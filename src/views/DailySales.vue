@@ -40,7 +40,7 @@
    :rowData="rowData"
    :columnDefs="colDefs"
    style="width: auto; height:700px"
-   class="themeClass ag-theme-quartz header-center"
+   class="themeClass ag-theme-quartz"
    enableCharts="true"
    :selection="selection"
    :gridOptions="gridOptions"
@@ -214,7 +214,7 @@ const searchButton = () => {
   
   const updateColumn = (result) => {
     const columns = [
-        {field : 'strStore' , headerName : '매장명' , hide: cellUnitedtf.value, maxWidth: 150  ,valueGetter: (params) => {
+        {field : 'strStore' , headerName : '매장명' ,headerClass : 'header-center' ,hide: cellUnitedtf.value, maxWidth: 150  ,valueGetter: (params) => {
           if(params.node.footer){
             const rowData = params.api.getDisplayedRowAtIndex(0).data;
             return rowData ? rowData.strStore : '총합계';
@@ -443,8 +443,9 @@ const handleDateRangeUpdate = (newDateRange) => {
     background-color: #B29BC7; /* 원하는 배경색 */
     color: white; /* 원하는 글자색 */
 }
-
-.header-center {
-    text-align: center !important;      /* 텍스트 가운데 정렬 */
+/*  오버라이드를 통해서 가운데 헤더 정렬 */
+.ag-header-cell-label {
+  justify-content: center;
+  margin-right: 2px;
 }
 </style>
