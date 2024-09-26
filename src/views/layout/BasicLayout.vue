@@ -40,11 +40,11 @@
       <!-- Main Content -->
       <main class="flex-1 p-1 bg-white overflow-auto">
         <div class="flex space-x-2">
-        <div v-if="showMenu" v-for="tab in tabs" :key="tab.uniqueId" @click="setActiveTab(tab)" class="w-2/12 bg-white text-gray-500 border border-slate-950 rounded-md px-4 py-2 cursor-pointer hover:bg-blue-50 transition">
+        <div v-if="showMenu" v-for="tab in tabs" :key="tab.lngProgramID" @click="setActiveTab(tab)" class="w-2/12 bg-white text-gray-500 border border-slate-950 rounded-md px-4 py-2 cursor-pointer hover:bg-blue-50 transition">
           {{tab.strTitle}}<button @click="removeTab(tab)"><img src="../../assets/deleteIcon.png" alt="x" class="w-4 h-auto"></button>  </div>
         </div>
         <router-view v-slot="{ Component }">
-      <keep-alive :exclude="excludedComponents">
+      <keep-alive :include="includedComponents">
       <component :is="Component" :key="`${route.path}-${activeTabId}`"/>
      </keep-alive>
       </router-view>
@@ -65,6 +65,7 @@ const route = useRoute();
 const store = useStore() ;
 const userData = store.state.userData;
 const showMenu = ref(route.path != '/'); // Initialize based on current route
+
 
 // Watch for route changes
 watch(() => route.path, (newPath) => {
@@ -126,18 +127,22 @@ const hideMenu = () => {
 const excludedComponents = ref([]);
 
 const tabs = computed(() => store.state.currentTabs);
+const includedComponents = computed(() => {
+  const currentTabs = store.state.currentTabs; // Vuex 상태 참조
+  return currentTabs.map( tab => tab.lngProgramID);
+});
+
 const removeTab = (tab) => {
   
-  store.dispatch("closeTab",tab.uniqueId);
- 
+  store.dispatch("closeTab", tab.lngProgramID);
+  
   const currentTabs = store.state.currentTabs;
-  excludedComponents.value.push(tab.uniqueId);
   
   if(currentTabs.length > 0){
     store.dispatch('changeActiveTab', currentTabs[currentTabs.length-1]);
-    console.log(currentTabs[currentTabs.length-1].url);
+    console.log(currentTabs[currentTabs.length-1].strUrl);
     
-    router.push(currentTabs[currentTabs.length-1].url);
+    router.push(currentTabs[currentTabs.length-1].strUrl);
   } else {
     router.push("/");
   }
@@ -147,13 +152,15 @@ const reload = () => {
 
 }
 
-const setActiveTab = (tab) => {
-  store.dispatch('changeActiveTab', tab)
-  router.push(tab.url)
-}
+//ref 는 기존의 변수까지 전부 병렬적으로 바꾸는거 같고 computed는 직렬적으로 바꾸는 것 같음
 const activeTabId = computed(() => {
-  return store.state?.activeTab ? store.state.activeTab : 'defaultTab'; // 기본값 설정
+  return store.state.activeTab || 'defaultTab'; // 기본값 설정
 });
+const setActiveTab = (tab) => {
+  store.dispatch('changeActiveTab', tab);
+  router.push(tab.strUrl);
+}
+
 
 
 </script>

@@ -20,7 +20,7 @@
     <h2 class="flex justify-start w-3/12">
     &nbsp;  &nbsp; &nbsp;<div class="items-center flex">일자</div> &nbsp;  &nbsp;
     <DateRangePicker @update:dateRange="handleDateRangeUpdate" class="w-9/12" />
-    </h2>
+    </h2> 
     
     <!-- <div><input type="checkbox" id="reportType" value="2" v-model="reportType"><label for="reportType"></label></div> -->
      <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd"></pickStore>

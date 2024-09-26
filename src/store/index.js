@@ -1,4 +1,5 @@
 // src/store/index.js
+import { v4 } from 'uuid';
 import { createStore } from 'vuex';
 import VuexPersistence from 'vuex-persist';
 
@@ -35,9 +36,9 @@ export default createStore({
 
       let newlngProgramID = tab.lngProgramID;
       let newstrTitle = tab.strTitle;
-      if(existingTabs.length > 0) {
+      if(existingTabs.length > 0 ) {
         const count = existingTabs.length + 1;
-        newlngProgramID = `${tab.lngProgramID}_${count}`;
+        newlngProgramID = `${tab.lngProgramID}_${v4()}`;
         newstrTitle = `${tab.strTitle}_${count}`;
       }
     
@@ -50,11 +51,11 @@ export default createStore({
     },
     setActiveTab(state, tab) {
       
-        state.activeTab = tab.uniqueId; // 현재 활성화된 탭으로 변경
+        state.activeTab = tab.lngProgramID; // 현재 활성화된 탭으로 변경
       
     },
-    removeTab(state, tabId) {
-      state.currentTabs = state.currentTabs.filter(tab => tab.uniqueId !== tabId); // 해당 탭 제거
+    removeTab(state, data) {
+      state.currentTabs = state.currentTabs.filter(tab => tab.lngProgramID !== data); // 해당 탭 제거
       
     },
     setMainCategory(state,data){

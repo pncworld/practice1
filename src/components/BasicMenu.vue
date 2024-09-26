@@ -67,9 +67,10 @@ const showAll = () =>{
 const isOpen = (id) => openCategoryId.value.includes(id);
 
 const selectCategory = (strUrl , lngProgramID , strTitle) => {
-  router.push(strUrl);
+  
   const newTab = { strUrl , lngProgramID, strTitle}
-  store.dispatch("addNewTab" , newTab); // activeTab 포함
+  store.dispatch("addNewTab" , newTab); 
+  router.push(strUrl);
 }
 var cMenu = ref("매출관리");
 const selectedCategoryId = computed(() => store.state.selectedCategoryId) ;
