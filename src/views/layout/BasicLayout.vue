@@ -23,7 +23,7 @@
         <button>계정</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       -->
         <div class="absolute right-10 space-x-4">
-        <button class=" text-sm" @click="reLoad">새로고침</button>
+        <!-- <button class=" text-sm" @click="reLoad">새로고침</button> -->
         <button class=" text-sm" @click="hideMenu">확대</button>
         <button class=" text-sm" @click="logout">로그아웃</button> 
         </div>
@@ -41,11 +41,11 @@
       <main class="flex-1 p-1 bg-white overflow-auto">
         <div class="flex space-x-2">
         <div v-if="showMenu" v-for="tab in tabs" :key="tab.uniqueId" @click="setActiveTab(tab)" class="w-2/12 bg-white text-gray-500 border border-slate-950 rounded-md px-4 py-2 cursor-pointer hover:bg-blue-50 transition">
-          {{tab.name}}<button @click="removeTab(tab)"><img src="../../assets/deleteIcon.png" alt="x" class="w-4 h-auto"></button>  </div>
+          {{tab.strTitle}}<button @click="removeTab(tab)"><img src="../../assets/deleteIcon.png" alt="x" class="w-4 h-auto"></button>  </div>
         </div>
         <router-view v-slot="{ Component }">
       <keep-alive :exclude="excludedComponents">
-    <component :is="Component" :key="`${route.path}-${activeTabId}`"/>
+      <component :is="Component" :key="`${route.path}-${activeTabId}`"/>
      </keep-alive>
       </router-view>
       </main>
@@ -86,8 +86,7 @@ const selectCategory = (category) => {
 }
 
 const logout = () => {
-  store.dispatch('updateUserData', []);
-  store.dispatch('closeAllTabs');
+  
   store.replaceState({
        userData: [], // 사용자 데이터를 저장할 상태
       selectedCategoryId : null ,
@@ -95,7 +94,10 @@ const logout = () => {
       activeTab : '',
       mainCategory : [],
       subCategory : [],
-      minorCategory : []
+      minorCategory : [],
+      storeGroup : [],
+      storeType : [],
+      storeCd : [],
   })
   localStorage.clear();
   sessionStorage.clear();
@@ -147,7 +149,6 @@ const reload = () => {
 
 const setActiveTab = (tab) => {
   store.dispatch('changeActiveTab', tab)
-  
   router.push(tab.url)
 }
 const activeTabId = computed(() => {

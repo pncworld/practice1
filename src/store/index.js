@@ -15,6 +15,9 @@ export default createStore({
       mainCategory : [],
       subCategory : [],
       minorCategory : [],
+      storeGroup : [],
+      storeType : [],
+      storeCd : [],
     };
   },
   mutations: {
@@ -28,7 +31,7 @@ export default createStore({
       state.selectedCategoryId = null; // 원하는 초기값으로 설정
     },
     addTab(state, tab) {
-      const existingTabs = state.currentTabs.filter(existingTab => existingTab.lngProgramID.startsWith(tab.lngProgramID))
+      const existingTabs = state.currentTabs.filter(existingTab => existingTab.lngProgramID.toString().startsWith(tab.lngProgramID.toString()))
 
       let newlngProgramID = tab.lngProgramID;
       let newstrTitle = tab.strTitle;
@@ -63,6 +66,18 @@ export default createStore({
     setMinorCategory(state,data){
       state.minorCategory = data;
     }
+    ,
+    setStoreGroup(state,data){
+      state.storeGroup = data;
+    }
+    ,
+    setStoreType(state,data){
+      state.storeType = data;
+    }
+    ,
+    setStoreCd(state,data){
+      state.storeCd = data;
+    }
 
   },
   actions: {
@@ -92,6 +107,15 @@ export default createStore({
     },
     minorCategory({commit},data){
       commit('setMinorCategory',data);
+    },
+    StoreGroup({commit},data){
+      commit('setStoreGroup',data);
+    },
+    StoreType({commit},data){
+      commit('setStoreType',data);
+    },
+    StoreCd({commit},data){
+      commit('setStoreCd',data);
     }
   },
   getters: {

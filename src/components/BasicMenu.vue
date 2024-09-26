@@ -70,7 +70,6 @@ const selectCategory = (strUrl , lngProgramID , strTitle) => {
   router.push(strUrl);
   const newTab = { strUrl , lngProgramID, strTitle}
   store.dispatch("addNewTab" , newTab); // activeTab 포함
-  
 }
 var cMenu = ref("매출관리");
 const selectedCategoryId = computed(() => store.state.selectedCategoryId) ;

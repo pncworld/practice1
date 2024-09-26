@@ -43,7 +43,7 @@ const router = useRouter(); // Vue Router 가져오기
 const username = ref(''); // 사용자 ID
 const password = ref(''); // 사용자 비밀번호
 const message = ref('');  // 상태 메시지
-
+const userData = store.state.userData;
 
 const login = async () => {
   store.state.selectedCategoryId = null ;
@@ -81,7 +81,18 @@ const login = async () => {
      
      } 
       await readPrograms();
-      console.log(store.state.subCategory);
+      const readsales = async() => {
+      const response = await axios.post("http://211.238.145.43:3000/usp_APP_COMSTORE_GET_LIST",{
+        P_STORE_CD : store.state.userData.lngStoreGroup ,
+      });
+
+       const result = response.data.recordsets ;
+       store.dispatch("StoreGroup",result[0]);
+       store.dispatch("StoreType",result[1]);
+       store.dispatch("StoreCd",result[2]);
+      
+     } 
+      await readsales();
       router.push('/MISALES::SLS06_004RPT.xml');
       
     } else {

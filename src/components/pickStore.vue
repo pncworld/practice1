@@ -27,6 +27,7 @@
 <script setup>
 import axios from 'axios';
 import { onMounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 const storeGroup = ref([]);
 const storeType = ref([]);
@@ -49,21 +50,12 @@ const emitStoreType = (value) => {
 const emitStoreCode = (value) => {
     emit('update:storeCd', value);
 };
-    const readsales = async() => {
-     const response = await axios.post("http://211.238.145.43:3000/usp_APP_COMSTORE_GET_LIST",{
-        P_STORE_CD : userData.lngStoreGroup ,
-     });
-
-     const result = response.data.recordsets ;
-     
-     storeGroup.value = result[0];
-     storeType.value = result[1];
-     storeCd.value = result[2];
-     storeCd2.value = result[2];
-     
-     
-  } 
-  const deActivate = () => {
+   
+  storeGroup.value = store.state.storeGroup;
+  storeType.value = store.state.storeType;
+  storeCd.value = store.state.storeCd;
+  storeCd2.value = store.state.storeCd;
+   const deActivate = () => {
      let storeIndex = storeGroup.value.filter(item => {
         return item.lngStoreGroup == userData.lngStoreGroup
      })
@@ -77,19 +69,19 @@ const emitStoreCode = (value) => {
         return item.lngStoreAttr == value ;
     })
   }
-  watch(
-    () => store.state.userData, // userData를 감시하는 함수
-  (newUserData) => {
-    if (newUserData && newUserData.lngStoreGroup) { // lngPosition이 존재하는지 확인
-      readsales();
-      
+
+  const route = useRoute();
+  
+  watch(() => route.path, (newPath) =>{
         if (storeGroup.value.length > 0) {
         emit('update:storeGroup', storeGroup.value[0].lngStoreGroup);
         console.log(storeGroup.value[0].lngStoreGroup);
         }
       
-    }
+    
   }
+ 
+  
 )
 </script>
 
