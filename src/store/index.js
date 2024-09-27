@@ -19,6 +19,7 @@ export default createStore({
       storeGroup : [],
       storeType : [],
       storeCd : [],
+      loading : false
     };
   },
   mutations: {
@@ -85,6 +86,9 @@ export default createStore({
          tab.lngProgramID  = data + new Date().getTime();
       }
       
+    } ,
+    setLoading(state ,data) {
+       state.loading = data ;
     }
 
   },
@@ -127,6 +131,9 @@ export default createStore({
     },
     refreshTab({commit},data) {
       commit('refreshTAB' , data) ;
+    },
+    convertLoading({commit} ,data) {
+      commit('setLoading',data);
     }
   },
   getters: {

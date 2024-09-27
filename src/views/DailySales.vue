@@ -28,7 +28,7 @@
 <br>
 <div class="flex justify-start items-center ml-5 space-x-3"><div class="flex items-center">조회조건 &nbsp;&nbsp;&nbsp;</div>
 <input type="checkbox" id="detail" @click="detailView"><label for="detail">상세보기</label></input>
-<input type="checkbox" @click="rowGroupEnable" id="cellUnite"><label for="cellUnite">셀병합</label></input>
+<input type="checkbox" @click="rowGroupEnable($event)" id="cellUnite"><label for="cellUnite">셀병합</label></input>
 </div>
 &nbsp;
 <!-- <div for="condition" class="flex justify-start">
@@ -168,7 +168,12 @@ const gridOptions = {
  }]
  const gridApi = ref(null);
  const rowGroupEnabled = ref(false);
-  const rowGroupEnable = () => {
+  const rowGroupEnable = (event) => {
+    if( !afterSearch.value) {
+        alert('조회를 먼저해주세요.');
+        event.preventDefault();
+        return ;
+    }
     rowGroupEnabled.value = !rowGroupEnabled.value;
     colDefs.value[0].rowGroup = rowGroupEnabled.value;
     cellUnitedtf.value = !cellUnitedtf.value;
@@ -187,7 +192,7 @@ const gridOptions = {
   }
 const searchButton = () => {
   const readsales = async() => {
-  
+    store.dispatch("convertLoading",true);
     if(storeCd.value == undefined) {
       alert("매장을 선택하세요.");
       return ;
@@ -205,6 +210,7 @@ const searchButton = () => {
      const result = response.data.recordsets ;
      updateColumn(result);
      afterSearch.value = true;
+     store.dispatch("convertLoading",false);
   } 
   readsales();
   const numberFormat = new Intl.NumberFormat('en-US', {

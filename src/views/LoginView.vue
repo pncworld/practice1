@@ -1,6 +1,6 @@
 <template>
-      
       <div class="flex items-center justify-center h-screen bg-blue-200">
+        <loading></loading>
         <img src="../assets/cashier.png" class="mr-40 w-60 h-auto animate-rise" alt="" >
         <img src="../assets/swipe.png" class="mr-40 w-60 h-auto animate-fall" alt="" >
       <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
@@ -35,6 +35,8 @@ import axios from 'axios';
 import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import loading from '@/components/loading.vue';
+
 
 
 const store = useStore(); // Vuex 스토어 가져오기
@@ -46,6 +48,7 @@ const message = ref('');  // 상태 메시지
 const userData = store.state.userData;
 
 const login = async () => {
+  store.dispatch('convertLoading',true);
   store.state.selectedCategoryId = null ;
   try {
     const response = await axios.post('http://211.238.145.43:3000/USP_AppLoginForTest', {
@@ -70,7 +73,7 @@ const login = async () => {
 
      const result = response.data.recordsets[0] ;
 
-     const mainCategoryData = result.filter(item => Number(item.strMenuLevel) == 1); // 숫자
+      const mainCategoryData = result.filter(item => Number(item.strMenuLevel) == 1); // 숫자
       const subCategoryData = result.filter(item => Number(item.strMenuLevel) == 2);
       const minorCategoryData = result.filter(item => Number(item.strMenuLevel) == 3);
 
@@ -93,7 +96,7 @@ const login = async () => {
       
      } 
       await readsales();
-     
+      store.dispatch('convertLoading',false);
       router.push('/MISALES::SLS06_004RPT.xml');
       
     } else {

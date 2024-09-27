@@ -1,5 +1,6 @@
 <template>
   <div class="flex flex-col h-screen overflow-hidden bg-gray-100">
+    <Loading></Loading>
     <!-- Header -->
     <header v-if="showMenu" class="bg-blue-900 text-white p-4 w-full h-2/7">
       <div class="text-xll font-bold flex space-x-5 ml-40 justify-center">
@@ -55,6 +56,7 @@
   
 <script setup>
 import BasicMenu from '@/components/BasicMenu.vue';
+import Loading from '@/components/loading.vue';
 import router from '@/router';
 import axios from 'axios';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
