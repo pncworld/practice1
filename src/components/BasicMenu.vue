@@ -81,7 +81,7 @@ watch(selectedCategoryId , (newCategory) => {
     
     const subCategory = store.state.subCategory;
     const minorCategory = store.state.minorCategory;
-    let category = [];
+    let category = [];  
    
     category = subCategory.filter(item => item.lngCode == newCategory);
     category.forEach(element => {
