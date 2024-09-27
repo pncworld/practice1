@@ -41,11 +41,11 @@
       <main class="flex-1 p-1 bg-white overflow-auto">
         <div class="flex space-x-2">
         <div v-if="showMenu" v-for="tab in tabs" :key="tab.lngProgramID" @click="setActiveTab(tab)" class="w-2/12 bg-white text-gray-500 border border-slate-950 rounded-md px-4 py-2 cursor-pointer hover:bg-blue-50 transition">
-          {{tab.strTitle}}<button @click="removeTab(tab)"><img src="../../assets/deleteIcon.png" alt="x" class="w-4 h-auto"></button>  </div>
+          {{tab.strTitle}}<button @click.stop="removeTab(tab)"><img src="../../assets/deleteIcon.png" alt="x" class="w-4 h-auto"></button>  </div>
         </div>
         <router-view v-slot="{ Component }">
-      <keep-alive :include="includedComponents">
-      <component :is="Component" :key="`${route.path}-${activeTabId}`"/>
+      <keep-alive>
+      <component :is="Component" :key="`${route.path}/${lngProgramID}`"/>
      </keep-alive>
       </router-view>
       </main>
@@ -132,19 +132,17 @@ const includedComponents = computed(() => {
   return currentTabs.map( tab => tab.lngProgramID);
 });
 
+
 const removeTab = (tab) => {
   
   store.dispatch("closeTab", tab.lngProgramID);
-  
-  const currentTabs = store.state.currentTabs;
-  
-  if(currentTabs.length > 0){
-    store.dispatch('changeActiveTab', currentTabs[currentTabs.length-1]);
-    console.log(currentTabs[currentTabs.length-1].strUrl);
-    
-    router.push(currentTabs[currentTabs.length-1].strUrl);
+  const currentTab = store.state.currentTabs ;
+  if(currentTab.length > 0){
+    // @click.stop 안해서 상위 이벤트 전파때문에 안됬었음.
+    store.dispatch('changeActiveTab', currentTab[currentTab.length-1]);
+    router.push(currentTab[currentTab.length-1].strUrl);
   } else {
-    router.push("/");
+    router.push("/dashboard");
   }
    
 }
@@ -153,8 +151,8 @@ const reload = () => {
 }
 
 //ref 는 기존의 변수까지 전부 병렬적으로 바꾸는거 같고 computed는 직렬적으로 바꾸는 것 같음
-const activeTabId = computed(() => {
-  return store.state.activeTab || 'defaultTab'; // 기본값 설정
+const lngProgramID = computed(() => {
+  return store.state.activeTab ; // 기본값 설정
 });
 const setActiveTab = (tab) => {
   store.dispatch('changeActiveTab', tab);

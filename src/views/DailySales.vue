@@ -446,6 +446,6 @@ const handleDateRangeUpdate = (newDateRange) => {
 /*  오버라이드를 통해서 가운데 헤더 정렬 */
 .ag-header-cell-label {
   justify-content: center;
-  margin-right: 2px;
+  margin-right : -20px;
 }
 </style>
