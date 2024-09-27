@@ -90,7 +90,7 @@ watch(selectedCategoryId , (newCategory) => {
     });
    
     categories.value = category ;
-    console.log(categories.value)
+    console.log(categories.value);
 })
 </script>
 

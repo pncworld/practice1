@@ -93,6 +93,7 @@ const login = async () => {
       
      } 
       await readsales();
+     
       router.push('/MISALES::SLS06_004RPT.xml');
       
     } else {
