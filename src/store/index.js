@@ -78,6 +78,13 @@ export default createStore({
     ,
     setStoreCd(state,data){
       state.storeCd = data;
+    },
+    refreshTAB(state, data) {
+      const tab = state.currentTabs.find(tab => tab.lngProgramID === data);
+      if (tab) {
+         tab.lngProgramID  = data + new Date().getTime();
+      }
+      
     }
 
   },
@@ -117,6 +124,9 @@ export default createStore({
     },
     StoreCd({commit},data){
       commit('setStoreCd',data);
+    },
+    refreshTab({commit},data) {
+      commit('refreshTAB' , data) ;
     }
   },
   getters: {

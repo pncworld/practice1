@@ -23,7 +23,7 @@
         <button>계정</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       -->
         <div class="absolute right-10 space-x-4">
-        <!-- <button class=" text-sm" @click="reLoad">새로고침</button> -->
+        <button class=" text-sm" @click="reLoad">새로고침</button> 
         <button class=" text-sm" @click="hideMenu">확대</button>
         <button class=" text-sm" @click="logout">로그아웃</button> 
         </div>
@@ -45,7 +45,7 @@
         </div>
         <router-view v-slot="{ Component }">
       <keep-alive>
-      <component :is="Component" :key="`${route.path}/${lngProgramID}`"/>
+      <component :is="Component" :key="componentKey"/>
      </keep-alive>
       </router-view>
       </main>
@@ -140,23 +140,29 @@ const removeTab = (tab) => {
   if(currentTab.length > 0){
     // @click.stop 안해서 상위 이벤트 전파때문에 안됬었음.
     store.dispatch('changeActiveTab', currentTab[currentTab.length-1]);
-    router.push(currentTab[currentTab.length-1].strUrl);
+    componentKey.value = currentTab[currentTab.length-1].lngProgramID;
+    
   } else {
+    componentKey.value = null ;
     router.push("/dashboard");
   }
    
-}
-const reload = () => {
-
 }
 
 //ref 는 기존의 변수까지 전부 병렬적으로 바꾸는거 같고 computed는 직렬적으로 바꾸는 것 같음
 const lngProgramID = computed(() => {
   return store.state.activeTab ; // 기본값 설정
 });
+const componentKey = ref(null);
+const reLoad = () => {
+  const activeTab = store.state.activeTab ;
+  store.dispatch('refreshTab' , activeTab );
+  componentKey.value = activeTab + new Date().getTime();
+}
 const setActiveTab = (tab) => {
   store.dispatch('changeActiveTab', tab);
-  router.push(tab.strUrl);
+  componentKey.value = tab.lngProgramID;
+ 
 }
 
 
