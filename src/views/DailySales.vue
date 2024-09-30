@@ -60,6 +60,7 @@ import axios from 'axios';
 import { AG_GRID_LOCALE_KR } from '@ag-grid-community/locale';
 import PickStore from '@/components/pickStore.vue';
 import { useTabInfo } from '@/common/api/useTabInfo';
+import Swal from 'sweetalert2';
 const store = useStore();
 const selection = ref({ mode : "cell"});
 const userData = store.state.userData; 
@@ -161,8 +162,25 @@ const gridOptions = {
       return params.value ;
     }
   },
+      field: '', // 그룹을 나타낼 필드
+      cellRendererParams: {
+      valueGetter: (params) => {
+      if (params.node.footer) {
+        return '총합계'; 
+      } else {
+        return ''; // 일반 그룹화된 셀에는 원래 값 표시
+      }
+     },
+     footerValueGetter: (params) => {
+          if (params.node.footer) {
+            return '총합계'; 
+          } else {
+            return ''; // 일반 그룹화된 셀에는 원래 값 표시
+          }
+        }
+      },
       suppressCount: false
-    },
+      },
   }
  // Column Definitions: Defines the columns to be displayed.
  const colDefs = ref([]);
@@ -202,7 +220,13 @@ const searchButton = () => {
   const readsales = async() => {
     
     if(storeCd.value == undefined) {
-      alert("매장을 선택하세요.");
+      Swal.fire({
+          icon: 'warning',
+            title: '매장을 선택하세요!',
+              text: '매장을 선택하지 않으면 진행할 수 없습니다.',
+                confirmButtonText: '확인',
+                  confirmButtonColor: '#3085d6',
+      });
       return ;
     }
      store.dispatch("convertLoading",true);
@@ -339,9 +363,18 @@ const searchButton = () => {
         },
         { headerName : '일자' , field: 'dtmDate' , cellClass:"dateType", width: 120 ,
          valueGetter: (params) => {
-          if (params.node.group.footer) {
-              return '소계'; // 그룹 소계에서만 '소계' 표시
+          const rowCount     = params.api.getDisplayedRowCount(); // 전체 행 개수
+          // const lastRowIndex = rowCount - 1; // 마지막 행의 인덱스
+          const soGyeIndex   = rowCount - 2;
+          
+          const checkbox = document.getElementById("cellUnite");
+          if(checkbox.checked){
+            if (params.node.rowIndex === soGyeIndex) {
+                if(params.node.footer){
+                  return '소계'; // 그룹 소계에서만 '소계' 표시
+                }
             }
+          } 
           const dateString = params.data?.dtmDate;
           if (!dateString) {
             return ''; // dtmDate가 없으면 빈 문자열 반환
