@@ -39,7 +39,7 @@
         <ag-grid-vue
    :rowData="rowData"
    :columnDefs="colDefs"
-   style="width: auto; height:700px"
+   style="width: auto; height:660px"
    class="themeClass ag-theme-quartz"
    enableCharts="true"
    :selection="selection"
@@ -59,6 +59,7 @@ import { useStore } from 'vuex';
 import axios from 'axios';
 import { AG_GRID_LOCALE_KR } from '@ag-grid-community/locale';
 import PickStore from '@/components/pickStore.vue';
+import { useTabInfo } from '@/common/api/useTabInfo';
 const store = useStore();
 const selection = ref({ mode : "cell"});
 const userData = store.state.userData; 
@@ -72,6 +73,10 @@ const storeCd = ref();
 const detailViewtf= ref(true);
 const afterSearch= ref(false);
 const cellUnitedtf= ref(false);
+const GridInfo_PROG_ID = "SLS06_004RPT_VUE_TEST";
+const GridInfo_GRID_ID = "1";
+const { tabInitSetArray } =  useTabInfo(GridInfo_PROG_ID,GridInfo_GRID_ID) ;
+
 const updateGroup = (value) => {
   groupCd.value = value;
   
@@ -139,20 +144,23 @@ const gridOptions = {
     suppressStickyTotalRow: 'group',
     suppressStickyLabel : true,
     groupDisplayType : 'singleColumn',
+    rowHeight: 20,
     grandTotalRow: 'bottom',
     groupUseEntireRow: false,
     autoGroupColumnDef: {
       headerName: '매장명', // 그룹화된 내용을 표시할 컬럼의 헤더,
-      field: 'store', // 그룹을 나타낼 필드
-      cellRendererParams: {
-      valueGetter: (params) => {
-      if (params.node.footer) {
-        return '총합계'; 
-      } else {
-        return ''; // 일반 그룹화된 셀에는 원래 값 표시
-      }
-     }
-      },
+      field: '', // 그룹을 나타낼 필드
+      cellRenderer: (params) => {
+      if (params.node.footer && params.node.level==0) {
+      // footer일 경우
+       return '소계'; 
+      } else if (params.node.group.footer) {
+      // 일반 그룹화된 셀에는 원래 값 표시
+      return "총합계";
+    } else {
+      return params.value ;
+    }
+  },
       suppressCount: false
     },
   }
@@ -192,12 +200,12 @@ const gridOptions = {
   }
 const searchButton = () => {
   const readsales = async() => {
-    store.dispatch("convertLoading",true);
+    
     if(storeCd.value == undefined) {
       alert("매장을 선택하세요.");
       return ;
     }
-    
+     store.dispatch("convertLoading",true);
      const response = await axios.post("http://211.238.145.43:3000/usp_AppDailySaleReportTest",{
         P_GROUP_CD : groupCd.value,
         P_STORE_CD : storeCd.value ,
@@ -219,8 +227,87 @@ const searchButton = () => {
   });
   
   const updateColumn = (result) => {
+    //스타일 태그로 동적으로 headerclass 생성
+    const styleTag = document.createElement("style");
+    document.head.appendChild(styleTag);
+    let column2 = [] ;
+    for (let i = 0; i < tabInitSetArray.value.length; i++) {
+     
+      const headerclass = 'headerclass' ; 
+      const hcolor = tabInitSetArray.value[i].strHdColor ;
+      const hbkcolor = tabInitSetArray.value[i].strHdBkColor ;
+      styleTag.innerHTML += `.${headerclass} {
+          background-color : ${hbkcolor} !important;
+          color : ${hcolor} !important ;
+      }`
+      const column = {
+        field : tabInitSetArray.value[i].strColID ,
+        headerName : tabInitSetArray.value[i].strHdText ,
+        width : tabInitSetArray.value[i].intHdWidth ,
+        headerClass: headerclass ,
+        editable : tabInitSetArray.value[i].strEdit
+
+      }
+      
+      if ( tabInitSetArray.value[i].strDisplay == 'number' ) {
+        column.aggFunc = 'sum' 
+        column.cellRenderer =(params) => {
+   
+       if (params.node.group && !params.node.footer) {
+         return ''; 
+      }
+    
+    return params.value !== undefined ? numberFormat.format(params.value) : '';
+  }
+      }
+      if (tabInitSetArray.value[i].strDisplay == 'date') {
+        column.valueGetter = (params) => {
+          if ( params.node.footer &&  params.node.level == 0) {
+              return tabInitSetArray.value[i].strSubSumtext; // 그룹 소계에서만 '소계' 표시
+           } else {
+               params.node.footer &&  params.node.level == 0
+           }
+           const dateString = params.data?.dtmDate;
+          if (!dateString) {
+            return ''; // dtmDate가 없으면 빈 문자열 반환
+          }
+          // 날짜 문자열에서 시간 부분을 잘라내고 날짜만 반환
+           const date = new Date(dateString);
+            const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
+
+        return formattedDate; 
+        }
+      }
+
+      if ( tabInitSetArray.value[i].strColID =='strPhen') {
+        column.valueGetter = (params) => {
+
+        const weather = params.data?.strPhen;
+              let result = '';
+              if (weather =='Clear') {
+                result = '맑음'
+              } else if (weather =='Snow') {
+                  result = '눈'
+              }
+              return `${result}`; // 날짜와 요일 반환
+            }
+      }
+      if (tabInitSetArray.value[i].strColID == 'dblDistRate' ) {
+        column.cellRenderer =  (params) => {
+      // Check if it's a group row and not a footer
+      if (params.node.group && !params.node.footer) {
+      return ''; // Display nothing in the group row
+   v }
+    // For normal rows, display the actual data or an empty string if data is missing
+    return params.value !== undefined ? Math.round(params.value * 10) /10 : '';
+      }
+    }
+      
+      column2.push(column);
+      
+    }
     const columns = [
-        {field : 'strStore' , headerName : '매장명' ,headerClass : 'header-center' ,hide: cellUnitedtf.value, maxWidth: 150  ,valueGetter: (params) => {
+        {field : 'strStore' , headerName : '매장명' ,headerClass : 'header-center' ,hide: cellUnitedtf.value, width: 150  ,valueGetter: (params) => {
           if(params.node.footer){
             const rowData = params.api.getDisplayedRowAtIndex(0).data;
             return rowData ? rowData.strStore : '총합계';
@@ -250,9 +337,9 @@ const searchButton = () => {
                 return params.value;
             } 
         },
-        { headerName : '일자' , field: 'dtmDate' , cellClass:"dateType", maxWidth: 120 ,
-        valueGetter: (params) => {
-          if (params.node.footer) {
+        { headerName : '일자' , field: 'dtmDate' , cellClass:"dateType", width: 120 ,
+         valueGetter: (params) => {
+          if (params.node.group.footer) {
               return '소계'; // 그룹 소계에서만 '소계' 표시
             }
           const dateString = params.data?.dtmDate;
@@ -268,7 +355,7 @@ const searchButton = () => {
         { 
         headerName: '요일', 
         field: 'strWeekName', 
-        cellClass: "String", maxWidth: 100 },
+        cellClass: "String", width: 100   },
         { headerName : '날씨' , field: 'strPhen' ,cellClass: "String"
           , maxWidth: 100 ,valueGetter: (params) => {
               const weather = params.data?.strPhen;
@@ -279,7 +366,7 @@ const searchButton = () => {
                   result = '눈'
               }
               return `${result}`; // 날짜와 요일 반환
-          } 
+          }  
         },
         // {field : 'lngRecCnt' , headerName : "조수", maxWidth: 100 ,aggFunc :'sum' },
         // {field : 'lngRecAmt' , headerName : "조단가", maxWidth: 100 ,aggFunc :'sum'},
@@ -290,7 +377,7 @@ const searchButton = () => {
         // {field : 'lngActAmt' , headerName : "실매출액", maxWidth: 120,aggFunc :'sum' },
         // {field : 'lngVAT' , headerName : "부가세", maxWidth: 120,aggFunc :'sum', hide : detailViewtf.value },
         // {field : 'lngSupplyAmt' , headerName : "순매출액", maxWidth: 120 ,aggFunc :'sum', hide : detailViewtf.value},
-        {field : 'lngRecCnt' , headerName : "조수", maxWidth: 100 ,aggFunc : 'sum'  ,
+        {field : 'lngRecCnt' , headerName : "조수", width: 100 ,aggFunc : 'sum'  ,
         cellRenderer: (params) => {
     // Check if it's a group row and not a footer
     if (params.node.group && !params.node.footer) {
@@ -300,7 +387,7 @@ const searchButton = () => {
     return params.value !== undefined ? numberFormat.format(params.value) : '';
   }
         },
-        {field : 'lngRecAmt' , headerName : "조단가", maxWidth: 100 ,aggFunc :'sum',
+        {field : 'lngRecAmt' , headerName : "조단가", width: 100 ,aggFunc :'sum',
         cellRenderer: (params) => {
     // Check if it's a group row and not a footer
     if (params.node.group && !params.node.footer) {
@@ -309,7 +396,7 @@ const searchButton = () => {
     // For normal rows, display the actual data or an empty string if data is missing
     return params.value !== undefined ? numberFormat.format(params.value) : '';
   }},
-        {field : 'lngCustCnt' , headerName : "객수", maxWidth: 100 ,aggFunc :'sum',
+        {field : 'lngCustCnt' , headerName : "객수", width: 100 ,aggFunc :'sum',
         cellRenderer: (params) => {
     // Check if it's a group row and not a footer
     if (params.node.group && !params.node.footer) {
@@ -319,7 +406,7 @@ const searchButton = () => {
     return params.value !== undefined ? numberFormat.format(params.value) : '';
   }
         },
-        {field : 'lngCustAmt' , headerName : "객단가", maxWidth: 100 ,aggFunc :'sum',
+        {field : 'lngCustAmt' , headerName : "객단가", width: 100 ,aggFunc :'sum',
         cellRenderer: (params) => {
     // Check if it's a group row and not a footer
     if (params.node.group && !params.node.footer) {
@@ -328,7 +415,7 @@ const searchButton = () => {
     // For normal rows, display the actual data or an empty string if data is missing
     return params.value !== undefined ? numberFormat.format(params.value) : '';
   }},
-        {field : 'lngSalAmt' , headerName : "총매출액", maxWidth: 120,aggFunc :'sum'  ,hide :detailViewtf.value ,
+        {field : 'lngSalAmt' , headerName : "총매출액", width: 120,aggFunc :'sum'  ,hide :detailViewtf.value ,
         cellRenderer: (params) => {
     // Check if it's a group row and not a footer
     if (params.node.group && !params.node.footer) {
@@ -337,7 +424,7 @@ const searchButton = () => {
     // For normal rows, display the actual data or an empty string if data is missing
     return params.value !== undefined ? numberFormat.format(params.value)  : '';
   }},
-        {field : 'lngDiscount' , headerName : "할인액", maxWidth: 120 ,aggFunc :'sum',hide :detailViewtf.value ,
+        {field : 'lngDiscount' , headerName : "할인액", width: 120  ,aggFunc :'sum',hide :detailViewtf.value ,
         cellRenderer: (params) => {
     // Check if it's a group row and not a footer
     if (params.node.group && !params.node.footer) {
@@ -346,7 +433,7 @@ const searchButton = () => {
     // For normal rows, display the actual data or an empty string if data is missing
     return params.value !== undefined ? numberFormat.format(params.value) : '';
   }},
-        {field : 'lngActAmt' , headerName : "실매출액", maxWidth: 120,aggFunc :'sum' ,
+        {field : 'lngActAmt' , headerName : "실매출액", width: 120,aggFunc :'sum' ,  editable: true,
         cellRenderer: (params) => {
     // Check if it's a group row and not a footer
     if (params.node.group && !params.node.footer) {
@@ -355,7 +442,7 @@ const searchButton = () => {
     // For normal rows, display the actual data or an empty string if data is missing
     return params.value !== undefined ? numberFormat.format(params.value) : '';
   }},
-        {field : 'lngVAT' , headerName : "부가세", maxWidth: 120,aggFunc :'sum' ,hide :detailViewtf.value ,
+        {field : 'lngVAT' , headerName : "부가세", width: 120,aggFunc :'sum' ,hide :detailViewtf.value ,
         cellRenderer: (params) => {
     // Check if it's a group row and not a footer
     if (params.node.group && !params.node.footer) {
@@ -364,7 +451,7 @@ const searchButton = () => {
     // For normal rows, display the actual data or an empty string if data is missing
     return params.value !== undefined ? numberFormat.format(params.value) : '';
   }},
-        {field : 'lngSupplyAmt' , headerName : "순매출액", maxWidth: 120 ,aggFunc :'sum',hide :detailViewtf.value ,
+        {field : 'lngSupplyAmt' , headerName : "순매출액", width: 120 ,aggFunc :'sum',hide :detailViewtf.value ,
         cellRenderer: (params) => {
     // Check if it's a group row and not a footer
     if (params.node.group && !params.node.footer) {
@@ -373,7 +460,7 @@ const searchButton = () => {
     // For normal rows, display the actual data or an empty string if data is missing
     return params.value !== undefined ? numberFormat.format(params.value) : '';
   }},
-        {field : 'dblDistRate' , headerName : "비율", maxWidth: 120 ,aggFunc :'sum' ,
+        {field : 'dblDistRate' , headerName : "비율", width: 120 ,aggFunc :'sum' ,
         cellRenderer: (params) => {
     // Check if it's a group row and not a footer
     if (params.node.group && !params.node.footer) {
@@ -384,8 +471,10 @@ const searchButton = () => {
   }
         
         },
+       
     ];
     rowData.value = result[0].map(item => ({
+      strStoreGroupName : item.strStoreGroupName,
       dtmDate: item.dtmDate,
       strStore : item.strStore,
       strWeekName : item.strWeekName,
@@ -401,7 +490,7 @@ const searchButton = () => {
       lngSupplyAmt: item.lngSupplyAmt,
       dblDistRate: item.dblDistRate
     }));
-    colDefs.value = columns;
+    colDefs.value = column2;
 
   }
 }
@@ -424,10 +513,10 @@ const handleDateRangeUpdate = (newDateRange) => {
 .themeClass {
     --ag-foreground-color: rgb(0, 0, 0) !important;
     --ag-background-color: rgb(255, 255, 255);
-    --ag-header-foreground-color: white !important;
-    --ag-header-background-color: rgb(68, 68, 107) !important;
+    /* --ag-header-foreground-color: white !important;
+    --ag-header-background-color: rgb(68, 68, 107) !important; */
     --ag-odd-row-background-color: rgb(0, 0, 0, 0.03);
-    --ag-header-column-resize-handle-color: rgb(255, 255, 255) !important;
+    /* --ag-header-column-resize-handle-color: rgb(255, 255, 255) !important; */
     
     --ag-font-size: 12px !important;
     --ag-font-family: monospace;
@@ -435,7 +524,7 @@ const handleDateRangeUpdate = (newDateRange) => {
     --ag-row-border-width: 1px !important;
     --ag-row-border-color: rgb(228, 228, 228) !important;
     --ag-cell-horizontal-border: solid rgb(228, 228, 228) !important;
-    --ag-row-height : 20px !important ;
+    /* --ag-row-height : 20px !important ; */
     --ag-cell-horizontal-padding : 5px !important;
 }
 
