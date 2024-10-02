@@ -54,7 +54,7 @@
 <script setup>
 import { format } from 'date-fns';
 import DateRangePicker from '../components/DateRangePicker.vue';
-import { computed, onMounted, ref } from 'vue';
+import { computed, watch, ref } from 'vue';
 import { useStore } from 'vuex';
 import axios from 'axios';
 import { AG_GRID_LOCALE_KR } from '@ag-grid-community/locale';
@@ -77,6 +77,8 @@ const cellUnitedtf= ref(false);
 const GridInfo_PROG_ID = "SLS06_004RPT_VUE_TEST";
 const GridInfo_GRID_ID = "1";
 const { tabInitSetArray } =  useTabInfo(GridInfo_PROG_ID,GridInfo_GRID_ID) ;
+const rowGroupEnabled = ref(false);
+
 
 const updateGroup = (value) => {
   groupCd.value = value;
@@ -144,20 +146,21 @@ const gridOptions = {
     suppressGroupRowsSticky: 'group',
     suppressStickyTotalRow: 'group',
     suppressStickyLabel : true,
-    groupDisplayType : 'singleColumn',
     rowHeight: 20,
     grandTotalRow: 'bottom',
     groupUseEntireRow: false,
+    groupDisplayType : 'groupRows',
     autoGroupColumnDef: {
       headerName: '매장명', // 그룹화된 내용을 표시할 컬럼의 헤더,
       field: '', // 그룹을 나타낼 필드
       cellRenderer: (params) => {
-      if (params.node.footer && params.node.level==0) {
-      // footer일 경우
-       return '소계'; 
-      } else if (params.node.group.footer) {
+      // if (params.node.footer && params.node.level == 0) {
+      // // footer일 경우
+      //  return '소계'; 
+      // } else
+       if (params.node.footer && params.node.level != 0) {
       // 일반 그룹화된 셀에는 원래 값 표시
-      return "총합계";
+      return "";
     } else {
       return params.value ;
     }
@@ -193,20 +196,31 @@ const gridOptions = {
         dataType: 'DateTime'
  }]
  const gridApi = ref(null);
- const rowGroupEnabled = ref(false);
+
   const rowGroupEnable = (event) => {
     if( !afterSearch.value) {
         alert('조회를 먼저해주세요.');
         event.preventDefault();
         return ;
     }
-    rowGroupEnabled.value = !rowGroupEnabled.value;
-    colDefs.value[0].rowGroup = rowGroupEnabled.value;
+    //rowGroupEnabled.value = !rowGroupEnabled.value;
+    colDefs.value[2].rowGroup = true;
     cellUnitedtf.value = !cellUnitedtf.value;
+    gridOptions.groupDisplayType = 'groupRows'
     colDefs.value.forEach(col => {
-    if (col.field == 'strStore') {
-    col.hide = cellUnitedtf.value ;
-    }})
+    if (col.field === 'strStore') {
+    col.cellRenderer = (params) => {
+      // cellUnitedtf가 true일 때는 빈 문자열을 반환
+      if (cellUnitedtf.value) {
+        return ''; // 빈 문자열을 반환하여 셀을 비웁니다.
+      } else {
+        return params.value; // cellUnitedtf가 false일 경우 원래 값을 반환
+      }
+    };
+  }
+});
+
+
     gridApi?.value.refreshCells({force: true});
     gridApi?.value.refreshCells();
   }
@@ -282,14 +296,23 @@ const searchButton = () => {
       }
     
     return params.value !== undefined ? numberFormat.format(params.value) : '';
-  }
+   }
+      }
+
+      if ( tabInitSetArray.value[i].strColID =='strStore') {
+         column.rowGroup = true ;
+      }
+      if( tabInitSetArray.value[i].strColID =='lngSalAmt' || tabInitSetArray.value[i].strColID =='lngDiscount' || tabInitSetArray.value[i].strColID =='lngVAT' ||
+         tabInitSetArray.value[i].strColID == 'lngSupplyAmt') {
+          column.hide = true ;
       }
       if (tabInitSetArray.value[i].strDisplay == 'date') {
+       
         column.valueGetter = (params) => {
-          if ( params.node.footer &&  params.node.level == 0) {
+          if ( params.node.footer && params.node.level == 0) {
               return tabInitSetArray.value[i].strSubSumtext; // 그룹 소계에서만 '소계' 표시
-           } else {
-               params.node.footer &&  params.node.level == 0
+           } else if (params.node.footer && params.node.level != 0) {
+              return '총합계'
            }
            const dateString = params.data?.dtmDate;
           if (!dateString) {
@@ -302,6 +325,8 @@ const searchButton = () => {
         return formattedDate; 
         }
       }
+
+      
 
       if ( tabInitSetArray.value[i].strColID =='strPhen') {
         column.valueGetter = (params) => {
