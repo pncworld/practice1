@@ -1,546 +1,355 @@
 <template>
-    <div>
-      <div class="flex justify-between items-center w-full">
-    <h1 class="flex-grow text-center ml-24 text-2xl">일자별 매출 현황</h1>
-    <div class="flex">
+  <div>
+    <div class="flex justify-between items-center w-full">
+      <h1 class="flex-grow text-center ml-24 text-2xl">일자별 매출 현황</h1>
+      <div class="flex">
         <button class="flex justify-center" @click="searchButton">
-            <!-- <img src="../assets/search.png" alt="" class="h-auto" style="width: 30px">조회 -->
-            조회 
+          <!-- <img src="../assets/search.png" alt="" class="h-auto" style="width: 30px">조회 -->
+          조회
         </button>
         &nbsp; &nbsp; &nbsp;
         <button class="flex justify-center" @click="exportExcel">
-            <!-- <img src="../assets/excel.png" alt="" class="h-auto" style="width: 30px">엑셀 내보내기 -->
-            엑셀
+          <!-- <img src="../assets/excel.png" alt="" class="h-auto" style="width: 30px">엑셀 내보내기 -->
+          엑셀
         </button>
         &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+      </div>
     </div>
-   </div>
-   <br/>
-        <div class="flex justify-between items-center">
-    <h2 class="flex justify-start w-3/12">
-    &nbsp;  &nbsp; &nbsp;<div class="items-center flex">일자</div> &nbsp;  &nbsp;
-    <DateRangePicker @update:dateRange="handleDateRangeUpdate" class="w-9/12" />
-    </h2> 
-    
-    <!-- <div><input type="checkbox" id="reportType" value="2" v-model="reportType"><label for="reportType"></label></div> -->
-     <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd"></pickStore>
-</div>
-<br>
-<div class="flex justify-start items-center ml-5 space-x-3"><div class="flex items-center">조회조건 &nbsp;&nbsp;&nbsp;</div>
-<input type="checkbox" id="detail" @click="detailView"><label for="detail">상세보기</label></input>
-<input type="checkbox" @click="rowGroupEnable($event)" id="cellUnite"><label for="cellUnite">셀병합</label></input>
-</div>
-&nbsp;
-<!-- <div for="condition" class="flex justify-start">
+    <br />
+    <div class="flex justify-between items-center">
+      <h2 class="flex justify-start w-3/12">
+        &nbsp; &nbsp; &nbsp;<div class="items-center flex">일자</div> &nbsp; &nbsp;
+        <DateRangePicker @update:dateRange="handleDateRangeUpdate" class="w-9/12" />
+      </h2>
+
+      <!-- <div><input type="checkbox" id="reportType" value="2" v-model="reportType"><label for="reportType"></label></div> -->
+      <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd"></pickStore>
+    </div>
+    <br>
+    <div class="flex justify-start items-center ml-5 space-x-3">
+      <div class="flex items-center">조회조건 &nbsp;&nbsp;&nbsp;</div>
+      <input type="checkbox" id="detail" @click="detailView"><label for="detail">상세보기</label></input>
+      <input type="checkbox" @click="rowGroupEnable($event)" id="cellUnite"><label for="cellUnite">셀병합</label></input>
+    </div>
+    &nbsp;
+    <!-- <div for="condition" class="flex justify-start">
   조회 조건 &nbsp; <input type="checkbox" value="1" id="condition"><label for="condition" >상세보기</label></input>
   &nbsp;&nbsp;<input type="checkbox" value="2" id="condition2"><label for="condition2" >셀병합</label></input>
 </div> -->
-&nbsp;
-        <ag-grid-vue
-   :rowData="rowData"
-   :columnDefs="colDefs"
-   style="width: auto; height:660px"
-   class="themeClass ag-theme-quartz"
-   enableCharts="true"
-   :selection="selection"
-   :gridOptions="gridOptions"
-   @grid-ready = "onGridReady"
-   groupTotalRow="bottom"
- </ag-grid-vue>
+    &nbsp;
+    <ag-grid-vue :rowData="rowData" :columnDefs="colDefs" style="width: auto; height:660px"
+      class="themeClass ag-theme-quartz" enableCharts="true" :selection="selection" :gridOptions="gridOptions"
+      @grid-ready="onGridReady" groupTotalRow="bottom" </ag-grid-vue>
 
-    </div>
+  </div>
 </template>
 
 <script setup>
+// 가져온 날짜의 형식을 고치기 위해서 사용 ( 데이터가 yyyy-mm-dd T ~~~ 이런형태여서 T부터 자름)
 import { format } from 'date-fns';
+// 설치한 라이브러리로 만든 달력을 가져옴 ( 재사용 )
 import DateRangePicker from '../components/DateRangePicker.vue';
-import { computed, watch, ref } from 'vue';
+// 뷰에서 제공 하는 기능, computed 반응형 상태를 기반으로 다른 로직을 실행해 결과값을 생성 , ref 반응형 변수 선언
+import { computed, ref } from 'vue';
+// vuex에서 제공하는 중앙 상태관리 
 import { useStore } from 'vuex';
+// api 호출 함수
 import axios from 'axios';
+// 그리드 한글화에 필요한 라이브러리
 import { AG_GRID_LOCALE_KR } from '@ag-grid-community/locale';
+// 로그인한 사용자에 따라 법인명 매장명 등을 선택할 수 있게  만든 공통 컴포넌트 
 import PickStore from '@/components/pickStore.vue';
+// 각 탭 마다 필요한 그리드 설정 속성 불러오기
 import { useTabInfo } from '@/common/api/useTabInfo';
+// alert 창 자동 꾸미기 위한 라이브러리
 import Swal from 'sweetalert2';
+
 const store = useStore();
-const selection = ref({ mode : "cell"});
-const userData = store.state.userData; 
+// 그리드에 다중 선택 혹은 개별 선택 설정 변수
+const selection = ref({ mode: "cell" });
+// vuex에 저장된 로그인된 정보 호출
+const userData = store.state.userData;
+// 그리드안에 들어갈 행 데이터 배열 선언 
 const rowData = ref([]);
-const storeInfo = ref([]);
-const reportType = ref(false);
-const reportValue = computed(() => (reportType.value ? '2' : '1'));
+// 로그인한 사람의 groupCd를 초기화하려는 목적(조회용)
 const groupCd = ref(userData.lngStoreGroup);
+// 로그인한 사람의 typeCd를 초기화하려는 목적(조회용)
 const typeCd = ref();
+// 로그인한 사람의 storeCd를 초기화하려는 목적 (조회용)
 const storeCd = ref();
-const detailViewtf= ref(true);
-const afterSearch= ref(false);
-const cellUnitedtf= ref(false);
+// 상세보기 기능을 위한 변수
+const detailViewtf = ref(true);
+// 조회 후를 감지하기 위한 변수
+const afterSearch = ref(false);
+// 셀병합 기능을 위한 변수
+const cellUnitedtf = ref(false);
+// 그리드 설정 값을 불러오기 위한 하드코딩
 const GridInfo_PROG_ID = "SLS06_004RPT_VUE_TEST";
 const GridInfo_GRID_ID = "1";
-const { tabInitSetArray } =  useTabInfo(GridInfo_PROG_ID,GridInfo_GRID_ID) ;
-const rowGroupEnabled = ref(false);
+// API 호출 (설정값 호출)
+const { tabInitSetArray } = useTabInfo(GridInfo_PROG_ID, GridInfo_GRID_ID);
 
-
+// 조회 값 설정 함수 선언
 const updateGroup = (value) => {
   groupCd.value = value;
-  
+
 }
 const updateType = (value) => {
   typeCd.value = value;
-  
+
 }
 const updateCd = (value) => {
-  storeCd.value = value ;
-  
+  storeCd.value = value;
+
 }
+// 상세보기 눌렀을때 실행하는 함수
 const detailView = () => {
-  
-  detailViewtf.value = !detailViewtf.value ;
-  updateColumnVisibility();
- 
-}
-const updateColumnVisibility= () => {
+
+  detailViewtf.value = !detailViewtf.value;
   colDefs.value.forEach(col => {
     if (col.field == 'lngSalAmt' || col.field == 'lngDiscount' || col.field == 'lngVAT' || col.field == 'lngSupplyAmt') {
 
-    col.hide = detailViewtf.value ;
-  }
+      col.hide = detailViewtf.value;
+    }
   })
-}
-const gridOptions = {
-    localeText : AG_GRID_LOCALE_KR,
-    groupIncludeFooter : true ,
-    // groupIncludeTotalFooter : false ,
-    // 집계 함수명을 컬럼 헤더에 추가하지 않음
-    suppressAggFuncInHeader: true,
-    
-    getRowStyle : (params) => {
-  // 그룹 행인지 확인
-  if (params.node.group) {
-    // 그룹 행일 경우
-    if (params.node.footer) {
-      if (params.node.level === 0) {
-        return { background: 'rgb(173, 216, 230)', fontWeight: 'bold' }; // 그룹 행에 대한 스타일
-      } else {
-        return { background: 'rgb(70, 130, 180)', fontWeight: 'bold' }; // 그룹 행에 대한 스타일
-      }
-      
-    } else {
-      return { background: 'white', fontWeight: 'bold'  }; // 그룹 행에 대한 스타일
-    }
-    
-  } else {
-    // 일반 행일 경우
-    const rowIndex = params.node.rowIndex; // 현재 행 인덱스
-    const isChildOfGroup = params.node.parent && params.node.parent.group; // 현재 노드가 그룹의 자식인지 확인
 
-    if (isChildOfGroup) {
-      // 그룹의 자식 행일 경우
-      return rowIndex % 2 === 0 ? { background: '#FAF0E6' } : { background: 'white' }; // 그룹 자식 행의 스타일
+}
+
+// 그리드 설정을 위한 속성 설정
+const gridOptions = {
+  // 한글화
+  localeText: AG_GRID_LOCALE_KR,
+  // 소계 푸터 설정
+  groupIncludeFooter: true,
+  // 집계 함수명을 컬럼 헤더에 추가하지 않음
+  suppressAggFuncInHeader: true,
+  // 행의 스타일 설정
+  getRowStyle: (params) => {
+    // 그룹 행인지 확인
+    if (params.node.group) {
+      // 총계 혹은 소계 인지 확인
+      if (params.node.footer) {
+        if (params.node.level === 0) {
+          return { background: 'rgb(173, 216, 230)', fontWeight: 'bold' }; // 소계 행에 대한 스타일
+        } else {
+          return { background: 'rgb(70, 130, 180)', fontWeight: 'bold' }; // 총계 행에 대한 스타일
+        }
+
+      } else {
+        return { background: 'white', fontWeight: 'bold' }; // 그룹 행에 대한 스타일
+      }
+
     } else {
-      // 일반 행에 대한 스타일
-      return rowIndex % 2 === 0 ? { background: '#FAF0E6' } : {};
-    }
-  }
-    },
-    groupDefaultExpanded: 1,
-    suppressGroupRowsSticky: 'group',
-    suppressStickyTotalRow: 'group',
-    suppressStickyLabel : true,
-    rowHeight: 20,
-    grandTotalRow: 'bottom',
-    groupUseEntireRow: false,
-    groupDisplayType : 'groupRows',
-    autoGroupColumnDef: {
-      headerName: '매장명', // 그룹화된 내용을 표시할 컬럼의 헤더,
-      field: '', // 그룹을 나타낼 필드
-      cellRenderer: (params) => {
-      // if (params.node.footer && params.node.level == 0) {
-      // // footer일 경우
-      //  return '소계'; 
-      // } else
-       if (params.node.footer && params.node.level != 0) {
-      // 일반 그룹화된 셀에는 원래 값 표시
-      return "";
-    } else {
-      return params.value ;
+      // 일반 행일 경우
+      const rowIndex = params.node.rowIndex; // 현재 행 인덱스
+      const isChildOfGroup = params.node.parent && params.node.parent.group; // 현재 노드가 그룹의 자식인지 확인
+
+      if (isChildOfGroup) {
+        // 그룹의 자식 행일 경우
+        return rowIndex % 2 === 0 ? { background: '#FAF0E6' } : { background: 'white' };
+      } else {
+        // 일반 행에 대한 스타일
+        return rowIndex % 2 === 0 ? { background: '#FAF0E6' } : {};
+      }
     }
   },
-      field: '', // 그룹을 나타낼 필드
-      cellRendererParams: {
-      valueGetter: (params) => {
-      if (params.node.footer) {
-        return '총합계'; 
-      } else {
-        return ''; // 일반 그룹화된 셀에는 원래 값 표시
-      }
-     },
-     footerValueGetter: (params) => {
-          if (params.node.footer) {
-            return '총합계'; 
-          } else {
-            return ''; // 일반 그룹화된 셀에는 원래 값 표시
-          }
-        }
-      },
-      suppressCount: false
-      },
-  }
- // Column Definitions: Defines the columns to be displayed.
- const colDefs = ref([]);
- 
- storeInfo.value.push({
-  strStoreName : userData.strStoreName
- })
- const excelStyles = [{
-              id: 'dateType',
-        dataType: 'DateTime'
- }]
- const gridApi = ref(null);
+  // 그룹 행이 처음에 펼치게 설정
+  groupDefaultExpanded: 1,
+  // 그룹 행이 화면에 붙여있게 설정 
+  suppressGroupRowsSticky: 'group',
+  // 총계 행이 화면에 붙여있게 설정
+  suppressStickyTotalRow: 'group',
+  // 그룹 헤더가 스크롤 시 고정되지 않도록 설정
+  suppressStickyLabel: true,
+  // 전체 행의 높이 설정
+  rowHeight: 20,
+  // 최종 총합 행을 그리드의 하단에 표시
+  grandTotalRow: 'bottom',
+  // 그룹 행이 전체 행을 차지하지 않도록 설정
+  groupUseEntireRow: false,
+  // rowGroup : true 설정시에 추가로 singleColumn 나타나게 할건지 설정 .
+  groupDisplayType: 'groupRows',
 
-  const rowGroupEnable = (event) => {
-    if( !afterSearch.value) {
-        alert('조회를 먼저해주세요.');
-        event.preventDefault();
-        return ;
-    }
-    //rowGroupEnabled.value = !rowGroupEnabled.value;
-    colDefs.value[2].rowGroup = true;
-    cellUnitedtf.value = !cellUnitedtf.value;
-    gridOptions.groupDisplayType = 'groupRows'
-    colDefs.value.forEach(col => {
-    if (col.field === 'strStore') {
-    col.cellRenderer = (params) => {
-      // cellUnitedtf가 true일 때는 빈 문자열을 반환
-      if (cellUnitedtf.value) {
-        return ''; // 빈 문자열을 반환하여 셀을 비웁니다.
-      } else {
-        return params.value; // cellUnitedtf가 false일 경우 원래 값을 반환
-      }
-    };
-  }
-});
-
-
-    gridApi?.value.refreshCells({force: true});
-    gridApi?.value.refreshCells();
-  }
- const onGridReady = (params) => {
-    gridApi.value = params.api;
 }
-  const exportExcel = () => {
-    gridApi.value.exportDataAsExcel();
-  }
-const searchButton = () => {
-  const readsales = async() => {
-    
-    if(storeCd.value == undefined) {
-      Swal.fire({
-          icon: 'warning',
-            title: '매장을 선택하세요!',
-              text: '매장을 선택하지 않으면 진행할 수 없습니다.',
-                confirmButtonText: '확인',
-                  confirmButtonColor: '#3085d6',
-      });
-      return ;
-    }
-     store.dispatch("convertLoading",true);
-     const response = await axios.post("http://211.238.145.43:3000/usp_AppDailySaleReportTest",{
-        P_GROUP_CD : groupCd.value,
-        P_STORE_CD : storeCd.value ,
-        P_START_DT : startDate.value ,
-        P_END_DT : endDate.value ,
-        P_REPORT_TYPE : '1',
-        P_LANGUAGE : userData.strLanguage
-     });
+// 행이 생성될 컬럼을 설정 (field, headerName 등등)
+const colDefs = ref([]);
 
-     const result = response.data.recordsets ;
-     updateColumn(result);
-     afterSearch.value = true;
-     store.dispatch("convertLoading",false);
-  } 
-  readsales();
-  const numberFormat = new Intl.NumberFormat('en-US', {
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 0,
+const gridApi = ref(null);
+
+// 셀병합 실행함수 
+const rowGroupEnable = (event) => {
+  if (!afterSearch.value) {
+    alert('조회를 먼저해주세요.');
+    event.preventDefault();
+    return;
+  }
+
+  cellUnitedtf.value = !cellUnitedtf.value;
+  colDefs.value.forEach(col => {
+    if (col.field === 'strStore') {
+      // cellRenderer 가 그 보여주는 것을 설정 ( 실제 값은 남아있음.)
+      col.cellRenderer = (params) => {
+        // cellUnitedtf가 true일 때는 빈 문자열을 반환
+        if (cellUnitedtf.value) {
+          return ''; // 빈 문자열을 반환하여 셀을 비웁니다.
+        } else {
+          return params.value; // cellUnitedtf가 false일 경우 원래 값을 반환
+        }
+      };
+    }
   });
-  
+
+  // 그리드 강제 새로고침 ( 없어도 작동함.)
+  // gridApi?.value.refreshCells({force: true});
+  // gridApi?.value.refreshCells();
+}
+
+// 그리드 가 생성될때 gridApi 값으로 해당 값을 저장함.
+const onGridReady = (params) => {
+  gridApi.value = params.api;
+}
+//  저장된 데이터를 엑셀로 내보내기 함수
+const exportExcel = () => {
+  gridApi.value.exportDataAsExcel();
+}
+// 조회 함수.
+const searchButton = () => {
+  const readsales = async () => {
+    if (storeCd.value == undefined) {
+      Swal.fire({
+        icon: 'warning',
+        title: '매장을 선택하세요!',
+        text: '매장을 선택하지 않으면 진행할 수 없습니다.',
+        confirmButtonText: '확인',
+        confirmButtonColor: '#3085d6',
+      });
+      return;
+    }
+    store.dispatch("convertLoading", true);
+    const response = await axios.post("http://211.238.145.43:3000/usp_AppDailySaleReportTest", {
+      P_GROUP_CD: groupCd.value,
+      P_STORE_CD: storeCd.value,
+      P_START_DT: startDate.value,
+      P_END_DT: endDate.value,
+      P_REPORT_TYPE: '1',
+      P_LANGUAGE: userData.strLanguage
+    });
+
+    const result = response.data.recordsets;
+    updateColumn(result);
+    afterSearch.value = true;
+    store.dispatch("convertLoading", false);
+  }
+  readsales(); // 세팅된 함수 실행
+  // 천단위 마다 쉼표 형식 지정
+  const numberFormat = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+
   const updateColumn = (result) => {
-    //스타일 태그로 동적으로 headerclass 생성
+    //스타일 태그로 동적으로 headerclass 생성 ( gridHeaderStyle 을 바로줄 수 있는 방법이 없음.)
     const styleTag = document.createElement("style");
     document.head.appendChild(styleTag);
-    let column2 = [] ;
+    let column2 = [];
     for (let i = 0; i < tabInitSetArray.value.length; i++) {
-     
-      const headerclass = 'headerclass' ; 
-      const hcolor = tabInitSetArray.value[i].strHdColor ;
-      const hbkcolor = tabInitSetArray.value[i].strHdBkColor ;
+      const headerclass = 'headerclass';
+      const hcolor = tabInitSetArray.value[i].strHdColor;
+      const hbkcolor = tabInitSetArray.value[i].strHdBkColor;
       styleTag.innerHTML += `.${headerclass} {
           background-color : ${hbkcolor} !important;
           color : ${hcolor} !important ;
       }`
+      // 컬럼마다의 값을 할당 밑은 조건에 해당할때 형식이나 값을 지정해줌.
       const column = {
-        field : tabInitSetArray.value[i].strColID ,
-        headerName : tabInitSetArray.value[i].strHdText ,
-        width : tabInitSetArray.value[i].intHdWidth ,
-        headerClass: headerclass ,
-        editable : tabInitSetArray.value[i].strEdit
+        field: tabInitSetArray.value[i].strColID,
+        headerName: tabInitSetArray.value[i].strHdText,
+        width: tabInitSetArray.value[i].intHdWidth,
+        headerClass: headerclass,
+        editable: tabInitSetArray.value[i].strEdit
 
       }
-      
-      if ( tabInitSetArray.value[i].strDisplay == 'number' ) {
-        column.aggFunc = 'sum' 
-        column.cellRenderer =(params) => {
-   
-       if (params.node.group && !params.node.footer) {
-         return ''; 
-      }
-    
-    return params.value !== undefined ? numberFormat.format(params.value) : '';
-   }
-      }
 
-      if ( tabInitSetArray.value[i].strColID =='strStore') {
-         column.rowGroup = true ;
-      }
-      if( tabInitSetArray.value[i].strColID =='lngSalAmt' || tabInitSetArray.value[i].strColID =='lngDiscount' || tabInitSetArray.value[i].strColID =='lngVAT' ||
-         tabInitSetArray.value[i].strColID == 'lngSupplyAmt') {
-          column.hide = true ;
-      }
-      if (tabInitSetArray.value[i].strDisplay == 'date') {
-       
-        column.valueGetter = (params) => {
-          if ( params.node.footer && params.node.level == 0) {
-              return tabInitSetArray.value[i].strSubSumtext; // 그룹 소계에서만 '소계' 표시
-           } else if (params.node.footer && params.node.level != 0) {
-              return '총합계'
-           }
-           const dateString = params.data?.dtmDate;
-          if (!dateString) {
-            return ''; // dtmDate가 없으면 빈 문자열 반환
+      if (tabInitSetArray.value[i].strDisplay == 'number') {
+        column.aggFunc = 'sum'
+        column.cellRenderer = (params) => {
+          if (params.node.group && !params.node.footer) {
+            return '';
           }
-          // 날짜 문자열에서 시간 부분을 잘라내고 날짜만 반환
-           const date = new Date(dateString);
-            const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
-
-        return formattedDate; 
+          return params.value !== undefined ? numberFormat.format(params.value) : '';
         }
       }
 
-      
-
-      if ( tabInitSetArray.value[i].strColID =='strPhen') {
-        column.valueGetter = (params) => {
-
-        const weather = params.data?.strPhen;
-              let result = '';
-              if (weather =='Clear') {
-                result = '맑음'
-              } else if (weather =='Snow') {
-                  result = '눈'
-              }
-              return `${result}`; // 날짜와 요일 반환
-            }
-      }
-      if (tabInitSetArray.value[i].strColID == 'dblDistRate' ) {
-        column.cellRenderer =  (params) => {
-      // Check if it's a group row and not a footer
-      if (params.node.group && !params.node.footer) {
-      return ''; // Display nothing in the group row
-   v }
-    // For normal rows, display the actual data or an empty string if data is missing
-    return params.value !== undefined ? Math.round(params.value * 10) /10 : '';
-      }
-    }
-      
-      column2.push(column);
-      
-    }
-    const columns = [
-        {field : 'strStore' , headerName : '매장명' ,headerClass : 'header-center' ,hide: cellUnitedtf.value, width: 150  ,valueGetter: (params) => {
-          if(params.node.footer){
-            const rowData = params.api.getDisplayedRowAtIndex(0).data;
-            return rowData ? rowData.strStore : '총합계';
+      if (tabInitSetArray.value[i].strColID == 'strStore') {
+        column.rowGroup = true;
+        column.cellRenderer = (params) => {
+          // cellUnitedtf가 true일 때는 빈 문자열을 반환
+          if (cellUnitedtf.value) {
+            return ''; // 빈 문자열을 반환하여 셀을 비웁니다.
           } else {
-            return params.data ? params.data.strStore : '';
+            return params.value; // cellUnitedtf가 false일 경우 원래 값을 반환
           }
-         } ,
-        cellRenderer: (params) => {
-                // 현재 행의 매장명
-                if(rowGroupEnable.value){
+        };
+      }
+      if (tabInitSetArray.value[i].strColID == 'lngSalAmt' || tabInitSetArray.value[i].strColID == 'lngDiscount' || tabInitSetArray.value[i].strColID == 'lngVAT' ||
+        tabInitSetArray.value[i].strColID == 'lngSupplyAmt') {
+        column.hide = detailViewtf.value;
+      }
+      if (tabInitSetArray.value[i].strDisplay == 'date') {
 
-                const currentStoreName = params.value;
-
-                // 이전 행의 매장명
-                const previousStoreName = params.node.rowIndex > 0 ? params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1).data.strStore : null;
-
-                // 같은 매장명인 경우 빈 문자열 반환
-                return currentStoreName === previousStoreName ? '' : currentStoreName;
-              } else {
-                return params.value;
-              }
-            }
-            , rowGroup: rowGroupEnable.value ,footerValueGetter: (params) => {
-                if (params.node.footer) {
-                    return `총합계`; // 그룹별 총합계
-                }
-                return params.value;
-            } 
-        },
-        { headerName : '일자' , field: 'dtmDate' , cellClass:"dateType", width: 120 ,
-         valueGetter: (params) => {
-          const rowCount     = params.api.getDisplayedRowCount(); // 전체 행 개수
-          // const lastRowIndex = rowCount - 1; // 마지막 행의 인덱스
-          const soGyeIndex   = rowCount - 2;
-          
-          const checkbox = document.getElementById("cellUnite");
-          if(checkbox.checked){
-            if (params.node.rowIndex === soGyeIndex) {
-                if(params.node.footer){
-                  return '소계'; // 그룹 소계에서만 '소계' 표시
-                }
-            }
-          } 
+        column.valueGetter = (params) => {
+          if (params.node.footer && params.node.level == 0) {
+            return tabInitSetArray.value[i].strSubSumtext; // 그룹 소계에서만 '소계' 표시
+          } else if (params.node.footer && params.node.level != 0) {
+            return '총합계'
+          }
           const dateString = params.data?.dtmDate;
           if (!dateString) {
             return ''; // dtmDate가 없으면 빈 문자열 반환
           }
           // 날짜 문자열에서 시간 부분을 잘라내고 날짜만 반환
-           const date = new Date(dateString);
-            const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
+          const date = new Date(dateString);
+          const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
+          return formattedDate;
+        }
+      }
 
-        return formattedDate; 
-        }},
-        { 
-        headerName: '요일', 
-        field: 'strWeekName', 
-        cellClass: "String", width: 100   },
-        { headerName : '날씨' , field: 'strPhen' ,cellClass: "String"
-          , maxWidth: 100 ,valueGetter: (params) => {
-              const weather = params.data?.strPhen;
-              let result = '';
-              if (weather =='Clear') {
-                result = '맑음'
-              } else if (weather =='Snow') {
-                  result = '눈'
-              }
-              return `${result}`; // 날짜와 요일 반환
-          }  
-        },
-        // {field : 'lngRecCnt' , headerName : "조수", maxWidth: 100 ,aggFunc :'sum' },
-        // {field : 'lngRecAmt' , headerName : "조단가", maxWidth: 100 ,aggFunc :'sum'},
-        // {field : 'lngCustCnt' , headerName : "객수", maxWidth: 100 ,aggFunc :'sum'},
-        // {field : 'lngCustAmt' , headerName : "객단가", maxWidth: 100 ,aggFunc :'sum'},
-        // {field : 'lngSalAmt' , headerName : "총매출액", maxWidth: 120,aggFunc :'sum', hide : detailViewtf.value },
-        // {field : 'lngDiscount' , headerName : "할인액", maxWidth: 120 ,aggFunc :'sum', hide : detailViewtf.value},
-        // {field : 'lngActAmt' , headerName : "실매출액", maxWidth: 120,aggFunc :'sum' },
-        // {field : 'lngVAT' , headerName : "부가세", maxWidth: 120,aggFunc :'sum', hide : detailViewtf.value },
-        // {field : 'lngSupplyAmt' , headerName : "순매출액", maxWidth: 120 ,aggFunc :'sum', hide : detailViewtf.value},
-        {field : 'lngRecCnt' , headerName : "조수", width: 100 ,aggFunc : 'sum'  ,
-        cellRenderer: (params) => {
-    // Check if it's a group row and not a footer
-    if (params.node.group && !params.node.footer) {
-      return ''; // Display nothing in the group row
+
+      if (tabInitSetArray.value[i].strColID == 'strPhen') {
+          column.valueGetter = (params) => {
+          const weather = params.data?.strPhen;
+          let result = '';
+          if (weather == 'Clear') {
+            result = '맑음'
+          } else if (weather == 'Snow') {
+            result = '눈'
+          }
+          return `${result}`; // 날짜와 요일 반환
+        }
+      }
+      if (tabInitSetArray.value[i].strColID == 'dblDistRate') {
+        column.cellRenderer = (params) => {
+          if (params.node.group && !params.node.footer) {
+            return ''; 
+          }
+          return params.value !== undefined ? Math.round(params.value * 10) / 10 : '';
+        }
+      }
+      // column2로 값을 전달해서 이 값으로 rowData와 맞추기 위해서 설정
+      column2.push(column);
+
     }
-    // For normal rows, display the actual data or an empty string if data is missing
-    return params.value !== undefined ? numberFormat.format(params.value) : '';
-  }
-        },
-        {field : 'lngRecAmt' , headerName : "조단가", width: 100 ,aggFunc :'sum',
-        cellRenderer: (params) => {
-    // Check if it's a group row and not a footer
-    if (params.node.group && !params.node.footer) {
-      return ''; // Display nothing in the group row
-    }
-    // For normal rows, display the actual data or an empty string if data is missing
-    return params.value !== undefined ? numberFormat.format(params.value) : '';
-  }},
-        {field : 'lngCustCnt' , headerName : "객수", width: 100 ,aggFunc :'sum',
-        cellRenderer: (params) => {
-    // Check if it's a group row and not a footer
-    if (params.node.group && !params.node.footer) {
-      return ''; // Display nothing in the group row
-    }
-    // For normal rows, display the actual data or an empty string if data is missing
-    return params.value !== undefined ? numberFormat.format(params.value) : '';
-  }
-        },
-        {field : 'lngCustAmt' , headerName : "객단가", width: 100 ,aggFunc :'sum',
-        cellRenderer: (params) => {
-    // Check if it's a group row and not a footer
-    if (params.node.group && !params.node.footer) {
-      return ''; // Display nothing in the group row
-    }
-    // For normal rows, display the actual data or an empty string if data is missing
-    return params.value !== undefined ? numberFormat.format(params.value) : '';
-  }},
-        {field : 'lngSalAmt' , headerName : "총매출액", width: 120,aggFunc :'sum'  ,hide :detailViewtf.value ,
-        cellRenderer: (params) => {
-    // Check if it's a group row and not a footer
-    if (params.node.group && !params.node.footer) {
-      return ''; // Display nothing in the group row
-    }
-    // For normal rows, display the actual data or an empty string if data is missing
-    return params.value !== undefined ? numberFormat.format(params.value)  : '';
-  }},
-        {field : 'lngDiscount' , headerName : "할인액", width: 120  ,aggFunc :'sum',hide :detailViewtf.value ,
-        cellRenderer: (params) => {
-    // Check if it's a group row and not a footer
-    if (params.node.group && !params.node.footer) {
-      return ''; // Display nothing in the group row
-    }
-    // For normal rows, display the actual data or an empty string if data is missing
-    return params.value !== undefined ? numberFormat.format(params.value) : '';
-  }},
-        {field : 'lngActAmt' , headerName : "실매출액", width: 120,aggFunc :'sum' ,  editable: true,
-        cellRenderer: (params) => {
-    // Check if it's a group row and not a footer
-    if (params.node.group && !params.node.footer) {
-      return ''; // Display nothing in the group row
-    }
-    // For normal rows, display the actual data or an empty string if data is missing
-    return params.value !== undefined ? numberFormat.format(params.value) : '';
-  }},
-        {field : 'lngVAT' , headerName : "부가세", width: 120,aggFunc :'sum' ,hide :detailViewtf.value ,
-        cellRenderer: (params) => {
-    // Check if it's a group row and not a footer
-    if (params.node.group && !params.node.footer) {
-      return ''; // Display nothing in the group row
-    }
-    // For normal rows, display the actual data or an empty string if data is missing
-    return params.value !== undefined ? numberFormat.format(params.value) : '';
-  }},
-        {field : 'lngSupplyAmt' , headerName : "순매출액", width: 120 ,aggFunc :'sum',hide :detailViewtf.value ,
-        cellRenderer: (params) => {
-    // Check if it's a group row and not a footer
-    if (params.node.group && !params.node.footer) {
-      return ''; // Display nothing in the group row
-    }
-    // For normal rows, display the actual data or an empty string if data is missing
-    return params.value !== undefined ? numberFormat.format(params.value) : '';
-  }},
-        {field : 'dblDistRate' , headerName : "비율", width: 120 ,aggFunc :'sum' ,
-        cellRenderer: (params) => {
-    // Check if it's a group row and not a footer
-    if (params.node.group && !params.node.footer) {
-      return ''; // Display nothing in the group row
-    }
-    // For normal rows, display the actual data or an empty string if data is missing
-    return params.value !== undefined ? Math.round(params.value * 10) /10 : '';
-  }
-        
-        },
-       
-    ];
+   
     rowData.value = result[0].map(item => ({
-      strStoreGroupName : item.strStoreGroupName,
+      strStoreGroupName: item.strStoreGroupName,
       dtmDate: item.dtmDate,
-      strStore : item.strStore,
-      strWeekName : item.strWeekName,
-      strPhen : item.strPhen,
-      lngRecCnt : item.lngRecCnt,
-      lngRecAmt : item.lngRecAmt,
-      lngCustCnt : item.lngCustCnt,
-      lngCustAmt : item.lngCustAmt,
+      strStore: item.strStore,
+      strWeekName: item.strWeekName,
+      strPhen: item.strPhen,
+      lngRecCnt: item.lngRecCnt,
+      lngRecAmt: item.lngRecAmt,
+      lngCustCnt: item.lngCustCnt,
+      lngCustAmt: item.lngCustAmt,
       lngSalAmt: item.lngSalAmt,
       lngActAmt: item.lngActAmt,
       lngDiscount: item.lngDiscount,
@@ -548,57 +357,77 @@ const searchButton = () => {
       lngSupplyAmt: item.lngSupplyAmt,
       dblDistRate: item.dblDistRate
     }));
+
     colDefs.value = column2;
 
   }
 }
-const startDate = ref(format(new Date(),'yyyy-MM-dd'));
-const endDate = ref(format(new Date(),'yyyy-MM-dd'));
+// 달력 초기 설정값 지정을 위한 변수 설정
+const startDate = ref(format(new Date(), 'yyyy-MM-dd'));
+const endDate = ref(format(new Date(), 'yyyy-MM-dd'));
 
 const handleDateRangeUpdate = (newDateRange) => {
-  if(newDateRange){
-  startDate.value=format(newDateRange[0] ,'yyyy-MM-dd');
-  endDate.value =format(newDateRange[1] ,'yyyy-MM-dd');
+  if (newDateRange) {
+    startDate.value = format(newDateRange[0], 'yyyy-MM-dd');
+    endDate.value = format(newDateRange[1], 'yyyy-MM-dd');
   } else {
-    startDate.value=null;
-  endDate.value =null;
+    startDate.value = null;
+    endDate.value = null;
   }
-  
+
 };
 </script>
 
 <style>
 .themeClass {
-    --ag-foreground-color: rgb(0, 0, 0) !important;
-    --ag-background-color: rgb(255, 255, 255);
-    /* --ag-header-foreground-color: white !important;
-    --ag-header-background-color: rgb(68, 68, 107) !important; */
-    --ag-odd-row-background-color: rgb(0, 0, 0, 0.03);
-    /* --ag-header-column-resize-handle-color: rgb(255, 255, 255) !important; */
-    
-    --ag-font-size: 12px !important;
-    --ag-font-family: monospace;
-    --ag-row-border-style: solid !important;
-    --ag-row-border-width: 1px !important;
-    --ag-row-border-color: rgb(228, 228, 228) !important;
-    --ag-cell-horizontal-border: solid rgb(228, 228, 228) !important;
-    /* --ag-row-height : 20px !important ; */
-    --ag-cell-horizontal-padding : 5px !important;
+   /* db안에 없는 속성으로 헤더 픽셀 값  설정 */
+   /* 그리드의 기본 전경 색상을 설정 */
+  --ag-foreground-color: rgb(0, 0, 0) !important;
+  /* 그리드의 기본 배경색 */
+  --ag-background-color: rgb(255, 255, 255);
+   /* 그리드의 헤더 기본 전경색(텍스트 색상) */
+  /* --ag-header-foreground-color: white !important;
+    그리드의 헤더 기본 배경색 
+  --ag-header-background-color: rgb(68, 68, 107) !important; */
+  /* 그리드 홀수행 배경색  */
+  --ag-odd-row-background-color: rgb(0, 0, 0, 0.03);
+    /* 그리드의 헤더에 표시되는 열 크기 조정 핸들의 색상 */
+   /* --ag-header-column-resize-handle-color: rgb(255, 255, 255) !important; */
+
+   /* 기본 폰트 사이즈 설정 */
+  --ag-font-size: 12px !important;
+  /* 폰트 설정 */
+  --ag-font-family: monospace;
+   /* 행과 행의 경계선 설정 */
+  --ag-row-border-style: solid !important;
+  --ag-row-border-width: 1px !important;
+  --ag-row-border-color: rgb(228, 228, 228) !important;
+  /* 열과열 사이의 경계선 설정 */
+  --ag-cell-horizontal-border: solid rgb(228, 228, 228) !important;
+   /* 행의 높이 설정 */
+  /* --ag-row-height : 20px !important ; */
+  /* 그리드 셀 내부의 수평 여백(패딩)을 설정 */
+  --ag-cell-horizontal-padding: 5px !important;
 }
 
-.ag-group-footer {
-    background-color: #C7B299; /* 원하는 배경색 */
-    color: white; /* 원하는 글자색 */
-}
+/* .ag-group-footer {
+  background-color: #fff5e8 ;
+  /* 원하는 배경색 
+  color: white;
+  /* 원하는 글자색 
+} */
 
 /* 그룹 총합계의 배경색 및 글자색 변경 */
 .ag-total-footer {
-    background-color: #B29BC7; /* 원하는 배경색 */
-    color: white; /* 원하는 글자색 */
+  background-color: #B29BC7;
+  /* 원하는 배경색 */
+  color: white;
+  /* 원하는 글자색 */
 }
-/*  오버라이드를 통해서 가운데 헤더 정렬 */
+
+/*  오버라이드를 통해서 헤더 가운데 정렬 */
 .ag-header-cell-label {
   justify-content: center;
-  margin-right : -20px;
+  margin-right: -20px;
 }
 </style>
