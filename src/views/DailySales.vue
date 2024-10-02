@@ -21,8 +21,6 @@
         &nbsp; &nbsp; &nbsp;<div class="items-center flex">일자</div> &nbsp; &nbsp;
         <DateRangePicker @update:dateRange="handleDateRangeUpdate" class="w-9/12" />
       </h2>
-
-      <!-- <div><input type="checkbox" id="reportType" value="2" v-model="reportType"><label for="reportType"></label></div> -->
       <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd"></pickStore>
     </div>
     <br>
@@ -32,10 +30,6 @@
       <input type="checkbox" @click="rowGroupEnable($event)" id="cellUnite"><label for="cellUnite">셀병합</label></input>
     </div>
     &nbsp;
-    <!-- <div for="condition" class="flex justify-start">
-  조회 조건 &nbsp; <input type="checkbox" value="1" id="condition"><label for="condition" >상세보기</label></input>
-  &nbsp;&nbsp;<input type="checkbox" value="2" id="condition2"><label for="condition2" >셀병합</label></input>
-</div> -->
     &nbsp;
     <ag-grid-vue :rowData="rowData" :columnDefs="colDefs" style="width: auto; height:660px"
       class="themeClass ag-theme-quartz" enableCharts="true" :selection="selection" :gridOptions="gridOptions"
