@@ -57,6 +57,7 @@ import PickStore from '@/components/pickStore.vue';
 import { useTabInfo } from '@/common/api/useTabInfo';
 // alert 창 자동 꾸미기 위한 라이브러리
 import Swal from 'sweetalert2';
+import { NIL } from 'uuid';
 
 const store = useStore();
 // 그리드에 다중 선택 혹은 개별 선택 설정 변수
@@ -163,7 +164,7 @@ const gridOptions = {
   groupUseEntireRow: false,
   // rowGroup : true 설정시에 추가로 singleColumn 나타나게 할건지 설정 .
   groupDisplayType: 'groupRows',
-
+  groupSuppressBlankHeader : true
 }
 // 행이 생성될 컬럼을 설정 (field, headerName 등등)
 const colDefs = ref([]);
@@ -260,12 +261,21 @@ const searchButton = () => {
         headerName: tabInitSetArray.value[i].strHdText,
         width: tabInitSetArray.value[i].intHdWidth,
         headerClass: headerclass,
-        editable: tabInitSetArray.value[i].strEdit
+        editable : tabInitSetArray.value[i].strEdit === 'true' ? true : false,
+        cellStyle : {
+          textAlign : tabInitSetArray.value[i].strAlign
+        },
 
       }
 
+      if (tabInitSetArray.value[i].strTotalexpr != null && tabInitSetArray.value[i].strTotalexpr.includes('sum(')) {
+          column.aggFunc = 'sum'
+      } else if (tabInitSetArray.value[i].strTotalexpr != null && tabInitSetArray.value[i].strTotalexpr.includes('avg(')) {
+          column.aggFunc = 'avg'
+      }
+      // 금요일 조단가 avg pncoffice랑 다른 부분 수정 
       if (tabInitSetArray.value[i].strDisplay == 'number') {
-        column.aggFunc = 'sum'
+        
         column.cellRenderer = (params) => {
           if (params.node.group && !params.node.footer) {
             return '';

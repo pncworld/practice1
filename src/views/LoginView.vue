@@ -46,7 +46,7 @@ const username = ref(''); // 사용자 ID
 const password = ref(''); // 사용자 비밀번호
 const message = ref('');  // 상태 메시지
 const userData = store.state.userData;
-
+store.dispatch('convertLoading',false);
 const login = async () => {
   store.dispatch('convertLoading',true);
   store.state.selectedCategoryId = null ;

@@ -85,11 +85,11 @@ export default createStore({
       if (tab) {
          tab.lngProgramID  = data + new Date().getTime();
       }
-      
     } ,
     setLoading(state ,data) {
-       state.loading = data ;
+      state.loading = data ;
     }
+    
 
   },
   actions: {
