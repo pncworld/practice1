@@ -35,15 +35,17 @@ export default createStore({
     addTab(state, tab) {
       const existingTabs = state.currentTabs.filter(existingTab => existingTab.lngProgramID.toString().startsWith(tab.lngProgramID.toString()))
 
-      let newlngProgramID = tab.lngProgramID;
+      let newlngProgramID = `${tab.lngProgramID}_${v4()}`;
       let newstrTitle = tab.strTitle;
+      let newstrUrl = tab.strUrl.split("::")[1];
+
       if(existingTabs.length > 0 ) {
         const count = existingTabs.length + 1;
-        newlngProgramID = `${tab.lngProgramID}_${v4()}`;
+     
         newstrTitle = `${tab.strTitle}_${count}`;
       }
-    
-      state.currentTabs.push({...tab , lngProgramID: newlngProgramID , strTitle : newstrTitle}); // 새로운 탭을 추가
+
+      state.currentTabs.push({strUrl: newstrUrl , lngProgramID: newlngProgramID , strTitle : newstrTitle}); // 새로운 탭을 추가
       state.activeTab = newlngProgramID ;
     },
     removeAllTabs(state) {
@@ -51,9 +53,9 @@ export default createStore({
       state.activeTab = '';
     },
     setActiveTab(state, tab) {
-      
+     
         state.activeTab = tab.lngProgramID; // 현재 활성화된 탭으로 변경
-      
+
     },
     removeTab(state, data) {
       state.currentTabs = state.currentTabs.filter(tab => tab.lngProgramID !== data); // 해당 탭 제거

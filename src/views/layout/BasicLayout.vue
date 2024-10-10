@@ -44,31 +44,32 @@
         <div v-if="showMenu" v-for="tab in tabs" :key="tab.lngProgramID" @click="setActiveTab(tab)" class="w-2/12 bg-white text-gray-500 border border-slate-950 rounded-md px-4 py-2 cursor-pointer hover:bg-blue-50 transition">
           {{tab.strTitle}}<button @click.stop="removeTab(tab)"><img src="../../assets/deleteIcon.png" alt="x" class="w-4 h-auto"></button>  </div>
         </div>
-        <router-view v-slot="{ Component }">
+      <router-view v-slot="{ Component , route}">
       <keep-alive>
-      <component :is="Component" :key="componentKey"/>
-     </keep-alive>
+        <component :is="Component" :key="`${route.path}-${componentKey}`" />
+      </keep-alive>
       </router-view>
-      </main>
+      </main>     
     </div>
   </div>
 </template>
   
 <script setup>
 import BasicMenu from '@/components/BasicMenu.vue';
+import DailySales from '@/components/DailySales.vue';
 import Loading from '@/components/loading.vue';
 import router from '@/router';
 import axios from 'axios';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import {  useStore } from 'vuex';
+import DailySales2 from '../DailySales2.vue';
 
 const route = useRoute();
 const store = useStore() ;
 const userData = store.state.userData;
 const showMenu = ref(route.path != '/'); // Initialize based on current route
-
-
+const componentKey = ref(null);
 // Watch for route changes
 watch(() => route.path, (newPath) => {
   showMenu.value = newPath != '/'; // Update based on new route
@@ -85,7 +86,7 @@ const selectCategory = (category) => {
    
     console.log(category);
   
-  isMenu.value = true;
+   isMenu.value = true;
 }
 
 const logout = () => {
@@ -126,6 +127,7 @@ const hideMenu = () => {
   
 }
 
+
 const excludedComponents = ref([]);
 
 const tabs = computed(() => store.state.currentTabs);
@@ -155,17 +157,35 @@ const removeTab = (tab) => {
 const lngProgramID = computed(() => {
   return store.state.activeTab ; // 기본값 설정
 });
-const componentKey = ref(null);
+
 const reLoad = () => {
   const activeTab = store.state.activeTab ;
   store.dispatch('refreshTab' , activeTab );
   componentKey.value = activeTab + new Date().getTime();
 }
+
 const setActiveTab = (tab) => {
+  
   store.dispatch('changeActiveTab', tab);
-  componentKey.value = tab.lngProgramID;
- 
-}
+  const activeTab = store.state.activeTab ;
+  componentKey.value = activeTab;
+  //store.dispatch('refreshTab' , activeTab );
+  router.push({path : tab.strUrl , query : { index : tab.lngProgramID}   });
+};
+
+watch( ()=> route.query , (newQuery) => {
+  if(newQuery.index) {
+    componentKey.value = newQuery.index
+  } 
+})
+
+watch(() => store.state.currentTabs, (newTabs) => {
+  store.dispatch('changeActiveTab', newTabs);
+  const activeTab = store.state.activeTab ;
+  componentKey.value = activeTab;
+  
+})
+
 
 
 

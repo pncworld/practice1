@@ -164,7 +164,8 @@ const gridOptions = {
   groupUseEntireRow: false,
   // rowGroup : true 설정시에 추가로 singleColumn 나타나게 할건지 설정 .
   groupDisplayType: 'groupRows',
-  groupSuppressBlankHeader : true
+  groupSuppressBlankHeader : true ,
+  suppressRowTransform : true
 }
 // 행이 생성될 컬럼을 설정 (field, headerName 등등)
 const colDefs = ref([]);
@@ -247,16 +248,30 @@ const searchButton = () => {
     const styleTag = document.createElement("style");
     document.head.appendChild(styleTag);
     let column2 = [];
-    for (let i = 0; i < tabInitSetArray.value.length; i++) {
-      const headerclass = 'headerclass';
+    let topHeaders = {};
+    let count = 0 ;
+
+    for (let i = 0; i < tabInitSetArray.value.length ; i++) {
+      let TopHeader = tabInitSetArray.value[i].strColID == '' || tabInitSetArray.value[i].strColID == null ;
+      const headerclass = `headerclass-${i}`;
       const hcolor = tabInitSetArray.value[i].strHdColor;
       const hbkcolor = tabInitSetArray.value[i].strHdBkColor;
       styleTag.innerHTML += `.${headerclass} {
           background-color : ${hbkcolor} !important;
           color : ${hcolor} !important ;
+       
       }`
+      
       // 컬럼마다의 값을 할당 밑은 조건에 해당할때 형식이나 값을 지정해줌.
-      const column = {
+      if (TopHeader) {
+        topHeaders = {
+        headerName: tabInitSetArray.value[i].strHdText, 
+        headerClass : headerclass ,
+        children: [] 
+        }
+        count = tabInitSetArray.value[i].intHdColspan ;
+      } else {
+       const column = {
         field: tabInitSetArray.value[i].strColID,
         headerName: tabInitSetArray.value[i].strHdText,
         width: tabInitSetArray.value[i].intHdWidth,
@@ -265,14 +280,140 @@ const searchButton = () => {
         cellStyle : {
           textAlign : tabInitSetArray.value[i].strAlign
         },
-
+        lockPosition : tabInitSetArray.value[i].strHdFix === 'true' ? false : true ,
+        // 콤보박스 설정
+        // cellEditor: 'agRichSelectCellEditor',
+        // cellEditorParams: {
+        //     values: ['매장1', '매장2', '매장3', '매장4', '매장5'],
+        // }
       }
-
-      if (tabInitSetArray.value[i].strTotalexpr != null && tabInitSetArray.value[i].strTotalexpr.includes('sum(')) {
+      if (tabInitSetArray.value[i].strTotalexpr != null && tabInitSetArray.value[i].strTotalexpr.split('(')[0].includes('sum')) {
           column.aggFunc = 'sum'
-      } else if (tabInitSetArray.value[i].strTotalexpr != null && tabInitSetArray.value[i].strTotalexpr.includes('avg(')) {
-          column.aggFunc = 'avg'
-      }
+      } else if (tabInitSetArray.value[i].strTotalexpr != null && tabInitSetArray.value[i].strTotalexpr.includes('/')) {
+
+       
+        // 2. '/'을 기준으로 lngActAmt와 lngRecCnt를 나눔
+        const divendColumn = tabInitSetArray.value[i].strTotalexpr.split('"')[1]
+        const divColumn = tabInitSetArray.value[i].strTotalexpr.split('"')[3]
+      
+        //결국엔 하드코딩밖에 안됨. // 테이블에 값을 바꾸는 방법 밖에는 없음. ag grid 형식으로 
+        // let divendColumn = tabInitSetArray.value[i].strTotalexpr.split('/')[1];
+        // let divColumn = tabInitSetArray.value[i].strTotalexpr.split('/')[2];
+
+         column.valueGetter = (params) => {
+         
+          if( params.node.footer && params.node.level != 0 ) {
+            const totalLng2 = params.node.allLeafChildren.reduce((sum, childNode) => {
+            return sum + (childNode.data[divendColumn] || 0); // lng2의 합계
+           }, 0);
+
+           const totalLng1 = params.node.allLeafChildren.reduce((sum, childNode) => {
+            return sum + (childNode.data[divColumn] || 0); // lng1의 합계
+          }, 0);
+         
+          // lng1으로 나누기. totalLng1이 0이 아닐 때만 나누기
+             let result = 0 ;
+             if(tabInitSetArray.value[i].strSubSumexpr.includes('round')) {
+                  const loc = tabInitSetArray.value[i].strSubSumexpr.match(/(\d+)\s*\)/);
+                  result = (totalLng2 / totalLng1).toFixed(loc[0]);
+             }
+            return totalLng1 !== 0 ? result : 0; // 0으로 나눌 경우를 방지
+           } else if (params.node.footer && params.node.level == 0 ) {
+            if(tabInitSetArray.value[i].strSubSumexpr != '' && tabInitSetArray.value[i].strSubSumexpr != null && tabInitSetArray.value[i].strSubSumexpr.includes('/')) {
+
+              const insideRound = tabInitSetArray.value[i].strSubSumexpr.split('(')[1].split(')')[0]; // 'lngActAmt/lngRecCnt, 0'
+             
+          // 2. '/'을 기준으로 lngActAmt와 lngRecCnt를 나눔
+            const divendColumn = insideRound.split(',')[0].split('/')[0]
+            const divColumn = insideRound.split(',')[0].split('/')[1]
+             
+              const totalLng2 = params.node.allLeafChildren.reduce((sum, childNode) => {
+              return sum + (childNode.data[divendColumn] || 0); // lng2의 합계
+             }, 0);
+
+              const totalLng1 = params.node.allLeafChildren.reduce((sum, childNode) => {
+              return sum + (childNode.data[divColumn] || 0); // lng1의 합계
+             }, 0);
+
+        // lng1으로 나누기. totalLng1이 0이 아닐 때만 나누기
+               let result = 0 ;
+             if(tabInitSetArray.value[i].strSubSumexpr.includes('round')) {
+               const loc = tabInitSetArray.value[i].strSubSumexpr.match(/(\d+)\s*\)/);
+                result = (totalLng2 / totalLng1 ).toFixed(loc[0]);
+             }
+            return totalLng1 !== 0 ? result : 0; // 0으로 나눌 경우를 방지
+            } else {
+              const totalLng2 = params.node.allLeafChildren.reduce((sum, childNode) => {
+              return sum + (childNode.data[divendColumn] || 0); // lng2의 합계
+           }, 0);
+
+           const totalLng1 = params.node.allLeafChildren.reduce((sum, childNode) => {
+            return sum + (childNode.data[divColumn] || 0); // lng1의 합계
+          }, 0);
+
+           // lng1으로 나누기. totalLng1이 0이 아닐 때만 나누기
+            return totalLng1 !== 0 ? totalLng2 / totalLng1 : 0; // 0으로 나눌 경우를 방지
+            }
+           
+           } 
+              return params.data[tabInitSetArray.value[i].strColID] ;
+           
+            
+          
+        }
+    // 0으로 나누는 것을 방지하기 위한 처리
+      
+  
+};
+// if (tabInitSetArray.value[i].intSuppress == '1') {
+//   column.cellRenderer = (params) => {
+//     const currentRowIndex = params.node.rowIndex;
+//     console.log(params.data)
+//     const currentValue = params.data[tabInitSetArray.value[i].strColID];
+
+//     if (currentRowIndex === 0) {
+//       return currentValue; // 첫 번째 행은 기본값 표시
+//     }
+
+//     const previousRowData = params.api.getDisplayedRowAtIndex(currentRowIndex - 1).data || {};
+  
+//     const previousValue = previousRowData[tabInitSetArray.value[i].strColID];
+
+//     // 중복된 셀은 빈 셀로 표시 (숨기기)
+//     if (currentValue === previousValue) {
+//       return ''; // 값이 중복되면 빈 셀을 반환
+//     }
+
+//     return currentValue;
+//   };
+
+//   column.cellStyle = (params) => {
+//     if(params.data != undefined) {
+//     const currentRowIndex = params.node.rowIndex;
+//     const currentValue = params.data[tabInitSetArray.value[i].strColID];
+    
+//     if (currentRowIndex === 0) {
+//       return {}; // 첫 번째 행은 기본 스타일 적용
+//     }
+
+//     const previousRowData = params.api.getDisplayedRowAtIndex(currentRowIndex - 1).data || {};
+//     const previousValue = previousRowData[tabInitSetArray.value[i].strColID];
+
+//     if (currentValue === previousValue) {
+//       // 셀 경계선 없애기
+//       return {
+//         display: 'none', // 셀 숨기기
+//         borderBottom : 'none' ,
+//         borderTop : 'none' ,
+//       };
+//     }
+
+//     return {}; // 기본 스타일
+//   };
+// }
+// }
+        
+      
       // 금요일 조단가 avg pncoffice랑 다른 부분 수정 
       if (tabInitSetArray.value[i].strDisplay == 'number') {
         
@@ -340,8 +481,18 @@ const searchButton = () => {
         }
       }
       // column2로 값을 전달해서 이 값으로 rowData와 맞추기 위해서 설정
-      column2.push(column);
-
+      
+      if ( tabInitSetArray.value[i].intHdColspan == '1' && topHeaders.children.length <= count -1 ) {
+        topHeaders.children.push(column);
+      } else if ( tabInitSetArray.value[i].intHdColspan != '1' && topHeaders.children && topHeaders.children.length == count ) {
+        column2.push(topHeaders);
+        count ++; 
+        column2.push(column);
+      } else {
+        column2.push(column);
+      }
+     
+      
     }
    
     rowData.value = result[0].map(item => ({
@@ -364,6 +515,7 @@ const searchButton = () => {
 
     colDefs.value = column2;
 
+  }
   }
 }
 // 달력 초기 설정값 지정을 위한 변수 설정
@@ -431,7 +583,16 @@ const handleDateRangeUpdate = (newDateRange) => {
 
 /*  오버라이드를 통해서 헤더 가운데 정렬 */
 .ag-header-cell-label {
-  justify-content: center;
+  justify-content: center ;
   margin-right: -20px;
+} 
+
+.ag-header-cell-comp-wrapper {
+  display: flex;
+  justify-content: center ;
+
+}
+.cell-span {
+  background-color: brown;
 }
 </style>

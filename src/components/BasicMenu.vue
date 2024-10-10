@@ -70,7 +70,7 @@ const selectCategory = (strUrl , lngProgramID , strTitle) => {
   
   const newTab = { strUrl , lngProgramID, strTitle}
   store.dispatch("addNewTab" , newTab); 
-  router.push(strUrl);
+  router.push(strUrl.split("::")[1]);
 }
 var cMenu = ref("매출관리");
 const selectedCategoryId = computed(() => store.state.selectedCategoryId) ;

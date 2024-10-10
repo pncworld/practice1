@@ -3,8 +3,8 @@ import BasicLayout from './views/layout/BasicLayout.vue';
 </script>
 
 <template>
-  <BasicLayout>
-  </BasicLayout>
+   <BasicLayout>
+   </BasicLayout>
 </template>
 
 <style>
