@@ -60,7 +60,6 @@ const showAll = () =>{
 } else {
   for (let index = 1; index <= categories.value.length; index++) {
     openCategoryId.value = [];
-   
   }
 }
 }

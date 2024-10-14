@@ -4,7 +4,7 @@
         <img src="../assets/cashier.png" class="mr-40 w-60 h-auto animate-rise" alt="" >
         <img src="../assets/swipe.png" class="mr-40 w-60 h-auto animate-fall" alt="" >
       <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
-      <h1 class="text-2xl font-bold text-center mb-6 text-blue-600">RMS</h1>
+      <h1 class="text-2xl font-bold text-center mb-6 text-blue-600">PnCOffice</h1>
       
       <form @submit.prevent="login">
         <div class="mb-4">

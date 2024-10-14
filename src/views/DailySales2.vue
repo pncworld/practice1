@@ -21,8 +21,7 @@
         &nbsp; &nbsp; &nbsp;&nbsp;<div class="items-center flex">일자  </div> &nbsp; &nbsp;
         <DateRangePicker @update:dateRange="handleDateRangeUpdate" />
       </h2>
-      <PickStore2 @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd" @storeCd="searchStoreCd"></PickStore2>
-        
+      <PickStore2 @update:storeGroup="updateGroup" @update:storeType="updateType" :afterSearch="afterSearch" @storeCd="searchStoreCd"></PickStore2>
     </div>
     <br>
     <div class="flex justify-start items-center ml-5 space-x-3 -mt-8">

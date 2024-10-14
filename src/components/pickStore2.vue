@@ -84,6 +84,22 @@ const firstRadiobutton = ref("1");
 const store = useStore();
 const storeName = ref('');
 const emit = defineEmits(['storeCd']);
+const props = defineProps({
+  afterSearch : {
+    type : Boolean
+  }
+});
+
+watch(
+  () => props.afterSearch,
+  (newValue, oldValue) => {
+    if(newValue) {
+      openStoreGrid.value = false 
+    } else {
+      openStoreGrid.value = true;
+    }
+  }
+);
 const emitStoreGroup = (value) => {
     emit('update:storeGroup', value);
 };

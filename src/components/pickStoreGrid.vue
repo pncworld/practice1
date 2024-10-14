@@ -1,7 +1,8 @@
 <template>
  
     <div class="ag-theme-alpine" style="height: 400px; width: 650px;">
-      <div>매장명 : <input type="text" placeholder="매장명 입력" class="border border-stone-600" v-model="quickFilterText"  @input="onInput"></div>
+      <div class="flex justify-center">매장명 : <input type="text" placeholder="매장명 입력" class="border border-stone-600" v-model="quickFilterText"  @input="onInput"></div>
+      <br>
       <ag-grid-vue
         class="ag-theme-alpine custom-grid"
         :columnDefs="columnDefs"

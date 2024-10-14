@@ -4,7 +4,10 @@
       :format="format"
       :locale="locale"
       :range="true"
-      placeholder="날짜를 선택하세요" :enable-time-picker="false" 
+      placeholder="날짜를 선택하세요" 
+      :enable-time-picker="false" 
+      week-start="0"
+      auto-apply
       @change="handleDateRangeChange"></VueDatePicker>
       
       &nbsp;  &nbsp;  <button class="w-1/12" @click="toggleRadio" v-if="!showRadio"><img src="../assets/choiceCalendar.png" alt="" >
