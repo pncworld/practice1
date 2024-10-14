@@ -1,7 +1,7 @@
 <template>
  
     <div class="ag-theme-alpine" style="height: 400px; width: 650px;">
-      <div>매장명 : <input type="text" placeholder="매장명 입력" class="border border-stone-600" v-model="quickFilterText" @keyup="onQuickFilterChanged"></div>
+      <div>매장명 : <input type="text" placeholder="매장명 입력" class="border border-stone-600" v-model="quickFilterText"  @input="onInput"></div>
       <ag-grid-vue
         class="ag-theme-alpine custom-grid"
         :columnDefs="columnDefs"
@@ -10,6 +10,7 @@
         :defaultColDef="defaultColDef"
         @grid-ready="onGridReady"
         @selection-changed="onSelectionChanged"
+        :quickFilterText="quickFilterText"
         :gridOptions="gridOptions"
       />
     </div>
@@ -46,7 +47,9 @@
       width : 60 ,
       suppressSizeToFit: true  
     },
-    { field: 'lngStoreGroup', headerName: '매장그룹', sortable: true,  width: 90 ,
+    { field: 'lngStoreGroup', headerName: '매장그룹', sortable: true,  width: 90 , getQuickFilterText : (params) => {
+      return '';
+    },
       cellRenderer : (params) => {
         const currentValue = params.value;
 
@@ -56,21 +59,27 @@
       }
     },
     { field: 'strName', headerName: '매장명', sortable: true,  width: 220 , filter:true},
-    { field: 'lngStoreAttr', headerName: '직/가맹', sortable: true , width:70 ,cellRenderer : (params) => {
+    { field: 'lngStoreAttr', headerName: '직/가맹', sortable: true , width:70 ,  getQuickFilterText : (params) => {
+      return '';
+    },cellRenderer : (params) => {
         const currentValue = params.value;
 
         const matchedItem = store.state.storeType.find(item => item.lngStoreAttr == currentValue);
 
         return matchedItem.strName ;
       }},
-    { field: 'lngTeamCode', headerName: '수퍼바이저팀', sortable: true , width: 100 ,cellRenderer : (params) => {
+    { field: 'lngTeamCode', headerName: '수퍼바이저팀', sortable: true , width: 100 ,  getQuickFilterText : (params) => {
+      return '';
+    },cellRenderer : (params) => {
         const currentValue = params.value;
 
         const matchedItem = store.state.storeTeamCode.find(item => item.lngTeamCode == currentValue);
        
         return matchedItem ? matchedItem.strTeamName : '' ;
       } },
-    { field: 'lngSupervisor', headerName: '수퍼바이저', sortable: true, width: 100 ,
+    { field: 'lngSupervisor', headerName: '수퍼바이저',  getQuickFilterText : (params) => {
+      return '';
+    },sortable: true, width: 100 ,
        cellRenderer : (params) => {
         const currentValue = params.value;
 
@@ -100,19 +109,11 @@
     gridApi.value = params.api;
 
   }
-
-  const onQuickFilterChanged = (event) => {
-    quickFilterText.value = event.target.value;
-    gridApi.value.setFilterModel({
-    strName: {
-      filter: quickFilterText.value,
-      filterType: 'text' // 텍스트 필터링
-    },
-  });
-
-  // 필터를 적용하기 위해 그리드 새로고침
-  gridApi.value.onFilterChanged();
-   }
+  const onInput =(event) => {
+    const inputText = event.target.value;
+    quickFilterText.value = inputText;
+  }
+ 
 
  
   const props = defineProps({

@@ -378,7 +378,7 @@ const searchButton = () => {
       
       // 금요일 조단가 avg pncoffice랑 다른 부분 수정 
       if (tabInitSetArray.value[i].strDisplay == 'number') {
-        
+      
         column.cellRenderer = (params) => {
           if (params.node.group && !params.node.footer) {
             return '';
