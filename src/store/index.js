@@ -19,6 +19,8 @@ export default createStore({
       storeGroup : [],
       storeType : [],
       storeCd : [],
+      storeTeamCode : [],
+      storeSupervisor : [],
       loading : false
     };
   },
@@ -82,6 +84,12 @@ export default createStore({
     setStoreCd(state,data){
       state.storeCd = data;
     },
+    setstoreTeamCode(state,data){
+      state.storeTeamCode = data;
+    },
+    setstoreSupervisor(state,data){
+      state.storeSupervisor = data;
+    },
     refreshTAB(state, data) {
       const tab = state.currentTabs.find(tab => tab.lngProgramID === data);
       if (tab) {
@@ -130,6 +138,12 @@ export default createStore({
     },
     StoreCd({commit},data){
       commit('setStoreCd',data);
+    },
+    StoreTeamCode({commit},data){
+      commit('setstoreTeamCode',data);
+    },
+    StoreSupervisor({commit},data){
+      commit('setstoreSupervisor',data);
     },
     refreshTab({commit},data) {
       commit('refreshTAB' , data) ;

@@ -17,9 +17,9 @@
     </div>
     <br />
     <div class="flex justify-between items-center">
-      <h2 class="flex justify-start w-3/12">
-        &nbsp; &nbsp; &nbsp;<div class="items-center flex">일자</div> &nbsp; &nbsp;
-        <DateRangePicker @update:dateRange="handleDateRangeUpdate" class="w-9/12" />
+      <h2 class="flex justify-start w-6/12">
+        &nbsp; &nbsp; &nbsp;&nbsp;<div class="items-center flex">일자  </div> &nbsp; &nbsp;
+        <DateRangePicker @update:dateRange="handleDateRangeUpdate" />
       </h2>
       <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd"></pickStore>
     </div>

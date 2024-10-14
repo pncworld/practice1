@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@ag-grid-community/locale": "~32.2.0",
+    "@vueform/multiselect": "^2.6.10",
     "@vuepic/vue-datepicker": "^9.0.3",
     "ag-grid-charts-enterprise": "^32.2.0",
     "ag-grid-community": "^32.2.0",

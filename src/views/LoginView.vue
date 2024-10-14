@@ -93,7 +93,8 @@ const login = async () => {
        store.dispatch("StoreGroup",result[0]);
        store.dispatch("StoreType",result[1]);
        store.dispatch("StoreCd",result[2]);
-      
+       store.dispatch("StoreTeamCode",result[3]);
+       store.dispatch("StoreSupervisor",result[4]);
      } 
       await readsales();
       store.dispatch('convertLoading',false);
