@@ -11,8 +11,10 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 import "ag-grid-enterprise";
 import  "ag-grid-charts-enterprise";
 import { useLoading } from 'vue-loading-overlay'
+import 'v-calendar/style.css';
+import { Calendar, DatePicker } from 'v-calendar'
 
 createApp(App).use(router).use(store).use('Loading', useLoading)
-.component('VueDatePicker',VueDatePicker).component("ag-grid-vue",AgGridVue).mount('#app');
+.component('VueDatePicker',VueDatePicker).component('VDatePicker',DatePicker ).component('VCalendar',Calendar ).component("ag-grid-vue",AgGridVue).mount('#app');
 
 

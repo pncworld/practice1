@@ -7,7 +7,7 @@
         class="ag-theme-alpine custom-grid"
         :columnDefs="columnDefs"
         :rowData="rowData"
-        :rowSelection="'multiple'"
+         suppressRowClickSelection='false' rowSelection="multiple" rowMultiSelectWithClick='true'
         :defaultColDef="defaultColDef"
         @grid-ready="onGridReady"
         @selection-changed="onSelectionChanged"
@@ -31,11 +31,6 @@
   const gridOptions = {
   // 한글화
   localeText: AG_GRID_LOCALE_KR,
-  suppressRowClickSelection: true,
-  onCellClicked: (event) => {
-    // 체크박스의 상태를 토글
-    event.node.setSelected(!event.node.isSelected());
-  },
   }
   let gridApi = shallowRef();
   let gridColumnApi = ref(null);

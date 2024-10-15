@@ -72,7 +72,7 @@ const login = async () => {
      });
 
      const result = response.data.recordsets[0] ;
-
+      console.log(result)
       const mainCategoryData = result.filter(item => Number(item.strMenuLevel) == 1); // 숫자
       const subCategoryData = result.filter(item => Number(item.strMenuLevel) == 2);
       const minorCategoryData = result.filter(item => Number(item.strMenuLevel) == 3);
@@ -88,8 +88,9 @@ const login = async () => {
       const response = await axios.post("http://211.238.145.43:3000/usp_APP_COMSTORE_GET_LIST",{
         P_STORE_CD : store.state.userData.lngStoreGroup ,
       });
-
+        
        const result = response.data.recordsets ;
+       console.log(result[2])
        store.dispatch("StoreGroup",result[0]);
        store.dispatch("StoreType",result[1]);
        store.dispatch("StoreCd",result[2]);

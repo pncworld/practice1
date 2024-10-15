@@ -5,6 +5,7 @@ import DailySales from '@/views/DailySales.vue'
 import CancelSales from '@/views/CancelSales.vue'
 import DailySales2 from '../views/DailySales2.vue'
 import LoginView from '../views/LoginView.vue'
+import MasterEnroll from '@/views/masterEnroll.vue'
 
 const routes = [
   {
@@ -28,7 +29,6 @@ const routes = [
     name: 'dailysales2',
     component: DailySales2
   }
-  
   ,
   {
     path: '/cancelsales',
@@ -36,6 +36,11 @@ const routes = [
     component: CancelSales
   }
   ,
+  {
+    path: '/MST01_032INS.xml',
+    name: 'masterEnroll',
+    component: MasterEnroll
+  }
 ]
 
 const router = createRouter({
