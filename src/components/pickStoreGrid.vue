@@ -50,7 +50,7 @@
         const currentValue = params.value;
 
         const matchedItem = store.state.storeGroup.find(item => item.lngStoreGroup == currentValue);
-
+        
         return matchedItem.strName ;
       }
     },
@@ -59,10 +59,10 @@
       return '';
     },cellRenderer : (params) => {
         const currentValue = params.value;
-
+     
         const matchedItem = store.state.storeType.find(item => item.lngStoreAttr == currentValue);
 
-        return matchedItem.strName ;
+        return matchedItem != undefined ? matchedItem.strName : '미지정' ;
       }},
     { field: 'lngTeamCode', headerName: '수퍼바이저팀', sortable: true , width: 100 ,  getQuickFilterText : (params) => {
       return '';
@@ -70,7 +70,7 @@
         const currentValue = params.value;
 
         const matchedItem = store.state.storeTeamCode.find(item => item.lngTeamCode == currentValue);
-       
+
         return matchedItem ? matchedItem.strTeamName : '' ;
       } },
     { field: 'lngSupervisor', headerName: '수퍼바이저',  getQuickFilterText : (params) => {
@@ -80,7 +80,7 @@
         const currentValue = params.value;
 
         const matchedItem = store.state.storeSupervisor.find(item => item.lngSupervisor == currentValue);
-
+        
         return matchedItem.strName ;
       }
     },
