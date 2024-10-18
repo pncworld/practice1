@@ -5,7 +5,7 @@
                  <div><button @click="addStore">신규</button></div>
                  <div><button @click="updateRowData">저장</button></div>
                  <div><button @click="deleteStore">삭제</button></div>
-                 <div><button>엑셀</button></div> </div>
+                 <div><button @click="exportToExcel">엑셀</button></div> </div>
                  <br>
                  <div class="flex justify-start ml-10 space-x-5"><PickStore3 :groupCdDisabled="groupCdDisabled" :gridOptions="gridOptions"  @update:storeType="handleGroupCdDisabledUpdate" @update:storeCd="handleStoreCd"></PickStore3> <input type="text" class="w-1/7 rounded border border-neutral-700 " v-model="searchStoreName" @keyup.enter="searchStore"></div> 
                 
@@ -198,6 +198,9 @@ const handleGroupCdDisabledUpdate = (newValue) => {
 const storeCd = ref('0');
 const handleStoreCd = (newValue) => {
     storeCd.value = newValue
+}
+function exportToExcel() {
+    gridApi.value.exportDataAsExcel();
 }
 const groupCdDisabled = ref(true);
 const defaultColDef = ref({
