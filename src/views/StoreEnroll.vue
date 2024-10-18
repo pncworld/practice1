@@ -1,7 +1,7 @@
 <template>
     <div>
                  <div class="flex justify-end space-x-10 mr-32"><div class="flex justify-start text-2xl font-bold mr-40"><h1>매장 정보 등록</h1></div>
-                 <div><button @click="searchStore">조회</button></div>
+                 <div><button @click="searchStore"><img src="../assets/search2.png" alt="" class="rounded-md "></button></div>
                  <div><button @click="addStore">신규</button></div>
                  <div><button @click="updateRowData">저장</button></div>
                  <div><button @click="deleteStore">삭제</button></div>
@@ -10,7 +10,7 @@
                  <div class="flex justify-start ml-10 space-x-5"><PickStore3 :groupCdDisabled="groupCdDisabled" :gridOptions="gridOptions"  @update:storeType="handleGroupCdDisabledUpdate" @update:storeCd="handleStoreCd"></PickStore3> <input type="text" class="w-1/7 rounded border border-neutral-700 " v-model="searchStoreName" @keyup.enter="searchStore"></div> 
                 
     </div>
-    <div><ag-grid-vue class="ag-theme-alpine custom-grid" :defaultColDef="defaultColDef" :columnDefs="colDefs2"  rowSelection="multiple" :rowData="rowData" style="height:460px" @rowClicked="onRowClicked" @grid-ready="onGridReady"/></div>
+    <div><ag-grid-vue class="ag-theme-alpine custom-grid" :defaultColDef="defaultColDef" :columnDefs="colDefs2"  rowSelection="multiple" :rowData="rowData" style="height:560px" @rowClicked="onRowClicked" @grid-ready="onGridReady"/></div>
    <div class="relative left-0 -top-4 mt-5">
     <div class="absolute grid grid-cols-6 grid-rows-10 gap-0 w-full">
         <div class="border flex h-7 items-center text-sm font-semibold justify-center bg rounded-ss-xl bg-gray-100 text-blue-500">
@@ -217,7 +217,7 @@ const GridInfo_PROG_ID = "MST01_002INS_VUE";
 const GridInfo_GRID_ID = "1";
 // API 호출 (설정값 호출)
 const { tabInitSetArray } = useTabInfo(GridInfo_PROG_ID, GridInfo_GRID_ID);
-console.log(tabInitSetArray)
+
 const colDefs2 =ref([]);
 
 const rowData = ref ([]);
@@ -323,7 +323,7 @@ const searchStore = async() => {
        }
       )
        const result = response.data.recordsets[0];
-       console.log(result)
+    
        updateColumns(result)
        store.dispatch("convertLoading", false);
     
@@ -331,6 +331,7 @@ const searchStore = async() => {
 }
 const insertupdated =ref();
 const deleteStore = async() => {
+  store.dispatch("convertLoading", true);
   const selectedRowNode = gridApi.value.getSelectedNodes();
 
   const response = await axios.post('http://211.238.145.43:3000/VUE_usp_mstStore_Delete' , {
@@ -343,6 +344,7 @@ const deleteStore = async() => {
   if (response.status == '200'){
     Swal.fire('삭제 되었습니다.')
   }
+  store.dispatch("convertLoading", false);
   searchStore();
 }
 const addStore = () => {
@@ -376,7 +378,7 @@ const addStore = () => {
       lngSaleType: '',
       dtmStop:'',
       strDev1: '',
-      lngTable: '',
+      lngTable: null,
       lngSupervisor: '',
       strStoreHistory: '',
       lngMultiPriceGroupCode: null,
@@ -389,6 +391,7 @@ const addStore = () => {
     insertupdated.value = gridApi.value.applyTransaction({add: [newItem]}); // 그리드에 업데이트
 }
 const updateRowData = async() => {
+  store.dispatch("convertLoading", true);
   const rowsToSave = [];
   const rowsToUpdate = [];
   gridApi.value.forEachNode((node) => {
@@ -396,7 +399,7 @@ const updateRowData = async() => {
     rowsToSave.push(node.data)
   } else if (node.data.isUpdate) {
     rowsToUpdate.push(node.data)
-    console.log(node.data)
+ 
   }
 });
 
@@ -426,7 +429,7 @@ let result = 0;
   P_lngUserID: rowsToSave.map(row => row.lngUserID).join(',') ,
   P_lngMultiPriceGroupCode : rowsToSave.map(row => row.lngMultiPriceGroupCode).join(',') 
 };
-console.log(finalObject)
+
 const response = await axios.post('http://211.238.145.43:3000/VUE_usp_mstStore_Insert', finalObject)
        
         if (response.status === 200) {
@@ -458,7 +461,7 @@ const finalObject1 = {
       P_strConvCode: rowsToUpdate.map(row => row.strConvCode).join(','),
       P_lngUserID: rowsToUpdate.map(row => row.lngUserID).join(',')
 };
-console.log(finalObject1)
+
 const response = await axios.post('http://211.238.145.43:3000/VUE_usp_mstStore_Update', finalObject1)
      
       if (response.status === 200) {
@@ -468,7 +471,7 @@ const response = await axios.post('http://211.238.145.43:3000/VUE_usp_mstStore_U
   if (result === 200) {
         Swal.fire('저장 되었습니다.');
     }
-  
+    store.dispatch("convertLoading", false);
   searchStore()
 }
 const updateColumns = (result) => {
@@ -562,7 +565,7 @@ const updateColumns = (result) => {
 
       if(tabInitSetArray.value[i].strColID == 'lngMultiPriceGroupCode'){
         column.cellRenderer = (params) =>{
-          if(params.value != null && params.value ){
+          if(params.value != null ){
           if(lngMultiPriceGroupCodes.value.length == 0){
              return ''
            } else {
@@ -670,7 +673,7 @@ const updateColumns = (result) => {
     
 }
 const updateGridValue = (event) => {
-  console.log(event)
+
   let inputText = event.target.value;
   const inputName = event.target.name ;
 
@@ -726,7 +729,7 @@ const onRowClicked = (event) => {
     
     if ( selectedRowData.isNew == true ) {
       disableStoreCode.value = false;
-      console.log(disableStoreCode.value)
+    
     } else {
       disableStoreCode.value = true;
     }

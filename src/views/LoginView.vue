@@ -1,5 +1,5 @@
 <template>
-      <div class="flex items-center justify-center h-screen bg-slate-100 mr-20 ">
+      <div class="flex items-center justify-center h-screen bg-slate-100  ">
         <loading></loading>
         <div><img class="mr-20 size-4/5" src="../assets/login_visual.png" alt=""></div>
         <!-- <img src="../assets/cashier.png" class="mr-40 w-60 h-auto animate-rise" alt="" >
@@ -91,7 +91,7 @@ const login = async () => {
       });
         
        const result = response.data.recordsets ;
-       console.log(result[2])
+  
        store.dispatch("StoreGroup",result[0]);
        store.dispatch("StoreType",result[1]);
        store.dispatch("StoreCd",result[2]);
@@ -99,8 +99,9 @@ const login = async () => {
        store.dispatch("StoreSupervisor",result[4]);
      } 
       await readsales();
+      store.dispatch('selectCategory' , 1)
       store.dispatch('convertLoading',false);
-      router.push('/MISALES::SLS06_004RPT.xml');
+      router.push('/homepage');
       
     } else {
       throw new Error("로그인 실패");

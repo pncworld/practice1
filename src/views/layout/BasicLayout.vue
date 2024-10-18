@@ -5,26 +5,8 @@
     <header v-if="showMenu" class="bg-white border rounded-3xl text-gray-600 p-4 w-full h-14">
       
       <div class="text-sm font-bold flex space-x-5 ml-40 justify-center -mt-2">
-        <img src="../../../public/favicon.png" class="size-10 right-10 relative" alt="">
+        <button @click="moveToHome"><img src="../../assets/homepage.svg" class="size-10 right-10 relative" alt=""></button>
         <button  v-for="(item , i) in mainCategoryList" :key="i" value="" id="{{ item.lngCode }}" @click="selectCategory(item.lngCode)" >{{ item.strTitle }}</button>
-        <!-- <button @click="navigateTo('/dashboard'); selectCategory('home');">홈</button>&nbsp;&nbsp;&nbsp;
-        <button>즐겨찾기</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button @click="selectCategory('sale')">매출</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button @click="selectCategory('warehouse')">창고</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button @click="selectCategory('purchase')">구매</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button @click="selectCategory('purchase2')">구매(직영)</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button @click="selectCategory('cost')">원가</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button @click="selectCategory('order')">수주</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button>인사</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button>회계</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button>포스</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button>CRM</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button>매출</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button>포스</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button>기준정보</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button>시스템</button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <button>계정</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      -->
         <div class="absolute right-10 space-x-4 mt-3 text-black font-bold ">
         <button class=" text-sm" @click="reLoad">새로고침</button> 
         <button class=" text-sm" @click="hideMenu">확대</button>
@@ -41,10 +23,10 @@
       </aside>
       
       <!-- Main Content -->
-      <main class="flex-1 p-1 overflow-y-scroll overflow-x-hidden">
+      <main class="flex-1 bg-white p-1 overflow-y-scroll overflow-x-hidden">
         <div class="flex space-x-2">
-        <div v-if="showMenu" v-for="tab in tabs" :key="tab.lngProgramID" @click="setActiveTab(tab)" class="w-2/12 bg-white text-gray-500 border border-slate-950 rounded-md px-4 py-2 cursor-pointer hover:bg-blue-50 transition">
-          {{tab.strTitle}}<button @click.stop="removeTab(tab)"><img src="../../assets/deleteIcon.png" alt="x" class="w-4 h-auto"></button>  </div>
+        <div v-if="showMenu" v-for="tab in tabs" :key="tab.lngProgramID" @click="setActiveTab(tab)" class="w-auto bg-slate-100 text-base text-black rounded-md px-4 py-2 cursor-pointer font-bold hover:bg-blue-50 transition">
+          {{tab.strTitle}}<button @click.stop="removeTab(tab)"><span class="text-blue-300"><img src="../../assets/deleteIcon.png" alt="" class="size-4"></span></button>  </div>
         </div>
       <router-view v-slot="{ Component , route}">
       <keep-alive>
@@ -110,7 +92,7 @@ const logout = () => {
   window.location.href = '/';
 }
 
-const isMenu = ref(true);
+const isMenu = ref(false);
 const mainCategoryList = computed(() => store.state.mainCategory);
 const clickFirstCategory = () => {
   const buttons = document.querySelectorAll('button'); // 모든 버튼 선택
@@ -128,7 +110,9 @@ const hideMenu = () => {
   isMenu.value = !isMenu.value;
   
 }
-
+const moveToHome = () => {
+  router.push('/homePage')
+}
 
 const excludedComponents = ref([]);
 

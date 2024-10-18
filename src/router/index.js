@@ -7,6 +7,7 @@ import DailySales2 from '../views/DailySales2.vue'
 import LoginView from '../views/LoginView.vue'
 import MasterEnroll from '@/views/masterEnroll.vue'
 import StoreEnroll from '@/views/StoreEnroll.vue'
+import HomePage from '@/views/homePage.vue'
 
 const routes = [
   {
@@ -25,6 +26,7 @@ const routes = [
     name: 'dailysales',
     component: DailySales
   },
+  
   {
     path: '/SLS06_003RPT.xml',
     name: 'dailysales2',
@@ -46,6 +48,11 @@ const routes = [
     path: '/MST01_002INS.xml',
     name: 'storeEnroll',
     component: StoreEnroll
+  },
+  {
+    path: '/homePage',
+    name: 'homePage',
+    component: HomePage
   }
 ]
 
