@@ -185,7 +185,7 @@ import { useTabInfo } from '@/common/api/useTabInfo';
 import Swal from 'sweetalert2';
 const result = ref([]);
 const store = useStore();
-const groupCd = store.state.storeGroup[0].lngStoreGroup
+const groupCd = store.state.storeGroup[0] ?  store.state.storeGroup[0].lngStoreGroup : ''
 const searchStoreName = ref('')
 const disableStoreCode = ref(true);
 const gridOptions = {

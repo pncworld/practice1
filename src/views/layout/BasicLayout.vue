@@ -41,7 +41,7 @@
       </aside>
       
       <!-- Main Content -->
-      <main class="flex-1 p-1 bg-white overflow-y-scroll overflow-x-hidden">
+      <main class="flex-1 p-1 overflow-y-scroll overflow-x-hidden">
         <div class="flex space-x-2">
         <div v-if="showMenu" v-for="tab in tabs" :key="tab.lngProgramID" @click="setActiveTab(tab)" class="w-2/12 bg-white text-gray-500 border border-slate-950 rounded-md px-4 py-2 cursor-pointer hover:bg-blue-50 transition">
           {{tab.strTitle}}<button @click.stop="removeTab(tab)"><img src="../../assets/deleteIcon.png" alt="x" class="w-4 h-auto"></button>  </div>

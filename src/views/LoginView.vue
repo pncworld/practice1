@@ -5,7 +5,7 @@
         <!-- <img src="../assets/cashier.png" class="mr-40 w-60 h-auto animate-rise" alt="" >
         <img src="../assets/swipe.png" class="mr-40 w-60 h-auto animate-fall" alt="" > -->
       <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
-      <h1 class="text-2xl font-bold text-center mb-6 text-blue-600 flex justify-center"><img src="../assets/login_rms.svg"></img></h1>
+      <h1 class="text-2xl font-bold text-center mb-6 text-blue-600 flex justify-center">PNC Office</h1>
       
       <form @submit.prevent="login">
         <div class="mb-4">
