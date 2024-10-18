@@ -1,10 +1,11 @@
 <template>
-      <div class="flex items-center justify-center h-screen bg-blue-200">
+      <div class="flex items-center justify-center h-screen bg-slate-100 mr-20 ">
         <loading></loading>
-        <img src="../assets/cashier.png" class="mr-40 w-60 h-auto animate-rise" alt="" >
-        <img src="../assets/swipe.png" class="mr-40 w-60 h-auto animate-fall" alt="" >
+        <div><img class="mr-20 size-4/5" src="../assets/login_visual.png" alt=""></div>
+        <!-- <img src="../assets/cashier.png" class="mr-40 w-60 h-auto animate-rise" alt="" >
+        <img src="../assets/swipe.png" class="mr-40 w-60 h-auto animate-fall" alt="" > -->
       <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
-      <h1 class="text-2xl font-bold text-center mb-6 text-blue-600">PnCOffice</h1>
+      <h1 class="text-2xl font-bold text-center mb-6 text-blue-600 flex justify-center"><img src="../assets/login_rms.svg"></img></h1>
       
       <form @submit.prevent="login">
         <div class="mb-4">

@@ -2,8 +2,10 @@
   <div class="flex flex-col h-screen overflow-hidden bg-gray-100">
     <Loading></Loading>
     <!-- Header -->
-    <header v-if="showMenu" class="bg-blue-900 text-white p-4 w-full h-2/7">
-      <div class="text-xll font-bold flex space-x-5 ml-40 justify-center">
+    <header v-if="showMenu" class="bg-white border rounded-3xl text-gray-600 p-4 w-full h-14">
+      
+      <div class="text-sm font-bold flex space-x-5 ml-40 justify-center -mt-2">
+        <img src="../../../public/favicon.png" class="size-10 right-10 relative" alt="">
         <button  v-for="(item , i) in mainCategoryList" :key="i" value="" id="{{ item.lngCode }}" @click="selectCategory(item.lngCode)" >{{ item.strTitle }}</button>
         <!-- <button @click="navigateTo('/dashboard'); selectCategory('home');">홈</button>&nbsp;&nbsp;&nbsp;
         <button>즐겨찾기</button>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -23,7 +25,7 @@
         <button>시스템</button>&nbsp;&nbsp;&nbsp;&nbsp;
         <button>계정</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       -->
-        <div class="absolute right-10 space-x-4">
+        <div class="absolute right-10 space-x-4 mt-3 text-black font-bold ">
         <button class=" text-sm" @click="reLoad">새로고침</button> 
         <button class=" text-sm" @click="hideMenu">확대</button>
         <button class=" text-sm" @click="logout">로그아웃</button> 
@@ -34,8 +36,8 @@
     
     <div class="flex flex-1 overflow-hidden">
       <!-- Sidebar -->
-      <aside v-show="isMenu && showMenu" class="w-1/5 bg-white text-gray-600 p-0 m-0 border-gray-200 rounded border-4 flex justify-center items-center">
-        <BasicMenu v-if="showMenu" class="w-full h-full" />
+      <aside v-show="isMenu && showMenu" class="w-1/5 bg-white text-gray-600 p-0 m-0 border-gray-200 rounded-full border flex justify-center items-center">
+        <BasicMenu v-if="showMenu" class="w-full h-full rounded-xl border" />
       </aside>
       
       <!-- Main Content -->
@@ -92,7 +94,7 @@ const selectCategory = (category) => {
 const logout = () => {
   
   store.replaceState({
-       userData: [], // 사용자 데이터를 저장할 상태
+      userData: [], // 사용자 데이터를 저장할 상태
       selectedCategoryId : null ,
       currentTabs : [] ,
       activeTab : '',

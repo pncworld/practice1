@@ -6,6 +6,7 @@ import CancelSales from '@/views/CancelSales.vue'
 import DailySales2 from '../views/DailySales2.vue'
 import LoginView from '../views/LoginView.vue'
 import MasterEnroll from '@/views/masterEnroll.vue'
+import StoreEnroll from '@/views/StoreEnroll.vue'
 
 const routes = [
   {
@@ -40,6 +41,11 @@ const routes = [
     path: '/MST01_032INS.xml',
     name: 'masterEnroll',
     component: MasterEnroll
+  }
+  ,{
+    path: '/MST01_002INS.xml',
+    name: 'storeEnroll',
+    component: StoreEnroll
   }
 ]
 

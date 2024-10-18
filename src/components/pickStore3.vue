@@ -16,7 +16,7 @@
       <div>
         <select :disabled="isDisabled3"  class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreCode($event.target.value)">
         
-          <option value="0">선택</option>
+          <option value="0">전체</option>
           <option :value="item.lngStoreCode" v-for="item in storeCd" :key="item.lngStoreCode">{{ item.strName }}</option>
         </select>
       </div>

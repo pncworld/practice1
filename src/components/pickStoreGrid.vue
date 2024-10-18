@@ -148,16 +148,7 @@
     emit('storeName' ,  selectedNodes.length > 1? selectedstoreName[0] +'외 '+(selectedNodes.length-1)+'건' : selectedstoreName[0]); 
   }
 
-  // const gridOptions = {
-  // onGridReady: (params) => {
-  //   params.api.sizeColumnsToFit();
-  // },
-  // };
-
-  // const onFilterChanged = () => {
-  //   const gridApi = gridOptions.api;
-  //   gridApi.setQuickFilter(searchTerm.value);
-  // }
+  
   </script>
   
   <style scoped>
