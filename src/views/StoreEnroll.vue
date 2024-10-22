@@ -1,16 +1,23 @@
 <template>
     <div>
-                 <div class="flex justify-end space-x-10 mr-32"><div class="flex justify-start text-2xl font-bold mr-40"><h1>매장 정보 등록</h1></div>
-                 <div><button @click="searchStore"><img src="../assets/search2.png" alt="" class="rounded-md "></button></div>
-                 <div><button @click="addStore">신규</button></div>
-                 <div><button @click="updateRowData">저장</button></div>
-                 <div><button @click="deleteStore">삭제</button></div>
-                 <div><button @click="exportToExcel">엑셀</button></div> </div>
+                 <div class="flex justify-start pl-4 pt-4">
+                 <div class="flex justify-start"><h1 class="font-bold text-2xl">
+                  매장정보등록
+                 </h1></div>
+                  <div class="flex absolute right-10 justify-end space-x-2"><button @click="searchStore" class="button search">조회</button>
+                  <button @click="addStore" class="button new">신규</button>
+                  <button @click="updateRowData" class="button save">저장</button>
+                  <button @click="deleteStore" class="button delete">삭제</button>
+                  <button @click="exportToExcel" class="button excel">엑셀</button>
+                </div> 
+                
+                 </div>
                  <br>
-                 <div class="flex justify-start ml-10 space-x-5"><PickStore3 :groupCdDisabled="groupCdDisabled" :gridOptions="gridOptions"  @update:storeType="handleGroupCdDisabledUpdate" @update:storeCd="handleStoreCd"></PickStore3> <input type="text" class="w-1/7 rounded border border-neutral-700 " v-model="searchStoreName" @keyup.enter="searchStore"></div> 
+                 
+                 <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center"><PickStore3 :groupCdDisabled="groupCdDisabled" :gridOptions="gridOptions"  @update:storeType="handleGroupCdDisabledUpdate" @update:storeCd="handleStoreCd"></PickStore3> <input type="text" class="w-1/7 rounded border border-neutral-700 h-9 px-1 " v-model="searchStoreName" @keyup.enter="searchStore"></div> 
                 
     </div>
-    <div><ag-grid-vue class="ag-theme-alpine custom-grid" :defaultColDef="defaultColDef" :columnDefs="colDefs2"  rowSelection="multiple" :rowData="rowData" style="height:560px" @rowClicked="onRowClicked" @grid-ready="onGridReady"/></div>
+    <div><ag-grid-vue class="ag-theme-alpine custom-grid" :defaultColDef="defaultColDef" :columnDefs="colDefs2"  rowSelection="multiple" :rowData="rowData" style="height:550px" @rowClicked="onRowClicked" @grid-ready="onGridReady"/></div>
    <div class="relative left-0 -top-4 mt-5">
     <div class="absolute grid grid-cols-6 grid-rows-10 gap-0 w-full">
         <div class="border flex h-7 items-center text-sm font-semibold justify-center bg rounded-ss-xl bg-gray-100 text-blue-500">
@@ -183,6 +190,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import PickStore3 from '@/components/pickStore3.vue';
 import { useTabInfo } from '@/common/api/useTabInfo';
 import Swal from 'sweetalert2';
+
 const result = ref([]);
 const store = useStore();
 const groupCd = store.state.storeGroup[0] ?  store.state.storeGroup[0].lngStoreGroup : ''
@@ -363,7 +371,7 @@ const addStore = () => {
       strStoreAttrName:'',
       lngStoreArea: null,
       strStoreAreaName: '',
-      dtmOpenDate: '',
+      dtmOpenDate: null,
       strTel: '',
       strFax: '',
       strZipCode: null,
@@ -553,7 +561,7 @@ const updateColumns = (result) => {
           if(params.value !='' && params.value !=null){
 
           
-          const rawDate = params.value; // 주어진 데이터 (예: 20110302)
+          const rawDate = params.value.toString(); // 주어진 데이터 (예: 20110302)
         
         // 날짜 형식을 변환 (2011-03-02)
         const formattedDate = `${rawDate.substring(0, 4)}-${rawDate.substring(4, 6)}-${rawDate.substring(6, 8)}`;

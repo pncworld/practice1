@@ -1,0 +1,148 @@
+/* button {
+  box-sizing: border-box;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: "Noto Sans KR", Helvetica, "malgun gothic", "Apple SD Gothic Neo", "Microsoft NeoGothic", "Droid sans", arial, sans-serif;
+  font-size: 1rem;
+  margin: 0;
+  letter-spacing: -0.02em;
+} */
+
+.button {
+  font-weight: 500;
+  height: 36px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.button.new:before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background: url(../assets/ic_new-registration.svg) no-repeat;
+  color: #fff;
+  margin-right: 5px;
+  margin-top: 1px;
+}
+
+.button.new {
+  background-color: #5782FF;
+  color: #fff;
+}
+
+.button.save {
+  background-color: #5782FF;
+  color: #fff;
+}
+.button.save:before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background: url(../assets/ic_save.svg) no-repeat;
+  color: #fff;
+  margin-right: 5px;
+  margin-top: 1px;
+}
+body, input, select, button, textarea, h1, h2, h3, h4, h5, h6, table {
+  font: 500 14px "Noto Sans KR", Helvetica, "malgun gothic", "Apple SD Gothic Neo", "Microsoft NeoGothic", "Droid sans", arial, sans-serif;
+}
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  word-break: keep-all;
+  word-wrap: break-word;
+}
+.contents_title {
+  display: flex;
+  align-items: center;
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.button.delete:before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background: url(../assets/ic_delete_file.svg) no-repeat;
+  color: #fff;
+  margin-right: 5px;
+  margin-top: 1px;
+}
+.button.delete {
+  background-color: #5782FF;
+  color: #fff;
+}
+.button.primary {
+  background-color: #5782FF;
+  color: #fff;
+}
+.contents_form-submit .button {
+  margin-left: 5px;
+}
+.button.search {
+  background-color: #5782FF;
+  color: #fff;
+  display: flex;
+  border-radius: 5px;
+  justify-content: center;
+}
+
+
+.button.search:before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background: url(../assets/ic_search_fff.svg) no-repeat;
+  color: #fff;
+  margin-right: 5px;
+  margin-top: 1px;
+}
+
+.button.search:disabled {
+  background-color: #dddddd;
+}
+.contents_form-top {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.contents_form-submit .button {
+  margin-left: 5px;
+}
+.contents_form-submit {
+  width: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.button.excel {
+  background-color: #5782FF;
+  color: #fff;
+  display: flex;
+  border-radius: 5px;
+  justify-content: center;
+}
+
+
+.button.excel:before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background: url(../assets/excel_icon.svg) no-repeat;
+  background-size: contain;
+  color: #fff;
+  margin-right: 5px;
+  margin-top: 1px;
+}
+
+.button.excel:disabled {
+  background-color: #dddddd;
+}

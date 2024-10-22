@@ -51,7 +51,7 @@
 
         const matchedItem = store.state.storeGroup.find(item => item.lngStoreGroup == currentValue);
         
-        return matchedItem.strName ;
+        return matchedItem ? matchedItem.strName : ''  ;
       }
     },
     { field: 'strName', headerName: '매장명', sortable: true,  width: 220 , filter:true},
@@ -81,7 +81,7 @@
 
         const matchedItem = store.state.storeSupervisor.find(item => item.lngSupervisor == currentValue);
         
-        return matchedItem.strName ;
+        return matchedItem ? matchedItem.strName : '' ;
       }
     },
    

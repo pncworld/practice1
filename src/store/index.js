@@ -21,7 +21,8 @@ export default createStore({
       storeCd : [],
       storeTeamCode : [],
       storeSupervisor : [],
-      loading : false
+      loading : false,
+      favoriteList : [],
     };
   },
   mutations: {
@@ -44,7 +45,7 @@ export default createStore({
       if(existingTabs.length > 0 ) {
         const count = existingTabs.length + 1;
      
-        newstrTitle = `${tab.strTitle}_${count}`;
+        newstrTitle = `${tab.strTitle}`;
       }
 
       state.currentTabs.push({strUrl: newstrUrl , lngProgramID: newlngProgramID , strTitle : newstrTitle}); // 새로운 탭을 추가
@@ -93,11 +94,18 @@ export default createStore({
     refreshTAB(state, data) {
       const tab = state.currentTabs.find(tab => tab.lngProgramID === data);
       if (tab) {
-         tab.lngProgramID  = data + new Date().getTime();
+         tab.lngProgramID  = tab.lngProgramID + new Date().getTime();
       }
+      state.activeTab = tab.lngProgramID;
     } ,
     setLoading(state ,data) {
       state.loading = data ;
+    } ,
+    setFavoriteList(state ,data) {
+      state.favoriteList = data;
+    } ,
+    addFavoriteList(state, data) {
+      state.favoriteList.push(data);
     }
     
 
@@ -150,6 +158,9 @@ export default createStore({
     },
     convertLoading({commit} ,data) {
       commit('setLoading',data);
+    } ,
+    addFavoriteList({commit}, data) {
+      commit('addFavoriteList', data);
     }
   },
   getters: {

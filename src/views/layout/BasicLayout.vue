@@ -1,33 +1,36 @@
 <template>
   <div class="flex flex-col h-screen overflow-hidden bg-gray-100">
     <Loading></Loading>
-    <!-- Header -->
-    <header v-if="showMenu" class="bg-white border rounded-3xl text-gray-600 p-4 w-full h-14">
+    <header v-if="showMenu" class="bg-white border rounded-3xl text-gray-600 p-4 w-full h-20">
       
-      <div class="text-sm font-bold flex space-x-5 ml-40 justify-center -mt-2">
-        <button @click="moveToHome"><img src="../../assets/homepage.svg" class="size-10 right-10 relative" alt=""></button>
+      <div class="text-sm font-bold flex space-x-5 -ml-64 justify-center -mt-2">
         <button  v-for="(item , i) in mainCategoryList" :key="i" value="" id="{{ item.lngCode }}" @click="selectCategory(item.lngCode)" >{{ item.strTitle }}</button>
         <div class="absolute right-10 space-x-4 mt-3 text-black font-bold ">
-        <button class=" text-sm" @click="reLoad">새로고침</button> 
-        <button class=" text-sm" @click="hideMenu">확대</button>
-        <button class=" text-sm" @click="logout">로그아웃</button> 
+        <button><img src="../../assets/table_star.svg" alt="" class="size-7"></button>
+        <button @click="deleteAllTabs"><img src="../../assets/ic_delete.svg" alt="" class="size-7"></button>
+        <button  @click="reLoad"><img src="../../assets/ic_refresh.svg" alt="" class="size-7"></button>
+        <button @click="showMenus"><img src="../../assets/ic_menu.svg" alt="" class="size-7"></button>
+        <button  @click="hideMenu"><img src="../../assets/ic_extent.svg" alt="" class="size-7"></button>
+        <button  @click="logout" ><img src="../../assets/logout_icon.svg" alt="" class="size-5 -mt-6 ml-2"></button> 
         </div>
+        
       </div>
+      <div class="absolute z-50 right-36 top-14 border border-black" v-show="showmenus" ><div v-for="i in currentTabs" :key="i.lngProgramID" class="bg-white flex justify-start pt-3 pb-3"><button @click="setActiveTab(i)">{{ i.strTitle }}</button></div></div> 
+      <div class="flex space-x-2 absolute left-72 mt-4">
+        <div v-if="showMenu" v-for="tab in tabs" :key="tab.lngProgramID" @click="setActiveTab(tab)" class="w-auto h-7 bg-slate-100 text-xs rounded-md px-4 py-2 cursor-pointer font-bold hover:bg-blue-50 transition" :class="{'text-black': !isActive(tab),'text-blue-400' : isActive(tab)}">
+          {{tab.strTitle}}<button @click.stop="removeTab(tab)"><span class="text-blue-300 "><img src="../../assets/deleteIcon.png" alt="" class="size-3"></span></button>  </div>
+        </div>
       
     </header>
-    
     <div class="flex flex-1 overflow-hidden">
       <!-- Sidebar -->
-      <aside v-show="isMenu && showMenu" class="w-1/5 bg-white text-gray-600 p-0 m-0 border-gray-200 rounded-full border flex justify-center items-center">
-        <BasicMenu v-if="showMenu" class="w-full h-full rounded-xl border" />
+      <aside v-show="isMenu && showMenu" class=" bg-white text-gray-600 p-0 m-0 border-gray-200  border flex justify-center items-center" style="width:14%">
+        <BasicMenu v-if="showMenu" class="w-full h-full  border" />
       </aside>
       
       <!-- Main Content -->
       <main class="flex-1 bg-white p-1 overflow-y-scroll overflow-x-hidden">
-        <div class="flex space-x-2">
-        <div v-if="showMenu" v-for="tab in tabs" :key="tab.lngProgramID" @click="setActiveTab(tab)" class="w-auto bg-slate-100 text-base text-black rounded-md px-4 py-2 cursor-pointer font-bold hover:bg-blue-50 transition">
-          {{tab.strTitle}}<button @click.stop="removeTab(tab)"><span class="text-blue-300"><img src="../../assets/deleteIcon.png" alt="" class="size-4"></span></button>  </div>
-        </div>
+        
       <router-view v-slot="{ Component , route}">
       <keep-alive>
         <component :is="Component" :key="`${route.path}-${componentKey}`" />
@@ -43,11 +46,11 @@ import BasicMenu from '@/components/BasicMenu.vue';
 import DailySales from '@/components/DailySales.vue';
 import Loading from '@/components/loading.vue';
 import router from '@/router';
-import axios from 'axios';
+import Swal from 'sweetalert2';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import {  useStore } from 'vuex';
-import DailySales2 from '../DailySales2.vue';
+
 
 const route = useRoute();
 const store = useStore() ;
@@ -59,18 +62,41 @@ watch(() => route.path, (newPath) => {
   showMenu.value = newPath != '/'; // Update based on new route
  
 });
-
+const deleteAllTabs = () => {
+  Swal.fire({
+      title: '확인',
+      text: '열린화면을 모두 닫으시겠습니까?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if(result.isConfirmed){
+        store.dispatch('closeAllTabs');
+        router.push('/homePage');
+      } else {
+        
+      }
+     
+    });
+  
+}
 const navigateTo = (path) => {
   router.push(path);
 }
-
+const showmenus = ref(false);
+const currentTabs = ref(store.state.currentTabs);
+const showMenus = () => {
+  showmenus.value = !showmenus.value;
+  
+}
 const selectCategory = (category) => {
   
     store.dispatch('selectCategory', category);
    
     console.log(category);
   
-   isMenu.value = true;
+    isMenu.value = true;
 }
 
 const logout = () => {
@@ -134,10 +160,15 @@ const removeTab = (tab) => {
     
   } else {
     componentKey.value = null ;
-    router.push("/dashboard");
+    router.push("/homePage");
   }
    
 }
+
+const isActive = (tab) => {
+  const activeTab = store.state.activeTab ; 
+  return activeTab && activeTab == tab.lngProgramID;
+} 
 
 //ref 는 기존의 변수까지 전부 병렬적으로 바꾸는거 같고 computed는 직렬적으로 바꾸는 것 같음
 const lngProgramID = computed(() => {
@@ -145,17 +176,21 @@ const lngProgramID = computed(() => {
 });
 
 const reLoad = () => {
+  store.dispatch('convertLoading',true);
   const activeTab = store.state.activeTab ;
   store.dispatch('refreshTab' , activeTab );
-  componentKey.value = activeTab + new Date().getTime();
+ 
+  componentKey.value = activeTab;
+
+  store.dispatch('convertLoading',false);
 }
 
 const setActiveTab = (tab) => {
-  
+  // showmenus.value = false ;
   store.dispatch('changeActiveTab', tab);
   const activeTab = store.state.activeTab ;
   componentKey.value = activeTab;
-  //store.dispatch('refreshTab' , activeTab );
+  isActive(tab);
   router.push({path : tab.strUrl , query : { index : tab.lngProgramID}   });
 };
 

@@ -80,6 +80,7 @@ const login = async () => {
 
     
      store.dispatch("mainCategory",mainCategoryData );
+     store.dispatch('selectCategory' ,mainCategoryData[0].lngCode);
      store.dispatch("subCategory",subCategoryData );
      store.dispatch("minorCategory",minorCategoryData );
      
@@ -99,7 +100,7 @@ const login = async () => {
        store.dispatch("StoreSupervisor",result[4]);
      } 
       await readsales();
-      store.dispatch('selectCategory' , 1)
+      
       store.dispatch('convertLoading',false);
       router.push('/homepage');
       

@@ -22,7 +22,8 @@
         <DateRangePicker @update:dateRange="handleDateRangeUpdate" />
       </h2>
       <PickStore2 @update:storeGroup="updateGroup" @update:storeType="updateType" :afterSearch="afterSearch" @storeCd="searchStoreCd"></PickStore2>
-    </div>
+      
+      </div>
     <br>
     <div class="flex justify-start items-center ml-5 space-x-3 -mt-8">
       <div class="flex items-center">조회조건 &nbsp;&nbsp;&nbsp;</div>
