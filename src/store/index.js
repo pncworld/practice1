@@ -21,6 +21,7 @@ export default createStore({
       storeCd : [],
       storeTeamCode : [],
       storeSupervisor : [],
+      storeAreaCd : [],
       loading : false,
       favoriteList : [],
     };
@@ -40,7 +41,7 @@ export default createStore({
 
       let newlngProgramID = `${tab.lngProgramID}_${v4()}`;
       let newstrTitle = tab.strTitle;
-      let newstrUrl = tab.strUrl.split("::")[1];
+      let newstrUrl = tab.strUrl;
 
       if(existingTabs.length > 0 ) {
         const count = existingTabs.length + 1;
@@ -90,6 +91,9 @@ export default createStore({
     },
     setstoreSupervisor(state,data){
       state.storeSupervisor = data;
+    },
+    setstoreAreaCd(state,data){
+      state.storeAreaCd = data;
     },
     refreshTAB(state, data) {
       const tab = state.currentTabs.find(tab => tab.lngProgramID === data);
@@ -152,6 +156,9 @@ export default createStore({
     },
     StoreSupervisor({commit},data){
       commit('setstoreSupervisor',data);
+    },
+    StoreAreaCd({commit},data){
+      commit('setstoreAreaCd',data);
     },
     refreshTab({commit},data) {
       commit('refreshTAB' , data) ;

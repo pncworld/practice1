@@ -1,33 +1,33 @@
 <template>
   <div>
-    <div class="flex justify-between items-center w-full">
-      <h1 class="flex-grow text-center ml-24 text-2xl">일자별 매출 현황</h1>
-      <div class="flex">
-        <button class="flex justify-center" @click="searchButton">
-          <!-- <img src="../assets/search.png" alt="" class="h-auto" style="width: 30px">조회 -->
-          조회
-        </button>
-        &nbsp; &nbsp; &nbsp;
-        <button class="flex justify-center" @click="exportExcel">
-          <!-- <img src="../assets/excel.png" alt="" class="h-auto" style="width: 30px">엑셀 내보내기 -->
-          엑셀
-        </button>
-        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+  
+    <div class="flex justify-start pl-4 pt-4">
+                 <div class="flex justify-start"><h1 class="font-bold text-2xl">
+                  일자별 매출 현황
+                 </h1><div class="flex justify-end space-x-2" style="margin-left:1150px"><button @click="searchButton" class="button search">조회</button>
+                
+                  <button @click="exportExcel" class="button excel">엑셀</button>
+                </div> </div>
+                  
+                
+                 </div>
+    <br />
+    <div class="flex flex-col justify-between  space-x-5 bg-gray-200 rounded-lg h-20 items-center">
+    <div class="flex justify-between items-center space-x-96 w-full">
+      <div class="flex justify-between w-auto">
+        <div class="items-center flex ml-5">일자 </div> 
+        <DateRangePicker @update:dateRange="handleDateRangeUpdate" />
+      </div>
+      <div>
+      <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd"></pickStore>
       </div>
     </div>
-    <br />
-    <div class="flex justify-between items-center">
-      <h2 class="flex justify-start w-6/12">
-        &nbsp; &nbsp; &nbsp;&nbsp;<div class="items-center flex">일자  </div> &nbsp; &nbsp;
-        <DateRangePicker @update:dateRange="handleDateRangeUpdate" />
-      </h2>
-      <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd"></pickStore>
-    </div>
     <br>
-    <div class="flex justify-start items-center ml-5 space-x-3">
+    <div class="flex justify-start items-center ml-5 space-x-3 w-full">
       <div class="flex items-center">조회조건 &nbsp;&nbsp;&nbsp;</div>
       <input type="checkbox" id="detail" @click="detailView"><label for="detail">상세보기</label></input>
       <input type="checkbox" @click="rowGroupEnable($event)" id="cellUnite"><label for="cellUnite">셀병합</label></input>
+    </div>
     </div>
     &nbsp;
     &nbsp;
@@ -54,10 +54,11 @@ import { AG_GRID_LOCALE_KR } from '@ag-grid-community/locale';
 // 로그인한 사용자에 따라 법인명 매장명 등을 선택할 수 있게  만든 공통 컴포넌트 
 import PickStore from '@/components/pickStore.vue';
 // 각 탭 마다 필요한 그리드 설정 속성 불러오기
-import { useTabInfo } from '@/common/api/useTabInfo';
+import { useTabInfo } from '@/api/common';
 // alert 창 자동 꾸미기 위한 라이브러리
 import Swal from 'sweetalert2';
-import { NIL } from 'uuid';
+import { dailySaleReport } from '@/api/misales';
+
 
 const store = useStore();
 // 그리드에 다중 선택 혹은 개별 선택 설정 변수
@@ -82,7 +83,17 @@ const cellUnitedtf = ref(false);
 const GridInfo_PROG_ID = "SLS06_004RPT_VUE_TEST";
 const GridInfo_GRID_ID = "1";
 // API 호출 (설정값 호출)
-const { tabInitSetArray } = useTabInfo(GridInfo_PROG_ID, GridInfo_GRID_ID);
+const tabInitSetArray = ref([]);
+(async () => {
+    try {
+        const result = await useTabInfo(GridInfo_PROG_ID, GridInfo_GRID_ID);
+        tabInitSetArray.value = result; 
+    } catch (error) {
+        console.error("Failed to fetch data:", error); // 오류 로그 출력
+    } finally {
+      
+    }
+})();
 
 // 조회 값 설정 함수 선언
 const updateGroup = (value) => {
@@ -222,16 +233,16 @@ const searchButton = () => {
       return;
     }
     store.dispatch("convertLoading", true);
-    const response = await axios.post("http://211.238.145.43:3000/usp_AppDailySaleReportTest", {
-      P_GROUP_CD: groupCd.value,
-      P_STORE_CD: storeCd.value,
-      P_START_DT: startDate.value,
-      P_END_DT: endDate.value,
-      P_REPORT_TYPE: '1',
-      P_LANGUAGE: userData.strLanguage
-    });
-
+    const response = await dailySaleReport(
+      groupCd.value,
+      storeCd.value,
+      startDate.value,
+      endDate.value,
+      userData.strLanguage
+    );
+    
     const result = response.data.recordsets;
+
     updateColumn(result);
     afterSearch.value = true;
     store.dispatch("convertLoading", false);

@@ -3,13 +3,13 @@
                  <div class="flex justify-start pl-4 pt-4">
                  <div class="flex justify-start"><h1 class="font-bold text-2xl">
                   매장정보등록
-                 </h1></div>
-                  <div class="flex absolute right-10 justify-end space-x-2"><button @click="searchStore" class="button search">조회</button>
+                 </h1><div class="flex justify-end space-x-2" style="margin-left:750px"><button @click="searchStore" class="button search">조회</button>
                   <button @click="addStore" class="button new">신규</button>
                   <button @click="updateRowData" class="button save">저장</button>
                   <button @click="deleteStore" class="button delete">삭제</button>
                   <button @click="exportToExcel" class="button excel">엑셀</button>
-                </div> 
+                </div> </div>
+                  
                 
                  </div>
                  <br>
@@ -17,7 +17,7 @@
                  <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center"><PickStore3 :groupCdDisabled="groupCdDisabled" :gridOptions="gridOptions"  @update:storeType="handleGroupCdDisabledUpdate" @update:storeCd="handleStoreCd"></PickStore3> <input type="text" class="w-1/7 rounded border border-neutral-700 h-9 px-1 " v-model="searchStoreName" @keyup.enter="searchStore"></div> 
                 
     </div>
-    <div><ag-grid-vue class="ag-theme-alpine custom-grid" :defaultColDef="defaultColDef" :columnDefs="colDefs2"  rowSelection="multiple" :rowData="rowData" style="height:550px" @rowClicked="onRowClicked" @grid-ready="onGridReady"/></div>
+    <div><ag-grid-vue class="ag-theme-alpine custom-grid" :defaultColDef="defaultColDef" :columnDefs="colDefs2"  rowSelection="multiple" :rowData="rowData" style="height:540px" @rowClicked="onRowClicked" @grid-ready="onGridReady"/></div>
    <div class="relative left-0 -top-4 mt-5">
     <div class="absolute grid grid-cols-6 grid-rows-10 gap-0 w-full">
         <div class="border flex h-7 items-center text-sm font-semibold justify-center bg rounded-ss-xl bg-gray-100 text-blue-500">
@@ -188,8 +188,9 @@ import { useStore } from 'vuex';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import PickStore3 from '@/components/pickStore3.vue';
-import { useTabInfo } from '@/common/api/useTabInfo';
+import { useTabInfo } from '@/api/common';
 import Swal from 'sweetalert2';
+import { getMultiPrice, INS004_select, INS006_select, joinType_query, store_delete, store_insert, store_query, store_update, storeArea, storeAttr, subLease_query } from '@/api/master';
 
 const result = ref([]);
 const store = useStore();
@@ -224,8 +225,17 @@ const gridApi = ref();
 const GridInfo_PROG_ID = "MST01_002INS_VUE";
 const GridInfo_GRID_ID = "1";
 // API 호출 (설정값 호출)
-const { tabInitSetArray } = useTabInfo(GridInfo_PROG_ID, GridInfo_GRID_ID);
-
+const tabInitSetArray = ref([]);
+(async () => {
+    try {
+        const result = await useTabInfo(GridInfo_PROG_ID, GridInfo_GRID_ID);
+        tabInitSetArray.value = result; 
+    } catch (error) {
+        console.error("Failed to fetch data:", error); // 오류 로그 출력
+    } finally {
+      
+    }
+})();
 const colDefs2 =ref([]);
 
 const rowData = ref ([]);
@@ -245,19 +255,14 @@ const searchStore = async() => {
      lngSaleTypes.value = [];
      lngSupervisors.value = [];
       store.dispatch("convertLoading", true);
-      const response1 = await axios.post("http://211.238.145.43:3000/VUE_usp_getMultiPriceGroup", {
-         P_GROUP_CD: groupCd
-      })
+      const response1 = await getMultiPrice(groupCd);
 
       const result1 = response1.data.recordsets[0];
       for (let i = 0; i < result1.length; i++) {
         lngMultiPriceGroupCodes.value.push(result1[i]);
       }
       lngMultiPriceGroupCode.value = result1[0].lngMultiPriceGroupCode
-      const response2 = await axios.post('http://211.238.145.43:3000/VUE_usp_mstStoreAttr_Query',{
-        P_GROUP_CD: groupCd,
-        P_STORE_ATTR: storeType.value
-      })
+      const response2 = await storeAttr(groupCd,storeType.value);
       
       const result2 = response2.data.recordsets[0];
       for (let i = 0; i < result2.length; i++) {
@@ -266,9 +271,7 @@ const searchStore = async() => {
       }
       lngStoreAttr.value = result2[0].lngStoreAttr
 
-      const response3 = await axios.post('http://211.238.145.43:3000/VUE_usp_mstJoinType_Query',{
-         P_GROUP_CD: groupCd
-      })
+      const response3 = await joinType_query(groupCd);
 
       const result3 = response3.data.recordsets[0];
       for (let i = 0; i < result3.length; i++) {
@@ -276,27 +279,21 @@ const searchStore = async() => {
       }
       lngJoinType.value = result3[0].lngCode
 
-      const response4 = await axios.post('http://211.238.145.43:3000/VUE_usp_mstSubLease_Query',{
-        P_GROUP_CD: groupCd
-      })
+      const response4 = await subLease_query(groupCd);
 
       const result4 = response4.data.recordsets[0]
       for (let i = 0; i < result4.length; i++) {
         lngSubLeases.value.push(result4[i])
       }
       lngSubLease.value = result4[0].lngCode
-      const response5 = await axios.post('http://211.238.145.43:3000/VUE_usp_mstStoreArea',{
-        P_GROUP_CD: groupCd
-      })
+      const response5 = await storeArea(groupCd);
 
       const result5 = response5.data.recordsets[0];
       for (let i = 0; i < result5.length; i++) {
         lngStoreAreas.value.push(result5[i])
       }
       lngStoreArea.value = result5[0].lngStoreArea
-      const response6 = await axios.post('http://211.238.145.43:3000/VUE_usp_MST01_006INS_SELECT',{
-        P_GROUP_CD: groupCd
-      })
+      const response6 = await INS006_select(groupCd);
 
       const result6 = response6.data.recordsets[0];
       for (let i = 0; i < result6.length; i++) {
@@ -312,9 +309,7 @@ const searchStore = async() => {
         lngSaleType.value = result6[0].lngSaleType 
       }
       
-       const response7 = await axios.post('http://211.238.145.43:3000/VUE_usp_MST01_004INS_SELECT',{
-          P_GROUP_CD: groupCd
-       })
+       const response7 = await INS004_select(groupCd)
 
       const result7 = response7.data.recordsets[0];
       for (let i = 0; i < result7.length; i++) {
@@ -322,14 +317,8 @@ const searchStore = async() => {
       }
       lngSupervisor.value = result7[0].lngSupervisor
 
-      const response = await axios.post("http://211.238.145.43:3000/VUE_usp_mstStore_Query", {
+      const response = await store_query(groupCd, storeType.value , storeCd.value , searchStoreName.value);
         
-         P_GROUP_CD: groupCd,
-         P_STORE_ATTR : storeType.value,
-         P_STORE_CD : storeCd.value,
-         P_SEARCH_TEXT : searchStoreName.value ? searchStoreName.value : ''
-       }
-      )
        const result = response.data.recordsets[0];
     
        updateColumns(result)
@@ -342,12 +331,9 @@ const deleteStore = async() => {
   store.dispatch("convertLoading", true);
   const selectedRowNode = gridApi.value.getSelectedNodes();
 
-  const response = await axios.post('http://211.238.145.43:3000/VUE_usp_mstStore_Delete' , {
-    
-    P_GROUP_CD: Array(selectedRowNode.length).fill(groupCd).join(','),
-    P_STORE_CD: selectedRowNode.map(row => row.data.lngStoreCode).join(',')
-
-  })
+  const response = await store_delete(Array(selectedRowNode.length).fill(groupCd).join(','),selectedRowNode.map(row => row.data.lngStoreCode).join(',')
+)
+ 
 
   if (response.status == '200'){
     Swal.fire('삭제 되었습니다.')
@@ -438,7 +424,7 @@ let result = 0;
   P_lngMultiPriceGroupCode : rowsToSave.map(row => row.lngMultiPriceGroupCode).join(',') 
 };
 
-const response = await axios.post('http://211.238.145.43:3000/VUE_usp_mstStore_Insert', finalObject)
+const response = await store_insert(finalObject);
        
         if (response.status === 200) {
              result = 200
@@ -470,7 +456,7 @@ const finalObject1 = {
       P_lngUserID: rowsToUpdate.map(row => row.lngUserID).join(',')
 };
 
-const response = await axios.post('http://211.238.145.43:3000/VUE_usp_mstStore_Update', finalObject1)
+const response = await store_update(finalObject1)
      
       if (response.status === 200) {
            result = 200

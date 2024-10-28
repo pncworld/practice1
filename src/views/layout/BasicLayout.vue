@@ -1,10 +1,12 @@
 <template>
   <div class="flex flex-col h-screen overflow-hidden bg-gray-100">
     <Loading></Loading>
+
     <header v-if="showMenu" class="bg-white border rounded-3xl text-gray-600 p-4 w-full h-20">
-      
-      <div class="text-sm font-bold flex space-x-5 -ml-64 justify-center -mt-2">
-        <button  v-for="(item , i) in mainCategoryList" :key="i" value="" id="{{ item.lngCode }}" @click="selectCategory(item.lngCode)" >{{ item.strTitle }}</button>
+      <div class="text-sm font-bold flex space-x-5 -ml-72 justify-center -mt-2">
+        <span><img :src="strLogoUrl" alt="" class="w-52 absolute left-5 -top-0 "></span>
+        <span class="absolute space-x-5" style="left: 270px;">
+        <button class="" v-for="(item , i) in mainCategoryList" :key="i" value="" id="{{ item.lngCode }}" @click="selectCategory(item.lngCode)" >{{ item.strTitle }}</button></span>
         <div class="absolute right-10 space-x-4 mt-3 text-black font-bold ">
         <button><img src="../../assets/table_star.svg" alt="" class="size-7"></button>
         <button @click="deleteAllTabs"><img src="../../assets/ic_delete.svg" alt="" class="size-7"></button>
@@ -15,8 +17,7 @@
         </div>
         
       </div>
-      <div class="absolute z-50 right-36 top-14 border border-black" v-show="showmenus" ><div v-for="i in currentTabs" :key="i.lngProgramID" class="bg-white flex justify-start pt-3 pb-3"><button @click="setActiveTab(i)">{{ i.strTitle }}</button></div></div> 
-      <div class="flex space-x-2 absolute left-72 mt-4">
+      <div class="flex space-x-2 absolute left-72 mt-8">
         <div v-if="showMenu" v-for="tab in tabs" :key="tab.lngProgramID" @click="setActiveTab(tab)" class="w-auto h-7 bg-slate-100 text-xs rounded-md px-4 py-2 cursor-pointer font-bold hover:bg-blue-50 transition" :class="{'text-black': !isActive(tab),'text-blue-400' : isActive(tab)}">
           {{tab.strTitle}}<button @click.stop="removeTab(tab)"><span class="text-blue-300 "><img src="../../assets/deleteIcon.png" alt="" class="size-3"></span></button>  </div>
         </div>
@@ -47,14 +48,16 @@ import DailySales from '@/components/DailySales.vue';
 import Loading from '@/components/loading.vue';
 import router from '@/router';
 import Swal from 'sweetalert2';
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import {  useStore } from 'vuex';
 
 
 const route = useRoute();
 const store = useStore() ;
-const userData = store.state.userData;
+const userData = computed(() => store.state.userData)
+const strLogoUrl = computed(() => userData.value.strLogoUrl)
+
 const showMenu = ref(route.path != '/'); // Initialize based on current route
 const componentKey = ref(null);
 // Watch for route changes
@@ -191,7 +194,7 @@ const setActiveTab = (tab) => {
   const activeTab = store.state.activeTab ;
   componentKey.value = activeTab;
   isActive(tab);
-  router.push({path : tab.strUrl , query : { index : tab.lngProgramID}   });
+  router.push({path : '/'+tab.strUrl.split('::')[0] + '/' + tab.strUrl.split('::')[1] , query : { index : tab.lngProgramID}   });
 };
 
 watch( ()=> route.query , (newQuery) => {

@@ -102,14 +102,14 @@ const selectCategory = (strUrl , lngProgramID , strTitle) => {
       } else {
         const newTab = { strUrl , lngProgramID, strTitle}
         store.dispatch("addNewTab" , newTab); 
-        router.push(strUrl.split("::")[1]);
+        router.push('/'+strUrl.split("::")[0]+'/'+strUrl.split("::")[1]);
       }
      
     });
   } else {
     const newTab = { strUrl , lngProgramID, strTitle}
     store.dispatch("addNewTab" , newTab); 
-    router.push(strUrl.split("::")[1]);
+    router.push('/'+strUrl.split("::")[0]+'/'+strUrl.split("::")[1]);
   } 
   
 }

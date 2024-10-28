@@ -8,6 +8,9 @@ import LoginView from '../views/LoginView.vue'
 import MasterEnroll from '@/views/masterEnroll.vue'
 import StoreEnroll from '@/views/StoreEnroll.vue'
 import HomePage from '@/views/homePage.vue'
+import salesRouter from './salesRouter'
+import masterRouter from './masterRouter'
+import BasicLayout from '@/views/layout/BasicLayout.vue'
 
 const routes = [
   {
@@ -22,33 +25,17 @@ const routes = [
   }
   ,
   {
-    path: '/SLS06_004RPT.xml',
-    name: 'dailysales',
-    component: DailySales
+    path: '/MISALES',
+    //component : BasicLayout ,
+    children: salesRouter()
+  },
+  {
+    path: '/MIMASTER',
+    //component : BasicLayout ,
+    children: masterRouter()
   },
   
-  {
-    path: '/SLS06_003RPT.xml',
-    name: 'dailysales2',
-    component: DailySales2
-  }
-  ,
-  {
-    path: '/cancelsales',
-    name: 'cancelsales', 
-    component: CancelSales
-  }
-  ,
-  {
-    path: '/MST01_032INS.xml',
-    name: 'masterEnroll',
-    component: MasterEnroll
-  }
-  ,{
-    path: '/MST01_002INS.xml',
-    name: 'storeEnroll',
-    component: StoreEnroll
-  },
+  
   {
     path: '/homePage',
     name: 'homePage',

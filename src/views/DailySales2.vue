@@ -55,12 +55,13 @@ import { AG_GRID_LOCALE_KR } from '@ag-grid-community/locale';
 // 로그인한 사용자에 따라 법인명 매장명 등을 선택할 수 있게  만든 공통 컴포넌트 
 import PickStore from '@/components/pickStore.vue';
 // 각 탭 마다 필요한 그리드 설정 속성 불러오기
-import { useTabInfo } from '@/common/api/useTabInfo';
+import { useTabInfo } from '@/api/common';
 // alert 창 자동 꾸미기 위한 라이브러리
 import Swal from 'sweetalert2';
 import { NIL } from 'uuid';
 import PickStoreGrid from '@/components/pickStoreGrid.vue';
 import PickStore2 from '@/components/pickStore2.vue';
+import { dailySaleReport } from '@/api/misales';
 
 const store = useStore();
 // 그리드에 다중 선택 혹은 개별 선택 설정 변수
@@ -85,8 +86,19 @@ const cellUnitedtf = ref(false);
 const GridInfo_PROG_ID = "SLS06_004RPT_VUE_TEST";
 const GridInfo_GRID_ID = "1";
 // API 호출 (설정값 호출)
-const { tabInitSetArray } = useTabInfo(GridInfo_PROG_ID, GridInfo_GRID_ID);
+const tabInitSetArray = ref([]);
+(async () => {
+    try {
+        const result = await useTabInfo(GridInfo_PROG_ID, GridInfo_GRID_ID);
+        tabInitSetArray.value = result; 
+    } catch (error) {
+        console.error("Failed to fetch data:", error); // 오류 로그 출력
+    } finally {
+      
+    }
+})();
 
+console.log(tabInitSetArray.value)
 // 조회 값 설정 함수 선언
 const updateGroup = (value) => {
   groupCd.value = value;
@@ -230,14 +242,13 @@ const searchButton = () => {
       return;
     }
     store.dispatch("convertLoading", true);
-    const response = await axios.post("http://211.238.145.43:3000/usp_AppDailySaleReportTest", {
-      P_GROUP_CD: groupCd.value,
-      P_STORE_CD: storeCd.value,
-      P_START_DT: startDate.value,
-      P_END_DT: endDate.value,
-      P_REPORT_TYPE: '1',
-      P_LANGUAGE: userData.strLanguage
-    });
+    const response = await dailySaleReport(
+      groupCd.value,
+      storeCd.value,
+      startDate.value,
+      endDate.value,
+      userData.strLanguage
+    );
 
     const result = response.data.recordsets;
     updateColumn(result);

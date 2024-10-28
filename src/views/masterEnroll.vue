@@ -65,13 +65,14 @@
   // 로그인한 사용자에 따라 법인명 매장명 등을 선택할 수 있게  만든 공통 컴포넌트 
   import PickStore from '@/components/pickStore.vue';
   // 각 탭 마다 필요한 그리드 설정 속성 불러오기
-  import { useTabInfo } from '@/common/api/useTabInfo';
+  import { useTabInfo } from '@/api/common';
   // alert 창 자동 꾸미기 위한 라이브러리
   import Swal from 'sweetalert2';
   import { NIL } from 'uuid';
   import PickStoreGrid from '@/components/pickStoreGrid.vue';
   import PickStore2 from '@/components/pickStore2.vue';
 import DateRangePicker2 from '@/components/DateRangePicker2.vue';
+import { get_area, get_ins_list1, get_ins_list2, get_pos, master_delete, master_save } from '@/api/master';
   
   const store = useStore();
   // 그리드에 다중 선택 혹은 개별 선택 설정 변수
@@ -96,7 +97,17 @@ import DateRangePicker2 from '@/components/DateRangePicker2.vue';
   const GridInfo_PROG_ID = "SLS06_004RPT_VUE_TEST";
   const GridInfo_GRID_ID = "1";
   // API 호출 (설정값 호출)
-  const { tabInitSetArray } = useTabInfo(GridInfo_PROG_ID, GridInfo_GRID_ID);
+  const tabInitSetArray = ref([]);
+    (async () => {
+    try {
+        const result = await useTabInfo(GridInfo_PROG_ID, GridInfo_GRID_ID);
+        tabInitSetArray.value = result; 
+    } catch (error) {
+        console.error("Failed to fetch data:", error); // 오류 로그 출력
+    } finally {
+      
+    }
+})();
   const stores = ref([]);
   const rowData2 = ref([])
   const lngAreaCd = ref(0);
@@ -148,10 +159,7 @@ import DateRangePicker2 from '@/components/DateRangePicker2.vue';
   const posNos = ref([]) ;
   const getPosNo = async () => {
     store.dispatch("convertLoading", true);
-    const response = await axios.post("http://211.238.145.43:3000/VUE_usp_MST01_032INS_GET_POS" ,{
-    P_GROUP_CD: groupCd.value,
-    P_STORE_CD: storeCd.value
-    })
+    const response = await get_pos( groupCd.value,storeCd.value);
 
     const result = response.data.recordsets[0] ;
 
@@ -164,11 +172,7 @@ import DateRangePicker2 from '@/components/DateRangePicker2.vue';
   const areaCd =ref(0);
   const getAreaCd = async () => {
     store.dispatch("convertLoading", true);
-    const response = await axios.post("http://211.238.145.43:3000/VUE_usp_MST01_032INS_GET_AREA" ,{
-    P_GROUP_CD: groupCd.value,
-    P_STORE_CD: storeCd.value ,
-    POS_NO : posNo.value
-    })
+    const response = await get_area(groupCd.value,storeCd.value ,posNo.value);
     const result = response.data.recordsets[0] ;
    
     areaCd.value = result
@@ -195,20 +199,9 @@ import DateRangePicker2 from '@/components/DateRangePicker2.vue';
   const searchButton = () => {
     const readsales = async () => {
       store.dispatch("convertLoading", true);
-      const response = await axios.post("http://211.238.145.43:3000/VUE_usp_MST01_032INS_GET_LIST1", {
-         MIN_TABLE_ID : "2",
-         MAX_TABLE_ID  : "94"
-       }
-      )
+      const response = await get_ins_list1('2','94');
   
-      const response2 = await axios.post('http://211.238.145.43:3000/VUE_usp_MST01_032INS_GET_LIST2', {
-        
-           P_GROUP_CD: groupCd.value,
-           P_STORE_CD : storeCd.value == '0' ? '0' : storeCd.value,
-           P_AREA_CD : lngAreaCd.value == '0' ? '0' : lngAreaCd.value,
-           POS_NO : posNo.value == '0' ? '0' : posNo.value,
-           DTM_DATE : selectedDate.value
-     })
+      const response2 = await get_ins_list2(groupCd.value, storeCd.value,lngAreaCd.value,posNo.value,selectedDate.value)
   
       const result = response.data.recordsets[0];
       const result2 = response2.data.recordsets[0];
@@ -419,17 +412,7 @@ import DateRangePicker2 from '@/components/DateRangePicker2.vue';
       
       selectedrows.value =  selectedrows.value.substring(0, selectedrows.value.length - 1);
      
-      const response = await axios.post("http://211.238.145.43:3000/VUE_usp_MST01_032INS_INSERT", {
-        
-          P_GROUP_CD: groupCd.value,
-          P_STORE_CD : storeCd.value,
-          P_AREA_CD : lngAreaCd.value,
-          POS_NO : posNo.value,
-          TABLE_ID:  selectedrows.value,
-          DTM_DATE : selectedDate.value
-
-       }
-      )
+      const response = await master_save(groupCd.value,storeCd.value,lngAreaCd.value,posNo.value, selectedrows.value,selectedDate.value)
       
       store.dispatch("convertLoading", false);
       if(response.status =='200'){
@@ -470,16 +453,7 @@ import DateRangePicker2 from '@/components/DateRangePicker2.vue';
       selectedPosNo.value =  selectedPosNo.value.substring(0, selectedPosNo.value.length - 1);
   
       store.dispatch("convertLoading", true);
-      const response = await axios.post("http://211.238.145.43:3000/VUE_usp_MST01_032INS_DEL", {
-        
-          P_GROUP_CD: groupCd.value,
-          P_STORE_CD : selectedstoreCd.value,
-          P_AREA_CD : selectedAreaCd.value,
-          POS_NO : selectedPosNo.value,
-          TABLE_ID:  selectedrows.value,
-          DTM_DATE : selectedDate.value
-
-       }
+      const response = await master_delete( groupCd.value,selectedstoreCd.value, selectedAreaCd.value, selectedPosNo.value,selectedrows.value,selectedDate.value
       )
       if(response.status =='200'){
         Swal.fire('삭제 되었습니다.')
