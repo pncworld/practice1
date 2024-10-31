@@ -17,7 +17,7 @@
     </div>
    
     <div class="h-60 w-4/6 ml-5  mt-10 border-t border-b border-black">
-        <div class="  text-white h-9 w-24 rounded-md flex items-center -mt-9 float-end -mr-24"><button class="button delete" style="font-size: 14px" @click="deleteMainCategory">삭제</button></div>
+        <div class="  text-white h-9 w-24 rounded-md flex items-center -mt-9 float-end -mr-24"><button class="whitebutton" style="font-size: 14px" @click="deleteMainCategory">삭제</button></div>
         <div class="grid grid-cols-[1fr_3fr] grid-rows-5 mt-0 h-full divide-x divide-y divide-gray-300">
             <div class="bg-gray-200 flex justify-start items-center pl-4">메인카테고리명(한국어)</div>
             <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " v-model="languageName0" @input="changeMajorName"></div>
@@ -34,18 +34,18 @@
     </div>
     
     </div>
-    <div class="flex justify-start ml-5 mt-5 space-x-2 "><button class="button primary" style="font-size: 14px" @click="addMainCategory">메인카테고리추가</button>
+    <div class="flex justify-start ml-5 mt-5 space-x-2 "><button class="whitebutton" style="font-size: 14px" @click="addMainCategory">메인카테고리추가</button>
         <!-- <button class="button primary " style="font-size: 14px">노출순서관리</button> -->
     </div>          
     <div class="flex justify-between -mt-36 ml-3 ">
-    <div class=" text-white rounded-md h-10 w-36 ml-72 flex items-center justify-center"><button class="button primary " @click="addsubCategory" style="font-size: 14px">서브카테고리 추가</button></div>
-    <div class=" text-white rounded-md h-10 w-32 flex items-center justify-center mr-40" ><button class="button delete" style="font-size: 14px">전체 삭제</button></div>
+    <div class=" rounded-md h-10 w-auto ml-72 flex items-center "><button class="whitebutton" @click="addsubCategory" style="font-size: 14px">서브카테고리 추가</button></div>
+    <div class="  rounded-md h-10 w-auto flex items-center justify-center mr-44" ><button class="whitebutton" style="font-size: 14px">전체 삭제</button></div>
 </div>
   
 
     <div class="w-4/6  border  border-neutral-600 -z-20" style="margin-left: 296px"></div>
     <div class="h-60 w-4/6   mt-10 border-t border-b border-black" style="margin-left: 296px" v-for="i in subMultiLang">
-        <div class="-mt-10" style="margin-left:1070px;"><button class="button delete" @click="deleteSubCategory(i[0].categoryCode)">삭제</button></div>
+        <div class="-mt-10" style="margin-left:1090px;"><button class="whitebutton" @click="deleteSubCategory(i[0].categoryCode)">삭제</button></div>
         <div class="grid grid-cols-[1fr_3fr] grid-rows-5 mt-0 h-full divide-x divide-y divide-gray-300" >
             <div class="bg-gray-200 flex justify-start items-center pl-4">서브카테고리명(한국어)</div>
             <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " :value="i[0] ? i[0].LanguageName : ''" @input="event => changeSubName(i[0].categoryCode, event)"></div>
@@ -65,8 +65,8 @@
     </div>
     <div class="flex justify-end mr-40 mt-10">
         <div class="flex flex-col items-end">
-    <div class=" text-white rounded-md h-8 w-44 flex items-center justify-center "><button class="button primary">서브카테고리 추가</button></div>
-    <div class=" text-white rounded-md h-8 w-28 flex items-center justify-center mt-5 "><button class="button primary">전체 저장</button></div>
+    <div class=" text-white rounded-md h-8 w-44 flex items-center justify-center "><button class="whitebutton">서브카테고리 추가</button></div>
+    <div class=" text-white rounded-md h-8 w-28 flex items-center justify-center mt-5 mr-1 "><button class="whitebutton">전체 저장</button></div>
     </div>
     </div>
     <br>

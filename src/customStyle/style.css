@@ -146,3 +146,15 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
 .button.excel:disabled {
   background-color: #dddddd;
 }
+.whitebutton {
+    font-weight: 500;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 6px;
+    border: 1px solid #E4E4E4;
+    height: 26px;
+    font-size: 14px;
+    color: #818181;
+    width : auto;
+}
