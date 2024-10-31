@@ -15,20 +15,20 @@
             <div v-for="x in i.SubCategory" :key="x.SubCode" class="flex items-start w-auto ml-5" :class="{'bg-lightblue': selectedButton === x.SubCode}"><button class=" font-thin " @click="bringCategory(i.MajorCode)" style="font-size: 15px">{{ x.SubName }}</button></div>
         </div>
     </div>
-   
-    <div class="h-60 w-4/6 ml-5  mt-10 border-t border-b border-black">
-        <div class="  text-white h-9 w-24 rounded-md flex items-center -mt-9 float-end -mr-24"><button class="whitebutton" style="font-size: 14px" @click="deleteMainCategory">삭제</button></div>
+    
+    <div class="h-60 ml-8  mt-10 border-t border-b border-black" style="width: 71%" v-if="afterCategory">
+        <div class="  text-white h-9 w-24 rounded-md flex items-center -mt-9 float-end -mr-10"><button class="whitebutton" style="font-size: 14px" @click="deleteMainCategory">삭제</button></div>
         <div class="grid grid-cols-[1fr_3fr] grid-rows-5 mt-0 h-full divide-x divide-y divide-gray-300">
-            <div class="bg-gray-200 flex justify-start items-center pl-4">메인카테고리명(한국어)</div>
-            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " v-model="languageName0" @input="changeMajorName"></div>
+            <div class="bg-gray-200 flex justify-start items-center pl-4 font-bold" style="color:#5782FF">*메인카테고리명(한국어)</div>
+            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " v-model="languageName0" @input="changeMajorName" @keyup="afterModifed"></div>
             <div class="bg-gray-200 flex justify-start items-center pl-4">메인카테고리명(영어)</div>
-            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"  v-model="languageName1" @input="changeMajorName1"></div>
+            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"  v-model="languageName1" @input="changeMajorName1"  @keyup="afterModifed"></div>
             <div class="bg-gray-200 flex justify-start items-center pl-4">메인카테고리명(중국어)</div>
-            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"  v-model="languageName2" @input="changeMajorName2"></div>
+            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"  v-model="languageName2" @input="changeMajorName2 "  @keyup="afterModifed"></div>
             <div class="bg-gray-200 flex justify-start items-center pl-4">메인카테고리명(일본어)</div>
-            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"  v-model="languageName3" @input="changeMajorName3"></div>
+            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"  v-model="languageName3" @input="changeMajorName3 "  @keyup="afterModifed"></div>
             <div class="bg-gray-200 flex justify-start items-center pl-4">메인카테고리명(스페인어)</div>
-            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"  v-model="languageName4" @input="changeMajorName4"></div>
+            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"  v-model="languageName4" @input="changeMajorName4"  @keyup="afterModifed"></div>
         
         </div>
     </div>
@@ -37,36 +37,36 @@
     <div class="flex justify-start ml-5 mt-5 space-x-2 "><button class="whitebutton" style="font-size: 14px" @click="addMainCategory">메인카테고리추가</button>
         <!-- <button class="button primary " style="font-size: 14px">노출순서관리</button> -->
     </div>          
-    <div class="flex justify-between -mt-36 ml-3 ">
+    <div class="flex justify-between -mt-36 ml-5 " v-if="afterCategory">
     <div class=" rounded-md h-10 w-auto ml-72 flex items-center "><button class="whitebutton" @click="addsubCategory" style="font-size: 14px">서브카테고리 추가</button></div>
-    <div class="  rounded-md h-10 w-auto flex items-center justify-center mr-44" ><button class="whitebutton" style="font-size: 14px">전체 삭제</button></div>
+    <div class="  rounded-md h-10 w-auto flex items-center justify-center mr-40" ><button class="whitebutton" style="font-size: 14px" @click="deleteAllsubCategory">전체 삭제</button></div>
 </div>
   
 
-    <div class="w-4/6  border  border-neutral-600 -z-20" style="margin-left: 296px"></div>
-    <div class="h-60 w-4/6   mt-10 border-t border-b border-black" style="margin-left: 296px" v-for="i in subMultiLang">
-        <div class="-mt-10" style="margin-left:1090px;"><button class="whitebutton" @click="deleteSubCategory(i[0].categoryCode)">삭제</button></div>
-        <div class="grid grid-cols-[1fr_3fr] grid-rows-5 mt-0 h-full divide-x divide-y divide-gray-300" >
-            <div class="bg-gray-200 flex justify-start items-center pl-4">서브카테고리명(한국어)</div>
-            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " :value="i[0] ? i[0].LanguageName : ''" @input="event => changeSubName(i[0].categoryCode, event)"></div>
+    <div class="  border  border-neutral-600 -z-20" style="margin-left: 307px; width:71% " v-if="afterCategory" ></div>
+    <div class="h-60  mt-10 border-t border-b border-white" style="margin-left: 296px; width: 71%" v-for="i in subMultiLang" v-if="afterCategory">
+        <div class="-mt-10" style="margin-left:1110px;"><button class="whitebutton" @click="deleteSubCategory(i[0].categoryCode)">삭제</button></div>
+        <div class="grid grid-cols-[1fr_3fr] grid-rows-5 mt-0 h-full divide-x divide-y divide-gray-300 ml-3" >
+            <div class="bg-gray-200 flex justify-start items-center pl-4 font-bold" style="color:#5782FF">*서브카테고리명(한국어)</div>
+            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " :value="i[0] ? i[0].LanguageName : ''" @input="event => { changeSubName(i[0].categoryCode, event); subcategorynm(event); }" @keyup="afterModifed" ></div>
             <div class="bg-gray-200 flex justify-start items-center pl-4">서브카테고리명(영어)</div>
-            <div class="bg-white"><input type="text" class="border  border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " :value="i[1] ? i[1].LanguageName : ''" @input="event => changeSubName1(i[0].categoryCode, event)"></div>
+            <div class="bg-white"><input type="text" class="border  border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " :value="i[1] ? i[1].LanguageName : ''" @input="event => changeSubName1(i[0].categoryCode, event)" @keyup="afterModifed"></div>
             <div class="bg-gray-200 flex justify-start items-center pl-4">서브카테고리명(중국어)</div>
-            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " :value="i[2] ? i[2].LanguageName : ''" @input="event => changeSubName2(i[0].categoryCode, event)"></div>
+            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " :value="i[2] ? i[2].LanguageName : ''" @input="event => changeSubName2(i[0].categoryCode, event)" @keyup="afterModifed"></div>
             <div class="bg-gray-200 flex justify-start items-center pl-4">서브카테고리명(일본어)</div>
-            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " :value="i[3] ? i[3].LanguageName : ''" @input="event => changeSubName3(i[0].categoryCode, event)"></div>
+            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " :value="i[3] ? i[3].LanguageName : ''" @input="event => changeSubName3(i[0].categoryCode, event)" @keyup="afterModifed"></div>
             <div class="bg-gray-200 flex justify-start items-center pl-4">서브카테고리명(스페인어)</div>
-            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " :value="i[4] ? i[4].LanguageName : ''" @input="event => changeSubName4(i[0].categoryCode, event)"></div>
+            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " :value="i[4] ? i[4].LanguageName : ''" @input="event => changeSubName4(i[0].categoryCode, event)" @keyup="afterModifed"></div>
          
         </div>
         <div class="float-right -mr-32 space-y-5">   
 
     </div>
     </div>
-    <div class="flex justify-end mr-40 mt-10">
+    <div class="flex justify-end mr-36 mt-10">
         <div class="flex flex-col items-end">
-    <div class=" text-white rounded-md h-8 w-44 flex items-center justify-center "><button class="whitebutton">서브카테고리 추가</button></div>
-    <div class=" text-white rounded-md h-8 w-28 flex items-center justify-center mt-5 mr-1 "><button class="whitebutton">전체 저장</button></div>
+    <div class=" text-white rounded-md h-8 w-44 flex items-center justify-center "><button class="whitebutton" @click="addsubCategory">서브카테고리 추가</button></div>
+    <div class=" text-white rounded-md h-8 w-28 flex items-center justify-center mt-5 mr-1 "><button class="button save" @click="saveMenus">저장</button></div>
     </div>
     </div>
     <br>
@@ -91,10 +91,25 @@ const subMultiLang = ref([])
 const mainCategoryInsert = ref(false)
 const store = useStore();
 const nowStoreCd = ref();
+const afterCategory = ref(false);
 const currentMajorCode = ref();
 const newMainCategoryCode = ref([]);
 const  handleStoreCd = (newValue) => {
     nowStoreCd.value = newValue ;
+}
+const afterSearch = ref(false);
+const modified = ref(false);
+const afterModifed = () => {
+    modified.value = true;
+}
+const fillsubCategory = ref(true);
+const subcategorynm = (event) => {
+    const value = event.target.value;
+     if(value ==''){
+        fillsubCategory.value = false;
+     } else {
+        fillsubCategory.value = true;
+     }
 }
 watch(nowStoreCd , (newvalue, oldvalue) => {
     if(newvalue != oldvalue) {
@@ -115,6 +130,7 @@ const  handleStoreAreaCd = (newValue) => {
   
     nowStoreAreaCd.value = newValue ;
 }
+
 const languageName0 = ref('');
 const languageName1 = ref('');
 const languageName2 = ref('');
@@ -124,12 +140,12 @@ const userData = store.state.userData;
 const groupCd = ref(userData.lngStoreGroup);
 
 const addMainCategory = () => {
-        mainCategoryInsert.value = true ; 
+        afterCategory.value = true;
         const newMajorCode = Category.value.map( item => {
             return Number(item.MajorCode);
         })
        
-        const newmajorcode = (newMajorCode[newMajorCode.length -1]+1).toString();
+        const newmajorcode = newMajorCode.length == 0 ? '1' : (newMajorCode[newMajorCode.length -1]+1).toString();
         newMainCategoryCode.value.push(newmajorcode);
         const newMainCategory = {MajorCode: newmajorcode, MajorName: '새 카테고리', SubCategory: [], mainMultilang: [], subMultilang: []};
         const languagename0 = {TypeCode: '4', categoryCode: newmajorcode , LanguageID: '0', LanguageName: '새 카테고리'}
@@ -217,25 +233,138 @@ const changeMajorName4 = (event) => {
     changegetMulilang();
     
 }
-const deleteSubCategory = (categoryCode) => {
-    console.log(categoryCode)
-    searchMenu();
-    bringCategory(categoryCode);
-}
-const deleteMainCategory = () => {
-    Swal.fire({
+const deleteSubCategory = async (categoryCode) => {
+    const result = await Swal.fire({
         title: '경고',
-        text: '메인 카테고리를 정말 삭제하시겠습니까?',
+        text: '서브 카테고리를 삭제하시겠습니까?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: '삭제',
-        cancelButtonText: '취소'
+        cancelButtonText: '취소',
+        allowOutsideClick: false
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const res = await axios.post('/api/MIMASTER/MST57_001INS.asmx/setSubCategoryDelete', {
+                GROUP_CD: groupCd.value,
+                STORE_CD: nowStoreCd.value,
+                AREA_CD: nowStoreAreaCd.value,
+                MAJOR_CD: currentMajorCode.value,
+                SUB_CD: categoryCode
+            });
+
+            if (res.status === 200) {
+                await Swal.fire({
+                    title: '삭제 성공',
+                    text: '삭제되었습니다',
+                    icon: 'success',
+                    confirmButtonText: '확인'
+                });
+
+                await searchMenu();
+                bringCategory(currentMajorCode.value);
+            }
+        } catch (error) {
+            console.error('삭제 중 오류 발생:', error);
+            Swal.fire({
+                title: '오류',
+                text: '서브 카테고리 삭제 중 오류가 발생했습니다.',
+                icon: 'error',
+                confirmButtonText: '확인'
+            });
+        }
+    }
+};
+
+const deleteMainCategory = () => {
+    Swal.fire({
+        title: '경고',
+        text: '메인 카테고리를 삭제하시겠습니까?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: '삭제',
+        cancelButtonText: '취소',
+        allowOutsideClick: false
+    }).then(async(result) => {
+        if(result.isConfirmed){
+        
+            const subMultis = getMultiLang.value.flatMap(innerArray => innerArray).filter(items => items.LanguageID =='0' && currentMajorCode.value == items.categoryCode && items.TypeCode =='4');
+            const subCd = subMultis.map(item => item.categoryCode);
+
+            const res = await axios.post('/api/MIMASTER/MST57_001INS.asmx/setMainCategoryDELETE',{
+                
+            GROUP_CD: groupCd.value,
+            STORE_CD: nowStoreCd.value,
+            AREA_CD: nowStoreAreaCd.value,
+            MAJOR_CD: currentMajorCode.value,
+            SUB_CD : subCd.join(',')
+
+            })
+
+            if(res.status ==200){
+                Swal.fire({
+                    title: '삭제 성공',
+                    text: '삭제되었습니다',
+                    icon:'success',
+                    confirmButtonText: '확인'
+                })
+                searchMenu();
+            }
+        } else {
+            return;
+        }
     })
 }
-const searchMenu = async () => {
+const deleteAllsubCategory = async() => {
+    Swal.fire({
+        title: '경고',
+        text: '서브 카테고리를 전체 삭제하시겠습니까?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: '삭제',
+        cancelButtonText: '취소',
+        allowOutsideClick: false
+    }).then(async(result)=>{
+        if(result.isConfirmed){
+         const subMultis = subMultiLang.value.flatMap(innerArray => innerArray).filter(items => items.LanguageID =='0');
+        const subCd = subMultis.map(item => item.categoryCode);
     
+        const res = await axios.post('/api/MIMASTER/MST57_001INS.asmx/setSubCategoryDelete',{
+
+        GROUP_CD: groupCd.value,
+        STORE_CD: nowStoreCd.value,
+        AREA_CD: nowStoreAreaCd.value,
+        MAJOR_CD: currentMajorCode.value,
+        SUB_CD : subCd.join(',')
+        }).then(async(result) => {
+        if(result.status ==200){
+        Swal.fire({
+        title: '전체 삭제 성공',
+        text: '삭제되었습니다',
+        icon:'success',
+        confirmButtonText: '확인'
+    }).then(async() => {
+        await searchMenu().then(() =>{
+        bringCategory(currentMajorCode.value);
+    })
+})
+    }})
+    }})
+        
+    
+    
+}
+
+const searchMenu = async () => {
+        afterSearch.value = true;
+        subMultiLang.value = [];
         Category.value = [] ;
         languageName0.value = '';
         languageName1.value = '';
@@ -250,6 +379,7 @@ const searchMenu = async () => {
             icon: 'warning',
             showCancelButton: false,
             confirmButtonColor: '#3085d6',
+            allowOutsideClick: false
         })
         return;
     }
@@ -260,6 +390,7 @@ const searchMenu = async () => {
             icon: 'warning',
             showCancelButton: false,
             confirmButtonColor: '#3085d6',
+            allowOutsideClick: false
         })
         return;
     }
@@ -286,13 +417,69 @@ const searchMenu = async () => {
     } finally {
         
         store.state.loading = false; // 로딩 상태 종료
+        (() => {
+            Category.value.filter(item => { 
+                item.SubCategory = item.SubCategory.filter(sub => sub.SubCode !== '')
+                 });
+                 })();
+                 modified.value = false ;
+                 afterCategory.value = false;
     }
     console.log(Category.value);
 };
 const saveMenus = async() => {
-    
-    let res ; 
-    if (mainCategoryInsert.value == false ){
+    // if(newMainCategoryCode.value.includes(currentMajorCode.value) && ){
+
+    // }
+    if(afterSearch.value == false) {
+        Swal.fire({
+            title: '경고',
+            text: '검색을 먼저 진행해주세요.',
+            icon: 'warning',
+            showCancelButton: false,
+            confirmButtonColor: '#3085d6',
+            allowOutsideClick: false
+        })
+        return;
+    }
+    if(modified.value == false){
+        Swal.fire({
+            title: '경고',
+            text: '변경사항이 없습니다.',
+            icon: 'warning',
+            showCancelButton: false,
+            confirmButtonColor: '#3085d6',
+            allowOutsideClick: false
+        })
+        return;
+    }
+    if(fillsubCategory.value == false) {
+        Swal.fire({
+            title: '경고',
+            text: '서브카테고리(한국어)를 입력해주세요.',
+            icon: 'warning',
+            showCancelButton: false,
+            confirmButtonColor: '#3085d6',
+            allowOutsideClick: false
+        })
+        return ;
+    }
+   
+    Swal.fire({
+        title: '저장하시겠습니까?',
+        text: '변경사항을 저장하시겠습니까?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: '저장',
+        cancelButtonText: '취소',
+        allowOutsideClick: false
+    }).then(async(result) => {
+        if(result.isConfirmed){
+            let res ; 
+ 
+    if (!newMainCategoryCode.value.includes(currentMajorCode.value) ){
         res = await axios.post('/api/MIMASTER/MST57_001INS.asmx/setMainCategoryUpdate', {
             GROUP_CD : groupCd.value,
             STORE_CD : nowStoreCd.value,
@@ -301,7 +488,7 @@ const saveMenus = async() => {
             MAJOR_NM  : [languageName0.value,languageName1.value,languageName2.value,languageName3.value,languageName4.value].join(","),
             LANGUAGE_ID : ['0','1','2','3','4'].join(",")
         });
-    } else if (mainCategoryInsert.value == true){
+    } else if (newMainCategoryCode.value.includes(currentMajorCode.value)){
       
         res = await axios.post('/api/MIMASTER/MST57_001INS.asmx/setMainCategoryINSERT', {
             GROUP_CD : groupCd.value,
@@ -362,6 +549,7 @@ const saveMenus = async() => {
             icon: 'success',
             showCancelButton: false,
             confirmButtonColor: '#3085d6',
+            allowOutsideClick: false
         });
     }
 } catch (error) {
@@ -373,14 +561,24 @@ const saveMenus = async() => {
         icon: 'error',
         showCancelButton: false,
         confirmButtonColor: '#3085d6',
+        allowOutsideClick: false
     });
+} finally {
+    newMainCategoryCode.value = [];
+    modified.value = false;
 }
+        } else {
+            return ;
+        }
+    })
+    
 }
 
 const convertedsubMultiLang = ref([])
 const subCode3 = ref();
 const userInputData = ref([])
 const bringCategory = (value) => {
+    afterCategory.value = true;
     if(newMainCategoryCode.value.includes(value)){
         mainCategoryInsert.value = true ; 
     } else {
@@ -388,6 +586,8 @@ const bringCategory = (value) => {
     }
     
     currentMajorCode.value = value;
+    console.log(getMultiLang.value);
+    console.log(Category.value);
     Category.value = Category.value.map(categoryItem => {
   // getMultiLang에서 MajorCode와 일치하는 항목을 찾아 mainMultilang으로 설정
     categoryItem.mainMultilang = getMultiLang.value.filter(item => 
@@ -436,21 +636,21 @@ const bringCategory = (value) => {
     }).flat(); // 각 배열을 평탄화하여 단일 배열로 만듭니다.
    
 });
-    // if( subMultiLang.value[0].length ==0){
-    //         subMultiLang.value = ''
-    // }
-     console.log(subMultiLang.value)
 
 }
 
 
 const addsubCategory = () => {
-    console.log(Category.value)
+    
+    fillsubCategory.value = false;
     let maxSubCode = Math.max(
        ...Category.value
     .filter(item => item.SubCategory && item.SubCategory.length > 0)
     .flatMap(item => item.SubCategory.map(sub => Number(sub.SubCode))));
-
+ 
+    if (!isFinite(maxSubCode)) {
+    maxSubCode = 0; // 원하는 기본값으로 설정
+    }
     maxSubCode =(Number(maxSubCode)+1).toString();
 
      (() => {
@@ -460,7 +660,7 @@ const addsubCategory = () => {
     }
     });
      })();
-    //console.log()
+   
   
     const sumarray = [];
   
@@ -480,12 +680,9 @@ const addsubCategory = () => {
     getMultiLang.value.push(newsubCategory2);
     getMultiLang.value.push(newsubCategory3);
     getMultiLang.value.push(newsubCategory4);
-    //  if(subMultiLang.value ==''){
-    //     subMultiLang.value = []
-    //  }
+   
     subMultiLang.value.push(sumarray);
-    console.log(subMultiLang.value)
-    console.log(getMultiLang.value)
+
     //bringCategory(currentMajorCode.value);
 }
 const changeSubName = (categorycode , event) => {
