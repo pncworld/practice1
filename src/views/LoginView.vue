@@ -1,9 +1,9 @@
 <template>
       <div class="flex items-center justify-center h-screen bg-slate-100  ">
         <loading></loading>
-        <div><img class="mr-20 size-4/5" src="../assets/login_visual.png" alt=""></div>
-        <!-- <img src="../assets/cashier.png" class="mr-40 w-60 h-auto animate-rise" alt="" >
-        <img src="../assets/swipe.png" class="mr-40 w-60 h-auto animate-fall" alt="" > -->
+        <!-- <div><img class="mr-20 size-4/5" src="../assets/login_visual.png" alt=""></div> -->
+        <img src="../assets/cashier.png" class="mr-40 w-60 h-auto animate-rise" alt="" >
+        <img src="../assets/swipe.png" class="mr-40 w-60 h-auto animate-fall" alt="" >
       <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
       <h1 class="text-2xl font-bold text-center mb-6 text-blue-600 flex justify-center">PNC Office</h1>
       
@@ -95,7 +95,7 @@ const login2 = async () => {
      } 
       await readsales();
       
-      store.dispatch('convertLoading',false);
+    
       router.push('/homepage');
       
     } else {
@@ -104,6 +104,8 @@ const login2 = async () => {
   } catch (error) {
     console.error(error);
     message.value = "오류 발생";
+  } finally {
+    store.dispatch('convertLoading',false);
   }
 };
 

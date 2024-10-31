@@ -97,7 +97,7 @@ const selectCategory = (strUrl , lngProgramID , strTitle) => {
         const matchingTabs = currentTabs.filter(tab => tab.lngProgramID.startsWith(lngProgramID));
         const tab = { lngProgramID : matchingTabs[0].lngProgramID};
         store.dispatch("changeActiveTab",tab);
-        router.push({path : matchingTabs[0].strUrl , query : { index : tab.lngProgramID} } );
+        router.push({path : '/'+matchingTabs[0].strUrl.split("::")[0]+'/'+matchingTabs[0].strUrl.split("::")[1] , query : { index : tab.lngProgramID} } );
        
       } else {
         const newTab = { strUrl , lngProgramID, strTitle}

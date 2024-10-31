@@ -18,7 +18,7 @@
         
       </div>
       <div class="flex space-x-2 absolute left-72 mt-8">
-        <div v-if="showMenu" v-for="tab in tabs" :key="tab.lngProgramID" @click="setActiveTab(tab)" class="w-auto h-7 bg-slate-100 text-xs rounded-md px-4 py-2 cursor-pointer font-bold hover:bg-blue-50 transition" :class="{'text-black': !isActive(tab),'text-blue-400' : isActive(tab)}">
+        <div v-if="showMenu" v-for="tab in tabs" :key="tab.lngProgramID" @click="setActiveTab(tab)" class="w-auto h-7 bg-slate-100 text-xs rounded-md px-4 py-2 cursor-pointer font-bold hover:bg-blue-50 transition" :class="{'text-blue-400' : isActive(tab)}">
           {{tab.strTitle}}<button @click.stop="removeTab(tab)"><span class="text-blue-300 "><img src="../../assets/deleteIcon.png" alt="" class="size-3"></span></button>  </div>
         </div>
       
@@ -151,15 +151,20 @@ const includedComponents = computed(() => {
   return currentTabs.map( tab => tab.lngProgramID);
 });
 
-
+const removedtabId = ref();
 const removeTab = (tab) => {
-  
   store.dispatch("closeTab", tab.lngProgramID);
   const currentTab = store.state.currentTabs ;
   if(currentTab.length > 0){
     // @click.stop 안해서 상위 이벤트 전파때문에 안됬었음.
+
     store.dispatch('changeActiveTab', currentTab[currentTab.length-1]);
-    componentKey.value = currentTab[currentTab.length-1].lngProgramID;
+    const insteadProgramID= currentTab[currentTab.length-1].lngProgramID;
+    const insteadtab= currentTab[currentTab.length-1];
+    const insteadstrUrl= currentTab[currentTab.length-1].strUrl;
+    componentKey.value = insteadProgramID;
+    isActive(insteadtab)
+    router.push({path : '/'+insteadstrUrl.split('::')[0] + '/' + insteadstrUrl.split('::')[1] , query : { index : insteadProgramID}   });
     
   } else {
     componentKey.value = null ;
@@ -170,6 +175,8 @@ const removeTab = (tab) => {
 
 const isActive = (tab) => {
   const activeTab = store.state.activeTab ; 
+  console.log(tab)
+  console.log(activeTab)
   return activeTab && activeTab == tab.lngProgramID;
 } 
 
