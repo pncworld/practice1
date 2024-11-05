@@ -1,5 +1,5 @@
 <template>
-    <div class="flex justify-end space-x-4 text-xs">
+    <div class="flex justify-end space-x-3 text-xs">
      <div class="flex items-center font-bold text-sm pl-4">매장명 : </div>
       <div>
         <select :disabled="isDisabled1"   id="storeGroup" class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreGroup($event.target.value)">
@@ -14,7 +14,7 @@
         </select>
       </div>
       <div>
-        <select :disabled="isDisabled3"  class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreCode($event.target.value); setStoreAreaCd($event.target.value); ">
+        <select :disabled="isDisabled3"  class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreCode($event.target.value); setStoreAreaCd($event.target.value); ischanged(); ">
         
           <option value="0">선택</option>
           <option :value="item.lngStoreCode" v-for="item in storeCd" :key="item.lngStoreCode">{{ item.strName }}</option>
@@ -22,7 +22,7 @@
       </div>
       
       <div>
-     <span class="font-bold text-sm">지역코드 :</span> <select :disabled="isDisabled4"  class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" v-model="selectedStoreAreaCd">
+     <span class="font-bold text-sm ">지역코드 : &nbsp;</span> <select :disabled="isDisabled4"  class="w-32 border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" v-model="selectedStoreAreaCd">
           <option :value="item.lngAreaCode" v-for="item in storeAreaCd" :key="item.lngAreaCode">{{ item.lngAreaCode }}</option>
         </select>
       </div>
@@ -46,9 +46,16 @@ const isDisabled2 = ref(false);
 const isDisabled3 = ref(false);
 const isDisabled4 = ref(false);
 const selectedStoreAreaCd = ref();
-watch ( selectedStoreAreaCd , (newValue) => {
-  emit('update:storeAreaCd',newValue);
-})
+const changed = ref(false)
+const ischanged = () => {
+    changed.value = !changed.value;
+    console.log("여긴")
+    console.log(changed.value)
+    emit('update:ischanged',changed.value);
+};
+// watch ( selectedStoreAreaCd , (newValue) => {
+//   emit('update:storeAreaCd',newValue);
+// })
     const store = useStore();
     const userData = store.state.userData ;
 
@@ -57,7 +64,7 @@ const props = defineProps({
     })
 const {groupCdDisabled} = props ;
 isDisabled1.value = groupCdDisabled;
-const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd', 'update:storeAreaCd']);
+const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd', 'update:storeAreaCd', 'update:ischanged']);
 const emitStoreGroup = (value) => {
     emit('update:storeGroup', value);
 };
@@ -67,6 +74,7 @@ const emitStoreType = (value) => {
 };
 
 const emitStoreCode = (value) => {
+    
     emit('update:storeCd', value);
 };
 const emitStoreAreaCd = (value) => {
@@ -102,7 +110,8 @@ const emitStoreAreaCd = (value) => {
             return item.lngStoreCode == value ;
         })
         selectedStoreAreaCd.value = storeAreaCd.value[0] ? storeAreaCd.value[0].lngAreaCode : ''
-        
+        console.log(selectedStoreAreaCd.value);
+        emitStoreAreaCd(selectedStoreAreaCd.value);
   }
 
   const route = useRoute();

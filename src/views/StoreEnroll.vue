@@ -429,7 +429,7 @@ const response = await store_insert(finalObject);
         if (response.status === 200) {
              result = 200
          }
-  };
+  }
 
   if (rowsToUpdate.length > 0) {
 
@@ -461,7 +461,7 @@ const response = await store_update(finalObject1)
       if (response.status === 200) {
            result = 200
        }
-};
+}
   if (result === 200) {
         Swal.fire('저장 되었습니다.');
     }

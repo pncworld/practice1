@@ -489,7 +489,7 @@ const saveMenus = async() => {
             LANGUAGE_ID : ['0','1','2','3','4'].join(",")
         });
     } else if (newMainCategoryCode.value.includes(currentMajorCode.value)){
-      
+
         res = await axios.post('/api/MIMASTER/MST57_001INS.asmx/setMainCategoryINSERT', {
             GROUP_CD : groupCd.value,
             STORE_CD : nowStoreCd.value,
@@ -500,7 +500,7 @@ const saveMenus = async() => {
         }
     )
     }
- 
+    
     const subMultis = subMultiLang.value
     .flatMap(innerArray => innerArray) // 이중 배열을 평평하게 만듭니다.
     .filter(item => item.Insert === true); // Insert 속성이 true인 요소만 필터링합니다.
@@ -516,7 +516,9 @@ const saveMenus = async() => {
     const subCd2 = subMultis2.map(item => item.categoryCode)
     const subNm2 = subMultis2.map(item => item.LanguageName)
     const languageNm2 = subMultis2.map(item => item.LanguageID)
-    
+    console.log(subCd)
+    console.log(subNm)
+    console.log(languageNm)
     try {
     const res2 = await axios.post('/api/MIMASTER/MST57_001INS.asmx/setSubCategoryINSERT', {
         GROUP_CD: groupCd.value,

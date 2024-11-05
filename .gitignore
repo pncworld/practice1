@@ -21,3 +21,7 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+
+# Local proxy config (vue-cli-plugin-proxy)
+proxy.config.local.js

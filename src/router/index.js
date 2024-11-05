@@ -11,7 +11,15 @@ import HomePage from '@/views/homePage.vue'
 import salesRouter from './salesRouter'
 import masterRouter from './masterRouter'
 import BasicLayout from '@/views/layout/BasicLayout.vue'
+import MobileLayout from '@/views/layout/mobileLayout.vue'
+import { defineComponent, h } from 'vue'
 
+
+
+const isMobile = () =>{
+  const userAgent = window.navigator.userAgent;
+  return /iPhone|iPad|iPod|Android/i.test(userAgent);
+}
 const routes = [
   {
     path: '/',
@@ -40,6 +48,7 @@ const routes = [
     path: '/homePage',
     name: 'homePage',
     component: HomePage
+   
   }
 ]
 

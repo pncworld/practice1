@@ -2,33 +2,37 @@
   <div>
   
     <div class="flex justify-start pl-4 pt-4">
-                 <div class="flex justify-start"><h1 class="font-bold text-2xl">
+                 <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-32 md:w-48">
                   일자별 매출 현황
-                 </h1><div class="flex justify-end space-x-2" style="margin-left:1150px"><button @click="searchButton" class="button search">조회</button>
+                 </h1><div class="flex justify-end space-x-2 ml-20 md:ml-[1000px]"><button @click="searchButton" class="button search md:w-auto w-14">조회</button>
                 
-                  <button @click="exportExcel" class="button excel">엑셀</button>
+                  <button @click="exportExcel" class="button excel text-sm  md:w-auto w-14">엑셀</button>
                 </div> </div>
                   
-                
                  </div>
     <br />
     <div class="flex flex-col justify-between  space-x-5 bg-gray-200 rounded-lg h-20 items-center">
     <div class="flex justify-between items-center space-x-96 w-full">
       <div class="flex justify-between w-auto">
-        <div class="items-center flex ml-5">일자 </div> 
-        <DateRangePicker @update:dateRange="handleDateRangeUpdate" />
+        <div class="items-center ml-5">일자 </div> 
+        <DateRangePicker @update:dateRange="handleDateRangeUpdate" class="hidden md:flex" />
+        <DateRangePicker @update:dateRange="handleDateRangeUpdate" class="block md:hidden w-5"/>
+        <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd" class="block md:hidden w-16 ml-48 "></pickStore>
       </div>
       <div>
-      <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd"></pickStore>
+      <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd" class="hidden md:flex"></pickStore>
+       
       </div>
     </div>
     <br>
-    <div class="flex justify-start items-center ml-5 space-x-3 w-full">
+    <div class="flex justify-start items-center ml-5 space-x-3 w-full -mt-5">
       <div class="flex items-center">조회조건 &nbsp;&nbsp;&nbsp;</div>
       <input type="checkbox" id="detail" @click="detailView"><label for="detail">상세보기</label></input>
       <input type="checkbox" @click="rowGroupEnable($event)" id="cellUnite"><label for="cellUnite">셀병합</label></input>
     </div>
     </div>
+
+    
     &nbsp;
     &nbsp;
     <ag-grid-vue :rowData="rowData" :columnDefs="colDefs" style="width: auto; height:660px"
@@ -108,6 +112,7 @@ const updateCd = (value) => {
   storeCd.value = value;
 
 }
+const isMobile = store.state.isMobile;
 // 상세보기 눌렀을때 실행하는 함수
 const detailView = () => {
 
@@ -292,6 +297,8 @@ const searchButton = () => {
           textAlign : tabInitSetArray.value[i].strAlign
         },
         lockPosition : tabInitSetArray.value[i].strHdFix === 'true' ? false : true ,
+        flex : isMobile && (tabInitSetArray.value[i].strColID =='dtmDate' || tabInitSetArray.value[i].strColID =='lngActAmt') ? 2 : 1 ,
+        hide : isMobile && (tabInitSetArray.value[i].strColID =='strPhen' || tabInitSetArray.value[i].strColID =='strStore' ||tabInitSetArray.value[i].strColID =='strWeekName' )
         // 콤보박스 설정
         // cellEditor: 'agRichSelectCellEditor',
         // cellEditorParams: {
@@ -375,7 +382,7 @@ const searchButton = () => {
     // 0으로 나누는 것을 방지하기 위한 처리
       
   
-};
+}
 // if (tabInitSetArray.value[i].intSuppress == '1') {
 //   column.cellRenderer = (params) => {
 //     const currentRowIndex = params.node.rowIndex;
@@ -547,6 +554,7 @@ const handleDateRangeUpdate = (newDateRange) => {
 
 <style>
 .themeClass {
+   width: 100%;
    /* db안에 없는 속성으로 헤더 픽셀 값  설정 */
    /* 그리드의 기본 전경 색상을 설정 */
   --ag-foreground-color: rgb(0, 0, 0) !important;

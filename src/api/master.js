@@ -8,6 +8,9 @@ const api = axios.create({
   baseURL: url, // API 기본 URL
   timeout: 10000, // 요청 타임아웃 설정
 });
+const api2 = axios.create({
+    baseURL: '', // 빈 문자열로 설정
+});
 
 // API 요청 메서드들
 export const get_pos = (groupCd, storeCd) => {
@@ -115,5 +118,14 @@ export const store_insert = (finalObject) => {
 export const store_update = (finalObject1) => {
     return api.post('/VUE_usp_mstStore_Update', finalObject1);
 };
+
+export const tablePosMenu = async(data) => {
+    return await axios.post('/api/MIMASTER/MST57_002INS.asmx/getTablePosMenu', data);
+};
+
+export const tablePosMenuKey = async(data) => {
+    return await axios.post('/api/MIMASTER/MST57_002INS.asmx/getTablePosMenuKey', data);
+};
+
 
 

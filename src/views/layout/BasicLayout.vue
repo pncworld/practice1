@@ -2,7 +2,63 @@
   <div class="flex flex-col h-screen overflow-hidden bg-gray-100">
     <Loading></Loading>
 
-    <header v-if="showMenu" class="bg-white border rounded-3xl text-gray-600 p-4 w-full h-20">
+    <header v-if="showMenu" class="bg-gray-100 border rounded-3xl text-gray-600 p-2 w-full h-10 md:h-14 box-content">
+  <!-- 상단 영역 -->
+  <div class="flex items-center justify-between bg-gray-100 p-4 rounded-lg fixed top-0 h-12 w-full -mt-3 pb-0">
+    <!-- 로고 영역 -->
+    <div class="flex-shrink-0 items-center mt-8 hidden md:block">
+      <img :src="strLogoUrl" alt="Logo" class="w-24 sm:w-36 md:w-48 lg:w-52 sm:h-8 md:h-12 lg:h-16 rounded-lg">
+    </div>
+    
+    <div class="flex justify-start mx-auto pb-1 scrollbar-hide max-w-[1300px] w-full"> <!-- 부모 div -->
+  <div class="flex overflow-x-auto space-x-2 md:space-x-1 w-full mt-4 md:mt-2 md:ml-5"> <!-- 내부 div -->
+    <button
+      v-for="(item, i) in mainCategoryList"
+      :key="i"
+      @click="selectCategory(item.lngCode)"
+      class="px-3 py-2 text-sm sm:text-sm md:text-xs lg:text-sm font-semibold text-gray-700 bg-white border rounded hover:bg-gray-200 whitespace-nowrap"
+    >
+      {{ item.strTitle }}
+    </button>
+    <button class="flex md:hidden w-5 md:w-7 px-3 py-2 text-sm sm:text-sm md:text-xs lg:text-sm font-semibold text-gray-700 bg-white border rounded hover:bg-gray-200 whitespace-nowrap"><img src="../../assets/table_star.svg" alt="Star" ></button>
+    <button @click="deleteAllTabs" class="block md:hidden"><img src="../../assets/ic_delete.svg" alt="Delete" class="w-1 sm:w-6 md:w-7 "></button>
+    <button @click="reLoad" class="block md:hidden"><img src="../../assets/ic_refresh.svg" alt="Refresh" class="w-1 sm:w-6 md:w-7 "></button>
+    <button @click="showMenus" class="block md:hidden"><img src="../../assets/ic_menu.svg" alt="Menu" class="w-1 sm:w-6 md:w-7 "></button>
+    <button @click="hideMenu" class="block md:hidden"><img src="../../assets/ic_extent.svg" alt="Extend" class="w-5 sm:w-6 md:w-7 "></button>
+    <button @click="logout" class="block md:hidden"><img src="../../assets/logout_icon.svg" alt="Logout" class="w-3 sm:w-4 md:w-5 "></button> </div>
+</div>
+
+
+    
+    <!-- 우측 버튼 영역 -->
+    <div class="items-center space-x-4 hidden sm:flex">
+      <button><img src="../../assets/table_star.svg" alt="Star" class="w-5 sm:w-6 md:w-7"></button>
+      <button @click="deleteAllTabs"><img src="../../assets/ic_delete.svg" alt="Delete" class="w-5 sm:w-6 md:w-7"></button>
+      <button @click="reLoad"><img src="../../assets/ic_refresh.svg" alt="Refresh" class="w-5 sm:w-6 md:w-7"></button>
+      <button @click="showMenus"><img src="../../assets/ic_menu.svg" alt="Menu" class="w-5 sm:w-6 md:w-7"></button>
+      <button @click="hideMenu"><img src="../../assets/ic_extent.svg" alt="Extend" class="w-5 sm:w-6 md:w-7"></button>
+      <button @click="logout"><img src="../../assets/logout_icon.svg" alt="Logout" class="w-3 sm:w-4 md:w-5 "></button>
+    </div>
+  </div>
+
+  <!-- 탭 영역 -->
+  <div class="overflow-x-auto space-x-2 mt-8 ml-60 hidden md:flex">
+    <div
+      v-for="tab in tabs"
+      :key="tab.lngProgramID"
+      @click="setActiveTab(tab)"
+      class="flex items-center space-x-2 px-4 py-2 border bg-white text-xs rounded-md cursor-pointer font-bold hover:bg-blue-50 transition whitespace-nowrap"
+      :class="{ 'text-blue-400': isActive(tab) }"
+    >
+      <span>{{ tab.strTitle }}</span>
+      <button @click.stop="removeTab(tab)">
+        <img src="../../assets/deleteIcon.png" alt="Delete" class="w-3 h-3 text-blue-300">
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- <header v-if="showMenu" class="bg-white border rounded-3xl text-gray-600 p-4 w-full h-20">
       <div class="text-sm font-bold flex space-x-5 -ml-72 justify-center -mt-2">
         <span><img :src="strLogoUrl" alt="" class="w-52 absolute left-5 -top-0 "></span>
         <span class="absolute space-x-5" style="left: 270px;">
@@ -22,21 +78,28 @@
           {{tab.strTitle}}<button @click.stop="removeTab(tab)"><span class="text-blue-300 "><img src="../../assets/deleteIcon.png" alt="" class="size-3"></span></button>  </div>
         </div>
       
-    </header>
-    <div class="flex flex-1 overflow-hidden">
+    </header> -->
+    <div class="flex flex-1 overflow-hidden ">
       <!-- Sidebar -->
-      <aside v-show="isMenu && showMenu" class=" bg-white text-gray-600 p-0 m-0 border-gray-200  border flex justify-center items-center" style="width:14%">
-        <BasicMenu v-if="showMenu" class="w-full h-full  border" />
+      <aside v-show="isMenu&&showMenu" class=" bg-white text-gray-600 p-0 m-0 border-gray-200  border  justify-center items-center hidden md:flex w-full md:w-[14%]" >
+        <BasicMenu v-if="showMenu" class="w-full h-full  border hidden md:block" />
       </aside>
       
       <!-- Main Content -->
       <main class="flex-1 bg-white p-1 overflow-y-scroll overflow-x-hidden">
-        
-      <router-view v-slot="{ Component , route}">
+      <router-view v-if="!isMobile" v-slot="{ Component, route }">
       <keep-alive>
         <component :is="Component" :key="`${route.path}-${componentKey}`" />
       </keep-alive>
       </router-view>
+
+      <router-view v-else v-slot="{ Component, route }">
+      <BasicMenu v-if="showMenu && mobileShowMenu" class="w-full h-full border block md:hidden" @mobileClickMenu="mobileClickMenu"/>
+      <component :is="Component" :key="`${route.path}-${componentKey}`" v-if="!mobileShowMenu" />
+    </router-view>
+
+
+      
       </main>     
     </div>
   </div>
@@ -46,24 +109,43 @@
 import BasicMenu from '@/components/BasicMenu.vue';
 import DailySales from '@/components/DailySales.vue';
 import Loading from '@/components/loading.vue';
+import MobileMenu from '@/components/MenuComponent/mobileMenu.vue';
 import router from '@/router';
 import Swal from 'sweetalert2';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import {  useStore } from 'vuex';
 
+const isMobile = ref(false);
+
+// 화면 크기 감지 및 업데이트
+const updateIsMobile = () => {
+  isMobile.value = window.innerWidth <= 640; // 모바일 기준 너비 설정 (640px 이하)
+};
 
 const route = useRoute();
 const store = useStore() ;
 const userData = computed(() => store.state.userData)
 const strLogoUrl = computed(() => userData.value.strLogoUrl)
-
+const mobileShowMenu = ref(false);
 const showMenu = ref(route.path != '/'); // Initialize based on current route
 const componentKey = ref(null);
 // Watch for route changes
+const mobileClickMenu = (value)=> {
+  mobileShowMenu.value = false;
+}
 watch(() => route.path, (newPath) => {
   showMenu.value = newPath != '/'; // Update based on new route
  
+});
+// 이벤트 리스너 등록 및 제거
+onMounted(() => {
+  updateIsMobile();
+  window.addEventListener('resize', updateIsMobile);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateIsMobile);
 });
 const deleteAllTabs = () => {
   Swal.fire({
@@ -96,10 +178,8 @@ const showMenus = () => {
 const selectCategory = (category) => {
   
     store.dispatch('selectCategory', category);
-   
-    console.log(category);
-  
     isMenu.value = true;
+    mobileShowMenu.value = true;
 }
 
 const logout = () => {
@@ -121,7 +201,7 @@ const logout = () => {
   window.location.href = '/';
 }
 
-const isMenu = ref(false);
+const isMenu = ref(true);
 const mainCategoryList = computed(() => store.state.mainCategory);
 const clickFirstCategory = () => {
   const buttons = document.querySelectorAll('button'); // 모든 버튼 선택

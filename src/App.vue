@@ -1,10 +1,26 @@
 <script setup>
+import { onMounted, ref } from 'vue';
 import BasicLayout from './views/layout/BasicLayout.vue';
+import MobileLayout from './views/layout/mobileLayout.vue';
+import { useStore } from 'vuex';
+const isMobile = ref(false);
+const store = useStore();
+const detectMobile  = () =>{
+  const userAgent = window.navigator.userAgent;
+  isMobile.value = /iPhone|iPad|iPod|Android/i.test(userAgent);
+}
+onMounted(() =>{
+  detectMobile();
+  store.state.isMobile= isMobile.value ;
+  
+})
+
 </script>
 
 <template>
-   <BasicLayout>
-   </BasicLayout>
+   <component :is="isMobile ? MobileLayout : BasicLayout" class="h-full">
+    <router-view></router-view> <!-- 자식 컴포넌트를 여기에 렌더링 -->
+  </component>
 </template>
 
 <style>
@@ -14,6 +30,14 @@ import BasicLayout from './views/layout/BasicLayout.vue';
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  height : 100vh;
+}
+html {
+  height : 100vh;
+
+}
+body {
+  height : 100vh;
 }
 
 nav {

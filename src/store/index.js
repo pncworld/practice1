@@ -24,6 +24,7 @@ export default createStore({
       storeAreaCd : [],
       loading : false,
       favoriteList : [],
+      isMobile : false,
     };
   },
   mutations: {
@@ -110,6 +111,9 @@ export default createStore({
     } ,
     addFavoriteList(state, data) {
       state.favoriteList.push(data);
+    },
+    setMobileState(state, data) {
+      state.isMobile = data;
     }
     
 
@@ -168,6 +172,10 @@ export default createStore({
     } ,
     addFavoriteList({commit}, data) {
       commit('addFavoriteList', data);
+    }
+    ,
+    setMobileState({commit}, data) {
+      commit('setMobileState', data);
     }
   },
   getters: {

@@ -33,8 +33,9 @@
 <script setup>
 import router from '@/router';
 import Swal from 'sweetalert2';
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
+const emit = defineEmits();
 const store = useStore();
 const categories = ref([]);
 const toggleArrow = ref(false);
@@ -78,9 +79,23 @@ const showAll = () =>{
 }
 }
 const isOpen = (id) => openCategoryId.value.includes(id);
-
+const isMobile = ref(false);
+const detectMobile = () => {
+  const userAgent = window.navigator.userAgent;
+  isMobile.value = /iPhone|iPad|iPod|Android/i.test(userAgent);
+};
+onMounted(() => {
+  detectMobile();
+  console.log(isMobile)
+});
+const mobileClickMenu = ref(true);
 const selectCategory = (strUrl , lngProgramID , strTitle) => {
-  
+  if(isMobile.value) {
+    mobileClickMenu.value = true;
+    emit("mobileClickMenu", mobileClickMenu.value);
+    router.push('/'+strUrl.split("::")[0]+'/'+strUrl.split("::")[1]);
+    return ;
+  }
   const currentTabs = store.state.currentTabs;
   
   const existingTab = currentTabs.find( tab => tab.lngProgramID.startsWith(lngProgramID));
@@ -111,6 +126,7 @@ const selectCategory = (strUrl , lngProgramID , strTitle) => {
     store.dispatch("addNewTab" , newTab); 
     router.push('/'+strUrl.split("::")[0]+'/'+strUrl.split("::")[1]);
   } 
+  
   
 }
 var cMenu = ref("매출관리");

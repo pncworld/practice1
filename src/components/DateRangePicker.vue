@@ -1,5 +1,5 @@
 <template>
-    <div class="w-72 flex relatvie">
+    <div class="md:w-72 w-14 flex relatvie ">
       <VueDatePicker  v-model="dateRange"
       :format="format"
       :locale="locale"
@@ -8,9 +8,10 @@
       :enable-time-picker="false" 
       week-start="0"
       auto-apply
+      :clearable="false"
       @change="handleDateRangeChange"></VueDatePicker>
       
-      &nbsp;  &nbsp;  <button class="w-1/12" @click="toggleRadio" v-if="!showRadio"><img src="../assets/choiceCalendar.png" alt="" >
+     <button class="w-1/12" @click="toggleRadio" v-if="!showRadio"><img src="../assets/choiceCalendar.png" alt="" >
       </button>
       <div v-if="showRadio" class="mt-2 p-8 ml-72 w-56 bg-gray-100 rounded-lg shadow-md z-10 absolute">
         <div class="flex justify-end -mr-6"><button @click="toggleRadio">닫기</button></div>
