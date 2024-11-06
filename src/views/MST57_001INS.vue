@@ -4,9 +4,9 @@
       <div class="flex justify-start pl-4 pt-4">
                  <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-32 md:w-auto">
                   메뉴 카테고리 관리
-                 </h1><div class="flex justify-end space-x-2 ml-24 md:ml-[1000px]"><button @click="searchMenu" class="button search md:w-auto w-14">조회</button>
+                 </h1><div class="flex justify-end space-x-2 ml-24 md:ml-[945px]"><button @click="searchMenu" class="button search md:w-auto w-14">조회</button>
                 
-                  <button @click="saveMenus" class="button excel text-sm  md:w-auto w-14">저장</button>
+                  <button @click="saveMenus" class="button save text-sm  md:w-auto w-14">저장</button>
                 </div></div>
                   
                  </div>
@@ -23,7 +23,7 @@
         </div>
     </div>
     <div class="h-60 md:ml-8 ml-1  mt-10 border-t border-b border-black md:w-[71%] w-full" v-if="afterCategory">
-        <div class="  text-white h-9 w-24 rounded-md flex items-center -mt-9 float-end md:-mr-10 mr-32 space-x-5 "><button class="whitebutton inline-block md:hidden" style="font-size: 14px" @click="addMainCategory">메인카테고리추가</button><button class="whitebutton" style="font-size: 14px" @click="deleteMainCategory">삭제</button></div>
+        <div class="  text-white h-9 w-24 rounded-md flex items-center -mt-9 float-end md:-mr-10 mr-32 space-x-5 "><button class="whitebutton" style="font-size: 14px" @click="deleteMainCategory">삭제</button></div>
         <div class="grid grid-cols-[1fr_3fr] grid-rows-5 mt-0 h-full divide-x divide-y divide-gray-300 -ml-2">
             <div class="bg-gray-200 flex justify-start items-center pl-4 font-bold" style="color:#5782FF">*메인카테고리명(한국어)</div>
             <div class="bg-white md:w-96 w-full"><input type="text" class="border border-gray-300 h-6 mt-2 w-8/12 md:w-96  flex justify-start ml-4 pl-2 " v-model="languageName0" @input="changeMajorName" @keyup="afterModifed"></div>
@@ -45,13 +45,13 @@
     </div>          
     <div class="flex justify-between -mt-36 ml-5 " v-if="afterCategory">
     <div class=" rounded-md h-10 w-auto ml-72 flex items-center "><button class="whitebutton" @click="addsubCategory" style="font-size: 14px">서브카테고리 추가</button></div>
-    <div class="  rounded-md h-10 w-auto flex items-center justify-center mr-40" ><button class="whitebutton" style="font-size: 14px" @click="deleteAllsubCategory">전체 삭제</button></div>
+    <div class="  rounded-md h-10 w-auto flex items-center justify-center mr-[120px]" ><button class="whitebutton" style="font-size: 14px" @click="deleteAllsubCategory">전체 삭제</button></div>
 </div>
   
 
     <div class="  border  border-neutral-600 -z-20" style="margin-left: 307px; width:71% " v-if="afterCategory" ></div>
     <div class="h-60  mt-10 border-t border-b border-white" style="margin-left: 296px; width: 71%" v-for="i in subMultiLang" v-if="afterCategory">
-        <div class="-mt-10" style="margin-left:1110px;"><button class="whitebutton" @click="deleteSubCategory(i[0].categoryCode)">삭제</button></div>
+        <div class="-mt-10" style="margin-left:1000px;"><button class="whitebutton" @click="deleteSubCategory(i[0].categoryCode)">삭제</button></div>
         <div class="grid grid-cols-[1fr_3fr] grid-rows-5 mt-0 h-full divide-x divide-y divide-gray-300 ml-3" >
             <div class="bg-gray-200 flex justify-start items-center pl-4 font-bold" style="color:#5782FF">*서브카테고리명(한국어)</div>
             <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " :value="i[0] ? i[0].LanguageName : ''" @input="event => { changeSubName(i[0].categoryCode, event); subcategorynm(event); }" @keyup="afterModifed" ></div>
@@ -69,7 +69,7 @@
 
     </div>
     </div>
-    <div class="flex justify-end mr-36 mt-10">
+    <div class="flex justify-end mr-32 mt-10">
         <div class="flex flex-col items-end">
     <div class=" text-white rounded-md h-8 w-44 flex items-center justify-center "><button class="whitebutton" @click="addsubCategory">서브카테고리 추가</button></div>
     <div class=" text-white rounded-md h-8 w-28 flex items-center justify-center mt-5 mr-1 "><button class="button save" @click="saveMenus">저장</button></div>
@@ -101,6 +101,9 @@ const afterCategory = ref(false);
 const currentMajorCode = ref();
 const newMainCategoryCode = ref([]);
 const  handleStoreCd = (newValue) => {
+    if(newValue == '0'){
+        afterSearch.value = false;
+    }
     nowStoreCd.value = newValue ;
 }
 const afterSearch = ref(false);
@@ -369,7 +372,6 @@ const deleteAllsubCategory = async() => {
 }
 
 const searchMenu = async () => {
-        afterSearch.value = true;
         subMultiLang.value = [];
         Category.value = [] ;
         languageName0.value = '';
@@ -411,7 +413,7 @@ const searchMenu = async () => {
         });
     
         Category.value = res.data.MainCategory ;
-        
+        afterSearch.value = true;
         const res1 = await axios.post('/api/MIMASTER/MST57_001INS.asmx/getMultiLingual' ,{
             GROUP_CD : groupCd.value,
             STORE_CD : nowStoreCd.value,
@@ -419,7 +421,7 @@ const searchMenu = async () => {
 
         getMultiLang.value = res1.data.MultiLingual ;
     } catch (error) {
-      
+        afterSearch.value = false;
     } finally {
         
         store.state.loading = false; // 로딩 상태 종료
@@ -440,7 +442,7 @@ const saveMenus = async() => {
     if(afterSearch.value == false) {
         Swal.fire({
             title: '경고',
-            text: '검색을 먼저 진행해주세요.',
+            text: '조회를 먼저 진행해주세요.',
             icon: 'warning',
             showCancelButton: false,
             confirmButtonColor: '#3085d6',

@@ -29,8 +29,9 @@
     </div>
     
       <div class="hidden md:inline-block">
-     <span class="font-bold text-sm ">지역코드 : &nbsp;</span> <select :disabled="isDisabled4"  class="w-32 border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" v-model="selectedStoreAreaCd">
-          <option :value="item.lngAreaCode" v-for="item in storeAreaCd" :key="item.lngAreaCode">{{ item.lngAreaCode }}</option>
+     <span class="font-bold text-sm ">지역코드 : &nbsp;</span> <select :disabled="isDisabled4"  class="w-32 border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" v-model="selectedStoreAreaCd" @change="emitStoreAreaCd($event.target.value)">
+      <option value="0">선택</option>
+      <option :value="item.lngAreaCode" v-for="item in storeAreaCd" :key="item.lngAreaCode">{{ item.lngAreaCode }}</option>
         </select>
       </div>
     </div>
@@ -52,7 +53,7 @@ const isDisabled1 = ref(false);
 const isDisabled2 = ref(false);
 const isDisabled3 = ref(false);
 const isDisabled4 = ref(false);
-const selectedStoreAreaCd = ref();
+const selectedStoreAreaCd = ref('0');
 const changed = ref(false)
 const ischanged = () => {
     changed.value = !changed.value;
@@ -116,7 +117,9 @@ const emitStoreAreaCd = (value) => {
         storeAreaCd.value = storeAreaCd2.value.filter( item => {
             return item.lngStoreCode == value ;
         })
-        selectedStoreAreaCd.value = storeAreaCd.value[0] ? storeAreaCd.value[0].lngAreaCode : ''
+        console.log(storeAreaCd.value)
+        // selectedStoreAreaCd.value = storeAreaCd.value[0] ? storeAreaCd.value[0].lngAreaCode : '0'
+        selectedStoreAreaCd.value =  '0'
         console.log(selectedStoreAreaCd.value);
         emitStoreAreaCd(selectedStoreAreaCd.value);
   }

@@ -60,8 +60,14 @@ watch(() => props.storeAreaCd, (newValue) => {
 
     currStoreAreaCd.value = newValue
 });
-watch(() => props.storeCd , async() =>{
-   
+watch(() => props.storeAreaCd , async() =>{
+    if(props.storeAreaCd =='0'){
+        mainCategories.value =[];
+        subCategories.value =[];
+        changed.value ='0'
+        changed2.value ='0'
+        return ;
+    }
     const res = await axios.post('/api/MIMASTER/MST57_001INS.asmx/getCategoryInfo',{
              GROUP_CD : groupCd.value,
              STORE_CD : currStoreCd.value,

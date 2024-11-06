@@ -2,36 +2,23 @@
     <div class="h-screen overflow-y-auto">
     <main class="h-screen overflow-y-auto">
     <router-view v-slot="{ Component, route }" >
-        <div class="grid grid-cols-1 gap-3 h-full w-full items-center justify-center mr-3" v-show="isMenu">
-        <div v-for="(item, i) in hierarchicalCategories" :key="i" class="w-full">
-    <!-- 상위 카테고리 버튼 -->
-    <button
-      @click="toggleCategory(item.lngCode)"
-      class="flex justify-center items-center px-3 py-2 font-semibold text-gray-700 bg-white border rounded hover:bg-gray-200 whitespace-nowrap w-full"
-    >
-      {{ item.strTitle }}
-    </button>
-
-    <!-- 하위 카테고리 버튼 -->
-    <div v-show="isCategoryVisible(subItem.lngCode)" v-for="(subItem, j) in item.subCategories" :key="subItem.lngCode" class="mt-2 space-y-1 pl-4" >
-      <button
-        @click="selectSubCategory(subItem.lngProgramSub)"
-        class="flex justify-center items-center px-3 py-2 font-medium text-gray-600 bg-gray-100 border rounded hover:bg-gray-200 whitespace-nowrap w-full"
-      >
-        {{ subItem.strTitle }}
-      </button>
-
-      <!-- 세 번째 계층 버튼 (minorCategories) -->
-      <div v-show="issubCategoryVisible(minorItem.lngProgramSub)" v-for="(minorItem, k) in subItem.minorCategories" :key="k" class="mt-1 space-y-1 pl-8">
-        <button
-          @click="routecategory(minorItem.strUrl , minorItem.strTitle ,minorItem.lngProgramID)"
-          class="flex justify-center items-center px-3 py-2 font-normal text-gray-500 bg-gray-50 border rounded hover:bg-gray-200 whitespace-nowrap w-full"
-        >
-          {{ minorItem.strTitle }}
-        </button>
-      </div>
-    </div>
-  </div>
+        <div class="flex flex-col gap-0  w-full items-center justify-center mr-0 h-auto" v-show="isMenu">
+        <div class="flex justify-end pr-10"><button class="text-3xl" @click="showMenu(false)"><font-awesome-icon icon="xmark" /></button></div>
+        <div class="flex justify-start items-center pl-10 border border-gray-300 h-24 w-full" ><button class="text-2xl h-full w-full flex justify-start items-center" @click="showsubMenu(1)"><font-awesome-icon icon="chart-simple" />매출</button>
+        </div>
+        <div class="grid grid-rows-6 h-80 border w-full " v-if="showornotsubMenu(1)">
+          <div class="h-full w-full border border-gray-200"><button class="h-full w-full">매출현황</button></div>
+          <div class="h-full w-full border border-gray-200"><button class="h-full w-full">시간대별 분석</button></div>
+          <div class="h-full w-full border border-gray-200"><button class="h-full w-full" @click="goRouter(3)">기간별 분석</button></div>
+          <div class="h-full w-full border border-gray-200"><button class="h-full w-full">요일별 분석</button></div>
+          <div class="h-full w-full border border-gray-200"><button class="h-full w-full">메뉴별 분석</button></div>
+          <div class="h-full w-full border border-gray-200"><button class="h-full w-full">주제/결제유형별 분석</button></div>
+        </div>
+        <div class="flex justify-start items-center pl-10 border border-gray-300 h-24  w-full" ><button class="text-2xl h-full w-full flex justify-start items-center"><font-awesome-icon icon="chart-simple" />기타1</button></div>
+        <div class="flex justify-start items-center pl-10 border border-gray-300 h-24  w-full" ><button class="text-2xl h-full w-full flex justify-start items-center"><font-awesome-icon icon="chart-simple" />기타2</button></div>
+        <div class="flex justify-start items-center pl-10 border border-gray-300 h-24  w-full" ><button class="text-2xl h-full w-full flex justify-start items-center"><font-awesome-icon icon="chart-simple" />기타3</button></div>
+        <div class="flex justify-start items-center pl-10 border border-gray-300 h-24  w-full" ><button class="text-2xl h-full w-full flex justify-start items-center"><font-awesome-icon icon="chart-simple" />기타3</button></div>
+        <div class="flex justify-start items-center pl-10 border border-gray-300 h-24  w-full" ><button class="text-2xl h-full w-full flex justify-start items-center"><font-awesome-icon icon="chart-simple" />기타3</button></div>
   </div>
  
     <div v-if="personal" class="grid grid-cols-2 gap-3 h-full w-auto items-center pl-24">
@@ -59,6 +46,7 @@ const isMenu = ref(false);
 const isMenu2 = ref(false);
 const personal = ref(false);
 const showMobileMenu = ref(true);
+const clickthismenu = ref([]);
 const route = useRoute();
 const showMenu = (value) => {
 
@@ -66,11 +54,25 @@ const showMenu = (value) => {
 }
 const showpersonal = (value) => {
     personal.value = value;
-    clickparent(value);
+  
 }
-const clickparent = (value) => {
-
+const goRouter = (value) => {
+   router.push('/m/MISALES/SLS06_004RPT.xml');
+   personal.value = false;
+   isMenu.value = false;
+}
+const showsubMenu = (value) => {
+  const index = clickthismenu.value.indexOf(value);
+  if( index == -1){
+    clickthismenu.value.push(value);
+  } else {
+    clickthismenu.value.splice(index, 1);
+  }
+   
 };
+const showornotsubMenu = (value) => {
+  return clickthismenu.value.includes(value);
+}
 const store = useStore();
 const categories = ref([]);
 const selectedCategoryId = computed(() => store.state.selectedCategoryId) ;

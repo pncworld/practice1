@@ -27,7 +27,7 @@
       {{ subCategory.subGroupNm }}
     </button>
         <div v-show="activeSub[subIndex]" v-for="(item, itemIndex) in subCategory.menuList" :key="itemIndex" class="flex w-72 justify-between ml-16">
-          <div class=""><button @click="addMenu(item.menuCd ,item.menuNm , mainCategory.majorGroupNm , subCategory.subGroupNm)" >{{ item.menuNm }}/{{ item.lngPrice}}원 </button></div><button @click="addMenu(item.menuCd ,item.menuNm ,mainCategory.majorGroupNm , subCategory.subGroupNm)" class="whitebutton">추가</button>
+          <div class=""><button @click="addMenu(item.menuCd ,item.menuNm , mainCategory.majorGroupNm , subCategory.subGroupNm ,item.fileName)" >{{ item.menuNm }}/{{ item.lngPrice}}원 </button></div><button @click="addMenu(item.menuCd ,item.menuNm ,mainCategory.majorGroupNm , subCategory.subGroupNm)" class="whitebutton">추가</button>
         </div>
       </div>
     </div>
@@ -41,7 +41,8 @@
       </div>
       <Draggable v-for="item in items">
         <div class="grid grid-cols-8 h-auto">
-          <div class="h-16 flex items-center justify-center"><font-awesome-icon icon="bars" /></div><div class="h-16 flex items-center justify-center">{{ item?.intKeySeq  }}</div><div class="h-16 flex items-center justify-center"><img :src="item?.imgurl" alt="" class="size-8"></div><div class="h-16 flex items-center justify-center">{{ item?.lngKeyscrNo }}</div>
+          <div class="h-16 flex items-center justify-center"><font-awesome-icon icon="bars" /></div><div class="h-16 flex items-center justify-center">{{ item?.intKeySeq  }}</div><div class="h-16 flex items-center justify-center"><img v-if="item.fileName" :src="`http://www.pncoffice.net/MenuImage/Image/${item.fileName}`" alt="" class="w-full h-full"><img v-if="!item.fileName" src="../assets/noImage.png" alt="">
+          </div><div class="h-16 flex items-center justify-center">{{ item?.lngKeyscrNo }}</div>
           <div class="h-16 flex items-center justify-center">{{ item?.strKeyName }}</div><div class="h-16 flex items-center justify-center">{{ item?.majorName}}</div><div class="h-16 flex items-center justify-center">{{ item?.subName}}</div><div class="h-16 flex items-center justify-center"><button @click="deleteitem(item?.lngKeyscrNo , item?.intKeySeq )"><img src="../assets/trash.svg" alt=""></button></div>
         </div>
       </Draggable>
@@ -75,14 +76,14 @@ const toggleSub = (index) => {
 
 
 const items = ref([]);
-const addMenu = (menuCd, menuNm, majorGroupNm ,subGroupNm) => {
+const addMenu = (menuCd, menuNm, majorGroupNm ,subGroupNm ,fileName) => {
    
    
     const nextid = items.value.length >0 ? items.value.reduce((max,item) =>{
       return item.intKeySeq > max ? Number(item.intKeySeq) : Number(max);
     },items.value[0].intKeySeq) +1 : 1 ;
 
-    let additem = {intKeySeq :nextid , strKeyName:menuNm ,lngKeyscrNo:menuCd , majorName:majorGroupNm ,subName:subGroupNm ,imgurl : strLogoUrl };
+    let additem = {intKeySeq :nextid , strKeyName:menuNm ,lngKeyscrNo:menuCd , majorName:majorGroupNm ,subName:subGroupNm , fileName : fileName };
     items.value.push(additem);
 
 }
@@ -120,6 +121,7 @@ const currAreaCd = ref('0');
 const currmainCateCd = ref('0');
 const currsubCateCd = ref('0');
 const ischange = ref(false);
+const afterSearch = ref(false);
 const ischanged = (value) => {
   ischange.value = value;
 }
@@ -129,7 +131,7 @@ const handleStoreAreaCd = (value) => {
 
 }
 const handleStoreCd = (value) => {
-   currAreaCd.value = '';
+   currAreaCd.value = '0';
    currstoreCd.value = value;
 }
 
@@ -143,31 +145,49 @@ const emitmaincate = (value) => {
 
 const majorGroup = ref([]);
 const deleteAllitems = ref([]);
+const confirmitem =ref([]);
 const searchPosMenu = async() => {
-    if(currstoreCd.value =='0' || currAreaCd.value =='0'){
+    if(currstoreCd.value =='0' ){
       Swal.fire({
-        title: 'Error',
+        title: '경고',
         text: '매장을 선택하세요.',
-        icon: 'error',
+        icon: 'warning',
         confirmButtonText: '확인'
       })
 
       return ; 
     }
-    console.log(currmainCateCd.value)
-    console.log(currsubCateCd.value)
-    if(currmainCateCd.value =='0' || currsubCateCd.value =='0'){
+    if(currAreaCd.value =='0'){
       Swal.fire({
-        title: 'Error',
-        text: '카테고리를 선택하세요.',
-        icon: 'error',
+        title: '경고',
+        text: '지역코드를 선택하세요.',
+        icon: 'warning',
+        confirmButtonText: '확인'
+      })
+      return ;
+    }
+    if(currmainCateCd.value =='0'){
+      Swal.fire({
+        title: '경고',
+        text: '메인 카테고리를 선택하세요.',
+        icon: 'warning',
         confirmButtonText: '확인'
       })
 
       return ; 
+    }
+    if(currsubCateCd.value =='0'){
+      Swal.fire({
+        title: '경고',
+        text: '서브 카테고리를 선택하세요.',
+        icon: 'warning',
+        confirmButtonText: '확인'
+      })
+      return ;
     }
     items.value = [];
-    const res = await tablePosMenu({
+    try {
+      const res = await tablePosMenu({
         GROUP_CD : groupCd.value,
         STORE_CD : currstoreCd.value,
     })
@@ -179,23 +199,62 @@ const searchPosMenu = async() => {
     AREA_CD: currAreaCd.value,
     MAJOR_CD: currmainCateCd.value,
     SUB_CD: currsubCateCd.value
-})
+   })
 
-  console.log(res2)
-    items.value = res2.data.menuKeyList.filter(item => item);
+   items.value = res2.data.menuKeyList.filter(item => item);
+   confirmitem.value = [...items.value];
      if(items.value[0] == undefined){
         items.value = [];
      } 
      deleteAllitems.value = res2.data.menuKeyList.map(item => item.intKeySeq);
-     console.log(deleteAllitems);
+  
+   afterSearch.value = true;
+    } catch (error) {
+      afterSearch.value = false;
+    }
+    
+
+   
 }
+
 const deleteitems = ref([]);
 const deleteitem =(value, value2) => {
   deleteitems.value.push(value2);
   items.value = items.value.filter(item => !(item.lngKeyscrNo === value && item.intKeySeq === value2));
 }
 const savePosMenu = async() => {
-      store.state.loading = true;
+      if(afterSearch.value == false) {
+        Swal.fire({
+          title: '경고',
+          text: '조회를 먼저 진행해주세요.',
+          icon: 'warning',
+          confirmButtonText: '확인'
+        })
+        return ;
+      }
+   
+      if(JSON.stringify(confirmitem.value) === JSON.stringify(items.value)) {
+        Swal.fire({
+          title: '경고',
+          text: '변경된 항목이 없습니다.',
+          icon: 'warning',
+          confirmButtonText: '확인'
+        })
+        return ;
+      }
+      Swal.fire({
+        title: '저장하시겠습니까?',
+        text: '변경사항을 저장하시겠습니까?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: '저장',
+        cancelButtonText: '취소',
+        allowOutsideClick: false
+    }).then(async (result) => {
+      if(result.isConfirmed){
+        store.state.loading = true;
       try {
         const res = await deletetablePosMenuKey({
          GROUP_CD: groupCd.value,
@@ -215,12 +274,26 @@ const savePosMenu = async() => {
         MENU_CD : MenuCds.join(','),
         MENU_NM : MenuNm.join(',')
       })
-      } catch (error) {
+    
+    } catch (error) {
         
       } finally {
         store.state.loading = false;
+        Swal.fire({
+          title: '저장 성공',
+          text: '변경 사항이 저장되었습니다.',
+          icon:'success',
+          confirmButtonText: '확인'
+        })
+  
         searchPosMenu()
       }
+    }
+  }
+)
+     
+
+   
      
      
 

@@ -2,36 +2,37 @@
   <div>
   
     <div class="flex justify-start pl-4 pt-4">
-                 <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-32 md:w-48">
-                  일자별 매출 현황
-                 </h1><div class="flex justify-end space-x-2 absolute right-5"><button @click="searchButton" class="button search md:w-auto w-14">조회</button>
-                
-                  <button @click="exportExcel" class="button excel text-sm  md:w-auto w-14">엑셀</button>
-                </div></div>
-                
-                  
+                 <div class="flex justify-start"><h1 class="font-bold text-2xl">
+                  기간별 분석
+                 </h1></div>
           </div>
     <br /><br />
-    <div class="flex flex-col justify-between  space-x-5 bg-gray-200 rounded-lg h-20 items-center">
-    <div class="flex justify-between items-center space-x-96 w-full">
-      <div class="flex justify-between w-auto">
-        <div class="items-center ml-5">일자 </div> 
-        <DateRangePicker @update:dateRange="handleDateRangeUpdate" class="hidden md:flex" />
-        <DateRangePicker @update:dateRange="handleDateRangeUpdate" class="block md:hidden w-5 z-10"/>
-        <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd" class="block md:hidden w-32 absolute right-5"></pickStore>
+    <div class="flex flex-col space-y-3 bg-gray-200 rounded-lg p-4 h-auto md:h-20 md:flex-row md:justify-between">
+  <!-- 상단 영역 -->
+  <div class="flex flex-col md:flex-row md:justify-between items-center w-full">
+    <div class="flex flex-col md:flex-row items-center w-full md:w-auto space-y-2 md:space-y-0 md:space-x-4">
+      <div class="flex items-center space-x-2">
+        <span class="text-sm font-medium">일자 선택</span>
       </div>
-      <div>
-      <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd" class="hidden md:flex"></pickStore>
-       
-      </div>
+      <DateRangePicker @update:dateRange="handleDateRangeUpdate" class=" w-full z-10"/>
     </div>
-    <br>
-    <div class="flex justify-start items-center ml-5 space-x-3 w-full -mt-5">
-      <div class="flex items-center">조회조건 &nbsp;&nbsp;&nbsp;</div>
-      <input type="checkbox" id="detail" @click="detailView"><label for="detail">상세보기</label></input>
-      <input type="checkbox" @click="rowGroupEnable($event)" id="cellUnite"><label for="cellUnite">셀병합</label></input>
+    
+    <!-- PickStore 버튼 -->
+    <div class="flex flex-col justify-start w-full ">
+      <span class="flex justify-center">매장 선택</span>
+      <PickStore 
+        @update:storeGroup="updateGroup" 
+        @update:storeType="updateType" 
+        @update:storeCd="updateCd" 
+        class="w-full justify-start flex" 
+      />
     </div>
-    </div>
+  </div>
+  
+  <!-- 하단 영역 -->
+  
+</div>
+
 
     
     &nbsp;
@@ -47,7 +48,7 @@
 // 가져온 날짜의 형식을 고치기 위해서 사용 ( 데이터가 yyyy-mm-dd T ~~~ 이런형태여서 T부터 자름)
 import { format } from 'date-fns';
 // 설치한 라이브러리로 만든 달력을 가져옴 ( 재사용 )
-import DateRangePicker from '../components/DateRangePicker.vue';
+import DateRangePicker from '@/components/DateRangePicker.vue';
 // 뷰에서 제공 하는 기능, computed 반응형 상태를 기반으로 다른 로직을 실행해 결과값을 생성 , ref 반응형 변수 선언
 import { computed, ref } from 'vue';
 // vuex에서 제공하는 중앙 상태관리 
@@ -63,6 +64,7 @@ import { useTabInfo } from '@/api/common';
 // alert 창 자동 꾸미기 위한 라이브러리
 import Swal from 'sweetalert2';
 import { dailySaleReport } from '@/api/misales';
+
 
 
 const store = useStore();

@@ -13,6 +13,7 @@ import masterRouter from './masterRouter'
 import BasicLayout from '@/views/layout/BasicLayout.vue'
 import MobileLayout from '@/views/layout/mobileLayout.vue'
 import { defineComponent, h } from 'vue'
+import mobileRouter from './mobileRouter'
 
 
 
@@ -41,6 +42,11 @@ const routes = [
     path: '/MIMASTER',
     //component : BasicLayout ,
     children: masterRouter()
+  },
+  {
+    path: '/m',
+    //component : BasicLayout ,
+    children: mobileRouter()
   },
   
   
