@@ -1,41 +1,47 @@
 <template>
-    <div class="flex justify-start pl-4 pt-4">
-        <div class="flex justify-start"><h1 class="font-bold text-2xl">
-            메뉴 카테고리 관리
-        </h1></div>
-        <div class="flex space-x-3" style="margin-left: 1050px;"><button @click="searchMenu" class="button search">조회</button><button @click="saveMenus" class="button save">저장</button></div>
+   
+   <div class="flex justify-between items-center w-full overflow-y-auto">
+      <div class="flex justify-start pl-4 pt-4">
+                 <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-32 md:w-auto">
+                  메뉴 카테고리 관리
+                 </h1><div class="flex justify-end space-x-2 ml-24 md:ml-[1000px]"><button @click="searchMenu" class="button search md:w-auto w-14">조회</button>
+                
+                  <button @click="saveMenus" class="button excel text-sm  md:w-auto w-14">저장</button>
+                </div></div>
+                  
+                 </div>
+
     </div>
     <br>
-    <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center"><PickStore4 @update:storeAreaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd"></PickStore4> </div> 
-    <div class="flex">
     
-    <div class="border border-black w-64 h-96 ml-5 mt-10 overflow-auto" >
-        
+    <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore4 @update:storeAreaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd"></PickStore4> </div> 
+    <div class="inline-block md:flex w-full">
+    <span class=" md:hidden font-bold flex justify-center w-auto "> 클릭하시면 아래 페이지에서 다국어 정보가 나옵니다.</span>
+    <div class="border border-black md:w-64 w-full h-96 md:ml-5 ml-0 mt-10 overflow-auto" >
         <div v-for="i in Category" :key="i.MajorCode" class="ml-5 w-auto flex justify-start items-start flex-col"><button @click="bringCategory(i.MajorCode)" class=" font-bold" style="font-size: 15px" >{{ i.MajorName}}</button>
             <div v-for="x in i.SubCategory" :key="x.SubCode" class="flex items-start w-auto ml-5" :class="{'bg-lightblue': selectedButton === x.SubCode}"><button class=" font-thin " @click="bringCategory(i.MajorCode)" style="font-size: 15px">{{ x.SubName }}</button></div>
         </div>
     </div>
-    
-    <div class="h-60 ml-8  mt-10 border-t border-b border-black" style="width: 71%" v-if="afterCategory">
-        <div class="  text-white h-9 w-24 rounded-md flex items-center -mt-9 float-end -mr-10"><button class="whitebutton" style="font-size: 14px" @click="deleteMainCategory">삭제</button></div>
-        <div class="grid grid-cols-[1fr_3fr] grid-rows-5 mt-0 h-full divide-x divide-y divide-gray-300">
+    <div class="h-60 md:ml-8 ml-1  mt-10 border-t border-b border-black md:w-[71%] w-full" v-if="afterCategory">
+        <div class="  text-white h-9 w-24 rounded-md flex items-center -mt-9 float-end md:-mr-10 mr-32 space-x-5 "><button class="whitebutton inline-block md:hidden" style="font-size: 14px" @click="addMainCategory">메인카테고리추가</button><button class="whitebutton" style="font-size: 14px" @click="deleteMainCategory">삭제</button></div>
+        <div class="grid grid-cols-[1fr_3fr] grid-rows-5 mt-0 h-full divide-x divide-y divide-gray-300 -ml-2">
             <div class="bg-gray-200 flex justify-start items-center pl-4 font-bold" style="color:#5782FF">*메인카테고리명(한국어)</div>
-            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2 " v-model="languageName0" @input="changeMajorName" @keyup="afterModifed"></div>
+            <div class="bg-white md:w-96 w-full"><input type="text" class="border border-gray-300 h-6 mt-2 w-8/12 md:w-96  flex justify-start ml-4 pl-2 " v-model="languageName0" @input="changeMajorName" @keyup="afterModifed"></div>
             <div class="bg-gray-200 flex justify-start items-center pl-4">메인카테고리명(영어)</div>
-            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"  v-model="languageName1" @input="changeMajorName1"  @keyup="afterModifed"></div>
+            <div class="bg-white md:w-96 w-full"><input type="text" class="border border-gray-300 h-6 mt-2 w-8/12 md:w-96 flex justify-start ml-4 pl-2"  v-model="languageName1" @input="changeMajorName1"  @keyup="afterModifed"></div>
             <div class="bg-gray-200 flex justify-start items-center pl-4">메인카테고리명(중국어)</div>
-            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"  v-model="languageName2" @input="changeMajorName2 "  @keyup="afterModifed"></div>
+            <div class="bg-white md:w-96 w-full"><input type="text" class="border border-gray-300 h-6 mt-2 w-8/12 md:w-96 flex justify-start ml-4 pl-2"  v-model="languageName2" @input="changeMajorName2 "  @keyup="afterModifed"></div>
             <div class="bg-gray-200 flex justify-start items-center pl-4">메인카테고리명(일본어)</div>
-            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"  v-model="languageName3" @input="changeMajorName3 "  @keyup="afterModifed"></div>
+            <div class="bg-white md:w-96 w-full"><input type="text" class="border border-gray-300 h-6 mt-2 w-8/12 md:w-96 flex justify-start ml-4 pl-2"  v-model="languageName3" @input="changeMajorName3 "  @keyup="afterModifed"></div>
             <div class="bg-gray-200 flex justify-start items-center pl-4">메인카테고리명(스페인어)</div>
-            <div class="bg-white"><input type="text" class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"  v-model="languageName4" @input="changeMajorName4"  @keyup="afterModifed"></div>
+            <div class="bg-white md:w-96 w-full"><input type="text" class="border border-gray-300 h-6 mt-2 w-8/12 md:w-96 flex justify-start ml-4 pl-2"  v-model="languageName4" @input="changeMajorName4"  @keyup="afterModifed"></div>
         
         </div>
     </div>
     
     </div>
-    <div class="flex justify-start ml-5 mt-5 space-x-2 "><button class="whitebutton" style="font-size: 14px" @click="addMainCategory">메인카테고리추가</button>
-        <!-- <button class="button primary " style="font-size: 14px">노출순서관리</button> -->
+    
+    <div class=" justify-start md:ml-5 ml-14 mt-5 space-x-2 hidden md:flex "><button class="whitebutton" style="font-size: 14px" @click="addMainCategory">메인카테고리추가</button>
     </div>          
     <div class="flex justify-between -mt-36 ml-5 " v-if="afterCategory">
     <div class=" rounded-md h-10 w-auto ml-72 flex items-center "><button class="whitebutton" @click="addsubCategory" style="font-size: 14px">서브카테고리 추가</button></div>

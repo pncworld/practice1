@@ -1,7 +1,7 @@
 <template>
-    <div class="h-full overflow-y-auto">
-    <main class="h-full overflow-y-auto">
-    <router-view v-slot="{ Component, route }">
+    <div class="h-screen overflow-y-auto">
+    <main class="h-screen overflow-y-auto">
+    <router-view v-slot="{ Component, route }" >
         <div class="grid grid-cols-1 gap-3 h-full w-full items-center justify-center mr-3" v-show="isMenu">
         <div v-for="(item, i) in hierarchicalCategories" :key="i" class="w-full">
     <!-- 상위 카테고리 버튼 -->
@@ -43,9 +43,8 @@
     <component v-show="!isMenu && !personal " :is="Component" ></component>
     </router-view>
     </main>
-
+    <MobileMenu v-show="showMobileMenu" @showMenu="showMenu" @showpersonal="showpersonal" class="" ></MobileMenu>
     </div>
-    <MobileMenu v-show="showMobileMenu" @showMenu="showMenu" @showpersonal="showpersonal" class="sticky bottom-0" ></MobileMenu>
 </template>
 
 <script setup>

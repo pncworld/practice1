@@ -18,7 +18,7 @@ onMounted(() =>{
 </script>
 
 <template>
-   <component :is="isMobile ? MobileLayout : BasicLayout" class="h-full">
+   <component :is="isMobile ? MobileLayout : BasicLayout" class="">
     <router-view></router-view> <!-- 자식 컴포넌트를 여기에 렌더링 -->
   </component>
 </template>

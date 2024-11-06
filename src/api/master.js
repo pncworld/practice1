@@ -127,5 +127,15 @@ export const tablePosMenuKey = async(data) => {
     return await axios.post('/api/MIMASTER/MST57_002INS.asmx/getTablePosMenuKey', data);
 };
 
+export const savetablePosMenuKey = async(data) => {
+    return await axios.post('/api/MIMASTER/MST57_002INS.asmx/insertTablePosMenuKey', data);
+};
+
+export const deletetablePosMenuKey = async(data) => {
+    return await axios.post('/api/MIMASTER/MST57_002INS.asmx/deleteTablePosMenuKey', data);
+};
+
+
+
 
 

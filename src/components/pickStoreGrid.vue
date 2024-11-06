@@ -1,10 +1,10 @@
 <template>
  
-    <div class="ag-theme-alpine" style="height: 400px; width: 650px;">
+    <div class="ag-theme-alpine">
       <div class="flex justify-center">매장명 : <input type="text" placeholder="매장명 입력" class="border border-stone-600" v-model="quickFilterText"  @input="onInput"></div>
       <br>
       <ag-grid-vue
-        class="ag-theme-alpine custom-grid"
+        class="ag-theme-alpine custom-grid "
         :columnDefs="columnDefs"
         :rowData="rowData"
          suppressRowClickSelection='false' rowSelection="multiple" rowMultiSelectWithClick='true'
@@ -34,7 +34,7 @@
   }
   let gridApi = shallowRef();
   let gridColumnApi = ref(null);
-  
+  let isMobile = store.state.isMobile;
   // 컬럼 정의
   const columnDefs = ref([
     { 
@@ -43,7 +43,7 @@
       width : 60 ,
       suppressSizeToFit: true  
     },
-    { field: 'lngStoreGroup', headerName: '매장그룹', sortable: true,  width: 90 , getQuickFilterText : (params) => {
+    { field: 'lngStoreGroup', headerName: '매장그룹', sortable: true, hide: isMobile ? true : false , width: 90 , getQuickFilterText : (params) => {
       return '';
     },
       cellRenderer : (params) => {
@@ -55,7 +55,7 @@
       }
     },
     { field: 'strName', headerName: '매장명', sortable: true,  width: 220 , filter:true},
-    { field: 'lngStoreAttr', headerName: '직/가맹', sortable: true , width:70 ,  getQuickFilterText : (params) => {
+    { field: 'lngStoreAttr', headerName: '직/가맹', sortable: true ,  hide: isMobile ? true : false , width:70 ,  getQuickFilterText : (params) => {
       return '';
     },cellRenderer : (params) => {
         const currentValue = params.value;
@@ -64,7 +64,7 @@
 
         return matchedItem != undefined ? matchedItem.strName : '미지정' ;
       }},
-    { field: 'lngTeamCode', headerName: '수퍼바이저팀', sortable: true , width: 100 ,  getQuickFilterText : (params) => {
+    { field: 'lngTeamCode', headerName: '수퍼바이저팀',  hide: isMobile ? true : false , sortable: true , width: 100 ,  getQuickFilterText : (params) => {
       return '';
     },cellRenderer : (params) => {
         const currentValue = params.value;

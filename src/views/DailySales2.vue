@@ -1,31 +1,28 @@
 <template>
-  <div>
-    <div class="flex justify-between items-center w-full">
-      <h1 class="flex-grow text-center ml-24 text-2xl">일자별 매출 현황(멀티선택)</h1>
-      <div class="flex">
-        <button class="flex justify-center" @click="searchButton">
-          <!-- <img src="../assets/search.png" alt="" class="h-auto" style="width: 30px">조회 -->
-          조회
-        </button>
-        &nbsp; &nbsp; &nbsp;
-        <button class="flex justify-center" @click="exportExcel">
-          <!-- <img src="../assets/excel.png" alt="" class="h-auto" style="width: 30px">엑셀 내보내기 -->
-          엑셀
-        </button>
-        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-      </div>
+  <div class="">
+    <div class="flex justify-between items-center w-full overflow-y-auto">
+      <div class="flex justify-start pl-4 pt-4">
+                 <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-32 md:w-48">
+                  일자별 매출 현황(멀티 선택)
+                 </h1><div class="flex justify-end space-x-2 ml-24 md:ml-[1000px]"><button @click="searchButton" class="button search md:w-auto w-14">조회</button>
+                
+                  <button @click="exportExcel" class="button excel text-sm  md:w-auto w-14">엑셀</button>
+                </div></div>
+                  
+                 </div>
+
     </div>
     <br />
     <div class="flex justify-between items-center">
       <h2 class="flex justify-start w-6/12">
         &nbsp; &nbsp; &nbsp;&nbsp;<div class="items-center flex">일자  </div> &nbsp; &nbsp;
-        <DateRangePicker @update:dateRange="handleDateRangeUpdate" />
+        <DateRangePicker class="z-10" @update:dateRange="handleDateRangeUpdate" />
       </h2>
-      <PickStore2 @update:storeGroup="updateGroup" @update:storeType="updateType" :afterSearch="afterSearch" @storeCd="searchStoreCd"></PickStore2>
+      <PickStore2 class="mr-10  h-1/2 w-full md:w-auto md:relative " @update:storeGroup="updateGroup" @update:storeType="updateType" :afterSearch="afterSearch" @storeCd="searchStoreCd"></PickStore2>
       
       </div>
     <br>
-    <div class="flex justify-start items-center ml-5 space-x-3 -mt-8">
+    <div class="justify-start items-center ml-5 space-x-3 -mt-8 hidden md:flex">
       <div class="flex items-center">조회조건 &nbsp;&nbsp;&nbsp;</div>
       <input type="checkbox" id="detail" @click="detailView"><label for="detail">상세보기</label></input>
       <input type="checkbox" @click="rowGroupEnable($event)" id="cellUnite"><label for="cellUnite">셀병합</label></input>

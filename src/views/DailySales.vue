@@ -4,20 +4,20 @@
     <div class="flex justify-start pl-4 pt-4">
                  <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-32 md:w-48">
                   일자별 매출 현황
-                 </h1><div class="flex justify-end space-x-2 ml-20 md:ml-[1000px]"><button @click="searchButton" class="button search md:w-auto w-14">조회</button>
+                 </h1><div class="flex justify-end space-x-2 absolute right-5"><button @click="searchButton" class="button search md:w-auto w-14">조회</button>
                 
                   <button @click="exportExcel" class="button excel text-sm  md:w-auto w-14">엑셀</button>
-                </div> </div>
+                </div></div>
                   
                  </div>
-    <br />
+    <br /><br />
     <div class="flex flex-col justify-between  space-x-5 bg-gray-200 rounded-lg h-20 items-center">
     <div class="flex justify-between items-center space-x-96 w-full">
       <div class="flex justify-between w-auto">
         <div class="items-center ml-5">일자 </div> 
         <DateRangePicker @update:dateRange="handleDateRangeUpdate" class="hidden md:flex" />
-        <DateRangePicker @update:dateRange="handleDateRangeUpdate" class="block md:hidden w-5"/>
-        <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd" class="block md:hidden w-16 ml-48 "></pickStore>
+        <DateRangePicker @update:dateRange="handleDateRangeUpdate" class="block md:hidden w-5 z-10"/>
+        <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd" class="block md:hidden w-32 absolute right-5"></pickStore>
       </div>
       <div>
       <PickStore @update:storeGroup="updateGroup" @update:storeType="updateType" @update:storeCd="updateCd" class="hidden md:flex"></pickStore>

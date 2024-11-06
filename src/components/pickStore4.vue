@@ -1,27 +1,34 @@
 <template>
-    <div class="flex justify-end space-x-3 text-xs">
-     <div class="flex items-center font-bold text-sm pl-4">매장명 : </div>
-      <div>
+    <div class="flex items-center justify-end space-x-3 text-xs ">
+     <div class="font-bold text-sm pl-4 hidden md:inline-block"> 매장명 :  </div>
+      <div class="hidden md:block">
         <select :disabled="isDisabled1"   id="storeGroup" class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreGroup($event.target.value)">
           <option :value="item.lngStoreGroup" v-for="item in storeGroup" :key="item.lngStoreGroup">{{ item.strName }}</option>
         </select>
       </div>
-      <div>
-        <select :disabled="isDisabled2"  class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="setStore($event.target.value); emitStoreType($event.target.value);">
+      <div class="hidden md:block">
+        <select :disabled="isDisabled2"  class=" border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="setStore($event.target.value); emitStoreType($event.target.value);">
          
           <option value="0">전체</option>
           <option :value="item.lngStoreAttr" v-for="item in storeType" :key="item.lngStoreAttr">{{ item.strName }}</option>
         </select>
       </div>
-      <div>
-        <select :disabled="isDisabled3"  class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreCode($event.target.value); setStoreAreaCd($event.target.value); ischanged(); ">
+      <div class="flex flex-col space-y-3">
+       <div><span class="font-bold text-sm pl-4 inline-block md:hidden"> 매장명 : </span> <select :disabled="isDisabled3"  class="w-2/3 md:w-auto border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreCode($event.target.value); setStoreAreaCd($event.target.value); ischanged(); ">
         
           <option value="0">선택</option>
           <option :value="item.lngStoreCode" v-for="item in storeCd" :key="item.lngStoreCode">{{ item.strName }}</option>
         </select>
+        
       </div>
-      
-      <div>
+        <div class="inline-block md:hidden">
+        <span class="font-bold text-sm ">지역코드 : &nbsp;</span> <select :disabled="isDisabled4"  class="w-32 border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" v-model="selectedStoreAreaCd">
+          <option :value="item.lngAreaCode" v-for="item in storeAreaCd" :key="item.lngAreaCode">{{ item.lngAreaCode }}</option>
+        </select>
+      </div>
+    </div>
+    
+      <div class="hidden md:inline-block">
      <span class="font-bold text-sm ">지역코드 : &nbsp;</span> <select :disabled="isDisabled4"  class="w-32 border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" v-model="selectedStoreAreaCd">
           <option :value="item.lngAreaCode" v-for="item in storeAreaCd" :key="item.lngAreaCode">{{ item.lngAreaCode }}</option>
         </select>

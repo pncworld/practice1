@@ -1,16 +1,16 @@
 <template>
     <div class="flex justify-end space-x-4 w-9/12 text-xs ">
       <div class="flex flex-col items-center justify-center">
-      <label for="type1" class="flex items-center mb-2 pt-4 ">
+      <label for="type1" class="items-center mb-2 pt-4 hidden md:flex ">
         <input type="radio" name="type" id="type1" class="mr-2 -ml-7" value="1" v-model="firstRadiobutton"  @change="radioClick"> 직/가맹
       </label>
-     <label for="type2" class="flex items-center pt-4">
+     <label for="type2" class="items-center pt-4 hidden md:flex">
        <input type="radio" name="type" id="type2" class="mr-2 -ml-7" value="2" v-model="firstRadiobutton" @change="radioClick"> 팀/SC
      </label>
      
       </div>
       <div class="flex justify-center space-x-2 w-8/12">
-      <div>
+      <div class="hidden md:inline-block">
         <select :disabled="true"  id="storeGroup" class="mt-2 border w-40 border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreGroup($event.target.value)">
           <option :value="item.lngStoreGroup" v-for="item in storeGroup" :key="item.lngStoreGroup">{{ item.strName }}</option>
         </select>
@@ -19,7 +19,7 @@
           <option :value="item.lngStoreGroup" v-for="item in storeGroup" :key="item.lngStoreGroup">{{ item.strName }}</option>
         </select>
       </div>
-      <div>
+      <div class="hidden md:inline-block">
         
         <select :disabled="isDisabled1"  class="mt-2  border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreType($event.target.value);">
          
@@ -33,19 +33,19 @@
       </div>
       <div>
        
-        <select :disabled="isDisabled1" id="updatedStoreName1" class="mt-2 border w-64 border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @mousedown.prevent="showStoreGrid">
+        <select :disabled="isDisabled1" id="updatedStoreName1" class="w-32 mt-2 border md:w-64 border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @mousedown.prevent="showStoreGrid">
           
           <option value="0" v-if="!updated">선택</option>
           <option value="1" v-if="updated">{{storeName}}</option>
           
         </select>
 
-        <select :disabled="isDisabled2"  id="storeSupervisor" class="mt-2 w-32 relative right-3 border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitsuperVisor($event.target.value)">
+        <select :disabled="isDisabled2"  id="storeSupervisor" class="hidden md:inline-block mt-2 w-32 relative right-3 border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitsuperVisor($event.target.value)">
           <option value="0">전체</option>
           <option :value="item.lngSupervisor" v-for="item in storeSupervisor2" :key="item.lngSupervisor">{{ item.strName }}</option>
         </select>
 
-        <select :disabled="isDisabled2" id="updatedStoreName2"  class="mt-2 w-32 relative right-0 border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"  @mousedown.prevent="showStoreGrid">
+        <select :disabled="isDisabled2" id="updatedStoreName2"  class="hidden md:inline-block mt-2 w-32 relative right-0 border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"  @mousedown.prevent="showStoreGrid">
           <option :value="0" v-if="!updated">전체</option>
           <option value="1" v-if="updated">{{storeName}}</option>
         </select>
@@ -55,7 +55,7 @@
       
       
     </div>
-    <div class="absolute flex justify-end items-center z-10 right-4 top-64 " v-show="openStoreGrid"><PickStoreGrid :storeType="storeType2" :radioSelect="radioSelect" :storeSupervisor="storeSupervisor3" @storeCd="searchStoreCd" @storeName="updatedstoreName"></PickStoreGrid></div>
+    <div class="absolute flex justify-end items-center z-10 right-4 md:top-64 top-32 h-full md:h-[400px] w-full md:w-[650px]" v-show="openStoreGrid"><PickStoreGrid  :storeType="storeType2" :radioSelect="radioSelect" :storeSupervisor="storeSupervisor3" @storeCd="searchStoreCd" @storeName="updatedstoreName"></PickStoreGrid></div>
       
   </div>
   

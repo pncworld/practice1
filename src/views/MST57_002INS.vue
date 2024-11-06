@@ -3,7 +3,7 @@
         <div class="flex justify-start"><h1 class="font-bold text-2xl">
             메뉴 배치 관리
         </h1></div>
-        <div class="absolute right-48 space-x-3 flex"><button class="button search" @click="searchPosMenu">조회</button><button class="button save">저장</button></div>
+        <div class="absolute right-48 space-x-3 flex"><button class="button search" @click="searchPosMenu">조회</button><button class="button save" @click="savePosMenu">저장</button></div>
     </div>
     <br>
     <div class="bg-gray-200 h-24 flex flex-col items-start rounded-md pt-2">
@@ -42,7 +42,7 @@
       <Draggable v-for="item in items">
         <div class="grid grid-cols-8 h-auto">
           <div class="h-16 flex items-center justify-center"><font-awesome-icon icon="bars" /></div><div class="h-16 flex items-center justify-center">{{ item?.intKeySeq  }}</div><div class="h-16 flex items-center justify-center"><img :src="item?.imgurl" alt="" class="size-8"></div><div class="h-16 flex items-center justify-center">{{ item?.lngKeyscrNo }}</div>
-          <div class="h-16 flex items-center justify-center">{{ item?.strKeyName }}</div><div class="h-16 flex items-center justify-center">{{ item?.majorName}}</div><div class="h-16 flex items-center justify-center">{{ item?.subName}}</div><div class="h-16 flex items-center justify-center"><button><img src="../assets/trash.svg" alt=""></button></div>
+          <div class="h-16 flex items-center justify-center">{{ item?.strKeyName }}</div><div class="h-16 flex items-center justify-center">{{ item?.majorName}}</div><div class="h-16 flex items-center justify-center">{{ item?.subName}}</div><div class="h-16 flex items-center justify-center"><button @click="deleteitem(item?.lngKeyscrNo , item?.intKeySeq )"><img src="../assets/trash.svg" alt=""></button></div>
         </div>
       </Draggable>
     </Container>
@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { tablePosMenu, tablePosMenuKey } from '@/api/master';
+import { deletetablePosMenuKey, savetablePosMenuKey, tablePosMenu, tablePosMenuKey } from '@/api/master';
 import PickCategory from '@/components/pickCategory.vue';
 import PickStore4 from '@/components/pickStore4.vue';
 import Swal from 'sweetalert2';
@@ -65,7 +65,7 @@ const strLogoUrl = computed(() => userData.value.strLogoUrl)
 const groupCd = ref(userData.value.lngStoreGroup);
 const activeMain = ref([]);
 const activeSub = ref([]);
-
+const loadingbar = ref(store.state.loading);
 const toggleMain = (index) => {
   activeMain.value[index] = !activeMain.value[index];
 }
@@ -142,7 +142,7 @@ const emitmaincate = (value) => {
 }
 
 const majorGroup = ref([]);
-
+const deleteAllitems = ref([]);
 const searchPosMenu = async() => {
     if(currstoreCd.value =='0' || currAreaCd.value =='0'){
       Swal.fire({
@@ -181,15 +181,49 @@ const searchPosMenu = async() => {
     SUB_CD: currsubCateCd.value
 })
 
-
-     items.value.push(res2.data.menuKeyList[0])
+  console.log(res2)
+    items.value = res2.data.menuKeyList.filter(item => item);
      if(items.value[0] == undefined){
-   
         items.value = [];
      } 
-
- 
+     deleteAllitems.value = res2.data.menuKeyList.map(item => item.intKeySeq);
+     console.log(deleteAllitems);
 }
+const deleteitems = ref([]);
+const deleteitem =(value, value2) => {
+  deleteitems.value.push(value2);
+  items.value = items.value.filter(item => !(item.lngKeyscrNo === value && item.intKeySeq === value2));
+}
+const savePosMenu = async() => {
+      store.state.loading = true;
+      try {
+        const res = await deletetablePosMenuKey({
+         GROUP_CD: groupCd.value,
+         STORE_CD:  currstoreCd.value,
+         AREA_CD : currAreaCd.value,
+         SUB_CD  : currsubCateCd.value,
+         KEY_SEQ : deleteAllitems.value.join(',')
+      })
 
+      const MenuCds = items.value.map(item => item.lngKeyscrNo);
+      const MenuNm = items.value.map(item => item.strKeyName);
+      const res2 = await savetablePosMenuKey({
+        GROUP_CD:  groupCd.value,
+        STORE_CD: currstoreCd.value,
+        AREA_CD : currAreaCd.value,
+        SUB_CD  : currsubCateCd.value,
+        MENU_CD : MenuCds.join(','),
+        MENU_NM : MenuNm.join(',')
+      })
+      } catch (error) {
+        
+      } finally {
+        store.state.loading = false;
+        searchPosMenu()
+      }
+     
+     
+
+}
 
 </script>
