@@ -1,6 +1,7 @@
 import CancelSales from '@/views/CancelSales.vue';
 import DailySales2 from '@/views/DailySales2.vue';
 import DailySales from '@/views/mobile/sales/DailySales.vue';
+import TimeSales from '@/views/mobile/sales/timeSales.vue';
 
 
 export default function mobileSales() {
@@ -12,7 +13,7 @@ export default function mobileSales() {
           {
             path: 'SLS06_003RPT.xml',
             name: 'dailysales2',
-            component: DailySales2
+            component: TimeSales
           }
           ,
           {

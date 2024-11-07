@@ -8,7 +8,7 @@
         </div>
         <div class="grid grid-rows-6 h-80 border w-full " v-if="showornotsubMenu(1)">
           <div class="h-full w-full border border-gray-200"><button class="h-full w-full">매출현황</button></div>
-          <div class="h-full w-full border border-gray-200"><button class="h-full w-full">시간대별 분석</button></div>
+          <div class="h-full w-full border border-gray-200"><button class="h-full w-full" @click="goRouter(2)">시간대별 분석</button></div>
           <div class="h-full w-full border border-gray-200"><button class="h-full w-full" @click="goRouter(3)">기간별 분석</button></div>
           <div class="h-full w-full border border-gray-200"><button class="h-full w-full">요일별 분석</button></div>
           <div class="h-full w-full border border-gray-200"><button class="h-full w-full">메뉴별 분석</button></div>
@@ -57,7 +57,19 @@ const showpersonal = (value) => {
   
 }
 const goRouter = (value) => {
-   router.push('/m/MISALES/SLS06_004RPT.xml');
+     switch (value) {
+      case 2:
+      router.push('/m/MISALES/SLS06_003RPT.xml');
+        break;
+    
+      case 3:
+      router.push('/m/MISALES/SLS06_004RPT.xml');
+        break;
+    
+      default:
+        break;
+    }
+   
    personal.value = false;
    isMenu.value = false;
 }
