@@ -1,7 +1,7 @@
 import CancelSales from '@/views/CancelSales.vue';
 import DailySales2 from '@/views/DailySales2.vue';
+import DailySales from '@/views/mobile/sales/DailySales.vue';
 
-import DailySales from '@/views/mobile/DailySales.vue';
 
 export default function mobileSales() {
     return [

@@ -1,5 +1,5 @@
 <template>
-    <div class="flex justify-center md:justify-end space-x-4 text-xs ">
+    <div class="flex justify-center md:justify-end space-x-4 text-xs mr-5  ">
      <div class="items-center hidden md:flex">매장명 : </div>
       <div>
         <select :disabled="isDisabled1"  id="storeGroup" class="hidden md:inline-block border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreGroup($event.target.value)">
@@ -13,7 +13,7 @@
           <option :value="item.lngStoreAttr" v-for="item in storeType" :key="item.lngStoreAttr">{{ item.strName }}</option>
         </select>
       </div>
-      <div class="">
+      <div class="w-full md:w-auto">
         <select :disabled="isDisabled3"  class="w-full md:w-auto border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreCode($event.target.value)">
         
           <option value="0">선택</option>

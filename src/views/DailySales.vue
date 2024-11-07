@@ -59,7 +59,7 @@ import { AG_GRID_LOCALE_KR } from '@ag-grid-community/locale';
 // 로그인한 사용자에 따라 법인명 매장명 등을 선택할 수 있게  만든 공통 컴포넌트 
 import PickStore from '@/components/pickStore.vue';
 // 각 탭 마다 필요한 그리드 설정 속성 불러오기
-import { useTabInfo } from '@/api/common';
+import { getGridInfoList } from '@/api/common';
 // alert 창 자동 꾸미기 위한 라이브러리
 import Swal from 'sweetalert2';
 import { dailySaleReport } from '@/api/misales';
@@ -91,7 +91,7 @@ const GridInfo_GRID_ID = "1";
 const tabInitSetArray = ref([]);
 (async () => {
     try {
-        const result = await useTabInfo(GridInfo_PROG_ID, GridInfo_GRID_ID);
+        const result = await getGridInfoList(GridInfo_PROG_ID, GridInfo_GRID_ID);
         tabInitSetArray.value = result; 
     } catch (error) {
         console.error("Failed to fetch data:", error); // 오류 로그 출력
@@ -247,7 +247,7 @@ const searchButton = () => {
       userData.strLanguage
     );
     
-    const result = response.data.recordsets;
+    const result = response.data.dailySales;
 
     updateColumn(result);
     afterSearch.value = true;
@@ -471,9 +471,8 @@ const searchButton = () => {
           if (!dateString) {
             return ''; // dtmDate가 없으면 빈 문자열 반환
           }
-          // 날짜 문자열에서 시간 부분을 잘라내고 날짜만 반환
-          const date = new Date(dateString);
-          const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
+         
+          const formattedDate = dateString.split(' ')[0]; // YYYY-MM-DD 형식으로 변환
           return formattedDate;
         }
       }
@@ -514,7 +513,7 @@ const searchButton = () => {
       
     }
    
-    rowData.value = result[0].map(item => ({
+    rowData.value = result.map(item => ({
       strStoreGroupName: item.strStoreGroupName,
       dtmDate: item.dtmDate,
       strStore: item.strStore,

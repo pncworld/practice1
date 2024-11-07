@@ -53,12 +53,12 @@ const login2 = async () => {
   store.state.selectedCategoryId = null ;
   try {
     const response = await login(username.value,  password.value) ;
-
-    const loginStatus = response.data.recordsets?.[0]?.[0]?.strUserID;
+    console.log(response.data)
+    const loginStatus = response.data.loginSession[0].strUserID;
    
     if (!isNaN(Number(loginStatus))) {
-      store.dispatch('updateUserData', response.data.recordsets[0][0]);
-      console.log(response.data.recordsets[0][0])
+      store.dispatch('updateUserData', response.data.loginSession[0]);
+      console.log(response.data.loginSession[0])
       message.value = "로그인 성공";
         const readPrograms = async() => {
         const response = await get_sys_list(store.state.userData.lngStoreGroup,
@@ -66,7 +66,7 @@ const login2 = async () => {
         store.state.userData.strLanguage 
         );
 
-     const result = response.data.recordsets[0] ;
+      const result = response.data.sysMenu ;
       console.log(result)
       const mainCategoryData = result.filter(item => Number(item.strMenuLevel) == 1); // 숫자
       const subCategoryData = result.filter(item => Number(item.strMenuLevel) == 2);
@@ -83,15 +83,20 @@ const login2 = async () => {
       const readsales = async() => {
       const response = await get_store_list(store.state.userData.lngStoreGroup);
         
-       const result = response.data.recordsets ;
-      
-   
-       store.dispatch("StoreGroup",result[0]);
-       store.dispatch("StoreType",result[1]);
-       store.dispatch("StoreCd",result[2]);
-       store.dispatch("StoreTeamCode",result[3]);
-       store.dispatch("StoreSupervisor",result[4]);
-       store.dispatch("StoreAreaCd",result[5]);
+     
+       const result0 = response.data.storeGroup
+       const result1 = response.data.storeAttr
+       const result2 = response.data.store
+       const result3 = response.data.storeSupervisorTeam
+       const result4 = response.data.storeSupervisor
+       const result5 = response.data.storeArea
+        
+       store.dispatch("StoreGroup",result0);
+       store.dispatch("StoreType",result1);
+       store.dispatch("StoreCd",result2);
+       store.dispatch("StoreTeamCode",result3);
+       store.dispatch("StoreSupervisor",result4);
+       store.dispatch("StoreAreaCd",result5);
      } 
       await readsales();
       

@@ -82,6 +82,7 @@
 
 <script setup>
 
+import { getCategoryInfo, getMultiLingual, setMainCategoryDELETE, setMainCategoryINSERT, setMainCategoryUpdate, setSubCategoryDelete, setSubCategoryINSERT, setSubCategoryUPDATE } from '@/api/master';
 import Loading from '@/components/loading.vue';
 import PickStore4 from '@/components/pickStore4.vue';
 import axios from 'axios';
@@ -257,13 +258,7 @@ const deleteSubCategory = async (categoryCode) => {
 
     if (result.isConfirmed) {
         try {
-            const res = await axios.post('/api/MIMASTER/MST57_001INS.asmx/setSubCategoryDelete', {
-                GROUP_CD: groupCd.value,
-                STORE_CD: nowStoreCd.value,
-                AREA_CD: nowStoreAreaCd.value,
-                MAJOR_CD: currentMajorCode.value,
-                SUB_CD: categoryCode
-            });
+            const res = await setSubCategoryDelete(groupCd.value,nowStoreCd.value,nowStoreAreaCd.value,currentMajorCode.value,categoryCode);
 
             if (res.status === 200) {
                 await Swal.fire({
@@ -305,15 +300,7 @@ const deleteMainCategory = () => {
             const subMultis = getMultiLang.value.flatMap(innerArray => innerArray).filter(items => items.LanguageID =='0' && currentMajorCode.value == items.categoryCode && items.TypeCode =='4');
             const subCd = subMultis.map(item => item.categoryCode);
 
-            const res = await axios.post('/api/MIMASTER/MST57_001INS.asmx/setMainCategoryDELETE',{
-                
-            GROUP_CD: groupCd.value,
-            STORE_CD: nowStoreCd.value,
-            AREA_CD: nowStoreAreaCd.value,
-            MAJOR_CD: currentMajorCode.value,
-            SUB_CD : subCd.join(',')
-
-            })
+            const res = await setMainCategoryDELETE(groupCd.value,nowStoreCd.value,nowStoreAreaCd.value,currentMajorCode.value,subCd.join(','))
 
             if(res.status ==200){
                 Swal.fire({
@@ -345,14 +332,8 @@ const deleteAllsubCategory = async() => {
          const subMultis = subMultiLang.value.flatMap(innerArray => innerArray).filter(items => items.LanguageID =='0');
         const subCd = subMultis.map(item => item.categoryCode);
     
-        const res = await axios.post('/api/MIMASTER/MST57_001INS.asmx/setSubCategoryDelete',{
-
-        GROUP_CD: groupCd.value,
-        STORE_CD: nowStoreCd.value,
-        AREA_CD: nowStoreAreaCd.value,
-        MAJOR_CD: currentMajorCode.value,
-        SUB_CD : subCd.join(',')
-        }).then(async(result) => {
+        const res = await setSubCategoryDelete(groupCd.value,nowStoreCd.value,nowStoreAreaCd.value,currentMajorCode.value,subCd.join(','))
+        .then(async(result) => {
         if(result.status ==200){
         Swal.fire({
         title: '전체 삭제 성공',
@@ -405,19 +386,11 @@ const searchMenu = async () => {
     store.state.loading = true;
     try {
        
-        const res = await axios.post('/api/MIMASTER/MST57_001INS.asmx/getCategoryInfo', {
-           
-             GROUP_CD : groupCd.value,
-             STORE_CD : nowStoreCd.value,
-             AREA_CD  : nowStoreAreaCd.value
-        });
+        const res = await getCategoryInfo( groupCd.value,nowStoreCd.value,nowStoreAreaCd.value);
     
         Category.value = res.data.MainCategory ;
         afterSearch.value = true;
-        const res1 = await axios.post('/api/MIMASTER/MST57_001INS.asmx/getMultiLingual' ,{
-            GROUP_CD : groupCd.value,
-            STORE_CD : nowStoreCd.value,
-        })
+        const res1 = await getMultiLingual( groupCd.value,nowStoreCd.value,)
 
         getMultiLang.value = res1.data.MultiLingual ;
     } catch (error) {
@@ -488,24 +461,16 @@ const saveMenus = async() => {
             let res ; 
  
     if (!newMainCategoryCode.value.includes(currentMajorCode.value) ){
-        res = await axios.post('/api/MIMASTER/MST57_001INS.asmx/setMainCategoryUpdate', {
-            GROUP_CD : groupCd.value,
-            STORE_CD : nowStoreCd.value,
-            AREA_CD  : nowStoreAreaCd.value,
-            MAJOR_CD  : currentMajorCode.value,
-            MAJOR_NM  : [languageName0.value,languageName1.value,languageName2.value,languageName3.value,languageName4.value].join(","),
-            LANGUAGE_ID : ['0','1','2','3','4'].join(",")
-        });
+        res = await setMainCategoryUpdate( groupCd.value,nowStoreCd.value,nowStoreAreaCd.value, currentMajorCode.value,
+         [languageName0.value,languageName1.value,languageName2.value,languageName3.value,languageName4.value].join(","),
+         ['0','1','2','3','4'].join(",")
+        );
     } else if (newMainCategoryCode.value.includes(currentMajorCode.value)){
 
-        res = await axios.post('/api/MIMASTER/MST57_001INS.asmx/setMainCategoryINSERT', {
-            GROUP_CD : groupCd.value,
-            STORE_CD : nowStoreCd.value,
-            AREA_CD  : nowStoreAreaCd.value,
-            MAJOR_CD  : currentMajorCode.value,
-            MAJOR_NM  : [languageName0.value,languageName1.value,languageName2.value,languageName3.value,languageName4.value].join(","),
-            LANGUAGE_ID : ['0','1','2','3','4'].join(",")
-        }
+        res = await setMainCategoryINSERT( groupCd.value,nowStoreCd.value, nowStoreAreaCd.value,currentMajorCode.value,
+        [languageName0.value,languageName1.value,languageName2.value,languageName3.value,languageName4.value].join(","),
+         ['0','1','2','3','4'].join(",")
+        
     )
     }
     
@@ -528,25 +493,13 @@ const saveMenus = async() => {
     console.log(subNm)
     console.log(languageNm)
     try {
-    const res2 = await axios.post('/api/MIMASTER/MST57_001INS.asmx/setSubCategoryINSERT', {
-        GROUP_CD: groupCd.value,
-        STORE_CD: nowStoreCd.value,
-        AREA_CD: nowStoreAreaCd.value,
-        MAJOR_CD: currentMajorCode.value,
-        SUB_CD: subCd.join(","),
-        SUB_NM: subNm.join(","),
-        LANGUAGE_ID: languageNm.join(",")
-    });
+    const res2 = await setSubCategoryINSERT( groupCd.value,nowStoreCd.value,nowStoreAreaCd.value,currentMajorCode.value,
+    subCd.join(","),subNm.join(","),languageNm.join(",")
+    );
 
-    const res3 = await axios.post('/api/MIMASTER/MST57_001INS.asmx/setSubCategoryUPDATE', {
-        GROUP_CD: groupCd.value,
-        STORE_CD: nowStoreCd.value,
-        AREA_CD: nowStoreAreaCd.value,
-        MAJOR_CD: currentMajorCode.value,
-        SUB_CD: subCd2.join(","),
-        SUB_NM: subNm2.join(","),
-        LANGUAGE_ID: languageNm2.join(",")
-    });
+    const res3 = await setSubCategoryUPDATE(groupCd.value,nowStoreCd.value,nowStoreAreaCd.value,currentMajorCode.value,subCd2.join(","),
+     subNm2.join(","), languageNm2.join(",")
+    );
 
     // 이제 res2를 사용하여 상태 확인 가능
     if (res2.status === 200 && res3.status === 200) {

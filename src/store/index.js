@@ -1,5 +1,4 @@
 // src/store/index.js
-import { v4 } from 'uuid';
 import { createStore } from 'vuex';
 import VuexPersistence from 'vuex-persist';
 
@@ -38,9 +37,9 @@ export default createStore({
       state.selectedCategoryId = null; // 원하는 초기값으로 설정
     },
     addTab(state, tab) {
-      const existingTabs = state.currentTabs.filter(existingTab => existingTab.lngProgramID.toString().startsWith(tab.lngProgramID.toString()))
+      const existingTabs = state.currentTabs.filter(existingTab => existingTab.lngProgramID ==tab.lngProgramID)
 
-      let newlngProgramID = `${tab.lngProgramID}_${v4()}`;
+      let newlngProgramID = tab.lngProgramID;
       let newstrTitle = tab.strTitle;
       let newstrUrl = tab.strUrl;
 

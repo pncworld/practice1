@@ -1,5 +1,5 @@
 <template>
-    <div class="md:w-72 w-14 flex relatvie ">
+    <div class="md:w-72 w-14 flex relatvie flex-col md:flex-row ">
       <VueDatePicker  v-model="dateRange"
       :format="format"
       :locale="locale"
@@ -11,8 +11,22 @@
       :clearable="false"
       @change="handleDateRangeChange"></VueDatePicker>
       
-     <button class="w-1/12" @click="toggleRadio" v-if="!showRadio"><img src="../assets/choiceCalendar.png" alt="" >
+     <button class="w-1/12 hidden md:inline-block" @click="toggleRadio" v-if="!showRadio"><img src="../assets/choiceCalendar.png" alt="" >
       </button>
+      <div class="flex md:hidden justify-center">
+        <div class="inline-flex rounded-md shadow-sm space-x-3 mt-2">
+          <button
+      v-for="(label, period) in periods"
+      :key="period"
+      @click="setActive(period)"
+      :class="[
+        'px-4 py-2 focus:outline-none border border-gray-500 rounded-md', 
+        { 'bg-blue-500 text-white': active === period, 'bg-gray-200 text-gray-700': active !== period }
+      ]">
+      {{ label }}
+    </button>
+</div>
+      </div>
       <div v-if="showRadio" class="mt-2 p-8 ml-72 w-56 bg-gray-100 rounded-lg shadow-md z-10 absolute">
         <div class="flex justify-end -mr-6"><button @click="toggleRadio">닫기</button></div>
         <h2 class="text-lg font-semibold mb-4">기간 선택</h2>
@@ -119,7 +133,19 @@
   const format = 'yyyy-MM-dd'; // 날짜 형식 설정
   const locale = "ko"; // 한글 로케일 설정
   const selectedRange = ref(''); // 선택한 기간
+  const active = ref("today");
+    const periods = {
+      dayUnit: "일 단위",
+      weekUnit: "주 단위",
+      monthUnit: "월 단위",
 
+    };
+
+    const setActive =(period) =>{
+      active.value = period;
+      selectedRange.value = period;
+      updateDateRange();
+    }
   // Emit date range change
 const emit = defineEmits(['update:dateRange']);
 
@@ -132,6 +158,41 @@ function updateDateRange() {
     let startDate, endDate;
 
       switch (selectedRange.value) {
+        case 'today':
+          startDate = startOfToday;
+          endDate = endOfToday;
+          break;
+        case 'dayUnit':
+          const StartdayUnit = new Date(today);
+          StartdayUnit.setDate(today.getDate()-30)
+          startDate = StartdayUnit;
+          endDate = endOfToday;
+          break;
+
+        case 'yesterday':
+          startDate = startOfToday -1;
+          endDate = startOfToday -1;
+          break;
+
+          case 'weekUnit':
+            //12주
+          const weekUnitStart = new Date(today);
+          const weekUnitEnd = new Date(today);
+          weekUnitStart.setDate(today.getDate() - today.getDay() - 7*11 );
+          startDate = weekUnitStart;
+          weekUnitEnd.setDate(today.getDate() - today.getDay()+6)
+          endDate = weekUnitEnd;
+          break;
+          case 'monthUnit':
+            //12주
+          const monthUnitStart = new Date(today);
+          const monthUnitEnd = new Date(today);
+          monthUnitStart.setMonth(today.getMonth()-6 );
+          monthUnitStart.setDate(1);
+          startDate = monthUnitStart;
+          monthUnitEnd.setDate(today.getDate() - today.getDay()+6)
+          endDate = monthUnitEnd;
+          break;
         case 'lastweek':
           const lastWeekStart = new Date(today);
           lastWeekStart.setDate(today.getDate() - today.getDay() - 7); // 지난 주 시작 날짜

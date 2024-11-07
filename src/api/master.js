@@ -1,6 +1,6 @@
 
 import axios from 'axios';
-import {commonUrl} from './common';
+import {commonUrl,commonUrl2} from './common';
 
 const url = commonUrl;
 // Axios 인스턴스 생성 (기본 설정)
@@ -8,10 +8,11 @@ const api = axios.create({
   baseURL: url, // API 기본 URL
   timeout: 10000, // 요청 타임아웃 설정
 });
+export const url2 = commonUrl2;
 const api2 = axios.create({
-    baseURL: '', // 빈 문자열로 설정
-});
-
+    baseURL: url2, // API 기본 URL
+    timeout: 10000, // 요청 타임아웃 설정
+  });
 // API 요청 메서드들
 export const get_pos = (groupCd, storeCd) => {
     return api.post('/VUE_usp_MST01_032INS_GET_POS', {
@@ -120,19 +121,93 @@ export const store_update = (finalObject1) => {
 };
 
 export const tablePosMenu = async(data) => {
-    return await axios.post('/api/MIMASTER/MST57_002INS.asmx/getTablePosMenu', data);
+    return await api2.post('/MIMASTER/MST57_002INS.asmx/getTablePosMenu', data);
 };
 
 export const tablePosMenuKey = async(data) => {
-    return await axios.post('/api/MIMASTER/MST57_002INS.asmx/getTablePosMenuKey', data);
+    return await api2.post('/MIMASTER/MST57_002INS.asmx/getTablePosMenuKey', data);
 };
 
 export const savetablePosMenuKey = async(data) => {
-    return await axios.post('/api/MIMASTER/MST57_002INS.asmx/insertTablePosMenuKey', data);
+    return await api2.post('/MIMASTER/MST57_002INS.asmx/insertTablePosMenuKey', data);
 };
 
 export const deletetablePosMenuKey = async(data) => {
-    return await axios.post('/api/MIMASTER/MST57_002INS.asmx/deleteTablePosMenuKey', data);
+    return await api2.post('/MIMASTER/MST57_002INS.asmx/deleteTablePosMenuKey', data);
+};
+
+export const setSubCategoryDelete = (groupCd ,storeCd , areaCd,majorCd , subCd) => {
+    return api2.post('/MIMASTER/MST57_001INS.asmx/setSubCategoryDelete', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd,
+        AREA_CD: areaCd,
+        MAJOR_CD: majorCd,
+        SUB_CD: subCd
+    });
+};
+export const setMainCategoryDELETE = (groupCd ,storeCd , areaCd,majorCd , subCd) => {
+    return api2.post('/MIMASTER/MST57_001INS.asmx/setMainCategoryDELETE', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd,
+        AREA_CD: areaCd,
+        MAJOR_CD: majorCd,
+        SUB_CD: subCd
+    });
+};
+export const getCategoryInfo = (groupCd ,storeCd , areaCd) => {
+    return api2.post('/MIMASTER/MST57_001INS.asmx/getCategoryInfo', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd,
+        AREA_CD: areaCd
+    });
+};
+export const getMultiLingual = (groupCd ,storeCd ) => {
+    return api2.post('/MIMASTER/MST57_001INS.asmx/getMultiLingual', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd,
+
+    });
+};
+export const setMainCategoryUpdate = (groupCd ,storeCd, areaCd,majorCd , majorNm ,langId ) => {
+    return api2.post('/MIMASTER/MST57_001INS.asmx/setMainCategoryUpdate', {
+        GROUP_CD : groupCd,
+        STORE_CD : storeCd,
+        AREA_CD  : areaCd,
+        MAJOR_CD  : majorCd,
+        MAJOR_NM  : majorNm,
+        LANGUAGE_ID : langId
+    });
+};
+export const setMainCategoryINSERT = (groupCd ,storeCd, areaCd,majorCd , majorNm ,langId ) => {
+    return api2.post('/MIMASTER/MST57_001INS.asmx/setMainCategoryINSERT', {
+        GROUP_CD : groupCd,
+        STORE_CD : storeCd,
+        AREA_CD  : areaCd,
+        MAJOR_CD  : majorCd,
+        MAJOR_NM  : majorNm,
+        LANGUAGE_ID : langId
+    });
+};
+
+export const setSubCategoryINSERT = (groupCd ,storeCd, areaCd,majorCd , subCd , subNm ,langId ) => {
+    return api2.post('/MIMASTER/MST57_001INS.asmx/setSubCategoryINSERT', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd,
+        AREA_CD: areaCd,
+        MAJOR_CD: majorCd,
+        SUB_CD: subCd,
+        SUB_NM: subNm,
+        LANGUAGE_ID: langId } );
+};
+export const setSubCategoryUPDATE = (groupCd ,storeCd, areaCd,majorCd , subCd , subNm ,langId ) => {
+    return api2.post('/MIMASTER/MST57_001INS.asmx/setSubCategoryUPDATE', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd,
+        AREA_CD: areaCd,
+        MAJOR_CD: majorCd,
+        SUB_CD: subCd,
+        SUB_NM: subNm,
+        LANGUAGE_ID: langId } );
 };
 
 

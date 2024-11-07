@@ -52,7 +52,7 @@ import { AG_GRID_LOCALE_KR } from '@ag-grid-community/locale';
 // 로그인한 사용자에 따라 법인명 매장명 등을 선택할 수 있게  만든 공통 컴포넌트 
 import PickStore from '@/components/pickStore.vue';
 // 각 탭 마다 필요한 그리드 설정 속성 불러오기
-import { useTabInfo } from '@/api/common';
+import { getGridInfoList} from '@/api/common';
 // alert 창 자동 꾸미기 위한 라이브러리
 import Swal from 'sweetalert2';
 import { NIL } from 'uuid';
@@ -86,7 +86,7 @@ const GridInfo_GRID_ID = "1";
 const tabInitSetArray = ref([]);
 (async () => {
     try {
-        const result = await useTabInfo(GridInfo_PROG_ID, GridInfo_GRID_ID);
+        const result = await getGridInfoList(GridInfo_PROG_ID, GridInfo_GRID_ID);
         tabInitSetArray.value = result; 
     } catch (error) {
         console.error("Failed to fetch data:", error); // 오류 로그 출력
@@ -95,7 +95,6 @@ const tabInitSetArray = ref([]);
     }
 })();
 
-console.log(tabInitSetArray.value)
 // 조회 값 설정 함수 선언
 const updateGroup = (value) => {
   groupCd.value = value;

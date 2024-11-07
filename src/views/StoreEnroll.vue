@@ -188,7 +188,7 @@ import { useStore } from 'vuex';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import PickStore3 from '@/components/pickStore3.vue';
-import { useTabInfo } from '@/api/common';
+import { getGridInfoList} from '@/api/common';
 import Swal from 'sweetalert2';
 import { getMultiPrice, INS004_select, INS006_select, joinType_query, store_delete, store_insert, store_query, store_update, storeArea, storeAttr, subLease_query } from '@/api/master';
 
@@ -228,7 +228,7 @@ const GridInfo_GRID_ID = "1";
 const tabInitSetArray = ref([]);
 (async () => {
     try {
-        const result = await useTabInfo(GridInfo_PROG_ID, GridInfo_GRID_ID);
+        const result = await getGridInfoList(GridInfo_PROG_ID, GridInfo_GRID_ID);
         tabInitSetArray.value = result; 
     } catch (error) {
         console.error("Failed to fetch data:", error); // 오류 로그 출력

@@ -1,21 +1,10 @@
-/*
-  See docs: https://github.com/chimurai/http-proxy-middleware
+const { defineConfig } = require('@vue/cli-service');
 
-  Example for multi proxy:
-  module.exports = {
-    '/one': {
-      target: 'http://localhost:3000',
+  module.exports = defineConfig({
+    '/api': {
+      target: 'http://pncoffice.com:8085',
       pathRewrite: {
-        '^/one': ''
+        '^/api': ''
       }
     },
-    '/two': {
-      target: 'http://localhost:3001',
-      pathRewrite: {
-        '^/two': ''
-      }
-    }
-  }
- */
-
-module.exports = {};
+  })

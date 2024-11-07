@@ -274,7 +274,7 @@ const savePosMenu = async() => {
         MENU_CD : MenuCds.join(','),
         MENU_NM : MenuNm.join(',')
       })
-    
+      
     } catch (error) {
         
       } finally {

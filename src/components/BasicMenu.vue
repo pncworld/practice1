@@ -33,6 +33,7 @@
 <script setup>
 import router from '@/router';
 import Swal from 'sweetalert2';
+import { v4 } from 'uuid';
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 const emit = defineEmits();
@@ -88,17 +89,13 @@ onMounted(() => {
   detectMobile();
   console.log(isMobile)
 });
-const mobileClickMenu = ref(true);
+
 const selectCategory = (strUrl , lngProgramID , strTitle) => {
-  if(isMobile.value) {
-    mobileClickMenu.value = true;
-    emit("mobileClickMenu", mobileClickMenu.value);
-    router.push('/'+strUrl.split("::")[0]+'/'+strUrl.split("::")[1]);
-    return ;
-  }
+  console.log(lngProgramID)
   const currentTabs = store.state.currentTabs;
-  
+  console.log(currentTabs)
   const existingTab = currentTabs.find( tab => tab.lngProgramID.startsWith(lngProgramID));
+  console.log(existingTab)
   if ( existingTab){
     Swal.fire({
       title: '메뉴 중복 안내',
@@ -109,22 +106,28 @@ const selectCategory = (strUrl , lngProgramID , strTitle) => {
       cancelButtonText: '새 화면 열기',
     }).then((result) => {
       if(result.isConfirmed){
+      
         const matchingTabs = currentTabs.filter(tab => tab.lngProgramID.startsWith(lngProgramID));
         const tab = { lngProgramID : matchingTabs[0].lngProgramID};
         store.dispatch("changeActiveTab",tab);
         router.push({path : '/'+matchingTabs[0].strUrl.split("::")[0]+'/'+matchingTabs[0].strUrl.split("::")[1] , query : { index : tab.lngProgramID} } );
        
       } else {
-        const newTab = { strUrl , lngProgramID, strTitle}
+        const uuid = v4();
+        const lngProgramIdv4 = lngProgramID +uuid ;
+        const newTab = { strUrl , lngProgramID: lngProgramIdv4, strTitle}
         store.dispatch("addNewTab" , newTab); 
-        router.push('/'+strUrl.split("::")[0]+'/'+strUrl.split("::")[1]);
+        router.push({ path :'/'+strUrl.split("::")[0]+'/'+strUrl.split("::")[1] , query : { index : lngProgramIdv4}});
       }
      
     });
   } else {
-    const newTab = { strUrl , lngProgramID, strTitle}
+    const uuid = v4();
+    const lngProgramIdv4 = lngProgramID + uuid ;
+    console.log(lngProgramIdv4)
+    const newTab = { strUrl , lngProgramID:lngProgramIdv4, strTitle}
     store.dispatch("addNewTab" , newTab); 
-    router.push('/'+strUrl.split("::")[0]+'/'+strUrl.split("::")[1]);
+    router.push({ path :'/'+strUrl.split("::")[0]+'/'+strUrl.split("::")[1] , query : { index : lngProgramIdv4}});
   } 
   
   

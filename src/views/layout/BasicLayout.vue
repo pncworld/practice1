@@ -86,17 +86,12 @@
       </aside>
       
       <!-- Main Content -->
-      <main class="flex-1 bg-white p-1 overflow-y-scroll overflow-x-hidden">
-      <router-view v-if="!isMobile" v-slot="{ Component, route }">
+      <main class="w-full bg-white p-1 overflow-y-scroll overflow-x-hidden">
+      <router-view  v-slot="{ Component, route }">
       <keep-alive>
         <component :is="Component" :key="`${route.path}-${componentKey}`" />
       </keep-alive>
       </router-view>
-
-      <router-view v-else v-slot="{ Component, route }">
-      <BasicMenu v-if="showMenu && mobileShowMenu" class="w-full h-full border block md:hidden" @mobileClickMenu="mobileClickMenu"/>
-      <component :is="Component" :key="`${route.path}-${componentKey}`" v-if="!mobileShowMenu" />
-    </router-view>
 
 
       
@@ -116,12 +111,9 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import {  useStore } from 'vuex';
 
-const isMobile = ref(false);
 
 // 화면 크기 감지 및 업데이트
-const updateIsMobile = () => {
-  isMobile.value = window.innerWidth <= 640; // 모바일 기준 너비 설정 (640px 이하)
-};
+
 
 const route = useRoute();
 const store = useStore() ;
@@ -131,22 +123,12 @@ const mobileShowMenu = ref(false);
 const showMenu = ref(route.path != '/'); // Initialize based on current route
 const componentKey = ref(null);
 // Watch for route changes
-const mobileClickMenu = (value)=> {
-  mobileShowMenu.value = false;
-}
+
 watch(() => route.path, (newPath) => {
   showMenu.value = newPath != '/'; // Update based on new route
  
 });
-// 이벤트 리스너 등록 및 제거
-onMounted(() => {
-  updateIsMobile();
-  window.addEventListener('resize', updateIsMobile);
-});
 
-onUnmounted(() => {
-  window.removeEventListener('resize', updateIsMobile);
-});
 const deleteAllTabs = () => {
   Swal.fire({
       title: '확인',
