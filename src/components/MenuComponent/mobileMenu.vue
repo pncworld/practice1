@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center sticky bottom-0 bg-white z-10 space-x-20 border border-gray-100">
+  <div class="flex justify-center fixed bottom-0 w-full bg-white z-10 space-x-20 border border-gray-100">
   <button @click="showHomePage"><font-awesome-icon icon="house" class="size-8"/></button>
   <button @click="showMobileMenu"><font-awesome-icon icon="bars" class="size-8"/></button>
   <button @click="showMobilePersonal"><font-awesome-icon :icon="['far', 'user']" class="size-8"/></button>

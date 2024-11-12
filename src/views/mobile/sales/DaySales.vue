@@ -3,7 +3,7 @@
     
       <div class="flex justify-center pl-4 pt-4">
                    <div class="flex justify-center"><h1 class="font-bold text-2xl">
-                    시간대별 분석
+                    요일별 분석
                    </h1></div>
             </div>
       <br /><br />
@@ -14,7 +14,7 @@
         <div class="flex items-center space-x-2">
           <span class="text-sm font-medium">일자 선택</span>
         </div>
-        <DateRangePicker2 @update:dateRange="handleDateRangeUpdate" class=" w-full z-10"/>
+        <DateRangePicker3  @update:dateRange="(newRange) => { handleDateRangeUpdate(newRange); searchButton(); }" class=" w-full z-10" />
       </div>
       
       <!-- PickStore 버튼 -->
@@ -36,10 +36,10 @@
     <!-- 상단 제목 영역 -->
     <div class="flex justify-between p-4 border-b border-gray-300">
       <div class="flex-1 text-center font-semibold text-gray-700 border-r border-gray-300">
-        최대 매출 시간대
+        최대 매출 요일
       </div>
       <div class="flex-1 text-center font-semibold text-gray-700">
-        최초 매출 시간대
+        최소 매출 요일
       </div>
     </div>
   
@@ -48,7 +48,7 @@
       <!-- 여기에 하단 내용을 추가하면 됩니다 -->
        <div class="flex-1">
         <p class="text-gray-600 border-r font-bold text-2xl">
-        {{  maxsalesDate }} {{ maxday }}
+        {{  maxsalesDate }} 
       </p>
       <p class="font-bold">
         {{ parseInt(maxsalesvalue).toLocaleString()}}원
@@ -56,7 +56,7 @@
        </div>
       <div class="flex-1">
       <p class="text-gray-600 font-bold text-2xl">
-        {{  minsalesDate }} {{ minday }}
+        {{  minsalesDate }} 
       </p>
       <p class="font-bold">
         {{ parseInt(minsalesvalue).toLocaleString()}}원
@@ -73,15 +73,17 @@
   
     <div class="w-full bg-white border border-gray-300 rounded-lg shadow-md mt-5" v-if="showcontent">
       <div class="flex justify-start font-semibold ml-3 text-xl">상세내역</div>
-      <div class="grid grid-cols-3 w-full text-xl ">
-        <div class="bg-gray-200">시간대</div>
+      <div class="grid grid-cols-4 w-full text-xl ">
+        <div class="bg-gray-200">요일</div>
+        <div class="bg-gray-200">영업일</div>
         <div class="bg-gray-200">건 수</div>
         <div class="bg-gray-200">실 매출액</div>
       </div>
-      <div v-for="i in result2" class="flex text-xl  ml-5">
-          <div class="flex-shrink-0 w-1/3"> {{i.dtmDate.split(' ')[0]}}</div>
-          <div class="flex-shrink-0 w-1/3"> {{i.lngRecCnt}}</div>
-          <div class="flex-shrink-0 w-1/3"> {{parseInt(i.lngActAmt).toLocaleString()}}</div>
+      <div v-for="(i,index) in daysInKorean" class="flex text-xl ml-0">
+          <div class="flex-shrink-0 w-1/4"> {{i}}</div>
+          <div class="flex-shrink-0 w-1/4"> {{saleDays[index]}}</div>
+          <div class="flex-shrink-0 w-1/4"> {{salecases[index]}}</div>
+          <div class="flex-shrink-0 w-1/4"> {{realSales[index]}}</div>
         </div>
     </div>
       
@@ -103,7 +105,7 @@
   // alert 창 자동 꾸미기 위한 라이브러리
   import Swal from 'sweetalert2';
   import { dailySaleReport } from '@/api/misales';
-import DateRangePicker2 from '../component/DateRangePicker2.vue';
+import DateRangePicker3 from '../component/DateRangePicker3.vue';
   
   
   
@@ -152,19 +154,19 @@ import DateRangePicker2 from '../component/DateRangePicker2.vue';
   const sumSales = ref();
   const avgSales = ref();
   const result2 = ref();
+  const saleDays = ref([]);
+  const salecases = ref([]);
+  const realSales = ref([]);
+  const daysInKorean = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
   const searchButton = () => {
-    showcontent.value = true ;
+    console.log('왓냐')
+   
     const readsales = async () => {
-      if (storeCd.value == undefined) {
-        Swal.fire({
-          icon: 'warning',
-          title: '매장을 선택하세요!',
-          text: '매장을 선택하지 않으면 진행할 수 없습니다.',
-          confirmButtonText: '확인',
-          confirmButtonColor: '#3085d6',
-        });
+      if (storeCd.value == undefined   || storeCd.value == '0' ) {
+       
         return;
       }
+      showcontent.value = true ;
       store.dispatch("convertLoading", true);
       const response = await dailySaleReport(
         groupCd.value,
@@ -181,20 +183,42 @@ import DateRangePicker2 from '../component/DateRangePicker2.vue';
       sumCase.value = result.reduce((sum, item) => sum + item.lngRecCnt, 0);
       sumSales.value = result.reduce((sum, item) => sum + item.lngActAmt, 0);
       avgSales.value = result.reduce((sum, item) => sum + item.lngActAmt, 0) / result.length;
-      minsalesDate.value = minsales.value.dtmDate.split(' ')[0]
-      maxsalesDate.value = maxsales.value.dtmDate.split(' ')[0]
+      minsalesDate.value = minsales.value.dtmDate.split(' ')[0];
+      let minDay = new Date(minsalesDate.value);
+      minDay = minDay.getDay();
+      minsalesDate.value = daysInKorean[minDay];
+      maxsalesDate.value = maxsales.value.dtmDate.split(' ')[0];
+      let maxDay = new Date(maxsalesDate.value);
+      maxDay = maxDay.getDay();
+      maxsalesDate.value = daysInKorean[maxDay];
       minsalesvalue.value = minsales.value.lngActAmt;
       maxsalesvalue.value = maxsales.value.lngActAmt;
-      const mindate = new Date(minsalesDate.value);
-      const maxdate = new Date(maxsalesDate.value);
-  
-      const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
-  
-      // 요일 추출
-      const minday2 = daysOfWeek[mindate.getDay()];
-      const maxday2 = daysOfWeek[maxdate.getDay()];
-      minday.value = minday2
-      maxday.value = maxday2
+     
+      saleDays.value = result.reduce((acc,item) => {
+        const date = item.dtmDate.split(' ')[0]
+        let day = new Date(date);
+        day = day.getDay();
+        acc[day] += 1 ;
+        return acc ;
+      },[0,0,0,0,0,0,0])
+      
+      salecases.value = result.reduce((acc,item) => {
+        const date = item.dtmDate.split(' ')[0]
+        let day = new Date(date);
+        day = day.getDay();
+        acc[day] += item.lngRecCnt ;
+        return acc ;
+      },[0,0,0,0,0,0,0])
+
+      realSales.value = result.reduce((acc,item) => {
+        const date = item.dtmDate.split(' ')[0]
+        let day = new Date(date);
+        day = day.getDay();
+        acc[day] += item.lngActAmt ;
+        return acc ;
+      },[0,0,0,0,0,0,0])
+      
+    
       afterSearch.value = true;
       store.dispatch("convertLoading", false);
     }

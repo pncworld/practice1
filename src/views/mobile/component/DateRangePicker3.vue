@@ -45,11 +45,9 @@
   const selectedRange = ref(''); // 선택한 기간
   const active = ref("today");
     const periods = {
-      today: "오늘",
-      yesterday: "전일",
-      weekago: "1주일",
-      monthago: "1개월",
-
+      week: "1주일",
+      month: "1개월",
+      month3: "3개월"
     };
 
     const setActive =(period) =>{
@@ -69,17 +67,8 @@ function updateDateRange() {
     let startDate, endDate;
 
       switch (selectedRange.value) {
-        case 'today':
-          startDate = startOfToday;
-          endDate = endOfToday;
-          break;
-      
-        case 'yesterday':
-          startDate = startOfToday -1;
-          endDate = startOfToday -1;
-          break;
 
-          case 'weekago':
+          case 'week':
             //12주
           const weekUnitStart = new Date(today);
           const weekUnitEnd = new Date(today);
@@ -87,13 +76,24 @@ function updateDateRange() {
           startDate = weekUnitStart;
           endDate = weekUnitEnd;
           break;
-          case 'monthago':
+          case 'month':
             //12주
           const monthUnitStart = new Date(today);
           const monthUnitEnd = new Date(today);
           monthUnitStart.setMonth(today.getMonth()-1 );
+          monthUnitStart.setDate(monthUnitStart.getDate() +1 );
           startDate = monthUnitStart;
           endDate = monthUnitEnd;
+          break;
+       
+          case 'month3':
+            //12주
+          const monthUnitStart3 = new Date(today);
+          const monthUnitEnd3 = new Date(today);
+          monthUnitStart3.setMonth(today.getMonth()-3 );
+          monthUnitStart3.setDate(monthUnitStart3.getDate()+1 );
+          startDate = monthUnitStart3;
+          endDate = monthUnitEnd3;
           break;
        
 

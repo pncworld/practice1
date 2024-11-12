@@ -127,6 +127,14 @@ export const tablePosMenu = async(data) => {
 export const tablePosMenuKey = async(data) => {
     return await api2.post('/MIMASTER/MST57_002INS.asmx/getTablePosMenuKey', data);
 };
+export const tablePosMenuKey_v2 = async(groupCd, storeCd, areaCd) => {
+    return await api2.post('/MIMASTER/MST57_002INS.asmx/getTablePosMenuKey_V2', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd,
+        AREA_CD: areaCd
+     
+    });
+};
 
 export const savetablePosMenuKey = async(data) => {
     return await api2.post('/MIMASTER/MST57_002INS.asmx/insertTablePosMenuKey', data);
@@ -135,7 +143,14 @@ export const savetablePosMenuKey = async(data) => {
 export const deletetablePosMenuKey = async(data) => {
     return await api2.post('/MIMASTER/MST57_002INS.asmx/deleteTablePosMenuKey', data);
 };
-
+export const get_category_info = (groupCd,storeCd, areaCd) => {
+    return api2.post('/MIMASTER/MST57_001INS.asmx/getCategoryInfo',{
+          GROUP_CD : groupCd,
+          STORE_CD : storeCd,
+          AREA_CD  : areaCd
+    })
+  }
+  
 export const setSubCategoryDelete = (groupCd ,storeCd , areaCd,majorCd , subCd) => {
     return api2.post('/MIMASTER/MST57_001INS.asmx/setSubCategoryDelete', {
         GROUP_CD: groupCd,

@@ -1,6 +1,7 @@
-import CancelSales from '@/views/CancelSales.vue';
-import DailySales2 from '@/views/DailySales2.vue';
+
 import MasterEnroll from '@/views/masterEnroll.vue';
+import MST05_004INS from '@/views/MST05_004INS.vue';
+import MST05_011INS from '@/views/MST05_011INS.vue';
 import MST57_001INS from '@/views/MST57_001INS.vue';
 import MST57_002INS from '@/views/MST57_002INS.vue';
 import StoreEnroll from '@/views/StoreEnroll.vue';
@@ -24,6 +25,15 @@ export default function salesRouter() {
       {
         path : "MST57_002INS.xml",
         component : MST57_002INS
+      },
+      {
+        path : "MST05_004INS.xml",
+        component : MST05_004INS
+      }
+      ,
+      {
+        path : "MST05_011INS.xml",
+        component : MST05_011INS
       }
     ];
   }

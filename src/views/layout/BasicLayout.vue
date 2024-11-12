@@ -86,7 +86,7 @@
       </aside>
       
       <!-- Main Content -->
-      <main class="w-full bg-white p-1 overflow-y-scroll overflow-x-hidden">
+      <main class="w-full h-full bg-white p-1 overflow-y-scroll overflow-x-hidden">
       <router-view  v-slot="{ Component, route }">
       <keep-alive>
         <component :is="Component" :key="`${route.path}-${componentKey}`" />

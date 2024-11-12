@@ -14,7 +14,7 @@
       <div class="flex items-center space-x-2">
         <span class="text-sm font-medium">일자 선택</span>
       </div>
-      <DateRangePicker @update:dateRange="handleDateRangeUpdate" class=" w-full z-10"/>
+      <DateRangePicker @update:dateRange="handleDateRangeUpdate" @update:unit="updateunit" class=" w-full z-10"/>
     </div>
     
     <!-- PickStore 버튼 -->
@@ -32,19 +32,19 @@
   </div>
 </div>
 
-<div class="w-full bg-white border border-gray-300 rounded-lg shadow-md">
+<div class="w-full bg-white border border-gray-300 rounded-lg shadow-md" v-if="showcontent">
   <!-- 상단 제목 영역 -->
   <div class="flex justify-between p-4 border-b border-gray-300">
     <div class="flex-1 text-center font-semibold text-gray-700 border-r border-gray-300">
-      최대 매출 일자
+      최대 매출 {{ currMainnames }}
     </div>
     <div class="flex-1 text-center font-semibold text-gray-700">
-      최초 매출 일자
+      최소 매출 {{ currMainnames }}
     </div>
   </div>
 
   <!-- 하단 내용 영역 -->
-  <div class="p-4 flex w-full" v-if="showcontent">
+  <div class="p-4 flex w-full" >
     <!-- 여기에 하단 내용을 추가하면 됩니다 -->
      <div class="flex-1">
       <p class="text-gray-600 border-r font-bold text-2xl">
@@ -69,7 +69,7 @@
   </div>
   
 </div>
-<div class="w-full bg-white border border-gray-300 rounded-lg shadow-md" v-if="showcontent">
+<div class="w-full bg-white border border-gray-300 rounded-lg shadow-md" >
      <div class="text-gray-600 border-r font-bold text-xl flex flex-col items-start ml-3 justify-start"> 
       <div>건수합계 : <span class="text-xl font-medium"> {{ parseInt(sumCase).toLocaleString() }} 건</span></div>
       <div>매출합계 : <span class="text-xl font-medium">{{ parseInt(sumSales).toLocaleString() }} 원</span></div>
@@ -78,7 +78,7 @@
     </div> 
    </div>
 
-  <div class="w-full bg-white border border-gray-300 rounded-lg shadow-md mt-5" v-if="showcontent">
+  <div class="w-full bg-white border border-gray-300 rounded-lg shadow-md mt-5" >
     <div class="flex justify-start font-semibold ml-3 text-xl">상세내역</div>
     <div class="grid grid-cols-3 w-full text-xl ">
       <div class="bg-gray-200">일자</div>
@@ -160,6 +160,16 @@ const sumCase = ref();
 const sumSales = ref();
 const avgSales = ref();
 const result2 = ref();
+const currMainnames = ref('일자');
+const updateunit = (value) => {
+  if(value == 'dayUnit'){
+    currMainnames.value = '일자'
+  } else if(value == 'weekUnit') {
+    currMainnames.value = '주차'
+  } else if (value == 'monthUnit'){
+    currMainnames.value = '월'
+  }
+}
 const searchButton = () => {
   showcontent.value = true ;
   const readsales = async () => {

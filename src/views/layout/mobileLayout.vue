@@ -1,24 +1,22 @@
 <template>
     <div class="h-screen overflow-y-auto">
+      <Loading></Loading>
     <main class="h-screen overflow-y-auto">
     <router-view v-slot="{ Component, route }" >
-        <div class="flex flex-col gap-0  w-full items-center justify-center mr-0 h-auto" v-show="isMenu">
-        <div class="flex justify-end pr-10"><button class="text-3xl" @click="showMenu(false)"><font-awesome-icon icon="xmark" /></button></div>
+        <div class="flex flex-col gap-0  w-full items-center justify-center mr-0 h-auto mt-8" v-show="isMenu">
+        <div class="flex justify-end w-full mr-4"><button class="text-3xl" @click="showMenu(false)"><font-awesome-icon icon="xmark" /></button></div>
         <div class="flex justify-start items-center pl-10 border border-gray-300 h-24 w-full" ><button class="text-2xl h-full w-full flex justify-start items-center" @click="showsubMenu(1)"><font-awesome-icon icon="chart-simple" />매출</button>
         </div>
         <div class="grid grid-rows-6 h-80 border w-full " v-if="showornotsubMenu(1)">
           <div class="h-full w-full border border-gray-200"><button class="h-full w-full">매출현황</button></div>
           <div class="h-full w-full border border-gray-200"><button class="h-full w-full" @click="goRouter(2)">시간대별 분석</button></div>
           <div class="h-full w-full border border-gray-200"><button class="h-full w-full" @click="goRouter(3)">기간별 분석</button></div>
-          <div class="h-full w-full border border-gray-200"><button class="h-full w-full">요일별 분석</button></div>
+          <div class="h-full w-full border border-gray-200"><button class="h-full w-full" @click="goRouter(4)">요일별 분석</button></div>
           <div class="h-full w-full border border-gray-200"><button class="h-full w-full">메뉴별 분석</button></div>
           <div class="h-full w-full border border-gray-200"><button class="h-full w-full">주제/결제유형별 분석</button></div>
         </div>
         <div class="flex justify-start items-center pl-10 border border-gray-300 h-24  w-full" ><button class="text-2xl h-full w-full flex justify-start items-center"><font-awesome-icon icon="chart-simple" />기타1</button></div>
-        <div class="flex justify-start items-center pl-10 border border-gray-300 h-24  w-full" ><button class="text-2xl h-full w-full flex justify-start items-center"><font-awesome-icon icon="chart-simple" />기타2</button></div>
-        <div class="flex justify-start items-center pl-10 border border-gray-300 h-24  w-full" ><button class="text-2xl h-full w-full flex justify-start items-center"><font-awesome-icon icon="chart-simple" />기타3</button></div>
-        <div class="flex justify-start items-center pl-10 border border-gray-300 h-24  w-full" ><button class="text-2xl h-full w-full flex justify-start items-center"><font-awesome-icon icon="chart-simple" />기타3</button></div>
-        <div class="flex justify-start items-center pl-10 border border-gray-300 h-24  w-full" ><button class="text-2xl h-full w-full flex justify-start items-center"><font-awesome-icon icon="chart-simple" />기타3</button></div>
+       
   </div>
  
     <div v-if="personal" class="grid grid-cols-2 gap-3 h-full w-auto items-center pl-24">
@@ -30,15 +28,16 @@
     <component v-show="!isMenu && !personal " :is="Component" ></component>
     </router-view>
     </main>
-    <MobileMenu v-show="showMobileMenu" @showMenu="showMenu" @showpersonal="showpersonal" class="" ></MobileMenu>
+    <MobileMenu ref="stickyElement" v-if="showMobileMenu" @showMenu="showMenu" @showpersonal="showpersonal" :class="{ hidden: !isStickyVisible }" ></MobileMenu>
     </div>
 </template>
 
 <script setup>
 import BasicMenu from '@/components/BasicMenu.vue';
+import Loading from '@/components/loading.vue';
 import MobileMenu from '@/components/MenuComponent/mobileMenu.vue';
 import router from '@/router';
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 
@@ -64,6 +63,10 @@ const goRouter = (value) => {
     
       case 3:
       router.push('/m/MISALES/SLS06_004RPT.xml');
+        break;
+        
+      case 4:
+      router.push('/m/MISALES/SLS06_005RPT.xml');
         break;
     
       default:
@@ -128,44 +131,13 @@ watch(selectedCategoryId , (newCategory) => {
  const activeCategory = ref([]);
  const activesubCategory = ref([]);
 
-// 카테고리 보이기/숨기기 함수
-const toggleCategory = (lngCode) => {
-  const index = activeCategory.value.indexOf(lngCode);
-  if (index === -1) {
-    // 카테고리가 활성화되지 않았다면 추가
-    activeCategory.value.push(lngCode);
-  } else {
-    // 카테고리가 이미 활성화된 상태라면 배열에서 제거
-    activeCategory.value.splice(index, 1);
-  }
-};
-const selectSubCategory = (lngProgramSub) => {
-  const index = activesubCategory.value.indexOf(lngProgramSub);
-  if (index === -1) {
-    // 카테고리가 활성화되지 않았다면 추가
-    activesubCategory.value.push(lngProgramSub);
-  } else {
-    // 카테고리가 이미 활성화된 상태라면 배열에서 제거
-    activesubCategory.value.splice(index, 1);
-  }
-};
 
-// 특정 카테고리가 활성화 상태인지 확인하는 함수
-const isCategoryVisible = (lngCode) => {
-  return activeCategory.value.includes(lngCode);
-};
-const issubCategoryVisible = (lngProgramSub) => {
-  return activesubCategory.value.includes(lngProgramSub);
-};
+
 watch(() => route.path, (newPath) => {
     showMobileMenu.value = newPath !== '/'; // Update based on new route
 });
 
-const routecategory =( strUrl, strTitle,lngProgramID) => {
-    router.push('/'+strUrl.split("::")[0]+'/'+strUrl.split("::")[1]);
-    personal.value = false;
-    isMenu.value = false;
-}
+
 const logout = () => {
   
   store.replaceState({
@@ -184,6 +156,40 @@ const logout = () => {
   sessionStorage.clear();
   window.location.href = '/';
 }
+
+const isStickyVisible = ref(true); // 요소가 화면에 보이는지 여부
+const stickyElement = ref(null);
+
+// IntersectionObserver 콜백 함수
+const handleIntersection = (entries) => {
+  const entry = entries[0]; // 첫 번째 관찰 항목만 처리
+  if (entry.isIntersecting) {
+    isStickyVisible.value = true; // 요소가 화면에 보일 때
+  } else {
+    isStickyVisible.value = false; // 요소가 화면에서 벗어날 때
+  }
+};
+
+// 컴포넌트가 마운트될 때 IntersectionObserver 설정
+onMounted(() => {
+  nextTick(() => {
+    if (stickyElement.value) {
+      const observer = new IntersectionObserver(handleIntersection, {
+        root: null, // 뷰포트를 기준으로 검사
+        threshold: 0, // 요소가 0%라도 보이면 callback 실행
+      });
+      console.log(stickyElement.value)
+      observer.observe(stickyElement.value);
+
+      // 컴포넌트가 언마운트될 때 observer 해제
+      onBeforeUnmount(() => {
+        observer.disconnect();
+      });
+    } else {
+      console.error('stickyElement is null');
+    }
+  });
+});
 </script>
 
 <style lang="scss" scoped>

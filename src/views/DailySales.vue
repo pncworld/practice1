@@ -239,6 +239,7 @@ const searchButton = () => {
       return;
     }
     store.dispatch("convertLoading", true);
+
     const response = await dailySaleReport(
       groupCd.value,
       storeCd.value,
@@ -306,7 +307,7 @@ const searchButton = () => {
         //     values: ['매장1', '매장2', '매장3', '매장4', '매장5'],
         // }
       }
-      if (tabInitSetArray.value[i].strTotalexpr != null && tabInitSetArray.value[i].strTotalexpr.split('(')[0].includes('sum')) {
+      if (tabInitSetArray.value[i].strTotalexpr != null && tabInitSetArray.value[i].strTotalexpr.split('(')[0].includes('sum') && !tabInitSetArray.value[i].strTotalexpr.includes('/')) {
           column.aggFunc = 'sum'
       } else if (tabInitSetArray.value[i].strTotalexpr != null && tabInitSetArray.value[i].strTotalexpr.includes('/')) {
 

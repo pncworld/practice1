@@ -60,6 +60,7 @@ import PickStoreGrid from '@/components/pickStoreGrid.vue';
 import PickStore2 from '@/components/pickStore2.vue';
 import { dailySaleReport } from '@/api/misales';
 
+
 const store = useStore();
 // 그리드에 다중 선택 혹은 개별 선택 설정 변수
 const selection = ref({ mode: "cell" });
@@ -222,7 +223,8 @@ const exportExcel = () => {
 
 const searchStoreCd = (selectedStoreCd) => {
   console.log(selectedStoreCd)
-  storeCd.value = selectedStoreCd;
+  storeCd.value = selectedStoreCd.slice(1, -1);
+ 
 }
 // 조회 함수.
 const searchButton = () => {
@@ -238,18 +240,29 @@ const searchButton = () => {
       return;
     }
     store.dispatch("convertLoading", true);
-    const response = await dailySaleReport(
-      groupCd.value,
-      storeCd.value,
-      startDate.value,
-      endDate.value,
-      userData.strLanguage
-    );
+    try {
+      
+     
+  const response = await dailySaleReport(
+    groupCd.value,
+    storeCd.value,
+    startDate.value,
+    endDate.value,
+    userData.strLanguage
+  );
+      
+  const result = response.data.dailySales;
 
-    const result = response.data.recordsets;
-    updateColumn(result);
-    afterSearch.value = true;
-    store.dispatch("convertLoading", false);
+  updateColumn(result);
+  afterSearch.value = true;
+  store.dispatch("convertLoading", false); // 성공 시 로딩 종료
+
+} catch (error) {
+  // 오류가 발생하면 catch 블록에서 처리
+  store.dispatch("convertLoading", false); // 실패 시에도 로딩 종료
+
+}
+
   }
   readsales(); // 세팅된 함수 실행
   // 천단위 마다 쉼표 형식 지정
@@ -302,11 +315,13 @@ const searchButton = () => {
         //     values: ['매장1', '매장2', '매장3', '매장4', '매장5'],
         // }
       }
-      if (tabInitSetArray.value[i].strTotalexpr != null && tabInitSetArray.value[i].strTotalexpr.split('(')[0].includes('sum')) {
+    
+   
+      if (tabInitSetArray.value[i].strTotalexpr != null && tabInitSetArray.value[i].strTotalexpr.split('(')[0].includes('sum') && !tabInitSetArray.value[i].strTotalexpr.includes('/')) {
           column.aggFunc = 'sum'
       } else if (tabInitSetArray.value[i].strTotalexpr != null && tabInitSetArray.value[i].strTotalexpr.includes('/')) {
-
        
+        column.aggFunc = 'avg'
         // 2. '/'을 기준으로 lngActAmt와 lngRecCnt를 나눔
         const divendColumn = tabInitSetArray.value[i].strTotalexpr.split('"')[1]
         const divColumn = tabInitSetArray.value[i].strTotalexpr.split('"')[3]
@@ -421,9 +436,8 @@ const searchButton = () => {
           if (!dateString) {
             return ''; // dtmDate가 없으면 빈 문자열 반환
           }
-          // 날짜 문자열에서 시간 부분을 잘라내고 날짜만 반환
-          const date = new Date(dateString);
-          const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
+         
+          const formattedDate = dateString.split(' ')[0]; // YYYY-MM-DD 형식으로 변환
           return formattedDate;
         }
       }
@@ -464,7 +478,7 @@ const searchButton = () => {
       
     }
    
-    rowData.value = result[0].map(item => ({
+    rowData.value = result.map(item => ({
       strStoreGroupName: item.strStoreGroupName,
       dtmDate: item.dtmDate,
       strStore: item.strStore,
