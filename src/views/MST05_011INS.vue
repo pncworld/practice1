@@ -71,12 +71,21 @@
       <!-- 데이터를 드래그하여 이동시키기 위한 컨테이너 -->
        <div class="w-full h-full ">
        <button class="button primary absolute right-[25%] top-[52%]" @click="changingMode">교체하기밀어내기</button>
-      <div ref="container" class="grid grid-cols-6 grid-rows-5 gap-3 mt-4 w-1/2 h-96 absolute bottom-5 right-10 pb-10 pr-10">
-        <div v-for="(item, index) in items" :key="item.intKeySeq" class=" p-4 bg-gray-200 rounded-lg shadow-md w-auto h-auto" :data-id="item.intKeySeq">
-          <p>{{ item.strKeyName }}</p>
-         
-        </div>
+       <VueDraggableNext
+      v-model="items"
+      :move="onMove"
+       @end="onEnd"
+      class="grid grid-cols-6 grid-rows-5 gap-3 mt-4 w-1/2 h-96 absolute bottom-5 right-10 pb-10 pr-10"
+    >
+      <div
+        v-for="(item, index) in items"
+        :key="item.intKeySeq"
+        class="p-4 bg-gray-200 rounded-lg shadow-md w-auto h-auto"
+        :data-key="item.intKeySeq"
+      >
+        <p>{{ item.strKeyName }}</p>
       </div>
+    </VueDraggableNext>
     </div>
     </div>
 
@@ -86,11 +95,12 @@
   </template>
   
   <script setup>
-  import { ref, onMounted } from 'vue';
+  import { ref, onMounted, watch } from 'vue';
   import Sortable from 'sortablejs';
 import PickStore4 from '@/components/pickStore4.vue';
 import { useStore } from 'vuex';
 import { get_category_info, getCategoryInfo, getMultiLingual, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
+import { VueDraggableNext } from 'vue-draggable-next';
 
   
   // 더미 데이터
@@ -234,65 +244,9 @@ let sortableInstance = null;
     subCategory.value = subOriginCategory.value.slice(10 * (currentsubPage.value-1), 10 * (currentsubPage.value-1)+10);
   
   }
- 
-  onMounted(() => {
-  // Sortable.js 초기화
-  const sortable = Sortable.create(container.value, {
-    animation: 150,
-    onStart(evt) {
-      // 드래그가 시작될 때 어떤 아이템을 드래그하고 있는지 추적
-      draggedItemIndex = evt.oldIndex;
-     
-    },
-    onMove(evt) {
-      // 드래그 중에는 데이터를 이동하지 않도록 함
-      // 마우스 이동은 계속 진행되지만, 순서가 바뀌지 않도록 처리
-   
-      if ( changeMode.value == false) {
-        targetItemIndex = Array.from(evt.from.children).indexOf(evt.related);
-        console.log(targetItemIndex)
-        // 순서 변경을 방지하기 위해 return false 사용
-        return false;  // 드래그 중에 순서 변경을 방지
-      } else {
-        
-        return true;
-      }
-    },
-    onEnd(evt) {
-      // 드래그가 끝났을 때만 데이터를 교환
-      const oldIndex = evt.oldIndex;
-      const newIndex = evt.newIndex;
-      if (draggedItemIndex !== targetItemIndex && changeMode.value == false) {
-        
-        // 실제 데이터 교환
-        const movedItem = items.value[draggedItemIndex]; // 드래그된 아이템
-        const movedItem2 = items.value[targetItemIndex]; 
-        // 아이템 순서 교환
-        items.value.splice(draggedItemIndex, 1);
-        items.value.splice(draggedItemIndex, 0, movedItem2); 
-        items.value.splice(targetItemIndex, 1); 
-        items.value.splice(targetItemIndex, 0, movedItem);
-       
-  
-      } else {
-        const movedItem = items.value.splice(oldIndex, 1)[0];  // 드래그한 항목을 빼내기
-        items.value.splice(newIndex, 0, movedItem);
-      }
-      console.log(items.value)
-   
-      saveMenuKeys()
-    },
-  });
-  const sortableInstance = Sortable.create(sortableContainer.value, {
-    animation: 150,
-    onEnd: (event) => {
-      // 드래그 완료 시 순서 업데이트
-      const movedItem = subOriginCategory.value.splice(event.oldIndex, 1)[0];
-      subOriginCategory.value.splice(event.newIndex, 0, movedItem);
-      subCategory.value = subOriginCategory.value.slice(10 * (currentsubPage.value-1), 10 * (currentsubPage.value-1)+10);
-    }
-  });
-});
+ watch( items, (newValue)=>{
+  console.log(newValue)
+ })
 
 const saveMenuKeys =() => {
   let dupliitems = [...items.value]
@@ -442,7 +396,37 @@ const showMenuKey =(value) => {
 const changeSubCate =() => {
   showchangingSub.value = !showchangingSub.value
 }
+let targetItemIndex2 ;
+const onMove = (evt) => {
+  // 예: 드래그 중 이동할 때의 조건 등을 설정할 수 있음
+  if( changeMode.value == false) {
+    targetItemIndex2 = Array.from(evt.from.children).indexOf(evt.related);
+    return false;
+  } else {
+    return true;
+  }
+ 
+};
+const onEnd = (evt) => {
+  // Swap을 처리할 조건
+  console.log(changeMode.value)
+  if (changeMode.value === false) {
+    const oldIndex = evt.oldIndex;  // 드래그된 아이템의 기존 인덱스
 
+
+    // oldIndex와 newIndex의 아이템을 swap (배열에서 두 아이템의 위치를 바꿔줍니다)
+    const swappedItems = [...items.value];  // items를 복사
+
+    const temp = swappedItems[oldIndex];
+    swappedItems[oldIndex] = swappedItems[targetItemIndex2];
+    swappedItems[targetItemIndex2] = temp;
+
+    // 배열을 업데이트
+    items.value = swappedItems;
+  } else {
+ 
+  }
+};
 
   </script>
   
