@@ -171,25 +171,25 @@ const handleIntersection = (entries) => {
 };
 
 // 컴포넌트가 마운트될 때 IntersectionObserver 설정
-onMounted(() => {
-  nextTick(() => {
-    if (stickyElement.value) {
-      const observer = new IntersectionObserver(handleIntersection, {
-        root: null, // 뷰포트를 기준으로 검사
-        threshold: 0, // 요소가 0%라도 보이면 callback 실행
-      });
-      console.log(stickyElement.value)
-      observer.observe(stickyElement.value);
+// onMounted(() => {
+//   nextTick(() => {
+//     if (stickyElement.value) {
+//       const observer = new IntersectionObserver(handleIntersection, {
+//         root: null, // 뷰포트를 기준으로 검사
+//         threshold: 0, // 요소가 0%라도 보이면 callback 실행
+//       });
+//       console.log(stickyElement.value)
+//       observer.observe(stickyElement.value);
 
-      // 컴포넌트가 언마운트될 때 observer 해제
-      onBeforeUnmount(() => {
-        observer.disconnect();
-      });
-    } else {
-      console.error('stickyElement is null');
-    }
-  });
-});
+//       // 컴포넌트가 언마운트될 때 observer 해제
+//       onBeforeUnmount(() => {
+//         observer.disconnect();
+//       });
+//     } else {
+//       console.error('stickyElement is null');
+//     }
+//   });
+// });
 </script>
 
 <style lang="scss" scoped>
