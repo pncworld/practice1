@@ -245,7 +245,7 @@ const fetchDataAndRenderGrid = () => {
     { name: '일자', fieldName: 'dtmDate', width: tabInitSetArray.value[1].intHdWidth, header: { text: '일자'  ,
     styleName : 'header-style-1'
     } , datetimeFormat :"yyyy-MM-dd" , groupFooter: {
-      expression: "소계",
+      text: "소계",
   
     } },
     { name: '요일', fieldName: 'strWeekName', width: tabInitSetArray.value[2].intHdWidth, header: { text: '요일',
@@ -258,76 +258,100 @@ const fetchDataAndRenderGrid = () => {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
-    } ,groupFooter: {
-      valueCallback: function (grid, column, groupFooterIndex, group, value) {
-        //계산 후 표시하고 싶은 값을 return
-        var groupModel = grid.getGroupModel(group.index);
-        return grid.getGroupSummary(groupModel, "Age").count + ' 건';
-      },
-      styleName: "right-column"
-    },},
+    } , groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
+    }},
     { name: '조단가', fieldName: 'lngRecAmt', width: tabInitSetArray.value[5].intHdWidth, numberFormat : '#,##0', header: { text: '조단가' ,
     styleName : 'header-style-5' },footer: {
       text: "합계",
       expression: "avg",
       numberFormat : '#,###.0'
-    } },
+    } , groupFooter: {
+      expression: "avg",
+      numberFormat: "#,##0",
+    }},
     { name: '객수', fieldName: 'lngCustAmt', width: tabInitSetArray.value[6].intHdWidth, numberFormat : '#,##0', header: { text: '객수' ,
     styleName : 'header-style-6' } ,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
+    } , groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
     }},
     { name: '객단가', fieldName: 'lngCustCnt', width: tabInitSetArray.value[7].intHdWidth, numberFormat : '#,##0', header: { text: '객단가' ,
     styleName : 'header-style-7' } ,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
+    } , groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
     } },
     { name: '총매출액', fieldName: 'lngSalAmt', width: tabInitSetArray.value[8].intHdWidth, numberFormat : '#,##0', header: { text: '총매출액' ,
     styleName : 'header-style-8'} ,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
-    } },
+    } , groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
+    }},
     { name: '할인액', fieldName: 'lngDiscount', width: tabInitSetArray.value[9].intHdWidth, numberFormat : '#,##0', header: { text: '할인액',
     styleName : 'header-style-9' } ,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
+    }, groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
     }},
     { name: '실매출액', fieldName: 'lngActAmt', width: tabInitSetArray.value[10].intHdWidth, numberFormat : '#,##0', header: { text: '실매출액',
     styleName : 'header-style-10' },footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
-    } },
+    } , groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
+    }},
     { name: '부가세', fieldName: 'lngVAT', width: tabInitSetArray.value[11].intHdWidth,numberFormat : '#,##0', header: { text: '부가세' ,
     styleName : 'header-style-11'},footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
+    }, groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
     } },
     { name: '순매출액', fieldName: 'lngSupplyAmt', width: tabInitSetArray.value[12].intHdWidth, numberFormat : '#,##0', header: { text: '순매출액',
     styleName : 'header-style-12' } ,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
-    } },
+    } , groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
+    }},
     { name: '비율', fieldName: 'dblDistRate', width: tabInitSetArray.value[13].intHdWidth,numberFormat : '#.0', header: { text: '비율' ,
     styleName : 'header-style-13' } ,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
+    }, groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
     }},
     
   ];
   gridView.setColumns(columns);
-
+  gridView.groupBy(["strStore"]);
   // 5. 샘플 데이터 추가
   dulpicatedrows.value = rows.value; 
   dataProvider.setRows(rows.value);
-
+  gridView.sortMode = 'explicit';
+  gridView.filterMode = 'explicit';
   gridView.setRowIndicator({
     visible: false
   });
