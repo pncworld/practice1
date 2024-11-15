@@ -41,9 +41,9 @@
       </div>
       <Draggable v-for="item in items">
         <div class="grid grid-cols-8 h-auto">
-          <div class="h-16 flex items-center justify-center"><font-awesome-icon icon="bars" /></div><div class="h-16 flex items-center justify-center">{{ item?.intKeySeq  }}</div><div class="h-16 flex items-center justify-center"><img v-if="item.fileName" :src="`http://www.pncoffice.net/MenuImage/Image/${item.fileName}`" alt="" class="w-full h-full"><img v-if="!item.fileName" src="../assets/noImage.png" alt="">
+          <div class="h-16 flex items-center justify-center"><font-awesome-icon icon="bars" /></div><div class="h-16 flex items-center justify-center">{{ item?.intKeySeq  }}</div><div class="h-16 flex items-center justify-center"><img v-if="item.fileName" :src="`http://www.pncoffice.net/MenuImage/Image/${item.fileName}`" alt="" class="w-full h-full"><img v-if="!item.fileName" src="../../assets/noImage.png" alt="">
           </div><div class="h-16 flex items-center justify-center">{{ item?.lngKeyscrNo }}</div>
-          <div class="h-16 flex items-center justify-center">{{ item?.strKeyName }}</div><div class="h-16 flex items-center justify-center">{{ item?.majorName}}</div><div class="h-16 flex items-center justify-center">{{ item?.subName}}</div><div class="h-16 flex items-center justify-center"><button @click="deleteitem(item?.lngKeyscrNo , item?.intKeySeq )"><img src="../assets/trash.svg" alt=""></button></div>
+          <div class="h-16 flex items-center justify-center">{{ item?.strKeyName }}</div><div class="h-16 flex items-center justify-center">{{ item?.majorName}}</div><div class="h-16 flex items-center justify-center">{{ item?.subName}}</div><div class="h-16 flex items-center justify-center"><button @click="deleteitem(item?.lngKeyscrNo , item?.intKeySeq )"><img src="../../assets/trash.svg" alt=""></button></div>
         </div>
       </Draggable>
     </Container>

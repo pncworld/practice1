@@ -40,7 +40,7 @@
 // 가져온 날짜의 형식을 고치기 위해서 사용 ( 데이터가 yyyy-mm-dd T ~~~ 이런형태여서 T부터 자름)
 import { format } from 'date-fns';
 // 설치한 라이브러리로 만든 달력을 가져옴 ( 재사용 )
-import DateRangePicker from '../components/DateRangePicker.vue';
+import DateRangePicker from '@/components/DateRangePicker.vue'
 // 뷰에서 제공 하는 기능, computed 반응형 상태를 기반으로 다른 로직을 실행해 결과값을 생성 , ref 반응형 변수 선언
 import { computed, ref } from 'vue';
 // vuex에서 제공하는 중앙 상태관리 
@@ -55,8 +55,6 @@ import PickStore from '@/components/pickStore.vue';
 import { getGridInfoList} from '@/api/common';
 // alert 창 자동 꾸미기 위한 라이브러리
 import Swal from 'sweetalert2';
-import { NIL } from 'uuid';
-import PickStoreGrid from '@/components/pickStoreGrid.vue';
 import PickStore2 from '@/components/pickStore2.vue';
 import { dailySaleReport } from '@/api/misales';
 

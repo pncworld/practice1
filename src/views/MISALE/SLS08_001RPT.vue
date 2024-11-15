@@ -25,7 +25,7 @@
 
 <script setup>
 import { format } from 'date-fns';
-import DateRangePicker from '../components/DateRangePicker.vue';
+import DateRangePicker from '@/components/DateRangePicker.vue';
 import { ref } from 'vue';
 import { useStore } from 'vuex';
 import axios from 'axios';

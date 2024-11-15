@@ -46,7 +46,7 @@
 // 가져온 날짜의 형식을 고치기 위해서 사용 ( 데이터가 yyyy-mm-dd T ~~~ 이런형태여서 T부터 자름)
 import { format } from 'date-fns';
 // 설치한 라이브러리로 만든 달력을 가져옴 ( 재사용 )
-import DateRangePicker from '../components/DateRangePicker.vue';
+import DateRangePicker from '@/components/DateRangePicker.vue';
 // 뷰에서 제공 하는 기능, computed 반응형 상태를 기반으로 다른 로직을 실행해 결과값을 생성 , ref 반응형 변수 선언
 
 // vuex에서 제공하는 중앙 상태관리 
@@ -89,15 +89,29 @@ const cellUnitedtf = ref(false);
 const GridInfo_PROG_ID = "SLS06_004RPT_VUE_TEST";
 const GridInfo_GRID_ID = "1";
 // API 호출 (설정값 호출)
+let styleContent = "";
 const tabInitSetArray = ref([]);
 (async () => {
     try {
         const result = await getGridInfoList(GridInfo_PROG_ID, GridInfo_GRID_ID);
         tabInitSetArray.value = result; 
+
+        tabInitSetArray.value.forEach((item, index) => {
+       styleContent += `
+    .header-style-${index} {
+      background-color: ${item.strHdBkColor} !important;
+      color: ${item.strHdColor} !important;
+    }
+  `;
+});
+
     } catch (error) {
         console.error("Failed to fetch data:", error); // 오류 로그 출력
     } finally {
-      
+      console.log(tabInitSetArray.value)
+      const styleTag = document.createElement("style");
+styleTag.appendChild(document.createTextNode(styleContent));
+document.head.appendChild(styleTag);
     }
 })();
 
@@ -153,6 +167,7 @@ const exportExcel = () => {
 }
 // 조회 함수.
 const searchButton = () => {
+
   const readsales = async () => {
     if (storeCd.value == undefined) {
       Swal.fire({
@@ -189,6 +204,9 @@ let gridView;
 let dataProvider;
 const dulpicatedrows = ref()
 const fetchDataAndRenderGrid = () => {
+  if (gridView) {
+    gridView.destroy();  // 기존 그리드 인스턴스 파괴
+  }
   // 1. DataProvider 설정
   dataProvider = new LocalDataProvider();
   
@@ -220,50 +238,87 @@ const fetchDataAndRenderGrid = () => {
 
   // 4. 컬럼 정의
   const columns = [
-    { name: '매장명', fieldName: 'strStore',  header: { text: '매장명' } },
-    { name: '일자', fieldName: 'dtmDate', header: { text: '일자' } , datetimeFormat :"yyyy-MM-dd"  },
-    { name: '요일', fieldName: 'strWeekName', header: { text: '요일' } },
-    { name: '날씨', fieldName: 'strPhen', header: { text: '날씨' } },
-    { name: '조수', fieldName: 'lngRecCnt', header: { text: '조수' } ,
+    { name: '매장명', fieldName: 'strStore', width: tabInitSetArray.value[0].intHdWidth
+    , header: { text: '매장명' ,
+    styleName : 'header-style-0'
+     } },
+    { name: '일자', fieldName: 'dtmDate', width: tabInitSetArray.value[1].intHdWidth, header: { text: '일자'  ,
+    styleName : 'header-style-1'
+    } , datetimeFormat :"yyyy-MM-dd" , groupFooter: {
+      expression: "소계",
+  
+    } },
+    { name: '요일', fieldName: 'strWeekName', width: tabInitSetArray.value[2].intHdWidth, header: { text: '요일',
+    styleName : 'header-style-2' } },
+    { name: '날씨', fieldName: 'strPhen', width: tabInitSetArray.value[3].intHdWidth, header: { text: '날씨',
+    styleName : 'header-style-3' } },
+    { name: '조수', fieldName: 'lngRecCnt', width: tabInitSetArray.value[4].intHdWidth, numberFormat : '#,##0',  header: { text: '조수',
+    styleName : 'header-style-4' } ,
     footer: {
       text: "합계",
       expression: "sum",
-    } },
-    { name: '조단가', fieldName: 'lngRecAmt', header: { text: '조단가' },footer: {
+      numberFormat : '#,##0'
+    } ,groupFooter: {
+      valueCallback: function (grid, column, groupFooterIndex, group, value) {
+        //계산 후 표시하고 싶은 값을 return
+        var groupModel = grid.getGroupModel(group.index);
+        return grid.getGroupSummary(groupModel, "Age").count + ' 건';
+      },
+      styleName: "right-column"
+    },},
+    { name: '조단가', fieldName: 'lngRecAmt', width: tabInitSetArray.value[5].intHdWidth, numberFormat : '#,##0', header: { text: '조단가' ,
+    styleName : 'header-style-5' },footer: {
       text: "합계",
       expression: "avg",
+      numberFormat : '#,###.0'
     } },
-    { name: '객수', fieldName: 'lngCustAmt', header: { text: '객수' } ,footer: {
+    { name: '객수', fieldName: 'lngCustAmt', width: tabInitSetArray.value[6].intHdWidth, numberFormat : '#,##0', header: { text: '객수' ,
+    styleName : 'header-style-6' } ,footer: {
       text: "합계",
       expression: "sum",
+      numberFormat : '#,##0'
     }},
-    { name: '객단가', fieldName: 'lngCustCnt', header: { text: '객단가' } ,footer: {
+    { name: '객단가', fieldName: 'lngCustCnt', width: tabInitSetArray.value[7].intHdWidth, numberFormat : '#,##0', header: { text: '객단가' ,
+    styleName : 'header-style-7' } ,footer: {
       text: "합계",
       expression: "sum",
+      numberFormat : '#,##0'
     } },
-    { name: '총매출액', fieldName: 'lngSalAmt', header: { text: '총매출액' } ,footer: {
+    { name: '총매출액', fieldName: 'lngSalAmt', width: tabInitSetArray.value[8].intHdWidth, numberFormat : '#,##0', header: { text: '총매출액' ,
+    styleName : 'header-style-8'} ,footer: {
       text: "합계",
       expression: "sum",
+      numberFormat : '#,##0'
     } },
-    { name: '할인액', fieldName: 'lngDiscount', header: { text: '할인액' } ,footer: {
+    { name: '할인액', fieldName: 'lngDiscount', width: tabInitSetArray.value[9].intHdWidth, numberFormat : '#,##0', header: { text: '할인액',
+    styleName : 'header-style-9' } ,footer: {
       text: "합계",
       expression: "sum",
+      numberFormat : '#,##0'
     }},
-    { name: '실매출액', fieldName: 'lngActAmt', header: { text: '실매출액' },footer: {
+    { name: '실매출액', fieldName: 'lngActAmt', width: tabInitSetArray.value[10].intHdWidth, numberFormat : '#,##0', header: { text: '실매출액',
+    styleName : 'header-style-10' },footer: {
       text: "합계",
       expression: "sum",
+      numberFormat : '#,##0'
     } },
-    { name: '부가세', fieldName: 'lngVAT', header: { text: '부가세' },footer: {
+    { name: '부가세', fieldName: 'lngVAT', width: tabInitSetArray.value[11].intHdWidth,numberFormat : '#,##0', header: { text: '부가세' ,
+    styleName : 'header-style-11'},footer: {
       text: "합계",
       expression: "sum",
+      numberFormat : '#,##0'
     } },
-    { name: '순매출액', fieldName: 'lngSupplyAmt', header: { text: '순매출액' } ,footer: {
+    { name: '순매출액', fieldName: 'lngSupplyAmt', width: tabInitSetArray.value[12].intHdWidth, numberFormat : '#,##0', header: { text: '순매출액',
+    styleName : 'header-style-12' } ,footer: {
       text: "합계",
       expression: "sum",
+      numberFormat : '#,##0'
     } },
-    { name: '비율', fieldName: 'dblDistRate', header: { text: '비율' } ,footer: {
+    { name: '비율', fieldName: 'dblDistRate', width: tabInitSetArray.value[13].intHdWidth,numberFormat : '#.0', header: { text: '비율' ,
+    styleName : 'header-style-13' } ,footer: {
       text: "합계",
       expression: "sum",
+      numberFormat : '#,##0'
     }},
     
   ];
@@ -281,19 +336,7 @@ const fetchDataAndRenderGrid = () => {
   });
   gridView.displayOptions.fitStyle = "even";
   gridView.sortingOptions.enabled = true;
-  gridView.onColumnCheckedChanged = function (grid, col, chk) {
-    grid.commit();
-    console.log(col.name + " was checked as: " + chk);
-    if (col.name === "selected") {
-      isAllSelected = !isAllSelected; // 전체 선택 상태 반전
-      const rowCount = dataProvider.getRowCount();
-
-      for (let i = 0; i < rowCount; i++) {
-        dataProvider.setValue(i, "selected", isAllSelected);
-      }
-      gridView.refresh(); // 화면 갱신
-    }
-  };
+  
 
   gridView.onCellEdited = function (grid, itemIndex, row, field) {
     // 데이터가 수정될 때 rows를 갱

@@ -1,22 +1,24 @@
 
-import MasterEnroll from '@/views/masterEnroll.vue';
-import MST05_004INS from '@/views/MST05_004INS.vue';
-import MST05_011INS from '@/views/MST05_011INS.vue';
-import MST57_001INS from '@/views/MST57_001INS.vue';
-import MST57_002INS from '@/views/MST57_002INS.vue';
-import StoreEnroll from '@/views/StoreEnroll.vue';
+import MST01_002INS from "@/views/MIMASTER/MST01_002INS.vue";
+import MST01_032INS from "@/views/MIMASTER/MST01_032INS.vue";
+import MST05_004INS from "@/views/MIMASTER/MST05_004INS.vue";
+import MST05_011INS from "@/views/MIMASTER/MST05_011INS.vue";
+import MST57_001INS from "@/views/MIMASTER/MST57_001INS.vue";
+import MST57_002INS from "@/views/MIMASTER/MST57_002INS.vue";
+
+
 
 export default function salesRouter() {
     return [
       {
         path: 'MST01_032INS.xml',
-        name: 'masterEnroll',
-        component: MasterEnroll
+
+        component: MST01_032INS
       }
       ,{
         path: 'MST01_002INS.xml',
         name: 'storeEnroll',
-        component: StoreEnroll
+        component: MST01_002INS
       },
       {
         path : "MST57_001INS.xml",
