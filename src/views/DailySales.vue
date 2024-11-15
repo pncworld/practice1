@@ -36,20 +36,19 @@
     
     &nbsp;
     &nbsp;
-    <ag-grid-vue :rowData="rowData" :columnDefs="colDefs" style="width: auto; height:660px"
-      class="themeClass ag-theme-quartz" enableCharts="true" :selection="selection" :gridOptions="gridOptions"
-      @grid-ready="onGridReady" groupTotalRow="bottom" </ag-grid-vue>
-
+   
+    <div id="realgrid" style="width: 100%; height: 400px;"></div>
   </div>
 </template>
 
 <script setup>
+
 // 가져온 날짜의 형식을 고치기 위해서 사용 ( 데이터가 yyyy-mm-dd T ~~~ 이런형태여서 T부터 자름)
 import { format } from 'date-fns';
 // 설치한 라이브러리로 만든 달력을 가져옴 ( 재사용 )
 import DateRangePicker from '../components/DateRangePicker.vue';
 // 뷰에서 제공 하는 기능, computed 반응형 상태를 기반으로 다른 로직을 실행해 결과값을 생성 , ref 반응형 변수 선언
-import { computed, ref } from 'vue';
+
 // vuex에서 제공하는 중앙 상태관리 
 import { useStore } from 'vuex';
 // api 호출 함수
@@ -63,6 +62,8 @@ import { getGridInfoList } from '@/api/common';
 // alert 창 자동 꾸미기 위한 라이브러리
 import Swal from 'sweetalert2';
 import { dailySaleReport } from '@/api/misales';
+import { onMounted, ref } from 'vue';
+import { GridView, LocalDataProvider } from 'realgrid';
 
 
 const store = useStore();
@@ -113,82 +114,9 @@ const updateCd = (value) => {
   storeCd.value = value;
 
 }
-const isMobile = store.state.isMobile;
-// 상세보기 눌렀을때 실행하는 함수
-const detailView = () => {
 
-  detailViewtf.value = !detailViewtf.value;
-  colDefs.value.forEach(col => {
-    if (col.field == 'lngSalAmt' || col.field == 'lngDiscount' || col.field == 'lngVAT' || col.field == 'lngSupplyAmt') {
 
-      col.hide = detailViewtf.value;
-    }
-  })
-
-}
-
-// 그리드 설정을 위한 속성 설정
-const gridOptions = {
-  // 한글화
-  localeText: AG_GRID_LOCALE_KR,
-  // 소계 푸터 설정
-  groupIncludeFooter: true,
-  // 집계 함수명을 컬럼 헤더에 추가하지 않음
-  suppressAggFuncInHeader: true,
-  // 행의 스타일 설정
-  getRowStyle: (params) => {
-    // 그룹 행인지 확인
-    if (params.node.group) {
-      // 총계 혹은 소계 인지 확인
-      if (params.node.footer) {
-        if (params.node.level === 0) {
-          return { background: 'rgb(173, 216, 230)', fontWeight: 'bold' }; // 소계 행에 대한 스타일
-        } else {
-          return { background: 'rgb(70, 130, 180)', fontWeight: 'bold' }; // 총계 행에 대한 스타일
-        }
-
-      } else {
-        return { background: 'white', fontWeight: 'bold' }; // 그룹 행에 대한 스타일
-      }
-
-    } else {
-      // 일반 행일 경우
-      const rowIndex = params.node.rowIndex; // 현재 행 인덱스
-      const isChildOfGroup = params.node.parent && params.node.parent.group; // 현재 노드가 그룹의 자식인지 확인
-
-      if (isChildOfGroup) {
-        // 그룹의 자식 행일 경우
-        return rowIndex % 2 === 0 ? { background: '#FAF0E6' } : { background: 'white' };
-      } else {
-        // 일반 행에 대한 스타일
-        return rowIndex % 2 === 0 ? { background: '#FAF0E6' } : {};
-      }
-    }
-  },
-  // 그룹 행이 처음에 펼치게 설정
-  groupDefaultExpanded: 1,
-  // 그룹 행이 화면에 붙여있게 설정 
-  suppressGroupRowsSticky: 'group',
-  // 총계 행이 화면에 붙여있게 설정
-  suppressStickyTotalRow: 'group',
-  // 그룹 헤더가 스크롤 시 고정되지 않도록 설정
-  suppressStickyLabel: true,
-  // 전체 행의 높이 설정
-  rowHeight: 20,
-  // 최종 총합 행을 그리드의 하단에 표시
-  grandTotalRow: 'bottom',
-  // 그룹 행이 전체 행을 차지하지 않도록 설정
-  groupUseEntireRow: false,
-  // rowGroup : true 설정시에 추가로 singleColumn 나타나게 할건지 설정 .
-  groupDisplayType: 'groupRows',
-  groupSuppressBlankHeader : true ,
-  suppressRowTransform : true
-}
-// 행이 생성될 컬럼을 설정 (field, headerName 등등)
-const colDefs = ref([]);
-
-const gridApi = ref(null);
-
+const rows = ref([]);
 // 셀병합 실행함수 
 const rowGroupEnable = (event) => {
   if (!afterSearch.value) {
@@ -218,9 +146,7 @@ const rowGroupEnable = (event) => {
 }
 
 // 그리드 가 생성될때 gridApi 값으로 해당 값을 저장함.
-const onGridReady = (params) => {
-  gridApi.value = params.api;
-}
+
 //  저장된 데이터를 엑셀로 내보내기 함수
 const exportExcel = () => {
   gridApi.value.exportDataAsExcel();
@@ -248,295 +174,136 @@ const searchButton = () => {
       userData.strLanguage
     );
     
-    const result = response.data.dailySales;
+    rows.value = response.data.dailySales;
 
-    updateColumn(result);
+    console.log(rows.value)
     afterSearch.value = true;
+    fetchDataAndRenderGrid()
     store.dispatch("convertLoading", false);
   }
   readsales(); // 세팅된 함수 실행
   // 천단위 마다 쉼표 형식 지정
-  const numberFormat = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-
-  const updateColumn = (result) => {
-    //스타일 태그로 동적으로 headerclass 생성 ( gridHeaderStyle 을 바로줄 수 있는 방법이 없음.)
-    const styleTag = document.createElement("style");
-    document.head.appendChild(styleTag);
-    let column2 = [];
-    let topHeaders = {};
-    let count = 0 ;
-
-    for (let i = 0; i < tabInitSetArray.value.length ; i++) {
-      let TopHeader = tabInitSetArray.value[i].strColID == '' || tabInitSetArray.value[i].strColID == null ;
-      const headerclass = `headerclass-${i}`;
-      const hcolor = tabInitSetArray.value[i].strHdColor;
-      const hbkcolor = tabInitSetArray.value[i].strHdBkColor;
-      styleTag.innerHTML += `.${headerclass} {
-          background-color : ${hbkcolor} !important;
-          color : ${hcolor} !important ;
-       
-      }`
-      
-      // 컬럼마다의 값을 할당 밑은 조건에 해당할때 형식이나 값을 지정해줌.
-      if (TopHeader) {
-        topHeaders = {
-        headerName: tabInitSetArray.value[i].strHdText, 
-        headerClass : headerclass ,
-        children: [] 
-        }
-        count = tabInitSetArray.value[i].intHdColspan ;
-      } else {
-       const column = {
-        field: tabInitSetArray.value[i].strColID,
-        headerName: tabInitSetArray.value[i].strHdText,
-        width: tabInitSetArray.value[i].intHdWidth,
-        headerClass: headerclass,
-        editable : tabInitSetArray.value[i].strEdit === 'true' ? true : false,
-        cellStyle : {
-          textAlign : tabInitSetArray.value[i].strAlign
-        },
-        lockPosition : tabInitSetArray.value[i].strHdFix === 'true' ? false : true ,
-        flex : isMobile && (tabInitSetArray.value[i].strColID =='dtmDate' || tabInitSetArray.value[i].strColID =='lngActAmt') ? 2 : 1 ,
-        hide : isMobile && (tabInitSetArray.value[i].strColID =='strPhen' || tabInitSetArray.value[i].strColID =='strStore' ||tabInitSetArray.value[i].strColID =='strWeekName' )
-        // 콤보박스 설정
-        // cellEditor: 'agRichSelectCellEditor',
-        // cellEditorParams: {
-        //     values: ['매장1', '매장2', '매장3', '매장4', '매장5'],
-        // }
-      }
-      if (tabInitSetArray.value[i].strTotalexpr != null && tabInitSetArray.value[i].strTotalexpr.split('(')[0].includes('sum') && !tabInitSetArray.value[i].strTotalexpr.includes('/')) {
-          column.aggFunc = 'sum'
-      } else if (tabInitSetArray.value[i].strTotalexpr != null && tabInitSetArray.value[i].strTotalexpr.includes('/')) {
-
-       
-        // 2. '/'을 기준으로 lngActAmt와 lngRecCnt를 나눔
-        const divendColumn = tabInitSetArray.value[i].strTotalexpr.split('"')[1]
-        const divColumn = tabInitSetArray.value[i].strTotalexpr.split('"')[3]
-      
-        //결국엔 하드코딩밖에 안됨. // 테이블에 값을 바꾸는 방법 밖에는 없음. ag grid 형식으로 
-        // let divendColumn = tabInitSetArray.value[i].strTotalexpr.split('/')[1];
-        // let divColumn = tabInitSetArray.value[i].strTotalexpr.split('/')[2];
-
-         column.valueGetter = (params) => {
-         
-          if( params.node.footer && params.node.level != 0 ) {
-            const totalLng2 = params.node.allLeafChildren.reduce((sum, childNode) => {
-            return sum + (childNode.data[divendColumn] || 0); // lng2의 합계
-           }, 0);
-
-           const totalLng1 = params.node.allLeafChildren.reduce((sum, childNode) => {
-            return sum + (childNode.data[divColumn] || 0); // lng1의 합계
-          }, 0);
-         
-          // lng1으로 나누기. totalLng1이 0이 아닐 때만 나누기
-             let result = 0 ;
-             if(tabInitSetArray.value[i].strSubSumexpr.includes('round')) {
-                  const loc = tabInitSetArray.value[i].strSubSumexpr.match(/(\d+)\s*\)/);
-                  result = (totalLng2 / totalLng1).toFixed(loc[0]);
-             }
-            return totalLng1 !== 0 ? result : 0; // 0으로 나눌 경우를 방지
-           } else if (params.node.footer && params.node.level == 0 ) {
-            if(tabInitSetArray.value[i].strSubSumexpr != '' && tabInitSetArray.value[i].strSubSumexpr != null && tabInitSetArray.value[i].strSubSumexpr.includes('/')) {
-
-              const insideRound = tabInitSetArray.value[i].strSubSumexpr.split('(')[1].split(')')[0]; // 'lngActAmt/lngRecCnt, 0'
-             
-          // 2. '/'을 기준으로 lngActAmt와 lngRecCnt를 나눔
-            const divendColumn = insideRound.split(',')[0].split('/')[0]
-            const divColumn = insideRound.split(',')[0].split('/')[1]
-             
-              const totalLng2 = params.node.allLeafChildren.reduce((sum, childNode) => {
-              return sum + (childNode.data[divendColumn] || 0); // lng2의 합계
-             }, 0);
-
-              const totalLng1 = params.node.allLeafChildren.reduce((sum, childNode) => {
-              return sum + (childNode.data[divColumn] || 0); // lng1의 합계
-             }, 0);
-
-        // lng1으로 나누기. totalLng1이 0이 아닐 때만 나누기
-               let result = 0 ;
-             if(tabInitSetArray.value[i].strSubSumexpr.includes('round')) {
-               const loc = tabInitSetArray.value[i].strSubSumexpr.match(/(\d+)\s*\)/);
-                result = (totalLng2 / totalLng1 ).toFixed(loc[0]);
-             }
-            return totalLng1 !== 0 ? result : 0; // 0으로 나눌 경우를 방지
-            } else {
-              const totalLng2 = params.node.allLeafChildren.reduce((sum, childNode) => {
-              return sum + (childNode.data[divendColumn] || 0); // lng2의 합계
-           }, 0);
-
-           const totalLng1 = params.node.allLeafChildren.reduce((sum, childNode) => {
-            return sum + (childNode.data[divColumn] || 0); // lng1의 합계
-          }, 0);
-
-           // lng1으로 나누기. totalLng1이 0이 아닐 때만 나누기
-            return totalLng1 !== 0 ? totalLng2 / totalLng1 : 0; // 0으로 나눌 경우를 방지
-            }
-           
-           } 
-              return params.data[tabInitSetArray.value[i].strColID] ;
-           
-            
-          
-        }
-    // 0으로 나누는 것을 방지하기 위한 처리
-      
-  
 }
-// if (tabInitSetArray.value[i].intSuppress == '1') {
-//   column.cellRenderer = (params) => {
-//     const currentRowIndex = params.node.rowIndex;
-//     console.log(params.data)
-//     const currentValue = params.data[tabInitSetArray.value[i].strColID];
 
-//     if (currentRowIndex === 0) {
-//       return currentValue; // 첫 번째 행은 기본값 표시
-//     }
-
-//     const previousRowData = params.api.getDisplayedRowAtIndex(currentRowIndex - 1).data || {};
+let gridView;
+let dataProvider;
+const dulpicatedrows = ref()
+const fetchDataAndRenderGrid = () => {
+  // 1. DataProvider 설정
+  dataProvider = new LocalDataProvider();
   
-//     const previousValue = previousRowData[tabInitSetArray.value[i].strColID];
+  // 2. GridView 설정
+  gridView = new GridView('realgrid');
+  gridView.setDataSource(dataProvider);
 
-//     // 중복된 셀은 빈 셀로 표시 (숨기기)
-//     if (currentValue === previousValue) {
-//       return ''; // 값이 중복되면 빈 셀을 반환
-//     }
+  // 3. 필드 정의
+  const fields = [
+    { fieldName: 'strStore', dataType: 'text' },
+    { fieldName: 'dtmDate', dataType: 'datetime' , datetimeFormat :"yyyy-MM-dd" },
+    { fieldName: 'strWeekName', dataType: 'text' },
+    { fieldName: 'strPhen', dataType: 'text' },
+    { fieldName: 'lngRecCnt', dataType: 'number' },
+    { fieldName: 'lngRecAmt', dataType: 'number' },
+    { fieldName: 'lngCustAmt', dataType: 'number' },
+    { fieldName: 'lngCustCnt', dataType: 'number' },
+    { fieldName: 'lngSalAmt', dataType: 'number' },
+    { fieldName: 'lngDiscount', dataType: 'number' },
+    { fieldName: 'lngActAmt', dataType: 'number' },
+    { fieldName: 'lngVAT', dataType: 'number' },
+    { fieldName: 'lngSupplyAmt', dataType: 'number' },
+    { fieldName: 'dblDistRate', dataType: 'number' },
+  
+  ];
+  dataProvider.setFields(fields);
 
-//     return currentValue;
-//   };
+  let isAllSelected = false; // 전체 선택 상태를 저장
 
-//   column.cellStyle = (params) => {
-//     if(params.data != undefined) {
-//     const currentRowIndex = params.node.rowIndex;
-//     const currentValue = params.data[tabInitSetArray.value[i].strColID];
+  // 4. 컬럼 정의
+  const columns = [
+    { name: '매장명', fieldName: 'strStore',  header: { text: '매장명' } },
+    { name: '일자', fieldName: 'dtmDate', header: { text: '일자' } , datetimeFormat :"yyyy-MM-dd"  },
+    { name: '요일', fieldName: 'strWeekName', header: { text: '요일' } },
+    { name: '날씨', fieldName: 'strPhen', header: { text: '날씨' } },
+    { name: '조수', fieldName: 'lngRecCnt', header: { text: '조수' } ,
+    footer: {
+      text: "합계",
+      expression: "sum",
+    } },
+    { name: '조단가', fieldName: 'lngRecAmt', header: { text: '조단가' },footer: {
+      text: "합계",
+      expression: "avg",
+    } },
+    { name: '객수', fieldName: 'lngCustAmt', header: { text: '객수' } ,footer: {
+      text: "합계",
+      expression: "sum",
+    }},
+    { name: '객단가', fieldName: 'lngCustCnt', header: { text: '객단가' } ,footer: {
+      text: "합계",
+      expression: "sum",
+    } },
+    { name: '총매출액', fieldName: 'lngSalAmt', header: { text: '총매출액' } ,footer: {
+      text: "합계",
+      expression: "sum",
+    } },
+    { name: '할인액', fieldName: 'lngDiscount', header: { text: '할인액' } ,footer: {
+      text: "합계",
+      expression: "sum",
+    }},
+    { name: '실매출액', fieldName: 'lngActAmt', header: { text: '실매출액' },footer: {
+      text: "합계",
+      expression: "sum",
+    } },
+    { name: '부가세', fieldName: 'lngVAT', header: { text: '부가세' },footer: {
+      text: "합계",
+      expression: "sum",
+    } },
+    { name: '순매출액', fieldName: 'lngSupplyAmt', header: { text: '순매출액' } ,footer: {
+      text: "합계",
+      expression: "sum",
+    } },
+    { name: '비율', fieldName: 'dblDistRate', header: { text: '비율' } ,footer: {
+      text: "합계",
+      expression: "sum",
+    }},
     
-//     if (currentRowIndex === 0) {
-//       return {}; // 첫 번째 행은 기본 스타일 적용
-//     }
+  ];
+  gridView.setColumns(columns);
 
-//     const previousRowData = params.api.getDisplayedRowAtIndex(currentRowIndex - 1).data || {};
-//     const previousValue = previousRowData[tabInitSetArray.value[i].strColID];
+  // 5. 샘플 데이터 추가
+  dulpicatedrows.value = rows.value; 
+  dataProvider.setRows(rows.value);
 
-//     if (currentValue === previousValue) {
-//       // 셀 경계선 없애기
-//       return {
-//         display: 'none', // 셀 숨기기
-//         borderBottom : 'none' ,
-//         borderTop : 'none' ,
-//       };
-//     }
+  gridView.setRowIndicator({
+    visible: false
+  });
+  gridView.setCheckBar({
+    visible: false,
+  });
+  gridView.displayOptions.fitStyle = "even";
+  gridView.sortingOptions.enabled = true;
+  gridView.onColumnCheckedChanged = function (grid, col, chk) {
+    grid.commit();
+    console.log(col.name + " was checked as: " + chk);
+    if (col.name === "selected") {
+      isAllSelected = !isAllSelected; // 전체 선택 상태 반전
+      const rowCount = dataProvider.getRowCount();
 
-//     return {}; // 기본 스타일
-//   };
-// }
-// }
-        
-      
-      // 금요일 조단가 avg pncoffice랑 다른 부분 수정 
-      if (tabInitSetArray.value[i].strDisplay == 'number') {
-        
-        column.cellRenderer = (params) => {
-          if (params.node.group && !params.node.footer) {
-            return '';
-          }
-          return params.value !== undefined ? numberFormat.format(params.value) : '';
-        }
+      for (let i = 0; i < rowCount; i++) {
+        dataProvider.setValue(i, "selected", isAllSelected);
       }
-
-      if (tabInitSetArray.value[i].strColID == 'strStore') {
-        column.rowGroup = true;
-        column.cellRenderer = (params) => {
-          // cellUnitedtf가 true일 때는 빈 문자열을 반환
-          if (cellUnitedtf.value) {
-            return ''; // 빈 문자열을 반환하여 셀을 비웁니다.
-          } else {
-            return params.value; // cellUnitedtf가 false일 경우 원래 값을 반환
-          }
-        };
-      }
-      if (tabInitSetArray.value[i].strColID == 'lngSalAmt' || tabInitSetArray.value[i].strColID == 'lngDiscount' || tabInitSetArray.value[i].strColID == 'lngVAT' ||
-        tabInitSetArray.value[i].strColID == 'lngSupplyAmt') {
-        column.hide = detailViewtf.value;
-      }
-      if (tabInitSetArray.value[i].strDisplay == 'date') {
-
-        column.valueGetter = (params) => {
-          if (params.node.footer && params.node.level == 0) {
-            return tabInitSetArray.value[i].strSubSumtext; // 그룹 소계에서만 '소계' 표시
-          } else if (params.node.footer && params.node.level != 0) {
-            return '총합계'
-          }
-          const dateString = params.data?.dtmDate;
-          if (!dateString) {
-            return ''; // dtmDate가 없으면 빈 문자열 반환
-          }
-         
-          const formattedDate = dateString.split(' ')[0]; // YYYY-MM-DD 형식으로 변환
-          return formattedDate;
-        }
-      }
-
-
-      if (tabInitSetArray.value[i].strColID == 'strPhen') {
-          column.valueGetter = (params) => {
-          const weather = params.data?.strPhen;
-          let result = '';
-          if (weather == 'Clear') {
-            result = '맑음'
-          } else if (weather == 'Snow') {
-            result = '눈'
-          }
-          return `${result}`; // 날짜와 요일 반환
-        }
-      }
-      if (tabInitSetArray.value[i].strColID == 'dblDistRate') {
-        column.cellRenderer = (params) => {
-          if (params.node.group && !params.node.footer) {
-            return ''; 
-          }
-          return params.value !== undefined ? Math.round(params.value * 10) / 10 : '';
-        }
-      }
-      // column2로 값을 전달해서 이 값으로 rowData와 맞추기 위해서 설정
-      
-      if ( tabInitSetArray.value[i].intHdColspan == '1' && topHeaders.children.length <= count -1 ) {
-        topHeaders.children.push(column);
-      } else if ( tabInitSetArray.value[i].intHdColspan != '1' && topHeaders.children && topHeaders.children.length == count ) {
-        column2.push(topHeaders);
-        count ++; 
-        column2.push(column);
-      } else {
-        column2.push(column);
-      }
-     
-      
+      gridView.refresh(); // 화면 갱신
     }
-   
-    rowData.value = result.map(item => ({
-      strStoreGroupName: item.strStoreGroupName,
-      dtmDate: item.dtmDate,
-      strStore: item.strStore,
-      strWeekName: item.strWeekName,
-      strPhen: item.strPhen,
-      lngRecCnt: item.lngRecCnt,
-      lngRecAmt: item.lngRecAmt,
-      lngCustCnt: item.lngCustCnt,
-      lngCustAmt: item.lngCustAmt,
-      lngSalAmt: item.lngSalAmt,
-      lngActAmt: item.lngActAmt,
-      lngDiscount: item.lngDiscount,
-      lngVAT: item.lngVAT,
-      lngSupplyAmt: item.lngSupplyAmt,
-      dblDistRate: item.dblDistRate
-    }));
+  };
 
-    colDefs.value = column2;
-
-  }
-  }
-}
+  gridView.onCellEdited = function (grid, itemIndex, row, field) {
+    // 데이터가 수정될 때 rows를 갱
+    gridView.commit();
+  
+  // 이후 데이터 갱신 (필요시 rows를 업데이트)
+    rows.value = dataProvider.getRows();
+ 
+  };
+};
 // 달력 초기 설정값 지정을 위한 변수 설정
 const startDate = ref(format(new Date(), 'yyyy-MM-dd'));
 const endDate = ref(format(new Date(), 'yyyy-MM-dd'));
