@@ -29,7 +29,7 @@
     <div class="flex justify-start items-center ml-5 space-x-3 w-full -mt-5">
       <div class="flex items-center">조회조건 &nbsp;&nbsp;&nbsp;</div>
       <input type="checkbox" id="detail" @click="detailView"><label for="detail">상세보기</label></input>
-      <input type="checkbox" @click="rowGroupEnable($event)" id="cellUnite"><label for="cellUnite">셀병합</label></input>
+      <input type="checkbox" @click="cellUnited()" id="cellUnite"><label for="cellUnite">셀병합</label></input>
     </div>
     </div>
 
@@ -167,7 +167,7 @@ const exportExcel = () => {
 }
 // 조회 함수.
 const searchButton = () => {
-
+  clickedUnited.value = false
   const readsales = async () => {
     if (storeCd.value == undefined) {
       Swal.fire({
@@ -347,6 +347,7 @@ const fetchDataAndRenderGrid = () => {
   ];
   gridView.setColumns(columns);
   gridView.groupBy(["strStore"]);
+  gridView.setRowGroup({ mergeMode: false , expandedAdornments: "footer" });
   // 5. 샘플 데이터 추가
   dulpicatedrows.value = rows.value; 
   dataProvider.setRows(rows.value);
@@ -371,6 +372,16 @@ const fetchDataAndRenderGrid = () => {
  
   };
 };
+//그룹화된 상위 라벨 없애는 방법?
+const clickedUnited = ref(false)
+const cellUnited = () => {
+  if ( clickedUnited.value == false) {
+    gridView.setRowGroup({ mergeMode: true , expandedAdornments: "footer" });
+  } else {
+    gridView.setRowGroup({ mergeMode: false , expandedAdornments: "footer" });
+  }
+ clickedUnited.value = !clickedUnited.value
+}
 // 달력 초기 설정값 지정을 위한 변수 설정
 const startDate = ref(format(new Date(), 'yyyy-MM-dd'));
 const endDate = ref(format(new Date(), 'yyyy-MM-dd'));
@@ -388,65 +399,5 @@ const handleDateRangeUpdate = (newDateRange) => {
 </script>
 
 <style>
-.themeClass {
-   width: 100%;
-   /* db안에 없는 속성으로 헤더 픽셀 값  설정 */
-   /* 그리드의 기본 전경 색상을 설정 */
-  --ag-foreground-color: rgb(0, 0, 0) !important;
-  /* 그리드의 기본 배경색 */
-  --ag-background-color: rgb(255, 255, 255);
-   /* 그리드의 헤더 기본 전경색(텍스트 색상) */
-  /* --ag-header-foreground-color: white !important;
-    그리드의 헤더 기본 배경색 
-  --ag-header-background-color: rgb(68, 68, 107) !important; */
-  /* 그리드 홀수행 배경색  */
-  --ag-odd-row-background-color: rgb(0, 0, 0, 0.03);
-    /* 그리드의 헤더에 표시되는 열 크기 조정 핸들의 색상 */
-   /* --ag-header-column-resize-handle-color: rgb(255, 255, 255) !important; */
 
-   /* 기본 폰트 사이즈 설정 */
-  --ag-font-size: 12px !important;
-  /* 폰트 설정 */
-  --ag-font-family: monospace;
-   /* 행과 행의 경계선 설정 */
-  --ag-row-border-style: solid !important;
-  --ag-row-border-width: 1px !important;
-  --ag-row-border-color: rgb(228, 228, 228) !important;
-  /* 열과열 사이의 경계선 설정 */
-  --ag-cell-horizontal-border: solid rgb(228, 228, 228) !important;
-   /* 행의 높이 설정 */
-  /* --ag-row-height : 20px !important ; */
-  /* 그리드 셀 내부의 수평 여백(패딩)을 설정 */
-  --ag-cell-horizontal-padding: 5px !important;
-}
-
-/* .ag-group-footer {
-  background-color: #fff5e8 ;
-  /* 원하는 배경색 
-  color: white;
-  /* 원하는 글자색 
-} */
-
-/* 그룹 총합계의 배경색 및 글자색 변경 */
-.ag-total-footer {
-  background-color: #B29BC7;
-  /* 원하는 배경색 */
-  color: white;
-  /* 원하는 글자색 */
-}
-
-/*  오버라이드를 통해서 헤더 가운데 정렬 */
-.ag-header-cell-label {
-  justify-content: center ;
-  margin-right: -20px;
-} 
-
-.ag-header-cell-comp-wrapper {
-  display: flex;
-  justify-content: center ;
-
-}
-.cell-span {
-  background-color: brown;
-}
 </style>

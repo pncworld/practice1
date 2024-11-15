@@ -128,7 +128,7 @@ watch(() => route.path, (newPath) => {
   showMenu.value = newPath != '/'; // Update based on new route
  
 });
-
+store.dispatch('convertLoading',false);
 const deleteAllTabs = () => {
   Swal.fire({
       title: '확인',
