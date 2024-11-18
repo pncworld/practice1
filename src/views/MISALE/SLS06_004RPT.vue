@@ -47,7 +47,7 @@
 import { format } from 'date-fns';
 // 설치한 라이브러리로 만든 달력을 가져옴 ( 재사용 )
 import DateRangePicker from '@/components/DateRangePicker.vue';
-// 뷰에서 제공 하는 기능, computed 반응형 상태를 기반으로 다른 로직을 실행해 결과값을 생성 , ref 반응형 변수 선언
+// 엑셀 기능 사용 위한 라이브러리
 
 // vuex에서 제공하는 중앙 상태관리 
 import { useStore } from 'vuex';
@@ -162,9 +162,7 @@ const rowGroupEnable = (event) => {
 // 그리드 가 생성될때 gridApi 값으로 해당 값을 저장함.
 
 //  저장된 데이터를 엑셀로 내보내기 함수
-const exportExcel = () => {
-  gridApi.value.exportDataAsExcel();
-}
+
 // 조회 함수.
 const searchButton = () => {
   clickedUnited.value = false
@@ -199,7 +197,7 @@ const searchButton = () => {
   readsales(); // 세팅된 함수 실행
   // 천단위 마다 쉼표 형식 지정
 }
-
+const detailViewed = ref(false);
 let gridView;
 let dataProvider;
 const dulpicatedrows = ref()
@@ -250,7 +248,15 @@ const fetchDataAndRenderGrid = () => {
     } },
     { name: '요일', fieldName: 'strWeekName', width: tabInitSetArray.value[2].intHdWidth, header: { text: '요일',
     styleName : 'header-style-2' } },
-    { name: '날씨', fieldName: 'strPhen', width: tabInitSetArray.value[3].intHdWidth, header: { text: '날씨',
+    { name: '날씨', fieldName: 'strPhen', width: tabInitSetArray.value[3].intHdWidth ,
+    displayCallback: function(grid, index, value) {   
+      if(value == 'Clear'){
+        return '맑음'
+      } else if(value =='Snow'){
+        return '눈'
+      }
+    }
+   ,header: { text: '날씨',
     styleName : 'header-style-3' } },
     { name: '조수', fieldName: 'lngRecCnt', width: tabInitSetArray.value[4].intHdWidth, numberFormat : '#,##0',  header: { text: '조수',
     styleName : 'header-style-4' } ,
@@ -289,7 +295,7 @@ const fetchDataAndRenderGrid = () => {
       expression: "sum",
       numberFormat: "#,##0",
     } },
-    { name: '총매출액', fieldName: 'lngSalAmt', width: tabInitSetArray.value[8].intHdWidth, numberFormat : '#,##0', header: { text: '총매출액' ,
+    { name: '총매출액', fieldName: 'lngSalAmt', width: tabInitSetArray.value[8].intHdWidth , visible: detailViewed.value , numberFormat : '#,##0', header: { text: '총매출액' ,
     styleName : 'header-style-8'} ,footer: {
       text: "합계",
       expression: "sum",
@@ -298,7 +304,7 @@ const fetchDataAndRenderGrid = () => {
       expression: "sum",
       numberFormat: "#,##0",
     }},
-    { name: '할인액', fieldName: 'lngDiscount', width: tabInitSetArray.value[9].intHdWidth, numberFormat : '#,##0', header: { text: '할인액',
+    { name: '할인액', fieldName: 'lngDiscount', width: tabInitSetArray.value[9].intHdWidth , visible: detailViewed.value, numberFormat : '#,##0', header: { text: '할인액',
     styleName : 'header-style-9' } ,footer: {
       text: "합계",
       expression: "sum",
@@ -307,8 +313,8 @@ const fetchDataAndRenderGrid = () => {
       expression: "sum",
       numberFormat: "#,##0",
     }},
-    { name: '실매출액', fieldName: 'lngActAmt', width: tabInitSetArray.value[10].intHdWidth, numberFormat : '#,##0', header: { text: '실매출액',
-    styleName : 'header-style-10' },footer: {
+    { name: '실매출액', fieldName: 'lngActAmt', width: tabInitSetArray.value[10].intHdWidth , numberFormat : '#,##0', header: { text: '실매출액',
+    styleName : 'header-style-10' }  ,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
@@ -317,7 +323,7 @@ const fetchDataAndRenderGrid = () => {
       numberFormat: "#,##0",
     }},
     { name: '부가세', fieldName: 'lngVAT', width: tabInitSetArray.value[11].intHdWidth,numberFormat : '#,##0', header: { text: '부가세' ,
-    styleName : 'header-style-11'},footer: {
+    styleName : 'header-style-11'} , visible: detailViewed.value,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
@@ -326,7 +332,7 @@ const fetchDataAndRenderGrid = () => {
       numberFormat: "#,##0",
     } },
     { name: '순매출액', fieldName: 'lngSupplyAmt', width: tabInitSetArray.value[12].intHdWidth, numberFormat : '#,##0', header: { text: '순매출액',
-    styleName : 'header-style-12' } ,footer: {
+    styleName : 'header-style-12' }  , visible: detailViewed.value,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
@@ -396,6 +402,42 @@ const handleDateRangeUpdate = (newDateRange) => {
   }
 
 };
+
+
+const detailView = () => {
+  detailViewed.value = !detailViewed.value
+
+  if ( detailViewed.value) {
+    gridView.columnByName("할인액").visible =  true;
+    gridView.columnByName("순매출액").visible =  true;
+    gridView.columnByName("부가세").visible =  true;
+    gridView.columnByName("총매출액").visible =  true;
+  } else {
+    gridView.columnByName("할인액").visible =  false;
+    gridView.columnByName("순매출액").visible =  false;
+    gridView.columnByName("부가세").visible =  false;
+    gridView.columnByName("총매출액").visible =  false;
+  }
+  
+}
+
+
+const exportExcel = () => {
+  gridView.exportGrid({
+      type: "excel",
+      target: "local",
+      fileName: "일자별 매출 현황.xlsx", 
+      showProgress: true,
+      progressMessage: "엑셀 Export중입니다.",
+      indicator: true,
+      header: true,
+      footer: true,
+      compatibility: true,
+      done: function () {  //내보내기 완료 후 실행되는 함수
+          alert("done excel export")
+      }
+  });
+}
 </script>
 
 <style>
