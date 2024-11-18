@@ -225,7 +225,12 @@ export const setSubCategoryUPDATE = (groupCd ,storeCd, areaCd,majorCd , subCd , 
         LANGUAGE_ID: langId } );
 };
 
-
+export const getMenuList = ( groupCd , storeCd) => {
+    return api2.post('/MIMASTER/MST05_011INS.asmx/getTablePosMenu' , {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd
+    })
+}
 
 
 

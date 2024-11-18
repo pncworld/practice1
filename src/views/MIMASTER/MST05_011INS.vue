@@ -1,18 +1,20 @@
 <template>
   <div class="flex justify-between items-center w-full overflow-y-auto">
-  <div class="flex justify-start pl-4 pt-4">
-             <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-32 md:w-auto">
+  <div class="flex justify-start  w-full pl-4 pt-4">
+             <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-full">
               메뉴키 설정
-             </h1><div class="flex justify-end space-x-2 ml-24 md:ml-[945px]"><button @click="searchMenu" class="button search md:w-auto w-14">조회</button>
-            
-              <button @click="savePosMenu" class="button save text-sm  md:w-auto w-14">저장</button>
-            </div></div>
+             </h1></div>
               
              </div>
+             <div class="flex justify-center mr-10 space-x-2 ml-[945px]"><button @click="searchMenu" class="button search md:w-auto w-14">조회</button>
+            
+            <button @click="savePosMenu" class="button save w-auto">저장</button>
+            <button @click="" class="button primary w-auto">복사</button>
+          </div>
 
 </div>
 <br>
-<div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore4 @update:storeAreaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd"></PickStore4> </div> 
+<div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore5 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo"></PickStore5> </div> 
 <div v-if="changePopup" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
   <div class="bg-white p-6 rounded shadow-lg">
     <h2 class="text-lg font-bold">다국어 설정</h2>
@@ -57,16 +59,42 @@
   </div>
 </div>
 </div>
-<div class="flex w-full">
-<div class="flex absolute justify-start w-full h-1/2 left-[25%]  ">
-  <div  class="grid grid-cols-1 grid-rows-5 gap-2 mt-20 w-1/6 h-1/2 justify-center items-center">
-    <button v-for="item in Category" class="p-4 bg-gray-200 rounded-lg shadow-md w-full h-full" @click="showsubCategory(item.MajorCode)">{{ item.MajorName }}</button>
+<div class="flex flex-col w-1/3 h-2/3">
+<div class="flex justify-between mt-10 ml-10 w-full border-b  border-b-gray-300">
+  <div>
+    <button class="contents_tab-button">메뉴관리</button>
+    <button  class="contents_tab-button">TLU관리</button>
+  </div>
+  <div class="mt-3">
+    <button class="whitebutton" @click="searchMenuList">조회</button>
+    <button class="whitebutton">추가</button>
+  </div>
 </div>
+
+<div class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
+  <div class="customtableIndex border border-gray-400 rounded-tl-lg">메뉴분류</div>
+  <div class="px-4 py-2 border border-gray-300 rounded-tr-lg flex ">
+    <select name="" id="" class="flex-1" @change="setSubCd" v-model="forsearchMain">
+      <option value="0">전체</option>
+      <option value="i.GroupCd" v-for="i in MenuGroup"> [{{i.GroupCd}}]{{ i.majorGroupNm }}</option>
+    </select>
+    <select name="" id="" class="flex-1" v-model="forsearchSub">
+      <option value="0">전체</option>
+      <option value="i.GroupCd" v-for="i in SubMenuGroup"> [{{i.GroupCd}}]{{ i.subGroupNm }}</option>
+    </select>
+  </div>
+  <div class="customtableIndex border border-gray-400 rounded-bl-lg">메뉴명/코드</div>
+  <div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" v-model="searchWord"></div>
+</div>
+  <div class="ml-10 mt-5 w-full h-full">
+
+    <div id="realgrid" style="width: 100%; height: 140%;"></div>
+  </div>
 </div>
 <div class="flex flex-col justify-end mr-5">
   <div class="flex absolute left-[50%] top-[24%] w-2/5 h-56">
 <div  class="grid grid-cols-5 grid-rows-2 gap-3 mt-4 w-full h-full ">
-<div v-for="item in subCategory" class=" p-4 bg-gray-200 rounded-lg shadow-md w-full h-full flex justify-center items-center" >
+<div v-for="item in subCategory" class="screen-muuri-sort-empty flex justify-center items-center" >
   <p v-if="item.SubName != ''" @click="showMenuKey(item.SubCode)" class="w-28 h-28 flex items-center justify-center"><button >{{ item.SubName }} </button><button @click.stop="showPopup(item.SubCode)"><font-awesome-icon :icon="['far', 'pen-to-square']" /></button></p> 
   <p v-else-if="item.new == true" class="text-gray-500 w-28 h-28 flex items-center justify-center" @click.stop="addData(item.SubCode)"><button><font-awesome-icon icon="plus" />카테고리 추가</button></p> 
   <p v-else class="text-gray-500 flex items-center justify-center"><button></button></p>
@@ -84,12 +112,12 @@
   :move="onMove"
    @end="onEnd"
    animation="200"
-  class="grid grid-cols-6 grid-rows-5 gap-3 mt-4 w-1/2 h-96 absolute bottom-5 right-10 pb-10 pr-10"
+  class="grid grid-cols-5 grid-rows-6 gap-3 mt-4 w-1/2 h-96 absolute bottom-5 right-10 pb-10 pr-10"
 >
   <div
     v-for="(item, index) in items"
     :key="item.intKeySeq"
-    class="p-4 bg-gray-200 rounded-lg shadow-md w-auto h-auto"
+    class="screen-muuri-sort-empty flex items-center justify-center"
     :data-key="item.intKeySeq"
   >
     <p>{{ item.strKeyName }}</p>
@@ -100,17 +128,17 @@
 
 </div>
 
-</div>
+
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import Sortable from 'sortablejs';
-import PickStore4 from '@/components/pickStore4.vue';
 import { useStore } from 'vuex';
-import { deletetablePosMenuKey, get_category_info, getCategoryInfo, getMultiLingual, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
+import { deletetablePosMenuKey, get_category_info, getCategoryInfo, getMenuList, getMultiLingual, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
 import { VueDraggableNext } from 'vue-draggable-next';
 import Swal from 'sweetalert2';
+import PickStore5 from '@/components/pickStore5.vue';
+import { ButtonVisibility, GridView, LocalDataProvider } from 'realgrid';
 
 
 // 더미 데이터
@@ -119,7 +147,10 @@ const items = ref([]);
 const subOriginCategory = ref([]);
 
 const subCategory = ref(subOriginCategory.value.slice(0,10));
+const forsearchMain = ref('0')
+const forsearchSub = ref('0')
 
+const searchWord = ref('')
 // 드래그 가능한 요소를 설정하는 메서드
 const container = ref(null);
 let draggedItemIndex = null;
@@ -142,6 +173,7 @@ const languageName3 = ref('');
 const languageName4 = ref('');
 const clickedSubCode = ref()
 const maxSubCode = ref();
+const posNo = ref();
 const sortableContainer =ref(null)
 let sortableInstance = null;
 const showPopup = (value) => {
@@ -286,7 +318,9 @@ const nowStoreAreaCd = ref();
 const  handleStoreAreaCd = (newValue) => {
 
 nowStoreAreaCd.value = newValue ;
+console.log(nowStoreAreaCd.value)
 }
+
 const nowStoreCd = ref();
 const afterCategory = ref(false);
 const  handleStoreCd = (newValue) => {
@@ -298,7 +332,9 @@ nowStoreCd.value = newValue ;
 const selectedButton = ref();
 const Category = ref([]);
 const getMultiLang = ref([])
-const mainMultiLang = ref([])
+const MenuGroup = ref([])
+const SubMenuGroup = ref([])
+const MenuKeyGroup = ref([])
 const subMultiLang = ref([])
 const mainCategoryInsert = ref(false)
 const store = useStore();
@@ -347,6 +383,10 @@ if(nowStoreAreaCd.value == '0' || nowStoreAreaCd.value == undefined) {
 }
 store.state.loading = true;
 try {
+    const res2 = await getMenuList(groupCd.value,nowStoreCd.value);
+    MenuGroup.value = res2.data.menuGroup
+    SubMenuGroup.value = res2.data.submenuGroup
+    MenuKeyList.value = res2.data.menuList
    
     const res = await getCategoryInfo( groupCd.value,nowStoreCd.value,nowStoreAreaCd.value);
 
@@ -356,10 +396,14 @@ try {
 
     getMultiLang.value = res1.data.MultiLingual ;
 
-    const res3 = await tablePosMenuKey_v2( groupCd.value,nowStoreCd.value,nowStoreAreaCd.value )
-    MenuKeyList.value = res3.data.menuKeyList
     confirmitem.value = [...MenuKeyList.value]
-    console.log(MenuKeyList.value )
+   
+    MenuKeyList.value = MenuKeyList.value.map(item => {
+    return {
+      ...item,
+      add: '추가'
+    }
+  })
 } catch (error) {
     afterSearch.value = false;
 } finally {
@@ -378,7 +422,9 @@ try {
 calculateMaxSubCode();
 };
 
-
+const setSubCd = () => {
+  // SubMenuGroup.value = 
+}
 const showsubCategory = (value) => {
 clickedMainCategory.value = value;
 currSubCategory.value = Category.value.filter(item => item.MajorCode == value)[0].SubCategory
@@ -545,10 +591,112 @@ const savePosMenu = async() => {
  
 // 빈공간 데이터를 넣으려고하는데 안 들어가고 조회가 안됨 // 빈 칸에 대한 것도 데이터를 불러와야 메뉴키위치를 정할 수 있음.
 
+}
+let gridView;
+let dataProvider;
+const currentSelectedMenuCode = ref('')
+onMounted(() => {
+  showMenuKeys()
+})
+
+const showMenuKeys = () => {
  
+  if (gridView) {
+    gridView.destroy();  // 기존 그리드 인스턴스 파괴
+  }
+
+  dataProvider = new LocalDataProvider();
+  
+  // 2. GridView 설정
+  gridView = new GridView('realgrid');
+  gridView.setDataSource(dataProvider);
+
+  // 3. 필드 정의
+  const fields = [
+    { fieldName: 'menuCd', dataType: 'text' },
+    { fieldName: 'menuNm', dataType: 'text' },
+    { fieldName: 'lngPrice', dataType: 'number'  },
+    { fieldName: 'add', dataType:'text' },
+  ];
+  dataProvider.setFields(fields);
+
+
+  // 4. 컬럼 정의
+  const columns = [
+    { name: '메뉴코드', fieldName: 'menuCd',  header: { text: '메뉴코드' ,
+    styleName : 'header-style-0'
+     } },
+    { name: '메뉴명', fieldName: 'menuNm',  header: { text: '메뉴명'  ,
+    styleName : 'header-style-1'
+    } },
+    { name: '판매가', fieldName: 'lngPrice', header: { text: '판매가',
+    styleName : 'header-style-2' } , numberFormat : '#,##0' },
+    { name: '선택', fieldName: 'add'
+      ,header: { text: '선택',styleName : 'header-style-3'} , editable:false, renderer:{
+      type:"button"
+     }
+
+    },
+    
+  ];
+  gridView.setColumns(columns);
+  // 5. 샘플 데이터 추가
+  dataProvider.setRows(MenuKeyList.value);
+  gridView.sortMode = 'explicit';
+  gridView.filterMode = 'explicit';
+  gridView.setFooters({ visible: false})
+  gridView.setRowIndicator({
+    visible: true
+  });
+  gridView.setCheckBar({
+    visible: false,
+  });
+  gridView.displayOptions.fitStyle = "even";
+  gridView.sortingOptions.enabled = true;
+  
+
+  gridView.onCellEdited = function (grid, itemIndex, row, field) {
+    // 데이터가 수정될 때 rows를 갱
+    gridView.commit();
+  
+  // 이후 데이터 갱신 (필요시 rows를 업데이트)
  
+  };
+
+  gridView.onCellItemClicked = function (grid, index, clickData) {
+    currentSelectedMenuCode.value = dataProvider.getRows()[clickData.itemIndex][0]
+   
+  return true;
+}
+
+
 
 }
+const searchMenuList = () => {
+  
+  var filters = [
+  {
+    name: "custom",
+    criteria: `value = '${searchWord.value}'`,
+    active: true
+  }
+];
+  var col = gridView.columnByName('메뉴코드')
+  var col2 = gridView.columnByName('메뉴명')
+  col.setFilters( filters );
+  col2.setFilters( filters );
+
+
+}
+const handlePosNo = (newValue) => {
+  posNo.value = newValue
+  searchMenu()
+}
+
+watch(() => MenuKeyList.value, () => {
+  showMenuKeys();  // MenuKeyList 값이 변경될 때마다 그리드 업데이트
+});
+
 </script>
 
 <style scoped>
