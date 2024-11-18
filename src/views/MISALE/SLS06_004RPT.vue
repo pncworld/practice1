@@ -29,7 +29,7 @@
     <div class="flex justify-start items-center ml-5 space-x-3 w-full -mt-5">
       <div class="flex items-center">조회조건 &nbsp;&nbsp;&nbsp;</div>
       <input type="checkbox" id="detail" @click="detailView"><label for="detail">상세보기</label></input>
-      <input type="checkbox" @click="rowGroupEnable($event)" id="cellUnite"><label for="cellUnite">셀병합</label></input>
+      <input type="checkbox" @click="cellUnited()" id="cellUnite"><label for="cellUnite">셀병합</label></input>
     </div>
     </div>
 
@@ -47,7 +47,7 @@
 import { format } from 'date-fns';
 // 설치한 라이브러리로 만든 달력을 가져옴 ( 재사용 )
 import DateRangePicker from '@/components/DateRangePicker.vue';
-// 뷰에서 제공 하는 기능, computed 반응형 상태를 기반으로 다른 로직을 실행해 결과값을 생성 , ref 반응형 변수 선언
+// 엑셀 기능 사용 위한 라이브러리
 
 // vuex에서 제공하는 중앙 상태관리 
 import { useStore } from 'vuex';
@@ -162,12 +162,10 @@ const rowGroupEnable = (event) => {
 // 그리드 가 생성될때 gridApi 값으로 해당 값을 저장함.
 
 //  저장된 데이터를 엑셀로 내보내기 함수
-const exportExcel = () => {
-  gridApi.value.exportDataAsExcel();
-}
+
 // 조회 함수.
 const searchButton = () => {
-
+  clickedUnited.value = false
   const readsales = async () => {
     if (storeCd.value == undefined) {
       Swal.fire({
@@ -199,7 +197,7 @@ const searchButton = () => {
   readsales(); // 세팅된 함수 실행
   // 천단위 마다 쉼표 형식 지정
 }
-
+const detailViewed = ref(false);
 let gridView;
 let dataProvider;
 const dulpicatedrows = ref()
@@ -245,12 +243,20 @@ const fetchDataAndRenderGrid = () => {
     { name: '일자', fieldName: 'dtmDate', width: tabInitSetArray.value[1].intHdWidth, header: { text: '일자'  ,
     styleName : 'header-style-1'
     } , datetimeFormat :"yyyy-MM-dd" , groupFooter: {
-      expression: "소계",
+      text: "소계",
   
     } },
     { name: '요일', fieldName: 'strWeekName', width: tabInitSetArray.value[2].intHdWidth, header: { text: '요일',
     styleName : 'header-style-2' } },
-    { name: '날씨', fieldName: 'strPhen', width: tabInitSetArray.value[3].intHdWidth, header: { text: '날씨',
+    { name: '날씨', fieldName: 'strPhen', width: tabInitSetArray.value[3].intHdWidth ,
+    displayCallback: function(grid, index, value) {   
+      if(value == 'Clear'){
+        return '맑음'
+      } else if(value =='Snow'){
+        return '눈'
+      }
+    }
+   ,header: { text: '날씨',
     styleName : 'header-style-3' } },
     { name: '조수', fieldName: 'lngRecCnt', width: tabInitSetArray.value[4].intHdWidth, numberFormat : '#,##0',  header: { text: '조수',
     styleName : 'header-style-4' } ,
@@ -258,76 +264,101 @@ const fetchDataAndRenderGrid = () => {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
-    } ,groupFooter: {
-      valueCallback: function (grid, column, groupFooterIndex, group, value) {
-        //계산 후 표시하고 싶은 값을 return
-        var groupModel = grid.getGroupModel(group.index);
-        return grid.getGroupSummary(groupModel, "Age").count + ' 건';
-      },
-      styleName: "right-column"
-    },},
+    } , groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
+    }},
     { name: '조단가', fieldName: 'lngRecAmt', width: tabInitSetArray.value[5].intHdWidth, numberFormat : '#,##0', header: { text: '조단가' ,
     styleName : 'header-style-5' },footer: {
       text: "합계",
       expression: "avg",
       numberFormat : '#,###.0'
-    } },
+    } , groupFooter: {
+      expression: "avg",
+      numberFormat: "#,##0",
+    }},
     { name: '객수', fieldName: 'lngCustAmt', width: tabInitSetArray.value[6].intHdWidth, numberFormat : '#,##0', header: { text: '객수' ,
     styleName : 'header-style-6' } ,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
+    } , groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
     }},
     { name: '객단가', fieldName: 'lngCustCnt', width: tabInitSetArray.value[7].intHdWidth, numberFormat : '#,##0', header: { text: '객단가' ,
     styleName : 'header-style-7' } ,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
+    } , groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
     } },
-    { name: '총매출액', fieldName: 'lngSalAmt', width: tabInitSetArray.value[8].intHdWidth, numberFormat : '#,##0', header: { text: '총매출액' ,
+    { name: '총매출액', fieldName: 'lngSalAmt', width: tabInitSetArray.value[8].intHdWidth , visible: detailViewed.value , numberFormat : '#,##0', header: { text: '총매출액' ,
     styleName : 'header-style-8'} ,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
-    } },
-    { name: '할인액', fieldName: 'lngDiscount', width: tabInitSetArray.value[9].intHdWidth, numberFormat : '#,##0', header: { text: '할인액',
+    } , groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
+    }},
+    { name: '할인액', fieldName: 'lngDiscount', width: tabInitSetArray.value[9].intHdWidth , visible: detailViewed.value, numberFormat : '#,##0', header: { text: '할인액',
     styleName : 'header-style-9' } ,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
+    }, groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
     }},
-    { name: '실매출액', fieldName: 'lngActAmt', width: tabInitSetArray.value[10].intHdWidth, numberFormat : '#,##0', header: { text: '실매출액',
-    styleName : 'header-style-10' },footer: {
+    { name: '실매출액', fieldName: 'lngActAmt', width: tabInitSetArray.value[10].intHdWidth , numberFormat : '#,##0', header: { text: '실매출액',
+    styleName : 'header-style-10' }  ,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
-    } },
+    } , groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
+    }},
     { name: '부가세', fieldName: 'lngVAT', width: tabInitSetArray.value[11].intHdWidth,numberFormat : '#,##0', header: { text: '부가세' ,
-    styleName : 'header-style-11'},footer: {
+    styleName : 'header-style-11'} , visible: detailViewed.value,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
+    }, groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
     } },
     { name: '순매출액', fieldName: 'lngSupplyAmt', width: tabInitSetArray.value[12].intHdWidth, numberFormat : '#,##0', header: { text: '순매출액',
-    styleName : 'header-style-12' } ,footer: {
+    styleName : 'header-style-12' }  , visible: detailViewed.value,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
-    } },
+    } , groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
+    }},
     { name: '비율', fieldName: 'dblDistRate', width: tabInitSetArray.value[13].intHdWidth,numberFormat : '#.0', header: { text: '비율' ,
     styleName : 'header-style-13' } ,footer: {
       text: "합계",
       expression: "sum",
       numberFormat : '#,##0'
+    }, groupFooter: {
+      expression: "sum",
+      numberFormat: "#,##0",
     }},
     
   ];
   gridView.setColumns(columns);
-
+  gridView.groupBy(["strStore"]);
+  gridView.setRowGroup({ mergeMode: false , expandedAdornments: "footer" });
   // 5. 샘플 데이터 추가
   dulpicatedrows.value = rows.value; 
   dataProvider.setRows(rows.value);
-
+  gridView.sortMode = 'explicit';
+  gridView.filterMode = 'explicit';
   gridView.setRowIndicator({
     visible: false
   });
@@ -347,6 +378,16 @@ const fetchDataAndRenderGrid = () => {
  
   };
 };
+//그룹화된 상위 라벨 없애는 방법?
+const clickedUnited = ref(false)
+const cellUnited = () => {
+  if ( clickedUnited.value == false) {
+    gridView.setRowGroup({ mergeMode: true , expandedAdornments: "footer" });
+  } else {
+    gridView.setRowGroup({ mergeMode: false , expandedAdornments: "footer" });
+  }
+ clickedUnited.value = !clickedUnited.value
+}
 // 달력 초기 설정값 지정을 위한 변수 설정
 const startDate = ref(format(new Date(), 'yyyy-MM-dd'));
 const endDate = ref(format(new Date(), 'yyyy-MM-dd'));
@@ -361,68 +402,44 @@ const handleDateRangeUpdate = (newDateRange) => {
   }
 
 };
+
+
+const detailView = () => {
+  detailViewed.value = !detailViewed.value
+
+  if ( detailViewed.value) {
+    gridView.columnByName("할인액").visible =  true;
+    gridView.columnByName("순매출액").visible =  true;
+    gridView.columnByName("부가세").visible =  true;
+    gridView.columnByName("총매출액").visible =  true;
+  } else {
+    gridView.columnByName("할인액").visible =  false;
+    gridView.columnByName("순매출액").visible =  false;
+    gridView.columnByName("부가세").visible =  false;
+    gridView.columnByName("총매출액").visible =  false;
+  }
+  
+}
+
+
+const exportExcel = () => {
+  gridView.exportGrid({
+      type: "excel",
+      target: "local",
+      fileName: "일자별 매출 현황.xlsx", 
+      showProgress: true,
+      progressMessage: "엑셀 Export중입니다.",
+      indicator: true,
+      header: true,
+      footer: true,
+      compatibility: true,
+      done: function () {  //내보내기 완료 후 실행되는 함수
+          alert("done excel export")
+      }
+  });
+}
 </script>
 
 <style>
-.themeClass {
-   width: 100%;
-   /* db안에 없는 속성으로 헤더 픽셀 값  설정 */
-   /* 그리드의 기본 전경 색상을 설정 */
-  --ag-foreground-color: rgb(0, 0, 0) !important;
-  /* 그리드의 기본 배경색 */
-  --ag-background-color: rgb(255, 255, 255);
-   /* 그리드의 헤더 기본 전경색(텍스트 색상) */
-  /* --ag-header-foreground-color: white !important;
-    그리드의 헤더 기본 배경색 
-  --ag-header-background-color: rgb(68, 68, 107) !important; */
-  /* 그리드 홀수행 배경색  */
-  --ag-odd-row-background-color: rgb(0, 0, 0, 0.03);
-    /* 그리드의 헤더에 표시되는 열 크기 조정 핸들의 색상 */
-   /* --ag-header-column-resize-handle-color: rgb(255, 255, 255) !important; */
 
-   /* 기본 폰트 사이즈 설정 */
-  --ag-font-size: 12px !important;
-  /* 폰트 설정 */
-  --ag-font-family: monospace;
-   /* 행과 행의 경계선 설정 */
-  --ag-row-border-style: solid !important;
-  --ag-row-border-width: 1px !important;
-  --ag-row-border-color: rgb(228, 228, 228) !important;
-  /* 열과열 사이의 경계선 설정 */
-  --ag-cell-horizontal-border: solid rgb(228, 228, 228) !important;
-   /* 행의 높이 설정 */
-  /* --ag-row-height : 20px !important ; */
-  /* 그리드 셀 내부의 수평 여백(패딩)을 설정 */
-  --ag-cell-horizontal-padding: 5px !important;
-}
-
-/* .ag-group-footer {
-  background-color: #fff5e8 ;
-  /* 원하는 배경색 
-  color: white;
-  /* 원하는 글자색 
-} */
-
-/* 그룹 총합계의 배경색 및 글자색 변경 */
-.ag-total-footer {
-  background-color: #B29BC7;
-  /* 원하는 배경색 */
-  color: white;
-  /* 원하는 글자색 */
-}
-
-/*  오버라이드를 통해서 헤더 가운데 정렬 */
-.ag-header-cell-label {
-  justify-content: center ;
-  margin-right: -20px;
-} 
-
-.ag-header-cell-comp-wrapper {
-  display: flex;
-  justify-content: center ;
-
-}
-.cell-span {
-  background-color: brown;
-}
 </style>
