@@ -81,8 +81,9 @@ const emitStoreCode = (value) => {
 };
 
 const emitPosInfo = (value1 ,value2) => {
-  emit('areaCd' ,value2 )
-  emit('posNo' ,value1 )
+
+  emit('areaCd' ,value1 )
+  emit('posNo' ,value2 )
 }
   storeGroup.value = store.state.storeGroup;
   storeType.value = store.state.storeType;

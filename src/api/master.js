@@ -232,5 +232,31 @@ export const getMenuList = ( groupCd , storeCd) => {
     })
 }
 
+export const getTablePosMenuKey = ( groupCd , storeCd , areaCd , posNo) => {
+    return axios.post('http://localhost:49840/MIMASTER/MST05_011INS.asmx/getTablePosMenuKey' , {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD : areaCd ,
+        POSNO : posNo
+    })
+}
+export const getScreenList = ( groupCd , storeCd , areaCd , posNo ,  screenType) => {
+    return axios.post('http://localhost:49840/MIMASTER/MST05_011INS.asmx/getScreenList' , {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD : areaCd ,
+        POSNO : posNo ,
+        SCREEN_TYPE : screenType
+    })
+}
+
+export const getMenuKeyList = ( groupCd , storeCd , areaCd) => {
+    return axios.post('http://localhost:49840/MIMASTER/MST05_011INS.asmx/getMenuKeyList' , {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD : areaCd 
+    })
+}
+
 
 
