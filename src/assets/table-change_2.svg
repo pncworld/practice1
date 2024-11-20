@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<svg width="36" height="36" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" enable-background="new 0 0 36 36" version="1.1" xml:space="preserve">
+ <style type="text/css">.st0{fill:#FFFFFF;}
+	.st1{fill:none;stroke:#E4E4E4;}
+	.st2{fill:none;}
+	.st3{fill:#5C5C5C;}</style>
+ <g class="layer">
+  <title>Layer 1</title>
+  <g id="Btn_ic_calendar_last" transform="rotate(180 30 30)">
+   <rect class="st2" height="24" id="사각형_612" width="24" x="30" y="30"/>
+  </g>
+  <g id="svg_3">
+   <rect class="st3" height="1.8" id="svg_4" width="13" x="11.5" y="12"/>
+   <rect class="st3" height="1.8" id="svg_5" width="13" x="11.5" y="17.1"/>
+   <rect class="st3" height="1.8" id="svg_6" width="13" x="11.5" y="22.2"/>
+  </g>
+ </g>
+</svg>
