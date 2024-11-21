@@ -9,29 +9,16 @@
              <div class="flex justify-center mr-10 space-x-2 ml-[945px]"><button @click="searchMenu" class="button search md:w-auto w-14">조회</button>
             
             <button @click="savePosMenu" class="button save w-auto">저장</button>
-            <button @click="" class="button primary w-auto">복사</button>
+            <button @click="showPopup2 = true" class="button primary w-auto">복사</button>
           </div>
 
 </div>
 <br>
-<div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore5 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo"></PickStore5> </div> 
-<div v-if="changePopup" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-  <div class="bg-white p-6 rounded shadow-lg">
-    <h2 class="text-lg font-bold">다국어 설정</h2>
-    <div class="flex flex-col justify-start">
-    <p>한국어</p><input type="text" class="border border-gray-400 pl-1" v-model="languageName0">
-    <p>영어</p><input type="text" class="border border-gray-400 pl-1" v-model="languageName1">
-    <p>중국어</p><input type="text" class="border border-gray-400 pl-1" v-model="languageName2">
-    <p>일본어</p><input type="text" class="border border-gray-400 pl-1" v-model="languageName3">
-    <p>스페인어</p><input type="text" class="border border-gray-400 pl-1" v-model="languageName4">
+<div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore5 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm"></PickStore5> </div> 
+<div>
+    <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :posNo="posNo">
+    </DupliPopUp>
   </div>
-  <div class="flex justify-center space-x-3">
-    <button @click="setLang()" class="mt-4 p-2 bg-blue-500 text-white rounded">확인</button>
-    <button @click="showPopup(false)" class="mt-4 p-2 bg-blue-500 text-white rounded">닫기</button>
-  </div>
-  </div>
-  
-</div>
 
 <div v-if="changeScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center  z-50">
   <div class="bg-white p-6 rounded shadow-lg w-[25%] h-[40%] ">
@@ -77,7 +64,6 @@
   >
     <div
       v-for="(item, index) in ScreenKeyOrigin"
-      :key="item.intScreenNo"
       class="p-4 bg-gray-200 rounded-lg shadow-md cursor-move h-12"
       v-show="item && item.strScreenName !== ''"
     >
@@ -90,9 +76,10 @@
   </div>
 </div>
 </div>
+<span class="h-5 mt-3 flex justify-between items-center w-[850px] ml-[700px]"><h1 class="font-bold text-xl">메뉴키 설정</h1><span class="flex space-x-3">순서변경 &nbsp; &nbsp;<label><input type="radio" name="changingMode" @click="changingMode(1)" checked>교체하기 </label><label><input type="radio" name="changingMode" @click="changingMode(2)">밀어내기</label></span></span> 
 <div class="flex h-5/6 w-full">
 <div class="flex flex-col w-3/5 h-4/6">
-<div class="flex justify-between mt-10 ml-10 w-full border-b  border-b-gray-300">
+<div class="flex justify-between mt-0 ml-10 w-full border-b  border-b-gray-300">
   
   <div>
     <button class="contents_tab-button " :class="{'text-blue-600' : currentMenu==false }" @click="showMenus(1)">메뉴관리</button>
@@ -137,13 +124,12 @@
   </div>
 </div>
 </div>
-<!-- <div><button class="button primary " @click="changingMode">교체하기밀어내기</button></div> -->
 <div class="grid grid-rows-[2fr,5fr] grid-cols-1 ml-10 w-full h-full">
   <div class="flex h-full w-[950px] mt-10" v-show="afterSearch" >
-  <div  class="grid grid-cols-5 grid-rows-2 gap-0  ml-10 mt-0 w-full h-[80%]">
-<div v-for="item in ScreenKeys" class="screen-muuri-sort-empty flex justify-center items-center w-[160px] h-[90px] " >
-  <p v-if="item.strScreenName != ''" @click="showMenuKey(item.intScreenNo)" class=" flex items-center justify-center"><button >{{ item.strScreenName }} </button><button @click.stop="editScreenKey(item.intScreenNo)"><font-awesome-icon :icon="['far', 'pen-to-square']" /></button></p> 
-  <p v-else-if="item.new == true" @click="addScreenKey(item.intScreenNo)" class=" flex items-center justify-center"><button > 화면키 추가 </button></p> 
+  <div  class="grid grid-cols-5 grid-rows-2 gap-1 ml-10 mt-0 w-full h-[80%]">
+<div v-for="(item,index) in ScreenKeys" class="screen-muuri-sort-empty flex justify-center items-center w-full h-full "  :class="{'!bg-orange-500 !border-blue-700' : clickedScreenKeyIndex==index }" @click="clickedScreenKeyIndex = index">
+  <p v-if="item.strScreenName != ''" @click="showMenuKey(item.intScreenNo)" class=" flex items-center justify-center w-full h-full"><button class="">{{ item.strScreenName }}</button><button @click.stop="editScreenKey(item.intScreenNo)"><font-awesome-icon :icon="['far', 'pen-to-square']" /></button></p> 
+  <p v-else-if="item.new == true" @click="addScreenKey(item.intScreenNo)" class=" flex items-center justify-center w-full h-full"><button class="w-full h-full"> 화면키 추가 </button></p> 
   <p v-else class="flex items-center justify-center"></p> 
 
 </div>
@@ -152,19 +138,19 @@
 
 </div>
 <div v-show="afterSearch"  class="flex mt-2 w-[950px] h-full">
- <div class="flex w-[950px] h-full ">
+ <div class="flex w-full h-full ">
   <VueDraggableNext
   v-model="items"
   :move="onMove"
    @end="onEnd"
    animation="200"
-  class="grid grid-cols-5 grid-rows-6  ml-10 mt-4 w-full h-full gap-0 " 
+  class="grid grid-cols-5 grid-rows-6  ml-10 mt-4 w-full h-full gap-1 " 
 >
   <div
     v-for="(item, index) in items"
     :key="index"
-    class="screen-muuri-sort-empty flex items-center justify-center w-[160px] h-[90px]"
-    :class="{'!bg-orange-300 !border-gray-400' : clickedMenuKey==index }"
+    class="screen-muuri-sort-empty flex items-center justify-center "
+    :class="{' !border-blue-700' : clickedMenuKey==index }"
     @click="saveMenuKeyposition(index); clickedMenuKey = index;"
   >
     {{ item ? item.strKeyName : '' }}
@@ -194,11 +180,12 @@ import { VueDraggableNext } from 'vue-draggable-next';
 import Swal from 'sweetalert2';
 import PickStore5 from '@/components/pickStore5.vue';
 import {  GridView, LocalDataProvider } from 'realgrid';
+import DupliPopUp from '@/components/dupliPopUp.vue';
 
 
 // 더미 데이터
 const items = ref([]);
-
+const clickedScreenKeyIndex = ref()
 const ScreenKeyOrigin = ref([]);
 const clickedMenuKey = ref()
 const ScreenKeys = ref();
@@ -210,9 +197,19 @@ const searchWord2 = ref('')
 // 드래그 가능한 요소를 설정하는 메서드
 const currentsubPage = ref(1);
 const changeMode = ref(false);
-const changingMode = () => {
-changeMode.value =!changeMode.value;
+const changingMode = (data) => {
+  if ( data == 1){
+    changeMode.value = false
+  } else {
+    changeMode.value = true
+  }
+
 }
+const clickedStoreNm = ref()
+const handlestoreNm = (newData) => {
+  clickedStoreNm.value = newData
+}
+const showPopup2 = ref(false)
 const showChangeScreenKey = ref(false)
 const changePopup = ref(false);
 const deleteAllitems = ref([]);
@@ -514,8 +511,13 @@ return true;
 }
 
 };
+let targetItemIndex3 ; 
+let dupliScreenKeyOrigin;
 const onMove2 = (evt) => {
 // 예: 드래그 중 이동할 때의 조건 등을 설정할 수 있음
+targetItemIndex3 = Array.from(evt.from.children).indexOf(evt.related)
+
+dupliScreenKeyOrigin = [...ScreenKeyOrigin.value]
 return true;
 
 };
@@ -543,11 +545,27 @@ updateMenuKey.value = true
 
 console.log(items.value)
 };
+
+const onEnd2 = (evt) => {
+    console.log(ScreenKeyOrigin.value)
+    const originScreenNo =  dupliScreenKeyOrigin[evt.oldIndex].intScreenNo
+    const targetScreenNo =  dupliScreenKeyOrigin[targetItemIndex3].intScreenNo
+    ScreenKeyOrigin.value.forEach((item,index) => {
+      item.intScreenNo = (index+1)
+    })
+    MenuKeyList.value.filter(item => item.intPosNo == posNo.value ).forEach((item,index) => {
+      if(item.intScreenNo == originScreenNo) {
+        item.intScreenNo = targetItemIndex3+1
+      } else if ( item.intScreenNo == targetScreenNo ){
+        item.intScreenNo = evt.oldIndex+1
+      }
+    })
+    addfor10ScreenKey()
+}
 watch( items , (newvalue) => {
   console.log(newvalue)
     newvalue.forEach((item,index) => {
-      console.log(item)
-        if ( item == null){
+        if ( item == null || item.lngKeyscrNo == null || item.lngKeyscrNo == ''){
           newvalue[index] = { intKeySeq : index + (currmenuKeyPage.value -1)*30 +1}
         } else {
           item.intKeySeq = index + (currmenuKeyPage.value -1)*30 +1;
@@ -555,7 +573,6 @@ watch( items , (newvalue) => {
         
     
     })
-
     console.log(items.value)
     console.log(MenuKeyList.value)
 
@@ -979,13 +996,7 @@ const confirmaddScreenKey = () => {
   clickedScreenNo.value = ''
 }
 
-const onEnd2 = () => {
-    ScreenKeyOrigin.value.forEach((item,index) => {
-      item.intScreenNo = (index+1)
-    })
-    console.log( ScreenKeyOrigin.value)
-    addfor10ScreenKey()
-}
+
 
 const prevMenuKey = () => {
   if(currmenuKeyPage.value == 1){
@@ -1031,7 +1042,7 @@ clickedRealIndex.value = (currmenuKeyPage.value - 1) * 30 + index + 1
 
 const addMenuKey =() => {
   console.log( MenuKeyList.value)
-  const foraddIndex = MenuKeyList.value.findIndex(item => item.intKeySeq == clickedRealIndex.value)
+  const foraddIndex = MenuKeyList.value.filter(item => item.intPosNo == posNo.value && item.intScreenNo == clickedintScreenNo.value).findIndex(item => item.intKeySeq == clickedRealIndex.value)
   console.log(foraddIndex)
   if( foraddIndex == -1) {
     MenuKeyList.value.push({intKeyNo: 6, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value})

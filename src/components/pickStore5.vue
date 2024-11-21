@@ -53,7 +53,7 @@ const selectedPosNo = ref('0');
 const changed = ref(false)
 const ischanged = () => {
     changed.value = !changed.value;
-    console.log("여긴")
+  
     console.log(changed.value)
     emit('update:ischanged',changed.value);
 };
@@ -66,7 +66,7 @@ const props = defineProps({
     })
 const {groupCdDisabled} = props ;
 isDisabled1.value = groupCdDisabled;
-const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd', 'areaCd', 'posNo' ,'update:ischanged']);
+const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd', 'areaCd', 'posNo' ,'update:ischanged' ,'storeNm']);
 const emitStoreGroup = (value) => {
     emit('update:storeGroup', value);
 };
@@ -76,7 +76,9 @@ const emitStoreType = (value) => {
 };
 
 const emitStoreCode = (value) => {
-    
+  const selectedNm = storeCd.value.filter(item => item.lngStoreCode == value)[0].strName
+
+    emit('storeNm' ,selectedNm )
     emit('update:storeCd', value);
 };
 
