@@ -1,20 +1,20 @@
 <template>
     <div class="flex items-center justify-end space-x-3 text-xs ">
-     <div class="font-bold text-sm pl-4 hidden md:inline-block"> 매장명 :  </div>
+     <div class="font-bold text-sm pl-12 hidden md:inline-block"> 매장명 :  </div>
       <div class="hidden md:block">
-        <select :disabled="isDisabled1"   id="storeGroup" class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreGroup($event.target.value)">
+        <select :disabled="isDisabled1"   id="storeGroup" class="border border-gray-800 rounded-md p-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreGroup($event.target.value); ischanged();">
           <option :value="item.lngStoreGroup" v-for="item in storeGroup" :key="item.lngStoreGroup">{{ item.strName }}</option>
         </select>
       </div>
       <div class="hidden md:block">
-        <select :disabled="isDisabled2"  class=" border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="setStore($event.target.value); emitStoreType($event.target.value);">
+        <select :disabled="isDisabled2"  class=" border border-gray-800 rounded-md p-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="setStore($event.target.value); emitStoreType($event.target.value); ischanged();">
          
           <option value="0">전체</option>
           <option :value="item.lngStoreAttr" v-for="item in storeType" :key="item.lngStoreAttr">{{ item.strName }}</option>
         </select>
       </div>
       <div class="flex flex-col space-y-3">
-       <div><span class="font-bold text-sm pl-4 inline-block md:hidden"> 매장명 : </span> <select :disabled="isDisabled3"  class="w-2/3 md:w-auto border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreCode($event.target.value); setPosNo($event.target.value); ischanged(); ">
+       <div><span class="font-bold text-sm pl-4 inline-block md:hidden"> 매장명 : </span> <select :disabled="isDisabled3"  class="text-sm w-2/3 md:w-auto border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreCode($event.target.value); setPosNo($event.target.value); ischanged(); ">
         
           <option value="0">선택</option>
           <option :value="item.lngStoreCode" v-for="item in storeCd" :key="item.lngStoreCode">{{ item.strName }}</option>
@@ -24,7 +24,7 @@
         
     </div>
       <div class="">
-        <span class="font-bold text-sm ">포스번호 : &nbsp;</span> <select :disabled="isDisabled4"  class="w-32 border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" v-model="selectedPosNo">
+        <span class="font-bold text-sm ">포스번호 : &nbsp;</span> <select :disabled="isDisabled4"  class="w-32 text-sm border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" v-model="selectedPosNo">
           <option value="0">선택</option>
           <option :value="{ lngCode: item.lngCode , lngAreaCode: item.lngAreaCode} " v-for="item in storePosNo" :key="item.lngAreaCode">{{ item.strName }}</option>
         </select>
@@ -76,10 +76,12 @@ const emitStoreType = (value) => {
 };
 
 const emitStoreCode = (value) => {
+  if( value !='0'){
   const selectedNm = storeCd.value.filter(item => item.lngStoreCode == value)[0].strName
 
     emit('storeNm' ,selectedNm )
     emit('update:storeCd', value);
+  }
 };
 
 const emitPosInfo = (value1 ,value2) => {
@@ -108,21 +110,28 @@ const emitPosInfo = (value1 ,value2) => {
 
   }
   const setPosNo = async (value) => {
-        if ( value == 0) {
-          selectedPosNo.value = '0';
-          storePosNo.value='0';
-          return  ;
-        }
-      
-        const response  =await getPosList(storeGroup.value[0].lngStoreGroup
+    selectedPosNo.value='0'
+    storePosNo.value='0';
+    let response;
+       try {
+        response  =await getPosList(storeGroup.value[0].lngStoreGroup
         , value)
-        storePosNo.value = response.data.pos
+       
        
         
         console.log( storePosNo.value)
+       } catch (error) {
+        
+       } finally{
+        storePosNo.value = response.data.pos
+       }
+        
   }
 watch( selectedPosNo, (newValue) => {
-  emitPosInfo(newValue.lngAreaCode, newValue.lngCode);
+  if ( selectedPosNo.value != '0'){
+    emitPosInfo(newValue.lngAreaCode, newValue.lngCode);
+  }
+  
 })
   const route = useRoute();
   

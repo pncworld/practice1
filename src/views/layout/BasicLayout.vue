@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col h-screen overflow-hidden bg-gray-100">
-    <Loading></Loading>
+    <Loading style="z-index: 100;"></Loading>
 
     <header v-if="showMenu" class="bg-gray-100 border rounded-3xl text-gray-600 p-2 w-full h-10 md:h-14 box-content">
   <!-- 상단 영역 -->

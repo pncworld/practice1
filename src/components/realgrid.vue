@@ -104,7 +104,8 @@ const funcshowGrid = () => {
 
   for(var i=0 ; i< tabInitSetArray.value.length ; i++) {
     columns.push({ name : tabInitSetArray.value[i].strHdText , fieldName : tabInitSetArray.value[i].strColID ,
-        header: { text: tabInitSetArray.value[i].strHdText , styleName : `header-style-`+i}
+        header: { text: tabInitSetArray.value[i].strHdText , styleName : `header-style-`+i} ,
+        width: tabInitSetArray.value[i].intHdWidth , visible : tabInitSetArray.value[i].intHdWidth ==0 ? false : true
     })
   }
   console.log(columns)
@@ -140,7 +141,7 @@ const funcshowGrid = () => {
     for( var i =0 ; i< index.length ; i++ ){
       selectedRowData.value.push(dataProvider.getRows()[index[i]])
     }
-   
+
     emit('selcetedrowData',selectedRowData.value)
   }
 
