@@ -1,24 +1,23 @@
 <template>
-    <div>
-                 <div class="flex justify-start pl-4 pt-4">
-                 <div class="flex justify-start"><h1 class="font-bold text-2xl">
-                  매장정보등록
-                 </h1><div class="flex justify-end space-x-2" style="margin-left:750px"><button @click="searchStore" class="button search">조회</button>
-                  <button @click="addStore" class="button new">신규</button>
-                  <button @click="updateRowData" class="button save">저장</button>
-                  <button @click="deleteStore" class="button delete">삭제</button>
-                  <button @click="exportToExcel" class="button excel">엑셀</button>
-                </div> </div>
-                  
-                
-                 </div>
-                 <br>
-                 
-                 <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center"><PickStore3 :groupCdDisabled="groupCdDisabled" :gridOptions="gridOptions"  @update:storeType="handleGroupCdDisabledUpdate" @update:storeCd="handleStoreCd"></PickStore3> <input type="text" class="w-1/7 rounded border border-neutral-700 h-9 px-1 " v-model="searchStoreName" @keyup.enter="searchStore"></div> 
-                
+  <div>
+    <div class="flex justify-start pl-4 pt-4">
+      <div class="flex justify-start">
+        <h1 class="font-bold text-2xl">매장정보등록</h1>
+          <div class="flex justify-end space-x-2" style="margin-left:750px">
+            <button @click="searchStore" class="button search">조회</button>
+            <button @click="addStore" class="button new">신규</button>
+            <button @click="updateRowData" class="button save">저장</button>
+            <button @click="deleteStore" class="button delete">삭제</button>
+            <button @click="exportToExcel" class="button excel">엑셀</button>
+          </div>
+      </div>
     </div>
-    <div><ag-grid-vue class="ag-theme-alpine custom-grid" :defaultColDef="defaultColDef" :columnDefs="colDefs2"  rowSelection="multiple" :rowData="rowData" style="height:540px" @rowClicked="onRowClicked" @grid-ready="onGridReady"/></div>
-   <div class="relative left-0 -top-4 mt-5">
+    <br>
+    <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center"><PickStore3 :groupCdDisabled="groupCdDisabled" :gridOptions="gridOptions"  @update:storeType="handleGroupCdDisabledUpdate" @update:storeCd="handleStoreCd"></PickStore3> <input type="text" class="w-1/7 rounded border border-neutral-700 h-9 px-1 " v-model="searchStoreName" @keyup.enter="searchStore"></div>
+  </div>
+  <div id="grid1" style="height: 600px"></div> <!-- RealGrid를 렌더링할 컨테이너 -->
+  <!-- <div><ag-grid-vue class="ag-theme-alpine custom-grid" :defaultColDef="defaultColDef" :columnDefs="colDefs2"  rowSelection="multiple" :rowData="rowData" style="height:540px" @rowClicked="onRowClicked" @grid-ready="onGridReady"/></div> -->
+  <div class="relative left-0 -top-4 mt-5">
     <div class="absolute grid grid-cols-6 grid-rows-10 gap-0 w-full">
         <div class="border flex h-7 items-center text-sm font-semibold justify-center bg rounded-ss-xl bg-gray-100 text-blue-500">
         *매장코드 
@@ -172,14 +171,13 @@
         매장이력  
         </div>
         <div class="border flex h-7 items-center text-sm font-semibold justify-center rounded-ee-xl" style="width:687px"><input type="text" id="storeCode" class="border rounded-md w-full pl-2 h-7 " v-model="strStoreHistory" name="strStoreHistory" @keyup="updateGridValue" /></div>
-        
     </div>
-    
-    
 </div>
 </template>
 
 <script setup>
+import * as RealGrid from "realgrid";
+import "realgrid/dist/realgrid-style.css";
 import PickStore from '@/components/pickStore.vue';
 import { AgGridVue } from 'ag-grid-vue3';
 import axios from 'axios';
@@ -246,6 +244,8 @@ const lngSubLeases = ref([]);
 const lngStoreAreas = ref([]);
 const lngSaleTypes = ref([]);
 const lngSupervisors = ref([]);
+
+//조회버튼 처리 함수
 const searchStore = async() => {
      lngMultiPriceGroupCodes.value = [];
      lngStoreAttrs.value = [];
@@ -317,15 +317,16 @@ const searchStore = async() => {
       }
       lngSupervisor.value = result7[0].lngSupervisor
 
+      console.log(result7[0].lngSupervisor);
+
       const response = await store_query(groupCd, storeType.value , storeCd.value , searchStoreName.value);
         
-       const result = response.data.recordsets[0];
+      const result = response.data.store;
     
-       updateColumns(result)
-       store.dispatch("convertLoading", false);
-    
-       
+      updateColumns(result);
+      store.dispatch("convertLoading", false);
 }
+
 const insertupdated =ref();
 const deleteStore = async() => {
   store.dispatch("convertLoading", true);
@@ -401,39 +402,39 @@ let result = 0;
   if (rowsToSave.length > 0) {
 
   const finalObject = {
-  P_lngCompanyCode: Array(rowsToSave.length).fill(groupCd).join(','),
-  P_lngStoreGroup: Array(rowsToSave.length).fill(groupCd).join(','),
-  P_lngStoreCode: rowsToSave.map(row => row.lngStoreCode).join(','),
-  P_strName: rowsToSave.map(row => row.strName).join(','),
-  P_strRegistNo: rowsToSave.map(row => row.strRegistNo).join(','),
-  P_strDirector: rowsToSave.map(row => row.strDirector).join(','),
-  P_strDealType: rowsToSave.map(row => row.strDealType).join(','),
-  P_strDealKind: rowsToSave.map(row => row.strDealKind).join(','),
-  P_strZipCode: rowsToSave.map(row => row.strZipCode).join(','),
-  P_strAddress: rowsToSave.map(row => row.strAddress).join(','),
-  P_strAddressEtc: rowsToSave.map(row => row.strAddressEtc).join(','),
-  P_strTel: rowsToSave.map(row => row.strTel).join(','),
-  P_strFax: rowsToSave.map(row => row.strFax).join(','),
-  P_dtmOpenDate: rowsToSave.map(row => row.dtmOpenDate).join(','),
-  P_lngJoinType: rowsToSave.map(row => row.lngJoinType).join(','),
-  P_lngSubLease: rowsToSave.map(row => row.lngSubLease).join(','),
-  P_lngStoreAttr: rowsToSave.map(row => row.lngStoreAttr).join(','),
-  P_lngStoreArea: rowsToSave.map(row => row.lngStoreArea).join(','),
-  P_strConvCode: rowsToSave.map(row => row.strConvCode).join(','),
-  P_lngUserID: rowsToSave.map(row => row.lngUserID).join(',') ,
-  P_lngMultiPriceGroupCode : rowsToSave.map(row => row.lngMultiPriceGroupCode).join(',') 
-};
+    P_lngCompanyCode: Array(rowsToSave.length).fill(groupCd).join(','),
+    P_lngStoreGroup: Array(rowsToSave.length).fill(groupCd).join(','),
+    P_lngStoreCode: rowsToSave.map(row => row.lngStoreCode).join(','),
+    P_strName: rowsToSave.map(row => row.strName).join(','),
+    P_strRegistNo: rowsToSave.map(row => row.strRegistNo).join(','),
+    P_strDirector: rowsToSave.map(row => row.strDirector).join(','),
+    P_strDealType: rowsToSave.map(row => row.strDealType).join(','),
+    P_strDealKind: rowsToSave.map(row => row.strDealKind).join(','),
+    P_strZipCode: rowsToSave.map(row => row.strZipCode).join(','),
+    P_strAddress: rowsToSave.map(row => row.strAddress).join(','),
+    P_strAddressEtc: rowsToSave.map(row => row.strAddressEtc).join(','),
+    P_strTel: rowsToSave.map(row => row.strTel).join(','),
+    P_strFax: rowsToSave.map(row => row.strFax).join(','),
+    P_dtmOpenDate: rowsToSave.map(row => row.dtmOpenDate).join(','),
+    P_lngJoinType: rowsToSave.map(row => row.lngJoinType).join(','),
+    P_lngSubLease: rowsToSave.map(row => row.lngSubLease).join(','),
+    P_lngStoreAttr: rowsToSave.map(row => row.lngStoreAttr).join(','),
+    P_lngStoreArea: rowsToSave.map(row => row.lngStoreArea).join(','),
+    P_strConvCode: rowsToSave.map(row => row.strConvCode).join(','),
+    P_lngUserID: rowsToSave.map(row => row.lngUserID).join(',') ,
+    P_lngMultiPriceGroupCode : rowsToSave.map(row => row.lngMultiPriceGroupCode).join(',') 
+  };
 
-const response = await store_insert(finalObject);
+  const response = await store_insert(finalObject);
        
-        if (response.status === 200) {
-             result = 200
-         }
+  if (response.status === 200) {
+    result = 200
   }
+}
 
-  if (rowsToUpdate.length > 0) {
+if (rowsToUpdate.length > 0) {
 
-const finalObject1 = {
+  const finalObject1 = {
       P_lngCompanyCode: Array(rowsToUpdate.length).fill(groupCd).join(',') ,
       P_lngStoreGroup: Array(rowsToUpdate.length).fill(groupCd).join(',') ,
       P_lngStoreCode: rowsToUpdate.map(row => row.lngStoreCode).join(',') ,
@@ -454,218 +455,206 @@ const finalObject1 = {
       P_lngStoreArea: rowsToUpdate.map(row => row.lngStoreArea).join(','),
       P_strConvCode: rowsToUpdate.map(row => row.strConvCode).join(','),
       P_lngUserID: rowsToUpdate.map(row => row.lngUserID).join(',')
-};
+  };
 
-const response = await store_update(finalObject1)
+  const response = await store_update(finalObject1)
      
-      if (response.status === 200) {
-           result = 200
-       }
+  if (response.status === 200) {
+    result = 200
+  }
 }
-  if (result === 200) {
-        Swal.fire('저장 되었습니다.');
-    }
-    store.dispatch("convertLoading", false);
-  searchStore()
+
+if (result === 200) {
+  Swal.fire('저장 되었습니다.');
 }
+
+store.dispatch("convertLoading", false);
+searchStore()
+}
+
+// 데이터 설정
+let dataProvider;
+let gridView;
+
 const updateColumns = (result) => {
-    let column2 = [];
-    column2.push(
-        {
-            field : 'NO',
-            headerName: 'No',
-        valueGetter: (params) => {
-        return params.node.rowIndex + 1;  // 0부터 시작하는 인덱스에 1을 더해 순번을 만듦
-    },
-    sortable: false,  // 정렬 비활성화 (순번이므로)
-    filter: false,    // 필터 비활성화
-    width: 80 ,        // 적절한 넓이 설정,
-    lockPosition : true
-        }
-    )
-   
-    const styleTag = document.createElement("style");
-    document.head.appendChild(styleTag);
-    
-    for (let i = 0; i < tabInitSetArray.value.length ; i++) {
-      const headerclass = `headerclass-${i}`;
-      const hcolor = tabInitSetArray.value[i].strHdColor;
-      const hbkcolor = tabInitSetArray.value[i].strHdBkColor;
-      styleTag.innerHTML += `.${headerclass} {
-          background-color : ${hbkcolor} !important;
-          color : ${hcolor} !important ;
-       
-      }`
-      
-      // 컬럼마다의 값을 할당 밑은 조건에 해당할때 형식이나 값을 지정해줌.
-       const column = {
-        field: tabInitSetArray.value[i].strColID,
-        headerName: tabInitSetArray.value[i].strHdText,
-        width: tabInitSetArray.value[i].intHdWidth,
-        headerClass: headerclass,
-        editable : tabInitSetArray.value[i].strEdit === 'true' ? true : false,
-        cellStyle : {
-          textAlign : tabInitSetArray.value[i].strAlign
-        },
-        lockPosition : tabInitSetArray.value[i].strHdFix === 'true' ? false : true ,
-      }
 
-      if( tabInitSetArray.value[i].intHdWidth == '0'){
-        column.hide = true
-      }
-      if ( tabInitSetArray.value[i].strColID =='lngCheck'){
-        column.checkboxSelection= true ;
-        column.headerCheckboxSelection = true ;
-      }
-      if(tabInitSetArray.value[i].strColID =='lngSaleType'){
-        column.cellRenderer = (params) =>{
-          if(params.value){
+  if (gridView) {
+    gridView.destroy();  // 기존 그리드 인스턴스 파괴
+  }
 
-           if(lngSaleTypes.value.length == 0){
-             return ''
-           } else {
-            return lngSaleTypes.value.find(item => item.lngSaleType == params.value).strSaleType
-           }
-        }
-      }
-      }
-      if(tabInitSetArray.value[i].strColID == 'lngSupervisor'){
-        column.cellRenderer = (params) =>{
-          if(params.value !='' && params.value){
+  dataProvider = new RealGrid.LocalDataProvider();
+  gridView = new RealGrid.GridView("grid1");
+  // 데이터 프로바이더 연결
+  gridView.setDataSource(dataProvider);
 
-           if(lngSupervisors.value.length == 0){
-             return '없음'
-           } else {
-            return lngSupervisors.value.find(item => item.lngSupervisor == params.value).strName
-           }
-          }
-        }
-      }
-      if(tabInitSetArray.value[i].strColID == 'dtmOpenDate'){
-        column.cellRenderer = (params) =>{
-        
-          if(params.value !='' && params.value !=null){
+  // 스타일 정의 (헤더 색상 및 스타일)
+  const styleTag = document.createElement("style");
+  document.head.appendChild(styleTag);
 
-          
-          const rawDate = params.value.toString(); // 주어진 데이터 (예: 20110302)
-        
-        // 날짜 형식을 변환 (2011-03-02)
-        const formattedDate = `${rawDate.substring(0, 4)}-${rawDate.substring(4, 6)}-${rawDate.substring(6, 8)}`;
+  const columns = [];
 
-        return formattedDate;
-        }
-      }
-      }
+    for (let i = 0; i < tabInitSetArray.value.length; i++) {
+        const headerClass = `headerclass-${i}`;
+        const hColor = tabInitSetArray.value[i].strHdColor;
+        const hBkColor = tabInitSetArray.value[i].strHdBkColor;
 
-      if(tabInitSetArray.value[i].strColID == 'lngMultiPriceGroupCode'){
-        column.cellRenderer = (params) =>{
-          if(params.value != null ){
-          if(lngMultiPriceGroupCodes.value.length == 0){
-             return ''
-           } else {
-            return lngMultiPriceGroupCodes.value.find(item => item.lngMultiPriceGroupCode == params.value).strMultiPriceGroupName
-           }
-          } 
-      }
-      }
+        // 헤더 스타일 추가
+        styleTag.innerHTML += `
+            .${headerClass} {
+                background-color: ${hBkColor} !important;
+                color: ${hColor} !important;
+            }
+        `;
 
-      if(tabInitSetArray.value[i].strColID === 'lngStoreAttr'){
-        column.cellRenderer = (params) =>{
-          if(params.value !='' && params.value){
-          if(lngStoreAttrs.value.length == 0 || params.value == '12'){
-             return ''
-           } else {
-            return lngStoreAttrs.value.find(item => item.lngStoreAttr == params.value).strName
-           }
-          } 
-        }
-      }
-      
+        const column = {
+            fieldName: tabInitSetArray.value[i].strColID,
+            name: tabInitSetArray.value[i].strColID,
+            header: {
+                text: tabInitSetArray.value[i].strHdText,
+                styles: {
+                  textAlignment: tabInitSetArray.value[i].strAlign
+                }
+            },
+            width: tabInitSetArray.value[i].intHdWidth,
+            editable: tabInitSetArray.value[i].strEdit === "true",
+            locked: tabInitSetArray.value[i].strHdFix === "true",
+            visible: tabInitSetArray.value[i].intHdWidth !== 0
+        };
 
-      if(tabInitSetArray.value[i].strColID == 'lngJoinType'){
-       
-        column.cellRenderer = (params) =>{
-         
-          if(params.value != '0' && params.value !='' && params.value !=null ) {
-          if(lngJoinTypes.value.length == 0 || params.value == '12'){
-             return ''
-           } else {
-            return lngJoinTypes.value.find(item => item.lngCode == params.value).strName
-           }
-          } else {
-            return ''
-          }
-      }
-      }
+        // 컬럼 추가
+        columns.push(column);
 
-
-      if(tabInitSetArray.value[i].strColID == 'lngSubLease'){
-        column.cellRenderer = (params) =>{
-          if(params.value !='' && params.value){
-
-          if(lngSubLeases.value.length == 0 ){
-             return ''
-           } else {
-            return lngSubLeases.value.find(item => item.lngCode == params.value ).strName
-           }
-          }
-        
-      }
-      }
-
-      if(tabInitSetArray.value[i].strColID == 'lngStoreArea'){
-        column.cellRenderer = (params) =>{
-          if(params.value !='' && params.value){
-          if(lngStoreAreas.value.length == 0 || params.value == '12'){
-             return ''
-           } else {
-            return lngStoreAreas.value.find(item => item.lngStoreArea == params.value).strName
-           }
-          }
-      }
-      }
-    column2.push(column);
     }
-    rowData.value = result.map(item => ({
-      lngStoreCode: item.lngStoreCode,
-      strName: item.strName,
-      strRegistNo: item.strRegistNo,
-      strDirector: item.strDirector,
-      strDealType: item.strDealType,
-      strDealKind: item.strDealKind,
-      lngJoinType: item.lngJoinType,
-      strJoinTypeName: item.strJoinTypeName,
-      lngSubLease: item.lngSubLease,
-      strSubLeaseName: item.strSubLeaseName,
-      lngStoreAttr: item.lngStoreAttr,
-      strStoreAttrName: item.strStoreAttrName,
-      lngStoreArea: item.lngStoreArea,
-      strStoreAreaName: item.strStoreAreaName,
-      dtmOpenDate: item.dtmOpenDate,
-      strTel: item.strTel,
-      strFax: item.strFax,
-      strZipCode: item.strZipCode,
-      strAddress: item.strAddress,
-      strAddressEtc: item.strAddressEtc,
-      strConvCode: item.strConvCode,
-      strPhone: item.strPhone,
-      lngBEP: item.lngBEP,
-      lngFloorSpace: item.lngFloorSpace,
-      lngLease: item.lngLease,
-      strCheck: item.strCheck,
-      lngSaleType: item.lngSaleType,
-      dtmStop: item.dtmStop,
-      strDev1: item.strDev1,
-      lngTable: item.lngTable,
-      lngSupervisor: item.lngSupervisor,
-      strStoreHistory: item.strStoreHistory,
-      lngMultiPriceGroupCode: item.lngMultiPriceGroupCode,
-      strMultiPriceGroupName: item.strMultiPriceGroupName
+
+        // 모든 컬럼 설정이 완료된 후 호출
+        gridView.setColumns(columns);
+
+        // console.log(gridView.getColumnNames());
+        // console.log(lngSaleTypes.value, lngSupervisors.value);
+
+        // 특정 컬럼 조건 처리
+        tabInitSetArray.value.forEach((columnSetting) => {
+        const columnId = columnSetting.strColID; // 컬럼 ID 확인
+            if (columnId === "lngCheck") {
+                gridView.setColumnProperty(columnId, "checkable", true);
+            } 
+            else if (columnId === "lngSaleType") {
+                gridView.setColumnProperty(columnId, "renderer", {
+                    type: "text",
+                    callback: (grid, cell) => {
+                        const value = cell.value;
+                        if (!value || lngSaleTypes.value.length === 0) return ""; // 값 검증
+                        return lngSaleTypes.value.find(item => item.lngSaleType == value)?.strSaleType || "";
+                    }
+                });
+            }
+            else if (columnId === "lngSupervisor") {
+                gridView.setColumnProperty(columnId, "renderer", {
+                    type: "text",
+                    callback: (grid, cell) => {
+                        const value = cell.value;
+                        if (!value || lngSupervisors.value.length === 0) return "없음";
+                        console.log(lngSupervisors.value);
+                        return lngSupervisors.value.find(item => item.lngSupervisor == value)?.strName || "";
+                    }
+                });
+            }
+            else if (columnId === "dtmOpenDate") {
+                gridView.setColumnProperty(columnId, "renderer", {
+                    type: "text",
+                    callback: (grid, cell) => {
+                        const value = cell.value;
+                        if (!value) return ""; // 값이 없으면 빈 문자열 반환
+                        const rawDate = value.toString();
+                        if (rawDate.length !== 8) return value; // 날짜 형식이 잘못되었으면 원본 값 반환
+                        return `${rawDate.substring(0, 4)}-${rawDate.substring(4, 6)}-${rawDate.substring(6, 8)}`;
+                    }
+                });
+            }
+        });
+
+
+    dataProvider.setFields([
+      { fieldName: "lngStoreCode" },
+      { fieldName: "strName" },
+      { fieldName: "strRegistNo" },
+      { fieldName: "strDirector" },
+      { fieldName: "strDealType" },
+      { fieldName: "strDealKind" },
+      { fieldName: "lngJoinType" },
+      { fieldName: "strJoinTypeName" },
+      { fieldName: "lngSubLease" },
+      { fieldName: "strSubLeaseName" },
+      { fieldName: "lngStoreAttr" },
+      { fieldName: "strStoreAttrName" },
+      { fieldName: "lngStoreArea" },
+      { fieldName: "strStoreAreaName" },
+      { fieldName: "dtmOpenDate" },
+      { fieldName: "strTel" },
+      { fieldName: "strFax" },
+      { fieldName: "strZipCode" },
+      { fieldName: "strAddress" },
+      { fieldName: "strAddressEtc" },
+      { fieldName: "strConvCode" },
+      { fieldName: "strPhone" },
+      { fieldName: "lngBEP" },
+      { fieldName: "lngFloorSpace" },
+      { fieldName: "lngLease" },
+      { fieldName: "strCheck" },
+      { fieldName: "lngSaleType" },
+      { fieldName: "dtmStop" },
+      { fieldName: "strDev1" },
+      { fieldName: "lngTable" },
+      { fieldName: "lngSupervisor" },
+      { fieldName: "strStoreHistory" },
+      { fieldName: "lngMultiPriceGroupCode" },
+      { fieldName: "strMultiPriceGroupName" }
+    ]);
+
+    // 데이터 추가
+    const rows = result.map(item => ({
+        lngStoreCode: item.lngStoreCode,
+        strName: item.strName,
+        strRegistNo: item.strRegistNo,
+        strDirector: item.strDirector,
+        strDealType: item.strDealType,
+        strDealKind: item.strDealKind,
+        lngJoinType: item.lngJoinType,
+        strJoinTypeName: item.strJoinTypeName,
+        lngSubLease: item.lngSubLease,
+        strSubLeaseName: item.strSubLeaseName,
+        lngStoreAttr: item.lngStoreAttr,
+        strStoreAttrName: item.strStoreAttrName,
+        lngStoreArea: item.lngStoreArea,
+        strStoreAreaName: item.strStoreAreaName,
+        dtmOpenDate: item.dtmOpenDate,
+        strTel: item.strTel,
+        strFax: item.strFax,
+        strZipCode: item.strZipCode,
+        strAddress: item.strAddress,
+        strAddressEtc: item.strAddressEtc,
+        strConvCode: item.strConvCode,
+        strPhone: item.strPhone,
+        lngBEP: item.lngBEP,
+        lngFloorSpace: item.lngFloorSpace,
+        lngLease: item.lngLease,
+        strCheck: item.strCheck,
+        lngSaleType: item.lngSaleType,
+        dtmStop: item.dtmStop,
+        strDev1: item.strDev1,
+        lngTable: item.lngTable,
+        lngSupervisor: item.lngSupervisor,
+        strStoreHistory: item.strStoreHistory,
+        lngMultiPriceGroupCode: item.lngMultiPriceGroupCode,
+        strMultiPriceGroupName: item.strMultiPriceGroupName
     }));
-   
-    colDefs2.value = column2;
-    
+
+    gridView.footer.visible = false;
+
+    dataProvider.setRows(rows);
+
 }
+
 const updateGridValue = (event) => {
 
   let inputText = event.target.value;
