@@ -1,170 +1,153 @@
 <template>
-    <div id="realgrid" class="h-[100%] w-[100%]"></div>
+  <div :id="realgridname" class="h-[100%] w-[100%]"></div>
 </template>
 
 <script setup>
 import { getGridInfoList } from '@/api/common';
 import { GridView, LocalDataProvider } from 'realgrid';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, nextTick } from 'vue';
 
 let gridView;
 let dataProvider;
-const currentSelectedMenuCode = ref('')
 
 const props = defineProps({
   progname: {
     type: String,
-    default: ""
+    default: "",
   },
   progid: {
     type: Number,
-    default: 0
+    default: 0,
   },
-  rowData : {
-    type : Array ,
-  
+  rowData: {
+    type: Array,
+    default: () => [],
   },
-  showGrid : {
-    type : Boolean ,
-    default : () => []
+  showGrid: {
+    type: Boolean,
+    default: false,
   },
-  showCheckBar : {
-    type : Boolean ,
-    default : false
+  showCheckBar: {
+    type: Boolean,
+    default: false,
   },
-  searchWord : {
-    type : String ,
-    default : ''
-  }
+  searchWord: {
+    type: String,
+    default: "",
+  },
 });
-const GridInfo_PROG_ID = props.progname;
-const GridInfo_GRID_ID = props.progid;
-  // API 호출 (설정값 호출)
+
+const realgridname = ref(`realgrid-${props.progname}-${props.progid}`); // 동적 ID 설정
 const tabInitSetArray = ref([]);
-let styleContent = "";
-onMounted(() => {
- 
-    (async () => {
-    try {
-     console.log(GridInfo_PROG_ID)
-    console.log(GridInfo_GRID_ID)
-    console.log("어ㅕㄴ제실행되냐")
-      const result = await getGridInfoList(GridInfo_PROG_ID, GridInfo_GRID_ID);
-        tabInitSetArray.value = result; 
+const selectedRowData = ref([]);
 
-        tabInitSetArray.value.forEach((item, index) => {
-       styleContent += `
-    .header-style-${index} {
-      background-color: ${item.strHdBkColor} !important;
-      color: ${item.strHdColor} !important;
-    }
-  `;
-});
-    } catch (error) {
-        console.error("Failed to fetch data:", error); // 오류 로그 출력
-    } finally {
-        console.log(tabInitSetArray.value)
-        funcshowGrid()
-    }
-    })();
-   
-  
+const emit = defineEmits(["selcetedrowData"]);
 
-})
-
-watch(() => props.showGrid, (newValue) => {
-        funcshowGrid()
-});
-
-
-const selectedRowData = ref([])
-const funcshowGrid = () => {
-    
+const funcshowGrid = async () => {
+  // 그리드 초기화
   if (gridView) {
-    gridView.destroy();  // 기존 그리드 인스턴스 파괴
+    gridView.destroy(); // 기존 그리드 인스턴스 제거
   }
 
   dataProvider = new LocalDataProvider();
   
-  // 2. GridView 설정
-  gridView = new GridView('realgrid');
+  // nextTick으로 DOM 업데이트 후 초기화
+  await nextTick();
+
+  const container = document.getElementById(realgridname.value);
+  if (!container) {
+    console.error(`Invalid grid container element: ${realgridname.value}`);
+    return;
+  }
+
+  gridView = new GridView(container);
   gridView.setDataSource(dataProvider);
 
-  // 3. 필드 정의
-  let fields = [];
-
-  for(var i=0 ; i< tabInitSetArray.value.length ; i++) {
-    fields.push({ fieldName : tabInitSetArray.value[i].strColID , dataType: 'text'})
-  }
+  // 필드 정의
+  const fields = tabInitSetArray.value.map(item => ({
+    fieldName: item.strColID,
+    dataType: 'text',
+  }));
   dataProvider.setFields(fields);
-  console.log(fields)
 
-  // 4. 컬럼 정의
-  let columns = [];
-
-  for(var i=0 ; i< tabInitSetArray.value.length ; i++) {
-    columns.push({ name : tabInitSetArray.value[i].strHdText , fieldName : tabInitSetArray.value[i].strColID ,
-        header: { text: tabInitSetArray.value[i].strHdText , styleName : `header-style-`+i} ,
-        width: tabInitSetArray.value[i].intHdWidth , visible : tabInitSetArray.value[i].intHdWidth ==0 ? false : true
-    })
-  }
-  console.log(columns)
+  // 컬럼 정의
+  const columns = tabInitSetArray.value.map((item, index) => ({
+    name: item.strHdText,
+    fieldName: item.strColID,
+    header: {
+      text: item.strHdText,
+      styleName: `header-style-${index}`,
+    },
+    width: item.intHdWidth,
+    visible: item.intHdWidth !== 0,
+    renderer : { type : item.strColID =='add' ? 'button' : 'text' }
+  }));
   gridView.setColumns(columns);
-  // 5. 샘플 데이터 추가
+
+  // 데이터 추가
   dataProvider.setRows(props.rowData);
-  gridView.sortMode = 'explicit';
-  gridView.filterMode = 'explicit';
-  gridView.setFooters({ visible: false})
-  gridView.setRowIndicator({
-    visible: true
-  });
-  gridView.setCheckBar({
-    visible: props.showCheckBar,
-  });
-  gridView.displayOptions.fitStyle = "even";
+
+  // 기타 옵션
+  gridView.setFooters({ visible: false });
+  gridView.setRowIndicator({ visible: true });
+  gridView.setCheckBar({ visible: props.showCheckBar });
+  gridView.displayOptions.fitStyle = 'even';
   gridView.sortingOptions.enabled = true;
-  
-  gridView.commit();
-  gridView.onCellEdited = function (grid, itemIndex, row, field) {
-    // 데이터가 수정될 때 rows를 갱
-    gridView.commit();
-  
-  // 이후 데이터 갱신 (필요시 rows를 업데이트)
- 
+
+  // 이벤트 설정
+  gridView.onCellEdited = () => gridView.commit();
+  gridView.onItemChecked = () => {
+    selectedRowData.value = gridView.getCheckedItems().map(index => dataProvider.getRows()[index]);
+    emit('selcetedrowData', selectedRowData.value);
   };
-  
 
- 
-  gridView.onItemChecked = function (grid ,clickData){
-    selectedRowData.value = []
-    const index = gridView.getCheckedItems();
-    for( var i =0 ; i< index.length ; i++ ){
-      selectedRowData.value.push(dataProvider.getRows()[index[i]])
-    }
 
-    emit('selcetedrowData',selectedRowData.value)
-  }
+  gridView.onCellItemClicked = function (grid, clickData) {
 
-}
-
-const emit = defineEmits(["selcetedrowData"])
-watch(() => props.searchWord ,(newValue) => {
-  console.log(props.rowData)
-  console.log(newValue)
-  if(newValue =='') {
+  if (clickData.itemIndex == undefined) {
     return ;
   }
-  const newRowData = props.rowData.filter(item => item.strName.includes(newValue)  || item.lngStoreCode.toString().includes(newValue) )
-  if ( newRowData.length >=1){
-    dataProvider.setRows(newRowData)
-  } else {
-    dataProvider.setRows({})
-  }
- 
-})
+  selectedRowData.value= dataProvider.getRows()[clickData.itemIndex];
+  emit('selcetedrowData', selectedRowData.value);
+}
+};
 
+onMounted(async () => {
+  try {
+    const result = await getGridInfoList(props.progname, props.progid);
+    tabInitSetArray.value = result;
+
+    // 동적 스타일 생성
+    let styleContent = '';
+    tabInitSetArray.value.forEach((item, index) => {
+      styleContent += `
+        .header-style-${index} {
+          background-color: ${item.strHdBkColor} !important;
+          color: ${item.strHdColor} !important;
+        }
+      `;
+    });
+    document.head.insertAdjacentHTML('beforeend', `<style>${styleContent}</style>`);
+
+    await funcshowGrid();
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
+  }
+});
+
+watch(() => props.showGrid, () => funcshowGrid());
+watch(() => props.searchWord, (newValue) => {
+  if (newValue === '') return;
+  const filteredData = props.rowData.filter(
+    item =>
+      item.strName.includes(newValue) ||
+      item.lngStoreCode.toString().includes(newValue)
+  );
+  dataProvider.setRows(filteredData.length ? filteredData : []);
+});
+watch(() => props.rowData, () => funcshowGrid());
 </script>
 
-<style>
-
+<style scoped>
+/* 동적 스타일이 삽입되므로 추가 스타일 정의는 필요 없음 */
 </style>

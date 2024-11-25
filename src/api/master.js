@@ -288,6 +288,23 @@ export const saveAllMenuKey = ( groupCd , storeCd ,areaCd , posNo , intKeySeq_ar
         STRKEYNAME_ARR : strKeyName_arr
     })
 }
+export const getMenuKeyList2 = ( groupCd , storeCd ,areaCd , posNo ) => {
+    return api2.post('/MIMASTER/MST05_004INS.asmx/getMenuKeyList' , {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+    })
+}
+
+export const getScreenList2 = (groupCd , storeCd ,areaCd , posNo ) => {
+    return api2.post('/MIMASTER/MST05_004INS.asmx/getScreenList', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+    })
+}
 
 
 
