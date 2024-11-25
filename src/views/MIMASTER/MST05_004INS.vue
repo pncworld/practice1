@@ -123,7 +123,7 @@
 <div class="grid grid-rows-[9fr,5fr] grid-cols-1 ml-10 w-full h-full z-20">
   <div class="flex h-full w-[950px] mt-10" v-show="afterSearch" >
     <VueDraggableNext
-  v-model="items"
+  v-model="showMenuKeyList"
   :move="onMove"
    @end="onEnd"
    animation="200"
@@ -131,12 +131,11 @@
 >
   <div
     v-for="(item, index) in showMenuKeyList"
-    :key="index"
     class="screen-muuri-sort-empty flex items-center justify-center h-16 w-44"
     :class="{' !bg-orange-500' : clickedMenuKey==index }"
     @click="saveMenuKeyposition(index); clickedMenuKey = index; clickedMenukeys()"
   >
-    <span class="flex flex-col"><span>{{ item.lngKeyscrNo ? item.lngKeyscrNo : '' }}</span><span>{{ item ? item.strKeyName : '' }}</span><span class="flex justify-end ml-9">{{ item.lngPrice ? formatNumber(item.lngPrice) +'원' : '' }}</span></span>
+    <span class="flex flex-col"><span>{{ item ? item.strKeyName : '' }}</span></span>
   </div>
 </VueDraggableNext>
 
@@ -415,7 +414,7 @@ try {
 // 중간에 비어 있는 번호 확인 및 채우기
     for (let i = startIndex; i < endIndex; i++) {
   // 해당 번호가 없는 경우 기본값 추가
-  const existingItem = filteredList.find((item) => item.intKeySeq === i);
+  const existingItem = filteredList.find((item) => item.intKeySeq === i+1);
   if (existingItem) {
     showMenuKeyList.value.push(existingItem);
   } else {
@@ -425,6 +424,7 @@ try {
     });
   }
 }
+console.log(MenuKeyList.value)
     MenuList.value = MenuList.value.map(item => {
     return {
       ...item,
@@ -474,12 +474,12 @@ const showMenuKey =(value) => {
 // 중간에 비어 있는 번호 확인 및 채우기
     for (let i = startIndex; i < endIndex; i++) {
   // 해당 번호가 없는 경우 기본값 추가
-  const existingItem = filteredList.find((item) => item.intKeySeq === i);
+  const existingItem = filteredList.find((item) => item.intKeySeq === i+1);
   if (existingItem) {
     showMenuKeyList.value.push(existingItem);
   } else {
     showMenuKeyList.value.push({
-      intKeySeq: i,
+      intKeySeq: i+1,
       strKeyName: ``, // 기본값 또는 placeholder
     });
   }
@@ -520,8 +520,9 @@ return true;
 const onEnd = (evt) => {
 // Swap을 처리할 조건
 if (changeMode.value === false) {
+  console.log(MenuKeyList.value)
 const oldIndex = evt.oldIndex;  // 드래그된 아이템의 기존 인덱스
-const swappedItems = [...items.value];  // items를 복사
+const swappedItems = [...showMenuKeyList.value];  // items를 복사
 const temp = swappedItems[oldIndex];
 
 swappedItems[oldIndex] = swappedItems[targetItemIndex2];
@@ -529,16 +530,15 @@ swappedItems[oldIndex] = swappedItems[targetItemIndex2];
 swappedItems[targetItemIndex2] = temp;
 
 
-
-// 배열을 업데이트
-items.value = swappedItems;
-
-console.log(items.value  )
+showMenuKeyList.value = swappedItems.map((item, index) => ({
+  ...item, // 기존 객체의 다른 속성 유지
+  intKeySeq: (index+ (nowscreenNo.value-1)*45) + 1 // 배열 순서대로 intKeySeq 재정렬
+}));
 } else {
 updateMenuKey.value = true
 }
+console.log(showMenuKeyList.value  )
 
-console.log(items.value)
 };
 function formatNumber(value) {
   if (!value) return '';
@@ -576,6 +576,28 @@ watch( items , (newvalue) => {
     console.log(items.value)
     console.log(MenuKeyList.value)
 
+})
+watch(showMenuKeyList ,(newvalue) => {
+
+
+  const newarr = MenuKeyList.value.filter(item => {
+    const matchedItem = showMenuKeyList.value.find(showItem => showItem.intKeySeq === item.intKeySeq && (showItem.lngKeyscrNo != item.lngKeyscrNo )  );
+    return matchedItem && matchedItem.strKeyName !== '';
+});
+
+console.log(newarr);
+
+  newarr.forEach((updatedItem) => {
+   const targetIndex = MenuKeyList.value.filter(item => item.intKeySeq == updatedItem.intKeySeq)
+    if (targetIndex !== -1) {
+      // MenuKeyList 값 업데이트
+      MenuKeyList.value[targetIndex] = { ...MenuKeyList.value[targetIndex], ...updatedItem };
+    } else {
+      MenuKeyList.value.push({...updatedItem})
+    }
+  });
+  console.log(MenuKeyList.value)
+ 
 })
 const savePosMenu = async() => {
   if(afterSearch.value == false) {
@@ -964,6 +986,7 @@ const handleScreenNo = (newValue) => {
   
 }
 watch(nowscreenNo , (newvalue) => {
+
   if(afterSearch.value) {
     showMenuKeyList.value = []
     const filteredList =  MenuKeyList.value.filter(item => item.intKeySeq >= (nowscreenNo.value -1)*45 && item.intKeySeq <= (nowscreenNo.value)*45 )
@@ -973,7 +996,7 @@ watch(nowscreenNo , (newvalue) => {
 // 중간에 비어 있는 번호 확인 및 채우기
     for (let i = startIndex; i < endIndex; i++) {
   // 해당 번호가 없는 경우 기본값 추가
-  const existingItem = filteredList.find((item) => item.intKeySeq === i);
+  const existingItem = filteredList.find((item) => item.intKeySeq === i+1);
   if (existingItem) {
     showMenuKeyList.value.push(existingItem);
   } else {
@@ -982,6 +1005,7 @@ watch(nowscreenNo , (newvalue) => {
       strKeyName: ``, // 기본값 또는 placeholder
     });
   }
+ 
 }
   }
 })
@@ -1105,9 +1129,9 @@ const addMenuKey =() => {
   const foraddIndex = MenuKeyList.value.findIndex(item => item.intKeySeq == (nowscreenNo.value-1)*45 + clickedRealIndex.value+1 )
   console.log(foraddIndex)
   if( foraddIndex == -1) {
-    MenuKeyList.value.push({intKeyNo: 6, intKeySeq : (nowscreenNo.value-1)*45 + clickedRealIndex.value, intPosNo : posNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value ,lngKeyColor :"16769216"})
+    MenuKeyList.value.push({intKeyNo: 6, intKeySeq : (nowscreenNo.value-1)*45 + clickedRealIndex.value+1, intPosNo : posNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value ,lngKeyColor :"16769216"})
   } else {
-    MenuKeyList.value[foraddIndex] = {intKeyNo: 6, intKeySeq : (nowscreenNo.value-1)*45 + clickedRealIndex.value, intPosNo : posNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value ,lngKeyColor :"16769216"}
+    MenuKeyList.value[foraddIndex] = {intKeyNo: 6, intKeySeq : (nowscreenNo.value-1)*45 + clickedRealIndex.value+1, intPosNo : posNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value ,lngKeyColor :"16769216"}
   }
   console.log(MenuKeyList.value)
   showMenuKey()
