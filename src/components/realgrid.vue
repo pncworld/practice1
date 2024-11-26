@@ -6,7 +6,7 @@
 import { getGridInfoList } from '@/api/common';
 import { GridView, LocalDataProvider } from 'realgrid';
 import { onMounted, ref, watch, nextTick } from 'vue';
-
+import { v4 as uuidv4 } from 'uuid';
 let gridView;
 let dataProvider;
 
@@ -37,7 +37,7 @@ const props = defineProps({
   },
 });
 
-const realgridname = ref(`realgrid-${props.progname}-${props.progid}`); // 동적 ID 설정
+const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}`); // 동적 ID 설정
 const tabInitSetArray = ref([]);
 const selectedRowData = ref([]);
 
@@ -45,8 +45,11 @@ const emit = defineEmits(["selcetedrowData"]);
 
 const funcshowGrid = async () => {
   // 그리드 초기화
-  if (gridView) {
+  console.log(gridView)
+  if (gridView !=undefined && gridView !=null ) {
     gridView.destroy(); // 기존 그리드 인스턴스 제거
+  }else {
+    console.log("초기화안되ㅁ?")
   }
 
   dataProvider = new LocalDataProvider();
@@ -135,7 +138,7 @@ onMounted(async () => {
   }
 });
 
-watch(() => props.showGrid, () => funcshowGrid());
+// watch(() => props.showGrid, () => funcshowGrid());
 watch(() => props.searchWord, (newValue) => {
   if (newValue === '') return;
   const filteredData = props.rowData.filter(

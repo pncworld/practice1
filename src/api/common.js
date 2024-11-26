@@ -57,40 +57,17 @@ export const getPosList = async(groupCd , storeCd) => {
     })
     return res ;
 }
-export const getStoreAndPosList = async(groupCd , storeCd) => {
+export const getStoreAndPosList = async(groupCd , storeCd ,posNo) => {
     const res = await api2.post("/SYSTEM/sysCom.asmx/getStoreAndPosList" , {
    
         GROUP_CD : groupCd,
-        STORE_CD : storeCd
+        STORE_CD : storeCd ,
+        POSNO : posNo
     })
     return res ;
 }
 
-export const DELETEALLPOSINFO = async(groupCd, storeCd, areaCd,posNo) => {
-  const res = await api2.post("/SYSTEM/sysCom.asmx/DELETEALLPOSINFO" , {
-   
-    GROUP_CD : groupCd,
-    STORE_CD : storeCd ,
-    AREA_CD : areaCd,
-    POSNO : posNo
-})
-return res ;
-}
 
-export const DUPLIALLPOSDATA = async(groupCd, storeCd, areaCd,posNo ,tgroupCd ,tstoreCd , tareaCd, tposNo) => {
-  const res = await api2.post("/SYSTEM/sysCom.asmx/DUPLIALLPOSDATA" , {
-   
-    GROUP_CD : groupCd,
-    STORE_CD : storeCd ,
-    AREA_CD : areaCd,
-    POSNO : posNo ,
-    T_GROUP_CD : tgroupCd ,
-    T_STORE_CD : tstoreCd,
-    T_AREA_CD : tareaCd,
-    T_POSNO : tposNo
-})
-return res ;
-}
 export const createItem = (item) => api.post('/items', item);
 export const updateItem = (id, item) => api.put(`/items/${id}`, item);
 export const deleteItem = (id) => api.delete(`/items/${id}`);

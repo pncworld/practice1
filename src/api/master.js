@@ -305,6 +305,62 @@ export const getScreenList2 = (groupCd , storeCd ,areaCd , posNo ) => {
         POSNO : posNo,
     })
 }
+export const DUPLIALLPOSDATA = async(groupCd, storeCd, areaCd,posNo ,tgroupCd ,tstoreCd , tareaCd, tposNo) => {
+    const res = await api2.post("/SYSTEM/sysCom.asmx/DUPLIALLPOSDATA" , {
+     
+      GROUP_CD : groupCd,
+      STORE_CD : storeCd ,
+      AREA_CD : areaCd,
+      POSNO : posNo ,
+      T_GROUP_CD : tgroupCd ,
+      T_STORE_CD : tstoreCd,
+      T_AREA_CD : tareaCd,
+      T_POSNO : tposNo
+  })
+  return res ;
+  }
+export const saveMenuKey2 = (groupCd , storeCd ,areaCd , posNo , keyseq ,keyname, keyscrno, keycolor ,keyNo ) => {
+    return api2.post('/MIMASTER/MST05_004INS.asmx/saveMenuKeys', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        KEYSEQ:  keyseq ,
+        KEYNAME: keyname,
+        KEYSCRNO: keyscrno,
+        KEYCOLOR: keycolor,
+        KEYNO :keyNo
+    })
+}
+export const dupliPos = (groupCd , storeCd ,areaCd , posNo ,tgroupCd ,tstoreCd , tareaCd, tposNo ) => {
+    return api2.post('/MIMASTER/MST05_004INS.asmx/dupliMenuKey', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        T_GROUP_CD:  tgroupCd ,
+        T_STORE_CD: tstoreCd,
+        T_AREA_CD: tareaCd,
+        T_POSNO: tposNo,
+    })
+}
+
+
+export const dupliPos2 = (groupCd , storeCd ,areaCd , posNo ,tgroupCd ,tstoreCd , tareaCd, tposNo ,screenNo, tscreenNo ) => {
+    return api2.post('/MIMASTER/MST05_004INS.asmx/dupliSpecificMenuKey', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        T_GROUP_CD:  tgroupCd ,
+        T_STORE_CD: tstoreCd,
+        T_AREA_CD: tareaCd,
+        T_POSNO: tposNo,
+        SCREEN_NO: screenNo,
+        T_SCREEN_NO : tscreenNo
+    })
+}
+
 
 
 

@@ -1,19 +1,21 @@
 <template>
   <div class="flex flex-col  w-full overflow-y-auto">
-  <div class="flex justify-start w-full pl-12 pt-2 ">
-             <div class="flex justify-start">
+  <div class="flex justify-between w-full pl-10 pt-5 ">
+             <div class="flex justify-between">
               <h1 class="font-bold text-sm md:text-2xl w-full">
               메뉴키 설정
              </h1></div>
+             <div class="flex space-x-6 pr-12"><button class="button search" @click="searchMenu">조회</button><button class="button save" @click="saveMenuKey">저장</button><button class="button primary" @click="showPopupf"><font-awesome-icon icon="copy" />&nbsp;&nbsp;메뉴키&nbsp;복사</button> <button class="button primary" @click="SpecificMenuDupli"><font-awesome-icon icon="copy" />&nbsp;&nbsp;메뉴키화면키&nbsp;복사</button></div>
              </div>
-            <div class="flex justify-end"><div class="flex space-x-6 pr-20"><button class="button search" @click="searchMenu">조회</button><button class="button save">저장</button><button class="button delete">삭제</button> <button class="button primary"><font-awesome-icon icon="copy" />&nbsp;&nbsp;메뉴키&nbsp;복사</button> <button class="button primary"><font-awesome-icon icon="copy" />&nbsp;&nbsp;메뉴키화면키&nbsp;복사</button></div></div>
-        <div class="flex  bg-gray-200 rounded-lg h-16 w-full items-center mt-1"><PickStore6 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @screenNo="handleScreenNo"></PickStore6></div> 
+           
+        <div class="flex  bg-gray-200 rounded-lg h-16 w-full items-center mt-5"><PickStore6 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @screenNo="handleScreenNo" @changed2="changed2"></PickStore6></div> 
 
 </div>
 <br>
 <div class="z-50">
-    <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo">
+    <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_004INS_VUE'" :dupliapiname="'dupliPos'" :progid="2">
     </DupliPopUp>
+    <DupliPopUp2 :isVisible="showSpecificMenukey" @close="showSpecificMenukey = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_004INS_VUE'" :progid="2" :dupliapiname="'dupliPos2'" :nowscreenNo="nowscreenNo"></DupliPopUp2>
   </div>
 
 <div v-if="changeScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center  z-50">
@@ -31,16 +33,16 @@
   
 </div>
 
-<div v-if="addscreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center  z-50">
+<div v-if="showScreenNm == true" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center  z-50">
   <div class="bg-white p-6 rounded shadow-lg w-[25%] h-[40%] ">
-    <h2 class="text-lg font-bold">화면키 추가</h2>
+    <h2 class="text-lg font-bold">화면명을 입력하세요</h2>
     <div class="flex flex-col justify-start h-12">
       <div><p>화면키명</p></div>
-      <div class="h-full w-full rounded-sm"><input type="text" class="border border-gray-400 pl-1 h-14 w-full rounded-sm" v-model="currentscreenKeyNm"></div>
+      <div class="h-full w-full rounded-sm"><input type="text" class="border border-gray-400 pl-1 h-14 w-full rounded-sm" v-model="currentSelectedMenuNm"></div>
   </div>
   <div class="flex justify-center space-x-3 w-full h-16 mt-28">
-    <button @click="confirmaddScreenKey()" class="mt-4 p-2 bg-blue-500 text-white rounded">확인</button>
-    <button @click="exitScreenKey" class="mt-4 p-2 bg-blue-500 text-white rounded">닫기</button>
+    <button @click="addScreenKeyf()" class="mt-4 p-2 bg-blue-500 text-white rounded">확인</button>
+    <button @click="showScreenNm =false" class="mt-4 p-2 bg-blue-500 text-white rounded">닫기</button>
   </div>
   </div>
   
@@ -60,7 +62,7 @@
   >
     <div
       v-for="(item, index) in ScreenKeyOrigin"
-      class="p-4 bg-gray-200 rounded-lg shadow-md cursor-move h-12"
+      class="p-4 bg-gray-200 rounded-lg shadow-md cursor-move h-14"
       v-show="item && item.strScreenName !== ''"
     >
       <p>{{ item.strScreenName }}</p>
@@ -72,21 +74,22 @@
   </div>
 </div>
 </div>
-<span class="h-5 -mt-1 flex justify-between items-center w-[900px] ml-[700px]  z-40"><h1 class="font-bold text-xl z-40">메뉴키 설정</h1><span class="flex space-x-3 ml-32 pl-56 items-center">순서변경 &nbsp; &nbsp;<label class="z-40"><input type="radio" name="changingMode" @click.stop="changingMode(1)" checked>교체하기 </label><label class="z-40"><input type="radio" name="changingMode" @click.stop="changingMode(2)">밀어내기</label><button class="whitebutton z-40" @click.stop="deletekey">삭제</button></span></span> 
-<div class="flex h-5/6 w-full -mt-5">
-<div class="flex flex-col w-3/5 h-4/6">
+<span class="h-5 -mt-1 flex justify-between items-center w-[930px] ml-[680px]  z-40"><h1 class="font-bold text-xl z-40">메뉴키 설정</h1><span class="flex space-x-3 ml-32 pl-56 items-center">순서변경 &nbsp; &nbsp;<label class="z-40"><input type="radio" name="changingMode" @click.stop="changingMode(1)" checked>교체하기 </label><label class="z-40"><input type="radio" name="changingMode" @click.stop="changingMode(2)">밀어내기</label><button class="whitebutton z-40" @click.stop="deletekey">삭제</button></span></span> 
+<div class="flex h-5/6 w-full -mt-5 ">
+<div class="flex flex-col w-3/5 h-4/6 ">
 <div class="flex justify-between mt-0 ml-10 w-full border-b  border-b-gray-300">
   
   <div>
-    <button class="contents_tab-button " :class="{'text-blue-600' : currentMenu==false }" @click="showMenus(1)">메뉴관리</button>
-    <button class="contents_tab-button" :class="{'text-blue-600' : currentMenu==true }"  @click="showMenus(2)">TLU관리</button>
+    <button class="contents_tab-button " :class="{'text-blue-600' : currentMenu==1 }" @click="showMenus(1)">메뉴관리</button>
+    <button class="contents_tab-button" :class="{'text-blue-600' : currentMenu==2 }"  @click="showMenus(2)">TLU관리</button>
+    <button class="contents_tab-button" :class="{'text-blue-600' : currentMenu==3 }"  @click="showMenus(3)">화면관리</button>
   </div>
   <div class="mt-3">
     <button class="whitebutton" @click="searchMenuList3">조회</button>
-    <button class="whitebutton">추가</button>
+    <button class="whitebutton" v-if="currentMenu != 3">추가</button>
   </div>
 </div>
-<div class="h-4/6" v-show="currentMenu == false">
+<div class="h-4/6" v-show="currentMenu == 1">
 <div class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
   <div class="customtableIndex border border-gray-400 rounded-tl-lg">메뉴분류</div>
   <div class="px-4 py-2 border border-gray-300 rounded-tr-lg flex ">
@@ -108,7 +111,7 @@
   </div>
 </div>
 
-<div class="h-4/6" v-show="currentMenu">
+<div class="h-4/6" v-show="currentMenu == 2">
 <div class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-1 gap-0 w-full">
   <div class="customtableIndex border border-gray-400 rounded-tl-lg">TLU명/코드</div>
   <div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList2"></div>
@@ -119,32 +122,38 @@
     <div id="realgrid3" style="width: 100%; height: 90%;" class="mt-5"></div>
   </div>
 </div>
+<div class="h-full" v-show="currentMenu == 3">
+  <div class="mt-7 ml-10 w-full h-full">
+  <Realgrid :progname="'MST01_004INS_VUE'" :progid="3" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData"></Realgrid>
 </div>
-<div class="grid grid-rows-[9fr,5fr] grid-cols-1 ml-10 w-full h-full z-20">
-  <div class="flex h-full w-[950px] mt-10" v-show="afterSearch" >
+</div>
+</div>
+<div class="grid grid-rows-1 grid-cols-1 ml-10 w-full h-full z-20">
+  <div class="flex h-[760px] w-[950px] mt-10 ml-8" v-show="afterSearch">
     <VueDraggableNext
-  v-model="showMenuKeyList"
-  :move="onMove"
-   @end="onEnd"
-   animation="200"
-  class="grid grid-cols-5 grid-rows-6  ml-10 mt-4 w-full h-full gap-1 " 
->
-  <div
-    v-for="(item, index) in showMenuKeyList"
-    class="screen-muuri-sort-empty flex items-center justify-center h-16 w-44"
-    :class="{' !bg-orange-500' : clickedMenuKey==index }"
-    @click="saveMenuKeyposition(index); clickedMenuKey = index; clickedMenukeys()"
-  >
-    <span class="flex flex-col"><span>{{ item ? item.strKeyName : '' }}</span></span>
+      v-model="showMenuKeyList"
+      :move="onMove"
+      @end="onEnd"
+      animation="200"
+      class="grid grid-cols-5 grid-rows-9 gap-1 w-[950px] h-[760px]" 
+    >
+      <div
+        v-for="(item, index) in showMenuKeyList"
+        class="flex items-center justify-center h-20 w-44 rounded-2xl shadow-sm border border-gray-500"
+        :class="{'!bg-orange-500': clickedMenuKey == index}"
+        @click="saveMenuKeyposition(index); clickedMenuKey = index; clickedMenukeys()"
+      >
+        <span class="flex flex-col">
+          <span v-if="item.intKeyNo ==1">(Screen. {{item.lngKeyscrNo}} )</span>
+          <span>{{ item ? formatStrKeyName(item.strKeyName).part1 : '' }}</span>
+          <span>{{ item ? formatStrKeyName(item.strKeyName).part2 : '' }}</span>
+          <span class="ml-16">{{ item ? (formatStrKeyName(item.strKeyName).part3 != null ? formatStrKeyName(item.strKeyName).part3 +'원' : '') : ''}}</span>
+        </span>
+      </div>
+    </VueDraggableNext>
   </div>
-</VueDraggableNext>
-
-
-
-
 </div>
 
-</div>
 
 
 
@@ -155,13 +164,15 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { useStore } from 'vuex';
-import { deletetablePosMenuKey, get_category_info, getCategoryInfo, getMenuKeyList, getMenuKeyList2, getMenuList, getMultiLingual, getScreenList, getScreenList2, getTablePosMenuKey, getTLUList, saveAllMenuKey, saveScreenKeys, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
+import { deletetablePosMenuKey, get_category_info, getCategoryInfo, getMenuKeyList, getMenuKeyList2, getMenuList, getMultiLingual, getScreenList, getScreenList2, getTablePosMenuKey, getTLUList, saveAllMenuKey, saveMenuKey2, saveScreenKeys, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
 import { VueDraggableNext } from 'vue-draggable-next';
 import Swal from 'sweetalert2';
 import PickStore5 from '@/components/pickStore5.vue';
 import {  GridView, LocalDataProvider } from 'realgrid';
 import DupliPopUp from '@/components/dupliPopUp.vue';
 import PickStore6 from '@/components/pickStore6.vue';
+import DupliPopUp2 from '@/components/dupliPopUp2.vue';
+import Realgrid from '@/components/realgrid.vue';
 
 
 // 더미 데이터
@@ -210,11 +221,45 @@ const changeScreenKey = ref(false);
 const currmenuKeyPage = ref(1)
 const AllscreenKeyPage = ref(1)
 const currentSelectedMenuNm = ref("")
+const showSpecificMenukey = ref(false)
+const rowData = ref([
+  { screenName: '화면1', add: '추가', screenNo: 1 },
+  { screenName: '화면2', add: '추가', screenNo: 2 },
+  { screenName: '화면3', add: '추가', screenNo: 3 },
+  { screenName: '화면4', add: '추가', screenNo: 4 },
+  { screenName: '화면5', add: '추가', screenNo: 5 },
+  { screenName: '화면6', add: '추가', screenNo: 6 },
+  { screenName: '화면7', add: '추가', screenNo: 7 },
+  { screenName: '화면8', add: '추가', screenNo: 8 },
+  { screenName: '화면9', add: '추가', screenNo: 9 },
+  { screenName: '화면10', add: '추가', screenNo: 10 },
+  { screenName: '화면11', add: '추가', screenNo: 11 },
+  { screenName: '화면12', add: '추가', screenNo: 12 },
+  { screenName: '화면13', add: '추가', screenNo: 13 },
+  { screenName: '화면14', add: '추가', screenNo: 14 },
+  { screenName: '화면15', add: '추가', screenNo: 15 },
+  { screenName: '화면16', add: '추가', screenNo: 16 },
+  { screenName: '화면17', add: '추가', screenNo: 17 },
+  { screenName: '화면18', add: '추가', screenNo: 18 },
+  { screenName: '화면19', add: '추가', screenNo: 19 },
+  { screenName: '화면20', add: '추가', screenNo: 20 }
+]);
 
 
 const isNew = ref(false);
-const currentMenu = ref(false)
-
+const currentMenu = ref('1')
+const SpecificMenuDupli = () => {
+  showSpecificMenukey.value = true
+}
+const showScreenNm = ref(false)
+const selcetedrowData = (newvalue) => {
+  console.log(newvalue[2])
+  showScreenNm.value = true
+  currentSelectedMenuNm.value = newvalue[0]
+  currentSelectedMenuCode.value = newvalue[2]
+  // addScreenKeyf()
+  
+}
 
 const showPopupf = () => {
   if(afterSearch.value == false) {
@@ -225,6 +270,25 @@ const showPopupf = () => {
     return ;
   }
   showPopup2.value = true;
+}
+function formatStrKeyName(strKeyName) {
+  // 첫 번째 파싱: '/' 기준으로 분리
+  const firstSplit = strKeyName.split('/');
+
+  // 두 번째 파싱: '(' 기준으로 분리
+  const secondSplit = firstSplit[1] ? firstSplit[1].split('(') : [null];
+
+  // 결과 반환
+  return {
+    part1: firstSplit[0], // 첫 번째 부분 ("/" 기준)
+    part2: secondSplit[0], // 두 번째 부분 ("(" 기준)
+    part3: secondSplit[1] ? secondSplit[1].replace(')', '') : null, // 괄호 안 내용
+  };
+}
+const changed2 = (newvalue) => {
+ 
+    MenuKeyList.value =[]
+    showMenuKeyList.value = []
 }
 const setLang = () => {
 
@@ -306,17 +370,45 @@ ScreenKeys.value = ScreenKeyOrigin.value.slice(10 * (currentsubPage.value-1), 10
 const updateMenuKey = ref(false)
 let dupliitems = []
 
-const saveMenuKeys =() => {
-let dupliitems = [...items.value]
-for(var i=0 ; i< dupliitems.length ; i++) {
-if(dupliitems[i].lngKeyscrNo !=''){
-  dupliitems[i].intKeySeq = (i +1).toString() ;
-}
+const saveMenuKey = () => {
+  const keyseq =  MenuKeyList.value.map(item => item.intKeySeq)
+  const keyname = MenuKeyList.value.map(item => item.strKeyName)
+  const keyscrno = MenuKeyList.value.map(item => item.lngKeyscrNo)
+  const keycolor = MenuKeyList.value.map(item => item.lngKeyColor)
+  const keyno = MenuKeyList.value.map(item => item.intKeyNo)
+  Swal.fire({
+    title: '저장하시겠습니까?',
+    confirmButtonText: '확인',
+    showCancelButton: true,
+    cancelButtonText: '취소',
+  }).then(async(result) =>{
+    if(result.isConfirmed){
+      try {
+        const res = await saveMenuKey2(groupCd.value, nowStoreCd.value , nowStoreAreaCd.value , posNo.value,
+        keyseq.join(","),
+        keyname.join(","),
+        keyscrno.join(","),
+        keycolor.join(","),
+        keyno.join(",")
+      )
+      console.log(res)
+      if(res.data.RESULT_CD =='00'){
+        Swal.fire({
+          title: '저장 성공',
+          confirmButtonText: '확인',
+        })
+      }
+      } catch (error) {
+        
+      } finally {
+        searchMenu()
+      }
+     
+    }})
 
-}
-const updatedMenuKeys = dupliitems.filter(item => item.lngKeyscrNo !='')
-console.log(updatedMenuKeys)
-
+    
+  
+ 
 }
 const nowStoreAreaCd = ref();
 const  handleStoreAreaCd = (newValue) => {
@@ -357,6 +449,7 @@ const MenuKeyList = ref([])
 const clickedScreenOrMenu = ref(false)
 const TLUList = ref([])
 const clickedScreenNo = ref()
+const changePage = ref(false)
 const searchMenu = async () => {
     changeMode.value = false
     Category.value = [] ;
@@ -374,10 +467,21 @@ if(nowStoreCd.value == '0' || nowStoreCd.value == undefined) {
     })
     return;
 }
-if(nowStoreAreaCd.value == '0' || nowStoreAreaCd.value == undefined) {
+if(posNo.value == '0' || posNo.value == undefined) {
     Swal.fire({
         title: '경고',
         text: '포스번호를 선택하세요.',
+        icon: 'warning',
+        showCancelButton: false,
+        confirmButtonColor: '#3085d6',
+        allowOutsideClick: false
+    })
+    return;
+}
+if(nowscreenNo.value == '0' || nowscreenNo.value == undefined) {
+    Swal.fire({
+        title: '경고',
+        text: '화면번호를 선택하세요.',
         icon: 'warning',
         showCancelButton: false,
         confirmButtonColor: '#3085d6',
@@ -457,6 +561,7 @@ const setSubCd = () => {
   console.log(SubMenuGroup.value)
   filteredSubMenuGroup.value = SubMenuGroup.value.filter(item => item.sublngMajor == forsearchMain.value)
   console.log(filteredSubMenuGroup.value)
+  forsearchSub.value = '0'
 }
 const clickedintScreenNo = ref()
 const calculateMaxSubCode = () =>{
@@ -536,7 +641,12 @@ showMenuKeyList.value = swappedItems.map((item, index) => ({
 }));
 } else {
 updateMenuKey.value = true
+showMenuKeyList.value = showMenuKeyList.value.map((item, index) => ({
+  ...item, // 기존 객체의 다른 속성 유지
+  intKeySeq: (index+ (nowscreenNo.value-1)*45) + 1 // 배열 순서대로 intKeySeq 재정렬
+}))
 }
+
 console.log(showMenuKeyList.value  )
 
 };
@@ -579,25 +689,18 @@ watch( items , (newvalue) => {
 })
 watch(showMenuKeyList ,(newvalue) => {
 
+ const firstfiltered =  showMenuKeyList.value.filter(item => (item.lngKeyscrNo !=undefined))
 
-  const newarr = MenuKeyList.value.filter(item => {
-    const matchedItem = showMenuKeyList.value.find(showItem => showItem.intKeySeq === item.intKeySeq && (showItem.lngKeyscrNo != item.lngKeyscrNo )  );
-    return matchedItem && matchedItem.strKeyName !== '';
-});
-
-console.log(newarr);
-
-  newarr.forEach((updatedItem) => {
-   const targetIndex = MenuKeyList.value.filter(item => item.intKeySeq == updatedItem.intKeySeq)
-    if (targetIndex !== -1) {
-      // MenuKeyList 값 업데이트
-      MenuKeyList.value[targetIndex] = { ...MenuKeyList.value[targetIndex], ...updatedItem };
-    } else {
-      MenuKeyList.value.push({...updatedItem})
-    }
-  });
-  console.log(MenuKeyList.value)
+console.log(firstfiltered);
+console.log(MenuKeyList.value);
  
+let secondfiltered = MenuKeyList.value.filter(item => item.intKeySeq < (nowscreenNo.value-1)*45 || item.intKeySeq > (nowscreenNo.value)*45  )
+   console.log(secondfiltered)
+  firstfiltered.forEach((updatedItem) => {
+    secondfiltered.push(updatedItem)
+  });
+  MenuKeyList.value = secondfiltered
+console.log(MenuKeyList.value)
 })
 const savePosMenu = async() => {
   if(afterSearch.value == false) {
@@ -986,11 +1089,15 @@ const handleScreenNo = (newValue) => {
   
 }
 watch(nowscreenNo , (newvalue) => {
-
+  changePage.value= true
   if(afterSearch.value) {
+    console.log(MenuKeyList.value)
+    console.log(showMenuKeyList.value)
+   
+    console.log(nowscreenNo.value)
     showMenuKeyList.value = []
-    const filteredList =  MenuKeyList.value.filter(item => item.intKeySeq >= (nowscreenNo.value -1)*45 && item.intKeySeq <= (nowscreenNo.value)*45 )
-    
+    const filteredList =  MenuKeyList.value.filter(item => item.intKeySeq > (nowscreenNo.value -1)*45 && item.intKeySeq <= (nowscreenNo.value)*45 )
+    console.log(filteredList)
     const startIndex = (nowscreenNo.value - 1) * 45;
     const endIndex = nowscreenNo.value * 45;
 // 중간에 비어 있는 번호 확인 및 채우기
@@ -1007,7 +1114,10 @@ watch(nowscreenNo , (newvalue) => {
   }
  
 }
+console.log(showMenuKeyList.value)
+console.log(MenuKeyList.value)
   }
+  changePage.value= false
 })
 watch(() => MenuList.value, () => {
   showMenuKeys();  // MenuKeyList 값이 변경될 때마다 그리드 업데이트
@@ -1118,7 +1228,7 @@ const saveMenuKeyposition = (index) => {
     console.log(clickedintScreenNo.value)
     console.log(index)
     console.log(items.value)
-
+    clickedScreenOrMenu.value = true ;
  clickedRealIndex.value = (nowscreenNo.value - 1) * 45 + index 
  console.log(clickedRealIndex.value)
 }
@@ -1138,14 +1248,30 @@ const addMenuKey =() => {
 
 }
 
+const addScreenKeyf =() => {
+  console.log( MenuKeyList.value)
+  console.log( clickedRealIndex.value)
+  const foraddIndex = MenuKeyList.value.findIndex(item => item.intKeySeq == (nowscreenNo.value-1)*45 + clickedRealIndex.value+1 )
+  console.log(foraddIndex)
+  if( foraddIndex == -1) {
+    MenuKeyList.value.push({intKeyNo: 1, intKeySeq : (nowscreenNo.value-1)*45 + clickedRealIndex.value+1, intPosNo : posNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value ,lngKeyColor :"16769216"})
+  } else {
+    MenuKeyList.value[foraddIndex] = {intKeyNo: 1, intKeySeq : (nowscreenNo.value-1)*45 + clickedRealIndex.value+1, intPosNo : posNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value ,lngKeyColor :"16769216"}
+  }
+  console.log(MenuKeyList.value)
+  showScreenNm.value = false
+  showMenuKey()
+
+}
+
 const addTLUKey =() => {
   console.log( MenuKeyList.value)
   const foraddIndex = MenuKeyList.value.findIndex(item => item.intKeySeq == clickedRealIndex.value)
   console.log(foraddIndex)
   if( foraddIndex == -1) {
-    MenuKeyList.value.push({intKeyNo: 6, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(clickedTLUCD.value) , strKeyName: clickedTLUNM.value})
+    MenuKeyList.value.push({intKeyNo: 6, intKeySeq : clickedRealIndex.value+1 , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(clickedTLUCD.value) , strKeyName: clickedTLUNM.value})
   } else {
-    MenuKeyList.value[foraddIndex] = {intKeyNo: 6, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(clickedTLUCD.value) , strKeyName: clickedTLUNM.value}
+    MenuKeyList.value[foraddIndex] = {intKeyNo: 6, intKeySeq : clickedRealIndex.value+1 , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(clickedTLUCD.value) , strKeyName: clickedTLUNM.value}
   }
   showMenuKey(clickedintScreenNo.value)
 }
@@ -1153,32 +1279,24 @@ const addTLUKey =() => {
 const showMenus = (value) => {
   if(value ==1) {
     currentMenuorTLU.value = false
-    currentMenu.value = false
-  } else {
+    currentMenu.value = value
+  } else if(value == 2){
     currentMenuorTLU.value = true
-    currentMenu.value = true
+    currentMenu.value = value
     showMenuKeys2()
     showMenuKeys3()
+  } else {
+    currentMenu.value = value
   }
 }
 const deletekey = () => {
-  if(clickedScreenOrMenu.value == false) {
-  
-      ScreenKeyOrigin.value = ScreenKeyOrigin.value.filter(item => item.intScreenNo !=clickedintScreenNo.value)
-      addscreenKey.value = false
-      addfor10ScreenKey()
-     
-      MenuKeyList.value = MenuKeyList.value.filter(item=> item.intScreenNo!=clickedintScreenNo.value)
-      currentscreenKeyNm.value = ''
-  
-      clickedintScreenNo.value= clickedintScreenNo.value +1 ;
-      showMenuKey(clickedintScreenNo.value)
-  } else {
+  if(clickedScreenOrMenu.value == true) {
+    const filteredMenuKeyList = MenuKeyList.value.filter(item => item.intKeySeq != clickedRealIndex.value +1)
+    MenuKeyList.value =  filteredMenuKeyList
+    showMenuKey()
+
    
-     MenuKeyList.value = MenuKeyList.value.filter(item=> (item.intScreenNo!=clickedintScreenNo.value || item.intKeySeq != clickedRealIndex.value))
-     console.log(MenuKeyList.value)
-     showMenuKey(clickedintScreenNo.value)
-  }
+  } 
 }
 
 const clickedMenukeys = () => {
@@ -1188,7 +1306,7 @@ const clickedScreenKeys = () => {
   clickedScreenOrMenu.value= false
 }
 const handleinitAll = (newvalue) => {
-  MenuList.value = []
+    MenuList.value = []
     MenuGroup.value =[]
     SubMenuGroup.value=[]
     MenuKeyList.value =[]
@@ -1198,6 +1316,7 @@ const handleinitAll = (newvalue) => {
     MenuList.value =[]
     ScreenKeys.value = []
     items.value = []
+    showMenuKeyList.value = []
 } 
 </script>
 

@@ -16,7 +16,7 @@
 <br>
 <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore5 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll"></PickStore5> </div> 
 <div class="z-50">
-    <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo">
+    <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_011INS_VUE'" :dupliapiname="'DUPLIALLPOSDATA'" :progid="1">
     </DupliPopUp>
   </div>
 
@@ -585,15 +585,15 @@ const savePosMenu = async() => {
     return ;
   }
 
-  if(JSON.stringify(confirmitem.value) === JSON.stringify(MenuList.value)) {
-    Swal.fire({
-      title: '경고',
-      text: '변경된 항목이 없습니다.',
-      icon: 'warning',
-      confirmButtonText: '확인'
-    })
-    return ;
-  }
+  // if(JSON.stringify(confirmitem.value) === JSON.stringify(MenuList.value)) {
+  //   Swal.fire({
+  //     title: '경고',
+  //     text: '변경된 항목이 없습니다.',
+  //     icon: 'warning',
+  //     confirmButtonText: '확인'
+  //   })
+  //   return ;
+  // }
   Swal.fire({
     title: '저장하시겠습니까?',
     text: '변경사항을 저장하시겠습니까?',
@@ -1145,6 +1145,7 @@ const handleinitAll = (newvalue) => {
     MenuList.value =[]
     ScreenKeys.value = []
     items.value = []
+  
 } 
 </script>
 

@@ -24,7 +24,7 @@
         
     </div>
       <div class="flex justify-center items-center">
-        <span class="font-bold text-sm ">포스번호 : &nbsp;</span> <select :disabled="isDisabled4"  class="w-32 text-sm border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" v-model="selectedPosNo" @change="setScreenNo">
+        <span class="font-bold text-sm ">포스번호 : &nbsp;</span> <select :disabled="isDisabled4"  class="w-32 text-sm border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" v-model="selectedPosNo" @change="setScreenNo(); posChanged();">
           <option value="0">선택</option>
           <option :value="{ lngCode: item.lngCode , lngAreaCode: item.lngAreaCode} " v-for="item in storePosNo" :key="item.lngAreaCode">{{ item.strName }}</option>
         </select>
@@ -59,12 +59,18 @@ const selectedPosNo = ref('0');
 const selectedStoreCd = ref('0');
 const selectedScreenNo = ref('0');
 const changed = ref(false)
+const changed2 = ref(false)
 const ischanged = () => {
     changed.value = !changed.value;
-  
-    console.log(changed.value)
+    selectedPosNo.value = '0'
+    selectedScreenNo.value = '0'
     emit('update:ischanged',changed.value);
 };
+
+const posChanged = () => {
+  changed2.value = !changed2.value
+  emit('changed2',changed2.value);
+}
 
     const store = useStore();
     const userData = store.state.userData ;
@@ -74,7 +80,7 @@ const props = defineProps({
     })
 const {groupCdDisabled} = props ;
 isDisabled1.value = groupCdDisabled;
-const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd', 'areaCd', 'posNo' ,'update:ischanged' ,'screenNo']);
+const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd', 'areaCd', 'posNo' ,'update:ischanged' ,'screenNo' ,'changed2']);
 const emitStoreGroup = (value) => {
     emit('update:storeGroup', value);
 };
@@ -136,12 +142,12 @@ const emitPosInfo = (value1 ,value2) => {
   }
 const ScreenList= ref([])
   const setScreenNo = async(value) => {
-     console.log(storeGroup.value[0].lngStoreGroup)
-     console.log(selectedStoreCd.value)
-     console.log(selectedPosNo.value)
+
+     if ( selectedPosNo.value !='0'){
       const res2 = await getScreenList2(storeGroup.value[0].lngStoreGroup, selectedStoreCd.value , selectedPosNo.value.lngAreaCode, selectedPosNo.value.lngCode)
       ScreenList.value = res2.data.ScreenList
-      console.log(ScreenList.value)
+    }
+    selectedScreenNo.value = '0'
     }
 watch( selectedPosNo, (newValue) => {
   if ( selectedPosNo.value != '0'){
