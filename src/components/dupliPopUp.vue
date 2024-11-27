@@ -1,7 +1,7 @@
 <template>
     <div v-if="isVisible" class="fixed flex top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 justify-center items-center">
       <div class=" bg-white w-[30%] h-[80%] shadow-lg rounded-lg flex flex-col">
-        <header class="popup-header flex justify-between pl-5 pt-5">
+        <header class="popup-header flex justify-between pl-12 pt-5">
             <h1 class="font-bold text-2xl">메뉴키 복사</h1>
             <button class="border border-gray-300 button primary rounded-md mr-12" @click="dupliStore">복사</button>
         </header>
@@ -56,6 +56,7 @@ import Swal from "sweetalert2";
   function close() {
     rowData.value = []
     emit("close");
+    checked.value = false
   }
  const rowData = ref([]);
  const showGrid = ref(false)
@@ -117,7 +118,7 @@ const dupliStore = async() => {
     console.log(checked.value)
     if(checked.value == false){
       Swal.fire({
-        title: '경고',
+        title: '알림',
         text: '복사할 대상이 없습니다.',
         icon: 'warning',
         confirmButtonText: '확인'
@@ -125,8 +126,8 @@ const dupliStore = async() => {
       return;
     } else {
       Swal.fire({
-      title: '확인',
-      text: '선택하신 POS의 메뉴배치정보 및 화면정보가 모두 삭제 후 복사됩니다. 계속 진행하시겠습니다?',
+      title: '복사',
+      text: '선택하신 POS의 메뉴배치정보 및 화면정보가 모두 삭제 후 복사됩니다. 계속 진행하시겠습니까?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: '복사',

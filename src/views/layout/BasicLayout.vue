@@ -250,9 +250,10 @@ const lngProgramID = computed(() => {
 const reLoad = () => {
   store.dispatch('convertLoading',true);
   const activeTab = store.state.activeTab ;
+  console.log(activeTab)
   store.dispatch('refreshTab' , activeTab );
- 
-  componentKey.value = activeTab;
+  const activeTab2 = store.state.activeTab ;
+  componentKey.value = activeTab2;
 
   store.dispatch('convertLoading',false);
 }

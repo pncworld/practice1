@@ -249,8 +249,16 @@ export const getScreenList = ( groupCd , storeCd , areaCd , posNo ) => {
     })
 }
 
+
 export const getMenuKeyList = ( groupCd , storeCd , areaCd) => {
     return api2.post('/MIMASTER/MST05_011INS.asmx/getMenuKeyList' , {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD : areaCd 
+    })
+}
+export const getMenuKeyList3 = ( groupCd , storeCd , areaCd) => {
+    return api2.post('/MIMASTER/MST44_052INS.asmx/getMenuKeyList' , {
         GROUP_CD: groupCd,
         STORE_CD: storeCd ,
         AREA_CD : areaCd 
@@ -306,7 +314,7 @@ export const getScreenList2 = (groupCd , storeCd ,areaCd , posNo ) => {
     })
 }
 export const DUPLIALLPOSDATA = async(groupCd, storeCd, areaCd,posNo ,tgroupCd ,tstoreCd , tareaCd, tposNo) => {
-    const res = await api2.post("/SYSTEM/sysCom.asmx/DUPLIALLPOSDATA" , {
+    const res = await api2.post("/MIMASTER/MST05_011INS.asmx/DUPLIALLPOSDATA" , {
      
       GROUP_CD : groupCd,
       STORE_CD : storeCd ,

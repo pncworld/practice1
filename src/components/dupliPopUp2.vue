@@ -1,7 +1,7 @@
 <template>
     <div v-if="isVisible" class="fixed flex top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 justify-center items-center">
       <div class=" bg-white w-[30%] h-[80%] shadow-lg rounded-lg flex flex-col">
-        <header class="popup-header flex justify-between pl-5 pt-5">
+        <header class="popup-header flex justify-between pl-12  pt-5">
             <h1 class="font-bold text-2xl">메뉴키화면키 복사</h1>
             <button class="border border-gray-300 button primary rounded-md mr-12" @click="dupliStore">복사</button>
         </header>
@@ -85,6 +85,7 @@ import Swal from "sweetalert2";
   function close() {
     rowData.value = []
     emit("close");
+    checked.value = false
   }
  const rowData = ref([]);
  const showGrid = ref(false)

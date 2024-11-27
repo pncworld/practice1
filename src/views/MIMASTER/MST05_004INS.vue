@@ -377,11 +377,13 @@ const saveMenuKey = () => {
   const keycolor = MenuKeyList.value.map(item => item.lngKeyColor)
   const keyno = MenuKeyList.value.map(item => item.intKeyNo)
   Swal.fire({
-    title: '저장하시겠습니까?',
-    confirmButtonText: '확인',
-    showCancelButton: true,
-    cancelButtonText: '취소',
-  }).then(async(result) =>{
+      title: '저장',
+      text: '저장 하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: '저장',
+      cancelButtonText: '취소'
+    }).then(async(result) =>{
     if(result.isConfirmed){
       try {
         const res = await saveMenuKey2(groupCd.value, nowStoreCd.value , nowStoreAreaCd.value , posNo.value,
@@ -394,7 +396,7 @@ const saveMenuKey = () => {
       console.log(res)
       if(res.data.RESULT_CD =='00'){
         Swal.fire({
-          title: '저장 성공',
+          title: '저장 되었습니다.',
           confirmButtonText: '확인',
         })
       }
@@ -1306,6 +1308,7 @@ const clickedScreenKeys = () => {
   clickedScreenOrMenu.value= false
 }
 const handleinitAll = (newvalue) => {
+    afterSearch.value = false
     MenuList.value = []
     MenuGroup.value =[]
     SubMenuGroup.value=[]

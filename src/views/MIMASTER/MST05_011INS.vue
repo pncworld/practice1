@@ -457,6 +457,7 @@ const setSubCd = () => {
   console.log(SubMenuGroup.value)
   filteredSubMenuGroup.value = SubMenuGroup.value.filter(item => item.sublngMajor == forsearchMain.value)
   console.log(filteredSubMenuGroup.value)
+  forsearchSub.value = '0'
 }
 const clickedintScreenNo = ref()
 const calculateMaxSubCode = () =>{
@@ -595,15 +596,12 @@ const savePosMenu = async() => {
   //   return ;
   // }
   Swal.fire({
-    title: '저장하시겠습니까?',
-    text: '변경사항을 저장하시겠습니까?',
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: '저장',
-    cancelButtonText: '취소',
-    allowOutsideClick: false
+    title: '저장',
+      text: '저장 하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: '저장',
+      cancelButtonText: '취소'
 }).then(async (result) => {
   if(result.isConfirmed){
     store.state.loading = true;
@@ -633,10 +631,8 @@ const savePosMenu = async() => {
   } finally {
     store.state.loading = false;
     Swal.fire({
-      title: '저장 성공',
-      text: '변경 사항이 저장되었습니다.',
-      icon:'success',
-      confirmButtonText: '확인'
+      title: '저장 되었습니다.',
+      confirmButtonText: '확인',
     })
 
     searchMenu()
