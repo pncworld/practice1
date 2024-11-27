@@ -35,7 +35,7 @@ import * as api from "@/api/common";
 import * as api2 from "@/api/master";
 import { useStore } from "vuex";
 import Swal from "sweetalert2";
-  const {isVisible ,storeCd,storeNm,posNo,areaCd , progname , progid ,dupliapiname } = defineProps({
+  const {isVisible ,storeCd,storeNm,posNo,areaCd , progname , progid ,dupliapiname , poskiosk } = defineProps({
     isVisible: { type: Boolean, default: false }, // 팝업 가시성 관리
     storeCd : { type : String , default: ''} ,
     storeNm : { type : String , default: ''} ,
@@ -44,6 +44,7 @@ import Swal from "sweetalert2";
     progname : {type: String },
     progid : {type : Number},
     dupliapiname : {type : String},
+    poskiosk : {type : String},
   
   });
   const store = useStore();  // vuex store
@@ -65,7 +66,7 @@ import Swal from "sweetalert2";
    console.log(progname)
    console.log(progid)
       try {
-         res = await api.getStoreAndPosList(groupCd.value , storeCd  , posNo)
+         res = await api[poskiosk](groupCd.value , storeCd  , posNo)
       } catch (error) {
         console.log(error)
       } finally {

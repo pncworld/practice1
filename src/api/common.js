@@ -75,6 +75,16 @@ export const getStoreAndPosList = async(groupCd , storeCd ,posNo) => {
     return res ;
 }
 
+export const getStoreAndPosList2 = async(groupCd , storeCd ,posNo) => {
+  const res = await api2.post("/SYSTEM/sysCom.asmx/getStoreAndPosList2" , {
+ 
+      GROUP_CD : groupCd,
+      STORE_CD : storeCd ,
+      POSNO : posNo
+  })
+  return res ;
+}
+
 
 export const createItem = (item) => api.post('/items', item);
 export const updateItem = (id, item) => api.put(`/items/${id}`, item);

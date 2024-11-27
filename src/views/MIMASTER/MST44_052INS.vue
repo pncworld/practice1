@@ -16,7 +16,7 @@
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore7kio @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll"></PickStore7kio> </div> 
   <div class="z-50">
-      <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_011INS_VUE'" :dupliapiname="'DUPLIALLPOSDATA'" :progid="1">
+      <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_011INS_VUE'" :dupliapiname="'DUPLIALLPOSDATA'" :progid="1" :poskiosk="'getStoreAndPosList2'">
       </DupliPopUp>
     </div>
   
@@ -144,16 +144,15 @@
     :move="onMove"
      @end="onEnd"
      animation="200"
-    class="grid grid-cols-4 grid-rows-4 ml-10 mt-4 w-full h-full gap-1 " 
+    class="grid grid-cols-4 grid-rows-4 ml-10 mt-4 w-full h-full gap-x-2" 
   >
     <div
       v-for="(item, index) in items"
-      :key="index"
-      class="screen-muuri-sort-empty flex items-center justify-center "
+      class="screen-muuri-sort-empty flex items-center justify-center !h-32 !w-[213px]"
       :class="{' !border-blue-700' : clickedMenuKey==index }"
       @click="saveMenuKeyposition(index); clickedMenuKey = index; clickedMenukeys()"
     >
-      <span class="flex flex-col"><span v-if="item.strUserFileName != ''" class="h-16"><img :src="`http://www.pncoffice.net/MenuImage/Image/${item.strUserFileName}`" alt=""></span><span>{{ item.lngKeyscrNo ? item.lngKeyscrNo : '' }}</span><span>{{ item ? item.strKeyName : '' }}</span><span class="flex justify-end ml-9">{{ item.lngPrice ? formatNumber(item.lngPrice) +'원' : '' }}</span></span>
+      <span class="flex flex-col items-center justify-center" ><span v-if="item && (item.strUserFileName !='' && item.strUserFileName != undefined)" class="mt-2 h-20 w-28 flex justify-center"><img :src="`http://www.pncoffice.net/MenuImage/Image/${item.strUserFileName}`" alt="" class="h-full w-full"></span><span>{{ item ? item.strKeyName : '' }}</span></span>
     </div>
   </VueDraggableNext>
    <div class="flex flex-col ml-3 w-10 h-full mt-5 items-center justify-center">
@@ -209,6 +208,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
     }
   
   }
+  const nowscreenNo = ref()
   const clickedStoreNm = ref()
   const handlestoreNm = (newData) => {
     clickedStoreNm.value = newData
@@ -323,15 +323,12 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
       MenuList.value = res2.data.menuList
       MenuGroup.value = res2.data.menuGroup
       SubMenuGroup.value = res2.data.submenuGroup
-      console.log( posNo.value)
-      console.log( nowStoreAreaCd.value)
-      console.log( nowStoreCd.value)
+    
       const res3 = await getScreenList( groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value )
       const res4 = await getMenuKeyList3(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value)
       MenuKeyList.value =res4.data.MenuKeyList
       ScreenKeyOrigin.value = res3.data.ScreenList;
-      console.log( ScreenKeyOrigin.value)
-      console.log(  MenuKeyList.value)
+      console.log( MenuKeyList.value)
      
       addfor10ScreenKey()
       console.log(ScreenKeys.value)
@@ -385,17 +382,20 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
       currmenuKeyPage.value = 1
     }
     clickedintScreenNo.value = value
-    items.value = [...Array(16).fill(null)]
+    items.value = Array.from({ length: 16 }, (_, index) => ({
+            intKeySeq: index + 1, // 인덱스에 1을 더하여 값 설정
+        }));
     console.log(MenuKeyList.value)
     MenuKeyList.value.filter(item => item.intPosNo == posNo.value && item.intScreenNo ==value).forEach(item =>  {
       console.log(item)
       const position = item.intKeySeq - (currmenuKeyPage.value -1)*16 -1
       if(position >= 0 && position < 16){
-        items.value[position] = item
+            items.value[position] = item
+     
       }
       
     })
-  
+    console.log(items.value)
     afterSearch2.value =true
   }
   watch(ScreenKeys,(newvalue) => {
@@ -428,7 +428,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   return true;
   
   };
-  
+  const clickedMove = ref(false)
   const onEnd = (evt) => {
   // Swap을 처리할 조건
   if (changeMode.value === false) {
@@ -441,16 +441,33 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   swappedItems[targetItemIndex2] = temp;
   
   
-  
+   console.log(swappedItems)
   // 배열을 업데이트
-  items.value = swappedItems;
+//   items.value = swappedItems;
   
-  console.log(items.value  )
+  items.value = swappedItems.map((item, index) => ({
+  ...item, // 기존 객체의 다른 속성 유지
+  intKeySeq: (index+ (clickedintScreenNo.value-1)*16) + 1 // 배열 순서대로 intKeySeq 재정렬
+}));
+
   } else {
   updateMenuKey.value = true
+  items.value = items.value.map((item, index) => ({
+  ...item, // 기존 객체의 다른 속성 유지
+  intKeySeq: (index+ (clickedintScreenNo.value-1)*16) + 1 // 배열 순서대로 intKeySeq 재정렬
+}))
   }
-  
-  console.log(items.value)
+  console.log(clickedintScreenNo.value)
+      MenuKeyList.value = MenuKeyList.value.filter(item =>  (item.intScreenNo !=clickedintScreenNo.value) || (item.intScreenNo ==clickedintScreenNo.value) && item.intKeySeq < (clickedintScreenNo.value -1) *16 +1  && item.intKeySeq > (clickedintScreenNo.value) *16)
+      items.value.forEach(item => {
+        if( item.lngKeyscrNo != undefined){
+            MenuKeyList.value.push(item)
+        }
+       
+      })
+  console.log("Items:", items.value);
+  console.log("MenuKeyList:", MenuKeyList.value);
+ 
   };
   function formatNumber(value) {
     if (!value) return '';
@@ -471,24 +488,15 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
         }
       })
       addfor10ScreenKey()
-   
-      showMenuKey(clickedintScreenNo.value)
-  }
-  watch( items , (newvalue) => {
-    console.log(newvalue)
-      newvalue.forEach((item,index) => {
-          if ( item == null || item.lngKeyscrNo == null || item.lngKeyscrNo == ''){
-            newvalue[index] = { intKeySeq : index + (currmenuKeyPage.value -1)*30 +1}
-          } else {
-            item.intKeySeq = index + (currmenuKeyPage.value -1)*30 +1;
-          }
-          
-      
-      })
       console.log(items.value)
       console.log(MenuKeyList.value)
-  
-  })
+      showMenuKey(clickedintScreenNo.value)
+  }
+  watch(items, (newvalue) => {
+ 
+     
+});
+
   const savePosMenu = async() => {
     if(afterSearch.value == false) {
       Swal.fire({
@@ -553,6 +561,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   let gridView;
   let dataProvider;
   const currentSelectedMenuCode = ref('')
+  const currentSelectedMenuImgUrl = ref('')
   onMounted(() => {
     showMenuKeys()
   })
@@ -574,6 +583,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
       { fieldName: 'menuCd', dataType: 'text' },
       { fieldName: 'menuNm', dataType: 'text' },
       { fieldName: 'lngPrice', dataType: 'number'  },
+      { fieldName: 'strUserFileName', dataType: 'text'  },
       { fieldName: 'add', dataType:'text' },
     ];
     dataProvider.setFields(fields);
@@ -589,6 +599,8 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
       } },
       { name: '판매가', fieldName: 'lngPrice', header: { text: '판매가',
       styleName : 'header-style-2' } , numberFormat : '#,##0' },
+      { name: 'strUserFileName', fieldName: 'strUserFileName', header: { text: 'strUserFileName',
+      styleName : 'header-style-2' } , numberFormat : '#,##0' , visible: false },
       { name: '선택', fieldName: 'add'
         ,header: { text: '선택',styleName : 'header-style-3'} , editable:false, renderer:{
         type:"button"
@@ -600,6 +612,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
     gridView.setColumns(columns);
     // 5. 샘플 데이터 추가
     dataProvider.setRows(MenuList.value);
+    console.log(MenuList.value)
     gridView.sortMode = 'explicit';
     gridView.filterMode = 'explicit';
     gridView.setFooters({ visible: false})
@@ -624,6 +637,8 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
     gridView.onCellItemClicked = function (grid, index, clickData) {
       currentSelectedMenuCode.value = dataProvider.getRows()[clickData.itemIndex][0]
       currentSelectedMenuNm.value = dataProvider.getRows()[clickData.itemIndex][1]
+      currentSelectedMenuImgUrl.value = dataProvider.getRows()[clickData.itemIndex][3]
+     
       addMenuKey()
     return true;
   }
@@ -766,7 +781,10 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
       return ;
     }
     currmenuKeyPage.value--
-    items.value = [...Array(16).fill(null)]
+  
+    items.value = Array.from({ length: 16 }, (_, index) => ({
+            intKeySeq: index + 1, // 인덱스에 1을 더하여 값 설정
+        }));
     MenuKeyList.value.filter(item => item.intPosNo == posNo.value && item.intScreenNo == clickedintScreenNo.value).forEach(item =>  {
       console.log(item)
       
@@ -775,14 +793,17 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
        items.value[position] = item
       }
     })
+  
   }
   const nextMenuKey = () => {
     if ( currmenuKeyPage.value == 33) {
       return ;
     }
     currmenuKeyPage.value++
-   
-    items.value = [...Array(16).fill(null)]
+  
+    items.value = Array.from({ length: 16 }, (_, index) => ({
+            intKeySeq: index + 1, // 인덱스에 1을 더하여 값 설정
+        }));
     MenuKeyList.value.filter(item => item.intPosNo == posNo.value && item.intScreenNo == clickedintScreenNo.value).forEach(item =>  {
       console.log(item)
       const position = item.intKeySeq -(currmenuKeyPage.value-1)*16-1
@@ -805,12 +826,18 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   
   const addMenuKey =() => {
     console.log( MenuKeyList.value)
-    const foraddIndex = MenuKeyList.value.filter(item => item.intPosNo == posNo.value && item.intScreenNo == clickedintScreenNo.value && item.intKeySeq==clickedRealIndex.value).findIndex(item => item.intKeySeq == clickedRealIndex.value)
+    console.log( clickedRealIndex.value)
+    const foraddIndex = MenuKeyList.value.findIndex((item) =>
+    item.intPosNo == posNo.value &&
+    item.intScreenNo == clickedintScreenNo.value &&
+    item.intKeySeq == clickedRealIndex.value
+);
+
     console.log(foraddIndex)
     if( foraddIndex == -1) {
-      MenuKeyList.value.push({intKeyNo: 6, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value})
+      MenuKeyList.value.push({intKeyNo: 6, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value , strUserFileName : currentSelectedMenuImgUrl.value})
     } else {
-      MenuKeyList.value[foraddIndex] = {intKeyNo: 6, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value}
+      MenuKeyList.value[foraddIndex] = {intKeyNo: 6, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value ,strUserFileName : currentSelectedMenuImgUrl.value }
     }
     showMenuKey(clickedintScreenNo.value)
     console.log( MenuKeyList.value)

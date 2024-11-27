@@ -13,9 +13,9 @@
 </div>
 <br>
 <div class="z-50">
-    <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_004INS_VUE'" :dupliapiname="'dupliPos'" :progid="2">
+    <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_004INS_VUE'" :dupliapiname="'dupliPos'" :progid="2" :poskiosk="'getStoreAndPosList'">
     </DupliPopUp>
-    <DupliPopUp2 :isVisible="showSpecificMenukey" @close="showSpecificMenukey = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_004INS_VUE'" :progid="2" :dupliapiname="'dupliPos2'" :nowscreenNo="nowscreenNo"></DupliPopUp2>
+    <DupliPopUp2 :isVisible="showSpecificMenukey" @close="showSpecificMenukey = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_004INS_VUE'" :progid="2" :dupliapiname="'dupliPos2'" :nowscreenNo="nowscreenNo" ></DupliPopUp2>
   </div>
 
 <div v-if="changeScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center  z-50">
