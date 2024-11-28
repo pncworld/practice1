@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { getGridInfoList } from '@/api/common';
+import { getGridInfoList, getRenderingData } from '@/api/common';
 import { GridView, LocalDataProvider } from 'realgrid';
 import { onMounted, ref, watch, nextTick } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
@@ -35,12 +35,16 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  renderProgname: {
+    type: String,
+    default: "",
+  },
 });
 
 const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}`); // 동적 ID 설정
 const tabInitSetArray = ref([]);
 const selectedRowData = ref([]);
-
+const result2 =ref([]) ;
 const emit = defineEmits(["selcetedrowData"]);
 
 const funcshowGrid = async () => {
@@ -82,6 +86,9 @@ const funcshowGrid = async () => {
       styleName: `header-style-${index}`,
     },
     width: item.intHdWidth,
+    lookupDisplay :  result2.value != [] ? true : false,
+    values :  result2.value != [] ? result2.value.value : [],
+    labels :  result2.value != [] ? result2.value.labels : [],
     visible: item.intHdWidth !== 0,
     renderer : { type : item.strColID =='add' ? 'button' : 'text' }
   }));
@@ -117,6 +124,10 @@ const funcshowGrid = async () => {
 
 onMounted(async () => {
   try {
+    if(props.renderProgname != ''){
+
+     // result2.value = await getRenderingData(props.renderProgname)
+    }
     const result = await getGridInfoList(props.progname, props.progid);
     tabInitSetArray.value = result;
 

@@ -16,7 +16,7 @@
 <br>
 <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore5 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll"></PickStore5> </div> 
 <div class="z-50">
-    <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_011INS_VUE'" :dupliapiname="'DUPLIALLPOSDATA'" :progid="1" :poskiosk="'getStoreAndPosList'">
+    <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_011INS_VUE'" :dupliapiname="'DUPLIALLPOSDATA'" :progid="1" :poskiosk="'getStoreAndPosList'" :naming="'POS번호'">
     </DupliPopUp>
   </div>
 
@@ -86,7 +86,7 @@
     <button class="contents_tab-button" :class="{'text-blue-600' : currentMenu==true }"  @click="showMenus(2)">TLU관리</button>
   </div>
   <div class="mt-3">
-    <button class="whitebutton" @click="searchMenuList3">조회</button>
+    <!-- <button class="whitebutton" @click="searchMenuList3">조회</button> -->
     <button class="whitebutton">추가</button>
   </div>
 </div>
@@ -104,7 +104,7 @@
     </select>
   </div>
   <div class="customtableIndex border border-gray-400 rounded-bl-lg">메뉴명/코드</div>
-  <div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList"></div>
+  <div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList" v-model="searchword1"></div>
 </div>
   <div class="ml-10 mt-5 w-full h-full">
 
@@ -115,7 +115,7 @@
 <div class="h-4/6" v-show="currentMenu">
 <div class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-1 gap-0 w-full">
   <div class="customtableIndex border border-gray-400 rounded-tl-lg">TLU명/코드</div>
-  <div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList2"></div>
+  <div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList2" v-model="searchword3"></div>
 </div>
   <div class="ml-10 mt-5 w-full h-full">
 
@@ -213,17 +213,11 @@ const handlestoreNm = (newData) => {
 }
 const showPopup2 = ref(false)
 const showChangeScreenKey = ref(false)
-const changePopup = ref(false);
-const deleteAllitems = ref([]);
-const popupData = ref([]);
+
 const confirmitem= ref([]);
-const languageName0 = ref('');
-const languageName1 = ref('');
-const languageName2 = ref('');
-const languageName3 = ref('');
-const languageName4 = ref('');
+const confirmitem2= ref([]);
+
 const currentscreenKeyNm = ref('');
-const clickedSubCode = ref()
 const maxSubCode = ref();
 const posNo = ref();
 const changeScreenKey = ref(false);
@@ -239,7 +233,9 @@ const currentMenu = ref(false)
 const showPopupf = () => {
   if(afterSearch.value == false) {
     Swal.fire({
-      title: '조회를 먼저 해주세요.',
+      title: '경고.',
+      text: '조회를 먼저 해주세요.',
+      icon: 'warning',
       confirmButtonText: '확인',
     })
     return ;
@@ -289,25 +285,40 @@ console.log(nowStoreAreaCd.value)
 
 const nowStoreCd = ref();
 const afterCategory = ref(false);
-const  handleStoreCd = (newValue) => {
+const  handleStoreCd = async(newValue) => {
 if(newValue == '0'){
     afterSearch.value = false;
 }
 nowStoreCd.value = newValue ;
+const res2 = await getMenuList(groupCd.value,nowStoreCd.value);
+    MenuList.value = res2.data.menuList
+    MenuGroup.value = res2.data.menuGroup
+    SubMenuGroup.value = res2.data.submenuGroup
+
+    MenuList.value = MenuList.value.map(item => {
+    return {
+      ...item,
+      add: '추가'
+    }
+  })
+  const res5 = await getTLUList(groupCd.value,nowStoreCd.value)
+    TLUList.value = res5.data.TLUList
+  TLUList.value = TLUList.value.map(item => {
+    return {
+      ...item,
+      add: '추가'
+    }
+  })
 }
 const selectedButton = ref();
 const Category = ref([]);
 const getMultiLang = ref([])
 const MenuGroup = ref([])
 const SubMenuGroup = ref([])
-const MenuKeyGroup = ref([])
-const subMultiLang = ref([])
-const mainCategoryInsert = ref(false)
+
 const store = useStore();
-const currSubCategory = ref([]);
-const clickedMainCategory = ref();
-const clickedSubCategory = ref();
-const convertedsubMultiLang = ref([])
+const searchword1 = ref()
+const searchword3 = ref()
 const userData = store.state.userData; 
 const groupCd = ref(userData.lngStoreGroup);
 const modified = ref(false);
@@ -320,7 +331,6 @@ const clickedScreenNo = ref()
 const searchMenu = async () => {
     changeMode.value = false
     Category.value = [] ;
-    MenuList.value = []
     items.value = []
 
 if(nowStoreCd.value == '0' || nowStoreCd.value == undefined) {
@@ -347,10 +357,6 @@ if(nowStoreAreaCd.value == '0' || nowStoreAreaCd.value == undefined) {
 }
 store.state.loading = true;
 try {
-    const res2 = await getMenuList(groupCd.value,nowStoreCd.value);
-    MenuList.value = res2.data.menuList
-    MenuGroup.value = res2.data.menuGroup
-    SubMenuGroup.value = res2.data.submenuGroup
    
     const res3 = await getScreenList( groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value )
     const res4 = await getMenuKeyList(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value)
@@ -358,26 +364,13 @@ try {
     ScreenKeyOrigin.value = res3.data.ScreenList;
     console.log( ScreenKeyOrigin.value)
     console.log(  MenuKeyList.value)
-    const res5 = await getTLUList(groupCd.value,nowStoreCd.value)
-    TLUList.value = res5.data.TLUList
-    console.log(TLUList.value)
     addfor10ScreenKey()
     AllscreenKeyPage.value = Math.ceil(ScreenKeyOrigin.value.length /10)
     
-    confirmitem.value = [...MenuList.value]
-   
-    MenuList.value = MenuList.value.map(item => {
-    return {
-      ...item,
-      add: '추가'
-    }
-  })
-  TLUList.value = TLUList.value.map(item => {
-    return {
-      ...item,
-      add: '추가'
-    }
-  })
+    confirmitem.value = JSON.parse(JSON.stringify(MenuKeyList.value));
+    confirmitem2.value = JSON.parse(JSON.stringify(ScreenKeyOrigin.value));
+
+    afterSearch.value = true;
 } catch (error) {
     afterSearch.value = false;
 } finally {
@@ -385,7 +378,7 @@ try {
     store.state.loading = false; // 로딩 상태 종료
              modified.value = false ;
              afterCategory.value = false;
-             afterSearch.value = true;
+            
 }
 
 
@@ -399,6 +392,7 @@ const setSubCd = () => {
   filteredSubMenuGroup.value = SubMenuGroup.value.filter(item => item.sublngMajor == forsearchMain.value)
   console.log(filteredSubMenuGroup.value)
   forsearchSub.value = '0'
+  searchMenuList3()
 }
 const clickedintScreenNo = ref()
 const calculateMaxSubCode = () =>{
@@ -531,16 +525,17 @@ const savePosMenu = async() => {
     })
     return ;
   }
+  if(JSON.stringify(confirmitem.value) === JSON.stringify(MenuKeyList.value) && JSON.stringify(confirmitem2.value) === JSON.stringify(ScreenKeyOrigin.value)) {
+    Swal.fire({
+      title: '경고',
+      text: '변경된 사항이 없습니다.',
+      icon: 'warning',
+      confirmButtonText: '확인'
+    })
+    return ;
+  }
 
-  // if(JSON.stringify(confirmitem.value) === JSON.stringify(MenuList.value)) {
-  //   Swal.fire({
-  //     title: '경고',
-  //     text: '변경된 항목이 없습니다.',
-  //     icon: 'warning',
-  //     confirmButtonText: '확인'
-  //   })
-  //   return ;
-  // }
+ 
   Swal.fire({
     title: '저장',
       text: '저장 하시겠습니까?',
@@ -877,7 +872,9 @@ dataProvider2.setRows(filteredList);
 }
 
 } 
-
+watch(forsearchSub, (newValue) => {
+  searchMenuList3();
+})
 const searchMenuList2 = (e) => {
   const searchword2 = e.target.value
   searchWord2.value = e.target.value
@@ -894,14 +891,19 @@ dataProvider2.setRows(filteredList);
 const handlePosNo = (newValue) => {
   posNo.value = newValue
   console.log(posNo.value)
-  if(posNo.value !='0'){
+  if(nowStoreAreaCd.value != undefined || posNo.value != undefined){
     searchMenu()
   }
  
 }
 
 watch(() => MenuList.value, () => {
-  showMenuKeys();  // MenuKeyList 값이 변경될 때마다 그리드 업데이트
+  showMenuKeys();  
+
+});
+watch(() => TLUList.value, () => {
+  showMenuKeys2(); 
+
 });
 
 const editScreenKey = (value) => {
@@ -1077,7 +1079,6 @@ const clickedScreenKeys = () => {
   clickedScreenOrMenu.value= false
 }
 const handleinitAll = (newvalue) => {
-  MenuList.value = []
     MenuGroup.value =[]
     SubMenuGroup.value=[]
     MenuKeyList.value =[]
@@ -1087,7 +1088,12 @@ const handleinitAll = (newvalue) => {
     MenuList.value =[]
     ScreenKeys.value = []
     items.value = []
-  
+    forsearchMain.value ='0'
+    forsearchSub.value ='0'
+    filteredSubMenuGroup.value =[]
+    searchword1.value =''
+    searchword3.value =''
+    afterSearch.value = false
 } 
 </script>
 

@@ -81,6 +81,8 @@ const emitStoreCode = (value) => {
 
     emit('storeNm' ,selectedNm )
     emit('update:storeCd', value);
+  } else {
+    emit('update:storeCd', value);
   }
 };
 
@@ -128,9 +130,9 @@ const emitPosInfo = (value1 ,value2) => {
         
   }
 watch( selectedPosNo, (newValue) => {
-  if ( selectedPosNo.value != '0'){
+ 
     emitPosInfo(newValue.lngAreaCode, newValue.lngCode);
-  }
+
   
 })
   const route = useRoute();

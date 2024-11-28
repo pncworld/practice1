@@ -24,7 +24,7 @@
         
     </div>
       <div class="">
-        <span class="font-bold text-sm "> KIOSK번호 : &nbsp;</span> <select :disabled="isDisabled4"  class="w-32 text-sm border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" v-model="selectedPosNo">
+        <span class="font-bold text-sm "> KIOSK번호 : &nbsp;</span> <select :disabled="isDisabled4"  class="w-32 text-sm border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" v-model="selectedPosNo" @change="ischanged2();">
           <option value="0">선택</option>
           <option :value="{ lngCode: item.lngCode , lngAreaCode: item.lngAreaCode} " v-for="item in storePosNo" :key="item.lngAreaCode">{{ item.strName }}</option>
         </select>
@@ -57,6 +57,12 @@ const ischanged = () => {
     console.log(changed.value)
     emit('update:ischanged',changed.value);
 };
+const ischanged2 = () => {
+    changed.value = !changed.value;
+  
+    console.log(changed.value)
+    emit('update:ischanged2',changed.value);
+};
 
     const store = useStore();
     const userData = store.state.userData ;
@@ -66,7 +72,7 @@ const props = defineProps({
     })
 const {groupCdDisabled} = props ;
 isDisabled1.value = groupCdDisabled;
-const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd', 'areaCd', 'posNo' ,'update:ischanged' ,'storeNm']);
+const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd', 'areaCd', 'posNo' ,'update:ischanged' ,'storeNm' ,'update:ischanged2']);
 const emitStoreGroup = (value) => {
     emit('update:storeGroup', value);
 };
@@ -80,6 +86,8 @@ const emitStoreCode = (value) => {
   const selectedNm = storeCd.value.filter(item => item.lngStoreCode == value)[0].strName
 
     emit('storeNm' ,selectedNm )
+    emit('update:storeCd', value);
+  } else {
     emit('update:storeCd', value);
   }
 };
@@ -128,9 +136,9 @@ const emitPosInfo = (value1 ,value2) => {
         
   }
 watch( selectedPosNo, (newValue) => {
-  if ( selectedPosNo.value != '0'){
+    console.log(newValue)
     emitPosInfo(newValue.lngAreaCode, newValue.lngCode);
-  }
+  
   
 })
   const route = useRoute();

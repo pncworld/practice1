@@ -48,6 +48,16 @@ export const getGridInfoList = async( P_ID , G_ID) => {
              
               return tabInitSetArray.value;
 } 
+export const getRenderingData = async( P_ID) => {
+  const tabInitSetArray = ref([]); 
+  const res = await api2.post("/SYSTEM/system.asmx/getRenderData" , 
+              { PROG_ID : P_ID });
+
+            
+              tabInitSetArray.value= res.data.renderInfo ;
+             
+              return tabInitSetArray.value;
+} 
       
 export const getPosList = async(groupCd , storeCd) => {
     const res = await api2.post("/SYSTEM/sysCom.asmx/getPosList" , {

@@ -14,7 +14,7 @@
   
   </div>
   <br>
-  <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore7kio @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll"></PickStore7kio> </div> 
+  <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore7kio @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @update:ischanged2="searchinit"></PickStore7kio> </div> 
   <div class="z-50">
       <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST44_052INS_VUE'" :dupliapiname="'DUPLIALLPOSDATA'" :progid="1" :poskiosk="'getStoreAndPosList2'" :naming="'KIOSK번호'">
       </DupliPopUp>
@@ -85,7 +85,7 @@
       메뉴 리스트
     </div>
     <div class="mt-3">
-      <button class="whitebutton" @click="searchMenuList3">조회</button>
+      <!-- <button class="whitebutton" @click="searchMenuList3">조회</button> -->
       <button class="whitebutton">추가</button>
     </div>
   </div>
@@ -103,7 +103,7 @@
       </select>
     </div>
     <div class="customtableIndex border border-gray-400 rounded-bl-lg">메뉴명/코드</div>
-    <div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList"></div>
+    <div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList" v-model="searchword1"></div>
   </div>
     <div class="ml-10 mt-5 w-full h-full">
   
@@ -114,7 +114,7 @@
   <div class="h-4/6" v-show="currentMenu">
   <div class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-1 gap-0 w-full">
     <div class="customtableIndex border border-gray-400 rounded-tl-lg">TLU명/코드</div>
-    <div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList2"></div>
+    <div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList2" v-model="searchword3"></div>
   </div>
     <div class="ml-10 mt-5 w-full h-full">
   
@@ -152,7 +152,7 @@
       :class="{' !border-blue-700' : clickedMenuKey==index }"
       @click="saveMenuKeyposition(index); clickedMenuKey = index; clickedMenukeys()"
     >
-      <span class="flex flex-col items-center justify-center" ><span v-if="item && (item.strUserFileName !='' && item.strUserFileName != undefined)" class=" h-20 w-28 flex justify-center"><img :src="`http://www.pncoffice.net/MenuImage/Image/${item.strUserFileName}`" alt="" class="h-full w-full"></span><span v-else-if="item && (item.strUserFileName =='')" class="mt-2 h-20 w-28 flex justify-center"><img src="../../assets/noimage.jpg" alt="" class="h-full w-full"></span><span>{{ item ? item.strKeyName : '' }}</span></span>
+      <span class="flex flex-col items-center justify-center" ><span v-if="item && (item.strUserFileName !='' && item.strUserFileName != undefined)" class=" h-20 w-28 flex justify-center"><img :src="`http://www.pncoffice.net/MenuImage/Image/${item.strUserFileName}`" alt="" class="h-full w-full"></span><span v-else-if="item && (item.strUserFileName =='')" class="h-20 w-28 flex justify-center"><img src="../../assets/noimage2.png" alt="" class="h-full w-full"></span><span>{{ item ? item.strKeyName : '' }}</span></span>
     </div>
   </VueDraggableNext>
    <div class="flex flex-col ml-3 w-10 h-full mt-5 items-center justify-center">
@@ -191,6 +191,8 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   const clickedMenuKey = ref()
   const ScreenKeys = ref([]);
   const currentMenuorTLU = ref(false)
+  const searchword1 = ref()
+  const searchword3 = ref()
   const forsearchMain = ref('0')
   const forsearchSub = ref('0')
   const addscreenKey = ref(false)
@@ -229,9 +231,11 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   const showPopupf = () => {
     if(afterSearch.value == false) {
       Swal.fire({
-        title: '조회를 먼저 해주세요.',
-        confirmButtonText: '확인',
-      })
+      title: '경고.',
+      text: '조회를 먼저 해주세요',
+      icon: 'warning',
+      confirmButtonText: '확인',
+    })
       return ;
     }
     showPopup2.value = true;
@@ -239,9 +243,9 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   
   
   const showNext = () => {
-  if(currentsubPage.value > Math.ceil(ScreenKeyOrigin.value.length /8)){
-     return ; 
-  }
+   if(currentsubPage.value >= AllscreenKeyPage.value){
+   return ; 
+}
   currentsubPage.value ++;
   
   addfor8ScreenKey()
@@ -267,15 +271,35 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   
   const nowStoreCd = ref();
   const afterCategory = ref(false);
-  const  handleStoreCd = (newValue) => {
-  if(newValue == '0'){
-      afterSearch.value = false;
-  }
-  nowStoreCd.value = newValue ;
-  }
+  const  handleStoreCd = async(newValue) => {
+if(newValue == '0'){
+    afterSearch.value = false;
+}
+nowStoreCd.value = newValue ;
+const res2 = await getMenuList(groupCd.value,nowStoreCd.value);
+    MenuList.value = res2.data.menuList
+    MenuGroup.value = res2.data.menuGroup
+    SubMenuGroup.value = res2.data.submenuGroup
+
+    MenuList.value = MenuList.value.map(item => {
+    return {
+      ...item,
+      add: '추가'
+    }
+  })
+  const res5 = await getTLUList(groupCd.value,nowStoreCd.value)
+    TLUList.value = res5.data.TLUList
+  TLUList.value = TLUList.value.map(item => {
+    return {
+      ...item,
+      add: '추가'
+    }
+  })
+}
   const Category = ref([]);
 
   const MenuGroup = ref([])
+  const confirmitem2 = ref([])
   const SubMenuGroup = ref([])
 
   const store = useStore();
@@ -283,7 +307,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   const userData = store.state.userData; 
   const groupCd = ref(userData.lngStoreGroup);
   const modified = ref(false);
-  const afterSearch = ref(true);
+  const afterSearch = ref(false);
   const MenuList = ref([])
   const MenuKeyList = ref([])
   const clickedScreenOrMenu = ref(false)
@@ -292,7 +316,6 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   const searchMenu = async () => {
       changeMode.value = false
       Category.value = [] ;
-      MenuList.value = []
       items.value = []
   
   if(nowStoreCd.value == '0' || nowStoreCd.value == undefined) {
@@ -309,7 +332,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   if(nowStoreAreaCd.value == '0' || nowStoreAreaCd.value == undefined) {
       Swal.fire({
           title: '경고',
-          text: '포스번호를 선택하세요.',
+          text: 'KIOSK번호를 선택하세요.',
           icon: 'warning',
           showCancelButton: false,
           confirmButtonColor: '#3085d6',
@@ -319,10 +342,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   }
   store.state.loading = true;
   try {
-      const res2 = await getMenuList(groupCd.value,nowStoreCd.value);
-      MenuList.value = res2.data.menuList
-      MenuGroup.value = res2.data.menuGroup
-      SubMenuGroup.value = res2.data.submenuGroup
+    
     
       const res3 = await getScreenList( groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value )
       const res4 = await getMenuKeyList3(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value)
@@ -332,22 +352,13 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
      
       addfor8ScreenKey()
       console.log(ScreenKeys.value)
-      AllscreenKeyPage.value = Math.ceil(ScreenKeyOrigin.value.length /10)
+      AllscreenKeyPage.value = Math.ceil(ScreenKeyOrigin.value.length /8)
   
-      confirmitem.value = [...MenuList.value]
+      confirmitem.value = JSON.parse(JSON.stringify(MenuKeyList.value));
+      confirmitem2.value = JSON.parse(JSON.stringify(ScreenKeyOrigin.value));
+
      
-      MenuList.value = MenuList.value.map(item => {
-      return {
-        ...item,
-        add: '추가'
-      }
-    })
-    TLUList.value = TLUList.value.map(item => {
-      return {
-        ...item,
-        add: '추가'
-      }
-    })
+   
   } catch (error) {
       afterSearch.value = false;
   } finally {
@@ -365,11 +376,15 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   const filteredSubMenuGroup = ref([]);
   const setSubCd = () => {
     console.log(forsearchMain.value)
-    console.log(SubMenuGroup.value)
-    filteredSubMenuGroup.value = SubMenuGroup.value.filter(item => item.sublngMajor == forsearchMain.value)
-    console.log(filteredSubMenuGroup.value)
-    forsearchSub.value = '0'
+  console.log(SubMenuGroup.value)
+  filteredSubMenuGroup.value = SubMenuGroup.value.filter(item => item.sublngMajor == forsearchMain.value)
+  console.log(filteredSubMenuGroup.value)
+  forsearchSub.value = '0'
+  searchMenuList3()
   }
+  watch(forsearchSub, (newValue) => {
+  searchMenuList3();
+})
   const clickedintScreenNo = ref()
   const calculateMaxSubCode = () =>{
   maxSubCode.value = Math.max(
@@ -399,10 +414,10 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
     afterSearch2.value =true
   }
   watch(ScreenKeys,(newvalue) => {
-      if(ScreenKeys.value.length >10){
-        AllscreenKeyPage.value = Math.ceil(ScreenKeys.value.length /10)
-      }
-  })
+
+  AllscreenKeyPage.value = Math.floor(ScreenKeyOrigin.value.length /8) +1
+
+})
   const showScreenKeysOrder =() => {
     showChangeScreenKey.value = !showChangeScreenKey.value
   }
@@ -411,7 +426,9 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   const onMove = (evt) => {
   // 예: 드래그 중 이동할 때의 조건 등을 설정할 수 있음
   if( changeMode.value == false) {
+   
   targetItemIndex2 = Array.from(evt.from.children).indexOf(evt.related);
+  console.log(targetItemIndex2)
   return false;
   } else {
   return true;
@@ -434,6 +451,8 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   if (changeMode.value === false) {
   const oldIndex = evt.oldIndex;  // 드래그된 아이템의 기존 인덱스
   const swappedItems = [...items.value];  // items를 복사
+  console.log(oldIndex)
+  console.log(targetItemIndex2)
   const temp = swappedItems[oldIndex];
   
   swappedItems[oldIndex] = swappedItems[targetItemIndex2];
@@ -505,6 +524,15 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
       Swal.fire({
         title: '경고',
         text: '조회를 먼저 진행해주세요.',
+        icon: 'warning',
+        confirmButtonText: '확인'
+      })
+      return ;
+    }
+    if(JSON.stringify(confirmitem.value)== JSON.stringify(MenuKeyList.value) &&  JSON.stringify(confirmitem2.value)== JSON.stringify(ScreenKeyOrigin.value)) {
+      Swal.fire({
+        title: '경고',
+        text: '변경된 사항이 없습니다.',
         icon: 'warning',
         confirmButtonText: '확인'
       })
@@ -700,7 +728,8 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   const handlePosNo = (newValue) => {
     posNo.value = newValue
     console.log(posNo.value)
-    if(posNo.value !='0'){
+    console.log(nowStoreAreaCd.value)
+    if(nowStoreAreaCd.value != undefined ||posNo.value !=undefined ){
       searchMenu()
     }
    
@@ -731,16 +760,16 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   
   const addfor8ScreenKey = () => {
     ScreenKeys.value = [...ScreenKeyOrigin.value.slice(8 * (currentsubPage.value-1), 8 * (currentsubPage.value-1)+8)];
-      const length = ScreenKeys.value.length
-      if (length <8){
+    const validateScreenKeys = ScreenKeys.value.filter(item => item.intScreenNo !='')
+      if (validateScreenKeys.length <8){
         ScreenKeys.value.push({strScreenName : '' , intScreenNo : '' , new : true})
-        for(var i=0 ; i< 7-length; i++){
+        for(var i=0 ; i< 7-validateScreenKeys.length; i++){
           ScreenKeys.value.push({strScreenName : '' , intScreenNo : ''})
         }
       }
     
   }
-  
+
   const addfor30MenuKeys = () => {
   
       const length = items.value.length
@@ -895,7 +924,15 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
       MenuList.value =[]
       ScreenKeys.value = []
       items.value = []
-    
+      forsearchMain.value ='0'
+      forsearchSub.value ='0'
+      afterSearch.value = false
+      searchword1.value =''
+      searchword3.value =''
+      afterSearch.value = false
+  } 
+  const searchinit = (newvalue) => {
+      afterSearch.value = false
   } 
   </script>
   

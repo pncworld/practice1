@@ -95,6 +95,8 @@ const emitStoreCode = (value) => {
 
     emit('storeNm' ,selectedNm )
     emit('update:storeCd', value);
+  } else {
+    emit('update:storeCd', value);
   }
 };
 watch(selectedScreenNo , (newValue) => {

@@ -137,13 +137,7 @@ const dupliStore = async() => {
     }).then(async(result) => {
       if(result.isConfirmed){
         store.state.loading = true;
-        console.log(groupCd.value)
-        console.log(storeCd)
-        console.log(areaCd)
-        console.log(posNo)
-        console.log(groupCd2)
-        console.log(areaCd2)
-        console.log(posNo2)
+      
         const res3 = await api2[dupliapiname](groupCd.value , storeCd,areaCd ,posNo , groupCd2.join(','),storeCd2.join(','),areaCd2.join(','),posNo2.join(','))
         console.log(res3.data)
         if(res3.data.RESULT_CD == '00'){

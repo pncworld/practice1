@@ -13,7 +13,7 @@
 </div>
 <br>
 <div class="z-50">
-    <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_004INS_VUE'" :dupliapiname="'dupliPos'" :progid="2" :poskiosk="'getStoreAndPosList'">
+    <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_004INS_VUE'" :dupliapiname="'dupliPos'" :progid="2" :poskiosk="'getStoreAndPosList'" :naming="'POS번호'">
     </DupliPopUp>
     <DupliPopUp2 :isVisible="showSpecificMenukey" @close="showSpecificMenukey = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_004INS_VUE'" :progid="2" :dupliapiname="'dupliPos2'" :nowscreenNo="nowscreenNo" ></DupliPopUp2>
   </div>
@@ -85,7 +85,7 @@
     <button class="contents_tab-button" :class="{'text-blue-600' : currentMenu==3 }"  @click="showMenus(3)">화면관리</button>
   </div>
   <div class="mt-3">
-    <button class="whitebutton" @click="searchMenuList3">조회</button>
+    <!-- <button class="whitebutton" @click="searchMenuList3">조회</button> -->
     <button class="whitebutton" v-if="currentMenu != 3">추가</button>
   </div>
 </div>
@@ -249,6 +249,15 @@ const rowData = ref([
 const isNew = ref(false);
 const currentMenu = ref('1')
 const SpecificMenuDupli = () => {
+  if(afterSearch.value ==false){
+    Swal.fire({
+      title: '경고.',
+      text: '조회를 먼저 해주세요',
+      icon: 'warning',
+      confirmButtonText: '확인',
+    })
+    return ;
+  }
   showSpecificMenukey.value = true
 }
 const showScreenNm = ref(false)
@@ -264,7 +273,9 @@ const selcetedrowData = (newvalue) => {
 const showPopupf = () => {
   if(afterSearch.value == false) {
     Swal.fire({
-      title: '조회를 먼저 해주세요.',
+      title: '경고.',
+      text: '조회를 먼저 해주세요',
+      icon: 'warning',
       confirmButtonText: '확인',
     })
     return ;
@@ -290,87 +301,31 @@ const changed2 = (newvalue) => {
     MenuKeyList.value =[]
     showMenuKeyList.value = []
 }
-const setLang = () => {
 
-const index = getMultiLang.value.findIndex(item => item.categoryCode === clickedSubCode.value.toString() ); // id로 해당 항목 찾기
-const index2 = ScreenKeyOrigin.value.findIndex(item => item.SubCode === clickedSubCode.value.toString() ); // id로 해당 항목 찾기
 
-if (index !== -1) {
-// 항목이 존재하면 수정
-  let category = Category.value.find(category => category.MajorCode == clickedMainCategory.value).SubCategory
-  let subCategory2 = category.find(item => item.SubCode == clickedSubCode.value.toString())
-  subCategory2.SubName = languageName0.value
- 
 
-   getMultiLang.value.forEach(item => {
-    if(item.categoryCode == clickedSubCode.value && item.TypeCode =='3'){
-      if(item.LanguageID =='0'){
-        item.LanguageName = languageName0.value
-      } else if (item.LanguageID =='1') {
-        item.LanguageName = languageName1.value
-      } else if (item.LanguageID =='2') {
-        item.LanguageName = languageName2.value
-      } else if (item.LanguageID =='3') {
-        item.LanguageName = languageName3.value
-      } else if (item.LanguageID =='4') {
-        item.LanguageName = languageName4.value
-      }
-    }
-   })
-   
-console.log(ScreenKeyOrigin.value)
-   subCategory.value = ScreenKeyOrigin.value.slice(10 * (currentsubPage.value-1), 10 * (currentsubPage.value-1)+10);
-   console.log(subCategory.value)
-
-} else {
-  const category = Category.value.find(category => category.MajorCode == clickedMainCategory.value)
-  category.SubCategory.push({SubCode : clickedSubCode.value , SubName : languageName0.value})
-  getMultiLang.value.push({TypeCode: '3', categoryCode: clickedSubCode.value , LanguageID: '0', LanguageName: languageName0.value})
-  getMultiLang.value.push({TypeCode: '3', categoryCode: clickedSubCode.value , LanguageID: '1', LanguageName: languageName1.value})
-  getMultiLang.value.push({TypeCode: '3', categoryCode: clickedSubCode.value , LanguageID: '2', LanguageName: languageName2.value})
-  getMultiLang.value.push({TypeCode: '3', categoryCode: clickedSubCode.value , LanguageID: '3', LanguageName: languageName3.value})
-  getMultiLang.value.push({TypeCode: '3', categoryCode: clickedSubCode.value , LanguageID: '4', LanguageName: languageName4.value})
-  currSubCategory.value = Category.value.filter(item => item.MajorCode == clickedMainCategory.value)[0].SubCategory
-  ScreenKeyOrigin.value = [...currSubCategory.value];
-  console.log(ScreenKeyOrigin.value)
-  const currlength = ScreenKeyOrigin.value.length
-  if(currlength< (currentsubPage.value)*10 ) {
-    calculateMaxSubCode()
-    ScreenKeyOrigin.value.push({SubCode : maxSubCode.value +1 , SubName : '', new:true})
-    for(var i=0 ; i< (currentsubPage.value)*10-currlength ; i++ ){
-      ScreenKeyOrigin.value.push({SubCode : '' , SubName : ''})
-  }
-  }
-  
-  subCategory.value = ScreenKeyOrigin.value.slice(10 * (currentsubPage.value-1), 10 * (currentsubPage.value-1)+10);
-  
-}
-console.log(ScreenKeyOrigin.value)
-isNew.value == false;
-changePopup.value = !changePopup.value
-}
-
-const showNext = () => {
-if(currentsubPage.value >= Math.ceil(ScreenKeyOrigin.value.length /10)){
-   return ; 
-}
-currentsubPage.value ++;
-
-addfor10ScreenKey()
-}
-const showPrev = () => {
-  console.log(ScreenKeyOrigin.value)
-if (currentsubPage.value == 1 ){
-  return ;
-}
-currentsubPage.value --;
-ScreenKeys.value = ScreenKeyOrigin.value.slice(10 * (currentsubPage.value-1), 10 * (currentsubPage.value-1)+10);
-
-}
 const updateMenuKey = ref(false)
 let dupliitems = []
 
 const saveMenuKey = () => {
+  if(afterSearch.value == false) {
+    Swal.fire({
+      title: '경고.',
+      text: '조회를 먼저 해주세요.',
+      icon: 'warning',
+      confirmButtonText: '확인',
+    })
+    return ;
+  }
+  if(JSON.stringify(confirmitem.value) === JSON.stringify(MenuKeyList.value) && JSON.stringify(confirmitem2.value) === JSON.stringify(ScreenKeyOrigin.value)) {
+    Swal.fire({
+      title: '경고',
+      text: '변경된 사항이 없습니다.',
+      icon: 'warning',
+      confirmButtonText: '확인'
+    })
+    return ;
+  }
   const keyseq =  MenuKeyList.value.map(item => item.intKeySeq)
   const keyname = MenuKeyList.value.map(item => item.strKeyName)
   const keyscrno = MenuKeyList.value.map(item => item.lngKeyscrNo)
@@ -421,11 +376,30 @@ console.log(nowStoreAreaCd.value)
 
 const nowStoreCd = ref();
 const afterCategory = ref(false);
-const  handleStoreCd = (newValue) => {
+const  handleStoreCd = async(newValue) => {
 if(newValue == '0'){
     afterSearch.value = false;
 }
 nowStoreCd.value = newValue ;
+const res2 = await getMenuList(groupCd.value,nowStoreCd.value);
+    MenuList.value = res2.data.menuList
+    MenuGroup.value = res2.data.menuGroup
+    SubMenuGroup.value = res2.data.submenuGroup
+
+    MenuList.value = MenuList.value.map(item => {
+    return {
+      ...item,
+      add: '추가'
+    }
+  })
+  const res5 = await getTLUList(groupCd.value,nowStoreCd.value)
+    TLUList.value = res5.data.TLUList
+  TLUList.value = TLUList.value.map(item => {
+    return {
+      ...item,
+      add: '추가'
+    }
+  })
 }
 const selectedButton = ref();
 const Category = ref([]);
@@ -433,14 +407,9 @@ const getMultiLang = ref([])
 const screenNoList = ref([])
 const MenuGroup = ref([])
 const SubMenuGroup = ref([])
-const MenuKeyGroup = ref([])
-const subMultiLang = ref([])
-const mainCategoryInsert = ref(false)
+
 const store = useStore();
-const currSubCategory = ref([]);
-const clickedMainCategory = ref();
-const clickedSubCategory = ref();
-const convertedsubMultiLang = ref([])
+
 const showMenuKeyList = ref([])
 const userData = store.state.userData; 
 const groupCd = ref(userData.lngStoreGroup);
@@ -450,12 +419,12 @@ const MenuList = ref([])
 const MenuKeyList = ref([])
 const clickedScreenOrMenu = ref(false)
 const TLUList = ref([])
+const confirmitem2 = ref([])
 const clickedScreenNo = ref()
 const changePage = ref(false)
 const searchMenu = async () => {
     changeMode.value = false
     Category.value = [] ;
-    MenuList.value = []
     items.value = []
 
 if(nowStoreCd.value == '0' || nowStoreCd.value == undefined) {
@@ -495,21 +464,16 @@ store.state.loading = true;
 try {
     MenuKeyList.value = []
     showMenuKeyList.value = []
-    const res2 = await getMenuList(groupCd.value,nowStoreCd.value);
-    MenuList.value = res2.data.menuList
-    MenuGroup.value = res2.data.menuGroup
-    SubMenuGroup.value = res2.data.submenuGroup
+  
     
     const res3 = await getScreenList2( groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value )
     const res4 = await getMenuKeyList2( groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value )
-    console.log(res3.data)
-    console.log(res4.data)
+
     MenuKeyList.value =res4.data.MenukeyList
     screenNoList.value = res3.data.ScreenList;
 
-    const res5 = await getTLUList(groupCd.value,nowStoreCd.value)
-    TLUList.value = res5.data.TLUList
-   
+    confirmitem.value = JSON.parse(JSON.stringify(MenuKeyList.value));
+    confirmitem2.value = JSON.parse(JSON.stringify(ScreenKeyOrigin.value));
     AllscreenKeyPage.value = Math.ceil(ScreenKeyOrigin.value.length /10)
     
    
@@ -531,18 +495,8 @@ try {
   }
 }
 console.log(MenuKeyList.value)
-    MenuList.value = MenuList.value.map(item => {
-    return {
-      ...item,
-      add: '추가'
-    }
-  })
-  TLUList.value = TLUList.value.map(item => {
-    return {
-      ...item,
-      add: '추가'
-    }
-  })
+   
+afterSearch.value = true;
 } catch (error) {
     afterSearch.value = false;
 } finally {
@@ -550,7 +504,7 @@ console.log(MenuKeyList.value)
     store.state.loading = false; // 로딩 상태 종료
              modified.value = false ;
              afterCategory.value = false;
-             afterSearch.value = true;
+            
 }
 
 
@@ -564,6 +518,7 @@ const setSubCd = () => {
   filteredSubMenuGroup.value = SubMenuGroup.value.filter(item => item.sublngMajor == forsearchMain.value)
   console.log(filteredSubMenuGroup.value)
   forsearchSub.value = '0'
+  searchMenuList3()
 }
 const clickedintScreenNo = ref()
 const calculateMaxSubCode = () =>{
@@ -1320,7 +1275,12 @@ const handleinitAll = (newvalue) => {
     ScreenKeys.value = []
     items.value = []
     showMenuKeyList.value = []
+    nowStoreAreaCd.value = '0'
+    posNo.value = '0'
 } 
+watch(forsearchSub ,(newvalue) => {
+  searchMenuList3()
+})
 </script>
 
 
