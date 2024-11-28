@@ -16,7 +16,7 @@
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore7kio @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll"></PickStore7kio> </div> 
   <div class="z-50">
-      <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_011INS_VUE'" :dupliapiname="'DUPLIALLPOSDATA'" :progid="1" :poskiosk="'getStoreAndPosList2'">
+      <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST44_052INS_VUE'" :dupliapiname="'DUPLIALLPOSDATA'" :progid="1" :poskiosk="'getStoreAndPosList2'" :naming="'KIOSK번호'">
       </DupliPopUp>
     </div>
   
@@ -148,11 +148,11 @@
   >
     <div
       v-for="(item, index) in items"
-      class="screen-muuri-sort-empty flex items-center justify-center !h-32 !w-[213px]"
+      class="screen-muuri-sort-empty flex items-start justify-center !h-32 !w-[213px]"
       :class="{' !border-blue-700' : clickedMenuKey==index }"
       @click="saveMenuKeyposition(index); clickedMenuKey = index; clickedMenukeys()"
     >
-      <span class="flex flex-col items-center justify-center" ><span v-if="item && (item.strUserFileName !='' && item.strUserFileName != undefined)" class="mt-2 h-20 w-28 flex justify-center"><img :src="`http://www.pncoffice.net/MenuImage/Image/${item.strUserFileName}`" alt="" class="h-full w-full"></span><span>{{ item ? item.strKeyName : '' }}</span></span>
+      <span class="flex flex-col items-center justify-center" ><span v-if="item && (item.strUserFileName !='' && item.strUserFileName != undefined)" class=" h-20 w-28 flex justify-center"><img :src="`http://www.pncoffice.net/MenuImage/Image/${item.strUserFileName}`" alt="" class="h-full w-full"></span><span v-else-if="item && (item.strUserFileName =='')" class="mt-2 h-20 w-28 flex justify-center"><img src="../../assets/noimage.jpg" alt="" class="h-full w-full"></span><span>{{ item ? item.strKeyName : '' }}</span></span>
     </div>
   </VueDraggableNext>
    <div class="flex flex-col ml-3 w-10 h-full mt-5 items-center justify-center">
@@ -239,12 +239,12 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   
   
   const showNext = () => {
-  if(currentsubPage.value >= Math.ceil(ScreenKeyOrigin.value.length /10)){
+  if(currentsubPage.value > Math.ceil(ScreenKeyOrigin.value.length /8)){
      return ; 
   }
   currentsubPage.value ++;
   
-  addfor10ScreenKey()
+  addfor8ScreenKey()
   }
   const showPrev = () => {
     console.log(ScreenKeyOrigin.value)
@@ -252,7 +252,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
     return ;
   }
   currentsubPage.value --;
-  ScreenKeys.value = ScreenKeyOrigin.value.slice(10 * (currentsubPage.value-1), 10 * (currentsubPage.value-1)+10);
+  ScreenKeys.value = ScreenKeyOrigin.value.slice(8 * (currentsubPage.value-1),8 * (currentsubPage.value-1)+8);
   
   }
   const updateMenuKey = ref(false)
@@ -330,7 +330,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
       ScreenKeyOrigin.value = res3.data.ScreenList;
       console.log( MenuKeyList.value)
      
-      addfor10ScreenKey()
+      addfor8ScreenKey()
       console.log(ScreenKeys.value)
       AllscreenKeyPage.value = Math.ceil(ScreenKeyOrigin.value.length /10)
   
@@ -447,18 +447,21 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   
   items.value = swappedItems.map((item, index) => ({
   ...item, // 기존 객체의 다른 속성 유지
-  intKeySeq: (index+ (clickedintScreenNo.value-1)*16) + 1 // 배열 순서대로 intKeySeq 재정렬
+  intKeySeq: (index+ (currmenuKeyPage.value-1)*16) + 1 // 배열 순서대로 intKeySeq 재정렬
 }));
 
   } else {
   updateMenuKey.value = true
   items.value = items.value.map((item, index) => ({
   ...item, // 기존 객체의 다른 속성 유지
-  intKeySeq: (index+ (clickedintScreenNo.value-1)*16) + 1 // 배열 순서대로 intKeySeq 재정렬
+  intKeySeq: (index+ (currmenuKeyPage.value-1)*16) + 1 // 배열 순서대로 intKeySeq 재정렬
 }))
   }
   console.log(clickedintScreenNo.value)
-      MenuKeyList.value = MenuKeyList.value.filter(item =>  (item.intScreenNo !=clickedintScreenNo.value) || (item.intScreenNo ==clickedintScreenNo.value) && item.intKeySeq < (clickedintScreenNo.value -1) *16 +1  && item.intKeySeq > (clickedintScreenNo.value) *16)
+  console.log( MenuKeyList.value)
+  console.log( currmenuKeyPage.value)
+      MenuKeyList.value = MenuKeyList.value.filter(item =>  (item.intScreenNo !=clickedintScreenNo.value) || (item.intKeySeq < (currmenuKeyPage.value -1) *16 +1  || item.intKeySeq > (currmenuKeyPage.value) *16))
+      console.log( MenuKeyList.value)
       items.value.forEach(item => {
         if( item.lngKeyscrNo != undefined){
             MenuKeyList.value.push(item)
@@ -487,7 +490,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
           item.intScreenNo = evt.oldIndex+1
         }
       })
-      addfor10ScreenKey()
+      addfor8ScreenKey()
       console.log(items.value)
       console.log(MenuKeyList.value)
       showMenuKey(clickedintScreenNo.value)
@@ -636,7 +639,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
   
     gridView.onCellItemClicked = function (grid, index, clickData) {
       currentSelectedMenuCode.value = dataProvider.getRows()[clickData.itemIndex][0]
-      currentSelectedMenuNm.value = dataProvider.getRows()[clickData.itemIndex][1]
+      currentSelectedMenuNm.value =dataProvider.getRows()[clickData.itemIndex][0] +'/ '+ dataProvider.getRows()[clickData.itemIndex][1] + ' ('+dataProvider.getRows()[clickData.itemIndex][2]+')'
       currentSelectedMenuImgUrl.value = dataProvider.getRows()[clickData.itemIndex][3]
      
       addMenuKey()
@@ -721,12 +724,12 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
     ScreenKeyOrigin.value[index].strScreenName = currentscreenKeyNm.value
     changeScreenKey.value = false ;
     console.log(ScreenKeyOrigin.value)
-    addfor10ScreenKey()
+    addfor8ScreenKey()
     currentscreenKeyNm.value = ''
     clickedScreenNo.value = ''
   }
   
-  const addfor10ScreenKey = () => {
+  const addfor8ScreenKey = () => {
     ScreenKeys.value = [...ScreenKeyOrigin.value.slice(8 * (currentsubPage.value-1), 8 * (currentsubPage.value-1)+8)];
       const length = ScreenKeys.value.length
       if (length <8){
@@ -767,7 +770,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
     const newScreenNo = ScreenKeyOrigin.value[ScreenKeyOrigin.value.length-1].intScreenNo +1;
     ScreenKeyOrigin.value.push({strScreenName : currentscreenKeyNm.value , intScreenNo : newScreenNo  })
     addscreenKey.value = false
-    addfor10ScreenKey()
+    addfor8ScreenKey()
     console.log(ScreenKeyOrigin.value)
     currentscreenKeyNm.value = ''
     console.log(clickedScreenNo.value)
@@ -820,7 +823,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
       console.log(index)
       console.log(items.value)
   
-  clickedRealIndex.value = (currmenuKeyPage.value - 1) * 30 + index + 1
+  clickedRealIndex.value = (currmenuKeyPage.value - 1) * 16 + index + 1
    console.log(clickedRealIndex.value)
   }
   
@@ -860,7 +863,7 @@ import PickStore7kio from '@/components/pickStore7kio.vue';
     
         ScreenKeyOrigin.value = ScreenKeyOrigin.value.filter(item => item.intScreenNo !=clickedintScreenNo.value)
         addscreenKey.value = false
-        addfor10ScreenKey()
+        addfor8ScreenKey()
        
         MenuKeyList.value = MenuKeyList.value.filter(item=> item.intScreenNo!=clickedintScreenNo.value)
         currentscreenKeyNm.value = ''

@@ -246,68 +246,10 @@ const showPopupf = () => {
   }
   showPopup2.value = true;
 }
-const setLang = () => {
 
-const index = getMultiLang.value.findIndex(item => item.categoryCode === clickedSubCode.value.toString() ); // id로 해당 항목 찾기
-const index2 = ScreenKeyOrigin.value.findIndex(item => item.SubCode === clickedSubCode.value.toString() ); // id로 해당 항목 찾기
-
-if (index !== -1) {
-// 항목이 존재하면 수정
-  let category = Category.value.find(category => category.MajorCode == clickedMainCategory.value).SubCategory
-  let subCategory2 = category.find(item => item.SubCode == clickedSubCode.value.toString())
-  subCategory2.SubName = languageName0.value
- 
-
-   getMultiLang.value.forEach(item => {
-    if(item.categoryCode == clickedSubCode.value && item.TypeCode =='3'){
-      if(item.LanguageID =='0'){
-        item.LanguageName = languageName0.value
-      } else if (item.LanguageID =='1') {
-        item.LanguageName = languageName1.value
-      } else if (item.LanguageID =='2') {
-        item.LanguageName = languageName2.value
-      } else if (item.LanguageID =='3') {
-        item.LanguageName = languageName3.value
-      } else if (item.LanguageID =='4') {
-        item.LanguageName = languageName4.value
-      }
-    }
-   })
-   
-console.log(ScreenKeyOrigin.value)
-   subCategory.value = ScreenKeyOrigin.value.slice(10 * (currentsubPage.value-1), 10 * (currentsubPage.value-1)+10);
-   console.log(subCategory.value)
-
-} else {
-  const category = Category.value.find(category => category.MajorCode == clickedMainCategory.value)
-  category.SubCategory.push({SubCode : clickedSubCode.value , SubName : languageName0.value})
-  getMultiLang.value.push({TypeCode: '3', categoryCode: clickedSubCode.value , LanguageID: '0', LanguageName: languageName0.value})
-  getMultiLang.value.push({TypeCode: '3', categoryCode: clickedSubCode.value , LanguageID: '1', LanguageName: languageName1.value})
-  getMultiLang.value.push({TypeCode: '3', categoryCode: clickedSubCode.value , LanguageID: '2', LanguageName: languageName2.value})
-  getMultiLang.value.push({TypeCode: '3', categoryCode: clickedSubCode.value , LanguageID: '3', LanguageName: languageName3.value})
-  getMultiLang.value.push({TypeCode: '3', categoryCode: clickedSubCode.value , LanguageID: '4', LanguageName: languageName4.value})
-  currSubCategory.value = Category.value.filter(item => item.MajorCode == clickedMainCategory.value)[0].SubCategory
-  ScreenKeyOrigin.value = [...currSubCategory.value];
-  console.log(ScreenKeyOrigin.value)
-  const currlength = ScreenKeyOrigin.value.length
-  if(currlength< (currentsubPage.value)*10 ) {
-    calculateMaxSubCode()
-    ScreenKeyOrigin.value.push({SubCode : maxSubCode.value +1 , SubName : '', new:true})
-    for(var i=0 ; i< (currentsubPage.value)*10-currlength ; i++ ){
-      ScreenKeyOrigin.value.push({SubCode : '' , SubName : ''})
-  }
-  }
-  
-  subCategory.value = ScreenKeyOrigin.value.slice(10 * (currentsubPage.value-1), 10 * (currentsubPage.value-1)+10);
-  
-}
-console.log(ScreenKeyOrigin.value)
-isNew.value == false;
-changePopup.value = !changePopup.value
-}
 
 const showNext = () => {
-if(currentsubPage.value >= Math.ceil(ScreenKeyOrigin.value.length /10)){
+if(currentsubPage.value >= AllscreenKeyPage.value){
    return ; 
 }
 currentsubPage.value ++;
@@ -421,8 +363,7 @@ try {
     console.log(TLUList.value)
     addfor10ScreenKey()
     AllscreenKeyPage.value = Math.ceil(ScreenKeyOrigin.value.length /10)
-    const res1 = await getMultiLingual( groupCd.value,nowStoreCd.value,)
-
+    
     confirmitem.value = [...MenuList.value]
    
     MenuList.value = MenuList.value.map(item => {
@@ -485,9 +426,12 @@ const showMenuKey =(value) => {
  
 }
 watch(ScreenKeys,(newvalue) => {
-    if(ScreenKeys.value.length >10){
-      AllscreenKeyPage.value = Math.ceil(ScreenKeys.value.length /10)
-    }
+console.log(ScreenKeys.value)
+
+  AllscreenKeyPage.value = Math.floor(ScreenKeyOrigin.value.length /10) +1
+
+    
+  
 })
 const showScreenKeysOrder =() => {
   showChangeScreenKey.value = !showChangeScreenKey.value
@@ -527,7 +471,6 @@ swappedItems[oldIndex] = swappedItems[targetItemIndex2];
 swappedItems[targetItemIndex2] = temp;
 
 
-
 // 배열을 업데이트
 items.value = swappedItems;
 
@@ -543,17 +486,20 @@ function formatNumber(value) {
   return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 const onEnd2 = (evt) => {
-    console.log(ScreenKeyOrigin.value)
     const originScreenNo =  dupliScreenKeyOrigin[evt.oldIndex].intScreenNo
     const targetScreenNo =  dupliScreenKeyOrigin[targetItemIndex3].intScreenNo
+    console.log(originScreenNo)
+    console.log(targetScreenNo)
+    console.log(ScreenKeyOrigin.value)
+    console.log(MenuKeyList.value)
     ScreenKeyOrigin.value.forEach((item,index) => {
       item.intScreenNo = (index+1)
     })
     MenuKeyList.value.filter(item => item.intPosNo == posNo.value ).forEach((item,index) => {
       if(item.intScreenNo == originScreenNo) {
-        item.intScreenNo = targetItemIndex3+1
+        item.intScreenNo = targetScreenNo
       } else if ( item.intScreenNo == targetScreenNo ){
-        item.intScreenNo = evt.oldIndex+1
+        item.intScreenNo = originScreenNo
       }
     })
     addfor10ScreenKey()
@@ -979,13 +925,13 @@ const confirmScreenKey = () =>{
 
 const addfor10ScreenKey = () => {
   ScreenKeys.value = [...ScreenKeyOrigin.value.slice(10 * (currentsubPage.value-1), 10 * (currentsubPage.value-1)+10)];
-    const length = ScreenKeys.value.length
-    if (length <10){
+  const validateScreenKeys = ScreenKeys.value.filter(item => item.intScreenNo !='')
+    if (validateScreenKeys.length <10){
       ScreenKeys.value.push({strScreenName : '' , intScreenNo : '' , new : true})
-      for(var i=0 ; i< 9-length; i++){
+      for(var i=0 ; i< 9-validateScreenKeys.length; i++){
         ScreenKeys.value.push({strScreenName : '' , intScreenNo : ''})
       }
-    }
+    } 
 }
 
 const addfor30MenuKeys = () => {
@@ -1106,7 +1052,7 @@ const showMenus = (value) => {
 }
 const deletekey = () => {
   if(clickedScreenOrMenu.value == false) {
-  
+      console.log(ScreenKeyOrigin.value)
       ScreenKeyOrigin.value = ScreenKeyOrigin.value.filter(item => item.intScreenNo !=clickedintScreenNo.value)
       addscreenKey.value = false
       addfor10ScreenKey()

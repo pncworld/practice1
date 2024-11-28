@@ -10,7 +10,7 @@
           <div class="grid grid-rows-2 grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[480px] ml-12 h-20 rounded-lg ">
             <div class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">기준매장</div>
             <div class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center"><input type="text" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md" :value="'['+storeCd+']' + storeNm" disabled></div>
-            <div class="border-[1px] border-gray-400 rounded-bl-md flex justify-center items-center">POS번호</div>
+            <div class="border-[1px] border-gray-400 rounded-bl-md flex justify-center items-center">{{ naming }}</div>
             <div class="w-full border border-gray-400 rounded-br-md flex justify-center items-center"><input type="text" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md" :value="posNo" disabled></div>
           </div>
           <div class="flex justify-center mt-10"><img src="../assets/masterCopy-ArrowDown.png" alt=""></div>
@@ -35,7 +35,7 @@ import * as api from "@/api/common";
 import * as api2 from "@/api/master";
 import { useStore } from "vuex";
 import Swal from "sweetalert2";
-  const {isVisible ,storeCd,storeNm,posNo,areaCd , progname , progid ,dupliapiname , poskiosk } = defineProps({
+  const {isVisible ,storeCd,storeNm,posNo,areaCd , progname , progid ,dupliapiname , poskiosk ,naming } = defineProps({
     isVisible: { type: Boolean, default: false }, // 팝업 가시성 관리
     storeCd : { type : String , default: ''} ,
     storeNm : { type : String , default: ''} ,
@@ -45,6 +45,7 @@ import Swal from "sweetalert2";
     progid : {type : Number},
     dupliapiname : {type : String},
     poskiosk : {type : String},
+    naming : {type : String},
   
   });
   const store = useStore();  // vuex store
@@ -136,7 +137,15 @@ const dupliStore = async() => {
     }).then(async(result) => {
       if(result.isConfirmed){
         store.state.loading = true;
+        console.log(groupCd.value)
+        console.log(storeCd)
+        console.log(areaCd)
+        console.log(posNo)
+        console.log(groupCd2)
+        console.log(areaCd2)
+        console.log(posNo2)
         const res3 = await api2[dupliapiname](groupCd.value , storeCd,areaCd ,posNo , groupCd2.join(','),storeCd2.join(','),areaCd2.join(','),posNo2.join(','))
+        console.log(res3.data)
         if(res3.data.RESULT_CD == '00'){
         store.state.loading = false;
           Swal.fire({
