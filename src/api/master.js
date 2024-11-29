@@ -368,6 +368,15 @@ export const dupliPos2 = (groupCd , storeCd ,areaCd , posNo ,tgroupCd ,tstoreCd 
         T_SCREEN_NO : tscreenNo
     })
 }
+export const getAmountList = (groupCd , storeCd ,areaCd , posNo ,screenType ) => {
+    return api2.post('/MIMASTER/MST44_054INS.asmx/getAmountList', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        SCREEN_TYPE : screenType
+    })
+}
 
 
 

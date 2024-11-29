@@ -128,7 +128,7 @@
   <div class="flex h-full w-[950px] mt-10" v-show="afterSearch" >
   <div  class="grid grid-cols-5 grid-rows-2 gap-1 ml-10 mt-0 w-full h-[80%]">
 <div v-for="(item,index) in ScreenKeys" class="screen-muuri-sort-empty flex justify-center items-center w-full h-full "  :class="{'!bg-orange-500 !border-blue-700' : clickedScreenKeyIndex==index }" @click="clickedScreenKeyIndex = index; clickedScreenKeys()">
-  <p v-if="item.strScreenName != ''" @click="showMenuKey(item.intScreenNo); " class=" flex items-center justify-center w-full h-full"><button class="">{{ item.strScreenName }}</button><button @click.stop="editScreenKey(item.intScreenNo)"><font-awesome-icon :icon="['far', 'pen-to-square']" /></button></p> 
+  <p v-if="item.strScreenName != ''" @click="showMenuKey(item.intScreenNo); " class=" flex items-center justify-center w-full h-full"><button class="">{{ item.strScreenName }}</button><button @click.stop="editScreenKey(item.intScreenNo , item.strScreenName)"><font-awesome-icon :icon="['far', 'pen-to-square']" /></button></p> 
   <p v-else-if="item.new == true" @click="addScreenKey(index); " class=" flex items-center justify-center w-full h-full"><button class="w-full h-full text-gray-300 flex justify-center items-center"><img src="../../assets/ic_add_gray_24.png" alt=""> 화면키 추가 </button></p> 
   <p v-else class="flex items-center justify-center"></p> 
 
@@ -154,7 +154,7 @@
     :class="{' !border-blue-700' : clickedMenuKey==index }"
     @click="saveMenuKeyposition(index); clickedMenuKey = index; clickedMenukeys()"
   >
-    <span class="flex flex-col"><span>{{ item.lngKeyscrNo ? item.lngKeyscrNo : '' }}</span><span>{{ item ? item.strKeyName : '' }}</span><span class="flex justify-end ml-9">{{ item.lngPrice ? formatNumber(item.lngPrice) +'원' : '' }}</span></span>
+    <span class="flex flex-col w-full h-full"><span class="mt-3">{{ item.lngKeyscrNo ? item.lngKeyscrNo : '' }}</span><span>{{ item ? item.strKeyName : '' }}</span><span class="flex justify-end pr-3">{{ item.lngPrice ? formatNumber(item.lngPrice) +'원' : '' }}</span></span>
   </div>
 </VueDraggableNext>
  <div class="flex flex-col ml-3 w-10 h-full mt-5 items-center justify-center">
@@ -588,6 +588,7 @@ const savePosMenu = async() => {
 let gridView;
 let dataProvider;
 const currentSelectedMenuCode = ref('')
+const currentSelectedMenuPrice = ref('')
 onMounted(() => {
   showMenuKeys()
 })
@@ -659,6 +660,7 @@ const showMenuKeys = () => {
   gridView.onCellItemClicked = function (grid, index, clickData) {
     currentSelectedMenuCode.value = dataProvider.getRows()[clickData.itemIndex][0]
     currentSelectedMenuNm.value = dataProvider.getRows()[clickData.itemIndex][1]
+    currentSelectedMenuPrice.value = dataProvider.getRows()[clickData.itemIndex][2]
     addMenuKey()
   return true;
 }
@@ -906,7 +908,8 @@ watch(() => TLUList.value, () => {
 
 });
 
-const editScreenKey = (value) => {
+const editScreenKey = (value,value2) => {
+  currentscreenKeyNm.value =value2
   clickedScreenNo.value = value
   changeScreenKey.value = true ;
 }
@@ -947,6 +950,7 @@ const addfor30MenuKeys = () => {
 }
 
 const addScreenKey = (value) => {
+  currentscreenKeyNm.value =''
   addscreenKey.value = true 
   console.log(value)
   clickedScreenNo.value = value +1
@@ -1021,9 +1025,9 @@ const addMenuKey =() => {
   const foraddIndex = MenuKeyList.value.filter(item => item.intPosNo == posNo.value && item.intScreenNo == clickedintScreenNo.value && item.intKeySeq==clickedRealIndex.value).findIndex(item => item.intKeySeq == clickedRealIndex.value)
   console.log(foraddIndex)
   if( foraddIndex == -1) {
-    MenuKeyList.value.push({intKeyNo: 6, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value})
+    MenuKeyList.value.push({intKeyNo: 6, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value , lngPrice:currentSelectedMenuPrice.value})
   } else {
-    MenuKeyList.value[foraddIndex] = {intKeyNo: 6, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value}
+    MenuKeyList.value[foraddIndex] = {intKeyNo: 6, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(currentSelectedMenuCode.value) , strKeyName: currentSelectedMenuNm.value , lngPrice:currentSelectedMenuPrice.value}
   }
   showMenuKey(clickedintScreenNo.value)
   console.log( MenuKeyList.value)

@@ -39,6 +39,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  searchColId: {
+    type: String,
+    default: "",
+  },
 });
 
 const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}`); // 동적 ID 설정
@@ -151,12 +155,25 @@ onMounted(async () => {
 
 // watch(() => props.showGrid, () => funcshowGrid());
 watch(() => props.searchWord, (newValue) => {
-  if (newValue === '') return;
+  const searchColId2 = props.searchColId.split(',')
+  console.log(searchColId2)
+  if (newValue === '') {
+    dataProvider.setRows( props.rowData );
+    return ;
+  };
   const filteredData = props.rowData.filter(
-    item =>
-      item.strName.includes(newValue) ||
-      item.lngStoreCode.toString().includes(newValue)
+    item => 
+  {
+     
+    return searchColId2.some(colId => {
+      const value = item[colId].toString() || '';
+      console.log(value)
+      console.log(newValue)
+      return value.includes(newValue.toString())
+    })
+  }
   );
+  console.log(filteredData)
   dataProvider.setRows(filteredData.length ? filteredData : []);
 });
 watch(() => props.rowData, () => funcshowGrid());

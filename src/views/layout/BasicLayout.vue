@@ -58,27 +58,6 @@
   </div>
 </header>
 
-<!-- <header v-if="showMenu" class="bg-white border rounded-3xl text-gray-600 p-4 w-full h-20">
-      <div class="text-sm font-bold flex space-x-5 -ml-72 justify-center -mt-2">
-        <span><img :src="strLogoUrl" alt="" class="w-52 absolute left-5 -top-0 "></span>
-        <span class="absolute space-x-5" style="left: 270px;">
-        <button class="" v-for="(item , i) in mainCategoryList" :key="i" value="" id="{{ item.lngCode }}" @click="selectCategory(item.lngCode)" >{{ item.strTitle }}</button></span>
-        <div class="absolute right-10 space-x-4 mt-3 text-black font-bold ">
-        <button><img src="../../assets/table_star.svg" alt="" class="size-7"></button>
-        <button @click="deleteAllTabs"><img src="../../assets/ic_delete.svg" alt="" class="size-7"></button>
-        <button  @click="reLoad"><img src="../../assets/ic_refresh.svg" alt="" class="size-7"></button>
-        <button @click="showMenus"><img src="../../assets/ic_menu.svg" alt="" class="size-7"></button>
-        <button  @click="hideMenu"><img src="../../assets/ic_extent.svg" alt="" class="size-7"></button>
-        <button  @click="logout" ><img src="../../assets/logout_icon.svg" alt="" class="size-5 -mt-6 ml-2"></button> 
-        </div>
-        
-      </div>
-      <div class="flex space-x-2 absolute left-72 mt-8">
-        <div v-if="showMenu" v-for="tab in tabs" :key="tab.lngProgramID" @click="setActiveTab(tab)" class="w-auto h-7 bg-slate-100 text-xs rounded-md px-4 py-2 cursor-pointer font-bold hover:bg-blue-50 transition" :class="{'text-blue-400' : isActive(tab)}">
-          {{tab.strTitle}}<button @click.stop="removeTab(tab)"><span class="text-blue-300 "><img src="../../assets/deleteIcon.png" alt="" class="size-3"></span></button>  </div>
-        </div>
-      
-    </header> -->
     <div class="flex flex-1 overflow-hidden ">
       <!-- Sidebar -->
       <aside v-show="isMenu&&showMenu" class=" bg-white text-gray-600 p-0 m-0 border-gray-200  border  justify-center items-center hidden md:flex w-full md:w-[14%]" >
@@ -307,6 +286,22 @@ watch(() => store.state.currentTabs, (newTabs) => {
     padding: 20px;
     overflow: hidden; /* 화면 밖으로 나가는 애니메이션 방지 */
   }
+  .header-style-0 {
+    background-color: #545876 !important;
+    color: white !important;
+   }
+   .header-style-1 {
+    background-color: #545876 !important;
+    color: white !important;
+   }
+   .header-style-2 {
+    background-color: #545876 !important;
+    color: white !important;
+   }
+   .header-style-3 {
+    background-color: #545876 !important;
+    color: white !important;
+   }
   
   </style>
   
