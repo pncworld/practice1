@@ -166,7 +166,7 @@
   <script setup>
   import { ref, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';
-  import {  getAmountList, saveAllMenuKey, saveScreenKeys, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
+  import {  getAmountList, saveAllMenuKey, saveScreenKeys, saveScreenKeys2, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
   import { VueDraggableNext } from 'vue-draggable-next';
   import Swal from 'sweetalert2';
 
@@ -340,7 +340,7 @@ nowStoreCd.value = newValue ;
       console.log(KeyList.value)
      
       addfor4ScreenKey()
-      console.log(ScreenKeys.value)
+      console.log(ScreenKeyOrigin.value)
       AllscreenKeyPage.value = Math.ceil(ScreenKeyOrigin.value.length /4)
   
       confirmitem.value = JSON.parse(JSON.stringify(KeyList.value));
@@ -389,9 +389,9 @@ nowStoreCd.value = newValue ;
     items.value = Array.from({ length: 30 }, (_, index) => ({
             intKeySeq: index + 1, // 인덱스에 1을 더하여 값 설정
         }));
-    console.log(KeyList.value)
-    KeyList.value.filter(item => item.intPosNo == posNo.value && item.intScreenNo ==value).forEach(item =>  {
-      console.log(item)
+  
+    KeyList.value.filter(item => item.intScreenNo ==value).forEach(item =>  {
+   
       const position = item.intKeySeq - (currmenuKeyPage.value -1)*30 -1
       if(position >= 0 && position < 30){
             items.value[position] = item
@@ -399,7 +399,7 @@ nowStoreCd.value = newValue ;
       }
       
     })
-    console.log(items.value)
+ 
     afterSearch2.value =true
   }
   watch(ScreenKeys,(newvalue) => {
@@ -539,9 +539,10 @@ nowStoreCd.value = newValue ;
     try {
       const screenKeyNoarr =  ScreenKeyOrigin.value.map(item => item.intScreenNo)
       const screenKeyNamearr =  ScreenKeyOrigin.value.map(item => item.strScreenName)
+
       console.log(screenKeyNoarr.join(','))
       console.log(screenKeyNamearr.join(','))
-      const res = await saveScreenKeys(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value , screenKeyNoarr.join(',') ,screenKeyNamearr.join(',') )
+      const res = await saveScreenKeys2(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value , screenKeyNoarr.join(',') ,screenKeyNamearr.join(',') ,  currentpaymentCd.value )
       
       
       const intKeySeqs = KeyList.value.filter(item => item.intPosNo == posNo.value).map(item => item.intKeySeq)
@@ -586,7 +587,9 @@ nowStoreCd.value = newValue ;
   const showMenuKeys = () => {
    
   }
-  
+  watch(ScreenKeyOrigin,(newvalue) => {
+    console.log(ScreenKeyOrigin.value)
+  })
   let gridView2 ;
   let dataProvider2 ;
   const clickedTLUCD = ref();
@@ -623,7 +626,7 @@ nowStoreCd.value = newValue ;
   } 
 
  const currentpaymentType = ref('할인')
- const currentpaymentCd = ref('3')
+ const currentpaymentCd = ref(3)
  const updatePaymentType = (newValue) => {
     console.log(newValue)
     currentpaymentCd.value = newValue
@@ -708,7 +711,7 @@ nowStoreCd.value = newValue ;
       return ;
     }
     const newScreenNo = ScreenKeyOrigin.value[ScreenKeyOrigin.value.length-1].intScreenNo +1;
-    ScreenKeyOrigin.value.push({strScreenName : currentscreenKeyNm.value , intScreenNo : newScreenNo  })
+    ScreenKeyOrigin.value.push({strScreenName : currentscreenKeyNm.value , intScreenNo : newScreenNo , intScreenType: currentpaymentCd.value })
     addscreenKey.value = false
     addfor4ScreenKey()
     console.log(ScreenKeyOrigin.value)
@@ -775,7 +778,7 @@ nowStoreCd.value = newValue ;
     item.intKeySeq == clickedRealIndex.value
 );
 
-    console.log(foraddIndex)
+    console.log(clickedintScreenNo.value)
     if( foraddIndex == -1) {
         KeyList.value.push({intKeyNo: currentpaymentCd.value, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(clickedCode.value ) , strName: clickedstrName.value })
     } else {

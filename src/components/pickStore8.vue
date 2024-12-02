@@ -33,8 +33,8 @@
       <div class="flex justify-center items-center space-x-2">
         <span class="font-bold text-sm ">결제키구분 : &nbsp;</span> 
         
-        <label for="discount" class="flex justify-center items-center "><input type="radio" id="discount" v-model="paymentType" value="3"><span class="font-bold">[1]할인</span> </label> 
-        <label for="payment" class="flex justify-center items-center"><input type="radio" v-model="paymentType" id="payment"  value="4"><span class="font-bold">[2]지불</span> </label> 
+        <label for="discount" class="flex justify-center items-center "><input type="radio" id="discount" v-model="paymentType" :value=3><span class="font-bold">[1]할인</span> </label> 
+        <label for="payment" class="flex justify-center items-center"><input type="radio" v-model="paymentType" id="payment"  :value=4><span class="font-bold">[2]지불</span> </label> 
     
       </div>
     </div>
@@ -59,7 +59,7 @@ const isDisabled3 = ref(false);
 const isDisabled4 = ref(false);
 const selectedPosNo = ref('0');
 const changed = ref(false)
-const paymentType = ref('3')
+const paymentType = ref(3)
 const ischanged = () => {
     changed.value = !changed.value;
   
