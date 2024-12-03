@@ -283,7 +283,7 @@ export const saveScreenKeys = ( groupCd , storeCd ,areaCd , posNo , screenNo_arr
         SCREEN_NAME_ARR : screenName_arr
     })
 }
-export const saveScreenKeys2 = ( groupCd , storeCd ,areaCd , posNo , screenNo_arr , screenName_arr , screenType ) => {
+export const saveScreenKeys2 = ( groupCd , storeCd ,areaCd , posNo , screenNo_arr , screenName_arr , screenDisc ,screenType ) => {
     return api2.post('/MIMASTER/MST44_054INS.asmx/saveScreenKeys' , {
         GROUP_CD: groupCd,
         STORE_CD: storeCd ,
@@ -291,6 +291,7 @@ export const saveScreenKeys2 = ( groupCd , storeCd ,areaCd , posNo , screenNo_ar
         POSNO : posNo,
         SCREEN_NO_ARR :  screenNo_arr ,
         SCREEN_NAME_ARR : screenName_arr ,
+        SCREEN_DISC : screenDisc,
         SCREEN_TYPE : screenType
     })
 }
@@ -308,7 +309,7 @@ export const saveAllMenuKey = ( groupCd , storeCd ,areaCd , posNo , intKeySeq_ar
     })
 }
 export const saveAllMenuKey2 = ( groupCd , storeCd ,areaCd , posNo , intKeySeq_arr , intScreenNo_arr , lngScrNo_arr ,strKeyName_arr , screenType) => {
-    return api2.post('/MIMASTER/MST44_054INS.asmx/saveMenuKeys' , {
+    return api2.post('/MIMASTER/MST44_054INS.asmx/saveKeys' , {
         GROUP_CD: groupCd,
         STORE_CD: storeCd ,
         AREA_CD: areaCd,
@@ -401,6 +402,29 @@ export const getAmountList = (groupCd , storeCd ,areaCd , posNo ,screenType ) =>
         SCREEN_TYPE : screenType
     })
 }
+export const getAllScreenList = (groupCd , storeCd ,areaCd , posNo ) => {
+    return api2.post('/MIMASTER/MST44_054INS.asmx/getAllScreenList', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+     
+    })
+}
+export const DUPLIPAYKEY = (groupCd , storeCd ,areaCd , posNo , screenNo , screenType, store_arr ) => {
+    return api2.post('/MIMASTER/MST44_054INS.asmx/DUPLIPAYKEY', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        SCREEN_NO : screenNo,
+        SCREEN_TYPE : screenType,
+        STORECD_ARR : store_arr
+
+     
+    })
+}
+
 
 
 

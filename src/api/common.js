@@ -84,13 +84,20 @@ export const getStoreAndPosList = async(groupCd , storeCd ,posNo) => {
     })
     return res ;
 }
-
 export const getStoreAndPosList2 = async(groupCd , storeCd ,posNo) => {
   const res = await api2.post("/SYSTEM/sysCom.asmx/getStoreAndPosList2" , {
  
       GROUP_CD : groupCd,
       STORE_CD : storeCd ,
       POSNO : posNo
+  })
+  return res ;
+}
+export const getStoreDistinctList = async(groupCd , storeCd ,areaCd,posNo) => {
+  const res = await api2.post("/SYSTEM/sysCom.asmx/getStoreDistinctList" , {
+ 
+      GROUP_CD : groupCd,
+     
   })
   return res ;
 }

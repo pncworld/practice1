@@ -16,8 +16,8 @@
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore8 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @update:ischanged2="searchinit" @updatePaymentType="updatePaymentType"></PickStore8> </div> 
   <div class="z-50">
-      <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST44_052INS_VUE'" :dupliapiname="'DUPLIALLPOSDATA'" :progid="1" :poskiosk="'getStoreAndPosList2'" :naming="'KIOSK번호'">
-      </DupliPopUp>
+      <DupliPopUp3 :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :poskiosk="'getStoreDistinctList'" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :screenType="currentpaymentCd" :screenList="screenList" :progname="'MST44_054INS_VUE'" :dupliapiname="'DUPLIPAYKEY'" :progid="2"  :naming="'POS번호'">
+      </DupliPopUp3>
     </div>
   
   <div v-if="changeScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center  z-50">
@@ -30,9 +30,9 @@
 
     <div class="flex flex-col justify-start h-12">
         <div><p>화면키 유형</p></div>
-        <div class="h-full w-full rounded-lg"><select name="" id="" class="border border-gray-400 pl-1 h-full w-full rounded-lg">
-            <option value="0">기본</option>
-            <option value="1">품목할인</option>
+        <div class="h-full w-full rounded-lg"><select name="" id="" class="border border-gray-400 pl-1 h-full w-full rounded-lg" v-model="currentProduct" :disabled="currentProduct == '1'">
+            <option :value="'0'">기본</option>
+            <option :value="'1'">품목할인</option>
         </select>
         </div>
     </div>
@@ -114,6 +114,7 @@
   
       <Realgrid class="w-full h-full" :progname="'MST44_054INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1"></Realgrid>
       <div class="flex justify-start">※ 사용여부가 미사용인 결제코드는 목록에서 노출되지 않습니다.</div>
+      <div class="flex justify-start">※ 복사시 결제코드 항목을 추가해야 결제키 화면에 노출됩니다.</div>
     </div>
     
   </div>
@@ -124,7 +125,7 @@
     <div class="flex h-full w-[86%] mt-10 items-start justify-center" v-show="afterSearch" >
     <div  class="grid grid-cols-4 grid-rows-1 gap-x-1 ml-10 mt-0 w-full h-full">
   <div v-for="(item,index) in ScreenKeys" class="custom-grid-style w-[174px] h-[80px]"  :class="{'!bg-orange-500 !border-blue-700' : clickedScreenKeyIndex==index && clickedScreenOrMenu ==false}" @click="clickedScreenKeyIndex = index; clickedScreenKeys()">
-    <p v-if="item.strScreenName != ''" @click="showKeys(item.intScreenNo); " class=" flex items-center justify-center w-full h-full"><button class="">{{ item.strScreenName }}</button><button @click.stop="editScreenKey(item.intScreenNo ,item.strScreenName)"><font-awesome-icon :icon="['far', 'pen-to-square']" /></button></p> 
+    <p v-if="item.strScreenName != ''" @click="showKeys(item.intScreenNo); " class=" flex items-center justify-center w-full h-full"><button class="">{{ item.strScreenName }}</button><button @click.stop="editScreenKey(item.intScreenNo ,item.strScreenName , item.itemDiscYn)"><font-awesome-icon :icon="['far', 'pen-to-square']" /></button></p> 
     <p v-else-if="item.new == true" @click="addScreenKey(index); " class=" flex items-center justify-center w-full h-full"><button class="w-full h-full text-gray-300 flex justify-center items-center"><img src="../../assets/ic_add_gray_24.png" alt=""> 화면키 추가 </button></p> 
     <p v-else class="flex items-center justify-center"></p> 
   
@@ -147,9 +148,9 @@
       v-for="(item, index) in items"
       class="custom-grid-style"
       :class="{'!bg-orange-500 !border-blue-700' : clickedMenuKey==index && clickedScreenOrMenu ==true }"
-      @click="saveMenuKeyposition(index); clickedMenuKey = index; clickedMenukeys()"
+      @click="index !== 29 && (saveMenuKeyposition(index), clickedMenuKey = index, clickedMenukeys())"
     >
-      <span class="flex flex-col items-center justify-center w-full h-full" ><span class="flex justify-center items-center">{{ item ? item.strName : '' }}</span></span>
+      <span class="flex flex-col items-center justify-center w-full h-full rounded-lg" :class="{'!bg-gray-500' : index == 29}" ><span class="flex justify-center items-center">{{ item ? item.lngKeyScrNo : '' }}</span><span class="flex justify-center items-center">{{ item ? item.strName : '' }}</span></span>
     </div>
   </VueDraggableNext>
   
@@ -166,7 +167,7 @@
   <script setup>
   import { ref, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';
-  import {  getAmountList, saveAllMenuKey, saveScreenKeys, saveScreenKeys2, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
+  import {  getAllScreenList, getAmountList, saveAllMenuKey, saveAllMenuKey2, saveScreenKeys, saveScreenKeys2, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
   import { VueDraggableNext } from 'vue-draggable-next';
   import Swal from 'sweetalert2';
 
@@ -178,6 +179,8 @@ import Realgrid from '@/components/realgrid.vue';
 import PickStore6 from '@/components/pickStore6.vue';
 import PickStore5 from '@/components/pickStore5.vue';
 import PickStore8 from '@/components/pickStore8.vue';
+import DupliPopUp3 from '@/components/dupliPopUp3.vue';
+
   
   
   // 더미 데이터
@@ -281,13 +284,14 @@ nowStoreCd.value = newValue ;
   const rowData = ref([])
 
   const store = useStore();
-
+  const currentProduct = ref('0')
   const userData = store.state.userData; 
   const groupCd = ref(userData.lngStoreGroup);
   const modified = ref(false);
   const afterSearch = ref(false);
   const AmountList = ref([])
   const KeyList = ref([])
+  const screenList = ref([])
   const clickedScreenOrMenu = ref(false)
   const TLUList = ref([])
   const clickedScreenNo = ref()
@@ -320,11 +324,20 @@ nowStoreCd.value = newValue ;
   }
   store.state.loading = true;
   try {
-    
-    
-      const res4 = await getAmountList(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value ,posNo.value, currentpaymentCd.value)
+    console.log(groupCd.value)
+    console.log(nowStoreCd.value)
+    console.log(nowStoreAreaCd.value)
+    console.log(posNo.value)
+      console.log(currentpaymentCd.value)
+      
+     
+      
+     
+      const res4 = await getAmountList(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value ,posNo.value, Number(currentpaymentCd.value))
+      console.log(res4)
       AmountList.value =res4.data.AmountList
       ScreenKeyOrigin.value = res4.data.AmountScreenList
+      console.log(ScreenKeyOrigin.value )
       KeyList.value =res4.data.AmountKeyList
       if (KeyList.value == null) {
         KeyList.value = ['1']
@@ -336,13 +349,14 @@ nowStoreCd.value = newValue ;
         }
         })
         rowData.value = AmountList.value
-    
+      const res2 = await getAllScreenList(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value ,posNo.value)
+      screenList.value = res2.data.ALLScreenList
+      console.log(screenList.value)
       console.log(KeyList.value)
      
       addfor4ScreenKey()
       console.log(ScreenKeyOrigin.value)
       AllscreenKeyPage.value = Math.ceil(ScreenKeyOrigin.value.length /4)
-  
       confirmitem.value = JSON.parse(JSON.stringify(KeyList.value));
       confirmitem2.value = JSON.parse(JSON.stringify(ScreenKeyOrigin.value));
 
@@ -431,6 +445,7 @@ nowStoreCd.value = newValue ;
   targetItemIndex3 = Array.from(evt.from.children).indexOf(evt.related)
   
   dupliScreenKeyOrigin = [...ScreenKeyOrigin.value]
+  console.log(dupliScreenKeyOrigin)
   return true;
   
   };
@@ -468,10 +483,10 @@ nowStoreCd.value = newValue ;
   console.log(clickedintScreenNo.value)
   console.log( KeyList.value)
   console.log( currmenuKeyPage.value)
-  KeyList.value = KeyList.value.filter(item =>  (item.intScreenNo !=clickedintScreenNo.value) || (item.intKeySeq < (currmenuKeyPage.value -1) *16 +1  || item.intKeySeq > (currmenuKeyPage.value) *16))
+  KeyList.value = KeyList.value.filter(item =>  (item.intScreenNo !=clickedintScreenNo.value))
       console.log( KeyList.value)
       items.value.forEach(item => {
-        if( item.lngKeyscrNo != undefined){
+        if( item.lngKeyScrNo != undefined){
             KeyList.value.push(item)
         }
        
@@ -485,22 +500,13 @@ nowStoreCd.value = newValue ;
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
   const onEnd2 = (evt) => {
-      console.log(ScreenKeyOrigin.value)
       const originScreenNo =  dupliScreenKeyOrigin[evt.oldIndex].intScreenNo
       const targetScreenNo =  dupliScreenKeyOrigin[targetItemIndex3].intScreenNo
-      ScreenKeyOrigin.value.forEach((item,index) => {
-        item.intScreenNo = (index+1)
-      })
-      KeyList.value.filter(item => item.intPosNo == posNo.value ).forEach((item,index) => {
-        if(item.intScreenNo == originScreenNo) {
-          item.intScreenNo = targetItemIndex3+1
-        } else if ( item.intScreenNo == targetScreenNo ){
-          item.intScreenNo = evt.oldIndex+1
-        }
-      })
+      
       addfor4ScreenKey()
       console.log(items.value)
       console.log(KeyList.value)
+      console.log(ScreenKeyOrigin.value)
       showKeys(clickedintScreenNo.value)
   }
  
@@ -539,22 +545,23 @@ nowStoreCd.value = newValue ;
     try {
       const screenKeyNoarr =  ScreenKeyOrigin.value.map(item => item.intScreenNo)
       const screenKeyNamearr =  ScreenKeyOrigin.value.map(item => item.strScreenName)
+      const screenKeyDisc =  ScreenKeyOrigin.value.map(item => item.itemDiscYn)
 
       console.log(screenKeyNoarr.join(','))
       console.log(screenKeyNamearr.join(','))
-      const res = await saveScreenKeys2(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value , screenKeyNoarr.join(',') ,screenKeyNamearr.join(',') ,  currentpaymentCd.value )
+      const res = await saveScreenKeys2(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value , screenKeyNoarr.join(',') ,screenKeyNamearr.join(',') ,screenKeyDisc.join(',')  , currentpaymentCd.value )
       
       
-      const intKeySeqs = KeyList.value.filter(item => item.intPosNo == posNo.value).map(item => item.intKeySeq)
-      const screenNumarr = KeyList.value.filter(item => item.intPosNo == posNo.value).map(item => item.intScreenNo)
-      const lngScrarr = KeyList.value.filter(item => item.intPosNo == posNo.value).map(item => item.lngKeyscrNo)
-      const menuKeyNmarr = KeyList.value.filter(item => item.intPosNo == posNo.value).map(item => item.strKeyName)
+      const intKeySeqs = KeyList.value.map(item => item.intKeySeq)
+      const screenNumarr = KeyList.value.map(item => item.intScreenNo)
+      const lngScrarr = KeyList.value.map(item => item.lngKeyScrNo)
+      const menuKeyNmarr = KeyList.value.map(item => item.strName)
       console.log(posNo.value)
       console.log(intKeySeqs.join(','))
       console.log(screenNumarr.join(','))
       console.log(lngScrarr.join(','))
       console.log(menuKeyNmarr.join(','))
-      const res2 = await saveAllMenuKey(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value , intKeySeqs.join(',') ,screenNumarr.join(',') , lngScrarr.join(','), menuKeyNmarr.join(','))
+      const res2 = await saveAllMenuKey2(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value , intKeySeqs.join(',') ,screenNumarr.join(',') , lngScrarr.join(','), menuKeyNmarr.join(',') ,currentpaymentCd.value )
       
       console.log(res)
       console.log(res2)
@@ -651,8 +658,10 @@ nowStoreCd.value = newValue ;
     showMenuKeys();  // MenuKeyList 값이 변경될 때마다 그리드 업데이트
   });
   
-  const editScreenKey = (value ,value2) => {
+  const editScreenKey = (value ,value2 ,value3) => {
     currentscreenKeyNm.value = value2
+    console.log(value3)
+    currentProduct.value = value3
     clickedScreenNo.value = value
     changeScreenKey.value = true ;
   }
@@ -722,50 +731,13 @@ nowStoreCd.value = newValue ;
   
   
   
-  const prevMenuKey = () => {
-    if(currmenuKeyPage.value == 1){
-      return ;
-    }
-    currmenuKeyPage.value--
-  
-    items.value = Array.from({ length: 16 }, (_, index) => ({
-            intKeySeq: index + 1, // 인덱스에 1을 더하여 값 설정
-        }));
-        KeyList.value.filter(item => item.intPosNo == posNo.value && item.intScreenNo == clickedintScreenNo.value).forEach(item =>  {
-      console.log(item)
-      
-      const position = item.intKeySeq -(currmenuKeyPage.value-1)*16  -1
-      if (position >= 0 && position < 16) {
-       items.value[position] = item
-      }
-    })
-  
-  }
-  const nextMenuKey = () => {
-    if ( currmenuKeyPage.value == 33) {
-      return ;
-    }
-    currmenuKeyPage.value++
-  
-    items.value = Array.from({ length: 16 }, (_, index) => ({
-            intKeySeq: index + 1, // 인덱스에 1을 더하여 값 설정
-        }));
-        KeyList.value.filter(item => item.intPosNo == posNo.value && item.intScreenNo == clickedintScreenNo.value).forEach(item =>  {
-      console.log(item)
-      const position = item.intKeySeq -(currmenuKeyPage.value-1)*16-1
-      if (position >= 0 && position < 16) {
-       items.value[position] = item
-      }
-    })
-  
-  }
+ 
   const existMenuKey = ref(false)
   const clickedRealIndex = ref()
   const saveMenuKeyposition = (index) => {
       console.log(clickedintScreenNo.value)
       console.log(index)
       console.log(items.value)
-  
   clickedRealIndex.value = (currmenuKeyPage.value - 1) * 16 + index + 1
    console.log(clickedRealIndex.value)
   }
@@ -780,9 +752,9 @@ nowStoreCd.value = newValue ;
 
     console.log(clickedintScreenNo.value)
     if( foraddIndex == -1) {
-        KeyList.value.push({intKeyNo: currentpaymentCd.value, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(clickedCode.value ) , strName: clickedstrName.value })
+        KeyList.value.push({intKeyNo: currentpaymentCd.value, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyScrNo: Number(clickedCode.value ) , strName: clickedstrName.value })
     } else {
-        KeyList.value[foraddIndex] = {intKeyNo: currentpaymentCd.value, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyscrNo: Number(clickedCode.value ) , strName: clickedstrName.value }
+        KeyList.value[foraddIndex] = {intKeyNo: currentpaymentCd.value, intKeySeq : clickedRealIndex.value , intPosNo : posNo.value , intScreenNo: clickedintScreenNo.value , lngKeyScrNo: Number(clickedCode.value ) , strName: clickedstrName.value }
     }
     showKeys(clickedintScreenNo.value)
     console.log( KeyList.value)
