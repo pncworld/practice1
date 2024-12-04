@@ -26,7 +26,7 @@
             <div class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">매장코드/명</div>
             <div class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center"><input type="text" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md"  @input="handleKeyup"></div></div>
         <div class="w-[480px] h-[380px] ml-12 flex justify-center"><realgrid :progname="progname" :progid="progid" :rowData="rowData" :showGrid="showGrid" :showCheckBar="true"  @selcetedrowData="selcetedrowData"></realgrid></div>
-        <div class="text-xs font-mono text-red-500 mt-2">결제키 복사시 결제키 설정 페이지에서 추가해야 결제키 화면에 나타납니다.</div>
+        <div class="text-sm text-gray-800 mt-2">※ 결제키 복사시 결제키 설정 페이지에서 추가해야 결제키 화면에 나타납니다.</div>
        
       </main>
        <footer class="flex justify-end p-5 mt-1">

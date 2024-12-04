@@ -308,7 +308,7 @@ export const saveAllMenuKey = ( groupCd , storeCd ,areaCd , posNo , intKeySeq_ar
         STRKEYNAME_ARR : strKeyName_arr
     })
 }
-export const saveAllMenuKey2 = ( groupCd , storeCd ,areaCd , posNo , intKeySeq_arr , intScreenNo_arr , lngScrNo_arr ,strKeyName_arr , screenType) => {
+export const saveAllMenuKey2 = ( groupCd , storeCd ,areaCd , posNo , intKeySeq_arr , intScreenNo_arr , lngScrNo_arr ,strKeyName_arr , screenType ,itemdisc) => {
     return api2.post('/MIMASTER/MST44_054INS.asmx/saveKeys' , {
         GROUP_CD: groupCd,
         STORE_CD: storeCd ,
@@ -318,7 +318,21 @@ export const saveAllMenuKey2 = ( groupCd , storeCd ,areaCd , posNo , intKeySeq_a
         INTSCREENNO_ARR : intScreenNo_arr,
         LNGKEYSCRNO_ARR : lngScrNo_arr,
         STRKEYNAME_ARR : strKeyName_arr ,
-        SCREEN_TYPE : screenType
+        SCREEN_TYPE : screenType ,
+        ITEMDISC_YN : itemdisc
+    })
+}
+export const saveAllMenuKey3 = ( groupCd , storeCd ,areaCd , posNo , intKeySeq_arr, menuCd_arr  ,strKeyName_arr , screenType ) => {
+    return api2.post('/MIMASTER/MST44_058INS.asmx/saveKeys' , {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        INTKEYSEQ_ARR :  intKeySeq_arr ,
+        LNGKEYSCRNO_ARR : menuCd_arr ,
+        STRKEYNAME_ARR : strKeyName_arr ,
+        SCREEN_TYPE : screenType ,
+     
     })
 }
 export const getMenuKeyList2 = ( groupCd , storeCd ,areaCd , posNo ) => {
@@ -395,6 +409,15 @@ export const dupliPos2 = (groupCd , storeCd ,areaCd , posNo ,tgroupCd ,tstoreCd 
 }
 export const getAmountList = (groupCd , storeCd ,areaCd , posNo ,screenType ) => {
     return api2.post('/MIMASTER/MST44_054INS.asmx/getAmountList', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        SCREEN_TYPE : screenType
+    })
+}
+export const getAmountList2 = (groupCd , storeCd ,areaCd , posNo ,screenType ) => {
+    return api2.post('/MIMASTER/MST44_058INS.asmx/getAmountList', {
         GROUP_CD: groupCd,
         STORE_CD: storeCd ,
         AREA_CD: areaCd,

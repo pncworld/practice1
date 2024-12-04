@@ -166,6 +166,8 @@ watch(() => props.searchWord, (newValue) => {
   {
      
     return searchColId2.some(colId => {
+      console.log(item)
+      console.log(colId)
       const value = item[colId].toString() || '';
       console.log(value)
       console.log(newValue)

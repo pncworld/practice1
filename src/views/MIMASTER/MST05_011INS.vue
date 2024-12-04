@@ -486,19 +486,24 @@ const onEnd2 = (evt) => {
     console.log(targetScreenNo)
     console.log(ScreenKeyOrigin.value)
     console.log(MenuKeyList.value)
+    let temparr = []
     ScreenKeyOrigin.value.forEach((item,index) => {
-      item.intScreenNo = (index+1)
+   
+      const tempScreenNo = item.intScreenNo
+      const targetScreenNo2 = (index+1)
+      temparr.push(tempScreenNo)
+      item.intScreenNo = targetScreenNo2
     })
-    MenuKeyList.value.filter(item => item.intPosNo == posNo.value ).forEach((item,index) => {
-      if(item.intScreenNo == originScreenNo) {
-        item.intScreenNo = targetScreenNo
-      } else if ( item.intScreenNo == targetScreenNo ){
-        item.intScreenNo = originScreenNo
-      }
+
+    MenuKeyList.value.filter(item => item.intPosNo == posNo.value).forEach((item,index) => {
+        const targetindex = temparr.findIndex(item2 => item2 ==  item.intScreenNo)
+        item.intScreenNo = targetindex+1
+   
     })
+   
     addfor10ScreenKey()
  
-    showMenuKey(clickedintScreenNo.value)
+    showMenuKey(clickedScreenKeyIndex.value+1)
 }
 watch( items , (newvalue) => {
   console.log(newvalue)
@@ -966,7 +971,13 @@ const confirmaddScreenKey = () => {
     })
     return ;
   }
-  const newScreenNo = ScreenKeyOrigin.value[ScreenKeyOrigin.value.length-1].intScreenNo +1;
+  let newScreenNo;
+  if(ScreenKeyOrigin.value.length == 0){
+    newScreenNo = 1;
+  } else {
+    newScreenNo = ScreenKeyOrigin.value[ScreenKeyOrigin.value.length-1].intScreenNo +1;
+  }
+
   ScreenKeyOrigin.value.push({strScreenName : currentscreenKeyNm.value , intScreenNo : newScreenNo  })
   addscreenKey.value = false
   addfor10ScreenKey()
