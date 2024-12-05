@@ -655,6 +655,12 @@ nowStoreCd.value = newValue ;
     } else {
         currentpaymentType.value ='지불'
     }
+    ScreenKeyOrigin.value = []
+    ScreenKeys.value = []
+    KeyList.value = []
+    rowData.value = []
+    items.value = []
+
  }
   
   const handlePosNo = (newValue) => {

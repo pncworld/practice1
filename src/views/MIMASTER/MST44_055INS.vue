@@ -2,7 +2,7 @@
     <div class="flex justify-between items-center w-full overflow-y-auto">
     <div class="flex justify-start  w-full pl-12 pt-4">
                <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-full">
-                결제키 설정(kiosk)
+                결제키 설정
                </h1></div>
                 
                </div>
@@ -14,7 +14,7 @@
   
   </div>
   <br>
-  <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore9kio @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @update:ischanged2="searchinit" @updatePaymentType="updatePaymentType"></PickStore9kio> </div> 
+  <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore5 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @update:ischanged2="searchinit"></PickStore5> </div> 
   <div class="z-50">
     <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST44_052INS_VUE'" :dupliapiname="'DUPLIALLKIOSKDATA'" :progid="1" :poskiosk="'getStoreAndPosList2'" :naming="'KIOSK번호'">
     </DupliPopUp>
@@ -92,13 +92,13 @@
     </div>
   </div>
   </div>
-  <span class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[700px]  z-40"><h1 class="font-bold text-xl z-40 ml-20">{{currentpaymentType}}&nbsp;결제키 설정</h1><span class="flex space-x-3 ml-32 pl-56 items-center">순서변경 &nbsp; &nbsp;<label class="z-40"><input type="radio" name="changingMode" @click.stop="changingMode(1)" checked>교체하기 </label><label class="z-40"><input type="radio" name="changingMode" @click.stop="changingMode(2)">밀어내기</label><button class="whitebutton z-40" @click.stop="deletekey">삭제</button></span></span> 
+  <span class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[700px]  z-40"><h1 class="font-bold text-xl z-40 ml-20">결제키 배치</h1><span class="flex space-x-3 ml-32 pl-56 items-center">순서변경 &nbsp; &nbsp;<label class="z-40"><input type="radio" name="changingMode" @click.stop="changingMode(1)" checked>교체하기 </label><label class="z-40"><input type="radio" name="changingMode" @click.stop="changingMode(2)">밀어내기</label><button class="whitebutton z-40" @click.stop="deletekey">삭제</button></span></span> 
   <div class="flex h-5/6 w-full -mt-5">
   <div class="flex flex-col w-2/5 h-5/6">
   <div class="flex justify-between mt-0 ml-10 w-full border-b  border-b-gray-300">
     <div class="font-bold text-xl w-auto ">
       <!-- <button class="contents_tab-button " :class="{'text-blue-600' : currentMenu==false }" @click="showMenus(1)">메뉴관리</button> -->
-      {{currentpaymentType}}&nbsp;결제키선택
+     결제명선택
     </div>
     <div class="mt-3">
       <!-- <button class="whitebutton" @click="searchAmountList3">조회</button> -->
@@ -113,7 +113,7 @@
   </div>
     <div class="ml-10 mt-0 w-full h-full">
   
-      <Realgrid class="w-full h-full" :progname="'MST44_054INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'"></Realgrid>
+      <Realgrid class="w-full h-full" :progname="'MST44_055INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'"></Realgrid>
       <div class="flex justify-start">※ 사용여부가 미사용인 결제코드는 목록에서 노출되지 않습니다.</div>
       <div class="flex justify-start">※ 복사시 결제코드 항목을 추가해야 결제키 화면에 노출됩니다.</div>
     </div>
@@ -129,7 +129,7 @@
     :move="onMove"
      @end="onEnd"
      animation="200"
-    class="grid grid-rows-3 grid-cols-2 h-full w-full gap-1 " 
+    class="grid grid-rows-5 grid-cols-3 h-full w-full gap-1 " 
   >
     <div
       v-for="(item, index) in KeyList"
@@ -152,7 +152,7 @@
   <script setup>
   import { ref, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';
-  import {  getAllScreenList, getAmountList, getAmountList2, saveAllMenuKey, saveAllMenuKey2, saveAllMenuKey3, saveScreenKeys, saveScreenKeys2, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
+  import {  getAllScreenList, getAmountList, getAmountList2, getAmountList3, saveAllMenuKey, saveAllMenuKey2, saveAllMenuKey3, saveScreenKeys, saveScreenKeys2, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
   import { VueDraggableNext } from 'vue-draggable-next';
   import Swal from 'sweetalert2';
 
@@ -317,7 +317,7 @@ nowStoreCd.value = newValue ;
      
       
      
-      const res4 = await getAmountList2(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value ,posNo.value, Number(currentpaymentCd.value))
+      const res4 = await getAmountList3(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value ,posNo.value)
       console.log(res4)
       AmountList.value =res4.data.AmountList
       KeyList.value =res4.data.AmountKeyList
@@ -410,7 +410,7 @@ nowStoreCd.value = newValue ;
   }
   watch(KeyList,(newvalue) => {
 
-  for(var i = 0 ; i< 6 ; i ++){
+  for(var i = 0 ; i< 15 ; i ++){
     if(KeyList.value.findIndex(item => item.intKeySeq == i+1) == -1){
        KeyList.value.splice( i , 0 , {intKeySeq : i+1})
     }

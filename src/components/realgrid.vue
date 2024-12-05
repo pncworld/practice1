@@ -114,6 +114,10 @@ const funcshowGrid = async () => {
     selectedRowData.value = gridView.getCheckedItems().map(index => dataProvider.getRows()[index]);
     emit('selcetedrowData', selectedRowData.value);
   };
+  gridView.onItemAllChecked = (grid, checked) => {
+    selectedRowData.value = gridView.getCheckedItems().map(index => dataProvider.getRows()[index]);
+    emit('selcetedrowData', selectedRowData.value);
+  };
 
 
   gridView.onCellItemClicked = function (grid, clickData) {
