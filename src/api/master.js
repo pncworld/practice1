@@ -471,6 +471,49 @@ export const DUPLIPAYKEY = (groupCd , storeCd ,areaCd , posNo , screenNo , scree
      
     })
 }
+export const savePayKey = (groupCd , storeCd ,areaCd , posNo , intkeyseqarr , keyscrnoarr, keynmarr , intkeynos , gp ) => {
+    return api2.post('/MIMASTER/MST44_055INS.asmx/savePayKey', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        KEY_SEQARR : intkeyseqarr,
+        KEYSCR_NOARR : keyscrnoarr,
+        KEY_NMARR : keynmarr ,
+        INT_KEY_NOARR : intkeynos,
+        GPARR : gp
+
+    })
+}
+export const saveGroupPayKey = (groupCd , storeCd ,areaCd , posNo , intkeyseqarr , keyamtarr, groupcodearr , intkeyNmarr ) => {
+    return api2.post('/MIMASTER/MST44_055INS.asmx/saveGroupPayKey', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        KEY_SEQARR : intkeyseqarr,
+        KEYSCR_NOARR : keyamtarr,
+        GROUP_CODEARR : groupcodearr,
+        KEY_NMARR : intkeyNmarr ,
+       
+    })
+}
+
+
+export const DUPLIALLPAYKEY = (groupCd , storeCd ,areaCd , posNo , t_groupCd , t_storeCd, t_areaCd , t_posNo ) => {
+    return api2.post('/MIMASTER/MST44_055INS.asmx/DUPLIALLPAYKEY', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        T_GROUP_CD : t_groupCd,
+        T_STORE_CD : t_storeCd,
+        T_AREA_CD : t_areaCd ,
+        T_POS_NO : t_posNo
+
+     
+    })
+}
 
 
 
