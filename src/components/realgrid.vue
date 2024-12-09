@@ -175,7 +175,7 @@ watch(() => props.searchWord, (newValue) => {
       const value = item[colId].toString() || '';
       console.log(value)
       console.log(newValue)
-      return value.includes(newValue.toString())
+      return value.toLowerCase().includes(newValue.toString().toLowerCase())
     })
   }
   );

@@ -237,8 +237,9 @@ import PickStore5 from '@/components/pickStore5.vue';
     return ;
   }
   KeyList2.value = []
-  clickedGroupPage.value --;
-  for(var i= 25 *(clickedGroupPage.value-1) ; i< 25 *(clickedGroupPage.value) ; i++){
+  clickedGroupPage.value-- ;
+  console.log(clickedGroupPage.value)
+  for(var i= 0 ; i< 25 ; i++){
         const findindex = originGroupKeys.value.findIndex(item => item.intKeySeq == 25 *(clickedGroupPage.value-1)+i+1)
         if(findindex == -1){
           KeyList2.value.splice( i, 0 , {intKeySeq : 25 *(clickedGroupPage.value-1)+i+1})
@@ -364,21 +365,15 @@ nowStoreCd.value = newValue ;
   }
   
   
-  calculateMaxSubCode();
+ 
   
   };
-  const filteredSubMenuGroup = ref([]);
  
   watch(forsearchSub, (newValue) => {
   searchAmountList3();
 })
   const clickedintScreenNo = ref()
-  const calculateMaxSubCode = () =>{
-  maxSubCode.value = Math.max(
-     ...Category.value
-  .filter(item => item.SubCategory && item.SubCategory.length > 0)
-  .flatMap(item => item.SubCategory.map(sub => Number(sub.SubCode))));
-  }
+
   const showKeys =(value) => {
     if(clickedintScreenNo.value != value) {
       currmenuKeyPage.value = 1
@@ -444,7 +439,7 @@ nowStoreCd.value = newValue ;
   return true;
   
   };
-  const clickedMove = ref(false)
+
   const onEnd = (evt) => {
   // Swap을 처리할 조건
   let oldIndex = evt.oldIndex;
@@ -522,10 +517,7 @@ KeyList2.value = swappedItems.map((item, index) => ({
   console.log("KeyList:", KeyList.value);
  
   };
-  function formatNumber(value) {
-    if (!value) return '';
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }
+
   const onEnd2 = (evt) => {
       const originScreenNo =  dupliScreenKeyOrigin[evt.oldIndex].intScreenNo
       const targetScreenNo =  dupliScreenKeyOrigin[targetItemIndex3].intScreenNo

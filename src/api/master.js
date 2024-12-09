@@ -449,8 +449,21 @@ export const getAmountList3 = (groupCd , storeCd ,areaCd , posNo ) => {
  
     })
 }
+export const getFuncKeyList = () => {
+    return api2.post('/MIMASTER/MST44_043INS.asmx/getFuncKeyList', {
+    })
+}
 export const getAllScreenList = (groupCd , storeCd ,areaCd , posNo ) => {
     return api2.post('/MIMASTER/MST44_054INS.asmx/getAllScreenList', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+     
+    })
+}
+export const getFuncKeys = (groupCd , storeCd ,areaCd , posNo ) => {
+    return api2.post('/MIMASTER/MST44_043INS.asmx/getFuncKeys', {
         GROUP_CD: groupCd,
         STORE_CD: storeCd ,
         AREA_CD: areaCd,
@@ -485,6 +498,7 @@ export const savePayKey = (groupCd , storeCd ,areaCd , posNo , intkeyseqarr , ke
 
     })
 }
+
 export const saveGroupPayKey = (groupCd , storeCd ,areaCd , posNo , intkeyseqarr , keyamtarr, groupcodearr , intkeyNmarr ) => {
     return api2.post('/MIMASTER/MST44_055INS.asmx/saveGroupPayKey', {
         GROUP_CD: groupCd,
@@ -515,7 +529,18 @@ export const DUPLIALLPAYKEY = (groupCd , storeCd ,areaCd , posNo , t_groupCd , t
     })
 }
 
+export const saveAllFuncKey = (groupCd , storeCd ,areaCd , posNo , lngDCodes , lngDCodes2  ) => {
+    return api2.post('/MIMASTER/MST44_043INS.asmx/saveAllFuncKey', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        LNGDCODES : lngDCodes,
+        LNGDCODES2 : lngDCodes2
 
+
+    })
+}
 
 
 
