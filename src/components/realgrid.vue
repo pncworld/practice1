@@ -43,13 +43,22 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  addRow: {
+    type: Boolean,
+    default: false,
+  },
+  deleteRow: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}`); // 동적 ID 설정
 const tabInitSetArray = ref([]);
 const selectedRowData = ref([]);
 const result2 =ref([]) ;
-const emit = defineEmits(["selcetedrowData"]);
+const updatedrowData = ref([])
+const emit = defineEmits(["selcetedrowData" , "updatedRowData"]);
 
 const funcshowGrid = async () => {
   // 그리드 초기화
@@ -91,7 +100,6 @@ const funcshowGrid = async () => {
     },
     width: item.intHdWidth,
     lookupDisplay :  result2.value != [] ? true : false,
-    values :  result2.value != [] ? result2.value.value : [],
     labels :  result2.value != [] ? result2.value.labels : [],
     visible: item.intHdWidth !== 0,
     renderer : { type : item.strColID =='add' ? 'button' : 'text' }
@@ -107,7 +115,9 @@ const funcshowGrid = async () => {
   gridView.setCheckBar({ visible: props.showCheckBar });
   gridView.displayOptions.fitStyle = 'even';
   gridView.sortingOptions.enabled = true;
-
+  gridView.editOptions.deletable = true 
+  dataProvider.softDeleting = true;
+  dataProvider.deleteCreated = true;
   // 이벤트 설정
   gridView.onCellEdited = () => gridView.commit();
   gridView.onItemChecked = () => {
@@ -119,9 +129,15 @@ const funcshowGrid = async () => {
     emit('selcetedrowData', selectedRowData.value);
   };
 
-
+   dataProvider.onDataChanged = function (provider) {
+     console.log(dataProvider.getJsonRows())
+     updatedrowData.value = [ ...dataProvider.getJsonRows()]
+     console.log(updatedrowData.value );
+     emit('updatedRowData', updatedrowData.value )
+   };
+  
   gridView.onCellItemClicked = function (grid, clickData) {
-
+ 
   if (clickData.itemIndex == undefined) {
     return ;
   }
@@ -129,6 +145,24 @@ const funcshowGrid = async () => {
   emit('selcetedrowData', selectedRowData.value);
 }
 };
+watch(() => props.addRow, (newVal) => {
+  var values = {add: "추가"};
+  var dataRow = dataProvider.addRow(values);
+  gridView.setCurrent({dataRow: dataRow});
+  console.log(dataProvider.getJsonRows())
+});
+watch(() => props.deleteRow, (newVal) => {
+ /// ???
+ var curr = gridView.getCurrent();
+ console.log(curr.dataRow)
+ const rowdata = dataProvider.getJsonRows()[curr.dataRow];
+ rowdata.delete = true
+ dataProvider.setValue(curr.dataRow, 'delete', true); 
+ updatedrowData.value = [ ...dataProvider.getJsonRows()]
+     console.log(updatedrowData.value );
+     emit('updatedRowData', updatedrowData.value )
+
+});
 
 onMounted(async () => {
   try {

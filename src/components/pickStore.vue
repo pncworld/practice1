@@ -1,6 +1,6 @@
 <template>
-    <div class="flex justify-center md:justify-end space-x-4 text-xs mr-5  ">
-     <div class="items-center hidden md:flex">매장명 : </div>
+    <div class="flex justify-center md:justify-end space-x-4 text-sm mr-5  ">
+     <div class="items-center font-bold hidden md:flex pl-5">매장명 : </div>
       <div>
         <select :disabled="isDisabled1"  id="storeGroup" class="hidden md:inline-block border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreGroup($event.target.value)">
           <option :value="item.lngStoreGroup" v-for="item in storeGroup" :key="item.lngStoreGroup">{{ item.strName }}</option>
@@ -14,7 +14,7 @@
         </select>
       </div>
       <div class="w-full md:w-auto">
-        <select :disabled="isDisabled3"  class="w-full md:w-auto border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreCode($event.target.value)">
+        <select :disabled="isDisabled3"  class="w-full md:w-auto border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreCode($event.target.value); ischanged();">
         
           <option value="0">선택</option>
           <option :value="item.lngStoreCode" v-for="item in storeCd" :key="item.lngStoreCode">{{ item.strName }}</option>
@@ -44,7 +44,14 @@ const props = defineProps({
     })
 const {groupCdDisabled} = props ;
 isDisabled1.value = groupCdDisabled;
-const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd']);
+const changed = ref(false)
+const ischanged = () => {
+    changed.value = !changed.value;
+  
+    console.log(changed.value)
+    emit('update:ischanged',changed.value);
+};
+const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd' ,'update:ischanged']);
 const emitStoreGroup = (value) => {
     emit('update:storeGroup', value);
 };

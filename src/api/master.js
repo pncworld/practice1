@@ -471,6 +471,15 @@ export const getFuncKeys = (groupCd , storeCd ,areaCd , posNo ) => {
      
     })
 }
+export const getCustomorList = (groupCd , storeCd ,areaCd , posNo ) => {
+    return api2.post('/MIMASTER/MST44_002INS.asmx/getCustomorList', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+     
+    })
+}
 export const DUPLIPAYKEY = (groupCd , storeCd ,areaCd , posNo , screenNo , screenType, store_arr ) => {
     return api2.post('/MIMASTER/MST44_054INS.asmx/DUPLIPAYKEY', {
         GROUP_CD: groupCd,
@@ -495,6 +504,20 @@ export const savePayKey = (groupCd , storeCd ,areaCd , posNo , intkeyseqarr , ke
         KEY_NMARR : keynmarr ,
         INT_KEY_NOARR : intkeynos,
         GPARR : gp
+
+    })
+}
+export const saveAllCustomor = (groupCd , storeCd ,areaCd , posNo , lngcode , strname , intkeyseq , strkeyname , lngkeyscrno ) => {
+    return api2.post('/MIMASTER/MST44_002INS.asmx/saveAllCustomor', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        LNGCODES : lngcode,
+        STRNAMES : strname,
+        INTKEYSEQS : intkeyseq ,
+        STRKEYNAMES : strkeyname,
+        KEYSCRNOS : lngkeyscrno
 
     })
 }
@@ -528,9 +551,35 @@ export const DUPLIALLPAYKEY = (groupCd , storeCd ,areaCd , posNo , t_groupCd , t
      
     })
 }
+export const DUPLIFUNCKEY = (groupCd , storeCd ,areaCd , posNo , t_groupCd , t_storeCd, t_areaCd , t_posNo ) => {
+    return api2.post('/MIMASTER/MST44_043INS.asmx/DUPLIFUNCKEY', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        T_GROUP_CD : t_groupCd,
+        T_STORE_CD : t_storeCd,
+        T_AREA_CD : t_areaCd ,
+        T_POS_NO : t_posNo
+
+     
+    })
+}
 
 export const saveAllFuncKey = (groupCd , storeCd ,areaCd , posNo , lngDCodes , lngDCodes2  ) => {
     return api2.post('/MIMASTER/MST44_043INS.asmx/saveAllFuncKey', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        LNGDCODES : lngDCodes,
+        LNGDCODES2 : lngDCodes2
+
+
+    })
+}
+export const saveAllFuncKey2 = (groupCd , storeCd ,areaCd , posNo , lngDCodes , lngDCodes2  ) => {
+    return api2.post('/MIMASTER/MST44_059INS.asmx/saveAllFuncKey', {
         GROUP_CD: groupCd,
         STORE_CD: storeCd ,
         AREA_CD: areaCd,

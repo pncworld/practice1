@@ -2,7 +2,7 @@
     <div class="flex justify-between items-center w-full overflow-y-auto">
     <div class="flex justify-start  w-full pl-12 pt-4">
                <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-full">
-                기능키 설정(#)
+                기능키 설정
                </h1></div>
                 
                </div>
@@ -81,7 +81,7 @@
     <div class="customtableIndex border border-gray-400 rounded-l-lg">기능키코드/명</div>
     <div class="px-1 py-1 border border-gray-300 rounded-r-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchAmountList"></div>
   </div>
-    <div class="ml-10 mt-0 w-full h-full">
+    <div class="ml-10 mt-0 w-full h-full z-30">
   
       <Realgrid class="w-full h-full" :progname="'MST44_043INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngDCode,strDName'"></Realgrid>
 
@@ -99,13 +99,13 @@
     :move="onMove"
      @end="onEnd"
      animation="200"
-    class="grid grid-cols-7 grid-rows-1 mt-8 ml-6 w-[87%] h-[50%] gap-1" 
+    class="grid grid-cols-5 grid-rows-1 mt-8 ml-6 w-[87%] h-[50%] gap-1" 
   >
     <div
       v-for="(item, index) in subsubKeyList1"
       class="custom-grid-style"
       :class="{'!bg-orange-500 !border-blue-700' : clickedKey1==index && clickedScreenOrMenu ==true }"
-      @click="(saveMenuKeyposition1(index), clickedKey1 = index, clickedMenukeys())"
+      @click="(saveMenuKeyposition1(index ,item.lngDCode), clickedKey1 = index, clickedMenukeys())"
     >
       <span class="flex flex-col items-center justify-center w-full h-full rounded-lg" ><span class="flex justify-center items-center">{{ item ? item.lngDCode : '' }}</span><span class="flex justify-center items-center">{{ item ? item.strDName : '' }}</span></span>
     </div>
@@ -113,8 +113,8 @@
 
   </div>
   
-  <div v-show="afterSearch"  class="flex flex-col mt-4  ml-10 w-11/12 h-5/6" >
-    <h1 class="font-bold text-xl w-auto flex justify-start ml-10">선택 기능키 설정</h1>
+  <div v-show="afterSearch && clickedFuncSelection"  class="flex flex-col mt-4  ml-10 w-11/12 h-5/6" >
+    <h1 class="font-bold text-xl w-auto flex justify-start ml-10">기능 선택키 설정</h1>
    <div class="flex w-[99%] h-full ">
     <VueDraggableNext
     v-model="subsubKeyList2"
@@ -137,24 +137,53 @@
   </div>
   </div>
 
-  <div v-if="showOtherKeys == true " class="mt-5 w-full h-full z-20">
-    <VueDraggableNext
-    v-model="subKeyList8"
-    :move="onMove2"
+  <div v-if="showOtherKeys == true" class="grid grid-rows-[1fr,4fr] grid-cols-1 mt-5 w-full h-full z-20">
+    <div class="flex h-full w-full items-start justify-center" v-show="afterSearch" >
+
+        <VueDraggableNext
+    v-model="subsubKeyList3"
+    :move="onMove"
      @end="onEnd3"
      animation="200"
-    class="grid grid-cols-5 grid-rows-3 ml-20 mt-7 w-[87%] h-[30%] gap-1" 
+    class="grid grid-cols-5 grid-rows-1 mt-8 ml-6 w-[87%] h-[50%] gap-1" 
   >
     <div
-      v-for="(item, index) in subKeyList8"
+      v-for="(item, index) in subsubKeyList3"
       class="custom-grid-style"
-      :class="{'!bg-orange-500 !border-blue-700' : clickedKey3==index && clickedScreenOrMenu ==true }"
-      @click="( item.disable != true) && (saveMenuKeyposition3(index), clickedKey3 = index, clickedMenukeys())"
+      :class="{'!bg-orange-500 !border-blue-700' : clickedKey1==index && clickedScreenOrMenu ==true }"
+      @click="(saveMenuKeyposition3(index ,item.lngDCode), clickedKey1 = index, clickedMenukeys())"
+    >
+      <span class="flex flex-col items-center justify-center w-full h-full rounded-lg" ><span class="flex justify-center items-center">{{ item ? item.lngDCode : '' }}</span><span class="flex justify-center items-center">{{ item ? item.strDName : '' }}</span></span>
+    </div>
+  </VueDraggableNext>
+
+  </div>
+  
+  <div v-show="afterSearch && clickedFuncSelection2"  class="flex flex-col mt-4  ml-10 w-11/12 h-5/6" >
+    <h1 class="font-bold text-xl w-auto flex justify-start ml-10">기능 선택키 설정</h1>
+   <div class="flex w-[99%] h-full ">
+    <VueDraggableNext
+    v-model="subsubKeyList4"
+    :move="onMove2"
+     @end="onEnd4"
+     animation="200"
+    class="grid grid-cols-5 grid-rows-6 ml-10 mt-4 w-full h-full gap-1" 
+  >
+    <div
+      v-for="(item, index) in subsubKeyList4"
+      class="custom-grid-style"
+      :class="{'!bg-orange-500 !border-blue-700' : clickedKey2==index && clickedScreenOrMenu ==true }"
+      @click="( item.disable != true) && (saveMenuKeyposition4(index), clickedKey2 = index, clickedMenukeys())"
     >
       <span class="flex flex-col items-center justify-center w-full h-full rounded-lg" :class="{'!bg-gray-300' : (item.disable == true )}" ><span class="flex justify-center items-center">{{ item ? item.lngDCode : '' }}</span><span class="flex justify-center items-center">{{ item ? item.strDName : '' }}</span></span>
     </div>
   </VueDraggableNext>
+  
   </div>
+  </div>
+  </div>
+
+
   
   
   
@@ -165,7 +194,7 @@
   <script setup>
   import { ref, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';
-  import {  getAllScreenList, getFuncKeyList, getFuncKeys, saveAllFuncKey } from '@/api/master';
+  import {  getAllScreenList, getFuncKeyList, getFuncKeys, saveAllFuncKey, saveAllFuncKey2 } from '@/api/master';
   import { VueDraggableNext } from 'vue-draggable-next';
   import Swal from 'sweetalert2';
 import Realgrid from '@/components/realgrid.vue';
@@ -178,7 +207,8 @@ import DupliPopUp from '@/components/dupliPopUp.vue';
   // 더미 데이터
   const items = ref([]);
   const ScreenKeyOrigin = ref([]);
-
+  const clickedFuncSelection = ref(false)
+  const clickedFuncSelection2 = ref(false)
   const ScreenKeys = ref([]);
   const currentMenuorTLU = ref(false)
   const searchword1 = ref()
@@ -195,14 +225,16 @@ import DupliPopUp from '@/components/dupliPopUp.vue';
   
   const clickedKey1 = ref()
   const clickedKey2= ref()
-  const clickedKey3 = ref()
+  const subsubKeyList3= ref()
+  const subsubKeyList4= ref()
+  const confirmitem4 = ref()
   const clickedStoreNm = ref()
   const handlestoreNm = (newData) => {
     clickedStoreNm.value = newData
   }
   const showPopup2 = ref(false)
   const showChangeScreenKey = ref(false)
-  const confirmitem= ref([]);
+  const confirmitem1= ref([]);
   const currentscreenKeyNm = ref('');
   const maxSubCode = ref();
   const posNo = ref();
@@ -262,6 +294,7 @@ import DupliPopUp from '@/components/dupliPopUp.vue';
 
   const MenuGroup = ref([])
   const confirmitem2 = ref([])
+  const confirmitem3 = ref([])
   const SubMenuGroup = ref([])
   const rowData = ref([])
 
@@ -330,10 +363,7 @@ import DupliPopUp from '@/components/dupliPopUp.vue';
      
       
       AllscreenKeyPage.value = Math.ceil(ScreenKeyOrigin.value.length /4)
-      confirmitem.value = JSON.parse(JSON.stringify(KeyList.value));
-      confirmitem2.value = JSON.parse(JSON.stringify(ScreenKeyOrigin.value));
-
-     
+    
    
   } catch (error) {
       afterSearch.value = false;
@@ -361,8 +391,7 @@ import DupliPopUp from '@/components/dupliPopUp.vue';
       },{})
       console.log(subKeyList1.value)
       const keysToExtract = [
-  'lngKeyNo1', 'lngKeyNo2', 'lngKeyNo3', 'lngKeyNo4', 'lngKeyNo5', 
-  'lngKeyNo6', 'lngKeyNo7'];// 뽑고 싶은 속성들
+  'lngKeyNo1', 'lngKeyNo2', 'lngKeyNo3', 'lngKeyNo4', 'lngKeyNo5'];// 뽑고 싶은 속성들
     subsubKeyList1.value = Object.keys(subKeyList1.value).reduce((acc, key) => {
     if (keysToExtract.includes(key)) {
       acc[key] = subKeyList1.value[key];
@@ -373,7 +402,7 @@ import DupliPopUp from '@/components/dupliPopUp.vue';
 
 
      const keysToExtract2 = [
-  'lngKeyNo8'   , 'lngKeyNo9', 'lngKeyNo10', 
+   'lngKeyNo6', 'lngKeyNo7','lngKeyNo8'   , 'lngKeyNo9', 'lngKeyNo10', 
   'lngKeyNo11', 'lngKeyNo12', 'lngKeyNo13', 'lngKeyNo14', 'lngKeyNo15',
   'lngKeyNo16', 'lngKeyNo17', 'lngKeyNo18', 'lngKeyNo19'];// 뽑고 싶은 속성들
     subsubKeyList2.value = Object.keys(subKeyList1.value).reduce((acc, key) => {
@@ -384,14 +413,11 @@ import DupliPopUp from '@/components/dupliPopUp.vue';
   }, {});
     
   subsubKeyList2.value.lngKeyNo20 = {disable : true}
-  subsubKeyList2.value.lngKeyNo21 = {disable : true}
-  subsubKeyList2.value.lngKeyNo22 = {disable : true}
   subsubKeyList1.value = Object.values(subsubKeyList1.value)  
-
   subsubKeyList2.value = Object.values(subsubKeyList2.value)
   
-
-      subKeyList8.value = Object.keys(KeyList.value[1]).reduce((result,key) => {
+// asdf
+  subKeyList8.value = Object.keys(KeyList.value[1]).reduce((result,key) => {
         console.log(key)
         if(key == 'intKeySeq') {
             result[key] = KeyList.value[1][key];
@@ -399,26 +425,42 @@ import DupliPopUp from '@/components/dupliPopUp.vue';
         } ;
         const keyValue = KeyList.value[1][key]
         const mappeditem = commonKeyList.value.find(item => item.lngDCode == keyValue)
-       
+        
              result[key] = {
           ...mappeditem 
     };
-  
+ 
  
   return result ;
       },{})
+      console.log(subKeyList8.value)
 
-      subKeyList8.value = Object.values(subKeyList8.value).slice(8)  
-      subKeyList8.value.push({disable : true})
-      subKeyList8.value.push({disable : true})
-      subKeyList8.value.push({disable : true})
-      store.state.loading = false; // 로딩 상태 종료
+    subsubKeyList3.value = Object.keys(subKeyList8.value).reduce((acc, key) => {
+    if (keysToExtract.includes(key)) {
+      acc[key] = subKeyList8.value[key];
+    }
+    return acc;
+  }, {});
+   
+    subsubKeyList4.value = Object.keys(subKeyList8.value).reduce((acc, key) => {
+    if (keysToExtract2.includes(key)) {
+      acc[key] = subKeyList8.value[key];
+    }
+    return acc;
+  }, {});
+    
+  subsubKeyList4.value.lngKeyNo20 = {disable : true}
+  subsubKeyList3.value = Object.values(subsubKeyList3.value)  
+  subsubKeyList4.value = Object.values(subsubKeyList4.value)
+              store.state.loading = false; // 로딩 상태 종료
                modified.value = false ;
                afterCategory.value = false;
                afterSearch.value = true;
   }
-  
-  
+  confirmitem1.value = JSON.parse(JSON.stringify( subsubKeyList1.value))
+  confirmitem2.value =  JSON.parse(JSON.stringify(subsubKeyList2.value))
+  confirmitem3.value =  JSON.parse(JSON.stringify(subsubKeyList3.value))
+  confirmitem4.value =  JSON.parse(JSON.stringify(subsubKeyList4.value))
   calculateMaxSubCode();
   
   };
@@ -472,9 +514,7 @@ import DupliPopUp from '@/components/dupliPopUp.vue';
 
 })
 
-  const showScreenKeysOrder =() => {
-    showChangeScreenKey.value = !showChangeScreenKey.value
-  }
+
   
   let targetItemIndex2 ;
   const onMove = (evt) => {
@@ -499,7 +539,7 @@ import DupliPopUp from '@/components/dupliPopUp.vue';
   } else {
     console.log(targetItemIndex2)
     console.log(evt.draggedContext.index)
-    if( targetItemIndex2 == undefined ||  targetItemIndex2 == 12 ||  targetItemIndex2 == 13 ||  targetItemIndex2 == 14 || evt.draggedContext.index == 12 || evt.draggedContext.index ==13 || evt.draggedContext.index ==14 ){
+    if( targetItemIndex2 == undefined ||  targetItemIndex2 == 14 ||  evt.draggedContext.index ==14 ){
         return false
     }
   return true;
@@ -559,7 +599,7 @@ subsubKeyList1.value = swappedItems.map((item, index) => ({
   const onEnd2 = (evt) => {
   // Swap을 처리할 조건
   console.log(evt.oldIndex)
-  if (evt.oldIndex == 12 ||evt.oldIndex == 13||evt.oldIndex == 14  || targetItemIndex2 == undefined || targetItemIndex2 == 12   || targetItemIndex2 == 13 || targetItemIndex2 == 14) {
+  if (evt.oldIndex == 14  || targetItemIndex2 == undefined  || targetItemIndex2 == 14) {
     return  ;
   }
   if (changeMode.value === false) {
@@ -597,13 +637,13 @@ subsubKeyList2.value = swappedItems.map((item, index) => ({
   };
   const onEnd3 = (evt) => {
    
-  if (evt.oldIndex == 12 ||evt.oldIndex == 13||evt.oldIndex == 14  || targetItemIndex2 == undefined || targetItemIndex2 == 12   || targetItemIndex2 == 13 || targetItemIndex2 == 14) {
+  if (evt.oldIndex == 14  || targetItemIndex2 == undefined || targetItemIndex2 == 14) {
     return  ;
   }
   if (changeMode.value === false) {
   const oldIndex = evt.oldIndex;  // 드래그된 아이템의 기존 인덱스
-  console.log(subKeyList8.value)
-  const swappedItems = [...subKeyList8.value];  // items를 복사
+
+  const swappedItems = [...subsubKeyList3.value];  // items를 복사
   console.log(oldIndex)
   console.log(targetItemIndex2)
   const temp = swappedItems[oldIndex];
@@ -617,22 +657,58 @@ subsubKeyList2.value = swappedItems.map((item, index) => ({
   // 배열을 업데이트
 //   items.value = swappedItems;
   
-subKeyList8.value = swappedItems.map((item, index) => ({
+subsubKeyList3.value = swappedItems.map((item, index) => ({
   ...item, // 기존 객체의 다른 속성 유지
   intKeySeq: index + 1 // 배열 순서대로 intKeySeq 재정렬
 }));
 
   } else {
   updateMenuKey.value = true
-  subKeyList8.value = subKeyList8.value.map((item, index) => ({
+  subsubKeyList3.value = subsubKeyList3.value.map((item, index) => ({
   ...item, // 기존 객체의 다른 속성 유지
   intKeySeq: index + 1 // 배열 순서대로 intKeySeq 재정렬
 }))
   }
 
-  console.log("subKeyList8:", subKeyList8.value);
+  console.log("subsubKeyList3:", subsubKeyList3.value);
  
   }
+
+  const onEnd4 = (evt) => {
+   
+   if (evt.oldIndex == 14  || targetItemIndex2 == undefined || targetItemIndex2 == 14) {
+     return  ;
+   }
+   if (changeMode.value === false) {
+   const oldIndex = evt.oldIndex;  // 드래그된 아이템의 기존 인덱스
+ 
+   const swappedItems = [...subsubKeyList4.value];  // items를 복사
+   console.log(oldIndex)
+   console.log(targetItemIndex2)
+   const temp = swappedItems[oldIndex];
+   
+   swappedItems[oldIndex] = swappedItems[targetItemIndex2];
+   
+   swappedItems[targetItemIndex2] = temp;
+   
+
+   
+ subsubKeyList4.value = swappedItems.map((item, index) => ({
+   ...item, // 기존 객체의 다른 속성 유지
+   intKeySeq: index + 1 // 배열 순서대로 intKeySeq 재정렬
+ }));
+ 
+   } else {
+   updateMenuKey.value = true
+   subsubKeyList4.value = subsubKeyList4.value.map((item, index) => ({
+   ...item, // 기존 객체의 다른 속성 유지
+   intKeySeq: index + 1 // 배열 순서대로 intKeySeq 재정렬
+ }))
+   }
+ 
+   console.log("subsubKeyList4:", subsubKeyList4.value);
+  
+   }
 
 
   const saveButton = async() => {
@@ -645,15 +721,15 @@ subKeyList8.value = swappedItems.map((item, index) => ({
       })
       return ;
     }
-    // if(JSON.stringify(confirmitem.value)== JSON.stringify(subKeyList1.value) &&  JSON.stringify(confirmitem2.value)== JSON.stringify(subKeyList8.value)) {
-    //   Swal.fire({
-    //     title: '경고',
-    //     text: '변경된 사항이 없습니다.',
-    //     icon: 'warning',
-    //     confirmButtonText: '확인'
-    //   })
-    //   return ;
-    // }
+    if(JSON.stringify(confirmitem1.value)== JSON.stringify(subsubKeyList1.value) &&  JSON.stringify(confirmitem2.value)== JSON.stringify(subsubKeyList2.value) &&  JSON.stringify(confirmitem3.value)== JSON.stringify(subKeyList8.value)) {
+      Swal.fire({
+        title: '경고',
+        text: '변경된 사항이 없습니다.',
+        icon: 'warning',
+        confirmButtonText: '확인'
+      })
+      return ;
+    }
   
    
     Swal.fire({
@@ -667,14 +743,15 @@ subKeyList8.value = swappedItems.map((item, index) => ({
     if(result.isConfirmed){
       store.state.loading = true;
       const lngDCodes = subsubKeyList1.value.map(item => item.lngDCode)
-      const lngDCodes2 = subsubKeyList2.value.map(item => item.lngDCode).slice(0,12)
-      console.log(subsubKeyList2.value.map(item => item.lngDCode).slice(0,12))
-      const plngDCodes = subKeyList8.value.map(item => item.lngDCode).slice(0,12)
-     
+      const lngDCodes2 = subsubKeyList2.value.map(item => item.lngDCode)
+      const lngDCodes3 = subsubKeyList3.value.map(item => item.lngDCode)
+      const lngDCodes4 = subsubKeyList4.value.map(item => item.lngDCode)
+      console.log(lngDCodes.join(',') + ',' + lngDCodes2.join(',') )
+      console.log(lngDCodes3.join(',') + ',' + lngDCodes4.join(','))
+  
     try {
     
-      console.log(plngDCodes)
-      const res2 = await saveAllFuncKey(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value , lngDCodes.join(',') + ',' + lngDCodes2.join(',')  , plngDCodes.join(',') )
+      const res2 = await saveAllFuncKey2(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value , lngDCodes.join(',') + ',' + lngDCodes2.join(',')  , lngDCodes3.join(',') + ',' + lngDCodes4.join(',') )
       console.log(res2)
     
   } catch (error) {
@@ -746,6 +823,8 @@ subKeyList8.value = swappedItems.map((item, index) => ({
  const updatePaymentType = (newValue) => {
     console.log(newValue)
     currentpaymentCd.value = newValue
+    clickedFuncSelection.value  = false
+    clickedFuncSelection2.value  = false
     if(newValue == 1){
         showOtherKeys.value = false
         currentpaymentType.value = "기본"
@@ -844,23 +923,8 @@ subKeyList8.value = swappedItems.map((item, index) => ({
     
   }
 
-  const addfor30MenuKeys = () => {
-  
-      const length = items.value.length
-      if (length <30){
-        for(var i=0 ; i< 30-length; i++){
-          items.value.push({strScreenName : '' , intScreenNo : ''})
-        }
-      }
-  }
-  
-  const addScreenKey = (value) => {
-    currentscreenKeyNm.value = ''
-    addscreenKey.value = true 
-    console.log(value)
-    clickedScreenNo.value = value +1
-  }
-  
+
+
   const confirmaddScreenKey = () => {
     if(currentscreenKeyNm.value == '' || currentscreenKeyNm.value == null){
       Swal.fire({
@@ -887,7 +951,15 @@ subKeyList8.value = swappedItems.map((item, index) => ({
   const existMenuKey = ref(false)
   const clickedSection = ref(1)
   const clickedRealIndex = ref()
-  const saveMenuKeyposition1 = (index) => {
+  const saveMenuKeyposition1 = (index , code) => {
+    if(code == 2){
+      clickedFuncSelection.value = true
+     
+    } else {
+      clickedFuncSelection.value = false
+  
+    }
+   
     clickedSection.value = 1
    clickedRealIndex.value =  index 
   
@@ -897,8 +969,21 @@ subKeyList8.value = swappedItems.map((item, index) => ({
    clickedRealIndex.value = index 
    console.log(clickedRealIndex.value)
   }
-  const saveMenuKeyposition3 = (index) => {
+  const saveMenuKeyposition3 = (index , code) => {
+
+    if(code == 2){
+ 
+      clickedFuncSelection2.value = true
+    } else {
+  
+      clickedFuncSelection2.value = false
+    }
     clickedSection.value = 3
+  clickedRealIndex.value = index 
+   console.log(clickedRealIndex.value)
+  }
+  const saveMenuKeyposition4 = (index) => {
+    clickedSection.value = 4
   clickedRealIndex.value = index 
    console.log(clickedRealIndex.value)
   }
@@ -913,7 +998,9 @@ subKeyList8.value = swappedItems.map((item, index) => ({
      } else if ( clickedSection.value == 2){
       subsubKeyList2.value[clickedRealIndex.value] = {strDName: clickedstrName.value, lngDCode : clickedCode.value  }
      } else if (clickedSection.value == 3){
-      subKeyList8.value[clickedRealIndex.value] = {strDName: clickedstrName.value, lngDCode : clickedCode.value  }
+      subsubKeyList3.value[clickedRealIndex.value] = {strDName: clickedstrName.value, lngDCode : clickedCode.value  }
+     } else if (clickedSection.value == 4){
+      subsubKeyList4.value[clickedRealIndex.value] = {strDName: clickedstrName.value, lngDCode : clickedCode.value  }
      }
     
 
@@ -930,7 +1017,9 @@ subKeyList8.value = swappedItems.map((item, index) => ({
       console.log(subsubKeyList2.value)
       subsubKeyList2.value[clickedRealIndex.value] = ''
     } else if (clickedSection.value == 3){
-      subKeyList8.value[clickedRealIndex.value] = ''
+      subsubKeyList3.value[clickedRealIndex.value] = ''
+    } else if (clickedSection.value == 4){
+      subsubKeyList4.value[clickedRealIndex.value] = ''
     }
   }
   

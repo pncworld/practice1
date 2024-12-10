@@ -200,7 +200,7 @@ const searchPosMenu = async() => {
     MAJOR_CD: currmainCateCd.value,
     SUB_CD: currsubCateCd.value
    })
-
+   console.log(res2)
    items.value = res2.data.menuKeyList.filter(item => item);
    confirmitem.value = [...items.value];
      if(items.value[0] == undefined){

@@ -2,7 +2,7 @@
     <div v-if="isVisible" class="fixed flex top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 justify-center items-center">
       <div class=" bg-white w-[30%] h-[80%] shadow-lg rounded-lg flex flex-col">
         <header class="popup-header flex justify-between pl-12 pt-5">
-            <h1 class="font-bold text-2xl">메뉴키 복사</h1>
+            <h1 class="font-bold text-2xl">{{ naming2 }} 복사</h1>
             <button class="border border-gray-300 button primary rounded-md mr-12" @click="dupliStore">복사</button>
         </header>
         <main class="popup-body flex-grow">
@@ -35,7 +35,7 @@ import * as api from "@/api/common";
 import * as api2 from "@/api/master";
 import { useStore } from "vuex";
 import Swal from "sweetalert2";
-  const {isVisible ,storeCd,storeNm,posNo,areaCd , progname , progid ,dupliapiname , poskiosk ,naming } = defineProps({
+  const {isVisible ,storeCd,storeNm,posNo,areaCd , progname , progid ,dupliapiname , poskiosk ,naming ,naming2 } = defineProps({
     isVisible: { type: Boolean, default: false }, // 팝업 가시성 관리
     storeCd : { type : String , default: ''} ,
     storeNm : { type : String , default: ''} ,
@@ -46,7 +46,7 @@ import Swal from "sweetalert2";
     dupliapiname : {type : String},
     poskiosk : {type : String},
     naming : {type : String},
-  
+    naming2 : {type : String , default : '메뉴키'}
   });
   const store = useStore();  // vuex store
   const userData = store.state.userData; 
