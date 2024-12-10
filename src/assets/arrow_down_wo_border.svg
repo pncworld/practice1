@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<svg width="36" height="36" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <g class="layer">
+  <title>Layer 1</title>
+  <g id="Btn_ic_calendar_last" transform="rotate(90 18 18) matrix(-1 1.22465e-16 -1.22465e-16 -1 0 0)">
+   <path d="m-14.18,-11.92l-1.26,1.26l-7.09,-7.08l7.08,-7.08l1.27,1.26l-5.82,5.82l5.82,5.82z" data-name="패스 1377" fill="#5c5c5c" id="패스_1377" transform="translate(0.528 -0.177)"/>
+   <rect data-name="사각형 612" fill="none" height="24" id="사각형_612" width="24" x="-30" y="-30"/>
+  </g>
+ </g>
+</svg>

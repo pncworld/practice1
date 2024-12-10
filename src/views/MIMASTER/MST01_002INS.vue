@@ -15,7 +15,10 @@
     <br>
     <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center"><PickStore3 :groupCdDisabled="groupCdDisabled" :gridOptions="gridOptions"  @update:storeType="handleGroupCdDisabledUpdate" @update:storeCd="handleStoreCd"></PickStore3> <input type="text" class="w-1/7 rounded border border-neutral-700 h-9 px-1 " v-model="searchStoreName" @keyup.enter="searchStore"></div>
   </div>
-  <div id="grid1" style="height: 600px"></div> <!-- RealGrid를 렌더링할 컨테이너 -->
+  <!-- RealGrid를 렌더링할 컨테이너 -->
+  <!-- <div id="grid1" style="height: 600px"></div>  -->
+  <Realgrid :progname="'MST01_002INS_VUE'" :progid="1" :rowData="result" :showGrid="showGrid" :showCheckBar="true"  @selcetedrowData="selcetedrowData" style="height: 600px"></Realgrid>
+
   <!-- <div><ag-grid-vue class="ag-theme-alpine custom-grid" :defaultColDef="defaultColDef" :columnDefs="colDefs2"  rowSelection="multiple" :rowData="rowData" style="height:540px" @rowClicked="onRowClicked" @grid-ready="onGridReady"/></div> -->
   <div class="relative left-0 -top-4 mt-5">
     <div class="absolute grid grid-cols-6 grid-rows-10 gap-0 w-full">
@@ -189,6 +192,7 @@ import PickStore3 from '@/components/pickStore3.vue';
 import { getGridInfoList} from '@/api/common';
 import Swal from 'sweetalert2';
 import { getMultiPrice, INS004_select, INS006_select, joinType_query, store_delete, store_insert, store_query, store_update, storeArea, storeAttr, subLease_query } from '@/api/master';
+import Realgrid from "@/components/realgrid.vue";
 
 const result = ref([]);
 const store = useStore();
@@ -321,7 +325,7 @@ const searchStore = async() => {
 
       const response = await store_query(groupCd, storeType.value , storeCd.value , searchStoreName.value);
         
-      const result = response.data.store;
+      result.value = response.data.store;
     
       updateColumns(result);
       store.dispatch("convertLoading", false);
@@ -472,20 +476,7 @@ store.dispatch("convertLoading", false);
 searchStore()
 }
 
-// 데이터 설정
-let dataProvider;
-let gridView;
-
 const updateColumns = (result) => {
-
-  if (gridView) {
-    gridView.destroy();  // 기존 그리드 인스턴스 파괴
-  }
-
-  dataProvider = new RealGrid.LocalDataProvider();
-  gridView = new RealGrid.GridView("grid1");
-  // 데이터 프로바이더 연결
-  gridView.setDataSource(dataProvider);
 
   // 스타일 정의 (헤더 색상 및 스타일)
   const styleTag = document.createElement("style");
@@ -526,132 +517,132 @@ const updateColumns = (result) => {
 
     }
 
-        // 모든 컬럼 설정이 완료된 후 호출
-        gridView.setColumns(columns);
+    //     // 모든 컬럼 설정이 완료된 후 호출
+    //     gridView.setColumns(columns);
 
-        // console.log(gridView.getColumnNames());
-        // console.log(lngSaleTypes.value, lngSupervisors.value);
+    //     // console.log(gridView.getColumnNames());
+    //     // console.log(lngSaleTypes.value, lngSupervisors.value);
 
-        // 특정 컬럼 조건 처리
-        tabInitSetArray.value.forEach((columnSetting) => {
-        const columnId = columnSetting.strColID; // 컬럼 ID 확인
-            if (columnId === "lngCheck") {
-                gridView.setColumnProperty(columnId, "checkable", true);
-            } 
-            else if (columnId === "lngSaleType") {
-                gridView.setColumnProperty(columnId, "renderer", {
-                    type: "text",
-                    callback: (grid, cell) => {
-                        const value = cell.value;
-                        if (!value || lngSaleTypes.value.length === 0) return ""; // 값 검증
-                        return lngSaleTypes.value.find(item => item.lngSaleType == value)?.strSaleType || "";
-                    }
-                });
-            }
-            else if (columnId === "lngSupervisor") {
-                gridView.setColumnProperty(columnId, "renderer", {
-                    type: "text",
-                    callback: (grid, cell) => {
-                        const value = cell.value;
-                        if (!value || lngSupervisors.value.length === 0) return "없음";
-                        console.log(lngSupervisors.value);
-                        return lngSupervisors.value.find(item => item.lngSupervisor == value)?.strName || "";
-                    }
-                });
-            }
-            else if (columnId === "dtmOpenDate") {
-                gridView.setColumnProperty(columnId, "renderer", {
-                    type: "text",
-                    callback: (grid, cell) => {
-                        const value = cell.value;
-                        if (!value) return ""; // 값이 없으면 빈 문자열 반환
-                        const rawDate = value.toString();
-                        if (rawDate.length !== 8) return value; // 날짜 형식이 잘못되었으면 원본 값 반환
-                        return `${rawDate.substring(0, 4)}-${rawDate.substring(4, 6)}-${rawDate.substring(6, 8)}`;
-                    }
-                });
-            }
-        });
+    //     // 특정 컬럼 조건 처리
+    //     tabInitSetArray.value.forEach((columnSetting) => {
+    //     const columnId = columnSetting.strColID; // 컬럼 ID 확인
+    //         if (columnId === "lngCheck") {
+    //             gridView.setColumnProperty(columnId, "checkable", true);
+    //         } 
+    //         else if (columnId === "lngSaleType") {
+    //             gridView.setColumnProperty(columnId, "renderer", {
+    //                 type: "text",
+    //                 callback: (grid, cell) => {
+    //                     const value = cell.value;
+    //                     if (!value || lngSaleTypes.value.length === 0) return ""; // 값 검증
+    //                     return lngSaleTypes.value.find(item => item.lngSaleType == value)?.strSaleType || "";
+    //                 }
+    //             });
+    //         }
+    //         else if (columnId === "lngSupervisor") {
+    //             gridView.setColumnProperty(columnId, "renderer", {
+    //                 type: "text",
+    //                 callback: (grid, cell) => {
+    //                     const value = cell.value;
+    //                     if (!value || lngSupervisors.value.length === 0) return "없음";
+    //                     console.log(lngSupervisors.value);
+    //                     return lngSupervisors.value.find(item => item.lngSupervisor == value)?.strName || "";
+    //                 }
+    //             });
+    //         }
+    //         else if (columnId === "dtmOpenDate") {
+    //             gridView.setColumnProperty(columnId, "renderer", {
+    //                 type: "text",
+    //                 callback: (grid, cell) => {
+    //                     const value = cell.value;
+    //                     if (!value) return ""; // 값이 없으면 빈 문자열 반환
+    //                     const rawDate = value.toString();
+    //                     if (rawDate.length !== 8) return value; // 날짜 형식이 잘못되었으면 원본 값 반환
+    //                     return `${rawDate.substring(0, 4)}-${rawDate.substring(4, 6)}-${rawDate.substring(6, 8)}`;
+    //                 }
+    //             });
+    //         }
+    //     });
 
 
-    dataProvider.setFields([
-      { fieldName: "lngStoreCode" },
-      { fieldName: "strName" },
-      { fieldName: "strRegistNo" },
-      { fieldName: "strDirector" },
-      { fieldName: "strDealType" },
-      { fieldName: "strDealKind" },
-      { fieldName: "lngJoinType" },
-      { fieldName: "strJoinTypeName" },
-      { fieldName: "lngSubLease" },
-      { fieldName: "strSubLeaseName" },
-      { fieldName: "lngStoreAttr" },
-      { fieldName: "strStoreAttrName" },
-      { fieldName: "lngStoreArea" },
-      { fieldName: "strStoreAreaName" },
-      { fieldName: "dtmOpenDate" },
-      { fieldName: "strTel" },
-      { fieldName: "strFax" },
-      { fieldName: "strZipCode" },
-      { fieldName: "strAddress" },
-      { fieldName: "strAddressEtc" },
-      { fieldName: "strConvCode" },
-      { fieldName: "strPhone" },
-      { fieldName: "lngBEP" },
-      { fieldName: "lngFloorSpace" },
-      { fieldName: "lngLease" },
-      { fieldName: "strCheck" },
-      { fieldName: "lngSaleType" },
-      { fieldName: "dtmStop" },
-      { fieldName: "strDev1" },
-      { fieldName: "lngTable" },
-      { fieldName: "lngSupervisor" },
-      { fieldName: "strStoreHistory" },
-      { fieldName: "lngMultiPriceGroupCode" },
-      { fieldName: "strMultiPriceGroupName" }
-    ]);
+    // dataProvider.setFields([
+    //   { fieldName: "lngStoreCode" },
+    //   { fieldName: "strName" },
+    //   { fieldName: "strRegistNo" },
+    //   { fieldName: "strDirector" },
+    //   { fieldName: "strDealType" },
+    //   { fieldName: "strDealKind" },
+    //   { fieldName: "lngJoinType" },
+    //   { fieldName: "strJoinTypeName" },
+    //   { fieldName: "lngSubLease" },
+    //   { fieldName: "strSubLeaseName" },
+    //   { fieldName: "lngStoreAttr" },
+    //   { fieldName: "strStoreAttrName" },
+    //   { fieldName: "lngStoreArea" },
+    //   { fieldName: "strStoreAreaName" },
+    //   { fieldName: "dtmOpenDate" },
+    //   { fieldName: "strTel" },
+    //   { fieldName: "strFax" },
+    //   { fieldName: "strZipCode" },
+    //   { fieldName: "strAddress" },
+    //   { fieldName: "strAddressEtc" },
+    //   { fieldName: "strConvCode" },
+    //   { fieldName: "strPhone" },
+    //   { fieldName: "lngBEP" },
+    //   { fieldName: "lngFloorSpace" },
+    //   { fieldName: "lngLease" },
+    //   { fieldName: "strCheck" },
+    //   { fieldName: "lngSaleType" },
+    //   { fieldName: "dtmStop" },
+    //   { fieldName: "strDev1" },
+    //   { fieldName: "lngTable" },
+    //   { fieldName: "lngSupervisor" },
+    //   { fieldName: "strStoreHistory" },
+    //   { fieldName: "lngMultiPriceGroupCode" },
+    //   { fieldName: "strMultiPriceGroupName" }
+    // ]);
 
-    // 데이터 추가
-    const rows = result.map(item => ({
-        lngStoreCode: item.lngStoreCode,
-        strName: item.strName,
-        strRegistNo: item.strRegistNo,
-        strDirector: item.strDirector,
-        strDealType: item.strDealType,
-        strDealKind: item.strDealKind,
-        lngJoinType: item.lngJoinType,
-        strJoinTypeName: item.strJoinTypeName,
-        lngSubLease: item.lngSubLease,
-        strSubLeaseName: item.strSubLeaseName,
-        lngStoreAttr: item.lngStoreAttr,
-        strStoreAttrName: item.strStoreAttrName,
-        lngStoreArea: item.lngStoreArea,
-        strStoreAreaName: item.strStoreAreaName,
-        dtmOpenDate: item.dtmOpenDate,
-        strTel: item.strTel,
-        strFax: item.strFax,
-        strZipCode: item.strZipCode,
-        strAddress: item.strAddress,
-        strAddressEtc: item.strAddressEtc,
-        strConvCode: item.strConvCode,
-        strPhone: item.strPhone,
-        lngBEP: item.lngBEP,
-        lngFloorSpace: item.lngFloorSpace,
-        lngLease: item.lngLease,
-        strCheck: item.strCheck,
-        lngSaleType: item.lngSaleType,
-        dtmStop: item.dtmStop,
-        strDev1: item.strDev1,
-        lngTable: item.lngTable,
-        lngSupervisor: item.lngSupervisor,
-        strStoreHistory: item.strStoreHistory,
-        lngMultiPriceGroupCode: item.lngMultiPriceGroupCode,
-        strMultiPriceGroupName: item.strMultiPriceGroupName
-    }));
+    // // 데이터 추가
+    // const rows = result.map(item => ({
+    //     lngStoreCode: item.lngStoreCode,
+    //     strName: item.strName,
+    //     strRegistNo: item.strRegistNo,
+    //     strDirector: item.strDirector,
+    //     strDealType: item.strDealType,
+    //     strDealKind: item.strDealKind,
+    //     lngJoinType: item.lngJoinType,
+    //     strJoinTypeName: item.strJoinTypeName,
+    //     lngSubLease: item.lngSubLease,
+    //     strSubLeaseName: item.strSubLeaseName,
+    //     lngStoreAttr: item.lngStoreAttr,
+    //     strStoreAttrName: item.strStoreAttrName,
+    //     lngStoreArea: item.lngStoreArea,
+    //     strStoreAreaName: item.strStoreAreaName,
+    //     dtmOpenDate: item.dtmOpenDate,
+    //     strTel: item.strTel,
+    //     strFax: item.strFax,
+    //     strZipCode: item.strZipCode,
+    //     strAddress: item.strAddress,
+    //     strAddressEtc: item.strAddressEtc,
+    //     strConvCode: item.strConvCode,
+    //     strPhone: item.strPhone,
+    //     lngBEP: item.lngBEP,
+    //     lngFloorSpace: item.lngFloorSpace,
+    //     lngLease: item.lngLease,
+    //     strCheck: item.strCheck,
+    //     lngSaleType: item.lngSaleType,
+    //     dtmStop: item.dtmStop,
+    //     strDev1: item.strDev1,
+    //     lngTable: item.lngTable,
+    //     lngSupervisor: item.lngSupervisor,
+    //     strStoreHistory: item.strStoreHistory,
+    //     lngMultiPriceGroupCode: item.lngMultiPriceGroupCode,
+    //     strMultiPriceGroupName: item.strMultiPriceGroupName
+    // }));
 
-    gridView.footer.visible = false;
+    // gridView.footer.visible = false;
 
-    dataProvider.setRows(rows);
+    // dataProvider.setRows(rows);
 
 }
 

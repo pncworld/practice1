@@ -328,15 +328,17 @@ let gridView2;
 
       // 데이터 필드 정의
       dataProvider2.setFields([
-        { fieldName: "lngCheck" },       // 수신구분 (체크박스 컬럼) 
-        { fieldName: "dtmDate"},      // 수신예정일
-        { fieldName: "lngTableID" },  // 수신코드
+        { fieldName: "lngCheck" },     // 수신구분 (체크박스 컬럼) 
+        { fieldName: "dtmDate"},       // 수신예정일
+        { fieldName: "lngTableID", dataType: "number" },  // 수신코드
         { fieldName: "strTableName" }, // 항목
         { fieldName: "lngStoreCode" }, // 매장코드
         { fieldName: "strStoreName" }, // 매장명
         { fieldName: "lngAreaCode" },  // 매장구역
         { fieldName: "intPosNO" },     // 포스번호
       ]);
+
+      gridView2.setColumnProperty("lngTableID", "numberFormat", "#,###"); // 소숫점 제거
 
       // 데이터 매핑
       const rowData2 = result2.map((item) => ({

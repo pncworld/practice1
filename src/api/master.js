@@ -14,51 +14,51 @@ const api2 = axios.create({
     timeout: 10000, // 요청 타임아웃 설정
   });
 // API 요청 메서드들
-export const get_pos = (groupCd, storeCd) => {
-    return api.post('/VUE_usp_MST01_032INS_GET_POS', {
-        P_GROUP_CD: groupCd,
-        P_STORE_CD: storeCd
+export const get_pos = async(groupCd, storeCd) => {
+    return await api2.post('/MIMASTER/MST01_032INS.asmx/getPosList', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd
     });
 };
-export const get_area = (groupCd, storeCd , posNo) => {
-    return api.post('/VUE_usp_MST01_032INS_GET_AREA', {
-        P_GROUP_CD: groupCd,
-        P_STORE_CD: storeCd ,
+export const get_area = async(groupCd, storeCd , posNo) => {
+    return await api2.post('/MIMASTER/MST01_032INS.asmx/getAreaList', {
+        GROUP_CD : groupCd,
+        STORE_CD : storeCd,
         POS_NO : posNo
     });
 };
-export const get_ins_list1 = (min , max) => {
-    return api.post('/VUE_usp_MST01_032INS_GET_LIST1', {
-         MIN_TABLE_ID : min,
-         MAX_TABLE_ID  : max
+export const get_ins_list1 = async(min , max) => {
+    return await api2.post('/MIMASTER/MST01_032INS.asmx/getMasterList', {
+        MIN_TABLE_ID : min,
+        MAX_TABLE_ID : max
     });
 };
-export const get_ins_list2 = (groupCd , storeCd , lngAreaCd , posNo ,selectedDate) => {
-    return api.post('/VUE_usp_MST01_032INS_GET_LIST2', {
-        P_GROUP_CD: groupCd,
-        P_STORE_CD : storeCd == '0' ? '0' : storeCd,
-        P_AREA_CD : lngAreaCd == '0' ? '0' : lngAreaCd,
-        POS_NO : posNo == '0' ? '0' : posNo,
+export const get_ins_list2 = async(groupCd , storeCd , lngAreaCd , posNo ,selectedDate) => {
+    return await api2.post('/MIMASTER/MST01_032INS.asmx/getMaster2List', {
+        GROUP_CD : groupCd,
+        STORE_CD : storeCd == '0' ? '0' : storeCd,
+        AREA_CD  : lngAreaCd == '0' ? '0' : lngAreaCd,
+        POS_NO   : posNo == '0' ? '0' : posNo,
         DTM_DATE : selectedDate
     });
 };
-export const master_save = (groupCd , storeCd , lngAreaCd , posNo ,selectedrows,selectedDate) => {
-    return api.post('/VUE_usp_MST01_032INS_INSERT', {
-        P_GROUP_CD: groupCd,
-        P_STORE_CD : storeCd,
-        P_AREA_CD : lngAreaCd,
-        POS_NO : posNo,
-        TABLE_ID : selectedrows ,
+export const master_save = async(groupCd , storeCd , lngAreaCd , posNo ,selectedrows, selectedDate) => {
+    return await api2.post('/MIMASTER/MST01_032INS.asmx/insertMasterList', {
+        GROUP_CD : groupCd,
+        STORE_CD : storeCd,
+        AREA_CD  : lngAreaCd,
+        POS_NO   : posNo,
+        TABLE_ID : selectedrows,
         DTM_DATE : selectedDate
     });
 };
-export const master_delete = (groupCd , storeCd , lngAreaCd , posNo ,selectedrows,selectedDate) => {
-    return api.post('/VUE_usp_MST01_032INS_DEL', {
-        P_GROUP_CD: groupCd,
-        P_STORE_CD : storeCd,
-        P_AREA_CD : lngAreaCd,
-        POS_NO : posNo,
-        TABLE_ID : selectedrows ,
+export const master_delete = async(groupCd , storeCd , lngAreaCd , posNo ,selectedrows, selectedDate) => {
+    return await api2.post('/MIMASTER/MST01_032INS.asmx/deleteMasterList', {
+        GROUP_CD : groupCd,
+        STORE_CD : storeCd == '0' ? '0' : storeCd,
+        AREA_CD  : lngAreaCd,
+        POS_NO   : posNo,
+        TABLE_ID : selectedrows,
         DTM_DATE : selectedDate
     });
 };
@@ -98,12 +98,12 @@ export const INS004_select = (groupCd) => {
         P_GROUP_CD: groupCd 
     });
 };
-export const store_query = (groupCd ,storeType ,storeCd ,searchStoreName) => {
-    return api.post('/VUE_usp_mstStore_Query', {
-         P_GROUP_CD: groupCd,
-         P_STORE_ATTR : storeType,
-         P_STORE_CD : storeCd,
-         P_SEARCH_TEXT : searchStoreName ? searchStoreName : ''
+export const store_query = async(groupCd ,storeType ,storeCd ,searchStoreName) => {
+    return await api2.post('/MIMASTER/MST01_002INS.asmx/getStoreQuery', {
+        GROUP_CD    : groupCd,
+        STORE_ATTR  : storeType == '0' ? '0' : storeType,
+        STORE_CD    : storeCd == '0' ? '0' : storeCd,
+        SEARCH_TEXT : searchStoreName ? searchStoreName : ''
     });
 };
 export const store_delete = (groupCd ,lngStoreCode) => {
@@ -306,7 +306,12 @@ export const getScreenList2 = (groupCd , storeCd ,areaCd , posNo ) => {
     })
 }
 
-
+export const MST36_003INS_GET_LIST = (groupCd , groupNm) => {
+    return api2.post('/MIMASTER/MST36_003INS.asmx/getKeyAmountGroupList', {
+        GROUP_CD: groupCd,
+        GROUP_NM: groupNm ? groupNm : ''
+    })
+}
 
 
 
