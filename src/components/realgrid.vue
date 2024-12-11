@@ -51,6 +51,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  editableColId: {
+    type: String,
+    default: '',
+  },
 });
 
 const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}`); // 동적 ID 설정
@@ -58,7 +62,7 @@ const tabInitSetArray = ref([]);
 const selectedRowData = ref([]);
 const result2 =ref([]) ;
 const updatedrowData = ref([])
-const emit = defineEmits(["selcetedrowData" , "updatedRowData"]);
+const emit = defineEmits(["selcetedrowData" , "updatedRowData" , "clickedRowData"]);
 
 const funcshowGrid = async () => {
   // 그리드 초기화
@@ -88,6 +92,7 @@ const funcshowGrid = async () => {
     fieldName: item.strColID,
     dataType: 'text',
   }));
+  fields.push({fieldName: "deleted", dataType: "boolean" })
   dataProvider.setFields(fields);
 
   // 컬럼 정의
@@ -102,7 +107,19 @@ const funcshowGrid = async () => {
     lookupDisplay :  result2.value != [] ? true : false,
     labels :  result2.value != [] ? result2.value.labels : [],
     visible: item.intHdWidth !== 0,
-    renderer : { type : item.strColID =='add' ? 'button' : 'text' }
+    renderer : { type : item.strColID =='add' ? 'button' : 'text' },
+    styleCallback: function(grid, dataCell){
+      var ret = {}
+       console.log(dataCell)
+      if(dataCell.item.rowState == 'created' || dataCell.item.itemState == 'appending' || dataCell.item.itemState == 'inserting'){
+        ret.editable = true;
+      } else {
+       
+        ret.editable = false
+      }
+ 
+      return ret;
+    }
   }));
   gridView.setColumns(columns);
 
@@ -115,9 +132,12 @@ const funcshowGrid = async () => {
   gridView.setCheckBar({ visible: props.showCheckBar });
   gridView.displayOptions.fitStyle = 'even';
   gridView.sortingOptions.enabled = true;
+  gridView.editOptions.editable = false;
+  gridView.editOptions.updatable = true;
   gridView.editOptions.deletable = true 
   dataProvider.softDeleting = true;
   dataProvider.deleteCreated = true;
+
   // 이벤트 설정
   gridView.onCellEdited = () => gridView.commit();
   gridView.onItemChecked = () => {
@@ -129,13 +149,18 @@ const funcshowGrid = async () => {
     emit('selcetedrowData', selectedRowData.value);
   };
 
+
    dataProvider.onDataChanged = function (provider) {
      console.log(dataProvider.getJsonRows())
      updatedrowData.value = [ ...dataProvider.getJsonRows()]
      console.log(updatedrowData.value );
      emit('updatedRowData', updatedrowData.value )
+
+
    };
-  
+
+
+
   gridView.onCellItemClicked = function (grid, clickData) {
  
   if (clickData.itemIndex == undefined) {
@@ -144,24 +169,40 @@ const funcshowGrid = async () => {
   selectedRowData.value= dataProvider.getRows()[clickData.itemIndex];
   emit('selcetedrowData', selectedRowData.value);
 }
+
+gridView.onCellClicked = function (grid, clickData) {
+  if (clickData.itemIndex == undefined) {
+    return ;
+  }
+  selectedRowData.value= dataProvider.getRows()[clickData.itemIndex];
+  emit('clickedRowData', selectedRowData.value);
+     console.log(clickData);
+}
+//gridView.columnByName("strName").editable = true;??
+
 };
+
+
 watch(() => props.addRow, (newVal) => {
-  var values = {add: "추가"};
+  var values = {add: "추가" , sort: '매장용'};
   var dataRow = dataProvider.addRow(values);
   gridView.setCurrent({dataRow: dataRow});
   console.log(dataProvider.getJsonRows())
 });
 watch(() => props.deleteRow, (newVal) => {
- /// ???
- var curr = gridView.getCurrent();
- console.log(curr.dataRow)
- const rowdata = dataProvider.getJsonRows()[curr.dataRow];
- rowdata.delete = true
- dataProvider.setValue(curr.dataRow, 'delete', true); 
- updatedrowData.value = [ ...dataProvider.getJsonRows()]
-     console.log(updatedrowData.value );
-     emit('updatedRowData', updatedrowData.value )
+ 
+    const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
+    if (curr && curr.dataRow >= 0) {
+      // 현재 데이터 행이 유효한 경우
+      dataProvider.setValue(curr.dataRow, "deleted", true); // "deleted" 속성을 true로 설정
+      dataProvider.removeRow(curr.dataRow);
+    } else {
+      console.warn("선택된 행이 없습니다.");
+    }
 
+    updatedrowData.value = [ ...dataProvider.getJsonRows()]
+     emit('updatedRowData', updatedrowData.value )
+  
 });
 
 onMounted(async () => {

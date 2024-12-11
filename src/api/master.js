@@ -480,6 +480,15 @@ export const getCustomorList = (groupCd , storeCd ,areaCd , posNo ) => {
      
     })
 }
+export const getAgeList = (groupCd , storeCd ,areaCd , posNo ) => {
+    return api2.post('/MIMASTER/MST44_060INS.asmx/getAgeList', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+     
+    })
+}
 export const DUPLIPAYKEY = (groupCd , storeCd ,areaCd , posNo , screenNo , screenType, store_arr ) => {
     return api2.post('/MIMASTER/MST44_054INS.asmx/DUPLIPAYKEY', {
         GROUP_CD: groupCd,
@@ -509,6 +518,20 @@ export const savePayKey = (groupCd , storeCd ,areaCd , posNo , intkeyseqarr , ke
 }
 export const saveAllCustomor = (groupCd , storeCd ,areaCd , posNo , lngcode , strname , intkeyseq , strkeyname , lngkeyscrno ) => {
     return api2.post('/MIMASTER/MST44_002INS.asmx/saveAllCustomor', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        LNGCODES : lngcode,
+        STRNAMES : strname,
+        INTKEYSEQS : intkeyseq ,
+        STRKEYNAMES : strkeyname,
+        KEYSCRNOS : lngkeyscrno
+
+    })
+}
+export const saveAllAge = (groupCd , storeCd ,areaCd , posNo , lngcode , strname , intkeyseq , strkeyname , lngkeyscrno ) => {
+    return api2.post('/MIMASTER/MST44_060INS.asmx/saveAllAge', {
         GROUP_CD: groupCd,
         STORE_CD: storeCd ,
         AREA_CD: areaCd,
@@ -553,6 +576,34 @@ export const DUPLIALLPAYKEY = (groupCd , storeCd ,areaCd , posNo , t_groupCd , t
 }
 export const DUPLIFUNCKEY = (groupCd , storeCd ,areaCd , posNo , t_groupCd , t_storeCd, t_areaCd , t_posNo ) => {
     return api2.post('/MIMASTER/MST44_043INS.asmx/DUPLIFUNCKEY', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        T_GROUP_CD : t_groupCd,
+        T_STORE_CD : t_storeCd,
+        T_AREA_CD : t_areaCd ,
+        T_POS_NO : t_posNo
+
+     
+    })
+}
+export const DUPLICUSTOMORKEY = (groupCd , storeCd ,areaCd , posNo , t_groupCd , t_storeCd, t_areaCd , t_posNo ) => {
+    return api2.post('/MIMASTER/MST44_002INS.asmx/DUPLICUSTOMORKEY', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        T_GROUP_CD : t_groupCd,
+        T_STORE_CD : t_storeCd,
+        T_AREA_CD : t_areaCd ,
+        T_POS_NO : t_posNo
+
+     
+    })
+}
+export const DUPLIAGEKEY = (groupCd , storeCd ,areaCd , posNo , t_groupCd , t_storeCd, t_areaCd , t_posNo ) => {
+    return api2.post('/MIMASTER/MST44_060INS.asmx/DUPLIAGEKEY', {
         GROUP_CD: groupCd,
         STORE_CD: storeCd ,
         AREA_CD: areaCd,

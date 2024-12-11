@@ -2,7 +2,7 @@
     <div class="flex justify-between items-center w-full overflow-y-auto">
     <div class="flex justify-start  w-full pl-12 pt-4">
                <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-full">
-                객층키 설정
+                연령키 설정
                </h1></div>
                 
                </div>
@@ -16,7 +16,7 @@
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore5 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @update:ischanged2="searchinit"></PickStore5></div> 
   <div class="z-50">
-      <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :poskiosk="'getStoreAndPosList'" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :screenType="currentpaymentCd" :screenList="screenList" :progname="'MST01_011INS_VUE'" :dupliapiname="'DUPLICUSTOMORKEY'" :progid="1" :naming="'POS번호'" :naming2="'객층키'">
+      <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :poskiosk="'getStoreAndPosList'" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :screenType="currentpaymentCd" :screenList="screenList" :progname="'MST01_011INS_VUE'" :dupliapiname="'DUPLIAGEKEY'" :progid="1" :naming="'POS번호'" :naming2="'연령키'">
       </DupliPopUp>
     </div>
   
@@ -24,12 +24,12 @@
 
   
  
-  <span class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[700px]  z-40"><h1 class="font-bold text-xl z-40">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;객체키 설정</h1><span class="flex space-x-3 ml-32 pl-56 items-center">순서변경 &nbsp; &nbsp;<label class="z-40"><input type="radio" :value="false" v-model="changeMode" >교체하기 </label><label class="z-40"><input type="radio" name="changingMode"  :value="true" v-model="changeMode">밀어내기</label><button class="whitebutton z-40" @click.stop="deletekey">삭제</button></span></span> 
+  <span class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[700px]  z-40"><h1 class="font-bold text-xl z-40">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;연령키 설정</h1><span class="flex space-x-3 ml-32 pl-56 items-center">순서변경 &nbsp; &nbsp;<label class="z-40"><input type="radio" :value="false" v-model="changeMode" >교체하기 </label><label class="z-40"><input type="radio" name="changingMode"  :value="true" v-model="changeMode">밀어내기</label><button class="whitebutton z-40" @click.stop="deletekey">삭제</button></span></span> 
   <div class="flex h-5/6 w-full -mt-5">
   <div class="flex flex-col w-3/5 h-5/6">
   <div class="flex justify-between mt-0 ml-10 w-full border-b  border-b-gray-300">
     <div class="font-bold text-xl w-auto ">
-      객층키 목록
+      연령키 목록
     </div>
     <div>
     <button class="whitebutton" @click="addRow">추가</button>
@@ -40,14 +40,14 @@
     
   <div class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
    
-    <div class="customtableIndex border border-gray-400 rounded-l-lg">객층키코드/명</div>
+    <div class="customtableIndex border border-gray-400 rounded-l-lg">연령키코드/명</div>
     <div class="px-1 py-1 border border-gray-300 rounded-r-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchAmountList"></div>
  
 </div>
   
     <div class="ml-10 mt-0 w-full h-full z-30">
   
-      <Realgrid class="w-full h-full" :progname="'MST44_002INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :addRow="addRows" @updatedRowData="updatedRowData" :deleteRow="deleteRows" @clickedRowData="clickedRowData"></Realgrid>
+      <Realgrid class="w-full h-full" :progname="'MST44_060INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :addRow="addRows" @updatedRowData="updatedRowData" :deleteRow="deleteRows" @clickedRowData="clickedRowData" :editableColId="'strName'"></Realgrid>
 
     </div>
     <div class="flex justify-start ml-10">※ 법인용코드는 삭제되지 않습니다.</div>
@@ -92,7 +92,7 @@
   <script setup>
   import { ref, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';
-  import {  getAllScreenList, getCustomorList, getFuncKeyList, getFuncKeys, saveAllCustomor, saveAllFuncKey, saveAllFuncKey2 } from '@/api/master';
+  import {  getAgeList, getAllScreenList, getCustomorList, getFuncKeyList, getFuncKeys, saveAllAge, saveAllCustomor, saveAllFuncKey, saveAllFuncKey2 } from '@/api/master';
   import { VueDraggableNext } from 'vue-draggable-next';
   import Swal from 'sweetalert2';
 import Realgrid from '@/components/realgrid.vue';
@@ -243,9 +243,9 @@ import PickStore5 from '@/components/pickStore5.vue';
   try {
  
       
-      const res = await getCustomorList(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value ,posNo.value)
-
-      commonKeyList.value = res.data.CUSTOMOR
+      const res = await getAgeList(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value ,posNo.value)
+      console.log(res)
+      commonKeyList.value = res.data.AGE
    
       commonKeyList.value = commonKeyList.value.map(item => {
         return {
@@ -255,7 +255,7 @@ import PickStore5 from '@/components/pickStore5.vue';
        })
       rowData.value = [...commonKeyList.value]
       updatedrowData.value = [...commonKeyList.value]
-      KeyList.value = res.data.CUSTOMORKEY
+      KeyList.value = res.data.AGEKEY
       console.log(KeyList.value)
       if(KeyList.value.length <16){
         for(var i =0 ; i < 16 ; i++){
@@ -303,43 +303,8 @@ import PickStore5 from '@/components/pickStore5.vue';
   .filter(item => item.SubCategory && item.SubCategory.length > 0)
   .flatMap(item => item.SubCategory.map(sub => Number(sub.SubCode))));
   }
-  const showKeys =(value) => {
-    if(clickedintScreenNo.value != value) {
-      currmenuKeyPage.value = 1
-    }
-    clickedintScreenNo.value = value
-    const thisProduct = ScreenKeyOrigin.value.filter(item => item.itemDiscYn == 1 && item.intScreenNo == value).length
-    if ( thisProduct >0){
-      clickedRealIndex.value = ''
-      items.value = Array.from({ length: 30 }, (_, index) => ({
-            intKeySeq: index + 1, // 인덱스에 1을 더하여 값 설정
-            itemDiscYn : 1
-        }));
-    } else {
-      items.value = Array.from({ length: 30 }, (_, index) => ({
-            intKeySeq: index + 1, // 인덱스에 1을 더하여 값 설정
-            itemDiscYn : 0
-        }));
-    }
   
-  
-    KeyList.value.filter(item => item.intScreenNo ==value).forEach(item =>  {
-   
-      const position = item.intKeySeq - (currmenuKeyPage.value -1)*30 -1
-      if(position >= 0 && position < 30){
-            items.value[position] = item
-     
-      }
-      
-    })
- 
-    afterSearch2.value =true
-  }
-  watch(ScreenKeys,(newvalue) => {
 
-  AllscreenKeyPage.value = Math.floor(ScreenKeyOrigin.value.length /4) +1
-
-})
 const updatedrowData = ref([])
   const updatedRowData = (newValue) => {
     updatedrowData.value = newValue
@@ -428,7 +393,7 @@ KeyList.value = swappedItems.map((item, index) => ({
     if( notyeslength >=1) {
       Swal.fire({
         title: '경고',
-        text: '객층키코드에 빈 항목이 있습니다.',
+        text: '연령키코드에 빈 항목이 있습니다.',
         icon: 'warning',
         confirmButtonText: '확인'
       })
@@ -438,7 +403,7 @@ KeyList.value = swappedItems.map((item, index) => ({
     if( notyeslength2 >=1) {
       Swal.fire({
         title: '경고',
-        text: '객층키명에 빈 항목이 있습니다.',
+        text: '연령키명에 빈 항목이 있습니다.',
         icon: 'warning',
         confirmButtonText: '확인'
       })
@@ -469,7 +434,7 @@ KeyList.value = swappedItems.map((item, index) => ({
   
     try {
     
-      const res2 = await saveAllCustomor(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value , lngCodes.join(',') , strNames.join(',') , intKeySeqs.join(',') ,strKeyNames.join(',') ,lngKeyscrNos.join(',') )
+      const res2 = await saveAllAge(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value , lngCodes.join(',') , strNames.join(',') , intKeySeqs.join(',') ,strKeyNames.join(',') ,lngKeyscrNos.join(',') )
       console.log(res2)
     
   } catch (error) {
