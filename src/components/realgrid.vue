@@ -107,14 +107,16 @@ const funcshowGrid = async () => {
     lookupDisplay :  result2.value != [] ? true : false,
     labels :  result2.value != [] ? result2.value.labels : [],
     visible: item.intHdWidth !== 0,
+    editable : true ,
     renderer : { type : item.strColID =='add' ? 'button' : 'text' },
     styleCallback: function(grid, dataCell){
       var ret = {}
        console.log(dataCell)
       if(dataCell.item.rowState == 'created' || dataCell.item.itemState == 'appending' || dataCell.item.itemState == 'inserting'){
         ret.editable = true;
+      } else if (item.strColID == props.editableColId) {
+        ret.editable = true
       } else {
-       
         ret.editable = false
       }
  
@@ -132,7 +134,7 @@ const funcshowGrid = async () => {
   gridView.setCheckBar({ visible: props.showCheckBar });
   gridView.displayOptions.fitStyle = 'even';
   gridView.sortingOptions.enabled = true;
-  gridView.editOptions.editable = false;
+  //gridView.editOptions.editable = false;
   gridView.editOptions.updatable = true;
   gridView.editOptions.deletable = true 
   dataProvider.softDeleting = true;
@@ -178,12 +180,13 @@ gridView.onCellClicked = function (grid, clickData) {
   emit('clickedRowData', selectedRowData.value);
      console.log(clickData);
 }
-//gridView.columnByName("strName").editable = true;??
+
 
 };
 
 
 watch(() => props.addRow, (newVal) => {
+  
   var values = {add: "추가" , sort: '매장용'};
   var dataRow = dataProvider.addRow(values);
   gridView.setCurrent({dataRow: dataRow});

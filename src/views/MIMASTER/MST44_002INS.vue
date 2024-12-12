@@ -47,7 +47,7 @@
   
     <div class="ml-10 mt-0 w-full h-full z-30">
   
-      <Realgrid class="w-full h-full" :progname="'MST44_002INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :addRow="addRows" @updatedRowData="updatedRowData" :deleteRow="deleteRows" @clickedRowData="clickedRowData"></Realgrid>
+      <Realgrid class="w-full h-full" :progname="'MST44_002INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :addRow="addRows" @updatedRowData="updatedRowData" :deleteRow="deleteRows" @clickedRowData="clickedRowData" :editableColId="'strName'"></Realgrid>
 
     </div>
     <div class="flex justify-start ml-10">※ 법인용코드는 삭제되지 않습니다.</div>
