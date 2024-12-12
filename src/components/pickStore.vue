@@ -6,14 +6,14 @@
           <option :value="item.lngStoreGroup" v-for="item in storeGroup" :key="item.lngStoreGroup">{{ item.strName }}</option>
         </select>
       </div>
-      <div>
+      <div v-show="hideit">
         <select :disabled="isDisabled2"  class="hidden md:inline-block border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="setStore($event.target.value); emitStoreType($event.target.value);">
          
           <option value="0">전체</option>
           <option :value="item.lngStoreAttr" v-for="item in storeType" :key="item.lngStoreAttr">{{ item.strName }}</option>
         </select>
       </div>
-      <div class="w-full md:w-auto">
+      <div class="w-full md:w-auto" v-show="hideit">
         <select :disabled="isDisabled3"  class="w-full md:w-auto border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreCode($event.target.value); ischanged();">
         
           <option value="0">선택</option>
@@ -25,7 +25,6 @@
   
 
 <script setup>
-import axios from 'axios';
 import { defineProps , ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
@@ -40,8 +39,20 @@ const isDisabled3 = ref(false);
     const userData = store.state.userData ;
 
 const props = defineProps({
-      groupCdDisabled: Boolean
+      groupCdDisabled: Boolean,
+      hidesub: {
+      type: Boolean,
+      default: true,
+     }
+     
+      
     })
+
+const hideit = ref(props.hidesub)
+
+watch(() => props.hidesub, () => {
+  hideit.value = props.hidesub;
+})
 const {groupCdDisabled} = props ;
 isDisabled1.value = groupCdDisabled;
 const changed = ref(false)

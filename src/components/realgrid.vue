@@ -55,6 +55,34 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  changeColid: {
+    type: String,
+    default: '',
+  },
+  changeRow: {
+    type: Number,
+    default: '',
+  },
+  changeValue: {
+    type: String,
+    default: '',
+  },
+  rowStateeditable: {
+    type: Boolean,
+    default: true,
+  },
+  addRow2: {
+    type: Boolean,
+    default: true,
+  },
+  addrowProp: {
+    type: String,
+    default: true,
+  },
+  addrowDefault: {
+    type: String,
+    default: true,
+  },
 });
 
 const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}`); // 동적 ID 설정
@@ -112,7 +140,7 @@ const funcshowGrid = async () => {
     styleCallback: function(grid, dataCell){
       var ret = {}
        console.log(dataCell)
-      if(dataCell.item.rowState == 'created' || dataCell.item.itemState == 'appending' || dataCell.item.itemState == 'inserting'){
+      if((dataCell.item.rowState == 'created' || dataCell.item.itemState == 'appending' || dataCell.item.itemState == 'inserting') && props.rowStateeditable){
         ret.editable = true;
       } else if (item.strColID == props.editableColId) {
         ret.editable = true
@@ -162,7 +190,6 @@ const funcshowGrid = async () => {
    };
 
 
-
   gridView.onCellItemClicked = function (grid, clickData) {
  
   if (clickData.itemIndex == undefined) {
@@ -177,17 +204,40 @@ gridView.onCellClicked = function (grid, clickData) {
     return ;
   }
   selectedRowData.value= dataProvider.getRows()[clickData.itemIndex];
+  selectedRowData.value.index = clickData.itemIndex
   emit('clickedRowData', selectedRowData.value);
-     console.log(clickData);
+ 
 }
 
 
 };
 
+watch(() => props.changeValue , () => {
+  console.log(props.changeRow)
+  console.log(props.changeColid)
+  console.log(props.changeValue)
+    dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue);
+
+    updatedrowData.value = [ ...dataProvider.getJsonRows()]
+     console.log(updatedrowData.value );
+     emit('updatedRowData', updatedrowData.value )
+})
 
 watch(() => props.addRow, (newVal) => {
   
   var values = {add: "추가" , sort: '매장용'};
+  var dataRow = dataProvider.addRow(values);
+  gridView.setCurrent({dataRow: dataRow});
+  console.log(dataProvider.getJsonRows())
+});
+
+watch(() => props.addRow2, (newVal) => {
+  const properties = props.addrowProp.split(',')
+  const value = props.addrowDefault.split(',')
+  let values = {};
+  for(var i= 0 ; i< properties.length ; i++){
+    values[properties[i]] = value[i]
+  }
   var dataRow = dataProvider.addRow(values);
   gridView.setCurrent({dataRow: dataRow});
   console.log(dataProvider.getJsonRows())

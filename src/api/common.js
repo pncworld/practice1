@@ -2,7 +2,7 @@ import axios from 'axios';
 import { ref } from 'vue';
 
 export const commonUrl = 'http://211.238.145.43:3000';
-export const commonUrl2 = 'http://www.pncoffice.com:8085';
+export const commonUrl2 = 'http://211.238.145.30:8085';
 // Axios 인스턴스 생성 (기본 설정)
 const api = axios.create({
   baseURL: commonUrl, // API 기본 URL

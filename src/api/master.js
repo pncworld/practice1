@@ -641,6 +641,32 @@ export const saveAllFuncKey2 = (groupCd , storeCd ,areaCd , posNo , lngDCodes , 
 
     })
 }
+export const saveKDSList = (groupCd , kdsNo, kdsNm , id  , deleteNo ) => {
+    return api2.post('/MIMASTER/MST44_061INS.asmx/saveKDSList', {
+        GROUP_CD: groupCd,
+        KDS_NO : kdsNo,
+        KDS_NM : kdsNm ,
+        ID: id ,
+        DELETE_NO : deleteNo
+
+
+    })
+}
+export const getKDSList = (groupCd ) => {
+    return api2.post('/MIMASTER/MST44_061INS.asmx/getKDSList', {
+        GROUP_CD: groupCd
+
+
+    })
+}
+export const getKDSSettingList = (groupCd  , store_cd) => {
+    return api2.post('/MIMASTER/MST44_061INS.asmx/getKDSSettingList', {
+        GROUP_CD: groupCd,
+        STORE_CD : store_cd
+
+
+    })
+}
 
 
 
