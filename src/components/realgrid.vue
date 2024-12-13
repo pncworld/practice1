@@ -83,6 +83,10 @@ const props = defineProps({
     type: String,
     default: true,
   },
+  reload: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}`); // 동적 ID 설정
@@ -118,7 +122,7 @@ const funcshowGrid = async () => {
   // 필드 정의
   const fields = tabInitSetArray.value.map(item => ({
     fieldName: item.strColID,
-    dataType: 'text',
+    dataType : item.strColID.includes('checkbox') ? 'boolean' : 'text',
   }));
   fields.push({fieldName: "deleted", dataType: "boolean" })
   dataProvider.setFields(fields);
@@ -130,19 +134,18 @@ const funcshowGrid = async () => {
     header: {
       text: item.strHdText,
       styleName: `header-style-${index}`,
+      checkLocation : item.strColID.includes('checkbox') ? 'left' : 'none'
     },
     width: item.intHdWidth,
-    lookupDisplay :  result2.value != [] ? true : false,
-    labels :  result2.value != [] ? result2.value.labels : [],
     visible: item.intHdWidth !== 0,
-    editable : true ,
-    renderer : { type : item.strColID =='add' ? 'button' : 'text' },
+    renderer : { type : item.strColID =='add' ? 'button' :  item.strColID.includes('checkbox') ? 'check' : 'text'
+     },
     styleCallback: function(grid, dataCell){
       var ret = {}
-       console.log(dataCell)
+   
       if((dataCell.item.rowState == 'created' || dataCell.item.itemState == 'appending' || dataCell.item.itemState == 'inserting') && props.rowStateeditable){
         ret.editable = true;
-      } else if (item.strColID == props.editableColId) {
+      } else if (item.strColID == props.editableColId ) {
         ret.editable = true
       } else {
         ret.editable = false
@@ -171,6 +174,7 @@ const funcshowGrid = async () => {
   // 이벤트 설정
   gridView.onCellEdited = () => gridView.commit();
   gridView.onItemChecked = () => {
+    console.log('여기오냐')
     selectedRowData.value = gridView.getCheckedItems().map(index => dataProvider.getRows()[index]);
     emit('selcetedrowData', selectedRowData.value);
   };
@@ -181,13 +185,14 @@ const funcshowGrid = async () => {
 
 
    dataProvider.onDataChanged = function (provider) {
-     console.log(dataProvider.getJsonRows())
+
      updatedrowData.value = [ ...dataProvider.getJsonRows()]
      console.log(updatedrowData.value );
      emit('updatedRowData', updatedrowData.value )
 
 
    };
+
 
 
   gridView.onCellItemClicked = function (grid, clickData) {
@@ -209,8 +214,17 @@ gridView.onCellClicked = function (grid, clickData) {
  
 }
 
-
+gridView.onColumnCheckedChanged = function (grid, col, chk) {
+     var rowCount = dataProvider.getRowCount();  // 전체 행의 개수
+     console.log(rowCount)
+     for (var i = 0; i < rowCount; i++) {
+      dataProvider.setValue(i, col.fieldName, chk);  // 
+     }
+   
+     console.log(col.fieldName + "was checked as: " + chk);
 };
+
+}
 
 watch(() => props.changeValue , () => {
   console.log(props.changeRow)
@@ -284,7 +298,37 @@ onMounted(async () => {
     console.error("Failed to fetch data:", error);
   }
 });
+watch(() => props.reload , (newValue) => {
+  setupGrid()
+})
 
+const setupGrid = async () => {
+  try {
+    if (props.renderProgname !== "") {
+      // Uncomment this if needed
+      // const result2 = await getRenderingData(props.renderProgname);
+    }
+
+    const result = await getGridInfoList(props.progname, props.progid);
+    tabInitSetArray.value = result;
+
+    // Dynamic style generation
+    let styleContent = "";
+    tabInitSetArray.value.forEach((item, index) => {
+      styleContent += `
+        .header-style-${index} {
+          background-color: ${item.strHdBkColor} !important;
+          color: ${item.strHdColor} !important;
+        }
+      `;
+    });
+    document.head.insertAdjacentHTML("beforeend", `<style>${styleContent}</style>`);
+
+    await funcshowGrid();
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
+  }
+};
 // watch(() => props.showGrid, () => funcshowGrid());
 watch(() => props.searchWord, (newValue) => {
   const searchColId2 = props.searchColId.split(',')

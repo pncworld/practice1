@@ -5,7 +5,7 @@
               <h1 class="font-bold text-sm md:text-2xl w-full">
               메뉴키 설정
              </h1></div>
-             <div class="flex space-x-6 pr-12"><button class="button search" @click="searchMenu">조회</button><button class="button save" @click="saveMenuKey">저장</button><button class="button primary" @click="showPopupf"><font-awesome-icon icon="copy" />&nbsp;&nbsp;메뉴키&nbsp;복사</button> <button class="button primary" @click="SpecificMenuDupli"><font-awesome-icon icon="copy" />&nbsp;&nbsp;메뉴키화면키&nbsp;복사</button></div>
+             <div class="flex space-x-6 pr-12"><button class="button search" @click="searchMenu">조회</button><button class="button save" @click="saveMenuKey">저장</button><button class="button copy" @click="showPopupf"><font-awesome-icon icon="copy" />&nbsp;&nbsp;메뉴키&nbsp;복사</button> <button class="button primary" @click="SpecificMenuDupli"><font-awesome-icon icon="copy" />&nbsp;&nbsp;메뉴키화면키&nbsp;복사</button></div>
              </div>
            
         <div class="flex  bg-gray-200 rounded-lg h-16 w-full items-center mt-5"><PickStore6 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @screenNo="handleScreenNo" @changed2="changed2"></PickStore6></div> 

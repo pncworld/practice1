@@ -381,6 +381,16 @@ export const DUPLIALLPOSDATA = async(groupCd, storeCd, areaCd,posNo ,tgroupCd ,t
   })
   return res ;
   }
+  export const DUPLIALLKDS = async(groupCd, storeCd, tgroupCd ,tstoreCd ) => {
+    const res = await api2.post("/MIMASTER/MST44_061INS.asmx/DUPLIALLKDS" , {
+     
+      GROUP_CD : groupCd,
+      STORE_CD : storeCd ,
+      T_GROUP_CD : tgroupCd ,
+      T_STORE_CD : tstoreCd,
+  })
+  return res ;
+  }
 export const saveMenuKey2 = (groupCd , storeCd ,areaCd , posNo , keyseq ,keyname, keyscrno, keycolor ,keyNo ) => {
     return api2.post('/MIMASTER/MST05_004INS.asmx/saveMenuKeys', {
         GROUP_CD: groupCd,
@@ -641,13 +651,23 @@ export const saveAllFuncKey2 = (groupCd , storeCd ,areaCd , posNo , lngDCodes , 
 
     })
 }
-export const saveKDSList = (groupCd , kdsNo, kdsNm , id  , deleteNo ) => {
+export const saveKDSList = (groupCd ,kdsNo, kdsNm , id  , deleteNo ) => {
     return api2.post('/MIMASTER/MST44_061INS.asmx/saveKDSList', {
         GROUP_CD: groupCd,
         KDS_NO : kdsNo,
         KDS_NM : kdsNm ,
         ID: id ,
         DELETE_NO : deleteNo
+
+
+    })
+}
+export const saveKDSSettingAll = (groupCd , storeCd , Menu2arr , id) => {
+    return api2.post('/MIMASTER/MST44_061INS.asmx/saveKDSSettingAll', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd ,
+        MENU_ARR : Menu2arr ,
+        ID : id
 
 
     })

@@ -9,7 +9,7 @@
              <div class="flex justify-center mr-10 space-x-2 pr-5"><button @click="searchMenu" class="button search md:w-auto w-14">조회</button>
             
             <button @click="savePosMenu" class="button save w-auto">저장</button>
-            <button @click="showPopupf" class="button primary w-auto">복사</button>
+            <button @click="showPopupf" class="button copy w-auto">복사</button>
           </div>
 
 </div>

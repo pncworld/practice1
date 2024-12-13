@@ -62,7 +62,7 @@ const ischanged = () => {
     console.log(changed.value)
     emit('update:ischanged',changed.value);
 };
-const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd' ,'update:ischanged']);
+const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd' ,'update:ischanged', 'storeNm']);
 const emitStoreGroup = (value) => {
     emit('update:storeGroup', value);
 };
@@ -72,7 +72,14 @@ const emitStoreType = (value) => {
 };
 
 const emitStoreCode = (value) => {
+  if( value !='0'){
+    const selectedNm = storeCd.value.filter(item => item.lngStoreCode == value)[0].strName
+
+    emit('storeNm' ,selectedNm )
     emit('update:storeCd', value);
+  } else {
+    emit('update:storeCd', value);
+  }
 };
    
   storeGroup.value = store.state.storeGroup;

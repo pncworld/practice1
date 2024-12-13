@@ -35,6 +35,12 @@ export const get_store_list = (lngStoreGroup) => {
     STORE_CD : lngStoreGroup
   })
 }
+export const getStoreList = (lngStoreGroup , lngStoreCode) => {
+  return api2.post('/SYSTEM/sysCom.asmx/getStoreList2',{
+    GROUP_CD : lngStoreGroup,
+    STORE_CD : lngStoreCode,
+  })
+}
 
 export const getGridInfoList = async( P_ID , G_ID) => {
   const tabInitSetArray = ref([]); 

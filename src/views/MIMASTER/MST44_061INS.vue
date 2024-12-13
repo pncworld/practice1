@@ -9,15 +9,17 @@
                <div class="flex justify-center mr-10 space-x-2 pr-5"><button @click="searchMenu" class="button search md:w-auto w-14">조회</button>
               
               <button @click="saveButton" class="button save w-auto">저장</button>
-              <button @click="copyButton" class="button primary w-auto">복사</button>
+              <button @click="copyButton" class="button copy w-auto" v-if="currentMenu == true">복사</button>
+           
             </div>
   
   </div>
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" :hidesub="hidesub"></PickStore> </div> 
   <div class="z-50">
-      <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_011INS_VUE'" :dupliapiname="'DUPLIALLPOSDATA'" :progid="1" :poskiosk="'getStoreAndPosList'" :naming="'POS번호'">
-      </DupliPopUp>
+      <DupliPopUp5 :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST44_061INS_VUE'" :dupliapiname="'DUPLIALLKDS'" :progid="3" :poskiosk="'getStoreList'"  naming2="KDS">
+      </DupliPopUp5>
+    
     </div>
     <div class="mt-5 flex justify-start ml-10">
       <button class="contents_tab-button " :class="{'text-blue-600' : currentMenu==false }" @click="showMenus(1)">KDS설정</button>
@@ -48,40 +50,40 @@
   <div class="h-4/6 w-[80vw]" v-show="currentMenu == true">
     <div class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-[52%]">
       <div class="customtableIndex border border-gray-400 rounded-tl-lg">메뉴분류</div>
-   <div class="px-4 py-2 border border-gray-300 rounded-tr-lg flex ">
-     <select name="" id="" class="flex-1" @change="setSubCd" v-model="forsearchMain">
+   <div class="px-2 py-1 border border-gray-400 rounded-tr-lg flex space-x-2 ">
+     <select name="" id="" class="flex-1 border border-gray-400 rounded-lg" @change="setSubCd" v-model="forsearchMain">
        <option value="0">전체</option>
-       <option :value="i" v-for="i in MenuGroup"> {{ i }}</option>
+       <option :value="i.mainCode" v-for="i in MenuGroup"> {{ i.mainName }}</option>
      </select>
-     <select name="" id="" class="flex-1" v-model="forsearchSub">
+     <select name="" id="" class="flex-1 border border-gray-400 rounded-lg" v-model="forsearchSub">
        <option value="0">전체</option>
-       <option :value="i" v-for="i in filteredSubMenuGroup">{{ i}}</option>
+       <option :value="i.subCode" v-for="i in filteredSubMenuGroup">{{ i.subName}}</option>
      </select>
    </div>
    
    <div class="customtableIndex border border-gray-400 rounded-bl-lg">메뉴명/코드</div>
-   <div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList" v-model="searchword1"></div>
+   <div class="px-2 py-1 border border-gray-400 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList" v-model="searchword1"></div>
   </div>
     <div class="ml-10 mt-5 w-full h-full">
-      <Realgrid class="w-full h-[200%]" :progname="'MST44_061INS_VUE'" :progid="2" :rowData="rowData2" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :addRow="addRows" @updatedRowData="updatedRowData2" :deleteRow="deleteRows" @clickedRowData="clickedRowData" :editableColId="'strName'"></Realgrid>
+      <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_061INS_VUE'" :progid="groupCd" :reload="reload" :rowData="rowData2" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :addRow="addRows" @updatedRowData="updatedRowData2" :deleteRow="deleteRows" @clickedRowData="clickedRowData" :editableColId="'strName'"></Realgrid>
 
     </div>
   </div>
 
 </div>
-<div class="w-[50%] h-[20%] grid grid-rows-2 grid-cols-1 ml-20 -mt-2" v-if="currentMenu == false">
+<div class="w-[52%] h-[20%] grid grid-rows-2 grid-cols-1 ml-28 -mt-2" v-if="currentMenu == false">
 <div class="font-bold text-xl flex justify-start items-center">상세정보</div>
   <div class="w-full h-full flex justify-start items-center">
-    <div class="grid grid-rows-2 grid-cols-[1fr,3fr] w-[90%] h-full  ">
+    <div class="grid grid-rows-2 grid-cols-[1fr,3fr] w-[93%] h-full  ">
       <div class="rounded-tl-lg border border-gray-600 flex justify-center items-center">KDS번호</div>
-      <div class="rounded-tr-lg border border-gray-600 h-full py-1 px-1 flex items-center"><input type="text" class="w-full border border-gray-600 rounded-lg" v-model="clickedNo" disabled></div>
+      <div class="rounded-tr-lg border border-gray-600 h-full py-1 px-1 flex items-center"><input type="text" class="w-full border border-gray-600 rounded-lg disabled:bg-gray-300" v-model="clickedNo" disabled></div>
       <div class="rounded-bl-lg border border-gray-600 flex justify-center items-center">KDS명</div>
       <div class="rounded-br-lg border border-gray-600 h-full py-1 px-1 flex items-center"><input type="text" class="w-full border border-gray-600 rounded-lg" v-model="clickedNm" @input="changeValues"></div>
     </div>
   </div>
 </div>
-<label v-if="currentMenu == true" class="mt-20 relative right-32 top-5">
-  <input type="checkbox" >
+<label v-if="currentMenu == true" class="mt-20 relative right-32 top-1">
+  <input type="checkbox" v-model="ischecked" >
   미설정메뉴보기
 </label>
   
@@ -95,13 +97,14 @@
   <script setup>
   import { ref, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';
-  import {  getKDSList, getKDSSettingList, getMenuKeyList, getMenuList, getScreenList,getTLUList, saveAllMenuKey, saveKDSList, saveScreenKeys } from '@/api/master';
+  import {  getKDSList, getKDSSettingList, getMenuKeyList, getMenuList, getScreenList,getTLUList, saveAllMenuKey, saveKDSList, saveKDSSettingAll, saveScreenKeys } from '@/api/master';
 
   import Swal from 'sweetalert2';
 
   import DupliPopUp from '@/components/dupliPopUp.vue';
 import PickStore from '@/components/pickStore.vue';
 import Realgrid from '@/components/realgrid.vue';
+import DupliPopUp5 from '@/components/dupliPopUp5.vue';
   
   
   // 더미 데이터
@@ -112,7 +115,7 @@ import Realgrid from '@/components/realgrid.vue';
   const updatedList2 = ref()
   const forsearchMain = ref('0')
   const forsearchSub = ref('0')
-
+  const ischecked = ref(false)
   const rowStateeditable = ref(false)
   const changeMode = ref(false);
 
@@ -123,11 +126,12 @@ import Realgrid from '@/components/realgrid.vue';
     clickedStoreNm.value = newData
   }
   const showPopup2 = ref(false)
+  const showPopup3 = ref(false)
 
   
   const confirmitem= ref([]);
-  const confirmitem2= ref([]);
-
+  const reloadit= ref(true);
+  
   const posNo = ref();
   const addrowDefault = ref()
   const currmenuKeyPage = ref(1)
@@ -163,8 +167,21 @@ import Realgrid from '@/components/realgrid.vue';
   const updatedRowData = (newValue) => {
     updatedList.value = newValue
   }
+
+  const forSaveMenu = ref([])
   const updatedRowData2 = (newValue) => {
+    if(currentMenu.value == true){
+
+    forSaveMenu.value = []
     updatedList2.value = newValue
+    const column = Object.keys(updatedList2.value[0])
+   
+    const ex = column.filter(column => column.includes('checkbox'))
+    for(var i=0 ; i < ex.length ; i++){
+      forSaveMenu.value.push(updatedList2.value.filter(item => item[ex[i]] == true).map(item2 => item2.lngCode))
+    }
+    console.log(forSaveMenu.value)
+  }
   }
   const nowStoreCd = ref();
   const afterCategory = ref(false);
@@ -194,6 +211,7 @@ import Realgrid from '@/components/realgrid.vue';
     })
   }
   const KDSList = ref();
+  const reload = ref(false)
   const KDSSettingList = ref();
   const Category = ref([]);
   const changeValue = ref('')
@@ -215,17 +233,22 @@ import Realgrid from '@/components/realgrid.vue';
   const MenuKeyList = ref([])
   const clickedScreenOrMenu = ref(false)
   const TLUList = ref([])
-  const clickedScreenNo = ref()
+  const checked = ref()
   const addRows = ref(false)
   const deleteRows = ref(false)
   const addRow = () => {
     addRows.value = !addRows.value
     addrowDefault.value = userData.strStoreGroupName
     console.log(updatedList.value)
-    const maxKdsCornerNum = Math.max(...updatedList.value.map(item => item.kdsCornerNum));
-
+    if(updatedList.value == undefined || updatedList.value[0] == undefined) {
+      addrowDefault.value += ','+1
+    } else {
+      const maxKdsCornerNum = Math.max(...updatedList.value.map(item => item.kdsCornerNum)) 
+    console.log(maxKdsCornerNum)
     addrowDefault.value += ','+ (maxKdsCornerNum+1)
     console.log(addrowDefault.value)
+    }
+   
   }
   const rowData = ref([])
   const rowData2 = ref([])
@@ -233,8 +256,20 @@ import Realgrid from '@/components/realgrid.vue';
     deleteRows.value = !deleteRows.value
   }
   const copyButton =() => {
+
+    if(afterSearch.value == false) {
+      Swal.fire({
+      title: '경고.',
+      text: '조회를 먼저 해주세요',
+      icon: 'warning',
+      confirmButtonText: '확인',
+    })
+      return ;
+    }
     showPopup2.value = true ;
+   
   }
+  
   const selcetedrowData = (newValue) => {
     console.log(newValue)
   }
@@ -268,12 +303,26 @@ if(currentMenu.value == true) {
       } else {
           res = await getKDSSettingList(groupCd.value , nowStoreCd.value )
           KDSSettingList.value = res.data.KDSSETTINGLIST
+          checked.value = res.data.CHECK
+
+          for(var i=0 ; i< checked.value.length ; i++){
+            const tlngCode = checked.value[i].lngCode
+            const tCornerNm = checked.value[i].kdsCornerNum
+            const index =  KDSSettingList.value.findIndex(item => item.lngCode == tlngCode)
+            KDSSettingList.value[index][tCornerNm] = true
+          }
+
           rowData2.value = [...KDSSettingList.value]
+          console.log(rowData2.value)
           updatedList2.value = [...KDSSettingList.value]
           confirmitem.value = JSON.parse(JSON.stringify(KDSSettingList.value));
-          MenuGroup.value = [ ...new Set(KDSSettingList.value.map(item => item.mainName))]
-          SubMenuGroup.value = [ ...new Set(KDSSettingList.value.map(item => item.subName))]
+         
+          MenuGroup.value = res.data.MAINGROUP
+          SubMenuGroup.value = res.data.SUBGROUP
+        
           console.log(MenuGroup.value)
+          console.log(SubMenuGroup.value)
+          console.log(checked.value)
       }
   
   
@@ -285,6 +334,8 @@ if(currentMenu.value == true) {
       store.state.loading = false; // 로딩 상태 종료
                modified.value = false ;
                afterCategory.value = false;
+               clickedNo.value = ''
+               clickedNm.value = ''
               
   }
   
@@ -293,10 +344,53 @@ if(currentMenu.value == true) {
   };
   const filteredSubMenuGroup = ref([]);
 
+  watch(ischecked , (newvalue) => {
+    if(ischecked.value == false) {
+      rowData2.value = KDSSettingList.value
+    } else {
+      rowData2.value = updatedList2.value.filter( item => {
+        return !Object.values(item).includes(true);
+      })
+    }
+  })
+  const setSubCd = () => {
+    forsearchSub.value = '0'
+    filteredSubMenuGroup.value = SubMenuGroup.value.filter(item => item.mainCode == forsearchMain.value)
+    searchword1.value = ''
+  }
+  watch(forsearchMain , () => {
+    if(forsearchMain.value != '0'){
+      rowData2.value = KDSSettingList.value.filter(item => item.mainCode == forsearchMain.value)
+    } else {
+      rowData2.value = KDSSettingList.value
+    }
+    forsearchSub.value = '0'
+  })
 
+  watch(forsearchSub , () => {
+    if(forsearchSub.value != '0'){
+      rowData2.value = KDSSettingList.value.filter(item => item.mainCode == forsearchMain.value && item.subCode == forsearchSub.value)
+     
+    } else {
+      if(forsearchMain.value !='0'){
+        rowData2.value = KDSSettingList.value.filter(item => item.mainCode == forsearchMain.value)
+      
+      }
+   
+    }
+    const temp = searchword1.value
+    searchword1.value = '' 
+    setTimeout(()=>{
+      searchword1.value = temp
+    },10)
+  })
   
   
-
+ const searchMenuList = (e) => {
+   searchword1.value = e.target.value
+   console.log(searchword1.value)
+ }
+ 
   function formatNumber(value) {
     if (!value) return '';
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -327,15 +421,28 @@ if(currentMenu.value == true) {
       })
       return ;
     }
-    // if(JSON.stringify(confirmitem.value) === JSON.stringify(updatedList.value) && JSON.stringify(confirmitem2.value) === JSON.stringify(ScreenKeyOrigin.value)) {
-    //   Swal.fire({
-    //     title: '경고',
-    //     text: '변경된 사항이 없습니다.',
-    //     icon: 'warning',
-    //     confirmButtonText: '확인'
-    //   })
-    //   return ;
-    // }
+    if ( currentMenu.value == false){
+
+    if(JSON.stringify(confirmitem.value) === JSON.stringify(updatedList.value) ) {
+      Swal.fire({
+        title: '경고',
+        text: '변경된 사항이 없습니다.',
+        icon: 'warning',
+        confirmButtonText: '확인'
+      }) 
+      return ;
+    }
+  } else if (currentMenu.value == true){
+    if(JSON.stringify(confirmitem.value) === JSON.stringify(updatedList2.value) ) {
+      Swal.fire({
+        title: '경고',
+        text: '변경된 사항이 없습니다.',
+        icon: 'warning',
+        confirmButtonText: '확인'
+      })
+      return ;
+    }
+  }
   
    
     Swal.fire({
@@ -357,26 +464,17 @@ if(currentMenu.value == true) {
       const deleteNo = updatedList.value.filter(item => item.deleted == true).map(item => item.kdsCornerNum)
       console.log(kdsNo)
       console.log(kdsNm)
+      
       console.log(deleteNo)
          res = await saveKDSList(groupCd.value , kdsNo.join(',') ,kdsNm.join(',') , userData.loginID , deleteNo.join(','))
+      } else {
+        // const checkedMenuCode = updatedList2.value.filter(item => )
+        
+         res = await saveKDSSettingAll(groupCd.value, nowStoreCd.value, JSON.stringify(forSaveMenu.value) ,userData.loginID)
       }
-     console.log(res)
-      updatedList.value
-     
-      
-      const intKeySeqs = MenuKeyList.value.filter(item => item.intPosNo == posNo.value).map(item => item.intKeySeq)
-      const screenNumarr = MenuKeyList.value.filter(item => item.intPosNo == posNo.value).map(item => item.intScreenNo)
-      const lngScrarr = MenuKeyList.value.filter(item => item.intPosNo == posNo.value).map(item => item.lngKeyscrNo)
-      const menuKeyNmarr = MenuKeyList.value.filter(item => item.intPosNo == posNo.value).map(item => item.strKeyName)
-      console.log(posNo.value)
-      console.log(intKeySeqs.join(','))
-      console.log(screenNumarr.join(','))
-      console.log(lngScrarr.join(','))
-      console.log(menuKeyNmarr.join(','))
-      // const res2 = await saveAllMenuKey(groupCd.value,nowStoreCd.value, nowStoreAreaCd.value , posNo.value , intKeySeqs.join(',') ,screenNumarr.join(',') , lngScrarr.join(','), menuKeyNmarr.join(','))
-      
+   
       console.log(res)
-      console.log(res2)
+     
   } catch (error) {
       
     } finally {
@@ -387,6 +485,7 @@ if(currentMenu.value == true) {
       })
   
       searchMenu()
+      reload.value= !reload.value
     }
   }
   }
