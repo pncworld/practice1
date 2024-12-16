@@ -7,7 +7,7 @@
         </header>
         <main class="popup-body flex-grow">
           <div class="flex justify-start font-bold text-xl ml-12">기준매장</div>
-          <div class="grid grid-rows-1 grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[480px] ml-12 h-20 rounded-lg ">
+          <div class="grid grid-rows-1 grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[480px] ml-12 h-10 rounded-lg ">
             <div class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">기준매장</div>
             <div class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center"><input type="text" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md" :value="'['+storeCd+']' + storeNm" disabled></div>
    

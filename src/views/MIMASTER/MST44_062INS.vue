@@ -2,11 +2,11 @@
     <div class="flex justify-between items-center w-full overflow-y-auto">
     <div class="flex justify-start  w-full pl-12 pt-4">
                <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-full">
-                KDS 관리
+                출력관리
                </h1></div>
                 
                </div>
-               <div class="flex justify-center mr-10 space-x-2 pr-5"><button @click="searchMenu" class="button search md:w-auto w-14">조회</button>
+               <div class="flex justify-center mr-10 space-x-2 pr-5"><button @click="searchButton" class="button search md:w-auto w-14">조회</button>
               
               <button @click="saveButton" class="button save w-auto">저장</button>
               <button @click="copyButton" class="button copy w-auto" v-if="currentMenu == true">복사</button>
@@ -15,39 +15,43 @@
   
   </div>
   <br>
-  <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" :hidesub="hidesub"></PickStore> </div> 
+  <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" ></PickStore> </div> 
   <div class="z-50">
       <DupliPopUp5 :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST44_061INS_VUE'" :dupliapiname="'DUPLIALLKDS'" :progid="3" :poskiosk="'getStoreList'"  naming2="KDS">
       </DupliPopUp5>
     
     </div>
     <div class="mt-5 flex justify-start ml-10">
-      <button class="contents_tab-button " :class="{'text-blue-600' : currentMenu==false }" @click="showMenus(1)">KDS설정</button>
-      <button class="contents_tab-button" :class="{'text-blue-600' : currentMenu==true }"  @click="showMenus(2)">매장별 KDS설정</button>
+      <button class="contents_tab-button " :class="{'text-blue-600' : currentMenu==1 }" @click="showMenus(1)">출력코너명 설정</button>
+      <button class="contents_tab-button" :class="{'text-blue-600' : currentMenu==2 }"  @click="showMenus(2)">주방출력 메뉴설정</button>
+      <button class="contents_tab-button" :class="{'text-blue-600' : currentMenu==3 }"  @click="showMenus(3)">영수증 문구출력</button>
     </div>
   <div class="flex h-4/6 w-full mt-5">
     
   <div class="flex flex-col w-3/5 h-4/6">
-  <div class="flex justify-between mt-0 ml-10  border-b  border-b-gray-300" :class="currentMenu == false ? 'w-full' : 'w-[54%]'">
+  <div class="flex justify-between mt-0 ml-10  border-b  border-b-gray-300" :class="currentMenu == 1 ? 'w-full' : 'w-[54%]'">
   
-    <div class="flex justify-start rounded-tl-lg  text-xl -mt-1 font-bold " v-if="currentMenu == false">KDS 목록</div>
-    <div class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold " v-if="currentMenu == true">메뉴별 KDS 설정</div>
+    <div class="flex justify-start rounded-tl-lg  text-xl -mt-1 font-bold " v-if="currentMenu == 1">출력코너명 목록</div>
+    <div class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold " v-if="currentMenu == 2">주방출력 메뉴설정</div>
      
-    <div class="mt-3">
    
-      <button class="whitebutton" @click="addRow" v-if="currentMenu == false">추가</button>
-    <button class="whitebutton" @click="deleteRow" v-if="currentMenu == false">삭제</button>
-    </div>
   </div>
   
-  <div class="h-4/6" v-show="currentMenu == false">
+  <div class="h-full" v-show="currentMenu == 1">
     <div class="ml-10 mt-5 w-full h-full">
-      <Realgrid class="w-full h-[230%]" :progname="'MST44_061INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :addRow2="addRows" :addrowProp="'strName,kdsCornerNum'" :addrowDefault="addrowDefault" @updatedRowData="updatedRowData" @clickedRowData="clickedRowData" :deleteRow="deleteRows"  :changeColid="'kdsCornerNm'" :changeRow="changeRow" :changeValue="changeValue" :rowStateeditable="rowStateeditable" ></Realgrid>
+      <Realgrid class="w-full h-[400%]" :progname="'MST44_062INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :changeRow="changeRow" :changeColid="'cornerNm'" :changeValue="changeValue" @updatedRowData="updatedRowData" @clickedRowData="clickedRowData"   ></Realgrid>
+
+    </div>
+  </div>
+  <div class="h-full mt-64" v-show="currentMenu == 1">
+    <div class="flex justify-start rounded-tl-lg  text-xl -mt-1 font-bold ml-10 " v-if="currentMenu == false">POS별 출력코너명 목록</div>
+    <div class="ml-10 mt-5 w-full h-full">
+      <Realgrid class="w-full h-[400%]" :progname="'MST44_062INS_VUE'" :progid="2" :rowData="rowData2" :showGrid="showGrid" :showCheckBar="false"  ></Realgrid>
 
     </div>
   </div>
 
-  <div class="h-4/6 w-[80vw]" v-show="currentMenu == true">
+  <div class="h-4/6 w-[80vw]" v-show="currentMenu == 2">
     <div class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-[35%]">
       <div class="customtableIndex border border-gray-400 rounded-tl-lg">메뉴분류</div>
    <div class="px-2 py-1 border border-gray-400 rounded-tr-lg flex space-x-2 ">
@@ -65,24 +69,24 @@
    <div class="px-2 py-1 border border-gray-400 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList" v-model="searchword1"></div>
   </div>
     <div class="ml-10 mt-5 w-full h-full">
-      <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_061INS_VUE'" :progid="groupCd" :reload="reload" :rowData="rowData2" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :addRow="addRows" @updatedRowData="updatedRowData2" :deleteRow="deleteRows" @clickedRowData="clickedRowData" :editableColId="'strName'" :fixedColumn="fixedColumn"></Realgrid>
+      <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="'999901'" :reload="reload" :rowData="rowData3" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :addRow="addRows" @updatedRowData="updatedRowData2" :deleteRow="deleteRows" @clickedRowData="clickedRowData" :editableColId="'strName'" :fixedColumn="fixedColumn" :mergeColumns="true"></Realgrid>
 
     </div>
   </div>
 
 </div>
-<div class="w-[52%] h-[20%] grid grid-rows-2 grid-cols-1 ml-28 -mt-2" v-if="currentMenu == false">
+<div class="w-[52%] h-[20%] grid grid-rows-2 grid-cols-1 ml-28 -mt-2" v-if="currentMenu == 1">
 <div class="font-bold text-xl flex justify-start items-center">상세정보</div>
   <div class="w-full h-full flex justify-start items-center">
     <div class="grid grid-rows-2 grid-cols-[1fr,3fr] w-[93%] h-full  ">
-      <div class="rounded-tl-lg border border-gray-600 flex justify-center items-center">KDS번호</div>
+      <div class="rounded-tl-lg border border-gray-600 flex justify-center items-center">출력코너</div>
       <div class="rounded-tr-lg border border-gray-600 h-full py-1 px-1 flex items-center"><input type="text" class="w-full border border-gray-600 rounded-lg disabled:bg-gray-300" v-model="clickedNo" disabled></div>
-      <div class="rounded-bl-lg border border-gray-600 flex justify-center items-center">KDS명</div>
+      <div class="rounded-bl-lg border border-gray-600 flex justify-center items-center">출력코너명</div>
       <div class="rounded-br-lg border border-gray-600 h-full py-1 px-1 flex items-center"><input type="text" class="w-full border border-gray-600 rounded-lg" v-model="clickedNm" @input="changeValues"></div>
     </div>
   </div>
 </div>
-<label v-if="currentMenu == true" class="mt-20 relative right-96 top-1 h-2">
+<label v-if="currentMenu == 2" class="mt-20 relative right-96 top-1 h-2">
   <input type="checkbox" v-model="ischecked" >
   미설정메뉴보기
 </label>
@@ -97,7 +101,7 @@
   <script setup>
   import { ref, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';
-  import {  getKDSList, getKDSSettingList, getMenuKeyList, getMenuList, getScreenList,getTLUList, saveAllMenuKey, saveKDSList, saveKDSSettingAll, saveScreenKeys } from '@/api/master';
+  import {  getKDSList, getKDSSettingList, getMenuKeyList, getMenuList, getPrintList, getScreenList,getTLUList, saveAllMenuKey, saveKDSList, saveKDSSettingAll, savePrintNm, saveScreenKeys } from '@/api/master';
 
   import Swal from 'sweetalert2';
 
@@ -137,19 +141,23 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
   const addrowDefault = ref()
   const currmenuKeyPage = ref(1)
   const AllscreenKeyPage = ref(1)
-
+  const rowData = ref([])
+  const rowData2 = ref([])
+  const rowData3 = ref([])
   const showMenus = (value) => {
   if(value ==1) {
-    currentMenu.value = false;
+    currentMenu.value = 1;
     hidesub.value = false
-  } else {
-    currentMenu.value = true;
+  } else if(value ==2){
+    currentMenu.value = 2;
     hidesub.value = true
+  } else {
+    currentMenu.value = 3
   }
 }
   
 
-  const currentMenu = ref(false)
+  const currentMenu = ref('1')
   
 
   
@@ -167,11 +175,12 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
   }
   const updatedRowData = (newValue) => {
     updatedList.value = newValue
+    console.log(updatedList.value)
   }
 
   const forSaveMenu = ref([])
   const updatedRowData2 = (newValue) => {
-    if(currentMenu.value == true){
+    if(currentMenu.value == 2){
 
     forSaveMenu.value = []
     updatedList2.value = newValue
@@ -194,6 +203,7 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
   const afterCategory = ref(false);
   const  handleStoreCd = async(newValue) => {
     afterSearch.value = false;
+    rowData.value = []
     rowData2.value = []
     
     KDSSettingList.value = []
@@ -255,8 +265,7 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
     }
    
   }
-  const rowData = ref([])
-  const rowData2 = ref([])
+
   const kdsList = ref([])
   const deleteRow = () => {
     if(afterSearch.value == false) {
@@ -288,11 +297,11 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
   const selcetedrowData = (newValue) => {
     console.log(newValue)
   }
-  const searchMenu = async () => {
+  const searchButton = async () => {
       changeMode.value = false
       Category.value = [] ;
       items.value = []
-if(currentMenu.value == true) {
+
   if(nowStoreCd.value == '0' || nowStoreCd.value == undefined) {
       Swal.fire({
           title: '경고',
@@ -305,40 +314,41 @@ if(currentMenu.value == true) {
       return;
   }
  
-}
+
   store.state.loading = true;
   try {
     let res;
-      if(currentMenu.value == false) {
-          res = await getKDSList(groupCd.value)
-          KDSList.value = res.data.KDS
-          rowData.value = [...KDSList.value]
-          updatedList.value = [...KDSList.value]
-          confirmitem.value = JSON.parse(JSON.stringify(KDSList.value));
-      } else {
-          res = await getKDSSettingList(groupCd.value , nowStoreCd.value )
-          KDSSettingList.value = res.data.KDSSETTINGLIST
-          checked.value = res.data.CHECK
-          kdsList.value = res.data.KDS
+      if(currentMenu.value == 1) {
+          res = await getPrintList(groupCd.value , nowStoreCd.value)
+          console.log(res)
+          rowData.value = res.data.Print
+          rowData2.value = res.data.Print2
 
-          for(var i=0 ; i< checked.value.length ; i++){
-            const tlngCode = checked.value[i].lngCode
-            const tCornerNm = checked.value[i].kdsCornerNum
-            const index =  KDSSettingList.value.findIndex(item => item.lngCode == tlngCode)
-            KDSSettingList.value[index][tCornerNm] = true
-          }
-
-          rowData2.value = [...KDSSettingList.value]
           console.log(rowData2.value)
-          updatedList2.value = [...KDSSettingList.value]
-          confirmitem.value = JSON.parse(JSON.stringify(KDSSettingList.value));
+      } else {
+        //   res = await getKDSSettingList(groupCd.value , nowStoreCd.value )
+        //   KDSSettingList.value = res.data.KDSSETTINGLIST
+        //   checked.value = res.data.CHECK
+        //   kdsList.value = res.data.KDS
+
+        //   for(var i=0 ; i< checked.value.length ; i++){
+        //     const tlngCode = checked.value[i].lngCode
+        //     const tCornerNm = checked.value[i].kdsCornerNum
+        //     const index =  KDSSettingList.value.findIndex(item => item.lngCode == tlngCode)
+        //     KDSSettingList.value[index][tCornerNm] = true
+        //   }
+
+        //   rowData2.value = [...KDSSettingList.value]
+        //   console.log(rowData2.value)
+        //   updatedList2.value = [...KDSSettingList.value]
+        //   confirmitem.value = JSON.parse(JSON.stringify(KDSSettingList.value));
          
-          MenuGroup.value = res.data.MAINGROUP
-          SubMenuGroup.value = res.data.SUBGROUP
+        //   MenuGroup.value = res.data.MAINGROUP
+        //   SubMenuGroup.value = res.data.SUBGROUP
         
-          console.log(MenuGroup.value)
-          console.log(SubMenuGroup.value)
-          console.log(checked.value)
+        //   console.log(MenuGroup.value)
+        //   console.log(SubMenuGroup.value)
+        //   console.log(checked.value)
       }
   
   
@@ -346,28 +356,28 @@ if(currentMenu.value == true) {
   } catch (error) {
       afterSearch.value = false;
   } finally {
-      if(ischecked.value == true){
-        ischecked.value = false
-        setTimeout(() => {
-          ischecked.value = true
-        },10)
-      } else {
-        ischecked.value = true
-        setTimeout(() => {
-          ischecked.value = false
-        },10)
-      }
+    //   if(ischecked.value == true){
+    //     ischecked.value = false
+    //     setTimeout(() => {
+    //       ischecked.value = true
+    //     },10)
+    //   } else {
+    //     ischecked.value = true
+    //     setTimeout(() => {
+    //       ischecked.value = false
+    //     },10)
+    //   }
 
-      const temp1 = forsearchMain.value
-      forsearchMain.value = '0'
-      setTimeout(() => {
-        forsearchMain.value = temp1
-        },1)
-      const temp2 = forsearchSub.value
-      forsearchSub.value = '0'
-      setTimeout(() => {
-        forsearchSub.value = temp2
-        },1)
+    //   const temp1 = forsearchMain.value
+    //   forsearchMain.value = '0'
+    //   setTimeout(() => {
+    //     forsearchMain.value = temp1
+    //     },1)
+    //   const temp2 = forsearchSub.value
+    //   forsearchSub.value = '0'
+    //   setTimeout(() => {
+    //     forsearchSub.value = temp2
+    //     },1)
       store.state.loading = false; // 로딩 상태 종료
                modified.value = false ;
                afterCategory.value = false;
@@ -604,15 +614,11 @@ if(currentMenu.value == true) {
     try {
       let res;
 
-      if(currentMenu.value == false) {
-        const kdsNo = updatedList.value.filter(item => item.deleted != true).map(item => item.kdsCornerNum)
-      const kdsNm =  updatedList.value.filter(item => item.deleted != true).map(item => item.kdsCornerNm)
-      const deleteNo = updatedList.value.filter(item => item.deleted == true).map(item => item.kdsCornerNum)
-      console.log(kdsNo)
-      console.log(kdsNm)
-      
-      console.log(deleteNo)
-         res = await saveKDSList(groupCd.value , kdsNo.join(',') ,kdsNm.join(',') , userData.loginID , deleteNo.join(','))
+      if(currentMenu.value == 1) {
+         const printNo =  updatedList.value.map(item => item.lngPosition)
+         const printNm =  updatedList.value.map(item => item.cornerNm)
+         res = await savePrintNm(groupCd.value , nowStoreCd.value ,printNo.join(',') , printNm.join(','))
+         console.log(res)
       } else {
        
           console.log(forSaveMenu.value)
@@ -631,16 +637,14 @@ if(currentMenu.value == true) {
         confirmButtonText: '확인',
       })
   
-      searchMenu()
+      searchButton()
       reload.value= !reload.value
     }
   }
   }
   )
    
-  // 빈공간 데이터를 넣으려고하는데 안 들어가고 조회가 안됨 // 빈 칸에 대한 것도 데이터를 불러와야 메뉴키위치를 정할 수 있음.
-  
-  
+
   
 
   }
@@ -648,8 +652,8 @@ if(currentMenu.value == true) {
   const changeRow = ref()
   const clickedRowData = (newValue) => {
     console.log(newValue)
-    clickedNo.value = newValue[1]
-    clickedNm.value = newValue[2]
+    clickedNo.value = newValue[2]
+    clickedNm.value = newValue[3]
     changeRow.value = newValue.index
     console.log(changeRow.value)
   }
@@ -658,7 +662,7 @@ if(currentMenu.value == true) {
     posNo.value = newValue
     console.log(posNo.value)
     if(nowStoreAreaCd.value != undefined || posNo.value != undefined){
-      searchMenu()
+        searchButton()
     }
    
   }

@@ -9,7 +9,17 @@ import { onMounted, ref, watch, nextTick } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 let gridView;
 let dataProvider;
-
+/*
+  사용법 progname => SQL mstgridInfo 에 저장된 설정값 가져오는 부분
+  사용법 progid => SQL mstgridInfo 에 저장된 설정값 가져오는 부분
+  rowData => 실제 데이터 입력 부분
+  showGrid => 변수로 그리드를 보여주거나 안 보여주게 설정
+  showCheckBar => 변수로 그리드 내의 체크바를 보여주거나 안 보여주게 설정
+  searchWord => 변수로 그리드 내의 데이터에서 검색어로 조회할 수 있게 설정 
+  searchColId => 검색하려는 필드명 ( 예)strName,SubName) , 로 나눠서 해당 필드들을 함께 조회 가능
+  addRow => true false로 값이 변할때마다 행을 추가 
+  deleteRow =>  true false로 값이 변할때마다 행을 삭제 
+*/
 const props = defineProps({
   progname: {
     type: String,
@@ -87,6 +97,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  fixedColumn: {
+    type: Boolean,
+    default: false,
+  },
+  mergeColumns: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}`); // 동적 ID 설정
@@ -154,8 +172,27 @@ const funcshowGrid = async () => {
       return ret;
     }
   }));
-  gridView.setColumns(columns);
 
+  gridView.setColumns(columns);
+  let layout
+   if(props.mergeColumns == true) {
+    layout = [{
+    name : '메뉴정보',
+    direction : 'horizontal',
+    items : [
+      "메인그룹",
+      '서브그룹',
+      '메뉴코드',
+      '메뉴명' ,
+      '판매가'
+    ],
+    header: {
+      text: "메뉴정보",
+    }
+  }]
+  gridView.setColumnLayout(layout);
+   }
+  
   // 데이터 추가
   dataProvider.setRows(props.rowData);
 
@@ -168,6 +205,7 @@ const funcshowGrid = async () => {
   //gridView.editOptions.editable = false;
   gridView.editOptions.updatable = true;
   gridView.editOptions.deletable = true 
+  gridView.displayOptions.fitStyle = props.fixedColumn == false ? 'even' : "none";
   dataProvider.softDeleting = true;
   dataProvider.deleteCreated = true;
 
@@ -244,6 +282,7 @@ watch(() => props.addRow, (newVal) => {
   gridView.setCurrent({dataRow: dataRow});
   console.log(dataProvider.getJsonRows())
 });
+
 
 watch(() => props.addRow2, (newVal) => {
   const properties = props.addrowProp.split(',')

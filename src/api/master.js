@@ -499,6 +499,13 @@ export const getAgeList = (groupCd , storeCd ,areaCd , posNo ) => {
      
     })
 }
+export const getPrintList = (groupCd , storeCd  ) => {
+    return api2.post('/MIMASTER/MST44_062INS.asmx/getPrintList', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd 
+
+    })
+}
 export const DUPLIPAYKEY = (groupCd , storeCd ,areaCd , posNo , screenNo , screenType, store_arr ) => {
     return api2.post('/MIMASTER/MST44_054INS.asmx/DUPLIPAYKEY', {
         GROUP_CD: groupCd,
@@ -551,6 +558,15 @@ export const saveAllAge = (groupCd , storeCd ,areaCd , posNo , lngcode , strname
         INTKEYSEQS : intkeyseq ,
         STRKEYNAMES : strkeyname,
         KEYSCRNOS : lngkeyscrno
+
+    })
+}
+export const savePrintNm = (groupCd , storeCd ,printNo , printNm ) => {
+    return api2.post('/MIMASTER/MST44_062INS.asmx/savePrintNm', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        PRINT_NO: printNo,
+        PRINT_NM : printNm
 
     })
 }
