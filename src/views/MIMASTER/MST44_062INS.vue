@@ -1,42 +1,34 @@
 <template>
     <div class="flex justify-between items-center w-full overflow-y-auto">
     <div class="flex justify-start  w-full pl-12 pt-4">
-               <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-full">
-                출력관리
-               </h1></div>
-                
-               </div>
-               <div class="flex justify-center mr-10 space-x-2 pr-5"><button @click="searchButton" class="button search md:w-auto w-14">조회</button>
-              
-              <button @click="saveButton" class="button save w-auto">저장</button>
-              <button @click="copyButton" class="button copy w-auto" v-if="currentMenu == true">복사</button>
-           
-            </div>
-  
-  </div>
+    <div class="flex justify-start">
+      <h1 class="font-bold text-sm md:text-2xl w-full">출력관리</h1></div>
+    </div>
+    <div class="flex justify-center mr-10 space-x-2 pr-5">
+      <button @click="searchButton" class="button search md:w-auto w-14">조회</button>
+      <button @click="saveButton" class="button save w-auto">저장</button>
+      <button @click="copyButton" class="button copy w-auto" v-if="currentMenu == true">복사</button>
+    </div>
+</div>
   <br>
-  <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" ></PickStore> </div> 
+  <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
+    <PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" ></PickStore>
+   </div> 
   <div class="z-50">
       <DupliPopUp5 :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST44_061INS_VUE'" :dupliapiname="'DUPLIALLKDS'" :progid="3" :poskiosk="'getStoreList'"  naming2="KDS">
       </DupliPopUp5>
-    
-    </div>
+   </div>
     <div class="mt-5 flex justify-start ml-10">
       <button class="contents_tab-button " :class="{'text-blue-600' : currentMenu==1 }" @click="showMenus(1)">출력코너명 설정</button>
       <button class="contents_tab-button" :class="{'text-blue-600' : currentMenu==2 }"  @click="showMenus(2)">주방출력 메뉴설정</button>
       <button class="contents_tab-button" :class="{'text-blue-600' : currentMenu==3 }"  @click="showMenus(3)">영수증 문구출력</button>
     </div>
   <div class="flex h-4/6 w-full mt-5">
-    
   <div class="flex flex-col w-3/5 h-4/6">
   <div class="flex justify-between mt-0 ml-10  border-b  border-b-gray-300" :class="currentMenu == 1 ? 'w-full' : 'w-[54%]'">
-  
     <div class="flex justify-start rounded-tl-lg  text-xl -mt-1 font-bold " v-if="currentMenu == 1">출력코너명 목록</div>
     <div class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold " v-if="currentMenu == 2">주방출력 메뉴설정</div>
-     
-   
   </div>
-  
   <div class="h-full" v-show="currentMenu == 1">
     <div class="ml-10 mt-5 w-full h-full">
       <Realgrid class="w-full h-[400%]" :progname="'MST44_062INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :changeRow="changeRow" :changeColid="'cornerNm'" :changeValue="changeValue" @updatedRowData="updatedRowData" @clickedRowData="clickedRowData"   ></Realgrid>
@@ -46,8 +38,7 @@
   <div class="h-full mt-64" v-show="currentMenu == 1">
     <div class="flex justify-start rounded-tl-lg  text-xl -mt-1 font-bold ml-10 " v-if="currentMenu == false">POS별 출력코너명 목록</div>
     <div class="ml-10 mt-5 w-full h-full">
-      <Realgrid class="w-full h-[400%]" :progname="'MST44_062INS_VUE'" :progid="2" :rowData="rowData2" :showGrid="showGrid" :showCheckBar="false"  ></Realgrid>
-
+      <Realgrid class="w-full h-[400%]" :progname="'MST44_062INS_VUE'" :progid="2" :rowData="rowData2" :showGrid="showGrid" :showCheckBar="false" ></Realgrid>
     </div>
   </div>
 
@@ -69,12 +60,12 @@
    <div class="px-2 py-1 border border-gray-400 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList" v-model="searchword1"></div>
   </div>
     <div class="ml-10 mt-5 w-full h-full">
-      <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="'999901'" :reload="reload" :rowData="rowData3" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :addRow="addRows" @updatedRowData="updatedRowData2" :deleteRow="deleteRows" @clickedRowData="clickedRowData" :editableColId="'strName'" :fixedColumn="fixedColumn" :mergeColumns="true"></Realgrid>
-
+      <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="nowStoreCd" :reload="reload" :rowData="rowData3" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :addRow="addRows" @updatedRowData="updatedRowData2" :deleteRow="deleteRows" @clickedRowData="clickedRowData" :editableColId="'strName'" :fixedColumn="fixedColumn" :mergeColumns="true" :mergeColumnGroupName="'메뉴정보'" :mergeColumnGroupSubList="'mainName,subName,lngCode,strName,lngPrice'"></Realgrid>
     </div>
   </div>
 
 </div>
+<!-- TAB1 공간 -->
 <div class="w-[52%] h-[20%] grid grid-rows-2 grid-cols-1 ml-28 -mt-2" v-if="currentMenu == 1">
 <div class="font-bold text-xl flex justify-start items-center">상세정보</div>
   <div class="w-full h-full flex justify-start items-center">
@@ -86,29 +77,27 @@
     </div>
   </div>
 </div>
+<!-- TAB2 공간 -->
 <label v-if="currentMenu == 2" class="mt-20 relative right-96 top-1 h-2">
   <input type="checkbox" v-model="ischecked" >
   미설정메뉴보기
 </label>
   
+
+</div>
   
+</template>
   
-  
-  </div>
-  
-  </template>
-  
-  <script setup>
+<script setup>
   import { ref, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';
-  import {  getKDSList, getKDSSettingList, getMenuKeyList, getMenuList, getPrintList, getScreenList,getTLUList, saveAllMenuKey, saveKDSList, saveKDSSettingAll, savePrintNm, saveScreenKeys } from '@/api/master';
+  import { getKitchenSettingList, getPrintList , saveKDSSettingAll, saveKitchenSettingAll, savePrintNm, saveScreenKeys } from '@/api/master';
 
   import Swal from 'sweetalert2';
-
-  import DupliPopUp from '@/components/dupliPopUp.vue';
 import PickStore from '@/components/pickStore.vue';
 import Realgrid from '@/components/realgrid.vue';
 import DupliPopUp5 from '@/components/dupliPopUp5.vue';
+
   
   
   // 더미 데이터
@@ -120,10 +109,10 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
   const forsearchMain = ref('0')
   const forsearchSub = ref('0')
   const ischecked = ref(false)
-  const rowStateeditable = ref(false)
+
   const changeMode = ref(false);
   const fixedColumn = ref(true);
-
+  const PrintList = ref([])
   const clickedNm = ref('')
   const clickedNo = ref()
   const clickedStoreNm = ref()
@@ -131,9 +120,6 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
     clickedStoreNm.value = newData
   }
   const showPopup2 = ref(false)
-  const showPopup3 = ref(false)
-
-  
   const confirmitem= ref([]);
   const reloadit= ref(true);
   
@@ -184,18 +170,19 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
 
     forSaveMenu.value = []
     updatedList2.value = newValue
-    KDSSettingList.value.forEach((item,index) => {
-      const matchedItem = updatedList2.value.find(kdsItem => kdsItem.lngCode == item.lngCode )
+    SettingList.value.forEach((item,index) => {
+      const matchedItem = updatedList2.value.find(Item => Item.lngCode == item.lngCode )
       if (matchedItem) {
-        KDSSettingList.value[index] = {...matchedItem}
+        SettingList.value[index] = {...matchedItem}
        }
     })
 
-    const kdslength = kdsList.value.length
-    for(var i=0 ; i < kdslength ; i++){
-      forSaveMenu.value.push(KDSSettingList.value.filter(item => item['checkbox'+(i+1)] == true).map(item2 => item2.lngCode))
+    const length = printNameList.value.length
+    for(var i=0 ; i < length ; i++){
+      forSaveMenu.value.push(SettingList.value.filter(item => item['checkbox'+(i+1)] == true).map(item2 => item2.lngCode))
     }
-
+    console.log(forSaveMenu.value)
+    console.log(updatedList2.value)
     
   }
   }
@@ -206,19 +193,19 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
     rowData.value = []
     rowData2.value = []
     
-    KDSSettingList.value = []
+    SettingList.value = []
           checked.value = []
-          kdsList.value = []
+          printNameList.value = []
           MenuGroup.value =[]
           SubMenuGroup.value =[]
           ischecked.value = false
 
   nowStoreCd.value = newValue ;
- 
+  reload.value = !reload.value
   }
   const KDSList = ref();
   const reload = ref(false)
-  const KDSSettingList = ref();
+  const SettingList = ref();
   const Category = ref([]);
   const changeValue = ref('')
   const MenuGroup = ref([])
@@ -235,6 +222,7 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
   const groupCd = ref(userData.lngStoreGroup);
   const modified = ref(false);
   const afterSearch = ref(false);
+  const afterSearch2 = ref(false);
   const MenuList = ref([])
   const MenuKeyList = ref([])
   const clickedScreenOrMenu = ref(false)
@@ -266,7 +254,7 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
    
   }
 
-  const kdsList = ref([])
+  const printNameList = ref([])
   const deleteRow = () => {
     if(afterSearch.value == false) {
       Swal.fire({
@@ -325,59 +313,63 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
           rowData2.value = res.data.Print2
 
           console.log(rowData2.value)
-      } else {
-        //   res = await getKDSSettingList(groupCd.value , nowStoreCd.value )
-        //   KDSSettingList.value = res.data.KDSSETTINGLIST
-        //   checked.value = res.data.CHECK
-        //   kdsList.value = res.data.KDS
+      } else if(currentMenu.value == 2){
+        res = await getKitchenSettingList(groupCd.value , nowStoreCd.value)
+        console.log(res)
+     
+        SettingList.value = [...res.data.KITCHENMENU]
+        MenuGroup.value = res.data.MAINGROUP
+        SubMenuGroup.value = res.data.SUBGROUP
+        checked.value = res.data.SAVED
+        PrintList.value = res.data.PRINTLIST
+        printNameList.value = res.data.KITCHENPRINT
+        console.log(checked.value)
+        console.log(printNameList.value)
+        for(var i=0 ; i< checked.value.length ; i++){
+             const tlngCode = checked.value[i].lngCode
+             const portid = checked.value[i].portId
+             const index =  SettingList.value.findIndex(item => item.lngCode == tlngCode)
+             SettingList.value[index][portid] = true
+         }
 
-        //   for(var i=0 ; i< checked.value.length ; i++){
-        //     const tlngCode = checked.value[i].lngCode
-        //     const tCornerNm = checked.value[i].kdsCornerNum
-        //     const index =  KDSSettingList.value.findIndex(item => item.lngCode == tlngCode)
-        //     KDSSettingList.value[index][tCornerNm] = true
-        //   }
-
-        //   rowData2.value = [...KDSSettingList.value]
-        //   console.log(rowData2.value)
-        //   updatedList2.value = [...KDSSettingList.value]
-        //   confirmitem.value = JSON.parse(JSON.stringify(KDSSettingList.value));
-         
-        //   MenuGroup.value = res.data.MAINGROUP
-        //   SubMenuGroup.value = res.data.SUBGROUP
-        
-        //   console.log(MenuGroup.value)
-        //   console.log(SubMenuGroup.value)
-        //   console.log(checked.value)
+         rowData3.value = [ ...SettingList.value]
+         updatedList2.value = [ ...SettingList.value]
+         console.log(SettingList.value)
+         confirmitem.value = JSON.parse(JSON.stringify(SettingList.value));
+        afterSearch2.value = true
       }
   
   
-      afterSearch.value = true;
+   
   } catch (error) {
       afterSearch.value = false;
+      afterSearch2.value = false;
   } finally {
-    //   if(ischecked.value == true){
-    //     ischecked.value = false
-    //     setTimeout(() => {
-    //       ischecked.value = true
-    //     },10)
-    //   } else {
-    //     ischecked.value = true
-    //     setTimeout(() => {
-    //       ischecked.value = false
-    //     },10)
-    //   }
+    if(currentMenu.value == 2){
+      if(ischecked.value == true){
+        ischecked.value = false
+        setTimeout(() => {
+          ischecked.value = true
+        },10)
+      } else {
+        ischecked.value = true
+        setTimeout(() => {
+          ischecked.value = false
+        },10)
+      }
 
-    //   const temp1 = forsearchMain.value
-    //   forsearchMain.value = '0'
-    //   setTimeout(() => {
-    //     forsearchMain.value = temp1
-    //     },1)
-    //   const temp2 = forsearchSub.value
-    //   forsearchSub.value = '0'
-    //   setTimeout(() => {
-    //     forsearchSub.value = temp2
-    //     },1)
+      const temp1 = forsearchMain.value
+      forsearchMain.value = '0'
+      setTimeout(() => {
+        forsearchMain.value = temp1
+        },1)
+      const temp2 = forsearchSub.value
+      forsearchSub.value = '0'
+      setTimeout(() => {
+        forsearchSub.value = temp2
+        },1)
+    }
+    
       store.state.loading = false; // 로딩 상태 종료
                modified.value = false ;
                afterCategory.value = false;
@@ -393,8 +385,8 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
   const alreadyCheckedList = ref([])
   const forSaveMenu2 = ref([])
   watch(ischecked , (newvalue) => {
-    if(ischecked.value == false && afterSearch.value) {
-      rowData2.value = KDSSettingList.value.filter( item => {
+    if(ischecked.value == false && afterSearch2.value) {
+      rowData3.value = SettingList.value.filter( item => {
         if(forsearchMain.value =='0' ){
           return item ;
         } else if ( forsearchMain.value !='0' && forsearchSub.value !='0' )  {
@@ -404,9 +396,9 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
         }
        
       })
-    } else if(ischecked.value == true && afterSearch.value){
+    } else if(ischecked.value == true && afterSearch2.value){
       forSaveMenu2.value = []
-      rowData2.value = KDSSettingList.value.filter( item => {
+      rowData3.value = SettingList.value.filter( item => {
         if(forsearchMain.value =='0'  ){
           forsearchSub.value = '0'
           return (!Object.values(item).includes(true));
@@ -434,8 +426,8 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
   }
   watch(forsearchMain , () => {
     if(forsearchMain.value != '0'){
-      if(ischecked.value == false && afterSearch.value) {
-      rowData2.value = KDSSettingList.value.filter( item => {
+      if(ischecked.value == false && afterSearch2.value) {
+        rowData3.value = SettingList.value.filter( item => {
         if(forsearchMain.value =='0' ){
           return item ;
         } else if ( forsearchMain.value !='0' && forsearchSub.value !='0' )  {
@@ -445,9 +437,9 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
         }
        
       })
-    } else if(ischecked.value == true && afterSearch.value){
+    } else if(ischecked.value == true && afterSearch2.value){
       forSaveMenu2.value = []
-      rowData2.value = KDSSettingList.value.filter( item => {
+      rowData3.value = SettingList.value.filter( item => {
         if(forsearchMain.value =='0'  ){
           forsearchSub.value = '0'
           return (!Object.values(item).includes(true));
@@ -461,8 +453,8 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
     
     }
     } else {
-      if(ischecked.value == false && afterSearch.value) {
-      rowData2.value = KDSSettingList.value.filter( item => {
+      if(ischecked.value == false && afterSearch2.value) {
+        rowData3.value = SettingList.value.filter( item => {
         if(forsearchMain.value =='0' ){
           return item ;
         } else if ( forsearchMain.value !='0' && forsearchSub.value !='0' )  {
@@ -472,9 +464,9 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
         }
        
       })
-    } else if(ischecked.value == true && afterSearch.value){
+    } else if(ischecked.value == true && afterSearch2.value){
       forSaveMenu2.value = []
-      rowData2.value = KDSSettingList.value.filter( item => {
+      rowData3.value = SettingList.value.filter( item => {
         if(forsearchMain.value =='0'  ){
           forsearchSub.value = '0'
           return (!Object.values(item).includes(true));
@@ -494,7 +486,7 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
   watch(forsearchSub , () => {
     if(forsearchSub.value != '0'){
       if(ischecked.value == true){
-        rowData2.value = KDSSettingList.value.filter( item => {
+        rowData3.value = SettingList.value.filter( item => {
         if(forsearchMain.value =='0'  ){
           forsearchSub.value = '0'
           return (!Object.values(item).includes(true));
@@ -506,7 +498,7 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
        
       })
       } else {
-        rowData2.value = KDSSettingList.value.filter( item => {
+        rowData3.value = SettingList.value.filter( item => {
         if(forsearchMain.value =='0' ){
           return item ;
         } else if ( forsearchMain.value !='0' && forsearchSub.value !='0' )  {
@@ -522,7 +514,7 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
       if(forsearchMain.value !='0'){
  
         if(ischecked.value == true){
-          rowData2.value = KDSSettingList.value.filter( item => {
+          rowData3.value = SettingList.value.filter( item => {
         if(forsearchMain.value =='0'  ){
           forsearchSub.value = '0'
           return (!Object.values(item).includes(true));
@@ -534,7 +526,7 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
        
       })
         } else {
-          rowData2.value = KDSSettingList.value.filter( item => {
+          rowData3.value = SettingList.value.filter( item => {
         if(forsearchMain.value =='0' ){
           return item ;
         } else if ( forsearchMain.value !='0' && forsearchSub.value !='0' )  {
@@ -568,7 +560,8 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
  
 
   const saveButton = async() => {
-    if(afterSearch.value == false) {
+    if(currentMenu.value ==1){
+      if(afterSearch.value == false) {
       Swal.fire({
         title: '경고',
         text: '조회를 먼저 진행해주세요.',
@@ -577,6 +570,18 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
       })
       return ;
     }
+    } else if (currentMenu.value ==2) {
+      if(afterSearch2.value == false) {
+      Swal.fire({
+        title: '경고',
+        text: '조회를 먼저 진행해주세요.',
+        icon: 'warning',
+        confirmButtonText: '확인'
+      })
+      return ;
+    }
+    }
+   
     if ( currentMenu.value == false){
 
     if(JSON.stringify(confirmitem.value) === JSON.stringify(updatedList.value) ) {
@@ -619,10 +624,59 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
          const printNm =  updatedList.value.map(item => item.cornerNm)
          res = await savePrintNm(groupCd.value , nowStoreCd.value ,printNo.join(',') , printNm.join(','))
          console.log(res)
-      } else {
-       
-          console.log(forSaveMenu.value)
-          res = await saveKDSSettingAll(groupCd.value, nowStoreCd.value, JSON.stringify(forSaveMenu.value) ,userData.loginID)
+      } else if(currentMenu.value == 2) {
+        let totalSum = [] ;
+        const calculateArr = ref({})
+        console.log(updatedList2.value)
+        updatedList2.value.forEach((obj) => {
+          let sum = 0 ;
+          Object.keys(obj).filter(key => key.startsWith('checkbox') && obj[key] == true)
+          .forEach(key => {
+            const index = parseInt(key.replace('checkbox' , ''))
+            sum += Math.pow(2,index-1)
+          })
+          totalSum.push(sum)
+        })
+      
+        totalSum = totalSum.filter(item => item !=0)
+     
+      
+        const uniqueArray = [...new Set(totalSum)].sort((a,b) => a-b);
+        console.log(updatedList2.value)
+        updatedList2.value.forEach((obj) => {
+  let sum = 0;
+  let index;
+  let checkedColumn = [];
+  
+  // 'checkbox'로 시작하는 키 중에서 값이 true인 항목들을 필터링
+  Object.keys(obj).filter(key => key.startsWith('checkbox') && obj[key] === true).forEach(key => {
+    index = parseInt(key.replace('checkbox', ''));  // index 계산
+    checkedColumn.push(index);  // 체크된 열 인덱스를 배열에 추가
+    sum += Math.pow(2, index - 1);  // sum에 값을 더함
+  });
+   console.log(checkedColumn)
+  // checkedColumn에 있는 모든 인덱스에 대해 sum 값을 추가
+  checkedColumn.forEach(colIndex => {
+    // calculateArr.value[colIndex]가 배열이 아닌 경우 초기화
+    if (!Array.isArray(calculateArr.value[colIndex])) {
+      calculateArr.value[colIndex] = [];  // 해당 index에 배열을 생성
+    }
+
+    calculateArr.value[colIndex].push(sum);  // 해당 열의 배열에 sum을 추가
+  });
+});
+
+// calculateArr.value의 각 속성 배열에 대해 중복을 제거
+Object.keys(calculateArr.value).forEach(key => {
+  if (Array.isArray(calculateArr.value[key])) {
+    // Set을 사용하여 중복을 제거하고 배열로 변환
+    calculateArr.value[key] = [...new Set(calculateArr.value[key])];
+  }
+});
+
+console.log(calculateArr.value);
+
+    res = await saveKitchenSettingAll(groupCd.value, nowStoreCd.value, JSON.stringify(forSaveMenu.value) ,uniqueArray.join(',') ,JSON.stringify(resultArray) ,userData.loginID)
          
       }
    

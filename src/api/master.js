@@ -506,6 +506,13 @@ export const getPrintList = (groupCd , storeCd  ) => {
 
     })
 }
+export const getKitchenSettingList = (groupCd , storeCd  ) => {
+    return api2.post('/MIMASTER/MST44_062INS.asmx/getKitchenSettingList', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd 
+
+    })
+}
 export const DUPLIPAYKEY = (groupCd , storeCd ,areaCd , posNo , screenNo , screenType, store_arr ) => {
     return api2.post('/MIMASTER/MST44_054INS.asmx/DUPLIPAYKEY', {
         GROUP_CD: groupCd,
@@ -683,6 +690,17 @@ export const saveKDSSettingAll = (groupCd , storeCd , Menu2arr , id) => {
         GROUP_CD: groupCd,
         STORE_CD : storeCd ,
         MENU_ARR : Menu2arr ,
+        ID : id
+
+
+    })
+}
+export const saveKitchenSettingAll = (groupCd , storeCd , Menu2arr , uniquearr, id) => {
+    return api2.post('/MIMASTER/MST44_062INS.asmx/saveKitchenSettingAll', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd ,
+        MENU_ARR : Menu2arr ,
+        TOTAL_ARR : uniquearr ,
         ID : id
 
 

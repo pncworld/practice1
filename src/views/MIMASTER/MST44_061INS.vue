@@ -6,7 +6,7 @@
                </h1></div>
                 
                </div>
-               <div class="flex justify-center mr-10 space-x-2 pr-5"><button @click="searchMenu" class="button search md:w-auto w-14">조회</button>
+               <div class="flex justify-center mr-10 space-x-2 pr-5"><button @click="searchButton" class="button search md:w-auto w-14">조회</button>
               
               <button @click="saveButton" class="button save w-auto">저장</button>
               <button @click="copyButton" class="button copy w-auto" v-if="currentMenu == true">복사</button>
@@ -225,6 +225,7 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
   const groupCd = ref(userData.lngStoreGroup);
   const modified = ref(false);
   const afterSearch = ref(false);
+  const afterSearch2 = ref(false);
   const MenuList = ref([])
   const MenuKeyList = ref([])
   const clickedScreenOrMenu = ref(false)
@@ -288,7 +289,7 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
   const selcetedrowData = (newValue) => {
     console.log(newValue)
   }
-  const searchMenu = async () => {
+  const searchButton = async () => {
       changeMode.value = false
       Category.value = [] ;
       items.value = []
@@ -315,12 +316,13 @@ if(currentMenu.value == true) {
           rowData.value = [...KDSList.value]
           updatedList.value = [...KDSList.value]
           confirmitem.value = JSON.parse(JSON.stringify(KDSList.value));
+          afterSearch2.value = true
       } else {
           res = await getKDSSettingList(groupCd.value , nowStoreCd.value )
           KDSSettingList.value = res.data.KDSSETTINGLIST
           checked.value = res.data.CHECK
           kdsList.value = res.data.KDS
-
+          
           for(var i=0 ; i< checked.value.length ; i++){
             const tlngCode = checked.value[i].lngCode
             const tCornerNm = checked.value[i].kdsCornerNum
@@ -339,12 +341,13 @@ if(currentMenu.value == true) {
           console.log(MenuGroup.value)
           console.log(SubMenuGroup.value)
           console.log(checked.value)
+          afterSearch.value = true;
       }
   
   
-      afterSearch.value = true;
+     
   } catch (error) {
-      afterSearch.value = false;
+  
   } finally {
       if(ischecked.value == true){
         ischecked.value = false
@@ -558,6 +561,18 @@ if(currentMenu.value == true) {
  
 
   const saveButton = async() => {
+    if ( currentMenu.value == false){
+
+    if(afterSearch2.value == false) {
+      Swal.fire({
+        title: '경고',
+        text: '조회를 먼저 진행해주세요.',
+        icon: 'warning',
+        confirmButtonText: '확인'
+      })
+      return ;
+    }
+  } else {
     if(afterSearch.value == false) {
       Swal.fire({
         title: '경고',
@@ -567,6 +582,8 @@ if(currentMenu.value == true) {
       })
       return ;
     }
+
+  }
     if ( currentMenu.value == false){
 
     if(JSON.stringify(confirmitem.value) === JSON.stringify(updatedList.value) ) {
@@ -631,16 +648,14 @@ if(currentMenu.value == true) {
         confirmButtonText: '확인',
       })
   
-      searchMenu()
+      searchButton()
       reload.value= !reload.value
     }
   }
   }
   )
    
-  // 빈공간 데이터를 넣으려고하는데 안 들어가고 조회가 안됨 // 빈 칸에 대한 것도 데이터를 불러와야 메뉴키위치를 정할 수 있음.
-  
-  
+
   
 
   }
@@ -658,7 +673,7 @@ if(currentMenu.value == true) {
     posNo.value = newValue
     console.log(posNo.value)
     if(nowStoreAreaCd.value != undefined || posNo.value != undefined){
-      searchMenu()
+      searchButton()
     }
    
   }

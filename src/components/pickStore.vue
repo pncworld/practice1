@@ -1,6 +1,6 @@
 <template>
     <div class="flex justify-center md:justify-end space-x-4 text-sm mr-5  ">
-     <div class="items-center font-bold hidden md:flex pl-5">매장명 : </div>
+     <div class="items-center font-bold hidden md:flex pl-12">매장명 : </div>
       <div>
         <select :disabled="isDisabled1"  id="storeGroup" class="hidden md:inline-block border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreGroup($event.target.value)">
           <option :value="item.lngStoreGroup" v-for="item in storeGroup" :key="item.lngStoreGroup">{{ item.strName }}</option>

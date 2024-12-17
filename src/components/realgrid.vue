@@ -105,6 +105,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  mergeColumnGroupName: {
+    type: String,
+    default: '',
+  },
+  mergeColumnGroupSubList: {
+    type: String,
+    default: '',
+  },
 });
 
 const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}`); // 동적 ID 설정
@@ -113,14 +121,15 @@ const selectedRowData = ref([]);
 const result2 =ref([]) ;
 const updatedrowData = ref([])
 const emit = defineEmits(["selcetedrowData" , "updatedRowData" , "clickedRowData"]);
-
 const funcshowGrid = async () => {
   // 그리드 초기화
   console.log(gridView)
+
   if (gridView !=undefined && gridView !=null ) {
     gridView.destroy(); // 기존 그리드 인스턴스 제거
+    dataProvider.clearRows();
   }else {
-    console.log("초기화안되ㅁ?")
+
   }
 
   dataProvider = new LocalDataProvider();
@@ -174,24 +183,58 @@ const funcshowGrid = async () => {
   }));
 
   gridView.setColumns(columns);
-  let layout
-   if(props.mergeColumns == true) {
-    layout = [{
-    name : '메뉴정보',
-    direction : 'horizontal',
-    items : [
-      "메인그룹",
-      '서브그룹',
-      '메뉴코드',
-      '메뉴명' ,
-      '판매가'
-    ],
-    header: {
-      text: "메뉴정보",
+
+console.log(props.mergeColumns)
+if(props.mergeColumns == true ) {
+
+    const subList = props.mergeColumnGroupSubList.split(','); // subList 분리
+const layout1 = []; // 최종 결과 배열
+let groupItems = null; // 그룹 아이템을 담을 객체
+
+tabInitSetArray.value.forEach((item,index) => {
+  const uniqueColumnName = item.strHdText
+  if (!layout1.some(layout => layout.column === uniqueColumnName)) {
+  if (subList.includes(item.strColID)) {
+    // subList에 포함된 값들로 그룹을 만듭니다.
+    if (!groupItems) {
+      groupItems = {
+        name: props.mergeColumnGroupName, // 예시로 "companyGroup" 사용
+        direction: "horizontal",
+        items: [],
+        header: {
+          text: props.mergeColumnGroupName,
+          styleName: `header-style-0`
+        },
+      };
     }
-  }]
-  gridView.setColumnLayout(layout);
-   }
+    groupItems.items.push(item.strHdText); // 그룹에 항목 추가
+  } else {
+    layout1.push({    
+     column : item.strHdText ,
+     header: {visible: true, text: item.strHdText},
+     visible: item.intHdWidth !== 0 ,
+    width: item.intHdWidth}); 
+  }
+  // 완벽한 해결이 아닌 것 같아서 추후에 에러날 가능성 존재
+  } else {
+      layout1.push({    
+       column : item.strColID,
+       header: {visible: true, text: item.strHdText},
+       visible: item.intHdWidth !== 0 ,
+       width: item.intHdWidth});
+  }
+
+
+});
+
+// 그룹이 존재하면 layout1에 추가
+if (groupItems) {
+  layout1.unshift(groupItems); // layout1의 첫 번째에 그룹 객체를 추가
+}
+console.log(layout1)
+gridView.setColumnLayout(layout1)
+    
+}
   
   // 데이터 추가
   dataProvider.setRows(props.rowData);
@@ -212,7 +255,7 @@ const funcshowGrid = async () => {
   // 이벤트 설정
   gridView.onCellEdited = () => gridView.commit();
   gridView.onItemChecked = () => {
-    console.log('여기오냐')
+
     selectedRowData.value = gridView.getCheckedItems().map(index => dataProvider.getRows()[index]);
     emit('selcetedrowData', selectedRowData.value);
   };
@@ -225,7 +268,7 @@ const funcshowGrid = async () => {
    dataProvider.onDataChanged = function (provider) {
 
      updatedrowData.value = [ ...dataProvider.getJsonRows()]
-     console.log(updatedrowData.value );
+
      emit('updatedRowData', updatedrowData.value )
 
 
