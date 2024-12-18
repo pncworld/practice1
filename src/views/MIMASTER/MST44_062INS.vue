@@ -28,6 +28,7 @@
   <div class="flex justify-between mt-0 ml-10  border-b  border-b-gray-300" :class="currentMenu == 1 ? 'w-full' : 'w-[54%]'">
     <div class="flex justify-start rounded-tl-lg  text-xl -mt-1 font-bold " v-if="currentMenu == 1">출력코너명 목록</div>
     <div class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold " v-if="currentMenu == 2">주방출력 메뉴설정</div>
+    <div class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold " v-if="currentMenu == 3">POS 목록</div>
   </div>
   <div class="h-full" v-show="currentMenu == 1">
     <div class="ml-10 mt-5 w-full h-full">
@@ -64,6 +65,13 @@
     </div>
   </div>
 
+
+  <div class="h-4/6 w-[80vw]" v-show="currentMenu == 3">
+    <div>
+     <Realgrid class="w-[100%] h-[150%]" :progname="'MST44_062INS_VUE'" :progid="3"></Realgrid>
+    </div>
+  </div>
+
 </div>
 <!-- TAB1 공간 -->
 <div class="w-[52%] h-[20%] grid grid-rows-2 grid-cols-1 ml-28 -mt-2" v-if="currentMenu == 1">
@@ -91,7 +99,7 @@
 <script setup>
   import { ref, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';
-  import { getKitchenSettingList, getPrintList , saveKDSSettingAll, saveKitchenSettingAll, savePrintNm, saveScreenKeys } from '@/api/master';
+  import { getKitchenSettingList, getPrintList , getStorePosList, saveKDSSettingAll, saveKitchenSettingAll, savePrintNm, saveScreenKeys } from '@/api/master';
 
   import Swal from 'sweetalert2';
 import PickStore from '@/components/pickStore.vue';
@@ -179,9 +187,8 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
 
     const length = printNameList.value.length
     for(var i=0 ; i < length ; i++){
-      forSaveMenu.value.push(SettingList.value.filter(item => item['checkbox'+(i+1)] == true).map(item2 => item2.lngCode))
+      forSaveMenu.value.push(SettingList.value.filter(item => item['checkbox'+(i+1)] == true).map(item2 => Number(item2.lngCode)))
     }
-    console.log(forSaveMenu.value)
     console.log(updatedList2.value)
     
   }
@@ -337,6 +344,9 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
          console.log(SettingList.value)
          confirmitem.value = JSON.parse(JSON.stringify(SettingList.value));
         afterSearch2.value = true
+      } else if (currentMenu.value ==3){
+        res = await getStorePosList(groupCd.value,nowStoreCd.value)
+        console.log(res)
       }
   
   
@@ -626,9 +636,9 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
          console.log(res)
       } else if(currentMenu.value == 2) {
         let totalSum = [] ;
-        const calculateArr = ref({})
-        console.log(updatedList2.value)
-        updatedList2.value.forEach((obj) => {
+        const calculateArr = ref([])
+
+        SettingList.value.forEach((obj) => {
           let sum = 0 ;
           Object.keys(obj).filter(key => key.startsWith('checkbox') && obj[key] == true)
           .forEach(key => {
@@ -642,8 +652,8 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
      
       
         const uniqueArray = [...new Set(totalSum)].sort((a,b) => a-b);
-        console.log(updatedList2.value)
-        updatedList2.value.forEach((obj) => {
+    
+        SettingList.value.forEach((obj) => {
   let sum = 0;
   let index;
   let checkedColumn = [];
@@ -654,31 +664,44 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
     checkedColumn.push(index);  // 체크된 열 인덱스를 배열에 추가
     sum += Math.pow(2, index - 1);  // sum에 값을 더함
   });
-   console.log(checkedColumn)
+
   // checkedColumn에 있는 모든 인덱스에 대해 sum 값을 추가
   checkedColumn.forEach(colIndex => {
     // calculateArr.value[colIndex]가 배열이 아닌 경우 초기화
     if (!Array.isArray(calculateArr.value[colIndex])) {
       calculateArr.value[colIndex] = [];  // 해당 index에 배열을 생성
     }
-
     calculateArr.value[colIndex].push(sum);  // 해당 열의 배열에 sum을 추가
   });
 });
 
 // calculateArr.value의 각 속성 배열에 대해 중복을 제거
+
 Object.keys(calculateArr.value).forEach(key => {
   if (Array.isArray(calculateArr.value[key])) {
     // Set을 사용하여 중복을 제거하고 배열로 변환
-    calculateArr.value[key] = [...new Set(calculateArr.value[key])];
+    calculateArr.value[key] = [...new Set(calculateArr.value[key])] ;
   }
 });
 
-console.log(calculateArr.value);
+ calculateArr.value = calculateArr.value.slice(1)
+ calculateArr.value = calculateArr.value.map(item =>  Array.from(item))
+ for(var i =0 ; i < calculateArr.value.length ; i++){
+   if(calculateArr.value[i] == null){
+    calculateArr.value[i] = [0] 
+   }
+ }
+ console.log(JSON.stringify(calculateArr.value))
+ console.log(JSON.stringify(forSaveMenu.value))
+ console.log(uniqueArray.join(','))
 
-    res = await saveKitchenSettingAll(groupCd.value, nowStoreCd.value, JSON.stringify(forSaveMenu.value) ,uniqueArray.join(',') ,JSON.stringify(resultArray) ,userData.loginID)
-         
-      }
+ console.log(updatedList2.value)
+
+
+    res = await saveKitchenSettingAll(groupCd.value, nowStoreCd.value, JSON.stringify(forSaveMenu.value) ,uniqueArray.join(',') ,JSON.stringify(calculateArr.value) ,userData.loginID)
+    console.log(res)  
+    
+}
    
       console.log(res)
      

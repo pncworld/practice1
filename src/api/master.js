@@ -695,12 +695,13 @@ export const saveKDSSettingAll = (groupCd , storeCd , Menu2arr , id) => {
 
     })
 }
-export const saveKitchenSettingAll = (groupCd , storeCd , Menu2arr , uniquearr, id) => {
+export const saveKitchenSettingAll = (groupCd , storeCd , Menu2arr , uniquearr,calculatearr , id) => {
     return api2.post('/MIMASTER/MST44_062INS.asmx/saveKitchenSettingAll', {
         GROUP_CD: groupCd,
         STORE_CD : storeCd ,
         MENU_ARR : Menu2arr ,
         TOTAL_ARR : uniquearr ,
+        CALCULATE_ARR : calculatearr ,
         ID : id
 
 
@@ -709,6 +710,14 @@ export const saveKitchenSettingAll = (groupCd , storeCd , Menu2arr , uniquearr, 
 export const getKDSList = (groupCd ) => {
     return api2.post('/MIMASTER/MST44_061INS.asmx/getKDSList', {
         GROUP_CD: groupCd
+
+
+    })
+}
+export const getStorePosList = (groupCd ,storeCd) => {
+    return api2.post('/MIMASTER/MST44_062INS.asmx/getStorePosList', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd
 
 
     })
