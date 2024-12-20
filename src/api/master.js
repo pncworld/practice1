@@ -707,9 +707,40 @@ export const saveKitchenSettingAll = (groupCd , storeCd , Menu2arr , uniquearr,c
 
     })
 }
+export const saveReceiptData = (groupCd , storeCd , posnos , areaCds, receiptu , receiptd) => {
+    return api2.post('/MIMASTER/MST44_062INS.asmx/saveReceiptData', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd ,
+        POS_NO : posnos ,
+        AREA_CD : areaCds ,
+        RECEIPTU : receiptu ,
+        RECEIPTD : receiptd
+
+    })
+}
 export const getKDSList = (groupCd ) => {
     return api2.post('/MIMASTER/MST44_061INS.asmx/getKDSList', {
         GROUP_CD: groupCd
+
+
+    })
+}
+export const getTableList = (groupCd ,storeCd , posNo , areaCd ) => {
+    return api2.post('/MIMASTER/MST_002INS.asmx/getTableList', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd,
+        POS_NO: posNo,
+        AREA_CD: areaCd
+
+
+    })
+}
+export const getTableScreenKeys = (groupCd ,storeCd , posNo , AreaCd ) => {
+    return api2.post('/MIMASTER/MST_002INS.asmx/getTableScreenKeys', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd,
+        POS_NO: posNo,
+        AREA_CD: AreaCd,
 
 
     })
