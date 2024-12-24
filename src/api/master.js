@@ -718,6 +718,59 @@ export const saveReceiptData = (groupCd , storeCd , posnos , areaCds, receiptu ,
 
     })
 }
+export const saveScreenKeys3 = (groupCd , storeCd , posnos , areaCds, screenNm , screenNo) => {
+    return api2.post('/MIMASTER/MST_002INS.asmx/saveScreenKeys3', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd ,
+        POS_NO : posnos ,
+        AREA_CD : areaCds ,
+        SCREEN_NM : screenNm ,
+        SCREEN_NO : screenNo
+
+    })
+}
+export const saveTables = (groupCd , storeCd , posnos , areaCds, screenNo ,lngKeyscrNo ,lngKeyColors ,lngShapes ,strNames ,lngCounts , xs, ys, ws,hs , newNm , newlngCount) => {
+    return api2.post('/MIMASTER/MST_002INS.asmx/saveTables', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd ,
+        POS_NO : posnos ,
+        AREA_CD : areaCds ,
+        SCREEN_NO : screenNo ,
+        KEYSCR_NO : lngKeyscrNo ,
+        KEY_COLOR : lngKeyColors ,
+        KEY_SHAPE : lngShapes ,
+        KEY_NAME : strNames ,
+        KEY_LNGCOUNT : lngCounts ,
+        X : xs ,
+        Y : ys ,
+        W : ws ,
+        H : hs ,
+        NEW_NM : newNm ,
+        NEW_COUNT : newlngCount ,
+
+
+
+    })
+}
+
+export const saveNewTables = (groupCd , storeCd , posnos , areaCds, screenNo ,lngKeyscrNo ,lngKeyColors ,lngShapes ,strNames ,lngCounts , xs, ys, ws,hs) => {
+    return api2.post('/MIMASTER/MST_002INS.asmx/saveNewTables', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd ,
+        POS_NO : posnos ,
+        AREA_CD : areaCds ,
+        SCREEN_NO : screenNo ,
+        KEYSCR_NO : lngKeyscrNo ,
+        KEY_COLOR : lngKeyColors ,
+        KEY_SHAPE : lngShapes ,
+        KEY_NAME : strNames ,
+        KEY_LNGCOUNT : lngCounts ,
+        X : xs ,
+        Y : ys ,
+        W : ws ,
+        H : hs 
+    })
+}
 export const getKDSList = (groupCd ) => {
     return api2.post('/MIMASTER/MST44_061INS.asmx/getKDSList', {
         GROUP_CD: groupCd

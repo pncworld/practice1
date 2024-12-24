@@ -14,37 +14,75 @@
    <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
      <PickStore5 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" ></PickStore5>
     </div> 
- 
+    <div v-if="showSetScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white p-6 rounded shadow-lg w-[25%] h-[40%] ">
+      <h2 class="text-lg font-bold">화면키 설정</h2>
+      <div class="flex flex-col justify-start h-12">
+        <div><p>화면키명</p></div>
+        <div class="h-full w-full rounded-lg"><input type="text" class="border border-gray-400 pl-1 h-full w-full rounded-lg" v-model="currScreenNm"></div>
+    </div>
+
+    <div class="flex justify-center space-x-3 w-full h-16">
+      <button @click="confirmScreenKey" class="mt-4 p-2 bg-blue-500 text-white rounded">확인</button>
+      <button @click="exitScreenKey" class="mt-4 p-2 bg-blue-500 text-white rounded">닫기</button>
+    </div>
+    </div>
+    
+  </div>
+
+  <div v-if="showModifyScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white p-6 rounded shadow-lg w-[25%] h-[40%] ">
+      <h2 class="text-lg font-bold">화면키 수정</h2>
+      <div class="flex flex-col justify-start h-12">
+        <div><p>화면키명</p></div>
+        <div class="h-full w-full rounded-lg"><input type="text" class="border border-gray-400 pl-1 h-full w-full rounded-lg" v-model="currScreenNm"></div>
+    </div>
+
+    <div class="flex justify-center space-x-3 w-full h-16">
+      <button @click="confirmModifyScreenKey" class="mt-4 p-2 bg-blue-500 text-white rounded">확인</button>
+      <button @click="exitModifyScreenKey" class="mt-4 p-2 bg-blue-500 text-white rounded">닫기</button>
+    </div>
+    </div>
+    
+  </div>
    <div class="flex ml-10 mt-2 w-[60%] flex-row justify-between">
      <div class="flex flex-row w-[79%]  items-center">
-     <button class="w-10 flex-shrink-0 flex items-center">
+     <button class="w-10 flex-shrink-0 flex items-center" @click="scrollLeft">
        <img src="../../assets/ic_before.svg" alt="">
      </button>
-     <div class="flex gap-2 w-full overflow-hidden">
-       <button v-for="(i,index) in ScreenKeyOrigin" :value="i.intScreenNo" class="bg-gray-100 rounded-lg w-[200px] h-10 flex-shrink-0" :class="clickScreenButton == (index) ? 'text-blue-600' : 'black' ">{{i.strScreenName}}</button>
+     <div class="flex gap-2 w-[1000px] overflow-hidden" ref="scrollContainer">
+      <div v-for="(i,index) in ScreenKeyOrigin" :value="i.intScreenNo"  class="bg-gray-100 rounded-lg w-[200px] h-10 flex-shrink-0 flex justify-center" :class="clickScreenButton == (i.intScreenNo) ? 'text-blue-600' : 'black' " >
+       <button @click.stop="showOtherScreen(i.intScreenNo)" class="w-[80%]">{{i.strScreenName}}</button>
+       <button @click.stop="showModifyButton(index)" class="w-[10%]"><img src="../../assets/ic_kebap.svg" alt=""></button>
+       <div v-show="clickedShowModifyButton == index && showModifyButton2 == true" class="flex flex-col bg-white z-40 absolute ml-36 mt-8 rounded-lg gap-2 w-12">
+        <button class="text-black" @click="modifyScreenKey(i.strScreenName , i.intScreenNo)">수정</button>
+        <button class="text-black" @click="deleteScreenKey(i.intScreenNo)">삭제</button>
+       </div>
+      </div>
+       
      </div> 
-     <button class="w-10 flex-shrink-0 flex items-center">
+     <button class="w-10 flex-shrink-0 flex items-center" @click="scrollRight">
        <img src="../../assets/ic_after.svg" alt="">
      </button>
-     <button class="w-10 flex-shrink-0 flex items-center">
+     <button class="w-10 flex-shrink-0 flex items-center" @click="addScreenKey">
        <img src="../../assets/Btn_46_add.svg" alt="">
      </button>
-     <button class="w-10 flex-shrink-0 flex items-center">
-       <img src="../../assets/Btn_46_refresh.svg" alt="">
+     <button class="w-10 flex-shrink-0 flex items-center" @click="initAllTable">
+       <img src="../../assets/Btn_46_refresh.svg" alt="" >
      </button>
    </div>
-   <div class="ml-60 h-14 w-[200px] mt-2 flex items-center">
-     <button class="button primary w-[130px] h-[40px] flex justify-center">테이블 추가</button>
+   <div class="ml-[57%] h-14 w-[200px] mt-2 flex items-center">
+     <button class="button primary w-[130px] h-[40px] flex justify-center" @click="addNewWidget()">테이블 추가</button>
    </div>
    </div>
    
-   <button type="button" @click="addNewWidget()">Add Widget</button> {{ info }}
+
    <div class="flex">
    <div class="grid-stack table_style overflow-hidden !w-[1000px] !h-[630px]"></div>
    <div class="grid grid-rows-[1fr,3fr,1fr,1fr,1fr,1fr,1fr,1fr,4fr,1fr] grid-cols-1 border border-gray-200 w-[25%] ml-20 rounded-lg" >
     <div class="bg-gray-100 font-semibold flex items-center justify-center">테이블 속성</div>
     <div class="flex justify-center items-center gap-3"><button @click="shapeclick(1)" :class="clickedShape == 1 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette1.svg" alt=""></button><button @click="shapeclick(2)" :class="clickedShape == 2 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette2.svg" alt=""></button><button @click="shapeclick(3)" :class="clickedShape == 3 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette3.svg" alt=""></button><button @click="shapeclick(4)" class="h-full w-[25%] flex justify-center items-center" :class="clickedShape == 4 ? 'bg-blue-200' : 'bg-white'"><img src="../../assets/palette4.svg" alt=""></button></div>
-    <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">테이블 코드</div><div class="flex justify-center items-center "><input type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableCode"></div></div>
+    <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">테이블 코드</div><div class="flex justify-center items-center "><input type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableCode" disabled></div></div>
     <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">테이블 명</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableNm"></div></div>
     <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">좌석 수</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableSeats"></div></div>
     <div  class="grid grid-cols-4"><div class="bg-gray-100 font-semibold flex justify-center items-center">가로 위치(x)</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableX"></div><div class="bg-gray-100 font-semibold flex justify-center items-center">세로 위치(Y)</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableY"></div></div>
@@ -52,32 +90,32 @@
     <div class="bg-gray-100 font-semibold flex items-center justify-center">테이블 색상</div>
     <div >
     <div class="grid grid-rows-2 grid-cols-7 gap-1 mt-5 ml-5">
-      <button class="bg-white w-10 h-10 border border-gray-300 rounded-lg " :class="clickedColor == 1 ? '!border-black' : ''" @click="setColor(1)" ></button>
-      <button class="bg-[#BACCFF] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedColor == 2 ? '!border-black' : ''" @click="setColor(2)"></button>
-      <button class="bg-[#B3EAFF] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedColor == 3 ? '!border-black' : ''" @click="setColor(3)"></button>
-      <button class="bg-[#CFFFAB] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedColor == 4 ? '!border-black' : ''" @click="setColor(4)"></button>
-      <button class="bg-[#FFDDBA] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedColor == 5 ? '!border-black' : ''" @click="setColor(5)"></button>
-      <button class="bg-[#FFC5C5] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedColor == 6 ? '!border-black' : ''" @click="setColor(6)"></button>
-      <button class="bg-[#D5C5FF] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedColor == 7 ? '!border-black' : ''" @click="setColor(7)"></button>
-      <button class="bg-[#C3C3C3] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedColor == 8 ? '!border-black' : ''" @click="setColor(8)"></button>
-      <button class="bg-[#7699FF] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedColor == 9 ? '!border-black' : ''" @click="setColor(9)"></button>
-      <button class="bg-[#5DD2FF] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedColor == 10 ? '!border-black' : ''" @click="setColor(10)"></button>
-      <button class="bg-[#9CFA55] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedColor == 11 ? '!border-black' : ''" @click="setColor(11)"></button>
-      <button class="bg-[#FFB162] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedColor == 12 ? '!border-black' : ''" @click="setColor(12)"></button>
-      <button class="bg-[#FF9191] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedColor == 13 ? '!border-black' : ''" @click="setColor(13)"></button>
-      <button class="bg-[#AB8CFF] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedColor == 14 ? '!border-black' : ''" @click="setColor(14)"></button>
+      <button class="bg-white w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#FFFFFF' ? '!border-black' : ''" @click="setColor(1)" ></button>
+      <button class="bg-[#BACCFF] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#BACCFF' ? '!border-black' : ''" @click="setColor(2)"></button>
+      <button class="bg-[#B3EAFF] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#B3EAFF'? '!border-black' : ''" @click="setColor(3)"></button>
+      <button class="bg-[#CFFFAB] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#CFFFAB' ? '!border-black' : ''" @click="setColor(4)"></button>
+      <button class="bg-[#FFDDBA] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#FFDDBA'? '!border-black' : ''" @click="setColor(5)"></button>
+      <button class="bg-[#FFC5C5] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#FFC5C5' ? '!border-black' : ''" @click="setColor(6)"></button>
+      <button class="bg-[#D5C5FF] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#D5C5FF' ? '!border-black' : ''" @click="setColor(7)"></button>
+      <button class="bg-[#C3C3C3] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#C3C3C3' ? '!border-black' : ''" @click="setColor(8)"></button>
+      <button class="bg-[#7699FF] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#7699FF' ? '!border-black' : ''" @click="setColor(9)"></button>
+      <button class="bg-[#5DD2FF] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#5DD2FF'? '!border-black' : ''" @click="setColor(10)"></button>
+      <button class="bg-[#9CFA55] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#9CFA55' ? '!border-black' : ''" @click="setColor(11)"></button>
+      <button class="bg-[#FFB162] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#FFB162' ? '!border-black' : ''" @click="setColor(12)"></button>
+      <button class="bg-[#FF9191] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#FF9191' ? '!border-black' : ''" @click="setColor(13)"></button>
+      <button class="bg-[#AB8CFF] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#AB8CFF' ? '!border-black' : ''" @click="setColor(14)"></button>
     </div>
     </div>
-    <div class="grid grid-cols-2"><div><button>복사</button></div><div><button>삭제</button></div></div>
+    <div class="grid grid-cols-2 border border-y-black"><div @click="duplicateTable" class="border border-x-black flex justify-center items-center"><button class="w-full h-full">복사</button></div><div @click="deleteTable" class="flex justify-center items-center border border-x-black "><button class="w-full h-full">삭제</button></div></div>
   </div>
   </div>
   
  </template>
  
  <script setup>
- import { getTableList, getTableScreenKeys } from '@/api/master';
+ import { getTableList, getTableScreenKeys,  saveScreenKeys3, saveTables } from '@/api/master';
  import PickStore5 from '@/components/pickStore5.vue';
- import { GridLayout, GridItem } from "grid-layout-plus";
+
 import { GridStack } from 'gridstack';
  import "gridstack/dist/gridstack.min.css";
 
@@ -99,29 +137,80 @@ import { GridStack } from 'gridstack';
  const posNo = ref('');
  const afterSearch = ref(false);
  const nowStoreAreaCd = ref('0');
- const clickScreenButton = ref(0);
+ const clickScreenButton = ref(1);
  const modified = ref(false);
  const afterCategory = ref(false);
  const clickedNo = ref('');
  const clickedNm = ref('');
+ const confirmitem = ref('');
  const tableList = ref([])
  const clickedShape = ref(1);
  const shapeclick = (value) => {
   clickedShape.value = value 
-
   const widgetElement = document.querySelector(`[gs-id="${clickedtableCode.value}"]`);
-  if(clickedShape.value ==2) {
-    widgetElement.style.borderRadius = '50%';
-  } else if (clickedShape.value ==3){
-    widgetElement.classList.add('diamond')
-    
+  const resizeHandle = widgetElement.querySelector('.grid-stack-item-content')
+  resizeHandle.classList.remove('rectangle', 'circle', 'diamond','triangle');
+ 
+  if(clickedShape.value ==1){
 
+     resizeHandle.classList.add('rectangle')
+    
+  } 
+  else if(clickedShape.value ==2) {
+     resizeHandle.classList.add('circle')
+
+  } else if (clickedShape.value ==3){
+ 
+  resizeHandle.classList.add('diamond')
+
+
+  } else if (clickedShape.value ==4 ){
+     resizeHandle.classList.add('triangle')
+  
   }
+  const findit = filteredtableList.value.find(item => item.lngKeyscrNo == clickedtableCode.value)
+  findit.lngShape = clickedShape.value -1
  
  }
  const clickedColor = ref(1);
  const setColor = (value) =>{
-  clickedColor.value = value
+  console.log(value)
+  if(value ==1){
+     clickedtableColor.value = '#FFFFFF'
+  } else if (value ==2) {
+     clickedtableColor.value = '#BACCFF'
+  } else if (value ==3) {
+     clickedtableColor.value = '#B3EAFF'
+  } else if (value ==4) {
+     clickedtableColor.value = '#CFFFAB'
+  } else if (value ==5) {
+     clickedtableColor.value = '#FFDDBA'
+  } else if (value ==6) {
+     clickedtableColor.value = '#FFC5C5'
+  } else if (value ==7) {
+     clickedtableColor.value = '#D5C5FF'
+  } else if (value ==8) {
+     clickedtableColor.value = '#C3C3C3'
+  } else if (value ==9) {
+     clickedtableColor.value = '#7699FF'
+  } else if (value ==10) {
+     clickedtableColor.value = '#5DD2FF'
+  } else if (value ==11) {
+     clickedtableColor.value = '#9CFA55'
+  } else if (value ==12) {
+     clickedtableColor.value = '#FFB162'
+  } else if (value ==13) {
+     clickedtableColor.value = '#FF9191'
+  } else if (value ==14) {
+     clickedtableColor.value = '#AB8CFF'
+  }
+  console.log(clickedtableColor.value)
+  const widgetElement = document.querySelector(`[gs-id="${clickedtableCode.value}"]`);
+  const resizeHandle = widgetElement.querySelector('.grid-stack-item-content')
+  resizeHandle.style.backgroundColor = clickedtableColor.value
+
+  const findit = filteredtableList.value.find(item => item.lngKeyscrNo == clickedtableCode.value)
+  findit.lngKeyColor = RGBToDecimal(clickedtableColor.value)
  }
  const filteredtableList = ref([])
  const  handleStoreCd = async(newValue) => {
@@ -194,7 +283,7 @@ import { GridStack } from 'gridstack';
       h : Math.round(item.lngHeight/120) ,
       id : item.lngKeyscrNo
      }))
-
+     afterSearch.value = true
      console.log(filteredtableList.value)
    } catch (error) {
        afterSearch.value = false;
@@ -215,12 +304,23 @@ import { GridStack } from 'gridstack';
    };
  
 
+   const RGBToDecimal = (hex) => {
+  // Remove '#' if present
+  const cleanHex = hex.startsWith('#') ? hex.slice(1) : hex;
 
+  // Parse the RGB components from the hex string
+  const r = parseInt(cleanHex.slice(0, 2), 16);
+  const g = parseInt(cleanHex.slice(2, 4), 16);
+  const b = parseInt(cleanHex.slice(4, 6), 16);
+
+  // Combine the RGB components into a single decimal value
+  return (r << 16) | (g << 8) | b;
+};
    const decimalToRGB = (decimal) => {
-   const r = (decimal >> 16) & 255;
-   const g = (decimal >> 8) & 255;
-   const b = decimal & 255;
-   return `rgb(${r}, ${g}, ${b})`;
+    const r = ((decimal >> 16) & 255).toString(16).padStart(2, '0').toUpperCase();
+    const g = ((decimal >> 8) & 255).toString(16).padStart(2, '0').toUpperCase();
+    const b = (decimal & 255).toString(16).padStart(2, '0').toUpperCase();
+    return `#${r}${g}${b}`;
  };
 
  watch(tableList , () => {
@@ -234,6 +334,8 @@ import { GridStack } from 'gridstack';
  const clickedtableY = ref('')
  const clickedtableW = ref('')
  const clickedtableH = ref('')
+ const clickedtableShape = ref('1')
+ const clickedtableColor = ref('')
  let count = ref(0);
           let info = ref("");
           let grid = null; // DO NOT use ref(null) as proxies GS will break all logic when comparing structures... see https://github.com/gridstack/gridstack.js/issues/2115
@@ -255,7 +357,46 @@ onMounted(() => {
               const findtableindex = filteredtableList.value.findIndex(item => item.id == node.id)
               filteredtableList.value[findtableindex].x = node.x
               filteredtableList.value[findtableindex].y = node.y
-          
+              
+
+              grid.getGridItems().forEach(item => {
+           // 현재 그리드에 있는 모든 아이템들 순회
+               if (item.gridstackNode.id !== node.id) { // 드래그된 요소를 제외한 나머지
+                const itemIndex = filteredtableList.value.findIndex(e => e.id == item.gridstackNode.id);
+                 if (itemIndex !== -1) {
+        // 밀린 요소의 새로운 위치 업데이트
+        filteredtableList.value[itemIndex].x = item.gridstackNode.x;
+        filteredtableList.value[itemIndex].y = item.gridstackNode.y;
+      }
+    }
+  });
+
+  filteredtableList.value.forEach(item => {
+    const tableItem = tableList.value.find(item2 => item2.intScreenNo == item.intScreenNo && item2.lngKeyscrNo == item.lngKeyscrNo )
+    if(tableItem){
+      Object.keys(item).forEach(key => {
+        if(key =='w'){
+          tableItem['lngWidth'] = item['w'] * 120
+        } else if(key == 'h'){
+          tableItem['lngHeight'] = item['h'] * 120
+        } else if(key =='x') {
+          tableItem['lngX'] = item['x'] * 125
+        } else if (key =='y'){
+          tableItem['lngY'] = item['y'] * 125
+        } else {
+          tableItem[key] = item[key]
+        }
+      })
+    }
+  })
+
+   console.log(tableList.value)
+              const widgetElement = document.querySelector(`[gs-id="${node.id}"]`);
+                 if (widgetElement) {
+                 widgetElement.click(); // 클릭 이벤트 발생
+               }
+
+             
             });
 
             grid.on("resizestop", function (event, element) {
@@ -268,24 +409,146 @@ onMounted(() => {
     filteredtableList.value[findtableindex].w = node.w;
     filteredtableList.value[findtableindex].h = node.h;
   }
+  
+  grid.getGridItems().forEach(item => {
+           // 현재 그리드에 있는 모든 아이템들 순회
+               if (item.gridstackNode.id !== node.id) { // 드래그된 요소를 제외한 나머지
+                const itemIndex = filteredtableList.value.findIndex(e => e.id == item.gridstackNode.id);
+                 if (itemIndex !== -1) {
+        // 밀린 요소의 새로운 위치 업데이트
+        filteredtableList.value[itemIndex].x = item.gridstackNode.x;
+        filteredtableList.value[itemIndex].y = item.gridstackNode.y;
+      }
+    }
+  });
+
+  filteredtableList.value.forEach(item => {
+    const tableItem = tableList.value.find(item2 => item2.intScreenNo == item.intScreenNo && item2.lngKeyscrNo == item.lngKeyscrNo )
+    if(tableItem){
+      Object.keys(item).forEach(key => {
+        if(key =='w'){
+          tableItem['lngWidth'] = item['w'] * 120
+        } else if(key == 'h'){
+          tableItem['lngHeight'] = item['h'] * 120
+        } else if(key =='x') {
+          tableItem['lngX'] = item['x'] * 125
+        } else if (key =='y'){
+          tableItem['lngY'] = item['y'] * 125
+        } else {
+          tableItem[key] = item[key]
+        }
+      })
+    }
+  })
+  console.log(tableList.value)
 });
 
 
           });
-
-          function addNewWidget() {
+const sequence = ref(1)
+function addNewWidget() {
+  
     // filteredtableList에서 아이템을 가져옴, 없으면 기본 값 설정
-    const node = filteredtableList.value[count.value] || {
-        w: Math.round(1 + 90 * Math.random()), // 너비
-        h: Math.round(1 + 90 * Math.random())  // 높이
+      const node = {
+        w: 5, // 너비
+        h: 5 ,
+        content: '신규'+sequence.value++ ,
+        intScreenNo : clickScreenButton.value ,
+        lngCount : 0 ,
+        lngKeyColor : '16777215',
+        lngKeyscrNo : 'new'+(++count.value),
+        lngShape : 0 ,
+        strName : '신규'+sequence.value 
     };
-    
     // id는 count 값을 사용
-    node.id = String(count.value++);
+    node.id = String('new'+(count.value));
+  
     
     // autoPosition을 true로 설정하여 겹치지 않게 자동으로 위치 배치
-    grid.addWidget(node, false); // true로 설정하면 GridStack이 자동으로 위치를 계산
+    const result = grid.addWidget(node); // true로 설정하면 GridStack이 자동으로 위치를 계산
+    console.log(result)
     grid.commit();
+    const gridItems = grid.getGridItems();
+    console.log(gridItems)
+    const validate = gridItems.find(item => item.gridstackNode.h + item.gridstackNode.y >= 56 || item.gridstackNode.w + item.gridstackNode.x > 90 )
+    console.log(validate)
+    const addedWidget = gridItems.find(item => item.gridstackNode.id === node.id);
+    if( validate!= undefined){
+      grid.removeWidget(addedWidget);
+      Swal.fire({
+        title: '오류',
+        text: "더이상 위치할 공간이 없습니다.",
+        icon: 'error',
+        confirmButtonText: '확인'
+      })
+      return;
+    }
+    filteredtableList.value.push({
+      intScreenNo : Number(clickScreenButton.value) ,
+      strName : '신규'+sequence.value ,
+        lngShape : 0 ,
+        lngKeyColor : 16777215,
+        lngKeyscrNo : 'new'+ count.value,
+        lngCount : 0 , 
+         w: 5 ,
+         h:5 ,
+        id : node.id ,
+        x : addedWidget.gridstackNode.x ,
+        y : addedWidget.gridstackNode.y ,
+      })
+      tableList.value.push({
+        intScreenNo : clickScreenButton.value ,
+        strName : '신규'+sequence.value ,
+        lngShape : 0 ,
+        lngKeyColor : 16777215,
+        lngKeyscrNo : 'new'+ count.value,
+        lngCount : 0 , 
+        w: 5 ,
+         h:5 ,
+        id : node.id ,
+        x : addedWidget.gridstackNode.x ,
+        y : addedWidget.gridstackNode.y ,
+
+      })
+      const widgetElement = document.querySelector(`[gs-id="${node.id}"]`);
+      if (widgetElement) {
+          widgetElement.style.backgroundColor = ''
+         const resizeHandle = widgetElement.querySelector('.grid-stack-item-content')
+         resizeHandle.style.backgroundColor = decimalToRGB('16777215')
+          resizeHandle.classList.add('rectangle')
+        
+      } 
+      widgetElement.addEventListener('click', function () {
+          const finditem = filteredtableList.value.find(item2 => item2.id == node.id);
+          const widgetElements = document.querySelectorAll('[gs-id]');
+
+        // 각 요소에 대해 스타일 변경
+          widgetElements.forEach(widgetElement => {
+         // 원하는 스타일 변경
+          widgetElement.style.border = ''; 
+        });
+
+            widgetElement.style.border = '2px solid black'; // 선택된 요소의 border를 흰색으로 설정
+       
+          console.log('아이템 클릭됨!');
+          console.log(`아이템 ID: ${finditem.id}`);
+          clickedtableColor.value = decimalToRGB(finditem.lngKeyColor)
+          clickedtableShape.value = finditem.lngShape
+          clickedShape.value = (Number(finditem.lngShape)+1)
+          clickedtableCode.value = finditem.id
+          clickedtableNm.value = finditem.strName
+          clickedtableX.value = finditem.x*125
+          clickedtableY.value = finditem.y*125
+          clickedtableW.value = finditem.w*120
+          clickedtableH.value = finditem.h*120
+          clickedtableSeats.value = finditem.lngCount
+          console.log(`x: ${finditem.x}, y: ${finditem.y}`);
+          console.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
+          console.log(clickedtableColor.value);
+          // 원하는 추가 작업을 여기에 작성
+        });
+      console.log(tableList.value)
+   
 }
 
  watch(filteredtableList,(newList) => {
@@ -297,23 +560,48 @@ onMounted(() => {
           y: item.y,
           w: item.w,
           h: item.h,
-          id: item.id
+          id: item.id ,
+          content : item.strName
         }
-        grid.addWidget(node); // Add widget to the grid
+       grid.addWidget(node); // Add widget to the grid
+        
         const widgetElement = document.querySelector(`[gs-id="${item.id}"]`);
          if (widgetElement) {
-        widgetElement.style.backgroundColor = decimalToRGB(item.lngKeyColor) || 'blue'; // 색상 적용
-      
+          widgetElement.style.backgroundColor = ''
+         const resizeHandle = widgetElement.querySelector('.grid-stack-item-content')
+         resizeHandle.style.backgroundColor = decimalToRGB(item.lngKeyColor)
+         if(item.lngShape == '0'){
+          resizeHandle.classList.add('rectangle')
+         } else if (item.lngShape == '1'){
+           resizeHandle.classList.add('circle')
+         } else if(item.lngShape == '2'){
+           resizeHandle.classList.add('diamond')
+         } else if (item.lngShape =='3'){
+          resizeHandle.classList.add('triangle')
+         }
       } 
-      const textElement = widgetElement.querySelector('.grid-stack-item-content');
-       if (textElement) {
-        textElement.innerText = item.strName; // 텍스트 설정
-      }
+      // const textElement = widgetElement.querySelector('.grid-stack-item-content');
+      //  if (textElement) {
+      //   textElement.innerText = item.strName; // 텍스트 설정
+      // }
       if (widgetElement) {
         widgetElement.addEventListener('click', function () {
           const finditem = filteredtableList.value.find(item2 => item2.id == item.id);
+          const widgetElements = document.querySelectorAll('[gs-id]');
+
+        // 각 요소에 대해 스타일 변경
+         widgetElements.forEach(widgetElement => {
+          // 원하는 스타일 변경
+          widgetElement.style.border = ''; 
+            });
+
+          widgetElement.style.border = '2px solid black'; // 선택된 요소의 border를 흰색으로 설정
+
           console.log('아이템 클릭됨!');
           console.log(`아이템 ID: ${finditem.id}`);
+          clickedtableColor.value = decimalToRGB(finditem.lngKeyColor)
+          clickedtableShape.value = finditem.lngShape
+          clickedShape.value = (Number(finditem.lngShape)+1)
           clickedtableCode.value = finditem.id
           clickedtableNm.value = finditem.strName
           clickedtableX.value = finditem.x*125
@@ -323,6 +611,7 @@ onMounted(() => {
           clickedtableSeats.value = finditem.lngCount
           console.log(`x: ${finditem.x}, y: ${finditem.y}`);
           console.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
+          console.log(clickedtableColor.value);
           // 원하는 추가 작업을 여기에 작성
         });
       }
@@ -333,6 +622,372 @@ onMounted(() => {
   },
   { immediate: false } // tableList가 처음 정의되었을 때는 실행하지 않음
 );
+
+const showOtherScreen = (newValue) => {
+  console.log(filteredtableList.value)
+  console.log(tableList.value)
+  filteredtableList.value.forEach(item => {
+    const tableItem = tableList.value.find(item2 => item2.intScreenNo == item.intScreenNo && item2.lngKeyscrNo == item.lngKeyscrNo )
+    if(tableItem){
+      Object.keys(item).forEach(key => {
+        if(key =='w'){
+          tableItem['lngWidth'] = item['w'] * 120
+        } else if(key == 'h'){
+          tableItem['lngHeight'] = item['h'] * 120
+        } else if(key =='x') {
+          tableItem['lngX'] = item['x'] * 125
+        } else if (key =='y'){
+          tableItem['lngY'] = item['y'] * 125
+        } else {
+          tableItem[key] = item[key]
+        }
+      })
+    }
+  })
+  console.log(tableList.value)
+    if(grid !== null){
+      grid.removeAll();
+    }
+    filteredtableList.value = tableList.value.filter(item => item.intScreenNo == newValue).map(item => ({
+      ...item,
+      x : Math.round(item.lngX/125) ,
+      y : Math.round(item.lngY/125) ,
+      w : Math.round(item.lngWidth/120) ,
+      h : Math.round(item.lngHeight/120) ,
+      id : item.lngKeyscrNo
+     }))
+     clickScreenButton.value = newValue
+     clickedShowModifyButton.value = -1
+}
+const scrollContainer = ref(null);
+const scrollRight = () => {
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollLeft += 200; // 오른쪽으로 200px 이동
+  }
+}
+const scrollLeft = () => {
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollLeft -= 200; // 오른쪽으로 200px 이동
+  }
+}
+const deleteTable = () => {
+  const finditem = filteredtableList.value.find(item => item.id == clickedtableCode.value);
+  if (finditem) {
+    const index = filteredtableList.value.indexOf(finditem);
+    if (index > -1) {
+      filteredtableList.value.splice(index, 1);
+    }
+  }
+  const finditem2 = tableList.value.find(item => item.lngKeyscrNo == clickedtableCode.value && item.intScreenNo == clickScreenButton.value);
+  if (finditem2) {
+    const index = tableList.value.indexOf(finditem2);
+    if (index > -1) {
+      tableList.value.splice(index, 1);
+    }
+  }
+  const widgetElement = document.querySelector(`[gs-id="${clickedtableCode.value}"]`);
+  if (widgetElement) {
+  grid.removeWidget(widgetElement);
+}
+}
+
+const duplicateTable = () => {
+  if(clickedtableCode.value != ''){
+    const node = {
+        w: Number(clickedtableW.value/120), // 너비
+        h: Number(clickedtableH.value/120),
+        content: '신규'+sequence.value++ ,
+        intScreenNo : clickScreenButton.value ,
+        lngCount : clickedtableSeats.value ,
+        lngKeyColor : RGBToDecimal(clickedtableColor.value),
+        lngKeyscrNo : 'new'+(++count.value),
+        lngShape : Number(clickedShape.value) ,
+        strName : '신규'+sequence.value 
+    };
+    // id는 count 값을 사용
+    console.log(node)
+    node.id = String('new'+(count.value));
+  
+    
+    // autoPosition을 true로 설정하여 겹치지 않게 자동으로 위치 배치
+    grid.addWidget(node); // true로 설정하면 GridStack이 자동으로 위치를 계산
+    grid.commit();
+    const gridItems = grid.getGridItems();
+    console.log(gridItems)
+    const addedWidget = gridItems.find(item => item.gridstackNode.id === node.id);
+    const validate = gridItems.find(item => item.gridstackNode.h + item.gridstackNode.y >= 56 || item.gridstackNode.w + item.gridstackNode.x > 90 )
+    console.log(validate)
+    if( validate!= undefined){
+      grid.removeWidget(addedWidget);
+      Swal.fire({
+        title: '오류',
+        text: "더이상 위치할 공간이 없습니다.",
+        icon: 'error',
+        confirmButtonText: '확인'
+      })
+      return;
+    }
+    filteredtableList.value.push({
+      intScreenNo : clickScreenButton.value ,
+      strName : '신규'+sequence.value ,
+        lngShape : clickedShape.value,
+        lngKeyColor : RGBToDecimal(clickedtableColor.value),
+        lngKeyscrNo : 'new'+ count.value,
+        lngCount : clickedtableSeats.value  , 
+        w: clickedtableW.value ,
+         h:clickedtableH.value,
+        id : node.id ,
+        x : addedWidget.gridstackNode.x ,
+        y : addedWidget.gridstackNode.y ,
+      })
+      tableList.value.push({
+        intScreenNo : clickScreenButton.value ,
+        strName : '신규'+sequence.value ,
+        lngShape : clickedShape.value ,
+        lngKeyColor : RGBToDecimal(clickedtableColor.value),
+        lngKeyscrNo : 'new'+ count.value,
+        lngCount : clickedtableSeats.value  , 
+        w: clickedtableW.value ,
+         h:clickedtableH.value,
+        id : node.id ,
+        x : addedWidget.gridstackNode.x ,
+        y : addedWidget.gridstackNode.y ,
+
+      })
+      const widgetElement = document.querySelector(`[gs-id="${node.id}"]`);
+      if (widgetElement) {
+          widgetElement.style.backgroundColor = ''
+         const resizeHandle = widgetElement.querySelector('.grid-stack-item-content')
+         resizeHandle.style.backgroundColor = clickedtableColor.value
+         if(clickedShape.value ==1){
+          resizeHandle.classList.add('rectangle')
+         } else if (clickedShape.value ==2){
+          resizeHandle.classList.add('circle')
+         } else if (clickedShape.value ==3){
+          resizeHandle.classList.add('diamond')
+         } else if (clickedShape.value ==4){
+          resizeHandle.classList.add('triangle')
+         }
+         
+        
+      } 
+      widgetElement.addEventListener('click', function () {
+          const finditem = filteredtableList.value.find(item2 => item2.id == node.id);
+          const widgetElements = document.querySelectorAll('[gs-id]');
+
+        // 각 요소에 대해 스타일 변경
+          widgetElements.forEach(widgetElement => {
+         // 원하는 스타일 변경
+          widgetElement.style.border = ''; 
+        });
+
+            widgetElement.style.border = '2px solid black'; // 선택된 요소의 border를 흰색으로 설정
+       
+          console.log('아이템 클릭됨!');
+          console.log(`아이템 ID: ${finditem.id}`);
+          clickedtableColor.value = decimalToRGB(finditem.lngKeyColor)
+          clickedtableShape.value = finditem.lngShape
+          clickedShape.value = (Number(finditem.lngShape)+1)
+          clickedtableCode.value = finditem.id
+          clickedtableNm.value = finditem.strName
+          clickedtableX.value = finditem.x*125
+          clickedtableY.value = finditem.y*125
+          clickedtableW.value = finditem.w*120
+          clickedtableH.value = finditem.h*120
+          clickedtableSeats.value = finditem.lngCount
+          console.log(`x: ${finditem.x}, y: ${finditem.y}`);
+          console.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
+          console.log(clickedtableColor.value);
+          // 원하는 추가 작업을 여기에 작성
+        });
+      console.log(filteredtableList.value)
+    } else {
+      Swal.fire({
+        title: '오류',
+        text: "복사할 대상을 선택해주세요.",
+        icon: 'error',
+        confirmButtonText: '확인'
+      })
+      return ;
+    }
+  }
+const showSetScreenKey = ref(false); 
+const addScreenKey = () => {
+  showSetScreenKey.value = true 
+}
+
+const exitScreenKey = () => {
+  showSetScreenKey.value = false
+}
+const currScreenNm = ref('')
+
+const confirmScreenKey = () => {
+  if(currScreenNm.value == ''){
+    Swal.fire({
+      title: '오류',
+      text: "화면명을 입력하세요.",
+      icon: 'error',
+      confirmButtonText: '확인'
+    })
+    return ;
+  }
+     const nextKeyno = Math.max(...ScreenKeyOrigin.value.map(item => item.intScreenNo));
+
+     console.log(nextKeyno)
+     ScreenKeyOrigin.value.push({strScreenName : currScreenNm.value , intScreenNo : nextKeyno+1 , intScreenKeySeq :1})
+     showSetScreenKey.value = false
+}
+const clickedShowModifyButton = ref(-1)
+const showModifyButton2 = ref(false)
+const showModifyButton = (newValue) => {
+  clickedShowModifyButton.value = newValue
+  showModifyButton2.value = !showModifyButton2.value
+}
+const showModifyScreenKey = ref(false)
+
+const modifyScreenNo = ref('0')
+const modifyScreenKey = (value , value2) => {
+  showModifyScreenKey.value = true 
+  currScreenNm.value= value
+  modifyScreenNo.value = value2
+}
+const exitModifyScreenKey = () => {
+  showModifyScreenKey.value = false
+}
+const confirmModifyScreenKey = () => {
+  const findit = ScreenKeyOrigin.value.find(item => item.intScreenNo == modifyScreenNo.value)
+  findit.strScreenName = currScreenNm.value
+  showModifyScreenKey.value = false
+  showModifyButton2.value = false
+}
+const deleteScreenKey = (newValue) => {
+  Swal.fire({
+      title: '확인',
+      text: "정말 삭제하시겠습니까?",
+      icon: 'error',
+      confirmButtonText: '확인' ,
+      showCancelButton : true ,
+      cancelButtonText : '취소' ,
+  }).then( (result) => {
+    if(result.isConfirmed){
+       ScreenKeyOrigin.value = ScreenKeyOrigin.value.filter(item => item.intScreenNo !== newValue)
+       filteredtableList.value = filteredtableList.value.filter(item => item.intScreenNo !== newValue)
+       tableList.value = tableList.value.filter(item => item.intScreenNo !== newValue )
+       if(grid != null){
+        grid.removeAll()
+       }
+       showModifyButton2.value = false
+    } 
+  })
+}
+
+const saveButton = async() => {
+  
+    if(afterSearch.value == false) {
+      Swal.fire({
+        title: '경고',
+        text: '조회를 먼저 진행해주세요.',
+        icon: 'warning',
+        confirmButtonText: '확인'
+      })
+      return ;
+    }
+
+    // if(JSON.stringify(confirmitem.value) === JSON.stringify(updatedList.value) ) {
+    //   Swal.fire({
+    //     title: '경고',
+    //     text: '변경된 사항이 없습니다.',
+    //     icon: 'warning',
+    //     confirmButtonText: '확인'
+    //   }) 
+    //   return ;
+    // }
+  
+   
+    Swal.fire({
+      title: '저장',
+        text: '저장 하시겠습니까?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '저장',
+        cancelButtonText: '취소'
+  }).then(async (result) => {
+    if(result.isConfirmed){
+      store.state.loading = true;
+    try {
+      let res;
+      let res2;
+      let res3;
+
+      const ScreenKeyNms = ScreenKeyOrigin.value.map(item => item.strScreenName)
+      const ScreenKeyNos = ScreenKeyOrigin.value.map(item => item.intScreenNo)
+      res = await saveScreenKeys3( groupCd.value , nowStoreCd.value,  posNo.value , nowStoreAreaCd.value ,ScreenKeyNms.join(',') ,ScreenKeyNos.join(',') )
+      console.log(res)
+      const intScreenNos = tableList.value.map(item => item.intScreenNo )
+      const ids = tableList.value.map(item => typeof(item.lngKeyscrNo) == 'string' ? 0 : item.lngKeyscrNo )
+      const lngKeyColors = tableList.value.map(item => item.lngKeyColor )
+      const lngShapes = tableList.value.map(item => item.lngShape )
+      const strNames = tableList.value.map(item => item.strName )
+      const lngCounts = tableList.value.map(item => item.lngCount )
+      const xs = tableList.value.map(item => {
+    return item.x *125 ?? item.lngX *125; // x가 없으면 lngX를 사용
+});
+const ys = tableList.value.map(item => {
+
+    return item.y *125 ?? item.lngY*125; // x가 없으면 lngX를 사용
+  
+});
+const ws = tableList.value.map(item => {
+ 
+    return item.w *120?? item.lngWidth*120; // x가 없으면 lngX를 사용
+  
+});
+     
+const hs = tableList.value.map(item => {
+    return item.h *120 ?? item.lngHeight *120; // x가 없으면 lngX를 사용
+});
+
+ const newtableNm = tableList.value.filter(item => item.lngKeyscrNo.toString().includes('new')).map(item => item.strName)
+ const newtableCount = tableList.value.filter(item => item.lngKeyscrNo.toString().includes('new')).map(item => item.lngCount)
+
+ console.log(intScreenNos)
+ console.log(ids)
+ console.log(lngKeyColors)
+ console.log(lngShapes)
+ console.log(strNames)
+ console.log(lngCounts)
+ console.log(xs)
+ console.log(ys)
+ console.log(ws)
+ console.log(hs)
+    res2 = await saveTables(groupCd.value , nowStoreCd.value,  posNo.value , nowStoreAreaCd.value ,intScreenNos.join(',') ,ids.join(',')
+     ,lngKeyColors.join(',') ,lngShapes.join(',') , strNames.join(',') , lngCounts.join(',') 
+     ,xs.join(',') ,ys.join(',') ,ws.join(',') ,hs.join(',') ,newtableNm.join(',') ,newtableCount.join(',') )
+    
+    
+    console.log(res2)
+     
+  } catch (error) {
+    console.log(error)
+    } finally {
+      store.state.loading = false;
+      Swal.fire({
+        title: '저장 되었습니다.',
+        confirmButtonText: '확인',
+      })
+  
+      searchButton()
+    
+    }
+  }
+  }
+  )
+   
+
+  
+
+  }
+
   </script>
  <style>
 .grid-stack {
@@ -340,19 +995,20 @@ onMounted(() => {
 }
 .grid-stack-item {
   position: relative;
-  border: 2px solid #555; /* 아이템 경계선 */
+  border: 1px solid gray; /* 아이템 경계선 */
   background-color: rgba(0, 0, 0, 0.1); /* 아이템 배경색 */
+  width : 100%;
+  height: 100%;
 }
 
-/* .grid-stack-item-content {
-  background-color: white;
-  border: 1px solid black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+ .grid-stack-item-content {
+  width : 100%;
   height: 100%;
-  box-sizing: border-box;
-} */
+  position : absolute !important ; 
+  bottom: 40px !important;
+  inset : 0px !important;
+  padding-top: 10px !important;
+} 
 .table_style {
   width: 902px; 
   height: 600px !important; 
@@ -363,7 +1019,21 @@ onMounted(() => {
 }
 
 .diamond {
-  position: absolute; z-index: 0; width:100%; height: 100%; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  position: absolute; 
+  z-index: 0; 
+  width:100%; 
+  height: 100%; 
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); 
+}
+.rectangle{width:100%; height: 100%;}
+.circle {width:100%; height: 100%; border-radius: 50%;}
+.ellipse {border-radius: 30% / 60%;}
+.triangle {
+  position: absolute;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%); /* 삼각형 */
 }
 
 
