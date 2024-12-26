@@ -650,6 +650,21 @@ export const DUPLIAGEKEY = (groupCd , storeCd ,areaCd , posNo , t_groupCd , t_st
     })
 }
 
+export const DUPLITABLEKEY = (groupCd , storeCd ,areaCd , posNo , t_groupCd , t_storeCd, t_areaCd , t_posNo ) => {
+    return api2.post('/MIMASTER/MST_002INS.asmx/DUPLITABLEKEY', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POSNO : posNo,
+        T_GROUP_CD : t_groupCd,
+        T_STORE_CD : t_storeCd,
+        T_AREA_CD : t_areaCd ,
+        T_POS_NO : t_posNo
+
+     
+    })
+}
+
 export const saveAllFuncKey = (groupCd , storeCd ,areaCd , posNo , lngDCodes , lngDCodes2  ) => {
     return api2.post('/MIMASTER/MST44_043INS.asmx/saveAllFuncKey', {
         GROUP_CD: groupCd,

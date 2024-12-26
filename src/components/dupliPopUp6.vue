@@ -68,7 +68,7 @@ import Swal from "sweetalert2";
    console.log(storeCd)
    console.log(posNo)
       try {
-         res = await api[poskiosk](groupCd.value , storeCd )
+         res = await api[poskiosk](groupCd.value , storeCd , areaCd , posNo)
       } catch (error) {
         console.log(error)
       } finally {
@@ -101,21 +101,19 @@ const selectedRows = ref([])
 const handleKeyup = (e) => {
   searchWord.value = e.target.value
 }
-const handleKeyup2 = (e) => {
-  
-}
+
 
 const dupliStore = async() => {
   let groupCd2 = [];
   let storeCd2 = [];
   let areaCd2 = [];
   let posNo2 = [];
+
   for(var i =0; i< selectedRows.value.length ; i++){
     groupCd2.push(groupCd.value)
     storeCd2.push(selectedRows.value[i][0])
     areaCd2.push(selectedRows.value[i][3])
     posNo2.push(selectedRows.value[i][2])
-
   }
   try {
     console.log(checked.value)
@@ -139,7 +137,7 @@ const dupliStore = async() => {
       if(result.isConfirmed){
         store.state.loading = true;
       
-        const res3 = await api2[dupliapiname](groupCd.value , storeCd , groupCd2.join(','),storeCd2.join(','))
+        const res3 = await api2[dupliapiname](groupCd.value , storeCd ,areaCd  , posNo  ,groupCd2.join(','),storeCd2.join(','),areaCd2.join(','),posNo2.join(','))
         console.log(res3.data)
         if(res3.data.RESULT_CD == '00'){
         store.state.loading = false;

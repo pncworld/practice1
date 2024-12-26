@@ -7,13 +7,18 @@
      <div class="flex justify-center mr-10 space-x-2 pr-5">
        <button @click="searchButton" class="button search md:w-auto w-14">조회</button>
        <button @click="saveButton" class="button save w-auto">저장</button>
-       <button @click="copyButton" class="button copy w-auto" v-if="currentMenu == true">복사</button>
+       <button @click="copyButton" class="button copy w-auto" >복사</button>
      </div>
  </div>
  <br>
    <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
      <PickStore5 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" ></PickStore5>
     </div> 
+    <div class="z-[90]">
+      <DupliPopUp6 :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST01_004INS_VUE'" :dupliapiname="'DUPLITABLEKEY'" :progid="2" :poskiosk="'getStoreAndPosList3'"  naming2="테이블">
+      </DupliPopUp6>
+    
+    </div>
     <div v-if="showSetScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
     <div class="bg-white p-6 rounded shadow-lg w-[25%] h-[40%] ">
       <h2 class="text-lg font-bold">화면키 설정</h2>
@@ -114,6 +119,8 @@
  
  <script setup>
  import { getTableList, getTableScreenKeys,  saveScreenKeys3, saveTables } from '@/api/master';
+import DupliPopUp5 from '@/components/dupliPopUp5.vue';
+import DupliPopUp6 from '@/components/dupliPopUp6.vue';
  import PickStore5 from '@/components/pickStore5.vue';
 
 import { GridStack } from 'gridstack';
@@ -143,6 +150,8 @@ import { GridStack } from 'gridstack';
  const clickedNo = ref('');
  const clickedNm = ref('');
  const confirmitem = ref('');
+ const clickedStoreNm = ref('');
+ const showPopup2 = ref(false);
  const tableList = ref([])
  const clickedShape = ref(1);
  const shapeclick = (value) => {
@@ -217,9 +226,14 @@ import { GridStack } from 'gridstack';
  }
  const filteredtableList = ref([])
  const  handleStoreCd = async(newValue) => {
-     afterSearch.value = false;
+      afterSearch.value = false;
     
       nowStoreCd.value = newValue ;
+    
+  }
+
+  const handlestoreNm = (newValue) => {
+    clickedStoreNm.value = newValue
   }
  
   const handlePosNo = (newValue) => {
@@ -1055,6 +1069,18 @@ const initAllTable = () => {
     }
   })
  
+}
+
+const copyButton = () => {
+  if(afterSearch.value == false){
+    Swal.fire({
+      title: '복사',
+      text: '조회를 먼저 해주세요.',
+      confirmButtonText: '확인'
+    })
+    return ;
+  }
+  showPopup2.value = true
 }
   </script>
  <style>
