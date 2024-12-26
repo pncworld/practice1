@@ -1102,11 +1102,9 @@ const copyButton = () => {
   position: absolute !important;
   top: 0 !important; /* 상단에서 0px 위치로 설정 */
   left: 0 !important; /* 좌측에서 0px 위치로 설정 */
-  right: 0 !important; /* 우측에서 0px 위치로 설정 */
-
-  padding-top: 20% !important;
-  z-index: 80 !important;
+  z-index: 50 !important;
   overflow: hidden !important;
+  text-align: left;
 }
 .table_style {
   width: 902px; 
@@ -1124,8 +1122,8 @@ const copyButton = () => {
   height: 100%; 
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); 
 }
-.rectangle{width:100%; height: 100%;}
-.circle {width:100%; height: 100%; border-radius: 50%;}
+.rectangle{width:100%; height: 100%; }
+.circle {width:100%; height: 100%; border-radius: 50%;  }
 .ellipse {border-radius: 30% / 60%;}
 .triangle {
   position: absolute;
@@ -1133,6 +1131,7 @@ const copyButton = () => {
   width: 100%;
   height: 100%;
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%); /* 삼각형 */
+ 
 }
 
 
