@@ -472,7 +472,6 @@ function addNewWidget() {
       const node = {
         w: 5, // 너비
         h: 5 ,
-        content: '신규'+(++sequence.value),
         intScreenNo : clickScreenButton.value ,
         lngCount : 0 ,
         lngKeyColor : '16777215',
@@ -481,7 +480,7 @@ function addNewWidget() {
         strName : '신규'+sequence.value 
     };
     // id는 count 값을 사용
-    node.id = String('new'+(sequence.value));
+    node.id = String('new'+(++sequence.value));
   
     
     // autoPosition을 true로 설정하여 겹치지 않게 자동으로 위치 배치
@@ -539,6 +538,15 @@ function addNewWidget() {
           resizeHandle.classList.add('rectangle')
         
       } 
+      const textElement = widgetElement.querySelector('.grid-stack-item-content');
+        if (textElement) {
+          const newDiv = document.createElement('div');
+          newDiv.innerText = '신규'+(sequence.value) // 텍스트 설정
+          newDiv.style.position = 'absolute';
+          newDiv.style.left = '0'
+          newDiv.style.zIndex = '81'
+          textElement.insertAdjacentElement('afterend', newDiv);
+      }
       widgetElement.addEventListener('click', function () {
           const finditem = filteredtableList.value.find(item2 => item2.id == node.id);
           const widgetElements = document.querySelectorAll('[gs-id]');
@@ -583,7 +591,6 @@ function addNewWidget() {
           w: item.w,
           h: item.h,
           id: item.id ,
-          content : item.strName
         }
        grid.addWidget(node); // Add widget to the grid
         
@@ -602,10 +609,15 @@ function addNewWidget() {
           resizeHandle.classList.add('triangle')
          }
       } 
-      // const textElement = widgetElement.querySelector('.grid-stack-item-content');
-      //  if (textElement) {
-      //   textElement.innerText = item.strName; // 텍스트 설정
-      // }
+       const textElement = widgetElement.querySelector('.grid-stack-item-content');
+        if (textElement) {
+          const newDiv = document.createElement('div');
+          newDiv.innerText = item.strName; // 텍스트 설정
+          newDiv.style.position = 'absolute';
+          newDiv.style.left = '0'
+          newDiv.style.zIndex = '81'
+          textElement.insertAdjacentElement('afterend', newDiv);
+       }
       if (widgetElement) {
         widgetElement.addEventListener('click', function () {
           const finditem = filteredtableList.value.find(item2 => item2.id == item.id);
@@ -723,13 +735,12 @@ const duplicateTable = () => {
     const node = {
         w: Number(clickedtableW.value/120), // 너비
         h: Number(clickedtableH.value/120),
-        content: '신규'+(++sequence.value) ,
         intScreenNo : clickScreenButton.value ,
         lngCount : clickedtableSeats.value ,
         lngKeyColor : RGBToDecimal(clickedtableColor.value),
         lngKeyscrNo : 'new'+(sequence.value),
         lngShape : Number(clickedShape.value) ,
-        strName : '신규'+sequence.value 
+        strName : '신규'+(++sequence.value )
     };
     // id는 count 값을 사용
     console.log(node)
@@ -754,7 +765,15 @@ const duplicateTable = () => {
       })
       return;
     }
-    
+    const textElement = widgetElement.querySelector('.grid-stack-item-content');
+        if (textElement) {
+          const newDiv = document.createElement('div');
+          newDiv.innerText = '신규'+(sequence.value) // 텍스트 설정
+          newDiv.style.position = 'absolute';
+          newDiv.style.left = '0'
+          newDiv.style.zIndex = '81'
+          textElement.insertAdjacentElement('afterend', newDiv);
+      }
     filteredtableList.value.push({
       intScreenNo : clickScreenButton.value ,
       strName : '신규'+sequence.value ,
@@ -1043,8 +1062,8 @@ const changetableProperty = (e) => {
         console.log(item.gridstackNode.id)
         const gridItem = item.gridstackNode.el;
         console.log(gridItem)
-        const label = gridItem.querySelector('.grid-stack-item-content');
-        label.textContent = clickedtableNm.value
+        const label = gridItem.querySelector('.grid-stack-item-content').nextElementSibling;
+        label.innerText = clickedtableNm.value
       }
     } )
 
