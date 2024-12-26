@@ -56,7 +56,7 @@
        <img src="../../assets/ic_before.svg" alt="">
      </button>
      <div class="flex gap-2 w-[1000px] overflow-hidden" ref="scrollContainer">
-      <div v-for="(i,index) in ScreenKeyOrigin" :value="i.intScreenNo"  class="bg-gray-100 rounded-lg w-[200px] h-10 flex-shrink-0 flex justify-center" :class="clickScreenButton == (i.intScreenNo) ? 'text-blue-600' : 'black' " >
+      <div v-for="(i,index) in ScreenKeyOrigin" :value="i.intScreenNo"  class="bg-gray-100 rounded-lg w-[200px] h-10 flex-shrink-0 flex justify-center" :class="clickScreenButton == (i.intScreenNo) ? 'text-blue-800 border-blue-500  border-2' : 'black' " >
        <button @click.stop="showOtherScreen(i.intScreenNo)" class="w-[80%]">{{i.strScreenName}}</button>
        <button @click.stop="showModifyButton(index)" class="w-[10%]"><img src="../../assets/ic_kebap.svg" alt=""></button>
        <div v-show="clickedShowModifyButton == index && showModifyButton2 == true" class="flex flex-col bg-white z-40 absolute ml-36 mt-8 rounded-lg gap-2 w-12">
@@ -86,12 +86,27 @@
    <div class="grid-stack table_style overflow-hidden !w-[1000px] !h-[630px]"></div>
    <div class="grid grid-rows-[1fr,3fr,1fr,1fr,1fr,1fr,1fr,1fr,4fr,1fr] grid-cols-1 border border-gray-200 w-[25%] ml-20 rounded-lg" >
     <div class="bg-gray-100 font-semibold flex items-center justify-center">테이블 속성</div>
-    <div class="flex justify-center items-center gap-3"><button :disabled="clickTable == false" @click="shapeclick(0)" :class="clickedShape == 0 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette1.svg" alt=""></button><button :disabled="clickTable == false" @click="shapeclick(1)" :class="clickedShape == 1 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette2.svg" alt=""></button><button :disabled="clickTable == false" @click="shapeclick(2)" :class="clickedShape == 2 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette3.svg" alt=""></button><button :disabled="clickTable == false" @click="shapeclick(3)" class="h-full w-[25%] flex justify-center items-center" :class="clickedShape == 3 ? 'bg-blue-200' : 'bg-white'"><img src="../../assets/palette4.svg" alt=""></button></div>
-    <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">테이블 코드</div><div class="flex justify-center items-center "><input type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableCode" disabled></div></div>
-    <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">테이블 명</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableNm" @input="changetableProperty"></div></div>
-    <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">좌석 수</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableSeats" @input="changetableProperty"></div></div>
-    <div  class="grid grid-cols-4"><div class="bg-gray-100 font-semibold flex justify-center items-center">가로 위치(x)</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableX" disabled></div><div class="bg-gray-100 font-semibold flex justify-center items-center">세로 위치(Y)</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableY" disabled></div></div>
-    <div  class="grid grid-cols-4"><div class="bg-gray-100 font-semibold flex justify-center items-center">너비</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableW" disabled></div><div class="bg-gray-100 font-semibold flex justify-center items-center">높이</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableH" disabled></div></div>
+    <div class="flex justify-center items-center gap-3">
+      <button :disabled="clickTable == false" @click="shapeclick(0)" :class="clickedShape == 0 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette1.svg" alt=""></button>
+      <button :disabled="clickTable == false" @click="shapeclick(1)" :class="clickedShape == 1 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette2.svg" alt=""></button>
+      <button :disabled="clickTable == false" @click="shapeclick(2)" :class="clickedShape == 2 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette3.svg" alt=""></button>
+      <button :disabled="clickTable == false" @click="shapeclick(3)" class="h-full w-[25%] flex justify-center items-center" :class="clickedShape == 3 ? 'bg-blue-200' : 'bg-white'"><img src="../../assets/palette4.svg" alt=""></button>
+    </div>
+    <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">테이블 코드</div>
+    <div class="flex justify-center items-center "><input v-if="!clickedtableCode.toString().includes('new')" type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableCode" disabled><input v-if="clickedtableCode.toString().includes('new')" type="text" class="border rounded-lg border-gray-200 px-2" value="" disabled></div></div>
+    <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">테이블 명</div>
+    <div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableNm" @input="changetableProperty"></div></div>
+    <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">좌석 수</div>
+    <div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableSeats" @input="changetableProperty"></div></div>
+    <div  class="grid grid-cols-4"><div class="bg-gray-100 font-semibold flex justify-center items-center">가로 위치(x)</div>
+    <div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableX" disabled></div>
+    <div class="bg-gray-100 font-semibold flex justify-center items-center">세로 위치(Y)</div>
+    <div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableY" disabled></div>
+  </div>
+    <div  class="grid grid-cols-4"><div class="bg-gray-100 font-semibold flex justify-center items-center">너비</div>
+    <div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableW" disabled></div>
+    <div class="bg-gray-100 font-semibold flex justify-center items-center">높이</div>
+    <div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableH" disabled></div></div>
     <div class="bg-gray-100 font-semibold flex items-center justify-center">테이블 색상</div>
     <div >
     <div class="grid grid-rows-2 grid-cols-7 gap-1 mt-5 ml-5">
@@ -315,7 +330,7 @@ import { GridStack } from 'gridstack';
                 clickedNm.value = ''
                 clickTable.value = false
                 clickedtableCode.value = ''
-                clickScreenButton.value = 1
+
                
    }
    
@@ -555,10 +570,12 @@ function addNewWidget() {
           widgetElements.forEach(widgetElement => {
          // 원하는 스타일 변경
           widgetElement.style.border = ''; 
+         
+         
         });
+         widgetElement.style.border = '2px solid black'
 
-            widgetElement.style.border = '2px solid black'; // 선택된 요소의 border를 흰색으로 설정
-       
+            
           console.log('아이템 클릭됨!');
           console.log(`아이템 ID: ${finditem.id}`);
           clickedtableColor.value = decimalToRGB(finditem.lngKeyColor)
@@ -627,10 +644,11 @@ function addNewWidget() {
          widgetElements.forEach(widgetElement => {
           // 원하는 스타일 변경
           widgetElement.style.border = ''; 
+         
+         
             });
-
-          widgetElement.style.border = '2px solid black'; // 선택된 요소의 border를 흰색으로 설정
-
+             widgetElement.style.border = '2px solid black'
+           
           console.log('아이템 클릭됨!');
           console.log(`아이템 ID: ${finditem.id}`);
           clickedtableColor.value = decimalToRGB(finditem.lngKeyColor)
@@ -724,6 +742,7 @@ const deleteTable = () => {
     }
   }
   console.log(tableList.value)
+
   const widgetElement = document.querySelector(`[gs-id="${clickedtableCode.value}"]`);
   if (widgetElement) {
   grid.removeWidget(widgetElement);
@@ -738,9 +757,9 @@ const duplicateTable = () => {
         intScreenNo : clickScreenButton.value ,
         lngCount : clickedtableSeats.value ,
         lngKeyColor : RGBToDecimal(clickedtableColor.value),
-        lngKeyscrNo : 'new'+(sequence.value),
+        lngKeyscrNo : 'new'+(++sequence.value),
         lngShape : Number(clickedShape.value) ,
-        strName : '신규'+(++sequence.value )
+        strName : '신규'+(sequence.value )
     };
     // id는 count 값을 사용
     console.log(node)
@@ -765,15 +784,7 @@ const duplicateTable = () => {
       })
       return;
     }
-    const textElement = widgetElement.querySelector('.grid-stack-item-content');
-        if (textElement) {
-          const newDiv = document.createElement('div');
-          newDiv.innerText = '신규'+(sequence.value) // 텍스트 설정
-          newDiv.style.position = 'absolute';
-          newDiv.style.left = '0'
-          newDiv.style.zIndex = '81'
-          textElement.insertAdjacentElement('afterend', newDiv);
-      }
+ 
     filteredtableList.value.push({
       intScreenNo : clickScreenButton.value ,
       strName : '신규'+sequence.value ,
@@ -818,6 +829,16 @@ const duplicateTable = () => {
          
         
       } 
+        
+    const textElement = widgetElement.querySelector('.grid-stack-item-content');
+        if (textElement) {
+          const newDiv = document.createElement('div');
+          newDiv.innerText = '신규'+(sequence.value) // 텍스트 설정
+          newDiv.style.position = 'absolute';
+          newDiv.style.left = '0'
+          newDiv.style.zIndex = '81'
+          textElement.insertAdjacentElement('afterend', newDiv);
+      }
       widgetElement.addEventListener('click', function () {
           const finditem = filteredtableList.value.find(item2 => item2.id == node.id);
           const widgetElements = document.querySelectorAll('[gs-id]');
@@ -826,10 +847,12 @@ const duplicateTable = () => {
           widgetElements.forEach(widgetElement => {
          // 원하는 스타일 변경
           widgetElement.style.border = ''; 
+  
         });
+        widgetElement.style.border = '2px solid black'
+         
 
-            widgetElement.style.border = '2px solid black'; // 선택된 요소의 border를 흰색으로 설정
-       
+          
           console.log('아이템 클릭됨!');
           console.log(`아이템 ID: ${finditem.id}`);
           clickedtableColor.value = decimalToRGB(finditem.lngKeyColor)
@@ -1026,8 +1049,12 @@ const hs = tableList.value.map(item => {
         confirmButtonText: '확인',
       })
   
-      searchButton()
-    
+      searchButton().then(()=>{
+        console.log(clickScreenButton.value)
+        showOtherScreen(clickScreenButton.value)
+      })
+     
+      
     }
   }
   }
@@ -1108,8 +1135,7 @@ const copyButton = () => {
 }
 .grid-stack-item {
   position: relative ;
-  border: 1px solid gray; /* 아이템 경계선 */
-  background-color: rgba(0, 0, 0, 0.1); /* 아이템 배경색 */
+  background-color: rgba(0, 0, 0, 0); /* 아이템 배경색 */
   width : 100%;
   height: 100%;
   overflow: hidden !important;
@@ -1126,12 +1152,14 @@ const copyButton = () => {
   text-align: left;
 }
 .table_style {
-  width: 902px; 
+  width: 900px; 
   height: 600px !important; 
   border: 1px solid #E4E4E4; 
   border-radius: 10px; 
   background-image: url('../../assets/tablegrid-bg.jpg'); 
+  background-size: 106% ;
   margin-right: 30px;
+  background-repeat: no-repeat;
 }
 
 .diamond {
