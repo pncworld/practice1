@@ -76,17 +76,17 @@
    </div>
    </div>
    
-
-   <div class="flex">
+   
+   <div class="flex" >
    <div class="grid-stack table_style overflow-hidden !w-[1000px] !h-[630px]"></div>
    <div class="grid grid-rows-[1fr,3fr,1fr,1fr,1fr,1fr,1fr,1fr,4fr,1fr] grid-cols-1 border border-gray-200 w-[25%] ml-20 rounded-lg" >
     <div class="bg-gray-100 font-semibold flex items-center justify-center">테이블 속성</div>
-    <div class="flex justify-center items-center gap-3"><button @click="shapeclick(1)" :class="clickedShape == 1 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette1.svg" alt=""></button><button @click="shapeclick(2)" :class="clickedShape == 2 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette2.svg" alt=""></button><button @click="shapeclick(3)" :class="clickedShape == 3 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette3.svg" alt=""></button><button @click="shapeclick(4)" class="h-full w-[25%] flex justify-center items-center" :class="clickedShape == 4 ? 'bg-blue-200' : 'bg-white'"><img src="../../assets/palette4.svg" alt=""></button></div>
+    <div class="flex justify-center items-center gap-3"><button :disabled="clickTable == false" @click="shapeclick(0)" :class="clickedShape == 0 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette1.svg" alt=""></button><button :disabled="clickTable == false" @click="shapeclick(1)" :class="clickedShape == 1 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette2.svg" alt=""></button><button :disabled="clickTable == false" @click="shapeclick(2)" :class="clickedShape == 2 ? 'bg-blue-200' : 'bg-white'" class="h-full w-[25%] flex justify-center items-center"><img src="../../assets/palette3.svg" alt=""></button><button :disabled="clickTable == false" @click="shapeclick(3)" class="h-full w-[25%] flex justify-center items-center" :class="clickedShape == 3 ? 'bg-blue-200' : 'bg-white'"><img src="../../assets/palette4.svg" alt=""></button></div>
     <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">테이블 코드</div><div class="flex justify-center items-center "><input type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableCode" disabled></div></div>
-    <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">테이블 명</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableNm"></div></div>
-    <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">좌석 수</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableSeats"></div></div>
-    <div  class="grid grid-cols-4"><div class="bg-gray-100 font-semibold flex justify-center items-center">가로 위치(x)</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableX"></div><div class="bg-gray-100 font-semibold flex justify-center items-center">세로 위치(Y)</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableY"></div></div>
-    <div  class="grid grid-cols-4"><div class="bg-gray-100 font-semibold flex justify-center items-center">너비</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableW"></div><div class="bg-gray-100 font-semibold flex justify-center items-center">높이</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableH"></div></div>
+    <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">테이블 명</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableNm" @input="changetableProperty"></div></div>
+    <div class="grid grid-cols-2"><div class="bg-gray-100 font-semibold flex justify-center items-center">좌석 수</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2" v-model="clickedtableSeats" @input="changetableProperty"></div></div>
+    <div  class="grid grid-cols-4"><div class="bg-gray-100 font-semibold flex justify-center items-center">가로 위치(x)</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableX" disabled></div><div class="bg-gray-100 font-semibold flex justify-center items-center">세로 위치(Y)</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableY" disabled></div></div>
+    <div  class="grid grid-cols-4"><div class="bg-gray-100 font-semibold flex justify-center items-center">너비</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableW" disabled></div><div class="bg-gray-100 font-semibold flex justify-center items-center">높이</div><div class="flex justify-center items-center"><input type="text" class="border rounded-lg border-gray-200 px-2 w-full" v-model="clickedtableH" disabled></div></div>
     <div class="bg-gray-100 font-semibold flex items-center justify-center">테이블 색상</div>
     <div >
     <div class="grid grid-rows-2 grid-cols-7 gap-1 mt-5 ml-5">
@@ -106,7 +106,7 @@
       <button class="bg-[#AB8CFF] w-10 h-10 border border-gray-300 rounded-lg " :class="clickedtableColor == '#AB8CFF' ? '!border-black' : ''" @click="setColor(14)"></button>
     </div>
     </div>
-    <div class="grid grid-cols-2 border border-y-black"><div @click="duplicateTable" class="border border-x-black flex justify-center items-center"><button class="w-full h-full">복사</button></div><div @click="deleteTable" class="flex justify-center items-center border border-x-black "><button class="w-full h-full">삭제</button></div></div>
+    <div class="grid grid-cols-2 border border-y-black"><div @click="duplicateTable" class="border border-x-black flex justify-center items-center" :disabled="clickTable == false"><button class="w-full h-full">복사</button></div><div @click="deleteTable" class="flex justify-center items-center border border-x-black " :disabled="clickTable == false"><button class="w-full h-full">삭제</button></div></div>
   </div>
   </div>
   
@@ -133,7 +133,7 @@ import { GridStack } from 'gridstack';
  const groupCd = ref(userData.lngStoreGroup);
  const nowStoreCd = ref('0');
  const currentMenu = ref(1);
- 
+ const clickTable = ref(false)
  const posNo = ref('');
  const afterSearch = ref(false);
  const nowStoreAreaCd = ref('0');
@@ -151,25 +151,25 @@ import { GridStack } from 'gridstack';
   const resizeHandle = widgetElement.querySelector('.grid-stack-item-content')
   resizeHandle.classList.remove('rectangle', 'circle', 'diamond','triangle');
  
-  if(clickedShape.value ==1){
+  if(clickedShape.value ==0){
 
      resizeHandle.classList.add('rectangle')
     
   } 
-  else if(clickedShape.value ==2) {
+  else if(clickedShape.value ==1) {
      resizeHandle.classList.add('circle')
 
-  } else if (clickedShape.value ==3){
+  } else if (clickedShape.value ==2){
  
   resizeHandle.classList.add('diamond')
 
 
-  } else if (clickedShape.value ==4 ){
+  } else if (clickedShape.value ==3 ){
      resizeHandle.classList.add('triangle')
   
   }
   const findit = filteredtableList.value.find(item => item.lngKeyscrNo == clickedtableCode.value)
-  findit.lngShape = clickedShape.value -1
+  findit.lngShape = clickedShape.value 
  
  }
  const clickedColor = ref(1);
@@ -211,6 +211,9 @@ import { GridStack } from 'gridstack';
 
   const findit = filteredtableList.value.find(item => item.lngKeyscrNo == clickedtableCode.value)
   findit.lngKeyColor = RGBToDecimal(clickedtableColor.value)
+
+  const findit2 = tableList.value.find(item => item.lngKeyscrNo == clickedtableCode.value)
+  findit2.lngKeyColor = RGBToDecimal(clickedtableColor.value)
  }
  const filteredtableList = ref([])
  const  handleStoreCd = async(newValue) => {
@@ -296,6 +299,9 @@ import { GridStack } from 'gridstack';
                 afterCategory.value = false;
                 clickedNo.value = ''
                 clickedNm.value = ''
+                clickTable.value = false
+                clickedtableCode.value = ''
+                clickScreenButton.value = 1
                
    }
    
@@ -376,13 +382,13 @@ onMounted(() => {
     if(tableItem){
       Object.keys(item).forEach(key => {
         if(key =='w'){
-          tableItem['lngWidth'] = item['w'] * 120
+          tableItem['w'] = item['w'] 
         } else if(key == 'h'){
-          tableItem['lngHeight'] = item['h'] * 120
+          tableItem['h'] = item['h'] 
         } else if(key =='x') {
-          tableItem['lngX'] = item['x'] * 125
+          tableItem['x'] = item['x'] 
         } else if (key =='y'){
-          tableItem['lngY'] = item['y'] * 125
+          tableItem['y'] = item['y'] 
         } else {
           tableItem[key] = item[key]
         }
@@ -427,13 +433,13 @@ onMounted(() => {
     if(tableItem){
       Object.keys(item).forEach(key => {
         if(key =='w'){
-          tableItem['lngWidth'] = item['w'] * 120
+          tableItem['w'] = item['w'] 
         } else if(key == 'h'){
-          tableItem['lngHeight'] = item['h'] * 120
+          tableItem['h'] = item['h'] 
         } else if(key =='x') {
-          tableItem['lngX'] = item['x'] * 125
+          tableItem['x'] = item['x'] 
         } else if (key =='y'){
-          tableItem['lngY'] = item['y'] * 125
+          tableItem['y'] = item['y']
         } else {
           tableItem[key] = item[key]
         }
@@ -452,28 +458,29 @@ function addNewWidget() {
       const node = {
         w: 5, // 너비
         h: 5 ,
-        content: '신규'+sequence.value++ ,
+        content: '신규'+(++sequence.value),
         intScreenNo : clickScreenButton.value ,
         lngCount : 0 ,
         lngKeyColor : '16777215',
-        lngKeyscrNo : 'new'+(++count.value),
+        lngKeyscrNo : 'new'+(sequence.value),
         lngShape : 0 ,
         strName : '신규'+sequence.value 
     };
     // id는 count 값을 사용
-    node.id = String('new'+(count.value));
+    node.id = String('new'+(sequence.value));
   
     
     // autoPosition을 true로 설정하여 겹치지 않게 자동으로 위치 배치
     const result = grid.addWidget(node); // true로 설정하면 GridStack이 자동으로 위치를 계산
     console.log(result)
     grid.commit();
-    const gridItems = grid.getGridItems();
-    console.log(gridItems)
-    const validate = gridItems.find(item => item.gridstackNode.h + item.gridstackNode.y >= 56 || item.gridstackNode.w + item.gridstackNode.x > 90 )
+   
+    const validate = result.gridstackNode
+    const validate2 = ((validate.x+ validate.w ) > 90 || (validate.y + validate.h) > 56)
     console.log(validate)
+    const gridItems = grid.getGridItems();
     const addedWidget = gridItems.find(item => item.gridstackNode.id === node.id);
-    if( validate!= undefined){
+    if( validate2== true){
       grid.removeWidget(addedWidget);
       Swal.fire({
         title: '오류',
@@ -488,7 +495,7 @@ function addNewWidget() {
       strName : '신규'+sequence.value ,
         lngShape : 0 ,
         lngKeyColor : 16777215,
-        lngKeyscrNo : 'new'+ count.value,
+        lngKeyscrNo : 'new'+ sequence.value,
         lngCount : 0 , 
          w: 5 ,
          h:5 ,
@@ -501,7 +508,7 @@ function addNewWidget() {
         strName : '신규'+sequence.value ,
         lngShape : 0 ,
         lngKeyColor : 16777215,
-        lngKeyscrNo : 'new'+ count.value,
+        lngKeyscrNo : 'new'+ sequence.value,
         lngCount : 0 , 
         w: 5 ,
          h:5 ,
@@ -534,13 +541,14 @@ function addNewWidget() {
           console.log(`아이템 ID: ${finditem.id}`);
           clickedtableColor.value = decimalToRGB(finditem.lngKeyColor)
           clickedtableShape.value = finditem.lngShape
-          clickedShape.value = (Number(finditem.lngShape)+1)
+          clickedShape.value = (Number(finditem.lngShape))
           clickedtableCode.value = finditem.id
           clickedtableNm.value = finditem.strName
           clickedtableX.value = finditem.x*125
           clickedtableY.value = finditem.y*125
           clickedtableW.value = finditem.w*120
           clickedtableH.value = finditem.h*120
+          clickTable.value = true
           clickedtableSeats.value = finditem.lngCount
           console.log(`x: ${finditem.x}, y: ${finditem.y}`);
           console.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
@@ -601,17 +609,19 @@ function addNewWidget() {
           console.log(`아이템 ID: ${finditem.id}`);
           clickedtableColor.value = decimalToRGB(finditem.lngKeyColor)
           clickedtableShape.value = finditem.lngShape
-          clickedShape.value = (Number(finditem.lngShape)+1)
+          clickedShape.value = (Number(finditem.lngShape))
           clickedtableCode.value = finditem.id
           clickedtableNm.value = finditem.strName
           clickedtableX.value = finditem.x*125
           clickedtableY.value = finditem.y*125
           clickedtableW.value = finditem.w*120
           clickedtableH.value = finditem.h*120
+          clickTable.value = true
           clickedtableSeats.value = finditem.lngCount
           console.log(`x: ${finditem.x}, y: ${finditem.y}`);
           console.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
           console.log(clickedtableColor.value);
+          console.log(clickedShape.value);
           // 원하는 추가 작업을 여기에 작성
         });
       }
@@ -626,6 +636,7 @@ function addNewWidget() {
 const showOtherScreen = (newValue) => {
   console.log(filteredtableList.value)
   console.log(tableList.value)
+  clickTable.value = false ;
   filteredtableList.value.forEach(item => {
     const tableItem = tableList.value.find(item2 => item2.intScreenNo == item.intScreenNo && item2.lngKeyscrNo == item.lngKeyscrNo )
     if(tableItem){
@@ -678,6 +689,7 @@ const deleteTable = () => {
       filteredtableList.value.splice(index, 1);
     }
   }
+  console.log(filteredtableList.value)
   const finditem2 = tableList.value.find(item => item.lngKeyscrNo == clickedtableCode.value && item.intScreenNo == clickScreenButton.value);
   if (finditem2) {
     const index = tableList.value.indexOf(finditem2);
@@ -685,6 +697,7 @@ const deleteTable = () => {
       tableList.value.splice(index, 1);
     }
   }
+  console.log(tableList.value)
   const widgetElement = document.querySelector(`[gs-id="${clickedtableCode.value}"]`);
   if (widgetElement) {
   grid.removeWidget(widgetElement);
@@ -696,28 +709,28 @@ const duplicateTable = () => {
     const node = {
         w: Number(clickedtableW.value/120), // 너비
         h: Number(clickedtableH.value/120),
-        content: '신규'+sequence.value++ ,
+        content: '신규'+(++sequence.value) ,
         intScreenNo : clickScreenButton.value ,
         lngCount : clickedtableSeats.value ,
         lngKeyColor : RGBToDecimal(clickedtableColor.value),
-        lngKeyscrNo : 'new'+(++count.value),
+        lngKeyscrNo : 'new'+(sequence.value),
         lngShape : Number(clickedShape.value) ,
         strName : '신규'+sequence.value 
     };
     // id는 count 값을 사용
     console.log(node)
-    node.id = String('new'+(count.value));
+    node.id = String('new'+(sequence.value));
   
     
     // autoPosition을 true로 설정하여 겹치지 않게 자동으로 위치 배치
-    grid.addWidget(node); // true로 설정하면 GridStack이 자동으로 위치를 계산
+    const result = grid.addWidget(node); // true로 설정하면 GridStack이 자동으로 위치를 계산
     grid.commit();
-    const gridItems = grid.getGridItems();
-    console.log(gridItems)
-    const addedWidget = gridItems.find(item => item.gridstackNode.id === node.id);
-    const validate = gridItems.find(item => item.gridstackNode.h + item.gridstackNode.y >= 56 || item.gridstackNode.w + item.gridstackNode.x > 90 )
+    const validate = result.gridstackNode
+    const validate2 = ((validate.x+ validate.w ) > 90 || (validate.y + validate.h) > 56)
     console.log(validate)
-    if( validate!= undefined){
+    const gridItems = grid.getGridItems();
+    const addedWidget = gridItems.find(item => item.gridstackNode.id === node.id);
+    if( validate2== true){
       grid.removeWidget(addedWidget);
       Swal.fire({
         title: '오류',
@@ -727,15 +740,16 @@ const duplicateTable = () => {
       })
       return;
     }
+    
     filteredtableList.value.push({
       intScreenNo : clickScreenButton.value ,
       strName : '신규'+sequence.value ,
         lngShape : clickedShape.value,
         lngKeyColor : RGBToDecimal(clickedtableColor.value),
-        lngKeyscrNo : 'new'+ count.value,
+        lngKeyscrNo : 'new'+ sequence.value,
         lngCount : clickedtableSeats.value  , 
-        w: clickedtableW.value ,
-         h:clickedtableH.value,
+        w: clickedtableW.value/120 ,
+         h:clickedtableH.value/120,
         id : node.id ,
         x : addedWidget.gridstackNode.x ,
         y : addedWidget.gridstackNode.y ,
@@ -745,10 +759,10 @@ const duplicateTable = () => {
         strName : '신규'+sequence.value ,
         lngShape : clickedShape.value ,
         lngKeyColor : RGBToDecimal(clickedtableColor.value),
-        lngKeyscrNo : 'new'+ count.value,
+        lngKeyscrNo : 'new'+ sequence.value,
         lngCount : clickedtableSeats.value  , 
-        w: clickedtableW.value ,
-         h:clickedtableH.value,
+        w: clickedtableW.value/120 ,
+         h:clickedtableH.value/120,
         id : node.id ,
         x : addedWidget.gridstackNode.x ,
         y : addedWidget.gridstackNode.y ,
@@ -759,13 +773,13 @@ const duplicateTable = () => {
           widgetElement.style.backgroundColor = ''
          const resizeHandle = widgetElement.querySelector('.grid-stack-item-content')
          resizeHandle.style.backgroundColor = clickedtableColor.value
-         if(clickedShape.value ==1){
+         if(clickedShape.value ==0){
           resizeHandle.classList.add('rectangle')
-         } else if (clickedShape.value ==2){
+         } else if (clickedShape.value ==1){
           resizeHandle.classList.add('circle')
-         } else if (clickedShape.value ==3){
+         } else if (clickedShape.value ==2){
           resizeHandle.classList.add('diamond')
-         } else if (clickedShape.value ==4){
+         } else if (clickedShape.value ==3){
           resizeHandle.classList.add('triangle')
          }
          
@@ -787,7 +801,7 @@ const duplicateTable = () => {
           console.log(`아이템 ID: ${finditem.id}`);
           clickedtableColor.value = decimalToRGB(finditem.lngKeyColor)
           clickedtableShape.value = finditem.lngShape
-          clickedShape.value = (Number(finditem.lngShape)+1)
+          clickedShape.value = (Number(finditem.lngShape))
           clickedtableCode.value = finditem.id
           clickedtableNm.value = finditem.strName
           clickedtableX.value = finditem.x*125
@@ -923,6 +937,7 @@ const saveButton = async() => {
       const ScreenKeyNos = ScreenKeyOrigin.value.map(item => item.intScreenNo)
       res = await saveScreenKeys3( groupCd.value , nowStoreCd.value,  posNo.value , nowStoreAreaCd.value ,ScreenKeyNms.join(',') ,ScreenKeyNos.join(',') )
       console.log(res)
+      console.log(tableList.value)
       const intScreenNos = tableList.value.map(item => item.intScreenNo )
       const ids = tableList.value.map(item => typeof(item.lngKeyscrNo) == 'string' ? 0 : item.lngKeyscrNo )
       const lngKeyColors = tableList.value.map(item => item.lngKeyColor )
@@ -930,21 +945,21 @@ const saveButton = async() => {
       const strNames = tableList.value.map(item => item.strName )
       const lngCounts = tableList.value.map(item => item.lngCount )
       const xs = tableList.value.map(item => {
-    return item.x *125 ?? item.lngX *125; // x가 없으면 lngX를 사용
+    return  (item.x !== undefined && item.x !== null)? item.x * 125 : item.lngX; // x가 없으면 lngX를 사용
 });
 const ys = tableList.value.map(item => {
 
-    return item.y *125 ?? item.lngY*125; // x가 없으면 lngX를 사용
+    return  (item.y !== undefined && item.y !== null) ? item.y * 125 : item.lngY;// x가 없으면 lngX를 사용
   
 });
 const ws = tableList.value.map(item => {
  
-    return item.w *120?? item.lngWidth*120; // x가 없으면 lngX를 사용
+    return  (item.w !== undefined && item.w !== null) ? item.w * 120 : item.lngWidth; // x가 없으면 lngX를 사용
   
 });
      
 const hs = tableList.value.map(item => {
-    return item.h *120 ?? item.lngHeight *120; // x가 없으면 lngX를 사용
+    return  (item.h !== undefined && item.h !== null) ? item.h * 120 : item.lngHeight; // x가 없으면 lngX를 사용
 });
 
  const newtableNm = tableList.value.filter(item => item.lngKeyscrNo.toString().includes('new')).map(item => item.strName)
@@ -960,6 +975,8 @@ const hs = tableList.value.map(item => {
  console.log(ys)
  console.log(ws)
  console.log(hs)
+ console.log(newtableNm)
+ console.log(newtableCount)
     res2 = await saveTables(groupCd.value , nowStoreCd.value,  posNo.value , nowStoreAreaCd.value ,intScreenNos.join(',') ,ids.join(',')
      ,lngKeyColors.join(',') ,lngShapes.join(',') , strNames.join(',') , lngCounts.join(',') 
      ,xs.join(',') ,ys.join(',') ,ws.join(',') ,hs.join(',') ,newtableNm.join(',') ,newtableCount.join(',') )
@@ -987,28 +1004,84 @@ const hs = tableList.value.map(item => {
   
 
   }
+const changetableProperty = (e) => {
+  clickedtableCode.value 
+  clickScreenButton.value
+  
+  const findtableindex = filteredtableList.value.findIndex(item => item.id == clickedtableCode.value);
+  if (findtableindex !== -1) {
+    filteredtableList.value[findtableindex].strName = clickedtableNm.value;
+    filteredtableList.value[findtableindex].lngCount = clickedtableSeats.value;
+  }
 
+  
+    const tableItem = tableList.value.find(item2 => item2.intScreenNo == clickScreenButton.value && item2.lngKeyscrNo == clickedtableCode.value  )
+    if(tableItem){
+      tableItem.lngCount = clickedtableSeats.value
+      tableItem.strName = clickedtableNm.value
+    }
+
+    console.log(filteredtableList.value)
+    console.log(tableList.value)
+
+    grid.getGridItems().forEach(item => {
+      if(item.gridstackNode.id == clickedtableCode.value){
+        console.log(item.gridstackNode.id)
+        const gridItem = item.gridstackNode.el;
+        console.log(gridItem)
+        const label = gridItem.querySelector('.grid-stack-item-content');
+        label.textContent = clickedtableNm.value
+      }
+    } )
+
+  
+
+  
+}
+const initAllTable = () => {
+  Swal.fire({
+    title: '테이블 초기화',
+    text: '테이블을 초기화하시겠습니까?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: '확인',
+    cancelButtonText: '취소'
+  }).then((result) => {
+    if(result.isConfirmed){
+      if(grid != null){
+      grid.removeAll();
+  }
+  tableList.value = tableList.value.filter(item => item.intScreenNo !== clickScreenButton.value)
+    }
+  })
+ 
+}
   </script>
  <style>
 .grid-stack {
  background : #ffffff
 }
 .grid-stack-item {
-  position: relative;
+  position: relative ;
   border: 1px solid gray; /* 아이템 경계선 */
   background-color: rgba(0, 0, 0, 0.1); /* 아이템 배경색 */
   width : 100%;
   height: 100%;
+  overflow: hidden !important;
 }
 
- .grid-stack-item-content {
-  width : 100%;
-  height: 100%;
-  position : absolute !important ; 
-  bottom: 40px !important;
-  inset : 0px !important;
-  padding-top: 10px !important;
-} 
+.grid-stack-item-content {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute !important;
+  top: 0 !important; /* 상단에서 0px 위치로 설정 */
+  left: 0 !important; /* 좌측에서 0px 위치로 설정 */
+  right: 0 !important; /* 우측에서 0px 위치로 설정 */
+
+  padding-top: 20% !important;
+  z-index: 80 !important;
+  overflow: hidden !important;
+}
 .table_style {
   width: 902px; 
   height: 600px !important; 
