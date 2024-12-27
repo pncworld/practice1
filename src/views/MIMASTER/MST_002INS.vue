@@ -265,7 +265,8 @@ import { GridStack } from 'gridstack';
    nowStoreAreaCd.value = newValue ;
    console.log(nowStoreAreaCd.value)
    }
- 
+   let grid = null; // DO NOT use ref(null) as proxies GS will break all logic when comparing structures... see https://github.com/gridstack/gridstack.js/issues/2115
+         
  const searchButton = async () => {
        items.value = []
       if(grid != null) {
@@ -375,8 +376,7 @@ import { GridStack } from 'gridstack';
  const clickedtableColor = ref('')
  let count = ref(0);
           let info = ref("");
-          let grid = null; // DO NOT use ref(null) as proxies GS will break all logic when comparing structures... see https://github.com/gridstack/gridstack.js/issues/2115
-          let items = ref([])
+           let items = ref([])
 // Initialize GridStack on mount
 // onMounted(() => {
     
@@ -484,7 +484,7 @@ import { GridStack } from 'gridstack';
 
 //           });
 
-          function initializeGrid() {
+ function initializeGrid() {
   const grid = GridStack.init({
     float: true,
     cellHeight: 'auto',
@@ -811,7 +811,11 @@ const showOtherScreen = (newValue) => {
     }
   })
   console.log(tableList.value)
-    if(grid !== null){
+    if(grid != null ){
+      console.log(grid.nodes)
+      if(grid == undefined){
+        return ;
+      }
       grid.removeAll();
     }
     filteredtableList.value = tableList.value.filter(item => item.intScreenNo == newValue).map(item => ({
@@ -1245,12 +1249,102 @@ const copyButton = () => {
 let savedGrid = null
 onActivated(() => {
     if (savedGrid != null) {
-      initializeGrid().then(() => {
-        showOtherScreen(clickScreenButton.value)
+      grid = GridStack.init({ // DO NOT use grid.value = GridStack.init(), see above
+              float: true,
+              cellHeight: 'auto',
+              column : 90 ,
+              resizable: { handles: 'e,se' },
+              minRow : 56 ,
+              maxRow: 56
+            })
+            grid.load(savedGrid)
+            grid.on("dragstop", function (event, element) {
+              const node = element.gridstackNode;
+              info.value = `you just dragged node #${node.id} to ${node.x},${node.y} – good job!`;
+              const findtableindex = filteredtableList.value.findIndex(item => item.id == node.id)
+              filteredtableList.value[findtableindex].x = node.x
+              filteredtableList.value[findtableindex].y = node.y
+              
+              grid.getGridItems().forEach(item => {
+           // 현재 그리드에 있는 모든 아이템들 순회
+               if (item.gridstackNode.id !== node.id) { // 드래그된 요소를 제외한 나머지
+                const itemIndex = filteredtableList.value.findIndex(e => e.id == item.gridstackNode.id);
+                 if (itemIndex !== -1) {
+        // 밀린 요소의 새로운 위치 업데이트
+        filteredtableList.value[itemIndex].x = item.gridstackNode.x;
+        filteredtableList.value[itemIndex].y = item.gridstackNode.y;
+      }
+    }
+  });
+  filteredtableList.value.forEach(item => {
+    const tableItem = tableList.value.find(item2 => item2.intScreenNo == item.intScreenNo && item2.lngKeyscrNo == item.lngKeyscrNo )
+    if(tableItem){
+      Object.keys(item).forEach(key => {
+        if(key =='w'){
+          tableItem['w'] = item['w'] 
+        } else if(key == 'h'){
+          tableItem['h'] = item['h'] 
+        } else if(key =='x') {
+          tableItem['x'] = item['x'] 
+        } else if (key =='y'){
+          tableItem['y'] = item['y'] 
+        } else {
+          tableItem[key] = item[key]
+        }
       })
     }
-    
+  })
+   console.log(tableList.value)
+              const widgetElement = document.querySelector(`[gs-id="${node.id}"]`);
+                 if (widgetElement) {
+                 widgetElement.click(); // 클릭 이벤트 발생
+               }
+             
+            });
+            grid.on("resizestop", function (event, element) {
+  const node = element.gridstackNode;
+  info.value = `you just resized node #${node.id} to width: ${node.w}, height: ${node.h} – good job!`;
+  // 리사이즈된 아이템의 정보 업데이트
+  const findtableindex = filteredtableList.value.findIndex(item => item.id == node.id);
+  if (findtableindex !== -1) {
+    filteredtableList.value[findtableindex].w = node.w;
+    filteredtableList.value[findtableindex].h = node.h;
+  }
+  
+  grid.getGridItems().forEach(item => {
+           // 현재 그리드에 있는 모든 아이템들 순회
+               if (item.gridstackNode.id !== node.id) { // 드래그된 요소를 제외한 나머지
+                const itemIndex = filteredtableList.value.findIndex(e => e.id == item.gridstackNode.id);
+                 if (itemIndex !== -1) {
+        // 밀린 요소의 새로운 위치 업데이트
+        filteredtableList.value[itemIndex].x = item.gridstackNode.x;
+        filteredtableList.value[itemIndex].y = item.gridstackNode.y;
+      }
+    }
+  });
+  filteredtableList.value.forEach(item => {
+    const tableItem = tableList.value.find(item2 => item2.intScreenNo == item.intScreenNo && item2.lngKeyscrNo == item.lngKeyscrNo )
+    if(tableItem){
+      Object.keys(item).forEach(key => {
+        if(key =='w'){
+          tableItem['w'] = item['w'] 
+        } else if(key == 'h'){
+          tableItem['h'] = item['h'] 
+        } else if(key =='x') {
+          tableItem['x'] = item['x'] 
+        } else if (key =='y'){
+          tableItem['y'] = item['y']
+        } else {
+          tableItem[key] = item[key]
+        }
+
+     console.log(tableList.value)
+});
+          }
+    showOtherScreen(clickScreenButton.value)
 })
+            })
+          }})
 
 
 onDeactivated(() => {
