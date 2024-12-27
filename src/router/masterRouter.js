@@ -104,6 +104,11 @@ export default function salesRouter() {
         path : "MST_002INS.xml",
         component : MST_002INS
       },
+      {
+        path: '/:pathMatch(.*)*', // 잘못된 경로를 처리
+        name: 'NotFound',
+        component: NotFound,  // 404 페이지 컴포넌트
+      },
      
     ];
   }
