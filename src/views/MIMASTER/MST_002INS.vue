@@ -19,7 +19,7 @@
       </DupliPopUp6>
     
     </div>
-    <div v-if="showSetScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+    <div v-if="showSetScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-[88]">
     <div class="bg-white p-6 rounded shadow-lg w-[25%] h-[40%] ">
       <h2 class="text-lg font-bold">화면키 설정</h2>
       <div class="flex flex-col justify-start h-12">
@@ -35,7 +35,7 @@
     
   </div>
 
-  <div v-if="showModifyScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+  <div v-if="showModifyScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-[88]">
     <div class="bg-white p-6 rounded shadow-lg w-[25%] h-[40%] ">
       <h2 class="text-lg font-bold">화면키 수정</h2>
       <div class="flex flex-col justify-start h-12">
@@ -50,22 +50,22 @@
     </div>
     
   </div>
-   <div class="flex ml-10 mt-2 w-[60%] flex-row justify-between">
+   <div class="flex ml-10 -mt-4 w-[60%] flex-row justify-between z-[88]">
      <div class="flex flex-row w-[79%]  items-center">
      <button class="w-10 flex-shrink-0 flex items-center" @click="scrollLeft">
        <img src="../../assets/ic_before.svg" alt="">
      </button>
-     <div class="flex gap-2 w-[1000px] overflow-hidden" ref="scrollContainer">
-      <div v-for="(i,index) in ScreenKeyOrigin" :value="i.intScreenNo"  class="bg-gray-100 rounded-lg w-[200px] h-10 flex-shrink-0 flex justify-center" :class="clickScreenButton == (i.intScreenNo) ? 'text-blue-800 border-blue-500  border-2' : 'black' " >
-       <button @click.stop="showOtherScreen(i.intScreenNo)" class="w-[80%]">{{i.strScreenName}}</button>
-       <button @click.stop="showModifyButton(index)" class="w-[10%]"><img src="../../assets/ic_kebap.svg" alt=""></button>
-       <div v-show="clickedShowModifyButton == index && showModifyButton2 == true" class="flex flex-col bg-white z-40 absolute ml-36 mt-8 rounded-lg gap-2 w-12">
-        <button class="text-black" @click="modifyScreenKey(i.strScreenName , i.intScreenNo)">수정</button>
-        <button class="text-black" @click="deleteScreenKey(i.intScreenNo)">삭제</button>
-       </div>
-      </div>
-       
-     </div> 
+     <div class="flex gap-2 w-[1000px] z-[88] h-32 items-center relative overflow-hidden" ref="scrollContainer">
+  <div v-for="(i, index) in ScreenKeyOrigin" :value="i.intScreenNo" class="bg-gray-100 rounded-lg w-[200px] h-10 flex-shrink-0 flex justify-center font-bold" :class="clickScreenButton == (i.intScreenNo) ? 'text-blue-800 border-blue-500 border-2' : 'black'">
+    <button @click.stop="showOtherScreen(i.intScreenNo)" class="w-[80%]">{{ i.strScreenName }}</button>
+    <button @click.stop="showModifyButton(index)" class="w-[10%]"><img src="../../assets/ic_kebap.svg" alt=""></button>
+    <div v-show="clickedShowModifyButton == index && showModifyButton2 == true" class="flex flex-col absolute bg-white z-[88] ml-36 mt-8 rounded-lg gap-2 w-12 border border-gray-600" ref="scrollContainer">
+      <button class="text-black" @click="modifyScreenKey(i.strScreenName, i.intScreenNo)">수정</button>
+      <button class="text-black" @click="deleteScreenKey(i.intScreenNo)">삭제</button>
+    </div>
+  </div>
+</div>
+
      <button class="w-10 flex-shrink-0 flex items-center" @click="scrollRight">
        <img src="../../assets/ic_after.svg" alt="">
      </button>
@@ -76,13 +76,13 @@
        <img src="../../assets/Btn_46_refresh.svg" alt="" >
      </button>
    </div>
-   <div class="ml-[57%] h-14 w-[200px] mt-2 flex items-center">
+   <div class="ml-[57%] h-14 w-[200px] mt-7 flex items-center">
      <button class="button primary w-[130px] h-[40px] flex justify-center" @click="addNewWidget()">테이블 추가</button>
    </div>
    </div>
    
    
-   <div class="flex" >
+   <div class="flex z-81 -mt-7" >
    <div class="grid-stack table_style overflow-hidden !w-[1000px] !h-[630px]"></div>
    <div class="grid grid-rows-[1fr,3fr,1fr,1fr,1fr,1fr,1fr,1fr,4fr,1fr] grid-cols-1 border border-gray-200 w-[25%] ml-20 rounded-lg" >
     <div class="bg-gray-100 font-semibold flex items-center justify-center">테이블 속성</div>
@@ -594,6 +594,7 @@ function addNewWidget() {
           console.log(clickedtableColor.value);
           // 원하는 추가 작업을 여기에 작성
         });
+        widgetElement.click();
       console.log(tableList.value)
    
 }
@@ -870,6 +871,7 @@ const duplicateTable = () => {
           console.log(clickedtableColor.value);
           // 원하는 추가 작업을 여기에 작성
         });
+        widgetElement.click();
       console.log(filteredtableList.value)
     } else {
       Swal.fire({
