@@ -2,7 +2,7 @@
   <div class="flex justify-between items-center w-full overflow-y-auto">
      <div class="flex justify-start  w-full pl-12 pt-4">
      <div class="flex justify-start">
-       <h1 class="font-bold text-sm md:text-2xl w-full">테이블관리</h1></div>
+       <h1 class="font-bold text-sm md:text-2xl w-full">좌석정보등록(#)</h1></div>
      </div>
      <div class="flex justify-center mr-10 space-x-2 pr-5">
        <button @click="searchButton" class="button search md:w-auto w-14">조회</button>
