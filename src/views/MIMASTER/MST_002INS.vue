@@ -57,8 +57,8 @@
      </button>
      <div class="flex gap-2 w-[1000px] z-[88] h-32 items-center relative overflow-hidden" ref="scrollContainer">
   <div v-for="(i, index) in ScreenKeyOrigin" :value="i.intScreenNo" class="bg-gray-100 rounded-lg w-[200px] h-10 flex-shrink-0 flex justify-center font-bold" :class="clickScreenButton == (i.intScreenNo) ? 'text-blue-800 border-blue-500 border-2' : 'black'">
-    <button @click.stop="showOtherScreen(i.intScreenNo)" class="w-[80%]">{{ i.strScreenName }}</button>
-    <button @click.stop="showModifyButton(index)" class="w-[10%]"><img src="../../assets/ic_kebap.svg" alt=""></button>
+    <button @click="showOtherScreen(i.intScreenNo)" class="w-[80%]">{{ i.strScreenName }}</button>
+    <button @click="showModifyButton(index,i.intScreenNo) " class="w-[15%]"><img src="../../assets/ic_kebap.svg" alt=""></button>
     <div v-show="clickedShowModifyButton == index && showModifyButton2 == true" class="flex flex-col absolute bg-white z-[88] ml-36 mt-8 rounded-lg gap-2 w-12 border border-gray-600" ref="scrollContainer">
       <button class="text-black" @click="modifyScreenKey(i.strScreenName, i.intScreenNo)">수정</button>
       <button class="text-black" @click="deleteScreenKey(i.intScreenNo)">삭제</button>
@@ -330,6 +330,7 @@ import { GridStack } from 'gridstack';
                 clickedNm.value = ''
                 clickTable.value = false
                 clickedtableCode.value = ''
+                showModifyButton2.value = false
 
                
    }
@@ -911,9 +912,11 @@ const confirmScreenKey = () => {
 }
 const clickedShowModifyButton = ref(-1)
 const showModifyButton2 = ref(false)
-const showModifyButton = (newValue) => {
+const showModifyButton = (newValue , newValue2) => {
+  showOtherScreen(newValue2)
   clickedShowModifyButton.value = newValue
-  showModifyButton2.value = !showModifyButton2.value
+  showModifyButton2.value = true
+
 }
 const showModifyScreenKey = ref(false)
 
