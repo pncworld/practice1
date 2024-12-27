@@ -19,7 +19,7 @@
       </DupliPopUp6>
     
     </div>
-    <div v-if="showSetScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-[88]">
+    <div v-if="showSetScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-[89]">
     <div class="bg-white p-6 rounded shadow-lg w-[25%] h-[40%] ">
       <h2 class="text-lg font-bold">화면키 설정</h2>
       <div class="flex flex-col justify-start h-12">
@@ -35,7 +35,7 @@
     
   </div>
 
-  <div v-if="showModifyScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-[88]">
+  <div v-if="showModifyScreenKey" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-[89]">
     <div class="bg-white p-6 rounded shadow-lg w-[25%] h-[40%] ">
       <h2 class="text-lg font-bold">화면키 수정</h2>
       <div class="flex flex-col justify-start h-12">
