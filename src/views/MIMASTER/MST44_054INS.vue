@@ -788,7 +788,13 @@ nowStoreCd.value = newValue ;
       })
       return ;
     }
-    const newScreenNo = ScreenKeyOrigin.value[ScreenKeyOrigin.value.length-1].intScreenNo +1;
+    let newScreenNo 
+    if(ScreenKeyOrigin.value.length ==0){
+      newScreenNo = 1;
+    } else {
+      newScreenNo = ScreenKeyOrigin.value[ScreenKeyOrigin.value.length-1].intScreenNo +1;
+    }
+   
     ScreenKeyOrigin.value.push({strScreenName : currentscreenKeyNm.value , intScreenNo : newScreenNo , intScreenType: currentpaymentCd.value })
     addscreenKey.value = false
     addfor4ScreenKey()

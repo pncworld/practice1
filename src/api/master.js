@@ -472,6 +472,15 @@ export const getAllScreenList = (groupCd , storeCd ,areaCd , posNo ) => {
      
     })
 }
+export const getScreenList3 = async(groupCd , storeCd ,areaCd , posNo ) => {
+    return await api2.post('/MIMASTER/MST_001INS.asmx/getScreenList3', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        AREA_CD: areaCd,
+        POS_NO : posNo
+     
+    })
+}
 export const getFuncKeys = (groupCd , storeCd ,areaCd , posNo ) => {
     return api2.post('/MIMASTER/MST44_043INS.asmx/getFuncKeys', {
         GROUP_CD: groupCd,
@@ -501,6 +510,13 @@ export const getAgeList = (groupCd , storeCd ,areaCd , posNo ) => {
 }
 export const getPrintList = (groupCd , storeCd  ) => {
     return api2.post('/MIMASTER/MST44_062INS.asmx/getPrintList', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd 
+
+    })
+}
+export const getMenuLists = (groupCd , storeCd  ) => {
+    return api2.post('/MIMASTER/MST01_008INS.asmx/getMenuLists', {
         GROUP_CD: groupCd,
         STORE_CD: storeCd 
 
@@ -767,6 +783,30 @@ export const saveTables = (groupCd , storeCd , posnos , areaCds, screenNo ,lngKe
 
     })
 }
+export const saveTables2 = (groupCd , storeCd , posnos , areaCds, screenNo ,lngKeyscrNo ,lngKeyColors ,lngShapes ,strNames ,lngCounts , xs, ys, ws,hs , newNm , newlngCount , intkeynos) => {
+    return api2.post('/MIMASTER/MST_001INS.asmx/saveTables2', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd ,
+        POS_NO : posnos ,
+        AREA_CD : areaCds ,
+        SCREEN_NO : screenNo ,
+        KEYSCR_NO : lngKeyscrNo ,
+        KEY_COLOR : lngKeyColors ,
+        KEY_SHAPE : lngShapes ,
+        KEY_NAME : strNames ,
+        KEY_LNGCOUNT : lngCounts ,
+        X : xs ,
+        Y : ys ,
+        W : ws ,
+        H : hs ,
+        NEW_NM : newNm ,
+        NEW_COUNT : newlngCount ,
+        INTKEYNO : intkeynos
+
+
+
+    })
+}
 
 export const saveNewTables = (groupCd , storeCd , posnos , areaCds, screenNo ,lngKeyscrNo ,lngKeyColors ,lngShapes ,strNames ,lngCounts , xs, ys, ws,hs) => {
     return api2.post('/MIMASTER/MST_002INS.asmx/saveNewTables', {
@@ -786,6 +826,17 @@ export const saveNewTables = (groupCd , storeCd , posnos , areaCds, screenNo ,ln
         H : hs 
     })
 }
+export const saveMenuManage = (groupCd , storeCd , maincode , mainnm, subcode ,subnm ,submajor) => {
+    return api2.post('/MIMASTER/MST01_008INS.asmx/saveMenuManage', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd ,
+        MAIN_CD : maincode ,
+        MAIN_NM : mainnm ,
+        SUB_CD : subcode ,
+        SUB_NM : subnm ,
+        SUB_MJ : submajor ,
+    })
+}
 export const getKDSList = (groupCd ) => {
     return api2.post('/MIMASTER/MST44_061INS.asmx/getKDSList', {
         GROUP_CD: groupCd
@@ -803,6 +854,20 @@ export const getTableList = (groupCd ,storeCd , posNo , areaCd ) => {
 
     })
 }
+
+export const getTableList2 = (groupCd ,storeCd , areaCd , posNo  , screenNo) => {
+    return api2.post('/MIMASTER/MST_001INS.asmx/getTableList2', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd,
+        AREA_CD: areaCd , 
+        POSNO: posNo,
+        SCREENNO : screenNo
+    
+
+
+    })
+}
+
 export const getTableScreenKeys = (groupCd ,storeCd , posNo , AreaCd ) => {
     return api2.post('/MIMASTER/MST_002INS.asmx/getTableScreenKeys', {
         GROUP_CD: groupCd,

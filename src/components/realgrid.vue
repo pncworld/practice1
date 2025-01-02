@@ -113,6 +113,22 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  exporttoExcel: {
+    type: Boolean,
+    default: false,
+  },
+  ExcelNm: {
+    type: String,
+    default: false,
+  },
+  deleteAll: {
+    type: Boolean,
+    default: false,
+  },
+  commitAll: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}`); // 동적 ID 설정
@@ -181,7 +197,7 @@ const funcshowGrid = async () => {
       return ret;
     }
   }));
-
+ 
   gridView.setColumns(columns);
 
 console.log(props.mergeColumns)
@@ -238,7 +254,8 @@ gridView.setColumnLayout(layout1)
   
   // 데이터 추가
   dataProvider.setRows(props.rowData);
-
+  
+ 
   // 기타 옵션
   gridView.setFooters({ visible: false });
   gridView.setRowIndicator({ visible: true });
@@ -251,6 +268,16 @@ gridView.setColumnLayout(layout1)
   gridView.displayOptions.fitStyle = props.fixedColumn == false ? 'even' : "none";
   dataProvider.softDeleting = true;
   dataProvider.deleteCreated = true;
+  dataProvider.autoCommit = true; // 자동 커밋 활성화
+
+  
+  for (let i = dataProvider.getRowCount() - 1; i >= 0; i--) { // 역순으로 순회
+  const rowData = dataProvider.getJsonRow(i);
+  if (rowData.deleted) {
+    dataProvider.removeRow(i); // 해당 행 삭제
+  
+  }
+}
 
   // 이벤트 설정
   gridView.onCellEdited = () => gridView.commit();
@@ -319,7 +346,7 @@ watch(() => props.changeValue , () => {
 })
 
 watch(() => props.addRow, (newVal) => {
-  
+  gridView.commit();
   var values = {add: "추가" , sort: '매장용'};
   var dataRow = dataProvider.addRow(values);
   gridView.setCurrent({dataRow: dataRow});
@@ -328,6 +355,7 @@ watch(() => props.addRow, (newVal) => {
 
 
 watch(() => props.addRow2, (newVal) => {
+  gridView.commit();
   const properties = props.addrowProp.split(',')
   const value = props.addrowDefault.split(',')
   let values = {};
@@ -339,7 +367,7 @@ watch(() => props.addRow2, (newVal) => {
   console.log(dataProvider.getJsonRows())
 });
 watch(() => props.deleteRow, (newVal) => {
- 
+    gridView.commit();
     const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
     if (curr && curr.dataRow >= 0) {
       // 현재 데이터 행이 유효한 경우
@@ -353,6 +381,48 @@ watch(() => props.deleteRow, (newVal) => {
      emit('updatedRowData', updatedrowData.value )
   
 });
+
+watch(() => props.deleteAll, (newVal) => {
+  gridView.commit();
+  const allRows = dataProvider.getJsonRows();
+
+// Mark all rows as deleted (if needed)
+  allRows.forEach((row, index) => {
+  dataProvider.setValue(index, "deleted", true); // Optionally mark them as deleted
+  dataProvider.removeRow(index);
+});
+
+
+// Update the row data after deletion
+updatedrowData.value = [...dataProvider.getJsonRows()];
+
+// Emit the updated row data
+emit('updatedRowData', updatedrowData.value);
+});
+
+watch(() => props.commitAll, (newVal) => {
+
+  if(dataProvider.getRowCount() > 0){
+    gridView.commit();
+  }
+ 
+ 
+});
+watch(() => props.exporttoExcel, (newVal) => {
+    gridView.exportGrid({
+      type: "excel",
+      target: "local",
+      fileName: props.ExcelNm+".xlsx", 
+      showProgress: true,
+      progressMessage: "엑셀 Export중입니다.",
+      indicator: true,
+      header: true,
+      footer: true,
+      compatibility: true,
+    })
+  
+});
+
 
 onMounted(async () => {
   try {

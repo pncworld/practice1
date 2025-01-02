@@ -234,7 +234,7 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
   const addRows = ref(false)
   const deleteRows = ref(false)
   const addRow = () => {
-    if(afterSearch.value == false) {
+    if(afterSearch2.value == false) {
       Swal.fire({
         title: '경고.',
         text: '조회를 먼저 해주세요',

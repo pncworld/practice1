@@ -1,5 +1,5 @@
 <template>
-    <div class="flex justify-end space-x-4 text-xs">
+    <div class="flex justify-end space-x-4 text-sm">
      <div class="flex items-center font-bold text-sm pl-4">매장명 : </div>
       <div>
         <select :disabled="isDisabled1"   id="storeGroup" class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreGroup($event.target.value)">
@@ -33,6 +33,7 @@ const storeGroup = ref([]);
 const storeType = ref([]);
 const storeCd = ref([]);
 const storeCd2 = ref([]);
+const storeNm = ref('');
 const isDisabled1 = ref(false);
 const isDisabled2 = ref(false);
 const isDisabled3 = ref(false);
@@ -44,7 +45,7 @@ const props = defineProps({
     })
 const {groupCdDisabled} = props ;
 isDisabled1.value = groupCdDisabled;
-const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd']);
+const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd','storeNm']);
 const emitStoreGroup = (value) => {
     emit('update:storeGroup', value);
 };
@@ -54,18 +55,21 @@ const emitStoreType = (value) => {
 };
 
 const emitStoreCode = (value) => {
+   if( value !='0'){
+   const selectedNm = storeCd.value.filter(item => item.lngStoreCode == value)[0].strName
+
+    emit('storeNm' ,selectedNm )
     emit('update:storeCd', value);
+  } else {
+    emit('update:storeCd', value);
+  }
 };
    
   storeGroup.value = store.state.storeGroup;
   storeType.value = store.state.storeType;
   storeCd.value = store.state.storeCd;
   storeCd2.value = store.state.storeCd;
-   const deActivate = () => {
-     let storeIndex = storeGroup.value.filter(item => {
-        return item.lngStoreGroup == userData.lngStoreGroup
-     })
-  }
+  
   const setStore = (value) => {
     if ( value ==0) {
         storeCd.value = storeCd2.value ;
