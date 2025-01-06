@@ -128,7 +128,37 @@ const props = defineProps({
   commitAll: {
     type: Boolean,
     default: false,
+  },
+  inputOnlyNumberColumn: {
+    type: String,
+    default: "",
   }
+  ,
+  dragOn: {
+    type: Boolean,
+    default: false,
+  }
+  ,
+  notsoftDelete: {
+    type: Boolean,
+    default: false,
+  }
+  ,
+  searchColId2: {
+    type: String,
+    default: '',
+  }
+  ,
+  searchColValue2: { // 숫자로만 오게
+    type: String,
+    default: '',
+  }
+  ,
+  addRow3: { // 숫자로만 오게
+    type: Boolean,
+    default: true,
+  }
+ 
 });
 
 const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}`); // 동적 ID 설정
@@ -136,7 +166,8 @@ const tabInitSetArray = ref([]);
 const selectedRowData = ref([]);
 const result2 =ref([]) ;
 const updatedrowData = ref([])
-const emit = defineEmits(["selcetedrowData" , "updatedRowData" , "clickedRowData"]);
+const selectedindex = ref(0)
+const emit = defineEmits(["selcetedrowData" , "updatedRowData" , "clickedRowData" ,"dblclickedRowData" ,"selectedIndex" ]);
 const funcshowGrid = async () => {
   // 그리드 초기화
   console.log(gridView)
@@ -168,6 +199,8 @@ const funcshowGrid = async () => {
     dataType : item.strColID.includes('checkbox') ? 'boolean' : 'text',
   }));
   fields.push({fieldName: "deleted", dataType: "boolean" })
+  fields.push({fieldName: "add", dataType: "boolean" })
+
   dataProvider.setFields(fields);
 
   // 컬럼 정의
@@ -180,6 +213,10 @@ const funcshowGrid = async () => {
       checkLocation : item.strColID.includes('checkbox') ? 'left' : 'none'
     },
     width: item.intHdWidth,
+    editor: {
+    type: 'line', 
+    inputCharacters: item.strColID == props.inputOnlyNumberColumn ? '0123456789' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ㄱ-힣!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
+  },
     visible: item.intHdWidth !== 0,
     renderer : { type : item.strColID =='add' ? 'button' :  item.strColID.includes('checkbox') ? 'check' : 'text'
      },
@@ -199,7 +236,7 @@ const funcshowGrid = async () => {
   }));
  
   gridView.setColumns(columns);
-
+  
 console.log(props.mergeColumns)
 if(props.mergeColumns == true ) {
 
@@ -266,10 +303,14 @@ gridView.setColumnLayout(layout1)
   gridView.editOptions.updatable = true;
   gridView.editOptions.deletable = true 
   gridView.displayOptions.fitStyle = props.fixedColumn == false ? 'even' : "none";
-  dataProvider.softDeleting = true;
+  gridView.editOptions.commitByCell = true;
+  gridView.editOptions.commitWhenLeave = true;
+  dataProvider.softDeleting = (props.notsoftDelete == false ? true : false);
   dataProvider.deleteCreated = true;
   dataProvider.autoCommit = true; // 자동 커밋 활성화
-
+  dataProvider.commitBeforeDataEdit = true
+  gridView.editOptions.movable = (props.dragOn == true ? true : false)
+  gridView.displayOptions.selectAndImmediateDrag = (props.dragOn == true ? true : false)
   
   for (let i = dataProvider.getRowCount() - 1; i >= 0; i--) { // 역순으로 순회
   const rowData = dataProvider.getJsonRow(i);
@@ -280,6 +321,7 @@ gridView.setColumnLayout(layout1)
 }
 
   // 이벤트 설정
+  
   gridView.onCellEdited = () => gridView.commit();
   gridView.onItemChecked = () => {
 
@@ -293,16 +335,16 @@ gridView.setColumnLayout(layout1)
 
 
    dataProvider.onDataChanged = function (provider) {
-
+     gridView.commit();
      updatedrowData.value = [ ...dataProvider.getJsonRows()]
 
      emit('updatedRowData', updatedrowData.value )
-
+     
 
    };
+ 
 
-
-
+ 
   gridView.onCellItemClicked = function (grid, clickData) {
  
   if (clickData.itemIndex == undefined) {
@@ -310,6 +352,7 @@ gridView.setColumnLayout(layout1)
   }
   selectedRowData.value= dataProvider.getRows()[clickData.itemIndex];
   emit('selcetedrowData', selectedRowData.value);
+  emit('selectedIndex' ,clickData.itemIndex )
 }
 
 gridView.onCellClicked = function (grid, clickData) {
@@ -319,6 +362,7 @@ gridView.onCellClicked = function (grid, clickData) {
   selectedRowData.value= dataProvider.getRows()[clickData.itemIndex];
   selectedRowData.value.index = clickData.itemIndex
   emit('clickedRowData', selectedRowData.value);
+  emit('selectedIndex' ,clickData.itemIndex )
  
 }
 
@@ -331,6 +375,36 @@ gridView.onColumnCheckedChanged = function (grid, col, chk) {
    
      console.log(col.fieldName + "was checked as: " + chk);
 };
+
+gridView.dataDropOptions.callback = function (source, sourceItems, target, targetItem) {
+    const provider = gridView.getDataSource();
+    const sourceStartIndex = sourceItems[0];
+    const sourceCount = sourceItems.length;
+
+    const targetIndex = targetItem > sourceStartIndex 
+        ? targetItem - sourceCount + 1 
+        : targetItem;
+
+    if (sourceCount === 1) {
+        provider.moveRow(sourceStartIndex, targetItem);
+    } else {
+        provider.moveRows(sourceStartIndex, sourceCount, targetIndex);
+    }
+
+    updatedrowData.value = [ ...dataProvider.getJsonRows()]
+
+     emit('updatedRowData', updatedrowData.value )
+};
+
+gridView.onCellDblClicked = function (grid, clickData) {
+  if (clickData.itemIndex == undefined) {
+    return ;
+  }
+  selectedRowData.value= dataProvider.getRows()[clickData.itemIndex];
+  selectedRowData.value.index = clickData.itemIndex
+  emit('dblclickedRowData', selectedRowData.value);
+ 
+}
 
 }
 
@@ -347,10 +421,12 @@ watch(() => props.changeValue , () => {
 
 watch(() => props.addRow, (newVal) => {
   gridView.commit();
-  var values = {add: "추가" , sort: '매장용'};
+  var values = {add: '추가' , sort: '매장용'}; 
   var dataRow = dataProvider.addRow(values);
+  console.log(dataRow)
   gridView.setCurrent({dataRow: dataRow});
   console.log(dataProvider.getJsonRows())
+
 });
 
 
@@ -365,6 +441,22 @@ watch(() => props.addRow2, (newVal) => {
   var dataRow = dataProvider.addRow(values);
   gridView.setCurrent({dataRow: dataRow});
   console.log(dataProvider.getJsonRows())
+});
+
+watch(() => props.addRow3, (newVal) => {
+  gridView.commit();
+  var values = {add: true , index: 0}; 
+  var dataRow = dataProvider.addRow(values);
+  gridView.setCurrent({dataRow: dataRow});
+  const current = gridView.getCurrent();  // 현재 선택된 행 정보 가져오기
+  const selectedRowIndex = current ? current.dataRow : null;
+   if (selectedRowIndex !== null) {
+    console.log("현재 선택된 인덱스:", selectedRowIndex);  // 선택된 행의 인덱스 출력
+  }
+  emit('selectedIndex' ,selectedRowIndex )
+  // updatedrowData.value = [ ...dataProvider.getJsonRows()]
+  // emit('updatedRowData', updatedrowData.value )
+
 });
 watch(() => props.deleteRow, (newVal) => {
     gridView.commit();
@@ -387,10 +479,18 @@ watch(() => props.deleteAll, (newVal) => {
   const allRows = dataProvider.getJsonRows();
 
 // Mark all rows as deleted (if needed)
-  allRows.forEach((row, index) => {
-  dataProvider.setValue(index, "deleted", true); // Optionally mark them as deleted
-  dataProvider.removeRow(index);
-});
+  if(props.notsoftDelete == false){
+    allRows.reverse().forEach((row, index) => {
+      dataProvider.setValue(index, "deleted", true); // Optionally mark them as deleted
+      dataProvider.removeRow(index);
+  }) 
+  
+   } else {
+    for (let i = allRows.length - 1; i >= 0; i--) {
+        dataProvider.removeRow(i);
+    }
+   }
+
 
 
 // Update the row data after deletion
@@ -402,7 +502,7 @@ emit('updatedRowData', updatedrowData.value);
 
 watch(() => props.commitAll, (newVal) => {
 
-  if(dataProvider.getRowCount() > 0){
+  if(dataProvider != undefined && dataProvider.getRowCount() > 0){
     gridView.commit();
   }
  
@@ -482,31 +582,112 @@ const setupGrid = async () => {
   }
 };
 // watch(() => props.showGrid, () => funcshowGrid());
-watch(() => props.searchWord, (newValue) => {
-  const searchColId2 = props.searchColId.split(',')
-  console.log(searchColId2)
-  if (newValue === '') {
+// watch(() => props.searchWord, (newValue) => {
+//   const searchColId2 = props.searchColId.split(',')
+ 
+//   if (newValue === '') {
+//     dataProvider.setRows( props.rowData );
+//     return ;
+//   };
+//   const filteredData = props.rowData.filter(
+//     item => 
+//   {
+     
+//     return searchColId2.some(colId => {
+    
+//       const value = item[colId].toString() || '';
+   
+//       return value.toLowerCase().includes(newValue.toString().toLowerCase())
+//     })
+//   }
+//   );
+//   dataProvider.setRows(filteredData.length ? filteredData : []);
+// });
+watch(() => props.rowData, () => funcshowGrid());
+
+watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) => {
+  const searchColId = props.searchColId.split(',')
+  let searchColId2;
+  let searchColValues;
+  console.log(props.searchColId2)
+  console.log(props.searchColValue2)
+  if(props.searchColId2 !== ''){
+     searchColId2 = props.searchColId2.split(',')
+  }
+  if(newValue2 !== ''){
+    searchColValues = newValue2.split(',')
+  }
+  
+  const searchWord = newValue.split(',')
+ console.log(searchWord)
+ console.log(searchColValues)
+
+ if(searchColId2 == undefined){
+   if (newValue === '') {
     dataProvider.setRows( props.rowData );
     return ;
-  };
-  const filteredData = props.rowData.filter(
+   };
+   const filteredData = props.rowData.filter(
     item => 
   {
      
-    return searchColId2.some(colId => {
-      console.log(item)
-      console.log(colId)
+    return searchColId.some(colId => {
+    
       const value = item[colId].toString() || '';
-      console.log(value)
-      console.log(newValue)
+   
       return value.toLowerCase().includes(newValue.toString().toLowerCase())
     })
   }
   );
-  console.log(filteredData)
   dataProvider.setRows(filteredData.length ? filteredData : []);
+ } else {
+  let check = false ;
+  for(var i=0 ; i< searchColValues.length ; i++){
+    if(searchColValues[i] != '0'){
+      check = true;
+    }
+  }
+  if(check == false){
+    dataProvider.setRows(props.rowData );
+    return ;
+  }
+  const filteredData = props.rowData.filter(
+    item => 
+  {
+     
+    return searchColId2.every((colId,index) => {
+    
+      const value = item[colId].toString() || '';
+      const searchValue = (searchColValues[index] || '').toString();
+
+      if ( searchValue === '0') {
+       return true;
+       }
+      return value.toLowerCase().includes(searchValue.toString().toLowerCase())
+    })
+  }
+  );
+  if(props.searchWord == '' ){
+    dataProvider.setRows(filteredData.length ? filteredData : []);
+  } else {
+    const filteredData2 = filteredData.filter(
+    item => 
+    {
+     
+    return searchColId.some(colId => {
+    
+      const value = item[colId].toString() || '';
+   
+      return value.toLowerCase().includes(props.searchWord.toString().toLowerCase())
+    })
+  }
+  );
+  dataProvider.setRows(filteredData2.length ? filteredData2 : []);
+  }
+  
+ }
+ 
 });
-watch(() => props.rowData, () => funcshowGrid());
 </script>
 
 <style scoped>

@@ -1,6 +1,6 @@
 <template>
     <div class="flex justify-end space-x-4 text-sm">
-     <div class="flex items-center font-bold text-sm pl-4">매장명 : </div>
+     <div class="flex items-center font-bold text-sm pl-4 ml-8">매장명 : </div>
       <div>
         <select :disabled="isDisabled1"   id="storeGroup" class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreGroup($event.target.value)">
           <option :value="item.lngStoreGroup" v-for="item in storeGroup" :key="item.lngStoreGroup">{{ item.strName }}</option>
@@ -45,7 +45,7 @@ const props = defineProps({
     })
 const {groupCdDisabled} = props ;
 isDisabled1.value = groupCdDisabled;
-const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd','storeNm']);
+const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd','storeNm' , 'GroupNm']);
 const emitStoreGroup = (value) => {
     emit('update:storeGroup', value);
 };
@@ -63,6 +63,7 @@ const emitStoreCode = (value) => {
   } else {
     emit('update:storeCd', value);
   }
+  emit('GroupNm', storeGroup.value[0].strName);
 };
    
   storeGroup.value = store.state.storeGroup;
@@ -78,6 +79,7 @@ const emitStoreCode = (value) => {
     storeCd.value = storeCd2.value.filter( item => {
         return item.lngStoreAttr == value ;
     })
+
   }
 
   const route = useRoute();
@@ -85,7 +87,8 @@ const emitStoreCode = (value) => {
   watch(() => route.path, (newPath) =>{
         if (storeGroup.value.length > 0) {
         emit('update:storeGroup', storeGroup.value[0].lngStoreGroup);
-        console.log(storeGroup.value[0].lngStoreGroup);
+
+   
         }
       
     

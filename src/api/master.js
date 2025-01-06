@@ -837,9 +837,84 @@ export const saveMenuManage = (groupCd , storeCd , maincode , mainnm, subcode ,s
         SUB_MJ : submajor ,
     })
 }
+export const saveOptions = (groupCd , storeCd , lngcode1 , strNames1, blnMustSels1 ,intMultiples1 ,lngChainMenu1,lngChainMenu2,lngChainMenu3,
+  lngChainMenu4,lngChainMenu5,lngChainMenu6,lngChainMenu7,lngChainMenu8,lngChainMenu9,lngChainMenu10,lngChainMenu11,lngChainMenu12,lngChainMenu13,
+  lngChainMenu14,lngChainMenu15,lngChainMenu16,lngChainMenu17,lngChainMenu18,lngChainMenu19,lngChainMenu20,lngChainMenu21,lngCodes2,strNames2,
+  lngChainGroup1,lngChainGroup2,lngChainGroup3,lngChainGroup4,lngChainGroup5,lngChainGroup6,lngChainGroup7,lngChainGroup8,lngChainGroup9, 
+  lngChainGroup10,lngChainGroup11,lngChainGroup12,lngChainGroup13,lngChainGroup14,lngChainGroup15,lngChainGroup16,lngChainGroup17,lngChainGroup18,
+  lngChainGroup19,lngChainGroup20
+) => {
+    return api2.post('/MIMASTER/MST01_011INS_01.asmx/saveOptions', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd ,
+        LNG_CODE1 : lngcode1 ,
+        STR_NAMES1 : strNames1 ,
+        BLN_MUST_SELS1 : blnMustSels1 ,
+        INT_MULTIPLES1 : intMultiples1 ,
+        LNG_CHAIN_MENU1 : lngChainMenu1 ,
+        LNG_CHAIN_MENU2 : lngChainMenu2 ,
+        LNG_CHAIN_MENU3 : lngChainMenu3 ,
+        LNG_CHAIN_MENU4 : lngChainMenu4 ,
+        LNG_CHAIN_MENU5 : lngChainMenu5 ,
+        LNG_CHAIN_MENU6 : lngChainMenu6 ,
+        LNG_CHAIN_MENU7 : lngChainMenu7 ,
+        LNG_CHAIN_MENU8 : lngChainMenu8 ,
+        LNG_CHAIN_MENU9 : lngChainMenu9 ,
+        LNG_CHAIN_MENU10 : lngChainMenu10 ,
+        LNG_CHAIN_MENU11 : lngChainMenu11 ,
+        LNG_CHAIN_MENU12 : lngChainMenu12 ,
+        LNG_CHAIN_MENU13 : lngChainMenu13 ,
+        LNG_CHAIN_MENU14 : lngChainMenu14 ,
+        LNG_CHAIN_MENU15 : lngChainMenu15 ,
+        LNG_CHAIN_MENU16 : lngChainMenu16 ,
+        LNG_CHAIN_MENU17 : lngChainMenu17 ,
+        LNG_CHAIN_MENU18 : lngChainMenu18 ,
+        LNG_CHAIN_MENU19 : lngChainMenu19 ,
+        LNG_CHAIN_MENU20 : lngChainMenu20 ,
+        LNG_CHAIN_MENU21 : lngChainMenu21 ,
+        LNG_CODES2 : lngCodes2 ,
+        STR_NAMES2 : strNames2 ,
+        LNG_CHAIN_GROUP1 : lngChainGroup1 ,
+        LNG_CHAIN_GROUP2 : lngChainGroup2 ,
+        LNG_CHAIN_GROUP3 : lngChainGroup3 ,
+        LNG_CHAIN_GROUP4 : lngChainGroup4 ,
+        LNG_CHAIN_GROUP5 : lngChainGroup5 ,
+        LNG_CHAIN_GROUP6 : lngChainGroup6 ,
+        LNG_CHAIN_GROUP7 : lngChainGroup7 ,
+        LNG_CHAIN_GROUP8 : lngChainGroup8 ,
+        LNG_CHAIN_GROUP9 : lngChainGroup9 ,
+        LNG_CHAIN_GROUP10 : lngChainGroup10 ,
+        LNG_CHAIN_GROUP11 : lngChainGroup11 ,
+        LNG_CHAIN_GROUP12 : lngChainGroup12 ,
+        LNG_CHAIN_GROUP13 : lngChainGroup13 ,
+        LNG_CHAIN_GROUP14 : lngChainGroup14 ,
+        LNG_CHAIN_GROUP15 : lngChainGroup15 ,
+        LNG_CHAIN_GROUP16 : lngChainGroup16 ,
+        LNG_CHAIN_GROUP17 : lngChainGroup17 ,
+        LNG_CHAIN_GROUP18 : lngChainGroup18 ,
+        LNG_CHAIN_GROUP19 : lngChainGroup19 ,
+        LNG_CHAIN_GROUP20 : lngChainGroup20
+    })
+}
 export const getKDSList = (groupCd ) => {
     return api2.post('/MIMASTER/MST44_061INS.asmx/getKDSList', {
         GROUP_CD: groupCd
+
+
+    })
+}
+export const getAllOptionManageData = (groupCd ,storeCd ) => {
+    return api2.post('/MIMASTER/MST01_011INS_01.asmx/getAllOptionManageData', {
+        GROUP_CD: groupCd ,
+        STORE_CD: storeCd
+
+
+    })
+}
+export const getMostColumnMenuList = (groupCd ,storeCd ) => {
+    return api2.post('/MIMASTER/MST01_011INS_01.asmx/getMostColumnMenuList', {
+        GROUP_CD: groupCd ,
+        STORE_CD: storeCd
 
 
     })

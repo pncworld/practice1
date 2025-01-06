@@ -19,10 +19,10 @@
 <div class="z-50">
 </div>
 
-<div class="flex justify-center w-[80%] h-[70%] gap-5 ml-10 mt-5">
+<div class="flex justify-center w-[80%] h-[70%] gap-5 ml-10 mt-5" >
     <div class="w-full h-full">
         <div class="flex justify-end gap-2"><button class="whitebutton" @click="addRow">추가</button><button class="whitebutton" @click="deleteRow">삭제</button></div>
-        <Realgrid class="w-full h-full mt-2" :progname="'MST01_008INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false" :addRow="addbutton"  @selcetedrowData="selcetedrowData" :changeRow="changeRow" :deleteRow="deleterow" :changeColid="'lngCode'" :changeValue="changeValue" @updatedRowData="updatedRowData1" @clickedRowData="clickedRowData" :exporttoExcel="exporttoExcel" :ExcelNm="'메뉴 분류 관리'" :editableColId="'strName'" :commitAll="commitAll" ></Realgrid>
+        <Realgrid class="w-full h-full mt-2" :progname="'MST01_008INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false" :addRow="addbutton"  @selcetedrowData="selcetedrowData" :changeRow="changeRow" :deleteRow="deleterow" :changeColid="'lngCode'" :changeValue="changeValue" @updatedRowData="updatedRowData1" @clickedRowData="clickedRowData" :exporttoExcel="exporttoExcel" :ExcelNm="'메뉴 분류 관리'" :editableColId="'strName'" :commitAll="commitAll" :inputOnlyNumberColumn="'lngCode'"></Realgrid>
     </div>
     <div class="w-full h-full">
         <div class="flex justify-end gap-2"><button class="whitebutton" @click="addRow2">추가</button><button class="whitebutton" @click="deleteRow2">삭제</button></div>
@@ -41,7 +41,7 @@ import DupliPopUp from '@/components/dupliPopUp.vue';
 import PickStore3 from '@/components/pickStore3.vue';
 import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 
 const nowStoreAreaCd = ref();
@@ -235,7 +235,9 @@ const deleteRow = () => {
 }
 
 const saveButton = () => {
-    commitAlls()
+    commitAlls().then( (newvalue) => {
+
+
     if(afterSearch.value == false) {
       Swal.fire({
         title: '경고',
@@ -246,11 +248,11 @@ const saveButton = () => {
       return ;
     }
     console.log(rowData2.value)
-    const length = (forsaveRowData.value?.filter(item => item.strName == '' ||item.strName == undefined ).length || 0) + (rowData2.value?.filter(item => item.strName == '' ||item.strName == undefined).length || 0);
+    const length = (forsaveRowData.value?.filter(item => item.strName == '' ||item.strName == undefined || item.lngCode == undefined ||  item.lngCode == '' || isNaN(Number(item.lngCode))).length || 0) + (rowData2.value?.filter(item => item.strName == '' ||item.strName == undefined).length || 0);
     if(length > 0) {
       Swal.fire({
         title: '경고',
-        text: '분류명에 빈칸이 존재합니다.',
+        text: '입력되지 않은 칸이나 잘못된 값이 포함되어 있습니다.',
         icon: 'warning',
         confirmButtonText: '확인'
       })
@@ -325,7 +327,7 @@ const saveButton = () => {
   )
    
 
-  
+})
 }
 const exporttoExcel = ref(false)
 const excelButton = () => {
@@ -337,8 +339,17 @@ const deleteAlls = () => {
 } 
 
 const commitAlls = () => {
-    commitAll.value = !commitAll.value
-}
+    return new Promise((resolve, reject) => {
+        try {
+            commitAll.value = !commitAll.value; // 기존 작업
+            resolve(commitAll.value); // 성공적으로 토글된 값 반환
+        } catch (error) {
+            reject(error); // 오류 발생 시 오류 반환
+        }
+    });
+};
+
+
 </script>
 
 <style>
