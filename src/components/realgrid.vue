@@ -158,6 +158,16 @@ const props = defineProps({
     type: Boolean,
     default: true,
   }
+  ,
+  selectionStyle: { // 숫자로만 오게
+    type: String,
+    default: 'block',
+  }
+  ,
+  initFocus: { // 숫자로만 오게
+    type: Boolean,
+    default: false,
+  }
  
 });
 
@@ -311,7 +321,8 @@ gridView.setColumnLayout(layout1)
   dataProvider.commitBeforeDataEdit = true
   gridView.editOptions.movable = (props.dragOn == true ? true : false)
   gridView.displayOptions.selectAndImmediateDrag = (props.dragOn == true ? true : false)
-  
+  gridView.displayOptions.selectionStyle = props.selectionStyle 
+
   for (let i = dataProvider.getRowCount() - 1; i >= 0; i--) { // 역순으로 순회
   const rowData = dataProvider.getJsonRow(i);
   if (rowData.deleted) {
@@ -335,6 +346,7 @@ gridView.setColumnLayout(layout1)
 
 
    dataProvider.onDataChanged = function (provider) {
+  
      gridView.commit();
      updatedrowData.value = [ ...dataProvider.getJsonRows()]
 
@@ -346,7 +358,7 @@ gridView.setColumnLayout(layout1)
 
  
   gridView.onCellItemClicked = function (grid, clickData) {
- 
+  
   if (clickData.itemIndex == undefined) {
     return ;
   }
@@ -356,6 +368,7 @@ gridView.setColumnLayout(layout1)
 }
 
 gridView.onCellClicked = function (grid, clickData) {
+ 
   if (clickData.itemIndex == undefined) {
     return ;
   }
@@ -363,10 +376,12 @@ gridView.onCellClicked = function (grid, clickData) {
   selectedRowData.value.index = clickData.itemIndex
   emit('clickedRowData', selectedRowData.value);
   emit('selectedIndex' ,clickData.itemIndex )
- 
+  selectedindex.value = clickData.itemIndex
+   
 }
 
 gridView.onColumnCheckedChanged = function (grid, col, chk) {
+  
      var rowCount = dataProvider.getRowCount();  // 전체 행의 개수
      console.log(rowCount)
      for (var i = 0; i < rowCount; i++) {
@@ -445,15 +460,22 @@ watch(() => props.addRow2, (newVal) => {
 
 watch(() => props.addRow3, (newVal) => {
   gridView.commit();
-  var values = {add: true , index: 0}; 
+  var values = {add: true }; 
+  let propertys = props.addrowProp.split(',')
+  for(var i=0 ; i<propertys.length ; i++){
+    values[propertys[i]] = undefined
+  }
   var dataRow = dataProvider.addRow(values);
-  gridView.setCurrent({dataRow: dataRow});
+  gridView.setCurrent({dataRow: dataRow });
+  props.rowData.push(values)
   const current = gridView.getCurrent();  // 현재 선택된 행 정보 가져오기
   const selectedRowIndex = current ? current.dataRow : null;
    if (selectedRowIndex !== null) {
     console.log("현재 선택된 인덱스:", selectedRowIndex);  // 선택된 행의 인덱스 출력
+    selectedindex.value = selectedRowIndex
   }
   emit('selectedIndex' ,selectedRowIndex )
+  
   // updatedrowData.value = [ ...dataProvider.getJsonRows()]
   // emit('updatedRowData', updatedrowData.value )
 
@@ -463,14 +485,15 @@ watch(() => props.deleteRow, (newVal) => {
     const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
     if (curr && curr.dataRow >= 0) {
       // 현재 데이터 행이 유효한 경우
+      props.rowData[curr.dataRow].deleted = true ;
       dataProvider.setValue(curr.dataRow, "deleted", true); // "deleted" 속성을 true로 설정
       dataProvider.removeRow(curr.dataRow);
+      gridView.commit();
     } else {
       console.warn("선택된 행이 없습니다.");
     }
-
     updatedrowData.value = [ ...dataProvider.getJsonRows()]
-     emit('updatedRowData', updatedrowData.value )
+    emit('updatedRowData', updatedrowData.value )
   
 });
 
@@ -520,6 +543,17 @@ watch(() => props.exporttoExcel, (newVal) => {
       footer: true,
       compatibility: true,
     })
+  
+});
+watch(() => props.initFocus, (newVal) => {
+  setTimeout(() => {
+    if(gridView !=undefined && gridView !=null ){
+    
+    gridView.clearCurrent();
+ }
+  },100)
+ 
+  
   
 });
 
@@ -581,36 +615,28 @@ const setupGrid = async () => {
     console.error("Failed to fetch data:", error);
   }
 };
-// watch(() => props.showGrid, () => funcshowGrid());
-// watch(() => props.searchWord, (newValue) => {
-//   const searchColId2 = props.searchColId.split(',')
- 
-//   if (newValue === '') {
-//     dataProvider.setRows( props.rowData );
-//     return ;
-//   };
-//   const filteredData = props.rowData.filter(
-//     item => 
-//   {
-     
-//     return searchColId2.some(colId => {
+
+watch(() => props.rowData, () => {
+  funcshowGrid().then(() =>{
+    setTimeout(function(){
+      if(selectedindex.value !='' && selectedindex.value !=undefined){
+    console.log(selectedindex.value)
+    gridView.setCurrent({ dataRow : selectedindex.value })
+  
+
+  }
+    },50) // 시간으로인한 미적용 이슈있음
     
-//       const value = item[colId].toString() || '';
-   
-//       return value.toLowerCase().includes(newValue.toString().toLowerCase())
-//     })
-//   }
-//   );
-//   dataProvider.setRows(filteredData.length ? filteredData : []);
-// });
-watch(() => props.rowData, () => funcshowGrid());
+})
+
+  
+});
 
 watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) => {
   const searchColId = props.searchColId.split(',')
   let searchColId2;
   let searchColValues;
-  console.log(props.searchColId2)
-  console.log(props.searchColValue2)
+
   if(props.searchColId2 !== ''){
      searchColId2 = props.searchColId2.split(',')
   }
@@ -619,8 +645,7 @@ watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) 
   }
   
   const searchWord = newValue.split(',')
- console.log(searchWord)
- console.log(searchColValues)
+
 
  if(searchColId2 == undefined){
    if (newValue === '') {
@@ -633,7 +658,7 @@ watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) 
      
     return searchColId.some(colId => {
     
-      const value = item[colId].toString() || '';
+      const value = item[colId] ? item[colId].toString() :'';
    
       return value.toLowerCase().includes(newValue.toString().toLowerCase())
     })
@@ -641,25 +666,16 @@ watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) 
   );
   dataProvider.setRows(filteredData.length ? filteredData : []);
  } else {
-  let check = false ;
-  for(var i=0 ; i< searchColValues.length ; i++){
-    if(searchColValues[i] != '0'){
-      check = true;
-    }
-  }
-  if(check == false){
-    dataProvider.setRows(props.rowData );
-    return ;
-  }
+
   const filteredData = props.rowData.filter(
     item => 
   {
      
     return searchColId2.every((colId,index) => {
     
-      const value = item[colId].toString() || '';
+      const value = item[colId] ? item[colId].toString() : '';
       const searchValue = (searchColValues[index] || '').toString();
-
+     
       if ( searchValue === '0') {
        return true;
        }
@@ -675,9 +691,9 @@ watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) 
     {
      
     return searchColId.some(colId => {
+       
+      const value = item[colId] ? item[colId].toString() : '';
     
-      const value = item[colId].toString() || '';
-   
       return value.toLowerCase().includes(props.searchWord.toString().toLowerCase())
     })
   }

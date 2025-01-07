@@ -15,8 +15,8 @@
   </div>
   <br>
   <div class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore3 @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd"  @storeNm="handlestoreNm" @GroupNm="handleGroupNm" @update:ischanged="handleinitAll">
-    </PickStore3> </div> 
+    <PickStore11 @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd"  @storeNm="handlestoreNm" @GroupNm="handleGroupNm" @update:ischanged="handleinitAll">
+    </PickStore11> </div> 
     
     <div v-if="addMenu" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center  z-50">
     <div class="bg-white p-6 rounded shadow-lg w-[60%] h-[60%] ">
@@ -72,11 +72,11 @@
     </div>
     </div>
     <div class="w-[100%] h-[60%] mt-16">
-      <Realgrid class="w-full h-full mt-2" :progname="'MST01_011INS_01_VUE'" :progid="5" :rowData="rowData5" @clickedRowData="clickedRowData3" :searchWord="searchword3" :searchColId="'lngCode,strName'" :searchColId2="'blnSetMenu,blnDeliveryYN,mainLngCode,subLngCode'" :searchColValue2="searchColValue2" @dblclickedRowData="dblclickedRowData"></Realgrid>
+      <Realgrid class="w-full h-full mt-2" :progname="'MST01_011INS_01_VUE'" :progid="5" :rowData="rowData5" @clickedRowData="clickedRowData3" :searchWord="searchword3" :searchColId="'lngCode,strName'" :searchColId2="'blnSetMenu,blnDeliveryYN,mainLngCode,subLngCode'" :searchColValue2="searchColValue2" @dblclickedRowData="dblclickedRowData" :selectionStyle="'singleRow'"></Realgrid>
     
     </div>
     <div class="flex justify-center space-x-3 w-full h-16 mt-5">
-      <button @click="confirmaddScreenKey()" class="mt-4 p-2 bg-blue-500 text-white rounded">추가</button>
+      <button @click="clickaddMenu1(selectedaddMenu)" class="mt-4 p-2 bg-blue-500 text-white rounded">추가</button>
       <button @click="closeMenus" class="mt-4 p-2 bg-blue-500 text-white rounded">닫기</button>
     </div>
     </div>
@@ -109,18 +109,18 @@
     </div>
     </div>
     <div class="w-[100%] h-[60%] mt-16">
-      <Realgrid class="w-full h-full mt-2" :progname="'MST01_011INS_01_VUE'" :progid="1" :rowData="rowData6" @clickedRowData="clickedRowData3" :searchWord="searchword4" :searchColId="'lngCode,strName'" @dblclickedRowData="dblclickedRowData2"></Realgrid>
+      <Realgrid class="w-full h-full mt-2" :progname="'MST01_011INS_01_VUE'" :progid="1" :rowData="rowData6" @clickedRowData="clickedRowData4" :searchWord="searchword4" :searchColId="'lngCode,strName'" :searchColValues="searchColValues" @dblclickedRowData="dblclickedRowData2" :selectionStyle="'singleRow'" :rowStateeditable="false"></Realgrid>
     
     </div>
     <div class="flex justify-center space-x-3 w-full h-16 mt-5">
-      <button @click="confirmaddScreenKey()" class="mt-4 p-2 bg-blue-500 text-white rounded">추가</button>
+      <button @click="clickaddMenu2(selectedaddMenu2)" class="mt-4 p-2 bg-blue-500 text-white rounded">추가</button>
       <button @click="closeMenus2" class="mt-4 p-2 bg-blue-500 text-white rounded">닫기</button>
     </div>
     </div>
     
   </div>
   
-  <span class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[70%]  z-40"><h1 class="font-bold text-xl z-40">옵션 정보</h1></span>
+  <span class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[70%]  z-40"><h1 class="font-bold text-xl z-40">옵션 {{ currentMenu == true ? '그룹' : '' }} 정보</h1></span>
   <div class="flex h-4/5 w-full -mt-5">
   <div class="flex flex-col w-full h-full">
   <div class="flex justify-between mt-0 ml-10 w-[65%] border-b  border-b-gray-300">
@@ -145,7 +145,7 @@
     <div class="px-1 py-1 border border-gray-300 rounded-r-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchOption" v-model="searchword1"></div>
   </div>
     <div class="ml-10 mt-5 w-full h-[140%]">
-    <Realgrid class="w-full h-full mt-2" :progname="'MST01_011INS_01_VUE'" :progid="1" :rowData="rowData1" @clickedRowData="clickedRowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :deleteRow="deleterow1" :addRow3="addrow1" @updatedRowData="updatedRowData3" @selectedIndex="selectedIndex"></Realgrid>
+    <Realgrid class="w-full h-full mt-2" :progname="'MST01_011INS_01_VUE'" :progid="1" :rowData="rowData1" @clickedRowData="clickedRowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :deleteRow="deleterow1" :addRow3="addrow1"  @selectedIndex="selectedIndex" :addrowProp="addrowProp" :selectionStyle="'singleRow'" :rowStateeditable="false" :initFocus="initFocus"></Realgrid>
     </div>
   </div>
 
@@ -156,36 +156,37 @@
     <div class="px-1 py-1 border border-gray-300 rounded-r-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchOption2" v-model="searchword2" ></div>
   </div>
     <div class="ml-10 mt-5 w-full h-[140%]">
-    <Realgrid class="w-full h-full mt-2" :progname="'MST01_011INS_01_VUE'" :progid="2" :rowData="rowData3" @clickedRowData="clickedRowData2" :deleteRow="deleterow2" :searchWord="searchword2" :searchColId="'lngCode,strName'" :addRow="addrow3"></Realgrid>
+    <Realgrid class="w-full h-full mt-2" :progname="'MST01_011INS_01_VUE'" :progid="2" :rowData="rowData3" @clickedRowData="clickedRowData2" :deleteRow="deleterow2" :searchWord="searchword2" :searchColId="'lngCode,strName'" :addRow3="addrow3"  @selectedIndex="selectedIndex2" :addrowProp="addrowProp2" :selectionStyle="'singleRow'" :rowStateeditable="false" :initFocus="initFocus"></Realgrid>
     </div>
   </div>
   
   <div class="h-full w-1/3 flex flex-col pl-10" v-show="currentMenu == false">
      <div class="grid grid-cols-[1fr,3fr] grid-rows-4  items-center w-full h-1/5 rounded-lg ">
         <div class="border border-black p-2 w-full h-full rounded-tl-lg flex items-center justify-center text-blue-500 font-semibold bg-gray-100">*옵션코드</div>
-        <div class="border border-black p-2 w-full h-full rounded-tr-lg flex items-center justify-center"><input type="text" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionCd" :disabled="!isNewColumn" @input="changeOptionManage4"></div>
+        <div class="border border-black p-2 w-full h-full rounded-tr-lg flex items-center justify-center"><input type="number" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionCd" :disabled="(!isNewColumn || !clickrowData1)" @input="changeOptionManage4"></div>
         <div class="border border-black p-2 w-full h-full flex items-center justify-center text-blue-500 font-semibold bg-gray-100">*옵션명</div>
-        <div class="border border-black p-2 w-full h-full flex items-center justify-center"><input type="text" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionNm" @input="changeOptionManage1"></div>
+        <div class="border border-black p-2 w-full h-full flex items-center justify-center"><input type="text" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionNm" @input="changeOptionManage1" :disabled="!clickrowData1"></div>
         <div class="border border-black p-2 w-full h-full flex items-center justify-center text-blue-500 font-semibold bg-gray-100">*필수/선택</div>
-        <div class="border border-black p-2 w-full h-full flex items-center justify-start"><input type="radio" name="choice" v-model="selectedOption" value="0" @input="changeOptionManage2">필수<input type="radio" name="choice" v-model="selectedOption" value="1" @input="changeOptionManage2">선택</div>
+        <div class="border border-black p-2 w-full h-full flex items-center justify-start"><label><input type="radio" name="choice" v-model="selectedOption" value="0" @input="changeOptionManage2" :disabled="!clickrowData1">필수</label>
+         <label><input type="radio" name="choice" v-model="selectedOption" value="1" @input="changeOptionManage2" :disabled="!clickrowData1">선택</label></div>
         <div class="border border-black p-2 w-full h-full rounded-bl-lg flex items-center justify-center text-blue-500 font-semibold bg-gray-100">*옵션 선택갯수</div>
-        <div class="border border-black p-2 w-full h-full rounded-br-lg flex items-center justify-center"><input type="text" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionNo" @input="changeOptionManage3"></div>
+        <div class="border border-black p-2 w-full h-full rounded-br-lg flex items-center justify-center"><input type="number" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionNo" @input="changeOptionManage3" :disabled="!clickrowData1"></div>
      </div>
 <div class="mt-5 w-full h-[73%] ">
       <div class="flex justify-between"><span class="font-bold text-xl flex justify-start">옵션 구성</span>
     <div class="flex gap-1"><button class="whitebutton" @click="addMenus">추가</button><button class="whitebutton" @click="deleteRowData2">삭제</button><button class="whitebutton" @click="deleteAll">초기화</button></div></div>
-     <Realgrid :progname="'MST01_011INS_01_VUE'" :progid="4" :rowData="filteredrowData2" class="mt-5" :dragOn="true" @updatedRowData="updatedRowData" :notsoftDelete="true" :deleteRow="deleterow3" :deleteAll="deleteAll1" :addRow="addrow4"></Realgrid>
+     <Realgrid :progname="'MST01_011INS_01_VUE'" :progid="4" :rowData="filteredrowData2" class="mt-5" :dragOn="true" @updatedRowData="updatedRowData" :notsoftDelete="true" :deleteRow="deleterow3" :deleteAll="deleteAll1" :addRow="addrow4" ></Realgrid>
     </div>
   </div>
 
   <div class="h-full w-1/3 flex flex-col pl-10" v-show="currentMenu == true">
-     <div class="grid grid-cols-[1fr,3fr] grid-rows-3  items-center w-full h-1/5 rounded-lg ">
+     <div class="grid grid-cols-[1fr,3fr] grid-rows-3  items-center w-full h-[15%] rounded-lg ">
         <div class="border border-black p-2 w-full h-full rounded-tl-lg flex items-center justify-center text-blue-500 font-semibold bg-gray-100">*옵션그룹코드</div>
-        <div class="border border-black p-2 w-full h-full rounded-tr-lg flex items-center justify-center"><input type="text" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionGroupCd" disabled></div>
+        <div class="border border-black p-2 w-full h-full rounded-tr-lg flex items-center justify-center"><input type="number" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionGroupCd" :disabled="!isNewColumn2 || !clickrowData2" @input="changeOptionGroupCd"></div>
         <div class="border border-black p-2 w-full h-full flex items-center justify-center text-blue-500 font-semibold bg-gray-100 rounded-bl-lg">*옵션그룹명</div>
-        <div class="border border-black p-2 w-full h-full flex items-center justify-center rounded-br-lg"><input type="text" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionGroupNm" @input="updateOptionNm"></div>
+        <div class="border border-black p-2 w-full h-full flex items-center justify-center rounded-br-lg"><input type="text" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionGroupNm" @input="updateOptionNm" :disabled="!clickrowData2"></div>
       </div>
-<div class="mt-5 w-full h-[73%] ">
+<div class="mt-11 w-full h-[73%] ">
       <div class="flex justify-between"><span class="font-bold text-xl flex justify-start">옵션그룹 구성</span>
     <div class="flex gap-1"><button class="whitebutton" @click="addRowData4">추가</button><button class="whitebutton" @click="deleteRowData4">삭제</button><button class="whitebutton" @click="deleteAlls">초기화</button></div></div>
      <Realgrid :progname="'MST01_011INS_01_VUE'" :progid="3" :rowData="filteredrowData4" @updatedRowData="updatedRowData2" class="mt-5" :dragOn="true" :notsoftDelete="true" :deleteRow="deleterow4" :deleteAll="deleteAll2" :addRow="addrow2"></Realgrid>
@@ -206,12 +207,11 @@
   import { ref, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';
   import { deletetablePosMenuKey, get_category_info, getAllOptionManageData, getCategoryInfo, getMenuKeyList, getMenuList, getMostColumnMenuList, getMultiLingual, getScreenList, getTablePosMenuKey, getTLUList, saveAllMenuKey, saveOptions, saveScreenKeys, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
-  import { VueDraggableNext } from 'vue-draggable-next';
-  import Swal from 'sweetalert2';
-  import {  GridView, LocalDataProvider } from 'realgrid';
 
+  import Swal from 'sweetalert2';
 import PickStore3 from '@/components/pickStore3.vue';
 import Realgrid from '@/components/realgrid.vue';
+import PickStore11 from '@/components/pickStore11.vue';
   
 
   // 더미 데이터
@@ -227,15 +227,15 @@ import Realgrid from '@/components/realgrid.vue';
   const rowData6 = ref([])
   const filteredrowData4 = ref([])
   const ScreenKeys = ref();
-  
-  const searchColValue2 = ref('')
+  const initFocus = ref(false)
+  const searchColValue2 = ref('0,0,0,0')
   const forsearchMain = ref('0')
   const forsearchSub = ref('0')
   const searchword2 = ref()
   const searchword4 = ref()
   const optionGroupCd = ref('')
   const optionGroupNm = ref('')
-  const selectedOption = ref(false)
+  const selectedOption = ref()
   // 드래그 가능한 요소를 설정하는 메서드
 
   const selectedGroupNm = ref();
@@ -308,7 +308,8 @@ import Realgrid from '@/components/realgrid.vue';
   const optionCd = ref()
   const optionNm = ref()
   const optionNo = ref()
-
+  const addrowProp = ref('lngCode,strName,blnMustSel,intMultiple,lngChainMenu1,lngChainMenu2,lngChainMenu3,lngChainMenu4,lngChainMenu5,lngChainMenu6,lngChainMenu7,lngChainMenu8,lngChainMenu9,lngChainMenu10,lngChainMenu11,lngChainMenu12,lngChainMenu13,lngChainMenu14,lngChainMenu15,lngChainMenu16,lngChainMenu17,lngChainMenu18,lngChainMenu19,lngChainMenu20,lngChainMenu21')
+  const addrowProp2 = ref('lngCode,strName,lngChainGroup1,lngChainGroup2,lngChainGroup3,lngChainGroup4,lngChainGroup5,lngChainGroup6,lngChainGroup7,lngChainGroup8,lngChainGroup9,lngChainGroup10,lngChainGroup11,lngChainGroup12,lngChainGroup13,lngChainGroup14,lngChainGroup15,lngChainGroup16,lngChainGroup17,lngChainGroup18,lngChainGroup19,lngChainGroup20')
 
   const showMenus = (newValue) => {
     if(newValue ==1){
@@ -318,11 +319,13 @@ import Realgrid from '@/components/realgrid.vue';
     }
   }
   const isNewColumn = ref(false)
+  const isNewColumn2 = ref(false)
+  const clickrowData1 = ref(false)
   const clickedRowData = (newValue) => {
+    clickrowData1.value = true
     console.log(newValue)
     selectedOptionCd.value = Number(newValue[0])
     isNewColumn.value = newValue[26] == true ? true : false
-    console.log(selectedOptionCd.value)
     filteredrowData2.value = []
     for(var i= 0 ; i< 21 ; i++){
         if(newValue[4+i] != '0'){
@@ -336,20 +339,26 @@ import Realgrid from '@/components/realgrid.vue';
         }
     }
     selectedOption.value = newValue[2] == '필수' ? 0 : 1 ;
-    optionCd.value = newValue[0]
+    optionCd.value = Number(newValue[0])
     optionNm.value = newValue[1]
     optionNo.value = newValue[3]
   }
   const selectedOptionGroupCd = ref()
+  const clickrowData2 = ref(false)
   const clickedRowData2 = (newValue) => {
     console.log(newValue)
+    clickrowData2.value = true
     selectedOptionGroupCd.value = newValue[0];
+    isNewColumn2.value = newValue[23] == true ? true : false
     filteredrowData4.value = []
     for(var i= 0 ; i< 20 ; i++){
         if(newValue[2+i] != '0'){
             console.log(rowData4.value)
             const seleced = rowData4.value.find(item => item.lngCode == Number(newValue[2+i]))
-            filteredrowData4.value.push({ lngCode : seleced.lngCode , strName : seleced.strName })
+            if(seleced != undefined){
+              filteredrowData4.value.push({ lngCode : seleced.lngCode , strName : seleced.strName })
+            }
+            
             console.log(filteredrowData4.value)
         }
     }
@@ -357,8 +366,13 @@ import Realgrid from '@/components/realgrid.vue';
     optionGroupCd.value = newValue[0]
     optionGroupNm.value = newValue[1]
   }
+  const selectedaddMenu = ref()
+  const selectedaddMenu2 = ref()
   const clickedRowData3 = (newValue) => {
-    console.log(newValue)
+    selectedaddMenu.value = newValue
+  }
+  const clickedRowData4 = (newValue) => {
+    selectedaddMenu2.value = newValue
    
   }
   const searchWord3 = (e) => {
@@ -388,7 +402,16 @@ import Realgrid from '@/components/realgrid.vue';
  
   store.state.loading = true;
   try {
-     
+    optionNo.value = ''
+    selectedOption.value = ''
+    optionNm.value = ''
+    optionCd.value = ''
+    optionGroupNm.value = ''
+    optionGroupCd.value = ''
+   
+    filteredrowData2.value=[]
+    filteredrowData4.value=[]
+    
       const res3 = await getAllOptionManageData( groupCd.value,nowStoreCd.value )
       const res4 = await getMostColumnMenuList( groupCd.value,nowStoreCd.value )
       console.log(res3)
@@ -408,7 +431,7 @@ import Realgrid from '@/components/realgrid.vue';
   } catch (error) {
       afterSearch.value = false;
   } finally {
-      
+      initFocus.value = !initFocus.value
       store.state.loading = false; // 로딩 상태 종료
                modified.value = false ;
                afterCategory.value = false;
@@ -431,6 +454,7 @@ import Realgrid from '@/components/realgrid.vue';
  
 
   const saveButton = async() => {
+
     if(afterSearch.value == false) {
       Swal.fire({
         title: '경고',
@@ -450,6 +474,30 @@ import Realgrid from '@/components/realgrid.vue';
       return ;
     }
   
+     const undefinededrowlength = rowData1.value.filter(item => item.lngCode == '' || item.lngCode == undefined || item.strName == undefined || item.strName == '' ||  item.intMultiple == undefined ||  item.intMultiple == '' ||  item.blnMustSel == undefined ||  item.blnMustSel == '').length
+     const undefinededrow2length = rowData3.value.filter(item => item.lngCode == '' || item.lngCode == undefined || item.strName == undefined || item.strName == '').length
+    if(undefinededrowlength >0) {
+      Swal.fire({
+        title: '경고',
+        text: '옵션 정보에 빈 값이 존재합니다',
+        icon: 'warning',
+        confirmButtonText: '확인'
+      })
+      currentMenu.value = false ;
+      return ;
+    }
+  
+    if(undefinededrow2length >0) {
+      Swal.fire({
+        title: '경고',
+        text: '옵션 그룹 정보에 빈 값이 존재합니다',
+        icon: 'warning',
+        confirmButtonText: '확인'
+      })
+      currentMenu.value = true ;
+      return ;
+    }
+  
    
     Swal.fire({
       title: '저장',
@@ -463,54 +511,55 @@ import Realgrid from '@/components/realgrid.vue';
       store.state.loading = true;
     try {
        console.log(rowData1.value)
-       const lngCodes = rowData1.value.map(item => item.lngCode)
-       const strNames = rowData1.value.map(item => item.strName)
-       const blnMustSels = rowData1.value.map(item => item.blnMustSel =='필수' ? 0 : 1)
-       const intMultiples = rowData1.value.map(item => item.intMultiple)
-       const lngChainMenu1 = rowData1.value.map(item => item.lngChainMenu1);
-const lngChainMenu2 = rowData1.value.map(item => item.lngChainMenu2);
-const lngChainMenu3 = rowData1.value.map(item => item.lngChainMenu3);
-const lngChainMenu4 = rowData1.value.map(item => item.lngChainMenu4);
-const lngChainMenu5 = rowData1.value.map(item => item.lngChainMenu5);
-const lngChainMenu6 = rowData1.value.map(item => item.lngChainMenu6);
-const lngChainMenu7 = rowData1.value.map(item => item.lngChainMenu7);
-const lngChainMenu8 = rowData1.value.map(item => item.lngChainMenu8);
-const lngChainMenu9 = rowData1.value.map(item => item.lngChainMenu9);
-const lngChainMenu10 = rowData1.value.map(item => item.lngChainMenu10);
-const lngChainMenu11 = rowData1.value.map(item => item.lngChainMenu11);
-const lngChainMenu12 = rowData1.value.map(item => item.lngChainMenu12);
-const lngChainMenu13 = rowData1.value.map(item => item.lngChainMenu13);
-const lngChainMenu14 = rowData1.value.map(item => item.lngChainMenu14);
-const lngChainMenu15 = rowData1.value.map(item => item.lngChainMenu15);
-const lngChainMenu16 = rowData1.value.map(item => item.lngChainMenu16);
-const lngChainMenu17 = rowData1.value.map(item => item.lngChainMenu17);
-const lngChainMenu18 = rowData1.value.map(item => item.lngChainMenu18);
-const lngChainMenu19 = rowData1.value.map(item => item.lngChainMenu19);
-const lngChainMenu20 = rowData1.value.map(item => item.lngChainMenu20);
-const lngChainMenu21 = rowData1.value.map(item => item.lngChainMenu21);
+       console.log(rowData3.value)
+       const lngCodes = rowData1.value.filter(item => item.deleted != true).map(item => item.lngCode)
+       const strNames = rowData1.value.filter(item => item.deleted != true).map(item => item.strName)
+       const blnMustSels = rowData1.value.filter(item => item.deleted != true).map(item => item.blnMustSel =='필수' ? 0 : 1)
+       const intMultiples = rowData1.value.filter(item => item.deleted != true).map(item => item.intMultiple)
+       const lngChainMenu1 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu1);
+const lngChainMenu2 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu2);
+const lngChainMenu3 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu3);
+const lngChainMenu4 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu4);
+const lngChainMenu5 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu5);
+const lngChainMenu6 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu6);
+const lngChainMenu7 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu7);
+const lngChainMenu8 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu8);
+const lngChainMenu9 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu9);
+const lngChainMenu10 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu10);
+const lngChainMenu11 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu11);
+const lngChainMenu12 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu12);
+const lngChainMenu13 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu13);
+const lngChainMenu14 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu14);
+const lngChainMenu15 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu15);
+const lngChainMenu16 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu16);
+const lngChainMenu17 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu17);
+const lngChainMenu18 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu18);
+const lngChainMenu19 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu19);
+const lngChainMenu20 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu20);
+const lngChainMenu21 = rowData1.value.filter(item => item.deleted != true).map(item => item.lngChainMenu21);
 
-const lngCodes2 = rowData3.value.map(item => item.lngCode)
-const strNames2 = rowData3.value.map(item => item.strName)
-const lngChainGroup1 = rowData3.value.map(item => item.lngChainGroup1);
-const lngChainGroup2 = rowData3.value.map(item => item.lngChainGroup2);
-const lngChainGroup3 = rowData3.value.map(item => item.lngChainGroup3);
-const lngChainGroup4 = rowData3.value.map(item => item.lngChainGroup4);
-const lngChainGroup5 = rowData3.value.map(item => item.lngChainGroup5);
-const lngChainGroup6 = rowData3.value.map(item => item.lngChainGroup6);
-const lngChainGroup7 = rowData3.value.map(item => item.lngChainGroup7);
-const lngChainGroup8 = rowData3.value.map(item => item.lngChainGroup8);
-const lngChainGroup9 = rowData3.value.map(item => item.lngChainGroup9);
-const lngChainGroup10 = rowData3.value.map(item => item.lngChainGroup10);
-const lngChainGroup11 = rowData3.value.map(item => item.lngChainGroup11);
-const lngChainGroup12 = rowData3.value.map(item => item.lngChainGroup12);
-const lngChainGroup13 = rowData3.value.map(item => item.lngChainGroup13);
-const lngChainGroup14 = rowData3.value.map(item => item.lngChainGroup14);
-const lngChainGroup15 = rowData3.value.map(item => item.lngChainGroup15);
-const lngChainGroup16 = rowData3.value.map(item => item.lngChainGroup16);
-const lngChainGroup17 = rowData3.value.map(item => item.lngChainGroup17);
-const lngChainGroup18 = rowData3.value.map(item => item.lngChainGroup18);
-const lngChainGroup19 = rowData3.value.map(item => item.lngChainGroup19);
-const lngChainGroup20 = rowData3.value.map(item => item.lngChainGroup20);
+const lngCodes2 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngCode)
+const strNames2 = rowData3.value.filter(item => item.deleted != true).map(item => item.strName)
+const lngChainGroup1 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup1);
+const lngChainGroup2 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup2);
+const lngChainGroup3 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup3);
+const lngChainGroup4 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup4);
+const lngChainGroup5 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup5);
+const lngChainGroup6 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup6);
+const lngChainGroup7 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup7);
+const lngChainGroup8 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup8);
+const lngChainGroup9 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup9);
+const lngChainGroup10 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup10);
+const lngChainGroup11 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup11);
+const lngChainGroup12 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup12);
+const lngChainGroup13 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup13);
+const lngChainGroup14 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup14);
+const lngChainGroup15 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup15);
+const lngChainGroup16 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup16);
+const lngChainGroup17 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup17);
+const lngChainGroup18 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup18);
+const lngChainGroup19 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup19);
+const lngChainGroup20 = rowData3.value.filter(item => item.deleted != true).map(item => item.lngChainGroup20);
 
 
 const res = await saveOptions(groupCd.value , nowStoreCd.value , lngCodes.join(','), strNames.join(','), blnMustSels.join(','),
@@ -522,6 +571,7 @@ const res = await saveOptions(groupCd.value , nowStoreCd.value , lngCodes.join('
  lngChainGroup6.join(','), lngChainGroup7.join(','), lngChainGroup8.join(','), lngChainGroup9.join(','), lngChainGroup10.join(','), lngChainGroup11.join(','),
  lngChainGroup12.join(','), lngChainGroup13.join(','), lngChainGroup14.join(','), lngChainGroup15.join(','), lngChainGroup16.join(','), lngChainGroup17.join(','),
  lngChainGroup18.join(','), lngChainGroup19.join(','), lngChainGroup20.join(','))
+ 
        console.log(res)
   } catch (error) {
       
@@ -607,41 +657,10 @@ change.lngChainGroup20 = newValue[19] == undefined ? 0 : newValue[19].lngCode;
     rowData3.value = [...rowData3.value] 
     console.log(newValue)
  }
- const updatedRowData3 = (newValue) => {
-    console.log(newValue)
-   
-    const change = rowData1.value.find(item => item.lngCode == Number(optionCd.value))
-    if(change){
-        change.lngChainMenu1 = newValue[0] == undefined ? 0 : newValue[0].lngCode;
-change.lngChainMenu2 = newValue[1] == undefined ? 0 : newValue[1].lngCode;
-change.lngChainMenu3 = newValue[2] == undefined ? 0 : newValue[2].lngCode;
-change.lngChainMenu4 = newValue[3] == undefined ? 0 : newValue[3].lngCode;
-change.lngChainMenu5 = newValue[4] == undefined ? 0 : newValue[4].lngCode;
-change.lngChainMenu6 = newValue[5] == undefined ? 0 : newValue[5].lngCode;
-change.lngChainMenu7 = newValue[6] == undefined ? 0 : newValue[6].lngCode;
-change.lngChainMenu8 = newValue[7] == undefined ? 0 : newValue[7].lngCode;
-change.lngChainMenu9 = newValue[8] == undefined ? 0 : newValue[8].lngCode;
-change.lngChainMenu10 = newValue[9] == undefined ? 0 : newValue[9].lngCode;
-change.lngChainMenu11 = newValue[10] == undefined ? 0 : newValue[10].lngCode;
-change.lngChainMenu12 = newValue[11] == undefined ? 0 : newValue[11].lngCode;
-change.lngChainMenu13 = newValue[12] == undefined ? 0 : newValue[12].lngCode;
-change.lngChainMenu14 = newValue[13] == undefined ? 0 : newValue[13].lngCode;
-change.lngChainMenu15 = newValue[14] == undefined ? 0 : newValue[14].lngCode;
-change.lngChainMenu16 = newValue[15] == undefined ? 0 : newValue[15].lngCode;
-change.lngChainMenu17 = newValue[16] == undefined ? 0 : newValue[16].lngCode;
-change.lngChainMenu18 = newValue[17] == undefined ? 0 : newValue[17].lngCode;
-change.lngChainMenu19 = newValue[18] == undefined ? 0 : newValue[18].lngCode;
-change.lngChainMenu20 = newValue[19] == undefined ? 0 : newValue[19].lngCode;
-change.lngChainMenu21 = newValue[20] == undefined ? 0 : newValue[20].lngCode;
-            console.log(change)
-       
-    }
-    rowData1.value = [...rowData1.value] 
-   
- }
+
  
   const changeOptionManage1 = (e) => {
-    const change = rowData1.value.find(item => item.lngCode == Number(optionCd.value))
+    const change = rowData1.value.find((item,index) => index == selectedindex.value)
     if(change){
             change.strName = e.target.value
            
@@ -650,7 +669,7 @@ change.lngChainMenu21 = newValue[20] == undefined ? 0 : newValue[20].lngCode;
     rowData1.value = [...rowData1.value] 
   }
   const changeOptionManage2 = (e) => {
-    const change = rowData1.value.find(item => item.lngCode == Number(optionCd.value))
+    const change = rowData1.value.find((item,index) => index == selectedindex.value)
     if(change){
             change.blnMustSel = e.target.value == 0 ? '필수' : '선택'
            
@@ -659,21 +678,25 @@ change.lngChainMenu21 = newValue[20] == undefined ? 0 : newValue[20].lngCode;
     rowData1.value = [...rowData1.value] 
   }
   const changeOptionManage3 = (e) => {
-    const change = rowData1.value.find(item => item.lngCode == Number(optionCd.value))
+    const confirmdata = e.target.value.replace(/[^0-9]/g, "");
+    const change = rowData1.value.find((item,index) => index == selectedindex.value)
+   
     if(change){
-            change.intMultiple = e.target.value
-           
-       
+        change.intMultiple = confirmdata
+          
     }
     rowData1.value = [...rowData1.value] 
   }
   const changeOptionManage4 = (e) => {
     console.log(rowData1.value)
+    const confirmdata = e.target.value.replace(/[^0-9]/g, "");
     const change = rowData1.value.find((item,index) => index == selectedindex.value)
     if(change){
-         change.lngCode = e.target.value
+         change.lngCode = confirmdata
     }
     rowData1.value = [...rowData1.value] 
+    // optionCd.value = e.target.value
+    // console.log(optionCd.value)
   }
 
   const searchOption = (e) => {
@@ -691,12 +714,21 @@ change.lngChainMenu21 = newValue[20] == undefined ? 0 : newValue[20].lngCode;
     deleteAll2.value = !deleteAll2.value
   }
   const updateOptionNm = (e) => {
-      const Nm = e.target.value 
-      const change = rowData3.value.find(item => item.lngCode == Number(optionGroupCd.value))
+     const confirmdata = e.target.value
+      const change = rowData3.value.find((item,index )=> index == selectedindex2.value)
       if(change){
-            change.strName = Nm
+            change.strName = confirmdata
            
-       
+    }
+    rowData3.value = [...rowData3.value] 
+
+  }
+  const changeOptionGroupCd = (e) => {
+      const Nm = e.target.value 
+      const change = rowData3.value.find((item,index )=> index == selectedindex2.value)
+      if(change){
+            change.lngCode = Nm
+           
     }
     rowData3.value = [...rowData3.value] 
 
@@ -718,6 +750,13 @@ change.lngChainMenu21 = newValue[20] == undefined ? 0 : newValue[20].lngCode;
       })
       return;
     }
+    isNewColumn.value = true;
+    optionNo.value = ''
+    selectedOption.value = ''
+    optionNm.value = ''
+    optionCd.value = ''
+    filteredrowData2.value = []
+    clickrowData1.value = true
     addrow1.value = !addrow1.value
    }
    const addRowData2 = () => {
@@ -738,6 +777,11 @@ change.lngChainMenu21 = newValue[20] == undefined ? 0 : newValue[20].lngCode;
       })
       return;
     }
+    optionGroupNm.value = ''
+    optionGroupCd.value = ''
+    filteredrowData4.value = []
+    isNewColumn2.value = true;
+    clickrowData2.value = true
     addrow3.value = !addrow3.value
    }
    const addRowData4 = () => {
@@ -748,6 +792,14 @@ change.lngChainMenu21 = newValue[20] == undefined ? 0 : newValue[20].lngCode;
       })
       return;
     }
+    if(optionGroupCd.value =='' || optionGroupCd.value==undefined){
+      Swal.fire({
+        title: '옵션그룹코드를 먼저 선택하세요.',
+        confirmButtonText: '확인',
+      })
+      return;
+    }
+ 
     selectMenuGroup.value = true;
    }
    const deleteRowData1 = () => {
@@ -792,7 +844,22 @@ change.lngChainMenu21 = newValue[20] == undefined ? 0 : newValue[20].lngCode;
    }
 
    const addMenus = () => {
-    addMenu.value = true ;
+    if(afterSearch.value == false){
+      Swal.fire({
+        title: '조회를 먼저 해주세요.',
+        confirmButtonText: '확인',
+      })
+      return;
+    }
+    if(optionCd.value=='' || optionCd.value == undefined){
+      Swal.fire({
+        title: '옵션을 먼저 선택하세요.',
+        confirmButtonText: '확인',
+      })
+      return ;
+    }
+ 
+     addMenu.value = true ;
    }
    const closeMenus = () => {
     addMenu.value = false ;
@@ -816,24 +883,56 @@ change.lngChainMenu21 = newValue[20] == undefined ? 0 : newValue[20].lngCode;
       newMenuSort +',' + newDeliverySort +','+ newMainCategory+',' + newSubCategory;
   }
 );
+
+const clickaddMenu1 =(newValue) => {
+   if(newValue == undefined || newValue ==''){
+    Swal.fire({
+      title: '메뉴를 선택하세요.',
+      confirmButtonText: '확인',
+    })
+    return ;
+   }
+   dblclickedRowData(newValue)
+}
+const clickaddMenu2 =(newValue) => {
+   if(newValue == undefined || newValue ==''){
+    Swal.fire({
+      title: '메뉴그룹을 선택하세요.',
+      confirmButtonText: '확인',
+    })
+    return ;
+   }
+   dblclickedRowData2(newValue)
+}
   const dblclickedRowData = (newValue) => {
-    const a = rowData1.value.find(item => item.lngCode == selectedOptionCd.value)
+    console.log(optionCd.value)
+    const a = rowData1.value.find(item => item.lngCode == optionCd.value)
+    const rollbackdata = [...filteredrowData2.value]
     filteredrowData2.value = []
-    console.log(newValue)
+    console.log(a)
     const keys = Object.keys(a);
     for(const key of keys){
       if(key.startsWith('lngChainMenu')){
-       
-        console.log(a[key])
-        if(a[key] == '0'){
+        if(a[key] == Number(newValue[2]) ){
+          Swal.fire({
+            title: '이미 등록된 메뉴코드입니다.',
+            confirmButtonText: '확인',
+          })
+          filteredrowData2.value = rollbackdata
+          return ;
+        }
+        
+        if(a[key] == '0' || a[key] == undefined|| a[key] == NaN ){
           a[key] = Number(newValue[2])
           const seleced = rowData2.value.find(item => item.lngCode == Number(newValue[2]))
-          filteredrowData2.value.push({ lngCode : seleced.lngCode , strName : seleced.strName , lngPrice : seleced.lngPrice})
-    
-          break;
+          if(seleced != undefined){
+            filteredrowData2.value.push({ lngCode : seleced.lngCode , strName : seleced.strName , lngPrice : seleced.lngPrice})
+            break;
+          }
+     
         } else {
           const seleced = rowData2.value.find(item => item.lngCode == a[key])
-         if(seleced != undefined){
+          if(seleced != undefined){
               filteredrowData2.value.push({ lngCode : seleced.lngCode , strName : seleced.strName , lngPrice : seleced.lngPrice})
           }
         }
@@ -841,38 +940,28 @@ change.lngChainMenu21 = newValue[20] == undefined ? 0 : newValue[20].lngCode;
     }
     rowData1.value = [...rowData1.value];
    
-    
-    console.log(a)
-    for(var i=0 ; i < 21 ; i++){
-      //if(a.)
-    }
-  
-  
-
    
     closeMenus()
   }
   const dblclickedRowData2 = (newValue) => {
-    const a = rowData3.value.find(item => item.lngCode == selectedOptionGroupCd.value)
+    const a = rowData3.value.find(item => item.lngCode == optionGroupCd.value)
+   
     filteredrowData4.value = []
-    console.log(rowData3.value)
-    console.log(rowData4.value)
-    console.log(newValue)
-    console.log(a)
     const keys = Object.keys(a);
     for(const key of keys){
       if(key.startsWith('lngChainGroup')){
-       
+   
         console.log(a[key])
-        if(a[key] == '0'){
+        if(a[key] == '0' ||a[key] == undefined || a[key]==NaN){
           a[key] = Number(newValue[0])
           filteredrowData4.value.push({ lngCode : newValue[0], strName : newValue[1] })
-    
           break;
         } else {
-       
-       
-              filteredrowData4.value.push({ lngCode : newValue[0] , strName : newValue[1]})
+          const seleced = rowData4.value.find(item => item.lngCode == a[key])
+          if(seleced != undefined){
+            filteredrowData4.value.push({ lngCode : seleced.lngCode , strName : seleced.strName})
+          }
+          
           
         }
       }
@@ -886,9 +975,14 @@ change.lngChainMenu21 = newValue[20] == undefined ? 0 : newValue[20].lngCode;
     closeMenus2()
   }
   const selectedindex = ref(0)
+  const selectedindex2 = ref(0)
   const selectedIndex = (newValue) => {
     selectedindex.value = newValue
     console.log(selectedindex.value);
+  }
+  const selectedIndex2 = (newValue) => {
+    selectedindex2.value = newValue
+    console.log(selectedindex2.value);
   }
   const handleinitAll = (newvalue) => {
       MenuGroup.value =[]
