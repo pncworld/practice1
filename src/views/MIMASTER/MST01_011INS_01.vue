@@ -163,7 +163,7 @@
   <div class="h-full w-1/3 flex flex-col pl-10" v-show="currentMenu == false">
      <div class="grid grid-cols-[1fr,3fr] grid-rows-4  items-center w-full h-1/5 rounded-lg ">
         <div class="border border-black p-2 w-full h-full rounded-tl-lg flex items-center justify-center text-blue-500 font-semibold bg-gray-100">*옵션코드</div>
-        <div class="border border-black p-2 w-full h-full rounded-tr-lg flex items-center justify-center"><input type="number" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionCd" :disabled="(!isNewColumn || !clickrowData1)" @input="changeOptionManage4"></div>
+        <div class="border border-black p-2 w-full h-full rounded-tr-lg flex items-center justify-center"><input type="number" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionCd" :disabled="(!isNewColumn || !clickrowData1)" @blur="changeOptionManage4"></div>
         <div class="border border-black p-2 w-full h-full flex items-center justify-center text-blue-500 font-semibold bg-gray-100">*옵션명</div>
         <div class="border border-black p-2 w-full h-full flex items-center justify-center"><input type="text" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionNm" @input="changeOptionManage1" :disabled="!clickrowData1"></div>
         <div class="border border-black p-2 w-full h-full flex items-center justify-center text-blue-500 font-semibold bg-gray-100">*필수/선택</div>
@@ -182,7 +182,7 @@
   <div class="h-full w-1/3 flex flex-col pl-10" v-show="currentMenu == true">
      <div class="grid grid-cols-[1fr,3fr] grid-rows-3  items-center w-full h-[15%] rounded-lg ">
         <div class="border border-black p-2 w-full h-full rounded-tl-lg flex items-center justify-center text-blue-500 font-semibold bg-gray-100">*옵션그룹코드</div>
-        <div class="border border-black p-2 w-full h-full rounded-tr-lg flex items-center justify-center"><input type="number" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionGroupCd" :disabled="!isNewColumn2 || !clickrowData2" @input="changeOptionGroupCd"></div>
+        <div class="border border-black p-2 w-full h-full rounded-tr-lg flex items-center justify-center"><input type="number" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionGroupCd" :disabled="!isNewColumn2 || !clickrowData2" @blur="changeOptionGroupCd"></div>
         <div class="border border-black p-2 w-full h-full flex items-center justify-center text-blue-500 font-semibold bg-gray-100 rounded-bl-lg">*옵션그룹명</div>
         <div class="border border-black p-2 w-full h-full flex items-center justify-center rounded-br-lg"><input type="text" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionGroupNm" @input="updateOptionNm" :disabled="!clickrowData2"></div>
       </div>
@@ -474,8 +474,8 @@ import PickStore11 from '@/components/pickStore11.vue';
       return ;
     }
   
-     const undefinededrowlength = rowData1.value.filter(item => item.lngCode == '' || item.lngCode == undefined || item.strName == undefined || item.strName == '' ||  item.intMultiple == undefined ||  item.intMultiple == '' ||  item.blnMustSel == undefined ||  item.blnMustSel == '').length
-     const undefinededrow2length = rowData3.value.filter(item => item.lngCode == '' || item.lngCode == undefined || item.strName == undefined || item.strName == '').length
+     const undefinededrowlength = rowData1.value.filter(item=>item.deleted !=true).filter(item => item.lngCode == '' || item.lngCode == undefined || item.strName == undefined || item.strName == '' ||  item.intMultiple == undefined ||  item.intMultiple == '' ||  item.blnMustSel == undefined ||  item.blnMustSel == '').length
+     const undefinededrow2length = rowData3.value.filter(item=>item.deleted !=true).filter(item => item.lngCode == '' || item.lngCode == undefined || item.strName == undefined || item.strName == '').length
     if(undefinededrowlength >0) {
       Swal.fire({
         title: '경고',
@@ -690,6 +690,17 @@ change.lngChainGroup20 = newValue[19] == undefined ? 0 : newValue[19].lngCode;
   const changeOptionManage4 = (e) => {
     console.log(rowData1.value)
     const confirmdata = e.target.value.replace(/[^0-9]/g, "");
+    const duplicate = rowData1.value.find(item => item.lngCode == confirmdata)
+    if(duplicate){
+      Swal.fire({
+        title: '중복된 옵션코드',
+        text: '이미 존재하는 코드입니다.',
+        icon: 'error',
+        confirmButtonText: '확인'
+      })
+      optionCd.value= ''
+      return
+    }
     const change = rowData1.value.find((item,index) => index == selectedindex.value)
     if(change){
          change.lngCode = confirmdata
@@ -725,6 +736,17 @@ change.lngChainGroup20 = newValue[19] == undefined ? 0 : newValue[19].lngCode;
   }
   const changeOptionGroupCd = (e) => {
       const Nm = e.target.value 
+      const dupli = rowData3.value.find(item=> item.lngCode == Nm)
+      if(dupli){
+        Swal.fire({
+          title: '중복된 옵션 그룹코드',
+          text: '이미 존재하는 코드입니다.',
+          icon: 'error',
+          confirmButtonText: '확인'
+        })
+        optionGroupCd.value = ''
+        return;
+      }
       const change = rowData3.value.find((item,index )=> index == selectedindex2.value)
       if(change){
             change.lngCode = Nm

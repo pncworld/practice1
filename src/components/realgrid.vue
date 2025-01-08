@@ -168,6 +168,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   }
+  ,
+  addRow4: { // 숫자로만 오게
+    type: Boolean,
+    default: false,
+  }
  
 });
 
@@ -175,8 +180,9 @@ const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}
 const tabInitSetArray = ref([]);
 const selectedRowData = ref([]);
 const result2 =ref([]) ;
+const addrow4activated =ref(false) ;
 const updatedrowData = ref([])
-const selectedindex = ref(0)
+const selectedindex = ref(-1)
 const emit = defineEmits(["selcetedrowData" , "updatedRowData" , "clickedRowData" ,"dblclickedRowData" ,"selectedIndex" ]);
 const funcshowGrid = async () => {
   // 그리드 초기화
@@ -209,7 +215,7 @@ const funcshowGrid = async () => {
     dataType : item.strColID.includes('checkbox') ? 'boolean' : 'text',
   }));
   fields.push({fieldName: "deleted", dataType: "boolean" })
-  fields.push({fieldName: "add", dataType: "boolean" })
+
 
   dataProvider.setFields(fields);
 
@@ -349,11 +355,10 @@ gridView.setColumnLayout(layout1)
   
      gridView.commit();
      updatedrowData.value = [ ...dataProvider.getJsonRows()]
-
+   
      emit('updatedRowData', updatedrowData.value )
      
-
-   };
+  };
  
 
  
@@ -377,7 +382,7 @@ gridView.onCellClicked = function (grid, clickData) {
   emit('clickedRowData', selectedRowData.value);
   emit('selectedIndex' ,clickData.itemIndex )
   selectedindex.value = clickData.itemIndex
-   
+   console.log(selectedindex.value)
 }
 
 gridView.onColumnCheckedChanged = function (grid, col, chk) {
@@ -475,7 +480,32 @@ watch(() => props.addRow3, (newVal) => {
     selectedindex.value = selectedRowIndex
   }
   emit('selectedIndex' ,selectedRowIndex )
-  
+  console.log(props.rowData)
+  // updatedrowData.value = [ ...dataProvider.getJsonRows()]
+  // emit('updatedRowData', updatedrowData.value )
+
+});
+watch(() => props.addRow4, (newVal) => {
+  gridView.commit();
+  var values = {add: true }; 
+  let propertys = props.addrowProp.split(',')
+  const value = props.addrowDefault.split(',')
+  for(var i=0 ; i<propertys.length ; i++){
+    values[propertys[i]] = value[i]
+  }
+  var dataRow = dataProvider.addRow(values);
+  gridView.setCurrent({dataRow: dataRow });
+  const current = gridView.getCurrent(); 
+
+  props.rowData.push(values)
+  const selectedRowIndex = current ? current.dataRow : null;
+   if (selectedRowIndex !== null) {
+    console.log("현재 선택된 인덱스:", selectedRowIndex);  // 선택된 행의 인덱스 출력
+    selectedindex.value = selectedRowIndex
+  }
+  emit('selectedIndex' ,selectedRowIndex )
+  console.log(props.rowData)
+  addrow4activated.value = true
   // updatedrowData.value = [ ...dataProvider.getJsonRows()]
   // emit('updatedRowData', updatedrowData.value )
 
@@ -551,7 +581,7 @@ watch(() => props.initFocus, (newVal) => {
     
     gridView.clearCurrent();
  }
-  },100)
+  },150)
  
   
   
@@ -617,15 +647,29 @@ const setupGrid = async () => {
 };
 
 watch(() => props.rowData, () => {
+  console.log(selectedindex.value)
   funcshowGrid().then(() =>{
     setTimeout(function(){
+      if(selectedindex.value == -1){
+        return;
+      }
       if(selectedindex.value !='' && selectedindex.value !=undefined){
     console.log(selectedindex.value)
     gridView.setCurrent({ dataRow : selectedindex.value })
-  
+
+
+  } else if (selectedindex.value ==0){
+    gridView.setCurrent({ dataRow : selectedindex.value })
+  }
+
+  if(addrow4activated.value == true){
+    const current = gridView.getCurrent();
+    dataProvider.setRowState(current.dataRow, 'created', true);
+    addrow4activated.value = false
+    
 
   }
-    },50) // 시간으로인한 미적용 이슈있음
+    },100) // 시간으로인한 미적용 이슈있음
     
 })
 

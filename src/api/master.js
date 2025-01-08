@@ -896,6 +896,44 @@ export const saveOptions = (groupCd , storeCd , lngcode1 , strNames1, blnMustSel
         LNG_CHAIN_GROUP20 : lngChainGroup20
     })
 }
+export const saveTLUList = (groupcd, storecd, lngcode, strname, lngmenu1, lngmenu2, lngmenu3, lngmenu4, lngmenu5, lngmenu6, lngmenu7, lngmenu8, lngmenu9, lngmenu10, lngmenu11, lngmenu12, lngmenu13, lngmenu14, lngmenu15, lngmenu16, lngmenu17, lngmenu18, lngmenu19, lngmenu20, lngmenu21, lngmenu22, lngmenu23, lngmenu24, lngmenu25, lngmenu26, lngmenu27, lngmenu28, lngmenu29)=> {
+    return api2.post('/MIMASTER/MST01_010INS.asmx/saveTLUList', {
+            GROUP_CD: groupcd,
+            STORE_CD: storecd,
+            LNG_CD: lngcode,
+            STRNAME: strname,
+            LNGMENU1: lngmenu1,
+            LNGMENU2: lngmenu2,
+            LNGMENU3: lngmenu3,
+            LNGMENU4: lngmenu4,
+            LNGMENU5: lngmenu5,
+            LNGMENU6: lngmenu6,
+            LNGMENU7: lngmenu7,
+            LNGMENU8: lngmenu8,
+            LNGMENU9: lngmenu9,
+            LNGMENU10: lngmenu10,
+            LNGMENU11: lngmenu11,
+            LNGMENU12: lngmenu12,
+            LNGMENU13: lngmenu13,
+            LNGMENU14: lngmenu14,
+            LNGMENU15: lngmenu15,
+            LNGMENU16: lngmenu16,
+            LNGMENU17: lngmenu17,
+            LNGMENU18: lngmenu18,
+            LNGMENU19: lngmenu19,
+            LNGMENU20: lngmenu20,
+            LNGMENU21: lngmenu21,
+            LNGMENU22: lngmenu22,
+            LNGMENU23: lngmenu23,
+            LNGMENU24: lngmenu24,
+            LNGMENU25: lngmenu25,
+            LNGMENU26: lngmenu26,
+            LNGMENU27: lngmenu27,
+            LNGMENU28: lngmenu28,
+            LNGMENU29: lngmenu29
+
+    })
+}
 export const getKDSList = (groupCd ) => {
     return api2.post('/MIMASTER/MST44_061INS.asmx/getKDSList', {
         GROUP_CD: groupCd
@@ -963,6 +1001,14 @@ export const getStorePosList = (groupCd ,storeCd) => {
 }
 export const getKDSSettingList = (groupCd  , store_cd) => {
     return api2.post('/MIMASTER/MST44_061INS.asmx/getKDSSettingList', {
+        GROUP_CD: groupCd,
+        STORE_CD : store_cd
+
+
+    })
+}
+export const getTLUManageInfo = (groupCd  , store_cd) => {
+    return api2.post('/MIMASTER/MST01_010INS.asmx/getTLUManageInfo', {
         GROUP_CD: groupCd,
         STORE_CD : store_cd
 
