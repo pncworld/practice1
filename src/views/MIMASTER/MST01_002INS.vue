@@ -1,23 +1,29 @@
 <template>
-    <div>
-                 <div class="flex justify-start pl-4 pt-4">
-                 <div class="flex justify-start"><h1 class="font-bold text-2xl">
-                  매장정보등록
-                 </h1><div class="flex justify-end space-x-2" style="margin-left:750px"><button @click="searchStore" class="button search">조회</button>
-                  <button @click="addStore" class="button new">신규</button>
-                  <button @click="updateRowData" class="button save">저장</button>
-                  <button @click="deleteStore" class="button delete">삭제</button>
+    <div class="flex justify-between items-center w-full overflow-y-auto">
+    <div class="flex justify-start  w-full pl-12 pt-4">
+               <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-full">
+                매장정보등록
+               </h1></div>
+                
+               </div>
+               <div class="flex justify-center mr-10 space-x-2 pr-5">
+
+                 <button @click="searchButton" class="button search">조회</button>
+                  <button @click="addButton" class="button new">신규</button>
+                  <button @click="saveButton" class="button save">저장</button>
+                  <button @click="deleteButton" class="button delete">삭제</button>
                   <button @click="exportToExcel" class="button excel">엑셀</button>
-                </div> </div>
-                  
-                
-                 </div>
-                 <br>
-                 
-                 <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center"><PickStore3 :groupCdDisabled="groupCdDisabled" :gridOptions="gridOptions"  @update:storeType="handleGroupCdDisabledUpdate" @update:storeCd="handleStoreCd"></PickStore3> <input type="text" class="w-1/7 rounded border border-neutral-700 h-9 px-1 " v-model="searchStoreName" @keyup.enter="searchStore"></div> 
-                
+            </div>
+            
+  
+  </div>
+  <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center mt-3">
+  <PickStore3 @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd"  @storeNm="handlestoreNm" @GroupNm="handleGroupNm" @update:ischanged="handleinitAll">
+  </PickStore3>
+  <input type="text" v-model="searchstore" class="rounded-lg h-[53%] items-center border border-black" :disabled="allstrore"></div> 
+       
+   <div class="h-[56%] w-full"><Realgrid class="w-full h-full mt-2" :progname="'MST01_002INS_VUE'" :progid="1" :rowData="rowData" @clickedRowData="clickedRowData3"  @selcetedrowData="selcetedrowData" :selectionStyle="'singleRow'" :initFocus="initFocus" :labelingColumns="'lngSupervisor,lngSaleType,lngMultiPriceGroupCode,lngJoinType,lngSubLease,lngStoreAttr,lngStoreArea'" :valuesData="valuesData" :labelsData="labelsData" :deleteRow="deleted"></Realgrid>
     </div>
-    <div><ag-grid-vue class="ag-theme-alpine custom-grid" :defaultColDef="defaultColDef" :columnDefs="colDefs2"  rowSelection="multiple" :rowData="rowData" style="height:540px" @rowClicked="onRowClicked" @grid-ready="onGridReady"/></div>
    <div class="relative left-0 -top-4 mt-5">
     <div class="absolute grid grid-cols-6 grid-rows-10 gap-0 w-full">
         <div class="border flex h-7 items-center text-sm font-semibold justify-center bg rounded-ss-xl bg-gray-100 text-blue-500">
@@ -36,7 +42,8 @@
         가맹유형 
         </div>
         <div class="border flex h-7 items-center text-sm font-semibold justify-center"><select class="text-xs border rounded-md w-full h-7 pl-1" v-model="lngJoinType" name="lngJoinType" @change="updateGridValue" >
-             <option v-for="item in lngJoinTypes" :key="item.lngCode" :value="item.lngCode" class="text-sm">
+    
+          <option v-for="item in lngJoinTypes" :key="item.lngCode" :value="item.lngCode" class="text-sm">
                 {{ item.strName }}
             </option>
         </select></div>
@@ -44,7 +51,8 @@
         *멀티단가 그룹 
         </div>
         <div class="border flex h-7 items-center text-sm font-semibold justify-center"><select  class="text-xs border rounded-md w-full h-7 pl-1 " v-model="lngMultiPriceGroupCode" name="lngMultiPriceGroupCode" @change="updateGridValue" >
-            <option v-for="item in lngMultiPriceGroupCodes" :key="item.lngMultiPriceGroupCode" :value="item.lngMultiPriceGroupCode" class="text-sm">
+        
+          <option v-for="item in lngMultiPriceGroupCodes" :key="item.lngMultiPriceGroupCode" :value="item.lngMultiPriceGroupCode" class="text-sm">
                 {{ item.strMultiPriceGroupName }}
             </option>
         </select></div>
@@ -70,6 +78,7 @@
         매장구분  
         </div>
         <div class="border flex h-7 items-center text-sm font-semibold justify-center"><select id="storeCode" class="text-xs border rounded-md w-full  h-7 pl-1" v-model="lngStoreAttr" name="lngStoreAttr" @change="updateGridValue">
+    
           <option v-for="item in lngStoreAttrs" :key="item.lngStoreAttr" :value="item.lngStoreAttr" class="text-xs">
                 {{ item.strName }}
             </option>
@@ -146,7 +155,7 @@
         상권  
         </div>
         <div class="border flex h-7 items-center text-sm font-semibold justify-center"><select  id="storeCode" class="text-xs border rounded-md w-full pl-1 h-7 " v-model="lngSaleType" name="lngSaleType" @change="updateGridValue">
-
+           <option value="0">없음</option>
           <option v-for="item in lngSaleTypes" :key="item.lngSaleType" :value="item.lngSaleType" class="text-sm">
                 {{ item.strSaleType }}
             </option>
@@ -180,47 +189,46 @@
 </template>
 
 <script setup>
-import PickStore from '@/components/pickStore.vue';
-import { AgGridVue } from 'ag-grid-vue3';
-import axios from 'axios';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useStore } from 'vuex';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
 import PickStore3 from '@/components/pickStore3.vue';
 import { getGridInfoList} from '@/api/common';
 import Swal from 'sweetalert2';
-import { getMultiPrice, INS004_select, INS006_select, joinType_query, store_delete, store_insert, store_query, store_update, storeArea, storeAttr, subLease_query } from '@/api/master';
+import { getMultiPrice, getstoreInfo, INS004_select, INS006_select, joinType_query, store_delete, store_insert, store_query, store_update, storeArea, storeAttr, subLease_query } from '@/api/master';
+import Realgrid from '@/components/realgrid.vue';
 
 const result = ref([]);
 const store = useStore();
-const groupCd = store.state.storeGroup[0] ?  store.state.storeGroup[0].lngStoreGroup : ''
+const groupCd = ref()
 const searchStoreName = ref('')
 const disableStoreCode = ref(true);
 const gridOptions = {
   immutableData: true,
 }
+const labelsData =ref([])
+const valuesData =ref([])
+
 const storeType = ref('0');
-const handleGroupCdDisabledUpdate = (newValue) => {
-    storeType.value = newValue;
-}
 const storeCd = ref('0');
+const allstrore = ref(false);
 const handleStoreCd = (newValue) => {
     storeCd.value = newValue
+    if(storeCd.value ==0){
+      allstrore.value = false
+    } else {
+      allstrore.value = true
+      searchstore.value = ''
+    }
+}
+const handleGroupCd = (newValue) => {
+    console.log(newValue)
+    groupCd.value = newValue
 }
 function exportToExcel() {
     gridApi.value.exportDataAsExcel();
 }
-const groupCdDisabled = ref(true);
-const defaultColDef = ref({
-    minWidth: 20,
-    resizable: true,
-    suppressMenu : true ,
-    enableCellChangeFlash: true,
-  });
-const onGridReady = (params) => {
-  gridApi.value = params.api; // 그리드 API 저장
-};
+const searchstore = ref('')
+
 const gridApi = ref();
 const GridInfo_PROG_ID = "MST01_002INS_VUE";
 const GridInfo_GRID_ID = "1";
@@ -246,7 +254,7 @@ const lngSubLeases = ref([]);
 const lngStoreAreas = ref([]);
 const lngSaleTypes = ref([]);
 const lngSupervisors = ref([]);
-const searchStore = async() => {
+const searchButton = async() => {
      lngMultiPriceGroupCodes.value = [];
      lngStoreAttrs.value = [];
      lngJoinTypes.value = [];
@@ -254,92 +262,133 @@ const searchStore = async() => {
      lngStoreAreas.value = [];
      lngSaleTypes.value = [];
      lngSupervisors.value = [];
+     valuesData.value = []
+     labelsData.value = []
       store.dispatch("convertLoading", true);
-      const response1 = await getMultiPrice(groupCd);
-
-      const result1 = response1.data.recordsets[0];
-      for (let i = 0; i < result1.length; i++) {
-        lngMultiPriceGroupCodes.value.push(result1[i]);
-      }
-      lngMultiPriceGroupCode.value = result1[0].lngMultiPriceGroupCode
-      const response2 = await storeAttr(groupCd,storeType.value);
-      
-      const result2 = response2.data.recordsets[0];
-      for (let i = 0; i < result2.length; i++) {
-        lngStoreAttrs.value.push(result2[i])
+       console.log(searchStoreName.value)
+       console.log(groupCd.value)
+       console.log(storeType.value)
+       console.log(storeCd.value)
+      const res = await getstoreInfo( groupCd.value, storeType.value , storeCd.value , searchStoreName.value);
+        console.log(res)
         
-      }
-      lngStoreAttr.value = result2[0].lngStoreAttr
+        lngJoinTypes.value = res.data.JOINTYPE
+        lngMultiPriceGroupCodes.value = res.data.STOREMULTI
+        lngStoreAttrs.value = res.data.STOREATTR
+        lngSubLeases.value = res.data.STORETYPE
+        lngStoreAreas.value = res.data.STOREAREA
+        lngSaleTypes.value = res.data.SALETYPE
+        lngSupervisors.value = res.data.SUPERVISOR
 
-      const response3 = await joinType_query(groupCd);
+        if(lngJoinTypes.value.length >0){
+          lngJoinType.value = lngJoinTypes.value[0].lngCode
+        }
+        if(lngMultiPriceGroupCodes.value.length >0){
+          lngMultiPriceGroupCode.value = lngMultiPriceGroupCodes.value[0].lngMultiPriceGroupCode
+        }
+        if(lngStoreAttrs.value.length >0){
 
-      const result3 = response3.data.recordsets[0];
-      for (let i = 0; i < result3.length; i++) {
-        lngJoinTypes.value.push(result3[i])
-      }
-      lngJoinType.value = result3[0].lngCode
+          lngStoreAttr.value = lngStoreAttrs.value[0].lngStoreAttr
+        }
 
-      const response4 = await subLease_query(groupCd);
+        if(lngSubLeases.value.length >0){
+          lngSubLease.value = lngSubLeases.value[0].lngCode
+        }
 
-      const result4 = response4.data.recordsets[0]
-      for (let i = 0; i < result4.length; i++) {
-        lngSubLeases.value.push(result4[i])
-      }
-      lngSubLease.value = result4[0].lngCode
-      const response5 = await storeArea(groupCd);
+        if(lngStoreAreas.value.length >0){
+          lngStoreArea.value = lngStoreAreas.value[0].lngStoreArea
+        }
 
-      const result5 = response5.data.recordsets[0];
-      for (let i = 0; i < result5.length; i++) {
-        lngStoreAreas.value.push(result5[i])
-      }
-      lngStoreArea.value = result5[0].lngStoreArea
-      const response6 = await INS006_select(groupCd);
+        if(lngSaleTypes.value.length >0){
+          lngSaleType.value = lngSaleTypes.value[0].lngSaleType
+        }
+        if(lngSupervisors.value.length >0){
+          lngSupervisor.value = lngSupervisors.value[0].lngSupervisor
+        }
+       
+        // labelsData.value.push()
+        // valuesData
+        console.log(lngSupervisors.value)
+        console.log(lngSaleTypes.value)
+        console.log(lngMultiPriceGroupCodes.value)
+        let sublabelarr = []
+        let subvaluearr = []
+        for(var i = 0 ; i< lngSupervisors.value.length ; i++){
+          sublabelarr.push(lngSupervisors.value[i].strName)
+          subvaluearr.push(lngSupervisors.value[i].lngSupervisor)
+        }
+        sublabelarr.push(' ')
+        subvaluearr.push(0)
+        labelsData.value.push(sublabelarr)
+        valuesData.value.push(subvaluearr)
+         sublabelarr = []
+         subvaluearr = []
+        for(var i = 0 ; i< lngSaleTypes.value.length ; i++){
+          sublabelarr.push(lngSaleTypes.value[i].strSaleType)
+          subvaluearr.push(lngSaleTypes.value[i].lngSaleType)
+        }
+        sublabelarr.push('없음')
+        subvaluearr.push(0)
+        labelsData.value.push(sublabelarr)
+        valuesData.value.push(subvaluearr)
+        sublabelarr = []
+         subvaluearr = []
+        for(var i = 0 ; i< lngMultiPriceGroupCodes.value.length ; i++){
+          sublabelarr.push(lngMultiPriceGroupCodes.value[i].strMultiPriceGroupName)
+          subvaluearr.push(lngMultiPriceGroupCodes.value[i].lngMultiPriceGroupCode)
+        }
+        labelsData.value.push(sublabelarr)
+        valuesData.value.push(subvaluearr)
 
-      const result6 = response6.data.recordsets[0];
-      for (let i = 0; i < result6.length; i++) {
-        lngSaleTypes.value.push(result6[i])
-      }
-      if (result6.length ==0 ){
-        lngSaleType.value = '0'
-        lngSaleTypes.value.push({
-          lngSaleType : '0',
-          strSaleType : '없음'
-        })
-      } else {
-        lngSaleType.value = result6[0].lngSaleType 
-      }
-      
-       const response7 = await INS004_select(groupCd)
+        sublabelarr = []
+         subvaluearr = []
+        for(var i = 0 ; i< lngJoinTypes.value.length ; i++){
+          sublabelarr.push(lngJoinTypes.value[i].strName)
+          subvaluearr.push(lngJoinTypes.value[i].lngCode)
+        }
+        sublabelarr.push(' ')
+        subvaluearr.push(0)
+        labelsData.value.push(sublabelarr)
+        valuesData.value.push(subvaluearr)
 
-      const result7 = response7.data.recordsets[0];
-      for (let i = 0; i < result7.length; i++) {
-        lngSupervisors.value.push(result7[i])
-      }
-      lngSupervisor.value = result7[0].lngSupervisor
+        sublabelarr = []
+         subvaluearr = []
+        for(var i = 0 ; i< lngSubLeases.value.length ; i++){
+          sublabelarr.push(lngSubLeases.value[i].strName)
+          subvaluearr.push(lngSubLeases.value[i].lngCode)
+        }
+        labelsData.value.push(sublabelarr)
+        valuesData.value.push(subvaluearr)
+ 
+        sublabelarr = []
+         subvaluearr = []
+        for(var i = 0 ; i< lngStoreAttrs.value.length ; i++){
+          sublabelarr.push(lngStoreAttrs.value[i].strName)
+          subvaluearr.push(lngStoreAttrs.value[i].lngStoreAttr)
+        }
+        labelsData.value.push(sublabelarr)
+        valuesData.value.push(subvaluearr)
 
-      const response = await store_query(groupCd, storeType.value , storeCd.value , searchStoreName.value);
-        
-       const result = response.data.recordsets[0];
-    
-       updateColumns(result)
+        sublabelarr = []
+         subvaluearr = []
+        for(var i = 0 ; i< lngStoreAreas.value.length ; i++){
+          sublabelarr.push(lngStoreAreas.value[i].strName)
+          subvaluearr.push(lngStoreAreas.value[i].lngStoreArea)
+        }
+        labelsData.value.push(sublabelarr)
+        valuesData.value.push(subvaluearr)
+ 
+        console.log(labelsData.value)
+        console.log(valuesData.value)
+        rowData.value = res.data.store
        store.dispatch("convertLoading", false);
     
        
 }
 const insertupdated =ref();
-const deleteStore = async() => {
-  store.dispatch("convertLoading", true);
-  const selectedRowNode = gridApi.value.getSelectedNodes();
-
-  const response = await store_delete(Array(selectedRowNode.length).fill(groupCd).join(','),selectedRowNode.map(row => row.data.lngStoreCode).join(',')
-)
- 
-
-  if (response.status == '200'){
-    Swal.fire('삭제 되었습니다.')
-  }
-  store.dispatch("convertLoading", false);
-  searchStore();
+const deleted = ref(false)
+const deleteButton = () => {
+  deleted.value = !deleted.value
 }
 const addStore = () => {
   const newItem = {
@@ -384,309 +433,45 @@ const addStore = () => {
   
     insertupdated.value = gridApi.value.applyTransaction({add: [newItem]}); // 그리드에 업데이트
 }
-const updateRowData = async() => {
-  store.dispatch("convertLoading", true);
-  const rowsToSave = [];
-  const rowsToUpdate = [];
-  gridApi.value.forEachNode((node) => {
-  if (node.data.isNew) {  // isNew 속성이 true인 경우에만 필터링
-    rowsToSave.push(node.data)
-  } else if (node.data.isUpdate) {
-    rowsToUpdate.push(node.data)
+
+
+const saveButton = () => {
+   console.log(rowData.value)
+}
+
+const clickedRowData3 = (newValue) => {
+  console.log(newValue)
+  console.log(rowData.value)
+  lngStoreCode.value = newValue[1]
+  strName.value = newValue[2]
+  strRegistNo.value = newValue[3]
+  strDirector.value = newValue[4]
+  strDealType.value = newValue[5]
+  strDealKind.value = newValue[6]
+  lngJoinType.value = newValue[7]
+  lngSubLease.value = newValue[9]
+  lngStoreAttr.value = newValue[11]
+  lngStoreArea.value = newValue[13]
+  dtmOpenDate.value = newValue[15]
+  strTel.value = newValue[16]
+  strFax.value = newValue[17]
+  strZipCode.value = newValue[18]
+  strAddress.value = newValue[19]
+  strAddressEtc.value = newValue[20]
+  strConvCode.value = newValue[21]
+  strPhone.value = newValue[22]
+  lngBEP.value = newValue[23]
+  lngFloorSpace.value = newValue[24]
+  lngLease.value = newValue[25] 
+  lngSupervisor.value = newValue[26] 
+  lngSaleType.value = newValue[27]
+  dtmStop.value = newValue[28]
+  strDev1.value = newValue[29]
+  lngTable.value = newValue[30]
+  lngMultiPriceGroupCode.value = newValue[31]
+  strStoreHistory.value = newValue[32]
  
-  }
-});
-
-let result = 0;
-  if (rowsToSave.length > 0) {
-
-  const finalObject = {
-  P_lngCompanyCode: Array(rowsToSave.length).fill(groupCd).join(','),
-  P_lngStoreGroup: Array(rowsToSave.length).fill(groupCd).join(','),
-  P_lngStoreCode: rowsToSave.map(row => row.lngStoreCode).join(','),
-  P_strName: rowsToSave.map(row => row.strName).join(','),
-  P_strRegistNo: rowsToSave.map(row => row.strRegistNo).join(','),
-  P_strDirector: rowsToSave.map(row => row.strDirector).join(','),
-  P_strDealType: rowsToSave.map(row => row.strDealType).join(','),
-  P_strDealKind: rowsToSave.map(row => row.strDealKind).join(','),
-  P_strZipCode: rowsToSave.map(row => row.strZipCode).join(','),
-  P_strAddress: rowsToSave.map(row => row.strAddress).join(','),
-  P_strAddressEtc: rowsToSave.map(row => row.strAddressEtc).join(','),
-  P_strTel: rowsToSave.map(row => row.strTel).join(','),
-  P_strFax: rowsToSave.map(row => row.strFax).join(','),
-  P_dtmOpenDate: rowsToSave.map(row => row.dtmOpenDate).join(','),
-  P_lngJoinType: rowsToSave.map(row => row.lngJoinType).join(','),
-  P_lngSubLease: rowsToSave.map(row => row.lngSubLease).join(','),
-  P_lngStoreAttr: rowsToSave.map(row => row.lngStoreAttr).join(','),
-  P_lngStoreArea: rowsToSave.map(row => row.lngStoreArea).join(','),
-  P_strConvCode: rowsToSave.map(row => row.strConvCode).join(','),
-  P_lngUserID: rowsToSave.map(row => row.lngUserID).join(',') ,
-  P_lngMultiPriceGroupCode : rowsToSave.map(row => row.lngMultiPriceGroupCode).join(',') 
-};
-
-const response = await store_insert(finalObject);
-       
-        if (response.status === 200) {
-             result = 200
-         }
-  }
-
-  if (rowsToUpdate.length > 0) {
-
-const finalObject1 = {
-      P_lngCompanyCode: Array(rowsToUpdate.length).fill(groupCd).join(',') ,
-      P_lngStoreGroup: Array(rowsToUpdate.length).fill(groupCd).join(',') ,
-      P_lngStoreCode: rowsToUpdate.map(row => row.lngStoreCode).join(',') ,
-      P_strName: rowsToUpdate.map(row => row.strName).join(',') ,
-      P_strRegistNo: rowsToUpdate.map(row => row.strRegistNo).join(','),
-      P_strDirector: rowsToUpdate.map(row => row.strDirector).join(','),
-      P_strDealType: rowsToUpdate.map(row => row.strDealType).join(','),
-      P_strDealKind: rowsToUpdate.map(row => row.strDealKind).join(','),
-      P_strZipCode: rowsToUpdate.map(row => row.strZipCode).join(','),
-      P_strAddress: rowsToUpdate.map(row => row.strAddress).join(','),
-      P_strAddressEtc: rowsToUpdate.map(row => row.strAddressEtc).join(','),
-      P_strTel: rowsToUpdate.map(row => row.strTel).join(','),
-      P_strFax: rowsToUpdate.map(row => row.strFax).join(','),
-      P_dtmOpenDate: rowsToUpdate.map(row => row.dtmOpenDate).join(','),
-      P_lngJoinType: rowsToUpdate.map(row => row.lngJoinType).join(','),
-      P_lngSubLease: rowsToUpdate.map(row => row.lngSubLease).join(','),
-      P_lngStoreAttr: rowsToUpdate.map(row => row.lngStoreAttr).join(','),
-      P_lngStoreArea: rowsToUpdate.map(row => row.lngStoreArea).join(','),
-      P_strConvCode: rowsToUpdate.map(row => row.strConvCode).join(','),
-      P_lngUserID: rowsToUpdate.map(row => row.lngUserID).join(',')
-};
-
-const response = await store_update(finalObject1)
-     
-      if (response.status === 200) {
-           result = 200
-       }
 }
-  if (result === 200) {
-        Swal.fire('저장 되었습니다.');
-    }
-    store.dispatch("convertLoading", false);
-  searchStore()
-}
-const updateColumns = (result) => {
-    let column2 = [];
-    column2.push(
-        {
-            field : 'NO',
-            headerName: 'No',
-        valueGetter: (params) => {
-        return params.node.rowIndex + 1;  // 0부터 시작하는 인덱스에 1을 더해 순번을 만듦
-    },
-    sortable: false,  // 정렬 비활성화 (순번이므로)
-    filter: false,    // 필터 비활성화
-    width: 80 ,        // 적절한 넓이 설정,
-    lockPosition : true
-        }
-    )
-   
-    const styleTag = document.createElement("style");
-    document.head.appendChild(styleTag);
-    
-    for (let i = 0; i < tabInitSetArray.value.length ; i++) {
-      const headerclass = `headerclass-${i}`;
-      const hcolor = tabInitSetArray.value[i].strHdColor;
-      const hbkcolor = tabInitSetArray.value[i].strHdBkColor;
-      styleTag.innerHTML += `.${headerclass} {
-          background-color : ${hbkcolor} !important;
-          color : ${hcolor} !important ;
-       
-      }`
-      
-      // 컬럼마다의 값을 할당 밑은 조건에 해당할때 형식이나 값을 지정해줌.
-       const column = {
-        field: tabInitSetArray.value[i].strColID,
-        headerName: tabInitSetArray.value[i].strHdText,
-        width: tabInitSetArray.value[i].intHdWidth,
-        headerClass: headerclass,
-        editable : tabInitSetArray.value[i].strEdit === 'true' ? true : false,
-        cellStyle : {
-          textAlign : tabInitSetArray.value[i].strAlign
-        },
-        lockPosition : tabInitSetArray.value[i].strHdFix === 'true' ? false : true ,
-      }
-
-      if( tabInitSetArray.value[i].intHdWidth == '0'){
-        column.hide = true
-      }
-      if ( tabInitSetArray.value[i].strColID =='lngCheck'){
-        column.checkboxSelection= true ;
-        column.headerCheckboxSelection = true ;
-      }
-      if(tabInitSetArray.value[i].strColID =='lngSaleType'){
-        column.cellRenderer = (params) =>{
-          if(params.value){
-
-           if(lngSaleTypes.value.length == 0){
-             return ''
-           } else {
-            return lngSaleTypes.value.find(item => item.lngSaleType == params.value).strSaleType
-           }
-        }
-      }
-      }
-      if(tabInitSetArray.value[i].strColID == 'lngSupervisor'){
-        column.cellRenderer = (params) =>{
-          if(params.value !='' && params.value){
-
-           if(lngSupervisors.value.length == 0){
-             return '없음'
-           } else {
-            return lngSupervisors.value.find(item => item.lngSupervisor == params.value).strName
-           }
-          }
-        }
-      }
-      if(tabInitSetArray.value[i].strColID == 'dtmOpenDate'){
-        column.cellRenderer = (params) =>{
-        
-          if(params.value !='' && params.value !=null){
-
-          
-          const rawDate = params.value.toString(); // 주어진 데이터 (예: 20110302)
-        
-        // 날짜 형식을 변환 (2011-03-02)
-        const formattedDate = `${rawDate.substring(0, 4)}-${rawDate.substring(4, 6)}-${rawDate.substring(6, 8)}`;
-
-        return formattedDate;
-        }
-      }
-      }
-
-      if(tabInitSetArray.value[i].strColID == 'lngMultiPriceGroupCode'){
-        column.cellRenderer = (params) =>{
-          if(params.value != null ){
-          if(lngMultiPriceGroupCodes.value.length == 0){
-             return ''
-           } else {
-            return lngMultiPriceGroupCodes.value.find(item => item.lngMultiPriceGroupCode == params.value).strMultiPriceGroupName
-           }
-          } 
-      }
-      }
-
-      if(tabInitSetArray.value[i].strColID === 'lngStoreAttr'){
-        column.cellRenderer = (params) =>{
-          if(params.value !='' && params.value){
-          if(lngStoreAttrs.value.length == 0 || params.value == '12'){
-             return ''
-           } else {
-            return lngStoreAttrs.value.find(item => item.lngStoreAttr == params.value).strName
-           }
-          } 
-        }
-      }
-      
-
-      if(tabInitSetArray.value[i].strColID == 'lngJoinType'){
-       
-        column.cellRenderer = (params) =>{
-         
-          if(params.value != '0' && params.value !='' && params.value !=null ) {
-          if(lngJoinTypes.value.length == 0 || params.value == '12'){
-             return ''
-           } else {
-            return lngJoinTypes.value.find(item => item.lngCode == params.value).strName
-           }
-          } else {
-            return ''
-          }
-      }
-      }
-
-
-      if(tabInitSetArray.value[i].strColID == 'lngSubLease'){
-        column.cellRenderer = (params) =>{
-          if(params.value !='' && params.value){
-
-          if(lngSubLeases.value.length == 0 ){
-             return ''
-           } else {
-            return lngSubLeases.value.find(item => item.lngCode == params.value ).strName
-           }
-          }
-        
-      }
-      }
-
-      if(tabInitSetArray.value[i].strColID == 'lngStoreArea'){
-        column.cellRenderer = (params) =>{
-          if(params.value !='' && params.value){
-          if(lngStoreAreas.value.length == 0 || params.value == '12'){
-             return ''
-           } else {
-            return lngStoreAreas.value.find(item => item.lngStoreArea == params.value).strName
-           }
-          }
-      }
-      }
-    column2.push(column);
-    }
-    rowData.value = result.map(item => ({
-      lngStoreCode: item.lngStoreCode,
-      strName: item.strName,
-      strRegistNo: item.strRegistNo,
-      strDirector: item.strDirector,
-      strDealType: item.strDealType,
-      strDealKind: item.strDealKind,
-      lngJoinType: item.lngJoinType,
-      strJoinTypeName: item.strJoinTypeName,
-      lngSubLease: item.lngSubLease,
-      strSubLeaseName: item.strSubLeaseName,
-      lngStoreAttr: item.lngStoreAttr,
-      strStoreAttrName: item.strStoreAttrName,
-      lngStoreArea: item.lngStoreArea,
-      strStoreAreaName: item.strStoreAreaName,
-      dtmOpenDate: item.dtmOpenDate,
-      strTel: item.strTel,
-      strFax: item.strFax,
-      strZipCode: item.strZipCode,
-      strAddress: item.strAddress,
-      strAddressEtc: item.strAddressEtc,
-      strConvCode: item.strConvCode,
-      strPhone: item.strPhone,
-      lngBEP: item.lngBEP,
-      lngFloorSpace: item.lngFloorSpace,
-      lngLease: item.lngLease,
-      strCheck: item.strCheck,
-      lngSaleType: item.lngSaleType,
-      dtmStop: item.dtmStop,
-      strDev1: item.strDev1,
-      lngTable: item.lngTable,
-      lngSupervisor: item.lngSupervisor,
-      strStoreHistory: item.strStoreHistory,
-      lngMultiPriceGroupCode: item.lngMultiPriceGroupCode,
-      strMultiPriceGroupName: item.strMultiPriceGroupName
-    }));
-   
-    colDefs2.value = column2;
-    
-}
-const updateGridValue = (event) => {
-
-  let inputText = event.target.value;
-  const inputName = event.target.name ;
-
-  const selectedRowNode = gridApi.value.getSelectedNodes()[0];
-  
-   if (selectedRowNode) {
-  // 선택한 행의 데이터를 업데이트
-   if (!isNaN(Number(inputText)) && inputText !='') {
-    inputText = Number(inputText)
-  }
-   selectedRowNode.data[inputName] = inputText; // 값 업데이트
-   selectedRowNode.data.isUpdate = true ;
-  // 업데이트 트랜잭션 적용
-  //insertupdated.value += gridApi.value.applyTransaction({ update: [selectedRowNode.data] });
-} 
-    gridApi.value.refreshCells({ rowNodes: [selectedRowNode] })
-
-}
-
 const lngStoreCode = ref();
 const strName = ref();
 const strRegistNo = ref();
@@ -698,7 +483,6 @@ const lngSubLease = ref();
 const lngStoreAttr = ref();
 const lngStoreArea = ref();
 const dtmOpenDate = ref();
-const dtmOpenDate2 = ref();
 const strTel = ref();
 const strFax = ref();
 const strZipCode = ref();
@@ -717,47 +501,7 @@ const strStoreHistory = ref();
 const lngTable = ref();
 const lngMultiPriceGroupCode = ref();
 
-const selectedRowData2 = ref('');
-const onRowClicked = (event) => {
-    const selectedRowData = event.data; // 클릭한 행의 데이터
-    
-    if ( selectedRowData.isNew == true ) {
-      disableStoreCode.value = false;
-    
-    } else {
-      disableStoreCode.value = true;
-    }
-    // 상태에 값을 설정하여 input/select에 전달
-    selectedRowData2.value = event.node
-    lngStoreCode.value = selectedRowData.lngStoreCode; 
-    strName.value = selectedRowData.strName; 
-    strRegistNo.value = selectedRowData.strRegistNo; 
-    strDirector.value = selectedRowData.strDirector; 
-    strDealType.value = selectedRowData.strDealType; 
-    strDealKind.value = selectedRowData.strDealKind; 
-    lngJoinType.value = selectedRowData.lngJoinType; 
-    lngSubLease.value = selectedRowData.lngSubLease; 
-    lngStoreAttr.value = selectedRowData.lngStoreAttr; 
-    lngStoreArea.value = selectedRowData.lngStoreArea; 
-    dtmOpenDate.value = selectedRowData.dtmOpenDate ; 
-    strTel.value = selectedRowData.strTel; 
-    strFax.value = selectedRowData.strFax; 
-    strZipCode.value = selectedRowData.strZipCode; 
-    strAddress.value = selectedRowData.strAddress; 
-    strAddressEtc.value = selectedRowData.strAddressEtc; 
-    strPhone.value = selectedRowData.strPhone; 
-    strConvCode.value = selectedRowData.strConvCode; 
-    lngBEP.value = selectedRowData.lngBEP; 
-    lngFloorSpace.value = selectedRowData.lngFloorSpace; 
-    lngLease.value = selectedRowData.lngLease; 
-    lngSaleType.value = selectedRowData.lngSaleType; 
-    dtmStop.value = selectedRowData.dtmStop; 
-    strDev1.value = selectedRowData.strDev1; 
-    lngTable.value = selectedRowData.lngTable; 
-    strStoreHistory.value = selectedRowData.strStoreHistory; 
-    lngMultiPriceGroupCode.value = selectedRowData.lngMultiPriceGroupCode; 
-  
-};
+
 
 
 </script>

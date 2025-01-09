@@ -106,6 +106,14 @@ export const store_query = (groupCd ,storeType ,storeCd ,searchStoreName) => {
          P_SEARCH_TEXT : searchStoreName ? searchStoreName : ''
     });
 };
+export const getstoreInfo = (groupCd ,storeType ,storeCd ,searchStoreName) => {
+    return api2.post('/MIMASTER/MST01_002INS.asmx/getstoreInfo', {
+         GROUP_CD: groupCd,
+         STORE_ATTR : storeType,
+         STORE_CD : storeCd,
+         SEARCH_TEXT : searchStoreName 
+    });
+};
 export const store_delete = (groupCd ,lngStoreCode) => {
     return api.post('/VUE_usp_mstStore_Delete', {
          P_GROUP_CD: groupCd,

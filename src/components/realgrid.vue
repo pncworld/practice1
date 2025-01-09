@@ -183,6 +183,21 @@ const props = defineProps({
     type: String,
     default: '',
   }
+  ,
+  labelsData: { // 숫자로만 오게
+    type: Array,
+    default: () => [],
+  }
+  ,
+  valuesData: { // 숫자로만 오게
+    type: Array,
+    default: () => [],
+  }
+  ,
+  labelingColumns: { // 숫자로만 오게
+    type: String,
+    default: '',
+  }
  
 });
 
@@ -266,7 +281,25 @@ const funcshowGrid = async () => {
       return ret;
     }
   }));
+
+
+  if(props.labelingColumns != ''){
+     const lcolumns = props.labelingColumns.split(',')
+     const labels = props.labelsData
+     const values = props.valuesData
+     
+     for(var i=0 ; i< lcolumns.length ; i++){
+      const labelingcolumn = columns.find(item => item.fieldName == lcolumns[i])
+       labelingcolumn.lookupDisplay =  true 
+       
+       labelingcolumn.values =values[i]
+       labelingcolumn.labels =labels[i]
+     }
+  }
+
  
+  
+  console.log(columns)
   gridView.setColumns(columns);
   
 console.log(props.mergeColumns)
@@ -322,6 +355,9 @@ gridView.setColumnLayout(layout1)
 }
   
   // 데이터 추가
+  console.log(props.rowData)
+  console.log(tabInitSetArray.value)
+ 
   dataProvider.setRows(props.rowData);
   
  
