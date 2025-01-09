@@ -145,7 +145,7 @@
     <div class="px-1 py-1 border border-gray-300 rounded-r-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchOption" v-model="searchword1"></div>
   </div>
     <div class="ml-10 mt-5 w-full h-[140%]">
-    <Realgrid class="w-full h-full mt-2" :progname="'MST01_011INS_01_VUE'" :progid="1" :rowData="rowData1" @clickedRowData="clickedRowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :deleteRow="deleterow1" :addRow3="addrow1"  @selectedIndex="selectedIndex" :addrowProp="addrowProp" :selectionStyle="'singleRow'" :rowStateeditable="false" :initFocus="initFocus"></Realgrid>
+    <Realgrid class="w-full h-full mt-2" :progname="'MST01_011INS_01_VUE'" :progid="1" :rowData="rowData1" @clickedRowData="clickedRowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :deleteRow="deleterow1" :addRow3="addrow1"  @selectedIndex="selectedIndex" :addrowProp="addrowProp" :selectionStyle="'singleRow'" :rowStateeditable="false" :initFocus="initFocus" :addField="'new'"></Realgrid>
     </div>
   </div>
 
@@ -156,14 +156,14 @@
     <div class="px-1 py-1 border border-gray-300 rounded-r-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchOption2" v-model="searchword2" ></div>
   </div>
     <div class="ml-10 mt-5 w-full h-[140%]">
-    <Realgrid class="w-full h-full mt-2" :progname="'MST01_011INS_01_VUE'" :progid="2" :rowData="rowData3" @clickedRowData="clickedRowData2" :deleteRow="deleterow2" :searchWord="searchword2" :searchColId="'lngCode,strName'" :addRow3="addrow3"  @selectedIndex="selectedIndex2" :addrowProp="addrowProp2" :selectionStyle="'singleRow'" :rowStateeditable="false" :initFocus="initFocus"></Realgrid>
+    <Realgrid class="w-full h-full mt-2" :progname="'MST01_011INS_01_VUE'" :progid="2" :rowData="rowData3" @clickedRowData="clickedRowData2" :deleteRow="deleterow2" :searchWord="searchword2" :searchColId="'lngCode,strName'" :addRow3="addrow3"  @selectedIndex="selectedIndex2" :addrowProp="addrowProp2" :selectionStyle="'singleRow'" :rowStateeditable="false" :initFocus="initFocus" :addField="'new'"></Realgrid>
     </div>
   </div>
   
   <div class="h-full w-1/3 flex flex-col pl-10" v-show="currentMenu == false">
      <div class="grid grid-cols-[1fr,3fr] grid-rows-4  items-center w-full h-1/5 rounded-lg ">
         <div class="border border-black p-2 w-full h-full rounded-tl-lg flex items-center justify-center text-blue-500 font-semibold bg-gray-100">*옵션코드</div>
-        <div class="border border-black p-2 w-full h-full rounded-tr-lg flex items-center justify-center"><input type="number" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionCd" :disabled="(!isNewColumn || !clickrowData1)" @blur="changeOptionManage4"></div>
+        <div class="border border-black p-2 w-full h-full rounded-tr-lg flex items-center justify-center"><input type="number" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionCd" :disabled="!(isNewColumn && clickrowData1)" @blur="changeOptionManage4"></div>
         <div class="border border-black p-2 w-full h-full flex items-center justify-center text-blue-500 font-semibold bg-gray-100">*옵션명</div>
         <div class="border border-black p-2 w-full h-full flex items-center justify-center"><input type="text" class="border border-gray-300 rounded-lg w-full h-full p-2" v-model="optionNm" @input="changeOptionManage1" :disabled="!clickrowData1"></div>
         <div class="border border-black p-2 w-full h-full flex items-center justify-center text-blue-500 font-semibold bg-gray-100">*필수/선택</div>
@@ -329,7 +329,6 @@ import PickStore11 from '@/components/pickStore11.vue';
     filteredrowData2.value = []
     for(var i= 0 ; i< 21 ; i++){
         if(newValue[4+i] != '0'){
-            console.log(rowData2.value)
             const seleced = rowData2.value.find(item => item.lngCode == Number(newValue[4+i]))
             if(seleced != undefined){
               filteredrowData2.value.push({ lngCode : seleced.lngCode , strName : seleced.strName , lngPrice : seleced.lngPrice})
@@ -435,6 +434,7 @@ import PickStore11 from '@/components/pickStore11.vue';
       store.state.loading = false; // 로딩 상태 종료
                modified.value = false ;
                afterCategory.value = false;
+               clickrowData1.value = false
               
   }
   

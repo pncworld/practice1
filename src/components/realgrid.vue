@@ -173,6 +173,16 @@ const props = defineProps({
     type: Boolean,
     default: false,
   }
+  ,
+  deleteRow2: { // 숫자로만 오게
+    type: Boolean,
+    default: false,
+  }
+  ,
+  addField: { // 숫자로만 오게
+    type: String,
+    default: '',
+  }
  
 });
 
@@ -180,7 +190,9 @@ const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}
 const tabInitSetArray = ref([]);
 const selectedRowData = ref([]);
 const result2 =ref([]) ;
+const deletedIndex =ref() ;
 const addrow4activated =ref(false) ;
+const deleted2activated =ref(false) ;
 const updatedrowData = ref([])
 const selectedindex = ref(-1)
 const emit = defineEmits(["selcetedrowData" , "updatedRowData" , "clickedRowData" ,"dblclickedRowData" ,"selectedIndex" ]);
@@ -215,6 +227,10 @@ const funcshowGrid = async () => {
     dataType : item.strColID.includes('checkbox') ? 'boolean' : 'text',
   }));
   fields.push({fieldName: "deleted", dataType: "boolean" })
+  if(props.addField == 'new'){
+    fields.push({fieldName: "new", dataType: "boolean" })
+  }
+ 
 
 
   dataProvider.setFields(fields);
@@ -470,6 +486,7 @@ watch(() => props.addRow3, (newVal) => {
   for(var i=0 ; i<propertys.length ; i++){
     values[propertys[i]] = undefined
   }
+  values.new = true 
   var dataRow = dataProvider.addRow(values);
   gridView.setCurrent({dataRow: dataRow });
   props.rowData.push(values)
@@ -487,12 +504,14 @@ watch(() => props.addRow3, (newVal) => {
 });
 watch(() => props.addRow4, (newVal) => {
   gridView.commit();
-  var values = {add: true }; 
+  var values = { add: true }; 
   let propertys = props.addrowProp.split(',')
   const value = props.addrowDefault.split(',')
   for(var i=0 ; i<propertys.length ; i++){
     values[propertys[i]] = value[i]
   }
+  values.new = true 
+  console.log(values)
   var dataRow = dataProvider.addRow(values);
   gridView.setCurrent({dataRow: dataRow });
   const current = gridView.getCurrent(); 
@@ -503,6 +522,7 @@ watch(() => props.addRow4, (newVal) => {
     console.log("현재 선택된 인덱스:", selectedRowIndex);  // 선택된 행의 인덱스 출력
     selectedindex.value = selectedRowIndex
   }
+  console.log(selectedRowIndex)
   emit('selectedIndex' ,selectedRowIndex )
   console.log(props.rowData)
   addrow4activated.value = true
@@ -525,6 +545,25 @@ watch(() => props.deleteRow, (newVal) => {
     updatedrowData.value = [ ...dataProvider.getJsonRows()]
     emit('updatedRowData', updatedrowData.value )
   
+});
+watch(() => props.deleteRow2, (newVal) => {
+    gridView.commit();
+    const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
+    if (curr && curr.dataRow >= 0) {
+      // 현재 데이터 행이 유효한 경우
+      props.rowData[curr.dataRow].deleted = true ;
+      dataProvider.setValue(curr.dataRow, "deleted", true); // "deleted" 속성을 true로 설정
+      dataProvider.removeRow(curr.dataRow);
+      gridView.commit();
+    } else {
+      console.warn("선택된 행이 없습니다.");
+    }
+    updatedrowData.value = [ ...dataProvider.getJsonRows()]
+    emit('updatedRowData', updatedrowData.value )
+    deleted2activated.value = true
+    addrow4activated.value = true
+    deletedIndex.value = curr.dataRow
+    
 });
 
 watch(() => props.deleteAll, (newVal) => {
@@ -648,6 +687,7 @@ const setupGrid = async () => {
 
 watch(() => props.rowData, () => {
   console.log(selectedindex.value)
+  addrow4activated.value = true
   funcshowGrid().then(() =>{
     setTimeout(function(){
       if(selectedindex.value == -1){
@@ -663,12 +703,27 @@ watch(() => props.rowData, () => {
   }
 
   if(addrow4activated.value == true){
-    const current = gridView.getCurrent();
-    dataProvider.setRowState(current.dataRow, 'created', true);
-    addrow4activated.value = false
-    
+    console.log(props.rowData)
 
+    const newIndices = props.rowData.reduce((indices, item, index) => {
+  if (item.new === true) {
+    indices.push(index);
   }
+  return indices;
+}, []);
+    dataProvider.setRowStates(newIndices, 'created', true);
+    addrow4activated.value = false
+    console.log(dataProvider.getRows(0, -1))
+    const current = gridView.getCurrent();
+    if(deleted2activated.value == true){
+      console.log(current.dataRow)
+      gridView.setCurrent({ dataRow : deletedIndex.value -1})
+      deleted2activated.value = false
+    } else {
+      gridView.setCurrent({ dataRow : current.dataRow})
+    }
+  }
+ 
     },100) // 시간으로인한 미적용 이슈있음
     
 })

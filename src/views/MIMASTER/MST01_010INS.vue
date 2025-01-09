@@ -39,7 +39,7 @@
 </div>
     <div class="ml-10 mt-5 w-full h-full">
   
-   <Realgrid class="w-full h-full mt-2" :progname="'MST01_010INS_VUE'" :progid="2" :rowData="TLUList" @clickedRowData="clickedRowData" :searchWord="searchword" :searchColId="'lngCode,strName'" :selectionStyle="'singleRow'" :addrowProp="'lngCode,strName,lngMenu1,lngMenu2,lngMenu3,lngMenu4,lngMenu5,lngMenu6,lngMenu7,lngMenu8,lngMenu9,lngMenu10,lngMenu11,lngMenu12,lngMenu13,lngMenu14,lngMenu15,lngMenu16,lngMenu17,lngMenu18,lngMenu19,lngMenu20,lngMenu21,lngMenu22,lngMenu23,lngMenu24,lngMenu25,lngMenu26,lngMenu27,lngMenu28,lngMenu29'" :addRow4="addRow3" :addrowDefault="addrowDefault" :rowStateeditable="false" :editableColId="'strName'" :deleteRow="deleteRow" :initFocus="initFocus" @updatedRowData="updatedRowData"></Realgrid>
+   <Realgrid class="w-full h-full mt-2" :progname="'MST01_010INS_VUE'" :progid="2" :rowData="TLUList" @clickedRowData="clickedRowData" :searchWord="searchword" :searchColId="'lngCode,strName'" :selectionStyle="'singleRow'" :addrowProp="'lngCode,strName,lngMenu1,lngMenu2,lngMenu3,lngMenu4,lngMenu5,lngMenu6,lngMenu7,lngMenu8,lngMenu9,lngMenu10,lngMenu11,lngMenu12,lngMenu13,lngMenu14,lngMenu15,lngMenu16,lngMenu17,lngMenu18,lngMenu19,lngMenu20,lngMenu21,lngMenu22,lngMenu23,lngMenu24,lngMenu25,lngMenu26,lngMenu27,lngMenu28,lngMenu29'" :addRow4="addRow3" :addrowDefault="addrowDefault" :rowStateeditable="false" :editableColId="'strName'" :deleteRow2="deleteRow" :initFocus="initFocus" @updatedRowData="updatedRowData" :addField="'new'"></Realgrid>
     
      </div>
      <div class="flex justify-start ml-10 mt-5"><h1 class="font-bold text-xl z-40">메뉴 목록</h1></div>
