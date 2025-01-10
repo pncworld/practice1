@@ -5,11 +5,6 @@ import './assets/index.css'
 import store from './store'
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
-import { AgGridVue } from 'ag-grid-vue3'
-import "ag-grid-community/styles/ag-grid.css"; 
-import "ag-grid-community/styles/ag-theme-quartz.css";
-import "ag-grid-enterprise";
-import  "ag-grid-charts-enterprise";
 import { useLoading } from 'vue-loading-overlay'
 import 'v-calendar/style.css';
 import { Calendar, DatePicker } from 'v-calendar'
@@ -25,6 +20,6 @@ import VueKonva from 'vue-konva';
 library.add(fas ,far );
 
 createApp(App).use(router).use(store).use('Loading', useLoading).use(VueKonva)
-.component('VueDatePicker',VueDatePicker).component("font-awesome-icon", FontAwesomeIcon).component('VDatePicker',DatePicker ).component('VCalendar',Calendar ).component("ag-grid-vue",AgGridVue).mount('#app');
+.component('VueDatePicker',VueDatePicker).component("font-awesome-icon", FontAwesomeIcon).component('VDatePicker',DatePicker ).component('VCalendar',Calendar ).mount('#app');
 
 

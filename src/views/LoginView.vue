@@ -11,13 +11,13 @@
         <div class="mb-4">
           <label for="username" class="block text-gray-700 font-medium mb-2">아이디</label>
           <input type="text" id="username" v-model="username" placeholder="아이디를 입력하세요" required
-                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" @keyup.enter="login2" />
         </div>
 
         <div class="mb-6">
           <label for="password" class="block text-gray-700 font-medium mb-2">비밀번호</label>
           <input type="password" id="password" v-model="password" placeholder="비밀번호를 입력하세요" required
-                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" @keyup.enter="login2" />
         </div>
 
         <button type="submit"

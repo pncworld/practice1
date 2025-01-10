@@ -3,7 +3,6 @@ import MST01_002INS from "@/views/MIMASTER/MST01_002INS.vue";
 import MST01_008INS from "@/views/MIMASTER/MST01_008INS.vue";
 import MST01_010INS from "@/views/MIMASTER/MST01_010INS.vue";
 import MST01_011INS_01 from "@/views/MIMASTER/MST01_011INS_01.vue";
-import MST01_032INS from "@/views/MIMASTER/MST01_032INS.vue";
 import MST05_004INS from "@/views/MIMASTER/MST05_004INS.vue";
 import MST05_011INS from "@/views/MIMASTER/MST05_011INS.vue";
 import MST36_001INS from "@/views/MIMASTER/MST36_001INS.vue";
@@ -27,12 +26,7 @@ import NotFound from "@/views/NotFound.vue";
 
 export default function salesRouter() {
     return [
-      {
-        path: 'MST01_032INS.xml',
-
-        component: MST01_032INS
-      }
-      ,{
+     {
         path: 'MST01_002INS.xml',
         name: 'storeEnroll',
         component: MST01_002INS

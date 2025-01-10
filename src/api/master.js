@@ -62,50 +62,7 @@ export const master_delete = (groupCd , storeCd , lngAreaCd , posNo ,selectedrow
         DTM_DATE : selectedDate
     });
 };
-export const getMultiPrice = (groupCd ) => {
-    return api.post('/VUE_usp_getMultiPriceGroup', {
-        P_GROUP_CD: groupCd
-    });
-};
-export const storeAttr = (groupCd ,storeType ) => {
-    return api.post('/VUE_usp_mstStoreAttr_Query', {
-        P_GROUP_CD: groupCd ,
-        P_STORE_ATTR: storeType
-    });
-};
-export const joinType_query = (groupCd) => {
-    return api.post('/VUE_usp_mstJoinType_Query', {
-        P_GROUP_CD: groupCd 
-    });
-};
-export const subLease_query = (groupCd) => {
-    return api.post('/VUE_usp_mstSubLease_Query', {
-        P_GROUP_CD: groupCd 
-    });
-};
-export const storeArea = (groupCd) => {
-    return api.post('/VUE_usp_mstStoreArea', {
-        P_GROUP_CD: groupCd 
-    });
-};
-export const INS006_select = (groupCd) => {
-    return api.post('/VUE_usp_MST01_006INS_SELECT', {
-        P_GROUP_CD: groupCd 
-    });
-};
-export const INS004_select = (groupCd) => {
-    return api.post('/VUE_usp_MST01_004INS_SELECT', {
-        P_GROUP_CD: groupCd 
-    });
-};
-export const store_query = (groupCd ,storeType ,storeCd ,searchStoreName) => {
-    return api.post('/VUE_usp_mstStore_Query', {
-         P_GROUP_CD: groupCd,
-         P_STORE_ATTR : storeType,
-         P_STORE_CD : storeCd,
-         P_SEARCH_TEXT : searchStoreName ? searchStoreName : ''
-    });
-};
+
 export const getstoreInfo = (groupCd ,storeType ,storeCd ,searchStoreName) => {
     return api2.post('/MIMASTER/MST01_002INS.asmx/getstoreInfo', {
          GROUP_CD: groupCd,
@@ -114,23 +71,90 @@ export const getstoreInfo = (groupCd ,storeType ,storeCd ,searchStoreName) => {
          SEARCH_TEXT : searchStoreName 
     });
 };
-export const store_delete = (groupCd ,lngStoreCode) => {
-    return api.post('/VUE_usp_mstStore_Delete', {
-         P_GROUP_CD: groupCd,
-         P_STORE_CD : lngStoreCode,
-       
-    });
-};
-export const store_insert = (finalObject) => {
-    return api.post('/VUE_usp_mstStore_Insert', finalObject);
-};
-export const store_update = (finalObject1) => {
-    return api.post('/VUE_usp_mstStore_Update', finalObject1);
-};
+export const saveStoreInfo = async (id, groupCd, deleteStore, 
+    updateStoreCd, updateStoreNm, updatestrRegistNo,updatestrDirector , updatestrDealType , updatestrDealKind, updatelngJoinType, 
+    updatelngSubLease, updatelngStoreAttr, updatelngStoreArea, 
+    updatedtmOpenDate, updatedtmStop, updatestrConvCode, updatestrZipCode, 
+    updatestrAddress ,updatestrAddressetc, updatestrTel, updatestrPhone, updatestrFax, 
+    updatelngFloorSpace, updatelngLease, updatelngBEP, updatelngSaleType, 
+    updatelngSupervisor, updatestrDev1, updatelngTable, updatestrStoreHistory, updatelngMultiPriceGroupCode,
+    insertStoreCd, insertStoreNm, insertstrRegistNo, insertstrDirector , insertstrDealType , insertstrDealKind, insertlngJoinType, 
+    insertlngSubLease, insertlngStoreAttr, insertlngStoreArea, 
+    insertedtmOpenDate, insertedtmStop, insertstrConvCode, insertstrZipCode, 
+    insertstrAddress, insertstrAddressetc,insertstrTel, insertstrPhone, insertstrFax, 
+    insertlngFloorSpace, insertlngLease, insertlngBEP, insertlngSaleType, 
+    insertlngSupervisor, insertstrDev1, insertlngTable, insertstrStoreHistory , insertlngMultiPriceGroupCode
+  ) => {
+    const data = {
+      ID: id,
+      GROUP_CD: groupCd,
+      DELETE_STORE: deleteStore,
+      UPDATE_STORE_CD: updateStoreCd,
+      UPDATE_STORE_NM: updateStoreNm,
+      UPDATE_STR_REGIST_NO: updatestrRegistNo,
+      UPDATE_STR_DIRECTOR: updatestrDirector,
+      UPDATE_STR_DEALTYPE: updatestrDealType,
+      UPDATE_STR_DEALKIND: updatestrDealKind,
+      UPDATE_LNG_JOIN_TYPE: updatelngJoinType,
+      UPDATE_LNG_SUB_LEASE: updatelngSubLease,
+      UPDATE_LNG_STORE_ATTR: updatelngStoreAttr,
+      UPDATE_LNG_STORE_AREA: updatelngStoreArea,
+      UPDATE_DTM_OPEN_DATE: updatedtmOpenDate,
+      UPDATE_DTM_STOP: updatedtmStop,
+      UPDATE_STR_CONV_CODE: updatestrConvCode,
+      UPDATE_STR_ZIP_CODE: updatestrZipCode,
+      UPDATE_STR_ADDRESS: updatestrAddress,
+      UPDATE_STR_ADDRESSETC: updatestrAddressetc,
+      UPDATE_STR_TEL: updatestrTel,
+      UPDATE_STR_PHONE: updatestrPhone,
+      UPDATE_STR_FAX: updatestrFax,
+      UPDATE_LNG_FLOOR_SPACE: updatelngFloorSpace,
+      UPDATE_LNG_LEASE: updatelngLease,
+      UPDATE_LNG_BEP: updatelngBEP,
+      UPDATE_LNG_SALE_TYPE: updatelngSaleType,
+      UPDATE_LNG_SUPERVISOR: updatelngSupervisor,
+      UPDATE_STR_DEV1: updatestrDev1,
+      UPDATE_LNG_TABLE: updatelngTable,
+      UPDATE_STR_STORE_HISTORY: updatestrStoreHistory,
+      UPDATE_MULTI_GROUP_CODE: updatelngMultiPriceGroupCode,
+      INSERT_STORE_CD: insertStoreCd,
+      INSERT_STORE_NM: insertStoreNm,
+      INSERT_STR_REGIST_NO: insertstrRegistNo,
+      INSERT_STR_DIRECTOR: insertstrDirector,
+      INSERT_STR_DEALTYPE: insertstrDealType,
+      INSERT_STR_DEALKIND: insertstrDealKind,
+      INSERT_LNG_JOIN_TYPE: insertlngJoinType,
+      INSERT_LNG_SUB_LEASE: insertlngSubLease,
+      INSERT_LNG_STORE_ATTR: insertlngStoreAttr,
+      INSERT_LNG_STORE_AREA: insertlngStoreArea,
+      INSERT_DTM_OPEN_DATE: insertedtmOpenDate,
+      INSERT_DTM_STOP: insertedtmStop,
+      INSERT_STR_CONV_CODE: insertstrConvCode,
+      INSERT_STR_ZIP_CODE: insertstrZipCode,
+      INSERT_STR_ADDRESS: insertstrAddress,
+      INSERT_STR_ADDRESSETC: insertstrAddressetc,
+      INSERT_STR_TEL: insertstrTel,
+      INSERT_STR_PHONE: insertstrPhone,
+      INSERT_STR_FAX: insertstrFax,
+      INSERT_LNG_FLOOR_SPACE: insertlngFloorSpace,
+      INSERT_LNG_LEASE: insertlngLease,
+      INSERT_LNG_BEP: insertlngBEP,
+      INSERT_LNG_SALE_TYPE: insertlngSaleType,
+      INSERT_LNG_SUPERVISOR: insertlngSupervisor,
+      INSERT_STR_DEV1: insertstrDev1,
+      INSERT_LNG_TABLE: insertlngTable,
+      INSERT_STR_STORE_HISTORY: insertstrStoreHistory,
+      INSERT_MULTI_GROUP_CODE: insertlngMultiPriceGroupCode,
+    };
+  
+    return await api2.post('/MIMASTER/MST01_002INS.asmx/saveStoreInfo', data);
+  };
+  
 
 export const tablePosMenu = async(data) => {
     return await api2.post('/MIMASTER/MST57_002INS.asmx/getTablePosMenu', data);
 };
+
 
 export const tablePosMenuKey = async(data) => {
     return await api2.post('/MIMASTER/MST57_002INS.asmx/getTablePosMenuKey', data);

@@ -19,6 +19,8 @@ let dataProvider;
   searchColId => 검색하려는 필드명 ( 예)strName,SubName) , 로 나눠서 해당 필드들을 함께 조회 가능
   addRow => true false로 값이 변할때마다 행을 추가 
   deleteRow =>  true false로 값이 변할때마다 행을 삭제 
+  사용법 emit updatedRowData 사용시에는 가급적 불가피한경우가 아니라면 기존 rowData와 교체 하지 말 것. updatedRowData로 수정된 사항을 별도의 
+  변수로 저장해두고 추후에 그 데이터를 저장하는게 옳다고봄
 */
 const props = defineProps({
   progname: {
@@ -198,6 +200,26 @@ const props = defineProps({
     type: String,
     default: '',
   }
+  ,
+  deleteRow3: { // 숫자로만 오게
+    type: Boolean,
+    default: false,
+  }
+  ,
+  useCheckboxfordelete: { // 숫자로만 오게
+    type: Boolean,
+    default: false,
+  }
+  ,
+  changeNow: { 
+    type: Boolean,
+    default: false,
+  }
+  ,
+  changeValue2: { 
+    type: String,
+    default: '',
+  }
  
 });
 
@@ -213,7 +235,7 @@ const selectedindex = ref(-1)
 const emit = defineEmits(["selcetedrowData" , "updatedRowData" , "clickedRowData" ,"dblclickedRowData" ,"selectedIndex" ]);
 const funcshowGrid = async () => {
   // 그리드 초기화
-  console.log(gridView)
+ 
 
   if (gridView !=undefined && gridView !=null ) {
     gridView.destroy(); // 기존 그리드 인스턴스 제거
@@ -299,10 +321,10 @@ const funcshowGrid = async () => {
 
  
   
-  console.log(columns)
+
   gridView.setColumns(columns);
   
-console.log(props.mergeColumns)
+
 if(props.mergeColumns == true ) {
 
     const subList = props.mergeColumnGroupSubList.split(','); // subList 분리
@@ -349,14 +371,13 @@ tabInitSetArray.value.forEach((item,index) => {
 if (groupItems) {
   layout1.unshift(groupItems); // layout1의 첫 번째에 그룹 객체를 추가
 }
-console.log(layout1)
+
 gridView.setColumnLayout(layout1)
     
 }
   
   // 데이터 추가
-  console.log(props.rowData)
-  console.log(tabInitSetArray.value)
+
  
   dataProvider.setRows(props.rowData);
   
@@ -388,14 +409,33 @@ gridView.setColumnLayout(layout1)
   
   }
 }
+if(props.useCheckboxfordelete == true){
 
+const alldata = dataProvider.getJsonRows();
+     for(var i=0 ; i< alldata.length ; i++){
+      
+       if(alldata[i].checkbox == false || alldata[i].checkbox == undefined  ){
+  
+        dataProvider.setRowState(i,"none" )
+       } else if(alldata[i].checkbox == true){
+        dataProvider.setRowState(i,"deleted" )
+       }
+   
+ }
+}
   // 이벤트 설정
   
-  gridView.onCellEdited = () => gridView.commit();
+  gridView.onCellEdited = function (grid, itemIndex, row, field) {
+     gridView.commit();
+   
+     updatedrowData.value = [ ...dataProvider.getJsonRows()]
+     emit('updatedRowData', updatedrowData.value )
+   }
   gridView.onItemChecked = () => {
 
     selectedRowData.value = gridView.getCheckedItems().map(index => dataProvider.getRows()[index]);
     emit('selcetedrowData', selectedRowData.value);
+  
   };
   gridView.onItemAllChecked = (grid, checked) => {
     selectedRowData.value = gridView.getCheckedItems().map(index => dataProvider.getRows()[index]);
@@ -440,7 +480,7 @@ gridView.onCellClicked = function (grid, clickData) {
 gridView.onColumnCheckedChanged = function (grid, col, chk) {
   
      var rowCount = dataProvider.getRowCount();  // 전체 행의 개수
-     console.log(rowCount)
+   
      for (var i = 0; i < rowCount; i++) {
       dataProvider.setValue(i, col.fieldName, chk);  // 
      }
@@ -481,13 +521,19 @@ gridView.onCellDblClicked = function (grid, clickData) {
 }
 
 watch(() => props.changeValue , () => {
-  console.log(props.changeRow)
-  console.log(props.changeColid)
-  console.log(props.changeValue)
+ 
     dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue);
-
+  
     updatedrowData.value = [ ...dataProvider.getJsonRows()]
-     console.log(updatedrowData.value );
+ 
+     emit('updatedRowData', updatedrowData.value )
+})
+watch(() => props.changeNow , () => {
+ 
+    dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue2);
+  
+    updatedrowData.value = [ ...dataProvider.getJsonRows()]
+ 
      emit('updatedRowData', updatedrowData.value )
 })
 
@@ -495,9 +541,9 @@ watch(() => props.addRow, (newVal) => {
   gridView.commit();
   var values = {add: '추가' , sort: '매장용'}; 
   var dataRow = dataProvider.addRow(values);
-  console.log(dataRow)
+
   gridView.setCurrent({dataRow: dataRow});
-  console.log(dataProvider.getJsonRows())
+ 
 
 });
 
@@ -547,7 +593,7 @@ watch(() => props.addRow4, (newVal) => {
     values[propertys[i]] = value[i]
   }
   values.new = true 
-  console.log(values)
+
   var dataRow = dataProvider.addRow(values);
   gridView.setCurrent({dataRow: dataRow });
   const current = gridView.getCurrent(); 
@@ -558,10 +604,15 @@ watch(() => props.addRow4, (newVal) => {
     console.log("현재 선택된 인덱스:", selectedRowIndex);  // 선택된 행의 인덱스 출력
     selectedindex.value = selectedRowIndex
   }
-  console.log(selectedRowIndex)
+
   emit('selectedIndex' ,selectedRowIndex )
   console.log(props.rowData)
   addrow4activated.value = true
+
+  selectedRowData.value= dataProvider.getRows()[selectedindex.value];
+  selectedRowData.value.index = selectedindex.value
+  emit('clickedRowData', selectedRowData.value);
+  emit('selectedIndex' ,selectedRowIndex )
   // updatedrowData.value = [ ...dataProvider.getJsonRows()]
   // emit('updatedRowData', updatedrowData.value )
 
@@ -599,6 +650,31 @@ watch(() => props.deleteRow2, (newVal) => {
     deleted2activated.value = true
     addrow4activated.value = true
     deletedIndex.value = curr.dataRow
+    
+});
+
+watch(() => props.deleteRow3, (newVal) => {
+    gridView.commit();
+    const alldata = dataProvider.getJsonRows();
+    const checkedIndexes = [];
+
+    alldata.forEach((item, index) => {
+        if (item.checkbox === true) {
+        checkedIndexes.push(index); // 체크된 항목의 인덱스를 저장
+      }
+    });
+    console.log(checkedIndexes)
+
+    for(var i=0 ; i<checkedIndexes.length ; i++){
+      props.rowData[checkedIndexes[i]].deleted = true ;
+      dataProvider.setValue(checkedIndexes[i], "deleted", true); // "deleted" 속성을 true로 설정
+      dataProvider.removeRow(checkedIndexes[i]);
+    }
+    updatedrowData.value = [ ...dataProvider.getJsonRows()]
+    emit('updatedRowData', updatedrowData.value )
+    deleted2activated.value = true
+    addrow4activated.value = true
+    //deletedIndex.value = curr.dataRow
     
 });
 
@@ -647,6 +723,7 @@ watch(() => props.exporttoExcel, (newVal) => {
       header: true,
       footer: true,
       compatibility: true,
+      lookupDisplay: true
     })
   
 });
@@ -656,7 +733,7 @@ watch(() => props.initFocus, (newVal) => {
     
     gridView.clearCurrent();
  }
-  },150)
+  },100)
  
   
   
@@ -722,7 +799,7 @@ const setupGrid = async () => {
 };
 
 watch(() => props.rowData, () => {
-  console.log(selectedindex.value)
+
   addrow4activated.value = true
   funcshowGrid().then(() =>{
     setTimeout(function(){
@@ -730,7 +807,7 @@ watch(() => props.rowData, () => {
         return;
       }
       if(selectedindex.value !='' && selectedindex.value !=undefined){
-    console.log(selectedindex.value)
+ 
     gridView.setCurrent({ dataRow : selectedindex.value })
 
 
@@ -739,7 +816,7 @@ watch(() => props.rowData, () => {
   }
 
   if(addrow4activated.value == true){
-    console.log(props.rowData)
+  
 
     const newIndices = props.rowData.reduce((indices, item, index) => {
   if (item.new === true) {
@@ -749,10 +826,10 @@ watch(() => props.rowData, () => {
 }, []);
     dataProvider.setRowStates(newIndices, 'created', true);
     addrow4activated.value = false
-    console.log(dataProvider.getRows(0, -1))
+  
     const current = gridView.getCurrent();
     if(deleted2activated.value == true){
-      console.log(current.dataRow)
+   
       gridView.setCurrent({ dataRow : deletedIndex.value -1})
       deleted2activated.value = false
     } else {
