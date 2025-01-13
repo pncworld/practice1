@@ -8,7 +8,7 @@ import HomePage from '@/views/homePage.vue'
 import salesRouter from './salesRouter'
 import masterRouter from './masterRouter'
 import mobileRouter from './mobileRouter'
-
+import miattendRouter from './miattendRouter'
 
 
 const isMobile = () =>{
@@ -36,6 +36,11 @@ const routes = [
     path: '/MIMASTER',
     //component : BasicLayout ,
     children: masterRouter()
+  },
+  {
+    path: '/MIATTEND',
+    //component : BasicLayout ,
+    children: miattendRouter()
   },
   {
     path: '/m',

@@ -396,6 +396,7 @@ gridView.setColumnLayout(layout1)
   gridView.editOptions.commitWhenLeave = true;
   dataProvider.softDeleting = (props.notsoftDelete == false ? true : false);
   dataProvider.deleteCreated = true;
+  //gridView.sortingOptions.enabled = false; // 정렬기능 비활성화
   dataProvider.autoCommit = true; // 자동 커밋 활성화
   dataProvider.commitBeforeDataEdit = true
   gridView.editOptions.movable = (props.dragOn == true ? true : false)
@@ -469,12 +470,12 @@ gridView.onCellClicked = function (grid, clickData) {
   if (clickData.itemIndex == undefined) {
     return ;
   }
-  selectedRowData.value= dataProvider.getRows()[clickData.itemIndex];
-  selectedRowData.value.index = clickData.itemIndex
+  var current = gridView.getCurrent();
+  selectedRowData.value= dataProvider.getRows()[current.dataRow];
+  selectedRowData.value.index = current.dataRow
   emit('clickedRowData', selectedRowData.value);
-  emit('selectedIndex' ,clickData.itemIndex )
-  selectedindex.value = clickData.itemIndex
-   console.log(selectedindex.value)
+  emit('selectedIndex' , current.dataRow )
+
 }
 
 gridView.onColumnCheckedChanged = function (grid, col, chk) {
@@ -517,7 +518,8 @@ gridView.onCellDblClicked = function (grid, clickData) {
   emit('dblclickedRowData', selectedRowData.value);
  
 }
-
+updatedrowData.value = [ ...dataProvider.getJsonRows()]
+emit('updatedRowData', updatedrowData.value )
 }
 
 watch(() => props.changeValue , () => {
@@ -598,7 +600,7 @@ watch(() => props.addRow4, (newVal) => {
   gridView.setCurrent({dataRow: dataRow });
   const current = gridView.getCurrent(); 
 
-  props.rowData.push(values)
+  //props.rowData.push(values)
   const selectedRowIndex = current ? current.dataRow : null;
    if (selectedRowIndex !== null) {
     console.log("현재 선택된 인덱스:", selectedRowIndex);  // 선택된 행의 인덱스 출력
@@ -613,8 +615,8 @@ watch(() => props.addRow4, (newVal) => {
   selectedRowData.value.index = selectedindex.value
   emit('clickedRowData', selectedRowData.value);
   emit('selectedIndex' ,selectedRowIndex )
-  // updatedrowData.value = [ ...dataProvider.getJsonRows()]
-  // emit('updatedRowData', updatedrowData.value )
+   updatedrowData.value = [ ...dataProvider.getJsonRows()]
+   emit('updatedRowData', updatedrowData.value )
 
 });
 watch(() => props.deleteRow, (newVal) => {
@@ -697,11 +699,9 @@ watch(() => props.deleteAll, (newVal) => {
 
 
 
-// Update the row data after deletion
-updatedrowData.value = [...dataProvider.getJsonRows()];
-
-// Emit the updated row data
-emit('updatedRowData', updatedrowData.value);
+   updatedrowData.value = [ ...dataProvider.getJsonRows()]
+emit('updatedrowData', updatedrowData.value )
+  
 });
 
 watch(() => props.commitAll, (newVal) => {
@@ -841,7 +841,7 @@ watch(() => props.rowData, () => {
     
 })
 
-  
+
 });
 
 watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) => {

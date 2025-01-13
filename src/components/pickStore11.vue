@@ -26,7 +26,7 @@
 
 <script setup>
 import axios from 'axios';
-import { defineProps , ref, watch } from 'vue';
+import { defineProps , onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 const storeGroup = ref([]);
@@ -65,7 +65,16 @@ const emitStoreCode = (value) => {
   }
   emit('GroupNm', storeGroup.value[0].strName);
 };
-   
+onMounted(()=>{
+
+storeGroup.value = store.state.storeGroup;
+if(storeGroup.value[0] !=undefined){
+  emit('update:storeGroup', storeGroup.value[0].lngStoreGroup);
+}
+
+
+
+})
   storeGroup.value = store.state.storeGroup;
   storeType.value = store.state.storeType;
   storeCd.value = store.state.storeCd;

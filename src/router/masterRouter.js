@@ -1,4 +1,5 @@
 
+import ATT01_002INS from "@/views/MIATTEND/ATT01_002INS.vue";
 import MST01_002INS from "@/views/MIMASTER/MST01_002INS.vue";
 import MST01_008INS from "@/views/MIMASTER/MST01_008INS.vue";
 import MST01_010INS from "@/views/MIMASTER/MST01_010INS.vue";
@@ -132,6 +133,7 @@ export default function salesRouter() {
         path : "MST01_010INS.xml",
         component : MST01_010INS
       }
+     
      
     ];
   }
