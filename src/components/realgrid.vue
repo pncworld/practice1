@@ -220,6 +220,11 @@ const props = defineProps({
     type: String,
     default: '',
   }
+  ,
+  setNumberformatColumn: { 
+    type: String,
+    default: '',
+  }
  
 });
 
@@ -261,7 +266,7 @@ const funcshowGrid = async () => {
   // 필드 정의
   const fields = tabInitSetArray.value.map(item => ({
     fieldName: item.strColID,
-    dataType : item.strColID.includes('checkbox') ? 'boolean' : 'text',
+    dataType : item.strColID.includes('checkbox') ? 'boolean' : (item.strColType == 'number' ? 'number' : 'text'),
   }));
   fields.push({fieldName: "deleted", dataType: "boolean" })
   if(props.addField == 'new'){
@@ -318,8 +323,13 @@ const funcshowGrid = async () => {
        labelingcolumn.labels =labels[i]
      }
   }
+  
+  if(props.setNumberformatColumn !=''){
+    let formatcolumn = columns.find(item => item.fieldName == props.setNumberformatColumn)
 
- 
+    formatcolumn.numberFormat = "#,##0.00";
+  }
+   
   
 
   gridView.setColumns(columns);
@@ -402,7 +412,6 @@ gridView.setColumnLayout(layout1)
   gridView.editOptions.movable = (props.dragOn == true ? true : false)
   gridView.displayOptions.selectAndImmediateDrag = (props.dragOn == true ? true : false)
   gridView.displayOptions.selectionStyle = props.selectionStyle 
-
   for (let i = dataProvider.getRowCount() - 1; i >= 0; i--) { // 역순으로 순회
   const rowData = dataProvider.getJsonRow(i);
   if (rowData.deleted) {
@@ -471,7 +480,7 @@ gridView.onSelectionChanged = function (grid) {
   selectedRowData.value= dataProvider.getRows()[current.dataRow];
   emit('clickedRowData', selectedRowData.value);
   emit('selectedIndex' , current.dataRow )
-  console.log('Selection changed!');
+
 }
 
 gridView.onCellClicked = function (grid, clickData) {
@@ -679,7 +688,7 @@ watch(() => props.deleteRow3, (newVal) => {
         checkedIndexes.push(index); // 체크된 항목의 인덱스를 저장
       }
     });
-    console.log(checkedIndexes)
+
 
     for(var i=0 ; i<checkedIndexes.length ; i++){
       props.rowData[checkedIndexes[i]].deleted = true ;

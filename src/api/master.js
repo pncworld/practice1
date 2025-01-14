@@ -869,6 +869,27 @@ export const saveMenuManage = (groupCd , storeCd , maincode , mainnm, subcode ,s
         SUB_MJ : submajor ,
     })
 }
+export const saveCreditCardEnroll = (groupCd , storeCd , cstorecd , cbuyCd ,cbuyNm , cbuyENm, clngrate , cifCode, istorecd , ibuyCd ,ibuyNm , ibuyENm, ilngrate , iifCode ,dstoreCd , dstorebuyCd) => {
+    return api2.post('/MIMASTER/MST43_001INS.asmx/saveCreditCardEnroll', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd ,
+        C_STORECD : cstorecd ,
+        C_BUYCD : cbuyCd ,
+        C_BUYNM : cbuyNm ,
+        C_BUYENM : cbuyENm ,
+        C_LNGRATE : clngrate ,
+        C_IFCODE : cifCode ,
+        I_STORECD : istorecd ,
+        I_BUYCD : ibuyCd ,
+        I_BUYNM : ibuyNm ,
+        I_BUYENM : ibuyENm ,
+        I_LNGRATE : ilngrate ,
+        I_IFCODE : iifCode ,
+        D_STORECD : dstoreCd ,
+        D_STOREBCD : dstorebuyCd
+       
+    })
+}
 export const saveOptions = (groupCd , storeCd , lngcode1 , strNames1, blnMustSels1 ,intMultiples1 ,lngChainMenu1,lngChainMenu2,lngChainMenu3,
   lngChainMenu4,lngChainMenu5,lngChainMenu6,lngChainMenu7,lngChainMenu8,lngChainMenu9,lngChainMenu10,lngChainMenu11,lngChainMenu12,lngChainMenu13,
   lngChainMenu14,lngChainMenu15,lngChainMenu16,lngChainMenu17,lngChainMenu18,lngChainMenu19,lngChainMenu20,lngChainMenu21,lngCodes2,strNames2,
