@@ -3,7 +3,7 @@
         <div class="flex justify-between items-center w-full overflow-y-auto">
     <div class="flex justify-start  w-full pl-12 pt-4">
                <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-full">
-                사원 등록.
+                신용카드 매입사 등록.
                </h1></div>
                 
                </div>
@@ -17,75 +17,40 @@
   
   </div>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center mt-3">
-  <PickStore11 @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd"  @update:ischanged="handleinitAll">
-  </PickStore11>
+  <PickStore3 @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd"  @update:ischanged="handleinitAll">
+  </PickStore3>
   </div>
-  <span class="grid grid-rows-1 grid-cols-2 mt-5"><div class="ml-10 flex justify-start font-bold text-xl">사용자 정보</div><div class="flex justify-between"><div class="flex justify-start font-bold text-xl">상세정보</div><div class="mr-20"><button class="whitebutton" @click="addButton">추가</button><button class="whitebutton" @click="deleteButton">삭제</button></div></div></span>
+  <span class="grid grid-rows-1 grid-cols-2 mt-5"><div class="ml-10 flex justify-start font-bold text-xl">카드 정보</div><div class="flex justify-between ml-44"><div class="flex justify-start font-bold text-xl">카드 상세정보</div><div class="mr-20"><button class="whitebutton" @click="addButton">추가</button><button class="whitebutton" @click="deleteButton">삭제</button></div></div></span>
   <div class="grid grid-rows-1 grid-cols-2 h-full w-full justify-center mt-2">
     
-    <div class="w-[90%] ml-10 h-full">
+    <div class="w-[110%] ml-10 h-full">
         
-        <Realgrid :progname="'ATT01_002INS_VUE'" :progid="1" :rowData="rowData" @clickedRowData="clickedRowData"  @selcetedrowData="selcetedrowData" @updatedRowData="updatedRowData" :selectionStyle="'singleRow'"  :labelingColumns="'blnExpireClass'" :valuesData="valuesData" :labelsData="labelsData" :addRow4="addRow" :deleteRow2="deleteRow" :addrowDefault="addrowDefault" :addrowProp="addrowProp"  :changeNow="changeNow" :changeValue2="changeValue2" :changeColid="changeColid" :changeRow="changeRow" @selectedIndex="selectedIndex" :rowStateeditable="false" :addField="'new'"></Realgrid></div>
+        <Realgrid :progname="'MST43_001INS_VUE'" :progid="1" :rowData="rowData" @clickedRowData="clickedRowData"  @selcetedrowData="selcetedrowData" @updatedRowData="updatedRowData" :selectionStyle="'singleRow'" ></Realgrid></div>
        
-        <div class="grid grid-cols-[1fr,6fr] grid-rows-4 w-[90%] mr-10 h-[15%] ">
-        <div class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500 rounded-tl-lg">*사원코드</div>
+        <div class="grid grid-cols-[1fr,6fr] grid-rows-6 w-[70%] ml-44 h-[22%] ">
+        <div class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500 rounded-tl-lg">*매장명</div>
         <div class="border flex h-7 items-center text-sm font-semibold justify-center rounded-tr-lg"><input type="text" class="border text-sm rounded-md w-full pl-2 h-7 disabled:bg-gray-200" v-model="empCode" name="empCode" @input="changeInfo" disabled></div>
-        <div class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500">*사원이름</div>
+        <div class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500">*매입사코드</div>
         <div class="border flex h-7 items-center text-sm font-semibold justify-center"><input type="text" class="border text-sm rounded-md w-full pl-2 h-7" v-model="empName" name="empName" @input="changeInfo"></div>
-        <div class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">재직구분</div>
-        <div class="border flex h-7 items-center text-sm font-semibold justify-left pl-2 space-x-2"><div class="flex items-center space-x-4">
-  <label for="empExpire0">
-    <input 
-      type="radio" 
-      class="border text-sm rounded-md pl-2" 
-      v-model="empExpire" 
-      id="empExpire0"
-      name="empExpire" 
-      value="0"
-      @input="changeInfo"
-    />
-    재직
-  </label>
-</div>
-<div class="flex items-center space-x-2">
-  <label for="empExpire1">
-    <input 
-      type="radio" 
-      class="border text-sm rounded-md pl-2" 
-      v-model="empExpire" 
-      id="empExpire1"
-      name="empExpire" 
-      value="1"
-      @input="changeInfo"
-    />
-    퇴직
-  </label>
-</div>
-<div class="flex items-center space-x-2">
-  <label for="empExpire2">
-    <input 
-      type="radio" 
-      class="border text-sm rounded-md pl-2" 
-      v-model="empExpire" 
-      id="empExpire2"
-      name="empExpire" 
-      value="2"
-      @input="changeInfo"
-    />
-    휴직
-  </label>
-</div>
-</div>
-        <div class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 rounded-bl-lg">비밀번호</div>
+        <div class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">매입사명</div>
+        <div class="border flex h-7 items-center text-sm font-semibold justify-left "><input type="text" class="border text-sm rounded-md w-full pl-2 h-7" v-model="empName" name="empName" @input="changeInfo"></div>
+        <div class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 ">영문명</div>
         <div class="border flex h-7 items-center text-sm font-semibold justify-center rounded-br-lg"><input type="text" class="border text-sm rounded-md w-full pl-2 h-7" v-model="password" name="password" @input="changeInfo"></div>
+        <div class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 ">적용비율</div>
+        <div class="border flex h-7 items-center text-sm font-semibold justify-center rounded-br-lg"><input type="text" class="border text-sm rounded-md w-full pl-2 h-7" v-model="password" name="password" @input="changeInfo"></div>
+        <div class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 rounded-bl-lg">인터페이스코드</div>
+        <div class="border flex h-7 items-center text-sm font-semibold justify-center rounded-br-lg"><input type="text" class="border text-sm rounded-md w-full pl-2 h-7" v-model="password" name="password" @input="changeInfo"></div>
+     
     </div>
   </div>
     </div>
 </template>
 
 <script setup>
+import { getCardInfo } from '@/api/master';
 import { getChargerInfo, saveEMP } from '@/api/miattend';
 import PickStore11 from '@/components/pickStore11.vue';
+import PickStore3 from '@/components/pickStore3.vue';
 
 import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';
@@ -94,7 +59,7 @@ import { useStore } from 'vuex';
 
 const rowData = ref([])
 const groupCd = ref()
-const storeCd = ref()
+const storeCd = ref(0)
 const afterSearch = ref(false);
 const empCode = ref()
 const empName = ref()
@@ -183,29 +148,14 @@ const addrowProp = ref('blnExpireClass,lngChargerCode')
 const store = useStore();
 const searchButton = async() => {
    
-   if(storeCd.value == '0' || storeCd.value == undefined) {
-       Swal.fire({
-           title: '경고',
-           text: '매장을 선택하세요.',
-           icon: 'warning',
-           showCancelButton: false,
-           confirmButtonColor: '#3085d6',
-           allowOutsideClick: false
-       })
-       return;
-   }
- 
-  
- 
    store.state.loading = true;
    try {
      let res;
-     console.log(groupCd.value)
-     console.log(storeCd.value)
-     res = await getChargerInfo( groupCd.value , storeCd.value)
+     console.log(groupCd.value +'+'+ storeCd.value)
+     res = await getCardInfo( groupCd.value , storeCd.value)
 
-     rowData.value = res.data.EMPCHARGER
-     updateRow.value = JSON.parse(JSON.stringify(rowData.value))
+     rowData.value = res.data.CARDLIST
+
      console.log(res)
       afterSearch.value = true;
    } catch (error) {

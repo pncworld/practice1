@@ -21,3 +21,18 @@ export const getChargerInfo = (groupCd, storeCd) => {
           STORE_CD: storeCd
       });
   };
+export const saveEMP = (groupCd, storeCd , code , name , expire, mngno ,code2 , name2 , expire2, mngno2 , dcode ) => {
+      return api2.post('/MIATTEND/ATT01_002INS.asmx/saveEMP', {
+          GROUP_CD: groupCd,
+          STORE_CD: storeCd ,
+          UCODE: code,
+          UNAME: name,
+          UEXPIRE: expire,
+          UMNGNO: mngno ,
+          ICODE: code2,
+          INAME: name2,
+          IEXPIRE: expire2,
+          IMNGNO: mngno2 ,
+          DELETECODE: dcode ,
+      });
+  };

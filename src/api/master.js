@@ -1047,6 +1047,12 @@ export const getTLUManageInfo = (groupCd  , store_cd) => {
 
     })
 }
+export const getCardInfo = (groupCd  , store_cd) => {
+    return api2.post('/MIMASTER/MST43_001INS.asmx/getCardInfo', {
+        GROUP_CD: groupCd,
+        STORE_CD : store_cd
+    })
+}
 
 
 

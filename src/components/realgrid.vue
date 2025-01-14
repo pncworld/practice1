@@ -433,7 +433,7 @@ const alldata = dataProvider.getJsonRows();
      emit('updatedRowData', updatedrowData.value )
    }
   gridView.onItemChecked = () => {
-
+    
     selectedRowData.value = gridView.getCheckedItems().map(index => dataProvider.getRows()[index]);
     emit('selcetedrowData', selectedRowData.value);
   
@@ -465,6 +465,15 @@ const alldata = dataProvider.getJsonRows();
   emit('selectedIndex' ,clickData.itemIndex )
 }
 
+gridView.onSelectionChanged = function (grid) {
+  var current = gridView.getCurrent();
+
+  selectedRowData.value= dataProvider.getRows()[current.dataRow];
+  emit('clickedRowData', selectedRowData.value);
+  emit('selectedIndex' , current.dataRow )
+  console.log('Selection changed!');
+}
+
 gridView.onCellClicked = function (grid, clickData) {
  
   if (clickData.itemIndex == undefined) {
@@ -475,6 +484,7 @@ gridView.onCellClicked = function (grid, clickData) {
   selectedRowData.value.index = current.dataRow
   emit('clickedRowData', selectedRowData.value);
   emit('selectedIndex' , current.dataRow )
+  
 
 }
 
@@ -518,8 +528,9 @@ gridView.onCellDblClicked = function (grid, clickData) {
   emit('dblclickedRowData', selectedRowData.value);
  
 }
-updatedrowData.value = [ ...dataProvider.getJsonRows()]
-emit('updatedRowData', updatedrowData.value )
+
+
+
 }
 
 watch(() => props.changeValue , () => {
@@ -600,7 +611,7 @@ watch(() => props.addRow4, (newVal) => {
   gridView.setCurrent({dataRow: dataRow });
   const current = gridView.getCurrent(); 
 
-  //props.rowData.push(values)
+  props.rowData.push(values)
   const selectedRowIndex = current ? current.dataRow : null;
    if (selectedRowIndex !== null) {
     console.log("현재 선택된 인덱스:", selectedRowIndex);  // 선택된 행의 인덱스 출력
@@ -648,7 +659,10 @@ watch(() => props.deleteRow2, (newVal) => {
       console.warn("선택된 행이 없습니다.");
     }
     updatedrowData.value = [ ...dataProvider.getJsonRows()]
+    const curr2 = gridView.getCurrent();
+    selectedRowData.value= dataProvider.getRows()[curr2.dataRow];
     emit('updatedRowData', updatedrowData.value )
+    emit('clickedRowData', selectedRowData.value);
     deleted2activated.value = true
     addrow4activated.value = true
     deletedIndex.value = curr.dataRow

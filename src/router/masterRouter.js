@@ -4,9 +4,11 @@ import MST01_002INS from "@/views/MIMASTER/MST01_002INS.vue";
 import MST01_008INS from "@/views/MIMASTER/MST01_008INS.vue";
 import MST01_010INS from "@/views/MIMASTER/MST01_010INS.vue";
 import MST01_011INS_01 from "@/views/MIMASTER/MST01_011INS_01.vue";
+import MST01_032INS from "@/views/MIMASTER/MST01_032INS.vue";
 import MST05_004INS from "@/views/MIMASTER/MST05_004INS.vue";
 import MST05_011INS from "@/views/MIMASTER/MST05_011INS.vue";
 import MST36_001INS from "@/views/MIMASTER/MST36_001INS.vue";
+import MST43_001INS from "@/views/MIMASTER/MST43_001INS.vue";
 import MST44_002INS from "@/views/MIMASTER/MST44_002INS.vue";
 import MST44_043INS from "@/views/MIMASTER/MST44_043INS.vue";
 import MST44_052INS from "@/views/MIMASTER/MST44_052INS.vue";
@@ -132,6 +134,16 @@ export default function salesRouter() {
       {
         path : "MST01_010INS.xml",
         component : MST01_010INS
+      }
+      ,
+      {
+        path : "MST43_001INS.xml",
+        component : MST43_001INS
+      }
+      ,
+      {
+        path : "MST01_032INS.xml",
+        component : MST01_032INS
       }
      
      
