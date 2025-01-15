@@ -792,6 +792,32 @@ export const saveScreenKeys3 = (groupCd , storeCd , posnos , areaCds, screenNm ,
 
     })
 }
+export const saveAccInfo = (groupCd , clngAccCode,cstrName ,cblnOut,cblnGear,ilngAccCode ,istrName,iblnOut,iblnGear ,dlngAccCode) => {
+    return api2.post('/MIMASTER/MST40_001INS.asmx/saveAccInfo', {
+        GROUP_CD: groupCd,
+        CACC_CD : clngAccCode ,
+        CSTR_NAME : cstrName ,
+        CBLNOUT : cblnOut ,
+        CBLNGEAR : cblnGear ,
+        IACCCD : ilngAccCode ,
+        ISTR_NAME : istrName ,
+        IBLNOUT : iblnOut ,
+        IBLNGEAR : iblnGear ,
+        DACCCD : dlngAccCode 
+
+    })
+}
+export const savePayGroup = (groupCd , lngstoregroup , lnggroupCd ,groupNm ,strrk ,dgroupCd) => {
+    return api2.post('/MIMASTER/MST36_003INS.asmx/savePayGroup', {
+        GROUP_CD: groupCd,
+        PAYSTOREGROUP : lngstoregroup,
+        PAYGROUP_CD : lnggroupCd ,
+        PAYGROUP_NM : groupNm ,
+        STR_REMARK : strrk ,
+        DGROUP_CD : dgroupCd
+
+    })
+}
 export const saveTables = (groupCd , storeCd , posnos , areaCds, screenNo ,lngKeyscrNo ,lngKeyColors ,lngShapes ,strNames ,lngCounts , xs, ys, ws,hs , newNm , newlngCount) => {
     return api2.post('/MIMASTER/MST_002INS.asmx/saveTables', {
         GROUP_CD: groupCd,
@@ -1033,6 +1059,11 @@ export const getTableList2 = (groupCd ,storeCd , areaCd , posNo  , screenNo) => 
 
     })
 }
+export const getacc = (groupCd ) => {
+    return api2.post('/MIMASTER/MST40_001INS.asmx/getacc', {
+        GROUP_CD: groupCd
+    })
+}
 
 export const getTableScreenKeys = (groupCd ,storeCd , posNo , AreaCd ) => {
     return api2.post('/MIMASTER/MST_002INS.asmx/getTableScreenKeys', {
@@ -1072,6 +1103,19 @@ export const getCardInfo = (groupCd  , store_cd) => {
     return api2.post('/MIMASTER/MST43_001INS.asmx/getCardInfo', {
         GROUP_CD: groupCd,
         STORE_CD : store_cd
+    })
+}
+export const getAmountGroup = (groupCd ) => {
+    return api2.post('/MIMASTER/MST36_003INS.asmx/getAmountGroup', {
+        GROUP_CD: groupCd
+
+    })
+}
+export const getAllPayList = (groupCd , storeCd) => {
+    return api2.post('/MIMASTER/MST36_055INS.asmx/getAllPayList', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd
+
     })
 }
 

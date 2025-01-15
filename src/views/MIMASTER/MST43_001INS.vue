@@ -20,7 +20,7 @@
   <PickStore3 @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd" @storeNm="storeNm"  @update:ischanged="handleinitAll">
   </PickStore3>
   </div>
-  <span class="grid grid-rows-1 grid-cols-2 mt-5"><div class="ml-10 flex justify-start font-bold text-xl">카드 정보</div><div class="flex justify-between ml-44"><div class="flex justify-start font-bold text-xl">카드 상세정보</div><div class="mr-20"><button class="whitebutton" @click="addButton">추가</button><button class="whitebutton" @click="deleteButton">삭제</button></div></div></span>
+  <span class="grid grid-rows-1 grid-cols-2 mt-5"><div class="ml-10 flex justify-start font-bold text-xl">카드 정보</div><div class="flex justify-between ml-44"><div class="flex justify-start font-bold text-xl">상세정보</div><div class="mr-20"><button class="whitebutton" @click="addButton">추가</button><button class="whitebutton" @click="deleteButton">삭제</button></div></div></span>
   <div class="grid grid-rows-1 grid-cols-2 h-full w-full justify-center mt-2">
     
     <div class="w-[110%] ml-10 h-full">
@@ -126,7 +126,7 @@ const clickedRowData = (newValue) => {
   gridvalue2.value = newValue[2]
   gridvalue3.value = newValue[3]
   gridvalue4.value = newValue[4]
-  gridvalue5.value = newValue[5].toFixed(2)
+  gridvalue5.value = newValue[5] == undefined ?  newValue[5] : newValue[5].toFixed(2)
   gridvalue6.value = newValue[6]
   gridvalue7.value = newValue[1]
    if(newValue[9] == true){
@@ -140,6 +140,14 @@ const handleGroupCd = (newValue) => {
     groupCd.value = newValue
 }
 const handleStoreCd = (newValue) => {
+    rowData.value = []
+    gridvalue1.value =''
+    gridvalue2.value =''
+    gridvalue3.value =''
+    gridvalue4.value =''
+    gridvalue5.value =''
+    gridvalue6.value =''
+    gridvalue7.value =''
     storeCd.value = newValue
     clickStoreCd.value = newValue
     console.log(newValue)
@@ -230,7 +238,7 @@ const storeNm = (newValue) => {
 }
 
 const saveButton = async() => {
-
+  console.log(updateRow.value)
 if(afterSearch.value == false) {
     Swal.fire({
       title: '경고',
@@ -309,7 +317,7 @@ if(duplicateCount > 0 ) {
     store.state.loading = true;
   try {
     
-   console.log(updateRow.value)
+
 
    const chargeStoreCd = updateRow.value.filter(item => item.deleted != true && item.new != true).map(item => item.lngStoreCode)
    const chargeBuyCd = updateRow.value.filter(item => item.deleted != true && item.new != true).map(item => item.strBuyCode)

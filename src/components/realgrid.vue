@@ -225,6 +225,16 @@ const props = defineProps({
     type: String,
     default: '',
   }
+  ,
+  setAllCheck: { 
+    type: Boolean,
+    default: false ,
+  }
+  ,
+  deleteRow4: { 
+    type: Boolean,
+    default: false ,
+  }
  
 });
 
@@ -237,14 +247,14 @@ const addrow4activated =ref(false) ;
 const deleted2activated =ref(false) ;
 const updatedrowData = ref([])
 const selectedindex = ref(-1)
-const emit = defineEmits(["selcetedrowData" , "updatedRowData" , "clickedRowData" ,"dblclickedRowData" ,"selectedIndex" ]);
+const emit = defineEmits(["selcetedrowData" , "updatedRowData" , "clickedRowData" ,"dblclickedRowData" ,"selectedIndex" , "checkedRowData" ]);
 const funcshowGrid = async () => {
-  // 그리드 초기화
  
-
-  if (gridView !=undefined && gridView !=null ) {
-    gridView.destroy(); // 기존 그리드 인스턴스 제거
+  if (gridView !==undefined && gridView !==null  ) {
+   
     dataProvider.clearRows();
+    gridView.destroy(); // 기존 그리드 인스턴스 제거
+  
   }else {
 
   }
@@ -317,10 +327,13 @@ const funcshowGrid = async () => {
      
      for(var i=0 ; i< lcolumns.length ; i++){
       const labelingcolumn = columns.find(item => item.fieldName == lcolumns[i])
-       labelingcolumn.lookupDisplay =  true 
+      if(labelingcolumn){
+        labelingcolumn.lookupDisplay =  true 
        
        labelingcolumn.values =values[i]
        labelingcolumn.labels =labels[i]
+      }
+    
      }
   }
   
@@ -441,10 +454,16 @@ const alldata = dataProvider.getJsonRows();
      updatedrowData.value = [ ...dataProvider.getJsonRows()]
      emit('updatedRowData', updatedrowData.value )
    }
-  gridView.onItemChecked = () => {
-    
-    selectedRowData.value = gridView.getCheckedItems().map(index => dataProvider.getRows()[index]);
-    emit('selcetedrowData', selectedRowData.value);
+  gridView.onItemChecked =  function (grid, itemIndex, checked) {
+    gridView.setCurrent({dataRow : itemIndex})
+    var rows = gridView.getCheckedRows();
+    selectedRowData.value = []
+    for (var i in rows) {
+    var data = dataProvider.getJsonRow(rows[i]);
+    selectedRowData.value.push(data);
+    }
+
+    emit('checkedRowData', selectedRowData.value);
   
   };
   gridView.onItemAllChecked = (grid, checked) => {
@@ -466,7 +485,7 @@ const alldata = dataProvider.getJsonRows();
  
   gridView.onCellItemClicked = function (grid, clickData) {
   
-  if (clickData.itemIndex == undefined) {
+  if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
     return ;
   }
   selectedRowData.value= dataProvider.getRows()[clickData.itemIndex];
@@ -485,14 +504,18 @@ gridView.onSelectionChanged = function (grid) {
 
 gridView.onCellClicked = function (grid, clickData) {
  
-  if (clickData.itemIndex == undefined) {
+  if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
     return ;
   }
   var current = gridView.getCurrent();
-  selectedRowData.value= dataProvider.getRows()[current.dataRow];
+
+  if(current.itemIndex != -1){
+    selectedRowData.value= dataProvider.getRows()[current.dataRow];
   selectedRowData.value.index = current.dataRow
   emit('clickedRowData', selectedRowData.value);
   emit('selectedIndex' , current.dataRow )
+  }
+  
   
 
 }
@@ -551,7 +574,9 @@ watch(() => props.changeValue , () => {
      emit('updatedRowData', updatedrowData.value )
 })
 watch(() => props.changeNow , () => {
- 
+    console.log(props.changeRow)
+    console.log(props.changeColid)
+    console.log(props.changeValue2)
     dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue2);
   
     updatedrowData.value = [ ...dataProvider.getJsonRows()]
@@ -703,6 +728,15 @@ watch(() => props.deleteRow3, (newVal) => {
     
 });
 
+
+watch(() => props.deleteRow4, (newVal) => {
+
+    var rows = gridView.getCheckedRows();
+    dataProvider.removeRows(rows);
+    gridView.checkRows(rows, false);
+ 
+});
+
 watch(() => props.deleteAll, (newVal) => {
   gridView.commit();
   const allRows = dataProvider.getJsonRows();
@@ -735,6 +769,11 @@ watch(() => props.commitAll, (newVal) => {
  
  
 });
+watch (() => props.setAllCheck , (newval) => {
+  if(gridView != null){
+    gridView.setAllCheck(false)
+  }
+})
 watch(() => props.exporttoExcel, (newVal) => {
     gridView.exportGrid({
       type: "excel",
