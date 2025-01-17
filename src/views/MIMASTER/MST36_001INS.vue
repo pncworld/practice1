@@ -7,55 +7,300 @@
                </h1></div>
                 
                </div>
-               <div class="flex justify-center mr-9 space-x-2 pr-5"><button @click="searchButton" class="button search md:w-auto w-14">조회</button>
-              
-              <button @click="saveButton" class="button save w-auto">저장</button>
+               <div class="flex justify-center mr-9 space-x-2 pr-5">
+                
+            <button @click="searchButton" class="button search md:w-auto w-14">조회</button>
+            <button @click="saveButton" class="button save w-auto">저장</button>
               
             </div>
             </div>
             <br>
-            <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center"><PickStore3  @update:storeCd="handleStoreCd"  @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @update:ischanged2="searchinit" ></PickStore3> </div> 
-  <div class="z-50">
-      <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :poskiosk="'getStoreAndPosList'" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :screenType="currentpaymentCd" :screenList="screenList" :progname="'MST01_011INS_VUE'" :dupliapiname="'DUPLIFUNCKEY'" :progid="1" :naming="'POS번호'" :naming2="'기능키'">
-      </DupliPopUp>
+            <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
+              <PickStore12  @update:storeCd="handleStoreCd"  @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @update:ischanged2="searchinit" ></PickStore12> </div> 
+   <div class="grid grid-rows-1 grid-cols-[4fr,5fr] h-[86%] w-full">
+            <div class="flex flex-col w-full h-full">
+  <div class="flex justify-between mt-5 ml-10 w-full border-b border-b-gray-300">
+    <div class="flex justify-start font-bold text-xl">결제코드 목록</div>
+    <div class="mt-3 space-x-2">
+      <button class="whitebutton">추가</button>
+      <button class="whitebutton">삭제</button>
     </div>
+  </div>
+
+  <div class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
+   
+    <div class="customtableIndex border border-gray-400 rounded-tl-lg">사용여부</div>
+    <div class="grid grid-rows-1 grid-cols-3 justify-center items-center ">
+      <div class="border border-gray-400 h-full">
+        <select name="blnInactive" id="" class="h-full w-full pl-1" @change="searchColumn" v-model="searchC1">
+        <option value="-1">전체</option>
+        <option value="1">사용</option>
+        <option value="0">미사용</option>
+      </select>
+      </div>
+      <div class="customtableIndex border border-gray-400 ">
+        결제구분
+      </div>
+      <div class="border border-gray-400 h-full rounded-tr-lg">
+        <select name="payDistinct" id="" class="h-full w-full rounded-tr-lg pl-1" @change="searchColumn" v-model="searchC2" >
+        <option value="-1">전체</option>
+        <option value="1">할인</option>
+        <option value="2">지불</option>
+        <option value="3">할증</option>
+      </select>
+      </div>
+    </div>
+
+    <div class="customtableIndex border border-gray-400 rounded-bl-lg ">결제코드/명</div>
+    <div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchword" v-model="searchWord"></div>
+  </div>
+    <div class="ml-10 mt-1 w-full h-full">
   
+      <Realgrid class="w-full h-full" :progname="'MST36_001INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false" @clickedRowData="clickedRowData" :selectionStyle="'singleRow'"  @selcetedrowData="selcetedrowData"  :labelsData="labelsData" :valuesData="valuesData" :labelingColumns="labelingColumns" :searchWord="searchWord" :searchColId2="'blnInactive,payDistinct'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" :defaultSearchAllValue="-1"></Realgrid>
+
+    </div>
+    
+
+  
+  
+  </div>
+   <div class="grid grid-cols-1 grid-rows-[1fr,9fr] ml-20">
+    <div class="flex space-x-1 mt-10">
+      <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border" @click="selectMenu(1)" :class="{'text-blue-400 bg-blue-100': selectedMenu==1}">기본설정</button>
+      <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border" @click="selectMenu(2)" :class="{'text-blue-400 bg-blue-100': selectedMenu==2}">할인대상메뉴</button>
+      <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border" @click="selectMenu(3)" :class="{'text-blue-400 bg-blue-100': selectedMenu==3}">복합결제허용</button>
+    </div>
+    <div>
+      <hr class="w-[90%] mt-0">
+      <div v-show="selectedMenu==1" class="mt-3 h-[46%]">
+          <div class="font-bold flex justify-start text-xl">기본정보</div>
+         <div class="grid grid-cols-[1fr,3fr,1fr,3fr] grid-rows-[1fr,2fr,1fr,1fr] mt-5 border rounded-lg w-[90%] h-[80%]">
+          <div class="flex justify-center items-center bg-gray-100 border">결제구분</div>
+          <div class="flex justify-center items-center border"><select name="" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue1" disabled>
+      <option value="0">선택</option>
+      <option value="1">할인</option>
+      <option value="2">지불</option>
+      <option value="3">할증</option>
+  
+    </select></div>
+          <div class="flex justify-center items-center bg-gray-100 border">결제유형</div>
+          <div class="flex justify-center items-center border"><select name="" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" disabled>
+       
+  
+    </select></div>
+          
+          <div class=" justify-center items-center bg-gray-100 border grid"><div>결제코드명</div></div>
+           <div class="grid grid-cols-1 grid-rows-2 h-full border"><div class="flex items-center mt-1 text-blue-400 font-semibold">*국문<input type="text" name="strName" id="" class="h-full w-[80%] border rounded-lg pl-2 ml-2 font-thin text-gray-700" v-model="gridvalue3" @input="changeInfo"></div><div class="flex items-center mt-1 ml-1"> 영문<input type="text" name="strNameE" id="" class="h-full w-[80%] border rounded-lg pl-2 ml-3" v-model="gridvalue4" @input="changeInfo"></div></div>
+          <div class=" justify-center items-center bg-gray-100 border flex flex-col "><div class="border h-full w-full flex items-center justify-center text-blue-400 font-semibold">*결제코드</div><div class="border h-full w-full flex items-center justify-center text-blue-400 font-semibold">*사용여부</div></div>
+          <div class="grid grid-cols-1 grid-rows-2 "> <div><input type="text" name="" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue5"></div><div class="space-x-5 border flex justify-left pl-2 items-center"><label for="using1"><input type="radio" name="using" id="using1" v-model="gridvalue6" value="0">예</label><label for="using2"><input type="radio" name="using" id="using2" v-model="gridvalue6" value="1" >아니오</label></div></div>
+          <div class="flex justify-center items-center bg-gray-100 border">할인그룹</div>
+          <div class="flex justify-center items-center border"><select name="" id="" class="border h-full w-full rounded-lg pl-2" v-model="gridvalue2">
+            <option value="0">선택</option>
+      <option value="1">전메뉴할인</option>
+      <option value="2">음료류 할인</option>
+  
+    </select></div>
+          <!-- <div class="flex justify-center items-center bg-gray-100 border">결제그룹</div>
+          <div class="flex justify-center items-center"><select name="" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" disabled>
+      <option value="">선택</option>
+  
+    </select></div> -->
+          
+          <div class=" justify-center items-center bg-gray-100 border grid">유효기간</div>
+          <div class="flex justify-center items-center border"><input type="date" max="9999-12-31" v-model="gridvalue7"> ~ <input type="date" max="9999-12-31" v-model="gridvalue8"></div>
+         
+          <div class="justify-center items-center bg-gray-100 border flex text-blue-400 font-semibold">*승인구분</div>
+          <div><select name="" id="" v-model="gridvalue9" class="h-full w-full rounded-lg pl-2">
+            <option value="">선택</option>
+          </select></div>
+          <div class="justify-center items-center bg-gray-100 border flex text-blue-400 font-semibold">*승인유형</div>
+          <div><select name="" id="" v-model="gridvalue10" class="h-full w-full rounded-lg pl-2">
+            <option value="">선택</option>
+          </select></div>
+         </div>
+         <div class="font-bold text-xl flex justify-start mt-5">부가정보</div>
+         <div class="grid grid-cols-[1fr,3fr,1fr,3fr] grid-rows-8 h-full mt-3 w-[90%]">
+          <div class="justify-center items-center bg-gray-100 border flex rounded-tl-lg">할인방법</div>
+    <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="discount1"><input type="radio" id="discount1" name="discount" v-model="gridvalue11" value="0">금액</label><label for="discount2"><input type="radio" id="discount2" name="discount" v-model="gridvalue11" value="1">비율</label> </div>
+    <div class="justify-center items-center bg-gray-100 border flex">할인금액(비율)</div>
+    <div class="flex justify-center items-center"><input type="text" name="" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue12"></div>
+    <div class="justify-center items-center bg-gray-100 border flex">자동계산</div>
+    <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="autopay1"><input type="radio" id="autopay1" name="autopay" v-model="gridvalue13" value="1">예</label><label for="autopay2"><input type="radio" id="autopay2" name="autopay" v-model="gridvalue13" value="0">아니오</label></div>
+    <div class="justify-center items-center bg-gray-100 border flex">할인한도금액</div>
+    <div class="flex justify-center items-center"><input type="text" name="" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue14"></div>
+    <div class="justify-center items-center bg-gray-100 border flex">돈통오픈</div>
+    <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="openmoney1"><input type="radio" id="openmoney1" name="openmoney" v-model="gridvalue15" value="0">예</label><label for="openmoney2"><input type="radio" id="openmoney2" name="openmoney" v-model="gridvalue15" value="1">아니오</label></div>
+    <div class="justify-center items-center bg-gray-100 border flex">계산우선순위</div>
+    <div class="flex justify-center items-center"><input type="text" name="" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue16"></div>
+    <div class="justify-center items-center bg-gray-100 border flex">영수증출력</div>
+    <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="receipt1"><input type="radio" id="receipt1" name="receipt" v-model="gridvalue17" value="0">예</label><label for="receipt2"><input type="radio" id="receipt2" name="receipt" v-model="gridvalue17"  value="1">아니오</label></div>
+    <div class="justify-center items-center bg-gray-100 border flex">잔금반환비율</div>
+    <div class="flex justify-center items-center"><input type="text" name="" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue18"></div>
+    <div class="justify-center items-center bg-gray-100 border flex">할인대상메뉴</div>
+    <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="discountfor1"><input type="radio" id="discountfor1" name="discountfor" v-model="gridvalue19" value="0">전체 선택</label><label for="discountfor2"><input type="radio" id="discountfor2" name="discountfor" v-model="gridvalue19" value="1">부분 선택</label></div>
+    <div class="justify-center items-center bg-gray-100 border flex">품목할인설정</div>
+    <div class="flex justify-center items-center"><select name="" id="" class="border h-full w-full rounded-lg pl-2" v-model="gridvalue20">
+      <option value="">선택</option>
+    <option :value="i.strDCode" v-for="i in itemDiscount">[{{ i.strDCode }}]{{i.strDName}}</option>
+  
+    </select></div>
+    <div class="justify-center items-center bg-gray-100 border flex">중복결제</div>
+    <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="allow1"><input type="radio" id="allow1" name="allow" v-model="gridvalue21" value="1">허용</label><label for="allow2"><input type="radio" id="allow2" name="allow"  v-model="gridvalue21"  value="0">비허용</label></div>
+    <div class="justify-center items-center bg-gray-100 border flex">크롤링결제코드</div>
+    <div class="flex justify-center items-center"><select name="" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" disabled>
+      <option value="">선택</option>
+  
+    </select></div>
+    <div class="justify-center items-center bg-gray-100 border flex">단수처리방법</div>
+    <div class="flex justify-center items-center"><select name="" id="" class="border h-full w-full rounded-lg pl-2" v-model="gridvalue22">
+      <option value="">선택</option>
+      <option value="0">사용안함</option>
+      <option value="1">절사</option>
+      <option value="2">반올림</option>
+      <option value="3">올림</option>
+    </select></div>
+    <div class="justify-center items-center bg-gray-100 border flex">단수처리자릿수</div>
+    <div><input type="text" name="" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue23"></div>
+    <div class="justify-center items-center bg-gray-100 border flex rounded-bl-lg">세금계산방법</div>
+    <div class="flex justify-center items-center"><select name="" id="" class="border h-full w-full rounded-lg pl-2" v-model="gridvalue24">
+      <option value="">선택</option>
+      <option value="0">세금전계산</option>
+      <option value="1">세금후계산</option>
+     
+  
+    </select></div>
+    <div class="justify-center items-center bg-gray-100 border flex">결제옵션</div>
+    <div class="flex justify-center items-center"><select name="" id="" class="border h-full w-full rounded-lg pl-2" v-model="gridvalue25">
+      <option value="">선택</option>
+       <option :value="i.strDCode" v-for="i in payOptions">[{{ i.strDCode }}] {{ i.strDName }}</option>
+    </select></div>
+         </div>
+      </div>
+      <div v-show="selectedMenu==2" class="h-[80%] w-[90%]" >
+       <div class="flex justify-between mt-5 w-full">
+        <div class="font-bold text-xl" >메뉴 목록</div><div><button class="whitebutton">할인대상메뉴복사</button></div></div>
+       <div class="mt-3  grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
+  <div class="customtableIndex border border-gray-400 rounded-tl-lg">메뉴분류</div>
+  <div class="px-4 py-2 border border-gray-300 rounded-tr-lg flex ">
+    <select name="" id="" class="flex-1" @change="setSubCd" v-model="forsearchMain">
+      <option value="0">전체</option>
+      <option :value="i.GroupCd" v-for="i in MenuGroup"> [{{i.GroupCd}}]{{ i.majorGroupNm }}</option>
+    </select>
+    <select name="" id="" class="flex-1" v-model="forsearchSub" @change="setSubCd2">
+      <option value="0">전체</option>
+      <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup"> [{{i.GroupCd}}]{{ i.subGroupNm }}</option>
+    </select>
+  </div>
+  <div class="customtableIndex border border-gray-400 rounded-bl-lg">메뉴명/코드</div>
+  <div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList" v-model="searchWord2"></div>
+</div>
+<Realgrid class="w-full h-full mt-5" :progname="'MST36_001INS_VUE'" :progid="2" :rowData="rowData2" :showCheckBar="true" :searchWord="searchWord2" :searchColId2="'majorGroupCd,subGroupCd'" :searchColId="'menuCd,menuNm'" :searchColValue2="searchColValue3"></Realgrid>
+      </div>
+<div v-show="selectedMenu==3" class="h-[90%] w-[90%]">
+  <Realgrid class="w-full h-full mt-5" :progname="'MST36_001INS_VUE'" :progid="3" :rowData="rowData3"></Realgrid>
+</div>
+    </div>
+   </div>
+  </div>
 
 
 </template>
 
 <script setup>
+import { getMenuList, getMenuLists, getPayCodeEnrollInfo } from '@/api/master';
 import DupliPopUp from '@/components/dupliPopUp.vue';
+import PickStore12 from '@/components/pickStore12.vue';
 import PickStore3 from '@/components/pickStore3.vue';
+import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';
 import { ref } from 'vue';
 import { useStore } from 'vuex';
 
-const nowStoreAreaCd = ref();
-const nowStoreCd = ref();
-const posNo = ref();
+const searchWord2 = ref('');
+const nowStoreCd = ref(-1);
+const rowData = ref([]);
 const searchword1 = ref('');
 const MenuGroup = ref('');
 const SubMenuGroup = ref('');
 const items = ref('');
-const forsearchMain = ref('');
-const forsearchSub = ref('');
+const forsearchMain = ref(0);
+const forsearchSub = ref(0);
 const afterSearch = ref(false);
 const clickedStoreNm = ref()
 const store = useStore();
 const userData = store.state.userData; 
 const groupCd = ref(userData.lngStoreGroup);
- 
+ const rowData2 = ref([])
+ const rowData3 = ref([])
+ const itemDiscount = ref([])
+ const payOptions = ref([])
   
+const labelsData = ref([['할인','지불','할증'],['미사용','사용']])
+const valuesData = ref([['1','2','3'],['0','1']])
+const labelingColumns = ref('payDistinct,blnInactive')
+const gridvalue1 = ref(0)
+const gridvalue2 = ref(0)
+const gridvalue3 = ref("")
+const gridvalue4 = ref("")
+const gridvalue5 = ref("")
+const gridvalue6 = ref("")
+const gridvalue7 = ref("")
+const gridvalue8 = ref("")
+const gridvalue9 = ref("")
+const gridvalue10 = ref("")
+const gridvalue11 = ref("")
+const gridvalue12 = ref("")
+const gridvalue13 = ref("")
+const gridvalue14 = ref("")
+const gridvalue15 = ref("")
+const gridvalue16 = ref("")
+const gridvalue17 = ref("")
+const gridvalue18 = ref("")
+const gridvalue19 = ref("")
+const gridvalue20 = ref("")
+const gridvalue21 = ref("")
+const gridvalue22 = ref("")
+const gridvalue23 = ref("")
+const gridvalue24 = ref("")
+const gridvalue25 = ref("")
 
+
+const clickedRowData = (newvalue) => {
+    console.log(newvalue)
+    gridvalue1.value = newvalue[4]
+    gridvalue2.value = newvalue[7]
+    gridvalue3.value = newvalue[3]
+    gridvalue4.value = newvalue[8]
+    gridvalue5.value = newvalue[2]
+    gridvalue6.value = newvalue[6]
+    gridvalue7.value = newvalue[9]
+    gridvalue8.value = newvalue[10]
+    gridvalue9.value = newvalue[18]
+    gridvalue10.value = newvalue[19]
+    gridvalue11.value = newvalue[11]
+    gridvalue12.value =  newvalue[5].substring( 0 , newvalue[5].length -1 )
+    gridvalue13.value =  newvalue[12]
+    gridvalue14.value = newvalue[13]
+    gridvalue15.value = newvalue[14]
+    gridvalue16.value = newvalue[15]
+    gridvalue17.value = newvalue[16]
+    gridvalue18.value = newvalue[20]
+    gridvalue19.value = newvalue[21]
+    gridvalue20.value = newvalue[22]
+    gridvalue21.value = newvalue[23]
+    gridvalue22.value = newvalue[24]
+    gridvalue23.value = newvalue[25]
+    gridvalue24.value = newvalue[17]
+    gridvalue25.value = newvalue[26]
+}
   const  handleStoreCd = async(newValue) => {
-    if(newValue == '0'){
+    if(newValue == '-1'){
     afterSearch.value = false;
     }
     nowStoreCd.value = newValue ;
     searchButton()
 }
-
+const clickmappingData = ref([])
   const handlestoreNm = (newData) => {
     clickedStoreNm.value = newData
   }
@@ -79,39 +324,28 @@ const groupCd = ref(userData.lngStoreGroup);
 
   const searchButton = async () => {
       items.value = []
-  
-  if(nowStoreCd.value == '0' || nowStoreCd.value == undefined) {
+    if(nowStoreCd.value == -1){
       Swal.fire({
-          title: '경고',
-          text: '매장을 선택하세요.',
-          icon: 'warning',
-          showCancelButton: false,
-          confirmButtonColor: '#3085d6',
-          allowOutsideClick: false
+        title: '경고',
+        text: '매장을 선택하세요.',
+        icon: 'warning',
+        confirmButtonText: '확인'
       })
-      return;
-  }
-//   if(nowStoreAreaCd.value == '0' || nowStoreAreaCd.value == undefined) {
-//       Swal.fire({
-//           title: '경고',
-//           text: 'POS번호를 선택하세요.',
-//           icon: 'warning',
-//           showCancelButton: false,
-//           confirmButtonColor: '#3085d6',
-//           allowOutsideClick: false
-//       })
-//       return;
-//   }
+      return ;
+    }
   store.state.loading = true;
   try {
-    console.log(groupCd.value)
-    console.log(nowStoreCd.value)
-    console.log(clickedStoreNm.value)
-      
+     const res = await getPayCodeEnrollInfo(groupCd.value , nowStoreCd.value)
 
-
-     
-   
+     rowData.value = res.data.PAYCODE
+     itemDiscount.value = res.data.ITEMDIS
+     payOptions.value = res.data.PAYOPTION
+     clickmappingData.value = res.data.MAPPINGCODE
+     const res2 = await getMenuList(groupCd.value , nowStoreCd.value)
+     rowData2.value = res2.data.menuList
+     SubMenuGroup.value = res2.data.submenuGroup
+     MenuGroup.value = res2.data.menuGroup
+     console.log(clickmappingData.value)
   } catch (error) {
       afterSearch.value = false;
   } finally {
@@ -124,8 +358,53 @@ const groupCd = ref(userData.lngStoreGroup);
 
   
   };
+
+const selectedMenu = ref(1)
+  const selectMenu = (newValue) => {
+    selectedMenu.value = newValue
+  }
+
+  const searchWord =ref("")
+  const searchColValue2 = ref("")
+  const searchC1 =ref(-1)
+  const searchC2 =ref(-1)
+  
+  const searchColumn = (e) => {
+     const columnNm = e.target.name 
+     const value = e.target.value 
+    
+     searchColValue2.value = searchC1.value+","+searchC2.value
+
+     console.log(searchColValue2.value)
+  }
+
+  const searchword = (e) => {
+    searchWord.value = e.target.value
+  }
+
+  const changeInfo = (e) => {
+     
+  }
+const searchColValue3  =ref('')
+  const filteredSubMenuGroup = ref([]);
+const setSubCd = () => {
+  console.log(forsearchMain.value)
+  console.log(SubMenuGroup.value)
+  filteredSubMenuGroup.value = SubMenuGroup.value.filter(item => item.sublngMajor == forsearchMain.value)
+  console.log(filteredSubMenuGroup.value)
+  forsearchSub.value = '0'
+
+  searchColValue3.value = forsearchMain.value+',0'
+}
+const setSubCd2 = () => {
+  searchColValue3.value = searchColValue3.value.split(',')[0]+','+forsearchSub.value
+}
+
+const searchMenuList = (e) => {
+  searchWord2.value = e.target.value
+}
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 
 </style>

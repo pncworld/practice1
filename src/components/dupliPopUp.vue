@@ -9,16 +9,16 @@
           <div class="flex justify-start font-bold text-xl ml-12">기준매장</div>
           <div class="grid grid-rows-2 grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[480px] ml-12 h-20 rounded-lg ">
             <div class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">기준매장</div>
-            <div class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center"><input type="text" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md" :value="'['+storeCd+']' + storeNm" disabled></div>
+            <div class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center"><input type="text" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md bg-gray-200" :value="'['+storeCd+']' + storeNm"  disabled></div>
             <div class="border-[1px] border-gray-400 rounded-bl-md flex justify-center items-center">{{ naming }}</div>
-            <div class="w-full border border-gray-400 rounded-br-md flex justify-center items-center"><input type="text" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md" :value="posNo" disabled></div>
+            <div class="w-full border border-gray-400 rounded-br-md flex justify-center items-center"><input type="text" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md bg-gray-200"  :value="posNo" disabled></div>
           </div>
           <div class="flex justify-center mt-10"><img src="../assets/masterCopy-ArrowDown.png" alt=""></div>
           <div class="flex justify-between font-bold text-xl ml-12"><div>대상 매장 선택</div><div><button class="whitebutton mr-12" @click="showStoreList">조회</button></div></div>
           <div class="grid grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[480px] ml-12 h-10 mt-5 rounded-lg ">
             <div class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">매장코드/명</div>
             <div class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center"><input type="text" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md"  @input="handleKeyup"></div></div>
-        <div class="w-[480px] h-[380px] ml-12 flex justify-center"><realgrid :progname="progname" :progid="progid" :rowData="rowData" :showGrid="showGrid" :showCheckBar="true"  @selcetedrowData="selcetedrowData"></realgrid></div>
+        <div class="w-[480px] h-[380px] ml-12 flex justify-center"><realgrid :progname="progname" :progid="progid" :rowData="rowData" :showGrid="showGrid" :showCheckBar="true"  @checkedRowData="selcetedrowData"></realgrid></div>
         </main>
         <footer class="flex justify-end p-5 mt-auto">
          <div class="border border-gray-300 rounded-md w-20 h-10 mr-7"><button @click="close" class="w-full h-full">닫기</button></div>
@@ -111,13 +111,15 @@ const dupliStore = async() => {
   let storeCd2 = [];
   let areaCd2 = [];
   let posNo2 = [];
+ 
   for(var i =0; i< selectedRows.value.length ; i++){
     groupCd2.push(groupCd.value)
-    storeCd2.push(selectedRows.value[i][0])
-    areaCd2.push(selectedRows.value[i][3])
-    posNo2.push(selectedRows.value[i][2])
+    storeCd2.push(selectedRows.value[i].lngStoreCode)
+    areaCd2.push(selectedRows.value[i].lngAreaCode)
+    posNo2.push(selectedRows.value[i].intPosNo)
 
   }
+ 
   try {
     console.log(checked.value)
     if(checked.value == false){

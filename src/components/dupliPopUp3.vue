@@ -9,9 +9,9 @@
           <div class="flex justify-start font-bold text-xl ml-12">기준매장</div>
           <div class="grid grid-rows-3 grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[480px] ml-12 h-32 rounded-lg ">
             <div class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">기준매장</div>
-            <div class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center"><input type="text" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md pl-1" :value="'['+storeCd+']' + storeNm" disabled></div>
+            <div class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center"><input type="text" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md pl-1 bg-gray-200" :value="'['+storeCd+']' + storeNm" disabled></div>
             <div class="border-[1px] border-gray-400 rounded-bl-md flex justify-center items-center">POS번호</div>
-            <div class="w-full border border-gray-400 rounded-br-md flex justify-center items-center"><input type="text" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md pl-1" :value="posNo" disabled></div>
+            <div class="w-full border border-gray-400 rounded-br-md flex justify-center items-center"><input type="text" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md pl-1 bg-gray-200" :value="posNo" disabled></div>
             <div class="border-[1px] border-gray-400 rounded-bl-md flex justify-center items-center">원본화면</div>
             <div class="w-full border border-gray-400 rounded-br-md flex justify-center items-center"><select name="" id="" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md pl-1" v-model="selectedScreen">
               <option value="0">전체</option>
@@ -25,7 +25,7 @@
       
             <div class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">매장코드/명</div>
             <div class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center"><input type="text" class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md"  @input="handleKeyup"></div></div>
-        <div class="w-[480px] h-[380px] ml-12 flex justify-center"><realgrid :progname="progname" :progid="progid" :rowData="rowData" :showGrid="showGrid" :showCheckBar="true"  @selcetedrowData="selcetedrowData"></realgrid></div>
+        <div class="w-[480px] h-[380px] ml-12 flex justify-center"><realgrid :progname="progname" :progid="progid" :rowData="rowData" :showGrid="showGrid" :showCheckBar="true"  @checkedRowData="selcetedrowData"></realgrid></div>
         <div class="text-sm text-gray-800 mt-2">※ 결제키 복사시 결제키 설정 페이지에서 추가해야 결제키 화면에 나타납니다.</div>
        
       </main>
@@ -124,7 +124,8 @@ const dupliStore = async() => {
 
   for(var i =0; i< selectedRows.value.length ; i++){
   
-    storeCd2.push(selectedRows.value[i][0])
+    storeCd2.push(selectedRows.value[i].lngStoreCode)
+
 
   }
   try {

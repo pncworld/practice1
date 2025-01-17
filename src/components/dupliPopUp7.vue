@@ -34,7 +34,7 @@ import * as api from "@/api/common";
 import * as api2 from "@/api/master";
 import { useStore } from "vuex";
 import Swal from "sweetalert2";
-  const {isVisible ,storeCd,storeNm,posNo,areaCd , progname , progid ,dupliapiname , poskiosk ,naming ,naming2 } = defineProps({
+  const {isVisible ,storeCd,storeNm,posNo,areaCd , progname , progid ,dupliapiname , poskiosk ,naming ,naming2 , warningWords } = defineProps({
     isVisible: { type: Boolean, default: false }, // 팝업 가시성 관리
     storeCd : { type : String , default: ''} ,
     storeNm : { type : String , default: ''} ,
@@ -45,7 +45,8 @@ import Swal from "sweetalert2";
     dupliapiname : {type : String},
     poskiosk : {type : String},
     naming : {type : String},
-    naming2 : {type : String , default : '메뉴키'}
+    naming2 : {type : String , default : '메뉴키'},
+    warningWords : {type : String , default : '기존의 데이터가 다 삭제됩니다. 진행하시겠습니까?'}
   });
   const store = useStore();  // vuex store
   const userData = store.state.userData; 
@@ -117,6 +118,10 @@ const dupliStore = async() => {
     posNo2.push(selectedRows.value[i].intPosNo)
 
   }
+  console.log(groupCd.value)
+        console.log(storeCd)
+        console.log(groupCd2.join(','))
+        console.log(storeCd2.join(','))
   try {
     console.log(checked.value)
     if(checked.value == false){
@@ -130,7 +135,7 @@ const dupliStore = async() => {
     } else {
       Swal.fire({
       title: '복사',
-      text: '선택하신 POS의 메뉴배치정보 및 화면정보가 모두 삭제 후 복사됩니다. 계속 진행하시겠습니까?',
+      text: warningWords,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: '복사',
@@ -138,7 +143,7 @@ const dupliStore = async() => {
     }).then(async(result) => {
       if(result.isConfirmed){
         store.state.loading = true;
-      
+    
         const res3 = await api2[dupliapiname](groupCd.value , storeCd , groupCd2.join(','),storeCd2.join(','))
         console.log(res3.data)
         if(res3.data.RESULT_CD == '00'){

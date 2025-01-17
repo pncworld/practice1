@@ -234,6 +234,10 @@ const props = defineProps({
   deleteRow4: { 
     type: Boolean,
     default: false ,
+  },
+  defaultSearchAllValue: { 
+    type: Number,
+    default: 0 ,
   }
  
 });
@@ -324,7 +328,9 @@ const funcshowGrid = async () => {
      const lcolumns = props.labelingColumns.split(',')
      const labels = props.labelsData
      const values = props.valuesData
-     
+     console.log(lcolumns)
+     console.log(labels)
+     console.log(values)
      for(var i=0 ; i< lcolumns.length ; i++){
       const labelingcolumn = columns.find(item => item.fieldName == lcolumns[i])
       if(labelingcolumn){
@@ -469,6 +475,15 @@ const alldata = dataProvider.getJsonRows();
   gridView.onItemAllChecked = (grid, checked) => {
     selectedRowData.value = gridView.getCheckedItems().map(index => dataProvider.getRows()[index]);
     emit('selcetedrowData', selectedRowData.value);
+     
+    var rows = gridView.getCheckedRows();
+    selectedRowData.value = []
+    for (var i in rows) {
+    var data = dataProvider.getJsonRow(rows[i]);
+    selectedRowData.value.push(data);
+    }
+
+    emit('checkedRowData', selectedRowData.value);
   };
 
 
@@ -527,7 +542,7 @@ gridView.onColumnCheckedChanged = function (grid, col, chk) {
      for (var i = 0; i < rowCount; i++) {
       dataProvider.setValue(i, col.fieldName, chk);  // 
      }
-   
+     
      console.log(col.fieldName + "was checked as: " + chk);
 };
 
@@ -947,12 +962,14 @@ watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) 
      
     return searchColId2.every((colId,index) => {
     
-      const value = item[colId] ? item[colId].toString() : '';
+      const value = item[colId] != null ? item[colId].toString() : '';
       const searchValue = (searchColValues[index] || '').toString();
      
-      if ( searchValue === '0') {
+      if ( searchValue == props.defaultSearchAllValue) {
        return true;
        }
+    
+    
       return value.toLowerCase().includes(searchValue.toString().toLowerCase())
     })
   }

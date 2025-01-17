@@ -17,9 +17,13 @@
   
   </div>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center mt-3">
-  <PickStore11 @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd" >
+  <PickStore11 @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd" @storeNm="storeNm" >
   </PickStore11>
   </div>
+  <div class="z-50">
+    <DupliPopUp7 :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="storeCd" :storeNm="clickStoreNm"  :progname="'MST44_061INS_VUE'" :dupliapiname="'DUPLIPAYCD'" :progid="3" :poskiosk="'getStoreList'"  naming2="결제코드" :warningWords="'선택하신 매장의 결제코드가 모두 삭제 후 복사됩니다. 계속 진행하시겠습니까?'">
+    </DupliPopUp7>
+    </div>
   <span class="grid grid-rows-1 grid-cols-2 mt-5"><div class="ml-10 flex justify-start font-bold text-xl">결제코드 목록</div><div class="flex ml-7"><div class="flex justify-start font-bold text-xl">매장에 할당된 결제코드 목록</div></div></span>
     <div class="w-[90%] ml-10 h-full grid grid-cols-[5fr_1fr_5fr]">
         
@@ -33,10 +37,11 @@
 </template>
 
 <script setup>
-import {  getAllPayList,  savePayGroup } from '@/api/master';
-import PickGroup from '@/components/pickGroup.vue';
+import {  getAllPayList,  saveStorePayCd } from '@/api/master';
+
+import DupliPopUp7 from '@/components/dupliPopUp7.vue';
 import PickStore11 from '@/components/pickStore11.vue';
-import PickStore3 from '@/components/pickStore3.vue';
+
 
 import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';
@@ -55,15 +60,10 @@ const addNew = ref(true)
 const valuesData = ref([['0','1','2']])
 const labelsData = ref([['할인','지불' ,'할증']])
 const addRow = ref(false)
-const changeNow  =ref(false)
-const changeValue2  =ref()
-const changeColid  =ref()
+const clickedStoreNm  =ref()
+
 const changeRow  =ref()
-const gridvalue1 = ref()
-const gridvalue2 = ref()
-const gridvalue3 = ref()
-const gridvalue4= ref(false)
-const gridvalue5 = ref()
+
 
 
 const selectedIndex = (newValue) => {
@@ -94,6 +94,7 @@ const handleGroupCd = (newValue) => {
 const handleStoreCd = (newvalue) => {
     storeCd.value = newvalue
     rowData.value = []
+    rowData2.value = []
 }
 
 const updateRow = ref([])
@@ -101,7 +102,7 @@ const checkedRowData = (newValue) => {
     updateRow.value = newValue
     console.log(newValue)
 }
-const updateRow2 = ref()
+const updateRow2 = ref([])
 const checkedRowData2 = (newValue) => {
     updateRow2.value = newValue
     console.log(newValue)
@@ -113,7 +114,7 @@ const updatedRowData = (newValue) => {
 const updatedRowData2 = (newValue) => {
   rowData2.value = newValue
 }
-const addrowDefault = ref()
+const validatearr = ref([])
 const exporttoExcel = ref(false)
 const addrowProp = ref('lngStoreGroup')
 const store = useStore();
@@ -150,8 +151,7 @@ const searchButton = async() => {
      console.log(res)
      rowData.value = res.data.PAYCODE
      rowData2.value = res.data.STOREPAYCODE
-     updateRow.value = JSON.parse(JSON.stringify(rowData.value))
-   
+     validatearr.value = JSON.parse(JSON.stringify(rowData2.value))
       afterSearch.value = true;
    } catch (error) {
        afterSearch.value = false;
@@ -168,7 +168,8 @@ const storeNm = (newValue) => {
 }
 
 const saveButton = async() => {
-  console.log(updateRow.value)
+
+  console.log(rowData2.value)
 if(afterSearch.value == false) {
     Swal.fire({
       title: '경고',
@@ -178,7 +179,7 @@ if(afterSearch.value == false) {
     })
     return ;
   }
-  if(JSON.stringify(updateRow.value) === JSON.stringify(rowData.value) ) {
+  if(JSON.stringify(validatearr.value) === JSON.stringify(rowData2.value) ) {
     Swal.fire({
       title: '경고',
       text: '변경된 사항이 없습니다.',
@@ -189,7 +190,7 @@ if(afterSearch.value == false) {
   }
 
 
- 
+  
 
   Swal.fire({
     title: '저장',
@@ -203,9 +204,9 @@ if(afterSearch.value == false) {
     store.state.loading = true;
   try {
     
-   console.log(rowData.value)
-   console.log(rowData2.value)
-
+     const lngCodes = rowData2.value.map(item => item.lngCode)
+    const res = await saveStorePayCd(groupCd.value , storeCd.value , lngCodes.join(','))
+    console.log(res)
 
 Swal.fire({
       title: '저장 되었습니다.',
@@ -231,6 +232,16 @@ const setAllCheck = ref(false)
 const setAllCheck2 = ref(false)
 const moveRight = () => {
   console.log(updateRow.value)
+
+  if(updateRow.value.length == 0){
+    Swal.fire({
+      title: '경고',
+      text: '할당할 결제코드를 체크해주세요.',
+      icon: 'warning',
+      confirmButtonText: '확인'
+    })
+    return ;
+  }
   for(var i=0 ; i <updateRow.value.length ; i++){
      rowData2.value.push({ lngCode : updateRow.value[i].lngCode , strName: updateRow.value[i].strName  , lngAmountType:  updateRow.value[i].lngAmountType  })
   }
@@ -244,7 +255,15 @@ const moveRight = () => {
 const moveLeft = () => {
 
   console.log(updateRow2.value)
- 
+  if(updateRow2.value.length == 0){
+    Swal.fire({
+      title: '경고',
+      text: '삭제할 결제코드를 체크해주세요.',
+      icon: 'warning',
+      confirmButtonText: '확인'
+    })
+    return ;
+  }
   for(var i=0 ; i <updateRow2.value.length ; i++){
      rowData.value.push({ lngCode : updateRow2.value[i].lngCode , strName: updateRow2.value[i].strName  , lngAmountType:  updateRow2.value[i].lngAmountType  })
   }
@@ -255,6 +274,19 @@ const moveLeft = () => {
   rowData.value = [...rowData.value]
   console.log(rowData2.value)
 }
+const showPopup2 =ref(false)
+const copyButton = () => {
+    if(afterSearch.value == false) {
+      Swal.fire({
+      title: '경고.',
+      text: '조회를 먼저 해주세요',
+      icon: 'warning',
+      confirmButtonText: '확인',
+    })
+      return ;
+    }
+    showPopup2.value = true;
+  }
 </script>
 
 <style scoped>

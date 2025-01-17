@@ -712,6 +712,16 @@ export const DUPLITABLEKEY = (groupCd , storeCd ,areaCd , posNo , t_groupCd , t_
      
     })
 }
+export const DUPLIPAYCD = (groupCd , storeCd , groupCd2 , storeCd2 ) => {
+    return api2.post('/MIMASTER/MST36_055INS.asmx/DUPLIPAYCD', {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd ,
+        T_GROUP_CD : groupCd2,
+        T_STORE_CD : storeCd2,
+
+     
+    })
+}
 
 export const saveAllFuncKey = (groupCd , storeCd ,areaCd , posNo , lngDCodes , lngDCodes2  ) => {
     return api2.post('/MIMASTER/MST44_043INS.asmx/saveAllFuncKey', {
@@ -815,6 +825,14 @@ export const savePayGroup = (groupCd , lngstoregroup , lnggroupCd ,groupNm ,strr
         PAYGROUP_NM : groupNm ,
         STR_REMARK : strrk ,
         DGROUP_CD : dgroupCd
+
+    })
+}
+export const saveStorePayCd = (groupCd , storeCd , lngcode) => {
+    return api2.post('/MIMASTER/MST36_055INS.asmx/saveStorePayCd', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd ,
+        LNG_CODE : lngcode
 
     })
 }
@@ -1113,6 +1131,13 @@ export const getAmountGroup = (groupCd ) => {
 }
 export const getAllPayList = (groupCd , storeCd) => {
     return api2.post('/MIMASTER/MST36_055INS.asmx/getAllPayList', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd
+
+    })
+}
+export const getPayCodeEnrollInfo = (groupCd , storeCd) => {
+    return api2.post('/MIMASTER/MST36_001INS.asmx/getPayCodeEnrollInfo', {
         GROUP_CD: groupCd,
         STORE_CD : storeCd
 
