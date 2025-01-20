@@ -56,8 +56,8 @@ const emitStoreType = (value) => {
 };
 
 const emitStoreCode = (value) => {
-   if( value !='0'){
-   const selectedNm = storeCd.value.filter(item => item.lngStoreCode == value)[0].strName
+   if( value !='-1' && value !='0'){
+    const selectedNm = storeCd.value.filter(item => item.lngStoreCode == value)[0].strName
 
     emit('storeNm' ,selectedNm )
     emit('update:storeCd', value);

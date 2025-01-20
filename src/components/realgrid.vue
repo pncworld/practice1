@@ -238,7 +238,50 @@ const props = defineProps({
   defaultSearchAllValue: { 
     type: Number,
     default: 0 ,
+  },
+  initCheckColumn: { 
+    type: String,
+    default: '' ,
   }
+  ,
+  initCheckValue: { 
+    type: String,
+    default: '' 
+  },
+  initCheckAct: { 
+    type: Boolean,
+    default: false
+  }
+  ,
+  initSelect: { 
+    type: Boolean,
+    default: false
+  }
+  ,
+  setAllCheck2: { 
+    type: Boolean,
+    default: false
+  }
+  ,
+  uncheckColumn: { 
+    type: String,
+    default: ''
+  } 
+  ,
+  uncheckValue: { 
+    type: String,
+    default: ''
+  } 
+  ,
+  uncheckAct: { 
+    type: Boolean,
+    default: false
+  } 
+  ,
+  maintaincheckColumn: { 
+    type: String,
+    default: ''
+  } 
  
 });
 
@@ -491,8 +534,12 @@ const alldata = dataProvider.getJsonRows();
   
      gridView.commit();
      updatedrowData.value = [ ...dataProvider.getJsonRows()]
-   
+    
      emit('updatedRowData', updatedrowData.value )
+     const a = updatedrowData.value.filter(item => item.checkbox == true);
+     // selectedRowData.value = []
+  
+    emit('checkedRowData', a);
      
   };
  
@@ -506,6 +553,7 @@ const alldata = dataProvider.getJsonRows();
   selectedRowData.value= dataProvider.getRows()[clickData.itemIndex];
   emit('selcetedrowData', selectedRowData.value);
   emit('selectedIndex' ,clickData.itemIndex )
+
 }
 
 gridView.onSelectionChanged = function (grid) {
@@ -523,12 +571,15 @@ gridView.onCellClicked = function (grid, clickData) {
     return ;
   }
   var current = gridView.getCurrent();
-
+   console.log(current)
   if(current.itemIndex != -1){
     selectedRowData.value= dataProvider.getRows()[current.dataRow];
   selectedRowData.value.index = current.dataRow
+  selectedindex.value = current.dataRow
+  console.log(selectedindex.value)
   emit('clickedRowData', selectedRowData.value);
   emit('selectedIndex' , current.dataRow )
+
   }
   
   
@@ -655,7 +706,7 @@ watch(() => props.addRow4, (newVal) => {
     values[propertys[i]] = value[i]
   }
   values.new = true 
-
+  console.log(values)
   var dataRow = dataProvider.addRow(values);
   gridView.setCurrent({dataRow: dataRow });
   const current = gridView.getCurrent(); 
@@ -789,6 +840,11 @@ watch (() => props.setAllCheck , (newval) => {
     gridView.setAllCheck(false)
   }
 })
+watch (() => props.setAllCheck2 , (newval) => {
+  if(gridView != null){
+    gridView.setAllCheck(true)
+  }
+})
 watch(() => props.exporttoExcel, (newVal) => {
     gridView.exportGrid({
       type: "excel",
@@ -815,6 +871,35 @@ watch(() => props.initFocus, (newVal) => {
   
   
 });
+watch(() => props.initCheckAct, (newVal) => {
+  console.log(props.initCheckValue)
+  console.log(props.initCheckColumn)
+   gridView.checkAll(false)
+   let itemCount = gridView.getItemCount()
+   const checkValues = props.initCheckValue.split(',')
+   for(var i =0 ; i < itemCount ; i++){
+     for(var j=0 ; j < checkValues.length ; j++){
+       if(gridView.getValue(i, props.initCheckColumn) == checkValues[j]){
+         dataProvider.setValue(i, 'checkbox',true)
+       }
+     }
+   }
+ 
+  
+  
+});
+
+
+watch(() => props.uncheckAct , (newvalue) => {
+   props.uncheckColumn 
+   props.uncheckValue
+   const uncheckValues = props.uncheckValue.split(";")
+   for(var i = 0 ; i < uncheckValues.length ; i++){
+    const a = dataProvider.searchDataRow({fields:[props.uncheckColumn ], values: [uncheckValues[i]]});
+    gridView.checkRow(a, false);
+   }
+  
+})
 
 
 onMounted(async () => {
@@ -917,6 +1002,9 @@ watch(() => props.rowData, () => {
     },100) // 시간으로인한 미적용 이슈있음
     
 })
+if(props.initSelect == true){
+  selectedindex.value = -1
+}
 
 
 });
@@ -925,12 +1013,16 @@ watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) 
   const searchColId = props.searchColId.split(',')
   let searchColId2;
   let searchColValues;
+  console.log(props.searchColValue2)
+
+
 
   if(props.searchColId2 !== ''){
      searchColId2 = props.searchColId2.split(',')
   }
   if(newValue2 !== ''){
     searchColValues = newValue2.split(',')
+   
   }
   
   const searchWord = newValue.split(',')
@@ -939,6 +1031,7 @@ watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) 
  if(searchColId2 == undefined){
    if (newValue === '') {
     dataProvider.setRows( props.rowData );
+
     return ;
    };
    const filteredData = props.rowData.filter(
@@ -993,6 +1086,7 @@ watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) 
   }
   
  }
+
  
 });
 </script>
