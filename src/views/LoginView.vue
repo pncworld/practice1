@@ -53,7 +53,7 @@ const login2 = async () => {
   store.state.selectedCategoryId = null ;
   try {
     const response = await login(username.value,  password.value) ;
-    console.log(response.data)
+    console.log(response)
     const loginStatus = response.data.loginSession[0].strUserID;
    
     if (!isNaN(Number(loginStatus))) {

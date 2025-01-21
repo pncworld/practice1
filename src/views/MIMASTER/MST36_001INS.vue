@@ -56,7 +56,7 @@
   </div>
     <div class="ml-10 mt-1 w-full h-full">
   
-      <Realgrid class="w-full h-full" :progname="'MST36_001INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false" @clickedRowData="clickedRowData" :selectionStyle="'singleRow'"  @selcetedrowData="selcetedrowData"  :labelsData="labelsData" :valuesData="valuesData" :labelingColumns="labelingColumns" :searchWord="searchWord" :searchColId2="'blnInactive,payDistinct'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" :defaultSearchAllValue="-1" :changeNow="changeNow" :changeValue2="changeValue2" :changeColid="changeColid" :changeRow="changeRow" @selectedIndex="selectedIndex" :initSelect="true" :addRow4="addRow4" :deleteRow2="deleteRow3" :addrowDefault="addrowDefault" :addrowProp="addrowProp"></Realgrid>
+      <Realgrid class="w-full h-full" :progname="'MST36_001INS_VUE'" :progid="1" :rowData="rowData" :showGrid="showGrid" :showCheckBar="false" @clickedRowData="clickedRowData" :selectionStyle="'singleRow'"  @selcetedrowData="selcetedrowData"  :labelsData="labelsData" :valuesData="valuesData" :labelingColumns="labelingColumns" :searchWord="searchWord" :searchColId2="'blnInactive,payDistinct'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" :defaultSearchAllValue="-1" :changeNow="changeNow" :changeValue2="changeValue2" :changeColid="changeColid" :changeRow="changeRow" @selectedIndex="selectedIndex" :initSelect="true" :addRow4="addRow4" :deleteRow2="deleteRow3" :addrowDefault="addrowDefault" :addrowProp="addrowProp" @updatedRowData="updatedRowData"></Realgrid>
 
     </div>
     
@@ -74,7 +74,7 @@
       <hr class="w-[90%] mt-0">
       <div v-show="selectedMenu==1" class="mt-3 h-[46%]">
           <div class="font-bold flex justify-start text-xl">기본정보</div>
-         <div class="grid grid-cols-[1fr,3fr,1fr,3fr] grid-rows-[1fr,2fr,1fr,1fr] mt-5 border rounded-lg w-[90%] h-[80%]">
+         <div class="grid grid-cols-[1fr,3fr,1fr,3fr] grid-rows-[1fr,2fr,1fr] mt-5 border rounded-lg w-[90%] h-[55%]">
           <div class="flex justify-center items-center bg-gray-100 border">결제구분</div>
           <div class="flex justify-center items-center border"><select name="" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue1" disabled>
       <option value="0">선택</option>
@@ -92,12 +92,11 @@
           <div class=" justify-center items-center bg-gray-100 border grid"><div>결제코드명</div></div>
            <div class="grid grid-cols-1 grid-rows-2 h-full border"><div class="flex items-center mt-1 text-blue-400 font-semibold">*국문<input type="text" name="strName" id="" class="h-full w-[80%] border rounded-lg pl-2 ml-2 font-thin text-gray-700" v-model="gridvalue3" @input="changeInfo"></div><div class="flex items-center mt-1 ml-1"> 영문<input type="text" name="strNameE" id="" class="h-full w-[80%] border rounded-lg pl-2 ml-3" v-model="gridvalue4" @input="changeInfo"></div></div>
           <div class=" justify-center items-center bg-gray-100 border flex flex-col "><div class="border h-full w-full flex items-center justify-center text-blue-400 font-semibold">*결제코드</div><div class="border h-full w-full flex items-center justify-center text-blue-400 font-semibold">*사용여부</div></div>
-          <div class="grid grid-cols-1 grid-rows-2 "> <div><input type="text" name="" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue5"></div><div class="space-x-5 border flex justify-left pl-2 items-center"><label for="using1"><input type="radio" name="using" id="using1" v-model="gridvalue6" value="0">예</label><label for="using2"><input type="radio" name="using" id="using2" v-model="gridvalue6" value="1" >아니오</label></div></div>
+          <div class="grid grid-cols-1 grid-rows-2 "> <div><input type="text" name="lngCode" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue5" @input="changeInfo"></div><div class="space-x-5 border flex justify-left pl-2 items-center"><label for="using1"><input type="radio" name="blnInactive" id="using1" v-model="gridvalue6" value="0" @input="changeInfo">예</label><label for="using2"><input type="radio" name="blnInactive" id="using2" v-model="gridvalue6" value="1"  @input="changeInfo" >아니오</label></div></div>
           <div class="flex justify-center items-center bg-gray-100 border">할인그룹</div>
-          <div class="flex justify-center items-center border"><select name="" id="" class="border h-full w-full rounded-lg pl-2" v-model="gridvalue2">
-            <option value="0">선택</option>
-      <option value="1">전메뉴할인</option>
-      <option value="2">음료류 할인</option>
+          <div class="flex justify-center items-center border"><select name="" id="" class="border h-full w-full rounded-lg pl-2 bg-gray-200" v-model="gridvalue2" disabled>
+            <option value="">선택</option>
+            <option :value="i.lngValue" v-for="i in disCountGroup">[{{ i.lngCode }}]{{i.strName}}</option>
   
     </select></div>
           <!-- <div class="flex justify-center items-center bg-gray-100 border">결제그룹</div>
@@ -107,65 +106,67 @@
     </select></div> -->
           
           <div class=" justify-center items-center bg-gray-100 border grid">유효기간</div>
-          <div class="flex justify-center items-center border"><input type="date" max="9999-12-31" v-model="gridvalue7"> ~ <input type="date" max="9999-12-31" v-model="gridvalue8"></div>
+          <div class="flex justify-center items-center border"><input type="date" max="9999-12-31" v-model="gridvalue7" name="dtmFromDate" @input="changeInfo"> ~ <input type="date" max="9999-12-31" v-model="gridvalue8" name="dtmToDate" @input="changeInfo"></div>
          
-          <div class="justify-center items-center bg-gray-100 border flex text-blue-400 font-semibold">*승인구분</div>
-          <div><select name="" id="" v-model="gridvalue9" class="h-full w-full rounded-lg pl-2">
+          <!-- <div class="justify-center items-center bg-gray-100 border flex text-blue-400 font-semibold">*승인구분</div>
+          <div><select name="" id="" v-model="gridvalue9" class="h-full w-full rounded-lg pl-2" @change="setSub">
             <option value="">선택</option>
-          </select></div>
-          <div class="justify-center items-center bg-gray-100 border flex text-blue-400 font-semibold">*승인유형</div>
+            <option :value="i.strDCode1" v-for="i in approveType">[{{ i.strDCode1 }}]{{i.strDName1}}</option>
+          </select></div> -->
+          <!-- <div class="justify-center items-center bg-gray-100 border flex text-blue-400 font-semibold">*승인유형</div>
           <div><select name="" id="" v-model="gridvalue10" class="h-full w-full rounded-lg pl-2">
             <option value="">선택</option>
-          </select></div>
+            <option :value="i.strDCode2" v-for="i in filteredapproveType">[{{ i.strDCode2 }}]{{i.strDName2}}</option>
+          </select></div> -->
          </div>
          <div class="font-bold text-xl flex justify-start mt-5">부가정보</div>
          <div class="grid grid-cols-[1fr,3fr,1fr,3fr] grid-rows-8 h-full mt-3 w-[90%]">
           <div class="justify-center items-center bg-gray-100 border flex rounded-tl-lg">할인방법</div>
-    <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="discount1"><input type="radio" id="discount1" name="discount" v-model="gridvalue11" value="0">금액</label><label for="discount2"><input type="radio" id="discount2" name="discount" v-model="gridvalue11" value="1">비율</label> </div>
+    <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="discount1"><input type="radio" id="discount1" name="lngRate" v-model="gridvalue11" value="0" @input="changeInfo">금액</label><label for="discount2"><input type="radio" id="discount2" name="lngRate" v-model="gridvalue11" value="1" @input="changeInfo">비율</label> </div>
     <div class="justify-center items-center bg-gray-100 border flex">할인금액(비율)</div>
-    <div class="flex justify-center items-center"><input type="text" name="" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue12"></div>
+    <div class="flex justify-center items-center"><input type="text" name="lngAmt" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue12" @input="changeInfo"></div>
     <div class="justify-center items-center bg-gray-100 border flex">자동계산</div>
-    <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="autopay1"><input type="radio" id="autopay1" name="autopay" v-model="gridvalue13" value="1">예</label><label for="autopay2"><input type="radio" id="autopay2" name="autopay" v-model="gridvalue13" value="0">아니오</label></div>
+    <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="autopay1"><input type="radio" id="autopay1" name="blnAuto" v-model="gridvalue13" value="1" @input="changeInfo">예</label><label for="autopay2"><input type="radio" id="autopay2" name="blnAuto" v-model="gridvalue13" value="0" @input="changeInfo">아니오</label></div>
     <div class="justify-center items-center bg-gray-100 border flex">할인한도금액</div>
-    <div class="flex justify-center items-center"><input type="text" name="" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue14"></div>
+    <div class="flex justify-center items-center"><input type="text" name="lngDiscAmtLimit" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue14" @input="changeInfo"></div>
     <div class="justify-center items-center bg-gray-100 border flex">돈통오픈</div>
-    <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="openmoney1"><input type="radio" id="openmoney1" name="openmoney" v-model="gridvalue15" value="0">예</label><label for="openmoney2"><input type="radio" id="openmoney2" name="openmoney" v-model="gridvalue15" value="1">아니오</label></div>
+    <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="openmoney1"><input type="radio" id="openmoney1" name="blnDrawer" v-model="gridvalue15" value="0" @input="changeInfo">예</label><label for="openmoney2"><input type="radio" id="openmoney2" name="blnDrawer" v-model="gridvalue15" value="1" @input="changeInfo">아니오</label></div>
     <div class="justify-center items-center bg-gray-100 border flex">계산우선순위</div>
-    <div class="flex justify-center items-center"><input type="text" name="" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue16"></div>
+    <div class="flex justify-center items-center"><input type="text" name="lngPrior" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue16" @input="changeInfo"></div>
     <div class="justify-center items-center bg-gray-100 border flex">영수증출력</div>
-    <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="receipt1"><input type="radio" id="receipt1" name="receipt" v-model="gridvalue17" value="0">예</label><label for="receipt2"><input type="radio" id="receipt2" name="receipt" v-model="gridvalue17"  value="1">아니오</label></div>
+    <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="receipt1"><input type="radio" id="receipt1" name="blnReceipt" v-model="gridvalue17" value="0" @input="changeInfo">예</label><label for="receipt2"><input type="radio" id="receipt2" name="blnReceipt" v-model="gridvalue17"  value="1" @input="changeInfo">아니오</label></div>
     <div class="justify-center items-center bg-gray-100 border flex">잔금반환비율</div>
-    <div class="flex justify-center items-center"><input type="text" name="" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue18"></div>
+    <div class="flex justify-center items-center"><input type="text" name="lngChangeRateLimit" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue18" @input="changeInfo"></div>
     <div class="justify-center items-center bg-gray-100 border flex">할인대상메뉴</div>
-    <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="discountfor1"><input type="radio" id="discountfor1" name="discountfor" v-model="gridvalue19" value="0">전체 선택</label><label for="discountfor2"><input type="radio" id="discountfor2" name="discountfor" v-model="gridvalue19" value="1">부분 선택</label></div>
+    <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="discountfor1"><input type="radio" id="discountfor1" name="lngMenu" v-model="gridvalue19" value="0" @input="changeInfo">전체 선택</label><label for="discountfor2"><input type="radio" id="discountfor2" name="lngMenu" v-model="gridvalue19" value="1" @input="changeInfo">부분 선택</label></div>
     <div class="justify-center items-center bg-gray-100 border flex">품목할인설정</div>
-    <div class="flex justify-center items-center"><select name="" id="" class="border h-full w-full rounded-lg pl-2" v-model="gridvalue20">
+    <div class="flex justify-center items-center"><select name="lngDiscType" id="" class="border h-full w-full rounded-lg pl-2" v-model="gridvalue20" @input="changeInfo">
       <option value="">선택</option>
     <option :value="i.strDCode" v-for="i in itemDiscount">[{{ i.strDCode }}]{{i.strDName}}</option>
   
     </select></div>
     <div class="justify-center items-center bg-gray-100 border flex">중복결제</div>
-    <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="allow1"><input type="radio" id="allow1" name="allow" v-model="gridvalue21" value="1">허용</label><label for="allow2"><input type="radio" id="allow2" name="allow"  v-model="gridvalue21"  value="0">비허용</label></div>
+    <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="allow1"><input type="radio" id="allow1" name="blnDuplicate" v-model="gridvalue21" value="1" @input="changeInfo">허용</label><label for="allow2"><input type="radio" id="allow2" name="blnDuplicate"  v-model="gridvalue21"  value="0" @input="changeInfo">비허용</label></div>
     <div class="justify-center items-center bg-gray-100 border flex">크롤링결제코드</div>
     <div class="flex justify-center items-center"><select name="" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" disabled>
       <option value="">선택</option>
   
     </select></div>
     <div class="justify-center items-center bg-gray-100 border flex">단수처리방법</div>
-    <div class="flex justify-center items-center"><select name="" id="" class="border h-full w-full rounded-lg pl-2" v-model="gridvalue22">
+    <div class="flex justify-center items-center"><select name="lngRoundType" id="" class="border h-full w-full rounded-lg pl-2" v-model="gridvalue22" @input="changeInfo">
       <option value="">선택</option>
      <option :value="i.strDCode" v-for="i in rounding">[{{ i.strDCode }}]{{i.strDName}}</option>
     </select></div>
     <div class="justify-center items-center bg-gray-100 border flex">단수처리자릿수</div>
-    <div><input type="text" name="" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue23"></div>
+    <div><input type="text" name="lngRound" id="" class="h-full w-full border rounded-lg pl-2" v-model="gridvalue23" @input="changeInfo"></div>
     <div class="justify-center items-center bg-gray-100 border flex rounded-bl-lg">세금계산방법</div>
-    <div class="flex justify-center items-center"><select name="" id="" class="border h-full w-full rounded-lg pl-2" v-model="gridvalue24">
+    <div class="flex justify-center items-center"><select name="lngTax" id="" class="border h-full w-full rounded-lg pl-2" v-model="gridvalue24" @input="changeInfo">
       <option value="">선택</option>
       <option :value="i.strDCode" v-for="i in taxs">[{{ i.strDCode }}]{{i.strDName}}</option>
      
     </select></div>
     <div class="justify-center items-center bg-gray-100 border flex">결제옵션</div>
-    <div class="flex justify-center items-center"><select name="" id="" class="border h-full w-full rounded-lg pl-2" v-model="gridvalue25">
+    <div class="flex justify-center items-center"><select name="strIcon" id="" class="border h-full w-full rounded-lg pl-2" v-model="gridvalue25" @input="changeInfo">
       <option value="">선택</option>
        <option :value="i.strDCode" v-for="i in payOptions">[{{ i.strDCode }}] {{ i.strDName }}</option>
     </select></div>
@@ -205,20 +206,18 @@
 </template>
 
 <script setup>
-import { getMenuList, getMenuLists, getPayCodeEnrollInfo } from '@/api/master';
-import DupliPopUp from '@/components/dupliPopUp.vue';
+import { getMenuList, getMenuLists, getPayCodeEnrollInfo, savePayCode } from '@/api/master';
 import PickStore12 from '@/components/pickStore12.vue';
-import PickStore3 from '@/components/pickStore3.vue';
 import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 const searchWord2 = ref('');
 const nowStoreCd = ref(-1);
 const rowData = ref([]);
 const addRow4 = ref(false);
-const nowStoreNm = ref('')
+const updateRow = ref([])
 const deleteRow3 = ref(false);
 const searchword1 = ref('');
 const MenuGroup = ref('');
@@ -242,7 +241,10 @@ const groupCd = ref(userData.lngStoreGroup);
  const rounding = ref([])
  const taxs = ref([])
 const initCheckColumn = ref('menuCd')
-
+const disCountGroup = ref([])
+const approveGroup = ref([])
+const approveType = ref([])
+const filteredapproveType = ref([])
 const initCheckValue = ref('')
 const initCheckAct = ref(false)
 const uncheckValue = ref()
@@ -251,7 +253,7 @@ const labelsData = ref([['할인','지불','할증'],['미사용','사용']])
 const valuesData = ref([['1','2','3'],['0','1']])
 const labelingColumns = ref('payDistinct,blnInactive')
 const gridvalue1 = ref(0)
-const gridvalue2 = ref(0)
+const gridvalue2 = ref("")
 const gridvalue3 = ref("")
 const gridvalue4 = ref("")
 const gridvalue5 = ref("")
@@ -278,9 +280,9 @@ const gridvalue25 = ref("")
 
 
 const clickedRowData = (newvalue) => {
-
+    console.log(newvalue)
     gridvalue1.value = newvalue[4]
-    gridvalue2.value = newvalue[7]
+    gridvalue2.value = newvalue[21]
     gridvalue3.value = newvalue[3]
     gridvalue4.value = newvalue[8]
     gridvalue5.value = newvalue[2]
@@ -307,7 +309,8 @@ const clickedRowData = (newvalue) => {
     clickrowData2.value = []
     clickrowData2.value = [...clickrowData2.value]
     const firstarr =  newvalue[27] != undefined ? newvalue[27].split(',') : []
-   
+   if(rowData2.value.length > 0){
+
     let dupliarr = JSON.parse(JSON.stringify(rowData2.value));
     dupliarr.sort((a, b) => {
       const aIndex = firstarr.indexOf(a.menuCd);
@@ -327,8 +330,10 @@ const clickedRowData = (newvalue) => {
   
    
     clickrowData2.value = dupliarr
- 
+  }
    
+  if(rowData3.value.length >0){
+
     let multiplearr = rowData3.value.filter(item => item.lngCode != gridvalue5.value).map(item => ({
       ...item ,
       checkbox : true
@@ -364,7 +369,7 @@ if(secondarr.length > 0 && secondarr[0] !=''){
 
     console.log(multiplearr)
     filteredrowData3.value = [...multiplearr]
-
+  }
   
  
   
@@ -427,26 +432,39 @@ const clickmappingData = ref([])
      const res = await getPayCodeEnrollInfo(groupCd.value , nowStoreCd.value)
 
      rowData.value = res.data.PAYCODE
+     updateRow.value = JSON.parse(JSON.stringify(rowData.value))
      itemDiscount.value = res.data.ITEMDIS
      payOptions.value = res.data.PAYOPTION
      clickmappingData.value = res.data.MAPPINGCODE
      rowData3.value = res.data.MULTIPLE
      rounding.value = res.data.ROUND
      taxs.value = res.data.TAX
+     disCountGroup.value = res.data.DISGROUP
+     approveGroup.value = res.data.APPROVE
      const res2 = await getMenuList(groupCd.value , nowStoreCd.value)
      rowData2.value = res2.data.menuList
      SubMenuGroup.value = res2.data.submenuGroup
      MenuGroup.value = res2.data.menuGroup
      console.log(res)
      console.log(res2)
+  
 
   } catch (error) {
       afterSearch.value = false;
   } finally {
-      
+ 
+approveType.value = Array.from(
+  new Set(
+    approveGroup.value.map(item => JSON.stringify({
+      strDCode1: item.strDCode1,
+      strDName1: item.strDName1
+    }))
+  )
+).map(item => JSON.parse(item)).sort((a,b) => a.strDCode1-b.strDCode1); // 다시 객체로 변환
+
       store.state.loading = false; // 로딩 상태 종료
     
-               afterSearch.value = true;
+       afterSearch.value = true;
   }
   
 
@@ -478,7 +496,23 @@ const selectedMenu = ref(1)
   }
 
   const changeInfo = (e) => {
-     
+     const tagName = e.target.name;
+     const value2 = e.target.value
+ 
+     if(tagName =='lngAmt'){
+       if(gridvalue11.value == 0 ){
+        changeValue2.value = value2+'원'
+        changeColid.value = tagName
+       } else if ( gridvalue11.value == 1){
+        changeValue2.value = value2+'%'
+        changeColid.value = tagName
+       }
+       changeNow.value = !changeNow.value
+       return ;
+     }
+     changeValue2.value = value2
+     changeColid.value = tagName
+      changeNow.value = !changeNow.value
   }
 const searchColValue3  =ref('0,0')
   const filteredSubMenuGroup = ref([]);
@@ -540,6 +574,157 @@ const addRow = () => {
 }
 const deleteRow = () => {
   deleteRow3.value = !deleteRow3.value
+}
+
+
+
+watch(gridvalue9 , () => {
+  const selectedCode = gridvalue9.value
+    if(selectedCode == ''){
+      filteredapproveType.value = []
+      return ;
+    }
+    filteredapproveType.value = approveGroup.value.filter(item => item.strDCode1 == selectedCode)
+})
+
+const saveButton = () => {
+  if(afterSearch.value == false) {
+    Swal.fire({
+      title: '경고',
+      text: '조회를 먼저 진행해주세요.',
+      icon: 'warning',
+      confirmButtonText: '확인'
+    })
+    return ;
+  }
+  if(JSON.stringify(updateRow.value) === JSON.stringify(rowData.value) ) {
+    Swal.fire({
+      title: '경고',
+      text: '변경된 사항이 없습니다.',
+      icon: 'warning',
+      confirmButtonText: '확인'
+    })
+    return ;
+  }
+
+   const validateRow = updateRow.value.filter(item =>  item.lngCode == '' || item.lngCode == undefined || item.strName == '' || item.strName == undefined || item.blnInactive == undefined || item.blnInactive == '' ).length
+  if(validateRow > 0 ) {
+    Swal.fire({
+      title: '경고',
+      text: '미입력된 필수값이 존재합니다. 확인해주세요.',
+      icon: 'warning',
+      confirmButtonText: '확인'
+    })
+    return ;
+  }
+
+  const validateRow2 = new Set(updateRow.value.map(item => item.lngCode)).size ==  updateRow.value.map(item => item.lngCode).length
+
+if(validateRow2 == false ) {
+    Swal.fire({
+      title: '경고',
+      text: '중복된 계정코드가 존재합니다. 확인해주세요.',
+      icon: 'warning',
+      confirmButtonText: '확인'
+    })
+    return ;
+  }
+
+  Swal.fire({
+    title: '저장',
+      text: '저장 하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: '저장',
+      cancelButtonText: '취소'
+}).then(async (result) => {
+  if(result.isConfirmed){
+    store.state.loading = true;
+  try {
+    const lngStoreCodearr = updateRow.value.map(item => item.lngStoreCode)
+    const strNamearr = updateRow.value.map(item => item.strName)
+    const strNameEarr = updateRow.value.map(item => item.strNameE)
+    const lngCodearr = updateRow.value.map(item => item.lngCode)
+    const blnInactivearr = updateRow.value.map(item => item.blnInactive)
+    const dtmFromDatearr = updateRow.value.map(item => item.dtmFromDate)
+    const dtmToDatearr = updateRow.value.map(item => item.dtmToDate)
+    const lngRatearr = updateRow.value.map(item => item.lngRate)
+    const lngAmtarr = updateRow.value.map(item => item.lngAmt != undefined ? item.lngAmt.substring(0,item.lngAmt.length-1) : 0)
+    const blnAutoarr = updateRow.value.map(item => item.blnAuto )
+    const lngDiscAmtLimitarr = updateRow.value.map(item => item.lngDiscAmtLimit )
+    const blnDrawerarr = updateRow.value.map(item => item.blnDrawer )
+    const lngPriorarr = updateRow.value.map(item => item.lngPrior )
+    const blnReceiptarr = updateRow.value.map(item => item.blnReceipt )
+    const lngChangeRateLimitarr = updateRow.value.map(item => item.lngChangeRateLimit )
+    const lngMenuarr = updateRow.value.map(item => item.lngMenu )
+    const lngDiscTypearr = updateRow.value.map(item => item.lngDiscType )
+    const blnDuplicatearr = updateRow.value.map(item => item.blnDuplicate )
+    const lngRoundTypearr = updateRow.value.map(item => item.lngRoundType )
+    const lngRoundarr = updateRow.value.map(item => item.lngRound )
+    const lngTaxarr = updateRow.value.map(item => item.lngTax )
+    const strIconarr = updateRow.value.map(item => item.strIcon )
+    const checkedMenus = updateRow.value.map(item => item.checkedMenu )
+    const unchecklngCodes = updateRow.value.map(item => item.unchecklngCode )
+    const deleteCd = updateRow.value.filter(item => item.deleted == true ).map(item => item.lngCode)
+   console.log(dtmFromDatearr)
+   console.log(dtmToDatearr)
+
+    console.log(deleteCd)
+   const res = await savePayCode( groupCd.value , nowStoreCd.value ,lngStoreCodearr.join(',') ,
+   strNamearr.join(',') , 
+   strNameEarr.join(','),
+   lngCodearr.join(','), 
+   blnInactivearr.join(','),
+   dtmFromDatearr.join(','),
+   dtmToDatearr.join(','),
+   lngRatearr.join(','),
+   lngAmtarr.join(','),
+   blnAutoarr.join(','),
+   lngDiscAmtLimitarr.join(','),
+   blnDrawerarr.join(','),
+   lngPriorarr.join(','),
+   blnReceiptarr.join(','),
+   lngChangeRateLimitarr.join(','),
+   lngMenuarr.join(','),
+   lngDiscTypearr.join(','),
+   blnDuplicatearr.join(','),
+   lngRoundTypearr.join(','),
+   lngRoundarr.join(','),
+   lngTaxarr.join(','),
+   strIconarr.join(','),
+   checkedMenus.join(';'),
+   unchecklngCodes.join(',') ,
+   deleteCd.join(',')
+  
+  
+  )
+   console.log(res)
+
+
+Swal.fire({
+      title: '저장 되었습니다.',
+      confirmButtonText: '확인',
+})
+store.state.loading = false
+  } catch (error) {
+    console.log(error)
+    Swal.fire({
+      title: '저장이 실패되었습니다.',
+      confirmButtonText: '확인',
+  })
+  } finally {
+    store.state.loading = false
+    searchButton();
+  }
+}
+})
+ 
+
+}
+
+const updatedRowData = (newvalue) => {
+  updateRow.value = newvalue
+  console.log(updateRow.value)
 }
 </script>
 

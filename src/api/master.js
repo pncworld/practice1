@@ -934,6 +934,68 @@ export const saveCreditCardEnroll = (groupCd , storeCd , cstorecd , cbuyCd ,cbuy
        
     })
 }
+// API 요청 함수 정의
+export const savePayCode = (
+    groupCd,
+    storeCd,
+    lngStoreCode,
+    strName,
+    strNameE,
+    lngCode,
+    blnInactive,
+    dtmFromDate,
+    dtmToDate,
+    lngRate,
+    lngAmt,
+    blnAuto,
+    lngDiscAmtLimit,
+    blnDrawer,
+    lngPrior,
+    blnReceipt,
+    lngChangeRateLimit,
+    lngMenu,
+    lngDiscType,
+    blnDuplicate,
+    lngRoundType,
+    lngRound,
+    lngTax,
+    strIcon ,
+    checkmenu ,
+    uncheckcode ,
+    deleteCd
+  ) => {
+    // POST 요청
+    return api2.post('/MIMASTER/MST36_001INS.asmx/savePayCode', {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      LNG_STORE_CODE: lngStoreCode,
+      STR_NAME: strName,
+      STR_NAME_E: strNameE,
+      LNG_CODE: lngCode,
+      BLN_INACTIVE: blnInactive,
+      DTM_FROM_DATE: dtmFromDate,
+      DTM_TO_DATE: dtmToDate,
+      LNG_RATE: lngRate,
+      LNG_AMT: lngAmt,
+      BLN_AUTO: blnAuto,
+      LNG_DISC_AMT_LIMIT: lngDiscAmtLimit,
+      BLN_DRAWER: blnDrawer,
+      LNG_PRIOR: lngPrior,
+      BLN_RECEIPT: blnReceipt,
+      LNG_CHANGE_RATE_LIMIT: lngChangeRateLimit,
+      LNG_MENU: lngMenu,
+      LNG_DISC_TYPE: lngDiscType,
+      BLN_DUPLICATE: blnDuplicate,
+      LNG_ROUND_TYPE: lngRoundType,
+      LNG_ROUND: lngRound,
+      LNG_TAX: lngTax,
+      STR_ICON: strIcon,
+      CHECK_MENU : checkmenu ,
+      UNCHECK_CODE : uncheckcode ,
+      DELETE_CD : deleteCd
+    });
+  };
+  
 export const saveOptions = (groupCd , storeCd , lngcode1 , strNames1, blnMustSels1 ,intMultiples1 ,lngChainMenu1,lngChainMenu2,lngChainMenu3,
   lngChainMenu4,lngChainMenu5,lngChainMenu6,lngChainMenu7,lngChainMenu8,lngChainMenu9,lngChainMenu10,lngChainMenu11,lngChainMenu12,lngChainMenu13,
   lngChainMenu14,lngChainMenu15,lngChainMenu16,lngChainMenu17,lngChainMenu18,lngChainMenu19,lngChainMenu20,lngChainMenu21,lngCodes2,strNames2,
