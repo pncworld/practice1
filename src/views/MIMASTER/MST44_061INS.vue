@@ -171,6 +171,7 @@ import DupliPopUp5 from '@/components/dupliPopUp5.vue';
 
   const forSaveMenu = ref([])
   const updatedRowData2 = (newValue) => {
+    console.log(newValue)
     if(currentMenu.value == true){
 
     forSaveMenu.value = []
@@ -322,12 +323,15 @@ if(currentMenu.value == true) {
           KDSSettingList.value = res.data.KDSSETTINGLIST
           checked.value = res.data.CHECK
           kdsList.value = res.data.KDS
-          
+          console.log(KDSSettingList.value)
           for(var i=0 ; i< checked.value.length ; i++){
             const tlngCode = checked.value[i].lngCode
             const tCornerNm = checked.value[i].kdsCornerNum
             const index =  KDSSettingList.value.findIndex(item => item.lngCode == tlngCode)
-            KDSSettingList.value[index][tCornerNm] = true
+            if(KDSSettingList.value[index]){
+              KDSSettingList.value[index][tCornerNm] = true
+            }
+           
           }
 
           rowData2.value = [...KDSSettingList.value]
@@ -347,7 +351,7 @@ if(currentMenu.value == true) {
   
      
   } catch (error) {
-  
+     console.log(error)
   } finally {
       if(ischecked.value == true){
         ischecked.value = false

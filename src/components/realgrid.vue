@@ -511,7 +511,9 @@ const alldata = dataProvider.getJsonRows();
     var data = dataProvider.getJsonRow(rows[i]);
     selectedRowData.value.push(data);
     }
-
+    updatedrowData.value = [ ...dataProvider.getJsonRows()]
+ 
+    selectedRowData.value.index = itemIndex
     emit('checkedRowData', selectedRowData.value);
   
   };
@@ -551,6 +553,7 @@ const alldata = dataProvider.getJsonRows();
     return ;
   }
   selectedRowData.value= dataProvider.getRows()[clickData.itemIndex];
+
   emit('selcetedrowData', selectedRowData.value);
   emit('selectedIndex' ,clickData.itemIndex )
 
@@ -559,9 +562,17 @@ const alldata = dataProvider.getJsonRows();
 gridView.onSelectionChanged = function (grid) {
   var current = gridView.getCurrent();
 
+
   selectedRowData.value= dataProvider.getRows()[current.dataRow];
+  selectedRowData.value.index = current.dataRow
   emit('clickedRowData', selectedRowData.value);
   emit('selectedIndex' , current.dataRow )
+
+  
+
+  
+
+
 
 }
 
@@ -571,12 +582,14 @@ gridView.onCellClicked = function (grid, clickData) {
     return ;
   }
   var current = gridView.getCurrent();
-   console.log(current)
+
   if(current.itemIndex != -1){
     selectedRowData.value= dataProvider.getRows()[current.dataRow];
-  selectedRowData.value.index = current.dataRow
-  selectedindex.value = current.dataRow
-  console.log(selectedindex.value)
+   selectedRowData.value.index = current.dataRow
+   selectedindex.value = current.dataRow
+  
+   console.log(selectedRowData.value)
+  
   emit('clickedRowData', selectedRowData.value);
   emit('selectedIndex' , current.dataRow )
 
@@ -648,6 +661,8 @@ watch(() => props.changeNow , () => {
     updatedrowData.value = [ ...dataProvider.getJsonRows()]
  
      emit('updatedRowData', updatedrowData.value )
+
+    
 })
 
 watch(() => props.addRow, (newVal) => {

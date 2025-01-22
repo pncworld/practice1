@@ -329,6 +329,7 @@ import { nextTick } from 'vue';
           ischecked.value = false
 
   nowStoreCd.value = newValue ;
+  console.log(nowStoreCd.value)
   reload.value = !reload.value
   }
   const handleInput = (e)=>{
