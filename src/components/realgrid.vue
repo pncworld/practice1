@@ -656,12 +656,13 @@ watch(() => props.changeNow , () => {
     console.log(props.changeRow)
     console.log(props.changeColid)
     console.log(props.changeValue2)
+ 
     dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue2);
   
     updatedrowData.value = [ ...dataProvider.getJsonRows()]
  
      emit('updatedRowData', updatedrowData.value )
-
+   
     
 })
 

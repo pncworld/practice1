@@ -1205,6 +1205,13 @@ export const getPayCodeEnrollInfo = (groupCd , storeCd) => {
 
     })
 }
+export const getMenuCodeEnroll = (groupCd , storeCd) => {
+    return api2.post('/MIMASTER/MST01_033INS.asmx/getMenuCodeEnroll', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd
+
+    })
+}
 
 
 
