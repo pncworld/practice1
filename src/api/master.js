@@ -995,7 +995,85 @@ export const savePayCode = (
       DELETE_CD : deleteCd
     });
   };
-  
+  export const saveMenuCode = (
+    groupCd,
+    storeCd,
+    lngMainGroup,
+    lngSubGroup,
+    lngCode,
+    dtmFromDate,
+    dtmToDate,
+    strName,
+    strNameE,
+    lngDCPrice,
+    lngChain,
+    lngPrice,
+    blnDCPriceYN,
+    lngTax,
+    blnInactive,
+    lngDiscount,
+    intCustCount,
+    blnCondimentprice,
+    lngOrder,
+    lngKPG,
+    strBarCode,
+    blnReceipt,
+    lngMenuOption,
+    blnRedPrint,
+    strIcon,
+    blnKitSingle,
+    lngSubTitle,
+    blnServing,
+    blnOpen,
+    blnDeliveryYN,
+    strNutrInfo,
+    strCntryOrg,
+    strMenuComment,
+    strAmtCodeList,
+    strUserFileName,
+    deleteCd
+) => {
+    // POST 요청
+    return api2.post('/MIMASTER/MST01_033INS.asmx/saveMenuCode', {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      LNG_MAIN_GROUP: lngMainGroup,
+      LNG_SUB_GROUP: lngSubGroup,
+      LNG_CODE: lngCode,
+      DTM_FROM_DATE: dtmFromDate,
+      DTM_TO_DATE: dtmToDate,
+      STR_NAME: strName,
+      STR_NAME_E: strNameE,
+      LNG_DC_PRICE: lngDCPrice,
+      LNG_CHAIN: lngChain,
+      LNG_PRICE: lngPrice,
+      BLN_DC_PRICE_YN: blnDCPriceYN,
+      LNG_TAX: lngTax,
+      BLN_INACTIVE: blnInactive,
+      LNG_DISCOUNT: lngDiscount,
+      INT_CUST_COUNT: intCustCount,
+      BLN_CONDIMENTPRICE: blnCondimentprice,
+      LNG_ORDER: lngOrder,
+      LNG_KPG: lngKPG,
+      STR_BAR_CODE: strBarCode,
+      BLN_RECEIPT: blnReceipt,
+      LNG_MENU_OPTION: lngMenuOption,
+      BLN_RED_PRINT: blnRedPrint,
+      STR_ICON: strIcon,
+      BLN_KIT_SINGLE: blnKitSingle,
+      LNG_SUB_TITLE: lngSubTitle,
+      BLN_SERVING: blnServing,
+      BLN_OPEN: blnOpen,
+      BLN_DELIVERY_YN: blnDeliveryYN,
+      STR_NUTR_INFO: strNutrInfo,
+      STR_CNTRY_ORG: strCntryOrg,
+      STR_MENU_COMMENT: strMenuComment,
+      STR_AMT_CODE_LIST: strAmtCodeList,
+      STR_USER_FILE_NAME: strUserFileName,
+      DELETE_CD: deleteCd,
+    });
+};
+
 export const saveOptions = (groupCd , storeCd , lngcode1 , strNames1, blnMustSels1 ,intMultiples1 ,lngChainMenu1,lngChainMenu2,lngChainMenu3,
   lngChainMenu4,lngChainMenu5,lngChainMenu6,lngChainMenu7,lngChainMenu8,lngChainMenu9,lngChainMenu10,lngChainMenu11,lngChainMenu12,lngChainMenu13,
   lngChainMenu14,lngChainMenu15,lngChainMenu16,lngChainMenu17,lngChainMenu18,lngChainMenu19,lngChainMenu20,lngChainMenu21,lngCodes2,strNames2,
@@ -1212,6 +1290,17 @@ export const getMenuCodeEnroll = (groupCd , storeCd) => {
 
     })
 }
+export const uploadImage = (formData) => {
+    return axios.post('/MIMASTER/MST01_033INS.asmx/fnImgSave', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',  // 파일을 전송할 때 필요한 헤더
+        },
+        params: {
+            GROUP_CD: groupCd,
+            STORE_CD: storeCd,
+        },
+    });
+};
 
 
 

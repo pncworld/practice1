@@ -41,12 +41,12 @@
 </select>
 </div>
 <div class="customtableIndex border border-gray-400 rounded-bl-lg">메뉴명/코드</div>
-<div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList" v-model="searchWord2"></div>
+<div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList" v-model="searchWord"></div>
 </div>
 
 <div class="ml-10 mt-1 w-full h-full">
 
-  <Realgrid class="w-full h-full" :progname="'MST01_033INS_VUE'" :progid="1" :rowData="updateRow" :showGrid="showGrid" :showCheckBar="false" @clickedRowData="clickedRowData" :selectionStyle="'singleRow'"  @selcetedrowData="selcetedrowData"  :labelsData="labelsData" :valuesData="valuesData" :labelingColumns="labelingColumns"  :defaultSearchAllValue="-1" :changeNow="changeNow" :changeValue2="changeValue2" :changeColid="changeColid" :changeRow="changeRow" @selectedIndex="selectedIndex" :initSelect="true" :addRow4="addRow4" :deleteRow2="deleteRow3" :addrowDefault="addrowDefault" :addrowProp="addrowProp" @updatedRowData="updatedRowData" :rowStateeditable="false" :addField="'new'"></Realgrid>
+  <Realgrid class="w-full h-full" :progname="'MST01_033INS_VUE'" :progid="1" :rowData="updateRow" :showGrid="showGrid" :showCheckBar="false" @clickedRowData="clickedRowData" :selectionStyle="'singleRow'"  @selcetedrowData="selcetedrowData"  :labelsData="labelsData" :valuesData="valuesData" :labelingColumns="labelingColumns"  :changeNow="changeNow" :changeValue2="changeValue2" :changeColid="changeColid" :changeRow="changeRow" @selectedIndex="selectedIndex"  :addRow4="addRow4" :deleteRow2="deleteRow3" :addrowDefault="addrowDefault" :addrowProp="addrowProp" @updatedRowData="updatedRowData" :rowStateeditable="false" :addField="'new'" :hideRow="hideRow" :hideNow="hideNow" :searchWord="searchWord" :searchColId2="'lngMainGroup,lngSubGroup'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue3"></Realgrid>
   <!-- :searchWord="searchWord" :searchColId2="'blnInactive,payDistinct'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" -->
 </div>
 
@@ -57,7 +57,7 @@
 <div class="grid grid-cols-1 grid-rows-[1fr,9fr] ml-20">
 <div class="flex space-x-1 mt-10">
   <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border" @click="selectMenu(1)" :class="{'text-blue-400 bg-blue-100': selectedMenu==1}">상세정보</button>
-  <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border disabled:bg-gray-50 disabled:text-gray-200 " @click="selectMenu(2)" :class="{'text-blue-400 bg-blue-100': selectedMenu==2}" :disabled="selectedPayDistinct">할인선택</button>
+  <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border disabled:bg-gray-50 disabled:text-gray-200 " @click="selectMenu(2)" :class="{'text-blue-400 bg-blue-100': selectedMenu==2}" >할인선택</button>
   <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border" @click="selectMenu(3)" :class="{'text-blue-400 bg-blue-100': selectedMenu==3}" :disabled="selectedMultiple">키오스크 이미지 설정</button>
 </div>
 <div>
@@ -65,141 +65,144 @@
   <div v-show="selectedMenu==1" class="mt-3 h-[46%]">
       <div class="font-bold flex justify-start text-xl">기본정보</div>
       <div class="grid grid-rows-6 grid-cols-[1fr,3fr,1fr,3fr] h-[60%] mt-3 w-[90%] border rounded-lg">
-        <div class="justify-center items-center bg-gray-100 border flex">메뉴분류</div>
+        <div class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">*메뉴분류</div>
         <div class="flex w-[236%]">
-        <select name="" id="" class="flex-1 border rounded-lg w-full h-full " @change="setSubCd" v-model="forsearchMain2">
+        <select name="lngMainGroup" id="" class="flex-1 border rounded-lg w-full h-full disabled:bg-gray-200 " @change="(e) => { setSubCd4(); changeInfo(e); }" v-model="gridvalue1" :disabled="afterClick">
   <option value="0">전체</option>
   <option :value="i.GroupCd" v-for="i in MenuGroup"> [{{i.GroupCd}}]{{ i.majorGroupNm }}</option>
 </select>
-<select name="" id="" class="flex-1 border rounded-lg w-full h-full" v-model="forsearchSub2" @change="setSubCd2">
+<select name="lngSubGroup" id="" class="flex-1 border rounded-lg w-full h-full disabled:bg-gray-200" v-model="gridvalue2" @change="changeInfo" :disabled="afterClick">
   <option value="0">전체</option>
-  <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup"> [{{i.GroupCd}}]{{ i.subGroupNm }}</option>
+  <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup2"> [{{i.GroupCd}}]{{ i.subGroupNm }}</option>
 </select>
         </div>
         <div class="w-0"></div>
         <div class="w-0"></div>
-        <div class="justify-center items-center bg-gray-100 border flex">메뉴코드</div>
-        <div class="justify-center items-center  border flex"><input type="text" class="justify-center rounded-lg items-center h-full w-full border flex"></div>
-        <div class="justify-center items-center bg-gray-100 border flex">유효기간</div>
-        <div class="grid grid-rows-1 grid-cols-2"><div class="justify-center rounded-lg items-center h-full w-full border flex"><input type="date"></div><div class="justify-center rounded-lg items-center h-full w-full border flex"><input type="date"></div></div>
+        <div class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">*메뉴코드</div>
+        <div class="justify-center items-center  border flex"><input type="number" name="lngCode" class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-200 " :disabled="!(!afterClick && isNew)" v-model="gridvalue3" @input="changeInfo"></div>
+        <div class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">*유효기간</div> 
+        <div class="grid grid-rows-1 grid-cols-2"><div class="justify-center rounded-lg items-center h-full w-full border flex"><input type="date" :disabled="afterClick" name="dtmFromDate" class="disabled:bg-gray-200 w-full h-full rounded-lg" v-model="gridvalue4" @input="changeInfo"></div><div class="justify-center rounded-lg items-center h-full w-full border flex"><input type="date" :disabled="afterClick" class="disabled:bg-gray-200 w-full h-full rounded-lg" name="dtmToDate" v-model="gridvalue5" @input="changeInfo"></div></div>
         <div class="justify-center items-center bg-gray-100 border flex">메뉴명</div>
-        <div class="grid grid-rows-1 grid-cols-2 w-[236%] z-5"><div class="justify-center rounded-lg items-center h-full w-full border flex">국문:<input type="text" class="justify-center rounded-lg items-center h-full w-full border flex"></div><div class="justify-center rounded-lg items-center h-full w-full border flex">영문: <input type="text" class="justify-center rounded-lg items-center h-full w-full border flex"> </div></div>
+        <div class="grid grid-rows-1 grid-cols-2 w-[236%] z-5"><div class="justify-center rounded-lg items-center h-full w-full border flex "><span class="text-blue-500 font-bold">*국문:</span><input type="text" class="ml-1 justify-center rounded-lg items-center h-full w-[88%] border flex disabled:bg-gray-200" :disabled="afterClick" v-model="gridvalue6" name="strName" @input="changeInfo"></div><div class="justify-center rounded-lg items-center h-full w-full border flex">영문: <input type="text" class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-200" :disabled="afterClick" v-model="gridvalue7" name="strNameE" @input="changeInfo"> </div></div>
         <div class="w-0"></div>
         <div class="w-0"></div>
         <div class="justify-center items-center bg-gray-100 border flex">정상단가</div>
-        <div><input type="text" class="justify-center rounded-lg items-center h-full w-full border flex"></div>
+        <div><input type="number" name="lngDCPrice" class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-200" :disabled="afterClick" v-model="gridvalue8" @input="changeInfo"></div>
         <div class="justify-center items-center bg-gray-100 border flex">옵션그룹선택</div>
-        <div><select name="" id="">
-            <option value="">선택</option>
+        <div><select name="lngChain" id="" :disabled="afterClick" class="disabled:bg-gray-200 border rounded-lg w-[50%] h-full p-2" v-model="gridvalue9" @change="changeInfo">
+            <option value="0">[0]선택</option>
+            <option :value="i.lngCode" v-for="i in optionGroup">[{{ i.lngCode }}]{{ i.strName }}</option>
         </select> <button class="whitebutton">옵션그룹 추가</button></div>
-        <div class="justify-center items-center bg-gray-100 border flex">판매가</div>
-        <div><input type="number" class="justify-center rounded-lg items-center h-full w-full border flex"></div>
+        <div class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">*판매가</div>
+        <div><input type="number" name="lngPrice" class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-200" :disabled="afterClick" v-model="gridvalue10" @input="changeInfo"></div>
         <div class="justify-center items-center bg-gray-100 border flex">정상단가할인표기</div>
-        <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="disY"><input type="radio"  name="disYn" id="disY" >예</label>
-            <label for="disN"><input type="radio"  name="disYn" id="disN" >아니오</label>
+        <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="disY"><input type="radio" name="blnDCPriceYN" id="disY" :disabled="afterClick" v-model="gridvalue11" value="1" @input="changeInfo">예</label>
+            <label for="disN"><input type="radio"  name="blnDCPriceYN" id="disN" :disabled="afterClick" v-model="gridvalue11" value="0" @input="changeInfo">아니오</label>
         <select name="" id="" :disabled="true" class="border rounded-lg disabled:bg-gray-200 ml-10">
             <option value="">선택</option>
         </select></div>
-        <div class="justify-center items-center bg-gray-100 border flex">과세구분</div>
-        <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="chargeY"><input type="radio"  name="charge" id="chargeY" >과세</label>
-            <label for="chargeN"><input type="radio"  name="charge" id="chargeN" >면세</label>
+        <div class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">*과세구분</div>
+        <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="chargeY"><input type="radio"  name="lngTax" id="chargeY" :disabled="afterClick"  value="0" v-model="gridvalue12" @input="changeInfo">과세</label>
+            <label for="chargeN"><input type="radio"  name="lngTax" id="chargeN"  :disabled="afterClick" value="2" v-model="gridvalue12" @input="changeInfo">면세</label>
        </div>
-       <div class="justify-center items-center bg-gray-100 border flex">사용여부</div>
-        <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="useY"><input type="radio"  name="use" id="useY" >사용</label>
-            <label for="useN"><input type="radio"  name="use" id="useN" >미사용</label>
+       <div class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">*사용여부</div>
+        <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="useY"><input type="radio"  name="blnInactive" id="useY" :disabled="afterClick" value="0" v-model="gridvalue13" @input="changeInfo">사용</label>
+            <label for="useN"><input type="radio"  name="blnInactive" id="useN" :disabled="afterClick" value="1" v-model="gridvalue13" @input="changeInfo">미사용</label>
        </div>
       </div>
      <div class="font-bold text-xl flex justify-start mt-5">부가정보</div>
      <div class="grid grid-cols-[1fr,3fr,1fr,3fr] grid-rows-12 h-[120%] mt-3 w-[90%]">
       <div class="justify-center items-center bg-gray-100 border flex rounded-tl-lg">할인여부</div>
-<div class="space-x-5 flex  items-center border justify-left pl-2"><label for="discount1"><input type="radio" id="discount1" name="lngRate" v-model="gridvalue11" value="0" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">금액</label><label for="discount2"><input type="radio" id="discount2" name="lngRate" v-model="gridvalue11" value="1" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">비율</label> </div>
+<div class="space-x-5 flex  items-center border justify-left pl-2"><label for="discount1"><input type="radio" id="discount1" name="lngDiscount" v-model="gridvalue14" value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="discount2"><input type="radio" id="discount2" name="lngDiscount" v-model="gridvalue14" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label> </div>
 <div class="justify-center items-center bg-gray-100 border flex">메뉴당객수</div>
-<div class="flex justify-center items-center"><input type="number" name="lngAmt" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue12" @input="changeInfo" :disabled="afterClickrow" ></div>
+<div class="flex justify-center items-center"><input type="number" name="intCustCount" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue15" @input="changeInfo" :disabled="afterClick" ></div>
 <div class="justify-center items-center bg-gray-100 border flex">주메뉴종속</div>
-<div class="space-x-5 flex  items-center border justify-left pl-2"><label for="autopay1"><input type="radio" id="autopay1" name="blnAuto" v-model="gridvalue13" value="1" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">예</label><label for="autopay2"><input type="radio" id="autopay2" name="blnAuto" v-model="gridvalue13" value="0" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">아니오</label></div>
+<div class="space-x-5 flex  items-center border justify-left pl-2"><label for="autopay1"><input type="radio" id="autopay1" name="blnCondimentprice" v-model="gridvalue100" value="1" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="autopay2"><input type="radio" id="autopay2" name="blnCondimentprice" v-model="gridvalue100" value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label>
+<select name="blnCondimentprice" id="" class="border h-full w-[40%] rounded-lg pl-2 disabled:bg-gray-200 ml-5" :disabled="afterClick || gridvalue100==0 " v-model="gridvalue16" @change="changeInfo">
+  <option value="0">선택</option>
+  <option :value="i.strDCode" v-for="i in MENUDEPEND">[{{ i.strDCode }}]{{i.strDName}}</option>
+</select>
+</div>
 <div class="justify-center items-center bg-gray-100 border flex">주문정렬순위</div>
-<div class="flex justify-center items-center"><input type="number" name="lngDiscAmtLimit" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue14" @input="changeInfo" :disabled="afterClickrow" ></div>
+<div class="flex justify-center items-center"><input type="number" name="lngOrder" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue17" @input="changeInfo" :disabled="afterClick" ></div>
 <div class="justify-center items-center bg-gray-100 border flex">주방출력제외</div>
-<div class="space-x-5 flex justify-left pl-2 items-center border"><label for="openmoney1"><input type="radio" id="openmoney1" name="blnDrawer" v-model="gridvalue15" value="0" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">예</label><label for="openmoney2"><input type="radio" id="openmoney2" name="blnDrawer" v-model="gridvalue15" value="1" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">아니오</label></div>
+<div class="space-x-5 flex justify-left pl-2 items-center border"><label for="openmoney1"><input type="radio" id="openmoney1" name="lngKPG" v-model="gridvalue18" value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="openmoney2"><input type="radio" id="openmoney2" name="lngKPG" v-model="gridvalue18" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label></div>
 <div class="justify-center items-center bg-gray-100 border flex">바코드</div>
-<div class="flex justify-center items-center"><input type="number" name="lngPrior" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue16" @input="changeInfo" :disabled="afterClickrow" ></div>
+<div class="flex justify-center items-center"><input type="number" name="strBarCode" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue19" @input="changeInfo" :disabled="afterClick" ></div>
 <div class="justify-center items-center bg-gray-100 border flex">영수증출력제외</div>
-<div class="space-x-5 flex justify-left pl-2 items-center border"><label for="receipt1"><input type="radio" id="receipt1" name="blnReceipt" v-model="gridvalue17" value="0" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">예</label><label for="receipt2"><input type="radio" id="receipt2" name="blnReceipt" v-model="gridvalue17"  value="1" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">아니오</label></div>
+<div class="space-x-5 flex justify-left pl-2 items-center border"><label for="receipt1"><input type="radio" id="receipt1" name="blnReceipt" v-model="gridvalue20" value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="receipt2"><input type="radio" id="receipt2" name="blnReceipt" v-model="gridvalue20"  value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label></div>
 <div class="justify-center items-center bg-gray-100 border flex">메뉴주문옵션</div>
-<div class="flex justify-center items-center"><select name="lngDiscType" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue20" @change="changeInfo" :disabled="afterClickrow" >
-  <option value="">선택</option>
-<option :value="i.strDCode" v-for="i in itemDiscount">[{{ i.strDCode }}]{{i.strDName}}</option>
+<div class="flex justify-center items-center"><select name="lngMenuOption" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue21" @change="changeInfo" :disabled="afterClick" >
+  <option value="0">선택</option>
+<option :value="i.strDCode" v-for="i in menuOrderOption">[{{ i.strDCode }}]{{i.strDName}}</option>
 
 </select></div>
 <div class="justify-center items-center bg-gray-100 border flex">주문서출력제외</div>
-<div class="space-x-5 flex justify-left pl-2 items-center border"><label for="discountfor1"><input type="radio" id="discountfor1" name="lngMenu" v-model="gridvalue19" value="0" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">전체 선택</label><label for="discountfor2"><input type="radio" id="discountfor2" name="lngMenu" v-model="gridvalue19" value="1" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">부분 선택</label></div>
+<div class="space-x-5 flex justify-left pl-2 items-center border"><label for="discountfor1"><input type="radio" id="discountfor1" name="blnRedPrint" v-model="gridvalue22" value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">전체 선택</label><label for="discountfor2"><input type="radio" id="discountfor2" name="blnRedPrint" v-model="gridvalue22" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">부분 선택</label></div>
 <div class="justify-center items-center bg-gray-100 border flex">메뉴옵션코드</div>
-<div class="flex justify-center items-center"><select name="lngDiscType" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue20" @change="changeInfo" :disabled="afterClickrow" >
-  <option value="">선택</option>
-<option :value="i.strDCode" v-for="i in itemDiscount">[{{ i.strDCode }}]{{i.strDName}}</option>
+<div class="flex justify-center items-center"><select name="strIcon" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue23" @change="changeInfo" :disabled="afterClick" >
+<option value="">선택</option>
+<option :value="i.strDCode" v-for="i in menuOptionCode">{{i.strDName}}</option>
 
 </select></div>
 <div class="justify-center items-center bg-gray-100 border flex">주방단품출력</div>
-<div class="space-x-5 flex justify-left pl-2 items-center border"><label for="allow1"><input type="radio" id="allow1" name="blnDuplicate" v-model="gridvalue21" value="1" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">허용</label><label for="allow2"><input type="radio" id="allow2" name="blnDuplicate"  v-model="gridvalue21"  value="0" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">비허용</label></div>
+<div class="space-x-5 flex justify-left pl-2 items-center border"><label for="allow1"><input type="radio" id="allow1" name="blnKitSingle" v-model="gridvalue24" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">허용</label><label for="allow2"><input type="radio" id="allow2" name="blnKitSingle"  v-model="gridvalue24"  value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">비허용</label></div>
 <div class="justify-center items-center bg-gray-100 border flex">서브타이틀</div>
-<div class="flex justify-center items-center"><select name="" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" disabled>
-  <option value="">선택</option>
-
+<div class="flex justify-center items-center"><select name="lngSubTitle" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" :disabled="afterClick" v-model="gridvalue25" @input="changeInfo">
+  <option value="0">선택</option>
+  <option :value="i.lngCode" v-for="i in subTitle">{{i.strName}}</option>
 </select></div>
 
 <div class="justify-center items-center bg-gray-100 border flex">메뉴제공완료여부</div>
-<div class="space-x-5 flex justify-left pl-2 items-center border w-[233%]"><label for="allow1"><input type="radio" id="allow1" name="blnDuplicate" v-model="gridvalue21" value="1" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">예</label><label for="allow2"><input type="radio" id="allow2" name="blnDuplicate"  v-model="gridvalue21"  value="0" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">아니오</label></div>
+<div class="space-x-5 flex justify-left pl-2 items-center border w-[233%]"><label for="allow1"><input type="radio" id="allow1" name="blnServing" v-model="gridvalue26" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="allow2"><input type="radio" id="allow2" name="blnServing"  v-model="gridvalue26"  value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label></div>
 <div class="w-0"></div>
 <div class="w-0"></div>
 <div class="justify-center items-center bg-gray-100 border flex rounded-bl-lg">시세가적용</div>
-<div class="space-x-5 flex justify-left pl-2 items-center border w-[233%]"><label for="allow1"><input type="radio" id="allow1" name="blnDuplicate" v-model="gridvalue21" value="1" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">예</label><label for="allow2"><input type="radio" id="allow2" name="blnDuplicate"  v-model="gridvalue21"  value="0" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">아니오</label></div>
+<div class="space-x-5 flex justify-left pl-2 items-center border w-[233%]"><label for="allow1"><input type="radio" id="allow1" name="blnOpen" v-model="gridvalue27" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="allow2"><input type="radio" id="allow2" name="blnOpen"  v-model="gridvalue27"  value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label></div>
 <div class="w-0"></div>
 <div class="w-0"></div>
 <div class="justify-center items-center bg-gray-100 border flex rounded-bl-lg">배달메뉴</div>
-<div class="space-x-5 flex justify-left pl-2 items-center border w-[233%]"><label for="allow1"><input type="radio" id="allow1" name="blnDuplicate" v-model="gridvalue21" value="1" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">예</label><label for="allow2"><input type="radio" id="allow2" name="blnDuplicate"  v-model="gridvalue21"  value="0" @input="changeInfo" :disabled="afterClickrow" class="disabled:bg-gray-200">아니오</label></div>
+<div class="space-x-5 flex justify-left pl-2 items-center border w-[233%]"><label for="allow1"><input type="radio" id="allow1" name="blnDeliveryYN" v-model="gridvalue28" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="allow2"><input type="radio" id="allow2" name="blnDeliveryYN"  v-model="gridvalue28"  value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label></div>
 <div class="w-0"></div>
 <div class="w-0"></div>
 <div class="justify-center items-center bg-gray-100 border flex">영양소 정보</div>
-<div class="flex justify-center items-center w-[233%]"><input type="number" name="lngPrior" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue16" @input="changeInfo" :disabled="afterClickrow" ></div>
+<div class="flex justify-center items-center w-[233%]"><input type="number" name="strNutrInfo" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue29" @input="changeInfo" :disabled="afterClick" ></div>
 <div class="w-0"></div>
 <div class="w-0"></div>
 <div class="justify-center items-center bg-gray-100 border flex">원산지 정보</div>
-<div class="flex justify-center items-center w-[233%]"><input type="number" name="lngPrior" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue16" @input="changeInfo" :disabled="afterClickrow" ></div>
+<div class="flex justify-center items-center w-[233%]"><input type="number" name="strCntryOrg" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue30" @input="changeInfo" :disabled="afterClick" ></div>
 <div class="w-0"></div>
 <div class="w-0"></div>
 <div class="justify-center items-center bg-gray-100 border flex">메뉴설명</div>
-<div class="flex justify-center items-center w-[233%]"><input type="number" name="lngPrior" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue16" @input="changeInfo" :disabled="afterClickrow" ></div>
+<div class="flex justify-center items-center w-[233%]"><input type="number" name="strMenuComment" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue31" @input="changeInfo" :disabled="afterClick" ></div>
 <div class="w-0"></div>
 <div class="w-0"></div>
    </div>
   </div>
   <div v-show="selectedMenu==2" class="h-[80%] w-[90%]" >
    <div class="flex justify-between mt-3 w-full">
-    <div class="font-bold text-xl" >메뉴 목록</div><div><button class="whitebutton">할인대상메뉴복사</button></div></div>
-   <div class="mt-3  grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
-<div class="customtableIndex border border-gray-400 rounded-tl-lg">메뉴분류</div>
-<div class=" border border-gray-300 rounded-tr-lg flex p-1">
-<select name="" id="" class="flex-1 border rounded-lg w-full h-full " @change="setSubCd" v-model="forsearchMain">
-  <option value="0">전체</option>
-  <option :value="i.GroupCd" v-for="i in MenuGroup"> [{{i.GroupCd}}]{{ i.majorGroupNm }}</option>
-</select>
-<select name="" id="" class="flex-1 border rounded-lg w-full h-full" v-model="forsearchSub" @change="setSubCd2">
-  <option value="0">전체</option>
-  <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup"> [{{i.GroupCd}}]{{ i.subGroupNm }}</option>
-</select>
+    <div class="font-bold text-xl" > 할인설정</div><div><button class="whitebutton">할인설정복사</button></div></div>
+ <div class="grid grid-rows-1 grid-cols-[1fr,3fr] mt-3">
+<div class="customtableIndex border border-gray-400 rounded-l-lg">결제코드/명</div>
+<div class="px-1 py-1 border border-gray-300 rounded-r-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchPayCd" v-model="searchWord2"></div>
 </div>
-<div class="customtableIndex border border-gray-400 rounded-bl-lg">메뉴명/코드</div>
-<div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList" v-model="searchWord2"></div>
-</div>
-<Realgrid class="w-full h-full mt-5" :progname="'MST36_001INS_VUE'" :progid="2" :rowData="clickrowData4"   @clickedRowData="clickedRowData2"  :initCheckColumn="initCheckColumn" :initCheckValue="initCheckValue" :initCheckAct="initCheckAct" @checkedRowData="checkedRowData" :initSelect="true" :maintaincheckColumn="'menuCd'" :rowStateeditable="false" :changeNow="changeNow2" :changeValue2="changeValue3" :changeColid="changeColid2" :changeRow="changeRow2" @updatedRowData="updatedRowData2" @selectedIndex="selectedIndex2"></Realgrid>
+<Realgrid class="w-full h-full mt-5" :progname="'MST01_033INS_VUE'" :progid="2" :rowData="clickrowData2"  @clickedRowData="clickedRowData2" :searchColId="'lngCode,strName'" :searchWord="searchWord2"  ></Realgrid>
 <!-- :searchColId2="'majorGroupCd,subGroupCd'" :searchColId="'menuCd,menuNm'" :searchColValue2="searchColValue3" :searchWord="searchWord2" -->
 </div>
-<div v-show="selectedMenu==3" class="h-[90%] w-[90%]">
-<div class="grid grid-rows-1 grid-cols-[1fr,4fr] mt-3">
-<div class="customtableIndex border border-gray-400 rounded-lg">결제코드/명</div>
-<div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList2" v-model="searchWord3"></div></div>
-<Realgrid class="w-full h-full mt-5" :progname="'MST36_001INS_VUE'" :progid="3" :rowData="filteredrowData5"  :setAllCheck2="setAllCheck2" :uncheckColumn="'lngCode'" :uncheckValue="uncheckValue" :uncheckAct="uncheckAct" :maintaincheckColumn="'lngCode'" @checkedRowData="checkedRowData2" :rowStateeditable="false" @updatedRowData="updatedRowData3" ></Realgrid>
-<!-- :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" :searchWord="searchWord3"  -->
+<div v-show="selectedMenu==3" class="h-[90%] w-full">
+<div class="grid grid-rows-1 grid-cols-[2fr,3fr] w-[80%] h-[40%] ml-10 mt-10 border pl-5">
+  <div class="flex justify-center items-center"><img :src="`http://www.pncoffice.net/MenuImage/Image/${fileName}`" alt="" class="w-[80%] h-[80%]"></div>
+  <div class="grid grid-rows-[1fr,5fr] grid-cols-[1fr,5fr] border ">
+    <div class="customtableIndex border border-gray-400 rounded-l-lg h-full w-full">파일명</div>
+    <div class="flex h-full w-full items-center"><input type="file" @change="handleFileUpload"><button class="whitebutton" @click="uploadImage">업로드</button></div>
+    <div class="customtableIndex border border-gray-400 rounded-l-lg h-full w-full">파일크기</div>
+    <div class="grid grid-rows-[1fr,5fr] grid-cols-1">
+      <div class="flex"><input type="file"><button class="whitebutton">파일선택</button></div>
+     <div>* 이미지 사이즈 220*160
+* 이미지 포맷 : PNG, JPG 등 이미지 형식
+* 이미지 용량 제한 : 2MB </div> </div>
+  </div>
+</div>
 </div>
 </div>
 </div>
@@ -209,7 +212,7 @@
 </template>
 
 <script setup>
-import { getMenuCodeEnroll, getMenuList, getMenuLists, getPayCodeEnrollInfo, savePayCode } from '@/api/master';
+import { getMenuCodeEnroll, getMenuList, getMenuLists, getPayCodeEnrollInfo, saveMenuCode, savePayCode } from '@/api/master';
 import PickStore12 from '@/components/pickStore12.vue';
 import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';
@@ -220,6 +223,13 @@ const searchWord2 = ref('');
 const nowStoreCd = ref(-1);
 const rowData = ref([]);
 const filteredrowData = ref([]);
+const hideNow = ref(false);
+const hideRow = ref([]);
+const MENUDEPEND = ref([])
+const hiderow = () => {
+  //hideRow.value = 3
+  hideNow.value = !hideNow.value
+}
 const addRow4 = ref(false);
 const updateRow = ref([])
 const deleteRow3 = ref(false);
@@ -244,8 +254,7 @@ const itemDiscount = ref([])
 const payOptions = ref([])
 const rounding = ref([])
 const taxs = ref([])
-const isNew = ref(true)
-
+const isNew = ref(false)
 const initCheckColumn = ref('menuCd')
 const disCountGroup = ref([])
 const approveGroup = ref([])
@@ -283,129 +292,110 @@ const gridvalue22 = ref("")
 const gridvalue23 = ref("")
 const gridvalue24 = ref("")
 const gridvalue25 = ref("")
+const gridvalue26 = ref("")
+const gridvalue27 = ref("")
+const gridvalue28 = ref("")
+const gridvalue29 = ref("")
+const gridvalue30 = ref("")
+const gridvalue31 = ref("")
+const gridvalue100 = ref("")
 const clickedrowdata = ref([])
 const clickrowData4 = ref([])
 const filteredrowData5 = ref([])
-const afterClickrow = ref(true)
+const afterClick = ref(true)
+const fileName = ref()
+const rowIndex = ref()
+const duplilfirstarr = ref()
 const clickedRowData = (newvalue) => {
+  console.log(newvalue)
+  rowIndex.value = newvalue.index
 clickrowData4.value = []
 filteredrowData5.value = []
 console.log(newvalue)
-forsearchMain.value = 0 
-forsearchSub.value = 0 
+// forsearchMain.value = 0 
+// forsearchSub.value = 0 
 searchWord2.value = ''
 searchWord3.value = ''
 clickedrowdata.value = newvalue[27]
-gridvalue1.value = newvalue[4]
-gridvalue2.value = newvalue[21]
-gridvalue3.value = newvalue[3]
-gridvalue4.value = newvalue[8]
-gridvalue5.value = newvalue[2]
-gridvalue6.value = newvalue[6]
-gridvalue7.value = newvalue[9]
-gridvalue8.value = newvalue[10]
-gridvalue9.value = newvalue[18]
-gridvalue10.value = newvalue[19]
-gridvalue11.value = newvalue[11]
-gridvalue12.value =  newvalue[5] != undefined ?  newvalue[5].substring( 0 , newvalue[5].length -1 ) : ''
-gridvalue13.value =  newvalue[12]
-gridvalue14.value = newvalue[13]
-gridvalue15.value = newvalue[14]
-gridvalue16.value = newvalue[15]
-gridvalue17.value = newvalue[16]
-gridvalue18.value = newvalue[20]
-gridvalue19.value = newvalue[21]
-gridvalue20.value = newvalue[22]
-gridvalue21.value = newvalue[23]
-gridvalue22.value = newvalue[24]
-gridvalue23.value = newvalue[25]
-gridvalue24.value = newvalue[17]
-gridvalue25.value = newvalue[26]
-clickrowData2.value = []
-clickrowData2.value = [...clickrowData2.value]
-if(newvalue[21] == '1'){
-  selectedPayDistinct.value = false 
-} else {
-  selectedPayDistinct.value = true
-}
+gridvalue1.value = newvalue[30]
+gridvalue2.value = newvalue[3]
+gridvalue3.value = newvalue[0]
+gridvalue4.value = newvalue[4]
+gridvalue5.value = newvalue[5]
+gridvalue6.value = newvalue[1]
+gridvalue7.value = newvalue[6]
+gridvalue8.value = newvalue[7]
+gridvalue9.value = newvalue[8]
+gridvalue10.value = newvalue[9]
+gridvalue11.value = newvalue[10]
+gridvalue12.value =  newvalue[11]
+gridvalue13.value =  newvalue[2]
+gridvalue14.value = newvalue[12]
+gridvalue15.value = newvalue[13]
+gridvalue16.value = newvalue[14]
+gridvalue17.value = newvalue[15]
+gridvalue18.value = newvalue[16]
+gridvalue19.value = newvalue[17]
+gridvalue20.value = newvalue[18]
+gridvalue21.value = newvalue[19]
+gridvalue22.value = newvalue[20]
+gridvalue23.value = newvalue[21]
+gridvalue24.value = newvalue[22]
+gridvalue25.value = newvalue[23]
+gridvalue26.value = newvalue[24]
+gridvalue27.value = newvalue[25]
+gridvalue28.value = newvalue[26]
+gridvalue29.value = newvalue[27]
+gridvalue30.value = newvalue[28]
+gridvalue31.value = newvalue[29]
 
-// changeRow.value = rowData.value.findIndex((item) => item.lngCode == newvalue[2])
-// console.log(changeRow.value)
-if(newvalue[30]== true){
-  isNew.value = false
+if(gridvalue16.value != 0){
+  gridvalue100.value = 1
 } else {
-  isNew.value = true
+  gridvalue100.value = 0
 }
-const firstarr =  newvalue[27] != undefined ? newvalue[27].split(',') : []
+// clickrowData2.value = []
+// clickrowData2.value = [...clickrowData2.value]
+fileName.value = newvalue[31]
+console.log(newvalue[33])
+if(newvalue[34] == true){
+  isNew.value = true
+} else {
+  isNew.value = false
+}
+const firstarr =  newvalue[32] != undefined ? newvalue[32].split(';') : []
+duplilfirstarr.value = firstarr
 if(rowData2.value.length > 0){
 
 let dupliarr = JSON.parse(JSON.stringify(rowData2.value));
 dupliarr.sort((a, b) => {
-  const aIndex = firstarr.indexOf(a.menuCd);
-  const bIndex =  firstarr.indexOf(b.menuCd);
+  const aIndex = firstarr.indexOf(a.lngCode.toString());
+  const bIndex =  firstarr.indexOf(b.lngCode.toString());
 
 if (aIndex === -1 && bIndex === -1) return 0; // 둘 다 우선순위에 없음
 if (aIndex === -1) return 1; // a가 우선순위에 없음
 if (bIndex === -1) return -1; // b가 우선순위에 없음
 return aIndex - bIndex; // 우선순위 배열에 따라 정렬
 });
+
 if(firstarr.length > 0 && firstarr[0] !==''){
 for(var i=0 ; i < firstarr.length ; i ++){
-  const change =  dupliarr.find(item => item.menuCd == firstarr[i])
-  change.checkbox = true
-}
-}
-
-
-clickrowData2.value = JSON.parse(JSON.stringify(dupliarr))
-clickrowData4.value = JSON.parse(JSON.stringify(dupliarr))
-}
-
-if(rowData3.value.length >0){
-
-let multiplearr = rowData3.value.filter(item => item.lngCode != gridvalue5.value).map(item => ({
-  ...item ,
-  checkbox : true
-}))
-let secondarr = newvalue[28] != undefined ? newvalue[28].split(';') : []
-
-multiplearr.sort((a, b) => {
-const aIndex = secondarr.indexOf(a.lngCode.toString());
-const bIndex = secondarr.indexOf(b.lngCode.toString());
-
-// 둘 다 secondarr에 포함되지 않으면 순서 유지
-if (aIndex === -1 && bIndex === -1) return 0;
-
-// a가 secondarr에 없고 b가 있을 경우, a를 뒤로 보냄
-if (aIndex === -1) return -1;
-
-// b가 secondarr에 없고 a가 있을 경우, b를 뒤로 보냄
-if (bIndex === -1) return 1;
-
-// 둘 다 secondarr에 있으면, secondarr에 나타나는 순서대로 정렬
-return aIndex - bIndex;
-});
-if(secondarr.length > 0 && secondarr[0] !=''){
-for(var i=0 ; i < secondarr.length ; i++){
-
-  const change =  multiplearr.find(item => item.lngCode.toString() == secondarr[i].toString())
-
+  const change =  dupliarr.find(item => item.lngCode == firstarr[i])
+  console.log(change)
   if(change){
-    change.checkbox = false
+    change.checkbox = true
   }
  
 }
 }
 
 
+clickrowData2.value = JSON.parse(JSON.stringify(dupliarr))
 
-//filteredrowData3.value = [...multiplearr]
-
-filteredrowData5.value = JSON.parse(JSON.stringify(multiplearr))
-filteredrowData3.value = JSON.parse(JSON.stringify(multiplearr))
 }
 
-afterClickrow.value = false
+afterClick.value = false
+setSubCd3()
 
 }
 
@@ -447,6 +437,10 @@ const handleinitAll = (newvalue) => {
 } 
 
 const confirmData = ref([])
+const optionGroup = ref([])
+const subTitle = ref([])
+const menuOrderOption = ref([])
+const menuOptionCode = ref([])
 const searchButton = async () => {
   items.value = []
  
@@ -471,21 +465,21 @@ try {
  const res = await getMenuCodeEnroll(groupCd.value , nowStoreCd.value)
 
  rowData.value = res.data.MENULIST
- updateRow.value = JSON.parse(JSON.stringify(rowData.value))
+ updateRow.value = rowData.value
+ MENUDEPEND.value = res.data.MENUDEPEND
+ subTitle.value = res.data.SUBTITLE
+ menuOrderOption.value = res.data.MENUORDEROPTION
+ menuOptionCode.value = res.data.MENUOPTIONCODE
   confirmData.value = JSON.parse(JSON.stringify(rowData.value))
   console.log(res)
-//  itemDiscount.value = res.data.ITEMDIS
-//  payOptions.value = res.data.PAYOPTION
-//  clickmappingData.value = res.data.MAPPINGCODE
-//  rowData3.value = res.data.MULTIPLE
-//  rounding.value = res.data.ROUND
-//  taxs.value = res.data.TAX
-//  disCountGroup.value = res.data.DISGROUP
-//  approveGroup.value = res.data.APPROVE
-//  const res2 = await getMenuList(groupCd.value , nowStoreCd.value)
-//  rowData2.value = res2.data.menuList
-//  SubMenuGroup.value = res2.data.submenuGroup
-//  MenuGroup.value = res2.data.menuGroup
+  optionGroup.value = res.data.OPTIONGROUP
+  rowData2.value = res.data.PAYCD
+  clickrowData2.value = res.data.PAYCD
+  
+ const res2 = await getMenuList(groupCd.value , nowStoreCd.value)
+ //rowData2.value = res2.data.menuList
+ SubMenuGroup.value = res2.data.submenuGroup
+ MenuGroup.value = res2.data.menuGroup
 //  console.log(res)
 //  console.log(res2)
 
@@ -539,37 +533,11 @@ searchWord.value = e.target.value
 const changeInfo = (e) => {
  const tagName = e.target.name;
  const value2 = e.target.value
-
- if(tagName =='lngAmt'){
-   if(gridvalue11.value == 0 ){
-    changeValue2.value = value2+'원'
-    changeColid.value = tagName
-   } else if ( gridvalue11.value == 1){
-    changeValue2.value = value2+'%'
-    changeColid.value = tagName
-   }
-   changeNow.value = !changeNow.value
-
-   const findrow = rowData.value.find(item => item.lngCode == gridvalue5.value)
- if(findrow !== undefined){
-  findrow[changeColid.value] = changeValue2.value
- } else {
-  const findrow2 = rowData.value.find(item => item.sequence == clickaddrowSeq.value)
-  findrow2[changeColid.value] = changeValue2.value
- }
-   return ;
- }
- changeValue2.value = value2
+  console.log(tagName)
+  console.log(value2)
  changeColid.value = tagName
- changeNow.value = !changeNow.value
-
- const findrow = rowData.value.find(item => item.lngCode == gridvalue5.value)
- if(findrow !== undefined){
-  findrow[changeColid.value] = changeValue2.value
- } else {
-  const findrow2 = rowData.value.find(item => item.sequence == clickaddrowSeq.value)
-  findrow2[changeColid.value] = changeValue2.value
- }
+ changeValue2.value = value2
+ changeNow.value= !changeNow.value
 
 }
 const searchColValue3  =ref('0,0')
@@ -582,30 +550,34 @@ forsearchSub.value = '0'
 
 searchColValue3.value = forsearchMain.value+',0'
 
-console.log(searchColValue3.value)
-
-// clickrowData2.value = rowData2.value.filter( item => {
-//   if(forsearchMain.value =='0' ){
-//         return item ;
-//       } else if ( forsearchMain.value !='0' && forsearchSub.value !='0' )  {
-//         return  item.majorGroupCd == forsearchMain.value && item.subGroupCd == forsearchSub.value ;
-//       } else if (  forsearchMain.value !='0' && forsearchSub.value =='0') {
-//         return  item.majorGroupCd == forsearchMain.value 
-//       } else {
-
-//       }
-   
-//   })
-
-
 
 }
+
 const setSubCd2 = () => {
-searchColValue3.value = searchColValue3.value.split(',')[0]+','+forsearchSub.value
+ 
+  searchColValue3.value = searchColValue3.value.split(',')[0]+','+forsearchSub.value
+}
+
+const filteredSubMenuGroup2 = ref([])
+const setSubCd3= () => {
+  filteredSubMenuGroup2.value = SubMenuGroup.value.filter(item => item.sublngMajor == gridvalue1.value)
+
+  //gridvalue2.value = '0'
+
+ //searchColValue3.value = gridvalue1.value+',0'
+}
+const setSubCd4= () => {
+  console.log(SubMenuGroup.value)
+  filteredSubMenuGroup2.value = SubMenuGroup.value.filter(item => item.sublngMajor == gridvalue1.value)
+
+  gridvalue2.value = '0'
+
+ //searchColValue3.value = gridvalue1.value+',0'
 }
 
 const searchMenuList = (e) => {
-searchWord2.value = e.target.value
+searchWord.value = e.target.value
+hideRow.value = e.target.value
 }
 const changeColid = ref('checkedMenu')
 const changeValue2 = ref('')
@@ -618,30 +590,11 @@ const changeColid2 = ref('checkbox')
 const changeNow2 = ref(false)
 const checkedRowData = (e) => {
 console.log(e)
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-//  for(var i = 0 ; i< arr.length ; i++){
 
-//    const checkrow = clickrowData2.value.find(item => item.menuCd == arr[i])
-//    console.log(checkrow)
-//    if(checkrow.checkbox == undefined || checkrow.checkbox == false){
-//     checkrow.checkbox = true
-//    } else {
-//     checkrow.checkbox = false
-//    }
-//  }
-//  clickrowData2.value = [...clickrowData2.value]
-//  console.log(clickrowData2.value)
 
 }
 const checkedRowData2 = (e) => {
-// changeColid.value = 'unchecklngCode'
-// const arr = e.map(item => Number(item.lngCode))
-// console.log(arr)
 
-// const filtered2 = rowData3.value.filter(item => item.lngCode != gridvalue5.value).filter(item => !arr.includes(Number(item.lngCode))).map(item => item.lngCode)
-
-// changeValue2.value = filtered2.join(';')
-// changeNow.value = !changeNow.value
 }
 
 const setAllCheck2 = ref(false)
@@ -656,8 +609,9 @@ const clickaddrowSeq = ref()
 const addRow = () => {
 const today = new Date();
 const formattedDate = today.toLocaleDateString('en-CA');
-addrowDefault.value = nowStoreCd.value+','+clickedStoreNm.value+ ','+formattedDate+','+'9999-12-31'+','+''+','+''+','+''+','+''
-addrowProp.value = 'lngStoreCode,storeName,dtmFromDate,dtmToDate,lngDiscType,lngRoundType,lngTax,strIcon'
+addrowProp.value = 'lngMainGroup,lngSubGroup,dtmFromDate,dtmToDate,strName,lngPrice,lngTax,blnInactive,strAmtCodeList'
+addrowDefault.value ='0,0,'+formattedDate+','+'9999-12-31'+','+''+','+'0'+','+'0'+','+'0'+','+' '
+
 console.log(addrowProp.value)
 addRow4.value = !addRow4.value
 addrowSeq.value++;
@@ -700,7 +654,7 @@ Swal.fire({
 return ;
 }
 
-const validateRow = rowData.value.filter(item =>  item.lngCode == '' || item.lngCode == undefined || item.strName == '' || item.strName == undefined || (item.blnInactive != 0 && item.blnInactive !=1 )).length
+const validateRow = rowData.value.filter(item =>  item.lngCode == '' || item.lngCode == undefined || item.strName == '' || item.strName == undefined || item.lngMainGroup == undefined || item.lngMainGroup == 0 || item.lngSubGroup == undefined || item.lngSubGroup == 0 ||  item.dtmToDate == undefined ||  item.dtmFromDate == undefined ||  item.lngPrice == undefined  ||  item.blnInactive == undefined ||  item.lngTax == undefined).length
 
 if(validateRow > 0 ) {
 Swal.fire({
@@ -717,7 +671,7 @@ const validateRow2 = new Set(rowData.value.map(item => item.lngCode)).size ==  r
 if(validateRow2 == false ) {
 Swal.fire({
   title: '경고',
-  text: '중복된 계정코드가 존재합니다. 확인해주세요.',
+  text: '중복된 메뉴코드가 존재합니다. 확인해주세요.',
   icon: 'warning',
   confirmButtonText: '확인'
 })
@@ -735,61 +689,86 @@ title: '저장',
 if(result.isConfirmed){
 store.state.loading = true;
 try {
-const lngStoreCodearr = rowData.value.filter(item => item.deleted !== true ).map(item => item.lngStoreCode)
-const strNamearr = rowData.value.filter(item => item.deleted !== true ).map(item => item.strName)
-const strNameEarr = rowData.value.filter(item => item.deleted !== true ).map(item => item.strNameE)
-const lngCodearr = rowData.value.filter(item => item.deleted !== true ).map(item => item.lngCode)
-const blnInactivearr = rowData.value.filter(item => item.deleted !== true ).map(item => item.blnInactive)
-const dtmFromDatearr = rowData.value.filter(item => item.deleted !== true ).map(item => item.dtmFromDate)
-const dtmToDatearr = rowData.value.filter(item => item.deleted !== true ).map(item => item.dtmToDate)
-const lngRatearr = rowData.value.filter(item => item.deleted !== true ).map(item => item.lngRate)
-const lngAmtarr = rowData.value.filter(item => item.deleted !== true ).map(item => item.lngAmt != undefined ? item.lngAmt.substring(0,item.lngAmt.length-1) : 0)
-const blnAutoarr = rowData.value.filter(item => item.deleted !== true ).map(item => item.blnAuto )
-const lngDiscAmtLimitarr = rowData.value.filter(item => item.deleted !== true ).map(item => item.lngDiscAmtLimit )
-const blnDrawerarr = rowData.value.filter(item => item.deleted !== true ).map(item => item.blnDrawer )
-const lngPriorarr = rowData.value.filter(item => item.deleted !== true ).map(item => item.lngPrior )
-const blnReceiptarr = rowData.value.filter(item => item.deleted !== true ).map(item => item.blnReceipt )
-const lngChangeRateLimitarr = rowData.value.filter(item => item.deleted !== true ).map(item => item.lngChangeRateLimit )
-const lngMenuarr = rowData.value.filter(item => item.deleted !== true ).map(item => item.lngMenu )
-const lngDiscTypearr = rowData.value.filter(item => item.deleted !== true ).map(item => item.lngDiscType )
-const blnDuplicatearr = rowData.value.filter(item => item.deleted !== true ).map(item => item.blnDuplicate )
-const lngRoundTypearr = rowData.value.filter(item => item.deleted !== true ).map(item => item.lngRoundType )
-const lngRoundarr = rowData.value.filter(item => item.deleted !== true ).map(item => item.lngRound )
-const lngTaxarr = rowData.value.filter(item => item.deleted !== true ).map(item => item.lngTax )
-const strIconarr = rowData.value.filter(item => item.deleted !== true ).map(item => item.strIcon )
-const checkedMenus = rowData.value.filter(item => item.deleted !== true ).map(item => item.checkedMenu )
-const unchecklngCodes = rowData.value.filter(item => item.deleted !== true ).map(item => item.unchecklngCode )
-const deleteCd = rowData.value.filter(item => item.deleted == true ).map(item => item.lngCode)
+  const filterAndMap = (key) => rowData.value.filter(item => item.deleted !== true).map(item => item[key]).join(',');
+
+  const deleteCd = rowData.value.filter(item => item.deleted == true).map(item => item.lngCode)
+
+  console.log("groupCd.value:", groupCd.value);
+  console.log("nowStoreCd.value:", nowStoreCd.value);
+  console.log("lngMainGroup:", filterAndMap('lngMainGroup'));
+  console.log("lngSubGroup:", filterAndMap('lngSubGroup'));
+  console.log("lngCode:", filterAndMap('lngCode'));
+  console.log("dtmFromDate:", filterAndMap('dtmFromDate'));
+  console.log("dtmToDate:", filterAndMap('dtmToDate'));
+  console.log("strName:", filterAndMap('strName'));
+  console.log("strNameE:", filterAndMap('strNameE'));
+  console.log("lngDCPrice:", filterAndMap('lngDCPrice'));
+  console.log("lngChain:", filterAndMap('lngChain'));
+  console.log("lngPrice:", filterAndMap('lngPrice'));
+  console.log("blnDCPriceYN:", filterAndMap('blnDCPriceYN'));
+  console.log("lngTax:", filterAndMap('lngTax'));
+  console.log("blnInactive:", filterAndMap('blnInactive'));
+  console.log("lngDiscount:", filterAndMap('lngDiscount'));
+  console.log("intCustCount:", filterAndMap('intCustCount'));
+  console.log("blnCondimentprice:", filterAndMap('blnCondimentprice'));
+  console.log("lngOrder:", filterAndMap('lngOrder'));
+  console.log("lngKPG:", filterAndMap('lngKPG'));
+  console.log("strBarCode:", filterAndMap('strBarCode'));
+  console.log("blnReceipt:", filterAndMap('blnReceipt'));
+  console.log("lngMenuOption:", filterAndMap('lngMenuOption'));
+  console.log("blnRedPrint:", filterAndMap('blnRedPrint'));
+  console.log("strIcon:", filterAndMap('strIcon'));
+  console.log("blnKitSingle:", filterAndMap('blnKitSingle'));
+  console.log("lngSubTitle:", filterAndMap('lngSubTitle'));
+  console.log("blnServing:", filterAndMap('blnServing'));
+  console.log("blnOpen:", filterAndMap('blnOpen'));
+  console.log("blnDeliveryYN:", filterAndMap('blnDeliveryYN'));
+  console.log("strNutrInfo:", filterAndMap('strNutrInfo'));
+  console.log("strCntryOrg:", filterAndMap('strCntryOrg'));
+  console.log("strMenuComment:", filterAndMap('strMenuComment'));
+  console.log("strAmtCodeList:", filterAndMap('strAmtCodeList'));
+  console.log("strUserFileName:", filterAndMap('strUserFileName'));
+  console.log("deleteCd:", deleteCd.join(','));
+const res = await saveMenuCode(
+  groupCd.value,
+  nowStoreCd.value,
+  filterAndMap('lngMainGroup'),
+  filterAndMap('lngSubGroup'),
+  filterAndMap('lngCode'),
+  filterAndMap('dtmFromDate'),
+  filterAndMap('dtmToDate'),
+  filterAndMap('strName'),
+  filterAndMap('strNameE'),
+  filterAndMap('lngDCPrice'),
+  filterAndMap('lngChain'),
+  filterAndMap('lngPrice'),
+  filterAndMap('blnDCPriceYN'),
+  filterAndMap('lngTax'),
+  filterAndMap('blnInactive'),
+  filterAndMap('lngDiscount'),
+  filterAndMap('intCustCount'),
+  filterAndMap('blnCondimentprice'),
+  filterAndMap('lngOrder'),
+  filterAndMap('lngKPG'),
+  filterAndMap('strBarCode'),
+  filterAndMap('blnReceipt'),
+  filterAndMap('lngMenuOption'),
+  filterAndMap('blnRedPrint'),
+  filterAndMap('strIcon'),
+  filterAndMap('blnKitSingle'),
+  filterAndMap('lngSubTitle'),
+  filterAndMap('blnServing'),
+  filterAndMap('blnOpen'),
+  filterAndMap('blnDeliveryYN'),
+  filterAndMap('strNutrInfo'),
+  filterAndMap('strCntryOrg'),
+  filterAndMap('strMenuComment'),
+  filterAndMap('strAmtCodeList'),
+  filterAndMap('strUserFileName'),
+  deleteCd.join(','),  // 삭제된 코드
+);
 
 
-const res = await savePayCode( groupCd.value ,
-nowStoreCd.value,
-lngStoreCodearr.join(','),
-strNamearr.join(',') , 
-strNameEarr.join(','),
-lngCodearr.join(','), 
-blnInactivearr.join(','),
-dtmFromDatearr.join(','),
-dtmToDatearr.join(','),
-lngRatearr.join(','),
-lngAmtarr.join(','),
-blnAutoarr.join(','),
-lngDiscAmtLimitarr.join(','),
-blnDrawerarr.join(','),
-lngPriorarr.join(','),
-blnReceiptarr.join(','),
-lngChangeRateLimitarr.join(','),
-lngMenuarr.join(','),
-lngDiscTypearr.join(','),
-blnDuplicatearr.join(','),
-lngRoundTypearr.join(','),
-lngRoundarr.join(','),
-lngTaxarr.join(','),
-strIconarr.join(','),
-checkedMenus.join(';'),
-unchecklngCodes.join(','),
-deleteCd.join(','),
-)
 console.log(res)
 
 
@@ -815,19 +794,26 @@ searchButton();
 }
 
 const updatedRowData = (newvalue) => {
-//rowData.value = newvalue
 console.log(newvalue)
-const temp = newvalue.filter(item => item.deleted == true).map(item => item.lngCode)
-if(temp.length>0){
-
-for(var i=0 ; i < temp.length ; i++){
-const findrow = rowData.value.find(item => item.lngCode == temp[i])
-if(findrow){
-  findrow.deleted = true
-}
-}
+console.log(rowData.value)
+  newvalue.forEach((newItem) => {
+  const targetRow = rowData.value.find(row => row.lngCode == newItem.lngCode);
+  if (targetRow) {
+    Object.keys(newItem).forEach(key => {
+      targetRow[key] = newItem[key]; // 속성 업데이트
+   
+    });
+  } else {
+    const targetRow2 = rowData.value.find(row => row.sequence == clickaddrowSeq.value);
+    console.log(targetRow2)
+    Object.keys(newItem).forEach(key => {
+      targetRow2[key] = newItem[key]; // 속성 업데이트
+   
+    });
+  }
+});
 rowData.value = [...rowData.value]
-}
+
 }
 const updatedList2 = ref([])
 const updatedRowData2 = (newvalue) => {
@@ -904,187 +890,141 @@ changeNow.value = !changeNow.value
 
 })
 watch((clickrowData2), () => {
-changeColid.value = 'checkedMenu'
+// changeColid.value = 'checkedMenu'
 
-const arr = clickrowData2.value.filter(item=> item.checkbox == true ).map(item => item.menuCd)
-console.log(arr)
-changeValue2.value = arr.join(',')
-if(arr.length > 0){
-changeNow.value = !changeNow.value
-}
+// const arr = clickrowData2.value.filter(item=> item.checkbox == true ).map(item => item.menuCd)
+// console.log(arr)
+// changeValue2.value = arr.join(',')
+// if(arr.length > 0){
+// changeNow.value = !changeNow.value
+// }
 
 })
 
 const clickedRowData2 = (e) => {
-// //console.log(e)
-// const clickedRow = clickrowData2.value.find(item => item.menuCd == e[3])
-// //console.log(clickedRow.checkbox == undefined)
-// if(clickedRow.checkbox == undefined|| clickedRow.checkbox == false){
-//   clickedRow.checkbox = true
-
-// } else {
-//   clickedRow.checkbox = false
-// }
-// clickrowData2.value = [...clickrowData2.value]
-
-// changeColid.value = 'checkedMenu'
-// console.log(clickrowData2.value)
-// const arr = clickrowData2.value.filter(item => item.checkbox == true).map(item => item.menuCd)
-
-// changeValue2.value = arr.join(',')
-// changeNow.value = !changeNow.value
-// //console.log(updateRow.value)
-
-// clickrowData2.value = rowData2.value.filter( item => {
-//       if(forsearchMain.value =='0' ){
-//         return item ;
-//       } else if ( forsearchMain.value !='0' && forsearchSub.value !='0' )  {
-//         return  item.majorGroupCd == forsearchMain.value && item.subGroupCd == forsearchSub.value ;
-//       } else if (  forsearchMain.value !='0' && forsearchSub.value =='0') {
-//         return  item.majorGroupCd == forsearchMain.value 
-//       }
-   
-//     })
-
-
-
-//     const firstarr = clickedrowdata.value != undefined ? clickedrowdata.value.split(',') : []
-//    if(rowData2.value.length > 0){
-
-//     let dupliarr = JSON.parse(JSON.stringify(clickrowData2.value));
-//     if(dupliarr){
-//     console.log(dupliarr)
-//     dupliarr.sort((a, b) => {
-//       const aIndex = firstarr.indexOf(a.menuCd);
-//       const bIndex =  firstarr.indexOf(b.menuCd);
-
-//   if (aIndex === -1 && bIndex === -1) return 0; // 둘 다 우선순위에 없음
-//   if (aIndex === -1) return 1; // a가 우선순위에 없음
-//   if (bIndex === -1) return -1; // b가 우선순위에 없음
-//   return aIndex - bIndex; // 우선순위 배열에 따라 정렬
-// });
-//    if(firstarr.length > 0 && firstarr[0] !==''){
-//     for(var i=0 ; i < firstarr.length ; i ++){
-//       const change =  dupliarr.find(item => item.menuCd == firstarr[i])
-//       change.checkbox = true
-//     }
-//    }
-
-
-//     clickrowData2.value = [...dupliarr]
-//   }
-// }
-
-
-
-}
-
-watch((forsearchMain) , () => {
-
-if(forsearchMain.value == 0  && searchWord2.value == ''){
-clickrowData4.value = [...clickrowData2.value]
-
-} else if( forsearchMain.value != 0  && searchWord2.value == '') {
-clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value)
-} else if( forsearchMain.value == 0  && searchWord2.value != '') {
-clickrowData4.value = clickrowData2.value.filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-} else {
-clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-}
-forsearchSub.value = 0 ;
-
-})
-
-watch((searchWord2) , () => {
-if(forsearchMain.value == 0 && forsearchSub.value == 0  && searchWord2.value == ''){
-clickrowData4.value = [...clickrowData2.value]
-
-} else if( forsearchMain.value != 0 && forsearchSub.value == 0  && searchWord2.value == '') {
-clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value)
-} else if( forsearchMain.value == 0  && forsearchSub.value == 0 && searchWord2.value != '') {
-clickrowData4.value = clickrowData2.value.filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-} else if( forsearchMain.value == 0 && forsearchSub.value != 0  && searchWord2.value != '') {
-clickrowData4.value = clickrowData2.value.filter(item => item.subGroupCd == forsearchSub.value ).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-} else if ( forsearchMain.value != 0 && forsearchSub.value != 0  && searchWord2.value != '') {
-clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value && item.subGroupCd == forsearchSub.value).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-} 
-})
-
-watch((forsearchSub) , () => {
-if(forsearchSub.value == 0 && forsearchMain.value == 0  && searchWord2.value == ''){
-clickrowData4.value = [...clickrowData2.value]
-} else if (forsearchSub.value == 0 && forsearchMain.value != 0 && searchWord2.value == '') {
-clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value)
-} else if(forsearchSub.value != 0 && forsearchMain.value != 0 && searchWord2.value == '') {
-clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value && item.subGroupCd == forsearchSub.value)
-} else if(forsearchSub.value == 0 && forsearchMain.value == 0  && searchWord2.value != ''){
-clickrowData4.value = clickrowData2.value.filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-} else if(forsearchSub.value == 0 && forsearchMain.value != 0 && searchWord2.value != ''){
-clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-} else if (forsearchSub.value != 0 && forsearchMain.value != 0 && searchWord2.value != ''){
-clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value && item.subGroupCd == forsearchSub.value).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-}
-
-})
-
-watch((searchWord3) , () => {
-if(searchWord3.value == ''){
-filteredrowData5.value = [...filteredrowData3.value]
-} else {
-filteredrowData5.value = filteredrowData3.value.filter(item => item.lngCode.toString().includes(searchWord3.value)|| item.strName.includes(searchWord3.value))
-}
-})
-watch((searchC1) , () => {
-initAll()
+console.log(gridvalue3.value)
 console.log(rowData.value)
-rowData.value = rowData.value.filter(item => item.lngCode !=undefined && item.lngCode != '')
-if(searchC1.value == -1){
-if(searchC2.value == -1 ){
-  updateRow.value = [...rowData.value]
+const clickedRow = rowData.value.find(item => item.lngCode == gridvalue3.value.toString())
+changeRow.value = rowIndex.value
+changeColid.value = 'strAmtCodeList'
+console.log(clickedRow)
+if(e[0] == undefined || e[0] == false){
+  clickedRow.strAmtCodeList = clickedRow.strAmtCodeList.replace(e[1],'').replace(/;;+/g, ';')
+  changeValue2.value = clickedRow.strAmtCodeList.replace(e[1],'').replace(/;;+/g, ';')
 } else {
-  updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value)
+  changeValue2.value = clickedRow.strAmtCodeList.split(';').concat(e[1]).map(Number).sort((a,b) => a-b).map(String).join(';')
 }
-} else if (searchC1.value != -1){
-if(searchC2.value == -1 ){
-  updateRow.value = rowData.value.filter(item => item.blnInactive == searchC1.value)
-} else {
-  updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value && item.blnInactive == searchC1.value)
-}
-} 
-})
-watch((searchC2) , () => {
-initAll()
-if(searchC1.value == -1){
-if(searchC2.value == -1 ){
-  updateRow.value = [...rowData.value]
-} else {
-  updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value)
-}
-} else if (searchC1.value != -1){
-if(searchC2.value == -1 ){
-  updateRow.value = rowData.value.filter(item => item.blnInactive == searchC1.value)
-} else {
-  updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value && item.blnInactive == searchC1.value)
-}
-} 
-})
 
-watch((searchWord) , () => {
-initAll()
-if(searchC1.value == -1){
-if(searchC2.value == -1 ){
-  updateRow.value = rowData.value.filter(item => item.lngCode?.toString().includes(searchWord.value) || item.strName?.toString().includes(searchWord.value))
-} else {
-  updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value).filter(item => item.lngCode.toString().includes(searchWord.value) || item.strName.toString().includes(searchWord.value))
+changeNow.value = !changeNow.value
+
 }
-} else if (searchC1.value != -1){
-if(searchC2.value == -1 ){
-  updateRow.value = rowData.value.filter(item => item.blnInactive == searchC1.value).filter(item => item.lngCode.toString().includes(searchWord.value) || item.strName.toString().includes(searchWord.value))
-} else {
-  updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value && item.blnInactive == searchC1.value).filter(item => item.lngCode.toString().includes(searchWord.value) || item.strName.toString().includes(searchWord.value))
-}
-} 
-})
+
+// watch((forsearchMain) , () => {
+
+// if(forsearchMain.value == 0  && searchWord2.value == ''){
+// clickrowData4.value = [...clickrowData2.value]
+
+// } else if( forsearchMain.value != 0  && searchWord2.value == '') {
+// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value)
+// } else if( forsearchMain.value == 0  && searchWord2.value != '') {
+// clickrowData4.value = clickrowData2.value.filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
+// } else {
+// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
+// }
+// forsearchSub.value = 0 ;
+
+// })
+
+// watch((searchWord2) , () => {
+// if(forsearchMain.value == 0 && forsearchSub.value == 0  && searchWord2.value == ''){
+// clickrowData4.value = [...clickrowData2.value]
+
+// } else if( forsearchMain.value != 0 && forsearchSub.value == 0  && searchWord2.value == '') {
+// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value)
+// } else if( forsearchMain.value == 0  && forsearchSub.value == 0 && searchWord2.value != '') {
+// clickrowData4.value = clickrowData2.value.filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
+// } else if( forsearchMain.value == 0 && forsearchSub.value != 0  && searchWord2.value != '') {
+// clickrowData4.value = clickrowData2.value.filter(item => item.subGroupCd == forsearchSub.value ).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
+// } else if ( forsearchMain.value != 0 && forsearchSub.value != 0  && searchWord2.value != '') {
+// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value && item.subGroupCd == forsearchSub.value).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
+// } 
+// })
+
+// watch((forsearchSub) , () => {
+// if(forsearchSub.value == 0 && forsearchMain.value == 0  && searchWord2.value == ''){
+// clickrowData4.value = [...clickrowData2.value]
+// } else if (forsearchSub.value == 0 && forsearchMain.value != 0 && searchWord2.value == '') {
+// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value)
+// } else if(forsearchSub.value != 0 && forsearchMain.value != 0 && searchWord2.value == '') {
+// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value && item.subGroupCd == forsearchSub.value)
+// } else if(forsearchSub.value == 0 && forsearchMain.value == 0  && searchWord2.value != ''){
+// clickrowData4.value = clickrowData2.value.filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
+// } else if(forsearchSub.value == 0 && forsearchMain.value != 0 && searchWord2.value != ''){
+// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
+// } else if (forsearchSub.value != 0 && forsearchMain.value != 0 && searchWord2.value != ''){
+// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value && item.subGroupCd == forsearchSub.value).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
+// }
+
+// })
+
+// watch((searchWord3) , () => {
+// if(searchWord3.value == ''){
+// filteredrowData5.value = [...filteredrowData3.value]
+// } else {
+// filteredrowData5.value = filteredrowData3.value.filter(item => item.lngCode.toString().includes(searchWord3.value)|| item.strName.includes(searchWord3.value))
+// }
+// })
+// watch((searchC1) , () => {
+// initAll()
+// console.log(rowData.value)
+// rowData.value = rowData.value.filter(item => item.lngCode !=undefined && item.lngCode != '')
+// if(searchC1.value == -1){
+// if(searchC2.value == -1 ){
+//   updateRow.value = [...rowData.value]
+// } else {
+//   updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value)
+// }
+// } else if (searchC1.value != -1){
+// if(searchC2.value == -1 ){
+//   updateRow.value = rowData.value.filter(item => item.blnInactive == searchC1.value)
+// } else {
+//   updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value && item.blnInactive == searchC1.value)
+// }
+// } 
+// })
+// watch((searchC2) , () => {
+// initAll()
+// if(searchC1.value == -1){
+// if(searchC2.value == -1 ){
+//   updateRow.value = [...rowData.value]
+// } else {
+//   updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value)
+// }
+// } else if (searchC1.value != -1){
+// if(searchC2.value == -1 ){
+//   updateRow.value = rowData.value.filter(item => item.blnInactive == searchC1.value)
+// } else {
+//   updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value && item.blnInactive == searchC1.value)
+// }
+// } 
+// })
+
+// watch((searchWord) , () => {
+// initAll()
+// if(searchC1.value == -1){
+// if(searchC2.value == -1 ){
+//   updateRow.value = rowData.value.filter(item => item.lngCode?.toString().includes(searchWord.value) || item.strName?.toString().includes(searchWord.value))
+// } else {
+//   updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value).filter(item => item.lngCode.toString().includes(searchWord.value) || item.strName.toString().includes(searchWord.value))
+// }
+// } else if (searchC1.value != -1){
+// if(searchC2.value == -1 ){
+//   updateRow.value = rowData.value.filter(item => item.blnInactive == searchC1.value).filter(item => item.lngCode.toString().includes(searchWord.value) || item.strName.toString().includes(searchWord.value))
+// } else {
+//   updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value && item.blnInactive == searchC1.value).filter(item => item.lngCode.toString().includes(searchWord.value) || item.strName.toString().includes(searchWord.value))
+// }
+// } 
+// })
 
 const initAll = () => {
 selectedMenu.value = 1
@@ -1096,7 +1036,7 @@ searchWord3.value = ''
 searchWord2.value = ''
 gridvalue1.value = ''
 gridvalue2.value = ''
-gridvalue3.value = ''
+//gridvalue3.value = ''
 gridvalue4.value = ''
 gridvalue5.value = ''
 gridvalue6.value = ''
@@ -1119,6 +1059,57 @@ gridvalue22.value = ''
 gridvalue23.value = ''
 gridvalue24.value = ''
 gridvalue25.value = ''
+}
+
+const searchPayCd = (e) => {
+   const value = e.target.value ;
+
+   clickrowData2.value = rowData2.value.filter(item => item.strName.includes(value) || item.lngCode.toString().includes(value));
+ 
+  
+   duplilfirstarr.value =  rowData.value.filter(item => item.lngCode == gridvalue3.value).map(item => item.strAmtCodeList)[0].split(';')
+ 
+   if(clickrowData2.value.length > 0){
+   
+let dupliarr = JSON.parse(JSON.stringify(clickrowData2.value));
+dupliarr.sort((a, b) => {
+  const aIndex = duplilfirstarr.value.indexOf(a.lngCode.toString());
+  const bIndex =  duplilfirstarr.value.indexOf(b.lngCode.toString());
+
+if (aIndex === -1 && bIndex === -1) return 0; // 둘 다 우선순위에 없음
+if (aIndex === -1) return 1; // a가 우선순위에 없음
+if (bIndex === -1) return -1; // b가 우선순위에 없음
+return aIndex - bIndex; // 우선순위 배열에 따라 정렬
+});
+
+if(duplilfirstarr.value.length > 0 && duplilfirstarr.value[0] !==''){
+for(var i=0 ; i < duplilfirstarr.value.length ; i ++){
+
+  const change =  dupliarr.find(item => item.lngCode == duplilfirstarr.value[i])
+
+  if(change){
+    change.checkbox = true
+  }
+ 
+}
+}
+clickrowData2.value = dupliarr
+   }
+ 
+}
+const uploadImage = ref()
+const handleFileUpload = (e) => {
+  uploadImage.value = e.target.files[0]
+}
+
+const upload = async() => {
+   const formData = new FormData();
+   formData.append("imageFile",uploadImage.value)
+   formData.append("fileName",uploadImage.value.name)
+   formData.append("kioskImgWidth", 300); // 이미지 너비
+   formData.append("kioskImgHeight", 300); // 이미지 높이
+
+   const res = await uploadImage(formData)
 }
 </script>
 

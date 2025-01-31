@@ -282,6 +282,21 @@ const props = defineProps({
     type: String,
     default: ''
   } 
+  ,
+  hideRow: { 
+    type: Number,
+    default: 0
+  } 
+  ,
+  hideNow: { 
+    type: Boolean,
+    default: ''
+  } 
+  ,
+  changeOriginRow: { 
+    type: Number,
+    default: ''
+  } 
  
 });
 
@@ -384,6 +399,7 @@ const funcshowGrid = async () => {
       }
     
      }
+    
   }
   
   if(props.setNumberformatColumn !=''){
@@ -553,7 +569,9 @@ const alldata = dataProvider.getJsonRows();
     return ;
   }
   selectedRowData.value= dataProvider.getRows()[clickData.itemIndex];
-
+  var current = gridView.getCurrent();
+  selectedindex.value = current.dataRow
+  console.log(selectedindex.value)
   emit('selcetedrowData', selectedRowData.value);
   emit('selectedIndex' ,clickData.itemIndex )
 
@@ -582,16 +600,18 @@ gridView.onCellClicked = function (grid, clickData) {
     return ;
   }
   var current = gridView.getCurrent();
-
+   console.log(current)
   if(current.itemIndex != -1){
     selectedRowData.value= dataProvider.getRows()[current.dataRow];
    selectedRowData.value.index = current.dataRow
    selectedindex.value = current.dataRow
-  
+    
    console.log(selectedRowData.value)
+   console.log(selectedindex.value)
   
   emit('clickedRowData', selectedRowData.value);
   emit('selectedIndex' , current.dataRow )
+  emit('selectedIndex2' , current.dataRow )
 
   }
   
@@ -656,12 +676,17 @@ watch(() => props.changeNow , () => {
     console.log(props.changeRow)
     console.log(props.changeColid)
     console.log(props.changeValue2)
+    console.log(props.changeOriginRow)
  
-    dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue2);
+   
+   
+      dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue2);
   
-    updatedrowData.value = [ ...dataProvider.getJsonRows()]
- 
-     emit('updatedRowData', updatedrowData.value )
+      updatedrowData.value = [ ...dataProvider.getJsonRows()]
+
+    
+
+      emit('updatedRowData', updatedrowData.value )
    
     
 })
@@ -917,7 +942,9 @@ watch(() => props.uncheckAct , (newvalue) => {
   
 })
 
-
+watch(() => props.hideNow , (newValue) => {
+  dataProvider.hideRows(props.hideRow);
+})
 onMounted(async () => {
   try {
     if(props.renderProgname != ''){
@@ -981,6 +1008,8 @@ watch(() => props.rowData, () => {
   addrow4activated.value = true
   funcshowGrid().then(() =>{
     setTimeout(function(){
+
+      console.log(selectedindex.value)
       if(selectedindex.value == -1){
         return;
       }
@@ -993,7 +1022,6 @@ watch(() => props.rowData, () => {
     gridView.setCurrent({ dataRow : selectedindex.value })
   }
 
-  if(addrow4activated.value == true){
   
 
     const newIndices = props.rowData.reduce((indices, item, index) => {
@@ -1013,9 +1041,9 @@ watch(() => props.rowData, () => {
     } else {
       gridView.setCurrent({ dataRow : current.dataRow})
     }
-  }
  
-    },100) // 시간으로인한 미적용 이슈있음
+ 
+    },90) // 시간으로인한 미적용 이슈있음
     
 })
 if(props.initSelect == true){
@@ -1041,9 +1069,6 @@ watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) 
    
   }
   
-  const searchWord = newValue.split(',')
-
-
  if(searchColId2 == undefined){
    if (newValue === '') {
     dataProvider.setRows( props.rowData );

@@ -68,7 +68,7 @@
     <div class="flex space-x-1 mt-10">
       <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border" @click="selectMenu(1)" :class="{'text-blue-400 bg-blue-100': selectedMenu==1}">기본설정</button>
       <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border disabled:bg-gray-50 disabled:text-gray-200 " @click="selectMenu(2)" :class="{'text-blue-400 bg-blue-100': selectedMenu==2}" :disabled="selectedPayDistinct">할인대상메뉴</button>
-      <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border" @click="selectMenu(3)" :class="{'text-blue-400 bg-blue-100': selectedMenu==3}" :disabled="selectedMultiple">복합결제허용</button>
+      <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border disabled:bg-gray-50 disabled:text-gray-200" @click="selectMenu(3)" :class="{'text-blue-400 bg-blue-100': selectedMenu==3}" :disabled="selectedMultiple">복합결제허용</button>
     </div>
     <div>
       <hr class="w-[90%] mt-0">
@@ -92,7 +92,7 @@
           <div class=" justify-center items-center bg-gray-100 border grid"><div>결제코드명</div></div>
            <div class="grid grid-cols-1 grid-rows-2 h-full border"><div class="flex items-center mt-1 text-blue-400 font-semibold">*국문<input type="text" name="strName" id="" class="h-full w-[80%] border rounded-lg pl-2 ml-2 font-thin text-gray-700 disabled:bg-gray-200" v-model="gridvalue3" @input="changeInfo" :disabled="afterClickrow"></div><div class="flex items-center mt-1 ml-1"> 영문<input type="text" name="strNameE" id="" class="h-full w-[80%] border rounded-lg pl-2 ml-3 disabled:bg-gray-200" v-model="gridvalue4" @input="changeInfo" :disabled="afterClickrow"></div></div>
           <div class=" justify-center items-center bg-gray-100 border flex flex-col "><div class="border h-full w-full flex items-center justify-center text-blue-400 font-semibold">*결제코드</div><div class="border h-full w-full flex items-center justify-center text-blue-400 font-semibold">*사용여부</div></div>
-          <div class="grid grid-cols-1 grid-rows-2 "> <div><input type="number" name="lngCode" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue5" @input="changeInfo" :disabled="isNew && afterClickrow" ></div><div class="space-x-5 border flex justify-left pl-2 items-center disabled:bg-gray-200" :disabled="afterClickrow" ><label for="using1"><input type="radio" name="blnInactive" id="using1" v-model="gridvalue6" value="0" @input="changeInfo" :disabled="afterClickrow">예</label><label for="using2"><input type="radio" name="blnInactive" id="using2" v-model="gridvalue6" value="1"  @input="changeInfo" :disabled="afterClickrow" >아니오</label></div></div>
+          <div class="grid grid-cols-1 grid-rows-2 "> <div><input type="text" name="lngCode" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue5" @input="changeInfo" :disabled="!(isNew == true && afterClickrow ==false)" ></div><div class="space-x-5 border flex justify-left pl-2 items-center disabled:bg-gray-200" :disabled="afterClickrow" ><label for="using1"><input type="radio" name="blnInactive" id="using1" v-model="gridvalue6" value="0" @change="changeInfo" :disabled="afterClickrow">예</label><label for="using2"><input type="radio" name="blnInactive" id="using2" v-model="gridvalue6" value="1"  @change="changeInfo" :disabled="afterClickrow" >아니오</label></div></div>
           <div class="flex justify-center items-center bg-gray-100 border">할인그룹</div>
           <div class="flex justify-center items-center border"><select name="" id="" class="border h-full w-full rounded-lg pl-2 bg-gray-200" v-model="gridvalue2" disabled>
             <option value="">선택</option>
@@ -243,7 +243,7 @@ const groupCd = ref(userData.lngStoreGroup);
  const payOptions = ref([])
  const rounding = ref([])
  const taxs = ref([])
- const isNew = ref(true)
+ const isNew = ref(false)
 
 const initCheckColumn = ref('menuCd')
 const disCountGroup = ref([])
@@ -294,6 +294,7 @@ const clickedRowData = (newvalue) => {
     forsearchSub.value = 0 
     searchWord2.value = ''
     searchWord3.value = ''
+    
     clickedrowdata.value = newvalue[27]
     gridvalue1.value = newvalue[4]
     gridvalue2.value = newvalue[21]
@@ -322,18 +323,31 @@ const clickedRowData = (newvalue) => {
     gridvalue25.value = newvalue[26]
     clickrowData2.value = []
     clickrowData2.value = [...clickrowData2.value]
-    if(newvalue[21] == '1'){
+    if(newvalue[4] == '1'){
       selectedPayDistinct.value = false 
+
     } else {
-      selectedPayDistinct.value = true
+      console.log(newvalue[5])
+      if(newvalue[2].toString().startsWith('24')){
+        selectedPayDistinct.value = false
+      } else {
+        selectedPayDistinct.value = true
+      }
+    
+    }
+
+    if(newvalue[4] == '1' && newvalue[6] == '0'){
+      selectedMultiple.value = false
+    } else {
+      selectedMultiple.value = true
     }
 
     // changeRow.value = rowData.value.findIndex((item) => item.lngCode == newvalue[2])
     // console.log(changeRow.value)
     if(newvalue[30]== true){
-      isNew.value = false
-    } else {
       isNew.value = true
+    } else {
+      isNew.value = false
     }
     const firstarr =  newvalue[27] != undefined ? newvalue[27].split(',') : []
    if(rowData2.value.length > 0){
@@ -491,7 +505,7 @@ const confirmData = ref([])
   } catch (error) {
       afterSearch.value = false;
   } finally {
- 
+    afterClickrow.value = true
 approveType.value = Array.from(
   new Set(
     approveGroup.value.map(item => JSON.stringify({
@@ -536,8 +550,16 @@ const selectedMenu = ref(1)
 
   const changeInfo = (e) => {
      const tagName = e.target.name;
-     const value2 = e.target.value
- 
+     let value2 = e.target.value
+    console.log(rowData.value)
+     
+     if(tagName == 'lngCode'){
+       const convert = value2.replace(/[^0-9]/g,'')
+       console.log(convert)
+       gridvalue5.value = convert
+       value2 = convert
+      
+     }
      if(tagName =='lngAmt'){
        if(gridvalue11.value == 0 ){
         changeValue2.value = value2+'원'
@@ -547,27 +569,43 @@ const selectedMenu = ref(1)
         changeColid.value = tagName
        }
        changeNow.value = !changeNow.value
+      }
 
-       const findrow = rowData.value.find(item => item.lngCode == gridvalue5.value)
-     if(findrow !== undefined){
-      findrow[changeColid.value] = changeValue2.value
-     } else {
-      const findrow2 = rowData.value.find(item => item.sequence == clickaddrowSeq.value)
-      findrow2[changeColid.value] = changeValue2.value
-     }
-       return ;
-     }
-     changeValue2.value = value2
-     changeColid.value = tagName
-     changeNow.value = !changeNow.value
+         changeValue2.value = value2   
+        changeColid.value = tagName
+      changeNow.value = !changeNow.value
+//        const findrow = rowData.value.find(item => item.lngCode == gridvalue5.value)
 
-     const findrow = rowData.value.find(item => item.lngCode == gridvalue5.value)
-     if(findrow !== undefined){
-      findrow[changeColid.value] = changeValue2.value
-     } else {
-      const findrow2 = rowData.value.find(item => item.sequence == clickaddrowSeq.value)
-      findrow2[changeColid.value] = changeValue2.value
-     }
+//        const findrowlength = rowData.value.filter(item => item.lngCode == gridvalue5.value).length 
+//      if(findrow !== undefined && findrowlength ==1){
+//       findrow[tagName] = value2
+//      }  else {
+//       const findrow2 = rowData.value.find(item => item.sequence == clickaddrowSeq.value)
+  
+//       findrow2[tagName] = value2
+//      }
+//        return ;
+//      }
+
+//      const findrow = rowData.value.find(item => item.lngCode == gridvalue5.value)
+//      console.log(findrow)
+// const findrowlength = rowData.value.filter(item => item.lngCode == gridvalue5.value).length 
+
+
+// if(findrow !== undefined && findrowlength ==1){
+// findrow[tagName] = value2
+// }  else {
+
+// const findrow2 = rowData.value.find(item => item.sequence == clickaddrowSeq.value)
+// console.log(changeValue2.value)
+// console.log(changeColid.value)
+// findrow2[tagName] = value2
+// }
+//      changeValue2.value = value2
+//      changeColid.value = tagName
+//      changeNow.value = !changeNow.value
+
+    
     
   }
 const searchColValue3  =ref('0,0')
@@ -654,16 +692,20 @@ const clickaddrowSeq = ref()
 const addRow = () => {
   const today = new Date();
   const formattedDate = today.toLocaleDateString('en-CA');
-  addrowDefault.value = nowStoreCd.value+','+clickedStoreNm.value+ ','+formattedDate+','+'9999-12-31'+','+''+','+''+','+''+','+''
-  addrowProp.value = 'lngStoreCode,storeName,dtmFromDate,dtmToDate,lngDiscType,lngRoundType,lngTax,strIcon'
+  addrowDefault.value = nowStoreCd.value+','+clickedStoreNm.value+ ','+formattedDate+','+'9999-12-31'+','+''+','+''+','+''+','+''+','+'0'
+  addrowProp.value = 'lngStoreCode,storeName,dtmFromDate,dtmToDate,lngDiscType,lngRoundType,lngTax,strIcon,blnInactive'
   console.log(addrowProp.value)
   addRow4.value = !addRow4.value
   addrowSeq.value++;
-  rowData.value.push({new : true , sequence : 'new'+addrowSeq.value , lngStoreCode : nowStoreCd.value , strName : undefined , lngCode : undefined , blnInactive : undefined})
+  rowData.value.push({new : true , sequence : 'new'+addrowSeq.value , lngStoreCode : nowStoreCd.value , strName : undefined , lngCode : undefined , blnInactive : 0})
   clickaddrowSeq.value = 'new'+addrowSeq.value
 }
+const deleteOn = ref(false)
 const deleteRow = () => {
   deleteRow3.value = !deleteRow3.value
+  deleteOn.value = true
+
+  rowData.value = rowData.value.filter(item => item.sequence != clickaddrowSeq.value)
 }
 
 
@@ -698,7 +740,7 @@ const saveButton = () => {
     return ;
   }
 
-   const validateRow = rowData.value.filter(item =>  item.lngCode == '' || item.lngCode == undefined || item.strName == '' || item.strName == undefined || (item.blnInactive != 0 && item.blnInactive !=1 )).length
+   const validateRow = rowData.value.filter(item => item.deleted != true).filter(item =>  item.lngCode == '' || item.lngCode == undefined || item.strName == '' || item.strName == undefined || (item.blnInactive != 0 && item.blnInactive !=1 )).length
   
   if(validateRow > 0 ) {
     Swal.fire({
@@ -711,7 +753,7 @@ const saveButton = () => {
   }
 
   const validateRow2 = new Set(rowData.value.map(item => item.lngCode)).size ==  rowData.value.map(item => item.lngCode).length
-
+  console.log(rowData.value)
 if(validateRow2 == false ) {
     Swal.fire({
       title: '경고',
@@ -813,7 +855,7 @@ store.state.loading = false
 }
 
 const updatedRowData = (newvalue) => {
-  //rowData.value = newvalue
+  rowData.value = newvalue
   console.log(newvalue)
   const temp = newvalue.filter(item => item.deleted == true).map(item => item.lngCode)
   if(temp.length>0){
@@ -824,7 +866,11 @@ const updatedRowData = (newvalue) => {
       findrow.deleted = true
     }
   }
-  rowData.value = [...rowData.value]
+
+  if(isNew.value == false){
+    rowData.value = [...rowData.value]
+  }
+ 
 }
 }
 const updatedList2 = ref([])
@@ -884,7 +930,7 @@ const updatedRowData3 = (newvalue) => {
    const findrow = rowData.value.find(item => item.lngCode == gridvalue5.value)
  
    if(findrow){
-    findrow.unchecklngCode = temp.value.join(',')
+    findrow.unchecklngCode = temp.value.join(';')
    }
 
   
@@ -896,21 +942,22 @@ watch((filteredrowData3), () => {
   const arr = filteredrowData3.value.filter(item=> item.checkbox != true ).map(item => item.lngCode)
   console.log(arr)
   changeValue2.value = arr.join(';')
-  if(arr.length > 0){
+  if(arr.length > 0 ){
+
     changeNow.value = !changeNow.value
   }
+
  
 })
 watch((clickrowData2), () => {
     changeColid.value = 'checkedMenu'
-
   const arr = clickrowData2.value.filter(item=> item.checkbox == true ).map(item => item.menuCd)
   console.log(arr)
   changeValue2.value = arr.join(',')
-  if(arr.length > 0){
+  if(arr.length > 0 && deleteOn.value == false){
     changeNow.value = !changeNow.value
   }
- 
+  deleteOn.value = true
 })
 
 const clickedRowData2 = (e) => {
