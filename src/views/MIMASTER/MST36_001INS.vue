@@ -433,6 +433,8 @@ const selectedIndex2 = (e) => {
     console.log(newValue)
     if(newValue == '-1'){
     afterSearch.value = false;
+    initAll();
+    afterClickrow.value = true
     return ;
     }
     nowStoreCd.value = newValue ;
@@ -1164,6 +1166,9 @@ const initAll = () => {
     gridvalue23.value = ''
     gridvalue24.value = ''
     gridvalue25.value = ''
+    rowData.value = []
+    rowData2.value = []
+    updateRow.value = []
 }
 </script>
 

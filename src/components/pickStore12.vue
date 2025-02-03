@@ -14,10 +14,10 @@
         </select>
       </div>
       <div>
-        <select :disabled="isDisabled3"  class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreCode($event.target.value)">
+        <select :disabled="isDisabled3"  class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreCode($event.target.value)" v-model="storeCdValue">
         
           <option value="-1">선택</option>
-          <option value="0">공통</option>
+          <option :value="0">공통</option>
           <option :value="item.lngStoreCode" v-for="item in storeCd" :key="item.lngStoreCode">{{ item.strName }}</option>
         </select>
       </div>
@@ -38,6 +38,7 @@ const storeNm = ref('');
 const isDisabled1 = ref(false);
 const isDisabled2 = ref(false);
 const isDisabled3 = ref(false);
+const storeCdValue = ref(-1)
 let store = useStore();
 const userData = store.state.userData ;
 
@@ -53,6 +54,8 @@ const emitStoreGroup = (value) => {
 
 const emitStoreType = (value) => {
     emit('update:storeType', value);
+    emit('update:storeCd', -1);
+    
 };
 
 const emitStoreCode = (value) => {
@@ -86,6 +89,7 @@ onMounted(()=>{
   storeCd2.value = store.state.storeCd;
   
   const setStore = (value) => {
+    storeCdValue.value = -1
     if ( value ==0) {
         storeCd.value = storeCd2.value ;
         return storeCd.value ;

@@ -1290,16 +1290,8 @@ export const getMenuCodeEnroll = (groupCd , storeCd) => {
 
     })
 }
-export const uploadImage = (formData) => {
-    return axios.post('/MIMASTER/MST01_033INS.asmx/fnImgSave', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',  // 파일을 전송할 때 필요한 헤더
-        },
-        params: {
-            GROUP_CD: groupCd,
-            STORE_CD: storeCd,
-        },
-    });
+export const uploadFile = (formData) => {
+    return api2.post('/MIMASTER/FileUpload.ashx', formData);
 };
 
 

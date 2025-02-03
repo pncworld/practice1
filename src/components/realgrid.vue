@@ -297,6 +297,11 @@ const props = defineProps({
     type: Number,
     default: ''
   } 
+  ,
+  checkBarInactive: { 
+    type: String,
+    default: ''
+  } 
  
 });
 
@@ -364,8 +369,7 @@ const funcshowGrid = async () => {
     inputCharacters: item.strColID == props.inputOnlyNumberColumn ? '0123456789' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ㄱ-힣!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
   },
     visible: item.intHdWidth !== 0,
-    renderer : { type : item.strColID =='add' ? 'button' :  item.strColID.includes('checkbox') ? 'check' : 'text'
-     },
+    renderer : { type : item.strColID =='add' ? 'button' :  item.strColID.includes('checkbox') ? 'check' : 'text' },
     styleCallback: function(grid, dataCell){
       var ret = {}
    
@@ -376,8 +380,21 @@ const funcshowGrid = async () => {
       } else {
         ret.editable = false
       }
- 
+
+      if(props.checkBarInactive != ''){
+        var inActiveColumn = grid.getValue(dataCell.index.itemIndex, props.checkBarInactive)
+
+        if(inActiveColumn == '0' && item.strColID =='checkbox'){
+          ret.style = {opacity: "0.5"}
+          ret.renderer = {type: "check", editable: false}
+        }
+      }
+  
+      
+
       return ret;
+
+      
     }
   }));
 
@@ -490,6 +507,7 @@ gridView.setColumnLayout(layout1)
   gridView.editOptions.movable = (props.dragOn == true ? true : false)
   gridView.displayOptions.selectAndImmediateDrag = (props.dragOn == true ? true : false)
   gridView.displayOptions.selectionStyle = props.selectionStyle 
+  gridView.displayOptions.showTooltip = true;
   for (let i = dataProvider.getRowCount() - 1; i >= 0; i--) { // 역순으로 순회
   const rowData = dataProvider.getJsonRow(i);
   if (rowData.deleted) {
@@ -497,6 +515,8 @@ gridView.setColumnLayout(layout1)
   
   }
 }
+
+
 if(props.useCheckboxfordelete == true){
 
 const alldata = dataProvider.getJsonRows();
@@ -593,6 +613,18 @@ gridView.onSelectionChanged = function (grid) {
 
 
 }
+
+
+gridView.onShowTooltip = function(grid, index, value) {
+  var column = index.fieldName;
+  var itemIndex = index.itemIndex;
+ 
+  var tooltip = '';
+  if (column == "checkbox" && grid.getValue(itemIndex, "lngMenu") == '0') {
+    tooltip = "해당 결제코드는 할인대상메뉴가 '전체 선택'이므로, 모든 메뉴에 적용되었습니다.";
+  } 
+  return tooltip;
+};
 
 gridView.onCellClicked = function (grid, clickData) {
  
@@ -907,7 +939,7 @@ watch(() => props.initFocus, (newVal) => {
     
     gridView.clearCurrent();
  }
-  },100)
+  },10)
  
   
   

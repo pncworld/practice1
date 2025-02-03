@@ -15,7 +15,7 @@
     <PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm" @update:ischanged="handleinitAll" ></PickStore>
    </div> 
   <div class="z-50">
-      <DupliPopUp5 :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST44_061INS_VUE'" :dupliapiname="'DUPLIALLKDS'" :progid="3" :poskiosk="'getStoreList'"  naming2="KDS">
+      <DupliPopUp5 :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm" :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST44_061INS_VUE'" :dupliapiname="'DUPLIALLKDS'" :progid="3" :poskiosk="'getStoreList'"  naming2="KDS" >
       </DupliPopUp5>
    </div>
     <div class="mt-5 flex justify-start ml-10">
@@ -63,7 +63,7 @@
    <div class="px-2 py-1 border border-gray-400 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList" v-model="searchword1"></div>
   </div>
     <div class="ml-10 mt-5 w-full h-full">
-      <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="nowStoreCd"  :rowData="rowData3" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :addRow="addRows" @updatedRowData="updatedRowData2" :deleteRow="deleteRows" @clickedRowData="clickedRowData" :editableColId="'strName'" :fixedColumn="fixedColumn" :mergeColumns="true" :mergeColumnGroupName="'메뉴정보'" :mergeColumnGroupSubList="'mainName,subName,lngCode,strName,lngPrice'"></Realgrid>
+      <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="nowStoreCd" :reload="reload"  :rowData="rowData3" :showGrid="showGrid" :showCheckBar="false"  @selcetedrowData="selcetedrowData" :searchWord="searchword1" :searchColId="'lngCode,strName'" :addRow="addRows" @updatedRowData="updatedRowData2" :deleteRow="deleteRows" @clickedRowData="clickedRowData" :editableColId="'strName'" :fixedColumn="fixedColumn" :mergeColumns="true" :mergeColumnGroupName="'메뉴정보'" :mergeColumnGroupSubList="'mainName,subName,lngCode,strName,lngPrice'"></Realgrid>
     </div>
   </div>
 
@@ -471,18 +471,22 @@ import { nextTick } from 'vue';
         printNameList.value = res.data.KITCHENPRINT
         console.log(checked.value)
         console.log(printNameList.value)
+        console.log(SettingList.value)
         for(var i=0 ; i< checked.value.length ; i++){
              const tlngCode = checked.value[i].lngCode
              const portid = checked.value[i].portId
              const index =  SettingList.value.findIndex(item => item.lngCode == tlngCode)
-             SettingList.value[index][portid] = true
+             if(index != -1){
+              SettingList.value[index][portid] = true
+             }
+           
          }
-
+          
          rowData3.value = [ ...SettingList.value]
          updatedList2.value = [ ...SettingList.value]
-         console.log(SettingList.value)
+        
          confirmitem.value = JSON.parse(JSON.stringify(SettingList.value));
-        afterSearch2.value = true
+         afterSearch2.value = true
       } else if (currentMenu.value ==3){
         res = await getStorePosList(groupCd.value,nowStoreCd.value)
         console.log(res)
@@ -493,6 +497,7 @@ import { nextTick } from 'vue';
   
    
   } catch (error) {
+      console.log(error)
       afterSearch.value = false;
       afterSearch2.value = false;
       afterSearch3.value = false;
@@ -723,6 +728,7 @@ import { nextTick } from 'vue';
       return ;
     }
     } else if (currentMenu.value ==2) {
+     
       if(afterSearch2.value == false) {
       Swal.fire({
         title: '경고',

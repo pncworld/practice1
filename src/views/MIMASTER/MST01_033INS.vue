@@ -31,7 +31,7 @@
 <div class="mt-3  grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full ml-10">
 <div class="customtableIndex border border-gray-400 rounded-tl-lg">메뉴분류</div>
 <div class=" border border-gray-300 rounded-tr-lg flex p-1">
-<select name="" id="" class="flex-1 border rounded-lg w-full h-full " @change="setSubCd" v-model="forsearchMain">
+<select name="" id="" class="flex-1 border rounded-lg w-[80%] h-full " @change="setSubCd" v-model="forsearchMain">
   <option value="0">전체</option>
   <option :value="i.GroupCd" v-for="i in MenuGroup"> [{{i.GroupCd}}]{{ i.majorGroupNm }}</option>
 </select>
@@ -46,7 +46,7 @@
 
 <div class="ml-10 mt-1 w-full h-full">
 
-  <Realgrid class="w-full h-full" :progname="'MST01_033INS_VUE'" :progid="1" :rowData="updateRow" :showGrid="showGrid" :showCheckBar="false" @clickedRowData="clickedRowData" :selectionStyle="'singleRow'"  @selcetedrowData="selcetedrowData"  :labelsData="labelsData" :valuesData="valuesData" :labelingColumns="labelingColumns"  :changeNow="changeNow" :changeValue2="changeValue2" :changeColid="changeColid" :changeRow="changeRow" @selectedIndex="selectedIndex"  :addRow4="addRow4" :deleteRow2="deleteRow3" :addrowDefault="addrowDefault" :addrowProp="addrowProp" @updatedRowData="updatedRowData" :rowStateeditable="false" :addField="'new'" :hideRow="hideRow" :hideNow="hideNow" :searchWord="searchWord" :searchColId2="'lngMainGroup,lngSubGroup'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue3"></Realgrid>
+  <Realgrid class="w-full h-full" :progname="'MST01_033INS_VUE'" :progid="1" :rowData="updateRow" :showGrid="showGrid" :showCheckBar="false" @clickedRowData="clickedRowData" :selectionStyle="'singleRow'"  @selcetedrowData="selcetedrowData"  :labelsData="labelsData" :valuesData="valuesData" :labelingColumns="labelingColumns"  :changeNow="changeNow" :changeValue2="changeValue2" :changeColid="changeColid" :changeRow="changeRow" @selectedIndex="selectedIndex"  :addRow4="addRow4" :deleteRow2="deleteRow3" :addrowDefault="addrowDefault" :addrowProp="addrowProp" @updatedRowData="updatedRowData" :rowStateeditable="false" :addField="'new'" :hideRow="hideRow" :hideNow="hideNow" :searchWord="searchWord" :searchColId2="'lngMainGroup,lngSubGroup'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue3" :initFocus="initFocus"></Realgrid>
   <!-- :searchWord="searchWord" :searchColId2="'blnInactive,payDistinct'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" -->
 </div>
 
@@ -67,11 +67,11 @@
       <div class="grid grid-rows-6 grid-cols-[1fr,3fr,1fr,3fr] h-[60%] mt-3 w-[90%] border rounded-lg">
         <div class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">*메뉴분류</div>
         <div class="flex w-[236%]">
-        <select name="lngMainGroup" id="" class="flex-1 border rounded-lg w-full h-full disabled:bg-gray-200 " @change="(e) => { setSubCd4(); changeInfo(e); }" v-model="gridvalue1" :disabled="afterClick">
+        <select name="lngMainGroup" id="" class="flex border rounded-lg w-[95%] h-full disabled:bg-gray-100 " @change="(e) => { setSubCd4(); changeInfo(e); }" v-model="gridvalue1" :disabled="afterClick">
   <option value="0">전체</option>
   <option :value="i.GroupCd" v-for="i in MenuGroup"> [{{i.GroupCd}}]{{ i.majorGroupNm }}</option>
 </select>
-<select name="lngSubGroup" id="" class="flex-1 border rounded-lg w-full h-full disabled:bg-gray-200" v-model="gridvalue2" @change="changeInfo" :disabled="afterClick">
+<select name="lngSubGroup" id="" class="flex border rounded-lg w-[130%] h-full disabled:bg-gray-100" v-model="gridvalue2" @change="changeInfo" :disabled="afterClick">
   <option value="0">전체</option>
   <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup2"> [{{i.GroupCd}}]{{ i.subGroupNm }}</option>
 </select>
@@ -79,26 +79,26 @@
         <div class="w-0"></div>
         <div class="w-0"></div>
         <div class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">*메뉴코드</div>
-        <div class="justify-center items-center  border flex"><input type="number" name="lngCode" class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-200 " :disabled="!(!afterClick && isNew)" v-model="gridvalue3" @input="changeInfo"></div>
+        <div class="justify-center items-center  border flex"><input type="number" name="lngCode" class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-100 " :disabled="!(!afterClick && isNew)" v-model="gridvalue3" @input="changeInfo"></div>
         <div class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">*유효기간</div> 
-        <div class="grid grid-rows-1 grid-cols-2"><div class="justify-center rounded-lg items-center h-full w-full border flex"><input type="date" :disabled="afterClick" name="dtmFromDate" class="disabled:bg-gray-200 w-full h-full rounded-lg" v-model="gridvalue4" @input="changeInfo"></div><div class="justify-center rounded-lg items-center h-full w-full border flex"><input type="date" :disabled="afterClick" class="disabled:bg-gray-200 w-full h-full rounded-lg" name="dtmToDate" v-model="gridvalue5" @input="changeInfo"></div></div>
+        <div class="grid grid-rows-1 grid-cols-2"><div class="justify-center rounded-lg items-center h-full w-full border flex"><input type="date" :disabled="afterClick" name="dtmFromDate" class="disabled:bg-gray-100 w-full h-full rounded-lg" v-model="gridvalue4" @input="changeInfo"></div><div class="justify-center rounded-lg items-center h-full w-full border flex"><input type="date" :disabled="afterClick" class="disabled:bg-gray-100 w-full h-full rounded-lg" name="dtmToDate" v-model="gridvalue5" @input="changeInfo"></div></div>
         <div class="justify-center items-center bg-gray-100 border flex">메뉴명</div>
-        <div class="grid grid-rows-1 grid-cols-2 w-[236%] z-5"><div class="justify-center rounded-lg items-center h-full w-full border flex "><span class="text-blue-500 font-bold">*국문:</span><input type="text" class="ml-1 justify-center rounded-lg items-center h-full w-[88%] border flex disabled:bg-gray-200" :disabled="afterClick" v-model="gridvalue6" name="strName" @input="changeInfo"></div><div class="justify-center rounded-lg items-center h-full w-full border flex">영문: <input type="text" class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-200" :disabled="afterClick" v-model="gridvalue7" name="strNameE" @input="changeInfo"> </div></div>
+        <div class="grid grid-rows-1 grid-cols-[2.9fr,4fr] w-[236%] z-5"><div class="justify-center rounded-lg items-center h-full w-full border flex "><span class="text-blue-500 font-bold text-start">*국문:</span><input type="text" class="ml-0 justify-center rounded-lg items-center h-full w-[87%] border flex disabled:bg-gray-100" :disabled="afterClick" v-model="gridvalue6" name="strName" @input="changeInfo"></div><div class="justify-center rounded-lg items-center h-full w-[100%] border flex mr-28">영문: <input type="text" class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-100" :disabled="afterClick" v-model="gridvalue7" name="strNameE" @input="changeInfo"> </div></div>
         <div class="w-0"></div>
         <div class="w-0"></div>
         <div class="justify-center items-center bg-gray-100 border flex">정상단가</div>
-        <div><input type="number" name="lngDCPrice" class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-200" :disabled="afterClick" v-model="gridvalue8" @input="changeInfo"></div>
+        <div><input type="number" name="lngDCPrice" class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-100" :disabled="afterClick" v-model="gridvalue8" @input="changeInfo"></div>
         <div class="justify-center items-center bg-gray-100 border flex">옵션그룹선택</div>
-        <div><select name="lngChain" id="" :disabled="afterClick" class="disabled:bg-gray-200 border rounded-lg w-[50%] h-full p-2" v-model="gridvalue9" @change="changeInfo">
+        <div><select name="lngChain" id="" :disabled="afterClick" class="disabled:bg-gray-100 border rounded-lg w-[50%] h-full p-2" v-model="gridvalue9" @change="changeInfo">
             <option value="0">[0]선택</option>
             <option :value="i.lngCode" v-for="i in optionGroup">[{{ i.lngCode }}]{{ i.strName }}</option>
         </select> <button class="whitebutton">옵션그룹 추가</button></div>
         <div class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">*판매가</div>
-        <div><input type="number" name="lngPrice" class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-200" :disabled="afterClick" v-model="gridvalue10" @input="changeInfo"></div>
+        <div><input type="number" name="lngPrice" class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-100" :disabled="afterClick" v-model="gridvalue10" @input="changeInfo"></div>
         <div class="justify-center items-center bg-gray-100 border flex">정상단가할인표기</div>
         <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="disY"><input type="radio" name="blnDCPriceYN" id="disY" :disabled="afterClick" v-model="gridvalue11" value="1" @input="changeInfo">예</label>
             <label for="disN"><input type="radio"  name="blnDCPriceYN" id="disN" :disabled="afterClick" v-model="gridvalue11" value="0" @input="changeInfo">아니오</label>
-        <select name="" id="" :disabled="true" class="border rounded-lg disabled:bg-gray-200 ml-10">
+        <select name="" id="" :disabled="true" class="border rounded-lg disabled:bg-gray-200 ml-10 h-[80%] w-[50%]">
             <option value="">선택</option>
         </select></div>
         <div class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">*과세구분</div>
@@ -115,25 +115,25 @@
       <div class="justify-center items-center bg-gray-100 border flex rounded-tl-lg">할인여부</div>
 <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="discount1"><input type="radio" id="discount1" name="lngDiscount" v-model="gridvalue14" value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="discount2"><input type="radio" id="discount2" name="lngDiscount" v-model="gridvalue14" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label> </div>
 <div class="justify-center items-center bg-gray-100 border flex">메뉴당객수</div>
-<div class="flex justify-center items-center"><input type="number" name="intCustCount" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue15" @input="changeInfo" :disabled="afterClick" ></div>
+<div class="flex justify-center items-center"><input type="number" name="intCustCount" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-100" v-model="gridvalue15" @input="changeInfo" :disabled="afterClick" ></div>
 <div class="justify-center items-center bg-gray-100 border flex">주메뉴종속</div>
 <div class="space-x-5 flex  items-center border justify-left pl-2"><label for="autopay1"><input type="radio" id="autopay1" name="blnCondimentprice" v-model="gridvalue100" value="1" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="autopay2"><input type="radio" id="autopay2" name="blnCondimentprice" v-model="gridvalue100" value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label>
-<select name="blnCondimentprice" id="" class="border h-full w-[40%] rounded-lg pl-2 disabled:bg-gray-200 ml-5" :disabled="afterClick || gridvalue100==0 " v-model="gridvalue16" @change="changeInfo">
+<select name="blnCondimentprice" id="" class="border h-[80%] w-[60%] rounded-lg pl-1 disabled:bg-gray-200 ml-3" :disabled="afterClick || gridvalue100==0 " v-model="gridvalue16" @change="changeInfo">
   <option value="0">선택</option>
   <option :value="i.strDCode" v-for="i in MENUDEPEND">[{{ i.strDCode }}]{{i.strDName}}</option>
 </select>
 </div>
 <div class="justify-center items-center bg-gray-100 border flex">주문정렬순위</div>
-<div class="flex justify-center items-center"><input type="number" name="lngOrder" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue17" @input="changeInfo" :disabled="afterClick" ></div>
+<div class="flex justify-center items-center"><input type="number" name="lngOrder" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-100" v-model="gridvalue17" @input="changeInfo" :disabled="afterClick" ></div>
 <div class="justify-center items-center bg-gray-100 border flex">주방출력제외</div>
 <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="openmoney1"><input type="radio" id="openmoney1" name="lngKPG" v-model="gridvalue18" value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="openmoney2"><input type="radio" id="openmoney2" name="lngKPG" v-model="gridvalue18" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label></div>
 <div class="justify-center items-center bg-gray-100 border flex">바코드</div>
-<div class="flex justify-center items-center"><input type="number" name="strBarCode" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue19" @input="changeInfo" :disabled="afterClick" ></div>
+<div class="flex justify-center items-center"><input type="number" name="strBarCode" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-100" v-model="gridvalue19" @input="changeInfo" :disabled="afterClick" ></div>
 <div class="justify-center items-center bg-gray-100 border flex">영수증출력제외</div>
 <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="receipt1"><input type="radio" id="receipt1" name="blnReceipt" v-model="gridvalue20" value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="receipt2"><input type="radio" id="receipt2" name="blnReceipt" v-model="gridvalue20"  value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label></div>
 <div class="justify-center items-center bg-gray-100 border flex">메뉴주문옵션</div>
 <div class="flex justify-center items-center"><select name="lngMenuOption" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue21" @change="changeInfo" :disabled="afterClick" >
-  <option value="0">선택</option>
+  <option value="">선택</option>
 <option :value="i.strDCode" v-for="i in menuOrderOption">[{{ i.strDCode }}]{{i.strDName}}</option>
 
 </select></div>
@@ -148,21 +148,21 @@
 <div class="justify-center items-center bg-gray-100 border flex">주방단품출력</div>
 <div class="space-x-5 flex justify-left pl-2 items-center border"><label for="allow1"><input type="radio" id="allow1" name="blnKitSingle" v-model="gridvalue24" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">허용</label><label for="allow2"><input type="radio" id="allow2" name="blnKitSingle"  v-model="gridvalue24"  value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">비허용</label></div>
 <div class="justify-center items-center bg-gray-100 border flex">서브타이틀</div>
-<div class="flex justify-center items-center"><select name="lngSubTitle" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" :disabled="afterClick" v-model="gridvalue25" @input="changeInfo">
-  <option value="0">선택</option>
+<div class="flex justify-center items-center"><select name="lngSubTitle" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" :disabled="afterClick" v-model="gridvalue25" @change="changeInfo">
+  <option :value="0">선택</option>
   <option :value="i.lngCode" v-for="i in subTitle">{{i.strName}}</option>
 </select></div>
 
 <div class="justify-center items-center bg-gray-100 border flex">메뉴제공완료여부</div>
-<div class="space-x-5 flex justify-left pl-2 items-center border w-[233%]"><label for="allow1"><input type="radio" id="allow1" name="blnServing" v-model="gridvalue26" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="allow2"><input type="radio" id="allow2" name="blnServing"  v-model="gridvalue26"  value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label></div>
+<div class="space-x-5 flex justify-left pl-2 items-center border w-[233%]"><label for="allow3"><input type="radio" id="allow3" name="blnServing" v-model="gridvalue26" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="allow4"><input type="radio" id="allow4" name="blnServing"  v-model="gridvalue26"  value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label></div>
 <div class="w-0"></div>
 <div class="w-0"></div>
 <div class="justify-center items-center bg-gray-100 border flex rounded-bl-lg">시세가적용</div>
-<div class="space-x-5 flex justify-left pl-2 items-center border w-[233%]"><label for="allow1"><input type="radio" id="allow1" name="blnOpen" v-model="gridvalue27" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="allow2"><input type="radio" id="allow2" name="blnOpen"  v-model="gridvalue27"  value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label></div>
+<div class="space-x-5 flex justify-left pl-2 items-center border w-[233%]"><label for="allow5"><input type="radio" id="allow5" name="blnOpen" v-model="gridvalue27" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="allow6"><input type="radio" id="allow6" name="blnOpen"  v-model="gridvalue27"  value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label></div>
 <div class="w-0"></div>
 <div class="w-0"></div>
 <div class="justify-center items-center bg-gray-100 border flex rounded-bl-lg">배달메뉴</div>
-<div class="space-x-5 flex justify-left pl-2 items-center border w-[233%]"><label for="allow1"><input type="radio" id="allow1" name="blnDeliveryYN" v-model="gridvalue28" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="allow2"><input type="radio" id="allow2" name="blnDeliveryYN"  v-model="gridvalue28"  value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label></div>
+<div class="space-x-5 flex justify-left pl-2 items-center border w-[233%]"><label for="allow7"><input type="radio" id="allow7" name="blnDeliveryYN" v-model="gridvalue28" value="1" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">예</label><label for="allow8"><input type="radio" id="allow8" name="blnDeliveryYN"  v-model="gridvalue28"  value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200">아니오</label></div>
 <div class="w-0"></div>
 <div class="w-0"></div>
 <div class="justify-center items-center bg-gray-100 border flex">영양소 정보</div>
@@ -186,21 +186,31 @@
 <div class="customtableIndex border border-gray-400 rounded-l-lg">결제코드/명</div>
 <div class="px-1 py-1 border border-gray-300 rounded-r-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchPayCd" v-model="searchWord2"></div>
 </div>
-<Realgrid class="w-full h-full mt-5" :progname="'MST01_033INS_VUE'" :progid="2" :rowData="clickrowData2"  @clickedRowData="clickedRowData2" :searchColId="'lngCode,strName'" :searchWord="searchWord2"  ></Realgrid>
+<Realgrid class="w-full h-full mt-5" :progname="'MST01_033INS_VUE'" :progid="2" :rowData="clickrowData2"  @clickedRowData="clickedRowData2" :searchColId="'lngCode,strName'" :searchWord="searchWord2" :checkBarInactive="'lngMenu'" :initFocus="initFocus" ></Realgrid>
 <!-- :searchColId2="'majorGroupCd,subGroupCd'" :searchColId="'menuCd,menuNm'" :searchColValue2="searchColValue3" :searchWord="searchWord2" -->
 </div>
 <div v-show="selectedMenu==3" class="h-[90%] w-full">
 <div class="grid grid-rows-1 grid-cols-[2fr,3fr] w-[80%] h-[40%] ml-10 mt-10 border pl-5">
-  <div class="flex justify-center items-center"><img :src="`http://www.pncoffice.net/MenuImage/Image/${fileName}`" alt="" class="w-[80%] h-[80%]"></div>
+  <div class="flex justify-center items-center"><img :src="`http://211.238.145.30:8085/Uploads/${fileName}`" @error="handleImageError" class="w-[80%] h-[80%]"></div>
   <div class="grid grid-rows-[1fr,5fr] grid-cols-[1fr,5fr] border ">
     <div class="customtableIndex border border-gray-400 rounded-l-lg h-full w-full">파일명</div>
-    <div class="flex h-full w-full items-center"><input type="file" @change="handleFileUpload"><button class="whitebutton" @click="uploadImage">업로드</button></div>
+    <div class="flex h-full w-full items-center"><input type="text" v-model="fileName2" class="border rounded-lg bg-gray-100 w-full" disabled><button class="whitebutton" @click="downloadFile">다운로드</button></div>
     <div class="customtableIndex border border-gray-400 rounded-l-lg h-full w-full">파일크기</div>
     <div class="grid grid-rows-[1fr,5fr] grid-cols-1">
-      <div class="flex"><input type="file"><button class="whitebutton">파일선택</button></div>
-     <div>* 이미지 사이즈 220*160
-* 이미지 포맷 : PNG, JPG 등 이미지 형식
-* 이미지 용량 제한 : 2MB </div> </div>
+      <div class="flex"><input type="text" v-model="fileSize" class="border rounded-lg bg-gray-100 w-full h-[80%]" disabled><label for="fileInput" class="whitebutton">파일선택</label>
+
+    <input 
+      id="fileInput"
+      type="file" 
+      @change="handleFileUpload" 
+      style="display: none;"
+      accept=".jpg,.png,.jpeg"
+    /></div>
+     <div class="flex flex-col justify-start ml-2"><span class="flex justify-start">* 이미지 사이즈 220*160 </span>
+      <span class="flex justify-start">* 이미지 포맷 : PNG, JPG 등 이미지 형식</span>
+      <span class="flex justify-start">* 이미지 용량 제한 : 2MB </span>
+</div>
+</div>
   </div>
 </div>
 </div>
@@ -212,11 +222,12 @@
 </template>
 
 <script setup>
-import { getMenuCodeEnroll, getMenuList, getMenuLists, getPayCodeEnrollInfo, saveMenuCode, savePayCode } from '@/api/master';
+import { getMenuCodeEnroll, getMenuList, saveMenuCode, uploadFile } from '@/api/master';
 import PickStore12 from '@/components/pickStore12.vue';
 import Realgrid from '@/components/realgrid.vue';
+import axios from 'axios';
 import Swal from 'sweetalert2';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 const searchWord2 = ref('');
@@ -306,7 +317,8 @@ const afterClick = ref(true)
 const fileName = ref()
 const rowIndex = ref()
 const duplilfirstarr = ref()
-const clickedRowData = (newvalue) => {
+const clickedRowData = async(newvalue) => {
+  
   console.log(newvalue)
   rowIndex.value = newvalue.index
 clickrowData4.value = []
@@ -341,8 +353,8 @@ gridvalue21.value = newvalue[19]
 gridvalue22.value = newvalue[20]
 gridvalue23.value = newvalue[21]
 gridvalue24.value = newvalue[22]
-gridvalue25.value = newvalue[23]
-gridvalue26.value = newvalue[24]
+gridvalue25.value = newvalue[24]
+gridvalue26.value = newvalue[23]
 gridvalue27.value = newvalue[25]
 gridvalue28.value = newvalue[26]
 gridvalue29.value = newvalue[27]
@@ -357,7 +369,22 @@ if(gridvalue16.value != 0){
 // clickrowData2.value = []
 // clickrowData2.value = [...clickrowData2.value]
 fileName.value = newvalue[31]
-console.log(newvalue[33])
+fileName2.value = newvalue[31]
+try {
+  const response = await axios.get(`http://211.238.145.30:8085/Uploads/${fileName.value}`, {
+      responseType: 'blob',  // 응답을 Blob 형태로 받음
+  });
+  uploadImage.value.name = newvalue[31]
+  fileSize.value = response.headers['content-length'];
+} catch (error) {
+  console.log(error)
+  console.log('사진없음')
+  uploadImage.value = {name : ""}
+  fileSize.value = ""
+}
+
+ 
+
 if(newvalue[34] == true){
   isNew.value = true
 } else {
@@ -372,16 +399,34 @@ dupliarr.sort((a, b) => {
   const aIndex = firstarr.indexOf(a.lngCode.toString());
   const bIndex =  firstarr.indexOf(b.lngCode.toString());
 
-if (aIndex === -1 && bIndex === -1) return 0; // 둘 다 우선순위에 없음
-if (aIndex === -1) return 1; // a가 우선순위에 없음
-if (bIndex === -1) return -1; // b가 우선순위에 없음
-return aIndex - bIndex; // 우선순위 배열에 따라 정렬
+  const rankA = (aIndex !== -1) ? 0 : (a.lngMenu === 0 ? 1 : 2);
+  const rankB = (bIndex !== -1) ? 0 : (b.lngMenu === 0 ? 1 : 2);
+  
+  // 우선순위(rank)가 다르면 rank에 따라 정렬합니다.
+  if (rankA !== rankB) {
+    return rankA - rankB;
+  }
+  
+  // 둘 다 rank 0인 경우 : firstarr에 있으므로 인덱스 순서대로 정렬
+  if (rankA === 0) {
+    if (aIndex === -1 && bIndex === -1) return 0; // 둘 다 우선순위에 없음
+    if (aIndex === -1) return 1; // a가 우선순위에 없음
+    if (bIndex === -1) return -1; // b가 우선순위에 없음
+    return aIndex - bIndex; // 우선순위 배열에 따라 정렬
+  }
+  
+  // rank가 1 혹은 2인 경우, 추가 정렬 기준이 필요하면 여기에 추가합니다.
+  // 예를 들어, lngCode 오름차순으로 정렬하는 식으로 할 수도 있습니다.
+  // (여기서는 별도의 추가 기준이 없으므로 0을 반환하여 순서를 그대로 유지)
+  return 0;
+
 });
+
 
 if(firstarr.length > 0 && firstarr[0] !==''){
 for(var i=0 ; i < firstarr.length ; i ++){
   const change =  dupliarr.find(item => item.lngCode == firstarr[i])
-  console.log(change)
+
   if(change){
     change.checkbox = true
   }
@@ -410,7 +455,16 @@ const  handleStoreCd = async(newValue) => {
 console.log(newValue)
 if(newValue == '-1'){
 afterSearch.value = false;
+afterClick.value = true
+gridvalue3.value = ''
+initAll()
 return ;
+}
+if(nowStoreCd.value != newValue){
+  afterSearch.value = false;
+  afterClick.value = true
+  gridvalue3.value = ''
+  initAll()
 }
 nowStoreCd.value = newValue ;
 searchButton()
@@ -443,7 +497,7 @@ const menuOrderOption = ref([])
 const menuOptionCode = ref([])
 const searchButton = async () => {
   items.value = []
- 
+  console.log(nowStoreCd.value)
 if(nowStoreCd.value == -1){
   Swal.fire({
     title: '경고',
@@ -462,8 +516,9 @@ try {
  filteredrowData3.value = []
  rowData.value = [...rowData.value]
  filteredrowData3.value = [...filteredrowData3.value]
+ 
  const res = await getMenuCodeEnroll(groupCd.value , nowStoreCd.value)
-
+ 
  rowData.value = res.data.MENULIST
  updateRow.value = rowData.value
  MENUDEPEND.value = res.data.MENUDEPEND
@@ -693,42 +748,7 @@ try {
 
   const deleteCd = rowData.value.filter(item => item.deleted == true).map(item => item.lngCode)
 
-  console.log("groupCd.value:", groupCd.value);
-  console.log("nowStoreCd.value:", nowStoreCd.value);
-  console.log("lngMainGroup:", filterAndMap('lngMainGroup'));
-  console.log("lngSubGroup:", filterAndMap('lngSubGroup'));
-  console.log("lngCode:", filterAndMap('lngCode'));
-  console.log("dtmFromDate:", filterAndMap('dtmFromDate'));
-  console.log("dtmToDate:", filterAndMap('dtmToDate'));
-  console.log("strName:", filterAndMap('strName'));
-  console.log("strNameE:", filterAndMap('strNameE'));
-  console.log("lngDCPrice:", filterAndMap('lngDCPrice'));
-  console.log("lngChain:", filterAndMap('lngChain'));
-  console.log("lngPrice:", filterAndMap('lngPrice'));
-  console.log("blnDCPriceYN:", filterAndMap('blnDCPriceYN'));
-  console.log("lngTax:", filterAndMap('lngTax'));
-  console.log("blnInactive:", filterAndMap('blnInactive'));
-  console.log("lngDiscount:", filterAndMap('lngDiscount'));
-  console.log("intCustCount:", filterAndMap('intCustCount'));
-  console.log("blnCondimentprice:", filterAndMap('blnCondimentprice'));
-  console.log("lngOrder:", filterAndMap('lngOrder'));
-  console.log("lngKPG:", filterAndMap('lngKPG'));
-  console.log("strBarCode:", filterAndMap('strBarCode'));
-  console.log("blnReceipt:", filterAndMap('blnReceipt'));
-  console.log("lngMenuOption:", filterAndMap('lngMenuOption'));
-  console.log("blnRedPrint:", filterAndMap('blnRedPrint'));
-  console.log("strIcon:", filterAndMap('strIcon'));
-  console.log("blnKitSingle:", filterAndMap('blnKitSingle'));
-  console.log("lngSubTitle:", filterAndMap('lngSubTitle'));
-  console.log("blnServing:", filterAndMap('blnServing'));
-  console.log("blnOpen:", filterAndMap('blnOpen'));
-  console.log("blnDeliveryYN:", filterAndMap('blnDeliveryYN'));
-  console.log("strNutrInfo:", filterAndMap('strNutrInfo'));
-  console.log("strCntryOrg:", filterAndMap('strCntryOrg'));
-  console.log("strMenuComment:", filterAndMap('strMenuComment'));
-  console.log("strAmtCodeList:", filterAndMap('strAmtCodeList'));
-  console.log("strUserFileName:", filterAndMap('strUserFileName'));
-  console.log("deleteCd:", deleteCd.join(','));
+ 
 const res = await saveMenuCode(
   groupCd.value,
   nowStoreCd.value,
@@ -771,6 +791,23 @@ const res = await saveMenuCode(
 
 console.log(res)
 
+const formData = new FormData();
+uploadImages.value.forEach((file, index) => {
+    const existedName = rowData.value.find(item => item.strUserFileName == file.name)
+    if(existedName){
+      formData.append(`file${index}`, file); 
+    }
+    
+});
+
+  try {
+    const res2 = await uploadFile(formData)
+    console.log(res2)
+  } catch (error) {
+    console.log(error)
+  }
+
+
 
 Swal.fire({
   title: '저장 되었습니다.',
@@ -794,8 +831,7 @@ searchButton();
 }
 
 const updatedRowData = (newvalue) => {
-console.log(newvalue)
-console.log(rowData.value)
+  
   newvalue.forEach((newItem) => {
   const targetRow = rowData.value.find(row => row.lngCode == newItem.lngCode);
   if (targetRow) {
@@ -902,23 +938,34 @@ watch((clickrowData2), () => {
 })
 
 const clickedRowData2 = (e) => {
-console.log(gridvalue3.value)
-console.log(rowData.value)
+
 const clickedRow = rowData.value.find(item => item.lngCode == gridvalue3.value.toString())
+if(clickedRow){
+
+
 changeRow.value = rowIndex.value
 changeColid.value = 'strAmtCodeList'
-console.log(clickedRow)
+
 if(e[0] == undefined || e[0] == false){
   clickedRow.strAmtCodeList = clickedRow.strAmtCodeList.replace(e[1],'').replace(/;;+/g, ';')
   changeValue2.value = clickedRow.strAmtCodeList.replace(e[1],'').replace(/;;+/g, ';')
+
 } else {
-  changeValue2.value = clickedRow.strAmtCodeList.split(';').concat(e[1]).map(Number).sort((a,b) => a-b).map(String).join(';')
+
+  changeValue2.value = clickedRow.strAmtCodeList.split(';').filter(item => item !== '').filter(item => {
+    const finditem = rowData2.value.find(item2 => item2.lngMenu == '0' && item2.lngCode == item)
+    if(finditem){
+      return false
+    } else {
+      return true
+    }
+  }).concat(e[1]).map(Number).sort((a,b) => a-b).map(String).join(';')
 }
 
 changeNow.value = !changeNow.value
 
 }
-
+}
 // watch((forsearchMain) , () => {
 
 // if(forsearchMain.value == 0  && searchWord2.value == ''){
@@ -1025,11 +1072,14 @@ changeNow.value = !changeNow.value
 // }
 // } 
 // })
-
+const initFocus = ref(true)
 const initAll = () => {
 selectedMenu.value = 1
 clickrowData4.value = []
 filteredrowData5.value = []
+rowData.value =[]
+rowData2.value =[]
+updateRow.value= []
 forsearchMain.value = 0
 forsearchSub.value = 0
 searchWord3.value = ''
@@ -1059,6 +1109,7 @@ gridvalue22.value = ''
 gridvalue23.value = ''
 gridvalue24.value = ''
 gridvalue25.value = ''
+//initFocus.value = !initFocus.value
 }
 
 const searchPayCd = (e) => {
@@ -1097,19 +1148,70 @@ clickrowData2.value = dupliarr
    }
  
 }
-const uploadImage = ref()
-const handleFileUpload = (e) => {
+const uploadImage = ref({name: ""})
+const uploadImages = ref([])
+const fileSize = ref()
+const fileName2 = ref()
+const fileDownloadUrl = ref()
+const maxSize = 2 * 1024 * 1024 
+const handleFileUpload = async(e) => {
+  
+  fileSize.value = e.target.files[0].size
+  if(fileSize.value > maxSize){
+    Swal.fire({
+    title: '경고',
+    text: '파일 크기가 2MB를 초과합니다.',
+    icon: 'warning',
+    confirmButtonText: '확인'
+    })
+    e.target.value = ''
+    return ;
+  }
+  fileName2.value = e.target.files[0].name
+    changeColid.value = 'strUserFileName'
+    changeValue2.value = fileName2.value
+    changeNow.value= !changeNow.value
+
+
   uploadImage.value = e.target.files[0]
+  uploadImages.value.push(uploadImage.value)
+  console.log(uploadImages.value)
+
+
 }
 
-const upload = async() => {
-   const formData = new FormData();
-   formData.append("imageFile",uploadImage.value)
-   formData.append("fileName",uploadImage.value.name)
-   formData.append("kioskImgWidth", 300); // 이미지 너비
-   formData.append("kioskImgHeight", 300); // 이미지 높이
+const downloadFile = async() => {
 
-   const res = await uploadImage(formData)
+  try {
+    const response = await axios.get(`http://211.238.145.30:8085/Uploads/${fileName.value}`, {
+      responseType: 'blob',  // 응답을 Blob 형태로 받음
+    });
+
+    const blob = response.data;
+    const url = window.URL.createObjectURL(blob);
+
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = `${fileName.value}`; // 다운로드 파일명 설정
+    downloadLink.click();
+
+    // 다운로드 후 Blob URL 해제
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    Swal.fire({
+      title: '오류',
+      text: '파일 다운로드 실패',
+      icon: 'error',
+      confirmButtonText: '확인'
+    })
+  }
+ 
+
+   
+}
+
+const handleImageError = (e) => {
+   e.target.src = 'http://211.238.145.30:8085/images/noimage2.png'; 
 }
 </script>
 
