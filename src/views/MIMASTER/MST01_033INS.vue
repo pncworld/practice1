@@ -57,7 +57,7 @@
 <div class="grid grid-cols-1 grid-rows-[1fr,9fr] ml-20">
 <div class="flex space-x-1 mt-10">
   <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border" @click="selectMenu(1)" :class="{'text-blue-400 bg-blue-100': selectedMenu==1}">상세정보</button>
-  <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border disabled:bg-gray-50 disabled:text-gray-200 " @click="selectMenu(2)" :class="{'text-blue-400 bg-blue-100': selectedMenu==2}" >할인선택</button>
+  <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border disabled:bg-gray-50 disabled:text-gray-200 " @click="selectMenu(2)" :class="{'text-blue-400 bg-blue-100': selectedMenu==2}" :disabled=" (gridvalue10 == 0 || gridvalue14==1 ) && afterSearch == true && afterClick == false">할인선택</button>
   <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border" @click="selectMenu(3)" :class="{'text-blue-400 bg-blue-100': selectedMenu==3}" :disabled="selectedMultiple">키오스크 이미지 설정</button>
 </div>
 <div>
@@ -166,15 +166,15 @@
 <div class="w-0"></div>
 <div class="w-0"></div>
 <div class="justify-center items-center bg-gray-100 border flex">영양소 정보</div>
-<div class="flex justify-center items-center w-[233%]"><input type="number" name="strNutrInfo" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue29" @input="changeInfo" :disabled="afterClick" ></div>
+<div class="flex justify-center items-center w-[233%]"><input type="text" name="strNutrInfo" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue29" @input="changeInfo" :disabled="afterClick" ></div>
 <div class="w-0"></div>
 <div class="w-0"></div>
 <div class="justify-center items-center bg-gray-100 border flex">원산지 정보</div>
-<div class="flex justify-center items-center w-[233%]"><input type="number" name="strCntryOrg" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue30" @input="changeInfo" :disabled="afterClick" ></div>
+<div class="flex justify-center items-center w-[233%]"><input type="text" name="strCntryOrg" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue30" @input="changeInfo" :disabled="afterClick" ></div>
 <div class="w-0"></div>
 <div class="w-0"></div>
 <div class="justify-center items-center bg-gray-100 border flex">메뉴설명</div>
-<div class="flex justify-center items-center w-[233%]"><input type="number" name="strMenuComment" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue31" @input="changeInfo" :disabled="afterClick" ></div>
+<div class="flex justify-center items-center w-[233%]"><input type="text" name="strMenuComment" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200" v-model="gridvalue31" @input="changeInfo" :disabled="afterClick" ></div>
 <div class="w-0"></div>
 <div class="w-0"></div>
    </div>
@@ -186,7 +186,7 @@
 <div class="customtableIndex border border-gray-400 rounded-l-lg">결제코드/명</div>
 <div class="px-1 py-1 border border-gray-300 rounded-r-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchPayCd" v-model="searchWord2"></div>
 </div>
-<Realgrid class="w-full h-full mt-5" :progname="'MST01_033INS_VUE'" :progid="2" :rowData="clickrowData2"  @clickedRowData="clickedRowData2" :searchColId="'lngCode,strName'" :searchWord="searchWord2" :checkBarInactive="'lngMenu'" :initFocus="initFocus" ></Realgrid>
+<Realgrid class="w-full h-full mt-5" :progname="'MST01_033INS_VUE'" :progid="2" :rowData="clickrowData2"  @clickedRowData="clickedRowData2" :searchColId="'lngCode,strName'" :searchWord="searchWord2" :checkBarInactive="'lngMenu'" :initSelect="true" :ExceptionCheck="'lngMenu'" ></Realgrid>
 <!-- :searchColId2="'majorGroupCd,subGroupCd'" :searchColId="'menuCd,menuNm'" :searchColValue2="searchColValue3" :searchWord="searchWord2" -->
 </div>
 <div v-show="selectedMenu==3" class="h-[90%] w-full">
@@ -317,8 +317,10 @@ const afterClick = ref(true)
 const fileName = ref()
 const rowIndex = ref()
 const duplilfirstarr = ref()
+const tempRowData2 = ref()
 const clickedRowData = async(newvalue) => {
-  
+  rowData2.value = JSON.parse(JSON.stringify(tempRowData2.value))
+  clickrowData2.value = JSON.parse(JSON.stringify(tempRowData2.value))
   console.log(newvalue)
   rowIndex.value = newvalue.index
 clickrowData4.value = []
@@ -399,8 +401,8 @@ dupliarr.sort((a, b) => {
   const aIndex = firstarr.indexOf(a.lngCode.toString());
   const bIndex =  firstarr.indexOf(b.lngCode.toString());
 
-  const rankA = (aIndex !== -1) ? 0 : (a.lngMenu === 0 ? 1 : 2);
-  const rankB = (bIndex !== -1) ? 0 : (b.lngMenu === 0 ? 1 : 2);
+  const rankA = (aIndex !== -1) ? 0 : (a.lngMenu === 0 ? 0 : 1);
+  const rankB = (bIndex !== -1) ? 0 : (b.lngMenu === 0 ? 0 : 1);
   
   // 우선순위(rank)가 다르면 rank에 따라 정렬합니다.
   if (rankA !== rankB) {
@@ -528,9 +530,7 @@ try {
   confirmData.value = JSON.parse(JSON.stringify(rowData.value))
   console.log(res)
   optionGroup.value = res.data.OPTIONGROUP
-  rowData2.value = res.data.PAYCD
-  clickrowData2.value = res.data.PAYCD
-  
+  tempRowData2.value = res.data.PAYCD
  const res2 = await getMenuList(groupCd.value , nowStoreCd.value)
  //rowData2.value = res2.data.menuList
  SubMenuGroup.value = res2.data.submenuGroup
@@ -588,8 +588,6 @@ searchWord.value = e.target.value
 const changeInfo = (e) => {
  const tagName = e.target.name;
  const value2 = e.target.value
-  console.log(tagName)
-  console.log(value2)
  changeColid.value = tagName
  changeValue2.value = value2
  changeNow.value= !changeNow.value
@@ -689,7 +687,7 @@ filteredapproveType.value = approveGroup.value.filter(item => item.strDCode1 == 
 })
 
 const saveButton = () => {
-console.log(rowData.value)
+
 if(afterSearch.value == false) {
 Swal.fire({
   title: '경고',
@@ -744,11 +742,43 @@ title: '저장',
 if(result.isConfirmed){
 store.state.loading = true;
 try {
-  const filterAndMap = (key) => rowData.value.filter(item => item.deleted !== true).map(item => item[key]).join(',');
+  const filterAndMap = (key) => rowData.value.filter(item => item.deleted !== true).map(item => item[key]).join('\u200B');
 
   const deleteCd = rowData.value.filter(item => item.deleted == true).map(item => item.lngCode)
-
  
+
+
+  console.log(rowData.value.length)
+  console.log(nowStoreCd.value)
+  console.log(filterAndMap('lngMainGroup'))
+  console.log(filterAndMap('lngSubGroup'))
+  console.log(filterAndMap('lngCode'))
+  console.log(filterAndMap('dtmFromDate'))
+  console.log(filterAndMap('dtmToDate'))
+  console.log(filterAndMap('strName'))
+  console.log(filterAndMap('strNameE'))
+  console.log(filterAndMap('lngDCPrice'))
+  console.log(filterAndMap('lngChain'))
+  console.log(filterAndMap('lngPrice'))
+  console.log(filterAndMap('blnDCPriceYN'))
+  console.log(filterAndMap('lngTax'))
+  console.log(filterAndMap('blnInactive'))
+  console.log(filterAndMap('lngDiscount'))
+  console.log(filterAndMap('intCustCount'))
+  console.log(filterAndMap('blnCondimentprice'))
+  console.log(filterAndMap('lngOrder'))
+  console.log(filterAndMap('lngKPG'))
+  console.log(filterAndMap('strBarCode'))
+  console.log(filterAndMap('blnReceipt'))
+  console.log(filterAndMap('lngMenuOption'))
+  console.log(filterAndMap('blnRedPrint'))
+  console.log(filterAndMap('strIcon'))
+  console.log(filterAndMap('blnKitSingle'))
+  console.log(filterAndMap('lngSubTitle'))
+  console.log(filterAndMap('blnServing'))
+  console.log(filterAndMap('blnOpen'))
+  console.log(filterAndMap('strAmtCodeList'))
+  console.log(filterAndMap('strUserFileName'))
 const res = await saveMenuCode(
   groupCd.value,
   nowStoreCd.value,
@@ -785,10 +815,8 @@ const res = await saveMenuCode(
   filterAndMap('strMenuComment'),
   filterAndMap('strAmtCodeList'),
   filterAndMap('strUserFileName'),
-  deleteCd.join(','),  // 삭제된 코드
+  deleteCd.join(',')
 );
-
-
 console.log(res)
 
 const formData = new FormData();
@@ -816,6 +844,7 @@ Swal.fire({
 store.state.loading = false
 } catch (error) {
 console.log(error)
+
 Swal.fire({
   title: '저장이 실패되었습니다.',
   confirmButtonText: '확인',
@@ -832,22 +861,43 @@ searchButton();
 
 const updatedRowData = (newvalue) => {
   
-  newvalue.forEach((newItem) => {
-  const targetRow = rowData.value.find(row => row.lngCode == newItem.lngCode);
+//   newvalue.forEach((newItem) => {
+//   const targetRow = rowData.value.find(row => row.lngCode == newItem.lngCode);
+//   if (targetRow) {
+//     Object.keys(newItem).forEach(key => {
+//       targetRow[key] = newItem[key]; // 속성 업데이트
+   
+//     });
+//   } else {
+//     const targetRow2 = rowData.value.find(row => row.sequence == clickaddrowSeq.value);
+//     console.log(targetRow2)
+//     Object.keys(newItem).forEach(key => {
+//       targetRow2[key] = newItem[key]; // 속성 업데이트
+   
+//     });
+//   }
+// });
+
+// rowData를 Map으로 변환 (기존 배열의 특정 필드를 key로 사용)
+const rowDataMap = new Map(rowData.value.map(row => [row.lngCode.toString(), row]));
+newvalue.forEach((newItem) => {
+  const targetRow = rowDataMap.get(newItem.lngCode.toString()); // Map을 통해 빠르게 찾기
+
   if (targetRow) {
+    // targetRow가 있으면 값을 업데이트
     Object.keys(newItem).forEach(key => {
       targetRow[key] = newItem[key]; // 속성 업데이트
-   
     });
   } else {
-    const targetRow2 = rowData.value.find(row => row.sequence == clickaddrowSeq.value);
-    console.log(targetRow2)
+    // find 방식 대신 sequence로 찾기
+    const targetRow2 = rowDataMap.get(clickaddrowSeq.value.toString());
+   
     Object.keys(newItem).forEach(key => {
       targetRow2[key] = newItem[key]; // 속성 업데이트
-   
     });
   }
 });
+
 rowData.value = [...rowData.value]
 
 }
@@ -951,7 +1001,7 @@ if(e[0] == undefined || e[0] == false){
   changeValue2.value = clickedRow.strAmtCodeList.replace(e[1],'').replace(/;;+/g, ';')
 
 } else {
-
+  console.log(clickedRow)
   changeValue2.value = clickedRow.strAmtCodeList.split(';').filter(item => item !== '').filter(item => {
     const finditem = rowData2.value.find(item2 => item2.lngMenu == '0' && item2.lngCode == item)
     if(finditem){
@@ -1079,6 +1129,7 @@ clickrowData4.value = []
 filteredrowData5.value = []
 rowData.value =[]
 rowData2.value =[]
+clickrowData2.value =[]
 updateRow.value= []
 forsearchMain.value = 0
 forsearchSub.value = 0
@@ -1110,6 +1161,10 @@ gridvalue23.value = ''
 gridvalue24.value = ''
 gridvalue25.value = ''
 //initFocus.value = !initFocus.value
+fileName.value = ''
+fileSize.value =''
+fileName2.value = ''
+
 }
 
 const searchPayCd = (e) => {

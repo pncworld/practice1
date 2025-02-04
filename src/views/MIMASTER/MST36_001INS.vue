@@ -190,7 +190,7 @@
   <div class="customtableIndex border border-gray-400 rounded-bl-lg">메뉴명/코드</div>
   <div class="px-1 py-1 border border-gray-300 rounded-br-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList" v-model="searchWord2"></div>
 </div>
-<Realgrid class="w-full h-full mt-5" :progname="'MST36_001INS_VUE'" :progid="2" :rowData="clickrowData4"   @clickedRowData="clickedRowData2"  :initCheckColumn="initCheckColumn" :initCheckValue="initCheckValue" :initCheckAct="initCheckAct" @checkedRowData="checkedRowData" :initSelect="true" :maintaincheckColumn="'menuCd'" :rowStateeditable="false" :changeNow="changeNow2" :changeValue2="changeValue3" :changeColid="changeColid2" :changeRow="changeRow2" @updatedRowData="updatedRowData2" @selectedIndex="selectedIndex2"></Realgrid>
+<Realgrid class="w-full h-full mt-5" :progname="'MST36_001INS_VUE'" :progid="2" :rowData="clickrowData4"   @clickedRowData="clickedRowData2"  :initCheckColumn="initCheckColumn" :initCheckValue="initCheckValue" :initCheckAct="initCheckAct" @checkedRowData="checkedRowData" :initSelect="true" :maintaincheckColumn="'menuCd'" :rowStateeditable="false" :changeNow="changeNow2" :changeValue2="changeValue3" :changeColid="changeColid2" :changeRow="changeRow2" @updatedRowData="updatedRowData2" @selectedIndex="selectedIndex2" ></Realgrid>
 <!-- :searchColId2="'majorGroupCd,subGroupCd'" :searchColId="'menuCd,menuNm'" :searchColValue2="searchColValue3" :searchWord="searchWord2" -->
 </div>
 <div v-show="selectedMenu==3" class="h-[90%] w-[90%]">

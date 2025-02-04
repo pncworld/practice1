@@ -302,6 +302,11 @@ const props = defineProps({
     type: String,
     default: ''
   } 
+  ,
+  ExceptionCheck: { 
+    type: String,
+    default: ''
+  } 
  
 });
 
@@ -654,10 +659,22 @@ gridView.onCellClicked = function (grid, clickData) {
 gridView.onColumnCheckedChanged = function (grid, col, chk) {
   
      var rowCount = dataProvider.getRowCount();  // 전체 행의 개수
-   
-     for (var i = 0; i < rowCount; i++) {
-      dataProvider.setValue(i, col.fieldName, chk);  // 
+     if( props.ExceptionCheck != ''  ){
+      for (var i = 0; i < rowCount; i++) {
+         if(grid.getValue(i, props.ExceptionCheck) !== '0'){
+          dataProvider.setValue(i, col.fieldName, chk);  
+         }
+        
+       }
+     } else {
+      for (var i = 0; i < rowCount; i++) {
+       
+          dataProvider.setValue(i, col.fieldName, chk);  
+       
+        
+       }
      }
+     
      
      console.log(col.fieldName + "was checked as: " + chk);
 };
@@ -708,15 +725,12 @@ watch(() => props.changeNow , () => {
     console.log(props.changeRow)
     console.log(props.changeColid)
     console.log(props.changeValue2)
-    console.log(props.changeOriginRow)
  
    
    
       dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue2);
   
       updatedrowData.value = [ ...dataProvider.getJsonRows()]
-
-    
 
       emit('updatedRowData', updatedrowData.value )
    
@@ -1036,15 +1050,19 @@ const setupGrid = async () => {
 };
 
 watch(() => props.rowData, () => {
-
+  if(props.initSelect == true){
+    selectedindex.value = -1
+  }
   addrow4activated.value = true
   funcshowGrid().then(() =>{
     setTimeout(function(){
-
-      console.log(selectedindex.value)
+      
+   
       if(selectedindex.value == -1){
         return;
       }
+
+   
       if(selectedindex.value !='' && selectedindex.value !=undefined){
  
     gridView.setCurrent({ dataRow : selectedindex.value })
@@ -1078,9 +1096,7 @@ watch(() => props.rowData, () => {
     },90) // 시간으로인한 미적용 이슈있음
     
 })
-if(props.initSelect == true){
-  selectedindex.value = -1
-}
+
 
 
 });

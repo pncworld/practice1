@@ -11,7 +11,7 @@ const api = axios.create({
 export const url2 = commonUrl2;
 const api2 = axios.create({
     baseURL: url2, // API 기본 URL
-    timeout: 10000, // 요청 타임아웃 설정
+    timeout: 100000, // 요청 타임아웃 설정
   });
 // API 요청 메서드들
 export const get_pos = (groupCd, storeCd) => {
@@ -1034,6 +1034,7 @@ export const savePayCode = (
     deleteCd
 ) => {
     // POST 요청
+   
     return api2.post('/MIMASTER/MST01_033INS.asmx/saveMenuCode', {
       GROUP_CD: groupCd,
       STORE_CD: storeCd,
