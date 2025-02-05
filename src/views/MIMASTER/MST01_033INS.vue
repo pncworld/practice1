@@ -22,8 +22,8 @@
 <div class="flex justify-between mt-5 ml-10 w-full border-b border-b-gray-300">
 <div class="flex justify-start font-bold text-xl">메뉴코드 목록</div>
 <div class="mt-3 space-x-2">
-  <button class="whitebutton" @click="addRow">추가</button>
-  <button class="whitebutton" @click="deleteRow">삭제</button>
+  <button class="whitebutton" @click="addRow" :disabled="!afterSearch">추가</button>
+  <button class="whitebutton" @click="deleteRow" :disabled="afterClick">삭제</button>
 </div>
 </div>
 
@@ -57,7 +57,7 @@
 <div class="grid grid-cols-1 grid-rows-[1fr,9fr] ml-20">
 <div class="flex space-x-1 mt-10">
   <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border" @click="selectMenu(1)" :class="{'text-blue-400 bg-blue-100': selectedMenu==1}">상세정보</button>
-  <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border disabled:bg-gray-50 disabled:text-gray-200 " @click="selectMenu(2)" :class="{'text-blue-400 bg-blue-100': selectedMenu==2}" :disabled=" (gridvalue10 == 0 || gridvalue14==1 ) && afterSearch == true && afterClick == false">할인선택</button>
+  <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border disabled:bg-gray-50 disabled:text-gray-200 " @click="selectMenu(2)" :class="{'text-blue-400 bg-blue-100': selectedMenu==2}" :disabled="discountDisabled">할인선택</button>
   <button class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border" @click="selectMenu(3)" :class="{'text-blue-400 bg-blue-100': selectedMenu==3}" :disabled="selectedMultiple">키오스크 이미지 설정</button>
 </div>
 <div>
@@ -186,7 +186,7 @@
 <div class="customtableIndex border border-gray-400 rounded-l-lg">결제코드/명</div>
 <div class="px-1 py-1 border border-gray-300 rounded-r-lg "><input type="text" class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchPayCd" v-model="searchWord2"></div>
 </div>
-<Realgrid class="w-full h-full mt-5" :progname="'MST01_033INS_VUE'" :progid="2" :rowData="clickrowData2"  @clickedRowData="clickedRowData2" :searchColId="'lngCode,strName'" :searchWord="searchWord2" :checkBarInactive="'lngMenu'" :initSelect="true" :ExceptionCheck="'lngMenu'" ></Realgrid>
+<Realgrid class="w-full h-full mt-5" :progname="'MST01_033INS_VUE'" :progid="2" :rowData="clickrowData2"  @clickedRowData="clickedRowData2" :searchColId="'lngCode,strName'" :searchWord="searchWord2" :checkBarInactive="'lngMenu'" :initSelect="true" :ExceptionCheck="'lngMenu'" :showTooltip="true"></Realgrid>
 <!-- :searchColId2="'majorGroupCd,subGroupCd'" :searchColId="'menuCd,menuNm'" :searchColValue2="searchColValue3" :searchWord="searchWord2" -->
 </div>
 <div v-show="selectedMenu==3" class="h-[90%] w-full">
@@ -227,6 +227,7 @@ import PickStore12 from '@/components/pickStore12.vue';
 import Realgrid from '@/components/realgrid.vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { v4 as uuidv4 } from 'uuid';
 import { computed, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
@@ -275,6 +276,7 @@ const initCheckValue = ref('')
 const initCheckAct = ref(false)
 const uncheckValue = ref()
 const uncheckAct = ref(false)
+const discountDisabled = ref(false)
 const labelsData = ref([['할인','지불','할증'],['사용','미사용']])
 const valuesData = ref([['1','2','3'],['0','1']])
 const labelingColumns = ref('payDistinct,blnInactive')
@@ -319,8 +321,19 @@ const rowIndex = ref()
 const duplilfirstarr = ref()
 const tempRowData2 = ref()
 const clickedRowData = async(newvalue) => {
-  rowData2.value = JSON.parse(JSON.stringify(tempRowData2.value))
-  clickrowData2.value = JSON.parse(JSON.stringify(tempRowData2.value))
+  
+  if(newvalue[9] == 0 || newvalue[12]==1){
+    rowData2.value = []
+    clickrowData2.value = []
+    if(selectedMenu.value ==2){
+      selectedMenu.value = 1
+    }
+    
+  } else {
+    rowData2.value = JSON.parse(JSON.stringify(tempRowData2.value))
+    clickrowData2.value = JSON.parse(JSON.stringify(tempRowData2.value))
+  }
+ 
   console.log(newvalue)
   rowIndex.value = newvalue.index
 clickrowData4.value = []
@@ -368,10 +381,9 @@ if(gridvalue16.value != 0){
 } else {
   gridvalue100.value = 0
 }
-// clickrowData2.value = []
-// clickrowData2.value = [...clickrowData2.value]
-fileName.value = newvalue[31]
-fileName2.value = newvalue[31]
+discountDisabled.value = ((newvalue[9] == 0 || newvalue[12]==1 ) && afterSearch.value == true && afterClick.value == false)
+fileName.value = newvalue[31] 
+fileName2.value = newvalue[31] != undefined ? newvalue[31].split('_').slice(1).join('_')  : ''
 try {
   const response = await axios.get(`http://211.238.145.30:8085/Uploads/${fileName.value}`, {
       responseType: 'blob',  // 응답을 Blob 형태로 받음
@@ -386,9 +398,11 @@ try {
 }
 
  
-
+console.log(newvalue)
 if(newvalue[34] == true){
   isNew.value = true
+  clickaddrowSeq.value = rowData.value[newvalue.index].sequence
+  console.log(clickaddrowSeq.value)
 } else {
   isNew.value = false
 }
@@ -411,10 +425,7 @@ dupliarr.sort((a, b) => {
   
   // 둘 다 rank 0인 경우 : firstarr에 있으므로 인덱스 순서대로 정렬
   if (rankA === 0) {
-    if (aIndex === -1 && bIndex === -1) return 0; // 둘 다 우선순위에 없음
-    if (aIndex === -1) return 1; // a가 우선순위에 없음
-    if (bIndex === -1) return -1; // b가 우선순위에 없음
-    return aIndex - bIndex; // 우선순위 배열에 따라 정렬
+    return Number(a.lngCode) - Number(b.lngCode)
   }
   
   // rank가 1 혹은 2인 경우, 추가 정렬 기준이 필요하면 여기에 추가합니다.
@@ -879,9 +890,16 @@ const updatedRowData = (newvalue) => {
 // });
 
 // rowData를 Map으로 변환 (기존 배열의 특정 필드를 key로 사용)
-const rowDataMap = new Map(rowData.value.map(row => [row.lngCode.toString(), row]));
+
+const rowDataMap = new Map(
+  rowData.value.map(row => [
+    row.sequence !== undefined ? row.sequence : row.lngCode.toString(),
+    row
+  ])
+);
+
 newvalue.forEach((newItem) => {
-  const targetRow = rowDataMap.get(newItem.lngCode.toString()); // Map을 통해 빠르게 찾기
+  const targetRow = rowDataMap.get( newItem.new == true ? clickaddrowSeq.value : newItem.lngCode.toString() ); // Map을 통해 빠르게 찾기
 
   if (targetRow) {
     // targetRow가 있으면 값을 업데이트
@@ -1208,6 +1226,7 @@ const uploadImages = ref([])
 const fileSize = ref()
 const fileName2 = ref()
 const fileDownloadUrl = ref()
+const randomuuid = ref()
 const maxSize = 2 * 1024 * 1024 
 const handleFileUpload = async(e) => {
   
@@ -1222,13 +1241,15 @@ const handleFileUpload = async(e) => {
     e.target.value = ''
     return ;
   }
-  fileName2.value = e.target.files[0].name
+    fileName2.value = e.target.files[0].name
     changeColid.value = 'strUserFileName'
-    changeValue2.value = fileName2.value
+    randomuuid.value = uuidv4();
+    changeValue2.value = randomuuid.value+'_'+fileName2.value
+    console.log(changeValue2.value)
     changeNow.value= !changeNow.value
 
-
-  uploadImage.value = e.target.files[0]
+  const file = e.target.files[0];
+  uploadImage.value = new File([file],changeValue2.value , {type : file.type})
   uploadImages.value.push(uploadImage.value)
   console.log(uploadImages.value)
 

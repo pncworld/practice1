@@ -208,7 +208,7 @@
 </template>
 
 <script setup>
-import { getMenuList, getMenuLists, getPayCodeEnrollInfo, savePayCode } from '@/api/master';
+import { getMenuList, getMenuListIncludeCommon, getMenuLists, getPayCodeEnrollInfo, savePayCode } from '@/api/master';
 import PickStore12 from '@/components/pickStore12.vue';
 import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';
@@ -289,12 +289,37 @@ const afterClickrow = ref(true)
 const clickedRowData = (newvalue) => {
    clickrowData4.value = []
    filteredrowData5.value = []
-    console.log(newvalue)
+ 
     forsearchMain.value = 0 
     forsearchSub.value = 0 
     searchWord2.value = ''
     searchWord3.value = ''
+    if(!(newvalue[4] == '1' && newvalue[6] == '0')){
+      if(selectedMenu.value==3){
+        selectedMenu.value = 1
+      }
+      
+    }
+  
+
+    if(newvalue[4] == '1'){
+      if(newvalue[21]!='0'){
+       
+      } else {
+        if(selectedMenu.value = 2){
+          selectedMenu.value = 1
+        }
+      }
+    } else {
+      if(newvalue[2] == undefined ? false : newvalue[2].toString().startsWith('24')){
+        
+      } else {
+        if(selectedMenu.value = 2){
+          selectedMenu.value = 1
+        }
+      }
     
+    }
     clickedrowdata.value = newvalue[27]
     gridvalue1.value = newvalue[4]
     gridvalue2.value = newvalue[21]
@@ -307,7 +332,7 @@ const clickedRowData = (newvalue) => {
     gridvalue9.value = newvalue[18]
     gridvalue10.value = newvalue[19]
     gridvalue11.value = newvalue[11]
-    gridvalue12.value =  newvalue[5] != undefined ?  newvalue[5].substring( 0 , newvalue[5].length -1 ) : ''
+    gridvalue12.value =  newvalue[5] != undefined ?  Number(newvalue[5].substring( 0 , newvalue[5].length -1 )) : ''
     gridvalue13.value =  newvalue[12]
     gridvalue14.value = newvalue[13]
     gridvalue15.value = newvalue[14]
@@ -324,11 +349,13 @@ const clickedRowData = (newvalue) => {
     clickrowData2.value = []
     clickrowData2.value = [...clickrowData2.value]
     if(newvalue[4] == '1'){
-      selectedPayDistinct.value = false 
-
+      if(newvalue[21]!='0'){
+        selectedPayDistinct.value = false
+      } else {
+        selectedPayDistinct.value = true
+      }
     } else {
-      console.log(newvalue[5])
-      if(newvalue[2].toString().startsWith('24')){
+      if(newvalue[2] == undefined ? false : newvalue[2].toString().startsWith('24')){
         selectedPayDistinct.value = false
       } else {
         selectedPayDistinct.value = true
@@ -346,6 +373,7 @@ const clickedRowData = (newvalue) => {
     // console.log(changeRow.value)
     if(newvalue[30]== true){
       isNew.value = true
+      clickaddrowSeq.value = rowData.value[newvalue.index].sequence
     } else {
       isNew.value = false
     }
@@ -365,7 +393,10 @@ const clickedRowData = (newvalue) => {
    if(firstarr.length > 0 && firstarr[0] !==''){
     for(var i=0 ; i < firstarr.length ; i ++){
       const change =  dupliarr.find(item => item.menuCd == firstarr[i])
-      change.checkbox = true
+      if(change){
+        change.checkbox = true
+      }
+     
     }
    }
   
@@ -434,6 +465,12 @@ const selectedIndex2 = (e) => {
     if(newValue == '-1'){
     afterSearch.value = false;
     initAll();
+    rowData.value = []
+    rowData2.value = []
+    rowData3.value = []
+    updateRow.value = []
+    filteredrowData5.value = []
+    clickrowData4.value = []
     afterClickrow.value = true
     return ;
     }
@@ -496,7 +533,7 @@ const confirmData = ref([])
      taxs.value = res.data.TAX
      disCountGroup.value = res.data.DISGROUP
      approveGroup.value = res.data.APPROVE
-     const res2 = await getMenuList(groupCd.value , nowStoreCd.value)
+     const res2 = await getMenuListIncludeCommon(groupCd.value , nowStoreCd.value)
      rowData2.value = res2.data.menuList
      SubMenuGroup.value = res2.data.submenuGroup
      MenuGroup.value = res2.data.menuGroup
@@ -520,6 +557,7 @@ approveType.value = Array.from(
       store.state.loading = false; // 로딩 상태 종료
     
        afterSearch.value = true;
+       isNew.value = false
   }
   
 
@@ -553,14 +591,13 @@ const selectedMenu = ref(1)
   const changeInfo = (e) => {
      const tagName = e.target.name;
      let value2 = e.target.value
-    console.log(rowData.value)
-     
+
      if(tagName == 'lngCode'){
        const convert = value2.replace(/[^0-9]/g,'')
        console.log(convert)
        gridvalue5.value = convert
        value2 = convert
-      
+       return ;
      }
      if(tagName =='lngAmt'){
        if(gridvalue11.value == 0 ){
@@ -571,6 +608,7 @@ const selectedMenu = ref(1)
         changeColid.value = tagName
        }
        changeNow.value = !changeNow.value
+       return ;
       }
 
          changeValue2.value = value2   
@@ -654,22 +692,41 @@ const changeRow2 = ref()
 const changeValue3 = ref(true)
 const changeColid2 = ref('checkbox')
 const changeNow2 = ref(false)
-const checkedRowData = (e) => {
-    console.log(e)
-  /////////////////////////////////////////////////////////////////////////////////////////////////////
-  //  for(var i = 0 ; i< arr.length ; i++){
-  
-  //    const checkrow = clickrowData2.value.find(item => item.menuCd == arr[i])
-  //    console.log(checkrow)
-  //    if(checkrow.checkbox == undefined || checkrow.checkbox == false){
-  //     checkrow.checkbox = true
-  //    } else {
-  //     checkrow.checkbox = false
-  //    }
-  //  }
-  //  clickrowData2.value = [...clickrowData2.value]
-  //  console.log(clickrowData2.value)
- 
+const checkedRowData = (e) => { 
+  const temp = e.map(item => item.menuCd);
+
+  const rowDataMap = new Map(
+    rowData.value.map(row => [
+    row.sequence !== undefined ? row.sequence : row.lngCode.toString(),
+    row
+  ])
+);
+
+const targetKey = (isNew.value == false ? gridvalue5.value.toString() : clickaddrowSeq.value);
+
+
+const targetRow = rowDataMap.get(targetKey);
+
+if (targetRow) {
+  targetRow.checkedMenu = temp.join(','); 
+
+  rowData.value = [...rowData.value]; // Trigger reactivity
+
+} else {
+
+  const targetKey2 = clickaddrowSeq.value.toString();
+  const targetRow2 = rowDataMap.get(targetKey2);
+  if (targetRow2) {
+    targetRow2.checkedMenu = temp.join(',');
+    rowData.value = [...rowData.value]; // Ensure reactivity here too
+  } else {
+    console.error('Both target rows not found!');
+  }
+}
+
+changeColid.value = 'checkedMenu'
+changeValue2.value = temp.join(',') ;
+changeNow.value = !changeNow.value
 }
 const checkedRowData2 = (e) => {
   // changeColid.value = 'unchecklngCode'
@@ -694,6 +751,9 @@ const clickaddrowSeq = ref()
 const addRow = () => {
   const today = new Date();
   const formattedDate = today.toLocaleDateString('en-CA');
+  if(nowStoreCd.value=='0'){
+    clickedStoreNm.value = 'COMMON'
+  }
   addrowDefault.value = nowStoreCd.value+','+clickedStoreNm.value+ ','+formattedDate+','+'9999-12-31'+','+''+','+''+','+''+','+''+','+'0'
   addrowProp.value = 'lngStoreCode,storeName,dtmFromDate,dtmToDate,lngDiscType,lngRoundType,lngTax,strIcon,blnInactive'
   console.log(addrowProp.value)
@@ -877,32 +937,46 @@ const updatedRowData = (newvalue) => {
 }
 const updatedList2 = ref([])
 const updatedRowData2 = (newvalue) => {
-   for(var i = 0 ; i < newvalue.length ; i++){
-      if(newvalue[i].checkbox == true){
-        const findrow = clickrowData2.value.find(item => item.menuCd == newvalue[i].menuCd)
-        findrow.checkbox = true ;
-      } else {
-        const findrow = clickrowData2.value.find(item => item.menuCd == newvalue[i].menuCd)
-        findrow.checkbox = false ;
-      }
-   }
-   clickrowData2.value = [...clickrowData2.value]
+  //  for(var i = 0 ; i < newvalue.length ; i++){
+  //     if(newvalue[i].checkbox == true){
+  //       const findrow = clickrowData2.value.find(item => item.menuCd == newvalue[i].menuCd)
+  //       findrow.checkbox = true ;
+  //     } else {
+  //       const findrow = clickrowData2.value.find(item => item.menuCd == newvalue[i].menuCd)
+  //       findrow.checkbox = false ;
+  //     }
+  //  }
+  //  clickrowData2.value = [...clickrowData2.value]
 
 
-   const temp = ref([])
-   for(var i = 0 ;  i< clickrowData2.value.length ; i++ ){
-      if(clickrowData2.value[i].checkbox == true){
-        temp.value.push(clickrowData2.value[i].menuCd)
-      }
-   }
+//    const temp = ref([])
+//    temp.value = clickrowData2.value.filter(item => item.checkbox === true).map(item => item.menuCd);
 
 
-   const findrow = rowData.value.find(item => item.lngCode == gridvalue5.value)
- 
-   if(findrow){
-    findrow.checkedMenu = temp.value.join(',')
-   }
 
+//    //const findrow = rowData.value.find(item => item.lngCode == gridvalue5.value)
+//    const rowDataMap = new Map(rowData.value.map(row => [row.lngCode.toString(), row]));
+
+//   //  if(findrow){
+//   //   findrow.checkedMenu = temp.value.join(',')
+//   //  }
+
+//   const targetRow = rowDataMap.get(gridvalue5.value.toString()); // Map을 통해 빠르게 찾기
+//   console.log(targetRow)
+//   if (targetRow) {
+//     // targetRow가 있으면 값을 업데이트
+//     targetRow.checkedMenu = temp.value.join(',')
+//   } else {
+//     // find 방식 대신 sequence로 찾기
+//     const targetRow2 = rowDataMap.get(clickaddrowSeq.value.toString());
+   
+//      // targetRow가 있으면 값을 업데이트
+//      targetRow2.checkedMenu = temp.value.join(',')
+//   }
+
+
+// rowData.value = [...rowData.value]
+// console.log(rowData.value)
     
 }
 
@@ -1166,9 +1240,7 @@ const initAll = () => {
     gridvalue23.value = ''
     gridvalue24.value = ''
     gridvalue25.value = ''
-    rowData.value = []
-    rowData2.value = []
-    updateRow.value = []
+  
 }
 </script>
 

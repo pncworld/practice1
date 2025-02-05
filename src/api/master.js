@@ -263,6 +263,12 @@ export const getMenuList = ( groupCd , storeCd) => {
         STORE_CD: storeCd
     })
 }
+export const getMenuListIncludeCommon = ( groupCd , storeCd) => {
+    return api2.post('/MIMASTER/MST36_001INS.asmx/getMenuListIncludeCommon' , {
+        GROUP_CD: groupCd,
+        STORE_CD: storeCd
+    })
+}
 
 export const getTablePosMenuKey = ( groupCd , storeCd , areaCd , posNo) => {
     return api2.post('/MIMASTER/MST05_011INS.asmx/getTablePosMenuKey' , {

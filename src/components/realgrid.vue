@@ -307,6 +307,11 @@ const props = defineProps({
     type: String,
     default: ''
   } 
+  ,
+  showTooltip: { 
+    type: Boolean,
+    default: false
+  } 
  
 });
 
@@ -623,12 +628,14 @@ gridView.onSelectionChanged = function (grid) {
 gridView.onShowTooltip = function(grid, index, value) {
   var column = index.fieldName;
   var itemIndex = index.itemIndex;
- 
+  if(props.showTooltip == true){
+
   var tooltip = '';
   if (column == "checkbox" && grid.getValue(itemIndex, "lngMenu") == '0') {
     tooltip = "해당 결제코드는 할인대상메뉴가 '전체 선택'이므로, 모든 메뉴에 적용되었습니다.";
   } 
   return tooltip;
+}
 };
 
 gridView.onCellClicked = function (grid, clickData) {
@@ -1108,19 +1115,22 @@ watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) 
   console.log(props.searchColValue2)
 
 
-
   if(props.searchColId2 !== ''){
+  
      searchColId2 = props.searchColId2.split(',')
+    
   }
   if(newValue2 !== ''){
-    searchColValues = newValue2.split(',')
    
+    searchColValues = newValue2.split(',')
+  
   }
   
  if(searchColId2 == undefined){
    if (newValue === '') {
+   
     dataProvider.setRows( props.rowData );
-
+ 
     return ;
    };
    const filteredData = props.rowData.filter(
