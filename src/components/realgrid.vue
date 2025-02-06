@@ -313,6 +313,17 @@ const props = defineProps({
     default: false
   } 
  
+  ,
+  searchPrimaryId: { 
+    type: String,
+    default: ''
+  } 
+  ,
+  setStateBar: { 
+    type: Boolean,
+    default: true
+  } 
+ 
 });
 
 const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}`); // 동적 ID 설정
@@ -518,6 +529,12 @@ gridView.setColumnLayout(layout1)
   gridView.displayOptions.selectAndImmediateDrag = (props.dragOn == true ? true : false)
   gridView.displayOptions.selectionStyle = props.selectionStyle 
   gridView.displayOptions.showTooltip = true;
+  if(props.setStateBar == false){
+    gridView.setStateBar({
+     visible: false
+    });
+  }
+  
   for (let i = dataProvider.getRowCount() - 1; i >= 0; i--) { // 역순으로 순회
   const rowData = dataProvider.getJsonRow(i);
   if (rowData.deleted) {
@@ -1109,6 +1126,7 @@ watch(() => props.rowData, () => {
 });
 
 watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) => {
+  
   const searchColId = props.searchColId.split(',')
   let searchColId2;
   let searchColValues;

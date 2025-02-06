@@ -16,6 +16,8 @@ import { far } from '@fortawesome/free-regular-svg-icons'; // Regular 아이콘
 import 'realgrid/dist/realgrid-style.css';
 import VueKonva from 'vue-konva';
 import Swal from 'sweetalert2'
+import VueSelect from 'vue-select'
+import "vue-select/dist/vue-select.css";
 
 
 library.add(fas ,far );
@@ -28,6 +30,7 @@ const app = createApp(App)
   .component('VueDatePicker', VueDatePicker)
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('VDatePicker', DatePicker)
+  .component('v-select', VueSelect)
   .component('VCalendar', Calendar).mount('#app');
 
 // 전역 오류 핸들러 설정
