@@ -117,7 +117,7 @@
 <div class="justify-center items-center bg-gray-100 border flex">메뉴당객수</div>
 <div class="flex justify-center items-center"><input type="number" name="intCustCount" id="" class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-100" v-model="gridvalue15" @input="changeInfo" :disabled="afterClick" ></div>
 <div class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">*주메뉴종속</div>
-<div class="space-x-5 flex  items-center border justify-left pl-2"><label for="autopay1"><input type="radio" id="autopay1" name="blnCondimentprice" v-model="gridvalue100" value="1" :disabled="afterClick" class="disabled:bg-gray-200" @click="disableKPG">예</label><label for="autopay2"><input type="radio" id="autopay2" name="blnCondimentprice" v-model="gridvalue100" value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200" @click="disableKPG">아니오</label>
+<div class="space-x-5 flex  items-center border justify-left pl-2"><label for="autopay1"><input type="radio" id="autopay1" name="blnCondimentprice" v-model="gridvalue100" value="1" :disabled="afterClick" class="disabled:bg-gray-200" @click="disableKPG" @input="changeInfo">예</label><label for="autopay2"><input type="radio" id="autopay2" name="blnCondimentprice" v-model="gridvalue100" value="0" @input="changeInfo" :disabled="afterClick" class="disabled:bg-gray-200" @click="disableKPG">아니오</label>
 <select name="lngKPG" id="" class="border h-[80%] w-[60%] rounded-lg pl-1 disabled:bg-gray-200 ml-3" :disabled="afterClick || gridvalue100==0 " v-model="gridvalue18" @change="changeInfo($event); resetKPG($event);">
   <option value="">선택</option> 
   <option :value="i.strDCode" v-for="i in MENUDEPEND">[{{ i.strDCode }}]{{i.strDName}}</option>
@@ -376,12 +376,14 @@ gridvalue29.value = newvalue[27]
 gridvalue30.value = newvalue[28]
 gridvalue31.value = newvalue[29]
 
-if(gridvalue16.value != 0){
+if(gridvalue16.value == 1){
   gridvalue100.value = 1
   disabledKPG.value = true
+  showKPG.value = true
 } else {
   gridvalue100.value = 0
   disabledKPG.value = false
+  showKPG.value = false
 }
 discountDisabled.value = ((newvalue[9] == 0 || newvalue[12]==1 ) && afterSearch.value == true && afterClick.value == false)
 fileName.value = newvalue[31] 
@@ -700,7 +702,7 @@ filteredapproveType.value = approveGroup.value.filter(item => item.strDCode1 == 
 })
 
 const saveButton = () => {
-
+console.log(rowData.value)
 if(afterSearch.value == false) {
 Swal.fire({
   title: '경고',
@@ -720,7 +722,7 @@ Swal.fire({
 return ;
 }
 
-const validateRow = rowData.value.filter(item =>  item.lngCode == '' || item.lngCode == undefined || item.strName == '' || item.strName == undefined || item.lngMainGroup == undefined || item.lngMainGroup == 0 || item.lngSubGroup == undefined || item.lngSubGroup == 0 ||  item.dtmToDate == undefined ||  item.dtmFromDate == undefined ||  item.lngPrice == undefined  ||  item.blnInactive == undefined ||  item.lngTax == undefined).length
+const validateRow = rowData.value.filter(item =>  item.lngCode == '' || item.lngCode == undefined || item.strName == '' || item.strName == undefined || item.lngMainGroup == undefined || item.lngMainGroup == 0 || item.lngSubGroup == undefined || item.lngSubGroup == 0 ||  item.dtmToDate == undefined ||  item.dtmFromDate == undefined ||  item.lngPrice == undefined  ||  item.blnInactive == undefined ||  item.lngTax == undefined || item.lngKPG == '').length
 
 if(validateRow > 0 ) {
 Swal.fire({

@@ -656,7 +656,9 @@ gridView.onShowTooltip = function(grid, index, value) {
 };
 
 gridView.onCellClicked = function (grid, clickData) {
- 
+  if(clickData.cellType === "header"){
+    gridView.setCurrent({ dataRow : selectedindex.value })
+  }
   if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
     return ;
   }
