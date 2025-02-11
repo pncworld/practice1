@@ -338,10 +338,14 @@ const selectedindex = ref(-1)
 const emit = defineEmits(["selcetedrowData" , "updatedRowData" , "clickedRowData" ,"dblclickedRowData" ,"selectedIndex" , "checkedRowData" ]);
 const funcshowGrid = async () => {
  
-  if (gridView !==undefined && gridView !==null  ) {
-   
+  if (gridView !==undefined && gridView !==null ) {
+  
     dataProvider.clearRows();
-    gridView.destroy(); // 기존 그리드 인스턴스 제거
+    
+   
+      gridView.destroy();
+ 
+    // 기존 그리드 인스턴스 제거
   
   }else {
 
@@ -364,7 +368,8 @@ const funcshowGrid = async () => {
   // 필드 정의
   const fields = tabInitSetArray.value.map(item => ({
     fieldName: item.strColID,
-    dataType : item.strColID.includes('checkbox') ? 'boolean' : (item.strColType == 'number' ? 'number' : 'text'),
+    dataType : item.strColID.includes('checkbox') ? 'boolean' : (item.strColType == 'number'  || item.strColType === 'float') ? 'number' : 'text',
+  
   }));
   fields.push({fieldName: "deleted", dataType: "boolean" })
   if(props.addField == 'new'){
@@ -384,6 +389,7 @@ const funcshowGrid = async () => {
       styleName: `header-style-${index}`,
       checkLocation : item.strColID.includes('checkbox') ? 'left' : 'none'
     },
+    numberFormat : item.strColType == 'float' ? '#,##0' : '##0' ,
     width: item.intHdWidth,
     editor: {
     type: 'line', 
@@ -441,6 +447,7 @@ const funcshowGrid = async () => {
   }
   
   if(props.setNumberformatColumn !=''){
+  
     let formatcolumn = columns.find(item => item.fieldName == props.setNumberformatColumn)
 
     formatcolumn.numberFormat = "#,##0.00";

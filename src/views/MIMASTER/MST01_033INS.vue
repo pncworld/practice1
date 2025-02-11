@@ -379,7 +379,12 @@ gridvalue31.value = newvalue[29]
 if(gridvalue16.value == 1){
   gridvalue100.value = 1
   disabledKPG.value = true
-  showKPG.value = true
+  if(gridvalue18.value !='1' && gridvalue18.value !='99'){
+    showKPG.value = false
+  } else {
+    showKPG.value = true
+  }
+  
 } else {
   gridvalue100.value = 0
   disabledKPG.value = false
@@ -603,6 +608,7 @@ searchWord.value = e.target.value
 const changeInfo = (e) => {
  const tagName = e.target.name;
  const value2 = e.target.value
+ console.log(value2)
  changeColid.value = tagName
  changeValue2.value = value2
  changeNow.value= !changeNow.value
@@ -1304,6 +1310,9 @@ const disableKPG = (e)=>{
       disabledKPG.value = false
       showKPG.value = true
       gridvalue18.value = '1'
+      changeColid.value = 'lngKPG'
+      changeValue2.value = '1'
+      changeNow.value= !changeNow.value
     }
 }
 const showKPG = ref(true)

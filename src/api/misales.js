@@ -27,6 +27,59 @@ export const dailySaleReport = (groupCd, storeCd,startDate,endDate,strLanguage) 
     });
 };
 
+export const getReceiptDatas = (groupCd, storeCd, posNo, dtmDate ,receiptNo , discountCd , payCd ,strlang) => {
+
+  return api2.post('/MISALES/SLS02_011RPT.asmx/getReceiptDatas', {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      POS_NO : posNo ,
+      DTM_DATE: dtmDate,
+      RECEIPT_NO: receiptNo,
+      DISCOUNT_CD: discountCd,
+      PAY_CD: payCd ,
+      STRLANG : strlang
+  });
+};
+export const getDiscountCdList = (groupCd, storeCd) => {
+
+  return api2.post('/MISALES/SLS02_011RPT.asmx/getDiscountCdList', {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd
+  });
+};
+export const getpayCodeList = (groupCd, storeCd) => {
+
+  return api2.post('/MISALES/SLS02_011RPT.asmx/getpayCodeList', {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd
+  });
+};
+export const getCustInfo = (groupCd, storeCd ,seqId) => {
+
+  return api2.post('/MISALES/SLS02_011RPT.asmx/getCustInfo', {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd ,
+      SEQ_ID : seqId
+  });
+};
+export const getOrderInfo = (groupCd, storeCd ,seqId) => {
+
+  return api2.post('/MISALES/SLS02_011RPT.asmx/getOrderInfo', {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd ,
+      SEQ_ID : seqId
+  });
+};
+export const getPayInfo = (groupCd, storeCd ,seqId , lang) => {
+
+  return api2.post('/MISALES/SLS02_011RPT.asmx/getPayInfo', {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd ,
+      SEQ_ID : seqId ,
+      STRLANG : lang
+  });
+};
+
 
 
 

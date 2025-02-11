@@ -369,8 +369,7 @@ const clickedRowData = (newvalue) => {
       selectedMultiple.value = true
     }
 
-    // changeRow.value = rowData.value.findIndex((item) => item.lngCode == newvalue[2])
-    // console.log(changeRow.value)
+   
     if(newvalue[30]== true){
       isNew.value = true
       clickaddrowSeq.value = rowData.value[newvalue.index].sequence
@@ -385,10 +384,10 @@ const clickedRowData = (newvalue) => {
       const aIndex = firstarr.indexOf(a.menuCd);
       const bIndex =  firstarr.indexOf(b.menuCd);
 
-  if (aIndex === -1 && bIndex === -1) return 0; // 둘 다 우선순위에 없음
+  if (aIndex === -1 && bIndex === -1) return Number(a.menuCd) - Number(b.menuCd); // 둘 다 우선순위에 없음
   if (aIndex === -1) return 1; // a가 우선순위에 없음
   if (bIndex === -1) return -1; // b가 우선순위에 없음
-  return aIndex - bIndex; // 우선순위 배열에 따라 정렬
+  return Number(a.menuCd) - Number(b.menuCd) // 우선순위 배열에 따라 정렬
 });
    if(firstarr.length > 0 && firstarr[0] !==''){
     for(var i=0 ; i < firstarr.length ; i ++){
@@ -613,7 +612,7 @@ const selectedMenu = ref(1)
 
          changeValue2.value = value2   
         changeColid.value = tagName
-      changeNow.value = !changeNow.value
+        changeNow.value = !changeNow.value
 //        const findrow = rowData.value.find(item => item.lngCode == gridvalue5.value)
 
 //        const findrowlength = rowData.value.filter(item => item.lngCode == gridvalue5.value).length 
@@ -782,7 +781,7 @@ watch(gridvalue9 , () => {
 })
 
 const saveButton = () => {
-   console.log(rowData.value)
+   console.log(rowData.value.filter(item => item.checkedMenu != ""))
   if(afterSearch.value == false) {
     Swal.fire({
       title: '경고',
@@ -825,7 +824,13 @@ if(validateRow2 == false ) {
     })
     return ;
   }
-
+  rowData.value = rowData.value.map(item => {
+    if (item.payDistinct != '1') {
+        item.checkedMenu = ''  // checkedMenu 값을 빈 문자열로 설정
+    }
+    return item;  // 수정된 item을 반환
+});
+   console.log(rowData.value)
   Swal.fire({
     title: '저장',
       text: '저장 하시겠습니까?',
@@ -863,7 +868,7 @@ if(validateRow2 == false ) {
     const unchecklngCodes = rowData.value.filter(item => item.deleted !== true ).map(item => item.unchecklngCode )
     const deleteCd = rowData.value.filter(item => item.deleted == true ).map(item => item.lngCode)
     
-
+  
    const res = await savePayCode( groupCd.value ,
    nowStoreCd.value,
    lngStoreCodearr.join(','),

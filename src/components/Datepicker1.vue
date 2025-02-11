@@ -4,12 +4,15 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 const formatDate = (date) => date.toISOString().split('T')[0]
 const selectedDate = ref(formatDate(new Date()))
 const emit = defineEmits(['dateValue','year','month','day']);
- 
+
+onMounted(() => {
+    emit('dateValue',selectedDate.value)
+})
 const emitDate = () => {
     console.log(selectedDate.value)
     emit('dateValue',selectedDate.value)
