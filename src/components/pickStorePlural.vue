@@ -53,7 +53,7 @@ const selectedStoreGroup2 = ref(store.state.storeGroup[0].lngStoreGroup)
 const selectedStoreType = ref(0)
 const selectedStoreTeam = ref(0)
 const selectedSuperVisor = ref(0)
-const emit = defineEmits(['lngStoreGroups','lngStoreCodes']);
+const emit = defineEmits(['lngStoreGroups','lngStoreCodes','lngStoreAttrs','lngStoreGroup']);
 const props = defineProps({
   initCheckBox: {
     type: Boolean,
@@ -76,7 +76,7 @@ onMounted(() => {
     storeTeam.value = store.state.storeTeamCode
     storeSuperVisor.value = store.state.storeSupervisor
     rowData.value = store.state.storeCd
-   
+    emit('lngStoreGroup' ,store.state.storeGroup[0].lngStoreGroup)
     labelsData.value.push(store.state.storeGroup.map(item => item.strName))
     valuesData.value.push(store.state.storeGroup.map(item => item.lngStoreGroup))
 
@@ -136,13 +136,16 @@ const showStoreList = () => {
 
 const sendStoreGroups = ref([])
 const sendStoreCodes = ref([])
+const sendStoreAttrs = ref([])
 const checkedRowData = (e) => {
     sendStoreGroups.value =  rowData.value.filter(item => item.checkbox == true).map(item => item.lngStoreGroup)
     sendStoreCodes.value = rowData.value.filter(item => item.checkbox == true).map(item => item.lngStoreCode)
+    sendStoreAttrs.value = rowData.value.filter(item => item.checkbox == true).map(item => item.lngStoreAttr)
 
    
     emit('lngStoreGroups', sendStoreGroups.value)
     emit('lngStoreCodes' , sendStoreCodes.value)
+    emit('lngStoreAttrs' , sendStoreAttrs.value)
 }
 const searchword = (e) => {
     searchWord.value = e.target.value

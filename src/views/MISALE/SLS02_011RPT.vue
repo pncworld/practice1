@@ -13,12 +13,12 @@
               
             </div>
             </div>
-            <div class="grid grid-rows-2 grid-cols-3 justify-between  bg-gray-200 rounded-lg h-24 items-center">
+            <div class="grid grid-rows-2 grid-cols-3 justify-between  bg-gray-200 rounded-lg h-24 items-center z-10">
                   <div><Datepicker1 @dateValue="dateValue" @year="year" @month="month" @day="day"></Datepicker1></div>
                   <div><PickStoreRenew @update:storeCd="selectedStoreCd" @update:storeGroup="selectedGroupCd" @update:storeType="changeStoreType"></pickStoreRenew></div>
-                    <div><PosList :groupCd="groupCd" :storeCd="storeCd" @posNo="posNo" class="!mr-10" :init="init"></posList></div>
-                  <div class="text-base font-semibold w-[90%] ml-10">영수증 번호: <input type="text" class="border rounded-lg pl-1 h-10 !w-36" v-model="receiptNo"></div>
-                  <div class="grid !mr-10  items-center relative"><DisCountCdList class="!mr-10 flex justify-start absolute right-5 w-[150%]" @disCountCd="DisCountCd" :groupCd="groupCd" :storeCd="storeCd" :init="init"></DisCountCdList></div>
+                    <div><PosList :groupCd="groupCd" :storeCd="storeCd" @posNo="posNo" class="!ml-3" :init="init"></posList></div>
+                  <div class="text-base font-semibold w-[90%] ml-10 z-10">영수증 번호: <input type="text" class="border rounded-lg pl-1 h-10 !w-36 z-30" v-model="receiptNo"></div>
+                  <div class="grid !mr-10  items-center relative"><DisCountCdList class=" flex absolute -right-1 w-[150%]" @disCountCd="DisCountCd" :groupCd="groupCd" :storeCd="storeCd" :init="init"></DisCountCdList></div>
                   <div class="relative"><PayCodeList class="absolute right-5 flex -mt-5 left-[155px]" @payCd="selectedpayCd" :groupCd="groupCd" :storeCd="storeCd" :init="init"></payCodeList></div> 
                 </div> 
 
@@ -74,7 +74,7 @@ const lngStoreCodes = (e) => {
     console.log(e)
 }
 
-const receiptNo = ref("")
+const receiptNo = ref()
 const initCheckBox = ref(false)
 const initSearchWord = ref(false)
 const store = useStore();
@@ -96,7 +96,7 @@ const searchButton = async() =>{
     }
   store.state.loading = true;
   try {
-  
+    initGrid()
     const res = await getReceiptDatas(groupCd.value , storeCd.value , selectedPosNo.value, selectedDate.value  ,receiptNo.value, disCountCd.value,  payCd.value ,loginedstrLang   )
     console.log(res)
 
@@ -106,6 +106,7 @@ const searchButton = async() =>{
     afterSearch.value = false
   } finally {
     store.state.loading = false;
+   
   }
 
 }
@@ -170,6 +171,8 @@ const clickedRowData = async(e) => {
     const res3 = await getPayInfo(groupCd.value ,storeCd.value ,seqId , loginedstrLang)
 
     rowData4.value = res3.data.PAYLIST
+
+     console.log(res3)
 
 }
 

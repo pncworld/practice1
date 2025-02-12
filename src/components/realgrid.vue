@@ -323,6 +323,26 @@ const props = defineProps({
     type: Boolean,
     default: true
   } 
+  ,
+  setFooter: { 
+    type: Boolean,
+    default: false
+  } 
+  ,
+  setGroupFooter: { 
+    type: Boolean,
+    default: false
+  } 
+  ,
+  setFooterExpressions: { 
+    type: Array,
+    default: []
+  } 
+  ,
+  setFooterColID: { 
+    type: Array,
+    default: []
+  } 
  
 });
 
@@ -368,7 +388,7 @@ const funcshowGrid = async () => {
   // 필드 정의
   const fields = tabInitSetArray.value.map(item => ({
     fieldName: item.strColID,
-    dataType : item.strColID.includes('checkbox') ? 'boolean' : (item.strColType == 'number'  || item.strColType === 'float') ? 'number' : 'text',
+    dataType : item.strColID.includes('checkbox') ? 'boolean' : (item.strColType == 'number'  || item.strColType === 'float' || item.strColType === 'double') ? 'number' : 'text',
   
   }));
   fields.push({fieldName: "deleted", dataType: "boolean" })
@@ -389,8 +409,17 @@ const funcshowGrid = async () => {
       styleName: `header-style-${index}`,
       checkLocation : item.strColID.includes('checkbox') ? 'left' : 'none'
     },
-    numberFormat : item.strColType == 'float' ? '#,##0' : '##0' ,
+    groupFooter: {
+      expression: props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)],
+      numberFormat: "#,##0",
+    },
+    footer :{
+      expression : props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)],
+      numberFormat: "#,##0",
+    },
     width: item.intHdWidth,
+    numberFormat: item.strColType == 'float' ? '#,##0' : item.strColType == 'double' ? '#,##0.0' : '#,##0' ,
+    styleName : item.strAlign == 'left' ? 'setTextAlignLeft' : item.strAlign == 'center' ? 'setTextAlignCenter'  : 'setTextAlignRight',
     editor: {
     type: 'line', 
     inputCharacters: item.strColID == props.inputOnlyNumberColumn ? '0123456789' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ㄱ-힣!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
@@ -516,7 +545,7 @@ gridView.setColumnLayout(layout1)
   
  
   // 기타 옵션
-  gridView.setFooters({ visible: false });
+  gridView.setFooters({ visible: props.setFooter == false ? false : true });
   gridView.setRowIndicator({ visible: true });
   gridView.setCheckBar({ visible: props.showCheckBar });
   gridView.displayOptions.fitStyle = 'even';
@@ -536,6 +565,19 @@ gridView.setColumnLayout(layout1)
   gridView.displayOptions.selectAndImmediateDrag = (props.dragOn == true ? true : false)
   gridView.displayOptions.selectionStyle = props.selectionStyle 
   gridView.displayOptions.showTooltip = true;
+  gridView.groupPanel.visible = false;
+  if(props.setGroupFooter == true){
+    gridView.groupBy(["dtmDate"]);
+    gridView.setRowGroup({
+    expandedAdornments: 'both',
+    collapsedAdornments: 'footer'
+});
+  }
+
+  if(props.setFooter == true){
+    gridView.setOptions({ summaryMode: "aggregate" });
+  }
+  
   if(props.setStateBar == false){
     gridView.setStateBar({
      visible: false
@@ -1217,6 +1259,18 @@ watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) 
 });
 </script>
 
-<style scoped>
-/* 동적 스타일이 삽입되므로 추가 스타일 정의는 필요 없음 */
+<style>
+
+.setTextAlignLeft{
+  text-align: left !important ;
+  white-space: pre !important;
+}
+.setTextAlignRight{
+  text-align: right !important ;
+  white-space: pre !important;
+}
+.setTextAlignCenter{
+  text-align: center !important;
+  white-space: pre !important;
+}
 </style>

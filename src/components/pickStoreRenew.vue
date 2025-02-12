@@ -13,12 +13,16 @@
           <option :value="item.lngStoreAttr" v-for="item in storeType" :key="item.lngStoreAttr">{{ item.strName }}</option>
         </select>
       </div>
-      <div class="flex items-center">
-        <input list="storeCd" id="fruits">
-        <datalist id="storeCd">
- <option :value="i.lngCode" v-for="i in storeCd"> {{  i.strName }}</option>
-</datalist>
-      </div>
+      <v-select
+    v-model="selectedStore"
+    :options="storeCd"
+    label="strName"
+    placeholder="선택"
+    class="!w-72 !h-7 -mt-3 custom-select"
+    :reduce="store => store != null ? store.lngStoreCode : null"
+    clearable="true"
+    @click="resetSelectedStore"
+  />
      
     </div>
 </template>
@@ -132,8 +136,8 @@ watch(selectedStore , () => {
   
 )
 
-const handleClear = (e) => {
-  selectedStore.value = 0
+const resetSelectedStore = (e) => {
+  selectedStore.value = null
 }
 </script>
 

@@ -1,6 +1,6 @@
 <template>
     <div class="text-base font-semibold w-full">
-     지불코드 : <select name="" id="" class="font-thin w-32 h-10 rounded-lg border ml-1 " @change="changePayCd" v-model="selectedPayCd">
+     지불코드 : <select name="" id="" class="font-thin w-44 h-10 rounded-lg border ml-1 pl-1 " @change="changePayCd" v-model="selectedPayCd">
         <option value="0">전체</option>
         <option :value="i.lngCode" v-for="i in payCodeList" >{{ i.strName }}</option>
      </select>

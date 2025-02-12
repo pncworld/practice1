@@ -79,6 +79,29 @@ export const getPayInfo = (groupCd, storeCd ,seqId , lang) => {
       STRLANG : lang
   });
 };
+export const getDailySalesReport = (groupCd ,storeCds , startDate , endDate , reporttype , lang) => {
+
+  return api2.post('/MISALES/SLS06_004RPT.asmx/getDailySalesReport', {
+      GROUP_CD: groupCd,
+      STORE_CDS : storeCds ,
+      START_DATE : startDate ,
+      END_DATE : endDate,
+      REPORT_TYPE : reporttype ,
+      LANG : lang
+  });
+};
+
+export const getDailySalesDetailReport = (groupCd ,storeCds , startDate , endDate , reporttype , lang) => {
+
+  return api2.post('/MISALES/SLS06_004RPT.asmx/getDailySalesDetailReport', {
+    GROUP_CD: groupCd,
+    STORE_CDS : storeCds ,
+    START_DATE : startDate ,
+    END_DATE : endDate,
+    REPORT_TYPE : reporttype ,
+    LANG : lang
+  });
+};
 
 
 
