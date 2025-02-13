@@ -18,8 +18,8 @@
                   <div><PickStoreRenew @update:storeCd="selectedStoreCd" @update:storeGroup="selectedGroupCd" @update:storeType="changeStoreType"></pickStoreRenew></div>
                     <div><PosList :groupCd="groupCd" :storeCd="storeCd" @posNo="posNo" class="!ml-3" :init="init"></posList></div>
                   <div class="text-base font-semibold w-[90%] ml-10 z-10">영수증 번호: <input type="text" class="border rounded-lg pl-1 h-10 !w-36 z-30" v-model="receiptNo"></div>
-                  <div class="grid !mr-10  items-center relative"><DisCountCdList class=" flex absolute -right-1 w-[150%]" @disCountCd="DisCountCd" :groupCd="groupCd" :storeCd="storeCd" :init="init"></DisCountCdList></div>
-                  <div class="relative"><PayCodeList class="absolute right-5 flex -mt-5 left-[155px]" @payCd="selectedpayCd" :groupCd="groupCd" :storeCd="storeCd" :init="init"></payCodeList></div> 
+                  <div class="grid !mr-44  items-center relative"><DisCountCdList class=" flex absolute -right-1 w-[150%]" @disCountCd="DisCountCd" :groupCd="groupCd" :storeCd="storeCd" :init="init"></DisCountCdList></div>
+                  <div class="flex justify-center items-center mt-3 ml-9"><PayCodeList class=" flex -mt-5 " @payCd="selectedpayCd" :groupCd="groupCd" :storeCd="storeCd" :init="init"></payCodeList></div> 
                 </div> 
 
                 <div class="grid grid-rows-1 grid-cols-[6.5fr,3.5fr] h-[80%] mt-5">
@@ -138,18 +138,33 @@ const rowData4 = ref([])
 const selectedPosNo = ref()
 const posNo = (e) => {
     console.log(e)
-    selectedPosNo.value = e
+    if(e == null){
+        selectedPosNo.value = 0
+    } else {
+        selectedPosNo.value = e
+    }
+   
 }
 
 const disCountCd = ref("")
 const DisCountCd = (e) => {
     console.log(e)
-    disCountCd.value = e
+    if(e == null){
+        disCountCd.value = 0
+    } else {
+        disCountCd.value = e
+    }
 }
 
 const payCd = ref("")
 const selectedpayCd = (e) => {
-    payCd.value = e
+
+
+    if(e == null){
+        payCd.value = 0
+    } else {
+        payCd.value = e
+    }
 }
 
 const valuesData = ref([['Sales Cancellation','Menu Correction','Order Cancellation']])

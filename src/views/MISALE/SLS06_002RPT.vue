@@ -2,7 +2,7 @@
     <div class="flex justify-between items-center w-full overflow-y-auto">
     <div class="flex justify-start  w-full pl-12 pt-4">
                <div class="flex justify-start"><h1 class="font-bold text-sm md:text-2xl w-full">
-                일자별 매출 현황.
+                시간대별 매출 현황.
                </h1></div>
                 
                </div>
@@ -14,10 +14,36 @@
               
             </div>
             </div>
-            <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-24 items-center z-10">
-                  <div class="grid grid-cols-1 grid-rows-2">
+            <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-32 items-center z-10">
+                  <div class="grid grid-cols-1 grid-rows-3 mt-5">
                     <Datepicker2 @endDate="endDate" @startDate="startDate"></Datepicker2>
-                    <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 ">조회조건 : <div><label for="detail" class="font-thin"><input type="checkbox" id="detail" class="ml-5"  @change="seeDetail">상세보기</label></div><div><label for="unite" class="font-thin"><input type="checkbox" id="unite"   class="ml-5 " @change="seeUnite">셀병합</label></div> </div>
+                    <div class="flex flex-col justify-start items-start text-nowrap ml-40 ">
+                       <div class=" text-nowrap flex justify-start items-center space-x-3 ml-4">
+                        <div class="text-base font-semibold">시간대 :</div>
+                        <div><select name="" id="" class="border rounded-lg w-16 h-8 mr-3">
+                            <option value="">주문</option>
+                            <option value="">계산</option>
+                        </select></div>
+                        <div><select name="" id="" class="border rounded-lg w-16 h-8">
+                            <option value="" v-for="i in times"></option>
+                        </select></div>
+                        <div>~</div>
+                        <div><select name="" id="" class="border rounded-lg w-16 h-8">
+                            <option value="" v-for="i in times"></option>
+                        </select></div>
+                        <div><label for=""><input type="checkbox">할인전 매출액</label></div>
+                    </div>
+                        </div>
+                        <div class="flex justify-center"><div>요일조건 : </div>
+                            <label for=""><input type="checkbox" id="mon">월</label>
+                            <label for=""><input type="checkbox" id="mon">화</label>
+                            <label for=""><input type="checkbox" id="mon">수</label>
+                            <label for=""><input type="checkbox" id="mon">목</label>
+                            <label for=""><input type="checkbox" id="mon">금</label>
+                            <label for=""><input type="checkbox" id="mon">토</label>
+                            <label for=""><input type="checkbox" id="mon">일</label>
+                        
+                        </div>
                   </div>
                   <div class="ml-10"><PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs"></PickStorePlural></div>
                   <div></div>

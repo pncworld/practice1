@@ -2,9 +2,9 @@
     <div class="flex justify-center items-center space-x-3 w-[600px] pl-20">
         <div class="pl-20 font-semibold  flex items-center text-nowrap text-base">매출일자 : </div>
         <div class="grid grid-cols-[2fr,1fr,2fr,1fr,1fr] grid-rows-1 justify-start h-11 pr-14 space-x-1">
-        <input type="date" class="border rounded-lg h-10 w-32 text-base mr-2 pl-5" v-model="selectedStartDate" >
+        <input type="date" class="border rounded-lg h-10 w-32 text-base mr-2 pl-5" v-model="selectedStartDate" max="9999-12-31" >
         <span class="items-center flex">~</span>
-        <input type="date" class="border rounded-lg h-10 w-32 text-base pl-5 ml-2" v-model="selectedEndDate" >
+        <input type="date" class="border rounded-lg h-10 w-32 text-base pl-5 ml-2" v-model="selectedEndDate" max="9999-12-31" >
         <button class="w-[600%] ml-2" @click="toggleRadio" ><img src="../assets/choiceCalendar.png"  class="w-full" alt="" >
         </button>
     </div>
@@ -107,8 +107,10 @@
 import { onMounted, ref, watch } from 'vue';
 
 const formatDate = (date) => date.toISOString().split('T')[0]
-const selectedStartDate = ref(formatDate(new Date()))
-const selectedEndDate = ref(formatDate(new Date()))
+const today = new Date();
+today.setDate(today.getDate() -1)
+const selectedStartDate = ref(formatDate(today))
+const selectedEndDate = ref(formatDate(today))
 
 const emitDate1 = (e) => {
     console.log(e)
@@ -127,19 +129,20 @@ const toggleRadio = (e) => {
 }
 const updateDateRange = (e) => {
     const TODAY = new Date();
+    TODAY.setDate(TODAY.getDate() - 1);
     if(e.target.value == 'lastweek'){
           const lastWeekStart = new Date(TODAY);
-          lastWeekStart.setDate(TODAY.getDate() - TODAY.getDay() - 7); // 지난 주 시작 날짜
+          lastWeekStart.setDate(TODAY.getDate() - TODAY.getDay() - 6); // 지난 주 시작 날짜
           const lastWeekEnd = new Date(TODAY);
-          lastWeekEnd.setDate(TODAY.getDate() - TODAY.getDay() - 1); // 지난 주 종료 날짜
+          lastWeekEnd.setDate(TODAY.getDate() - TODAY.getDay() ); // 지난 주 종료 날짜
           console.log(lastWeekStart)
           selectedStartDate.value = formatDateToYYYYMMDD(lastWeekStart);
           selectedEndDate.value = formatDateToYYYYMMDD(lastWeekEnd);
     } else  if(e.target.value == 'currentWeek'){
           const currentWeekStart = new Date(TODAY);
-          currentWeekStart.setDate(TODAY.getDate() - TODAY.getDay()); // 이번 주 시작 날짜
+          currentWeekStart.setDate(TODAY.getDate() - TODAY.getDay()+1); // 이번 주 시작 날짜
           const currentWeekEnd = new Date(TODAY);
-          currentWeekEnd.setDate(TODAY.getDate() ); // 이번 주 종료 날짜
+          currentWeekEnd.setDate(TODAY.getDate()+1); // 이번 주 종료 날짜
           selectedStartDate.value =  formatDateToYYYYMMDD(currentWeekStart);
           selectedEndDate.value  =  formatDateToYYYYMMDD(currentWeekEnd);
     } else  if(e.target.value == 'lastMonth'){

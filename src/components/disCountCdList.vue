@@ -1,9 +1,22 @@
 <template>
     <div class=" flex justify-center items-center space-x-3 ">
-     <div class="text-base font-semibold ">할인코드 :</div><select name="" id="" class="font-thin w-64 h-10 rounded-lg border " @change="changeDiscount" v-model="selectedDiscountNo">
+     <div class="text-base font-semibold ">할인코드 :</div>
+     <!-- <select name="" id="" class="font-thin w-64 h-10 rounded-lg border " @change="changeDiscount" v-model="selectedDiscountNo">
         <option value="0">전체</option>
         <option :value="i.lngCode" v-for="i in disCountList" >{{ i.strName }}</option>
-     </select>
+     </select> -->
+
+     <v-select
+    v-model="selectedDiscountNo"
+    :options="disCountList"
+    label="strName"
+    placeholder="전체"
+    class="!w-48 !h-7 -mt-3 custom-select"
+    :reduce="store => store != null ? store.lngCode : null"
+    clearable="true"
+    @click="clickDiscount"
+  
+  />
     </div>
 </template>
 
@@ -30,19 +43,27 @@ const props = defineProps({
 
     const emit = defineEmits(['disCountCd']);
 const disCountList = ref([])
-const selectedDiscountNo = ref(0)
+const selectedDiscountNo = ref(null)
 watch( () => props.storeCd , async() => {
        const res = await getDiscountCdList(props.groupCd , props.storeCd);
        disCountList.value = res.data.DISCOUNTLIST
-       console.log(res)
+       //console.log(res)
     })
 
-    const changeDiscount = (e) => {
-        emit('disCountCd' , e.target.value)
+    // const changeDiscount = (e) => {
+    //     console.log(e)
+    //     emit('disCountCd' , e.target.value)
+    // }
+
+    watch(selectedDiscountNo, () => {
+        emit('disCountCd' , selectedDiscountNo.value)
+    })
+    const clickDiscount = (e) => {
+        selectedDiscountNo.value = null
     }
 
     watch( () => props.init , () => {
-        selectedDiscountNo.value = 0
+        selectedDiscountNo.value = null
     
     })
 

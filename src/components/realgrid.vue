@@ -7,6 +7,7 @@ import { getGridInfoList, getRenderingData } from '@/api/common';
 import { GridView, LocalDataProvider } from 'realgrid';
 import { onMounted, ref, watch, nextTick } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
+import { formatLocalDate } from '@/customFunc/customFunc';
 let gridView;
 let dataProvider;
 /*
@@ -343,6 +344,37 @@ const props = defineProps({
     type: Array,
     default: []
   } 
+  ,
+  showOnlyChecked: { 
+    type: Boolean,
+    default: false
+  } 
+  ,
+  setGroupColumnId: { 
+    type: String,
+    default: 'dtmDate'
+  } 
+  ,
+  setGroupSumCustomText: { 
+    type: String,
+    default: '소계'
+  } 
+  ,
+  setGroupSumCustomColumnId: { 
+    type: String,
+    default: 'strWeekName'
+  } 
+  ,
+  setGroupCustomLevel: { 
+    type: String,
+    default: '1'
+  } 
+ 
+  ,
+  setGroupSummaryCenterIds: { 
+    type: String,
+    default: ' '
+  } 
  
 });
 
@@ -388,8 +420,8 @@ const funcshowGrid = async () => {
   // 필드 정의
   const fields = tabInitSetArray.value.map(item => ({
     fieldName: item.strColID,
-    dataType : item.strColID.includes('checkbox') ? 'boolean' : (item.strColType == 'number'  || item.strColType === 'float' || item.strColType === 'double') ? 'number' : 'text',
-  
+    dataType : item.strColID.includes('checkbox') ? 'boolean' : (item.strColType == 'number'  || item.strColType === 'float' || item.strColType === 'double') ? 'number' : (item.strColType  == 'date') ? 'datetime' : 'text',
+    datetimeFormat: "yyyy-MM-dd"
   }));
   fields.push({fieldName: "deleted", dataType: "boolean" })
   if(props.addField == 'new'){
@@ -410,13 +442,18 @@ const funcshowGrid = async () => {
       checkLocation : item.strColID.includes('checkbox') ? 'left' : 'none'
     },
     groupFooter: {
-      expression: props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)],
-      numberFormat: "#,##0",
+      text : item.strColID == props.setGroupSumCustomColumnId ? props.setGroupSumCustomText : ' ' ,
+      styleName :  props.setGroupSummaryCenterIds.includes(item.strColID) ? 'setTextAlignCenter' : 'setTextAlignRight',
+      expression: props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)] !='custom' ? props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)] : '',
+      numberFormat: item.strColType === 'double' ? "#,##0.0" : "#,##0",
+
     },
     footer :{
+      // text : item.strColID =='dtmDate' ? '소계' : '' ,
       expression : props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)],
-      numberFormat: "#,##0",
+      numberFormat: item.strColType === 'double' ? "#,##0.0" : "#,##0",
     },
+    datetimeFormat : 'yyyy-MM-dd',
     width: item.intHdWidth,
     numberFormat: item.strColType == 'float' ? '#,##0' : item.strColType == 'double' ? '#,##0.0' : '#,##0' ,
     styleName : item.strAlign == 'left' ? 'setTextAlignLeft' : item.strAlign == 'center' ? 'setTextAlignCenter'  : 'setTextAlignRight',
@@ -455,6 +492,7 @@ const funcshowGrid = async () => {
   }));
 
 
+
   if(props.labelingColumns != ''){
      const lcolumns = props.labelingColumns.split(',')
      const labels = props.labelsData
@@ -485,6 +523,18 @@ const funcshowGrid = async () => {
   
 
   gridView.setColumns(columns);
+
+  if(props.setFooterColID[props.setFooterExpressions.indexOf('custom')]){
+  
+    gridView.columnByField(props.setFooterColID[props.setFooterExpressions.indexOf('custom')]).groupFooter.valueCallback = function(grid, cell, footerIndex, footerModel,){
+    if(props.setGroupCustomLevel == 1){
+     
+        return formatLocalDate(dataProvider.getValue(footerModel.firstItem.dataRow,"dtmDate"));
+    }else if(props.setGroupCustomLevel == 2){
+        return "level2"
+    }
+}
+  }
   
 
 if(props.mergeColumns == true ) {
@@ -507,6 +557,7 @@ tabInitSetArray.value.forEach((item,index) => {
           text: props.mergeColumnGroupName,
           styleName: `header-style-0`
         },
+    
       };
     }
     groupItems.items.push(item.strHdText); // 그룹에 항목 추가
@@ -566,13 +617,16 @@ gridView.setColumnLayout(layout1)
   gridView.displayOptions.selectionStyle = props.selectionStyle 
   gridView.displayOptions.showTooltip = true;
   gridView.groupPanel.visible = false;
+
   if(props.setGroupFooter == true){
-    gridView.groupBy(["dtmDate"]);
+    gridView.groupBy([props.setGroupColumnId]);
     gridView.setRowGroup({
     expandedAdornments: 'both',
-    collapsedAdornments: 'footer'
+    collapsedAdornments: 'footer',
+    headerStatement: ""
 });
   }
+  
 
   if(props.setFooter == true){
     gridView.setOptions({ summaryMode: "aggregate" });
@@ -583,7 +637,8 @@ gridView.setColumnLayout(layout1)
      visible: false
     });
   }
-  
+  gridView.headerSummaries.visible = false; // 그룹핑 할때 상단 요약값 없애는 설정
+
   for (let i = dataProvider.getRowCount() - 1; i >= 0; i--) { // 역순으로 순회
   const rowData = dataProvider.getJsonRow(i);
   if (rowData.deleted) {
@@ -678,9 +733,12 @@ gridView.onSelectionChanged = function (grid) {
 
 
   selectedRowData.value= dataProvider.getRows()[current.dataRow];
-  selectedRowData.value.index = current.dataRow
+  if(selectedRowData.value){
+    selectedRowData.value.index = current.dataRow
   emit('clickedRowData', selectedRowData.value);
   emit('selectedIndex' , current.dataRow )
+  }
+  
 
   
 
@@ -715,7 +773,9 @@ gridView.onCellClicked = function (grid, clickData) {
    console.log(current)
   if(current.itemIndex != -1){
     selectedRowData.value= dataProvider.getRows()[current.dataRow];
+    if(selectedRowData.value){
    selectedRowData.value.index = current.dataRow
+  }
    selectedindex.value = current.dataRow
     
    console.log(selectedRowData.value)
@@ -1175,6 +1235,12 @@ watch(() => props.rowData, () => {
 
 
 });
+
+watch(() => props.showOnlyChecked , () => {
+
+   const filteredData = props.rowData.filter(item => item.checkbox == true)
+   dataProvider.setRows( filteredData)
+})
 
 watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) => {
   
