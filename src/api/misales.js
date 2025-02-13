@@ -102,6 +102,17 @@ export const getDailySalesDetailReport = (groupCd ,storeCds , startDate , endDat
     LANG : lang
   });
 };
+export const getTimeSalesReport = (groupCd ,storeCds , startDate , endDate , reporttype , lang) => {
+
+  return api2.post('/MISALES/SLS06_002RPT.asmx/getTimeSalesReport', {
+    GROUP_CD: groupCd,
+    STORE_CDS : storeCds ,
+    START_DATE : startDate ,
+    END_DATE : endDate,
+    REPORT_TYPE : reporttype ,
+    LANG : lang
+  });
+};
 
 
 
