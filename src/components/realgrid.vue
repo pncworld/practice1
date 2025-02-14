@@ -212,199 +212,219 @@ const props = defineProps({
     default: false,
   }
   ,
-  changeNow: { 
+  changeNow: {
     type: Boolean,
     default: false,
   }
   ,
-  changeValue2: { 
+  changeValue2: {
     type: String,
     default: '',
   }
   ,
-  setNumberformatColumn: { 
+  setNumberformatColumn: {
     type: String,
     default: '',
   }
   ,
-  setAllCheck: { 
+  setAllCheck: {
     type: Boolean,
-    default: false ,
+    default: false,
   }
   ,
-  deleteRow4: { 
+  deleteRow4: {
     type: Boolean,
-    default: false ,
+    default: false,
   },
-  defaultSearchAllValue: { 
+  defaultSearchAllValue: {
     type: Number,
-    default: 0 ,
+    default: 0,
   },
-  initCheckColumn: { 
+  initCheckColumn: {
     type: String,
-    default: '' ,
+    default: '',
   }
   ,
-  initCheckValue: { 
+  initCheckValue: {
     type: String,
-    default: '' 
+    default: ''
   },
-  initCheckAct: { 
+  initCheckAct: {
     type: Boolean,
     default: false
   }
   ,
-  initSelect: { 
+  initSelect: {
     type: Boolean,
     default: false
   }
   ,
-  setAllCheck2: { 
+  setAllCheck2: {
     type: Boolean,
     default: false
   }
   ,
-  uncheckColumn: { 
+  uncheckColumn: {
     type: String,
     default: ''
-  } 
+  }
   ,
-  uncheckValue: { 
+  uncheckValue: {
     type: String,
     default: ''
-  } 
+  }
   ,
-  uncheckAct: { 
+  uncheckAct: {
     type: Boolean,
     default: false
-  } 
+  }
   ,
-  maintaincheckColumn: { 
+  maintaincheckColumn: {
     type: String,
     default: ''
-  } 
+  }
   ,
-  hideRow: { 
+  hideRow: {
     type: Number,
     default: 0
-  } 
+  }
   ,
-  hideNow: { 
+  hideNow: {
     type: Boolean,
     default: ''
-  } 
+  }
   ,
-  changeOriginRow: { 
+  changeOriginRow: {
     type: Number,
     default: ''
-  } 
+  }
   ,
-  checkBarInactive: { 
+  checkBarInactive: {
     type: String,
     default: ''
-  } 
+  }
   ,
-  ExceptionCheck: { 
+  ExceptionCheck: {
     type: String,
     default: ''
-  } 
+  }
   ,
-  showTooltip: { 
+  showTooltip: {
     type: Boolean,
     default: false
-  } 
- 
+  }
+
   ,
-  searchPrimaryId: { 
+  searchPrimaryId: {
     type: String,
     default: ''
-  } 
+  }
   ,
-  setStateBar: { 
+  setStateBar: {
     type: Boolean,
     default: true
-  } 
+  }
   ,
-  setFooter: { 
+  setFooter: {
     type: Boolean,
     default: false
-  } 
+  }
   ,
-  setGroupFooter: { 
+  setGroupFooter: {
     type: Boolean,
     default: false
-  } 
+  }
   ,
-  setFooterExpressions: { 
+  setFooterExpressions: {
     type: Array,
     default: []
-  } 
+  }
   ,
-  setFooterColID: { 
+  setFooterColID: {
     type: Array,
     default: []
-  } 
+  }
   ,
-  showOnlyChecked: { 
+  showOnlyChecked: {
     type: Boolean,
     default: false
-  } 
+  }
   ,
-  setGroupColumnId: { 
+  setGroupColumnId: {
     type: String,
     default: 'dtmDate'
-  } 
+  }
   ,
-  setGroupSumCustomText: { 
+  setGroupSumCustomText: {
     type: String,
     default: '소계'
-  } 
+  }
   ,
-  setGroupSumCustomColumnId: { 
+  setGroupSumCustomColumnId: {
     type: String,
     default: 'strWeekName'
-  } 
+  }
   ,
-  setGroupCustomLevel: { 
+  setGroupCustomLevel: {
     type: String,
     default: '1'
-  } 
- 
+  }
+
   ,
-  setGroupSummaryCenterIds: { 
+  setGroupSummaryCenterIds: {
     type: String,
     default: ' '
-  } 
- 
+  }
+  ,
+  hideColumnNow: {
+    type: Boolean,
+    default: false
+  }
+  ,
+  hideColumn: {
+    type: String,
+    default: ''
+  }
+  ,
+  setRowGroupSpan: {
+    type: String,
+    default: ''
+  }
+  ,
+  documentTitle: {
+    type: String,
+    default: ''
+  }
+
 });
 
 const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}`); // 동적 ID 설정
 const tabInitSetArray = ref([]);
 const selectedRowData = ref([]);
-const result2 =ref([]) ;
-const deletedIndex =ref() ;
-const addrow4activated =ref(false) ;
-const deleted2activated =ref(false) ;
+const result2 = ref([]);
+const deletedIndex = ref();
+const addrow4activated = ref(false);
+const deleted2activated = ref(false);
 const updatedrowData = ref([])
 const selectedindex = ref(-1)
-const emit = defineEmits(["selcetedrowData" , "updatedRowData" , "clickedRowData" ,"dblclickedRowData" ,"selectedIndex" , "checkedRowData" ]);
+const emit = defineEmits(["selcetedrowData", "updatedRowData", "clickedRowData", "dblclickedRowData", "selectedIndex", "checkedRowData"]);
 const funcshowGrid = async () => {
- 
-  if (gridView !==undefined && gridView !==null ) {
-  
+
+  if (gridView !== undefined && gridView !== null) {
+
     dataProvider.clearRows();
-    
-   
-      gridView.destroy();
- 
+
+
+    gridView.destroy();
+
     // 기존 그리드 인스턴스 제거
-  
-  }else {
+
+  } else {
 
   }
 
   dataProvider = new LocalDataProvider();
-  
+
   // nextTick으로 DOM 업데이트 후 초기화
   await nextTick();
 
@@ -420,14 +440,14 @@ const funcshowGrid = async () => {
   // 필드 정의
   const fields = tabInitSetArray.value.map(item => ({
     fieldName: item.strColID,
-    dataType : item.strColID.includes('checkbox') ? 'boolean' : (item.strColType == 'number'  || item.strColType === 'float' || item.strColType === 'double') ? 'number' : (item.strColType  == 'date') ? 'datetime' : 'text',
+    dataType: item.strColID.includes('checkbox') ? 'boolean' : (item.strColType == 'number' || item.strColType === 'float' || item.strColType === 'double') ? 'number' : (item.strColType == 'date') ? 'datetime' : 'text',
     datetimeFormat: "yyyy-MM-dd"
   }));
-  fields.push({fieldName: "deleted", dataType: "boolean" })
-  if(props.addField == 'new'){
-    fields.push({fieldName: "new", dataType: "boolean" })
+  fields.push({ fieldName: "deleted", dataType: "boolean" })
+  if (props.addField == 'new') {
+    fields.push({ fieldName: "new", dataType: "boolean" })
   }
- 
+
 
 
   dataProvider.setFields(fields);
@@ -439,162 +459,176 @@ const funcshowGrid = async () => {
     header: {
       text: item.strHdText,
       styleName: `header-style-${index}`,
-      checkLocation : item.strColID.includes('checkbox') ? 'left' : 'none'
+      checkLocation: item.strColID.includes('checkbox') ? 'left' : 'none'
     },
     groupFooter: {
-      text : item.strColID == props.setGroupSumCustomColumnId ? props.setGroupSumCustomText : ' ' ,
-      styleName :  props.setGroupSummaryCenterIds.includes(item.strColID) ? 'setTextAlignCenter' : 'setTextAlignRight',
-      expression: props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)] !='custom' ? props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)] : '',
-      numberFormat: item.strColType === 'double' ? "#,##0.0" : "#,##0",
+      text: item.strColID == props.setGroupSumCustomColumnId ? props.setGroupSumCustomText : ' ',
+      styleName: item.strAlign == 'center' ? 'setTextAlignCenter' : item.strAlign == 'left' ? 'setTextAlignLeft' : 'setTextAlignRight',
+      expression: props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)] != 'custom' ? props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)] : '',
+      numberFormat: item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0"
 
     },
-    footer :{
+    footer: {
       // text : item.strColID =='dtmDate' ? '소계' : '' ,
-      expression : props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)],
-      numberFormat: item.strColType === 'double' ? "#,##0.0" : "#,##0",
+      expression: props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)],
+      numberFormat: item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0"
     },
-    datetimeFormat : 'yyyy-MM-dd',
+    datetimeFormat: 'yyyy-MM-dd',
     width: item.intHdWidth,
-    numberFormat: item.strColType == 'float' ? '#,##0' : item.strColType == 'double' ? '#,##0.0' : '#,##0' ,
-    styleName : item.strAlign == 'left' ? 'setTextAlignLeft' : item.strAlign == 'center' ? 'setTextAlignCenter'  : 'setTextAlignRight',
+    numberFormat: item.strColType == 'float' ? '#,##0' : item.strColType == 'double' && item.strDisplay == 'double' ? "#,##0.00" : '#,##0.0',
+    styleName: item.strAlign == 'left' ? 'setTextAlignLeft' : item.strAlign == 'center' ? 'setTextAlignCenter' : 'setTextAlignRight',
     editor: {
-    type: 'line', 
-    inputCharacters: item.strColID == props.inputOnlyNumberColumn ? '0123456789' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ㄱ-힣!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
-  },
+      type: 'line',
+      inputCharacters: item.strColID == props.inputOnlyNumberColumn ? '0123456789' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ㄱ-힣!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
+    },
     visible: item.intHdWidth !== 0,
-    renderer : { type : item.strColID =='add' ? 'button' :  item.strColID.includes('checkbox') ? 'check' : 'text' },
-    styleCallback: function(grid, dataCell){
+    renderer: { type: item.strColID == 'add' ? 'button' : item.strColID.includes('checkbox') ? 'check' : 'text' },
+    styleCallback: function (grid, dataCell) {
       var ret = {}
-   
-      if((dataCell.item.rowState == 'created' || dataCell.item.itemState == 'appending' || dataCell.item.itemState == 'inserting') && props.rowStateeditable){
+
+      if ((dataCell.item.rowState == 'created' || dataCell.item.itemState == 'appending' || dataCell.item.itemState == 'inserting') && props.rowStateeditable) {
         ret.editable = true;
-      } else if (item.strColID == props.editableColId ) {
+      } else if (item.strColID == props.editableColId) {
         ret.editable = true
       } else {
         ret.editable = false
       }
 
-      if(props.checkBarInactive != ''){
+      if (props.checkBarInactive != '') {
         var inActiveColumn = grid.getValue(dataCell.index.itemIndex, props.checkBarInactive)
 
-        if(inActiveColumn == '0' && item.strColID =='checkbox'){
-          ret.style = {opacity: "0.5"}
-          ret.renderer = {type: "check", editable: false}
+        if (inActiveColumn == '0' && item.strColID == 'checkbox') {
+          ret.style = { opacity: "0.5" }
+          ret.renderer = { type: "check", editable: false }
         }
       }
-  
-      
+
+
 
       return ret;
 
-      
+
     }
   }));
 
 
 
-  if(props.labelingColumns != ''){
-     const lcolumns = props.labelingColumns.split(',')
-     const labels = props.labelsData
-     const values = props.valuesData
-     console.log(lcolumns)
-     console.log(labels)
-     console.log(values)
-     for(var i=0 ; i< lcolumns.length ; i++){
+  if (props.labelingColumns != '') {
+    const lcolumns = props.labelingColumns.split(',')
+    const labels = props.labelsData
+    const values = props.valuesData
+    console.log(lcolumns)
+    console.log(labels)
+    console.log(values)
+    for (var i = 0; i < lcolumns.length; i++) {
       const labelingcolumn = columns.find(item => item.fieldName == lcolumns[i])
-      if(labelingcolumn){
-        labelingcolumn.lookupDisplay =  true 
-       
-       labelingcolumn.values =values[i]
-       labelingcolumn.labels =labels[i]
+      if (labelingcolumn) {
+        labelingcolumn.lookupDisplay = true
+
+        labelingcolumn.values = values[i]
+        labelingcolumn.labels = labels[i]
       }
-    
-     }
-    
+
+    }
+
   }
-  
-  if(props.setNumberformatColumn !=''){
-  
+
+  if (props.setNumberformatColumn != '') {
+
     let formatcolumn = columns.find(item => item.fieldName == props.setNumberformatColumn)
 
     formatcolumn.numberFormat = "#,##0.00";
   }
-   
-  
+
+  if (props.setRowGroupSpan != '') {
+    const mergeColumn = props.setRowGroupSpan.split(',')
+    for (var i = 0; i < mergeColumn.length; i++) {
+      const rowGroupSpanColumn = columns.find(item => item.fieldName == mergeColumn[i])
+      rowGroupSpanColumn.mergeRule = { criteria: "value" }
+    }
+
+
+  }
+
+
 
   gridView.setColumns(columns);
 
-  if(props.setFooterColID[props.setFooterExpressions.indexOf('custom')]){
-  
-    gridView.columnByField(props.setFooterColID[props.setFooterExpressions.indexOf('custom')]).groupFooter.valueCallback = function(grid, cell, footerIndex, footerModel,){
-    if(props.setGroupCustomLevel == 1){
-     
-        return formatLocalDate(dataProvider.getValue(footerModel.firstItem.dataRow,"dtmDate"));
-    }else if(props.setGroupCustomLevel == 2){
-        return "level2"
-    }
-}
-  }
-  
+  if (props.setFooterColID[props.setFooterExpressions.indexOf('custom')]) {
 
-if(props.mergeColumns == true ) {
+    gridView.columnByField(props.setFooterColID[props.setFooterExpressions.indexOf('custom')]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel,) {
+      if (props.setGroupCustomLevel == 1) {
+
+        return formatLocalDate(dataProvider.getValue(footerModel.firstItem.dataRow, "dtmDate"));
+      } else if (props.setGroupCustomLevel == 2) {
+        return ""
+      }
+    }
+  }
+
+
+
+
+  if (props.mergeColumns == true) {
 
     const subList = props.mergeColumnGroupSubList.split(','); // subList 분리
-const layout1 = []; // 최종 결과 배열
-let groupItems = null; // 그룹 아이템을 담을 객체
+    const layout1 = []; // 최종 결과 배열
+    let groupItems = null; // 그룹 아이템을 담을 객체
 
-tabInitSetArray.value.forEach((item,index) => {
-  const uniqueColumnName = item.strHdText
-  if (!layout1.some(layout => layout.column === uniqueColumnName)) {
-  if (subList.includes(item.strColID)) {
-    // subList에 포함된 값들로 그룹을 만듭니다.
-    if (!groupItems) {
-      groupItems = {
-        name: props.mergeColumnGroupName, // 예시로 "companyGroup" 사용
-        direction: "horizontal",
-        items: [],
-        header: {
-          text: props.mergeColumnGroupName,
-          styleName: `header-style-0`
-        },
-    
-      };
+    tabInitSetArray.value.forEach((item, index) => {
+      const uniqueColumnName = item.strHdText
+      if (!layout1.some(layout => layout.column === uniqueColumnName)) {
+        if (subList.includes(item.strColID)) {
+          // subList에 포함된 값들로 그룹을 만듭니다.
+          if (!groupItems) {
+            groupItems = {
+              name: props.mergeColumnGroupName, // 예시로 "companyGroup" 사용
+              direction: "horizontal",
+              items: [],
+              header: {
+                text: props.mergeColumnGroupName,
+                styleName: `header-style-0`
+              },
+
+            };
+          }
+          groupItems.items.push(item.strHdText); // 그룹에 항목 추가
+        } else {
+          layout1.push({
+            column: item.strHdText,
+            header: { visible: true, text: item.strHdText },
+            visible: item.intHdWidth !== 0,
+            width: item.intHdWidth
+          });
+        }
+        // 완벽한 해결이 아닌 것 같아서 추후에 에러날 가능성 존재
+      } else {
+        layout1.push({
+          column: item.strColID,
+          header: { visible: true, text: item.strHdText },
+          visible: item.intHdWidth !== 0,
+          width: item.intHdWidth
+        });
+      }
+
+
+    });
+
+    // 그룹이 존재하면 layout1에 추가
+    if (groupItems) {
+      layout1.unshift(groupItems); // layout1의 첫 번째에 그룹 객체를 추가
     }
-    groupItems.items.push(item.strHdText); // 그룹에 항목 추가
-  } else {
-    layout1.push({    
-     column : item.strHdText ,
-     header: {visible: true, text: item.strHdText},
-     visible: item.intHdWidth !== 0 ,
-    width: item.intHdWidth}); 
-  }
-  // 완벽한 해결이 아닌 것 같아서 추후에 에러날 가능성 존재
-  } else {
-      layout1.push({    
-       column : item.strColID,
-       header: {visible: true, text: item.strHdText},
-       visible: item.intHdWidth !== 0 ,
-       width: item.intHdWidth});
+
+    gridView.setColumnLayout(layout1)
+
   }
 
-
-});
-
-// 그룹이 존재하면 layout1에 추가
-if (groupItems) {
-  layout1.unshift(groupItems); // layout1의 첫 번째에 그룹 객체를 추가
-}
-
-gridView.setColumnLayout(layout1)
-    
-}
-  
   // 데이터 추가
 
- 
+
   dataProvider.setRows(props.rowData);
-  
- 
+
+
   // 기타 옵션
   gridView.setFooters({ visible: props.setFooter == false ? false : true });
   gridView.setRowIndicator({ visible: true });
@@ -603,7 +637,7 @@ gridView.setColumnLayout(layout1)
   gridView.sortingOptions.enabled = true;
   //gridView.editOptions.editable = false;
   gridView.editOptions.updatable = true;
-  gridView.editOptions.deletable = true 
+  gridView.editOptions.deletable = true
   gridView.displayOptions.fitStyle = props.fixedColumn == false ? 'even' : "none";
   gridView.editOptions.commitByCell = true;
   gridView.editOptions.commitWhenLeave = true;
@@ -614,271 +648,276 @@ gridView.setColumnLayout(layout1)
   dataProvider.commitBeforeDataEdit = true
   gridView.editOptions.movable = (props.dragOn == true ? true : false)
   gridView.displayOptions.selectAndImmediateDrag = (props.dragOn == true ? true : false)
-  gridView.displayOptions.selectionStyle = props.selectionStyle 
+  gridView.displayOptions.selectionStyle = props.selectionStyle
   gridView.displayOptions.showTooltip = true;
   gridView.groupPanel.visible = false;
 
-  if(props.setGroupFooter == true){
-    gridView.groupBy([props.setGroupColumnId]);
-    gridView.setRowGroup({
-    expandedAdornments: 'both',
-    collapsedAdornments: 'footer',
-    headerStatement: ""
-});
+  if (props.hideColumnNow == true) {
+    gridView.columnByField(props.hideColumn).visible = false;
   }
-  
+  if (props.setGroupFooter == true) {
+    gridView.groupBy(props.setGroupColumnId.split(','));
+    gridView.setRowGroup({
+      expandedAdornments: 'footer',
+      collapsedAdornments: 'footer',
+      headerStatement: ""
+    });
+  }
 
-  if(props.setFooter == true){
+
+  if (props.setFooter == true) {
     gridView.setOptions({ summaryMode: "aggregate" });
   }
-  
-  if(props.setStateBar == false){
+
+
+
+  if (props.setStateBar == false) {
     gridView.setStateBar({
-     visible: false
+      visible: false
     });
   }
   gridView.headerSummaries.visible = false; // 그룹핑 할때 상단 요약값 없애는 설정
 
   for (let i = dataProvider.getRowCount() - 1; i >= 0; i--) { // 역순으로 순회
-  const rowData = dataProvider.getJsonRow(i);
-  if (rowData.deleted) {
-    dataProvider.removeRow(i); // 해당 행 삭제
-  
+    const rowData = dataProvider.getJsonRow(i);
+    if (rowData.deleted) {
+      dataProvider.removeRow(i); // 해당 행 삭제
+
+    }
   }
-}
 
 
-if(props.useCheckboxfordelete == true){
+  if (props.useCheckboxfordelete == true) {
 
-const alldata = dataProvider.getJsonRows();
-     for(var i=0 ; i< alldata.length ; i++){
-      
-       if(alldata[i].checkbox == false || alldata[i].checkbox == undefined  ){
-  
-        dataProvider.setRowState(i,"none" )
-       } else if(alldata[i].checkbox == true){
-        dataProvider.setRowState(i,"deleted" )
-       }
-   
- }
-}
+    const alldata = dataProvider.getJsonRows();
+    for (var i = 0; i < alldata.length; i++) {
+
+      if (alldata[i].checkbox == false || alldata[i].checkbox == undefined) {
+
+        dataProvider.setRowState(i, "none")
+      } else if (alldata[i].checkbox == true) {
+        dataProvider.setRowState(i, "deleted")
+      }
+
+    }
+  }
   // 이벤트 설정
-  
+
   gridView.onCellEdited = function (grid, itemIndex, row, field) {
-     gridView.commit();
-   
-     updatedrowData.value = [ ...dataProvider.getJsonRows()]
-     emit('updatedRowData', updatedrowData.value )
-   }
-  gridView.onItemChecked =  function (grid, itemIndex, checked) {
-    gridView.setCurrent({dataRow : itemIndex})
+    gridView.commit();
+
+    updatedrowData.value = [...dataProvider.getJsonRows()]
+    emit('updatedRowData', updatedrowData.value)
+  }
+  gridView.onItemChecked = function (grid, itemIndex, checked) {
+    gridView.setCurrent({ dataRow: itemIndex })
     var rows = gridView.getCheckedRows();
     selectedRowData.value = []
     for (var i in rows) {
-    var data = dataProvider.getJsonRow(rows[i]);
-    selectedRowData.value.push(data);
+      var data = dataProvider.getJsonRow(rows[i]);
+      selectedRowData.value.push(data);
     }
-    updatedrowData.value = [ ...dataProvider.getJsonRows()]
- 
+    updatedrowData.value = [...dataProvider.getJsonRows()]
+
     selectedRowData.value.index = itemIndex
     emit('checkedRowData', selectedRowData.value);
-  
+
   };
   gridView.onItemAllChecked = (grid, checked) => {
     selectedRowData.value = gridView.getCheckedItems().map(index => dataProvider.getRows()[index]);
     emit('selcetedrowData', selectedRowData.value);
-     
+
     var rows = gridView.getCheckedRows();
     selectedRowData.value = []
     for (var i in rows) {
-    var data = dataProvider.getJsonRow(rows[i]);
-    selectedRowData.value.push(data);
+      var data = dataProvider.getJsonRow(rows[i]);
+      selectedRowData.value.push(data);
     }
 
     emit('checkedRowData', selectedRowData.value);
   };
 
 
-   dataProvider.onDataChanged = function (provider) {
-  
-     gridView.commit();
-     updatedrowData.value = [ ...dataProvider.getJsonRows()]
-    
-     emit('updatedRowData', updatedrowData.value )
-     const a = updatedrowData.value.filter(item => item.checkbox == true);
-     // selectedRowData.value = []
-  
+  dataProvider.onDataChanged = function (provider) {
+
+    gridView.commit();
+    updatedrowData.value = [...dataProvider.getJsonRows()]
+
+    emit('updatedRowData', updatedrowData.value)
+    const a = updatedrowData.value.filter(item => item.checkbox == true);
+    // selectedRowData.value = []
+
     emit('checkedRowData', a);
-     
+
   };
- 
 
- 
+
+
   gridView.onCellItemClicked = function (grid, clickData) {
-  
-  if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
-    return ;
-  }
-  selectedRowData.value= dataProvider.getRows()[clickData.itemIndex];
-  var current = gridView.getCurrent();
-  selectedindex.value = current.dataRow
-  console.log(selectedindex.value)
-  emit('selcetedrowData', selectedRowData.value);
-  emit('selectedIndex' ,clickData.itemIndex )
 
-}
-
-gridView.onSelectionChanged = function (grid) {
-  var current = gridView.getCurrent();
-
-
-  selectedRowData.value= dataProvider.getRows()[current.dataRow];
-  if(selectedRowData.value){
-    selectedRowData.value.index = current.dataRow
-  emit('clickedRowData', selectedRowData.value);
-  emit('selectedIndex' , current.dataRow )
-  }
-  
-
-  
-
-  
-
-
-
-}
-
-
-gridView.onShowTooltip = function(grid, index, value) {
-  var column = index.fieldName;
-  var itemIndex = index.itemIndex;
-  if(props.showTooltip == true){
-
-  var tooltip = '';
-  if (column == "checkbox" && grid.getValue(itemIndex, "lngMenu") == '0') {
-    tooltip = "해당 결제코드는 할인대상메뉴가 '전체 선택'이므로, 모든 메뉴에 적용되었습니다.";
-  } 
-  return tooltip;
-}
-};
-
-gridView.onCellClicked = function (grid, clickData) {
-  if(clickData.cellType === "header"){
-    gridView.setCurrent({ dataRow : selectedindex.value })
-  }
-  if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
-    return ;
-  }
-  var current = gridView.getCurrent();
-   console.log(current)
-  if(current.itemIndex != -1){
-    selectedRowData.value= dataProvider.getRows()[current.dataRow];
-    if(selectedRowData.value){
-   selectedRowData.value.index = current.dataRow
-  }
-   selectedindex.value = current.dataRow
-    
-   console.log(selectedRowData.value)
-   console.log(selectedindex.value)
-  
-  emit('clickedRowData', selectedRowData.value);
-  emit('selectedIndex' , current.dataRow )
-  emit('selectedIndex2' , current.dataRow )
+    if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
+      return;
+    }
+    selectedRowData.value = dataProvider.getRows()[clickData.itemIndex];
+    var current = gridView.getCurrent();
+    selectedindex.value = current.dataRow
+    console.log(selectedindex.value)
+    emit('selcetedrowData', selectedRowData.value);
+    emit('selectedIndex', clickData.itemIndex)
 
   }
-  
-  
 
-}
+  gridView.onSelectionChanged = function (grid) {
+    var current = gridView.getCurrent();
 
-gridView.onColumnCheckedChanged = function (grid, col, chk) {
-  
-     var rowCount = dataProvider.getRowCount();  // 전체 행의 개수
-     if( props.ExceptionCheck != ''  ){
+
+    selectedRowData.value = dataProvider.getRows()[current.dataRow];
+    if (selectedRowData.value) {
+      selectedRowData.value.index = current.dataRow
+      emit('clickedRowData', selectedRowData.value);
+      emit('selectedIndex', current.dataRow)
+    }
+
+
+
+
+
+
+
+
+  }
+
+
+  gridView.onShowTooltip = function (grid, index, value) {
+    var column = index.fieldName;
+    var itemIndex = index.itemIndex;
+    if (props.showTooltip == true) {
+
+      var tooltip = '';
+      if (column == "checkbox" && grid.getValue(itemIndex, "lngMenu") == '0') {
+        tooltip = "해당 결제코드는 할인대상메뉴가 '전체 선택'이므로, 모든 메뉴에 적용되었습니다.";
+      }
+      return tooltip;
+    }
+  };
+
+  gridView.onCellClicked = function (grid, clickData) {
+    if (clickData.cellType === "header") {
+      gridView.setCurrent({ dataRow: selectedindex.value })
+    }
+    if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
+      return;
+    }
+    var current = gridView.getCurrent();
+    console.log(current)
+    if (current.itemIndex != -1) {
+      selectedRowData.value = dataProvider.getRows()[current.dataRow];
+      if (selectedRowData.value) {
+        selectedRowData.value.index = current.dataRow
+      }
+      selectedindex.value = current.dataRow
+
+      console.log(selectedRowData.value)
+      console.log(selectedindex.value)
+
+      emit('clickedRowData', selectedRowData.value);
+      emit('selectedIndex', current.dataRow)
+      emit('selectedIndex2', current.dataRow)
+
+    }
+
+
+
+  }
+
+  gridView.onColumnCheckedChanged = function (grid, col, chk) {
+
+    var rowCount = dataProvider.getRowCount();  // 전체 행의 개수
+    if (props.ExceptionCheck != '') {
       for (var i = 0; i < rowCount; i++) {
-         if(grid.getValue(i, props.ExceptionCheck) !== '0'){
-          dataProvider.setValue(i, col.fieldName, chk);  
-         }
-        
-       }
-     } else {
-      for (var i = 0; i < rowCount; i++) {
-       
-          dataProvider.setValue(i, col.fieldName, chk);  
-       
-        
-       }
-     }
-     
-     
-     console.log(col.fieldName + "was checked as: " + chk);
-};
+        if (grid.getValue(i, props.ExceptionCheck) !== '0') {
+          dataProvider.setValue(i, col.fieldName, chk);
+        }
 
-gridView.dataDropOptions.callback = function (source, sourceItems, target, targetItem) {
+      }
+    } else {
+      for (var i = 0; i < rowCount; i++) {
+
+        dataProvider.setValue(i, col.fieldName, chk);
+
+
+      }
+    }
+
+
+    console.log(col.fieldName + "was checked as: " + chk);
+  };
+
+  gridView.dataDropOptions.callback = function (source, sourceItems, target, targetItem) {
     const provider = gridView.getDataSource();
     const sourceStartIndex = sourceItems[0];
     const sourceCount = sourceItems.length;
 
-    const targetIndex = targetItem > sourceStartIndex 
-        ? targetItem - sourceCount + 1 
-        : targetItem;
+    const targetIndex = targetItem > sourceStartIndex
+      ? targetItem - sourceCount + 1
+      : targetItem;
 
     if (sourceCount === 1) {
-        provider.moveRow(sourceStartIndex, targetItem);
+      provider.moveRow(sourceStartIndex, targetItem);
     } else {
-        provider.moveRows(sourceStartIndex, sourceCount, targetIndex);
+      provider.moveRows(sourceStartIndex, sourceCount, targetIndex);
     }
 
-    updatedrowData.value = [ ...dataProvider.getJsonRows()]
+    updatedrowData.value = [...dataProvider.getJsonRows()]
 
-     emit('updatedRowData', updatedrowData.value )
-};
+    emit('updatedRowData', updatedrowData.value)
+  };
 
-gridView.onCellDblClicked = function (grid, clickData) {
-  if (clickData.itemIndex == undefined) {
-    return ;
+  gridView.onCellDblClicked = function (grid, clickData) {
+    if (clickData.itemIndex == undefined) {
+      return;
+    }
+    selectedRowData.value = dataProvider.getRows()[clickData.itemIndex];
+    selectedRowData.value.index = clickData.itemIndex
+    emit('dblclickedRowData', selectedRowData.value);
+
   }
-  selectedRowData.value= dataProvider.getRows()[clickData.itemIndex];
-  selectedRowData.value.index = clickData.itemIndex
-  emit('dblclickedRowData', selectedRowData.value);
- 
-}
 
 
 
 }
 
-watch(() => props.changeValue , () => {
- 
-    dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue);
-  
-    updatedrowData.value = [ ...dataProvider.getJsonRows()]
- 
-     emit('updatedRowData', updatedrowData.value )
+watch(() => props.changeValue, () => {
+
+  dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue);
+
+  updatedrowData.value = [...dataProvider.getJsonRows()]
+
+  emit('updatedRowData', updatedrowData.value)
 })
-watch(() => props.changeNow , () => {
-    console.log(props.changeRow)
-    console.log(props.changeColid)
-    console.log(props.changeValue2)
- 
-   
-   
-      dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue2);
-  
-      updatedrowData.value = [ ...dataProvider.getJsonRows()]
+watch(() => props.changeNow, () => {
+  console.log(props.changeRow)
+  console.log(props.changeColid)
+  console.log(props.changeValue2)
 
-      emit('updatedRowData', updatedrowData.value )
-   
-    
+
+
+  dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue2);
+
+  updatedrowData.value = [...dataProvider.getJsonRows()]
+
+  emit('updatedRowData', updatedrowData.value)
+
+
 })
 
 watch(() => props.addRow, (newVal) => {
   gridView.commit();
-  var values = {add: '추가' , sort: '매장용'}; 
+  var values = { add: '추가', sort: '매장용' };
   var dataRow = dataProvider.addRow(values);
 
-  gridView.setCurrent({dataRow: dataRow});
- 
+  gridView.setCurrent({ dataRow: dataRow });
+
 
 });
 
@@ -888,32 +927,32 @@ watch(() => props.addRow2, (newVal) => {
   const properties = props.addrowProp.split(',')
   const value = props.addrowDefault.split(',')
   let values = {};
-  for(var i= 0 ; i< properties.length ; i++){
+  for (var i = 0; i < properties.length; i++) {
     values[properties[i]] = value[i]
   }
   var dataRow = dataProvider.addRow(values);
-  gridView.setCurrent({dataRow: dataRow});
+  gridView.setCurrent({ dataRow: dataRow });
   console.log(dataProvider.getJsonRows())
 });
 
 watch(() => props.addRow3, (newVal) => {
   gridView.commit();
-  var values = {add: true }; 
+  var values = { add: true };
   let propertys = props.addrowProp.split(',')
-  for(var i=0 ; i<propertys.length ; i++){
+  for (var i = 0; i < propertys.length; i++) {
     values[propertys[i]] = undefined
   }
-  values.new = true 
+  values.new = true
   var dataRow = dataProvider.addRow(values);
-  gridView.setCurrent({dataRow: dataRow });
+  gridView.setCurrent({ dataRow: dataRow });
   props.rowData.push(values)
   const current = gridView.getCurrent();  // 현재 선택된 행 정보 가져오기
   const selectedRowIndex = current ? current.dataRow : null;
-   if (selectedRowIndex !== null) {
+  if (selectedRowIndex !== null) {
     console.log("현재 선택된 인덱스:", selectedRowIndex);  // 선택된 행의 인덱스 출력
     selectedindex.value = selectedRowIndex
   }
-  emit('selectedIndex' ,selectedRowIndex )
+  emit('selectedIndex', selectedRowIndex)
   console.log(props.rowData)
   // updatedrowData.value = [ ...dataProvider.getJsonRows()]
   // emit('updatedRowData', updatedrowData.value )
@@ -921,216 +960,228 @@ watch(() => props.addRow3, (newVal) => {
 });
 watch(() => props.addRow4, (newVal) => {
   gridView.commit();
-  var values = { add: true }; 
+  var values = { add: true };
   let propertys = props.addrowProp.split(',')
   const value = props.addrowDefault.split(',')
-  for(var i=0 ; i<propertys.length ; i++){
+  for (var i = 0; i < propertys.length; i++) {
     values[propertys[i]] = value[i]
   }
-  values.new = true 
+  values.new = true
   console.log(values)
   var dataRow = dataProvider.addRow(values);
-  gridView.setCurrent({dataRow: dataRow });
-  const current = gridView.getCurrent(); 
+  gridView.setCurrent({ dataRow: dataRow });
+  const current = gridView.getCurrent();
 
   props.rowData.push(values)
   const selectedRowIndex = current ? current.dataRow : null;
-   if (selectedRowIndex !== null) {
+  if (selectedRowIndex !== null) {
     console.log("현재 선택된 인덱스:", selectedRowIndex);  // 선택된 행의 인덱스 출력
     selectedindex.value = selectedRowIndex
   }
 
-  emit('selectedIndex' ,selectedRowIndex )
+  emit('selectedIndex', selectedRowIndex)
   console.log(props.rowData)
   addrow4activated.value = true
 
-  selectedRowData.value= dataProvider.getRows()[selectedindex.value];
+  selectedRowData.value = dataProvider.getRows()[selectedindex.value];
   selectedRowData.value.index = selectedindex.value
   emit('clickedRowData', selectedRowData.value);
-  emit('selectedIndex' ,selectedRowIndex )
-   updatedrowData.value = [ ...dataProvider.getJsonRows()]
-   emit('updatedRowData', updatedrowData.value )
+  emit('selectedIndex', selectedRowIndex)
+  updatedrowData.value = [...dataProvider.getJsonRows()]
+  emit('updatedRowData', updatedrowData.value)
 
 });
 watch(() => props.deleteRow, (newVal) => {
+  gridView.commit();
+  const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
+  if (curr && curr.dataRow >= 0) {
+    // 현재 데이터 행이 유효한 경우
+    props.rowData[curr.dataRow].deleted = true;
+    dataProvider.setValue(curr.dataRow, "deleted", true); // "deleted" 속성을 true로 설정
+    dataProvider.removeRow(curr.dataRow);
     gridView.commit();
-    const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
-    if (curr && curr.dataRow >= 0) {
-      // 현재 데이터 행이 유효한 경우
-      props.rowData[curr.dataRow].deleted = true ;
-      dataProvider.setValue(curr.dataRow, "deleted", true); // "deleted" 속성을 true로 설정
-      dataProvider.removeRow(curr.dataRow);
-      gridView.commit();
-    } else {
-      console.warn("선택된 행이 없습니다.");
-    }
-    updatedrowData.value = [ ...dataProvider.getJsonRows()]
-    emit('updatedRowData', updatedrowData.value )
-  
+  } else {
+    console.warn("선택된 행이 없습니다.");
+  }
+  updatedrowData.value = [...dataProvider.getJsonRows()]
+  emit('updatedRowData', updatedrowData.value)
+
 });
 watch(() => props.deleteRow2, (newVal) => {
+  gridView.commit();
+  const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
+  if (curr && curr.dataRow >= 0) {
+    // 현재 데이터 행이 유효한 경우
+    props.rowData[curr.dataRow].deleted = true;
+    dataProvider.setValue(curr.dataRow, "deleted", true); // "deleted" 속성을 true로 설정
+    dataProvider.removeRow(curr.dataRow);
     gridView.commit();
-    const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
-    if (curr && curr.dataRow >= 0) {
-      // 현재 데이터 행이 유효한 경우
-      props.rowData[curr.dataRow].deleted = true ;
-      dataProvider.setValue(curr.dataRow, "deleted", true); // "deleted" 속성을 true로 설정
-      dataProvider.removeRow(curr.dataRow);
-      gridView.commit();
-    } else {
-      console.warn("선택된 행이 없습니다.");
-    }
-    updatedrowData.value = [ ...dataProvider.getJsonRows()]
-    const curr2 = gridView.getCurrent();
-    selectedRowData.value= dataProvider.getRows()[curr2.dataRow];
-    emit('updatedRowData', updatedrowData.value )
-    emit('clickedRowData', selectedRowData.value);
-    deleted2activated.value = true
-    addrow4activated.value = true
-    deletedIndex.value = curr.dataRow
-    
+  } else {
+    console.warn("선택된 행이 없습니다.");
+  }
+  updatedrowData.value = [...dataProvider.getJsonRows()]
+  const curr2 = gridView.getCurrent();
+  selectedRowData.value = dataProvider.getRows()[curr2.dataRow];
+  emit('updatedRowData', updatedrowData.value)
+  emit('clickedRowData', selectedRowData.value);
+  deleted2activated.value = true
+  addrow4activated.value = true
+  deletedIndex.value = curr.dataRow
+
 });
 
 watch(() => props.deleteRow3, (newVal) => {
-    gridView.commit();
-    const alldata = dataProvider.getJsonRows();
-    const checkedIndexes = [];
+  gridView.commit();
+  const alldata = dataProvider.getJsonRows();
+  const checkedIndexes = [];
 
-    alldata.forEach((item, index) => {
-        if (item.checkbox === true) {
-        checkedIndexes.push(index); // 체크된 항목의 인덱스를 저장
-      }
-    });
-
-
-    for(var i=0 ; i<checkedIndexes.length ; i++){
-      props.rowData[checkedIndexes[i]].deleted = true ;
-      dataProvider.setValue(checkedIndexes[i], "deleted", true); // "deleted" 속성을 true로 설정
-      dataProvider.removeRow(checkedIndexes[i]);
+  alldata.forEach((item, index) => {
+    if (item.checkbox === true) {
+      checkedIndexes.push(index); // 체크된 항목의 인덱스를 저장
     }
-    updatedrowData.value = [ ...dataProvider.getJsonRows()]
-    emit('updatedRowData', updatedrowData.value )
-    deleted2activated.value = true
-    addrow4activated.value = true
-    //deletedIndex.value = curr.dataRow
-    
+  });
+
+
+  for (var i = 0; i < checkedIndexes.length; i++) {
+    props.rowData[checkedIndexes[i]].deleted = true;
+    dataProvider.setValue(checkedIndexes[i], "deleted", true); // "deleted" 속성을 true로 설정
+    dataProvider.removeRow(checkedIndexes[i]);
+  }
+  updatedrowData.value = [...dataProvider.getJsonRows()]
+  emit('updatedRowData', updatedrowData.value)
+  deleted2activated.value = true
+  addrow4activated.value = true
+  //deletedIndex.value = curr.dataRow
+
 });
 
 
 watch(() => props.deleteRow4, (newVal) => {
 
-    var rows = gridView.getCheckedRows();
-    dataProvider.removeRows(rows);
-    gridView.checkRows(rows, false);
- 
+  var rows = gridView.getCheckedRows();
+  dataProvider.removeRows(rows);
+  gridView.checkRows(rows, false);
+
 });
 
 watch(() => props.deleteAll, (newVal) => {
   gridView.commit();
   const allRows = dataProvider.getJsonRows();
 
-// Mark all rows as deleted (if needed)
-  if(props.notsoftDelete == false){
+  // Mark all rows as deleted (if needed)
+  if (props.notsoftDelete == false) {
     allRows.reverse().forEach((row, index) => {
       dataProvider.setValue(index, "deleted", true); // Optionally mark them as deleted
       dataProvider.removeRow(index);
-  }) 
-  
-   } else {
+    })
+
+  } else {
     for (let i = allRows.length - 1; i >= 0; i--) {
-        dataProvider.removeRow(i);
+      dataProvider.removeRow(i);
     }
-   }
+  }
 
 
 
-   updatedrowData.value = [ ...dataProvider.getJsonRows()]
-emit('updatedrowData', updatedrowData.value )
-  
+  updatedrowData.value = [...dataProvider.getJsonRows()]
+  emit('updatedrowData', updatedrowData.value)
+
 });
 
 watch(() => props.commitAll, (newVal) => {
 
-  if(dataProvider != undefined && dataProvider.getRowCount() > 0){
+  if (dataProvider != undefined && dataProvider.getRowCount() > 0) {
     gridView.commit();
   }
- 
- 
+
+
 });
-watch (() => props.setAllCheck , (newval) => {
-  if(gridView != null){
+watch(() => props.setAllCheck, (newval) => {
+  if (gridView != null) {
     gridView.setAllCheck(false)
   }
 })
-watch (() => props.setAllCheck2 , (newval) => {
-  if(gridView != null){
+watch(() => props.setAllCheck2, (newval) => {
+  if (gridView != null) {
     gridView.setAllCheck(true)
   }
 })
 watch(() => props.exporttoExcel, (newVal) => {
-    gridView.exportGrid({
-      type: "excel",
-      target: "local",
-      fileName: props.ExcelNm+".xlsx", 
-      showProgress: true,
-      progressMessage: "엑셀 Export중입니다.",
-      indicator: true,
-      header: true,
-      footer: true,
-      compatibility: true,
-      lookupDisplay: true
-    })
-  
+
+  gridView.exportGrid({
+    type: "excel",
+    target: "local",
+    documentTitle: { //제목
+    message: props.documentTitle,
+    visible: true,
+    spaceTop: 1,
+    spaceBottom: 0,
+    height: 30,
+    styleName: "documentStyle"
+    },
+    fileName: props.ExcelNm + ".xlsx",
+    showProgress: true,
+    progressMessage: "엑셀 Export중입니다.",
+    indicator: true,
+    header: true,
+    footer: true,
+    compatibility: true,
+    lookupDisplay: true
+  })
+
 });
 watch(() => props.initFocus, (newVal) => {
   setTimeout(() => {
-    if(gridView !=undefined && gridView !=null ){
-    
-    gridView.clearCurrent();
- }
-  },10)
- 
-  
-  
+    if (gridView != undefined && gridView != null) {
+
+      gridView.clearCurrent();
+    }
+  }, 10)
+
+
+
 });
 watch(() => props.initCheckAct, (newVal) => {
   console.log(props.initCheckValue)
   console.log(props.initCheckColumn)
-   gridView.checkAll(false)
-   let itemCount = gridView.getItemCount()
-   const checkValues = props.initCheckValue.split(',')
-   for(var i =0 ; i < itemCount ; i++){
-     for(var j=0 ; j < checkValues.length ; j++){
-       if(gridView.getValue(i, props.initCheckColumn) == checkValues[j]){
-         dataProvider.setValue(i, 'checkbox',true)
-       }
-     }
-   }
- 
-  
-  
+  gridView.checkAll(false)
+  let itemCount = gridView.getItemCount()
+  const checkValues = props.initCheckValue.split(',')
+  for (var i = 0; i < itemCount; i++) {
+    for (var j = 0; j < checkValues.length; j++) {
+      if (gridView.getValue(i, props.initCheckColumn) == checkValues[j]) {
+        dataProvider.setValue(i, 'checkbox', true)
+      }
+    }
+  }
+
+
+
 });
 
 
-watch(() => props.uncheckAct , (newvalue) => {
-   props.uncheckColumn 
-   props.uncheckValue
-   const uncheckValues = props.uncheckValue.split(";")
-   for(var i = 0 ; i < uncheckValues.length ; i++){
-    const a = dataProvider.searchDataRow({fields:[props.uncheckColumn ], values: [uncheckValues[i]]});
+watch(() => props.uncheckAct, (newvalue) => {
+  props.uncheckColumn
+  props.uncheckValue
+  const uncheckValues = props.uncheckValue.split(";")
+  for (var i = 0; i < uncheckValues.length; i++) {
+    const a = dataProvider.searchDataRow({ fields: [props.uncheckColumn], values: [uncheckValues[i]] });
     gridView.checkRow(a, false);
-   }
-  
+  }
+
 })
 
-watch(() => props.hideNow , (newValue) => {
+watch(() => props.hideNow, (newValue) => {
   dataProvider.hideRows(props.hideRow);
+})
+watch(() => props.hideColumnNow, (newValue) => {
+  gridView.columnByField(props.hideColumn).visible = !props.hideColumnNow;
 })
 onMounted(async () => {
   try {
-    if(props.renderProgname != ''){
+    if (props.renderProgname != '') {
 
-     // result2.value = await getRenderingData(props.renderProgname)
+      // result2.value = await getRenderingData(props.renderProgname)
     }
     const result = await getGridInfoList(props.progname, props.progid);
     tabInitSetArray.value = result;
@@ -1152,7 +1203,7 @@ onMounted(async () => {
     console.error("Failed to fetch data:", error);
   }
 });
-watch(() => props.reload , (newValue) => {
+watch(() => props.reload, (newValue) => {
   setupGrid()
 })
 
@@ -1185,158 +1236,162 @@ const setupGrid = async () => {
 };
 
 watch(() => props.rowData, () => {
-  if(props.initSelect == true){
+  if (props.initSelect == true) {
     selectedindex.value = -1
   }
   addrow4activated.value = true
-  funcshowGrid().then(() =>{
-    setTimeout(function(){
-      
-   
-      if(selectedindex.value == -1){
+  funcshowGrid().then(() => {
+    setTimeout(function () {
+
+
+      if (selectedindex.value == -1) {
         return;
       }
 
-   
-      if(selectedindex.value !='' && selectedindex.value !=undefined){
- 
-    gridView.setCurrent({ dataRow : selectedindex.value })
+
+      if (selectedindex.value != '' && selectedindex.value != undefined) {
+
+        gridView.setCurrent({ dataRow: selectedindex.value })
 
 
-  } else if (selectedindex.value ==0){
-    gridView.setCurrent({ dataRow : selectedindex.value })
-  }
+      } else if (selectedindex.value == 0) {
+        gridView.setCurrent({ dataRow: selectedindex.value })
+      }
 
-  
 
-    const newIndices = props.rowData.reduce((indices, item, index) => {
-  if (item.new === true) {
-    indices.push(index);
-  }
-  return indices;
-}, []);
-    dataProvider.setRowStates(newIndices, 'created', true);
-    addrow4activated.value = false
-  
-    const current = gridView.getCurrent();
-    if(deleted2activated.value == true){
-   
-      gridView.setCurrent({ dataRow : deletedIndex.value -1})
-      deleted2activated.value = false
-    } else {
-      gridView.setCurrent({ dataRow : current.dataRow})
-    }
- 
- 
-    },90) // 시간으로인한 미적용 이슈있음
-    
-})
+
+      const newIndices = props.rowData.reduce((indices, item, index) => {
+        if (item.new === true) {
+          indices.push(index);
+        }
+        return indices;
+      }, []);
+      dataProvider.setRowStates(newIndices, 'created', true);
+      addrow4activated.value = false
+
+      const current = gridView.getCurrent();
+      if (deleted2activated.value == true) {
+
+        gridView.setCurrent({ dataRow: deletedIndex.value - 1 })
+        deleted2activated.value = false
+      } else {
+        gridView.setCurrent({ dataRow: current.dataRow })
+      }
+
+
+    }, 90) // 시간으로인한 미적용 이슈있음
+
+  })
 
 
 
 });
 
-watch(() => props.showOnlyChecked , () => {
+watch(() => props.showOnlyChecked, () => {
 
-   const filteredData = props.rowData.filter(item => item.checkbox == true)
-   dataProvider.setRows( filteredData)
+  const filteredData = props.rowData.filter(item => item.checkbox == true)
+  dataProvider.setRows(filteredData)
 })
 
-watch(() => [ props.searchWord, props.searchColValue2], ([newValue, newValue2]) => {
-  
+watch(() => [props.searchWord, props.searchColValue2], ([newValue, newValue2]) => {
+
   const searchColId = props.searchColId.split(',')
   let searchColId2;
   let searchColValues;
   console.log(props.searchColValue2)
 
 
-  if(props.searchColId2 !== ''){
-  
-     searchColId2 = props.searchColId2.split(',')
-    
-  }
-  if(newValue2 !== ''){
-   
-    searchColValues = newValue2.split(',')
-  
-  }
-  
- if(searchColId2 == undefined){
-   if (newValue === '') {
-   
-    dataProvider.setRows( props.rowData );
- 
-    return ;
-   };
-   const filteredData = props.rowData.filter(
-    item => 
-  {
-     
-    return searchColId.some(colId => {
-    
-      const value = item[colId] ? item[colId].toString() :'';
-   
-      return value.toLowerCase().includes(newValue.toString().toLowerCase())
-    })
-  }
-  );
-  dataProvider.setRows(filteredData.length ? filteredData : []);
- } else {
+  if (props.searchColId2 !== '') {
 
-  const filteredData = props.rowData.filter(
-    item => 
-  {
-     
-    return searchColId2.every((colId,index) => {
-    
-      const value = item[colId] != null ? item[colId].toString() : '';
-      const searchValue = (searchColValues[index] || '').toString();
-     
-      if ( searchValue == props.defaultSearchAllValue) {
-       return true;
-       }
-    
-    
-      return value.toLowerCase().includes(searchValue.toString().toLowerCase())
-    })
+    searchColId2 = props.searchColId2.split(',')
+
   }
-  );
-  if(props.searchWord == '' ){
+  if (newValue2 !== '') {
+
+    searchColValues = newValue2.split(',')
+
+  }
+
+  if (searchColId2 == undefined) {
+    if (newValue === '') {
+
+      dataProvider.setRows(props.rowData);
+
+      return;
+    };
+    const filteredData = props.rowData.filter(
+      item => {
+
+        return searchColId.some(colId => {
+
+          const value = item[colId] ? item[colId].toString() : '';
+
+          return value.toLowerCase().includes(newValue.toString().toLowerCase())
+        })
+      }
+    );
     dataProvider.setRows(filteredData.length ? filteredData : []);
   } else {
-    const filteredData2 = filteredData.filter(
-    item => 
-    {
-     
-    return searchColId.some(colId => {
-       
-      const value = item[colId] ? item[colId].toString() : '';
-    
-      return value.toLowerCase().includes(props.searchWord.toString().toLowerCase())
-    })
-  }
-  );
-  dataProvider.setRows(filteredData2.length ? filteredData2 : []);
-  }
-  
- }
 
- 
+    const filteredData = props.rowData.filter(
+      item => {
+
+        return searchColId2.every((colId, index) => {
+
+          const value = item[colId] != null ? item[colId].toString() : '';
+          const searchValue = (searchColValues[index] || '').toString();
+
+          if (searchValue == props.defaultSearchAllValue) {
+            return true;
+          }
+
+
+          return value.toLowerCase().includes(searchValue.toString().toLowerCase())
+        })
+      }
+    );
+    if (props.searchWord == '') {
+      dataProvider.setRows(filteredData.length ? filteredData : []);
+    } else {
+      const filteredData2 = filteredData.filter(
+        item => {
+
+          return searchColId.some(colId => {
+
+            const value = item[colId] ? item[colId].toString() : '';
+
+            return value.toLowerCase().includes(props.searchWord.toString().toLowerCase())
+          })
+        }
+      );
+      dataProvider.setRows(filteredData2.length ? filteredData2 : []);
+    }
+
+  }
+
+
 });
 </script>
 
 <style>
+.setTextAlignLeft {
+  text-align: left !important;
+  white-space: pre !important;
+}
 
-.setTextAlignLeft{
-  text-align: left !important ;
+.setTextAlignRight {
+  text-align: right !important;
   white-space: pre !important;
 }
-.setTextAlignRight{
-  text-align: right !important ;
-  white-space: pre !important;
-}
-.setTextAlignCenter{
+
+.setTextAlignCenter {
   text-align: center !important;
   white-space: pre !important;
+}
+.documentStyle {
+  border: 1px solid blue;
+  text-align: center;
+  font-size: 28px;
+  background-color:rgba(231, 134, 77, 0.3);
 }
 </style>

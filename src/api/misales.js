@@ -1,6 +1,6 @@
 
 import axios from 'axios';
-import {commonUrl, commonUrl2} from './common';
+import { commonUrl, commonUrl2 } from './common';
 
 const url = commonUrl;
 const url2 = commonUrl2;
@@ -15,102 +15,105 @@ const api2 = axios.create({
 });
 
 // API 요청 메서드들
-export const dailySaleReport = (groupCd, storeCd,startDate,endDate,strLanguage) => {
+export const dailySaleReport = (groupCd, storeCd, startDate, endDate, strLanguage) => {
 
-    return api2.post('/MISALES/SLS06_004RPT.asmx/getDailySalesReport', {
-        GROUP_CD: groupCd,
-        STORE_CD: storeCd,
-        START_DATE: startDate,
-        END_DATE: endDate,
-        REPORT_TYPE: '1',
-        LANGUAGE: strLanguage
-    });
+  return api2.post('/MISALES/SLS06_004RPT.asmx/getDailySalesReport', {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    START_DATE: startDate,
+    END_DATE: endDate,
+    REPORT_TYPE: '1',
+    LANGUAGE: strLanguage
+  });
 };
 
-export const getReceiptDatas = (groupCd, storeCd, posNo, dtmDate ,receiptNo , discountCd , payCd ,strlang) => {
+export const getReceiptDatas = (groupCd, storeCd, posNo, dtmDate, receiptNo, discountCd, payCd, strlang) => {
 
   return api2.post('/MISALES/SLS02_011RPT.asmx/getReceiptDatas', {
-      GROUP_CD: groupCd,
-      STORE_CD: storeCd,
-      POS_NO : posNo ,
-      DTM_DATE: dtmDate,
-      RECEIPT_NO: receiptNo,
-      DISCOUNT_CD: discountCd,
-      PAY_CD: payCd ,
-      STRLANG : strlang
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    POS_NO: posNo,
+    DTM_DATE: dtmDate,
+    RECEIPT_NO: receiptNo,
+    DISCOUNT_CD: discountCd,
+    PAY_CD: payCd,
+    STRLANG: strlang
   });
 };
 export const getDiscountCdList = (groupCd, storeCd) => {
 
   return api2.post('/MISALES/SLS02_011RPT.asmx/getDiscountCdList', {
-      GROUP_CD: groupCd,
-      STORE_CD: storeCd
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd
   });
 };
 export const getpayCodeList = (groupCd, storeCd) => {
 
   return api2.post('/MISALES/SLS02_011RPT.asmx/getpayCodeList', {
-      GROUP_CD: groupCd,
-      STORE_CD: storeCd
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd
   });
 };
-export const getCustInfo = (groupCd, storeCd ,seqId) => {
+export const getCustInfo = (groupCd, storeCd, seqId) => {
 
   return api2.post('/MISALES/SLS02_011RPT.asmx/getCustInfo', {
-      GROUP_CD: groupCd,
-      STORE_CD: storeCd ,
-      SEQ_ID : seqId
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SEQ_ID: seqId
   });
 };
-export const getOrderInfo = (groupCd, storeCd ,seqId) => {
+export const getOrderInfo = (groupCd, storeCd, seqId) => {
 
   return api2.post('/MISALES/SLS02_011RPT.asmx/getOrderInfo', {
-      GROUP_CD: groupCd,
-      STORE_CD: storeCd ,
-      SEQ_ID : seqId
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SEQ_ID: seqId
   });
 };
-export const getPayInfo = (groupCd, storeCd ,seqId , lang) => {
+export const getPayInfo = (groupCd, storeCd, seqId, lang) => {
 
   return api2.post('/MISALES/SLS02_011RPT.asmx/getPayInfo', {
-      GROUP_CD: groupCd,
-      STORE_CD: storeCd ,
-      SEQ_ID : seqId ,
-      STRLANG : lang
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SEQ_ID: seqId,
+    STRLANG: lang
   });
 };
-export const getDailySalesReport = (groupCd ,storeCds , startDate , endDate , reporttype , lang) => {
+export const getDailySalesReport = (groupCd, storeCds, startDate, endDate, reporttype, lang) => {
 
   return api2.post('/MISALES/SLS06_004RPT.asmx/getDailySalesReport', {
-      GROUP_CD: groupCd,
-      STORE_CDS : storeCds ,
-      START_DATE : startDate ,
-      END_DATE : endDate,
-      REPORT_TYPE : reporttype ,
-      LANG : lang
+    GROUP_CD: groupCd,
+    STORE_CDS: storeCds,
+    START_DATE: startDate,
+    END_DATE: endDate,
+    REPORT_TYPE: reporttype,
+    LANG: lang
   });
 };
 
-export const getDailySalesDetailReport = (groupCd ,storeCds , startDate , endDate , reporttype , lang) => {
+export const getDailySalesDetailReport = (groupCd, storeCds, startDate, endDate, reporttype, lang) => {
 
   return api2.post('/MISALES/SLS06_004RPT.asmx/getDailySalesDetailReport', {
     GROUP_CD: groupCd,
-    STORE_CDS : storeCds ,
-    START_DATE : startDate ,
-    END_DATE : endDate,
-    REPORT_TYPE : reporttype ,
-    LANG : lang
+    STORE_CDS: storeCds,
+    START_DATE: startDate,
+    END_DATE: endDate,
+    REPORT_TYPE: reporttype,
+    LANG: lang
   });
 };
-export const getTimeSalesReport = (groupCd ,storeCds , startDate , endDate , reporttype , lang) => {
+export const getTimeSalesReport = (groupCd, storeCds, startDate, endDate, reporttype, startTime, endTime, timeType, checkedday) => {
 
   return api2.post('/MISALES/SLS06_002RPT.asmx/getTimeSalesReport', {
     GROUP_CD: groupCd,
-    STORE_CDS : storeCds ,
-    START_DATE : startDate ,
-    END_DATE : endDate,
-    REPORT_TYPE : reporttype ,
-    LANG : lang
+    STORE_CDS: storeCds,
+    START_DATE: startDate,
+    END_DATE: endDate,
+    REPORT_TYPE: reporttype,
+    START_TIME: startTime,
+    END_TIME: endTime,
+    TIME_TYPE: timeType,
+    CHECKED_DAYS: checkedday
   });
 };
 

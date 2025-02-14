@@ -143,6 +143,32 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
   border-radius: 5px;
   justify-content: center;
 }
+.custom-select2 .vs__dropdown-toggle {
+  height: 25px !important; 
+  background-color: white !important;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+
+}
+
+.custom-select3 .vs__dropdown-toggle {
+  height: 32px !important; 
+  background-color: white !important;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+
+
+}
+.custom-select3 .vs__dropdown-menu {
+  height: 500px !important; 
+  min-width: 80px !important;
+
+}
+
 
 
 .button.excel:before {

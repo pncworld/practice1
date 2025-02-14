@@ -6,3 +6,12 @@ export function formatLocalDate(date) {
     const day = String(d.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
+
+
+export function excelTitle(target) {
+      const first = target.strMajorName 
+      const second = target.strSubName 
+      const third = target.strTitle
+
+      return `${first}-${second}-${third}`;
+  }
