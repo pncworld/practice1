@@ -38,8 +38,9 @@
             </div>
             <div class="ml-10">
                 <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup"
-                    @lngStoreAttrs="lngStoreAttrs">
+                    @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore">
                 </PickStorePlural>
+                <div class="text-red-500 h-5 mt-2" ><div v-show="afterSearch">{{currentTime}}에 조회되었으며 미결제금액은 조회 시간 기준입니다.</div></div>
             </div>
             <div></div>
 
@@ -48,7 +49,7 @@
         <div class="w-full h-[85%]">
 
             <Realgrid :progname="'SLS02_030RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload"
-                 :exporttoExcel="exportExcel"></Realgrid>
+                 :exporttoExcel="exportExcel" :documentSubTitle="documentSubTitle" :documentTitle="'SLS02_030RPT'"></Realgrid>
         </div>
     </div>
 </template>
@@ -58,6 +59,7 @@ import { getDailySalesDetailReport, getDailySalesReport, getRealTimeReport } fro
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStorePlural from '@/components/pickStorePlural.vue';
 import Realgrid from '@/components/realgrid.vue';
+import { formatTime } from '@/customFunc/customFunc';
 import Swal from 'sweetalert2';
 import { ref } from 'vue';
 import { useStore } from 'vuex';
@@ -126,7 +128,7 @@ const searchButton = async () => {
     }
 
 }
-
+const currentTime = ref(formatTime(new Date()))
 const selectedGroup = ref()
 const selectedStores = ref()
 const selectedStoreAttrs = ref()
@@ -150,7 +152,9 @@ const initGrid = () => {
 }
 
 const exportExcel = ref(false)
+const documentSubTitle = ref('')
 const excelButton = () => {
+    documentSubTitle.value = selectedExcelDate.value+'\n'+selectedExcelStore.value
     exportExcel.value = !exportExcel.value
 }
 
@@ -164,6 +168,14 @@ const handleParentClick = (e) => {
     }
     closePopUp.value = !closePopUp.value
 
+}
+const selectedExcelDate = ref('')
+const selectedExcelStore = ref('')
+const excelDate = (e) => {
+    selectedExcelDate.value = e
+}
+const excelStore = (e) => {
+    selectedExcelStore.value = e
 }
 </script>
 

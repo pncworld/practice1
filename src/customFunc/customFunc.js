@@ -21,6 +21,20 @@ export function formatDateTime(date) {
     const koreanDateTime = date.toLocaleString('ko-KR', options);
     return koreanDateTime;
   }
+  export function formatTime(date) {
+    if (!date) return '';
+    const options = {
+      timeZone: 'Asia/Seoul', // 한국 시간대 설정
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false // 24시간제로 표시
+    };
+  
+    // toLocaleTimeString은 기본적으로 "HH:MM" 형태로 반환함
+    const timeString = date.toLocaleTimeString('ko-KR', options);
+    return timeString; //
+  }
+  
 
 
 export function excelTitle(target) {
