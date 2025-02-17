@@ -89,6 +89,7 @@ onMounted(() => {
     storeSuperVisor.value = store.state.storeSupervisor
     rowData.value = store.state.storeCd
     emit('lngStoreGroup' ,store.state.storeGroup[0].lngStoreGroup)
+    emit('lngStoreCodes' ,0)
     labelsData.value.push(store.state.storeGroup.map(item => item.strName))
     valuesData.value.push(store.state.storeGroup.map(item => item.lngStoreGroup))
 
@@ -183,7 +184,7 @@ const checkedRowData = (e) => {
         }
     }
     emit('lngStoreGroups', sendStoreGroups.value)
-    emit('lngStoreCodes' , sendStoreCodes.value)
+    emit('lngStoreCodes' , sendStoreCodes.value.join(','))
     emit('lngStoreAttrs' , sendStoreAttrs.value)
 }
 const searchword = (e) => {
@@ -214,7 +215,7 @@ const resetChecked = () => {
     rowData.value = [...rowData.value]
 
     emit('lngStoreGroup', store.state.storeGroup[0].lngStoreGroup)
-    emit('lngStoreCodes' , [])
+    emit('lngStoreCodes' , 0)
     emit('lngStoreAttrs' , 0)
     selectedStoreList.value = '전체'
 }

@@ -137,6 +137,15 @@ export const getRealTimeReport = (groupCd, storeCd, startDate, endDate , seeday)
    
   });
 };
+export const getTableSearchCondition = (groupCd, storeCd, selectedMenuCond) => {
+
+  return api2.post('/MISALES/SLS04_002RPT.asmx/getTableSearchCondition', {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    MENU_COND: selectedMenuCond,
+   
+  });
+};
 
 
 

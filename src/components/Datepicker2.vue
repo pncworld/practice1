@@ -73,9 +73,25 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 
+const emit = defineEmits(['startDate', 'endDate','excelDate']);
+const props = defineProps({
+  closePopUp: {
+    type: Boolean,
+    default: false // 기본값: 빈 함수
+  },
+  initToday: {
+    type: String,
+    default: '', // 기본값: 현재 날짜
+  }
+});
 const formatDate = (date) => date.toISOString().split('T')[0]
 const today = new Date();
-today.setDate(today.getDate() - 1)
+if(props.initToday == ''){
+  today.setDate(today.getDate() - 1)
+} else {
+  today.setDate(today.getDate())
+}
+
 const selectedStartDate = ref(formatDate(today))
 const selectedEndDate = ref(formatDate(today))
 
@@ -90,8 +106,7 @@ onMounted(() => {
 const emitDate2 = (e) => {
   console.log(e)
 }
-const emit = defineEmits(['startDate', 'endDate','excelDate']);
-const props = defineProps(['closePopUp'])
+
 const showRadio = ref(false)
 const toggleRadio = (e) => {
   showRadio.value = !showRadio.value;

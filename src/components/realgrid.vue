@@ -1116,6 +1116,7 @@ watch(() => props.exporttoExcel, (newVal) => {
   const documentTitle = excelTitle(store.state.minorCategory.find(item => item.strUrl.includes(props.documentTitle)))
   const excelNm = documentTitle.split('-')[2]
   const user = store.state.userData.strChargerName
+  const userID = store.state.userData.loginID
   const today = formatDateTime(new Date())
 
   gridView.exportGrid({
@@ -1130,7 +1131,7 @@ watch(() => props.exporttoExcel, (newVal) => {
     styleName: "documentStyle"
     },
     documentSubtitle: { //부제
-    message: props.documentSubTitle +'\n'+'조회시간 : '+today+'\n'+'작성자 : '+user,
+    message: props.documentSubTitle +'\n'+'조회시간 : '+today+'\n'+'작성자 : '+user+'('+userID+')',
     visible: true,
     height: 70,
     styleName: "documentSubtitleStyle"

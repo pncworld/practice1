@@ -4,42 +4,48 @@
             <div class="flex justify-start  w-full pl-12 pt-4">
                 <div class="flex justify-start">
                     <h1 class="font-bold text-sm md:text-2xl w-full">
-                        매장별 실시간 매출 조회
+                        메뉴군별 매출 현황2.
                     </h1>
                 </div>
 
             </div>
             <div class="flex justify-center mr-9 space-x-2 pr-5">
-
+                <button @click="chartButton" class="button primary md:w-auto w-14">차트</button>
                 <button @click="searchButton" class="button search md:w-auto w-14">조회</button>
                 <button @click="excelButton" class="button save w-auto excel">엑셀</button>
+                <button @click="printButton" class="button primary w-auto">인쇄</button>
 
             </div>
         </div>
         <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-28 items-center z-10 ">
-            <div class="grid grid-cols-1 grid-rows-3 -space-y-5 mt-5">
+            <div class="grid grid-cols-1 grid-rows-3 -space-y-3 mt-5">
                 <Datepicker2 @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker"
-                    @excelDate="excelDate" :initToday="'Y'"></Datepicker2>
-                    <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-48 ">
-                        구분 : <div class="flex ml-3 space-x-3">
-                            <select name="" id="" class="border w-40 h-7 rounded-lg">
-                                <option value="">직가맹</option>
+                    @excelDate="excelDate"></Datepicker2>
+                    <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 ">
+                        메뉴구분 : <div class="flex ml-3 space-x-3">
+                            <select name="" id="" class="border w-40 h-7 rounded-lg" v-model="selectedMenu">
+                                <option :value="0">전체</option>
+                                <option :value="1">대그룹</option>
+                                <option :value="2">서브그룹</option>
+                                <option :value="3">메뉴코드</option>
+                           
                             </select>
                             <select name="" id=""  class="border w-40 h-7 rounded-lg">
-                                <option value="">전체</option>
+                                
+                                <option :value="i.lngCode" v-for="i in subList">{{ i.strName }}</option>
                             </select>
                         </div>
                     </div>
-                <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 !-mt-10 ">조회조건 : <div>
+                <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 -mt-20 h-8">조회조건 : <div>
                         <label for="detail" class="font-thin"><input type="checkbox" id="detail" class="ml-5"
                                 @change="seeDays">일자별</label></div>
 
                 </div>
             </div>
             <div class="ml-10">
-                <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup"
+                <PickStorePlural2 @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup"
                     @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore">
-                </PickStorePlural>
+                </PickStorePlural2>
                 <div class="text-red-500 h-5 mt-2 flex justify-end mr-3" ><div v-show="afterSearch">{{currentTime}}에 조회되었으며 미결제금액은 조회 시간 기준입니다.</div></div>
             </div>
             <div></div>
@@ -55,13 +61,14 @@
 </template>
 
 <script setup>
-import { getDailySalesDetailReport, getDailySalesReport, getRealTimeReport } from '@/api/misales';
+import { getDailySalesDetailReport, getDailySalesReport, getRealTimeReport, getTableSearchCondition } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStorePlural from '@/components/pickStorePlural.vue';
+import PickStorePlural2 from '@/components/pickStorePlural2.vue';
 import Realgrid from '@/components/realgrid.vue';
 import { formatTime } from '@/customFunc/customFunc';
 import Swal from 'sweetalert2';
-import { ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 const setGroupFooter = ref(false)
@@ -177,6 +184,25 @@ const excelDate = (e) => {
 const excelStore = (e) => {
     selectedExcelStore.value = e
 }
+const printButton = () => {
+    window.print()
+}
+const selectedMenu = ref(0)
+const subList = ref([])
+watch(selectedMenu , async() => {
+ 
+    const res = await getTableSearchCondition(selectedGroup.value,selectedStores.value,selectedMenu.value ) 
+    subList.value = res.data.SUBLIST
+    console.log(res)
+})
+
+onMounted(async() => {
+    const res = await getTableSearchCondition(selectedGroup.value,selectedStores.value,selectedMenu.value ) 
+    subList.value = res.data.SUBLIST
+
+})
+
+
 </script>
 
 <style></style>

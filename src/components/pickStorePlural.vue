@@ -103,7 +103,7 @@ onMounted(() => {
     labelsData.value.push(store.state.storeSupervisor.map(item => item.strName))
     valuesData.value.push(store.state.storeSupervisor.map(item => item.lngSupervisor))
 
-  
+    initCheck.value = !initCheck.value
    
 })
 
@@ -206,7 +206,12 @@ const updatedRowData = (e) => {
 }
 const initCheckBoxRef = toRef(props, 'initCheckBox') 
 const initSearchWord = toRef(props, 'initCheckBox') 
+const initCheck = ref(false)
 watch( initCheckBoxRef , () => {
+    rowData.value.forEach(item => item.checkbox = false)
+    rowData.value = [...rowData.value]
+})
+watch( initCheck , () => {
     rowData.value.forEach(item => item.checkbox = false)
     rowData.value = [...rowData.value]
 })

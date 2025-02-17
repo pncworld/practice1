@@ -152,14 +152,7 @@ const searchButton = async () => {
     initGrid()
 
     const sendcheckedDay = [...checkedDay]
-    console.log(selectedGroup.value)
-    console.log(selectedStores.value)
-    console.log(selectedstartDate.value)
-    console.log(selectedendDate.value)
-    console.log(startTime.value)
-    console.log(endTime.value)
-    console.log(orderPay.value)
-    console.log(sendcheckedDay.join(','))
+
 
 
     const res = await getTimeSalesReport(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, '12', startTime.value, endTime.value, orderPay.value, sendcheckedDay.join(','))
