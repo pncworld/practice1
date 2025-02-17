@@ -85,11 +85,12 @@ const emitDate1 = (e) => {
 onMounted(() => {
   emit('startDate', selectedStartDate.value)
   emit('endDate', selectedEndDate.value)
+  emit('excelDate', '매출일자 : '+selectedStartDate.value+'~'+ selectedEndDate.value)
 })
 const emitDate2 = (e) => {
   console.log(e)
 }
-const emit = defineEmits(['startDate', 'endDate']);
+const emit = defineEmits(['startDate', 'endDate','excelDate']);
 const props = defineProps(['closePopUp'])
 const showRadio = ref(false)
 const toggleRadio = (e) => {
@@ -157,6 +158,7 @@ function formatDateToYYYYMMDD(date) {
 watch(() => [selectedStartDate.value, selectedEndDate.value], () => {
   emit('startDate', selectedStartDate.value);
   emit('endDate', selectedEndDate.value);
+  emit('excelDate', '매출일자 : '+selectedStartDate.value+'~'+ selectedEndDate.value)
 },
   { deep: true })
 

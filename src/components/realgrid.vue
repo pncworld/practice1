@@ -7,7 +7,8 @@ import { getGridInfoList, getRenderingData } from '@/api/common';
 import { GridView, LocalDataProvider } from 'realgrid';
 import { onMounted, ref, watch, nextTick } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import { formatLocalDate } from '@/customFunc/customFunc';
+import { excelTitle, formatDateTime, formatLocalDate } from '@/customFunc/customFunc';
+import store from '@/store';
 let gridView;
 let dataProvider;
 /*
@@ -395,6 +396,11 @@ const props = defineProps({
     type: String,
     default: ''
   }
+  ,
+  documentSubTitle: {
+    type: String,
+    default: ''
+  }
 
 });
 
@@ -554,7 +560,7 @@ const funcshowGrid = async () => {
 
   gridView.setColumns(columns);
 
-  if (props.setFooterColID[props.setFooterExpressions.indexOf('custom')]) {
+  if (gridView.columnByField(props.setFooterColID[props.setFooterExpressions.indexOf('custom')])) {
 
     gridView.columnByField(props.setFooterColID[props.setFooterExpressions.indexOf('custom')]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel,) {
       if (props.setGroupCustomLevel == 1) {
@@ -1107,19 +1113,29 @@ watch(() => props.setAllCheck2, (newval) => {
   }
 })
 watch(() => props.exporttoExcel, (newVal) => {
+  const documentTitle = excelTitle(store.state.minorCategory.find(item => item.strUrl.includes(props.documentTitle)))
+  const excelNm = documentTitle.split('-')[2]
+  const user = store.state.userData.strChargerName
+  const today = formatDateTime(new Date())
 
   gridView.exportGrid({
     type: "excel",
     target: "local",
     documentTitle: { //제목
-    message: props.documentTitle,
+    message: documentTitle,
     visible: true,
     spaceTop: 1,
     spaceBottom: 0,
     height: 30,
     styleName: "documentStyle"
     },
-    fileName: props.ExcelNm + ".xlsx",
+    documentSubtitle: { //부제
+    message: props.documentSubTitle +'\n'+'조회시간 : '+today+'\n'+'작성자 : '+user,
+    visible: true,
+    height: 70,
+    styleName: "documentSubtitleStyle"
+  } ,
+    fileName: excelNm + ".xlsx",
     showProgress: true,
     progressMessage: "엑셀 Export중입니다.",
     indicator: true,
@@ -1392,6 +1408,11 @@ watch(() => [props.searchWord, props.searchColValue2], ([newValue, newValue2]) =
   border: 1px solid blue;
   text-align: center;
   font-size: 28px;
+  background-color:rgba(231, 134, 77, 0.3);
+}
+.documentSubtitleStyle {
+  text-align: right;
+  font-size: 12px;
   background-color:rgba(231, 134, 77, 0.3);
 }
 </style>

@@ -20,7 +20,7 @@
     <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-32 items-center z-10">
       <div class="grid grid-cols-1 grid-rows-3 mt-5">
 
-        <Datepicker2 @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker"></Datepicker2>
+        <Datepicker2 @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker" @excelDate="excelDate"></Datepicker2>
         <div class="flex flex-col justify-start items-start text-nowrap ml-40 ">
           <div class=" text-nowrap flex justify-start items-center space-x-3 ml-4">
             <div class="text-base font-semibold">시간대 :</div>
@@ -62,7 +62,7 @@
         </div>
       </div>
       <div class="ml-10 -mt-10">
-        <PickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup">
+        <PickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore">
         </PickStoreSingle>
       </div>
       <div></div>
@@ -76,7 +76,7 @@
         :ExcelNm="'시간대별 매출 현황.'" :exporttoExcel="exportExcel" :setGroupColumnId="'strStore,strTime'"
         :setGroupSumCustomText="'소계'" :setGroupSumCustomColumnId="'strTime'" :setGroupCustomLevel="2"
         :setRowGroupSpan="'lngCustTotCnt,lngRecTotCnt,lngAccTotAmt'"
-        :setGroupSummaryCenterIds="setGroupSummaryCenterIds" :hideColumn="'lngSalAmt'" :hideColumnNow="hideColumnNow" :documentTitle="documentTitle">
+        :setGroupSummaryCenterIds="setGroupSummaryCenterIds" :hideColumn="'lngSalAmt'" :hideColumnNow="hideColumnNow" :documentTitle="'SLS06_002RPT'" :documentSubTitle="documentSubTitle">
       </Realgrid>
     </div>
   </div>
@@ -143,6 +143,8 @@ const endTime = ref(23)
 const tempSeeDetail = ref(1)
 
 const store = useStore()
+console.log(store.state); // 여기서 한번 확인
+console.log(store.state.lngStoreGroup); // 여기서도 확인
 const loginedstrLang = store.state.userData.lngLanguage
 const searchButton = async () => {
   store.state.loading = true;
@@ -203,12 +205,26 @@ const exportExcel = ref(false)
 
 console.log(store.state.minorCategory)
 
-const documentTitle = excelTitle(store.state.minorCategory.find(item => item.strUrl.includes('SLS06_002RPT')))
-const excelButton = () => {
 
+
+const excelButton = () => {
+  const order = orderPay.value == 1 ? '주문 ' :'계산 '
+  const stime = times.value.filter(item => item.value == startTime.value)[0].strName
+  const etime = times.value.filter(item => item.value == endTime.value)[0].strName
+  const dayArray = Array.from(checkedDay).sort((a,b) => a -b).map((day) => dayMap[day]).join(',')
+  documentSubTitle.value = selectedExcelDate.value +'\n'+ selectedExcelStore.value +'\n'+'시간대 : '+order+stime+'~'+etime +'\n'+'요일조건 : '+dayArray
   exportExcel.value = !exportExcel.value
 }
 const checkedDay = new Set([1, 2, 3, 4, 5, 6, 7])
+const dayMap = {
+  1:'월',
+  2:'화',
+  3:'수',
+  4:'목',
+  5:'금',
+  6:'토',
+  7:'일'
+}
 const checkit = (e) => {
   console.log(e)
   if (e.target.checked) {
@@ -242,6 +258,15 @@ const handleParentClick = (e) => {
   }
   closePopUp.value = !closePopUp.value
 
+}
+const documentSubTitle = ref('')
+const selectedExcelDate = ref('')
+const excelDate = (e)=> {
+   selectedExcelDate.value = e
+}
+const selectedExcelStore = ref('')
+const excelStore = (e) =>{
+  selectedExcelStore.value = e
 }
 </script>
 

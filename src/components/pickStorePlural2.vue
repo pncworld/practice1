@@ -89,7 +89,6 @@ onMounted(() => {
     storeSuperVisor.value = store.state.storeSupervisor
     rowData.value = store.state.storeCd
     emit('lngStoreGroup' ,store.state.storeGroup[0].lngStoreGroup)
-
     labelsData.value.push(store.state.storeGroup.map(item => item.strName))
     valuesData.value.push(store.state.storeGroup.map(item => item.lngStoreGroup))
 

@@ -116,6 +116,27 @@ export const getTimeSalesReport = (groupCd, storeCds, startDate, endDate, report
     CHECKED_DAYS: checkedday
   });
 };
+export const getReceiptDataDetail = (groupCd, storeCd, startDate, endDate) => {
+
+  return api2.post('/MISALES/SLS02_021RPT.asmx/getReceiptDataDetail', {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    START_DATE: startDate,
+    END_DATE: endDate,
+   
+  });
+};
+export const getRealTimeReport = (groupCd, storeCd, startDate, endDate , seeday) => {
+
+  return api2.post('/MISALES/SLS02_030RPT.asmx/getRealTimeReport', {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    START_DATE: startDate,
+    END_DATE: endDate,
+    DAY_ON: seeday,
+   
+  });
+};
 
 
 
