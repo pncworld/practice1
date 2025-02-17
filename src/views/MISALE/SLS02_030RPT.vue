@@ -47,11 +47,8 @@
 
         <div class="w-full h-[85%]">
 
-            <Realgrid :progname="'SLS06_004RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload"
-                :setFooter="true" :setGroupFooter="setGroupFooter" :setFooterExpressions="setFooterExpressions"
-                :setFooterColID="setFooterColID" :ExcelNm="'일자별 매출 현황.'" :exporttoExcel="exportExcel"
-                :setGroupColumnId="'dtmDate'" :setGroupSumCustomText="'소계'" :setGroupSumCustomColumnId="'strWeekName'"
-                :setGroupCustomLevel="1" :setGroupSummaryCenterIds="setGroupSummaryCenterIds"></Realgrid>
+            <Realgrid :progname="'SLS02_030RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload"
+                 :exporttoExcel="exportExcel"></Realgrid>
         </div>
     </div>
 </template>
@@ -69,7 +66,7 @@ const setGroupFooter = ref(false)
 const setFooterColID = ref(['lngRecCnt', 'lngRecAmt', 'lngCustCnt', 'lngCustAmt', 'lngSalAmt', 'lngDiscount', 'lngActAmt', 'lngVAT', 'lngSupplyAmt', 'dblDistRate', 'lngTotAmt', 'dtmDate'])
 const setFooterExpressions = ref(['sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'custom'])
 const setGroupSummaryCenterIds = ref('dtmDate,strWeekName')
-const progid = ref(1)
+const progid = ref(2)
 const reload = ref(false)
 const rowData = ref([])
 const afterSearch = ref(false)
@@ -90,6 +87,7 @@ const seeDays = (e) => {
         tempSeeDay.value = 1
     } else {
         tempSeeDay.value = 0
+     
     }
 }
 const store = useStore()
@@ -98,6 +96,11 @@ const searchButton = async () => {
     store.state.loading = true;
     try {
         initGrid()
+        if(tempSeeDay.value == 1){
+            progid.value = 1
+        } else {
+            progid.value = 2
+        }
         reload.value = !reload.value
         let selectedStorearr;
         if (selectedStores.value == undefined || selectedStores.value.length == 0) {
@@ -109,7 +112,7 @@ const searchButton = async () => {
   
             const res = await getRealTimeReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, tempSeeDay.value )
             console.log(res)
-            rowData.value = res.data.DAILYSALES
+            rowData.value = res.data.RECEIPT
 
 
 
