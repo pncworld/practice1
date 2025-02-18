@@ -72,10 +72,10 @@
     <div class="w-full h-[80%]">
 
       <Realgrid :progname="'SLS06_002RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setFooter="true"
-        :setGroupFooter="true" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
+        :setGroupFooter="true" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID" :setGroupFooterExpressions="setGroupFooterExpressions" :setGroupFooterColID="setGroupFooterColID"
         :ExcelNm="'시간대별 매출 현황.'" :exporttoExcel="exportExcel" :setGroupColumnId="'strStore,strTime'"
-        :setGroupSumCustomText="'소계'" :setGroupSumCustomColumnId="'strTime'" :setGroupCustomLevel="2"
-        :setRowGroupSpan="'lngCustTotCnt,lngRecTotCnt,lngAccTotAmt'"
+        :setGroupSumCustomText="['소계']" :setGroupSumCustomColumnId="['strTime']" :setGroupCustomLevel="1"
+        :setRowGroupSpan="'lngCustTotCnt,lngRecTotCnt,lngAccTotAmt'" 
         :setGroupSummaryCenterIds="setGroupSummaryCenterIds" :hideColumn="'lngSalAmt'" :hideColumnNow="hideColumnNow" :documentTitle="'SLS06_002RPT'" :documentSubTitle="documentSubTitle">
       </Realgrid>
     </div>
@@ -122,7 +122,9 @@ const times = ref([
 
 const orderPay = ref(1)
 const setFooterColID = ref(['lngRecCnt', 'lngRecAmt', 'lngCustCnt', 'lngCustAmt', 'lngSalAmt', 'lngDiscount', 'lngActAmt', 'lngVAT', 'lngSupplyAmt', 'dblDistRate', 'lngTotAmt', 'dtmDate'])
+const setGroupFooterColID = ref(['lngRecCnt', 'lngRecAmt', 'lngCustCnt', 'lngCustAmt', 'lngSalAmt', 'lngDiscount', 'lngActAmt', 'lngVAT', 'lngSupplyAmt', 'dblDistRate', 'lngTotAmt', 'dtmDate'])
 const setFooterExpressions = ref(['sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'custom'])
+const setGroupFooterExpressions = ref(['sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'custom'])
 const setGroupSummaryCenterIds = ref('strTime')
 const progid = ref(1)
 const reload = ref(false)

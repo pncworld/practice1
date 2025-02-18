@@ -357,13 +357,13 @@ const props = defineProps({
   }
   ,
   setGroupSumCustomText: {
-    type: String,
-    default: '소계'
+    type: Array,
+    default: []
   }
   ,
   setGroupSumCustomColumnId: {
-    type: String,
-    default: 'strWeekName'
+    type: Array,
+    default: []
   }
   ,
   setGroupCustomLevel: {
@@ -400,6 +400,25 @@ const props = defineProps({
   documentSubTitle: {
     type: String,
     default: ''
+  }
+  ,
+  hideColumnsId: {
+    type: Array,
+    default: []
+  }
+  ,
+  setGroupFooterExpressions: {
+    type: Array,
+    default: []
+  },
+  setGroupFooterColID: {
+    type: Array,
+    default: []
+  }
+  ,
+  setGroupSumCustomLevel: {
+    type: String,
+    default: 1
   }
 
 });
@@ -468,9 +487,9 @@ const funcshowGrid = async () => {
       checkLocation: item.strColID.includes('checkbox') ? 'left' : 'none'
     },
     groupFooter: {
-      text: item.strColID == props.setGroupSumCustomColumnId ? props.setGroupSumCustomText : ' ',
+      text: props.setGroupSumCustomText[props.setGroupSumCustomColumnId.indexOf(item.strColID)],
       styleName: item.strAlign == 'center' ? 'setTextAlignCenter' : item.strAlign == 'left' ? 'setTextAlignLeft' : 'setTextAlignRight',
-      expression: props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)] != 'custom' ? props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)] : '',
+      expression: props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(item.strColID)] == 'custom' ? '' : props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(item.strColID)],
       numberFormat: item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0"
 
     },
@@ -560,17 +579,68 @@ const funcshowGrid = async () => {
 
   gridView.setColumns(columns);
 
-  if (gridView.columnByField(props.setFooterColID[props.setFooterExpressions.indexOf('custom')])) {
+  // if (gridView.columnByField(props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')])) {
 
-    gridView.columnByField(props.setFooterColID[props.setFooterExpressions.indexOf('custom')]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel,) {
-      if (props.setGroupCustomLevel == 1) {
+  //   gridView.columnByField(props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel,) {
+  //     if (props.setGroupCustomLevel == 1) {
 
-        return formatLocalDate(dataProvider.getValue(footerModel.firstItem.dataRow, "dtmDate"));
-      } else if (props.setGroupCustomLevel == 2) {
-        return ""
+  //       return formatLocalDate(dataProvider.getValue(footerModel.firstItem.dataRow, "dtmDate"));
+  //     } else if (props.setGroupCustomLevel == 2) {
+  //       return dataProvider.getValue(footerModel.firstItem.dataRow, props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')])
+  //     }
+  //   }
+  // }
+
+  if(props.setGroupSumCustomColumnId !=[]){
+    for(let i=0 ; i < props.setGroupSumCustomColumnId.length ; i++){
+      gridView.columnByField(props.setGroupSumCustomColumnId[i]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel){
+        if(props.setGroupSumCustomLevel ==1){
+          return dataProvider.getValue(footerModel.firstItem.dataRow, props.setGroupSumCustomColumnId[i]) +' ' + props.setGroupSumCustomText[props.setGroupSumCustomColumnId.indexOf(props.setGroupSumCustomColumnId[i])];
+        }
       }
     }
   }
+
+  if(props.setGroupFooterExpressions !=[]){
+    for(let i=0 ; i <props.setGroupFooterExpressions.length ; i++){
+      gridView.columnByField(props.setGroupFooterColID[i]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel){
+        if(props.setGroupSumCustomLevel ==1){
+          if(props.setGroupFooterColID[i]=='dtmDate'){
+            return formatLocalDate(dataProvider.getValue(footerModel.firstItem.dataRow, "dtmDate"));
+          }
+          return dataProvider.getValue(footerModel.firstItem.dataRow, props.setGroupFooterColID[i]) 
+        }
+      }
+    }
+  }
+
+//   if (gridView.columnByField(props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')])) {
+
+//     gridView.columnByField(props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel,) {
+//   if (props.setGroupCustomLevel == 1) {
+
+//     return formatLocalDate(dataProvider.getValue(footerModel.firstItem.dataRow, "dtmDate"));
+//   } else if (props.setGroupCustomLevel == 2) {
+//     return dataProvider.getValue(footerModel.firstItem.dataRow, props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')])
+//   }
+//  }
+// }
+
+// if(props.setGroupFooterColID != []){
+//   for(var i= 0 ; i< props.setGroupFooterColID ; i++){
+//     if(props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(props.setGroupFooterColID[i])] == 'custom'){
+//       gridView.columnByField(props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel,) {
+//         return dataProvider.getValue(footerModel.firstItem.dataRow, props.setGroupFooterColID[i])
+//       }
+//       } else if(props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(props.setGroupFooterColID[i])] == 'sum'){
+//         gridView.columnByField(props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')]).groupFooter.expression = 'sum'
+//       } else if (props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(props.setGroupFooterColID[i])] == 'avg'){
+//          gridView.columnByField(props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')]).groupFooter.expression = 'avg'
+//       }
+//     }
+
+  
+// }
 
 
 
@@ -661,13 +731,24 @@ const funcshowGrid = async () => {
   if (props.hideColumnNow == true) {
     gridView.columnByField(props.hideColumn).visible = false;
   }
+
+  if(props.hideColumnsId!=[]){
+    for(var i=0 ; i < props.hideColumnsId.length ; i++){
+    gridView.columnByField(props.hideColumnsId[i]).visible = false;
+    }
+  }
+
   if (props.setGroupFooter == true) {
-    gridView.groupBy(props.setGroupColumnId.split(','));
-    gridView.setRowGroup({
+      
+      gridView.setRowGroup({
       expandedAdornments: 'footer',
-      collapsedAdornments: 'footer',
-      headerStatement: ""
+      sorting: false,
+      collapsedAdornments: 'none',
+      headerStatement: "",
+      expanderVisibility: false ,
+      mergeMode : false
     });
+    gridView.groupBy(props.setGroupColumnId.split(','));
   }
 
 
@@ -1176,6 +1257,12 @@ watch(() => props.initCheckAct, (newVal) => {
 
 });
 
+// watch(() => props.hideColumnsId , ()=>{
+//   for(var i=0 ; i < props.hideColumnsId.length ; i++){
+//     gridView.columnByField(props.hideColumnsId[i]).visible = false;
+//   }
+//   //gridView.columnByField(props.hideColumn).visible = false;
+// })
 
 watch(() => props.uncheckAct, (newvalue) => {
   props.uncheckColumn
