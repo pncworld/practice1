@@ -3,6 +3,7 @@ import SLS02_021RPT from "@/views/MISALE/SLS02_021RPT.vue";
 import SLS02_030RPT from "@/views/MISALE/SLS02_030RPT.vue";
 import SLS06_002RPT from "@/views/MISALE/SLS06_002RPT.vue";
 import SLS06_004RPT from "@/views/MISALE/SLS06_004RPT.vue";
+import SLS02_014RPT from "@/views/MISALE/SLS02_014RPT.vue";
 
 
 
@@ -31,6 +32,11 @@ export default function salesRouter() {
       {
         path : "SLS02_030RPT.xml",
         component : SLS02_030RPT
+      }
+      ,
+      {
+        path : "SLS02_014RPT.xml",
+        component : SLS02_014RPT
       }
     
     

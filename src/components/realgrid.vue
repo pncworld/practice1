@@ -565,9 +565,9 @@ const funcshowGrid = async () => {
     gridView.columnByField(props.setFooterColID[props.setFooterExpressions.indexOf('custom')]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel,) {
       if (props.setGroupCustomLevel == 1) {
 
-        return formatLocalDate(dataProvider.getValue(footerModel.firstItem.dataRow, "dtmDate"));
+        return formatLocalDate(dataProvider.getValue(footerModel.firstItem.dataRow, props.setFooterColID[props.setFooterExpressions.indexOf('custom')]));
       } else if (props.setGroupCustomLevel == 2) {
-        return ""
+        return dataProvider.getValue(footerModel.firstItem.dataRow, props.setFooterColID[props.setFooterExpressions.indexOf('custom')]);
       }
     }
   }

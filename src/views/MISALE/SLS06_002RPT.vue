@@ -213,6 +213,7 @@ const excelButton = () => {
   const etime = times.value.filter(item => item.value == endTime.value)[0].strName
   const dayArray = Array.from(checkedDay).sort((a,b) => a -b).map((day) => dayMap[day]).join(',')
   documentSubTitle.value = selectedExcelDate.value +'\n'+ selectedExcelStore.value +'\n'+'시간대 : '+order+stime+'~'+etime +'\n'+'요일조건 : '+dayArray
+  console.log(documentSubTitle.value);
   exportExcel.value = !exportExcel.value
 }
 const checkedDay = new Set([1, 2, 3, 4, 5, 6, 7])

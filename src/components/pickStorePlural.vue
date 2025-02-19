@@ -89,7 +89,7 @@ onMounted(() => {
     storeSuperVisor.value = store.state.storeSupervisor
     rowData.value = store.state.storeCd
     emit('lngStoreGroup' ,store.state.storeGroup[0].lngStoreGroup)
-
+    
     labelsData.value.push(store.state.storeGroup.map(item => item.strName))
     valuesData.value.push(store.state.storeGroup.map(item => item.lngStoreGroup))
 
@@ -101,7 +101,7 @@ onMounted(() => {
 
     labelsData.value.push(store.state.storeSupervisor.map(item => item.strName))
     valuesData.value.push(store.state.storeSupervisor.map(item => item.lngSupervisor))
-
+    initCheckBox.value = !initCheckBox.value
   
    
 })
@@ -113,6 +113,8 @@ watch(selectedStoreType , (newValue) => {
         rowData.value = store.state.storeCd.filter(item => item.lngStoreAttr == selectedStoreType.value)
     }
     console.log(rowData.value)
+    
+    emit('lngStoreAttrs' ,selectedStoreType.value)
 })
 
 watch(selectedStoreTeam, (newValue) => {
@@ -201,8 +203,13 @@ const updatedRowData = (e) => {
    
 }
 const initCheckBoxRef = toRef(props, 'initCheckBox') 
+const initCheckBox = ref(false) 
 const initSearchWord = toRef(props, 'initCheckBox') 
 watch( initCheckBoxRef , () => {
+    rowData.value.forEach(item => item.checkbox = false)
+    rowData.value = [...rowData.value]
+})
+watch( initCheckBox , () => {
     rowData.value.forEach(item => item.checkbox = false)
     rowData.value = [...rowData.value]
 })

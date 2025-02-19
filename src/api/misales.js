@@ -138,6 +138,17 @@ export const getRealTimeReport = (groupCd, storeCd, startDate, endDate , seeday)
   });
 };
 
+export const getAreaIndustrySalesReport = (groupCd ,storeCds , startDate , endDate , reporttype , lang) => {
+
+  return api2.post('/MISALES/SLS02_014RPT.asmx/getAreaIndustrySalesReport', {
+    GROUP_CD: groupCd,
+    STORE_CDS : storeCds ,
+    START_DATE : startDate ,
+    END_DATE : endDate,
+    REPORT_TYPE : reporttype ,
+    LANG : lang
+  });
+};
 
 
 
