@@ -90,12 +90,7 @@ onMounted(() => {
     storeSuperVisor.value = store.state.storeSupervisor
     rowData.value = store.state.storeCd
     emit('lngStoreGroup' ,store.state.storeGroup[0].lngStoreGroup)
-<<<<<<< HEAD
     
-=======
-    emit('lngStoreCodes' ,0)
-    emit('excelStore' ,'매장명 : 전체')
->>>>>>> 5f21109d0d8e27423d42aac21e5d017d923f19e7
     labelsData.value.push(store.state.storeGroup.map(item => item.strName))
     valuesData.value.push(store.state.storeGroup.map(item => item.lngStoreGroup))
 
@@ -107,13 +102,8 @@ onMounted(() => {
 
     labelsData.value.push(store.state.storeSupervisor.map(item => item.strName))
     valuesData.value.push(store.state.storeSupervisor.map(item => item.lngSupervisor))
-<<<<<<< HEAD
     initCheckBox.value = !initCheckBox.value
   
-=======
-    initCheck.value =!initCheck.value
-    
->>>>>>> 5f21109d0d8e27423d42aac21e5d017d923f19e7
    
 })
 
@@ -124,12 +114,8 @@ watch(selectedStoreType , (newValue) => {
         rowData.value = store.state.storeCd.filter(item => item.lngStoreAttr == selectedStoreType.value)
     }
     console.log(rowData.value)
-<<<<<<< HEAD
     
     emit('lngStoreAttrs' ,selectedStoreType.value)
-=======
-    emit('lngStoreAttr',selectedStoreType.value)
->>>>>>> 5f21109d0d8e27423d42aac21e5d017d923f19e7
 })
 
 watch(selectedStoreTeam, (newValue) => {
@@ -230,12 +216,7 @@ watch( initCheckBoxRef , () => {
     rowData.value.forEach(item => item.checkbox = false)
     rowData.value = [...rowData.value]
 })
-<<<<<<< HEAD
 watch( initCheckBox , () => {
-=======
-
-watch(initCheck,() => {
->>>>>>> 5f21109d0d8e27423d42aac21e5d017d923f19e7
     rowData.value.forEach(item => item.checkbox = false)
     rowData.value = [...rowData.value]
 })
