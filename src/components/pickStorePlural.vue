@@ -64,7 +64,7 @@ const selectedStoreGroup2 = ref(store.state.storeGroup[0].lngStoreGroup)
 const selectedStoreType = ref(0)
 const selectedStoreTeam = ref(0)
 const selectedSuperVisor = ref(-1)
-const emit = defineEmits(['lngStoreGroups','lngStoreCodes','lngStoreAttrs','lngStoreGroup']);
+const emit = defineEmits(['lngStoreGroups','lngStoreCodes','lngStoreAttrs','lngStoreGroup','excelStore','lngStoreAttr','lngStoreTeam','lngSupervisor']);
 const props = defineProps({
   initCheckBox: {
     type: Boolean,
@@ -80,6 +80,7 @@ const rowData = ref([])
 const labelingColumns = ref('lngStoreGroup,lngStoreAttr,lngTeamCode,lngSupervisor') 
 const valuesData = ref([])
 const labelsData = ref([])
+const initCheck =ref(false)
 onMounted(() => {
   
     storeGroup.value = store.state.storeGroup
@@ -89,7 +90,12 @@ onMounted(() => {
     storeSuperVisor.value = store.state.storeSupervisor
     rowData.value = store.state.storeCd
     emit('lngStoreGroup' ,store.state.storeGroup[0].lngStoreGroup)
+<<<<<<< HEAD
     
+=======
+    emit('lngStoreCodes' ,0)
+    emit('excelStore' ,'매장명 : 전체')
+>>>>>>> 5f21109d0d8e27423d42aac21e5d017d923f19e7
     labelsData.value.push(store.state.storeGroup.map(item => item.strName))
     valuesData.value.push(store.state.storeGroup.map(item => item.lngStoreGroup))
 
@@ -101,8 +107,13 @@ onMounted(() => {
 
     labelsData.value.push(store.state.storeSupervisor.map(item => item.strName))
     valuesData.value.push(store.state.storeSupervisor.map(item => item.lngSupervisor))
+<<<<<<< HEAD
     initCheckBox.value = !initCheckBox.value
   
+=======
+    initCheck.value =!initCheck.value
+    
+>>>>>>> 5f21109d0d8e27423d42aac21e5d017d923f19e7
    
 })
 
@@ -113,8 +124,12 @@ watch(selectedStoreType , (newValue) => {
         rowData.value = store.state.storeCd.filter(item => item.lngStoreAttr == selectedStoreType.value)
     }
     console.log(rowData.value)
+<<<<<<< HEAD
     
     emit('lngStoreAttrs' ,selectedStoreType.value)
+=======
+    emit('lngStoreAttr',selectedStoreType.value)
+>>>>>>> 5f21109d0d8e27423d42aac21e5d017d923f19e7
 })
 
 watch(selectedStoreTeam, (newValue) => {
@@ -127,10 +142,8 @@ watch(selectedStoreTeam, (newValue) => {
     }
     selectedSuperVisor.value = -1 ;
 
-    console.log(storeSuperVisor.value)
-
-    console.log(selectedStoreTeam.value)
-  
+   
+    emit('lngStoreTeam',selectedStoreTeam.value)
    
 })
 
@@ -149,6 +162,7 @@ watch(selectedSuperVisor, (newValue) => {
         }
      
     }
+    emit('lngSupervisor',selectedSuperVisor.value)
 })
 
 
@@ -175,6 +189,7 @@ const checkedRowData = (e) => {
         } else {
             selectedStoreList.value = '전체'
         }
+        emit('excelStore' ,'매장명 : '+ selectedStoreList.value)
     } else {
         selectedStoreList.value = '전체'
         if(selectedStores.value.length > 1){
@@ -184,9 +199,15 @@ const checkedRowData = (e) => {
         } else {
             teamscList.value = '전체'
         }
+        emit('excelStore' ,'매장명 : '+ selectedStoreList.value)
     }
     emit('lngStoreGroups', sendStoreGroups.value)
-    emit('lngStoreCodes' , sendStoreCodes.value)
+    if(sendStoreCodes.value.length == 0){
+        emit('lngStoreCodes' , 0)
+    } else {
+        emit('lngStoreCodes' , sendStoreCodes.value.join(','))
+    }
+   
     emit('lngStoreAttrs' , sendStoreAttrs.value)
 }
 const searchword = (e) => {
@@ -209,7 +230,12 @@ watch( initCheckBoxRef , () => {
     rowData.value.forEach(item => item.checkbox = false)
     rowData.value = [...rowData.value]
 })
+<<<<<<< HEAD
 watch( initCheckBox , () => {
+=======
+
+watch(initCheck,() => {
+>>>>>>> 5f21109d0d8e27423d42aac21e5d017d923f19e7
     rowData.value.forEach(item => item.checkbox = false)
     rowData.value = [...rowData.value]
 })
@@ -222,7 +248,7 @@ const resetChecked = () => {
     rowData.value = [...rowData.value]
 
     emit('lngStoreGroup', store.state.storeGroup[0].lngStoreGroup)
-    emit('lngStoreCodes' , [])
+    emit('lngStoreCodes' , 0)
     emit('lngStoreAttrs' , 0)
     selectedStoreList.value = '전체'
 }

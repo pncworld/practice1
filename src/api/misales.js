@@ -137,6 +137,32 @@ export const getRealTimeReport = (groupCd, storeCd, startDate, endDate , seeday)
    
   });
 };
+export const getTableSearchCondition = (groupCd, storeCd, selectedMenuCond) => {
+
+  return api2.post('/MISALES/SLS04_002RPT.asmx/getTableSearchCondition', {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    MENU_COND: selectedMenuCond,
+   
+  });
+};
+export const getSalesReportByMenu = (groupCd, storeCd, startDate, endDate, searchType, searchValue ,reporttype, checkedgift , checklngprice, checkedlngprint , checkdays , checkholiday) => {
+
+  return api2.post('/MISALES/SLS04_002RPT.asmx/getSalesReportByMenu', {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    START_DATE: startDate,
+    END_DATE: endDate,
+    SEARCH_TYPE :  searchType,
+    SEARCH_VALUE : searchValue,
+    REPORT_TYPE : reporttype ,
+    CHECKED_GIFT : checkedgift ,
+    CHECKED_LNGPRICE : checklngprice ,
+    CHECKED_LNGPRINT : checkedlngprint ,
+    CHECKED_DAYS : checkdays ,
+    CHECKED_HOLIDAY : checkholiday,
+  });
+};
 
 export const getAreaIndustrySalesReport = (groupCd ,storeCds , startDate , endDate , reporttype , lang) => {
 
