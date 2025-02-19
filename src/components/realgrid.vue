@@ -420,6 +420,11 @@ const props = defineProps({
     type: String,
     default: 1
   }
+  ,
+  setGroupSumCustomLevel2: {
+    type: String,
+    default: 1
+  }
 
 });
 
@@ -594,8 +599,10 @@ const funcshowGrid = async () => {
   if(props.setGroupSumCustomColumnId !=[]){
     for(let i=0 ; i < props.setGroupSumCustomColumnId.length ; i++){
       gridView.columnByField(props.setGroupSumCustomColumnId[i]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel){
-        if(props.setGroupSumCustomLevel ==1){
+        if(props.setGroupSumCustomLevel2 ==1){
           return dataProvider.getValue(footerModel.firstItem.dataRow, props.setGroupSumCustomColumnId[i]) +' ' + props.setGroupSumCustomText[props.setGroupSumCustomColumnId.indexOf(props.setGroupSumCustomColumnId[i])];
+        } else if(props.setGroupSumCustomLevel2 ==2) {
+          return ''
         }
       }
     }
@@ -603,12 +610,17 @@ const funcshowGrid = async () => {
 
   if(props.setGroupFooterExpressions !=[]){
     for(let i=0 ; i <props.setGroupFooterExpressions.length ; i++){
+      if(props.setGroupFooterExpressions[i] !='custom'){
+        continue ;
+      }
       gridView.columnByField(props.setGroupFooterColID[i]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel){
         if(props.setGroupSumCustomLevel ==1){
           if(props.setGroupFooterColID[i]=='dtmDate'){
             return formatLocalDate(dataProvider.getValue(footerModel.firstItem.dataRow, "dtmDate"));
           }
           return dataProvider.getValue(footerModel.firstItem.dataRow, props.setGroupFooterColID[i]) 
+        } else if(props.setGroupSumCustomLevel ==2) {
+          return ''
         }
       }
     }
@@ -746,7 +758,11 @@ const funcshowGrid = async () => {
       collapsedAdornments: 'none',
       headerStatement: "",
       expanderVisibility: false ,
-      mergeMode : false
+      mergeMode : true ,
+      createFooterCallback: function(grid,group) {
+     
+       return true;
+    }
     });
     gridView.groupBy(props.setGroupColumnId.split(','));
   }
@@ -1214,7 +1230,7 @@ watch(() => props.exporttoExcel, (newVal) => {
     documentSubtitle: { //부제
     message: props.documentSubTitle +'\n'+'조회시간 : '+today+'\n'+'작성자 : '+user+'('+userID+')',
     visible: true,
-    height: 70,
+    height: 80,
     styleName: "documentSubtitleStyle"
   } ,
     fileName: excelNm + ".xlsx",

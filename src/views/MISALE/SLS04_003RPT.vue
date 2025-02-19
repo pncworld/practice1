@@ -4,23 +4,32 @@
             <div class="flex justify-start  w-full pl-12 pt-4">
                 <div class="flex justify-start">
                     <h1 class="font-bold text-sm md:text-2xl w-full">
-                        메뉴군별 매출 현황2.
+                        메뉴별/결제형태별 매출현황.
                     </h1>
                 </div>
 
             </div>
             <div class="flex justify-center mr-9 space-x-2 pr-5">
-                <button @click="chartButton" class="button primary md:w-auto w-14">차트</button>
+               
                 <button @click="searchButton" class="button search md:w-auto w-14">조회</button>
                 <button @click="excelButton" class="button save w-auto excel">엑셀</button>
-                <button @click="printButton" class="button primary w-auto">인쇄</button>
+            
 
             </div>
         </div>
-        <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-36 items-center z-10 ">
-            <div class="grid grid-cols-1 grid-rows-4 -space-y-3 mt-12">
+        <div class="grid grid-cols-[1fr,10fr,10fr] grid-rows-1 justify-between  bg-gray-200 rounded-lg h-24 items-center z-10 ">
+            <div class="w-10 ml-2 -mt-10"><select name="" id="" class="border rounded-lg h-8 text-base">
+                <option value="">집계</option>
+                <option value="">일자별</option>
+                <option value="">월별</option>
+            </select>
+        </div>
+            <div class="grid grid-cols-1 grid-rows-2 -space-y-3 justify-start -ml-36 mt-3" >
+                <div class="flex justify-start">
                 <Datepicker2 @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker"
                     @excelDate="excelDate"></Datepicker2>
+                    <div class="mt-2"><label for="detail"><input type="checkbox" id="detail">상세보기</label></div>
+                </div>
                 <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 ">
                     메뉴구분 : <div class="flex ml-3 space-x-3 mt-1">
                        
@@ -35,7 +44,16 @@
                 
 
                         <v-select v-model="selectedsubMenu" 
-                        :options="subList" 
+                        :options="menuType" 
+                        placeholder="전체"
+                         label="strName"
+                         class="w-44 !h-8 bg-white "
+                          :reduce="store => store != null ? store.lngCode : null"
+                         clearable="true" 
+                          />
+
+                          <v-select v-model="selectedsubMenu" 
+                        :options="Menus" 
                         placeholder="전체"
                          label="strName"
                          class="w-44 !h-8 bg-white "
@@ -43,91 +61,19 @@
                          clearable="true" 
                           />
                     </div>
-                </div>
-                <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 -mt-20 h-8 -space-x-2">조회조건 :
-                    <div>
-                        <label for="store" class="font-thin"><input type="checkbox" id="store" class="ml-5"
-                                @change="checking">매장명표시</label>
-                    </div>
-                    <div>
-                        <label for="maingroup" class="font-thin"><input type="checkbox" id="maingroup" class="ml-5"
-                                @change="checking">대그룹</label>
-                    </div>
-                    <div>
-                        <label for="subgroup" class="font-thin"><input type="checkbox" id="subgroup" class="ml-5"
-                                @change="checking">서브그룹</label>
-                    </div>
-                    <div>
-                        <label for="day" class="font-thin"><input type="checkbox" id="day" class="ml-5"
-                                @change="checking">일자별</label>
-                    </div>
-                    <div>
-                        <label for="gift" class="font-thin"><input type="checkbox" id="gift" class="ml-5"
-                                @change="checking">증정구분</label>
-                    </div>
-                    <div>
-                        <label for="exception" class="font-thin"><input type="checkbox" id="exception" class="ml-5"
-                                @change="checking">단가제외</label>
-                    </div>
-                    <div>
-                        <label for="sum" class="font-thin"><input type="checkbox" id="sum" class="ml-5"
-                                @change="checking">합계</label>
-                    </div>
-                    <div>
-                        <label for="unite" class="font-thin"><input type="checkbox" id="unite" class="ml-5"
-                                @change="checking">셀병합</label>
-                    </div>
+               
+               
 
-                </div>
-                <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 !-mt-6 h-8">
-                    요일조건 : 
-                    <div>
-                        <label for="mon" class="font-thin"><input type="checkbox" id="mon" class="ml-5"
-                                @change="checkday" checked>월</label>
-                    </div>
-                    <div>
-                        <label for="tue" class="font-thin"><input type="checkbox" id="tue" class="ml-5"
-                                @change="checkday" checked>화</label>
-                    </div>
-                    <div>
-                        <label for="wed" class="font-thin"><input type="checkbox" id="wed" class="ml-5"
-                                @change="checkday" checked>수</label>
-                    </div>
-                    <div>
-                        <label for="thu" class="font-thin"><input type="checkbox" id="thu" class="ml-5"
-                                @change="checkday" checked>목</label>
-                    </div>
-                    <div>
-                        <label for="fri" class="font-thin"><input type="checkbox" id="fri" class="ml-5"
-                                @change="checkday" checked>금</label>
-                    </div>
-                    <div>
-                        <label for="sat" class="font-thin"><input type="checkbox" id="sat" class="ml-5"
-                                @change="checkday" checked>토</label>
-                    </div>
-                    <div>
-                        <label for="sun" class="font-thin"><input type="checkbox" id="sun" class="ml-5"
-                                @change="checkday" checked>일</label>
-                    </div>
-
-                    <div class="ml-20 -mt-2">
-                        공휴일 : 
-                        <select name="" id="" class="border w-16 h-7 rounded-lg" v-model="selectedHoliday">
-                            <option :value="0">선택</option>
-                            <option :value="1">포함</option>
-                            <option :value="2">제외</option>
-                        </select>
-                    </div>
 
                 </div>
             </div>
-            <div class="ml-10 -mt-14">
+            <div class="ml-10">
                 <PickStorePlural2 @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam"
                     @lngStoreAttr="lngStoreAttr" @excelStore="excelStore" :setFooterColID="setFooterColID" :setFooterExpressions="setFooterExpressions">
                 </PickStorePlural2>
                 
             </div>
-            <div></div>
+         
 
         </div>
 
@@ -156,9 +102,9 @@ import { useStore } from 'vuex';
 const setGroupFooter = ref(false)
 const setFooterColID = ref(['strStore','lngCode','strMajor','strSub','strMenu','dtmDate','lngPrice','dtmDate','lngNMenuCnt','lngGMenuCnt','lngMenuCnt','lngSalAmt','lngGAmount','lngDCAmt','lngActAmt','lngVAT','lngNetAmt','dblDistRate','lngSalCnt','dblPreWeek','dblPreYear' ])
 
-const setFooterExpressions = ref(['custom','custom','custom','custom','custom','custom','custom' ,'sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','avg','avg' ])
+const setFooterExpressions = ref(['custom','custom','custom','custom','custom','custom','custom' ,'sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum' ])
 const setGroupFooterColID = ref(['strStore','strMajor','strSub','dtmDate','lngPrice','dtmDate','lngNMenuCnt','lngGMenuCnt','lngMenuCnt','lngSalAmt','lngGAmount','lngDCAmt','lngActAmt','lngVAT','lngNetAmt','dblDistRate','lngSalCnt','dblPreWeek','dblPreYear' ])
-const setGroupFooterExpressions = ref(['custom','custom','custom','custom','sum' ,'sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','avg','avg' ])
+const setGroupFooterExpressions = ref(['custom','custom','custom','custom','sum' ,'sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum' ])
 const setGroupSumCustomColumnId = ref(['strStore','strMajor','strSub'])
 const setGroupSumCustomText = ref(['매장 소계','',''])
 const setGroupSumCustomLevel = ref(1)
@@ -285,17 +231,11 @@ const excelButton = () => {
     for(let i=0 ; i< newCondarr.length ; i++ ){
         searchcond+=searchCondition.value[newCondarr[i]]+','
     }
-    if (searchcond.slice(-1) === ',') {
-        searchcond = searchcond.slice(0, -1);
-        }
   
     let thirdcond = ''
     const newCondarr2 = [...checkedDays].sort()
     for(let i=0 ; i < newCondarr2.length ; i++){
         thirdcond+= dayCondition.value[newCondarr2[i]-1]+','
-    }
-    if (thirdcond.slice(-1) === ',') {
-        thirdcond = thirdcond.slice(0, -1);
     }
     
     documentSubTitle.value = selectedExcelDate.value + '\n' + selectedExcelStore.value +'\n'+'메뉴구분 :' +menu +','+submenu +'\n'+'조회조건 : ' +searchcond +'\n'+'요일조건 : ' +thirdcond

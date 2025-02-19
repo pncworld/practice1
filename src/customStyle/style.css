@@ -163,6 +163,22 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
 
 
 }
+.custom-select3 .vs__selected{
+  height: 32px !important; 
+  background-color: white !important;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden !important;
+  width: 100% !important;
+  position : absolute ;
+
+}
+.custom-select3 .vs__search{
+  margin-top : 2px;
+
+
+}
 .custom-select3 .vs__dropdown-menu {
   height: 500px !important; 
   min-width: 80px !important;
