@@ -45,6 +45,16 @@ export default function salesRouter() {
         path : "SLS05_002RPT.xml",
         component : SLS05_002RPT
       }
+      ,
+      {
+        path : "SLS06_002RPT.xml",
+        component : SLS06_002RPT
+      }
+      ,
+      {
+        path : "SLS06_004RPT.xml",
+        component : SLS06_004RPT
+      }
     
     ];
   }
