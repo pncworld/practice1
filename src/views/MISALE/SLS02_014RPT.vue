@@ -34,7 +34,7 @@
         </div>
       </div>
       <div class="ml-10">
-        <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore" ></PickStorePlural>
+        <PickStorePlural2 @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore" ></PickStorePlural2>
       </div>
     </div>
     <div class="w-full h-[85%]">
@@ -52,6 +52,7 @@
   import { getAreaIndustrySalesReport } from '@/api/misales';
   import Datepicker2 from '@/components/Datepicker2.vue';
   import PickStorePlural from '@/components/pickStorePlural.vue';
+import PickStorePlural2 from '@/components/pickStorePlural2.vue';
   import Realgrid from '@/components/realgrid.vue';
   import Swal from 'sweetalert2';
   import { ref } from 'vue';
@@ -141,11 +142,13 @@
 
       //매장 선택
       let selectedStorearr;
-      if (selectedStores.value == undefined || selectedStores.value.length == 0) {
-        selectedStorearr = ref(store.state.storeCd).value.map(item => item.lngStoreCode).join(',');
-      } else {
+      // console.log(selectedStores.value)
+      // if (selectedStores.value == undefined || selectedStores.value.length == 0) {
+      //   console.log('여기오냐?')
+      //   selectedStorearr = ref(store.state.storeCd).value.map(item => item.lngStoreCode).join(',');
+      // } else {
         selectedStorearr = selectedStores.value
-      }
+      //}
 
       console.log(selectedStorearr);
   

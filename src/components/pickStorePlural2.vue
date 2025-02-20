@@ -90,9 +90,13 @@ onMounted(() => {
     storeSuperVisor.value = store.state.storeSupervisor
     rowData.value = store.state.storeCd
     emit('lngStoreGroup' ,store.state.storeGroup[0].lngStoreGroup)
-    emit('lngStoreCodes' ,0)
+   
+    emit('lngStoreCodes' ,store.state.storeCd.map(item => item.lngStoreCode).join(','))
+    console.log(store.state.storeCd)
  
-    emit('lngStoreAttrs' ,store.state.storeType[0].lngStoreAttr)
+    emit('lngStoreAttrs' ,0)
+    emit('lngSupervisor' ,0)
+    emit('lngStoreTeam' ,0)
     emit('excelStore' ,'매장명 : 전체')
     labelsData.value.push(store.state.storeGroup.map(item => item.strName))
     valuesData.value.push(store.state.storeGroup.map(item => item.lngStoreGroup))
@@ -113,10 +117,13 @@ onMounted(() => {
 watch(selectedStoreType , (newValue) => {
     if(selectedStoreType.value == 0){
         rowData.value = store.state.storeCd
+        emit('lngStoreCodes' ,store.state.storeCd.map(item => item.lngStoreCode).join(','))
     } else {
         rowData.value = store.state.storeCd.filter(item => item.lngStoreAttr == selectedStoreType.value)
+        //sendStoreCodes.value = rowData.value.filter(item => item.checkbox == true).map(item => item.lngStoreCode)
+        emit('lngStoreCodes' ,store.state.storeCd.filter(item => item.lngStoreAttr == selectedStoreType.value).map(item => item.lngStoreCode).join(','))
     }
-    console.log(rowData.value)
+ 
     emit('lngStoreAttr',selectedStoreType.value)
     emit('lngStoreAttrs',selectedStoreType.value)
     emit('excelStore' ,'매장명 : 전체')
@@ -128,9 +135,11 @@ watch(selectedStoreTeam, (newValue) => {
     if(selectedStoreTeam.value == 0){
         rowData.value = store.state.storeCd
         storeSuperVisor.value = store.state.storeSupervisor
+        emit('lngStoreCodes' ,store.state.storeCd.map(item => item.lngStoreCode).join(','))
     } else {
         rowData.value = store.state.storeCd.filter(item => item.lngTeamCode == selectedStoreTeam.value)
         storeSuperVisor.value = store.state.storeSupervisor.filter(item => item.lngTeamCode == selectedStoreTeam.value)
+        emit('lngStoreCodes' ,store.state.storeCd.filter(item => item.lngTeamCode == selectedStoreTeam.value).map(item => item.lngStoreCode).join(','))
     }
     selectedSuperVisor.value = -1 ;
 
@@ -144,19 +153,24 @@ watch(selectedSuperVisor, (newValue) => {
     if(selectedSuperVisor.value == -1){
         if(selectedStoreTeam.value ==0){
             rowData.value = store.state.storeCd
+            emit('lngStoreCodes' ,store.state.storeCd.map(item => item.lngStoreCode).join(','))
         } else {
             rowData.value = store.state.storeCd.filter(item => item.lngTeamCode == selectedStoreTeam.value)
+            emit('lngStoreCodes' ,store.state.storeCd.filter(item => item.lngTeamCode == selectedStoreTeam.value).map(item => item.lngStoreCode).join(','))
         }
     } else {
         if(selectedStoreTeam.value ==0){
             rowData.value = store.state.storeCd.filter(item => item.lngSupervisor == selectedSuperVisor.value)
+            emit('lngStoreCodes' ,store.state.storeCd.filter(item => item.lngSupervisor == selectedSuperVisor.value).map(item => item.lngStoreCode).join(','))
         } else {
             rowData.value = store.state.storeCd.filter(item => item.lngTeamCode == selectedStoreTeam.value).filter(item => item.lngSupervisor == selectedSuperVisor.value)
+            emit('lngStoreCodes' ,store.state.storeCd.filter(item => item.lngTeamCode == selectedStoreTeam.value).filter(item => item.lngSupervisor == selectedSuperVisor.value).map(item => item.lngStoreCode).join(','))
         }
      
     }
     initCheck.value = !initCheck.value
-    emit('lngSupervisor',selectedSuperVisor.value)
+    const sendSupervisor = selectedSuperVisor.value == -1 ? 0 :selectedSuperVisor.value
+    emit('lngSupervisor',sendSupervisor)
     emit('excelStore' ,'매장명 : 전체')
     selectedStoreList.value = '전체'
 })
@@ -204,7 +218,10 @@ const checkedRowData = (e) => {
         emit('lngStoreCodes' , sendStoreCodes.value.join(','))
     }
    
-    emit('lngStoreAttrs' , sendStoreAttrs.value)
+    emit('lngStoreAttrs' , selectedStoreType.value)
+    const sendSupervisor = selectedSuperVisor.value == -1 ? 0 :selectedSuperVisor.value
+    emit('lngSupervisor',sendSupervisor)
+    emit('lngStoreTeam', selectedStoreTeam.value)
 }
 const searchword = (e) => {
     searchWord.value = e.target.value
@@ -241,6 +258,9 @@ const resetChecked = () => {
     emit('lngStoreGroup', store.state.storeGroup[0].lngStoreGroup)
     emit('lngStoreCodes' , 0)
     emit('lngStoreAttrs' , 0)
+    const sendSupervisor = selectedSuperVisor.value == -1 ? 0 :selectedSuperVisor.value
+    emit('lngSupervisor',sendSupervisor)
+    emit('lngStoreTeam' ,0)
     selectedStoreList.value = '전체'
 }
 const showOnlycheck = ref(false)

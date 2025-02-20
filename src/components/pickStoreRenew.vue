@@ -7,23 +7,24 @@
         </select>
       </div>
       <div>
-        <select :disabled="isDisabled2"  class=" border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="setStore($event.target.value); emitStoreType($event.target.value);">
+        <select :disabled="isDisabled2"  class=" border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="setStore($event.target.value); emitStoreType($event.target.value);" v-model="selectedStoreType">
          
           <option value="0">전체</option>
           <option :value="item.lngStoreAttr" v-for="item in storeType" :key="item.lngStoreAttr">{{ item.strName }}</option>
         </select>
       </div>
+      <div class="h-10 flex ">
       <v-select
     v-model="selectedStore"
     :options="storeCd"
     label="strName"
     placeholder="선택"
-    class="!w-72 !h-7 -mt-3 custom-select"
+    class="!w-72 !h-7 mt-0 custom-select"
     :reduce="store => store != null ? store.lngStoreCode : null"
     clearable="true"
     @click="resetSelectedStore"
   />
-     
+</div>
     </div>
 </template>
   
@@ -40,6 +41,7 @@ const isDisabled1 = ref(false);
 const isDisabled2 = ref(false);
 const isDisabled3 = ref(false);
 const selectedGroup = ref()
+const selectedStoreType = ref(0)
 const selectedStore = ref(null);
     const store = useStore();
     const userData = store.state.userData ;
@@ -103,6 +105,9 @@ watch(selectedStore , () => {
   }
 })
    
+watch(selectedStoreType ,() => {
+  selectedStore.value = null
+})
   storeGroup.value = store.state.storeGroup;
   storeType.value = store.state.storeType;
   storeCd.value = store.state.storeCd;
@@ -117,7 +122,7 @@ watch(selectedStore , () => {
     storeCd.value = storeCd2.value.filter( item => {
         return item.lngStoreAttr == value ;
     })
-    selectedStore.value = 0
+    selectedStore.value = null
   }
 
   const route = useRoute();

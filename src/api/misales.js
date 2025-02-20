@@ -126,14 +126,14 @@ export const getReceiptDataDetail = (groupCd, storeCd, startDate, endDate) => {
    
   });
 };
-export const getRealTimeReport = (groupCd, storeCd, startDate, endDate , seeday) => {
+export const getRealTimeReport = (groupCd, storeCd, startDate, endDate , seeday ,attr ,team , supervisor) => {
 
   return api2.post('/MISALES/SLS02_030RPT.asmx/getRealTimeReport', {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     START_DATE: startDate,
     END_DATE: endDate,
-    DAY_ON: seeday,
+    DAY_ON: seeday
    
   });
 };
