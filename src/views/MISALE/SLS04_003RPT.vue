@@ -92,7 +92,7 @@ import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStorePlural from '@/components/pickStorePlural.vue';
 import PickStorePlural2 from '@/components/pickStorePlural2.vue';
 import Realgrid from '@/components/realgrid.vue';
-import { formatTime } from '@/customFunc/customFunc';
+import { formatTime, insertPageLog } from '@/customFunc/customFunc';
 import Swal from 'sweetalert2';
 import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
@@ -284,15 +284,17 @@ watch(selectedsubMenu, async () => {
     // if(selectedsubMenu.value == null){
     //     selectedsubMenu.value = 0
     // }
-    console.log(selectedsubMenu.value)
+
     const res = await getMenuCondition(selectedGroup.value, selectedStores.value,3, selectedMenu.value.lngcode ,selectedsubMenu.value.lngcode)
     Menus.value = res.data.List
     selectedSubSubMenu.value = null
-    console.log(Menus.value)
+  
 
 })
 
 onMounted(async () => {
+    console.log(store.state.activeTab2)
+    const pageLog = insertPageLog(store.state.activeTab2)
     console.log(selectedStores.value)
     const res = await getMenuCondition(selectedGroup.value, selectedStores.value ,1 , 0, 0)
 

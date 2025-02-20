@@ -127,6 +127,21 @@ export const getStoreAndPosList3 = async(groupCd , storeCd ,areaCd,posNo) => {
   })
   return res ;
 }
+export const savePageLog = async(time,group,store,userid,userip,progname,progid,bln) => {
+  const res = await api2.post("/SYSTEM/sysCom.asmx/savePageLog" , {
+   
+      TIME: time,
+      GROUP : group ,
+      STORE : store,
+      USERID : userid ,
+      USERIP : userip ,
+      PROGNAME : progname ,
+      PROGID : progid ,
+      BLN : bln ,
+     
+  })
+  return res ;
+}
 
 
 

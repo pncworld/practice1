@@ -436,7 +436,7 @@ const props = defineProps({
   },
   mergeColumnGroupSubList2: {
     type: Array,
-    default: [],
+    default: [[]],
   }
 
 });
