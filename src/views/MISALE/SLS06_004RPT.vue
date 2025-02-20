@@ -18,7 +18,7 @@
   </div>
   <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-24 items-center z-10">
     <div class="grid grid-cols-1 grid-rows-2">
-      <Datepicker2 @endDate="endDate" @startDate="startDate"></Datepicker2>
+      <Datepicker2 @endDate="endDate" @startDate="startDate" @excelDate="excelDate"></Datepicker2>
       <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 ">조회조건 : <div><label
             for="detail" class="font-thin"><input type="checkbox" id="detail" class="ml-5"
               @change="seeDetail">상세보기</label></div>
@@ -27,8 +27,8 @@
       </div>
     </div>
     <div class="ml-10">
-      <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs">
-      </PickStorePlural>
+      <PickStorePlural2 @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore">
+      </PickStorePlural2>
     </div>
     <div></div>
 
@@ -38,8 +38,8 @@
 
     <Realgrid :progname="'SLS06_004RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload" :setFooter="true"
       :setGroupFooter="setGroupFooter" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
-      :ExcelNm="'일자별 매출 현황.'" :exporttoExcel="exportExcel" :setGroupColumnId="'dtmDate'" :setGroupSumCustomText="'소계'"
-      :setGroupSumCustomColumnId="'strWeekName'" :setGroupCustomLevel="1"
+      :documentTitle="'SLS06_004RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel" :setGroupColumnId="'dtmDate'" :setGroupSumCustomText="['소계']"
+      :setGroupSumCustomColumnId="['strWeekName']" :setGroupCustomLevel="3"
       :setGroupSummaryCenterIds="setGroupSummaryCenterIds"></Realgrid>
   </div>
 </template>
@@ -48,6 +48,7 @@
 import { getDailySalesDetailReport, getDailySalesReport } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStorePlural from '@/components/pickStorePlural.vue';
+import PickStorePlural2 from '@/components/pickStorePlural2.vue';
 import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';
 import { ref } from 'vue';
@@ -97,11 +98,9 @@ const searchButton = async () => {
     progid.value = tempSeeDetail.value
     reload.value = !reload.value
     let selectedStorearr;
-    if (selectedStores.value == undefined || selectedStores.value.length == 0) {
-      selectedStorearr = 0
-    } else {
-      selectedStorearr = selectedStores.value.map(item => item).join(',')
-    }
+  
+      selectedStorearr = selectedStores.value
+ 
 
     if (progid.value == 1) {
       const res = await getDailySalesReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, 1, loginedstrLang)
@@ -149,7 +148,17 @@ const initGrid = () => {
 }
 
 const exportExcel = ref(false)
+const selectedExcelStore = ref('')
+const selectedExcelDate = ref('')
+const documentSubTitle = ref('')
+const excelStore = (e) => {
+  selectedExcelStore.value = e
+}
+const excelDate = (e) => {
+  selectedExcelDate.value = e
+}
 const excelButton = () => {
+  documentSubTitle.value = selectedExcelDate.value+'\n'+selectedExcelStore.value
   exportExcel.value = !exportExcel.value
 }
 </script>

@@ -126,14 +126,14 @@ export const getReceiptDataDetail = (groupCd, storeCd, startDate, endDate) => {
    
   });
 };
-export const getRealTimeReport = (groupCd, storeCd, startDate, endDate , seeday) => {
+export const getRealTimeReport = (groupCd, storeCd, startDate, endDate , seeday ,attr ,team , supervisor) => {
 
   return api2.post('/MISALES/SLS02_030RPT.asmx/getRealTimeReport', {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     START_DATE: startDate,
     END_DATE: endDate,
-    DAY_ON: seeday,
+    DAY_ON: seeday
    
   });
 };
@@ -143,6 +143,17 @@ export const getTableSearchCondition = (groupCd, storeCd, selectedMenuCond) => {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     MENU_COND: selectedMenuCond,
+   
+  });
+};
+export const getMenuCondition = (groupCd, storeCd, searchKb , majorCode, subCode ) => {
+
+  return api2.post('/MISALES/SLS04_003RPT.asmx/getMenuCondition', {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SEARCH_KB: searchKb,
+    MAJOR_CD: majorCode,
+    SUB_CD: subCode,
    
   });
 };

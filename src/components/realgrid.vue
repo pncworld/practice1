@@ -425,6 +425,19 @@ const props = defineProps({
     type: String,
     default: 1
   }
+  ,
+  mergeColumns2: {
+    type: Boolean,
+    default: false,
+  },
+  mergeColumnGroupName2: {
+    type: Array,
+    default: [],
+  },
+  mergeColumnGroupSubList2: {
+    type: Array,
+    default: [],
+  }
 
 });
 
@@ -698,6 +711,39 @@ const funcshowGrid = async () => {
     gridView.setColumnLayout(layout1)
 
   }
+
+  if (props.mergeColumns2 == true) {
+    const subList = props.mergeColumnGroupSubList2.split(',');
+    const layout = [];
+    const groupItems = {
+        name: props.mergeColumnGroupName2.join(','), // 배열을 문자열로 결합하여 그룹 이름 생성
+        direction: "horizontal",
+        items: [],
+        header: {
+            text: props.mergeColumnGroupName2.join(','), // 배열의 각 항목을 쉼표로 연결하여 헤더 텍스트 생성
+            styleName: `header-style-0`
+        },
+    };
+
+    tabInitSetArray.value.forEach(item => {
+        if (subList.includes(item.strColID)) {
+            groupItems.items.push(item.strHdText);
+        } else {
+            layout.push({
+                column: item.strColID,
+                header: { visible: true, text: item.strHdText },
+                visible: item.intHdWidth !== 0,
+                width: item.intHdWidth
+            });
+        }
+    });
+
+    if (groupItems.items.length > 0) {
+        layout.unshift(groupItems);
+    }
+
+    gridView.setColumnLayout(layout);
+}
 
   // 데이터 추가
 

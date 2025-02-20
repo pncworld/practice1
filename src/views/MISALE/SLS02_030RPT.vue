@@ -37,9 +37,9 @@
                 </div>
             </div>
             <div class="ml-10">
-                <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup"
+                <PickStorePlural2 @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam"
                     @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore">
-                </PickStorePlural>
+                </PickStorePlural2>
                 <div class="text-red-500 h-5 mt-2 flex justify-end mr-3" ><div v-show="afterSearch">{{currentTime}}에 조회되었으며 미결제금액은 조회 시간 기준입니다.</div></div>
             </div>
             <div></div>
@@ -58,6 +58,7 @@
 import { getDailySalesDetailReport, getDailySalesReport, getRealTimeReport } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStorePlural from '@/components/pickStorePlural.vue';
+import PickStorePlural2 from '@/components/pickStorePlural2.vue';
 import Realgrid from '@/components/realgrid.vue';
 import { formatTime } from '@/customFunc/customFunc';
 import Swal from 'sweetalert2';
@@ -104,12 +105,12 @@ const searchButton = async () => {
             progid.value = 2
         }
         reload.value = !reload.value
-        let selectedStorearr;
-        if (selectedStores.value == undefined || selectedStores.value.length == 0) {
-            selectedStorearr = 0
-        } else {
-            selectedStorearr = selectedStores.value.map(item => item).join(',')
-        }
+         let selectedStorearr;
+        // if (selectedStores.value == undefined || selectedStores.value.length == 0) {
+        //     selectedStorearr = 0
+        // } else {
+            selectedStorearr = selectedStores.value
+       // }
 
   
             const res = await getRealTimeReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, tempSeeDay.value )
@@ -131,7 +132,9 @@ const searchButton = async () => {
 const currentTime = ref(formatTime(new Date()))
 const selectedGroup = ref()
 const selectedStores = ref()
-const selectedStoreAttrs = ref()
+const selectedStoreAttrs = ref(0)
+const selectedLngSuperVisor = ref(0)
+const selectedLngStoreTeam = ref(0)
 const lngStoreGroup = (e) => {
     console.log(e)
     selectedGroup.value = e
@@ -141,9 +144,22 @@ const lngStoreCodes = (e) => {
     console.log(e)
 }
 const lngStoreAttrs = (e) => {
+    initGrid()
     selectedStoreAttrs.value = e
     console.log(e)
 }
+const lngSupervisor = (e) => {
+    initGrid()
+    selectedLngSuperVisor.value = e
+    console.log(e)
+}
+
+const lngStoreTeam = (e) => {
+    initGrid()
+    selectedLngStoreTeam.value = e
+    console.log(e)
+}
+
 
 const initGrid = () => {
     if (rowData.value.length > 0) {

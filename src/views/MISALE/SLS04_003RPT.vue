@@ -18,17 +18,18 @@
             </div>
         </div>
         <div class="grid grid-cols-[1fr,10fr,10fr] grid-rows-1 justify-between  bg-gray-200 rounded-lg h-24 items-center z-10 ">
-            <div class="w-10 ml-2 -mt-10"><select name="" id="" class="border rounded-lg h-8 text-base">
-                <option value="">집계</option>
-                <option value="">일자별</option>
-                <option value="">월별</option>
+            <div class="w-10 ml-2 -mt-10">
+                <select name="" id="" class="border rounded-lg h-8 text-base z-10" v-model="selectedSearchType">
+                <option :value="4">집계</option>
+                <option :value="2">일자별</option>
+                <option :value="1">월별</option>
             </select>
         </div>
             <div class="grid grid-cols-1 grid-rows-2 -space-y-3 justify-start -ml-36 mt-3" >
-                <div class="flex justify-start">
+                <div class="flex justify-start mr">
                 <Datepicker2 @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker"
                     @excelDate="excelDate"></Datepicker2>
-                    <div class="mt-2"><label for="detail"><input type="checkbox" id="detail">상세보기</label></div>
+                    <div class="mt-2"><label for="detail"><input type="checkbox" id="detail" @change="detailView">상세보기</label></div>
                 </div>
                 <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 ">
                     메뉴구분 : <div class="flex ml-3 space-x-3 mt-1">
@@ -36,9 +37,8 @@
                         <v-select v-model="selectedMenu" 
                         :options="mainMenu" 
                         placeholder="전체"
-                         label="strName"
+                         label="strname"
                          class="w-44 !h-8 bg-white "
-                          :reduce="store => store != null ? store.lngCode : null"
                          clearable="true" 
                           />
                 
@@ -46,18 +46,16 @@
                         <v-select v-model="selectedsubMenu" 
                         :options="menuType" 
                         placeholder="전체"
-                         label="strName"
+                         label="strname"
                          class="w-44 !h-8 bg-white "
-                          :reduce="store => store != null ? store.lngCode : null"
                          clearable="true" 
                           />
 
-                          <v-select v-model="selectedsubMenu" 
+                          <v-select v-model="selectedSubSubMenu" 
                         :options="Menus" 
                         placeholder="전체"
-                         label="strName"
+                         label="strname"
                          class="w-44 !h-8 bg-white "
-                          :reduce="store => store != null ? store.lngCode : null"
                          clearable="true" 
                           />
                     </div>
@@ -67,7 +65,7 @@
 
                 </div>
             </div>
-            <div class="ml-10">
+            <div class="ml-0">
                 <PickStorePlural2 @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam"
                     @lngStoreAttr="lngStoreAttr" @excelStore="excelStore" :setFooterColID="setFooterColID" :setFooterExpressions="setFooterExpressions">
                 </PickStorePlural2>
@@ -79,7 +77,7 @@
 
         <div class="w-full h-[80%] mt-1">
 
-            <Realgrid :progname="'SLS04_002RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload"
+            <Realgrid :progname="'SLS04_002RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload"
                 :exporttoExcel="exportExcel" :documentSubTitle="documentSubTitle" :documentTitle="'SLS04_002RPT'"
                 :hideColumnsId="hideColumnsId" :setGroupColumnId="setGroupColumnId2" :setGroupFooter="setGroupFooter" :setFooter="true" :setGroupCustomLevel="2"
                 :setFooterColID="setFooterColID" :setFooterExpressions="setFooterExpressions" :setGroupSumCustomColumnId="setGroupSumCustomColumnId" :setGroupSumCustomText="setGroupSumCustomText" :setGroupSumCustomLevel="setGroupSumCustomLevel"
@@ -89,7 +87,7 @@
 </template>
 
 <script setup>
-import { getDailySalesDetailReport, getDailySalesReport, getRealTimeReport, getSalesReportByMenu, getTableSearchCondition } from '@/api/misales';
+import { getDailySalesDetailReport, getDailySalesReport, getMenuCondition, getRealTimeReport, getSalesReportByMenu, getTableSearchCondition } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStorePlural from '@/components/pickStorePlural.vue';
 import PickStorePlural2 from '@/components/pickStorePlural2.vue';
@@ -111,7 +109,7 @@ const setGroupSumCustomLevel = ref(1)
 const setGroupColumnId = ref([''])
 const setGroupColumnId2 = ref('')
 const setGroupSumCustomLevel2 = ref(1)
-const progid = ref(2)
+const progid = ref(1)
 const reload = ref(false)
 const rowData = ref([])
 const afterSearch = ref(false)
@@ -207,6 +205,7 @@ const initGrid = () => {
 }
 
 const exportExcel = ref(false)
+const selectedSearchType = ref(4)
 const documentSubTitle = ref('')
 const menuDistinct = ref(['전체','대그룹','서브그룹','메뉴구분'])
 const searchCondition = ref(['매장명표시','대그룹','서브그룹','일자별','증정구분','단가제외','합계','셀병합'])
@@ -267,27 +266,53 @@ const printButton = () => {
 const selectedMenu = ref(null)
 
 const subList = ref([])
+const menuType = ref([])
+const Menus = ref([])
 const mainMenu = ref([{lngCode : 0 , strName : '전체'},{lngCode : 1 , strName : '대그룹'},{lngCode : 2 , strName : '서브그룹'},{lngCode : 3 , strName : '메뉴코드'}])
 watch(selectedMenu, async () => {
-
-    const res = await getTableSearchCondition(selectedGroup.value, selectedStores.value, selectedMenu.value)
-    subList.value = res.data.SUBLIST
-    console.log(subList.value)
+    // if(selectedMenu.value == null){
+    //     selectedMenu.value = 0
+    // }
+    console.log(selectedMenu.value)
+    const res = await getMenuCondition(selectedGroup.value, selectedStores.value,2, selectedMenu.value.lngcode ,0)
+    menuType.value = res.data.List
     selectedsubMenu.value = null
+    console.log(menuType.value)
+})
+const selectedSubSubMenu = ref(null)
+watch(selectedsubMenu, async () => {
+    // if(selectedsubMenu.value == null){
+    //     selectedsubMenu.value = 0
+    // }
+    console.log(selectedsubMenu.value)
+    const res = await getMenuCondition(selectedGroup.value, selectedStores.value,3, selectedMenu.value.lngcode ,selectedsubMenu.value.lngcode)
+    Menus.value = res.data.List
+    selectedSubSubMenu.value = null
+    console.log(Menus.value)
 
 })
 
 onMounted(async () => {
-    const res = await getTableSearchCondition(selectedGroup.value, selectedStores.value, selectedMenu.value)
-    subList.value = res.data.SUBLIST
-  
+    console.log(selectedStores.value)
+    const res = await getMenuCondition(selectedGroup.value, selectedStores.value ,1 , 0, 0)
 
+    mainMenu.value = res.data.List
+   
+  
 })
 const hideColumnsId = ref(['strStore','strMajor','strSub','dtmDate','lngNMenuCnt','lngGMenuCnt'])
 const checkedReportTypes = new Set([0])
 const checkedGift = ref(0)
 const checkedlngPrice = ref(0)
 const checkedlngPrint = ref(0)
+const selectedDetail = ref(false)
+const detailView = (e)=>{
+    if(e.target.checked){
+        selectedDetail.value = true
+    } else {
+        selectedDetail.value = false
+    }
+}
 const customOrder = ['strStore','strMajor','strSub','dtmDate']
 const checking = (e) => {
     
