@@ -74,7 +74,8 @@ onMounted(()=>{
     if(storeGroup.value[0] !=undefined){
       emit('update:storeGroup', storeGroup.value[0].lngStoreGroup);
     }
- 
+    console.log(store)
+    emit('update:storeCd', 0);
 
 
 })

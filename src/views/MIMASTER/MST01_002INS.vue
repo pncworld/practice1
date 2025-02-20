@@ -286,6 +286,7 @@ const storeCd = ref('0');
 const allstrore = ref(false);
 const handleStoreCd = (newValue) => {
   storeCd.value = newValue
+  console.log(newValue)
   if (storeCd.value == 0) {
     allstrore.value = false
   } else {
@@ -382,7 +383,11 @@ const searchButton = async () => {
   strStoreHistory.value = '';
 
   store.dispatch("convertLoading", true);
-
+  
+  console.log(groupCd.value)
+  console.log(storeType.value)
+  console.log(storeCd.value)
+  console.log(searchStoreName.value)
   const res = await getstoreInfo(groupCd.value, storeType.value, storeCd.value, searchStoreName.value);
 
   console.log(res)
