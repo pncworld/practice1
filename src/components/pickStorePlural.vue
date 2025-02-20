@@ -90,6 +90,7 @@ onMounted(() => {
     storeSuperVisor.value = store.state.storeSupervisor
     rowData.value = store.state.storeCd
     emit('lngStoreGroup' ,store.state.storeGroup[0].lngStoreGroup)
+    emit('excelStore' ,'매장명 : 전체')
     
     labelsData.value.push(store.state.storeGroup.map(item => item.strName))
     valuesData.value.push(store.state.storeGroup.map(item => item.lngStoreGroup))
@@ -231,6 +232,7 @@ const resetChecked = () => {
     emit('lngStoreGroup', store.state.storeGroup[0].lngStoreGroup)
     emit('lngStoreCodes' , 0)
     emit('lngStoreAttrs' , 0)
+    emit('excelStore' ,'매장명 : 전체')
     selectedStoreList.value = '전체'
 }
 const showOnlycheck = ref(false)

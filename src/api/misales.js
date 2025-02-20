@@ -176,7 +176,6 @@ export const getSalesReportByMenu = (groupCd, storeCd, startDate, endDate, searc
 };
 
 export const getAreaIndustrySalesReport = (groupCd ,storeCds , startDate , endDate , reporttype , lang) => {
-
   return api2.post('/MISALES/SLS02_014RPT.asmx/getAreaIndustrySalesReport', {
     GROUP_CD: groupCd,
     STORE_CDS : storeCds ,
@@ -184,6 +183,17 @@ export const getAreaIndustrySalesReport = (groupCd ,storeCds , startDate , endDa
     END_DATE : endDate,
     REPORT_TYPE : reporttype ,
     LANG : lang
+  });
+};
+
+export const getCardSalesDetailReport = (groupCd ,storeCds , startDate , endDate , reporttype , lang) => {
+  return api2.post('/MISALES/SLS05_002RPT.asmx/getCardSalesDetailReport', {
+    GROUP_CD    : groupCd,
+    STORE_CDS   : storeCds,
+    START_DATE  : startDate,
+    END_DATE    : endDate,
+    REPORT_TYPE : reporttype,
+    LANG        : lang
   });
 };
 
