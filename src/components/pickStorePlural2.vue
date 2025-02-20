@@ -59,8 +59,8 @@ const storeType = ref([]);
 const storeTeam = ref([]);
 const settingDisable = ref(1);
 const storeSuperVisor = ref([]);
-const selectedStoreGroup = ref(store.state.storeGroup[0].lngStoreGroup)
-const selectedStoreGroup2 = ref(store.state.storeGroup[0].lngStoreGroup)
+const selectedStoreGroup = ref(store.state.storeGroup?.[0]?.lngStoreGroup || null)
+const selectedStoreGroup2 = ref(store.state.storeGroup?.[0]?.lngStoreGroup || null)
 const selectedStoreType = ref(0)
 const selectedStoreTeam = ref(0)
 const selectedSuperVisor = ref(-1)
@@ -91,6 +91,8 @@ onMounted(() => {
     rowData.value = store.state.storeCd
     emit('lngStoreGroup' ,store.state.storeGroup[0].lngStoreGroup)
     emit('lngStoreCodes' ,0)
+ 
+    emit('lngStoreAttrs' ,store.state.storeType[0].lngStoreAttr)
     emit('excelStore' ,'매장명 : 전체')
     labelsData.value.push(store.state.storeGroup.map(item => item.strName))
     valuesData.value.push(store.state.storeGroup.map(item => item.lngStoreGroup))
@@ -116,6 +118,10 @@ watch(selectedStoreType , (newValue) => {
     }
     console.log(rowData.value)
     emit('lngStoreAttr',selectedStoreType.value)
+    emit('lngStoreAttrs',selectedStoreType.value)
+    emit('excelStore' ,'매장명 : 전체')
+    initCheck.value = !initCheck.value
+    selectedStoreList.value = '전체'
 })
 
 watch(selectedStoreTeam, (newValue) => {
@@ -128,9 +134,10 @@ watch(selectedStoreTeam, (newValue) => {
     }
     selectedSuperVisor.value = -1 ;
 
-   
+    initCheck.value = !initCheck.value
     emit('lngStoreTeam',selectedStoreTeam.value)
-   
+    emit('excelStore' ,'매장명 : 전체')
+    selectedStoreList.value = '전체'
 })
 
 watch(selectedSuperVisor, (newValue) => {
@@ -148,7 +155,10 @@ watch(selectedSuperVisor, (newValue) => {
         }
      
     }
+    initCheck.value = !initCheck.value
     emit('lngSupervisor',selectedSuperVisor.value)
+    emit('excelStore' ,'매장명 : 전체')
+    selectedStoreList.value = '전체'
 })
 
 
@@ -179,11 +189,11 @@ const checkedRowData = (e) => {
     } else {
         selectedStoreList.value = '전체'
         if(selectedStores.value.length > 1){
-            teamscList.value = selectedStores.value[0] + ' 외' + (selectedStores.value.length -1) + '건'
+            selectedStoreList.value = selectedStores.value[0] + ' 외' + (selectedStores.value.length -1) + '건'
         } else if ( selectedStores.value.length == 1) {
-            teamscList.value = selectedStores.value
+            selectedStoreList.value = selectedStores.value
         } else {
-            teamscList.value = '전체'
+            selectedStoreList.value = '전체'
         }
         emit('excelStore' ,'매장명 : '+ selectedStoreList.value)
     }

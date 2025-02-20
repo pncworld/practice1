@@ -100,7 +100,7 @@ const searchButton = async () => {
     if (selectedStores.value == undefined || selectedStores.value.length == 0) {
       selectedStorearr = 0
     } else {
-      selectedStorearr = selectedStores.value.map(item => item).join(',')
+      selectedStorearr = selectedStores.value
     }
 
     if (progid.value == 1) {

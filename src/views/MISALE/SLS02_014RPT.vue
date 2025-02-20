@@ -144,7 +144,7 @@
       if (selectedStores.value == undefined || selectedStores.value.length == 0) {
         selectedStorearr = ref(store.state.storeCd).value.map(item => item.lngStoreCode).join(',');
       } else {
-        selectedStorearr = selectedStores.value.map(item => item).join(',')
+        selectedStorearr = selectedStores.value
       }
 
       console.log(selectedStorearr);

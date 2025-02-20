@@ -36,9 +36,9 @@
                         <v-select v-model="selectedMenu" 
                         :options="mainMenu" 
                         placeholder="전체"
-                         label="strName"
+                         label="strname"
                          class="w-44 !h-8 bg-white "
-                          :reduce="store => store != null ? store.lngCode : null"
+                          :reduce="store => store != null ? store.lngcode : null"
                          clearable="true" 
                           />
                 
@@ -46,18 +46,18 @@
                         <v-select v-model="selectedsubMenu" 
                         :options="menuType" 
                         placeholder="전체"
-                         label="strName"
+                         label="strname"
                          class="w-44 !h-8 bg-white "
-                          :reduce="store => store != null ? store.lngCode : null"
+                          :reduce="store => store != null ? store.lngcode : null"
                          clearable="true" 
                           />
 
-                          <v-select v-model="selectedsubMenu" 
+                          <v-select v-model="selectedSubSubMenu" 
                         :options="Menus" 
                         placeholder="전체"
-                         label="strName"
+                         label="strname"
                          class="w-44 !h-8 bg-white "
-                          :reduce="store => store != null ? store.lngCode : null"
+                          :reduce="store => store != null ? store.lngcode : null"
                          clearable="true" 
                           />
                     </div>
@@ -67,7 +67,7 @@
 
                 </div>
             </div>
-            <div class="ml-10">
+            <div class="ml-0">
                 <PickStorePlural2 @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam"
                     @lngStoreAttr="lngStoreAttr" @excelStore="excelStore" :setFooterColID="setFooterColID" :setFooterExpressions="setFooterExpressions">
                 </PickStorePlural2>
@@ -89,7 +89,7 @@
 </template>
 
 <script setup>
-import { getDailySalesDetailReport, getDailySalesReport, getRealTimeReport, getSalesReportByMenu, getTableSearchCondition } from '@/api/misales';
+import { getDailySalesDetailReport, getDailySalesReport, getMenuCondition, getRealTimeReport, getSalesReportByMenu, getTableSearchCondition } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStorePlural from '@/components/pickStorePlural.vue';
 import PickStorePlural2 from '@/components/pickStorePlural2.vue';
@@ -267,20 +267,35 @@ const printButton = () => {
 const selectedMenu = ref(null)
 
 const subList = ref([])
+const menuType = ref([])
+const Menus = ref([])
 const mainMenu = ref([{lngCode : 0 , strName : '전체'},{lngCode : 1 , strName : '대그룹'},{lngCode : 2 , strName : '서브그룹'},{lngCode : 3 , strName : '메뉴코드'}])
 watch(selectedMenu, async () => {
-
-    const res = await getTableSearchCondition(selectedGroup.value, selectedStores.value, selectedMenu.value)
-    subList.value = res.data.SUBLIST
-    console.log(subList.value)
+    if(selectedMenu.value == null){
+        selectedMenu.value = 0
+    }
+    const res = await getMenuCondition(selectedGroup.value, selectedStores.value,2, selectedMenu.value ,0)
+    menuType.value = res.data.List
     selectedsubMenu.value = null
+    console.log(menuType.value)
+})
+const selectedSubSubMenu = ref(null)
+watch(selectedsubMenu, async () => {
+    if(selectedsubMenu.value == null){
+        selectedsubMenu.value = 0
+    }
+    const res = await getMenuCondition(selectedGroup.value, selectedStores.value,3, selectedMenu.value ,selectedsubMenu.value)
+    Menus.value = res.data.List
+    selectedSubSubMenu.value = null
+    console.log(Menus.value)
 
 })
 
 onMounted(async () => {
-    const res = await getTableSearchCondition(selectedGroup.value, selectedStores.value, selectedMenu.value)
-    subList.value = res.data.SUBLIST
-  
+    const res = await getMenuCondition(selectedGroup.value, selectedStores.value ,1 , 0, 0)
+
+    mainMenu.value = res.data.List
+   
 
 })
 const hideColumnsId = ref(['strStore','strMajor','strSub','dtmDate','lngNMenuCnt','lngGMenuCnt'])

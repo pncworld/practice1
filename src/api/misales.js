@@ -146,6 +146,17 @@ export const getTableSearchCondition = (groupCd, storeCd, selectedMenuCond) => {
    
   });
 };
+export const getMenuCondition = (groupCd, storeCd, searchKb , majorCode, subCode ) => {
+
+  return api2.post('/MISALES/SLS04_003RPT.asmx/getMenuCondition', {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SEARCH_KB: searchKb,
+    MAJOR_CD: majorCode,
+    SUB_CD: subCode,
+   
+  });
+};
 export const getSalesReportByMenu = (groupCd, storeCd, startDate, endDate, searchType, searchValue ,reporttype, checkedgift , checklngprice, checkedlngprint , checkdays , checkholiday) => {
 
   return api2.post('/MISALES/SLS04_002RPT.asmx/getSalesReportByMenu', {
