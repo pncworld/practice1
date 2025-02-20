@@ -51,7 +51,7 @@
   import Realgrid from '@/components/realgrid.vue';
   import { ref } from 'vue';
   import { useStore } from 'vuex';
-  
+  //
   const setFooterColID = ref(['strStore', 'lngRecCnt', 'lngRecAmt', 'lngCustCnt', 'lngCustAmt', 'lngSalAmt', 'lngDiscountAmt', 'lngTotAmt', 'lngVAT', 'lngSupplyAmt', 'dblDistRate', 'lngWorkDay', 'lngActAvg', 'lngStoreCode'])
   const setFooterExpressions = ref(['custom', 'sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'avg', 'custom'])
   const progid = ref(1)
@@ -98,7 +98,7 @@
       } else {
         selectedStorearr = selectedStores.value;
       }
-      
+
       console.log(selectedStorearr)
 
       const res = await getCardSalesDetailReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, 0, 1)
