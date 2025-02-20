@@ -79,7 +79,7 @@ const emitStoreType = (value) => {
     emit('update:storeType', value);
 };
 onMounted(() => {
-  selectedGroup.value = store.state.storeGroup[0].lngStoreGroup
+  selectedGroup.value = store.state?.storeGroup[0]?.lngStoreGroup
   emit('update:storeCd', 0);
 })
 // const emitStoreCode = (e) => {

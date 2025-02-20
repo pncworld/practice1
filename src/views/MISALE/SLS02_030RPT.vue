@@ -105,12 +105,12 @@ const searchButton = async () => {
             progid.value = 2
         }
         reload.value = !reload.value
-        let selectedStorearr;
-        if (selectedStores.value == undefined || selectedStores.value.length == 0) {
-            selectedStorearr = 0
-        } else {
+         let selectedStorearr;
+        // if (selectedStores.value == undefined || selectedStores.value.length == 0) {
+        //     selectedStorearr = 0
+        // } else {
             selectedStorearr = selectedStores.value
-        }
+       // }
 
   
             const res = await getRealTimeReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, tempSeeDay.value )
@@ -144,15 +144,18 @@ const lngStoreCodes = (e) => {
     console.log(e)
 }
 const lngStoreAttrs = (e) => {
+    initGrid()
     selectedStoreAttrs.value = e
     console.log(e)
 }
 const lngSupervisor = (e) => {
+    initGrid()
     selectedLngSuperVisor.value = e
     console.log(e)
 }
 
 const lngStoreTeam = (e) => {
+    initGrid()
     selectedLngStoreTeam.value = e
     console.log(e)
 }
