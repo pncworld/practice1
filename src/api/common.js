@@ -6,11 +6,11 @@ export const commonUrl2 = 'http://211.238.145.30:8085'; //http://211.238.145.30:
 // Axios 인스턴스 생성 (기본 설정)
 const api = axios.create({
   baseURL: commonUrl, // API 기본 URL
-  timeout: 10000, // 요청 타임아웃 설정
+  timeout: 20000, // 요청 타임아웃 설정
 });
 const api2 = axios.create({
   baseURL: commonUrl2, // API 기본 URL
-  timeout: 10000, // 요청 타임아웃 설정
+  timeout: 20000, // 요청 타임아웃 설정
 });
 
 // API 요청 메서드들
