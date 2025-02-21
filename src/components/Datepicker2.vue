@@ -1,6 +1,6 @@
 <template>
   <div class="flex justify-center items-center space-x-3 w-[600px] pl-20">
-    <div class="pl-20 font-semibold  flex items-center text-nowrap text-base">매출일자 : </div>
+    <div class="pl-20 font-semibold  flex items-center text-nowrap text-base ">매출일자 : </div>
     <div class="grid grid-cols-[2fr,1fr,2fr,1fr,1fr] grid-rows-1 justify-start h-11 pr-14 space-x-1">
       <input type="date" class="border rounded-lg h-10 w-32 text-base mr-2 pl-5" v-model="selectedStartDate"
         max="9999-12-31">

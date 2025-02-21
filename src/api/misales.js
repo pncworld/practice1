@@ -7,11 +7,11 @@ const url2 = commonUrl2;
 // Axios 인스턴스 생성 (기본 설정)
 const api = axios.create({
   baseURL: url, // API 기본 URL
-  timeout: 10000, // 요청 타임아웃 설정
+  timeout: 30000, // 요청 타임아웃 설정
 });
 const api2 = axios.create({
   baseURL: url2, // API 기본 URL
-  timeout: 10000, // 요청 타임아웃 설정
+  timeout: 30000, // 요청 타임아웃 설정
 });
 
 // API 요청 메서드들
@@ -194,6 +194,18 @@ export const getCardSalesDetailReport = (groupCd ,storeCds , startDate , endDate
     END_DATE    : endDate,
     REPORT_TYPE : reporttype,
     LANG        : lang
+  });
+};
+export const getSalesReportByMenuAndPayType = (groupCd ,storeCds , startDate , endDate , reporttype , menu, submenu , subsubmenu) => {
+  return api2.post('/MISALES/SLS04_003RPT.asmx/getSalesReportByMenuAndPayType', {
+    GROUP_CD    : groupCd,
+    STORE_CDS   : storeCds,
+    START_DATE  : startDate,
+    END_DATE    : endDate,
+    REPORT_TYPE : reporttype,
+    MENU        : menu ,
+    SUB_MENU    : submenu ,
+    SUB_SUB_MENU: subsubmenu ,
   });
 };
 

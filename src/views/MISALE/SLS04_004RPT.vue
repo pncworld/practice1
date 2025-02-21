@@ -17,23 +17,21 @@
 
             </div>
         </div>
-        <div class="grid grid-cols-[1fr,10fr,10fr] grid-rows-1 justify-between  bg-gray-200 rounded-lg h-24 items-center z-10 ">
-            <div class="w-10 ml-2 -mt-10 ">
-                <select name="" id="" class="border rounded-lg h-8 text-base relative z-50" v-model="selectedSearchType">
-                <option :value="1">집계</option>
-                <option :value="2">일자별</option>
-                <option :value="3">월별</option>
-            </select>
-        </div>
-            <div class="grid grid-cols-1 grid-rows-2 -space-y-3 justify-start -ml-36 mt-3" >
-                <div class="flex justify-start mr ">
+        <div class="grid grid-cols-[10fr,10fr] grid-rows-1 justify-between  bg-gray-200 rounded-lg h-32 items-center z-10 p-5">
+            <div class="grid grid-cols-1 grid-rows-3 -space-y-3 justify-start -ml-36 mt-3" >
+                <div class="flex justify-start  ">
                 <Datepicker2 @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker"
                     @excelDate="excelDate"></Datepicker2>
-                    <div class="mt-2"><label for="detail"><input type="checkbox" id="detail" @change="detailView">상세보기</label></div>
-                    <div class="mt-2 ml-44"><label for="StoreName"><input type="checkbox" id="StoreName" @change="showStore"></label></div>
+              
+                </div>
+                <div class="justify-start flex  items-center space-x-5 w-[600px] pl-48">
+                  <div class="text-base font-semibold">조건 :</div>
+                  <div><label for="store"><input type="checkbox" id="store">매장별</label></div>
+                  <div><label for="date"><input type="checkbox" id="date">일자별</label></div>
+              
                 </div>
                 <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 ">
-                    메뉴구분 : <div class="flex ml-3 space-x-3 mt-1">
+                    메뉴구분 : <div class="flex ml-3 space-x-3 -mt-1">
                        
                         <v-select v-model="selectedMenu" 
                         :options="mainMenu" 
@@ -59,6 +57,18 @@
                          class="w-44 !h-8 bg-white "
                          clearable="true" 
                           />
+
+                          <input type="text" v-model="searchText" class="pl-2 w-44 !h-8 bg-white ">
+
+                          <div class="flex justify-start space-x-2">객층구분 :
+                            <v-select v-model="selectedSubSubMenu" 
+                        :options="Menus" 
+                        placeholder="전체"
+                         label="strname"
+                         class="w-44 !h-8 bg-white "
+                         clearable="true" 
+                          />
+                          </div>
                     </div>
                
                
@@ -66,9 +76,10 @@
 
                 </div>
             </div>
-            <div class="ml-0">
+            <div class="ml-96">
                 <PickStorePlural2 @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam"
-                    @lngStoreAttr="lngStoreAttr" @excelStore="excelStore" :setFooterColID="setFooterColID" :setFooterExpressions="setFooterExpressions">
+                    @lngStoreAttr="lngStoreAttr" @excelStore="excelStore" :setFooterColID="setFooterColID" :setFooterExpressions="setFooterExpressions"
+                    :hideColumn="'strStoreName'" :hideColumnNow="hideColumnNow">
                 </PickStorePlural2>
                 
             </div>
@@ -76,12 +87,12 @@
 
         </div>
 
-        <div class="w-full h-[85%] mt-1">
+        <div class="w-full h-[80%] mt-1">
 
             <Realgrid :progname="'SLS04_003RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload"
                 :exporttoExcel="exportExcel" :documentSubTitle="documentSubTitle" :documentTitle="'SLS04_003RPT'"
-                :mergeColumns2="mergeColumns2" :mergeColumnGroupSubList2="[['col1_1','col1_3','col1_2','col1'],['col2_1','col2_2','col2_3','col2'],['col3_1','col3_3','col3_2','col3'],['col4_1','col4_3','col4_2','col4'],['col5_1','col5_3','col5_2','col5'],['col6_1','col6_3','col6_2','col6']]"
-                :mergeColumnGroupName2="['현금','신용카드','선수금매출','비율할인','품목할인','금액할인']" :setFooter="true" :setFooterColID="setFooterColID" :setFooterExpressions="setFooterExpressions" :hideColumn="'strStoreName'" :hideColumnNow="hideColumnNow"
+                :mergeColumns2="mergeColumns2" :mergeColumnGroupSubList2="[['col1_1','col1_2','col1_3','col1'],['col2_1','col2_2','col2_3','col2'],['col3_1','col3_2','col3_3','col3'],['col4_1','col4_2','col4_3','col4'],['col5_1','col5_2','col5_3','col5'],['col6_1','col6_2','col6_3','col6']]"
+                :mergeColumnGroupName2="['현금','신용카드','선수금매출','비율할인','품목할인','금액할인']"
                 ></Realgrid>
         </div>
     </div>
@@ -100,9 +111,9 @@ import { useStore } from 'vuex';
 
 const setGroupFooter = ref(false)
 const mergeColumns2 = ref(false)
-const setFooterColID = ref(['lCnt','lTot','lDis','lVAT','lAct','col1_1','col1_2','col1_3','col1','col2_1','col2_2','col2_3','col2','col3_1','col3_2','col3_3','col3','col4_1','col4_2','col4_3','col4','col5_1','col5_2','col5_3','col5','col6_1','col6_2','col6_3','col6' ])
-// 5+24
-const setFooterExpressions = ref(['sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum' ])
+const setFooterColID = ref(['strStore','lngCode','strMajor','strSub','strMenu','dtmDate','lngPrice','dtmDate','lngNMenuCnt','lngGMenuCnt','lngMenuCnt','lngSalAmt','lngGAmount','lngDCAmt','lngActAmt','lngVAT','lngNetAmt','dblDistRate','lngSalCnt','dblPreWeek','dblPreYear' ])
+
+const setFooterExpressions = ref(['custom','custom','custom','custom','custom','custom','custom' ,'sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum' ])
 const setGroupFooterColID = ref(['strStore','strMajor','strSub','dtmDate','lngPrice','dtmDate','lngNMenuCnt','lngGMenuCnt','lngMenuCnt','lngSalAmt','lngGAmount','lngDCAmt','lngActAmt','lngVAT','lngNetAmt','dblDistRate','lngSalCnt','dblPreWeek','dblPreYear' ])
 const setGroupFooterExpressions = ref(['custom','custom','custom','custom','sum' ,'sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum' ])
 const setGroupSumCustomColumnId = ref(['strStore','strMajor','strSub'])
@@ -117,7 +128,7 @@ const rowData = ref([])
 const afterSearch = ref(false)
 const selectedstartDate = ref()
 const selectedendDate = ref()
-
+const searchText = ref('')
 const startDate = (e) => {
     console.log(e)
     selectedstartDate.value = e
@@ -143,48 +154,22 @@ const searchButton = async () => {
     store.state.loading = true;
     try {
         initGrid()
-        console.log(selectedSearchType.value)
-        console.log(selectedDetail.value)
-       
-        let reportType ;
-        if(selectedDetail.value == true && showornotstore.value == true &&  selectedSearchType.value == 1)  {
-            progid.value = 4
-            reportType = 12
-        } else if(selectedDetail.value == true && showornotstore.value == true &&  selectedSearchType.value == 2){
-            progid.value = 5
-            reportType = 13
-        } else if(selectedDetail.value == true && showornotstore.value == true &&  selectedSearchType.value == 3){
-            progid.value = 6
-            reportType = 14
-        }else if(selectedDetail.value == true && showornotstore.value == false &&  selectedSearchType.value == 1){
-            progid.value = 4
-            reportType = 8
-        } else if(selectedDetail.value == true && showornotstore.value == false &&  selectedSearchType.value == 2){
-            progid.value = 5
-            reportType = 9
-        }else if(selectedDetail.value == true && showornotstore.value == false &&  selectedSearchType.value == 3){
-            progid.value = 6
-            reportType = 10
-        } else if(selectedDetail.value == false && showornotstore.value == true &&  selectedSearchType.value == 1){
+        const reportType = selectedSearchType.value | selectedDetail.value
+        if(reportType ==4) {
             progid.value = 1
-            reportType = 4
-        } else if(selectedDetail.value == false && showornotstore.value == true &&  selectedSearchType.value == 2){
+        } else if(reportType ==1){
             progid.value = 2
-            reportType = 5
-        }else if(selectedDetail.value == false && showornotstore.value == true &&  selectedSearchType.value == 3){
+        } else if(reportType ==2){
             progid.value = 3
-            reportType = 6
-        }  else if(selectedDetail.value == false && showornotstore.value == false &&  selectedSearchType.value == 1){
-            progid.value = 1
-            reportType = 0
-        } else if(selectedDetail.value == false && showornotstore.value == false &&  selectedSearchType.value == 2){
-            progid.value = 2
-            reportType = 1
-        } else if(selectedDetail.value == false && showornotstore.value == false &&  selectedSearchType.value == 3){
-            progid.value = 3
-            reportType = 2
+        }else if(reportType ==9){
+            progid.value = 4
         }
-         console.log(reportType )
+        else if(reportType ==10){
+            progid.value = 5
+        }else if(reportType ==12){
+            progid.value = 6
+        }
+
         if(temptmergeColumns2.value == false){
             mergeColumns2.value = false
         } else {
@@ -276,7 +261,7 @@ const initGrid = () => {
 }
 
 const exportExcel = ref(false)
-const selectedSearchType = ref(1)
+const selectedSearchType = ref(4)
 const documentSubTitle = ref('')
 const menuDistinct = ref(['전체','대그룹','서브그룹','메뉴구분'])
 const searchCondition = ref(['매장명표시','대그룹','서브그룹','일자별','증정구분','단가제외','합계','셀병합'])
@@ -404,10 +389,10 @@ const selectedDetail = ref(0)
 const temptmergeColumns2= ref(false)
 const detailView = (e)=>{
     if(e.target.checked){
-        selectedDetail.value = true
+        selectedDetail.value = 8
         temptmergeColumns2.value = true
     } else {
-        selectedDetail.value = false
+        selectedDetail.value = 0
         temptmergeColumns2.value = false
     }
 }
@@ -586,16 +571,7 @@ const checkday = (e) => {
         }
     }
 }
-const showornotstore = ref(false)
-const showStore = (e) => {
-   if(e.target.checked){
-    showornotstore.value = true
-    hideColumnNow.value = false
-   } else {
-    showornotstore.value = false
-    hideColumnNow.value = true
-   }
-}
+
 </script>
 
 <style></style>

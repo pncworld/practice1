@@ -7,6 +7,7 @@ import SLS06_004RPT from "@/views/MISALE/SLS06_004RPT.vue";
 import SLS05_002RPT from "@/views/MISALE/SLS05_002RPT.vue";
 import SLS04_003RPT from "@/views/MISALE/SLS04_003RPT.vue";
 import SLS04_002RPT from "@/views/MISALE/SLS04_002RPT.vue";
+import SLS04_004RPT from "@/views/MISALE/SLS04_004RPT.vue";
 
 export default function salesRouter() {
     return [
@@ -54,6 +55,11 @@ export default function salesRouter() {
       {
         path : "SLS06_004RPT.xml",
         component : SLS06_004RPT
+      }
+      ,
+      {
+        path : "SLS04_004RPT.xml",
+        component : SLS04_004RPT
       }
     
     ];
