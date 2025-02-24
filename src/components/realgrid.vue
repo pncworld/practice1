@@ -438,6 +438,12 @@ const props = defineProps({
     type: Array,
     default: [[]],
   }
+  ,
+  getJson: {
+    type: Boolean,
+    default: false,
+  }
+ 
 
 });
 
@@ -450,7 +456,7 @@ const addrow4activated = ref(false);
 const deleted2activated = ref(false);
 const updatedrowData = ref([])
 const selectedindex = ref(-1)
-const emit = defineEmits(["selcetedrowData", "updatedRowData", "clickedRowData", "dblclickedRowData", "selectedIndex", "checkedRowData"]);
+const emit = defineEmits(["selcetedrowData", "updatedRowData", "clickedRowData", "dblclickedRowData", "selectedIndex", "checkedRowData","getJsonData"]);
 const funcshowGrid = async () => {
 
   if (gridView !== undefined && gridView !== null) {
@@ -516,7 +522,7 @@ const funcshowGrid = async () => {
       expression: props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)],
       numberFormat: item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0"
     },
-    datetimeFormat: item.strMask == '' ? 'yyyy-MM-dd' : item.strMask,
+    datetimeFormat: item.strMask == '' ? 'yyyy-MM-dd' : item.strMask, // sql 에서 mstgridinfo 에서 date  일때 기본값이 있고 정의할 수 있음
     width: item.intHdWidth,
     numberFormat: item.strColType == 'float' ? '#,##0' : item.strColType == 'double' && item.strDisplay == 'double' ? "#,##0.00" : '#,##0.0',
     styleName: item.strAlign == 'left' ? 'setTextAlignLeft' : item.strAlign == 'center' ? 'setTextAlignCenter' : 'setTextAlignRight',
@@ -1319,6 +1325,11 @@ watch(() => props.initCheckAct, (newVal) => {
 
 
 });
+
+watch(() => props.getJson , () => {
+  const jsonData =  dataProvider.getJsonRows();
+  emit('getJsonData',jsonData)
+})
 
 // watch(() => props.hideColumnsId , ()=>{
 //   for(var i=0 ; i < props.hideColumnsId.length ; i++){

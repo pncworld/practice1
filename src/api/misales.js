@@ -208,6 +208,43 @@ export const getSalesReportByMenuAndPayType = (groupCd ,storeCds , startDate , e
     SUB_SUB_MENU: subsubmenu ,
   });
 };
+export const getSalesDatabyTimeAndMenu = (groupCd ,storeCds , startDate , endDate , reporttype , menu, submenu , subsubmenu ,searchText ,checkdate , loginlang , selectedguest) => {
+  return api2.post('/MISALES/SLS04_004RPT.asmx/getSalesDatabyTimeAndMenu', {
+    GROUP_CD    : groupCd,
+    STORE_CDS   : storeCds,
+    START_DATE  : startDate,
+    END_DATE    : endDate,
+    REPORT_TYPE : reporttype,
+    MENU        : menu ,
+    SUB_MENU    : submenu ,
+    SUB_SUB_MENU: subsubmenu ,
+    SEARCH_TEXT : searchText , 
+    CHECKED_DATE :  checkdate,
+    STR_LANG  :loginlang ,
+    GUEST : selectedguest
+
+  });
+};
+export const getPrevYearComparison = (groupCd ,storeCd , dtmdate1 , dtmdate2 , salesflag ) => {
+  return api2.post('/MISALES/SLS06_005RPT.asmx/getPrevYearComparison', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+    DTM_DATE1  : dtmdate1,
+    DTM_DATE2  : dtmdate2,
+    SALES_FLAG : salesflag,
+
+  });
+};
+export const getSalesDayReport = (groupCd ,storeCd , dtmdate1 , dtmdate2 , salesflag ) => {
+  return api2.post('/MISALES/SLS02_017RPT.asmx/getSalesDayReport', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+    DTM_DATE1  : dtmdate1,
+    DTM_DATE2  : dtmdate2,
+    SALES_FLAG : salesflag,
+
+  });
+};
 
 
 
