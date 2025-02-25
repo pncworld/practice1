@@ -43,10 +43,11 @@ const props = defineProps({
      
       
     })
-    const emit = defineEmits(['posNo']);
+    const emit = defineEmits(['posNo','excelPosNo']);
 
 onMounted(() => {
-    emit('posNo' , selectedPosNo.value)
+    emit('posNo' , 0)
+    emit('excelPosNo' , '포스번호 : 전체')
 })
  const POSLIST = ref([])
     watch( () => props.storeCd , async() => {
@@ -61,7 +62,14 @@ onMounted(() => {
     // }
 
     watch(selectedPosNo, () => {
-        emit('posNo' , selectedPosNo.value)
+        if(selectedPosNo.value == null || selectedPosNo.value == undefined){
+            emit('posNo' , 0)
+            emit('excelPosNo' , '포스번호 : 전체')
+        } else {
+            emit('posNo' , selectedPosNo.value)
+            emit('excelPosNo' , '포스번호 : '+selectedPosNo.value)
+        }
+        
     })
     const clickPosNo = (e) => {
         selectedPosNo.value = null

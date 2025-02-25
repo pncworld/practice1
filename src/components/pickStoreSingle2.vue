@@ -1,7 +1,7 @@
 <template>
     <div class="grid grid-cols-[100px,150px,150px,300px] grid-rows-2 h-16 w-[750px]">
         <div><label for="searchType1" class="text-base">직/가맹<input type="radio" id="searchType1" value="1"
-                    v-model="settingDisable"></label></div>
+                    v-model="settingDisable" @click="initSearchBox"></label></div>
         <div class="w-24"><select name="" id="" v-model="selectedStoreGroup" :disabled="settingDisable == 2"
                 class="mr-28 w-36 h-7 rounded-lg">
                 <option :value="i.lngStoreGroup" v-for="i in storeGroup">{{ i.strName }}</option>
@@ -20,7 +20,7 @@
             </div>
         </div>
         <div><label for="searchType2" class="text-base ml-2">팀/SC<input type="radio" id="searchType2" value="2"
-                    v-model="settingDisable"></label></div>
+                    v-model="settingDisable" @click="initSearchBox"></label></div>
         <div class="w-32"><select name="" id="" v-model="selectedStoreGroup2" class="w-full mr-10  h-7 rounded-lg"
                 :disabled="settingDisable == 1">
                 <option :value="i.lngStoreGroup" v-for="i in storeGroup">{{ i.strName }}</option>
@@ -39,24 +39,23 @@
                     </select></div>
             </div>
         </div>
-        <div>
+        <div >
             <!-- <button class="bg-white border w-[60%] ml-4 rounded-lg h-7 disabled:bg-gray-100"  @click="showStoreList" >전체</button> -->
             <!-- <input type="button"
                 class="bg-white border w-44 ml-4 rounded-lg h-7 disabled:bg-gray-100 text-center overflow-hidden"
                 @click="showStoreList" :disabled="settingDisable == 1" v-model="selectedStoreList"> -->
 
-            <v-select v-model="selectedStoreList2" :options="rowData2" label="strName" placeholder="선택"
-                class="w-[272px] custom-select2 ml-12 " :reduce="store => store != null ? store.lngStoreCode : null"
-                clearable="true" @click="clickStoreCd" :disabled="settingDisable == 1" />
+                <v-select v-model="selectedStoreList" :options="rowData" label="strName" placeholder="선택"
+                    class=" custom-select4 mr-10" :reduce="store => store != null ? store.lngStoreCode : null"
+                    clearable="true" @click="clickPosNo" :disabled="settingDisable == 1" />
 
         </div>
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref, toRef, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
-import Realgrid from './realgrid.vue';
 
 const store = useStore();
 const teamscList = ref('전체')
@@ -73,7 +72,7 @@ const selectedStoreGroup2 = ref(store.state.storeGroup[0].lngStoreGroup)
 const selectedStoreType = ref(0)
 const selectedStoreTeam = ref(0)
 const selectedSuperVisor = ref(-1)
-const emit = defineEmits(['lngStoreGroups', 'lngStoreCode', 'lngStoreAttrs', 'lngStoreGroup','excelStore']);
+const emit = defineEmits(['lngStoreGroups', 'lngStoreCode', 'lngStoreAttrs', 'lngStoreGroup','excelStore','lngStoreTeam','lngSupervisor']);
 const props = defineProps({
     initCheckBox: {
         type: Boolean,
@@ -125,20 +124,21 @@ watch(selectedStoreType, (newValue) => {
         rowData.value = store.state.storeCd.filter(item => item.lngStoreAttr == selectedStoreType.value)
     }
     selectedStoreList.value = null
+    emit('lngStoreAttrs', selectedStoreType.value)
 
 })
 
 watch(selectedStoreTeam, (newValue) => {
     if (selectedStoreTeam.value == 0) {
-        rowData2.value = store.state.storeCd
+        rowData.value = store.state.storeCd
         storeSuperVisor.value = store.state.storeSupervisor
     } else {
-        rowData2.value = store.state.storeCd.filter(item => item.lngTeamCode == selectedStoreTeam.value)
+        rowData.value = store.state.storeCd.filter(item => item.lngTeamCode == selectedStoreTeam.value)
         storeSuperVisor.value = store.state.storeSupervisor.filter(item => item.lngTeamCode == selectedStoreTeam.value)
     }
     selectedSuperVisor.value = -1;
-    selectedStoreList2.value = null
-
+    selectedStoreList.value = null
+    emit('lngStoreTeam', selectedStoreTeam.value)
 
 
 })
@@ -146,30 +146,23 @@ watch(selectedStoreTeam, (newValue) => {
 watch(selectedSuperVisor, (newValue) => {
     if (selectedSuperVisor.value == -1) {
         if (selectedStoreTeam.value == 0) {
-            rowData2.value = store.state.storeCd
+            rowData.value = store.state.storeCd
         } else {
-            rowData2.value = store.state.storeCd.filter(item => item.lngTeamCode == selectedStoreTeam.value)
+            rowData.value = store.state.storeCd.filter(item => item.lngTeamCode == selectedStoreTeam.value)
         }
     } else {
         if (selectedStoreTeam.value == 0) {
-            rowData2.value = store.state.storeCd.filter(item => item.lngSupervisor == selectedSuperVisor.value)
+            rowData.value = store.state.storeCd.filter(item => item.lngSupervisor == selectedSuperVisor.value)
         } else {
-            rowData2.value = store.state.storeCd.filter(item => item.lngTeamCode == selectedStoreTeam.value).filter(item => item.lngSupervisor == selectedSuperVisor.value)
+            rowData.value = store.state.storeCd.filter(item => item.lngTeamCode == selectedStoreTeam.value).filter(item => item.lngSupervisor == selectedSuperVisor.value)
         }
 
     }
-    selectedStoreList2.value = null
+    emit('lngSupervisor', selectedSuperVisor.value)
+    selectedStoreList.value = null
 })
 
 
-const showStore = ref(false)
-
-
-
-const clickStoreCd = (e) => {
-    console.log(e)
-    selectedStoreList.value = null
-}
 
 
 watch(selectedStoreList, () => {
@@ -187,5 +180,13 @@ watch(selectedStoreList, () => {
 })
 
 
+const initSearchBox = (e) => {
+    if(e.target.value ==1){
+        selectedSuperVisor.value = -1
+        selectedStoreTeam.value = 0
+    } else {
+        selectedStoreType.value = 0
+    }
+}
 
 </script>

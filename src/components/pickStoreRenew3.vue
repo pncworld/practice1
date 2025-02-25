@@ -17,7 +17,7 @@
     v-model="selectedStore"
     :options="storeCd"
     label="strName"
-    placeholder="전체"
+    placeholder="선택"
     class="!w-72 !h-7 -mt-3 custom-select"
     :reduce="store => store != null ? store.lngStoreCode : null"
     clearable="true"

@@ -235,13 +235,26 @@ export const getPrevYearComparison = (groupCd ,storeCd , dtmdate1 , dtmdate2 , s
 
   });
 };
-export const getSalesDayReport = (groupCd ,storeCd , dtmdate1 , dtmdate2 , salesflag ) => {
+export const getSalesDayReport = (groupCd ,storeCd , dtmdate1 , dtmdate2 , bill , lang ) => {
   return api2.post('/MISALES/SLS02_017RPT.asmx/getSalesDayReport', {
     GROUP_CD    : groupCd,
     STORE_CD   : storeCd,
-    DTM_DATE1  : dtmdate1,
-    DTM_DATE2  : dtmdate2,
-    SALES_FLAG : salesflag,
+    START_DATE  : dtmdate1,
+    END_DATE  : dtmdate2,
+    SHOW_BILL : bill,
+    LOGIN_LANG : lang
+
+  });
+};
+export const getSalesDayReportByPos = (groupCd ,storeCd , dtmdate1 , dtmdate2 , bill , lang ,posNo ) => {
+  return api2.post('/MISALES/SLS02_028RPT.asmx/getSalesDayReportByPos', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+    START_DATE  : dtmdate1,
+    END_DATE  : dtmdate2,
+    SHOW_BILL : bill,
+    LOGIN_LANG : lang ,
+    POS_NO : posNo
 
   });
 };
