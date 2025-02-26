@@ -18,14 +18,14 @@
     </div>
     <div class="grid grid-cols-[15fr,1fr,15fr] grid-rows-1 justify-between  bg-gray-200 rounded-lg h-24 items-center z-10">
       <div class="grid grid-cols-1 grid-rows-2">
-        <Datepicker3 @endMonth="endMonth" @endYear="endYear" @startMonth="startMonth" @startYear="startYear"></Datepicker3>
+        <Datepicker3 @endMonth="endMonth" @endYear="endYear" @startMonth="startMonth" @startYear="startYear" @excelDate="excelDate"></Datepicker3>
         <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-24 mt-3">조회조건 : <div><label
               for="sum" class="font-thin"><input type="checkbox" id="sum" class="ml-5"
                 @change="seeSum">합계</label></div>
     
         </div>
       </div>
-      <div><input type="checkbox" name="" id=""></div>
+      <div><input type="checkbox" name="" id="" @change="showStore"></div>
       <div class="ml-5">
         <PickStorePlural2 @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore">
         </PickStorePlural2>
@@ -36,16 +36,15 @@
   
     <div class="w-full h-[85%]">
   
-      <Realgrid :progname="'SLS06_004RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload" :setFooter="true"
-        :setGroupFooter="setGroupFooter" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
-        :documentTitle="'SLS06_004RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel" :setGroupColumnId="'dtmDate'" :setGroupSumCustomText="['소계']"
-        :setGroupSumCustomColumnId="['strWeekName']" :setGroupCustomLevel="3"
-        :setGroupSummaryCenterIds="setGroupSummaryCenterIds"></Realgrid>
+      <Realgrid :progname="'SLS06_003RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setFooter="true" :setFooterColID="setFooterColID" :setFooterExpressions="setFooterExpressions"
+      :setGroupFooter="true" :setGroupColumnId="'strStoreGroupName'" :setGroupFooterColID="setGroupFooterColID" :setGroupFooterExpressions="setGroupFooterExpressions"
+      :hideColumnsId="hideColumnsId" :suffixColumnPercent="['lngActAmt_pastMonth_rate','lngActAmt_pastYear_rate']"
+        :documentTitle="'SLS06_003RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel" :mergeColumns2="true" :mergeColumnGroupSubList2="[['lngActAmt_pastMonth','lngActAmt_pastYear','lngActAmt_pastMonth_rate','lngActAmt_pastYear_rate','lngSupplyAmt']]" :mergeColumnGroupName2="['순매출액']"></Realgrid>
     </div>
   </template>
   
   <script setup>
-  import { getDailySalesDetailReport, getDailySalesReport } from '@/api/misales';
+  import { getSalesDatabyMonth } from '@/api/misales';
 import Datepicker3 from '@/components/Datepicker3.vue';
 import PickStorePlural2 from '@/components/pickStorePlural2.vue';
 import Realgrid from '@/components/realgrid.vue';
@@ -53,8 +52,12 @@ import { ref } from 'vue';
 import { useStore } from 'vuex';
   
   const setGroupFooter = ref(false)
-  const setFooterColID = ref(['lngRecCnt', 'lngRecAmt', 'lngCustCnt', 'lngCustAmt', 'lngSalAmt', 'lngDiscount', 'lngActAmt', 'lngVAT', 'lngSupplyAmt', 'dblDistRate', 'lngTotAmt', 'dtmDate'])
-  const setFooterExpressions = ref(['sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'custom'])
+  const setFooterColID = ref(['lngDayCnt', 'lngCustCnt', 'lngCustAmt', 'lngRecCnt', 'lngRecAmt', 'lngSalAmt', 'lngTotAmt', 'lngActAmt_pastMonth', 'lngActAmt_pastYear', 'lngActAmt_pastMonth_rate', 'lngActAmt_pastYear_rate', 'lngSupplyAmt', 'lngVAT', 'lngAvgCustCnt', 'lngAvgTotAmt', 'dblDistRate'])
+  const setGroupFooterColID = ref(['lngDayCnt', 'lngCustCnt', 'lngCustAmt', 'lngRecCnt', 'lngRecAmt', 'lngSalAmt', 'lngTotAmt', 'lngActAmt_pastMonth', 'lngActAmt_pastYear', 'lngActAmt_pastMonth_rate', 'lngActAmt_pastYear_rate', 'lngSupplyAmt', 'lngVAT', 'lngAvgCustCnt', 'lngAvgTotAmt', 'dblDistRate'])
+  const setFooterExpressions = ref(['sum', 'sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'avg', 'avg', 'sum','sum','avg','avg','sum'])
+  const setGroupFooterExpressions = ref(['sum', 'sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'avg', 'avg', 'sum','sum','avg','avg','sum'])
+ 
+ 
   const setGroupSummaryCenterIds = ref('dtmDate,strWeekName')
   const progid = ref(1)
   const reload = ref(false)
@@ -64,6 +67,9 @@ import { useStore } from 'vuex';
   const selectedendYear = ref()
   const selectedstartMonth = ref()
   const selectedendMonth = ref()
+  const hideColumnNow = ref(true)
+  const hideColumn = ref('strStore')
+  const hideColumnsId = ref(['strStore'])
   const endMonth = (e) => {
     console.log(e)
     selectedendMonth.value = e
@@ -90,6 +96,7 @@ import { useStore } from 'vuex';
     }
     reload.value = !reload.value
   }
+
   const tempSeeDetail = ref(1)
   const seeDetail = (e) => {
   
@@ -101,28 +108,29 @@ import { useStore } from 'vuex';
   }
   const store = useStore()
   const loginedstrLang = store.state.userData.lngLanguage
-  const searchButton = async () => {
+  console.log(store.state.userData)
+
+const searchButton = async () => {
     store.state.loading = true;
     try {
       initGrid()
-      progid.value = tempSeeDetail.value
-      reload.value = !reload.value
-      let selectedStorearr;
-    
-        selectedStorearr = selectedStores.value
-   
-  
-      if (progid.value == 1) {
-        const res = await getDailySalesReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, 1, loginedstrLang)
-        console.log(res)
-        rowData.value = res.data.DAILYSALES
-  
-      } else if (progid.value == 2) {
-        const res = await getDailySalesDetailReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, 1, loginedstrLang)
-        console.log(res)
-        rowData.value = res.data.DAILYSALES
+      if(tempChecked.value== true){
+        hideColumnsId.value =[]
+      } else {
+        hideColumnsId.value = ['strStore']
       }
-  
+      reload.value = !reload.value
+        const startDate = `${selectedstartYear.value}-${String(selectedstartMonth.value).padStart(2, '0')}-01`
+        const endDate = `${selectedendYear.value}-${String(selectedendMonth.value).padStart(2, '0')}-01`
+       console.log(selectedGroup.value)
+       console.log(selectedStores.value)
+       console.log(startDate)
+       console.log(endDate)
+       console.log(tempChecked.value ? 1 : 0)
+        const res = await getSalesDatabyMonth(selectedGroup.value, selectedStores.value, startDate, endDate, tempChecked.value ? 1 : 0)
+        console.log(res)
+        rowData.value = res.data.List
+ 
   
   
       afterSearch.value = true
@@ -170,6 +178,15 @@ import { useStore } from 'vuex';
   const excelButton = () => {
     documentSubTitle.value = selectedExcelDate.value+'\n'+selectedExcelStore.value
     exportExcel.value = !exportExcel.value
+  }
+
+  const tempChecked = ref(false)
+  const showStore = (e) => {
+    if(e.target.checked){
+      tempChecked.value = true
+    } else {
+      tempChecked.value = false
+    }
   }
   </script>
   

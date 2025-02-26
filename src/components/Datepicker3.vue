@@ -1,27 +1,28 @@
 <template>
     <div class="flex items-center ml-20 space-x-2">
         <span class="ml-10 font-semibold text-base">해당월 : </span>
-        <select name="" id="" class="w-32 h-8 rounded-lg border border-gray-500" v-model="startyear">
+        <select name="" id="" class="w-32 h-8 rounded-lg border border-gray-500" v-model="startyear" @change="setStartYear">
             <option :value="i" v-for="i in settingYears">{{ i }}</option>
         </select>
-        <select name="" id="" class="w-10 h-8 rounded-lg border border-gray-500" v-model="startmonth">
+        <select name="" id="" class="w-10 h-8 rounded-lg border border-gray-500" v-model="startmonth"  @change="setStartMonth">
             <option :value="i" v-for="i in Months">{{ i }}</option>
         </select>
 
-        <select name="" id="" class="w-32 h-8 rounded-lg border border-gray-500" v-model="endyear">
+        <select name="" id="" class="w-32 h-8 rounded-lg border border-gray-500" v-model="endyear"  @change="setEndYear">
             <option :value="i" v-for="i in settingYears">{{ i }}</option>
         </select>
-        <select name="" id="" class="w-10 h-8 rounded-lg border border-gray-500" v-model="endmonth">
+        <select name="" id="" class="w-10 h-8 rounded-lg border border-gray-500" v-model="endmonth"  @change="setEndMonth">
             <option :value="i" v-for="i in Months">{{ i }}</option>
         </select>
     </div>
 </template>
 
 <script setup>
+import Swal from 'sweetalert2';
 import { onMounted, ref, watch } from 'vue';
 
 
-const emit = defineEmits(['startYear', 'startMonth', 'endYear', 'endMonth']);
+const emit = defineEmits(['startYear', 'startMonth', 'endYear', 'endMonth','excelDate']);
 
 
 const startyear = ref()
@@ -32,13 +33,20 @@ const endmonth = ref(1)
 const settingYears = ref([])
 
 let Months = [1,2,3,4,5,6,7,8,9,10,11,12]
+const tempStartDateStack = []
+const tempEndDateStack = []
+
 onMounted(() => {
     const today = new Date()
+    const lastMonth = new Date(today)
+    lastMonth.setMonth(today.getMonth()-1)
     const currentYear = today.getFullYear()
+    const currentMonth = today.getMonth()+1
 
-    startyear.value = currentYear
+    startyear.value = lastMonth.getFullYear()
     endyear.value = currentYear
-
+    startmonth.value = lastMonth.getMonth()+1
+    endmonth.value = currentMonth
     for (let i = currentYear-8; i <= currentYear + 5; i++) {
         settingYears.value.push(i)
     }
@@ -49,12 +57,200 @@ onMounted(() => {
     emit('startMonth', startmonth.value)
     emit('endYear', endyear.value)
     emit('endMonth', endmonth.value)
+    const startDate = `${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`
+    const endDate = `${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`
+    tempStartDateStack.push(startDate)
+    tempEndDateStack.push(endDate)
+    emit('excelDate', '해당월 : '+currentYear+'-'+currentMonth +'~'+currentYear+'-'+currentMonth)
 })
 
 watch([startyear,startmonth,endyear,endmonth] , () => {
-    emit('startYear', startyear.value)
-    emit('startMonth', startmonth.value)
-    emit('endYear', endyear.value)
-    emit('endMonth', endmonth.value)
+    
+//     const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
+//     const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
+//     if(startDate.getTime() > endDate.getTime()){
+//      Swal.fire({
+//       title: '시작일이 종료일을 앞섭니다.',
+//       text: '시작일과 종료일을 다시 선택하세요.',
+//       icon: 'error',
+//       confirmButtonText: '확인'
+//     })
+   
+//     const temp = new Date(tempStartDateStack.pop())
+//     console.log(temp)
+   
+//     startyear.value = temp.getFullYear()
+//     console.log(startyear.value)
+
+//      startmonth.value = temp.getMonth()+1
+
+//      const temp2 = tempEndDateStack.pop().toISOString()
+//      endyear.value = temp2.split('-')[0]
+//      endmonth.value = temp2.split('-')[1]
+
+//     const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
+//     const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
+//     tempStartDateStack.push(startDate)
+//     tempEndDateStack.push(endDate)
+//     return;
+//   } else {
+//     emit('startYear', startyear.value)
+//     emit('startMonth', startmonth.value)
+//     emit('endYear', endyear.value)
+//     emit('endMonth', endmonth.value)
+
+//     emit('excelDate',  '해당월 : '+startyear.value+'-'+startmonth.value +'~'+endyear.value+'-'+endmonth.value)
+//     tempStartDateStack.push(startDate)
+//     tempEndDateStack.push(endDate)
+//   }
+
+//   console.log(startyear.value)
+ 
 })
+
+const setEndMonth = () => {
+    const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
+    const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
+    if(startDate.getTime() > endDate.getTime()){
+     Swal.fire({
+      title: '시작일이 종료일을 앞섭니다.',
+      text: '시작일과 종료일을 다시 선택하세요.',
+      icon: 'error',
+      confirmButtonText: '확인'
+    })
+   
+    const temp = new Date(tempStartDateStack.pop())
+    console.log(temp)
+   
+     startyear.value = temp.getFullYear()
+     startmonth.value = temp.getMonth()+1
+
+     const temp2 =  new Date(tempEndDateStack.pop())
+     endyear.value = temp2.getFullYear()
+     endmonth.value = temp2.getMonth()+1
+
+    const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
+    const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
+    tempStartDateStack.push(startDate)
+    tempEndDateStack.push(endDate)
+    return;
+  } else {
+    const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
+    const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
+
+    tempStartDateStack.push(startDate)
+    tempEndDateStack.push(endDate)
+  }
+
+    emit('endMonth', endmonth.value)
+}
+const setEndYear = () => {
+    const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
+    const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
+    if(startDate.getTime() > endDate.getTime()){
+     Swal.fire({
+      title: '시작일이 종료일을 앞섭니다.',
+      text: '시작일과 종료일을 다시 선택하세요.',
+      icon: 'error',
+      confirmButtonText: '확인'
+    })
+   
+    const temp = new Date(tempStartDateStack.pop())
+    console.log(temp)
+   
+     startyear.value = temp.getFullYear()
+     startmonth.value = temp.getMonth()+1
+
+     const temp2 =  new Date(tempEndDateStack.pop())
+     endyear.value = temp2.getFullYear()
+     endmonth.value = temp2.getMonth()+1
+
+    const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
+    const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
+    tempStartDateStack.push(startDate)
+    tempEndDateStack.push(endDate)
+    return;
+  } else {
+    const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
+    const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
+
+    tempStartDateStack.push(startDate)
+    tempEndDateStack.push(endDate)
+  }
+  
+    emit('endYear', endyear.value)
+}
+const setStartMonth = () => {
+    const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
+    const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
+    if(startDate.getTime() > endDate.getTime()){
+     Swal.fire({
+      title: '시작일이 종료일을 앞섭니다.',
+      text: '시작일과 종료일을 다시 선택하세요.',
+      icon: 'error',
+      confirmButtonText: '확인'
+    })
+   
+    const temp = new Date(tempStartDateStack.pop())
+    console.log(temp)
+   
+     startyear.value = temp.getFullYear()
+     startmonth.value = temp.getMonth()+1
+
+     const temp2 =  new Date(tempEndDateStack.pop())
+     endyear.value = temp2.getFullYear()
+     endmonth.value = temp2.getMonth()+1
+
+    const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
+    const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
+    tempStartDateStack.push(startDate)
+    tempEndDateStack.push(endDate)
+    return;
+  } else {
+    const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
+    const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
+
+    tempStartDateStack.push(startDate)
+    tempEndDateStack.push(endDate)
+  }
+
+    emit('startMonth', startmonth.value)
+}
+const setStartYear = () => {
+    const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
+    const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
+    if(startDate.getTime() > endDate.getTime()){
+     Swal.fire({
+      title: '시작일이 종료일을 앞섭니다.',
+      text: '시작일과 종료일을 다시 선택하세요.',
+      icon: 'error',
+      confirmButtonText: '확인'
+    })
+   
+    const temp = new Date(tempStartDateStack.pop())
+    console.log(temp)
+   
+     startyear.value = temp.getFullYear()
+     startmonth.value = temp.getMonth()+1
+
+     const temp2 =  new Date(tempEndDateStack.pop())
+     endyear.value = temp2.getFullYear()
+     endmonth.value = temp2.getMonth()+1
+
+     const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
+    const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
+
+    tempStartDateStack.push(startDate)
+    tempEndDateStack.push(endDate)
+    return;
+  } else {
+    const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
+    const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
+
+    tempStartDateStack.push(startDate)
+    tempEndDateStack.push(endDate)
+  }
+  console.log(tempStartDateStack)
+    emit('startYear', startyear.value)
+}
 </script>

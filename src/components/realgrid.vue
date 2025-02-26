@@ -443,6 +443,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   }
+  ,
+  suffixColumnPercent: {
+    type: Array,
+    default: [],
+  }
  
 
 });
@@ -514,13 +519,15 @@ const funcshowGrid = async () => {
       text: props.setGroupSumCustomText[props.setGroupSumCustomColumnId.indexOf(item.strColID)],
       styleName: item.strAlign == 'center' ? 'setTextAlignCenter' : item.strAlign == 'left' ? 'setTextAlignLeft' : 'setTextAlignRight',
       expression: props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(item.strColID)] == 'custom' ? '' : props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(item.strColID)],
-      numberFormat: item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0"
+      numberFormat: item.strSubSumexpr !='' ?  item.strSubSumexpr : item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0",
+      suffix : props.suffixColumnPercent.includes(item.strColID) ? '%' : ''
 
     },
     footer: {
       // text : item.strColID =='dtmDate' ? '소계' : '' ,
       expression: props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)],
-      numberFormat: item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0"
+      numberFormat: item.strTotalexpr !='' ?  item.strTotalexpr : item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0",
+      suffix : props.suffixColumnPercent.includes(item.strColID) ? '%' : ''
     },
     datetimeFormat: item.strMask == '' ? 'yyyy-MM-dd' : item.strMask, // sql 에서 mstgridinfo 에서 date  일때 기본값이 있고 정의할 수 있음
     width: item.intHdWidth,
@@ -792,7 +799,11 @@ const funcshowGrid = async () => {
   gridView.displayOptions.selectionStyle = props.selectionStyle
   gridView.displayOptions.showTooltip = true;
   gridView.groupPanel.visible = false;
-
+  if(props.suffixColumnPercent != []){
+   for(let i=0 ; i < props.suffixColumnPercent.length ; i++){
+    gridView.columnByName(props.suffixColumnPercent[i]).suffix = "%"
+   }
+  }
   if (props.hideColumnNow == true) {
     gridView.columnByField(props.hideColumn).visible = false;
   }
@@ -1353,7 +1364,10 @@ watch(() => props.hideNow, (newValue) => {
   dataProvider.hideRows(props.hideRow);
 })
 watch(() => props.hideColumnNow, (newValue) => {
-  gridView.columnByField(props.hideColumn).visible = !props.hideColumnNow;
+  if(props.hideColumn != ''){
+    gridView.columnByField(props.hideColumn).visible = !props.hideColumnNow;
+  }
+  
 })
 onMounted(async () => {
   try {

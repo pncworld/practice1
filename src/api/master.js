@@ -1300,6 +1300,54 @@ export const getMenuCodeEnroll = (groupCd , storeCd) => {
 export const uploadFile = (formData) => {
     return api2.post('/MIMASTER/FileUpload.ashx', formData);
 };
+export const getPosList = (groupCd , storeCd) => {
+    return api2.post('/MIMASTER/MST01_032INS.asmx/getPosList', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd
+    });
+};
+export const getAreaList = (groupCd , storeCd,posNo) => {
+    return api2.post('/MIMASTER/MST01_032INS.asmx/getAreaList', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd,
+        POS_NO : posNo
+    });
+};
+export const getMasterList = (min_table,max_table) => {
+    return api2.post('/MIMASTER/MST01_032INS.asmx/getMasterList', {
+        MIN_TABLE_ID: min_table,
+        MAX_TABLE_ID : max_table
+    });
+};
+export const getMaster2List = (groupCd , storeCd,areaCd ,posNo ,date) => {
+    return api2.post('/MIMASTER/MST01_032INS.asmx/getMaster2List', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd,
+        AREA_CD : areaCd,
+        POS_NO : posNo ,
+        DTM_DATE : date
+    });
+};
+export const insertMasterList = (groupCd , storeCd,areaCd ,posNo ,tableIds ,date) => {
+    return api2.post('/MIMASTER/MST01_032INS.asmx/insertMasterList', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd,
+        AREA_CD : areaCd,
+        POS_NO : posNo ,
+        TABLE_ID : tableIds ,
+        DTM_DATE : date
+    });
+};
+export const deleteMasterList = (groupCd , storeCd,areaCd ,posNo ,tableIds ,date) => {
+    return api2.post('/MIMASTER/MST01_032INS.asmx/deleteMasterList', {
+        GROUP_CD: groupCd,
+        STORE_CD : storeCd,
+        AREA_CD : areaCd,
+        POS_NO : posNo ,
+        TABLE_ID : tableIds ,
+        DTM_DATE : date
+    });
+};
 
 
 

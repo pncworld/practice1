@@ -258,6 +258,24 @@ export const getSalesDayReportByPos = (groupCd ,storeCd , dtmdate1 , dtmdate2 , 
 
   });
 };
+export const getSalesDatabyMonth = (groupCd ,storeCds , dtmdate1 , dtmdate2 , reportType  ) => {
+  return api2.post('/MISALES/SLS06_003RPT.asmx/getSalesDatabyMonth', {
+    GROUP_CD    : groupCd,
+    STORE_CDS    : storeCds,
+    START_DATE  : dtmdate1,
+    END_DATE  : dtmdate2,
+    REPORT_TYPE : reportType
+
+  });
+};
+export const getCauseList = (groupCd ,storeCd  ) => {
+  return api2.post('/MISALES/SLS08_001RPT.asmx/getCauseList', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd
+
+
+  });
+};
 
 
 
