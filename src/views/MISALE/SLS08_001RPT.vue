@@ -23,9 +23,9 @@
             <div class=" text-nowrap flex justify-start items-center space-x-10 ml-8 mt-2">
               <div class="text-base font-semibold">조건 :</div>
               <div class="flex space-x-10">
-                <label for=""><input type="checkbox">매장명</label>
-                <label for=""><input type="checkbox">셀병합</label>
-                <label for=""><input type="checkbox">합계</label>
+                <label for=""><input type="checkbox" @click="showStore">매장명</label>
+                <label for=""><input type="checkbox" @click="cellUnite">셀병합</label>
+                <label for=""><input type="checkbox" @click="showSum">합계</label>
             </div>
             
             </div>
@@ -51,19 +51,16 @@
   
       <div class="w-full h-[80%]">
   
-        <Realgrid :progname="'SLS06_002RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setFooter="true"
-          :setGroupFooter="true" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID" :setGroupFooterExpressions="setGroupFooterExpressions" :setGroupFooterColID="setGroupFooterColID"
-          :ExcelNm="'시간대별 매출 현황.'" :exporttoExcel="exportExcel" :setGroupColumnId="'strStore,strTime'"
-          :setGroupSumCustomText="['소계']" :setGroupSumCustomColumnId="['strTime']" :setGroupCustomLevel="1"
-          :setRowGroupSpan="'lngCustTotCnt,lngRecTotCnt,lngAccTotAmt'" 
-          :setGroupSummaryCenterIds="setGroupSummaryCenterIds" :hideColumn="'lngSalAmt'" :hideColumnNow="hideColumnNow" :documentTitle="'SLS06_002RPT'" :documentSubTitle="documentSubTitle">
+        <Realgrid :progname="'SLS08_001RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setFooter="true"
+        :hideColumnsId="hideColumnsId" :setRowGroupSpan="setRowGroupSpan"
+          :documentTitle="'SLS06_002RPT'" :documentSubTitle="documentSubTitle">
         </Realgrid>
       </div>
     </div>
   </template>
   
   <script setup>
-  import { getCauseList, getTimeSalesReport } from '@/api/misales';
+  import { getCauseList, getSalesCancelData, getTimeSalesReport } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStoreSingle from '@/components/pickStoreSingle.vue';
 import Realgrid from '@/components/realgrid.vue';
@@ -80,12 +77,14 @@ import { useStore } from 'vuex';
   const setGroupFooterExpressions = ref(['sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'custom'])
   const setGroupSummaryCenterIds = ref('strTime')
   const progid = ref(1)
+  const setRowGroupSpan = ref('')
   const reload = ref(false)
   const rowData = ref([])
   const afterSearch = ref(false)
   const selectedstartDate = ref()
   const selectedendDate = ref()
   const hideColumnNow = ref(true)
+  const hideColumnsId = ref(['strStore'])
   const startDate = (e) => {
     console.log(e)
     selectedstartDate.value = e
@@ -116,11 +115,29 @@ onMounted(async () => {
     store.state.loading = true;
     try {
       initGrid()
-  
-     
-      const res = await getSalesCancelData(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, '12', startTime.value, endTime.value, orderPay.value, sendcheckedDay.join(','))
+      let cause ;
+      if(selectedCause.value == null || selectedCause.value == undefined ){
+        cause = 0 
+      } else {
+        cause = selectedCause.value.lngCode
+      }
+
+      if(tempHideStore.value == true){
+        hideColumnsId.value = []
+      } else {
+        hideColumnsId.value = ['strStore']
+      }
+
+      if(tempCellUnite.value == true){
+        setRowGroupSpan.value = 'dtmDate'
+      } else {
+          setRowGroupSpan.value = ''
+      }
+
+      reload.value =!reload.value
+      const res = await getSalesCancelData(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, '12', cause)
       console.log(res)
-      rowData.value = res.data.TIMESALE
+      rowData.value = res.data.List
   
   
   
@@ -182,26 +199,10 @@ onMounted(async () => {
     6:'토',
     7:'일'
   }
-  const checkit = (e) => {
-    console.log(e)
-    if (e.target.checked) {
-      checkedDay.add(Number(e.target.value))
-    } else {
-      checkedDay.delete(Number(e.target.value))
-    }
-  }
-  const changecheckedBefore = (e) => {
-    if (e.target.checked) {
-      hideColumnNow.value = false
-    } else {
-      hideColumnNow.value = true
-    }
+
+
   
-  }
-  
-  const resetVselect = () => {
-    startTime.value = 0
-  }
+
   const resetVselect2 = () => {
     endTime.value = 23
   }
@@ -224,6 +225,22 @@ onMounted(async () => {
   const selectedExcelStore = ref('')
   const excelStore = (e) =>{
     selectedExcelStore.value = e
+  }
+const tempHideStore = ref(false)
+  const showStore = (e) => {
+      if(e.target.checked){
+        tempHideStore.value = true 
+      } else {
+        tempHideStore.value = false
+      }
+  }
+  const tempCellUnite= ref(false)
+  const cellUnite = (e) => {
+      if(e.target.checked){
+        tempCellUnite.value = true 
+      } else {
+        tempCellUnite.value = false
+      }
   }
   </script>
   

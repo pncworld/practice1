@@ -160,6 +160,9 @@ const updateDateRange = (e) => {
     selectedStartDate.value = formatDateToYYYYMMDD(current3MonthStart);
     selectedEndDate.value = formatDateToYYYYMMDD(current3MonthEnd);
   }
+
+  emit('startDate', selectedStartDate.value)
+  emit('endDate', selectedEndDate.value)
 }
 
 function formatDateToYYYYMMDD(date) {

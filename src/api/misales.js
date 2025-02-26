@@ -276,6 +276,18 @@ export const getCauseList = (groupCd ,storeCd  ) => {
 
   });
 };
+export const getSalesCancelData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+  return api2.post('/MISALES/SLS08_001RPT.asmx/getSalesCancelData', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd ,
+    START_DATE :  startDate,
+    END_DATE : endDate  ,
+    REPORT_TYPE :  reporttype ,
+    CAUSE : cause,
+
+
+  });
+};
 
 
 
