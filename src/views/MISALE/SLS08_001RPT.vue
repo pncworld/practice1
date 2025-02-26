@@ -51,8 +51,9 @@
   
       <div class="w-full h-[80%]">
   
-        <Realgrid :progname="'SLS08_001RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setFooter="true"
-        :hideColumnsId="hideColumnsId" :setRowGroupSpan="setRowGroupSpan"
+        <Realgrid :progname="'SLS08_001RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setFooter="true" :mergeMask="mergeMask"
+
+        :hideColumnsId="hideColumnsId" :setRowGroupSpan2="setRowGroupSpan" :setFooterExpressions="['sum','sum','sum','sum','sum']" :setFooterColID="['lngActAmt','lngCredit','lngCash','lngECard','lngETC']"
           :documentTitle="'SLS06_002RPT'" :documentSubTitle="documentSubTitle">
         </Realgrid>
       </div>
@@ -98,6 +99,7 @@ import { useStore } from 'vuex';
   const selectedCause = ref(null)
   const store = useStore()
   const causeList = ref([])
+  const mergeMask = ref()
 onMounted(async () => {
 
    const pageLog = await insertPageLog(store.state.activeTab2)
@@ -124,17 +126,25 @@ onMounted(async () => {
 
       if(tempHideStore.value == true){
         hideColumnsId.value = []
+        mergeMask.value = 'strStore'
       } else {
         hideColumnsId.value = ['strStore']
+        mergeMask.value = ''
       }
-
       if(tempCellUnite.value == true){
         setRowGroupSpan.value = 'dtmDate'
       } else {
-          setRowGroupSpan.value = ''
+        setRowGroupSpan.value = ''
       }
-
+      
+      if(tempSum.value == true){
+       // setRowGroupSpan.value = 'dtmDate'
+      } else {
+        //  setRowGroupSpan.value = ''
+      }
+     
       reload.value =!reload.value
+     
       const res = await getSalesCancelData(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, '12', cause)
       console.log(res)
       rowData.value = res.data.List
@@ -240,6 +250,14 @@ const tempHideStore = ref(false)
         tempCellUnite.value = true 
       } else {
         tempCellUnite.value = false
+      }
+  }
+  const tempSum= ref(false)
+  const showSum = (e) => {
+      if(e.target.checked){
+        tempSum.value = true 
+      } else {
+        tempSum.value = false
       }
   }
   </script>

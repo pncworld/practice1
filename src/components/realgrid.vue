@@ -448,6 +448,17 @@ const props = defineProps({
     type: Array,
     default: [],
   }
+  ,
+  mergeMask: {
+    type: Array,
+    default: [[]],
+  }
+ 
+  ,
+  setRowGroupSpan2: {
+    type: String,
+    default: "",
+  }
  
 
 });
@@ -605,8 +616,31 @@ const funcshowGrid = async () => {
 
 
   }
+  if (props.setRowGroupSpan2 != '') {
+    const mergeColumn = props.setRowGroupSpan2.split(',')
+    const maskColumns = props.mergeMask.split(',')
+    for (var i = 0; i < mergeColumn.length; i++) {
+      const rowGroupSpanColumn = columns.find(item => item.fieldName == mergeColumn[i])
+      let maskdata ;
+      if(props.mergeMask != ''){
+        const mask = maskColumns.map(item => item)
+     
+
+      for(let i=0 ; i < mask.length ; i++ ){
+        maskdata = "values['"+mask[i]+"']+"
+      }
+      maskdata = maskdata+"value"
+      } else {
+        maskdata = "value"
+      }
+      
+      rowGroupSpanColumn.mergeRule = { criteria: maskdata}
+    }
 
 
+  }
+
+   
 
   gridView.setColumns(columns);
 
@@ -1369,6 +1403,18 @@ watch(() => props.hideColumnNow, (newValue) => {
   }
   
 })
+
+// watch(() => props.setRowGroupSpan  , () => {
+//   if(props.setRowGroupSpan != ''){
+//    console.log(props.setRowGroupSpan)
+//   const mergeColumn = props.setRowGroupSpan.split(',')
+//     for (var i = 0; i < mergeColumn.length; i++) {
+//       gridView.columnByName(mergeColumn[i]).mergeRule = {
+//         criteria: "value"
+//       }
+//     }
+//   }
+// })
 onMounted(async () => {
   try {
     if (props.renderProgname != '') {
