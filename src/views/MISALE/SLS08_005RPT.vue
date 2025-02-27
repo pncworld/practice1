@@ -4,7 +4,7 @@
         <div class="flex justify-start  w-full pl-12 pt-4">
           <div class="flex justify-start">
             <h1 class="font-bold text-sm md:text-2xl w-full">
-              매출 취소 현황.
+              과거 매출 변환 현황.
             </h1>
           </div>
   
@@ -23,9 +23,10 @@
             <div class=" text-nowrap flex justify-start items-center space-x-10 ml-8 mt-2">
               <div class="text-base font-semibold">조건 :</div>
               <div class="flex space-x-10">
-                <label for="store"><input type="checkbox" id="store" @click="showStore">매장명</label>
-                <label for="unite"><input type="checkbox" id="unite" @click="cellUnite">셀병합</label>
-                <label for="sum"><input type="checkbox" id="sum" @click="showSum">합계</label>
+                <label for="unite"><input type="checkbox" id="unite" @click="cellUnite" checked>셀병합</label>
+                <label for="store"><input type="checkbox" id="store" @click="showSum" checked>합계</label>
+               
+              
             </div>
             
             </div>
@@ -42,7 +43,7 @@
           </div>
         </div>
         <div class="ml-10 -mt-10">
-          <PickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore" @changeInit="changeInit">
+          <PickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore"  @changeInit="changeInit">
           </PickStoreSingle>
         </div>
         <div></div>
@@ -51,20 +52,19 @@
   
       <div class="w-full h-[80%]">
   
-        <Realgrid :progname="'SLS08_001RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setFooter="true" :mergeMask="mergeMask" :setMergeMode="false" :setGroupSumCustomColumnId="['dtmDate']" :setGroupSumCustomText="['소계']"
-        :setGroupFooter="setGroupFooter" :setGroupColumnId="setGroupColumnId" :setGroupFooterExpressions="['sum','sum','sum','sum','sum']" :setGroupFooterColID="['lngActAmt','lngCredit','lngCash','lngECard','lngETC']"
-        :hideColumnsId="hideColumnsId" :setRowGroupSpan2="setRowGroupSpan" :setFooterExpressions="['sum','sum','sum','sum','sum']" :setFooterColID="['lngActAmt','lngCredit','lngCash','lngECard','lngETC']"
-          :documentTitle="'SLS08_001RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
+        <Realgrid :progname="'SLS08_005RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setFooter="true" :mergeMask="''" :setMergeMode="false" :setGroupSumCustomColumnId="['dtmDate']" :setGroupSumCustomText="['소계']"
+        :setGroupFooter="setGroupFooter" :setGroupColumnId="setGroupColumnId" :setGroupFooterExpressions="['sum','sum','sum','sum']" :setGroupFooterColID="['lngBActamt','lngAActamt','lngAActamt2','lngChange']"
+        :hideColumnsId="hideColumnsId" :setRowGroupSpan2="setRowGroupSpan" :setFooterExpressions="['sum','sum','sum','sum']" :setFooterColID="['lngBActamt','lngAActamt','lngAActamt2','lngChange']"
+          :documentTitle="'SLS08_005RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
         </Realgrid>
       </div>
     </div>
   </template>
   
   <script setup>
-  import { getCauseList, getSalesCancelData, getTimeSalesReport } from '@/api/misales';
+  import { getCauseList, getPastSalesChanges } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStoreSingle from '@/components/pickStoreSingle.vue';
-import PickStoreSingle2 from '@/components/pickStoreSingle2.vue';
 import Realgrid from '@/components/realgrid.vue';
 import { insertPageLog } from '@/customFunc/customFunc';
 import { onMounted, ref } from 'vue';
@@ -87,7 +87,7 @@ import { useStore } from 'vuex';
   const selectedendDate = ref()
   const hideColumnNow = ref(true)
   const setGroupColumnId = ref('dtmDate')
-  const hideColumnsId = ref(['strStore'])
+  const hideColumnsId = ref([])
   const startDate = (e) => {
     console.log(e)
     selectedstartDate.value = e
@@ -97,7 +97,7 @@ import { useStore } from 'vuex';
   }
   const startTime = ref(0)
   const endTime = ref(23)
-  const setGroupFooter = ref(false)
+  const setGroupFooter = ref(true)
   const selectedCause = ref(null)
   const store = useStore()
   const causeList = ref([])
@@ -126,17 +126,9 @@ onMounted(async () => {
         cause = selectedCause.value.lngCode
       }
 
-      if(tempHideStore.value == true){
-        hideColumnsId.value = []
-        mergeMask.value = 'strStore'
-        setGroupColumnId.value = 'strStore'
-      } else {
-        hideColumnsId.value = ['strStore']
-        setGroupColumnId.value = 'dtmDate'
-        mergeMask.value = ''
-      }
+     
       if(tempCellUnite.value == true){
-        setRowGroupSpan.value = 'dtmDate'
+        setRowGroupSpan.value = 'strName'
       } else {
         setRowGroupSpan.value = ''
       }
@@ -149,7 +141,7 @@ onMounted(async () => {
      
       reload.value =!reload.value
      
-      const res = await getSalesCancelData(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, '12', cause)
+      const res = await getPastSalesChanges(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, '12', cause)
       console.log(res)
       rowData.value = res.data.List
   
@@ -245,15 +237,9 @@ onMounted(async () => {
   const excelStore = (e) =>{
     selectedExcelStore.value = e
   }
-const tempHideStore = ref(false)
-  const showStore = (e) => {
-      if(e.target.checked){
-        tempHideStore.value = true 
-      } else {
-        tempHideStore.value = false
-      }
-  }
-  const tempCellUnite= ref(false)
+const tempHideStore = ref(true)
+  
+  const tempCellUnite= ref(true)
   const cellUnite = (e) => {
       if(e.target.checked){
         tempCellUnite.value = true 
@@ -264,22 +250,16 @@ const tempHideStore = ref(false)
   const tempSum= ref(false)
   const showSum = (e) => {
       if(e.target.checked){
-        //tempSum.value = true 
-        
-        if(tempHideStore.value == true){
-          setGroupColumnId.value = 'strStore'
-        } else {
-          setGroupColumnId.value = 'dtmDate'
-        }
+       
+        setGroupColumnId.value = 'strName,strGubun'
         setGroupFooter.value = true
         reload.value = !reload.value
       } else {
-        //tempSum.value = false
+       
         setGroupFooter.value = false
         reload.value = !reload.value
       }
   }
-
   const changeInit = (e) => {
     initGrid()
   }

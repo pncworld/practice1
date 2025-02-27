@@ -459,6 +459,11 @@ const props = defineProps({
     type: String,
     default: "",
   }
+  ,
+  setMergeMode: {
+    type: Boolean,
+    default: true,
+  }
  
 
 });
@@ -617,11 +622,12 @@ const funcshowGrid = async () => {
 
   }
   if (props.setRowGroupSpan2 != '') {
+    console.log(props.setRowGroupSpan2)
     const mergeColumn = props.setRowGroupSpan2.split(',')
     const maskColumns = props.mergeMask.split(',')
     for (var i = 0; i < mergeColumn.length; i++) {
       const rowGroupSpanColumn = columns.find(item => item.fieldName == mergeColumn[i])
-      let maskdata ;
+      let maskdata = 'value' ;
       if(props.mergeMask != ''){
         const mask = maskColumns.map(item => item)
      
@@ -633,8 +639,11 @@ const funcshowGrid = async () => {
       } else {
         maskdata = "value"
       }
+       console.log(maskdata)
+       if(rowGroupSpanColumn){
+        rowGroupSpanColumn.mergeRule = { criteria: maskdata}
+       }
       
-      rowGroupSpanColumn.mergeRule = { criteria: maskdata}
     }
 
 
@@ -812,6 +821,7 @@ const funcshowGrid = async () => {
 
 
   // 기타 옵션
+  gridView.rowIndicator.width = 50;
   gridView.setFooters({ visible: props.setFooter == false ? false : true });
   gridView.setRowIndicator({ visible: true });
   gridView.setCheckBar({ visible: props.showCheckBar });
@@ -856,7 +866,7 @@ const funcshowGrid = async () => {
       collapsedAdornments: 'none',
       headerStatement: "",
       expanderVisibility: false ,
-      mergeMode : true ,
+      mergeMode : props.setMergeMode ,
       createFooterCallback: function(grid,group) {
      
        return true;

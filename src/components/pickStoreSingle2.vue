@@ -58,7 +58,7 @@ import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
-const teamscList = ref('전체')
+const teamscList = ref('선택')
 const selectedStoreList = ref(null)
 const selectedStoreList2 = ref(null)
 const selectedStore = ref(0)
@@ -72,7 +72,7 @@ const selectedStoreGroup2 = ref(store.state.storeGroup[0].lngStoreGroup)
 const selectedStoreType = ref(0)
 const selectedStoreTeam = ref(0)
 const selectedSuperVisor = ref(-1)
-const emit = defineEmits(['lngStoreGroups', 'lngStoreCode', 'lngStoreAttrs', 'lngStoreGroup','excelStore','lngStoreTeam','lngSupervisor']);
+const emit = defineEmits(['lngStoreGroups', 'lngStoreCode', 'lngStoreAttrs', 'lngStoreGroup','excelStore','lngStoreTeam','lngSupervisor','changeInit']);
 const props = defineProps({
     initCheckBox: {
         type: Boolean,
@@ -100,7 +100,7 @@ onMounted(() => {
     rowData2.value = store.state.storeCd
     emit('lngStoreGroup', store.state.storeGroup[0].lngStoreGroup)
     emit('lngStoreCode', 0)
-    emit('excelStore', '매장명 : 전체')
+    emit('excelStore', '매장명 : 선택')
     labelsData.value.push(store.state.storeGroup.map(item => item.strName))
     valuesData.value.push(store.state.storeGroup.map(item => item.lngStoreGroup))
 
@@ -125,7 +125,7 @@ watch(selectedStoreType, (newValue) => {
     }
     selectedStoreList.value = null
     emit('lngStoreAttrs', selectedStoreType.value)
-
+    emit('changeInit', true)
 })
 
 watch(selectedStoreTeam, (newValue) => {
@@ -139,7 +139,7 @@ watch(selectedStoreTeam, (newValue) => {
     selectedSuperVisor.value = -1;
     selectedStoreList.value = null
     emit('lngStoreTeam', selectedStoreTeam.value)
-
+    emit('changeInit', true)
 
 })
 
@@ -159,6 +159,7 @@ watch(selectedSuperVisor, (newValue) => {
 
     }
     emit('lngSupervisor', selectedSuperVisor.value)
+    emit('changeInit', true)
     selectedStoreList.value = null
 })
 
@@ -168,13 +169,14 @@ watch(selectedSuperVisor, (newValue) => {
 watch(selectedStoreList, () => {
     if (selectedStoreList.value == null) {
         selectedStore.value = 0
-        emit('excelStore', '매장명 : 전체')
+        emit('excelStore', '매장명 : 선택')
     } else {
         selectedStore.value = selectedStoreList.value
         const name = store.state.storeCd.filter(item => item.lngStoreCode == selectedStoreList.value)[0].strName
         emit('excelStore', '매장명 :'+name)
     }
     emit('lngStoreCode', selectedStore.value)
+    emit('changeInit', true)
  
 
 })

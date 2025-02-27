@@ -1,5 +1,5 @@
 <template>
-    <div class="grid grid-rows-1 grid-cols-[2fr,3fr,3fr,3fr] justify-center space-x-2 text-sm items-center w-full ">
+    <div class="grid grid-rows-1 grid-cols-[2fr,3fr,3fr,3fr] justify-center space-x-2 text-sm items-center w-[600px] ">
      <div class="items-center font-bold text-base flex w-20 pl-5">매장명 : </div>
       <div>
         <select :disabled="is9999" v-model="selectedGroup"  id="storeGroup" class=" border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreGroup($event.target.value)" >

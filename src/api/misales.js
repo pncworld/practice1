@@ -276,8 +276,76 @@ export const getCauseList = (groupCd ,storeCd  ) => {
 
   });
 };
+export const getCauseListbyMenu = (groupCd ,storeCd  ) => {
+  return api2.post('/MISALES/SLS08_002RPT.asmx/getCauseListbyMenu', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd
+
+
+  });
+};
 export const getSalesCancelData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
   return api2.post('/MISALES/SLS08_001RPT.asmx/getSalesCancelData', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd ,
+    START_DATE :  startDate,
+    END_DATE : endDate  ,
+    REPORT_TYPE :  reporttype ,
+    CAUSE : cause,
+
+
+  });
+};
+export const getMenusCancelData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+  return api2.post('/MISALES/SLS08_002RPT.asmx/getMenusCancelData', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd ,
+    START_DATE :  startDate,
+    END_DATE : endDate  ,
+    REPORT_TYPE :  reporttype ,
+    CAUSE : cause,
+
+
+  });
+};
+export const getItemsCancelData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+  return api2.post('/MISALES/SLS08_003RPT.asmx/getItemsCancelData', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd ,
+    START_DATE :  startDate,
+    END_DATE : endDate  ,
+    REPORT_TYPE :  reporttype ,
+    CAUSE : cause,
+
+
+  });
+};
+export const getSalesChangeData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+  return api2.post('/MISALES/SLS08_004RPT.asmx/getSalesChangeData', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd ,
+    START_DATE :  startDate,
+    END_DATE : endDate  ,
+    REPORT_TYPE :  reporttype ,
+    CAUSE : cause,
+
+
+  });
+};
+export const getSalesChangeDetailData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+  return api2.post('/MISALES/SLS08_004RPT.asmx/getSalesChangeDetailData', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd ,
+    START_DATE :  startDate,
+    END_DATE : endDate  ,
+    REPORT_TYPE :  reporttype ,
+    CAUSE : cause,
+
+
+  });
+};
+export const getPastSalesChanges = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+  return api2.post('/MISALES/SLS08_005RPT.asmx/getPastSalesChanges', {
     GROUP_CD    : groupCd,
     STORE_CD   : storeCd ,
     START_DATE :  startDate,

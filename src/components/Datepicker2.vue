@@ -163,6 +163,7 @@ const updateDateRange = (e) => {
 
   emit('startDate', selectedStartDate.value)
   emit('endDate', selectedEndDate.value)
+  emit('excelDate', '매출일자 : '+selectedStartDate.value+'~'+ selectedEndDate.value)
 }
 
 function formatDateToYYYYMMDD(date) {

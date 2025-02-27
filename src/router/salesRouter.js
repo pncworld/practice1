@@ -13,6 +13,10 @@ import SLS02_017RPT from "@/views/MISALE/SLS02_017RPT.vue";
 import SLS02_028RPT from "@/views/MISALE/SLS02_028RPT.vue";
 import SLS06_003RPT from "@/views/MISALE/SLS06_003RPT.vue";
 import SLS08_001RPT from "@/views/MISALE/SLS08_001RPT.vue";
+import SLS08_002RPT from "@/views/MISALE/SLS08_002RPT.vue";
+import SLS08_003RPT from "@/views/MISALE/SLS08_003RPT.vue";
+import SLS08_004RPT from "@/views/MISALE/SLS08_004RPT.vue";
+import SLS08_005RPT from "@/views/MISALE/SLS08_005RPT.vue";
 
 export default function salesRouter() {
     return [
@@ -91,6 +95,26 @@ export default function salesRouter() {
       {
         path : "SLS08_001RPT.xml",
         component : SLS08_001RPT
+      }
+      ,
+      {
+        path : "SLS08_002RPT.xml",
+        component : SLS08_002RPT
+      }
+      ,
+      {
+        path : "SLS08_003RPT.xml",
+        component : SLS08_003RPT
+      }
+      ,
+      {
+        path : "SLS08_004RPT.xml",
+        component : SLS08_004RPT
+      }
+      ,
+      {
+        path : "SLS08_005RPT.xml",
+        component : SLS08_005RPT
       }
     
     ];

@@ -4,34 +4,26 @@
         <div class="flex justify-start  w-full pl-12 pt-4">
           <div class="flex justify-start">
             <h1 class="font-bold text-sm md:text-2xl w-full">
-              매출 취소 현황.
+              매출 변환 현황.
             </h1>
           </div>
   
         </div>
         <div class="flex justify-center mr-9 space-x-2 pr-5">
           <button @click="searchButton" class="button search md:w-auto w-14">조회</button>
+          <button @click="detailSearchButton" class="button search md:w-auto w-14">상세조회</button>
           <button @click="excelButton" class="button save w-auto excel">엑셀</button>
   
         </div>
       </div>
-      <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-32 items-center z-10">
-        <div class="grid grid-cols-1 grid-rows-3 mt-5">
+      <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-24 items-center z-10">
+        <div class="grid grid-cols-1 grid-rows-2 mt-2 space-y-1">
   
           <Datepicker2 @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker" @excelDate="excelDate"></Datepicker2>
-          <div class="flex flex-col justify-start items-start text-nowrap ml-40 ">
-            <div class=" text-nowrap flex justify-start items-center space-x-10 ml-8 mt-2">
-              <div class="text-base font-semibold">조건 :</div>
-              <div class="flex space-x-10">
-                <label for="store"><input type="checkbox" id="store" @click="showStore">매장명</label>
-                <label for="unite"><input type="checkbox" id="unite" @click="cellUnite">셀병합</label>
-                <label for="sum"><input type="checkbox" id="sum" @click="showSum">합계</label>
-            </div>
-            
-            </div>
-          </div>
-          <div class="flex justify-center -mr-16 -space-x-5">
+          
+          <div class="flex justify-center mr-20 -space-x-5">
             <div class="text-base font-semibold ml-5">사유코드 : </div>
+            <div class="flex justify-center -space-x-48">
             <v-select v-model="selectedCause" 
             :options="causeList"
              placeholder="전체"
@@ -39,10 +31,13 @@
              class=" custom-select4 !mr-10"
              clearable="true"
              @click="resetVselect2" />
+             <div class="mt-1 relative"><label for="sum"><input id="sum" type="checkbox" @click="showSum">합계</label></div>
+            </div>
           </div>
+          
         </div>
-        <div class="ml-10 -mt-10">
-          <PickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore" @changeInit="changeInit">
+        <div class="ml-10 mt-2">
+          <PickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore"  @changeInit="changeInit">
           </PickStoreSingle>
         </div>
         <div></div>
@@ -51,20 +46,19 @@
   
       <div class="w-full h-[80%]">
   
-        <Realgrid :progname="'SLS08_001RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setFooter="true" :mergeMask="mergeMask" :setMergeMode="false" :setGroupSumCustomColumnId="['dtmDate']" :setGroupSumCustomText="['소계']"
-        :setGroupFooter="setGroupFooter" :setGroupColumnId="setGroupColumnId" :setGroupFooterExpressions="['sum','sum','sum','sum','sum']" :setGroupFooterColID="['lngActAmt','lngCredit','lngCash','lngECard','lngETC']"
-        :hideColumnsId="hideColumnsId" :setRowGroupSpan2="setRowGroupSpan" :setFooterExpressions="['sum','sum','sum','sum','sum']" :setFooterColID="['lngActAmt','lngCredit','lngCash','lngECard','lngETC']"
-          :documentTitle="'SLS08_001RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
+        <Realgrid :progname="'SLS08_004RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload" :setFooter="true" :mergeMask="''" :setMergeMode="false" :setGroupSumCustomColumnId="['dtmDate']" :setGroupSumCustomText="['소계']"
+        :setGroupFooter="setGroupFooter" :setGroupColumnId="setGroupColumnId" :setGroupFooterExpressions="setGroupFooterExpressions" :setGroupFooterColID="setGroupFooterColID"
+         :setRowGroupSpan2="setRowGroupSpan" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
+          :documentTitle="'SLS08_004RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
         </Realgrid>
       </div>
     </div>
   </template>
   
   <script setup>
-  import { getCauseList, getSalesCancelData, getTimeSalesReport } from '@/api/misales';
+  import { getCauseList, getSalesCancelData, getSalesChangeData, getSalesChangeDetailData } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStoreSingle from '@/components/pickStoreSingle.vue';
-import PickStoreSingle2 from '@/components/pickStoreSingle2.vue';
 import Realgrid from '@/components/realgrid.vue';
 import { insertPageLog } from '@/customFunc/customFunc';
 import { onMounted, ref } from 'vue';
@@ -73,13 +67,13 @@ import { useStore } from 'vuex';
 
   
   const orderPay = ref(1)
-  const setFooterColID = ref(['lngRecCnt', 'lngRecAmt', 'lngCustCnt', 'lngCustAmt', 'lngSalAmt', 'lngDiscount', 'lngActAmt', 'lngVAT', 'lngSupplyAmt', 'dblDistRate', 'lngTotAmt', 'dtmDate'])
-  const setGroupFooterColID = ref(['lngRecCnt', 'lngRecAmt', 'lngCustCnt', 'lngCustAmt', 'lngSalAmt', 'lngDiscount', 'lngActAmt', 'lngVAT', 'lngSupplyAmt', 'dblDistRate', 'lngTotAmt', 'dtmDate'])
-  const setFooterExpressions = ref(['sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'custom'])
-  const setGroupFooterExpressions = ref(['sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'custom'])
-  const setGroupSummaryCenterIds = ref('strTime')
+  const setFooterColID = ref(['lngCount', 'lngPreAmt', 'lngAmt', 'lngChange'])
+  const setGroupFooterColID = ref(['lngCount', 'lngPreAmt', 'lngAmt', 'lngChange'])
+  const setFooterExpressions = ref(['sum', 'sum', 'sum', 'sum'])
+  const setGroupFooterExpressions = ref(['sum', 'sum', 'sum', 'sum'])
+
   const progid = ref(1)
-  const setRowGroupSpan = ref('')
+  const setRowGroupSpan = ref('lngStoreCode,strName')
   const reload = ref(false)
   const rowData = ref([])
   const afterSearch = ref(false)
@@ -125,31 +119,58 @@ onMounted(async () => {
       } else {
         cause = selectedCause.value.lngCode
       }
-
-      if(tempHideStore.value == true){
-        hideColumnsId.value = []
-        mergeMask.value = 'strStore'
-        setGroupColumnId.value = 'strStore'
-      } else {
-        hideColumnsId.value = ['strStore']
-        setGroupColumnId.value = 'dtmDate'
-        mergeMask.value = ''
-      }
-      if(tempCellUnite.value == true){
-        setRowGroupSpan.value = 'dtmDate'
-      } else {
-        setRowGroupSpan.value = ''
-      }
-      
-      // if(tempSum.value == true){
-      //   setGroupFooter.value = true
-      // } else {
-      //   setGroupFooter.value = false
-      // }
+     setFooterColID.value = ['lngCount', 'lngPreAmt', 'lngAmt', 'lngChange']
+    setGroupFooterColID.value =['lngCount', 'lngPreAmt', 'lngAmt', 'lngChange']
+    setFooterExpressions.value = ['sum', 'sum', 'sum', 'sum']
+     setGroupFooterExpressions.value = ['sum', 'sum', 'sum', 'sum']
+      setRowGroupSpan.value = 'lngStoreCode,strName'
+      progid.value = 1
      
       reload.value =!reload.value
      
-      const res = await getSalesCancelData(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, '12', cause)
+      const res = await getSalesChangeData(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, '1', cause)
+      console.log(res)
+      rowData.value = res.data.List
+  
+  
+  
+  
+      afterSearch.value = true
+    } catch (error) {
+      afterSearch.value = false
+    } finally {
+      store.state.loading = false;
+  
+    }
+  
+  }
+  const detailSearchButton = async () => {
+    store.state.loading = true;
+    try {
+      initGrid()
+      let cause ;
+      if(selectedCause.value == null || selectedCause.value == undefined ){
+        cause = 0 
+      } else {
+        cause = selectedCause.value.lngCode
+      }
+    
+     
+      
+      if(tempSum.value == true){
+        setGroupFooter.value = true
+      } else {
+        setGroupFooter.value = false
+      }
+     setFooterColID.value = ['lngStartActAmt', 'lngEndActAmt', 'lngChange']
+     setGroupFooterColID.value =['lngStartActAmt', 'lngEndActAmt', 'lngChange']
+     setFooterExpressions.value = ['sum', 'sum', 'sum']
+     setGroupFooterExpressions.value = ['sum', 'sum', 'sum']
+      setRowGroupSpan.value = 'strName'
+      progid.value = 2
+      reload.value =!reload.value
+     
+      const res = await getSalesChangeDetailData(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, '12', cause)
       console.log(res)
       rowData.value = res.data.List
   
@@ -195,17 +216,17 @@ onMounted(async () => {
   
   
   const excelButton = () => {
-    let condition = '조건 :';
-    if(tempHideStore.value == true){
-      condition+="매장명,"
-    }
-    if(tempCellUnite.value == true){
-      condition+="셀병합,"
-    }
-    if(setGroupFooter.value == true){
-      condition+="합계,"
-    }
-    condition= condition.substring(0,condition.length-1)
+    // let condition = '조건 :';
+    // if(tempHideStore.value == true){
+    //   condition+="매장명,"
+    // }
+    // if(tempCellUnite.value == true){
+    //   condition+="셀병합,"
+    // }
+    // if(setGroupFooter.value == true){
+    //   condition+="합계,"
+    // }
+    // condition= condition.substring(0,condition.length-1)
     let codestr
     if(selectedCause.value == null || selectedCause.value == undefined){
       codestr = '전체'
@@ -213,7 +234,7 @@ onMounted(async () => {
       codestr = causeList.value.filter(item => item.lngCode == selectedCause.value.lngCode)[0].strName
     }
 
-    documentSubTitle.value = selectedExcelDate.value +'\n'+ selectedExcelStore.value +'\n'+condition +'\n'+'사유코드 : '+codestr
+    documentSubTitle.value = selectedExcelDate.value +'\n'+ selectedExcelStore.value +'\n'+'사유코드 : '+codestr
     console.log(documentSubTitle.value);
     exportExcel.value = !exportExcel.value
   }
@@ -266,20 +287,16 @@ const tempHideStore = ref(false)
       if(e.target.checked){
         //tempSum.value = true 
         
-        if(tempHideStore.value == true){
-          setGroupColumnId.value = 'strStore'
-        } else {
-          setGroupColumnId.value = 'dtmDate'
-        }
+        setGroupColumnId.value = 'strName'
         setGroupFooter.value = true
         reload.value = !reload.value
       } else {
         //tempSum.value = false
+         setGroupColumnId.value = ''
         setGroupFooter.value = false
         reload.value = !reload.value
       }
   }
-
   const changeInit = (e) => {
     initGrid()
   }

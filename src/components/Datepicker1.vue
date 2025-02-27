@@ -8,10 +8,11 @@ import { onMounted, ref, watch } from 'vue';
 
 const formatDate = (date) => date.toISOString().split('T')[0]
 const selectedDate = ref(formatDate(new Date()))
-const emit = defineEmits(['dateValue','year','month','day']);
+const emit = defineEmits(['dateValue','year','month','day','excelDate']);
 
 onMounted(() => {
     emit('dateValue',selectedDate.value)
+    emit('excelDate','매출일자 : '+selectedDate.value)
 })
 const emitDate = () => {
     console.log(selectedDate.value)
@@ -19,6 +20,7 @@ const emitDate = () => {
     emit('year',selectedDate.value.split('-')[0])
     emit('month',Number(selectedDate.value.split('-')[1]))
     emit('day',Number(selectedDate.value.split('-')[2]))
+    emit('excelDate','매출일자 : '+selectedDate.value)
 }
 </script>
 
