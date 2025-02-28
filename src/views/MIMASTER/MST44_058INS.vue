@@ -18,9 +18,9 @@
   </div>
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore9kio @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo"
+    <PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @kioskNo="handlePosNo" :showKioskNo="true" :showPayType="true"
       @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @update:ischanged2="searchinit"
-      @updatePaymentType="updatePaymentType"></PickStore9kio>
+      @updatePaymentType="updatePaymentType"></PickStore>
   </div>
   <div class="z-50">
     <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm"
@@ -162,23 +162,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
-import { getAllScreenList, getAmountList, getAmountList2, saveAllMenuKey, saveAllMenuKey2, saveAllMenuKey3, saveScreenKeys, saveScreenKeys2, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
-import { VueDraggableNext } from 'vue-draggable-next';
+import { getAllScreenList, getAmountList2, saveAllMenuKey3 } from '@/api/master';
 import Swal from 'sweetalert2';
+import { onMounted, ref, watch } from 'vue';
+import { VueDraggableNext } from 'vue-draggable-next';
+import { useStore } from 'vuex';
 
-import { GridView, LocalDataProvider } from 'realgrid';
 import DupliPopUp from '@/components/dupliPopUp.vue';
 
-import PickStore7kio from '@/components/pickStore7kio.vue';
+import PickStore from '@/components/pickStore.vue';
 import Realgrid from '@/components/realgrid.vue';
-import PickStore6 from '@/components/pickStore6.vue';
-import PickStore5 from '@/components/pickStore5.vue';
-import PickStore8 from '@/components/pickStore8.vue';
-import DupliPopUp3 from '@/components/dupliPopUp3.vue';
-import PickStore9kio from '@/components/pickStore9kio.vue';
-import DupliPopUp4 from '@/components/dupliPopUp4.vue';
 
 
 

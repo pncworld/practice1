@@ -9,6 +9,7 @@ import salesRouter from './salesRouter'
 import masterRouter from './masterRouter'
 import mobileRouter from './mobileRouter'
 import miattendRouter from './miattendRouter'
+import accountRouter from './accountRouter'
 
 
 const isMobile = () =>{
@@ -54,7 +55,12 @@ const routes = [
     name: 'homePage',
     component: HomePage
    
-  }
+  },
+  {
+    path: '/MIACCOUNT',
+    //component : BasicLayout ,
+    children: accountRouter()
+  },
 ]
 
 const router = createRouter({

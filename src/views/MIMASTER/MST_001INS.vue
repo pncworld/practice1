@@ -13,8 +13,8 @@
   </div>
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore5 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo"
-      @storeNm="handlestoreNm" @update:ischanged="handleinitAll"></PickStore5>
+    <PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" :showPosNo="true"
+      @storeNm="handlestoreNm" @update:ischanged="handleinitAll"></PickStore>
     <div class="">
       <span class="font-bold text-sm ">화면번호 : &nbsp;</span>
       <select
@@ -178,17 +178,16 @@
 </template>
 
 <script setup>
-import { getScreenList3, getTableList, getTableList2, getTableScreenKeys, saveScreenKeys3, saveTables, saveTables2 } from '@/api/master';
-import DupliPopUp5 from '@/components/dupliPopUp5.vue';
+import { getTableList2, saveTables2 } from '@/api/master';
 import DupliPopUp6 from '@/components/dupliPopUp6.vue';
-import PickStore5 from '@/components/pickStore5.vue';
+import PickStore from '@/components/pickStore.vue';
 
 import { GridStack } from 'gridstack';
 import "gridstack/dist/gridstack.min.css";
 
 
 import Swal from 'sweetalert2';
-import { computed, nextTick, onActivated, onDeactivated, onMounted, ref, watch } from 'vue';
+import { onActivated, onDeactivated, onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 const ScreenKeyOrigin = ref([])

@@ -27,8 +27,8 @@
       </div>
       <div><input type="checkbox" name="" id="" @change="showStore"></div>
       <div class="ml-5">
-        <PickStorePlural2 @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore">
-        </PickStorePlural2>
+        <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore">
+        </PickStorePlural>
       </div>
       <div></div>
   
@@ -46,7 +46,7 @@
   <script setup>
   import { getSalesDatabyMonth } from '@/api/misales';
 import Datepicker3 from '@/components/Datepicker3.vue';
-import PickStorePlural2 from '@/components/pickStorePlural2.vue';
+import PickStorePlural from '@/components/pickStorePlural.vue';
 import Realgrid from '@/components/realgrid.vue';
 import { ref } from 'vue';
 import { useStore } from 'vuex';

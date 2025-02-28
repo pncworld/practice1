@@ -116,7 +116,8 @@ export default function salesRouter() {
         path : "SLS08_005RPT.xml",
         component : SLS08_005RPT
       }
-    
+      
+   
     ];
   }
   

@@ -30,9 +30,15 @@ export const get_sys_list = ( lngStoreGroup , lngUserAdminID ,strLanguage ) => {
   })
 
 };
-export const get_store_list = (lngStoreGroup) => {
+export const get_store_list = (lngStoreGroup ,lngpositiontype,blnbrandadmin, lngposition ,lngjointype,lngTeamCode,lngSupervisor) => {
   return api2.post('/SYSTEM/sysCom.asmx/getComStoreList',{
-    STORE_CD : lngStoreGroup
+    STORE_CD : lngStoreGroup,
+    LNG_POSITION_TYPE : lngpositiontype,
+    BLN_BRAND_ADMIN : blnbrandadmin ,
+    LNG_POSITION : lngposition ,
+    LNG_JOINTYPE : lngjointype ,
+    LNG_TEAMCODE : lngTeamCode ,
+    LNG_SUPERVISOR : lngSupervisor ,
   })
 }
 export const getStoreList = (lngStoreGroup , lngStoreCode) => {

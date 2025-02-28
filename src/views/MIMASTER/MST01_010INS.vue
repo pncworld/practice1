@@ -18,9 +18,9 @@
   </div>
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore11 @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd" @storeNm="handlestoreNm"
+    <PickStore @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd" @storeNm="handlestoreNm"
       @GroupNm="handleGroupNm" @update:ischanged="handleinitAll">
-    </PickStore11>
+    </PickStore>
   </div>
 
 
@@ -122,15 +122,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
-import { getTLUManageInfo, saveAllMenuKey, saveScreenKeys, savetablePosMenuKey, saveTLUList, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
-import { VueDraggableNext } from 'vue-draggable-next';
+import { getTLUManageInfo, saveTLUList } from '@/api/master';
 import Swal from 'sweetalert2';
+import { ref, watch } from 'vue';
+import { VueDraggableNext } from 'vue-draggable-next';
+import { useStore } from 'vuex';
 
-import { GridView, LocalDataProvider } from 'realgrid';
 
-import PickStore11 from '@/components/pickStore11.vue';
+import PickStore from '@/components/pickStore.vue';
 import Realgrid from '@/components/realgrid.vue';
 
 

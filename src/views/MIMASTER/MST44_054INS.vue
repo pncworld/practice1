@@ -18,9 +18,9 @@
   </div>
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore8 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo"
+    <PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" :showPosNo="true" :showPayType="true"
       @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @update:ischanged2="searchinit"
-      @updatePaymentType="updatePaymentType"></PickStore8>
+      @updatePaymentType="updatePaymentType"></PickStore>
   </div>
   <div class="z-50">
     <DupliPopUp3 :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd"
@@ -199,21 +199,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
-import { getAllScreenList, getAmountList, saveAllMenuKey, saveAllMenuKey2, saveScreenKeys, saveScreenKeys2, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
-import { VueDraggableNext } from 'vue-draggable-next';
+import { getAllScreenList, getAmountList, saveAllMenuKey2, saveScreenKeys2 } from '@/api/master';
 import Swal from 'sweetalert2';
+import { onMounted, ref, watch } from 'vue';
+import { VueDraggableNext } from 'vue-draggable-next';
+import { useStore } from 'vuex';
 
-import { GridView, LocalDataProvider } from 'realgrid';
-import DupliPopUp from '@/components/dupliPopUp.vue';
 
-import PickStore7kio from '@/components/pickStore7kio.vue';
-import Realgrid from '@/components/realgrid.vue';
-import PickStore6 from '@/components/pickStore6.vue';
-import PickStore5 from '@/components/pickStore5.vue';
-import PickStore8 from '@/components/pickStore8.vue';
 import DupliPopUp3 from '@/components/dupliPopUp3.vue';
+import PickStore from '@/components/pickStore.vue';
+import Realgrid from '@/components/realgrid.vue';
 
 
 
@@ -701,7 +696,7 @@ const handlePosNo = (newValue) => {
   posNo.value = newValue
   console.log(posNo.value)
   console.log(nowStoreAreaCd.value)
-  if (nowStoreAreaCd.value != undefined || posNo.value != undefined) {
+  if (nowStoreAreaCd.value != undefined && (posNo.value != undefined && posNo.value != 0) ) {
     searchAmount()
   }
 

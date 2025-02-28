@@ -19,8 +19,8 @@
 
     </div>
     <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center mt-3">
-      <PickStore11 @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd" @update:ischanged="handleinitAll">
-      </PickStore11>
+      <PickStore @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd" @update:ischanged="handleinitAll">
+      </PickStore>
     </div>
     <span class="grid grid-rows-1 grid-cols-2 mt-5">
       <div class="ml-10 flex justify-start font-bold text-xl">사용자 정보</div>
@@ -90,7 +90,7 @@
 
 <script setup>
 import { getChargerInfo, saveEMP } from '@/api/miattend';
-import PickStore11 from '@/components/pickStore11.vue';
+import PickStore from '@/components/pickStore.vue';
 
 import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';

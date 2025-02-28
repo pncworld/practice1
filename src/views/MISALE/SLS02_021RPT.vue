@@ -21,8 +21,8 @@
             <Datepicker2 @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker" @excelDate="excelDate"></Datepicker2>
         </div>
         <div class="w-96 ml-40">
-            <PickStoreRenew2 @update:storeCd="selectedStoreCd" @update:storeGroup="selectedGroupCd"
-                @update:storeType="changeStoreType" @excelStore="excelStore"></PickStoreRenew2>
+            <PickStoreRenew3 @lngStoreCode="selectedStoreCd" @lngStoreGroup="selectedGroupCd"
+                @lngStoreAttrs="changeStoreType" @excelStore="excelStore"></PickStoreRenew3>
         </div>
        
     </div>
@@ -39,18 +39,11 @@
 </template>
 
 <script setup>
-import { getCustInfo, getOrderInfo, getPayInfo, getReceiptDataDetail, getReceiptDatas } from '@/api/misales';
-import Datepicker1 from '@/components/Datepicker1.vue';
+import { getReceiptDataDetail } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
-import DisCountCdList from '@/components/disCountCdList.vue';
-import PayCodeList from '@/components/payCodeList.vue';
-import PickStorePlural from '@/components/pickStorePlural.vue';
-import PickStoreRenew from '@/components/pickStoreRenew.vue';
-import PickStoreRenew2 from '@/components/pickStoreRenew2.vue';
-import PosList from '@/components/posList.vue';
+import PickStoreRenew3 from '@/components/pickStoreRenew.vue';
 import Realgrid from '@/components/realgrid.vue';
-import Swal from 'sweetalert2';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { useStore } from 'vuex';
 const selectedStartDate = ref()
 const selectedEndDate = ref()

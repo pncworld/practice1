@@ -18,8 +18,8 @@
   </div>
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore12 @update:storeCd="handleStoreCd" @storeNm="handlestoreNm" @update:ischanged="handleinitAll"
-      @update:ischanged2="searchinit"></PickStore12>
+    <PickStore @update:storeCd="handleStoreCd" @storeNm="handlestoreNm" @update:ischanged="handleinitAll"
+      @update:ischanged2="searchinit"></PickStore>
   </div>
   <div class="grid grid-rows-1 grid-cols-[3fr,5fr] h-[86%] w-full">
     <div class="flex flex-col w-full h-full">
@@ -347,12 +347,12 @@
 
 <script setup>
 import { getMenuCodeEnroll, getMenuList, saveMenuCode, uploadFile } from '@/api/master';
-import PickStore12 from '@/components/pickStore12.vue';
+import PickStore from '@/components/pickStore.vue';
 import Realgrid from '@/components/realgrid.vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { v4 as uuidv4 } from 'uuid';
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 const searchWord2 = ref('');

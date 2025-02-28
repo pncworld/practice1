@@ -19,8 +19,8 @@
   </div>
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore3 @update:storeCd="handleStoreCd" @storeNm="handlestoreNm" @update:ischanged="handleinitAll"
-      @update:ischanged2="searchinit"></PickStore3>
+    <PickStore @update:storeCd="handleStoreCd" @storeNm="handlestoreNm" @update:ischanged="handleinitAll"
+      @update:ischanged2="searchinit"></PickStore>
   </div>
   <div class="z-50">
   </div>
@@ -55,11 +55,10 @@
 
 <script setup>
 import { getMenuLists, saveMenuManage } from '@/api/master';
-import DupliPopUp from '@/components/dupliPopUp.vue';
-import PickStore3 from '@/components/pickStore3.vue';
+import PickStore from '@/components/pickStore.vue';
 import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { useStore } from 'vuex';
 
 const nowStoreAreaCd = ref();

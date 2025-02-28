@@ -225,9 +225,12 @@ export const getSalesDatabyTimeAndMenu = (groupCd ,storeCds , startDate , endDat
 
   });
 };
-export const getPrevYearComparison = (groupCd ,storeCd , dtmdate1 , dtmdate2 , salesflag ) => {
+export const getPrevYearComparison = (groupCd , attr, team , supervisor , storeCd , dtmdate1 , dtmdate2 , salesflag ) => {
   return api2.post('/MISALES/SLS06_005RPT.asmx/getPrevYearComparison', {
     GROUP_CD    : groupCd,
+    ATTR       : attr,
+    TEAM       : team,
+    SUPERVISOR : supervisor,
     STORE_CD   : storeCd,
     DTM_DATE1  : dtmdate1,
     DTM_DATE2  : dtmdate2,

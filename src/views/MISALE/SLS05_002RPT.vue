@@ -25,7 +25,7 @@
       </div>
       <div class="ml-10">
         <!-- <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore" ></PickStorePlural> -->
-        <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle>
+        <PickStoreSingle2 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></PickStoreSingle2>
       </div>
     </div>
     <div class="w-full h-[85%]">
@@ -45,12 +45,11 @@
   
   <script setup>
   import { getCardSalesDetailReport } from '@/api/misales';
-  import Datepicker2 from '@/components/Datepicker2.vue';
-  import PickStorePlural from '@/components/pickStorePlural.vue';
-  import pickStoreSingle from '@/components/pickStoreSingle.vue';
-  import Realgrid from '@/components/realgrid.vue';
-  import { ref } from 'vue';
-  import { useStore } from 'vuex';
+import Datepicker2 from '@/components/Datepicker2.vue';
+import PickStoreSingle2 from '@/components/pickStoreSingle.vue';
+import Realgrid from '@/components/realgrid.vue';
+import { ref } from 'vue';
+import { useStore } from 'vuex';
   //
   const setFooterColID = ref(['strStore', 'lngRecCnt', 'lngRecAmt', 'lngCustCnt', 'lngCustAmt', 'lngSalAmt', 'lngDiscountAmt', 'lngTotAmt', 'lngVAT', 'lngSupplyAmt', 'dblDistRate', 'lngWorkDay', 'lngActAvg', 'lngStoreCode'])
   const setFooterExpressions = ref(['custom', 'sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'avg', 'custom'])

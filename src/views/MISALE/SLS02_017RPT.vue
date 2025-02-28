@@ -86,7 +86,7 @@
 <script setup>
 import { getSalesDayReport } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
-import PickStoreSingle2 from '@/components/pickStoreSingle2.vue';
+import PickStoreSingle2 from '@/components/pickStoreSingle.vue';
 import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';
 import { ref } from 'vue';

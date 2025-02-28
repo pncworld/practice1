@@ -18,9 +18,9 @@
   </div>
   <br>
   <div class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore11 @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd" @storeNm="handlestoreNm"
+    <PickStore @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd" @storeNm="handlestoreNm"
       @GroupNm="handleGroupNm" @update:ischanged="handleinitAll">
-    </PickStore11>
+    </PickStore>
   </div>
 
   <div v-if="addMenu" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center  z-50">
@@ -279,14 +279,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { getAllOptionManageData, getMostColumnMenuList, saveOptions } from '@/api/master';
+import { ref, watch } from 'vue';
 import { useStore } from 'vuex';
-import { deletetablePosMenuKey, get_category_info, getAllOptionManageData, getCategoryInfo, getMenuKeyList, getMenuList, getMostColumnMenuList, getMultiLingual, getScreenList, getTablePosMenuKey, getTLUList, saveAllMenuKey, saveOptions, saveScreenKeys, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
 
-import Swal from 'sweetalert2';
-import PickStore3 from '@/components/pickStore3.vue';
+import PickStore from '@/components/pickStore.vue';
 import Realgrid from '@/components/realgrid.vue';
-import PickStore11 from '@/components/pickStore11.vue';
+import Swal from 'sweetalert2';
 
 
 // 더미 데이터

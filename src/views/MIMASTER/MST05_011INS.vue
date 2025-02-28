@@ -18,8 +18,8 @@
   </div>
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore5 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo"
-      @storeNm="handlestoreNm" @update:ischanged="handleinitAll"></PickStore5>
+    <PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo"
+      @storeNm="handlestoreNm" @update:ischanged="handleinitAll" :showPosNo="true"></PickStore>
   </div>
   <div class="z-50">
     <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm"
@@ -204,14 +204,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
-import { deletetablePosMenuKey, get_category_info, getCategoryInfo, getMenuKeyList, getMenuList, getMultiLingual, getScreenList, getTablePosMenuKey, getTLUList, saveAllMenuKey, saveScreenKeys, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
-import { VueDraggableNext } from 'vue-draggable-next';
-import Swal from 'sweetalert2';
-import PickStore5 from '@/components/pickStore5.vue';
-import { GridView, LocalDataProvider } from 'realgrid';
+import { getMenuKeyList, getMenuList, getScreenList, getTLUList, saveAllMenuKey, saveScreenKeys } from '@/api/master';
 import DupliPopUp from '@/components/dupliPopUp.vue';
+import PickStore from '@/components/pickStore.vue';
+import { GridView, LocalDataProvider } from 'realgrid';
+import Swal from 'sweetalert2';
+import { onMounted, ref, watch } from 'vue';
+import { VueDraggableNext } from 'vue-draggable-next';
+import { useStore } from 'vuex';
 
 
 // 더미 데이터
@@ -952,7 +952,7 @@ const searchMenuList2 = (e) => {
 const handlePosNo = (newValue) => {
   posNo.value = newValue
   console.log(posNo.value)
-  if (nowStoreAreaCd.value != undefined || posNo.value != undefined) {
+  if (nowStoreAreaCd.value != undefined || (posNo.value != undefined && posNo.value != 0)) {
     searchMenu()
   }
 

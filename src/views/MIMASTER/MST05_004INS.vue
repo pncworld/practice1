@@ -14,9 +14,9 @@
     </div>
 
     <div class="flex  bg-gray-200 rounded-lg h-16 w-full items-center mt-5">
-      <PickStore6 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo"
+      <PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" :showPosNo="true" :showScreenNo="true"
         @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @screenNo="handleScreenNo" @changed2="changed2">
-      </PickStore6>
+      </PickStore>
     </div>
 
   </div>
@@ -181,17 +181,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
-import { deletetablePosMenuKey, get_category_info, getCategoryInfo, getMenuKeyList, getMenuKeyList2, getMenuList, getMultiLingual, getScreenList, getScreenList2, getTablePosMenuKey, getTLUList, saveAllMenuKey, saveMenuKey2, saveScreenKeys, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
-import { VueDraggableNext } from 'vue-draggable-next';
-import Swal from 'sweetalert2';
-import PickStore5 from '@/components/pickStore5.vue';
-import { GridView, LocalDataProvider } from 'realgrid';
+import { getMenuKeyList2, getMenuList, getScreenList2, getTLUList, saveAllMenuKey, saveMenuKey2, saveScreenKeys } from '@/api/master';
 import DupliPopUp from '@/components/dupliPopUp.vue';
-import PickStore6 from '@/components/pickStore6.vue';
 import DupliPopUp2 from '@/components/dupliPopUp2.vue';
+import PickStore from '@/components/pickStore.vue';
 import Realgrid from '@/components/realgrid.vue';
+import { GridView, LocalDataProvider } from 'realgrid';
+import Swal from 'sweetalert2';
+import { onMounted, ref, watch } from 'vue';
+import { VueDraggableNext } from 'vue-draggable-next';
+import { useStore } from 'vuex';
 
 
 // 더미 데이터

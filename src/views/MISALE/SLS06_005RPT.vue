@@ -47,10 +47,9 @@
 
             </div>
             <div class="ml-96 mt-3">
-                <PickStoreSingle @lngStoreCode="lngStoreCode" @lngStoreGroup="lngStoreGroup"
-                    @excelStore="excelStore" :setFooterColID="setFooterColID"
-                    :setFooterExpressions="setFooterExpressions">
-                </PickStoreSingle>
+                <PickStoreSingle2 @lngStoreCode="lngStoreCode" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @lngStoreTeam="lngStoreTeam" @lngSupervisor="lngSupervisor"
+                    @excelStore="excelStore" >
+                </PickStoreSingle2>
 
             </div>
 
@@ -80,11 +79,11 @@
 </template>
 
 <script setup>
-import { getPrevYearComparison, getSalesDatabyTimeAndMenu } from '@/api/misales';
+import { getPrevYearComparison } from '@/api/misales';
 import Chart from '@/components/chart.vue';
-import PickStoreSingle from '@/components/pickStoreSingle.vue';
+import PickStoreSingle2 from '@/components/pickStoreSingle.vue';
 import Realgrid from '@/components/realgrid.vue';
-import { formatTime, insertPageLog } from '@/customFunc/customFunc';
+import { insertPageLog } from '@/customFunc/customFunc';
 import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
@@ -123,7 +122,7 @@ const searchButton = async () => {
 
        
         setchart.value = 2
-        const res = await getPrevYearComparison(selectedGroup.value, selectedStores.value, selectedRefYear.value, selectedCompareYear.value,selectedSalesType.value )
+        const res = await getPrevYearComparison(selectedGroup.value,selectedStoreAttrs.value ,selectedStoreTeam.value ,selectedStoreSuperVisor.value , selectedStores.value, selectedRefYear.value, selectedCompareYear.value,selectedSalesType.value )
         console.log(res)
         rowData.value = res.data.List.filter(item => item.lngCode != '')
 
@@ -143,6 +142,8 @@ const print = ref(false)
 const selectedGroup = ref()
 const selectedStores = ref()
 const selectedStoreAttrs = ref()
+const selectedStoreTeam = ref()
+const selectedStoreSuperVisor = ref()
 const selectedHoliday = ref(0)
 const selectedsubMenu = ref(null)
 const lngStoreGroup = (e) => {
@@ -155,15 +156,17 @@ const lngStoreCode = (e) => {
     selectedStores.value = e
     console.log(e)
 }
-const lngStoreAttr = (e) => {
+const lngStoreAttrs = (e) => {
     initGrid()
     selectedStoreAttrs.value = e
     console.log(e)
 }
 const lngStoreTeam = (e) => {
+    selectedStoreTeam.value = e
     initGrid()
 }
 const lngSupervisor = (e) => {
+    selectedStoreSuperVisor.value = e
     initGrid()
 }
 

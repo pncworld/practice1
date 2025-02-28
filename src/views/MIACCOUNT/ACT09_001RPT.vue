@@ -4,7 +4,7 @@
         <div class="flex justify-start  w-full pl-12 pt-4">
           <div class="flex justify-start">
             <h1 class="font-bold text-sm md:text-2xl w-full">
-              과거 매출 변환 현황.
+              직원 후불 집계현황.
             </h1>
           </div>
   
@@ -43,8 +43,8 @@
           </div>
         </div>
         <div class="ml-10 -mt-10">
-          <PickStoreSingle2 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore"  @changeInit="changeInit">
-          </PickStoreSingle2>
+          <PickStoreRenew3 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore"  @changeInit="changeInit" >
+          </PickStoreRenew3>
         </div>
         <div></div>
   
@@ -64,7 +64,7 @@
   <script setup>
   import { getCauseList, getPastSalesChanges } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
-import PickStoreSingle2 from '@/components/pickStoreSingle.vue';
+import PickStoreRenew3 from '@/components/pickStoreRenew.vue';
 import Realgrid from '@/components/realgrid.vue';
 import { insertPageLog } from '@/customFunc/customFunc';
 import { onMounted, ref } from 'vue';

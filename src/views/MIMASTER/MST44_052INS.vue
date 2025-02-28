@@ -18,8 +18,8 @@
   </div>
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore7kio @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo"
-      @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @update:ischanged2="searchinit"></PickStore7kio>
+    <PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @kioskNo="handlePosNo" :showKioskNo="true"
+      @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @update:ischanged2="searchinit"></PickStore>
   </div>
   <div class="z-50">
     <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm"
@@ -149,7 +149,7 @@
             @click="clickedScreenKeyIndex = index; clickedScreenKeys()">
             <p v-if="item.strScreenName != ''" @click="showMenuKey(item.intScreenNo);"
               class=" flex items-center justify-center w-full h-full"><button class="">{{ item.strScreenName
-                }}</button><button @click.stop="editScreenKey(item.intScreenNo, item.strScreenName)"><font-awesome-icon
+              }}</button><button @click.stop="editScreenKey(item.intScreenNo, item.strScreenName)"><font-awesome-icon
                   :icon="['far', 'pen-to-square']" /></button></p>
             <p v-else-if="item.new == true" @click="addScreenKey(index);"
               class=" flex items-center justify-center w-full h-full"><button
@@ -205,16 +205,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
-import { deletetablePosMenuKey, get_category_info, getCategoryInfo, getMenuKeyList, getMenuKeyList3, getMenuList, getMultiLingual, getScreenList, getTablePosMenuKey, getTLUList, saveAllMenuKey, saveScreenKeys, savetablePosMenuKey, tablePosMenuKey, tablePosMenuKey_v2 } from '@/api/master';
-import { VueDraggableNext } from 'vue-draggable-next';
+import { getMenuKeyList3, getMenuList, getScreenList, getTLUList, saveAllMenuKey, saveScreenKeys } from '@/api/master';
 import Swal from 'sweetalert2';
+import { onMounted, ref, watch } from 'vue';
+import { VueDraggableNext } from 'vue-draggable-next';
+import { useStore } from 'vuex';
 
-import { GridView, LocalDataProvider } from 'realgrid';
 import DupliPopUp from '@/components/dupliPopUp.vue';
+import { GridView, LocalDataProvider } from 'realgrid';
 
-import PickStore7kio from '@/components/pickStore7kio.vue';
+import PickStore from '@/components/pickStore.vue';
 
 
 // 더미 데이터
@@ -777,7 +777,7 @@ const handlePosNo = (newValue) => {
   posNo.value = newValue
   console.log(posNo.value)
   console.log(nowStoreAreaCd.value)
-  if (nowStoreAreaCd.value != undefined || posNo.value != undefined) {
+  if (nowStoreAreaCd.value != undefined &&  (posNo.value != undefined && posNo.value != 0)) {
     searchMenu()
   }
 

@@ -10,9 +10,9 @@
   </div>
   <br>
   <div class="bg-gray-200 h-24 flex flex-col items-start rounded-md pt-2">
-    <PickStore4 class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center"
-      @update:storeAreaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @update:ischanged="ischanged">
-    </PickStore4>
+    <PickStore class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center"
+      @update:storeAreaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @update:ischanged="ischanged" :showAreaCd="true">
+    </PickStore>
     <PickCategory :storeCd="currstoreCd" :storeAreaCd="currAreaCd" :ischange="ischange" @emitsub="emitsubcate"
       @emitmain="emitmaincate"></PickCategory>
   </div>
@@ -77,7 +77,7 @@
 <script setup>
 import { deletetablePosMenuKey, savetablePosMenuKey, tablePosMenu, tablePosMenuKey } from '@/api/master';
 import PickCategory from '@/components/pickCategory.vue';
-import PickStore4 from '@/components/pickStore4.vue';
+import PickStore from '@/components/pickStore.vue';
 import Swal from 'sweetalert2';
 import { computed, ref } from 'vue';
 
