@@ -71,9 +71,10 @@
 </template>
 
 <script setup>
+import { getSalesCloseMaxDate } from '@/api/misales';
 import { onMounted, ref, watch } from 'vue';
 
-const emit = defineEmits(['startDate', 'endDate','excelDate']);
+const emit = defineEmits(['startDate', 'endDate', 'acceptDate', 'excelDate']);
 const props = defineProps({
   closePopUp: {
     type: Boolean,
@@ -82,6 +83,18 @@ const props = defineProps({
   initToday: {
     type: String,
     default: '', // 기본값: 현재 날짜
+  },
+  selectedRadioBox : {
+    type : String,
+    default : '01'
+  },
+  selectedGroup : {
+    type: String,
+    default: ''
+  },
+  orgAcceptDate : {
+    type: String,
+    default: ''
   }
 });
 const formatDate = (date) => date.toISOString().split('T')[0]
@@ -170,15 +183,37 @@ function formatDateToYYYYMMDD(date) {
   return year + '-' + month + '-' + day;
 }
 
-watch(() => [selectedStartDate.value, selectedEndDate.value], () => {
+watch(() => [selectedStartDate.value, selectedEndDate.value], async () => {
   emit('startDate', selectedStartDate.value);
   emit('endDate', selectedEndDate.value);
   emit('excelDate', '매출일자 : '+selectedStartDate.value+'~'+ selectedEndDate.value)
+
+  console.log(selectedEndDate.value)
+  if(props.selectedRadioBox == '02'){
+    if(selectedEndDate.value > props.orgAcceptDate){
+      selectedEndDate.value = props.orgAcceptDate;
+      emit('endDate', props.orgAcceptDate);
+    }
+  }
 },
   { deep: true })
 
 watch(() => props.closePopUp, () => {
   showRadio.value = false
+})
+
+watch(() => props.selectedRadioBox, async () => {
+  if(props.selectedRadioBox == '02'){
+    const res = await getSalesCloseMaxDate(props.selectedGroup)
+    const acceptDate = res.data.closeMaxDate[0].dtmCloseDate.split(" ")[0]
+    console.log(acceptDate)
+
+    if(selectedEndDate.value > acceptDate){
+      selectedEndDate.value = acceptDate;
+      emit('endDate', acceptDate);
+    }
+    emit('acceptDate', acceptDate);
+  }
 })
 
 </script>

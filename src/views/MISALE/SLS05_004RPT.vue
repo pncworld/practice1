@@ -3,7 +3,7 @@
     <div class="flex justify-between items-center w-full overflow-y-auto">
       <div class="flex justify-start  w-full pl-12 pt-4">
         <div class="flex justify-start">
-          <h1 class="font-bold text-sm md:text-2xl w-full">카드 매출 세부 현황.</h1>
+          <h1 class="font-bold text-sm md:text-2xl w-full">카드 매출 집계 현황.</h1>
         </div>
       </div>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
@@ -13,7 +13,12 @@
     </div>
     <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-32 items-center z-10">
       <div class="grid grid-cols-1 grid-rows-3">
-        <Datepicker2 @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker" @excelDate="excelDate"></Datepicker2>
+        <label for="daily" class="font-thin inline-flex">
+          <input type="checkbox" id="daily" @change="seeDaily" class="ml-28">
+          <Datepicker2 @startDate="startDate" @endDate="endDate" @acceptDate="acceptDate" :closePopUp="closePopUp" ref="datepicker" 
+          :selectedRadioBox="selectedRadioBox" :selectedGroup="selectedGroup" :orgAcceptDate="orgAcceptDate"
+          @excelDate="excelDate" class="ml-[-126px]"></Datepicker2>
+        </label>
         <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 "> 매입사 : 
           <div class="flex ml-7 space-x-3 mt-1">
             <v-select v-model="selectCardCorp" :options="cardCorp" placeholder="전체" label="strBuyName" class="w-48 !h-8 bg-white " clearable="true"/>
@@ -21,61 +26,125 @@
         </div>
         <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 ">조회조건 :
           <div>
-            <label for="accept" class="font-thin">
-              <input type="radio" id="accept" value="0" v-model="selectedRadioBox" class="ml-5"> 승인
+            <label for="saleDay" class="font-thin">
+              <input type="radio" id="saleDay" value="01" v-model="selectedRadioBox" class="ml-5"> 영업일
             </label>
           </div>
           <div>
-            <label for="cancel" class="font-thin">
-              <input type="radio" id="cancel" value="1" v-model="selectedRadioBox" class="ml-5"> 취소
+            <label for="acceptDay" class="font-thin">
+              <input type="radio" id="acceptDay" value="02" v-model="selectedRadioBox" class="ml-5"> 승인일
             </label>
           </div>
         </div>
       </div>
-      <div class="h-[75%] ml-12">
-        <!-- <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore" ></PickStorePlural> -->
-        <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle>
+      <div class="h-[75%] ml-5">
+        <label for="daily" class="font-thin inline-flex">
+          <input type="checkbox" id="daily" @change="seeStore">
+          <!-- <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore" ></PickStorePlural> -->
+          <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle>
+        </label>
       </div>
     </div>
     <div class="w-full h-[82%]">
-      <!-- <Realgrid :progname="'SLS02_014RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload" 
-         :setFooter="true" :setGroupFooter="setGroupFooter" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
-        :setGroupColumnId="'strStore'" :setGroupSumCustomText="['소계']" :setGroupSumCustomColumnId="setGroupSumCustomColumnId"
-        :setGroupSumCustomLevel="3" :setGroupSummaryCenterIds="setGroupSummaryCenterIds" :setGroupFooterExpressions="setGroupFooterExpressions" :setGroupFooterColID="setGroupFooterColID"
-        :documentTitle="'SLS02_014RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
-      </Realgrid> -->
-      <Realgrid :progname="'SLS05_002RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload" 
-         :setFooter="true" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
-         :exporttoExcel="exportExcel" :documentTitle="'SLS05_002RPT'" :documentSubTitle="documentSubTitle" 
+      <Realgrid :progname="'SLS05_004RPT_VUE'" :progid="progId" :rowData="rowData" :reload="reload" 
+        :setFooter="true" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
+        :setGroupFooter="setGroupFooter" :setGroupColumnId="'strStoreName,dtmDate'" :setGroupSumCustomText="['소계']" 
+        :setGroupSumCustomColumnId="setGroupSumCustomColumnId" :setGroupSumCustomLevel="3" :setGroupSummaryCenterIds="setGroupSummaryCenterIds" 
+        :setGroupFooterExpressions="setGroupFooterExpressions" :setGroupFooterColID="setGroupFooterColID"
+        :documentTitle="'SLS05_004RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
       </Realgrid>
+      <!-- <Realgrid :progname="'SLS05_004RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" 
+         :setFooter="true" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
+         :exporttoExcel="exportExcel" :documentTitle="'SLS05_004RPT'" :documentSubTitle="documentSubTitle" 
+      </Realgrid> -->
     </div>
     </div>
   </template>
   
   <script setup>
-  import { getCardSalesDetailReport, getCardCorp } from '@/api/misales';
+  import { getCardSalesSumReport, getCardCorp } from '@/api/misales';
   import Datepicker2 from '@/components/Datepicker2.vue';
   import PickStorePlural from '@/components/pickStorePlural.vue';
   import pickStoreSingle from '@/components/pickStoreSingle.vue';
   import Realgrid from '@/components/realgrid.vue';
   import { ref, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';
-  
-  const setFooterColID = ref(['lngAmount'])
-  const setFooterExpressions = ref(['sum'])
-  const progid = ref(1)
+  import Swal from 'sweetalert2';
+
+  const setFooterColID = ref(['lngTotalCnt', 'lngTotalAmt', 'lngApprovalCnt', 'lngApprovalAmt', 'lngCancleCnt', 'lngCancleAmt', 'lngSumCnt', 'lngSumAmt', 'lngCommission'])
+  const setFooterExpressions = ref(['sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum'])
+  const setGroupFooter = ref(true)
+  const setGroupFooterColID = ref(['lngTotalCnt', 'lngTotalAmt', 'lngApprovalCnt', 'lngApprovalAmt', 'lngCancleCnt', 'lngCancleAmt', 'lngSumCnt', 'lngSumAmt', 'lngCommission'])
+  const setGroupFooterExpressions = ref(['sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum'])
+  const setGroupSummaryCenterIds = ref('dtmDate, strBuyName')
+  const setGroupSumCustomColumnId = ref(['strBuyName']);
   const reload = ref(false)
   const rowData = ref([])
   const afterSearch = ref(false)
-  const selectedstartDate = ref()
-  const selectedendDate = ref()
+  const selectedstartDate = ref();
+  const selectedendDate = ref();
+  const orgAcceptDate = ref();
+
   const startDate = (e) => {
-    console.log(e)
-    selectedstartDate.value = e
-  }
+    console.log(e);
+    selectedstartDate.value = e;
+  };
+
   const endDate = (e) => {
-    selectedendDate.value = e
-  }
+    console.log(e);
+    selectedendDate.value = e;
+    if (selectedRadioBox.value == '02'){
+      if (selectedendDate.value > orgAcceptDate.value) {
+        Swal.fire({
+          title: '경고',
+          text: '승인일 기준 조회는 ' + orgAcceptDate.value + '까지 가능합니다.',
+          icon: 'warning',
+          confirmButtonText: '확인'
+        })
+      }
+    }
+  };
+
+  const acceptDate = (e) => {
+    console.log(e);
+    orgAcceptDate.value = e;
+  };
+
+  const tempSeeDaily = ref(false);
+  const tempSeeStore = ref(false);
+  const reportCheckData = ref('0');
+  const progId = ref('1');
+  
+  const seeDaily = (e) => {
+    tempSeeDaily.value = e.target.checked;
+    updateProgid();
+  };
+  
+  const seeStore = (e) => {
+    tempSeeStore.value = e.target.checked;
+    updateProgid();
+  };
+  
+  const updateProgid = () => {
+    if (tempSeeDaily.value && tempSeeStore.value) {
+      reportCheckData.value = '012';
+      setGroupSumCustomColumnId.value = ['strBuyName']
+      progId.value = '4'
+    } else if (tempSeeDaily.value) {
+      reportCheckData.value = '01'; 
+      setGroupSumCustomColumnId.value = ['strBuyName']
+      progId.value = '2'
+    } else if (tempSeeStore.value) {
+      reportCheckData.value = '02';
+      setGroupSumCustomColumnId.value = ['strBuyName']
+      progId.value = '3'
+    } else {
+      reportCheckData.value = '0';
+      setGroupSumCustomColumnId.value = ['strBuyName']
+      progId.value = '1'
+    }
+  };
+
   const store = useStore()
   const loginedstrLang = store.state.userData.lngLanguage
 
@@ -89,8 +158,8 @@
     closePopUp.value = !closePopUp.value
   }
   
-  // 조회조건 라디오박스(승인, 취소)
-  const selectedRadioBox = ref('0') // 기본 선택값
+  // 조회조건 라디오박스 이벤트 (영업일, 승인일)
+  const selectedRadioBox = ref('01') // 기본 선택값
 
   /* 
    *조회 처리 함수
@@ -123,11 +192,15 @@
 
       console.log(selectedBuyCodeValue)
 
-      const res = await getCardSalesDetailReport(
-        selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, 0, selectedRadioBox.value, selectedBuyCodeValue
+      console.log(selectedRadioBox.value)
+
+      console.log(reportCheckData.value)
+
+      const res = await getCardSalesSumReport(
+        selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, reportCheckData.value, selectedRadioBox.value, selectedBuyCodeValue
       )
       console.log(res)
-      rowData.value = res.data.cardSalesDetail
+      rowData.value = res.data.cardSalesSum
   
       afterSearch.value = true
   

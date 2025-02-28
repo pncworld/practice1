@@ -752,6 +752,7 @@ const funcshowGrid = async () => {
 
 
   // 기타 옵션
+  gridView.rowIndicator.width = 50;
   gridView.setFooters({ visible: props.setFooter == false ? false : true });
   gridView.setRowIndicator({ visible: true });
   gridView.setCheckBar({ visible: props.showCheckBar });

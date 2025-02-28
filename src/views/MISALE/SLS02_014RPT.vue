@@ -203,7 +203,7 @@ import PickStorePlural2 from '@/components/pickStorePlural2.vue';
     selectedStoreAttrs.value = e
     console.log(e)
   }
-  
+
   /*
   그리드 초기화
   */
