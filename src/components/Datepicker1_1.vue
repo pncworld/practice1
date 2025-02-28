@@ -1,5 +1,5 @@
 <template>
-    <div><span class="ml-10 font-semibold text-base">매출일자 : </span><input type="date" class="border rounded-lg h-10 w-36 text-base pl-5" v-model="selectedDate" @change="emitDate">
+    <div><span class="ml-10 font-semibold text-base">적용일 : </span><input type="date" class="border rounded-lg h-10 w-36 text-base pl-5" v-model="selectedDate" @change="emitDate">
     </div>
 </template>
 
@@ -8,7 +8,7 @@ import { onMounted, ref, watch } from 'vue';
 
 const formatDate = (date) => date.toISOString().split('T')[0]
 const selectedDate = ref(formatDate(new Date()))
-const emit = defineEmits(['dateValue','year','month','day','excelDate']);
+const emit = defineEmits(['dateValue','year','month','day']);
 
 onMounted(() => {
     emit('dateValue',selectedDate.value)

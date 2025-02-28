@@ -12,6 +12,7 @@ export default createStore({
       selectedCategoryId : null ,
       currentTabs : [] ,
       activeTab : '',
+      activeTab2 : '',
       mainCategory : [],
       subCategory : [],
       minorCategory : [],
@@ -51,6 +52,7 @@ export default createStore({
 
       state.currentTabs.push({strUrl: newstrUrl , lngProgramID: newlngProgramID , strTitle : newstrTitle}); // 새로운 탭을 추가
       state.activeTab = newlngProgramID ;
+      //state.activeTab2 = tab.lngProgramID ;
     },
     removeAllTabs(state) {
       state.currentTabs = []; // 새로운 탭을 추가
@@ -59,6 +61,7 @@ export default createStore({
     setActiveTab(state, tab) {
      
         state.activeTab = tab.lngProgramID; // 현재 활성화된 탭으로 변경
+        //state.activeTab2 = tab.lngProgramID; // 현재 활성화된 탭으로 변경
 
     },
     removeTab(state, data) {
@@ -113,6 +116,10 @@ export default createStore({
     },
     setMobileState(state, data) {
       state.isMobile = data;
+    }
+    ,
+    saveactiveTab(state, data) {
+      state.activeTab2 = data;
     }
     
 
@@ -175,6 +182,10 @@ export default createStore({
     ,
     setMobileState({commit}, data) {
       commit('setMobileState', data);
+    }
+    ,
+    saveActiveTab({commit}, data) {
+      commit('saveactiveTab', data);
     }
   },
   getters: {

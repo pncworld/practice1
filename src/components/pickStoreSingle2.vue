@@ -13,7 +13,7 @@
             </select></div>
         <div class="w-44">
             <div class="w-44 !h-7">
-                <v-select v-model="selectedStoreList" :options="rowData" label="strName" placeholder="전체"
+                <v-select v-model="selectedStoreList" :options="rowData" label="strName" placeholder="선택"
                     class="w-80 custom-select2  " :reduce="store => store != null ? store.lngStoreCode : null"
                     clearable="true" @click="clickPosNo" :disabled="settingDisable == 2" />
 
@@ -45,7 +45,7 @@
                 class="bg-white border w-44 ml-4 rounded-lg h-7 disabled:bg-gray-100 text-center overflow-hidden"
                 @click="showStoreList" :disabled="settingDisable == 1" v-model="selectedStoreList"> -->
 
-                <v-select v-model="selectedStoreList" :options="rowData" label="strName" placeholder="전체"
+                <v-select v-model="selectedStoreList" :options="rowData" label="strName" placeholder="선택"
                     class=" custom-select4 mr-10" :reduce="store => store != null ? store.lngStoreCode : null"
                     clearable="true" @click="clickPosNo" :disabled="settingDisable == 1" />
 
@@ -58,7 +58,7 @@ import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
-const teamscList = ref('전체')
+const teamscList = ref('선택')
 const selectedStoreList = ref(null)
 const selectedStoreList2 = ref(null)
 const selectedStore = ref(0)
@@ -100,7 +100,7 @@ onMounted(() => {
     rowData2.value = store.state.storeCd
     emit('lngStoreGroup', store.state.storeGroup[0].lngStoreGroup)
     emit('lngStoreCode', 0)
-    emit('excelStore', '매장명 : 전체')
+    emit('excelStore', '매장명 : 선택')
     labelsData.value.push(store.state.storeGroup.map(item => item.strName))
     valuesData.value.push(store.state.storeGroup.map(item => item.lngStoreGroup))
 
@@ -169,7 +169,7 @@ watch(selectedSuperVisor, (newValue) => {
 watch(selectedStoreList, () => {
     if (selectedStoreList.value == null) {
         selectedStore.value = 0
-        emit('excelStore', '매장명 : 전체')
+        emit('excelStore', '매장명 : 선택')
     } else {
         selectedStore.value = selectedStoreList.value
         const name = store.state.storeCd.filter(item => item.lngStoreCode == selectedStoreList.value)[0].strName
@@ -177,6 +177,7 @@ watch(selectedStoreList, () => {
     }
     emit('lngStoreCode', selectedStore.value)
     emit('changeInit', true)
+ 
 
 })
 

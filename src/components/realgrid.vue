@@ -436,8 +436,35 @@ const props = defineProps({
   },
   mergeColumnGroupSubList2: {
     type: Array,
+    default: [[]],
+  }
+  ,
+  getJson: {
+    type: Boolean,
+    default: false,
+  }
+  ,
+  suffixColumnPercent: {
+    type: Array,
     default: [],
   }
+  ,
+  mergeMask: {
+    type: Array,
+    default: [[]],
+  }
+ 
+  ,
+  setRowGroupSpan2: {
+    type: String,
+    default: "",
+  }
+  ,
+  setMergeMode: {
+    type: Boolean,
+    default: true,
+  }
+ 
 
 });
 
@@ -450,7 +477,7 @@ const addrow4activated = ref(false);
 const deleted2activated = ref(false);
 const updatedrowData = ref([])
 const selectedindex = ref(-1)
-const emit = defineEmits(["selcetedrowData", "updatedRowData", "clickedRowData", "dblclickedRowData", "selectedIndex", "checkedRowData"]);
+const emit = defineEmits(["selcetedrowData", "updatedRowData", "clickedRowData", "dblclickedRowData", "selectedIndex", "checkedRowData","getJsonData"]);
 const funcshowGrid = async () => {
 
   if (gridView !== undefined && gridView !== null) {
@@ -497,8 +524,8 @@ const funcshowGrid = async () => {
 
   // 컬럼 정의
   const columns = tabInitSetArray.value.map((item, index) => ({
-    name: item.strHdText,
-    fieldName: item.strColID,
+    name: item.strColID,
+    fieldName: item.strColID, 
     header: {
       text: item.strHdText,
       styleName: `header-style-${index}`,
@@ -508,15 +535,17 @@ const funcshowGrid = async () => {
       text: props.setGroupSumCustomText[props.setGroupSumCustomColumnId.indexOf(item.strColID)],
       styleName: item.strAlign == 'center' ? 'setTextAlignCenter' : item.strAlign == 'left' ? 'setTextAlignLeft' : 'setTextAlignRight',
       expression: props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(item.strColID)] == 'custom' ? '' : props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(item.strColID)],
-      numberFormat: item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0"
+      numberFormat: item.strSubSumexpr !='' ?  item.strSubSumexpr : item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0",
+      suffix : props.suffixColumnPercent.includes(item.strColID) ? '%' : ''
 
     },
     footer: {
       // text : item.strColID =='dtmDate' ? '소계' : '' ,
       expression: props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)],
-      numberFormat: item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0"
+      numberFormat: item.strTotalexpr !='' ?  item.strTotalexpr : item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0",
+      suffix : props.suffixColumnPercent.includes(item.strColID) ? '%' : ''
     },
-    datetimeFormat: 'yyyy-MM-dd',
+    datetimeFormat: item.strMask == '' ? 'yyyy-MM-dd' : item.strMask, // sql 에서 mstgridinfo 에서 date  일때 기본값이 있고 정의할 수 있음
     width: item.intHdWidth,
     numberFormat: item.strColType == 'float' ? '#,##0' : item.strColType == 'double' && item.strDisplay == 'double' ? "#,##0.00" : '#,##0.0',
     styleName: item.strAlign == 'left' ? 'setTextAlignLeft' : item.strAlign == 'center' ? 'setTextAlignCenter' : 'setTextAlignRight',
@@ -592,8 +621,35 @@ const funcshowGrid = async () => {
 
 
   }
+  if (props.setRowGroupSpan2 != '') {
+    console.log(props.setRowGroupSpan2)
+    const mergeColumn = props.setRowGroupSpan2.split(',')
+    const maskColumns = props.mergeMask.split(',')
+    for (var i = 0; i < mergeColumn.length; i++) {
+      const rowGroupSpanColumn = columns.find(item => item.fieldName == mergeColumn[i])
+      let maskdata = 'value' ;
+      if(props.mergeMask != ''){
+        const mask = maskColumns.map(item => item)
+     
+
+      for(let i=0 ; i < mask.length ; i++ ){
+        maskdata = "values['"+mask[i]+"']+"
+      }
+      maskdata = maskdata+"value"
+      } else {
+        maskdata = "value"
+      }
+       console.log(maskdata)
+       if(rowGroupSpanColumn){
+        rowGroupSpanColumn.mergeRule = { criteria: maskdata}
+       }
+      
+    }
 
 
+  }
+
+   
 
   gridView.setColumns(columns);
 
@@ -713,24 +769,39 @@ const funcshowGrid = async () => {
   }
 
   if (props.mergeColumns2 == true) {
-    const subList = props.mergeColumnGroupSubList2.split(',');
-    const layout = [];
-    const groupItems = {
-        name: props.mergeColumnGroupName2.join(','), // 배열을 문자열로 결합하여 그룹 이름 생성
-        direction: "horizontal",
-        items: [],
-        header: {
-            text: props.mergeColumnGroupName2.join(','), // 배열의 각 항목을 쉼표로 연결하여 헤더 텍스트 생성
-            styleName: `header-style-0`
-        },
-    };
-
+    const subList = props.mergeColumnGroupSubList2; // [['column1','column2'],['column3','column4']]
+    const groupList = props.mergeColumnGroupName2; // ['그룹컬럼1','그룹컬럼2']
+    let layout = []
     tabInitSetArray.value.forEach(item => {
-        if (subList.includes(item.strColID)) {
-            groupItems.items.push(item.strHdText);
+  
+        if (subList.flat().includes(item.strColID)) {
+    
+          const index = subList.findIndex(innerArray => innerArray.includes(item.strColID));
+        
+            if(layout.find(item => item.name == groupList[index])){
+        
+              const findit = layout.find(item => item.name == groupList[index])
+           
+              if(findit){
+              
+                findit.items.push(item.strColID)
+              }
+            } else {
+              layout.push({
+                name: groupList[index],
+                direction: "horizontal",
+                items: [item.strColID],
+                header: {
+                  text: groupList[index],
+                  styleName: `header-style-0`
+                },
+              });
+             // layout.push(tempgroupList)
+            }
         } else {
             layout.push({
                 column: item.strColID,
+                name: item.strHdText,
                 header: { visible: true, text: item.strHdText },
                 visible: item.intHdWidth !== 0,
                 width: item.intHdWidth
@@ -738,10 +809,8 @@ const funcshowGrid = async () => {
         }
     });
 
-    if (groupItems.items.length > 0) {
-        layout.unshift(groupItems);
-    }
 
+ 
     gridView.setColumnLayout(layout);
 }
 
@@ -774,7 +843,11 @@ const funcshowGrid = async () => {
   gridView.displayOptions.selectionStyle = props.selectionStyle
   gridView.displayOptions.showTooltip = true;
   gridView.groupPanel.visible = false;
-
+  if(props.suffixColumnPercent != []){
+   for(let i=0 ; i < props.suffixColumnPercent.length ; i++){
+    gridView.columnByName(props.suffixColumnPercent[i]).suffix = "%"
+   }
+  }
   if (props.hideColumnNow == true) {
     gridView.columnByField(props.hideColumn).visible = false;
   }
@@ -793,7 +866,7 @@ const funcshowGrid = async () => {
       collapsedAdornments: 'none',
       headerStatement: "",
       expanderVisibility: false ,
-      mergeMode : true ,
+      mergeMode : props.setMergeMode ,
       createFooterCallback: function(grid,group) {
      
        return true;
@@ -1308,6 +1381,11 @@ watch(() => props.initCheckAct, (newVal) => {
 
 });
 
+watch(() => props.getJson , () => {
+  const jsonData =  dataProvider.getJsonRows();
+  emit('getJsonData',jsonData)
+})
+
 // watch(() => props.hideColumnsId , ()=>{
 //   for(var i=0 ; i < props.hideColumnsId.length ; i++){
 //     gridView.columnByField(props.hideColumnsId[i]).visible = false;
@@ -1330,8 +1408,23 @@ watch(() => props.hideNow, (newValue) => {
   dataProvider.hideRows(props.hideRow);
 })
 watch(() => props.hideColumnNow, (newValue) => {
-  gridView.columnByField(props.hideColumn).visible = !props.hideColumnNow;
+  if(props.hideColumn != ''){
+    gridView.columnByField(props.hideColumn).visible = !props.hideColumnNow;
+  }
+  
 })
+
+// watch(() => props.setRowGroupSpan  , () => {
+//   if(props.setRowGroupSpan != ''){
+//    console.log(props.setRowGroupSpan)
+//   const mergeColumn = props.setRowGroupSpan.split(',')
+//     for (var i = 0; i < mergeColumn.length; i++) {
+//       gridView.columnByName(mergeColumn[i]).mergeRule = {
+//         criteria: "value"
+//       }
+//     }
+//   }
+// })
 onMounted(async () => {
   try {
     if (props.renderProgname != '') {

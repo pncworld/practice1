@@ -90,11 +90,11 @@ onMounted(() => {
   console.log(isMobile)
 });
 
-const selectCategory = (strUrl , lngProgramID , strTitle) => {
-  console.log(lngProgramID)
+const selectCategory = (strUrl , lngProgramID2 , strTitle) => {
+  console.log(lngProgramID2)
   const currentTabs = store.state.currentTabs;
-  console.log(currentTabs)
-  const existingTab = currentTabs.find( tab => tab.lngProgramID.startsWith(lngProgramID));
+  console.log(categories.value)
+  const existingTab = currentTabs.find( tab => tab.lngProgramID.startsWith(lngProgramID2));
   console.log(existingTab)
   if ( existingTab){
     Swal.fire({
@@ -107,30 +107,35 @@ const selectCategory = (strUrl , lngProgramID , strTitle) => {
     }).then((result) => {
       if(result.isConfirmed){
       
-        const matchingTabs = currentTabs.filter(tab => tab.lngProgramID.startsWith(lngProgramID));
+        const matchingTabs = currentTabs.filter(tab => tab.lngProgramID.startsWith(lngProgramID2));
         const tab = { lngProgramID : matchingTabs[0].lngProgramID};
         store.dispatch("changeActiveTab",tab);
         router.push({path : '/'+matchingTabs[0].strUrl.split("::")[0]+'/'+matchingTabs[0].strUrl.split("::")[1] , query : { index : tab.lngProgramID} } );
        
       } else {
         const uuid = v4();
-        const lngProgramIdv4 = lngProgramID +uuid ;
+        const lngProgramIdv4 = lngProgramID2 +uuid ;
         const newTab = { strUrl , lngProgramID: lngProgramIdv4, strTitle}
         store.dispatch("addNewTab" , newTab); 
+   
         router.push({ path :'/'+strUrl.split("::")[0]+'/'+strUrl.split("::")[1] , query : { index : lngProgramIdv4}});
       }
      
     });
   } else {
     const uuid = v4();
-    const lngProgramIdv4 = lngProgramID + uuid ;
+    const lngProgramIdv4 = lngProgramID2 + uuid ;
     console.log(lngProgramIdv4)
     const newTab = { strUrl , lngProgramID:lngProgramIdv4, strTitle}
     store.dispatch("addNewTab" , newTab); 
     router.push({ path :'/'+strUrl.split("::")[0]+'/'+strUrl.split("::")[1] , query : { index : lngProgramIdv4}});
   } 
-  
-  
+
+
+  const matchingtab = categories.value.flatMap(item => item.subcategories).filter(sub => sub.lngProgramID == lngProgramID2); // 조건 넣어서 필터
+
+  console.log(matchingtab)
+  store.dispatch('saveActiveTab',matchingtab[0])
 }
 var cMenu = ref("매출관리");
 const selectedCategoryId = computed(() => store.state.selectedCategoryId) ;

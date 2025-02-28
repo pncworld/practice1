@@ -6,11 +6,11 @@ export const commonUrl2 = 'http://211.238.145.30:8085'; //http://211.238.145.30:
 // Axios 인스턴스 생성 (기본 설정)
 const api = axios.create({
   baseURL: commonUrl, // API 기본 URL
-  timeout: 10000, // 요청 타임아웃 설정
+  timeout: 30000, // 요청 타임아웃 설정
 });
 const api2 = axios.create({
   baseURL: commonUrl2, // API 기본 URL
-  timeout: 10000, // 요청 타임아웃 설정
+  timeout: 30000, // 요청 타임아웃 설정
 });
 
 // API 요청 메서드들
@@ -123,6 +123,21 @@ export const getStoreAndPosList3 = async(groupCd , storeCd ,areaCd,posNo) => {
       STORE_CD : storeCd ,
       AREA_CD : areaCd,
       POSNO : posNo
+     
+  })
+  return res ;
+}
+export const savePageLog = async(time,group,store,userid,userip,progname,progid,bln) => {
+  const res = await api2.post("/SYSTEM/sysCom.asmx/savePageLog" , {
+   
+      TIME: time,
+      GROUP : group ,
+      STORE : store,
+      USERID : userid ,
+      USERIP : userip ,
+      PROGNAME : progname ,
+      PROGID : progid ,
+      BLN : bln ,
      
   })
   return res ;

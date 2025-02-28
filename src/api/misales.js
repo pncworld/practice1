@@ -7,11 +7,11 @@ const url2 = commonUrl2;
 // Axios 인스턴스 생성 (기본 설정)
 const api = axios.create({
   baseURL: url, // API 기본 URL
-  timeout: 10000, // 요청 타임아웃 설정
+  timeout: 30000, // 요청 타임아웃 설정
 });
 const api2 = axios.create({
   baseURL: url2, // API 기본 URL
-  timeout: 10000, // 요청 타임아웃 설정
+  timeout: 30000, // 요청 타임아웃 설정
 });
 
 // API 요청 메서드들
@@ -239,6 +239,166 @@ export const getWeekDayList = (M_CD, LANGUAGE_CD) => {
   return api2.post('/MISALES/SLS06_001RPT.asmx/getWeekDayList', {
     M_CD        : M_CD,
     LANGUAGE_CD : LANGUAGE_CD
+  });
+};
+export const getSalesReportByMenuAndPayType = (groupCd ,storeCds , startDate , endDate , reporttype , menu, submenu , subsubmenu) => {
+  return api2.post('/MISALES/SLS04_003RPT.asmx/getSalesReportByMenuAndPayType', {
+    GROUP_CD    : groupCd,
+    STORE_CDS   : storeCds,
+    START_DATE  : startDate,
+    END_DATE    : endDate,
+    REPORT_TYPE : reporttype,
+    MENU        : menu ,
+    SUB_MENU    : submenu ,
+    SUB_SUB_MENU: subsubmenu ,
+  });
+};
+export const getSalesDatabyTimeAndMenu = (groupCd ,storeCds , startDate , endDate , reporttype , menu, submenu , subsubmenu ,searchText ,checkdate , loginlang , selectedguest) => {
+  return api2.post('/MISALES/SLS04_004RPT.asmx/getSalesDatabyTimeAndMenu', {
+    GROUP_CD    : groupCd,
+    STORE_CDS   : storeCds,
+    START_DATE  : startDate,
+    END_DATE    : endDate,
+    REPORT_TYPE : reporttype,
+    MENU        : menu ,
+    SUB_MENU    : submenu ,
+    SUB_SUB_MENU: subsubmenu ,
+    SEARCH_TEXT : searchText , 
+    CHECKED_DATE :  checkdate,
+    STR_LANG  :loginlang ,
+    GUEST : selectedguest
+
+  });
+};
+export const getPrevYearComparison = (groupCd ,storeCd , dtmdate1 , dtmdate2 , salesflag ) => {
+  return api2.post('/MISALES/SLS06_005RPT.asmx/getPrevYearComparison', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+    DTM_DATE1  : dtmdate1,
+    DTM_DATE2  : dtmdate2,
+    SALES_FLAG : salesflag,
+
+  });
+};
+export const getSalesDayReport = (groupCd ,storeCd , dtmdate1 , dtmdate2 , bill , lang ) => {
+  return api2.post('/MISALES/SLS02_017RPT.asmx/getSalesDayReport', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+    START_DATE  : dtmdate1,
+    END_DATE  : dtmdate2,
+    SHOW_BILL : bill,
+    LOGIN_LANG : lang
+
+  });
+};
+export const getSalesDayReportByPos = (groupCd ,storeCd , dtmdate1 , dtmdate2 , bill , lang ,posNo ) => {
+  return api2.post('/MISALES/SLS02_028RPT.asmx/getSalesDayReportByPos', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+    START_DATE  : dtmdate1,
+    END_DATE  : dtmdate2,
+    SHOW_BILL : bill,
+    LOGIN_LANG : lang ,
+    POS_NO : posNo
+
+  });
+};
+export const getSalesDatabyMonth = (groupCd ,storeCds , dtmdate1 , dtmdate2 , reportType  ) => {
+  return api2.post('/MISALES/SLS06_003RPT.asmx/getSalesDatabyMonth', {
+    GROUP_CD    : groupCd,
+    STORE_CDS    : storeCds,
+    START_DATE  : dtmdate1,
+    END_DATE  : dtmdate2,
+    REPORT_TYPE : reportType
+
+  });
+};
+export const getCauseList = (groupCd ,storeCd  ) => {
+  return api2.post('/MISALES/SLS08_001RPT.asmx/getCauseList', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd
+
+
+  });
+};
+export const getCauseListbyMenu = (groupCd ,storeCd  ) => {
+  return api2.post('/MISALES/SLS08_002RPT.asmx/getCauseListbyMenu', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd
+
+
+  });
+};
+export const getSalesCancelData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+  return api2.post('/MISALES/SLS08_001RPT.asmx/getSalesCancelData', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd ,
+    START_DATE :  startDate,
+    END_DATE : endDate  ,
+    REPORT_TYPE :  reporttype ,
+    CAUSE : cause,
+
+
+  });
+};
+export const getMenusCancelData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+  return api2.post('/MISALES/SLS08_002RPT.asmx/getMenusCancelData', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd ,
+    START_DATE :  startDate,
+    END_DATE : endDate  ,
+    REPORT_TYPE :  reporttype ,
+    CAUSE : cause,
+
+
+  });
+};
+export const getItemsCancelData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+  return api2.post('/MISALES/SLS08_003RPT.asmx/getItemsCancelData', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd ,
+    START_DATE :  startDate,
+    END_DATE : endDate  ,
+    REPORT_TYPE :  reporttype ,
+    CAUSE : cause,
+
+
+  });
+};
+export const getSalesChangeData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+  return api2.post('/MISALES/SLS08_004RPT.asmx/getSalesChangeData', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd ,
+    START_DATE :  startDate,
+    END_DATE : endDate  ,
+    REPORT_TYPE :  reporttype ,
+    CAUSE : cause,
+
+
+  });
+};
+export const getSalesChangeDetailData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+  return api2.post('/MISALES/SLS08_004RPT.asmx/getSalesChangeDetailData', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd ,
+    START_DATE :  startDate,
+    END_DATE : endDate  ,
+    REPORT_TYPE :  reporttype ,
+    CAUSE : cause,
+
+
+  });
+};
+export const getPastSalesChanges = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+  return api2.post('/MISALES/SLS08_005RPT.asmx/getPastSalesChanges', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd ,
+    START_DATE :  startDate,
+    END_DATE : endDate  ,
+    REPORT_TYPE :  reporttype ,
+    CAUSE : cause,
+
+
   });
 };
 

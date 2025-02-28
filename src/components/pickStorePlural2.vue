@@ -4,7 +4,7 @@
         <div><select name="" id="" v-model="selectedStoreGroup" :disabled="settingDisable ==2" class="mr-5 w-56 h-7 rounded-lg">
             <option :value="i.lngStoreGroup" v-for="i in storeGroup">{{ i.strName }}</option>
         </select></div>
-        <div><select name="" id=""  v-model="selectedStoreType" :disabled="settingDisable ==2" class="w-56 h-7 rounded-lg mr-5">
+        <div><select name="" id=""  v-model="selectedStoreType" :disabled="settingDisable ==2" class="w-56 h-7 rounded-lg mr-5" @change="selectstoreType">
             <option :value="0" >전체</option>
             <option :value="i.lngStoreAttr" v-for="i in storeType">{{ i.strName }}</option>
         </select></div>
@@ -29,11 +29,11 @@
             <option :value="i.lngStoreGroup" v-for="i in storeGroup">{{ i.strName }}</option>
         </select></div>
         <div ><div class="grid grid-rows-1 grid-cols-2 ">
-            <div class="-ml-8"><select name="" id="" v-model="selectedStoreTeam" class="w-full h-7 rounded-lg" :disabled="settingDisable ==1"  >
+            <div class="-ml-8"><select name="" id="" v-model="selectedStoreTeam" class="w-full h-7 rounded-lg" :disabled="settingDisable ==1" @change="selectstoreteam"  >
                 <option :value="0" >전체</option>
             <option :value="i.lngTeamCode" v-for="i in storeTeam">{{ i.strTeamName }}</option>
         </select></div>
-        <div ><select name="" id="" v-model="selectedSuperVisor" class="w-32 h-7 rounded-lg ml-2" :disabled="settingDisable ==1" >
+        <div ><select name="" id="" v-model="selectedSuperVisor" class="w-32 h-7 rounded-lg ml-2" :disabled="settingDisable ==1" @change="selectsupervisor">
             <option :value="-1" >전체</option>
             <option :value="i.lngSupervisor" v-for="i in storeSuperVisor">{{ i.strName }}</option>
         </select></div>
@@ -115,6 +115,23 @@ onMounted(() => {
 })
 
 watch(selectedStoreType , (newValue) => {
+    // if(selectedStoreType.value == 0){
+    //     rowData.value = store.state.storeCd
+    //     emit('lngStoreCodes' ,store.state.storeCd.map(item => item.lngStoreCode).join(','))
+    // } else {
+    //     rowData.value = store.state.storeCd.filter(item => item.lngStoreAttr == selectedStoreType.value)
+    //     //sendStoreCodes.value = rowData.value.filter(item => item.checkbox == true).map(item => item.lngStoreCode)
+    //     emit('lngStoreCodes' ,store.state.storeCd.filter(item => item.lngStoreAttr == selectedStoreType.value).map(item => item.lngStoreCode).join(','))
+    // }
+ 
+    // emit('lngStoreAttr',selectedStoreType.value)
+    // emit('lngStoreAttrs',selectedStoreType.value)
+    // emit('excelStore' ,'매장명 : 전체')
+    // initCheck.value = !initCheck.value
+    // selectedStoreList.value = '전체'
+})
+
+const selectstoreType = (e) => {
     if(selectedStoreType.value == 0){
         rowData.value = store.state.storeCd
         emit('lngStoreCodes' ,store.state.storeCd.map(item => item.lngStoreCode).join(','))
@@ -129,9 +146,8 @@ watch(selectedStoreType , (newValue) => {
     emit('excelStore' ,'매장명 : 전체')
     initCheck.value = !initCheck.value
     selectedStoreList.value = '전체'
-})
-
-watch(selectedStoreTeam, (newValue) => {
+}
+const selectstoreteam = (e) => {
     if(selectedStoreTeam.value == 0){
         rowData.value = store.state.storeCd
         storeSuperVisor.value = store.state.storeSupervisor
@@ -147,9 +163,11 @@ watch(selectedStoreTeam, (newValue) => {
     emit('lngStoreTeam',selectedStoreTeam.value)
     emit('excelStore' ,'매장명 : 전체')
     selectedStoreList.value = '전체'
+}
+watch(selectedStoreTeam, (newValue) => {
+   
 })
-
-watch(selectedSuperVisor, (newValue) => {
+const selectsupervisor = (e) => {
     if(selectedSuperVisor.value == -1){
         if(selectedStoreTeam.value ==0){
             rowData.value = store.state.storeCd
@@ -173,8 +191,19 @@ watch(selectedSuperVisor, (newValue) => {
     emit('lngSupervisor',sendSupervisor)
     emit('excelStore' ,'매장명 : 전체')
     selectedStoreList.value = '전체'
+}
+watch(selectedSuperVisor, (newValue) => {
+   
 })
 
+watch(settingDisable , () => {
+    if(settingDisable.value == 1){
+        selectedSuperVisor.value = -1
+        selectedStoreTeam.value = 0
+    } else {
+        selectedStoreType.value = 0
+    }
+})
 
 const showStore = ref(false)
 const showStoreList = () => {

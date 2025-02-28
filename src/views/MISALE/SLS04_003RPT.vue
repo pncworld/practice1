@@ -18,18 +18,19 @@
             </div>
         </div>
         <div class="grid grid-cols-[1fr,10fr,10fr] grid-rows-1 justify-between  bg-gray-200 rounded-lg h-24 items-center z-10 ">
-            <div class="w-10 ml-2 -mt-10">
-                <select name="" id="" class="border rounded-lg h-8 text-base z-10" v-model="selectedSearchType">
-                <option :value="4">집계</option>
+            <div class="w-10 ml-2 -mt-10 ">
+                <select name="" id="" class="border rounded-lg h-8 text-base relative z-50" v-model="selectedSearchType">
+                <option :value="1">집계</option>
                 <option :value="2">일자별</option>
-                <option :value="1">월별</option>
+                <option :value="3">월별</option>
             </select>
         </div>
             <div class="grid grid-cols-1 grid-rows-2 -space-y-3 justify-start -ml-36 mt-3" >
-                <div class="flex justify-start mr">
+                <div class="flex justify-start mr ">
                 <Datepicker2 @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker"
                     @excelDate="excelDate"></Datepicker2>
                     <div class="mt-2"><label for="detail"><input type="checkbox" id="detail" @change="detailView">상세보기</label></div>
+                    <div class="mt-2 ml-44"><label for="StoreName"><input type="checkbox" id="StoreName" @change="showStore"></label></div>
                 </div>
                 <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 ">
                     메뉴구분 : <div class="flex ml-3 space-x-3 mt-1">
@@ -75,32 +76,33 @@
 
         </div>
 
-        <div class="w-full h-[80%] mt-1">
+        <div class="w-full h-[85%] mt-1">
 
-            <Realgrid :progname="'SLS04_002RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload"
-                :exporttoExcel="exportExcel" :documentSubTitle="documentSubTitle" :documentTitle="'SLS04_002RPT'"
-                :hideColumnsId="hideColumnsId" :setGroupColumnId="setGroupColumnId2" :setGroupFooter="setGroupFooter" :setFooter="true" :setGroupCustomLevel="2"
-                :setFooterColID="setFooterColID" :setFooterExpressions="setFooterExpressions" :setGroupSumCustomColumnId="setGroupSumCustomColumnId" :setGroupSumCustomText="setGroupSumCustomText" :setGroupSumCustomLevel="setGroupSumCustomLevel"
-                :setGroupFooterColID="setGroupFooterColID" :setGroupFooterExpressions="setGroupFooterExpressions" :setRowGroupSpan="setRowGroupSpan" :setGroupSumCustomLevel2="setGroupSumCustomLevel2"></Realgrid>
+            <Realgrid :progname="'SLS04_003RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload"
+                :exporttoExcel="exportExcel" :documentSubTitle="documentSubTitle" :documentTitle="'SLS04_003RPT'"
+                :mergeColumns2="mergeColumns2" :mergeColumnGroupSubList2="[['col1_1','col1_3','col1_2','col1'],['col2_1','col2_2','col2_3','col2'],['col3_1','col3_3','col3_2','col3'],['col4_1','col4_3','col4_2','col4'],['col5_1','col5_3','col5_2','col5'],['col6_1','col6_3','col6_2','col6']]"
+                :mergeColumnGroupName2="['현금','신용카드','선수금매출','비율할인','품목할인','금액할인']" :setFooter="true" :setFooterColID="setFooterColID" :setFooterExpressions="setFooterExpressions" :hideColumn="'strStoreName'" :hideColumnNow="hideColumnNow"
+                ></Realgrid>
         </div>
     </div>
 </template>
 
 <script setup>
-import { getDailySalesDetailReport, getDailySalesReport, getMenuCondition, getRealTimeReport, getSalesReportByMenu, getTableSearchCondition } from '@/api/misales';
+import { getDailySalesDetailReport, getDailySalesReport, getMenuCondition, getRealTimeReport, getSalesReportByMenu, getSalesReportByMenuAndPayType, getTableSearchCondition } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStorePlural from '@/components/pickStorePlural.vue';
 import PickStorePlural2 from '@/components/pickStorePlural2.vue';
 import Realgrid from '@/components/realgrid.vue';
-import { formatTime } from '@/customFunc/customFunc';
+import { formatTime, insertPageLog } from '@/customFunc/customFunc';
 import Swal from 'sweetalert2';
 import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 const setGroupFooter = ref(false)
-const setFooterColID = ref(['strStore','lngCode','strMajor','strSub','strMenu','dtmDate','lngPrice','dtmDate','lngNMenuCnt','lngGMenuCnt','lngMenuCnt','lngSalAmt','lngGAmount','lngDCAmt','lngActAmt','lngVAT','lngNetAmt','dblDistRate','lngSalCnt','dblPreWeek','dblPreYear' ])
-
-const setFooterExpressions = ref(['custom','custom','custom','custom','custom','custom','custom' ,'sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum' ])
+const mergeColumns2 = ref(false)
+const setFooterColID = ref(['lCnt','lTot','lDis','lVAT','lAct','col1_1','col1_2','col1_3','col1','col2_1','col2_2','col2_3','col2','col3_1','col3_2','col3_3','col3','col4_1','col4_2','col4_3','col4','col5_1','col5_2','col5_3','col5','col6_1','col6_2','col6_3','col6' ])
+// 5+24
+const setFooterExpressions = ref(['sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum' ])
 const setGroupFooterColID = ref(['strStore','strMajor','strSub','dtmDate','lngPrice','dtmDate','lngNMenuCnt','lngGMenuCnt','lngMenuCnt','lngSalAmt','lngGAmount','lngDCAmt','lngActAmt','lngVAT','lngNetAmt','dblDistRate','lngSalCnt','dblPreWeek','dblPreYear' ])
 const setGroupFooterExpressions = ref(['custom','custom','custom','custom','sum' ,'sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum','sum' ])
 const setGroupSumCustomColumnId = ref(['strStore','strMajor','strSub'])
@@ -109,12 +111,13 @@ const setGroupSumCustomLevel = ref(1)
 const setGroupColumnId = ref([''])
 const setGroupColumnId2 = ref('')
 const setGroupSumCustomLevel2 = ref(1)
-const progid = ref(1)
+const progid = ref(4)
 const reload = ref(false)
 const rowData = ref([])
 const afterSearch = ref(false)
 const selectedstartDate = ref()
 const selectedendDate = ref()
+
 const startDate = (e) => {
     console.log(e)
     selectedstartDate.value = e
@@ -133,29 +136,97 @@ const seeDays = (e) => {
 
     }
 }
+const hideColumnNow = ref(true)
 const store = useStore()
 const loginedstrLang = store.state.userData.lngLanguage
 const searchButton = async () => {
     store.state.loading = true;
     try {
         initGrid()
+        console.log(selectedSearchType.value)
+        console.log(selectedDetail.value)
        
+        let reportType ;
+        if(selectedDetail.value == true && showornotstore.value == true &&  selectedSearchType.value == 1)  {
+            progid.value = 4
+            reportType = 12
+        } else if(selectedDetail.value == true && showornotstore.value == true &&  selectedSearchType.value == 2){
+            progid.value = 5
+            reportType = 13
+        } else if(selectedDetail.value == true && showornotstore.value == true &&  selectedSearchType.value == 3){
+            progid.value = 6
+            reportType = 14
+        }else if(selectedDetail.value == true && showornotstore.value == false &&  selectedSearchType.value == 1){
+            progid.value = 4
+            reportType = 8
+        } else if(selectedDetail.value == true && showornotstore.value == false &&  selectedSearchType.value == 2){
+            progid.value = 5
+            reportType = 9
+        }else if(selectedDetail.value == true && showornotstore.value == false &&  selectedSearchType.value == 3){
+            progid.value = 6
+            reportType = 10
+        } else if(selectedDetail.value == false && showornotstore.value == true &&  selectedSearchType.value == 1){
+            progid.value = 1
+            reportType = 4
+        } else if(selectedDetail.value == false && showornotstore.value == true &&  selectedSearchType.value == 2){
+            progid.value = 2
+            reportType = 5
+        }else if(selectedDetail.value == false && showornotstore.value == true &&  selectedSearchType.value == 3){
+            progid.value = 3
+            reportType = 6
+        }  else if(selectedDetail.value == false && showornotstore.value == false &&  selectedSearchType.value == 1){
+            progid.value = 1
+            reportType = 0
+        } else if(selectedDetail.value == false && showornotstore.value == false &&  selectedSearchType.value == 2){
+            progid.value = 2
+            reportType = 1
+        } else if(selectedDetail.value == false && showornotstore.value == false &&  selectedSearchType.value == 3){
+            progid.value = 3
+            reportType = 2
+        }
+         console.log(reportType )
+        if(temptmergeColumns2.value == false){
+            mergeColumns2.value = false
+        } else {
+            mergeColumns2.value = true
+        }
         reload.value = !reload.value
        
-        const reportType = [...checkedReportTypes]
-        const checkdays = [...checkedDays]
+        // const reportType = [...checkedReportTypes]
+        // const checkdays = [...checkedDays]
 
-        console.log(checkdays)
-
+        // console.log(checkdays)
+        let first ;
+        let second ;
+        let third ;
+        
         if(selectedsubMenu.value == null ||selectedsubMenu.value == undefined ){
-            selectedsubMenu.value = 0
+            second = 0
+        } else {
+            second= selectedsubMenu.value.lngcode
         }
         if(selectedMenu.value == null ||selectedMenu.value == undefined ){
-            selectedMenu.value = 0
+            first = 0
+        } else {
+            console.log(selectedMenu.value)
+            first= selectedMenu.value.lngcode
         }
-        const res = await getSalesReportByMenu(selectedGroup.value, selectedStores.value , selectedstartDate.value, selectedendDate.value, selectedMenu.value,selectedsubMenu.value,reportType.join(''), checkedGift.value , checkedlngPrice.value ,checkedlngPrint.value ,checkdays.join(','), selectedHoliday.value)
+
+        if(selectedSubSubMenu.value == null || selectedSubSubMenu.value == undefined ){
+            third = 0
+        } else {
+            third= selectedSubSubMenu.value.lngcode
+        }
+       
+        console.log(selectedstartDate.value)
+        console.log(selectedendDate.value)
+        console.log(first)
+        console.log(second)
+        console.log(third)
+    
+        const res = await getSalesReportByMenuAndPayType(selectedGroup.value, selectedStores.value , selectedstartDate.value, selectedendDate.value, reportType , first , second , third )
         console.log(res)
-        rowData.value = res.data.MENUS
+        rowData.value = res.data.List.filter(item => item.lngCode !='')
 
 
 
@@ -205,7 +276,7 @@ const initGrid = () => {
 }
 
 const exportExcel = ref(false)
-const selectedSearchType = ref(4)
+const selectedSearchType = ref(1)
 const documentSubTitle = ref('')
 const menuDistinct = ref(['전체','대그룹','서브그룹','메뉴구분'])
 const searchCondition = ref(['매장명표시','대그룹','서브그룹','일자별','증정구분','단가제외','합계','셀병합'])
@@ -213,17 +284,19 @@ const dayCondition = ref(['일','월','화','수','목','금','토'])
 const ConditionSet = new Set([])
 const excelButton = () => {
     let menu ; 
-    if(selectedMenu.value == null){
+    if(selectedMenu.value == null ){
         menu = '전체'
     } else {
         menu = menuDistinct.value[selectedMenu.value]
     }
    
     let submenu;
-    if(selectedsubMenu.value == null ){
+    console.log(selectedsubMenu.value)
+    console.log(subList.value)
+    if(selectedsubMenu.value == null || menuType.value.length == 0 ){
         submenu = '전체'
     } else {
-        submenu = subList.value.find(item => item.lngCode == selectedsubMenu.value).strName
+        submenu = menuType.value.find(item => item.lngcode == selectedsubMenu.value.lngcode).strname
     }
     const newCondarr = [...ConditionSet].sort()
     let searchcond ='';
@@ -236,8 +309,29 @@ const excelButton = () => {
     for(let i=0 ; i < newCondarr2.length ; i++){
         thirdcond+= dayCondition.value[newCondarr2[i]-1]+','
     }
+    let first 
+    let second 
+    let third 
+    if(selectedMenu.value == null  ){
+        first = '전체'
+    } else {
+        console.log(mainMenu.value.filter(item => item.lngcode == selectedMenu.value ))
+        first = mainMenu.value.filter(item => item.lngcode == selectedMenu.value.lngcode  )[0].strname
+    }
+
+    if(selectedsubMenu.value == null || menuType.value.length == 0 ){
+        second = '전체'
+    } else {
+        second = menuType.value.filter(item => item.lngcode == selectedsubMenu.value.lngcode )[0].strname
+    }
+
+    if(selectedSubSubMenu.value == null || Menus.value.length == 0){
+        third = '전체'
+    } else {
+        third = Menus.value.filter(item => item.lngcode == selectedSubSubMenu.value.lngcode  )[0].strname
+    }
     
-    documentSubTitle.value = selectedExcelDate.value + '\n' + selectedExcelStore.value +'\n'+'메뉴구분 :' +menu +','+submenu +'\n'+'조회조건 : ' +searchcond +'\n'+'요일조건 : ' +thirdcond
+    documentSubTitle.value = selectedExcelDate.value + '\n' + selectedExcelStore.value +'\n'+'메뉴구분 :' + first +',' +second+','+third
     exportExcel.value = !exportExcel.value
 }
 
@@ -268,32 +362,33 @@ const selectedMenu = ref(null)
 const subList = ref([])
 const menuType = ref([])
 const Menus = ref([])
-const mainMenu = ref([{lngCode : 0 , strName : '전체'},{lngCode : 1 , strName : '대그룹'},{lngCode : 2 , strName : '서브그룹'},{lngCode : 3 , strName : '메뉴코드'}])
+const mainMenu = ref([{lngcode : 0 , strname : '전체'},{lngcode : 1 , strname : '대그룹'},{lngcode : 2 , strname : '서브그룹'},{lngcode : 3 , strname : '메뉴코드'}])
 watch(selectedMenu, async () => {
-    // if(selectedMenu.value == null){
-    //     selectedMenu.value = 0
-    // }
-    console.log(selectedMenu.value)
-    const res = await getMenuCondition(selectedGroup.value, selectedStores.value,2, selectedMenu.value.lngcode ,0)
+    if(selectedMenu.value == null){
+        selectedMenu.value = 0
+    }
+    const res = await getMenuCondition(selectedGroup.value, selectedStores.value,2, selectedMenu.value == 0 ? 0 : selectedMenu.value.lngcode ,0)
     menuType.value = res.data.List
     selectedsubMenu.value = null
     console.log(menuType.value)
 })
 const selectedSubSubMenu = ref(null)
 watch(selectedsubMenu, async () => {
-    // if(selectedsubMenu.value == null){
-    //     selectedsubMenu.value = 0
-    // }
-    console.log(selectedsubMenu.value)
-    const res = await getMenuCondition(selectedGroup.value, selectedStores.value,3, selectedMenu.value.lngcode ,selectedsubMenu.value.lngcode)
+    if(selectedsubMenu.value == null){
+        selectedsubMenu.value = 0
+    }
+
+    const res = await getMenuCondition(selectedGroup.value, selectedStores.value,3, selectedMenu.value == 0 ? 0 : selectedMenu.value.lngcode ,selectedsubMenu.value == 0 ? 0 : selectedsubMenu.value.lngcode)
     Menus.value = res.data.List
     selectedSubSubMenu.value = null
-    console.log(Menus.value)
+  
 
 })
 
 onMounted(async () => {
-    console.log(selectedStores.value)
+
+    const pageLog = insertPageLog(store.state.activeTab2)
+
     const res = await getMenuCondition(selectedGroup.value, selectedStores.value ,1 , 0, 0)
 
     mainMenu.value = res.data.List
@@ -305,12 +400,15 @@ const checkedReportTypes = new Set([0])
 const checkedGift = ref(0)
 const checkedlngPrice = ref(0)
 const checkedlngPrint = ref(0)
-const selectedDetail = ref(false)
+const selectedDetail = ref(0)
+const temptmergeColumns2= ref(false)
 const detailView = (e)=>{
     if(e.target.checked){
         selectedDetail.value = true
+        temptmergeColumns2.value = true
     } else {
         selectedDetail.value = false
+        temptmergeColumns2.value = false
     }
 }
 const customOrder = ['strStore','strMajor','strSub','dtmDate']
@@ -488,7 +586,16 @@ const checkday = (e) => {
         }
     }
 }
-
+const showornotstore = ref(false)
+const showStore = (e) => {
+   if(e.target.checked){
+    showornotstore.value = true
+    hideColumnNow.value = false
+   } else {
+    showornotstore.value = false
+    hideColumnNow.value = true
+   }
+}
 </script>
 
 <style></style>
