@@ -186,14 +186,59 @@ export const getAreaIndustrySalesReport = (groupCd ,storeCds , startDate , endDa
   });
 };
 
-export const getCardSalesDetailReport = (groupCd ,storeCds , startDate , endDate , reporttype , lang) => {
+export const getCardSalesDetailReport = (groupCd ,storeCds , startDate , endDate , reporttype , voidFlag, strBuyCode) => {
   return api2.post('/MISALES/SLS05_002RPT.asmx/getCardSalesDetailReport', {
     GROUP_CD    : groupCd,
     STORE_CDS   : storeCds,
     START_DATE  : startDate,
     END_DATE    : endDate,
     REPORT_TYPE : reporttype,
-    LANG        : lang
+    VOID_FLG    : voidFlag,
+    BUY_CODE    : strBuyCode
+  });
+};
+
+export const getCardCorp = (groupCd ,storeCds , orderBy) => {
+  return api2.post('/MISALES/SLS05_002RPT.asmx/getCardCorp', {
+    GROUP_CD  : groupCd,
+    STORE_CDS : storeCds,
+    ORDER_BY  : orderBy
+  });
+};
+
+export const getCardSalesSumReport = (groupCd , storeCds, startDate, endDate, reporttype, dateType, strBuyCode) => {
+  return api2.post('/MISALES/SLS05_004RPT.asmx/getCardSalesSumReport', {
+    GROUP_CD    : groupCd,
+    STORE_CDS   : storeCds,
+    START_DATE  : startDate,
+    END_DATE    : endDate,
+    REPORT_TYPE : reporttype,
+    DATE_TYPE   : dateType,
+    BUY_CODE    : strBuyCode
+  });
+};
+
+export const getSalesCloseMaxDate = (groupCd) => {
+  return api2.post('/MISALES/SLS05_004RPT.asmx/getSalesCloseMaxDate', {
+    GROUP_CD    : groupCd
+  });
+};
+
+export const getWeedaySalesReport = (groupCd , storeCds, startDate, endDate, reporttype, weekDay) => {
+  return api2.post('/MISALES/SLS06_001RPT.asmx/getWeedaySalesReport', {
+    GROUP_CD    : groupCd,
+    STORE_CDS   : storeCds,
+    START_DATE  : startDate,
+    END_DATE    : endDate,
+    REPORT_TYPE : reporttype,
+    WEEK_DAY    : weekDay
+  });
+};
+
+export const getWeekDayList = (M_CD, LANGUAGE_CD) => {
+  return api2.post('/MISALES/SLS06_001RPT.asmx/getWeekDayList', {
+    M_CD        : M_CD,
+    LANGUAGE_CD : LANGUAGE_CD
   });
 };
 export const getSalesReportByMenuAndPayType = (groupCd ,storeCds , startDate , endDate , reporttype , menu, submenu , subsubmenu) => {
@@ -359,6 +404,5 @@ export const getPastSalesChanges = (groupCd ,storeCd , startDate, endDate , repo
 
   });
 };
-
 
 

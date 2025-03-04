@@ -202,7 +202,7 @@ import { useStore } from 'vuex';
     selectedStoreAttrs.value = e
     console.log(e)
   }
-  
+
   /*
   그리드 초기화
   */

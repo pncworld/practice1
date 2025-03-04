@@ -71,10 +71,11 @@
 </template>
 
 <script setup>
+import { getSalesCloseMaxDate } from '@/api/misales';
 import Swal from 'sweetalert2';
 import { onMounted, ref, watch } from 'vue';
 
-const emit = defineEmits(['startDate', 'endDate','excelDate']);
+const emit = defineEmits(['startDate', 'endDate', 'acceptDate', 'excelDate']);
 const props = defineProps({
   closePopUp: {
     type: Boolean,
@@ -83,6 +84,18 @@ const props = defineProps({
   initToday: {
     type: String,
     default: '', // 기본값: 현재 날짜
+  },
+  selectedRadioBox : {
+    type : String,
+    default : '01'
+  },
+  selectedGroup : {
+    type: String,
+    default: ''
+  },
+  orgAcceptDate : {
+    type: String,
+    default: ''
   }
 });
 const formatDate = (date) => date.toISOString().split('T')[0]
@@ -176,33 +189,41 @@ function formatDateToYYYYMMDD(date) {
 
   return year + '-' + month + '-' + day;
 }
+
+watch(() => [selectedStartDate.value, selectedEndDate.value], async () => {
+  emit('startDate', selectedStartDate.value);
+  emit('endDate', selectedEndDate.value);
+  emit('excelDate', '매출일자 : '+selectedStartDate.value+'~'+ selectedEndDate.value)
+
+  console.log(selectedEndDate.value)
+  if(props.selectedRadioBox == '02'){
+    if(selectedEndDate.value > props.orgAcceptDate){
+      selectedEndDate.value = props.orgAcceptDate;
+      emit('endDate', props.orgAcceptDate);
+    }
+  }
+})
+
 const tempStartDateStack = []
 const tempEndDateStack = []
-watch(() => [selectedStartDate.value, selectedEndDate.value], () => {
- 
-  // if(date2.getTime() < date1.getTime()){
-  //   Swal.fire({
-  //     title: '종료일이 시작일보다 늦습니다.',
-  //     text: '종료일을 다시 선택하세요.',
-  //     icon: 'error',
-  //     confirmButtonText: '확인'
-  //   })
-  //   selectedEndDate.value = tempEndDateStack.pop()
-  //   tempEndDateStack.push(selectedEndDate.value)
-  //   return;
-  // }
-  // emit('startDate', selectedStartDate.value);
-  // emit('endDate', selectedEndDate.value);
-  // emit('excelDate', '매출일자 : '+selectedStartDate.value+'~'+ selectedEndDate.value)
-  // tempStartDateStack.push(selectedStartDate.value)
-  // tempEndDateStack.push(selectedEndDate.value)
-},
-  { deep: true })
 
 watch(() => props.closePopUp, () => {
   showRadio.value = false
 })
 
+watch(() => props.selectedRadioBox, async () => {
+  if(props.selectedRadioBox == '02'){
+    const res = await getSalesCloseMaxDate(props.selectedGroup)
+    const acceptDate = res.data.closeMaxDate[0].dtmCloseDate.split(" ")[0]
+    console.log(acceptDate)
+
+    if(selectedEndDate.value > acceptDate){
+      selectedEndDate.value = acceptDate;
+      emit('endDate', acceptDate);
+    }
+    emit('acceptDate', acceptDate);
+  }
+})
 const changeStartDate = (e) => {
   const date1 = new Date(e.target.value)
   const date2 = new Date(selectedEndDate.value)
