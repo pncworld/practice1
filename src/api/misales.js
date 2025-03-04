@@ -102,10 +102,13 @@ export const getDailySalesDetailReport = (groupCd, storeCds, startDate, endDate,
     LANG: lang
   });
 };
-export const getTimeSalesReport = (groupCd, storeCds, startDate, endDate, reporttype, startTime, endTime, timeType, checkedday) => {
+export const getTimeSalesReport = (groupCd, storeattr, storeteam, storesupervisor, storeCds, startDate, endDate, reporttype, startTime, endTime, timeType, checkedday) => {
 
   return api2.post('/MISALES/SLS06_002RPT.asmx/getTimeSalesReport', {
     GROUP_CD: groupCd,
+    STORE_ATTR: storeattr,
+    STORE_TEAM: storeteam,
+    STORE_SUPERVISOR: storesupervisor,
     STORE_CDS: storeCds,
     START_DATE: startDate,
     END_DATE: endDate,
@@ -206,9 +209,12 @@ export const getCardCorp = (groupCd ,storeCds , orderBy) => {
   });
 };
 
-export const getCardSalesSumReport = (groupCd , storeCds, startDate, endDate, reporttype, dateType, strBuyCode) => {
+export const getCardSalesSumReport = (groupCd , storeattr , storeteam, storesupervisor , storeCds, startDate, endDate, reporttype, dateType, strBuyCode) => {
   return api2.post('/MISALES/SLS05_004RPT.asmx/getCardSalesSumReport', {
     GROUP_CD    : groupCd,
+    STORE_ATTR    : storeattr,
+    STORE_TEAM    : storeteam,
+    STORE_SUPERVISOR    : storesupervisor,
     STORE_CDS   : storeCds,
     START_DATE  : startDate,
     END_DATE    : endDate,
@@ -224,9 +230,12 @@ export const getSalesCloseMaxDate = (groupCd) => {
   });
 };
 
-export const getWeedaySalesReport = (groupCd , storeCds, startDate, endDate, reporttype, weekDay) => {
+export const getWeedaySalesReport = (groupCd , storeattr ,storeteam ,storesupervisor , storeCds, startDate, endDate, reporttype, weekDay) => {
   return api2.post('/MISALES/SLS06_001RPT.asmx/getWeedaySalesReport', {
     GROUP_CD    : groupCd,
+    STORE_ATTR    : storeattr,
+    STORE_TEAM    : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
     STORE_CDS   : storeCds,
     START_DATE  : startDate,
     END_DATE    : endDate,
@@ -332,9 +341,12 @@ export const getCauseListbyMenu = (groupCd ,storeCd  ) => {
 
   });
 };
-export const getSalesCancelData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+export const getSalesCancelData = (groupCd ,storeattr, storeteam , storesupervisor , storeCd , startDate, endDate , reporttype , cause  ) => {
   return api2.post('/MISALES/SLS08_001RPT.asmx/getSalesCancelData', {
     GROUP_CD    : groupCd,
+    STORE_ATTR    : storeattr,
+    STORE_TEAM    : storeteam,
+    STORE_SUPERVISOR    : storesupervisor,
     STORE_CD   : storeCd ,
     START_DATE :  startDate,
     END_DATE : endDate  ,
@@ -344,9 +356,10 @@ export const getSalesCancelData = (groupCd ,storeCd , startDate, endDate , repor
 
   });
 };
-export const getMenusCancelData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+export const getMenusCancelData = (groupCd , storeattr,storeCd , startDate, endDate , reporttype , cause  ) => {
   return api2.post('/MISALES/SLS08_002RPT.asmx/getMenusCancelData', {
     GROUP_CD    : groupCd,
+    STORE_ATTR    : storeattr,
     STORE_CD   : storeCd ,
     START_DATE :  startDate,
     END_DATE : endDate  ,
@@ -356,9 +369,10 @@ export const getMenusCancelData = (groupCd ,storeCd , startDate, endDate , repor
 
   });
 };
-export const getItemsCancelData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+export const getItemsCancelData = (groupCd ,storeattr ,storeCd , startDate, endDate , reporttype , cause  ) => {
   return api2.post('/MISALES/SLS08_003RPT.asmx/getItemsCancelData', {
     GROUP_CD    : groupCd,
+    STORE_ATTR    : storeattr,
     STORE_CD   : storeCd ,
     START_DATE :  startDate,
     END_DATE : endDate  ,
@@ -368,9 +382,12 @@ export const getItemsCancelData = (groupCd ,storeCd , startDate, endDate , repor
 
   });
 };
-export const getSalesChangeData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+export const getSalesChangeData = (groupCd ,storeattr, storeteam , storeSupervisor ,storeCd , startDate, endDate , reporttype , cause  ) => {
   return api2.post('/MISALES/SLS08_004RPT.asmx/getSalesChangeData', {
     GROUP_CD    : groupCd,
+    STORE_ATTR    : storeattr,
+    STORE_TEAM    : storeteam,
+    STORE_SUPERVISOR    : storeSupervisor,
     STORE_CD   : storeCd ,
     START_DATE :  startDate,
     END_DATE : endDate  ,
@@ -380,9 +397,12 @@ export const getSalesChangeData = (groupCd ,storeCd , startDate, endDate , repor
 
   });
 };
-export const getSalesChangeDetailData = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+export const getSalesChangeDetailData = (groupCd ,storeattr, storeteam , storeSupervisor ,storeCd , startDate, endDate , reporttype , cause  ) => {
   return api2.post('/MISALES/SLS08_004RPT.asmx/getSalesChangeDetailData', {
     GROUP_CD    : groupCd,
+    STORE_ATTR    : storeattr,
+    STORE_TEAM    : storeteam,
+    STORE_SUPERVISOR    : storeSupervisor,
     STORE_CD   : storeCd ,
     START_DATE :  startDate,
     END_DATE : endDate  ,
@@ -392,9 +412,12 @@ export const getSalesChangeDetailData = (groupCd ,storeCd , startDate, endDate ,
 
   });
 };
-export const getPastSalesChanges = (groupCd ,storeCd , startDate, endDate , reporttype , cause  ) => {
+export const getPastSalesChanges = (groupCd , storeattr, storeteam , storesupervisor ,storeCd , startDate, endDate , reporttype , cause  ) => {
   return api2.post('/MISALES/SLS08_005RPT.asmx/getPastSalesChanges', {
     GROUP_CD    : groupCd,
+    STORE_ATTR    : storeattr,
+    STORE_TEAM    : storeteam,
+    STORE_SUPERVISOR    : storesupervisor,
     STORE_CD   : storeCd ,
     START_DATE :  startDate,
     END_DATE : endDate  ,

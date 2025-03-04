@@ -43,7 +43,7 @@
           </div>
         </div>
         <div class="ml-10 -mt-10">
-          <PickStoreSingle2 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore"  @changeInit="changeInit">
+          <PickStoreSingle2 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore"  @changeInit="changeInit" @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam" @lngStoreAttrs="lngStoreAttrs">
           </PickStoreSingle2>
         </div>
         <div></div>
@@ -55,7 +55,7 @@
         <Realgrid :progname="'SLS08_005RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setFooter="true" :mergeMask="''" :setMergeMode="false" :setGroupSumCustomColumnId="['dtmDate']" :setGroupSumCustomText="['소계']"
         :setGroupFooter="setGroupFooter" :setGroupColumnId="setGroupColumnId" :setGroupFooterExpressions="['sum','sum','sum','sum']" :setGroupFooterColID="['lngBActamt','lngAActamt','lngAActamt2','lngChange']"
         :hideColumnsId="hideColumnsId" :setRowGroupSpan2="setRowGroupSpan" :setFooterExpressions="['sum','sum','sum','sum']" :setFooterColID="['lngBActamt','lngAActamt','lngAActamt2','lngChange']"
-          :documentTitle="'SLS08_005RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
+          :documentTitle="'SLS08_005RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel" :setGroupOrderByColumnId="'dtmDate'">
         </Realgrid>
       </div>
     </div>
@@ -141,7 +141,7 @@ onMounted(async () => {
      
       reload.value =!reload.value
      
-      const res = await getPastSalesChanges(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, '12', cause)
+      const res = await getPastSalesChanges(selectedGroup.value, selectedStoreAttrs.value ,selectedStoreTeam.value , selectedStoreSupervisor.value ,  selectedStores.value, selectedstartDate.value, selectedendDate.value, '12', cause)
       console.log(res)
       rowData.value = res.data.List
   
@@ -161,6 +161,8 @@ onMounted(async () => {
   const selectedGroup = ref()
   const selectedStores = ref()
   const selectedStoreAttrs = ref()
+  const selectedStoreTeam = ref()
+  const selectedStoreSupervisor = ref()
   const lngStoreGroup = (e) => {
     console.log(e)
     selectedGroup.value = e
@@ -171,6 +173,14 @@ onMounted(async () => {
   }
   const lngStoreAttrs = (e) => {
     selectedStoreAttrs.value = e
+    console.log(e)
+  }
+  const lngStoreTeam = (e) => {
+    selectedStoreTeam.value = e
+    console.log(e)
+  }
+  const lngSupervisor = (e) => {
+    selectedStoreSupervisor.value = e
     console.log(e)
   }
   

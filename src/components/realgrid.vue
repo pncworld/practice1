@@ -23,6 +23,18 @@ let dataProvider;
   deleteRow =>  true false로 값이 변할때마다 행을 삭제 
   사용법 emit updatedRowData 사용시에는 가급적 불가피한경우가 아니라면 기존 rowData와 교체 하지 말 것. updatedRowData로 수정된 사항을 별도의 
   변수로 저장해두고 추후에 그 데이터를 저장하는게 옳다고봄
+
+
+
+  gridView.columnByName("colName").footer.valueCallback = function(grid, column, footerIndex, columnFooter, value){
+    var sum = 0;
+    var checkedItems = gridView.getCheckedItems();
+    for(var i = 0; i < checkedItems.length; i++){
+        sum += grid.getValue(checkedItems[i], "fieldName")
+    }
+
+    return sum;
+}
 */
 const props = defineProps({
   progname: {
@@ -165,7 +177,7 @@ const props = defineProps({
   ,
   selectionStyle: { // 숫자로만 오게
     type: String,
-    default: 'block',
+    default: 'singleRow',
   }
   ,
   initFocus: { // 숫자로만 오게
@@ -464,6 +476,21 @@ const props = defineProps({
     type: Boolean,
     default: true,
   }
+  ,
+  setFooterCustomText: {
+    type: Array,
+    default: [],
+  }
+  ,
+  setFooterCustomColumnId: {
+    type: Array,
+    default: [],
+  }
+  ,
+  setGroupOrderByColumnId: {
+    type: String,
+    default: '',
+  }
  
 
 });
@@ -540,7 +567,8 @@ const funcshowGrid = async () => {
 
     },
     footer: {
-      // text : item.strColID =='dtmDate' ? '소계' : '' ,
+       text : props.setFooterCustomText[props.setFooterCustomColumnId.indexOf(item.strColID)],
+      styleName: props.setFooterCustomText[props.setFooterCustomColumnId.indexOf(item.strColID)] ? 'setTextAlignCenter' : item.strAlign == 'center' ? 'setTextAlignCenter' : item.strAlign == 'left' ? 'setTextAlignLeft' : 'setTextAlignRight',
       expression: props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)],
       numberFormat: item.strTotalexpr !='' ?  item.strTotalexpr : item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0",
       suffix : props.suffixColumnPercent.includes(item.strColID) ? '%' : ''
@@ -875,6 +903,10 @@ const funcshowGrid = async () => {
     }
     });
     gridView.groupBy(props.setGroupColumnId.split(','));
+    if(props.setGroupOrderByColumnId  != ''){
+      gridView.orderBy([props.setGroupOrderByColumnId]);
+    } 
+   
   }
 
 

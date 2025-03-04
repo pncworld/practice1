@@ -62,7 +62,7 @@
         </div>
       </div>
       <div class="ml-10 -mt-10">
-        <PickStoreSingle2 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore">
+        <PickStoreSingle2 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore" @lngStoreAttrs="lngStoreAttrs" @lngStoreTeam="lngStoreTeam" @lngSupervisor="lngSupervisor">
         </PickStoreSingle2>
       </div>
       <div></div>
@@ -155,7 +155,7 @@ const searchButton = async () => {
 
 
 
-    const res = await getTimeSalesReport(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, '12', startTime.value, endTime.value, orderPay.value, sendcheckedDay.join(','))
+    const res = await getTimeSalesReport(selectedGroup.value, selectedStoreAttrs.value ,selectedStoreTeam.value ,selectedStoreSuperVisor.value , selectedStores.value, selectedstartDate.value, selectedendDate.value, '12', startTime.value, endTime.value, orderPay.value, sendcheckedDay.join(','))
     console.log(res)
     rowData.value = res.data.TIMESALE
 
@@ -175,6 +175,8 @@ const searchButton = async () => {
 const selectedGroup = ref()
 const selectedStores = ref()
 const selectedStoreAttrs = ref()
+const selectedStoreTeam = ref()
+const selectedStoreSuperVisor = ref()
 const lngStoreGroup = (e) => {
   console.log(e)
   selectedGroup.value = e
@@ -185,6 +187,14 @@ const lngStoreCodes = (e) => {
 }
 const lngStoreAttrs = (e) => {
   selectedStoreAttrs.value = e
+  console.log(e)
+}
+const lngStoreTeam = (e) => {
+  selectedStoreTeam.value = e
+  console.log(e)
+}
+const lngSupervisor = (e) => {
+  selectedStoreSuperVisor.value = e
   console.log(e)
 }
 

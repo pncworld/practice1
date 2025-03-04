@@ -44,7 +44,7 @@
          
         </div>
         <div class="ml-10 -mt-10 ">
-          <PickStoreRenew3  @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore"  @changeInit="changeInit">
+          <PickStoreRenew3  @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore"  @changeInit="changeInit" @lngStoreAttrs="lngStoreAttrs">
           </PickStoreRenew3>
         </div>
         <div></div>
@@ -156,7 +156,7 @@ onMounted(async () => {
      
       reload.value =!reload.value
      
-      const res = await getMenusCancelData(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, reportType.value, cause)
+      const res = await getMenusCancelData(selectedGroup.value, selectedStoreAttrs.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, reportType.value, cause)
       console.log(res)
       rowData.value = res.data.List
   

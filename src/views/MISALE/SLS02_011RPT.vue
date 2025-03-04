@@ -21,7 +21,7 @@
         </div>
         <div>
             <PickStoreRenew3 @lngStoreCode="selectedStoreCd" @lngStoreGroup="selectedGroupCd"
-                @lngStoreAttrs="changeStoreType"></PickStoreRenew3>
+                @lngStoreAttrs="lngStoreAttrs" :placeholderName="'선택'"></PickStoreRenew3>
         </div>
         <div>
             <PosList :groupCd="groupCd" :storeCd="storeCd" @posNo="posNo" class="!ml-3" :init="init"></posList>
@@ -250,7 +250,9 @@ const initGrid = () => {
 
 }
 
-const changeStoreType = (e) => {
+const selectedStoreAttr = ref()
+const lngStoreAttrs = (e) => {
+    selectedStoreAttr.value = e
     initGrid();
     init.value = !init.value
 }

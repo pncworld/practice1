@@ -44,7 +44,7 @@
          
         </div>
         <div class="ml-10 -mt-10 ">
-          <PickStoreRenew3 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore"  @changeInit="changeInit">
+          <PickStoreRenew3 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore"  @changeInit="changeInit" @lngStoreAttrs="lngStoreAttrs">
           </PickStoreRenew3>
         </div>
         <div></div>
@@ -86,7 +86,7 @@ import { useStore } from 'vuex';
   const afterSearch = ref(false)
   const selectedstartDate = ref()
   const selectedendDate = ref()
-  const hideColumnNow = ref(true)
+  const selectedStoreAttr = ref('')
   const reportType = ref(1)
   const setGroupColumnId = ref('dtmDate')
   const hideColumnsId = ref(['strStore'])
@@ -97,6 +97,7 @@ import { useStore } from 'vuex';
   const endDate = (e) => {
     selectedendDate.value = e
   }
+
   const startTime = ref(0)
   const endTime = ref(23)
   const setGroupFooter = ref(false)
@@ -156,7 +157,7 @@ onMounted(async () => {
      
       reload.value =!reload.value
      
-      const res = await getItemsCancelData(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, reportType.value, cause)
+      const res = await getItemsCancelData(selectedGroup.value, selectedStoreAttrs.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, reportType.value, cause)
       console.log(res)
       rowData.value = res.data.List
   

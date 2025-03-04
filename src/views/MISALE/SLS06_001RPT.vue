@@ -28,7 +28,7 @@
         <label for="daily" class="font-thin inline-flex">
           <input type="checkbox" id="daily" @change="seeStore">
           <!-- <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore" ></PickStorePlural> -->
-          <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle>
+          <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @excelStore="excelStore" @lngStoreAttrs="lngStoreAttrs" @lngStoreTeam="lngStoreTeam" @lngSupervisor="lngSupervisor"></pickStoreSingle>
         </label>
       </div>
     </div>
@@ -50,13 +50,11 @@
   
   <script setup>
   import { getWeedaySalesReport, getWeekDayList } from '@/api/misales';
-  import Datepicker2 from '@/components/Datepicker2.vue';
-  import PickStorePlural from '@/components/pickStorePlural.vue';
-  import pickStoreSingle from '@/components/pickStoreSingle.vue';
-  import Realgrid from '@/components/realgrid.vue';
-  import { ref, onMounted, watch } from 'vue';
-  import { useStore } from 'vuex';
-  import Swal from 'sweetalert2';
+import Datepicker2 from '@/components/Datepicker2.vue';
+import pickStoreSingle from '@/components/pickStoreSingle.vue';
+import Realgrid from '@/components/realgrid.vue';
+import { onMounted, ref, watch } from 'vue';
+import { useStore } from 'vuex';
 
   const setFooterColID = ref(['lngWeekCnt', 'lngCustCnt', 'lngCustAmt', 'lngRecCnt', 'lngRecAmt', 'lngSalAmt', 'lngActAmt', 'lngSumAmt', 'lngAvgCustCnt', 'lngAvgActAmt', 'dblDistRate'])
   const setFooterExpressions = ref(['sum', 'sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'avg', 'sum'])
@@ -172,7 +170,7 @@
       console.log(reportCheckData.value)
 
       const res = await getWeedaySalesReport(
-        selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, reportCheckData.value, selectedWeekDayValue
+        selectedGroup.value, selectedStoreAttrs.value ,selectedStoreTeam.value ,selectedStoreSuperVisor.value ,selectedStorearr, selectedstartDate.value, selectedendDate.value, reportCheckData.value, selectedWeekDayValue
       )
       console.log(res)
       rowData.value = res.data.weekdaySales
@@ -193,6 +191,8 @@
   const selectedGroup = ref()
   const selectedStores = ref()
   const selectedStoreAttrs = ref()
+  const selectedStoreTeam = ref()
+  const selectedStoreSuperVisor = ref()
   const lngStoreGroup = (e) => {
     initGrid()
     console.log(e)
@@ -207,6 +207,16 @@
   const lngStoreAttrs = (e) => {
     initGrid()
     selectedStoreAttrs.value = e
+    console.log(e)
+  }
+  const lngSupervisor = (e) => {
+    initGrid()
+    selectedStoreSuperVisor.value = e
+    console.log(e)
+  }
+  const lngStoreTeam = (e) => {
+    initGrid()
+    selectedStoreTeam.value = e
     console.log(e)
   }
   

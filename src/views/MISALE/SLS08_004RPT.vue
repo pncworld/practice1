@@ -37,7 +37,7 @@
           
         </div>
         <div class="ml-10 mt-2">
-          <PickStoreSingle2 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore"  @changeInit="changeInit">
+          <PickStoreSingle2 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore"  @changeInit="changeInit" @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam" @lngStoreAttrs="lngStoreAttrs">
           </PickStoreSingle2>
         </div>
         <div></div>
@@ -128,7 +128,7 @@ onMounted(async () => {
      
       reload.value =!reload.value
      
-      const res = await getSalesChangeData(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, '1', cause)
+      const res = await getSalesChangeData(selectedGroup.value,selectedStoreAttrs.value , selectedStoreTeam.value , selectedStoreSuperVisor.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, '1', cause)
       console.log(res)
       rowData.value = res.data.List
   
@@ -170,7 +170,7 @@ onMounted(async () => {
       progid.value = 2
       reload.value =!reload.value
      
-      const res = await getSalesChangeDetailData(selectedGroup.value, selectedStores.value, selectedstartDate.value, selectedendDate.value, '12', cause)
+      const res = await getSalesChangeDetailData(selectedGroup.value, selectedStoreAttrs.value , selectedStoreTeam.value , selectedStoreSuperVisor.value ,selectedStores.value, selectedstartDate.value, selectedendDate.value, '12', cause)
       console.log(res)
       rowData.value = res.data.List
   
@@ -190,6 +190,8 @@ onMounted(async () => {
   const selectedGroup = ref()
   const selectedStores = ref()
   const selectedStoreAttrs = ref()
+  const selectedStoreTeam = ref()
+  const selectedStoreSuperVisor = ref()
   const lngStoreGroup = (e) => {
     console.log(e)
     selectedGroup.value = e
@@ -200,6 +202,14 @@ onMounted(async () => {
   }
   const lngStoreAttrs = (e) => {
     selectedStoreAttrs.value = e
+    console.log(e)
+  }
+  const lngSupervisor = (e) => {
+    selectedStoreSuperVisor.value = e
+    console.log(e)
+  }
+  const lngStoreTeam = (e) => {
+    selectedStoreTeam.value = e
     console.log(e)
   }
   

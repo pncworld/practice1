@@ -41,7 +41,7 @@
         <label for="daily" class="font-thin inline-flex">
           <input type="checkbox" id="daily" @change="seeStore">
           <!-- <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore" ></PickStorePlural> -->
-          <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle>
+          <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @excelStore="excelStore" @lngStoreAttrs="lngStoreAttrs" @lngStoreTeam="lngStoreTeam" @lngSupervisor="lngSupervisor"></pickStoreSingle>
         </label>
       </div>
     </div>
@@ -62,14 +62,13 @@
   </template>
   
   <script setup>
-  import { getCardSalesSumReport, getCardCorp } from '@/api/misales';
-  import Datepicker2 from '@/components/Datepicker2.vue';
-  import PickStorePlural from '@/components/pickStorePlural.vue';
-  import pickStoreSingle from '@/components/pickStoreSingle.vue';
-  import Realgrid from '@/components/realgrid.vue';
-  import { ref, onMounted, watch } from 'vue';
-  import { useStore } from 'vuex';
-  import Swal from 'sweetalert2';
+  import { getCardCorp, getCardSalesSumReport } from '@/api/misales';
+import Datepicker2 from '@/components/Datepicker2.vue';
+import pickStoreSingle from '@/components/pickStoreSingle.vue';
+import Realgrid from '@/components/realgrid.vue';
+import Swal from 'sweetalert2';
+import { onMounted, ref, watch } from 'vue';
+import { useStore } from 'vuex';
 
   const setFooterColID = ref(['lngTotalCnt', 'lngTotalAmt', 'lngApprovalCnt', 'lngApprovalAmt', 'lngCancleCnt', 'lngCancleAmt', 'lngSumCnt', 'lngSumAmt', 'lngCommission'])
   const setFooterExpressions = ref(['sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum'])
@@ -197,7 +196,7 @@
       console.log(reportCheckData.value)
 
       const res = await getCardSalesSumReport(
-        selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, reportCheckData.value, selectedRadioBox.value, selectedBuyCodeValue
+        selectedGroup.value, selectedStoreAttrs.value, selectedStoreTeam.value , selectedStoreSuperVisor.value , selectedStorearr, selectedstartDate.value, selectedendDate.value, reportCheckData.value, selectedRadioBox.value, selectedBuyCodeValue
       )
       console.log(res)
       rowData.value = res.data.cardSalesSum
@@ -218,6 +217,8 @@
   const selectedGroup = ref()
   const selectedStores = ref()
   const selectedStoreAttrs = ref()
+  const selectedStoreTeam = ref()
+  const selectedStoreSuperVisor = ref()
   const lngStoreGroup = (e) => {
     initGrid()
     console.log(e)
@@ -232,6 +233,16 @@
   const lngStoreAttrs = (e) => {
     initGrid()
     selectedStoreAttrs.value = e
+    console.log(e)
+  }
+  const lngSupervisor = (e) => {
+    initGrid()
+    selectedStoreSuperVisor.value = e
+    console.log(e)
+  }
+  const lngStoreTeam = (e) => {
+    initGrid()
+    selectedStoreTeam.value = e
     console.log(e)
   }
   
