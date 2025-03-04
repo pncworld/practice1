@@ -19,7 +19,7 @@
     :disabled="disabled1"
     label="strName"
     :placeholder="defaultPlaceHolder"
-    class="!w-72 !h-7 -mt-3 custom-select disabled:bg-gray-300"
+    class="!w-72 !h-7 -mt-3 custom-select"
     :clearable="!disabled1"
     @click="resetSelectedStore"
   />
@@ -193,11 +193,14 @@ watch(selectedStore , () => {
 )
 
 const resetSelectedStore = (e) => {
-  //selectedStore.value = null
+  if (store.state.userData.blnBrandAdmin == 'True' || store.state.userData.lngPositionType == '1') {
+    selectedStore.value = null
+  } 
+ 
 }
 </script>
 
-<style>
+<style >
 .custom-select .vs__dropdown-toggle {
   border: 1px solid #d1d5db !important; /* 전체 테두리 */
   border-radius: 0.375rem !important; /* Tailwind rounded-md */
@@ -267,5 +270,13 @@ const resetSelectedStore = (e) => {
   outline: none !important;
 }
 
+.vs--disabled .vs__dropdown-toggle{
+  background-color: #d1d5db !important;
+  color: white !important; /* 텍스트 색상도 변경 */
+  border-color: #d1d5db !important;
+}
+
+
 </style>
+
 

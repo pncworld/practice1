@@ -13,9 +13,17 @@
             </select></div>
         <div class="w-44">
             <div class="w-44 !h-7">
-                <v-select v-model="selectedStoreList" :options="rowData" label="strName" :placeholder="placeHolderNm"
-                    class="w-80 custom-select2  " :reduce="store => store != null ? store.lngStoreCode : null"
-                    clearable="true" @click="clickPosNo" :disabled="disabled1"/>
+              <v-select 
+  v-model="selectedStoreList" 
+  :options="rowData" 
+  label="strName" 
+  :placeholder="placeHolderNm"
+  class="custom-select2 w-80"
+  clearable="true"
+  @click="clickPosNo" 
+  :disabled="disabled1"
+  :reduce="store => store.lngStoreCode"
+/>
 
             </div>
         </div>
@@ -45,9 +53,18 @@
                 class="bg-white border w-44 ml-4 rounded-lg h-7 disabled:bg-gray-100 text-center overflow-hidden"
                 @click="showStoreList" :disabled="settingDisable == 1" v-model="selectedStoreList"> -->
 
-                <v-select v-model="selectedStoreList" :options="rowData" label="strName" :placeholder="placeHolderNm"
-                    class=" custom-select4 mr-10" :reduce="store => store != null ? store.lngStoreCode : null"
-                    clearable="true" @click="clickPosNo" :disabled="disabled1" />
+                <v-select 
+  v-model="selectedStoreList" 
+  :options="rowData" 
+  label="strName" 
+  :placeholder="placeHolderNm"
+  class="custom-select4 mr-10"
+  clearable="true"
+  @click="clickPosNo" 
+  :disabled="disabled1"
+  :reduce="store => store.lngStoreCode"
+/>
+
 
         </div>
     </div>
@@ -98,7 +115,7 @@ onMounted(() => {
     placeHolderNm.value = props.placeholderName
     storeGroup.value = store.state.storeGroup
     storeType.value = store.state.storeType
-    console.log(store.state.storeType)
+ 
     storeTeam.value = store.state.storeTeamCode
     storeSuperVisor.value = store.state.storeSupervisor
     rowData.value = store.state.storeCd
@@ -107,7 +124,7 @@ onMounted(() => {
         disabled1.value = false
         emit('lngStoreGroup', store.state.storeGroup[0].lngStoreGroup)
 
-        emit('lngStoreCodes', store.state.storeCd.map(item => item.lngStoreCode).join(','))
+        emit('lngStoreCode', store.state.storeCd.map(item => item.lngStoreCode).join(','))
         console.log(store.state.storeCd)
 
         emit('lngStoreAttrs', 0)
@@ -115,29 +132,32 @@ onMounted(() => {
         emit('lngStoreTeam', 0)
         emit('excelStore', '매장명 : 전체')
     } else {
-        disabled1.value = true
+      
         emit('lngStoreGroup', store.state.userData.lngStoreGroup)
-        emit('lngStoreCodes', store.state.userData.lngPosition)
+        emit('lngStoreCode', store.state.userData.lngPosition)
         emit('lngStoreAttrs', store.state.userData.lngJoinType)
         emit('lngSupervisor', store.state.userData.lngSupervisor)
         emit('lngStoreTeam', store.state.userData.lngTeamCode)
         emit('excelStore', '매장명 : ' + store.state.userData.strStoreName)
         selectedStoreType.value = store.state.userData.lngJoinType
-        selectedStoreList.value = store.state.userData.strStoreName
+        selectedStoreList.value = Number(store.state.userData.lngPosition)
+        console.log(selectedStoreList.value)
         selectedStoreTeam.value = store.state.userData.lngTeamCode
         selectedSuperVisor.value = store.state.userData.lngSupervisor
+        disabled1.value = true
+     
     }
-    labelsData.value.push(store.state.storeGroup.map(item => item.strName))
-    valuesData.value.push(store.state.storeGroup.map(item => item.lngStoreGroup))
+    // labelsData.value.push(store.state.storeGroup.map(item => item.strName))
+    // valuesData.value.push(store.state.storeGroup.map(item => item.lngStoreGroup))
 
-    labelsData.value.push(store.state.storeType.map(item => item.strName))
-    valuesData.value.push(store.state.storeType.map(item => item.lngStoreAttr))
+    // labelsData.value.push(store.state.storeType.map(item => item.strName))
+    // valuesData.value.push(store.state.storeType.map(item => item.lngStoreAttr))
 
-    labelsData.value.push(store.state.storeTeamCode.map(item => item.strTeamName))
-    valuesData.value.push(store.state.storeTeamCode.map(item => item.lngTeamCode))
+    // labelsData.value.push(store.state.storeTeamCode.map(item => item.strTeamName))
+    // valuesData.value.push(store.state.storeTeamCode.map(item => item.lngTeamCode))
 
-    labelsData.value.push(store.state.storeSupervisor.map(item => item.strName))
-    valuesData.value.push(store.state.storeSupervisor.map(item => item.lngSupervisor))
+    // labelsData.value.push(store.state.storeSupervisor.map(item => item.strName))
+    // valuesData.value.push(store.state.storeSupervisor.map(item => item.lngSupervisor))
 
 
 
@@ -149,7 +169,10 @@ watch(selectedStoreType, (newValue) => {
     } else {
         rowData.value = store.state.storeCd.filter(item => item.lngStoreAttr == selectedStoreType.value)
     }
-    selectedStoreList.value = null
+    if (store.state.userData.blnBrandAdmin == 'True' || store.state.userData.lngPositionType == '1') {
+        selectedStoreList.value = null
+    }
+  
     emit('lngStoreAttrs', selectedStoreType.value)
     emit('changeInit', true)
 })
@@ -163,7 +186,9 @@ watch(selectedStoreTeam, (newValue) => {
         storeSuperVisor.value = store.state.storeSupervisor.filter(item => item.lngTeamCode == selectedStoreTeam.value)
     }
     selectedSuperVisor.value = -1;
-    selectedStoreList.value = null
+    if (store.state.userData.blnBrandAdmin == 'True' || store.state.userData.lngPositionType == '1') {
+        selectedStoreList.value = null
+    }
     emit('lngStoreTeam', selectedStoreTeam.value)
     emit('changeInit', true)
 
@@ -186,7 +211,9 @@ watch(selectedSuperVisor, (newValue) => {
     }
     emit('lngSupervisor', selectedSuperVisor.value)
     emit('changeInit', true)
-    selectedStoreList.value = null
+    if (store.state.userData.blnBrandAdmin == 'True' || store.state.userData.lngPositionType == '1') {
+        selectedStoreList.value = null
+    }
 })
 
 
@@ -218,3 +245,13 @@ const initSearchBox = (e) => {
 }
 
 </script>
+
+<style>
+.vs--disabled .vs__dropdown-toggle{
+  background-color: #d1d5db !important;
+  color: black !important; /* 텍스트 색상도 변경 */
+
+  border-color: #d1d5db !important;
+}
+
+</style>
