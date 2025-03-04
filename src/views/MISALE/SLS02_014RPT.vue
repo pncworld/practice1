@@ -28,13 +28,13 @@
                 @change="seeUnite">셀병합</label>
           </div> -->
           <div>
-            <label for="sum" class="font-thin"><input type="checkbox" id="sum" class="ml-5 "
+            <label for="sum" class="font-thin"><input type="checkbox" id="sum" class="ml-5"
                 @change="seeSum">합계</label>
           </div>
         </div>
       </div>
       <div class="ml-10">
-        <PickStorePlural2 @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore" ></PickStorePlural2>
+        <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"  ></PickStorePlural>
       </div>
     </div>
     <div class="w-full h-[85%]">
@@ -50,13 +50,12 @@
   
   <script setup>
   import { getAreaIndustrySalesReport } from '@/api/misales';
-  import Datepicker2 from '@/components/Datepicker2.vue';
-  import PickStorePlural from '@/components/pickStorePlural.vue';
-import PickStorePlural2 from '@/components/pickStorePlural2.vue';
-  import Realgrid from '@/components/realgrid.vue';
-  import Swal from 'sweetalert2';
-  import { ref } from 'vue';
-  import { useStore } from 'vuex';
+import Datepicker2 from '@/components/Datepicker2.vue';
+import PickStorePlural from '@/components/pickStorePlural.vue';
+
+import Realgrid from '@/components/realgrid.vue';
+import { ref } from 'vue';
+import { useStore } from 'vuex';
   
   const setGroupFooter = ref(false)
   const setFooterColID = ref(['strStore', 'lngRecCnt', 'lngRecAmt', 'lngCustCnt', 'lngCustAmt', 'lngSalAmt', 'lngDiscountAmt', 'lngTotAmt', 'lngVAT', 'lngSupplyAmt', 'dblDistRate', 'lngWorkDay', 'lngActAvg', 'lngStoreCode'])

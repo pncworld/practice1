@@ -18,9 +18,9 @@
   </div>
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore10 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo"
+    <PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" :showPosNo="true" :showPayType="true"
       @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @update:ischanged2="searchinit"
-      @updatePaymentType="updatePaymentType"></PickStore10>
+      @updatePaymentType="updatePaymentType"></PickStore>
   </div>
   <div class="z-50">
     <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd"
@@ -176,15 +176,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
 import { getAllScreenList, getFuncKeyList, getFuncKeys, saveAllFuncKey } from '@/api/master';
-import { VueDraggableNext } from 'vue-draggable-next';
-import Swal from 'sweetalert2';
 import Realgrid from '@/components/realgrid.vue';
+import Swal from 'sweetalert2';
+import { onMounted, ref, watch } from 'vue';
+import { VueDraggableNext } from 'vue-draggable-next';
+import { useStore } from 'vuex';
 
-import PickStore10 from '@/components/pickStore10.vue';
 import DupliPopUp from '@/components/dupliPopUp.vue';
+import PickStore from '@/components/pickStore.vue';
 
 
 
@@ -759,7 +759,7 @@ const currentpaymentCd = ref(3)
 const updatePaymentType = (newValue) => {
   console.log(newValue)
   currentpaymentCd.value = newValue
-  if (newValue == 1) {
+  if (newValue == 3) {
     showOtherKeys.value = false
     currentpaymentType.value = "기본"
   } else {
@@ -777,7 +777,7 @@ const handlePosNo = (newValue) => {
   posNo.value = newValue
   console.log(posNo.value)
   console.log(nowStoreAreaCd.value)
-  if (nowStoreAreaCd.value != undefined || posNo.value != undefined) {
+  if (nowStoreAreaCd.value != undefined && (posNo.value != undefined && posNo.value != 0)) {
     searchButton()
   }
 

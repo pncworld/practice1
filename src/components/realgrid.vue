@@ -608,8 +608,10 @@ const funcshowGrid = async () => {
   if (props.setNumberformatColumn != '') {
 
     let formatcolumn = columns.find(item => item.fieldName == props.setNumberformatColumn)
-
-    formatcolumn.numberFormat = "#,##0.00";
+    if(formatcolumn){
+      formatcolumn.numberFormat = "#,##0.00";
+    }
+   
   }
 
   if (props.setRowGroupSpan != '') {

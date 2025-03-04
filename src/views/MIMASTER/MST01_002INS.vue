@@ -18,9 +18,8 @@
 
   </div>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center mt-3">
-    <PickStore3 @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd" @storeNm="handlestoreNm"
-      @GroupNm="handleGroupNm" @update:ischanged="handleinitAll">
-    </PickStore3>
+    <PickStore @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd" >
+    </PickStore>
     <input type="text" v-model="searchStoreName" class="rounded-lg h-[53%] items-center border border-black"
       :disabled="allstrore" @keydown.enter="searchButton">
   </div>
@@ -264,13 +263,13 @@
 </template>
 
 <script setup>
+import { getGridInfoList } from '@/api/common';
+import { getstoreInfo, saveStoreInfo } from '@/api/master';
+import PickStore from '@/components/pickStore.vue';
+import Realgrid from '@/components/realgrid.vue';
+import Swal from 'sweetalert2';
 import { ref, watch } from 'vue';
 import { useStore } from 'vuex';
-import PickStore3 from '@/components/pickStore3.vue';
-import { getGridInfoList } from '@/api/common';
-import Swal from 'sweetalert2';
-import { getstoreInfo, saveStoreInfo } from '@/api/master';
-import Realgrid from '@/components/realgrid.vue';
 
 const result = ref([]);
 const store = useStore();

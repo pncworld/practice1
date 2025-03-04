@@ -19,7 +19,7 @@
     <br>
 
     <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-        <PickStore4 @update:storeAreaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd"></PickStore4>
+        <PickStore @update:storeAreaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" :showAreaCd="true"></PickStore>
     </div>
     <div class="inline-block md:flex w-full">
         <span class=" md:hidden font-bold flex justify-center w-auto "> 클릭하시면 아래 페이지에서 다국어 정보가 나옵니다.</span>
@@ -129,9 +129,7 @@
 <script setup>
 
 import { getCategoryInfo, getMultiLingual, setMainCategoryDELETE, setMainCategoryINSERT, setMainCategoryUpdate, setSubCategoryDelete, setSubCategoryINSERT, setSubCategoryUPDATE } from '@/api/master';
-import Loading from '@/components/loading.vue';
-import PickStore4 from '@/components/pickStore4.vue';
-import axios from 'axios';
+import PickStore from '@/components/pickStore.vue';
 import Swal from 'sweetalert2';
 import { ref, watch } from 'vue';
 import { useStore } from 'vuex';

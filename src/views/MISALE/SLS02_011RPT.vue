@@ -20,8 +20,8 @@
             <Datepicker1 @dateValue="dateValue" @year="year" @month="month" @day="day"></Datepicker1>
         </div>
         <div>
-            <PickStoreRenew @update:storeCd="selectedStoreCd" @update:storeGroup="selectedGroupCd"
-                @update:storeType="changeStoreType"></pickStoreRenew>
+            <PickStoreRenew3 @lngStoreCode="selectedStoreCd" @lngStoreGroup="selectedGroupCd"
+                @lngStoreAttrs="changeStoreType"></PickStoreRenew3>
         </div>
         <div>
             <PosList :groupCd="groupCd" :storeCd="storeCd" @posNo="posNo" class="!ml-3" :init="init"></posList>
@@ -70,12 +70,11 @@ import { getCustInfo, getOrderInfo, getPayInfo, getReceiptDatas } from '@/api/mi
 import Datepicker1 from '@/components/Datepicker1.vue';
 import DisCountCdList from '@/components/disCountCdList.vue';
 import PayCodeList from '@/components/payCodeList.vue';
-import PickStorePlural from '@/components/pickStorePlural.vue';
-import PickStoreRenew from '@/components/pickStoreRenew.vue';
+import PickStoreRenew3 from '@/components/pickStoreRenew.vue';
 import PosList from '@/components/posList.vue';
 import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { useStore } from 'vuex';
 const selectedDate = ref()
 

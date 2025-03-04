@@ -62,8 +62,8 @@
         </div>
       </div>
       <div class="ml-10 -mt-10">
-        <PickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore">
-        </PickStoreSingle>
+        <PickStoreSingle2 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore">
+        </PickStoreSingle2>
       </div>
       <div></div>
 
@@ -83,12 +83,10 @@
 </template>
 
 <script setup>
-import { getDailySalesDetailReport, getDailySalesReport, getTimeSalesReport } from '@/api/misales';
+import { getTimeSalesReport } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
-import PickStorePlural from '@/components/pickStorePlural.vue';
-import PickStoreSingle from '@/components/pickStoreSingle.vue';
+import PickStoreSingle2 from '@/components/pickStoreSingle.vue';
 import Realgrid from '@/components/realgrid.vue';
-import { excelTitle } from '@/customFunc/customFunc';
 import { ref } from 'vue';
 import { useStore } from 'vuex';
 

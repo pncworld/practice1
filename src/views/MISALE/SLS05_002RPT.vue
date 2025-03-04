@@ -34,7 +34,7 @@
       </div>
       <div class="h-[75%] ml-12">
         <!-- <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore" ></PickStorePlural> -->
-        <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle>
+        <PickStoreSingle2 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></PickStoreSingle2>
       </div>
     </div>
     <div class="w-full h-[82%]">
@@ -53,13 +53,11 @@
   </template>
   
   <script setup>
-  import { getCardSalesDetailReport, getCardCorp } from '@/api/misales';
-  import Datepicker2 from '@/components/Datepicker2.vue';
-  import PickStorePlural from '@/components/pickStorePlural.vue';
-  import pickStoreSingle from '@/components/pickStoreSingle.vue';
-  import Realgrid from '@/components/realgrid.vue';
-  import { ref, onMounted, watch } from 'vue';
-  import { useStore } from 'vuex';
+  import { getCardCorp, getCardSalesDetailReport } from '@/api/misales';
+import Datepicker2 from '@/components/Datepicker2.vue';
+import Realgrid from '@/components/realgrid.vue';
+import { onMounted, ref, watch } from 'vue';
+import { useStore } from 'vuex';
   
   const setFooterColID = ref(['lngAmount'])
   const setFooterExpressions = ref(['sum'])

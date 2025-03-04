@@ -18,8 +18,8 @@
   </div>
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore5 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo"
-      @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @update:ischanged2="searchinit"></PickStore5>
+    <PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" :showPosNo="true"
+      @storeNm="handlestoreNm" @update:ischanged="handleinitAll" @update:ischanged2="searchinit"></PickStore>
   </div>
   <div class="z-50">
     <DupliPopUp :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd"
@@ -103,15 +103,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
-import { getAgeList, getAllScreenList, getCustomorList, getFuncKeyList, getFuncKeys, saveAllAge, saveAllCustomor, saveAllFuncKey, saveAllFuncKey2 } from '@/api/master';
-import { VueDraggableNext } from 'vue-draggable-next';
-import Swal from 'sweetalert2';
-import Realgrid from '@/components/realgrid.vue';
+import { getAgeList, getAllScreenList, saveAllAge } from '@/api/master';
 import DupliPopUp from '@/components/dupliPopUp.vue';
+import Realgrid from '@/components/realgrid.vue';
+import Swal from 'sweetalert2';
+import { onMounted, ref, watch } from 'vue';
+import { VueDraggableNext } from 'vue-draggable-next';
+import { useStore } from 'vuex';
 
-import PickStore5 from '@/components/pickStore5.vue';
+import PickStore from '@/components/pickStore.vue';
 
 
 
@@ -531,7 +531,7 @@ const handlePosNo = (newValue) => {
   posNo.value = newValue
   // console.log(posNo.value)
   // console.log(nowStoreAreaCd.value)
-  if (nowStoreAreaCd.value != undefined || posNo.value != undefined) {
+  if (nowStoreAreaCd.value != undefined || (posNo.value != undefined && posNo.value != 0)) {
     searchButton()
   }
 

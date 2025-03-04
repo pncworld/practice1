@@ -27,8 +27,8 @@
       </div>
     </div>
     <div class="ml-10">
-      <PickStorePlural2 @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore">
-      </PickStorePlural2>
+      <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore">
+      </PickStorePlural>
     </div>
     <div></div>
 
@@ -48,9 +48,7 @@
 import { getDailySalesDetailReport, getDailySalesReport } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStorePlural from '@/components/pickStorePlural.vue';
-import PickStorePlural2 from '@/components/pickStorePlural2.vue';
 import Realgrid from '@/components/realgrid.vue';
-import Swal from 'sweetalert2';
 import { ref } from 'vue';
 import { useStore } from 'vuex';
 

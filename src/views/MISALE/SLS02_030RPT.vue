@@ -37,9 +37,9 @@
                 </div>
             </div>
             <div class="ml-10">
-                <PickStorePlural2 @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam"
+                <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam"
                     @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore">
-                </PickStorePlural2>
+                </PickStorePlural>
                 <div class="text-red-500 h-5 mt-2 flex justify-end mr-3" ><div v-show="afterSearch">{{currentTime}}에 조회되었으며 미결제금액은 조회 시간 기준입니다.</div></div>
             </div>
             <div></div>
@@ -55,13 +55,11 @@
 </template>
 
 <script setup>
-import { getDailySalesDetailReport, getDailySalesReport, getRealTimeReport } from '@/api/misales';
+import { getRealTimeReport } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStorePlural from '@/components/pickStorePlural.vue';
-import PickStorePlural2 from '@/components/pickStorePlural2.vue';
 import Realgrid from '@/components/realgrid.vue';
 import { formatTime } from '@/customFunc/customFunc';
-import Swal from 'sweetalert2';
 import { ref } from 'vue';
 import { useStore } from 'vuex';
 

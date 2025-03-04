@@ -13,8 +13,8 @@
   </div>
   <br>
   <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore5 @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo"
-      @storeNm="handlestoreNm" @update:ischanged="handleinitAll"></PickStore5>
+    <PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" :showPosNo="true"
+      @storeNm="handlestoreNm" @update:ischanged="handleinitAll"></PickStore>
   </div>
   <div class="z-[90]">
     <DupliPopUp6 :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm"
@@ -196,16 +196,15 @@
 
 <script setup>
 import { getTableList, getTableScreenKeys, saveScreenKeys3, saveTables } from '@/api/master';
-import DupliPopUp5 from '@/components/dupliPopUp5.vue';
 import DupliPopUp6 from '@/components/dupliPopUp6.vue';
-import PickStore5 from '@/components/pickStore5.vue';
+import PickStore from '@/components/pickStore.vue';
 
 import { GridStack } from 'gridstack';
 import "gridstack/dist/gridstack.min.css";
 
 
 import Swal from 'sweetalert2';
-import { computed, nextTick, onActivated, onDeactivated, onMounted, ref, watch } from 'vue';
+import { onActivated, onDeactivated, onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 const ScreenKeyOrigin = ref([])
@@ -316,7 +315,7 @@ const handlestoreNm = (newValue) => {
 const handlePosNo = (newValue) => {
   posNo.value = newValue
   console.log(posNo.value)
-  if (nowStoreAreaCd.value != undefined || posNo.value != undefined) {
+  if (nowStoreAreaCd.value != undefined && (posNo.value != undefined && posNo.value != 0)) {
     searchButton()
   }
 

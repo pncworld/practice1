@@ -122,9 +122,9 @@
                 </div>
             </div>
             <div class="ml-10 -mt-14">
-                <PickStorePlural2 @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam"
+                <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam"
                     @lngStoreAttr="lngStoreAttr" @excelStore="excelStore" :setFooterColID="setFooterColID" :setFooterExpressions="setFooterExpressions">
-                </PickStorePlural2>
+                </PickStorePlural>
                 
             </div>
             <div></div>
@@ -143,13 +143,11 @@
 </template>
 
 <script setup>
-import { getDailySalesDetailReport, getDailySalesReport, getRealTimeReport, getSalesReportByMenu, getTableSearchCondition } from '@/api/misales';
+import { getSalesReportByMenu, getTableSearchCondition } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStorePlural from '@/components/pickStorePlural.vue';
-import PickStorePlural2 from '@/components/pickStorePlural2.vue';
 import Realgrid from '@/components/realgrid.vue';
 import { formatTime } from '@/customFunc/customFunc';
-import Swal from 'sweetalert2';
 import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 

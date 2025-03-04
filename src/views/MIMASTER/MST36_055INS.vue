@@ -19,8 +19,8 @@
 
     </div>
     <div class="flex justify-start  space-x-5 bg-gray-200 rounded-lg h-16 items-center mt-3">
-      <PickStore11 @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd" @storeNm="storeNm">
-      </PickStore11>
+      <PickStore @update:storeGroup="handleGroupCd" @update:storeCd="handleStoreCd" @storeNm="storeNm">
+      </PickStore>
     </div>
     <div class="z-50">
       <DupliPopUp7 :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="storeCd" :storeNm="clickStoreNm"
@@ -59,7 +59,7 @@
 import { getAllPayList, saveStorePayCd } from '@/api/master';
 
 import DupliPopUp7 from '@/components/dupliPopUp7.vue';
-import PickStore11 from '@/components/pickStore11.vue';
+import PickStore from '@/components/pickStore.vue';
 
 
 import Realgrid from '@/components/realgrid.vue';

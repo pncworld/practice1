@@ -42,8 +42,8 @@
           </div>
         </div>
         <div class="ml-10 -mt-10">
-          <PickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore" @changeInit="changeInit">
-          </PickStoreSingle>
+          <PickStoreSingle2 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore" @changeInit="changeInit">
+          </PickStoreSingle2>
         </div>
         <div></div>
   
@@ -61,10 +61,9 @@
   </template>
   
   <script setup>
-  import { getCauseList, getSalesCancelData, getTimeSalesReport } from '@/api/misales';
+  import { getCauseList, getSalesCancelData } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
-import PickStoreSingle from '@/components/pickStoreSingle.vue';
-import PickStoreSingle2 from '@/components/pickStoreSingle2.vue';
+import PickStoreSingle2 from '@/components/pickStoreSingle.vue';
 import Realgrid from '@/components/realgrid.vue';
 import { insertPageLog } from '@/customFunc/customFunc';
 import { onMounted, ref } from 'vue';

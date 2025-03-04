@@ -98,7 +98,7 @@
 <script setup>
 import { getSalesDayReportByPos } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
-import PickStoreRenew3 from '@/components/pickStoreRenew3.vue';
+import PickStoreRenew3 from '@/components/pickStoreRenew.vue';
 import PosList from '@/components/posList.vue';
 import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';

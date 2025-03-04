@@ -34,7 +34,7 @@
       </div>
       <div class="h-[75%] ml-5">
           <!-- <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle> -->
-          <pickStoreRenew2 @update:storeCd="selectedStoreCd" @update:storeGroup="selectedGroupCd" @update:storeType="changeStoreType"></pickStoreRenew2>
+          <pickStoreRenew @update:storeCd="selectedStoreCd" @update:storeGroup="selectedGroupCd" @update:storeType="changeStoreType"></pickStoreRenew>
       </div>
     </div>
     <div class="w-full h-[82%]">
@@ -52,7 +52,7 @@
   <script setup>
   import { getWeedaySalesReport, getWeekDayList } from '@/api/misales';
   import Datepicker2 from '@/components/Datepicker2.vue';
-  import pickStoreRenew2 from '@/components/pickStoreRenew2.vue';
+  import pickStoreRenew from '@/components/pickStoreRenew.vue';
   import Realgrid from '@/components/realgrid.vue';
   import { ref, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';

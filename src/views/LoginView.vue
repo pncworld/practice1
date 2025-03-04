@@ -81,9 +81,9 @@ const login2 = async () => {
      } 
       await readPrograms();
       const readsales = async() => {
-      const response = await get_store_list(store.state.userData.lngStoreGroup);
+      const response = await get_store_list(store.state.userData.lngStoreGroup,store.state.userData.lngPositionType,store.state.userData.blnBrandAdmin == 'False' ? 0 : 1,store.state.userData.lngPosition,store.state.userData.lngJoinType,store.state.userData.lngTeamCode,store.state.userData.lngSupervisor);
         
-     
+       console.log(response)
        const result0 = response.data.storeGroup
        const result1 = response.data.storeAttr
        const result2 = response.data.store
