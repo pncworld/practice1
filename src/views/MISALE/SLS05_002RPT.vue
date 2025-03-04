@@ -53,13 +53,11 @@
   </template>
   
   <script setup>
-  import { getCardSalesDetailReport, getCardCorp } from '@/api/misales';
-  import Datepicker2 from '@/components/Datepicker2.vue';
-  import PickStorePlural from '@/components/pickStorePlural.vue';
-  import pickStoreSingle from '@/components/pickStoreSingle.vue';
-  import Realgrid from '@/components/realgrid.vue';
-  import { ref, onMounted, watch } from 'vue';
-  import { useStore } from 'vuex';
+  import { getCardCorp, getCardSalesDetailReport } from '@/api/misales';
+import Datepicker2 from '@/components/Datepicker2.vue';
+import Realgrid from '@/components/realgrid.vue';
+import { onMounted, ref, watch } from 'vue';
+import { useStore } from 'vuex';
   
   const setFooterColID = ref(['lngAmount'])
   const setFooterExpressions = ref(['sum'])
