@@ -49,7 +49,7 @@
         </div>
 
       </div>
-      <div class="ml-10 -mt-10">
+      <div class="ml-20 -mt-10">
         <PickStoreRenew3 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore" @lngStoreAttrs="lngStoreAttrs"
           @changeInit="changeInit">
         </PickStoreRenew3>
