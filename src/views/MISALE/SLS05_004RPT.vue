@@ -40,8 +40,7 @@
       <div class="h-[75%] ml-5">
         <label for="daily" class="font-thin inline-flex">
           <input type="checkbox" id="daily" @change="seeStore">
-          <!-- <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore" ></PickStorePlural> -->
-          <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @excelStore="excelStore" @lngStoreAttrs="lngStoreAttrs" @lngStoreTeam="lngStoreTeam" @lngSupervisor="lngSupervisor"></pickStoreSingle>
+          <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle>
         </label>
       </div>
     </div>
@@ -62,13 +61,13 @@
   </template>
   
   <script setup>
-  import { getCardCorp, getCardSalesSumReport } from '@/api/misales';
-import Datepicker2 from '@/components/Datepicker2.vue';
-import pickStoreSingle from '@/components/pickStoreSingle.vue';
-import Realgrid from '@/components/realgrid.vue';
-import Swal from 'sweetalert2';
-import { onMounted, ref, watch } from 'vue';
-import { useStore } from 'vuex';
+  import { getCardSalesSumReport, getCardCorp } from '@/api/misales';
+  import Datepicker2 from '@/components/Datepicker2.vue';
+  import pickStoreSingle from '@/components/pickStoreSingle.vue';
+  import Realgrid from '@/components/realgrid.vue';
+  import { ref, onMounted, watch } from 'vue';
+  import { useStore } from 'vuex';
+  import Swal from 'sweetalert2';
 
   const setFooterColID = ref(['lngTotalCnt', 'lngTotalAmt', 'lngApprovalCnt', 'lngApprovalAmt', 'lngCancleCnt', 'lngCancleAmt', 'lngSumCnt', 'lngSumAmt', 'lngCommission'])
   const setFooterExpressions = ref(['sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum'])

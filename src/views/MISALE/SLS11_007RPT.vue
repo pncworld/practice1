@@ -34,50 +34,45 @@
         </div>
       </div>
       <div class="h-[75%] ml-5">
-        <!-- <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle> -->
-        <pickStoreRenew @lngStoreCode="selectedStoreCd" @lngStoreGroup="selectedGroupCd"
-        @lngStoreAttrs="changeStoreType"></pickStoreRenew>
+          <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle>
+          <!-- <pickStoreRenew @update:storeCd="selectedStoreCd" @update:storeGroup="selectedGroupCd" @update:storeType="changeStoreType"></pickStoreRenew> -->
       </div>
     </div>
     <div class="w-full h-[82%]">
-      <Realgrid :progname="'SLS06_001RPT_VUE'" :progid="progId" :rowData="rowData" :reload="reload" :setFooter="true"
-        :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID" :setGroupFooter="setGroupFooter"
-        :setGroupColumnId="setGroupColumnId" :setGroupSumCustomText="['소계']"
-        :setGroupSumCustomColumnId="setGroupSumCustomColumnId" :setGroupSumCustomLevel="3"
-        :setGroupSummaryCenterIds="setGroupSummaryCenterIds" :setGroupFooterExpressions="setGroupFooterExpressions"
-        :setGroupFooterColID="setGroupFooterColID" :documentTitle="'SLS06_001RPT'" :documentSubTitle="documentSubTitle"
-        :exporttoExcel="exportExcel">
+      <Realgrid :progname="'SLS11_007RPT_VUE'" :progid="progId" :rowData="rowData" :reload="reload" 
+        :setFooter="true" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
+        :setGroupFooter="setGroupFooter" :setGroupColumnId="setGroupColumnId" :setGroupSumCustomText="['소계']" 
+        :setGroupSumCustomColumnId="setGroupSumCustomColumnId" :setGroupSumCustomLevel="3" :setGroupSummaryCenterIds="setGroupSummaryCenterIds" 
+        :setGroupFooterExpressions="setGroupFooterExpressions" :setGroupFooterColID="setGroupFooterColID"
+        :documentTitle="'SLS11_007RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
       </Realgrid>
     </div>
-  </div>
-</template>
+    </div>
+  </template>
+  
+  <script setup>
+  import { getSalesByPaymentTypeReport } from '@/api/misales';
+  import Datepicker2 from '@/components/Datepicker2.vue';
+  import pickStoreSingle from '@/components/pickStoreSingle.vue';
+  import Realgrid from '@/components/realgrid.vue';
+  import { ref, onMounted, watch } from 'vue';
+  import { useStore } from 'vuex';
 
-<script setup>
-import { getWeedaySalesReport } from '@/api/misales';
-import Datepicker2 from '@/components/Datepicker2.vue';
-import pickStoreRenew from '@/components/pickStoreRenew.vue';
-import Realgrid from '@/components/realgrid.vue';
-import { insertPageLog } from '@/customFunc/customFunc';
-import { onMounted, ref } from 'vue';
-import { useStore } from 'vuex';
-onMounted(async () => {
-
-  const pageLog = await insertPageLog(store.state.activeTab2)
-
-})
-const setFooterColID = ref(['lngWeekCnt', 'lngCustCnt', 'lngCustAmt', 'lngRecCnt', 'lngRecAmt', 'lngSalAmt', 'lngActAmt', 'lngSumAmt', 'lngAvgCustCnt', 'lngAvgActAmt', 'dblDistRate'])
-const setFooterExpressions = ref(['sum', 'sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'avg', 'sum'])
-const setGroupFooter = ref(true)
-const setGroupFooterColID = ref(['lngWeekCnt', 'lngCustCnt', 'lngCustAmt', 'lngRecCnt', 'lngRecAmt', 'lngSalAmt', 'lngActAmt', 'lngSumAmt', 'lngAvgCustCnt', 'lngAvgActAmt', 'dblDistRate'])
-const setGroupFooterExpressions = ref(['sum', 'sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'avg', 'sum'])
-const setGroupSummaryCenterIds = ref('dtmDate, strWeek')
-const setGroupSumCustomColumnId = ref(['strWeek']);
-const setGroupColumnId = ref('');
-const reload = ref(false)
-const rowData = ref([])
-const afterSearch = ref(false)
-const selectedstartDate = ref();
-const selectedendDate = ref();
+  const setFooterColID = ref(['lngTotAmt', 'lngActAmt', 'lngCashAmt', 'lngCreditAmt', 'lngTicketAmt', 'lngTrustAmt', 'lngPointAmt', 'lngPointCnt', 'lngCashBagSAmt'
+                            , 'lngCashBagCnt', 'lngCashBagAmt', 'lngTMCAmt', 'lngTMCCnt', 'lngDCAmt', 'lngDepositAmt', 'lngRepayAmt', 'lngGiftCardAmt'])
+  const setFooterExpressions = ref(['sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum'])
+  const setGroupFooter = ref(true)
+  const setGroupFooterColID  = ref(['lngTotAmt', 'lngActAmt', 'lngCashAmt', 'lngCreditAmt', 'lngTicketAmt', 'lngTrustAmt', 'lngPointAmt', 'lngPointCnt', 'lngCashBagSAmt'
+                                  , 'lngCashBagCnt', 'lngCashBagAmt', 'lngTMCAmt', 'lngTMCCnt', 'lngDCAmt', 'lngDepositAmt', 'lngRepayAmt', 'lngGiftCardAmt'])
+  const setGroupFooterExpressions = ref(['sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum'])
+  const setGroupSummaryCenterIds = ref('dtmDate, strWeek')
+  const setGroupSumCustomColumnId = ref(['strWeek']);
+  const setGroupColumnId = ref('');
+  const reload = ref(false)
+  const rowData = ref([])
+  const afterSearch = ref(false)
+  const selectedstartDate = ref();
+  const selectedendDate = ref();
 
 const startDate = (e) => {
   console.log(e);
@@ -89,48 +84,30 @@ const endDate = (e) => {
   selectedendDate.value = e;
 };
 
-const tempSeeDaily = ref(false);
-const tempSeeStore = ref(false);
-const reportCheckData = ref('0');
-const progId = ref('1');
-
-const seeDaily = (e) => {
-  tempSeeDaily.value = e.target.checked;
-  updateProgid();
-};
-
-const seeStore = (e) => {
-  tempSeeStore.value = e.target.checked;
-  updateProgid();
-};
-
-const updateProgid = () => {
-  if (tempSeeDaily.value && tempSeeStore.value) {
-    reportCheckData.value = '12';
-    setGroupSumCustomColumnId.value = ['dtmDate']
-    setGroupColumnId.value = 'strStore,strWeek'
-    console.log(setGroupColumnId.value)
-    progId.value = '4'
-  } else if (tempSeeDaily.value) {
-    reportCheckData.value = '1';
-    setGroupSumCustomColumnId.value = ['dtmDate']
-    setGroupColumnId.value = 'strWeek'
-    console.log(setGroupColumnId.value)
-    progId.value = '2'
-  } else if (tempSeeStore.value) {
-    reportCheckData.value = '2';
-    setGroupSumCustomColumnId.value = ['strWeek']
-    setGroupColumnId.value = 'strStore'
-    console.log(setGroupColumnId.value)
-    progId.value = '3'
-  } else {
-    reportCheckData.value = '0';
-    setGroupSumCustomColumnId.value = ['dtmDate']
-    setGroupColumnId.value = ''
-    console.log(setGroupColumnId.value)
-    progId.value = '1'
-  }
-};
+  const tempSeeDaily = ref(false);
+  const reportCheckData = ref('0');
+  const progId = ref('1');
+  
+  const seeDaily = (e) => {
+    tempSeeDaily.value = e.target.checked;
+    updateProgid();
+  };
+  
+  const updateProgid = () => {
+    if (tempSeeDaily.value) {
+      reportCheckData.value = '1'; 
+      setGroupSumCustomColumnId.value = ['dtmDate']
+      setGroupColumnId.value = 'strWeek'
+      console.log(setGroupColumnId.value)
+      progId.value = '2'
+    } else {
+      reportCheckData.value = '0';
+      setGroupSumCustomColumnId.value = ['dtmDate']
+      setGroupColumnId.value = ''
+      console.log(setGroupColumnId.value)
+      progId.value = '1'
+    }
+  };
 
 const store = useStore()
 const loginedstrLang = store.state.userData.lngLanguage
@@ -168,71 +145,71 @@ const searchButton = async () => {
 
     console.log(reportCheckData.value)
 
-    const res = await getWeedaySalesReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, reportCheckData.value)
-    console.log(res)
-    rowData.value = res.data.weekdaySales
-
-    afterSearch.value = true
-
-  } catch (error) {
-    afterSearch.value = false
-    console.log(error);
-  } finally {
-    store.state.loading = false;
-
+      const res = await getSalesByPaymentTypeReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, reportCheckData.value)
+      // const res = await getSalesByPaymentTypeReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, '1')
+      console.log(res)
+      rowData.value = res.data.salesByPaymentType
+  
+      afterSearch.value = true
+  
+    } catch (error) {
+      afterSearch.value = false
+      console.log(error);
+    } finally {
+      store.state.loading = false;
+  
+    }
+  
   }
-
-}
-
-/* 매장 컴포넌트 관련 함수 */
-const selectedGroup = ref()
-const selectedStores = ref()
-const selectedStoreAttrs = ref()
-const lngStoreGroup = (e) => {
-  initGrid()
-  console.log(e)
-  selectedGroup.value = e
-}
-const lngStoreCodes = (e) => {
-  initGrid()
-  selectWeekDay.value = null
-  selectedStores.value = e
-  console.log(e)
-}
-const lngStoreAttrs = (e) => {
-  initGrid()
-  selectedStoreAttrs.value = e
-  console.log(e)
-}
-
-/*
-그리드 초기화
-*/
-const initGrid = () => {
-  if (rowData.value.length > 0) {
-    rowData.value = []
+  
+  /* 매장 컴포넌트 관련 함수 */
+  const selectedGroup = ref()
+  const selectedStores = ref()
+  const selectedStoreAttrs = ref()
+  const lngStoreGroup = (e) => {
+    initGrid()
+    console.log(e)
+    selectedGroup.value = e
   }
-}
-
-//엑셀 버튼 처리 함수
-const exportExcel = ref(false)
-const excelButton = () => {
-  documentSubTitle.value = selectedExcelDate.value + '\n' + selectedExcelStore.value
-  console.log(documentSubTitle.value); // 맑음 소스 pickStorePlural.vue 소스의 excelStore 받아야 함.
-  // 엑셀 기능 실행
-  exportExcel.value = !exportExcel.value
-}
-
-// 엑셀 추출
-const documentSubTitle = ref('')
-const selectedExcelDate = ref('')
-const excelDate = (e) => {
-  selectedExcelDate.value = e
-  console.log(e)
-}
-const selectedExcelStore = ref('')
-const excelStore = (e) => {
-  selectedExcelStore.value = e
-  console.log(e)
-}
-</script>
+  const lngStoreCodes = (e) => {
+    initGrid()
+    selectedStores.value = e
+    console.log(e)
+  }
+  const lngStoreAttrs = (e) => {
+    initGrid()
+    selectedStoreAttrs.value = e
+    console.log(e)
+  }
+  
+  /*
+  그리드 초기화
+  */
+  const initGrid = () => {
+    if (rowData.value.length > 0) {
+      rowData.value = []
+    }
+  }
+  
+  //엑셀 버튼 처리 함수
+  const exportExcel = ref(false)
+  const excelButton = () => {
+    documentSubTitle.value = selectedExcelDate.value +'\n'+ selectedExcelStore.value
+    console.log(documentSubTitle.value); // 맑음 소스 pickStorePlural.vue 소스의 excelStore 받아야 함.
+    // 엑셀 기능 실행
+    exportExcel.value = !exportExcel.value
+  }
+  
+  // 엑셀 추출
+  const documentSubTitle = ref('')
+  const selectedExcelDate = ref('')
+  const excelDate = (e)=> {
+   selectedExcelDate.value = e
+   console.log(e)
+  }
+  const selectedExcelStore = ref('')
+  const excelStore = (e) =>{
+    selectedExcelStore.value = e
+    console.log(e)
+  }
+  </script>

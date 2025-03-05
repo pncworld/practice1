@@ -33,8 +33,7 @@
         </div>
       </div>
       <div class="h-[75%] ml-12">
-        <!-- <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore" ></PickStorePlural> -->
-        <PickStoreSingle2 @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></PickStoreSingle2>
+        <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @lngSupervisor="lngSupervisor" @excelStore="excelStore"></pickStoreSingle>
       </div>
     </div>
     <div class="w-full h-[82%]">
@@ -56,6 +55,7 @@
   import { getCardCorp, getCardSalesDetailReport } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import Realgrid from '@/components/realgrid.vue';
+import pickStoreSingle from '@/components/pickStoreSingle.vue';
 import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
   
@@ -102,14 +102,14 @@ import { useStore } from 'vuex';
       reload.value = !reload.value
 
       //매장 선택
-      let selectedStorearr;
-      if (selectedStores.value == undefined || selectedStores.value.length == 0 || selectedStores.value == 0) {
-        selectedStorearr = 0
-      } else {
-        selectedStorearr = selectedStores.value
-      }
+      // let selectedStorearr;
+      // if (selectedStores.value == undefined || selectedStores.value.length == 0 || selectedStores.value == 0) {
+      //   selectedStorearr = 0
+      // } else {
+      //   selectedStorearr = selectedStores.value
+      // }
 
-      console.log(selectedStorearr)
+      // console.log(selectedStorearr)
       
       //매입사코드 선택 콤보박스
       let selectedBuyCodeValue;
@@ -122,7 +122,8 @@ import { useStore } from 'vuex';
       console.log(selectedBuyCodeValue)
 
       const res = await getCardSalesDetailReport(
-        selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, 0, selectedRadioBox.value, selectedBuyCodeValue
+          selectedGroup.value, selectedStoreAttrs.value, selectedSupervisor.value, selectedStores.value
+        , selectedstartDate.value, selectedendDate.value, 0, selectedRadioBox.value, selectedBuyCodeValue
       )
       console.log(res)
       rowData.value = res.data.cardSalesDetail
@@ -143,6 +144,7 @@ import { useStore } from 'vuex';
   const selectedGroup = ref()
   const selectedStores = ref()
   const selectedStoreAttrs = ref()
+  const selectedSupervisor = ref()
   const lngStoreGroup = (e) => {
     initGrid()
     console.log(e)
@@ -159,6 +161,13 @@ import { useStore } from 'vuex';
     selectedStoreAttrs.value = e
     console.log(e)
   }
+  const lngSupervisor = (e) => {
+    initGrid()
+    selectedSupervisor.value = e
+    console.log(e)
+  }
+
+  
   
   /* 매입사 콤보박스 */
   const selectCardCorp = ref(null)
