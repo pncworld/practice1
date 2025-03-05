@@ -42,7 +42,7 @@
                     </select></div>
                 <div><select name="" id="" v-model="selectedSuperVisor" class="w-28 h-7 rounded-lg ml-2"
                     :disabled="disabled2">
-                        <option :value="-1">전체</option>
+                        <option :value="0">전체</option>
                         <option :value="i.lngSupervisor" v-for="i in storeSuperVisor">{{ i.strName }}</option>
                     </select></div>
             </div>
@@ -88,7 +88,7 @@ const selectedStoreGroup = ref(store.state.storeGroup[0].lngStoreGroup)
 const selectedStoreGroup2 = ref(store.state.storeGroup[0].lngStoreGroup)
 const selectedStoreType = ref(0)
 const selectedStoreTeam = ref(0)
-const selectedSuperVisor = ref(-1)
+const selectedSuperVisor = ref(0)
 const emit = defineEmits(['lngStoreGroups', 'lngStoreCode', 'lngStoreAttrs', 'lngStoreGroup','excelStore','lngStoreTeam','lngSupervisor','changeInit']);
 const props = defineProps({
     initCheckBox: {
@@ -186,7 +186,7 @@ watch(selectedStoreTeam, (newValue) => {
         rowData.value = store.state.storeCd.filter(item => item.lngTeamCode == selectedStoreTeam.value)
         storeSuperVisor.value = store.state.storeSupervisor.filter(item => item.lngTeamCode == selectedStoreTeam.value)
     }
-    selectedSuperVisor.value = -1;
+    selectedSuperVisor.value = 0;
     if (store.state.userData.blnBrandAdmin == 'True' || store.state.userData.lngPositionType == '1') {
         selectedStoreList.value = null
     }
@@ -196,7 +196,7 @@ watch(selectedStoreTeam, (newValue) => {
 })
 
 watch(selectedSuperVisor, (newValue) => {
-    if (selectedSuperVisor.value == -1) {
+    if (selectedSuperVisor.value == 0) {
         if (selectedStoreTeam.value == 0) {
             rowData.value = store.state.storeCd
         } else {
@@ -238,7 +238,7 @@ watch(selectedStoreList, () => {
 
 const initSearchBox = (e) => {
     if(e.target.value ==1){
-        selectedSuperVisor.value = -1
+        selectedSuperVisor.value = 0
         selectedStoreTeam.value = 0
         disabled2.value = true
         disabled1.value = false

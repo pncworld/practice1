@@ -427,5 +427,17 @@ export const getPastSalesChanges = (groupCd , storeattr, storeteam , storesuperv
 
   });
 };
+export const getSalesByTimeAndSeats = (groupCd , storeattr, storeCd , startDateTime ,endDateTime  ) => {
+  return api2.post('/MISALES/SLS11_006RPT.asmx/getSalesByTimeAndSeats', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR    : storeattr,
+    STORE_CD   : storeCd,
+    START_DATETIME : startDateTime,
+    END_DATETIME   : endDateTime ,
+  
+
+
+  });
+};
 
 

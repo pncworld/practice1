@@ -53,7 +53,7 @@
                     </select></div>
                 <div><select name="" id="" v-model="selectedSuperVisor" class="w-32 h-7 rounded-lg ml-2"
                         :disabled="settingDisable == 1 || disabled1" @change="selectsupervisor">
-                        <option :value="-1">전체</option>
+                        <option :value="0">전체</option>
                         <option :value="i.lngSupervisor" v-for="i in storeSuperVisor">{{ i.strName }}</option>
                     </select></div>
             </div>
@@ -84,7 +84,7 @@ const selectedStoreGroup = ref(store.state.storeGroup?.[0]?.lngStoreGroup || nul
 const selectedStoreGroup2 = ref(store.state.storeGroup?.[0]?.lngStoreGroup || null)
 const selectedStoreType = ref(0)
 const selectedStoreTeam = ref(0)
-const selectedSuperVisor = ref(-1)
+const selectedSuperVisor = ref(0)
 const disabled1 = ref(false)
 const emit = defineEmits(['lngStoreGroups', 'lngStoreCodes', 'lngStoreAttrs', 'lngStoreGroup', 'excelStore', 'lngStoreAttr', 'lngStoreTeam', 'lngSupervisor']);
 const props = defineProps({
@@ -196,7 +196,7 @@ const selectstoreteam = (e) => {
         storeSuperVisor.value = store.state.storeSupervisor.filter(item => item.lngTeamCode == selectedStoreTeam.value)
         emit('lngStoreCodes', store.state.storeCd.filter(item => item.lngTeamCode == selectedStoreTeam.value).map(item => item.lngStoreCode).join(','))
     }
-    selectedSuperVisor.value = -1;
+    selectedSuperVisor.value = 0;
 
     initCheck.value = !initCheck.value
     emit('lngStoreTeam', selectedStoreTeam.value)
@@ -207,7 +207,7 @@ watch(selectedStoreTeam, (newValue) => {
 
 })
 const selectsupervisor = (e) => {
-    if (selectedSuperVisor.value == -1) {
+    if (selectedSuperVisor.value == 0) {
         if (selectedStoreTeam.value == 0) {
             rowData.value = store.state.storeCd
             emit('lngStoreCodes', store.state.storeCd.map(item => item.lngStoreCode).join(','))
@@ -226,7 +226,7 @@ const selectsupervisor = (e) => {
 
     }
     initCheck.value = !initCheck.value
-    const sendSupervisor = selectedSuperVisor.value == -1 ? 0 : selectedSuperVisor.value
+    const sendSupervisor = selectedSuperVisor.value 
     emit('lngSupervisor', sendSupervisor)
     emit('excelStore', '매장명 : 전체')
     selectedStoreList.value = '전체'
@@ -237,7 +237,7 @@ watch(selectedSuperVisor, (newValue) => {
 
 watch(settingDisable, () => {
     if (settingDisable.value == 1) {
-        selectedSuperVisor.value = -1
+        selectedSuperVisor.value = 0
         selectedStoreTeam.value = 0
     } else {
         selectedStoreType.value = 0
@@ -287,7 +287,7 @@ const checkedRowData = (e) => {
     }
 
     emit('lngStoreAttrs', selectedStoreType.value)
-    const sendSupervisor = selectedSuperVisor.value == -1 ? 0 : selectedSuperVisor.value
+    const sendSupervisor = selectedSuperVisor.value 
     emit('lngSupervisor', sendSupervisor)
     emit('lngStoreTeam', selectedStoreTeam.value)
 }
@@ -326,8 +326,7 @@ const resetChecked = () => {
     emit('lngStoreGroup', store.state.storeGroup[0].lngStoreGroup)
     emit('lngStoreCodes', 0)
     emit('lngStoreAttrs', 0)
-    const sendSupervisor = selectedSuperVisor.value == -1 ? 0 : selectedSuperVisor.value
-    emit('lngSupervisor', sendSupervisor)
+    emit('lngSupervisor', 0)
     emit('lngStoreTeam', 0)
     selectedStoreList.value = '전체'
 }
