@@ -40,7 +40,6 @@
       <div class="h-[75%] ml-5">
         <label for="daily" class="font-thin inline-flex">
           <input type="checkbox" id="daily" @change="seeStore">
-          <!-- <PickStorePlural @lngStoreCodes="lngStoreCodes" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore" ></PickStorePlural> -->
           <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle>
         </label>
       </div>
@@ -64,7 +63,6 @@
   <script setup>
   import { getCardSalesSumReport, getCardCorp } from '@/api/misales';
   import Datepicker2 from '@/components/Datepicker2.vue';
-  import PickStorePlural from '@/components/pickStorePlural.vue';
   import pickStoreSingle from '@/components/pickStoreSingle.vue';
   import Realgrid from '@/components/realgrid.vue';
   import { ref, onMounted, watch } from 'vue';

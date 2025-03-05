@@ -33,36 +33,37 @@
         </div>
       </div>
       <div class="h-[75%] ml-5">
-          <!-- <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle> -->
-          <pickStoreRenew @update:storeCd="selectedStoreCd" @update:storeGroup="selectedGroupCd" @update:storeType="changeStoreType"></pickStoreRenew>
+          <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle>
+          <!-- <pickStoreRenew @update:storeCd="selectedStoreCd" @update:storeGroup="selectedGroupCd" @update:storeType="changeStoreType"></pickStoreRenew> -->
       </div>
     </div>
     <div class="w-full h-[82%]">
-      <Realgrid :progname="'SLS06_001RPT_VUE'" :progid="progId" :rowData="rowData" :reload="reload" 
+      <Realgrid :progname="'SLS11_007RPT_VUE'" :progid="progId" :rowData="rowData" :reload="reload" 
         :setFooter="true" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
         :setGroupFooter="setGroupFooter" :setGroupColumnId="setGroupColumnId" :setGroupSumCustomText="['소계']" 
         :setGroupSumCustomColumnId="setGroupSumCustomColumnId" :setGroupSumCustomLevel="3" :setGroupSummaryCenterIds="setGroupSummaryCenterIds" 
         :setGroupFooterExpressions="setGroupFooterExpressions" :setGroupFooterColID="setGroupFooterColID"
-        :documentTitle="'SLS06_001RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
+        :documentTitle="'SLS11_007RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
       </Realgrid>
     </div>
     </div>
   </template>
   
   <script setup>
-  import { getWeedaySalesReport, getWeekDayList } from '@/api/misales';
+  import { getSalesByPaymentTypeReport } from '@/api/misales';
   import Datepicker2 from '@/components/Datepicker2.vue';
-  import pickStoreRenew from '@/components/pickStoreRenew.vue';
+  import pickStoreSingle from '@/components/pickStoreSingle.vue';
   import Realgrid from '@/components/realgrid.vue';
   import { ref, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';
-  import Swal from 'sweetalert2';
 
-  const setFooterColID = ref(['lngWeekCnt', 'lngCustCnt', 'lngCustAmt', 'lngRecCnt', 'lngRecAmt', 'lngSalAmt', 'lngActAmt', 'lngSumAmt', 'lngAvgCustCnt', 'lngAvgActAmt', 'dblDistRate'])
-  const setFooterExpressions = ref(['sum', 'sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'avg', 'sum'])
+  const setFooterColID = ref(['lngTotAmt', 'lngActAmt', 'lngCashAmt', 'lngCreditAmt', 'lngTicketAmt', 'lngTrustAmt', 'lngPointAmt', 'lngPointCnt', 'lngCashBagSAmt'
+                            , 'lngCashBagCnt', 'lngCashBagAmt', 'lngTMCAmt', 'lngTMCCnt', 'lngDCAmt', 'lngDepositAmt', 'lngRepayAmt', 'lngGiftCardAmt'])
+  const setFooterExpressions = ref(['sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum'])
   const setGroupFooter = ref(true)
-  const setGroupFooterColID = ref(['lngWeekCnt', 'lngCustCnt', 'lngCustAmt', 'lngRecCnt', 'lngRecAmt', 'lngSalAmt', 'lngActAmt', 'lngSumAmt', 'lngAvgCustCnt', 'lngAvgActAmt', 'dblDistRate'])
-  const setGroupFooterExpressions = ref(['sum', 'sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'avg', 'sum'])
+  const setGroupFooterColID  = ref(['lngTotAmt', 'lngActAmt', 'lngCashAmt', 'lngCreditAmt', 'lngTicketAmt', 'lngTrustAmt', 'lngPointAmt', 'lngPointCnt', 'lngCashBagSAmt'
+                                  , 'lngCashBagCnt', 'lngCashBagAmt', 'lngTMCAmt', 'lngTMCCnt', 'lngDCAmt', 'lngDepositAmt', 'lngRepayAmt', 'lngGiftCardAmt'])
+  const setGroupFooterExpressions = ref(['sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum'])
   const setGroupSummaryCenterIds = ref('dtmDate, strWeek')
   const setGroupSumCustomColumnId = ref(['strWeek']);
   const setGroupColumnId = ref('');
@@ -83,7 +84,6 @@
   };
 
   const tempSeeDaily = ref(false);
-  const tempSeeStore = ref(false);
   const reportCheckData = ref('0');
   const progId = ref('1');
   
@@ -92,30 +92,13 @@
     updateProgid();
   };
   
-  const seeStore = (e) => {
-    tempSeeStore.value = e.target.checked;
-    updateProgid();
-  };
-  
   const updateProgid = () => {
-    if (tempSeeDaily.value && tempSeeStore.value) {
-      reportCheckData.value = '12';
-      setGroupSumCustomColumnId.value = ['dtmDate']
-      setGroupColumnId.value = 'strStore,strWeek'
-      console.log(setGroupColumnId.value)
-      progId.value = '4'
-    } else if (tempSeeDaily.value) {
+    if (tempSeeDaily.value) {
       reportCheckData.value = '1'; 
       setGroupSumCustomColumnId.value = ['dtmDate']
       setGroupColumnId.value = 'strWeek'
       console.log(setGroupColumnId.value)
       progId.value = '2'
-    } else if (tempSeeStore.value) {
-      reportCheckData.value = '2';
-      setGroupSumCustomColumnId.value = ['strWeek']
-      setGroupColumnId.value = 'strStore'
-      console.log(setGroupColumnId.value)
-      progId.value = '3'
     } else {
       reportCheckData.value = '0';
       setGroupSumCustomColumnId.value = ['dtmDate']
@@ -161,9 +144,10 @@
 
       console.log(reportCheckData.value)
 
-      const res = await getWeedaySalesReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, reportCheckData.value)
+      const res = await getSalesByPaymentTypeReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, reportCheckData.value)
+      // const res = await getSalesByPaymentTypeReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, '1')
       console.log(res)
-      rowData.value = res.data.weekdaySales
+      rowData.value = res.data.salesByPaymentType
   
       afterSearch.value = true
   
@@ -188,7 +172,6 @@
   }
   const lngStoreCodes = (e) => {
     initGrid()
-    selectWeekDay.value = null
     selectedStores.value = e
     console.log(e)
   }

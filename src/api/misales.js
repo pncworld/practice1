@@ -186,9 +186,11 @@ export const getAreaIndustrySalesReport = (groupCd ,storeCds , startDate , endDa
   });
 };
 
-export const getCardSalesDetailReport = (groupCd ,storeCds , startDate , endDate , reporttype , voidFlag, strBuyCode) => {
+export const getCardSalesDetailReport = (groupCd, joinType, superVisor, storeCds , startDate , endDate , reporttype , voidFlag, strBuyCode) => {
   return api2.post('/MISALES/SLS05_002RPT.asmx/getCardSalesDetailReport', {
     GROUP_CD    : groupCd,
+    JOIN_TYPE   : joinType,
+    SUPERVISOR  : superVisor,
     STORE_CDS   : storeCds,
     START_DATE  : startDate,
     END_DATE    : endDate,
@@ -402,6 +404,16 @@ export const getPastSalesChanges = (groupCd ,storeCd , startDate, endDate , repo
     CAUSE : cause,
 
 
+  });
+};
+
+export const getSalesByPaymentTypeReport = (groupCd ,storeCd , startDate, endDate , reporttype) => {
+  return api2.post('/MISALES/SLS11_007RPT.asmx/getSalesByPaymentTypeReport', {
+    GROUP_CD    : groupCd,
+    STORE_CDS   : storeCd,
+    START_DATE  : startDate,
+    END_DATE    : endDate,
+    REPORT_TYPE : reporttype
   });
 };
 

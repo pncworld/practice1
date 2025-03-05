@@ -39,9 +39,10 @@
     </div>
     <div class="w-full h-[85%]">
       <Realgrid :progname="'SLS02_014RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload" 
-         :setFooter="true" :setGroupFooter="setGroupFooter" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
+        :setFooter="true" :setGroupFooter="setGroupFooter" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
         :setGroupColumnId="'strStore'" :setGroupSumCustomText="['소계']" :setGroupSumCustomColumnId="setGroupSumCustomColumnId"
-        :setGroupSumCustomLevel="3" :setGroupSummaryCenterIds="setGroupSummaryCenterIds" :setGroupFooterExpressions="setGroupFooterExpressions" :setGroupFooterColID="setGroupFooterColID"
+        :setGroupSumCustomLevel="3" :setGroupSummaryCenterIds="setGroupSummaryCenterIds" 
+        :setGroupFooterExpressions="setGroupFooterExpressions" :setGroupFooterColID="setGroupFooterColID"
         :documentTitle="'SLS02_014RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
       </Realgrid>
     </div>
@@ -49,7 +50,8 @@
   </template>
   
   <script setup>
-  import { getAreaIndustrySalesReport } from '@/api/misales';
+
+import { getAreaIndustrySalesReport } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStorePlural from '@/components/pickStorePlural.vue';
 
@@ -58,8 +60,10 @@ import { ref } from 'vue';
 import { useStore } from 'vuex';
   
   const setGroupFooter = ref(false)
-  const setFooterColID = ref(['strStore', 'lngRecCnt', 'lngRecAmt', 'lngCustCnt', 'lngCustAmt', 'lngSalAmt', 'lngDiscountAmt', 'lngTotAmt', 'lngVAT', 'lngSupplyAmt', 'dblDistRate', 'lngWorkDay', 'lngActAvg', 'lngStoreCode'])
-  const setGroupFooterColID = ref(['strStore', 'lngRecCnt', 'lngRecAmt', 'lngCustCnt', 'lngCustAmt', 'lngSalAmt', 'lngDiscountAmt', 'lngTotAmt', 'lngVAT', 'lngSupplyAmt', 'dblDistRate', 'lngWorkDay', 'lngActAvg', 'lngStoreCode'])
+  const setFooterColID = ref(['strStore', 'lngRecCnt', 'lngRecAmt', 'lngCustCnt', 'lngCustAmt', 'lngSalAmt', 'lngDiscountAmt', 'lngTotAmt', 'lngVAT', 'lngSupplyAmt', 
+                              'dblDistRate', 'lngWorkDay', 'lngActAvg', 'lngStoreCode'])
+  const setGroupFooterColID = ref(['strStore', 'lngRecCnt', 'lngRecAmt', 'lngCustCnt', 'lngCustAmt', 'lngSalAmt', 'lngDiscountAmt', 'lngTotAmt', 'lngVAT', 'lngSupplyAmt',
+                                   'dblDistRate', 'lngWorkDay', 'lngActAvg', 'lngStoreCode'])
   const setFooterExpressions = ref(['custom', 'sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'avg', 'custom'])
   const setGroupFooterExpressions = ref(['custom', 'sum', 'avg', 'sum', 'avg', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'avg', 'custom'])
   const setGroupSummaryCenterIds = ref('dtmDate,dayName')
