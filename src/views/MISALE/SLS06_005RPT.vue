@@ -88,7 +88,7 @@ import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 
-const selectedCompareYear = ref(new Date().getFullYear())
+const selectedCompareYear = ref(new Date().getFullYear()-1)
 const selectedRefYear = ref(new Date().getFullYear())
 const Years = new Date().getFullYear();
 const yearsArray = Array.from({ length: 11 }, (_, i) => Years - 10 + i).sort((a, b) => b - a);

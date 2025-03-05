@@ -195,7 +195,7 @@
       console.log(reportCheckData.value)
 
       const res = await getCardSalesSumReport(
-        selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, reportCheckData.value, selectedRadioBox.value, selectedBuyCodeValue
+        selectedGroup.value, selectedStoreAttrs.value, selectedStoreTeam.value , selectedStoreSuperVisor.value , selectedStorearr, selectedstartDate.value, selectedendDate.value, reportCheckData.value, selectedRadioBox.value, selectedBuyCodeValue
       )
       console.log(res)
       rowData.value = res.data.cardSalesSum
@@ -216,6 +216,8 @@
   const selectedGroup = ref()
   const selectedStores = ref()
   const selectedStoreAttrs = ref()
+  const selectedStoreTeam = ref()
+  const selectedStoreSuperVisor = ref()
   const lngStoreGroup = (e) => {
     initGrid()
     console.log(e)
@@ -230,6 +232,16 @@
   const lngStoreAttrs = (e) => {
     initGrid()
     selectedStoreAttrs.value = e
+    console.log(e)
+  }
+  const lngSupervisor = (e) => {
+    initGrid()
+    selectedStoreSuperVisor.value = e
+    console.log(e)
+  }
+  const lngStoreTeam = (e) => {
+    initGrid()
+    selectedStoreTeam.value = e
     console.log(e)
   }
   

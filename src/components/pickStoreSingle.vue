@@ -1,7 +1,7 @@
 <template>
     <div class="grid grid-cols-[100px,150px,150px,300px] grid-rows-2 h-16 w-[750px]">
         <div><label for="searchType1" class="text-base">직/가맹<input type="radio" id="searchType1" value="1"
-                    v-model="settingDisable" @click="initSearchBox" :disabled="disabled1"></label></div>
+                    v-model="settingDisable" @click="initSearchBox" ></label></div>
         <div class="w-24"><select name="" id="" v-model="selectedStoreGroup" :disabled="true"
                 class="mr-28 w-36 h-7 rounded-lg">
                 <option :value="i.lngStoreGroup" v-for="i in storeGroup">{{ i.strName }}</option>
@@ -28,7 +28,7 @@
             </div>
         </div>
         <div><label for="searchType2" class="text-base ml-2">팀/SC<input type="radio" id="searchType2" value="2"
-                    v-model="settingDisable" @click="initSearchBox" :disabled="disabled1"></label></div>
+                    v-model="settingDisable" @click="initSearchBox"></label></div>
         <div class="w-32"><select name="" id="" v-model="selectedStoreGroup2" class="w-full mr-10  h-7 rounded-lg"
                 :disabled="true">
                 <option :value="i.lngStoreGroup" v-for="i in storeGroup">{{ i.strName }}</option>
@@ -36,12 +36,12 @@
         <div>
             <div class="grid grid-rows-1 grid-cols-2 ">
                 <div class="-ml-3"><select name="" id="" v-model="selectedStoreTeam" class="w-full h-7 rounded-lg"
-                    :disabled="disabled1">
+                    :disabled="disabled2">
                         <option :value="0">전체</option>
                         <option :value="i.lngTeamCode" v-for="i in storeTeam">{{ i.strTeamName }}</option>
                     </select></div>
                 <div><select name="" id="" v-model="selectedSuperVisor" class="w-28 h-7 rounded-lg ml-2"
-                    :disabled="disabled1">
+                    :disabled="disabled2">
                         <option :value="-1">전체</option>
                         <option :value="i.lngSupervisor" v-for="i in storeSuperVisor">{{ i.strName }}</option>
                     </select></div>
@@ -61,7 +61,7 @@
   class="custom-select4 mr-10"
   clearable="true"
   @click="clickPosNo" 
-  :disabled="disabled1"
+  :disabled="disabled2"
   :reduce="store => store.lngStoreCode"
 />
 
@@ -105,6 +105,7 @@ const props = defineProps({
      }
 })
 const disabled1 = ref(false)
+const disabled2 = ref(true)
 const rowData = ref([])
 const rowData2 = ref([])
 const labelingColumns = ref('lngStoreGroup,lngStoreAttr,lngTeamCode,lngSupervisor')
@@ -124,7 +125,7 @@ onMounted(() => {
         disabled1.value = false
         emit('lngStoreGroup', store.state.storeGroup[0].lngStoreGroup)
 
-        emit('lngStoreCode', store.state.storeCd.map(item => item.lngStoreCode).join(','))
+        emit('lngStoreCode', 0)
         console.log(store.state.storeCd)
 
         emit('lngStoreAttrs', 0)
@@ -239,8 +240,12 @@ const initSearchBox = (e) => {
     if(e.target.value ==1){
         selectedSuperVisor.value = -1
         selectedStoreTeam.value = 0
+        disabled2.value = true
+        disabled1.value = false
     } else {
         selectedStoreType.value = 0
+        disabled2.value = false
+        disabled1.value = true
     }
 }
 

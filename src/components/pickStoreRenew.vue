@@ -1,18 +1,19 @@
 <template>
-    <div class="grid grid-rows-1 grid-cols-[2fr,3fr,3fr,3fr] justify-center space-x-2 text-sm items-center w-[600px] ">
-     <div class="items-center font-bold text-base flex w-20 pl-5">매장명 : </div>
-      <div>
-        <select :disabled="true" v-model="selectedGroup"  id="storeGroup" class=" border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreGroup($event.target.value)" >
+    <div class="grid grid-rows-1 grid-cols-[repeat(4,1fr)] justify-center text-sm items-center w-[500px] space-x-2 ">
+     <div class="items-center font-bold text-base flex w-20 pl-5 ">매장명 : </div>
+      <div >
+        <select :disabled="true" v-model="selectedGroup"  id="storeGroup" class=" border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 " @change="emitStoreGroup($event.target.value)" >
           <option :value="item.lngStoreGroup" v-for="item in storeGroup" :key="item.lngStoreGroup">{{ item.strName }}</option>
         </select>
       </div>
       <div>
-        <select :disabled="disabled1" v-model="selectedStoreType" class=" border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="initGrid">
+        <select :disabled="disabled1" v-model="selectedStoreType" class=" border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 " @change="initGrid">
          
           <option value="0">전체</option>
           <option :value="item.lngStoreAttr" v-for="item in storeType" :key="item.lngStoreAttr">{{ item.strName }}</option>
         </select>
       </div>
+      <div >
       <v-select
     v-model="selectedStore"
     :options="storeCd"
@@ -23,6 +24,7 @@
     :clearable="!disabled1"
     @click="resetSelectedStore"
   />
+</div>
      
     </div>
 </template>
@@ -136,7 +138,7 @@ watch(selectedStoreType , () => {
       selectedStore.value =null
     } 
    
-    emit('lngStoreAttrs', 0);
+    emit('lngStoreAttrs', selectedStoreType.value);
     emit('changeInit', true);
 })
 watch(selectedStore , () => {

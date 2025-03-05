@@ -22,7 +22,7 @@
             <Datepicker2 @endDate="endDate" @startDate="startDate" @excelDate="excelDate" :closePopUp="closePopUp" ref="datepicker"></Datepicker2>
         </div>
         <div class="mt-10">
-            <PickStoreSingle2 @lngStoreCode="lngStoreCode" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore" @lngStoreTeam="lngStoreTeam" @lngSupervisor="lngSupervisor">
+            <PickStoreSingle2 @lngStoreCode="lngStoreCode" @lngStoreGroup="lngStoreGroup" @excelStore="excelStore"  @lngStoreAttrs="lngStoreAttrs" @lngStoreTeam="lngStoreTeam" @lngSupervisor="lngSupervisor" :placeholderName="'선택'">
             </PickStoreSingle2>
         </div>
         <div class="-ml-96">
@@ -97,6 +97,9 @@ import { utils, write, writeFile } from 'xlsx-js-style';
 const excelstore = ref()
 const selectedGroup = ref()
 const selectedStore = ref()
+const selectedStoreAttr = ref()
+const selectedStoreTeam = ref()
+const selectedStoreSuperVisor = ref()
 
 const getJson = ref(false)
 
@@ -109,13 +112,17 @@ const lngStoreCode = (e) => {
     selectedStore.value = e
     console.log(e)
 }
+const lngStoreAttrs = (e) => {
+    initGrid()
+    selectedStoreAttr.value = e
+}
 const lngStoreTeam = (e) => {
     initGrid()
- 
+    selectedStoreTeam.value = e
 }
 const lngSupervisor = (e) => {
     initGrid()
-   
+    selectedStoreSuperVisor.value = e
 }
 const excelStore = (e) => {
     excelstore.value = e

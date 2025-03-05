@@ -22,8 +22,8 @@
                 <Datepicker2 @endDate="endDate" @startDate="startDate" @excelDate="excelDate" :closePopUp="closePopUp"
                     ref="datepicker"></Datepicker2>
             </div>
-            <div class="mt-2 ml-20 ">
-                <PickStoreRenew3 class="space-x-10 !w-96" @lngStoreCode="lngStoreCode" @lngStoreGroup="lngStoreGroup"
+            <div class="mt-2 ml-2 ">
+                <PickStoreRenew3 @lngStoreCode="lngStoreCode" @lngStoreGroup="lngStoreGroup" @lngStoreAttrs="lngStoreAttrs" :placeholderName="'선택'"
                     @excelStore="excelStore">
                 </PickStoreRenew3>
             </div>
@@ -110,12 +110,17 @@ import { utils, writeFile } from 'xlsx-js-style';
 const excelstore = ref()
 const selectedGroup = ref()
 const selectedStore = ref()
+const selectedStoreAttr = ref()
 
 const getJson = ref(false)
 
 const lngStoreGroup = (e) => {
     selectedGroup.value = e
     groupCd.value = e
+    console.log(e)
+}
+const lngStoreAttrs = (e) => {
+    selectedStoreAttr.value = e
     console.log(e)
 }
 const lngStoreCode = (e) => {
@@ -161,7 +166,7 @@ const searchButton = async () => {
     try {
         initGrid()
         console.log(selectedStore.value)
-        const res = await getSalesDayReportByPos(selectedGroup.value, selectedStore.value, selectedstartDate.value, selectedendDate.value, whetherBill.value, loginedlngLang, selectedPosNo.value)
+        const res = await getSalesDayReportByPos(selectedGroup.value ,selectedStore.value, selectedstartDate.value, selectedendDate.value, whetherBill.value, loginedlngLang, selectedPosNo.value)
         console.log(res)
 
         rowData.value = res.data.TIMELIST

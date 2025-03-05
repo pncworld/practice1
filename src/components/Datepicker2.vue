@@ -1,13 +1,13 @@
 <template>
   <div class="flex justify-center items-center space-x-3 w-[600px] pl-20">
-    <div class="pl-20 font-semibold  flex items-center text-nowrap text-base ">매출일자 : </div>
+    <div class="pl-20 font-semibold  flex items-center text-nowrap text-base ">{{mainName}} : </div>
     <div class="grid grid-cols-[2fr,1fr,2fr,1fr,1fr] grid-rows-1 justify-start h-11 pr-14 space-x-1">
       <input type="date" class="border rounded-lg h-10 w-32 text-base mr-2 pl-5" v-model="selectedStartDate"  @change="changeStartDate"
         max="9999-12-31">
       <span class="items-center flex">~</span>
       <input type="date" class="border rounded-lg h-10 w-32 text-base pl-5 ml-2" v-model="selectedEndDate"  @change="changeEndDate"
         max="9999-12-31">
-      <button class="w-[600%] ml-2" @click="toggleRadio"><img src="../assets/choiceCalendar.png" class="w-full" alt="">
+      <button class="w-[30px] ml-2" @click="toggleRadio"><img src="../assets/choiceCalendar.png" class="w-full" alt="">
       </button>
     </div>
     <div class="flex justify-start">
@@ -96,6 +96,10 @@ const props = defineProps({
   orgAcceptDate : {
     type: String,
     default: ''
+  },
+  mainName : {
+    type: String,
+    default: '매출일자'
   }
 });
 const formatDate = (date) => date.toISOString().split('T')[0]
@@ -105,7 +109,7 @@ if(props.initToday == ''){
 } else {
   today.setDate(today.getDate())
 }
-
+const mainName = ref(props.mainName)
 const selectedStartDate = ref(formatDate(today))
 const selectedEndDate = ref(formatDate(today))
 
@@ -117,7 +121,7 @@ onMounted(() => {
   tempEndDateStack.push(selectedEndDate.value)
   emit('startDate', selectedStartDate.value)
   emit('endDate', selectedEndDate.value)
-  emit('excelDate', '매출일자 : '+selectedStartDate.value+'~'+ selectedEndDate.value)
+  emit('excelDate', mainName.value + ' : '+selectedStartDate.value+'~'+ selectedEndDate.value)
 })
 const emitDate2 = (e) => {
   console.log(e)
@@ -176,7 +180,7 @@ const updateDateRange = (e) => {
 
   emit('startDate', selectedStartDate.value)
   emit('endDate', selectedEndDate.value)
-  emit('excelDate', '매출일자 : '+selectedStartDate.value+'~'+ selectedEndDate.value)
+  emit('excelDate', mainName.value + ' : '+selectedStartDate.value+'~'+ selectedEndDate.value)
 }
 
 function formatDateToYYYYMMDD(date) {
@@ -193,7 +197,7 @@ function formatDateToYYYYMMDD(date) {
 watch(() => [selectedStartDate.value, selectedEndDate.value], async () => {
   emit('startDate', selectedStartDate.value);
   emit('endDate', selectedEndDate.value);
-  emit('excelDate', '매출일자 : '+selectedStartDate.value+'~'+ selectedEndDate.value)
+  emit('excelDate', mainName.value + ' : '+selectedStartDate.value+'~'+ selectedEndDate.value)
 
   console.log(selectedEndDate.value)
   if(props.selectedRadioBox == '02'){
@@ -238,12 +242,12 @@ const changeStartDate = (e) => {
     tempStartDateStack.push(selectedStartDate.value)
     selectedEndDate.value = tempEndDateStack.pop()
     tempEndDateStack.push(selectedEndDate.value)
-    emit('excelDate', '매출일자 : '+selectedStartDate.value+'~'+ selectedEndDate.value)
+    emit('excelDate', mainName.value + ' : '+selectedStartDate.value+'~'+ selectedEndDate.value)
     return;
   } else {
     tempStartDateStack.push(e.target.value)
     tempEndDateStack.push(selectedEndDate.value)
-    emit('excelDate', '매출일자 : '+selectedStartDate.value+'~'+ selectedEndDate.value)
+    emit('excelDate', mainName.value + ' : '+selectedStartDate.value+'~'+ selectedEndDate.value)
   }
   emit('startDate', selectedStartDate.value);
 }
@@ -261,12 +265,12 @@ const changeEndDate = (e) => {
     tempStartDateStack.push(selectedStartDate.value)
     selectedEndDate.value = tempEndDateStack.pop()
     tempEndDateStack.push(selectedEndDate.value)
-    emit('excelDate', '매출일자 : '+selectedStartDate.value+'~'+ selectedEndDate.value)
+    emit('excelDate', mainName.value + ' : '+selectedStartDate.value+'~'+ selectedEndDate.value)
     return;
   } else {
     tempStartDateStack.push(selectedStartDate.value)
     tempEndDateStack.push(e.target.value)
-    emit('excelDate', '매출일자 : '+selectedStartDate.value+'~'+ selectedEndDate.value)
+    emit('excelDate', mainName.value + ' : '+selectedStartDate.value+'~'+ selectedEndDate.value)
   }
 
   emit('endDate', selectedEndDate.value);
