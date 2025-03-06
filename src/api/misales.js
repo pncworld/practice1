@@ -484,5 +484,62 @@ export const getSalesbyCustomer = (groupCd ,storeattr , storeteam, storesupervis
   
   });
 };
+export const getSalesbyOrders = (groupCd ,storeattr , storeteam, storesupervisor , storeCd  , startdate , enddate ,reporttype ) => {
+  return api2.post('/MISALES/SLS11_012RPT.asmx/getSalesbyOrders', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    REPORT_TYPE    : reporttype
+  
+  
+  });
+};
+export const getSalesByBuyType = (groupCd ,storeattr , storeCd  , startdate , enddate ) => {
+  return api2.post('/MISALES/SLS11_014RPT.asmx/getSalesByBuyType', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+
+  
+  });
+};
+export const getDiscountCodes = (groupCd ,storeCd  ) => {
+  return api2.post('/MISALES/SLS11_004RPT.asmx/getDiscountCodes', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+
+  });
+};
+export const getDiscountRecords = (groupCd ,storeattr , storeteam, storesupervisor , storeCd  , startdate , enddate , discount  ) => {
+  return api2.post('/MISALES/SLS11_004RPT.asmx/getDiscountRecords', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    DISCOUNT_CODE    : discount
+  });
+};
+export const getCashReceiptDetail = (groupCd ,storeattr , storeteam, storesupervisor , storeCd  , startdate , enddate , cond , cond2  ) => {
+  return api2.post('/MISALES/SLS11_008RPT.asmx/getCashReceiptDetail', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    CONDITION    : cond,
+    CONDITION2    : cond2,
+  });
+};
 
 

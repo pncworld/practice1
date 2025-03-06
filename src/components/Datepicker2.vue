@@ -82,8 +82,8 @@ const props = defineProps({
     default: false // 기본값: 빈 함수
   },
   initToday: {
-    type: String,
-    default: '', // 기본값: 현재 날짜
+    type: Number,
+    default: 0, // 기본값: 현재 날짜
   },
   selectedRadioBox : {
     type : String,
@@ -104,10 +104,10 @@ const props = defineProps({
 });
 const formatDate = (date) => date.toISOString().split('T')[0]
 const today = new Date();
-if(props.initToday == ''){
+if(props.initToday == 0){
   today.setDate(today.getDate() - 1)
 } else {
-  today.setDate(today.getDate())
+  today.setDate(today.getDate() + props.initToday-1)
 }
 const mainName = ref(props.mainName)
 const selectedStartDate = ref(formatDate(today))

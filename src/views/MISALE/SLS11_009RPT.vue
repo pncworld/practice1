@@ -20,7 +20,7 @@
           <div class="flex -space-x-20">
            <input type="checkbox" class="ml-16 z-30" @click="checkReportType" :value="1">
           <Datepicker2 @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker" @excelDate="excelDate" :mainName="'일자'"></Datepicker2>
-          <div><input type="checkbox" class="ml-40 mt-5" @click="checkReportType" :value="2"></div>
+          <div><input type="checkbox" class="ml-72 mt-5" @click="checkReportType" :value="2"></div>
         </div>
           <div class="flex justify-center mr-5 -space-x-5 mt-2">
             <div class="text-base font-semibold ">객층구분 : </div>
@@ -52,9 +52,9 @@
   
       <div class="w-full h-[80%]">
   
-        <Realgrid :progname="'SLS11_009RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setFooter="true" :mergeMask="mergeMask" :setMergeMode="false" :setGroupSumCustomColumnId="['dtmDate']" :setGroupSumCustomText="['소계']"
-        :setGroupFooter="setGroupFooter" 
-        :hideColumnsId="hideColumnsId" :setRowGroupSpan2="setRowGroupSpan" 
+        <Realgrid :progname="'SLS11_009RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setFooter="true"  :setMergeMode="false" :setGroupSumCustomColumnId2="['strCustomer']"
+        :setGroupFooter="setGroupFooter"  :setGroupColumnId="setGroupColumnId" 
+        :hideColumnsId="hideColumnsId" :setRowGroupSpan="setRowGroupSpan" 
           :documentTitle="'SLS11_009RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
         </Realgrid>
       </div>
@@ -62,7 +62,7 @@
   </template>
   
   <script setup>
-  import { getCauseList, getCustomerList, getSalesbyCustomer, getSalesCancelData } from '@/api/misales';
+  import { getCustomerList, getSalesbyCustomer } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStoreSingle2 from '@/components/pickStoreSingle.vue';
 import Realgrid from '@/components/realgrid.vue';
@@ -86,8 +86,8 @@ import { useStore } from 'vuex';
   const selectedstartDate = ref()
   const selectedendDate = ref()
   const hideColumnNow = ref(true)
-  const setGroupColumnId = ref('dtmDate')
-  const hideColumnsId = ref(['strStore'])
+  const setGroupColumnId = ref('')
+  const hideColumnsId = ref(['strStore','dtmDate','lngTotAmt'])
   const startDate = (e) => {
     console.log(e)
     selectedstartDate.value = e
@@ -187,26 +187,28 @@ onMounted(async () => {
   
   
   const excelButton = () => {
-    let condition = '조건 :';
-    if(tempHideStore.value == true){
-      condition+="매장명,"
-    }
-    if(tempCellUnite.value == true){
-      condition+="셀병합,"
-    }
-    if(setGroupFooter.value == true){
-      condition+="합계,"
-    }
-    condition= condition.substring(0,condition.length-1)
-    let codestr
-    if(selectedCause.value == null || selectedCause.value == undefined){
-      codestr = '전체'
+    let condition = '객층구분 :';
+    if(selectedCust.value == null){
+      condition+="전체"
     } else {
-      codestr = causeList.value.filter(item => item.lngCode == selectedCause.value.lngCode)[0].strName
+      condition+=selectedCust.value.strName
     }
 
-    documentSubTitle.value = selectedExcelDate.value +'\n'+ selectedExcelStore.value +'\n'+condition +'\n'+'사유코드 : '+codestr
-    console.log(documentSubTitle.value);
+    let condition2 = '조건 : '
+    if(setRowGroupSpan.value == 'strStore'){
+      condition2+="셀병합,"
+    } 
+    if(hideColumnsId.value.includes('lngTotAmt')){
+      condition2+="할인전잔액,"
+    }
+    if(setGroupFooter.value== true){
+      condition2+="합계,"
+    }
+
+    condition2 = condition2.substring(0,condition2.length-1)
+
+    documentSubTitle.value = selectedExcelDate.value +'\n'+ selectedExcelStore.value +'\n'+condition +'\n'+condition2
+
     exportExcel.value = !exportExcel.value
   }
 
@@ -248,25 +250,25 @@ const tempHideStore = ref(false)
   const tempCellUnite= ref(false)
   const cellUnite = (e) => {
       if(e.target.checked){
-        tempCellUnite.value = true 
+        if(setGroupColumnId.value == 'strCustomer'){
+          setRowGroupSpan.value = 'strCustomer' 
+        } else {
+          setRowGroupSpan.value = 'strStore' 
+        }
+        
       } else {
-        tempCellUnite.value = false
+        setRowGroupSpan.value = ''
       }
+      reload.value = !reload.value
   }
   const tempSum= ref(false)
   const showSum = (e) => {
       if(e.target.checked){
-        //tempSum.value = true 
-        
-        if(tempHideStore.value == true){
-          setGroupColumnId.value = 'strStore'
-        } else {
-          setGroupColumnId.value = 'dtmDate'
-        }
+        console.log(setGroupColumnId.value)
         setGroupFooter.value = true
         reload.value = !reload.value
       } else {
-        //tempSum.value = false
+      
         setGroupFooter.value = false
         reload.value = !reload.value
       }
@@ -279,6 +281,12 @@ const tempHideStore = ref(false)
   const checkReportType = (e) => {
     if(e.target.value ==1 ){
         if(e.target.checked){
+          if(  setGroupColumnId.value.includes('strStore')){
+              setGroupColumnId.value = 'strStore,dtmDate'
+          } else {
+              setGroupColumnId.value = 'strCustomer'
+          }
+          hideColumnsId.value = hideColumnsId.value.filter(item => item !== 'dtmDate')
           if(reportType.value.includes('2')){
             reportType.value = '12'
           } else if(reportType.value.includes('1')){
@@ -287,6 +295,12 @@ const tempHideStore = ref(false)
             reportType.value = '1'
           }
         } else {
+          if(  setGroupColumnId.value.includes('strStore')){
+              setGroupColumnId.value = 'strStore'
+          }  else {
+             setGroupColumnId.value = ''
+          }
+          hideColumnsId.value.push('dtmDate')
             if(reportType.value.includes('2')){
             reportType.value = '2'
           } else if(reportType.value.includes('1')){
@@ -295,6 +309,13 @@ const tempHideStore = ref(false)
         }
     } else if(e.target.value ==2){
         if(e.target.checked){
+          if(  setGroupColumnId.value.includes('strCustomer')){
+              setGroupColumnId.value = 'strStore,dtmDate'
+          } else {
+            setGroupColumnId.value = 'strStore'
+          }
+       
+          hideColumnsId.value = hideColumnsId.value.filter(item => item !== 'strStore')
           if(reportType.value.includes('1')){
             reportType.value = '12'
           } else if(reportType.value.includes('2')){
@@ -303,12 +324,29 @@ const tempHideStore = ref(false)
             reportType.value = '2'
           }
         } else {
+          if(  setGroupColumnId.value.includes('dtmDate')){
+              setGroupColumnId.value = 'strCustomer'
+          } else {
+            setGroupColumnId.value = ''
+          }
+          hideColumnsId.value.push('strStore')
             if(reportType.value.includes('1')){
             reportType.value = '1'
           } else if(reportType.value.includes('2')){
             reportType.value = '0'
           } 
         }
+    }
+  }
+
+  const balance = (e) => {
+    if(e.target.checked){
+      hideColumnsId.value = hideColumnsId.value.filter(item => item!= 'lngTotAmt')
+      reload.value = !reload.value
+    } else {
+      
+      hideColumnsId.value.push('lngTotAmt')
+      reload.value = !reload.value
     }
   }
   </script>

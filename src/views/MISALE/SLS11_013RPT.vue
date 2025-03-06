@@ -32,8 +32,8 @@
             </div>
         </div>
         <div class="w-full h-[82%]">
-            <Realgrid :progname="'SLS11_013RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setGroupColumnId="setGroupColumnId" :setMergeMode="false" 
-                :setFooter="true" :setGroupFooter="setGroupFooter" :setFooterExpressions="setFooterExpressions" :hideColumnsId="hideColumnsId" :setGroupSumCustomColumnId="['strStoreName']" :setGroupSumCustomText="['소계']"
+            <Realgrid :progname="'SLS11_013RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setGroupColumnId="setGroupColumnId" :setMergeMode="false" :setGroupSumCustomColumnId2="['strStoreName']"
+                :setFooter="true" :setGroupFooter="setGroupFooter" :setFooterExpressions="setFooterExpressions" :hideColumnsId="hideColumnsId" 
                 :documentTitle="'SLS11_013RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
             </Realgrid>
         </div>

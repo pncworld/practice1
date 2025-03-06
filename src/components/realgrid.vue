@@ -494,12 +494,18 @@ const props = defineProps({
   ,
   setGroupSumCustomText2: {
     type: Array,
-    default:[],
+    default:[[]],
   },
   
   setGroupSumCustomColumnId2: {
     type: Array,
-    default: [[]],
+    default: [],
+  }
+  ,
+  
+  setGroupCustomLevel: {
+    type: String,
+    default: 1,
   }
 
 });
@@ -558,6 +564,7 @@ const funcshowGrid = async () => {
 
   dataProvider.setFields(fields);
 
+
   // 컬럼 정의
   const columns = tabInitSetArray.value.map((item, index) => ({
     name: item.strColID,
@@ -567,7 +574,7 @@ const funcshowGrid = async () => {
       styleName: `header-style-${index}`,
       checkLocation: item.strColID.includes('checkbox') ? 'left' : 'none'
     },
-    groupFooter: {
+    groupFooter:{
       text: props.setGroupSumCustomText[props.setGroupSumCustomColumnId.indexOf(item.strColID)],
       styleName: item.strAlign == 'center' ? 'setTextAlignCenter' : item.strAlign == 'left' ? 'setTextAlignLeft' : 'setTextAlignRight',
       expression: props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(item.strColID)] == 'custom' ? '' : props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(item.strColID)],
@@ -598,14 +605,14 @@ const funcshowGrid = async () => {
           for(let i=0 ; i< tokens.length ; i++){
           if(tokens[i].type == 'function'){
             returnText += `grid.getGroupSummary(group,"${tokens[i].field}").${tokens[i].func}`;
-        
+            
             
           } else {
             returnText += tokens[i].operator
           }
           }
       
-          return eval(returnText)
+          return eval(returnText) == 'Infinity' ? 0 : eval(returnText)
          } else {
             return value 
          }
@@ -622,7 +629,7 @@ const funcshowGrid = async () => {
         const regex = /(sum|avg)\(\s*([^)]+?)\s*\)|([+\-*/])/gi;
         let tokens = [];
         let match;
-        console.log(item.strTotalSumtext)
+  
          if(item.strTotalSumtext != '' && item.strTotalSumtext != 'N'){
           while ((match = regex.exec(item.strTotalSumtext)) !== null) {
             if (match[1]) {
@@ -649,7 +656,7 @@ const funcshowGrid = async () => {
           }
           }
         
-          return eval(returnText)
+          return eval(returnText) == 'Infinity' ? 0 : eval(returnText)
          } else {
     
             return value 
@@ -694,21 +701,9 @@ const funcshowGrid = async () => {
     }
   }));
 
-  // if(props.setGroupSumCustomColumnId2 != []){
-  //   for(let i=0 ; i < props.setGroupSumCustomColumnId2.length ; i++){
-  //     const column = columns.find(item => item.fieldName == props.setGroupSumCustomColumnId2[i])
-  //     column.groupFooters = []
-  //     for(let j=0 ; j < props.setGroupSumCustomText2[i].length ; j++ ){
-  //       if(column){
-  //          column.groupFooters.push({text : props.setGroupSumCustomText2[i][j]})
-  //       }
-  //     }
-  //     console.log(column)
-    
-     
-  //   }
-  // }
 
+
+  
   if (props.labelingColumns != '') {
     const lcolumns = props.labelingColumns.split(',')
     const labels = props.labelsData
@@ -779,17 +774,7 @@ const funcshowGrid = async () => {
 
   gridView.setColumns(columns);
 
-  // if (gridView.columnByField(props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')])) {
 
-  //   gridView.columnByField(props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel,) {
-  //     if (props.setGroupCustomLevel == 1) {
-
-  //       return formatLocalDate(dataProvider.getValue(footerModel.firstItem.dataRow, props.setFooterColID[props.setFooterExpressions.indexOf('custom')]));
-  //     } else if (props.setGroupCustomLevel == 2) {
-  //       return dataProvider.getValue(footerModel.firstItem.dataRow, props.setFooterColID[props.setFooterExpressions.indexOf('custom')]);
-  //     }
-  //   }
-  // }
 
   if(props.setGroupFooterExpressions !=[]){
     for(let i=0 ; i <props.setGroupFooterExpressions.length ; i++){
@@ -809,33 +794,28 @@ const funcshowGrid = async () => {
     }
   }
 
-//   if (gridView.columnByField(props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')])) {
 
-//     gridView.columnByField(props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel,) {
-//   if (props.setGroupCustomLevel == 1) {
+  for(let i= 0 ; i < props.setGroupSumCustomColumnId2.length ; i++){
+    if(gridView.columnByField(props.setGroupSumCustomColumnId2[i])){
 
-//     return formatLocalDate(dataProvider.getValue(footerModel.firstItem.dataRow, "dtmDate"));
-//   } else if (props.setGroupCustomLevel == 2) {
-//     return dataProvider.getValue(footerModel.firstItem.dataRow, props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')])
-//   }
-//  }
-// }
 
-// if(props.setGroupFooterColID != []){
-//   for(var i= 0 ; i< props.setGroupFooterColID ; i++){
-//     if(props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(props.setGroupFooterColID[i])] == 'custom'){
-//       gridView.columnByField(props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel,) {
-//         return dataProvider.getValue(footerModel.firstItem.dataRow, props.setGroupFooterColID[i])
-//       }
-//       } else if(props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(props.setGroupFooterColID[i])] == 'sum'){
-//         gridView.columnByField(props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')]).groupFooter.expression = 'sum'
-//       } else if (props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(props.setGroupFooterColID[i])] == 'avg'){
-//          gridView.columnByField(props.setGroupFooterColID[props.setGroupFooterExpressions.indexOf('custom')]).groupFooter.expression = 'avg'
-//       }
-//     }
+    gridView.columnByField(props.setGroupSumCustomColumnId2[i]).groupFooter.valueCallback = function (grid, column, footerIndex,columnFooter, value){
+      if(props.setGroupCustomLevel == '2'){
+        return '매장소계'
+      }
+      if(props.setGroupColumnId.split(',').length ==1){
+        return "소계"
+      }
+      
+      if(columnFooter.level == 2){
+        return "소계"
+        }else if(columnFooter.level == 1){
+        return "매장소계"
+        }
+    }
+  }
+  }
 
-  
-// }
 
 
 
@@ -959,6 +939,7 @@ const funcshowGrid = async () => {
   gridView.displayOptions.fitStyle = props.fixedColumn == false ? 'even' : "none";
   gridView.editOptions.commitByCell = true;
   gridView.editOptions.commitWhenLeave = true;
+  gridView.displayOptions.showInnerFocus = false;
   dataProvider.softDeleting = (props.notsoftDelete == false ? true : false);
   dataProvider.deleteCreated = true;
   //gridView.sortingOptions.enabled = false; // 정렬기능 비활성화
@@ -980,7 +961,11 @@ const funcshowGrid = async () => {
 
   if(props.hideColumnsId!=[]){
     for(var i=0 ; i < props.hideColumnsId.length ; i++){
-    gridView.columnByField(props.hideColumnsId[i]).visible = false;
+      console.log(props.hideColumnsId)
+      if(gridView.columnByField(props.hideColumnsId[i])){
+        gridView.columnByField(props.hideColumnsId[i]).visible = false;
+      }
+   
     }
   }
 
