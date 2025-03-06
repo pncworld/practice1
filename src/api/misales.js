@@ -451,5 +451,38 @@ export const getSalesByPaymentTypeReport = (groupCd ,storeCd , startDate, endDat
     REPORT_TYPE : reporttype
   });
 };
+export const getSalesbySeats = (groupCd ,storeattr , storeCd , startDate, endDate, selectday , selectstore) => {
+  return api2.post('/MISALES/SLS11_013RPT.asmx/getSalesbySeats', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR   : storeattr,
+    STORE_CD   : storeCd,
+    START_DATE  : startDate,
+    END_DATE    : endDate,
+    SELECT_DAY : selectday,
+    SELECT_STORE : selectstore,
+  });
+};
+export const getCustomerList = (groupCd , storeCd ) => {
+  return api2.post('/MISALES/SLS11_009RPT.asmx/getCustomerList', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+  
+  });
+};
+export const getSalesbyCustomer = (groupCd ,storeattr , storeteam, storesupervisor , storeCd  , startdate , enddate ,reporttype , cust) => {
+  return api2.post('/MISALES/SLS11_009RPT.asmx/getSalesbyCustomer', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    REPORT_TYPE    : reporttype,
+    CUSTOMER    : cust
+  
+  
+  });
+};
 
 

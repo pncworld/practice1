@@ -491,7 +491,16 @@ const props = defineProps({
     type: String,
     default: '',
   }
- 
+  ,
+  setGroupSumCustomText2: {
+    type: Array,
+    default:[],
+  },
+  
+  setGroupSumCustomColumnId2: {
+    type: Array,
+    default: [[]],
+  }
 
 });
 
@@ -563,7 +572,44 @@ const funcshowGrid = async () => {
       styleName: item.strAlign == 'center' ? 'setTextAlignCenter' : item.strAlign == 'left' ? 'setTextAlignLeft' : 'setTextAlignRight',
       expression: props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(item.strColID)] == 'custom' ? '' : props.setGroupFooterExpressions[props.setGroupFooterColID.indexOf(item.strColID)],
       numberFormat: item.strSubSumexpr !='' ?  item.strSubSumexpr : item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0",
-      suffix : props.suffixColumnPercent.includes(item.strColID) ? '%' : ''
+      suffix : props.suffixColumnPercent.includes(item.strColID) ? '%' : '' ,
+      valueCallback : function(grid, column, groupFooterIndex, group, value){
+        const regex = /(sum|avg)\(\s*([^)]+?)\s*\)|([+\-*/])/gi;
+        let tokens = [];
+        let match;
+         if(item.strSubSumtext != ''){
+          while ((match = regex.exec(item.strSubSumtext)) !== null) {
+            if (match[1]) {
+              // 함수 호출 패턴에 매칭된 경우
+              tokens.push({
+                type: "function",
+                func: match[1],     // "sum" 또는 "avg"
+                field: match[2]     // 괄호 안의 필드명 (공백 제거됨)
+              });
+            } else if (match[3]) {
+              // 연산자에 매칭된 경우
+              tokens.push({
+                type: "operator",
+                operator: match[3]
+              });
+            }
+          }
+           let returnText = ''
+          for(let i=0 ; i< tokens.length ; i++){
+          if(tokens[i].type == 'function'){
+            returnText += `grid.getGroupSummary(group,"${tokens[i].field}").${tokens[i].func}`;
+        
+            
+          } else {
+            returnText += tokens[i].operator
+          }
+          }
+      
+          return eval(returnText)
+         } else {
+            return value 
+         }
+      }
 
     },
     footer: {
@@ -571,7 +617,44 @@ const funcshowGrid = async () => {
       styleName: props.setFooterCustomText[props.setFooterCustomColumnId.indexOf(item.strColID)] ? 'setTextAlignCenter' : item.strAlign == 'center' ? 'setTextAlignCenter' : item.strAlign == 'left' ? 'setTextAlignLeft' : 'setTextAlignRight',
       expression: props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)],
       numberFormat: item.strTotalexpr !='' ?  item.strTotalexpr : item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0",
-      suffix : props.suffixColumnPercent.includes(item.strColID) ? '%' : ''
+      suffix : props.suffixColumnPercent.includes(item.strColID) ? '%' : '' ,
+      valueCallback : function(grid,column , footerIndex, columnFooter, value){
+        const regex = /(sum|avg)\(\s*([^)]+?)\s*\)|([+\-*/])/gi;
+        let tokens = [];
+        let match;
+        console.log(item.strTotalSumtext)
+         if(item.strTotalSumtext != '' && item.strTotalSumtext != 'N'){
+          while ((match = regex.exec(item.strTotalSumtext)) !== null) {
+            if (match[1]) {
+              // 함수 호출 패턴에 매칭된 경우
+              tokens.push({
+                type: "function",
+                func: match[1],     // "sum" 또는 "avg"
+                field: match[2]     // 괄호 안의 필드명 (공백 제거됨)
+              });
+            } else if (match[3]) {
+              // 연산자에 매칭된 경우
+              tokens.push({
+                type: "operator",
+                operator: match[3]
+              });
+            }
+          }
+           let returnText = ''
+          for(let i=0 ; i< tokens.length ; i++){
+          if(tokens[i].type == 'function'){
+            returnText += `gridView.getSummary("${tokens[i].field}", "${tokens[i].func}")`;
+          } else {
+            returnText += tokens[i].operator
+          }
+          }
+        
+          return eval(returnText)
+         } else {
+    
+            return value 
+         }
+      }
     },
     datetimeFormat: item.strMask == '' ? 'yyyy-MM-dd' : item.strMask, // sql 에서 mstgridinfo 에서 date  일때 기본값이 있고 정의할 수 있음
     width: item.intHdWidth,
@@ -611,7 +694,20 @@ const funcshowGrid = async () => {
     }
   }));
 
-
+  // if(props.setGroupSumCustomColumnId2 != []){
+  //   for(let i=0 ; i < props.setGroupSumCustomColumnId2.length ; i++){
+  //     const column = columns.find(item => item.fieldName == props.setGroupSumCustomColumnId2[i])
+  //     column.groupFooters = []
+  //     for(let j=0 ; j < props.setGroupSumCustomText2[i].length ; j++ ){
+  //       if(column){
+  //          column.groupFooters.push({text : props.setGroupSumCustomText2[i][j]})
+  //       }
+  //     }
+  //     console.log(column)
+    
+     
+  //   }
+  // }
 
   if (props.labelingColumns != '') {
     const lcolumns = props.labelingColumns.split(',')
@@ -700,7 +796,7 @@ const funcshowGrid = async () => {
       if(props.setGroupFooterExpressions[i] !='custom'){
         continue ;
       }
-      gridView.columnByField(props.setGroupFooterColID[i]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel){
+      gridView.columnByField(props.setGroupFooterColID[i]).groupFooter.valueCallback = function (grid, cell, footerIndex, footerModel ,value){
         if(props.setGroupSumCustomLevel ==1){
           if(props.setGroupFooterColID[i]=='dtmDate'){
             return formatLocalDate(dataProvider.getValue(footerModel.firstItem.dataRow, "dtmDate"));
@@ -1361,6 +1457,13 @@ watch(() => props.exporttoExcel, (newVal) => {
   gridView.exportGrid({
     type: "excel",
     target: "local",
+    numberCallback: function(index, column, value){
+        if (value === Infinity) {
+            return 0
+        }else {
+            return value
+        }
+    },
     documentTitle: { //제목
     message: documentTitle,
     visible: true,

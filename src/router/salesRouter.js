@@ -21,6 +21,8 @@ import SLS08_004RPT from "@/views/MISALE/SLS08_004RPT.vue";
 import SLS08_005RPT from "@/views/MISALE/SLS08_005RPT.vue";
 import SLS11_007RPT from "@/views/MISALE/SLS11_007RPT.vue";
 import SLS11_006RPT from "@/views/MISALE/SLS11_006RPT.vue";
+import SLS11_013RPT from "@/views/MISALE/SLS11_013RPT.vue";
+import SLS11_009RPT from "@/views/MISALE/SLS11_009RPT.vue";
 
 export default function salesRouter() {
     return [
@@ -138,6 +140,16 @@ export default function salesRouter() {
       {
         path : "SLS11_006RPT.xml",
         component : SLS11_006RPT
+      }
+      ,
+      {
+        path : "SLS11_013RPT.xml",
+        component : SLS11_013RPT
+      }
+      ,
+      {
+        path : "SLS11_009RPT.xml",
+        component : SLS11_009RPT
       }
 
       

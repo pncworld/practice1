@@ -216,6 +216,43 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
 .custom-select4 .vs__dropdown-menu {
   height: auto !important; 
   max-width: 272px !important;
+  margin-left: 10px !important;
+  margin-top: -10px !important;
+  
+}
+
+.custom-select5 .vs__dropdown-toggle{
+  height: 28px !important; 
+  background-color: white !important;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+  min-width: 272px !important;
+  margin-right : 130px !important;
+}
+.custom-select5 {
+  display: flex; /* 부모 요소를 flex 컨테이너로 설정 */
+  flex-direction: column; /* 수직 정렬 */
+  align-items: center; /* 중앙 정렬 */
+  min-height: 40px; /* 최소 높이 설정 */
+  min-width: 500px !important;
+  
+}
+.custom-select5 .vs__selected {
+  height: 32px !important; 
+  background-color: white !important;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden !important;
+  min-width: 80px !important;
+
+
+}
+.custom-select5 .vs__dropdown-menu {
+  height: auto !important; 
+  max-width: 272px !important;
   margin-left: 50px !important;
   margin-top: -10px !important;
   
