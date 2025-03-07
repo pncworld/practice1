@@ -1,23 +1,22 @@
-import { createApp, render } from 'vue'
-import App from './App.vue'
-import router from './router'
-import './assets/index.css'
-import store from './store'
-import VueDatePicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css';
-import { useLoading } from 'vue-loading-overlay'
-import 'v-calendar/style.css';
-import { Calendar, DatePicker } from 'v-calendar'
-import './customStyle/style.css';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons'; // 필요한 아이콘만 import
+import { library } from '@fortawesome/fontawesome-svg-core'
 import { far } from '@fortawesome/free-regular-svg-icons'; // Regular 아이콘
-import 'realgrid/dist/realgrid-style.css';
-import VueKonva from 'vue-konva';
-import Swal from 'sweetalert2'
+import { fas } from '@fortawesome/free-solid-svg-icons'; // 필요한 아이콘만 import
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
+import 'realgrid/dist/realgrid-style.css'
+import { Calendar, DatePicker } from 'v-calendar'
+import 'v-calendar/style.css'
+import { createApp } from 'vue'
+import VueKonva from 'vue-konva'
+import { useLoading } from 'vue-loading-overlay'
 import VueSelect from 'vue-select'
-import "vue-select/dist/vue-select.css";
+import "vue-select/dist/vue-select.css"
+import App from './App.vue'
+import './assets/index.css'
+import './customStyle/style.css'
+import router from './router'
+import store from './store'
 
 
 library.add(fas ,far );

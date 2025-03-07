@@ -3,10 +3,10 @@
     <div class="pl-20 font-semibold  flex items-center text-nowrap text-base ">{{mainName}} : </div>
     <div class="grid grid-cols-[2fr,1fr,2fr,1fr,1fr] grid-rows-1 justify-start h-11 pr-14 space-x-1">
       <input type="date" class="border rounded-lg h-10 w-32 text-base mr-2 pl-5" v-model="selectedStartDate"  @change="changeStartDate"
-        max="9999-12-31">
+        :max="maxEndDate">
       <span class="items-center flex">~</span>
       <input type="date" class="border rounded-lg h-10 w-32 text-base pl-5 ml-2" v-model="selectedEndDate"  @change="changeEndDate"
-        max="9999-12-31">
+        :max="maxEndDate">
       <button class="w-[30px] ml-2" @click="toggleRadio"><img src="../assets/choiceCalendar.png" class="w-full" alt="">
       </button>
     </div>
@@ -101,6 +101,11 @@ const props = defineProps({
     type: String,
     default: '매출일자'
   }
+  ,
+  limitEndDate : {
+    type: String,
+    default: '9999-12-31'
+  }
 });
 const formatDate = (date) => date.toISOString().split('T')[0]
 const today = new Date();
@@ -114,17 +119,32 @@ const selectedStartDate = ref(formatDate(today))
 const selectedEndDate = ref(formatDate(today))
 
 const emitDate1 = (e) => {
-  console.log(e)
+  
 }
+const maxEndDate = ref('9999-12-31')
 onMounted(() => {
   tempStartDateStack.push(selectedStartDate.value)
   tempEndDateStack.push(selectedEndDate.value)
+
+  maxEndDate.value = props.limitEndDate
   emit('startDate', selectedStartDate.value)
   emit('endDate', selectedEndDate.value)
   emit('excelDate', mainName.value + ' : '+selectedStartDate.value+'~'+ selectedEndDate.value)
 })
+
+watch( () => props.limitEndDate , () => {
+  console.log(props.limitEndDate)
+  maxEndDate.value = props.limitEndDate
+  if(new Date(selectedEndDate.value) > new Date(maxEndDate.value)){
+    selectedEndDate.value = maxEndDate.value
+  }
+
+  if(new Date(selectedStartDate.value) > new Date(maxEndDate.value)){
+    selectedStartDate.value = maxEndDate.value
+  }
+})
 const emitDate2 = (e) => {
-  console.log(e)
+
 }
 
 const showRadio = ref(false)
@@ -139,10 +159,11 @@ const updateDateRange = (e) => {
     lastWeekStart.setDate(TODAY.getDate() - TODAY.getDay() - 6); // 지난 주 시작 날짜
     const lastWeekEnd = new Date(TODAY);
     lastWeekEnd.setDate(TODAY.getDate() - TODAY.getDay()); // 지난 주 종료 날짜
-    console.log(lastWeekStart)
+
     selectedStartDate.value = formatDateToYYYYMMDD(lastWeekStart);
     selectedEndDate.value = formatDateToYYYYMMDD(lastWeekEnd);
   } else if (e.target.value == 'currentWeek') {
+    
     const currentWeekStart = new Date(TODAY);
     currentWeekStart.setDate(TODAY.getDate() - TODAY.getDay() + 1); // 이번 주 시작 날짜
     const currentWeekEnd = new Date(TODAY);
@@ -195,11 +216,23 @@ function formatDateToYYYYMMDD(date) {
 }
 
 watch(() => [selectedStartDate.value, selectedEndDate.value], async () => {
+
+  if(new Date(selectedEndDate.value) > new Date(maxEndDate.value) || new Date(selectedStartDate.value) > new Date(maxEndDate.value)){
+     Swal.fire({
+      title: '오류',
+      text: '승인일 기준 조회일은 '+maxEndDate.value+'일 까지 가능합니다.',
+      icon: 'error',
+      confirmButtonText: '확인'
+     })
+     selectedEndDate.value = maxEndDate.value
+     //selectedStartDate.value = maxEndDate.value
+     return
+  }
   emit('startDate', selectedStartDate.value);
   emit('endDate', selectedEndDate.value);
   emit('excelDate', mainName.value + ' : '+selectedStartDate.value+'~'+ selectedEndDate.value)
 
-  console.log(selectedEndDate.value)
+
   if(props.selectedRadioBox == '02'){
     if(selectedEndDate.value > props.orgAcceptDate){
       selectedEndDate.value = props.orgAcceptDate;
@@ -219,7 +252,7 @@ watch(() => props.selectedRadioBox, async () => {
   if(props.selectedRadioBox == '02'){
     const res = await getSalesCloseMaxDate(props.selectedGroup)
     const acceptDate = res.data.closeMaxDate[0].dtmCloseDate.split(" ")[0]
-    console.log(acceptDate)
+ 
 
     if(selectedEndDate.value > acceptDate){
       selectedEndDate.value = acceptDate;

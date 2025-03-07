@@ -66,7 +66,7 @@ export function excelTitle(target) {
 }
 
 export async function insertPageLog(progdata) {
-  console.log(progdata)
+
   const store = useStore()
   const currenttime = new Date()
   const inserttime = formatDateTime2(currenttime)
@@ -78,7 +78,7 @@ export async function insertPageLog(progdata) {
     const result = await fetch('https://api64.ipify.org?format=json');
     const data = await result.json();
     userIp = data.ip;
-    console.log(userIp)
+  
   }
   await userip()
   const progname = progdata.strUrl.split('::')[1].split('.xml')[0]

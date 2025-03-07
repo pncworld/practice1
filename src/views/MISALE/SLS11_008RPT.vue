@@ -61,7 +61,7 @@
   
         <Realgrid :progname="'SLS11_008RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setFooter="true" :mergeMask="'strStore'" :setMergeMode="false" 
         :setGroupFooter="setGroupFooter" :setRowGroupSpan2="setRowGroupSpan" :setGroupSumCustomColumnId2="['strStore']" :setGroupColumnId="'strStore,dtmDate'"
-          :documentTitle="'SLS11_008RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel" :setGroupOrderByColumnId="'dtmDate'">
+          :documentTitle="'SLS11_008RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel" :setGroupOrderByColumnId="'strStore'">
         </Realgrid>
       </div>
     </div>
@@ -104,7 +104,7 @@ import { useStore } from 'vuex';
   const causeList = ref([])
   const mergeMask = ref()
   const selecetedCond =ref(0)
-  const selecetedCond2 =ref(0)
+  const selecetedCond2 =ref(1)
 onMounted(async () => {
 
    const pageLog = await insertPageLog(store.state.activeTab2)

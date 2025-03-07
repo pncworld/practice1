@@ -220,7 +220,7 @@ watch(selectedSuperVisor, (newValue) => {
 watch(selectedStoreList, () => {
     if (selectedStoreList.value == null) {
         selectedStore.value = 0
-        emit('excelStore', '매장명 : 선택')
+        emit('excelStore', '매장명 : 전체')
     } else {
         selectedStore.value = selectedStoreList.value
         const name = store.state.storeCd.filter(item => item.lngStoreCode == selectedStoreList.value)[0].strName

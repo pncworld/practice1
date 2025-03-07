@@ -462,8 +462,8 @@ const props = defineProps({
   }
   ,
   mergeMask: {
-    type: Array,
-    default: [[]],
+    type: String,
+    default: '',
   }
  
   ,
@@ -506,6 +506,12 @@ const props = defineProps({
   setGroupCustomLevel: {
     type: String,
     default: 1,
+  }
+  ,
+  
+  setRowStyleCalls: {
+    type: Boolean,
+    default: false,
   }
 
 });
@@ -774,7 +780,25 @@ const funcshowGrid = async () => {
 
   gridView.setColumns(columns);
 
+  if(props.setRowStyleCalls){
 
+  gridView.setRowStyleCallback((grid, item, fixed) => {
+    let ret = {};
+    let Value = grid.getValue(item.index, "seqNum");
+    if(Value){
+
+ 
+    console.log(Value)
+    if (Value.toString().substring(Value.length-1 ) == '2'|| Value.substring(Value.length-1 ) == '3') {
+      return 'blue'
+    } else if ( Value.substring(Value.length-1 ) == '8'){
+      return 'pink'
+    } else if (Value.substring(Value.length-1 ) == '9'){
+      return 'navy'
+    }
+  }
+});
+}
 
   if(props.setGroupFooterExpressions !=[]){
     for(let i=0 ; i <props.setGroupFooterExpressions.length ; i++){
@@ -961,7 +985,7 @@ const funcshowGrid = async () => {
 
   if(props.hideColumnsId!=[]){
     for(var i=0 ; i < props.hideColumnsId.length ; i++){
-      console.log(props.hideColumnsId)
+   
       if(gridView.columnByField(props.hideColumnsId[i])){
         gridView.columnByField(props.hideColumnsId[i]).visible = false;
       }
@@ -1768,5 +1792,15 @@ watch(() => [props.searchWord, props.searchColValue2], ([newValue, newValue2]) =
   text-align: right;
   font-size: 12px;
   background-color:rgba(231, 134, 77, 0.3);
+}
+.blue {
+  background : rgb(135, 206, 235);
+}
+.navy {
+  background : navy;
+  color : white
+}
+.pink {
+  background : pink;
 }
 </style>

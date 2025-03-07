@@ -61,13 +61,13 @@
   </template>
   
   <script setup>
-  import { getCardSalesSumReport, getCardCorp } from '@/api/misales';
-  import Datepicker2 from '@/components/Datepicker2.vue';
-  import pickStoreSingle from '@/components/pickStoreSingle.vue';
-  import Realgrid from '@/components/realgrid.vue';
-  import { ref, onMounted, watch } from 'vue';
-  import { useStore } from 'vuex';
-  import Swal from 'sweetalert2';
+  import { getCardCorp, getCardSalesSumReport } from '@/api/misales';
+import Datepicker2 from '@/components/Datepicker2.vue';
+import pickStoreSingle from '@/components/pickStoreSingle.vue';
+import Realgrid from '@/components/realgrid.vue';
+import Swal from 'sweetalert2';
+import { onMounted, ref, watch } from 'vue';
+import { useStore } from 'vuex';
 
   const setFooterColID = ref(['lngTotalCnt', 'lngTotalAmt', 'lngApprovalCnt', 'lngApprovalAmt', 'lngCancleCnt', 'lngCancleAmt', 'lngSumCnt', 'lngSumAmt', 'lngCommission'])
   const setFooterExpressions = ref(['sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum'])

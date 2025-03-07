@@ -54,6 +54,13 @@ export const getpayCodeList = (groupCd, storeCd) => {
     STORE_CD: storeCd
   });
 };
+export const getpayCodeList2 = (groupCd, storeCd) => {
+
+  return api2.post('/MISALES/SLS12_019RPT.asmx/getpayCodeList2', {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd
+  });
+};
 export const getCustInfo = (groupCd, storeCd, seqId) => {
 
   return api2.post('/MISALES/SLS02_011RPT.asmx/getCustInfo', {
@@ -539,6 +546,50 @@ export const getCashReceiptDetail = (groupCd ,storeattr , storeteam, storesuperv
     END_DATE    : enddate,
     CONDITION    : cond,
     CONDITION2    : cond2,
+  });
+};
+export const getReportybyCashReceipt = (groupCd ,storeattr , storeteam, storesupervisor , storeCd  , startdate , enddate , reporttype , cond2  ) => {
+  return api2.post('/MISALES/SLS12_011RPT.asmx/getReportybyCashReceipt', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    REPORT_TYPE    : reporttype,
+    CONDITION2    : cond2,
+  });
+};
+export const getSalesDetail = (groupCd ,storeattr , storeteam, storesupervisor , storeCd  , startdate , enddate , cond2  ) => {
+  return api2.post('/MISALES/SLS12_019RPT.asmx/getSalesDetail', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    CONDITION    : cond2,
+  });
+};
+export const getVATInfo = (groupCd , storeCd  , startdate , enddate  ) => {
+  return api2.post('/MISALES/SLS14_032RPT.asmx/getVATInfo', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate
+  });
+};
+export const getPlanbyTime = (groupCd , storeattr , storeteam , storesupervisor , storeCd  , selecedate ,bit ) => {
+  return api2.post('/MISALES/SLS01_091RPT.asmx/getPlanbyTime', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    DATE    : selecedate,
+    BIT : bit
   });
 };
 
