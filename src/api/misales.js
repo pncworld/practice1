@@ -54,6 +54,13 @@ export const getpayCodeList = (groupCd, storeCd) => {
     STORE_CD: storeCd
   });
 };
+export const getpayCodeList2 = (groupCd, storeCd) => {
+
+  return api2.post('/MISALES/SLS12_019RPT.asmx/getpayCodeList2', {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd
+  });
+};
 export const getCustInfo = (groupCd, storeCd, seqId) => {
 
   return api2.post('/MISALES/SLS02_011RPT.asmx/getCustInfo', {
@@ -449,6 +456,140 @@ export const getSalesByPaymentTypeReport = (groupCd ,storeCd , startDate, endDat
     START_DATE  : startDate,
     END_DATE    : endDate,
     REPORT_TYPE : reporttype
+  });
+};
+export const getSalesbySeats = (groupCd ,storeattr , storeCd , startDate, endDate, selectday , selectstore) => {
+  return api2.post('/MISALES/SLS11_013RPT.asmx/getSalesbySeats', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR   : storeattr,
+    STORE_CD   : storeCd,
+    START_DATE  : startDate,
+    END_DATE    : endDate,
+    SELECT_DAY : selectday,
+    SELECT_STORE : selectstore,
+  });
+};
+export const getCustomerList = (groupCd , storeCd ) => {
+  return api2.post('/MISALES/SLS11_009RPT.asmx/getCustomerList', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+  
+  });
+};
+export const getSalesbyCustomer = (groupCd ,storeattr , storeteam, storesupervisor , storeCd  , startdate , enddate ,reporttype , cust) => {
+  return api2.post('/MISALES/SLS11_009RPT.asmx/getSalesbyCustomer', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    REPORT_TYPE    : reporttype,
+    CUSTOMER    : cust
+  
+  
+  });
+};
+export const getSalesbyOrders = (groupCd ,storeattr , storeteam, storesupervisor , storeCd  , startdate , enddate ,reporttype ) => {
+  return api2.post('/MISALES/SLS11_012RPT.asmx/getSalesbyOrders', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    REPORT_TYPE    : reporttype
+  
+  
+  });
+};
+export const getSalesByBuyType = (groupCd ,storeattr , storeCd  , startdate , enddate ) => {
+  return api2.post('/MISALES/SLS11_014RPT.asmx/getSalesByBuyType', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+
+  
+  });
+};
+export const getDiscountCodes = (groupCd ,storeCd  ) => {
+  return api2.post('/MISALES/SLS11_004RPT.asmx/getDiscountCodes', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+
+  });
+};
+export const getDiscountRecords = (groupCd ,storeattr , storeteam, storesupervisor , storeCd  , startdate , enddate , discount  ) => {
+  return api2.post('/MISALES/SLS11_004RPT.asmx/getDiscountRecords', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    DISCOUNT_CODE    : discount
+  });
+};
+export const getCashReceiptDetail = (groupCd ,storeattr , storeteam, storesupervisor , storeCd  , startdate , enddate , cond , cond2  ) => {
+  return api2.post('/MISALES/SLS11_008RPT.asmx/getCashReceiptDetail', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    CONDITION    : cond,
+    CONDITION2    : cond2,
+  });
+};
+export const getReportybyCashReceipt = (groupCd ,storeattr , storeteam, storesupervisor , storeCd  , startdate , enddate , reporttype , cond2  ) => {
+  return api2.post('/MISALES/SLS12_011RPT.asmx/getReportybyCashReceipt', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    REPORT_TYPE    : reporttype,
+    CONDITION2    : cond2,
+  });
+};
+export const getSalesDetail = (groupCd ,storeattr , storeteam, storesupervisor , storeCd  , startdate , enddate , cond2  ) => {
+  return api2.post('/MISALES/SLS12_019RPT.asmx/getSalesDetail', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    CONDITION    : cond2,
+  });
+};
+export const getVATInfo = (groupCd , storeCd  , startdate , enddate  ) => {
+  return api2.post('/MISALES/SLS14_032RPT.asmx/getVATInfo', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate
+  });
+};
+export const getPlanbyTime = (groupCd , storeattr , storeteam , storesupervisor , storeCd  , selecedate ,bit ) => {
+  return api2.post('/MISALES/SLS01_091RPT.asmx/getPlanbyTime', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    DATE    : selecedate,
+    BIT : bit
   });
 };
 

@@ -21,6 +21,16 @@ import SLS08_004RPT from "@/views/MISALE/SLS08_004RPT.vue";
 import SLS08_005RPT from "@/views/MISALE/SLS08_005RPT.vue";
 import SLS11_007RPT from "@/views/MISALE/SLS11_007RPT.vue";
 import SLS11_006RPT from "@/views/MISALE/SLS11_006RPT.vue";
+import SLS11_013RPT from "@/views/MISALE/SLS11_013RPT.vue";
+import SLS11_009RPT from "@/views/MISALE/SLS11_009RPT.vue";
+import SLS11_012RPT from "@/views/MISALE/SLS11_012RPT.vue";
+import SLS11_014RPT from "@/views/MISALE/SLS11_014RPT.vue";
+import SLS11_004RPT from "@/views/MISALE/SLS11_004RPT.vue";
+import SLS11_008RPT from "@/views/MISALE/SLS11_008RPT.vue";
+import SLS12_011RPT from "@/views/MISALE/SLS12_011RPT.vue";
+import SLS12_019RPT from "@/views/MISALE/SLS12_019RPT.vue";
+import SLS14_032RPT from "@/views/MISALE/SLS14_032RPT.vue";
+import SLS01_091RPT from "@/views/MISALE/SLS01_091RPT.vue";
 
 export default function salesRouter() {
     return [
@@ -138,6 +148,56 @@ export default function salesRouter() {
       {
         path : "SLS11_006RPT.xml",
         component : SLS11_006RPT
+      }
+      ,
+      {
+        path : "SLS11_013RPT.xml",
+        component : SLS11_013RPT
+      }
+      ,
+      {
+        path : "SLS11_009RPT.xml",
+        component : SLS11_009RPT
+      }
+      ,
+      {
+        path : "SLS11_012RPT.xml",
+        component : SLS11_012RPT
+      }
+      ,
+      {
+        path : "SLS11_014RPT.xml",
+        component : SLS11_014RPT
+      }
+      ,
+      {
+        path : "SLS11_004RPT.xml",
+        component : SLS11_004RPT
+      }
+      ,
+      {
+        path : "SLS11_008RPT.xml",
+        component : SLS11_008RPT
+      }
+      ,
+      {
+        path : "SLS12_011RPT.xml",
+        component : SLS12_011RPT
+      }
+      ,
+      {
+        path : "SLS12_019RPT.xml",
+        component : SLS12_019RPT
+      }
+      ,
+      {
+        path : "SLS14_032RPT.xml",
+        component : SLS14_032RPT
+      }
+      ,
+      {
+        path : "SLS01_091RPT.xml",
+        component : SLS01_091RPT
       }
 
       

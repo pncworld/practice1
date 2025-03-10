@@ -47,18 +47,15 @@
                     </select></div>
             </div>
         </div>
-        <div >
-            <!-- <button class="bg-white border w-[60%] ml-4 rounded-lg h-7 disabled:bg-gray-100"  @click="showStoreList" >전체</button> -->
-            <!-- <input type="button"
-                class="bg-white border w-44 ml-4 rounded-lg h-7 disabled:bg-gray-100 text-center overflow-hidden"
-                @click="showStoreList" :disabled="settingDisable == 1" v-model="selectedStoreList"> -->
+        <div class="ml-10">
+  
 
                 <v-select 
   v-model="selectedStoreList" 
   :options="rowData" 
   label="strName" 
   :placeholder="placeHolderNm"
-  class="custom-select4 mr-10"
+  class="custom-select4 pr-20"
   clearable="true"
   @click="clickPosNo" 
   :disabled="disabled2"
@@ -223,7 +220,7 @@ watch(selectedSuperVisor, (newValue) => {
 watch(selectedStoreList, () => {
     if (selectedStoreList.value == null) {
         selectedStore.value = 0
-        emit('excelStore', '매장명 : 선택')
+        emit('excelStore', '매장명 : 전체')
     } else {
         selectedStore.value = selectedStoreList.value
         const name = store.state.storeCd.filter(item => item.lngStoreCode == selectedStoreList.value)[0].strName

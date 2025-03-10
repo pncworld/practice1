@@ -3,11 +3,11 @@
         <div><label for="searchType1" class="text-base" :disabled="disabled1">직/가맹<input type="radio" id="searchType1"
                     value="1" v-model="settingDisable" :disabled="disabled1"></label></div>
         <div><select name="" id="" v-model="selectedStoreGroup" :disabled="true"
-                class="mr-5 w-56 h-7 rounded-lg">
+                class="mr-2 w-56 h-7 rounded-lg">
                 <option :value="i.lngStoreGroup" v-for="i in storeGroup">{{ i.strName }}</option>
             </select></div>
         <div><select name="" id="" v-model="selectedStoreType" :disabled="settingDisable == 2 || disabled1"
-                class="w-56 h-7 rounded-lg mr-5" @change="selectstoreType">
+                class="w-56 h-7 rounded-lg mr-2" @change="selectstoreType">
                 <option :value="0">전체</option>
                 <option :value="i.lngStoreAttr" v-for="i in storeType">{{ i.strName }}</option>
             </select></div>
@@ -58,10 +58,9 @@
                     </select></div>
             </div>
         </div>
-        <div>
-            <!-- <button class="bg-white border w-[60%] ml-4 rounded-lg h-7 disabled:bg-gray-100"  @click="showStoreList" >전체</button> -->
+        <div class="ml-5 pr-10 w-[95%]">
             <input type="button"
-                class="bg-white border w-44 ml-4 rounded-lg h-7 disabled:bg-gray-100 text-center overflow-hidden"
+                class="bg-white border w-full ml-4 rounded-lg h-7 disabled:bg-gray-100 text-center overflow-hidden mr-5"
                 @click="showStoreList" :disabled="settingDisable == 1 || disabled1" v-model="selectedStoreList">
         </div>
     </div>
