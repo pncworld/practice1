@@ -34,7 +34,7 @@
   
       <Realgrid :progname="'SLS14_032RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :setRowStyleCalls="true"
       :setGroupFooter="true" :setGroupColumnId="'strStoreGroupName'" :setGroupFooterColID="setGroupFooterColID" :setGroupFooterExpressions="setGroupFooterExpressions"
-        :setRowGroupSpan2="'strName,dtmDate'" :mergeMask="'strName'"
+        :setRowGroupSpan2="'strName,dtmDate'" :mergeMask="'strName'" 
         :documentTitle="'SLS14_032RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel" ></Realgrid>
     </div>
   </template>
@@ -205,4 +205,9 @@ const searchButton = async () => {
   }
   </script>
   
-  <style></style>
+  <style>
+.rg-body .rg-table tr td:hover,
+.rg-fixed-body .rg-table tr td:hover {
+    background: none;
+}
+</style>

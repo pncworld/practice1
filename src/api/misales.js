@@ -592,5 +592,44 @@ export const getPlanbyTime = (groupCd , storeattr , storeteam , storesupervisor 
     BIT : bit
   });
 };
+export const getSalesbyDateAndMonth = (groupCd , storeCd  , startdate , enddate , reporttype , cardno , empcode ,empname , custdeptname , custcompname ,custstatus , posno) => {
+  return api2.post('/MISALES/SLS02_006RPT.asmx/getSalesbyDateAndMonth', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    REPORT_TYPE    : reporttype,
+    CARD_NO    : cardno,
+    EMP_CODE    : empcode,
+    EMP_NAME    : empname,
+    CUST_DEPT_NAME    : custdeptname,
+    CUST_COMP_NAME    : custcompname,
+    CUST_STATUS    : custstatus,
+    POS_NO : posno
+  });
+};
+export const getSalesbyPostPay = (groupCd , storeCd  , startdate , enddate , cond, cardno , empcode ,empname , custdeptname , custcompname ,custstatus , posno) => {
+  return api2.post('/MISALES/SLS02_022RPT.asmx/getSalesbyPostPay', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    REPORT_TYPE    : cond,
+    CARD_NO    : cardno,
+    EMP_CODE    : empcode,
+    EMP_NAME    : empname,
+    CUST_DEPT_NAME    : custdeptname,
+    CUST_COMP_NAME    : custcompname,
+    CUST_STATUS    : custstatus,
+    POS_NO : posno
+  });
+};
+export const getCondition4List = (groupCd , storeCd  , cond) => {
+  return api2.post('/MISALES/SLS02_022RPT.asmx/getCondition4List', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+    SEARCH_TYPE : cond
+  });
+};
 
 

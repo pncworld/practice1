@@ -3,7 +3,7 @@
         <div class="flex justify-start  w-full pl-12 pt-4">
             <div class="flex justify-start">
                 <h1 class="font-bold text-sm md:text-2xl w-full">
-                    시간대별 계획 대비 현황.
+                    일별 계획 대비 현황.
                 </h1>
             </div>
 
@@ -15,25 +15,30 @@
 
         </div>
     </div>
-    <div class="grid grid-rows-1 grid-cols-[7fr,1fr,7fr] justify-between  bg-gray-200 rounded-lg h-24 items-center z-10">
+    <div
+        class="grid grid-rows-1 grid-cols-[7fr,1fr,7fr] justify-between  bg-gray-200 rounded-lg h-24 items-center z-10">
         <div class="grid grid-cols-1 grid-rows-2 mr-60">
-            <Datepicker1 @dateValue="dateValue" @year="year" @month="month" @day="day" @excelDate="excelDate"></Datepicker1>
-            <div class="flex justify-center items-center ml-16 space-x-3"><div class="text-base font-semibold">매출목표 : </div><input type="text" class="rounded-lg pl-1 h-8 disabled:bg-white text-right" v-model="Project" disabled></div>
+            <Datepicker2 @startDate="startDate" @endDate="endDate" @excelDate="excelDate" class="ml-5"></Datepicker2>
+            <div class="flex justify-center items-center ml-72 mr-2 space-x-3 text-nowrap">
+                <div class="text-base font-semibold">매출목표 : </div><input type="text" class="rounded-lg pl-1 h-8">
+                <div class="text-base font-semibold">매출구분 : </div><label for=""><input type="radio">실매출</label> <label for=""><input type="radio">순매출</label>
+            </div>
         </div>
         <div><input type="checkbox" :value="1" @click="updateShowStore"></div>
         <div>
-            <PickStoreSingle @lngStoreGroup="lngStoreGroup" @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam" @lngStoreAttrs="lngStoreAttrs" @lngStoreCode="lngStoreCode" @excelStore="excelStore"></PickStoreSingle>
+            <PickStoreSingle @lngStoreGroup="lngStoreGroup" @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam"
+                @lngStoreAttrs="lngStoreAttrs" @lngStoreCode="lngStoreCode" @excelStore="excelStore" :placeholderName="'선택'"></PickStoreSingle>
         </div>
-       
+
     </div>
 
     <div class="h-[80%] mt-5">
-       
-            <Realgrid :progname="'SLS01_091RPT_VUE'" :progid="1" :rowData="rowData" 
-                 :selectionStyle="'singleRow'" :hideColumnsId="hideColumnsId" :setFooter="true"
-                :documentTitle="'SLS01_091RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exporttoExcel"></Realgrid>
-       
-       
+
+        <Realgrid :progname="'SLS01_091RPT_VUE'" :progid="1" :rowData="rowData" :selectionStyle="'singleRow'"
+            :hideColumnsId="hideColumnsId" :setFooter="true" :documentTitle="'SLS01_092RPT'"
+            :documentSubTitle="documentSubTitle" :exporttoExcel="exporttoExcel"></Realgrid>
+
+
     </div>
 
 
@@ -42,7 +47,7 @@
 
 <script setup>
 import { getPlanbyTime } from '@/api/misales';
-import Datepicker1 from '@/components/Datepicker1.vue';
+import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStoreSingle from '@/components/pickStoreSingle.vue';
 import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';
@@ -52,32 +57,27 @@ const selectedDate = ref()
 const documentSubTitle = ref()
 const selectedExcelDate = ref()
 const selectedExcelStore = ref()
-const Project = ref(null)
-const dateValue = (e) => {
-    selectedDate.value = e
-    console.log(selectedDate.value)
-    initGrid()
+const selectedstartDate = ref()
+const selectedendDate = ref()
+
+const startDate = (e) => {
+    selectedstartDate.value = e
 }
-const year = (e) => {
-    console.log(e)
+const endDate = (e) => {
+    selectedendDate.value = e
 }
-const month = (e) => {
-    console.log(e)
-}
-const day = (e) => {
-    console.log(e)
-}
+
 const excelDate = (e) => {
     selectedExcelDate.value = e
 }
 const excelStore = (e) => {
     selectedExcelStore.value = e
 }
-const lngstoregroup =ref()
-const lngstoreattr =ref()
-const lngstoreteam =ref()
-const lngstoresupervisor =ref()
-const lngstorecode =ref()
+const lngstoregroup = ref()
+const lngstoreattr = ref()
+const lngstoreteam = ref()
+const lngstoresupervisor = ref()
+const lngstorecode = ref()
 const checked = ref([0])
 const hideColumnsId = ref(['strStoreName'])
 const lngStoreGroup = (e) => {
@@ -124,19 +124,17 @@ const searchButton = async () => {
     store.state.loading = true;
     try {
         initGrid()
-        let bit ;
-        if(checked.value.includes(1)){
+        let bit;
+        if (checked.value.includes(1)) {
             bit = 1
         } else {
             bit = 0
         }
-        const res = await getPlanbyTime(lngstoregroup.value, lngstoreattr.value, lngstoreteam.value, lngstoresupervisor.value, lngstorecode.value, selectedDate.value ,bit)
+        const res = await getPlanbyTime(lngstoregroup.value, lngstoreattr.value, lngstoreteam.value, lngstoresupervisor.value, lngstorecode.value, selectedDate.value, bit)
         console.log(res)
 
         rowData.value = res.data.List
         afterSearch.value = true
-    
-        Project.value = rowData.value[0]?.lngProject == '' || rowData.value[0]?.lngProject == undefined  ?  '' :  Number(rowData.value[0]?.lngProject).toLocaleString()
     } catch (error) {
         afterSearch.value = false
     } finally {
@@ -216,7 +214,7 @@ const excelButton = () => {
         })
         return;
     }
-    documentSubTitle.value = selectedExcelDate.value+'\n'+selectedExcelStore.value
+    documentSubTitle.value = selectedExcelDate.value + '\n' + selectedExcelStore.value
     exporttoExcel.value = !exporttoExcel.value
 }
 const initGrid = () => {
@@ -225,20 +223,20 @@ const initGrid = () => {
     if (rowData.value.length > 0) {
         rowData.value = []
     }
-  
+
 
 
 }
 const updateShowStore = (e) => {
-     if(e.target.checked){
-       hideColumnsId.value = []
-       checked.value = [1]
- 
-     } else {
-       hideColumnsId.value = ['strStoreName']
-       checked.value = [0]
-   
-     }
+    if (e.target.checked) {
+        hideColumnsId.value = []
+        checked.value = [1]
+
+    } else {
+        hideColumnsId.value = ['strStoreName']
+        checked.value = [0]
+
+    }
 }
 
 

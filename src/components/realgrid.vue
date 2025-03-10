@@ -514,6 +514,13 @@ const props = defineProps({
     default: false,
   }
 
+  ,
+  
+  setRowGroupSpan3 : {
+    type: String,
+    default: '',
+  }
+
 });
 
 const realgridname = ref(`realgrid-${props.progname}-${props.progid}-${uuidv4()}`); // 동적 ID 설정
@@ -587,7 +594,7 @@ const funcshowGrid = async () => {
       numberFormat: item.strSubSumexpr !='' ?  item.strSubSumexpr : item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0",
       suffix : props.suffixColumnPercent.includes(item.strColID) ? '%' : '' ,
       valueCallback : function(grid, column, groupFooterIndex, group, value){
-        const regex = /(sum|avg)\(\s*([^)]+?)\s*\)|([+\-*/])/gi;
+        const regex = /(sum|avg|max|min|count)\(\s*([^)]+?)\s*\)|([+\-*/])/gi;
         let tokens = [];
         let match;
          if(item.strSubSumtext != ''){
@@ -632,7 +639,7 @@ const funcshowGrid = async () => {
       numberFormat: item.strTotalexpr !='' ?  item.strTotalexpr : item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0",
       suffix : props.suffixColumnPercent.includes(item.strColID) ? '%' : '' ,
       valueCallback : function(grid,column , footerIndex, columnFooter, value){
-        const regex = /(sum|avg)\(\s*([^)]+?)\s*\)|([+\-*/])/gi;
+        const regex = /(sum|avg|max|min|count)\(\s*([^)]+?)\s*\)|([+\-*/])/gi;
         let tokens = [];
         let match;
   
@@ -661,7 +668,7 @@ const funcshowGrid = async () => {
             returnText += tokens[i].operator
           }
           }
-        
+    
           return eval(returnText) == 'Infinity' ? 0 : eval(returnText)
          } else {
     
@@ -714,9 +721,9 @@ const funcshowGrid = async () => {
     const lcolumns = props.labelingColumns.split(',')
     const labels = props.labelsData
     const values = props.valuesData
-    console.log(lcolumns)
-    console.log(labels)
-    console.log(values)
+    // console.log(lcolumns)
+    // console.log(labels)
+    // console.log(values)
     for (var i = 0; i < lcolumns.length; i++) {
       const labelingcolumn = columns.find(item => item.fieldName == lcolumns[i])
       if (labelingcolumn) {
@@ -749,7 +756,7 @@ const funcshowGrid = async () => {
 
   }
   if (props.setRowGroupSpan2 != '') {
-    console.log(props.setRowGroupSpan2)
+
     const mergeColumn = props.setRowGroupSpan2.split(',')
     const maskColumns = props.mergeMask.split(',')
     for (var i = 0; i < mergeColumn.length; i++) {
@@ -758,16 +765,16 @@ const funcshowGrid = async () => {
       if(props.mergeMask != ''){
         const mask = maskColumns.map(item => item)
      
-
+      
       for(let i=0 ; i < mask.length ; i++ ){
         maskdata = "values['"+mask[i]+"']+"
       }
-      maskdata = maskdata+"value"
+       maskdata = maskdata+"value"
       } else {
         maskdata = "value"
       }
-       console.log(maskdata)
-       if(rowGroupSpanColumn){
+  
+       if(rowGroupSpanColumn ){
         rowGroupSpanColumn.mergeRule = { criteria: maskdata}
        }
       
@@ -775,6 +782,42 @@ const funcshowGrid = async () => {
 
 
   }
+
+  // if (props.setRowGroupSpan3 != '') {
+  //   console.log(props.setRowGroupSpan3)
+  //   const mergeColumn = props.setRowGroupSpan3.split(',')
+  //   const maskColumns = props.mergeMask.split(',')
+  //   for (var i = 0; i < maskColumns.length; i++) {
+  //     const rowGroupSpanColumn = columns.find(item => item.fieldName == maskColumns[i])
+  //     let maskdata = 'value' ;
+  //     if(props.mergeMask != ''){
+  //       const mask = maskColumns.map(item => item)
+     
+
+  //     for(let j=0 ; j < mask.length ; j++ ){
+  //       if(mask[j] == maskColumns[i]){
+  //         maskdata = "values['"+mask[j]+"']+"
+  //       } else {
+  //         maskdata = ''
+  //       }
+        
+  //     }
+  //     maskdata = maskdata+"value"
+  //     } else {
+  //       maskdata = "value"
+  //     }
+  //      console.log(maskdata)
+  //      if(rowGroupSpanColumn){
+  //       rowGroupSpanColumn.mergeRule = { criteria: maskdata}
+  //      }
+      
+  //   }
+
+
+  // }
+
+
+ 
 
    
 
@@ -788,7 +831,7 @@ const funcshowGrid = async () => {
     if(Value){
 
  
-    console.log(Value)
+
     if (Value.toString().substring(Value.length-1 ) == '2'|| Value.substring(Value.length-1 ) == '3') {
       return 'blue'
     } else if ( Value.substring(Value.length-1 ) == '8'){
@@ -824,6 +867,15 @@ const funcshowGrid = async () => {
 
 
     gridView.columnByField(props.setGroupSumCustomColumnId2[i]).groupFooter.valueCallback = function (grid, column, footerIndex,columnFooter, value){
+      if(props.setGroupCustomLevel == '3'){
+        if(columnFooter.level == 2){
+          const a =  props.setGroupSumCustomText2[i][0]
+         return a
+        }else if(columnFooter.level == 1){
+          const b =  props.setGroupSumCustomText2[i][1]
+        return  b
+       }
+      }
       if(props.setGroupCustomLevel == '2'){
         return '매장소계'
       }
@@ -834,8 +886,9 @@ const funcshowGrid = async () => {
       if(columnFooter.level == 2){
         return "소계"
         }else if(columnFooter.level == 1){
-        return "매장소계"
-        }
+        return   "매장소계"
+       }
+       
     }
   }
   }
@@ -974,6 +1027,7 @@ const funcshowGrid = async () => {
   gridView.displayOptions.selectionStyle = props.selectionStyle
   gridView.displayOptions.showTooltip = true;
   gridView.groupPanel.visible = false;
+
   if(props.suffixColumnPercent != []){
    for(let i=0 ; i < props.suffixColumnPercent.length ; i++){
     gridView.columnByName(props.suffixColumnPercent[i]).suffix = "%"
@@ -1803,4 +1857,5 @@ watch(() => [props.searchWord, props.searchColValue2], ([newValue, newValue2]) =
 .pink {
   background : pink;
 }
+
 </style>

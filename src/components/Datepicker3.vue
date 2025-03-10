@@ -1,6 +1,6 @@
 <template>
     <div class="flex items-center ml-20 space-x-2 ">
-        <span class="ml-10 font-semibold text-base">해당월 : </span>
+        <span class="ml-10 font-semibold text-base">해당연월 : </span>
         <!-- <select name="" id="" class="w-32 h-8 rounded-lg border border-gray-500" v-model="startyear" @change="setStartYear">
             <option :value="i" v-for="i in settingYears">{{ i }}</option>
         </select> -->

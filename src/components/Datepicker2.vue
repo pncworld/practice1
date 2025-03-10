@@ -134,9 +134,11 @@ onMounted(() => {
 
 watch( () => props.limitEndDate , () => {
   console.log(props.limitEndDate)
+ 
   maxEndDate.value = props.limitEndDate
   if(new Date(selectedEndDate.value) > new Date(maxEndDate.value)){
     selectedEndDate.value = maxEndDate.value
+
   }
 
   if(new Date(selectedStartDate.value) > new Date(maxEndDate.value)){
@@ -225,7 +227,7 @@ watch(() => [selectedStartDate.value, selectedEndDate.value], async () => {
       confirmButtonText: '확인'
      })
      selectedEndDate.value = maxEndDate.value
-     //selectedStartDate.value = maxEndDate.value
+     selectedStartDate.value = maxEndDate.value
      return
   }
   emit('startDate', selectedStartDate.value);

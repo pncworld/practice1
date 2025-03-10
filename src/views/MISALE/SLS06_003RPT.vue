@@ -48,6 +48,7 @@
 import Datepicker3 from '@/components/Datepicker3.vue';
 import PickStorePlural from '@/components/pickStorePlural.vue';
 import Realgrid from '@/components/realgrid.vue';
+import Swal from 'sweetalert2';
 import { ref } from 'vue';
 import { useStore } from 'vuex';
   
@@ -111,8 +112,21 @@ import { useStore } from 'vuex';
   console.log(store.state.userData)
 
 const searchButton = async () => {
-    store.state.loading = true;
+
+    if(selectedstartYear.value == null || selectedstartMonth.value == null || selectedendYear.value == null || selectedendMonth.value == null){
+        Swal.fire({
+            title: '날짜를 선택하세요.',
+            icon: 'info',
+      
+            confirmButtonColor: '#3085d6',
+      
+            confirmButtonText: '확인'
+          })
+          return ;
+    }
+   
     try {
+      store.state.loading = true;
       initGrid()
       if(tempChecked.value== true){
         hideColumnsId.value =[]
