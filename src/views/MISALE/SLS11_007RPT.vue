@@ -23,7 +23,7 @@
           </div>
           <div>
             <label for="unite" class="font-thin">
-              <input type="checkbox" id="unite" class="ml-5 " @change="seeUnite">셀병합
+              <input type="checkbox" id="unite" class="ml-5 " @change="cellUnite">셀병합
             </label>
           </div>
           <div>
@@ -34,17 +34,17 @@
         </div>
       </div>
       <div class="h-[75%] ml-5">
-          <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle>
-          <!-- <pickStoreRenew @update:storeCd="selectedStoreCd" @update:storeGroup="selectedGroupCd" @update:storeType="changeStoreType"></pickStoreRenew> -->
+          <pickStoreRenew @lngStoreCode="selectedStoreCd" @lngStoreGroup="selectedGroupCd" @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"  @changeInit="changeInit"></pickStoreRenew>
       </div>
     </div>
     <div class="w-full h-[82%]">
       <Realgrid :progname="'SLS11_007RPT_VUE'" :progid="progId" :rowData="rowData" :reload="reload" 
         :setFooter="true" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
-        :setGroupFooter="setGroupFooter" :setGroupColumnId="setGroupColumnId" :setGroupSumCustomText="['소계']" 
-        :setGroupSumCustomColumnId="setGroupSumCustomColumnId" :setGroupSumCustomLevel="3" :setGroupSummaryCenterIds="setGroupSummaryCenterIds" 
+        :setGroupFooter="setGroupFooter" :setGroupColumnId="setGroupColumnId" 
+        :setGroupSumCustomColumnId="['dtmDate']" :setGroupSumCustomText="['소계']"  :hideColumnsId="hideColumnsId"
         :setGroupFooterExpressions="setGroupFooterExpressions" :setGroupFooterColID="setGroupFooterColID"
-        :documentTitle="'SLS11_007RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
+        :mergeMask="''" :setMergeMode="false" :setRowGroupSpan2="setRowGroupSpan"
+        :documentTitle="'SLS11_007RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel" >
       </Realgrid>
     </div>
     </div>
@@ -53,7 +53,7 @@
   <script setup>
   import { getSalesByPaymentTypeReport } from '@/api/misales';
   import Datepicker2 from '@/components/Datepicker2.vue';
-  import pickStoreSingle from '@/components/pickStoreSingle.vue';
+  import pickStoreRenew from '@/components/pickStoreRenew.vue';
   import Realgrid from '@/components/realgrid.vue';
   import { ref, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';
@@ -65,14 +65,15 @@
   const setGroupFooterColID  = ref(['lngTotAmt', 'lngActAmt', 'lngCashAmt', 'lngCreditAmt', 'lngTicketAmt', 'lngTrustAmt', 'lngPointAmt', 'lngPointCnt', 'lngCashBagSAmt'
                                   , 'lngCashBagCnt', 'lngCashBagAmt', 'lngTMCAmt', 'lngTMCCnt', 'lngDCAmt', 'lngDepositAmt', 'lngRepayAmt', 'lngGiftCardAmt'])
   const setGroupFooterExpressions = ref(['sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum'])
-  const setGroupSummaryCenterIds = ref('dtmDate, strWeek')
-  const setGroupSumCustomColumnId = ref(['strWeek']);
-  const setGroupColumnId = ref('');
+
+  const setGroupColumnId = ref('')
+  const hideColumnsId = ref([])
   const reload = ref(false)
   const rowData = ref([])
   const afterSearch = ref(false)
   const selectedstartDate = ref();
   const selectedendDate = ref();
+  const setRowGroupSpan = ref('')
 
 const startDate = (e) => {
   console.log(e);
@@ -96,15 +97,9 @@ const endDate = (e) => {
   const updateProgid = () => {
     if (tempSeeDaily.value) {
       reportCheckData.value = '1'; 
-      setGroupSumCustomColumnId.value = ['dtmDate']
-      setGroupColumnId.value = 'strWeek'
-      console.log(setGroupColumnId.value)
       progId.value = '2'
     } else {
       reportCheckData.value = '0';
-      setGroupSumCustomColumnId.value = ['dtmDate']
-      setGroupColumnId.value = ''
-      console.log(setGroupColumnId.value)
       progId.value = '1'
     }
   };
@@ -130,27 +125,22 @@ const searchButton = async () => {
   try {
     initGrid()
 
+    if(tempCellUnite.value == true){
+        setRowGroupSpan.value = 'strStore'
+      } else {
+        setRowGroupSpan.value = ''
+    }
+
     //그리드 갱신
     reload.value = !reload.value
 
-    //매장 선택
-    let selectedStorearr;
-    if (selectedStores.value == undefined || selectedStores.value.length == 0 || selectedStores.value == 0) {
-      selectedStorearr = 0
-    } else {
-      selectedStorearr = selectedStores.value
-    }
-
-    console.log(selectedStorearr)
-
     console.log(reportCheckData.value)
 
-      const res = await getSalesByPaymentTypeReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, reportCheckData.value)
-      // const res = await getSalesByPaymentTypeReport(selectedGroup.value, selectedStorearr, selectedstartDate.value, selectedendDate.value, '1')
-      console.log(res)
-      rowData.value = res.data.salesByPaymentType
+    const res = await getSalesByPaymentTypeReport(groupCd.value, storeCd.value, selectedstartDate.value, selectedendDate.value, reportCheckData.value)
+    console.log(res)
+    rowData.value = res.data.salesByPaymentType
   
-      afterSearch.value = true
+    afterSearch.value = true
   
     } catch (error) {
       afterSearch.value = false
@@ -162,23 +152,21 @@ const searchButton = async () => {
   
   }
   
-  /* 매장 컴포넌트 관련 함수 */
-  const selectedGroup = ref()
-  const selectedStores = ref()
-  const selectedStoreAttrs = ref()
-  const lngStoreGroup = (e) => {
-    initGrid()
-    console.log(e)
-    selectedGroup.value = e
+  const groupCd = ref()
+  const storeCd = ref()
+  const selectedStoreAttr = ref()
+
+  const selectedStoreCd = (e) => {
+      console.log(e)
+      storeCd.value = e
   }
-  const lngStoreCodes = (e) => {
-    initGrid()
-    selectedStores.value = e
-    console.log(e)
+  const selectedGroupCd = (e) => {
+      console.log(e)
+      groupCd.value = e
   }
   const lngStoreAttrs = (e) => {
-    initGrid()
-    selectedStoreAttrs.value = e
+    initGrid();
+    selectedStoreAttr.value = e
     console.log(e)
   }
   
@@ -195,7 +183,7 @@ const searchButton = async () => {
   const exportExcel = ref(false)
   const excelButton = () => {
     documentSubTitle.value = selectedExcelDate.value +'\n'+ selectedExcelStore.value
-    console.log(documentSubTitle.value); // 맑음 소스 pickStorePlural.vue 소스의 excelStore 받아야 함.
+    console.log(documentSubTitle.value);
     // 엑셀 기능 실행
     exportExcel.value = !exportExcel.value
   }
@@ -211,5 +199,36 @@ const searchButton = async () => {
   const excelStore = (e) =>{
     selectedExcelStore.value = e
     console.log(e)
+  }
+  
+  const tempCellUnite= ref(true)
+  const cellUnite = (e) => {
+      if(e.target.checked){
+        tempCellUnite.value = true 
+        setRowGroupSpan.value = 'strStore'
+      } else {
+        tempCellUnite.value = false
+        setRowGroupSpan.value = ''
+      }
+      reload.value = !reload.value
+  }
+
+  const seeSum = (e) => {
+      if(e.target.checked){
+        setGroupColumnId.value = 'strStore'
+        if (tempSeeDaily.value) {
+          setGroupFooter.value = true
+        } else {
+          setGroupFooter.value = false
+        }
+        reload.value = !reload.value
+      } else {
+        setGroupColumnId.value = ''
+        setGroupFooter.value = false
+        reload.value = !reload.value
+      }
+  }
+  const changeInit = (e) => {
+      initGrid()
   }
   </script>

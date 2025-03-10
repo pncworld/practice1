@@ -205,6 +205,10 @@ watch(() => [selectedStartDate.value, selectedEndDate.value], async () => {
       selectedEndDate.value = props.orgAcceptDate;
       emit('endDate', props.orgAcceptDate);
     }
+    if(selectedStartDate.value > selectedEndDate.value){
+      selectedStartDate.value = props.orgAcceptDate;
+      emit('startDate', props.orgAcceptDate);
+    }
   }
 })
 

@@ -205,8 +205,12 @@ import { useStore } from 'vuex';
   //엑셀 버튼 처리 함수
   const exportExcel = ref(false)
   const excelButton = () => {
-    documentSubTitle.value = selectedExcelDate.value +'\n'+ selectedExcelStore.value
-    console.log(documentSubTitle.value); // 맑음 소스 pickStorePlural.vue 소스의 excelStore 받아야 함.
+    if(selectedExcelStore.value == '매장명 : 선택'){
+      documentSubTitle.value = selectedExcelDate.value +'\n'+ '매장명 : 전체'
+    } else {
+      documentSubTitle.value = selectedExcelDate.value +'\n'+ selectedExcelStore.value
+    }
+    console.log(documentSubTitle.value);
     // 엑셀 기능 실행
     exportExcel.value = !exportExcel.value
   }
