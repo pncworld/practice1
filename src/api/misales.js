@@ -632,4 +632,31 @@ export const getCondition4List = (groupCd , storeCd  , cond) => {
   });
 };
 
+export const getPlanbyDays = (groupCd , storeattr , storeteam ,storesupervisor , storeCd  , startdate, enddate, cond , cond2) => {
+  return api2.post('/MISALES/SLS01_092RPT.asmx/getPlanbyDays', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    CONDITON    : cond,
+    CONDITON2 : cond2
+  });
+};
+export const getPlanbyMonths = (groupCd , storeattr , storeteam ,storesupervisor , storeCd  , startdate, enddate, cond , cond2) => {
+  return api2.post('/MISALES/SLS01_093RPT.asmx/getPlanbyMonths', {
+    GROUP_CD    : groupCd,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM   : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
+    STORE_CD   : storeCd,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    CONDITON    : cond,
+    CONDITON2 : cond2
+  });
+};
+
 

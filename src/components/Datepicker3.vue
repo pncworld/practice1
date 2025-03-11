@@ -1,6 +1,6 @@
 <template>
     <div class="flex items-center ml-20 space-x-2 ">
-        <span class="ml-10 font-semibold text-base">해당연월 : </span>
+        <span class="ml-10 font-semibold text-base text-nowrap">해당연월 : </span>
         <!-- <select name="" id="" class="w-32 h-8 rounded-lg border border-gray-500" v-model="startyear" @change="setStartYear">
             <option :value="i" v-for="i in settingYears">{{ i }}</option>
         </select> -->
@@ -8,7 +8,8 @@
     v-model="startyear"
     :options="settingYears"
     :placeholder="'선택'"
-    class="custom-select6 "
+    class="custom-select8 w-32 bg-white "
+    :reduce="year => year"
     @click="resetSelect1"
   />
         <!-- <select name="" id="" class="w-10 h-8 rounded-lg border border-gray-500" v-model="startmonth"  @change="setStartMonth">
@@ -18,7 +19,8 @@
     v-model="startmonth"
     :options="Months"
     :placeholder="'선택'"
-    class="custom-select7 "
+    class="custom-select8 w-28 bg-white "
+    :reduce="month => Number(month)"
     @click="resetSelect2"
   />
   <div>~</div>
@@ -30,7 +32,7 @@
     v-model="endyear"
     :options="settingYears"
     :placeholder="'선택'"
-    class="custom-select6 "
+    class="custom-select8 w-32 bg-white "
     @click="resetSelect3"
   />
         <!-- <select name="" id="" class="w-10 h-8 rounded-lg border border-gray-500" v-model="endmonth"  @change="setEndMonth">
@@ -41,7 +43,7 @@
     v-model="endmonth"
     :options="Months"
     :placeholder="'선택'"
-    class="custom-select7 "
+    class="custom-select8 w-28 bg-white "
     @click="resetSelect4"
   />
     </div>
@@ -437,5 +439,8 @@ const resetSelect3 = (e) => {
 }
 const resetSelect4 = (e) => {
   endmonth.value = null
+}
+const handleEnter1 =(e) => {
+  console.log(e)
 }
 </script>

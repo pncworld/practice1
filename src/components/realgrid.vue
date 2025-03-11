@@ -513,12 +513,31 @@ const props = defineProps({
     type: Boolean,
     default: false,
   }
+  ,
+  
+  setRowStyleLevel: {
+    type: Number,
+    default: 1,
+  }
 
   ,
   
   setRowGroupSpan3 : {
     type: String,
     default: '',
+  }
+
+  ,
+  
+  customFooterCalculate : {
+    type: String,
+    default: "",
+  }
+  ,
+  
+  customFooterShowLast : {
+    type: Boolean,
+    default: false,
   }
 
 });
@@ -594,7 +613,7 @@ const funcshowGrid = async () => {
       numberFormat: item.strSubSumexpr !='' ?  item.strSubSumexpr : item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0",
       suffix : props.suffixColumnPercent.includes(item.strColID) ? '%' : '' ,
       valueCallback : function(grid, column, groupFooterIndex, group, value){
-        const regex = /(sum|avg|max|min|count)\(\s*([^)]+?)\s*\)|([+\-*/])/gi;
+        const regex = /(sum|avg|max|min|count)\(\s*([^)]+?)\s*\)|([+\-*/]|\b\d+\b)/gi;
         let tokens = [];
         let match;
          if(item.strSubSumtext != ''){
@@ -639,7 +658,25 @@ const funcshowGrid = async () => {
       numberFormat: item.strTotalexpr !='' ?  item.strTotalexpr : item.strColType === 'double' && item.strDisplay == 'double' ? "#,##0.00" : item.strColType === 'double' && item.strDisplay != 'double' ? '#,##0.0' : "#,##0",
       suffix : props.suffixColumnPercent.includes(item.strColID) ? '%' : '' ,
       valueCallback : function(grid,column , footerIndex, columnFooter, value){
-        const regex = /(sum|avg|max|min|count)\(\s*([^)]+?)\s*\)|([+\-*/])/gi;
+        if(props.customFooterCalculate != "" && props.customFooterCalculate == item.strColID){
+          if(props.customFooterShowLast == false){
+
+         let sum = 0 
+         let cnt = grid.getItemCount();
+         for(let i=0 ; i < cnt ; i++){
+            let value = grid.getValue(i,'lngOrder')
+            if(value == 1){
+              sum += grid.getValue(i,props.customFooterCalculate)
+            }
+         }
+          return sum 
+        } else {
+          let cnt = grid.getItemCount();
+          return grid.getValue(cnt-1,props.customFooterCalculate)
+        }
+        }
+        const regex = /(sum|avg|max|min|count)\(\s*([^)]+?)\s*\)|([+\-*/]|\b\d+\b)/gi;
+
         let tokens = [];
         let match;
   
@@ -663,12 +700,14 @@ const funcshowGrid = async () => {
            let returnText = ''
           for(let i=0 ; i< tokens.length ; i++){
           if(tokens[i].type == 'function'){
-            returnText += `gridView.getSummary("${tokens[i].field}", "${tokens[i].func}")`;
+           
+              returnText += `gridView.getSummary("${tokens[i].field}", "${tokens[i].func}")`;
+              
           } else {
             returnText += tokens[i].operator
           }
           }
-    
+          //console.log(returnText)
           return eval(returnText) == 'Infinity' ? 0 : eval(returnText)
          } else {
     
@@ -826,7 +865,8 @@ const funcshowGrid = async () => {
   if(props.setRowStyleCalls){
 
   gridView.setRowStyleCallback((grid, item, fixed) => {
-    let ret = {};
+    if(props.setRowStyleLevel == 1){
+
     let Value = grid.getValue(item.index, "seqNum");
     if(Value){
 
@@ -840,6 +880,14 @@ const funcshowGrid = async () => {
       return 'navy'
     }
   }
+} else if (props.setRowStyleLevel == 2){
+    let ret = {};
+    let Value = grid.getValue(item.index, "lngOrder");
+
+    if(Value == 1){
+      return 'blue'
+    }
+}
 });
 }
 
@@ -1548,7 +1596,9 @@ watch(() => props.exporttoExcel, (newVal) => {
     header: true,
     footer: true,
     compatibility: true,
-    lookupDisplay: true
+    lookupDisplay: true,
+    applyDynamicStyles: true
+
   })
 
 });
