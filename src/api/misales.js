@@ -659,4 +659,46 @@ export const getPlanbyMonths = (groupCd , storeattr , storeteam ,storesupervisor
   });
 };
 
+export const getStoreCorner = (groupCd , position , storeCd  , areacd) => {
+  return api2.post('/MISALES/SLS01_055RPT.asmx/getStoreCorner', {
+    GROUP_CD    : groupCd,
+    POSITION : position,
+    STORE_CD   : storeCd,
+    AREA_CD : areacd
+  });
+};
+export const getSalesByCorner = (groupCd , storeCd  , areacd ,startdate , enddate , reporttype ) => {
+  return api2.post('/MISALES/SLS01_055RPT.asmx/getSalesByCorner', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+    AREA_CD : areacd ,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    REPORT_TYPE    : reporttype
+  });
+};
+export const getSalesByCornerPayType = (groupCd , storeCd  , areacd ,startdate , enddate , reporttype ) => {
+  return api2.post('/MISALES/SLS01_056RPT.asmx/getSalesByCornerPayType', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+    AREA_CD : areacd ,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    REPORT_TYPE    : reporttype
+  });
+};
+export const getReceiptbyCorner = (groupCd , storeCd ,areaCd , posNo ,date , receiptno , discountcd , paycd , loggined ) => {
+  return api2.post('/MISALES/SLS01_057RPT.asmx/getReceiptbyCorner', {
+    GROUP_CD    : groupCd,
+    STORE_CD   : storeCd,
+    AREA_CD : areaCd,
+    POS_NO : posNo,
+    DATE    : date,
+    RECEIPT_NO    : receiptno,
+    DISCOUNT_CD    : discountcd,
+    PAY_CD    : paycd,
+    LOGIN_LANG    : loggined
+  });
+};
+
 

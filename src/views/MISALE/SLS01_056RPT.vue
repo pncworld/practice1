@@ -4,7 +4,7 @@
         <div class="flex justify-start  w-full pl-12 pt-4">
             <div class="flex justify-start">
                 <h1 class="font-bold text-sm md:text-2xl w-full">
-                    코너별 메뉴 매출 현황.
+                    코너별 결제 형태별 매출 현황.
                 </h1>
             </div>
 
@@ -22,22 +22,22 @@
         <div class="grid grid-cols-1 grid-rows-2 ml-10 ">
             <Datepicker2 @endDate="endDate" @startDate="startDate"  @excelDate="excelDate"  :initToday="1" class="pr-48" :closePopUp="closePopUp" ref="datepicker"></Datepicker2>
             <div class="flex justify-start ml-10 items-center  space-x-3 text-nowrap">
-                 <div class="text-base font-semibold ml-2">조회조건 : </div>
+                <div class="text-base font-semibold ml-2">조회조건 : </div>
                 <label for="sum"><input id="sum" type="checkbox" @click="checkSum" checked>합계</label>   
                 <label for="unite"><input id="unite" type="checkbox" @click="checkUnite" checked>셀병합</label>   
             </div>
         </div>
         <div class="-mt-10 -ml-10"><input type="checkbox" :value="1" @click="updateShowStore"></div>
-        <div class="-mt-10">
-           <PickStoreCorner @lngStoreGroup="lngStoreGroup" @lngStoreCode="lngStoreCode" @lngAreaCode="lngAreaCode" @excelStore="excelStore" ></pickStoreCorner>
+        <div class="-mt-10 ">
+           <PickStoreCorner @lngStoreGroup="lngStoreGroup" @lngStoreCode="lngStoreCode" @lngAreaCode="lngAreaCode" @excelStore="excelStore"  ></pickStoreCorner>
         </div>
 
     </div>
 
     <div class="h-[80%] mt-5">
 
-        <Realgrid :progname="'SLS01_055RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :selectionStyle="'singleRow'" 
-            :hideColumnsId="hideColumnsId" :setFooter="true" :documentTitle="'SLS01_055RPT'" :setGroupFooter="setGroupFooter" 
+        <Realgrid :progname="'SLS01_056RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" :selectionStyle="'singleRow'" 
+            :hideColumnsId="hideColumnsId" :setFooter="true" :documentTitle="'SLS01_056RPT'" :setGroupFooter="setGroupFooter" 
             :setGroupSumCustomColumnId3="setGroupSumCustomColumnId3" :customStyleColumnID="['strStore','dtmDate','strCorner']"
             :setGroupColumnId="setGroupColumnId" :setMergeMode="false" :setRowGroupSpan2="setRowGroupSpan2"
             :documentSubTitle="documentSubTitle" :exporttoExcel="exporttoExcel"></Realgrid>
@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { getSalesByCorner } from '@/api/misales';
+import { getSalesByCorner, getSalesByCornerPayType } from '@/api/misales';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStoreCorner from '@/components/pickStoreCorner.vue';
 import Realgrid from '@/components/realgrid.vue';
@@ -144,7 +144,7 @@ const searchButton = async () => {
         }
         reload.value = !reload.value
         console.log(setGroupColumnId.value)
-        const res = await getSalesByCorner(lngstoregroup.value, lngstorecode.value, lngareacode.value ,selectedstartDate.value , selectedendDate.value , reporttype)
+        const res = await getSalesByCornerPayType(lngstoregroup.value, lngstorecode.value, lngareacode.value ,selectedstartDate.value , selectedendDate.value , reporttype)
         console.log(res)
 
         rowData.value = res.data.List

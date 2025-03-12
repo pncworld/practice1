@@ -40,7 +40,7 @@ const props = defineProps({
      
       
     })
-    const emit = defineEmits(['payCd']);
+    const emit = defineEmits(['payCd','payNm']);
 const payCodeList = ref([])
 const selectedPayCd =ref(null)
 watch( () => props.storeCd , async() => {
@@ -55,6 +55,14 @@ watch( () => props.storeCd , async() => {
 
     watch(selectedPayCd, () => {
         emit('payCd' , selectedPayCd.value)
+        if(selectedPayCd.value == null){
+            emit('payNm','전체')
+        } else {
+            console.log(payCodeList.value)
+            console.log(selectedPayCd.value)
+            let nm = payCodeList.value.filter(item => item.lngCode == selectedPayCd.value)[0].strName
+            emit('payNm',nm)
+        }
     })
 
     const clickPayCd = () => {

@@ -41,7 +41,7 @@ const props = defineProps({
       
     })
 
-    const emit = defineEmits(['disCountCd']);
+    const emit = defineEmits(['disCountCd','discountNm']);
 const disCountList = ref([])
 const selectedDiscountNo = ref(null)
 watch( () => props.storeCd , async() => {
@@ -57,6 +57,13 @@ watch( () => props.storeCd , async() => {
 
     watch(selectedDiscountNo, () => {
         emit('disCountCd' , selectedDiscountNo.value)
+        if(selectedDiscountNo.value !=null){
+            let nm = disCountList.value.filter(item => item.lngCode == selectedDiscountNo.value)
+            emit('discountNm' , nm[0].strName)
+        } else {
+            emit('discountNm' , '전체')
+        }
+  
     })
     const clickDiscount = (e) => {
         selectedDiscountNo.value = null
