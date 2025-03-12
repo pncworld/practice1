@@ -40,7 +40,8 @@
       <div class="h-[75%] ml-5">
         <label for="daily" class="font-thin inline-flex">
           <input type="checkbox" id="daily" @change="seeStore">
-          <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @excelStore="excelStore"></pickStoreSingle>
+          <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" 
+                           @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam" @excelStore="excelStore" />
         </label>
       </div>
     </div>
@@ -171,14 +172,14 @@ import { useStore } from 'vuex';
       reload.value = !reload.value
 
       //매장 선택
-      let selectedStorearr;
-      if (selectedStores.value == undefined || selectedStores.value.length == 0 || selectedStores.value == 0) {
-        selectedStorearr = 0
-      } else {
-        selectedStorearr = selectedStores.value
-      }
+      // let selectedStorearr;
+      // if (selectedStores.value == undefined || selectedStores.value.length == 0 || selectedStores.value == 0) {
+      //   selectedStorearr = 0
+      // } else {
+      //   selectedStorearr = selectedStores.value
+      // }
 
-      console.log(selectedStorearr)
+      // console.log(selectedStorearr)
       
       //매입사코드 선택 콤보박스
       let selectedBuyCodeValue;
@@ -195,7 +196,8 @@ import { useStore } from 'vuex';
       console.log(reportCheckData.value)
 
       const res = await getCardSalesSumReport(
-        selectedGroup.value, selectedStoreAttrs.value, selectedStoreTeam.value , selectedStoreSuperVisor.value , selectedStorearr, selectedstartDate.value, selectedendDate.value, reportCheckData.value, selectedRadioBox.value, selectedBuyCodeValue
+          selectedGroup.value, selectedStoreAttrs.value, selectedStoreTeam.value , selectedStoreSuperVisor.value , selectedStores.value
+        , selectedstartDate.value, selectedendDate.value, reportCheckData.value, selectedRadioBox.value, selectedBuyCodeValue
       )
       console.log(res)
       rowData.value = res.data.cardSalesSum
@@ -281,8 +283,12 @@ import { useStore } from 'vuex';
   //엑셀 버튼 처리 함수
   const exportExcel = ref(false)
   const excelButton = () => {
-    documentSubTitle.value = selectedExcelDate.value +'\n'+ selectedExcelStore.value
-    console.log(documentSubTitle.value); // 맑음 소스 pickStorePlural.vue 소스의 excelStore 받아야 함.
+    if(selectedExcelStore.value == '매장명 : 선택'){
+      documentSubTitle.value = selectedExcelDate.value +'\n'+ '매장명 : 전체'
+    } else {
+      documentSubTitle.value = selectedExcelDate.value +'\n'+ selectedExcelStore.value
+    }
+    console.log(documentSubTitle.value);
     // 엑셀 기능 실행
     exportExcel.value = !exportExcel.value
   }

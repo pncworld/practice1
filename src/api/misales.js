@@ -221,9 +221,9 @@ export const getCardCorp = (groupCd ,storeCds , orderBy) => {
 export const getCardSalesSumReport = (groupCd , storeattr , storeteam, storesupervisor , storeCds, startDate, endDate, reporttype, dateType, strBuyCode) => {
   return api2.post('/MISALES/SLS05_004RPT.asmx/getCardSalesSumReport', {
     GROUP_CD    : groupCd,
-    STORE_ATTR    : storeattr,
-    STORE_TEAM    : storeteam,
-    STORE_SUPERVISOR    : storesupervisor,
+    STORE_ATTR  : storeattr,
+    STORE_TEAM  : storeteam,
+    STORE_SUPERVISOR : storesupervisor,
     STORE_CDS   : storeCds,
     START_DATE  : startDate,
     END_DATE    : endDate,

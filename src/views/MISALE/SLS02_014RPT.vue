@@ -220,7 +220,7 @@ import { useStore } from 'vuex';
   const exportExcel = ref(false)
   const excelButton = () => {
     documentSubTitle.value = selectedExcelDate.value +'\n'+ selectedExcelStore.value
-    console.log(documentSubTitle.value); // 맑음 소스 pickStorePlural.vue 소스의 excelStore 받아야 함.
+    console.log(documentSubTitle.value);
     // 엑셀 기능 실행
     exportExcel.value = !exportExcel.value
   }
