@@ -22,7 +22,7 @@
 
 <script setup>
 import { getpayCodeList } from '@/api/misales';
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 const props = defineProps({
       groupCd: {
       type: String,
@@ -43,6 +43,9 @@ const props = defineProps({
     const emit = defineEmits(['payCd','payNm']);
 const payCodeList = ref([])
 const selectedPayCd =ref(null)
+onMounted( () => {
+    emit('payNm' ,'전체')
+})
 watch( () => props.storeCd , async() => {
        const res = await getpayCodeList(props.groupCd , props.storeCd);
        payCodeList.value = res.data.PAYCDLIST

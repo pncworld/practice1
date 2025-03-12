@@ -139,13 +139,14 @@ const resetArea = ()=> {
   padding: 1px 0 !important; /* 입력 필드가 너무 위쪽에 올라가지 않도록 조정 */
   margin: 0 !important;
   display : none;
-
+  color : rgb(211, 211, 211) !important;
   
 }
 .vs--disabled .vs__dropdown-toggle{
-  background-color: #d1d5db !important;
-  color: white !important; /* 텍스트 색상도 변경 */
-  border-color: #d1d5db !important;
+  background-color: white !important;
+  border-color: white !important;
+  -webkit-text-fill-color: #2c3e50 !important;
+  opacity: 0.7;
 }
 
 

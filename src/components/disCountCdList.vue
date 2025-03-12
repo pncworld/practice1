@@ -22,7 +22,7 @@
 
 <script setup>
 import { getDiscountCdList } from '@/api/misales';
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 const props = defineProps({
       groupCd: {
       type: String,
@@ -44,6 +44,9 @@ const props = defineProps({
     const emit = defineEmits(['disCountCd','discountNm']);
 const disCountList = ref([])
 const selectedDiscountNo = ref(null)
+onMounted( () => {
+    emit('discountNm' ,'전체')
+})
 watch( () => props.storeCd , async() => {
        const res = await getDiscountCdList(props.groupCd , props.storeCd);
        disCountList.value = res.data.DISCOUNTLIST
