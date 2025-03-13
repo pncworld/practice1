@@ -1,12 +1,12 @@
 <template>
     <div class="flex justify-center md:justify-end space-x-4 text-sm mr-5  ">
      <div class="items-center font-bold hidden md:flex pl-12">매장명 : </div>
-      <div>
+      <div v-show="hideit2">
         <select :disabled="isDisabled" v-model="selectedGroupCd" id="storeGroup" class="hidden md:inline-block border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="emitStoreGroup($event.target.value)">
           <option :value="item.lngStoreGroup" v-for="item in storeGroup" :key="item.lngStoreGroup">{{ item.strName }}</option>
         </select>
       </div>
-      <div v-show="hideit">
+      <div v-show="hideit2">
         <select :disabled="isDisabled"  class="hidden md:inline-block border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" @change="setStore($event.target.value); emitStoreType($event.target.value);" v-model="selectedStoreType">
          
           <option value="0">전체</option>
@@ -16,7 +16,7 @@
       <div class="w-full md:w-auto" v-show="hideit">
         <select :disabled="isDisabled"  class="w-full md:w-auto border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" v-model="selectedStoreCode" @change="emitStoreCode($event.target.value); ischanged(); setStoreAreaCd($event.target.value); setPosNo($event.target.value); setKioskNo($event.target.value);">
         
-          <option value="0">선택</option>
+          <option value="0">{{defaultStoreNm}}</option>
           <option :value="item.lngStoreCode" v-for="item in storeCd" :key="item.lngStoreCode">{{ item.strName }}</option>
         </select>
       </div>
@@ -82,7 +82,7 @@ const selectedStoreType = ref(store.state.userData.lngJoinType);
 const selectedStoreCode = ref(store.state.userData.lngPosition);
 const isDisabled1 = ref(false);
 const isDisabled = ref(false);
-
+const hideit2 = ref(true)
  
     const userData = store.state.userData ;
 
@@ -115,6 +115,11 @@ const props = defineProps({
       type: Boolean,
       default: false,
      }
+     ,
+     defaultStoreNm: {
+      type: String,
+      default: '선택',
+     }
      
       
     })
@@ -125,6 +130,7 @@ const showPosNo = ref(props.showPosNo)
 const showScreenNo= ref(props.showScreenNo)
 const showKioskNo= ref(props.showKioskNo)
 const showPayType= ref(props.showPayType)
+const defaultStoreNm = ref('선택')
 watch(() => props.hidesub, () => {
   hideit.value = props.hidesub;
 })
@@ -154,10 +160,11 @@ onMounted(()=>{
   storeCd2.value = store.state.storeCd;
   storeAreaCd2.value = store.state.storeAreaCd;
   selectedStoreAreaCd.value = 0
-  console.log(storeAreaCd2.value)
+
   emit('update:storeGroup', store.state.userData.lngStoreGroup);
   emit('update:storeType', store.state.userData.lngJoinType);
   emit('update:storeCd', store.state.userData.lngPosition);
+  emit('storeNm', store.state.userData.strStoreName);
   emit('posNo', 0);
   emit('update:storeAreaCd', 0);
   emit('GroupNm', store.state.userData.strStoreGroupName);
@@ -169,6 +176,8 @@ onMounted(()=>{
   } else {
     isDisabled.value = true
   }
+
+  defaultStoreNm.value = props.defaultStoreNm
 })
 const emitStoreType = (value) => {
     emit('update:storeType', value);
@@ -182,6 +191,7 @@ const emitStoreCode = (value) => {
     emit('storeNm' ,selectedNm )
     emit('update:storeCd', value);
   } else {
+    emit('storeNm' ,'전체' )
     emit('update:storeCd', value);
   }
 };

@@ -573,7 +573,7 @@ const addrow4activated = ref(false);
 const deleted2activated = ref(false);
 const updatedrowData = ref([])
 const selectedindex = ref(-1)
-const emit = defineEmits(["selcetedrowData", "updatedRowData", "clickedRowData", "dblclickedRowData", "selectedIndex", "checkedRowData", "getJsonData"]);
+const emit = defineEmits(["selcetedrowData", "updatedRowData", "clickedRowData", "dblclickedRowData", "selectedIndex", "checkedRowData", "getJsonData" ,"sendRowState"]);
 const funcshowGrid = async () => {
 
   if (gridView !== undefined && gridView !== null) {
@@ -606,7 +606,7 @@ const funcshowGrid = async () => {
   // 필드 정의
   const fields = tabInitSetArray.value.map(item => ({
     fieldName: item.strColID,
-    dataType: item.strColID.includes('checkbox') ? 'boolean' : (item.strColType == 'number' || item.strColType === 'float' || item.strColType === 'double') ? 'number' : (item.strColType == 'date') ? 'datetime' : 'text',
+    dataType: item.strColID.includes('checkbox') || item.strColID.includes('lngSupplierID')  ? 'boolean' : (item.strColType == 'number' || item.strColType === 'float' || item.strColType === 'double') ? 'number' : (item.strColType == 'date') ? 'datetime' : 'text',
     datetimeFormat: "yyyy-MM-dd"
   }));
   fields.push({ fieldName: "deleted", dataType: "boolean" })
@@ -803,7 +803,7 @@ const funcshowGrid = async () => {
       inputCharacters: item.strColID == props.inputOnlyNumberColumn ? '0123456789' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ㄱ-힣!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
     },
     visible: item.intHdWidth !== 0,
-    renderer: { type: item.strColID == 'add' ? 'button' : item.strColID.includes('checkbox') ? 'check' : 'text' },
+    renderer: { type: item.strColID == 'add' ? 'button' : (item.strColID.includes('checkbox') || item.strColID.includes('lngSupplierID')) ? 'check' : 'text' },
     styleCallback: function (grid, dataCell) {
       var ret = {}
 
@@ -818,9 +818,15 @@ const funcshowGrid = async () => {
       if (props.checkBarInactive != '') {
         var inActiveColumn = grid.getValue(dataCell.index.itemIndex, props.checkBarInactive)
 
-        if (inActiveColumn == '0' && item.strColID == 'checkbox') {
+        if (inActiveColumn == '0' && (item.strColID == 'checkbox' )) {
           ret.style = { opacity: "0.5" }
           ret.renderer = { type: "check", editable: false }
+        
+        }
+        if ( (item.strColID == 'lngSupplierID' )) {
+          ret.style = { opacity: "0.5" }
+          ret.renderer = { type: "check", editable: false }
+        
         }
       }
 
@@ -1376,7 +1382,8 @@ const funcshowGrid = async () => {
 
       console.log(selectedRowData.value)
       console.log(selectedindex.value)
-
+      const rowState = dataProvider.getRowState(clickData.dataRow)
+      emit('sendRowState' ,rowState)
       emit('clickedRowData', selectedRowData.value);
       emit('selectedIndex', current.dataRow)
       emit('selectedIndex2', current.dataRow)
@@ -1458,12 +1465,14 @@ watch(() => props.changeNow, () => {
   console.log(props.changeValue2)
 
 
+  if(props.changeRow != ''){
+    dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue2);
 
-  dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue2);
+    updatedrowData.value = [...dataProvider.getJsonRows()]
 
-  updatedrowData.value = [...dataProvider.getJsonRows()]
-
-  emit('updatedRowData', updatedrowData.value)
+    emit('updatedRowData', updatedrowData.value)
+  }
+ 
 
 
 })
@@ -1542,6 +1551,8 @@ watch(() => props.addRow4, (newVal) => {
 
   selectedRowData.value = dataProvider.getRows()[selectedindex.value];
   selectedRowData.value.index = selectedindex.value
+  const rowState = dataProvider.getRowState(selectedindex.value)
+  emit('sendRowState' ,rowState)
   emit('clickedRowData', selectedRowData.value);
   emit('selectedIndex', selectedRowIndex)
   updatedrowData.value = [...dataProvider.getJsonRows()]
