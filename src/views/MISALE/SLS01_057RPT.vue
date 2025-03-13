@@ -3,7 +3,7 @@
         <div class="flex justify-start  w-full pl-12 pt-4">
             <div class="flex justify-start">
                 <h1 class="font-bold text-sm md:text-2xl w-full">
-                    영수증별 매출 조회.
+                    코너별 영수증별 매출 조회.
                 </h1>
             </div>
 
@@ -17,33 +17,34 @@
     </div>
     <div class="grid grid-rows-2 grid-cols-3 justify-between  bg-gray-200 rounded-lg h-24 items-center z-10">
         <div>
-            <Datepicker1 @dateValue="dateValue" @year="year" @month="month" @day="day"></Datepicker1>
+            <Datepicker1 @dateValue="dateValue" @year="year" @month="month" @day="day" @excelDate="excelDate"></Datepicker1>
         </div>
-        <div>
-            <PickStoreRenew3 @lngStoreCode="selectedStoreCd" @lngStoreGroup="selectedGroupCd"
-                @lngStoreAttrs="lngStoreAttrs" :placeholderName="'선택'"></PickStoreRenew3>
+        <div class="-ml-10">
+
+            <PickStoreCorner @lngStoreGroup="lngStoreGroup" @lngStoreCode="lngStoreCode" @lngAreaCode="lngAreaCode"
+                @excelStore="excelStore"></pickStoreCorner>
         </div>
         <div>
             <PosList :groupCd="groupCd" :storeCd="storeCd" @posNo="posNo" class="!ml-3" :init="init"></posList>
         </div>
         <div class="text-base font-semibold w-[90%] ml-10 z-10">영수증 번호: <input type="text"
                 class="border rounded-lg pl-1 h-10 !w-36 z-30" v-model="receiptNo"></div>
-        <div class="grid !mr-44  items-center relative">
-            <DisCountCdList class=" flex absolute -right-1 w-[150%]" @disCountCd="DisCountCd" :groupCd="groupCd"
+        <div class="grid !mr-80  items-center relative">
+            <DisCountCdList class=" flex absolute -right-1 w-[150%]" @disCountCd="DisCountCd" @discountNm="discountNm" :groupCd="groupCd"
                 :storeCd="storeCd" :init="init"></DisCountCdList>
         </div>
         <div class="flex justify-center items-center mt-3 ml-9">
-            <PayCodeList class=" flex -mt-5 " @payCd="selectedpayCd" :groupCd="groupCd" :storeCd="storeCd" :init="init">
+            <PayCodeList class=" flex -mt-5 " @payCd="selectedpayCd" @payNm="payNm" :groupCd="groupCd" :storeCd="storeCd" :init="init">
             </payCodeList>
         </div>
     </div>
 
     <div class="grid grid-rows-1 grid-cols-[7fr,3fr] h-[80%] mt-5">
         <div><span class="flex justify-start">*영수내역을 선택하시면 상세내역을 확인할 수 있습니다.</span>
-            <Realgrid :progname="'SLS02_011RPT_VUE'" :progid="1" :rowData="rowData" :valuesData="valuesData"
-                :labelsData="labelsData" :labelingColumns="'strVoidFlag'" :selectionStyle="'singleRow'"
-                @clickedRowData="clickedRowData" :initSelect="true" :exporttoExcel="exceloutput" :setStateBar="false"
-                :ExcelNm="'영수증별 매출 조회.'"></Realgrid>
+            <Realgrid :progname="'SLS01_057RPT_VUE'" :progid="1" :rowData="rowData" :valuesData="valuesData"
+                :documentTitle="'SLS01_057RPT'" :labelsData="labelsData" :labelingColumns="'strVoidFlag'"
+                :selectionStyle="'singleRow'" @clickedRowData="clickedRowData" :initSelect="true" :setStateBar="false"
+                :exporttoExcel="exceloutput" :documentSubTitle="documentSubTitle"></Realgrid>
         </div>
         <div class="grid grid-rows-3 grid-cols-1">
             <div>
@@ -66,11 +67,11 @@
 </template>
 
 <script setup>
-import { getCustInfo, getOrderInfo, getPayInfo, getReceiptDatas } from '@/api/misales';
+import { getCustInfo, getOrderInfo, getPayInfo, getReceiptbyCorner, getReceiptDatas } from '@/api/misales';
+import PickStoreCorner from '@/components/pickStoreCorner.vue';
 import Datepicker1 from '@/components/Datepicker1.vue';
 import DisCountCdList from '@/components/disCountCdList.vue';
 import PayCodeList from '@/components/payCodeList.vue';
-import PickStoreRenew3 from '@/components/pickStoreRenew.vue';
 import PosList from '@/components/posList.vue';
 import Realgrid from '@/components/realgrid.vue';
 import Swal from 'sweetalert2';
@@ -93,12 +94,6 @@ const day = (e) => {
     console.log(e)
 }
 
-const lngStoreGroups = (e) => {
-    console.log(e)
-}
-const lngStoreCodes = (e) => {
-    console.log(e)
-}
 
 const receiptNo = ref()
 const initCheckBox = ref(false)
@@ -123,10 +118,10 @@ const searchButton = async () => {
     store.state.loading = true;
     try {
         initGrid()
-        const res = await getReceiptDatas(groupCd.value, storeCd.value, selectedPosNo.value, selectedDate.value, receiptNo.value, disCountCd.value, payCd.value, loginedstrLang)
+        const res = await getReceiptbyCorner(groupCd.value, storeCd.value,selectedStoreAreaCode.value , selectedPosNo.value, selectedDate.value, receiptNo.value, disCountCd.value, payCd.value, loginedstrLang)
         console.log(res)
 
-        rowData.value = res.data.RECEIPT
+        rowData.value = res.data.List
         afterSearch.value = true
     } catch (error) {
         afterSearch.value = false
@@ -138,9 +133,12 @@ const searchButton = async () => {
 }
 const groupCd = ref()
 const storeCd = ref()
-const dtmDate = ref()
+const selectedExcelStore = ref()
+const selectedExcelDate = ref()
+const selectedStoreAreaCode = ref()
 const init = ref(false)
-const selectedStoreCd = (e) => {
+const documentSubTitle = ref('')
+const lngStoreCode = async (e) => {
     console.log(e)
     storeCd.value = e
 
@@ -151,9 +149,22 @@ const selectedStoreCd = (e) => {
 
 
 }
-const selectedGroupCd = (e) => {
+const lngStoreGroup = (e) => {
     console.log(e)
     groupCd.value = e
+}
+const lngAreaCode = (e) => {
+    initGrid()
+    console.log(e)
+    selectedStoreAreaCode.value = e
+}
+const excelStore = (e) => {
+    console.log(e)
+    selectedExcelStore.value = e
+}
+const excelDate = (e) => {
+    console.log(e)
+    selectedExcelDate.value = e
 }
 const rowData = ref([])
 const rowData2 = ref([])
@@ -173,6 +184,7 @@ const posNo = (e) => {
 }
 
 const disCountCd = ref("")
+const disCountNm = ref("")
 const DisCountCd = (e) => {
     console.log(e)
     if (e == null) {
@@ -181,8 +193,13 @@ const DisCountCd = (e) => {
         disCountCd.value = e
     }
 }
+const discountNm = (e) => {
+    console.log(e)
+    disCountNm.value = e
+}
 
 const payCd = ref("")
+const paynm = ref("")
 const selectedpayCd = (e) => {
 
 
@@ -192,6 +209,10 @@ const selectedpayCd = (e) => {
         payCd.value = e
     }
 }
+const payNm = (e) => {
+
+    paynm.value = e
+}
 
 const valuesData = ref([['Sales Cancellation', 'Menu Correction', 'Order Cancellation']])
 const labelsData = ref([['매출취소', '메뉴정정', '주문취소']])
@@ -199,7 +220,7 @@ const labelsData = ref([['매출취소', '메뉴정정', '주문취소']])
 
 const clickedRowData = async (e) => {
     console.log(e)
-    const seqId = e[17]
+    const seqId = e[0]
 
     const res = await getCustInfo(groupCd.value, storeCd.value, seqId)
 
@@ -228,6 +249,16 @@ const excelButton = () => {
         })
         return;
     }
+    let cond = '포스번호 : '; 
+    cond += selectedPosNo.value == 0 ? '전체' : selectedPosNo.value
+    let cond2 = '영수증번호 : '; 
+    cond2+=receiptNo.value
+    let cond3 = '할인코드 : '; 
+    cond3 += disCountNm.value
+    let cond4 = '지불코드 : '; 
+    cond4 += paynm.value
+    
+    documentSubTitle.value = selectedExcelDate.value +'\n' + selectedExcelStore.value +'\n' + cond +'\n' + cond2 +'\n' + cond3 +'\n' + cond4 
     exceloutput.value = !exceloutput.value
 }
 const initGrid = () => {

@@ -110,7 +110,7 @@ onMounted(async () => {
     const pageLog = await insertPageLog(store.state.activeTab2)
 
     const res = await getSalesCloseMaxDate(store.state.userData.lngStoreGroup)
-    limitEndDate.value = res.data.closeMaxDate[0].dtmCloseDate.split(" ")[0]
+    formattedDate.value = res.data.closeMaxDate[0].dtmCloseDate.split(" ")[0]
 
 })
 
@@ -248,12 +248,13 @@ const changeInit = (e) => {
 const selectedCond = ref([]);
 const selectedCond2 = ref("01")
 const selectedCond3 = ref([2])
-
+const formattedDate = ref('')
 watch((selectedCond2), () => {
     if (selectedCond2.value.includes("01")) {
-        formattedDate.value = '9999-12-31'
+        limitEndDate.value = '9999-12-31'
     } else {
-        formattedDate.value = limitEndDate.toISOString().split("T")[0]
+        limitEndDate.value = formattedDate.value
+        //limitEndDate.value = limitEndDate.value.toISOString().split("T")[0]
     }
     console.log(formattedDate.value)
 })

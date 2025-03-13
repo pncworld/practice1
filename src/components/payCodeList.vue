@@ -22,7 +22,7 @@
 
 <script setup>
 import { getpayCodeList } from '@/api/misales';
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 const props = defineProps({
       groupCd: {
       type: String,
@@ -40,9 +40,12 @@ const props = defineProps({
      
       
     })
-    const emit = defineEmits(['payCd']);
+    const emit = defineEmits(['payCd','payNm']);
 const payCodeList = ref([])
 const selectedPayCd =ref(null)
+onMounted( () => {
+    emit('payNm' ,'전체')
+})
 watch( () => props.storeCd , async() => {
        const res = await getpayCodeList(props.groupCd , props.storeCd);
        payCodeList.value = res.data.PAYCDLIST
@@ -55,6 +58,14 @@ watch( () => props.storeCd , async() => {
 
     watch(selectedPayCd, () => {
         emit('payCd' , selectedPayCd.value)
+        if(selectedPayCd.value == null){
+            emit('payNm','전체')
+        } else {
+            console.log(payCodeList.value)
+            console.log(selectedPayCd.value)
+            let nm = payCodeList.value.filter(item => item.lngCode == selectedPayCd.value)[0].strName
+            emit('payNm',nm)
+        }
     })
 
     const clickPayCd = () => {
