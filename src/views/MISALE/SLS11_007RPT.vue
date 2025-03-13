@@ -15,7 +15,7 @@
       <div class="grid grid-cols-1 grid-rows-2">
         <Datepicker2 @startDate="startDate" @endDate="endDate" :closePopUp="closePopUp" ref="datepicker"
           :selectedGroup="selectedGroup" @excelDate="excelDate" />
-        <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 ">조회조건 :
+        <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-36 ">조회조건 :
           <div>
             <label for="daily" class="font-thin">
               <input type="checkbox" id="daily" class="ml-5" @change="seeDaily">일자별
@@ -23,12 +23,12 @@
           </div>
           <div>
             <label for="unite" class="font-thin">
-              <input type="checkbox" id="unite" class="ml-5 " @change="cellUnite">셀병합
+              <input type="checkbox" id="unite" class="ml-5 " @change="cellUnite" checked>셀병합
             </label>
           </div>
           <div>
             <label for="sum" class="font-thin">
-              <input type="checkbox" id="sum" class="ml-5 " @change="seeSum">합계
+              <input type="checkbox" id="sum" class="ml-5 " @change="seeSum" checked>합계
             </label>
           </div>
         </div>
@@ -55,18 +55,18 @@
   import Datepicker2 from '@/components/Datepicker2.vue';
   import pickStoreRenew from '@/components/pickStoreRenew.vue';
   import Realgrid from '@/components/realgrid.vue';
-  import { ref, onMounted, watch } from 'vue';
+  import { ref, watch } from 'vue';
   import { useStore } from 'vuex';
 
   const setFooterColID = ref(['lngTotAmt', 'lngActAmt', 'lngCashAmt', 'lngCreditAmt', 'lngTicketAmt', 'lngTrustAmt', 'lngPointAmt', 'lngPointCnt', 'lngCashBagSAmt'
                             , 'lngCashBagCnt', 'lngCashBagAmt', 'lngTMCAmt', 'lngTMCCnt', 'lngDCAmt', 'lngDepositAmt', 'lngRepayAmt', 'lngGiftCardAmt'])
   const setFooterExpressions = ref(['sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum'])
-  const setGroupFooter = ref(true)
+  const setGroupFooter = ref(false)
   const setGroupFooterColID  = ref(['lngTotAmt', 'lngActAmt', 'lngCashAmt', 'lngCreditAmt', 'lngTicketAmt', 'lngTrustAmt', 'lngPointAmt', 'lngPointCnt', 'lngCashBagSAmt'
                                   , 'lngCashBagCnt', 'lngCashBagAmt', 'lngTMCAmt', 'lngTMCCnt', 'lngDCAmt', 'lngDepositAmt', 'lngRepayAmt', 'lngGiftCardAmt'])
   const setGroupFooterExpressions = ref(['sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum', 'sum'])
 
-  const setGroupColumnId = ref('')
+  const setGroupColumnId = ref('strStore')
   const hideColumnsId = ref([])
   const reload = ref(false)
   const rowData = ref([])
@@ -213,22 +213,23 @@ const searchButton = async () => {
       reload.value = !reload.value
   }
 
+
+  watch([tempSeeDaily, reload], ([dailyValue, _]) => {
+    setGroupFooter.value = dailyValue;
+  });
+  
   const seeSum = (e) => {
-      if(e.target.checked){
-        setGroupColumnId.value = 'strStore'
-        if (tempSeeDaily.value) {
-          setGroupFooter.value = true
-        } else {
-          setGroupFooter.value = false
-        }
-        reload.value = !reload.value
-      } else {
-        setGroupColumnId.value = ''
-        setGroupFooter.value = false
-        reload.value = !reload.value
-      }
+    if(e.target.checked){
+      setGroupColumnId.value = 'strStore'
+      reload.value = !reload.value
+    } else {
+      setGroupColumnId.value = ''
+      reload.value = !reload.value
+    }
   }
+
   const changeInit = (e) => {
       initGrid()
   }
+
   </script>

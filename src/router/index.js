@@ -10,6 +10,7 @@ import masterRouter from './masterRouter'
 import mobileRouter from './mobileRouter'
 import miattendRouter from './miattendRouter'
 import accountRouter from './accountRouter'
+import systemRouter from './systemRouter'
 
 
 const isMobile = () =>{
@@ -60,6 +61,10 @@ const routes = [
     path: '/MIACCOUNT',
     //component : BasicLayout ,
     children: accountRouter()
+  },
+  {
+    path: '/MISYSTEM',
+    children: systemRouter()
   },
 ]
 

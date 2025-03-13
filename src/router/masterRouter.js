@@ -31,7 +31,7 @@ import NotFound from "@/views/NotFound.vue";
 
 
 
-export default function salesRouter() {
+export default function masterRouter() {
     return [
      {
         path: 'MST01_002INS.xml',
