@@ -1410,6 +1410,7 @@ const funcshowGrid = async () => {
       emit('sendRowState' ,rowState)
       
       emit('clickedRowData', selectedRowData.value);
+
       emit('selectedIndex', current.dataRow)
       emit('selectedIndex2', current.dataRow)
 
@@ -1490,12 +1491,13 @@ watch(() => props.changeNow, () => {
   // console.log(props.changeValue2)
 
 
-  if(props.changeRow != ''){
+  if(props.changeRow != '' && props.changeRow != -1 ){
     dataProvider.setValue(props.changeRow, props.changeColid, props.changeValue2);
 
     updatedrowData.value = [...dataProvider.getJsonRows()]
 
     emit('updatedRowData', updatedrowData.value)
+    emit('updatedRowData2', updatedrowData.value)
   }
  
 
@@ -1706,6 +1708,7 @@ watch(() => props.deleteRow4, (newVal) => {
 watch(() => props.deleteRow5, (newVal) => {
   gridView.commit();
   const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
+  const currRowState = dataProvider.getRowState(curr.dataRow)
   if (curr && curr.dataRow >= 0) {
     // 현재 데이터 행이 유효한 경우
     console.log(dataProvider.getRowState(curr.dataRow) )
@@ -1720,6 +1723,12 @@ watch(() => props.deleteRow5, (newVal) => {
   } else {
     console.warn("선택된 행이 없습니다.");
   }
+
+    const curr2 = gridView.getCurrent();
+    const currRowState2 = dataProvider.getRowState(curr2.dataRow)
+    emit('sendRowState', currRowState2 )
+    emit('selectedindex', curr2.dataRow )
+  
  
   let deletedRows = dataProvider.getStateRows('deleted')
   console.log(deletedRows)
@@ -1729,9 +1738,10 @@ watch(() => props.deleteRow5, (newVal) => {
   }
 
   emit('deleteRows' , deleteRowsArr.value)
-  if(curr.dataRow-1 >=0){
-   
-    emit('clickedRowData2' ,Number(curr.dataRow-1) )
+
+  if(curr2.dataRow >=0){
+    
+    emit('clickedRowData2' ,Number(curr2.dataRow) )
   } else {
     emit('clickedRowData2' ,Number(0) )
   }
@@ -1829,8 +1839,8 @@ watch(() => props.exporttoExcel, (newVal) => {
 watch(() => props.initFocus, (newVal) => {
   setTimeout(() => {
     if (gridView != undefined && gridView != null) {
-
       gridView.clearCurrent();
+      dataProvider.clearRowStates()
     }
   }, 10)
 
@@ -1893,7 +1903,7 @@ watch(() => props.moveFocusbyIndex , () => {
    //console.log(gridView.setCurrent({ dataRow: Number(props.moveFocusbyIndex) }))
    if(props.moveFocusbyIndex != -1){
     gridView.setCurrent({ dataRow: props.moveFocusbyIndex})
-
+   
       selectedRowData.value = dataProvider.getRows()[props.moveFocusbyIndex];
       if (selectedRowData.value) {
         emit('selectedIndex', props.moveFocusbyIndex);
@@ -1983,6 +1993,8 @@ watch(() => props.rowData, () => {
 
 
       if (selectedindex.value == -1) {
+        dataProvider.clearRowStates()
+        emit('selectedIndex' , selectedindex.value)
         return;
       }
 

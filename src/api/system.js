@@ -94,3 +94,34 @@ export const saveUserEnroll = (flag, sequence , chargercode , chargername , strI
 
   });
 };
+export const getUserPassWordEnroll = (groupCd, storeCd, cond, cond2) => {
+  return api2.post('/MISYSTEM/SYS49_003INS.asmx/getUserPassWordEnroll', {
+      GROUP_CD   : groupCd,
+      STORE_CD  : storeCd,
+      CONDITION : cond,
+      CONDITION2   : cond2,
+   
+  });
+};
+export const saveUserPassWordEnroll = (sequence , password) => {
+  return api2.post('/MISYSTEM/SYS49_003INS.asmx/saveUserPassWordEnroll', {
+    SEQUENCE : sequence,
+    PASSWORD :  password,
+   
+  });
+};
+export const validatePassWord = (sequence , password) => {
+  return api2.post('/MISYSTEM/SYS49_016INS.asmx/validatePassWord', {
+    SEQUENCE : sequence,
+    PASSWORD :  password,
+   
+  });
+};
+export const savePassWord = (groupcd , sequence , password) => {
+  return api2.post('/MISYSTEM/SYS49_016INS.asmx/savePassWord', {
+    GROUP_CD : groupcd,
+    SEQUENCE : sequence,
+    PASSWORD :  password,
+   
+  });
+};

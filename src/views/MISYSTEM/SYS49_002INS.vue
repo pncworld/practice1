@@ -37,7 +37,7 @@
         <div>
             <div class="text-xl font-semibold flex justify-start ml-10 mt-2">사용자 정보</div>
             <Realgrid :progname="'SYS49_002INS_VUE'" :progid="1" :rowData="rowData" :documentTitle="'SYS49_002INS'"
-                class="mt-2" :selectionStyle="'singleRow'" @clickedRowData="clickedRowData" :initFocus="initFocus"
+                class="mt-2" :selectionStyle="'singleRow'" @clickedRowData="clickedRowData" :initSelect="true"
                 :moveFocusbyIndex="moveFocusbyIndex" @sendRowState="sendRowState" @selectedIndex="selectedIndex"
                 :deleteRow5="deleteRow2" @updatedRowData2="updatedRowData" :setStateBar="true" @deleteRows="deleteRows"
                 :checkBarInactive="'lngSupplierID'" :exporttoExcel="exceloutput" :changeNow="changeNow"
@@ -50,61 +50,64 @@
             <div class="text-xl font-semibold flex justify-between ml-10 mt-2">
                 <div>상세 정보</div>
                 <div>
-                    <button @click="addButton" class="whitebutton md:w-auto w-14">신규</button>
-                    <button @click="deleteButton" class="whitebutton md:w-auto w-14">삭제</button>
+                    <button @click="addButton" class="whitebutton md:w-auto w-14" :disabled="!afterSearch">신규</button>
+                    <button @click="deleteButton" class="whitebutton md:w-auto w-14"
+                        :disabled="clickedOrNot">삭제</button>
                 </div>
             </div>
             <div
                 class="grid grid-rows-[repeat(10,minmax(0,1fr))_6fr] grid-cols-[1fr,4fr] border border-gray-500 h-[100%] ml-10 -mt-5">
-                <div class="border border-gray-500 p-2 font-semibold">매장</div>
+                <div class="border border-gray-500 p-2 flex h-auto items-center text-sm font-semibold justify-center bg-gray-100">매장</div>
                 <div class="border border-gray-500 p-1 flex space-x-3"><input type="text" v-model="value1" disabled
                         class="border border-gray-500"><input type="text" disabled class="border border-gray-500 w-64"
                         v-model="value2"></div>
-                <div class="border border-gray-500 p-2 font-semibold">사용자ID</div>
+                <div class="border border-gray-500 p-2 flex h-auto items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500">*사용자ID</div>
                 <div class="border border-gray-500 p-1 flex space-x-3"><input type="text" v-model="value3"
                         @input="setValue3" :disabled="forupdateDisabled" class="border border-gray-500"><button
-                        class="button primary h-7" @click="checkDupli">중복체크</button></div>
-                <div class="border border-gray-500 p-2 font-semibold">사용자명</div>
+                        class="button primary h-7" @click="checkDupli" :disabled="clickedOrNot">중복체크</button></div>
+                <div class="border border-gray-500 p-2 flex h-auto items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500">*사용자명</div>
                 <div class="border border-gray-500 p-1 flex space-x-3"><input type="text" v-model="value4"
-                        @input="setValue4" class="border border-gray-500 w-64"></div>
-                <div class="border border-gray-500 p-2 font-semibold">주민등록번호</div>
+                        @input="setValue4" class="border border-gray-500 w-64" :disabled="clickedOrNot"></div>
+                <div class="border border-gray-500 p-2 flex h-auto items-center text-sm font-semibold justify-center bg-gray-100">주민등록번호</div>
                 <div class="border border-gray-500 p-1 flex space-x-3"><input type="number" v-model="value5"
-                        @input="setValue5" class="border border-gray-500 w-32">-<input type="number"
-                        class="border border-gray-500 w-32" v-model="value6" @change="setValue6">
+                        @input="setValue5" class="border border-gray-500 w-32" :disabled="clickedOrNot">-<input
+                        type="number" class="border border-gray-500 w-32" v-model="value6" @change="setValue6"
+                        :disabled="clickedOrNot">
                 </div>
-                <div class="border border-gray-500 p-2 font-semibold">비밀번호</div>
+                <div class="border border-gray-500 p-2 flex h-auto items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500 ">*비밀번호</div>
                 <div class="border border-gray-500 p-1 flex space-x-3"><input type="password" v-model="value7"
-                        @input="setValue7" class="border border-gray-500 w-64"></div>
-                <div class="border border-gray-500 p-2 font-semibold">보안분류</div>
+                        @input="setValue7" class="border border-gray-500 w-64" :disabled="clickedOrNot"></div>
+                <div class="border border-gray-500 p-2 flex h-auto items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500">*보안분류</div>
                 <div class="border border-gray-500 p-1 flex"><select name="" id="" class="border border-gray-500 w-64"
-                        v-model="value8" @change="setValue8">
+                        v-model="value8" @change="setValue8" :disabled="clickedOrNot">
                         <option :value="i.lngUserAdminID" v-for="i in secureList">{{ i.strName }}</option>
                     </select></div>
-                <div class="border border-gray-500 p-2 font-semibold">언어선택</div>
+                <div class="border border-gray-500 p-2 flex h-auto items-center text-sm font-semibold justify-center bg-gray-100">언어선택</div>
                 <div class="border border-gray-500 p-1 flex"><select name="" id="" class="border border-gray-500 w-64"
-                        v-model="value9" @change="setValue9">
+                        v-model="value9" @change="setValue9" :disabled="clickedOrNot">
                         <option value="0">한글</option>
                         <option value="1">영문</option>
                         <option value="2">중국어</option>
                         <option value="3">에스파냐어</option>
                     </select></div>
-                <div class="border border-gray-500 p-2 font-semibold">차단설정</div>
+                <div class="border border-gray-500 p-2 flex h-auto items-center text-sm font-semibold justify-center bg-gray-100">차단설정</div>
                 <div class="border border-gray-500 p-1 flex"><select name="" id="" class="border border-gray-500 w-64"
-                        v-model="value10" :disabled="disabledLock" @change="setValue10">
+                        v-model="value10" :disabled="disabledLock || clickedOrNot" @change="setValue10">
                         <option :value="i.strDCode" v-for="i in LockList">{{ i.strDName }}</option>
                     </select></div>
-                <div class="border border-gray-500 p-2 font-semibold">거래처여부</div>
+                <div class="border border-gray-500 p-2 flex h-auto items-center text-sm font-semibold justify-center bg-gray-100">거래처여부</div>
                 <div class="border border-gray-500 p-1 flex"><input type="checkbox" v-model="value11"
-                        @change="setValue11"></div>
-                <div class="border border-gray-500 p-2 font-semibold">슈퍼바이저여부</div>
+                        @change="setValue11" :disabled="clickedOrNot"></div>
+                <div class="border border-gray-500 p-2 flex h-auto items-center text-sm font-semibold justify-center bg-gray-100">슈퍼바이저여부</div>
                 <div class="border border-gray-500 p-1 flex space-x-3"><input type="checkbox" v-model="value12"
-                        @change="setValue12"><select name="" id="" v-model="value13" :disabled="disableSupervisor"
-                        @change="setValue13" class="border border-gray-500 w-64">
+                        @change="setValue12" :disabled="clickedOrNot"><select name="" id="" v-model="value13"
+                        :disabled="disableSupervisor || clickedOrNot" @change="setValue13"
+                        class="border border-gray-500 w-64">
                         <option :value="i.lngCode" v-for="i in superVisorList">{{ i.strName }}</option>
                     </select></div>
-                <div class="border border-gray-500 p-2 font-semibold flex justify-center items-center">브랜드통합관리</div>
+                <div class="border border-gray-500 p-2 flex h-auto items-center text-sm font-semibold justify-center bg-gray-100">브랜드통합관리</div>
                 <div class="border border-gray-500 p-1 flex"><input type="checkbox" v-model="value14"
-                        @change="setValue14"></div>
+                        @change="setValue14" :disabled="clickedOrNot"></div>
 
 
             </div>
@@ -118,7 +121,6 @@
 <script setup>
 import { checkId, deleteUserInformation, getLockTypeList, getSecureList, getStoreListforUserEnroll, getSupervisorList, getUserEnroll, saveUserEnroll } from '@/api/system';
 import Realgrid from '@/components/realgrid.vue';
-import { RowState } from 'realgrid';
 import Swal from 'sweetalert2';
 import { nextTick, onMounted, ref, watch } from 'vue';
 
@@ -126,7 +128,7 @@ import { useStore } from 'vuex';
 const selectedDate = ref()
 
 const selectedStoreCd = ref(null)
-
+const clickedOrNot = ref(true)
 const receiptNo = ref()
 const store = useStore();
 const secureList = ref([])
@@ -215,11 +217,12 @@ const searchButton = async () => {
         console.log(res)
 
         rowData.value = JSON.parse(JSON.stringify(res.data.List))
-        updateRowData.value = res.data.List
+        updateRowData.value = JSON.parse(JSON.stringify(res.data.List))
         afterSearch.value = true
     } catch (error) {
         afterSearch.value = false
     } finally {
+        clickedOrNot.value = true
         store.state.loading = false;
         disabledLock.value = false
         initFocus.value = !initFocus.value
@@ -227,6 +230,7 @@ const searchButton = async () => {
         prevRowState.value = []
         prevIndex.value = []
         prevSequence.value = []
+        selectedUserSequence.value = ''
     }
 
 }
@@ -241,7 +245,7 @@ const documentSubTitle = ref('')
 
 const rowData = ref([])
 
-
+const currentOriPassWord = ref('')
 
 const selectedPosNo = ref()
 
@@ -254,6 +258,9 @@ const selectedRowState = ref('')
 const sendRowState = (e) => {
     selectedRowState.value = e
     console.log(e)
+    if (e == 'none') {
+        blnCheckDupli.value = true
+    }
 }
 const rollBackFoucus = () => {
     const currentIndex = selectedIndexArray.value[selectedIndexArray.value.length - 1]
@@ -273,7 +280,7 @@ const rollBackFoucus = () => {
 
     selectedindex.value = realPrevIndex
 }
-const rollBack = () => {
+const rollBack = (e) => {
 
 
     if (selectedUserSequence.value == '0') {
@@ -308,17 +315,69 @@ const rollBack = () => {
         value10.value = Value10
         const Value11 = rowData.value.filter(item => item.lngSequence == selectedUserSequence.value)[0].chkSupplierID
         setTimeout(() => { setValue11(Value11) }, 10)
-        value11.value = Value11
+        value11.value = Value11 =='1' ? true : false
         const Value12 = rowData.value.filter(item => item.lngSequence == selectedUserSequence.value)[0].blnSupervisor
         setTimeout(() => { setValue12(Value12) }, 10)
-        value12.value = Value12
+        value12.value = Value12 =='1' ? true : false
         const Value13 = rowData.value.filter(item => item.lngSequence == selectedUserSequence.value)[0].lngSuperAttrCd
         setTimeout(() => { setValue13(Value13) }, 10)
         value13.value = Value13
         const Value14 = rowData.value.filter(item => item.lngSequence == selectedUserSequence.value)[0].blnCompanyAdmin
         setTimeout(() => { setValue14(Value14) }, 10)
-        value14.value = Value14
+        value14.value = Value14 =='1' ? true : false
     }, 20)
+    
+
+}
+
+const temprollbackIndex = ref('')
+const rollBack2 = () => {
+
+  const tempSequence =  prevSequence.value[prevSequence.value.length-2]
+  temprollbackIndex.value = prevIndex.value[prevIndex.value.length -2]
+  if(tempSequence == '0'){
+    return ;
+  }
+console.log(selectedUserSequence.value)
+
+setTimeout(() => {
+    const Value3 = rowData.value.filter(item => item.lngSequence == tempSequence)[0].strUserID
+    setTimeout(() => { setValue3_1(Value3) }, 10)
+    value3.value = Value3
+    const Value4 = rowData.value.filter(item => item.lngSequence == tempSequence)[0].strChargerName
+    setTimeout(() => { setValue4_1(Value4) }, 10)
+    value4.value = Value4
+    const Value5 = rowData.value.filter(item => item.lngSequence == tempSequence)[0].strIdNo.split("-")[0]
+    setTimeout(() => { setValue5_1(Value5) }, 10)
+    value5.value = Value5
+    const Value6 = rowData.value.filter(item => item.lngSequence == tempSequence)[0].strIdNo.split("-")[1]
+    setTimeout(() => { setValue6_1(Value6) }, 10)
+    value6.value = Value6
+    const Value7 = rowData.value.filter(item => item.lngSequence == tempSequence)[0].strPassword
+    setTimeout(() => { setValue7_1(Value7) }, 10)
+    value7.value = Value7
+    const Value8 = rowData.value.filter(item => item.lngSequence == tempSequence)[0].lngUserAdminID
+    setTimeout(() => { setValue8_1(Value8) }, 10)
+    value8.value = Value8
+    const Value9 = rowData.value.filter(item => item.lngSequence == tempSequence)[0].lngLanguage
+    setTimeout(() => { setValue9_1(Value9) }, 10)
+    value9.value = Value9
+    const Value10 = rowData.value.filter(item => item.lngSequence == tempSequence)[0].strLockType
+    setTimeout(() => { setValue10_1(Value10) }, 10)
+    value10.value = Value10
+    const Value11 = rowData.value.filter(item => item.lngSequence == tempSequence)[0].chkSupplierID
+    setTimeout(() => { setValue11_1(Value11) }, 10)
+    value11.value = Value11 =='1' ? true : false
+    const Value12 = rowData.value.filter(item => item.lngSequence == tempSequence)[0].blnSupervisor
+    setTimeout(() => { setValue12_1(Value12) }, 10)
+    value12.value = Value12 =='1' ? true : false
+    const Value13 = rowData.value.filter(item => item.lngSequence == tempSequence)[0].lngSuperAttrCd
+    setTimeout(() => { setValue13_1(Value13) }, 10)
+    value13.value = Value13
+    const Value14 = rowData.value.filter(item => item.lngSequence == tempSequence)[0].blnCompanyAdmin
+    setTimeout(() => { setValue14_1(Value14) }, 10)
+    value14.value = Value14 =='1' ? true : false
+}, 20)
 
 
 }
@@ -338,63 +397,109 @@ const prevIndex = ref([])
 const prevSequence = ref([])
 
 const clickedRowData2 = (e) => {
+    if (selectedindex.value == -1) {
+        return
+    }
+    clickedOrNot.value = false
     const curr = rowData.value[e]
-        value1.value = curr.lngPosition
-        value2.value = curr.strStoreName
-        value3.value = curr.strUserID
-        value4.value = curr.strChargerName
-        if (curr.strIdNo != undefined && curr.strIdNo.includes('-')) {
-            let first = curr.strIdNo.split('-')[0]
-            let second = curr.strIdNo.split('-')[1]
-            value5.value = first
-            value6.value = second
-        } else {
-            value5.value = ''
-            value6.value = ''
-        }
-        value7.value = curr.strPassword
-        value8.value = curr.lngUserAdminID
-        value9.value = curr.lngLanguage
-        value10.value = curr.strLockType //10차단설정
-        value11.value = curr.chkSupplierID == '0' ? false : true
-        value12.value = curr.blnSupervisor == '0' ? false : true
-        value13.value = curr.lngSuperAttrCd
-        value14.value = curr.blnCompanyAdmin== '0' ? false : true
+    console.log(e)
+    console.log(curr)
+    value1.value = curr.lngPosition
+    value2.value = curr.strStoreName
+    value3.value = curr.strUserID
+    value4.value = curr.strChargerName
+    if (curr.strIdNo != undefined && curr.strIdNo.includes('-')) {
+        let first = curr.strIdNo.split('-')[0]
+        let second = curr.strIdNo.split('-')[1]
+        value5.value = first
+        value6.value = second
+    } else {
+        value5.value = ''
+        value6.value = ''
+    }
+    value7.value = curr.strPassword
+    value8.value = curr.lngUserAdminID
+    value9.value = curr.lngLanguage
+    value10.value = curr.strLockType //10차단설정
+    value11.value = curr.chkSupplierID == '0' ? false : true
+    value12.value = curr.blnSupervisor == '0' ? false : true
+    value13.value = curr.lngSuperAttrCd
+    value14.value = curr.blnCompanyAdmin == '0' ? false : true
 
-        if (value12.value == false) {
-            disableSupervisor.value = true
-        } else {
-            disableSupervisor.value = false
-        }
+    if (value12.value == false) {
+        disableSupervisor.value = true
+    } else {
+        disableSupervisor.value = false
+    }
 
-        selectedUserChargerCode.value = curr.lngChargerCode
-        selectedUserSequence.value = curr.lngSequence
+    selectedUserChargerCode.value = curr.lngChargerCode
+    selectedUserSequence.value = curr.lngSequence
+    currentOriPassWord.value = curr.ori_strPassword
+    console.log(currentOriPassWord.value)
 }
 const clickedRowData = async (e) => {
+    if (selectedindex.value == -1) {
+        return
+    }
+    if(selectedUserSequence.value == e[15]){
+        return ;
+    }
+    prevSequence.value.push(e[15])
+    prevIndex.value.push(selectedindex.value )
+    
+    console.log(updateRowData.value)
+    clickedOrNot.value = false
+    let newRow = updateRowData.value.filter(item => item.lngSequence == '0').length
+    console.log(newRow)
+    if (newRow > 0) {
+        Swal.fire({
+            title: '신규',
+            text: '새로 입력한 내용이 존재합니다. 저장하시겠습니까? 취소하시면 원래 데이터가 복원됩니다.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '저장',
+            cancelButtonText: '취소'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                saveButton2()
+            } else {
+                rollBackFoucus()
+                rollBack();
+                selectedRowState.value = 'created'
+                //updateRowData.value = JSON.parse(JSON.stringify(rowData.value))
+
+
+            }
+        })
+        return;
+    }
+
     console.log(e)
     console.log(prevSequence.value)
     console.log(updateRowData.value)
     console.log(currentAddState.value)
     // if (currentAddState.value == true) {
-       
+
     //     currentAddState.value = false
     //     return
     // }
-    if (prevSequence.value.length > 0 && prevSequence.value[prevSequence.value.length - 1] == e[15]) {
-        return
-    }
-    console.log(e)
-    prevRowState.value.push(e.rowState)
-    prevIndex.value.push(e.index)
-    prevSequence.value.push(e[15])
+    ///이부분부터 봐야할듯? 
+    // if (prevSequence.value.length > 0 && prevSequence.value[prevSequence.value.length - 1] == e[15]) {
+    //     return
+    // }
+    // console.log(e)
+    // prevRowState.value.push(e.rowState)
+    // prevIndex.value.push(e.index)
+    // prevSequence.value.push(e[15])
 
-    let newRow = updateRowData.value.filter(item => item.lngSequence == '0').length
-    console.log(newRow)
-    updateRowData.value = updateRowData.value.filter(item => item.lngSequence != '0')
+
+    //updateRowData.value = updateRowData.value.filter(item => item.lngSequence != '0')
 
     console.log(updateRowData.value)
     console.log(rowData.value)
-    if (JSON.stringify(sortObject(rowData.value)) != JSON.stringify(sortObject(updateRowData.value)) || newRow > 0) {
+    
+    if (JSON.stringify(sortObject(rowData.value)) != JSON.stringify(sortObject(updateRowData.value))) {
+      
         Swal.fire({
             title: '변경',
             text: '기존 내용과 수정된 내용이 존재합니다. 저장하시겠습니까? 취소하시면 원래 데이터가 복원됩니다.',
@@ -404,16 +509,26 @@ const clickedRowData = async (e) => {
             cancelButtonText: '취소'
         }).then((result) => {
             if (result.isConfirmed) {
-                saveButton()
+                saveButton2()
             } else {
-                rollBackFoucus()
-                rollBack();
+                let temp = selectedindex.value
+               
+                rollBackFoucus();
+                rollBack()
 
+                setTimeout(() => {
+                    moveFocusbyIndex.value = temp
+                },100)
+                 
+              
+              
                 updateRowData.value = JSON.parse(JSON.stringify(rowData.value))
-
-
+                //rowData.value = [...rowData.value]
+             
             }
+          
         })
+       
         return;
     }
 
@@ -425,6 +540,7 @@ const clickedRowData = async (e) => {
 
     selectedUserChargerCode.value = e[16]
     selectedUserSequence.value = e[15]
+    currentOriPassWord.value = e[17]
     blnCheckDupli.value = true
     value1.value = e[5]
     value2.value = e[0]
@@ -443,6 +559,9 @@ const clickedRowData = async (e) => {
     value8.value = e[8]
     value9.value = e[9]
     value10.value = e[10] //10차단설정
+    console.log(e[11])
+    console.log(e[12])
+    console.log(e[14])
     value11.value = e[11] == '0' ? false : true
     value12.value = e[12] == '0' ? false : true
     value13.value = e[14]
@@ -555,6 +674,7 @@ const addButton = () => {
     addRow4.value = !addRow4.value
     blnCheckDupli.value = false
     forupdateDisabled.value = false
+    clickedOrNot.value = false
     selectedUserSequence.value = '0'
     selectedUserChargerCode.value = '0'
     value1.value = selectedStoreCd.value.lngStoreCode
@@ -577,6 +697,25 @@ const addButton = () => {
 }
 
 const saveButton = async () => {
+    if(afterSearch.value == false){
+        Swal.fire({
+            title: '경고',
+            text: '조회를 먼저 진행해주세요.',
+            icon: 'warning',
+            confirmButtonText: '확인'
+        })
+        return
+    }
+    if(JSON.stringify(updateRowData.value) == JSON.stringify(rowData.value)){
+        Swal.fire({
+            title: '경고',
+            text: '변경된 내용이 없습니다.',
+            icon: 'warning',
+            confirmButtonText: '확인'
+        })
+        return
+    }
+    
     if (value3.value == '') {
         Swal.fire({
             title: '경고',
@@ -613,12 +752,19 @@ const saveButton = async () => {
         })
         return
     }
-    let validatePassWord = ''
+
+    let ori_validatePassWord = ''
     if (selectedUserSequence.value != '0') {
-        validatePassWord = rowData.value.filter(item => item.lngSequence == selectedUserSequence.value)[0].strPassword
+
+        ori_validatePassWord = rowData.value.filter(item => item.lngSequence == selectedUserSequence.value)[0].ori_strPassword
     }
 
-    if ((value7.value.length <= 5 || value7.value.length >= 21) && selectedRowState.value !== 'none' || (selectedRowState.value == 'none' && validatePassWord != value7.value)) {
+    console.log(ori_validatePassWord)
+    console.log(value7.value)
+    console.log(selectedRowState.value)
+
+
+    if ((((value7.value.length <= 5 || value7.value.length >= 21) && selectedRowState.value !== 'none') && (selectedRowState.value == 'none' || selectedRowState.value == 'updated') && value7.value != ori_validatePassWord && (value7.value.length <= 5 || value7.value.length >= 21)) && selectedRowState.value != 'deleted') {
         Swal.fire({
             title: '경고',
             text: '비밀번호는 6자리 이상 20자리 이하로 입력하세요.',
@@ -654,13 +800,41 @@ const saveButton = async () => {
         cancelButtonText: '취소'
     }).then(async (result) => {
         if (result.isConfirmed) {
+            store.state.loading = true
             if (deleteRowSequences.value.length > 0) {
                 const res = await deleteUserInformation('D', deleteRowSequences.value.join(','))
                 console.log(res)
             }
-            const res = await saveUserEnroll(flag, selectedUserSequence.value, selectedUserChargerCode.value, value4.value, uniteUserIdNo, value7.value, selectedStoreCd.value.blnHQ, selectedStoreCd.value.lngStoreCode, groupCd.value, value3.value, value8.value, value9.value, value10.value, value11.value == false ? 0 : 1, value12.value == false ? 0 : 1, value13.value, value14.value == false ? 0 : 1)
 
-            if (res.data.RESULT_CD == '00') {
+            if (selectedRowState.value != 'deleted') {
+
+                const blnHQ = storeList.value.filter(item => item.lngStoreCode == value1.value)[0].blnHQ
+                const res = await saveUserEnroll(flag, selectedUserSequence.value, selectedUserChargerCode.value, value4.value, uniteUserIdNo, value7.value, blnHQ, value1.value, groupCd.value, value3.value, value8.value, value9.value, value10.value, value11.value == false ? 0 : 1, value12.value == false ? 0 : 1, value13.value, value14.value == false ? 0 : 1)
+
+                if (res.data.RESULT_CD == '00') {
+                    Swal.fire({
+                        title: '성공',
+                        text: '저장하였습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인'
+                    })
+                    searchButton()
+
+                    blnCheckDupli.value = false
+                    currentAddState.value = false
+                    return
+                } else {
+                    Swal.fire({
+                        title: '실패',
+                        text: '저장에 실패하였습니다.',
+                        icon: 'warning',
+                        confirmButtonText: '확인'
+                    })
+                    blnCheckDupli.value = false
+                    store.state.loading = false
+                    return
+                }
+            } else {
                 Swal.fire({
                     title: '성공',
                     text: '저장하였습니다.',
@@ -668,22 +842,148 @@ const saveButton = async () => {
                     confirmButtonText: '확인'
                 })
                 searchButton()
+
                 blnCheckDupli.value = false
                 currentAddState.value = false
-                return
-            } else {
-                Swal.fire({
-                    title: '실패',
-                    text: '저장에 실패하였습니다.',
-                    icon: 'warning',
-                    confirmButtonText: '확인'
-                })
-                blnCheckDupli.value = false
+
                 return
             }
         }
     })
 
+
+}
+
+const saveButton2 = async () => {
+    if (value3.value == '') {
+        Swal.fire({
+            title: '경고',
+            text: '사용자ID를 입력하세요.',
+            icon: 'warning',
+            confirmButtonText: '확인'
+        })
+        return
+    }
+    if (blnCheckDupli.value == false) {
+        Swal.fire({
+            title: '경고',
+            text: '사용자ID 중복체크는 필수입니다.',
+            icon: 'warning',
+            confirmButtonText: '확인'
+        })
+        return
+    }
+    if (value4.value == '') {
+        Swal.fire({
+            title: '경고',
+            text: '사용자명을 입력하세요.',
+            icon: 'warning',
+            confirmButtonText: '확인'
+        })
+        return
+    }
+    if (value7.value == '') {
+        Swal.fire({
+            title: '경고',
+            text: '비밀번호를 입력하세요.',
+            icon: 'warning',
+            confirmButtonText: '확인'
+        })
+        return
+    }
+
+    let ori_validatePassWord = ''
+    if (selectedUserSequence.value != '0') {
+
+        ori_validatePassWord = rowData.value.filter(item => item.lngSequence == selectedUserSequence.value)[0].ori_strPassword
+    }
+
+    console.log(ori_validatePassWord)
+    console.log(value7.value)
+    console.log(selectedRowState.value)
+
+
+    if ((((value7.value.length <= 5 || value7.value.length >= 21) && selectedRowState.value !== 'none') && (selectedRowState.value == 'none' || selectedRowState.value == 'updated') && value7.value != ori_validatePassWord && (value7.value.length <= 5 || value7.value.length >= 21)) && selectedRowState.value != 'deleted') {
+        Swal.fire({
+            title: '경고',
+            text: '비밀번호는 6자리 이상 20자리 이하로 입력하세요.',
+            icon: 'warning',
+            confirmButtonText: '확인'
+        })
+        return
+    }
+
+    if (value8.value === '') {
+        Swal.fire({
+            title: '경고',
+            text: '보안분류를 선택하세요.',
+            icon: 'warning',
+            confirmButtonText: '확인'
+        })
+        return
+    }
+    let flag;
+    if (selectedUserSequence.value == '0') {
+        flag = 'N'
+    } else {
+        flag = 'U'
+    }
+    let uniteUserIdNo = value5.value + '-' + value6.value
+
+   try {
+    store.state.loading = true
+            if (deleteRowSequences.value.length > 0) {
+                const res = await deleteUserInformation('D', deleteRowSequences.value.join(','))
+                console.log(res)
+            }
+
+            if (selectedRowState.value != 'deleted') {
+
+                const blnHQ = storeList.value.filter(item => item.lngStoreCode == value1.value)[0].blnHQ
+                const res = await saveUserEnroll(flag, selectedUserSequence.value, selectedUserChargerCode.value, value4.value, uniteUserIdNo, value7.value, blnHQ, value1.value, groupCd.value, value3.value, value8.value, value9.value, value10.value, value11.value == false ? 0 : 1, value12.value == false ? 0 : 1, value13.value, value14.value == false ? 0 : 1)
+
+                if (res.data.RESULT_CD == '00') {
+                    Swal.fire({
+                        title: '성공',
+                        text: '저장하였습니다.',
+                        icon: 'success',
+                        confirmButtonText: '확인'
+                    })
+                    searchButton()
+
+                    blnCheckDupli.value = false
+                    currentAddState.value = false
+                    return
+                } else {
+                    Swal.fire({
+                        title: '실패',
+                        text: '저장에 실패하였습니다.',
+                        icon: 'warning',
+                        confirmButtonText: '확인'
+                    })
+                    blnCheckDupli.value = false
+                    store.state.loading = false
+                    return
+                }
+            } else {
+                Swal.fire({
+                    title: '성공',
+                    text: '저장하였습니다.',
+                    icon: 'success',
+                    confirmButtonText: '확인'
+                })
+                searchButton()
+
+                blnCheckDupli.value = false
+                currentAddState.value = false
+
+                return
+            }
+   } catch (error) {
+    
+   }
+          
+  
 
 }
 
@@ -733,7 +1033,7 @@ const updatedRowData = (e) => {
 
 
     updateRowData.value = convertArray
-    console.log(e)
+    console.log(updateRowData.value)
 }
 const deleteRows = (e) => {
     // deleteRowSequences.value = rowData.value.filter(item => item.lngSequence == )
@@ -825,6 +1125,13 @@ const setValue8 = (e) => {
     changeValue2.value = value
 
     changeNow.value = !changeNow.value
+
+    changeColid.value = 'strUserAdminID'
+    changeValue2.value = secureList.value.filter(item => item.lngUserAdminID == value)[0].strName
+     setTimeout(() => {
+        changeNow.value = !changeNow.value
+     },10)
+    
 }
 const setValue9 = (e) => {
     if (e == undefined) {
@@ -852,12 +1159,28 @@ const setValue11 = (e) => {
     if (e == undefined) {
         e = ''
     }
-    const value = typeof e === "string" ? e : e.target.value;
+    console.log(e)
+    let value = typeof e === "string" ? e : e.target.checked;
+    console.log(value)
+    if(value == '1' || value == true){
+        value = '1'
+    } else {
+       value = '0'
+    }
     changeColid.value = 'chkSupplierID'
     changeRow.value = selectedindex.value
     changeValue2.value = value
 
     changeNow.value = !changeNow.value
+    
+
+    changeColid.value = 'lngSupplierID'
+
+    setTimeout(() => {
+        changeValue2.value = value 
+        changeColid.value = 'lngSupplierID'
+        changeNow.value = !changeNow.value
+    },10)
 }
 const setValue12 = (e) => {
     if (e == undefined) {
@@ -888,6 +1211,163 @@ const setValue14 = (e) => {
     const value = typeof e === "string" ? e : e.target.value;
     changeColid.value = 'blnCompanyAdmin'
     changeRow.value = selectedindex.value
+    changeValue2.value = value
+
+    changeNow.value = !changeNow.value
+}
+
+
+const setValue3_1 = (e) => {
+    if (e == undefined) {
+        e = ''
+    }
+    const value = typeof e === "string" ? e : e.target.value;
+    changeColid.value = 'strUserID'
+    changeRow.value = temprollbackIndex.value
+    changeValue2.value = value
+
+    changeNow.value = !changeNow.value
+}
+const setValue4_1 = (e) => {
+    if (e == undefined) {
+        e = ''
+    }
+    const value = typeof e === "string" ? e : e.target.value;
+    changeColid.value = 'strChargerName'
+    changeRow.value = temprollbackIndex.value
+    changeValue2.value = value
+
+    changeNow.value = !changeNow.value
+}
+const setValue5_1 = (e) => {
+    if (e == undefined) {
+        e = ''
+    }
+    const value = typeof e === "string" ? e : e.target.value;
+    changeColid.value = 'strIdNo'
+    changeRow.value = temprollbackIndex.value
+    changeValue2.value = value + '-' + value6.value
+
+    changeNow.value = !changeNow.value
+}
+const setValue6_1 = (e) => {
+    if (e == undefined) {
+        e = ''
+    }
+    const value = typeof e === "string" ? e : e.target.value;
+    changeColid.value = 'strIdNo'
+    changeRow.value = temprollbackIndex.value
+    changeValue2.value = value5.value + '-' + value
+
+    changeNow.value = !changeNow.value
+}
+const setValue7_1 = (e) => {
+    if (e == undefined) {
+        e = ''
+    }
+    const value = typeof e === "string" ? e : e.target.value;
+    changeColid.value = 'strPassword'
+    changeRow.value = temprollbackIndex.value
+    changeValue2.value = value
+
+    changeNow.value = !changeNow.value
+}
+const setValue8_1 = (e) => {
+    if (e == undefined) {
+        e = ''
+    }
+    const value = typeof e === "string" ? e : e.target.value;
+    changeColid.value = 'lngUserAdminID'
+    changeRow.value = temprollbackIndex.value
+    changeValue2.value = value
+
+    changeNow.value = !changeNow.value
+
+    changeColid.value = 'strUserAdminID'
+    changeValue2.value = secureList.value.filter(item => item.lngUserAdminID == value)[0].strName
+     setTimeout(() => {
+        changeNow.value = !changeNow.value
+     },10)
+    
+}
+const setValue9_1 = (e) => {
+    if (e == undefined) {
+        e = ''
+    }
+    const value = typeof e === "string" ? e : e.target.value;
+    changeColid.value = 'lngLanguage'
+    changeRow.value = temprollbackIndex.value
+    changeValue2.value = value
+
+    changeNow.value = !changeNow.value
+}
+const setValue10_1 = (e) => {
+    if (e == undefined) {
+        e = ''
+    }
+    const value = typeof e === "string" ? e : e.target.value;
+    changeColid.value = 'strLockType'
+    changeRow.value = temprollbackIndex.value
+    changeValue2.value = value
+
+    changeNow.value = !changeNow.value
+}
+const setValue11_1 = (e) => {
+    if (e == undefined) {
+        e = ''
+    }
+    console.log(e)
+    let value = typeof e === "string" ? e : e.target.checked;
+    console.log(value)
+    if(value == '1' || value == true){
+        value = '1'
+    } else {
+       value = '0'
+    }
+    changeColid.value = 'chkSupplierID'
+    changeRow.value = temprollbackIndex.value
+    changeValue2.value = value
+
+    changeNow.value = !changeNow.value
+    
+
+    changeColid.value = 'lngSupplierID'
+
+    setTimeout(() => {
+        changeValue2.value = value 
+        changeColid.value = 'lngSupplierID'
+        changeNow.value = !changeNow.value
+    },10)
+}
+const setValue12_1 = (e) => {
+    if (e == undefined) {
+        e = ''
+    }
+    const value = typeof e === "string" ? e : e.target.value;
+    changeColid.value = 'blnSupervisor'
+    changeRow.value = temprollbackIndex.value
+    changeValue2.value = value
+
+    changeNow.value = !changeNow.value
+}
+const setValue13_1 = (e) => {
+    if (e == undefined) {
+        e = ''
+    }
+    const value = typeof e === "string" ? e : e.target.value;
+    changeColid.value = 'lngSuperAttrCd'
+    changeRow.value = temprollbackIndex.value
+    changeValue2.value = value
+
+    changeNow.value = !changeNow.value
+}
+const setValue14_1 = (e) => {
+    if (e == undefined) {
+        e = ''
+    }
+    const value = typeof e === "string" ? e : e.target.value;
+    changeColid.value = 'blnCompanyAdmin'
+    changeRow.value = temprollbackIndex.value
     changeValue2.value = value
 
     changeNow.value = !changeNow.value
