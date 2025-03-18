@@ -700,5 +700,47 @@ export const getReceiptbyCorner = (groupCd , storeCd ,areaCd , posNo ,date , rec
     LOGIN_LANG    : loggined
   });
 };
+export const getDynamicGrid = (groupCd ,count ) => {
+  return api2.post('/MISALES/SLS02_023RPT.asmx/getDynamicGrid', {
+    GROUP_CD    : groupCd,
+    COUNT : count
+  });
+};
+export const getJoinType = (groupCd ,count ) => {
+  return api2.post('/MISALES/SLS02_023RPT.asmx/getJoinType', {
+    GROUP_CD    : groupCd,
+    CODE : count
+  });
+};
+export const getStoreArea = (groupCd ,count ) => {
+  return api2.post('/MISALES/SLS02_023RPT.asmx/getStoreArea', {
+    GROUP_CD    : groupCd,
+    CODE : count
+  });
+};
+export const getSubLease = (groupCd ,count ) => {
+  return api2.post('/MISALES/SLS02_023RPT.asmx/getSubLease', {
+    GROUP_CD    : groupCd,
+    CODE : count
+  });
+};
+export const isDynamicGrid = (groupCd ) => {
+  return api2.post('/MISALES/SLS02_023RPT.asmx/isDynamicGrid', {
+    GROUP_CD    : groupCd,
+  });
+};
+export const getSalesByPaymentType2Report = (groupCd ,storecds , startdate, enddate , reporttype , gridtype , reporttype2 , itemvalue , lngcnt  ) => {
+  return api2.post('/MISALES/SLS02_023RPT.asmx/getSalesByPaymentType2Report', {
+    GROUP_CD    : groupCd,
+    STORE_CDS  : storecds,
+    START_DATE    : startdate,
+    END_DATE    : enddate,
+    REPORT_TYPE    : reporttype,
+    GRID_TYPE    : gridtype,
+    REPORT_TYPE2    : reporttype2,
+    ITEM_VALUE    : itemvalue,
+    LNG_CNT : lngcnt
+  });
+};
 
 

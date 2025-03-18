@@ -4,6 +4,7 @@ import BasicLayout from './views/layout/BasicLayout.vue';
 import MobileLayout from './views/layout/mobileLayout.vue';
 import { useStore } from 'vuex';
 import JSZip from 'jszip';
+
 const isMobile = ref(false);
 const store = useStore();
 const detectMobile  = () =>{

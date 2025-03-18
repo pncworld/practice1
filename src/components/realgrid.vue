@@ -4,6 +4,7 @@
 
 <script setup>
 import { getGridInfoList, getRenderingData } from '@/api/common';
+import { getDynamicGrid} from '@/api/misales';
 import { GridView, LocalDataProvider } from 'realgrid';
 import { onMounted, ref, watch, nextTick } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
@@ -582,6 +583,14 @@ const props = defineProps({
     type: Boolean,
     default: true ,
   }
+  ,
+
+  setDynamicGrid: {
+    type: Boolean,
+    default: false ,
+  }
+  ,
+
 
 });
 
@@ -1486,9 +1495,9 @@ watch(() => props.changeValue, () => {
   emit('updatedRowData', updatedrowData.value)
 })
 watch(() => props.changeNow, () => {
-  // console.log(props.changeRow)
-  // console.log(props.changeColid)
-  // console.log(props.changeValue2)
+  console.log(props.changeRow)
+  console.log(props.changeColid)
+  console.log(props.changeValue2)
 
 
   if(props.changeRow != '' && props.changeRow != -1 ){
@@ -1799,6 +1808,7 @@ watch(() => props.exporttoExcel, (newVal) => {
   const userID = store.state.userData.loginID
   const today = formatDateTime(new Date())
 
+
   gridView.exportGrid({
     type: "excel",
     target: "local",
@@ -1934,6 +1944,12 @@ onMounted(async () => {
     const result = await getGridInfoList(props.progname, props.progid);
     tabInitSetArray.value = result;
 
+
+    if(props.setDynamicGrid == true){
+     const res = await getDynamicGrid(store.state.userData.lngStoreGroup , result.length)
+     tabInitSetArray.value.push(...res.data.List);
+    }
+
     // 동적 스타일 생성
     let styleContent = '';
     tabInitSetArray.value.forEach((item, index) => {
@@ -1964,7 +1980,12 @@ const setupGrid = async () => {
 
     const result = await getGridInfoList(props.progname, props.progid);
     tabInitSetArray.value = result;
-
+    
+    console.log(props.setDynamicGrid)
+    if(props.setDynamicGrid == true){
+     const res = await getDynamicGrid(store.state.userData.lngStoreGroup , result.length)
+     tabInitSetArray.value.push(...res.data.List);
+    }
     // Dynamic style generation
     let styleContent = "";
     tabInitSetArray.value.forEach((item, index) => {

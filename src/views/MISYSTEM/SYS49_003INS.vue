@@ -184,7 +184,8 @@ const searchButton = async () => {
         prevRowState.value = []
         prevIndex.value = []
         prevSequence.value = []
-        selectedUserSequence.value = ''
+        selectedUserSequence.value = '0'
+   
     }
 
 }
@@ -280,7 +281,7 @@ const saveButton = async () => {
         })
         return
     }
-    if (rowData.value.filter(item => item.lngSequence == selectedUserSequence.value  && item.strPassWord == value7.value ).length > 0 ){
+    if (rowData.value.filter(item => item.lngSequence == selectedUserSequence.value  && item.strPassWord == value7.value ).length > 0  || selectedUserSequence.value =='0'){
         Swal.fire({
             title: '경고',
             text: '변경된 사항이 없습니다.',

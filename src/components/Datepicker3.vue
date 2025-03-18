@@ -1,6 +1,6 @@
 <template>
     <div class="flex items-center ml-20 space-x-2 ">
-        <span class="ml-10 font-semibold text-base text-nowrap">해당연월 : </span>
+        <span class="ml-10 font-semibold text-base text-nowrap">{{ FirstName}} : </span>
         <!-- <select name="" id="" class="w-32 h-8 rounded-lg border border-gray-500" v-model="startyear" @change="setStartYear">
             <option :value="i" v-for="i in settingYears">{{ i }}</option>
         </select> -->
@@ -23,7 +23,7 @@
     :reduce="month => Number(month)"
     @click="resetSelect2"
   />
-  <div>~</div>
+  <div v-if="hideEndDates">~</div>
 
         <!-- <select name="" id="" class="w-32 h-8 rounded-lg border border-gray-500" v-model="endyear"  @change="setEndYear">
             <option :value="i" v-for="i in settingYears">{{ i }}</option>
@@ -34,6 +34,7 @@
     :placeholder="'선택'"
     class="custom-select8 w-32 bg-white "
     @click="resetSelect3"
+    v-if="hideEndDates"
   />
         <!-- <select name="" id="" class="w-10 h-8 rounded-lg border border-gray-500" v-model="endmonth"  @change="setEndMonth">
             <option :value="i" v-for="i in Months">{{ i }}</option>
@@ -45,6 +46,7 @@
     :placeholder="'선택'"
     class="custom-select8 w-28 bg-white "
     @click="resetSelect4"
+    v-if="hideEndDates"
   />
     </div>
 </template>
@@ -56,7 +58,18 @@ import { onMounted, ref, watch } from 'vue';
 
 const emit = defineEmits(['startYear', 'startMonth', 'endYear', 'endMonth','excelDate']);
 
-
+const props = defineProps({
+      hideEndDate: {
+        type: Boolean,
+        default: true,
+    },
+    firstName: {
+        type: String,
+        default: '해당연월',
+    }
+})
+const hideEndDates = ref(props.hideEndDate)
+const FirstName = ref(props.firstName)
 const startyear = ref(null)
 const startmonth = ref(1)
 const endyear = ref()

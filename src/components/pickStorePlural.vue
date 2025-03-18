@@ -58,7 +58,7 @@
                     </select></div>
             </div>
         </div>
-        <div class="ml-5 pr-10 w-[95%]">
+        <div class="ml-5 pr-10 w-[200px]">
             <input type="button"
                 class="bg-white border w-full ml-4 rounded-lg h-7 disabled:bg-gray-100 text-center overflow-hidden mr-5"
                 @click="showStoreList" :disabled="settingDisable == 1 || disabled1" v-model="selectedStoreList">
@@ -280,7 +280,8 @@ const checkedRowData = (e) => {
     }
     emit('lngStoreGroups', sendStoreGroups.value)
     if (sendStoreCodes.value.length == 0) {
-        emit('lngStoreCodes', 0)
+        let senditem = rowData.value.map(item => item.lngStoreCode).join(',')
+        emit('lngStoreCodes', senditem)
     } else {
         emit('lngStoreCodes', sendStoreCodes.value.join(','))
     }

@@ -204,6 +204,7 @@ const searchButton = async () => {
 
 
     try {
+        changeRow.value = -1
         store.state.loading = true;
         initGrid()
         let storecd
@@ -231,6 +232,7 @@ const searchButton = async () => {
         prevIndex.value = []
         prevSequence.value = []
         selectedUserSequence.value = ''
+        deleteRowSequences.value = []
     }
 
 }
@@ -706,7 +708,7 @@ const saveButton = async () => {
         })
         return
     }
-    if(JSON.stringify(updateRowData.value) == JSON.stringify(rowData.value)){
+    if(JSON.stringify(updateRowData.value) == JSON.stringify(rowData.value) && deleteRowSequences.value.length == 0 ){
         Swal.fire({
             title: '경고',
             text: '변경된 내용이 없습니다.',
