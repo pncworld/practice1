@@ -59,13 +59,33 @@ import { onMounted, ref, watch } from 'vue';
 const emit = defineEmits(['startYear', 'startMonth', 'endYear', 'endMonth','excelDate']);
 
 const props = defineProps({
-      hideEndDate: {
+    hideEndDate: {
         type: Boolean,
         default: true,
     },
     firstName: {
         type: String,
         default: '해당연월',
+    }
+    ,
+    nextMonth: {
+        type: Boolean,
+        default: false,
+    }
+    ,
+    prevMonth: {
+      type: Boolean,
+      default: false,
+    }
+    ,
+    initMonth: {
+      type: Number,
+      default: 0,
+    }
+    ,
+    stopLimit: {
+      type: Boolean,
+      default: false,
     }
 })
 const hideEndDates = ref(props.hideEndDate)
@@ -81,10 +101,44 @@ let Months = [1,2,3,4,5,6,7,8,9,10,11,12]
 const tempStartDateStack = []
 const tempEndDateStack = []
 
+watch(() => props.prevMonth , () => {
+
+  const currentDate = new Date(parseInt(startyear.value,10) , parseInt(startmonth.value,10)-1 , 1)
+  currentDate.setMonth(currentDate.getMonth() -1)
+
+  const startyear2 = currentDate.getFullYear()
+  const startmonth2 = currentDate.getMonth()+1
+ 
+  startyear.value =startyear2
+  startmonth.value =startmonth2
+
+  emit('startYear', startyear.value)
+  emit('startMonth', startmonth.value)
+ 
+  emit('excelDate', '해당월 : '+startyear.value+'-'+startmonth.value)
+})
+watch(() => props.nextMonth , () => {
+
+const currentDate = new Date(parseInt(startyear.value,10) , parseInt(startmonth.value,10)-1 , 1)
+currentDate.setMonth(currentDate.getMonth() +1)
+
+const startyear2 = currentDate.getFullYear()
+const startmonth2 = currentDate.getMonth()+1
+
+startyear.value =startyear2
+startmonth.value =startmonth2
+
+emit('startYear', startyear.value)
+emit('startMonth', startmonth.value)
+
+emit('excelDate', '해당월 : '+startyear.value+'-'+startmonth.value)
+
+})
 onMounted(() => {
     const today = new Date()
     const lastMonth = new Date(today)
-    lastMonth.setMonth(today.getMonth()-1)
+  
+    lastMonth.setMonth(today.getMonth()-1+ props.initMonth)
     const currentYear = today.getFullYear()
     const currentMonth = today.getMonth()+1
 
@@ -359,7 +413,7 @@ watch((startmonth) , () => {
   }
   const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
     const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
-    if(startDate.getTime() > endDate.getTime()){
+    if(startDate.getTime() > endDate.getTime() && !props.stopLimit){
      Swal.fire({
       title: '시작일이 종료일을 앞섭니다.',
       text: '시작일과 종료일을 다시 선택하세요.',
@@ -406,7 +460,7 @@ watch((startyear) , () => {
   }
   const startDate = new Date(`${startyear.value}-${String(startmonth.value).padStart(2, '0')}-01`)
     const endDate = new Date(`${endyear.value}-${String(endmonth.value).padStart(2, '0')}-01`)
-    if(startDate.getTime() > endDate.getTime()){
+    if(startDate.getTime() > endDate.getTime() && !props.stopLimit){
      Swal.fire({
       title: '시작일이 종료일을 앞섭니다.',
       text: '시작일과 종료일을 다시 선택하세요.',

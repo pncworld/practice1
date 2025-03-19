@@ -20,7 +20,8 @@
         <div class="grid grid-cols-1 grid-rows-2 mr-60">
 
             <Datepicker3 @startYear="startYear" @startMonth="startMonth" :hideEndDate="false" @excelDate="excelDate"
-                :firstName="'날짜'" class="ml-20 -mt-10">
+                :firstName="'날짜'" class="ml-20 -mt-10" :prevMonth="prevMonth" :nextMonth="nextMonth" :initMonth="1"
+                :stopLimit="true">
             </Datepicker3>
 
 
@@ -44,8 +45,11 @@
                 <div class="text-base font-semibold text-nowrap justify-center flex items-center ml-8">파일선택 : </div>
                 <div class="flex">
                     <div class="flex w-[300%]">
-                        <input type="text" class="w-52 h-8 rounded-lg pl-1 mt-1 ml-2 disabled:bg-white" disabled>
-                        <button class="button primary h-7 flex items-center ml-2 mt-1">파일선택</button>
+                        <input type="text" class="w-52 h-8 rounded-lg pl-1 mt-1 ml-2 disabled:bg-white" disabled v-model="excelName">
+                        <label for="hiddenFile" class="button primary h-7 flex items-center ml-2 mt-1 cursor-pointer">
+                            파일선택
+                        </label>
+                        <input type="file" class="hidden" id="hiddenFile" @change="readExcel">
 
 
 
@@ -59,7 +63,8 @@
 
         <div class="flex flex-col">
             <PickStoreSingle @lngStoreGroup="lngStoreGroup" @lngSupervisor="lngSupervisor" @lngStoreTeam="lngStoreTeam"
-                @lngStoreAttrs="lngStoreAttrs" @lngStoreCode="lngStoreCode" @excelStore="excelStore"></PickStoreSingle>
+                @lngStoreAttrs="lngStoreAttrs" @lngStoreCode="lngStoreCode" @excelStore="excelStore"
+                :placeholderName="'선택'"></PickStoreSingle>
             <div class="flex mt-12 items-center -ml-20">
                 <div class="text-base font-semibold text-nowrap ">sheet선택:</div>
                 <select name="" id="" class="w-32 h-8 rounded-lg ml-2">
@@ -70,7 +75,7 @@
         </div>
 
     </div>
-    <div><button @click="down"><img src="../../assets/sampleDownload.png" alt="" class="w-20">
+    <div><button @click="downloadSample"><img src="../../assets/sampleDownload.png" alt="" class="w-20">
         </button></div>
     <div class="h-[70%] mt-1">
 
@@ -86,15 +91,58 @@
 
 <script setup>
 import { getPlanbyDays } from '@/api/misales';
-import PickStoreSingle from '@/components/pickStoreSingle.vue';
 import Datepicker3 from '@/components/Datepicker3.vue';
+import PickStoreSingle from '@/components/pickStoreSingle.vue';
+import koLocale from '@fullcalendar/core/locales/ko';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import FullCalendar from '@fullcalendar/vue3';
 import Swal from 'sweetalert2';
 import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
-import FullCalendar from '@fullcalendar/vue3';
-import dayGridPlugin from '@fullcalendar/daygrid'
-import koLocale from '@fullcalendar/core/locales/ko';
-import interactionPlugin from '@fullcalendar/interaction';
+import { read, utils, write, writeFile, writeXLSX } from 'xlsx-js-style';
+
+const excelData = ref([])
+const excelName = ref('')
+const readExcel = (e) => {
+    const file = e.target.files[0]
+    excelName.value = file.name
+    if(!file) return ;
+    const reader = new FileReader();
+
+    reader.readAsArrayBuffer(file)
+    reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result)
+        const workbook = read(data,{type : "array"})
+
+        // 첫 번째 시트 가져오기
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+
+        // 엑셀 데이터를 JSON 형식으로 변환
+        const jsonData = utils.sheet_to_json(worksheet, { header: 1 });
+
+        // 첫 번째 행(헤더) 확인
+        const expectedHeader = ["매장코드", "일자", "목표금액", "비고"];
+        const header = jsonData[0];
+
+        if (JSON.stringify(header) !== JSON.stringify(expectedHeader)) {
+          alert("엑셀 형식이 올바르지 않습니다.");
+          return;
+        }
+
+        // 데이터 추출 (헤더 제외) 후 v-model로 매핑
+        excelData.value = jsonData.slice(1).map((row) => ({
+          매장코드: row[0] || "",
+          일자: row[1] || "",
+          목표금액: row[2] || "",
+          비고: row[3] || "",
+        }));
+
+        console.log(excelData.value)
+      };
+    };
+
 
 const handleDateClick = (e) => {
     alert(e)
@@ -107,13 +155,13 @@ onMounted(() => {
 
     if (nextBtn) {
         nextBtn.addEventListener('click', () => {
-            console.log('다음 버튼 클릭');
+            nextMonth.value = !nextMonth.value
         });
     }
 
     if (prevBtn) {
         prevBtn.addEventListener('click', () => {
-            console.log('이전 버튼 클릭');
+            prevMonth.value = !prevMonth.value
         });
     }
 })
@@ -125,9 +173,9 @@ const calendarOptions = ref({
     headerToolbar: {
         left: 'prev',            // 왼쪽에 제목(날짜)
         center: 'title',               // 중앙은 비워두거나 다른 버튼 추가 가능
-        right: 'today next',  // 오른쪽에 이전, 다음, 오늘 버튼
+        right: 'next',  // 오른쪽에 이전, 다음, 오늘 버튼
     },
-  
+
 })
 
 
@@ -136,15 +184,12 @@ const selectedExcelDate = ref()
 const selectedExcelStore = ref()
 const selectedstartDate = ref()
 const selectedendDate = ref()
-const customFooterShowLast = ref(true)
+
 const WeekDays = ref([{ lngCode: 0, strName: '일요일' }])
-const progid = ref(1)
-const startDate = (e) => {
-    selectedstartDate.value = e
-}
-const endDate = (e) => {
-    selectedendDate.value = e
-}
+
+const prevMonth = ref(false)
+const nextMonth = ref(false)
+
 
 const excelDate = (e) => {
     selectedExcelDate.value = e
@@ -159,8 +204,7 @@ const lngstoresupervisor = ref()
 const lngstorecode = ref()
 const maxSaleTarget = ref('')
 const checked = ref(0)
-const setGroupFooter = ref(false)
-const hideColumnsId = ref(['strStore'])
+
 const lngStoreGroup = (e) => {
     lngstoregroup.value = e
     console.log(e)
@@ -187,11 +231,9 @@ const lngStoreCode = (e) => {
     initGrid()
 }
 
-const receiptNo = ref()
-const initCheckBox = ref(false)
-const setGroupColumnId = ref('strStore')
+
 const store = useStore();
-const reload = ref(false)
+
 console.log(store)
 
 const afterSearch = ref(false)
@@ -216,12 +258,8 @@ const searchButton = async () => {
         } else {
             barea = 1
         }
-        if (hideColumnsId.value.includes('strStore')) {
-            progid.value = 1
-        } else {
-            progid.value = 2
-        }
-        reload.value = !reload.value
+
+
         console.log(lngstoregroup.value)
         console.log(lngstoreattr.value)
         console.log(lngstoreteam.value)
@@ -248,62 +286,87 @@ const searchButton = async () => {
     }
 
 }
-const groupCd = ref()
-const storeCd = ref()
-const dtmDate = ref()
-const init = ref(false)
-const selectedStoreCd = (e) => {
-    console.log(e)
-    storeCd.value = e
-
-    initGrid()
-    selectedPosNo.value = '0'
-    receiptNo.value = ''
-    init.value = !init.value
 
 
-}
-const selectedGroupCd = (e) => {
-    console.log(e)
-    groupCd.value = e
-}
 const rowData = ref([])
-const rowData2 = ref([])
-const rowData3 = ref([])
-const rowData4 = ref([])
 
-
-const selectedPosNo = ref()
-const posNo = (e) => {
-    console.log(e)
-    if (e == null) {
-        selectedPosNo.value = 0
-    } else {
-        selectedPosNo.value = e
+const downloadSample = () => {
+    if (lngstorecode.value == 0) {
+        Swal.fire({
+            title: '경고',
+            text: '매장을 선택하세요.',
+            icon: 'warning',
+            confirmButtonText: '확인'
+        })
+        return
     }
+    const data = [
+        ['매장코드', '일자', '목표금액', '비고'],
+        [lngstorecode.value, '2025-03-01', '1,400,000', '샘플코드 작성시 삭제 후 업로드'],
+        [lngstorecode.value, '2025-03-02', '2,000,000', '매장코드는 상단 괄호안 코드 참고']
+    ]
+
+    const worksheet = utils.aoa_to_sheet(data)
+    worksheet['!cols'] = [
+        { wch: 20 }, // 매장코드
+        { wch: 20 }, // 일자
+        { wch: 20 }, // 목표금액
+        { wch: 60 }  // 비고
+    ];
+    // 헤더에 스타일 적용 예시 (Pro 버전 사용 시)
+    const headerStyle = {
+        fill: { fgColor: { rgb: "FF87CEFA" } },
+        font: { bold: true, size: 16 }
+    };
+
+    const dataStyle = {
+        border: { top: 'thin', left: 'thin', bottom: 'thin', right: 'thin' },
+        font: { size: 16 }
+    };
+
+    ['A1', 'B1', 'C1', 'D1'].forEach(cell => {
+        if (worksheet[cell]) {
+            worksheet[cell].s = headerStyle;
+        }
+    });
+
+    ['A2', 'B2', 'C2', 'D2', 'A3', 'B3', 'C3', 'D3'].forEach(cell => {
+        if (worksheet[cell]) {
+            worksheet[cell].s = dataStyle;
+        }
+    });
+
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+
+    const workbookOut = write(workbook, { bookType: 'xlsx', type: 'binary' });
+
+    function s2ab(s) {
+        const buf = new ArrayBuffer(s.length);
+        const view = new Uint8Array(buf);
+        for (let i = 0; i < s.length; i++) {
+            view[i] = s.charCodeAt(i) & 0xFF;
+        }
+        return buf;
+    }
+
+    const blob = new Blob([s2ab(workbookOut)], { type: "application/octet-stream" });
+
+    // Blob을 가리키는 URL 생성
+    const url = window.URL.createObjectURL(blob);
+
+    // 임시 링크를 만들어 클릭 이벤트로 다운로드 실행
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sample.xlsx"; // 저장될 파일명
+    document.body.appendChild(a);
+    a.click();
+
 
 }
 
-const disCountCd = ref("")
-const DisCountCd = (e) => {
-    console.log(e)
-    if (e == null) {
-        disCountCd.value = 0
-    } else {
-        disCountCd.value = e
-    }
-}
 
-const payCd = ref("")
-const selectedpayCd = (e) => {
-
-
-    if (e == null) {
-        payCd.value = 0
-    } else {
-        payCd.value = e
-    }
-}
 
 
 
@@ -336,7 +399,7 @@ const excelButton = () => {
 }
 const initGrid = () => {
 
-    console.log(rowData.value)
+
     if (rowData.value.length > 0) {
         rowData.value = []
     }
@@ -344,15 +407,7 @@ const initGrid = () => {
 
 
 }
-const updateShowStore = (e) => {
-    if (e.target.checked) {
-        hideColumnsId.value = []
 
-    } else {
-        hideColumnsId.value = ['strStore']
-
-    }
-}
 
 
 </script>
