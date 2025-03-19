@@ -64,6 +64,12 @@ export function excelTitle(target) {
 
       return `${first}-${second}-${third}`;
 }
+export function excelSerialDateToJSDate(serial) {
+  const baseDate = new Date(1899, 11, 31); // 1900년 1월 0일 (엑셀의 기준일 이전 날짜)
+  const millisecondsPerDay = 24 * 60 * 60 * 1000;
+  const daysToAdd = serial - 1; // 엑셀은 1부터 시작
+  return new Date(baseDate.getTime() + daysToAdd * millisecondsPerDay).toISOString().split('T')[0];
+}
 
 export async function insertPageLog(progdata) {
 

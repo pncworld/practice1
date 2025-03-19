@@ -743,4 +743,13 @@ export const getSalesByPaymentType2Report = (groupCd ,storecds , startdate, endd
   });
 };
 
+export const getProjByMonth = (groupCd ,storecd , startdate) => {
+  return api2.post('/MISALES/SLS01_001INS.asmx/getProjByMonth', {
+    GROUP_CD    : groupCd,
+    STORE_CD  : storecd,
+    DTM_DATE   : startdate
+
+  });
+};
+
 
