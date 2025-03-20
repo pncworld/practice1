@@ -76,6 +76,7 @@ onMounted(() => {
         display: props.chartName != '' ? true : false,        // 제목 표시 여부
         text: props.chartName,     // 차트 제목 텍스트
       },
+
       datalabels: {
             display: true,      // 항상 표시
             color: 'black',     // 텍스트 색상
@@ -95,6 +96,7 @@ onMounted(() => {
     },
         maintainAspectRatio: false,
       },
+      backgroundColor: 'white',
     });
   }
 });

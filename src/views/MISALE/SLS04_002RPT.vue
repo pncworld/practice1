@@ -132,8 +132,8 @@
         </div>
 
         <div class="w-full h-[80%] mt-1">
-
-            <Realgrid :progname="'SLS04_002RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload"
+            <Chart class="h-auto absolute top-72 left-400 z-[60] !w-[1000px]" v-show="byRadioButton" :type="type" :labels="['1','2','3','4','5','6','7','8','9','10','11','12']" :label="[selectedCompareYear,selectedRefYear]" :datas="datas" :chartName="'전년대비실적'" :colors="['lightgreen','#333399']" :print="print"></Chart>
+            <Realgrid :progname="'SLS04_002RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" @getJsonData="getJsonData" :getJson="getJson"
                 :exporttoExcel="exportExcel" :documentSubTitle="documentSubTitle" :documentTitle="'SLS04_002RPT'"
                 :hideColumnsId="hideColumnsId" :setGroupColumnId="setGroupColumnId2" :setGroupFooter="setGroupFooter" :setFooter="true" :setGroupCustomLevel="2"
                 :setFooterColID="setFooterColID" :setFooterExpressions="setFooterExpressions" :setGroupSumCustomColumnId="setGroupSumCustomColumnId" :setGroupSumCustomText="setGroupSumCustomText" :setGroupSumCustomLevel="setGroupSumCustomLevel"
@@ -144,6 +144,7 @@
 
 <script setup>
 import { getSalesReportByMenu, getTableSearchCondition } from '@/api/misales';
+import Chart from '@/components/chart.vue';
 import Datepicker2 from '@/components/Datepicker2.vue';
 import PickStorePlural from '@/components/pickStorePlural.vue';
 import Realgrid from '@/components/realgrid.vue';
@@ -173,8 +174,45 @@ const startDate = (e) => {
     console.log(e)
     selectedstartDate.value = e
 }
+const byRadioButton = ref(false)
+
+const datas = ref([])
+const type = ref('line')
+const getJsonData = (e) => {
+    datas.value = []
+    let data1 = []
+    for(let i=0 ; i< e.length ; i++){
+        data1.push(e[i].lastTotAmt)
+    }
+    datas.value.push(data1)
+
+    let data2 = []
+    for(let i=0 ; i< e.length ; i++){
+        data2.push(e[i].nowTotAmt)
+    }
+    datas.value.push(data2)
+    console.log(e)
+}
+const setchart=ref(2)
+const getJson = ref(false)
+watch(setchart , () => {
+    if(setchart.value == 0){
+        type.value = 'line'
+        byRadioButton.value = true
+    } else if(setchart.value == 1) {
+        type.value = 'bar'
+        byRadioButton.value = true
+    } else {
+        byRadioButton.value = false
+    }
+   
+    getJson.value = !getJson.value
+})
 const endDate = (e) => {
     selectedendDate.value = e
+}
+const chartButton = () => {
+    byRadioButton.value = !byRadioButton.value
 }
 const setRowGroupSpan = ref('')
 const tempSeeDay = ref(0)

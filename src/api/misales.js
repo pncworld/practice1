@@ -751,5 +751,15 @@ export const getProjByMonth = (groupCd ,storecd , startdate) => {
 
   });
 };
+export const saveExcelDataPlan = (groupCd ,storecd , date, proj, comment) => {
+  return api2.post('/MISALES/SLS01_001INS.asmx/saveExcelDataPlan', {
+    GROUP_CD    : groupCd,
+    STORE_CD  : storecd,
+    DTM_DATE   : date ,
+    PROJ : proj,
+    COMMENT : comment
+
+  });
+};
 
 
