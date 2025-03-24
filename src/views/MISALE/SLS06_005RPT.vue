@@ -152,7 +152,7 @@
         :colors="['lightgreen', '#333399']"
         :print="print"></Chart>
     </div>
-    <div class="flex justify-end space-x-2">
+    <div class="flex justify-end space-x-2 absolute bottom-5 right-5">
       <label for="line"
         ><input
           type="radio"
@@ -177,7 +177,7 @@
           :value="2"
           v-model="setchart" />차트숨기기</label
       >
-      <button class="button primary" @click="printChart">프린트</button>
+      <button class="button primary" @click="printChart">인쇄</button>
     </div>
   </div>
 </template>
@@ -293,6 +293,10 @@ const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
   }
+  if (datas.value.length > 0) {
+    datas.value = [];
+  }
+  setchart.value = 2;
 };
 
 const exportExcel = ref(false);

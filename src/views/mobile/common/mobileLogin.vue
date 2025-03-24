@@ -2,14 +2,6 @@
   <div class="flex items-center justify-center h-screen bg-slate-100">
     <loading></loading>
     <!-- <div><img class="mr-20 size-4/5" src="../assets/login_visual.png" alt=""></div> -->
-    <img
-      src="../assets/cashier.png"
-      class="hidden sm:block mr-40 w-60 h-auto animate-rise"
-      alt="" />
-    <img
-      src="../assets/swipe.png"
-      class="hidden sm:block mr-40 w-60 h-auto animate-fall"
-      alt="" />
     <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
       <h1
         class="text-2xl font-bold text-center mb-6 text-blue-600 flex justify-center">
@@ -36,13 +28,19 @@
             >비밀번호</label
           >
           <input
-            type="password"
+            :type="passwordVisible ? 'text' : 'password'"
             id="password"
             v-model="password"
             placeholder="비밀번호를 입력하세요"
             required
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             @keyup.enter="login2" />
+          <button
+            type="button"
+            class="absolute right-14 mt-2"
+            @click="showPassword">
+            {{ passwordVisible ? "숨기기" : "보기" }}
+          </button>
         </div>
 
         <button
@@ -51,21 +49,67 @@
           로그인
         </button>
       </form>
+      <div class="flex justify-start items-center space-x-2 mt-3">
+        <input
+          type="checkbox"
+          id="saveId"
+          v-model="saveID"
+          class="form-checkbox h-6 w-6 text-blue-500 rounded-full" />
 
+        <label for="saveId" class="cursor-pointer text-gray-700"
+          >아이디 저장</label
+        >
+        <div><button @click="showCustomorCenter">| 고객센터</button></div>
+      </div>
       <p class="mt-4 text-center text-gray-600">{{ message }}</p>
+    </div>
+  </div>
+
+  <div
+    class="absolute z-50 top-[30%] left-[5%] w-[90%] h-[70%]"
+    v-if="showPopUp">
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
+      <h1
+        class="text-2xl font-bold text-center mb-6 text-blue-600 flex justify-center">
+        고객센터
+      </h1>
+      <div class="text-xl">
+        비밀번호 찾기 및 기타 문의사항은 <br />아래 고객센터로 문의해 주시기
+        바랍니다.
+      </div>
+
+      <div class="text-sm mt-3">
+        대표 번호 : 02-1588-7443 <br />대표 메일 : customer@pncworld.com
+      </div>
+      <div class="text-sm mt-3">연중 무휴 09:00 ~ 21:00</div>
+      <div class="flex justify-center items-center space-x-2 mt-3">
+        <button
+          @click="
+            showPopUp = false;
+            disableBg();
+          ">
+          닫기
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import loading from "@/components/loading.vue";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { get_store_list, get_sys_list, login } from "../api/common";
+import { get_store_list, get_sys_list, login } from "../../../api/common";
 
 const store = useStore(); // Vuex 스토어 가져오기
 const router = useRouter(); // Vue Router 가져오기
+const passwordVisible = ref(false);
+
+const saveID = ref(false);
+const showPassword = () => {
+  passwordVisible.value = !passwordVisible.value;
+};
 
 const username = ref(""); // 사용자 ID
 const password = ref(""); // 사용자 비밀번호
@@ -74,6 +118,17 @@ const userData = store.state.userData;
 store.dispatch("convertLoading", false);
 const login2 = async () => {
   store.dispatch("convertLoading", true);
+
+  console.log(saveID.value);
+  if (saveID.value) {
+    localStorage.setItem("username", username.value);
+    localStorage.setItem("saveID", saveID.value.toString()); // boolean 값 그대로 저장
+  } else {
+    // 체크가 해제되었을 경우 로컬 스토리지에서 제거하는 것이 좋을 수 있습니다.
+    localStorage.removeItem("username");
+    localStorage.removeItem("saveID");
+  }
+
   store.state.selectedCategoryId = null;
   try {
     const response = await login(username.value, password.value);
@@ -150,40 +205,58 @@ const login2 = async () => {
 };
 
 onMounted(() => {
+  store.state.inActiveBackGround = false;
+  console.log(localStorage.getItem("saveID"));
+  if (localStorage.getItem("saveID") === "true") {
+    console.log(localStorage.getItem("username"));
+    saveID.value = true;
+    username.value = localStorage.getItem("username");
+  }
+
   if (store.state.userData?.[0]?.[0]?.STATUS_CD === "0000") {
     router.push("/dashboard");
   }
 });
+
+const showPopUp = ref(false);
+const showCustomorCenter = () => {
+  store.state.inActiveBackGround = true;
+  showPopUp.value = true;
+};
+
+const disableBg = () => {
+  store.state.inActiveBackGround = false;
+};
 </script>
 
 <style>
-@keyframes fall {
-  0% {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  width: 24px;
+  height: 24px;
+  background-color: white;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-@keyframes rise {
-  0% {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
+input[type="checkbox"]:checked {
+  background-color: #4a90e2;
+  border-color: #4a90e2;
 }
 
-.animate-fall {
-  animation: fall 1s ease-out forwards;
-}
-
-.animate-rise {
-  animation: rise 1s ease-out forwards;
+input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  border-radius: 50%;
 }
 </style>

@@ -25,6 +25,7 @@ export default createStore({
       loading : false,
       favoriteList : [],
       isMobile : false,
+      inActiveBackGround : false
     };
   },
   mutations: {
@@ -108,6 +109,9 @@ export default createStore({
     setLoading(state ,data) {
       state.loading = data ;
     } ,
+    setinActiveBackGround(state ,data) {
+      state.inActiveBackGround = data ;
+    } ,
     setFavoriteList(state ,data) {
       state.favoriteList = data;
     } ,
@@ -175,6 +179,9 @@ export default createStore({
     },
     convertLoading({commit} ,data) {
       commit('setLoading',data);
+    } ,
+    convertInActive({commit} ,data) {
+      commit('setinActiveBackGround',data);
     } ,
     addFavoriteList({commit}, data) {
       commit('addFavoriteList', data);

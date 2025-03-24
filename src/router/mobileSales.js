@@ -1,7 +1,6 @@
-import DailySales from "@/views/mobile/sales/DailySales.vue";
-import DaySales from "@/views/mobile/sales/DaySales.vue";
-import TimeSales from "@/views/mobile/sales/timeSales.vue";
-
+import DailySales from "@/views/MOBILE/sales/DailySales.vue";
+import DaySales from "@/views/MOBILE/sales/DaySales.vue";
+import TimeSales from "@/views/MOBILE/sales/timeSales.vue";
 
 
 export default function mobileSales() {

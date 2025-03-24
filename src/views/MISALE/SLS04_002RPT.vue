@@ -348,6 +348,7 @@
           :chartName="'메뉴군별 매출 현황2'"
           :colors="colors"></Chart>
       </div>
+      <span id="print-area2"></span>
       <div id="print-area" class="h-full w-full">
         <Realgrid
           :progname="'SLS04_002RPT_VUE'"
@@ -383,7 +384,6 @@ import Datepicker2 from "@/components/Datepicker2.vue";
 import PickStorePlural from "@/components/pickStorePlural.vue";
 import Realgrid from "@/components/realgrid.vue";
 import { formatTime } from "@/customFunc/customFunc";
-import printJS from "print-js";
 
 import { onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
@@ -1199,23 +1199,63 @@ const excelDate = (e) => {
 const excelStore = (e) => {
   selectedExcelStore.value = e;
 };
+
 const printButton = () => {
-  printJS({
-    printable: "print-area",
-    type: "html",
-    targetStyles: ["*"],
-    pageStyle: `
-    @page {
-      size: A4 landscape;
-      margin: 0;
-    }
-    body {
-      width: 200%;
-      height: 100%;
-    }
-  `,
-  });
+  const header = document.createElement("div");
+  header.style.textAlign = "center";
+  header.style.fontSize = "18px";
+  header.style.fontWeight = "bold";
+  header.style.marginBottom = "20px";
+  header.innerHTML = "메뉴군별 매출 현황"; // 여기서 내용 변경 가능
+
+  const header2 = document.createElement("div");
+  header2.style.textAlign = "left";
+  header2.style.fontSize = "18px";
+  header2.style.fontWeight = "bold";
+
+  header2.style.marginBottom = "20px";
+  header2.innerHTML = selectedExcelDate.value; // 여기서 내용 변경 가능
+
+  const header3 = document.createElement("div");
+  header3.style.textAlign = "left";
+  header3.style.fontSize = "18px";
+  header3.style.fontWeight = "bold";
+  header3.style.position = "absolute";
+  header3.style.top = "70px";
+  header3.style.left = "0";
+  header3.style.marginBottom = "20px";
+  header3.innerHTML = selectedExcelStore.value; // 여기서 내용 변경 가능
+
+  const isoString = new Date().toISOString();
+  const formattedString = isoString.replace("T", " ").replace("Z", "");
+
+  const header4 = document.createElement("div");
+  header4.style.textAlign = "left";
+  header4.style.fontSize = "18px";
+  header4.style.fontWeight = "bold";
+
+  header4.style.marginBottom = "10px";
+  header4.innerHTML = "출력일시 : " + formattedString; // 여기서 내용 변경 가능
+
+  const printArea = document.getElementById("print-area");
+  // print-area 내에 머리글 3개 추가
+  printArea.prepend(header4);
+  printArea.prepend(header3);
+  printArea.prepend(header2);
+  printArea.prepend(header);
+
+  // 인쇄 후 헤더 제거 (선택적)
+  window.onafterprint = () => {
+    printArea.removeChild(header4);
+    printArea.removeChild(header3);
+    printArea.removeChild(header2);
+    printArea.removeChild(header);
+  };
+
+  // 인쇄 실행
+  window.print();
 };
+
 const selectedMenu = ref(null);
 
 const subList = ref([]);
@@ -1437,4 +1477,37 @@ const checkday = (e) => {
 };
 </script>
 
-<style></style>
+<style>
+@media print {
+  body * {
+    visibility: hidden; /* 모든 요소 숨기기 */
+  }
+
+  #print-area,
+  #print-area * {
+    visibility: visible !important; /* print-area 영역만 보이게 */
+  }
+
+  #print-area2,
+  #print-area2 * {
+    visibility: visible !important; /* print-area2도 보이게 */
+  }
+
+  /* @page는 페이지 크기와 방향을 설정 */
+  @page {
+    size: A4 landscape; /* A4 크기, 가로 방향으로 설정 */
+    margin: 5%; /* 여백을 없앰 */
+  }
+
+  #print-area,
+  #print-area2 {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%; /* 가로 폭을 페이지에 맞춤 */
+    height: 80%; /* 세로를 페이지에 맞춤 */
+    transform-origin: 0 0; /* 왼쪽 상단에서 크기 축소 */
+    zoom: 0.55;
+  }
+}
+</style>

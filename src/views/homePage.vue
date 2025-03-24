@@ -1,20 +1,24 @@
 <template>
-    <div class="bg-white border border-gray-200 rounded-lg shadow-lg p-6 max-w-lg mx-auto mt-8">
-    <div class="text-xl font-semibold text-blue-600 mb-2">공지사항</div>
-    <div class="text-gray-700" v-if="isMobile">
-      모바일 환경에서는 일부 기능이 제한됩니다.
+  <div>
+    <div class="text-2xl flex justify-start ml-2 font-semibold">매출 현황</div>
+    <div class="text-xl flex justify-between ml-2 font-normal mt-2">
+      <SelectMobileStore @lngStoreCode="lngStoreCode"></SelectMobileStore>
+      <button><img src="../assets/ic_refresh.svg" alt="" /></button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { useStore } from 'vuex';
+import { useStore } from "vuex";
+import SelectMobileStore from "./MOBILE/component/selectMobileStore.vue";
+import { ref } from "vue";
 
 const store = useStore();
-
-const isMobile = store.state.isMobile ;
+const selectedStoreCode = ref("");
+const lngStoreCode = (e) => {
+  selectedStoreCode.value = e;
+};
+const isMobile = store.state.isMobile;
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>
