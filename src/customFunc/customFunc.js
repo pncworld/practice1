@@ -1,5 +1,5 @@
 import { savePageLog } from "@/api/common";
-import { useStore } from "vuex";
+import store from '@/store';  
 
 export function formatLocalDate(date) {
     if (!date) return '';
@@ -73,7 +73,7 @@ export function excelSerialDateToJSDate(serial) {
 
 export async function insertPageLog(progdata) {
 
-  const store = useStore()
+  //const store = useStore()
   const currenttime = new Date()
   const inserttime = formatDateTime2(currenttime)
   const userGroup = store.state.userData.lngCompanyCode
@@ -93,5 +93,33 @@ export async function insertPageLog(progdata) {
 
   const res = await savePageLog(inserttime,userGroup,userStoreCd,userId,userIp,progname,progid,1)
  
+  return ``;
+}
+
+
+export async function insertMobilePageLog(progdata) {
+
+  //const store = useStore()
+  const currenttime = new Date()
+  const inserttime = formatDateTime2(currenttime)
+
+  console.log(store)
+  const userGroup = store.state.userData.GROUP_CD
+  const userStoreCd = store.state.userData.STORE_CD
+  const userId = store.state.userData.USER_NO
+  let userIp ;
+  const userip = async()=>{
+    const result = await fetch('https://api64.ipify.org?format=json');
+    const data = await result.json();
+    userIp = data.ip;
+  
+  }
+  await userip()
+  const progname = progdata.strUrl
+  const progid = progdata.lngProgramID
+
+
+  const res = await savePageLog(inserttime,userGroup,userStoreCd,userId,userIp,progname,progid,2)
+  console.log(res)
   return ``;
 }

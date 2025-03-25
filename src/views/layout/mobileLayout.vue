@@ -1,14 +1,8 @@
 <template>
-  <div class="h-screen overflow-y-auto">
+  <div class="h-screen overflow-y-auto" @click="resetScreen">
     <Loading></Loading>
     <Inactive></Inactive>
     <main class="h-screen overflow-y-auto bg-gray-100">
-      <MobileMenu
-        ref="stickyElement"
-        v-if="showMobileMenu"
-        @showMenu="showMenu"
-        @showpersonal="showpersonal"
-        :class="{ hidden: !isStickyVisible }"></MobileMenu>
       <router-view v-slot="{ Component, route }" class="mt-24">
         <div
           class="flex flex-col gap-0 w-full items-center justify-center mr-0 h-auto mt-8"
@@ -25,34 +19,6 @@
               @click="showsubMenu(1)">
               <font-awesome-icon icon="chart-simple" />매출
             </button>
-          </div>
-          <div
-            class="grid grid-rows-6 h-80 border w-full"
-            v-if="showornotsubMenu(1)">
-            <div class="h-full w-full border border-gray-200">
-              <button class="h-full w-full">매출현황</button>
-            </div>
-            <div class="h-full w-full border border-gray-200">
-              <button class="h-full w-full" @click="goRouter(2)">
-                시간대별 분석
-              </button>
-            </div>
-            <div class="h-full w-full border border-gray-200">
-              <button class="h-full w-full" @click="goRouter(3)">
-                기간별 분석
-              </button>
-            </div>
-            <div class="h-full w-full border border-gray-200">
-              <button class="h-full w-full" @click="goRouter(4)">
-                요일별 분석
-              </button>
-            </div>
-            <div class="h-full w-full border border-gray-200">
-              <button class="h-full w-full">메뉴별 분석</button>
-            </div>
-            <div class="h-full w-full border border-gray-200">
-              <button class="h-full w-full">주제/결제유형별 분석</button>
-            </div>
           </div>
           <div
             class="flex justify-start items-center pl-10 border border-gray-300 h-24 w-full">
@@ -85,6 +51,19 @@
       </router-view>
     </main>
   </div>
+  <MobileTotalMenu
+    v-show="showTotalMenu"
+    @MenuState="MenuState"></MobileTotalMenu>
+  <MobileMenu
+    ref="stickyElement"
+    id="stickyElement"
+    v-if="showMobileMenu"
+    @showMenu="showMenu"
+    @showpersonal="showpersonal"
+    @showMenu3="showMenu3"
+    @click.stop
+    :changeMenuState="showTotalMenu"
+    :class="{ hidden: !isStickyVisible }"></MobileMenu>
 </template>
 
 <script setup>
@@ -95,6 +74,7 @@ import router from "@/router";
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
+import MobileTotalMenu from "../MOBILE/component/mobileTotalMenu.vue";
 
 const isMenu = ref(false);
 const isMenu2 = ref(false);
@@ -102,12 +82,34 @@ const personal = ref(false);
 const showMobileMenu = ref(true);
 const clickthismenu = ref([]);
 const route = useRoute();
+
+const MenuState = (e) => {
+  showTotalMenu.value = e;
+};
 const showMenu = (value) => {
   isMenu.value = value;
 };
 const showpersonal = (value) => {
   personal.value = value;
 };
+
+const showTotalMenu = ref(false);
+const showMenu3 = (e) => {
+  console.log(e);
+  if (e == true) {
+    showTotalMenu.value = true;
+    store.state.inActiveBackGround = true;
+  } else {
+    showTotalMenu.value = false;
+    store.state.inActiveBackGround = false;
+  }
+};
+
+const resetScreen = (e) => {
+  showTotalMenu.value = false;
+  store.state.inActiveBackGround = false;
+};
+
 const goRouter = (value) => {
   switch (value) {
     case 2:

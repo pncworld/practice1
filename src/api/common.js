@@ -1,3 +1,5 @@
+import router from '@/router';
+import store from '@/store';
 import axios from 'axios';
 import { ref } from 'vue';
 
@@ -13,6 +15,27 @@ const api2 = axios.create({
   timeout: 30000, // 요청 타임아웃 설정
 });
 
+
+api2.interceptors.request.use((config) => {
+  const token = store.state.StoreToken
+
+  config.headers['Authorization'] = `Bearer ${token}`
+
+  return config 
+}, (error) => {
+  return Promise.reject(error)
+})
+
+api2.interceptors.response.use((response) => {
+  return response;
+} ,(error) => {
+  if(error.response && error.response.status == 401){
+    alert('로그인 시간이 1분 이상 지났습니다. 재로그인 해주세요.')
+    store.commit('clearSession')
+    router.push('/');
+    
+  }
+})
 // API 요청 메서드들
 export const login = async (username, password) => {
     return api2.post('/SYSTEM/system.asmx/getLoginSession', {

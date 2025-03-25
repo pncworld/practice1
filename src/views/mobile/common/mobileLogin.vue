@@ -96,11 +96,11 @@
 </template>
 
 <script setup>
+import { getMobileProgList, mobileLogin } from "@/api/mobile";
 import loading from "@/components/loading.vue";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { get_store_list, get_sys_list, login } from "../../../api/common";
 
 const store = useStore(); // Vuex 스토어 가져오기
 const router = useRouter(); // Vue Router 가져오기
@@ -131,66 +131,69 @@ const login2 = async () => {
 
   store.state.selectedCategoryId = null;
   try {
-    const response = await login(username.value, password.value);
+    const response = await mobileLogin(username.value, password.value);
     console.log(response);
-    const loginStatus = response.data.loginSession[0].strUserID;
 
-    if (!isNaN(Number(loginStatus))) {
+    if (response.data.RESULT_CD == "00") {
+      // store.state.userData = response.data.loginSession[0];
+      // console.log(store.state.userData);
       store.dispatch("updateUserData", response.data.loginSession[0]);
+      store.dispatch("setToken", response.data.loginSession[0].SessionToken);
       console.log(response.data.loginSession[0]);
       message.value = "로그인 성공";
       const readPrograms = async () => {
-        const response = await get_sys_list(
-          store.state.userData.lngStoreGroup,
-          store.state.userData.lngUserAdminID,
-          store.state.userData.strLanguage
+        const response = await getMobileProgList(
+          store.state.userData.GROUP_CD,
+          store.state.userData.STORE_CD,
+          store.state.userData.USER_NO
         );
 
-        const result = response.data.sysMenu;
+        const result = response.data.List.filter(
+          (item) => item.USE_YN == "Y"
+        ).map((item) => ({
+          CATEGORY_ID: item.CATEGORY_ID,
+          CATEGORY_NM: item.CATEGORY_NM,
+          PROGID: item.PROGRAM_ID,
+          PROGNM: item.PROGRAM_NM,
+        }));
         console.log(result);
-        const mainCategoryData = result.filter(
-          (item) => Number(item.strMenuLevel) == 1
-        ); // 숫자
-        const subCategoryData = result.filter(
-          (item) => Number(item.strMenuLevel) == 2
-        );
-        const minorCategoryData = result.filter(
-          (item) => Number(item.strMenuLevel) == 3
-        );
 
-        store.dispatch("mainCategory", mainCategoryData);
-        store.dispatch("selectCategory", mainCategoryData[0].lngCode);
-        store.dispatch("subCategory", subCategoryData);
-        store.dispatch("minorCategory", minorCategoryData);
+        const result3 = response.data.List3;
+        console.log(result3);
+        store.state.mobileCategory = [...result];
+        //store.dispatch("setmobileCategory", result);
+        console.log(store.state.mobileCategory);
+        store.dispatch("saveMobileFunction", result3);
       };
       await readPrograms();
-      const readsales = async () => {
-        const response = await get_store_list(
-          store.state.userData.lngStoreGroup,
-          store.state.userData.lngPositionType,
-          store.state.userData.blnBrandAdmin == "False" ? 0 : 1,
-          store.state.userData.lngPosition,
-          store.state.userData.lngJoinType,
-          store.state.userData.lngTeamCode,
-          store.state.userData.lngSupervisor
-        );
+      // const readsales = async () => {
+      //   const response = await get_store_list(
+      //     store.state.userData.lngStoreGroup,
+      //     store.state.userData.lngPositionType,
+      //     store.state.userData.blnBrandAdmin == "False" ? 0 : 1,
+      //     store.state.userData.lngPosition,
+      //     store.state.userData.lngJoinType,
+      //     store.state.userData.lngTeamCode,
+      //     store.state.userData.lngSupervisor
+      //   );
 
-        console.log(response);
-        const result0 = response.data.storeGroup;
-        const result1 = response.data.storeAttr;
-        const result2 = response.data.store;
-        const result3 = response.data.storeSupervisorTeam;
-        const result4 = response.data.storeSupervisor;
-        const result5 = response.data.storeArea;
-
-        store.dispatch("StoreGroup", result0);
-        store.dispatch("StoreType", result1);
-        store.dispatch("StoreCd", result2);
-        store.dispatch("StoreTeamCode", result3);
-        store.dispatch("StoreSupervisor", result4);
-        store.dispatch("StoreAreaCd", result5);
-      };
-      await readsales();
+      //   console.log(response);
+      //   const result0 = response.data.storeGroup;
+      //   const result1 = response.data.storeAttr;
+      //   const result2 = response.data.store;
+      //   const result3 = response.data.storeSupervisorTeam;
+      //   const result4 = response.data.storeSupervisor;
+      //   const result5 = response.data.storeArea;
+      //   const result6 = response.data.SessionToken;
+      //   store.dispatch("StoreGroup", result0);
+      //   store.dispatch("StoreType", result1);
+      //   store.dispatch("StoreCd", result2);
+      //   store.dispatch("StoreTeamCode", result3);
+      //   store.dispatch("StoreSupervisor", result4);
+      //   store.dispatch("StoreAreaCd", result5);
+      //   store.dispatch("setToken", result6);
+      // };
+      // await readsales();
 
       router.push("/homepage");
     } else {

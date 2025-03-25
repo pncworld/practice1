@@ -25,7 +25,10 @@ export default createStore({
       loading : false,
       favoriteList : [],
       isMobile : false,
-      inActiveBackGround : false
+      inActiveBackGround : false ,
+      mobileFunction:[],
+      mobileCategory : [],
+      StoreToken : ''
     };
   },
   mutations: {
@@ -77,6 +80,10 @@ export default createStore({
     },
     setMinorCategory(state,data){
       state.minorCategory = data;
+    },
+
+    setMobilFunction(state,data){
+      state.mobileFunction = data;
     }
     ,
     setStoreGroup(state,data){
@@ -125,6 +132,37 @@ export default createStore({
     saveactiveTab(state, data) {
       state.activeTab2 = data;
     }
+    ,
+    saveToken(state, data) {
+      state.StoreToken = data;
+    }
+    ,
+    saveMobileCategory(state, data) {
+      state.mobileCategory = data;
+    } ,
+    clearSession(state){
+      state.userData = [], // 사용자 데이터를 저장할 상태
+      state.selectedCategoryId = '' ,
+      state.currentTabs = [] ,
+      state.activeTab ='',
+      state.activeTab2 ='',
+      state.mainCategory =[],
+      state.subCategory =[],
+      state.minorCategory= [],
+      state.storeGroup =[],
+      state.storeType= [],
+      state.storeCd =[],
+      state.storeTeamCode = [],
+      state.storeSupervisor= [],
+      state.storeAreaCd = [],
+      state.loading= false,
+      state.favoriteList =[],
+      state.isMobile =false,
+      state.inActiveBackGround= false ,
+      state.mobileFunction=[],
+      state.mobileCategory = [],
+      state.StoreToken = ''
+    }
     
 
   },
@@ -155,6 +193,9 @@ export default createStore({
     },
     minorCategory({commit},data){
       commit('setMinorCategory',data);
+    },
+    saveMobileFunction({commit},data){
+      commit('setMobilFunction',data);
     },
     StoreGroup({commit},data){
       commit('setStoreGroup',data);
@@ -193,6 +234,16 @@ export default createStore({
     ,
     saveActiveTab({commit}, data) {
       commit('saveactiveTab', data);
+    }
+    ,
+    setToken({commit}, data) {
+      commit('saveToken', data);
+    } ,
+    setmobileCategory({commit},data){
+      commit('saveMobileCategory',data);
+    } ,
+    logout({commit}){
+      commit('clearSession')
     }
   },
   getters: {
