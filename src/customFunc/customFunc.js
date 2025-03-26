@@ -9,6 +9,18 @@ export function formatLocalDate(date) {
     const day = String(d.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
+
+  export function formatLocalDate2(date) {
+    if (!date) return '';
+
+    const weekDays = ['일','월','화','수','목','금','토']
+    const weekday = weekDays[date.getDay()]
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day} (${weekday})`;
+  }
 export function formatDateTime(date) {
     const options = {
     timeZone: 'Asia/Seoul', // 한국 시간대 설정
@@ -122,4 +134,9 @@ export async function insertMobilePageLog(progdata) {
   const res = await savePageLog(inserttime,userGroup,userStoreCd,userId,userIp,progname,progid,2)
   console.log(res)
   return ``;
+}
+
+export function formatNumberWithCommas(number) {
+ // if (typeof number !== 'number') return number; // 숫자가 아닐 경우 그대로 반환
+  return new Intl.NumberFormat().format(Number(number)); // 천 단위로 구분한 숫자 포맷
 }

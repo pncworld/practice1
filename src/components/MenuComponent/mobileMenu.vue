@@ -2,15 +2,37 @@
   <div
     class="flex fixed top-0 w-full bg-white z-10 space-x-0 border border-gray-100 justify-between"
     v-show="showMenu2">
-    <div>
+    <div class="flex">
       <button @click="showTotalMenu">
         <font-awesome-icon :icon="['fas', 'bars']" class="size-8 mt-2 ml-5" />
       </button>
+      <div
+        v-if="clickIcon == 2"
+        class="flex justify-center items-center ml-[2vw] text-xl font-semibold">
+        공지사항
+      </div>
+      <div
+        v-if="clickIcon == 3"
+        class="flex justify-center items-center ml-[2vw] text-xl font-semibold">
+        매출조회
+      </div>
+      <div
+        v-if="clickIcon == 0"
+        class="flex justify-center items-center ml-[2vw] text-xl font-semibold">
+        {{ selectedProgName }}
+      </div>
     </div>
     <div>
-      <font-awesome-icon
-        :icon="['fas', 'rotate-right']"
-        class="size-8 mt-2 mr-5" />
+      <button @click="reload" v-if="clickIcon == 1">
+        <font-awesome-icon
+          :icon="['fas', 'rotate-right']"
+          class="size-8 mt-2 mr-5" />
+      </button>
+      <button @click="reload" v-if="clickIcon == 2">
+        <font-awesome-icon
+          :icon="['fas', 'magnifying-glass']"
+          class="size-8 mt-2 mr-5" />
+      </button>
     </div>
   </div>
   <div
@@ -24,7 +46,7 @@
       <div class="text-xs">홈</div>
     </button>
     <button
-      @click="showMobileMenu"
+      @click="showMobileNotice"
       class="w-1/3 bg-white"
       :class="{ '!bg-blue-500 text-white': clickIcon == 2 }">
       <font-awesome-icon :icon="['far', 'bell']" class="size-8" />
@@ -42,6 +64,7 @@
 
 <script setup>
 import router from "@/router";
+import store from "@/store";
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
@@ -49,17 +72,24 @@ const showTotalMenu = () => {
   showMenu3.value = !showMenu3.value;
   emit("showMenu3", showMenu3.value);
 };
+const selectedProgName = ref("");
 
+watch(
+  () => store.state.mobileSelectProgName,
+  () => {
+    selectedProgName.value = store.state.mobileSelectProgName;
+  }
+);
 const showMenu3 = ref(false);
 const mobileMenu = ref(false);
 const showMenu = ref(false);
 const showMenu2 = ref(false);
 const personal = ref(false);
-const clickIcon = ref(0);
+const clickIcon = ref(1);
 const route = useRoute();
 watch(route, () => {
   console.log(route.path);
-  if (route.path === "/") {
+  if (route.path === "/m") {
     showMenu.value = false; // 또는 원하는 다른 동작 수행
     showMenu2.value = false; // 또는 원하는 다른 동작 수행
   } else {
@@ -68,7 +98,7 @@ watch(route, () => {
   }
 });
 const emit = defineEmits([
-  "showMenu",
+  "showNotice",
   "showpersonal",
   "showHomepage",
   "showMenu3",
@@ -80,19 +110,35 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  changeBottomMenu: {
+    type: Boolean,
+    default: true,
+  },
+  changeIcon: {
+    type: Boolean,
+    default: true,
+  },
 });
 
+watch(
+  () => props.changeIcon,
+  () => {
+    clickIcon.value = 0;
+  }
+);
 watch(
   () => props.changeMenuState,
   () => {
     showMenu3.value = props.changeMenuState;
+    clickIcon.value = 0;
   }
 );
-const showMobileMenu = () => {
+
+const showMobileNotice = () => {
   clickIcon.value = 2;
   mobileMenu.value = !mobileMenu.value;
 
-  emit("showMenu", mobileMenu.value);
+  emit("showNotice", mobileMenu.value);
   personal.value = false;
   emit("showpersonal", personal.value);
   emit("showHomepage", false);
@@ -100,7 +146,7 @@ const showMobileMenu = () => {
 const showMobilePersonal = () => {
   clickIcon.value = 3;
   mobileMenu.value = false;
-  emit("showMenu", mobileMenu.value);
+  emit("showNotice", mobileMenu.value);
   personal.value = !personal.value;
   emit("showpersonal", personal.value);
   emit("showHomepage", false);
@@ -108,11 +154,23 @@ const showMobilePersonal = () => {
 const showHomePage = () => {
   clickIcon.value = 1;
   mobileMenu.value = false;
-  emit("showMenu", mobileMenu.value);
+  emit("showNotice", mobileMenu.value);
   personal.value = false;
   emit("showpersonal", personal.value);
-  router.push("/homePage");
+  router.push("/m/homePage");
 };
+
+const reload = () => {
+  window.location.reload();
+};
+
+watch(
+  () => props.changeBottomMenu,
+  () => {
+    console.log(props.changeBottomMenu);
+    showMenu.value = props.changeBottomMenu;
+  }
+);
 </script>
 
 <style lang="scss" scoped></style>

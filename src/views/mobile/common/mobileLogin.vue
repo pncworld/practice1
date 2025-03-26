@@ -159,10 +159,8 @@ const login2 = async () => {
         console.log(result);
 
         const result3 = response.data.List3;
-        console.log(result3);
-        store.state.mobileCategory = [...result];
-        //store.dispatch("setmobileCategory", result);
-        console.log(store.state.mobileCategory);
+
+        store.dispatch("setmobileCategory", result);
         store.dispatch("saveMobileFunction", result3);
       };
       await readPrograms();
@@ -195,7 +193,7 @@ const login2 = async () => {
       // };
       // await readsales();
 
-      router.push("/homepage");
+      router.push("/m/homepage");
     } else {
       throw new Error("로그인 실패");
     }

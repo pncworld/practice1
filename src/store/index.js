@@ -1,10 +1,7 @@
 // src/store/index.js
 import { createStore } from 'vuex';
-import VuexPersistence from 'vuex-persist';
+import createPersistedState from "vuex-persistedstate";
 
-const vuexPersist = new VuexPersistence({
-  storage : window.localStorage
-})
 export default createStore({
   state() {
     return {
@@ -28,7 +25,8 @@ export default createStore({
       inActiveBackGround : false ,
       mobileFunction:[],
       mobileCategory : [],
-      StoreToken : ''
+      StoreToken : '' ,
+      mobileSelectProgName : ''
     };
   },
   mutations: {
@@ -140,6 +138,9 @@ export default createStore({
     saveMobileCategory(state, data) {
       state.mobileCategory = data;
     } ,
+    setMobileProgName(state, data) {
+      state.mobileSelectProgName = data;
+    } ,
     clearSession(state){
       state.userData = [], // 사용자 데이터를 저장할 상태
       state.selectedCategoryId = '' ,
@@ -242,6 +243,9 @@ export default createStore({
     setmobileCategory({commit},data){
       commit('saveMobileCategory',data);
     } ,
+    saveMobileProgName({commit},data){
+      commit('setMobileProgName',data);
+    } ,
     logout({commit}){
       commit('clearSession')
     }
@@ -249,5 +253,7 @@ export default createStore({
   getters: {
     userData: state => state.userData, // 상태를 가져오는 getter
   },
-  plugins: [vuexPersist.plugin]
+  plugins: [ createPersistedState({
+    storage: window.localStorage, // ✅ 기본값 (localStorage에 저장됨)
+  })]
 });

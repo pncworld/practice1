@@ -2,67 +2,59 @@
   <div class="h-screen overflow-y-auto" @click="resetScreen">
     <Loading></Loading>
     <Inactive></Inactive>
-    <main class="h-screen overflow-y-auto bg-gray-100">
-      <router-view v-slot="{ Component, route }" class="mt-24">
+    <main class="h-screen overflow-y-auto bg-gray-100" ref="scrollContainer">
+      <router-view v-slot="{ Component, route }" class="mt-12">
         <div
           class="flex flex-col gap-0 w-full items-center justify-center mr-0 h-auto mt-8"
-          v-show="isMenu">
-          <div class="flex justify-end w-full mr-4">
-            <button class="text-3xl" @click="showMenu(false)">
+          v-show="notice">
+          <!-- <div class="flex justify-end w-full mr-4">
+            <button class="text-3xl" @click="showNotice(false)">
               <font-awesome-icon icon="xmark" />
             </button>
-          </div>
-          <div
-            class="flex justify-start items-center pl-10 border border-gray-300 h-24 w-full">
-            <button
-              class="text-2xl h-full w-full flex justify-start items-center"
-              @click="showsubMenu(1)">
-              <font-awesome-icon icon="chart-simple" />매출
-            </button>
-          </div>
-          <div
-            class="flex justify-start items-center pl-10 border border-gray-300 h-24 w-full">
-            <button
-              class="text-2xl h-full w-full flex justify-start items-center">
-              <font-awesome-icon icon="chart-simple" />기타1
-            </button>
+          </div> -->
+          <div class="absolute top-[50vh] flex justify-center items-center">
+            공지사항이 없습니다.
           </div>
         </div>
 
         <div
           v-if="personal"
-          class="grid grid-cols-2 gap-3 h-full w-auto items-center pl-24">
-          <div>
-            <button
-              class="flex font-semibold size-16 justify-end items-center text-gray-700 bg-white border rounded hover:bg-gray-200 whitespace-nowrap">
-              즐겨찾기
-            </button>
-          </div>
-          <div>
-            <button
-              @click="logout"
-              class="flex font-semibold size-16 justify-end items-center text-gray-700 bg-white border rounded hover:bg-gray-200 whitespace-nowrap">
-              로그아웃
-            </button>
+          class="h-[110%] w-auto items-center overflow-y-auto">
+          <div
+            class="flex flex-col h-full w-full space-y-3 justify-center items-center overflow-y-auto">
+            <div
+              v-for="(i, index) in salesMenus"
+              @click="movePage(i.code, i.name)"
+              class="text-xl mt-[5vh] text-nowrap w-[95vw] h-[10vh] flex justify-center items-center"
+              :class="index % 2 == 1 ? 'bg-white' : 'bg-gray-200'">
+              <button>{{ i.name }}</button>
+            </div>
           </div>
         </div>
 
-        <component v-show="!isMenu && !personal" :is="Component"></component>
+        <component
+          v-show="!notice && !personal"
+          :is="Component"
+          class="overflow-y-auto"
+          id="content"></component>
       </router-view>
     </main>
   </div>
   <MobileTotalMenu
     v-show="showTotalMenu"
-    @MenuState="MenuState"></MobileTotalMenu>
+    @MenuState="MenuState"
+    @SalesMenus="SalesMenus"></MobileTotalMenu>
   <MobileMenu
     ref="stickyElement"
     id="stickyElement"
     v-if="showMobileMenu"
-    @showMenu="showMenu"
+    @showNotice="showNotice"
     @showpersonal="showpersonal"
     @showMenu3="showMenu3"
     @click.stop
+    :changeIcon="changeIcon"
     :changeMenuState="showTotalMenu"
+    :changeBottomMenu="changeBottomMenu"
     :class="{ hidden: !isStickyVisible }"></MobileMenu>
 </template>
 
@@ -71,23 +63,30 @@ import Inactive from "@/components/inactive.vue";
 import Loading from "@/components/loading.vue";
 import MobileMenu from "@/components/MenuComponent/mobileMenu.vue";
 import router from "@/router";
-import { computed, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import MobileTotalMenu from "../MOBILE/component/mobileTotalMenu.vue";
 
-const isMenu = ref(false);
+const notice = ref(false);
 const isMenu2 = ref(false);
 const personal = ref(false);
 const showMobileMenu = ref(true);
 const clickthismenu = ref([]);
 const route = useRoute();
 
+const salesMenus = ref([]);
+const SalesMenus = (e) => {
+  console.log(e);
+  salesMenus.value = e;
+};
 const MenuState = (e) => {
   showTotalMenu.value = e;
+  notice.value = e;
+  personal.value = e;
 };
-const showMenu = (value) => {
-  isMenu.value = value;
+const showNotice = (value) => {
+  notice.value = value;
 };
 const showpersonal = (value) => {
   personal.value = value;
@@ -215,15 +214,33 @@ const logout = () => {
 const isStickyVisible = ref(true); // 요소가 화면에 보이는지 여부
 const stickyElement = ref(null);
 
-// IntersectionObserver 콜백 함수
-const handleIntersection = (entries) => {
-  const entry = entries[0]; // 첫 번째 관찰 항목만 처리
-  if (entry.isIntersecting) {
-    isStickyVisible.value = true; // 요소가 화면에 보일 때
+const changeBottomMenu = ref(true);
+
+const lastScrollY = ref(0); // 마지막 스크롤 위치
+const scrollContainer = ref(null);
+const handleScroll = () => {
+  if (scrollContainer.value.scrollTop > lastScrollY.value) {
+    // 아래로 스크롤하면 메뉴 숨기기
+    changeBottomMenu.value = false;
   } else {
-    isStickyVisible.value = false; // 요소가 화면에서 벗어날 때
+    // 위로 스크롤하면 메뉴 보이기
+    changeBottomMenu.value = true;
   }
+  lastScrollY.value = scrollContainer.value.scrollTop;
 };
+
+onMounted(() => {
+  if (scrollContainer.value) {
+    scrollContainer.value.addEventListener("scroll", handleScroll); // 스크롤 컨테이너에 이벤트 등록
+    lastScrollY.value = scrollContainer.value.scrollTop;
+  }
+});
+
+onBeforeUnmount(() => {
+  if (scrollContainer.value) {
+    scrollContainer.value.removeEventListener("scroll", handleScroll);
+  }
+});
 
 // 컴포넌트가 마운트될 때 IntersectionObserver 설정
 // onMounted(() => {
@@ -245,6 +262,16 @@ const handleIntersection = (entries) => {
 //     }
 //   });
 // });
+
+const changeIcon = ref(false);
+const movePage = (e, e2) => {
+  console.log(`/m/${e}`);
+  store.state.mobileSelectProgName = e2;
+  changeIcon.value = !changeIcon.value;
+  personal.value = false;
+  notice.value = false;
+  router.push(`/m/${e}`);
+};
 </script>
 
 <style lang="scss" scoped></style>

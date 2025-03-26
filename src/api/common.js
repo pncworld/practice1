@@ -27,6 +27,11 @@ api2.interceptors.request.use((config) => {
 })
 
 api2.interceptors.response.use((response) => {
+  if(response.headers.authorization){
+    let newtoken = response.headers.authorization.substring(7);
+
+    store.state.StoreToken = newtoken
+  }
   return response;
 } ,(error) => {
   if(error.response && error.response.status == 401){

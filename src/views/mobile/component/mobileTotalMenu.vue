@@ -1,5 +1,6 @@
 <template>
-  <div class="h-screen top-0 fixed w-64 z-[60] bg-white overflow-auto">
+  <div
+    class="h-screen top-0 fixed w-64 z-[60] bg-white overflow-y-auto overflow-x-hidden">
     <div class="flex justify-center items-center mr-5 mt-[5%]">
       <img src="../../../assets/login_rms.svg" alt="" />
     </div>
@@ -60,41 +61,6 @@ import router from "@/router";
 import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
-
-const store = useStore();
-const StoreName = ref("");
-const toggleSubMenu = (e) => {
-  menuItems.value[e].isOpen = !menuItems.value[e].isOpen;
-};
-
-const groupMenu = ref([]);
-
-const emit = defineEmits(["MenuState"]);
-watch(
-  () => store.state.mobileCategory,
-  () => {
-    console.log(store.state.mobileCategory);
-    console.log(store.state.mobileFunction);
-    menuItems.value = menuItems2.value.filter(
-      (item) =>
-        store.state.mobileFunction.some(
-          (func) => func.CATEGORY_ID == item.mainCode.toString()
-        ) // mobileFunction 배열 내에 CATEGORY_ID item.mainCode와 일치하는 항목이 있는지 확인
-    );
-    console.log(menuItems.value);
-    menuItems.value = menuItems.value.map((item) => ({
-      ...item,
-      children: store.state.mobileCategory
-        .filter((item2) => item.mainCode == Number(item2.CATEGORY_ID)) // mainCode와 CATEGORY_ID가 같은 것만 남김
-        .map((item2) => ({
-          code: item2.PROGID,
-          name: item2.PROGNM,
-        })),
-    }));
-
-    console.log(menuItems.value);
-  }
-);
 const menuItems = ref([
   //   {
   //     title: "공지사항",
@@ -190,6 +156,44 @@ const menuItems2 = ref([
     ],
   },
 ]);
+const store = useStore();
+const StoreName = ref("");
+const toggleSubMenu = (e) => {
+  menuItems.value[e].isOpen = !menuItems.value[e].isOpen;
+};
+
+const groupMenu = ref([]);
+
+const emit = defineEmits(["MenuState", "SalesMenus"]);
+watch(
+  () => store.state.mobileCategory,
+  () => {
+    console.log(store.state.mobileCategory);
+    console.log(store.state.mobileFunction);
+    menuItems.value = menuItems2.value.filter(
+      (item) =>
+        store.state.mobileFunction.some(
+          (func) => func.CATEGORY_ID == item.mainCode.toString()
+        ) // mobileFunction 배열 내에 CATEGORY_ID item.mainCode와 일치하는 항목이 있는지 확인
+    );
+    console.log(menuItems.value);
+    menuItems.value = menuItems.value.map((item) => ({
+      ...item,
+      children: store.state.mobileCategory
+        .filter((item2) => item.mainCode == Number(item2.CATEGORY_ID)) // mainCode와 CATEGORY_ID가 같은 것만 남김
+        .map((item2) => ({
+          code: item2.PROGID,
+          name: item2.PROGNM,
+        })),
+    }));
+
+    console.log(menuItems.value);
+    if (menuItems.value[0]) {
+      emit("SalesMenus", menuItems.value[0].children);
+    }
+  },
+  { immediate: true } // 새로고침할때 반응해주게 하는 설정
+);
 
 onMounted(() => {});
 
@@ -206,10 +210,8 @@ const moveProgram = async (e1, e2) => {
     strUrl: e2,
     lngProgramID: e1,
   });
-
-  if (e1 == 20001) {
-    router.push("/MOBILE/sales/DaySales");
-  }
+  store.state.mobileSelectProgName = e2;
+  router.push(`/m/${e1}`);
 
   emit("MenuState", false);
   store.state.inActiveBackGround = false;
