@@ -17,21 +17,6 @@
           </div>
         </div>
 
-        <div
-          v-if="personal"
-          class="h-[110%] w-auto items-center overflow-y-auto relative">
-          <div
-            class="flex flex-col h-full w-full space-y-3 justify-center items-center overflow-y-auto">
-            <div
-              v-for="(i, index) in salesMenus"
-              @click="movePage(i.code, i.name)"
-              class="text-xl mt-[5vh] text-nowrap w-[95vw] h-[10vh] flex justify-center items-center"
-              :class="index % 2 == 1 ? 'bg-white' : 'bg-gray-200'">
-              <button>{{ i.name }}</button>
-            </div>
-          </div>
-        </div>
-
         <component
           v-show="!(notice || personal)"
           :is="Component"
@@ -39,6 +24,22 @@
           id="content"></component>
       </router-view>
     </main>
+
+    <div
+      v-if="personal"
+      class="h-[120%] w-full items-center overflow-y-auto flex"
+      ref="scrollContainer3">
+      <div
+        class="flex flex-col h-full w-full space-y-3 justify-center items-center overflow-y-auto">
+        <div
+          v-for="(i, index) in salesMenus"
+          @click="movePage(i.code, i.name)"
+          class="text-xl mt-[5vh] text-nowrap w-[95vw] h-[10vh] flex justify-center items-center"
+          :class="index % 2 == 1 ? 'bg-white' : 'bg-gray-200'">
+          <button>{{ i.name }}</button>
+        </div>
+      </div>
+    </div>
   </div>
   <MobileTotalMenu
     v-show="showTotalMenu"
@@ -217,7 +218,9 @@ const stickyElement = ref(null);
 const changeBottomMenu = ref(true);
 
 const lastScrollY = ref(0); // 마지막 스크롤 위치
+const lastScrollY3 = ref(0); // 마지막 스크롤 위치
 const scrollContainer = ref(null);
+const scrollContainer3 = ref(null);
 const handleScroll = () => {
   if (scrollContainer.value.scrollTop > lastScrollY.value) {
     // 아래로 스크롤하면 메뉴 숨기기
@@ -226,7 +229,19 @@ const handleScroll = () => {
     // 위로 스크롤하면 메뉴 보이기
     changeBottomMenu.value = true;
   }
+
   lastScrollY.value = scrollContainer.value.scrollTop;
+};
+const handleScroll3 = () => {
+  if (scrollContainer3.value.scrollTop > lastScrollY3.value) {
+    // 아래로 스크롤하면 메뉴 숨기기
+    changeBottomMenu.value = false;
+  } else {
+    // 위로 스크롤하면 메뉴 보이기
+    changeBottomMenu.value = true;
+  }
+
+  lastScrollY3.value = scrollContainer3.value.scrollTop;
 };
 
 onMounted(() => {
@@ -234,11 +249,18 @@ onMounted(() => {
     scrollContainer.value.addEventListener("scroll", handleScroll); // 스크롤 컨테이너에 이벤트 등록
     lastScrollY.value = scrollContainer.value.scrollTop;
   }
+  if (scrollContainer3.value) {
+    scrollContainer3.value.addEventListener("scroll", handleScroll3); // 스크롤 컨테이너에 이벤트 등록
+    lastScrollY3.value = scrollContainer3.value.scrollTop;
+  }
 });
 
 onBeforeUnmount(() => {
   if (scrollContainer.value) {
     scrollContainer.value.removeEventListener("scroll", handleScroll);
+  }
+  if (scrollContainer3.value) {
+    scrollContainer3.value.removeEventListener("scroll", handleScroll3);
   }
 });
 

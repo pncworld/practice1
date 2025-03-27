@@ -12,33 +12,36 @@
       </div>
     </div>
 
-    <div class="h-[15%] w-[95%] bg-white overflow-visible">
+    <div class="h-[20%] w-[95%] bg-white overflow-visible">
       <div class="grid grid-rows-2 grid-cols-3 h-full gap-1">
-        <div class="bg-black text-white flex justify-center items-center">
+        <div
+          class="bg-black text-white flex justify-center items-center h-[50%]">
           일매출
         </div>
-        <div class="bg-black text-white flex justify-center items-center">
+        <div
+          class="bg-black text-white flex justify-center items-center h-[50%]">
           주간매출
         </div>
-        <div class="bg-black text-white flex justify-center items-center">
+        <div
+          class="bg-black text-white flex justify-center items-center h-[50%]">
           월매출
         </div>
-        <div class="text-gray-500">
+        <div class="text-gray-500 h-full -mt-[30%]">
           전일 / {{ lastDaySale }}원
           <div class="text-blue-400">{{ todaySale }}원</div>
         </div>
-        <div class="text-gray-500">
+        <div class="text-gray-500 h-full -mt-[30%]">
           전주 / {{ lastWeekSale }}원
           <div class="text-blue-400">{{ WeekSale }}원</div>
         </div>
-        <div class="text-gray-500">
+        <div class="text-gray-500 h-full -mt-[30%]">
           전월 / {{ lastMonthSale }}원
           <div class="text-blue-400">{{ MonthSale }}원</div>
         </div>
       </div>
     </div>
 
-    <div class="h-[10%] w-[95%] flex space-x-1">
+    <div class="h-[20%] w-[95%] flex space-x-1">
       <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white">
         <div class="flex flex-col h-[10vh]">
           <div class="flex justify-end text-gray-500 mt-[2vh] mr-[2vw]">
@@ -88,8 +91,8 @@
         </div>
       </div>
     </div>
-    <div class="grid grid-rows-1 grid-cols-3 bg-white h-[50%] w-[95%]">
-      <div class="flex items-end justify-center space-x-4">
+    <div class="grid grid-rows-1 grid-cols-3 bg-white h-[50%] w-[95%] relative">
+      <div class="flex items-end justify-center space-x-4 h-[90%]">
         <div
           class="bg-red-500 opacity-60 w-[10vw] flex relative"
           :style="{ height: prevsaleH }">
@@ -106,7 +109,7 @@
         </div>
       </div>
 
-      <div class="flex items-end justify-center space-x-4">
+      <div class="flex items-end justify-center space-x-4 h-[90%] relative">
         <div
           class="bg-green-500 opacity-60 w-[10vw] flex relative"
           :style="{ height: prevWeeksaleH }">
@@ -122,7 +125,7 @@
           }}</span>
         </div>
       </div>
-      <div class="flex items-end justify-center space-x-4">
+      <div class="flex items-end justify-center space-x-4 h-[90%]">
         <div
           class="bg-blue-500 opacity-60 w-[10vw] flex relative"
           :style="{ height: prevMonthsaleH }">
@@ -221,10 +224,10 @@ onMounted(async () => {
 
   nextsaleH.value = Number(data.TODAY_SAL) / 500000 + "px";
   prevsaleH.value = Number(data.YESTERDAY_SAL) / 500000 + "px";
-  nextWeeksaleH.value = Number(data.THISWEEK_SAL) / 1000000 + "px";
-  prevWeeksaleH.value = Number(data.LASTWEEK_SAL) / 1000000 + "px";
-  nextMonthsaleH.value = Number(data.THISMONTH_SAL) / 10000000 + "px";
-  prevMonthsaleH.value = Number(data.LASTMONTH_SAL) / 10000000 + "px";
+  nextWeeksaleH.value = Number(data.THISWEEK_SAL) / 1500000 + "px";
+  prevWeeksaleH.value = Number(data.LASTWEEK_SAL) / 1500000 + "px";
+  nextMonthsaleH.value = Number(data.THISMONTH_SAL) / 15000000 + "px";
+  prevMonthsaleH.value = Number(data.LASTMONTH_SAL) / 15000000 + "px";
 
   difweekSale.value = Number(data.THISWEEK_SAL) - Number(data.LASTWEEK_SAL);
   difweekSale2.value = formatNumberWithCommas(
