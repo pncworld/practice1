@@ -1,6 +1,6 @@
 
 import axios from 'axios';
-
+import store from '@/store';
 import {commonUrl,commonUrl2} from './common';
 
 const url = commonUrl;

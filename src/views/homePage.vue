@@ -1,7 +1,7 @@
 <template>
   <div
-    class="overflow-y-auto flex flex-col justify-center items-center space-y-4">
-    <div class="w-[95%] p-3 h-[20%] bg-white flex flex-col justify-center">
+    class="overflow-y-auto flex flex-col justify-center items-center space-y-4 h-full relative">
+    <div class="w-[95%] p-3 h-[10%] bg-white flex flex-col justify-center">
       <div class="flex justify-start">안녕하세요!</div>
       <div class="flex items-center">
         <span class="text-blue-500 text-nowrap text-2xl">{{ StoreName }}</span>
@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div class="h-[25vh] w-[95%] bg-white">
+    <div class="h-[15%] w-[95%] bg-white overflow-visible">
       <div class="grid grid-rows-2 grid-cols-3 h-full gap-1">
         <div class="bg-black text-white flex justify-center items-center">
           일매출
@@ -38,7 +38,7 @@
       </div>
     </div>
 
-    <div class="h-[15vh] w-[95%] flex space-x-1">
+    <div class="h-[10%] w-[95%] flex space-x-1">
       <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white">
         <div class="flex flex-col h-[10vh]">
           <div class="flex justify-end text-gray-500 mt-[2vh] mr-[2vw]">
@@ -71,7 +71,7 @@
           </div>
         </div>
       </div>
-      <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white">
+      <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white relative">
         <div class="flex flex-col h-[10vh]">
           <div class="flex justify-end text-gray-500 mt-[2vh] mr-[2vw]">
             전월대비
@@ -88,7 +88,7 @@
         </div>
       </div>
     </div>
-    <div class="grid grid-rows-1 grid-cols-3 bg-white h-[48vh] w-[95%]">
+    <div class="grid grid-rows-1 grid-cols-3 bg-white h-[50%] w-[95%]">
       <div class="flex items-end justify-center space-x-4">
         <div
           class="bg-red-500 opacity-60 w-[10vw] flex relative"

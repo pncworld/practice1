@@ -19,7 +19,7 @@
 
         <div
           v-if="personal"
-          class="h-[110%] w-auto items-center overflow-y-auto">
+          class="h-[110%] w-auto items-center overflow-y-auto relative">
           <div
             class="flex flex-col h-full w-full space-y-3 justify-center items-center overflow-y-auto">
             <div
@@ -33,7 +33,7 @@
         </div>
 
         <component
-          v-show="!notice && !personal"
+          v-show="!(notice || personal)"
           :is="Component"
           class="overflow-y-auto"
           id="content"></component>

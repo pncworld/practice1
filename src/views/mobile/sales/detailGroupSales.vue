@@ -19,7 +19,6 @@
   </div>
   <MobileDateStore
     @click.stop
-    class="z-[10]"
     :changeState="changeState"
     @currState="currState"
     @SEARCHNOW="SEARCHNOW"

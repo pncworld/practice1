@@ -3,6 +3,7 @@ import MobileLogin from "@/views/MOBILE/common/mobileLogin.vue";
 import mobileMaster from "./mobileMaster";
 import mobileSales from "./mobileSales";
 import DetailSales from "@/views/MOBILE/sales/detailSales.vue";
+import DetailGroupSales from "@/views/MOBILE/sales/detailGroupSales.vue";
 
 
 export default function mobileRouter() {
@@ -30,6 +31,11 @@ export default function mobileRouter() {
             path: '20002',
             //component : BasicLayout ,
             component: DetailSales
+        },
+        {
+            path: '20003',
+            //component : BasicLayout ,
+            component: DetailGroupSales
         },
      
     ];
