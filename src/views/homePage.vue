@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div class="h-[20%] w-[95%] bg-white overflow-visible">
+    <div class="h-[15vh] w-[95%] bg-white overflow-visible">
       <div class="grid grid-rows-2 grid-cols-3 h-full gap-1">
         <div
           class="bg-black text-white flex justify-center items-center h-[50%]">
@@ -26,22 +26,22 @@
           class="bg-black text-white flex justify-center items-center h-[50%]">
           월매출
         </div>
-        <div class="text-gray-500 h-full -mt-[30%]">
+        <div class="text-gray-500 h-full -mt-[25%]">
           전일 / {{ lastDaySale }}원
           <div class="text-blue-400">{{ todaySale }}원</div>
         </div>
-        <div class="text-gray-500 h-full -mt-[30%]">
+        <div class="text-gray-500 h-full -mt-[25%]">
           전주 / {{ lastWeekSale }}원
           <div class="text-blue-400">{{ WeekSale }}원</div>
         </div>
-        <div class="text-gray-500 h-full -mt-[30%]">
+        <div class="text-gray-500 h-full -mt-[25%]">
           전월 / {{ lastMonthSale }}원
           <div class="text-blue-400">{{ MonthSale }}원</div>
         </div>
       </div>
     </div>
 
-    <div class="h-[20%] w-[95%] flex space-x-1">
+    <div class="h-[10%] w-[95%] flex space-x-1">
       <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white">
         <div class="flex flex-col h-[10vh]">
           <div class="flex justify-end text-gray-500 mt-[2vh] mr-[2vw]">
@@ -50,10 +50,10 @@
           <div>
             <font-awesome-icon
               :icon="['fas', 'circle-arrow-up']"
-              class="text-red-500 size-7"
+              class="text-red-500 size-[3vw]"
               v-show="difdaySale > 0" /><font-awesome-icon
               :icon="['fas', 'circle-arrow-down']"
-              class="text-blue-500 size-7"
+              class="text-blue-500 size-[3vw]"
               v-show="difdaySale < 0" />&nbsp;&nbsp;{{ difdaySale2 }}
           </div>
         </div>
@@ -66,14 +66,15 @@
           <div>
             <font-awesome-icon
               :icon="['fas', 'circle-arrow-up']"
-              class="text-red-500 size-7"
+              class="text-red-500 size-[3vw]"
               v-show="difweekSale > 0" /><font-awesome-icon
               :icon="['fas', 'circle-arrow-down']"
-              class="text-blue-500 size-7"
+              class="text-blue-500 size-[3vw]"
               v-show="difweekSale < 0" />&nbsp;&nbsp;{{ difweekSale2 }}
           </div>
         </div>
       </div>
+
       <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white relative">
         <div class="flex flex-col h-[10vh]">
           <div class="flex justify-end text-gray-500 mt-[2vh] mr-[2vw]">
@@ -82,10 +83,10 @@
           <div>
             <font-awesome-icon
               :icon="['fas', 'circle-arrow-up']"
-              class="text-red-500 size-7"
+              class="text-red-500 size-[3vw]"
               v-show="difmonthSale > 0" /><font-awesome-icon
               :icon="['fas', 'circle-arrow-down']"
-              class="text-blue-500 size-7"
+              class="text-blue-500 size-[3vw]"
               v-show="difmonthSale < 0" />&nbsp;&nbsp;{{ difmonthSale2 }}
           </div>
         </div>
@@ -108,7 +109,7 @@
           }}</span>
         </div>
       </div>
-
+      <div class="size-[1vw] absolute text-nowrap">단위 (만원)</div>
       <div class="flex items-end justify-center space-x-4 h-[90%] relative">
         <div
           class="bg-green-500 opacity-60 w-[10vw] flex relative"

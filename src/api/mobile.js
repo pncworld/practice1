@@ -38,8 +38,10 @@ api2.interceptors.response.use((response) => {
     alert('로그인 시간이 1분 이상 지났습니다. 재로그인 해주세요.')
     store.commit('clearSession')
     router.push('/');
-    
-  }
+    return new Promise(() => {}); 
+    }
+    return new Promise(() => {}); 
+  
 })
 export const mobileLogin = (userid , password) => {
   return api2.post('/MOBILE/LOGIN_ANDROID.asmx/mobileLogin', {
@@ -74,6 +76,33 @@ export const getAppStoreList = (groupcd , storecd,  userno) => {
 };
 export const getMobileDetailSales = (groupcd , storecd,  startdate, enddate) => {
   return api2.post('/MOBILE/TOTAL_DETAIL_SALE.asmx/getMobileDetailSales', {
+      GROUP_CD   : groupcd,
+      STORE_CD : storecd ,
+      START_DATE : startdate ,
+      END_DATE :  enddate
+
+  });
+};
+export const getMobileGroupSales = (groupcd , storecd,  startdate, enddate) => {
+  return api2.post('/MOBILE/TOTAL_MENUGROUP_DETAIL_SALE.asmx/getMobileGroupSales', {
+      GROUP_CD   : groupcd,
+      STORE_CD : storecd ,
+      START_DATE : startdate ,
+      END_DATE :  enddate
+
+  });
+};
+export const getMobileSalesByMenu = (groupcd , storecd,  startdate, enddate) => {
+  return api2.post('/MOBILE/TOTAL_MENU_SALES.asmx/getMobileSalesByMenu', {
+      GROUP_CD   : groupcd,
+      STORE_CD : storecd ,
+      START_DATE : startdate ,
+      END_DATE :  enddate
+
+  });
+};
+export const getSalesByCreditCard = (groupcd , storecd,  startdate, enddate) => {
+  return api2.post('/MOBILE/TOTAL_CREDIT_SALES.asmx/getSalesByCreditCard', {
       GROUP_CD   : groupcd,
       STORE_CD : storecd ,
       START_DATE : startdate ,

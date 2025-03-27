@@ -96,6 +96,7 @@
 </template>
 
 <script setup>
+import { alreadyLogined } from "@/api/common";
 import { getMobileProgList, mobileLogin } from "@/api/mobile";
 import loading from "@/components/loading.vue";
 import { onMounted, ref } from "vue";
@@ -205,7 +206,15 @@ const login2 = async () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
+  const token = store.state.StoreToken;
+  const res = await alreadyLogined(token);
+
+  if (res.data.RESULT == true) {
+    router.push("/m/homepage");
+    return;
+  }
+
   store.state.inActiveBackGround = false;
   console.log(localStorage.getItem("saveID"));
   if (localStorage.getItem("saveID") === "true") {
@@ -213,12 +222,7 @@ onMounted(() => {
     saveID.value = true;
     username.value = localStorage.getItem("username");
   }
-
-  if (store.state.userData?.[0]?.[0]?.STATUS_CD === "0000") {
-    router.push("/dashboard");
-  }
 });
-
 const showPopUp = ref(false);
 const showCustomorCenter = () => {
   store.state.inActiveBackGround = true;

@@ -1,16 +1,17 @@
-import HomePage from "@/views/homePage.vue";
-import MobileLogin from "@/views/MOBILE/common/mobileLogin.vue";
+import DetailGroupSales from "@/views/MOBILE/sales/detailGroupSales.vue";
+import DetailSales from "@/views/MOBILE/sales/detailSales.vue";
+import SalesByMenu from "@/views/MOBILE/sales/SalesByMenu.vue";
 import mobileMaster from "./mobileMaster";
 import mobileSales from "./mobileSales";
-import DetailSales from "@/views/MOBILE/sales/detailSales.vue";
-import DetailGroupSales from "@/views/MOBILE/sales/detailGroupSales.vue";
+import SalesByCreditCard from "@/views/MOBILE/sales/salesByCreditCard.vue";
+import SalesByTime from "@/views/MOBILE/sales/salesByTime.vue";
 
 
 export default function mobileRouter() {
     return [
         {
             path: '',  // 기본 하위 경로 (빈 경로)
-            component: MobileLogin // 기본 컴포넌트
+            component: () => import('../views/MOBILE/common/mobileLogin.vue') // 기본 컴포넌트
         },
         {
             path: 'MISALES',
@@ -25,7 +26,7 @@ export default function mobileRouter() {
         {
             path: 'homepage',
             //component : BasicLayout ,
-            component: HomePage
+            component: () => import('../views/homePage.vue')
         },
         {
             path: '20002',
@@ -36,6 +37,21 @@ export default function mobileRouter() {
             path: '20003',
             //component : BasicLayout ,
             component: DetailGroupSales
+        },
+        {
+            path: '20004',
+            //component : BasicLayout ,
+            component: SalesByMenu
+        },
+        {
+            path: '20005',
+            //component : BasicLayout ,
+            component: SalesByCreditCard
+        },
+        {
+            path: '20006',
+            //component : BasicLayout ,
+            component: SalesByTime
         },
      
     ];

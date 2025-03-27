@@ -22,7 +22,11 @@ import store from './store'
 
 
 library.add(fas ,far );
-
+window.addEventListener("storage", (event) => {
+  if (event.key === "vuex") {
+    store.replaceState(JSON.parse(event.newValue)); // 새로운 값으로 업데이트
+  }
+});
 const app = createApp(App)
   .use(router)
   .use(store)

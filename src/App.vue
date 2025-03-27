@@ -1,9 +1,9 @@
 <script setup>
-import { onMounted, ref } from "vue";
-import BasicLayout from "./views/layout/BasicLayout.vue";
-import MobileLayout from "./views/layout/mobileLayout.vue";
+import { defineAsyncComponent, onMounted, ref, Suspense } from "vue";
 import { useStore } from "vuex";
 import JSZip from "jszip";
+import LoadingScreen from "./components/LoadingScreen.vue";
+import router from "./router";
 
 const isMobile = ref(false);
 const store = useStore();
@@ -11,18 +11,35 @@ const detectMobile = () => {
   const userAgent = window.navigator.userAgent;
   isMobile.value = /iPhone|iPad|iPod|Android/i.test(userAgent);
 };
+
+const MobileLayout = defineAsyncComponent(() =>
+  import("../src/views/layout/mobileLayout.vue")
+);
+const BasicLayout = defineAsyncComponent(() =>
+  import("../src/views/layout/BasicLayout.vue")
+);
 onMounted(() => {
   detectMobile();
   store.state.isMobile = isMobile.value;
 });
+
 window.JSZip = JSZip;
 </script>
 
 <template>
-  <component :is="isMobile ? MobileLayout : BasicLayout" class="">
-    <router-view></router-view>
-    <!-- 자식 컴포넌트를 여기에 렌더링 -->
-  </component>
+  <Suspense>
+    <template #default>
+      <!-- isMobile에 따라 레이아웃을 동적으로 선택 -->
+      <component :is="isMobile ? MobileLayout : BasicLayout" class="">
+        <router-view></router-view>
+        <!-- 자식 컴포넌트를 여기에 렌더링 -->
+      </component>
+    </template>
+    <template #fallback>
+      <!-- 로딩 중에 보여줄 컴포넌트 -->
+      <LoadingScreen />
+    </template>
+  </Suspense>
 </template>
 
 <style>

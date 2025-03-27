@@ -38,8 +38,10 @@ api2.interceptors.response.use((response) => {
     alert('로그인 시간이 1분 이상 지났습니다. 재로그인 해주세요.')
     store.commit('clearSession')
     router.push('/');
-    
-  }
+    return new Promise(() => {}); 
+    }
+    return new Promise(() => {}); 
+  
 })
 // API 요청 메서드들
 export const login = async (username, password) => {
@@ -176,7 +178,12 @@ export const savePageLog = async(time,group,store,userid,userip,progname,progid,
   })
   return res ;
 }
+export const alreadyLogined = (token) => {
+  return api2.post('/SYSTEM/VERIFYLOGIN.asmx/alreadyLogined', {
+      TOKEN : token
 
+  });
+};
 
 
 export const createItem = (item) => api.post('/items', item);

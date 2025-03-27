@@ -31,15 +31,16 @@ api2.interceptors.response.use((response) => {
 
     store.state.StoreToken = newtoken
   }
-
   return response;
 } ,(error) => {
   if(error.response && error.response.status == 401){
     alert('로그인 시간이 1분 이상 지났습니다. 재로그인 해주세요.')
     store.commit('clearSession')
     router.push('/');
-    
-  }
+    return new Promise(() => {}); 
+    }
+    return new Promise(() => {}); 
+  
 })
 
 // API 요청 메서드들

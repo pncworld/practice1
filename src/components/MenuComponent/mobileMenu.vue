@@ -65,27 +65,32 @@
 <script setup>
 import router from "@/router";
 import store from "@/store";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 const showTotalMenu = () => {
   showMenu3.value = !showMenu3.value;
   emit("showMenu3", showMenu3.value);
 };
-const selectedProgName = ref("");
-
+const selectedProgName = ref(store.state.mobileSelectProgName);
+const clickIcon = ref(1);
 watch(
   () => store.state.mobileSelectProgName,
   () => {
+    console.log(store.state.mobileSelectProgName);
+    if (store.state.mobileSelectProgName != "") {
+      clickIcon.value = 0;
+    }
     selectedProgName.value = store.state.mobileSelectProgName;
-  }
+  },
+  { immediate: true }
 );
 const showMenu3 = ref(false);
 const mobileMenu = ref(false);
 const showMenu = ref(false);
 const showMenu2 = ref(false);
 const personal = ref(false);
-const clickIcon = ref(1);
+
 const route = useRoute();
 watch(route, () => {
   console.log(route.path);

@@ -37,8 +37,10 @@ const api2 = axios.create({
       alert('로그인 시간이 1분 이상 지났습니다. 재로그인 해주세요.')
       store.commit('clearSession')
       router.push('/');
-      
-    }
+      return new Promise(() => {}); 
+      }
+      return new Promise(() => {}); 
+    
   })
   
 // API 요청 메서드들

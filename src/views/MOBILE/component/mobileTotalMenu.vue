@@ -52,6 +52,18 @@
         </ul>
       </li>
     </ul>
+    <div class="fixed bottom-0 w-64 justify-between flex">
+      <div
+        class="w-1/2 bg-gray-200 text-gray-600 h-14 flex justify-center items-center">
+        <font-awesome-icon :icon="['fas', 'gear']" />설정
+      </div>
+      <div
+        class="w-1/2 bg-gray-200 text-gray-600 h-14 flex justify-center items-center"
+        @click="logout">
+        <font-awesome-icon
+          :icon="['fas', 'arrow-right-from-bracket']" />로그아웃
+      </div>
+    </div>
   </div>
 </template>
 
@@ -168,8 +180,6 @@ const emit = defineEmits(["MenuState", "SalesMenus"]);
 watch(
   () => store.state.mobileCategory,
   () => {
-    console.log(store.state.mobileCategory);
-    console.log(store.state.mobileFunction);
     menuItems.value = menuItems2.value.filter(
       (item) =>
         store.state.mobileFunction.some(
@@ -215,6 +225,13 @@ const moveProgram = async (e1, e2) => {
 
   emit("MenuState", false);
   store.state.inActiveBackGround = false;
+};
+
+const logout = () => {
+  store.commit("clearSession");
+  //localStorage.clear();
+  // sessionStorage.clear();
+  window.location.href = "/";
 };
 </script>
 

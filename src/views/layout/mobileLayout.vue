@@ -1,8 +1,14 @@
 <template>
-  <div class="h-screen overflow-y-auto" @click="resetScreen">
-    <Loading></Loading>
+  <div
+    class="h-screen overflow-y-auto"
+    @click="resetScreen"
+    ref="scrollContainer3">
+    <loading></loading>
     <Inactive></Inactive>
-    <main class="h-screen overflow-y-auto bg-gray-100" ref="scrollContainer">
+    <main
+      class="h-screen overflow-y-auto bg-gray-100"
+      ref="scrollContainer"
+      v-show="!(notice || personal)">
       <router-view v-slot="{ Component, route }" class="mt-12">
         <div
           class="flex flex-col gap-0 w-full items-center justify-center mr-0 h-auto mt-8"
@@ -18,23 +24,19 @@
         </div>
 
         <component
-          v-show="!(notice || personal)"
           :is="Component"
           class="overflow-y-auto"
           id="content"></component>
       </router-view>
     </main>
 
-    <div
-      v-if="personal"
-      class="h-[120%] w-full items-center overflow-y-auto flex"
-      ref="scrollContainer3">
+    <div v-if="personal" class="h-[120%] w-full items-center relative">
       <div
-        class="flex flex-col h-full w-full space-y-3 justify-center items-center overflow-y-auto">
+        class="flex flex-col h-full w-full space-y-3 justify-center items-center mt-[10%]">
         <div
           v-for="(i, index) in salesMenus"
           @click="movePage(i.code, i.name)"
-          class="text-xl mt-[5vh] text-nowrap w-[95vw] h-[10vh] flex justify-center items-center"
+          class="text-xl text-nowrap w-[95vw] h-[10%] flex justify-center items-center border"
           :class="index % 2 == 1 ? 'bg-white' : 'bg-gray-200'">
           <button>{{ i.name }}</button>
         </div>
@@ -68,6 +70,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import MobileTotalMenu from "../MOBILE/component/mobileTotalMenu.vue";
+import { alreadyLogined } from "@/api/common";
 
 const notice = ref(false);
 const isMenu2 = ref(false);
@@ -194,24 +197,6 @@ const activesubCategory = ref([]);
 //   }
 // );
 
-const logout = () => {
-  store.replaceState({
-    userData: [], // 사용자 데이터를 저장할 상태
-    selectedCategoryId: null,
-    currentTabs: [],
-    activeTab: "",
-    mainCategory: [],
-    subCategory: [],
-    minorCategory: [],
-    storeGroup: [],
-    storeType: [],
-    storeCd: [],
-  });
-  //localStorage.clear();
-  // sessionStorage.clear();
-  window.location.href = "/";
-};
-
 const isStickyVisible = ref(true); // 요소가 화면에 보이는지 여부
 const stickyElement = ref(null);
 
@@ -232,7 +217,8 @@ const handleScroll = () => {
 
   lastScrollY.value = scrollContainer.value.scrollTop;
 };
-const handleScroll3 = () => {
+const handleScroll3 = (e) => {
+  console.log(e);
   if (scrollContainer3.value.scrollTop > lastScrollY3.value) {
     // 아래로 스크롤하면 메뉴 숨기기
     changeBottomMenu.value = false;
@@ -244,7 +230,8 @@ const handleScroll3 = () => {
   lastScrollY3.value = scrollContainer3.value.scrollTop;
 };
 
-onMounted(() => {
+const hideAll = ref(true);
+onMounted(async () => {
   if (scrollContainer.value) {
     scrollContainer.value.addEventListener("scroll", handleScroll); // 스크롤 컨테이너에 이벤트 등록
     lastScrollY.value = scrollContainer.value.scrollTop;
