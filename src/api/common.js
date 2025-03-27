@@ -18,7 +18,7 @@ const api2 = axios.create({
 
 api2.interceptors.request.use((config) => {
   const token = store.state.StoreToken
-
+  console.log(token)
   config.headers['Authorization'] = `Bearer ${token}`
 
   return config 

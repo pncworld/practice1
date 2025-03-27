@@ -82,6 +82,7 @@ const login2 = async () => {
 
     if (!isNaN(Number(loginStatus))) {
       store.dispatch("updateUserData", response.data.loginSession[0]);
+      store.dispatch("setToken", response.data.loginSession[0].SessionToken);
       console.log(response.data.loginSession[0]);
       message.value = "로그인 성공";
       const readPrograms = async () => {
