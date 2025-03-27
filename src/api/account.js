@@ -1,5 +1,6 @@
 
 import axios from 'axios';
+import store from '@/store';
 import { commonUrl, commonUrl2 } from './common';
 
 const url = commonUrl;
@@ -13,6 +14,32 @@ const api2 = axios.create({
   baseURL: url2, // API 기본 URL
   timeout: 30000, // 요청 타임아웃 설정
 });
+
+api2.interceptors.request.use((config) => {
+  const token = store.state.StoreToken
+
+  config.headers['Authorization'] = `Bearer ${token}`
+
+  return config 
+}, (error) => {
+  return Promise.reject(error)
+})
+
+api2.interceptors.response.use((response) => {
+  if(response.headers.authorization){
+    let newtoken = response.headers.authorization.substring(7);
+
+    store.state.StoreToken = newtoken
+  }
+  return response;
+} ,(error) => {
+  if(error.response && error.response.status == 401){
+    alert('로그인 시간이 1분 이상 지났습니다. 재로그인 해주세요.')
+    store.commit('clearSession')
+    router.push('/');
+    
+  }
+})
 
 export const getEmployeesData = (groupCd ,searchType, searchText ) => {
     return api2.post('/MIACCOUNT/ACT09_001RPT.asmx/getEmployeesData', {

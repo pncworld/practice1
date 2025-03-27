@@ -1,17 +1,19 @@
 <template>
   <div class="h-full w-full" @click="resetScreen">
+    <div class="h-[15vh] w-full"></div>
     <div
-      class="absolute top-[15vh] h-[7vh] items-center text-lg font-medium w-full bg-white flex justify-center">
+      class="relative h-[7vh] items-center text-lg font-medium w-full bg-white flex justify-center">
       <div class="w-2/4 font-semibold">세부항목</div>
       <div class="w-1/4 font-semibold">건수</div>
       <div class="w-1/4 font-semibold">금액</div>
     </div>
-    <div
-      class="absolute top-[22vh] h-[7vh] items-center text-lg font-medium w-full bg-white flex flex-col justify-center">
-      <div v-for="i in rowData" class="flex">
-        <div class="w-2/4 font-normal">{{ i.strAccName }}</div>
-        <div class="w-1/4 font-normal">{{ i.lngCount }}</div>
-        <div class="w-1/4 font-normal">{{ i.lngAmount }}</div>
+    <div v-for="i in rowData" class="bg-gray-300">
+      <div
+        :class="i.strAccName.includes('[') ? 'bg-gray-300' : 'bg-blue-50'"
+        class="grid grid-rows-1 grid-cols-[2fr,1fr,1fr] h-[5vh] justify-center items-center font-medium">
+        <div class="flex justify-start ml-[5vw]">{{ i.strAccName }}</div>
+        <div>{{ i.lngCount }}</div>
+        <div>{{ i.lngAMount }}</div>
       </div>
     </div>
   </div>
@@ -70,7 +72,11 @@ const SEARCHNOW = async (e) => {
     selectEndDate.value
   );
 
-  rowData.value = res.data.List;
+  rowData.value = res.data.List.map((item) => ({
+    ...item,
+    lngAMount: item.lngAMount.toLocaleString(),
+    lngCount: item.lngCount.toLocaleString(),
+  }));
   console.log(rowData.value);
 };
 onMounted(() => {

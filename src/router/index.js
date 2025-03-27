@@ -12,6 +12,7 @@ import miattendRouter from './miattendRouter'
 import salesRouter from './salesRouter'
 import systemRouter from './systemRouter'
 import mobileRouter from './mobileRouter'
+import HomePage2 from '@/views/homePage2.vue'
 
 
 
@@ -60,7 +61,7 @@ const routes = [
   {
     path: '/homePage',
     name: 'homePage',
-    component: HomePage
+    component: HomePage2 
    
   },
   {
