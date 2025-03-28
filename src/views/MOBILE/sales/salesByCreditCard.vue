@@ -3,14 +3,14 @@
     <div class="h-[15vh] w-full"></div>
     <div
       class="relative h-[7vh] items-center text-lg font-medium w-full bg-white flex justify-center">
-      <div class="w-[60%] font-semibold text-nowrap">카드사명</div>
-      <div class="w-[15%] font-semibold">건수</div>
+      <div class="w-[50%] font-semibold text-nowrap">카드사명</div>
+      <div class="w-[25%] font-semibold">건수</div>
       <div class="w-[25%] font-semibold">금액</div>
     </div>
     <div v-for="i in rowData" class="bg-gray-300">
       <div
         :class="i.strBuyName.includes('[') ? 'bg-gray-300' : 'bg-blue-50'"
-        class="grid grid-rows-1 grid-cols-[6fr,1fr,3fr] h-[7vh] justify-center items-center font-medium">
+        class="grid grid-rows-1 grid-cols-[6fr,2fr,2fr] h-[7vh] justify-center items-center font-medium">
         <div class="text-nowrap flex justify-start ml-[5%]">
           {{ i.strBuyName }}
         </div>
@@ -70,7 +70,7 @@ const STORE_CD = (e) => {
 const rowData = ref([]);
 const SEARCHNOW = async (e) => {
   try {
-    store.state.loading = true;
+    store.state.loading2 = true;
     const res = await getSalesByCreditCard(
       selectGroupCd.value,
       selectStoreCd.value,
@@ -85,7 +85,7 @@ const SEARCHNOW = async (e) => {
     }));
   } catch (error) {
   } finally {
-    store.state.loading = false;
+    store.state.loading2 = false;
   }
 
   console.log(rowData.value);

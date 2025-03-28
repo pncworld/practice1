@@ -207,12 +207,17 @@ const login2 = async () => {
 };
 
 onMounted(async () => {
-  const token = store.state.StoreToken;
-  const res = await alreadyLogined(token);
+  store.state.loading2 = true;
+  try {
+    const token = store.state.StoreToken;
+    const res = await alreadyLogined(token);
 
-  if (res.data.RESULT == true) {
-    router.push("/m/homepage");
-    return;
+    if (res.data.RESULT == true) {
+      router.push("/m/homepage");
+      return;
+    }
+  } catch (error) {
+  } finally {
   }
 
   store.state.inActiveBackGround = false;
@@ -222,6 +227,7 @@ onMounted(async () => {
     saveID.value = true;
     username.value = localStorage.getItem("username");
   }
+  store.state.loading2 = false;
 });
 const showPopUp = ref(false);
 const showCustomorCenter = () => {

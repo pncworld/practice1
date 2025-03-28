@@ -190,15 +190,16 @@ const isMobile = store.state.isMobile;
 const StoreName = ref("");
 const today = ref(formatLocalDate2(new Date()));
 onMounted(async () => {
-  console.log(store.state.userData);
-  console.log(store.state);
   StoreName.value = store.state.userData.STORE_NM;
-
-  const res = await getMobileDashBoard(
-    store.state.userData.GROUP_CD,
-    store.state.userData.STORE_CD,
-    store.state.userData.USER_NO
-  );
+  let res;
+  try {
+    store.state.loading2 = false;
+    res = await getMobileDashBoard(
+      store.state.userData.GROUP_CD,
+      store.state.userData.STORE_CD,
+      store.state.userData.USER_NO
+    );
+  } catch (error) {}
 
   const data = res.data.List[0];
   lastDaySale.value = formatNumberWithCommas(data.YESTERDAY_SAL);
@@ -223,12 +224,12 @@ onMounted(async () => {
   WeekSale2.value = Math.floor(Number(data.THISWEEK_SAL) / 10000);
   lastWeekSale2.value = Math.floor(Number(data.LASTWEEK_SAL) / 10000);
 
-  nextsaleH.value = Number(data.TODAY_SAL) / 500000 + "px";
-  prevsaleH.value = Number(data.YESTERDAY_SAL) / 500000 + "px";
-  nextWeeksaleH.value = Number(data.THISWEEK_SAL) / 1500000 + "px";
-  prevWeeksaleH.value = Number(data.LASTWEEK_SAL) / 1500000 + "px";
-  nextMonthsaleH.value = Number(data.THISMONTH_SAL) / 15000000 + "px";
-  prevMonthsaleH.value = Number(data.LASTMONTH_SAL) / 15000000 + "px";
+  nextsaleH.value = Number(data.TODAY_SAL) / 5000000 + "vh";
+  prevsaleH.value = Number(data.YESTERDAY_SAL) / 5000000 + "vh";
+  nextWeeksaleH.value = Number(data.THISWEEK_SAL) / 15000000 + "vh";
+  prevWeeksaleH.value = Number(data.LASTWEEK_SAL) / 15000000 + "vh";
+  nextMonthsaleH.value = Number(data.THISMONTH_SAL) / 150000000 + "vh";
+  prevMonthsaleH.value = Number(data.LASTMONTH_SAL) / 150000000 + "vh";
 
   difweekSale.value = Number(data.THISWEEK_SAL) - Number(data.LASTWEEK_SAL);
   difweekSale2.value = formatNumberWithCommas(

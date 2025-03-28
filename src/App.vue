@@ -1,9 +1,8 @@
 <script setup>
-import { defineAsyncComponent, onMounted, ref, Suspense } from "vue";
-import { useStore } from "vuex";
 import JSZip from "jszip";
+import { defineAsyncComponent, onMounted, ref } from "vue";
+import { useStore } from "vuex";
 import LoadingScreen from "./components/LoadingScreen.vue";
-import router from "./router";
 
 const isMobile = ref(false);
 const store = useStore();

@@ -102,6 +102,15 @@ watch(route, () => {
     showMenu2.value = true;
   }
 });
+onMounted(() => {
+  if (store.state.StoreToken != "") {
+    showMenu2.value = true;
+    showMenu.value = true;
+  } else {
+    showMenu2.value = false;
+    showMenu.value = false;
+  }
+});
 const emit = defineEmits([
   "showNotice",
   "showpersonal",

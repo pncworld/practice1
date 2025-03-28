@@ -70,7 +70,7 @@ const STORE_CD = (e) => {
 const rowData = ref([]);
 const SEARCHNOW = async (e) => {
   try {
-    store.state.loading = true;
+    store.state.loading2 = true;
     const res = await getMobileDetailSales(
       selectGroupCd.value,
       selectStoreCd.value,
@@ -85,7 +85,7 @@ const SEARCHNOW = async (e) => {
     }));
   } catch (error) {
   } finally {
-    store.state.loading = false;
+    store.state.loading2 = false;
   }
 
   console.log(rowData.value);

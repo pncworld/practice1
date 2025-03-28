@@ -3,13 +3,13 @@
     <div class="h-[15vh] w-full"></div>
     <div
       class="relative h-[7vh] items-center text-lg font-medium w-full bg-white flex justify-center">
-      <div class="w-[30%] font-semibold text-nowrap">시간대</div>
+      <div class="w-[50%] font-semibold text-nowrap">매장명</div>
       <div>|</div>
-      <div class="w-[70%] font-semibold">내역</div>
+      <div class="w-[50%] font-semibold">매출 내역</div>
     </div>
     <div v-for="i in rowData" class="bg-gray-200">
       <div
-        class="grid grid-rows-1 grid-cols-[2fr,6fr] h-[20vh] justify-center items-center font-medium">
+        class="grid grid-rows-1 grid-cols-[1fr,1fr] h-[20vh] justify-center items-center font-medium">
         <div
           class="text-nowrap flex flex-col justify-center items-center ml-[5%]">
           <div class="text-xl">{{ i.strTimeName }}</div>

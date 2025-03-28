@@ -1,12 +1,12 @@
 <template>
-  <!-- <div
+  <div
     v-if="isLoading"
     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-[95]">
     <div class="text-white text-lg mt-4">
       <img src="../assets/spinner1.gif" alt="Loading" />
     </div>
-  </div> -->
-  <LoadingScreen v-if="isLoading"></LoadingScreen>
+  </div>
+  <!-- <LoadingScreen v-if="isLoading"></LoadingScreen> -->
 </template>
 
 <script setup>

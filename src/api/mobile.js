@@ -110,3 +110,12 @@ export const getSalesByCreditCard = (groupcd , storecd,  startdate, enddate) => 
 
   });
 };
+export const getMobileSalesByTime = (groupcd , storecd,  startdate, enddate) => {
+  return api2.post('/MOBILE/TOTAL_TIME_SALES.asmx/getMobileSalesByTime', {
+      GROUP_CD   : groupcd,
+      STORE_CD : storecd ,
+      START_DATE : startdate ,
+      END_DATE :  enddate
+
+  });
+};

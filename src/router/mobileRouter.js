@@ -5,6 +5,7 @@ import mobileMaster from "./mobileMaster";
 import mobileSales from "./mobileSales";
 import SalesByCreditCard from "@/views/MOBILE/sales/salesByCreditCard.vue";
 import SalesByTime from "@/views/MOBILE/sales/salesByTime.vue";
+import SalesByStore from "@/views/MOBILE/sales/salesByStore.vue";
 
 
 export default function mobileRouter() {
@@ -52,6 +53,12 @@ export default function mobileRouter() {
             path: '20006',
             //component : BasicLayout ,
             component: SalesByTime
+        },
+        {
+            path: '20007',
+            //component : BasicLayout ,
+            component: SalesByStore
+            
         },
      
     ];

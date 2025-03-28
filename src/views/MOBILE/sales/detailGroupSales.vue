@@ -67,19 +67,26 @@ const STORE_CD = (e) => {
 
 const rowData = ref([]);
 const SEARCHNOW = async (e) => {
-  const res = await getMobileGroupSales(
-    selectGroupCd.value,
-    selectStoreCd.value,
-    selectStartDate.value,
-    selectEndDate.value
-  );
+  try {
+    store.state.loading2 = true;
 
-  rowData.value = res.data.List.map((item) => ({
-    ...item,
-    lngAmount: item.lngAmount.toLocaleString(),
-    lngCount: item.lngCount.toLocaleString(),
-  }));
-  console.log(rowData.value);
+    const res = await getMobileGroupSales(
+      selectGroupCd.value,
+      selectStoreCd.value,
+      selectStartDate.value,
+      selectEndDate.value
+    );
+
+    rowData.value = res.data.List.map((item) => ({
+      ...item,
+      lngAmount: item.lngAmount.toLocaleString(),
+      lngCount: item.lngCount.toLocaleString(),
+    }));
+    console.log(rowData.value);
+  } catch (error) {
+  } finally {
+    store.state.loading2 = false;
+  }
 };
 onMounted(() => {
   console.log(store.state);

@@ -20,6 +20,7 @@ export default createStore({
       storeSupervisor : [],
       storeAreaCd : [],
       loading : false,
+      loading2 : false,
       favoriteList : [],
       isMobile : false,
       inActiveBackGround : false ,
@@ -113,6 +114,9 @@ export default createStore({
     } ,
     setLoading(state ,data) {
       state.loading = data ;
+    } ,
+    setLoading2(state ,data) {
+      state.loading2 = data ;
     } ,
     setinActiveBackGround(state ,data) {
       state.inActiveBackGround = data ;
@@ -221,6 +225,9 @@ export default createStore({
     },
     convertLoading({commit} ,data) {
       commit('setLoading',data);
+    } ,
+    convertLoading2({commit} ,data) {
+      commit('setLoading2',data);
     } ,
     convertInActive({commit} ,data) {
       commit('setinActiveBackGround',data);

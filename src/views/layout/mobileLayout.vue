@@ -4,12 +4,13 @@
     @click="resetScreen"
     ref="scrollContainer3">
     <loading></loading>
+    <Loading2></Loading2>
     <Inactive></Inactive>
     <main
       class="h-screen overflow-y-auto bg-gray-100"
       ref="scrollContainer"
       v-show="!(notice || personal)">
-      <router-view v-slot="{ Component, route }" class="mt-12">
+      <router-view v-slot="{ Component, route }" class="mt-5">
         <div
           class="flex flex-col gap-0 w-full items-center justify-center mr-0 h-auto mt-8"
           v-show="notice">
@@ -71,6 +72,7 @@ import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import MobileTotalMenu from "../MOBILE/component/mobileTotalMenu.vue";
 import { alreadyLogined } from "@/api/common";
+import Loading2 from "@/components/loading2.vue";
 
 const notice = ref(false);
 const isMenu2 = ref(false);
