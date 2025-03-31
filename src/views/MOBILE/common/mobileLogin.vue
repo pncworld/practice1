@@ -116,9 +116,9 @@ const username = ref(""); // 사용자 ID
 const password = ref(""); // 사용자 비밀번호
 const message = ref(""); // 상태 메시지
 const userData = store.state.userData;
-store.dispatch("convertLoading", false);
+
 const login2 = async () => {
-  store.dispatch("convertLoading", true);
+  // /store.state.loading2 = true;
 
   console.log(saveID.value);
   if (saveID.value) {
@@ -202,7 +202,7 @@ const login2 = async () => {
     console.error(error);
     message.value = "오류 발생";
   } finally {
-    store.dispatch("convertLoading", false);
+    store.state.loading2 = false;
   }
 };
 
@@ -247,8 +247,8 @@ input[type="checkbox"] {
   appearance: none;
   border-radius: 50%;
   border: 2px solid #ccc;
-  width: 24px;
-  height: 24px;
+  width: 15px;
+  height: 15px;
   background-color: white;
   position: relative;
   cursor: pointer;
@@ -263,8 +263,8 @@ input[type="checkbox"]:checked {
 input[type="checkbox"]:checked::after {
   content: "";
   position: absolute;
-  left: 6px;
-  top: 6px;
+  left: 0px;
+  top: 0px;
   width: 12px;
   height: 12px;
   background-color: white;

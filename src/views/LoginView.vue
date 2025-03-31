@@ -62,7 +62,12 @@ import loading from "@/components/loading.vue";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { get_store_list, get_sys_list, login } from "../api/common";
+import {
+  alreadyLogined,
+  get_store_list,
+  get_sys_list,
+  login,
+} from "../api/common";
 
 const store = useStore(); // Vuex 스토어 가져오기
 const router = useRouter(); // Vue Router 가져오기
@@ -150,10 +155,30 @@ const login2 = async () => {
   }
 };
 
-onMounted(() => {
-  if (store.state.userData?.[0]?.[0]?.STATUS_CD === "0000") {
-    router.push("/dashboard");
+onMounted(async () => {
+  store.state.loading = true;
+  try {
+    const token = store.state.StoreToken;
+    const res = await alreadyLogined(token);
+    console.log(token);
+    console.log(res);
+    if (res.data.RESULT == true) {
+      router.push("/homepage");
+      return;
+    }
+  } catch (error) {
+  } finally {
+    store.state.loading = false;
   }
+
+  store.state.inActiveBackGround = false;
+  console.log(localStorage.getItem("saveID"));
+  if (localStorage.getItem("saveID") === "true") {
+    console.log(localStorage.getItem("username"));
+    saveID.value = true;
+    username.value = localStorage.getItem("username");
+  }
+  store.state.loading2 = false;
 });
 </script>
 

@@ -7,9 +7,6 @@ export default createStore({
     return {
       userData: [], // 사용자 데이터를 저장할 상태
       selectedCategoryId : null ,
-      currentTabs : [] ,
-      activeTab : '',
-      activeTab2 : '',
       mainCategory : [],
       subCategory : [],
       minorCategory : [],
@@ -63,7 +60,7 @@ export default createStore({
     },
     setActiveTab(state, tab) {
      
-        state.activeTab = tab.lngProgramID; // 현재 활성화된 탭으로 변경
+        state.activeTab = tab != undefined ? tab.lngProgramID : ''; // 현재 활성화된 탭으로 변경
         //state.activeTab2 = tab.lngProgramID; // 현재 활성화된 탭으로 변경
 
     },
@@ -148,9 +145,6 @@ export default createStore({
     clearSession(state){
       state.userData = [], // 사용자 데이터를 저장할 상태
       state.selectedCategoryId = '' ,
-      state.currentTabs = [] ,
-      state.activeTab ='',
-      state.activeTab2 ='',
       state.mainCategory =[],
       state.subCategory =[],
       state.minorCategory= [],
@@ -167,7 +161,7 @@ export default createStore({
       state.mobileFunction=[],
       state.mobileCategory = [],
       state.StoreToken = ''
-    }
+    } 
     
 
   },
@@ -262,6 +256,7 @@ export default createStore({
   },
   plugins: [ createPersistedState({
     storage: window.localStorage, // ✅ 기본값 (localStorage에 저장됨)
+   
   })]
 });
 

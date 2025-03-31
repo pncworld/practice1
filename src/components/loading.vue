@@ -12,7 +12,6 @@
 <script setup>
 import { ref, watch } from "vue";
 import { useStore } from "vuex";
-import LoadingScreen from "./LoadingScreen.vue";
 
 const store = useStore();
 const isLoading = ref(store.state.loading);

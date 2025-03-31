@@ -9,11 +9,16 @@
 </template>
 
 <script setup>
+import { onMounted } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
 
 const isMobile = store.state.isMobile;
+
+onMounted(() => {
+  store.state.loading = false;
+});
 </script>
 
 <style lang="scss" scoped></style>

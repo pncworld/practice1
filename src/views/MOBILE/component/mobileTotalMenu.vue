@@ -2,7 +2,7 @@
   <div
     class="h-screen top-0 fixed w-64 z-[60] bg-white overflow-y-auto overflow-x-hidden">
     <div class="flex justify-center items-center mr-5 mt-[5%]">
-      <img src="../../../assets/login_rms.svg" alt="" />
+      <img src="../../../assets/pnc_mobile_logo.png" alt="" />
     </div>
     <div class="grid grid-rows-3 h-60 border w-full mt-[5%]">
       <div
@@ -12,19 +12,20 @@
       <div class="h-full w-full border border-gray-200">
         <button class="h-full w-full flex justify-start items-center ml-[10%]">
           <font-awesome-icon icon="house" class="size-8" />
-          <div class="text-xl mt-1 ml-[20%]">홈</div>
+          <div class="text-xl mt-1 ml-[16%]">홈</div>
         </button>
       </div>
       <div class="h-full w-full border border-gray-200">
         <button class="h-full w-full flex justify-start items-center ml-[10%]">
           <font-awesome-icon :icon="['far', 'bell']" class="size-8" />
-          <div class="text-xl mt-1 ml-[20%]">공지사항</div>
+          <div class="text-xl mt-1 ml-[16%]">공지사항</div>
         </button>
       </div>
     </div>
     <ul
-      class="w-64 bg-white p-4 rounded-lg flex justify-start items-center flex-col">
-      <li v-for="(i, index) in menuItems" class="mr-10 mb-8">
+      v-for="(i, index) in menuItems"
+      class="w-64 bg-white h-[10vh] pr-[18vw] rounded-lg flex justify-start items-center flex-col border-b-gray-200 border border-b-1">
+      <li class="h-full w-full">
         <button
           class="h-full w-full flex justify-center items-center"
           @click="toggleSubMenu(index)">
@@ -170,8 +171,10 @@ const menuItems2 = ref([
 ]);
 const store = useStore();
 const StoreName = ref("");
+const toggleHeight = ref(false);
 const toggleSubMenu = (e) => {
   menuItems.value[e].isOpen = !menuItems.value[e].isOpen;
+  toggleHeight.value = !toggleHeight.value;
 };
 
 const groupMenu = ref([]);

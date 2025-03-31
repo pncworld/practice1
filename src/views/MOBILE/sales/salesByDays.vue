@@ -2,20 +2,22 @@
   <div class="h-full w-full" @click="resetScreen">
     <div class="h-[15vh] w-full"></div>
     <div
-      class="relative h-[7vh] items-center text-lg font-medium w-full bg-white flex justify-center">
-      <div class="w-2/4 font-semibold">세부항목</div>
-      <div class="w-1/4 font-semibold">건수</div>
-      <div class="w-1/4 font-semibold">금액</div>
+      class="relative h-[7vh] text-sm font-medium w-full bg-white grid grid-rows-1 grid-cols-[1fr,1fr,2fr,2fr,1fr] items-center">
+      <div class="font-semibold text-nowrap">일자</div>
+      <div class="font-semibold text-nowrap">객수/조수</div>
+      <div class="font-semibold text-nowrap">총매출</div>
+      <div class="font-semibold text-nowrap">실매출</div>
+      <div class="font-semibold text-nowrap">할인액</div>
     </div>
     <div v-for="i in rowData" class="bg-gray-300">
       <div
-        :class="i.strAccName.includes('[') ? 'bg-gray-300' : 'bg-blue-50'"
-        class="grid grid-rows-1 grid-cols-[2fr,1fr,1fr] h-[5vh] justify-center items-center font-medium">
-        <div class="flex justify-start ml-[5vw] text-nowrap">
-          {{ i.strAccName }}
-        </div>
-        <div>{{ i.lngCount }}</div>
-        <div>{{ i.lngAmount }}</div>
+        :class="i.dtmDate.includes('[') ? 'bg-gray-300' : 'bg-blue-50'"
+        class="grid grid-rows-1 grid-cols-[1fr,1fr,2fr,2fr,1fr] h-[7vh] justify-center items-center font-medium text-xs">
+        <div>{{ i.dtmDate }}</div>
+        <div>{{ i.lngCustCnt }}/{{ i.lngRecCnt }}</div>
+        <div>{{ i.lngSalAmt }}</div>
+        <div>{{ i.lngActAmt }}</div>
+        <div>{{ i.lngDiscountAmt }}</div>
       </div>
     </div>
   </div>
@@ -32,10 +34,10 @@
 </template>
 
 <script setup>
+import { getMobileSalesbyDays, getMobileSalesByMenu } from "@/api/mobile";
 import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 import MobileDateStore from "../component/mobileDateStore.vue";
-import { getMobileDetailSales } from "@/api/mobile";
 
 const store = useStore();
 const changeState = ref(true);
@@ -46,7 +48,6 @@ const resetScreen = async (e) => {
   store.state.inActiveBackGround = false;
 };
 
-const emit = defineEmits(["initPlaceName"]);
 const currState = (e) => {
   changeState.value = e;
 };
@@ -71,26 +72,21 @@ const rowData = ref([]);
 const SEARCHNOW = async (e) => {
   try {
     store.state.loading2 = true;
-    const res = await getMobileDetailSales(
+    const res = await getMobileSalesbyDays(
       selectGroupCd.value,
       selectStoreCd.value,
       selectStartDate.value,
       selectEndDate.value
     );
 
-    rowData.value = res.data.List.filter((item2) => item2.strAccName != "").map(
-      (item) => ({
-        ...item,
-        lngAmount: item.lngAmount.toLocaleString(),
-        lngCount:
-          item.strAccName.includes("[준비금]") ||
-          item.strAccName.includes("[현금계산재고]") ||
-          item.strAccName.includes("[현금실재고]") ||
-          item.strAccName.includes("[과부족]")
-            ? ""
-            : item.lngCount.toLocaleString(),
-      })
-    );
+    rowData.value = res.data.List.map((item) => ({
+      ...item,
+      lngCustCnt: item.lngCustCnt.toLocaleString(),
+      lngRecCnt: item.lngRecCnt.toLocaleString(),
+      lngSalAmt: item.lngSalAmt.toLocaleString(),
+      lngActAmt: item.lngActAmt.toLocaleString(),
+      lngDiscountAmt: item.lngDiscountAmt.toLocaleString(),
+    }));
   } catch (error) {
   } finally {
     store.state.loading2 = false;

@@ -10,7 +10,7 @@
       class="h-screen overflow-y-auto bg-gray-100"
       ref="scrollContainer"
       v-show="!(notice || personal)">
-      <router-view v-slot="{ Component, route }" class="mt-5">
+      <router-view v-slot="{ Component, route }" class="mt-1">
         <div
           class="flex flex-col gap-0 w-full items-center justify-center mr-0 h-auto mt-8"
           v-show="notice">
@@ -65,14 +65,14 @@
 <script setup>
 import Inactive from "@/components/inactive.vue";
 import Loading from "@/components/loading.vue";
+import Loading2 from "@/components/loading2.vue";
 import MobileMenu from "@/components/MenuComponent/mobileMenu.vue";
 import router from "@/router";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import MobileTotalMenu from "../MOBILE/component/mobileTotalMenu.vue";
-import { alreadyLogined } from "@/api/common";
-import Loading2 from "@/components/loading2.vue";
+const store = useStore();
 
 const notice = ref(false);
 const isMenu2 = ref(false);
@@ -147,7 +147,7 @@ const showsubMenu = (value) => {
 const showornotsubMenu = (value) => {
   return clickthismenu.value.includes(value);
 };
-const store = useStore();
+
 const categories = ref([]);
 const selectedCategoryId = computed(() => store.state.selectedCategoryId);
 

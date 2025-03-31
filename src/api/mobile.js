@@ -119,3 +119,66 @@ export const getMobileSalesByTime = (groupcd , storecd,  startdate, enddate) => 
 
   });
 };
+export const getMobileSalesByStore = (groupcd , storecd,  startdate, enddate) => {
+  return api2.post('/MOBILE/TOTAL_STORE_SALES.asmx/getMobileSalesByStore', {
+      GROUP_CD   : groupcd,
+      STORE_CD : storecd ,
+      START_DATE : startdate ,
+      END_DATE :  enddate
+
+  });
+};
+export const getMobileSalesByRealTime = (groupcd , storecd,  startdate, enddate) => {
+  return api2.post('/MOBILE/REAL_TIME_SALES.asmx/getMobileSalesByRealTime', {
+      GROUP_CD   : groupcd,
+      STORE_CD : storecd ,
+      START_DATE : startdate ,
+      END_DATE :  enddate
+
+  });
+};
+export const getMobileSalesbyDays = (groupcd , storecd,  startdate, enddate) => {
+  return api2.post('/MOBILE/TOTAL_DAILY_SALES.asmx/getMobileSalesbyDays', {
+      GROUP_CD   : groupcd,
+      STORE_CD : storecd ,
+      START_DATE : startdate ,
+      END_DATE :  enddate
+
+  });
+};
+export const getMobileVoidReport = (groupcd , storecd,  startdate, enddate) => {
+  return api2.post('/MOBILE/TOTAL_VOID_REPORT.asmx/getMobileVoidReport', {
+      GROUP_CD   : groupcd,
+      STORE_CD : storecd ,
+      START_DATE : startdate ,
+      END_DATE :  enddate
+
+  });
+};
+export const getMobileOpenCloseReport = (groupcd , storecd,  startdate, enddate) => {
+  return api2.post('/MOBILE/CLOSE_OPEN_REPORT.asmx/getMobileOpenCloseReport', {
+      GROUP_CD   : groupcd,
+      STORE_CD : storecd ,
+      START_DATE : startdate ,
+      END_DATE :  enddate
+
+  });
+};
+export const getMobileTaxReport = (groupcd , storecd,  startdate, enddate) => {
+  return api2.post('/MOBILE/TAX_REPORT.asmx/getMobileTaxReport', {
+      GROUP_CD   : groupcd,
+      STORE_CD : storecd ,
+      START_DATE : startdate ,
+      END_DATE :  enddate
+
+  });
+};
+export const getMobileSeatInfo = (groupcd , storecd,  userno , seat) => {
+  return api2.post('/MOBILE/TABLE_USE_INFO.asmx/getMobileSeatInfo', {
+      GROUP_CD   : groupcd,
+      STORE_CD : storecd ,
+      USER_NO : userno ,
+      SEAT_SET :  seat
+
+  });
+};

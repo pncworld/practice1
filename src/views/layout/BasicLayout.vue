@@ -114,7 +114,9 @@
           :key="tab.lngProgramID"
           @click="setActiveTab(tab)"
           class="flex items-center space-x-2 px-4 py-2 border bg-white text-xs rounded-md cursor-pointer font-bold hover:bg-blue-50 transition whitespace-nowrap"
-          :class="{ 'text-blue-400': isActive(tab) }">
+          :class="{
+            'text-blue-400': currentActiveTab.lngProgramID == tab.lngProgramID,
+          }">
           <span>{{ tab.strTitle }}</span>
           <button @click.stop="removeTab(tab)">
             <img
@@ -133,6 +135,10 @@
         class="bg-white text-gray-600 p-0 m-0 border-gray-200 border justify-center items-center hidden md:flex w-full md:w-[14%]">
         <BasicMenu
           v-if="showMenu"
+          @emittab="emittab"
+          @activeTab="activeTab"
+          :selectCategoryId="selectCategoryId"
+          :tabs="tabs"
           class="w-full h-full border hidden md:block" />
       </aside>
 
@@ -154,10 +160,13 @@ import BasicMenu from "@/components/BasicMenu.vue";
 import Loading from "@/components/loading.vue";
 import router from "@/router";
 import Swal from "sweetalert2";
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
+onMounted(() => {
+  // router.push("/homepage");
+});
 // 화면 크기 감지 및 업데이트
 
 const route = useRoute();
@@ -192,36 +201,27 @@ const deleteAllTabs = () => {
     }
   });
 };
-const navigateTo = (path) => {
-  router.push(path);
-};
+
 const showmenus = ref(false);
-const currentTabs = ref(store.state.currentTabs);
+
 const showMenus = () => {
   showmenus.value = !showmenus.value;
 };
+const selectCategoryId = ref(1);
 const selectCategory = (category) => {
-  store.dispatch("selectCategory", category);
+  //store.dispatch("selectCategory", category);\
+  selectCategoryId.value = category;
   isMenu.value = true;
   mobileShowMenu.value = true;
 };
 
 const logout = () => {
-  store.replaceState({
-    userData: [], // 사용자 데이터를 저장할 상태
-    selectedCategoryId: null,
-    currentTabs: [],
-    activeTab: "",
-    mainCategory: [],
-    subCategory: [],
-    minorCategory: [],
-    storeGroup: [],
-    storeType: [],
-    storeCd: [],
-  });
+  store.dispatch("logout");
   localStorage.clear();
   sessionStorage.clear();
   window.location.href = "/";
+
+  console.log(store.state);
 };
 
 const isMenu = ref(true);
@@ -241,31 +241,32 @@ watch(mainCategoryList, (newCategories) => {
 const hideMenu = () => {
   isMenu.value = !isMenu.value;
 };
-const moveToHome = () => {
-  router.push("/homePage");
+
+const tabs = ref([]);
+const emittab = (e) => {
+  tabs.value = e;
 };
-
-const excludedComponents = ref([]);
-
-const tabs = computed(() => store.state.currentTabs);
-const includedComponents = computed(() => {
-  const currentTabs = store.state.currentTabs; // Vuex 상태 참조
-  return currentTabs.map((tab) => tab.lngProgramID);
-});
+const activeTab = (e) => {
+  console.log(e);
+  currentActiveTab.value = e;
+};
 
 const removedtabId = ref();
 const removeTab = (tab) => {
-  store.dispatch("closeTab", tab.lngProgramID);
-  const currentTab = store.state.currentTabs;
+  console.log(tab);
+  console.log(tabs.value);
+  tabs.value = tabs.value.filter(
+    (item) => item.lngProgramID != tab.lngProgramID
+  );
+  const currentTab = tabs.value;
   if (currentTab.length > 0) {
     // @click.stop 안해서 상위 이벤트 전파때문에 안됬었음.
 
-    store.dispatch("changeActiveTab", currentTab[currentTab.length - 1]);
-    const insteadProgramID = currentTab[currentTab.length - 1].lngProgramID;
-    const insteadtab = currentTab[currentTab.length - 1];
-    const insteadstrUrl = currentTab[currentTab.length - 1].strUrl;
+    currentActiveTab.value = tabs.value[tabs.value.length - 1];
+    const insteadProgramID = tabs.value[tabs.value.length - 1].lngProgramID;
+    const insteadstrUrl = tabs.value[tabs.value.length - 1].strUrl;
     componentKey.value = insteadProgramID;
-    isActive(insteadtab);
+    // isActive(insteadtab);
     router.push({
       path:
         "/" + insteadstrUrl.split("::")[0] + "/" + insteadstrUrl.split("::")[1],
@@ -277,36 +278,19 @@ const removeTab = (tab) => {
   }
 };
 
-const isActive = (tab) => {
-  const activeTab = store.state.activeTab;
-  console.log(tab);
-  console.log(activeTab);
-  return activeTab && activeTab == tab.lngProgramID;
-};
-
 //ref 는 기존의 변수까지 전부 병렬적으로 바꾸는거 같고 computed는 직렬적으로 바꾸는 것 같음
-const lngProgramID = computed(() => {
-  return store.state.activeTab; // 기본값 설정
-});
 
 const reLoad = () => {
-  store.dispatch("convertLoading", true);
-  const activeTab = store.state.activeTab;
-  console.log(activeTab);
-  if (activeTab) {
-    store.dispatch("refreshTab", activeTab);
-    const activeTab2 = store.state.activeTab;
-    componentKey.value = activeTab2;
-  }
-  store.dispatch("convertLoading", false);
+  window.location.reload(); // 페이지 새로 고침
 };
 
+const currentActiveTab = ref({ lngProgramID: "", strTitle: "" });
 const setActiveTab = (tab) => {
   // showmenus.value = false ;
-  store.dispatch("changeActiveTab", tab);
-  const activeTab = store.state.activeTab;
-  componentKey.value = activeTab;
-  isActive(tab);
+  //store.dispatch("changeActiveTab", tab);
+  currentActiveTab.value = tab;
+  componentKey.value = tab.lngProgramID;
+  //isActive(tab);
   router.push({
     path: "/" + tab.strUrl.split("::")[0] + "/" + tab.strUrl.split("::")[1],
     query: { index: tab.lngProgramID },

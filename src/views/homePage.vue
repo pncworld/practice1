@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div class="h-[15vh] w-[95%] bg-white overflow-visible">
+    <div class="h-[12vh] w-[95%] bg-white overflow-visible">
       <div class="grid grid-rows-2 grid-cols-3 h-full gap-1">
         <div
           class="bg-black text-white flex justify-center items-center h-[50%]">
@@ -26,27 +26,25 @@
           class="bg-black text-white flex justify-center items-center h-[50%]">
           월매출
         </div>
-        <div class="text-gray-500 h-full -mt-[25%]">
+        <div class="text-gray-500 h-full -mt-[20%]">
           전일 / {{ lastDaySale }}원
           <div class="text-blue-400">{{ todaySale }}원</div>
         </div>
-        <div class="text-gray-500 h-full -mt-[25%]">
+        <div class="text-gray-500 h-full -mt-[20%]">
           전주 / {{ lastWeekSale }}원
           <div class="text-blue-400">{{ WeekSale }}원</div>
         </div>
-        <div class="text-gray-500 h-full -mt-[25%]">
+        <div class="text-gray-500 h-full -mt-[20%]">
           전월 / {{ lastMonthSale }}원
           <div class="text-blue-400">{{ MonthSale }}원</div>
         </div>
       </div>
     </div>
 
-    <div class="h-[10%] w-[95%] flex space-x-1">
+    <div class="h-[6%] w-[95%] flex space-x-1">
       <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white">
         <div class="flex flex-col h-[10vh]">
-          <div class="flex justify-end text-gray-500 mt-[2vh] mr-[2vw]">
-            전일대비
-          </div>
+          <div class="flex justify-end text-gray-500 mr-[2vw]">전일대비</div>
           <div>
             <font-awesome-icon
               :icon="['fas', 'circle-arrow-up']"
@@ -60,9 +58,7 @@
       </div>
       <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white">
         <div class="flex flex-col h-[10vh]">
-          <div class="flex justify-end text-gray-500 mt-[2vh] mr-[2vw]">
-            전주대비
-          </div>
+          <div class="flex justify-end text-gray-500 mr-[2vw]">전주대비</div>
           <div>
             <font-awesome-icon
               :icon="['fas', 'circle-arrow-up']"
@@ -77,9 +73,7 @@
 
       <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white relative">
         <div class="flex flex-col h-[10vh]">
-          <div class="flex justify-end text-gray-500 mt-[2vh] mr-[2vw]">
-            전월대비
-          </div>
+          <div class="flex justify-end text-gray-500 mr-[2vw]">전월대비</div>
           <div>
             <font-awesome-icon
               :icon="['fas', 'circle-arrow-up']"
@@ -190,10 +184,12 @@ const isMobile = store.state.isMobile;
 const StoreName = ref("");
 const today = ref(formatLocalDate2(new Date()));
 onMounted(async () => {
+  store.state.loading2 = false;
+
   StoreName.value = store.state.userData.STORE_NM;
+  store.state.mobileSelectProgName = "";
   let res;
   try {
-    store.state.loading2 = false;
     res = await getMobileDashBoard(
       store.state.userData.GROUP_CD,
       store.state.userData.STORE_CD,

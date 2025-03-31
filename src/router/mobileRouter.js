@@ -1,11 +1,17 @@
 import DetailGroupSales from "@/views/MOBILE/sales/detailGroupSales.vue";
 import DetailSales from "@/views/MOBILE/sales/detailSales.vue";
+import SalesByCreditCard from "@/views/MOBILE/sales/salesByCreditCard.vue";
 import SalesByMenu from "@/views/MOBILE/sales/SalesByMenu.vue";
+import SalesByRealTime from "@/views/MOBILE/sales/salesByRealTime.vue";
+import SalesByStore from "@/views/MOBILE/sales/salesByStore.vue";
+import SalesByTime from "@/views/MOBILE/sales/salesByTime.vue";
 import mobileMaster from "./mobileMaster";
 import mobileSales from "./mobileSales";
-import SalesByCreditCard from "@/views/MOBILE/sales/salesByCreditCard.vue";
-import SalesByTime from "@/views/MOBILE/sales/salesByTime.vue";
-import SalesByStore from "@/views/MOBILE/sales/salesByStore.vue";
+import SalesByDays from "@/views/MOBILE/sales/salesByDays.vue";
+import SalesVoidReport from "@/views/MOBILE/sales/salesVoidReport.vue";
+import OpenAndClose from "@/views/MOBILE/sales/openAndClose.vue";
+import TaxReport from "@/views/MOBILE/sales/taxReport.vue";
+import TableReport from "@/views/MOBILE/sales/tableReport.vue";
 
 
 export default function mobileRouter() {
@@ -59,6 +65,42 @@ export default function mobileRouter() {
             //component : BasicLayout ,
             component: SalesByStore
             
+        },
+        {
+            path: '20008',
+            //component : BasicLayout ,
+            component: SalesByRealTime
+
+        },
+        {
+            path: '20009',
+            //component : BasicLayout ,
+            component: SalesByDays
+
+        },
+        {
+            path: '20010',
+            //component : BasicLayout ,
+            component: SalesVoidReport
+
+        },
+        {
+            path: '20011',
+            //component : BasicLayout ,
+            component: OpenAndClose
+
+        },
+        {
+            path: '20012',
+            //component : BasicLayout ,
+            component: TaxReport
+
+        },
+        {
+            path: '20013',
+            //component : BasicLayout ,
+            component: TableReport
+
         },
      
     ];

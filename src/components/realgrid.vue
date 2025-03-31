@@ -5,7 +5,7 @@
 <script setup>
 import { getGridInfoList, getRenderingData } from "@/api/common";
 import { getDynamicGrid } from "@/api/misales";
-import { GridView, LocalDataProvider } from "realgrid";
+import RealGrid, { GridView, LocalDataProvider } from "realgrid";
 import { onMounted, ref, watch, nextTick } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -542,15 +542,18 @@ const emit = defineEmits([
   "getJsonData",
   "sendRowState",
   "deleteRows",
+  "realgridName",
 ]);
 const funcshowGrid = async () => {
   if (gridView !== undefined && gridView !== null) {
     dataProvider.clearRows();
+    dataProvider.destroy();
 
     gridView.destroy();
+    gridView = null;
+    dataProvider = null;
 
     // 기존 그리드 인스턴스 제거
-  } else {
   }
 
   dataProvider = new LocalDataProvider();
@@ -559,6 +562,8 @@ const funcshowGrid = async () => {
   await nextTick();
 
   const container = document.getElementById(realgridname.value);
+  console.log(realgridname.value);
+  console.log(container);
   if (!container) {
     console.error(`Invalid grid container element: ${realgridname.value}`);
     return;
@@ -1285,6 +1290,10 @@ const funcshowGrid = async () => {
     }
   }
   // 이벤트 설정
+  gridView.onDataLoadComplated = function (grid) {
+    grid.refresh(true);
+    grid.resetSize();
+  };
 
   gridView.onCellEdited = function (grid, itemIndex, row, field) {
     gridView.commit();
@@ -1376,8 +1385,10 @@ const funcshowGrid = async () => {
       return;
     }
     var current = gridView.getCurrent();
-
+    console.log(current);
     if (current.itemIndex != -1) {
+      emit("selectedIndex", current.dataRow);
+      emit("selectedIndex2", current.dataRow);
       selectedRowData.value = dataProvider.getRows()[current.dataRow];
       if (selectedRowData.value) {
         const rowState = dataProvider.getRowState(clickData.dataRow);
@@ -1391,9 +1402,6 @@ const funcshowGrid = async () => {
         emit("sendRowState", rowState);
 
         emit("clickedRowData", selectedRowData.value);
-
-        emit("selectedIndex", current.dataRow);
-        emit("selectedIndex2", current.dataRow);
       }
     }
   };
@@ -1472,7 +1480,7 @@ watch(
     console.log(props.changeColid);
     console.log(props.changeValue2);
 
-    if (props.changeRow != "" && props.changeRow != -1) {
+    if (props.changeRow !== "" && props.changeRow != -1) {
       dataProvider.setValue(
         props.changeRow,
         props.changeColid,
@@ -1952,6 +1960,7 @@ watch(
 //   }
 // })
 onMounted(async () => {
+  emit("realgridname", realgridname.value);
   try {
     if (props.renderProgname != "") {
       // result2.value = await getRenderingData(props.renderProgname)
@@ -2048,9 +2057,7 @@ watch(
           return;
         }
 
-        if (selectedindex.value != "" && selectedindex.value != undefined) {
-          gridView.setCurrent({ dataRow: selectedindex.value });
-        } else if (selectedindex.value == 0) {
+        if (selectedindex.value !== "" && selectedindex.value != undefined) {
           gridView.setCurrent({ dataRow: selectedindex.value });
         }
 
@@ -2064,13 +2071,15 @@ watch(
         addrow4activated.value = false;
 
         const current = gridView.getCurrent();
+        console.log(current);
+        console.log(selectedindex.value);
         if (deleted2activated.value == true) {
-          gridView.setCurrent({ dataRow: deletedIndex.value - 1 });
+          gridView.clearCurrent();
           deleted2activated.value = false;
         } else {
-          gridView.setCurrent({ dataRow: current.dataRow });
+          gridView.clearCurrent();
         }
-      }, 90); // 시간으로인한 미적용 이슈있음
+      }, 80); // 시간으로인한 미적용 이슈있음
     });
   }
 );

@@ -2,11 +2,11 @@
   <div
     class="w-[100vw] h-[9vh] absolute top-[6vh] bg-black grid grid-rows-1 grid-cols-[1fr,3fr,1fr]">
     <div class="flex flex-col items-center justify-center ml-2">
-      <div class="text-lg text-white text-nowrap">{{ startDate }}</div>
-      <div class="text-lg text-white text-nowrap">~{{ endDate }}</div>
+      <div class="text-sm text-white text-nowrap">{{ startDate }}</div>
+      <div class="text-sm text-white text-nowrap">~{{ endDate }}</div>
     </div>
     <div class="flex flex-col items-center justify-center">
-      <div class="text-lg text-white text-nowrap">{{ selectedStoreName }}</div>
+      <div class="text-sm text-white text-nowrap">{{ selectedStoreName }}</div>
     </div>
     <div class="flex flex-col items-center justify-center bg-blue-500">
       <button @click="showStoreAndDate">

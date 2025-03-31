@@ -23,7 +23,7 @@
       </div>
     </div>
     <div>
-      <button @click="reload" v-if="clickIcon == 1">
+      <button @click="reload" v-if="clickIcon == 1 || clickIcon == 0">
         <font-awesome-icon
           :icon="['fas', 'rotate-right']"
           class="size-8 mt-2 mr-5" />

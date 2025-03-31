@@ -12,36 +12,40 @@
         class="grid grid-rows-1 grid-cols-[1fr,1fr] h-[20vh] justify-center items-center font-medium">
         <div
           class="text-nowrap flex flex-col justify-center items-center ml-[5%]">
-          <div class="text-lg">{{ i.STORE_NM }}</div>
+          <div class="text-base font-semibold">{{ i.STORE_NM }}</div>
         </div>
 
         <div class="grid grid-rows-4 grid-cols-2 gap-2 p-1">
-          <div class="text-blue-500 flex justify-start">일순매출액</div>
+          <div class="text-blue-500 flex justify-start">예상실매출</div>
           <div class="text-nowrap flex justify-end">
-            {{ i.DAY_NET }}
+            {{ i.TOT_AMT }}
           </div>
-          <div class="text-blue-500 flex justify-start">일목표</div>
+          <div class="text-blue-500 flex justify-start">미결제</div>
           <div class="text-nowrap flex justify-end">
-            {{ i.DAY_PRJ }}
+            {{ i.ORDER_AMT }}
           </div>
-          <div class="text-blue-500 flex justify-start">월순매출</div>
+          <div class="text-blue-500 flex justify-start">총매출</div>
           <div class="text-nowrap flex justify-end">
-            {{ i.MONTH_NET }}
+            {{ i.SAL_AMT }}
           </div>
-          <div class="text-blue-500 flex justify-start">월목표</div>
+          <div class="text-blue-500 flex justify-start">할인</div>
           <div class="text-nowrap flex justify-end">
-            {{ i.MONTH_PRJ }}
+            {{ i.DC_AMT }}
+          </div>
+          <div class="text-blue-500 flex justify-start">실매출</div>
+          <div class="text-nowrap flex justify-end">
+            {{ i.ACT_AMT }}
           </div>
         </div>
       </div>
       <div class="grid grid-rows-1 grid-cols-2 bg-gray-300">
         <div class="flex justify-between items-center p-2">
-          일달성율
-          <div class="text-red-500">{{ i.DAY_RAT }}%</div>
+          조수
+          <div class="text-red-500">{{ i.REC_CNT }}</div>
         </div>
         <div class="flex justify-between items-center p-2">
-          월달성율
-          <div class="text-red-500">{{ i.MONTH_RAT }}%</div>
+          객수
+          <div class="text-red-500">{{ i.CUST_CNT }}</div>
         </div>
       </div>
     </div>
@@ -59,7 +63,7 @@
 </template>
 
 <script setup>
-import { getMobileSalesByStore } from "@/api/mobile";
+import { getMobileSalesByRealTime, getMobileSalesByStore } from "@/api/mobile";
 import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 import MobileDateStore from "../component/mobileDateStore.vue";
@@ -97,7 +101,7 @@ const rowData = ref([]);
 const SEARCHNOW = async (e) => {
   try {
     store.state.loading2 = true;
-    const res = await getMobileSalesByStore(
+    const res = await getMobileSalesByRealTime(
       selectGroupCd.value,
       selectStoreCd.value,
       selectStartDate.value,
@@ -106,12 +110,12 @@ const SEARCHNOW = async (e) => {
 
     rowData.value = res.data.List.map((item) => ({
       ...item,
-      DAY_NET: item.DAY_NET.toLocaleString(),
-      MONTH_NET: item.MONTH_NET.toLocaleString(),
-      DAY_PRJ: item.DAY_PRJ.toLocaleString(),
-      MONTH_PRJ: item.MONTH_PRJ.toLocaleString(),
-      DAY_RAT: (Number(item.DAY_RAT) * 100).toFixed(0),
-      MONTH_RAT: (Number(item.MONTH_RAT) * 100).toFixed(0),
+      TOT_AMT: item.TOT_AMT.toLocaleString(),
+      ORDER_AMT: item.ORDER_AMT.toLocaleString(),
+      SAL_AMT: item.SAL_AMT.toLocaleString(),
+      ACT_AMT: item.ACT_AMT.toLocaleString(),
+      REC_CNT: item.REC_CNT.toLocaleString(),
+      CUST_CNT: item.CUST_CNT.toLocaleString(),
     }));
   } catch (error) {
   } finally {
