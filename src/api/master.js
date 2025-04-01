@@ -723,6 +723,12 @@ export const getAmountList2 = (groupCd, storeCd, areaCd, posNo, screenType) => {
     SCREEN_TYPE: screenType,
   });
 };
+export const getDynamicGrid2 = (groupCd, count) => {
+  return api2.post("/MIMASTER/MST44_061INS.asmx/getDynamicGrid2", {
+    GROUP_CD: groupCd,
+    COUNT: count,
+  });
+};
 export const getAmountList3 = (groupCd, storeCd, areaCd, posNo) => {
   return api2.post("/MIMASTER/MST44_055INS.asmx/getAmountList", {
     GROUP_CD: groupCd,
@@ -1756,12 +1762,12 @@ export const getMenuCodeEnroll = (groupCd, storeCd) => {
 };
 export const uploadFile = (formData) => {
   return api2.post("/MIMASTER/FileUpload.ashx", formData, {
-    withCredentials: true,
     headers: {
-      "Content-Type": "multipart/form-data",
+      "Content-Type": "multipart/form-data", // 일부 서버에서 필요할 수 있음
     },
   });
 };
+
 export const getPosList = (groupCd, storeCd) => {
   return api2.post("/MIMASTER/MST01_032INS.asmx/getPosList", {
     GROUP_CD: groupCd,

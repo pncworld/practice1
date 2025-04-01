@@ -502,6 +502,7 @@ const searchButton = async () => {
       rowData2.value = res.data.Print2
 
       console.log(rowData2.value)
+      afterSearch.value = true
     } else if (currentMenu.value == 2) {
       res = await getKitchenSettingList(groupCd.value, nowStoreCd.value)
       console.log(res)

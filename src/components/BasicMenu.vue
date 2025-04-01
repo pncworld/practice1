@@ -160,6 +160,19 @@ onMounted(() => {
   router.push("/homepage");
 });
 
+watch(
+  () => store.state.moveOtherTab,
+  () => {
+    if (store.state.moveOtherTab != "") {
+      selectCategory(
+        store.state.moveOtherTab.strUrl,
+        store.state.moveOtherTab.lngProgramID,
+        store.state.moveOtherTab.strTitle
+      );
+    }
+    store.state.moveOtherTab = "";
+  }
+);
 const tabs = ref([]);
 
 watch(
@@ -181,9 +194,7 @@ const selectCategory = (strUrl, lngProgramID2, strTitle) => {
     return;
   }
   currentTab.value = strTitle;
-  console.log(tabs.value);
-  console.log(lngProgramID2);
-  console.log(categories.value);
+
   const existingTab = tabs.value.find((tab) =>
     tab.lngProgramID.startsWith(lngProgramID2)
   );
@@ -198,13 +209,16 @@ const selectCategory = (strUrl, lngProgramID2, strTitle) => {
       cancelButtonText: "새 화면 열기",
     }).then((result) => {
       if (result.isConfirmed) {
+        console.log(lngProgramID2);
+        console.log(tabs.value);
         const matchingTabs = tabs.value.filter((tab) =>
           tab.lngProgramID.startsWith(lngProgramID2)
         );
         const tab = { lngProgramID: matchingTabs[0].lngProgramID };
+        emit("emittab", tabs.value);
         emit("activeTab", {
           strUrl: strUrl,
-          lngProgramID: lngProgramID2,
+          lngProgramID: matchingTabs[0].lngProgramID,
           strTitle: strTitle,
         });
         router.push({
@@ -220,7 +234,7 @@ const selectCategory = (strUrl, lngProgramID2, strTitle) => {
         const lngProgramIdv4 = lngProgramID2 + uuid;
         const newTab = { strUrl, lngProgramID: lngProgramIdv4, strTitle };
         emit("activeTab", newTab);
-
+        tabs.value.push(newTab);
         router.push({
           path: "/" + strUrl.split("::")[0] + "/" + strUrl.split("::")[1],
           query: { index: lngProgramIdv4 },

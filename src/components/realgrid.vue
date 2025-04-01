@@ -3,17 +3,18 @@
 </template>
 
 <script setup>
-import { getGridInfoList, getRenderingData } from "@/api/common";
+import { getGridInfoList } from "@/api/common";
+import { getDynamicGrid2 } from "@/api/master";
 import { getDynamicGrid } from "@/api/misales";
-import RealGrid, { GridView, LocalDataProvider } from "realgrid";
-import { onMounted, ref, watch, nextTick } from "vue";
-import { v4 as uuidv4 } from "uuid";
 import {
   excelTitle,
   formatDateTime,
   formatLocalDate,
 } from "@/customFunc/customFunc";
 import store from "@/store";
+import { GridView, LocalDataProvider } from "realgrid";
+import { v4 as uuidv4 } from "uuid";
+import { nextTick, onMounted, ref, watch } from "vue";
 let gridView;
 let dataProvider;
 /*
@@ -516,6 +517,14 @@ const props = defineProps({
   setDynamicGrid: {
     type: Boolean,
     default: false,
+  },
+  setDynamicGrid2: {
+    type: Boolean,
+    default: false,
+  },
+  dynamicStoreCd: {
+    type: String,
+    default: "",
   },
 });
 
@@ -1633,13 +1642,14 @@ watch(
   (newVal) => {
     gridView.commit();
     const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
-    if (curr && curr.dataRow >= 0) {
+    if (curr && curr.dataRow >= 0 && props.rowData[curr.dataRow]) {
       // 현재 데이터 행이 유효한 경우
       props.rowData[curr.dataRow].deleted = true;
       dataProvider.setValue(curr.dataRow, "deleted", true); // "deleted" 속성을 true로 설정
       dataProvider.removeRow(curr.dataRow);
       gridView.commit();
     } else {
+      dataProvider.removeRow(curr.dataRow);
       console.warn("선택된 행이 없습니다.");
     }
     updatedrowData.value = [...dataProvider.getJsonRows()];
@@ -1976,6 +1986,15 @@ onMounted(async () => {
       tabInitSetArray.value.push(...res.data.List);
     }
 
+    if (props.setDynamicGrid2 == true) {
+      const res = await getDynamicGrid2(
+        store.state.userData.lngStoreGroup,
+        result.length
+      );
+      console.log(res);
+      tabInitSetArray.value.push(...res.data.List);
+    }
+    console.log(tabInitSetArray.value);
     // 동적 스타일 생성
     let styleContent = "";
     tabInitSetArray.value.forEach((item, index) => {
@@ -2013,12 +2032,20 @@ const setupGrid = async () => {
     const result = await getGridInfoList(props.progname, props.progid);
     tabInitSetArray.value = result;
 
-    console.log(props.setDynamicGrid);
     if (props.setDynamicGrid == true) {
       const res = await getDynamicGrid(
         store.state.userData.lngStoreGroup,
         result.length
       );
+      tabInitSetArray.value.push(...res.data.List);
+    }
+
+    if (props.setDynamicGrid2 == true) {
+      const res = await getDynamicGrid2(
+        store.state.userData.lngStoreGroup,
+        result.length
+      );
+      console.log(res);
       tabInitSetArray.value.push(...res.data.List);
     }
     // Dynamic style generation

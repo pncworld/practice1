@@ -828,7 +828,7 @@
             </div>
             <div class="grid grid-rows-[1fr,5fr] grid-cols-[1fr,5fr] border">
               <div
-                class="customtableIndex border border-gray-400 rounded-l-lg h-full w-full">
+                class="customtableIndex border border-gray-400 rounded-l-lg h-full">
                 파일명
               </div>
               <div class="flex h-full w-full items-center">
@@ -894,7 +894,7 @@ import axios from "axios";
 import RealGrid from "realgrid";
 import Swal from "sweetalert2";
 import { v4 as uuidv4 } from "uuid";
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 const searchWord2 = ref("");
@@ -1088,69 +1088,68 @@ const clickedRowData = async (newvalue) => {
     newvalue[31] != undefined ? newvalue[31].split("_").slice(1).join("_") : "";
   try {
     const response = await axios.get(
-      `http://211.238.145.30:8085/Uploads/${fileName.value}`,
-      {
-        responseType: "blob", // 응답을 Blob 형태로 받음
-      }
+      `http://211.238.145.30:8085/Uploads/${fileName.value}`
     );
+
+    console.log(response);
     uploadImage.value.name = newvalue[31];
     fileSize.value = response.headers["content-length"];
+
+    await nextTick();
+    if (newvalue[34] == true) {
+      isNew.value = true;
+      clickaddrowSeq.value = rowData.value[newvalue.index].sequence;
+      console.log(clickaddrowSeq.value);
+    } else {
+      isNew.value = false;
+    }
+    const firstarr = newvalue[32] != undefined ? newvalue[32].split(";") : [];
+    duplilfirstarr.value = firstarr;
+    if (rowData2.value.length > 0) {
+      let dupliarr = JSON.parse(JSON.stringify(rowData2.value));
+      dupliarr.sort((a, b) => {
+        const aIndex = firstarr.indexOf(a.lngCode.toString());
+        const bIndex = firstarr.indexOf(b.lngCode.toString());
+
+        const rankA = aIndex !== -1 ? 0 : a.lngMenu === 0 ? 0 : 1;
+        const rankB = bIndex !== -1 ? 0 : b.lngMenu === 0 ? 0 : 1;
+
+        // 우선순위(rank)가 다르면 rank에 따라 정렬합니다.
+        if (rankA !== rankB) {
+          return rankA - rankB;
+        }
+
+        // 둘 다 rank 0인 경우 : firstarr에 있으므로 인덱스 순서대로 정렬
+        if (rankA === 0) {
+          return Number(a.lngCode) - Number(b.lngCode);
+        }
+
+        // rank가 1 혹은 2인 경우, 추가 정렬 기준이 필요하면 여기에 추가합니다.
+        // 예를 들어, lngCode 오름차순으로 정렬하는 식으로 할 수도 있습니다.
+        // (여기서는 별도의 추가 기준이 없으므로 0을 반환하여 순서를 그대로 유지)
+        return 0;
+      });
+
+      if (firstarr.length > 0 && firstarr[0] !== "") {
+        for (var i = 0; i < firstarr.length; i++) {
+          const change = dupliarr.find((item) => item.lngCode == firstarr[i]);
+
+          if (change) {
+            change.checkbox = true;
+          }
+        }
+      }
+
+      clickrowData2.value = JSON.parse(JSON.stringify(dupliarr));
+    }
+
+    afterClick.value = false;
+    setSubCd3();
   } catch (error) {
     console.log("사진없음");
     uploadImage.value = { name: "" };
     fileSize.value = "";
   }
-
-  console.log(newvalue);
-  if (newvalue[34] == true) {
-    isNew.value = true;
-    clickaddrowSeq.value = rowData.value[newvalue.index].sequence;
-    console.log(clickaddrowSeq.value);
-  } else {
-    isNew.value = false;
-  }
-  const firstarr = newvalue[32] != undefined ? newvalue[32].split(";") : [];
-  duplilfirstarr.value = firstarr;
-  if (rowData2.value.length > 0) {
-    let dupliarr = JSON.parse(JSON.stringify(rowData2.value));
-    dupliarr.sort((a, b) => {
-      const aIndex = firstarr.indexOf(a.lngCode.toString());
-      const bIndex = firstarr.indexOf(b.lngCode.toString());
-
-      const rankA = aIndex !== -1 ? 0 : a.lngMenu === 0 ? 0 : 1;
-      const rankB = bIndex !== -1 ? 0 : b.lngMenu === 0 ? 0 : 1;
-
-      // 우선순위(rank)가 다르면 rank에 따라 정렬합니다.
-      if (rankA !== rankB) {
-        return rankA - rankB;
-      }
-
-      // 둘 다 rank 0인 경우 : firstarr에 있으므로 인덱스 순서대로 정렬
-      if (rankA === 0) {
-        return Number(a.lngCode) - Number(b.lngCode);
-      }
-
-      // rank가 1 혹은 2인 경우, 추가 정렬 기준이 필요하면 여기에 추가합니다.
-      // 예를 들어, lngCode 오름차순으로 정렬하는 식으로 할 수도 있습니다.
-      // (여기서는 별도의 추가 기준이 없으므로 0을 반환하여 순서를 그대로 유지)
-      return 0;
-    });
-
-    if (firstarr.length > 0 && firstarr[0] !== "") {
-      for (var i = 0; i < firstarr.length; i++) {
-        const change = dupliarr.find((item) => item.lngCode == firstarr[i]);
-
-        if (change) {
-          change.checkbox = true;
-        }
-      }
-    }
-
-    clickrowData2.value = JSON.parse(JSON.stringify(dupliarr));
-  }
-
-  afterClick.value = false;
-  setSubCd3();
 };
 
 const selectedIndex = (e) => {
@@ -1263,6 +1262,7 @@ const searchButton = async () => {
     afterSearch.value = true;
     initFocus.value = !initFocus.value;
     initSelect.value = !initSelect.value;
+    afterClick.value = true;
   }
 };
 
@@ -1429,20 +1429,20 @@ const saveButton = () => {
 
   const validateRow = rowData.value.filter(
     (item) =>
-      item.lngCode == "" ||
-      item.lngCode == undefined ||
-      item.strName == "" ||
-      item.strName == undefined ||
-      item.lngMainGroup == undefined ||
-      item.lngMainGroup == 0 ||
-      item.lngSubGroup == undefined ||
-      item.lngSubGroup == 0 ||
-      item.dtmToDate == undefined ||
-      item.dtmFromDate == undefined ||
-      item.lngPrice == undefined ||
-      item.blnInactive == undefined ||
-      item.lngTax == undefined ||
-      item.lngKPG == ""
+      item.lngCode === "" ||
+      item.lngCode === undefined ||
+      item.strName === "" ||
+      item.strName === undefined ||
+      item.lngMainGroup === undefined ||
+      item.lngMainGroup === 0 ||
+      item.lngSubGroup === undefined ||
+      item.lngSubGroup === 0 ||
+      item.dtmToDate === undefined ||
+      item.dtmFromDate === undefined ||
+      item.lngPrice === undefined ||
+      item.blnInactive === undefined ||
+      item.lngTax === undefined ||
+      item.lngKPG === ""
   ).length;
 
   if (validateRow > 0) {
@@ -1599,37 +1599,7 @@ const saveButton = () => {
         });
       } finally {
         store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
-        store.state.loading = false;
+
         searchButton();
       }
     }
@@ -2009,6 +1979,9 @@ const fileDownloadUrl = ref();
 const randomuuid = ref();
 const maxSize = 2 * 1024 * 1024;
 const handleFileUpload = async (e) => {
+  if (e.target.files.length == 0) {
+    return;
+  }
   fileSize.value = e.target.files[0].size;
   if (fileSize.value > maxSize) {
     Swal.fire({
