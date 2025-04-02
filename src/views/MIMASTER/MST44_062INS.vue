@@ -45,9 +45,9 @@
       <div class="h-full" v-show="currentMenu == 1">
         <div class="ml-10 mt-5 w-full h-full">
           <Realgrid class="w-full h-[400%]" :progname="'MST44_062INS_VUE'" :progid="1" :rowData="rowData"
-            :showGrid="showGrid" :showCheckBar="false" @selcetedrowData="selcetedrowData" :changeRow="changeRow"
-            :changeColid="'cornerNm'" :changeValue="changeValue2" @updatedRowData="updatedRowData"
-            @clickedRowData="clickedRowData"></Realgrid>
+            :showCheckBar="false" @selcetedrowData="selcetedrowData" :changeRow="changeRow" :changeNow="changeNow"
+            :changeColid="changeColid" :changeValue2="changeValue" @updatedRowData="updatedRowData" @selectedIndex="selectedIndex"
+            @clickedRowData="clickedRowData" @realgridname="realgridname"></Realgrid>
 
         </div>
       </div>
@@ -56,7 +56,7 @@
           출력코너명 목록</div>
         <div class="ml-10 mt-5 w-full h-full">
           <Realgrid class="w-full h-[400%]" :progname="'MST44_062INS_VUE'" :progid="2" :rowData="rowData2"
-            :showGrid="showGrid" :showCheckBar="false"></Realgrid>
+            :showGrid="showGrid" :showCheckBar="false" @realgridname="realgridname2"></Realgrid>
         </div>
       </div>
 
@@ -81,22 +81,21 @@
               v-model="searchword1"></div>
         </div>
         <div class="ml-10 mt-5 w-full h-full">
-          <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="nowStoreCd" :reload="reload"
+          <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="4" :reload="reload"
             :rowData="rowData3" :showGrid="showGrid" :showCheckBar="false" @selcetedrowData="selcetedrowData"
-            :searchWord="searchword1" :searchColId="'lngCode,strName'" :addRow="addRows"
-            @updatedRowData="updatedRowData2" :deleteRow="deleteRows" @clickedRowData="clickedRowData"
-            :editableColId="'strName'" :fixedColumn="fixedColumn" :mergeColumns="true" :mergeColumnGroupName="'메뉴정보'"
-            :mergeColumnGroupSubList="'mainName,subName,lngCode,strName,lngPrice'"></Realgrid>
+            @updatedRowData="updatedRowData2" :mergeColumns2="true" :mergeColumnGroupName2="['메뉴정보']" :mergeColumnGroupSubList2="[['mainName','subName','lngCode','strName','lngPrice']]"
+            :setDynamicGrid3="true" :dynamicStoreCd="nowStoreCd" @realgridname="realgridname3"
+          ></Realgrid>
         </div>
       </div>
 
-      <div class="h-[100vh]" v-if="currentMenu == 3">
+      <div class="h-[100vh]" v-show="currentMenu == 3">
         <div class="h-[15vh] w-[45vw] ml-10 mt-5" v-show="currentMenu == 3">
           <div class="w-full h-full ">
             <Realgrid class="w-[100%] h-[150%] " :progname="'MST44_062INS_VUE'" :progid="3" :reload="reload"
-              :rowData="rowData4" :showGrid="showGrid" @clickedRowData="clickedRowData2"
-              @updatedRowData="updatedRowData3" :changeColid="changeColid" :changeRow="changeRow"
-              :changeValue="changeValue"></Realgrid>
+              :rowData="rowData4" @clickedRowData="clickedRowData2" @realgridname="realgridname4"
+              @updatedRowData="updatedRowData3" :changeColid="changeColid" :changeRow="changeRow" :changeNow="changeNow2"
+              :changeValue2="changeValue" :initSelect="initSelect" ></Realgrid>
           </div>
         </div>
 
@@ -124,19 +123,19 @@
               <div class=" w-full h-full px-2 py-2 rounded-lg  flex justify-center text-red-500">({{ receiptDByte }}byte)
               </div>
               <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                v-model="receiptD1" @input="handleInput2" @click="selecedReceiptSection(1)"
+                v-model="receiptD1" name="receiptD1"  @input="handleInput2" @click="selecedReceiptSection(1)"
                 :disabled="!afterSearch3"></input>
               <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                v-model="receiptD2" @input="handleInput2" @click="selecedReceiptSection(2)"
+                v-model="receiptD2"  name="receiptD2" @input="handleInput2" @click="selecedReceiptSection(2)"
                 :disabled="!afterSearch3"></input>
               <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                v-model="receiptD3" @input="handleInput2" @click="selecedReceiptSection(3)"
+                v-model="receiptD3"  name="receiptD3" @input="handleInput2" @click="selecedReceiptSection(3)"
                 :disabled="!afterSearch3"></input>
               <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                v-model="receiptD4" @input="handleInput2" @click="selecedReceiptSection(4)"
+                v-model="receiptD4"  name="receiptD4" @input="handleInput2" @click="selecedReceiptSection(4)"
                 :disabled="!afterSearch3"></input>
               <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                v-model="receiptD5" @input="handleInput2" @click="selecedReceiptSection(5)"
+                v-model="receiptD5" name="receiptD5"  @input="handleInput2" @click="selecedReceiptSection(5)"
                 :disabled="!afterSearch3"></input>
             </div>
           </div>
@@ -154,7 +153,7 @@
               class="w-full border border-gray-600 rounded-lg disabled:bg-gray-300" v-model="clickedNo" disabled></div>
           <div class="rounded-bl-lg border border-gray-600 flex justify-center items-center">출력코너명</div>
           <div class="rounded-br-lg border border-gray-600 h-full py-1 px-1 flex items-center"><input type="text"
-              class="w-full border border-gray-600 rounded-lg" v-model="clickedNm" @input="changeValues"></div>
+              class="w-full border border-gray-600 rounded-lg pl-1" :disabled="disabled" v-model="clickedNm" @input="changeValues"></div>
         </div>
       </div>
     </div>
@@ -249,19 +248,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { getKitchenSettingList, getPrintList, getStorePosList, saveKitchenSettingAll, savePrintNm, saveReceiptData } from '@/api/master';
+import { ref, watch } from 'vue';
 import { useStore } from 'vuex';
-import { getKitchenSettingList, getPrintList, getStorePosList, saveKDSSettingAll, saveKitchenSettingAll, savePrintNm, saveReceiptData, saveScreenKeys } from '@/api/master';
 
-import Swal from 'sweetalert2';
+import DupliPopUp5 from '@/components/dupliPopUp5.vue';
 import PickStore from '@/components/pickStore.vue';
 import Realgrid from '@/components/realgrid.vue';
-import DupliPopUp5 from '@/components/dupliPopUp5.vue';
-import { nextTick } from 'vue';
+import RealGrid from 'realgrid';
+import Swal from 'sweetalert2';
 
 
 
 // 더미 데이터
+const disabled = ref(true)
 const items = ref([]);
 const ScreenKeyOrigin = ref([]);
 const ScreenKeys = ref();
@@ -315,7 +315,53 @@ const currentMenu = ref('1')
 
 
 
+const realgrid2Name = ref("");
+const realgrid3Name = ref("");
+const realgrid4Name = ref("");
+const realgrid5Name = ref("");
+const realgridname = (e) => {
+  realgrid2Name.value = e;
+};
+const realgridname2 = (e) => {
+  realgrid3Name.value = e;
+};
+const realgridname3 = (e) => {
+  realgrid4Name.value = e;
+};
+const realgridname4 = (e) => {
+  console.log(e)
+  realgrid5Name.value = e;
+};
 
+watch(currentMenu, () => {
+  if(currentMenu.value == 1){
+    const reagrid2 = document.getElementById(realgrid2Name.value);
+  setTimeout(() => {
+    RealGrid.getGridInstance(reagrid2).resetSize();
+    RealGrid.getGridInstance(reagrid2).refresh(true);
+  }, 100);
+  const reagrid3 = document.getElementById(realgrid3Name.value);
+  setTimeout(() => {
+    RealGrid.getGridInstance(reagrid3).resetSize();
+    RealGrid.getGridInstance(reagrid3).refresh(true);
+  }, 100);
+  } else if(currentMenu.value == 2 ){
+    const reagrid4 = document.getElementById(realgrid4Name.value);
+  setTimeout(() => {
+    RealGrid.getGridInstance(reagrid4).resetSize();
+    RealGrid.getGridInstance(reagrid4).refresh(true);
+  }, 100);
+  } else if(currentMenu.value == 3){
+    const reagrid5 = document.getElementById(realgrid5Name.value);
+    setTimeout(() => {
+      RealGrid.getGridInstance(reagrid5).resetSize();
+      RealGrid.getGridInstance(reagrid5).refresh(true);
+    }, 100);
+  }
+
+ 
+ 
+});
 
 const hidesub = ref(false)
 
@@ -377,9 +423,30 @@ const handleStoreCd = async (newValue) => {
 }
 const handleInput = (e) => {
   changeColid.value = 'strReceiptU'
-  calculateByte(e);
-  changeValues(e)
+  changeValue.value = e.target.value
 
+  changeNow2.value = !changeNow2.value
+
+}
+
+const handleInput2 = (e) => {
+  calculateByte2(e)
+  changeColid.value = 'strReceiptD'
+  
+  if(e.target.name == 'receiptD1'){
+    changeValue.value = addSpace42Text(e.target.value) + addSpace42Text(receiptD2.value) + addSpace42Text(receiptD3.value) + addSpace42Text(receiptD4.value) + addSpace42Text(receiptD5.value) 
+  } else if(e.target.name == 'receiptD2'){
+    changeValue.value = addSpace42Text(receiptD1.value)+ addSpace42Text(e.target.value) + addSpace42Text(receiptD3.value) + addSpace42Text(receiptD4.value) + addSpace42Text(receiptD5.value) 
+  } else if(e.target.name == 'receiptD3'){
+    changeValue.value =addSpace42Text(receiptD1.value)+ addSpace42Text(receiptD2.value) + addSpace42Text(e.target.value)  + addSpace42Text(receiptD4.value) + addSpace42Text(receiptD5.value) 
+  } else if(e.target.name == 'receiptD4'){
+    changeValue.value = addSpace42Text(receiptD1.value) + addSpace42Text(receiptD2.value) +addSpace42Text(receiptD3.value)+ addSpace42Text(e.target.value) + addSpace42Text(receiptD5.value)
+  } else if(e.target.name == 'receiptD5'){
+    changeValue.value = addSpace42Text(receiptD1.value) + addSpace42Text(receiptD2.value) + addSpace42Text(receiptD3.value)+ addSpace42Text(receiptD4.value) + addSpace42Text(e.target.value)
+  }
+  
+
+  changeNow2.value = !changeNow2.value
 }
 
 const reload = ref(false)
@@ -388,9 +455,12 @@ const Category = ref([]);
 const changeValue = ref('')
 const MenuGroup = ref([])
 const SubMenuGroup = ref([])
-
+const changeNow = ref(false)
+const changeNow2= ref(false)
 const changeValues = (e) => {
+  
   changeValue.value = e.target.value
+  changeNow.value = !changeNow.value
 }
 
 const store = useStore();
@@ -468,6 +538,8 @@ const selcetedrowData = (newValue) => {
 
   }
 }
+
+const initSelect = ref(false)
 const searchButton = async () => {
   changeMode.value = false
   Category.value = [];
@@ -576,7 +648,7 @@ const searchButton = async () => {
     afterCategory.value = false;
     clickedNo.value = ''
     clickedNm.value = ''
-
+    initSelect.value = !initSelect.value
   }
 
 
@@ -829,7 +901,7 @@ const saveButton = async () => {
         } else if (currentMenu.value == 2) {
           let totalSum = [];
           const calculateArr = ref([])
-
+          console.log(SettingList.value)
           SettingList.value.forEach((obj) => {
             let sum = 0;
             Object.keys(obj).filter(key => key.startsWith('checkbox') && obj[key] == true)
@@ -927,13 +999,17 @@ const saveButton = async () => {
 
 }
 
+const selectedIndex =(e) => {
+  changeRow.value = e
+}
 const changeRow = ref()
 const clickedRowData = (newValue) => {
-  console.log(newValue)
+  disabled.value = false
   clickedNo.value = newValue[2]
   clickedNm.value = newValue[3]
-  changeRow.value = newValue.index
-
+  
+  //changeRow.value = newValue.index
+  changeColid.value = 'cornerNm'
 }
 const receiptUByte = ref('0')
 const receiptDByte = ref('0')
@@ -945,6 +1021,8 @@ const caculateByte3 = (e) => {
   let inputValue = e.target.value
   receiptUByte.value = encoder.encode(inputValue).length
   changeValue.value = e.target.value
+
+  changeNow2.value = !changeNow2.value
 }
 
 
@@ -973,6 +1051,14 @@ const dupliData = () => {
   savedreceiptD3 = receiptD3.value
   savedreceiptD4 = receiptD4.value
   savedreceiptD5 = receiptD5.value
+
+  Swal.fire({
+      title: '완료',
+      text: '복사 완료',
+      icon: 'success',
+      confirmButtonText: '확인'
+    })
+    return ;
 }
 
 
@@ -1083,11 +1169,7 @@ const calculateByte2 = (e) => {
 
 
 }
-const handleInput2 = (e) => {
-  calculateByte2(e);
-  changeValues2(e);
 
-}
 const addSpace42Text = (value) => {
   let prechangeValue = value
   const encoder = new TextEncoder();

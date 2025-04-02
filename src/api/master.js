@@ -729,6 +729,13 @@ export const getDynamicGrid2 = (groupCd, count) => {
     COUNT: count,
   });
 };
+export const getDynamicGrid3 = (groupCd, storeCd, count) => {
+  return api2.post("/MIMASTER/MST44_062INS.asmx/getDynamicGrid3", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    COUNT: count,
+  });
+};
 export const getAmountList3 = (groupCd, storeCd, areaCd, posNo) => {
   return api2.post("/MIMASTER/MST44_055INS.asmx/getAmountList", {
     GROUP_CD: groupCd,
@@ -1517,29 +1524,7 @@ export const saveOptions = (
   lngChainMenu18,
   lngChainMenu19,
   lngChainMenu20,
-  lngChainMenu21,
-  lngCodes2,
-  strNames2,
-  lngChainGroup1,
-  lngChainGroup2,
-  lngChainGroup3,
-  lngChainGroup4,
-  lngChainGroup5,
-  lngChainGroup6,
-  lngChainGroup7,
-  lngChainGroup8,
-  lngChainGroup9,
-  lngChainGroup10,
-  lngChainGroup11,
-  lngChainGroup12,
-  lngChainGroup13,
-  lngChainGroup14,
-  lngChainGroup15,
-  lngChainGroup16,
-  lngChainGroup17,
-  lngChainGroup18,
-  lngChainGroup19,
-  lngChainGroup20
+  lngChainMenu21
 ) => {
   return api2.post("/MIMASTER/MST01_011INS_01.asmx/saveOptions", {
     GROUP_CD: groupCd,
@@ -1569,6 +1554,37 @@ export const saveOptions = (
     LNG_CHAIN_MENU19: lngChainMenu19,
     LNG_CHAIN_MENU20: lngChainMenu20,
     LNG_CHAIN_MENU21: lngChainMenu21,
+  });
+};
+export const saveOptions2 = (
+  groupCd,
+  storeCd,
+  lngCodes2,
+  strNames2,
+  lngChainGroup1,
+  lngChainGroup2,
+  lngChainGroup3,
+  lngChainGroup4,
+  lngChainGroup5,
+  lngChainGroup6,
+  lngChainGroup7,
+  lngChainGroup8,
+  lngChainGroup9,
+  lngChainGroup10,
+  lngChainGroup11,
+  lngChainGroup12,
+  lngChainGroup13,
+  lngChainGroup14,
+  lngChainGroup15,
+  lngChainGroup16,
+  lngChainGroup17,
+  lngChainGroup18,
+  lngChainGroup19,
+  lngChainGroup20
+) => {
+  return api2.post("/MIMASTER/MST01_011INS_01.asmx/saveOptions2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
     LNG_CODES2: lngCodes2,
     STR_NAMES2: strNames2,
     LNG_CHAIN_GROUP1: lngChainGroup1,

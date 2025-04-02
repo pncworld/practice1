@@ -263,10 +263,10 @@ input[type="checkbox"]:checked {
 input[type="checkbox"]:checked::after {
   content: "";
   position: absolute;
-  left: 0px;
-  top: 0px;
-  width: 12px;
-  height: 12px;
+  left: 2px;
+  top: 2px;
+  width: 8px;
+  height: 8px;
   background-color: white;
   border-radius: 50%;
 }

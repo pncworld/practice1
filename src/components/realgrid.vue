@@ -4,7 +4,7 @@
 
 <script setup>
 import { getGridInfoList } from "@/api/common";
-import { getDynamicGrid2 } from "@/api/master";
+import { getDynamicGrid2, getDynamicGrid3 } from "@/api/master";
 import { getDynamicGrid } from "@/api/misales";
 import {
   excelTitle,
@@ -23,11 +23,11 @@ let dataProvider;
   rowData => 실제 데이터 입력 부분
   showGrid => 변수로 그리드를 보여주거나 안 보여주게 설정
   showCheckBar => 변수로 그리드 내의 체크바를 보여주거나 안 보여주게 설정
-  searchWord => 변수로 그리드 내의 데이터에서 검색어로 조회할 수 있게 설정 
+  searchWord => 변수로 그리드 내의 데이터에서 검색어로 조회할 수 있게 설정
   searchColId => 검색하려는 필드명 ( 예)strName,SubName) , 로 나눠서 해당 필드들을 함께 조회 가능
-  addRow => true false로 값이 변할때마다 행을 추가 
-  deleteRow =>  true false로 값이 변할때마다 행을 삭제 
-  사용법 emit updatedRowData 사용시에는 가급적 불가피한경우가 아니라면 기존 rowData와 교체 하지 말 것. updatedRowData로 수정된 사항을 별도의 
+  addRow => true false로 값이 변할때마다 행을 추가
+  deleteRow =>  true false로 값이 변할때마다 행을 삭제
+  사용법 emit updatedRowData 사용시에는 가급적 불가피한경우가 아니라면 기존 rowData와 교체 하지 말 것. updatedRowData로 수정된 사항을 별도의
   변수로 저장해두고 추후에 그 데이터를 저장하는게 옳다고봄
 
 
@@ -523,6 +523,14 @@ const props = defineProps({
     default: false,
   },
   dynamicStoreCd: {
+    type: String,
+    default: "",
+  },
+  setDynamicGrid3: {
+    type: Boolean,
+    default: false,
+  },
+  searchWord3: {
     type: String,
     default: "",
   },
@@ -1223,6 +1231,7 @@ const funcshowGrid = async () => {
   gridView.displayOptions.showInnerFocus = false;
   dataProvider.softDeleting = props.notsoftDelete == false ? true : false;
   dataProvider.deleteCreated = props.deleteCreated;
+  gridView.filteringOptions.handleVisibility = "hidden";
   //gridView.sortingOptions.enabled = false; // 정렬기능 비활성화
   dataProvider.autoCommit = true; // 자동 커밋 활성화
   dataProvider.commitBeforeDataEdit = true;
@@ -1360,6 +1369,7 @@ const funcshowGrid = async () => {
     console.log(selectedindex.value);
     emit("selcetedrowData", selectedRowData.value);
     emit("selectedIndex", clickData.itemIndex);
+    emit("selectedIndex2", clickData.dataRow);
   };
 
   gridView.onSelectionChanged = function (grid) {
@@ -1488,7 +1498,7 @@ watch(
     console.log(props.changeRow);
     console.log(props.changeColid);
     console.log(props.changeValue2);
-
+    console.log(dataProvider.getJsonRows());
     if (props.changeRow !== "" && props.changeRow != -1) {
       dataProvider.setValue(
         props.changeRow,
@@ -1498,8 +1508,40 @@ watch(
 
       updatedrowData.value = [...dataProvider.getJsonRows()];
 
+      const dataRow = gridView.getCurrent().dataRow;
+      selectedRowData.value = dataProvider.getRows()[dataRow];
+      emit("clickedRowData", selectedRowData.value);
       emit("updatedRowData", updatedrowData.value);
       emit("updatedRowData2", updatedrowData.value);
+    }
+  }
+);
+
+watch(
+  () => props.searchWord3,
+  () => {
+    console.log(props.searchWord3);
+
+    let criteria2 = props.searchColId.split(",");
+
+    let criteria3 = `(value match '${props.searchWord3}')`;
+
+    for (let i = 1; i < criteria2.length; i++) {
+      criteria3 +=
+        " or (values['" + criteria2[i] + `'] match '${props.searchWord3}')`;
+    }
+    let filter = [
+      {
+        name: "검색조건1",
+        criteria: criteria3,
+        active: true,
+      },
+    ];
+
+    if (props.searchWord3 == "") {
+      gridView.setColumnFilters(criteria2[0], []);
+    } else {
+      gridView.setColumnFilters(criteria2[0], filter);
     }
   }
 );
@@ -1511,7 +1553,8 @@ watch(
     var values = { add: "추가", sort: "매장용" };
     var dataRow = dataProvider.addRow(values);
 
-    gridView.setCurrent({ dataRow: dataRow });
+    emit("selectedIndex2", dataRow);
+    // gridView.setCurrent({ dataRow: dataRow });
   }
 );
 
@@ -1550,6 +1593,7 @@ watch(
       selectedindex.value = selectedRowIndex;
     }
     emit("selectedIndex", selectedRowIndex);
+    emit("selectedIndex2", current.dataRow);
     console.log(props.rowData);
     // updatedrowData.value = [ ...dataProvider.getJsonRows()]
     // emit('updatedRowData', updatedrowData.value )
@@ -1580,7 +1624,7 @@ watch(
     }
 
     emit("selectedIndex", selectedRowIndex);
-
+    emit("selectedIndex2", current.dataRow);
     console.log(props.rowData);
     addrow4activated.value = true;
 
@@ -1673,8 +1717,11 @@ watch(
     updatedrowData.value = [...dataProvider.getJsonRows()];
     const curr2 = gridView.getCurrent();
     selectedRowData.value = dataProvider.getRows()[curr2.dataRow];
-    emit("updatedRowData", updatedrowData.value);
-    emit("clickedRowData", selectedRowData.value);
+    if (curr2.dataRow > -1) {
+      emit("updatedRowData", updatedrowData.value);
+      emit("clickedRowData", selectedRowData.value);
+    }
+
     deleted2activated.value = true;
     addrow4activated.value = true;
     deletedIndex.value = curr.dataRow;
@@ -1975,9 +2022,11 @@ onMounted(async () => {
     if (props.renderProgname != "") {
       // result2.value = await getRenderingData(props.renderProgname)
     }
+    tabInitSetArray.value = [];
     const result = await getGridInfoList(props.progname, props.progid);
     tabInitSetArray.value = result;
-
+    console.log(tabInitSetArray.value);
+    await nextTick();
     if (props.setDynamicGrid == true) {
       const res = await getDynamicGrid(
         store.state.userData.lngStoreGroup,
@@ -1994,6 +2043,19 @@ onMounted(async () => {
       console.log(res);
       tabInitSetArray.value.push(...res.data.List);
     }
+
+    // if (props.setDynamicGrid3 == true) {
+    //   console.log(tabInitSetArray.value);
+    //   const res = await getDynamicGrid3(
+    //     store.state.userData.lngStoreGroup,
+    //     props.dynamicStoreCd,
+    //     result.length
+    //   );
+    //   console.log(tabInitSetArray.value);
+    //   console.log(res);
+    //   tabInitSetArray.value.push(...res.data.List);
+    //   console.log(tabInitSetArray.value);
+    // }
     console.log(tabInitSetArray.value);
     // 동적 스타일 생성
     let styleContent = "";
@@ -2028,10 +2090,11 @@ const setupGrid = async () => {
       // Uncomment this if needed
       // const result2 = await getRenderingData(props.renderProgname);
     }
-
+    tabInitSetArray.value = [];
     const result = await getGridInfoList(props.progname, props.progid);
     tabInitSetArray.value = result;
 
+    await nextTick();
     if (props.setDynamicGrid == true) {
       const res = await getDynamicGrid(
         store.state.userData.lngStoreGroup,
@@ -2048,6 +2111,19 @@ const setupGrid = async () => {
       console.log(res);
       tabInitSetArray.value.push(...res.data.List);
     }
+    if (props.setDynamicGrid3 == true) {
+      const res = await getDynamicGrid3(
+        store.state.userData.lngStoreGroup,
+        props.dynamicStoreCd,
+        result.length
+      );
+      console.log(res);
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+    }
+
+    console.log(tabInitSetArray.value);
     // Dynamic style generation
     let styleContent = "";
     tabInitSetArray.value.forEach((item, index) => {
@@ -2088,13 +2164,13 @@ watch(
           gridView.setCurrent({ dataRow: selectedindex.value });
         }
 
-        const newIndices = props.rowData.reduce((indices, item, index) => {
-          if (item.new === true) {
-            indices.push(index);
-          }
-          return indices;
-        }, []);
-        dataProvider.setRowStates(newIndices, "created", true);
+        // const newIndices = props.rowData.reduce((indices, item, index) => {
+        //   if (item.new === true) {
+        //     indices.push(index);
+        //   }
+        //   return indices;
+        // }, []);
+        // dataProvider.setRowStates(newIndices, "created", true);
         addrow4activated.value = false;
 
         const current = gridView.getCurrent();
