@@ -534,6 +534,22 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  changeNow2: {
+    type: Boolean,
+    default: false,
+  },
+  searchColId3: {
+    type: Array,
+    default: [],
+  },
+  searchValue: {
+    type: Array,
+    default: [],
+  },
+  deleteRow6: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const realgridname = ref(
@@ -560,6 +576,7 @@ const emit = defineEmits([
   "sendRowState",
   "deleteRows",
   "realgridName",
+  "allStateRows",
 ]);
 const funcshowGrid = async () => {
   if (gridView !== undefined && gridView !== null) {
@@ -851,6 +868,7 @@ const funcshowGrid = async () => {
           ? "check"
           : "text",
     },
+    buttonVisibility: "always",
     styleCallback: function (grid, dataCell) {
       var ret = {};
 
@@ -1355,7 +1373,8 @@ const funcshowGrid = async () => {
     emit("updatedRowData", updatedrowData.value);
     const a = updatedrowData.value.filter((item) => item.checkbox == true);
     // selectedRowData.value = []
-
+    console.log(dataProvider.getAllStateRows());
+    emit("allStateRows", dataProvider.getAllStateRows());
     emit("checkedRowData", a);
   };
 
@@ -1518,9 +1537,38 @@ watch(
 );
 
 watch(
-  () => props.searchWord3,
+  () => props.changeNow2,
+  () => {
+    console.log(props.changeRow);
+    console.log(props.changeColid);
+    console.log(props.changeValue2);
+    console.log(dataProvider.getJsonRows());
+    if (props.changeRow !== "" && props.changeRow != -1) {
+      dataProvider.setValue(
+        props.changeRow,
+        props.changeColid,
+        props.changeValue2
+      );
+
+      updatedrowData.value = [...dataProvider.getJsonRows()];
+
+      const dataRow = gridView.getCurrent().dataRow;
+      selectedRowData.value = dataProvider.getRows()[dataRow];
+      emit("updatedRowData", updatedrowData.value);
+      emit("updatedRowData2", updatedrowData.value);
+    }
+  }
+);
+
+// onMounted(() => {
+//   console.log("asdf");
+// });
+
+watch(
+  () => [props.searchWord3, props.searchValue],
   () => {
     console.log(props.searchWord3);
+    console.log(props.searchValue);
 
     let criteria2 = props.searchColId.split(",");
 
@@ -1532,16 +1580,55 @@ watch(
     }
     let filter = [
       {
-        name: "검색조건1",
+        name: "검색조건",
         criteria: criteria3,
         active: true,
       },
     ];
+    let filter2 = [];
+    if (props.searchColId3 != []) {
+      filter2.push([
+        {
+          name: "검색조건0",
+          criteria: `(value = '${props.searchValue[0]}')`,
+          active: true,
+        },
+      ]);
+      for (let i = 1; i < props.searchColId3.length; i++) {
+        filter2.push([
+          {
+            name: "검색조건" + i,
+            criteria: `(value = '${props.searchValue[i]}')`,
+            active: true,
+          },
+        ]);
+      }
+    }
 
-    if (props.searchWord3 == "") {
+    if (props.searchWord3 == "" && props.searchColId3 == []) {
       gridView.setColumnFilters(criteria2[0], []);
+
+      if (props.searchColId3.length > 0) {
+        for (let i = 0; i < filter2.length; i++) {
+          gridView.setColumnFilters(props.searchColId3[i], []);
+        }
+      }
     } else {
-      gridView.setColumnFilters(criteria2[0], filter);
+      if (props.searchWord3 !== "") {
+        gridView.setColumnFilters(criteria2[0], filter);
+      } else {
+        gridView.setColumnFilters(criteria2[0], []);
+      }
+      for (let i = 0; i < filter2.length; i++) {
+        console.log(filter2);
+        console.log(props.searchValue[i]);
+        console.log(props.searchColId3[i]);
+        if (props.searchValue[i] == -1) {
+          gridView.setColumnFilters(props.searchColId3[i], []);
+        } else {
+          gridView.setColumnFilters(props.searchColId3[i], filter2[i]);
+        }
+      }
     }
   }
 );
@@ -1806,6 +1893,15 @@ watch(
   }
 );
 
+watch(
+  () => props.deleteRow6,
+  () => {
+    const curr = gridView.getCurrent();
+    dataProvider.removeRow(curr.dataRow);
+    console.log(dataProvider.getAllStateRows());
+    emit("allStateRows", dataProvider.getAllStateRows());
+  }
+);
 watch(
   () => props.deleteAll,
   (newVal) => {

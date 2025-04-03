@@ -16,8 +16,10 @@
   <div
     class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
     <PickStore
-      @update:storeCd="handleStoreCd"
+      @update:storeGroup="lngStoreGroup"
       @storeNm="handlestoreNm"
+      :hidesub="false"
+      :hideAttr="false"
       @update:ischanged="handleinitAll"
       @update:ischanged2="searchinit"></PickStore>
   </div>
@@ -27,8 +29,15 @@
         class="flex justify-between mt-5 ml-10 w-full border-b border-b-gray-300">
         <div class="flex justify-start font-bold text-xl">결제코드 목록</div>
         <div class="mt-3 space-x-2">
-          <button class="whitebutton" @click="addRow">추가</button>
-          <button class="whitebutton" @click="deleteRow">삭제</button>
+          <button class="whitebutton" @click="addRow" :disabled="!afterSearch">
+            추가
+          </button>
+          <button
+            class="whitebutton"
+            @click="deleteRow"
+            :disabled="!afterSearch">
+            삭제
+          </button>
         </div>
       </div>
 
@@ -81,9 +90,12 @@
           class="w-full h-full"
           :progname="'MST36_001INS_VUE'"
           :progid="1"
-          :rowData="updateRow"
-          :showGrid="showGrid"
+          :rowData="rowData"
           :showCheckBar="false"
+          :searchColId="'lngCode,strName'"
+          :searchColId3="['blnInactive', 'payDistinct']"
+          :searchValue="searchValue"
+          :searchWord3="searchWord"
           @clickedRowData="clickedRowData"
           :selectionStyle="'singleRow'"
           @selcetedrowData="selcetedrowData"
@@ -91,17 +103,18 @@
           :valuesData="valuesData"
           :labelingColumns="labelingColumns"
           :defaultSearchAllValue="-1"
-          :changeNow="changeNow"
+          :changeNow2="changeNow"
           :changeValue2="changeValue2"
           :changeColid="changeColid"
           :changeRow="changeRow"
           @selectedIndex="selectedIndex"
           :initSelect="true"
           :addRow4="addRow4"
-          :deleteRow2="deleteRow3"
+          :deleteRow6="deleteRow3"
           :addrowDefault="addrowDefault"
           :addrowProp="addrowProp"
           @updatedRowData="updatedRowData"
+          @allStateRows="allStateRows"
           :rowStateeditable="false"
           :addField="'new'">
         </Realgrid>
@@ -610,23 +623,23 @@
             </div>
             <div class="border border-gray-300 rounded-tr-lg flex p-1">
               <select
-                name=""
+                name="majorGroupCd"
                 id=""
                 class="flex-1 border rounded-lg w-full h-full"
                 @change="setSubCd"
                 v-model="forsearchMain">
-                <option value="0">전체</option>
+                <option value="-1">전체</option>
                 <option :value="i.GroupCd" v-for="i in MenuGroup">
                   [{{ i.GroupCd }}]{{ i.majorGroupNm }}
                 </option>
               </select>
               <select
-                name=""
+                name="subGroupCd"
                 id=""
                 class="flex-1 border rounded-lg w-full h-full"
                 v-model="forsearchSub"
-                @change="setSubCd2">
-                <option value="0">전체</option>
+                @change="setSubCd">
+                <option value="-1">전체</option>
                 <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup">
                   [{{ i.GroupCd }}]{{ i.subGroupNm }}
                 </option>
@@ -649,11 +662,15 @@
             :progname="'MST36_001INS_VUE'"
             :progid="2"
             @realgridname="realgridname"
-            :rowData="clickrowData4"
+            :rowData="clickrowData2"
             @clickedRowData="clickedRowData2"
             :initCheckColumn="initCheckColumn"
             :initCheckValue="initCheckValue"
             :initCheckAct="initCheckAct"
+            :searchColId="'menuCd,menuNm'"
+            :searchWord3="searchWord2"
+            :searchColId3="['majorGroupCd', 'subGroupCd']"
+            :searchValue="searchValue2"
             @checkedRowData="checkedRowData"
             :initSelect="true"
             :maintaincheckColumn="'menuCd'"
@@ -686,6 +703,8 @@
             :rowData="filteredrowData5"
             @realgridname="realgridname2"
             :setAllCheck2="setAllCheck2"
+            :searchColId="'lngCode,strName'"
+            :searchWord3="searchWord3"
             :uncheckColumn="'lngCode'"
             :uncheckValue="uncheckValue"
             :uncheckAct="uncheckAct"
@@ -710,7 +729,7 @@ import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
 import RealGrid from "realgrid";
 import Swal from "sweetalert2";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 const selectedMenu = ref(1);
@@ -719,7 +738,7 @@ const selectMenu = (newValue) => {
 };
 
 const searchWord2 = ref("");
-const nowStoreCd = ref(-1);
+const nowStoreCd = ref(0);
 const rowData = ref([]);
 const filteredrowData = ref([]);
 const addRow4 = ref(false);
@@ -731,8 +750,8 @@ const SubMenuGroup = ref("");
 const items = ref("");
 const selectedPayDistinct = ref(true);
 const selectedMultiple = ref(false);
-const forsearchMain = ref(0);
-const forsearchSub = ref(0);
+const forsearchMain = ref(-1);
+const forsearchSub = ref(-1);
 const afterSearch = ref(false);
 const clickedStoreNm = ref();
 const store = useStore();
@@ -748,6 +767,9 @@ const rounding = ref([]);
 const taxs = ref([]);
 const isNew = ref(false);
 
+const lngStoreGroup = (e) => {
+  groupCd.value = e;
+};
 const initCheckColumn = ref("menuCd");
 const disCountGroup = ref([]);
 const approveGroup = ref([]);
@@ -774,6 +796,27 @@ const realgridname = (e) => {
 const realgridname2 = (e) => {
   realgrid3Name.value = e;
 };
+
+onMounted(() => {
+  console.log(store.state.userData.lngCommonMenu);
+
+  if (store.state.userData.lngCommonMenu == "1") {
+    nowStoreCd.value = 0;
+  }
+});
+// onActivated(() => {
+//   const reagrid2 = document.getElementById(realgrid2Name.value);
+//   setTimeout(() => {
+//     RealGrid.getGridInstance(reagrid2).resetSize();
+//     RealGrid.getGridInstance(reagrid2).refresh(true);
+//   }, 100);
+
+//   const realgrid3 = document.getElementById(realgrid3Name.value);
+//   setTimeout(() => {
+//     RealGrid.getGridInstance(realgrid3).resetSize();
+//     RealGrid.getGridInstance(realgrid3).refresh(true);
+//   }, 100);
+// });
 
 watch(selectedMenu, () => {
   const reagrid2 = document.getElementById(realgrid2Name.value);
@@ -822,8 +865,8 @@ const clickedRowData = (newvalue) => {
   clickrowData4.value = [];
   filteredrowData5.value = [];
 
-  forsearchMain.value = 0;
-  forsearchSub.value = 0;
+  forsearchMain.value = -1;
+  forsearchSub.value = -1;
   searchWord2.value = "";
   searchWord3.value = "";
   if (!(newvalue[4] == "1" && newvalue[6] == "0")) {
@@ -881,8 +924,7 @@ const clickedRowData = (newvalue) => {
   gridvalue23.value = newvalue[25];
   gridvalue24.value = newvalue[17];
   gridvalue25.value = newvalue[26];
-  clickrowData2.value = [];
-  clickrowData2.value = [...clickrowData2.value];
+
   if (newvalue[4] == "1") {
     if (newvalue[21] != "0") {
       selectedPayDistinct.value = false;
@@ -911,6 +953,8 @@ const clickedRowData = (newvalue) => {
   } else {
     isNew.value = false;
   }
+
+  rowData2.value = [...rowData2.value];
   const firstarr = newvalue[27] != undefined ? newvalue[27].split(",") : [];
   if (rowData2.value.length > 0) {
     let dupliarr = JSON.parse(JSON.stringify(rowData2.value));
@@ -1019,8 +1063,8 @@ const handleinitAll = (newvalue) => {
   MenuGroup.value = [];
   SubMenuGroup.value = [];
   items.value = [];
-  forsearchMain.value = "0";
-  forsearchSub.value = "0";
+  forsearchMain.value = "-1";
+  forsearchSub.value = "-1";
   afterSearch.value = false;
   searchword1.value = "";
   afterSearch.value = false;
@@ -1030,15 +1074,6 @@ const confirmData = ref([]);
 const searchButton = async () => {
   items.value = [];
 
-  if (nowStoreCd.value == -1) {
-    Swal.fire({
-      title: "경고",
-      text: "매장을 선택하세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
   store.state.loading = true;
   try {
     initAll();
@@ -1048,7 +1083,7 @@ const searchButton = async () => {
     filteredrowData3.value = [];
     rowData.value = [...rowData.value];
     filteredrowData3.value = [...filteredrowData3.value];
-    const res = await getPayCodeEnrollInfo(groupCd.value, nowStoreCd.value);
+    const res = await getPayCodeEnrollInfo(groupCd.value, 0);
 
     rowData.value = res.data.PAYCODE;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
@@ -1061,10 +1096,7 @@ const searchButton = async () => {
     taxs.value = res.data.TAX;
     disCountGroup.value = res.data.DISGROUP;
     approveGroup.value = res.data.APPROVE;
-    const res2 = await getMenuListIncludeCommon(
-      groupCd.value,
-      nowStoreCd.value
-    );
+    const res2 = await getMenuListIncludeCommon(groupCd.value, 0);
     rowData2.value = res2.data.menuList;
     SubMenuGroup.value = res2.data.submenuGroup;
     MenuGroup.value = res2.data.menuGroup;
@@ -1091,6 +1123,10 @@ const searchButton = async () => {
 
     afterSearch.value = true;
     isNew.value = false;
+    forsearchMain.value = "-1";
+    forsearchSub.value = "-1";
+    searchC1.value = -1;
+    searchC2.value = -1;
   }
 };
 
@@ -1102,7 +1138,7 @@ const searchButton = async () => {
 // });
 
 const searchWord = ref("");
-const searchColValue2 = ref("");
+const searchValue = ref([]);
 const searchC1 = ref(-1);
 const searchC2 = ref(-1);
 
@@ -1110,9 +1146,11 @@ const searchColumn = (e) => {
   const columnNm = e.target.name;
   const value = e.target.value;
 
-  searchColValue2.value = searchC1.value + "," + searchC2.value;
-
-  console.log(searchColValue2.value);
+  if (columnNm == "blnInactive") {
+    searchValue.value = [value, searchC2.value];
+  } else {
+    searchValue.value = [searchC1.value, value];
+  }
 };
 
 const searchword = (e) => {
@@ -1182,16 +1220,31 @@ const changeInfo = (e) => {
 };
 const searchColValue3 = ref("0,0");
 const filteredSubMenuGroup = ref([]);
-const setSubCd = () => {
-  filteredSubMenuGroup.value = SubMenuGroup.value.filter(
-    (item) => item.sublngMajor == forsearchMain.value
-  );
+const searchValue2 = ref([]);
+const setSubCd = (e) => {
+  const name = e.target.name;
+  const value = e.target.value;
+  if (name == "majorGroupCd") {
+    filteredSubMenuGroup.value = SubMenuGroup.value.filter(
+      (item) => item.sublngMajor == forsearchMain.value
+    );
+    forsearchSub.value = "-1";
+    forsearchMain.value = value;
+    searchValue2.value = [value, forsearchSub.value];
+  } else {
+    forsearchSub.value = value;
+    searchValue2.value = [forsearchMain.value, value];
+  }
 
-  forsearchSub.value = "0";
+  // filteredSubMenuGroup.value = SubMenuGroup.value.filter(
+  //   (item) => item.sublngMajor == forsearchMain.value
+  // );
 
-  searchColValue3.value = forsearchMain.value + ",0";
+  // forsearchSub.value = "0";
 
-  console.log(searchColValue3.value);
+  // searchColValue3.value = forsearchMain.value + ",0";
+
+  // console.log(searchColValue3.value);
 
   // clickrowData2.value = rowData2.value.filter( item => {
   //   if(forsearchMain.value =='0' ){
@@ -1205,10 +1258,6 @@ const setSubCd = () => {
   //       }
 
   //   })
-};
-const setSubCd2 = () => {
-  searchColValue3.value =
-    searchColValue3.value.split(",")[0] + "," + forsearchSub.value;
 };
 
 const searchMenuList = (e) => {
@@ -1225,45 +1274,48 @@ const changeColid2 = ref("checkbox");
 const changeNow2 = ref(false);
 const checkedRowData = (e) => {
   const temp = e.map((item) => item.menuCd);
+  console.log(e, updateRow.value);
+  // const rowDataMap = new Map(
+  //   rowData.value.map((row) => [
+  //     row.sequence !== undefined ? row.sequence : row.lngCode.toString(),
+  //     row,
+  //   ])
+  // );
 
-  const rowDataMap = new Map(
-    rowData.value.map((row) => [
-      row.sequence !== undefined ? row.sequence : row.lngCode.toString(),
-      row,
-    ])
-  );
+  // const targetKey =
+  //   isNew.value == false ? gridvalue5.value.toString() : clickaddrowSeq.value;
 
-  const targetKey =
-    isNew.value == false ? gridvalue5.value.toString() : clickaddrowSeq.value;
+  // const targetRow = rowDataMap.get(targetKey);
 
-  const targetRow = rowDataMap.get(targetKey);
+  // if (targetRow) {
+  //   targetRow.checkedMenu = temp.join(",");
 
-  if (targetRow) {
-    targetRow.checkedMenu = temp.join(",");
-
-    rowData.value = [...rowData.value]; // Trigger reactivity
-  } else {
-    const targetKey2 = clickaddrowSeq.value.toString();
-    const targetRow2 = rowDataMap.get(targetKey2);
-    if (targetRow2) {
-      targetRow2.checkedMenu = temp.join(",");
-      rowData.value = [...rowData.value]; // Ensure reactivity here too
-    } else {
-      console.error("Both target rows not found!");
-    }
-  }
+  //   rowData.value = [...rowData.value]; // Trigger reactivity
+  // } else {
+  //   const targetKey2 = clickaddrowSeq.value.toString();
+  //   const targetRow2 = rowDataMap.get(targetKey2);
+  //   if (targetRow2) {
+  //     targetRow2.checkedMenu = temp.join(",");
+  //     rowData.value = [...rowData.value]; // Ensure reactivity here too
+  //   } else {
+  //     console.error("Both target rows not found!");
+  //   }
+  // }
 
   changeColid.value = "checkedMenu";
   changeValue2.value = temp.join(",");
   changeNow.value = !changeNow.value;
 };
 const checkedRowData2 = (e) => {
-  // changeColid.value = 'unchecklngCode'
-  // const arr = e.map(item => Number(item.lngCode))
-  // console.log(arr)
-  // const filtered2 = rowData3.value.filter(item => item.lngCode != gridvalue5.value).filter(item => !arr.includes(Number(item.lngCode))).map(item => item.lngCode)
-  // changeValue2.value = filtered2.join(';')
-  // changeNow.value = !changeNow.value
+  changeColid.value = "unchecklngCode";
+  const arr = e.map((item) => Number(item.lngCode));
+  console.log(arr);
+  const filtered2 = rowData3.value
+    .filter((item) => item.lngCode != gridvalue5.value)
+    .filter((item) => !arr.includes(Number(item.lngCode)))
+    .map((item) => item.lngCode);
+  changeValue2.value = filtered2.join(";");
+  changeNow.value = !changeNow.value;
 };
 
 const setAllCheck2 = ref(false);
@@ -1318,10 +1370,6 @@ const deleteOn = ref(false);
 const deleteRow = () => {
   deleteRow3.value = !deleteRow3.value;
   deleteOn.value = true;
-
-  rowData.value = rowData.value.filter(
-    (item) => item.sequence != clickaddrowSeq.value
-  );
 };
 
 watch(gridvalue9, () => {
@@ -1336,7 +1384,7 @@ watch(gridvalue9, () => {
 });
 
 const saveButton = () => {
-  console.log(rowData.value.filter((item) => item.checkedMenu != ""));
+  console.log(updateRow.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -1346,7 +1394,12 @@ const saveButton = () => {
     });
     return;
   }
-  if (JSON.stringify(confirmData.value) === JSON.stringify(rowData.value)) {
+  if (
+    updateDeleteInsertrowIndex.value.deleted.length +
+      updateDeleteInsertrowIndex.value.created.length +
+      updateDeleteInsertrowIndex.value.updated.length ==
+    0
+  ) {
     Swal.fire({
       title: "경고",
       text: "변경된 사항이 없습니다.",
@@ -1356,7 +1409,7 @@ const saveButton = () => {
     return;
   }
 
-  const validateRow = rowData.value
+  const validateRow = updateRow.value
     .filter((item) => item.deleted != true)
     .filter(
       (item) =>
@@ -1378,8 +1431,8 @@ const saveButton = () => {
   }
 
   const validateRow2 =
-    new Set(rowData.value.map((item) => item.lngCode)).size ==
-    rowData.value.map((item) => item.lngCode).length;
+    new Set(updateRow.value.map((item) => item.lngCode)).size ==
+    updateRow.value.map((item) => item.lngCode).length;
   console.log(rowData.value);
   if (validateRow2 == false) {
     Swal.fire({
@@ -1390,13 +1443,21 @@ const saveButton = () => {
     });
     return;
   }
-  rowData.value = rowData.value.map((item) => {
+  updateRow.value = updateRow.value.map((item) => {
     if (item.payDistinct != "1") {
       item.checkedMenu = ""; // checkedMenu 값을 빈 문자열로 설정
     }
     return item; // 수정된 item을 반환
   });
-  console.log(rowData.value);
+  const deletedRow = updateRow.value.filter((_, index) =>
+    updateDeleteInsertrowIndex.value.deleted.includes(index)
+  );
+  const updatedAndInsertRow = updateRow.value.filter(
+    (_, index) =>
+      updateDeleteInsertrowIndex.value.updated.includes(index) ||
+      updateDeleteInsertrowIndex.value.created.includes(index)
+  );
+
   Swal.fire({
     title: "저장",
     text: "저장 하시겠습니까?",
@@ -1408,85 +1469,57 @@ const saveButton = () => {
     if (result.isConfirmed) {
       store.state.loading = true;
       try {
-        const lngStoreCodearr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.lngStoreCode);
-        const strNamearr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.strName);
-        const strNameEarr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.strNameE);
-        const lngCodearr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.lngCode);
-        const blnInactivearr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.blnInactive);
-        const dtmFromDatearr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.dtmFromDate);
-        const dtmToDatearr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.dtmToDate);
-        const lngRatearr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.lngRate);
-        const lngAmtarr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) =>
-            item.lngAmt != undefined
-              ? item.lngAmt.substring(0, item.lngAmt.length - 1)
-              : 0
-          );
-        const blnAutoarr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.blnAuto);
-        const lngDiscAmtLimitarr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.lngDiscAmtLimit);
-        const blnDrawerarr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.blnDrawer);
-        const lngPriorarr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.lngPrior);
-        const blnReceiptarr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.blnReceipt);
-        const lngChangeRateLimitarr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.lngChangeRateLimit);
-        const lngMenuarr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.lngMenu);
-        const lngDiscTypearr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.lngDiscType);
-        const blnDuplicatearr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.blnDuplicate);
-        const lngRoundTypearr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.lngRoundType);
-        const lngRoundarr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.lngRound);
-        const lngTaxarr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.lngTax);
-        const strIconarr = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.strIcon);
-        const checkedMenus = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.checkedMenu);
-        const unchecklngCodes = rowData.value
-          .filter((item) => item.deleted !== true)
-          .map((item) => item.unchecklngCode);
-        const deleteCd = rowData.value
-          .filter((item) => item.deleted == true)
-          .map((item) => item.lngCode);
+        const lngStoreCodearr = updatedAndInsertRow.map(
+          (item) => item.lngStoreCode
+        );
+        const strNamearr = updatedAndInsertRow.map((item) => item.strName);
+        const strNameEarr = updatedAndInsertRow.map((item) => item.strNameE);
+        const lngCodearr = updatedAndInsertRow.map((item) => item.lngCode);
+        const blnInactivearr = updatedAndInsertRow.map(
+          (item) => item.blnInactive
+        );
+        const dtmFromDatearr = updatedAndInsertRow.map(
+          (item) => item.dtmFromDate
+        );
+        const dtmToDatearr = updatedAndInsertRow.map((item) => item.dtmToDate);
+        const lngRatearr = updatedAndInsertRow.map((item) => item.lngRate);
+        const lngAmtarr = updatedAndInsertRow.map((item) =>
+          item.lngAmt != undefined
+            ? item.lngAmt.substring(0, item.lngAmt.length - 1)
+            : 0
+        );
+        const blnAutoarr = updatedAndInsertRow.map((item) => item.blnAuto);
+        const lngDiscAmtLimitarr = updatedAndInsertRow.map(
+          (item) => item.lngDiscAmtLimit
+        );
+        const blnDrawerarr = updatedAndInsertRow.map((item) => item.blnDrawer);
+        const lngPriorarr = updatedAndInsertRow.map((item) => item.lngPrior);
+        const blnReceiptarr = updatedAndInsertRow.map(
+          (item) => item.blnReceipt
+        );
+        const lngChangeRateLimitarr = updatedAndInsertRow.map(
+          (item) => item.lngChangeRateLimit
+        );
+        const lngMenuarr = updatedAndInsertRow.map((item) => item.lngMenu);
+        const lngDiscTypearr = updatedAndInsertRow.map(
+          (item) => item.lngDiscType
+        );
+        const blnDuplicatearr = updatedAndInsertRow.map(
+          (item) => item.blnDuplicate
+        );
+        const lngRoundTypearr = updatedAndInsertRow.map(
+          (item) => item.lngRoundType
+        );
+        const lngRoundarr = updatedAndInsertRow.map((item) => item.lngRound);
+        const lngTaxarr = updatedAndInsertRow.map((item) => item.lngTax);
+        const strIconarr = updatedAndInsertRow.map((item) => item.strIcon);
+        const checkedMenus = updatedAndInsertRow.map(
+          (item) => item.checkedMenu
+        );
+        const unchecklngCodes = updatedAndInsertRow.map(
+          (item) => item.unchecklngCode
+        );
+        const deleteCd = deletedRow.map((item) => item.lngCode);
 
         const res = await savePayCode(
           groupCd.value,
@@ -1538,24 +1571,31 @@ const saveButton = () => {
   });
 };
 
+const updateDeleteInsertrowIndex = ref([]);
+const allStateRows = (e) => {
+  updateDeleteInsertrowIndex.value = e;
+  console.log(e);
+};
 const updatedRowData = (newvalue) => {
-  rowData.value = newvalue;
   console.log(newvalue);
-  const temp = newvalue
-    .filter((item) => item.deleted == true)
-    .map((item) => item.lngCode);
-  if (temp.length > 0) {
-    for (var i = 0; i < temp.length; i++) {
-      const findrow = rowData.value.find((item) => item.lngCode == temp[i]);
-      if (findrow) {
-        findrow.deleted = true;
-      }
-    }
+  updateRow.value = newvalue;
+  // rowData.value = newvalue;
+  // console.log(newvalue);
+  // const temp = newvalue
+  //   .filter((item) => item.deleted == true)
+  //   .map((item) => item.lngCode);
+  // if (temp.length > 0) {
+  //   for (var i = 0; i < temp.length; i++) {
+  //     const findrow = rowData.value.find((item) => item.lngCode == temp[i]);
+  //     if (findrow) {
+  //       findrow.deleted = true;
+  //     }
+  //   }
 
-    if (isNew.value == false) {
-      rowData.value = [...rowData.value];
-    }
-  }
+  //   if (isNew.value == false) {
+  //     rowData.value = [...rowData.value];
+  //   }
+  // }
 };
 const updatedList2 = ref([]);
 const updatedRowData2 = (newvalue) => {
@@ -1622,30 +1662,19 @@ const updatedRowData3 = (newvalue) => {
     findrow.unchecklngCode = temp.value.join(";");
   }
 };
-watch(filteredrowData3, () => {
-  changeColid.value = "unchecklngCode";
-  console.log(filteredrowData3.value);
-  const arr = filteredrowData3.value
-    .filter((item) => item.checkbox != true)
-    .map((item) => item.lngCode);
-  console.log(arr);
-  changeValue2.value = arr.join(";");
-  if (arr.length > 0) {
-    changeNow.value = !changeNow.value;
-  }
-});
-watch(clickrowData2, () => {
-  changeColid.value = "checkedMenu";
-  const arr = clickrowData2.value
-    .filter((item) => item.checkbox == true)
-    .map((item) => item.menuCd);
-  console.log(arr);
-  changeValue2.value = arr.join(",");
-  if (arr.length > 0 && deleteOn.value == false) {
-    changeNow.value = !changeNow.value;
-  }
-  deleteOn.value = true;
-});
+
+// watch(clickrowData2, () => {
+//   changeColid.value = "checkedMenu";
+//   const arr = clickrowData2.value
+//     .filter((item) => item.checkbox == true)
+//     .map((item) => item.menuCd);
+//   console.log(arr);
+//   changeValue2.value = arr.join(",");
+//   if (arr.length > 0 && deleteOn.value == false) {
+//     changeNow.value = !changeNow.value;
+//   }
+//   deleteOn.value = true;
+// });
 
 const clickedRowData2 = (e) => {
   // //console.log(e)
@@ -1695,270 +1724,6 @@ const clickedRowData2 = (e) => {
   //   }
   // }
 };
-
-watch(forsearchMain, () => {
-  if (forsearchMain.value == 0 && searchWord2.value == "") {
-    clickrowData4.value = [...clickrowData2.value];
-  } else if (forsearchMain.value != 0 && searchWord2.value == "") {
-    clickrowData4.value = clickrowData2.value.filter(
-      (item) => item.majorGroupCd == forsearchMain.value
-    );
-  } else if (forsearchMain.value == 0 && searchWord2.value != "") {
-    clickrowData4.value = clickrowData2.value.filter(
-      (item) =>
-        item.menuCd.includes(searchWord2.value) ||
-        item.menuNm.includes(searchWord2.value)
-    );
-  } else {
-    clickrowData4.value = clickrowData2.value
-      .filter((item) => item.majorGroupCd == forsearchMain.value)
-      .filter(
-        (item) =>
-          item.menuCd.includes(searchWord2.value) ||
-          item.menuNm.includes(searchWord2.value)
-      );
-  }
-  forsearchSub.value = 0;
-});
-
-watch(searchWord2, () => {
-  if (
-    forsearchMain.value == 0 &&
-    forsearchSub.value == 0 &&
-    searchWord2.value == ""
-  ) {
-    clickrowData4.value = [...clickrowData2.value];
-  } else if (
-    forsearchMain.value != 0 &&
-    forsearchSub.value == 0 &&
-    searchWord2.value == ""
-  ) {
-    clickrowData4.value = clickrowData2.value.filter(
-      (item) => item.majorGroupCd == forsearchMain.value
-    );
-  } else if (
-    forsearchMain.value != 0 &&
-    forsearchSub.value != 0 &&
-    searchWord2.value == ""
-  ) {
-    clickrowData4.value = clickrowData2.value.filter(
-      (item) =>
-        item.majorGroupCd == forsearchMain.value &&
-        item.subGroupCd == forsearchSub.value
-    );
-  } else if (
-    forsearchMain.value == 0 &&
-    forsearchSub.value == 0 &&
-    searchWord2.value != ""
-  ) {
-    clickrowData4.value = clickrowData2.value.filter(
-      (item) =>
-        item.menuCd.includes(searchWord2.value) ||
-        item.menuNm.includes(searchWord2.value)
-    );
-  } else if (
-    forsearchMain.value == 0 &&
-    forsearchSub.value != 0 &&
-    searchWord2.value != ""
-  ) {
-    clickrowData4.value = clickrowData2.value
-      .filter((item) => item.subGroupCd == forsearchSub.value)
-      .filter(
-        (item) =>
-          item.menuCd.includes(searchWord2.value) ||
-          item.menuNm.includes(searchWord2.value)
-      );
-  } else if (
-    forsearchMain.value != 0 &&
-    forsearchSub.value != 0 &&
-    searchWord2.value != ""
-  ) {
-    clickrowData4.value = clickrowData2.value
-      .filter(
-        (item) =>
-          item.majorGroupCd == forsearchMain.value &&
-          item.subGroupCd == forsearchSub.value
-      )
-      .filter(
-        (item) =>
-          item.menuCd.includes(searchWord2.value) ||
-          item.menuNm.includes(searchWord2.value)
-      );
-  }
-});
-
-watch(forsearchSub, () => {
-  if (
-    forsearchSub.value == 0 &&
-    forsearchMain.value == 0 &&
-    searchWord2.value == ""
-  ) {
-    clickrowData4.value = [...clickrowData2.value];
-  } else if (
-    forsearchSub.value == 0 &&
-    forsearchMain.value != 0 &&
-    searchWord2.value == ""
-  ) {
-    clickrowData4.value = clickrowData2.value.filter(
-      (item) => item.majorGroupCd == forsearchMain.value
-    );
-  } else if (
-    forsearchSub.value != 0 &&
-    forsearchMain.value != 0 &&
-    searchWord2.value == ""
-  ) {
-    clickrowData4.value = clickrowData2.value.filter(
-      (item) =>
-        item.majorGroupCd == forsearchMain.value &&
-        item.subGroupCd == forsearchSub.value
-    );
-  } else if (
-    forsearchSub.value == 0 &&
-    forsearchMain.value == 0 &&
-    searchWord2.value != ""
-  ) {
-    clickrowData4.value = clickrowData2.value.filter(
-      (item) =>
-        item.menuCd.includes(searchWord2.value) ||
-        item.menuNm.includes(searchWord2.value)
-    );
-  } else if (
-    forsearchSub.value == 0 &&
-    forsearchMain.value != 0 &&
-    searchWord2.value != ""
-  ) {
-    clickrowData4.value = clickrowData2.value
-      .filter((item) => item.majorGroupCd == forsearchMain.value)
-      .filter(
-        (item) =>
-          item.menuCd.includes(searchWord2.value) ||
-          item.menuNm.includes(searchWord2.value)
-      );
-  } else if (
-    forsearchSub.value != 0 &&
-    forsearchMain.value != 0 &&
-    searchWord2.value != ""
-  ) {
-    clickrowData4.value = clickrowData2.value
-      .filter(
-        (item) =>
-          item.majorGroupCd == forsearchMain.value &&
-          item.subGroupCd == forsearchSub.value
-      )
-      .filter(
-        (item) =>
-          item.menuCd.includes(searchWord2.value) ||
-          item.menuNm.includes(searchWord2.value)
-      );
-  }
-});
-
-watch(searchWord3, () => {
-  if (searchWord3.value == "") {
-    filteredrowData5.value = [...filteredrowData3.value];
-  } else {
-    filteredrowData5.value = filteredrowData3.value.filter(
-      (item) =>
-        item.lngCode.toString().includes(searchWord3.value) ||
-        item.strName.includes(searchWord3.value)
-    );
-  }
-});
-watch(searchC1, () => {
-  initAll();
-  console.log(rowData.value);
-  rowData.value = rowData.value.filter(
-    (item) => item.lngCode != undefined && item.lngCode != ""
-  );
-  if (searchC1.value == -1) {
-    if (searchC2.value == -1) {
-      updateRow.value = [...rowData.value];
-    } else {
-      updateRow.value = rowData.value.filter(
-        (item) => item.payDistinct == searchC2.value
-      );
-    }
-  } else if (searchC1.value != -1) {
-    if (searchC2.value == -1) {
-      updateRow.value = rowData.value.filter(
-        (item) => item.blnInactive == searchC1.value
-      );
-    } else {
-      updateRow.value = rowData.value.filter(
-        (item) =>
-          item.payDistinct == searchC2.value &&
-          item.blnInactive == searchC1.value
-      );
-    }
-  }
-});
-watch(searchC2, () => {
-  initAll();
-  if (searchC1.value == -1) {
-    if (searchC2.value == -1) {
-      updateRow.value = [...rowData.value];
-    } else {
-      updateRow.value = rowData.value.filter(
-        (item) => item.payDistinct == searchC2.value
-      );
-    }
-  } else if (searchC1.value != -1) {
-    if (searchC2.value == -1) {
-      updateRow.value = rowData.value.filter(
-        (item) => item.blnInactive == searchC1.value
-      );
-    } else {
-      updateRow.value = rowData.value.filter(
-        (item) =>
-          item.payDistinct == searchC2.value &&
-          item.blnInactive == searchC1.value
-      );
-    }
-  }
-});
-
-watch(searchWord, () => {
-  initAll();
-  if (searchC1.value == -1) {
-    if (searchC2.value == -1) {
-      updateRow.value = rowData.value.filter(
-        (item) =>
-          item.lngCode?.toString().includes(searchWord.value) ||
-          item.strName?.toString().includes(searchWord.value)
-      );
-    } else {
-      updateRow.value = rowData.value
-        .filter((item) => item.payDistinct == searchC2.value)
-        .filter(
-          (item) =>
-            item.lngCode.toString().includes(searchWord.value) ||
-            item.strName.toString().includes(searchWord.value)
-        );
-    }
-  } else if (searchC1.value != -1) {
-    if (searchC2.value == -1) {
-      updateRow.value = rowData.value
-        .filter((item) => item.blnInactive == searchC1.value)
-        .filter(
-          (item) =>
-            item.lngCode.toString().includes(searchWord.value) ||
-            item.strName.toString().includes(searchWord.value)
-        );
-    } else {
-      updateRow.value = rowData.value
-        .filter(
-          (item) =>
-            item.payDistinct == searchC2.value &&
-            item.blnInactive == searchC1.value
-        )
-        .filter(
-          (item) =>
-            item.lngCode.toString().includes(searchWord.value) ||
-            item.strName.toString().includes(searchWord.value)
-        );
-    }
-  }
-});
 
 const initAll = () => {
   selectedMenu.value = 1;

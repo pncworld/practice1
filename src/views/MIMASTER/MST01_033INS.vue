@@ -16,8 +16,11 @@
   <div
     class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
     <PickStore
+      @update:storeGroup="lngStoreGroup"
       @update:storeCd="handleStoreCd"
       @storeNm="handlestoreNm"
+      :hidesub="hidesub"
+      :hideAttr="hideAttr"
       @update:ischanged="handleinitAll"
       @update:ischanged2="searchinit"></PickStore>
   </div>
@@ -42,23 +45,23 @@
         </div>
         <div class="border border-gray-300 rounded-tr-lg flex p-1">
           <select
-            name=""
+            name="lngMainGroup"
             id=""
             class="flex-1 border rounded-lg w-[80%] h-full"
             @change="setSubCd"
             v-model="forsearchMain">
-            <option value="0">전체</option>
+            <option value="-1">전체</option>
             <option :value="i.GroupCd" v-for="i in MenuGroup">
               [{{ i.GroupCd }}]{{ i.majorGroupNm }}
             </option>
           </select>
           <select
-            name=""
+            name="lngSubGroup"
             id=""
             class="flex-1 border rounded-lg w-full h-full"
             v-model="forsearchSub"
-            @change="setSubCd2">
-            <option value="0">전체</option>
+            @change="setSubCd">
+            <option value="-1">전체</option>
             <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup">
               [{{ i.GroupCd }}]{{ i.subGroupNm }}
             </option>
@@ -81,22 +84,24 @@
           class="w-full h-full"
           :progname="'MST01_033INS_VUE'"
           :progid="1"
-          :rowData="updateRow"
+          :rowData="rowData"
           :showGrid="showGrid"
           :showCheckBar="false"
           @clickedRowData="clickedRowData"
           :selectionStyle="'singleRow'"
           @selcetedrowData="selcetedrowData"
+          @allStateRows="allStateRows"
           :labelsData="labelsData"
           :valuesData="valuesData"
           :labelingColumns="labelingColumns"
-          :changeNow="changeNow"
+          :changeNow2="changeNow"
           :changeValue2="changeValue2"
           :changeColid="changeColid"
           :changeRow="changeRow"
           @selectedIndex="selectedIndex"
+          @selectedIndex2="selectedIndex2"
           :addRow4="addRow4"
-          :deleteRow2="deleteRow3"
+          :deleteRow6="deleteRow3"
           :addrowDefault="addrowDefault"
           :addrowProp="addrowProp"
           @updatedRowData="updatedRowData"
@@ -104,10 +109,10 @@
           :addField="'new'"
           :hideRow="hideRow"
           :hideNow="hideNow"
-          :searchWord="searchWord"
-          :searchColId2="'lngMainGroup,lngSubGroup'"
           :searchColId="'lngCode,strName'"
-          :searchColValue2="searchColValue3"
+          :searchColId3="['lngMainGroup', 'lngSubGroup']"
+          :searchValue="searchValue"
+          :searchWord3="searchWord"
           :initFocus="initFocus"></Realgrid>
         <!-- :searchWord="searchWord" :searchColId2="'blnInactive,payDistinct'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" -->
       </div>
@@ -808,9 +813,9 @@
             :progname="'MST01_033INS_VUE'"
             :progid="2"
             :rowData="clickrowData2"
-            @clickedRowData="clickedRowData2"
+            @checkedRowData="checkedRowData2"
             :searchColId="'lngCode,strName'"
-            :searchWord="searchWord2"
+            :searchWord3="searchWord2"
             :checkBarInactive="'lngMenu'"
             :initSelect="true"
             :ExceptionCheck="'lngMenu'"
@@ -894,11 +899,26 @@ import axios from "axios";
 import RealGrid from "realgrid";
 import Swal from "sweetalert2";
 import { v4 as uuidv4 } from "uuid";
-import { nextTick, ref, watch } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 
+const hidesub = ref(true);
+const hideAttr = ref(true);
+
+onMounted(() => {
+  console.log(store.state.userData.lngCommonMenu);
+
+  if (store.state.userData.lngCommonMenu == "1") {
+    hidesub.value = false;
+    hideAttr.value = false;
+    nowStoreCd.value = "0";
+  } else {
+    hidesub.value = true;
+    hideAttr.value = true;
+  }
+});
 const searchWord2 = ref("");
-const nowStoreCd = ref(-1);
+const nowStoreCd = ref(0);
 const rowData = ref([]);
 const filteredrowData = ref([]);
 const hideNow = ref(false);
@@ -912,6 +932,11 @@ const hiderow = () => {
 const realgrid2Name = ref("");
 const realgridname = (e) => {
   realgrid2Name.value = e;
+};
+const updateDeleteInsertrowIndex = ref([]);
+const allStateRows = (e) => {
+  updateDeleteInsertrowIndex.value = e;
+  console.log(e);
 };
 
 const selectedMenu = ref(1);
@@ -937,8 +962,8 @@ const SubMenuGroup = ref("");
 const items = ref("");
 const selectedPayDistinct = ref(true);
 const selectedMultiple = ref(false);
-const forsearchMain = ref(0);
-const forsearchSub = ref(0);
+const forsearchMain = ref(-1);
+const forsearchSub = ref(-1);
 const afterSearch = ref(false);
 const clickedStoreNm = ref();
 const store = useStore();
@@ -1012,6 +1037,10 @@ const fileName = ref();
 const rowIndex = ref();
 const duplilfirstarr = ref();
 const tempRowData2 = ref();
+
+const selectedIndex2 = (e) => {
+  rowIndex.value = e;
+};
 const clickedRowData = async (newvalue) => {
   if (newvalue[9] == 0 || newvalue[12] == 1) {
     rowData2.value = [];
@@ -1025,7 +1054,7 @@ const clickedRowData = async (newvalue) => {
   }
 
   console.log(newvalue);
-  rowIndex.value = newvalue.index;
+  //rowIndex.value = newvalue.index;
   clickrowData4.value = [];
   filteredrowData5.value = [];
   console.log(newvalue);
@@ -1086,62 +1115,62 @@ const clickedRowData = async (newvalue) => {
   fileName.value = newvalue[31];
   fileName2.value =
     newvalue[31] != undefined ? newvalue[31].split("_").slice(1).join("_") : "";
+  console.log(newvalue);
+  if (newvalue[34] == true) {
+    isNew.value = true;
+    clickaddrowSeq.value = rowData.value[newvalue.index].sequence;
+    console.log(clickaddrowSeq.value);
+  } else {
+    isNew.value = false;
+  }
+
+  const firstarr = newvalue[32] != undefined ? newvalue[32].split(";") : [];
+  duplilfirstarr.value = firstarr;
+  if (rowData2.value.length > 0) {
+    let dupliarr = JSON.parse(JSON.stringify(rowData2.value));
+    dupliarr.sort((a, b) => {
+      const aIndex = firstarr.indexOf(a.lngCode.toString());
+      const bIndex = firstarr.indexOf(b.lngCode.toString());
+
+      const rankA = aIndex !== -1 ? 0 : a.lngMenu === 0 ? 0 : 1;
+      const rankB = bIndex !== -1 ? 0 : b.lngMenu === 0 ? 0 : 1;
+
+      // 우선순위(rank)가 다르면 rank에 따라 정렬합니다.
+      if (rankA !== rankB) {
+        return rankA - rankB;
+      }
+
+      // 둘 다 rank 0인 경우 : firstarr에 있으므로 인덱스 순서대로 정렬
+      if (rankA === 0) {
+        return Number(a.lngCode) - Number(b.lngCode);
+      }
+
+      // rank가 1 혹은 2인 경우, 추가 정렬 기준이 필요하면 여기에 추가합니다.
+      // 예를 들어, lngCode 오름차순으로 정렬하는 식으로 할 수도 있습니다.
+      // (여기서는 별도의 추가 기준이 없으므로 0을 반환하여 순서를 그대로 유지)
+      return 0;
+    });
+
+    if (firstarr.length > 0 && firstarr[0] !== "") {
+      for (var i = 0; i < firstarr.length; i++) {
+        const change = dupliarr.find((item) => item.lngCode == firstarr[i]);
+        console.log(dupliarr);
+        if (change) {
+          change.checkbox = true;
+        }
+      }
+    }
+
+    clickrowData2.value = JSON.parse(JSON.stringify(dupliarr));
+  }
   try {
     const response = await axios.get(
       `http://211.238.145.30:8085/Uploads/${fileName.value}`
     );
-
+    await nextTick();
     console.log(response);
     uploadImage.value.name = newvalue[31];
     fileSize.value = response.headers["content-length"];
-
-    await nextTick();
-    if (newvalue[34] == true) {
-      isNew.value = true;
-      clickaddrowSeq.value = rowData.value[newvalue.index].sequence;
-      console.log(clickaddrowSeq.value);
-    } else {
-      isNew.value = false;
-    }
-    const firstarr = newvalue[32] != undefined ? newvalue[32].split(";") : [];
-    duplilfirstarr.value = firstarr;
-    if (rowData2.value.length > 0) {
-      let dupliarr = JSON.parse(JSON.stringify(rowData2.value));
-      dupliarr.sort((a, b) => {
-        const aIndex = firstarr.indexOf(a.lngCode.toString());
-        const bIndex = firstarr.indexOf(b.lngCode.toString());
-
-        const rankA = aIndex !== -1 ? 0 : a.lngMenu === 0 ? 0 : 1;
-        const rankB = bIndex !== -1 ? 0 : b.lngMenu === 0 ? 0 : 1;
-
-        // 우선순위(rank)가 다르면 rank에 따라 정렬합니다.
-        if (rankA !== rankB) {
-          return rankA - rankB;
-        }
-
-        // 둘 다 rank 0인 경우 : firstarr에 있으므로 인덱스 순서대로 정렬
-        if (rankA === 0) {
-          return Number(a.lngCode) - Number(b.lngCode);
-        }
-
-        // rank가 1 혹은 2인 경우, 추가 정렬 기준이 필요하면 여기에 추가합니다.
-        // 예를 들어, lngCode 오름차순으로 정렬하는 식으로 할 수도 있습니다.
-        // (여기서는 별도의 추가 기준이 없으므로 0을 반환하여 순서를 그대로 유지)
-        return 0;
-      });
-
-      if (firstarr.length > 0 && firstarr[0] !== "") {
-        for (var i = 0; i < firstarr.length; i++) {
-          const change = dupliarr.find((item) => item.lngCode == firstarr[i]);
-
-          if (change) {
-            change.checkbox = true;
-          }
-        }
-      }
-
-      clickrowData2.value = JSON.parse(JSON.stringify(dupliarr));
-    }
 
     afterClick.value = false;
     setSubCd3();
@@ -1149,14 +1178,17 @@ const clickedRowData = async (newvalue) => {
     console.log("사진없음");
     uploadImage.value = { name: "" };
     fileSize.value = "";
+  } finally {
+    afterClick.value = false;
   }
 };
 
 const selectedIndex = (e) => {
   changeRow.value = e;
 };
-const selectedIndex2 = (e) => {
-  changeRow2.value = e;
+
+const lngStoreGroup = (e) => {
+  groupCd.value = e;
 };
 const handleStoreCd = async (newValue) => {
   console.log(newValue);
@@ -1173,6 +1205,7 @@ const handleStoreCd = async (newValue) => {
     gridvalue3.value = "";
     initAll();
   }
+
   nowStoreCd.value = newValue;
   searchButton();
 };
@@ -1189,8 +1222,8 @@ const handleinitAll = (newvalue) => {
   MenuGroup.value = [];
   SubMenuGroup.value = [];
   items.value = [];
-  forsearchMain.value = "0";
-  forsearchSub.value = "0";
+  forsearchMain.value = "-1";
+  forsearchSub.value = "-1";
   afterSearch.value = false;
   searchword1.value = "";
   afterSearch.value = false;
@@ -1213,6 +1246,10 @@ const searchButton = async () => {
     });
     return;
   }
+  if (store.state.userData.lngCommonMenu == "1") {
+    nowStoreCd.value = "0";
+  }
+  console.log(groupCd.value, nowStoreCd.value);
   store.state.loading = true;
   try {
     initAll();
@@ -1226,7 +1263,7 @@ const searchButton = async () => {
     const res = await getMenuCodeEnroll(groupCd.value, nowStoreCd.value);
     console.log(res);
     rowData.value = res.data.MENULIST;
-    updateRow.value = rowData.value;
+    updateRow.value = JSON.parse(JSON.stringify(rowData.value));
     MENUDEPEND.value = res.data.MENUDEPEND;
     subTitle.value = res.data.SUBTITLE;
     menuOrderOption.value = res.data.MENUORDEROPTION;
@@ -1263,6 +1300,7 @@ const searchButton = async () => {
     initFocus.value = !initFocus.value;
     initSelect.value = !initSelect.value;
     afterClick.value = true;
+    uploadImages.value = [];
   }
 };
 
@@ -1270,19 +1308,6 @@ const searchWord = ref("");
 const searchColValue2 = ref("");
 const searchC1 = ref(-1);
 const searchC2 = ref(-1);
-
-const searchColumn = (e) => {
-  const columnNm = e.target.name;
-  const value = e.target.value;
-
-  searchColValue2.value = searchC1.value + "," + searchC2.value;
-
-  console.log(searchColValue2.value);
-};
-
-const searchword = (e) => {
-  searchWord.value = e.target.value;
-};
 
 const changeInfo = (e) => {
   const tagName = e.target.name;
@@ -1294,14 +1319,22 @@ const changeInfo = (e) => {
 };
 const searchColValue3 = ref("0,0");
 const filteredSubMenuGroup = ref([]);
-const setSubCd = () => {
-  filteredSubMenuGroup.value = SubMenuGroup.value.filter(
-    (item) => item.sublngMajor == forsearchMain.value
-  );
-
-  forsearchSub.value = "0";
-
-  searchColValue3.value = forsearchMain.value + ",0";
+const searchValue = ref([]);
+const setSubCd = (e) => {
+  const name = e.target.name;
+  const value = e.target.value;
+  if (name == "lngMainGroup") {
+    console.log(SubMenuGroup.value);
+    filteredSubMenuGroup.value = SubMenuGroup.value.filter(
+      (item) => item.sublngMajor == forsearchMain.value
+    );
+    forsearchSub.value = "-1";
+    forsearchMain.value = value;
+    searchValue.value = [value, forsearchSub.value];
+  } else {
+    forsearchSub.value = value;
+    searchValue.value = [forsearchMain.value, value];
+  }
 };
 
 const setSubCd2 = () => {
@@ -1346,7 +1379,19 @@ const changeNow2 = ref(false);
 const checkedRowData = (e) => {
   console.log(e);
 };
-const checkedRowData2 = (e) => {};
+const checkedRowData2 = (e) => {
+  changeColid.value = "strAmtCodeList";
+  console.log(updateRow.value);
+  console.log(e);
+  changeValue2.value = e
+    .filter((item) => item.lngMenu !== "0")
+    .map((item2) => Number(item2.lngCode))
+    .join(";");
+
+  //changeValue2.value = e.changeRow.value = rowIndex.value;
+  changeNow.value = !changeNow.value;
+  console.log(e);
+};
 
 const setAllCheck2 = ref(false);
 const searchWord3 = ref();
@@ -1407,7 +1452,7 @@ watch(gridvalue9, () => {
 });
 
 const saveButton = () => {
-  console.log(rowData.value);
+  console.log(updateRow.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -1417,7 +1462,12 @@ const saveButton = () => {
     });
     return;
   }
-  if (JSON.stringify(confirmData.value) === JSON.stringify(rowData.value)) {
+  if (
+    updateDeleteInsertrowIndex.value.deleted.length +
+      updateDeleteInsertrowIndex.value.created.length +
+      updateDeleteInsertrowIndex.value.updated.length ==
+    0
+  ) {
     Swal.fire({
       title: "경고",
       text: "변경된 사항이 없습니다.",
@@ -1427,7 +1477,7 @@ const saveButton = () => {
     return;
   }
 
-  const validateRow = rowData.value.filter(
+  const validateRow = updateRow.value.filter(
     (item) =>
       item.lngCode === "" ||
       item.lngCode === undefined ||
@@ -1456,8 +1506,8 @@ const saveButton = () => {
   }
 
   const validateRow2 =
-    new Set(rowData.value.map((item) => item.lngCode)).size ==
-    rowData.value.map((item) => item.lngCode).length;
+    new Set(updateRow.value.map((item) => item.lngCode)).size ==
+    updateRow.value.map((item) => item.lngCode).length;
 
   if (validateRow2 == false) {
     Swal.fire({
@@ -1480,47 +1530,25 @@ const saveButton = () => {
     if (result.isConfirmed) {
       store.state.loading = true;
       try {
+        const deletedRow = updateRow.value.filter((_, index) =>
+          updateDeleteInsertrowIndex.value.deleted.includes(index)
+        );
+        const updatedAndInsertRow = updateRow.value.filter(
+          (_, index) =>
+            updateDeleteInsertrowIndex.value.updated.includes(index) ||
+            updateDeleteInsertrowIndex.value.created.includes(index)
+        );
+        console.log(updateDeleteInsertrowIndex.value);
+        console.log(updatedAndInsertRow);
         const filterAndMap = (key) =>
-          rowData.value
-            .filter((item) => item.deleted !== true)
-            .map((item) => item[key])
-            .join("\u200B");
+          updatedAndInsertRow.map((item) => item[key]).join("\u200B");
 
-        const deleteCd = rowData.value
-          .filter((item) => item.deleted == true)
-          .map((item) => item.lngCode);
+        const deleteCd = deletedRow.map((item) => item.lngCode);
 
-        console.log(rowData.value.length);
-        console.log(nowStoreCd.value);
+        console.log(updatedAndInsertRow);
+        console.log(deleteCd.join(","));
         console.log(filterAndMap("lngMainGroup"));
-        console.log(filterAndMap("lngSubGroup"));
-        console.log(filterAndMap("lngCode"));
-        console.log(filterAndMap("dtmFromDate"));
-        console.log(filterAndMap("dtmToDate"));
-        console.log(filterAndMap("strName"));
-        console.log(filterAndMap("strNameE"));
-        console.log(filterAndMap("lngDCPrice"));
-        console.log(filterAndMap("lngChain"));
-        console.log(filterAndMap("lngPrice"));
-        console.log(filterAndMap("blnDCPriceYN"));
-        console.log(filterAndMap("lngTax"));
-        console.log(filterAndMap("blnInactive"));
-        console.log(filterAndMap("lngDiscount"));
-        console.log(filterAndMap("intCustCount"));
-        console.log(filterAndMap("blnCondimentprice"));
-        console.log(filterAndMap("lngOrder"));
-        console.log(filterAndMap("lngKPG"));
-        console.log(filterAndMap("strBarCode"));
-        console.log(filterAndMap("blnReceipt"));
-        console.log(filterAndMap("lngMenuOption"));
-        console.log(filterAndMap("blnRedPrint"));
-        console.log(filterAndMap("strIcon"));
-        console.log(filterAndMap("blnKitSingle"));
-        console.log(filterAndMap("lngSubTitle"));
-        console.log(filterAndMap("blnServing"));
-        console.log(filterAndMap("blnOpen"));
-        console.log(filterAndMap("strAmtCodeList"));
-        console.log(filterAndMap("strUserFileName"));
+
         const res = await saveMenuCode(
           groupCd.value,
           nowStoreCd.value,
@@ -1560,12 +1588,15 @@ const saveButton = () => {
           deleteCd.join(",")
         );
         console.log(res);
+
+        console.log(updatedAndInsertRow);
+
         console.log(uploadImages.value);
-        console.log(rowData.value);
+        console.log(updateRow.value);
 
         const formData = new FormData();
         uploadImages.value.forEach((file, index) => {
-          const existedName = rowData.value.filter(
+          const existedName = updateRow.value.filter(
             (item) => item.strUserFileName == file.name
           );
 
@@ -1576,6 +1607,7 @@ const saveButton = () => {
 
         if (uploadImages.value.length >= 1) {
           try {
+            console.log(formData.entries());
             const res2 = await uploadFile(formData);
             console.log(res2);
           } catch (error) {
@@ -1607,6 +1639,7 @@ const saveButton = () => {
 };
 
 const updatedRowData = (newvalue) => {
+  updateRow.value = newvalue;
   //   newvalue.forEach((newItem) => {
   //   const targetRow = rowData.value.find(row => row.lngCode == newItem.lngCode);
   //   if (targetRow) {
@@ -1626,34 +1659,34 @@ const updatedRowData = (newvalue) => {
 
   // rowData를 Map으로 변환 (기존 배열의 특정 필드를 key로 사용)
 
-  const rowDataMap = new Map(
-    rowData.value.map((row) => [
-      row.sequence !== undefined ? row.sequence : row.lngCode.toString(),
-      row,
-    ])
-  );
+  // const rowDataMap = new Map(
+  //   rowData.value.map((row) => [
+  //     row.sequence !== undefined ? row.sequence : row.lngCode.toString(),
+  //     row,
+  //   ])
+  // );
 
-  newvalue.forEach((newItem) => {
-    const targetRow = rowDataMap.get(
-      newItem.new == true ? clickaddrowSeq.value : newItem.lngCode.toString()
-    ); // Map을 통해 빠르게 찾기
+  // newvalue.forEach((newItem) => {
+  //   const targetRow = rowDataMap.get(
+  //     newItem.new == true ? clickaddrowSeq.value : newItem.lngCode.toString()
+  //   ); // Map을 통해 빠르게 찾기
 
-    if (targetRow) {
-      // targetRow가 있으면 값을 업데이트
-      Object.keys(newItem).forEach((key) => {
-        targetRow[key] = newItem[key]; // 속성 업데이트
-      });
-    } else {
-      // find 방식 대신 sequence로 찾기
-      const targetRow2 = rowDataMap.get(clickaddrowSeq.value.toString());
+  //   if (targetRow) {
+  //     // targetRow가 있으면 값을 업데이트
+  //     Object.keys(newItem).forEach((key) => {
+  //       targetRow[key] = newItem[key]; // 속성 업데이트
+  //     });
+  //   } else {
+  //     // find 방식 대신 sequence로 찾기
+  //     const targetRow2 = rowDataMap.get(clickaddrowSeq.value.toString());
 
-      Object.keys(newItem).forEach((key) => {
-        targetRow2[key] = newItem[key]; // 속성 업데이트
-      });
-    }
-  });
+  //     Object.keys(newItem).forEach((key) => {
+  //       targetRow2[key] = newItem[key]; // 속성 업데이트
+  //     });
+  //   }
+  // });
 
-  rowData.value = [...rowData.value];
+  // rowData.value = [...rowData.value];
 };
 const updatedList2 = ref([]);
 const updatedRowData2 = (newvalue) => {
@@ -1781,112 +1814,7 @@ const clickedRowData2 = (e) => {
     changeNow.value = !changeNow.value;
   }
 };
-// watch((forsearchMain) , () => {
 
-// if(forsearchMain.value == 0  && searchWord2.value == ''){
-// clickrowData4.value = [...clickrowData2.value]
-
-// } else if( forsearchMain.value != 0  && searchWord2.value == '') {
-// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value)
-// } else if( forsearchMain.value == 0  && searchWord2.value != '') {
-// clickrowData4.value = clickrowData2.value.filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-// } else {
-// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-// }
-// forsearchSub.value = 0 ;
-
-// })
-
-// watch((searchWord2) , () => {
-// if(forsearchMain.value == 0 && forsearchSub.value == 0  && searchWord2.value == ''){
-// clickrowData4.value = [...clickrowData2.value]
-
-// } else if( forsearchMain.value != 0 && forsearchSub.value == 0  && searchWord2.value == '') {
-// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value)
-// } else if( forsearchMain.value == 0  && forsearchSub.value == 0 && searchWord2.value != '') {
-// clickrowData4.value = clickrowData2.value.filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-// } else if( forsearchMain.value == 0 && forsearchSub.value != 0  && searchWord2.value != '') {
-// clickrowData4.value = clickrowData2.value.filter(item => item.subGroupCd == forsearchSub.value ).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-// } else if ( forsearchMain.value != 0 && forsearchSub.value != 0  && searchWord2.value != '') {
-// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value && item.subGroupCd == forsearchSub.value).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-// }
-// })
-
-// watch((forsearchSub) , () => {
-// if(forsearchSub.value == 0 && forsearchMain.value == 0  && searchWord2.value == ''){
-// clickrowData4.value = [...clickrowData2.value]
-// } else if (forsearchSub.value == 0 && forsearchMain.value != 0 && searchWord2.value == '') {
-// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value)
-// } else if(forsearchSub.value != 0 && forsearchMain.value != 0 && searchWord2.value == '') {
-// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value && item.subGroupCd == forsearchSub.value)
-// } else if(forsearchSub.value == 0 && forsearchMain.value == 0  && searchWord2.value != ''){
-// clickrowData4.value = clickrowData2.value.filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-// } else if(forsearchSub.value == 0 && forsearchMain.value != 0 && searchWord2.value != ''){
-// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-// } else if (forsearchSub.value != 0 && forsearchMain.value != 0 && searchWord2.value != ''){
-// clickrowData4.value = clickrowData2.value.filter(item => item.majorGroupCd == forsearchMain.value && item.subGroupCd == forsearchSub.value).filter(item => item.menuCd.includes(searchWord2.value)|| item.menuNm.includes(searchWord2.value))
-// }
-
-// })
-
-// watch((searchWord3) , () => {
-// if(searchWord3.value == ''){
-// filteredrowData5.value = [...filteredrowData3.value]
-// } else {
-// filteredrowData5.value = filteredrowData3.value.filter(item => item.lngCode.toString().includes(searchWord3.value)|| item.strName.includes(searchWord3.value))
-// }
-// })
-// watch((searchC1) , () => {
-// initAll()
-// console.log(rowData.value)
-// rowData.value = rowData.value.filter(item => item.lngCode !=undefined && item.lngCode != '')
-// if(searchC1.value == -1){
-// if(searchC2.value == -1 ){
-//   updateRow.value = [...rowData.value]
-// } else {
-//   updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value)
-// }
-// } else if (searchC1.value != -1){
-// if(searchC2.value == -1 ){
-//   updateRow.value = rowData.value.filter(item => item.blnInactive == searchC1.value)
-// } else {
-//   updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value && item.blnInactive == searchC1.value)
-// }
-// }
-// })
-// watch((searchC2) , () => {
-// initAll()
-// if(searchC1.value == -1){
-// if(searchC2.value == -1 ){
-//   updateRow.value = [...rowData.value]
-// } else {
-//   updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value)
-// }
-// } else if (searchC1.value != -1){
-// if(searchC2.value == -1 ){
-//   updateRow.value = rowData.value.filter(item => item.blnInactive == searchC1.value)
-// } else {
-//   updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value && item.blnInactive == searchC1.value)
-// }
-// }
-// })
-
-// watch((searchWord) , () => {
-// initAll()
-// if(searchC1.value == -1){
-// if(searchC2.value == -1 ){
-//   updateRow.value = rowData.value.filter(item => item.lngCode?.toString().includes(searchWord.value) || item.strName?.toString().includes(searchWord.value))
-// } else {
-//   updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value).filter(item => item.lngCode.toString().includes(searchWord.value) || item.strName.toString().includes(searchWord.value))
-// }
-// } else if (searchC1.value != -1){
-// if(searchC2.value == -1 ){
-//   updateRow.value = rowData.value.filter(item => item.blnInactive == searchC1.value).filter(item => item.lngCode.toString().includes(searchWord.value) || item.strName.toString().includes(searchWord.value))
-// } else {
-//   updateRow.value = rowData.value.filter(item => item.payDistinct == searchC2.value && item.blnInactive == searchC1.value).filter(item => item.lngCode.toString().includes(searchWord.value) || item.strName.toString().includes(searchWord.value))
-// }
-// }
-// })
 const initFocus = ref(true);
 const initAll = () => {
   selectedMenu.value = 1;
@@ -1896,8 +1824,8 @@ const initAll = () => {
   rowData2.value = [];
   clickrowData2.value = [];
   updateRow.value = [];
-  forsearchMain.value = 0;
-  forsearchSub.value = 0;
+  forsearchMain.value = -1;
+  forsearchSub.value = -1;
   searchWord3.value = "";
   searchWord2.value = "";
   gridvalue1.value = "";
@@ -1934,42 +1862,42 @@ const initAll = () => {
 
 const searchPayCd = (e) => {
   const value = e.target.value;
+  searchWord2.value = value;
+  // clickrowData2.value = rowData2.value.filter(
+  //   (item) =>
+  //     item.strName.includes(value) || item.lngCode.toString().includes(value)
+  // );
 
-  clickrowData2.value = rowData2.value.filter(
-    (item) =>
-      item.strName.includes(value) || item.lngCode.toString().includes(value)
-  );
+  // duplilfirstarr.value = rowData.value
+  //   .filter((item) => item.lngCode == gridvalue3.value)
+  //   .map((item) => item.strAmtCodeList)[0]
+  //   .split(";");
 
-  duplilfirstarr.value = rowData.value
-    .filter((item) => item.lngCode == gridvalue3.value)
-    .map((item) => item.strAmtCodeList)[0]
-    .split(";");
+  // if (clickrowData2.value.length > 0) {
+  //   let dupliarr = JSON.parse(JSON.stringify(clickrowData2.value));
+  //   dupliarr.sort((a, b) => {
+  //     const aIndex = duplilfirstarr.value.indexOf(a.lngCode.toString());
+  //     const bIndex = duplilfirstarr.value.indexOf(b.lngCode.toString());
 
-  if (clickrowData2.value.length > 0) {
-    let dupliarr = JSON.parse(JSON.stringify(clickrowData2.value));
-    dupliarr.sort((a, b) => {
-      const aIndex = duplilfirstarr.value.indexOf(a.lngCode.toString());
-      const bIndex = duplilfirstarr.value.indexOf(b.lngCode.toString());
+  //     if (aIndex === -1 && bIndex === -1) return 0; // 둘 다 우선순위에 없음
+  //     if (aIndex === -1) return 1; // a가 우선순위에 없음
+  //     if (bIndex === -1) return -1; // b가 우선순위에 없음
+  //     return aIndex - bIndex; // 우선순위 배열에 따라 정렬
+  //   });
 
-      if (aIndex === -1 && bIndex === -1) return 0; // 둘 다 우선순위에 없음
-      if (aIndex === -1) return 1; // a가 우선순위에 없음
-      if (bIndex === -1) return -1; // b가 우선순위에 없음
-      return aIndex - bIndex; // 우선순위 배열에 따라 정렬
-    });
+  //   if (duplilfirstarr.value.length > 0 && duplilfirstarr.value[0] !== "") {
+  //     for (var i = 0; i < duplilfirstarr.value.length; i++) {
+  //       const change = dupliarr.find(
+  //         (item) => item.lngCode == duplilfirstarr.value[i]
+  //       );
 
-    if (duplilfirstarr.value.length > 0 && duplilfirstarr.value[0] !== "") {
-      for (var i = 0; i < duplilfirstarr.value.length; i++) {
-        const change = dupliarr.find(
-          (item) => item.lngCode == duplilfirstarr.value[i]
-        );
-
-        if (change) {
-          change.checkbox = true;
-        }
-      }
-    }
-    clickrowData2.value = dupliarr;
-  }
+  //       if (change) {
+  //         change.checkbox = true;
+  //       }
+  //     }
+  //   }
+  //   clickrowData2.value = dupliarr;
+  // }
 };
 const uploadImage = ref({ name: "" });
 const uploadImages = ref([]);
