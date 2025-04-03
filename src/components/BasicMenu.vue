@@ -231,7 +231,7 @@ const selectCategory = (strUrl, lngProgramID2, strTitle) => {
         });
       } else {
         const uuid = v4();
-        const lngProgramIdv4 = lngProgramID2 + uuid;
+        const lngProgramIdv4 = lngProgramID2 + "_" + uuid;
         const newTab = { strUrl, lngProgramID: lngProgramIdv4, strTitle };
         emit("activeTab", newTab);
         tabs.value.push(newTab);
@@ -243,7 +243,7 @@ const selectCategory = (strUrl, lngProgramID2, strTitle) => {
     });
   } else {
     const uuid = v4();
-    const lngProgramIdv4 = lngProgramID2 + uuid;
+    const lngProgramIdv4 = lngProgramID2 + "_" + uuid;
     console.log(lngProgramIdv4);
     const newTab = { strUrl, lngProgramID: lngProgramIdv4, strTitle };
     tabs.value.push(newTab);

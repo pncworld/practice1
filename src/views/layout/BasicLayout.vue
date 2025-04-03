@@ -160,6 +160,7 @@ import BasicMenu from "@/components/BasicMenu.vue";
 import Loading from "@/components/loading.vue";
 import router from "@/router";
 import Swal from "sweetalert2";
+import { v4 } from "uuid";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
@@ -281,7 +282,18 @@ const removeTab = (tab) => {
 //ref 는 기존의 변수까지 전부 병렬적으로 바꾸는거 같고 computed는 직렬적으로 바꾸는 것 같음
 
 const reLoad = () => {
-  window.location.reload(); // 페이지 새로 고침
+  // window.location.reload(); // 페이지 새로 고침
+  console.log(currentActiveTab.value);
+  console.log(tabs.value);
+  const uuid = v4();
+  const b = currentActiveTab.value.lngProgramID.split("_")[0];
+  const a = tabs.value.find(
+    (item) => item.lngProgramID == currentActiveTab.value.lngProgramID
+  );
+
+  const c = b + "_" + uuid;
+  a.lngProgramID = c;
+  componentKey.value = c;
 };
 
 const currentActiveTab = ref({ lngProgramID: "", strTitle: "" });
