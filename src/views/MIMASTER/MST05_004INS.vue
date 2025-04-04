@@ -189,12 +189,12 @@
             @click="showMenus(2)">
             TLU관리
           </button>
-          <button
+          <!-- <button
             class="contents_tab-button"
             :class="{ 'text-blue-600': currentMenu == 3 }"
             @click="showMenus(3)">
             화면관리
-          </button>
+          </button> -->
         </div>
         <div class="mt-3">
           <!-- <button class="whitebutton" @click="searchMenuList3">조회</button> -->
@@ -209,18 +209,23 @@
           </div>
           <div class="px-4 py-2 border border-gray-300 rounded-tr-lg flex">
             <select
-              name=""
+              name="majorGroupCd"
               id=""
               class="flex-1"
               @change="setSubCd"
               v-model="forsearchMain">
-              <option value="0">전체</option>
+              <option value="-1">전체</option>
               <option :value="i.GroupCd" v-for="i in MenuGroup">
                 [{{ i.GroupCd }}]{{ i.majorGroupNm }}
               </option>
             </select>
-            <select name="" id="" class="flex-1" v-model="forsearchSub">
-              <option value="0">전체</option>
+            <select
+              name="subGroupCd"
+              id=""
+              class="flex-1"
+              v-model="forsearchSub"
+              @change="setSubCd">
+              <option value="-1">전체</option>
               <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup">
                 [{{ i.GroupCd }}]{{ i.subGroupNm }}
               </option>
@@ -233,11 +238,20 @@
             <input
               type="text"
               class="border w-full h-full px-1 border-gray-400 rounded-lg"
-              @input="searchMenuList" />
+              @input="searchMenuList"
+              v-model="searchword1" />
           </div>
         </div>
-        <div class="ml-10 mt-5 w-full h-full">
-          <div id="realgrid" style="width: 100%; height: 180%"></div>
+        <div class="ml-10 mt-5 w-full h-[170%]">
+          <Realgrid
+            :progname="'MST05_011INS_VUE'"
+            :progid="1"
+            :rowData="MenuList"
+            @selcetedrowData="selcetedrowData"
+            :searchColId="'menuCd,menuNm'"
+            :searchColId3="['majorGroupCd', 'subGroupCd']"
+            :searchValue="searchValue"
+            :searchWord3="searchword1"></Realgrid>
         </div>
       </div>
 
@@ -251,39 +265,54 @@
             <input
               type="text"
               class="border w-full h-full px-1 border-gray-400 rounded-lg"
-              @input="searchMenuList2" />
+              @input="searchMenuList2"
+              v-model="searchword3" />
           </div>
         </div>
         <div class="ml-10 mt-5 w-full h-full">
-          <div id="realgrid2" style="width: 100%; height: 90%"></div>
-          <div
-            id="realgrid3"
-            style="width: 100%; height: 90%"
-            class="mt-5"></div>
+          <Realgrid
+            class="h-[120%]"
+            :progname="'MST05_011INS_VUE'"
+            :progid="2"
+            :rowData="TLUList"
+            @selcetedrowData="selcetedrowData2"
+            @clickedRowData="clickedRowData"
+            @realgridname="realgridname"
+            :searchColId="'lngCode,strName'"
+            :searchWord3="searchword3"></Realgrid>
+          <Realgrid
+            class="h-[70%] mt-5"
+            :progname="'MST05_011INS_VUE'"
+            :progid="3"
+            :rowData="TLUSubList"
+            @realgridname="realgridname2"></Realgrid>
         </div>
       </div>
       <div class="h-full" v-show="currentMenu == 3">
-        <div class="mt-7 ml-10 w-full h-full">
+        <div class="mt-7 ml-10 w-full h-[160%]">
           <Realgrid
-            :progname="'MST01_004INS_VUE'"
-            :progid="3"
-            :rowData="rowData"
-            :showGrid="showGrid"
-            :showCheckBar="false"
-            @selcetedrowData="selcetedrowData"></Realgrid>
+            class="h-full"
+            :progname="'MST05_011INS_VUE'"
+            :progid="1"
+            :rowData="MenuList"
+            @selcetedrowData="selcetedrowData"
+            :searchColId="'menuCd,menuNm'"
+            :searchColId3="['majorGroupCd', 'subGroupCd']"
+            :searchValue="searchValue"
+            :searchWord3="searchword1"></Realgrid>
         </div>
       </div>
     </div>
     <div class="grid grid-rows-1 grid-cols-1 ml-10 w-full h-full z-20">
       <div class="flex h-[760px] w-[950px] mt-10 ml-8" v-show="afterSearch">
         <VueDraggableNext
-          v-model="showMenuKeyList"
+          v-model="items"
           :move="onMove"
           @end="onEnd"
           animation="200"
           class="grid grid-cols-5 grid-rows-9 gap-1 w-[950px] h-[760px]">
           <div
-            v-for="(item, index) in showMenuKeyList"
+            v-for="(item, index) in items"
             class="flex items-center justify-center h-20 w-44 rounded-2xl shadow-sm border border-gray-500"
             :class="{ '!bg-orange-500': clickedMenuKey == index }"
             @click="
@@ -295,17 +324,18 @@
               <span v-if="item.intKeyNo == 1"
                 >(Screen. {{ item.lngKeyscrNo }} )</span
               >
-              <span>{{
+              <span v-if="item.intKeyNo == 6"
+                >{{ item.lngKeyscrNo }} <br />{{ item.strKeyName }}</span
+              >
+              <span v-if="item.intKeyNo == 7"
+                >{{ item.lngKeyscrNo }} <br />{{ item.strKeyName }}</span
+              >
+              <span v-if="item.intKeyNo == 1">{{
                 item ? formatStrKeyName(item.strKeyName).part1 : ""
               }}</span>
-              <span>{{
-                item ? formatStrKeyName(item.strKeyName).part2 : ""
-              }}</span>
-              <span class="ml-16">{{
-                item
-                  ? formatStrKeyName(item.strKeyName).part3 != null
-                    ? formatStrKeyName(item.strKeyName).part3 + "원"
-                    : ""
+              <span class="ml-16" v-if="item.intKeyNo == 6">{{
+                item.lngKeyscrNo
+                  ? Number(item.lngPrice).toLocaleString() + "원"
                   : ""
               }}</span>
             </span>
@@ -330,7 +360,7 @@ import DupliPopUp from "@/components/dupliPopUp.vue";
 import DupliPopUp2 from "@/components/dupliPopUp2.vue";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
-import { GridView, LocalDataProvider } from "realgrid";
+import RealGrid, { GridView, LocalDataProvider } from "realgrid";
 import Swal from "sweetalert2";
 import { onMounted, ref, watch } from "vue";
 import { VueDraggableNext } from "vue-draggable-next";
@@ -343,8 +373,8 @@ const ScreenKeyOrigin = ref([]);
 const clickedMenuKey = ref();
 const ScreenKeys = ref();
 const currentMenuorTLU = ref(false);
-const forsearchMain = ref("0");
-const forsearchSub = ref("0");
+const forsearchMain = ref(-1);
+const forsearchSub = ref(-1);
 const addscreenKey = ref(false);
 const searchWord = ref("");
 const searchWord2 = ref("");
@@ -382,6 +412,7 @@ const currmenuKeyPage = ref(1);
 const AllscreenKeyPage = ref(1);
 const currentSelectedMenuNm = ref("");
 const showSpecificMenukey = ref(false);
+const searchword3 = ref("");
 const rowData = ref([
   { screenName: "화면1", add: "추가", screenNo: 1 },
   { screenName: "화면2", add: "추가", screenNo: 2 },
@@ -419,13 +450,64 @@ const SpecificMenuDupli = () => {
   }
   showSpecificMenukey.value = true;
 };
+const TLUSubList = ref([]);
+const clickedRowData = (e) => {
+  TLUSubList.value = [];
+  for (let i = 1; i <= 29; i++) {
+    if (MenuList.value.filter((item) => item.menuCd == e[i]).length > 0) {
+      TLUSubList.value.push({
+        lngCode: e[i],
+        strName: MenuList.value.filter((item) => item.menuCd == e[i])[0].menuNm,
+      });
+    }
+  }
+};
 const showScreenNm = ref(false);
-const selcetedrowData = (newvalue) => {
-  console.log(newvalue[2]);
-  showScreenNm.value = true;
-  currentSelectedMenuNm.value = newvalue[0];
-  currentSelectedMenuCode.value = newvalue[2];
-  // addScreenKeyf()
+const realgrid2Name = ref("");
+const realgridname = (e) => {
+  realgrid2Name.value = e;
+};
+const realgrid3Name = ref("");
+const realgridname2 = (e) => {
+  realgrid3Name.value = e;
+};
+
+watch(currentMenu, () => {
+  const reagrid2 = document.getElementById(realgrid2Name.value);
+  setTimeout(() => {
+    RealGrid.getGridInstance(reagrid2).resetSize();
+    RealGrid.getGridInstance(reagrid2).refresh(true);
+  }, 100);
+
+  const realgrid3 = document.getElementById(realgrid3Name.value);
+  setTimeout(() => {
+    RealGrid.getGridInstance(realgrid3).resetSize();
+    RealGrid.getGridInstance(realgrid3).refresh(true);
+  }, 100);
+});
+const currentSelectedMenuCode = ref();
+const currentSelectedMenuPrice = ref();
+
+const selcetedrowData = (e) => {
+  if (clickedRealIndex.value == null) {
+    return;
+  }
+  //console.log(e);
+  currentSelectedMenuNm.value = e[1];
+  currentSelectedMenuCode.value = e[0];
+  currentSelectedMenuPrice.value = e[2];
+  addMenuKey();
+};
+
+const selcetedrowData2 = (e) => {
+  if (clickedRealIndex.value == null) {
+    return;
+  }
+  console.log(e);
+  currentSelectedMenuNm.value = e[1];
+  currentSelectedMenuCode.value = e[0];
+  currentSelectedMenuPrice.value = "";
+  addMenuKey2();
 };
 
 const showPopupf = () => {
@@ -440,8 +522,13 @@ const showPopupf = () => {
   }
   showPopup2.value = true;
 };
+
+const searchword1 = ref("");
 function formatStrKeyName(strKeyName) {
   // 첫 번째 파싱: '/' 기준으로 분리
+  if (strKeyName == null || strKeyName == undefined) {
+    return "";
+  }
   const firstSplit = strKeyName.split("/");
 
   // 두 번째 파싱: '(' 기준으로 분리
@@ -456,7 +543,7 @@ function formatStrKeyName(strKeyName) {
 }
 const changed2 = (newvalue) => {
   MenuKeyList.value = [];
-  showMenuKeyList.value = [];
+  items.value = [];
 };
 
 const updateMenuKey = ref(false);
@@ -499,6 +586,7 @@ const saveMenuKey = () => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
+        store.state.loading = true;
         const res = await saveMenuKey2(
           groupCd.value,
           nowStoreCd.value,
@@ -519,6 +607,7 @@ const saveMenuKey = () => {
         }
       } catch (error) {
       } finally {
+        store.state.loading = false;
         searchMenu();
       }
     }
@@ -619,7 +708,7 @@ const searchMenu = async () => {
   store.state.loading = true;
   try {
     MenuKeyList.value = [];
-    showMenuKeyList.value = [];
+    items.value = [];
 
     const res3 = await getScreenList2(
       groupCd.value,
@@ -627,6 +716,8 @@ const searchMenu = async () => {
       nowStoreAreaCd.value,
       posNo.value
     );
+
+    console.log(res3);
     const res4 = await getMenuKeyList2(
       groupCd.value,
       nowStoreCd.value,
@@ -656,9 +747,9 @@ const searchMenu = async () => {
         (item) => item.intKeySeq === i + 1
       );
       if (existingItem) {
-        showMenuKeyList.value.push(existingItem);
+        items.value.push(existingItem);
       } else {
-        showMenuKeyList.value.push({
+        items.value.push({
           intKeySeq: i,
           strKeyName: ``, // 기본값 또는 placeholder
         });
@@ -678,15 +769,21 @@ const searchMenu = async () => {
   calculateMaxSubCode();
 };
 const filteredSubMenuGroup = ref([]);
-const setSubCd = () => {
-  console.log(forsearchMain.value);
+const searchValue = ref([]);
+const setSubCd = (e) => {
+  const name = e.target.name;
+  const value = e.target.value;
   console.log(SubMenuGroup.value);
-  filteredSubMenuGroup.value = SubMenuGroup.value.filter(
-    (item) => item.sublngMajor == forsearchMain.value
-  );
-  console.log(filteredSubMenuGroup.value);
-  forsearchSub.value = "0";
-  searchMenuList3();
+  console.log(MenuGroup.value);
+  if (name == "majorGroupCd") {
+    filteredSubMenuGroup.value = SubMenuGroup.value.filter(
+      (item) => item.sublngMajor == value
+    );
+    searchValue.value = [value, forsearchSub.value];
+    forsearchSub.value = -1;
+  } else if (name == "subGroupCd") {
+    searchValue.value = [forsearchMain.value, value];
+  }
 };
 const clickedintScreenNo = ref();
 const calculateMaxSubCode = () => {
@@ -697,28 +794,50 @@ const calculateMaxSubCode = () => {
   );
 };
 const showMenuKey = (value) => {
-  showMenuKeyList.value = [];
+  items.value = Array.from({ length: 45 }, (_, index) => ({
+    intKeySeq: index + 1,
+  }));
+  console.log(MenuKeyList.value);
+  console.log(nowscreenNo.value);
   const filteredList = MenuKeyList.value.filter(
     (item) =>
-      item.intKeySeq >= (nowscreenNo.value - 1) * 45 &&
+      item.intKeySeq >= (nowscreenNo.value - 1) * 45 + 1 &&
       item.intKeySeq <= nowscreenNo.value * 45
   );
-
-  const startIndex = (nowscreenNo.value - 1) * 45;
+  console.log(filteredList);
+  const startIndex = (nowscreenNo.value - 1) * 45 + 1;
   const endIndex = nowscreenNo.value * 45;
   // 중간에 비어 있는 번호 확인 및 채우기
-  for (let i = startIndex; i < endIndex; i++) {
+  for (let i = startIndex; i <= endIndex; i++) {
     // 해당 번호가 없는 경우 기본값 추가
-    const existingItem = filteredList.find((item) => item.intKeySeq === i + 1);
-    if (existingItem) {
-      showMenuKeyList.value.push(existingItem);
+    const existingItem = filteredList.find((item) => item.intKeySeq === i);
+
+    const targetIndex = items.value.findIndex(
+      (item) => item.intKeySeq === i - startIndex + 1
+    );
+
+    if (targetIndex !== -1 && existingItem) {
+      items.value[targetIndex] = existingItem;
     } else {
-      showMenuKeyList.value.push({
-        intKeySeq: i + 1,
-        strKeyName: ``, // 기본값 또는 placeholder
-      });
     }
   }
+
+  // if (clickedintScreenNo.value != value) {
+  //   currmenuKeyPage.value = 1;
+  // }
+  // clickedintScreenNo.value = value;
+  // items.value = Array.from({ length: 30 }, (_, index) => ({
+  //   intKeySeq: index + 1,
+  // }));
+
+  // MenuKeyList.value
+  //   .filter((item) => item.intPosNo == posNo.value && item.intScreenNo == value)
+  //   .forEach((item) => {
+  //     const position = item.intKeySeq - (currmenuKeyPage.value - 1) * 30 - 1;
+  //     if (position >= 0 && position < 30) {
+  //       items.value[position] = item;
+  //     }
+  //   });
 };
 watch(ScreenKeys, (newvalue) => {
   if (ScreenKeys.value.length > 10) {
@@ -754,26 +873,26 @@ const onEnd = (evt) => {
   if (changeMode.value === false) {
     console.log(MenuKeyList.value);
     const oldIndex = evt.oldIndex; // 드래그된 아이템의 기존 인덱스
-    const swappedItems = [...showMenuKeyList.value]; // items를 복사
+    const swappedItems = [...items.value]; // items를 복사
     const temp = swappedItems[oldIndex];
 
     swappedItems[oldIndex] = swappedItems[targetItemIndex2];
 
     swappedItems[targetItemIndex2] = temp;
 
-    showMenuKeyList.value = swappedItems.map((item, index) => ({
+    items.value = swappedItems.map((item, index) => ({
       ...item, // 기존 객체의 다른 속성 유지
       intKeySeq: index + (nowscreenNo.value - 1) * 45 + 1, // 배열 순서대로 intKeySeq 재정렬
     }));
   } else {
     updateMenuKey.value = true;
-    showMenuKeyList.value = showMenuKeyList.value.map((item, index) => ({
+    items.value = items.value.map((item, index) => ({
       ...item, // 기존 객체의 다른 속성 유지
       intKeySeq: index + (nowscreenNo.value - 1) * 45 + 1, // 배열 순서대로 intKeySeq 재정렬
     }));
   }
 
-  console.log(showMenuKeyList.value);
+  console.log(items.value);
 };
 function formatNumber(value) {
   if (!value) return "";
@@ -801,38 +920,20 @@ const onEnd2 = (evt) => {
 };
 watch(items, (newvalue) => {
   console.log(newvalue);
-  newvalue.forEach((item, index) => {
-    if (item == null || item.lngKeyscrNo == null || item.lngKeyscrNo == "") {
-      newvalue[index] = {
-        intKeySeq: index + (currmenuKeyPage.value - 1) * 30 + 1,
-      };
+  items.value.forEach((item) => {
+    const index = MenuKeyList.value.findIndex(
+      (m) => m.intKeySeq == item.intKeySeq
+    );
+
+    if (index !== -1) {
+      MenuKeyList.value[index] = item; // 💥 여기서 items 걸로 덮어씌움
     } else {
-      item.intKeySeq = index + (currmenuKeyPage.value - 1) * 30 + 1;
+      MenuKeyList.value.push(item); // 💥 없으면 추가
     }
   });
-  console.log(items.value);
   console.log(MenuKeyList.value);
 });
-watch(showMenuKeyList, (newvalue) => {
-  const firstfiltered = showMenuKeyList.value.filter(
-    (item) => item.lngKeyscrNo != undefined
-  );
 
-  console.log(firstfiltered);
-  console.log(MenuKeyList.value);
-
-  let secondfiltered = MenuKeyList.value.filter(
-    (item) =>
-      item.intKeySeq < (nowscreenNo.value - 1) * 45 ||
-      item.intKeySeq > nowscreenNo.value * 45
-  );
-  console.log(secondfiltered);
-  firstfiltered.forEach((updatedItem) => {
-    secondfiltered.push(updatedItem);
-  });
-  MenuKeyList.value = secondfiltered;
-  console.log(MenuKeyList.value);
-});
 const savePosMenu = async () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -931,342 +1032,16 @@ const savePosMenu = async () => {
 
   // 빈공간 데이터를 넣으려고하는데 안 들어가고 조회가 안됨 // 빈 칸에 대한 것도 데이터를 불러와야 메뉴키위치를 정할 수 있음.
 };
-let gridView;
-let dataProvider;
-const currentSelectedMenuCode = ref("");
-onMounted(() => {
-  showMenuKeys();
-});
 
-const showMenuKeys = () => {
-  if (gridView !== undefined && gridView !== null) {
-    dataProvider.clearRows();
-    console.log(gridView);
-    gridView.destroy();
-
-    // 기존 그리드 인스턴스 제거
-  }
-
-  dataProvider = new LocalDataProvider();
-  const container = document.getElementById("realgrid");
-  if (!container || container == null) {
-    console.error(`Invalid grid container element: realgrid`);
-    return;
-  }
-  // 2. GridView 설정
-  gridView = new GridView(container);
-  gridView.setDataSource(dataProvider);
-
-  // 3. 필드 정의
-  const fields = [
-    { fieldName: "menuCd", dataType: "text" },
-    { fieldName: "menuNm", dataType: "text" },
-    { fieldName: "lngPrice", dataType: "number" },
-    { fieldName: "add", dataType: "text" },
-  ];
-  dataProvider.setFields(fields);
-
-  // 4. 컬럼 정의
-  const columns = [
-    {
-      name: "메뉴코드",
-      fieldName: "menuCd",
-      header: {
-        text: "메뉴코드",
-        styleName: "header-style-0",
-      },
-    },
-    {
-      name: "메뉴명",
-      fieldName: "menuNm",
-      header: {
-        text: "메뉴명",
-        styleName: "header-style-1",
-      },
-    },
-    {
-      name: "판매가",
-      fieldName: "lngPrice",
-      header: {
-        text: "판매가",
-        styleName: "header-style-2",
-      },
-      numberFormat: "#,##0",
-    },
-    {
-      name: "선택",
-      fieldName: "add",
-      header: { text: "선택", styleName: "header-style-3" },
-      editable: false,
-      renderer: {
-        type: "button",
-      },
-    },
-  ];
-  gridView.setColumns(columns);
-  // 5. 샘플 데이터 추가
-  dataProvider.setRows(MenuList.value);
-  gridView.sortMode = "explicit";
-  gridView.filterMode = "explicit";
-  gridView.setFooters({ visible: false });
-  gridView.setRowIndicator({
-    visible: true,
-  });
-  gridView.setCheckBar({
-    visible: false,
-  });
-  gridView.displayOptions.fitStyle = "even";
-  gridView.sortingOptions.enabled = true;
-
-  gridView.commit();
-  gridView.onCellEdited = function (grid, itemIndex, row, field) {
-    // 데이터가 수정될 때 rows를 갱
-    gridView.commit();
-
-    // 이후 데이터 갱신 (필요시 rows를 업데이트)
-  };
-
-  gridView.onCellItemClicked = function (grid, index, clickData) {
-    currentSelectedMenuCode.value =
-      dataProvider.getRows()[clickData.itemIndex][0];
-    currentSelectedMenuNm.value =
-      dataProvider.getRows()[clickData.itemIndex][1];
-    addMenuKey();
-    return true;
-  };
-};
-
-let gridView2;
-let dataProvider2;
-const clickedTLUCD = ref();
-const clickedTLUNM = ref();
-const showMenuKeys2 = () => {
-  if (gridView2) {
-    gridView2.destroy(); // 기존 그리드 인스턴스 파괴
-  }
-
-  dataProvider2 = new LocalDataProvider();
-
-  // 2. GridView 설정
-  gridView2 = new GridView("realgrid2");
-  gridView2.setDataSource(dataProvider2);
-
-  // 3. 필드 정의
-  const fields = [
-    { fieldName: "lngCode", dataType: "text" },
-    { fieldName: "strName", dataType: "text" },
-    { fieldName: "add", dataType: "text" },
-  ];
-  dataProvider2.setFields(fields);
-
-  // 4. 컬럼 정의
-  const columns = [
-    {
-      name: "TLU코드",
-      fieldName: "lngCode",
-      header: {
-        text: "TLU코드",
-        styleName: "header-style-0",
-      },
-    },
-    {
-      name: "TLU명",
-      fieldName: "strName",
-      header: {
-        text: "TLU명",
-        styleName: "header-style-1",
-      },
-    },
-    {
-      name: "선택",
-      fieldName: "add",
-      header: { text: "선택", styleName: "header-style-3" },
-      editable: false,
-      renderer: {
-        type: "button",
-      },
-    },
-  ];
-  gridView2.setColumns(columns);
-  // 5. 샘플 데이터 추가
-  dataProvider2.setRows(TLUList.value);
-  gridView2.sortMode = "explicit";
-  gridView2.filterMode = "explicit";
-  gridView2.setFooters({ visible: false });
-  gridView2.setRowIndicator({
-    visible: true,
-  });
-  gridView2.setCheckBar({
-    visible: false,
-  });
-  gridView2.displayOptions.fitStyle = "even";
-  gridView2.sortingOptions.enabled = true;
-
-  gridView2.commit();
-  gridView2.onCellEdited = function (grid, itemIndex, row, field) {
-    // 데이터가 수정될 때 rows를 갱
-    gridView2.commit();
-
-    // 이후 데이터 갱신 (필요시 rows를 업데이트)
-  };
-  gridView2.onCellClicked = function (grid, clickData) {
-    if (clickData == undefined) {
-      return;
-    }
-    clickedTLUCD.value = dataProvider2.getRows()[clickData.itemIndex][0];
-  };
-  gridView2.onCellItemClicked = function (grid, clickData) {
-    console.log(clickData.itemIndex);
-    if (clickData.itemIndex == undefined) {
-      return;
-    }
-    clickedTLUCD.value = dataProvider2.getRows()[clickData.itemIndex][0];
-    clickedTLUNM.value = dataProvider2.getRows()[clickData.itemIndex][1];
-    addTLUKey();
-  };
-};
-
-let gridView3;
-let dataProvider3;
-const showMenuKeys3 = () => {
-  if (gridView3) {
-    gridView3.destroy(); // 기존 그리드 인스턴스 파괴
-  }
-
-  dataProvider3 = new LocalDataProvider();
-
-  // 2. GridView 설정
-  gridView3 = new GridView("realgrid3");
-  gridView3.setDataSource(dataProvider3);
-
-  // 3. 필드 정의
-  const fields = [
-    { fieldName: "menuCd", dataType: "text" },
-    { fieldName: "menuNm", dataType: "text" },
-  ];
-  dataProvider3.setFields(fields);
-
-  // 4. 컬럼 정의
-  const columns = [
-    {
-      name: "메뉴코드",
-      fieldName: "menuCd",
-      header: {
-        text: "메뉴코드",
-        styleName: "header-style-0",
-      },
-    },
-    {
-      name: "메뉴명",
-      fieldName: "menuNm",
-      header: {
-        text: "메뉴명",
-        styleName: "header-style-1",
-      },
-    },
-  ];
-  gridView3.setColumns(columns);
-  // 5. 샘플 데이터 추가
-  dataProvider3.setRows();
-  gridView3.sortMode = "explicit";
-  gridView3.filterMode = "explicit";
-  gridView3.setFooters({ visible: false });
-  gridView3.setRowIndicator({
-    visible: true,
-  });
-  gridView3.setCheckBar({
-    visible: false,
-  });
-  gridView3.displayOptions.fitStyle = "even";
-  gridView3.sortingOptions.enabled = true;
-
-  gridView3.commit();
-  gridView3.onCellEdited = function (grid, itemIndex, row, field) {
-    // 데이터가 수정될 때 rows를 갱
-    gridView3.commit();
-
-    // 이후 데이터 갱신 (필요시 rows를 업데이트)
-  };
-
-  gridView3.onCellItemClicked = function (grid, index, clickData) {
-    return true;
-  };
-
-  watch(clickedTLUCD, (newValue) => {
-    const TLUMenuCd = TLUList.value
-      .filter((item) => item.lngCode == newValue) // lngCode가 newValue와 일치하는 항목 필터링
-      .map((item) => {
-        // 객체의 모든 키를 가져오고 'lngMenu'로 시작하는 키들만 필터링
-        const filteredMenus = Object.keys(item)
-          .filter((key) => key.startsWith("lngMenu") && item[key] !== 0) // 'lngMenu'로 시작하는 키들만 필터링
-          .reduce((result, key) => {
-            result[key] = item[key]; // 필터링된 속성만 포함
-            return result;
-          }, {});
-        return filteredMenus; // 필터링된 항목 반환
-      });
-
-    console.log(TLUMenuCd[0]);
-    const newTLUMenus = [];
-
-    Object.keys(TLUMenuCd[0]).forEach((key) => {
-      const menuValue = TLUMenuCd[0][key]; // menu1, menu2, ..., menu29 값 가져오기
-
-      const filteredMenus = MenuList.value.filter(
-        (menuItem) => menuItem.menuCd === menuValue.toString()
-      );
-      newTLUMenus.push(...filteredMenus); // 결과 배열에 필터링된 메뉴들을 추가
-    });
-
-    console.log(newTLUMenus);
-
-    dataProvider3.setRows(newTLUMenus);
-  });
-};
 const searchMenuList = (e) => {
-  const searchWord1 = e.target.value;
-  searchWord.value = e.target.value;
-  const filteredList = MenuList.value.filter(
-    (item) =>
-      (forsearchMain.value === "0" ||
-        item.majorGroupCd === forsearchMain.value) &&
-      (forsearchSub.value === "0" || item.subGroupCd === forsearchSub.value) &&
-      (item.menuCd.includes(searchWord1) || item.menuNm.includes(searchWord1))
-  );
-  dataProvider.setRows(filteredList);
+  searchword1.value = e.target.value;
 };
-const searchMenuList3 = (e) => {
-  if (currentMenuorTLU.value == false) {
-    const filteredList = MenuList.value.filter(
-      (item) =>
-        (forsearchMain.value === "0" ||
-          item.majorGroupCd === forsearchMain.value) &&
-        (forsearchSub.value === "0" ||
-          item.subGroupCd === forsearchSub.value) &&
-        (item.menuCd.includes(searchWord.value) ||
-          item.menuNm.includes(searchWord.value))
-    );
-    dataProvider.setRows(filteredList);
-  } else {
-    const filteredList = TLUList.value.filter(
-      (item) =>
-        item.lngCode.toString().includes(searchWord2.value) ||
-        item.strName.includes(searchWord2.value)
-    );
-    dataProvider2.setRows(filteredList);
-  }
-};
+// const searchMenuList3 = (e) => {
+//   searchword3.value = e.target.value;
+// };
 
 const searchMenuList2 = (e) => {
-  const searchword2 = e.target.value;
-  searchWord2.value = e.target.value;
-  const filteredList = TLUList.value.filter(
-    (item) =>
-      item.lngCode.toString().includes(searchword2) ||
-      item.strName.includes(searchword2)
-  );
-
-  dataProvider2.setRows(filteredList);
+  searchWord2 = e.target.value;
 };
 
 const handlePosNo = (newValue) => {
@@ -1277,49 +1052,21 @@ const nowscreenNo = ref();
 const handleScreenNo = (newValue) => {
   nowscreenNo.value = newValue;
   console.log(nowscreenNo.value);
+  showMenuKey(newValue);
 };
 watch(nowscreenNo, (newvalue) => {
   changePage.value = true;
   if (afterSearch.value) {
-    console.log(MenuKeyList.value);
-    console.log(showMenuKeyList.value);
-
-    console.log(nowscreenNo.value);
-    showMenuKeyList.value = [];
-    const filteredList = MenuKeyList.value.filter(
-      (item) =>
-        item.intKeySeq > (nowscreenNo.value - 1) * 45 &&
-        item.intKeySeq <= nowscreenNo.value * 45
-    );
-    console.log(filteredList);
-    const startIndex = (nowscreenNo.value - 1) * 45;
-    const endIndex = nowscreenNo.value * 45;
-    // 중간에 비어 있는 번호 확인 및 채우기
-    for (let i = startIndex; i < endIndex; i++) {
-      // 해당 번호가 없는 경우 기본값 추가
-      const existingItem = filteredList.find(
-        (item) => item.intKeySeq === i + 1
-      );
-      if (existingItem) {
-        showMenuKeyList.value.push(existingItem);
-      } else {
-        showMenuKeyList.value.push({
-          intKeySeq: i,
-          strKeyName: ``, // 기본값 또는 placeholder
-        });
-      }
-    }
-    console.log(showMenuKeyList.value);
-    console.log(MenuKeyList.value);
+    showMenuKey(newvalue);
   }
   changePage.value = false;
 });
-watch(
-  () => MenuList.value,
-  () => {
-    showMenuKeys(); // MenuKeyList 값이 변경될 때마다 그리드 업데이트
-  }
-);
+// watch(
+//   () => MenuList.value,
+//   () => {
+//     showMenuKeys(); // MenuKeyList 값이 변경될 때마다 그리드 업데이트
+//   }
+// );
 
 const editScreenKey = (value) => {
   clickedScreenNo.value = value;
@@ -1442,44 +1189,158 @@ const nextMenuKey = () => {
 const existMenuKey = ref(false);
 const clickedRealIndex = ref();
 const saveMenuKeyposition = (index) => {
-  console.log(clickedintScreenNo.value);
-  console.log(index);
-  console.log(items.value);
   clickedScreenOrMenu.value = true;
+  clickedMenuKeyIndex.value = index + 1 + (nowscreenNo.value - 1) * 45;
   clickedRealIndex.value = (nowscreenNo.value - 1) * 45 + index;
-  console.log(clickedRealIndex.value);
 };
 
+const clickedMenuKeyIndex = ref(null);
 const addMenuKey = () => {
-  console.log(MenuKeyList.value);
-  console.log(clickedRealIndex.value);
-  const foraddIndex = MenuKeyList.value.findIndex(
-    (item) =>
-      item.intKeySeq ==
-      (nowscreenNo.value - 1) * 45 + clickedRealIndex.value + 1
-  );
-  console.log(foraddIndex);
-  if (foraddIndex == -1) {
-    MenuKeyList.value.push({
-      intKeyNo: 6,
-      intKeySeq: (nowscreenNo.value - 1) * 45 + clickedRealIndex.value + 1,
-      intPosNo: posNo.value,
-      lngKeyscrNo: Number(currentSelectedMenuCode.value),
-      strKeyName: currentSelectedMenuNm.value,
-      lngKeyColor: "16769216",
-    });
-  } else {
-    MenuKeyList.value[foraddIndex] = {
-      intKeyNo: 6,
-      intKeySeq: (nowscreenNo.value - 1) * 45 + clickedRealIndex.value + 1,
-      intPosNo: posNo.value,
-      lngKeyscrNo: Number(currentSelectedMenuCode.value),
-      strKeyName: currentSelectedMenuNm.value,
-      lngKeyColor: "16769216",
-    };
+  console.log(clickedMenuKeyIndex.value);
+  if (clickedMenuKeyIndex.value == null) {
+    return;
   }
+  console.log(items.value);
+  const onScreenKey =
+    nowscreenNo.value * 45 - clickedMenuKeyIndex.value >= 0 &&
+    nowscreenNo.value * 45 - clickedMenuKeyIndex.value <= 10;
+  console.log(clickedMenuKeyIndex.value);
+  const a = items.value.find(
+    (item) => item.intKeySeq == clickedMenuKeyIndex.value
+  );
+  if (a !== undefined) {
+    a.intKeyNo = onScreenKey ? 1 : 6;
+    a.intKeySeq = clickedMenuKeyIndex.value;
+    a.intPosNo = posNo.value;
+    a.lngKeyColor = "16769216";
+    a.lngKeyscrNo = Number(currentSelectedMenuCode.value);
+    a.strKeyName = currentSelectedMenuNm.value;
+  }
+  console.log(items.value);
+  console.log(posNo.value);
+  console.log(clickedMenuKeyIndex.value);
   console.log(MenuKeyList.value);
-  showMenuKey();
+  const b = MenuKeyList.value.find(
+    (item) =>
+      item.intKeySeq == clickedMenuKeyIndex.value &&
+      item.intPosNo == posNo.value
+  );
+
+  console.log(b);
+
+  if (b !== undefined) {
+    b.intKeyNo = onScreenKey ? 1 : 6;
+    b.intKeySeq = clickedMenuKeyIndex.value;
+    b.intPosNo = posNo.value;
+    b.lngKeyColor = "16769216";
+    b.lngKeyscrNo = Number(currentSelectedMenuCode.value);
+    b.strKeyName = currentSelectedMenuNm.value;
+  } else {
+    MenuKeyList.value.push({
+      intKeyNo: onScreenKey ? 1 : 6,
+      intKeySeq: clickedMenuKeyIndex.value,
+      intPosNo: posNo.value,
+      lngKeyColor: "16769216",
+      lngKeyscrNo: Number(currentSelectedMenuCode.value),
+      strKeyName: currentSelectedMenuNm.value,
+    });
+  }
+
+  // const foraddIndex = MenuKeyList.value.find(
+  //   (item) =>
+  //     item.intPosNo == posNo.value &&
+  //     item.intKeySeq == clickedMenuKeyIndex.value
+  // );
+
+  // console.log(foraddIndex);
+  // if (foraddIndex == undefined) {
+  //   MenuKeyList.value.push({
+  //     intKeyNo: 6,
+  //     intKeySeq: clickedRealIndex.value,
+  //     intPosNo: posNo.value,
+  //     lngKeyscrNo: Number(currentSelectedMenuCode.value),
+  //     strKeyName: currentSelectedMenuNm.value,
+  //   });
+  // } else {
+  //   foraddIndex.lngKeyscrNo = Number(currentSelectedMenuCode.value);
+  //   foraddIndex.strKeyName = currentSelectedMenuNm.value;
+  // }
+
+  showMenuKey(nowscreenNo.value);
+  console.log(MenuKeyList.value);
+};
+
+const addMenuKey2 = () => {
+  console.log(clickedMenuKeyIndex.value);
+  if (clickedMenuKeyIndex.value == null) {
+    return;
+  }
+  console.log(items.value);
+
+  console.log(clickedMenuKeyIndex.value);
+  const a = items.value.find(
+    (item) => item.intKeySeq == clickedMenuKeyIndex.value
+  );
+  if (a !== undefined) {
+    a.intKeyNo = 7;
+    a.intKeySeq = clickedMenuKeyIndex.value;
+    a.intPosNo = posNo.value;
+    a.lngKeyColor = "16769216";
+    a.lngKeyscrNo = Number(currentSelectedMenuCode.value);
+    a.strKeyName = currentSelectedMenuNm.value;
+  }
+  console.log(items.value);
+  console.log(posNo.value);
+  console.log(clickedMenuKeyIndex.value);
+  console.log(MenuKeyList.value);
+  const b = MenuKeyList.value.find(
+    (item) =>
+      item.intKeySeq == clickedMenuKeyIndex.value &&
+      item.intPosNo == posNo.value
+  );
+
+  console.log(b);
+
+  if (b !== undefined) {
+    b.intKeyNo = 7;
+    b.intKeySeq = clickedMenuKeyIndex.value;
+    b.intPosNo = posNo.value;
+    b.lngKeyColor = "16769216";
+    b.lngKeyscrNo = Number(currentSelectedMenuCode.value);
+    b.strKeyName = currentSelectedMenuNm.value;
+  } else {
+    MenuKeyList.value.push({
+      intKeyNo: 7,
+      intKeySeq: clickedMenuKeyIndex.value,
+      intPosNo: posNo.value,
+      lngKeyColor: "16769216",
+      lngKeyscrNo: Number(currentSelectedMenuCode.value),
+      strKeyName: currentSelectedMenuNm.value,
+    });
+  }
+
+  // const foraddIndex = MenuKeyList.value.find(
+  //   (item) =>
+  //     item.intPosNo == posNo.value &&
+  //     item.intKeySeq == clickedMenuKeyIndex.value
+  // );
+
+  // console.log(foraddIndex);
+  // if (foraddIndex == undefined) {
+  //   MenuKeyList.value.push({
+  //     intKeyNo: 6,
+  //     intKeySeq: clickedRealIndex.value,
+  //     intPosNo: posNo.value,
+  //     lngKeyscrNo: Number(currentSelectedMenuCode.value),
+  //     strKeyName: currentSelectedMenuNm.value,
+  //   });
+  // } else {
+  //   foraddIndex.lngKeyscrNo = Number(currentSelectedMenuCode.value);
+  //   foraddIndex.strKeyName = currentSelectedMenuNm.value;
+  // }
+
+  showMenuKey(nowscreenNo.value);
+  console.log(MenuKeyList.value);
 };
 
 const addScreenKeyf = () => {
@@ -1550,8 +1411,6 @@ const showMenus = (value) => {
   } else if (value == 2) {
     currentMenuorTLU.value = true;
     currentMenu.value = value;
-    showMenuKeys2();
-    showMenuKeys3();
   } else {
     currentMenu.value = value;
   }
@@ -1584,13 +1443,13 @@ const handleinitAll = (newvalue) => {
   MenuList.value = [];
   ScreenKeys.value = [];
   items.value = [];
-  showMenuKeyList.value = [];
+  items.value = [];
   nowStoreAreaCd.value = "0";
   posNo.value = "0";
 };
-watch(forsearchSub, (newvalue) => {
-  searchMenuList3();
-});
+// watch(forsearchSub, (newvalue) => {
+//   searchMenuList3();
+// });
 </script>
 
 <style scoped></style>

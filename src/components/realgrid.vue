@@ -577,6 +577,7 @@ const emit = defineEmits([
   "deleteRows",
   "realgridName",
   "allStateRows",
+  "buttonClicked",
 ]);
 const funcshowGrid = async () => {
   if (gridView !== undefined && gridView !== null) {
@@ -1337,6 +1338,16 @@ const funcshowGrid = async () => {
     updatedrowData.value = [...dataProvider.getJsonRows()];
     emit("updatedRowData", updatedrowData.value);
   };
+  // gridView.onCellItemClicked = function (grid, index, clickData) {
+  //   if (clickData.index == undefined || clickData.index == -1) {
+  //     return;
+  //   }
+  //   selectedRowData.value = dataProvider.getRows()[index];
+  //   // var current = gridView.getCurrent();
+  //   // selectedindex.value = current.dataRow;
+  //   // console.log(selectedindex.value);
+  //   emit("buttonClicked", selectedRowData.value);
+  // };
   gridView.onItemChecked = function (grid, itemIndex, checked) {
     gridView.setCurrent({ dataRow: itemIndex });
     var rows = gridView.getCheckedRows();
@@ -1657,6 +1668,11 @@ watch(
     }
     var dataRow = dataProvider.addRow(values);
     gridView.setCurrent({ dataRow: dataRow });
+
+    selectedRowData.value = dataProvider.getRows()[dataRow];
+
+    emit("clickedRowData", selectedRowData.value);
+    emit("selectedIndex2", dataRow);
   }
 );
 
@@ -1773,6 +1789,7 @@ watch(
   (newVal) => {
     gridView.commit();
     const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
+    console.log(curr.dataRow);
     if (curr && curr.dataRow >= 0 && props.rowData[curr.dataRow]) {
       // 현재 데이터 행이 유효한 경우
       props.rowData[curr.dataRow].deleted = true;
@@ -1780,8 +1797,8 @@ watch(
       dataProvider.removeRow(curr.dataRow);
       gridView.commit();
     } else {
+      console.log(curr.dataRow);
       dataProvider.removeRow(curr.dataRow);
-      console.warn("선택된 행이 없습니다.");
     }
     updatedrowData.value = [...dataProvider.getJsonRows()];
     emit("updatedRowData", updatedrowData.value);

@@ -191,7 +191,7 @@
               class="flex-1"
               @change="setSubCd"
               v-model="forsearchMain">
-              <option value="0">전체</option>
+              <option value="-1">전체</option>
               <option :value="i.GroupCd" v-for="i in MenuGroup">
                 [{{ i.GroupCd }}]{{ i.majorGroupNm }}
               </option>
@@ -202,7 +202,7 @@
               class="flex-1"
               v-model="forsearchSub"
               @change="setSubCd">
-              <option value="0">전체</option>
+              <option value="-1">전체</option>
               <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup">
                 [{{ i.GroupCd }}]{{ i.subGroupNm }}
               </option>
@@ -224,8 +224,8 @@
             :progname="'MST05_011INS_VUE'"
             :progid="1"
             :rowData="MenuList"
-            @clickedRowData="clickedRowData"
-            :searchColId="'lngCode,strName'"
+            @selcetedrowData="selcetedrowData"
+            :searchColId="'menuCd,menuNm'"
             :searchColId3="['majorGroupCd', 'subGroupCd']"
             :searchValue="searchValue"
             :searchWord3="searchword1"></Realgrid>
@@ -247,11 +247,22 @@
           </div>
         </div>
         <div class="ml-10 mt-5 w-full h-full">
-          <div id="realgrid2" style="width: 100%; height: 90%"></div>
-          <div
-            id="realgrid3"
-            style="width: 100%; height: 90%"
-            class="mt-5"></div>
+          <Realgrid
+            class="h-[120%]"
+            :progname="'MST05_011INS_VUE'"
+            :progid="2"
+            :rowData="TLUList"
+            @selcetedrowData="selcetedrowData2"
+            @clickedRowData="clickedRowData"
+            @realgridname="realgridname"
+            :searchColId="'lngCode,strName'"
+            :searchWord3="searchword3"></Realgrid>
+          <Realgrid
+            class="h-[70%] mt-5"
+            :progname="'MST05_011INS_VUE'"
+            :progid="3"
+            :rowData="TLUSubList"
+            @realgridname="realgridname2"></Realgrid>
         </div>
       </div>
     </div>
@@ -329,9 +340,7 @@
                 clickedMenukeys();
               ">
               <span class="flex flex-col w-full h-full"
-                ><span class="mt-3">{{
-                  item.lngKeyscrNo ? item.lngKeyscrNo : ""
-                }}</span
+                ><span class="mt-3">{{ item ? item.lngKeyscrNo : "" }}</span
                 ><span>{{ item ? item.strKeyName : "" }}</span
                 ><span class="flex justify-end pr-3">{{
                   item.lngPrice ? formatNumber(item.lngPrice) + "원" : ""
@@ -371,20 +380,53 @@ import {
 import DupliPopUp from "@/components/dupliPopUp.vue";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
+import RealGrid from "realgrid";
 import Swal from "sweetalert2";
 import { ref, watch } from "vue";
 import { VueDraggableNext } from "vue-draggable-next";
 import { useStore } from "vuex";
 
 // 더미 데이터
-const items = ref([]);
+const items = ref([
+  { intKeySeq: 1 },
+  { intKeySeq: 2 },
+  { intKeySeq: 3 },
+  { intKeySeq: 4 },
+  { intKeySeq: 5 },
+  { intKeySeq: 6 },
+  { intKeySeq: 7 },
+  { intKeySeq: 8 },
+  { intKeySeq: 9 },
+  { intKeySeq: 10 },
+  { intKeySeq: 11 },
+  { intKeySeq: 12 },
+  { intKeySeq: 13 },
+  { intKeySeq: 14 },
+  { intKeySeq: 15 },
+  { intKeySeq: 16 },
+  { intKeySeq: 17 },
+  { intKeySeq: 18 },
+  { intKeySeq: 19 },
+  { intKeySeq: 20 },
+  { intKeySeq: 21 },
+  { intKeySeq: 22 },
+  { intKeySeq: 23 },
+  { intKeySeq: 24 },
+  { intKeySeq: 25 },
+  { intKeySeq: 26 },
+  { intKeySeq: 27 },
+  { intKeySeq: 28 },
+  { intKeySeq: 29 },
+  { intKeySeq: 30 },
+]);
+
 const clickedScreenKeyIndex = ref();
 const ScreenKeyOrigin = ref([]);
 const clickedMenuKey = ref();
 const ScreenKeys = ref();
 const currentMenuorTLU = ref(false);
-const forsearchMain = ref("0");
-const forsearchSub = ref("0");
+const forsearchMain = ref(-1);
+const forsearchSub = ref(-1);
 const addscreenKey = ref(false);
 const searchWord = ref("");
 const searchWord2 = ref("");
@@ -432,6 +474,32 @@ const showPopupf = () => {
   showPopup2.value = true;
 };
 
+const searchMenuList2 = (e) => {
+  searchword3.value = e.target.value;
+};
+const realgrid2Name = ref("");
+const realgridname = (e) => {
+  realgrid2Name.value = e;
+};
+const realgrid3Name = ref("");
+const realgridname2 = (e) => {
+  realgrid3Name.value = e;
+};
+
+watch(currentMenu, () => {
+  const reagrid2 = document.getElementById(realgrid2Name.value);
+  setTimeout(() => {
+    RealGrid.getGridInstance(reagrid2).resetSize();
+    RealGrid.getGridInstance(reagrid2).refresh(true);
+  }, 100);
+
+  const realgrid3 = document.getElementById(realgrid3Name.value);
+  setTimeout(() => {
+    RealGrid.getGridInstance(realgrid3).resetSize();
+    RealGrid.getGridInstance(realgrid3).refresh(true);
+  }, 100);
+});
+
 const showNext = () => {
   if (currentsubPage.value >= AllscreenKeyPage.value) {
     return;
@@ -454,16 +522,16 @@ const showPrev = () => {
 const updateMenuKey = ref(false);
 let dupliitems = [];
 
-const saveMenuKeys = () => {
-  let dupliitems = [...items.value];
-  for (var i = 0; i < dupliitems.length; i++) {
-    if (dupliitems[i].lngKeyscrNo != "") {
-      dupliitems[i].intKeySeq = (i + 1).toString();
-    }
-  }
-  const updatedMenuKeys = dupliitems.filter((item) => item.lngKeyscrNo != "");
-  console.log(updatedMenuKeys);
-};
+// const saveMenuKeys = () => {
+//   let dupliitems = [...items.value];
+//   for (var i = 0; i < dupliitems.length; i++) {
+//     if (dupliitems[i].lngKeyscrNo != "") {
+//       dupliitems[i].intKeySeq = (i + 1).toString();
+//     }
+//   }
+//   const updatedMenuKeys = dupliitems.filter((item) => item.lngKeyscrNo != "");
+//   console.log(updatedMenuKeys);
+// };
 const nowStoreAreaCd = ref();
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
@@ -471,7 +539,7 @@ const handleStoreAreaCd = (newValue) => {
 };
 
 const searchMenuList = (e) => {
-  searchword1.value = e;
+  searchword1.value = e.target.value;
 };
 const nowStoreCd = ref();
 const afterCategory = ref(false);
@@ -494,6 +562,7 @@ const handleStoreCd = async (newValue) => {
     };
   });
   const res5 = await getTLUList(groupCd.value, nowStoreCd.value);
+  console.log(res5);
   TLUList.value = res5.data.TLUList;
   TLUList.value = TLUList.value.map((item) => {
     return {
@@ -582,7 +651,22 @@ const searchButton = async () => {
   calculateMaxSubCode();
 };
 const filteredSubMenuGroup = ref([]);
-const setSubCd = (e) => {};
+const searchValue = ref([]);
+const setSubCd = (e) => {
+  const name = e.target.name;
+  const value = e.target.value;
+  console.log(SubMenuGroup.value);
+  console.log(MenuGroup.value);
+  if (name == "majorGroupCd") {
+    filteredSubMenuGroup.value = SubMenuGroup.value.filter(
+      (item) => item.sublngMajor == value
+    );
+    searchValue.value = [value, forsearchSub.value];
+    forsearchSub.value = -1;
+  } else if (name == "subGroupCd") {
+    searchValue.value = [forsearchMain.value, value];
+  }
+};
 const clickedintScreenNo = ref();
 const calculateMaxSubCode = () => {
   maxSubCode.value = Math.max(
@@ -592,20 +676,51 @@ const calculateMaxSubCode = () => {
   );
 };
 
+const TLUSubList = ref([]);
 const clickedRowData = (e) => {
+  TLUSubList.value = [];
+  for (let i = 1; i <= 29; i++) {
+    if (MenuList.value.filter((item) => item.menuCd == e[i]).length > 0) {
+      TLUSubList.value.push({
+        lngCode: e[i],
+        strName: MenuList.value.filter((item) => item.menuCd == e[i])[0].menuNm,
+      });
+    }
+  }
+};
+const selcetedrowData = (e) => {
+  if (clickedRealIndex.value == null) {
+    return;
+  }
   console.log(e);
+  currentSelectedMenuNm.value = e[1];
+  currentSelectedMenuCode.value = e[0];
+  currentSelectedMenuPrice.value = e[2];
+  addMenuKey();
+};
+
+const selcetedrowData2 = (e) => {
+  if (clickedRealIndex.value == null) {
+    return;
+  }
+  console.log(e);
+  currentSelectedMenuNm.value = e[1];
+  currentSelectedMenuCode.value = e[0];
+  currentSelectedMenuPrice.value = "";
+  addMenuKey();
 };
 const showMenuKey = (value) => {
   if (clickedintScreenNo.value != value) {
     currmenuKeyPage.value = 1;
   }
   clickedintScreenNo.value = value;
-  items.value = [...Array(30).fill(null)];
-  console.log(MenuKeyList.value);
+  items.value = Array.from({ length: 30 }, (_, index) => ({
+    intKeySeq: index + 1,
+  }));
+
   MenuKeyList.value
     .filter((item) => item.intPosNo == posNo.value && item.intScreenNo == value)
     .forEach((item) => {
-      console.log(item);
       const position = item.intKeySeq - (currmenuKeyPage.value - 1) * 30 - 1;
       if (position >= 0 && position < 30) {
         items.value[position] = item;
@@ -695,20 +810,38 @@ const onEnd2 = (evt) => {
   showMenuKey(clickedScreenKeyIndex.value + 1);
 };
 watch(items, (newvalue) => {
-  console.log(newvalue);
-  newvalue.forEach((item, index) => {
-    if (item == null || item.lngKeyscrNo == null || item.lngKeyscrNo == "") {
-      newvalue[index] = {
-        intKeySeq: index + (currmenuKeyPage.value - 1) * 30 + 1,
-      };
-    } else {
-      item.intKeySeq = index + (currmenuKeyPage.value - 1) * 30 + 1;
-    }
+  // console.log(newvalue);
+  // newvalue.forEach((item, index) => {
+  //   if (item == null || item.lngKeyscrNo == null || item.lngKeyscrNo == "") {
+  //     newvalue[index] = {
+  //       intKeySeq: index + (currmenuKeyPage.value - 1) * 30 + 1,
+  //     };
+  //   } else {
+  //     item.intKeySeq = index + (currmenuKeyPage.value - 1) * 30 + 1;
+  //   }
+  // });
+
+  items.value.forEach((item, index) => {
+    item.intKeySeq = index + (currmenuKeyPage.value - 1) * 30 + 1;
   });
+  // items.value.forEach((item, index) => {
+  //   if (item.lngKeyscrNo == null || item.lngKeyscrNo == undefined) {
+  //     const a = MenuKeyList.value.find(
+  //       (item2) =>
+  //         item2.intKeySeq == item.intKeySeq + (currmenuKeyPage.value - 1) * 30
+  //     );
+  //     a.intKeySeq = (index+1) + (currmenuKeyPage.value - 1) * 30;
+
+  //   } else {
+
+  //   }
+
+  // });
   console.log(items.value);
   console.log(MenuKeyList.value);
 });
 const savePosMenu = async () => {
+  console.log(MenuKeyList.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -871,9 +1004,9 @@ const currentSelectedMenuPrice = ref("");
 //     dataProvider2.setRows(filteredList);
 //   }
 // };
-watch(forsearchSub, (newValue) => {
-  searchMenuList3();
-});
+// watch(forsearchSub, (newValue) => {
+//   searchMenuList3();
+// });
 // const searchMenuList2 = (e) => {
 //   const searchword2 = e.target.value;
 //   searchWord2.value = e.target.value;
@@ -1001,7 +1134,9 @@ const prevMenuKey = () => {
     return;
   }
   currmenuKeyPage.value--;
-  items.value = [...Array(30).fill(null)];
+  items.value = Array.from({ length: 30 }, (_, index) => ({
+    intKeySeq: index + 1,
+  }));
   MenuKeyList.value
     .filter(
       (item) =>
@@ -1023,7 +1158,10 @@ const nextMenuKey = () => {
   }
   currmenuKeyPage.value++;
 
-  items.value = [...Array(30).fill(null)];
+  items.value = Array.from({ length: 30 }, (_, index) => ({
+    intKeySeq: index + 1,
+  }));
+
   MenuKeyList.value
     .filter(
       (item) =>
@@ -1040,27 +1178,48 @@ const nextMenuKey = () => {
 };
 const existMenuKey = ref(false);
 const clickedRealIndex = ref();
+const clickedMenuKeyIndex = ref();
 const saveMenuKeyposition = (index) => {
   console.log(clickedintScreenNo.value);
   console.log(index);
   console.log(items.value);
-
+  clickedMenuKeyIndex.value = index + 1;
   clickedRealIndex.value = (currmenuKeyPage.value - 1) * 30 + index + 1;
   console.log(clickedRealIndex.value);
 };
 
 const addMenuKey = () => {
+  console.log(clickedMenuKeyIndex.value);
+  if (clickedMenuKeyIndex.value == null) {
+    return;
+  }
+  console.log(items.value);
+  items.value[clickedMenuKeyIndex.value] = {
+    intKeyNo: 6,
+    intKeySeq: clickedRealIndex.value,
+    intPosNo: posNo.value,
+    intScreenNo: clickedintScreenNo.value,
+    lngKeyscrNo: Number(currentSelectedMenuCode.value),
+    strKeyName: currentSelectedMenuNm.value,
+    lngPrice: currentSelectedMenuPrice.value.substring(
+      0,
+      currentSelectedMenuPrice.value.length - 1
+    ),
+  };
+  console.log(items.value);
   console.log(MenuKeyList.value);
-  const foraddIndex = MenuKeyList.value
-    .filter(
-      (item) =>
-        item.intPosNo == posNo.value &&
-        item.intScreenNo == clickedintScreenNo.value &&
-        item.intKeySeq == clickedRealIndex.value
-    )
-    .findIndex((item) => item.intKeySeq == clickedRealIndex.value);
+  console.log(posNo.value);
+  console.log(clickedintScreenNo.value);
+  console.log(clickedRealIndex.value);
+  const foraddIndex = MenuKeyList.value.find(
+    (item) =>
+      item.intPosNo == posNo.value &&
+      item.intScreenNo == clickedintScreenNo.value &&
+      item.intKeySeq == clickedRealIndex.value
+  );
+
   console.log(foraddIndex);
-  if (foraddIndex == -1) {
+  if (foraddIndex == undefined) {
     MenuKeyList.value.push({
       intKeyNo: 6,
       intKeySeq: clickedRealIndex.value,
@@ -1068,19 +1227,20 @@ const addMenuKey = () => {
       intScreenNo: clickedintScreenNo.value,
       lngKeyscrNo: Number(currentSelectedMenuCode.value),
       strKeyName: currentSelectedMenuNm.value,
-      lngPrice: currentSelectedMenuPrice.value,
+      lngPrice: currentSelectedMenuPrice.value.substring(
+        0,
+        currentSelectedMenuPrice.value.length - 1
+      ),
     });
   } else {
-    MenuKeyList.value[foraddIndex] = {
-      intKeyNo: 6,
-      intKeySeq: clickedRealIndex.value,
-      intPosNo: posNo.value,
-      intScreenNo: clickedintScreenNo.value,
-      lngKeyscrNo: Number(currentSelectedMenuCode.value),
-      strKeyName: currentSelectedMenuNm.value,
-      lngPrice: currentSelectedMenuPrice.value,
-    };
+    foraddIndex.lngKeyscrNo = Number(currentSelectedMenuCode.value);
+    foraddIndex.strKeyName = currentSelectedMenuNm.value;
+    foraddIndex.lngPrice = currentSelectedMenuPrice.value.substring(
+      0,
+      currentSelectedMenuPrice.value.length - 1
+    );
   }
+
   showMenuKey(clickedintScreenNo.value);
   console.log(MenuKeyList.value);
 };
@@ -1120,8 +1280,8 @@ const showMenus = (value) => {
   } else {
     currentMenuorTLU.value = true;
     currentMenu.value = true;
-    showMenuKeys2();
-    showMenuKeys3();
+    //showMenuKeys2();
+    // showMenuKeys3();
   }
 };
 const deletekey = () => {
@@ -1167,8 +1327,8 @@ const handleinitAll = (newvalue) => {
   MenuList.value = [];
   ScreenKeys.value = [];
   items.value = [];
-  forsearchMain.value = "0";
-  forsearchSub.value = "0";
+  forsearchMain.value = "-1";
+  forsearchSub.value = "-1";
   filteredSubMenuGroup.value = [];
   searchword1.value = "";
   searchword3.value = "";

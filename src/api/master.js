@@ -409,7 +409,7 @@ export const setSubCategoryUPDATE = (
 export const getMenuList = (groupCd, storeCd) => {
   return api2.post("/MIMASTER/MST05_011INS.asmx/getTablePosMenu", {
     GROUP_CD: groupCd,
-    STORE_CD: storeCd,
+    STORE_CD: 0,
   });
 };
 export const getMenuListIncludeCommon = (groupCd, storeCd) => {

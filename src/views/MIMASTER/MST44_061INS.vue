@@ -78,6 +78,7 @@
         <div class="mt-3">
           <button
             class="whitebutton"
+            :disabled="!(afterSearch == true)"
             @click="addRow"
             v-if="currentMenu == false">
             추가
@@ -85,6 +86,7 @@
           <button
             class="whitebutton"
             @click="deleteRow"
+            :disabled="!(afterClick == true && afterSearch == true)"
             v-if="currentMenu == false">
             삭제
           </button>
@@ -104,6 +106,7 @@
             :searchWord="searchword1"
             :searchColId="'lngCode,strName'"
             :addRow2="addRows"
+            @selectedIndex2="selectedIndex2"
             :addrowProp="'strName,kdsCornerNum'"
             :addrowDefault="addrowDefault"
             @updatedRowData="updatedRowData"
@@ -111,7 +114,8 @@
             :deleteRow="deleteRows"
             :changeColid="'kdsCornerNm'"
             :changeRow="changeRow"
-            :changeValue="changeValue"
+            :changeValue2="changeValue"
+            :changeNow="changeNow"
             @realgridname="realgridname2"
             :rowStateeditable="rowStateeditable"></Realgrid>
         </div>
@@ -168,13 +172,9 @@
             :rowData="rowData2"
             :showGrid="showGrid"
             :showCheckBar="false"
-            @selcetedrowData="selcetedrowData"
             :searchWord="searchword1"
             :searchColId="'lngCode,strName'"
-            :addRow="addRows"
             @updatedRowData="updatedRowData2"
-            :deleteRow="deleteRows"
-            @clickedRowData="clickedRowData"
             @realgridname="realgridname"
             :editableColId="'strName'"
             :fixedColumn="fixedColumn"
@@ -265,6 +265,7 @@ watch(currentMenu, () => {
 
 // 더미 데이터
 const items = ref([]);
+const afterClick = ref(false);
 const ScreenKeyOrigin = ref([]);
 const ScreenKeys = ref();
 const updatedList = ref();
@@ -361,9 +362,14 @@ const Category = ref([]);
 const changeValue = ref("");
 const MenuGroup = ref([]);
 const SubMenuGroup = ref([]);
+const changeNow = ref(false);
 
+const selectedIndex2 = (e) => {
+  changeRow.value = e;
+};
 const changeValues = (e) => {
   changeValue.value = e.target.value;
+  changeNow.value = !changeNow.value;
 };
 const store = useStore();
 const searchword1 = ref();
@@ -382,7 +388,7 @@ const checked = ref();
 const addRows = ref(false);
 const deleteRows = ref(false);
 const addRow = () => {
-  if (afterSearch2.value == false) {
+  if (afterSearch.value == false) {
     Swal.fire({
       title: "경고.",
       text: "조회를 먼저 해주세요",
@@ -462,7 +468,7 @@ const searchButton = async () => {
       rowData.value = [...KDSList.value];
       updatedList.value = [...KDSList.value];
       confirmitem.value = JSON.parse(JSON.stringify(KDSList.value));
-      afterSearch2.value = true;
+      afterSearch.value = true;
     } else {
       res = await getKDSSettingList(groupCd.value, nowStoreCd.value);
       KDSSettingList.value = res.data.KDSSETTINGLIST;
@@ -491,7 +497,7 @@ const searchButton = async () => {
       console.log(MenuGroup.value);
       console.log(SubMenuGroup.value);
       console.log(checked.value);
-      afterSearch.value = true;
+      afterSearch2.value = true;
     }
   } catch (error) {
     console.log(error);
@@ -731,7 +737,7 @@ const searchMenuList = (e) => {
 
 const saveButton = async () => {
   if (currentMenu.value == false) {
-    if (afterSearch2.value == false) {
+    if (afterSearch.value == false) {
       Swal.fire({
         title: "경고",
         text: "조회를 먼저 진행해주세요.",
@@ -741,7 +747,7 @@ const saveButton = async () => {
       return;
     }
   } else {
-    if (afterSearch.value == false) {
+    if (afterSearch2.value == false) {
       Swal.fire({
         title: "경고",
         text: "조회를 먼저 진행해주세요.",
@@ -839,10 +845,11 @@ const saveButton = async () => {
 
 const changeRow = ref();
 const clickedRowData = (newValue) => {
+  afterClick.value = true;
   console.log(newValue);
   clickedNo.value = newValue[1];
   clickedNm.value = newValue[2];
-  changeRow.value = newValue.index;
+  //changeRow.value = newValue.index;
   console.log(changeRow.value);
 };
 

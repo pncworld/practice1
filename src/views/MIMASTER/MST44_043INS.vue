@@ -488,8 +488,57 @@ const searchButton = async () => {
   } finally {
     initFocus.value = !initFocus.value;
     console.log(KeyList.value);
-    if (KeyList.value == null) {
-      KeyList.value = ["1"];
+    if (
+      KeyList.value == null ||
+      KeyList.value == {} ||
+      KeyList.value.length == 0
+    ) {
+      KeyList.value = [
+        {
+          intKeySeq: 1,
+          lngKeyNo1: 0,
+          lngKeyNo2: 0,
+          lngKeyNo3: 0,
+          lngKeyNo4: 0,
+          lngKeyNo5: 0,
+          lngKeyNo6: 0,
+          lngKeyNo7: 0,
+          lngKeyNo8: 0,
+          lngKeyNo9: 0,
+          lngKeyNo10: 0,
+          lngKeyNo11: 0,
+          lngKeyNo12: 0,
+          lngKeyNo13: 0,
+          lngKeyNo14: 0,
+          lngKeyNo15: 0,
+          lngKeyNo16: 0,
+          lngKeyNo17: 0,
+          lngKeyNo18: 0,
+          lngKeyNo19: 0,
+        },
+        {
+          intKeySeq: 8,
+          lngKeyNo1: 0,
+          lngKeyNo2: 0,
+          lngKeyNo3: 0,
+          lngKeyNo4: 0,
+          lngKeyNo5: 0,
+          lngKeyNo6: 0,
+          lngKeyNo7: 0,
+          lngKeyNo8: 0,
+          lngKeyNo9: 0,
+          lngKeyNo10: 0,
+          lngKeyNo11: 0,
+          lngKeyNo12: 0,
+          lngKeyNo13: 0,
+          lngKeyNo14: 0,
+          lngKeyNo15: 0,
+          lngKeyNo16: 0,
+          lngKeyNo17: 0,
+          lngKeyNo18: 0,
+          lngKeyNo19: 0,
+        },
+      ];
     }
     subKeyList1.value = Object.keys(KeyList.value[0]).reduce((result, key) => {
       console.log(key);
