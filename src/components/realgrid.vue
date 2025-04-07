@@ -597,8 +597,7 @@ const funcshowGrid = async () => {
   await nextTick();
 
   const container = document.getElementById(realgridname.value);
-  console.log(realgridname.value);
-  console.log(container);
+
   if (!container) {
     console.error(`Invalid grid container element: ${realgridname.value}`);
     return;
@@ -709,7 +708,7 @@ const funcshowGrid = async () => {
         if (props.setGroupColumnId != []) {
           defaultGroupNum = props.setGroupColumnId.split(",").length;
         }
-        console.log(defaultGroupNum);
+
         if (item.strAlign !== "right") {
           if (defaultGroupNum == 1) {
             if (item2.level == 2) {
@@ -729,7 +728,6 @@ const funcshowGrid = async () => {
             } else if (item2.level == 4) {
               ret.styleName = "skyblue setTextAlignLeft";
             }
-            console.log(ret);
           }
           return ret;
         } else {
@@ -838,6 +836,7 @@ const funcshowGrid = async () => {
         }
       },
     },
+
     datetimeFormat: item.strMask == "" ? "yyyy-MM-dd" : item.strMask, // sql 에서 mstgridinfo 에서 date  일때 기본값이 있고 정의할 수 있음
     width: item.intHdWidth,
     numberFormat:
@@ -853,7 +852,9 @@ const funcshowGrid = async () => {
         ? "setTextAlignCenter"
         : "setTextAlignRight",
     editor: {
-      type: "line",
+      type: item.strColType.includes("dropdown") ? "dropdown" : "line",
+      domainOnly: true,
+
       inputCharacters:
         item.strColID == props.inputOnlyNumberColumn
           ? "0123456789"
@@ -867,6 +868,8 @@ const funcshowGrid = async () => {
           : item.strColID.includes("checkbox") ||
             item.strColID.includes("lngSupplierID")
           ? "check"
+          : item.strColType.includes("dropdown")
+          ? "list"
           : "text",
     },
     buttonVisibility: "always",
@@ -881,6 +884,11 @@ const funcshowGrid = async () => {
       ) {
         ret.editable = true;
       } else if (item.strColID == props.editableColId) {
+        ret.editable = true;
+      } else if (
+        props.rowStateeditable == true &&
+        dataCell.item.itemState == "normal"
+      ) {
         ret.editable = true;
       } else {
         ret.editable = false;
@@ -1435,7 +1443,7 @@ const funcshowGrid = async () => {
     }
     var current = gridView.getCurrent();
     console.log(current);
-    if (current.itemIndex != -1) {
+    if (current.itemIndex !== -1) {
       emit("selectedIndex", current.dataRow);
       emit("selectedIndex2", current.dataRow);
       selectedRowData.value = dataProvider.getRows()[current.dataRow];

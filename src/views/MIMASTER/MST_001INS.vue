@@ -1377,7 +1377,7 @@ const showOtherScreen = (newValue) => {
   console.log(tableList.value);
   if (grid != null) {
     console.log(grid.nodes);
-    if (grid == undefined || grid.nodes == undefined) {
+    if (grid == undefined) {
       return;
     }
     grid.removeAll();

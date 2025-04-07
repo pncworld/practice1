@@ -359,80 +359,50 @@ const onEnd = (evt) => {
     // 배열을 업데이트
     items.value = swappedItems;
     console.log(TLUList.value);
-    const first = TLUList.value.find(
-      (item) => item.lngCode == clickedTLUCd.value
-    );
-    first.lngMenu1 = items.value[0].lngCode;
-    first.lngMenu2 = items.value[1].lngCode;
-    first.lngMenu3 = items.value[2].lngCode;
-    first.lngMenu4 = items.value[3].lngCode;
-    first.lngMenu5 = items.value[4].lngCode;
-    first.lngMenu6 = items.value[5].lngCode;
-    first.lngMenu7 = items.value[6].lngCode;
-    first.lngMenu8 = items.value[7].lngCode;
-    first.lngMenu9 = items.value[8].lngCode;
-    first.lngMenu10 = items.value[9].lngCode;
-    first.lngMenu11 = items.value[10].lngCode;
-    first.lngMenu12 = items.value[11].lngCode;
-    first.lngMenu13 = items.value[12].lngCode;
-    first.lngMenu14 = items.value[13].lngCode;
-    first.lngMenu15 = items.value[14].lngCode;
-    first.lngMenu16 = items.value[15].lngCode;
-    first.lngMenu17 = items.value[16].lngCode;
-    first.lngMenu18 = items.value[17].lngCode;
-    first.lngMenu19 = items.value[18].lngCode;
-    first.lngMenu20 = items.value[19].lngCode;
-    first.lngMenu21 = items.value[20].lngCode;
-    first.lngMenu22 = items.value[21].lngCode;
-    first.lngMenu23 = items.value[22].lngCode;
-    first.lngMenu24 = items.value[23].lngCode;
-    first.lngMenu25 = items.value[24].lngCode;
-    first.lngMenu26 = items.value[25].lngCode;
-    first.lngMenu27 = items.value[26].lngCode;
-    first.lngMenu28 = items.value[27].lngCode;
-    first.lngMenu29 = items.value[28].lngCode;
 
-    TLUList.value = [...TLUList.value];
-  } else {
-    console.log(items.value);
-    const first = TLUList.value.find(
-      (item) => item.lngCode == clickedTLUCd.value
-    );
-    first.lngMenu1 = items.value[0].lngCode;
-    first.lngMenu2 = items.value[1].lngCode;
-    first.lngMenu3 = items.value[2].lngCode;
-    first.lngMenu4 = items.value[3].lngCode;
-    first.lngMenu5 = items.value[4].lngCode;
-    first.lngMenu6 = items.value[5].lngCode;
-    first.lngMenu7 = items.value[6].lngCode;
-    first.lngMenu8 = items.value[7].lngCode;
-    first.lngMenu9 = items.value[8].lngCode;
-    first.lngMenu10 = items.value[9].lngCode;
-    first.lngMenu11 = items.value[10].lngCode;
-    first.lngMenu12 = items.value[11].lngCode;
-    first.lngMenu13 = items.value[12].lngCode;
-    first.lngMenu14 = items.value[13].lngCode;
-    first.lngMenu15 = items.value[14].lngCode;
-    first.lngMenu16 = items.value[15].lngCode;
-    first.lngMenu17 = items.value[16].lngCode;
-    first.lngMenu18 = items.value[17].lngCode;
-    first.lngMenu19 = items.value[18].lngCode;
-    first.lngMenu20 = items.value[19].lngCode;
-    first.lngMenu21 = items.value[20].lngCode;
-    first.lngMenu22 = items.value[21].lngCode;
-    first.lngMenu23 = items.value[22].lngCode;
-    first.lngMenu24 = items.value[23].lngCode;
-    first.lngMenu25 = items.value[24].lngCode;
-    first.lngMenu26 = items.value[25].lngCode;
-    first.lngMenu27 = items.value[26].lngCode;
-    first.lngMenu28 = items.value[27].lngCode;
-    first.lngMenu29 = items.value[28].lngCode;
-
-    TLUList.value = [...TLUList.value];
+    clickedMenuKey.value = targetItemIndex2;
+    console.log(TLUList.value);
   }
-  clickedMenuKey.value = targetItemIndex2;
-  console.log(TLUList.value);
 };
+
+watch(items, () => {
+  console.log(items.value);
+  if (items.value.length == 0) return;
+  const first = updatedRowData2.value.find(
+    (item) => item.lngCode == clickedTLUCd.value
+  );
+  first.lngMenu1 = items.value[0].lngCode;
+  first.lngMenu2 = items.value[1].lngCode;
+  first.lngMenu3 = items.value[2].lngCode;
+  first.lngMenu4 = items.value[3].lngCode;
+  first.lngMenu5 = items.value[4].lngCode;
+  first.lngMenu6 = items.value[5].lngCode;
+  first.lngMenu7 = items.value[6].lngCode;
+  first.lngMenu8 = items.value[7].lngCode;
+  first.lngMenu9 = items.value[8].lngCode;
+  first.lngMenu10 = items.value[9].lngCode;
+  first.lngMenu11 = items.value[10].lngCode;
+  first.lngMenu12 = items.value[11].lngCode;
+  first.lngMenu13 = items.value[12].lngCode;
+  first.lngMenu14 = items.value[13].lngCode;
+  first.lngMenu15 = items.value[14].lngCode;
+  first.lngMenu16 = items.value[15].lngCode;
+  first.lngMenu17 = items.value[16].lngCode;
+  first.lngMenu18 = items.value[17].lngCode;
+  first.lngMenu19 = items.value[18].lngCode;
+  first.lngMenu20 = items.value[19].lngCode;
+  first.lngMenu21 = items.value[20].lngCode;
+  first.lngMenu22 = items.value[21].lngCode;
+  first.lngMenu23 = items.value[22].lngCode;
+  first.lngMenu24 = items.value[23].lngCode;
+  first.lngMenu25 = items.value[24].lngCode;
+  first.lngMenu26 = items.value[25].lngCode;
+  first.lngMenu27 = items.value[26].lngCode;
+  first.lngMenu28 = items.value[27].lngCode;
+  first.lngMenu29 = items.value[28].lngCode;
+
+  console.log(updatedRowData2.value);
+});
 
 function formatNumber(value) {
   if (!value) return "";

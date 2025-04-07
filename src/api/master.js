@@ -564,12 +564,13 @@ export const saveAllMenuKey3 = (
     SCREEN_TYPE: screenType,
   });
 };
-export const getMenuKeyList2 = (groupCd, storeCd, areaCd, posNo) => {
+export const getMenuKeyList2 = (groupCd, storeCd, areaCd, posNo, screenNo) => {
   return api2.post("/MIMASTER/MST05_004INS.asmx/getMenuKeyList", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     AREA_CD: areaCd,
     POSNO: posNo,
+    SCREEN_NO: screenNo,
   });
 };
 
@@ -803,6 +804,46 @@ export const getKitchenSettingList = (groupCd, storeCd) => {
   return api2.post("/MIMASTER/MST44_062INS.asmx/getKitchenSettingList", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
+  });
+};
+export const getPortConnectionList = (groupCd, storeCd, areaCd) => {
+  return api2.post("/MIMASTER/MST44_063INS.asmx/getPortConnectionList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+  });
+};
+export const savePortConfig = (
+  groupCd,
+  storeCd,
+  posno,
+  lngpositions,
+  lngposs,
+  lngports,
+  cornernms,
+  portidvalues,
+  lngstorecodes,
+  areaCds,
+  deleteposs,
+  deletestorecd,
+  deletelngposition,
+  deleteareacode
+) => {
+  return api2.post("/MIMASTER/MST44_063INS.asmx/savePortConfig", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    POS_NO: posno,
+    LNG_POSITION: lngpositions,
+    LNG_POS: lngposs,
+    LNG_PORT: lngports,
+    CORNER_NM: cornernms,
+    PORT_ID_VALUE: portidvalues,
+    STORE_CDS: lngstorecodes,
+    AREA_CDS: areaCds,
+    DELETE_POSS: deleteposs,
+    DELETE_STORE_CDS: deletestorecd,
+    DELETE_LNG_POSITION: deletelngposition,
+    DELETE_AREACODE: deleteareacode,
   });
 };
 export const DUPLIPAYKEY = (

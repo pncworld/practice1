@@ -45,15 +45,16 @@
           @selectedIndex="selectedIndex"
           @selcetedrowData="selcetedrowData"
           @updatedRowData="updatedRowData"
+          @allStateRows="allStateRows"
           :selectionStyle="'singleRow'"
           :addRow4="addRow"
-          :deleteRow2="deleteRow"
+          :deleteRow6="deleteRow"
           :addrowDefault="addrowDefault"
           :addrowProp="addrowProp"
           :rowStateeditable="false"
           :addField="'new'"
           :exporttoExcel="exporttoExcel"
-          :ExcelNm="'입출금계정등록'"></Realgrid>
+          :documentTitle="'MST40_001INS'"></Realgrid>
       </div>
 
       <div class="grid grid-cols-[1fr,6fr] grid-rows-3 w-[70%] ml-44 h-[15%]">
@@ -149,7 +150,11 @@ const rowData = ref([]);
 const groupCd = ref();
 const storeCd = ref(0);
 const afterSearch = ref(false);
-
+const changedRows = ref([]);
+const allStateRows = (e) => {
+  changedRows.value = e;
+  console.log(changedRows.value);
+};
 const clickStoreCd = ref(0);
 const clickStoreNm = ref();
 const addNew = ref(true);
@@ -313,7 +318,10 @@ const saveButton = async () => {
     });
     return;
   }
-  if (JSON.stringify(updateRow.value) === JSON.stringify(rowData.value)) {
+  let a = changedRows.value.deleted.length;
+  let b = changedRows.value.created.length;
+  let c = changedRows.value.updated.length;
+  if (a + b + c == 0) {
     Swal.fire({
       title: "경고",
       text: "변경된 사항이 없습니다.",
@@ -393,7 +401,7 @@ const saveButton = async () => {
           .map((item) => item.blnGear);
 
         const dlngAccCode = updateRow.value
-          .filter((item) => item.deleted == true)
+          .filter((item, index) => changedRows.value.deleted.includes(index))
           .map((item) => item.lngAccCode);
 
         const res = await saveAccInfo(

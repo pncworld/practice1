@@ -93,7 +93,7 @@
         <div class="h-[15vh] w-[45vw] ml-10 mt-5" v-show="currentMenu == 3">
           <div class="w-full h-full ">
             <Realgrid class="w-[100%] h-[150%] " :progname="'MST44_062INS_VUE'" :progid="3" :reload="reload"
-              :rowData="rowData4" @clickedRowData="clickedRowData2" @realgridname="realgridname4"
+              :rowData="rowData4" @clickedRowData="clickedRowData2" @realgridname="realgridname4" @selectedIndex2="selectedIndex2"
               @updatedRowData="updatedRowData3" :changeColid="changeColid" :changeRow="changeRow" :changeNow="changeNow2"
               :changeValue2="changeValue" :initSelect="initSelect" ></Realgrid>
           </div>
@@ -123,19 +123,19 @@
               <div class=" w-full h-full px-2 py-2 rounded-lg  flex justify-center text-red-500">({{ receiptDByte }}byte)
               </div>
               <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                v-model="receiptD1" name="receiptD1"  @input="handleInput2" @click="selecedReceiptSection(1)"
+                :value="receiptD1" name="receiptD1"  @input="handleInput2" @blur="handleBlur" @click="selecedReceiptSection(1)"
                 :disabled="!afterSearch3"></input>
               <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                v-model="receiptD2"  name="receiptD2" @input="handleInput2" @click="selecedReceiptSection(2)"
+                 :value="receiptD2"  name="receiptD2" @input="handleInput2" @blur="handleBlur" @click="selecedReceiptSection(2)"
                 :disabled="!afterSearch3"></input>
               <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                v-model="receiptD3"  name="receiptD3" @input="handleInput2" @click="selecedReceiptSection(3)"
+                 :value="receiptD3"  name="receiptD3" @input="handleInput2" @blur="handleBlur" @click="selecedReceiptSection(3)"
                 :disabled="!afterSearch3"></input>
               <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                v-model="receiptD4"  name="receiptD4" @input="handleInput2" @click="selecedReceiptSection(4)"
+                 :value="receiptD4"  name="receiptD4" @input="handleInput2"  @blur="handleBlur" @click="selecedReceiptSection(4)"
                 :disabled="!afterSearch3"></input>
               <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                v-model="receiptD5" name="receiptD5"  @input="handleInput2" @click="selecedReceiptSection(5)"
+                 :value="receiptD5" name="receiptD5"  @input="handleInput2" @blur="handleBlur" @click="selecedReceiptSection(5)"
                 :disabled="!afterSearch3"></input>
             </div>
           </div>
@@ -249,7 +249,7 @@
 
 <script setup>
 import { getKitchenSettingList, getPrintList, getStorePosList, saveKitchenSettingAll, savePrintNm, saveReceiptData } from '@/api/master';
-import { ref, watch } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 import DupliPopUp5 from '@/components/dupliPopUp5.vue';
@@ -429,14 +429,20 @@ const handleInput = (e) => {
 
 }
 
-const handleInput2 = (e) => {
-  calculateByte2(e)
-  changeColid.value = 'strReceiptD'
-  
+const handleBlur = (e) => {
+  if(isSwalOpen == true){
+    return
+  }
+
+  receiptD1.value = receiptD1.value == undefined ? '' : receiptD1.value
+  receiptD2.value =receiptD2.value == undefined ? '' : receiptD2.value
+  receiptD3.value =receiptD3.value == undefined ? '' : receiptD3.value
+  receiptD4.value = receiptD4.value == undefined ? '' : receiptD4.value
+  receiptD5.value = receiptD5.value == undefined ? '' : receiptD5.value
   if(e.target.name == 'receiptD1'){
-    changeValue.value = addSpace42Text(e.target.value) + addSpace42Text(receiptD2.value) + addSpace42Text(receiptD3.value) + addSpace42Text(receiptD4.value) + addSpace42Text(receiptD5.value) 
+    changeValue.value = addSpace42Text(e.target.value) + addSpace42Text(receiptD2.value) + addSpace42Text(receiptD3.value) + addSpace42Text( receiptD4.value) + addSpace42Text(receiptD5.value) 
   } else if(e.target.name == 'receiptD2'){
-    changeValue.value = addSpace42Text(receiptD1.value)+ addSpace42Text(e.target.value) + addSpace42Text(receiptD3.value) + addSpace42Text(receiptD4.value) + addSpace42Text(receiptD5.value) 
+    changeValue.value = addSpace42Text( receiptD1.value)+ addSpace42Text(e.target.value) + addSpace42Text(receiptD3.value) + addSpace42Text(receiptD4.value) + addSpace42Text(receiptD5.value) 
   } else if(e.target.name == 'receiptD3'){
     changeValue.value =addSpace42Text(receiptD1.value)+ addSpace42Text(receiptD2.value) + addSpace42Text(e.target.value)  + addSpace42Text(receiptD4.value) + addSpace42Text(receiptD5.value) 
   } else if(e.target.name == 'receiptD4'){
@@ -447,6 +453,78 @@ const handleInput2 = (e) => {
   
 
   changeNow2.value = !changeNow2.value
+}
+let isSwalOpen = false;
+const handleInput2 = (e) => {
+  const isValid = calculateByte2(e);
+  changeColid.value = 'strReceiptD';
+
+  if (!isValid) return;
+
+  const name = e.target.name;
+  const value = e.target.value;
+  if(value == undefined) value = '';
+  if (name === 'receiptD1') receiptD1.value = value;
+  else if (name === 'receiptD2') receiptD2.value = value;
+  else if (name === 'receiptD3') receiptD3.value = value;
+  else if (name === 'receiptD4') receiptD4.value = value;
+  else if (name === 'receiptD5') receiptD5.value = value;
+};
+
+
+const calculateByte2 = async(e) => {
+
+const encoder = new TextEncoder();
+let inputValue = e.target.value
+console.log(inputValue)
+receiptDByte.value = encoder.encode(inputValue).length
+if (receiptDByte.value >= 43) {
+  console.log(inputValue)
+  isSwalOpen = true ; 
+    const result = await Swal.fire({
+    title: '경고',
+    text: '43바이트 이상 입력할 수 없습니다.',
+    icon: 'warning',
+    confirmButtonText: '확인'
+  }).then((result) => {
+    
+    if (result.isConfirmed) {
+
+      isSwalOpen = false
+      while (receiptDByte.value >= 43) {
+        inputValue = inputValue.slice(0, inputValue.length - 1)
+
+      
+        console.log(receiptU.value)
+        console.log(inputValue)
+        receiptDByte.value = encoder.encode(inputValue).length
+      }
+      if (e.target.name == 'receiptD1') {
+        receiptD1.value = inputValue
+      } else if (e.target.name == 'receiptD2') {
+        receiptD2.value = inputValue
+      } else if (e.target.name == 'receiptD3') {
+        receiptD3.value = inputValue
+      } else if (e.target.name == 'receiptD4') {
+        receiptD4.value = inputValue
+      } else if (e.target.name == 'receiptD5') {
+        receiptD5.value = inputValue
+      }
+
+    
+    }
+
+
+  }
+  )
+
+
+  return false;
+} else {
+  return true
+}
+
+
 }
 
 const reload = ref(false)
@@ -966,6 +1044,7 @@ const saveButton = async () => {
           console.log(res)
 
         } else if (currentMenu.value == 3) {
+          console.log(updatedList3.value)
           const posNos = updatedList3.value.map(item => item.intPosNo)
           const areaCodes = updatedList3.value.map(item => item.lngAreaCode)
           const strreceipts = updatedList3.value.map(item => item.strReceiptU)
@@ -1025,14 +1104,22 @@ const caculateByte3 = (e) => {
   changeNow2.value = !changeNow2.value
 }
 
-
-const initAllSection = () => {
+const initAllSection = async () => {
   receiptU.value = ''
   receiptD1.value = ''
   receiptD2.value = ''
   receiptD3.value = ''
   receiptD4.value = ''
   receiptD5.value = ''
+  changeColid.value = 'strReceiptU'
+  changeValue.value = ''
+  changeNow2.value = !changeNow2.value
+
+  await nextTick() // DOM 업데이트 기다림
+
+  changeColid.value = 'strReceiptD'
+  changeValue.value = ''
+  changeNow2.value = !changeNow2.value
 }
 
 let changedupliindex = ''
@@ -1065,43 +1152,7 @@ const dupliData = () => {
 
 
 
-const calculateByte = (e) => {
 
-  const encoder = new TextEncoder();
-  let inputValue = e.target.value
-  console.log(inputValue)
-  receiptUByte.value = encoder.encode(inputValue).length
-  if (receiptUByte.value >= 43) {
-    console.log(inputValue)
-    Swal.fire({
-      title: '경고',
-      text: '43바이트 이상 입력할 수 없습니다.',
-      icon: 'warning',
-      confirmButtonText: '확인'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        console.log(inputValue)
-
-        while (receiptUByte.value >= 43) {
-          inputValue = inputValue.slice(0, inputValue.length - 1)
-          console.log(receiptU.value)
-          receiptUByte.value = encoder.encode(inputValue).length
-        }
-
-        receiptU.value = inputValue
-
-      }
-
-
-    }
-    )
-
-
-    return;
-  }
-
-
-}
 
 const selecedSection = ref()
 const selecedReceiptSection = (value) => {
@@ -1122,53 +1173,8 @@ const selecedReceiptSection = (value) => {
     receiptDByte.value = encoder.encode(receiptD5.value).length
   }
 }
-const calculateByte2 = (e) => {
-
-  const encoder = new TextEncoder();
-  let inputValue = e.target.value
-  console.log(inputValue)
-  receiptDByte.value = encoder.encode(inputValue).length
-  if (receiptDByte.value >= 43) {
-    console.log(inputValue)
-    Swal.fire({
-      title: '경고',
-      text: '43바이트 이상 입력할 수 없습니다.',
-      icon: 'warning',
-      confirmButtonText: '확인'
-    }).then((result) => {
-      if (result.isConfirmed) {
 
 
-        while (receiptDByte.value >= 43) {
-          inputValue = inputValue.slice(0, inputValue.length - 1)
-          console.log(receiptU.value)
-          receiptDByte.value = encoder.encode(inputValue).length
-        }
-        if (selecedSection.value == 1) {
-          receiptD1.value = inputValue
-        } else if (selecedSection.value == 2) {
-          receiptD2.value = inputValue
-        } else if (selecedSection.value == 3) {
-          receiptD3.value = inputValue
-        } else if (selecedSection.value == 4) {
-          receiptD4.value = inputValue
-        } else if (selecedSection.value == 5) {
-          receiptD5.value = inputValue
-        }
-
-
-      }
-
-
-    }
-    )
-
-
-    return;
-  }
-
-
-}
 
 const addSpace42Text = (value) => {
   let prechangeValue = value
@@ -1196,13 +1202,28 @@ const changeValues2 = async (e) => {
 
 }
 
-const dupliAllData = () => {
+const dupliAllData = async() => {
   receiptU.value = savedreceiptU
+  console.log(savedreceiptU)
+  console.log(changeNow2.value)
+  changeColid.value = 'strReceiptU'
+  changeValue.value = savedreceiptU
+  changeNow2.value = !changeNow2.value
+
+
+  await nextTick()
+ 
   receiptD1.value = savedreceiptD1
   receiptD2.value = savedreceiptD2
   receiptD3.value = savedreceiptD3
   receiptD4.value = savedreceiptD4
   receiptD5.value = savedreceiptD5
+   changeColid.value = 'strReceiptD'
+   changeValue.value = savedreceiptD1 + savedreceiptD2 + savedreceiptD3 + savedreceiptD4 + savedreceiptD5
+
+   console.log(changeValue.value)
+   console.log(changeNow2.value)
+   changeNow2.value = !changeNow2.value
 
 }
 
@@ -1269,9 +1290,12 @@ function splitStringByByteLength(str, maxByteLength) {
 
   return chunks;
 }
+const selectedIndex2 = (e) => {
+  changeRow.value = e
+
+}
 const clickedRowData2 = (newValue) => {
   console.log(newValue)
-  changeRow.value = newValue.index
   receiptU.value = newValue[2]
   const result = splitStringByByteLength(newValue[3], 42)
   receiptD1.value = result[0]

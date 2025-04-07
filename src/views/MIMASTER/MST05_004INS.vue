@@ -335,7 +335,9 @@
               }}</span>
               <span class="ml-16" v-if="item.intKeyNo == 6">{{
                 item.lngKeyscrNo
-                  ? Number(item.lngPrice).toLocaleString() + "원"
+                  ? typeof item.lngPrice == "string"
+                    ? item.lngPrice
+                    : Number(item.lngPrice).toLocaleString() + "원"
                   : ""
               }}</span>
             </span>
@@ -492,7 +494,7 @@ const selcetedrowData = (e) => {
   if (clickedRealIndex.value == null) {
     return;
   }
-  //console.log(e);
+  console.log(e);
   currentSelectedMenuNm.value = e[1];
   currentSelectedMenuCode.value = e[0];
   currentSelectedMenuPrice.value = e[2];
@@ -722,7 +724,8 @@ const searchMenu = async () => {
       groupCd.value,
       nowStoreCd.value,
       nowStoreAreaCd.value,
-      posNo.value
+      posNo.value,
+      nowscreenNo.value
     );
 
     MenuKeyList.value = res4.data.MenukeyList;
@@ -740,6 +743,7 @@ const searchMenu = async () => {
 
     const startIndex = (nowscreenNo.value - 1) * 45;
     const endIndex = nowscreenNo.value * 45;
+    console.log(items.value);
     // 중간에 비어 있는 번호 확인 및 채우기
     for (let i = startIndex; i < endIndex; i++) {
       // 해당 번호가 없는 경우 기본값 추가
@@ -755,7 +759,7 @@ const searchMenu = async () => {
         });
       }
     }
-    console.log(MenuKeyList.value);
+    console.log(items.value);
 
     afterSearch.value = true;
   } catch (error) {
@@ -764,6 +768,8 @@ const searchMenu = async () => {
     store.state.loading = false; // 로딩 상태 종료
     modified.value = false;
     afterCategory.value = false;
+    console.log(items.value);
+    console.log(MenuKeyList.value);
   }
 
   calculateMaxSubCode();
@@ -1052,12 +1058,15 @@ const nowscreenNo = ref();
 const handleScreenNo = (newValue) => {
   nowscreenNo.value = newValue;
   console.log(nowscreenNo.value);
-  showMenuKey(newValue);
+  //showMenuKey(newValue);
+  if (newValue != "0") {
+    searchMenu();
+  }
 };
 watch(nowscreenNo, (newvalue) => {
   changePage.value = true;
   if (afterSearch.value) {
-    showMenuKey(newvalue);
+    // showMenuKey(newvalue);
   }
   changePage.value = false;
 });
@@ -1215,6 +1224,7 @@ const addMenuKey = () => {
     a.lngKeyColor = "16769216";
     a.lngKeyscrNo = Number(currentSelectedMenuCode.value);
     a.strKeyName = currentSelectedMenuNm.value;
+    a.lngPrice = currentSelectedMenuPrice.value;
   }
   console.log(items.value);
   console.log(posNo.value);
@@ -1235,6 +1245,7 @@ const addMenuKey = () => {
     b.lngKeyColor = "16769216";
     b.lngKeyscrNo = Number(currentSelectedMenuCode.value);
     b.strKeyName = currentSelectedMenuNm.value;
+    b.lngPrice = currentSelectedMenuPrice.value;
   } else {
     MenuKeyList.value.push({
       intKeyNo: onScreenKey ? 1 : 6,
@@ -1243,6 +1254,7 @@ const addMenuKey = () => {
       lngKeyColor: "16769216",
       lngKeyscrNo: Number(currentSelectedMenuCode.value),
       strKeyName: currentSelectedMenuNm.value,
+      lngPrice: currentSelectedMenuPrice.value,
     });
   }
 

@@ -270,7 +270,7 @@ onMounted(() => {
   emit("update:storeCd", store.state.userData.lngPosition);
   emit("storeNm", store.state.userData.strStoreName);
   emit("posNo", 0);
-  emit("update:storeAreaCd", 0);
+  //emit("update:storeAreaCd", 0);
   emit("GroupNm", store.state.userData.strStoreGroupName);
   setPosNo(store.state.userData.lngPosition);
   setStoreAreaCd(store.state.userData.lngPosition);
@@ -340,9 +340,13 @@ const setStoreAreaCd = (value) => {
   storeAreaCd.value = storeAreaCd2.value.filter((item) => {
     return item.lngStoreCode == value;
   });
-  // selectedStoreAreaCd.value = storeAreaCd.value[0] ? storeAreaCd.value[0].lngAreaCode : '0'
-  selectedStoreAreaCd.value = "0";
 
+  console.log(storeAreaCd.value);
+  selectedStoreAreaCd.value = storeAreaCd.value[0]
+    ? storeAreaCd.value[0].lngAreaCode
+    : "0";
+  // selectedStoreAreaCd.value = "0";
+  //emit("update:storeAreaCd", selectedStoreAreaCd.value);
   emitStoreAreaCd(selectedStoreAreaCd.value);
 };
 
@@ -398,6 +402,7 @@ const setScreenNo = async (value) => {
     );
     ScreenList.value = res2.data.ScreenList;
   }
+  console.log(ScreenList.value);
   selectedScreenNo.value = "0";
 };
 

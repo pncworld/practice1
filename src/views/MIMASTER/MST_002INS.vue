@@ -1052,6 +1052,7 @@ watch(
 const showOtherScreen = (newValue) => {
   console.log(filteredtableList.value);
   console.log(tableList.value);
+  console.log(newValue);
   clickTable.value = false;
   filteredtableList.value.forEach((item) => {
     const tableItem = tableList.value.find(
@@ -1079,7 +1080,7 @@ const showOtherScreen = (newValue) => {
   console.log(grid);
   if (grid != null) {
     console.log(grid.nodes);
-    if (grid == undefined || grid.nodes == undefined) {
+    if (grid == undefined) {
       return;
     }
     grid.removeAll();
