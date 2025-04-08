@@ -813,6 +813,13 @@ export const getPortConnectionList = (groupCd, storeCd, areaCd) => {
     AREA_CD: areaCd,
   });
 };
+export const getPrintDefaultSetting = (groupCd, storeCd, areaCd) => {
+  return api2.post("/MIMASTER/MST44_063INS.asmx/getPrintDefaultSetting", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+  });
+};
 export const savePortConfig = (
   groupCd,
   storeCd,
@@ -1719,6 +1726,100 @@ export const saveTLUList = (
     LNGMENU27: lngmenu27,
     LNGMENU28: lngmenu28,
     LNGMENU29: lngmenu29,
+  });
+};
+
+export const savePrintConfig = (
+  groupCd,
+  storeCd,
+  posNos,
+  issuecounts,
+  issuetypes,
+  issuesums,
+  rissuecounts,
+  rissuetypes,
+  kitchenordervoids,
+  kitchenmenuvoids,
+  kitchenus,
+  kitchends,
+  floormaxs,
+  lnglogos,
+  lngstoregroup,
+  lngstorecode,
+  lngareacode,
+  poskiosk,
+  deleteposnos
+) => {
+  return api2.post("/MIMASTER/MST44_063INS.asmx/savePrintConfig", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    POS_NO: posNos,
+    ISSUE_COUNT: issuecounts,
+    ISSUE_TYPE: issuetypes,
+    ISSUE_SUM: issuesums,
+    RISSUE_COUNT: rissuecounts,
+    RISSUE_TYPE: rissuetypes,
+    KITCHEN_ORDER_VOID: kitchenordervoids,
+    KITCHEN_MENU_VOID: kitchenmenuvoids,
+    KITCHEN_US: kitchenus,
+    KITCHEN_DS: kitchends,
+    FLOOR_MAX: floormaxs,
+    LNG_LOGO: lnglogos,
+    LNG_STOREGROUP: lngstoregroup,
+    LNG_STORECODE: lngstorecode,
+    LNG_AREACODE: lngareacode,
+    POS_KIOSK: poskiosk,
+    DELETE_POSNO: deleteposnos,
+  });
+};
+export const savePosInfo = (
+  groupCds,
+  storeCds,
+  areacds,
+  posnos,
+  posipeqcl,
+  posEqipk,
+  dates,
+  oscds,
+  posips,
+  posclcd,
+  useyn,
+  remark,
+  deleteGROUP,
+  deleteSTORECD,
+  deleteAreaCd,
+  deletePoss
+) => {
+  return api2.post("/MIMASTER/MST44_063INS.asmx/savePosInfo", {
+    GROUP_CDS: groupCds,
+    STORE_CDS: storeCds,
+    AREA_CDS: areacds,
+    POS_NOS: posnos,
+    POS_IP_CL: posipeqcl,
+    POS_IPK: posEqipk,
+    DATES: dates,
+    OS_CDS: oscds,
+    POS_IPS: posips,
+    POS_CLCDS: posclcd,
+    USE_YNS: useyn,
+    REMARKS: remark,
+    DELETE_GROUP: deleteGROUP,
+    DELETE_STORE: deleteSTORECD,
+    DELETE_AREA: deleteAreaCd,
+    DELETE_POS: deletePoss,
+  });
+};
+
+export const getPortDefaultInfo = (groupCd, storeCd) => {
+  return api2.post("/MIMASTER/MST44_063INS.asmx/getPortDefaultInfo", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+export const getPosInfo = (groupCd, storeCd) => {
+  return api2.post("/MIMASTER/MST44_063INS.asmx/getPosInfo", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
   });
 };
 export const getKDSList = (groupCd) => {

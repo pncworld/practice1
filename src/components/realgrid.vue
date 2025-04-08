@@ -550,6 +550,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  suffixColumnJul: {
+    type: Array,
+    default: [],
+  },
+  suffixColumnheng: {
+    type: Array,
+    default: [],
+  },
 });
 
 const realgridname = ref(
@@ -664,7 +672,6 @@ const funcshowGrid = async () => {
           : item.strColType === "double" && item.strDisplay != "double"
           ? "#,##0.0"
           : "#,##0",
-      suffix: props.suffixColumnPercent.includes(item.strColID) ? "%" : "",
       valueCallback: function (grid, column, groupFooterIndex, group, value) {
         const regex =
           /(sum|avg|max|min|count)\(\s*([^)]+?)\s*\)|([+\-*/]|\b\d+\b)/gi;
@@ -852,9 +859,15 @@ const funcshowGrid = async () => {
         ? "setTextAlignCenter"
         : "setTextAlignRight",
     editor: {
-      type: item.strColType.includes("dropdown") ? "dropdown" : "line",
+      type: item.strColType.includes("dropdown")
+        ? "dropdown"
+        : item.strDisplay.includes("date")
+        ? "date"
+        : "line",
       domainOnly: true,
+      datetimeFormat: "yyyy-MM-dd",
 
+      commitOnSelect: true,
       inputCharacters:
         item.strColID == props.inputOnlyNumberColumn
           ? "0123456789"
@@ -925,12 +938,14 @@ const funcshowGrid = async () => {
       const labelingcolumn = columns.find(
         (item) => item.fieldName == lcolumns[i]
       );
+
       if (labelingcolumn) {
         labelingcolumn.lookupDisplay = true;
 
         labelingcolumn.values = values[i];
         labelingcolumn.labels = labels[i];
       }
+      console.log(labelingcolumn);
     }
   }
 
@@ -1275,6 +1290,16 @@ const funcshowGrid = async () => {
       gridView.columnByName(props.suffixColumnPercent[i]).suffix = "%";
     }
   }
+  if (props.suffixColumnJul != []) {
+    for (let i = 0; i < props.suffixColumnJul.length; i++) {
+      gridView.columnByName(props.suffixColumnJul[i]).suffix = "줄";
+    }
+  }
+  if (props.suffixColumnheng != []) {
+    for (let i = 0; i < props.suffixColumnheng.length; i++) {
+      gridView.columnByName(props.suffixColumnheng[i]).suffix = "회";
+    }
+  }
   if (props.hideColumnNow == true) {
     gridView.columnByField(props.hideColumn).visible = false;
   }
@@ -1392,7 +1417,7 @@ const funcshowGrid = async () => {
     emit("updatedRowData", updatedrowData.value);
     const a = updatedrowData.value.filter((item) => item.checkbox == true);
     // selectedRowData.value = []
-    console.log(dataProvider.getAllStateRows());
+
     emit("allStateRows", dataProvider.getAllStateRows());
     emit("checkedRowData", a);
   };
@@ -1404,7 +1429,7 @@ const funcshowGrid = async () => {
     selectedRowData.value = dataProvider.getRows()[clickData.itemIndex];
     var current = gridView.getCurrent();
     selectedindex.value = current.dataRow;
-    console.log(selectedindex.value);
+
     emit("selcetedrowData", selectedRowData.value);
     emit("selectedIndex", clickData.itemIndex);
     emit("selectedIndex2", clickData.dataRow);
@@ -1726,7 +1751,7 @@ watch(
     var dataRow = dataProvider.addRow(values);
     gridView.setCurrent({ dataRow: dataRow });
     const current = gridView.getCurrent();
-
+    emit("allStateRows", dataProvider.getAllStateRows());
     props.rowData.push(values);
     const selectedRowIndex = current ? current.dataRow : null;
     if (selectedRowIndex !== null) {
@@ -2146,7 +2171,7 @@ onMounted(async () => {
     tabInitSetArray.value = [];
     const result = await getGridInfoList(props.progname, props.progid);
     tabInitSetArray.value = result;
-    console.log(tabInitSetArray.value);
+
     await nextTick();
     if (props.setDynamicGrid == true) {
       const res = await getDynamicGrid(
@@ -2161,7 +2186,7 @@ onMounted(async () => {
         store.state.userData.lngStoreGroup,
         result.length
       );
-      console.log(res);
+
       tabInitSetArray.value.push(...res.data.List);
     }
 
@@ -2177,7 +2202,7 @@ onMounted(async () => {
     //   tabInitSetArray.value.push(...res.data.List);
     //   console.log(tabInitSetArray.value);
     // }
-    console.log(tabInitSetArray.value);
+
     // 동적 스타일 생성
     let styleContent = "";
     tabInitSetArray.value.forEach((item, index) => {
@@ -2229,7 +2254,7 @@ const setupGrid = async () => {
         store.state.userData.lngStoreGroup,
         result.length
       );
-      console.log(res);
+
       tabInitSetArray.value.push(...res.data.List);
     }
     if (props.setDynamicGrid3 == true) {
@@ -2238,13 +2263,12 @@ const setupGrid = async () => {
         props.dynamicStoreCd,
         result.length
       );
-      console.log(res);
+
       if (res.data.List.length > 0) {
         tabInitSetArray.value.push(...res.data.List);
       }
     }
 
-    console.log(tabInitSetArray.value);
     // Dynamic style generation
     let styleContent = "";
     tabInitSetArray.value.forEach((item, index) => {
@@ -2295,8 +2319,7 @@ watch(
         addrow4activated.value = false;
 
         const current = gridView.getCurrent();
-        console.log(current);
-        console.log(selectedindex.value);
+
         if (deleted2activated.value == true) {
           gridView.clearCurrent();
           deleted2activated.value = false;
@@ -2322,7 +2345,6 @@ watch(
     const searchColId = props.searchColId.split(",");
     let searchColId2;
     let searchColValues;
-    console.log(props.searchColValue2);
 
     if (props.searchColId2 !== "") {
       searchColId2 = props.searchColId2.split(",");

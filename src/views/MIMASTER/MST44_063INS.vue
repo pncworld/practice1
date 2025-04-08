@@ -23,21 +23,7 @@
       @storeNm="handlestoreNm"
       @update:ischanged="handleinitAll"></PickStore>
   </div>
-  <div class="z-50">
-    <DupliPopUp5
-      :isVisible="showPopup2"
-      @close="showPopup2 = false"
-      :storeCd="nowStoreCd"
-      :storeNm="clickedStoreNm"
-      :areaCd="nowStoreAreaCd"
-      :posNo="posNo"
-      :progname="'MST44_061INS_VUE'"
-      :dupliapiname="'DUPLIALLKDS'"
-      :progid="3"
-      :poskiosk="'getStoreList'"
-      naming2="KDS">
-    </DupliPopUp5>
-  </div>
+
   <div class="mt-5 flex justify-start ml-10">
     <button
       class="contents_tab-button"
@@ -73,8 +59,8 @@
           v-if="currentMenu == 1">
           <div>POS정보 목록</div>
           <div>
-            <button class="whitebutton">추가</button
-            ><button class="whitebutton">삭제</button>
+            <button class="whitebutton" @click="addRow">추가</button
+            ><button class="whitebutton" @click="deleteRow">삭제</button>
           </div>
         </div>
         <div
@@ -99,24 +85,47 @@
           class="flex justify-between rounded-tl-lg text-xl -mt-1 font-bold w-full"
           v-if="currentMenu == 4">
           <div>출력기본 목록</div>
-          <div>
-            <button class="whitebutton">추가</button
-            ><button class="whitebutton">삭제</button>
+          <div class="space-x-1">
+            <button class="whitebutton" @click="addRow4">추가</button>
+            <button class="whitebutton" @click="dupliRow4">복사</button>
+            <button class="whitebutton" @click="deleteRow4">삭제</button>
           </div>
         </div>
         <!-- <div class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold space-x-1 " v-if="currentMenu == 4"><button
               class="whitebutton" @click="initAllSection">초기화</button><button class="whitebutton"
               @click="dupliData">복사</button><button class="whitebutton" @click="dupliAllData">붙여넣기</button></div> -->
       </div>
-      <div class="w-full h-full" v-show="currentMenu == 1">
+      <div class="w-full h-full" v-if="currentMenu == 1">
         <div class="ml-10 mt-5 w-full h-full">
           <Realgrid
             class="w-[95%] h-[150%]"
-            :progname="'MST44_062INS_VUE'"
+            :progname="'MST44_063INS_VUE'"
             :progid="1"
             :rowData="rowData"
             :showCheckBar="false"
+            :labelingColumns="'intPosNo,posEqipClCd,posEqipKndCd,instlOsClCd,posClCd,useYn'"
+            :labelsData="[
+              labelsData1,
+              labelsData6,
+              labelsData7,
+              labelsData8,
+              labelsData9,
+              labelsData4,
+            ]"
+            :valuesData="[
+              valueData1,
+              valueData6,
+              valueData7,
+              valueData8,
+              valueData9,
+              valueData4,
+            ]"
             @selcetedrowData="selcetedrowData"
+            @allStateRows="allStateRows"
+            :addRow4="addRows"
+            :addrowDefault="addrowDefault"
+            :addrowProp="addrowProp"
+            :deleteRow6="deleteRows"
             :changeRow="changeRow"
             :changeNow="changeNow"
             :changeColid="changeColid"
@@ -144,24 +153,35 @@
             <select
               name=""
               id=""
-              class="w-full h-8 border border-gray-500 rounded-lg"></select>
+              :disabled="disabled1"
+              v-model="gridvalue21"
+              class="w-full h-8 border border-gray-500 rounded-lg disabled:bg-gray-100">
+              <option value="-1">선택</option>
+              <option :value="i.lngCode" v-for="i in commonList11">
+                {{ i.strName }}
+              </option>
+            </select>
           </div>
           <div class="text-blue-500 font-semibold text-center">*PORT 번호</div>
           <div>
             <input
               type="text"
+              v-model="gridvalue22"
+              :disabled="disabled1"
               class="w-full h-8 border border-gray-500 rounded-lg" />
           </div>
           <div class="text-blue-500 font-semibold text-center">*PORT명</div>
           <div>
             <input
               type="text"
+              v-model="gridvalue23"
               class="w-full h-8 border border-gray-500 rounded-lg" />
           </div>
           <div class="text-blue-500 font-semibold text-center">*PORT설정값</div>
           <div>
             <input
               type="text"
+              v-model="gridvalue24"
               class="w-full h-8 border border-gray-500 rounded-lg" />
           </div>
           <div class="text-blue-500 font-semibold text-center">*PORT구분</div>
@@ -169,7 +189,14 @@
             <select
               name=""
               id=""
-              class="w-full h-8 border border-gray-500 rounded-lg"></select>
+              @change="setPortEqType"
+              class="w-full h-8 border border-gray-500 rounded-lg"
+              v-model="selectCode1">
+              <option value="-1">선택</option>
+              <option :value="JSON.stringify(i)" v-for="i in commonList7">
+                {{ i.strDName }}
+              </option>
+            </select>
           </div>
           <div class="text-blue-500 font-semibold text-center">
             *연결장비유형
@@ -178,7 +205,14 @@
             <select
               name=""
               id=""
-              class="w-full h-8 border border-gray-500 rounded-lg"></select>
+              @change="setEqType"
+              v-model="selectCode2"
+              class="w-full h-8 border border-gray-500 rounded-lg">
+              <option value="-1">선택</option>
+              <option :value="JSON.stringify(i)" v-for="i in commonList8">
+                {{ i.strDName }}
+              </option>
+            </select>
           </div>
           <div class="text-blue-500 font-semibold text-center">
             *PORT오픈여부
@@ -187,7 +221,14 @@
             <select
               name=""
               id=""
-              class="w-full h-8 border border-gray-500 rounded-lg"></select>
+              @change=""
+              v-model="selectCode4"
+              class="w-full h-8 border border-gray-500 rounded-lg">
+              <option value="-1">선택</option>
+              <option :value="i.strDCode" v-for="i in commonList10">
+                {{ i.strDName }}
+              </option>
+            </select>
           </div>
           <div class="text-blue-500 font-semibold text-center">
             *PORT공유여부
@@ -196,14 +237,28 @@
             <select
               name=""
               id=""
-              class="w-full h-8 border border-gray-500 rounded-lg"></select>
+              @change=""
+              v-model="selectCode5"
+              class="w-full h-8 border border-gray-500 rounded-lg">
+              <option value="-1">선택</option>
+              <option :value="i.strDCode" v-for="i in commonList10">
+                {{ i.strDName }}
+              </option>
+            </select>
           </div>
           <div>연결장비종류</div>
           <div>
             <select
               name=""
               id=""
-              class="w-full h-8 border font-semibold border-gray-500 rounded-lg"></select>
+              @change=""
+              v-model="selectCode3"
+              class="w-full h-8 border border-gray-500 rounded-lg">
+              <option value="-1">선택</option>
+              <option :value="i.strDCode" v-for="i in commonList9">
+                {{ i.strDName }}
+              </option>
+            </select>
           </div>
         </div>
         <div class="ml-10 mt-5 w-full h-full">
@@ -212,21 +267,14 @@
           </div>
           <Realgrid
             class="w-[103%] h-[300%]"
-            :progname="'MST44_062INS_VUE'"
-            :progid="4"
+            :progname="'MST44_063INS_VUE'"
+            :progid="2"
             :reload="reload"
-            :rowData="rowData3"
+            :rowData="rowData2"
             :showGrid="showGrid"
             :showCheckBar="false"
             @selcetedrowData="selcetedrowData"
             @updatedRowData="updatedRowData2"
-            :mergeColumns2="true"
-            :mergeColumnGroupName2="['메뉴정보']"
-            :mergeColumnGroupSubList2="[
-              ['mainName', 'subName', 'lngCode', 'strName', 'lngPrice'],
-            ]"
-            :setDynamicGrid3="true"
-            :dynamicStoreCd="nowStoreCd"
             @realgridname="realgridname2"></Realgrid>
         </div>
       </div>
@@ -263,28 +311,68 @@
         </div>
       </div>
 
-      <div class="w-full h-full flex" v-show="currentMenu == 4">
+      <div class="w-full h-full flex" v-if="currentMenu == 4">
         <div class="ml-10 mt-5 w-[75%] h-full">
           <Realgrid
             class="w-[95%] h-[150%]"
-            :progname="'MST44_062INS_VUE'"
-            :progid="1"
-            :rowData="rowData"
-            :showCheckBar="false"
+            :progname="'MST44_063INS_VUE'"
+            :progid="4"
+            :mergeColumns2="true"
+            :mergeColumnGroupName2="[
+              '주문서',
+              '영수증',
+              '주방출력',
+              '주방전표',
+            ]"
+            :mergeColumnGroupSubList2="[
+              ['lngOIssueCount', 'lngOIssueType', 'lngOIssueSum'],
+              ['lngRIssueCount', 'lngRIssueType'],
+              ['lngKitchenOrderVoid', 'lngKitchenMenuVoid'],
+              ['lngKitchenU', 'lngKitchenD'],
+            ]"
+            :rowData="rowData4"
+            :showCheckBar="true"
+            :labelingColumns="'intPosNo,lngOIssueType,lngOIssueSum,lngRIssueType,lngKitchenOrderVoid,lngKitchenMenuVoid,lngLogo'"
+            :labelsData="[
+              labelsData1,
+              labelsData2,
+              labelsData3,
+              labelsData3,
+              labelsData4,
+              labelsData4,
+              labelsData5,
+            ]"
+            :valuesData="[
+              valueData1,
+              valueData2,
+              valueData3,
+              valueData3,
+              valueData4,
+              valueData4,
+              valueData5,
+            ]"
             @selcetedrowData="selcetedrowData"
-            :changeRow="changeRow"
-            :changeNow="changeNow"
+            @checkedRowData="checkedRowData4"
+            :addRow4="addRows4"
+            :addrowDefault="addrowDefault4"
+            :addrowProp="addrowProp4"
+            :deleteRow6="deleterow4"
+            :changeRow="changeRow4"
+            :changeNow="changeNow4"
             :changeColid="changeColid"
             :changeValue2="changeValue"
-            @updatedRowData="updatedRowData"
-            @selectedIndex="selectedIndex"
-            @clickedRowData="clickedRowData"
+            :suffixColumnheng="['lngOIssueCount']"
+            :suffixColumnJul="['lngKitchenU', 'lngKitchenD', 'lngFloorMax']"
+            @updatedRowData="updatedRowData4"
+            @allStateRows="allStateRows4"
+            @selectedIndex2="selectedIndex4"
+            @clickedRowData="clickedRowData4"
             @realgridname="realgridname4"></Realgrid>
         </div>
         <div class="font-semibold">
           <div class="flex justify-start -ml-9 mt-2 text-xl">상세정보</div>
           <div
-            class="grid grid-rows-11 grid-cols-[1fr,2fr] h-full w-full -ml-10 mt-5 items-center gap-0">
+            class="grid grid-rows-12 grid-cols-[1fr,2fr] h-full w-full -ml-10 mt-5 items-center gap-0">
             <div
               class="bg-gray-100 rounded-tl-lg h-full w-full font-semibold items-center text-center border-t border-l border-gray-300 flex justify-center">
               주문서 발행횟수
@@ -293,7 +381,10 @@
               class="bg-white rounded-tr-lg h-full w-full font-semibold items-center text-center border-t border-r border-l border-gray-300 flex justify-start pl-1">
               <input
                 type="number"
-                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]" />회
+                name="lngOIssueCount"
+                @input="setValue"
+                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]"
+                v-model="gridvalue1" />회
             </div>
             <div
               class="text-blue-500 font-semibold bg-gray-100 h-full w-full items-center text-center border-t border-l border-gray-300 flex justify-center">
@@ -302,10 +393,14 @@
             <div
               class="bg-white h-full w-full font-semibold items-center text-center border-t border-r border-l border-gray-300 flex justify-start pl-1">
               <select
-                name=""
-                id=""
-                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]">
-                <option value=""></option>
+                name="lngOIssueType"
+                @change="setValue"
+                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
+                v-model="selectCommon1">
+                <option value="-1">선택</option>
+                <option :value="i.strDCode" v-for="i in commonList1">
+                  {{ i.strDName }}
+                </option>
               </select>
             </div>
             <div
@@ -315,10 +410,14 @@
             <div
               class="bg-white h-full w-full font-semibold items-center text-center border-t border-r border-l border-gray-300 flex justify-start pl-1">
               <select
-                name=""
-                id=""
-                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]">
-                <option value=""></option>
+                name="lngOIssueSum"
+                @change="setValue"
+                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
+                v-model="selectCommon2">
+                <option value="-1">선택</option>
+                <option :value="i.strDCode" v-for="i in commonList2">
+                  {{ i.strDName }}
+                </option>
               </select>
             </div>
             <div
@@ -329,7 +428,10 @@
               class="bg-white rounded-tr-lg h-full w-full font-semibold items-center text-center border-t border-r border-l border-gray-300 flex justify-start pl-1">
               <input
                 type="number"
-                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]" />회
+                @input="setValue"
+                name="lngRIssueCount"
+                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]"
+                v-model="gridvalue2" />회
             </div>
             <div
               class="text-blue-500 font-semibold bg-gray-100 h-full w-full items-center text-center border-t border-l border-gray-300 flex justify-center">
@@ -338,10 +440,14 @@
             <div
               class="bg-white h-full w-full font-semibold items-center text-center border-t border-r border-l border-gray-300 flex justify-start pl-1">
               <select
-                name=""
-                id=""
-                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]">
-                <option value=""></option>
+                name="lngRIssueType"
+                @change="setValue"
+                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
+                v-model="selectCommon3">
+                <option value="-1">선택</option>
+                <option :value="i.strDCode" v-for="i in commonList3">
+                  {{ i.strDName }}
+                </option>
               </select>
             </div>
             <div
@@ -351,10 +457,14 @@
             <div
               class="bg-white h-full w-full font-semibold items-center text-center border-t border-r border-l border-gray-300 flex justify-start pl-1">
               <select
-                name=""
-                id=""
-                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]">
-                <option value=""></option>
+                name="lngKitchenOrderVoid"
+                @change="setValue"
+                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
+                v-model="selectCommon4">
+                <option value="-1">선택</option>
+                <option :value="i.strDCode" v-for="i in commonList4">
+                  {{ i.strDName }}
+                </option>
               </select>
             </div>
             <div
@@ -364,10 +474,14 @@
             <div
               class="bg-white h-full w-full font-semibold items-center text-center border-t border-r border-l border-gray-300 flex justify-start pl-1">
               <select
-                name=""
-                id=""
-                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]">
-                <option value=""></option>
+                name="lngKitchenMenuVoid"
+                @change="setValue"
+                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
+                v-model="selectCommon5">
+                <option value="-1">선택</option>
+                <option :value="i.strDCode" v-for="i in commonList5">
+                  {{ i.strDName }}
+                </option>
               </select>
             </div>
             <div
@@ -378,7 +492,10 @@
               class="bg-white rounded-tr-lg h-full w-full font-semibold items-center text-center border-t border-r border-l border-gray-300 flex justify-start pl-1">
               <input
                 type="number"
-                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]" />줄
+                name="lngKitchenU"
+                @input="setValue"
+                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]"
+                v-model="gridvalue3" />줄
             </div>
             <div
               class="text-blue-500 font-semibold bg-gray-100 h-full w-full items-center text-center border-t border-l border-gray-300 flex justify-center">
@@ -388,7 +505,10 @@
               class="bg-white rounded-tr-lg h-full w-full font-semibold items-center text-center border-t border-r border-l border-gray-300 flex justify-start pl-1">
               <input
                 type="number"
-                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]" />줄
+                name="lngKitchenD"
+                @input="setValue"
+                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]"
+                v-model="gridvalue4" />줄
             </div>
             <div
               class="text-blue-500 font-semibold bg-gray-100 h-full w-full items-center text-center border-t border-l border-gray-300 flex justify-center">
@@ -398,19 +518,42 @@
               class="bg-white rounded-tr-lg h-full w-full font-semibold items-center text-center border-t border-r border-l border-gray-300 flex justify-start pl-1">
               <input
                 type="number"
-                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]" />줄
+                name="lngFloorMax"
+                @input="setValue"
+                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]"
+                v-model="gridvalue5" />줄
             </div>
             <div
-              class="text-blue-500 font-semibold bg-gray-100 h-full w-full rounded-bl-lg items-center flex text-center border-t border-l border-b border-gray-300 justify-center">
+              class="text-blue-500 font-semibold bg-gray-100 h-full w-full items-center flex text-center border-t border-l border-b border-gray-300 justify-center">
               *영수증로고 출력유형
             </div>
             <div
               class="bg-white h-full w-full font-semibold items-center text-center border-t border-r border-l border-gray-300 flex justify-start pl-1">
               <select
-                name=""
-                id=""
-                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]">
-                <option value=""></option>
+                name="lngLogo"
+                @change="setValue"
+                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
+                v-model="selectCommon6">
+                <option value="-1">선택</option>
+                <option :value="i.strDCode" v-for="i in commonList6">
+                  {{ i.strDName }}
+                </option>
+              </select>
+            </div>
+            <div
+              class="text-blue-500 font-semibold bg-gray-100 h-full w-full rounded-bl-lg items-center flex text-center border-t border-l border-b border-gray-300 justify-center">
+              *포스기 유형
+            </div>
+            <div
+              class="bg-white h-full w-full font-semibold items-center text-center border-t border-r border-l border-gray-300 flex justify-start pl-1">
+              <select
+                name="POSKIOSK"
+                @change="setValue"
+                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
+                v-model="selectCommon7">
+                <option value="-1">선택</option>
+                <option value="0">포스</option>
+                <option value="1">키오스크</option>
               </select>
             </div>
           </div>
@@ -424,45 +567,198 @@
 import {
   getKitchenSettingList,
   getPortConnectionList,
+  getPortDefaultInfo,
+  getPosInfo,
+  getPrintDefaultSetting,
   getPrintList,
   saveKitchenSettingAll,
   savePortConfig,
+  savePosInfo,
+  savePrintConfig,
   savePrintNm,
-  saveReceiptData,
 } from "@/api/master";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 
-import DupliPopUp5 from "@/components/dupliPopUp5.vue";
+import { getCommonList, getPosList } from "@/api/common";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
 import RealGrid from "realgrid";
 import Swal from "sweetalert2";
-import { onMounted } from "vue";
-import { getPosList } from "@/api/common";
 const store = useStore();
 // 더미 데이터
 const labelsData1 = ref(["선택"]);
+const labelsData2 = ref([]);
+const labelsData3 = ref([]);
+const labelsData4 = ref([]);
+const labelsData5 = ref([]);
+
+const labelsData6 = ref([]);
+const labelsData7 = ref([]);
+const labelsData8 = ref([]);
+const labelsData9 = ref([]);
 
 const valueData1 = ref([""]);
+const valueData2 = ref([]);
+const valueData3 = ref([]);
+const valueData4 = ref([]);
+const valueData5 = ref([]);
 
+const valueData6 = ref([]);
+const valueData7 = ref([]);
+const valueData8 = ref([]);
+const valueData9 = ref([]);
+
+const commonList11 = ref([]);
 const settingPosList = async (e1, e2) => {
   labelsData1.value = ["선택"];
   valueData1.value = [0];
   const res = await getPosList(e1, e2);
 
   const datas = res.data.pos;
-
+  commonList11.value = res.data.pos;
   for (let i = 0; i < datas.length; i++) {
     valueData1.value.push(datas[i].lngCode);
     labelsData1.value.push(datas[i].strName);
   }
 };
-// onMounted(async () => {
-//   const e2 = store.state.userData.lngPosition;
-//   const e1 = store.state.userData.lngStoreGroup;
-//   settingPosList(e1, e2);
-// });
+const commonList1 = ref([]);
+const commonList2 = ref([]);
+const commonList3 = ref([]);
+const commonList4 = ref([]);
+const commonList5 = ref([]);
+const commonList6 = ref([]);
+const commonList7 = ref([]);
+const commonList10 = ref([]);
+
+const selectCommon1 = ref(-1);
+const selectCommon2 = ref(-1);
+const selectCommon3 = ref(-1);
+const selectCommon4 = ref(-1);
+const selectCommon5 = ref(-1);
+const selectCommon6 = ref(-1);
+const selectCommon7 = ref(-1);
+
+const gridvalue1 = ref(null);
+const gridvalue2 = ref(null);
+const gridvalue3 = ref(null);
+const gridvalue4 = ref(null);
+const gridvalue5 = ref(null);
+
+const reload4 = ref(false);
+const selectCode1 = ref(-1);
+const selectCode2 = ref(-1);
+const selectCode3 = ref(-1);
+const selectCode4 = ref(-1);
+const selectCode5 = ref(-1);
+
+const gridvalue21 = ref(-1);
+const gridvalue22 = ref("");
+const gridvalue23 = ref("");
+const gridvalue24 = ref("");
+
+const disabled1 = ref(true);
+onMounted(async () => {
+  const res = await getCommonList(106);
+  const res2 = await getCommonList(402);
+  const res3 = await getCommonList(407);
+  const res4 = await getCommonList(401);
+  commonList10.value = res3.data.List;
+  const res5 = await getCommonList(403);
+
+  const res6 = await getCommonList(404);
+  const res7 = await getCommonList(405);
+  const res8 = await getCommonList(406);
+
+  const res9 = await getCommonList(408);
+  console.log(res9);
+  commonList7.value = res9.data.List;
+  labelsData6.value = ["선택", ...res5.data.List.map((item) => item.strDName)];
+  valueData6.value = [
+    "-1",
+    ...res5.data.List.map((item) => Number(item.strDCode)),
+  ];
+
+  labelsData7.value = ["선택", ...res6.data.List.map((item) => item.strDName)];
+  valueData7.value = [
+    "-1",
+    ...res6.data.List.map((item) => Number(item.strDCode)),
+  ];
+
+  labelsData8.value = ["선택", ...res7.data.List.map((item) => item.strDName)];
+  valueData8.value = [
+    "-1",
+    ...res7.data.List.map((item) => Number(item.strDCode)),
+  ];
+
+  labelsData9.value = ["선택", ...res8.data.List.map((item) => item.strDName)];
+  valueData9.value = [
+    "-1",
+    ...res8.data.List.map((item) => Number(item.strDCode)),
+  ];
+  commonList1.value = res.data.List;
+  commonList2.value = res2.data.List;
+  commonList3.value = res2.data.List;
+  commonList4.value = res3.data.List.map((item) => ({
+    ...item,
+    strDCode: Number(item.strDCode),
+  }));
+  commonList5.value = res3.data.List.map((item) => ({
+    ...item,
+    strDCode: Number(item.strDCode),
+  }));
+  commonList6.value = res4.data.List;
+
+  labelsData2.value = ["선택", ...res.data.List.map((item) => item.strDName)];
+  valueData2.value = [
+    "-1",
+    ...res.data.List.map((item) => Number(item.strDCode)),
+  ];
+
+  labelsData3.value = ["선택", ...res2.data.List.map((item) => item.strDName)];
+  valueData3.value = [
+    "-1",
+    ...res2.data.List.map((item) => Number(item.strDCode)),
+  ];
+
+  labelsData4.value = ["선택", ...res3.data.List.map((item) => item.strDName)];
+  valueData4.value = [
+    "-1",
+    ...res3.data.List.map((item) => Number(item.strDCode)),
+  ];
+
+  labelsData5.value = ["선택", ...res4.data.List.map((item) => item.strDName)];
+  valueData5.value = [
+    "-1",
+    ...res4.data.List.map((item) => Number(item.strDCode)),
+  ];
+
+  currentMenu.value = 1;
+});
+
+const commonList8 = ref([]);
+const commonList9 = ref([]);
+const setPortEqType = async (e) => {
+  const value = JSON.parse(e.target.value);
+  if (value == -1) {
+    return;
+  }
+  console.log(value.strSCode);
+  const res = await getCommonList(value.strSCode);
+
+  commonList8.value = res.data.List;
+  selectCode2.value = -1;
+};
+const setEqType = async (e) => {
+  const value = JSON.parse(e.target.value);
+  if (value == -1) {
+    return;
+  }
+  console.log(value.strSCode);
+  const res = await getCommonList(value.strSCode);
+  commonList9.value = res.data.List;
+  selectCode3.value = -1;
+};
 const disabled = ref(true);
 const items = ref([]);
 const ScreenKeyOrigin = ref([]);
@@ -483,17 +779,19 @@ const handlestoreNm = (newData) => {
   clickedStoreNm.value = newData;
 };
 const showPopup2 = ref(false);
+const changeNow4 = ref(false);
 const confirmitem = ref([]);
-const reloadit = ref(true);
-const receiptU = ref("");
-const receiptD1 = ref("");
-const receiptD2 = ref("");
-const receiptD3 = ref("");
-const receiptD4 = ref("");
-const receiptD5 = ref("");
+const setValue = (e) => {
+  const name = e.target.name;
+  const value = e.target.value;
+
+  changeColid.value = name;
+  changeValue.value = value;
+  changeNow4.value = !changeNow4.value;
+};
 const posNo = ref();
-const addrowDefault = ref();
-const currmenuKeyPage = ref(1);
+const addrowDefault = ref([]);
+const addrowProp = ref("strName,lngStoreGroup,lngStoreCode,lngAreaCode");
 const AllscreenKeyPage = ref(1);
 const rowData = ref([]);
 const rowData2 = ref([]);
@@ -512,7 +810,7 @@ const showMenus = (value) => {
   }
 };
 
-const currentMenu = ref("1");
+const currentMenu = ref(0);
 
 const realgrid2Name = ref("");
 const realgrid3Name = ref("");
@@ -536,8 +834,10 @@ watch(currentMenu, () => {
   if (currentMenu.value == 1) {
     const reagrid2 = document.getElementById(realgrid2Name.value);
     setTimeout(() => {
-      RealGrid.getGridInstance(reagrid2).resetSize();
-      RealGrid.getGridInstance(reagrid2).refresh(true);
+      if (reagrid2) {
+        RealGrid.getGridInstance(reagrid2).resetSize();
+        RealGrid.getGridInstance(reagrid2).refresh(true);
+      }
     }, 100);
   } else if (currentMenu.value == 2) {
     const reagrid3 = document.getElementById(realgrid3Name.value);
@@ -554,8 +854,10 @@ watch(currentMenu, () => {
   } else if (currentMenu.value == 4) {
     const reagrid5 = document.getElementById(realgrid5Name.value);
     setTimeout(() => {
-      RealGrid.getGridInstance(reagrid5).resetSize();
-      RealGrid.getGridInstance(reagrid5).refresh(true);
+      if (reagrid5) {
+        RealGrid.getGridInstance(reagrid5).resetSize();
+        RealGrid.getGridInstance(reagrid5).refresh(true);
+      }
     }, 100);
   }
 });
@@ -603,6 +905,12 @@ const updatedRowData3 = (newValue) => {
   updatedList3.value = newValue;
   console.log(updatedList3.value);
 };
+
+const updatedList4 = ref([]);
+const updatedRowData4 = (newValue) => {
+  updatedList4.value = newValue;
+  console.log(updatedList4.value);
+};
 const nowStoreCd = ref();
 const afterCategory = ref(false);
 const handleStoreGroup = (e) => {
@@ -628,15 +936,23 @@ const handleStoreCd = async (newValue) => {
 
 let isSwalOpen = false;
 const selectIndex3 = ref();
-
+const selectIndex4 = ref();
+const changeRow4 = ref(0);
 const selectedIndex3 = (e) => {
   selectIndex3.value = e;
+};
+const selectedIndex4 = (e) => {
+  changeRow4.value = e;
 };
 const addrow3 = ref(false);
 const addrowProp3 = ref(
   "strName,intPosNo,lngPosition,lngPos,lngPort,cornerNm,portIdVlu,lngStoreCode,lngAreaCode"
 );
 const addrowDefault3 = ref("");
+const addrowProp4 = ref(
+  "intPosNo,lngOIssueCount,lngOIssueType,lngOIssueSum,lngRIssueCount,lngRIssueType,lngKitchenOrderVoid,lngKitchenMenuVoid,lngKitchenU,lngKitchenD,lngFloorMax,lngLogo,lngStoreGroup,lngStoreCode,lngAreaCode,POSKIOSK"
+);
+const addrowDefault4 = ref(" ,'',-1,-1,'',-1,-1,-1,'','','',-1");
 const addRow3 = () => {
   const newMax =
     Math.max(...rowData3.value.map((item) => Number(item.portIdVlu))) * 2;
@@ -654,10 +970,21 @@ const addRow3 = () => {
 };
 
 const deleterow3 = ref(false);
+const deleterow4 = ref(false);
+const allstaterow = ref([]);
 const allstaterow3 = ref([]);
+const allStateRows = (e) => {
+  console.log(e);
+  allstaterow.value = e;
+};
 const allStateRows3 = (e) => {
   console.log(e);
   allstaterow3.value = e;
+};
+const allstaterow4 = ref([]);
+const allStateRows4 = (e) => {
+  console.log(e);
+  allstaterow4.value = e;
 };
 const deleteRow3 = () => {
   if (afterSearch3.value == false) {
@@ -668,6 +995,16 @@ const deleteRow3 = () => {
     return;
   }
   deleterow3.value = !deleterow3.value;
+};
+const deleteRow4 = () => {
+  if (afterSearch4.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "먼저 조회해주세요.",
+    });
+    return;
+  }
+  deleterow4.value = !deleterow4.value;
 };
 
 const reload = ref(false);
@@ -694,7 +1031,63 @@ const clickedScreenOrMenu = ref(false);
 const TLUList = ref([]);
 const checked = ref();
 const addRows = ref(false);
+const addRows4 = ref(false);
 const deleteRows = ref(false);
+const afterSearch4 = ref(false);
+
+const addRow4 = () => {
+  if (afterSearch4.value == false) {
+    Swal.fire({
+      title: "경고.",
+      text: "조회를 먼저 해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  addrowDefault4.value =
+    " ,'',-1,-1,'',-1,-1,-1,'','','',-1," +
+    groupCd.value +
+    "," +
+    nowStoreCd.value +
+    "," +
+    nowStoreAreaCd.value +
+    ",-1";
+  addRows4.value = !addRows4.value;
+};
+const dupliRow4 = () => {
+  if (afterSearch4.value == false) {
+    Swal.fire({
+      title: "경고.",
+      text: "조회를 먼저 해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (checkedRowDataList.value.length !== 1) {
+    Swal.fire({
+      title: "경고.",
+      text: "한 행만 체크해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  console.log(checkedRowDataList.value);
+  addrowDefault4.value =
+    ` ,${checkedRowDataList.value[0].lngOIssueCount},${checkedRowDataList.value[0].lngOIssueType},${checkedRowDataList.value[0].lngOIssueSum},${checkedRowDataList.value[0].lngRIssueCount},${checkedRowDataList.value[0].lngRIssueType},${checkedRowDataList.value[0].lngKitchenOrderVoid},${checkedRowDataList.value[0].lngKitchenMenuVoid},${checkedRowDataList.value[0].lngKitchenU},${checkedRowDataList.value[0].lngKitchenD},${checkedRowDataList.value[0].lngFloorMax},${checkedRowDataList.value[0].lngLogo},` +
+    checkedRowDataList.value[0].lngStoreGroup +
+    "," +
+    checkedRowDataList.value[0].lngStoreCode +
+    "," +
+    checkedRowDataList.value[0].lngAreaCode +
+    `,${checkedRowDataList.value[0].POSKIOSK}`;
+
+  console.log(addrowDefault4.value);
+  addRows4.value = !addRows4.value;
+};
 const addRow = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -706,18 +1099,15 @@ const addRow = () => {
     return;
   }
   addRows.value = !addRows.value;
-  addrowDefault.value = userData.strStoreGroupName;
+  addrowDefault.value =
+    clickedStoreNm.value +
+    "," +
+    groupCd.value +
+    "," +
+    nowStoreCd.value +
+    "," +
+    nowStoreAreaCd.value;
   console.log(updatedList.value);
-  if (updatedList.value == undefined || updatedList.value[0] == undefined) {
-    addrowDefault.value += "," + 1;
-  } else {
-    const maxKdsCornerNum = Math.max(
-      ...updatedList.value.map((item) => item.kdsCornerNum)
-    );
-    console.log(maxKdsCornerNum);
-    addrowDefault.value += "," + (maxKdsCornerNum + 1);
-    console.log(addrowDefault.value);
-  }
 };
 
 const printNameList = ref([]);
@@ -740,6 +1130,12 @@ const selcetedrowData = (newValue) => {
   }
 };
 
+const checkedRowDataList = ref([]);
+const checkedRowData4 = (e) => {
+  checkedRowDataList.value = e;
+  console.log(e);
+};
+
 const initSelect = ref(false);
 const searchButton = async () => {
   if (nowStoreCd.value == "0" || nowStoreCd.value == undefined) {
@@ -758,41 +1154,20 @@ const searchButton = async () => {
     store.state.loading = true;
     let res;
     if (currentMenu.value == 1) {
-      res = await getPrintList(groupCd.value, nowStoreCd.value);
+      res = await getPosInfo(groupCd.value, nowStoreCd.value);
       console.log(res);
-      rowData.value = res.data.Print;
-      rowData2.value = res.data.Print2;
-
-      console.log(rowData2.value);
+      rowData.value = res.data.List;
+      updatedList.value = JSON.parse(JSON.stringify(res.data.List));
+      console.log(rowData.value);
       afterSearch.value = true;
     } else if (currentMenu.value == 2) {
-      res = await getKitchenSettingList(groupCd.value, nowStoreCd.value);
+      res = await getPortDefaultInfo(groupCd.value, nowStoreCd.value);
       console.log(res);
 
-      SettingList.value = [...res.data.KITCHENMENU];
-      MenuGroup.value = res.data.MAINGROUP;
-      SubMenuGroup.value = res.data.SUBGROUP;
-      checked.value = res.data.SAVED;
-      PrintList.value = res.data.PRINTLIST;
-      printNameList.value = res.data.KITCHENPRINT;
-      console.log(checked.value);
-      console.log(printNameList.value);
-      console.log(SettingList.value);
-      for (var i = 0; i < checked.value.length; i++) {
-        const tlngCode = checked.value[i].lngCode;
-        const portid = checked.value[i].portId;
-        const index = SettingList.value.findIndex(
-          (item) => item.lngCode == tlngCode
-        );
-        if (index != -1) {
-          SettingList.value[index][portid] = true;
-        }
-      }
-
+      rowData2.value = res.data.List;
       // rowData3.value = [...SettingList.value];
       updatedList2.value = [...SettingList.value];
 
-      confirmitem.value = JSON.parse(JSON.stringify(SettingList.value));
       afterSearch2.value = true;
     } else if (currentMenu.value == 3) {
       res = await getPortConnectionList(
@@ -804,6 +1179,16 @@ const searchButton = async () => {
       rowData3.value = res.data.List;
       updatedList3.value = JSON.parse(JSON.stringify(res.data.List));
       afterSearch3.value = true;
+    } else if (currentMenu.value == 4) {
+      res = await getPrintDefaultSetting(
+        groupCd.value,
+        nowStoreCd.value,
+        nowStoreAreaCd.value
+      );
+      console.log(res);
+      rowData4.value = res.data.List;
+      updatedList4.value = JSON.parse(JSON.stringify(res.data.List));
+      afterSearch4.value = true;
     }
   } catch (error) {
     console.log(error);
@@ -949,13 +1334,94 @@ const saveButton = async () => {
         let res;
 
         if (currentMenu.value == 1) {
-          const printNo = updatedList.value.map((item) => item.lngPosition);
-          const printNm = updatedList.value.map((item) => item.cornerNm);
-          res = await savePrintNm(
-            groupCd.value,
-            nowStoreCd.value,
-            printNo.join(","),
-            printNm.join(",")
+          const deletePoss = updatedList.value
+            .filter((_, index) => allstaterow.value.deleted.includes(index))
+            .map((item2) => item2.intPosNo)
+            .join(",");
+
+          const deleteGROUP = updatedList.value
+            .filter((_, index) => allstaterow.value.deleted.includes(index))
+            .map((item2) => item2.lngStoreGroup)
+            .join(",");
+
+          const deleteSTORECD = updatedList.value
+            .filter((_, index) => allstaterow.value.deleted.includes(index))
+            .map((item2) => item2.lngStoreCode)
+            .join(",");
+
+          const deleteAreaCd = updatedList.value
+            .filter((_, index) => allstaterow.value.deleted.includes(index))
+            .map((item2) => item2.lngAreaCode)
+            .join(",");
+
+          const storeGroupCd = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.lngStoreGroup)
+            .join(",");
+          const storeCd = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.lngStoreCode)
+            .join(",");
+          const storeAreaCd = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.lngAreaCode)
+            .join(",");
+          const PosNo = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.intPosNo)
+            .join(",");
+          const posEqipcl = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.posEqipClCd)
+            .join(",");
+          const posEqipk = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.posEqipKndCd)
+            .join(",");
+
+          const dates = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.instlDate)
+            .join(",");
+          const oscds = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.instlOsClCd)
+            .join(",");
+          const posips = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.posIp)
+            .join(",");
+          const posclcd = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.posClCd)
+            .join(",");
+          const useyn = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.useYn)
+            .join(",");
+          const remark = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.remark)
+            .join(",");
+
+          console.log(deletePoss);
+          res = await savePosInfo(
+            storeGroupCd,
+            storeCd,
+            storeAreaCd,
+            PosNo,
+            posEqipcl,
+            posEqipk,
+            dates,
+            oscds,
+            posips,
+            posclcd,
+            useyn,
+            remark,
+            deleteGROUP,
+            deleteSTORECD,
+            deleteAreaCd,
+            deletePoss
           );
           console.log(res);
         } else if (currentMenu.value == 2) {
@@ -1080,6 +1546,85 @@ const saveButton = async () => {
             deletedPosition.join(","),
             deletedAreaCodes.join(",")
           );
+        } else if (currentMenu.value == 4) {
+          const deletedPosNos = updatedList4.value
+            .filter((item, index) => allstaterow4.value.deleted.includes(index))
+            .map((item2) => item2.intPosNo)
+            .join(",");
+          const posNos = updatedList4.value
+            .map((item) => item.intPosNo)
+            .join(",");
+          const issuecounts = updatedList4.value
+            .map((item) => item.lngOIssueCount)
+            .join(",");
+          const issuetypes = updatedList4.value
+            .map((item) => item.lngOIssueType)
+            .join(",");
+          const issuesums = updatedList4.value
+            .map((item) => item.lngOIssueSum)
+            .join(",");
+          const rissuecounts = updatedList4.value
+            .map((item) => item.lngRIssueCount)
+            .join(",");
+          const rissuetypes = updatedList4.value
+            .map((item) => item.lngRIssueType)
+            .join(",");
+          const kitchenordervoids = updatedList4.value
+            .map((item) => item.lngKitchenOrderVoid)
+            .join(",");
+          const kitchenmenuvoids = updatedList4.value
+            .map((item) => item.lngKitchenMenuVoid)
+            .join(",");
+          const kitchenus = updatedList4.value
+            .map((item) => item.lngKitchenU)
+            .join(",");
+          const kitchends = updatedList4.value
+            .map((item) => item.lngKitchenD)
+            .join(",");
+          const floormaxs = updatedList4.value
+            .map((item) => item.lngFloorMax)
+            .join(",");
+          const lnglogos = updatedList4.value
+            .map((item) => item.lngLogo)
+            .join(",");
+
+          const lngstoregroup = updatedList4.value
+            .map((item) => item.lngStoreGroup)
+            .join(",");
+
+          const lngstorecode = updatedList4.value
+            .map((item) => item.lngStoreCode)
+            .join(",");
+
+          const lngareacode = updatedList4.value
+            .map((item) => item.lngAreaCode)
+            .join(",");
+
+          const poskiosk = updatedList4.value
+            .map((item) => item.POSKIOSK)
+            .join(",");
+
+          res = await savePrintConfig(
+            groupCd.value,
+            nowStoreCd.value,
+            posNos,
+            issuecounts,
+            issuetypes,
+            issuesums,
+            rissuecounts,
+            rissuetypes,
+            kitchenordervoids,
+            kitchenmenuvoids,
+            kitchenus,
+            kitchends,
+            floormaxs,
+            lnglogos,
+            lngstoregroup,
+            lngstorecode,
+            lngareacode,
+            poskiosk,
+            deletedPosNos
+          );
         }
 
         console.log(res);
@@ -1116,6 +1661,22 @@ const changeColid = ref("");
 
 const clickedRowData3 = (newValue) => {
   console.log(newValue);
+};
+const clickedRowData4 = (e) => {
+  console.log(e);
+
+  gridvalue1.value = e[1];
+  selectCommon1.value = e[2];
+  selectCommon2.value = e[3];
+  gridvalue2.value = e[4];
+  selectCommon3.value = e[5];
+  selectCommon4.value = e[6];
+  selectCommon5.value = e[7];
+  gridvalue3.value = e[8];
+  gridvalue4.value = e[9];
+  gridvalue5.value = e[10];
+  selectCommon6.value = e[11];
+  selectCommon7.value = e[15];
 };
 
 const handlePosNo = (newValue) => {
