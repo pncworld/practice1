@@ -3,11 +3,17 @@
     class="flex fixed top-0 w-full bg-white z-10 space-x-0 border border-gray-100 justify-between"
     v-show="showMenu2">
     <div class="flex">
-      <button @click="showTotalMenu">
+      <button @click="showTotalMenu" v-if="clickIcon != 4">
         <font-awesome-icon :icon="['fas', 'bars']" class="size-8 mt-2 ml-5" />
       </button>
+
+      <button @click="moveBack" v-if="clickIcon == 4">
+        <font-awesome-icon
+          :icon="['fas', 'angle-left']"
+          class="size-8 mt-2 ml-5" />
+      </button>
       <div
-        v-if="clickIcon == 2"
+        v-if="clickIcon == 2 && showInputBox == false"
         class="flex justify-center items-center ml-[2vw] text-xl font-semibold">
         공지사항
       </div>
@@ -21,6 +27,17 @@
         class="flex justify-center items-center ml-[2vw] text-xl font-semibold">
         {{ selectedProgName }}
       </div>
+      <div
+        v-if="clickIcon == 4"
+        class="flex justify-center items-center ml-[2vw] text-xl font-semibold"></div>
+      <div
+        v-if="showInputBox"
+        class="flex justify-center items-center ml-[2vw] text-xl font-semibold">
+        <input
+          type="text"
+          v-model="searchWord"
+          class="border border-gray-500 rounded-lg h-6 pl-1" />
+      </div>
     </div>
     <div>
       <button @click="reload" v-if="clickIcon == 1 || clickIcon == 0">
@@ -28,7 +45,7 @@
           :icon="['fas', 'rotate-right']"
           class="size-8 mt-2 mr-5" />
       </button>
-      <button @click="reload" v-if="clickIcon == 2">
+      <button @click="searchNotice" v-if="clickIcon == 2">
         <font-awesome-icon
           :icon="['fas', 'magnifying-glass']"
           class="size-8 mt-2 mr-5" />
@@ -71,6 +88,12 @@ import { useRoute } from "vue-router";
 const showTotalMenu = () => {
   showMenu3.value = !showMenu3.value;
   emit("showMenu3", showMenu3.value);
+};
+const moveBack = () => {
+  //showMenu3.value = !showMenu3.value;
+  clickIcon.value = 1;
+  emit("showNotice", true);
+  emit("showMenu3", false);
 };
 const selectedProgName = ref(store.state.mobileSelectProgName);
 const clickIcon = ref(1);
@@ -116,6 +139,9 @@ const emit = defineEmits([
   "showpersonal",
   "showHomepage",
   "showMenu3",
+  "changeIconValue",
+  "searchNow",
+  "searchword",
 ]);
 
 const props = defineProps({
@@ -129,17 +155,22 @@ const props = defineProps({
     default: true,
   },
   changeIcon: {
-    type: Boolean,
-    default: true,
+    type: String,
+    default: "0",
   },
 });
 
 watch(
   () => props.changeIcon,
   () => {
-    clickIcon.value = 0;
+    console.log(props.changeIcon);
+    clickIcon.value = props.changeIcon;
   }
 );
+
+watch(clickIcon, () => {
+  emit("changeIconValue", clickIcon.value);
+});
 watch(
   () => props.changeMenuState,
   () => {
@@ -176,6 +207,21 @@ const showHomePage = () => {
 
 const reload = () => {
   window.location.reload();
+};
+
+const showInputBox = ref(false);
+const searchWord = ref("");
+const searchNow = ref(false);
+const searchNotice = () => {
+  emit("searchword", searchWord.value);
+  if (showInputBox.value == false) {
+    showInputBox.value = true;
+  } else {
+    searchNow.value = !searchNow.value;
+    emit("searchNow", searchNow);
+    showInputBox.value = false;
+    // emit("searchword", searchWord.value);
+  }
 };
 
 watch(

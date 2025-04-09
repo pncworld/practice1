@@ -865,6 +865,7 @@ const funcshowGrid = async () => {
         ? "date"
         : "line",
       domainOnly: true,
+      textReadOnly: true,
       datetimeFormat: "yyyy-MM-dd",
 
       commitOnSelect: true,
@@ -1947,6 +1948,7 @@ watch(
   () => props.deleteRow6,
   () => {
     const curr = gridView.getCurrent();
+    console.log(curr.dataRow);
     dataProvider.removeRow(curr.dataRow);
     console.log(dataProvider.getAllStateRows());
     emit("allStateRows", dataProvider.getAllStateRows());

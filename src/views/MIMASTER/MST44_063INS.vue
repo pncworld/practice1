@@ -68,8 +68,8 @@
           v-if="currentMenu == 2">
           <div>상세정보</div>
           <div>
-            <button class="whitebutton">추가</button
-            ><button class="whitebutton">삭제</button>
+            <button class="whitebutton" @click="addRow2">추가</button
+            ><button class="whitebutton" @click="deleteRow2">삭제</button>
           </div>
         </div>
         <div
@@ -155,6 +155,7 @@
               id=""
               :disabled="disabled1"
               v-model="gridvalue21"
+              @change="setRowValueChange1"
               class="w-full h-8 border border-gray-500 rounded-lg disabled:bg-gray-100">
               <option value="-1">선택</option>
               <option :value="i.lngCode" v-for="i in commonList11">
@@ -165,32 +166,38 @@
           <div class="text-blue-500 font-semibold text-center">*PORT 번호</div>
           <div>
             <input
-              type="text"
+              type="number"
               v-model="gridvalue22"
               :disabled="disabled1"
-              class="w-full h-8 border border-gray-500 rounded-lg" />
+              @input="setRowValueChange2"
+              class="w-full h-8 border border-gray-500 rounded-lg disabled:bg-gray-100" />
           </div>
           <div class="text-blue-500 font-semibold text-center">*PORT명</div>
           <div>
             <input
               type="text"
               v-model="gridvalue23"
-              class="w-full h-8 border border-gray-500 rounded-lg" />
+              :disabled="disabled2"
+              @input="setRowValueChange3"
+              class="w-full h-8 border border-gray-500 rounded-lg disabled:bg-gray-100" />
           </div>
           <div class="text-blue-500 font-semibold text-center">*PORT설정값</div>
           <div>
             <input
               type="text"
               v-model="gridvalue24"
-              class="w-full h-8 border border-gray-500 rounded-lg" />
+              :disabled="disabled2"
+              @input="setRowValueChange4"
+              class="w-full h-8 border border-gray-500 rounded-lg disabled:bg-gray-100" />
           </div>
           <div class="text-blue-500 font-semibold text-center">*PORT구분</div>
           <div>
             <select
               name=""
               id=""
+              :disabled="disabled2"
               @change="setPortEqType"
-              class="w-full h-8 border border-gray-500 rounded-lg"
+              class="w-full h-8 border border-gray-500 rounded-lg disabled:bg-gray-100"
               v-model="selectCode1">
               <option value="-1">선택</option>
               <option :value="i.strDCode" v-for="i in commonList7">
@@ -206,8 +213,9 @@
               name=""
               id=""
               @change="setEqType"
+              :disabled="disabled2"
               v-model="selectCode2"
-              class="w-full h-8 border border-gray-500 rounded-lg">
+              class="w-full h-8 border border-gray-500 rounded-lg disabled:bg-gray-100">
               <option value="-1">선택</option>
               <option :value="i.strDCode" v-for="i in commonList8">
                 [{{ i.strDCode }}]{{ i.strDName }}
@@ -221,11 +229,12 @@
             <select
               name=""
               id=""
-              @change=""
+              :disabled="disabled2"
+              @change="setRowValueChange5"
               v-model="selectCode4"
-              class="w-full h-8 border border-gray-500 rounded-lg">
+              class="w-full h-8 border border-gray-500 rounded-lg disabled:bg-gray-100">
               <option value="-1">선택</option>
-              <option :value="i.strDCode" v-for="i in commonList10">
+              <option :value="i.strDCode" v-for="i in commonList12">
                 [{{ i.strDCode }}]{{ i.strDName }}
               </option>
             </select>
@@ -237,11 +246,12 @@
             <select
               name=""
               id=""
-              @change=""
+              :disabled="disabled2"
+              @change="setRowValueChange6"
               v-model="selectCode5"
-              class="w-full h-8 border border-gray-500 rounded-lg">
+              class="w-full h-8 border border-gray-500 rounded-lg disabled:bg-gray-100">
               <option value="-1">선택</option>
-              <option :value="i.strDCode" v-for="i in commonList10">
+              <option :value="i.strDCode" v-for="i in commonList12">
                 [{{ i.strDCode }}]{{ i.strDName }}
               </option>
             </select>
@@ -251,9 +261,10 @@
             <select
               name=""
               id=""
-              @change=""
+              :disabled="disabled2"
+              @change="setRowValueChange7"
               v-model="selectCode3"
-              class="w-full h-8 border border-gray-500 rounded-lg">
+              class="w-full h-8 border border-gray-500 rounded-lg disabled:bg-gray-100">
               <option value="-1">선택</option>
               <option :value="i.strDCode" v-for="i in commonList9">
                 [{{ i.strDCode }}]{{ i.strDName }}
@@ -270,15 +281,27 @@
             :progname="'MST44_063INS_VUE'"
             :progid="2"
             :reload="reload"
+            :rowStateeditable="false"
             :rowData="rowData2"
             :showGrid="showGrid"
             :labelingColumns="'blnOpen,blnShare'"
             :labelsData="[labelsData10, labelsData10]"
             :valuesData="[valueData10, valueData10]"
             :showCheckBar="false"
+            @selectedIndex2="selectedIndex2"
+            :addRow4="addrow2"
+            :addrowDefault="addrowDefault2"
+            :addrowProp="addrowProp2"
+            :deleteRow6="deleterow2"
+            :changeRow="changeRow2"
+            :changeNow2="changeNow3"
+            :changeColid="changeColid"
+            :changeValue2="changeValue2"
+            @allStateRows="allStateRows2"
             @clickedRowData="clickedRowData2"
             @selcetedrowData="selcetedrowData"
             @updatedRowData="updatedRowData2"
+            @sendRowState="sendRowState2"
             @realgridname="realgridname2"></Realgrid>
         </div>
       </div>
@@ -355,6 +378,7 @@
               valueData4,
               valueData5,
             ]"
+            :rowStateeditable="false"
             @selcetedrowData="selcetedrowData"
             @checkedRowData="checkedRowData4"
             :addRow4="addRows4"
@@ -365,7 +389,8 @@
             :changeNow="changeNow4"
             :changeColid="changeColid"
             :changeValue2="changeValue"
-            :suffixColumnheng="['lngOIssueCount']"
+            :editableColId="'intPosNo'"
+            :suffixColumnheng="['lngOIssueCount', 'lngRIssueCount']"
             :suffixColumnJul="['lngKitchenU', 'lngKitchenD', 'lngFloorMax']"
             @updatedRowData="updatedRowData4"
             @allStateRows="allStateRows4"
@@ -401,7 +426,7 @@
                 @change="setValue"
                 class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
                 v-model="selectCommon1">
-                <option value="-1">선택</option>
+                <option :value="-1">선택</option>
                 <option :value="i.strDCode" v-for="i in commonList1">
                   {{ i.strDName }}
                 </option>
@@ -418,7 +443,7 @@
                 @change="setValue"
                 class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
                 v-model="selectCommon2">
-                <option value="-1">선택</option>
+                <option :value="-1">선택</option>
                 <option :value="i.strDCode" v-for="i in commonList2">
                   {{ i.strDName }}
                 </option>
@@ -448,7 +473,7 @@
                 @change="setValue"
                 class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
                 v-model="selectCommon3">
-                <option value="-1">선택</option>
+                <option :value="-1">선택</option>
                 <option :value="i.strDCode" v-for="i in commonList3">
                   {{ i.strDName }}
                 </option>
@@ -465,7 +490,7 @@
                 @change="setValue"
                 class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
                 v-model="selectCommon4">
-                <option value="-1">선택</option>
+                <option :value="-1">선택</option>
                 <option :value="i.strDCode" v-for="i in commonList4">
                   {{ i.strDName }}
                 </option>
@@ -482,7 +507,7 @@
                 @change="setValue"
                 class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
                 v-model="selectCommon5">
-                <option value="-1">선택</option>
+                <option :value="-1">선택</option>
                 <option :value="i.strDCode" v-for="i in commonList5">
                   {{ i.strDName }}
                 </option>
@@ -538,7 +563,7 @@
                 @change="setValue"
                 class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
                 v-model="selectCommon6">
-                <option value="-1">선택</option>
+                <option :value="-1">선택</option>
                 <option :value="i.strDCode" v-for="i in commonList6">
                   {{ i.strDName }}
                 </option>
@@ -555,7 +580,7 @@
                 @change="setValue"
                 class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
                 v-model="selectCommon7">
-                <option value="-1">선택</option>
+                <option :value="-1">선택</option>
                 <option value="0">포스</option>
                 <option value="1">키오스크</option>
               </select>
@@ -577,11 +602,12 @@ import {
   getPrintList,
   saveKitchenSettingAll,
   savePortConfig,
+  savePortDefaultSetting,
   savePosInfo,
   savePrintConfig,
   savePrintNm,
 } from "@/api/master";
-import { onMounted, ref, watch } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 import { getCommonList, getPosList } from "@/api/common";
@@ -636,6 +662,7 @@ const commonList5 = ref([]);
 const commonList6 = ref([]);
 const commonList7 = ref([]);
 const commonList10 = ref([]);
+const commonList12 = ref([]);
 
 const selectCommon1 = ref(-1);
 const selectCommon2 = ref(-1);
@@ -664,6 +691,7 @@ const gridvalue23 = ref("");
 const gridvalue24 = ref("");
 
 const disabled1 = ref(true);
+const disabled2 = ref(true);
 onMounted(async () => {
   const res = await getCommonList(106);
   const res2 = await getCommonList(402);
@@ -681,7 +709,7 @@ onMounted(async () => {
 
   valueData10.value = res10.data.List.map((item) => item.strDCode);
   labelsData10.value = res10.data.List.map((item) => item.strDName);
-
+  commonList12.value = res10.data.List;
   console.log(res9);
   commonList7.value = res9.data.List;
   labelsData6.value = ["선택", ...res5.data.List.map((item) => item.strDName)];
@@ -749,6 +777,15 @@ onMounted(async () => {
 
 const commonList8 = ref([]);
 const commonList9 = ref([]);
+
+// watch(selectCode1, () => {
+//   // if(selectCode1.value !=-1){}
+//   setPortEqType2(selectCode1.value);
+// });
+// watch(selectCode2, () => {
+//   // if(selectCode1.value !=-1){}
+//   setEqType2(selectCode2.value);
+// });
 const setPortEqType = async (e) => {
   const value = e.target.value;
   if (value == -1) {
@@ -756,12 +793,65 @@ const setPortEqType = async (e) => {
   }
   const targetValue = commonList7.value.filter(
     (item) => item.strDCode == value
-  )[0].strSCode;
+  )[0]?.strSCode;
   console.log(value.strSCode);
+  if (targetValue == undefined) {
+    return;
+  }
   const res = await getCommonList(targetValue);
+
+  changeColid.value = "lngOLEType";
+  changeValue2.value = value;
+  changeNow3.value = !changeNow3.value;
+  await nextTick();
+
+  const targetValue2 = commonList7.value.filter(
+    (item) => item.strDCode == value
+  )[0]?.strDName;
+  changeColid.value = "strPortName";
+  changeValue2.value = targetValue2;
+  changeNow3.value = !changeNow3.value;
+  await nextTick();
 
   commonList8.value = res.data.List;
   selectCode2.value = -1;
+  selectCode3.value = -1;
+  changeColid.value = "lngMachineType";
+  changeValue2.value = -1;
+  changeNow3.value = !changeNow3.value;
+
+  await nextTick();
+
+  changeColid.value = "strMachineType";
+  changeValue2.value = "선택";
+  changeNow3.value = !changeNow3.value;
+
+  await nextTick();
+
+  changeColid.value = "lngMachine";
+  changeValue2.value = -1;
+  changeNow3.value = !changeNow3.value;
+
+  await nextTick();
+
+  changeColid.value = "strMachine";
+  changeValue2.value = "선택";
+  changeNow3.value = !changeNow3.value;
+};
+const setPortEqType2 = async (e) => {
+  const value = e;
+  if (value == -1) {
+    return;
+  }
+  const targetValue = commonList7.value.filter(
+    (item) => item.strDCode == value
+  )[0]?.strSCode;
+  if (targetValue == undefined) {
+    return;
+  }
+  const res = await getCommonList(targetValue);
+
+  commonList8.value = res.data.List;
 };
 const setEqType = async (e) => {
   const value = e.target.value;
@@ -770,10 +860,119 @@ const setEqType = async (e) => {
   }
   const targetValue = commonList8.value.filter(
     (item) => item.strDCode == value
-  )[0].strSCode;
+  )[0]?.strSCode;
+  if (targetValue == undefined) {
+    return;
+  }
+
+  changeColid.value = "lngMachineType";
+  changeValue2.value = value;
+  changeNow3.value = !changeNow3.value;
+
+  await nextTick();
+
+  const targetValue2 = commonList8.value.filter(
+    (item) => item.strDCode == value
+  )[0]?.strDName;
+  changeColid.value = "strMachineType";
+  changeValue2.value = targetValue2;
+  changeNow3.value = !changeNow3.value;
+
+  await nextTick();
+
   const res = await getCommonList(targetValue);
   commonList9.value = res.data.List;
   selectCode3.value = -1;
+
+  changeColid.value = "lngMachine";
+  changeValue2.value = -1;
+  changeNow3.value = !changeNow3.value;
+
+  await nextTick();
+
+  changeColid.value = "strMachine";
+  changeValue2.value = "선택";
+  changeNow3.value = !changeNow3.value;
+
+  await nextTick();
+};
+
+const setEqType2 = async (e) => {
+  const value = e;
+  if (value == -1) {
+    return;
+  }
+
+  console.log(commonList8.value);
+  const targetValue = commonList8.value.filter(
+    (item) => item.strDCode == value
+  )[0]?.strSCode;
+
+  if (targetValue == undefined) {
+    return;
+  }
+  const res = await getCommonList(targetValue);
+  commonList9.value = res.data.List;
+};
+
+const changeRow2 = ref(-1);
+const changeValue2 = ref();
+const changeNow3 = ref(false);
+const selectedIndex2 = (e) => {
+  changeRow2.value = e;
+};
+const setRowValueChange1 = (e) => {
+  changeColid.value = "intPosNo";
+  changeValue2.value = e.target.value;
+
+  changeNow3.value = !changeNow3.value;
+};
+const setRowValueChange2 = (e) => {
+  changeColid.value = "lngPort";
+  changeValue2.value = e.target.value;
+
+  changeNow3.value = !changeNow3.value;
+};
+const setRowValueChange3 = (e) => {
+  changeColid.value = "strName";
+  changeValue2.value = gridvalue23.value;
+
+  changeNow3.value = !changeNow3.value;
+};
+const setRowValueChange4 = (e) => {
+  changeColid.value = "strSetting";
+  changeValue2.value = e.target.value;
+
+  changeNow3.value = !changeNow3.value;
+};
+const setRowValueChange5 = (e) => {
+  changeColid.value = "blnOpen";
+  changeValue2.value = e.target.value;
+
+  changeNow3.value = !changeNow3.value;
+};
+const setRowValueChange6 = (e) => {
+  changeColid.value = "blnShare";
+  changeValue2.value = e.target.value;
+
+  changeNow3.value = !changeNow3.value;
+};
+
+const setRowValueChange7 = async (e) => {
+  changeColid.value = "lngMachine";
+  changeValue2.value = e.target.value;
+
+  changeNow3.value = !changeNow3.value;
+
+  await nextTick();
+
+  const targetValue2 = commonList9.value.filter(
+    (item) => item.strDCode == e.target.value
+  )[0]?.strDName;
+  changeColid.value = "strMachine";
+  changeValue2.value = targetValue2;
+
+  changeNow3.value = !changeNow3.value;
 };
 const disabled = ref(true);
 const items = ref([]);
@@ -892,28 +1091,7 @@ const updatedRowData = (newValue) => {
 
 const forSaveMenu = ref([]);
 const updatedRowData2 = (newValue) => {
-  if (currentMenu.value == 2) {
-    forSaveMenu.value = [];
-    updatedList2.value = newValue;
-    SettingList.value.forEach((item, index) => {
-      const matchedItem = updatedList2.value.find(
-        (Item) => Item.lngCode == item.lngCode
-      );
-      if (matchedItem) {
-        SettingList.value[index] = { ...matchedItem };
-      }
-    });
-
-    const length = printNameList.value.length;
-    for (var i = 0; i < length; i++) {
-      forSaveMenu.value.push(
-        SettingList.value
-          .filter((item) => item["checkbox" + (i + 1)] == true)
-          .map((item2) => Number(item2.lngCode))
-      );
-    }
-    console.log(updatedList2.value);
-  }
+  updatedList2.value = newValue;
 };
 
 const updatedList3 = ref([]);
@@ -954,6 +1132,14 @@ let isSwalOpen = false;
 const selectIndex3 = ref();
 const selectIndex4 = ref();
 const changeRow4 = ref(0);
+
+const sendRowState2 = (e) => {
+  if (e == "created") {
+    disabled1.value = false;
+  } else {
+    disabled1.value = true;
+  }
+};
 const selectedIndex3 = (e) => {
   selectIndex3.value = e;
 };
@@ -961,22 +1147,41 @@ const selectedIndex4 = (e) => {
   changeRow4.value = e;
 };
 const addrow3 = ref(false);
+const addrow2 = ref(false);
 const addrowProp3 = ref(
   "strName,intPosNo,lngPosition,lngPos,lngPort,cornerNm,portIdVlu,lngStoreCode,lngAreaCode"
 );
+const addrowProp2 = ref(
+  "StoreName,lngStoreGroup,lngStoreCode,lngAreaCode,intPosNo,lngPort,strName,strSetting,lngOLEType,blnOpen,blnShare,lngMachine,lngMachineType,strPortName,strMachine"
+);
+const addrowDefault2 = ref("");
 const addrowDefault3 = ref("");
 const addrowProp4 = ref(
   "intPosNo,lngOIssueCount,lngOIssueType,lngOIssueSum,lngRIssueCount,lngRIssueType,lngKitchenOrderVoid,lngKitchenMenuVoid,lngKitchenU,lngKitchenD,lngFloorMax,lngLogo,lngStoreGroup,lngStoreCode,lngAreaCode,POSKIOSK"
 );
-const addrowDefault4 = ref(" ,'',-1,-1,'',-1,-1,-1,'','','',-1");
+const addrowDefault4 = ref(" ,' ',-1,-1,' ',-1,-1,-1,' ',' ',' ',-1");
+const addRow2 = () => {
+  addrowDefault2.value =
+    clickedStoreNm.value +
+    "," +
+    groupCd.value +
+    "," +
+    nowStoreCd.value +
+    "," +
+    nowStoreAreaCd.value +
+    ",,,,,-1,,,-1,-1,, ";
+  addrow2.value = !addrow2.value;
+};
 const addRow3 = () => {
   const newMax =
-    Math.max(...rowData3.value.map((item) => Number(item.portIdVlu))) * 2;
+    rowData3.value.length == 0
+      ? 1
+      : Math.max(...rowData3.value.map((item) => Number(item.portIdVlu))) * 2;
 
   addrowDefault3.value =
     clickedStoreNm.value +
     "," +
-    "0, ,0, , ," +
+    "0,,0,,," +
     newMax +
     "," +
     nowStoreCd.value +
@@ -985,13 +1190,19 @@ const addRow3 = () => {
   addrow3.value = !addrow3.value;
 };
 
+const deleterow2 = ref(false);
 const deleterow3 = ref(false);
 const deleterow4 = ref(false);
 const allstaterow = ref([]);
+const allstaterow2 = ref([]);
 const allstaterow3 = ref([]);
 const allStateRows = (e) => {
   console.log(e);
   allstaterow.value = e;
+};
+const allStateRows2 = (e) => {
+  console.log(e);
+  allstaterow2.value = e;
 };
 const allStateRows3 = (e) => {
   console.log(e);
@@ -1001,6 +1212,16 @@ const allstaterow4 = ref([]);
 const allStateRows4 = (e) => {
   console.log(e);
   allstaterow4.value = e;
+};
+const deleteRow2 = () => {
+  if (afterSearch2.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "먼저 조회해주세요.",
+    });
+    return;
+  }
+  deleterow2.value = !deleterow2.value;
 };
 const deleteRow3 = () => {
   if (afterSearch3.value == false) {
@@ -1062,7 +1283,7 @@ const addRow4 = () => {
     return;
   }
   addrowDefault4.value =
-    " ,'',-1,-1,'',-1,-1,-1,'','','',-1," +
+    " ,'  ',-1,-1,'  ',-1,-1,-1,'  ','  ','  ',-1," +
     groupCd.value +
     "," +
     nowStoreCd.value +
@@ -1182,7 +1403,7 @@ const searchButton = async () => {
 
       rowData2.value = res.data.List;
       // rowData3.value = [...SettingList.value];
-      updatedList2.value = [...SettingList.value];
+      updatedList2.value = JSON.parse(JSON.stringify(res.data.List));
 
       afterSearch2.value = true;
     } else if (currentMenu.value == 3) {
@@ -1295,9 +1516,10 @@ const saveButton = async () => {
       return;
     }
   } else if (currentMenu.value == 2) {
-    if (
-      JSON.stringify(confirmitem.value) === JSON.stringify(updatedList2.value)
-    ) {
+    const a = allstaterow2.value.deleted.length;
+    const b = allstaterow2.value.created.length;
+    const c = allstaterow2.value.updated.length;
+    if (a + b + c == 0) {
       Swal.fire({
         title: "경고",
         text: "변경된 사항이 없습니다.",
@@ -1321,14 +1543,215 @@ const saveButton = async () => {
     }
   }
 
-  if (currentMenu.value == 3) {
-    const length = new Set(updatedList3.value.map((item) => item.lngPosition))
-      .size;
-    const length2 = updatedList3.value.map((item) => item.lngPosition).length;
+  if (currentMenu.value == 1) {
+    const validate = updatedList.value.filter(
+      (item) =>
+        item.intPosNo == "" ||
+        item.posEqipClCd == "" ||
+        item.posEqipKndCd == "" ||
+        item.instlDate == "" ||
+        item.instlOsClCd == "" ||
+        item.posIp == "" ||
+        item.posClCd == "" ||
+        item.useYn == "" ||
+        item.intPosNo == undefined ||
+        item.posEqipClCd == undefined ||
+        item.posEqipKndCd == undefined ||
+        item.instlDate == undefined ||
+        item.instlOsClCd == undefined ||
+        item.posIp == undefined ||
+        item.posClCd == undefined ||
+        item.useYn == undefined ||
+        item.intPosNo == -1 ||
+        item.posEqipClCd == -1 ||
+        item.posEqipKndCd == -1 ||
+        item.instlOsClCd == -1 ||
+        item.posClCd == -1 ||
+        item.useYn == -1
+    );
+    if (validate.length > 0) {
+      Swal.fire({
+        title: "경고",
+        text: "필수입력값이 누락되었습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } else if (currentMenu.value == 2) {
+    const validate = updatedList2.value.filter(
+      (item) =>
+        item.intPosNo == "" ||
+        item.lngPort == "" ||
+        item.strName == "" ||
+        item.strSetting == "" ||
+        item.lngOLEType == "" ||
+        item.lngMachineType == "" ||
+        item.lngMachine == "" ||
+        item.blnOpen == "" ||
+        item.blnShare == "" ||
+        item.intPosNo == undefined ||
+        item.lngPort == undefined ||
+        item.strName == undefined ||
+        item.strSetting == undefined ||
+        item.lngOLEType == undefined ||
+        item.lngMachineType == undefined ||
+        item.lngMachine == undefined ||
+        item.blnOpen == undefined ||
+        item.blnShare == undefined ||
+        item.intPosNo == -1 ||
+        item.lngOLEType == -1 ||
+        item.lngMachineType == -1 ||
+        item.lngMachine == -1 ||
+        item.blnOpen == -1 ||
+        item.blnShare == -1
+    );
+    if (validate.length > 0) {
+      Swal.fire({
+        title: "경고",
+        text: "필수입력값이 누락되었습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } else if (currentMenu.value == 4) {
+    console.log(updatedList4.value);
+    const validate = updatedList4.value.filter(
+      (item) =>
+        item.intPosNo == "" ||
+        item.intPosNo == "0" ||
+        item.lngOIssueType === "" ||
+        Number.isNaN(item.lngRIssueCount) ||
+        item.lngRIssueType == "" ||
+        Number.isNaN(item.lngKitchenU) ||
+        Number.isNaN(item.lngKitchenD) ||
+        Number.isNaN(item.lngFloorMax) ||
+        item.lngLogo === "" ||
+        item.POSKIOSK === "" ||
+        item.intPosNo === undefined ||
+        item.lngOIssueType === undefined ||
+        item.lngOIssueSum === undefined ||
+        item.lngRIssueCount === undefined ||
+        item.lngRIssueType === undefined ||
+        item.lngKitchenU === undefined ||
+        item.lngKitchenD === undefined ||
+        item.lngFloorMax === undefined ||
+        item.lngLogo === undefined ||
+        item.POSKIOSK === undefined ||
+        item.intPosNo === "-1" ||
+        item.lngOIssueType === "-1" ||
+        item.lngOIssueSum === "-1" ||
+        item.lngRIssueType === "-1" ||
+        item.lngKitchenU === " " ||
+        item.lngKitchenD === " " ||
+        item.lngFloorMax === " " ||
+        item.lngLogo === "-1" ||
+        item.POSKIOSK === "-1"
+    );
+
+    if (validate.length > 0) {
+      Swal.fire({
+        title: "경고",
+        text: "필수입력값이 누락되었습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } else if (currentMenu.value == 3) {
+    console.log(updatedList3.value);
+    const validate = updatedList3.value.filter(
+      (item) =>
+        item.intPosNo == "" ||
+        item.lngPosition == "" ||
+        item.lngPos == "" ||
+        item.lngPort == "" ||
+        item.intPosNo == undefined ||
+        item.lngPosition == undefined ||
+        item.lngPos == undefined ||
+        item.lngPort == undefined ||
+        item.intPosNo == -1 ||
+        item.lngPos == -1
+    );
+
+    if (validate.length > 0) {
+      Swal.fire({
+        title: "경고",
+        text: "필수입력값이 누락되었습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  }
+
+  if (currentMenu.value == 1) {
+    const length = new Set(updatedList.value.map((item) => item.intPosNo)).size;
+    const length2 = updatedList.value.map((item) => item.intPosNo).length;
     if (length != length2) {
       Swal.fire({
         title: "경고",
-        text: "Port연결ID가 중복되었습니다.",
+        text: "포스번호가 중복되었습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } else if (currentMenu.value == 2) {
+    const length = new Set(
+      updatedList2.value.map((item) =>
+        JSON.stringify({ intPosNo: item.intPosNo, lngPort: item.lngPort })
+      )
+    ).size;
+
+    const length2 = updatedList2.value.length;
+
+    if (length != length2) {
+      Swal.fire({
+        title: "경고",
+        text: "중복된 포스번호와 포트번호가 존재합니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } else if (currentMenu.value == 3) {
+    const length = new Set(
+      updatedList3.value.map((item) =>
+        JSON.stringify({
+          intPosNo: item.intPosNo,
+          lngPosition: item.lngPosition,
+        })
+      )
+    ).size;
+
+    const length2 = updatedList3.value.length;
+
+    if (length != length2) {
+      Swal.fire({
+        title: "경고",
+        text: "중복된 포스번호와 Port연결ID가 존재합니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } else if (currentMenu.value == 4) {
+    const length = new Set(
+      updatedList4.value.map((item) =>
+        JSON.stringify({
+          intPosNo: item.intPosNo,
+        })
+      )
+    ).size;
+
+    const length2 = updatedList4.value.length;
+
+    if (length != length2) {
+      Swal.fire({
+        title: "경고",
+        text: "중복된 포스번호가 존재합니다.",
         icon: "warning",
         confirmButtonText: "확인",
       });
@@ -1353,72 +1776,72 @@ const saveButton = async () => {
           const deletePoss = updatedList.value
             .filter((_, index) => allstaterow.value.deleted.includes(index))
             .map((item2) => item2.intPosNo)
-            .join(",");
+            .join("\u200B");
 
           const deleteGROUP = updatedList.value
             .filter((_, index) => allstaterow.value.deleted.includes(index))
             .map((item2) => item2.lngStoreGroup)
-            .join(",");
+            .join("\u200B");
 
           const deleteSTORECD = updatedList.value
             .filter((_, index) => allstaterow.value.deleted.includes(index))
             .map((item2) => item2.lngStoreCode)
-            .join(",");
+            .join("\u200B");
 
           const deleteAreaCd = updatedList.value
             .filter((_, index) => allstaterow.value.deleted.includes(index))
             .map((item2) => item2.lngAreaCode)
-            .join(",");
+            .join("\u200B");
 
           const storeGroupCd = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
             .map((item) => item.lngStoreGroup)
-            .join(",");
+            .join("\u200B");
           const storeCd = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
             .map((item) => item.lngStoreCode)
-            .join(",");
+            .join("\u200B");
           const storeAreaCd = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
             .map((item) => item.lngAreaCode)
-            .join(",");
+            .join("\u200B");
           const PosNo = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
             .map((item) => item.intPosNo)
-            .join(",");
+            .join("\u200B");
           const posEqipcl = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
             .map((item) => item.posEqipClCd)
-            .join(",");
+            .join("\u200B");
           const posEqipk = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
             .map((item) => item.posEqipKndCd)
-            .join(",");
+            .join("\u200B");
 
           const dates = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
             .map((item) => item.instlDate)
-            .join(",");
+            .join("\u200B");
           const oscds = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
             .map((item) => item.instlOsClCd)
-            .join(",");
+            .join("\u200B");
           const posips = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
             .map((item) => item.posIp)
-            .join(",");
+            .join("\u200B");
           const posclcd = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
             .map((item) => item.posClCd)
-            .join(",");
+            .join("\u200B");
           const useyn = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
             .map((item) => item.useYn)
-            .join(",");
+            .join("\u200B");
           const remark = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
             .map((item) => item.remark)
-            .join(",");
+            .join("\u200B");
 
           console.log(deletePoss);
           res = await savePosInfo(
@@ -1441,94 +1864,128 @@ const saveButton = async () => {
           );
           console.log(res);
         } else if (currentMenu.value == 2) {
-          let totalSum = [];
-          const calculateArr = ref([]);
-          console.log(SettingList.value);
-          SettingList.value.forEach((obj) => {
-            let sum = 0;
-            Object.keys(obj)
-              .filter((key) => key.startsWith("checkbox") && obj[key] == true)
-              .forEach((key) => {
-                const index = parseInt(key.replace("checkbox", ""));
-                sum += Math.pow(2, index - 1);
-              });
-            totalSum.push(sum);
-          });
+          const deleteRowGroup = updatedList2.value
+            .filter((_, index) => allstaterow2.value.deleted.includes(index))
+            .map((item) => item.lngStoreGroup)
+            .join("\u200B");
+          const deleteStoreCode = updatedList2.value
+            .filter((_, index) => allstaterow2.value.deleted.includes(index))
+            .map((item) => item.lngStoreCode)
+            .join("\u200B");
 
-          totalSum = totalSum.filter((item) => item != 0);
+          const deletelngAreaCode = updatedList2.value
+            .filter((_, index) => allstaterow2.value.deleted.includes(index))
+            .map((item) => item.lngAreaCode)
+            .join("\u200B");
 
-          const uniqueArray = [...new Set(totalSum)].sort((a, b) => a - b);
+          const deleteintPosNo = updatedList2.value
+            .filter((_, index) => allstaterow2.value.deleted.includes(index))
+            .map((item) => item.intPosNo)
+            .join("\u200B");
 
-          SettingList.value.forEach((obj) => {
-            let sum = 0;
-            let index;
-            let checkedColumn = [];
+          const deletelngPort = updatedList2.value
+            .filter((_, index) => allstaterow2.value.deleted.includes(index))
+            .map((item) => item.lngPort)
+            .join("\u200B");
 
-            // 'checkbox'로 시작하는 키 중에서 값이 true인 항목들을 필터링
-            Object.keys(obj)
-              .filter((key) => key.startsWith("checkbox") && obj[key] === true)
-              .forEach((key) => {
-                index = parseInt(key.replace("checkbox", "")); // index 계산
-                checkedColumn.push(index); // 체크된 열 인덱스를 배열에 추가
-                sum += Math.pow(2, index - 1); // sum에 값을 더함
-              });
+          const lngStoreGroups = updatedList2.value
+            .filter((_, index) => !allstaterow2.value.deleted.includes(index))
+            .map((item) => item.lngStoreGroup)
+            .join("\u200B");
+          const lngStoreCodes = updatedList2.value
+            .filter((_, index) => !allstaterow2.value.deleted.includes(index))
+            .map((item) => item.lngStoreCode)
+            .join("\u200B");
+          const lngAreaCodes = updatedList2.value
+            .filter((_, index) => !allstaterow2.value.deleted.includes(index))
+            .map((item) => item.lngAreaCode)
+            .join("\u200B");
 
-            // checkedColumn에 있는 모든 인덱스에 대해 sum 값을 추가
-            checkedColumn.forEach((colIndex) => {
-              // calculateArr.value[colIndex]가 배열이 아닌 경우 초기화
-              if (!Array.isArray(calculateArr.value[colIndex])) {
-                calculateArr.value[colIndex] = []; // 해당 index에 배열을 생성
-              }
-              calculateArr.value[colIndex].push(sum); // 해당 열의 배열에 sum을 추가
-            });
-          });
+          const intPosNos = updatedList2.value
+            .filter((_, index) => !allstaterow2.value.deleted.includes(index))
+            .map((item) => item.intPosNo)
+            .join("\u200B");
+          const lngPorts = updatedList2.value
+            .filter((_, index) => !allstaterow2.value.deleted.includes(index))
+            .map((item) => item.lngPort)
+            .join("\u200B");
+          const strNames = updatedList2.value
+            .filter((_, index) => !allstaterow2.value.deleted.includes(index))
+            .map((item) => item.strName)
+            .join("\u200B");
 
-          // calculateArr.value의 각 속성 배열에 대해 중복을 제거
+          const strSettings = updatedList2.value
+            .filter((_, index) => !allstaterow2.value.deleted.includes(index))
+            .map((item) => item.strSetting)
+            .join("\u200B");
+          const lngOLETypes = updatedList2.value
+            .filter((_, index) => !allstaterow2.value.deleted.includes(index))
+            .map((item) => item.lngOLEType)
+            .join("\u200B");
+          const lngMachineTypes = updatedList2.value
+            .filter((_, index) => !allstaterow2.value.deleted.includes(index))
+            .map((item) => item.lngMachineType)
+            .join("\u200B");
 
-          Object.keys(calculateArr.value).forEach((key) => {
-            if (Array.isArray(calculateArr.value[key])) {
-              // Set을 사용하여 중복을 제거하고 배열로 변환
-              calculateArr.value[key] = [...new Set(calculateArr.value[key])];
-            }
-          });
+          const blnOpens = updatedList2.value
+            .filter((_, index) => !allstaterow2.value.deleted.includes(index))
+            .map((item) => item.blnOpen)
+            .join("\u200B");
+          const blnShares = updatedList2.value
+            .filter((_, index) => !allstaterow2.value.deleted.includes(index))
+            .map((item) => item.blnShare)
+            .join("\u200B");
+          const lngMachines = updatedList2.value
+            .filter((_, index) => !allstaterow2.value.deleted.includes(index))
+            .map((item) => item.lngMachine)
+            .join("\u200B");
 
-          calculateArr.value = calculateArr.value.slice(1);
-          calculateArr.value = calculateArr.value.map((item) =>
-            Array.from(item)
+          const res = await savePortDefaultSetting(
+            lngStoreGroups,
+            lngStoreCodes,
+            lngAreaCodes,
+            intPosNos,
+            lngPorts,
+            strNames,
+            strSettings,
+            lngOLETypes,
+            lngMachineTypes,
+            blnOpens,
+            blnShares,
+            lngMachines,
+            deleteRowGroup,
+            deleteStoreCode,
+            deletelngAreaCode,
+            deleteintPosNo,
+            deletelngPort
           );
-          for (var i = 0; i < calculateArr.value.length; i++) {
-            if (calculateArr.value[i] == null) {
-              calculateArr.value[i] = [0];
-            }
-          }
-          console.log(JSON.stringify(calculateArr.value));
-          console.log(JSON.stringify(forSaveMenu.value));
-          console.log(uniqueArray.join(","));
 
-          console.log(updatedList2.value);
-
-          res = await saveKitchenSettingAll(
-            groupCd.value,
-            nowStoreCd.value,
-            JSON.stringify(forSaveMenu.value),
-            uniqueArray.join(","),
-            JSON.stringify(calculateArr.value),
-            userData.loginID
-          );
           console.log(res);
         } else if (currentMenu.value == 3) {
-          const posNos = updatedList3.value.map((item) => item.intPosNo);
-          const lngpositions = updatedList3.value.map(
-            (item) => item.lngPosition
-          );
-          const lngposs = updatedList3.value.map((item) => item.lngPos);
-          const lngports = updatedList3.value.map((item) => item.lngPort);
-          const areaCds = updatedList3.value.map((item) => item.lngAreaCode);
-          const cornernms = updatedList3.value.map((item) => item.cornerNm);
-          const portIdVlus = updatedList3.value.map((item) => item.portIdVlu);
-          const lngstorecodes = updatedList3.value.map(
-            (item) => item.lngStoreCode
-          );
+          const posNos = updatedList3.value
+            .filter((_, index) => !allstaterow3.value.deleted.includes(index))
+            .map((item) => item.intPosNo);
+          const lngpositions = updatedList3.value
+            .filter((_, index) => !allstaterow3.value.deleted.includes(index))
+            .map((item) => item.lngPosition);
+          const lngposs = updatedList3.value
+            .filter((_, index) => !allstaterow3.value.deleted.includes(index))
+            .map((item) => item.lngPos);
+          const lngports = updatedList3.value
+            .filter((_, index) => !allstaterow3.value.deleted.includes(index))
+            .map((item) => item.lngPort);
+          const areaCds = updatedList3.value
+            .filter((_, index) => !allstaterow3.value.deleted.includes(index))
+            .map((item) => item.lngAreaCode);
+          const cornernms = updatedList3.value
+            .filter((_, index) => !allstaterow3.value.deleted.includes(index))
+            .map((item) => item.cornerNm);
+          const portIdVlus = updatedList3.value
+            .filter((_, index) => !allstaterow3.value.deleted.includes(index))
+            .map((item) => item.portIdVlu);
+          const lngstorecodes = updatedList3.value
+            .filter((_, index) => !allstaterow3.value.deleted.includes(index))
+            .map((item) => item.lngStoreCode);
 
           console.log(allstaterow3.value);
           const deletePoss = updatedList3.value
@@ -1549,76 +2006,126 @@ const saveButton = async () => {
           res = await savePortConfig(
             groupCd.value,
             nowStoreCd.value,
-            posNos.join(","),
-            lngpositions.join(","),
-            lngposs.join(","),
-            lngports.join(","),
-            cornernms.join(","),
-            portIdVlus.join(","),
-            lngstorecodes.join(","),
-            areaCds.join(","),
-            deletePoss.join(","),
-            deletedStoreCodes.join(","),
-            deletedPosition.join(","),
-            deletedAreaCodes.join(",")
+            posNos.join("\u200B"),
+            lngpositions.join("\u200B"),
+            lngposs.join("\u200B"),
+            lngports.join("\u200B"),
+            cornernms.join("\u200B"),
+            portIdVlus.join("\u200B"),
+            lngstorecodes.join("\u200B"),
+            areaCds.join("\u200B"),
+            deletePoss.join("\u200B"),
+            deletedStoreCodes.join("\u200B"),
+            deletedPosition.join("\u200B"),
+            deletedAreaCodes.join("\u200B")
           );
         } else if (currentMenu.value == 4) {
           const deletedPosNos = updatedList4.value
             .filter((item, index) => allstaterow4.value.deleted.includes(index))
             .map((item2) => item2.intPosNo)
-            .join(",");
+            .join("\u200B");
           const posNos = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.intPosNo)
-            .join(",");
+            .join("\u200B");
           const issuecounts = updatedList4.value
-            .map((item) => item.lngOIssueCount)
-            .join(",");
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
+            .map((item) =>
+              Number.isNaN(item.lngOIssueCount) ? "" : item.lngOIssueCount
+            )
+            .join("\u200B");
           const issuetypes = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.lngOIssueType)
-            .join(",");
+            .join("\u200B");
           const issuesums = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.lngOIssueSum)
-            .join(",");
+            .join("\u200B");
           const rissuecounts = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.lngRIssueCount)
-            .join(",");
+            .join("\u200B");
           const rissuetypes = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.lngRIssueType)
-            .join(",");
+            .join("\u200B");
           const kitchenordervoids = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.lngKitchenOrderVoid)
-            .join(",");
+            .join("\u200B");
           const kitchenmenuvoids = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.lngKitchenMenuVoid)
-            .join(",");
+            .join("\u200B");
           const kitchenus = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.lngKitchenU)
-            .join(",");
+            .join("\u200B");
           const kitchends = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.lngKitchenD)
-            .join(",");
+            .join("\u200B");
           const floormaxs = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.lngFloorMax)
-            .join(",");
+            .join("\u200B");
           const lnglogos = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.lngLogo)
-            .join(",");
+            .join("\u200B");
 
           const lngstoregroup = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.lngStoreGroup)
-            .join(",");
+            .join("\u200B");
 
           const lngstorecode = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.lngStoreCode)
-            .join(",");
+            .join("\u200B");
 
           const lngareacode = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.lngAreaCode)
-            .join(",");
+            .join("\u200B");
 
           const poskiosk = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
             .map((item) => item.POSKIOSK)
-            .join(",");
+            .join("\u200B");
 
           res = await savePrintConfig(
             groupCd.value,
@@ -1645,6 +2152,7 @@ const saveButton = async () => {
 
         console.log(res);
       } catch (error) {
+        console.log(error);
       } finally {
         store.state.loading = false;
         changeValue.value = null;
@@ -1672,15 +2180,21 @@ const clickedRowData = (newValue) => {
   //changeRow.value = newValue.index
   changeColid.value = "cornerNm";
 };
-const clickedRowData2 = (newValue) => {
+const clickedRowData2 = async (newValue) => {
   console.log(newValue);
-
+  disabled2.value = false;
   gridvalue21.value = newValue[1];
   gridvalue22.value = newValue[2];
   gridvalue23.value = newValue[3];
   gridvalue24.value = newValue[4];
   selectCode1.value = newValue[10];
+  await setPortEqType2(selectCode1.value);
+  console.log(selectCode1.value);
+  await nextTick();
   selectCode2.value = newValue[11];
+  console.log(selectCode2.value);
+  setEqType2(selectCode2.value);
+
   selectCode4.value = newValue[7];
   selectCode5.value = newValue[8];
   selectCode3.value = newValue[12];

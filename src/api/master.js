@@ -1809,6 +1809,45 @@ export const savePosInfo = (
     DELETE_POS: deletePoss,
   });
 };
+export const savePortDefaultSetting = (
+  groupCds,
+  storeCds,
+  areacds,
+  posnos,
+  ports,
+  strnames,
+  strsettings,
+  lngoleType,
+  lngmachineType,
+  blnopen,
+  blnshare,
+  lngmachine,
+  deleteGROUP,
+  deleteSTORECD,
+  deleteAreaCd,
+  deletePoss,
+  deletePort
+) => {
+  return api2.post("/MIMASTER/MST44_063INS.asmx/savePortDefaultSetting", {
+    GROUP_CDS: groupCds,
+    STORE_CDS: storeCds,
+    AREA_CDS: areacds,
+    POS_NOS: posnos,
+    PORTS: ports,
+    STRNAMES: strnames,
+    STRSETTINGS: strsettings,
+    LNGOLETYPES: lngoleType,
+    LNG_MATCHINETYPE: lngmachineType,
+    BLNOPEN: blnopen,
+    BLNSHARE: blnshare,
+    LNG_MACHINE: lngmachine,
+    DELETE_GROUP: deleteGROUP,
+    DELETE_STORE: deleteSTORECD,
+    DELETE_AREA: deleteAreaCd,
+    DELETE_POS: deletePoss,
+    DELETE_PORT: deletePort,
+  });
+};
 
 export const getPortDefaultInfo = (groupCd, storeCd) => {
   return api2.post("/MIMASTER/MST44_063INS.asmx/getPortDefaultInfo", {

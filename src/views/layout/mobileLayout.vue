@@ -11,25 +11,56 @@
       ref="scrollContainer"
       v-show="!(notice || personal)">
       <router-view v-slot="{ Component, route }" class="mt-1">
-        <div
-          class="flex flex-col gap-0 w-full items-center justify-center mr-0 h-auto mt-8"
-          v-show="notice">
-          <!-- <div class="flex justify-end w-full mr-4">
-            <button class="text-3xl" @click="showNotice(false)">
-              <font-awesome-icon icon="xmark" />
-            </button>
-          </div> -->
-          <div class="absolute top-[50vh] flex justify-center items-center">
-            공지사항이 없습니다.
-          </div>
-        </div>
-
         <component
           :is="Component"
           class="overflow-y-auto"
           id="content"></component>
       </router-view>
     </main>
+    <div
+      class="flex flex-col gap-0 w-full items-center justify-center mr-0 h-auto mt-10"
+      v-show="notice">
+      <!-- <div class="flex justify-end w-full mr-4">
+            <button class="text-3xl" @click="showNotice(false)">
+              <font-awesome-icon icon="xmark" />
+            </button>
+          </div> -->
+      <div
+        v-show="!showDetailNotice"
+        @scroll="handleScroll2"
+        ref="scrollArea"
+        class="overflow-y-auto">
+        <div
+          class="absolute top-[20vh] flex justify-center items-center"
+          v-if="blnNoticeList">
+          공지사항이 없습니다.
+        </div>
+
+        <div class="p-4 space-y-4" v-if="!blnNoticeList">
+          <div
+            v-for="I in notices"
+            @click="showNoticeDetail(I.NOTICE_ID)"
+            class="bg-white shadow-md rounded-2xl p-4 border border-gray-100">
+            <h5
+              class="text-lg text-gray-800 mb-2 text-left flex justify-between">
+              <div>{{ I.NOTICE_ID }}</div>
+              <div class="bg-red-600 text-white rounded-lg">
+                {{ I.IMPORTANT_YN == "1" ? "중요" : "" }}
+              </div>
+            </h5>
+            <h2 class="text-lg font-semibold text-gray-800 mb-2">
+              {{ I.TITLE_NM }}
+            </h2>
+            <p class="text-sm text-gray-600 line-clamp-2 text-right">
+              작성자 : {{ I.WRITER_NM }}
+            </p>
+            <div class="text-xs text-gray-400 mt-2 text-right">
+              {{ I.WRITE_DT }} / 조회수 : {{ I.READ_CNT }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div v-if="personal" class="h-[120%] w-full items-center relative">
       <div
@@ -40,6 +71,31 @@
           class="text-xl text-nowrap w-[95vw] h-[10%] flex justify-center items-center border"
           :class="index % 2 == 1 ? 'bg-white' : 'bg-gray-200'">
           <button>{{ i.name }}</button>
+        </div>
+      </div>
+    </div>
+    <div v-if="showDetailNotice" class="h-full">
+      <div class="min-h-screen bg-gray-50">
+        <!-- 제목 -->
+        <h1 class="text-2xl font-bold text-gray-900 mb-4 text-left pl-5 pt-5">
+          {{ DetailNotice.TITLE_NM }}
+        </h1>
+
+        <!-- 작성 정보 -->
+        <div
+          class="text-sm text-gray-500 mb-6 flex flex-col space-y-1 text-left pl-5">
+          <div><strong>작성자:</strong> {{ DetailNotice.WRITER_NM }}</div>
+          <div>
+            <strong>작성일:</strong> {{ DetailNotice.WRITE_DT }}
+            <span class="mx-2">|</span>
+            <strong>조회수:</strong> {{ DetailNotice.READ_CNT }}
+          </div>
+        </div>
+
+        <!-- 본문 -->
+        <div
+          class="bg-white rounded-xl shadow-sm text-gray-800 whitespace-pre-line h-full w-full min-h-[500px]">
+          <div v-html="DetailNotice.NOTICE_CT" class="h-full"></div>
         </div>
       </div>
     </div>
@@ -55,6 +111,9 @@
     @showNotice="showNotice"
     @showpersonal="showpersonal"
     @showMenu3="showMenu3"
+    @changeIconValue="changeIconValue"
+    @searchword="searchword"
+    @searchNow="searchNow"
     @click.stop
     :changeIcon="changeIcon"
     :changeMenuState="showTotalMenu"
@@ -72,6 +131,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import MobileTotalMenu from "../MOBILE/component/mobileTotalMenu.vue";
+import { getNoticeDetail, getNoticeList } from "@/api/mobile";
 const store = useStore();
 
 const notice = ref(false);
@@ -80,7 +140,7 @@ const personal = ref(false);
 const showMobileMenu = ref(true);
 const clickthismenu = ref([]);
 const route = useRoute();
-
+const blnNoticeList = ref(true);
 const salesMenus = ref([]);
 const SalesMenus = (e) => {
   console.log(e);
@@ -93,6 +153,7 @@ const MenuState = (e) => {
 };
 const showNotice = (value) => {
   notice.value = value;
+  showDetailNotice.value = false;
 };
 const showpersonal = (value) => {
   personal.value = value;
@@ -115,37 +176,82 @@ const resetScreen = (e) => {
   store.state.inActiveBackGround = false;
 };
 
-const goRouter = (value) => {
-  switch (value) {
-    case 2:
-      router.push("/m/MISALES/SLS06_003RPT.xml");
-      break;
+// const goRouter = (value) => {
+//   switch (value) {
+//     case 2:
+//       router.push("/m/MISALES/SLS06_003RPT.xml");
+//       break;
 
-    case 3:
-      router.push("/m/MISALES/SLS06_004RPT.xml");
-      break;
+//     case 3:
+//       router.push("/m/MISALES/SLS06_004RPT.xml");
+//       break;
 
-    case 4:
-      router.push("/m/MISALES/SLS06_005RPT.xml");
-      break;
+//     case 4:
+//       router.push("/m/MISALES/SLS06_005RPT.xml");
+//       break;
 
-    default:
-      break;
+//     default:
+//       break;
+//   }
+
+//   personal.value = false;
+//   isMenu.value = false;
+// };
+
+watch(notice, async () => {
+  console.log(store.state.userData);
+  if (notice.value == true) {
+    const res = await getNoticeList(
+      store.state.userData.GROUP_CD,
+      store.state.userData.STORE_CD,
+      store.state.userData.USER_NO,
+      pageIndex.value,
+      pageIndex2.value,
+      0,
+      ""
+    );
+
+    console.log(res);
+    if (res.data.List.length == 0) {
+      blnNoticeList.value = true;
+    } else {
+      blnNoticeList.value = false;
+    }
+    notices.value = res.data.List;
   }
+});
 
-  personal.value = false;
-  isMenu.value = false;
+const changeIconValue = (e) => {
+  changeIcon.value = e;
 };
-const showsubMenu = (value) => {
-  const index = clickthismenu.value.indexOf(value);
-  if (index == -1) {
-    clickthismenu.value.push(value);
-  } else {
-    clickthismenu.value.splice(index, 1);
-  }
-};
-const showornotsubMenu = (value) => {
-  return clickthismenu.value.includes(value);
+// const showsubMenu = (value) => {
+//   const index = clickthismenu.value.indexOf(value);
+//   if (index == -1) {
+//     clickthismenu.value.push(value);
+//   } else {
+//     clickthismenu.value.splice(index, 1);
+//   }
+// };
+// const showornotsubMenu = (value) => {
+//   return clickthismenu.value.includes(value);
+// };
+const pageIndex = ref(0);
+const pageIndex2 = ref(15);
+const DetailNotice = ref([]);
+const showDetailNotice = ref(false);
+const showNoticeDetail = async (e) => {
+  showDetailNotice.value = true;
+  changeIcon.value = 4;
+
+  const res = await getNoticeDetail(
+    store.state.userData.GROUP_CD,
+    store.state.userData.STORE_CD,
+    store.state.userData.USER_NO,
+    e
+  );
+  DetailNotice.value = res.data.List[0];
+  console.log(DetailNotice.value);
+  scrollContainer3.value.scrollTop = 0;
 };
 
 const categories = ref([]);
@@ -208,6 +314,29 @@ const lastScrollY = ref(0); // 마지막 스크롤 위치
 const lastScrollY3 = ref(0); // 마지막 스크롤 위치
 const scrollContainer = ref(null);
 const scrollContainer3 = ref(null);
+
+const scrollArea = ref(null);
+
+// const handleScroll2 = () => {
+//   const el = scrollArea.value;
+//   const threshold = 10; // 10px 여유 두고 바닥 처리
+
+//   if (el.scrollTop + el.clientHeight >= el.scrollHeight - threshold) {
+//     console.log("⬇ 바닥에 도달했어요!");
+//     // 여기에 API 더 불러오거나 알림 띄우거나 원하는 액션 실행
+//   }
+// };
+
+const handleScroll2 = () => {
+  if (scrollArea.value.scrollTop > lastScrollY.value) {
+    // 아래로 스크롤하면 메뉴 숨기기
+  } else {
+    // 위로 스크롤하면 메뉴 보이기
+  }
+
+  lastScrollY.value = scrollArea.value.scrollTop;
+};
+
 const handleScroll = () => {
   if (scrollContainer.value.scrollTop > lastScrollY.value) {
     // 아래로 스크롤하면 메뉴 숨기기
@@ -219,8 +348,28 @@ const handleScroll = () => {
 
   lastScrollY.value = scrollContainer.value.scrollTop;
 };
-const handleScroll3 = (e) => {
-  console.log(e);
+const handleScroll3 = async (e) => {
+  const target = scrollContainer3.value;
+  const scrollTop = target.scrollTop; // 현재 스크롤 위치
+  const scrollHeight = target.scrollHeight; // 전체 스크롤 높이
+  const clientHeight = target.clientHeight; // 보이는 영역 높이
+
+  if (scrollTop + clientHeight >= scrollHeight - 1) {
+    pageIndex.value = pageIndex.value + 1;
+    //pageIndex2.value = pageIndex2.value + 15;
+    const res = await getNoticeList(
+      store.state.userData.GROUP_CD,
+      store.state.userData.STORE_CD,
+      store.state.userData.USER_NO,
+      pageIndex.value,
+      pageIndex2.value,
+      searchNotice.value == "" ? 0 : 1,
+      searchNotice.value
+    );
+
+    notices.value.push(...res.data.List);
+  }
+
   if (scrollContainer3.value.scrollTop > lastScrollY3.value) {
     // 아래로 스크롤하면 메뉴 숨기기
     changeBottomMenu.value = false;
@@ -232,7 +381,28 @@ const handleScroll3 = (e) => {
   lastScrollY3.value = scrollContainer3.value.scrollTop;
 };
 
-const hideAll = ref(true);
+const searchNotice = ref("");
+const searchword = (e) => {
+  searchNotice.value = e;
+};
+
+const searchNow = async (e) => {
+  pageIndex.value = 0;
+  pageIndex2.value = 15;
+  console.log(searchNotice.value);
+  const res = await getNoticeList(
+    store.state.userData.GROUP_CD,
+    store.state.userData.STORE_CD,
+    store.state.userData.USER_NO,
+    pageIndex.value,
+    pageIndex2.value,
+    1,
+    searchNotice.value
+  );
+  console.log(res);
+  notices.value = res.data.List;
+};
+const notices = ref([]);
 onMounted(async () => {
   if (scrollContainer.value) {
     scrollContainer.value.addEventListener("scroll", handleScroll); // 스크롤 컨테이너에 이벤트 등록
@@ -241,6 +411,10 @@ onMounted(async () => {
   if (scrollContainer3.value) {
     scrollContainer3.value.addEventListener("scroll", handleScroll3); // 스크롤 컨테이너에 이벤트 등록
     lastScrollY3.value = scrollContainer3.value.scrollTop;
+  }
+  if (scrollArea.value) {
+    scrollArea.value.addEventListener("scroll", handleScroll2); // 스크롤 컨테이너에 이벤트 등록
+    lastScrollY3.value = scrollArea.value.scrollTop;
   }
 });
 
@@ -274,11 +448,11 @@ onBeforeUnmount(() => {
 //   });
 // });
 
-const changeIcon = ref(false);
+const changeIcon = ref(0);
 const movePage = (e, e2) => {
   console.log(`/m/${e}`);
   store.state.mobileSelectProgName = e2;
-  changeIcon.value = !changeIcon.value;
+  changeIcon.value = 4;
   personal.value = false;
   notice.value = false;
   router.push(`/m/${e}`);
