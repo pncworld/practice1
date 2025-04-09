@@ -1987,6 +1987,10 @@ const saveButton = async () => {
             .filter((_, index) => !allstaterow3.value.deleted.includes(index))
             .map((item) => item.lngStoreCode);
 
+          const lngoriginPort = updatedList3.value
+            .filter((_, index) => !allstaterow3.value.deleted.includes(index))
+            .map((item) => item.originPort);
+
           console.log(allstaterow3.value);
           const deletePoss = updatedList3.value
             .filter((_, index) => allstaterow3.value.deleted.includes(index))
@@ -2014,6 +2018,7 @@ const saveButton = async () => {
             portIdVlus.join("\u200B"),
             lngstorecodes.join("\u200B"),
             areaCds.join("\u200B"),
+            lngoriginPort.join("\u200B"),
             deletePoss.join("\u200B"),
             deletedStoreCodes.join("\u200B"),
             deletedPosition.join("\u200B"),
