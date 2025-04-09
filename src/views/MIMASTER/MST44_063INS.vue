@@ -193,8 +193,8 @@
               class="w-full h-8 border border-gray-500 rounded-lg"
               v-model="selectCode1">
               <option value="-1">선택</option>
-              <option :value="JSON.stringify(i)" v-for="i in commonList7">
-                {{ i.strDName }}
+              <option :value="i.strDCode" v-for="i in commonList7">
+                [{{ i.strDCode }}]{{ i.strDName }}
               </option>
             </select>
           </div>
@@ -209,8 +209,8 @@
               v-model="selectCode2"
               class="w-full h-8 border border-gray-500 rounded-lg">
               <option value="-1">선택</option>
-              <option :value="JSON.stringify(i)" v-for="i in commonList8">
-                {{ i.strDName }}
+              <option :value="i.strDCode" v-for="i in commonList8">
+                [{{ i.strDCode }}]{{ i.strDName }}
               </option>
             </select>
           </div>
@@ -226,7 +226,7 @@
               class="w-full h-8 border border-gray-500 rounded-lg">
               <option value="-1">선택</option>
               <option :value="i.strDCode" v-for="i in commonList10">
-                {{ i.strDName }}
+                [{{ i.strDCode }}]{{ i.strDName }}
               </option>
             </select>
           </div>
@@ -242,7 +242,7 @@
               class="w-full h-8 border border-gray-500 rounded-lg">
               <option value="-1">선택</option>
               <option :value="i.strDCode" v-for="i in commonList10">
-                {{ i.strDName }}
+                [{{ i.strDCode }}]{{ i.strDName }}
               </option>
             </select>
           </div>
@@ -256,7 +256,7 @@
               class="w-full h-8 border border-gray-500 rounded-lg">
               <option value="-1">선택</option>
               <option :value="i.strDCode" v-for="i in commonList9">
-                {{ i.strDName }}
+                [{{ i.strDCode }}]{{ i.strDName }}
               </option>
             </select>
           </div>
@@ -272,7 +272,11 @@
             :reload="reload"
             :rowData="rowData2"
             :showGrid="showGrid"
+            :labelingColumns="'blnOpen,blnShare'"
+            :labelsData="[labelsData10, labelsData10]"
+            :valuesData="[valueData10, valueData10]"
             :showCheckBar="false"
+            @clickedRowData="clickedRowData2"
             @selcetedrowData="selcetedrowData"
             @updatedRowData="updatedRowData2"
             @realgridname="realgridname2"></Realgrid>
@@ -597,6 +601,7 @@ const labelsData6 = ref([]);
 const labelsData7 = ref([]);
 const labelsData8 = ref([]);
 const labelsData9 = ref([]);
+const labelsData10 = ref([]);
 
 const valueData1 = ref([""]);
 const valueData2 = ref([]);
@@ -608,6 +613,7 @@ const valueData6 = ref([]);
 const valueData7 = ref([]);
 const valueData8 = ref([]);
 const valueData9 = ref([]);
+const valueData10 = ref([]);
 
 const commonList11 = ref([]);
 const settingPosList = async (e1, e2) => {
@@ -671,6 +677,11 @@ onMounted(async () => {
   const res8 = await getCommonList(406);
 
   const res9 = await getCommonList(408);
+  const res10 = await getCommonList(399);
+
+  valueData10.value = res10.data.List.map((item) => item.strDCode);
+  labelsData10.value = res10.data.List.map((item) => item.strDName);
+
   console.log(res9);
   commonList7.value = res9.data.List;
   labelsData6.value = ["선택", ...res5.data.List.map((item) => item.strDName)];
@@ -739,23 +750,28 @@ onMounted(async () => {
 const commonList8 = ref([]);
 const commonList9 = ref([]);
 const setPortEqType = async (e) => {
-  const value = JSON.parse(e.target.value);
+  const value = e.target.value;
   if (value == -1) {
     return;
   }
+  const targetValue = commonList7.value.filter(
+    (item) => item.strDCode == value
+  )[0].strSCode;
   console.log(value.strSCode);
-  const res = await getCommonList(value.strSCode);
+  const res = await getCommonList(targetValue);
 
   commonList8.value = res.data.List;
   selectCode2.value = -1;
 };
 const setEqType = async (e) => {
-  const value = JSON.parse(e.target.value);
+  const value = e.target.value;
   if (value == -1) {
     return;
   }
-  console.log(value.strSCode);
-  const res = await getCommonList(value.strSCode);
+  const targetValue = commonList8.value.filter(
+    (item) => item.strDCode == value
+  )[0].strSCode;
+  const res = await getCommonList(targetValue);
   commonList9.value = res.data.List;
   selectCode3.value = -1;
 };
@@ -1655,6 +1671,19 @@ const clickedRowData = (newValue) => {
 
   //changeRow.value = newValue.index
   changeColid.value = "cornerNm";
+};
+const clickedRowData2 = (newValue) => {
+  console.log(newValue);
+
+  gridvalue21.value = newValue[1];
+  gridvalue22.value = newValue[2];
+  gridvalue23.value = newValue[3];
+  gridvalue24.value = newValue[4];
+  selectCode1.value = newValue[10];
+  selectCode2.value = newValue[11];
+  selectCode4.value = newValue[7];
+  selectCode5.value = newValue[8];
+  selectCode3.value = newValue[12];
 };
 
 const changeColid = ref("");
