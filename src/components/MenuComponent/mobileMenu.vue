@@ -35,6 +35,7 @@
         class="flex justify-center items-center ml-[2vw] text-xl font-semibold">
         <input
           type="text"
+          @keydown.enter="searchNotice2"
           v-model="searchWord"
           class="border border-gray-500 rounded-lg h-6 pl-1" />
       </div>
@@ -212,6 +213,18 @@ const reload = () => {
 const showInputBox = ref(false);
 const searchWord = ref("");
 const searchNow = ref(false);
+
+const searchNotice2 = () => {
+  emit("searchword", searchWord.value);
+  if (showInputBox.value == false) {
+    showInputBox.value = true;
+  } else {
+    searchNow.value = !searchNow.value;
+    emit("searchNow", searchNow);
+    showInputBox.value = false;
+    // emit("searchword", searchWord.value);
+  }
+};
 const searchNotice = () => {
   emit("searchword", searchWord.value);
   if (showInputBox.value == false) {
