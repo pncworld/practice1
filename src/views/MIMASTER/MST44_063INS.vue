@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-center w-full overflow-y-auto">
+  <div class="flex justify-between items-center w-full overflow-y-hidden">
     <div class="flex justify-start w-full pl-12 pt-4">
       <div class="flex justify-start">
         <h1 class="font-bold text-sm md:text-2xl w-full">출력기기관리</h1>
@@ -256,7 +256,9 @@
               </option>
             </select>
           </div>
-          <div>연결장비종류</div>
+          <div class="text-blue-500 font-semibold text-center">
+            *연결장비종류
+          </div>
           <div>
             <select
               name=""
@@ -361,7 +363,7 @@
             :showCheckBar="true"
             :labelingColumns="'intPosNo,lngOIssueType,lngOIssueSum,lngRIssueType,lngKitchenOrderVoid,lngKitchenMenuVoid,lngLogo'"
             :labelsData="[
-              labelsData1,
+              labelsData20,
               labelsData2,
               labelsData3,
               labelsData3,
@@ -370,7 +372,7 @@
               labelsData5,
             ]"
             :valuesData="[
-              valueData1,
+              valueData20,
               valueData2,
               valueData3,
               valueData3,
@@ -410,9 +412,10 @@
               class="bg-white rounded-tr-lg h-full w-full font-semibold items-center text-center border-t border-r border-l border-gray-300 flex justify-start pl-1">
               <input
                 type="number"
+                :disabled="disabled3"
                 name="lngOIssueCount"
                 @input="setValue"
-                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]"
+                class="disabled:bg-gray-100 bg-white border rounded-lg w-[50%] h-[80%]"
                 v-model="gridvalue1" />회
             </div>
             <div
@@ -424,7 +427,8 @@
               <select
                 name="lngOIssueType"
                 @change="setValue"
-                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
+                :disabled="disabled3"
+                class="disabled:bg-gray-100 bg-white border rounded-lg w-[90%] h-[80%]"
                 v-model="selectCommon1">
                 <option :value="-1">선택</option>
                 <option :value="i.strDCode" v-for="i in commonList1">
@@ -441,7 +445,8 @@
               <select
                 name="lngOIssueSum"
                 @change="setValue"
-                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
+                :disabled="disabled3"
+                class="disabled:bg-gray-100 bg-white border rounded-lg w-[90%] h-[80%]"
                 v-model="selectCommon2">
                 <option :value="-1">선택</option>
                 <option :value="i.strDCode" v-for="i in commonList2">
@@ -458,8 +463,9 @@
               <input
                 type="number"
                 @input="setValue"
+                :disabled="disabled3"
                 name="lngRIssueCount"
-                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]"
+                class="disabled:bg-gray-100 bg-white border rounded-lg w-[50%] h-[80%]"
                 v-model="gridvalue2" />회
             </div>
             <div
@@ -471,7 +477,8 @@
               <select
                 name="lngRIssueType"
                 @change="setValue"
-                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
+                :disabled="disabled3"
+                class="disabled:bg-gray-100 bg-white border rounded-lg w-[90%] h-[80%]"
                 v-model="selectCommon3">
                 <option :value="-1">선택</option>
                 <option :value="i.strDCode" v-for="i in commonList3">
@@ -488,7 +495,8 @@
               <select
                 name="lngKitchenOrderVoid"
                 @change="setValue"
-                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
+                :disabled="disabled3"
+                class="disabled:bg-gray-100 bg-white border rounded-lg w-[90%] h-[80%]"
                 v-model="selectCommon4">
                 <option :value="-1">선택</option>
                 <option :value="i.strDCode" v-for="i in commonList4">
@@ -505,7 +513,8 @@
               <select
                 name="lngKitchenMenuVoid"
                 @change="setValue"
-                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
+                :disabled="disabled3"
+                class="disabled:bg-gray-100 bg-white border rounded-lg w-[90%] h-[80%]"
                 v-model="selectCommon5">
                 <option :value="-1">선택</option>
                 <option :value="i.strDCode" v-for="i in commonList5">
@@ -523,7 +532,8 @@
                 type="number"
                 name="lngKitchenU"
                 @input="setValue"
-                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]"
+                :disabled="disabled3"
+                class="disabled:bg-gray-100 bg-white border rounded-lg w-[50%] h-[80%]"
                 v-model="gridvalue3" />줄
             </div>
             <div
@@ -536,7 +546,8 @@
                 type="number"
                 name="lngKitchenD"
                 @input="setValue"
-                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]"
+                :disabled="disabled3"
+                class="disabled:bg-gray-100 bg-white border rounded-lg w-[50%] h-[80%]"
                 v-model="gridvalue4" />줄
             </div>
             <div
@@ -549,7 +560,8 @@
                 type="number"
                 name="lngFloorMax"
                 @input="setValue"
-                class="bg-gray-50 border rounded-lg w-[50%] h-[80%]"
+                :disabled="disabled3"
+                class="disabled:bg-gray-100 bg-white border rounded-lg w-[50%] h-[80%]"
                 v-model="gridvalue5" />줄
             </div>
             <div
@@ -561,7 +573,8 @@
               <select
                 name="lngLogo"
                 @change="setValue"
-                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
+                :disabled="disabled3"
+                class="disabled:bg-gray-100 bg-white border rounded-lg w-[90%] h-[80%]"
                 v-model="selectCommon6">
                 <option :value="-1">선택</option>
                 <option :value="i.strDCode" v-for="i in commonList6">
@@ -578,7 +591,8 @@
               <select
                 name="POSKIOSK"
                 @change="setValue"
-                class="bg-gray-50 border rounded-lg w-[90%] h-[80%]"
+                :disabled="disabled3"
+                class="disabled:bg-gray-100 bg-white border rounded-lg w-[90%] h-[80%]"
                 v-model="selectCommon7">
                 <option :value="-1">선택</option>
                 <option value="0">포스</option>
@@ -628,6 +642,7 @@ const labelsData7 = ref([]);
 const labelsData8 = ref([]);
 const labelsData9 = ref([]);
 const labelsData10 = ref([]);
+const labelsData20 = ref([1, 2, 3, 4, 5]);
 
 const valueData1 = ref([""]);
 const valueData2 = ref([]);
@@ -640,6 +655,7 @@ const valueData7 = ref([]);
 const valueData8 = ref([]);
 const valueData9 = ref([]);
 const valueData10 = ref([]);
+const valueData20 = ref([1, 2, 3, 4, 5]);
 
 const commonList11 = ref([]);
 const settingPosList = async (e1, e2) => {
@@ -647,6 +663,7 @@ const settingPosList = async (e1, e2) => {
   valueData1.value = [0];
   const res = await getPosList(e1, e2);
 
+  console.log(res);
   const datas = res.data.pos;
   commonList11.value = res.data.pos;
   for (let i = 0; i < datas.length; i++) {
@@ -789,6 +806,44 @@ const commonList9 = ref([]);
 const setPortEqType = async (e) => {
   const value = e.target.value;
   if (value == -1) {
+    selectCode2.value = -1;
+    selectCode3.value = -1;
+
+    commonList8.value = [];
+    commonList9.value = [];
+
+    changeColid.value = "lngOLEType";
+    changeValue2.value = -1;
+    changeNow3.value = !changeNow3.value;
+    await nextTick();
+
+    changeColid.value = "strPortName";
+    changeValue2.value = "선택";
+    changeNow3.value = !changeNow3.value;
+    await nextTick();
+
+    changeColid.value = "lngMachineType";
+    changeValue2.value = -1;
+    changeNow3.value = !changeNow3.value;
+
+    await nextTick();
+
+    changeColid.value = "strMachineType";
+    changeValue2.value = "선택";
+    changeNow3.value = !changeNow3.value;
+
+    await nextTick();
+
+    changeColid.value = "lngMachine";
+    changeValue2.value = -1;
+    changeNow3.value = !changeNow3.value;
+
+    await nextTick();
+
+    changeColid.value = "strMachine";
+    changeValue2.value = "선택";
+    changeNow3.value = !changeNow3.value;
+
     return;
   }
   const targetValue = commonList7.value.filter(
@@ -841,6 +896,44 @@ const setPortEqType = async (e) => {
 const setPortEqType2 = async (e) => {
   const value = e;
   if (value == -1) {
+    selectCode2.value = -1;
+    selectCode3.value = -1;
+
+    commonList8.value = [];
+    commonList9.value = [];
+
+    changeColid.value = "lngOLEType";
+    changeValue2.value = -1;
+    changeNow3.value = !changeNow3.value;
+    await nextTick();
+
+    changeColid.value = "strPortName";
+    changeValue2.value = "선택";
+    changeNow3.value = !changeNow3.value;
+    await nextTick();
+
+    changeColid.value = "lngMachineType";
+    changeValue2.value = -1;
+    changeNow3.value = !changeNow3.value;
+
+    await nextTick();
+
+    changeColid.value = "strMachineType";
+    changeValue2.value = "선택";
+    changeNow3.value = !changeNow3.value;
+
+    await nextTick();
+
+    changeColid.value = "lngMachine";
+    changeValue2.value = -1;
+    changeNow3.value = !changeNow3.value;
+
+    await nextTick();
+
+    changeColid.value = "strMachine";
+    changeValue2.value = "선택";
+    changeNow3.value = !changeNow3.value;
+
     return;
   }
   const targetValue = commonList7.value.filter(
@@ -856,6 +949,33 @@ const setPortEqType2 = async (e) => {
 const setEqType = async (e) => {
   const value = e.target.value;
   if (value == -1) {
+    selectCode3.value = -1;
+    commonList9.value = [];
+
+    changeColid.value = "lngMachineType";
+    changeValue2.value = -1;
+    changeNow3.value = !changeNow3.value;
+
+    await nextTick();
+
+    changeColid.value = "strMachineType";
+    changeValue2.value = "선택";
+    changeNow3.value = !changeNow3.value;
+
+    await nextTick();
+
+    changeColid.value = "lngMachine";
+    changeValue2.value = -1;
+    changeNow3.value = !changeNow3.value;
+
+    await nextTick();
+
+    changeColid.value = "strMachine";
+    changeValue2.value = "선택";
+    changeNow3.value = !changeNow3.value;
+
+    await nextTick();
+
     return;
   }
   const targetValue = commonList8.value.filter(
@@ -900,6 +1020,33 @@ const setEqType = async (e) => {
 const setEqType2 = async (e) => {
   const value = e;
   if (value == -1) {
+    selectCode3.value = -1;
+    commonList9.value = [];
+
+    changeColid.value = "lngMachineType";
+    changeValue2.value = -1;
+    changeNow3.value = !changeNow3.value;
+
+    await nextTick();
+
+    changeColid.value = "strMachineType";
+    changeValue2.value = "선택";
+    changeNow3.value = !changeNow3.value;
+
+    await nextTick();
+
+    changeColid.value = "lngMachine";
+    changeValue2.value = -1;
+    changeNow3.value = !changeNow3.value;
+
+    await nextTick();
+
+    changeColid.value = "strMachine";
+    changeValue2.value = "선택";
+    changeNow3.value = !changeNow3.value;
+
+    await nextTick();
+
     return;
   }
 
@@ -975,6 +1122,7 @@ const setRowValueChange7 = async (e) => {
   changeNow3.value = !changeNow3.value;
 };
 const disabled = ref(true);
+const disabled3 = ref(true);
 const items = ref([]);
 const ScreenKeyOrigin = ref([]);
 const ScreenKeys = ref();
@@ -1161,6 +1309,15 @@ const addrowProp4 = ref(
 );
 const addrowDefault4 = ref(" ,' ',-1,-1,' ',-1,-1,-1,' ',' ',' ',-1");
 const addRow2 = () => {
+  if (afterSearch2.value == false) {
+    Swal.fire({
+      title: "경고.",
+      text: "조회를 먼저 해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   addrowDefault2.value =
     clickedStoreNm.value +
     "," +
@@ -1173,10 +1330,16 @@ const addRow2 = () => {
   addrow2.value = !addrow2.value;
 };
 const addRow3 = () => {
-  const newMax =
-    rowData3.value.length == 0
-      ? 1
-      : Math.max(...rowData3.value.map((item) => Number(item.portIdVlu))) * 2;
+  if (afterSearch3.value == false) {
+    Swal.fire({
+      title: "경고.",
+      text: "조회를 먼저 해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  const newMax = "";
 
   addrowDefault3.value =
     clickedStoreNm.value +
@@ -1216,8 +1379,10 @@ const allStateRows4 = (e) => {
 const deleteRow2 = () => {
   if (afterSearch2.value == false) {
     Swal.fire({
-      title: "경고",
-      text: "먼저 조회해주세요.",
+      title: "경고.",
+      text: "조회를 먼저 해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
     });
     return;
   }
@@ -1226,8 +1391,10 @@ const deleteRow2 = () => {
 const deleteRow3 = () => {
   if (afterSearch3.value == false) {
     Swal.fire({
-      title: "경고",
-      text: "먼저 조회해주세요.",
+      title: "경고.",
+      text: "조회를 먼저 해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
     });
     return;
   }
@@ -1236,8 +1403,10 @@ const deleteRow3 = () => {
 const deleteRow4 = () => {
   if (afterSearch4.value == false) {
     Swal.fire({
-      title: "경고",
-      text: "먼저 조회해주세요.",
+      title: "경고.",
+      text: "조회를 먼저 해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
     });
     return;
   }
@@ -1433,30 +1602,7 @@ const searchButton = async () => {
     afterSearch2.value = false;
     afterSearch3.value = false;
   } finally {
-    if (currentMenu.value == 2) {
-      if (ischecked.value == true) {
-        ischecked.value = false;
-        setTimeout(() => {
-          ischecked.value = true;
-        }, 10);
-      } else {
-        ischecked.value = true;
-        setTimeout(() => {
-          ischecked.value = false;
-        }, 10);
-      }
-
-      const temp1 = forsearchMain.value;
-      forsearchMain.value = "0";
-      setTimeout(() => {
-        forsearchMain.value = temp1;
-      }, 1);
-      const temp2 = forsearchSub.value;
-      forsearchSub.value = "0";
-      setTimeout(() => {
-        forsearchSub.value = temp2;
-      }, 1);
-    }
+    handleinitAll();
 
     store.state.loading = false; // 로딩 상태 종료
     modified.value = false;
@@ -1504,9 +1650,10 @@ const saveButton = async () => {
   }
 
   if (currentMenu.value == 1) {
-    if (
-      JSON.stringify(confirmitem.value) === JSON.stringify(updatedList.value)
-    ) {
+    const a = allstaterow.value.deleted?.length;
+    const b = allstaterow.value.created?.length;
+    const c = allstaterow.value.updated?.length;
+    if (a == undefined || a + b + c == 0) {
       Swal.fire({
         title: "경고",
         text: "변경된 사항이 없습니다.",
@@ -1516,10 +1663,10 @@ const saveButton = async () => {
       return;
     }
   } else if (currentMenu.value == 2) {
-    const a = allstaterow2.value.deleted.length;
-    const b = allstaterow2.value.created.length;
-    const c = allstaterow2.value.updated.length;
-    if (a + b + c == 0) {
+    const a = allstaterow2.value.deleted?.length;
+    const b = allstaterow2.value.created?.length;
+    const c = allstaterow2.value.updated?.length;
+    if (a == undefined || a + b + c == 0) {
       Swal.fire({
         title: "경고",
         text: "변경된 사항이 없습니다.",
@@ -1529,13 +1676,99 @@ const saveButton = async () => {
       return;
     }
   } else if (currentMenu.value == 3) {
-    const a = allstaterow3.value.deleted.length;
-    const b = allstaterow3.value.created.length;
-    const c = allstaterow3.value.updated.length;
-    if (a + b + c == 0) {
+    const a = allstaterow3.value.deleted?.length;
+    const b = allstaterow3.value.created?.length;
+    const c = allstaterow3.value.updated?.length;
+    if (a == undefined || a + b + c == 0) {
       Swal.fire({
         title: "경고",
         text: "변경된 사항이 없습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } else if (currentMenu.value == 4) {
+    const a = allstaterow4.value.deleted?.length;
+    const b = allstaterow4.value.created?.length;
+    const c = allstaterow4.value.updated?.length;
+    if (a == undefined || a + b + c == 0) {
+      Swal.fire({
+        title: "경고",
+        text: "변경된 사항이 없습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  }
+
+  if (currentMenu.value == 1) {
+    const length = new Set(updatedList.value.map((item) => item.intPosNo)).size;
+    const length2 = updatedList.value.map((item) => item.intPosNo).length;
+    if (length != length2) {
+      Swal.fire({
+        title: "경고",
+        text: "포스번호가 중복되었습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } else if (currentMenu.value == 2) {
+    const length = new Set(
+      updatedList2.value.map((item) =>
+        JSON.stringify({ intPosNo: item.intPosNo, lngPort: item.lngPort })
+      )
+    ).size;
+
+    const length2 = updatedList2.value.length;
+
+    if (length != length2) {
+      Swal.fire({
+        title: "경고",
+        text: "중복된 포스번호와 포트번호가 존재합니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } else if (currentMenu.value == 3) {
+    const length = new Set(
+      updatedList3.value.map((item) =>
+        JSON.stringify({
+          intPosNo: item.intPosNo,
+          lngPosition: item.lngPosition,
+        })
+      )
+    ).size;
+
+    const length2 = updatedList3.value.length;
+
+    if (length != length2) {
+      Swal.fire({
+        title: "경고",
+        text: "중복된 포스번호와 Port연결ID가 존재합니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } else if (currentMenu.value == 4) {
+    const length = new Set(
+      updatedList4.value.map((item) =>
+        JSON.stringify({
+          intPosNo: item.intPosNo,
+        })
+      )
+    ).size;
+
+    const length2 = updatedList4.value.length;
+
+    if (length != length2) {
+      Swal.fire({
+        title: "경고",
+        text: "중복된 포스번호가 존재합니다.",
         icon: "warning",
         confirmButtonText: "확인",
       });
@@ -1619,11 +1852,11 @@ const saveButton = async () => {
     console.log(updatedList4.value);
     const validate = updatedList4.value.filter(
       (item) =>
-        item.intPosNo == "" ||
-        item.intPosNo == "0" ||
+        item.intPosNo === "" ||
+        item.intPosNo === "0" ||
         item.lngOIssueType === "" ||
         Number.isNaN(item.lngRIssueCount) ||
-        item.lngRIssueType == "" ||
+        item.lngRIssueType === "" ||
         Number.isNaN(item.lngKitchenU) ||
         Number.isNaN(item.lngKitchenD) ||
         Number.isNaN(item.lngFloorMax) ||
@@ -1679,79 +1912,6 @@ const saveButton = async () => {
       Swal.fire({
         title: "경고",
         text: "필수입력값이 누락되었습니다.",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
-      return;
-    }
-  }
-
-  if (currentMenu.value == 1) {
-    const length = new Set(updatedList.value.map((item) => item.intPosNo)).size;
-    const length2 = updatedList.value.map((item) => item.intPosNo).length;
-    if (length != length2) {
-      Swal.fire({
-        title: "경고",
-        text: "포스번호가 중복되었습니다.",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
-      return;
-    }
-  } else if (currentMenu.value == 2) {
-    const length = new Set(
-      updatedList2.value.map((item) =>
-        JSON.stringify({ intPosNo: item.intPosNo, lngPort: item.lngPort })
-      )
-    ).size;
-
-    const length2 = updatedList2.value.length;
-
-    if (length != length2) {
-      Swal.fire({
-        title: "경고",
-        text: "중복된 포스번호와 포트번호가 존재합니다.",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
-      return;
-    }
-  } else if (currentMenu.value == 3) {
-    const length = new Set(
-      updatedList3.value.map((item) =>
-        JSON.stringify({
-          intPosNo: item.intPosNo,
-          lngPosition: item.lngPosition,
-        })
-      )
-    ).size;
-
-    const length2 = updatedList3.value.length;
-
-    if (length != length2) {
-      Swal.fire({
-        title: "경고",
-        text: "중복된 포스번호와 Port연결ID가 존재합니다.",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
-      return;
-    }
-  } else if (currentMenu.value == 4) {
-    const length = new Set(
-      updatedList4.value.map((item) =>
-        JSON.stringify({
-          intPosNo: item.intPosNo,
-        })
-      )
-    ).size;
-
-    const length2 = updatedList4.value.length;
-
-    if (length != length2) {
-      Swal.fire({
-        title: "경고",
-        text: "중복된 포스번호가 존재합니다.",
         icon: "warning",
         confirmButtonText: "확인",
       });
@@ -2162,7 +2322,9 @@ const saveButton = async () => {
         store.state.loading = false;
         changeValue.value = null;
         Swal.fire({
-          title: "저장 되었습니다.",
+          title: "성공",
+          text: "저장이 완료되었습니다.",
+          icon: "success",
           confirmButtonText: "확인",
         });
 
@@ -2188,21 +2350,21 @@ const clickedRowData = (newValue) => {
 const clickedRowData2 = async (newValue) => {
   console.log(newValue);
   disabled2.value = false;
-  gridvalue21.value = newValue[1];
-  gridvalue22.value = newValue[2];
-  gridvalue23.value = newValue[3];
-  gridvalue24.value = newValue[4];
-  selectCode1.value = newValue[10];
+  gridvalue21.value = newValue[0];
+  gridvalue22.value = newValue[1];
+  gridvalue23.value = newValue[2];
+  gridvalue24.value = newValue[3];
+  selectCode1.value = newValue[9];
   await setPortEqType2(selectCode1.value);
   console.log(selectCode1.value);
   await nextTick();
-  selectCode2.value = newValue[11];
+  selectCode2.value = newValue[10];
   console.log(selectCode2.value);
   setEqType2(selectCode2.value);
 
-  selectCode4.value = newValue[7];
-  selectCode5.value = newValue[8];
-  selectCode3.value = newValue[12];
+  selectCode4.value = newValue[6];
+  selectCode5.value = newValue[7];
+  selectCode3.value = newValue[11];
 };
 
 const changeColid = ref("");
@@ -2212,7 +2374,7 @@ const clickedRowData3 = (newValue) => {
 };
 const clickedRowData4 = (e) => {
   console.log(e);
-
+  disabled3.value = false;
   gridvalue1.value = e[1];
   selectCommon1.value = e[2];
   selectCommon2.value = e[3];
@@ -2235,22 +2397,34 @@ const handlePosNo = (newValue) => {
   }
 };
 
-const handleinitAll = (newvalue) => {
-  MenuGroup.value = [];
-  SubMenuGroup.value = [];
-  MenuKeyList.value = [];
-  ScreenKeyOrigin.value = [];
-  TLUList.value = [];
-  AllscreenKeyPage.value = "1";
-  MenuList.value = [];
-  ScreenKeys.value = [];
-  items.value = [];
-  forsearchMain.value = "0";
-  forsearchSub.value = "0";
-  filteredSubMenuGroup.value = [];
-  searchword1.value = "";
-  searchword3.value = "";
-  afterSearch.value = false;
+const handleinitAll = () => {
+  disabled1.value = true;
+  disabled2.value = true;
+  disabled3.value = true;
+  gridvalue21.value = "";
+  gridvalue22.value = "";
+  gridvalue23.value = "";
+  gridvalue24.value = "";
+
+  selectCode1.value = -1;
+  selectCode2.value = -1;
+  selectCode3.value = -1;
+  selectCode4.value = -1;
+  selectCode5.value = -1;
+
+  gridvalue1.value = "";
+  gridvalue2.value = "";
+  gridvalue3.value = "";
+  gridvalue4.value = "";
+  gridvalue5.value = "";
+
+  selectCommon1.value = -1;
+  selectCommon2.value = -1;
+  selectCommon3.value = -1;
+  selectCommon4.value = -1;
+  selectCommon5.value = -1;
+  selectCommon6.value = -1;
+  selectCommon7.value = -1;
 };
 </script>
 

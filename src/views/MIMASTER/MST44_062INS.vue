@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-center w-full overflow-y-auto">
+  <div class="flex justify-between items-center w-full overflow-y-hidden">
     <div class="flex justify-start  w-full pl-12 pt-4">
       <div class="flex justify-start">
         <h1 class="font-bold text-sm md:text-2xl w-full">출력관리</h1>
@@ -66,11 +66,11 @@
           <div class="px-2 py-1 border border-gray-400 rounded-tr-lg flex space-x-2 ">
             <select name="" id="" class="flex-1 border border-gray-400 rounded-lg" @change="setSubCd"
               v-model="forsearchMain">
-              <option value="0">전체</option>
+              <option value="-1">전체</option>
               <option :value="i.mainCode" v-for="i in MenuGroup"> {{ i.mainName }}</option>
             </select>
             <select name="" id="" class="flex-1 border border-gray-400 rounded-lg" v-model="forsearchSub">
-              <option value="0">전체</option>
+              <option value="-1">전체</option>
               <option :value="i.subCode" v-for="i in filteredSubMenuGroup">{{ i.subName }}</option>
             </select>
           </div>
@@ -83,6 +83,7 @@
         <div class="ml-10 mt-5 w-full h-full">
           <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="4" :reload="reload"
             :rowData="rowData3" :showGrid="showGrid" :showCheckBar="false" @selcetedrowData="selcetedrowData"
+            :searchWord3="searchword1" :searchColId="'lngCode,strName'" :searchColId3="['mainCode','subCode']" :searchValue="[forsearchMain,forsearchSub]"
             @updatedRowData="updatedRowData2" :mergeColumns2="true" :mergeColumnGroupName2="['메뉴정보']" :mergeColumnGroupSubList2="[['mainName','subName','lngCode','strName','lngPrice']]"
             :setDynamicGrid3="true" :dynamicStoreCd="nowStoreCd" @realgridname="realgridname3"
           ></Realgrid>
@@ -267,8 +268,8 @@ const ScreenKeyOrigin = ref([]);
 const ScreenKeys = ref();
 const updatedList = ref()
 const updatedList2 = ref()
-const forsearchMain = ref('0')
-const forsearchSub = ref('0')
+const forsearchMain = ref('-1')
+const forsearchSub = ref('-1')
 const ischecked = ref(false)
 const rowData4 = ref([])
 const changeMode = ref(false);
@@ -378,24 +379,9 @@ const updatedRowData = (newValue) => {
 
 const forSaveMenu = ref([])
 const updatedRowData2 = (newValue) => {
-  if (currentMenu.value == 2) {
+  updatedList2.value = newValue
+  console.log(newValue)
 
-    forSaveMenu.value = []
-    updatedList2.value = newValue
-    SettingList.value.forEach((item, index) => {
-      const matchedItem = updatedList2.value.find(Item => Item.lngCode == item.lngCode)
-      if (matchedItem) {
-        SettingList.value[index] = { ...matchedItem }
-      }
-    })
-
-    const length = printNameList.value.length
-    for (var i = 0; i < length; i++) {
-      forSaveMenu.value.push(SettingList.value.filter(item => item['checkbox' + (i + 1)] == true).map(item2 => Number(item2.lngCode)))
-    }
-    console.log(updatedList2.value)
-
-  }
 }
 
 const updatedList3 = ref([])
@@ -612,11 +598,9 @@ const copyButton = () => {
 
 const selcetedrowData = (newValue) => {
   console.log(newValue)
-  if (currentMenu.value == 3) {
 
-  }
 }
-
+const originRowData3 = ref([])
 const initSelect = ref(false)
 const searchButton = async () => {
   changeMode.value = false
@@ -672,10 +656,10 @@ const searchButton = async () => {
         const index = SettingList.value.findIndex(item => item.lngCode == tlngCode)
         if (index != -1) {
           SettingList.value[index][portid] = true
-        }
+        } 
 
       }
-
+      originRowData3.value = [...SettingList.value]
       rowData3.value = [...SettingList.value]
       updatedList2.value = [...SettingList.value]
 
@@ -696,18 +680,7 @@ const searchButton = async () => {
     afterSearch2.value = false;
     afterSearch3.value = false;
   } finally {
-    if (currentMenu.value == 2) {
-      if (ischecked.value == true) {
-        ischecked.value = false
-        setTimeout(() => {
-          ischecked.value = true
-        }, 10)
-      } else {
-        ischecked.value = true
-        setTimeout(() => {
-          ischecked.value = false
-        }, 10)
-      }
+      ischecked.value = false
 
       const temp1 = forsearchMain.value
       forsearchMain.value = '0'
@@ -719,7 +692,7 @@ const searchButton = async () => {
       setTimeout(() => {
         forsearchSub.value = temp2
       }, 1)
-    }
+    
 
     store.state.loading = false; // 로딩 상태 종료
     modified.value = false;
@@ -735,171 +708,14 @@ const searchButton = async () => {
 const filteredSubMenuGroup = ref([]);
 const alreadyCheckedList = ref([])
 const forSaveMenu2 = ref([])
-watch(ischecked, (newvalue) => {
-  if (ischecked.value == false && afterSearch2.value) {
-    rowData3.value = SettingList.value.filter(item => {
-      if (forsearchMain.value == '0') {
-        return item;
-      } else if (forsearchMain.value != '0' && forsearchSub.value != '0') {
-        return item.mainCode == forsearchMain.value && item.subCode == forsearchSub.value;
-      } else if (forsearchMain.value != '0' && forsearchSub.value == '0') {
-        return item.mainCode == forsearchMain.value
-      }
 
-    })
-  } else if (ischecked.value == true && afterSearch2.value) {
-    forSaveMenu2.value = []
-    rowData3.value = SettingList.value.filter(item => {
-      if (forsearchMain.value == '0') {
-        forsearchSub.value = '0'
-        return (!Object.values(item).includes(true));
-      } else if (forsearchMain.value != '0' && forsearchSub.value != '0') {
-        return (!Object.values(item).includes(true)) && item.mainCode == forsearchMain.value && item.subCode == forsearchSub.value;
-      } else {
-        return (!Object.values(item).includes(true)) && item.mainCode == forsearchMain.value;
-      }
-
-    })
-
-  }
-  const temp1 = searchword1.value
-  searchword1.value = ''
-  setTimeout(() => {
-    searchword1.value = temp1
-  }, 1)
-
-})
 const setSubCd = () => {
-  forsearchSub.value = '0'
+  forsearchSub.value = '-1'
   filteredSubMenuGroup.value = SubMenuGroup.value.filter(item => item.mainCode == forsearchMain.value)
   searchword1.value = ''
 
 }
-watch(forsearchMain, () => {
-  if (forsearchMain.value != '0') {
-    if (ischecked.value == false && afterSearch2.value) {
-      rowData3.value = SettingList.value.filter(item => {
-        if (forsearchMain.value == '0') {
-          return item;
-        } else if (forsearchMain.value != '0' && forsearchSub.value != '0') {
-          return item.mainCode == forsearchMain.value && item.subCode == forsearchSub.value;
-        } else if (forsearchMain.value != '0' && forsearchSub.value == '0') {
-          return item.mainCode == forsearchMain.value
-        }
 
-      })
-    } else if (ischecked.value == true && afterSearch2.value) {
-      forSaveMenu2.value = []
-      rowData3.value = SettingList.value.filter(item => {
-        if (forsearchMain.value == '0') {
-          forsearchSub.value = '0'
-          return (!Object.values(item).includes(true));
-        } else if (forsearchMain.value != '0' && forsearchSub.value != '0') {
-          return (!Object.values(item).includes(true)) && item.mainCode == forsearchMain.value && item.subCode == forsearchSub.value;
-        } else {
-          return (!Object.values(item).includes(true)) && item.mainCode == forsearchMain.value;
-        }
-
-      })
-
-    }
-  } else {
-    if (ischecked.value == false && afterSearch2.value) {
-      rowData3.value = SettingList.value.filter(item => {
-        if (forsearchMain.value == '0') {
-          return item;
-        } else if (forsearchMain.value != '0' && forsearchSub.value != '0') {
-          return item.mainCode == forsearchMain.value && item.subCode == forsearchSub.value;
-        } else if (forsearchMain.value != '0' && forsearchSub.value == '0') {
-          return item.mainCode == forsearchMain.value
-        }
-
-      })
-    } else if (ischecked.value == true && afterSearch2.value) {
-      forSaveMenu2.value = []
-      rowData3.value = SettingList.value.filter(item => {
-        if (forsearchMain.value == '0') {
-          forsearchSub.value = '0'
-          return (!Object.values(item).includes(true));
-        } else if (forsearchMain.value != '0' && forsearchSub.value != '0') {
-          return (!Object.values(item).includes(true)) && item.mainCode == forsearchMain.value && item.subCode == forsearchSub.value;
-        } else {
-          return (!Object.values(item).includes(true)) && item.mainCode == forsearchMain.value;
-        }
-
-      })
-
-    }
-  }
-
-})
-
-watch(forsearchSub, () => {
-  if (forsearchSub.value != '0') {
-    if (ischecked.value == true) {
-      rowData3.value = SettingList.value.filter(item => {
-        if (forsearchMain.value == '0') {
-          forsearchSub.value = '0'
-          return (!Object.values(item).includes(true));
-        } else if (forsearchMain.value != '0' && forsearchSub.value != '0') {
-          return (!Object.values(item).includes(true)) && item.mainCode == forsearchMain.value && item.subCode == forsearchSub.value;
-        } else {
-          return (!Object.values(item).includes(true)) && item.mainCode == forsearchMain.value;
-        }
-
-      })
-    } else {
-      rowData3.value = SettingList.value.filter(item => {
-        if (forsearchMain.value == '0') {
-          return item;
-        } else if (forsearchMain.value != '0' && forsearchSub.value != '0') {
-          return item.mainCode == forsearchMain.value && item.subCode == forsearchSub.value;
-        } else if (forsearchMain.value != '0' && forsearchSub.value == '0') {
-          return item.mainCode == forsearchMain.value
-        }
-
-      })
-    }
-
-  } else {
-    if (forsearchMain.value != '0') {
-
-      if (ischecked.value == true) {
-        rowData3.value = SettingList.value.filter(item => {
-          if (forsearchMain.value == '0') {
-            forsearchSub.value = '0'
-            return (!Object.values(item).includes(true));
-          } else if (forsearchMain.value != '0' && forsearchSub.value != '0') {
-            return (!Object.values(item).includes(true)) && item.mainCode == forsearchMain.value && item.subCode == forsearchSub.value;
-          } else {
-            return (!Object.values(item).includes(true)) && item.mainCode == forsearchMain.value;
-          }
-
-        })
-      } else {
-        rowData3.value = SettingList.value.filter(item => {
-          if (forsearchMain.value == '0') {
-            return item;
-          } else if (forsearchMain.value != '0' && forsearchSub.value != '0') {
-            return item.mainCode == forsearchMain.value && item.subCode == forsearchSub.value;
-          } else if (forsearchMain.value != '0' && forsearchSub.value == '0') {
-            return item.mainCode == forsearchMain.value
-          }
-
-        })
-      }
-
-
-    }
-
-  }
-
-  const temp = searchword1.value
-  searchword1.value = ''
-  setTimeout(() => {
-    searchword1.value = temp
-  }, 10)
-})
 
 
 const searchMenuList = (e) => {
@@ -911,6 +727,7 @@ const searchMenuList = (e) => {
 
 
 const saveButton = async () => {
+  console.log(updatedList2.value)
   if (currentMenu.value == 1) {
     if (afterSearch.value == false) {
       Swal.fire({
@@ -977,69 +794,69 @@ const saveButton = async () => {
           res = await savePrintNm(groupCd.value, nowStoreCd.value, printNo.join(','), printNm.join(','))
           console.log(res)
         } else if (currentMenu.value == 2) {
-          let totalSum = [];
+        
           const calculateArr = ref([])
-          console.log(SettingList.value)
-          SettingList.value.forEach((obj) => {
-            let sum = 0;
-            Object.keys(obj).filter(key => key.startsWith('checkbox') && obj[key] == true)
-              .forEach(key => {
-                const index = parseInt(key.replace('checkbox', ''))
-                sum += Math.pow(2, index - 1)
-              })
-            totalSum.push(sum)
-          })
+          const count = Object.keys(updatedList2.value[0]).filter(key => key.startsWith("checkbox")).length;
+          console.log(count)
 
-          totalSum = totalSum.filter(item => item != 0)
-
-
-          const uniqueArray = [...new Set(totalSum)].sort((a, b) => a - b);
-
-          SettingList.value.forEach((obj) => {
-            let sum = 0;
-            let index;
-            let checkedColumn = [];
-
-            // 'checkbox'로 시작하는 키 중에서 값이 true인 항목들을 필터링
-            Object.keys(obj).filter(key => key.startsWith('checkbox') && obj[key] === true).forEach(key => {
-              index = parseInt(key.replace('checkbox', ''));  // index 계산
-              checkedColumn.push(index);  // 체크된 열 인덱스를 배열에 추가
-              sum += Math.pow(2, index - 1);  // sum에 값을 더함
-            });
-
-            // checkedColumn에 있는 모든 인덱스에 대해 sum 값을 추가
-            checkedColumn.forEach(colIndex => {
-              // calculateArr.value[colIndex]가 배열이 아닌 경우 초기화
-              if (!Array.isArray(calculateArr.value[colIndex])) {
-                calculateArr.value[colIndex] = [];  // 해당 index에 배열을 생성
+          forSaveMenu.value = []
+          for(let i=1 ; i  <= count ; i++){
+            let tempArr = []
+            for(let j=0 ; j< updatedList2.value.length ; j++){
+              if(updatedList2.value[j]["checkbox"+i] == true){
+                tempArr.push(updatedList2.value[j].lngCode)
               }
-              calculateArr.value[colIndex].push(sum);  // 해당 열의 배열에 sum을 추가
-            });
-          });
-
-          // calculateArr.value의 각 속성 배열에 대해 중복을 제거
-
-          Object.keys(calculateArr.value).forEach(key => {
-            if (Array.isArray(calculateArr.value[key])) {
-              // Set을 사용하여 중복을 제거하고 배열로 변환
-              calculateArr.value[key] = [...new Set(calculateArr.value[key])];
             }
-          });
-
-          calculateArr.value = calculateArr.value.slice(1)
-          calculateArr.value = calculateArr.value.map(item => Array.from(item))
-          for (var i = 0; i < calculateArr.value.length; i++) {
-            if (calculateArr.value[i] == null) {
-              calculateArr.value[i] = [0]
-            }
+            forSaveMenu.value.push(tempArr)
           }
-          console.log(JSON.stringify(calculateArr.value))
-          console.log(JSON.stringify(forSaveMenu.value))
-          console.log(uniqueArray.join(','))
 
-          console.log(updatedList2.value)
+          let uniqueArray = new Set()
+          for(let j=0 ; j< updatedList2.value.length ; j++){
+            let tempint = 0;
+            for(let i=0 ; i < count ; i++){
+              if(updatedList2.value[j]["checkbox"+i] == true){
+                tempint += 2**(i-1)
+              }
+            }
+            if(tempint!=0){
+              uniqueArray.add(tempint)
+            }
+          
+          }
+          uniqueArray = [...uniqueArray]
+          calculateArr.value = [[1],[2,6],[6]]
+          calculateArr.value = []
 
 
+     
+             for(let i=0 ; i< count ; i++){
+       
+              for(let j=0 ; j< updatedList2.value.length ; j++){
+                    let tempint = 0;
+                for(let k=1 ; k<= count ; k++){
+                  if(updatedList2.value[j]["checkbox"+k] == true && updatedList2.value[j]["checkbox"+(i+1)] == true  ){
+                    tempint+= 2**(k-1)
+                  }
+                }
+
+                if (!calculateArr.value[i]) {
+            // 해당 인덱스 없으면 초기화
+                calculateArr.value[i] = new Set();
+              }
+              if(tempint !=0){
+                calculateArr.value[i].add(tempint)
+              }
+      
+              }
+              calculateArr.value[i] = Array.from(calculateArr.value[i]);
+             } 
+
+         
+
+        
+          console.log(forSaveMenu.value)
+          console.log(uniqueArray)
+          console.log(calculateArr.value)
           res = await saveKitchenSettingAll(groupCd.value, nowStoreCd.value, JSON.stringify(forSaveMenu.value), uniqueArray.join(','), JSON.stringify(calculateArr.value), userData.loginID)
           console.log(res)
 
@@ -1078,6 +895,31 @@ const saveButton = async () => {
 
 }
 
+watch(ischecked , () => {
+  console.log(originRowData3.value)
+  console.log(ischecked.value)
+
+   if(ischecked.value == true){
+    const count = Object.keys(originRowData3.value[0]).filter(key => key.startsWith("checkbox")).length;
+    let tempArr = []
+    let tempbln = false
+    for(let j=0 ; j < originRowData3.value.length ; j++){
+      for(let i=1 ; i <= count ; i++){
+      if( originRowData3.value[j]?.['checkbox'+i] ==true){
+        tempbln = true
+      }
+      }
+      if(tempbln == false){
+        tempArr.push(originRowData3.value[j])
+      }
+      tempbln =  false
+    }
+    rowData3.value = tempArr ;
+   } else {
+    rowData3.value = originRowData3.value ;
+   }
+   console.log(rowData3.value)
+})
 const selectedIndex =(e) => {
   changeRow.value = e
 }

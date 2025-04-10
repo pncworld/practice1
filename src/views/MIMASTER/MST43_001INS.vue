@@ -1,6 +1,6 @@
 <template>
   <div class="h-[80%]">
-    <div class="flex justify-between items-center w-full overflow-y-auto">
+    <div class="flex justify-between items-center w-full overflow-y-hidden">
       <div class="flex justify-start w-full pl-12 pt-4">
         <div class="flex justify-start">
           <h1 class="font-bold text-sm md:text-2xl w-full">
@@ -19,6 +19,7 @@
         @update:storeGroup="handleGroupCd"
         @update:storeCd="handleStoreCd"
         @storeNm="storeNm"
+        :defaultStoreNm="'전체'"
         @update:ischanged="handleinitAll">
       </PickStore>
     </div>

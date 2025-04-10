@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-center w-full overflow-y-auto">
+  <div class="flex justify-between items-center w-full overflow-y-hidden">
     <div class="flex justify-start w-full pl-12 pt-4">
       <div class="flex justify-start">
         <h1 class="font-bold text-sm md:text-2xl w-full">매장정보등록</h1>
@@ -27,7 +27,7 @@
 
   <div class="h-[54%] w-full">
     <div class="flex justify-end gap-1 mt-1">
-      <button @click="addButton" class="whitebutton">신규</button>
+      <button @click="addButton" class="whitebutton">추가</button>
       <button @click="deleteButton" class="whitebutton">삭제</button>
     </div>
     <Realgrid

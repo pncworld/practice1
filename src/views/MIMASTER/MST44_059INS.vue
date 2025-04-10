@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-center w-full overflow-y-auto">
+  <div class="flex justify-between items-center w-full overflow-y-hidden">
     <div class="flex justify-start w-full pl-12 pt-4">
       <div class="flex justify-start">
         <h1 class="font-bold text-sm md:text-2xl w-full">기능키 설정</h1>
@@ -138,28 +138,8 @@
     </div>
   </div>
 
-  <span
-    class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[700px] z-40">
-    <h1 class="font-bold text-xl z-40">{{ currentpaymentType }} 기능키 설정</h1>
-    <span class="flex space-x-3 ml-32 pl-56 items-center"
-      >순서변경 &nbsp; &nbsp;<label class="z-40"
-        ><input
-          type="radio"
-          :value="false"
-          v-model="changeMode" />교체하기 </label
-      ><label class="z-40"
-        ><input
-          type="radio"
-          name="changingMode"
-          :value="true"
-          v-model="changeMode" />밀어내기</label
-      ><button class="whitebutton z-40" @click.stop="deletekey">
-        삭제
-      </button></span
-    >
-  </span>
-  <div class="flex h-5/6 w-full -mt-5">
-    <div class="flex flex-col w-3/5 h-5/6">
+  <div class="grid grid-rows-1 grid-cols-[1fr,1.5fr] h-5/6 w-full mt-5">
+    <div class="flex flex-col w-[95%] h-5/6">
       <div
         class="flex justify-between mt-0 ml-10 w-full border-b border-b-gray-300">
         <div class="font-bold text-xl w-auto">기능키 목록</div>
@@ -192,72 +172,54 @@
         </div>
       </div>
     </div>
-    <div
-      v-if="showOtherKeys == false"
-      class="grid grid-rows-[1fr,4fr] grid-cols-1 mt-5 w-full h-full z-20">
-      <div
-        class="flex h-full w-full items-start justify-center"
-        v-show="afterSearch">
-        <VueDraggableNext
-          v-model="subsubKeyList1"
-          :move="onMove"
-          @end="onEnd"
-          animation="200"
-          class="grid grid-cols-5 grid-rows-1 mt-8 ml-6 w-[87%] h-[50%] gap-1">
-          <div
-            v-for="(item, index) in subsubKeyList1"
-            class="custom-grid-style"
-            :class="{
-              '!bg-orange-500 !border-blue-700':
-                clickedKey1 == index && clickedScreenOrMenu == true,
-            }"
-            @click="
-              saveMenuKeyposition1(index, item.lngDCode),
-                (clickedKey1 = index),
-                clickedMenukeys()
-            ">
-            <span
-              class="flex flex-col items-center justify-center w-full h-full rounded-lg"
-              ><span class="flex justify-center items-center">{{
-                item ? item.lngDCode : ""
-              }}</span
-              ><span class="flex justify-center items-center">{{
-                item ? item.strDName : ""
-              }}</span></span
-            >
-          </div>
-        </VueDraggableNext>
-      </div>
-
-      <div
-        v-show="afterSearch && clickedFuncSelection"
-        class="flex flex-col mt-4 ml-10 w-11/12 h-5/6">
-        <h1 class="font-bold text-xl w-auto flex justify-start ml-10">
-          기능 선택키 설정
+    <div class="h-full w-full">
+      <span class="flex justify-between items-start h-[5%] w-full z-40">
+        <h1 class="font-bold text-xl z-40 ml-20">
+          {{ currentpaymentType }} 기능키 설정
         </h1>
-        <div class="flex w-[99%] h-full">
+        <span class="flex space-x-3 ml-32 pl-56 items-center"
+          >순서변경 &nbsp; &nbsp;<label class="z-40"
+            ><input
+              type="radio"
+              :value="false"
+              v-model="changeMode" />교체하기 </label
+          ><label class="z-40"
+            ><input
+              type="radio"
+              name="changingMode"
+              :value="true"
+              v-model="changeMode" />밀어내기</label
+          ><button class="whitebutton z-40" @click.stop="deletekey">
+            삭제
+          </button></span
+        >
+      </span>
+      <div
+        v-if="showOtherKeys == false"
+        class="grid grid-rows-[1fr,4fr] grid-cols-1 mt-5 w-full h-[80%] z-20">
+        <div
+          class="flex h-full w-full items-start justify-center"
+          v-show="afterSearch">
           <VueDraggableNext
-            v-model="subsubKeyList2"
-            :move="onMove2"
-            @end="onEnd2"
+            v-model="subsubKeyList1"
+            :move="onMove"
+            @end="onEnd"
             animation="200"
-            class="grid grid-cols-5 grid-rows-6 ml-10 mt-4 w-full h-full gap-1">
+            class="grid grid-cols-5 grid-rows-1 mt-8 ml-6 w-[87%] h-[50%] gap-1">
             <div
-              v-for="(item, index) in subsubKeyList2"
+              v-for="(item, index) in subsubKeyList1"
               class="custom-grid-style"
               :class="{
                 '!bg-orange-500 !border-blue-700':
-                  clickedKey2 == index && clickedScreenOrMenu == true,
+                  clickedKey1 == index && clickedScreenOrMenu == true,
               }"
               @click="
-                item.disable != true &&
-                  (saveMenuKeyposition2(index),
-                  (clickedKey2 = index),
-                  clickedMenukeys())
+                saveMenuKeyposition1(index, item.lngDCode),
+                  (clickedKey1 = index),
+                  clickedMenukeys()
               ">
               <span
                 class="flex flex-col items-center justify-center w-full h-full rounded-lg"
-                :class="{ '!bg-gray-300': item.disable == true }"
                 ><span class="flex justify-center items-center">{{
                   item ? item.lngDCode : ""
                 }}</span
@@ -268,75 +230,75 @@
             </div>
           </VueDraggableNext>
         </div>
-      </div>
-    </div>
 
-    <div
-      v-if="showOtherKeys == true"
-      class="grid grid-rows-[1fr,4fr] grid-cols-1 mt-5 w-full h-full z-20">
-      <div
-        class="flex h-full w-full items-start justify-center"
-        v-show="afterSearch">
-        <VueDraggableNext
-          v-model="subsubKeyList3"
-          :move="onMove"
-          @end="onEnd3"
-          animation="200"
-          class="grid grid-cols-5 grid-rows-1 mt-8 ml-6 w-[87%] h-[50%] gap-1">
-          <div
-            v-for="(item, index) in subsubKeyList3"
-            class="custom-grid-style"
-            :class="{
-              '!bg-orange-500 !border-blue-700':
-                clickedKey1 == index && clickedScreenOrMenu == true,
-            }"
-            @click="
-              saveMenuKeyposition3(index, item.lngDCode),
-                (clickedKey1 = index),
-                clickedMenukeys2()
-            ">
-            <span
-              class="flex flex-col items-center justify-center w-full h-full rounded-lg"
-              ><span class="flex justify-center items-center">{{
-                item ? item.lngDCode : ""
-              }}</span
-              ><span class="flex justify-center items-center">{{
-                item ? item.strDName : ""
-              }}</span></span
-            >
+        <div
+          v-show="showOtherKeys == false"
+          class="flex flex-col mt-4 w-11/12 h-5/6">
+          <h1 class="font-bold text-xl ml-20 w-auto flex justify-start">
+            기능 선택키 설정
+          </h1>
+          <div class="flex w-[99%] h-full ml-10">
+            <VueDraggableNext
+              v-model="subsubKeyList2"
+              :move="onMove2"
+              @end="onEnd2"
+              animation="200"
+              class="grid grid-cols-5 grid-rows-6 ml-10 mt-4 w-full h-full gap-1">
+              <div
+                v-for="(item, index) in subsubKeyList2"
+                class="custom-grid-style"
+                :class="{
+                  '!bg-orange-500 !border-blue-700':
+                    clickedKey2 == index && clickedScreenOrMenu == true,
+                }"
+                @click="
+                  item.disable != true &&
+                    (saveMenuKeyposition2(index),
+                    (clickedKey2 = index),
+                    clickedMenukeys())
+                ">
+                <span
+                  class="flex flex-col items-center justify-center w-full h-full rounded-lg"
+                  :class="{ '!bg-gray-300': item.disable == true }"
+                  ><span class="flex justify-center items-center">{{
+                    item ? item.lngDCode : ""
+                  }}</span
+                  ><span class="flex justify-center items-center">{{
+                    item ? item.strDName : ""
+                  }}</span></span
+                >
+              </div>
+            </VueDraggableNext>
           </div>
-        </VueDraggableNext>
+        </div>
       </div>
 
       <div
-        v-show="afterSearch && clickedFuncSelection2"
-        class="flex flex-col mt-4 ml-10 w-11/12 h-5/6">
-        <h1 class="font-bold text-xl w-auto flex justify-start ml-10">
-          기능 선택키 설정
-        </h1>
-        <div class="flex w-[99%] h-full">
+        v-if="showOtherKeys == true"
+        class="grid grid-rows-[1fr,4fr] grid-cols-1 mt-5 w-full h-[80%] z-20">
+        <div
+          class="flex h-full w-full items-start justify-center"
+          v-show="afterSearch">
           <VueDraggableNext
-            v-model="subsubKeyList4"
-            :move="onMove2"
-            @end="onEnd4"
+            v-model="subsubKeyList3"
+            :move="onMove"
+            @end="onEnd3"
             animation="200"
-            class="grid grid-cols-5 grid-rows-6 ml-10 mt-4 w-full h-full gap-1">
+            class="grid grid-cols-5 grid-rows-1 mt-8 ml-6 w-[87%] h-[50%] gap-1">
             <div
-              v-for="(item, index) in subsubKeyList4"
+              v-for="(item, index) in subsubKeyList3"
               class="custom-grid-style"
               :class="{
                 '!bg-orange-500 !border-blue-700':
-                  clickedKey2 == index && clickedScreenOrMenu == true,
+                  clickedKey1 == index && clickedScreenOrMenu == true,
               }"
               @click="
-                item.disable != true &&
-                  (saveMenuKeyposition4(index),
-                  (clickedKey2 = index),
-                  clickedMenukeys2())
+                saveMenuKeyposition3(index, item.lngDCode),
+                  (clickedKey1 = index),
+                  clickedMenukeys2()
               ">
               <span
                 class="flex flex-col items-center justify-center w-full h-full rounded-lg"
-                :class="{ '!bg-gray-300': item.disable == true }"
                 ><span class="flex justify-center items-center">{{
                   item ? item.lngDCode : ""
                 }}</span
@@ -346,6 +308,47 @@
               >
             </div>
           </VueDraggableNext>
+        </div>
+
+        <div
+          v-show="showOtherKeys == true"
+          class="flex flex-col mt-4 ml-10 w-11/12 h-5/6">
+          <h1 class="font-bold text-xl w-auto flex justify-start ml-10">
+            기능 선택키 설정
+          </h1>
+          <div class="flex w-[99%] h-full">
+            <VueDraggableNext
+              v-model="subsubKeyList4"
+              :move="onMove2"
+              @end="onEnd4"
+              animation="200"
+              class="grid grid-cols-5 grid-rows-6 ml-10 mt-4 w-full h-full gap-1">
+              <div
+                v-for="(item, index) in subsubKeyList4"
+                class="custom-grid-style"
+                :class="{
+                  '!bg-orange-500 !border-blue-700':
+                    clickedKey2 == index && clickedScreenOrMenu == true,
+                }"
+                @click="
+                  item.disable != true &&
+                    (saveMenuKeyposition4(index),
+                    (clickedKey2 = index),
+                    clickedMenukeys2())
+                ">
+                <span
+                  class="flex flex-col items-center justify-center w-full h-full rounded-lg"
+                  :class="{ '!bg-gray-300': item.disable == true }"
+                  ><span class="flex justify-center items-center">{{
+                    item ? item.lngDCode : ""
+                  }}</span
+                  ><span class="flex justify-center items-center">{{
+                    item ? item.strDName : ""
+                  }}</span></span
+                >
+              </div>
+            </VueDraggableNext>
+          </div>
         </div>
       </div>
     </div>

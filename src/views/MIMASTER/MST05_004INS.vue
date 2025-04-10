@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col w-full overflow-y-auto">
+  <div class="flex flex-col w-full overflow-y-hidden">
     <div class="flex justify-between w-full pl-10 pt-5">
       <div class="flex justify-between">
         <h1 class="font-bold text-sm md:text-2xl w-full">메뉴키 설정</h1>

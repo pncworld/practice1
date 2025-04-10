@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-center w-full overflow-y-auto">
+  <div class="flex justify-between items-center w-full overflow-y-hidden">
     <div class="flex justify-start w-full pl-12 pt-4">
       <div class="flex justify-start">
         <h1 class="font-bold text-sm md:text-2xl w-full">연령키 설정</h1>
@@ -220,6 +220,16 @@ const copyButton = () => {
 const updateMenuKey = ref(false);
 
 const addRow = () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고.",
+      text: "조회를 먼저 해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
   addRows.value = !addRows.value;
 };
 const nowStoreAreaCd = ref();
@@ -238,6 +248,16 @@ const handleStoreCd = async (newValue) => {
 };
 const Category = ref([]);
 const deleteRow = () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고.",
+      text: "조회를 먼저 해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
   if (deleteException.value == true) {
     Swal.fire({
       title: "경고.",

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-center w-full overflow-y-auto">
+  <div class="flex justify-between items-center w-full overflow-y-hidden">
     <div class="flex justify-start w-full pl-12 pt-4">
       <div class="flex justify-start">
         <h1 class="font-bold text-sm md:text-2xl w-full">KDS 관리</h1>
@@ -30,21 +30,7 @@
       @update:ischanged="handleinitAll"
       :hidesub="hidesub"></PickStore>
   </div>
-  <div class="z-50">
-    <DupliPopUp5
-      :isVisible="showPopup2"
-      @close="showPopup2 = false"
-      :storeCd="nowStoreCd"
-      :storeNm="clickedStoreNm"
-      :areaCd="nowStoreAreaCd"
-      :posNo="posNo"
-      :progname="'MST44_061INS_VUE'"
-      :dupliapiname="'DUPLIALLKDS'"
-      :progid="3"
-      :poskiosk="'getStoreList'"
-      naming2="KDS">
-    </DupliPopUp5>
-  </div>
+
   <div class="mt-5 flex justify-start ml-10">
     <button
       class="contents_tab-button"
@@ -135,7 +121,7 @@
               class="flex-1 border border-gray-400 rounded-lg"
               @change="setSubCd"
               v-model="forsearchMain">
-              <option value="0">전체</option>
+              <option value="-1">전체</option>
               <option :value="i.mainCode" v-for="i in MenuGroup">
                 {{ i.mainName }}
               </option>
@@ -145,7 +131,7 @@
               id=""
               class="flex-1 border border-gray-400 rounded-lg"
               v-model="forsearchSub">
-              <option value="0">전체</option>
+              <option value="-1">전체</option>
               <option :value="i.subCode" v-for="i in filteredSubMenuGroup">
                 {{ i.subName }}
               </option>
@@ -172,8 +158,12 @@
             :rowData="rowData2"
             :showGrid="showGrid"
             :showCheckBar="false"
-            :searchWord="searchword1"
+            :searchWord3="searchword1"
             :searchColId="'lngCode,strName'"
+            :searchColId3="['mainCode', 'subCode']"
+            :searchSpecialColId="searchSpecialColId"
+            :searchSpecialCond="searchSpecialCond"
+            :searchValue="[forsearchMain, forsearchSub]"
             @updatedRowData="updatedRowData2"
             @realgridname="realgridname"
             :editableColId="'strName'"
@@ -250,6 +240,8 @@ const realgridname2 = (e) => {
   realgrid3Name.value = e;
 };
 
+const searchSpecialColId = ref([]);
+const searchSpecialCond = ref(true);
 watch(currentMenu, () => {
   const reagrid2 = document.getElementById(realgrid2Name.value);
   setTimeout(() => {
@@ -270,8 +262,8 @@ const ScreenKeyOrigin = ref([]);
 const ScreenKeys = ref();
 const updatedList = ref();
 const updatedList2 = ref();
-const forsearchMain = ref("0");
-const forsearchSub = ref("0");
+const forsearchMain = ref("-1");
+const forsearchSub = ref("-1");
 const ischecked = ref(false);
 const rowStateeditable = ref(false);
 const changeMode = ref(false);
@@ -414,6 +406,7 @@ const addRow = () => {
 const rowData = ref([]);
 const rowData2 = ref([]);
 const kdsList = ref([]);
+const originRowData2 = ref([]);
 const deleteRow = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -487,7 +480,7 @@ const searchButton = async () => {
       }
 
       rowData2.value = [...KDSSettingList.value];
-      console.log(rowData2.value);
+      originRowData2.value = [...KDSSettingList.value];
       updatedList2.value = [...KDSSettingList.value];
       confirmitem.value = JSON.parse(JSON.stringify(KDSSettingList.value));
 
@@ -502,28 +495,30 @@ const searchButton = async () => {
   } catch (error) {
     console.log(error);
   } finally {
-    if (ischecked.value == true) {
-      ischecked.value = false;
-      setTimeout(() => {
-        ischecked.value = true;
-      }, 10);
-    } else {
-      ischecked.value = true;
-      setTimeout(() => {
-        ischecked.value = false;
-      }, 10);
-    }
+    console.log(KDSList.value);
+    // if (ischecked.value == true) {
+    //   ischecked.value = false;
+    //   setTimeout(() => {
+    //     ischecked.value = true;
+    //   }, 10);
+    // } else {
+    //   ischecked.value = true;
+    //   setTimeout(() => {
+    //     ischecked.value = false;
+    //   }, 10);
+    // }
+    ischecked.value = false;
 
-    const temp1 = forsearchMain.value;
-    forsearchMain.value = "0";
-    setTimeout(() => {
-      forsearchMain.value = temp1;
-    }, 1);
-    const temp2 = forsearchSub.value;
-    forsearchSub.value = "0";
-    setTimeout(() => {
-      forsearchSub.value = temp2;
-    }, 1);
+    // const temp1 = forsearchMain.value;
+    // forsearchMain.value = "0";
+    // setTimeout(() => {
+    //   forsearchMain.value = temp1;
+    // }, 1);
+    // const temp2 = forsearchSub.value;
+    // forsearchSub.value = "0";
+    // setTimeout(() => {
+    //   forsearchSub.value = temp2;
+    // }, 1);
     store.state.loading = false; // 로딩 상태 종료
     modified.value = false;
     afterCategory.value = false;
@@ -534,202 +529,216 @@ const searchButton = async () => {
 const filteredSubMenuGroup = ref([]);
 const alreadyCheckedList = ref([]);
 const forSaveMenu2 = ref([]);
-watch(ischecked, (newvalue) => {
-  if (ischecked.value == false && afterSearch.value) {
-    rowData2.value = KDSSettingList.value.filter((item) => {
-      if (forsearchMain.value == "0") {
-        return item;
-      } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
-        return (
-          item.mainCode == forsearchMain.value &&
-          item.subCode == forsearchSub.value
-        );
-      } else if (forsearchMain.value != "0" && forsearchSub.value == "0") {
-        return item.mainCode == forsearchMain.value;
-      }
-    });
-  } else if (ischecked.value == true && afterSearch.value) {
-    forSaveMenu2.value = [];
-    rowData2.value = KDSSettingList.value.filter((item) => {
-      if (forsearchMain.value == "0") {
-        forsearchSub.value = "0";
-        return !Object.values(item).includes(true);
-      } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
-        return (
-          !Object.values(item).includes(true) &&
-          item.mainCode == forsearchMain.value &&
-          item.subCode == forsearchSub.value
-        );
-      } else {
-        return (
-          !Object.values(item).includes(true) &&
-          item.mainCode == forsearchMain.value
-        );
-      }
-    });
+
+watch(ischecked, () => {
+  searchSpecialColId.value = [];
+  for (let i = 1; i <= KDSList.value.length; i++) {
+    searchSpecialColId.value.push("checkbox" + i);
   }
-  const temp1 = searchword1.value;
-  searchword1.value = "";
-  setTimeout(() => {
-    searchword1.value = temp1;
-  }, 1);
+  if (ischecked.value == true) {
+    console.log(searchSpecialColId.value);
+
+    searchSpecialCond.value = false;
+  } else {
+    searchSpecialCond.value = true;
+  }
 });
+// watch(ischecked, (newvalue) => {
+//   if (ischecked.value == false && afterSearch.value) {
+//     rowData2.value = KDSSettingList.value.filter((item) => {
+//       if (forsearchMain.value == "0") {
+//         return item;
+//       } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
+//         return (
+//           item.mainCode == forsearchMain.value &&
+//           item.subCode == forsearchSub.value
+//         );
+//       } else if (forsearchMain.value != "0" && forsearchSub.value == "0") {
+//         return item.mainCode == forsearchMain.value;
+//       }
+//     });
+//   } else if (ischecked.value == true && afterSearch.value) {
+//     forSaveMenu2.value = [];
+//     rowData2.value = KDSSettingList.value.filter((item) => {
+//       if (forsearchMain.value == "0") {
+//         forsearchSub.value = "0";
+//         return !Object.values(item).includes(true);
+//       } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
+//         return (
+//           !Object.values(item).includes(true) &&
+//           item.mainCode == forsearchMain.value &&
+//           item.subCode == forsearchSub.value
+//         );
+//       } else {
+//         return (
+//           !Object.values(item).includes(true) &&
+//           item.mainCode == forsearchMain.value
+//         );
+//       }
+//     });
+//   }
+//   const temp1 = searchword1.value;
+//   searchword1.value = "";
+//   setTimeout(() => {
+//     searchword1.value = temp1;
+//   }, 1);
+// });
 const setSubCd = () => {
-  forsearchSub.value = "0";
+  forsearchSub.value = "-1";
   filteredSubMenuGroup.value = SubMenuGroup.value.filter(
     (item) => item.mainCode == forsearchMain.value
   );
   searchword1.value = "";
 };
-watch(forsearchMain, () => {
-  if (forsearchMain.value != "0") {
-    if (ischecked.value == false && afterSearch.value) {
-      rowData2.value = KDSSettingList.value.filter((item) => {
-        if (forsearchMain.value == "0") {
-          return item;
-        } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
-          return (
-            item.mainCode == forsearchMain.value &&
-            item.subCode == forsearchSub.value
-          );
-        } else if (forsearchMain.value != "0" && forsearchSub.value == "0") {
-          return item.mainCode == forsearchMain.value;
-        }
-      });
-    } else if (ischecked.value == true && afterSearch.value) {
-      forSaveMenu2.value = [];
-      rowData2.value = KDSSettingList.value.filter((item) => {
-        if (forsearchMain.value == "0") {
-          forsearchSub.value = "0";
-          return !Object.values(item).includes(true);
-        } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
-          return (
-            !Object.values(item).includes(true) &&
-            item.mainCode == forsearchMain.value &&
-            item.subCode == forsearchSub.value
-          );
-        } else {
-          return (
-            !Object.values(item).includes(true) &&
-            item.mainCode == forsearchMain.value
-          );
-        }
-      });
-    }
-  } else {
-    if (ischecked.value == false && afterSearch.value) {
-      rowData2.value = KDSSettingList.value.filter((item) => {
-        if (forsearchMain.value == "0") {
-          return item;
-        } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
-          return (
-            item.mainCode == forsearchMain.value &&
-            item.subCode == forsearchSub.value
-          );
-        } else if (forsearchMain.value != "0" && forsearchSub.value == "0") {
-          return item.mainCode == forsearchMain.value;
-        }
-      });
-    } else if (ischecked.value == true && afterSearch.value) {
-      forSaveMenu2.value = [];
-      rowData2.value = KDSSettingList.value.filter((item) => {
-        if (forsearchMain.value == "0") {
-          forsearchSub.value = "0";
-          return !Object.values(item).includes(true);
-        } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
-          return (
-            !Object.values(item).includes(true) &&
-            item.mainCode == forsearchMain.value &&
-            item.subCode == forsearchSub.value
-          );
-        } else {
-          return (
-            !Object.values(item).includes(true) &&
-            item.mainCode == forsearchMain.value
-          );
-        }
-      });
-    }
-  }
-});
+// watch(forsearchMain, () => {
+//   if (forsearchMain.value != "0") {
+//     if (ischecked.value == false && afterSearch.value) {
+//       rowData2.value = KDSSettingList.value.filter((item) => {
+//         if (forsearchMain.value == "0") {
+//           return item;
+//         } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
+//           return (
+//             item.mainCode == forsearchMain.value &&
+//             item.subCode == forsearchSub.value
+//           );
+//         } else if (forsearchMain.value != "0" && forsearchSub.value == "0") {
+//           return item.mainCode == forsearchMain.value;
+//         }
+//       });
+//     } else if (ischecked.value == true && afterSearch.value) {
+//       forSaveMenu2.value = [];
+//       rowData2.value = KDSSettingList.value.filter((item) => {
+//         if (forsearchMain.value == "0") {
+//           forsearchSub.value = "0";
+//           return !Object.values(item).includes(true);
+//         } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
+//           return (
+//             !Object.values(item).includes(true) &&
+//             item.mainCode == forsearchMain.value &&
+//             item.subCode == forsearchSub.value
+//           );
+//         } else {
+//           return (
+//             !Object.values(item).includes(true) &&
+//             item.mainCode == forsearchMain.value
+//           );
+//         }
+//       });
+//     }
+//   } else {
+//     if (ischecked.value == false && afterSearch.value) {
+//       rowData2.value = KDSSettingList.value.filter((item) => {
+//         if (forsearchMain.value == "0") {
+//           return item;
+//         } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
+//           return (
+//             item.mainCode == forsearchMain.value &&
+//             item.subCode == forsearchSub.value
+//           );
+//         } else if (forsearchMain.value != "0" && forsearchSub.value == "0") {
+//           return item.mainCode == forsearchMain.value;
+//         }
+//       });
+//     } else if (ischecked.value == true && afterSearch.value) {
+//       forSaveMenu2.value = [];
+//       rowData2.value = KDSSettingList.value.filter((item) => {
+//         if (forsearchMain.value == "0") {
+//           forsearchSub.value = "0";
+//           return !Object.values(item).includes(true);
+//         } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
+//           return (
+//             !Object.values(item).includes(true) &&
+//             item.mainCode == forsearchMain.value &&
+//             item.subCode == forsearchSub.value
+//           );
+//         } else {
+//           return (
+//             !Object.values(item).includes(true) &&
+//             item.mainCode == forsearchMain.value
+//           );
+//         }
+//       });
+//     }
+//   }
+// });
 
-watch(forsearchSub, () => {
-  if (forsearchSub.value != "0") {
-    if (ischecked.value == true) {
-      rowData2.value = KDSSettingList.value.filter((item) => {
-        if (forsearchMain.value == "0") {
-          forsearchSub.value = "0";
-          return !Object.values(item).includes(true);
-        } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
-          return (
-            !Object.values(item).includes(true) &&
-            item.mainCode == forsearchMain.value &&
-            item.subCode == forsearchSub.value
-          );
-        } else {
-          return (
-            !Object.values(item).includes(true) &&
-            item.mainCode == forsearchMain.value
-          );
-        }
-      });
-    } else {
-      rowData2.value = KDSSettingList.value.filter((item) => {
-        if (forsearchMain.value == "0") {
-          return item;
-        } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
-          return (
-            item.mainCode == forsearchMain.value &&
-            item.subCode == forsearchSub.value
-          );
-        } else if (forsearchMain.value != "0" && forsearchSub.value == "0") {
-          return item.mainCode == forsearchMain.value;
-        }
-      });
-    }
-  } else {
-    if (forsearchMain.value != "0") {
-      if (ischecked.value == true) {
-        rowData2.value = KDSSettingList.value.filter((item) => {
-          if (forsearchMain.value == "0") {
-            forsearchSub.value = "0";
-            return !Object.values(item).includes(true);
-          } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
-            return (
-              !Object.values(item).includes(true) &&
-              item.mainCode == forsearchMain.value &&
-              item.subCode == forsearchSub.value
-            );
-          } else {
-            return (
-              !Object.values(item).includes(true) &&
-              item.mainCode == forsearchMain.value
-            );
-          }
-        });
-      } else {
-        rowData2.value = KDSSettingList.value.filter((item) => {
-          if (forsearchMain.value == "0") {
-            return item;
-          } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
-            return (
-              item.mainCode == forsearchMain.value &&
-              item.subCode == forsearchSub.value
-            );
-          } else if (forsearchMain.value != "0" && forsearchSub.value == "0") {
-            return item.mainCode == forsearchMain.value;
-          }
-        });
-      }
-    }
-  }
+// watch(forsearchSub, () => {
+//   if (forsearchSub.value != "0") {
+//     if (ischecked.value == true) {
+//       rowData2.value = KDSSettingList.value.filter((item) => {
+//         if (forsearchMain.value == "0") {
+//           forsearchSub.value = "0";
+//           return !Object.values(item).includes(true);
+//         } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
+//           return (
+//             !Object.values(item).includes(true) &&
+//             item.mainCode == forsearchMain.value &&
+//             item.subCode == forsearchSub.value
+//           );
+//         } else {
+//           return (
+//             !Object.values(item).includes(true) &&
+//             item.mainCode == forsearchMain.value
+//           );
+//         }
+//       });
+//     } else {
+//       rowData2.value = KDSSettingList.value.filter((item) => {
+//         if (forsearchMain.value == "0") {
+//           return item;
+//         } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
+//           return (
+//             item.mainCode == forsearchMain.value &&
+//             item.subCode == forsearchSub.value
+//           );
+//         } else if (forsearchMain.value != "0" && forsearchSub.value == "0") {
+//           return item.mainCode == forsearchMain.value;
+//         }
+//       });
+//     }
+//   } else {
+//     if (forsearchMain.value != "0") {
+//       if (ischecked.value == true) {
+//         rowData2.value = KDSSettingList.value.filter((item) => {
+//           if (forsearchMain.value == "0") {
+//             forsearchSub.value = "0";
+//             return !Object.values(item).includes(true);
+//           } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
+//             return (
+//               !Object.values(item).includes(true) &&
+//               item.mainCode == forsearchMain.value &&
+//               item.subCode == forsearchSub.value
+//             );
+//           } else {
+//             return (
+//               !Object.values(item).includes(true) &&
+//               item.mainCode == forsearchMain.value
+//             );
+//           }
+//         });
+//       } else {
+//         rowData2.value = KDSSettingList.value.filter((item) => {
+//           if (forsearchMain.value == "0") {
+//             return item;
+//           } else if (forsearchMain.value != "0" && forsearchSub.value != "0") {
+//             return (
+//               item.mainCode == forsearchMain.value &&
+//               item.subCode == forsearchSub.value
+//             );
+//           } else if (forsearchMain.value != "0" && forsearchSub.value == "0") {
+//             return item.mainCode == forsearchMain.value;
+//           }
+//         });
+//       }
+//     }
+//   }
 
-  const temp = searchword1.value;
-  searchword1.value = "";
-  setTimeout(() => {
-    searchword1.value = temp;
-  }, 10);
-});
+//   const temp = searchword1.value;
+//   searchword1.value = "";
+//   setTimeout(() => {
+//     searchword1.value = temp;
+//   }, 10);
+// });
 
 const searchMenuList = (e) => {
   searchword1.value = e.target.value;

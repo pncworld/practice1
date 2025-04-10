@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-center w-full overflow-y-auto">
+  <div class="flex justify-between items-center w-full overflow-y-hidden">
     <div class="flex justify-start w-full pl-12 pt-4">
       <div class="flex justify-start">
         <h1 class="font-bold text-sm md:text-2xl w-full">옵션관리</h1>
@@ -176,7 +176,7 @@
           :progid="1"
           :rowData="rowData6"
           @clickedRowData="clickedRowData4"
-          :searchWord="searchword4"
+          :searchWord3="searchword4"
           :searchColId="'lngCode,strName'"
           :searchColValues="searchColValues"
           @dblclickedRowData="dblclickedRowData2"
@@ -279,6 +279,9 @@
               :changeColid="changeColid"
               :changeValue2="changeValue"
               :searchWord3="searchword1"
+              :labelingColumns="'blnMustSel'"
+              :labelsData="labelData"
+              :valuesData="valueData"
               :searchColId="'lngCode,strName'"
               :deleteRow="deleterow1"
               :addRow3="addrow1"
@@ -518,6 +521,8 @@ import Swal from "sweetalert2";
 import RealGrid from "realgrid";
 
 // 더미 데이터
+const labelData = ref([["필수", "선택"]]);
+const valueData = ref([["0", "1"]]);
 const currentMenu = ref(false);
 const items = ref([]);
 const selectedOptionCd = ref();
@@ -909,7 +914,7 @@ const saveButton = async () => {
             .map((item) => item.strName);
           const blnMustSels = updatedRowData4.value
             .filter((item) => item.deleted != true)
-            .map((item) => (item.blnMustSel == "필수" ? 0 : 1));
+            .map((item) => item.blnMustSel);
           const intMultiples = updatedRowData4.value
             .filter((item) => item.deleted != true)
             .map((item) => item.intMultiple);

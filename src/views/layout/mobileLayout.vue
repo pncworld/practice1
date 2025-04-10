@@ -396,7 +396,7 @@ const searchNow = async (e) => {
     store.state.userData.USER_NO,
     pageIndex.value,
     pageIndex2.value,
-    1,
+    searchNotice.value == "" ? 0 : 1,
     searchNotice.value
   );
   console.log(res);

@@ -558,6 +558,14 @@ const props = defineProps({
     type: Array,
     default: [],
   },
+  searchSpecialCond: {
+    type: Boolean,
+    default: true,
+  },
+  searchSpecialColId: {
+    type: Array,
+    default: [],
+  },
 });
 
 const realgridname = ref(
@@ -1409,6 +1417,10 @@ const funcshowGrid = async () => {
     }
 
     emit("checkedRowData", selectedRowData.value);
+
+    updatedrowData.value = [...dataProvider.getJsonRows()];
+
+    emit("updatedRowData", updatedrowData.value);
   };
 
   dataProvider.onDataChanged = function (provider) {
@@ -1610,7 +1622,7 @@ watch(
 // });
 
 watch(
-  () => [props.searchWord3, props.searchValue],
+  () => [props.searchWord3, props.searchValue, props.searchSpecialCond],
   () => {
     console.log(props.searchWord3);
     console.log(props.searchValue);
@@ -1619,6 +1631,30 @@ watch(
 
     let criteria3 = `(value match '${props.searchWord3}')`;
 
+    let criteria4 = props.searchSpecialColId;
+
+    let filter4 = [
+      {
+        name: "미설정메뉴",
+        criteria: "(value = 'false') or (value is null ) ",
+        active: true,
+      },
+    ];
+    if (props.searchSpecialCond == false) {
+      for (let i = 0; i < criteria4.length; i++) {
+        console.log(gridView);
+        if (gridView !== undefined) {
+          gridView.setColumnFilters(criteria4[i], filter4);
+        }
+      }
+    } else {
+      for (let i = 0; i < criteria4.length; i++) {
+        console.log(gridView);
+        if (gridView !== undefined) {
+          gridView.setColumnFilters(criteria4[i], []);
+        }
+      }
+    }
     for (let i = 1; i < criteria2.length; i++) {
       criteria3 +=
         " or (values['" + criteria2[i] + `'] match '${props.searchWord3}')`;
@@ -1650,28 +1686,31 @@ watch(
       }
     }
 
-    if (props.searchWord3 == "" && props.searchColId3 == []) {
-      gridView.setColumnFilters(criteria2[0], []);
-
-      if (props.searchColId3.length > 0) {
-        for (let i = 0; i < filter2.length; i++) {
-          gridView.setColumnFilters(props.searchColId3[i], []);
-        }
-      }
-    } else {
-      if (props.searchWord3 !== "") {
-        gridView.setColumnFilters(criteria2[0], filter);
-      } else {
+    console.log(criteria2);
+    if (gridView != undefined) {
+      if (props.searchWord3 == "" && props.searchColId3 == []) {
         gridView.setColumnFilters(criteria2[0], []);
-      }
-      for (let i = 0; i < filter2.length; i++) {
-        console.log(filter2);
-        console.log(props.searchValue[i]);
-        console.log(props.searchColId3[i]);
-        if (props.searchValue[i] == -1) {
-          gridView.setColumnFilters(props.searchColId3[i], []);
+
+        if (props.searchColId3.length > 0) {
+          for (let i = 0; i < filter2.length; i++) {
+            gridView.setColumnFilters(props.searchColId3[i], []);
+          }
+        }
+      } else {
+        if (props.searchWord3 !== "") {
+          gridView.setColumnFilters(criteria2[0], filter);
         } else {
-          gridView.setColumnFilters(props.searchColId3[i], filter2[i]);
+          gridView.setColumnFilters(criteria2[0], []);
+        }
+        for (let i = 0; i < filter2.length; i++) {
+          console.log(filter2);
+          console.log(props.searchValue[i]);
+          console.log(props.searchColId3[i]);
+          if (props.searchValue[i] == -1) {
+            gridView.setColumnFilters(props.searchColId3[i], []);
+          } else {
+            gridView.setColumnFilters(props.searchColId3[i], filter2[i]);
+          }
         }
       }
     }
@@ -1824,6 +1863,9 @@ watch(
     gridView.commit();
     const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
     console.log(curr.dataRow);
+    if (curr.dataRow == -1) {
+      return;
+    }
     if (curr && curr.dataRow >= 0 && props.rowData[curr.dataRow]) {
       // 현재 데이터 행이 유효한 경우
       props.rowData[curr.dataRow].deleted = true;
@@ -1843,6 +1885,9 @@ watch(
   (newVal) => {
     gridView.commit();
     const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
+    if (curr.dataRow == -1) {
+      return;
+    }
     if (curr && curr.dataRow >= 0) {
       // 현재 데이터 행이 유효한 경우
       props.rowData[curr.dataRow].deleted = true;
@@ -1870,6 +1915,10 @@ watch(
   () => props.deleteRow3,
   (newVal) => {
     gridView.commit();
+    const curr = gridView.getCurrent();
+    if (curr.dataRow == -1) {
+      return;
+    }
     const alldata = dataProvider.getJsonRows();
     const checkedIndexes = [];
 
@@ -1895,6 +1944,10 @@ watch(
 watch(
   () => props.deleteRow4,
   (newVal) => {
+    const curr = gridView.getCurrent();
+    if (curr.dataRow == -1) {
+      return;
+    }
     var rows = gridView.getCheckedRows();
     dataProvider.removeRows(rows);
     gridView.checkRows(rows, false);
@@ -1905,8 +1958,11 @@ watch(
   () => props.deleteRow5,
   (newVal) => {
     gridView.commit();
+
     const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
-    const currRowState = dataProvider.getRowState(curr.dataRow);
+    if (curr.dataRow == -1) {
+      return;
+    }
     if (curr && curr.dataRow >= 0) {
       // 현재 데이터 행이 유효한 경우
       console.log(dataProvider.getRowState(curr.dataRow));
@@ -1948,6 +2004,9 @@ watch(
   () => props.deleteRow6,
   () => {
     const curr = gridView.getCurrent();
+    if (curr.dataRow == -1 || curr.dataRow == undefined) {
+      return;
+    }
     console.log(curr.dataRow);
     dataProvider.removeRow(curr.dataRow);
     console.log(dataProvider.getAllStateRows());
