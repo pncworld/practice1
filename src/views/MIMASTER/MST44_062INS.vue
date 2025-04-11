@@ -83,6 +83,7 @@
         <div class="ml-10 mt-5 w-full h-full">
           <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="4" :reload="reload"
             :rowData="rowData3" :showGrid="showGrid" :showCheckBar="false" @selcetedrowData="selcetedrowData"
+            :activeSearchSpecial="true" :searchSpecialColId="searchSpecialColId"  :searchSpecialCond="searchSpecialCond"
             :searchWord3="searchword1" :searchColId="'lngCode,strName'" :searchColId3="['mainCode','subCode']" :searchValue="[forsearchMain,forsearchSub]"
             @updatedRowData="updatedRowData2" :mergeColumns2="true" :mergeColumnGroupName2="['메뉴정보']" :mergeColumnGroupSubList2="[['mainName','subName','lngCode','strName','lngPrice']]"
             :setDynamicGrid3="true" :dynamicStoreCd="nowStoreCd" @realgridname="realgridname3"
@@ -312,8 +313,21 @@ const showMenus = (value) => {
 
 const currentMenu = ref('1')
 
+const searchSpecialColId = ref([])
+const searchSpecialCond = ref(false)
+watch(ischecked, () => {
+  searchSpecialColId.value = [];
+  for (let i = 1; i <= rowData.value.length; i++) {
+    searchSpecialColId.value.push("checkbox" + i);
+  }
+  if (ischecked.value == true) {
+    console.log(searchSpecialColId.value);
 
-
+    searchSpecialCond.value = false;
+  } else {
+    searchSpecialCond.value = true;
+  }
+});
 
 
 const realgrid2Name = ref("");
@@ -895,31 +909,31 @@ const saveButton = async () => {
 
 }
 
-watch(ischecked , () => {
-  console.log(originRowData3.value)
-  console.log(ischecked.value)
+// watch(ischecked , () => {
+//   console.log(originRowData3.value)
+//   console.log(ischecked.value)
 
-   if(ischecked.value == true){
-    const count = Object.keys(originRowData3.value[0]).filter(key => key.startsWith("checkbox")).length;
-    let tempArr = []
-    let tempbln = false
-    for(let j=0 ; j < originRowData3.value.length ; j++){
-      for(let i=1 ; i <= count ; i++){
-      if( originRowData3.value[j]?.['checkbox'+i] ==true){
-        tempbln = true
-      }
-      }
-      if(tempbln == false){
-        tempArr.push(originRowData3.value[j])
-      }
-      tempbln =  false
-    }
-    rowData3.value = tempArr ;
-   } else {
-    rowData3.value = originRowData3.value ;
-   }
-   console.log(rowData3.value)
-})
+//    if(ischecked.value == true){
+//     const count = Object.keys(originRowData3.value[0]).filter(key => key.startsWith("checkbox")).length;
+//     let tempArr = []
+//     let tempbln = false
+//     for(let j=0 ; j < originRowData3.value.length ; j++){
+//       for(let i=1 ; i <= count ; i++){
+//       if( originRowData3.value[j]?.['checkbox'+i] ==true){
+//         tempbln = true
+//       }
+//       }
+//       if(tempbln == false){
+//         tempArr.push(originRowData3.value[j])
+//       }
+//       tempbln =  false
+//     }
+//     rowData3.value = tempArr ;
+//    } else {
+//     rowData3.value = originRowData3.value ;
+//    }
+//    console.log(rowData3.value)
+// })
 const selectedIndex =(e) => {
   changeRow.value = e
 }

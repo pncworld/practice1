@@ -47,7 +47,7 @@
           :labelingColumns="'lngStoreCode'"
           :valuesData="valuesData"
           :labelsData="labelsData"
-          :changeNow="changeNow"
+          :changeNow2="changeNow"
           :changeValue2="changeValue2"
           :changeColid="changeColid"
           :changeRow="changeRow"
@@ -125,8 +125,9 @@
           <input
             type="text"
             class="border text-sm rounded-md w-full pl-2 h-full"
-            v-model="gridvalue5"
             name="gridvalue5"
+            :value="gridvalue5"
+            @blur="makeToFixed2"
             @input="changeInfo" />
         </div>
         <div
@@ -222,13 +223,16 @@ const deleteButton = () => {
   deleteRow.value = !deleteRow.value;
 };
 const disableCd = ref(false);
+
+const tempgridValue5 = ref();
 const clickedRowData = (newValue) => {
+  isFirstInput.value = true;
+
   gridvalue1.value = newValue[7];
   gridvalue2.value = newValue[2];
   gridvalue3.value = newValue[3];
   gridvalue4.value = newValue[4];
-  gridvalue5.value =
-    newValue[5] == undefined ? newValue[5] : newValue[5].toFixed(2);
+  gridvalue5.value = newValue[5] === undefined ? "" : newValue[5].toFixed(2);
   gridvalue6.value = newValue[6];
   gridvalue7.value = newValue[1];
   if (newValue[9] == true) {
@@ -259,31 +263,20 @@ const updatedRowData = (newValue) => {
   console.log(newValue);
 };
 
+const makeToFixed2 = (e) => {
+  console.log(e.target.value);
+  if (!isNaN(Number(e.target.value))) {
+    gridvalue5.value = Number(e.target.value).toFixed(2);
+  }
+};
+const isFirstInput = ref(true);
 const changeInfo = (e) => {
   const rowName = e.target.name;
   const rowValue = e.target.value;
 
   if (rowName == "gridvalue5") {
-    const regex = /^\d*\.?\d{0,2}$/;
+    gridvalue5.value = rowValue;
 
-    // 값이 숫자 형식이 아닌 경우 처리 (빈 문자열도 처리)
-    if (rowValue === "" || regex.test(rowValue)) {
-      // 0 이상 100 이하 체크 (빈 문자열은 조건에서 제외)
-      const isInRange = Number(rowValue) >= 0 && Number(rowValue) <= 100;
-
-      if (isInRange) {
-        // 소수점 둘째 자리까지 포맷팅하여 적용
-        e.target.value = parseFloat(rowValue).toFixed(2);
-      } else {
-        // 범위 초과시 입력을 허용하지 않음
-        e.target.value = rowValue.slice(0, -1);
-        return;
-      }
-    } else {
-      // 잘못된 문자가 들어오면 제거
-      e.target.value = rowValue.slice(0, -1);
-      return;
-    }
     changeColid.value = "lngRate";
     changeValue2.value = rowValue;
   } else if (rowName == "gridvalue2") {

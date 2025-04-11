@@ -566,6 +566,10 @@ const props = defineProps({
     type: Array,
     default: [],
   },
+  activeSearchSpecial: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const realgridname = ref(
@@ -1293,6 +1297,7 @@ const funcshowGrid = async () => {
   gridView.displayOptions.showTooltip = true;
   gridView.groupPanel.visible = false;
   gridView.displayOptions.watchDisplayChange = false;
+  gridView.filterMode = "explicit";
 
   if (props.suffixColumnPercent != []) {
     for (let i = 0; i < props.suffixColumnPercent.length; i++) {
@@ -1626,7 +1631,6 @@ watch(
   () => {
     console.log(props.searchWord3);
     console.log(props.searchValue);
-
     let criteria2 = props.searchColId.split(",");
 
     let criteria3 = `(value match '${props.searchWord3}')`;
@@ -1640,18 +1644,19 @@ watch(
         active: true,
       },
     ];
-    if (props.searchSpecialCond == false) {
-      for (let i = 0; i < criteria4.length; i++) {
-        console.log(gridView);
-        if (gridView !== undefined) {
-          gridView.setColumnFilters(criteria4[i], filter4);
+
+    if (props.activeSearchSpecial == true) {
+      if (props.searchSpecialCond == false) {
+        for (let i = 0; i < criteria4.length; i++) {
+          if (gridView !== undefined && gridView != null) {
+            gridView.setColumnFilters(criteria4[i], filter4);
+          }
         }
-      }
-    } else {
-      for (let i = 0; i < criteria4.length; i++) {
-        console.log(gridView);
-        if (gridView !== undefined) {
-          gridView.setColumnFilters(criteria4[i], []);
+      } else {
+        for (let i = 0; i < criteria4.length; i++) {
+          if (gridView !== undefined && gridView != null) {
+            gridView.setColumnFilters(criteria4[i], []);
+          }
         }
       }
     }

@@ -163,6 +163,7 @@
             :searchColId3="['mainCode', 'subCode']"
             :searchSpecialColId="searchSpecialColId"
             :searchSpecialCond="searchSpecialCond"
+            :activeSearchSpecial="true"
             :searchValue="[forsearchMain, forsearchSub]"
             @updatedRowData="updatedRowData2"
             @realgridname="realgridname"

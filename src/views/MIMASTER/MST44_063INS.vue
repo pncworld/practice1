@@ -103,7 +103,7 @@
             :progid="1"
             :rowData="rowData"
             :showCheckBar="false"
-            :labelingColumns="'intPosNo,posEqipClCd,posEqipKndCd,instlOsClCd,posClCd,useYn'"
+            :labelingColumns="'intPosNo,posEqipClCd,posEqipKndCd,instlOsClCd,posClCd,useYn,storeFg,lngPrePaid'"
             :labelsData="[
               labelsData1,
               labelsData6,
@@ -111,6 +111,8 @@
               labelsData8,
               labelsData9,
               labelsData4,
+              labelsData21,
+              labelsData22,
             ]"
             :valuesData="[
               valueData1,
@@ -119,6 +121,8 @@
               valueData8,
               valueData9,
               valueData4,
+              valueData21,
+              valueData22,
             ]"
             @selcetedrowData="selcetedrowData"
             @allStateRows="allStateRows"
@@ -643,6 +647,8 @@ const labelsData8 = ref([]);
 const labelsData9 = ref([]);
 const labelsData10 = ref([]);
 const labelsData20 = ref([1, 2, 3, 4, 5]);
+const labelsData21 = ref([]);
+const labelsData22 = ref(["선택", "선불", "후불"]);
 
 const valueData1 = ref([""]);
 const valueData2 = ref([]);
@@ -656,6 +662,8 @@ const valueData8 = ref([]);
 const valueData9 = ref([]);
 const valueData10 = ref([]);
 const valueData20 = ref([1, 2, 3, 4, 5]);
+const valueData21 = ref([]);
+const valueData22 = ref([-1, 1, 0]);
 
 const commonList11 = ref([]);
 const settingPosList = async (e1, e2) => {
@@ -724,6 +732,16 @@ onMounted(async () => {
   const res9 = await getCommonList(408);
   const res10 = await getCommonList(399);
 
+  const res11 = await getCommonList(432);
+
+  valueData21.value = [
+    "-1",
+    ...res11.data.List.map((item) => Number(item.strDCode)),
+  ];
+  labelsData21.value = [
+    "선택",
+    ...res11.data.List.map((item) => item.strDName),
+  ];
   valueData10.value = res10.data.List.map((item) => item.strDCode);
   labelsData10.value = res10.data.List.map((item) => item.strDName);
   commonList12.value = res10.data.List;
@@ -1154,7 +1172,7 @@ const setValue = (e) => {
 };
 const posNo = ref();
 const addrowDefault = ref([]);
-const addrowProp = ref("strName,lngStoreGroup,lngStoreCode,lngAreaCode");
+const addrowProp = ref("lngStoreGroup,lngStoreCode,lngAreaCode");
 const AllscreenKeyPage = ref(1);
 const rowData = ref([]);
 const rowData2 = ref([]);
@@ -1506,13 +1524,7 @@ const addRow = () => {
   }
   addRows.value = !addRows.value;
   addrowDefault.value =
-    clickedStoreNm.value +
-    "," +
-    groupCd.value +
-    "," +
-    nowStoreCd.value +
-    "," +
-    nowStoreAreaCd.value;
+    groupCd.value + "," + nowStoreCd.value + "," + nowStoreAreaCd.value + ",";
   console.log(updatedList.value);
 };
 
@@ -1779,20 +1791,20 @@ const saveButton = async () => {
   if (currentMenu.value == 1) {
     const validate = updatedList.value.filter(
       (item) =>
-        item.intPosNo == "" ||
-        item.posEqipClCd == "" ||
-        item.posEqipKndCd == "" ||
-        item.instlDate == "" ||
-        item.instlOsClCd == "" ||
-        item.posIp == "" ||
-        item.posClCd == "" ||
-        item.useYn == "" ||
+        item.intPosNo === "" ||
+        item.posEqipClCd === "" ||
+        item.posEqipKndCd === "" ||
+        item.instlDate === "" ||
+        item.storeFg === "" ||
+        item.lngPrePaid === "" ||
+        item.posClCd === "" ||
+        item.useYn === "" ||
         item.intPosNo == undefined ||
         item.posEqipClCd == undefined ||
         item.posEqipKndCd == undefined ||
         item.instlDate == undefined ||
-        item.instlOsClCd == undefined ||
-        item.posIp == undefined ||
+        item.storeFg == undefined ||
+        item.lngPrePaid == undefined ||
         item.posClCd == undefined ||
         item.useYn == undefined ||
         item.intPosNo == -1 ||
@@ -1800,7 +1812,9 @@ const saveButton = async () => {
         item.posEqipKndCd == -1 ||
         item.instlOsClCd == -1 ||
         item.posClCd == -1 ||
-        item.useYn == -1
+        item.useYn == -1 ||
+        item.storeFg == -1 ||
+        item.lngPrePaid == -1
     );
     if (validate.length > 0) {
       Swal.fire({
@@ -1982,13 +1996,33 @@ const saveButton = async () => {
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
             .map((item) => item.instlDate)
             .join("\u200B");
-          const oscds = updatedList.value
+          const printcnt = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
-            .map((item) => item.instlOsClCd)
+            .map((item) => item.printCnt)
             .join("\u200B");
-          const posips = updatedList.value
+          const lanprintcnt = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
-            .map((item) => item.posIp)
+            .map((item) => item.lanPrinterCnt)
+            .join("\u200B");
+          const kdscnt = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.kdsCnt)
+            .join("\u200B");
+          const didcnt = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.didCnt)
+            .join("\u200B");
+          const storefg = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.storeFg)
+            .join("\u200B");
+          const lngprepaid = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.lngPrePaid)
+            .join("\u200B");
+          const tablecnt = updatedList.value
+            .filter((_, index) => !allstaterow.value.deleted.includes(index))
+            .map((item) => item.tableCnt)
             .join("\u200B");
           const posclcd = updatedList.value
             .filter((_, index) => !allstaterow.value.deleted.includes(index))
@@ -2012,8 +2046,13 @@ const saveButton = async () => {
             posEqipcl,
             posEqipk,
             dates,
-            oscds,
-            posips,
+            printcnt,
+            lanprintcnt,
+            kdscnt,
+            didcnt,
+            storefg,
+            lngprepaid,
+            tablecnt,
             posclcd,
             useyn,
             remark,
