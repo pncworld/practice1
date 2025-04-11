@@ -1629,8 +1629,6 @@ watch(
 watch(
   () => [props.searchWord3, props.searchValue, props.searchSpecialCond],
   () => {
-    console.log(props.searchWord3);
-    console.log(props.searchValue);
     let criteria2 = props.searchColId.split(",");
 
     let criteria3 = `(value match '${props.searchWord3}')`;
@@ -1691,7 +1689,6 @@ watch(
       }
     }
 
-    console.log(criteria2);
     if (gridView != undefined) {
       if (props.searchWord3 == "" && props.searchColId3 == []) {
         gridView.setColumnFilters(criteria2[0], []);
@@ -1708,9 +1705,6 @@ watch(
           gridView.setColumnFilters(criteria2[0], []);
         }
         for (let i = 0; i < filter2.length; i++) {
-          console.log(filter2);
-          console.log(props.searchValue[i]);
-          console.log(props.searchColId3[i]);
           if (props.searchValue[i] == -1) {
             gridView.setColumnFilters(props.searchColId3[i], []);
           } else {

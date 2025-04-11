@@ -1315,7 +1315,7 @@ const selectedIndex4 = (e) => {
 const addrow3 = ref(false);
 const addrow2 = ref(false);
 const addrowProp3 = ref(
-  "strName,intPosNo,lngPosition,lngPos,lngPort,cornerNm,portIdVlu,lngStoreCode,lngAreaCode"
+  "strName,intPosNo,lngPosition,lngPos,lngPort,cornerNm,portIdVlu,lngStoreCode,lngAreaCode,originPort,originPos"
 );
 const addrowProp2 = ref(
   "StoreName,lngStoreGroup,lngStoreCode,lngAreaCode,intPosNo,lngPort,strName,strSetting,lngOLEType,blnOpen,blnShare,lngMachine,lngMachineType,strPortName,strMachine"
@@ -1367,7 +1367,8 @@ const addRow3 = () => {
     "," +
     nowStoreCd.value +
     "," +
-    nowStoreAreaCd.value;
+    nowStoreAreaCd.value +
+    ",0,0";
   addrow3.value = !addrow3.value;
 };
 
@@ -2176,12 +2177,22 @@ const saveButton = async () => {
           const areaCds = updatedList3.value
             .filter((_, index) => !allstaterow3.value.deleted.includes(index))
             .map((item) => item.lngAreaCode);
-          const cornernms = updatedList3.value
-            .filter((_, index) => !allstaterow3.value.deleted.includes(index))
-            .map((item) => item.cornerNm);
+          //const cornernms = updatedList3.value
+          // .filter((_, index) => !allstaterow3.value.deleted.includes(index))
+          // .map((item) => item.cornerNm);
+          const counts = {};
           const portIdVlus = updatedList3.value
             .filter((_, index) => !allstaterow3.value.deleted.includes(index))
-            .map((item) => item.portIdVlu);
+            .map((item, index) => {
+              const key = item.intPosNo;
+
+              if (!counts[key]) counts[key] = 1;
+              else counts[key] *= 2;
+
+              return counts[key];
+            });
+
+          console.log(portIdVlus);
           const lngstorecodes = updatedList3.value
             .filter((_, index) => !allstaterow3.value.deleted.includes(index))
             .map((item) => item.lngStoreCode);
@@ -2189,6 +2200,10 @@ const saveButton = async () => {
           const lngoriginPort = updatedList3.value
             .filter((_, index) => !allstaterow3.value.deleted.includes(index))
             .map((item) => item.originPort);
+
+          const lngoriginPos = updatedList3.value
+            .filter((_, index) => !allstaterow3.value.deleted.includes(index))
+            .map((item) => item.originPos);
 
           console.log(allstaterow3.value);
           const deletePoss = updatedList3.value
@@ -2213,11 +2228,12 @@ const saveButton = async () => {
             lngpositions.join("\u200B"),
             lngposs.join("\u200B"),
             lngports.join("\u200B"),
-            cornernms.join("\u200B"),
+            //    cornernms.join("\u200B"),
             portIdVlus.join("\u200B"),
             lngstorecodes.join("\u200B"),
             areaCds.join("\u200B"),
             lngoriginPort.join("\u200B"),
+            lngoriginPos.join("\u200B"),
             deletePoss.join("\u200B"),
             deletedStoreCodes.join("\u200B"),
             deletedPosition.join("\u200B"),

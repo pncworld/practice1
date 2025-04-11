@@ -44,7 +44,7 @@
       </div>
       <div class="h-full" v-show="currentMenu == 1">
         <div class="ml-10 mt-5 w-full h-full">
-          <Realgrid class="w-full h-[400%]" :progname="'MST44_062INS_VUE'" :progid="1" :rowData="rowData"
+          <Realgrid class="w-full h-[400%]" :progname="'MST44_062INS_VUE'" :progid="1" :rowData="rowData" :rowStateeditable="false"
             :showCheckBar="false" @selcetedrowData="selcetedrowData" :changeRow="changeRow" :changeNow="changeNow"
             :changeColid="changeColid" :changeValue2="changeValue" @updatedRowData="updatedRowData" @selectedIndex="selectedIndex"
             @clickedRowData="clickedRowData" @realgridname="realgridname"></Realgrid>
@@ -55,7 +55,7 @@
         <div class="flex justify-start rounded-tl-lg  text-xl -mt-1 font-bold ml-10 " v-if="currentMenu == false">POS별
           출력코너명 목록</div>
         <div class="ml-10 mt-5 w-full h-full">
-          <Realgrid class="w-full h-[400%]" :progname="'MST44_062INS_VUE'" :progid="2" :rowData="rowData2"
+          <Realgrid class="w-full h-[400%]" :progname="'MST44_062INS_VUE'" :progid="2" :rowData="rowData2" :rowStateeditable="false"
             :showGrid="showGrid" :showCheckBar="false" @realgridname="realgridname2"></Realgrid>
         </div>
       </div>
@@ -82,7 +82,7 @@
         </div>
         <div class="ml-10 mt-5 w-full h-full">
           <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="4" :reload="reload"
-            :rowData="rowData3" :showGrid="showGrid" :showCheckBar="false" @selcetedrowData="selcetedrowData"
+            :rowData="rowData3" :showGrid="showGrid" :showCheckBar="false" @selcetedrowData="selcetedrowData" :rowStateeditable="false"
             :activeSearchSpecial="true" :searchSpecialColId="searchSpecialColId"  :searchSpecialCond="searchSpecialCond"
             :searchWord3="searchword1" :searchColId="'lngCode,strName'" :searchColId3="['mainCode','subCode']" :searchValue="[forsearchMain,forsearchSub]"
             @updatedRowData="updatedRowData2" :mergeColumns2="true" :mergeColumnGroupName2="['메뉴정보']" :mergeColumnGroupSubList2="[['mainName','subName','lngCode','strName','lngPrice']]"
@@ -94,7 +94,7 @@
       <div class="h-[100vh]" v-show="currentMenu == 3">
         <div class="h-[15vh] w-[45vw] ml-10 mt-5" v-show="currentMenu == 3">
           <div class="w-full h-full ">
-            <Realgrid class="w-[100%] h-[150%] " :progname="'MST44_062INS_VUE'" :progid="3" :reload="reload"
+            <Realgrid class="w-[100%] h-[150%] " :progname="'MST44_062INS_VUE'" :progid="3" :reload="reload" :rowStateeditable="false"
               :rowData="rowData4" @clickedRowData="clickedRowData2" @realgridname="realgridname4" @selectedIndex2="selectedIndex2"
               @updatedRowData="updatedRowData3" :changeColid="changeColid" :changeRow="changeRow" :changeNow="changeNow2"
               :changeValue2="changeValue" :initSelect="initSelect" ></Realgrid>
@@ -765,7 +765,7 @@ const saveButton = async () => {
     }
   }
 
-  if (currentMenu.value == false) {
+  if (currentMenu.value == 1) {
 
     if (JSON.stringify(confirmitem.value) === JSON.stringify(updatedList.value)) {
       Swal.fire({
@@ -776,7 +776,7 @@ const saveButton = async () => {
       })
       return;
     }
-  } else if (currentMenu.value == true) {
+  } else if (currentMenu.value == 2) {
     if (JSON.stringify(confirmitem.value) === JSON.stringify(updatedList2.value)) {
       Swal.fire({
         title: '경고',
@@ -827,7 +827,7 @@ const saveButton = async () => {
           let uniqueArray = new Set()
           for(let j=0 ; j< updatedList2.value.length ; j++){
             let tempint = 0;
-            for(let i=0 ; i < count ; i++){
+            for(let i=1 ; i <= count ; i++){
               if(updatedList2.value[j]["checkbox"+i] == true){
                 tempint += 2**(i-1)
               }
@@ -838,7 +838,7 @@ const saveButton = async () => {
           
           }
           uniqueArray = [...uniqueArray]
-          calculateArr.value = [[1],[2,6],[6]]
+         // calculateArr.value = [[1],[2,6],[6]]
           calculateArr.value = []
 
 
@@ -871,7 +871,7 @@ const saveButton = async () => {
           console.log(forSaveMenu.value)
           console.log(uniqueArray)
           console.log(calculateArr.value)
-          res = await saveKitchenSettingAll(groupCd.value, nowStoreCd.value, JSON.stringify(forSaveMenu.value), uniqueArray.join(','), JSON.stringify(calculateArr.value), userData.loginID)
+          res = await saveKitchenSettingAll(groupCd.value, nowStoreCd.value, JSON.stringify(forSaveMenu.value), uniqueArray.sort().join(','), JSON.stringify(calculateArr.value), userData.loginID)
           console.log(res)
 
         } else if (currentMenu.value == 3) {
