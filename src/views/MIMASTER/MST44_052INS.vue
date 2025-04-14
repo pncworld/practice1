@@ -205,8 +205,16 @@
               v-model="searchword1" />
           </div>
         </div>
-        <div class="ml-10 mt-5 w-full h-full">
-          <div id="realgrid" style="width: 100%; height: 180%"></div>
+        <div class="ml-10 mt-5 w-full h-[180%]">
+          <Realgrid
+            :progname="'MST05_011INS_VUE'"
+            :progid="1"
+            :rowData="MenuList"
+            @selcetedrowData="selcetedrowData"
+            :searchColId="'menuCd,menuNm'"
+            :searchColId3="['majorGroupCd', 'subGroupCd']"
+            :searchValue="searchValue"
+            :searchWord3="searchword1"></Realgrid>
         </div>
       </div>
 
@@ -366,6 +374,7 @@ import DupliPopUp from "@/components/dupliPopUp.vue";
 import { GridView, LocalDataProvider } from "realgrid";
 
 import PickStore from "@/components/pickStore.vue";
+import Realgrid from "@/components/realgrid.vue";
 
 // 더미 데이터
 const items = ref([]);
@@ -799,118 +808,118 @@ let dataProvider;
 const currentSelectedMenuCode = ref("");
 const currentSelectedMenuImgUrl = ref("");
 onMounted(() => {
-  showMenuKeys();
+  //showMenuKeys();
 });
 
-const showMenuKeys = () => {
-  if (gridView) {
-    gridView.destroy(); // 기존 그리드 인스턴스 파괴
-  }
+// const showMenuKeys = () => {
+//   if (gridView) {
+//     gridView.destroy(); // 기존 그리드 인스턴스 파괴
+//   }
 
-  dataProvider = new LocalDataProvider();
+//   dataProvider = new LocalDataProvider();
 
-  // 2. GridView 설정
-  gridView = new GridView("realgrid");
-  gridView.setDataSource(dataProvider);
+//   // 2. GridView 설정
+//   gridView = new GridView("realgrid");
+//   gridView.setDataSource(dataProvider);
 
-  // 3. 필드 정의
-  const fields = [
-    { fieldName: "menuCd", dataType: "text" },
-    { fieldName: "menuNm", dataType: "text" },
-    { fieldName: "lngPrice", dataType: "number" },
-    { fieldName: "strUserFileName", dataType: "text" },
-    { fieldName: "add", dataType: "text" },
-  ];
-  dataProvider.setFields(fields);
+//   // 3. 필드 정의
+//   const fields = [
+//     { fieldName: "menuCd", dataType: "text" },
+//     { fieldName: "menuNm", dataType: "text" },
+//     { fieldName: "lngPrice", dataType: "number" },
+//     { fieldName: "strUserFileName", dataType: "text" },
+//     { fieldName: "add", dataType: "text" },
+//   ];
+//   dataProvider.setFields(fields);
 
-  // 4. 컬럼 정의
-  const columns = [
-    {
-      name: "메뉴코드",
-      fieldName: "menuCd",
-      header: {
-        text: "메뉴코드",
-        styleName: "header-style-0",
-      },
-    },
-    {
-      name: "메뉴명",
-      fieldName: "menuNm",
-      header: {
-        text: "메뉴명",
-        styleName: "header-style-1",
-      },
-    },
-    {
-      name: "판매가",
-      fieldName: "lngPrice",
-      header: {
-        text: "판매가",
-        styleName: "header-style-2",
-      },
-      numberFormat: "#,##0",
-    },
-    {
-      name: "strUserFileName",
-      fieldName: "strUserFileName",
-      header: {
-        text: "strUserFileName",
-        styleName: "header-style-2",
-      },
-      numberFormat: "#,##0",
-      visible: false,
-    },
-    {
-      name: "선택",
-      fieldName: "add",
-      header: { text: "선택", styleName: "header-style-3" },
-      editable: false,
-      renderer: {
-        type: "button",
-      },
-    },
-  ];
-  gridView.setColumns(columns);
-  // 5. 샘플 데이터 추가
-  dataProvider.setRows(MenuList.value);
-  console.log(MenuList.value);
-  gridView.sortMode = "explicit";
-  gridView.filterMode = "explicit";
-  gridView.setFooters({ visible: false });
-  gridView.setRowIndicator({
-    visible: true,
-  });
-  gridView.setCheckBar({
-    visible: false,
-  });
-  gridView.displayOptions.fitStyle = "even";
-  gridView.sortingOptions.enabled = true;
+//   // 4. 컬럼 정의
+//   const columns = [
+//     {
+//       name: "메뉴코드",
+//       fieldName: "menuCd",
+//       header: {
+//         text: "메뉴코드",
+//         styleName: "header-style-0",
+//       },
+//     },
+//     {
+//       name: "메뉴명",
+//       fieldName: "menuNm",
+//       header: {
+//         text: "메뉴명",
+//         styleName: "header-style-1",
+//       },
+//     },
+//     {
+//       name: "판매가",
+//       fieldName: "lngPrice",
+//       header: {
+//         text: "판매가",
+//         styleName: "header-style-2",
+//       },
+//       numberFormat: "#,##0",
+//     },
+//     {
+//       name: "strUserFileName",
+//       fieldName: "strUserFileName",
+//       header: {
+//         text: "strUserFileName",
+//         styleName: "header-style-2",
+//       },
+//       numberFormat: "#,##0",
+//       visible: false,
+//     },
+//     {
+//       name: "선택",
+//       fieldName: "add",
+//       header: { text: "선택", styleName: "header-style-3" },
+//       editable: false,
+//       renderer: {
+//         type: "button",
+//       },
+//     },
+//   ];
+//   gridView.setColumns(columns);
+//   // 5. 샘플 데이터 추가
+//   dataProvider.setRows(MenuList.value);
+//   console.log(MenuList.value);
+//   gridView.sortMode = "explicit";
+//   gridView.filterMode = "explicit";
+//   gridView.setFooters({ visible: false });
+//   gridView.setRowIndicator({
+//     visible: true,
+//   });
+//   gridView.setCheckBar({
+//     visible: false,
+//   });
+//   gridView.displayOptions.fitStyle = "even";
+//   gridView.sortingOptions.enabled = true;
 
-  gridView.commit();
-  gridView.onCellEdited = function (grid, itemIndex, row, field) {
-    // 데이터가 수정될 때 rows를 갱
-    gridView.commit();
+//   gridView.commit();
+//   gridView.onCellEdited = function (grid, itemIndex, row, field) {
+//     // 데이터가 수정될 때 rows를 갱
+//     gridView.commit();
 
-    // 이후 데이터 갱신 (필요시 rows를 업데이트)
-  };
+//     // 이후 데이터 갱신 (필요시 rows를 업데이트)
+//   };
 
-  gridView.onCellItemClicked = function (grid, index, clickData) {
-    currentSelectedMenuCode.value =
-      dataProvider.getRows()[clickData.itemIndex][0];
-    currentSelectedMenuNm.value =
-      dataProvider.getRows()[clickData.itemIndex][0] +
-      "/ " +
-      dataProvider.getRows()[clickData.itemIndex][1] +
-      " (" +
-      dataProvider.getRows()[clickData.itemIndex][2] +
-      ")";
-    currentSelectedMenuImgUrl.value =
-      dataProvider.getRows()[clickData.itemIndex][3];
+//   gridView.onCellItemClicked = function (grid, index, clickData) {
+//     currentSelectedMenuCode.value =
+//       dataProvider.getRows()[clickData.itemIndex][0];
+//     currentSelectedMenuNm.value =
+//       dataProvider.getRows()[clickData.itemIndex][0] +
+//       "/ " +
+//       dataProvider.getRows()[clickData.itemIndex][1] +
+//       " (" +
+//       dataProvider.getRows()[clickData.itemIndex][2] +
+//       ")";
+//     currentSelectedMenuImgUrl.value =
+//       dataProvider.getRows()[clickData.itemIndex][3];
 
-    addMenuKey();
-    return true;
-  };
-};
+//     addMenuKey();
+//     return true;
+//   };
+// };
 
 let gridView2;
 let dataProvider2;
@@ -979,7 +988,7 @@ const handlePosNo = (newValue) => {
 watch(
   () => MenuList.value,
   () => {
-    showMenuKeys(); // MenuKeyList 값이 변경될 때마다 그리드 업데이트
+    //showMenuKeys(); // MenuKeyList 값이 변경될 때마다 그리드 업데이트
   }
 );
 

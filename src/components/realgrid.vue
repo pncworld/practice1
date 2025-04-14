@@ -1444,10 +1444,10 @@ const funcshowGrid = async () => {
     if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
       return;
     }
-    selectedRowData.value = dataProvider.getRows()[clickData.itemIndex];
+
     var current = gridView.getCurrent();
     selectedindex.value = current.dataRow;
-
+    selectedRowData.value = dataProvider.getRows()[current.dataRow];
     emit("selcetedrowData", selectedRowData.value);
     emit("selectedIndex", clickData.itemIndex);
     emit("selectedIndex2", clickData.dataRow);
@@ -1692,12 +1692,6 @@ watch(
     if (gridView != undefined) {
       if (props.searchWord3 == "" && props.searchColId3 == []) {
         gridView.setColumnFilters(criteria2[0], []);
-
-        if (props.searchColId3.length > 0) {
-          for (let i = 0; i < filter2.length; i++) {
-            gridView.setColumnFilters(props.searchColId3[i], []);
-          }
-        }
       } else {
         if (props.searchWord3 !== "") {
           gridView.setColumnFilters(criteria2[0], filter);
@@ -1705,6 +1699,7 @@ watch(
           gridView.setColumnFilters(criteria2[0], []);
         }
         for (let i = 0; i < filter2.length; i++) {
+          console.log(props.searchValue[i]);
           if (props.searchValue[i] == -1) {
             gridView.setColumnFilters(props.searchColId3[i], []);
           } else {

@@ -785,8 +785,8 @@ const setSubCd = (e) => {
     filteredSubMenuGroup.value = SubMenuGroup.value.filter(
       (item) => item.sublngMajor == value
     );
-    searchValue.value = [value, forsearchSub.value];
     forsearchSub.value = -1;
+    searchValue.value = [value, forsearchSub.value];
   } else if (name == "subGroupCd") {
     searchValue.value = [forsearchMain.value, value];
   }
@@ -869,7 +869,7 @@ let dupliScreenKeyOrigin;
 const onMove2 = (evt) => {
   // 예: 드래그 중 이동할 때의 조건 등을 설정할 수 있음
   targetItemIndex3 = Array.from(evt.from.children).indexOf(evt.related);
-
+  console.log(targetItemIndex3);
   dupliScreenKeyOrigin = [...ScreenKeyOrigin.value];
   return true;
 };
@@ -897,7 +897,9 @@ const onEnd = (evt) => {
       intKeySeq: index + (nowscreenNo.value - 1) * 45 + 1, // 배열 순서대로 intKeySeq 재정렬
     }));
   }
-
+  console.log(evt);
+  clickedMenuKey.value =
+    changeMode.value == false ? targetItemIndex2 : evt.newIndex;
   console.log(items.value);
 };
 function formatNumber(value) {
@@ -920,6 +922,7 @@ const onEnd2 = (evt) => {
         item.intScreenNo = evt.oldIndex + 1;
       }
     });
+
   addfor10ScreenKey();
 
   showMenuKey(clickedintScreenNo.value);

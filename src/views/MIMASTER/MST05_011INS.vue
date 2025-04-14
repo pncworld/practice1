@@ -333,7 +333,9 @@
               v-for="(item, index) in items"
               :key="index"
               class="screen-muuri-sort-empty flex items-center justify-center"
-              :class="{ ' !border-blue-700': clickedMenuKey == index }"
+              :class="{
+                '!bg-orange-400 !border-blue-700': clickedMenuKey == index,
+              }"
               @click="
                 saveMenuKeyposition(index);
                 clickedMenuKey = index;
@@ -661,8 +663,8 @@ const setSubCd = (e) => {
     filteredSubMenuGroup.value = SubMenuGroup.value.filter(
       (item) => item.sublngMajor == value
     );
-    searchValue.value = [value, forsearchSub.value];
     forsearchSub.value = -1;
+    searchValue.value = [value, forsearchSub.value];
   } else if (name == "subGroupCd") {
     searchValue.value = [forsearchMain.value, value];
   }
@@ -774,6 +776,9 @@ const onEnd = (evt) => {
   } else {
     updateMenuKey.value = true;
   }
+
+  clickedMenuKey.value =
+    changeMode.value == false ? targetItemIndex2 : evt.newIndex;
 
   console.log(items.value);
 };

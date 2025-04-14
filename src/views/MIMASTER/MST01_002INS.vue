@@ -14,6 +14,7 @@
   <div
     class="flex justify-start space-x-5 bg-gray-200 rounded-lg h-16 items-center mt-3">
     <PickStore
+      :defaultStoreNm="'전체'"
       @update:storeGroup="handleGroupCd"
       @update:storeCd="handleStoreCd">
     </PickStore>
@@ -47,7 +48,7 @@
       :changeColid="changeColid"
       :changeRow="changeRow"
       :changeValue2="changeValue"
-      :changeNow="changeNow"
+      :changeNow2="changeNow"
       @selectedIndex2="selectedIndex2"
       :useCheckboxfordelete="true"
       :addRow4="addRow4"
