@@ -96,18 +96,27 @@ const moveBack = () => {
   emit("showNotice", true);
   emit("showMenu3", false);
 };
-const selectedProgName = ref(store.state.mobileSelectProgName);
+
+const selectedProgName = ref("");
+
+watch(selectedProgName, () => {
+  console.log(selectedProgName.value);
+});
+
 const clickIcon = ref(1);
 watch(
   () => store.state.mobileSelectProgName,
   () => {
     console.log(store.state.mobileSelectProgName);
+
     if (store.state.mobileSelectProgName != "") {
       clickIcon.value = 0;
     }
     selectedProgName.value = store.state.mobileSelectProgName;
   },
-  { immediate: true }
+  {
+    immediate: true,
+  }
 );
 const showMenu3 = ref(false);
 const mobileMenu = ref(false);
@@ -125,6 +134,8 @@ watch(route, () => {
     showMenu.value = true;
     showMenu2.value = true;
   }
+
+  console.log(store.state.mobileSelectProgName);
 });
 onMounted(() => {
   if (store.state.StoreToken != "") {
@@ -134,6 +145,8 @@ onMounted(() => {
     showMenu2.value = false;
     showMenu.value = false;
   }
+  console.log(store.state.mobileSelectProgName);
+  //selectedProgName.value = store.state.mobileSelectProgName;
 });
 const emit = defineEmits([
   "showNotice",
@@ -181,7 +194,11 @@ watch(
 );
 
 const showMobileNotice = () => {
-  clickIcon.value = 2;
+  if (mobileMenu.value) {
+    clickIcon.value = 0;
+  } else {
+    clickIcon.value = 2;
+  }
   mobileMenu.value = !mobileMenu.value;
 
   emit("showNotice", mobileMenu.value);
@@ -190,16 +207,23 @@ const showMobileNotice = () => {
   emit("showHomepage", false);
 };
 const showMobilePersonal = () => {
-  clickIcon.value = 3;
+  if (personal.value) {
+    clickIcon.value = 0;
+  } else {
+    clickIcon.value = 3;
+  }
+
   mobileMenu.value = false;
   emit("showNotice", mobileMenu.value);
   personal.value = !personal.value;
+  showInputBox.value = false;
   emit("showpersonal", personal.value);
   emit("showHomepage", false);
 };
 const showHomePage = () => {
   clickIcon.value = 1;
   mobileMenu.value = false;
+  showInputBox.value = false;
   emit("showNotice", mobileMenu.value);
   personal.value = false;
   emit("showpersonal", personal.value);

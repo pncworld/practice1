@@ -2,7 +2,7 @@
   <div class="h-full w-full" @click="resetScreen">
     <div class="h-[15vh] w-full"></div>
     <div
-      class="relative h-[7vh] text-base font-medium w-full bg-white grid grid-rows-1 grid-cols-[1fr,1fr,1.8fr,1fr] p-1">
+      class="relative h-[7vh] text-base font-medium w-full bg-white grid grid-rows-1 grid-cols-[1.5fr,1.5fr,2fr,1fr] p-1">
       <div class="w-full font-semibold flex items-center">세션구분</div>
       <div class="w-full font-semibold flex items-center">POS</div>
       <div class="w-full font-semibold flex items-center">작업시간</div>

@@ -578,7 +578,8 @@ const onEnd = (evt) => {
       intKeySeq: index + (currmenuKeyPage.value - 1) * 6 + 1, // 배열 순서대로 intKeySeq 재정렬
     }));
   }
-
+  clickedMenuKey.value =
+    changeMode.value == false ? targetItemIndex2 : evt.newIndex;
   console.log("KeyList:", KeyList.value);
 };
 function formatNumber(value) {

@@ -11,12 +11,12 @@
     <div v-for="i in rowData" class="bg-gray-300">
       <div
         :class="i.MONTH_DT.includes('[') ? 'bg-gray-300' : 'bg-blue-50'"
-        class="grid grid-rows-1 grid-cols-[1fr,1fr,1fr,1fr] h-[7vh] justify-center items-center font-medium">
+        class="grid grid-rows-1 grid-cols-[1fr,1fr,1fr,1.5fr] h-[7vh] justify-center items-center font-medium">
         <div class="pl-1">{{ i.MONTH_DT }}</div>
 
         <div>{{ i.BUYCOMP_NM }}</div>
-        <div>{{ i.APP_CNT }}</div>
-        <div>{{ i.APP_AMT }}</div>
+        <div class="flex justify-end">{{ i.APP_CNT }}</div>
+        <div class="flex justify-end pr-[10%]">{{ i.APP_AMT }}</div>
       </div>
     </div>
   </div>

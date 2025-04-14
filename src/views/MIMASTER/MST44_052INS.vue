@@ -23,7 +23,6 @@
       @kioskNo="handlePosNo"
       :showKioskNo="true"
       @storeNm="handlestoreNm"
-      @update:ischanged="handleinitAll"
       @update:ischanged2="searchinit"></PickStore>
   </div>
   <div class="z-50">
@@ -177,18 +176,23 @@
           </div>
           <div class="px-4 py-2 border border-gray-300 rounded-tr-lg flex">
             <select
-              name=""
+              name="majorGroupCd"
               id=""
               class="flex-1"
               @change="setSubCd"
               v-model="forsearchMain">
-              <option value="0">전체</option>
+              <option value="-1">전체</option>
               <option :value="i.GroupCd" v-for="i in MenuGroup">
                 [{{ i.GroupCd }}]{{ i.majorGroupNm }}
               </option>
             </select>
-            <select name="" id="" class="flex-1" v-model="forsearchSub">
-              <option value="0">전체</option>
+            <select
+              name="subGroupCd"
+              id=""
+              class="flex-1"
+              v-model="forsearchSub"
+              @change="setSubCd">
+              <option value="-1">전체</option>
               <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup">
                 [{{ i.GroupCd }}]{{ i.subGroupNm }}
               </option>
@@ -207,8 +211,8 @@
         </div>
         <div class="ml-10 mt-5 w-full h-[180%]">
           <Realgrid
-            :progname="'MST05_011INS_VUE'"
-            :progid="1"
+            :progname="'MST44_052INS_VUE'"
+            :progid="2"
             :rowData="MenuList"
             @selcetedrowData="selcetedrowData"
             :searchColId="'menuCd,menuNm'"
@@ -232,13 +236,13 @@
               v-model="searchword3" />
           </div>
         </div>
-        <div class="ml-10 mt-5 w-full h-full">
+        <!-- <div class="ml-10 mt-5 w-full h-full">
           <div id="realgrid2" style="width: 100%; height: 90%"></div>
           <div
             id="realgrid3"
             style="width: 100%; height: 90%"
             class="mt-5"></div>
-        </div>
+        </div> -->
       </div>
     </div>
     <div class="grid grid-rows-[2fr,5fr] grid-cols-1 ml-10 w-full h-full z-20">
@@ -307,7 +311,9 @@
             <div
               v-for="(item, index) in items"
               class="screen-muuri-sort-empty flex items-start justify-center !h-32 !w-[213px]"
-              :class="{ ' !border-blue-700': clickedMenuKey == index }"
+              :class="{
+                '!bg-orange-400 !border-blue-700': clickedMenuKey == index,
+              }"
               @click="
                 saveMenuKeyposition(index);
                 clickedMenuKey = index;
@@ -385,8 +391,8 @@ const ScreenKeys = ref([]);
 const currentMenuorTLU = ref(false);
 const searchword1 = ref();
 const searchword3 = ref();
-const forsearchMain = ref("0");
-const forsearchSub = ref("0");
+const forsearchMain = ref(-1);
+const forsearchSub = ref(-1);
 const addscreenKey = ref(false);
 const searchWord = ref("");
 const searchWord2 = ref("");
@@ -466,10 +472,11 @@ const handleStoreCd = async (newValue) => {
   }
   nowStoreCd.value = newValue;
   const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
+  console.log(res2.data.menuList);
   MenuList.value = res2.data.menuList;
   MenuGroup.value = res2.data.menuGroup;
   SubMenuGroup.value = res2.data.submenuGroup;
-
+  console.log(MenuList.value);
   MenuList.value = MenuList.value.map((item) => {
     return {
       ...item,
@@ -506,7 +513,12 @@ const searchMenu = async () => {
   changeMode.value = false;
   Category.value = [];
   items.value = [];
-
+  console.log(
+    nowStoreCd.value,
+    nowStoreAreaCd.value,
+    groupCd.value,
+    posNo.value
+  );
   if (nowStoreCd.value == "0" || nowStoreCd.value == undefined) {
     Swal.fire({
       title: "경고",
@@ -564,19 +576,25 @@ const searchMenu = async () => {
   calculateMaxSubCode();
 };
 const filteredSubMenuGroup = ref([]);
-const setSubCd = () => {
-  console.log(forsearchMain.value);
+const searchValue = ref([]);
+const setSubCd = (e) => {
+  const name = e.target.name;
+  const value = e.target.value;
   console.log(SubMenuGroup.value);
-  filteredSubMenuGroup.value = SubMenuGroup.value.filter(
-    (item) => item.sublngMajor == forsearchMain.value
-  );
-  console.log(filteredSubMenuGroup.value);
-  forsearchSub.value = "0";
-  searchMenuList3();
+  console.log(MenuGroup.value);
+  if (name == "majorGroupCd") {
+    filteredSubMenuGroup.value = SubMenuGroup.value.filter(
+      (item) => item.sublngMajor == value
+    );
+    forsearchSub.value = -1;
+    searchValue.value = [value, forsearchSub.value];
+  } else if (name == "subGroupCd") {
+    searchValue.value = [forsearchMain.value, value];
+  }
 };
-watch(forsearchSub, (newValue) => {
-  searchMenuList3();
-});
+// watch(forsearchSub, (newValue) => {
+//   searchMenuList3();
+// });
 const clickedintScreenNo = ref();
 const calculateMaxSubCode = () => {
   maxSubCode.value = Math.max(
@@ -662,23 +680,21 @@ const onEnd = (evt) => {
       intKeySeq: index + (currmenuKeyPage.value - 1) * 16 + 1, // 배열 순서대로 intKeySeq 재정렬
     }));
   }
-  console.log(clickedintScreenNo.value);
-  console.log(MenuKeyList.value);
-  console.log(currmenuKeyPage.value);
+
   MenuKeyList.value = MenuKeyList.value.filter(
     (item) =>
       item.intScreenNo != clickedintScreenNo.value ||
       item.intKeySeq < (currmenuKeyPage.value - 1) * 16 + 1 ||
       item.intKeySeq > currmenuKeyPage.value * 16
   );
-  console.log(MenuKeyList.value);
+
   items.value.forEach((item) => {
     if (item.lngKeyscrNo != undefined) {
       MenuKeyList.value.push(item);
     }
   });
-  console.log("Items:", items.value);
-  console.log("MenuKeyList:", MenuKeyList.value);
+  clickedMenuKey.value =
+    changeMode.value === false ? targetItemIndex2 : evt.newIndex;
 };
 function formatNumber(value) {
   if (!value) return "";
@@ -803,10 +819,10 @@ const savePosMenu = async () => {
 
   // 빈공간 데이터를 넣으려고하는데 안 들어가고 조회가 안됨 // 빈 칸에 대한 것도 데이터를 불러와야 메뉴키위치를 정할 수 있음.
 };
-let gridView;
-let dataProvider;
+
 const currentSelectedMenuCode = ref("");
 const currentSelectedMenuImgUrl = ref("");
+const currentSelectedMenuPrice = ref("");
 onMounted(() => {
   //showMenuKeys();
 });
@@ -921,56 +937,67 @@ onMounted(() => {
 //   };
 // };
 
-let gridView2;
-let dataProvider2;
 const clickedTLUCD = ref();
 const clickedTLUNM = ref();
 
-const searchMenuList = (e) => {
-  const searchWord1 = e.target.value;
-  searchWord.value = e.target.value;
-  const filteredList = MenuList.value.filter(
-    (item) =>
-      (forsearchMain.value === "0" ||
-        item.majorGroupCd === forsearchMain.value) &&
-      (forsearchSub.value === "0" || item.subGroupCd === forsearchSub.value) &&
-      (item.menuCd.includes(searchWord1) || item.menuNm.includes(searchWord1))
-  );
-  dataProvider.setRows(filteredList);
-};
-const searchMenuList3 = (e) => {
-  if (currentMenuorTLU.value == false) {
-    const filteredList = MenuList.value.filter(
-      (item) =>
-        (forsearchMain.value === "0" ||
-          item.majorGroupCd === forsearchMain.value) &&
-        (forsearchSub.value === "0" ||
-          item.subGroupCd === forsearchSub.value) &&
-        (item.menuCd.includes(searchWord.value) ||
-          item.menuNm.includes(searchWord.value))
-    );
-    dataProvider.setRows(filteredList);
-  } else {
-    const filteredList = TLUList.value.filter(
-      (item) =>
-        item.lngCode.toString().includes(searchWord2.value) ||
-        item.strName.includes(searchWord2.value)
-    );
-    dataProvider2.setRows(filteredList);
+const selcetedrowData = (e) => {
+  if (clickedRealIndex.value == null) {
+    return;
   }
+  console.log(e);
+  currentSelectedMenuNm.value = e[1];
+  currentSelectedMenuCode.value = e[0];
+  currentSelectedMenuPrice.value = e[2];
+  currentSelectedMenuImgUrl.value = e[6];
+
+  addMenuKey();
 };
 
-const searchMenuList2 = (e) => {
-  const searchword2 = e.target.value;
-  searchWord2.value = e.target.value;
-  const filteredList = TLUList.value.filter(
-    (item) =>
-      item.lngCode.toString().includes(searchword2) ||
-      item.strName.includes(searchword2)
-  );
+// const searchMenuList = (e) => {
+//   const searchWord1 = e.target.value;
+//   searchWord.value = e.target.value;
+//   const filteredList = MenuList.value.filter(
+//     (item) =>
+//       (forsearchMain.value === "0" ||
+//         item.majorGroupCd === forsearchMain.value) &&
+//       (forsearchSub.value === "0" || item.subGroupCd === forsearchSub.value) &&
+//       (item.menuCd.includes(searchWord1) || item.menuNm.includes(searchWord1))
+//   );
+//   dataProvider.setRows(filteredList);
+// };
+// const searchMenuList3 = (e) => {
+//   if (currentMenuorTLU.value == false) {
+//     const filteredList = MenuList.value.filter(
+//       (item) =>
+//         (forsearchMain.value === "0" ||
+//           item.majorGroupCd === forsearchMain.value) &&
+//         (forsearchSub.value === "0" ||
+//           item.subGroupCd === forsearchSub.value) &&
+//         (item.menuCd.includes(searchWord.value) ||
+//           item.menuNm.includes(searchWord.value))
+//     );
+//     dataProvider.setRows(filteredList);
+//   } else {
+//     const filteredList = TLUList.value.filter(
+//       (item) =>
+//         item.lngCode.toString().includes(searchWord2.value) ||
+//         item.strName.includes(searchWord2.value)
+//     );
+//     dataProvider2.setRows(filteredList);
+//   }
+// };
 
-  dataProvider2.setRows(filteredList);
-};
+// const searchMenuList2 = (e) => {
+//   const searchword2 = e.target.value;
+//   searchWord2.value = e.target.value;
+//   const filteredList = TLUList.value.filter(
+//     (item) =>
+//       item.lngCode.toString().includes(searchword2) ||
+//       item.strName.includes(searchword2)
+//   );
+
+//   dataProvider2.setRows(filteredList);
+// };
 
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
@@ -1059,7 +1086,9 @@ const confirmaddScreenKey = () => {
     return;
   }
   const newScreenNo =
-    ScreenKeyOrigin.value[ScreenKeyOrigin.value.length - 1].intScreenNo + 1;
+    ScreenKeyOrigin.value[ScreenKeyOrigin.value.length - 1] == undefined
+      ? 1
+      : ScreenKeyOrigin.value[ScreenKeyOrigin.value.length - 1].intScreenNo + 1;
   ScreenKeyOrigin.value.push({
     strScreenName: currentscreenKeyNm.value,
     intScreenNo: newScreenNo,
@@ -1227,14 +1256,12 @@ const clickedScreenKeys = () => {
   clickedScreenOrMenu.value = false;
 };
 const handleinitAll = (newvalue) => {
-  MenuList.value = [];
   MenuGroup.value = [];
   SubMenuGroup.value = [];
   MenuKeyList.value = [];
   ScreenKeyOrigin.value = [];
   TLUList.value = [];
   AllscreenKeyPage.value = "1";
-  MenuList.value = [];
   ScreenKeys.value = [];
   items.value = [];
   forsearchMain.value = "0";

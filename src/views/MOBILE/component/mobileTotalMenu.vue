@@ -10,49 +10,58 @@
         {{ StoreName }}
       </div>
       <div class="h-full w-full border border-gray-200">
-        <button class="h-full w-full flex justify-start items-center ml-[10%]">
+        <button
+          class="h-full w-full flex justify-start items-center ml-[10%]"
+          @click="showHome">
           <font-awesome-icon icon="house" class="size-8" />
-          <div class="text-xl mt-1 ml-[16%]">홈</div>
+          <div class="text-xl mt-1 ml-4">홈</div>
         </button>
       </div>
       <div class="h-full w-full border border-gray-200">
-        <button class="h-full w-full flex justify-start items-center ml-[10%]">
+        <button
+          class="h-full w-full flex justify-start items-center ml-[10%]"
+          @click="showNotice">
           <font-awesome-icon :icon="['far', 'bell']" class="size-8" />
-          <div class="text-xl mt-1 ml-[16%]">공지사항</div>
+          <div class="text-xl mt-1 ml-4">공지사항</div>
         </button>
       </div>
     </div>
-    <ul
-      v-for="(i, index) in menuItems"
-      class="w-64 bg-white h-[10vh] pr-[18vw] rounded-lg flex justify-start items-center flex-col border-b-gray-200 border border-b-1">
-      <li class="h-full w-full">
-        <button
-          class="h-full w-full flex justify-center items-center"
-          @click="toggleSubMenu(index)">
-          <font-awesome-icon
-            :icon="['far', 'calendar-days']"
-            class="size-8"
-            v-if="index == 0" />
-          <font-awesome-icon
-            :icon="['fas', 'truck']"
-            class="size-8"
-            v-if="index == 1" />
-          <div class="text-xl mt-1 ml-10">{{ i.title }}</div>
-        </button>
+    <div
+      class="w-64 bg-white rounded-lg overflow-y-auto mb-14"
+      style="max-height: 80vh">
+      <ul
+        v-for="(i, index) in menuItems"
+        :key="index"
+        class="border-b-2 border-l-2 border-r-2 border-gray-200">
+        <li>
+          <button
+            class="w-full flex justify-start pl-6 items-center py-4 px-4 h-20"
+            @click="toggleSubMenu(index)">
+            <font-awesome-icon
+              :icon="['far', 'calendar-days']"
+              class="size-8"
+              v-if="index == 0" />
+            <font-awesome-icon
+              :icon="['fas', 'truck']"
+              class="size-8"
+              v-if="index == 1" />
+            <div class="text-xl ml-4">{{ i.title }}</div>
+          </button>
 
-        <ul
-          v-if="i.isOpen"
-          class="ml-4 mt-2 w-full bg-white p-2 rounded-md transition-all duration-300 overflow-auto">
-          <li v-for="(subItem, subIndex) in i.children" :key="subIndex">
-            <button
-              class="w-full text-lg px-4 py-2 bg-white rounded-md"
-              @click="moveProgram(subItem.code, subItem.name)">
-              {{ subItem.name }}
-            </button>
-          </li>
-        </ul>
-      </li>
-    </ul>
+          <ul
+            v-if="i.isOpen"
+            class="ml-8 mb-2 bg-white p-2 rounded-md transition-all duration-300">
+            <li v-for="(subItem, subIndex) in i.children" :key="subIndex">
+              <button
+                class="w-full text-lg px-4 py-2 bg-white rounded-md hover:bg-gray-100 flex justify-start"
+                @click="moveProgram(subItem.code, subItem.name)">
+                {{ subItem.name }}
+              </button>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
     <div class="fixed bottom-0 w-64 justify-between flex">
       <div
         class="w-1/2 bg-gray-200 text-gray-600 h-14 flex justify-center items-center">
@@ -96,7 +105,7 @@ const menuItems = ref([
       { code: 20006, name: "시간대별 매출내역" },
       { code: 20007, name: "매장별 매출현황" },
       { code: 20008, name: "실시간 매출현황" },
-      { code: 20009, name: "일자별 매출내역" },
+      { code: 20009, name: "일자별 매출내역2" },
       { code: 20010, name: "매출취소현황" },
       { code: 20011, name: "개점/마감정보" },
       { code: 20012, name: "부가세신고참고자료" },
@@ -144,7 +153,7 @@ const menuItems2 = ref([
       { code: 20006, name: "시간대별 매출내역" },
       { code: 20007, name: "매장별 매출현황" },
       { code: 20008, name: "실시간 매출현황" },
-      { code: 20009, name: "일자별 매출내역" },
+      { code: 20009, name: "일자별 매출내역2" },
       { code: 20010, name: "매출취소현황" },
       { code: 20011, name: "개점/마감정보" },
       { code: 20012, name: "부가세신고참고자료" },
@@ -179,10 +188,11 @@ const toggleSubMenu = (e) => {
 
 const groupMenu = ref([]);
 
-const emit = defineEmits(["MenuState", "SalesMenus"]);
+const emit = defineEmits(["MenuState", "SalesMenus", "showNotice"]);
 watch(
   () => store.state.mobileCategory,
   () => {
+    console.log(store.state.mobileSelectProgName);
     menuItems.value = menuItems2.value.filter(
       (item) =>
         store.state.mobileFunction.some(
@@ -208,7 +218,9 @@ watch(
   { immediate: true } // 새로고침할때 반응해주게 하는 설정
 );
 
-onMounted(() => {});
+onMounted(() => {
+  StoreName.value = store.state.userData.USER_NM;
+});
 
 const route = useRoute();
 watch(route, () => {
@@ -223,11 +235,27 @@ const moveProgram = async (e1, e2) => {
     strUrl: e2,
     lngProgramID: e1,
   });
-  store.state.mobileSelectProgName = e2;
+
+  console.log(e1, e2);
+  //store.state.mobileSelectProgName = e2;
+  store.dispatch("saveMobileProgName", e2);
   router.push(`/m/${e1}`);
 
   emit("MenuState", false);
   store.state.inActiveBackGround = false;
+};
+
+const showHome = () => {
+  router.push(`/m/homepage`);
+  store.state.mobileSelectProgName = "";
+  emit("MenuState", false);
+  store.state.inActiveBackGround = false;
+};
+const showNotice = () => {
+  store.state.mobileSelectProgName = "공지사항";
+  emit("MenuState", false);
+  store.state.inActiveBackGround = false;
+  emit("showNotice", true);
 };
 
 const logout = () => {

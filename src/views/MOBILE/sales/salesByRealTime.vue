@@ -107,7 +107,7 @@ const SEARCHNOW = async (e) => {
       selectStartDate.value,
       selectEndDate.value
     );
-
+    console.log(res);
     rowData.value = res.data.List.map((item) => ({
       ...item,
       TOT_AMT: item.TOT_AMT.toLocaleString(),

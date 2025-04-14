@@ -507,12 +507,6 @@ const searchAmount = async () => {
   }
   store.state.loading = true;
   try {
-    console.log(groupCd.value);
-    console.log(nowStoreCd.value);
-    console.log(nowStoreAreaCd.value);
-    console.log(posNo.value);
-    console.log(currentpaymentCd.value);
-
     const res4 = await getAmountList(
       groupCd.value,
       nowStoreCd.value,
@@ -535,6 +529,7 @@ const searchAmount = async () => {
       };
     });
     rowData.value = AmountList.value;
+
     const res2 = await getAllScreenList(
       groupCd.value,
       nowStoreCd.value,
@@ -588,6 +583,7 @@ const showKeys = (value) => {
   if (clickedintScreenNo.value != value) {
     currmenuKeyPage.value = 1;
   }
+  console.log(value);
   clickedintScreenNo.value = value;
   const thisProduct = ScreenKeyOrigin.value.filter(
     (item) => item.itemDiscYn == 1 && item.intScreenNo == value
@@ -686,6 +682,9 @@ const onEnd = (evt) => {
       KeyList.value.push(item);
     }
   });
+
+  clickedMenuKey.value =
+    changeMode.value == false ? targetItemIndex2 : evt.newIndex;
   console.log("Items:", items.value);
   console.log("KeyList:", KeyList.value);
 };
@@ -748,9 +747,6 @@ const savePosMenu = async () => {
           (item) => item.itemDiscYn
         );
 
-        console.log(screenKeyNoarr.join(","));
-        console.log(screenKeyNamearr.join(","));
-        console.log(currentpaymentCd.value);
         const res = await saveScreenKeys2(
           groupCd.value,
           nowStoreCd.value,
@@ -973,6 +969,7 @@ const addfor4ScreenKey = () => {
       4 * (currentsubPage.value - 1) + 4
     ),
   ];
+  console.log(ScreenKeys.value);
   const validateScreenKeys = ScreenKeys.value.filter(
     (item) => item.intScreenNo != ""
   );
@@ -1028,7 +1025,7 @@ const confirmaddScreenKey = () => {
   console.log(ScreenKeyOrigin.value);
   currentscreenKeyNm.value = "";
   console.log(clickedScreenNo.value);
-  showKeys(clickedScreenNo.value + (currentsubPage.value - 1) * 10);
+  showKeys(clickedScreenNo.value);
 };
 
 const existMenuKey = ref(false);

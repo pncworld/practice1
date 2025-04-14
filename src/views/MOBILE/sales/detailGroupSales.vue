@@ -3,19 +3,21 @@
     <div class="h-[15vh] w-full"></div>
     <div
       class="relative h-[7vh] items-center text-lg font-medium w-full bg-white flex justify-center">
-      <div class="w-2/4 font-semibold">메뉴그룹명</div>
-      <div class="w-1/4 font-semibold">건수</div>
-      <div class="w-1/4 font-semibold">금액</div>
+      <div class="w-4/12 font-semibold justify-start">메뉴그룹명</div>
+      <div class="w-4/12 font-semibold">건수</div>
+      <div class="w-4/12 font-semibold">금액</div>
     </div>
     <div v-for="i in rowData" class="bg-gray-300">
       <div
         :class="i.strMajorGroup.includes('[') ? 'bg-gray-300' : 'bg-blue-50'"
-        class="grid grid-rows-1 grid-cols-[2fr,1fr,1fr] h-[5vh] justify-center items-center font-medium">
-        <div class="flex justify-start ml-[5vw] text-nowrap">
+        class="grid grid-rows-1 grid-cols-[1fr,1fr,1fr] h-[5vh] justify-center items-center font-medium">
+        <div class="flex justify-start pl-[5vw] text-nowrap">
           {{ i.strMajorGroup }}
         </div>
-        <div>{{ i.lngCount }}</div>
-        <div>{{ i.lngAmount }}</div>
+        <div class="text-nowrap flex justify-end">{{ i.lngCount }}</div>
+        <div class="text-nowrap flex justify-end pr-[5vw]">
+          {{ i.lngAmount }}
+        </div>
       </div>
     </div>
   </div>

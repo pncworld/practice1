@@ -10,17 +10,28 @@
     </div>
     <div v-for="i in rowData" class="bg-gray-300">
       <div
-        :class="i.strMenuName.includes('[') ? 'bg-gray-300' : 'bg-blue-50'"
-        class="grid grid-rows-1 grid-cols-[33fr,33fr,17fr,17fr] h-[7vh] justify-center items-center font-medium">
-        <div class="flex justify-start ml-[5vw] flex-col items-start">
+        :class="
+          i.strMenuName.includes('[')
+            ? 'bg-gray-300'
+            : i.strSubGroup.includes('[')
+            ? 'bg-gray-400'
+            : 'bg-blue-50'
+        "
+        class="grid grid-rows-1 grid-cols-[33fr,27fr,10fr,30fr] h-[7vh] justify-center items-center font-medium">
+        <div class="flex justify-start pl-[5vw] flex-col items-start">
           <div class="text-nowrap">{{ i.strMajorGroup }}</div>
           <div class="text-nowrap">{{ i.strSubGroup }}</div>
         </div>
-        <div class="flex justify-start ml-[5vw] text-nowrap">
+        <div
+          class="flex items-center justify-start text-left break-words whitespace-normal w-full h-full">
           {{ i.strMenuName }}
         </div>
-        <div>{{ i.lngCount }}</div>
-        <div>{{ i.lngAmount }}</div>
+        <div class="flex justify-end items-center w-full h-full">
+          {{ i.lngCount }}
+        </div>
+        <div class="flex justify-end items-center w-full h-full pr-[5vw]">
+          {{ i.lngAmount }}
+        </div>
       </div>
     </div>
   </div>

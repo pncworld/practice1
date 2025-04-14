@@ -18,19 +18,19 @@
 
         <div class="grid grid-rows-4 grid-cols-2 gap-2">
           <div class="text-blue-500 flex justify-start">조수/누계</div>
-          <div class="text-nowrap flex justify-end">
+          <div class="text-nowrap flex justify-end pr-[10%]">
             {{ i.lngRecCnt }}&nbsp;/&nbsp;{{ i.lngAccRecCnt }}
           </div>
           <div class="text-blue-500 flex justify-start">객수/누계</div>
-          <div class="text-nowrap flex justify-end">
+          <div class="text-nowrap flex justify-end pr-[10%]">
             {{ i.lngCustCnt }}&nbsp;/&nbsp;{{ i.lngAccCustCnt }}
           </div>
           <div class="text-blue-500 flex justify-start">실매출/실매출누계</div>
-          <div class="text-nowrap flex justify-end">
+          <div class="text-nowrap flex justify-end pr-[10%]">
             {{ i.lngActAmt }}&nbsp;/&nbsp;{{ i.lngAccActAmt }}
           </div>
           <div class="text-blue-500 flex justify-start">객단가/객단가누계</div>
-          <div class="text-nowrap flex justify-end">
+          <div class="text-nowrap flex justify-end pr-[10%]">
             {{ i.lngAvgCustAmt }}&nbsp;/&nbsp;{{ i.lngAvgAccCustAmt }}
           </div>
         </div>
@@ -94,7 +94,7 @@ const SEARCHNOW = async (e) => {
       selectStartDate.value,
       selectEndDate.value
     );
-
+    console.log(res);
     rowData.value = res.data.List.map((item) => ({
       ...item,
       dblDistRate: Math.ceil(item.dblDistRate),

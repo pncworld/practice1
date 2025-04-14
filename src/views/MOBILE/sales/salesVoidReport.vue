@@ -3,17 +3,17 @@
     <div class="h-[15vh] w-full"></div>
     <div
       class="relative h-[7vh] items-center text-lg font-medium w-full bg-white flex justify-center">
-      <div class="w-[50%] font-semibold">취소항목</div>
-      <div class="w-[25%] font-semibold">건수</div>
-      <div class="w-[25%] font-semibold">금액</div>
+      <div class="w-[50%] font-semibold flex justify-start pl-3">취소항목</div>
+      <div class="w-[20%] font-semibold">건수</div>
+      <div class="w-[30%] font-semibold">금액</div>
     </div>
     <div v-for="i in rowData" class="bg-gray-300">
       <div
         :class="i.strVoidName.includes('[') ? 'bg-gray-300' : 'bg-blue-50'"
-        class="grid grid-rows-1 grid-cols-[2fr,1fr,1fr] h-[7vh] justify-center items-center font-medium">
-        <div class="flex justify-start pl-2">{{ i.strVoidName }}</div>
-        <div>{{ i.lngCount }}</div>
-        <div>{{ i.lngAmount }}</div>
+        class="grid grid-rows-1 grid-cols-[2fr,1fr,2fr] h-[7vh] justify-center items-center font-medium">
+        <div class="flex justify-start pl-[10%]">{{ i.strVoidName }}</div>
+        <div class="flex justify-end">{{ i.lngCount }}</div>
+        <div class="flex justify-end pr-[10%]">{{ i.lngAmount }}</div>
       </div>
     </div>
   </div>

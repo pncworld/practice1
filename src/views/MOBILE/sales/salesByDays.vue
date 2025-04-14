@@ -2,7 +2,7 @@
   <div class="h-full w-full" @click="resetScreen">
     <div class="h-[15vh] w-full"></div>
     <div
-      class="relative h-[7vh] text-sm font-medium w-full bg-white grid grid-rows-1 grid-cols-[1fr,1fr,2fr,2fr,1fr] items-center">
+      class="relative h-[7vh] text-sm font-medium w-full bg-white grid grid-rows-1 grid-cols-[1fr,1fr,1.2fr,1.2fr,1fr] items-center">
       <div class="font-semibold text-nowrap">일자</div>
       <div class="font-semibold text-nowrap">객수/조수</div>
       <div class="font-semibold text-nowrap">총매출</div>
@@ -12,12 +12,14 @@
     <div v-for="i in rowData" class="bg-gray-300">
       <div
         :class="i.dtmDate.includes('[') ? 'bg-gray-300' : 'bg-blue-50'"
-        class="grid grid-rows-1 grid-cols-[1fr,1fr,2fr,2fr,1fr] h-[7vh] justify-center items-center font-medium text-xs">
-        <div>{{ i.dtmDate }}</div>
-        <div>{{ i.lngCustCnt }}/{{ i.lngRecCnt }}</div>
-        <div>{{ i.lngSalAmt }}</div>
-        <div>{{ i.lngActAmt }}</div>
-        <div>{{ i.lngDiscountAmt }}</div>
+        class="grid grid-rows-1 grid-cols-[1fr,1fr,1.2fr,1.2fr,1fr] h-[7vh] justify-center items-center font-medium text-xs">
+        <div class="flex justify-start pl-[10%]">{{ i.dtmDate }}</div>
+        <div class="flex justify-center">
+          {{ i.lngCustCnt }}/{{ i.lngRecCnt }}
+        </div>
+        <div class="flex justify-end">{{ i.lngSalAmt }}</div>
+        <div class="flex justify-end">{{ i.lngActAmt }}</div>
+        <div class="flex justify-end pr-[10%]">{{ i.lngDiscountAmt }}</div>
       </div>
     </div>
   </div>

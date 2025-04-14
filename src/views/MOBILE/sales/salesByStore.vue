@@ -12,7 +12,9 @@
         class="grid grid-rows-1 grid-cols-[1fr,1fr] h-[20vh] justify-center items-center font-medium">
         <div
           class="text-nowrap flex flex-col justify-center items-center ml-[5%]">
-          <div class="text-lg">{{ i.STORE_NM }}</div>
+          <div class="text-lg break-words whitespace-normal">
+            {{ i.STORE_NM }}
+          </div>
         </div>
 
         <div class="grid grid-rows-4 grid-cols-2 gap-2 p-1">

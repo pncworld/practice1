@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-screen h-screen flex flex-col justify-center items-center bg-white">
+    class="w-screen h-screen flex flex-col justify-center items-center bg-white absolute">
     <div class="spinner"></div>
     <p class="mt-4 text-xl font-bold">로딩 중</p>
   </div>

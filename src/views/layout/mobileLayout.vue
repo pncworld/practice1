@@ -31,7 +31,7 @@
         ref="scrollArea"
         class="overflow-y-auto">
         <div
-          class="absolute top-[20vh] flex justify-center items-center"
+          class="absolute top-[20vh] left-[35vw] flex justify-center items-center w-auto"
           v-if="blnNoticeList">
           공지사항이 없습니다.
         </div>
@@ -103,6 +103,7 @@
   <MobileTotalMenu
     v-show="showTotalMenu"
     @MenuState="MenuState"
+    @showNotice="showNotice2"
     @SalesMenus="SalesMenus"></MobileTotalMenu>
   <MobileMenu
     ref="stickyElement"
@@ -153,6 +154,11 @@ const MenuState = (e) => {
 };
 const showNotice = (value) => {
   notice.value = value;
+  showDetailNotice.value = false;
+};
+
+const showNotice2 = (e) => {
+  notice.value = e;
   showDetailNotice.value = false;
 };
 const showpersonal = (value) => {
@@ -416,6 +422,8 @@ onMounted(async () => {
     scrollArea.value.addEventListener("scroll", handleScroll2); // 스크롤 컨테이너에 이벤트 등록
     lastScrollY3.value = scrollArea.value.scrollTop;
   }
+
+  store.state.inActiveBackGround = false;
 });
 
 onBeforeUnmount(() => {
@@ -450,9 +458,10 @@ onBeforeUnmount(() => {
 
 const changeIcon = ref(0);
 const movePage = (e, e2) => {
-  console.log(`/m/${e}`);
-  store.state.mobileSelectProgName = e2;
-  changeIcon.value = 4;
+  console.log(e2);
+  //store.state.mobileSelectProgName = e2;
+  store.dispatch("saveMobileProgName", e2);
+  changeIcon.value = 0;
   personal.value = false;
   notice.value = false;
   router.push(`/m/${e}`);

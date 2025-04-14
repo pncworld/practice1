@@ -69,7 +69,11 @@
       <div class="flex mt-[5vh] space-x-5">
         <div class="text-lg font-medium ml-[4vw]">지점명</div>
         <div class="border border-gray-600 w-[70vw]">
-          <select name="" id="" class="w-full h-full" v-model="selectedStoreCd">
+          <select
+            name=""
+            id=""
+            class="w-full h-full"
+            v-model="selectedStoreCd2">
             <option
               :value="{
                 STORE_CD: i.STORE_CD,
@@ -161,6 +165,11 @@ const emit = defineEmits([
 ]);
 const showStoreAndDate = () => {
   show.value = true;
+
+  selectedStoreCd2.value = {
+    STORE_CD: 0,
+    GROUP_CD: store.state.userData.GROUP_CD,
+  };
 };
 onMounted(async () => {
   const res = await getAppStoreList(
@@ -173,6 +182,11 @@ onMounted(async () => {
 
   selectedStoreCd.value = {
     STORE_CD: store.state.userData.STORE_CD,
+    GROUP_CD: store.state.userData.GROUP_CD,
+  };
+
+  selectedStoreCd2.value = {
+    STORE_CD: 0,
     GROUP_CD: store.state.userData.GROUP_CD,
   };
   console.log(selectedStoreCd.value);
@@ -196,16 +210,22 @@ watch(
 );
 
 const selectedStoreCd = ref(0);
+const selectedStoreCd2 = ref(0);
 const sendSearch = () => {
   console.log(selectedStoreCd.value.GROUP_CD);
   emit("startDate", startDate.value);
   emit("endDate", endDate.value);
-  emit("GROUP_CD", selectedStoreCd.value.GROUP_CD);
-  emit("STORE_CD", selectedStoreCd.value.STORE_CD);
+  emit("GROUP_CD", selectedStoreCd2.value.GROUP_CD);
+  emit("STORE_CD", selectedStoreCd2.value.STORE_CD);
+
+  console.log(selectedStoreCd2.value);
+  selectedStoreCd.value = selectedStoreCd2.value;
   emit("SEARCHNOW", true);
 
   const filteredNm = StoreList.value.filter(
-    (item) => item.STORE_CD == selectedStoreCd.value.STORE_CD
+    (item) =>
+      item.STORE_CD == selectedStoreCd.value.STORE_CD &&
+      item.GROUP_CD == selectedStoreCd.value.GROUP_CD
   )[0].STORE_NM;
   selectedStoreName.value = filteredNm;
   show.value = false;

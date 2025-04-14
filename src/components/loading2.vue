@@ -12,7 +12,7 @@ const isLoading = ref(store.state.loading2);
 //
 // 컴포넌트가 마운트될 때 로딩 상태 변경
 watch(
-  () => store.state.isloading2,
+  () => store.state.loading2,
   () => {
     isLoading.value = store.state.loading2;
   }
