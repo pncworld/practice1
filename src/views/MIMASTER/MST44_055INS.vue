@@ -128,8 +128,9 @@
             :rowData="rowData"
             :showGrid="showGrid"
             :showCheckBar="false"
+            :setStateBar="false"
             @selcetedrowData="selcetedrowData"
-            :searchWord="searchword1"
+            :searchWord3="searchword1"
             :searchColId="'lngCode,strName'"></Realgrid>
           <div class="flex justify-start">
             ※ 사용여부가 미사용인 결제코드는 목록에서 노출되지 않습니다.

@@ -2,11 +2,11 @@
   <div class="h-full w-full" @click="resetScreen">
     <div class="h-[15vh] w-full"></div>
     <div
-      class="relative h-[7vh] items-center text-lg font-medium w-full bg-white flex justify-center">
-      <div class="w-[33%] font-semibold text-nowrap">대그룹/서브그룹</div>
-      <div class="w-[33%] font-semibold">메뉴명</div>
-      <div class="w-2/12 font-semibold">건수</div>
-      <div class="w-2/12 font-semibold">금액</div>
+      class="relative h-[7vh] items-center text-sm font-medium w-full bg-white flex justify-center">
+      <div class="w-[22%] font-semibold text-nowrap">대그룹/서브그룹</div>
+      <div class="w-[33%] font-semibold flex justify-end">메뉴명</div>
+      <div class="w-4/12 font-semibold flex justify-end pr-3">건수</div>
+      <div class="w-4/12 font-semibold flex justify-end pr-5">금액</div>
     </div>
     <div v-for="i in rowData" class="bg-gray-300">
       <div

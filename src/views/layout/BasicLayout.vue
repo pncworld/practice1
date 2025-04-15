@@ -249,6 +249,8 @@ const emittab = (e) => {
 };
 const activeTab = (e) => {
   console.log(e);
+  //store.state.activeTab2 = e;
+  store.dispatch("saveActiveTab", e);
   currentActiveTab.value = e;
 };
 
@@ -301,6 +303,7 @@ const setActiveTab = (tab) => {
   // showmenus.value = false ;
   //store.dispatch("changeActiveTab", tab);
   currentActiveTab.value = tab;
+  store.dispatch("saveActiveTab", tab);
   componentKey.value = tab.lngProgramID;
   //isActive(tab);
   router.push({

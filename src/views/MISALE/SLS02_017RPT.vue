@@ -1,6 +1,6 @@
 <template>
   <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-auto">
+    <div class="flex justify-between items-center w-full overflow-y-hidden">
       <div class="flex justify-start w-full pl-12 pt-4">
         <div class="flex justify-start">
           <h1 class="font-bold text-sm md:text-2xl w-full">
@@ -39,7 +39,7 @@
           :placeholderName="'선택'">
         </PickStoreSingle2>
       </div>
-      <div class="-ml-96">
+      <div class="-ml-96 mr-24">
         <label for="bill"
           ><input
             type="checkbox"
@@ -955,9 +955,9 @@ const initGrid = () => {
 const whetherBill = ref(0);
 const checkBill = (e) => {
   if (e.target.checked) {
-    whetherBill.value = 1;
+    whetherBill.value = "1";
   } else {
-    whetherBill.value = 0;
+    whetherBill.value = "0";
   }
 };
 

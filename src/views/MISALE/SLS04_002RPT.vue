@@ -25,6 +25,7 @@
       class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-36 items-center z-10">
       <div class="grid grid-cols-1 grid-rows-4 -space-y-3 mt-12">
         <Datepicker2
+          class="pl-36"
           @endDate="endDate"
           @startDate="startDate"
           :closePopUp="closePopUp"
@@ -57,7 +58,7 @@
           class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 -mt-20 h-8 -space-x-2">
           조회조건 :
           <div>
-            <label for="store" class="font-thin"
+            <label for="store" class="font-normal"
               ><input
                 type="checkbox"
                 id="store"
@@ -66,7 +67,7 @@
             >
           </div>
           <div>
-            <label for="maingroup" class="font-thin"
+            <label for="maingroup" class="font-normal"
               ><input
                 type="checkbox"
                 id="maingroup"
@@ -75,7 +76,7 @@
             >
           </div>
           <div>
-            <label for="subgroup" class="font-thin"
+            <label for="subgroup" class="font-normal"
               ><input
                 type="checkbox"
                 id="subgroup"
@@ -84,7 +85,7 @@
             >
           </div>
           <div>
-            <label for="day" class="font-thin"
+            <label for="day" class="font-normal"
               ><input
                 type="checkbox"
                 id="day"
@@ -93,7 +94,7 @@
             >
           </div>
           <div>
-            <label for="gift" class="font-thin"
+            <label for="gift" class="font-normal"
               ><input
                 type="checkbox"
                 id="gift"
@@ -102,7 +103,7 @@
             >
           </div>
           <div>
-            <label for="exception" class="font-thin"
+            <label for="exception" class="font-normal"
               ><input
                 type="checkbox"
                 id="exception"
@@ -111,7 +112,7 @@
             >
           </div>
           <div>
-            <label for="sum" class="font-thin"
+            <label for="sum" class="font-normal"
               ><input
                 type="checkbox"
                 id="sum"
@@ -120,7 +121,7 @@
             >
           </div>
           <div>
-            <label for="unite" class="font-thin"
+            <label for="unite" class="font-normal"
               ><input
                 type="checkbox"
                 id="unite"
@@ -133,7 +134,7 @@
           class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 !-mt-6 h-8">
           요일조건 :
           <div>
-            <label for="mon" class="font-thin"
+            <label for="mon" class="font-normal"
               ><input
                 type="checkbox"
                 id="mon"
@@ -143,7 +144,7 @@
             >
           </div>
           <div>
-            <label for="tue" class="font-thin"
+            <label for="tue" class="font-normal"
               ><input
                 type="checkbox"
                 id="tue"
@@ -153,7 +154,7 @@
             >
           </div>
           <div>
-            <label for="wed" class="font-thin"
+            <label for="wed" class="font-normal"
               ><input
                 type="checkbox"
                 id="wed"
@@ -163,7 +164,7 @@
             >
           </div>
           <div>
-            <label for="thu" class="font-thin"
+            <label for="thu" class="font-normal"
               ><input
                 type="checkbox"
                 id="thu"
@@ -173,7 +174,7 @@
             >
           </div>
           <div>
-            <label for="fri" class="font-thin"
+            <label for="fri" class="font-normal"
               ><input
                 type="checkbox"
                 id="fri"
@@ -183,7 +184,7 @@
             >
           </div>
           <div>
-            <label for="sat" class="font-thin"
+            <label for="sat" class="font-normal"
               ><input
                 type="checkbox"
                 id="sat"
@@ -193,7 +194,7 @@
             >
           </div>
           <div>
-            <label for="sun" class="font-thin"
+            <label for="sun" class="font-normal"
               ><input
                 type="checkbox"
                 id="sun"

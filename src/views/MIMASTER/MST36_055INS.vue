@@ -62,7 +62,7 @@
         :labelsData="labelsData"
         :showCheckBar="true"
         :notsoftDelete="true"
-        :setAllCheck="setAllCheck"
+        :setAllCheck2="true"
         :deleteRow4="deleteRow4"></Realgrid>
       <div class="flex flex-col justify-center items-center space-y-10">
         <button @click="moveRight">
@@ -86,7 +86,7 @@
         :labelsData="labelsData"
         :showCheckBar="true"
         :notsoftDelete="true"
-        :setAllCheck="setAllCheck2"
+        :setAllCheck2="setAllCheck2"
         :deleteRow4="deleteRow5"></Realgrid>
     </div>
   </div>

@@ -26,6 +26,7 @@ export default createStore({
       StoreToken: "",
       mobileSelectProgName: "",
       moveOtherTab: "",
+      mobileReSearch: false,
     };
   },
   mutations: {
@@ -145,6 +146,9 @@ export default createStore({
     setMobileProgName(state, data) {
       state.mobileSelectProgName = data;
     },
+    setMobileReSearch(state, data) {
+      state.mobileReSearch = data;
+    },
     clearSession(state) {
       (state.userData = []), // 사용자 데이터를 저장할 상태
         (state.selectedCategoryId = ""),
@@ -250,6 +254,9 @@ export default createStore({
     },
     moveOthertab({ commit }, data) {
       commit("setOtherTab", data);
+    },
+    setMobileSearch({ commit }, data) {
+      commit("setMobileReSearch", data);
     },
   },
   getters: {

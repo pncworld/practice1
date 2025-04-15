@@ -198,6 +198,7 @@ onMounted(async () => {
   } catch (error) {}
 
   const data = res.data.List[0];
+  console.log(data);
   lastDaySale.value = formatNumberWithCommas(data.YESTERDAY_SAL);
   todaySale.value = formatNumberWithCommas(data.TODAY_SAL);
   lastWeekSale.value = formatNumberWithCommas(data.LASTWEEK_SAL);
@@ -210,15 +211,15 @@ onMounted(async () => {
     Number(data.TODAY_SAL) - Number(data.YESTERDAY_SAL)
   );
 
-  todaySale2.value = Math.floor(Number(data.TODAY_SAL) / 10000);
-  lastDaySale2.value = Math.floor(Number(data.YESTERDAY_SAL) / 10000);
+  todaySale2.value = Math.round(Number(data.TODAY_SAL) / 10000);
+  lastDaySale2.value = Math.round(Number(data.YESTERDAY_SAL) / 10000);
 
-  MonthSale2.value = Math.floor(Number(data.THISMONTH_SAL) / 10000);
+  MonthSale2.value = Math.round(Number(data.THISMONTH_SAL) / 10000);
 
-  lastMonthSale2.value = Math.floor(Number(data.LASTMONTH_SAL) / 10000);
+  lastMonthSale2.value = Math.round(Number(data.LASTMONTH_SAL) / 10000);
 
-  WeekSale2.value = Math.floor(Number(data.THISWEEK_SAL) / 10000);
-  lastWeekSale2.value = Math.floor(Number(data.LASTWEEK_SAL) / 10000);
+  WeekSale2.value = Math.round(Number(data.THISWEEK_SAL) / 10000);
+  lastWeekSale2.value = Math.round(Number(data.LASTWEEK_SAL) / 10000);
 
   nextsaleH.value = Number(data.TODAY_SAL) / 5000000 + "vh";
   prevsaleH.value = Number(data.YESTERDAY_SAL) / 5000000 + "vh";

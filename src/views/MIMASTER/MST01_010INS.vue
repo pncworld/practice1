@@ -20,8 +20,7 @@
       @update:storeGroup="handleGroupCd"
       @update:storeCd="handleStoreCd"
       @storeNm="handlestoreNm"
-      @GroupNm="handleGroupNm"
-      @update:ischanged="handleinitAll">
+      @GroupNm="handleGroupNm">
     </PickStore>
   </div>
 
@@ -308,6 +307,7 @@ const searchButton = async () => {
 
     afterSearch.value = true;
   } catch (error) {
+    console.log(error);
     afterSearch.value = false;
   } finally {
     initFocus.value = !initFocus.value;

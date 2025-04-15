@@ -3,15 +3,15 @@
     <div class="h-[15vh] w-full"></div>
     <div
       class="relative h-[7vh] items-center text-lg font-medium w-full bg-white flex justify-center">
-      <div class="w-1/3 font-semibold flex justify-start pl-3">세부항목</div>
-      <div class="w-1/3 font-semibold">건수</div>
-      <div class="w-1/3 font-semibold">금액</div>
+      <div class="w-2/5 font-semibold flex justify-start pl-3">세부항목</div>
+      <div class="w-1/5 font-semibold flex justify-end">건수</div>
+      <div class="w-2/5 font-semibold flex justify-end pr-5">금액</div>
     </div>
     <div v-for="i in rowData" class="bg-gray-300">
       <div
         :class="i.strAccName.includes('[') ? 'bg-gray-300' : 'bg-blue-50'"
-        class="grid grid-rows-1 grid-cols-[1fr,1fr,1fr] h-[5vh] justify-center items-center font-medium">
-        <div class="flex justify-start pl-[5vw] text-nowrap">
+        class="grid grid-rows-1 grid-cols-[1fr,0.5fr,1fr] h-[5vh] justify-center items-center font-medium">
+        <div class="flex justify-start pl-[2vw] text-nowrap">
           {{ i.strAccName }}
         </div>
         <div class="flex justify-end text-nowrap">{{ i.lngCount }}</div>

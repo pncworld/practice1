@@ -13,20 +13,20 @@
     </div>
     <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-32 items-center z-10">
       <div class="grid grid-cols-1 grid-rows-3">
-        <Datepicker2 @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker" @excelDate="excelDate"></Datepicker2>
+        <Datepicker2 class="ml-4" @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker" @excelDate="excelDate"></Datepicker2>
         <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 "> 매입사 : 
           <div class="flex ml-7 space-x-3 mt-1">
             <v-select v-model="selectCardCorp" :options="cardCorp" placeholder="전체" label="strBuyName" class="w-48 !h-8 bg-white " clearable="true"/>
           </div>
         </div>
-        <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 ">조회조건 :
+        <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-36 ">조회조건 :
           <div>
-            <label for="accept" class="font-thin">
+            <label for="accept" class="font-normal">
               <input type="radio" id="accept" value="0" v-model="selectedRadioBox" class="ml-5"> 승인
             </label>
           </div>
           <div>
-            <label for="cancel" class="font-thin">
+            <label for="cancel" class="font-normal">
               <input type="radio" id="cancel" value="1" v-model="selectedRadioBox" class="ml-5"> 취소
             </label>
           </div>

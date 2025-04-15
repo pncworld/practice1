@@ -1370,6 +1370,7 @@ const saveButton = async () => {
     return;
   }
   console.log(filteredtableList.value);
+  console.log(tableList.value);
   // if(JSON.stringify(confirmitem.value) === JSON.stringify(updatedList.value) ) {
   //   Swal.fire({
   //     title: '경고',
@@ -1411,44 +1412,40 @@ const saveButton = async () => {
         );
         console.log(res);
         console.log(tableList.value);
-        const intScreenNos = filteredtableList.value.map(
-          (item) => item.intScreenNo
-        );
-        const ids = filteredtableList.value.map((item) =>
+        const intScreenNos = tableList.value.map((item) => item.intScreenNo);
+        const ids = tableList.value.map((item) =>
           typeof item.lngKeyscrNo == "string" ? 0 : item.lngKeyscrNo
         );
-        const lngKeyColors = filteredtableList.value.map(
-          (item) => item.lngKeyColor
-        );
-        const lngShapes = filteredtableList.value.map((item) => item.lngShape);
-        const strNames = filteredtableList.value.map((item) => item.strName);
-        const lngCounts = filteredtableList.value.map((item) => item.lngCount);
-        const xs = filteredtableList.value.map((item) => {
+        const lngKeyColors = tableList.value.map((item) => item.lngKeyColor);
+        const lngShapes = tableList.value.map((item) => item.lngShape);
+        const strNames = tableList.value.map((item) => item.strName);
+        const lngCounts = tableList.value.map((item) => item.lngCount);
+        const xs = tableList.value.map((item) => {
           return item.x !== undefined && item.x !== null
             ? item.x * 125
             : item.lngX; // x가 없으면 lngX를 사용
         });
-        const ys = filteredtableList.value.map((item) => {
+        const ys = tableList.value.map((item) => {
           return item.y !== undefined && item.y !== null
             ? item.y * 125
             : item.lngY; // x가 없으면 lngX를 사용
         });
-        const ws = filteredtableList.value.map((item) => {
+        const ws = tableList.value.map((item) => {
           return item.w !== undefined && item.w !== null
             ? item.w * 120
             : item.lngWidth; // x가 없으면 lngX를 사용
         });
 
-        const hs = filteredtableList.value.map((item) => {
+        const hs = tableList.value.map((item) => {
           return item.h !== undefined && item.h !== null
             ? item.h * 120
             : item.lngHeight; // x가 없으면 lngX를 사용
         });
 
-        const newtableNm = filteredtableList.value
+        const newtableNm = tableList.value
           .filter((item) => item.lngKeyscrNo.toString().includes("new"))
           .map((item) => item.strName);
-        const newtableCount = filteredtableList.value
+        const newtableCount = tableList.value
           .filter((item) => item.lngKeyscrNo.toString().includes("new"))
           .map((item) => item.lngCount);
 

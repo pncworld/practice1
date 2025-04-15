@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-center w-full overflow-y-auto">
+  <div class="flex justify-between items-center w-full overflow-y-hidden">
     <div class="flex justify-start w-full pl-12 pt-4">
       <div class="flex justify-start">
         <h1 class="font-bold text-sm md:text-2xl w-full">월별 매출 현황.</h1>
@@ -18,16 +18,17 @@
     class="grid grid-cols-[15fr,1fr,15fr] grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
     <div class="grid grid-cols-1 grid-rows-2">
       <Datepicker3
+        class="pl-2"
         @endMonth="endMonth"
         @endYear="endYear"
         @startMonth="startMonth"
         @startYear="startYear"
         @excelDate="excelDate"></Datepicker3>
       <div
-        class="flex justify-start items-center text-base text-nowrap font-semibold ml-24 mt-3">
+        class="flex items-center text-base text-nowrap font-semibold pl-32 mt-3">
         조회조건 :
         <div>
-          <label for="sum" class="font-thin"
+          <label for="sum" class="font-normal"
             ><input
               type="checkbox"
               id="sum"

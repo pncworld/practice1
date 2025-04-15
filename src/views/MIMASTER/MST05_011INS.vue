@@ -228,6 +228,7 @@
             :searchColId="'menuCd,menuNm'"
             :searchColId3="['majorGroupCd', 'subGroupCd']"
             :searchValue="searchValue"
+            @realgridname="realgridname3"
             :searchWord3="searchword1"></Realgrid>
         </div>
       </div>
@@ -487,6 +488,10 @@ const realgrid3Name = ref("");
 const realgridname2 = (e) => {
   realgrid3Name.value = e;
 };
+const realgrid4Name = ref("");
+const realgridname3 = (e) => {
+  realgrid4Name.value = e;
+};
 
 watch(currentMenu, () => {
   const reagrid2 = document.getElementById(realgrid2Name.value);
@@ -499,6 +504,12 @@ watch(currentMenu, () => {
   setTimeout(() => {
     RealGrid.getGridInstance(realgrid3).resetSize();
     RealGrid.getGridInstance(realgrid3).refresh(true);
+  }, 100);
+
+  const realgrid4 = document.getElementById(realgrid4Name.value);
+  setTimeout(() => {
+    RealGrid.getGridInstance(realgrid4).resetSize();
+    RealGrid.getGridInstance(realgrid4).refresh(true);
   }, 100);
 });
 
@@ -653,7 +664,7 @@ const searchButton = async () => {
   calculateMaxSubCode();
 };
 const filteredSubMenuGroup = ref([]);
-const searchValue = ref([]);
+const searchValue = ref([-1, -1]);
 const setSubCd = (e) => {
   const name = e.target.name;
   const value = e.target.value;
@@ -815,35 +826,11 @@ const onEnd2 = (evt) => {
   showMenuKey(clickedScreenKeyIndex.value + 1);
 };
 watch(items, (newvalue) => {
-  // console.log(newvalue);
-  // newvalue.forEach((item, index) => {
-  //   if (item == null || item.lngKeyscrNo == null || item.lngKeyscrNo == "") {
-  //     newvalue[index] = {
-  //       intKeySeq: index + (currmenuKeyPage.value - 1) * 30 + 1,
-  //     };
-  //   } else {
-  //     item.intKeySeq = index + (currmenuKeyPage.value - 1) * 30 + 1;
-  //   }
-  // });
-
   items.value.forEach((item, index) => {
-    item.intKeySeq = index + (currmenuKeyPage.value - 1) * 30 + 1;
+    if (item) {
+      item.intKeySeq = index + (currmenuKeyPage.value - 1) * 30 + 1;
+    }
   });
-  // items.value.forEach((item, index) => {
-  //   if (item.lngKeyscrNo == null || item.lngKeyscrNo == undefined) {
-  //     const a = MenuKeyList.value.find(
-  //       (item2) =>
-  //         item2.intKeySeq == item.intKeySeq + (currmenuKeyPage.value - 1) * 30
-  //     );
-  //     a.intKeySeq = (index+1) + (currmenuKeyPage.value - 1) * 30;
-
-  //   } else {
-
-  //   }
-
-  // });
-  console.log(items.value);
-  console.log(MenuKeyList.value);
 });
 const savePosMenu = async () => {
   console.log(MenuKeyList.value);

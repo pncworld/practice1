@@ -193,7 +193,12 @@ const getPosNo = async () => {
 };
 const posNo = ref(0);
 const areaCd = ref(0);
-const getAreaCd = async () => {
+const getAreaCd = async (e) => {
+  if (e.target.value == 0) {
+    areaCd.value = [];
+    lngAreaCd.value = 0;
+    return;
+  }
   const response = await getAreaList(groupCd.value, storeCd.value, posNo.value);
   areaCd.value = response.data.area;
   lngAreaCd.value = 0;
@@ -229,7 +234,7 @@ const searchButton = async () => {
     afterSearch.value = false;
   } finally {
     store.state.loading = false;
-    areaCd.value = [];
+    //areaCd.value = [];
   }
 };
 const initGrid = () => {

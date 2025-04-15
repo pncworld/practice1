@@ -322,7 +322,7 @@
               :deleteRow="deleterow2"
               :searchColId="'lngCode,strName'"
               :searchWord3="searchword2"
-              :changeRow="changeRow"
+              :changeRow="changeRow2"
               :changeValue2="changeValue2"
               :changeNow="changeNow2"
               :changeColid="changeColid"
@@ -429,6 +429,7 @@
               class="mt-5"
               :dragOn="true"
               @updatedRowData="updatedRowData"
+              @selectedIndex2="selectedIndex4"
               :notsoftDelete="true"
               @realgridname="realgridname3"
               :deleteRow="deleterow3"
@@ -491,6 +492,7 @@
               :rowData="filteredrowData4"
               @updatedRowData="updatedRowData2"
               @realgridname="realgridname4"
+              @selectedIndex2="selectedIndex3"
               :initSelect="initSelect"
               class="mt-5"
               :dragOn="true"
@@ -512,7 +514,7 @@ import {
   saveOptions,
   saveOptions2,
 } from "@/api/master";
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 import PickStore from "@/components/pickStore.vue";
@@ -730,6 +732,9 @@ const clickedRowData3 = (newValue) => {
 };
 const clickedRowData4 = (newValue) => {
   selectedaddMenu2.value = newValue;
+};
+const clickedRowData5 = (newValue) => {
+  console.log(newValue);
 };
 const searchWord3 = (e) => {
   searchword3.value = e.target.value;
@@ -1241,41 +1246,41 @@ const changeOptionManage2 = (e) => {
   changeNow2.value = !changeNow2.value;
 };
 
-const changeOptionManage3 = (e) => {
-  const confirmdata = e.target.value.replace(/[^0-9]/g, "");
-  const change = rowData1.value.find(
-    (item, index) => index == selectedindex.value
-  );
+// const changeOptionManage3 = (e) => {
+//   const confirmdata = e.target.value.replace(/[^0-9]/g, "");
+//   const change = rowData1.value.find(
+//     (item, index) => index == selectedindex.value
+//   );
 
-  if (change) {
-    change.intMultiple = confirmdata;
-  }
-  rowData1.value = [...rowData1.value];
-};
-const changeOptionManage4 = (e) => {
-  console.log(rowData1.value);
-  const confirmdata = e.target.value.replace(/[^0-9]/g, "");
-  const duplicate = rowData1.value.find((item) => item.lngCode == confirmdata);
-  if (duplicate) {
-    Swal.fire({
-      title: "중복된 옵션코드",
-      text: "이미 존재하는 코드입니다.",
-      icon: "error",
-      confirmButtonText: "확인",
-    });
-    optionCd.value = "";
-    return;
-  }
-  const change = rowData1.value.find(
-    (item, index) => index == selectedindex.value
-  );
-  if (change) {
-    change.lngCode = confirmdata;
-  }
-  rowData1.value = [...rowData1.value];
-  // optionCd.value = e.target.value
-  // console.log(optionCd.value)
-};
+//   if (change) {
+//     change.intMultiple = confirmdata;
+//   }
+//   rowData1.value = [...rowData1.value];
+// };
+// const changeOptionManage4 = (e) => {
+//   console.log(rowData1.value);
+//   const confirmdata = e.target.value.replace(/[^0-9]/g, "");
+//   const duplicate = rowData1.value.find((item) => item.lngCode == confirmdata);
+//   if (duplicate) {
+//     Swal.fire({
+//       title: "중복된 옵션코드",
+//       text: "이미 존재하는 코드입니다.",
+//       icon: "error",
+//       confirmButtonText: "확인",
+//     });
+//     optionCd.value = "";
+//     return;
+//   }
+//   const change = rowData1.value.find(
+//     (item, index) => index == selectedindex.value
+//   );
+//   if (change) {
+//     change.lngCode = confirmdata;
+//   }
+//   rowData1.value = [...rowData1.value];
+//   // optionCd.value = e.target.value
+//   // console.log(optionCd.value)
+// };
 
 const searchOption = (e) => {
   searchword1.value = e.target.value;
@@ -1284,44 +1289,284 @@ const searchOption2 = (e) => {
   searchword2.value = e.target.value;
 };
 const deleteAll1 = ref(false);
-const deleteAll = () => {
-  deleteAll1.value = !deleteAll1.value;
+const deleteAll = async () => {
+  changeColid.value = "lngChainMenu1";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu2";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu3";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu4";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu5";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu6";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu7";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu8";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu9";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu10";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu11";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu12";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu13";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu14";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu15";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+  changeColid.value = "lngChainMenu16";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu17";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu18";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu19";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu20";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainMenu21";
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
 };
 const deleteAll2 = ref(false);
-const deleteAlls = () => {
-  deleteAll2.value = !deleteAll2.value;
+const deleteAlls = async () => {
+  changeColid.value = "lngChainGroup1";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup2";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup3";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup4";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup5";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup6";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup7";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup8";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup9";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup10";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup11";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup12";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup13";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup14";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup15";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup16";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup17";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+  changeColid.value = "lngChainGroup18";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup19";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
+
+  changeColid.value = "lngChainGroup20";
+  changeValue.value = 0;
+  changeNow2.value = !changeNow2.value;
+
+  await nextTick();
 };
-const updateOptionNm = (e) => {
-  const confirmdata = e.target.value;
-  const change = rowData3.value.find(
-    (item, index) => index == selectedindex2.value
-  );
-  if (change) {
-    change.strName = confirmdata;
-  }
-  rowData3.value = [...rowData3.value];
-};
-const changeOptionGroupCd = (e) => {
-  const Nm = e.target.value;
-  const dupli = rowData3.value.find((item) => item.lngCode == Nm);
-  if (dupli) {
-    Swal.fire({
-      title: "중복된 옵션 그룹코드",
-      text: "이미 존재하는 코드입니다.",
-      icon: "error",
-      confirmButtonText: "확인",
-    });
-    optionGroupCd.value = "";
-    return;
-  }
-  const change = rowData3.value.find(
-    (item, index) => index == selectedindex2.value
-  );
-  if (change) {
-    change.lngCode = Nm;
-  }
-  rowData3.value = [...rowData3.value];
-};
+// const updateOptionNm = (e) => {
+//   const confirmdata = e.target.value;
+//   const change = rowData3.value.find(
+//     (item, index) => index == selectedindex2.value
+//   );
+//   if (change) {
+//     change.strName = confirmdata;
+//   }
+//   rowData3.value = [...rowData3.value];
+// };
+// const changeOptionGroupCd = (e) => {
+//   const Nm = e.target.value;
+//   const dupli = rowData3.value.find((item) => item.lngCode == Nm);
+//   if (dupli) {
+//     Swal.fire({
+//       title: "중복된 옵션 그룹코드",
+//       text: "이미 존재하는 코드입니다.",
+//       icon: "error",
+//       confirmButtonText: "확인",
+//     });
+//     optionGroupCd.value = "";
+//     return;
+//   }
+//   const change = rowData3.value.find(
+//     (item, index) => index == selectedindex2.value
+//   );
+//   if (change) {
+//     change.lngCode = Nm;
+//   }
+//   rowData3.value = [...rowData3.value];
+// };
 const addrow1 = ref(false);
 const addrow2 = ref(false);
 const addrow3 = ref(false);
@@ -1348,16 +1593,16 @@ const addRowData1 = () => {
   clickrowData1.value = true;
   addrow1.value = !addrow1.value;
 };
-const addRowData2 = () => {
-  if (afterSearch.value == false) {
-    Swal.fire({
-      title: "조회를 먼저 해주세요.",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  addrow4.value = !addrow4.value;
-};
+// const addRowData2 = () => {
+//   if (afterSearch.value == false) {
+//     Swal.fire({
+//       title: "조회를 먼저 해주세요.",
+//       confirmButtonText: "확인",
+//     });
+//     return;
+//   }
+//   addrow4.value = !addrow4.value;
+// };
 const addRowData3 = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -1419,7 +1664,12 @@ const deleteRowData2 = () => {
     });
     return;
   }
-  deleterow3.value = !deleterow3.value;
+
+  changeColid.value = "lngChainMenu" + (changeRow2.value + 1);
+  changeValue.value = 0;
+  changeNow.value = !changeNow.value;
+  //changeNow
+  //deleterow3.value = !deleterow3.value;
 };
 const deleteRowData4 = () => {
   if (afterSearch.value == false) {
@@ -1429,7 +1679,10 @@ const deleteRowData4 = () => {
     });
     return;
   }
-  deleterow4.value = !deleterow4.value;
+
+  changeColid.value = "lngChainGroup" + (changeRow3.value + 1);
+  changeValue2.value = 0;
+  changeNow2.value = !changeNow2.value;
 };
 
 const addMenus = () => {
@@ -1510,7 +1763,8 @@ const dblclickedRowData = (newValue) => {
   );
   for (let i = 1; i <= 21; i++) {
     const key = `lngChainMenu${i}`;
-    if (a[key] === "0" || a[key] === undefined) {
+    console.log(a[key]);
+    if (a[key] == "0" || a[key] === undefined) {
       changeColid.value = key;
       break; // 첫 번째로 조건 맞는 값만 처리할 경우
     }
@@ -1619,9 +1873,18 @@ const selectedIndex = (newValue) => {
   console.log(selectedindex.value);
 };
 const selectedIndex2 = (newValue) => {
-  changeRow.value = newValue;
+  changeRow2.value = newValue;
   selectedindex2.value = newValue;
-  console.log(selectedindex2.value);
+  //console.log(selectedindex2.value);
+};
+
+const changeRow2 = ref();
+const selectedIndex4 = (newValue) => {
+  changeRow2.value = newValue;
+};
+const changeRow3 = ref();
+const selectedIndex3 = (newValue) => {
+  changeRow3.value = newValue;
 };
 const handleinitAll = (newvalue) => {
   MenuGroup.value = [];

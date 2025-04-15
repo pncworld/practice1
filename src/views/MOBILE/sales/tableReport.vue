@@ -101,6 +101,28 @@ onMounted(async () => {
 
 const rowData = ref([]);
 
+watch(
+  () => store.state.mobileReSearch,
+  async () => {
+    try {
+      store.state.loading2 = true;
+      const res = await getMobileSeatInfo(
+        selectGroupCd.value,
+        selectStoreCd.value.STORE_CD,
+        store.state.userData.USER_NO,
+        selectSeat.value
+      );
+
+      rowData.value = res.data.List.map((item) => ({
+        ...item,
+        SEAT_CNT: item.SEAT_CNT.toLocaleString(),
+      }));
+    } catch (error) {
+    } finally {
+      store.state.loading2 = false;
+    }
+  }
+);
 watch([selectStoreCd, selectSeat], async () => {
   try {
     store.state.loading2 = true;

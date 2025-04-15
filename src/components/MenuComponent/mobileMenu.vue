@@ -85,6 +85,7 @@ import router from "@/router";
 import store from "@/store";
 import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import { useStore } from "vuex";
 
 const showTotalMenu = () => {
   showMenu3.value = !showMenu3.value;
@@ -172,6 +173,10 @@ const props = defineProps({
     type: String,
     default: "0",
   },
+  changeSalesIconState: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 watch(
@@ -190,6 +195,12 @@ watch(
   () => {
     showMenu3.value = props.changeMenuState;
     clickIcon.value = 0;
+  }
+);
+watch(
+  () => props.changeSalesIconState,
+  () => {
+    personal.value = false;
   }
 );
 
@@ -230,7 +241,16 @@ const showHomePage = () => {
   router.push("/m/homePage");
 };
 
+const reSearch = ref(false);
+const store2 = useStore();
 const reload = () => {
+  console.log(route.path);
+  if (route.path === "/m/20013") {
+    reSearch.value = !reSearch.value;
+    store2.state.mobileReSearch = reSearch.value;
+    // store.state.mobileReSearch = !reSearch.value;
+    return;
+  }
   window.location.reload();
 };
 

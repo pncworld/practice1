@@ -576,7 +576,7 @@ const searchMenu = async () => {
   calculateMaxSubCode();
 };
 const filteredSubMenuGroup = ref([]);
-const searchValue = ref([]);
+const searchValue = ref([-1, -1]);
 const setSubCd = (e) => {
   const name = e.target.name;
   const value = e.target.value;
@@ -592,9 +592,9 @@ const setSubCd = (e) => {
     searchValue.value = [forsearchMain.value, value];
   }
 };
-// watch(forsearchSub, (newValue) => {
-//   searchMenuList3();
-// });
+const searchMenuList = (e) => {
+  searchword1.value = e.target.value;
+};
 const clickedintScreenNo = ref();
 const calculateMaxSubCode = () => {
   maxSubCode.value = Math.max(

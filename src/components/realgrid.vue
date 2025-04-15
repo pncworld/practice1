@@ -1070,29 +1070,31 @@ const funcshowGrid = async () => {
       if (props.setGroupFooterExpressions[i] != "custom") {
         continue;
       }
-      gridView.columnByField(
-        props.setGroupFooterColID[i]
-      ).groupFooter.valueCallback = function (
-        grid,
-        cell,
-        footerIndex,
-        footerModel,
-        value
-      ) {
-        if (props.setGroupSumCustomLevel == 1) {
-          if (props.setGroupFooterColID[i] == "dtmDate") {
-            return formatLocalDate(
-              dataProvider.getValue(footerModel.firstItem.dataRow, "dtmDate")
+      if (gridView.columnByField(props.setGroupFooterColID[i])) {
+        gridView.columnByField(
+          props.setGroupFooterColID[i]
+        ).groupFooter.valueCallback = function (
+          grid,
+          cell,
+          footerIndex,
+          footerModel,
+          value
+        ) {
+          if (props.setGroupSumCustomLevel == 1) {
+            if (props.setGroupFooterColID[i] == "dtmDate") {
+              return formatLocalDate(
+                dataProvider.getValue(footerModel.firstItem.dataRow, "dtmDate")
+              );
+            }
+            return dataProvider.getValue(
+              footerModel.firstItem.dataRow,
+              props.setGroupFooterColID[i]
             );
+          } else if (props.setGroupSumCustomLevel == 2) {
+            return "";
           }
-          return dataProvider.getValue(
-            footerModel.firstItem.dataRow,
-            props.setGroupFooterColID[i]
-          );
-        } else if (props.setGroupSumCustomLevel == 2) {
-          return "";
-        }
-      };
+        };
+      }
     }
   }
 
@@ -1301,7 +1303,9 @@ const funcshowGrid = async () => {
 
   if (props.suffixColumnPercent != []) {
     for (let i = 0; i < props.suffixColumnPercent.length; i++) {
-      gridView.columnByName(props.suffixColumnPercent[i]).suffix = "%";
+      if (gridView.columnByName(props.suffixColumnPercent[i])) {
+        gridView.columnByName(props.suffixColumnPercent[i]).suffix = "%";
+      }
     }
   }
   if (props.suffixColumnJul != []) {
@@ -1315,7 +1319,9 @@ const funcshowGrid = async () => {
     }
   }
   if (props.hideColumnNow == true) {
-    gridView.columnByField(props.hideColumn).visible = false;
+    if (gridView.columnByField(props.hideColumn)) {
+      gridView.columnByField(props.hideColumn).visible = false;
+    }
   }
 
   if (props.hideColumnsId != []) {
@@ -1409,23 +1415,20 @@ const funcshowGrid = async () => {
     emit("checkedRowData", selectedRowData.value);
   };
   gridView.onItemAllChecked = (grid, checked) => {
+    console.log("전체체크");
     selectedRowData.value = gridView
       .getCheckedItems()
       .map((index) => dataProvider.getRows()[index]);
     emit("selcetedrowData", selectedRowData.value);
-
     var rows = gridView.getCheckedRows();
     selectedRowData.value = [];
     for (var i in rows) {
       var data = dataProvider.getJsonRow(rows[i]);
       selectedRowData.value.push(data);
     }
-
     emit("checkedRowData", selectedRowData.value);
-
-    updatedrowData.value = [...dataProvider.getJsonRows()];
-
-    emit("updatedRowData", updatedrowData.value);
+    // updatedrowData.value = [...dataProvider.getJsonRows()];
+    // emit("updatedRowData", updatedrowData.value);
   };
 
   dataProvider.onDataChanged = function (provider) {

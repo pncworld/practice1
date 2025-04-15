@@ -36,20 +36,20 @@
           공지사항이 없습니다.
         </div>
 
-        <div class="p-4 space-y-4" v-if="!blnNoticeList">
+        <div class="p-2 space-y-2" v-if="!blnNoticeList">
           <div
             v-for="I in notices"
             @click="showNoticeDetail(I.NOTICE_ID)"
-            class="bg-white shadow-md rounded-2xl p-4 border border-gray-100">
+            :class="I.READ_YN == 1 ? 'opacity-50' : ''"
+            class="bg-white shadow-md rounded-2xl p-2 border border-gray-100">
             <h5
-              class="text-lg text-gray-800 mb-2 text-left flex justify-between">
-              <div>{{ I.NOTICE_ID }}</div>
+              class="text-lg text-gray-800 mb-2 text-left flex justify-between"></h5>
+            <h2
+              class="text-lg font-semibold text-gray-800 mb-2 flex justify-center">
               <div class="bg-red-600 text-white rounded-lg">
                 {{ I.IMPORTANT_YN == "1" ? "중요" : "" }}
               </div>
-            </h5>
-            <h2 class="text-lg font-semibold text-gray-800 mb-2">
-              {{ I.TITLE_NM }}
+              <div>{{ I.TITLE_NM }}</div>
             </h2>
             <p class="text-sm text-gray-600 line-clamp-2 text-right">
               작성자 : {{ I.WRITER_NM }}
@@ -85,17 +85,20 @@
         <div
           class="text-sm text-gray-500 mb-6 flex flex-col space-y-1 text-left pl-5">
           <div><strong>작성자:</strong> {{ DetailNotice.WRITER_NM }}</div>
-          <div>
+          <div class="flex w-full items-center">
             <strong>작성일:</strong> {{ DetailNotice.WRITE_DT }}
             <span class="mx-2">|</span>
             <strong>조회수:</strong> {{ DetailNotice.READ_CNT }}
+            <button class="text-blue-500 ml-auto mr-5" @click="downloadFile">
+              첨부파일({{ downloadFileLeng }})
+            </button>
           </div>
         </div>
 
         <!-- 본문 -->
         <div
           class="bg-white rounded-xl shadow-sm text-gray-800 whitespace-pre-line h-full w-full min-h-[500px]">
-          <div v-html="DetailNotice.NOTICE_CT" class="h-full"></div>
+          <div v-html="DetailNotice.NOTICE_CT" class="h-full text-left"></div>
         </div>
       </div>
     </div>
@@ -115,8 +118,10 @@
     @changeIconValue="changeIconValue"
     @searchword="searchword"
     @searchNow="searchNow"
+    @reSearch="reSearch"
     @click.stop
     :changeIcon="changeIcon"
+    :changeSalesIconState="changeSalesIconState"
     :changeMenuState="showTotalMenu"
     :changeBottomMenu="changeBottomMenu"
     :class="{ hidden: !isStickyVisible }"></MobileMenu>
@@ -152,9 +157,28 @@ const MenuState = (e) => {
   notice.value = e;
   personal.value = e;
 };
-const showNotice = (value) => {
+const showNotice = async (value) => {
   notice.value = value;
   showDetailNotice.value = false;
+
+  pageIndex.value = 0;
+  const res = await getNoticeList(
+    store.state.userData.GROUP_CD,
+    store.state.userData.STORE_CD,
+    store.state.userData.USER_NO,
+    pageIndex.value,
+    pageIndex2.value,
+    0,
+    ""
+  );
+
+  console.log(res);
+  if (res.data.List.length == 0) {
+    blnNoticeList.value = true;
+  } else {
+    blnNoticeList.value = false;
+  }
+  notices.value = res.data.List;
 };
 
 const showNotice2 = (e) => {
@@ -245,6 +269,9 @@ const pageIndex = ref(0);
 const pageIndex2 = ref(15);
 const DetailNotice = ref([]);
 const showDetailNotice = ref(false);
+const downloadFileUrl = ref("");
+const downloadFileName = ref("");
+const downloadFileLeng = ref(0);
 const showNoticeDetail = async (e) => {
   showDetailNotice.value = true;
   changeIcon.value = 4;
@@ -256,10 +283,38 @@ const showNoticeDetail = async (e) => {
     e
   );
   DetailNotice.value = res.data.List[0];
-  console.log(DetailNotice.value);
+  if (res.data.List2.length > 0) {
+    downloadFileLeng.value = res.data.List2.length;
+    downloadFileUrl.value = res.data.List2[0].FILE_URL;
+    downloadFileName.value = res.data.List2[0].FILE_NM;
+  } else {
+    downloadFileLeng.value = 0;
+    downloadFileUrl.value = "";
+    downloadFileName.value = "";
+  }
+
+  console.log(res);
   scrollContainer3.value.scrollTop = 0;
 };
 
+const downloadFile = async () => {
+  if (downloadFileLeng.value > 0) {
+    const response = await fetch(downloadFileUrl.value, {
+      method: "GET",
+      // headers: { Authorization: 'Bearer xxx' } // 필요하면 추가
+    });
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = downloadFileName.value;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(blobUrl);
+  }
+};
 const categories = ref([]);
 const selectedCategoryId = computed(() => store.state.selectedCategoryId);
 
@@ -456,6 +511,7 @@ onBeforeUnmount(() => {
 //   });
 // });
 
+const changeSalesIconState = ref(true);
 const changeIcon = ref(0);
 const movePage = (e, e2) => {
   console.log(e2);
@@ -463,6 +519,7 @@ const movePage = (e, e2) => {
   store.dispatch("saveMobileProgName", e2);
   changeIcon.value = 0;
   personal.value = false;
+  changeSalesIconState.value = !changeSalesIconState.value;
   notice.value = false;
   router.push(`/m/${e}`);
 };

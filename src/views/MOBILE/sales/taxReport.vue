@@ -3,10 +3,10 @@
     <div class="h-[15vh] w-full"></div>
     <div
       class="relative h-[7vh] items-center text-lg font-medium w-full bg-white flex justify-center">
-      <div class="w-[25%] font-semibold text-nowrap">조회월</div>
-      <div class="w-[25%] font-semibold">매입사</div>
-      <div class="w-[25%] font-semibold">건수</div>
-      <div class="w-[25%] font-semibold">금액</div>
+      <div class="w-[20%] font-semibold text-nowrap">조회월</div>
+      <div class="w-[20%] font-semibold">매입사</div>
+      <div class="w-[25%] font-semibold flex justify-end">건수</div>
+      <div class="w-[30%] font-semibold flex justify-end">금액</div>
     </div>
     <div v-for="i in rowData" class="bg-gray-300">
       <div

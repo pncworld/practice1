@@ -248,6 +248,7 @@
             :progid="1"
             :rowData="MenuList"
             @selcetedrowData="selcetedrowData"
+            @realgridname="realgridname3"
             :searchColId="'menuCd,menuNm'"
             :searchColId3="['majorGroupCd', 'subGroupCd']"
             :searchValue="searchValue"
@@ -473,6 +474,10 @@ const realgrid3Name = ref("");
 const realgridname2 = (e) => {
   realgrid3Name.value = e;
 };
+const realgrid4Name = ref("");
+const realgridname3 = (e) => {
+  realgrid4Name.value = e;
+};
 
 watch(currentMenu, () => {
   const reagrid2 = document.getElementById(realgrid2Name.value);
@@ -485,6 +490,12 @@ watch(currentMenu, () => {
   setTimeout(() => {
     RealGrid.getGridInstance(realgrid3).resetSize();
     RealGrid.getGridInstance(realgrid3).refresh(true);
+  }, 100);
+
+  const realgrid4 = document.getElementById(realgrid4Name.value);
+  setTimeout(() => {
+    RealGrid.getGridInstance(realgrid4).resetSize();
+    RealGrid.getGridInstance(realgrid4).refresh(true);
   }, 100);
 });
 const currentSelectedMenuCode = ref();
@@ -775,7 +786,7 @@ const searchMenu = async () => {
   calculateMaxSubCode();
 };
 const filteredSubMenuGroup = ref([]);
-const searchValue = ref([]);
+const searchValue = ref([-1, -1]);
 const setSubCd = (e) => {
   const name = e.target.name;
   const value = e.target.value;

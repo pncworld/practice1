@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-center w-full overflow-y-auto">
+  <div class="flex justify-between items-center w-full overflow-y-hidden">
     <div class="flex justify-start w-full pl-12 pt-4">
       <div class="flex justify-start">
         <h1 class="font-bold text-sm md:text-2xl w-full">일자별 매출 현황.</h1>
@@ -25,10 +25,10 @@
         @startDate="startDate"
         @excelDate="excelDate"></Datepicker2>
       <div
-        class="flex justify-start items-center text-base text-nowrap font-semibold ml-40">
+        class="flex justify-start items-center text-base text-nowrap font-semibold ml-32">
         조회조건 :
         <div>
-          <label for="detail" class="font-thin"
+          <label for="detail" class="font-normal"
             ><input
               type="checkbox"
               id="detail"
@@ -37,7 +37,7 @@
           >
         </div>
         <div>
-          <label for="unite" class="font-thin"
+          <label for="unite" class="font-normal"
             ><input
               type="checkbox"
               id="unite"

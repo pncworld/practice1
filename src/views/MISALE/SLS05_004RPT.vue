@@ -1,6 +1,6 @@
 <template>
   <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-auto">
+    <div class="flex justify-between items-center w-full overflow-y-hidden">
       <div class="flex justify-start w-full pl-12 pt-4">
         <div class="flex justify-start">
           <h1 class="font-bold text-sm md:text-2xl w-full">
@@ -21,7 +21,11 @@
       class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-32 items-center z-10">
       <div class="grid grid-cols-1 grid-rows-3">
         <label for="daily" class="font-thin inline-flex">
-          <input type="checkbox" id="daily" @change="seeDaily" class="ml-28" />
+          <input
+            type="checkbox"
+            id="daily"
+            @change="seeDaily"
+            class="ml-28 mt-5" />
           <Datepicker2
             @startDate="startDate"
             @endDate="endDate"
@@ -32,7 +36,7 @@
             :selectedGroup="selectedGroup"
             :orgAcceptDate="orgAcceptDate"
             @excelDate="excelDate"
-            class="ml-[-126px]"></Datepicker2>
+            class="-ml-28"></Datepicker2>
         </label>
         <div
           class="flex justify-start items-center text-base text-nowrap font-semibold ml-40">
@@ -51,7 +55,7 @@
           class="flex justify-start items-center text-base text-nowrap font-semibold ml-40">
           조회조건 :
           <div>
-            <label for="saleDay" class="font-thin">
+            <label for="saleDay" class="font-normal">
               <input
                 type="radio"
                 id="saleDay"
@@ -62,7 +66,7 @@
             </label>
           </div>
           <div>
-            <label for="acceptDay" class="font-thin">
+            <label for="acceptDay" class="font-normal">
               <input
                 type="radio"
                 id="acceptDay"

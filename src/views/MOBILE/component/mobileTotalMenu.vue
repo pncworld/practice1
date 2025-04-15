@@ -35,7 +35,7 @@
         class="border-b-2 border-l-2 border-r-2 border-gray-200">
         <li>
           <button
-            class="w-full flex justify-start pl-6 items-center py-4 px-4 h-20"
+            class="w-full flex justify-start pl-6 items-center py-4 px-3 h-20"
             @click="toggleSubMenu(index)">
             <font-awesome-icon
               :icon="['far', 'calendar-days']"
@@ -53,7 +53,7 @@
             class="ml-8 mb-2 bg-white p-2 rounded-md transition-all duration-300">
             <li v-for="(subItem, subIndex) in i.children" :key="subIndex">
               <button
-                class="w-full text-lg px-4 py-2 bg-white rounded-md hover:bg-gray-100 flex justify-start"
+                class="w-full text-lg px-4 py-2 bg-white rounded-md hover:bg-gray-100 flex justify-start text-nowrap"
                 @click="moveProgram(subItem.code, subItem.name)">
                 {{ subItem.name }}
               </button>

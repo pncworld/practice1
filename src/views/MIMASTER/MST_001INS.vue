@@ -394,6 +394,7 @@ const shapeclick = (value) => {
   } else if (clickedShape.value == 3) {
     resizeHandle.classList.add("triangle");
   }
+  console.log(clickedtableCode.value);
   const findit = tableList.value.find(
     (item) => item.lngKeyscrNo == clickedtableCode.value
   );
@@ -1689,6 +1690,8 @@ const saveButton = async () => {
   //   })
   //   return ;
   // }
+
+  console.log(tableList.value);
 
   Swal.fire({
     title: "저장",
