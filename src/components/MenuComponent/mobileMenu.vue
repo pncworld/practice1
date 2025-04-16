@@ -88,12 +88,12 @@ import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
 const showTotalMenu = () => {
-  showMenu3.value = !showMenu3.value;
-  emit("showMenu3", showMenu3.value);
+  //showMenu3.value = !showMenu3.value;
+  emit("showMenu3", true);
 };
 const moveBack = () => {
   //showMenu3.value = !showMenu3.value;
-  clickIcon.value = 1;
+  clickIcon.value = 2;
   emit("showNotice", true);
   emit("showMenu3", false);
 };
@@ -193,6 +193,7 @@ watch(clickIcon, () => {
 watch(
   () => props.changeMenuState,
   () => {
+    console.log("여길오냐?");
     showMenu3.value = props.changeMenuState;
     clickIcon.value = 0;
   }

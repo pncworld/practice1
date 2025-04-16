@@ -122,7 +122,7 @@
     @click.stop
     :changeIcon="changeIcon"
     :changeSalesIconState="changeSalesIconState"
-    :changeMenuState="showTotalMenu"
+    :changeMenuState="changeMenuState"
     :changeBottomMenu="changeBottomMenu"
     :class="{ hidden: !isStickyVisible }"></MobileMenu>
 </template>
@@ -152,6 +152,8 @@ const SalesMenus = (e) => {
   console.log(e);
   salesMenus.value = e;
 };
+
+const changeMenuState = ref(false);
 const MenuState = (e) => {
   showTotalMenu.value = e;
   notice.value = e;
