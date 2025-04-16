@@ -383,6 +383,7 @@ import {
 } from "@/api/master";
 import DupliPopUp6 from "@/components/dupliPopUp6.vue";
 import PickStore from "@/components/pickStore.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.min.css";
@@ -844,7 +845,9 @@ function updateTableListFromFiltered() {
 }
 
 // Usage in onMounted
-onMounted(() => {
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+
   grid = initializeGrid();
 });
 

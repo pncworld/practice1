@@ -276,6 +276,11 @@ import DupliPopUp from "@/components/dupliPopUp.vue";
 
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
+
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
 
 // 더미 데이터
 const items = ref([1, 1, 1, 1, 1, 1]);

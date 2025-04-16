@@ -33,10 +33,10 @@
             ref="datepicker"
             :selectedGroup="selectedGroup"
             @excelDate="excelDate"
-            class="-ml-24"></Datepicker2>
+            class="pr-72"></Datepicker2>
         </label>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-40">
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-36 pl-1">
           요일명 :
           <div class="flex ml-7 space-x-3 mt-1">
             <v-select
@@ -97,6 +97,7 @@ import { getWeedaySalesReport, getWeekDayList } from "@/api/misales";
 import Datepicker2 from "@/components/Datepicker2.vue";
 import pickStoreSingle from "@/components/pickStoreSingle.vue";
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 import { onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 
@@ -331,6 +332,8 @@ const weekDay = ref([]);
 const selectedWeekDay = ref("");
 
 onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+
   const res = await getWeekDayList(87, "01");
   weekDay.value = res.data.weekDayList;
   console.log(weekDay.value);

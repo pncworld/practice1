@@ -977,7 +977,9 @@ const funcshowGrid = async () => {
       const rowGroupSpanColumn = columns.find(
         (item) => item.fieldName == mergeColumn[i]
       );
-      rowGroupSpanColumn.mergeRule = { criteria: "value" };
+      if (rowGroupSpanColumn) {
+        rowGroupSpanColumn.mergeRule = { criteria: "value" };
+      }
     }
   }
   if (props.setRowGroupSpan2 != "") {
@@ -1346,7 +1348,11 @@ const funcshowGrid = async () => {
     });
     gridView.groupBy(props.setGroupColumnId.split(","));
     if (props.setGroupOrderByColumnId != "") {
-      gridView.orderBy([props.setGroupOrderByColumnId]);
+      console.log(props.setGroupColumnId);
+      if (gridView) {
+        console.log(props.setGroupOrderByColumnId);
+        //gridView.orderBy(props.setGroupOrderByColumnId.split(","));
+      }
     }
   }
 
@@ -2364,7 +2370,9 @@ watch(
         }
 
         if (selectedindex.value !== "" && selectedindex.value != undefined) {
-          gridView.setCurrent({ dataRow: selectedindex.value });
+          if (gridView) {
+            gridView.setCurrent({ dataRow: selectedindex.value });
+          }
         }
 
         // const newIndices = props.rowData.reduce((indices, item, index) => {
@@ -2375,8 +2383,6 @@ watch(
         // }, []);
         // dataProvider.setRowStates(newIndices, "created", true);
         addrow4activated.value = false;
-
-        const current = gridView.getCurrent();
 
         if (deleted2activated.value == true) {
           gridView.clearCurrent();

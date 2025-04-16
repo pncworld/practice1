@@ -47,7 +47,7 @@
         class="border rounded-lg pl-1 h-10 !w-36 z-30"
         v-model="receiptNo" />
     </div>
-    <div class="grid !mr-44 items-center relative">
+    <div class="grid !mr-32 items-center relative">
       <DisCountCdList
         class="flex absolute -right-1 w-[150%]"
         @disCountCd="DisCountCd"
@@ -127,9 +127,14 @@ import PayCodeList from "@/components/payCodeList.vue";
 import PickStoreRenew3 from "@/components/pickStoreRenew.vue";
 import PosList from "@/components/posList.vue";
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
+
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
 const selectedDate = ref();
 
 const dateValue = (e) => {

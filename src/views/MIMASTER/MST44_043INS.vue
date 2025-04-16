@@ -320,6 +320,7 @@ import { useStore } from "vuex";
 
 import DupliPopUp from "@/components/dupliPopUp.vue";
 import PickStore from "@/components/pickStore.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 
 // 더미 데이터
 const items = ref([]);
@@ -357,7 +358,9 @@ const currmenuKeyPage = ref(1);
 const AllscreenKeyPage = ref(1);
 
 const currentMenu = ref(false);
-
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
 onMounted(async () => {
   const res4 = await getFuncKeyList();
   console.log(res4);

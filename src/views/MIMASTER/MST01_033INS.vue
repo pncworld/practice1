@@ -895,6 +895,7 @@ import {
 } from "@/api/master";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 import axios from "axios";
 import RealGrid from "realgrid";
 import Swal from "sweetalert2";
@@ -905,8 +906,10 @@ import { useStore } from "vuex";
 const hidesub = ref(true);
 const hideAttr = ref(true);
 
-onMounted(() => {
+onMounted(async () => {
   console.log(store.state.userData.lngCommonMenu);
+
+  const pageLog = await insertPageLog(store.state.activeTab2);
 
   if (store.state.userData.lngCommonMenu == "1") {
     hidesub.value = false;

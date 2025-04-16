@@ -23,6 +23,7 @@
         class="grid grid-cols-1 grid-rows-4 -space-y-3 justify-start -ml-36 mt-10">
         <div class="flex justify-start ml-9">
           <Datepicker2
+            class="pr-20"
             @endDate="endDate"
             @startDate="startDate"
             :closePopUp="closePopUp"
@@ -42,6 +43,22 @@
           <div>
             <label for="date"
               ><input type="checkbox" id="date" @click="setCond" />일자별</label
+            >
+          </div>
+          <div>
+            <label for="unite"
+              ><input
+                type="checkbox"
+                id="unite"
+                @click="setCellUnite" />셀병합</label
+            >
+          </div>
+          <div>
+            <label for="group"
+              ><input
+                type="checkbox"
+                id="group"
+                @click="changeGridMenus" />메뉴그룹표시</label
             >
           </div>
         </div>
@@ -90,15 +107,9 @@
             </div>
           </div>
         </div>
-        <div class="pt-1 space-x-2 ml-10">
-          <label for="unite"><input type="checkbox" id="unite" />셀병합</label>
-          <label for="group"
-            ><input
-              type="checkbox"
-              id="group"
-              @click="changeGridMenus" />메뉴그룹표시</label
-          >
-        </div>
+        <!-- <div class="pt-1 space-x-2 ml-10">
+        
+        </div> -->
       </div>
       <div class="ml-96 -mt-10">
         <PickStorePlural
@@ -123,6 +134,7 @@
         :exporttoExcel="exportExcel"
         :documentSubTitle="documentSubTitle"
         :documentTitle="'SLS04_004RPT'"
+        :setRowGroupSpan2="setRowGroupSpan2"
         :mergeColumns2="true"
         :mergeColumnGroupSubList2="[
           ['R1', 'S1', 'C1'],
@@ -200,6 +212,7 @@ const afterSearch = ref(false);
 const selectedstartDate = ref();
 const selectedendDate = ref();
 const searchText = ref("");
+
 const selectedGuest = ref({ strName: "전체", lngCode: 0 });
 const GuestType = ref([
   { strName: "전체", lngCode: 0 },
@@ -534,22 +547,40 @@ onMounted(async () => {
   mainMenu.value = res.data.List;
 });
 const hideColumnsId = ref(["strMajor", "strSub", "strStore", "dtmDate"]);
-const checkedReportTypes = new Set([0]);
-const checkedGift = ref(0);
-const checkedlngPrice = ref(0);
-const checkedlngPrint = ref(0);
-const selectedDetail = ref(0);
-const temptmergeColumns2 = ref(false);
-
-const customOrder = ["strStore", "strMajor", "strSub", "dtmDate"];
 
 const checkedDays = new Set([1, 2, 3, 4, 5, 6, 7]);
 
 const changeGridMenus = (e) => {
   if (e.target.checked) {
-    hideColumnsId.value = [];
+    if (hideColumnsId.value.includes("strStore")) {
+      hideColumnsId.value = ["strStore"];
+    } else {
+      hideColumnsId.value = [];
+    }
   } else {
-    hideColumnsId.value = ["strMajor", "strSub"];
+    if (hideColumnsId.value.includes("strStore")) {
+      hideColumnsId.value = ["strStore", "strMajor", "strSub"];
+    } else {
+      hideColumnsId.value = ["strStore"];
+    }
+  }
+  reload.value = !reload.value;
+};
+
+const setRowGroupSpan2 = ref("");
+const setCellUnite = () => {
+  if (checkedDate.value == 1) {
+    if (checkedStore.value == 1) {
+      setRowGroupSpan2.value = "strStore,dtmDate";
+    } else {
+      setRowGroupSpan2.value = "dtmDate";
+    }
+  } else {
+    if (checkedStore.value == 1) {
+      setRowGroupSpan2.value = "strStore";
+    } else {
+      setRowGroupSpan2.value = "";
+    }
   }
   reload.value = !reload.value;
 };

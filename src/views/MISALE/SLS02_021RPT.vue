@@ -54,8 +54,14 @@ import { getReceiptDataDetail } from "@/api/misales";
 import Datepicker2 from "@/components/Datepicker2.vue";
 import PickStoreRenew3 from "@/components/pickStoreRenew.vue";
 import Realgrid from "@/components/realgrid.vue";
-import { ref } from "vue";
+import { insertPageLog } from "@/customFunc/customFunc";
+import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
+
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
+
 const selectedStartDate = ref();
 const selectedEndDate = ref();
 

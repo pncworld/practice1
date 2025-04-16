@@ -25,8 +25,9 @@
             type="checkbox"
             id="daily"
             @change="seeDaily"
-            class="ml-28 mt-5" />
+            class="ml-20 mt-5" />
           <Datepicker2
+            class="pr-52"
             @startDate="startDate"
             @endDate="endDate"
             @acceptDate="acceptDate"
@@ -35,11 +36,10 @@
             :selectedRadioBox="selectedRadioBox"
             :selectedGroup="selectedGroup"
             :orgAcceptDate="orgAcceptDate"
-            @excelDate="excelDate"
-            class="-ml-28"></Datepicker2>
+            @excelDate="excelDate"></Datepicker2>
         </label>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-40">
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-44">
           매입사 :
           <div class="flex ml-7 space-x-3 mt-1">
             <v-select
@@ -125,6 +125,7 @@ import { getCardCorp, getCardSalesSumReport } from "@/api/misales";
 import Datepicker2 from "@/components/Datepicker2.vue";
 import pickStoreSingle from "@/components/pickStoreSingle.vue";
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
 import { onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
@@ -371,7 +372,8 @@ const cardCorp = ref([]);
 const selectedBuyCode = ref("");
 
 onMounted(async () => {
-  console.log(selectedGroup.value, selectedStores.value);
+  const pageLog = await insertPageLog(store.state.activeTab2);
+
   const res = await getCardCorp(selectedGroup.value, selectedStores.value, 1);
   cardCorp.value = res.data.cardCorpList;
   console.log(cardCorp.value);

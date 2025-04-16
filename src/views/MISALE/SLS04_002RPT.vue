@@ -1,6 +1,6 @@
 <template>
   <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-auto">
+    <div class="flex justify-between items-center w-full overflow-y-hidden">
       <div class="flex justify-start w-full pl-12 pt-4">
         <div class="flex justify-start">
           <h1 class="font-bold text-sm md:text-2xl w-full">
@@ -25,7 +25,7 @@
       class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-36 items-center z-10">
       <div class="grid grid-cols-1 grid-rows-4 -space-y-3 mt-12">
         <Datepicker2
-          class="pl-36"
+          class="pl-16 pr-4"
           @endDate="endDate"
           @startDate="startDate"
           :closePopUp="closePopUp"
@@ -384,7 +384,7 @@ import Chart from "@/components/chart.vue";
 import Datepicker2 from "@/components/Datepicker2.vue";
 import PickStorePlural from "@/components/pickStorePlural.vue";
 import Realgrid from "@/components/realgrid.vue";
-import { formatTime } from "@/customFunc/customFunc";
+import { formatTime, insertPageLog } from "@/customFunc/customFunc";
 
 import { onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
@@ -1278,6 +1278,8 @@ watch(selectedMenu, async () => {
 });
 
 onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+
   const res = await getTableSearchCondition(
     selectedGroup.value,
     selectedStores.value,

@@ -222,15 +222,20 @@ import {
   saveKDSList,
   saveKDSSettingAll,
 } from "@/api/master";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 import Swal from "sweetalert2";
 
-import DupliPopUp5 from "@/components/dupliPopUp5.vue";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
 import RealGrid from "realgrid";
+import { insertPageLog } from "@/customFunc/customFunc";
+
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
+
 const currentMenu = ref(false);
 const realgrid2Name = ref("");
 const realgrid3Name = ref("");

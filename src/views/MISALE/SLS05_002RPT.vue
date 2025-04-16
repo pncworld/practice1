@@ -1,6 +1,6 @@
 <template>
     <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-auto">
+    <div class="flex justify-between items-center w-full overflow-y-hidden">
       <div class="flex justify-start  w-full pl-12 pt-4">
         <div class="flex justify-start">
           <h1 class="font-bold text-sm md:text-2xl w-full">카드 매출 세부 현황.</h1>
@@ -14,12 +14,12 @@
     <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-32 items-center z-10">
       <div class="grid grid-cols-1 grid-rows-3">
         <Datepicker2 class="ml-4" @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker" @excelDate="excelDate"></Datepicker2>
-        <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 "> 매입사 : 
+        <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-44 "> 매입사 : 
           <div class="flex ml-7 space-x-3 mt-1">
             <v-select v-model="selectCardCorp" :options="cardCorp" placeholder="전체" label="strBuyName" class="w-48 !h-8 bg-white " clearable="true"/>
           </div>
         </div>
-        <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-36 ">조회조건 :
+        <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 ">조회조건 :
           <div>
             <label for="accept" class="font-normal">
               <input type="radio" id="accept" value="0" v-model="selectedRadioBox" class="ml-5"> 승인
@@ -58,6 +58,7 @@ import Realgrid from '@/components/realgrid.vue';
 import pickStoreSingle from '@/components/pickStoreSingle.vue';
 import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
+import { insertPageLog } from '@/customFunc/customFunc';
   
   const setFooterColID = ref(['lngAmount'])
   const setFooterExpressions = ref(['sum'])
@@ -175,6 +176,10 @@ import { useStore } from 'vuex';
   const selectedBuyCode = ref("")
 
   onMounted(async () => {
+
+
+  const pageLog = await insertPageLog(store.state.activeTab2);
+
     console.log(selectedGroup.value, selectedStores.value)
     const res = await getCardCorp(selectedGroup.value, selectedStores.value, 1)
     cardCorp.value = res.data.cardCorpList

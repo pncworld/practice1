@@ -271,9 +271,15 @@ import {
   setSubCategoryUPDATE,
 } from "@/api/master";
 import PickStore from "@/components/pickStore.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
+
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
+
 const searchStoreName = ref();
 const selectedButton = ref();
 const Category = ref([]);

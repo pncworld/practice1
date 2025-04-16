@@ -251,7 +251,7 @@
 
 <script setup>
 import { getKitchenSettingList, getPrintList, getStorePosList, saveKitchenSettingAll, savePrintNm, saveReceiptData } from '@/api/master';
-import { nextTick, ref, watch } from 'vue';
+import { nextTick, onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 import DupliPopUp5 from '@/components/dupliPopUp5.vue';
@@ -259,9 +259,12 @@ import PickStore from '@/components/pickStore.vue';
 import Realgrid from '@/components/realgrid.vue';
 import RealGrid from 'realgrid';
 import Swal from 'sweetalert2';
+import { insertPageLog } from '@/customFunc/customFunc';
 
 
-
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
 // 더미 데이터
 const disabled = ref(true)
 const items = ref([]);

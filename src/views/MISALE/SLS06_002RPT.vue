@@ -294,8 +294,14 @@ import Chart from "@/components/chart.vue";
 import Datepicker2 from "@/components/Datepicker2.vue";
 import PickStoreSingle2 from "@/components/pickStoreSingle.vue";
 import Realgrid from "@/components/realgrid.vue";
-import { ref, watch } from "vue";
+import { insertPageLog } from "@/customFunc/customFunc";
+import { onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
+
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
+
 const colors = [
   "lightgreen",
   "#333399",

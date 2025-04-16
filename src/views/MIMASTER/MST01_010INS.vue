@@ -204,12 +204,17 @@
 <script setup>
 import { getTLUManageInfo, saveTLUList } from "@/api/master";
 import Swal from "sweetalert2";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { VueDraggableNext } from "vue-draggable-next";
 import { useStore } from "vuex";
 
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
+
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
 
 // 더미 데이터
 const items = ref([]);

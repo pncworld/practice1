@@ -124,7 +124,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
 import { useStore } from "vuex";
 
@@ -137,12 +137,14 @@ import {
   getMasterList,
   getPosList,
   insertMasterList,
-  master_delete,
-  master_save,
 } from "@/api/master";
 import Datepicker1_1 from "@/components/Datepicker1_1.vue";
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
 const store = useStore();
 // 그리드에 다중 선택 혹은 개별 선택 설정 변수
 const selection = ref({ mode: "cell" });

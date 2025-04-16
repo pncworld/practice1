@@ -39,7 +39,7 @@
           :placeholderName="'선택'">
         </PickStoreSingle2>
       </div>
-      <div class="-ml-96 mr-24">
+      <div class="-ml-96 mr-5">
         <label for="bill"
           ><input
             type="checkbox"
@@ -143,10 +143,15 @@ import { getSalesDayReport } from "@/api/misales";
 import Datepicker2 from "@/components/Datepicker2.vue";
 import PickStoreSingle2 from "@/components/pickStoreSingle.vue";
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 import { utils, write, writeFile } from "xlsx-js-style";
+
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
 
 const excelstore = ref();
 const selectedGroup = ref();

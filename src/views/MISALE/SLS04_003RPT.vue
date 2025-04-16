@@ -54,7 +54,7 @@
           </div>
         </div>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-40">
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-48 pl-1">
           메뉴구분 :
           <div class="flex ml-3 space-x-3 mt-1">
             <v-select
@@ -435,6 +435,7 @@ const searchButton = async () => {
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
+    store.state.loading = false;
   } finally {
     store.state.loading = false;
   }
@@ -595,14 +596,14 @@ const mainMenu = ref([
   { lngcode: 3, strname: "메뉴코드" },
 ]);
 watch(selectedMenu, async () => {
-  if (selectedMenu.value == null) {
-    selectedMenu.value = 0;
-  }
+  // if (selectedMenu.value == null) {
+  //   selectedMenu.value = 0;
+  // }
   const res = await getMenuCondition(
     selectedGroup.value,
     selectedStores.value,
     2,
-    selectedMenu.value == 0 ? 0 : selectedMenu.value.lngcode,
+    selectedMenu.value == null ? 0 : selectedMenu.value.lngcode,
     0
   );
   menuType.value = res.data.List;
@@ -611,16 +612,16 @@ watch(selectedMenu, async () => {
 });
 const selectedSubSubMenu = ref(null);
 watch(selectedsubMenu, async () => {
-  if (selectedsubMenu.value == null) {
-    selectedsubMenu.value = 0;
-  }
+  // if (selectedsubMenu.value == null) {
+  //   selectedsubMenu.value = 0;
+  // }
 
   const res = await getMenuCondition(
     selectedGroup.value,
     selectedStores.value,
     3,
-    selectedMenu.value == 0 ? 0 : selectedMenu.value.lngcode,
-    selectedsubMenu.value == 0 ? 0 : selectedsubMenu.value.lngcode
+    selectedMenu.value == null ? 0 : selectedMenu.value.lngcode,
+    selectedsubMenu.value == null ? 0 : selectedsubMenu.value.lngcode
   );
   Menus.value = res.data.List;
   selectedSubSubMenu.value = null;

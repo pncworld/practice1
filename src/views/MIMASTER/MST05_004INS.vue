@@ -363,11 +363,16 @@ import DupliPopUp from "@/components/dupliPopUp.vue";
 import DupliPopUp2 from "@/components/dupliPopUp2.vue";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 import RealGrid, { GridView, LocalDataProvider } from "realgrid";
 import Swal from "sweetalert2";
 import { onMounted, ref, watch } from "vue";
 import { VueDraggableNext } from "vue-draggable-next";
 import { useStore } from "vuex";
+
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
 
 // 더미 데이터
 const items = ref([]);

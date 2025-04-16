@@ -88,9 +88,14 @@
 import { getMenuLists, saveMenuManage } from "@/api/master";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
+
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
 
 const nowStoreAreaCd = ref();
 const nowStoreCd = ref();

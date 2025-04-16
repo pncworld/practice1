@@ -1,5 +1,6 @@
 <template>
-  <div class="flex justify-center items-center space-x-3 w-[600px] pl-20 pr-2">
+  <div
+    class="flex justify-center items-center space-x-3 w-[600px] pl-20 pr-2 ml-9">
     <div
       class="w-auto font-semibold flex items-center text-nowrap text-base ml-20">
       {{ mainName }} :

@@ -514,13 +514,18 @@ import {
   saveOptions,
   saveOptions2,
 } from "@/api/master";
-import { nextTick, ref, watch } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
 import Swal from "sweetalert2";
 import RealGrid from "realgrid";
+import { insertPageLog } from "@/customFunc/customFunc";
+
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
 
 // 더미 데이터
 const labelData = ref([["필수", "선택"]]);

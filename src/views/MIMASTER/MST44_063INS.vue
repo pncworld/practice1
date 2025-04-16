@@ -612,18 +612,14 @@
 
 <script setup>
 import {
-  getKitchenSettingList,
   getPortConnectionList,
   getPortDefaultInfo,
   getPosInfo,
   getPrintDefaultSetting,
-  getPrintList,
-  saveKitchenSettingAll,
   savePortConfig,
   savePortDefaultSetting,
   savePosInfo,
   savePrintConfig,
-  savePrintNm,
 } from "@/api/master";
 import { nextTick, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
@@ -633,6 +629,12 @@ import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
 import RealGrid from "realgrid";
 import Swal from "sweetalert2";
+import { insertPageLog } from "@/customFunc/customFunc";
+
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
+
 const store = useStore();
 // 더미 데이터
 const labelsData1 = ref(["선택"]);

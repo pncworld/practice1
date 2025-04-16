@@ -1,6 +1,6 @@
 <template>
   <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-auto">
+    <div class="flex justify-between items-center w-full overflow-y-hidden">
       <div class="flex justify-start w-full pl-12 pt-4">
         <div class="flex justify-start">
           <h1 class="font-bold text-sm md:text-2xl w-full">
@@ -28,7 +28,7 @@
           @excelDate="excelDate"
           :initToday="'Y'"></Datepicker2>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-40">
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-48">
           구분 :
           <div class="flex ml-3 space-x-3">
             <select name="" id="" class="border w-40 h-7 rounded-lg">
@@ -40,7 +40,7 @@
           </div>
         </div>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-32 !-mt-10">
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 !-mt-10">
           조회조건 :
           <div>
             <label for="detail" class="font-normal"
@@ -90,9 +90,13 @@ import { getRealTimeReport } from "@/api/misales";
 import Datepicker2 from "@/components/Datepicker2.vue";
 import PickStorePlural from "@/components/pickStorePlural.vue";
 import Realgrid from "@/components/realgrid.vue";
-import { formatTime } from "@/customFunc/customFunc";
-import { ref } from "vue";
+import { formatTime, insertPageLog } from "@/customFunc/customFunc";
+import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
+
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
 
 const setGroupFooter = ref(false);
 const setFooterColID = ref([

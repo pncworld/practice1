@@ -167,6 +167,7 @@ import { VueDraggableNext } from "vue-draggable-next";
 import { useStore } from "vuex";
 
 import PickStore from "@/components/pickStore.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 
 // 더미 데이터
 const items = ref([]);
@@ -604,7 +605,9 @@ const saveButton = async () => {
 
 let dataProvider;
 
-onMounted(() => {
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+
   showMenuKeys();
 });
 

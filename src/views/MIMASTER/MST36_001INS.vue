@@ -727,6 +727,7 @@ import {
 } from "@/api/master";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 import RealGrid from "realgrid";
 import Swal from "sweetalert2";
 import { onMounted, ref, watch } from "vue";
@@ -797,7 +798,9 @@ const realgridname2 = (e) => {
   realgrid3Name.value = e;
 };
 
-onMounted(() => {
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+
   console.log(store.state.userData.lngCommonMenu);
 
   if (store.state.userData.lngCommonMenu == "1") {

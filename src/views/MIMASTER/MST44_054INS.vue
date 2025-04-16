@@ -358,8 +358,11 @@ import { useStore } from "vuex";
 import DupliPopUp3 from "@/components/dupliPopUp3.vue";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
-import router from "@/router";
+import { insertPageLog } from "@/customFunc/customFunc";
 
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
 // 더미 데이터
 const items = ref([]);
 const clickedScreenKeyIndex = ref();

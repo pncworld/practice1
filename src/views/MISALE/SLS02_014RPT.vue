@@ -27,7 +27,7 @@
           ref="datepicker"
           @excelDate="excelDate"></Datepicker2>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-32">
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 pl-1">
           조회조건 :
           <div>
             <label for="daily" class="font-normal"
@@ -101,8 +101,13 @@ import Datepicker2 from "@/components/Datepicker2.vue";
 import PickStorePlural from "@/components/pickStorePlural.vue";
 
 import Realgrid from "@/components/realgrid.vue";
-import { ref } from "vue";
+import { insertPageLog } from "@/customFunc/customFunc";
+import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
+
+onMounted(async () => {
+  const pageLog = await insertPageLog(store.state.activeTab2);
+});
 
 const setGroupFooter = ref(false);
 const setFooterColID = ref([
