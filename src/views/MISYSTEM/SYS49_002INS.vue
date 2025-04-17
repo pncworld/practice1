@@ -288,6 +288,7 @@ import {
   saveUserEnroll,
 } from "@/api/system";
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
 import { nextTick, onMounted, ref, watch } from "vue";
 
@@ -384,8 +385,9 @@ const rowData2 = ref([]);
 const searchButton = async () => {
   try {
     changeRow.value = -1;
-    store.state.loading = true;
+    await nextTick();
     initGrid();
+    store.state.loading = true;
     let storecd;
     if (selectedStoreCd.value == null) {
       storecd = 0;

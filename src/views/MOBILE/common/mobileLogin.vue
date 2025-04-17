@@ -96,7 +96,7 @@
 </template>
 
 <script setup>
-import { alreadyLogined } from "@/api/common";
+import { alreadyLogined, alreadyMobileLogined } from "@/api/common";
 import { getMobileProgList, mobileLogin } from "@/api/mobile";
 import loading from "@/components/loading.vue";
 import { onMounted, ref } from "vue";
@@ -210,7 +210,32 @@ onMounted(async () => {
   store.state.loading2 = true;
   try {
     const token = store.state.StoreToken;
-    const res = await alreadyLogined(token);
+    const res = await alreadyMobileLogined(token);
+
+    console.log(res);
+    store.dispatch("updateUserData", res.data.List[0]);
+    store.dispatch("setToken", res.data.List[0].SessionToken);
+
+    const response = await getMobileProgList(
+      res.data.List[0].GROUP_CD,
+      res.data.List[0].STORE_CD,
+      res.data.List[0].USER_NO
+    );
+
+    const result = response.data.List.filter((item) => item.USE_YN == "Y").map(
+      (item) => ({
+        CATEGORY_ID: item.CATEGORY_ID,
+        CATEGORY_NM: item.CATEGORY_NM,
+        PROGID: item.PROGRAM_ID,
+        PROGNM: item.PROGRAM_NM,
+      })
+    );
+    console.log(result);
+
+    const result3 = response.data.List3;
+
+    store.dispatch("setmobileCategory", result);
+    store.dispatch("saveMobileFunction", result3);
 
     if (res.data.RESULT == true) {
       router.push("/m/homepage");

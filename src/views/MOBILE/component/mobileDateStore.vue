@@ -193,7 +193,7 @@ onMounted(async () => {
   console.log(StoreList.value);
   const filteredNm = StoreList.value.filter(
     (item) => item.STORE_CD == selectedStoreCd.value.STORE_CD
-  )[0].STORE_NM;
+  )[0]?.STORE_NM;
   selectedStoreName.value = filteredNm;
 });
 

@@ -10,16 +10,24 @@
           type="text"
           class="rounded-2xl bg-transparent border border-solid placeholder-opacity-30 y-3 mx-2 my-2 px-3"
           style="height: 39px; width: 190px; border-radius: 19px"
+          v-model="searchword"
+          @keydown.enter="setProgramList"
           placeholder="검색어입력" /><button class="w-2/12">
           <img
             src="../assets/finder_icon.svg"
-            class="inline-block w-6/12"
+            class="inline-block w-9"
+            @click="setProgramList"
             alt="" />
         </button>
       </div>
       <label class="bg-gray-100">
         <div class="flex justify-start bg-gray-100 h-8 items-center">
-          <input type="checkbox" @click="showAll" class="ml-3" />전체
+          <input
+            type="checkbox"
+            @click="showAll"
+            class="ml-3"
+            :value="true"
+            v-model="countShow" />전체
         </div>
       </label>
       <ul>
@@ -85,8 +93,50 @@ const props = defineProps({
     type: Array,
     default: [],
   },
+  triggerNow: {
+    type: Boolean,
+    default: false,
+  },
 });
 
+const setProgramList = (e) => {
+  if (searchword.value == "") {
+    searchword.value = "";
+    openCategoryId.value = [];
+    cMenu = store.state.mainCategory
+      .filter((item) => item.lngCode == props.selectCategoryId)
+      .map((item) => item.strTitle)[0];
+
+    const subCategory = store.state.subCategory;
+    const minorCategory = store.state.minorCategory;
+    let category = [];
+
+    category = subCategory.filter(
+      (item) => item.lngCode == props.selectCategoryId
+    );
+    category.forEach((element) => {
+      const matchedMinorCategory = minorCategory.filter(
+        (item) => item.lngProgramSub == element.lngProgramSub
+      );
+      element.subcategories = matchedMinorCategory;
+    });
+
+    categories.value = category;
+  }
+  console.log(categories.value);
+  categories.value.forEach((item) => {
+    item.subcategories = item.subcategories.filter((subitem) =>
+      subitem.strProgramName.includes(searchword.value)
+    );
+  });
+
+  categories.value = categories.value.filter(
+    (item) => item.subcategories.length !== 0
+  );
+  showAll();
+};
+
+const searchword = ref("");
 const store = useStore();
 const categories = ref([]);
 const toggleArrow = ref(false);
@@ -113,10 +163,10 @@ const toggleCategory = (id) => {
   });
 };
 
-var countShow = false;
+const countShow = ref(false);
 const showAll = () => {
-  countShow = !countShow;
-  if (countShow) {
+  countShow.value = !countShow.value;
+  if (countShow.value) {
     for (let index = 0; index < categories.value.length; index++) {
       openCategoryId.value.push(categories.value[index].lngProgramSub);
     }
@@ -266,17 +316,21 @@ var cMenu = ref("매출관리");
 const selectedCategoryId = computed(() => store.state.selectedCategoryId);
 
 watch(
-  () => props.selectCategoryId,
+  () => [props.selectCategoryId, props.triggerNow],
   (newCategory) => {
+    searchword.value = "";
+    openCategoryId.value = [];
     cMenu = store.state.mainCategory
-      .filter((item) => item.lngCode == newCategory)
+      .filter((item) => item.lngCode == props.selectCategoryId)
       .map((item) => item.strTitle)[0];
 
     const subCategory = store.state.subCategory;
     const minorCategory = store.state.minorCategory;
     let category = [];
 
-    category = subCategory.filter((item) => item.lngCode == newCategory);
+    category = subCategory.filter(
+      (item) => item.lngCode == props.selectCategoryId
+    );
     category.forEach((element) => {
       const matchedMinorCategory = minorCategory.filter(
         (item) => item.lngProgramSub == element.lngProgramSub

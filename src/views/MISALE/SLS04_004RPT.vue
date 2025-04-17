@@ -552,16 +552,30 @@ const checkedDays = new Set([1, 2, 3, 4, 5, 6, 7]);
 
 const changeGridMenus = (e) => {
   if (e.target.checked) {
-    if (hideColumnsId.value.includes("strStore")) {
+    if (
+      hideColumnsId.value.includes("strStore") &&
+      hideColumnsId.value.includes("dtmDate")
+    ) {
+      hideColumnsId.value = ["strStore", "dtmDate"];
+    } else if (hideColumnsId.value.includes("strStore")) {
       hideColumnsId.value = ["strStore"];
+    } else if (hideColumnsId.value.includes("dtmDate")) {
+      hideColumnsId.value = ["dtmDate"];
     } else {
       hideColumnsId.value = [];
     }
   } else {
-    if (hideColumnsId.value.includes("strStore")) {
+    if (
+      hideColumnsId.value.includes("strStore") &&
+      hideColumnsId.value.includes("dtmDate")
+    ) {
+      hideColumnsId.value = ["strStore", "dtmDate", "strMajor", "strSub"];
+    } else if (hideColumnsId.value.includes("strStore")) {
       hideColumnsId.value = ["strStore", "strMajor", "strSub"];
+    } else if (hideColumnsId.value.includes("dtmDate")) {
+      hideColumnsId.value = ["dtmDate", "strMajor", "strSub"];
     } else {
-      hideColumnsId.value = ["strStore"];
+      hideColumnsId.value = ["strMajor", "strSub"];
     }
   }
   reload.value = !reload.value;

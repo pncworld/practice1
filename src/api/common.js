@@ -190,6 +190,11 @@ export const alreadyLogined = (token) => {
     TOKEN: token,
   });
 };
+export const alreadyMobileLogined = (token) => {
+  return api2.post("/SYSTEM/VERIFYLOGIN.asmx/alreadyMobileLogined", {
+    TOKEN: token,
+  });
+};
 
 export const createItem = (item) => api.post("/items", item);
 export const updateItem = (id, item) => api.put(`/items/${id}`, item);

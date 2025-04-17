@@ -139,6 +139,7 @@
           @activeTab="activeTab"
           :selectCategoryId="selectCategoryId"
           :tabs="tabs"
+          :triggerNow="triggerNow"
           class="w-full h-full border hidden md:block" />
       </aside>
 
@@ -209,11 +210,13 @@ const showMenus = () => {
   showmenus.value = !showmenus.value;
 };
 const selectCategoryId = ref(1);
+const triggerNow = ref(false);
 const selectCategory = (category) => {
   //store.dispatch("selectCategory", category);\
   selectCategoryId.value = category;
   isMenu.value = true;
   mobileShowMenu.value = true;
+  triggerNow.value = !triggerNow.value;
 };
 
 const logout = () => {
@@ -287,6 +290,12 @@ const reLoad = () => {
   // window.location.reload(); // 페이지 새로 고침
   console.log(currentActiveTab.value);
   console.log(tabs.value);
+  if (
+    currentActiveTab.value &&
+    (tabs.value.length == 0 || currentActiveTab.value.lngProgramID == "")
+  ) {
+    return;
+  }
   const uuid = v4();
   const b = currentActiveTab.value.lngProgramID.split("_")[0];
   const a = tabs.value.find(

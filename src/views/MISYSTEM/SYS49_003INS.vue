@@ -148,6 +148,7 @@ import {
   saveUserPassWordEnroll,
 } from "@/api/system";
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
 import { onMounted, ref, watch } from "vue";
 

@@ -163,6 +163,56 @@ onMounted(async () => {
     console.log(token);
     console.log(res);
     if (res.data.RESULT == true) {
+      store.dispatch("updateUserData", res.data.List[0]);
+      store.dispatch("setToken", res.data.List[0].SessionToken);
+
+      const response = await get_sys_list(
+        res.data.List[0].lngStoreGroup,
+        res.data.List[0].lngUserAdminID,
+        res.data.List[0].strLanguage
+      );
+
+      const result = response.data.sysMenu;
+      console.log(result);
+      const mainCategoryData = result.filter(
+        (item) => Number(item.strMenuLevel) == 1
+      ); // 숫자
+      const subCategoryData = result.filter(
+        (item) => Number(item.strMenuLevel) == 2
+      );
+      const minorCategoryData = result.filter(
+        (item) => Number(item.strMenuLevel) == 3
+      );
+
+      store.dispatch("mainCategory", mainCategoryData);
+      store.dispatch("selectCategory", mainCategoryData[0].lngCode);
+      store.dispatch("subCategory", subCategoryData);
+      store.dispatch("minorCategory", minorCategoryData);
+
+      const response2 = await get_store_list(
+        res.data.List[0].lngStoreGroup,
+        res.data.List[0].lngPositionType,
+        res.data.List[0].blnBrandAdmin == "False" ? 0 : 1,
+        res.data.List[0].lngPosition,
+        res.data.List[0].lngJoinType,
+        res.data.List[0].lngTeamCode,
+        res.data.List[0].lngSupervisor
+      );
+
+      const result0 = response2.data.storeGroup;
+      const result1 = response2.data.storeAttr;
+      const result2 = response2.data.store;
+      const result3 = response2.data.storeSupervisorTeam;
+      const result4 = response2.data.storeSupervisor;
+      const result5 = response2.data.storeArea;
+
+      store.dispatch("StoreGroup", result0);
+      store.dispatch("StoreType", result1);
+      store.dispatch("StoreCd", result2);
+      store.dispatch("StoreTeamCode", result3);
+      store.dispatch("StoreSupervisor", result4);
+      store.dispatch("StoreAreaCd", result5);
+
       router.push("/homepage");
       return;
     }

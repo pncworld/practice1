@@ -17,6 +17,7 @@ import "./assets/index.css";
 import "./customStyle/style.css";
 import router from "./router";
 import store from "./store";
+import Swal from "sweetalert2";
 
 library.add(fas, far);
 window.addEventListener("storage", (event) => {
@@ -35,11 +36,13 @@ const app = createApp(App)
   .component("v-select", VueSelect)
   .component("VCalendar", Calendar);
 
-app.config.errorHandler = function (err, vm, info) {
-  alert(
-    "죄송합니다. 애플리케이션에서 에러가 발생했습니다. 개발팀에 문의해주세요."
-  );
-};
+// app.config.errorHandler = function (err, vm, info) {
+//   Swal.fire({
+//     title: "경고",
+//     icon: "warning",
+//     text: "죄송합니다. 애플리케이션에서 에러가 발생했습니다. 개발팀에 문의해주세요.",
+//   });
+// };
 
 app.mount("#app");
 

@@ -70,6 +70,7 @@ import { getuserPageAccessLogReport } from "@/api/system";
 import Datepicker2 from "@/components/Datepicker2.vue";
 import pickStoreRenew from "@/components/pickStoreRenew.vue";
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog } from "@/customFunc/customFunc";
 import { onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 

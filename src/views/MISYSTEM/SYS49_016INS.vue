@@ -71,6 +71,7 @@
 </template>
 <script setup>
 import { savePassWord, validatePassWord } from "@/api/system";
+import { insertPageLog } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
 import { onMounted, ref } from "vue";
 import { useStore } from "vuex";

@@ -1615,11 +1615,17 @@ watch(
     console.log(props.changeValue2);
     console.log(dataProvider.getJsonRows());
     if (props.changeRow !== "" && props.changeRow != -1) {
-      dataProvider.setValue(
-        props.changeRow,
-        props.changeColid,
-        props.changeValue2
-      );
+      if (
+        dataProvider != null &&
+        dataProvider != undefined &&
+        dataProvider.getJsonRows().length != 0
+      ) {
+        dataProvider.setValue(
+          props.changeRow,
+          props.changeColid,
+          props.changeValue2
+        );
+      }
 
       updatedrowData.value = [...dataProvider.getJsonRows()];
 
