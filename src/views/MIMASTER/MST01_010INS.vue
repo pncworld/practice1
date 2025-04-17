@@ -665,11 +665,7 @@ const saveKey = (index) => {
 
 const deletekey = () => {
   // const filtered = TLUList.value.find((item,index) => item.lngCode == Number(clickedTLUCd.value)).find((item,index) => index == currIndexKey.value+2)
-  console.log(
-    TLUList.value.find(
-      (item, index) => item.lngCode == Number(clickedTLUCd.value)
-    )
-  );
+
   const finditem = TLUList.value.find(
     (item, index) => item.lngCode == Number(clickedTLUCd.value)
   );

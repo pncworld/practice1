@@ -516,12 +516,7 @@ const searchMenu = async () => {
   changeMode.value = false;
   Category.value = [];
   items.value = [];
-  console.log(
-    nowStoreCd.value,
-    nowStoreAreaCd.value,
-    groupCd.value,
-    posNo.value
-  );
+
   if (nowStoreCd.value == "0" || nowStoreCd.value == undefined) {
     Swal.fire({
       title: "경고",

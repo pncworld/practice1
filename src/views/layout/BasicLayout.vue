@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-col h-screen overflow-hidden bg-gray-100">
+  <div
+    class="flex flex-col h-screen overflow-hidden bg-gray-100"
+    @click="closeOtherTab">
     <Loading style="z-index: 100"></Loading>
 
     <header
@@ -17,10 +19,10 @@
         </div>
 
         <div
-          class="flex justify-start mx-auto pb-1 scrollbar-hide max-w-[1300px] w-full">
+          class="flex justify-start mx-auto pb-1 scrollbar-hide max-w-[75%] w-full">
           <!-- 부모 div -->
           <div
-            class="flex overflow-x-auto space-x-2 md:space-x-1 w-full mt-4 md:mt-2 md:ml-5">
+            class="flex overflow-x-auto space-x-2 md:space-x-1 w-full mt-4 md:mt-2 ml-1">
             <!-- 내부 div -->
             <button
               v-for="(item, i) in mainCategoryList"
@@ -45,7 +47,7 @@
                 alt="Refresh"
                 class="w-1 sm:w-6 md:w-7" />
             </button>
-            <button @click="showMenus" class="block md:hidden">
+            <button @click.stop="showMenus" class="block md:hidden">
               <img
                 src="../../assets/ic_menu.svg"
                 alt="Menu"
@@ -65,15 +67,15 @@
             </button>
           </div>
         </div>
-
-        <!-- 우측 버튼 영역 -->
-        <div class="items-center space-x-4 hidden sm:flex">
-          <button>
-            <img
-              src="../../assets/table_star.svg"
-              alt="Star"
-              class="w-5 sm:w-6 md:w-7" />
+        <div
+          class="absolute top-12 right-10 bg-white w-52 rounded-lg h-auto text-lg"
+          v-show="showmenus">
+          <button v-for="i in tabs" @click="setActiveTab(i)">
+            {{ i.strTitle }}
           </button>
+        </div>
+        <!-- 우측 버튼 영역 -->
+        <div class="items-center space-x-4 flex mr-8">
           <button @click="deleteAllTabs">
             <img
               src="../../assets/ic_delete.svg"
@@ -86,7 +88,7 @@
               alt="Refresh"
               class="w-5 sm:w-6 md:w-7" />
           </button>
-          <button @click="showMenus">
+          <button @click.stop="showMenus">
             <img
               src="../../assets/ic_menu.svg"
               alt="Menu"
@@ -171,6 +173,9 @@ onMounted(() => {
 });
 // 화면 크기 감지 및 업데이트
 
+const closeOtherTab = () => {
+  showmenus.value = false;
+};
 const route = useRoute();
 const store = useStore();
 const userData = computed(() => store.state.userData);
@@ -197,7 +202,8 @@ const deleteAllTabs = () => {
     cancelButtonText: "취소",
   }).then((result) => {
     if (result.isConfirmed) {
-      store.dispatch("closeAllTabs");
+      //store.dispatch("closeAllTabs");
+      tabs.value = [];
       router.push("/homePage");
     } else {
     }
@@ -244,6 +250,7 @@ watch(mainCategoryList, (newCategories) => {
 
 const hideMenu = () => {
   isMenu.value = !isMenu.value;
+  reLoad();
 };
 
 const tabs = ref([]);

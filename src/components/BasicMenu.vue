@@ -11,25 +11,36 @@
           class="rounded-2xl bg-transparent border border-solid placeholder-opacity-30 y-3 mx-2 my-2 px-3"
           style="height: 39px; width: 190px; border-radius: 19px"
           v-model="searchword"
-          @keydown.enter="setProgramList"
-          placeholder="검색어입력" /><button class="w-2/12">
-          <img
+          @input="setProgramList"
+          placeholder="검색어입력" />
+        <!-- <img
             src="../assets/finder_icon.svg"
             class="inline-block w-9"
             @click="setProgramList"
+            alt="" /> -->
+      </div>
+      <div class="flex justify-between bg-gray-100">
+        <label class="bg-gray-100">
+          <div class="flex justify-start bg-gray-100 h-8 items-center">
+            <input
+              type="checkbox"
+              @click="showAll"
+              class="ml-3"
+              :value="true"
+              v-model="countShow" />전체
+          </div>
+        </label>
+        <button class="mr-5 text-black" @click.stop="showFavorite">
+          <img
+            src="../../src/assets/table_star.svg"
+            alt="Star"
+            v-show="!clickFavorite" />
+          <img
+            v-show="clickFavorite"
+            src="../assets/table_star-checked.svg"
             alt="" />
         </button>
       </div>
-      <label class="bg-gray-100">
-        <div class="flex justify-start bg-gray-100 h-8 items-center">
-          <input
-            type="checkbox"
-            @click="showAll"
-            class="ml-3"
-            :value="true"
-            v-model="countShow" />전체
-        </div>
-      </label>
       <ul>
         <li
           v-for="category in categories"
@@ -99,41 +110,51 @@ const props = defineProps({
   },
 });
 
+const clickFavorite = ref(false);
+const showFavorite = () => {
+  clickFavorite.value = !clickFavorite.value;
+};
+
 const setProgramList = (e) => {
-  if (searchword.value == "") {
-    searchword.value = "";
-    openCategoryId.value = [];
-    cMenu = store.state.mainCategory
-      .filter((item) => item.lngCode == props.selectCategoryId)
-      .map((item) => item.strTitle)[0];
+  console.log(e.target.value);
 
-    const subCategory = store.state.subCategory;
-    const minorCategory = store.state.minorCategory;
-    let category = [];
+  cMenu = store.state.mainCategory
+    .filter((item) => item.lngCode == props.selectCategoryId)
+    .map((item) => item.strTitle)[0];
 
-    category = subCategory.filter(
-      (item) => item.lngCode == props.selectCategoryId
+  const subCategory = store.state.subCategory;
+  const minorCategory = store.state.minorCategory;
+  let category = [];
+
+  category = subCategory.filter(
+    (item) => item.lngCode == props.selectCategoryId
+  );
+  category.forEach((element) => {
+    const matchedMinorCategory = minorCategory.filter(
+      (item) => item.lngProgramSub == element.lngProgramSub
     );
-    category.forEach((element) => {
-      const matchedMinorCategory = minorCategory.filter(
-        (item) => item.lngProgramSub == element.lngProgramSub
-      );
-      element.subcategories = matchedMinorCategory;
-    });
-
-    categories.value = category;
-  }
-  console.log(categories.value);
-  categories.value.forEach((item) => {
-    item.subcategories = item.subcategories.filter((subitem) =>
-      subitem.strProgramName.includes(searchword.value)
-    );
+    element.subcategories = matchedMinorCategory;
   });
 
-  categories.value = categories.value.filter(
-    (item) => item.subcategories.length !== 0
-  );
-  showAll();
+  categories.value = category;
+  if (e.target.value == "") {
+    searchword.value = "";
+    openCategoryId.value = [];
+    showAll();
+    return;
+  } else {
+    console.log(categories.value);
+    categories.value.forEach((item) => {
+      item.subcategories = item.subcategories.filter((subitem) =>
+        subitem.strProgramName.includes(e.target.value)
+      );
+    });
+
+    categories.value = categories.value.filter(
+      (item) => item.subcategories.length !== 0
+    );
+    showAll2();
+  }
 };
 
 const searchword = ref("");
@@ -166,6 +187,18 @@ const toggleCategory = (id) => {
 const countShow = ref(false);
 const showAll = () => {
   countShow.value = !countShow.value;
+  if (countShow.value) {
+    for (let index = 0; index < categories.value.length; index++) {
+      openCategoryId.value.push(categories.value[index].lngProgramSub);
+    }
+  } else {
+    for (let index = 1; index <= categories.value.length; index++) {
+      openCategoryId.value = [];
+    }
+  }
+};
+const showAll2 = () => {
+  countShow.value = true;
   if (countShow.value) {
     for (let index = 0; index < categories.value.length; index++) {
       openCategoryId.value.push(categories.value[index].lngProgramSub);

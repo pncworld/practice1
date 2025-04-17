@@ -1,39 +1,55 @@
 <template>
-    <div class="grid grid-rows-1 grid-cols-[repeat(4,1fr)] justify-center text-sm items-center w-[500px] space-x-2 ">
-     <div class="items-center font-bold text-base flex w-20 pl-5 ">매장명 : </div>
-      <div >
-        <select :disabled="true" v-model="selectedGroup"  id="storeGroup" class=" border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 " @change="emitStoreGroup($event.target.value)" >
-          <option :value="item.lngStoreGroup" v-for="item in storeGroup" :key="item.lngStoreGroup">{{ item.strName }}</option>
-        </select>
-      </div>
-      <div>
-        <select :disabled="disabled1" v-model="selectedStoreType" class=" border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 " @change="initGrid">
-         
-          <option value="0">전체</option>
-          <option :value="item.lngStoreAttr" v-for="item in storeType" :key="item.lngStoreAttr">{{ item.strName }}</option>
-        </select>
-      </div>
-      <div >
-      <v-select
-    v-model="selectedStore"
-    :options="storeCd"
-    :disabled="disabled1"
-    label="strName"
-    :placeholder="defaultPlaceHolder"
-    class="!w-72 !h-7 -mt-3 custom-select"
-    :clearable="!disabled1"
-    @click="resetSelectedStore"
-  />
-</div>
-     
+  <div
+    class="grid grid-rows-1 grid-cols-[repeat(4,1fr)] justify-center text-sm items-center w-[500px] space-x-2">
+    <div class="items-center font-bold text-base flex w-20 pl-5">매장명 :</div>
+    <div>
+      <select
+        :disabled="true"
+        v-model="selectedGroup"
+        id="storeGroup"
+        class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        @change="emitStoreGroup($event.target.value)">
+        <option
+          :value="item.lngStoreGroup"
+          v-for="item in storeGroup"
+          :key="item.lngStoreGroup">
+          {{ item.strName }}
+        </option>
+      </select>
     </div>
+    <div>
+      <select
+        :disabled="disabled1"
+        v-model="selectedStoreType"
+        class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        @change="initGrid">
+        <option value="0">전체</option>
+        <option
+          :value="item.lngStoreAttr"
+          v-for="item in storeType"
+          :key="item.lngStoreAttr">
+          {{ item.strName }}
+        </option>
+      </select>
+    </div>
+    <div>
+      <v-select
+        v-model="selectedStore"
+        :options="storeCd"
+        :disabled="disabled1"
+        label="strName"
+        :placeholder="defaultPlaceHolder"
+        class="!w-72 !h-7 -mt-3 custom-select"
+        :clearable="!disabled1"
+        @click="resetSelectedStore" />
+    </div>
+  </div>
 </template>
-  
 
 <script setup>
-import { defineProps , onMounted, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
-import { useStore } from 'vuex';
+import { defineProps, onMounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import { useStore } from "vuex";
 
 const store = useStore();
 const storeGroup = ref([]);
@@ -43,76 +59,88 @@ const storeCd2 = ref([]);
 const isDisabled1 = ref(false);
 const isDisabled2 = ref(false);
 const disabled1 = ref(false);
-const selectedGroup = ref()
+const selectedGroup = ref();
 const selectedStore = ref(null);
 
-    const userData = store.state.userData ;
+const userData = store.state.userData;
 
 const props = defineProps({
-      groupCdDisabled: Boolean,
-      hidesub: {
-      type: Boolean,
-      default: true,
-     },
-     placeholderName: {
-      type: String,
-      default: '전체',
-     }
-     
-      
-    })
-const is9999 = ref(store.state.userData.lngStoreGroup[0] !=='9999')
-const hideit = ref(props.hidesub)
-const defaultPlaceHolder = ref(props.placeholderName)
-const selectedStoreType = ref(0)
-watch(() => props.hidesub, () => {
-  hideit.value = props.hidesub;
-})
-const {groupCdDisabled} = props ;
+  groupCdDisabled: Boolean,
+  hidesub: {
+    type: Boolean,
+    default: true,
+  },
+  placeholderName: {
+    type: String,
+    default: "전체",
+  },
+});
+const is9999 = ref(store.state.userData.lngStoreGroup[0] !== "9999");
+const hideit = ref(props.hidesub);
+const defaultPlaceHolder = ref(props.placeholderName);
+const selectedStoreType = ref(0);
+watch(
+  () => props.hidesub,
+  () => {
+    hideit.value = props.hidesub;
+  }
+);
+const { groupCdDisabled } = props;
 isDisabled1.value = groupCdDisabled;
-const changed = ref(false)
+const changed = ref(false);
 const ischanged = () => {
-    changed.value = !changed.value;
-  
-    console.log(changed.value)
-    emit('update:ischanged',changed.value);
+  changed.value = !changed.value;
+
+  console.log(changed.value);
+  emit("update:ischanged", changed.value);
 };
-const emit = defineEmits(['update:storeGroup' , 'update:storeType' , 'update:storeCd' ,'update:ischanged', 'storeNm','excelStore','lngStoreCode','lngStoreGroup','lngStoreAttrs','changeInit']);
+const emit = defineEmits([
+  "update:storeGroup",
+  "update:storeType",
+  "update:storeCd",
+  "update:ischanged",
+  "storeNm",
+  "excelStore",
+  "lngStoreCode",
+  "lngStoreGroup",
+  "lngStoreAttrs",
+  "changeInit",
+]);
 const emitStoreGroup = (value) => {
-    emit('update:storeGroup', value);
-    emit('lngStoreGroup', value);
-    emit('changeInit', true);
+  emit("update:storeGroup", value);
+  emit("lngStoreGroup", value);
+  emit("changeInit", true);
 };
 
 const emitStoreType = (value) => {
-    emit('update:storeType', value);
+  emit("update:storeType", value);
 };
 onMounted(() => {
-  defaultPlaceHolder.value = props.placeholderName
-  selectedGroup.value = store.state.storeGroup[0].lngStoreGroup
+  defaultPlaceHolder.value = props.placeholderName;
+  selectedGroup.value = store.state.storeGroup[0].lngStoreGroup;
 
-  if (store.state.userData.blnBrandAdmin == 'True' || store.state.userData.lngPositionType == '1') {
-    disabled1.value = false
-    emit('update:storeGroup', selectedGroup.value);
-    emit('lngStoreGroup', selectedGroup.value);
-   emit('update:storeCd', 0);
-   emit('lngStoreAttrs', 0);
-    emit('lngStoreCode', 0);
-   emit('excelStore', '매장명 : 전체');
-     } else {
-    disabled1.value = true
-        emit('lngStoreGroup', store.state.userData.lngStoreGroup)
-        emit('lngStoreCodes', store.state.userData.lngPosition)
-        emit('lngStoreAttrs', store.state.userData.lngJoinType)
-        emit('excelStore', '매장명 : ' + store.state.userData.strStoreName)
-        selectedStoreType.value = store.state.userData.lngJoinType
-        selectedStore.value = store.state.storeCd[0]
-        console.log(store.state.storeCd)
-  
+  if (
+    store.state.userData.blnBrandAdmin == "True" ||
+    store.state.userData.lngPositionType == "1"
+  ) {
+    disabled1.value = false;
+    emit("update:storeGroup", selectedGroup.value);
+    emit("lngStoreGroup", selectedGroup.value);
+    emit("update:storeCd", 0);
+    emit("lngStoreAttrs", 0);
+    emit("lngStoreCode", 0);
+    emit("excelStore", "매장명 : 전체");
+  } else {
+    disabled1.value = true;
+    emit("lngStoreGroup", store.state.userData.lngStoreGroup);
+    emit("lngStoreCodes", store.state.userData.lngPosition);
+    emit("lngStoreAttrs", store.state.userData.lngJoinType);
+    emit("excelStore", "매장명 : " + store.state.userData.strStoreName);
+    selectedStoreType.value = store.state.userData.lngJoinType;
+    selectedStore.value = store.state.storeCd[0];
+    console.log(store.state.storeCd);
   }
-
-
-})
+});
 // const emitStoreCode = (e) => {
 //   console.log(e)
 //   const selectedCd = e.target.value
@@ -126,83 +154,90 @@ onMounted(() => {
 //   }
 // };
 const initGrid = (e) => {
-  emit('changeInit', true);
-}
-watch(selectedStoreType , () => {
+  emit("changeInit", true);
+};
+watch(selectedStoreType, () => {
   if (selectedStoreType.value == 0) {
-      storeCd.value = store.state.storeCd
-    } else {
-      storeCd.value = store.state.storeCd.filter(item => item.lngStoreAttr == selectedStoreType.value)
-    }
-    if (store.state.userData.blnBrandAdmin == 'True' || store.state.userData.lngPositionType == '1') {
-      selectedStore.value =null
-    } 
-   
-    emit('lngStoreAttrs', selectedStoreType.value);
-    emit('changeInit', true);
-})
-watch(selectedStore , () => {
-  if(selectedStore.value == null){
-    emit('update:storeGroup', selectedGroup.value);
-    emit('update:storeCd', 0);
-    emit('lngStoreGroup', selectedGroup.value);
-     emit('lngStoreCode', 0);
-    emit('excelStore', '매장명 : 전체');
+    storeCd.value = store.state.storeCd;
   } else {
-    emit('update:storeGroup', selectedGroup.value);
-    emit('update:storeCd', selectedStore.value.lngStoreCode);
-    emit('lngStoreGroup', selectedGroup.value);
-    emit('lngStoreCode', selectedStore.value.lngStoreCode);
-    const name = store.state.storeCd.filter(item => item.lngStoreCode == selectedStore.value.lngStoreCode)[0].strName
-    emit('excelStore', '매장명 : '+name);
+    storeCd.value = store.state.storeCd.filter(
+      (item) => item.lngStoreAttr == selectedStoreType.value
+    );
   }
-  console.log(selectedStore.value)
-  emit('changeInit', true);
-})
-   
-  storeGroup.value = store.state.storeGroup;
-  storeType.value = store.state.storeType;
-  storeCd.value = store.state.storeCd;
-  storeCd2.value = store.state.storeCd;
+  if (
+    store.state.userData.blnBrandAdmin == "True" ||
+    store.state.userData.lngPositionType == "1"
+  ) {
+    selectedStore.value = null;
+  }
 
-  const setStore = (value) => {
-    console.log(value)
-    if ( value ==0) {
-        storeCd.value = storeCd2.value ;
-        return storeCd.value ;
+  emit("lngStoreAttrs", selectedStoreType.value);
+  emit("changeInit", true);
+});
+watch(selectedStore, () => {
+  if (selectedStore.value == null) {
+    emit("update:storeGroup", selectedGroup.value);
+    emit("update:storeCd", 0);
+    emit("lngStoreGroup", selectedGroup.value);
+    emit("lngStoreCode", 0);
+    emit("excelStore", "매장명 : 전체");
+  } else {
+    emit("update:storeGroup", selectedGroup.value);
+    emit("update:storeCd", selectedStore.value.lngStoreCode);
+    emit("lngStoreGroup", selectedGroup.value);
+    emit("lngStoreCode", selectedStore.value.lngStoreCode);
+    const name = store.state.storeCd.filter(
+      (item) => item.lngStoreCode == selectedStore.value.lngStoreCode
+    )[0].strName;
+    emit("excelStore", "매장명 : " + name);
+  }
+  console.log(selectedStore.value);
+  emit("changeInit", true);
+});
+
+storeGroup.value = store.state.storeGroup;
+storeType.value = store.state.storeType;
+storeCd.value = store.state.storeCd;
+storeCd2.value = store.state.storeCd;
+
+const setStore = (value) => {
+  console.log(value);
+  if (value == 0) {
+    storeCd.value = storeCd2.value;
+    return storeCd.value;
+  }
+  storeCd.value = storeCd2.value.filter((item) => {
+    return item.lngStoreAttr == value;
+  });
+  selectedStore.value = 0;
+};
+
+const route = useRoute();
+
+watch(
+  () => route.path,
+  (newPath) => {
+    if (storeGroup.value.length > 0) {
+      selectedGroup.value = storeGroup.value[0].lngStoreGroup;
+      emit("update:storeGroup", storeGroup.value[0].lngStoreGroup);
+      emit("lngStoreGroup", storeGroup.value[0].lngStoreGroup);
+
+      console.log(storeGroup.value[0].lngStoreGroup);
     }
-    storeCd.value = storeCd2.value.filter( item => {
-        return item.lngStoreAttr == value ;
-    })
-    selectedStore.value = 0
   }
-
-  const route = useRoute();
-  
-  watch(() => route.path, (newPath) =>{
-        if (storeGroup.value.length > 0) {
-          selectedGroup.value = storeGroup.value[0].lngStoreGroup
-        emit('update:storeGroup', storeGroup.value[0].lngStoreGroup);
-        emit('lngStoreGroup', storeGroup.value[0].lngStoreGroup);
-      
-        console.log(storeGroup.value[0].lngStoreGroup);
-        }
-      
-    
-  }
- 
-  
-)
+);
 
 const resetSelectedStore = (e) => {
-  if (store.state.userData.blnBrandAdmin == 'True' || store.state.userData.lngPositionType == '1') {
-    selectedStore.value = null
-  } 
- 
-}
+  if (
+    store.state.userData.blnBrandAdmin == "True" ||
+    store.state.userData.lngPositionType == "1"
+  ) {
+    selectedStore.value = null;
+  }
+};
 </script>
 
-<style >
+<style>
 .custom-select .vs__dropdown-toggle {
   border: 1px solid #d1d5db !important; /* 전체 테두리 */
   border-radius: 0.375rem !important; /* Tailwind rounded-md */
@@ -222,9 +257,9 @@ const resetSelectedStore = (e) => {
   align-items: center;
   height: 100% !important;
 
-  min-width : 110% !important;
+  min-width: 110% !important;
   padding-top: 14px !important; /* 텍스트를 좀 더 아래로 이동 */
-  
+
   overflow: hidden !important;
 }
 .custom-select.vs--disabled .vs__selected {
@@ -235,25 +270,24 @@ const resetSelectedStore = (e) => {
   align-items: center;
   height: 100% !important;
 
-  min-width : 110% !important;
+  min-width: 110% !important;
   margin-top: -10px !important; /* 텍스트를 좀 더 아래로 이동 */
-  
+
   overflow: hidden !important;
 }
 
 /* 플레이스홀더 및 입력 필드 조정 */
- .custom-select .vs__search {
+.custom-select .vs__search {
   height: 100%;
   padding: 1px 0 !important; /* 입력 필드가 너무 위쪽에 올라가지 않도록 조정 */
   margin: 0 !important;
-} 
+}
 .custom-select.vs--disabled .vs__search {
   height: 100%;
   padding: 1px 0 !important; /* 입력 필드가 너무 위쪽에 올라가지 않도록 조정 */
   margin: 0 !important;
-  display : none;
+  display: none;
 }
-
 
 /* 드롭다운 리스트 스타일 */
 .custom-select .vs__dropdown-menu {
@@ -263,7 +297,6 @@ const resetSelectedStore = (e) => {
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   margin-top: 14px !important;
   padding-top: 1px !important;
-
 }
 
 /* 포커스 상태 스타일 */
@@ -272,13 +305,9 @@ const resetSelectedStore = (e) => {
   outline: none !important;
 }
 
-.vs--disabled .vs__dropdown-toggle{
+.vs--disabled .vs__dropdown-toggle {
   background-color: #d1d5db !important;
   color: white !important; /* 텍스트 색상도 변경 */
   border-color: #d1d5db !important;
 }
-
-
 </style>
-
-

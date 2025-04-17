@@ -525,9 +525,6 @@ const excelButton = () => {
   if (selectedMenu.value == null) {
     first = "전체";
   } else {
-    console.log(
-      mainMenu.value.filter((item) => item.lngcode == selectedMenu.value)
-    );
     first = mainMenu.value.filter(
       (item) => item.lngcode == selectedMenu.value.lngcode
     )[0].strname;

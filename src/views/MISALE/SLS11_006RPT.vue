@@ -206,9 +206,6 @@ const searchButton = async () => {
   try {
     initGrid();
 
-    console.log(
-      selectedstartDate.value + " " + selectedStartTime.value.strName
-    );
     const res = await getSalesByTimeAndSeats(
       selectedGroup.value,
       selectedStoreAttrs.value,
