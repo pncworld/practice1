@@ -1,13 +1,7 @@
 <template>
   <div class="h-[80%]">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <div class="flex justify-start w-full pl-12 pt-4">
-        <div class="flex justify-start">
-          <h1 class="font-bold text-sm md:text-2xl w-full">
-            매장별 결제코드 등록
-          </h1>
-        </div>
-      </div>
+      <PageName></PageName>
       <div class="flex justify-center mr-10 space-x-2 pr-5">
         <button @click="searchButton" class="button search">조회</button>
         <button @click="saveButton" class="button save">저장</button>
@@ -96,6 +90,7 @@
 import { getAllPayList, saveStorePayCd } from "@/api/master";
 
 import DupliPopUp7 from "@/components/dupliPopUp7.vue";
+import PageName from "@/components/pageName.vue";
 import PickStore from "@/components/pickStore.vue";
 
 import Realgrid from "@/components/realgrid.vue";

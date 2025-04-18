@@ -1,9 +1,7 @@
 <template>
-  <div class="flex justify-start pl-4 pt-4">
-    <div class="flex justify-start">
-      <h1 class="font-bold text-2xl">메뉴 배치 관리</h1>
-    </div>
-    <div class="absolute right-48 space-x-3 flex">
+  <div class="flex justify-start pl-4 pt-0">
+    <PageName></PageName>
+    <div class="absolute right-16 space-x-3 flex mt-3">
       <button class="button search" @click="searchPosMenu">조회</button
       ><button class="button save" @click="savePosMenu">저장</button>
     </div>
@@ -143,6 +141,7 @@ import {
   tablePosMenu,
   tablePosMenuKey,
 } from "@/api/master";
+import PageName from "@/components/pageName.vue";
 import PickCategory from "@/components/pickCategory.vue";
 import PickStore from "@/components/pickStore.vue";
 import { insertPageLog } from "@/customFunc/customFunc";

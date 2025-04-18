@@ -1,9 +1,7 @@
 <template>
   <div class="flex flex-col w-full overflow-y-hidden">
     <div class="flex justify-between w-full pl-10 pt-5">
-      <div class="flex justify-between">
-        <h1 class="font-bold text-sm md:text-2xl w-full">메뉴키 설정</h1>
-      </div>
+      <pageName></pageName>
       <div class="flex space-x-6 pr-12">
         <button class="button search" @click="searchMenu">조회</button
         ><button class="button save" @click="saveMenuKey">저장</button
@@ -361,6 +359,7 @@ import {
 } from "@/api/master";
 import DupliPopUp from "@/components/dupliPopUp.vue";
 import DupliPopUp2 from "@/components/dupliPopUp2.vue";
+import PageName from "@/components/pageName.vue";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
 import { insertPageLog } from "@/customFunc/customFunc";

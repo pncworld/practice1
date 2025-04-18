@@ -27,6 +27,7 @@ export default createStore({
       mobileSelectProgName: "",
       moveOtherTab: "",
       mobileReSearch: false,
+      currentActiveTab: [],
     };
   },
   mutations: {
@@ -125,11 +126,8 @@ export default createStore({
     setinActiveBackGround(state, data) {
       state.inActiveBackGround = data;
     },
-    setFavoriteList(state, data) {
-      state.favoriteList = data;
-    },
     addFavoriteList(state, data) {
-      state.favoriteList.push(data);
+      state.favoriteList = data;
     },
     setMobileState(state, data) {
       state.isMobile = data;
@@ -149,6 +147,9 @@ export default createStore({
     setMobileReSearch(state, data) {
       state.mobileReSearch = data;
     },
+    setCurrentActiveTab(state, data) {
+      state.currentActiveTab = data;
+    },
     clearSession(state) {
       (state.userData = []), // 사용자 데이터를 저장할 상태
         (state.selectedCategoryId = ""),
@@ -167,6 +168,7 @@ export default createStore({
         (state.inActiveBackGround = false),
         (state.mobileFunction = []),
         (state.mobileCategory = []),
+        (state.currentActiveTab = []),
         (state.StoreToken = "");
     },
   },
@@ -231,7 +233,7 @@ export default createStore({
     convertInActive({ commit }, data) {
       commit("setinActiveBackGround", data);
     },
-    addFavoriteList({ commit }, data) {
+    setFavoriteList({ commit }, data) {
       commit("addFavoriteList", data);
     },
     setMobileState({ commit }, data) {
@@ -257,6 +259,9 @@ export default createStore({
     },
     setMobileSearch({ commit }, data) {
       commit("setMobileReSearch", data);
+    },
+    saveCurrentTab({ commit }, data) {
+      commit("setCurrentActiveTab", data);
     },
   },
   getters: {

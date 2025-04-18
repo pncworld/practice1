@@ -1,6 +1,6 @@
 <template>
   <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-auto">
+    <div class="flex justify-between items-center w-full overflow-y-hidden">
       <div class="flex justify-start w-full pl-12 pt-4">
         <div class="flex justify-start">
           <h1 class="font-bold text-sm md:text-2xl w-full">
@@ -29,8 +29,8 @@
           :mainName="'일자'"
           :initToday="'1'"></Datepicker2>
         <div
-          class="flex justify-start items-center text-nowrap ml-40 space-x-10 mt-1">
-          <div class="flex items-center">
+          class="flex justify-start items-center text-nowrap ml-36 space-x-10 mt-1">
+          <div class="flex items-center mr-2">
             <div class="font-semibold text-base">거래 구분 :</div>
             <div>
               <select

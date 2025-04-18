@@ -1,6 +1,6 @@
 <template>
   <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-auto">
+    <div class="flex justify-between items-center w-full overflow-y-hidden">
       <div class="flex justify-start w-full pl-12 pt-4">
         <div class="flex justify-start">
           <h1 class="font-bold text-sm md:text-2xl w-full">
@@ -25,7 +25,7 @@
           @endDate="endDate"
           :closePopUp="closePopUp"
           ref="datepicker"
-          class="pr-20"
+          class="pr-24"
           :selectedGroup="selectedGroup"
           @excelDate="excelDate" />
       </div>
@@ -34,7 +34,7 @@
           @lngStoreCode="lngStoreCode"
           @lngStoreGroup="lngStoreGroup"
           @excelStore="excelStore"
-          class="pl-10"
+          class="pl-8"
           @lngStoreAttrs="lngStoreAttrs"
           :placeholderName="'선택'"></pickStoreRenew>
       </div>
@@ -47,7 +47,7 @@
           </option>
         </select>
       </div>
-      <div class="flex justify-center items-center pr-6 space-x-2">
+      <div class="flex justify-center items-center space-x-2 ml-6">
         <div class="text-base font-semibold">조회조건 :</div>
         <select
           name=""

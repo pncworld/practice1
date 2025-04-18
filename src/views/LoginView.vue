@@ -66,6 +66,7 @@ import {
   alreadyLogined,
   get_store_list,
   get_sys_list,
+  getFavoriteList,
   login,
 } from "../api/common";
 
@@ -142,7 +143,12 @@ const login2 = async () => {
         store.dispatch("StoreAreaCd", result5);
       };
       await readsales();
-
+      const res4 = await getFavoriteList(username.value);
+      console.log(res4);
+      store.dispatch(
+        "setFavoriteList",
+        res4.data.List.map((item) => Number(item.lngProgramID))
+      );
       router.push("/homepage");
     } else {
       throw new Error("로그인 실패");
@@ -213,6 +219,12 @@ onMounted(async () => {
       store.dispatch("StoreSupervisor", result4);
       store.dispatch("StoreAreaCd", result5);
 
+      console.log(res.data.List[0]);
+      const res4 = await getFavoriteList(res.data.List[0].loginID);
+      store.dispatch(
+        "setFavoriteList",
+        res4.data.List.map((item) => Number(item.lngProgramID))
+      );
       router.push("/homepage");
       return;
     }

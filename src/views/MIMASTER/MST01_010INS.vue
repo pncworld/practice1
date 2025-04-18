@@ -1,10 +1,6 @@
 <template>
   <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <div class="flex justify-start w-full pl-12 pt-4">
-      <div class="flex justify-start">
-        <h1 class="font-bold text-sm md:text-2xl w-full">TLU 관리</h1>
-      </div>
-    </div>
+    <PageName></PageName>
     <div class="flex justify-center mr-10 space-x-2 pr-5">
       <button @click="searchButton" class="button search md:w-auto w-14">
         조회
@@ -88,7 +84,8 @@
             :changeRow="changeRow"
             :changeValue2="changeValue"
             :changeColid="changeColid"
-            :changeNow="changeNow"
+            :changeNow2="changeNow"
+            :changeNow="changeNow2"
             :searchWord3="searchword"
             :searchColId="'lngCode,strName'"
             :selectionStyle="'singleRow'"
@@ -204,9 +201,10 @@
 <script setup>
 import { getTLUManageInfo, saveTLUList } from "@/api/master";
 import Swal from "sweetalert2";
-import { onMounted, ref, watch } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 import { VueDraggableNext } from "vue-draggable-next";
 import { useStore } from "vuex";
+import PageName from "@/components/pageName.vue";
 
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
@@ -341,7 +339,7 @@ const onMove = (evt) => {
   }
 };
 
-const onEnd = (evt) => {
+const onEnd = async (evt) => {
   // Swap을 처리할 조건
 
   if (
@@ -370,43 +368,183 @@ const onEnd = (evt) => {
   }
 };
 
-watch(items, () => {
+watch(items, async () => {
   console.log(items.value);
   if (items.value.length == 0) return;
-  const first = updatedRowData2.value.find(
-    (item) => item.lngCode == clickedTLUCd.value
-  );
-  first.lngMenu1 = items.value[0].lngCode;
-  first.lngMenu2 = items.value[1].lngCode;
-  first.lngMenu3 = items.value[2].lngCode;
-  first.lngMenu4 = items.value[3].lngCode;
-  first.lngMenu5 = items.value[4].lngCode;
-  first.lngMenu6 = items.value[5].lngCode;
-  first.lngMenu7 = items.value[6].lngCode;
-  first.lngMenu8 = items.value[7].lngCode;
-  first.lngMenu9 = items.value[8].lngCode;
-  first.lngMenu10 = items.value[9].lngCode;
-  first.lngMenu11 = items.value[10].lngCode;
-  first.lngMenu12 = items.value[11].lngCode;
-  first.lngMenu13 = items.value[12].lngCode;
-  first.lngMenu14 = items.value[13].lngCode;
-  first.lngMenu15 = items.value[14].lngCode;
-  first.lngMenu16 = items.value[15].lngCode;
-  first.lngMenu17 = items.value[16].lngCode;
-  first.lngMenu18 = items.value[17].lngCode;
-  first.lngMenu19 = items.value[18].lngCode;
-  first.lngMenu20 = items.value[19].lngCode;
-  first.lngMenu21 = items.value[20].lngCode;
-  first.lngMenu22 = items.value[21].lngCode;
-  first.lngMenu23 = items.value[22].lngCode;
-  first.lngMenu24 = items.value[23].lngCode;
-  first.lngMenu25 = items.value[24].lngCode;
-  first.lngMenu26 = items.value[25].lngCode;
-  first.lngMenu27 = items.value[26].lngCode;
-  first.lngMenu28 = items.value[27].lngCode;
-  first.lngMenu29 = items.value[28].lngCode;
 
-  console.log(updatedRowData2.value);
+  changeValue.value = items.value[0].lngCode;
+  changeColid.value = "lngMenu1";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[1].lngCode;
+  changeColid.value = "lngMenu2";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[2].lngCode;
+  changeColid.value = "lngMenu3";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[3].lngCode;
+  changeColid.value = "lngMenu4";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[4].lngCode;
+  changeColid.value = "lngMenu5";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[5].lngCode;
+  changeColid.value = "lngMenu6";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[6].lngCode;
+  changeColid.value = "lngMenu7";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[7].lngCode;
+  changeColid.value = "lngMenu8";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[8].lngCode;
+  changeColid.value = "lngMenu9";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[9].lngCode;
+  changeColid.value = "lngMenu10";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[10].lngCode;
+  changeColid.value = "lngMenu11";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[11].lngCode;
+  changeColid.value = "lngMenu12";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[12].lngCode;
+  changeColid.value = "lngMenu13";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[13].lngCode;
+  changeColid.value = "lngMenu14";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[14].lngCode;
+  changeColid.value = "lngMenu15";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[15].lngCode;
+  changeColid.value = "lngMenu16";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[16].lngCode;
+  changeColid.value = "lngMenu17";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[17].lngCode;
+  changeColid.value = "lngMenu18";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[18].lngCode;
+  changeColid.value = "lngMenu19";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[19].lngCode;
+  changeColid.value = "lngMenu20";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[20].lngCode;
+  changeColid.value = "lngMenu21";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[21].lngCode;
+  changeColid.value = "lngMenu22";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[22].lngCode;
+  changeColid.value = "lngMenu23";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[23].lngCode;
+  changeColid.value = "lngMenu24";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[24].lngCode;
+  changeColid.value = "lngMenu25";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[25].lngCode;
+  changeColid.value = "lngMenu26";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[26].lngCode;
+  changeColid.value = "lngMenu27";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[27].lngCode;
+  changeColid.value = "lngMenu28";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeValue.value = items.value[28].lngCode;
+  changeColid.value = "lngMenu29";
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
 });
 
 function formatNumber(value) {
@@ -415,6 +553,7 @@ function formatNumber(value) {
 }
 
 const saveButton = async () => {
+  console.log(updatedRowData2.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -607,8 +746,6 @@ const saveButton = async () => {
   // 빈공간 데이터를 넣으려고하는데 안 들어가고 조회가 안됨 // 빈 칸에 대한 것도 데이터를 불러와야 메뉴키위치를 정할 수 있음.
 };
 
-let dataProvider2;
-
 const searchMenuList = (e) => {
   searchword1.value = e.target.value;
 };
@@ -666,14 +803,18 @@ const saveKey = (index) => {
 const deletekey = () => {
   // const filtered = TLUList.value.find((item,index) => item.lngCode == Number(clickedTLUCd.value)).find((item,index) => index == currIndexKey.value+2)
 
-  const finditem = TLUList.value.find(
-    (item, index) => item.lngCode == Number(clickedTLUCd.value)
-  );
-  if (currIndexKey.value >= 0 && currIndexKey.value <= 28) {
-    finditem[`lngMenu${currIndexKey.value + 1}`] = 0;
-  }
+  // const finditem = TLUList.value.find(
+  //   (item, index) => item.lngCode == Number(clickedTLUCd.value)
+  // );
+  // if (currIndexKey.value >= 0 && currIndexKey.value <= 28) {
+  //   finditem[`lngMenu${currIndexKey.value + 1}`] = 0;
+  // }
 
-  TLUList.value = [...TLUList.value];
+  // TLUList.value = [...TLUList.value];
+
+  changeValue.value = 0;
+  changeColid.value = `lngMenu${currIndexKey.value + 1}`;
+  changeNow.value = !changeNow.value;
   const finditem2 = items.value.find(
     (item, index) => index == currIndexKey.value
   );
@@ -695,6 +836,7 @@ const changeRow = ref();
 const changeValue = ref();
 const changeColid = ref();
 const changeNow = ref(false);
+const changeNow2 = ref(false);
 
 const selectedIndex2 = (e) => {
   changeRow.value = e;
@@ -720,7 +862,7 @@ const selcetedrowData = (newValue) => {
   changeValue.value = newValue[0];
   changeColid.value = "lngMenu" + (currIndexKey.value + 1);
   console.log(changeColid.value);
-  changeNow.value = !changeNow.value;
+  changeNow2.value = !changeNow2.value;
   // const finditem = TLUList.value.find(
   //   (item, index) => item.lngCode == Number(clickedTLUCd.value)
   // );

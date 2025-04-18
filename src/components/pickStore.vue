@@ -257,6 +257,39 @@ const emitStoreGroup = (value) => {
 const emitStoreAreaCd = (value) => {
   emit("update:storeAreaCd", value);
 };
+
+watch(
+  () => store.state.storeCd,
+  () => {
+    storeGroup.value = store.state.storeGroup;
+    storeType.value = store.state.storeType;
+    storeCd.value = store.state.storeCd;
+    storeCd2.value = store.state.storeCd;
+    storeAreaCd2.value = store.state.storeAreaCd;
+    selectedStoreAreaCd.value = 0;
+
+    emit("update:storeGroup", selectedGroupCd.value);
+    emit("update:storeType", selectedStoreType.value);
+    emit("update:storeCd", selectedStoreCode.value);
+    emit("storeNm", defaultStoreNm.value);
+    emit("posNo", 0);
+    //emit("update:storeAreaCd", 0);
+    emit("GroupNm", store.state.userData.strStoreGroupName);
+    setPosNo(store.state.userData.lngPosition);
+    setStoreAreaCd(store.state.userData.lngPosition);
+    setKioskNo(store.state.userData.lngPosition);
+    if (
+      store.state.userData.blnBrandAdmin == "True" ||
+      store.state.userData.lngPositionType == "1"
+    ) {
+      isDisabled.value = false;
+    } else {
+      isDisabled.value = true;
+    }
+
+    defaultStoreNm.value = props.defaultStoreNm;
+  }
+);
 onMounted(() => {
   storeGroup.value = store.state.storeGroup;
   storeType.value = store.state.storeType;

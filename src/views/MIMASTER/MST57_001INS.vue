@@ -1,11 +1,9 @@
 <template>
   <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <div class="flex justify-start pl-4 pt-4">
-      <div class="flex justify-start">
-        <h1 class="font-bold text-sm md:text-2xl w-32 md:w-auto">
-          메뉴 카테고리 관리
-        </h1>
-        <div class="flex justify-end space-x-2 ml-24 md:ml-[945px]">
+    <div class="flex justify-start pl-4 pt-0">
+      <PageName></PageName>
+      <div class="flex justify-end space-x-2 ml-[1168px]">
+        <div class="flex justify-center space-x-2 mt-2">
           <button @click="searchMenu" class="button search md:w-auto w-14">
             조회
           </button>
@@ -270,6 +268,7 @@ import {
   setSubCategoryINSERT,
   setSubCategoryUPDATE,
 } from "@/api/master";
+import PageName from "@/components/pageName.vue";
 import PickStore from "@/components/pickStore.vue";
 import { insertPageLog } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";

@@ -2390,11 +2390,13 @@ watch(
         // dataProvider.setRowStates(newIndices, "created", true);
         addrow4activated.value = false;
 
-        if (deleted2activated.value == true) {
-          gridView.clearCurrent();
-          deleted2activated.value = false;
-        } else {
-          gridView.clearCurrent();
+        if (gridView !== null && gridView != undefined) {
+          if (deleted2activated.value == true) {
+            gridView.clearCurrent();
+            deleted2activated.value = false;
+          } else {
+            gridView.clearCurrent();
+          }
         }
       }, 80); // 시간으로인한 미적용 이슈있음
     });

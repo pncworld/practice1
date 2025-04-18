@@ -115,6 +115,10 @@ const emitStoreGroup = (value) => {
 const emitStoreType = (value) => {
   emit("update:storeType", value);
 };
+
+// watch(() => store.state.storeCd , () => {
+
+// })
 onMounted(() => {
   defaultPlaceHolder.value = props.placeholderName;
   selectedGroup.value = store.state.storeGroup[0].lngStoreGroup;

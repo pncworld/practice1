@@ -1,6 +1,6 @@
 <template>
   <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-auto">
+    <div class="flex justify-between items-center w-full overflow-y-hidden">
       <div class="flex justify-start w-full pl-12 pt-4">
         <div class="flex justify-start">
           <h1 class="font-bold text-sm md:text-2xl w-full">
@@ -19,7 +19,7 @@
     </div>
     <div
       class="grid grid-cols-2 grid-rows-3 bg-gray-200 rounded-lg h-32 items-center z-10 space-x-5">
-      <div class="mt-1 justify-start flex">
+      <div class="mt-1 ml-2 justify-start flex">
         <Datepicker2
           @startDate="startDate"
           @endDate="endDate"
@@ -38,7 +38,7 @@
           @lngStoreAttrs="lngStoreAttrs"
           :placeholderName="'선택'"></pickStoreRenew>
       </div>
-      <div class="flex justify-start items-center pl-20 space-x-2">
+      <div class="flex justify-start items-center pl-28 space-x-2">
         <div class="text-base font-semibold pl-1">조회조건 :</div>
         <select
           name=""
@@ -75,7 +75,7 @@
       </div>
 
       <div class="flex justify-start items-center h-8 space-x-1 pl-2">
-        <div class="text-base font-semibold w-24 text-nowrap ml-16 -mr-1">
+        <div class="text-base font-semibold w-24 text-nowrap ml-24 -mr-1">
           검색조건 :
         </div>
         <select

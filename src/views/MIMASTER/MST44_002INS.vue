@@ -1,10 +1,6 @@
 <template>
   <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <div class="flex justify-start w-full pl-12 pt-4">
-      <div class="flex justify-start">
-        <h1 class="font-bold text-sm md:text-2xl w-full">객층키 설정</h1>
-      </div>
-    </div>
+    <PageName></PageName>
     <div class="flex justify-center mr-9 space-x-2 pr-5">
       <button @click="searchButton" class="button search md:w-auto w-14">
         조회
@@ -168,6 +164,7 @@ import { useStore } from "vuex";
 
 import PickStore from "@/components/pickStore.vue";
 import { insertPageLog } from "@/customFunc/customFunc";
+import PageName from "@/components/pageName.vue";
 
 // 더미 데이터
 const items = ref([]);

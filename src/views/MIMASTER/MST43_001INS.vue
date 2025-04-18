@@ -1,13 +1,7 @@
 <template>
   <div class="h-[80%]">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <div class="flex justify-start w-full pl-12 pt-4">
-        <div class="flex justify-start">
-          <h1 class="font-bold text-sm md:text-2xl w-full">
-            신용카드 매입사 등록.
-          </h1>
-        </div>
-      </div>
+      <PageName></PageName>
       <div class="flex justify-center mr-10 space-x-2 pr-5">
         <button @click="searchButton" class="button search">조회</button>
         <button @click="saveButton" class="button save">저장</button>
@@ -164,7 +158,7 @@ import { insertPageLog } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
 import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
-
+import PageName from "@/components/pageName.vue";
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 });

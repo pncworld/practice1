@@ -15,13 +15,7 @@
       </div>
     </div> -->
     <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <div class="flex justify-start w-full pl-12 pt-4">
-        <div class="flex justify-start">
-          <h1 class="font-bold text-sm md:text-2xl w-full">
-            마스터자동다운로드 등록
-          </h1>
-        </div>
-      </div>
+      <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
@@ -141,6 +135,7 @@ import {
 import Datepicker1_1 from "@/components/Datepicker1_1.vue";
 import Realgrid from "@/components/realgrid.vue";
 import { insertPageLog } from "@/customFunc/customFunc";
+import PageName from "@/components/pageName.vue";
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);

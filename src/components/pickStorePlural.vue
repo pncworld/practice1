@@ -214,6 +214,64 @@ const labelingColumns = ref(
 const valuesData = ref([]);
 const labelsData = ref([]);
 const initCheck = ref(false);
+
+watch(
+  () => store.state.storeCd,
+  () => {
+    // storeGroup.value = store.state.storeGroup;
+    // storeType.value = store.state.storeType;
+    // storeTeam.value = store.state.storeTeamCode;
+    // storeSuperVisor.value = store.state.storeSupervisor;
+    // rowData.value = store.state.storeCd;
+    // if (
+    //   store.state.userData.blnBrandAdmin == "True" ||
+    //   store.state.userData.lngPositionType == "1"
+    // ) {
+    //   disabled1.value = false;
+    //   emit("lngStoreGroup", store.state.storeGroup[0].lngStoreGroup);
+    //   emit(
+    //     "lngStoreCodes",
+    //     store.state.storeCd.map((item) => item.lngStoreCode).join(",")
+    //   );
+    //   console.log(store.state.storeCd);
+    //   emit("lngStoreAttrs", 0);
+    //   emit("lngSupervisor", 0);
+    //   emit("lngStoreTeam", 0);
+    //   emit("excelStore", "매장명 : 전체");
+    // } else {
+    //   disabled1.value = true;
+    //   emit("lngStoreGroup", store.state.userData.lngStoreGroup);
+    //   emit("lngStoreCodes", store.state.userData.lngPosition);
+    //   emit("lngStoreAttrs", store.state.userData.lngJoinType);
+    //   emit("lngSupervisor", store.state.userData.lngSupervisor);
+    //   emit("lngStoreTeam", store.state.userData.lngTeamCode);
+    //   emit("excelStore", "매장명 : " + store.state.userData.strStoreName);
+    //   selectedStoreType.value = store.state.userData.lngJoinType;
+    //   selectedStoreList.value = store.state.userData.strStoreName;
+    //   selectedStoreTeam.value = store.state.userData.lngTeamCode;
+    //   selectedSuperVisor.value = store.state.userData.lngSupervisor;
+    // }
+    // labelsData.value.push(store.state.storeGroup.map((item) => item.strName));
+    // valuesData.value.push(
+    //   store.state.storeGroup.map((item) => item.lngStoreGroup)
+    // );
+    // labelsData.value.push(store.state.storeType.map((item) => item.strName));
+    // valuesData.value.push(store.state.storeType.map((item) => item.lngStoreAttr));
+    // labelsData.value.push(
+    //   store.state.storeTeamCode.map((item) => item.strTeamName)
+    // );
+    // valuesData.value.push(
+    //   store.state.storeTeamCode.map((item) => item.lngTeamCode)
+    // );
+    // labelsData.value.push(
+    //   store.state.storeSupervisor.map((item) => item.strName)
+    // );
+    // valuesData.value.push(
+    //   store.state.storeSupervisor.map((item) => item.lngSupervisor)
+    // );
+    // initCheck.value = !initCheck.value;
+  }
+);
 onMounted(() => {
   storeGroup.value = store.state.storeGroup;
   storeType.value = store.state.storeType;

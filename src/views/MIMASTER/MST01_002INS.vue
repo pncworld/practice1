@@ -1,10 +1,6 @@
 <template>
   <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <div class="flex justify-start w-full pl-12 pt-4">
-      <div class="flex justify-start">
-        <h1 class="font-bold text-sm md:text-2xl w-full">매장정보등록</h1>
-      </div>
-    </div>
+    <PageName></PageName>
     <div class="flex justify-center mr-10 space-x-2 pr-5">
       <button @click="searchButton" class="button search">조회</button>
       <button @click="saveButton" class="button save">저장</button>
@@ -528,8 +524,9 @@
 </template>
 
 <script setup>
-import { getGridInfoList } from "@/api/common";
+import { get_store_list, getGridInfoList } from "@/api/common";
 import { getstoreInfo, saveStoreInfo } from "@/api/master";
+import PageName from "@/components/pageName.vue";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
 import { insertPageLog } from "@/customFunc/customFunc";
@@ -1158,6 +1155,33 @@ const saveButton = async () => {
           insertlngMultiPriceGroupCode.join(",")
         );
         console.log(res);
+
+        const response2 = await get_store_list(
+          store.state.userData.lngStoreGroup,
+          store.state.userData.lngPositionType,
+          store.state.userData.blnBrandAdmin == "False" ? 0 : 1,
+          store.state.userData.lngPosition,
+          store.state.userData.lngJoinType,
+          store.state.userData.lngTeamCode,
+          store.state.userData.lngSupervisor
+        );
+
+        console.log(response2.data);
+
+        const result0 = response2.data.storeGroup;
+        const result1 = response2.data.storeAttr;
+        const result2 = response2.data.store;
+        const result3 = response2.data.storeSupervisorTeam;
+        const result4 = response2.data.storeSupervisor;
+        const result5 = response2.data.storeArea;
+
+        store.dispatch("StoreGroup", result0);
+        store.dispatch("StoreType", result1);
+        store.dispatch("StoreCd", result2);
+        store.dispatch("StoreTeamCode", result3);
+        store.dispatch("StoreSupervisor", result4);
+        store.dispatch("StoreAreaCd", result5);
+
         Swal.fire({
           title: "저장 되었습니다.",
           confirmButtonText: "확인",

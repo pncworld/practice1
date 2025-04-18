@@ -196,6 +196,24 @@ export const alreadyMobileLogined = (token) => {
   });
 };
 
+export const getFavoriteList = (userid) => {
+  return api2.post("/SYSTEM/system.asmx/getFavoriteList", {
+    USER_ID: userid,
+  });
+};
+export const addFavorite = (progid, userid) => {
+  return api2.post("/SYSTEM/system.asmx/addFavorite", {
+    PROG_ID: progid,
+    USER_ID: userid,
+  });
+};
+export const deleteFavorite = (progid, userid) => {
+  return api2.post("/SYSTEM/system.asmx/deleteFavorite", {
+    PROG_ID: progid,
+    USER_ID: userid,
+  });
+};
+
 export const createItem = (item) => api.post("/items", item);
 export const updateItem = (id, item) => api.put(`/items/${id}`, item);
 export const deleteItem = (id) => api.delete(`/items/${id}`);

@@ -22,7 +22,7 @@
           class="flex justify-start mx-auto pb-1 scrollbar-hide max-w-[75%] w-full">
           <!-- 부모 div -->
           <div
-            class="flex overflow-x-auto space-x-2 md:space-x-1 w-full mt-4 md:mt-2 ml-1">
+            class="flex overflow-x-auto space-x-2 md:space-x-1 w-full mt-4 md:mt-2 ml-4">
             <!-- 내부 div -->
             <button
               v-for="(item, i) in mainCategoryList"
@@ -68,14 +68,26 @@
           </div>
         </div>
         <div
-          class="absolute top-12 right-10 bg-white w-52 rounded-lg h-auto text-lg"
+          class="absolute top-12 right-10 bg-white w-52 rounded-lg h-auto text-lg overflow-x-hidden"
           v-show="showmenus">
           <button v-for="i in tabs" @click="setActiveTab(i)">
             {{ i.strTitle }}
           </button>
         </div>
         <!-- 우측 버튼 영역 -->
-        <div class="items-center space-x-4 flex mr-8">
+        <div class="items-center space-x-4 flex mr-5 w-96">
+          <button @click="moveleft">
+            <img
+              src="../../assets/arrow2.png"
+              alt="Delete"
+              class="w-5 sm:w-6 md:w-7 h-4" />
+          </button>
+          <button @click="moveright">
+            <img
+              src="../../assets/arrow2.png"
+              alt="Delete"
+              class="w-5 sm:w-6 md:w-7 h-4 rotate-180" />
+          </button>
           <button @click="deleteAllTabs">
             <img
               src="../../assets/ic_delete.svg"
@@ -110,7 +122,9 @@
       </div>
 
       <!-- 탭 영역 -->
-      <div class="overflow-x-auto space-x-2 mt-8 ml-60 hidden md:flex">
+      <div
+        class="overflow-x-hidden space-x-2 mt-8 ml-60 hidden md:flex scroll-smooth"
+        ref="scrollContainer">
         <div
           v-for="tab in tabs"
           :key="tab.lngProgramID"
@@ -120,7 +134,7 @@
             'text-blue-400': currentActiveTab.lngProgramID == tab.lngProgramID,
           }">
           <span>{{ tab.strTitle }}</span>
-          <button @click.stop="removeTab(tab)">
+          <button @click.stop="removeTab(tab)" class="w-3 h-3">
             <img
               src="../../assets/deleteIcon.png"
               alt="Delete"
@@ -150,7 +164,10 @@
         class="w-full h-full bg-white p-1 overflow-y-scroll overflow-x-hidden">
         <router-view v-slot="{ Component, route }">
           <keep-alive>
-            <component :is="Component" :key="`${route.path}-${componentKey}`" />
+            <component
+              :is="Component"
+              :key="`${route.path}-${componentKey}`"
+              class="bg-white" />
           </keep-alive>
         </router-view>
       </main>
@@ -164,10 +181,20 @@ import Loading from "@/components/loading.vue";
 import router from "@/router";
 import Swal from "sweetalert2";
 import { v4 } from "uuid";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
+const scrollContainer = ref(null);
+const moveright = () => {
+  scrollContainer.value.scrollLeft += 200;
+};
+const moveMaxright = () => {
+  scrollContainer.value.scrollLeft = scrollContainer.value.scrollWidth + 2000;
+};
+const moveleft = () => {
+  scrollContainer.value.scrollLeft -= 200;
+};
 onMounted(() => {
   // router.push("/homepage");
 });
@@ -217,6 +244,7 @@ const showMenus = () => {
 };
 const selectCategoryId = ref(1);
 const triggerNow = ref(false);
+
 const selectCategory = (category) => {
   //store.dispatch("selectCategory", category);\
   selectCategoryId.value = category;
@@ -254,9 +282,12 @@ const hideMenu = () => {
 };
 
 const tabs = ref([]);
-const emittab = (e) => {
+const emittab = async (e) => {
   tabs.value = e;
+  await nextTick();
+  moveMaxright();
 };
+
 const activeTab = (e) => {
   console.log(e);
   //store.state.activeTab2 = e;
@@ -276,6 +307,7 @@ const removeTab = (tab) => {
     // @click.stop 안해서 상위 이벤트 전파때문에 안됬었음.
 
     currentActiveTab.value = tabs.value[tabs.value.length - 1];
+    store.dispatch("saveActiveTab", currentActiveTab.value);
     const insteadProgramID = tabs.value[tabs.value.length - 1].lngProgramID;
     const insteadstrUrl = tabs.value[tabs.value.length - 1].strUrl;
     componentKey.value = insteadProgramID;
