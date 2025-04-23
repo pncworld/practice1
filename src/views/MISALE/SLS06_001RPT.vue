@@ -1,13 +1,7 @@
 <template>
   <div class="h-full" @click="handleParentClick">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <div class="flex justify-start w-full pl-12 pt-4">
-        <div class="flex justify-start">
-          <h1 class="font-bold text-sm md:text-2xl w-full">
-            요일별 매출 현황.
-          </h1>
-        </div>
-      </div>
+      <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
@@ -95,6 +89,7 @@
 <script setup>
 import { getWeedaySalesReport, getWeekDayList } from "@/api/misales";
 import Datepicker2 from "@/components/Datepicker2.vue";
+import PageName from "@/components/pageName.vue";
 import pickStoreSingle from "@/components/pickStoreSingle.vue";
 import Realgrid from "@/components/realgrid.vue";
 import { insertPageLog } from "@/customFunc/customFunc";

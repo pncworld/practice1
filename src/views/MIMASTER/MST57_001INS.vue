@@ -129,7 +129,9 @@
     </div>
   </div>
 
-  <div class="justify-start md:ml-5 ml-14 mt-5 space-x-2 hidden md:flex">
+  <div
+    class="justify-start md:ml-5 ml-14 mt-5 space-x-2 hidden md:flex"
+    v-show="afterSearch">
     <button
       class="whitebutton"
       style="font-size: 14px"
@@ -146,8 +148,7 @@
         서브카테고리 추가
       </button>
     </div>
-    <div
-      class="rounded-md h-10 w-auto flex items-center justify-center mr-[120px]">
+    <div class="rounded-md h-10 w-auto flex items-center justify-center mr-44">
       <button
         class="whitebutton"
         style="font-size: 14px"
@@ -166,7 +167,7 @@
     style="margin-left: 296px; width: 71%"
     v-for="i in subMultiLang"
     v-if="afterCategory">
-    <div class="-mt-10" style="margin-left: 1000px">
+    <div class="-mt-10" style="margin-left: 1120px">
       <button class="whitebutton" @click="deleteSubCategory(i[0].categoryCode)">
         삭제
       </button>
@@ -238,7 +239,7 @@
     </div>
     <div class="float-right -mr-32 space-y-5"></div>
   </div>
-  <div class="flex justify-end mr-32 mt-10">
+  <div class="flex justify-end mr-40 mt-10" v-show="afterCategory">
     <div class="flex flex-col items-end">
       <div
         class="text-white rounded-md h-8 w-44 flex items-center justify-center">
@@ -292,9 +293,9 @@ const afterCategory = ref(false);
 const currentMajorCode = ref();
 const newMainCategoryCode = ref([]);
 const handleStoreCd = (newValue) => {
-  if (newValue == "0") {
-    afterSearch.value = false;
-  }
+  // if (newValue == "0") {
+  afterSearch.value = false;
+  // }
   nowStoreCd.value = newValue;
 };
 const afterSearch = ref(false);
@@ -845,8 +846,8 @@ const bringCategory = (value) => {
   }
 
   currentMajorCode.value = value;
-  console.log(getMultiLang.value);
-  console.log(Category.value);
+  // console.log(getMultiLang.value);
+  // console.log(Category.value);
   Category.value = Category.value.map((categoryItem) => {
     // getMultiLang에서 MajorCode와 일치하는 항목을 찾아 mainMultilang으로 설정
     categoryItem.mainMultilang = getMultiLang.value.filter(

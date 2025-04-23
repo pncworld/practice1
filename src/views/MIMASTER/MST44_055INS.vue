@@ -338,7 +338,8 @@ const showNext = () => {
     i++
   ) {
     const findindex = originGroupKeys.value.findIndex(
-      (item) => item.intKeySeq == i + 1
+      (item) =>
+        item.intKeySeq == i + 1 && item.lngGroupCode == clickedGroupCd.value
     );
     if (findindex == -1) {
       KeyList2.value.splice(i, 0, { intKeySeq: i + 1 });
@@ -357,7 +358,9 @@ const showPrev = () => {
   console.log(clickedGroupPage.value);
   for (var i = 0; i < 25; i++) {
     const findindex = originGroupKeys.value.findIndex(
-      (item) => item.intKeySeq == 25 * (clickedGroupPage.value - 1) + i + 1
+      (item) =>
+        item.intKeySeq == 25 * (clickedGroupPage.value - 1) + i + 1 &&
+        item.lngGroupCode == clickedGroupCd.value
     );
     if (findindex == -1) {
       KeyList2.value.splice(i, 0, {
@@ -642,6 +645,7 @@ const onEnd2 = (evt) => {
 };
 
 const savePosMenu = async () => {
+  console.log(KeyList.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -677,22 +681,20 @@ const savePosMenu = async () => {
     if (result.isConfirmed) {
       store.state.loading = true;
       try {
-        console.log(currentpaymentCd.value);
-
         const intKeySeqs = KeyList.value
-          .filter((item) => item.lngKeyScrNo != undefined)
+          .filter((item) => item.lngKeyScrNo !== undefined)
           .map((item) => item.intKeySeq);
         const keyscrnos = KeyList.value
-          .filter((item) => item.lngKeyScrNo != undefined)
+          .filter((item) => item.lngKeyScrNo !== undefined)
           .map((item) => item.lngKeyScrNo);
         const KeyNmarr = KeyList.value
-          .filter((item) => item.lngKeyScrNo != undefined)
+          .filter((item) => item.lngKeyScrNo !== undefined)
           .map((item) => item.strKeyName);
         const gps = KeyList.value
-          .filter((item) => item.lngKeyScrNo != undefined)
+          .filter((item) => item.lngKeyScrNo !== undefined)
           .map((item) => item.gp);
         const intKeyNos = KeyList.value
-          .filter((item) => item.lngKeyScrNo != undefined)
+          .filter((item) => item.lngKeyScrNo !== undefined)
           .map((item) => item.intKeyNo);
 
         const intKeySeqs2 = originGroupKeys.value.map((item) => item.intKeySeq);
@@ -729,6 +731,7 @@ const savePosMenu = async () => {
         );
 
         console.log(res2);
+        console.log(res3);
       } catch (error) {
       } finally {
         store.state.loading = false;
@@ -876,7 +879,9 @@ const saveMenuKeyposition = (index, item) => {
       i++
     ) {
       const findindex = originGroupKeys.value.findIndex(
-        (item) => item.intKeySeq == (clickedGroupPage.value - 1) * 25 + i + 1
+        (item) =>
+          item.intKeySeq == (clickedGroupPage.value - 1) * 25 + i + 1 &&
+          item.lngGroupCode == clickedGroupCd.value
       );
       if (findindex == -1) {
         KeyList2.value.splice(i, 0, {

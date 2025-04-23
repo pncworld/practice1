@@ -1,13 +1,7 @@
 <template>
   <div class="h-full" @click="handleParentClick">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <div class="flex justify-start w-full pl-12 pt-4">
-        <div class="flex justify-start">
-          <h1 class="font-bold text-sm md:text-2xl w-full">
-            메뉴군별 매출 현황2.
-          </h1>
-        </div>
-      </div>
+      <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="chartButton" class="button primary md:w-auto w-14">
           차트
@@ -382,6 +376,7 @@
 import { getSalesReportByMenu, getTableSearchCondition } from "@/api/misales";
 import Chart from "@/components/chart.vue";
 import Datepicker2 from "@/components/Datepicker2.vue";
+import PageName from "@/components/pageName.vue";
 import PickStorePlural from "@/components/pickStorePlural.vue";
 import Realgrid from "@/components/realgrid.vue";
 import { formatTime, insertPageLog } from "@/customFunc/customFunc";
@@ -695,7 +690,7 @@ const searchButton2 = async () => {
         }, {})
       )
         .sort((a, b) => b.lngMenuCnt - a.lngMenuCnt)
-        .slice(0, 30);
+        .slice(0, 5);
       console.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
@@ -740,7 +735,7 @@ const searchButton2 = async () => {
         }, {})
       )
         .sort((a, b) => b.lngNMenuCnt - a.lngNMenuCnt)
-        .slice(0, 30);
+        .slice(0, 5);
       console.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
@@ -785,7 +780,7 @@ const searchButton2 = async () => {
         }, {})
       )
         .sort((a, b) => b.lngGMenuCnt - a.lngGMenuCnt)
-        .slice(0, 30);
+        .slice(0, 5);
       console.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
@@ -829,7 +824,7 @@ const searchButton2 = async () => {
         }, {})
       )
         .sort((a, b) => b.lngSalCnt - a.lngSalCnt)
-        .slice(0, 30);
+        .slice(0, 5);
       console.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
@@ -873,7 +868,7 @@ const searchButton2 = async () => {
         }, {})
       )
         .sort((a, b) => b.lngSalAmt - a.lngSalAmt)
-        .slice(0, 30);
+        .slice(0, 5);
       console.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
@@ -917,7 +912,7 @@ const searchButton2 = async () => {
         }, {})
       )
         .sort((a, b) => b.lngActAmt - a.lngActAmt)
-        .slice(0, 30);
+        .slice(0, 5);
       console.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
@@ -961,7 +956,7 @@ const searchButton2 = async () => {
         }, {})
       )
         .sort((a, b) => b.lngNetAmt - a.lngNetAmt)
-        .slice(0, 30);
+        .slice(0, 5);
       console.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
@@ -1005,7 +1000,7 @@ const searchButton2 = async () => {
         }, {})
       )
         .sort((a, b) => b.lngDCAmt - a.lngDCAmt)
-        .slice(0, 30);
+        .slice(0, 5);
       console.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
@@ -1049,7 +1044,7 @@ const searchButton2 = async () => {
         }, {})
       )
         .sort((a, b) => b.lngGAmount - a.lngGAmount)
-        .slice(0, 30);
+        .slice(0, 5);
       console.log(menus);
       label.value = menus.map((item) => item.strMenu);
 

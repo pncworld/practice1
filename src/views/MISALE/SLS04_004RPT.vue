@@ -1,13 +1,7 @@
 <template>
   <div class="h-full" @click="handleParentClick">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <div class="flex justify-start w-full pl-12 pt-4">
-        <div class="flex justify-start">
-          <h1 class="font-bold text-sm md:text-2xl w-full">
-            메뉴별/시간별 매출현황.
-          </h1>
-        </div>
-      </div>
+      <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
@@ -196,6 +190,7 @@
 <script setup>
 import { getMenuCondition, getSalesDatabyTimeAndMenu } from "@/api/misales";
 import Datepicker2 from "@/components/Datepicker2.vue";
+import PageName from "@/components/pageName.vue";
 import PickStorePlural from "@/components/pickStorePlural.vue";
 import Realgrid from "@/components/realgrid.vue";
 import { formatTime, insertPageLog } from "@/customFunc/customFunc";
@@ -255,11 +250,16 @@ const setCond = (e) => {
     if (e.target.checked) {
       checkedDate.value = 1;
       temphideColumns.value = temphideColumns.value.filter(
-        (item) => item != "dtmDate"
+        (item) => item !== "dtmDate" && item !== "lngPrice"
+      );
+      hideColumnsId.value = hideColumnsId.value.filter(
+        (item) => item !== "dtmDate" && item !== "lngPrice"
       );
     } else {
       checkedDate.value = 0;
       temphideColumns.value.push("dtmDate");
+      hideColumnsId.value.push("dtmDate");
+      hideColumnsId.value.push("lngPrice");
     }
   }
 };
@@ -543,7 +543,13 @@ onMounted(async () => {
 
   mainMenu.value = res.data.List;
 });
-const hideColumnsId = ref(["strMajor", "strSub", "strStore", "dtmDate"]);
+const hideColumnsId = ref([
+  "strMajor",
+  "strSub",
+  "strStore",
+  "dtmDate",
+  "lngPrice",
+]);
 
 const checkedDays = new Set([1, 2, 3, 4, 5, 6, 7]);
 
@@ -579,19 +585,15 @@ const changeGridMenus = (e) => {
 };
 
 const setRowGroupSpan2 = ref("");
-const setCellUnite = () => {
-  if (checkedDate.value == 1) {
+const setCellUnite = (e) => {
+  if (e.target.checked) {
     if (checkedStore.value == 1) {
       setRowGroupSpan2.value = "strStore,dtmDate";
     } else {
       setRowGroupSpan2.value = "dtmDate";
     }
   } else {
-    if (checkedStore.value == 1) {
-      setRowGroupSpan2.value = "strStore";
-    } else {
-      setRowGroupSpan2.value = "";
-    }
+    setRowGroupSpan2.value = "";
   }
   reload.value = !reload.value;
 };

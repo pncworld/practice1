@@ -412,6 +412,108 @@ export const getMenuList = (groupCd, storeCd) => {
     STORE_CD: 0,
   });
 };
+export const getKitchenGroupList = (groupCd) => {
+  return api2.post("/MIMASTER/MST44_064INS.asmx/getKitchenGroupList", {
+    GROUP_CD: groupCd,
+    STORE_CD: 0,
+  });
+};
+export const getKitchenGroupList2 = (groupCd) => {
+  return api2.post("/MIMASTER/MST44_064INS.asmx/getKitchenGroupList2", {
+    GROUP_CD: groupCd,
+    STORE_CD: 0,
+  });
+};
+export const getKitchenPortList = (groupCd, storeCd, areaCd) => {
+  return api2.post("/MIMASTER/MST44_064INS.asmx/getKitchenPortList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+  });
+};
+export const saveKitchenGroupList = (
+  deletegroupCd,
+  deletegroupCd2,
+  groupCd,
+  groupcds,
+  groupNms,
+  loginid
+) => {
+  return api2.post("/MIMASTER/MST44_064INS.asmx/saveKitchenGroupList", {
+    DELETE_GROUP_CD: deletegroupCd,
+    DELETE_GROUP_CD2: deletegroupCd2,
+    GROUP_CD: groupCd,
+    GROUP_CDS: groupcds,
+    GROUP_NMS: groupNms,
+    ID: loginid,
+  });
+};
+export const saveMenuKPG = (groupCd, lngCodes, lngkpg) => {
+  return api2.post("/MIMASTER/MST44_064INS.asmx/saveMenuKPG", {
+    GROUP_CD: groupCd,
+    LNG_CODE: lngCodes,
+    LNG_KPG: lngkpg,
+  });
+};
+export const savePortKitchenConfig = (
+  groupCd,
+  storeCds,
+  areaCds,
+  posNos,
+  lngpo,
+  lngprinttype,
+  p1,
+  p2,
+  p3,
+  p4,
+  p5,
+  p6,
+  p7,
+  p8,
+  p9,
+  p10,
+  p11,
+  p12,
+  p13,
+  p14,
+  p15,
+  p16,
+  p17,
+  p18,
+  p19,
+  p20,
+  strname
+) => {
+  return api2.post("/MIMASTER/MST44_064INS.asmx/savePortKitchenConfig", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCds,
+    AREA_CD: areaCds,
+    POS_NO: posNos,
+    LNG_POSITION: lngpo,
+    LNG_PRINTTYPE: lngprinttype,
+    P1: p1,
+    P2: p2,
+    P3: p3,
+    P4: p4,
+    P5: p5,
+    P6: p6,
+    P7: p7,
+    P8: p8,
+    P9: p9,
+    P10: p10,
+    P11: p11,
+    P12: p12,
+    P13: p13,
+    P14: p14,
+    P15: p15,
+    P16: p16,
+    P17: p17,
+    P18: p18,
+    P19: p19,
+    P20: p20,
+    STRNAME: strname,
+  });
+};
 export const getMenuListIncludeCommon = (groupCd, storeCd) => {
   return api2.post("/MIMASTER/MST36_001INS.asmx/getMenuListIncludeCommon", {
     GROUP_CD: groupCd,

@@ -140,6 +140,7 @@ const props = defineProps({
   },
 });
 
+const store = useStore();
 const clickFavorite = ref(false);
 const favoriteProgList = ref([]);
 const showFavorite = () => {
@@ -159,6 +160,16 @@ const showFavorite = () => {
       .map((item) => item.strTitle)[0];
   }
 };
+
+watch(
+  () => store.state.favoriteList,
+  () => {
+    currentFavorite.value = [...store.state.favoriteList];
+    favoriteProgList.value = store.state.minorCategory.filter((item) =>
+      currentFavorite.value.includes(item.lngProgramID)
+    );
+  }
+);
 
 const setProgramList = (e) => {
   console.log(e.target.value);
@@ -203,7 +214,6 @@ const setProgramList = (e) => {
 };
 
 const searchword = ref("");
-const store = useStore();
 const categories = ref([]);
 const toggleArrow = ref(false);
 const openCategoryId = ref([]);
@@ -266,6 +276,7 @@ const detectMobile = () => {
   const userAgent = window.navigator.userAgent;
   isMobile.value = /iPhone|iPad|iPod|Android/i.test(userAgent);
 };
+
 onMounted(() => {
   currentFavorite.value = [];
   currentFavorite.value = [...store.state.favoriteList];
@@ -319,6 +330,7 @@ watch(
 );
 const currentTab = ref();
 const selectCategory = (strUrl, lngProgramID2, strTitle) => {
+  console.log(strUrl, lngProgramID2, strTitle);
   if (tabs.value.length >= 10) {
     Swal.fire({
       title: "탭 제한",

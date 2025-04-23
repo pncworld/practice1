@@ -384,6 +384,9 @@ const setStoreAreaCd = (value) => {
 };
 
 const setPosNo = async (value) => {
+  console.log(value);
+  //console.log(storeGroup.value[0].lngStoreGroup);
+  if (value == undefined || storeGroup.value.length == 0) return;
   selectedPosNo.value = "0";
   storePosNo.value = "0";
   let response;
@@ -400,6 +403,7 @@ const setKioskNo = async (value) => {
   selectedKioskNo.value = "0";
   storeKioskNo.value = [];
   let response;
+  if (value == undefined || storeGroup.value.length == 0) return;
   try {
     response = await getKioskList(storeGroup.value[0].lngStoreGroup, value);
 

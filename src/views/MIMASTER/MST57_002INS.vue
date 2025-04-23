@@ -235,6 +235,7 @@ const handleStoreCd = (value) => {
 
 const emitsubcate = (value) => {
   currsubCateCd.value = value;
+  items.value = [];
 };
 const emitmaincate = (value) => {
   currmainCateCd.value = value;
@@ -284,10 +285,13 @@ const searchPosMenu = async () => {
   }
   items.value = [];
   try {
+    store.state.loading = true;
     const res = await tablePosMenu({
       GROUP_CD: groupCd.value,
       STORE_CD: currstoreCd.value,
     });
+
+    console.log(res);
     majorGroup.value = res.data.majorGroup;
 
     const res2 = await tablePosMenuKey({
@@ -308,6 +312,9 @@ const searchPosMenu = async () => {
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
+  } finally {
+    store.state.loading = false;
+    afterSearch.value = true;
   }
 };
 
@@ -352,16 +359,18 @@ const savePosMenu = async () => {
     if (result.isConfirmed) {
       store.state.loading = true;
       try {
-        const res = await deletetablePosMenuKey({
-          GROUP_CD: groupCd.value,
-          STORE_CD: currstoreCd.value,
-          AREA_CD: currAreaCd.value,
-          SUB_CD: currsubCateCd.value,
-          KEY_SEQ: deleteAllitems.value.join(","),
-        });
-
+        // const res = await deletetablePosMenuKey({
+        //   GROUP_CD: groupCd.value,
+        //   STORE_CD: currstoreCd.value,
+        //   AREA_CD: currAreaCd.value,
+        //   SUB_CD: currsubCateCd.value,
+        //   KEY_SEQ: deleteAllitems.value.join(","),
+        // });
+        // console.log(res);
         const MenuCds = items.value.map((item) => item.lngKeyscrNo);
         const MenuNm = items.value.map((item) => item.strKeyName);
+        console.log(items.value);
+
         const res2 = await savetablePosMenuKey({
           GROUP_CD: groupCd.value,
           STORE_CD: currstoreCd.value,
@@ -370,6 +379,7 @@ const savePosMenu = async () => {
           MENU_CD: MenuCds.join(","),
           MENU_NM: MenuNm.join(","),
         });
+        console.log(res2);
       } catch (error) {
       } finally {
         store.state.loading = false;

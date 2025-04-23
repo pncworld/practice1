@@ -267,7 +267,7 @@
                 name="lngChain"
                 id=""
                 :disabled="afterClick"
-                class="disabled:bg-gray-100 border rounded-lg w-[50%] h-full p-2"
+                class="disabled:bg-gray-100 border rounded-lg w-[50%] h-full p-1"
                 v-model="gridvalue9"
                 @change="changeInfo">
                 <option value="0">[0]선택</option>
@@ -275,7 +275,9 @@
                   [{{ i.lngCode }}]{{ i.strName }}
                 </option>
               </select>
-              <button class="whitebutton">옵션그룹 추가</button>
+              <button class="whitebutton" @click="moveOptionGroupPage">
+                옵션그룹 추가
+              </button>
             </div>
             <div
               class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">
@@ -893,6 +895,7 @@ import PageName from "@/components/pageName.vue";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
 import { insertPageLog } from "@/customFunc/customFunc";
+import router from "@/router";
 import axios from "axios";
 import RealGrid from "realgrid";
 import Swal from "sweetalert2";
@@ -924,9 +927,13 @@ const filteredrowData = ref([]);
 const hideNow = ref(false);
 const hideRow = ref([]);
 const MENUDEPEND = ref([]);
-const hiderow = () => {
-  //hideRow.value = 3
-  hideNow.value = !hideNow.value;
+const moveOptionGroupPage = () => {
+  store.state.moveOtherTab = {
+    strTitle: "선택 메뉴 그룹 등록.(U)",
+    lngProgramID: "73757",
+    strUrl: "MIMASTER::MST01_011INS_01.xml",
+  };
+  // router.push("/MIMASTER/MST01_011INS_01.xml");
 };
 
 const realgrid2Name = ref("");
@@ -1042,6 +1049,7 @@ const selectedIndex2 = (e) => {
   rowIndex.value = e;
 };
 const clickedRowData = async (newvalue) => {
+  afterClick.value = false;
   if (newvalue[9] == 0 || newvalue[12] == 1) {
     rowData2.value = [];
     clickrowData2.value = [];
@@ -1053,7 +1061,13 @@ const clickedRowData = async (newvalue) => {
     clickrowData2.value = JSON.parse(JSON.stringify(tempRowData2.value));
   }
 
-  console.log(newvalue);
+  console.log(SubMenuGroup.value);
+  console.log(newvalue[30]);
+  filteredSubMenuGroup2.value = SubMenuGroup.value.filter(
+    (item) => item.sublngMajor == newvalue[30]
+  );
+
+  console.log(filteredSubMenuGroup2.value);
   //rowIndex.value = newvalue.index;
   clickrowData4.value = [];
   filteredrowData5.value = [];
@@ -1206,7 +1220,7 @@ const handleStoreCd = async (newValue) => {
     initAll();
   }
 
-  nowStoreCd.value = newValue;
+  nowStoreCd.value = 0;
   searchButton();
 };
 const clickmappingData = ref([]);
@@ -1272,7 +1286,7 @@ const searchButton = async () => {
     console.log(res);
     optionGroup.value = res.data.OPTIONGROUP;
     tempRowData2.value = res.data.PAYCD;
-    const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
+    const res2 = await getMenuList(groupCd.value, 0);
     //rowData2.value = res2.data.menuList
     SubMenuGroup.value = res2.data.submenuGroup;
     MenuGroup.value = res2.data.menuGroup;

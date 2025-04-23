@@ -1,10 +1,6 @@
 <template>
   <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <div class="flex justify-start w-full pl-12 pt-4">
-      <div class="flex justify-start">
-        <h1 class="font-bold text-sm md:text-2xl w-full">좌석정보등록</h1>
-      </div>
-    </div>
+    <PageName></PageName>
     <div class="flex justify-center mr-10 space-x-2 pr-5">
       <button @click="searchButton" class="button search md:w-auto w-14">
         조회
@@ -343,6 +339,7 @@
 <script setup>
 import { getTableList2, saveTables2 } from "@/api/master";
 import DupliPopUp6 from "@/components/dupliPopUp6.vue";
+import PageName from "@/components/pageName.vue";
 import PickStore from "@/components/pickStore.vue";
 import { insertPageLog } from "@/customFunc/customFunc";
 
@@ -762,9 +759,10 @@ function initializeGrid() {
     maxRow: 56,
   });
 
-  grid.on("dragstop", (event, element) => handleDragStop(grid, element));
-  grid.on("resizestop", (event, element) => handleResizeStop(grid, element));
-
+  if (grid) {
+    grid.on("dragstop", (event, element) => handleDragStop(grid, element));
+    grid.on("resizestop", (event, element) => handleResizeStop(grid, element));
+  }
   return grid;
 }
 

@@ -1,13 +1,7 @@
 <template>
   <div class="h-full" @click="handleParentClick">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <div class="flex justify-start w-full pl-12 pt-4">
-        <div class="flex justify-start">
-          <h1 class="font-bold text-sm md:text-2xl w-full">
-            결제 형태별 매출현황II
-          </h1>
-        </div>
-      </div>
+      <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
@@ -116,6 +110,7 @@ import {
   isDynamicGrid,
 } from "@/api/misales";
 import Datepicker2 from "@/components/Datepicker2.vue";
+import PageName from "@/components/pageName.vue";
 import PickStorePlural from "@/components/pickStorePlural.vue";
 import Realgrid from "@/components/realgrid.vue";
 import { insertPageLog } from "@/customFunc/customFunc";
@@ -144,7 +139,14 @@ onMounted(async () => {
   const res2 = await isDynamicGrid(store.state.userData.lngStoreGroup);
   console.log(res2);
   //isDynamicGrid2.value = res2.data.List[0].strDynamicGrid;
-  isDynamicGrid2.value = "Y";
+  if (res2.data.List[0].strDynamicGrid == "Y") {
+    isDynamicGrid2.value = "Y";
+    progId.value = 1;
+  } else {
+    isDynamicGrid2.value = "N";
+    progId.value = 2;
+  }
+  reload.value = !reload.value;
 });
 
 const getSub = async (e) => {

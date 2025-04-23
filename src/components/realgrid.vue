@@ -1722,6 +1722,27 @@ watch(
           }
         }
       }
+
+      var current = gridView.getCurrent();
+      console.log(current);
+      if (current.itemIndex !== -1) {
+        emit("selectedIndex", current.dataRow);
+        emit("selectedIndex2", current.dataRow);
+        selectedRowData.value = dataProvider.getRows()[current.dataRow];
+        if (selectedRowData.value) {
+          const rowState = dataProvider.getRowState(current.dataRow);
+          if (selectedRowData.value) {
+            selectedRowData.value.index = current.dataRow;
+            selectedRowData.value.rowState = rowState;
+          }
+          selectedindex.value = current.dataRow;
+
+          console.log(rowState);
+          emit("sendRowState", rowState);
+
+          emit("clickedRowData", selectedRowData.value);
+        }
+      }
     }
   }
 );

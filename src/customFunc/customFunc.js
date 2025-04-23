@@ -92,9 +92,9 @@ export async function insertPageLog(progdata) {
   const userId = store.state.userData.lngSequence;
   let userIp;
   const userip = async () => {
-    const result = await fetch("https://api64.ipify.org?format=json");
-    const data = await result.json();
-    userIp = data.ip;
+    const result = await fetch("https://api64.ipify.org");
+    const data = await result.text(); // ← 여기!
+    userIp = data;
   };
   await userip();
   console.log(progdata);
