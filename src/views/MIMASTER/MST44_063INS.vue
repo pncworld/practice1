@@ -388,10 +388,11 @@
             :addrowProp="addrowProp4"
             :deleteRow6="deleterow4"
             :changeRow="changeRow4"
-            :changeNow="changeNow4"
+            :changeNow2="changeNow4"
             :changeColid="changeColid"
             :changeValue2="changeValue"
             :editableColId="'intPosNo'"
+            :setReFocus="setReFocus"
             :suffixColumnheng="['lngOIssueCount', 'lngRIssueCount']"
             :suffixColumnJul="['lngKitchenU', 'lngKitchenD', 'lngFloorMax']"
             @updatedRowData="updatedRowData4"
@@ -403,7 +404,7 @@
         <div class="font-semibold">
           <div class="flex justify-start -ml-9 mt-2 text-xl">상세정보</div>
           <div
-            class="grid grid-rows-12 grid-cols-[1fr,2fr] h-full w-full -ml-10 mt-5 items-center gap-0">
+            class="grid grid-rows-13 grid-cols-[1fr,2fr] h-[110%] w-full -ml-10 mt-5 items-center gap-0">
             <div
               class="bg-gray-100 rounded-tl-lg h-full w-full font-semibold items-center text-center border-t border-l border-gray-300 flex justify-center">
               주문서 발행횟수
@@ -583,7 +584,7 @@
               </select>
             </div>
             <div
-              class="text-blue-500 font-semibold bg-gray-100 h-full w-full rounded-bl-lg items-center flex text-center border-t border-l border-b border-gray-300 justify-center">
+              class="text-blue-500 font-semibold bg-gray-100 h-full w-full items-center flex text-center border-t border-l border-b border-gray-300 justify-center">
               *포스기 유형
             </div>
             <div
@@ -598,6 +599,183 @@
                 <option value="0">포스</option>
                 <option value="1">키오스크</option>
               </select>
+            </div>
+            <div
+              class="font-semibold bg-gray-100 h-full w-full rounded-bl-lg items-center flex text-center border-t border-l border-b border-gray-300 justify-center">
+              출력옵션값
+            </div>
+            <div
+              class="bg-white h-full w-full font-semibold items-center text-center border border-gray-300 flex justify-start pl-1 rounded-br-lg">
+              <button
+                class="whitebutton"
+                @click="openPopUp"
+                :disabled="disabled3">
+                출력 옵션값 설정
+              </button>
+              <div
+                class="absolute w-full h-full inset-0 bg-gray-500/50 top-0 left-0"
+                v-show="open">
+                <div
+                  class="absolute top-[25%] right-[25%] bg-white w-[50%] h-[50%] opacity-100">
+                  <div class="flex justify-between">
+                    <div
+                      class="flex justify-center items-center text-2xl ml-2 mt-2">
+                      출력옵션값
+                    </div>
+                    <button
+                      @click="disabledButton"
+                      class="button primary mr-2 mt-2">
+                      선택
+                    </button>
+                  </div>
+                  <div class="flex justify-center items-center h-[80%]">
+                    <div
+                      class="grid grid-cols-[1fr] grid-rows-1 h-full w-[95%] border border-gray-500 rounded-lg mt-3">
+                      <div
+                        class="flex justify-evenly items-center flex-wrap gap-x-2">
+                        <label for="1"
+                          ><input
+                            type="checkbox"
+                            id="1"
+                            value="1"
+                            @change="checkOption"
+                            v-model="checkedOptions" />객층/객수 출력
+                          안함(할리스)</label
+                        ><label for="2"
+                          ><input
+                            type="checkbox"
+                            id="2"
+                            value="2"
+                            @change="checkOption"
+                            v-model="checkedOptions" />영수발행시 메뉴 내역
+                          제외</label
+                        >
+                        <label for="3"
+                          ><input
+                            type="checkbox"
+                            id="3"
+                            value="3"
+                            @change="checkOption"
+                            v-model="checkedOptions" />주문서 발행 여부
+                          확인</label
+                        >
+                        <label for="4"
+                          ><input
+                            type="checkbox"
+                            id="4"
+                            value="4"
+                            :disabled="checkedOptions.includes('5')"
+                            @change="checkOption"
+                            v-model="checkedOptions" />승인내역 분할 출력</label
+                        >
+                        <label for="5"
+                          ><input
+                            type="checkbox"
+                            id="5"
+                            value="5"
+                            :disabled="checkedOptions.includes('4')"
+                            @change="checkOption"
+                            v-model="checkedOptions" />승인내역 전체 출력</label
+                        >
+                        <label for="6"
+                          ><input
+                            type="checkbox"
+                            id="6"
+                            value="6"
+                            @change="checkOption"
+                            v-model="checkedOptions" />전자서명
+                          전표미발행</label
+                        >
+                        <label for="7"
+                          ><input
+                            type="checkbox"
+                            id="7"
+                            value="7"
+                            @change="checkOption"
+                            v-model="checkedOptions" />멤버쉽 포인트 적립금이
+                          0일경우 출력제외</label
+                        >
+                        <label for="8"
+                          ><input
+                            type="checkbox"
+                            id="8"
+                            value="8"
+                            @change="checkOption"
+                            v-model="checkedOptions" />썬앳파주첼시점 결제내역
+                          제외 출력</label
+                        >
+                        <label for="9"
+                          ><input
+                            type="checkbox"
+                            id="9"
+                            value="9"
+                            @change="checkOption"
+                            v-model="checkedOptions" />영수증번호 미표시</label
+                        >
+                        <label for="10"
+                          ><input
+                            type="checkbox"
+                            id="10"
+                            value="10"
+                            @change="checkOption"
+                            v-model="checkedOptions" />머그잔사용 출력</label
+                        >
+                        <label for="11"
+                          ><input
+                            type="checkbox"
+                            id="11"
+                            value="11"
+                            :disabled="checkedOptions.includes('12')"
+                            @change="checkOption"
+                            v-model="checkedOptions" />주방빌지 폰트 세로로
+                          크게</label
+                        >
+                        <label for="12"
+                          ><input
+                            type="checkbox"
+                            id="12"
+                            value="12"
+                            @change="checkOption"
+                            :disabled="checkedOptions.includes('11')"
+                            v-model="checkedOptions" />주방빌지 폰트 가로세로
+                          크게</label
+                        >
+                        <label for="13"
+                          ><input
+                            type="checkbox"
+                            id="13"
+                            value="13"
+                            @change="checkOption"
+                            v-model="checkedOptions" />중간결제 이력 저장</label
+                        >
+                        <label for="18"
+                          ><input
+                            type="checkbox"
+                            id="18"
+                            value="18"
+                            @change="checkOption"
+                            v-model="checkedOptions" />주문서에 선택메뉴 출력
+                          안되게</label
+                        >
+                        <label for="23"
+                          ><input
+                            type="checkbox"
+                            id="23"
+                            value="23"
+                            @change="checkOption"
+                            v-model="checkedOptions" />영수증출력여부
+                          팝업창</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex justify-end mt-2 mr-2">
+                    <button @click="rollbackButton" class="whitebutton">
+                      닫기
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1322,7 +1500,7 @@ const addrowProp2 = ref(
 const addrowDefault2 = ref("");
 const addrowDefault3 = ref("");
 const addrowProp4 = ref(
-  "intPosNo,lngOIssueCount,lngOIssueType,lngOIssueSum,lngRIssueCount,lngRIssueType,lngKitchenOrderVoid,lngKitchenMenuVoid,lngKitchenU,lngKitchenD,lngFloorMax,lngLogo,lngStoreGroup,lngStoreCode,lngAreaCode,POSKIOSK"
+  "intPosNo,lngOIssueCount,lngOIssueType,lngOIssueSum,lngRIssueCount,lngRIssueType,lngKitchenOrderVoid,lngKitchenMenuVoid,lngKitchenU,lngKitchenD,lngFloorMax,lngLogo,lngStoreGroup,lngStoreCode,lngAreaCode,POSKIOSK,lngOption"
 );
 const addrowDefault4 = ref(" ,' ',-1,-1,' ',-1,-1,-1,' ',' ',' ',-1");
 const addRow2 = () => {
@@ -1476,7 +1654,7 @@ const addRow4 = () => {
     nowStoreCd.value +
     "," +
     nowStoreAreaCd.value +
-    ",-1";
+    ",-1,0";
   addRows4.value = !addRows4.value;
 };
 const dupliRow4 = () => {
@@ -1507,7 +1685,9 @@ const dupliRow4 = () => {
     checkedRowDataList.value[0].lngStoreCode +
     "," +
     checkedRowDataList.value[0].lngAreaCode +
-    `,${checkedRowDataList.value[0].POSKIOSK}`;
+    `,${checkedRowDataList.value[0].POSKIOSK}` +
+    "," +
+    checkedRowDataList.value[0].lngOption;
 
   console.log(addrowDefault4.value);
   addRows4.value = !addRows4.value;
@@ -2346,6 +2526,13 @@ const saveButton = async () => {
             .map((item) => item.POSKIOSK)
             .join("\u200B");
 
+          const lngOptions = updatedList4.value
+            .filter(
+              (item, index) => !allstaterow4.value.deleted.includes(index)
+            )
+            .map((item) => item.lngOption)
+            .join("\u200B");
+
           res = await savePrintConfig(
             groupCd.value,
             nowStoreCd.value,
@@ -2365,6 +2552,7 @@ const saveButton = async () => {
             lngstorecode,
             lngareacode,
             poskiosk,
+            lngOptions,
             deletedPosNos
           );
         }
@@ -2441,6 +2629,27 @@ const clickedRowData4 = (e) => {
   gridvalue5.value = e[10];
   selectCommon6.value = e[11];
   selectCommon7.value = e[15];
+  rollbackOption.value = e[16];
+  // //8 16 => 24
+
+  // 24/2  = 0
+  // 12 /2 = 0
+  // 6/2 = 0
+  // 3 /2 = 1
+  // 1
+  checkedOptions.value = [];
+  let option = Number(e[16]);
+  let count = 1;
+  while (true) {
+    if (option == 0) {
+      break;
+    }
+    if (option % 2 == 1) {
+      checkedOptions.value.push(count.toString());
+    }
+    option = Math.floor(option / 2);
+    count++;
+  }
 };
 
 const handlePosNo = (newValue) => {
@@ -2479,6 +2688,58 @@ const handleinitAll = () => {
   selectCommon5.value = -1;
   selectCommon6.value = -1;
   selectCommon7.value = -1;
+};
+
+const open = ref(false);
+const openPopUp = () => {
+  open.value = true;
+};
+const disabledButton = () => {
+  open.value = false;
+  setReFocus.value = !setReFocus.value;
+};
+
+const checkedOptions = ref([]);
+// const check2 = ref(false);
+// const check3 = ref(false);
+// const check4 = ref(false);
+// const check5 = ref(false);
+// const check6 = ref(false);
+// const check7 = ref(false);
+// const check8 = ref(false);
+// const check9 = ref(false);
+// const check10 = ref(false);
+// const check11 = ref(false);
+// const check12 = ref(false);
+// const check13 = ref(false);
+// const check18 = ref(false);
+// const check23 = ref(false);
+const rollbackOption = ref();
+const checkOption = (e) => {
+  let newValue;
+  console.log(checkedOptions.value);
+  if (checkedOptions.value.length == 0) {
+    newValue = 0;
+  } else {
+    newValue = checkedOptions.value.reduce((acc, val) => {
+      return Number(acc) + Math.pow(2, Number(val) - 1);
+    }, 0);
+  }
+  console.log(newValue);
+  changeValue.value = newValue;
+  changeColid.value = "lngOption";
+  changeNow4.value = !changeNow4.value;
+};
+
+const setReFocus = ref(false);
+const rollbackButton = () => {
+  changeValue.value = rollbackOption.value;
+  changeColid.value = "lngOption";
+  changeNow4.value = !changeNow4.value;
+
+  //rollbackOption.value = 0;
+  open.value = false;
+  setReFocus.value = !setReFocus.value;
 };
 </script>
 

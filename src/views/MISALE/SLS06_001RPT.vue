@@ -14,12 +14,14 @@
     <div
       class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
       <div class="grid grid-cols-1 grid-rows-2">
-        <label for="daily" class="font-thin inline-flex ml-4">
-          <input
-            type="checkbox"
-            id="daily"
-            @change="seeDaily"
-            class="ml-20 mt-2" />
+        <div class="flex">
+          <label for="daily" class="font-thin inline-flex ml-4">
+            <input
+              type="checkbox"
+              id="daily"
+              @change="seeDaily"
+              class="ml-20 mt-2" />
+          </label>
           <Datepicker2
             @startDate="startDate"
             @endDate="endDate"
@@ -28,7 +30,7 @@
             :selectedGroup="selectedGroup"
             @excelDate="excelDate"
             class="pr-72"></Datepicker2>
-        </label>
+        </div>
         <div
           class="flex justify-start items-center text-base text-nowrap font-semibold ml-36 pl-1">
           요일명 :

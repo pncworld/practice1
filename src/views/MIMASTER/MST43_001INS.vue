@@ -279,6 +279,10 @@ const changeInfo = (e) => {
     changeColid.value = "lngRate";
     changeValue2.value = rowValue;
   } else if (rowName == "gridvalue2") {
+    if (/^\d+$/.test(rowValue) == false) {
+      gridvalue2.value = e.target.value.replace(/[^\d]/g, "");
+      return;
+    }
     changeValue2.value = rowValue;
     changeColid.value = "strBuyCode";
   } else if (rowName == "gridvalue3") {

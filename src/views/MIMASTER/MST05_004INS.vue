@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col w-full overflow-y-hidden">
-    <div class="flex justify-between w-full pl-10 pt-5">
+    <div class="flex justify-between w-full pl-10">
       <pageName></pageName>
-      <div class="flex space-x-6 pr-12">
+      <div class="flex space-x-6 pr-12 pt-2">
         <button class="button search" @click="searchMenu">조회</button
         ><button class="button save" @click="saveMenuKey">저장</button
         ><button class="button copy" @click="showPopupf">
@@ -334,7 +334,9 @@
               }}</span>
               <span class="ml-16" v-if="item.intKeyNo == 6">{{
                 item.lngKeyscrNo
-                  ? typeof item.lngPrice == "string"
+                  ? typeof item.lngPrice == "number"
+                    ? item.lngPrice.toLocaleString() + "원"
+                    : item.lngPrice.substring(item.lngPrice.length - 1) == "원"
                     ? item.lngPrice
                     : Number(item.lngPrice).toLocaleString() + "원"
                   : ""
@@ -609,11 +611,11 @@ const saveMenuKey = () => {
           nowStoreCd.value,
           nowStoreAreaCd.value,
           posNo.value,
-          keyseq.join(","),
-          keyname.join(","),
-          keyscrno.join(","),
-          keycolor.join(","),
-          keyno.join(",")
+          keyseq.join("\u200B"),
+          keyname.join("\u200B"),
+          keyscrno.join("\u200B"),
+          keycolor.join("\u200B"),
+          keyno.join("\u200B")
         );
         console.log(res);
         if (res.data.RESULT_CD == "00") {

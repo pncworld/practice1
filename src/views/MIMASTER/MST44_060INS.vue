@@ -102,6 +102,7 @@
             @updatedRowData="updatedRowData"
             :deleteRow="deleteRows"
             @clickedRowData="clickedRowData"
+            :inputOnlyNumberColumn="'lngCode'"
             :editableColId="'strName'"></Realgrid>
         </div>
         <div class="flex justify-start ml-10">

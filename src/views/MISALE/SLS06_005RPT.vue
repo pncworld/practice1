@@ -173,7 +173,7 @@
           :value="2"
           v-model="setchart" />차트숨기기</label
       >
-      <button class="button primary" @click="printChart">인쇄</button>
+      <button class="button print" @click="printChart">인쇄</button>
     </div>
   </div>
 </template>

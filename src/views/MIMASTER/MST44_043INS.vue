@@ -904,8 +904,8 @@ const saveButton = async () => {
           nowStoreCd.value,
           nowStoreAreaCd.value,
           posNo.value,
-          lngDCodes.join(",") + "," + lngDCodes2.join(","),
-          plngDCodes.join(",")
+          lngDCodes.join("\u200B") + "\u200B" + lngDCodes2.join("\u200B"),
+          plngDCodes.join("\u200B")
         );
         console.log(res2);
       } catch (error) {
@@ -1085,22 +1085,6 @@ const addfor4ScreenKey = () => {
       ScreenKeys.value.push({ strScreenName: "", intScreenNo: "" });
     }
   }
-};
-
-const addfor30MenuKeys = () => {
-  const length = items.value.length;
-  if (length < 30) {
-    for (var i = 0; i < 30 - length; i++) {
-      items.value.push({ strScreenName: "", intScreenNo: "" });
-    }
-  }
-};
-
-const addScreenKey = (value) => {
-  currentscreenKeyNm.value = "";
-  addscreenKey.value = true;
-  console.log(value);
-  clickedScreenNo.value = value + 1;
 };
 
 const confirmaddScreenKey = () => {

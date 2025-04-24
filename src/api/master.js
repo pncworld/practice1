@@ -1852,6 +1852,7 @@ export const savePrintConfig = (
   lngstorecode,
   lngareacode,
   poskiosk,
+  lngoption,
   deleteposnos
 ) => {
   return api2.post("/MIMASTER/MST44_063INS.asmx/savePrintConfig", {
@@ -1873,6 +1874,7 @@ export const savePrintConfig = (
     LNG_STORECODE: lngstorecode,
     LNG_AREACODE: lngareacode,
     POS_KIOSK: poskiosk,
+    LNG_OPTION: lngoption,
     DELETE_POSNO: deleteposnos,
   });
 };

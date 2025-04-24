@@ -48,6 +48,37 @@
   margin-right: 5px;
   margin-top: 1px;
 }
+
+.button.print {
+  background-color: #5782FF;
+  color: #fff;
+}
+.button.print:before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background: url(../assets/print-solid.svg) no-repeat;
+  color: #fff;
+  filter: invert(1);
+  margin-right: 5px;
+  margin-top: 1px;
+}
+
+.button.chart {
+  background-color: #5782FF;
+  color: #fff;
+}
+.button.chart:before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background: url(../assets/chart-simple-solid.svg) no-repeat;
+  color: #fff;
+  filter: invert(1);
+  margin-right: 5px;
+  margin-top: 1px;
+}
+
 body, input, select, button, textarea, h1, h2, h3, h4, h5, h6, table {
   font: 500 14px "Noto Sans KR", Helvetica, "malgun gothic", "Apple SD Gothic Neo", "Microsoft NeoGothic", "Droid sans", arial, sans-serif;
 }

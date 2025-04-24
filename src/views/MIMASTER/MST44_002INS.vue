@@ -102,6 +102,7 @@
             @updatedRowData="updatedRowData"
             :deleteRow="deleteRows"
             @clickedRowData="clickedRowData"
+            :inputOnlyNumberColumn="'lngCode'"
             :editableColId="'strName'"></Realgrid>
         </div>
         <div class="flex justify-start ml-10">
@@ -576,11 +577,11 @@ const saveButton = async () => {
           nowStoreCd.value,
           nowStoreAreaCd.value,
           posNo.value,
-          lngCodes.join(","),
-          strNames.join(","),
-          intKeySeqs.join(","),
-          strKeyNames.join(","),
-          lngKeyscrNos.join(",")
+          lngCodes.join("\u200B"),
+          strNames.join("\u200B"),
+          intKeySeqs.join("\u200B"),
+          strKeyNames.join("\u200B"),
+          lngKeyscrNos.join("\u200B")
         );
         console.log(res2);
       } catch (error) {

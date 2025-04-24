@@ -570,6 +570,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  setReFocus: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const realgridname = ref(
@@ -2240,6 +2244,16 @@ watch(
         // emit('clickedRowData', selectedRowData.value);
       }
     }
+  }
+);
+
+watch(
+  () => props.setReFocus,
+  () => {
+    const datarow = gridView.getCurrent();
+    console.log(datarow);
+    selectedRowData.value = dataProvider.getRows()[datarow.dataRow];
+    emit("clickedRowData", selectedRowData.value);
   }
 );
 // watch(() => props.setRowGroupSpan  , () => {

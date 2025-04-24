@@ -182,7 +182,7 @@
                   type="text"
                   name="strName"
                   id=""
-                  class="h-full w-[80%] border rounded-lg pl-2 ml-2 font-thin text-gray-700 disabled:bg-gray-200"
+                  class="h-full w-[80%] border rounded-lg pl-2 ml-2 font-semibold text-gray-700 disabled:bg-gray-200"
                   v-model="gridvalue3"
                   @input="changeInfo"
                   :disabled="afterClickrow" />

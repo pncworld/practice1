@@ -108,11 +108,13 @@
       :progname="'MST01_032INS_VUE'"
       :progid="1"
       :rowData="rowData"
+      :rowStateeditable="false"
       @checkedRowData="checkedRowData"></Realgrid>
     <Realgrid
       :progname="'MST01_032INS_VUE'"
       :progid="2"
       :rowData="rowData2"
+      :rowStateeditable="false"
       @checkedRowData="checkedRowData2"></Realgrid>
   </div>
 </template>

@@ -1,6 +1,6 @@
 <template>
   <div class="h-[80%]">
-    <div class="flex justify-between items-center w-full overflow-y-auto">
+    <div class="flex justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-10 space-x-2 pr-5">
         <button @click="searchButton" class="button search">조회</button>

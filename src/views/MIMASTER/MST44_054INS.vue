@@ -752,9 +752,9 @@ const savePosMenu = async () => {
           nowStoreCd.value,
           nowStoreAreaCd.value,
           posNo.value,
-          screenKeyNoarr.join(","),
-          screenKeyNamearr.join(","),
-          screenKeyDisc.join(","),
+          screenKeyNoarr.join("\u200B"),
+          screenKeyNamearr.join("\u200B"),
+          screenKeyDisc.join("\u200B"),
           currentpaymentCd.value
         );
 
@@ -773,12 +773,12 @@ const savePosMenu = async () => {
           nowStoreCd.value,
           nowStoreAreaCd.value,
           posNo.value,
-          intKeySeqs.join(","),
-          screenNumarr.join(","),
-          lngScrarr.join(","),
-          menuKeyNmarr.join(","),
+          intKeySeqs.join("\u200B"),
+          screenNumarr.join("\u200B"),
+          lngScrarr.join("\u200B"),
+          menuKeyNmarr.join("\u200B"),
           currentpaymentCd.value,
-          itemDiscYnarr.join(",")
+          itemDiscYnarr.join("\u200B")
         );
 
         console.log(res);

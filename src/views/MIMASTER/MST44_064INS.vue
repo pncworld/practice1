@@ -279,7 +279,7 @@
             name=""
             id=""
             :disabled="afterClick"
-            class="h-full w-full border rounded-lg pl-1"
+            class="h-full w-full border rounded-lg pl-1 disabled:bg-gray-100"
             v-model="selectedKitchenGroup"
             @change="setMenuKPG">
             <option :value="0">선택</option>
@@ -329,7 +329,7 @@
             class="h-full w-full border rounded-lg pl-1"
             v-model="gridValue3"
             @change="changePortKitchenPrint">
-            <option :value="0">선택</option>
+            <option :value="''">선택</option>
             <option :value="i.strDCode" v-for="i in printTypeList">
               {{ i.strDName }}
             </option>
@@ -791,9 +791,10 @@ onMounted(async () => {
   const res = await getCommonList(402);
 
   console.log(res);
-  labelsData.value = [res.data.List.map((item) => item.strDName)];
-  valuesData.value = [res.data.List.map((item) => item.strDCode)];
+  labelsData.value = [["", ...res.data.List.map((item) => item.strDName)]];
+  valuesData.value = [["", ...res.data.List.map((item) => item.strDCode)]];
 
+  console.log(labelsData.value);
   printTypeList.value = res.data.List;
 });
 
@@ -1158,6 +1159,7 @@ const searchButton = async () => {
     afterClick.value = true;
     afterClick2.value = true;
     afterClick3.value = true;
+    tempDisabled2.value = true;
   }
 };
 const filteredSubMenuGroup = ref([]);

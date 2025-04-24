@@ -3,7 +3,7 @@
     <div class="flex justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="chartButton" class="button primary md:w-auto w-14">
+        <button @click="chartButton" class="button chart md:w-auto w-14">
           차트
         </button>
         <button @click="searchButton" class="button search md:w-auto w-14">
@@ -12,7 +12,7 @@
         <button @click="excelButton" class="button save w-auto excel">
           엑셀
         </button>
-        <button @click="printButton" class="button primary w-auto">인쇄</button>
+        <button @click="printButton" class="button print w-auto">인쇄</button>
       </div>
     </div>
     <div
@@ -380,6 +380,7 @@ import PageName from "@/components/pageName.vue";
 import PickStorePlural from "@/components/pickStorePlural.vue";
 import Realgrid from "@/components/realgrid.vue";
 import { formatTime, insertPageLog } from "@/customFunc/customFunc";
+import printJS from "print-js";
 
 import { onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
@@ -1197,59 +1198,75 @@ const excelStore = (e) => {
 };
 
 const printButton = () => {
-  const header = document.createElement("div");
-  header.style.textAlign = "center";
-  header.style.fontSize = "18px";
-  header.style.fontWeight = "bold";
-  header.style.marginBottom = "20px";
-  header.innerHTML = "메뉴군별 매출 현황"; // 여기서 내용 변경 가능
+  if (afterSearch.value == false) {
+    return;
+  }
+  console.log(rowData.value);
 
-  const header2 = document.createElement("div");
-  header2.style.textAlign = "left";
-  header2.style.fontSize = "18px";
-  header2.style.fontWeight = "bold";
+  const convert = rowData.value.map((item) => ({
+    ...item,
+    lngPrice: item.lngPrice.toLocaleString(),
+    lngNMenuCnt: item.lngNMenuCnt.toLocaleString(),
+    lngGMenuCnt: item.lngGMenuCnt.toLocaleString(),
+    lngMenuCnt: item.lngMenuCnt.toLocaleString(),
+    lngSalAmt: item.lngSalAmt.toLocaleString(),
+    lngGAmount: item.lngGAmount.toLocaleString(),
+    lngDCAmt: item.lngDCAmt.toLocaleString(),
+    lngActAmt: item.lngActAmt.toLocaleString(),
+    lngNetAmt: item.lngNetAmt.toLocaleString(),
+    lngSalCnt: item.lngSalCnt.toLocaleString(),
+    dblPreWeek: Math.round(item.dblPreWeek * 100) / 100,
+    dblPreYear: Math.round(item.dblPreYear * 100) / 100,
+  }));
 
-  header2.style.marginBottom = "20px";
-  header2.innerHTML = selectedExcelDate.value; // 여기서 내용 변경 가능
-
-  const header3 = document.createElement("div");
-  header3.style.textAlign = "left";
-  header3.style.fontSize = "18px";
-  header3.style.fontWeight = "bold";
-  header3.style.position = "absolute";
-  header3.style.top = "70px";
-  header3.style.left = "0";
-  header3.style.marginBottom = "20px";
-  header3.innerHTML = selectedExcelStore.value; // 여기서 내용 변경 가능
-
-  const isoString = new Date().toISOString();
-  const formattedString = isoString.replace("T", " ").replace("Z", "");
-
-  const header4 = document.createElement("div");
-  header4.style.textAlign = "left";
-  header4.style.fontSize = "18px";
-  header4.style.fontWeight = "bold";
-
-  header4.style.marginBottom = "10px";
-  header4.innerHTML = "출력일시 : " + formattedString; // 여기서 내용 변경 가능
-
-  const printArea = document.getElementById("print-area");
-  // print-area 내에 머리글 3개 추가
-  printArea.prepend(header4);
-  printArea.prepend(header3);
-  printArea.prepend(header2);
-  printArea.prepend(header);
-
-  // 인쇄 후 헤더 제거 (선택적)
-  window.onafterprint = () => {
-    printArea.removeChild(header4);
-    printArea.removeChild(header3);
-    printArea.removeChild(header2);
-    printArea.removeChild(header);
-  };
-
-  // 인쇄 실행
-  window.print();
+  let property = [
+    { field: "strStore", displayName: "매장명" },
+    { field: "strMajor", displayName: "대그룹" },
+    { field: "strSub", displayName: "서브그룹" },
+    { field: "lngCode", displayName: "메뉴코드" },
+    { field: "strMenu", displayName: "메뉴명" },
+    { field: "lngPrice", displayName: "단가" },
+    { field: "dtmDate", displayName: "일자" },
+    { field: "lngNMenuCnt", displayName: "정상건수" },
+    { field: "lngGMenuCnt", displayName: "증정건수" },
+    { field: "lngMenuCnt", displayName: "총건수" },
+    { field: "lngSalAmt", displayName: "총매출액" },
+    { field: "lngGAmount", displayName: "증정금액" },
+    { field: "lngDCAmt", displayName: "할인액" },
+    { field: "lngActAmt", displayName: "실매출액" },
+    { field: "lngNetAmt", displayName: "순매출액" },
+    { field: "lngSalCnt", displayName: "할인건수" },
+    { field: "dblPreWeek", displayName: "전주비" },
+    { field: "dblPreYear", displayName: "전년비" },
+  ];
+  if (hideColumnsId.value.includes("dtmDate")) {
+    property = property.filter((item) => item.field !== "dtmDate");
+  }
+  if (hideColumnsId.value.includes("strStore")) {
+    property = property.filter((item) => item.field !== "strStore");
+  }
+  if (hideColumnsId.value.includes("strMajor")) {
+    property = property.filter((item) => item.field !== "strMajor");
+  }
+  if (hideColumnsId.value.includes("strSub")) {
+    property = property.filter((item) => item.field !== "strSub");
+  }
+  printJS({
+    printable: convert, // JSON 배열
+    properties: property,
+    type: "json",
+    header: `
+  <div style="display: flex; justify-content: space-between; font-size: 24px; font-weight: bold; margin-bottom: 10px;">
+    <div>메뉴군별 매출 현황2</div>
+    <div> ${selectedExcelStore.value}</div>
+  </div>
+`,
+    style: `.header { font-weight: bold;  font-size: 16px;  } @page {
+    size: portrait;
+  }  th {
+    font-size: 16px;  /* 원하는 글자 크기 */
+  }`,
+  });
 };
 
 const selectedMenu = ref(null);

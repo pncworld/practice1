@@ -9,7 +9,7 @@
         <button @click="excelButton" class="button save w-auto excel">
           엑셀
         </button>
-        <button @click="printButton" class="button primary w-auto">인쇄</button>
+        <button @click="printButton" class="button print w-auto">인쇄</button>
       </div>
     </div>
     <div

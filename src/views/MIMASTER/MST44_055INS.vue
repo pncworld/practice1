@@ -582,20 +582,21 @@ const onEnd = (evt) => {
       console.log(oldIndex);
       console.log(targetItemIndex2);
       const temp = swappedItems[oldIndex];
-      const originindex = originGroupKeys.value.findIndex(
+      const originindex = originGroupKeys.value.find(
         (item) =>
-          item.intKeySeq == oldIndex + (clickedGroupPage.value - 1) * 25 + 1
+          item.intKeySeq == oldIndex + (clickedGroupPage.value - 1) * 25 + 1 &&
+          item.lngGroupCode == clickedGroupCd.value
       );
       console.log(originindex);
-      if (originindex != -1) {
-        originGroupKeys.value[originindex].intKeySeq =
+      if (originindex !== undefined && originindex != -1) {
+        originindex.intKeySeq =
           targetItemIndex2 + (clickedGroupPage.value - 1) * 25 + 1;
       }
       swappedItems[oldIndex] = swappedItems[targetItemIndex2];
 
       swappedItems[targetItemIndex2] = temp;
 
-      console.log(swappedItems);
+      console.log(originGroupKeys.value);
       // 배열을 업데이트
       //   items.value = swappedItems;
 
@@ -616,20 +617,36 @@ const onEnd = (evt) => {
         ...item, // 기존 객체의 다른 속성 유지
         intKeySeq: index + 1, // 배열 순서대로 intKeySeq 재정렬
       }));
+
+      for (let i = 0; i < KeyList2.value.length; i++) {
+        let gc = KeyList2.value[i].lngGroupCode;
+        let ac = KeyList2.value[i].lngAmtCode;
+        let seq = KeyList2.value[i].intKeySeq;
+
+        const findit = originGroupKeys.value.find(
+          (item) => item.lngGroupCode == gc && item.lngAmtCode == ac
+        );
+        if (findit) {
+          findit.intKeySeq = seq;
+        }
+      }
     }
 
-    const originindex = originGroupKeys.value.findIndex(
-      (item) =>
-        item.intKeySeq == oldIndex + (clickedGroupPage.value - 1) * 25 + 1
-    );
-    console.log(originindex);
-    if (originindex != -1) {
-      originGroupKeys.value[originindex].intKeySeq =
-        targetItemIndex2 + (clickedGroupPage.value - 1) * 25 + 1;
-    }
+    console.log(KeyList2.value);
+    // const originindex = originGroupKeys.value.find(
+    //   (item) =>
+    //     item.intKeySeq ==
+    //       evt.oldIndex + (clickedGroupPage.value - 1) * 25 + 1 &&
+    //     item.lngGroupCode == clickedGroupCd.value
+    // );
+    // console.log(originindex);
+    // if (originindex !== undefined && originindex != -1) {
+    //   originindex.intKeySeq =
+    //     targetItemIndex2 + (clickedGroupPage.value - 1) * 25 + 1;
+    // }
   }
   clickedMenuKey.value = targetItemIndex2;
-  console.log("KeyList:", KeyList.value);
+  console.log(originGroupKeys.value);
 };
 
 const onEnd2 = (evt) => {
@@ -713,21 +730,21 @@ const savePosMenu = async () => {
           nowStoreCd.value,
           nowStoreAreaCd.value,
           posNo.value,
-          intKeySeqs.join(","),
-          keyscrnos.join(","),
-          KeyNmarr.join(","),
-          intKeyNos.join(","),
-          gps.join(",")
+          intKeySeqs.join("\u200B"),
+          keyscrnos.join("\u200B"),
+          KeyNmarr.join("\u200B"),
+          intKeyNos.join("\u200B"),
+          gps.join("\u200B")
         );
         const res3 = await saveGroupPayKey(
           groupCd.value,
           nowStoreCd.value,
           nowStoreAreaCd.value,
           posNo.value,
-          intKeySeqs2.join(","),
-          lngAmtcode2.join(","),
-          lngGroupCode2.join(","),
-          strKeyName2.join(",")
+          intKeySeqs2.join("\u200B"),
+          lngAmtcode2.join("\u200B"),
+          lngGroupCode2.join("\u200B"),
+          strKeyName2.join("\u200B")
         );
 
         console.log(res2);

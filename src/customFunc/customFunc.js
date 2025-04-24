@@ -90,23 +90,31 @@ export async function insertPageLog(progdata) {
   const userGroup = store.state.userData.lngCompanyCode;
   const userStoreCd = store.state.userData.lngChargerCode;
   const userId = store.state.userData.lngSequence;
-  let userIp;
+  let userIp = "0.0.0.0"; // 기본값
+
   const userip = async () => {
-    const result = await fetch("https://api64.ipify.org");
-    const data = await result.text(); // ← 여기!
-    userIp = data;
+    try {
+      const result = await fetch("https://api64.ipify.org", { timeout: 3000 });
+      const data = await result.text();
+      userIp = data;
+    } catch (err) {
+      console.warn("IP 가져오기 실패:", err);
+      // userIp는 기본값 유지
+    }
   };
+
   await userip();
-  console.log(progdata);
+  console.log("내 IP:", userIp);
+
   const progname = progdata.strUrl.split("::")[1].split(".xml")[0];
   const progid = progdata.lngProgramID.split("_")[0];
 
-  console.log(inserttime);
-  console.log(userGroup);
-  console.log(userStoreCd);
-  console.log(userId);
-  console.log(progname);
-  console.log(progid);
+  // console.log(inserttime);
+  // console.log(userGroup);
+  // console.log(userStoreCd);
+  // console.log(userId);
+  // console.log(progname);
+  // console.log(progid);
   const res = await savePageLog(
     inserttime,
     userGroup,

@@ -836,6 +836,7 @@ watch(items, (newvalue) => {
 });
 const savePosMenu = async () => {
   console.log(MenuKeyList.value);
+
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -882,21 +883,28 @@ const savePosMenu = async () => {
           nowStoreCd.value,
           nowStoreAreaCd.value,
           posNo.value,
-          screenKeyNoarr.join(","),
-          screenKeyNamearr.join(",")
+          screenKeyNoarr.join("\u200B"),
+          screenKeyNamearr.join("\u200B")
         );
 
+        const saveScreenInt = ScreenKeyOrigin.value.map(
+          (item) => item.intScreenNo
+        );
         const intKeySeqs = MenuKeyList.value
           .filter((item) => item.intPosNo == posNo.value)
+          .filter((item2) => saveScreenInt.includes(item2.intScreenNo))
           .map((item) => item.intKeySeq);
         const screenNumarr = MenuKeyList.value
           .filter((item) => item.intPosNo == posNo.value)
+          .filter((item2) => saveScreenInt.includes(item2.intScreenNo))
           .map((item) => item.intScreenNo);
         const lngScrarr = MenuKeyList.value
           .filter((item) => item.intPosNo == posNo.value)
+          .filter((item2) => saveScreenInt.includes(item2.intScreenNo))
           .map((item) => item.lngKeyscrNo);
         const menuKeyNmarr = MenuKeyList.value
           .filter((item) => item.intPosNo == posNo.value)
+          .filter((item2) => saveScreenInt.includes(item2.intScreenNo))
           .map((item) => item.strKeyName);
         console.log(posNo.value);
         console.log(intKeySeqs.join(","));
@@ -908,10 +916,10 @@ const savePosMenu = async () => {
           nowStoreCd.value,
           nowStoreAreaCd.value,
           posNo.value,
-          intKeySeqs.join(","),
-          screenNumarr.join(","),
-          lngScrarr.join(","),
-          menuKeyNmarr.join(",")
+          intKeySeqs.join("\u200B"),
+          screenNumarr.join("\u200B"),
+          lngScrarr.join("\u200B"),
+          menuKeyNmarr.join("\u200B")
         );
 
         console.log(res);

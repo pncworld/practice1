@@ -9,7 +9,7 @@
         <button @click="excelButton" class="button save w-auto excel">
           엑셀
         </button>
-        <button @click="printButton" class="button primary w-auto">출력</button>
+        <button @click="printButton" class="button print w-auto">인쇄</button>
       </div>
     </div>
     <div
@@ -620,7 +620,9 @@ const printButton = () => {
     const secondTableStartRow = firstTableRows + 2;
     const origin = "A" + secondTableStartRow;
     const origin2 = "A" + (secondTableStartRow + 1);
-    utils.sheet_add_aoa(ws, [["세부항목", "건수", "금액"]], { origin: origin });
+    utils.sheet_add_aoa(ws, [["세부항목", "건수", "금액", "비율"]], {
+      origin: origin,
+    });
     utils.sheet_add_json(ws, exportExcel2.value, {
       origin: origin2,
       skipHeader: true,
@@ -630,7 +632,7 @@ const printButton = () => {
     const subtitle2 = "A" + (thirdTableRows + 1);
     const origin3 = "A" + (thirdTableRows + 2);
     const origin4 = "A" + (thirdTableRows + 3);
-    utils.sheet_add_aoa(ws, [["정산항목", "건수", "금액"]], {
+    utils.sheet_add_aoa(ws, [["정산항목", "건수", "금액", "비율"]], {
       origin: origin3,
     });
     utils.sheet_add_json(ws, exportExcel3.value, {
@@ -655,7 +657,7 @@ const printButton = () => {
     const origin8 = "G" + (secondTableStartRow + 1);
     const subtitle4 = "G" + (secondTableStartRow - 1);
 
-    utils.sheet_add_aoa(ws, [["메뉴그룹명", "건수", "금액"]], {
+    utils.sheet_add_aoa(ws, [["메뉴그룹명", "건수", "금액", "비율"]], {
       origin: origin7,
     });
 
@@ -676,7 +678,7 @@ const printButton = () => {
     const origin10 = "G" + (fifthTableRows + 2);
     const subtitle5 = "G" + fifthTableRows;
 
-    utils.sheet_add_aoa(ws, [["카드사명", "건수", "금액"]], {
+    utils.sheet_add_aoa(ws, [["카드사명", "건수", "금액", "비율"]], {
       origin: origin9,
     });
 
@@ -822,7 +824,7 @@ const printButton = () => {
     // H3 셀에 줄바꿈 포함된 텍스트 추가
     const cellAddress = "H3";
     const cell = ws[cellAddress] || {};
-    cell.v = `조회기간: ${selectedstartDate.value} ~ ${selectedendDate.value}\n${excelstore.value}\n${excelposno.value}`;
+    cell.v = `조회기간: ${selectedstartDate.value} ~ ${selectedendDate.value}\n${excelstore.value}`;
     cell.s = {
       alignment: {
         horizontal: "top",

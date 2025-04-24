@@ -2,7 +2,7 @@
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
     <div class="flex justify-center mr-9 space-x-2 pr-5">
-      <button @click="chartButton" class="button primary md:w-auto w-14">
+      <button @click="chartButton" class="button chart md:w-auto w-14">
         차트
       </button>
       <button @click="searchButton" class="button search md:w-auto w-14">
