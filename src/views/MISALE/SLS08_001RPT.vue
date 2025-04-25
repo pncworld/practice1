@@ -83,6 +83,7 @@
         :setGroupSumCustomText="['소계']"
         :setGroupFooter="setGroupFooter"
         :setGroupColumnId="setGroupColumnId"
+        :rowStateeditable="false"
         :setGroupFooterExpressions="['sum', 'sum', 'sum', 'sum', 'sum']"
         :setGroupFooterColID="[
           'lngActAmt',

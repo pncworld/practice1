@@ -61,6 +61,7 @@
           :documentSubTitle="documentSubTitle"
           :documentTitle="'SLS06_005RPT'"
           :getJson="getJson"
+          :rowStateeditable="false"
           @getJsonData="getJsonData">
         </Realgrid>
       </div>
@@ -78,6 +79,7 @@
             :exporttoExcel="exportExcel"
             :documentSubTitle="documentSubTitle"
             :documentTitle="'SLS06_005RPT'"
+            :rowStateeditable="false"
             :getJson="getJson"
             @getJsonData="getJsonData2">
           </Realgrid>
@@ -89,6 +91,7 @@
             :exporttoExcel="exportExcel"
             :documentSubTitle="documentSubTitle"
             :documentTitle="'SLS06_005RPT'"
+            :rowStateeditable="false"
             :getJson="getJson"
             @getJsonData="getJsonData5">
           </Realgrid>
@@ -105,12 +108,14 @@
             :progid="3"
             :rowData="rowData3"
             :getJson="getJson"
+            :rowStateeditable="false"
             @getJsonData="getJsonData3"></Realgrid>
           <Realgrid
             :progname="'SLS02_028RPT_VUE'"
             :progid="6"
             :rowData="rowData6"
             :getJson="getJson"
+            :rowStateeditable="false"
             @getJsonData="getJsonData6"></Realgrid>
         </div>
       </div>
@@ -125,12 +130,14 @@
             :progid="4"
             :rowData="rowData4"
             :getJson="getJson"
+            :rowStateeditable="false"
             @getJsonData="getJsonData4"></Realgrid>
           <Realgrid
             :progname="'SLS02_028RPT_VUE'"
             :progid="7"
             :rowData="rowData7"
             :getJson="getJson"
+            :rowStateeditable="false"
             @getJsonData="getJsonData7"></Realgrid>
         </div>
       </div>

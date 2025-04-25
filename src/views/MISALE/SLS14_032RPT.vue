@@ -46,6 +46,7 @@
       :setRowGroupSpan2="'strName,dtmDate'"
       :mergeMask="'strName'"
       :documentTitle="'SLS14_032RPT'"
+      :rowStateeditable="false"
       :documentSubTitle="documentSubTitle"
       :exporttoExcel="exportExcel"></Realgrid>
   </div>

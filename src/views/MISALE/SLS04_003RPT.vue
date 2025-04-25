@@ -120,6 +120,7 @@
         :setFooter="true"
         :setFooterColID="setFooterColID"
         :setFooterExpressions="setFooterExpressions"
+        :rowStateeditable="false"
         :hideColumn="'strStoreName'"
         :hideColumnNow="hideColumnNow"></Realgrid>
     </div>

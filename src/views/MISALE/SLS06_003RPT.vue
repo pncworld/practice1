@@ -73,6 +73,7 @@
           'lngSupplyAmt',
         ],
       ]"
+      :rowStateeditable="false"
       :mergeColumnGroupName2="['순매출액']"></Realgrid>
   </div>
 </template>

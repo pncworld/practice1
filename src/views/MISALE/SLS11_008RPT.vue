@@ -126,6 +126,7 @@
         :documentTitle="'SLS11_008RPT'"
         :documentSubTitle="documentSubTitle"
         :exporttoExcel="exportExcel"
+        :rowStateeditable="false"
         :setGroupOrderByColumnId="'strStore'">
       </Realgrid>
     </div>

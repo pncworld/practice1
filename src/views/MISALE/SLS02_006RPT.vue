@@ -118,6 +118,7 @@
         :setFooterCustomText="['합계']"
         :setGroupSumCustomColumnId2="['strCompName']"
         :documentSubTitle="documentSubTitle"
+        :rowStateeditable="false"
         :exporttoExcel="exportExcel">
       </Realgrid>
     </div>

@@ -65,6 +65,7 @@
         :setFooterCustomColumnId="['strStoreName']"
         :setFooterCustomText="['총합계']"
         :documentTitle="'SLS11_006RPT'"
+        :rowStateeditable="false"
         :documentSubTitle="documentSubTitle"
         :exporttoExcel="exportExcel">
       </Realgrid>

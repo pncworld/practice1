@@ -95,6 +95,7 @@
         :hideColumnsId="hideColumnsId"
         :setRowGroupSpan="setRowGroupSpan"
         :documentTitle="'SLS11_009RPT'"
+        :rowStateeditable="false"
         :documentSubTitle="documentSubTitle"
         :exporttoExcel="exportExcel">
       </Realgrid>

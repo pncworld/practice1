@@ -72,6 +72,7 @@
       :setFooter="true"
       :documentTitle="'SLS01_092RPT'"
       :setMergeMode="false"
+      :rowStateeditable="false"
       :documentSubTitle="documentSubTitle"
       :exporttoExcel="exporttoExcel"></Realgrid>
   </div>

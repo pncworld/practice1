@@ -181,6 +181,7 @@
       :setGroupSumCustomText="['소계']"
       :setGroupSumCustomColumnId="['strWeekName']"
       :setGroupCustomLevel="3"
+      :rowStateeditable="false"
       :setGroupSummaryCenterIds="setGroupSummaryCenterIds"></Realgrid>
   </div>
 </template>

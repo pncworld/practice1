@@ -82,6 +82,7 @@
         :setGroupFooterExpressions="setGroupFooterExpressions"
         :setGroupFooterColID="setGroupFooterColID"
         :documentTitle="'SLS02_014RPT'"
+        :rowStateeditable="false"
         :documentSubTitle="documentSubTitle"
         :exporttoExcel="exportExcel">
       </Realgrid>

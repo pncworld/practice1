@@ -130,6 +130,7 @@
         :documentTitle="'SLS04_004RPT'"
         :setRowGroupSpan2="setRowGroupSpan2"
         :mergeColumns2="true"
+        :rowStateeditable="false"
         :mergeColumnGroupSubList2="[
           ['R1', 'S1', 'C1'],
           ['R2', 'S2', 'C2'],

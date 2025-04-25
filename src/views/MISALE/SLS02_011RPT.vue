@@ -77,6 +77,7 @@
         :initSelect="true"
         :exporttoExcel="exceloutput"
         :setStateBar="false"
+        :rowStateeditable="false"
         :ExcelNm="'영수증별 매출 조회.'"></Realgrid>
     </div>
     <div class="grid grid-rows-3 grid-cols-1">
@@ -86,6 +87,7 @@
           :progname="'SLS02_011RPT_VUE'"
           :progid="2"
           :rowData="rowData2"
+          :rowStateeditable="false"
           :setStateBar="false"></Realgrid>
       </div>
       <div class="mt-5">
@@ -94,6 +96,7 @@
           :progname="'SLS02_011RPT_VUE'"
           :progid="3"
           :rowData="rowData3"
+          :rowStateeditable="false"
           :setStateBar="false"></Realgrid>
       </div>
       <div class="mt-5">
@@ -102,6 +105,7 @@
           :progname="'SLS02_011RPT_VUE'"
           :progid="4"
           :rowData="rowData4"
+          :rowStateeditable="false"
           :setStateBar="false"></Realgrid>
       </div>
     </div>

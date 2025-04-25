@@ -276,6 +276,7 @@
         :hideColumn="'lngSalAmt'"
         :hideColumnNow="hideColumnNow"
         :documentTitle="'SLS06_002RPT'"
+        :rowStateeditable="false"
         :documentSubTitle="documentSubTitle">
       </Realgrid>
     </div>

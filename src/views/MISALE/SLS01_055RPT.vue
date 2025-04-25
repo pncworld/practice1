@@ -71,7 +71,8 @@
         :setMergeMode="false"
         :setRowGroupSpan2="setRowGroupSpan2"
         :documentSubTitle="documentSubTitle"
-        :exporttoExcel="exporttoExcel"></Realgrid>
+        :exporttoExcel="exporttoExcel"
+        :rowStateeditable="false"></Realgrid>
     </div>
   </div>
 </template>

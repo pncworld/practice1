@@ -86,6 +86,7 @@
         :setFooterExpressions="['sum', 'sum']"
         :setFooterColID="['intCount', 'lngAmtCode']"
         :documentTitle="'SLS08_003RPT'"
+        :rowStateeditable="false"
         :documentSubTitle="documentSubTitle"
         :exporttoExcel="exportExcel">
       </Realgrid>

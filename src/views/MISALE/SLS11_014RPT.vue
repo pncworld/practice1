@@ -44,6 +44,7 @@
         ]"
         :mergeColumnGroupName2="['Eat-In', 'Take-Out', '합계']"
         :documentTitle="'SLS11_014RPT'"
+        :rowStateeditable="false"
         :documentSubTitle="documentSubTitle"
         :exporttoExcel="exportExcel">
       </Realgrid>

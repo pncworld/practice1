@@ -39,7 +39,7 @@
         :setGroupSumCustomLevel="3" :setGroupSummaryCenterIds="setGroupSummaryCenterIds" :setGroupFooterExpressions="setGroupFooterExpressions" :setGroupFooterColID="setGroupFooterColID"
         :documentTitle="'SLS02_014RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
       </Realgrid> -->
-      <Realgrid :progname="'SLS05_002RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload" 
+      <Realgrid :progname="'SLS05_002RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload" :rowStateeditable="false"
          :setFooter="true" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
          :exporttoExcel="exportExcel" :documentTitle="'SLS05_002RPT'" :documentSubTitle="documentSubTitle" 
       </Realgrid>

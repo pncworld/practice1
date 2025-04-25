@@ -49,6 +49,7 @@
       :hideColumnsId="hideColumnsId"
       :setFooter="true"
       :documentTitle="'SLS01_091RPT'"
+      :rowStateeditable="false"
       :documentSubTitle="documentSubTitle"
       :exporttoExcel="exporttoExcel"></Realgrid>
   </div>

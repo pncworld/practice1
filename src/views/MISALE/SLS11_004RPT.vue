@@ -66,6 +66,7 @@
         :setGroupFooter="true"
         :setGroupColumnId="setGroupColumnId"
         :selectionStyle="'group'"
+        :rowStateeditable="false"
         :setFooterCustomColumnId="['strStoreName']"
         :setFooterCustomText="['총합계']"
         :documentTitle="'SLS11_004RPT'"

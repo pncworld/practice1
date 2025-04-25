@@ -69,6 +69,7 @@
         :setFooterExpressions="setFooterExpressions"
         :hideColumnsId="hideColumnsId"
         :documentTitle="'SLS11_013RPT'"
+        :rowStateeditable="false"
         :documentSubTitle="documentSubTitle"
         :exporttoExcel="exportExcel">
       </Realgrid>

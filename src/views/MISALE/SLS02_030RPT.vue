@@ -74,6 +74,7 @@
         :exporttoExcel="exportExcel"
         :documentSubTitle="documentSubTitle"
         :documentTitle="'SLS02_030RPT'"
+        :rowStateeditable="false"
         :setRowGroupSpan="'strName'"></Realgrid>
     </div>
   </div>

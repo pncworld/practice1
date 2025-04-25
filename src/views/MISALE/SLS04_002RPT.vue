@@ -366,6 +366,7 @@
           :setGroupFooterColID="setGroupFooterColID"
           :setGroupFooterExpressions="setGroupFooterExpressions"
           :setRowGroupSpan="setRowGroupSpan"
+          :rowStateeditable="false"
           :setGroupSumCustomLevel2="setGroupSumCustomLevel2"></Realgrid>
       </div>
     </div>

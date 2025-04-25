@@ -95,6 +95,7 @@
         :setRowGroupSpan2="setRowGroupSpan"
         :documentTitle="'SLS02_023RPT'"
         :documentSubTitle="documentSubTitle"
+        :rowStateeditable="false"
         :exporttoExcel="exportExcel">
       </Realgrid>
     </div>

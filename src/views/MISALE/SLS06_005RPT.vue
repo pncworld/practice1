@@ -85,6 +85,7 @@
         :exporttoExcel="exportExcel"
         :documentSubTitle="documentSubTitle"
         :documentTitle="'SLS06_005RPT'"
+        :rowStateeditable="false"
         :setFooterColID="[
           'lastTotAmt',
           'lastCustCnt',

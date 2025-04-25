@@ -100,6 +100,7 @@
         :documentTitle="'SLS12_011RPT'"
         :documentSubTitle="documentSubTitle"
         :exporttoExcel="exportExcel"
+        :rowStateeditable="false"
         :setGroupOrderByColumnId="'dtmDate'">
       </Realgrid>
     </div>

@@ -138,6 +138,7 @@
         ]"
         :setGroupCustomLevel="3"
         :documentSubTitle="documentSubTitle"
+        :rowStateeditable="false"
         :exporttoExcel="exportExcel">
       </Realgrid>
     </div>

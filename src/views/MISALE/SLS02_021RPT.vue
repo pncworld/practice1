@@ -37,6 +37,7 @@
         :rowData="rowData"
         :exporttoExcel="exporttoExcel"
         :documentTitle="'SLS02_021RPT'"
+        :rowStateeditable="false"
         :documentSubTitle="documentSubTitle">
       </Realgrid>
     </div>

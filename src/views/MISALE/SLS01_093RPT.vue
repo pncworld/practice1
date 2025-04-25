@@ -76,6 +76,7 @@
       :setGroupColumnId="setGroupColumnId"
       :setMergeMode="false"
       :documentSubTitle="documentSubTitle"
+      :rowStateeditable="false"
       :exporttoExcel="exporttoExcel"></Realgrid>
   </div>
 </template>

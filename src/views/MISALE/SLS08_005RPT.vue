@@ -78,6 +78,7 @@
         :setFooter="true"
         :mergeMask="''"
         :setMergeMode="false"
+        :rowStateeditable="false"
         :setGroupSumCustomColumnId="['dtmDate']"
         :setGroupSumCustomText="['소계']"
         :setGroupFooter="setGroupFooter"

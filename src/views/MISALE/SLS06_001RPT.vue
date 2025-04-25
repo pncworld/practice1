@@ -78,6 +78,7 @@
         :setGroupFooterColID="setGroupFooterColID"
         :documentTitle="'SLS06_001RPT'"
         :documentSubTitle="documentSubTitle"
+        :rowStateeditable="false"
         :exporttoExcel="exportExcel">
       </Realgrid>
       <!-- <Realgrid :progname="'SLS05_004RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" 

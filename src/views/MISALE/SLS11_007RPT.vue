@@ -84,6 +84,7 @@
         :setMergeMode="false"
         :setRowGroupSpan2="setRowGroupSpan"
         :documentTitle="'SLS11_007RPT'"
+        :rowStateeditable="false"
         :documentSubTitle="documentSubTitle"
         :exporttoExcel="exportExcel">
       </Realgrid>
