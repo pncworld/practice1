@@ -86,11 +86,7 @@
 </template>
 
 <script setup>
-import {
-  getCustomerList,
-  getSalesbyCustomer,
-  getSalesbyOrders,
-} from "@/api/misales";
+import { getSalesbyOrders } from "@/api/misales";
 import Datepicker2 from "@/components/Datepicker2.vue";
 import PageName from "@/components/pageName.vue";
 import PickStoreSingle2 from "@/components/pickStoreSingle.vue";

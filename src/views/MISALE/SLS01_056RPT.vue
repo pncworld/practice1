@@ -90,6 +90,10 @@ import { useStore } from "vuex";
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
+  // Swal.fire({
+
+  // });
 });
 
 const setGroupSumCustomColumnId3 = ref(["strCorner"]);
