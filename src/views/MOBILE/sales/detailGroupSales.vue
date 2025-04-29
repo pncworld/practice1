@@ -84,14 +84,14 @@ const SEARCHNOW = async (e) => {
       lngAmount: item.lngAmount.toLocaleString(),
       lngCount: item.lngCount.toLocaleString(),
     }));
-    console.log(rowData.value);
+    //console.log(rowData.value);
   } catch (error) {
   } finally {
     store.state.loading2 = false;
   }
 };
 onMounted(() => {
-  console.log(store.state);
+  //console.log(store.state);
 });
 </script>
 

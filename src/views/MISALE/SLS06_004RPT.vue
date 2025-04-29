@@ -238,7 +238,7 @@ const afterSearch = ref(false);
 const selectedstartDate = ref();
 const selectedendDate = ref();
 const startDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartDate.value = e;
 };
 const endDate = (e) => {
@@ -281,7 +281,7 @@ const searchButton = async () => {
         1,
         loginedstrLang
       );
-      console.log(res);
+      //console.log(res);
       rowData.value = res.data.DAILYSALES;
     } else if (progid.value == 2) {
       const res = await getDailySalesDetailReport(
@@ -292,7 +292,7 @@ const searchButton = async () => {
         1,
         loginedstrLang
       );
-      console.log(res);
+      //console.log(res);
       rowData.value = res.data.DAILYSALES;
     }
 
@@ -308,16 +308,16 @@ const selectedGroup = ref();
 const selectedStores = ref();
 const selectedStoreAttrs = ref();
 const lngStoreGroup = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = (e) => {
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreAttrs = (e) => {
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 const initGrid = () => {
@@ -381,9 +381,9 @@ const searchButton2 = async () => {
       1,
       loginedstrLang
     );
-    console.log(res);
+    //console.log(res);
     let temp = res.data.DAILYSALES;
-    console.log(temp);
+    //console.log(temp);
     if (selectOption.value == 1) {
       labels.value = [
         ...new Set(temp.map((item) => item.dtmDate.split(" ")[0])),
@@ -405,10 +405,10 @@ const searchButton2 = async () => {
         }, {})
       ).sort((a, b) => b.lngCustCnt - a.lngCustCnt);
 
-      console.log(menus);
+      //console.log(menus);
       label.value = menus.map((item) => item.dtmDate);
 
-      console.log(menus);
+      //console.log(menus);
       datas.value = [];
       let data1 = [];
       data1 = menus
@@ -438,10 +438,10 @@ const searchButton2 = async () => {
         }, {})
       ).sort((a, b) => b.lngCustAmt - a.lngCustAmt);
 
-      console.log(menus);
+      //console.log(menus);
       label.value = menus.map((item) => item.dtmDate);
 
-      console.log(menus);
+      //console.log(menus);
       datas.value = [];
       let data1 = [];
       data1 = menus
@@ -471,10 +471,10 @@ const searchButton2 = async () => {
         }, {})
       ).sort((a, b) => b.lngRecCnt - a.lngRecCnt);
 
-      console.log(menus);
+      //console.log(menus);
       label.value = menus.map((item) => item.dtmDate);
 
-      console.log(menus);
+      //console.log(menus);
       datas.value = [];
       let data1 = [];
       data1 = menus
@@ -504,10 +504,10 @@ const searchButton2 = async () => {
         }, {})
       ).sort((a, b) => b.lngRecAmt - a.lngRecAmt);
 
-      console.log(menus);
+      //console.log(menus);
       label.value = menus.map((item) => item.dtmDate);
 
-      console.log(menus);
+      //console.log(menus);
       datas.value = [];
       let data1 = [];
       data1 = menus
@@ -537,10 +537,10 @@ const searchButton2 = async () => {
         }, {})
       ).sort((a, b) => b.lngSalAmt - a.lngSalAmt);
 
-      console.log(menus);
+      //console.log(menus);
       label.value = menus.map((item) => item.dtmDate);
 
-      console.log(menus);
+      //console.log(menus);
       datas.value = [];
       let data1 = [];
       data1 = menus
@@ -570,10 +570,10 @@ const searchButton2 = async () => {
         }, {})
       ).sort((a, b) => b.lngActAmt - a.lngActAmt);
 
-      console.log(menus);
+      //console.log(menus);
       label.value = menus.map((item) => item.dtmDate);
 
-      console.log(menus);
+      //console.log(menus);
       datas.value = [];
       let data1 = [];
       data1 = menus
@@ -603,10 +603,10 @@ const searchButton2 = async () => {
         }, {})
       ).sort((a, b) => b.lngSupplyAmt - a.lngSupplyAmt);
 
-      console.log(menus);
+      //console.log(menus);
       label.value = menus.map((item) => item.dtmDate);
 
-      console.log(menus);
+      //console.log(menus);
       datas.value = [];
       let data1 = [];
       data1 = menus
@@ -636,10 +636,10 @@ const searchButton2 = async () => {
         }, {})
       ).sort((a, b) => b.lngDiscount - a.lngDiscount);
 
-      console.log(menus);
+      //console.log(menus);
       label.value = menus.map((item) => item.dtmDate);
 
-      console.log(menus);
+      //console.log(menus);
       datas.value = [];
       let data1 = [];
       data1 = menus

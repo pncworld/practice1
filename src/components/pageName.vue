@@ -54,7 +54,7 @@ const deleteFavoriteF = async () => {
 const saveFavoriteF = async () => {
   let b = [...store.state.favoriteList];
   b.push(Number(lngProgId));
-  console.log(b);
+  //console.log(b);
   const res = await addFavorite(
     Number(lngProgId),
     store.state.userData.loginID

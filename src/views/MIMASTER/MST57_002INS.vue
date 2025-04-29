@@ -191,8 +191,8 @@ const addMenu = (menuCd, menuNm, majorGroupNm, subGroupNm, fileName) => {
 const onDrop = (dropResult) => {
   const { removedIndex, addedIndex } = dropResult;
 
-  console.log(removedIndex);
-  console.log(addedIndex);
+  //console.log(removedIndex);
+  //console.log(addedIndex);
 
   // 1부터 시작하는 인덱스를 0으로 조정
   const realRemovedIndex = removedIndex - 1;
@@ -291,7 +291,7 @@ const searchPosMenu = async () => {
       STORE_CD: currstoreCd.value,
     });
 
-    console.log(res);
+    //console.log(res);
     majorGroup.value = res.data.majorGroup;
 
     const res2 = await tablePosMenuKey({
@@ -301,7 +301,7 @@ const searchPosMenu = async () => {
       MAJOR_CD: currmainCateCd.value,
       SUB_CD: currsubCateCd.value,
     });
-    console.log(res2);
+    //console.log(res2);
     items.value = res2.data.menuKeyList.filter((item) => item);
     confirmitem.value = [...items.value];
     if (items.value[0] == undefined) {
@@ -366,10 +366,10 @@ const savePosMenu = async () => {
         //   SUB_CD: currsubCateCd.value,
         //   KEY_SEQ: deleteAllitems.value.join(","),
         // });
-        // console.log(res);
+        // //console.log(res);
         const MenuCds = items.value.map((item) => item.lngKeyscrNo);
         const MenuNm = items.value.map((item) => item.strKeyName);
-        console.log(items.value);
+        //console.log(items.value);
 
         const res2 = await savetablePosMenuKey({
           GROUP_CD: groupCd.value,
@@ -379,7 +379,7 @@ const savePosMenu = async () => {
           MENU_CD: MenuCds.join(","),
           MENU_NM: MenuNm.join(","),
         });
-        console.log(res2);
+        //console.log(res2);
       } catch (error) {
       } finally {
         store.state.loading = false;

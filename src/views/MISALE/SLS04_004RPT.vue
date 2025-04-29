@@ -226,7 +226,7 @@ const GuestType = ref([
   { strName: "12", lngCode: 12 },
 ]);
 const startDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartDate.value = e;
 };
 const endDate = (e) => {
@@ -287,7 +287,7 @@ const searchButton = async () => {
       );
     }
 
-    console.log(hideColumnsId.value);
+    //console.log(hideColumnsId.value);
     reload.value = !reload.value;
 
     let first;
@@ -332,7 +332,7 @@ const searchButton = async () => {
       loginedstrLang,
       selectedGuest.value.lngCode
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List.filter((item) => item.lngCode != "");
 
     afterSearch.value = true;
@@ -350,18 +350,18 @@ const selectedHoliday = ref(0);
 const selectedsubMenu = ref(null);
 const lngStoreGroup = (e) => {
   initGrid();
-  console.log(e);
+  //console.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreAttr = (e) => {
   initGrid();
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreTeam = (e) => {
   initGrid();
@@ -512,7 +512,7 @@ watch(selectedMenu, async () => {
   );
   menuType.value = res.data.List;
   selectedsubMenu.value = null;
-  console.log(menuType.value);
+  //console.log(menuType.value);
 });
 const selectedSubSubMenu = ref(null);
 watch(selectedsubMenu, async () => {

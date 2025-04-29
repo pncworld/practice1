@@ -119,7 +119,7 @@ const changeRow = ref();
 
 const selectedIndex = (newValue) => {
   changeRow.value = newValue;
-  console.log(changeRow.value);
+  //console.log(changeRow.value);
 };
 const addButton = () => {
   if (afterSearch.value == false) {
@@ -148,12 +148,12 @@ const handleStoreCd = (newvalue) => {
 const updateRow = ref([]);
 const checkedRowData = (newValue) => {
   updateRow.value = newValue;
-  console.log(newValue);
+  //console.log(newValue);
 };
 const updateRow2 = ref([]);
 const checkedRowData2 = (newValue) => {
   updateRow2.value = newValue;
-  console.log(newValue);
+  //console.log(newValue);
 };
 
 const updatedRowData = (newValue) => {
@@ -194,7 +194,7 @@ const searchButton = async () => {
     let res;
 
     res = await getAllPayList(groupCd.value, storeCd.value);
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.PAYCODE;
     rowData2.value = res.data.STOREPAYCODE;
     validatearr.value = JSON.parse(JSON.stringify(rowData2.value));
@@ -210,7 +210,7 @@ const storeNm = (newValue) => {
 };
 
 const saveButton = async () => {
-  console.log(rowData2.value);
+  //console.log(rowData2.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -247,7 +247,7 @@ const saveButton = async () => {
           storeCd.value,
           lngCodes.join(",")
         );
-        console.log(res);
+        //console.log(res);
 
         Swal.fire({
           title: "저장 되었습니다.",
@@ -255,7 +255,7 @@ const saveButton = async () => {
         });
         store.state.loading = false;
       } catch (error) {
-        console.log(error);
+        //console.log(error);
         Swal.fire({
           title: "저장이 실패되었습니다.",
           confirmButtonText: "확인",
@@ -270,7 +270,7 @@ const saveButton = async () => {
 const setAllCheck = ref(false);
 const setAllCheck2 = ref(false);
 const moveRight = () => {
-  console.log(updateRow.value);
+  //console.log(updateRow.value);
 
   if (updateRow.value.length == 0) {
     Swal.fire({
@@ -293,10 +293,10 @@ const moveRight = () => {
   deleteRow4.value = !deleteRow4.value;
   rowData2.value = [...rowData2.value];
 
-  console.log(rowData.value);
+  //console.log(rowData.value);
 };
 const moveLeft = () => {
-  console.log(updateRow2.value);
+  //console.log(updateRow2.value);
   if (updateRow2.value.length == 0) {
     Swal.fire({
       title: "경고",
@@ -317,7 +317,7 @@ const moveLeft = () => {
 
   deleteRow5.value = !deleteRow5.value;
   rowData.value = [...rowData.value];
-  console.log(rowData2.value);
+  //console.log(rowData2.value);
 };
 const showPopup2 = ref(false);
 const copyButton = () => {

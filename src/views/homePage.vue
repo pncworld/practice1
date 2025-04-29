@@ -198,7 +198,7 @@ onMounted(async () => {
   } catch (error) {}
 
   const data = res.data.List[0];
-  console.log(data);
+  //console.log(data);
   lastDaySale.value = formatNumberWithCommas(data.YESTERDAY_SAL);
   todaySale.value = formatNumberWithCommas(data.TODAY_SAL);
   lastWeekSale.value = formatNumberWithCommas(data.LASTWEEK_SAL);

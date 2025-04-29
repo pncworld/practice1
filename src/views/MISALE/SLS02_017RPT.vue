@@ -166,12 +166,12 @@ const getJson = ref(false);
 
 const lngStoreGroup = (e) => {
   selectedGroup.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreCode = (e) => {
   initGrid();
   selectedStore.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreAttrs = (e) => {
   initGrid();
@@ -193,11 +193,11 @@ const receiptNo = ref();
 
 const store = useStore();
 const loginedlngLang = store.state.userData.lngLanguage;
-console.log(store);
+//console.log(store);
 const selectedstartDate = ref();
 const selectedendDate = ref();
 const startDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartDate.value = e;
 };
 const endDate = (e) => {
@@ -227,7 +227,7 @@ const searchButton = async () => {
       whetherBill.value,
       loginedlngLang
     );
-    console.log(res);
+    //console.log(res);
 
     rowData.value = res.data.TIMELIST;
     rowData2.value = res.data.SALESDATA1;

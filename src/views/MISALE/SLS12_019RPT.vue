@@ -103,7 +103,7 @@ const hideColumnNow = ref(true);
 const setGroupColumnId = ref("lngStoreCode");
 const hideColumnsId = ref(["strStore"]);
 const startDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartDate.value = e;
 };
 const endDate = (e) => {
@@ -123,7 +123,7 @@ onMounted(async () => {
 
   const res = await getpayCodeList2(userGroup, 0);
   codeList.value = res.data.List;
-  console.log(res);
+  //console.log(res);
 });
 
 const loginedstrLang = store.state.userData.lngLanguage;
@@ -150,7 +150,7 @@ const searchButton = async () => {
       selectedendDate.value,
       code
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -167,7 +167,7 @@ const selectedStoreAttrs = ref();
 const selectedStoreTeam = ref();
 const selectedStoreSuperVisor = ref();
 const lngStoreGroup = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = async (e) => {
@@ -176,19 +176,19 @@ const lngStoreCodes = async (e) => {
 
   const res = await getpayCodeList2(userGroup, selectedStores.value);
   codeList.value = res.data.List;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreAttrs = (e) => {
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngSupervisor = (e) => {
   selectedStoreSuperVisor.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreTeam = (e) => {
   selectedStoreTeam.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 const initGrid = () => {
@@ -220,7 +220,7 @@ const excelButton = () => {
 
   documentSubTitle.value =
     selectedExcelDate.value + "\n" + selectedExcelStore.value + "\n" + codestr;
-  console.log(documentSubTitle.value);
+  //console.log(documentSubTitle.value);
   exportExcel.value = !exportExcel.value;
 };
 

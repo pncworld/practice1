@@ -108,19 +108,19 @@ const selectedEndMonth = ref();
 const selectedStartMonth = ref();
 const progid = ref(1);
 const endYear = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedEndYear.value = e;
 };
 const endMonth = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedEndMonth.value = e;
 };
 const startYear = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedStartYear.value = e;
 };
 const startMonth = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedStartMonth.value = e;
 };
 
@@ -142,27 +142,27 @@ const setGroupFooter = ref(false);
 const hideColumnsId = ref(["strStore"]);
 const lngStoreGroup = (e) => {
   lngstoregroup.value = e;
-  console.log(e);
+  //console.log(e);
   initGrid();
 };
 const lngStoreAttrs = (e) => {
   lngstoreattr.value = e;
-  console.log(e);
+  //console.log(e);
   initGrid();
 };
 const lngStoreTeam = (e) => {
   lngstoreteam.value = e;
-  console.log(e);
+  //console.log(e);
   initGrid();
 };
 const lngSupervisor = (e) => {
   lngstoresupervisor.value = e;
-  console.log(e);
+  //console.log(e);
   initGrid();
 };
 const lngStoreCode = (e) => {
   lngstorecode.value = e;
-  console.log(e);
+  //console.log(e);
   initGrid();
 };
 
@@ -171,7 +171,7 @@ const initCheckBox = ref(false);
 const setGroupColumnId = ref("strStore");
 const store = useStore();
 const loginedstrLang = store.state.userData.lngLanguage;
-console.log(store);
+//console.log(store);
 
 const afterSearch = ref(false);
 const searchButton = async () => {
@@ -221,7 +221,7 @@ const searchButton = async () => {
     let endDate = new Date(selectedEndYear.value, selectedEndMonth.value, 1)
       .toISOString()
       .split("T")[0];
-    console.log(endDate);
+    //console.log(endDate);
     const res = await getPlanbyMonths(
       lngstoregroup.value,
       lngstoreattr.value,
@@ -233,11 +233,11 @@ const searchButton = async () => {
       barea,
       checked.value
     );
-    console.log(res);
+    //console.log(res);
 
     rowData.value = res.data.List;
     if (rowData.value.length > 0) {
-      console.log(rowData.value);
+      //console.log(rowData.value);
       if (customFooterShowLast.value == true) {
         maxSaleTarget.value = rowData.value
           .map((i) => i.lngMonthProject)
@@ -255,7 +255,7 @@ const searchButton = async () => {
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    console.log(error);
+    //console.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -265,7 +265,7 @@ const storeCd = ref();
 const dtmDate = ref();
 const init = ref(false);
 const selectedStoreCd = (e) => {
-  console.log(e);
+  //console.log(e);
   storeCd.value = e;
 
   initGrid();
@@ -274,7 +274,7 @@ const selectedStoreCd = (e) => {
   init.value = !init.value;
 };
 const selectedGroupCd = (e) => {
-  console.log(e);
+  //console.log(e);
   groupCd.value = e;
 };
 const rowData = ref([]);
@@ -284,7 +284,7 @@ const rowData4 = ref([]);
 
 const selectedPosNo = ref();
 const posNo = (e) => {
-  console.log(e);
+  //console.log(e);
   if (e == null) {
     selectedPosNo.value = 0;
   } else {
@@ -294,7 +294,7 @@ const posNo = (e) => {
 
 const disCountCd = ref("");
 const DisCountCd = (e) => {
-  console.log(e);
+  //console.log(e);
   if (e == null) {
     disCountCd.value = 0;
   } else {
@@ -345,7 +345,7 @@ const excelButton = () => {
   exporttoExcel.value = !exporttoExcel.value;
 };
 const initGrid = () => {
-  console.log(rowData.value);
+  //console.log(rowData.value);
   if (rowData.value.length > 0) {
     rowData.value = [];
   }

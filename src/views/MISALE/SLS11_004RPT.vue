@@ -99,7 +99,7 @@ const setGroupSumCustomColumnId2 = ref(["lngStoreCode"]);
 const setGroupColumnId = ref("lngStoreCode");
 const hideColumnsId = ref(["strStore", "dtmDate"]);
 const startDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartDate.value = e;
 };
 const endDate = (e) => {
@@ -136,7 +136,7 @@ const searchButton = async () => {
       selectedendDate.value,
       selectedlngCode
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -153,12 +153,12 @@ const selectedStoreAttrs = ref();
 const selectedStoreTeam = ref();
 const selectedStoreSuperVisor = ref();
 const lngStoreGroup = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = async (e) => {
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 
   const res = await getDiscountCodes(selectedGroup.value, selectedStores.value);
   discountCodeList.value = res.data.List;
@@ -166,15 +166,15 @@ const lngStoreCodes = async (e) => {
 };
 const lngStoreAttrs = (e) => {
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngSupervisor = (e) => {
   selectedStoreSuperVisor.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreTeam = (e) => {
   selectedStoreTeam.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 const initGrid = () => {

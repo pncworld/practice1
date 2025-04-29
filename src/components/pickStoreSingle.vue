@@ -187,7 +187,7 @@ onMounted(() => {
     emit("lngStoreGroup", store.state.storeGroup[0].lngStoreGroup);
 
     emit("lngStoreCode", 0);
-    console.log(store.state.storeCd);
+    //console.log(store.state.storeCd);
 
     emit("lngStoreAttrs", 0);
     emit("lngSupervisor", 0);
@@ -202,7 +202,7 @@ onMounted(() => {
     emit("excelStore", "매장명 : " + store.state.userData.strStoreName);
     selectedStoreType.value = store.state.userData.lngJoinType;
     selectedStoreList.value = Number(store.state.userData.lngPosition);
-    console.log(selectedStoreList.value);
+    //console.log(selectedStoreList.value);
     selectedStoreTeam.value = store.state.userData.lngTeamCode;
     selectedSuperVisor.value = store.state.userData.lngSupervisor;
     disabled1.value = true;

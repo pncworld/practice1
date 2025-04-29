@@ -121,14 +121,14 @@ const rowData = ref([]);
 const showGrid = ref(false);
 const showStoreList = async () => {
   let res;
-  console.log(progname);
-  console.log(progid);
-  console.log(storeCd);
-  console.log(posNo);
+  //console.log(progname);
+  //console.log(progid);
+  //console.log(storeCd);
+  //console.log(posNo);
   try {
     res = await api[poskiosk](groupCd.value, storeCd, areaCd, posNo);
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   } finally {
     showGrid.value = true;
     if (searchWord.value == "") {
@@ -141,7 +141,7 @@ const showStoreList = async () => {
       );
     }
 
-    console.log(rowData.value);
+    //console.log(rowData.value);
   }
 };
 const selectedRows = ref([]);
@@ -152,7 +152,7 @@ const selcetedrowData = (newData) => {
     checked.value = false;
   }
   selectedRows.value = newData;
-  console.log(selectedRows.value);
+  //console.log(selectedRows.value);
 };
 
 const handleKeyup = (e) => {
@@ -172,7 +172,7 @@ const dupliStore = async () => {
     posNo2.push(selectedRows.value[i].intPosNo);
   }
   try {
-    console.log(checked.value);
+    //console.log(checked.value);
     if (checked.value == false) {
       Swal.fire({
         title: "알림",
@@ -203,7 +203,7 @@ const dupliStore = async () => {
             areaCd2.join(","),
             posNo2.join(",")
           );
-          console.log(res3.data);
+          //console.log(res3.data);
           if (res3.data.RESULT_CD == "00") {
             store.state.loading = false;
             Swal.fire({

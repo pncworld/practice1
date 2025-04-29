@@ -149,7 +149,7 @@ const route = useRoute();
 const blnNoticeList = ref(true);
 const salesMenus = ref([]);
 const SalesMenus = (e) => {
-  console.log(e);
+  //console.log(e);
   salesMenus.value = e;
 };
 
@@ -174,7 +174,7 @@ const showNotice = async (value) => {
     ""
   );
 
-  console.log(res);
+  //console.log(res);
   if (res.data.List.length == 0) {
     blnNoticeList.value = true;
   } else {
@@ -193,7 +193,7 @@ const showpersonal = (value) => {
 
 const showTotalMenu = ref(false);
 const showMenu3 = (e) => {
-  console.log(e);
+  //console.log(e);
   if (e == true) {
     showTotalMenu.value = true;
     store.state.inActiveBackGround = true;
@@ -231,7 +231,7 @@ const resetScreen = (e) => {
 // };
 
 watch(notice, async () => {
-  console.log(store.state.userData);
+  //console.log(store.state.userData);
   if (notice.value == true) {
     const res = await getNoticeList(
       store.state.userData.GROUP_CD,
@@ -243,7 +243,7 @@ watch(notice, async () => {
       ""
     );
 
-    console.log(res);
+    //console.log(res);
     if (res.data.List.length == 0) {
       blnNoticeList.value = true;
     } else {
@@ -295,7 +295,7 @@ const showNoticeDetail = async (e) => {
     downloadFileName.value = "";
   }
 
-  console.log(res);
+  //console.log(res);
   scrollContainer3.value.scrollTop = 0;
 };
 
@@ -356,7 +356,7 @@ watch(selectedCategoryId, (newCategory) => {
   });
 
   categories.value = category;
-  console.log(hierarchicalCategories.value);
+  //console.log(hierarchicalCategories.value);
 });
 const activeCategory = ref([]);
 const activesubCategory = ref([]);
@@ -385,7 +385,7 @@ const scrollArea = ref(null);
 //   const threshold = 10; // 10px 여유 두고 바닥 처리
 
 //   if (el.scrollTop + el.clientHeight >= el.scrollHeight - threshold) {
-//     console.log("⬇ 바닥에 도달했어요!");
+//     //console.log("⬇ 바닥에 도달했어요!");
 //     // 여기에 API 더 불러오거나 알림 띄우거나 원하는 액션 실행
 //   }
 // };
@@ -452,7 +452,7 @@ const searchword = (e) => {
 const searchNow = async (e) => {
   pageIndex.value = 0;
   pageIndex2.value = 15;
-  console.log(searchNotice.value);
+  //console.log(searchNotice.value);
   const res = await getNoticeList(
     store.state.userData.GROUP_CD,
     store.state.userData.STORE_CD,
@@ -462,7 +462,7 @@ const searchNow = async (e) => {
     searchNotice.value == "" ? 0 : 1,
     searchNotice.value
   );
-  console.log(res);
+  //console.log(res);
   notices.value = res.data.List;
 };
 const notices = ref([]);
@@ -500,7 +500,7 @@ onBeforeUnmount(() => {
 //         root: null, // 뷰포트를 기준으로 검사
 //         threshold: 0, // 요소가 0%라도 보이면 callback 실행
 //       });
-//       console.log(stickyElement.value)
+//       //console.log(stickyElement.value)
 //       observer.observe(stickyElement.value);
 
 //       // 컴포넌트가 언마운트될 때 observer 해제
@@ -516,7 +516,7 @@ onBeforeUnmount(() => {
 const changeSalesIconState = ref(true);
 const changeIcon = ref(0);
 const movePage = (e, e2) => {
-  console.log(e2);
+  //console.log(e2);
   //store.state.mobileSelectProgName = e2;
   store.dispatch("saveMobileProgName", e2);
   changeIcon.value = 0;

@@ -91,7 +91,7 @@ const changed = ref(false);
 const ischanged = () => {
   changed.value = !changed.value;
 
-  console.log(changed.value);
+  //console.log(changed.value);
   emit("update:ischanged", changed.value);
 };
 const emit = defineEmits([
@@ -142,11 +142,11 @@ onMounted(() => {
     emit("excelStore", "매장명 : " + store.state.userData.strStoreName);
     selectedStoreType.value = store.state.userData.lngJoinType;
     selectedStore.value = store.state.storeCd[0];
-    console.log(store.state.storeCd);
+    //console.log(store.state.storeCd);
   }
 });
 // const emitStoreCode = (e) => {
-//   console.log(e)
+//   //console.log(e)
 //   const selectedCd = e.target.value
 //   if( value !='0' && value != undefined){
 //     const selectedNm = storeCd.value.filter(item => item.lngStoreCode == value)[0].strName
@@ -195,7 +195,7 @@ watch(selectedStore, () => {
     )[0].strName;
     emit("excelStore", "매장명 : " + name);
   }
-  console.log(selectedStore.value);
+  //console.log(selectedStore.value);
   emit("changeInit", true);
 });
 
@@ -205,7 +205,7 @@ storeCd.value = store.state.storeCd;
 storeCd2.value = store.state.storeCd;
 
 const setStore = (value) => {
-  console.log(value);
+  //console.log(value);
   if (value == 0) {
     storeCd.value = storeCd2.value;
     return storeCd.value;
@@ -226,7 +226,7 @@ watch(
       emit("update:storeGroup", storeGroup.value[0].lngStoreGroup);
       emit("lngStoreGroup", storeGroup.value[0].lngStoreGroup);
 
-      console.log(storeGroup.value[0].lngStoreGroup);
+      //console.log(storeGroup.value[0].lngStoreGroup);
     }
   }
 );

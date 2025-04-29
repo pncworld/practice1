@@ -192,14 +192,14 @@ const emit = defineEmits(["MenuState", "SalesMenus", "showNotice"]);
 watch(
   () => store.state.mobileCategory,
   () => {
-    console.log(store.state.mobileSelectProgName);
+    //console.log(store.state.mobileSelectProgName);
     menuItems.value = menuItems2.value.filter(
       (item) =>
         store.state.mobileFunction.some(
           (func) => func.CATEGORY_ID == item.mainCode.toString()
         ) // mobileFunction 배열 내에 CATEGORY_ID item.mainCode와 일치하는 항목이 있는지 확인
     );
-    console.log(menuItems.value);
+    //console.log(menuItems.value);
     menuItems.value = menuItems.value.map((item) => ({
       ...item,
       children: store.state.mobileCategory
@@ -210,7 +210,7 @@ watch(
         })),
     }));
 
-    console.log(menuItems.value);
+    //console.log(menuItems.value);
     if (menuItems.value[0]) {
       emit("SalesMenus", menuItems.value[0].children);
     }
@@ -230,13 +230,13 @@ watch(route, () => {
 });
 
 const moveProgram = async (e1, e2) => {
-  console.log(store.state.userData);
+  //console.log(store.state.userData);
   const checkSession = await insertMobilePageLog({
     strUrl: e2,
     lngProgramID: e1,
   });
 
-  console.log(e1, e2);
+  //console.log(e1, e2);
   //store.state.mobileSelectProgName = e2;
   store.dispatch("saveMobileProgName", e2);
   router.push(`/m/${e1}`);

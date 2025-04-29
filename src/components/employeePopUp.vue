@@ -69,7 +69,7 @@ const searchButton = async () => {
       searchType.value,
       searchText.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
   } catch (error) {}
 };

@@ -129,7 +129,7 @@ const gridvalue5 = ref();
 
 const selectedIndex = (newValue) => {
   changeRow.value = newValue;
-  console.log(changeRow.value);
+  //console.log(changeRow.value);
 };
 const addButton = () => {
   if (afterSearch.value == false) {
@@ -158,7 +158,7 @@ const clickedRowData = (newValue) => {
   gridvalue2.value = newValue[1];
   gridvalue3.value = newValue[2];
   gridvalue4.value = newValue[3] == 1 ? true : false;
-  console.log(newValue);
+  //console.log(newValue);
   if (newValue[5] == true) {
     addNew.value = false;
   } else {
@@ -179,7 +179,7 @@ const handleGroupCd = (newValue) => {
 const updateRow = ref([]);
 const updatedRowData = (newValue) => {
   updateRow.value = newValue;
-  console.log(newValue);
+  //console.log(newValue);
 };
 
 const changeInfo = (e) => {
@@ -231,12 +231,12 @@ const searchButton = async () => {
     gridvalue3.value = "";
 
     let res;
-    console.log(groupCd.value);
+    //console.log(groupCd.value);
     res = await getAmountGroup(groupCd.value);
 
     rowData.value = res.data.AMOUNTGROUP;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -330,7 +330,7 @@ const saveButton = async () => {
           strRemark.join(","),
           dlngGroupCode.join(",")
         );
-        console.log(res);
+        //console.log(res);
 
         Swal.fire({
           title: "저장 되었습니다.",

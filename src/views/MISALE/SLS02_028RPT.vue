@@ -171,17 +171,17 @@ const getJson = ref(false);
 const lngStoreGroup = (e) => {
   selectedGroup.value = e;
   groupCd.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreAttrs = (e) => {
   selectedStoreAttr.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreCode = (e) => {
   init.value = !init.value;
   selectedStore.value = e;
   storeCd.value = e;
-  console.log(e);
+  //console.log(e);
   initGrid();
 };
 const excelStore = (e) => {
@@ -193,11 +193,11 @@ const groupCd = ref();
 const storeCd = ref();
 const store = useStore();
 const loginedlngLang = store.state.userData.lngLanguage;
-console.log(store);
+//console.log(store);
 const selectedstartDate = ref();
 const selectedendDate = ref();
 const startDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartDate.value = e;
 };
 const endDate = (e) => {
@@ -219,7 +219,7 @@ const searchButton = async () => {
   store.state.loading = true;
   try {
     initGrid();
-    console.log(selectedStore.value);
+    //console.log(selectedStore.value);
     const res = await getSalesDayReportByPos(
       selectedGroup.value,
       selectedStore.value,
@@ -229,7 +229,7 @@ const searchButton = async () => {
       loginedlngLang,
       selectedPosNo.value
     );
-    console.log(res);
+    //console.log(res);
 
     rowData.value = res.data.TIMELIST;
     rowData2.value = res.data.SALESDATA1;

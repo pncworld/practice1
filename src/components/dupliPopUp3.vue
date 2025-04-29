@@ -159,14 +159,14 @@ const showGrid = ref(false);
 
 const showStoreList = async () => {
   let res;
-  console.log(progname);
-  console.log(progid);
+  //console.log(progname);
+  //console.log(progid);
   try {
-    console.log(poskiosk);
+    //console.log(poskiosk);
     res = await api[poskiosk](groupCd.value);
-    console.log(res);
+    //console.log(res);
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   } finally {
     showGrid.value = true;
     if (searchWord.value == "") {
@@ -179,7 +179,7 @@ const showStoreList = async () => {
       );
     }
 
-    console.log(rowData.value);
+    //console.log(rowData.value);
   }
 };
 const selectedRows = ref([]);
@@ -190,7 +190,7 @@ const selcetedrowData = (newData) => {
     checked.value = false;
   }
   selectedRows.value = newData;
-  console.log(selectedRows.value);
+  //console.log(selectedRows.value);
 };
 
 const handleKeyup = (e) => {
@@ -234,7 +234,7 @@ const dupliStore = async () => {
             screenType,
             storeCd2.join(",")
           );
-          console.log(res3);
+          //console.log(res3);
           if (res3.data.RESULT_CD == "00") {
             store.state.loading = false;
             Swal.fire({

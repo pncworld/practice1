@@ -612,7 +612,7 @@ const posNo = ref();
 const AllscreenKeyPage = ref(1);
 
 watch(selectedOption, () => {
-  console.log(selectedOption.value);
+  //console.log(selectedOption.value);
 });
 
 const selectMenuGroup = ref(false);
@@ -621,7 +621,7 @@ let dupliitems = [];
 const nowStoreAreaCd = ref();
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
-  console.log(nowStoreAreaCd.value);
+  //console.log(nowStoreAreaCd.value);
 };
 
 const nowStoreCd = ref();
@@ -675,7 +675,7 @@ const isNewColumn2 = ref(false);
 const clickrowData1 = ref(false);
 const clickedRowData = (newValue) => {
   clickrowData1.value = true;
-  console.log(newValue);
+  //console.log(newValue);
   selectedOptionCd.value = Number(newValue[0]);
   isNewColumn.value = newValue[26] == true ? true : false;
   filteredrowData2.value = [];
@@ -692,7 +692,7 @@ const clickedRowData = (newValue) => {
         });
       }
 
-      console.log(filteredrowData2.value);
+      //console.log(filteredrowData2.value);
     }
   }
   selectedOption.value = newValue[2] == "필수" ? 0 : 1;
@@ -703,7 +703,7 @@ const clickedRowData = (newValue) => {
 const selectedOptionGroupCd = ref();
 const clickrowData2 = ref(false);
 const clickedRowData2 = (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
 
   clickrowData2.value = true;
   selectedOptionGroupCd.value = newValue[0];
@@ -711,7 +711,7 @@ const clickedRowData2 = (newValue) => {
   filteredrowData4.value = [];
   for (var i = 0; i < 20; i++) {
     if (newValue[2 + i] != "0") {
-      console.log(rowData4.value);
+      //console.log(rowData4.value);
       const seleced = rowData4.value.find(
         (item) => item.lngCode == Number(newValue[2 + i])
       );
@@ -721,7 +721,7 @@ const clickedRowData2 = (newValue) => {
           strName: seleced.strName,
         });
       }
-      console.log(filteredrowData4.value);
+      //console.log(filteredrowData4.value);
     }
   }
   optionGroupCd.value = newValue[0];
@@ -736,14 +736,14 @@ const clickedRowData4 = (newValue) => {
   selectedaddMenu2.value = newValue;
 };
 const clickedRowData5 = (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
 };
 const searchWord3 = (e) => {
   searchword3.value = e.target.value;
 };
 
 watch(rowData3, () => {
-  console.log(rowData3.value);
+  //console.log(rowData3.value);
 });
 const searchButton = async () => {
   filteredrowData2.value = [];
@@ -778,8 +778,8 @@ const searchButton = async () => {
 
     const res3 = await getAllOptionManageData(groupCd.value, nowStoreCd.value);
     const res4 = await getMostColumnMenuList(groupCd.value, nowStoreCd.value);
-    console.log(res3);
-    console.log(res4);
+    //console.log(res3);
+    //console.log(res4);
     rowData1.value = res3.data.OPTIONMANAGE;
     rowData2.value = res3.data.MENULIST;
     rowData3.value = res3.data.OPTIONGROUPMANAGE;
@@ -909,8 +909,8 @@ const saveButton = async () => {
     if (result.isConfirmed) {
       store.state.loading = true;
       try {
-        console.log(updatedRowData4.value);
-        console.log(rowData3.value);
+        //console.log(updatedRowData4.value);
+        //console.log(rowData3.value);
 
         if (currentMenu.value == false) {
           const lngCodes = updatedRowData4.value
@@ -1114,7 +1114,7 @@ const saveButton = async () => {
           );
         }
 
-        console.log(res);
+        //console.log(res);
       } catch (error) {
       } finally {
         store.state.loading = false;
@@ -1141,7 +1141,7 @@ const updatedRowData6 = (e) => {
   updatedRowData5.value = e;
 };
 const updatedRowData = (newValue) => {
-  console.log(optionCd.value);
+  //console.log(optionCd.value);
 
   const change = updatedRowData4.value.find(
     (item) => item.lngCode == Number(optionCd.value)
@@ -1180,14 +1180,14 @@ const updatedRowData = (newValue) => {
       newValue[19] == undefined ? 0 : newValue[19].lngCode;
     change.lngChainMenu21 =
       newValue[20] == undefined ? 0 : newValue[20].lngCode;
-    console.log(change);
+    //console.log(change);
   }
   rowData1.value = [...rowData1.value];
-  console.log(newValue);
+  //console.log(newValue);
 };
 
 const updatedRowData2 = (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
 
   const change = updatedRowData5.value.find(
     (item) => item.lngCode == Number(selectedOptionGroupCd.value)
@@ -1223,10 +1223,10 @@ const updatedRowData2 = (newValue) => {
       newValue[18] == undefined ? 0 : newValue[18].lngCode;
     change.lngChainGroup20 =
       newValue[19] == undefined ? 0 : newValue[19].lngCode;
-    console.log(change);
+    //console.log(change);
   }
   // rowData3.value = [...rowData3.value];
-  console.log(newValue);
+  //console.log(newValue);
 };
 
 const changeColid = ref("");
@@ -1260,7 +1260,7 @@ const changeOptionManage2 = (e) => {
 //   rowData1.value = [...rowData1.value];
 // };
 // const changeOptionManage4 = (e) => {
-//   console.log(rowData1.value);
+//   //console.log(rowData1.value);
 //   const confirmdata = e.target.value.replace(/[^0-9]/g, "");
 //   const duplicate = rowData1.value.find((item) => item.lngCode == confirmdata);
 //   if (duplicate) {
@@ -1281,7 +1281,7 @@ const changeOptionManage2 = (e) => {
 //   }
 //   rowData1.value = [...rowData1.value];
 //   // optionCd.value = e.target.value
-//   // console.log(optionCd.value)
+//   // //console.log(optionCd.value)
 // };
 
 const searchOption = (e) => {
@@ -1713,7 +1713,7 @@ const closeMenus2 = () => {
 };
 const handleGroupNm = (newValue) => {
   selectedGroupNm.value = newValue;
-  console.log(selectedGroupNm.value);
+  //console.log(selectedGroupNm.value);
 };
 const handleGroupCd = (newValue) => {
   groupCd.value = newValue;
@@ -1759,13 +1759,13 @@ const clickaddMenu2 = (newValue) => {
   dblclickedRowData2(newValue);
 };
 const dblclickedRowData = (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
   const a = updatedRowData4.value.find(
     (item) => item.lngCode == optionCd.value
   );
   for (let i = 1; i <= 21; i++) {
     const key = `lngChainMenu${i}`;
-    console.log(a[key]);
+    //console.log(a[key]);
     if (a[key] == "0" || a[key] === undefined) {
       changeColid.value = key;
       break; // 첫 번째로 조건 맞는 값만 처리할 경우
@@ -1776,7 +1776,7 @@ const dblclickedRowData = (newValue) => {
   changeNow.value = !changeNow.value;
   // const rollbackdata = [...filteredrowData2.value];
   // filteredrowData2.value = [];
-  // console.log(a);
+  // //console.log(a);
 
   // const keys = Object.keys(a);
   // for (const key of keys) {
@@ -1820,8 +1820,8 @@ const dblclickedRowData = (newValue) => {
   closeMenus();
 };
 const dblclickedRowData2 = (newValue) => {
-  console.log(newValue);
-  console.log(updatedRowData5.value);
+  //console.log(newValue);
+  //console.log(updatedRowData5.value);
   const a = updatedRowData5.value.find(
     (item) => item.lngCode == optionGroupCd.value
   );
@@ -1842,7 +1842,7 @@ const dblclickedRowData2 = (newValue) => {
   // const keys = Object.keys(a);
   // for (const key of keys) {
   //   if (key.startsWith("lngChainGroup")) {
-  //     console.log(a[key]);
+  //     //console.log(a[key]);
   //     if (a[key] == "0" || a[key] == undefined || a[key] == NaN) {
   //       a[key] = Number(newValue[0]);
   //       filteredrowData4.value.push({
@@ -1863,7 +1863,7 @@ const dblclickedRowData2 = (newValue) => {
   // }
   // rowData3.value = [...rowData3.value];
 
-  // console.log(a);
+  // //console.log(a);
 
   closeMenus2();
 };
@@ -1872,12 +1872,12 @@ const selectedindex2 = ref(0);
 const selectedIndex = (newValue) => {
   changeRow.value = newValue;
   selectedindex.value = newValue;
-  console.log(selectedindex.value);
+  //console.log(selectedindex.value);
 };
 const selectedIndex2 = (newValue) => {
   changeRow2.value = newValue;
   selectedindex2.value = newValue;
-  //console.log(selectedindex2.value);
+  ////console.log(selectedindex2.value);
 };
 
 const changeRow2 = ref();

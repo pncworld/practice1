@@ -143,17 +143,17 @@ const selectedDate = ref();
 
 const dateValue = (e) => {
   selectedDate.value = e;
-  console.log(selectedDate.value);
+  //console.log(selectedDate.value);
   initGrid();
 };
 const year = (e) => {
-  console.log(e);
+  //console.log(e);
 };
 const month = (e) => {
-  console.log(e);
+  //console.log(e);
 };
 const day = (e) => {
-  console.log(e);
+  //console.log(e);
 };
 
 const receiptNo = ref();
@@ -161,7 +161,7 @@ const initCheckBox = ref(false);
 const initSearchWord = ref(false);
 const store = useStore();
 const loginedstrLang = store.state.userData.lngLanguage;
-console.log(store);
+//console.log(store);
 
 const afterSearch = ref(false);
 const searchButton = async () => {
@@ -190,7 +190,7 @@ const searchButton = async () => {
       payCd.value,
       loginedstrLang
     );
-    console.log(res);
+    //console.log(res);
 
     rowData.value = res.data.List;
     afterSearch.value = true;
@@ -208,7 +208,7 @@ const selectedStoreAreaCode = ref();
 const init = ref(false);
 const documentSubTitle = ref("");
 const lngStoreCode = async (e) => {
-  console.log(e);
+  //console.log(e);
   storeCd.value = e;
 
   initGrid();
@@ -217,20 +217,20 @@ const lngStoreCode = async (e) => {
   init.value = !init.value;
 };
 const lngStoreGroup = (e) => {
-  console.log(e);
+  //console.log(e);
   groupCd.value = e;
 };
 const lngAreaCode = (e) => {
   initGrid();
-  console.log(e);
+  //console.log(e);
   selectedStoreAreaCode.value = e;
 };
 const excelStore = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedExcelStore.value = e;
 };
 const excelDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedExcelDate.value = e;
 };
 const rowData = ref([]);
@@ -240,7 +240,7 @@ const rowData4 = ref([]);
 
 const selectedPosNo = ref();
 const posNo = (e) => {
-  console.log(e);
+  //console.log(e);
   if (e == null) {
     selectedPosNo.value = 0;
   } else {
@@ -251,7 +251,7 @@ const posNo = (e) => {
 const disCountCd = ref("");
 const disCountNm = ref("");
 const DisCountCd = (e) => {
-  console.log(e);
+  //console.log(e);
   if (e == null) {
     disCountCd.value = 0;
   } else {
@@ -259,7 +259,7 @@ const DisCountCd = (e) => {
   }
 };
 const discountNm = (e) => {
-  console.log(e);
+  //console.log(e);
   disCountNm.value = e;
 };
 
@@ -282,7 +282,7 @@ const valuesData = ref([
 const labelsData = ref([["매출취소", "메뉴정정", "주문취소"]]);
 
 const clickedRowData = async (e) => {
-  console.log(e);
+  //console.log(e);
   const seqId = e[0];
 
   const res = await getCustInfo(groupCd.value, storeCd.value, seqId);
@@ -302,7 +302,7 @@ const clickedRowData = async (e) => {
 
   rowData4.value = res3.data.PAYLIST;
 
-  console.log(res3);
+  //console.log(res3);
 };
 
 const exceloutput = ref(false);

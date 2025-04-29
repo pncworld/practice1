@@ -54,9 +54,9 @@ Chart.register(zoomPlugin);
 onMounted(() => {
   if (chartRef.value) {
     Chart.register(ChartDataLabels);
-    console.log(props.datas);
-    console.log(props.label);
-    console.log(props.labels);
+    //console.log(props.datas);
+    //console.log(props.label);
+    //console.log(props.labels);
     const dataSet = ref([]);
     for (let i = 0; i < props.datas.length; i++) {
       dataSet.value.push({
@@ -67,7 +67,7 @@ onMounted(() => {
         borderWidth: 2,
       });
     }
-    console.log(dataSet.labels);
+    //console.log(dataSet.labels);
     chartInstance = new Chart(chartRef.value, {
       type: props.type,
       data: {
@@ -189,7 +189,7 @@ watch(
       if (chartInstance) {
         chartInstance.destroy();
       }
-      console.log(data);
+      //console.log(data);
 
       chartInstance = new Chart(chartRef.value, {
         type: props.type,

@@ -40,7 +40,7 @@ const fetchData = async () => {
 
     selectPrograms.value = response.data.recordsets.flat();
   } catch (error) {
-    console.log(error.message);
+    //console.log(error.message);
   }
 };
 onMounted(() => {

@@ -46,7 +46,7 @@ watch(
   async () => {
     const res = await getpayCodeList(props.groupCd, props.storeCd);
     payCodeList.value = res.data.PAYCDLIST;
-    //console.log(res)
+    ////console.log(res)
   }
 );
 
@@ -59,8 +59,8 @@ watch(selectedPayCd, () => {
   if (selectedPayCd.value == null) {
     emit("payNm", "전체");
   } else {
-    console.log(payCodeList.value);
-    console.log(selectedPayCd.value);
+    //console.log(payCodeList.value);
+    //console.log(selectedPayCd.value);
     let nm = payCodeList.value.filter(
       (item) => item.lngCode == selectedPayCd.value
     )[0].strName;

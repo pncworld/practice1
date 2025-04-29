@@ -416,7 +416,7 @@ const currentMenu = ref(false);
 
 onMounted(async () => {
   const res4 = await getFuncKeyList();
-  console.log(res4);
+  //console.log(res4);
   commonKeyList.value = res4.data.FuncKeyList;
   commonKeyList.value = commonKeyList.value.map((item) => {
     return {
@@ -425,7 +425,7 @@ onMounted(async () => {
     };
   });
   rowData.value = [...commonKeyList.value];
-  console.log(commonKeyList.value);
+  //console.log(commonKeyList.value);
 });
 const copyButton = () => {
   if (afterSearch.value == false) {
@@ -445,7 +445,7 @@ const updateMenuKey = ref(false);
 const nowStoreAreaCd = ref();
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
-  console.log(nowStoreAreaCd.value);
+  //console.log(nowStoreAreaCd.value);
 };
 
 const nowStoreCd = ref();
@@ -518,7 +518,7 @@ const searchButton = async () => {
     );
     KeyList.value = res4.data.FuncKeys;
 
-    console.log(KeyList.value);
+    //console.log(KeyList.value);
     const res2 = await getAllScreenList(
       groupCd.value,
       nowStoreCd.value,
@@ -526,14 +526,14 @@ const searchButton = async () => {
       posNo.value
     );
     screenList.value = res2.data.ALLScreenList;
-    console.log(screenList.value);
-    console.log(KeyList.value);
+    //console.log(screenList.value);
+    //console.log(KeyList.value);
 
     AllscreenKeyPage.value = Math.ceil(ScreenKeyOrigin.value.length / 4);
   } catch (error) {
     afterSearch.value = false;
   } finally {
-    console.log(KeyList.value);
+    //console.log(KeyList.value);
     if (
       KeyList.value == null ||
       KeyList.value == {} ||
@@ -587,7 +587,7 @@ const searchButton = async () => {
       ];
     }
     subKeyList1.value = Object.keys(KeyList.value[0]).reduce((result, key) => {
-      console.log(key);
+      //console.log(key);
       if (key == "intKeySeq") {
         result[key] = KeyList.value[0][key];
         return result;
@@ -603,7 +603,7 @@ const searchButton = async () => {
 
       return result;
     }, {});
-    console.log(subKeyList1.value);
+    //console.log(subKeyList1.value);
     const keysToExtract = [
       "lngKeyNo1",
       "lngKeyNo2",
@@ -647,7 +647,7 @@ const searchButton = async () => {
 
     // asdf
     subKeyList8.value = Object.keys(KeyList.value[1]).reduce((result, key) => {
-      console.log(key);
+      //console.log(key);
       if (key == "intKeySeq") {
         result[key] = KeyList.value[1][key];
         return result;
@@ -663,7 +663,7 @@ const searchButton = async () => {
 
       return result;
     }, {});
-    console.log(subKeyList8.value);
+    //console.log(subKeyList8.value);
 
     subsubKeyList3.value = Object.keys(subKeyList8.value).reduce((acc, key) => {
       if (keysToExtract.includes(key)) {
@@ -750,7 +750,7 @@ const onMove = (evt) => {
   // 예: 드래그 중 이동할 때의 조건 등을 설정할 수 있음
   if (changeMode.value == false) {
     targetItemIndex2 = Array.from(evt.from.children).indexOf(evt.related);
-    console.log(targetItemIndex2);
+    //console.log(targetItemIndex2);
     return false;
   } else {
     return true;
@@ -760,11 +760,11 @@ const onMove2 = (evt) => {
   // 예: 드래그 중 이동할 때의 조건 등을 설정할 수 있음
   targetItemIndex2 = Array.from(evt.from.children).indexOf(evt.related);
   if (changeMode.value == false) {
-    console.log(targetItemIndex2);
+    //console.log(targetItemIndex2);
     return false;
   } else {
-    console.log(targetItemIndex2);
-    console.log(evt.draggedContext.index);
+    //console.log(targetItemIndex2);
+    //console.log(evt.draggedContext.index);
     if (
       targetItemIndex2 == undefined ||
       targetItemIndex2 == 14 ||
@@ -783,7 +783,7 @@ const onMove3 = (evt) => {
   targetItemIndex3 = Array.from(evt.from.children).indexOf(evt.related);
 
   dupliScreenKeyOrigin = [...ScreenKeyOrigin.value];
-  console.log(dupliScreenKeyOrigin);
+  //console.log(dupliScreenKeyOrigin);
   return true;
 };
 const clickedMove = ref(false);
@@ -791,17 +791,17 @@ const onEnd = (evt) => {
   // Swap을 처리할 조건
   if (changeMode.value === false) {
     const oldIndex = evt.oldIndex; // 드래그된 아이템의 기존 인덱스
-    console.log(subsubKeyList1.value);
+    //console.log(subsubKeyList1.value);
     const swappedItems = [...subsubKeyList1.value]; // items를 복사
-    console.log(oldIndex);
-    console.log(targetItemIndex2);
+    //console.log(oldIndex);
+    //console.log(targetItemIndex2);
     const temp = swappedItems[oldIndex];
 
     swappedItems[oldIndex] = swappedItems[targetItemIndex2];
 
     swappedItems[targetItemIndex2] = temp;
 
-    console.log(swappedItems);
+    //console.log(swappedItems);
     // 배열을 업데이트
     //   items.value = swappedItems;
 
@@ -817,12 +817,12 @@ const onEnd = (evt) => {
     }));
   }
   clickedKey1.value = targetItemIndex2;
-  console.log("subsubKeyList1:", subsubKeyList1.value);
+  //console.log("subsubKeyList1:", subsubKeyList1.value);
 };
 
 const onEnd2 = (evt) => {
   // Swap을 처리할 조건
-  console.log(evt.oldIndex);
+  //console.log(evt.oldIndex);
   if (
     evt.oldIndex == 14 ||
     targetItemIndex2 == undefined ||
@@ -832,17 +832,17 @@ const onEnd2 = (evt) => {
   }
   if (changeMode.value === false) {
     const oldIndex = evt.oldIndex; // 드래그된 아이템의 기존 인덱스
-    console.log(subsubKeyList1.value);
+    //console.log(subsubKeyList1.value);
     const swappedItems = [...subsubKeyList2.value]; // items를 복사
-    console.log(oldIndex);
-    console.log(targetItemIndex2);
+    //console.log(oldIndex);
+    //console.log(targetItemIndex2);
     const temp = swappedItems[oldIndex];
 
     swappedItems[oldIndex] = swappedItems[targetItemIndex2];
 
     swappedItems[targetItemIndex2] = temp;
 
-    console.log(swappedItems);
+    //console.log(swappedItems);
     // 배열을 업데이트
     //   items.value = swappedItems;
 
@@ -858,7 +858,7 @@ const onEnd2 = (evt) => {
     }));
   }
   clickedKey2.value = targetItemIndex2;
-  console.log("subsubKeyList2:", subsubKeyList2.value);
+  //console.log("subsubKeyList2:", subsubKeyList2.value);
 };
 const onEnd3 = (evt) => {
   if (
@@ -872,15 +872,15 @@ const onEnd3 = (evt) => {
     const oldIndex = evt.oldIndex; // 드래그된 아이템의 기존 인덱스
 
     const swappedItems = [...subsubKeyList3.value]; // items를 복사
-    console.log(oldIndex);
-    console.log(targetItemIndex2);
+    //console.log(oldIndex);
+    //console.log(targetItemIndex2);
     const temp = swappedItems[oldIndex];
 
     swappedItems[oldIndex] = swappedItems[targetItemIndex2];
 
     swappedItems[targetItemIndex2] = temp;
 
-    console.log(swappedItems);
+    //console.log(swappedItems);
     // 배열을 업데이트
     //   items.value = swappedItems;
 
@@ -896,7 +896,7 @@ const onEnd3 = (evt) => {
     }));
   }
   clickedKey1.value = targetItemIndex2;
-  console.log("subsubKeyList3:", subsubKeyList3.value);
+  //console.log("subsubKeyList3:", subsubKeyList3.value);
 };
 
 const onEnd4 = (evt) => {
@@ -911,8 +911,8 @@ const onEnd4 = (evt) => {
     const oldIndex = evt.oldIndex; // 드래그된 아이템의 기존 인덱스
 
     const swappedItems = [...subsubKeyList4.value]; // items를 복사
-    console.log(oldIndex);
-    console.log(targetItemIndex2);
+    //console.log(oldIndex);
+    //console.log(targetItemIndex2);
     const temp = swappedItems[oldIndex];
 
     swappedItems[oldIndex] = swappedItems[targetItemIndex2];
@@ -931,7 +931,7 @@ const onEnd4 = (evt) => {
     }));
   }
   clickedKey2.value = targetItemIndex2;
-  console.log("subsubKeyList4:", subsubKeyList4.value);
+  //console.log("subsubKeyList4:", subsubKeyList4.value);
 };
 
 const saveButton = async () => {
@@ -974,8 +974,8 @@ const saveButton = async () => {
       const lngDCodes2 = subsubKeyList2.value.map((item) => item.lngDCode);
       const lngDCodes3 = subsubKeyList3.value.map((item) => item.lngDCode);
       const lngDCodes4 = subsubKeyList4.value.map((item) => item.lngDCode);
-      console.log(lngDCodes.join(",") + "," + lngDCodes2.join(","));
-      console.log(lngDCodes3.join(",") + "," + lngDCodes4.join(","));
+      //console.log(lngDCodes.join(",") + "," + lngDCodes2.join(","));
+      //console.log(lngDCodes3.join(",") + "," + lngDCodes4.join(","));
 
       try {
         const res2 = await saveAllFuncKey2(
@@ -986,7 +986,7 @@ const saveButton = async () => {
           lngDCodes.join(",") + "," + lngDCodes2.join(","),
           lngDCodes3.join(",") + "," + lngDCodes4.join(",")
         );
-        console.log(res2);
+        //console.log(res2);
       } catch (error) {
         console.error("API 호출 중 오류 발생:", error);
       } finally {
@@ -1019,7 +1019,7 @@ const clickedTLUNM = ref();
 const clickedstrName = ref();
 const clickedCode = ref();
 const selcetedrowData = (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
   clickedstrName.value = newValue[1];
   clickedCode.value = newValue[0];
   addKey();
@@ -1072,8 +1072,8 @@ const updatePaymentType = (newValue) => {
 
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
-  console.log(posNo.value);
-  console.log(nowStoreAreaCd.value);
+  //console.log(posNo.value);
+  //console.log(nowStoreAreaCd.value);
   if (
     nowStoreAreaCd.value != undefined &&
     posNo.value != undefined &&
@@ -1111,8 +1111,8 @@ const confirmScreenKey = () => {
       cancelButtonText: "취소",
     }).then((result) => {
       if (result.isConfirmed) {
-        console.log(ScreenKeyOrigin.value[index].itemDiscYn);
-        console.log(currentProduct.value);
+        //console.log(ScreenKeyOrigin.value[index].itemDiscYn);
+        //console.log(currentProduct.value);
         if (ScreenKeyOrigin.value[index].itemDiscYn != currentProduct.value) {
           KeyList.value = KeyList.value.filter(
             (item) => item.intScreenNo !== clickedScreenNo.value
@@ -1123,7 +1123,7 @@ const confirmScreenKey = () => {
         ScreenKeyOrigin.value[index].itemDiscYn = currentProduct.value;
 
         changeScreenKey.value = false;
-        console.log(ScreenKeyOrigin.value);
+        //console.log(ScreenKeyOrigin.value);
         addfor4ScreenKey();
         currentscreenKeyNm.value = "";
         showKeys(clickedScreenNo.value);
@@ -1136,7 +1136,7 @@ const confirmScreenKey = () => {
   ) {
     ScreenKeyOrigin.value[index].strScreenName = currentscreenKeyNm.value;
     changeScreenKey.value = false;
-    console.log(ScreenKeyOrigin.value);
+    //console.log(ScreenKeyOrigin.value);
     addfor4ScreenKey();
     currentscreenKeyNm.value = "";
     showKeys(clickedScreenNo.value);
@@ -1144,7 +1144,7 @@ const confirmScreenKey = () => {
   } else {
     ScreenKeyOrigin.value[index].strScreenName = currentscreenKeyNm.value;
     changeScreenKey.value = false;
-    console.log(ScreenKeyOrigin.value);
+    //console.log(ScreenKeyOrigin.value);
     addfor4ScreenKey();
     currentscreenKeyNm.value = "";
     showKeys(clickedScreenNo.value);
@@ -1189,9 +1189,9 @@ const confirmaddScreenKey = () => {
   });
   addscreenKey.value = false;
   addfor4ScreenKey();
-  console.log(ScreenKeyOrigin.value);
+  //console.log(ScreenKeyOrigin.value);
   currentscreenKeyNm.value = "";
-  console.log(clickedScreenNo.value);
+  //console.log(clickedScreenNo.value);
   showKeys(clickedScreenNo.value + (currentsubPage.value - 1) * 10);
 };
 
@@ -1211,7 +1211,7 @@ const saveMenuKeyposition1 = (index, code) => {
 const saveMenuKeyposition2 = (index) => {
   clickedSection.value = 2;
   clickedRealIndex.value = index;
-  console.log(clickedRealIndex.value);
+  //console.log(clickedRealIndex.value);
 };
 const saveMenuKeyposition3 = (index, code) => {
   if (code == 2) {
@@ -1221,17 +1221,17 @@ const saveMenuKeyposition3 = (index, code) => {
   }
   clickedSection.value = 3;
   clickedRealIndex.value = index;
-  console.log(clickedRealIndex.value);
+  //console.log(clickedRealIndex.value);
 };
 const saveMenuKeyposition4 = (index) => {
   clickedSection.value = 4;
   clickedRealIndex.value = index;
-  console.log(clickedRealIndex.value);
+  //console.log(clickedRealIndex.value);
 };
 
 const addKey = () => {
   if (clickedSection.value == 1) {
-    console.log(subsubKeyList1.value);
+    //console.log(subsubKeyList1.value);
     subsubKeyList1.value[clickedRealIndex.value] = {
       strDName: clickedstrName.value,
       lngDCode: clickedCode.value,
@@ -1253,14 +1253,14 @@ const addKey = () => {
     };
   }
 
-  console.log(KeyList.value);
+  //console.log(KeyList.value);
 };
 
 const deletekey = () => {
   if (clickedSection.value == 1) {
     subsubKeyList1.value[clickedRealIndex.value] = "";
   } else if (clickedSection.value == 2) {
-    console.log(subsubKeyList2.value);
+    //console.log(subsubKeyList2.value);
     subsubKeyList2.value[clickedRealIndex.value] = "";
   } else if (clickedSection.value == 3) {
     subsubKeyList3.value[clickedRealIndex.value] = "";
@@ -1272,13 +1272,13 @@ const deletekey = () => {
 const clickedMenukeys = () => {
   clickedFuncSelection.value = true;
   clickedScreenOrMenu.value = true;
-  console.log(subsubKeyList2.value);
+  //console.log(subsubKeyList2.value);
 };
 
 const clickedMenukeys2 = () => {
   clickedFuncSelection2.value = true;
   clickedScreenOrMenu.value = true;
-  console.log(subsubKeyList2.value);
+  //console.log(subsubKeyList2.value);
 };
 
 const handleinitAll = (newvalue) => {

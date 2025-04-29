@@ -241,7 +241,7 @@ const searchButton = () => {
     const result = response.data.dailySales;
     result2.value = response.data.dailySales;
     result3.value = response.data.dailySales;
-    console.log(result2.value);
+    //console.log(result2.value);
     if (currUnit.value == "dayUnit") {
       maxsales.value = result.reduce(
         (max, item) => (item.lngActAmt > max.lngActAmt ? item : max),
@@ -299,7 +299,7 @@ const searchButton = () => {
         acc[groupIndex].lngVAT += item.lngVAT;
         return acc;
       }, []);
-      console.log(result2.value);
+      //console.log(result2.value);
       maxsales.value = result2.value.reduce(
         (max, item) => (item.lngActAmt > max.lngActAmt ? item : max),
         result2.value[0]

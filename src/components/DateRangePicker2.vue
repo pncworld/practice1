@@ -25,7 +25,7 @@ const emit = defineEmits(["update:selectedDate"]);
 
 // Watch for selectedDate changes
 watch(selectedDate, (newDate) => {
-  console.log(newDate);
+  //console.log(newDate);
   emit("update:selectedDate", newDate);
 });
 </script>

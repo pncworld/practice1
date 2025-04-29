@@ -131,7 +131,7 @@ const afterSearch = ref(false);
 const selectedstartDate = ref();
 const selectedendDate = ref();
 const startDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartDate.value = e;
 };
 const endDate = (e) => {
@@ -172,7 +172,7 @@ const searchButton = async () => {
       selectedendDate.value,
       tempSeeDay.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.RECEIPT;
 
     afterSearch.value = true;
@@ -189,28 +189,28 @@ const selectedStoreAttrs = ref(0);
 const selectedLngSuperVisor = ref(0);
 const selectedLngStoreTeam = ref(0);
 const lngStoreGroup = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = (e) => {
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreAttrs = (e) => {
   initGrid();
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngSupervisor = (e) => {
   initGrid();
   selectedLngSuperVisor.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 const lngStoreTeam = (e) => {
   initGrid();
   selectedLngStoreTeam.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 const initGrid = () => {

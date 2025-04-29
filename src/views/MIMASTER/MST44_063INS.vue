@@ -848,7 +848,7 @@ const settingPosList = async (e1, e2) => {
   valueData1.value = [0];
   const res = await getPosList(e1, e2);
 
-  console.log(res);
+  //console.log(res);
   const datas = res.data.pos;
   commonList11.value = res.data.pos;
   for (let i = 0; i < datas.length; i++) {
@@ -922,7 +922,7 @@ onMounted(async () => {
   valueData10.value = res10.data.List.map((item) => item.strDCode);
   labelsData10.value = res10.data.List.map((item) => item.strDName);
   commonList12.value = res10.data.List;
-  console.log(res9);
+  //console.log(res9);
   commonList7.value = res9.data.List;
   labelsData6.value = ["선택", ...res5.data.List.map((item) => item.strDName)];
   valueData6.value = [
@@ -1044,7 +1044,7 @@ const setPortEqType = async (e) => {
   const targetValue = commonList7.value.filter(
     (item) => item.strDCode == value
   )[0]?.strSCode;
-  console.log(value.strSCode);
+  //console.log(value.strSCode);
   if (targetValue == undefined) {
     return;
   }
@@ -1245,7 +1245,7 @@ const setEqType2 = async (e) => {
     return;
   }
 
-  console.log(commonList8.value);
+  //console.log(commonList8.value);
   const targetValue = commonList8.value.filter(
     (item) => item.strDCode == value
   )[0]?.strSCode;
@@ -1384,7 +1384,7 @@ const realgridname3 = (e) => {
   realgrid4Name.value = e;
 };
 const realgridname4 = (e) => {
-  console.log(e);
+  //console.log(e);
   realgrid5Name.value = e;
 };
 
@@ -1425,11 +1425,11 @@ const hidesub = ref(false);
 const nowStoreAreaCd = ref();
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
-  console.log(nowStoreAreaCd.value);
+  //console.log(nowStoreAreaCd.value);
 };
 const updatedRowData = (newValue) => {
   updatedList.value = newValue;
-  console.log(updatedList.value);
+  //console.log(updatedList.value);
 };
 
 const forSaveMenu = ref([]);
@@ -1440,13 +1440,13 @@ const updatedRowData2 = (newValue) => {
 const updatedList3 = ref([]);
 const updatedRowData3 = (newValue) => {
   updatedList3.value = newValue;
-  console.log(updatedList3.value);
+  //console.log(updatedList3.value);
 };
 
 const updatedList4 = ref([]);
 const updatedRowData4 = (newValue) => {
   updatedList4.value = newValue;
-  console.log(updatedList4.value);
+  //console.log(updatedList4.value);
 };
 const nowStoreCd = ref();
 const afterCategory = ref(false);
@@ -1467,7 +1467,7 @@ const handleStoreCd = async (newValue) => {
 
   nowStoreCd.value = newValue;
   settingPosList(groupCd.value, nowStoreCd.value);
-  console.log(nowStoreCd.value);
+  //console.log(nowStoreCd.value);
   reload.value = !reload.value;
 };
 
@@ -1556,20 +1556,20 @@ const allstaterow = ref([]);
 const allstaterow2 = ref([]);
 const allstaterow3 = ref([]);
 const allStateRows = (e) => {
-  console.log(e);
+  //console.log(e);
   allstaterow.value = e;
 };
 const allStateRows2 = (e) => {
-  console.log(e);
+  //console.log(e);
   allstaterow2.value = e;
 };
 const allStateRows3 = (e) => {
-  console.log(e);
+  //console.log(e);
   allstaterow3.value = e;
 };
 const allstaterow4 = ref([]);
 const allStateRows4 = (e) => {
-  console.log(e);
+  //console.log(e);
   allstaterow4.value = e;
 };
 const deleteRow2 = () => {
@@ -1677,7 +1677,7 @@ const dupliRow4 = () => {
     });
     return;
   }
-  console.log(checkedRowDataList.value);
+  //console.log(checkedRowDataList.value);
   addrowDefault4.value =
     ` ,${checkedRowDataList.value[0].lngOIssueCount},${checkedRowDataList.value[0].lngOIssueType},${checkedRowDataList.value[0].lngOIssueSum},${checkedRowDataList.value[0].lngRIssueCount},${checkedRowDataList.value[0].lngRIssueType},${checkedRowDataList.value[0].lngKitchenOrderVoid},${checkedRowDataList.value[0].lngKitchenMenuVoid},${checkedRowDataList.value[0].lngKitchenU},${checkedRowDataList.value[0].lngKitchenD},${checkedRowDataList.value[0].lngFloorMax},${checkedRowDataList.value[0].lngLogo},` +
     checkedRowDataList.value[0].lngStoreGroup +
@@ -1689,7 +1689,7 @@ const dupliRow4 = () => {
     "," +
     checkedRowDataList.value[0].lngOption;
 
-  console.log(addrowDefault4.value);
+  //console.log(addrowDefault4.value);
   addRows4.value = !addRows4.value;
 };
 const addRow = () => {
@@ -1705,7 +1705,7 @@ const addRow = () => {
   addRows.value = !addRows.value;
   addrowDefault.value =
     groupCd.value + "," + nowStoreCd.value + "," + nowStoreAreaCd.value + ",";
-  console.log(updatedList.value);
+  //console.log(updatedList.value);
 };
 
 const printNameList = ref([]);
@@ -1723,7 +1723,7 @@ const deleteRow = () => {
 };
 
 const selcetedrowData = (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
   if (currentMenu.value == 3) {
   }
 };
@@ -1731,7 +1731,7 @@ const selcetedrowData = (newValue) => {
 const checkedRowDataList = ref([]);
 const checkedRowData4 = (e) => {
   checkedRowDataList.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 const initSelect = ref(false);
@@ -1753,14 +1753,14 @@ const searchButton = async () => {
     let res;
     if (currentMenu.value == 1) {
       res = await getPosInfo(groupCd.value, nowStoreCd.value);
-      console.log(res);
+      //console.log(res);
       rowData.value = res.data.List;
       updatedList.value = JSON.parse(JSON.stringify(res.data.List));
-      console.log(rowData.value);
+      //console.log(rowData.value);
       afterSearch.value = true;
     } else if (currentMenu.value == 2) {
       res = await getPortDefaultInfo(groupCd.value, nowStoreCd.value);
-      console.log(res);
+      //console.log(res);
 
       rowData2.value = res.data.List;
       // rowData3.value = [...SettingList.value];
@@ -1773,7 +1773,7 @@ const searchButton = async () => {
         nowStoreCd.value,
         nowStoreAreaCd.value
       );
-      console.log(res);
+      //console.log(res);
       rowData3.value = res.data.List;
       updatedList3.value = JSON.parse(JSON.stringify(res.data.List));
       afterSearch3.value = true;
@@ -1783,13 +1783,13 @@ const searchButton = async () => {
         nowStoreCd.value,
         nowStoreAreaCd.value
       );
-      console.log(res);
+      //console.log(res);
       rowData4.value = res.data.List;
       updatedList4.value = JSON.parse(JSON.stringify(res.data.List));
       afterSearch4.value = true;
     }
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     afterSearch.value = false;
     afterSearch2.value = false;
     afterSearch3.value = false;
@@ -2043,7 +2043,7 @@ const saveButton = async () => {
       return;
     }
   } else if (currentMenu.value == 4) {
-    console.log(updatedList4.value);
+    //console.log(updatedList4.value);
     const validate = updatedList4.value.filter(
       (item) =>
         item.intPosNo === "" ||
@@ -2087,7 +2087,7 @@ const saveButton = async () => {
       return;
     }
   } else if (currentMenu.value == 3) {
-    console.log(updatedList3.value);
+    //console.log(updatedList3.value);
     const validate = updatedList3.value.filter(
       (item) =>
         item.intPosNo == "" ||
@@ -2217,7 +2217,7 @@ const saveButton = async () => {
             .map((item) => item.remark)
             .join("\u200B");
 
-          console.log(deletePoss);
+          //console.log(deletePoss);
           res = await savePosInfo(
             storeGroupCd,
             storeCd,
@@ -2241,7 +2241,7 @@ const saveButton = async () => {
             deleteAreaCd,
             deletePoss
           );
-          console.log(res);
+          //console.log(res);
         } else if (currentMenu.value == 2) {
           const deleteRowGroup = updatedList2.value
             .filter((_, index) => allstaterow2.value.deleted.includes(index))
@@ -2339,7 +2339,7 @@ const saveButton = async () => {
             deletelngPort
           );
 
-          console.log(res);
+          //console.log(res);
         } else if (currentMenu.value == 3) {
           const posNos = updatedList3.value
             .filter((_, index) => !allstaterow3.value.deleted.includes(index))
@@ -2371,7 +2371,7 @@ const saveButton = async () => {
               return counts[key];
             });
 
-          console.log(portIdVlus);
+          //console.log(portIdVlus);
           const lngstorecodes = updatedList3.value
             .filter((_, index) => !allstaterow3.value.deleted.includes(index))
             .map((item) => item.lngStoreCode);
@@ -2384,7 +2384,7 @@ const saveButton = async () => {
             .filter((_, index) => !allstaterow3.value.deleted.includes(index))
             .map((item) => item.originPos);
 
-          console.log(allstaterow3.value);
+          //console.log(allstaterow3.value);
           const deletePoss = updatedList3.value
             .filter((_, index) => allstaterow3.value.deleted.includes(index))
             .map((item2) => item2.intPosNo);
@@ -2399,7 +2399,7 @@ const saveButton = async () => {
             .filter((_, index) => allstaterow3.value.deleted.includes(index))
             .map((item2) => item2.lngAreaCode);
 
-          console.log(deleterow3);
+          //console.log(deleterow3);
           res = await savePortConfig(
             groupCd.value,
             nowStoreCd.value,
@@ -2557,9 +2557,9 @@ const saveButton = async () => {
           );
         }
 
-        console.log(res);
+        //console.log(res);
       } catch (error) {
-        console.log(error);
+        //console.log(error);
       } finally {
         store.state.loading = false;
         changeValue.value = null;
@@ -2590,7 +2590,7 @@ const clickedRowData = (newValue) => {
   changeColid.value = "cornerNm";
 };
 const clickedRowData2 = async (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
   disabled2.value = false;
   gridvalue21.value = newValue[0];
   gridvalue22.value = newValue[1];
@@ -2598,10 +2598,10 @@ const clickedRowData2 = async (newValue) => {
   gridvalue24.value = newValue[3];
   selectCode1.value = newValue[9];
   await setPortEqType2(selectCode1.value);
-  console.log(selectCode1.value);
+  //console.log(selectCode1.value);
   await nextTick();
   selectCode2.value = newValue[10];
-  console.log(selectCode2.value);
+  //console.log(selectCode2.value);
   setEqType2(selectCode2.value);
 
   selectCode4.value = newValue[6];
@@ -2612,10 +2612,10 @@ const clickedRowData2 = async (newValue) => {
 const changeColid = ref("");
 
 const clickedRowData3 = (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
 };
 const clickedRowData4 = (e) => {
-  console.log(e);
+  //console.log(e);
   disabled3.value = false;
   gridvalue1.value = e[1];
   selectCommon1.value = e[2];
@@ -2654,7 +2654,7 @@ const clickedRowData4 = (e) => {
 
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
-  console.log(posNo.value);
+  //console.log(posNo.value);
   if (nowStoreAreaCd.value != undefined || posNo.value != undefined) {
     searchButton();
   }
@@ -2717,7 +2717,7 @@ const checkedOptions = ref([]);
 const rollbackOption = ref();
 const checkOption = (e) => {
   let newValue;
-  console.log(checkedOptions.value);
+  //console.log(checkedOptions.value);
   if (checkedOptions.value.length == 0) {
     newValue = 0;
   } else {
@@ -2725,7 +2725,7 @@ const checkOption = (e) => {
       return Number(acc) + Math.pow(2, Number(val) - 1);
     }, 0);
   }
-  console.log(newValue);
+  //console.log(newValue);
   changeValue.value = newValue;
   changeColid.value = "lngOption";
   changeNow4.value = !changeNow4.value;

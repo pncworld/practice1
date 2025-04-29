@@ -154,19 +154,19 @@ const hideColumnNow = ref(true);
 const hideColumn = ref("strStore");
 const hideColumnsId = ref(["strStore"]);
 const endMonth = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedendMonth.value = e;
 };
 const startYear = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartYear.value = e;
 };
 const startMonth = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartMonth.value = e;
 };
 const endYear = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedendYear.value = e;
 };
 
@@ -189,7 +189,7 @@ const seeDetail = (e) => {
 };
 const store = useStore();
 const loginedstrLang = store.state.userData.lngLanguage;
-console.log(store.state.userData);
+//console.log(store.state.userData);
 
 const searchButton = async () => {
   if (
@@ -241,7 +241,7 @@ const searchButton = async () => {
       startDate,
       endDate
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -256,16 +256,16 @@ const selectedGroup = ref();
 const selectedStores = ref();
 const selectedStoreAttrs = ref();
 const lngStoreGroup = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = (e) => {
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreAttrs = (e) => {
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 const initGrid = () => {

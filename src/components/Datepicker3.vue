@@ -200,9 +200,9 @@ watch([startyear, startmonth, endyear, endmonth], () => {
   //       confirmButtonText: '확인'
   //     })
   //     const temp = new Date(tempStartDateStack.pop())
-  //     console.log(temp)
+  //     //console.log(temp)
   //     startyear.value = temp.getFullYear()
-  //     console.log(startyear.value)
+  //     //console.log(startyear.value)
   //      startmonth.value = temp.getMonth()+1
   //      const temp2 = tempEndDateStack.pop().toISOString()
   //      endyear.value = temp2.split('-')[0]
@@ -221,7 +221,7 @@ watch([startyear, startmonth, endyear, endmonth], () => {
   //     tempStartDateStack.push(startDate)
   //     tempEndDateStack.push(endDate)
   //   }
-  //   console.log(startyear.value)
+  //   //console.log(startyear.value)
 });
 
 const setEndMonth = () => {
@@ -235,7 +235,7 @@ const setEndMonth = () => {
   //     confirmButtonText: '확인'
   //   })
   //   const temp = new Date(tempStartDateStack.pop())
-  //   console.log(temp)
+  //   //console.log(temp)
   //    startyear.value = temp.getFullYear()
   //    startmonth.value = temp.getMonth()+1
   //    const temp2 =  new Date(tempEndDateStack.pop())
@@ -287,7 +287,7 @@ watch(endmonth, () => {
     });
 
     const temp = new Date(tempStartDateStack.pop());
-    console.log(temp);
+    //console.log(temp);
 
     startyear.value = temp.getFullYear();
     startmonth.value = temp.getMonth() + 1;
@@ -341,7 +341,7 @@ const setEndYear = () => {
   //     confirmButtonText: '확인'
   //   })
   //   const temp = new Date(tempStartDateStack.pop())
-  //   console.log(temp)
+  //   //console.log(temp)
   //    startyear.value = temp.getFullYear()
   //    startmonth.value = temp.getMonth()+1
   //    const temp2 =  new Date(tempEndDateStack.pop())
@@ -392,7 +392,7 @@ watch(endyear, () => {
     });
 
     const temp = new Date(tempStartDateStack.pop());
-    console.log(temp);
+    //console.log(temp);
 
     startyear.value = temp.getFullYear();
     startmonth.value = temp.getMonth() + 1;
@@ -446,7 +446,7 @@ const setStartMonth = () => {
   //     confirmButtonText: '확인'
   //   })
   //   const temp = new Date(tempStartDateStack.pop())
-  //   console.log(temp)
+  //   //console.log(temp)
   //    startyear.value = temp.getFullYear()
   //    startmonth.value = temp.getMonth()+1
   //    const temp2 =  new Date(tempEndDateStack.pop())
@@ -498,7 +498,7 @@ watch(startmonth, () => {
     });
 
     const temp = new Date(tempStartDateStack.pop());
-    console.log(temp);
+    //console.log(temp);
 
     startyear.value = temp.getFullYear();
     startmonth.value = temp.getMonth() + 1;
@@ -574,7 +574,7 @@ watch(startyear, () => {
     });
 
     const temp = new Date(tempStartDateStack.pop());
-    console.log(temp);
+    //console.log(temp);
 
     startyear.value = temp.getFullYear();
     startmonth.value = temp.getMonth() + 1;
@@ -631,6 +631,6 @@ const resetSelect4 = (e) => {
   endmonth.value = null;
 };
 const handleEnter1 = (e) => {
-  console.log(e);
+  //console.log(e);
 };
 </script>

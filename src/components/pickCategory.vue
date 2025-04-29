@@ -119,7 +119,7 @@ const viewsubCategories = (newValue) => {
 };
 const emit = defineEmits(["emitmain", "emitsub"]);
 const emitmaincate = (value) => {
-  console.log(value);
+  //console.log(value);
   emit("emitmain", value);
 };
 const emitsubcate = (value) => {

@@ -107,7 +107,7 @@ const setGroupSumCustomColumnId2 = ref(["strStore"]);
 const setGroupColumnId = ref("");
 const hideColumnsId = ref(["strStore", "dtmDate"]);
 const startDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartDate.value = e;
 };
 const endDate = (e) => {
@@ -144,7 +144,7 @@ const searchButton = async () => {
       selectedendDate.value,
       reportType.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -161,27 +161,27 @@ const selectedStoreAttrs = ref();
 const selectedStoreTeam = ref();
 const selectedStoreSuperVisor = ref();
 const lngStoreGroup = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = async (e) => {
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 
   // const res = await getCustomerList(selectedGroup.value,selectedStores.value)
   // customerList.value = res.data.List
 };
 const lngStoreAttrs = (e) => {
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngSupervisor = (e) => {
   selectedStoreSuperVisor.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreTeam = (e) => {
   selectedStoreTeam.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 const initGrid = () => {
@@ -192,7 +192,7 @@ const initGrid = () => {
 
 const exportExcel = ref(false);
 
-console.log(store.state.minorCategory);
+//console.log(store.state.minorCategory);
 
 const excelButton = () => {
   let condition2 = "조건 : ";
@@ -323,7 +323,7 @@ const showUnite = (e) => {
 const tempSum = ref(false);
 const showSum = (e) => {
   if (e.target.checked) {
-    console.log(reportType.value);
+    //console.log(reportType.value);
     setGroupFooter.value = true;
     reload.value = !reload.value;
   } else {

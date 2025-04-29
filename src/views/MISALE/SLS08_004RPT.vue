@@ -123,7 +123,7 @@ const hideColumnNow = ref(true);
 const setGroupColumnId = ref("dtmDate");
 const hideColumnsId = ref(["strStore"]);
 const startDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartDate.value = e;
 };
 const endDate = (e) => {
@@ -143,7 +143,7 @@ onMounted(async () => {
 
   const res = await getCauseList(userGroup, 0);
   causeList.value = res.data.List;
-  console.log(res);
+  //console.log(res);
 });
 
 const loginedstrLang = store.state.userData.lngLanguage;
@@ -182,7 +182,7 @@ const searchButton = async () => {
       "1",
       cause
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -227,7 +227,7 @@ const detailSearchButton = async () => {
       "12",
       cause
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -244,24 +244,24 @@ const selectedStoreAttrs = ref();
 const selectedStoreTeam = ref();
 const selectedStoreSuperVisor = ref();
 const lngStoreGroup = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = (e) => {
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreAttrs = (e) => {
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngSupervisor = (e) => {
   selectedStoreSuperVisor.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreTeam = (e) => {
   selectedStoreTeam.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 const initGrid = () => {
@@ -272,7 +272,7 @@ const initGrid = () => {
 
 const exportExcel = ref(false);
 
-console.log(store.state.minorCategory);
+//console.log(store.state.minorCategory);
 
 const excelButton = () => {
   // let condition = '조건 :';
@@ -302,7 +302,7 @@ const excelButton = () => {
     "\n" +
     "사유코드 : " +
     codestr;
-  console.log(documentSubTitle.value);
+  //console.log(documentSubTitle.value);
   exportExcel.value = !exportExcel.value;
 };
 

@@ -77,17 +77,17 @@ const selectedExcelStore = ref();
 const Project = ref(null);
 const dateValue = (e) => {
   selectedDate.value = e;
-  console.log(selectedDate.value);
+  //console.log(selectedDate.value);
   initGrid();
 };
 const year = (e) => {
-  console.log(e);
+  //console.log(e);
 };
 const month = (e) => {
-  console.log(e);
+  //console.log(e);
 };
 const day = (e) => {
-  console.log(e);
+  //console.log(e);
 };
 const excelDate = (e) => {
   selectedExcelDate.value = e;
@@ -104,23 +104,23 @@ const checked = ref([0]);
 const hideColumnsId = ref(["strStoreName"]);
 const lngStoreGroup = (e) => {
   lngstoregroup.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreAttrs = (e) => {
   lngstoreattr.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreTeam = (e) => {
   lngstoreteam.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngSupervisor = (e) => {
   lngstoresupervisor.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreCode = (e) => {
   lngstorecode.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 const receiptNo = ref();
@@ -128,7 +128,7 @@ const initCheckBox = ref(false);
 const initSearchWord = ref(false);
 const store = useStore();
 const loginedstrLang = store.state.userData.lngLanguage;
-console.log(store);
+//console.log(store);
 
 const afterSearch = ref(false);
 const searchButton = async () => {
@@ -161,7 +161,7 @@ const searchButton = async () => {
       selectedDate.value,
       bit
     );
-    console.log(res);
+    //console.log(res);
 
     rowData.value = res.data.List;
     afterSearch.value = true;
@@ -182,7 +182,7 @@ const storeCd = ref();
 const dtmDate = ref();
 const init = ref(false);
 const selectedStoreCd = (e) => {
-  console.log(e);
+  //console.log(e);
   storeCd.value = e;
 
   initGrid();
@@ -191,7 +191,7 @@ const selectedStoreCd = (e) => {
   init.value = !init.value;
 };
 const selectedGroupCd = (e) => {
-  console.log(e);
+  //console.log(e);
   groupCd.value = e;
 };
 const rowData = ref([]);
@@ -201,7 +201,7 @@ const rowData4 = ref([]);
 
 const selectedPosNo = ref();
 const posNo = (e) => {
-  console.log(e);
+  //console.log(e);
   if (e == null) {
     selectedPosNo.value = 0;
   } else {
@@ -211,7 +211,7 @@ const posNo = (e) => {
 
 const disCountCd = ref("");
 const DisCountCd = (e) => {
-  console.log(e);
+  //console.log(e);
   if (e == null) {
     disCountCd.value = 0;
   } else {
@@ -244,7 +244,7 @@ const excelButton = () => {
   exporttoExcel.value = !exporttoExcel.value;
 };
 const initGrid = () => {
-  console.log(rowData.value);
+  //console.log(rowData.value);
   if (rowData.value.length > 0) {
     rowData.value = [];
   }

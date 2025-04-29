@@ -83,12 +83,12 @@ const setRowGroupSpan = ref("");
 const progId = ref("1");
 
 const startDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartDate.value = e;
 };
 
 const endDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedendDate.value = e;
 };
 
@@ -127,13 +127,13 @@ const searchButton = async () => {
       endDateResult,
       ""
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.userPageAccessLog;
 
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    console.log(error);
+    //console.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -144,17 +144,17 @@ const storeCd = ref();
 const selectedStoreAttr = ref();
 
 const selectedStoreCd = (e) => {
-  console.log(e);
+  //console.log(e);
   storeCd.value = e;
 };
 const selectedGroupCd = (e) => {
-  console.log(e);
+  //console.log(e);
   groupCd.value = e;
 };
 const lngStoreAttrs = (e) => {
   initGrid();
   selectedStoreAttr.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 /*
@@ -171,7 +171,7 @@ const exportExcel = ref(false);
 const excelButton = () => {
   documentSubTitle.value =
     selectedExcelDate.value + "\n" + selectedExcelStore.value;
-  console.log(documentSubTitle.value);
+  //console.log(documentSubTitle.value);
   // 엑셀 기능 실행
   exportExcel.value = !exportExcel.value;
 };
@@ -181,12 +181,12 @@ const documentSubTitle = ref("");
 const selectedExcelDate = ref("");
 const excelDate = (e) => {
   selectedExcelDate.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const selectedExcelStore = ref("");
 const excelStore = (e) => {
   selectedExcelStore.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const changeInit = (e) => {
   initGrid();

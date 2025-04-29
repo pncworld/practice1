@@ -177,12 +177,12 @@ const showGrid = ref(false);
 
 const showStoreList = async () => {
   let res;
-  console.log(progname);
-  console.log(progid);
+  //console.log(progname);
+  //console.log(progid);
   try {
     res = await api.getStoreAndPosList(groupCd.value, storeCd, posNo);
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   } finally {
     showGrid.value = true;
     if (searchWord.value == "") {
@@ -195,7 +195,7 @@ const showStoreList = async () => {
       );
     }
 
-    console.log(rowData.value);
+    //console.log(rowData.value);
   }
 };
 const selectedRows = ref([]);
@@ -206,7 +206,7 @@ const selcetedrowData = (newData) => {
     checked.value = false;
   }
   selectedRows.value = newData;
-  console.log(selectedRows.value);
+  //console.log(selectedRows.value);
 };
 
 const handleKeyup = (e) => {
@@ -267,7 +267,7 @@ const dupliStore = async () => {
             nowscreenNo,
             targetScreenNo.value
           );
-          console.log(res3);
+          //console.log(res3);
           if (res3.data.RESULT_CD == "00") {
             store.state.loading = false;
             Swal.fire({

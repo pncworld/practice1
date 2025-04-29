@@ -209,7 +209,7 @@ const hideColumnNow = ref(true);
 const setGroupColumnId = ref("strName");
 const hideColumnsId = ref([]);
 const startDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartDate.value = e;
 };
 const endDate = (e) => {
@@ -233,7 +233,7 @@ onMounted(async () => {
 
   const res = await getCauseList(userGroup, 0);
   causeList.value = res.data.List;
-  console.log(res);
+  //console.log(res);
 });
 
 const loginedstrLang = store.state.userData.lngLanguage;
@@ -261,7 +261,7 @@ const searchButton = async () => {
       lngOption.value,
       optionValue.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -276,16 +276,16 @@ const selectedGroup = ref();
 const selectedStores = ref();
 const selectedStoreAttrs = ref();
 const lngStoreGroup = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = (e) => {
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreAttrs = (e) => {
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 const initGrid = () => {
@@ -296,7 +296,7 @@ const initGrid = () => {
 
 const exportExcel = ref(false);
 
-console.log(store.state.minorCategory);
+//console.log(store.state.minorCategory);
 
 const excelButton = () => {
   let condition = "거래 구분 :";
@@ -329,7 +329,7 @@ const excelButton = () => {
     condition2 +
     "\n" +
     condition3;
-  console.log(documentSubTitle.value);
+  //console.log(documentSubTitle.value);
   exportExcel.value = !exportExcel.value;
 };
 

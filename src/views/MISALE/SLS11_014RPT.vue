@@ -76,12 +76,12 @@ const selectedStartTime = ref({ value: 0, strName: "00:00" });
 const selectedEndTime = ref({ value: 23, strName: "23:00" });
 
 const startDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartDate.value = e;
 };
 
 const endDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedendDate.value = e;
 };
 
@@ -116,13 +116,13 @@ const searchButton = async () => {
       selectedstartDate.value,
       selectedendDate.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    console.log(error);
+    //console.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -134,18 +134,18 @@ const selectedStores = ref();
 const selectedStoreAttrs = ref();
 const lngStoreGroup = (e) => {
   //initGrid();
-  console.log(e);
+  //console.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCode = (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreAttrs = (e) => {
   initGrid();
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 /*
@@ -171,11 +171,11 @@ const documentSubTitle = ref("");
 const selectedExcelDate = ref("");
 const excelDate = (e) => {
   selectedExcelDate.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const selectedExcelStore = ref("");
 const excelStore = (e) => {
   selectedExcelStore.value = e;
-  console.log(e);
+  //console.log(e);
 };
 </script>

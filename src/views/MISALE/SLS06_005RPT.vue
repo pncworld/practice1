@@ -245,7 +245,7 @@ const searchButton = async () => {
       selectedCompareYear.value,
       selectedSalesType.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List.filter((item) => item.lngCode != "");
 
     afterSearch.value = true;
@@ -265,18 +265,18 @@ const selectedHoliday = ref(0);
 const selectedsubMenu = ref(null);
 const lngStoreGroup = (e) => {
   initGrid();
-  console.log(e);
+  //console.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCode = (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreAttrs = (e) => {
   initGrid();
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreTeam = (e) => {
   selectedStoreTeam.value = e;
@@ -345,9 +345,7 @@ const excelButton = () => {
   if (selectedMenu.value == null) {
     first = "전체";
   } else {
-    console.log(
-      mainMenu.value.filter((item) => item.lngcode == selectedMenu.value)
-    );
+    //console.log( mainMenu.value.filter((item) => item.lngcode == selectedMenu.value));
     first = mainMenu.value.filter(
       (item) => item.lngcode == selectedMenu.value.lngcode
     )[0].strname;
@@ -437,9 +435,9 @@ const getJsonData = (e) => {
     data2.push(e[i].nowTotAmt);
   }
   datas.value.push(data2);
-  console.log(labels.value);
-  console.log(label.value);
-  console.log(datas.value);
+  //console.log(labels.value);
+  //console.log(label.value);
+  //console.log(datas.value);
 };
 onMounted(async () => {
   const pageLog = insertPageLog(store.state.activeTab2);

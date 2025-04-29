@@ -299,18 +299,18 @@ const searchButton = async () => {
   try {
     const res3 = await getTLUManageInfo(groupCd.value, nowStoreCd.value);
 
-    console.log(res3);
+    //console.log(res3);
     TLUList.value = res3.data.TLULIST;
     MenuList.value = res3.data.MENULIST;
     filteredMenuList.value = [...MenuList.value];
     MenuGroup.value = res3.data.MAINGROUP;
     SubMenuGroup.value = res3.data.SUBGROUP;
-    console.log(MenuList.value);
+    //console.log(MenuList.value);
     updatedRowData2.value = JSON.parse(JSON.stringify(TLUList.value));
 
     afterSearch.value = true;
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     afterSearch.value = false;
   } finally {
     initFocus.value = !initFocus.value;
@@ -349,7 +349,7 @@ const onEnd = async (evt) => {
   ) {
     return;
   }
-  console.log(items.value);
+  //console.log(items.value);
   if (changeMode.value == false) {
     const oldIndex = evt.oldIndex; // 드래그된 아이템의 기존 인덱스
     const swappedItems = [...items.value]; // items를 복사
@@ -361,15 +361,15 @@ const onEnd = async (evt) => {
 
     // 배열을 업데이트
     items.value = swappedItems;
-    console.log(TLUList.value);
+    //console.log(TLUList.value);
 
     clickedMenuKey.value = targetItemIndex2;
-    console.log(TLUList.value);
+    //console.log(TLUList.value);
   }
 };
 
 watch(items, async () => {
-  console.log(items.value);
+  //console.log(items.value);
   if (items.value.length == 0) return;
 
   changeValue.value = items.value[0].lngCode;
@@ -553,7 +553,7 @@ function formatNumber(value) {
 }
 
 const saveButton = async () => {
-  console.log(updatedRowData2.value);
+  //console.log(updatedRowData2.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -729,7 +729,7 @@ const saveButton = async () => {
           lngMenu28.join(","),
           lngMenu29.join(",")
         );
-        console.log(res);
+        //console.log(res);
       } catch (error) {
       } finally {
         store.state.loading = false;
@@ -751,14 +751,14 @@ const searchMenuList = (e) => {
 };
 
 const clickedRowData = (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
   clickedTLUCd.value = newValue[0];
   items.value = [];
   for (var i = 2; i < 31; i++) {
     const filtereddata = MenuList.value.filter(
       (item) => Number(item.lngCode) == Number(newValue[i])
     );
-    console.log(filtereddata);
+    //console.log(filtereddata);
     if (filtereddata[0] != undefined) {
       items.value.push({
         lngCode: filtereddata[0].lngCode,
@@ -770,7 +770,7 @@ const clickedRowData = (newValue) => {
     }
   }
   items.value.push({ lngCode: 0, strName: "", lngPrice: "", inactivate: true });
-  console.log(items.value);
+  //console.log(items.value);
 };
 
 const searchTLU = (e) => {
@@ -788,7 +788,7 @@ const addTLU = () => {
   addrowDefault.value = newTLU;
   addrowDefault.value +=
     ", ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0";
-  console.log(addrowDefault.value);
+  //console.log(addrowDefault.value);
   addRow3.value = !addRow3.value;
 };
 const deleteTLU = () => {
@@ -797,7 +797,7 @@ const deleteTLU = () => {
 const currIndexKey = ref();
 const saveKey = (index) => {
   currIndexKey.value = index;
-  console.log(currIndexKey.value);
+  //console.log(currIndexKey.value);
 };
 
 const deletekey = () => {
@@ -825,11 +825,11 @@ const deletekey = () => {
 
 watch(forsearchMain, () => {
   searchColValue2.value = forsearchMain.value + ",0";
-  console.log(searchColValue2.value);
+  //console.log(searchColValue2.value);
 });
 watch(forsearchSub, () => {
   searchColValue2.value = forsearchMain.value + "," + forsearchSub.value;
-  console.log(searchColValue2.value);
+  //console.log(searchColValue2.value);
 });
 
 const changeRow = ref();
@@ -842,8 +842,8 @@ const selectedIndex2 = (e) => {
   changeRow.value = e;
 };
 const selcetedrowData = (newValue) => {
-  console.log(currIndexKey.value);
-  console.log(newValue);
+  //console.log(currIndexKey.value);
+  //console.log(newValue);
   if (
     currIndexKey.value === undefined ||
     currIndexKey.value === "" ||
@@ -861,19 +861,19 @@ const selcetedrowData = (newValue) => {
 
   changeValue.value = newValue[0];
   changeColid.value = "lngMenu" + (currIndexKey.value + 1);
-  console.log(changeColid.value);
+  //console.log(changeColid.value);
   changeNow2.value = !changeNow2.value;
   // const finditem = TLUList.value.find(
   //   (item, index) => item.lngCode == Number(clickedTLUCd.value)
   // );
   // finditem[`lngMenu${currIndexKey.value + 1}`] = Number(newValue[0]);
-  // console.log(finditem);
-  // console.log(TLUList.value);
+  // //console.log(finditem);
+  // //console.log(TLUList.value);
   // TLUList.value = [...TLUList.value];
   // const finditem2 = items.value.find(
   //   (item, index) => index == currIndexKey.value
   // );
-  // console.log(finditem2);
+  // //console.log(finditem2);
   // finditem2.lngCode = newValue[0];
   // finditem2.strName = newValue[1];
   // finditem2.lngPrice = newValue[2];
@@ -881,14 +881,14 @@ const selcetedrowData = (newValue) => {
 
 const updatedRowData2 = ref([]);
 const updatedRowData = (newvalue) => {
-  console.log(newvalue);
+  //console.log(newvalue);
   // const updatename = newvalue.filter(item => Number(item.lngCode) == Number(clickedTLUCd.value))[0].strName
   // const findname = TLUList.value.find(item => item.lngCode == clickedTLUCd.value)
   // if(findname != undefined){
   //     findname.strName = updatename
   // }
   updatedRowData2.value = newvalue;
-  console.log(TLUList.value);
+  //console.log(TLUList.value);
 };
 const handleinitAll = (newvalue) => {
   MenuGroup.value = [];

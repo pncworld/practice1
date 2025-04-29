@@ -798,7 +798,7 @@ const realgridname2 = (e) => {
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
-  console.log(store.state.userData.lngCommonMenu);
+  //console.log(store.state.userData.lngCommonMenu);
 
   if (store.state.userData.lngCommonMenu == "1") {
     nowStoreCd.value = 0;
@@ -1034,7 +1034,7 @@ const selectedIndex2 = (e) => {
   changeRow2.value = e;
 };
 const handleStoreCd = async (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
   if (newValue == "-1") {
     afterSearch.value = false;
     initAll();
@@ -1100,8 +1100,8 @@ const searchButton = async () => {
     rowData2.value = res2.data.menuList;
     SubMenuGroup.value = res2.data.submenuGroup;
     MenuGroup.value = res2.data.menuGroup;
-    console.log(res);
-    console.log(res2);
+    //console.log(res);
+    //console.log(res2);
   } catch (error) {
     afterSearch.value = false;
   } finally {
@@ -1134,7 +1134,7 @@ const searchButton = async () => {
 //   const reagrid2 = document.getElementById(realgrid2Name.value);
 //   RealGrid.getGridInstance(reagrid2).resetSize();
 //   RealGrid.getGridInstance(reagrid2).refresh(true);
-//   console.log(RealGrid.getGridInstance(reagrid2));
+//   //console.log(RealGrid.getGridInstance(reagrid2));
 // });
 
 const searchWord = ref("");
@@ -1160,11 +1160,11 @@ const searchword = (e) => {
 const changeInfo = (e) => {
   const tagName = e.target.name;
   let value2 = e.target.value;
-  console.log(tagName);
-  console.log(value2);
+  //console.log(tagName);
+  //console.log(value2);
   if (tagName == "lngCode") {
     const convert = value2.replace(/[^0-9]/g, "");
-    console.log(convert);
+    //console.log(convert);
     gridvalue5.value = convert;
     value2 = convert;
 
@@ -1202,7 +1202,7 @@ const changeInfo = (e) => {
   //      }
 
   //      const findrow = rowData.value.find(item => item.lngCode == gridvalue5.value)
-  //      console.log(findrow)
+  //      //console.log(findrow)
   // const findrowlength = rowData.value.filter(item => item.lngCode == gridvalue5.value).length
 
   // if(findrow !== undefined && findrowlength ==1){
@@ -1210,8 +1210,8 @@ const changeInfo = (e) => {
   // }  else {
 
   // const findrow2 = rowData.value.find(item => item.sequence == clickaddrowSeq.value)
-  // console.log(changeValue2.value)
-  // console.log(changeColid.value)
+  // //console.log(changeValue2.value)
+  // //console.log(changeColid.value)
   // findrow2[tagName] = value2
   // }
   //      changeValue2.value = value2
@@ -1244,7 +1244,7 @@ const setSubCd = (e) => {
 
   // searchColValue3.value = forsearchMain.value + ",0";
 
-  // console.log(searchColValue3.value);
+  // //console.log(searchColValue3.value);
 
   // clickrowData2.value = rowData2.value.filter( item => {
   //   if(forsearchMain.value =='0' ){
@@ -1274,7 +1274,7 @@ const changeColid2 = ref("checkbox");
 const changeNow2 = ref(false);
 const checkedRowData = (e) => {
   const temp = e.map((item) => item.menuCd);
-  console.log(e, updateRow.value);
+  //console.log(e, updateRow.value);
   // const rowDataMap = new Map(
   //   rowData.value.map((row) => [
   //     row.sequence !== undefined ? row.sequence : row.lngCode.toString(),
@@ -1309,7 +1309,7 @@ const checkedRowData = (e) => {
 const checkedRowData2 = (e) => {
   changeColid.value = "unchecklngCode";
   const arr = e.map((item) => Number(item.lngCode));
-  console.log(arr);
+  //console.log(arr);
   const filtered2 = rowData3.value
     .filter((item) => item.lngCode != gridvalue5.value)
     .filter((item) => !arr.includes(Number(item.lngCode)))
@@ -1353,7 +1353,7 @@ const addRow = () => {
     "0";
   addrowProp.value =
     "lngStoreCode,storeName,dtmFromDate,dtmToDate,lngDiscType,lngRoundType,lngTax,strIcon,blnInactive";
-  console.log(addrowProp.value);
+  //console.log(addrowProp.value);
   addRow4.value = !addRow4.value;
   addrowSeq.value++;
   rowData.value.push({
@@ -1384,7 +1384,7 @@ watch(gridvalue9, () => {
 });
 
 const saveButton = () => {
-  console.log(updateRow.value);
+  //console.log(updateRow.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -1433,7 +1433,7 @@ const saveButton = () => {
   const validateRow2 =
     new Set(updateRow.value.map((item) => item.lngCode)).size ==
     updateRow.value.map((item) => item.lngCode).length;
-  console.log(rowData.value);
+  //console.log(rowData.value);
   if (validateRow2 == false) {
     Swal.fire({
       title: "경고",
@@ -1550,7 +1550,7 @@ const saveButton = () => {
           unchecklngCodes.join(","),
           deleteCd.join(",")
         );
-        console.log(res);
+        //console.log(res);
 
         Swal.fire({
           title: "저장 되었습니다.",
@@ -1558,7 +1558,7 @@ const saveButton = () => {
         });
         store.state.loading = false;
       } catch (error) {
-        console.log(error);
+        //console.log(error);
         Swal.fire({
           title: "저장이 실패되었습니다.",
           confirmButtonText: "확인",
@@ -1574,13 +1574,13 @@ const saveButton = () => {
 const updateDeleteInsertrowIndex = ref([]);
 const allStateRows = (e) => {
   updateDeleteInsertrowIndex.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const updatedRowData = (newvalue) => {
-  console.log(newvalue);
+  //console.log(newvalue);
   updateRow.value = newvalue;
   // rowData.value = newvalue;
-  // console.log(newvalue);
+  // //console.log(newvalue);
   // const temp = newvalue
   //   .filter((item) => item.deleted == true)
   //   .map((item) => item.lngCode);
@@ -1617,7 +1617,7 @@ const updatedRowData2 = (newvalue) => {
   //   //   findrow.checkedMenu = temp.value.join(',')
   //   //  }
   //   const targetRow = rowDataMap.get(gridvalue5.value.toString()); // Map을 통해 빠르게 찾기
-  //   console.log(targetRow)
+  //   //console.log(targetRow)
   //   if (targetRow) {
   //     // targetRow가 있으면 값을 업데이트
   //     targetRow.checkedMenu = temp.value.join(',')
@@ -1628,7 +1628,7 @@ const updatedRowData2 = (newvalue) => {
   //      targetRow2.checkedMenu = temp.value.join(',')
   //   }
   // rowData.value = [...rowData.value]
-  // console.log(rowData.value)
+  // //console.log(rowData.value)
 };
 
 const updatedRowData3 = (newvalue) => {
@@ -1668,7 +1668,7 @@ const updatedRowData3 = (newvalue) => {
 //   const arr = clickrowData2.value
 //     .filter((item) => item.checkbox == true)
 //     .map((item) => item.menuCd);
-//   console.log(arr);
+//   //console.log(arr);
 //   changeValue2.value = arr.join(",");
 //   if (arr.length > 0 && deleteOn.value == false) {
 //     changeNow.value = !changeNow.value;
@@ -1677,9 +1677,9 @@ const updatedRowData3 = (newvalue) => {
 // });
 
 const clickedRowData2 = (e) => {
-  // //console.log(e)
+  // ////console.log(e)
   // const clickedRow = clickrowData2.value.find(item => item.menuCd == e[3])
-  // //console.log(clickedRow.checkbox == undefined)
+  // ////console.log(clickedRow.checkbox == undefined)
   // if(clickedRow.checkbox == undefined|| clickedRow.checkbox == false){
   //   clickedRow.checkbox = true
   // } else {
@@ -1687,11 +1687,11 @@ const clickedRowData2 = (e) => {
   // }
   // clickrowData2.value = [...clickrowData2.value]
   // changeColid.value = 'checkedMenu'
-  // console.log(clickrowData2.value)
+  // //console.log(clickrowData2.value)
   // const arr = clickrowData2.value.filter(item => item.checkbox == true).map(item => item.menuCd)
   // changeValue2.value = arr.join(',')
   // changeNow.value = !changeNow.value
-  // //console.log(updateRow.value)
+  // ////console.log(updateRow.value)
   // clickrowData2.value = rowData2.value.filter( item => {
   //       if(forsearchMain.value =='0' ){
   //         return item ;
@@ -1705,7 +1705,7 @@ const clickedRowData2 = (e) => {
   //    if(rowData2.value.length > 0){
   //     let dupliarr = JSON.parse(JSON.stringify(clickrowData2.value));
   //     if(dupliarr){
-  //     console.log(dupliarr)
+  //     //console.log(dupliarr)
   //     dupliarr.sort((a, b) => {
   //       const aIndex = firstarr.indexOf(a.menuCd);
   //       const bIndex =  firstarr.indexOf(b.menuCd);

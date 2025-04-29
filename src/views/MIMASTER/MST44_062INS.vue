@@ -321,7 +321,7 @@ watch(ischecked, () => {
     searchSpecialColId.value.push("checkbox" + i);
   }
   if (ischecked.value == true) {
-    console.log(searchSpecialColId.value);
+    //console.log(searchSpecialColId.value);
 
     searchSpecialCond.value = false;
   } else {
@@ -344,7 +344,7 @@ const realgridname3 = (e) => {
   realgrid4Name.value = e;
 };
 const realgridname4 = (e) => {
-  console.log(e)
+  //console.log(e)
   realgrid5Name.value = e;
 };
 
@@ -384,24 +384,24 @@ const nowStoreAreaCd = ref();
 const handleStoreAreaCd = (newValue) => {
 
   nowStoreAreaCd.value = newValue;
-  console.log(nowStoreAreaCd.value)
+  //console.log(nowStoreAreaCd.value)
 }
 const updatedRowData = (newValue) => {
   updatedList.value = newValue
-  console.log(updatedList.value)
+  //console.log(updatedList.value)
 }
 
 const forSaveMenu = ref([])
 const updatedRowData2 = (newValue) => {
   updatedList2.value = newValue
-  console.log(newValue)
+  //console.log(newValue)
 
 }
 
 const updatedList3 = ref([])
 const updatedRowData3 = (newValue) => {
   updatedList3.value = newValue
-  console.log(updatedList3.value)
+  //console.log(updatedList3.value)
 }
 const nowStoreCd = ref();
 const afterCategory = ref(false);
@@ -418,7 +418,7 @@ const handleStoreCd = async (newValue) => {
   ischecked.value = false
 
   nowStoreCd.value = newValue;
-  console.log(nowStoreCd.value)
+  //console.log(nowStoreCd.value)
   reload.value = !reload.value
 }
 const handleInput = (e) => {
@@ -476,10 +476,10 @@ const calculateByte2 = async(e) => {
 
 const encoder = new TextEncoder();
 let inputValue = e.target.value
-console.log(inputValue)
+//console.log(inputValue)
 receiptDByte.value = encoder.encode(inputValue).length
 if (receiptDByte.value >= 43) {
-  console.log(inputValue)
+  //console.log(inputValue)
   isSwalOpen = true ; 
     const result = await Swal.fire({
     title: '경고',
@@ -495,8 +495,8 @@ if (receiptDByte.value >= 43) {
         inputValue = inputValue.slice(0, inputValue.length - 1)
 
       
-        console.log(receiptU.value)
-        console.log(inputValue)
+        //console.log(receiptU.value)
+        //console.log(inputValue)
         receiptDByte.value = encoder.encode(inputValue).length
       }
       if (e.target.name == 'receiptD1') {
@@ -570,14 +570,14 @@ const addRow = () => {
   }
   addRows.value = !addRows.value
   addrowDefault.value = userData.strStoreGroupName
-  console.log(updatedList.value)
+  //console.log(updatedList.value)
   if (updatedList.value == undefined || updatedList.value[0] == undefined) {
     addrowDefault.value += ',' + 1
   } else {
     const maxKdsCornerNum = Math.max(...updatedList.value.map(item => item.kdsCornerNum))
-    console.log(maxKdsCornerNum)
+    //console.log(maxKdsCornerNum)
     addrowDefault.value += ',' + (maxKdsCornerNum + 1)
-    console.log(addrowDefault.value)
+    //console.log(addrowDefault.value)
   }
 
 }
@@ -611,7 +611,7 @@ const copyButton = () => {
 }
 
 const selcetedrowData = (newValue) => {
-  console.log(newValue)
+  //console.log(newValue)
 
 }
 const originRowData3 = ref([])
@@ -645,15 +645,15 @@ const searchButton = async () => {
     let res;
     if (currentMenu.value == 1) {
       res = await getPrintList(groupCd.value, nowStoreCd.value)
-      console.log(res)
+      //console.log(res)
       rowData.value = res.data.Print
       rowData2.value = res.data.Print2
 
-      console.log(rowData2.value)
+      //console.log(rowData2.value)
       afterSearch.value = true
     } else if (currentMenu.value == 2) {
       res = await getKitchenSettingList(groupCd.value, nowStoreCd.value)
-      console.log(res)
+      //console.log(res)
 
       SettingList.value = [...res.data.KITCHENMENU]
       MenuGroup.value = res.data.MAINGROUP
@@ -661,9 +661,9 @@ const searchButton = async () => {
       checked.value = res.data.SAVED
       PrintList.value = res.data.PRINTLIST
       printNameList.value = res.data.KITCHENPRINT
-      console.log(checked.value)
-      console.log(printNameList.value)
-      console.log(SettingList.value)
+      //console.log(checked.value)
+      //console.log(printNameList.value)
+      //console.log(SettingList.value)
       for (var i = 0; i < checked.value.length; i++) {
         const tlngCode = checked.value[i].lngCode
         const portid = checked.value[i].portId
@@ -681,7 +681,7 @@ const searchButton = async () => {
       afterSearch2.value = true
     } else if (currentMenu.value == 3) {
       res = await getStorePosList(groupCd.value, nowStoreCd.value)
-      console.log(res)
+      //console.log(res)
       rowData4.value = res.data.RECEIPTLIST
       afterSearch3.value = true
     }
@@ -689,7 +689,7 @@ const searchButton = async () => {
 
 
   } catch (error) {
-    console.log(error)
+    //console.log(error)
     afterSearch.value = false;
     afterSearch2.value = false;
     afterSearch3.value = false;
@@ -741,7 +741,7 @@ const searchMenuList = (e) => {
 
 
 const saveButton = async () => {
-  console.log(updatedList2.value)
+  //console.log(updatedList2.value)
   if (currentMenu.value == 1) {
     if (afterSearch.value == false) {
       Swal.fire({
@@ -806,12 +806,12 @@ const saveButton = async () => {
           const printNo = updatedList.value.map(item => item.lngPosition)
           const printNm = updatedList.value.map(item => item.cornerNm)
           res = await savePrintNm(groupCd.value, nowStoreCd.value, printNo.join(','), printNm.join(','))
-          console.log(res)
+          //console.log(res)
         } else if (currentMenu.value == 2) {
         
           const calculateArr = ref([])
           const count = Object.keys(updatedList2.value[0]).filter(key => key.startsWith("checkbox")).length;
-          console.log(count)
+          //console.log(count)
 
           forSaveMenu.value = []
           for(let i=1 ; i  <= count ; i++){
@@ -868,14 +868,14 @@ const saveButton = async () => {
          
 
         
-          console.log(forSaveMenu.value)
-          console.log(uniqueArray)
-          console.log(calculateArr.value)
+          //console.log(forSaveMenu.value)
+          //console.log(uniqueArray)
+          //console.log(calculateArr.value)
           res = await saveKitchenSettingAll(groupCd.value, nowStoreCd.value, JSON.stringify(forSaveMenu.value), uniqueArray.sort().join(','), JSON.stringify(calculateArr.value), userData.loginID)
-          console.log(res)
+          //console.log(res)
 
         } else if (currentMenu.value == 3) {
-          console.log(updatedList3.value)
+          //console.log(updatedList3.value)
           const posNos = updatedList3.value.map(item => item.intPosNo)
           const areaCodes = updatedList3.value.map(item => item.lngAreaCode)
           const strreceipts = updatedList3.value.map(item => item.strReceiptU)
@@ -885,7 +885,7 @@ const saveButton = async () => {
 
         }
 
-        console.log(res)
+        //console.log(res)
 
       } catch (error) {
 
@@ -910,8 +910,8 @@ const saveButton = async () => {
 }
 
 // watch(ischecked , () => {
-//   console.log(originRowData3.value)
-//   console.log(ischecked.value)
+//   //console.log(originRowData3.value)
+//   //console.log(ischecked.value)
 
 //    if(ischecked.value == true){
 //     const count = Object.keys(originRowData3.value[0]).filter(key => key.startsWith("checkbox")).length;
@@ -932,7 +932,7 @@ const saveButton = async () => {
 //    } else {
 //     rowData3.value = originRowData3.value ;
 //    }
-//    console.log(rowData3.value)
+//    //console.log(rowData3.value)
 // })
 const selectedIndex =(e) => {
   changeRow.value = e
@@ -1060,8 +1060,8 @@ const changeValues2 = async (e) => {
 
 const dupliAllData = async() => {
   receiptU.value = savedreceiptU
-  console.log(savedreceiptU)
-  console.log(changeNow2.value)
+  //console.log(savedreceiptU)
+  //console.log(changeNow2.value)
   changeColid.value = 'strReceiptU'
   changeValue.value = savedreceiptU
   changeNow2.value = !changeNow2.value
@@ -1077,8 +1077,8 @@ const dupliAllData = async() => {
    changeColid.value = 'strReceiptD'
    changeValue.value = savedreceiptD1 + savedreceiptD2 + savedreceiptD3 + savedreceiptD4 + savedreceiptD5
 
-   console.log(changeValue.value)
-   console.log(changeNow2.value)
+   //console.log(changeValue.value)
+   //console.log(changeNow2.value)
    changeNow2.value = !changeNow2.value
 
 }
@@ -1151,7 +1151,7 @@ const selectedIndex2 = (e) => {
 
 }
 const clickedRowData2 = (newValue) => {
-  console.log(newValue)
+  //console.log(newValue)
   receiptU.value = newValue[2]
   const result = splitStringByByteLength(newValue[3], 42)
   receiptD1.value = result[0]
@@ -1164,7 +1164,7 @@ const clickedRowData2 = (newValue) => {
 
 const handlePosNo = (newValue) => {
   posNo.value = newValue
-  console.log(posNo.value)
+  //console.log(posNo.value)
   if (nowStoreAreaCd.value != undefined || posNo.value != undefined) {
     searchButton()
   }

@@ -552,7 +552,7 @@ const storeCd = ref("0");
 const allstrore = ref(false);
 const handleStoreCd = (newValue) => {
   storeCd.value = newValue;
-  console.log(newValue);
+  //console.log(newValue);
   if (storeCd.value == 0) {
     allstrore.value = false;
   } else {
@@ -563,7 +563,7 @@ const handleStoreCd = (newValue) => {
 const inputValue = ref("");
 
 const handleGroupCd = (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
   groupCd.value = newValue;
 };
 const exExcel = ref(false);
@@ -647,10 +647,10 @@ const searchButton = async () => {
 
   store.dispatch("convertLoading", true);
 
-  console.log(groupCd.value);
-  console.log(storeType.value);
-  console.log(storeCd.value);
-  console.log(searchStoreName.value);
+  //console.log(groupCd.value);
+  //console.log(storeType.value);
+  //console.log(storeCd.value);
+  //console.log(searchStoreName.value);
   const res = await getstoreInfo(
     groupCd.value,
     storeType.value,
@@ -658,7 +658,7 @@ const searchButton = async () => {
     searchStoreName.value
   );
 
-  console.log(res);
+  //console.log(res);
   lngJoinTypes.value = res.data.JOINTYPE;
   lngMultiPriceGroupCodes.value = res.data.STOREMULTI;
   lngStoreAttrs.value = res.data.STOREATTR;
@@ -703,9 +703,9 @@ const searchButton = async () => {
 
   // labelsData.value.push()
   // valuesData
-  console.log(lngSupervisors.value);
-  console.log(lngSaleTypes.value);
-  console.log(lngMultiPriceGroupCodes.value);
+  //console.log(lngSupervisors.value);
+  //console.log(lngSaleTypes.value);
+  //console.log(lngMultiPriceGroupCodes.value);
   let sublabelarr = [];
   let subvaluearr = [];
   for (var i = 0; i < lngSupervisors.value.length; i++) {
@@ -791,13 +791,13 @@ const searchButton = async () => {
   labelsData.value.push(sublabelarr);
   valuesData.value.push(subvaluearr);
 
-  console.log(labelsData.value);
-  console.log(valuesData.value);
+  //console.log(labelsData.value);
+  //console.log(valuesData.value);
   rowData.value = res.data.store;
   updateRowData.value = JSON.parse(JSON.stringify(rowData.value));
   store.dispatch("convertLoading", false);
   afterSearch.value = true;
-  console.log(lngStoreArea.value);
+  //console.log(lngStoreArea.value);
 };
 
 const deleted = ref(false);
@@ -864,7 +864,7 @@ const saveButton = async () => {
     });
     return;
   }
-  console.log(updateRowData.value);
+  //console.log(updateRowData.value);
 
   const validateRow = updateRowData.value.filter(
     (item) =>
@@ -913,7 +913,7 @@ const saveButton = async () => {
     if (result.isConfirmed) {
       store.state.loading = true;
       try {
-        console.log(updateRowData.value);
+        //console.log(updateRowData.value);
         const deleteStore = updateRowData.value
           .filter((item) => item.checkbox == true || item.deleted == true)
           .map((item) => item.lngStoreCode);
@@ -1089,7 +1089,7 @@ const saveButton = async () => {
 
         const id = store.state.userData.strUserID;
 
-        console.log(updatelngLease);
+        //console.log(updatelngLease);
         const res = await saveStoreInfo(
           id,
           groupCd.value,
@@ -1154,7 +1154,7 @@ const saveButton = async () => {
           insertstrStoreHistory.join(","),
           insertlngMultiPriceGroupCode.join(",")
         );
-        console.log(res);
+        //console.log(res);
 
         const response2 = await get_store_list(
           store.state.userData.lngStoreGroup,
@@ -1166,7 +1166,7 @@ const saveButton = async () => {
           store.state.userData.lngSupervisor
         );
 
-        console.log(response2.data);
+        //console.log(response2.data);
 
         const result0 = response2.data.storeGroup;
         const result1 = response2.data.storeAttr;
@@ -1203,8 +1203,8 @@ const selectedIndex2 = (e) => {
   changeRow.value = e;
 };
 const clickedRowData3 = (newValue) => {
-  console.log(newValue);
-  console.log(rowData.value);
+  //console.log(newValue);
+  //console.log(rowData.value);
   lngStoreCode.value = newValue[0]; // 1 -> 0
   strName.value = newValue[1]; // 2 -> 1
   strRegistNo.value = newValue[2]; // 3 -> 2
@@ -1284,14 +1284,14 @@ const updateGridValue = (e) => {
 const updateRowData = ref([]);
 const updatedRowData = (newvalue) => {
   updateRowData.value = newvalue;
-  console.log(updateRowData.value);
+  //console.log(updateRowData.value);
 };
 
 watch(dtmOpenDate, () => {
-  console.log(dtmOpenDate.value);
+  //console.log(dtmOpenDate.value);
 });
 watch(dtmStop, () => {
-  console.log(dtmStop.value);
+  //console.log(dtmStop.value);
 });
 </script>
 

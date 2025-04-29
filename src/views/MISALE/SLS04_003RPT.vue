@@ -261,7 +261,7 @@ const selectedstartDate = ref();
 const selectedendDate = ref();
 
 const startDate = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedstartDate.value = e;
 };
 const endDate = (e) => {
@@ -283,8 +283,8 @@ const searchButton = async () => {
   store.state.loading = true;
   try {
     initGrid();
-    console.log(selectedSearchType.value);
-    console.log(selectedDetail.value);
+    //console.log(selectedSearchType.value);
+    //console.log(selectedDetail.value);
 
     let reportType;
     if (
@@ -372,7 +372,7 @@ const searchButton = async () => {
       progid.value = 3;
       reportType = 2;
     }
-    console.log(reportType);
+    //console.log(reportType);
     if (temptmergeColumns2.value == false) {
       mergeColumns2.value = false;
     } else {
@@ -383,7 +383,7 @@ const searchButton = async () => {
     // const reportType = [...checkedReportTypes]
     // const checkdays = [...checkedDays]
 
-    // console.log(checkdays)
+    // //console.log(checkdays)
     let first;
     let second;
     let third;
@@ -396,7 +396,7 @@ const searchButton = async () => {
     if (selectedMenu.value == null || selectedMenu.value == undefined) {
       first = 0;
     } else {
-      console.log(selectedMenu.value);
+      //console.log(selectedMenu.value);
       first = selectedMenu.value.lngcode;
     }
 
@@ -409,11 +409,11 @@ const searchButton = async () => {
       third = selectedSubSubMenu.value.lngcode;
     }
 
-    console.log(selectedstartDate.value);
-    console.log(selectedendDate.value);
-    console.log(first);
-    console.log(second);
-    console.log(third);
+    //console.log(selectedstartDate.value);
+    //console.log(selectedendDate.value);
+    //console.log(first);
+    //console.log(second);
+    //console.log(third);
 
     const res = await getSalesReportByMenuAndPayType(
       selectedGroup.value,
@@ -425,7 +425,7 @@ const searchButton = async () => {
       second,
       third
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List.filter((item) => item.lngCode != "");
 
     afterSearch.value = true;
@@ -444,18 +444,18 @@ const selectedHoliday = ref(0);
 const selectedsubMenu = ref(null);
 const lngStoreGroup = (e) => {
   initGrid();
-  console.log(e);
+  //console.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreAttr = (e) => {
   initGrid();
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreTeam = (e) => {
   initGrid();
@@ -495,8 +495,8 @@ const excelButton = () => {
   }
 
   let submenu;
-  console.log(selectedsubMenu.value);
-  console.log(subList.value);
+  //console.log(selectedsubMenu.value);
+  //console.log(subList.value);
   if (selectedsubMenu.value == null || menuType.value.length == 0) {
     submenu = "전체";
   } else {
@@ -601,7 +601,7 @@ watch(selectedMenu, async () => {
   );
   menuType.value = res.data.List;
   selectedsubMenu.value = null;
-  console.log(menuType.value);
+  //console.log(menuType.value);
 });
 const selectedSubSubMenu = ref(null);
 watch(selectedsubMenu, async () => {

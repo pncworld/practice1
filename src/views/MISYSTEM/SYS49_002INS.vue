@@ -306,7 +306,7 @@ const storeList = ref([]);
 const forupdateDisabled = ref(true);
 // const lngStoreCode = (e) => {
 //     selectedStoreCd.value = e
-//     console.log(e)
+//     //console.log(e)
 // }
 const moveFocusbyIndex = ref("");
 const deleteRow2 = ref(false);
@@ -361,11 +361,11 @@ onMounted(async () => {
   const loginedstrLang = store.state.userData.strLanguage;
   const res2 = await getSecureList(groupCd.value);
   secureList.value = res2.data.List;
-  console.log(secureList.value);
+  //console.log(secureList.value);
   const res3 = await getLockTypeList(groupCd.value, loginedstrLang);
 
   LockList.value = res3.data.List;
-  console.log(res3);
+  //console.log(res3);
   let storecd;
   if (
     store.state.userData.blnBrandAdmin == "True" ||
@@ -398,7 +398,7 @@ const searchButton = async () => {
       condition1.value,
       condition2.value
     );
-    console.log(res);
+    //console.log(res);
 
     rowData.value = JSON.parse(JSON.stringify(res.data.List));
     updateRowData.value = JSON.parse(JSON.stringify(res.data.List));
@@ -440,7 +440,7 @@ const payCd = ref("");
 const selectedRowState = ref("");
 const sendRowState = (e) => {
   selectedRowState.value = e;
-  console.log(e);
+  //console.log(e);
   if (e == "none") {
     blnCheckDupli.value = true;
   }
@@ -448,13 +448,13 @@ const sendRowState = (e) => {
 const rollBackFoucus = () => {
   const currentIndex =
     selectedIndexArray.value[selectedIndexArray.value.length - 1];
-  console.log(currentIndex);
+  //console.log(currentIndex);
   const prevIndexarr = selectedIndexArray.value.filter(
     (item) => item !== currentIndex
   );
-  console.log(prevIndexarr);
+  //console.log(prevIndexarr);
   const realPrevIndex = prevIndexarr[prevIndexarr.length - 1];
-  console.log(realPrevIndex);
+  //console.log(realPrevIndex);
 
   setTimeout(() => {
     moveFocusbyIndex.value = -1; // 임시 값 변경
@@ -469,7 +469,7 @@ const rollBack = (e) => {
   if (selectedUserSequence.value == "0") {
     return;
   }
-  console.log(selectedUserSequence.value);
+  //console.log(selectedUserSequence.value);
 
   setTimeout(() => {
     const Value3 = rowData.value.filter(
@@ -566,7 +566,7 @@ const rollBack2 = () => {
   if (tempSequence == "0") {
     return;
   }
-  console.log(selectedUserSequence.value);
+  //console.log(selectedUserSequence.value);
 
   setTimeout(() => {
     const Value3 = rowData.value.filter(
@@ -676,8 +676,8 @@ const clickedRowData2 = (e) => {
   }
   clickedOrNot.value = false;
   const curr = rowData.value[e];
-  console.log(e);
-  console.log(curr);
+  //console.log(e);
+  //console.log(curr);
   value1.value = curr.lngPosition;
   value2.value = curr.strStoreName;
   value3.value = curr.strUserID;
@@ -709,7 +709,7 @@ const clickedRowData2 = (e) => {
   selectedUserChargerCode.value = curr.lngChargerCode;
   selectedUserSequence.value = curr.lngSequence;
   currentOriPassWord.value = curr.ori_strPassword;
-  console.log(currentOriPassWord.value);
+  //console.log(currentOriPassWord.value);
 };
 const clickedRowData = async (e) => {
   if (selectedindex.value == -1) {
@@ -721,12 +721,12 @@ const clickedRowData = async (e) => {
   prevSequence.value.push(e[15]);
   prevIndex.value.push(selectedindex.value);
 
-  console.log(updateRowData.value);
+  //console.log(updateRowData.value);
   clickedOrNot.value = false;
   let newRow = updateRowData.value.filter(
     (item) => item.lngSequence == "0"
   ).length;
-  console.log(newRow);
+  //console.log(newRow);
   if (newRow > 0) {
     Swal.fire({
       title: "신규",
@@ -748,10 +748,10 @@ const clickedRowData = async (e) => {
     return;
   }
 
-  console.log(e);
-  console.log(prevSequence.value);
-  console.log(updateRowData.value);
-  console.log(currentAddState.value);
+  //console.log(e);
+  //console.log(prevSequence.value);
+  //console.log(updateRowData.value);
+  //console.log(currentAddState.value);
   // if (currentAddState.value == true) {
 
   //     currentAddState.value = false
@@ -761,15 +761,15 @@ const clickedRowData = async (e) => {
   // if (prevSequence.value.length > 0 && prevSequence.value[prevSequence.value.length - 1] == e[15]) {
   //     return
   // }
-  // console.log(e)
+  // //console.log(e)
   // prevRowState.value.push(e.rowState)
   // prevIndex.value.push(e.index)
   // prevSequence.value.push(e[15])
 
   //updateRowData.value = updateRowData.value.filter(item => item.lngSequence != '0')
 
-  console.log(updateRowData.value);
-  console.log(rowData.value);
+  //console.log(updateRowData.value);
+  //console.log(rowData.value);
 
   if (
     JSON.stringify(sortObject(rowData.value)) !=
@@ -830,9 +830,9 @@ const clickedRowData = async (e) => {
   value8.value = e[8];
   value9.value = e[9];
   value10.value = e[10]; //10차단설정
-  console.log(e[11]);
-  console.log(e[12]);
-  console.log(e[14]);
+  //console.log(e[11]);
+  //console.log(e[12]);
+  //console.log(e[14]);
   value11.value = e[11] == "0" ? false : true;
   value12.value = e[12] == "0" ? false : true;
   value13.value = e[14];
@@ -890,7 +890,7 @@ const initGrid = () => {
 const selectedStoreAttr = ref();
 const blnCheckDupli = ref(false);
 const checkDupli = async () => {
-  console.log(value3.value);
+  //console.log(value3.value);
   const res = await checkId(value3.value);
   let cnt = res.data.List[0].cnt;
   if (cnt == 1) {
@@ -1031,9 +1031,9 @@ const saveButton = async () => {
     )[0].ori_strPassword;
   }
 
-  console.log(ori_validatePassWord);
-  console.log(value7.value);
-  console.log(selectedRowState.value);
+  //console.log(ori_validatePassWord);
+  //console.log(value7.value);
+  //console.log(selectedRowState.value);
 
   if (
     (value7.value.length <= 5 || value7.value.length >= 21) &&
@@ -1084,7 +1084,7 @@ const saveButton = async () => {
           "D",
           deleteRowSequences.value.join(",")
         );
-        console.log(res);
+        //console.log(res);
       }
 
       if (selectedRowState.value != "deleted") {
@@ -1197,9 +1197,9 @@ const saveButton2 = async () => {
     )[0].ori_strPassword;
   }
 
-  console.log(ori_validatePassWord);
-  console.log(value7.value);
-  console.log(selectedRowState.value);
+  //console.log(ori_validatePassWord);
+  //console.log(value7.value);
+  //console.log(selectedRowState.value);
 
   if (
     (value7.value.length <= 5 || value7.value.length >= 21) &&
@@ -1242,7 +1242,7 @@ const saveButton2 = async () => {
         "D",
         deleteRowSequences.value.join(",")
       );
-      console.log(res);
+      //console.log(res);
     }
 
     if (selectedRowState.value != "deleted") {
@@ -1351,13 +1351,13 @@ const updatedRowData = (e) => {
   }));
 
   updateRowData.value = convertArray;
-  console.log(updateRowData.value);
+  //console.log(updateRowData.value);
 };
 const deleteRows = (e) => {
   // deleteRowSequences.value = rowData.value.filter(item => item.lngSequence == )
 
   deleteRowSequences.value = e.map((item) => item[15]);
-  console.log(deleteRowSequences.value);
+  //console.log(deleteRowSequences.value);
   updateRowData.value = updateRowData.value.filter(
     (item) => item.lngSequence != "0"
   );
@@ -1373,7 +1373,7 @@ const selectedindex = ref("");
 const selectedIndexArray = ref([]);
 const selectedIndex = (e) => {
   selectedindex.value = e;
-  console.log(e);
+  //console.log(e);
   selectedIndexArray.value.push(e);
 };
 const changeRow = ref("");
@@ -1480,9 +1480,9 @@ const setValue11 = (e) => {
   if (e == undefined) {
     e = "";
   }
-  console.log(e);
+  //console.log(e);
   let value = typeof e === "string" ? e : e.target.checked;
-  console.log(value);
+  //console.log(value);
   if (value == "1" || value == true) {
     value = "1";
   } else {
@@ -1636,9 +1636,9 @@ const setValue11_1 = (e) => {
   if (e == undefined) {
     e = "";
   }
-  console.log(e);
+  //console.log(e);
   let value = typeof e === "string" ? e : e.target.checked;
-  console.log(value);
+  //console.log(value);
   if (value == "1" || value == true) {
     value = "1";
   } else {

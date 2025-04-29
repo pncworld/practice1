@@ -674,7 +674,7 @@ const searchMenu = async () => {
     modified.value = false;
     afterCategory.value = false;
   }
-  console.log(Category.value);
+  //console.log(Category.value);
 };
 const saveMenus = async () => {
   // if(newMainCategoryCode.value.includes(currentMajorCode.value) && ){
@@ -775,9 +775,9 @@ const saveMenus = async () => {
       const subCd2 = subMultis2.map((item) => item.categoryCode);
       const subNm2 = subMultis2.map((item) => item.LanguageName);
       const languageNm2 = subMultis2.map((item) => item.LanguageID);
-      console.log(subCd);
-      console.log(subNm);
-      console.log(languageNm);
+      //console.log(subCd);
+      //console.log(subNm);
+      //console.log(languageNm);
       try {
         const res2 = await setSubCategoryINSERT(
           groupCd.value,
@@ -846,8 +846,8 @@ const bringCategory = (value) => {
   }
 
   currentMajorCode.value = value;
-  // console.log(getMultiLang.value);
-  // console.log(Category.value);
+  // //console.log(getMultiLang.value);
+  // //console.log(Category.value);
   Category.value = Category.value.map((categoryItem) => {
     // getMultiLang에서 MajorCode와 일치하는 항목을 찾아 mainMultilang으로 설정
     categoryItem.mainMultilang = getMultiLang.value.filter(
@@ -913,7 +913,7 @@ const bringCategory = (value) => {
   const subCodes = Category.value
     .filter((item2) => item2.MajorCode == value)
     .flatMap((item2) => item2.SubCategory.map((item3) => item3.SubCode));
-  console.log(subCodes);
+  //console.log(subCodes);
   subMultiLang.value = subCodes.map((code) => {
     // 각 code에 대해 필터링하여 해당 categoryCode와 일치하는 subMultilang 항목을 모음
     return Category.value

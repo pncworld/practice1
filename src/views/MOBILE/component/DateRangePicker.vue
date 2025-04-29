@@ -146,7 +146,7 @@ function handleDateRangeChange(newDateRange) {
   } else if (selectedRange.value == "dayUnit") {
     emit("update:dateRange", newDateRange);
   } else {
-    console.log(newDateRange);
+    //console.log(newDateRange);
     const startday = new Date();
     startday.setMonth(newDateRange[0].month);
     startday.setDate(1);
@@ -160,7 +160,7 @@ function handleDateRangeChange(newDateRange) {
       end.setDate(0);
     }
     newdate.push(startday, end);
-    console.log(newdate);
+    //console.log(newdate);
     emit("update:dateRange", newdate);
   }
 }
@@ -173,7 +173,7 @@ function handleDateRangeChange2(newDateRange) {
   } else if (selectedRange.value == "dayUnit") {
     emit("update:dateRange", newDateRange);
   } else {
-    console.log(newDateRange);
+    //console.log(newDateRange);
     const startday = new Date();
     startday.setMonth(newDateRange[0].month);
     startday.setDate(1);
@@ -187,13 +187,13 @@ function handleDateRangeChange2(newDateRange) {
       end.setDate(0);
     }
     newdate.push(startday, end);
-    console.log(newdate);
+    //console.log(newdate);
     emit("update:dateRange", newdate);
   }
 }
 function notActive() {
   clickUnit.value = false;
-  console.log(clickUnit.value);
+  //console.log(clickUnit.value);
 }
 function combinedHandler() {
   notActive();
@@ -296,12 +296,12 @@ function updateDateRange() {
   // DatePicker에 선택된 날짜 범위를 업데이트
 }
 watch(monthRange, (newvalue) => {
-  console.log(newvalue);
+  //console.log(newvalue);
 });
 watch(dateRange, (newvalue) => {});
 watch(weekRange, (newvalue) => {});
 function updateWeekChange() {
-  console.log(weekRange.value);
+  //console.log(weekRange.value);
 }
 // Watch for dateRange changes
 watch(dateRange, (newDateRange) => {

@@ -132,25 +132,25 @@ const setGroupFooter = ref(true);
 const hideColumnsId = ref(["dtmDate", "strStore"]);
 const lngStoreGroup = (e) => {
   lngstoregroup.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 const lngStoreCode = (e) => {
   initGrid();
   lngstorecode.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngAreaCode = (e) => {
   initGrid();
   lngareacode.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const receiptNo = ref();
 const initCheckBox = ref(false);
 const setGroupColumnId = ref("strCorner");
 const store = useStore();
 const loginedstrLang = store.state.userData.lngLanguage;
-console.log(store);
+//console.log(store);
 
 const afterSearch = ref(false);
 const searchButton = async () => {
@@ -180,7 +180,7 @@ const searchButton = async () => {
       reporttype = 3;
     }
     reload.value = !reload.value;
-    console.log(setGroupColumnId.value);
+    //console.log(setGroupColumnId.value);
     const res = await getSalesByCornerPayType(
       lngstoregroup.value,
       lngstorecode.value,
@@ -189,14 +189,14 @@ const searchButton = async () => {
       selectedendDate.value,
       reporttype
     );
-    console.log(res);
+    //console.log(res);
 
     rowData.value = res.data.List;
 
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    console.log(error);
+    //console.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -244,7 +244,7 @@ const excelButton = () => {
   exporttoExcel.value = !exporttoExcel.value;
 };
 const initGrid = () => {
-  console.log(rowData.value);
+  //console.log(rowData.value);
   if (rowData.value.length > 0) {
     rowData.value = [];
   }

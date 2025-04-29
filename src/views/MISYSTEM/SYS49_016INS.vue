@@ -88,7 +88,7 @@ onMounted(async () => {
 
   userSequence.value = store.state.userData.lngSequence;
   userlngGroup.value = store.state.userData.lngStoreGroup;
-  console.log(userSequence.value);
+  //console.log(userSequence.value);
 });
 const saveButton = (e) => {
   if (newPassWord.value != newPassWordVali.value) {
@@ -123,14 +123,14 @@ const saveButton = (e) => {
           userSequence.value,
           currentPassWord.value
         );
-        console.log(res);
+        //console.log(res);
         if (res.data.List[0].value == "1") {
           const res2 = await savePassWord(
             userlngGroup.value,
             userSequence.value,
             newPassWord.value
           );
-          console.log(res2);
+          //console.log(res2);
           if (res2.data.RESULT_CD == "00") {
             Swal.fire({
               icon: "success",
