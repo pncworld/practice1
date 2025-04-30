@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col h-full bg-slate-100">
-    <div class="flex items-center justify-center h-full bg-slate-100 pt-20">
+    <div class="flex items-center justify-center h-full bg-slate-100">
       <loading></loading>
       <!-- <div><img class="mr-20 size-4/5" src="../assets/login_visual.png" alt=""></div> -->
       <div class="flex">
@@ -59,7 +59,7 @@
         <p class="mt-4 text-center text-gray-600">{{ message }}</p>
       </div>
     </div>
-    <div class="bg-green-700 h-24 rounded-lg">
+    <!-- <div class="bg-green-700 h-24 rounded-lg">
       <p class="text-white break-normal">
         개인정보취급방침 | 이메일무단수집거부 | 사이트맵 | CONTACT US
         <br />
@@ -70,7 +70,7 @@
         대표자명 : 권종택 | 개인정보관리 책임자 : 서성우 | customer@pncworld.com
         Copyright(c)1997 PnCworld ALL RIGHT RESERVED. admin
       </p>
-    </div>
+    </div> -->
   </div>
 </template>
 
