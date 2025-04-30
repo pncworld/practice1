@@ -63,22 +63,22 @@ app.config.errorHandler = (err, vm, info) => {
   }
 };
 
-//   // Vue 경고 핸들러 추가 (개발 중 경고를 잡기 위해)
-//   app.config.warnHandler = (msg, vm, trace) => {
-//     console.warn('Vue 경고:', msg, trace);
+// Vue 경고 핸들러 추가 (개발 중 경고를 잡기 위해)
+app.config.warnHandler = (msg, vm, trace) => {
+  console.warn("Vue 경고:", msg, trace);
 
-//     Swal.fire({
-//         title: '오류 발생',
-//         text: '예기치 않은 오류가 발생했습니다. 이전 상태로 복원합니다.',
-//         icon: 'error',
-//         confirmButtonText: '확인'
-//       });
+  Swal.fire({
+    title: "오류 발생",
+    text: "예기치 않은 오류가 발생했습니다. 이전 상태로 복원합니다.",
+    icon: "error",
+    confirmButtonText: "확인",
+  });
 
-//       // 롤백 처리
-//       if (vm?.rollback) {
-//         vm.rollback();
-//       }
-//   };
+  // 롤백 처리
+  if (vm?.rollback) {
+    vm.rollback();
+  }
+};
 
 //   // 비동기 오류 캐치
 //   window.onerror = function (message, source, lineno, colno, error) {
