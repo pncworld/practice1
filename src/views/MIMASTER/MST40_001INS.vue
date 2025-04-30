@@ -146,7 +146,7 @@ const afterSearch = ref(false);
 const changedRows = ref([]);
 const allStateRows = (e) => {
   changedRows.value = e;
-  console.log(changedRows.value);
+  //comsole.log(changedRows.value);
 };
 const clickStoreCd = ref(0);
 const clickStoreNm = ref();
@@ -172,7 +172,7 @@ const gridvalue5 = ref();
 
 const selectedIndex = (newValue) => {
   changeRow.value = newValue;
-  console.log(changeRow.value);
+  //comsole.log(changeRow.value);
 };
 const addButton = () => {
   if (afterSearch.value == false) {
@@ -201,7 +201,7 @@ const clickedRowData = (newValue) => {
   gridvalue2.value = newValue[1];
   gridvalue3.value = newValue[2];
   gridvalue4.value = newValue[3] == 1 ? true : false;
-  console.log(newValue);
+  //comsole.log(newValue);
   if (newValue[5] == true) {
     addNew.value = false;
   } else {
@@ -221,7 +221,7 @@ const handleGroupCd = (newValue) => {
 const updateRow = ref([]);
 const updatedRowData = (newValue) => {
   updateRow.value = newValue;
-  console.log(newValue);
+  //comsole.log(newValue);
 };
 
 const changeInfo = (e) => {
@@ -283,12 +283,12 @@ const searchButton = async () => {
     gridvalue4.value = "";
     gridvalue5.value = "";
     let res;
-    console.log(groupCd.value);
+    //comsole.log(groupCd.value);
     res = await getacc(groupCd.value);
 
     rowData.value = res.data.ACCOUNT;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
-    console.log(res);
+    //comsole.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -301,7 +301,7 @@ const storeNm = (newValue) => {
 };
 
 const saveButton = async () => {
-  console.log(updateRow.value);
+  //comsole.log(updateRow.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -409,7 +409,7 @@ const saveButton = async () => {
           iblnGear.join(","),
           dlngAccCode.join(",")
         );
-        console.log(res);
+        //comsole.log(res);
         Swal.fire({
           title: "저장 되었습니다.",
           confirmButtonText: "확인",

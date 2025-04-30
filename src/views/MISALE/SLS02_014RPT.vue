@@ -179,7 +179,7 @@ const afterSearch = ref(false);
 const selectedstartDate = ref();
 const selectedendDate = ref();
 const startDate = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedstartDate.value = e;
 };
 const endDate = (e) => {
@@ -187,7 +187,7 @@ const endDate = (e) => {
 };
 /* 합계 체크박스 */
 const seeSum = (e) => {
-  console.log(e.target.checked);
+  //comsole.log(e.target.checked);
   if (e.target.checked) {
     setGroupFooter.value = true;
   } else {
@@ -247,22 +247,22 @@ const searchButton = async () => {
   store.state.loading = true;
   try {
     initGrid();
-    //   console.log(tempCheckData.value)
+    //   //comsole.log(tempCheckData.value)
     progid.value = tempCheckData.value;
     //그리드 갱신
     reload.value = !reload.value;
 
     //매장 선택
     let selectedStorearr;
-    // console.log(selectedStores.value)
+    // //comsole.log(selectedStores.value)
     // if (selectedStores.value == undefined || selectedStores.value.length == 0) {
-    //   console.log('여기오냐?')
+    //   //comsole.log('여기오냐?')
     //   selectedStorearr = ref(store.state.storeCd).value.map(item => item.lngStoreCode).join(',');
     // } else {
     selectedStorearr = selectedStores.value;
     //}
 
-    console.log(selectedStorearr);
+    //comsole.log(selectedStorearr);
 
     // 체크박스별 조회
     if (progid.value == 1) {
@@ -275,7 +275,7 @@ const searchButton = async () => {
         1,
         loginedstrLang
       );
-      console.log(res);
+      //comsole.log(res);
       rowData.value = res.data.areaIndustrySales;
     } else if (progid.value == 2) {
       // 매장별 조회
@@ -287,7 +287,7 @@ const searchButton = async () => {
         2,
         loginedstrLang
       );
-      console.log(res);
+      //comsole.log(res);
       rowData.value = res.data.areaIndustrySales;
     } else if (progid.value == 12) {
       // 일자별 매장별 조회
@@ -299,7 +299,7 @@ const searchButton = async () => {
         12,
         loginedstrLang
       );
-      console.log(res);
+      //comsole.log(res);
       rowData.value = res.data.areaIndustrySales;
     } else {
       // 조회
@@ -311,14 +311,14 @@ const searchButton = async () => {
         0,
         loginedstrLang
       );
-      console.log(res);
+      //comsole.log(res);
       rowData.value = res.data.areaIndustrySales;
     }
 
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    console.log(error);
+    //comsole.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -329,18 +329,18 @@ const selectedStores = ref();
 const selectedStoreAttrs = ref();
 const lngStoreGroup = (e) => {
   initGrid();
-  console.log(e);
+  //comsole.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngStoreAttrs = (e) => {
   initGrid();
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 
 /*
@@ -357,7 +357,7 @@ const exportExcel = ref(false);
 const excelButton = () => {
   documentSubTitle.value =
     selectedExcelDate.value + "\n" + selectedExcelStore.value;
-  console.log(documentSubTitle.value);
+  //comsole.log(documentSubTitle.value);
   // 엑셀 기능 실행
   exportExcel.value = !exportExcel.value;
 };
@@ -367,12 +367,12 @@ const documentSubTitle = ref("");
 const selectedExcelDate = ref("");
 const excelDate = (e) => {
   selectedExcelDate.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const selectedExcelStore = ref("");
 const excelStore = (e) => {
   selectedExcelStore.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 </script>
 

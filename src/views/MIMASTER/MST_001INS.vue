@@ -392,7 +392,7 @@ const shapeclick = (value) => {
   } else if (clickedShape.value == 3) {
     resizeHandle.classList.add("triangle");
   }
-  console.log(clickedtableCode.value);
+  //comsole.log(clickedtableCode.value);
   const findit = tableList.value.find(
     (item) => item.lngKeyscrNo == clickedtableCode.value
   );
@@ -417,7 +417,7 @@ const existedScreenKeys = ref([
 ]);
 const clickedColor = ref(1);
 const setColor = (value) => {
-  console.log(value);
+  //comsole.log(value);
   if (value == 1) {
     clickedtableColor.value = "#FFFFFF";
   } else if (value == 2) {
@@ -447,7 +447,7 @@ const setColor = (value) => {
   } else if (value == 14) {
     clickedtableColor.value = "#AB8CFF";
   }
-  console.log(clickedtableColor.value);
+  //comsole.log(clickedtableColor.value);
   const widgetElement = document.querySelector(
     `[gs-id="${clickedtableCode.value}"]`
   );
@@ -493,17 +493,17 @@ const handlestoreNm = (newValue) => {
 };
 
 const handlePosNo = async (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
   selectedScreenNo.value = 0;
   if (newValue != 0 && newValue != undefined) {
     posNo.value = newValue;
-    console.log(groupCd.value);
-    console.log(nowStoreCd.value);
-    console.log(nowStoreAreaCd.value);
-    console.log(posNo.value);
+    //comsole.log(groupCd.value);
+    //comsole.log(nowStoreCd.value);
+    //comsole.log(nowStoreAreaCd.value);
+    //comsole.log(posNo.value);
 
     // const res = await getScreenList3(groupCd.value, nowStoreCd.value, nowStoreAreaCd.value , posNo.value)
-    // console.log(res)
+    // //comsole.log(res)
     // getScreenNos.value = res.data.SCREENKEYS
   }
 };
@@ -515,7 +515,7 @@ watch(selectedScreenNo, () => {
 
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
-  console.log(nowStoreAreaCd.value);
+  //comsole.log(nowStoreAreaCd.value);
 };
 let grid = null; // DO NOT use ref(null) as proxies GS will break all logic when comparing structures... see https://github.com/gridstack/gridstack.js/issues/2115
 
@@ -570,8 +570,8 @@ const searchButton = async () => {
     afterSearch.value = true;
     maxtableseq.value = res2.data.MAXTABLESEQ[0].NEXT;
 
-    console.log(tableList.value);
-    console.log(maxtableseq.value);
+    //comsole.log(tableList.value);
+    //comsole.log(maxtableseq.value);
   } catch (error) {
     afterSearch.value = false;
   } finally {
@@ -629,7 +629,7 @@ const decimalToRGB = (decimal) => {
 };
 
 watch(tableList, () => {
-  console.log(tableList.value);
+  //comsole.log(tableList.value);
 });
 
 const clickedtableCode = ref("");
@@ -695,7 +695,7 @@ let items = ref([]);
 //     }
 //   })
 
-//    console.log(tableList.value)
+//    //comsole.log(tableList.value)
 //               const widgetElement = document.querySelector(`[gs-id="${node.id}"]`);
 //                  if (widgetElement) {
 //                  widgetElement.click(); // 클릭 이벤트 발생
@@ -744,7 +744,7 @@ let items = ref([]);
 //       })
 //     }
 //   })
-//   console.log(tableList.value)
+//   //comsole.log(tableList.value)
 // });
 
 //           });
@@ -773,7 +773,7 @@ function handleDragStop(grid, element) {
   updateNodePosition(grid, node);
   syncFilteredTableList();
   updateTableListFromFiltered();
-  console.log(tableList.value);
+  //comsole.log(tableList.value);
 
   const widgetElement = document.querySelector(`[gs-id="${node.id}"]`);
   if (widgetElement) {
@@ -788,7 +788,7 @@ function handleResizeStop(grid, element) {
   updateNodeSize(node);
   syncFilteredTableList();
   updateTableListFromFiltered();
-  console.log(tableList.value);
+  //comsole.log(tableList.value);
 }
 
 function updateNodePosition(grid, node) {
@@ -887,13 +887,13 @@ function addNewWidget() {
 
   // autoPosition을 true로 설정하여 겹치지 않게 자동으로 위치 배치
   const result = grid.addWidget(node); // true로 설정하면 GridStack이 자동으로 위치를 계산
-  console.log(result);
+  //comsole.log(result);
   grid.commit();
 
   const validate = result.gridstackNode;
   const validate2 =
     validate.x + validate.w > 90 || validate.y + validate.h > 56;
-  console.log(validate);
+  //comsole.log(validate);
   const gridItems = grid.getGridItems();
   const tablelength = tableList.value.filter(
     (item) => item.intKeyNo == 13
@@ -970,8 +970,8 @@ function addNewWidget() {
     });
     widgetElement.style.border = "2px solid black";
 
-    console.log("아이템 클릭됨!");
-    console.log(`아이템 ID: ${finditem.id}`);
+    //comsole.log("아이템 클릭됨!");
+    //comsole.log(`아이템 ID: ${finditem.id}`);
     clickedtableColor.value = decimalToRGB(finditem.lngKeyColor);
     clickedtableShape.value = finditem.lngShape;
     clickedShape.value = Number(finditem.lngShape);
@@ -983,13 +983,13 @@ function addNewWidget() {
     clickedtableH.value = finditem.h * 120;
     clickTable.value = true;
     clickedtableSeats.value = finditem.lngCount;
-    console.log(`x: ${finditem.x}, y: ${finditem.y}`);
-    console.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
-    console.log(clickedtableColor.value);
+    //comsole.log(`x: ${finditem.x}, y: ${finditem.y}`);
+    //comsole.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
+    //comsole.log(clickedtableColor.value);
     // 원하는 추가 작업을 여기에 작성
   });
   widgetElement.click();
-  console.log(tableList.value);
+  //comsole.log(tableList.value);
 }
 
 function addScreenKey() {
@@ -999,8 +999,8 @@ function addScreenKey() {
       .filter((item) => item.intKeySeq !== undefined)
       .map((item) => item.intKeySeq)
   );
-  console.log(currcount);
-  console.log(minValue);
+  //comsole.log(currcount);
+  //comsole.log(minValue);
   if (maxtableseq.value != -1 && maxtableseq.value <= minValue + currcount) {
     Swal.fire({
       title: "테이블추가오류",
@@ -1027,13 +1027,13 @@ function addScreenKey() {
 
   // autoPosition을 true로 설정하여 겹치지 않게 자동으로 위치 배치
   const result = grid.addWidget(node); // true로 설정하면 GridStack이 자동으로 위치를 계산
-  console.log(result);
+  //comsole.log(result);
   grid.commit();
 
   const validate = result.gridstackNode;
   const validate2 =
     validate.x + validate.w > 90 || validate.y + validate.h > 56;
-  console.log(validate);
+  //comsole.log(validate);
   const gridItems = grid.getGridItems();
   const addedWidget = gridItems.find(
     (item) => item.gridstackNode.id === node.id
@@ -1107,8 +1107,8 @@ function addScreenKey() {
     });
     widgetElement.style.border = "2px solid black";
 
-    console.log("아이템 클릭됨!");
-    console.log(`아이템 ID: ${finditem.id}`);
+    //comsole.log("아이템 클릭됨!");
+    //comsole.log(`아이템 ID: ${finditem.id}`);
     clickedtableColor.value = decimalToRGB(finditem.lngKeyColor);
     clickedtableShape.value = finditem.lngShape;
     clickedShape.value = Number(finditem.lngShape);
@@ -1121,13 +1121,13 @@ function addScreenKey() {
     clickedtableH.value = finditem.h * 120;
     clickTable.value = true;
     clickedtableSeats.value = finditem.lngCount;
-    console.log(`x: ${finditem.x}, y: ${finditem.y}`);
-    console.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
-    console.log(clickedtableColor.value);
+    //comsole.log(`x: ${finditem.x}, y: ${finditem.y}`);
+    //comsole.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
+    //comsole.log(clickedtableColor.value);
     // 원하는 추가 작업을 여기에 작성
   });
   widgetElement.click();
-  console.log(tableList.value);
+  //comsole.log(tableList.value);
 }
 
 function addScreenKey2() {
@@ -1160,13 +1160,13 @@ function addScreenKey2() {
 
   // autoPosition을 true로 설정하여 겹치지 않게 자동으로 위치 배치
   const result = grid.addWidget(node); // true로 설정하면 GridStack이 자동으로 위치를 계산
-  console.log(result);
+  //comsole.log(result);
   grid.commit();
 
   const validate = result.gridstackNode;
   const validate2 =
     validate.x + validate.w > 90 || validate.y + validate.h > 56;
-  console.log(validate);
+  //comsole.log(validate);
   const gridItems = grid.getGridItems();
   const addedWidget = gridItems.find(
     (item) => item.gridstackNode.id === node.id
@@ -1240,8 +1240,8 @@ function addScreenKey2() {
     });
     widgetElement.style.border = "2px solid black";
 
-    console.log("아이템 클릭됨!");
-    console.log(finditem);
+    //comsole.log("아이템 클릭됨!");
+    //comsole.log(finditem);
     clickedtableColor.value = decimalToRGB(finditem.lngKeyColor);
     clickedtableShape.value = finditem.lngShape;
     clickedShape.value = Number(finditem.lngShape);
@@ -1254,14 +1254,14 @@ function addScreenKey2() {
     clickedtableH.value = finditem.h * 120;
     clickTable.value = true;
     clickedtableSeats.value = finditem.lngCount;
-    console.log(`x: ${finditem.x}, y: ${finditem.y}`);
-    console.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
-    console.log(clickedtableColor.value);
-    console.log(clickedtableNo.value);
+    //comsole.log(`x: ${finditem.x}, y: ${finditem.y}`);
+    //comsole.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
+    //comsole.log(clickedtableColor.value);
+    //comsole.log(clickedtableNo.value);
     // 원하는 추가 작업을 여기에 작성
   });
   widgetElement.click();
-  console.log(tableList.value);
+  //comsole.log(tableList.value);
 }
 
 watch(
@@ -1296,7 +1296,7 @@ watch(
             resizeHandle.classList.add("triangle");
           }
         }
-        console.log(widgetElement);
+        //comsole.log(widgetElement);
         const textElement = widgetElement.querySelector(
           ".grid-stack-item-content"
         );
@@ -1322,8 +1322,8 @@ watch(
             });
             widgetElement.style.border = "2px solid black";
 
-            console.log("아이템 클릭됨!");
-            console.log(`아이템 ID: ${finditem.id}`);
+            //comsole.log("아이템 클릭됨!");
+            //comsole.log(`아이템 ID: ${finditem.id}`);
             clickedtableColor.value = decimalToRGB(finditem.lngKeyColor);
             clickedtableShape.value = finditem.lngShape;
             clickedShape.value = Number(finditem.lngShape);
@@ -1336,11 +1336,11 @@ watch(
             clickedtableH.value = finditem.h * 120;
             clickTable.value = true;
             clickedtableSeats.value = finditem.lngCount;
-            console.log(`x: ${finditem.x}, y: ${finditem.y}`);
-            console.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
-            console.log(clickedtableColor.value);
-            console.log(clickedShape.value);
-            console.log(clickedtableNo.value);
+            //comsole.log(`x: ${finditem.x}, y: ${finditem.y}`);
+            //comsole.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
+            //comsole.log(clickedtableColor.value);
+            //comsole.log(clickedShape.value);
+            //comsole.log(clickedtableNo.value);
             // 원하는 추가 작업을 여기에 작성
           });
         }
@@ -1351,8 +1351,8 @@ watch(
 );
 
 const showOtherScreen = (newValue) => {
-  console.log(filteredtableList.value);
-  console.log(tableList.value);
+  //comsole.log(filteredtableList.value);
+  //comsole.log(tableList.value);
   clickTable.value = false;
   filteredtableList.value.forEach((item) => {
     const tableItem = tableList.value.find(
@@ -1376,9 +1376,9 @@ const showOtherScreen = (newValue) => {
       });
     }
   });
-  console.log(tableList.value);
+  //comsole.log(tableList.value);
   if (grid != null) {
-    console.log(grid.nodes);
+    //comsole.log(grid.nodes);
     if (grid == undefined) {
       return;
     }
@@ -1418,7 +1418,7 @@ const deleteTable = () => {
       filteredtableList.value.splice(index, 1);
     }
   }
-  console.log(filteredtableList.value);
+  //comsole.log(filteredtableList.value);
   const finditem2 = tableList.value.find(
     (item) => item.lngKeyscrNo == clickedtableCode.value
   );
@@ -1428,7 +1428,7 @@ const deleteTable = () => {
       tableList.value.splice(index, 1);
     }
   }
-  console.log(tableList.value);
+  //comsole.log(tableList.value);
 
   const widgetElement = document.querySelector(
     `[gs-id="${clickedtableCode.value}"]`
@@ -1445,8 +1445,8 @@ const duplicateTable = () => {
       .filter((item) => item.intKeySeq !== undefined)
       .map((item) => item.intKeySeq)
   );
-  console.log(currcount);
-  console.log(minValue);
+  //comsole.log(currcount);
+  //comsole.log(minValue);
   if (maxtableseq.value != -1 && maxtableseq.value <= minValue + currcount) {
     Swal.fire({
       title: "테이블추가오류",
@@ -1468,7 +1468,7 @@ const duplicateTable = () => {
       strName: "신규" + sequence.value,
     };
     // id는 count 값을 사용
-    console.log(node);
+    //comsole.log(node);
     node.id = String("new" + sequence.value);
 
     // autoPosition을 true로 설정하여 겹치지 않게 자동으로 위치 배치
@@ -1477,7 +1477,7 @@ const duplicateTable = () => {
     const validate = result.gridstackNode;
     const validate2 =
       validate.x + validate.w > 90 || validate.y + validate.h > 56;
-    console.log(validate);
+    //comsole.log(validate);
     const gridItems = grid.getGridItems();
     const addedWidget = gridItems.find(
       (item) => item.gridstackNode.id === node.id
@@ -1559,8 +1559,8 @@ const duplicateTable = () => {
       });
       widgetElement.style.border = "2px solid black";
 
-      console.log("아이템 클릭됨!");
-      console.log(`아이템 ID: ${finditem.id}`);
+      //comsole.log("아이템 클릭됨!");
+      //comsole.log(`아이템 ID: ${finditem.id}`);
       clickedtableColor.value = decimalToRGB(finditem.lngKeyColor);
       clickedtableShape.value = finditem.lngShape;
       clickedShape.value = Number(finditem.lngShape);
@@ -1572,13 +1572,13 @@ const duplicateTable = () => {
       clickedtableW.value = finditem.w * 120;
       clickedtableH.value = finditem.h * 120;
       clickedtableSeats.value = finditem.lngCount;
-      console.log(`x: ${finditem.x}, y: ${finditem.y}`);
-      console.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
-      console.log(clickedtableColor.value);
+      //comsole.log(`x: ${finditem.x}, y: ${finditem.y}`);
+      //comsole.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
+      //comsole.log(clickedtableColor.value);
       // 원하는 추가 작업을 여기에 작성
     });
     widgetElement.click();
-    console.log(filteredtableList.value);
+    //comsole.log(filteredtableList.value);
   } else {
     Swal.fire({
       title: "오류",
@@ -1610,7 +1610,7 @@ const confirmScreenKey = () => {
     ...ScreenKeyOrigin.value.map((item) => item.intScreenNo)
   );
 
-  console.log(nextKeyno);
+  //comsole.log(nextKeyno);
   ScreenKeyOrigin.value.push({
     strScreenName: currScreenNm.value,
     intScreenNo: nextKeyno + 1,
@@ -1692,7 +1692,7 @@ const saveButton = async () => {
   //   return ;
   // }
 
-  console.log(tableList.value);
+  //comsole.log(tableList.value);
 
   Swal.fire({
     title: "저장",
@@ -1709,8 +1709,8 @@ const saveButton = async () => {
         let res2;
         let res3;
 
-        console.log(res);
-        console.log(tableList.value);
+        //comsole.log(res);
+        //comsole.log(tableList.value);
         const intScreenNos = tableList.value.map((item) => item.intScreenNo);
         const ids = tableList.value.map((item) =>
           typeof item.lngKeyscrNo == "string" ? 0 : item.lngKeyscrNo
@@ -1748,17 +1748,17 @@ const saveButton = async () => {
           .filter((item) => item.lngKeyscrNo.toString().includes("new"))
           .map((item) => item.lngCount);
         const intKeyNo = tableList.value.map((item) => item.intKeyNo);
-        console.log(intScreenNos);
-        console.log(ids);
-        console.log(lngKeyColors);
-        console.log(lngShapes);
-        console.log(strNames);
-        console.log(lngCounts);
-        console.log(xs);
-        console.log(ys);
-        console.log(ws);
-        console.log(hs);
-        console.log(intKeyNo);
+        //comsole.log(intScreenNos);
+        //comsole.log(ids);
+        //comsole.log(lngKeyColors);
+        //comsole.log(lngShapes);
+        //comsole.log(strNames);
+        //comsole.log(lngCounts);
+        //comsole.log(xs);
+        //comsole.log(ys);
+        //comsole.log(ws);
+        //comsole.log(hs);
+        //comsole.log(intKeyNo);
 
         res2 = await saveTables2(
           groupCd.value,
@@ -1780,9 +1780,9 @@ const saveButton = async () => {
           intKeyNo.join(",")
         );
 
-        console.log(res2);
+        //comsole.log(res2);
       } catch (error) {
-        console.log(error);
+        //comsole.log(error);
       } finally {
         store.state.loading = false;
         Swal.fire({
@@ -1815,14 +1815,14 @@ const changetableProperty = (e) => {
     tableItem.strName = clickedtableNm.value;
   }
 
-  console.log(filteredtableList.value);
-  console.log(tableList.value);
+  //comsole.log(filteredtableList.value);
+  //comsole.log(tableList.value);
 
   grid.getGridItems().forEach((item) => {
     if (item.gridstackNode.id == clickedtableCode.value) {
-      console.log(item.gridstackNode.id);
+      //comsole.log(item.gridstackNode.id);
       const gridItem = item.gridstackNode.el;
-      console.log(gridItem);
+      //comsole.log(gridItem);
       const label = gridItem.querySelector(
         ".grid-stack-item-content"
       ).nextElementSibling;
@@ -1846,7 +1846,7 @@ const initAllTable = () => {
       tableList.value = tableList.value.filter(
         (item) => item.intScreenNo !== selectedScreenNo.value
       );
-      console.log(tableList.value);
+      //comsole.log(tableList.value);
     }
   });
 };
@@ -1920,7 +1920,7 @@ onActivated(() => {
           });
         }
       });
-      console.log(tableList.value);
+      //comsole.log(tableList.value);
       const widgetElement = document.querySelector(`[gs-id="${node.id}"]`);
       if (widgetElement) {
         widgetElement.click(); // 클릭 이벤트 발생
@@ -1972,7 +1972,7 @@ onActivated(() => {
               tableItem[key] = item[key];
             }
 
-            console.log(tableList.value);
+            //comsole.log(tableList.value);
           });
         }
         showOtherScreen(clickScreenButton.value);
@@ -1982,7 +1982,7 @@ onActivated(() => {
 });
 
 onDeactivated(() => {
-  console.log(grid);
+  //comsole.log(grid);
   if (grid) {
     savedGrid = grid.save();
     grid.destroy(false);

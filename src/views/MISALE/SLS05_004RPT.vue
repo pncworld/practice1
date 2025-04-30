@@ -183,7 +183,7 @@ const selectedendDate = ref();
 const orgAcceptDate = ref();
 
 const startDate = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedstartDate.value = e;
   if (selectedRadioBox.value == "02") {
     if (selectedstartDate.value > orgAcceptDate.value) {
@@ -198,7 +198,7 @@ const startDate = (e) => {
 };
 
 const endDate = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedendDate.value = e;
   if (selectedRadioBox.value == "02") {
     if (selectedendDate.value > orgAcceptDate.value) {
@@ -213,7 +213,7 @@ const endDate = (e) => {
 };
 
 const acceptDate = (e) => {
-  console.log(e);
+  //comsole.log(e);
   orgAcceptDate.value = e;
 };
 
@@ -287,7 +287,7 @@ const searchButton = async () => {
     //   selectedStorearr = selectedStores.value
     // }
 
-    // console.log(selectedStorearr)
+    // //comsole.log(selectedStorearr)
 
     //매입사코드 선택 콤보박스
     let selectedBuyCodeValue;
@@ -301,11 +301,11 @@ const searchButton = async () => {
       selectedBuyCodeValue = selectedBuyCode.value;
     }
 
-    console.log(selectedBuyCodeValue);
+    //comsole.log(selectedBuyCodeValue);
 
-    console.log(selectedRadioBox.value);
+    //comsole.log(selectedRadioBox.value);
 
-    console.log(reportCheckData.value);
+    //comsole.log(reportCheckData.value);
 
     const res = await getCardSalesSumReport(
       selectedGroup.value,
@@ -319,13 +319,13 @@ const searchButton = async () => {
       selectedRadioBox.value,
       selectedBuyCodeValue
     );
-    console.log(res);
+    //comsole.log(res);
     rowData.value = res.data.cardSalesSum;
 
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    console.log(error);
+    //comsole.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -339,29 +339,29 @@ const selectedStoreTeam = ref();
 const selectedStoreSuperVisor = ref();
 const lngStoreGroup = (e) => {
   initGrid();
-  console.log(e);
+  //comsole.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = (e) => {
   initGrid();
   selectCardCorp.value = null;
   selectedStores.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngStoreAttrs = (e) => {
   initGrid();
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngSupervisor = (e) => {
   initGrid();
   selectedStoreSuperVisor.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngStoreTeam = (e) => {
   initGrid();
   selectedStoreTeam.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 
 /* 매입사 콤보박스 */
@@ -374,19 +374,19 @@ onMounted(async () => {
 
   const res = await getCardCorp(selectedGroup.value, selectedStores.value, 1);
   cardCorp.value = res.data.cardCorpList;
-  console.log(cardCorp.value);
+  //comsole.log(cardCorp.value);
 });
 
 watch([selectedGroup, selectedStores], async () => {
-  console.log(selectedGroup.value, selectedStores.value);
+  //comsole.log(selectedGroup.value, selectedStores.value);
   const res = await getCardCorp(selectedGroup.value, selectedStores.value, 1);
   cardCorp.value = res.data.cardCorpList;
-  console.log(cardCorp.value);
+  //comsole.log(cardCorp.value);
 });
 
 watch(selectCardCorp, (newValue) => {
   selectedBuyCode.value = newValue ? newValue.strBuyCode : "";
-  console.log(selectedBuyCode.value);
+  //comsole.log(selectedBuyCode.value);
 });
 
 /*
@@ -407,7 +407,7 @@ const excelButton = () => {
     documentSubTitle.value =
       selectedExcelDate.value + "\n" + selectedExcelStore.value;
   }
-  console.log(documentSubTitle.value);
+  //comsole.log(documentSubTitle.value);
   // 엑셀 기능 실행
   exportExcel.value = !exportExcel.value;
 };
@@ -417,11 +417,11 @@ const documentSubTitle = ref("");
 const selectedExcelDate = ref("");
 const excelDate = (e) => {
   selectedExcelDate.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const selectedExcelStore = ref("");
 const excelStore = (e) => {
   selectedExcelStore.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 </script>

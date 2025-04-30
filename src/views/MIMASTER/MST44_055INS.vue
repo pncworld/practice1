@@ -329,9 +329,9 @@ const showNext = () => {
     return;
   }
   KeyList2.value = [];
-  console.log(clickedGroupPage.value);
+  //comsole.log(clickedGroupPage.value);
   clickedGroupPage.value++;
-  console.log(clickedGroupPage.value);
+  //comsole.log(clickedGroupPage.value);
   for (
     var i = 25 * (clickedGroupPage.value - 1);
     i < 25 * clickedGroupPage.value;
@@ -347,7 +347,7 @@ const showNext = () => {
       KeyList2.value.splice(i, 0, originGroupKeys.value[findindex]);
     }
   }
-  console.log(KeyList2.value);
+  //comsole.log(KeyList2.value);
 };
 const showPrev = () => {
   if (clickedGroupPage.value == 1) {
@@ -355,7 +355,7 @@ const showPrev = () => {
   }
   KeyList2.value = [];
   clickedGroupPage.value--;
-  console.log(clickedGroupPage.value);
+  //comsole.log(clickedGroupPage.value);
   for (var i = 0; i < 25; i++) {
     const findindex = originGroupKeys.value.findIndex(
       (item) =>
@@ -376,7 +376,7 @@ const updateMenuKey = ref(false);
 const nowStoreAreaCd = ref();
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
-  console.log(nowStoreAreaCd.value);
+  //comsole.log(nowStoreAreaCd.value);
 };
 
 const nowStoreCd = ref();
@@ -446,13 +446,13 @@ const searchAmount = async () => {
       nowStoreAreaCd.value,
       posNo.value
     );
-    console.log(res4);
+    //comsole.log(res4);
     AmountList.value = res4.data.AmountList;
     KeyList.value = res4.data.AmountKeyList;
     originGroupKeys.value = res4.data.GroupList;
-    console.log(AmountList.value);
-    console.log(KeyList.value);
-    console.log(originGroupKeys.value);
+    //comsole.log(AmountList.value);
+    //comsole.log(KeyList.value);
+    //comsole.log(originGroupKeys.value);
 
     AmountList.value = AmountList.value.map((item) => {
       return {
@@ -524,7 +524,7 @@ const showKeys = (value) => {
 };
 
 function changeRowData() {
-  console.log(AmountList.value);
+  //comsole.log(AmountList.value);
   rowData.value = AmountList.value;
 }
 const showScreenKeysOrder = () => {
@@ -536,7 +536,7 @@ const onMove = (evt) => {
   // 예: 드래그 중 이동할 때의 조건 등을 설정할 수 있음
   if (changeMode.value == false) {
     targetItemIndex2 = Array.from(evt.from.children).indexOf(evt.related);
-    console.log(targetItemIndex2);
+    //comsole.log(targetItemIndex2);
     return false;
   } else {
     return true;
@@ -549,7 +549,7 @@ const onMove2 = (evt) => {
   targetItemIndex3 = Array.from(evt.from.children).indexOf(evt.related);
 
   dupliScreenKeyOrigin = [...ScreenKeyOrigin.value];
-  console.log(dupliScreenKeyOrigin);
+  //comsole.log(dupliScreenKeyOrigin);
   return true;
 };
 
@@ -560,15 +560,15 @@ const onEnd = (evt) => {
     if (changeGrid.value == false) {
       // 드래그된 아이템의 기존 인덱스
       const swappedItems = [...KeyList.value]; // items를 복사
-      console.log(oldIndex);
-      console.log(targetItemIndex2);
+      //comsole.log(oldIndex);
+      //comsole.log(targetItemIndex2);
       const temp = swappedItems[oldIndex];
 
       swappedItems[oldIndex] = swappedItems[targetItemIndex2];
 
       swappedItems[targetItemIndex2] = temp;
 
-      console.log(swappedItems);
+      //comsole.log(swappedItems);
       // 배열을 업데이트
       //   items.value = swappedItems;
 
@@ -579,15 +579,15 @@ const onEnd = (evt) => {
     } else if (changeGrid.value == true) {
       const oldIndex = evt.oldIndex; // 드래그된 아이템의 기존 인덱스
       const swappedItems = [...KeyList2.value]; // items를 복사
-      console.log(oldIndex);
-      console.log(targetItemIndex2);
+      //comsole.log(oldIndex);
+      //comsole.log(targetItemIndex2);
       const temp = swappedItems[oldIndex];
       const originindex = originGroupKeys.value.find(
         (item) =>
           item.intKeySeq == oldIndex + (clickedGroupPage.value - 1) * 25 + 1 &&
           item.lngGroupCode == clickedGroupCd.value
       );
-      console.log(originindex);
+      //comsole.log(originindex);
       if (originindex !== undefined && originindex != -1) {
         originindex.intKeySeq =
           targetItemIndex2 + (clickedGroupPage.value - 1) * 25 + 1;
@@ -596,7 +596,7 @@ const onEnd = (evt) => {
 
       swappedItems[targetItemIndex2] = temp;
 
-      console.log(originGroupKeys.value);
+      //comsole.log(originGroupKeys.value);
       // 배열을 업데이트
       //   items.value = swappedItems;
 
@@ -632,21 +632,21 @@ const onEnd = (evt) => {
       }
     }
 
-    console.log(KeyList2.value);
+    //comsole.log(KeyList2.value);
     // const originindex = originGroupKeys.value.find(
     //   (item) =>
     //     item.intKeySeq ==
     //       evt.oldIndex + (clickedGroupPage.value - 1) * 25 + 1 &&
     //     item.lngGroupCode == clickedGroupCd.value
     // );
-    // console.log(originindex);
+    // //comsole.log(originindex);
     // if (originindex !== undefined && originindex != -1) {
     //   originindex.intKeySeq =
     //     targetItemIndex2 + (clickedGroupPage.value - 1) * 25 + 1;
     // }
   }
   clickedMenuKey.value = targetItemIndex2;
-  console.log(originGroupKeys.value);
+  //comsole.log(originGroupKeys.value);
 };
 
 const onEnd2 = (evt) => {
@@ -654,15 +654,15 @@ const onEnd2 = (evt) => {
   const targetScreenNo = dupliScreenKeyOrigin[targetItemIndex3].intScreenNo;
 
   addfor4ScreenKey();
-  console.log(items.value);
-  console.log(KeyList.value);
-  console.log(ScreenKeyOrigin.value);
+  //comsole.log(items.value);
+  //comsole.log(KeyList.value);
+  //comsole.log(ScreenKeyOrigin.value);
   clickedMenuKey.value = targetItemIndex2;
   showKeys(targetScreenNo);
 };
 
 const savePosMenu = async () => {
-  console.log(KeyList.value);
+  //comsole.log(KeyList.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -747,8 +747,8 @@ const savePosMenu = async () => {
           strKeyName2.join("\u200B")
         );
 
-        console.log(res2);
-        console.log(res3);
+        //comsole.log(res2);
+        //comsole.log(res3);
       } catch (error) {
       } finally {
         store.state.loading = false;
@@ -778,7 +778,7 @@ const clickedstrName = ref();
 const clickedCode = ref();
 const clickedPrice = ref();
 const selcetedrowData = (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
   if (newValue[0] == "결제코드") {
     clickedsort.value = 0;
   } else if (newValue[0] == "결제그룹코드") {
@@ -833,8 +833,8 @@ const currentpaymentCd = ref(3);
 
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
-  console.log(posNo.value);
-  console.log(nowStoreAreaCd.value);
+  //comsole.log(posNo.value);
+  //comsole.log(nowStoreAreaCd.value);
   if (
     nowStoreAreaCd.value !== undefined &&
     posNo.value !== undefined &&
@@ -856,7 +856,7 @@ watch(KeyList, (newvalue) => {
     if (KeyList.value.findIndex((item) => item.intKeySeq == i + 1) == -1) {
       KeyList.value.splice(i, 0, { intKeySeq: i + 1 });
     }
-    console.log(KeyList.value);
+    //comsole.log(KeyList.value);
   }
 });
 
@@ -888,8 +888,8 @@ const saveMenuKeyposition = (index, item) => {
     rowData.value = AmountList.value.filter(
       (item) => item.sort != "결제그룹코드"
     );
-    console.log(originGroupKeys.value);
-    console.log(KeyList2.value);
+    //comsole.log(originGroupKeys.value);
+    //comsole.log(KeyList2.value);
     for (
       var i = (clickedGroupPage.value - 1) * 25;
       i < clickedGroupPage.value * 25;
@@ -909,7 +909,7 @@ const saveMenuKeyposition = (index, item) => {
       }
     }
 
-    console.log(KeyList2.value);
+    //comsole.log(KeyList2.value);
     clickedRealIndex.value = (clickedGroupPage.value - 1) * 25 + index + 1;
   } else {
     clickedRealIndex.value = index + 1;
@@ -943,17 +943,17 @@ const addKey = () => {
       };
     }
 
-    console.log(KeyList.value);
+    //comsole.log(KeyList.value);
   } else if (changeGrid.value == true) {
-    console.log(clickedRealIndex.value);
-    console.log(clickedGroupPage.value);
-    console.log(KeyList2.value);
+    //comsole.log(clickedRealIndex.value);
+    //comsole.log(clickedGroupPage.value);
+    //comsole.log(KeyList2.value);
     const foraddIndex = KeyList2.value.findIndex(
       (item) =>
         item.intKeySeq ==
         (clickedGroupPage.value - 1) * 25 + clickedRealIndex.value
     );
-    console.log(foraddIndex);
+    //comsole.log(foraddIndex);
     if (foraddIndex == -1) {
       KeyList2.value.push({
         intKeySeq: (clickedGroupPage.value - 1) * 25 + clickedRealIndex.value,
@@ -982,8 +982,8 @@ const addKey = () => {
       });
     }
   }
-  console.log(originGroupKeys.value);
-  console.log(KeyList2.value);
+  //comsole.log(originGroupKeys.value);
+  //comsole.log(KeyList2.value);
 };
 
 const deletekey = () => {
@@ -996,7 +996,7 @@ const deletekey = () => {
       }
       return item;
     });
-    console.log(KeyList.value);
+    //comsole.log(KeyList.value);
   } else if (changeGrid.value == true) {
     KeyList2.value = KeyList2.value.map((item) => {
       if (
@@ -1016,8 +1016,8 @@ const deletekey = () => {
           (clickedGroupPage.value - 1) * 25 + clickedRealIndex.value &&
         item.lngGroupCode == clickedGroupCd.value
     );
-    console.log(KeyList2.value);
-    console.log(originGroupKeys.value);
+    //comsole.log(KeyList2.value);
+    //comsole.log(originGroupKeys.value);
   }
 };
 

@@ -147,7 +147,7 @@ const showFavorite = () => {
   clickFavorite.value = !clickFavorite.value;
   //currentFavorite.value;
 
-  console.log(store.state.minorCategory);
+  //comsole.log(store.state.minorCategory);
   favoriteProgList.value = store.state.minorCategory.filter((item) =>
     currentFavorite.value.includes(item.lngProgramID)
   );
@@ -172,7 +172,7 @@ watch(
 );
 
 const setProgramList = (e) => {
-  console.log(e.target.value);
+  //comsole.log(e.target.value);
 
   cMenu = store.state.mainCategory
     .filter((item) => item.lngCode == props.selectCategoryId)
@@ -199,7 +199,7 @@ const setProgramList = (e) => {
     showAll();
     return;
   } else {
-    console.log(categories.value);
+    //comsole.log(categories.value);
     categories.value.forEach((item) => {
       item.subcategories = item.subcategories.filter((subitem) =>
         subitem.strProgramName.includes(e.target.value)
@@ -300,9 +300,9 @@ onMounted(() => {
   });
 
   categories.value = category;
-  console.log(categories.value);
+  //comsole.log(categories.value);
   detectMobile();
-  console.log(isMobile);
+  //comsole.log(isMobile);
 
   router.push("/homepage");
 });
@@ -330,7 +330,7 @@ watch(
 );
 const currentTab = ref();
 const selectCategory = (strUrl, lngProgramID2, strTitle) => {
-  console.log(strUrl, lngProgramID2, strTitle);
+  //comsole.log(strUrl, lngProgramID2, strTitle);
   if (tabs.value.length >= 10) {
     Swal.fire({
       title: "탭 제한",
@@ -346,7 +346,7 @@ const selectCategory = (strUrl, lngProgramID2, strTitle) => {
   const existingTab = tabs.value.find((tab) =>
     tab.lngProgramID.startsWith(lngProgramID2)
   );
-  console.log(existingTab);
+  //comsole.log(existingTab);
   if (existingTab) {
     Swal.fire({
       title: "메뉴 중복 안내",
@@ -357,8 +357,8 @@ const selectCategory = (strUrl, lngProgramID2, strTitle) => {
       cancelButtonText: "새 화면 열기",
     }).then((result) => {
       if (result.isConfirmed) {
-        console.log(lngProgramID2);
-        console.log(tabs.value);
+        //comsole.log(lngProgramID2);
+        //comsole.log(tabs.value);
         const matchingTabs = tabs.value.filter((tab) =>
           tab.lngProgramID.startsWith(lngProgramID2)
         );
@@ -396,7 +396,7 @@ const selectCategory = (strUrl, lngProgramID2, strTitle) => {
   } else {
     const uuid = v4();
     const lngProgramIdv4 = lngProgramID2 + "_" + uuid;
-    console.log(lngProgramIdv4);
+    //comsole.log(lngProgramIdv4);
     const newTab = { strUrl, lngProgramID: lngProgramIdv4, strTitle };
     tabs.value.push(newTab);
     emit("emittab", tabs.value);
@@ -411,7 +411,7 @@ const selectCategory = (strUrl, lngProgramID2, strTitle) => {
     .flatMap((item) => item.subcategories)
     .filter((sub) => sub.lngProgramID == lngProgramID2); // 조건 넣어서 필터
 
-  console.log(matchingtab);
+  //comsole.log(matchingtab);
   //store.dispatch("saveActiveTab", matchingtab[0]);
 };
 var cMenu = ref("매출관리");
@@ -442,7 +442,7 @@ watch(
     });
 
     categories.value = category;
-    console.log(categories.value);
+    //comsole.log(categories.value);
   }
 );
 </script>

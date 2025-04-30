@@ -142,12 +142,12 @@ const resetVselect2 = () => {
   selectedEndTime.value = { value: 23, strName: "23:00" };
 };
 const startDate = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedstartDate.value = e;
 };
 
 const endDate = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedendDate.value = e;
 };
 
@@ -202,7 +202,7 @@ const searchButton = async () => {
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    console.log(error);
+    //comsole.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -214,18 +214,18 @@ const selectedStores = ref();
 const selectedStoreAttrs = ref();
 const lngStoreGroup = (e) => {
   //initGrid();
-  console.log(e);
+  //comsole.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCode = (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngStoreAttrs = (e) => {
   //initGrid();
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 
 /*
@@ -257,7 +257,7 @@ const excelButton = () => {
     selectedExcelStore.value +
     "\n" +
     condition;
-  console.log(documentSubTitle.value); // 맑음 소스 pickStorePlural.vue 소스의 excelStore 받아야 함.
+  //comsole.log(documentSubTitle.value); // 맑음 소스 pickStorePlural.vue 소스의 excelStore 받아야 함.
   // 엑셀 기능 실행
   exportExcel.value = !exportExcel.value;
 };
@@ -267,12 +267,12 @@ const documentSubTitle = ref("");
 const selectedExcelDate = ref("");
 const excelDate = (e) => {
   selectedExcelDate.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const selectedExcelStore = ref("");
 const excelStore = (e) => {
   selectedExcelStore.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 
 const showSum = (e) => {

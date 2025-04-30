@@ -189,8 +189,8 @@ onMounted(async () => {
     STORE_CD: 0,
     GROUP_CD: store.state.userData.GROUP_CD,
   };
-  console.log(selectedStoreCd.value);
-  console.log(StoreList.value);
+  //comsole.log(selectedStoreCd.value);
+  //comsole.log(StoreList.value);
   const filteredNm = StoreList.value.filter(
     (item) => item.STORE_CD == selectedStoreCd.value.STORE_CD
   )[0]?.STORE_NM;
@@ -201,7 +201,7 @@ const StoreList = ref([]);
 watch(
   () => props.changeState,
   () => {
-    console.log(props.changeState);
+    //comsole.log(props.changeState);
     if (props.changeState == false) {
       show.value = props.changeState;
       emit("currState", true);
@@ -212,13 +212,13 @@ watch(
 const selectedStoreCd = ref(0);
 const selectedStoreCd2 = ref(0);
 const sendSearch = () => {
-  console.log(selectedStoreCd.value.GROUP_CD);
+  //comsole.log(selectedStoreCd.value.GROUP_CD);
   emit("startDate", startDate.value);
   emit("endDate", endDate.value);
   emit("GROUP_CD", selectedStoreCd2.value.GROUP_CD);
   emit("STORE_CD", selectedStoreCd2.value.STORE_CD);
 
-  console.log(selectedStoreCd2.value);
+  //comsole.log(selectedStoreCd2.value);
   selectedStoreCd.value = selectedStoreCd2.value;
   emit("SEARCHNOW", true);
 

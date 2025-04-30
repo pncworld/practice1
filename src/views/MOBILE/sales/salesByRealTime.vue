@@ -110,7 +110,7 @@ const SEARCHNOW = async (e) => {
       selectStartDate.value,
       selectEndDate.value
     );
-    console.log(res);
+    //comsole.log(res);
     rowData.value = res.data.List.map((item) => ({
       ...item,
       TOT_AMT: item.TOT_AMT.toLocaleString(),
@@ -125,7 +125,7 @@ const SEARCHNOW = async (e) => {
     store.state.loading2 = false;
   }
 
-  console.log(rowData.value);
+  //comsole.log(rowData.value);
 };
 onMounted(() => {});
 </script>

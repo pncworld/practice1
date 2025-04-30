@@ -66,7 +66,7 @@ import PageName from '@/components/pageName.vue';
   const selectedstartDate = ref()
   const selectedendDate = ref()
   const startDate = (e) => {
-    console.log(e)
+    //comsole.log(e)
     selectedstartDate.value = e
   }
   const endDate = (e) => {
@@ -107,7 +107,7 @@ import PageName from '@/components/pageName.vue';
       //   selectedStorearr = selectedStores.value
       // }
 
-      // console.log(selectedStorearr)
+      // //comsole.log(selectedStorearr)
       
       //매입사코드 선택 콤보박스
       let selectedBuyCodeValue;
@@ -117,20 +117,20 @@ import PageName from '@/components/pageName.vue';
         selectedBuyCodeValue = selectedBuyCode.value
       }
 
-      console.log(selectedBuyCodeValue)
+      //comsole.log(selectedBuyCodeValue)
 
       const res = await getCardSalesDetailReport(
           selectedGroup.value, selectedStoreAttrs.value, selectedSupervisor.value, selectedStores.value
         , selectedstartDate.value, selectedendDate.value, 0, selectedRadioBox.value, selectedBuyCodeValue
       )
-      console.log(res)
+      //comsole.log(res)
       rowData.value = res.data.cardSalesDetail
   
       afterSearch.value = true
   
     } catch (error) {
       afterSearch.value = false
-      console.log(error);
+      //comsole.log(error);
     } finally {
       store.state.loading = false;
   
@@ -145,24 +145,24 @@ import PageName from '@/components/pageName.vue';
   const selectedSupervisor = ref()
   const lngStoreGroup = (e) => {
     initGrid()
-    console.log(e)
+    //comsole.log(e)
     selectedGroup.value = e
   }
   const lngStoreCodes = (e) => {
     initGrid()
     selectCardCorp.value = null
     selectedStores.value = e
-    console.log(e)
+    //comsole.log(e)
   }
   const lngStoreAttrs = (e) => {
     initGrid()
     selectedStoreAttrs.value = e
-    console.log(e)
+    //comsole.log(e)
   }
   const lngSupervisor = (e) => {
     initGrid()
     selectedSupervisor.value = e
-    console.log(e)
+    //comsole.log(e)
   }
 
   
@@ -177,22 +177,22 @@ import PageName from '@/components/pageName.vue';
 
   const pageLog = await insertPageLog(store.state.activeTab2);
 
-    console.log(selectedGroup.value, selectedStores.value)
+    //comsole.log(selectedGroup.value, selectedStores.value)
     const res = await getCardCorp(selectedGroup.value, selectedStores.value, 1)
     cardCorp.value = res.data.cardCorpList
-    console.log(cardCorp.value)
+    //comsole.log(cardCorp.value)
   })
 
   watch([selectedGroup, selectedStores], async () => {
-      console.log(selectedGroup.value, selectedStores.value)
+      //comsole.log(selectedGroup.value, selectedStores.value)
       const res = await getCardCorp(selectedGroup.value, selectedStores.value, 1)
       cardCorp.value = res.data.cardCorpList
-      console.log(cardCorp.value)
+      //comsole.log(cardCorp.value)
   })
   
   watch(selectCardCorp, (newValue) => {
     selectedBuyCode.value = newValue ? newValue.strBuyCode : ""
-    console.log(selectedBuyCode.value)
+    //comsole.log(selectedBuyCode.value)
   })
   
   /*
@@ -212,7 +212,7 @@ import PageName from '@/components/pageName.vue';
     } else {
       documentSubTitle.value = selectedExcelDate.value +'\n'+ selectedExcelStore.value
     }
-    console.log(documentSubTitle.value);
+    //comsole.log(documentSubTitle.value);
     // 엑셀 기능 실행
     exportExcel.value = !exportExcel.value
   }
@@ -222,11 +222,11 @@ import PageName from '@/components/pageName.vue';
   const selectedExcelDate = ref('')
   const excelDate = (e)=> {
    selectedExcelDate.value = e
-   console.log(e)
+   //comsole.log(e)
   }
   const selectedExcelStore = ref('')
   const excelStore = (e) =>{
     selectedExcelStore.value = e
-    console.log(e)
+    //comsole.log(e)
   }
   </script>

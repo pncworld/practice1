@@ -89,7 +89,7 @@ onMounted(async () => {
     store.state.userData.USER_NO
   );
 
-  console.log(res);
+  //comsole.log(res);
 
   StoreList.value = res?.data?.List;
 
@@ -142,7 +142,7 @@ watch([selectStoreCd, selectSeat], async () => {
     store.state.loading2 = false;
   }
 
-  console.log(rowData.value);
+  //comsole.log(rowData.value);
 });
 
 onMounted(() => {});

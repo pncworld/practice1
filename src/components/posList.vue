@@ -53,7 +53,7 @@ watch(
 );
 
 // const changePosNo = (e) => {
-//     console.log(e)
+//     //comsole.log(e)
 //     emit('posNo' , e.target.value)
 // }
 

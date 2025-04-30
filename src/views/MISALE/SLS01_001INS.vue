@@ -320,7 +320,7 @@ const readExcel = (e) => {
       );
     }
 
-    console.log(excelData.value);
+    //comsole.log(excelData.value);
   };
 };
 
@@ -352,7 +352,7 @@ const saveUploadFile = async () => {
     });
     return;
   }
-  console.log(excelData.value);
+  //comsole.log(excelData.value);
 
   try {
     const dates = excelData.value[selectSheet.value]
@@ -372,7 +372,7 @@ const saveUploadFile = async () => {
       comments
     );
 
-    console.log(res);
+    //comsole.log(res);
 
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
@@ -383,7 +383,7 @@ const saveUploadFile = async () => {
       });
     }
   } catch (error) {
-    console.log(error);
+    //comsole.log(error);
   } finally {
     searchButton();
   }
@@ -436,7 +436,7 @@ const saveButton = async () => {
             .map((i) => i.strComment)
             .join("\u2063");
 
-          console.log(dates, projs, comments);
+          //comsole.log(dates, projs, comments);
           const res = await saveExcelDataPlan(
             lngstoregroup.value,
             lngstorecode.value,
@@ -445,7 +445,7 @@ const saveButton = async () => {
             comments
           );
 
-          console.log(res);
+          //comsole.log(res);
 
           if (res.data.RESULT_CD == "00") {
             Swal.fire({
@@ -463,14 +463,14 @@ const saveButton = async () => {
             });
           }
         } catch (e) {
-          console.log(e);
+          //comsole.log(e);
         } finally {
           searchButton();
         }
       }
     });
   } catch (error) {
-    console.log(error);
+    //comsole.log(error);
   } finally {
   }
 };
@@ -549,7 +549,7 @@ const calendarOptions = ref({
     };
   },
   eventClick: function (event) {
-    console.log(event);
+    //comsole.log(event);
     const info = {
       dateStr: event.event.startStr,
       jsEvent: {
@@ -639,33 +639,33 @@ const checked = ref(0);
 
 const lngStoreGroup = (e) => {
   lngstoregroup.value = e;
-  console.log(e);
+  //comsole.log(e);
   initGrid();
 };
 const lngStoreAttrs = (e) => {
   lngstoreattr.value = e;
-  console.log(e);
+  //comsole.log(e);
   initGrid();
 };
 const lngStoreTeam = (e) => {
   lngstoreteam.value = e;
-  console.log(e);
+  //comsole.log(e);
   initGrid();
 };
 const lngSupervisor = (e) => {
   lngstoresupervisor.value = e;
-  console.log(e);
+  //comsole.log(e);
   initGrid();
 };
 const lngStoreCode = (e) => {
   lngstorecode.value = e;
-  console.log(e);
+  //comsole.log(e);
   initGrid();
 };
 
 const store = useStore();
 
-console.log(store);
+//comsole.log(store);
 
 const afterSearch = ref(false);
 const searchButton = async () => {
@@ -696,7 +696,7 @@ const searchButton = async () => {
       lngstorecode.value,
       selectedstartDate.value
     );
-    console.log(res);
+    //comsole.log(res);
     afterSearch.value = true;
     rowData2.value = JSON.parse(JSON.stringify(res.data.List));
 
@@ -757,7 +757,7 @@ const downloadSample = () => {
 
   // Object.keys(worksheet).forEach(cell => {
   // if (cell.startsWith("B") && cell !== "B1") {
-  //     console.log(cell)
+  //     //comsole.log(cell)
   //     worksheet[cell].z = "yyyy-mm-dd"; // 날짜 형식 적용
   // }
   // });
@@ -937,7 +937,7 @@ const excelButton = () => {
     }
   });
 
-  console.log(calendarData);
+  //comsole.log(calendarData);
   // 워크북에 시트 추가
   const workbook = utils.book_new();
   utils.book_append_sheet(workbook, worksheet, "월별 목표금액 달력");

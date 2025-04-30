@@ -68,10 +68,10 @@ const endDate = (e) => {
   selectedEndDate.value = e;
 };
 const lngStoreGroups = (e) => {
-  console.log(e);
+  //comsole.log(e);
 };
 const lngStoreCodes = (e) => {
-  console.log(e);
+  //comsole.log(e);
 };
 
 const receiptNo = ref();
@@ -79,7 +79,7 @@ const initCheckBox = ref(false);
 const initSearchWord = ref(false);
 const store = useStore();
 const loginedstrLang = store.state.userData.lngLanguage;
-console.log(store);
+//comsole.log(store);
 
 const afterSearch = ref(false);
 const searchButton = async () => {
@@ -93,7 +93,7 @@ const searchButton = async () => {
       selectedStartDate.value,
       selectedEndDate.value
     );
-    console.log(res);
+    //comsole.log(res);
 
     rowData.value = res.data.RECEIPT;
     afterSearch.value = true;
@@ -108,7 +108,7 @@ const storeCd = ref();
 const dtmDate = ref();
 const init = ref(false);
 const selectedStoreCd = (e) => {
-  console.log(e);
+  //comsole.log(e);
   storeCd.value = e;
 
   initGrid();
@@ -117,7 +117,7 @@ const selectedStoreCd = (e) => {
   init.value = !init.value;
 };
 const selectedGroupCd = (e) => {
-  console.log(e);
+  //comsole.log(e);
   groupCd.value = e;
 };
 const rowData = ref([]);

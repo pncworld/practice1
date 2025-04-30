@@ -204,7 +204,7 @@ const getAreaCd = async (e) => {
 };
 const selectedDate = ref();
 const dateValue = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedDate.value = e;
 };
 
@@ -254,7 +254,7 @@ const checkedRowData = (e) => {
   saveTables.value = e.map((item) => item.lngTableID);
 };
 const checkedRowData2 = (e) => {
-  console.log(e);
+  //comsole.log(e);
   deleteTables.value = e.map((item) => item.lngTableID);
   deleteTablesStoreCds.value = e.map((item) => item.lngStoreCode);
   deleteTablesAreaCds.value = e.map((item) => item.lngAreaCode);
@@ -281,7 +281,7 @@ const saveButton = async () => {
       saveTables.value.join(","),
       selectedDate.value
     );
-    console.log(res);
+    //comsole.log(res);
   } catch (error) {}
 
   searchButton();
@@ -306,7 +306,7 @@ const deleteButton = async () => {
       deleteTables.value.join(","),
       selectedDate.value
     );
-    console.log(res);
+    //comsole.log(res);
   } catch (error) {
   } finally {
     Swal.fire({

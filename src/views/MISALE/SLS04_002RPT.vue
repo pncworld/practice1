@@ -521,7 +521,7 @@ const afterSearch = ref(false);
 const selectedstartDate = ref();
 const selectedendDate = ref();
 const startDate = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedstartDate.value = e;
 };
 const byRadioButton = ref(false);
@@ -530,7 +530,7 @@ const selectOption = ref(1);
 const selectOption2 = ref(1);
 
 watch(selectOption, () => {
-  console.log(selectOption.value);
+  //comsole.log(selectOption.value);
 });
 watch(selectOption2, () => {
   if (selectOption2.value == 1) {
@@ -603,7 +603,7 @@ const searchButton = async () => {
     const reportType = [...checkedReportTypes];
     const checkdays = [...checkedDays];
 
-    console.log(checkdays);
+    //comsole.log(checkdays);
 
     if (selectedsubMenu.value == null || selectedsubMenu.value == undefined) {
       selectedsubMenu.value = 0;
@@ -625,7 +625,7 @@ const searchButton = async () => {
       checkdays.join(","),
       selectedHoliday.value
     );
-    console.log(res);
+    //comsole.log(res);
     rowData.value = res.data.MENUS;
 
     afterSearch.value = true;
@@ -645,7 +645,7 @@ const searchButton2 = async () => {
     const reportType = [...checkedReportTypes];
     const checkdays = [...checkedDays];
 
-    console.log(checkdays);
+    //comsole.log(checkdays);
 
     if (selectedsubMenu.value == null || selectedsubMenu.value == undefined) {
       selectedsubMenu.value = 0;
@@ -668,14 +668,14 @@ const searchButton2 = async () => {
       selectedHoliday.value
     );
 
-    console.log(res.data.MENUS);
-    console.log(selectOption.value);
+    //comsole.log(res.data.MENUS);
+    //comsole.log(selectOption.value);
     datas.value = [];
     if (selectOption.value == 1) {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
       ].slice(); // 반응형 Proxy에서 일반 배열로 변환
-      console.log(labels.value); // 이 부분은 배열로 변환된 결과
+      //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
         res.data.MENUS.reduce((acc, cur) => {
@@ -693,10 +693,10 @@ const searchButton2 = async () => {
       )
         .sort((a, b) => b.lngMenuCnt - a.lngMenuCnt)
         .slice(0, 5);
-      console.log(menus);
+      //comsole.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
-      console.log(menus);
+      //comsole.log(menus);
       let data1 = [];
       for (let i = 0; i < menus.length; i++) {
         data1 = [];
@@ -715,12 +715,12 @@ const searchButton2 = async () => {
         datas.value.push(data1);
       }
       datas.value = [...datas.value];
-      console.log(datas.value);
+      //comsole.log(datas.value);
     } else if (selectOption.value == 2) {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
       ].slice(); // 반응형 Proxy에서 일반 배열로 변환
-      console.log(labels.value); // 이 부분은 배열로 변환된 결과
+      //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
         res.data.MENUS.reduce((acc, cur) => {
@@ -738,10 +738,10 @@ const searchButton2 = async () => {
       )
         .sort((a, b) => b.lngNMenuCnt - a.lngNMenuCnt)
         .slice(0, 5);
-      console.log(menus);
+      //comsole.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
-      console.log(menus);
+      //comsole.log(menus);
       let data1 = [];
       for (let i = 0; i < menus.length; i++) {
         data1 = [];
@@ -760,12 +760,12 @@ const searchButton2 = async () => {
         datas.value.push(data1);
       }
       datas.value = [...datas.value];
-      console.log(datas.value);
+      //comsole.log(datas.value);
     } else if (selectOption.value == 3) {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
       ].slice(); // 반응형 Proxy에서 일반 배열로 변환
-      console.log(labels.value); // 이 부분은 배열로 변환된 결과
+      //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
         res.data.MENUS.reduce((acc, cur) => {
@@ -783,10 +783,10 @@ const searchButton2 = async () => {
       )
         .sort((a, b) => b.lngGMenuCnt - a.lngGMenuCnt)
         .slice(0, 5);
-      console.log(menus);
+      //comsole.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
-      console.log(menus);
+      //comsole.log(menus);
       let data1 = [];
       for (let i = 0; i < menus.length; i++) {
         data1 = [];
@@ -809,7 +809,7 @@ const searchButton2 = async () => {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
       ].slice(); // 반응형 Proxy에서 일반 배열로 변환
-      console.log(labels.value); // 이 부분은 배열로 변환된 결과
+      //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
         res.data.MENUS.reduce((acc, cur) => {
@@ -827,10 +827,10 @@ const searchButton2 = async () => {
       )
         .sort((a, b) => b.lngSalCnt - a.lngSalCnt)
         .slice(0, 5);
-      console.log(menus);
+      //comsole.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
-      console.log(menus);
+      //comsole.log(menus);
       let data1 = [];
       for (let i = 0; i < menus.length; i++) {
         data1 = [];
@@ -853,7 +853,7 @@ const searchButton2 = async () => {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
       ].slice(); // 반응형 Proxy에서 일반 배열로 변환
-      console.log(labels.value); // 이 부분은 배열로 변환된 결과
+      //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
         res.data.MENUS.reduce((acc, cur) => {
@@ -871,10 +871,10 @@ const searchButton2 = async () => {
       )
         .sort((a, b) => b.lngSalAmt - a.lngSalAmt)
         .slice(0, 5);
-      console.log(menus);
+      //comsole.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
-      console.log(menus);
+      //comsole.log(menus);
       let data1 = [];
       for (let i = 0; i < menus.length; i++) {
         data1 = [];
@@ -897,7 +897,7 @@ const searchButton2 = async () => {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
       ].slice(); // 반응형 Proxy에서 일반 배열로 변환
-      console.log(labels.value); // 이 부분은 배열로 변환된 결과
+      //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
         res.data.MENUS.reduce((acc, cur) => {
@@ -915,10 +915,10 @@ const searchButton2 = async () => {
       )
         .sort((a, b) => b.lngActAmt - a.lngActAmt)
         .slice(0, 5);
-      console.log(menus);
+      //comsole.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
-      console.log(menus);
+      //comsole.log(menus);
       let data1 = [];
       for (let i = 0; i < menus.length; i++) {
         data1 = [];
@@ -941,7 +941,7 @@ const searchButton2 = async () => {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
       ].slice(); // 반응형 Proxy에서 일반 배열로 변환
-      console.log(labels.value); // 이 부분은 배열로 변환된 결과
+      //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
         res.data.MENUS.reduce((acc, cur) => {
@@ -959,10 +959,10 @@ const searchButton2 = async () => {
       )
         .sort((a, b) => b.lngNetAmt - a.lngNetAmt)
         .slice(0, 5);
-      console.log(menus);
+      //comsole.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
-      console.log(menus);
+      //comsole.log(menus);
       let data1 = [];
       for (let i = 0; i < menus.length; i++) {
         data1 = [];
@@ -985,7 +985,7 @@ const searchButton2 = async () => {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
       ].slice(); // 반응형 Proxy에서 일반 배열로 변환
-      console.log(labels.value); // 이 부분은 배열로 변환된 결과
+      //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
         res.data.MENUS.reduce((acc, cur) => {
@@ -1003,10 +1003,10 @@ const searchButton2 = async () => {
       )
         .sort((a, b) => b.lngDCAmt - a.lngDCAmt)
         .slice(0, 5);
-      console.log(menus);
+      //comsole.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
-      console.log(menus);
+      //comsole.log(menus);
       let data1 = [];
       for (let i = 0; i < menus.length; i++) {
         data1 = [];
@@ -1029,7 +1029,7 @@ const searchButton2 = async () => {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
       ].slice(); // 반응형 Proxy에서 일반 배열로 변환
-      console.log(labels.value); // 이 부분은 배열로 변환된 결과
+      //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
         res.data.MENUS.reduce((acc, cur) => {
@@ -1047,10 +1047,10 @@ const searchButton2 = async () => {
       )
         .sort((a, b) => b.lngGAmount - a.lngGAmount)
         .slice(0, 5);
-      console.log(menus);
+      //comsole.log(menus);
       label.value = menus.map((item) => item.strMenu);
 
-      console.log(menus);
+      //comsole.log(menus);
       let data1 = [];
       for (let i = 0; i < menus.length; i++) {
         data1 = [];
@@ -1086,18 +1086,18 @@ const selectedHoliday = ref(0);
 const selectedsubMenu = ref(null);
 const lngStoreGroup = (e) => {
   initGrid();
-  console.log(e);
+  //comsole.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngStoreAttr = (e) => {
   initGrid();
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngStoreTeam = (e) => {
   initGrid();
@@ -1202,7 +1202,7 @@ const printButton = () => {
   if (afterSearch.value == false) {
     return;
   }
-  console.log(rowData.value);
+  //comsole.log(rowData.value);
 
   const convert = rowData.value.map((item) => ({
     ...item,
@@ -1286,7 +1286,7 @@ watch(selectedMenu, async () => {
     selectedMenu.value
   );
   subList.value = res.data.SUBLIST;
-  console.log(subList.value);
+  //comsole.log(subList.value);
   selectedsubMenu.value = null;
 });
 

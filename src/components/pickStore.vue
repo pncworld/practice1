@@ -232,7 +232,7 @@ const ischanged = () => {
   changed.value = !changed.value;
   selectedPosNo.value = "0";
   selectedScreenNo.value = "0";
-  console.log(changed.value);
+  //comsole.log(changed.value);
   emit("update:ischanged", changed.value);
   emit("update:ischanged2", changed.value);
 };
@@ -359,7 +359,7 @@ watch(
   (newPath) => {
     if (storeGroup.value.length > 0) {
       emit("update:storeGroup", storeGroup.value[0].lngStoreGroup);
-      console.log(storeGroup.value[0].lngStoreGroup);
+      //comsole.log(storeGroup.value[0].lngStoreGroup);
     }
   }
 );
@@ -374,7 +374,7 @@ const setStoreAreaCd = (value) => {
     return item.lngStoreCode == value;
   });
 
-  console.log(storeAreaCd.value);
+  //comsole.log(storeAreaCd.value);
   selectedStoreAreaCd.value = storeAreaCd.value[0]
     ? storeAreaCd.value[0].lngAreaCode
     : "0";
@@ -384,8 +384,8 @@ const setStoreAreaCd = (value) => {
 };
 
 const setPosNo = async (value) => {
-  console.log(value);
-  //console.log(storeGroup.value[0].lngStoreGroup);
+  //comsole.log(value);
+  ////comsole.log(storeGroup.value[0].lngStoreGroup);
   if (value == undefined || storeGroup.value.length == 0) return;
   selectedPosNo.value = "0";
   storePosNo.value = "0";
@@ -393,7 +393,7 @@ const setPosNo = async (value) => {
   try {
     response = await getPosList(storeGroup.value[0].lngStoreGroup, value);
 
-    console.log(storePosNo.value);
+    //comsole.log(storePosNo.value);
   } catch (error) {
   } finally {
     storePosNo.value = response.data.pos;
@@ -407,7 +407,7 @@ const setKioskNo = async (value) => {
   try {
     response = await getKioskList(storeGroup.value[0].lngStoreGroup, value);
 
-    console.log(storePosNo.value);
+    //comsole.log(storePosNo.value);
   } catch (error) {
   } finally {
     storeKioskNo.value = response.data.pos;
@@ -439,7 +439,7 @@ const setScreenNo = async (value) => {
     );
     ScreenList.value = res2.data.ScreenList;
   }
-  console.log(ScreenList.value);
+  //comsole.log(ScreenList.value);
   selectedScreenNo.value = "0";
 };
 
@@ -450,7 +450,7 @@ const posChanged = () => {
 };
 
 watch(selectedKioskNo, (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
   emitKioskInfo(newValue.lngAreaCode, newValue.lngCode);
 });
 

@@ -101,14 +101,14 @@ const moveBack = () => {
 const selectedProgName = ref("");
 
 watch(selectedProgName, () => {
-  console.log(selectedProgName.value);
+  //comsole.log(selectedProgName.value);
 });
 
 const clickIcon = ref(1);
 watch(
   () => store.state.mobileSelectProgName,
   () => {
-    console.log(store.state.mobileSelectProgName);
+    //comsole.log(store.state.mobileSelectProgName);
 
     if (store.state.mobileSelectProgName != "") {
       clickIcon.value = 0;
@@ -127,7 +127,7 @@ const personal = ref(false);
 
 const route = useRoute();
 watch(route, () => {
-  console.log(route.path);
+  //comsole.log(route.path);
   if (route.path === "/m") {
     showMenu.value = false; // 또는 원하는 다른 동작 수행
     showMenu2.value = false; // 또는 원하는 다른 동작 수행
@@ -136,7 +136,7 @@ watch(route, () => {
     showMenu2.value = true;
   }
 
-  console.log(store.state.mobileSelectProgName);
+  //comsole.log(store.state.mobileSelectProgName);
 });
 onMounted(() => {
   if (store.state.StoreToken != "") {
@@ -146,7 +146,7 @@ onMounted(() => {
     showMenu2.value = false;
     showMenu.value = false;
   }
-  console.log(store.state.mobileSelectProgName);
+  //comsole.log(store.state.mobileSelectProgName);
   //selectedProgName.value = store.state.mobileSelectProgName;
 });
 const emit = defineEmits([
@@ -182,7 +182,7 @@ const props = defineProps({
 watch(
   () => props.changeIcon,
   () => {
-    console.log(props.changeIcon);
+    //comsole.log(props.changeIcon);
     clickIcon.value = props.changeIcon;
   }
 );
@@ -193,7 +193,7 @@ watch(clickIcon, () => {
 watch(
   () => props.changeMenuState,
   () => {
-    console.log("여길오냐?");
+    //comsole.log("여길오냐?");
     showMenu3.value = props.changeMenuState;
     clickIcon.value = 0;
   }
@@ -245,7 +245,7 @@ const showHomePage = () => {
 const reSearch = ref(false);
 const store2 = useStore();
 const reload = () => {
-  console.log(route.path);
+  //comsole.log(route.path);
   if (route.path === "/m/20013") {
     reSearch.value = !reSearch.value;
     store2.state.mobileReSearch = reSearch.value;
@@ -285,7 +285,7 @@ const searchNotice = () => {
 watch(
   () => props.changeBottomMenu,
   () => {
-    console.log(props.changeBottomMenu);
+    //comsole.log(props.changeBottomMenu);
     showMenu.value = props.changeBottomMenu;
   }
 );

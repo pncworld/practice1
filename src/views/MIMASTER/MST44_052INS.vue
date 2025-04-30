@@ -446,7 +446,7 @@ const showNext = () => {
   addfor8ScreenKey();
 };
 const showPrev = () => {
-  console.log(ScreenKeyOrigin.value);
+  //comsole.log(ScreenKeyOrigin.value);
   if (currentsubPage.value == 1) {
     return;
   }
@@ -461,7 +461,7 @@ const updateMenuKey = ref(false);
 const nowStoreAreaCd = ref();
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
-  console.log(nowStoreAreaCd.value);
+  //comsole.log(nowStoreAreaCd.value);
 };
 
 const nowStoreCd = ref();
@@ -472,11 +472,11 @@ const handleStoreCd = async (newValue) => {
   }
   nowStoreCd.value = newValue;
   const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
-  console.log(res2.data.menuList);
+  //comsole.log(res2.data.menuList);
   MenuList.value = res2.data.menuList;
   MenuGroup.value = res2.data.menuGroup;
   SubMenuGroup.value = res2.data.submenuGroup;
-  console.log(MenuList.value);
+  //comsole.log(MenuList.value);
   MenuList.value = MenuList.value.map((item) => {
     return {
       ...item,
@@ -551,10 +551,10 @@ const searchMenu = async () => {
     );
     MenuKeyList.value = res4.data.MenuKeyList;
     ScreenKeyOrigin.value = res3.data.ScreenList;
-    console.log(MenuKeyList.value);
+    //comsole.log(MenuKeyList.value);
 
     addfor8ScreenKey();
-    console.log(ScreenKeys.value);
+    //comsole.log(ScreenKeys.value);
     AllscreenKeyPage.value = Math.ceil(ScreenKeyOrigin.value.length / 8);
 
     confirmitem.value = JSON.parse(JSON.stringify(MenuKeyList.value));
@@ -575,8 +575,8 @@ const searchValue = ref([-1, -1]);
 const setSubCd = (e) => {
   const name = e.target.name;
   const value = e.target.value;
-  console.log(SubMenuGroup.value);
-  console.log(MenuGroup.value);
+  //comsole.log(SubMenuGroup.value);
+  //comsole.log(MenuGroup.value);
   if (name == "majorGroupCd") {
     filteredSubMenuGroup.value = SubMenuGroup.value.filter(
       (item) => item.sublngMajor == value
@@ -606,17 +606,17 @@ const showMenuKey = (value) => {
   items.value = Array.from({ length: 16 }, (_, index) => ({
     intKeySeq: index + 1, // 인덱스에 1을 더하여 값 설정
   }));
-  console.log(MenuKeyList.value);
+  //comsole.log(MenuKeyList.value);
   MenuKeyList.value
     .filter((item) => item.intPosNo == posNo.value && item.intScreenNo == value)
     .forEach((item) => {
-      console.log(item);
+      //comsole.log(item);
       const position = item.intKeySeq - (currmenuKeyPage.value - 1) * 16 - 1;
       if (position >= 0 && position < 16) {
         items.value[position] = item;
       }
     });
-  console.log(items.value);
+  //comsole.log(items.value);
   afterSearch2.value = true;
 };
 watch(ScreenKeys, (newvalue) => {
@@ -631,7 +631,7 @@ const onMove = (evt) => {
   // 예: 드래그 중 이동할 때의 조건 등을 설정할 수 있음
   if (changeMode.value == false) {
     targetItemIndex2 = Array.from(evt.from.children).indexOf(evt.related);
-    console.log(targetItemIndex2);
+    //comsole.log(targetItemIndex2);
     return false;
   } else {
     return true;
@@ -652,15 +652,15 @@ const onEnd = (evt) => {
   if (changeMode.value === false) {
     const oldIndex = evt.oldIndex; // 드래그된 아이템의 기존 인덱스
     const swappedItems = [...items.value]; // items를 복사
-    console.log(oldIndex);
-    console.log(targetItemIndex2);
+    //comsole.log(oldIndex);
+    //comsole.log(targetItemIndex2);
     const temp = swappedItems[oldIndex];
 
     swappedItems[oldIndex] = swappedItems[targetItemIndex2];
 
     swappedItems[targetItemIndex2] = temp;
 
-    console.log(swappedItems);
+    //comsole.log(swappedItems);
     // 배열을 업데이트
     //   items.value = swappedItems;
 
@@ -696,7 +696,7 @@ function formatNumber(value) {
   return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 const onEnd2 = (evt) => {
-  console.log(ScreenKeyOrigin.value);
+  //comsole.log(ScreenKeyOrigin.value);
   const originScreenNo = dupliScreenKeyOrigin[evt.oldIndex].intScreenNo;
   const targetScreenNo = dupliScreenKeyOrigin[targetItemIndex3].intScreenNo;
   ScreenKeyOrigin.value.forEach((item, index) => {
@@ -712,8 +712,8 @@ const onEnd2 = (evt) => {
       }
     });
   addfor8ScreenKey();
-  console.log(items.value);
-  console.log(MenuKeyList.value);
+  //comsole.log(items.value);
+  //comsole.log(MenuKeyList.value);
   showMenuKey(clickedintScreenNo.value);
 };
 watch(items, (newvalue) => {});
@@ -758,8 +758,8 @@ const savePosMenu = async () => {
         const screenKeyNamearr = ScreenKeyOrigin.value.map(
           (item) => item.strScreenName
         );
-        console.log(screenKeyNoarr.join(","));
-        console.log(screenKeyNamearr.join(","));
+        //comsole.log(screenKeyNoarr.join(","));
+        //comsole.log(screenKeyNamearr.join(","));
         const res = await saveScreenKeys(
           groupCd.value,
           nowStoreCd.value,
@@ -781,11 +781,11 @@ const savePosMenu = async () => {
         const menuKeyNmarr = MenuKeyList.value
           .filter((item) => item.intPosNo == posNo.value)
           .map((item) => item.strKeyName);
-        console.log(posNo.value);
-        console.log(intKeySeqs.join(","));
-        console.log(screenNumarr.join(","));
-        console.log(lngScrarr.join(","));
-        console.log(menuKeyNmarr.join(","));
+        //comsole.log(posNo.value);
+        //comsole.log(intKeySeqs.join(","));
+        //comsole.log(screenNumarr.join(","));
+        //comsole.log(lngScrarr.join(","));
+        //comsole.log(menuKeyNmarr.join(","));
         const res2 = await saveAllMenuKey(
           groupCd.value,
           nowStoreCd.value,
@@ -797,8 +797,8 @@ const savePosMenu = async () => {
           menuKeyNmarr.join("\u200B")
         );
 
-        console.log(res);
-        console.log(res2);
+        //comsole.log(res);
+        //comsole.log(res2);
       } catch (error) {
       } finally {
         store.state.loading = false;
@@ -893,7 +893,7 @@ onMounted(() => {
 //   gridView.setColumns(columns);
 //   // 5. 샘플 데이터 추가
 //   dataProvider.setRows(MenuList.value);
-//   console.log(MenuList.value);
+//   //comsole.log(MenuList.value);
 //   gridView.sortMode = "explicit";
 //   gridView.filterMode = "explicit";
 //   gridView.setFooters({ visible: false });
@@ -939,7 +939,7 @@ const selcetedrowData = (e) => {
   if (clickedRealIndex.value == null) {
     return;
   }
-  console.log(e);
+  //comsole.log(e);
   currentSelectedMenuNm.value = e[1];
   currentSelectedMenuCode.value = e[0];
   currentSelectedMenuPrice.value = e[2];
@@ -996,8 +996,8 @@ const selcetedrowData = (e) => {
 
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
-  console.log(posNo.value);
-  console.log(nowStoreAreaCd.value);
+  //comsole.log(posNo.value);
+  //comsole.log(nowStoreAreaCd.value);
   if (
     nowStoreAreaCd.value != undefined &&
     posNo.value != undefined &&
@@ -1030,7 +1030,7 @@ const confirmScreenKey = () => {
   );
   ScreenKeyOrigin.value[index].strScreenName = currentscreenKeyNm.value;
   changeScreenKey.value = false;
-  console.log(ScreenKeyOrigin.value);
+  //comsole.log(ScreenKeyOrigin.value);
   addfor8ScreenKey();
   currentscreenKeyNm.value = "";
   clickedScreenNo.value = "";
@@ -1066,7 +1066,7 @@ const addfor30MenuKeys = () => {
 const addScreenKey = (value) => {
   currentscreenKeyNm.value = "";
   addscreenKey.value = true;
-  console.log(value);
+  //comsole.log(value);
   clickedScreenNo.value = value + 1;
 };
 
@@ -1090,9 +1090,9 @@ const confirmaddScreenKey = () => {
   });
   addscreenKey.value = false;
   addfor8ScreenKey();
-  console.log(ScreenKeyOrigin.value);
+  //comsole.log(ScreenKeyOrigin.value);
   currentscreenKeyNm.value = "";
-  console.log(clickedScreenNo.value);
+  //comsole.log(clickedScreenNo.value);
   showMenuKey(clickedScreenNo.value + (currentsubPage.value - 1) * 10);
 };
 
@@ -1112,7 +1112,7 @@ const prevMenuKey = () => {
         item.intScreenNo == clickedintScreenNo.value
     )
     .forEach((item) => {
-      console.log(item);
+      //comsole.log(item);
 
       const position = item.intKeySeq - (currmenuKeyPage.value - 1) * 16 - 1;
       if (position >= 0 && position < 16) {
@@ -1136,7 +1136,7 @@ const nextMenuKey = () => {
         item.intScreenNo == clickedintScreenNo.value
     )
     .forEach((item) => {
-      console.log(item);
+      //comsole.log(item);
       const position = item.intKeySeq - (currmenuKeyPage.value - 1) * 16 - 1;
       if (position >= 0 && position < 16) {
         items.value[position] = item;
@@ -1146,17 +1146,17 @@ const nextMenuKey = () => {
 const existMenuKey = ref(false);
 const clickedRealIndex = ref();
 const saveMenuKeyposition = (index) => {
-  console.log(clickedintScreenNo.value);
-  console.log(index);
-  console.log(items.value);
+  //comsole.log(clickedintScreenNo.value);
+  //comsole.log(index);
+  //comsole.log(items.value);
 
   clickedRealIndex.value = (currmenuKeyPage.value - 1) * 16 + index + 1;
-  console.log(clickedRealIndex.value);
+  //comsole.log(clickedRealIndex.value);
 };
 
 const addMenuKey = () => {
-  console.log(MenuKeyList.value);
-  console.log(clickedRealIndex.value);
+  //comsole.log(MenuKeyList.value);
+  //comsole.log(clickedRealIndex.value);
   const foraddIndex = MenuKeyList.value.findIndex(
     (item) =>
       item.intPosNo == posNo.value &&
@@ -1164,7 +1164,7 @@ const addMenuKey = () => {
       item.intKeySeq == clickedRealIndex.value
   );
 
-  console.log(foraddIndex);
+  //comsole.log(foraddIndex);
   if (foraddIndex == -1) {
     MenuKeyList.value.push({
       intKeyNo: 6,
@@ -1187,15 +1187,15 @@ const addMenuKey = () => {
     };
   }
   showMenuKey(clickedintScreenNo.value);
-  console.log(MenuKeyList.value);
+  //comsole.log(MenuKeyList.value);
 };
 
 const addTLUKey = () => {
-  console.log(MenuKeyList.value);
+  //comsole.log(MenuKeyList.value);
   const foraddIndex = MenuKeyList.value.findIndex(
     (item) => item.intKeySeq == clickedRealIndex.value
   );
-  console.log(foraddIndex);
+  //comsole.log(foraddIndex);
   if (foraddIndex == -1) {
     MenuKeyList.value.push({
       intKeyNo: 6,
@@ -1239,7 +1239,7 @@ const deletekey = () => {
         item.intScreenNo != clickedintScreenNo.value ||
         item.intKeySeq != clickedRealIndex.value
     );
-    console.log(MenuKeyList.value);
+    //comsole.log(MenuKeyList.value);
     showMenuKey(clickedintScreenNo.value);
   }
 };

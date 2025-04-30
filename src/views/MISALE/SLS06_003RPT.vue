@@ -108,19 +108,19 @@ const hideColumnNow = ref(true);
 const hideColumn = ref("strStore");
 const hideColumnsId = ref(["strStore"]);
 const endMonth = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedendMonth.value = e;
 };
 const startYear = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedstartYear.value = e;
 };
 const startMonth = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedstartMonth.value = e;
 };
 const endYear = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedendYear.value = e;
 };
 
@@ -143,7 +143,7 @@ const seeDetail = (e) => {
 };
 const store = useStore();
 const loginedstrLang = store.state.userData.lngLanguage;
-console.log(store.state.userData);
+//comsole.log(store.state.userData);
 
 const searchButton = async () => {
   if (
@@ -178,11 +178,11 @@ const searchButton = async () => {
     const endDate = `${selectedendYear.value}-${String(
       selectedendMonth.value
     ).padStart(2, "0")}-01`;
-    console.log(selectedGroup.value);
-    console.log(selectedStores.value);
-    console.log(startDate);
-    console.log(endDate);
-    console.log(tempChecked.value ? 1 : 0);
+    //comsole.log(selectedGroup.value);
+    //comsole.log(selectedStores.value);
+    //comsole.log(startDate);
+    //comsole.log(endDate);
+    //comsole.log(tempChecked.value ? 1 : 0);
     const res = await getSalesDatabyMonth(
       selectedGroup.value,
       selectedStores.value,
@@ -190,7 +190,7 @@ const searchButton = async () => {
       endDate,
       tempChecked.value ? 1 : 0
     );
-    console.log(res);
+    //comsole.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -205,16 +205,16 @@ const selectedGroup = ref();
 const selectedStores = ref();
 const selectedStoreAttrs = ref();
 const lngStoreGroup = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = (e) => {
   selectedStores.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngStoreAttrs = (e) => {
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 
 const initGrid = () => {

@@ -184,7 +184,7 @@ const addButton = () => {
     });
     return;
   }
-  console.log(updateRow.value);
+  //comsole.log(updateRow.value);
   const newCode =
     Math.max(0, ...updateRow.value.map((item) => item.lngChargerCode)) + 1;
   addrowDefault.value = "0," + newCode;
@@ -203,7 +203,7 @@ const deleteButton = () => {
 };
 
 const clickedRowData = (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
   empCode.value = newValue[0];
   empName.value = newValue[1];
   empExpire.value = newValue[2];
@@ -218,7 +218,7 @@ const handleStoreCd = (newValue) => {
 const updateRow = ref([]);
 const updatedRowData = (newValue) => {
   updateRow.value = newValue;
-  console.log(newValue);
+  //comsole.log(newValue);
 };
 
 const changeInfo = (e) => {
@@ -258,13 +258,13 @@ const searchButton = async () => {
   store.state.loading = true;
   try {
     let res;
-    console.log(groupCd.value);
-    console.log(storeCd.value);
+    //comsole.log(groupCd.value);
+    //comsole.log(storeCd.value);
     res = await getChargerInfo(groupCd.value, storeCd.value);
 
     rowData.value = res.data.EMPCHARGER;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
-    console.log(res);
+    //comsole.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -323,7 +323,7 @@ const saveButton = async () => {
     if (result.isConfirmed) {
       store.state.loading = true;
       try {
-        console.log(updateRow.value);
+        //comsole.log(updateRow.value);
 
         const chargerCode = updateRow.value
           .filter((item) => item.deleted != true && item.new != true)
@@ -367,7 +367,7 @@ const saveButton = async () => {
           chargerMngNo2.join(","),
           deleteCode.join(",")
         );
-        console.log(res);
+        //comsole.log(res);
         Swal.fire({
           title: "저장 되었습니다.",
           confirmButtonText: "확인",

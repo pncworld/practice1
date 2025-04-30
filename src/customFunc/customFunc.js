@@ -65,7 +65,7 @@ function formatDateTime2(dateString) {
 
 // const dateString = '2025 02 20 18:05:34';
 // const formattedDate = formatDate(dateString);
-// console.log(formattedDate); // 출력: 2025-02-20 18:05:34
+// //comsole.log(formattedDate); // 출력: 2025-02-20 18:05:34
 
 export function excelTitle(target) {
   const first = target.strMajorName;
@@ -104,17 +104,17 @@ export async function insertPageLog(progdata) {
   };
 
   await userip();
-  console.log("내 IP:", userIp);
+  //comsole.log("내 IP:", userIp);
 
   const progname = progdata.strUrl.split("::")[1].split(".xml")[0];
   const progid = progdata.lngProgramID.split("_")[0];
 
-  // console.log(inserttime);
-  // console.log(userGroup);
-  // console.log(userStoreCd);
-  // console.log(userId);
-  // console.log(progname);
-  // console.log(progid);
+  // //comsole.log(inserttime);
+  // //comsole.log(userGroup);
+  // //comsole.log(userStoreCd);
+  // //comsole.log(userId);
+  // //comsole.log(progname);
+  // //comsole.log(progid);
   const res = await savePageLog(
     inserttime,
     userGroup,
@@ -125,7 +125,7 @@ export async function insertPageLog(progdata) {
     progid,
     1
   );
-  console.log(res);
+  //comsole.log(res);
   return ``;
 }
 
@@ -134,7 +134,7 @@ export async function insertMobilePageLog(progdata) {
   const currenttime = new Date();
   const inserttime = formatDateTime2(currenttime);
 
-  console.log(store);
+  //comsole.log(store);
   const userGroup = store.state.userData.GROUP_CD;
   const userStoreCd = store.state.userData.STORE_CD;
   const userId = store.state.userData.USER_NO;
@@ -158,7 +158,7 @@ export async function insertMobilePageLog(progdata) {
     progid,
     2
   );
-  console.log(res);
+  //comsole.log(res);
   return ``;
 }
 

@@ -159,7 +159,7 @@ const props = defineProps({
   },
 });
 const formatDate = (date) => {
-  console.log(date);
+  //comsole.log(date);
   return date.toISOString().split("T")[0];
 };
 const today = new Date();
@@ -196,7 +196,7 @@ onMounted(() => {
 watch(
   () => props.limitEndDate,
   () => {
-    console.log(props.limitEndDate);
+    //comsole.log(props.limitEndDate);
 
     maxEndDate.value = props.limitEndDate;
     if (new Date(selectedEndDate.value) > new Date(maxEndDate.value)) {
@@ -319,8 +319,8 @@ function formatDateToYYYYMMDD(date) {
 watch(
   () => [selectedStartDate.value, selectedEndDate.value],
   async () => {
-    console.log(selectedStartDate.value);
-    console.log(maxEndDate.value);
+    //comsole.log(selectedStartDate.value);
+    //comsole.log(maxEndDate.value);
     if (
       new Date(selectedEndDate.value) > new Date(maxEndDate.value) ||
       new Date(selectedStartDate.value) > new Date(maxEndDate.value)

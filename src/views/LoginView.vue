@@ -100,13 +100,13 @@ const login2 = async () => {
   store.state.selectedCategoryId = null;
   try {
     const response = await login(username.value, password.value);
-    console.log(response);
+    //comsole.log(response);
     const loginStatus = response.data.loginSession[0].strUserID;
 
     if (!isNaN(Number(loginStatus))) {
       store.dispatch("updateUserData", response.data.loginSession[0]);
       store.dispatch("setToken", response.data.loginSession[0].SessionToken);
-      console.log(response.data.loginSession[0]);
+      //comsole.log(response.data.loginSession[0]);
       message.value = "로그인 성공";
       const readPrograms = async () => {
         const response = await get_sys_list(
@@ -116,7 +116,7 @@ const login2 = async () => {
         );
 
         const result = response.data.sysMenu;
-        console.log(result);
+        //comsole.log(result);
         const mainCategoryData = result.filter(
           (item) => Number(item.strMenuLevel) == 1
         ); // 숫자
@@ -144,7 +144,7 @@ const login2 = async () => {
           store.state.userData.lngSupervisor
         );
 
-        console.log(response);
+        //comsole.log(response);
         const result0 = response.data.storeGroup;
         const result1 = response.data.storeAttr;
         const result2 = response.data.store;
@@ -161,7 +161,7 @@ const login2 = async () => {
       };
       await readsales();
       const res4 = await getFavoriteList(username.value);
-      console.log(res4);
+      //comsole.log(res4);
       store.dispatch(
         "setFavoriteList",
         res4.data.List.map((item) => Number(item.lngProgramID))
@@ -183,8 +183,8 @@ onMounted(async () => {
   try {
     const token = store.state.StoreToken;
     const res = await alreadyLogined(token);
-    console.log(token);
-    console.log(res);
+    //comsole.log(token);
+    //comsole.log(res);
     if (res.data.RESULT == true) {
       store.dispatch("updateUserData", res.data.List[0]);
       store.dispatch("setToken", res.data.List[0].SessionToken);
@@ -196,7 +196,7 @@ onMounted(async () => {
       );
 
       const result = response.data.sysMenu;
-      console.log(result);
+      //comsole.log(result);
       const mainCategoryData = result.filter(
         (item) => Number(item.strMenuLevel) == 1
       ); // 숫자
@@ -236,7 +236,7 @@ onMounted(async () => {
       store.dispatch("StoreSupervisor", result4);
       store.dispatch("StoreAreaCd", result5);
 
-      console.log(res.data.List[0]);
+      //comsole.log(res.data.List[0]);
       const res4 = await getFavoriteList(res.data.List[0].loginID);
       store.dispatch(
         "setFavoriteList",
@@ -251,9 +251,9 @@ onMounted(async () => {
   }
 
   store.state.inActiveBackGround = false;
-  console.log(localStorage.getItem("saveID"));
+  //comsole.log(localStorage.getItem("saveID"));
   if (localStorage.getItem("saveID") === "true") {
-    console.log(localStorage.getItem("username"));
+    //comsole.log(localStorage.getItem("username"));
     saveID.value = true;
     username.value = localStorage.getItem("username");
   }

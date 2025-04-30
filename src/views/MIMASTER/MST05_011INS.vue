@@ -524,7 +524,7 @@ const showNext = () => {
   addfor10ScreenKey();
 };
 const showPrev = () => {
-  console.log(ScreenKeyOrigin.value);
+  //comsole.log(ScreenKeyOrigin.value);
   if (currentsubPage.value == 1) {
     return;
   }
@@ -545,12 +545,12 @@ let dupliitems = [];
 //     }
 //   }
 //   const updatedMenuKeys = dupliitems.filter((item) => item.lngKeyscrNo != "");
-//   console.log(updatedMenuKeys);
+//   //comsole.log(updatedMenuKeys);
 // };
 const nowStoreAreaCd = ref();
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
-  console.log(nowStoreAreaCd.value);
+  //comsole.log(nowStoreAreaCd.value);
 };
 
 const searchMenuList = (e) => {
@@ -565,7 +565,7 @@ const handleStoreCd = async (newValue) => {
   nowStoreCd.value = newValue;
   const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
 
-  console.log(res2);
+  //comsole.log(res2);
   MenuList.value = res2.data.menuList;
   MenuGroup.value = res2.data.menuGroup;
   SubMenuGroup.value = res2.data.submenuGroup;
@@ -577,7 +577,7 @@ const handleStoreCd = async (newValue) => {
     };
   });
   const res5 = await getTLUList(groupCd.value, nowStoreCd.value);
-  console.log(res5);
+  //comsole.log(res5);
   TLUList.value = res5.data.TLUList;
   TLUList.value = TLUList.value.map((item) => {
     return {
@@ -646,8 +646,8 @@ const searchButton = async () => {
     );
     MenuKeyList.value = res4.data.MenuKeyList;
     ScreenKeyOrigin.value = res3.data.ScreenList;
-    console.log(ScreenKeyOrigin.value);
-    console.log(MenuKeyList.value);
+    //comsole.log(ScreenKeyOrigin.value);
+    //comsole.log(MenuKeyList.value);
     addfor10ScreenKey();
     AllscreenKeyPage.value = Math.ceil(ScreenKeyOrigin.value.length / 10);
 
@@ -670,8 +670,8 @@ const searchValue = ref([-1, -1]);
 const setSubCd = (e) => {
   const name = e.target.name;
   const value = e.target.value;
-  console.log(SubMenuGroup.value);
-  console.log(MenuGroup.value);
+  //comsole.log(SubMenuGroup.value);
+  //comsole.log(MenuGroup.value);
   if (name == "majorGroupCd") {
     filteredSubMenuGroup.value = SubMenuGroup.value.filter(
       (item) => item.sublngMajor == value
@@ -707,7 +707,7 @@ const selcetedrowData = (e) => {
   if (clickedRealIndex.value == null) {
     return;
   }
-  console.log(e);
+  //comsole.log(e);
   currentSelectedMenuNm.value = e[1];
   currentSelectedMenuCode.value = e[0];
   currentSelectedMenuPrice.value = e[2];
@@ -718,7 +718,7 @@ const selcetedrowData2 = (e) => {
   if (clickedRealIndex.value == null) {
     return;
   }
-  console.log(e);
+  //comsole.log(e);
   currentSelectedMenuNm.value = e[1];
   currentSelectedMenuCode.value = e[0];
   currentSelectedMenuPrice.value = "";
@@ -743,7 +743,7 @@ const showMenuKey = (value) => {
     });
 };
 watch(ScreenKeys, (newvalue) => {
-  console.log(ScreenKeys.value);
+  //comsole.log(ScreenKeys.value);
 
   AllscreenKeyPage.value = Math.floor(ScreenKeyOrigin.value.length / 10) + 1;
 });
@@ -785,7 +785,7 @@ const onEnd = (evt) => {
     // 배열을 업데이트
     items.value = swappedItems;
 
-    console.log(items.value);
+    //comsole.log(items.value);
   } else {
     updateMenuKey.value = true;
   }
@@ -793,7 +793,7 @@ const onEnd = (evt) => {
   clickedMenuKey.value =
     changeMode.value == false ? targetItemIndex2 : evt.newIndex;
 
-  console.log(items.value);
+  //comsole.log(items.value);
 };
 function formatNumber(value) {
   if (!value) return "";
@@ -802,10 +802,10 @@ function formatNumber(value) {
 const onEnd2 = (evt) => {
   const originScreenNo = dupliScreenKeyOrigin[evt.oldIndex].intScreenNo;
   const targetScreenNo = dupliScreenKeyOrigin[targetItemIndex3].intScreenNo;
-  console.log(originScreenNo);
-  console.log(targetScreenNo);
-  console.log(ScreenKeyOrigin.value);
-  console.log(MenuKeyList.value);
+  //comsole.log(originScreenNo);
+  //comsole.log(targetScreenNo);
+  //comsole.log(ScreenKeyOrigin.value);
+  //comsole.log(MenuKeyList.value);
   let temparr = [];
   ScreenKeyOrigin.value.forEach((item, index) => {
     const tempScreenNo = item.intScreenNo;
@@ -835,7 +835,7 @@ watch(items, (newvalue) => {
   });
 });
 const savePosMenu = async () => {
-  console.log(MenuKeyList.value);
+  //comsole.log(MenuKeyList.value);
 
   if (afterSearch.value == false) {
     Swal.fire({
@@ -876,8 +876,8 @@ const savePosMenu = async () => {
         const screenKeyNamearr = ScreenKeyOrigin.value.map(
           (item) => item.strScreenName
         );
-        console.log(screenKeyNoarr.join(","));
-        console.log(screenKeyNamearr.join(","));
+        //comsole.log(screenKeyNoarr.join(","));
+        //comsole.log(screenKeyNamearr.join(","));
         const res = await saveScreenKeys(
           groupCd.value,
           nowStoreCd.value,
@@ -906,11 +906,11 @@ const savePosMenu = async () => {
           .filter((item) => item.intPosNo == posNo.value)
           .filter((item2) => saveScreenInt.includes(item2.intScreenNo))
           .map((item) => item.strKeyName);
-        console.log(posNo.value);
-        console.log(intKeySeqs.join(","));
-        console.log(screenNumarr.join(","));
-        console.log(lngScrarr.join(","));
-        console.log(menuKeyNmarr.join(","));
+        //comsole.log(posNo.value);
+        //comsole.log(intKeySeqs.join(","));
+        //comsole.log(screenNumarr.join(","));
+        //comsole.log(lngScrarr.join(","));
+        //comsole.log(menuKeyNmarr.join(","));
         const res2 = await saveAllMenuKey(
           groupCd.value,
           nowStoreCd.value,
@@ -922,8 +922,8 @@ const savePosMenu = async () => {
           menuKeyNmarr.join("\u200B")
         );
 
-        console.log(res);
-        console.log(res2);
+        //comsole.log(res);
+        //comsole.log(res2);
       } catch (error) {
       } finally {
         store.state.loading = false;
@@ -957,7 +957,7 @@ const currentSelectedMenuPrice = ref("");
 //         return filteredMenus;  // 필터링된 항목 반환
 //       });
 
-//     console.log(TLUMenuCd[0])
+//     //comsole.log(TLUMenuCd[0])
 //     const newTLUMenus = [];
 
 //     Object.keys(TLUMenuCd[0]).forEach(key => {
@@ -968,7 +968,7 @@ const currentSelectedMenuPrice = ref("");
 //       newTLUMenus.push(...filteredMenus); // 결과 배열에 필터링된 메뉴들을 추가
 //     });
 
-//     console.log(newTLUMenus);
+//     //comsole.log(newTLUMenus);
 
 //     dataProvider3.setRows(newTLUMenus);
 //   })
@@ -1023,7 +1023,7 @@ const currentSelectedMenuPrice = ref("");
 
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
-  console.log(posNo.value);
+  //comsole.log(posNo.value);
   if (
     nowStoreAreaCd.value != undefined ||
     (posNo.value != undefined && posNo.value != 0)
@@ -1061,7 +1061,7 @@ const confirmScreenKey = () => {
   );
   ScreenKeyOrigin.value[index].strScreenName = currentscreenKeyNm.value;
   changeScreenKey.value = false;
-  console.log(ScreenKeyOrigin.value);
+  //comsole.log(ScreenKeyOrigin.value);
   addfor10ScreenKey();
   currentscreenKeyNm.value = "";
   clickedScreenNo.value = "";
@@ -1097,7 +1097,7 @@ const addfor30MenuKeys = () => {
 const addScreenKey = (value) => {
   currentscreenKeyNm.value = "";
   addscreenKey.value = true;
-  console.log(value);
+  //comsole.log(value);
   clickedScreenNo.value = value + 1;
 };
 
@@ -1125,9 +1125,9 @@ const confirmaddScreenKey = () => {
   });
   addscreenKey.value = false;
   addfor10ScreenKey();
-  console.log(ScreenKeyOrigin.value);
+  //comsole.log(ScreenKeyOrigin.value);
   currentscreenKeyNm.value = "";
-  console.log(clickedScreenNo.value);
+  //comsole.log(clickedScreenNo.value);
   showMenuKey(clickedScreenNo.value + (currentsubPage.value - 1) * 10);
 };
 
@@ -1146,7 +1146,7 @@ const prevMenuKey = () => {
         item.intScreenNo == clickedintScreenNo.value
     )
     .forEach((item) => {
-      console.log(item);
+      //comsole.log(item);
 
       const position = item.intKeySeq - (currmenuKeyPage.value - 1) * 30 - 1;
       if (position >= 0 && position < 30) {
@@ -1171,7 +1171,7 @@ const nextMenuKey = () => {
         item.intScreenNo == clickedintScreenNo.value
     )
     .forEach((item) => {
-      console.log(item);
+      //comsole.log(item);
       const position = item.intKeySeq - (currmenuKeyPage.value - 1) * 30 - 1;
       if (position >= 0 && position < 30) {
         items.value[position] = item;
@@ -1182,20 +1182,20 @@ const existMenuKey = ref(false);
 const clickedRealIndex = ref();
 const clickedMenuKeyIndex = ref();
 const saveMenuKeyposition = (index) => {
-  console.log(clickedintScreenNo.value);
-  console.log(index);
-  console.log(items.value);
+  //comsole.log(clickedintScreenNo.value);
+  //comsole.log(index);
+  //comsole.log(items.value);
   clickedMenuKeyIndex.value = index + 1;
   clickedRealIndex.value = (currmenuKeyPage.value - 1) * 30 + index + 1;
-  console.log(clickedRealIndex.value);
+  //comsole.log(clickedRealIndex.value);
 };
 
 const addMenuKey = () => {
-  console.log(clickedMenuKeyIndex.value);
+  //comsole.log(clickedMenuKeyIndex.value);
   if (clickedMenuKeyIndex.value == null) {
     return;
   }
-  console.log(items.value);
+  //comsole.log(items.value);
   items.value[clickedMenuKeyIndex.value] = {
     intKeyNo: 6,
     intKeySeq: clickedRealIndex.value,
@@ -1208,11 +1208,11 @@ const addMenuKey = () => {
       currentSelectedMenuPrice.value.length - 1
     ),
   };
-  console.log(items.value);
-  console.log(MenuKeyList.value);
-  console.log(posNo.value);
-  console.log(clickedintScreenNo.value);
-  console.log(clickedRealIndex.value);
+  //comsole.log(items.value);
+  //comsole.log(MenuKeyList.value);
+  //comsole.log(posNo.value);
+  //comsole.log(clickedintScreenNo.value);
+  //comsole.log(clickedRealIndex.value);
   const foraddIndex = MenuKeyList.value.find(
     (item) =>
       item.intPosNo == posNo.value &&
@@ -1220,7 +1220,7 @@ const addMenuKey = () => {
       item.intKeySeq == clickedRealIndex.value
   );
 
-  console.log(foraddIndex);
+  //comsole.log(foraddIndex);
   if (foraddIndex == undefined) {
     MenuKeyList.value.push({
       intKeyNo: 6,
@@ -1244,15 +1244,15 @@ const addMenuKey = () => {
   }
 
   showMenuKey(clickedintScreenNo.value);
-  console.log(MenuKeyList.value);
+  //comsole.log(MenuKeyList.value);
 };
 
 const addTLUKey = () => {
-  console.log(MenuKeyList.value);
+  //comsole.log(MenuKeyList.value);
   const foraddIndex = MenuKeyList.value.findIndex(
     (item) => item.intKeySeq == clickedRealIndex.value
   );
-  console.log(foraddIndex);
+  //comsole.log(foraddIndex);
   if (foraddIndex == -1) {
     MenuKeyList.value.push({
       intKeyNo: 6,
@@ -1288,7 +1288,7 @@ const showMenus = (value) => {
 };
 const deletekey = () => {
   if (clickedScreenOrMenu.value == false) {
-    console.log(ScreenKeyOrigin.value);
+    //comsole.log(ScreenKeyOrigin.value);
     ScreenKeyOrigin.value = ScreenKeyOrigin.value.filter(
       (item) => item.intScreenNo != clickedintScreenNo.value
     );
@@ -1308,7 +1308,7 @@ const deletekey = () => {
         item.intScreenNo != clickedintScreenNo.value ||
         item.intKeySeq != clickedRealIndex.value
     );
-    console.log(MenuKeyList.value);
+    //comsole.log(MenuKeyList.value);
     showMenuKey(clickedintScreenNo.value);
   }
 };

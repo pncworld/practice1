@@ -32,7 +32,7 @@ const fetchData = async () => {
 
     selectStore.value = res.data.recordsets.flat();
   } catch (error) {
-    console.log(error.message);
+    //comsole.log(error.message);
   }
 };
 

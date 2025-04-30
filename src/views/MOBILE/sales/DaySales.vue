@@ -164,7 +164,7 @@ const daysInKorean = [
   "토요일",
 ];
 const searchButton = () => {
-  console.log("왓냐");
+  //comsole.log("왓냐");
 
   const readsales = async () => {
     if (storeCd.value == undefined || storeCd.value == "0") {

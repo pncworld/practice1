@@ -187,7 +187,7 @@ const hideColumnNow = ref(true);
 const setGroupColumnId = ref("strName");
 const hideColumnsId = ref([]);
 const startDate = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedstartDate.value = e;
 };
 const endDate = (e) => {
@@ -207,7 +207,7 @@ onMounted(async () => {
 
   const res = await getCauseList(userGroup, 0);
   causeList.value = res.data.List;
-  console.log(res);
+  //comsole.log(res);
 });
 
 const loginedstrLang = store.state.userData.lngLanguage;
@@ -247,7 +247,7 @@ const searchButton = async () => {
       "12",
       cause
     );
-    console.log(res);
+    //comsole.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -264,24 +264,24 @@ const selectedStoreAttrs = ref();
 const selectedStoreTeam = ref();
 const selectedStoreSupervisor = ref();
 const lngStoreGroup = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = (e) => {
   selectedStores.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngStoreAttrs = (e) => {
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngStoreTeam = (e) => {
   selectedStoreTeam.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngSupervisor = (e) => {
   selectedStoreSupervisor.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 
 const initGrid = () => {
@@ -292,7 +292,7 @@ const initGrid = () => {
 
 const exportExcel = ref(false);
 
-console.log(store.state.minorCategory);
+//comsole.log(store.state.minorCategory);
 
 const excelButton = () => {
   let condition = "조건 :";
@@ -321,7 +321,7 @@ const excelButton = () => {
     "\n" +
     "사유코드 : " +
     codestr;
-  console.log(documentSubTitle.value);
+  //comsole.log(documentSubTitle.value);
   exportExcel.value = !exportExcel.value;
 };
 

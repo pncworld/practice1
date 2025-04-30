@@ -162,12 +162,12 @@ const selectedstartDate = ref();
 const selectedendDate = ref();
 
 const startDate = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedstartDate.value = e;
 };
 
 const endDate = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedendDate.value = e;
 };
 
@@ -191,25 +191,25 @@ const updateProgid = () => {
     reportCheckData.value = "12";
     setGroupSumCustomColumnId.value = ["dtmDate"];
     setGroupColumnId.value = "strStore,strWeek";
-    console.log(setGroupColumnId.value);
+    //comsole.log(setGroupColumnId.value);
     progId.value = "4";
   } else if (tempSeeDaily.value) {
     reportCheckData.value = "1";
     setGroupSumCustomColumnId.value = ["dtmDate"];
     setGroupColumnId.value = "strWeek";
-    console.log(setGroupColumnId.value);
+    //comsole.log(setGroupColumnId.value);
     progId.value = "2";
   } else if (tempSeeStore.value) {
     reportCheckData.value = "2";
     setGroupSumCustomColumnId.value = ["strWeek"];
     setGroupColumnId.value = "strStore";
-    console.log(setGroupColumnId.value);
+    //comsole.log(setGroupColumnId.value);
     progId.value = "3";
   } else {
     reportCheckData.value = "0";
     setGroupSumCustomColumnId.value = ["dtmDate"];
     setGroupColumnId.value = "";
-    console.log(setGroupColumnId.value);
+    //comsole.log(setGroupColumnId.value);
     progId.value = "1";
   }
 };
@@ -250,7 +250,7 @@ const searchButton = async () => {
       selectedStorearr = selectedStores.value;
     }
 
-    console.log(selectedStorearr);
+    //comsole.log(selectedStorearr);
 
     //요일명 선택 콤보박스
     let selectedWeekDayValue;
@@ -264,9 +264,9 @@ const searchButton = async () => {
       selectedWeekDayValue = selectedWeekDay.value;
     }
 
-    console.log(selectedWeekDayValue);
+    //comsole.log(selectedWeekDayValue);
 
-    console.log(reportCheckData.value);
+    //comsole.log(reportCheckData.value);
 
     const res = await getWeedaySalesReport(
       selectedGroup.value,
@@ -279,13 +279,13 @@ const searchButton = async () => {
       reportCheckData.value,
       selectedWeekDayValue
     );
-    console.log(res);
+    //comsole.log(res);
     rowData.value = res.data.weekdaySales;
 
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    console.log(error);
+    //comsole.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -299,29 +299,29 @@ const selectedStoreTeam = ref();
 const selectedStoreSuperVisor = ref();
 const lngStoreGroup = (e) => {
   initGrid();
-  console.log(e);
+  //comsole.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = (e) => {
   initGrid();
   selectWeekDay.value = null;
   selectedStores.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngStoreAttrs = (e) => {
   initGrid();
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngSupervisor = (e) => {
   initGrid();
   selectedStoreSuperVisor.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngStoreTeam = (e) => {
   initGrid();
   selectedStoreTeam.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 
 /* 매입사 콤보박스 */
@@ -334,19 +334,19 @@ onMounted(async () => {
 
   const res = await getWeekDayList(87, "01");
   weekDay.value = res.data.weekDayList;
-  console.log(weekDay.value);
+  //comsole.log(weekDay.value);
 });
 
 // watch([selectedGroup, selectedStores], async () => {
-//     console.log(selectedGroup.value, selectedStores.value)
+//     //comsole.log(selectedGroup.value, selectedStores.value)
 //     const res = await getWeekDayList(87, '01')
 //     weekDay.value = res.data.getWeekDayList
-//     console.log(weekDay.value)
+//     //comsole.log(weekDay.value)
 // })
 
 watch(selectWeekDay, (newValue) => {
   selectedWeekDay.value = newValue ? newValue.strDcode : "";
-  console.log(selectedWeekDay.value);
+  //comsole.log(selectedWeekDay.value);
 });
 
 /*
@@ -363,7 +363,7 @@ const exportExcel = ref(false);
 const excelButton = () => {
   documentSubTitle.value =
     selectedExcelDate.value + "\n" + selectedExcelStore.value;
-  console.log(documentSubTitle.value); // 맑음 소스 pickStorePlural.vue 소스의 excelStore 받아야 함.
+  //comsole.log(documentSubTitle.value); // 맑음 소스 pickStorePlural.vue 소스의 excelStore 받아야 함.
   // 엑셀 기능 실행
   exportExcel.value = !exportExcel.value;
 };
@@ -373,11 +373,11 @@ const documentSubTitle = ref("");
 const selectedExcelDate = ref("");
 const excelDate = (e) => {
   selectedExcelDate.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const selectedExcelStore = ref("");
 const excelStore = (e) => {
   selectedExcelStore.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 </script>

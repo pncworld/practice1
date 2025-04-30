@@ -138,7 +138,7 @@ onMounted(async () => {
   sublist.value = res.data.List;
 
   const res2 = await isDynamicGrid(store.state.userData.lngStoreGroup);
-  console.log(res2);
+  //comsole.log(res2);
   //isDynamicGrid2.value = res2.data.List[0].strDynamicGrid;
   if (res2.data.List[0].strDynamicGrid == "Y") {
     isDynamicGrid2.value = "Y";
@@ -157,7 +157,7 @@ const getSub = async (e) => {
   } else if (e.target.value == "02") {
     const res = await getStoreArea(store.state.userData.lngStoreGroup, 0);
     sublist.value = res.data.List;
-    console.log(sublist.value);
+    //comsole.log(sublist.value);
   } else if (e.target.value == "03") {
     const res = await getSubLease(store.state.userData.lngStoreGroup);
     sublist.value = res.data.List;
@@ -165,12 +165,12 @@ const getSub = async (e) => {
   selectedCode.value = -1;
 };
 const startDate = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedstartDate.value = e;
 };
 
 const endDate = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedendDate.value = e;
 };
 
@@ -210,17 +210,17 @@ const searchButton = async () => {
     //그리드 갱신
     reload.value = !reload.value;
 
-    console.log(
-      groupCd.value,
-      storeCd.value,
-      selectedstartDate.value,
-      selectedendDate.value,
-      tempSeeDaily.value ? 1 : 0,
-      isDynamicGrid2.value,
-      selectedMainCode.value,
-      selectedCode.value,
-      setCnt.value
-    );
+    //comsole.log(
+    // groupCd.value,
+    //     storeCd.value,
+    //     selectedstartDate.value,
+    //     selectedendDate.value,
+    //     tempSeeDaily.value ? 1 : 0,
+    //     isDynamicGrid2.value,
+    //     selectedMainCode.value,
+    //     selectedCode.value,
+    //     setCnt.value
+    //   );
     const res = await getSalesByPaymentType2Report(
       groupCd.value,
       storeCd.value,
@@ -232,13 +232,13 @@ const searchButton = async () => {
       selectedCode.value,
       setCnt.value
     );
-    console.log(res);
+    //comsole.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    console.log(error);
+    //comsole.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -250,17 +250,17 @@ const selectedStoreAttr = ref();
 
 const lngStoreCodes = (e) => {
   initGrid();
-  console.log(e);
+  //comsole.log(e);
   storeCd.value = e;
 };
 const lngStoreGroup = (e) => {
-  console.log(e);
+  //comsole.log(e);
   groupCd.value = e;
 };
 const lngStoreAttrs = (e) => {
   initGrid();
   selectedStoreAttr.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 
 /*
@@ -309,7 +309,7 @@ const excelButton = () => {
     cond +
     "\n" +
     cond2;
-  console.log(documentSubTitle.value);
+  //comsole.log(documentSubTitle.value);
   // 엑셀 기능 실행
   exportExcel.value = !exportExcel.value;
 };
@@ -319,12 +319,12 @@ const documentSubTitle = ref("");
 const selectedExcelDate = ref("");
 const excelDate = (e) => {
   selectedExcelDate.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const selectedExcelStore = ref("");
 const excelStore = (e) => {
   selectedExcelStore.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 
 const setCnt = ref(0);

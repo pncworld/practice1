@@ -125,27 +125,27 @@ const setGroupFooter = ref(false);
 const hideColumnsId = ref(["strStore"]);
 const lngStoreGroup = (e) => {
   lngstoregroup.value = e;
-  console.log(e);
+  //comsole.log(e);
   initGrid();
 };
 const lngStoreAttrs = (e) => {
   lngstoreattr.value = e;
-  console.log(e);
+  //comsole.log(e);
   initGrid();
 };
 const lngStoreTeam = (e) => {
   lngstoreteam.value = e;
-  console.log(e);
+  //comsole.log(e);
   initGrid();
 };
 const lngSupervisor = (e) => {
   lngstoresupervisor.value = e;
-  console.log(e);
+  //comsole.log(e);
   initGrid();
 };
 const lngStoreCode = (e) => {
   lngstorecode.value = e;
-  console.log(e);
+  //comsole.log(e);
   initGrid();
 };
 
@@ -154,7 +154,7 @@ const initCheckBox = ref(false);
 const setGroupColumnId = ref("strStore");
 const store = useStore();
 const reload = ref(false);
-console.log(store);
+//comsole.log(store);
 
 const afterSearch = ref(false);
 const searchButton = async () => {
@@ -184,15 +184,15 @@ const searchButton = async () => {
       progid.value = 2;
     }
     reload.value = !reload.value;
-    console.log(lngstoregroup.value);
-    console.log(lngstoreattr.value);
-    console.log(lngstoreteam.value);
-    console.log(lngstoresupervisor.value);
-    console.log(lngstorecode.value);
-    console.log(selectedstartDate.value);
-    console.log(selectedendDate.value);
-    console.log(barea);
-    console.log(checked.value);
+    //comsole.log(lngstoregroup.value);
+    //comsole.log(lngstoreattr.value);
+    //comsole.log(lngstoreteam.value);
+    //comsole.log(lngstoresupervisor.value);
+    //comsole.log(lngstorecode.value);
+    //comsole.log(selectedstartDate.value);
+    //comsole.log(selectedendDate.value);
+    //comsole.log(barea);
+    //comsole.log(checked.value);
     const res = await getPlanbyDays(
       lngstoregroup.value,
       lngstoreattr.value,
@@ -204,7 +204,7 @@ const searchButton = async () => {
       barea,
       checked.value
     );
-    console.log(res);
+    //comsole.log(res);
 
     rowData.value = res.data.List;
     if (rowData.value.length > 0) {
@@ -225,7 +225,7 @@ const storeCd = ref();
 const dtmDate = ref();
 const init = ref(false);
 const selectedStoreCd = (e) => {
-  console.log(e);
+  //comsole.log(e);
   storeCd.value = e;
 
   initGrid();
@@ -234,7 +234,7 @@ const selectedStoreCd = (e) => {
   init.value = !init.value;
 };
 const selectedGroupCd = (e) => {
-  console.log(e);
+  //comsole.log(e);
   groupCd.value = e;
 };
 const rowData = ref([]);
@@ -244,7 +244,7 @@ const rowData4 = ref([]);
 
 const selectedPosNo = ref();
 const posNo = (e) => {
-  console.log(e);
+  //comsole.log(e);
   if (e == null) {
     selectedPosNo.value = 0;
   } else {
@@ -254,7 +254,7 @@ const posNo = (e) => {
 
 const disCountCd = ref("");
 const DisCountCd = (e) => {
-  console.log(e);
+  //comsole.log(e);
   if (e == null) {
     disCountCd.value = 0;
   } else {
@@ -305,7 +305,7 @@ const excelButton = () => {
   exporttoExcel.value = !exporttoExcel.value;
 };
 const initGrid = () => {
-  console.log(rowData.value);
+  //comsole.log(rowData.value);
   if (rowData.value.length > 0) {
     rowData.value = [];
   }

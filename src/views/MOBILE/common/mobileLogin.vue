@@ -120,7 +120,7 @@ const userData = store.state.userData;
 const login2 = async () => {
   // /store.state.loading2 = true;
 
-  console.log(saveID.value);
+  //comsole.log(saveID.value);
   if (saveID.value) {
     localStorage.setItem("username", username.value);
     localStorage.setItem("saveID", saveID.value.toString()); // boolean 값 그대로 저장
@@ -133,14 +133,14 @@ const login2 = async () => {
   store.state.selectedCategoryId = null;
   try {
     const response = await mobileLogin(username.value, password.value);
-    console.log(response);
+    //comsole.log(response);
 
     if (response.data.RESULT_CD == "00") {
       // store.state.userData = response.data.loginSession[0];
-      // console.log(store.state.userData);
+      // //comsole.log(store.state.userData);
       store.dispatch("updateUserData", response.data.loginSession[0]);
       store.dispatch("setToken", response.data.loginSession[0].SessionToken);
-      console.log(response.data.loginSession[0]);
+      //comsole.log(response.data.loginSession[0]);
       message.value = "로그인 성공";
       const readPrograms = async () => {
         const response = await getMobileProgList(
@@ -157,7 +157,7 @@ const login2 = async () => {
           PROGID: item.PROGRAM_ID,
           PROGNM: item.PROGRAM_NM,
         }));
-        console.log(result);
+        //comsole.log(result);
 
         const result3 = response.data.List3;
 
@@ -176,7 +176,7 @@ const login2 = async () => {
       //     store.state.userData.lngSupervisor
       //   );
 
-      //   console.log(response);
+      //   //comsole.log(response);
       //   const result0 = response.data.storeGroup;
       //   const result1 = response.data.storeAttr;
       //   const result2 = response.data.store;
@@ -212,7 +212,7 @@ onMounted(async () => {
     const token = store.state.StoreToken;
     const res = await alreadyMobileLogined(token);
 
-    console.log(res);
+    //comsole.log(res);
     store.dispatch("updateUserData", res.data.List[0]);
     store.dispatch("setToken", res.data.List[0].SessionToken);
 
@@ -230,7 +230,7 @@ onMounted(async () => {
         PROGNM: item.PROGRAM_NM,
       })
     );
-    console.log(result);
+    //comsole.log(result);
 
     const result3 = response.data.List3;
 
@@ -246,9 +246,9 @@ onMounted(async () => {
   }
 
   store.state.inActiveBackGround = false;
-  console.log(localStorage.getItem("saveID"));
+  //comsole.log(localStorage.getItem("saveID"));
   if (localStorage.getItem("saveID") === "true") {
-    console.log(localStorage.getItem("username"));
+    //comsole.log(localStorage.getItem("username"));
     saveID.value = true;
     username.value = localStorage.getItem("username");
   }

@@ -238,7 +238,7 @@ const addRow = () => {
 const nowStoreAreaCd = ref();
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
-  //console.log(nowStoreAreaCd.value)
+  ////comsole.log(nowStoreAreaCd.value)
 };
 
 const nowStoreCd = ref();
@@ -328,7 +328,7 @@ const searchButton = async () => {
       nowStoreAreaCd.value,
       posNo.value
     );
-    console.log(res);
+    //comsole.log(res);
     commonKeyList.value = res.data.AGE;
 
     commonKeyList.value = commonKeyList.value.map((item) => {
@@ -340,7 +340,7 @@ const searchButton = async () => {
     rowData.value = [...commonKeyList.value];
     updatedrowData.value = [...commonKeyList.value];
     KeyList.value = res.data.AGEKEY;
-    console.log(KeyList.value);
+    //comsole.log(KeyList.value);
     if (KeyList.value.length < 16) {
       for (var i = 0; i < 16; i++) {
         const tindex = KeyList.value.findIndex(
@@ -351,7 +351,7 @@ const searchButton = async () => {
         }
       }
     }
-    console.log(KeyList.value);
+    //comsole.log(KeyList.value);
     confirmitem1.value = JSON.parse(JSON.stringify(commonKeyList.value));
     confirmitem2.value = JSON.parse(JSON.stringify(KeyList.value));
     const res2 = await getAllScreenList(
@@ -366,7 +366,7 @@ const searchButton = async () => {
   } catch (error) {
     afterSearch.value = false;
   } finally {
-    //console.log(KeyList.value)
+    ////comsole.log(KeyList.value)
     deleteException.value = false;
     store.state.loading = false; // 로딩 상태 종료
     modified.value = false;
@@ -394,7 +394,7 @@ const calculateMaxSubCode = () => {
 const updatedrowData = ref([]);
 const updatedRowData = (newValue) => {
   updatedrowData.value = newValue;
-  console.log(updatedrowData.value);
+  //comsole.log(updatedrowData.value);
 };
 
 let targetItemIndex2;
@@ -402,7 +402,7 @@ const onMove = (evt) => {
   // 예: 드래그 중 이동할 때의 조건 등을 설정할 수 있음
   if (changeMode.value == false) {
     targetItemIndex2 = Array.from(evt.from.children).indexOf(evt.related);
-    //console.log(targetItemIndex2)
+    ////comsole.log(targetItemIndex2)
     return false;
   } else {
     return true;
@@ -415,15 +415,15 @@ const onEnd = (evt) => {
     const oldIndex = evt.oldIndex; // 드래그된 아이템의 기존 인덱스
 
     const swappedItems = [...KeyList.value]; // items를 복사
-    console.log(oldIndex);
-    console.log(targetItemIndex2);
+    //comsole.log(oldIndex);
+    //comsole.log(targetItemIndex2);
     const temp = swappedItems[oldIndex];
 
     swappedItems[oldIndex] = swappedItems[targetItemIndex2];
 
     swappedItems[targetItemIndex2] = temp;
 
-    console.log(swappedItems);
+    //comsole.log(swappedItems);
     // 배열을 업데이트
     //   items.value = swappedItems;
 
@@ -439,7 +439,7 @@ const onEnd = (evt) => {
     }));
   }
   clickedKey1.value = targetItemIndex2;
-  console.log("KeyList:", KeyList.value);
+  //comsole.log("KeyList:", KeyList.value);
 };
 
 const saveButton = async () => {
@@ -512,7 +512,7 @@ const saveButton = async () => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       store.state.loading = true;
-      //console.log(updatedrowData.value)
+      ////comsole.log(updatedrowData.value)
       const lngCodes = updatedrowData.value
         .filter((item) => item.sort != "법인용" && item.deleted != true)
         .map((item) => item.lngCode);
@@ -529,9 +529,9 @@ const saveButton = async () => {
         .filter((item) => item.lngKeyscrNo != undefined)
         .map((item) => item.lngKeyscrNo);
 
-      console.log(intKeySeqs.join(","));
-      console.log(strKeyNames.join(","));
-      console.log(lngKeyscrNos.join(","));
+      //comsole.log(intKeySeqs.join(","));
+      //comsole.log(strKeyNames.join(","));
+      //comsole.log(lngKeyscrNos.join(","));
 
       try {
         const res2 = await saveAllAge(
@@ -545,7 +545,7 @@ const saveButton = async () => {
           strKeyNames.join(","),
           lngKeyscrNos.join(",")
         );
-        console.log(res2);
+        //comsole.log(res2);
       } catch (error) {
         console.error("API 호출 중 오류 발생:", error);
       } finally {
@@ -578,14 +578,14 @@ const deleteException = ref(false);
 const clickedstrName = ref();
 const clickedCode = ref();
 const selcetedrowData = (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
   clickedstrName.value = newValue[2];
   clickedCode.value = newValue[1];
   addKey();
 };
 
 const clickedRowData = (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
   if (newValue[0] == "법인용") {
     deleteException.value = true;
   } else {
@@ -623,8 +623,8 @@ const currentpaymentCd = ref(3);
 
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
-  // console.log(posNo.value)
-  // console.log(nowStoreAreaCd.value)
+  // //comsole.log(posNo.value)
+  // //comsole.log(nowStoreAreaCd.value)
   if (
     nowStoreAreaCd.value != undefined ||
     (posNo.value != undefined && posNo.value != 0)
@@ -655,7 +655,7 @@ const addKey = () => {
     lngKeyscrNo: clickedCode.value,
   };
 
-  console.log(KeyList.value);
+  //comsole.log(KeyList.value);
 };
 
 const deletekey = () => {

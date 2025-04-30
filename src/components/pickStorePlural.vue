@@ -233,7 +233,7 @@ watch(
     //     "lngStoreCodes",
     //     store.state.storeCd.map((item) => item.lngStoreCode).join(",")
     //   );
-    //   console.log(store.state.storeCd);
+    //   //comsole.log(store.state.storeCd);
     //   emit("lngStoreAttrs", 0);
     //   emit("lngSupervisor", 0);
     //   emit("lngStoreTeam", 0);
@@ -275,7 +275,7 @@ watch(
 onMounted(() => {
   storeGroup.value = store.state.storeGroup;
   storeType.value = store.state.storeType;
-  console.log(store.state.storeType);
+  //comsole.log(store.state.storeType);
   storeTeam.value = store.state.storeTeamCode;
   storeSuperVisor.value = store.state.storeSupervisor;
   rowData.value = store.state.storeCd;
@@ -291,7 +291,7 @@ onMounted(() => {
       "lngStoreCodes",
       store.state.storeCd.map((item) => item.lngStoreCode).join(",")
     );
-    console.log(store.state.storeCd);
+    //comsole.log(store.state.storeCd);
 
     emit("lngStoreAttrs", 0);
     emit("lngSupervisor", 0);

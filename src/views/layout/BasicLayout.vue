@@ -259,7 +259,7 @@ const logout = () => {
   sessionStorage.clear();
   window.location.href = "/";
 
-  console.log(store.state);
+  //comsole.log(store.state);
 };
 
 const isMenu = ref(true);
@@ -289,7 +289,7 @@ const emittab = async (e) => {
 };
 
 const activeTab = (e) => {
-  console.log(e);
+  //comsole.log(e);
   //store.state.activeTab2 = e;
   store.dispatch("saveActiveTab", e);
   currentActiveTab.value = e;
@@ -297,8 +297,8 @@ const activeTab = (e) => {
 
 const removedtabId = ref();
 const removeTab = (tab) => {
-  console.log(tab);
-  console.log(tabs.value);
+  //comsole.log(tab);
+  //comsole.log(tabs.value);
   tabs.value = tabs.value.filter(
     (item) => item.lngProgramID != tab.lngProgramID
   );
@@ -327,8 +327,8 @@ const removeTab = (tab) => {
 
 const reLoad = () => {
   // window.location.reload(); // 페이지 새로 고침
-  console.log(currentActiveTab.value);
-  console.log(tabs.value);
+  //comsole.log(currentActiveTab.value);
+  //comsole.log(tabs.value);
   if (
     currentActiveTab.value &&
     (tabs.value.length == 0 || currentActiveTab.value.lngProgramID == "")

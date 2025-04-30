@@ -98,7 +98,7 @@ const SEARCHNOW = async (e) => {
     store.state.loading2 = false;
   }
 
-  console.log(rowData.value);
+  //comsole.log(rowData.value);
 };
 onMounted(() => {});
 </script>

@@ -21,7 +21,7 @@ onMounted(() => {
   emit("excelDate", "매출일자 : " + selectedDate.value);
 });
 const emitDate = () => {
-  console.log(selectedDate.value);
+  //comsole.log(selectedDate.value);
   emit("dateValue", selectedDate.value);
   emit("year", selectedDate.value.split("-")[0]);
   emit("month", Number(selectedDate.value.split("-")[1]));

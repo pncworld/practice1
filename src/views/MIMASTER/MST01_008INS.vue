@@ -172,9 +172,9 @@ const searchButton = async () => {
   //   }
   store.state.loading = true;
   try {
-    console.log(groupCd.value);
-    console.log(nowStoreCd.value);
-    console.log(clickedStoreNm.value);
+    //comsole.log(groupCd.value);
+    //comsole.log(nowStoreCd.value);
+    //comsole.log(clickedStoreNm.value);
 
     let res = await getMenuLists(groupCd.value, nowStoreCd.value);
     rowData.value = res.data.MAINMENU;
@@ -182,8 +182,8 @@ const searchButton = async () => {
 
     confirmData.value = rowData.value;
     confirmData2.value = rowData2.value;
-    console.log(res);
-    console.log(rowData2.value);
+    //comsole.log(res);
+    //comsole.log(rowData2.value);
   } catch (error) {
     afterSearch.value = false;
   } finally {
@@ -213,8 +213,8 @@ const addRow2 = () => {
     currentsubNo.value = selectedlngCode.value * 100;
   }
   addbutton2.value = !addbutton2.value;
-  console.log(currentsubNo.value + 1);
-  console.log(filteredRowData2.value);
+  //comsole.log(currentsubNo.value + 1);
+  //comsole.log(filteredRowData2.value);
   addrowDefault.value = (currentsubNo.value + 1).toString() + ",";
   addrowDefault.value += selectedlngCode.value;
   filteredRowData2.value.push({
@@ -228,21 +228,21 @@ const selectedlngCode = ref();
 const changeRow = ref();
 const changeValue = ref("0");
 const clickedRowData = (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
   filteredRowData2.value = rowData2.value.filter(
     (item) => item.lngMajor == newValue[0]
   );
   selectedlngCode.value = newValue[0];
   changeRow.value = newValue.index;
-  console.log(changeRow.value);
+  //comsole.log(changeRow.value);
 };
 const clickedRowData2 = (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
 };
 
 const updatedRowData = (newValue) => {
-  console.log(newValue);
-  console.log(filteredRowData2.value);
+  //comsole.log(newValue);
+  //comsole.log(filteredRowData2.value);
   rowData2.value = rowData2.value.filter(
     (item) => Number(item.lngMajor) !== Number(selectedlngCode.value)
   );
@@ -250,17 +250,17 @@ const updatedRowData = (newValue) => {
   for (var i = 0; i < newValue.length; i++) {
     rowData2.value.push(newValue[i]);
   }
-  console.log(rowData2.value);
-  console.log(newValue.length);
+  //comsole.log(rowData2.value);
+  //comsole.log(newValue.length);
 };
 const forsaveRowData = ref();
 const updatedRowData1 = (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
   const validate = newValue.map((item) => item.lngCode);
   const duplicates = validate.filter(
     (item, index) => validate.indexOf(item) !== index
   );
-  console.log(changeValue.value);
+  //comsole.log(changeValue.value);
   if (duplicates.length > 0) {
     changeValue.value = "0";
     Swal.fire({
@@ -275,7 +275,7 @@ const updatedRowData1 = (newValue) => {
     });
   }
   forsaveRowData.value = newValue;
-  console.log(forsaveRowData.value);
+  //comsole.log(forsaveRowData.value);
 };
 const deleterow = ref(false);
 const deleterow2 = ref(false);
@@ -298,7 +298,7 @@ const saveButton = () => {
       });
       return;
     }
-    console.log(rowData2.value);
+    //comsole.log(rowData2.value);
     const length =
       (forsaveRowData.value?.filter(
         (item) =>
@@ -345,7 +345,7 @@ const saveButton = () => {
       if (result.isConfirmed) {
         store.state.loading = true;
         try {
-          console.log(rowData2.value);
+          //comsole.log(rowData2.value);
           let mainMenulngCode;
           let mainMenuNm;
           let deletedmainMenuCd;
@@ -367,18 +367,18 @@ const saveButton = () => {
               .filter((item) => item.deleted == true)
               .map((item) => Number(item.lngCode));
           }
-          console.log(forsaveRowData.value);
-          console.log(mainMenulngCode);
-          console.log(mainMenuNm);
+          //comsole.log(forsaveRowData.value);
+          //comsole.log(mainMenulngCode);
+          //comsole.log(mainMenuNm);
 
-          console.log(deletedmainMenuCd);
+          //comsole.log(deletedmainMenuCd);
           if (deletedmainMenuCd != undefined) {
             rowData2.value = rowData2.value.filter(
               (item) => !deletedmainMenuCd.includes(Number(item.lngMajor))
             );
           }
 
-          console.log(rowData2.value);
+          //comsole.log(rowData2.value);
           const subMenulngCode = rowData2.value
             .filter((item) => item.deleted !== true)
             .map((item) => item.lngCode);
@@ -397,9 +397,9 @@ const saveButton = () => {
             subMenuNm.join(","),
             subMenuMajorCode.join(",")
           );
-          console.log(res);
+          //comsole.log(res);
         } catch (error) {
-          console.log(error);
+          //comsole.log(error);
         } finally {
           store.state.loading = false;
           Swal.fire({

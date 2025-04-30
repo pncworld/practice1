@@ -790,11 +790,11 @@ onMounted(async () => {
 
   const res = await getCommonList(402);
 
-  console.log(res);
+  //comsole.log(res);
   labelsData.value = [["", ...res.data.List.map((item) => item.strDName)]];
   valuesData.value = [["", ...res.data.List.map((item) => item.strDCode)]];
 
-  console.log(labelsData.value);
+  //comsole.log(labelsData.value);
   printTypeList.value = res.data.List;
 });
 
@@ -886,7 +886,7 @@ const showMenus = async (value) => {
     hidesub.value = false;
 
     const res = await getMenuCodeEnroll(groupCd.value, 0);
-    console.log(res);
+    //comsole.log(res);
     rowData2.value = res.data.MENULIST;
     updatedList2.value = JSON.parse(JSON.stringify(rowData2.value));
     const res2 = await getMenuList(groupCd.value, 0);
@@ -913,7 +913,7 @@ const hidesub = ref(false);
 const nowStoreAreaCd = ref();
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
-  //   console.log(nowStoreAreaCd.value);
+  //   //comsole.log(nowStoreAreaCd.value);
 };
 const updatedRowData = (newValue) => {
   updatedList.value = newValue;
@@ -921,11 +921,11 @@ const updatedRowData = (newValue) => {
 
 const forSaveMenu = ref([]);
 const updatedRowData2 = (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
   updatedList2.value = newValue;
 };
 const updatedRowData3 = (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
   updatedList3.value = newValue;
 };
 
@@ -1028,16 +1028,16 @@ const addRow = () => {
   addrowDefault.value = clickedGroupNm.value + "," + groupCd.value;
   addRows.value = !addRows.value;
   //   addrowDefault.value = userData.strStoreGroupName;
-  //   console.log(updatedList.value);
+  //   //comsole.log(updatedList.value);
   //   if (updatedList.value == undefined || updatedList.value[0] == undefined) {
   //     addrowDefault.value += "," + 1;
   //   } else {
   //     const maxKdsCornerNum = Math.max(
   //       ...updatedList.value.map((item) => item.kdsCornerNum)
   //     );
-  //     console.log(maxKdsCornerNum);
+  //     //comsole.log(maxKdsCornerNum);
   //     addrowDefault.value += "," + (maxKdsCornerNum + 1);
-  //     console.log(addrowDefault.value);
+  //     //comsole.log(addrowDefault.value);
   //   }
 };
 const rowData = ref([]);
@@ -1083,7 +1083,7 @@ const deleteRow = () => {
 // };
 
 const selcetedrowData = (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
 };
 const searchButton = async () => {
   changeMode.value = false;
@@ -1108,7 +1108,7 @@ const searchButton = async () => {
     if (currentMenu.value == 1) {
       res = await getKitchenGroupList(groupCd.value);
 
-      console.log(res);
+      //comsole.log(res);
       rowData.value = res.data.List;
       //   res = await getKDSList(groupCd.value);
       //   KDSList.value = res.data.KDS;
@@ -1119,21 +1119,21 @@ const searchButton = async () => {
       afterSearch.value = true;
     } else if (currentMenu.value == 2) {
       const res = await getMenuCodeEnroll(groupCd.value, 0);
-      console.log(res);
+      //comsole.log(res);
       rowData2.value = res.data.MENULIST;
       updatedList2.value = JSON.parse(JSON.stringify(rowData2.value));
       confirmitem2.value = JSON.parse(JSON.stringify(rowData2.value));
       // updatedList2.value = rowData.value;
       afterSearch2.value = true;
     } else {
-      console.log(groupCd.value, nowStoreCd.value, nowStoreAreaCd.value);
+      //comsole.log(groupCd.value, nowStoreCd.value, nowStoreAreaCd.value);
       const res = await getKitchenPortList(
         groupCd.value,
         nowStoreCd.value,
         nowStoreAreaCd.value
       );
 
-      console.log(res);
+      //comsole.log(res);
 
       rowData3.value = res.data.List;
       updatedList3.value = JSON.parse(JSON.stringify(rowData3.value));
@@ -1141,10 +1141,10 @@ const searchButton = async () => {
       afterSearch3.value = true;
     }
   } catch (error) {
-    console.log(error);
+    //comsole.log(error);
     store.state.loading = false;
   } finally {
-    console.log(KDSList.value);
+    //comsole.log(KDSList.value);
 
     ischecked.value = false;
 
@@ -1170,7 +1170,7 @@ const setSubCd = (e) => {
   const name = e.target.name;
   const value = e.target.value;
   if (name == "lngMainGroup") {
-    console.log(SubMenuGroup.value);
+    //comsole.log(SubMenuGroup.value);
     filteredSubMenuGroup.value = SubMenuGroup.value.filter(
       (item) => item.sublngMajor == forsearchMain.value
     );
@@ -1327,7 +1327,7 @@ const saveButton = async () => {
             store.state.userData.loginID
           );
         } else if (currentMenu.value == 2) {
-          console.log(forSaveMenu.value);
+          //comsole.log(forSaveMenu.value);
           const filteredSave = updatedList2.value.filter((_, index) =>
             forSaveMenu.value.includes(index)
           );
@@ -1453,7 +1453,7 @@ const saveButton = async () => {
           );
         }
 
-        console.log(res);
+        //comsole.log(res);
       } catch (error) {
       } finally {
         store.state.loading = false;
@@ -1476,14 +1476,14 @@ const tempDisabled2 = ref(true);
 const forDeleteRows = ref([]);
 const allStateRows = (e) => {
   forDeleteRows.value = e.deleted;
-  console.log(forDeleteRows.value);
+  //comsole.log(forDeleteRows.value);
 };
 const allStateRows2 = (e) => {
   forSaveMenu.value = e.updated;
-  console.log(e);
+  //comsole.log(e);
 };
 const sendRowState = (e) => {
-  console.log(e);
+  //comsole.log(e);
   currentRowState.value = e;
 
   if (e == "created") {
@@ -1497,11 +1497,11 @@ const clickedRowData = (newValue) => {
     return;
   }
   afterClick.value = true;
-  console.log(newValue);
+  //comsole.log(newValue);
   clickedNo.value = newValue[1];
   clickedNm.value = newValue[2];
   //changeRow.value = newValue.index;
-  console.log(changeRow.value);
+  //comsole.log(changeRow.value);
   tempDisabled2.value = false;
 };
 const clickedRowData2 = (newValue) => {
@@ -1509,22 +1509,22 @@ const clickedRowData2 = (newValue) => {
     return;
   }
   afterClick.value = false;
-  //   console.log(newValue[16]);
-  console.log(newValue);
+  //   //comsole.log(newValue[16]);
+  //comsole.log(newValue);
   selectedmenuCode.value = newValue[0];
   selectedmenuNm.value = newValue[1];
   selectedKitchenGroup.value = newValue[16];
   //   clickedNo.value = newValue[1];
   //   clickedNm.value = newValue[2];
   //   //changeRow.value = newValue.index;
-  //   console.log(changeRow.value);
+  //   //comsole.log(changeRow.value);
 };
 const clickedRowData3 = (newValue) => {
   if (newValue == undefined) {
     return;
   }
   afterClick3.value = false;
-  console.log(newValue);
+  //comsole.log(newValue);
   gridValue1.value = newValue[3];
   gridValue2.value = newValue[4];
   gridValue3.value = newValue[5];
@@ -1554,7 +1554,7 @@ const clickedRowData3 = (newValue) => {
 
 // const handlePosNo = (newValue) => {
 //   posNo.value = newValue;
-//   console.log(posNo.value);
+//   //comsole.log(posNo.value);
 //   if (nowStoreAreaCd.value != undefined || posNo.value != undefined) {
 //     searchButton();
 //   }

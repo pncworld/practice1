@@ -254,16 +254,16 @@ const handleStoreCd = (newValue) => {
   gridvalue7.value = "";
   storeCd.value = newValue;
   clickStoreCd.value = newValue;
-  console.log(newValue);
+  //comsole.log(newValue);
 };
 const updateRow = ref([]);
 const updatedRowData = (newValue) => {
   updateRow.value = newValue;
-  console.log(newValue);
+  //comsole.log(newValue);
 };
 
 const makeToFixed2 = (e) => {
-  console.log(e.target.value);
+  //comsole.log(e.target.value);
   if (!isNaN(Number(e.target.value))) {
     gridvalue5.value = Number(e.target.value).toFixed(2);
   }
@@ -312,7 +312,7 @@ const searchButton = async () => {
     rowData.value = res.data.CARDLIST;
     storeList.value = res.data.STOREINFO;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
-    console.log(res);
+    //comsole.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -336,7 +336,7 @@ const storeNm = (newValue) => {
 };
 
 const saveButton = async () => {
-  console.log(updateRow.value);
+  //comsole.log(updateRow.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -394,7 +394,7 @@ const saveButton = async () => {
     })
     .reduce((acc, count) => acc + count, 0); // 모든 그룹의 중복 개수를 합산
 
-  console.log(duplicateCount);
+  //comsole.log(duplicateCount);
 
   if (duplicateCount > 0) {
     Swal.fire({
@@ -479,7 +479,7 @@ const saveButton = async () => {
           deleteStoreCd.join(","),
           deleteCode.join(",")
         );
-        console.log(res);
+        //comsole.log(res);
         Swal.fire({
           title: "저장 되었습니다.",
           confirmButtonText: "확인",

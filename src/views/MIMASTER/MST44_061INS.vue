@@ -304,7 +304,7 @@ const hidesub = ref(false);
 const nowStoreAreaCd = ref();
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
-  console.log(nowStoreAreaCd.value);
+  //comsole.log(nowStoreAreaCd.value);
 };
 const updatedRowData = (newValue) => {
   updatedList.value = newValue;
@@ -312,7 +312,7 @@ const updatedRowData = (newValue) => {
 
 const forSaveMenu = ref([]);
 const updatedRowData2 = (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
   if (currentMenu.value == true) {
     forSaveMenu.value = [];
     updatedList2.value = newValue;
@@ -394,16 +394,16 @@ const addRow = () => {
   }
   addRows.value = !addRows.value;
   addrowDefault.value = userData.strStoreGroupName;
-  console.log(updatedList.value);
+  //comsole.log(updatedList.value);
   if (updatedList.value == undefined || updatedList.value[0] == undefined) {
     addrowDefault.value += "," + 1;
   } else {
     const maxKdsCornerNum = Math.max(
       ...updatedList.value.map((item) => item.kdsCornerNum)
     );
-    console.log(maxKdsCornerNum);
+    //comsole.log(maxKdsCornerNum);
     addrowDefault.value += "," + (maxKdsCornerNum + 1);
-    console.log(addrowDefault.value);
+    //comsole.log(addrowDefault.value);
   }
 };
 const rowData = ref([]);
@@ -436,7 +436,7 @@ const copyButton = () => {
 };
 
 const selcetedrowData = (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
 };
 const searchButton = async () => {
   changeMode.value = false;
@@ -470,7 +470,7 @@ const searchButton = async () => {
       KDSSettingList.value = res.data.KDSSETTINGLIST;
       checked.value = res.data.CHECK;
       kdsList.value = res.data.KDS;
-      console.log(KDSSettingList.value);
+      //comsole.log(KDSSettingList.value);
       for (var i = 0; i < checked.value.length; i++) {
         const tlngCode = checked.value[i].lngCode;
         const tCornerNm = checked.value[i].kdsCornerNum;
@@ -490,15 +490,15 @@ const searchButton = async () => {
       MenuGroup.value = res.data.MAINGROUP;
       SubMenuGroup.value = res.data.SUBGROUP;
 
-      console.log(MenuGroup.value);
-      console.log(SubMenuGroup.value);
-      console.log(checked.value);
+      //comsole.log(MenuGroup.value);
+      //comsole.log(SubMenuGroup.value);
+      //comsole.log(checked.value);
       afterSearch2.value = true;
     }
   } catch (error) {
-    console.log(error);
+    //comsole.log(error);
   } finally {
-    console.log(KDSList.value);
+    //comsole.log(KDSList.value);
     // if (ischecked.value == true) {
     //   ischecked.value = false;
     //   setTimeout(() => {
@@ -539,7 +539,7 @@ watch(ischecked, () => {
     searchSpecialColId.value.push("checkbox" + i);
   }
   if (ischecked.value == true) {
-    console.log(searchSpecialColId.value);
+    //comsole.log(searchSpecialColId.value);
 
     searchSpecialCond.value = false;
   } else {
@@ -818,10 +818,10 @@ const saveButton = async () => {
           const deleteNo = updatedList.value
             .filter((item) => item.deleted == true)
             .map((item) => item.kdsCornerNum);
-          console.log(kdsNo);
-          console.log(kdsNm);
+          //comsole.log(kdsNo);
+          //comsole.log(kdsNm);
 
-          console.log(deleteNo);
+          //comsole.log(deleteNo);
           res = await saveKDSList(
             groupCd.value,
             kdsNo.join(","),
@@ -830,7 +830,7 @@ const saveButton = async () => {
             deleteNo.join(",")
           );
         } else {
-          console.log(forSaveMenu.value);
+          //comsole.log(forSaveMenu.value);
           res = await saveKDSSettingAll(
             groupCd.value,
             nowStoreCd.value,
@@ -839,7 +839,7 @@ const saveButton = async () => {
           );
         }
 
-        console.log(res);
+        //comsole.log(res);
       } catch (error) {
       } finally {
         store.state.loading = false;
@@ -858,16 +858,16 @@ const saveButton = async () => {
 const changeRow = ref();
 const clickedRowData = (newValue) => {
   afterClick.value = true;
-  console.log(newValue);
+  //comsole.log(newValue);
   clickedNo.value = newValue[1];
   clickedNm.value = newValue[2];
   //changeRow.value = newValue.index;
-  console.log(changeRow.value);
+  //comsole.log(changeRow.value);
 };
 
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
-  console.log(posNo.value);
+  //comsole.log(posNo.value);
   if (nowStoreAreaCd.value != undefined || posNo.value != undefined) {
     searchButton();
   }

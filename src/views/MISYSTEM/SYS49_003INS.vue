@@ -166,7 +166,7 @@ const storeList = ref([]);
 const forupdateDisabled = ref(true);
 // const lngStoreCode = (e) => {
 //     selectedStoreCd.value = e
-//     console.log(e)
+//     //comsole.log(e)
 // }
 const moveFocusbyIndex = ref("");
 const deleteRow2 = ref(false);
@@ -220,7 +220,7 @@ onMounted(async () => {
   groupCd.value = store.state.userData.lngStoreGroup;
   const res2 = await getSecureList(groupCd.value);
   secureList.value = res2.data.List;
-  console.log(secureList.value);
+  //comsole.log(secureList.value);
   let storecd;
   if (
     store.state.userData.blnBrandAdmin == "True" ||
@@ -249,7 +249,7 @@ const searchButton = async () => {
       condition1.value,
       condition2.value
     );
-    console.log(res);
+    //comsole.log(res);
 
     rowData.value = JSON.parse(JSON.stringify(res.data.List));
     afterSearch.value = true;
@@ -289,7 +289,7 @@ const payCd = ref("");
 const selectedRowState = ref("");
 const sendRowState = (e) => {
   selectedRowState.value = e;
-  console.log(e);
+  //comsole.log(e);
   if (e == "none") {
     blnCheckDupli.value = true;
   }
@@ -301,7 +301,7 @@ const prevSequence = ref([]);
 
 const clickedRowData = async (e) => {
   selectedUserSequence.value = e[6];
-  console.log(e);
+  //comsole.log(e);
   value1.value = e[5];
   value2.value = e[0];
   value3.value = e[1];
@@ -429,14 +429,14 @@ const updatedRowData = (e) => {
   }));
 
   updateRowData.value = convertArray;
-  console.log(updateRowData.value);
+  //comsole.log(updateRowData.value);
 };
 
 const selectedindex = ref("");
 const selectedIndexArray = ref([]);
 const selectedIndex = (e) => {
   selectedindex.value = e;
-  console.log(e);
+  //comsole.log(e);
   selectedIndexArray.value.push(e);
 };
 const changeRow = ref("");

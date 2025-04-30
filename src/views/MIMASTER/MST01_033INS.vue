@@ -907,7 +907,7 @@ const hidesub = ref(true);
 const hideAttr = ref(true);
 
 onMounted(async () => {
-  console.log(store.state.userData.lngCommonMenu);
+  //comsole.log(store.state.userData.lngCommonMenu);
 
   const pageLog = await insertPageLog(store.state.activeTab2);
 
@@ -943,7 +943,7 @@ const realgridname = (e) => {
 const updateDeleteInsertrowIndex = ref([]);
 const allStateRows = (e) => {
   updateDeleteInsertrowIndex.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 
 const selectedMenu = ref(1);
@@ -958,7 +958,7 @@ watch(selectedMenu, () => {
     RealGrid.getGridInstance(reagrid2).refresh(true);
   }, 100);
 
-  console.log(RealGrid.getGridInstance(reagrid2));
+  //comsole.log(RealGrid.getGridInstance(reagrid2));
 });
 const addRow4 = ref(false);
 const updateRow = ref([]);
@@ -1061,17 +1061,17 @@ const clickedRowData = async (newvalue) => {
     clickrowData2.value = JSON.parse(JSON.stringify(tempRowData2.value));
   }
 
-  console.log(SubMenuGroup.value);
-  console.log(newvalue[30]);
+  //comsole.log(SubMenuGroup.value);
+  //comsole.log(newvalue[30]);
   filteredSubMenuGroup2.value = SubMenuGroup.value.filter(
     (item) => item.sublngMajor == newvalue[30]
   );
 
-  console.log(filteredSubMenuGroup2.value);
+  //comsole.log(filteredSubMenuGroup2.value);
   //rowIndex.value = newvalue.index;
   clickrowData4.value = [];
   filteredrowData5.value = [];
-  console.log(newvalue);
+  //comsole.log(newvalue);
   // forsearchMain.value = 0
   // forsearchSub.value = 0
   searchWord2.value = "";
@@ -1129,11 +1129,11 @@ const clickedRowData = async (newvalue) => {
   fileName.value = newvalue[31];
   fileName2.value =
     newvalue[31] != undefined ? newvalue[31].split("_").slice(1).join("_") : "";
-  console.log(newvalue);
+  //comsole.log(newvalue);
   if (newvalue[34] == true) {
     isNew.value = true;
     clickaddrowSeq.value = rowData.value[newvalue.index].sequence;
-    console.log(clickaddrowSeq.value);
+    //comsole.log(clickaddrowSeq.value);
   } else {
     isNew.value = false;
   }
@@ -1168,7 +1168,7 @@ const clickedRowData = async (newvalue) => {
     if (firstarr.length > 0 && firstarr[0] !== "") {
       for (var i = 0; i < firstarr.length; i++) {
         const change = dupliarr.find((item) => item.lngCode == firstarr[i]);
-        console.log(dupliarr);
+        //comsole.log(dupliarr);
         if (change) {
           change.checkbox = true;
         }
@@ -1182,14 +1182,14 @@ const clickedRowData = async (newvalue) => {
       `http://211.238.145.30:8085/Uploads/${fileName.value}`
     );
     await nextTick();
-    console.log(response);
+    //comsole.log(response);
     uploadImage.value.name = newvalue[31];
     fileSize.value = response.headers["content-length"];
 
     afterClick.value = false;
     setSubCd3();
   } catch (error) {
-    console.log("사진없음");
+    //comsole.log("사진없음");
     uploadImage.value = { name: "" };
     fileSize.value = "";
   } finally {
@@ -1205,7 +1205,7 @@ const lngStoreGroup = (e) => {
   groupCd.value = e;
 };
 const handleStoreCd = async (newValue) => {
-  console.log(newValue);
+  //comsole.log(newValue);
   if (newValue == "-1") {
     afterSearch.value = false;
     afterClick.value = true;
@@ -1250,7 +1250,7 @@ const menuOrderOption = ref([]);
 const menuOptionCode = ref([]);
 const searchButton = async () => {
   items.value = [];
-  console.log(nowStoreCd.value);
+  //comsole.log(nowStoreCd.value);
   if (nowStoreCd.value == -1) {
     Swal.fire({
       title: "경고",
@@ -1263,7 +1263,7 @@ const searchButton = async () => {
   if (store.state.userData.lngCommonMenu == "1") {
     nowStoreCd.value = "0";
   }
-  console.log(groupCd.value, nowStoreCd.value);
+  //comsole.log(groupCd.value, nowStoreCd.value);
   store.state.loading = true;
   try {
     initAll();
@@ -1275,7 +1275,7 @@ const searchButton = async () => {
     filteredrowData3.value = [...filteredrowData3.value];
 
     const res = await getMenuCodeEnroll(groupCd.value, nowStoreCd.value);
-    console.log(res);
+    //comsole.log(res);
     rowData.value = res.data.MENULIST;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
     MENUDEPEND.value = res.data.MENUDEPEND;
@@ -1283,15 +1283,15 @@ const searchButton = async () => {
     menuOrderOption.value = res.data.MENUORDEROPTION;
     menuOptionCode.value = res.data.MENUOPTIONCODE;
     confirmData.value = JSON.parse(JSON.stringify(rowData.value));
-    console.log(res);
+    //comsole.log(res);
     optionGroup.value = res.data.OPTIONGROUP;
     tempRowData2.value = res.data.PAYCD;
     const res2 = await getMenuList(groupCd.value, 0);
     //rowData2.value = res2.data.menuList
     SubMenuGroup.value = res2.data.submenuGroup;
     MenuGroup.value = res2.data.menuGroup;
-    //  console.log(res)
-    //  console.log(res2)
+    //  //comsole.log(res)
+    //  //comsole.log(res2)
   } catch (error) {
     afterSearch.value = false;
   } finally {
@@ -1326,7 +1326,7 @@ const searchC2 = ref(-1);
 const changeInfo = (e) => {
   const tagName = e.target.name;
   const value2 = e.target.value;
-  console.log(value2);
+  //comsole.log(value2);
   changeColid.value = tagName;
   changeValue2.value = value2;
   changeNow.value = !changeNow.value;
@@ -1338,7 +1338,7 @@ const setSubCd = (e) => {
   const name = e.target.name;
   const value = e.target.value;
   if (name == "lngMainGroup") {
-    console.log(SubMenuGroup.value);
+    //comsole.log(SubMenuGroup.value);
     filteredSubMenuGroup.value = SubMenuGroup.value.filter(
       (item) => item.sublngMajor == forsearchMain.value
     );
@@ -1367,7 +1367,7 @@ const setSubCd3 = () => {
   //searchColValue3.value = gridvalue1.value+',0'
 };
 const setSubCd4 = () => {
-  console.log(SubMenuGroup.value);
+  //comsole.log(SubMenuGroup.value);
   filteredSubMenuGroup2.value = SubMenuGroup.value.filter(
     (item) => item.sublngMajor == gridvalue1.value
   );
@@ -1391,12 +1391,12 @@ const changeValue3 = ref(true);
 const changeColid2 = ref("checkbox");
 const changeNow2 = ref(false);
 const checkedRowData = (e) => {
-  console.log(e);
+  //comsole.log(e);
 };
 const checkedRowData2 = (e) => {
   changeColid.value = "strAmtCodeList";
-  console.log(updateRow.value);
-  console.log(e);
+  //comsole.log(updateRow.value);
+  //comsole.log(e);
   changeValue2.value = e
     .filter((item) => item.lngMenu !== "0")
     .map((item2) => Number(item2.lngCode))
@@ -1404,7 +1404,7 @@ const checkedRowData2 = (e) => {
 
   //changeValue2.value = e.changeRow.value = rowIndex.value;
   changeNow.value = !changeNow.value;
-  console.log(e);
+  //comsole.log(e);
 };
 
 const setAllCheck2 = ref(false);
@@ -1437,7 +1437,7 @@ const addRow = () => {
     "," +
     " ";
 
-  console.log(addrowProp.value);
+  //comsole.log(addrowProp.value);
   addRow4.value = !addRow4.value;
   addrowSeq.value++;
   rowData.value.push({
@@ -1466,7 +1466,7 @@ watch(gridvalue9, () => {
 });
 
 const saveButton = () => {
-  console.log(updateRow.value);
+  //comsole.log(updateRow.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -1552,16 +1552,16 @@ const saveButton = () => {
             updateDeleteInsertrowIndex.value.updated.includes(index) ||
             updateDeleteInsertrowIndex.value.created.includes(index)
         );
-        console.log(updateDeleteInsertrowIndex.value);
-        console.log(updatedAndInsertRow);
+        //comsole.log(updateDeleteInsertrowIndex.value);
+        //comsole.log(updatedAndInsertRow);
         const filterAndMap = (key) =>
           updatedAndInsertRow.map((item) => item[key]).join("\u200B");
 
         const deleteCd = deletedRow.map((item) => item.lngCode);
 
-        console.log(updatedAndInsertRow);
-        console.log(deleteCd.join(","));
-        console.log(filterAndMap("lngMainGroup"));
+        //comsole.log(updatedAndInsertRow);
+        //comsole.log(deleteCd.join(","));
+        //comsole.log(filterAndMap("lngMainGroup"));
 
         const res = await saveMenuCode(
           groupCd.value,
@@ -1601,12 +1601,12 @@ const saveButton = () => {
           filterAndMap("strUserFileName"),
           deleteCd.join(",")
         );
-        console.log(res);
+        //comsole.log(res);
 
-        console.log(updatedAndInsertRow);
+        //comsole.log(updatedAndInsertRow);
 
-        console.log(uploadImages.value);
-        console.log(updateRow.value);
+        //comsole.log(uploadImages.value);
+        //comsole.log(updateRow.value);
 
         const formData = new FormData();
         uploadImages.value.forEach((file, index) => {
@@ -1621,9 +1621,9 @@ const saveButton = () => {
 
         if (uploadImages.value.length >= 1) {
           try {
-            console.log(formData.entries());
+            //comsole.log(formData.entries());
             const res2 = await uploadFile(formData);
-            console.log(res2);
+            //comsole.log(res2);
           } catch (error) {
             store.state.loading = false;
           } finally {
@@ -1637,7 +1637,7 @@ const saveButton = () => {
         });
         store.state.loading = false;
       } catch (error) {
-        console.log(error);
+        //comsole.log(error);
 
         Swal.fire({
           title: "저장이 실패되었습니다.",
@@ -1663,7 +1663,7 @@ const updatedRowData = (newvalue) => {
   //     });
   //   } else {
   //     const targetRow2 = rowData.value.find(row => row.sequence == clickaddrowSeq.value);
-  //     console.log(targetRow2)
+  //     //comsole.log(targetRow2)
   //     Object.keys(newItem).forEach(key => {
   //       targetRow2[key] = newItem[key]; // 속성 업데이트
 
@@ -1768,11 +1768,11 @@ const updatedRowData3 = (newvalue) => {
 };
 watch(filteredrowData3, () => {
   changeColid.value = "unchecklngCode";
-  console.log(filteredrowData3.value);
+  //comsole.log(filteredrowData3.value);
   const arr = filteredrowData3.value
     .filter((item) => item.checkbox != true)
     .map((item) => item.lngCode);
-  console.log(arr);
+  //comsole.log(arr);
   changeValue2.value = arr.join(";");
   if (arr.length > 0) {
     changeNow.value = !changeNow.value;
@@ -1781,7 +1781,7 @@ watch(filteredrowData3, () => {
 watch(clickrowData2, () => {
   // changeColid.value = 'checkedMenu'
   // const arr = clickrowData2.value.filter(item=> item.checkbox == true ).map(item => item.menuCd)
-  // console.log(arr)
+  // //comsole.log(arr)
   // changeValue2.value = arr.join(',')
   // if(arr.length > 0){
   // changeNow.value = !changeNow.value
@@ -1804,7 +1804,7 @@ const clickedRowData2 = (e) => {
         .replace(e[1], "")
         .replace(/;;+/g, ";");
     } else {
-      console.log(clickedRow);
+      //comsole.log(clickedRow);
       changeValue2.value = clickedRow.strAmtCodeList
         .split(";")
         .filter((item) => item !== "")
@@ -1939,13 +1939,13 @@ const handleFileUpload = async (e) => {
   changeColid.value = "strUserFileName";
   randomuuid.value = uuidv4();
   changeValue2.value = randomuuid.value + "_" + fileName2.value;
-  console.log(changeValue2.value);
+  //comsole.log(changeValue2.value);
   changeNow.value = !changeNow.value;
 
   const file = e.target.files[0];
   uploadImage.value = new File([file], changeValue2.value, { type: file.type });
   uploadImages.value.push(uploadImage.value);
-  console.log(uploadImages.value);
+  //comsole.log(uploadImages.value);
 };
 
 const downloadFile = async () => {

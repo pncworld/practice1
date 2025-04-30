@@ -132,7 +132,7 @@ const hideColumnNow = ref(true);
 const setGroupColumnId = ref("");
 const hideColumnsId = ref(["strStoreName", "dtmDate"]);
 const startDate = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedstartDate.value = e;
 };
 const endDate = (e) => {
@@ -181,7 +181,7 @@ const searchButton = async () => {
       reportType,
       selectedCond2.value
     );
-    console.log(res);
+    //comsole.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -198,24 +198,24 @@ const selectedStoreAttrs = ref();
 const selectedStoreTeam = ref();
 const selectedStoreSupervisor = ref();
 const lngStoreGroup = (e) => {
-  console.log(e);
+  //comsole.log(e);
   selectedGroup.value = e;
 };
 const lngStoreCodes = (e) => {
   selectedStores.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngStoreAttrs = (e) => {
   selectedStoreAttrs.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngStoreTeam = (e) => {
   selectedStoreTeam.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 const lngSupervisor = (e) => {
   selectedStoreSupervisor.value = e;
-  console.log(e);
+  //comsole.log(e);
 };
 
 const initGrid = () => {
@@ -226,7 +226,7 @@ const initGrid = () => {
 
 const exportExcel = ref(false);
 
-console.log(store.state.minorCategory);
+//comsole.log(store.state.minorCategory);
 
 const excelButton = () => {
   let condition = "조건 :";
@@ -294,7 +294,7 @@ watch(selectedCond2, () => {
     limitEndDate.value = formattedDate.value;
     //limitEndDate.value = limitEndDate.value.toISOString().split("T")[0]
   }
-  console.log(formattedDate.value);
+  //comsole.log(formattedDate.value);
 });
 const tempGroupColumnIds = new Set();
 watch(selectedCond, () => {
@@ -319,17 +319,17 @@ watch(selectedCond, () => {
   setGroupColumnId.value = [...tempGroupColumnIds]
     .sort((a, b) => b - a)
     .join(",");
-  console.log(setGroupColumnId.value);
+  //comsole.log(setGroupColumnId.value);
 });
 
 watch(selectedCond3, () => {
-  console.log(selectedCond3.value);
+  //comsole.log(selectedCond3.value);
   if (selectedCond3.value.includes(2)) {
     setGroupFooter.value = true;
   } else {
     setGroupFooter.value = false;
   }
-  console.log(selectedCond3.value);
+  //comsole.log(selectedCond3.value);
   reload.value = !reload.value;
 });
 </script>

@@ -48,7 +48,7 @@ watch(
   async () => {
     try {
       const res = await getDiscountCdList(props.groupCd, props.storeCd);
-      console.log(res);
+      //comsole.log(res);
       disCountList.value = res.data.DISCOUNTLIST;
     } catch (error) {
       console.error("API 호출 실패:", error);
@@ -58,7 +58,7 @@ watch(
 );
 
 // const changeDiscount = (e) => {
-//     console.log(e)
+//     //comsole.log(e)
 //     emit('disCountCd' , e.target.value)
 // }
 

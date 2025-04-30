@@ -63,8 +63,8 @@ const emit = defineEmits([
 ]);
 const lngPositionType = ref(0);
 onMounted(async () => {
-  console.log(store.state.storeGroup);
-  console.log(store.state);
+  //comsole.log(store.state.storeGroup);
+  //comsole.log(store.state);
   storeGroups.value = store.state.storeGroup;
   storeList.value = store.state.storeCd;
   storeGroup.value = store.state.storeGroup[0].lngStoreGroup;
@@ -85,7 +85,7 @@ onMounted(async () => {
     lngAreaCode
   );
   storeAreaList.value = res.data.List;
-  console.log(storeAreaList.value);
+  //comsole.log(storeAreaList.value);
   // selectedAreaCode.value = storeAreaList.value[0].lngAreaCode
   if (
     store.state.userData.lngPositionType == "1" ||
