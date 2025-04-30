@@ -7,7 +7,7 @@ module.exports = defineConfig({
     port: 80,
     proxy: {
       "^/api": {
-        target: "http://www.pncoffice.com:8085", // 실제 API URL
+        target: "http://www.pncoffice.co.kr", // 실제 API URL
         changeOrigin: true, // CORS 문제 해결
         pathRewrite: { "^/api": "/" },
       },
