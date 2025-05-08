@@ -83,7 +83,7 @@
       </div>
       <div class="ml-10 mt-1 w-full h-full">
         <Realgrid
-          class="w-full h-full"
+          class="w-full h-[58vh]"
           :progname="'MST36_001INS_VUE'"
           :progid="1"
           :rowData="rowData"
@@ -117,7 +117,7 @@
         <!-- :searchWord="searchWord" :searchColId2="'blnInactive,payDistinct'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" -->
       </div>
     </div>
-    <div class="grid grid-cols-1 grid-rows-[1fr,9fr] ml-20">
+    <div class="grid grid-cols-1 grid-rows-[1fr,9fr] ml-24 w-[40vw]">
       <div class="flex space-x-1 mt-10">
         <button
           class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border"
@@ -608,7 +608,7 @@
             </div>
           </div>
         </div>
-        <div class="h-[80%] w-[90%]" v-show="selectedMenu == 2">
+        <div class="h-[50vh] w-[40vw]" v-show="selectedMenu == 2">
           <div class="flex justify-between mt-3 w-full">
             <div class="font-bold text-xl">메뉴 목록</div>
             <div><button class="whitebutton">할인대상메뉴복사</button></div>
@@ -654,7 +654,7 @@
           </div>
 
           <Realgrid
-            class="w-full h-full mt-5"
+            class="w-full h-[50vh] mt-5"
             :progname="'MST36_001INS_VUE'"
             :progid="2"
             @realgridname="realgridname"
@@ -693,7 +693,7 @@
             </div>
           </div>
           <Realgrid
-            class="w-full h-full mt-5"
+            class="w-full h-[55vh] mt-5"
             :progname="'MST36_001INS_VUE'"
             :progid="3"
             :rowData="filteredrowData5"
@@ -727,7 +727,7 @@ import Realgrid from "@/components/realgrid.vue";
 import { insertPageLog } from "@/customFunc/customFunc";
 import RealGrid from "realgrid";
 import Swal from "sweetalert2";
-import { onMounted, ref, watch } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 const selectedMenu = ref(1);
@@ -1138,7 +1138,7 @@ const searchButton = async () => {
 // });
 
 const searchWord = ref("");
-const searchValue = ref([]);
+const searchValue = ref([-1, -1]);
 const searchC1 = ref(-1);
 const searchC2 = ref(-1);
 
@@ -1306,7 +1306,7 @@ const checkedRowData = (e) => {
   changeValue2.value = temp.join(",");
   changeNow.value = !changeNow.value;
 };
-const checkedRowData2 = (e) => {
+const checkedRowData2 = async (e) => {
   changeColid.value = "unchecklngCode";
   const arr = e.map((item) => Number(item.lngCode));
   //comsole.log(arr);
@@ -1314,8 +1314,12 @@ const checkedRowData2 = (e) => {
     .filter((item) => item.lngCode != gridvalue5.value)
     .filter((item) => !arr.includes(Number(item.lngCode)))
     .map((item) => item.lngCode);
+  // console.log(filtered2);
+  // console.log(arr);
   changeValue2.value = filtered2.join(";");
   changeNow.value = !changeNow.value;
+
+  await nextTick();
 };
 
 const setAllCheck2 = ref(false);

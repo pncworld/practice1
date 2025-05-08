@@ -26,7 +26,7 @@
     <button class="contents_tab-button" :class="{ 'text-blue-600': currentMenu == 3 }" @click="showMenus(3)">영수증
       문구출력</button>
   </div>
-  <div class="flex h-4/6 w-full mt-5">
+  <div class="flex h-[55vh] w-full mt-5">
     <div class="flex flex-col w-3/5 h-4/6">
       <div class="flex justify-between mt-0 ml-10  border-b  border-b-gray-300"
         :class="currentMenu == 1 ? 'w-full' : currentMenu == 3 ? 'w-[45vw]' : 'w-[54%]'">
@@ -87,19 +87,19 @@
         </div>
       </div>
 
-      <div class="h-[100vh]" v-show="currentMenu == 3">
+      <div class="h-[55vh]" v-show="currentMenu == 3">
         <div class="h-[15vh] w-[45vw] ml-10 mt-5" v-show="currentMenu == 3">
           <div class="w-full h-full ">
-            <Realgrid class="w-[100%] h-[150%] " :progname="'MST44_062INS_VUE'" :progid="3" :reload="reload" :rowStateeditable="false"
+            <Realgrid class="w-[100%] h-[130%] " :progname="'MST44_062INS_VUE'" :progid="3" :reload="reload" :rowStateeditable="false"
               :rowData="rowData4" @clickedRowData="clickedRowData2" @realgridname="realgridname4" @selectedIndex2="selectedIndex2"
               @updatedRowData="updatedRowData3" :changeColid="changeColid" :changeRow="changeRow" :changeNow="changeNow2"
               :changeValue2="changeValue" :initSelect="initSelect" ></Realgrid>
           </div>
         </div>
 
-        <div v-show="currentMenu == 3" class="mt-24 flex flex-col justify-start ml-10 h-[40vh] w-[45vw] rounded-lg ">
+        <div v-show="currentMenu == 3" class="mt-12 flex flex-col justify-start ml-10 h-[40vh] w-[45vw] rounded-lg ">
           <h1 class="text-xl font-bold flex justify-start">영수증 문구</h1>
-          <div class="grid grid-rows-[1fr,4fr] grid-cols-[2fr,9fr] h-full">
+          <div class="grid grid-rows-[1fr,4fr] grid-cols-[2fr,9fr] h-[80%]">
             <div class="bg-gray-100 flex justify-center items-center rounded-tl-lg border border-gray-600">
               영수증 상단 문구
             </div>

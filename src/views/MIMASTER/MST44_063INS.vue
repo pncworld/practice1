@@ -343,7 +343,7 @@
       <div class="w-full h-full flex" v-if="currentMenu == 4">
         <div class="ml-10 mt-5 w-[75%] h-full">
           <Realgrid
-            class="w-[95%] h-[150%]"
+            class="w-[95%] h-[130%]"
             :progname="'MST44_063INS_VUE'"
             :progid="4"
             :mergeColumns2="true"

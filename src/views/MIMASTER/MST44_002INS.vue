@@ -87,7 +87,7 @@
           </div>
         </div>
 
-        <div class="ml-10 mt-0 w-full h-full z-30">
+        <div class="ml-10 -mt-8 w-full h-full z-30">
           <Realgrid
             class="w-full h-full"
             :progname="'MST44_002INS_VUE'"

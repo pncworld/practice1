@@ -164,7 +164,7 @@
           <button class="whitebutton">추가</button>
         </div>
       </div>
-      <div class="h-4/6" v-show="currentMenu == false">
+      <div class="h-[30vh]" v-show="currentMenu == false">
         <div
           class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
           <div class="customtableIndex border border-gray-400 rounded-tl-lg">
@@ -205,7 +205,7 @@
               v-model="searchword1" />
           </div>
         </div>
-        <div class="ml-10 mt-5 w-full h-[180%]">
+        <div class="ml-10 w-full h-[180%]">
           <Realgrid
             :progname="'MST44_052INS_VUE'"
             :progid="2"
@@ -241,7 +241,8 @@
         </div> -->
       </div>
     </div>
-    <div class="grid grid-rows-[2fr,5fr] grid-cols-1 ml-10 w-full h-full z-20">
+    <div
+      class="grid grid-rows-[2fr,5fr] grid-cols-1 ml-10 w-full h-[65vh] z-20">
       <div class="flex h-full w-[950px] mt-10" v-show="afterSearch">
         <div
           class="grid grid-cols-4 grid-rows-2 gap-1 ml-10 mt-0 w-full h-[80%]">
@@ -306,7 +307,7 @@
             class="grid grid-cols-4 grid-rows-4 ml-10 mt-4 w-full h-full gap-x-2">
             <div
               v-for="(item, index) in items"
-              class="screen-muuri-sort-empty flex items-start justify-center !h-32 !w-[213px]"
+              class="screen-muuri-sort-empty flex items-start justify-center !h-28 !w-52"
               :class="{
                 '!bg-orange-400 !border-blue-700': clickedMenuKey == index,
               }"

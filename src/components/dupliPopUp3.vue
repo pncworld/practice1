@@ -14,7 +14,7 @@
       <main class="popup-body flex-grow">
         <div class="flex justify-start font-bold text-xl ml-12">기준매장</div>
         <div
-          class="grid grid-rows-3 grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[480px] ml-12 h-32 rounded-lg">
+          class="grid grid-rows-3 grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[25vw] ml-12 h-[10vh] rounded-lg">
           <div
             class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">
             기준매장
@@ -57,7 +57,7 @@
             </select>
           </div>
         </div>
-        <div class="flex justify-center mt-5">
+        <div class="flex justify-center mt-3">
           <img src="../assets/masterCopy-ArrowDown.png" alt="" />
         </div>
         <div class="flex justify-between font-bold text-xl ml-12">
@@ -69,7 +69,7 @@
           </div>
         </div>
         <div
-          class="grid grid-cols-[1fr,4fr,1fr] border-[1px] border-gray-400 w-[480px] ml-12 h-10 mt-5 rounded-lg">
+          class="grid grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[25vw] ml-12 h-[4vh] mt-3 rounded-lg">
           <div
             class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">
             매장코드/명
@@ -78,11 +78,11 @@
             class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center">
             <input
               type="text"
-              class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md"
+              class="w-full h-full border-[1px] border-gray-400 rounded-md"
               @input="handleKeyup" />
           </div>
         </div>
-        <div class="w-[480px] h-[380px] ml-12 flex justify-center">
+        <div class="w-[25vw] h-[30vh] ml-12 flex justify-center">
           <realgrid
             :progname="progname"
             :progid="progid"
@@ -97,7 +97,8 @@
         </div>
       </main>
       <footer class="flex justify-end p-5 mt-1">
-        <div class="border border-gray-300 rounded-md w-20 h-10 mr-7 -mt-8">
+        <div
+          class="border border-gray-300 rounded-md w-[5vw] h-[4vh] mr-7 -mt-8">
           <button @click="close" class="w-full h-full">닫기</button>
         </div>
       </footer>

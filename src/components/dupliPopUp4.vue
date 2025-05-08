@@ -65,7 +65,7 @@
               @input="handleKeyup" />
           </div>
         </div>
-        <div class="w-[480px] h-[380px] ml-12 flex justify-center">
+        <div class="w-[25vw] h-[35vh] ml-12 flex justify-center">
           <realgrid
             :progname="progname"
             :progid="progid"

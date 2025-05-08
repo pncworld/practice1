@@ -25,8 +25,9 @@
         </div>
       </div>
     </span>
-    <div class="grid grid-rows-1 grid-cols-2 h-full w-full justify-center mt-2">
-      <div class="w-[90%] ml-10 h-full">
+    <div
+      class="grid grid-rows-1 grid-cols-2 h-[60vh] w-full justify-center mt-2">
+      <div class="w-[90%] ml-10 h-[60vh]">
         <Realgrid
           :progname="'ATT01_002INS_VUE'"
           :progid="1"
@@ -51,7 +52,7 @@
           :addField="'new'"></Realgrid>
       </div>
 
-      <div class="grid grid-cols-[1fr,6fr] grid-rows-4 w-[90%] mr-10 h-[15%]">
+      <div class="grid grid-cols-[1fr,6fr] grid-rows-4 w-[90%] mr-10 h-[18%]">
         <div
           class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500 rounded-tl-lg">
           *사원코드

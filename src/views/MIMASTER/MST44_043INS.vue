@@ -154,7 +154,7 @@
       </button></span
     >
   </span>
-  <div class="flex h-5/6 w-full -mt-5">
+  <div class="flex h-[65vh] w-full -mt-5">
     <div class="flex flex-col w-3/5 h-5/6">
       <div
         class="flex justify-between mt-0 ml-10 w-full border-b border-b-gray-300">
@@ -173,7 +173,7 @@
               @input="searchAmountList" />
           </div>
         </div>
-        <div class="ml-10 mt-0 w-full h-full">
+        <div class="ml-10 -mt-8 w-full h-full">
           <Realgrid
             class="w-full h-full"
             :progname="'MST44_043INS_VUE'"

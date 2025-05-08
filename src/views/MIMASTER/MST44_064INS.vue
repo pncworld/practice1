@@ -87,7 +87,7 @@
         </div>
       </div>
 
-      <div class="h-4/6" v-show="currentMenu == 1">
+      <div class="h-[25vh]" v-show="currentMenu == 1">
         <div class="ml-10 mt-5 w-full h-full">
           <Realgrid
             class="w-full h-[230%]"
@@ -117,7 +117,7 @@
         </div>
       </div>
 
-      <div class="h-4/6" v-show="currentMenu == 2">
+      <div class="h-[25vh]" v-show="currentMenu == 2">
         <div
           class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
           <div class="customtableIndex border border-gray-400 rounded-tl-lg">
@@ -160,9 +160,9 @@
               v-model="searchword1" />
           </div>
         </div>
-        <div class="ml-10 mt-5 w-full h-full">
+        <div class="ml-10 mt-5 w-full h-[25vh]">
           <Realgrid
-            class="w-full h-[210%]"
+            class="w-full h-[200%]"
             :progname="'MST01_033INS_VUE'"
             :progid="1"
             :reload="reload"
@@ -187,7 +187,7 @@
             @realgridname="realgridname"></Realgrid>
         </div>
       </div>
-      <div class="ml-10 mt-5 w-full h-full" v-show="currentMenu == 3">
+      <div class="ml-10 mt-5 w-full h-[25vh]" v-show="currentMenu == 3">
         <Realgrid
           class="h-[170%]"
           :progname="'MST44_064INS_VUE'"

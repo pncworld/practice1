@@ -472,6 +472,18 @@ const setColor = (value) => {
   const widgetElement = document.querySelector(
     `[gs-id="${clickedtableCode.value}"]`
   );
+
+  if (widgetElement == undefined || widgetElement == null) {
+    Swal.fire({
+      title: "경고",
+      text: "테이블을 먼저 생성한 후 색상을 선택해주세요.",
+      icon: "warning",
+      showCancelButton: false,
+      confirmButtonColor: "#3085d6",
+      allowOutsideClick: false,
+    });
+    return;
+  }
   const resizeHandle = widgetElement.querySelector(".grid-stack-item-content");
   resizeHandle.style.backgroundColor = clickedtableColor.value;
 

@@ -41,7 +41,7 @@
       매장별 KDS설정
     </button>
   </div>
-  <div class="flex h-4/6 w-full mt-5">
+  <div class="flex h-[55vh] w-full mt-5">
     <div class="flex flex-col w-3/5 h-4/6">
       <div
         class="flex justify-between mt-0 ml-10 border-b border-b-gray-300"

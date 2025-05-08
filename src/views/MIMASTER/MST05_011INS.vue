@@ -174,7 +174,7 @@
           <button class="whitebutton">추가</button>
         </div>
       </div>
-      <div class="h-4/6" v-show="currentMenu == false">
+      <div class="h-[30vh]" v-show="currentMenu == false">
         <div
           class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
           <div class="customtableIndex border border-gray-400 rounded-tl-lg">
@@ -263,10 +263,11 @@
         </div>
       </div>
     </div>
-    <div class="grid grid-rows-[2fr,5fr] grid-cols-1 ml-10 w-full h-full z-20">
+    <div
+      class="grid grid-rows-[2fr,5fr] grid-cols-1 ml-10 w-full h-[55vh] z-20">
       <div class="flex h-full w-[950px] mt-10" v-show="afterSearch">
         <div
-          class="grid grid-cols-5 grid-rows-2 gap-1 ml-10 mt-0 w-full h-[80%]">
+          class="grid grid-cols-5 grid-rows-2 gap-1 ml-10 mt-0 w-full h-[12vh]">
           <div
             v-for="(item, index) in ScreenKeys"
             class="screen-muuri-sort-empty flex justify-center items-center w-full h-full"
@@ -318,14 +319,14 @@
           {{ currentsubPage }}/{{ AllscreenKeyPage }}
         </div>
       </div>
-      <div v-show="afterSearch" class="flex -mt-2 w-[950px] h-[95%]">
+      <div v-show="afterSearch" class="flex -mt-2 w-[950px] h-[55vh]">
         <div class="flex w-full h-full">
           <VueDraggableNext
             v-model="items"
             :move="onMove"
             @end="onEnd"
             animation="200"
-            class="grid grid-cols-5 grid-rows-6 ml-10 mt-4 w-full h-full gap-1">
+            class="grid grid-cols-5 grid-rows-6 ml-10 mt-4 w-full h-[50vh] gap-1">
             <div
               v-for="(item, index) in items"
               :key="index"
@@ -348,7 +349,7 @@
             </div>
           </VueDraggableNext>
           <div
-            class="flex flex-col ml-3 w-10 h-full mt-5 items-center justify-center">
+            class="flex flex-col ml-3 w-10 h-[90%] mt-7 items-center justify-center">
             <div
               class="border flex items-center border-[#CCCCCC] w-full h-full rounded-md"
               @click="prevMenuKey">

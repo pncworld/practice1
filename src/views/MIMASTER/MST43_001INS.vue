@@ -27,7 +27,8 @@
         </div>
       </div>
     </span>
-    <div class="grid grid-rows-1 grid-cols-2 h-full w-full justify-center mt-2">
+    <div
+      class="grid grid-rows-1 grid-cols-2 h-[65vh] w-full justify-center mt-2">
       <div class="w-[110%] ml-10 h-full">
         <Realgrid
           :progname="'MST43_001INS_VUE'"

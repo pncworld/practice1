@@ -22,7 +22,7 @@
       @keydown.enter="searchButton" />
   </div>
 
-  <div class="h-[54%] w-full">
+  <div class="h-[42vh] w-full">
     <div class="flex justify-end gap-1 mt-1">
       <button @click="addButton" class="whitebutton">추가</button>
       <button @click="deleteButton" class="whitebutton">삭제</button>

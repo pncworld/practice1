@@ -95,6 +95,7 @@
               메뉴명 :
               <input
                 type="text"
+                v-model="searchword3"
                 @input="searchWord3"
                 class="border border-gray-800 rounded-lg shadow-lg pl-1 h-8" />
             </div>
@@ -1706,6 +1707,11 @@ const addMenus = () => {
   addMenu.value = true;
 };
 const closeMenus = () => {
+  subCategory.value = 0;
+  mainCategory.value = 0;
+  deliverySort.value = 0;
+  menuSort.value = 0;
+  searchword3.value = "";
   addMenu.value = false;
 };
 const closeMenus2 = () => {
@@ -1746,6 +1752,11 @@ const clickaddMenu1 = (newValue) => {
     });
     return;
   }
+  subCategory.value = 0;
+  mainCategory.value = 0;
+  deliverySort.value = 0;
+  menuSort.value = 0;
+  searchword3.value = "";
   dblclickedRowData(newValue);
 };
 const clickaddMenu2 = (newValue) => {

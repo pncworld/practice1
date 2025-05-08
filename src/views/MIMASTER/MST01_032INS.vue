@@ -103,7 +103,7 @@
     </div>
   </div>
   <div
-    class="grid grid-cols-[1fr,2fr] grid-rows-1 justify-between h-[85%] space-x-10 w-[97%] mt-1">
+    class="grid grid-cols-[1fr,2fr] grid-rows-1 justify-between h-[65vh] space-x-10 w-[97%] mt-1">
     <Realgrid
       :progname="'MST01_032INS_VUE'"
       :progid="1"

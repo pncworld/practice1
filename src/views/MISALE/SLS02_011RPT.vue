@@ -60,7 +60,7 @@
     </div>
   </div>
 
-  <div class="grid grid-rows-1 grid-cols-[7fr,3fr] h-[80%] mt-5">
+  <div class="grid grid-rows-1 grid-cols-[7fr,3fr] h-[65vh] mt-5">
     <div>
       <span class="flex justify-start"
         >*영수내역을 선택하시면 상세내역을 확인할 수 있습니다.</span

@@ -190,7 +190,7 @@
           <button class="whitebutton">추가</button>
         </div>
       </div>
-      <div class="h-full" v-show="currentMenu == false">
+      <div class="h-[55vh]" v-show="currentMenu == false">
         <div
           class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
           <div class="customtableIndex border border-gray-400 rounded-l-lg">
@@ -203,7 +203,7 @@
               @input="searchAmountList" />
           </div>
         </div>
-        <div class="ml-10 mt-0 w-full h-full">
+        <div class="ml-10 -mt-8 w-full h-full">
           <Realgrid
             class="w-full h-full"
             :progname="'MST44_054INS_VUE'"

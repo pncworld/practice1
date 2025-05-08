@@ -30,7 +30,7 @@
       </select>
     </div>
   </div>
-  <div class="z-[90]">
+  <!-- <div class="z-[90]">
     <DupliPopUp6
       :isVisible="showPopup2"
       @close="showPopup2 = false"
@@ -44,7 +44,7 @@
       :poskiosk="'getStoreAndPosList3'"
       naming2="테이블">
     </DupliPopUp6>
-  </div>
+  </div> -->
   <div
     v-if="showSetScreenKey"
     class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-[89]">

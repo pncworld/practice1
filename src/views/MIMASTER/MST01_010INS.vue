@@ -73,7 +73,7 @@
               v-model="searchword" />
           </div>
         </div>
-        <div class="ml-10 mt-5 w-full h-full">
+        <div class="ml-10 w-full h-full">
           <Realgrid
             class="w-full h-full mt-2"
             :progname="'MST01_010INS_VUE'"
@@ -143,9 +143,9 @@
               v-model="searchword1" />
           </div>
         </div>
-        <div class="ml-10 -mt-5 w-full h-full">
+        <div class="ml-10 -mt-8 w-full h-full">
           <Realgrid
-            class="w-full h-full mt-2"
+            class="w-full h-[70%]"
             :progname="'MST01_010INS_VUE'"
             :progid="1"
             :rowData="filteredMenuList"

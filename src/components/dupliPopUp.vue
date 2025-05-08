@@ -11,16 +11,16 @@
           복사
         </button>
       </header>
-      <main class="popup-body flex-grow">
+      <main class="popup-body flex-grow h-[80vh]">
         <div class="flex justify-start font-bold text-xl ml-12">기준매장</div>
         <div
-          class="grid grid-rows-2 grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[480px] ml-12 h-20 rounded-lg">
+          class="grid grid-rows-2 grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[25vw] ml-12 h-[8vh] rounded-lg">
           <div
             class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">
             기준매장
           </div>
           <div
-            class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center">
+            class="border border-gray-400 rounded-tr-md flex justify-center items-center">
             <input
               type="text"
               class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md bg-gray-200"
@@ -40,7 +40,7 @@
               disabled />
           </div>
         </div>
-        <div class="flex justify-center mt-10">
+        <div class="flex justify-center mt-4">
           <img src="../assets/masterCopy-ArrowDown.png" alt="" />
         </div>
         <div class="flex justify-between font-bold text-xl ml-12">
@@ -52,7 +52,7 @@
           </div>
         </div>
         <div
-          class="grid grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[480px] ml-12 h-10 mt-5 rounded-lg">
+          class="grid grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[25vw] h-[5vh] ml-12 mt-5 rounded-lg">
           <div
             class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">
             매장코드/명
@@ -65,7 +65,7 @@
               @input="handleKeyup" />
           </div>
         </div>
-        <div class="w-[480px] h-[380px] ml-12 flex justify-center">
+        <div class="w-[25vw] h-[35vh] ml-12 flex justify-center">
           <realgrid
             :progname="progname"
             :progid="progid"
@@ -75,8 +75,8 @@
             @checkedRowData="selcetedrowData"></realgrid>
         </div>
       </main>
-      <footer class="flex justify-end p-5 mt-auto">
-        <div class="border border-gray-300 rounded-md w-20 h-10 mr-7">
+      <footer class="flex justify-end p-5 -mt-9">
+        <div class="border border-gray-300 rounded-md w-[4vw] h-[5vh] mr-7">
           <button @click="close" class="w-full h-full">닫기</button>
         </div>
       </footer>

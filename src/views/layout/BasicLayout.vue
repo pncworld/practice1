@@ -161,7 +161,7 @@
 
       <!-- Main Content -->
       <main
-        class="w-full h-full bg-white p-1 overflow-y-scroll overflow-x-hidden">
+        class="w-full h-full bg-white p-1 overflow-y-auto overflow-x-hidden">
         <router-view v-slot="{ Component, route }">
           <keep-alive>
             <component

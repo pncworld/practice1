@@ -40,7 +40,7 @@
         </div>
       </div>
     </span>
-    <div class="w-[90%] ml-10 h-full grid grid-cols-[5fr_1fr_5fr]">
+    <div class="w-[90%] ml-10 h-[65vh] grid grid-cols-[5fr_1fr_5fr]">
       <Realgrid
         :progname="'MST36_055INS_VUE'"
         :progid="1"

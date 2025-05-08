@@ -240,7 +240,7 @@
               v-model="searchword1" />
           </div>
         </div>
-        <div class="ml-10 mt-5 w-full h-[170%]">
+        <div class="ml-10 w-full h-[170%]">
           <Realgrid
             :progname="'MST05_011INS_VUE'"
             :progid="1"
@@ -254,7 +254,7 @@
         </div>
       </div>
 
-      <div class="h-4/6" v-show="currentMenu == 2">
+      <div class="h-[65vh]" v-show="currentMenu == 2">
         <div
           class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-1 gap-0 w-full">
           <div class="customtableIndex border border-gray-400 rounded-tl-lg">
@@ -270,7 +270,7 @@
         </div>
         <div class="ml-10 mt-5 w-full h-full">
           <Realgrid
-            class="h-[120%]"
+            class="h-[30vh]"
             :progname="'MST05_011INS_VUE'"
             :progid="2"
             :rowData="TLUList"
@@ -280,7 +280,7 @@
             :searchColId="'lngCode,strName'"
             :searchWord3="searchword3"></Realgrid>
           <Realgrid
-            class="h-[70%] mt-5"
+            class="h-[30vh] mt-5"
             :progname="'MST05_011INS_VUE'"
             :progid="3"
             :rowData="TLUSubList"
@@ -302,17 +302,17 @@
         </div>
       </div>
     </div>
-    <div class="grid grid-rows-1 grid-cols-1 ml-10 w-full h-full z-20">
-      <div class="flex h-[760px] w-[950px] mt-10 ml-8" v-show="afterSearch">
+    <div class="grid grid-rows-1 grid-cols-1 ml-10 w-full h-[65vh] z-20">
+      <div class="flex h-[65vh] w-[950px] mt-10 ml-8" v-show="afterSearch">
         <VueDraggableNext
           v-model="items"
           :move="onMove"
           @end="onEnd"
           animation="200"
-          class="grid grid-cols-5 grid-rows-9 gap-1 w-[950px] h-[760px]">
+          class="grid grid-cols-5 grid-rows-9 gap-1 w-[950px] h-[65vh]">
           <div
             v-for="(item, index) in items"
-            class="flex items-center justify-center h-20 w-44 rounded-2xl shadow-sm border border-gray-500"
+            class="flex items-center justify-center h-[7vh] w-[9vw] rounded-2xl shadow-sm border border-gray-500"
             :class="{ '!bg-orange-500': clickedMenuKey == index }"
             @click="
               saveMenuKeyposition(index);

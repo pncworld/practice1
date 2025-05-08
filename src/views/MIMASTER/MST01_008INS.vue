@@ -21,7 +21,7 @@
   </div>
   <div class="z-50"></div>
 
-  <div class="flex justify-center w-[80%] h-[70%] gap-5 ml-10 mt-5">
+  <div class="flex justify-center w-[80%] h-[60vh] gap-5 ml-10 mt-5">
     <div class="w-full h-full">
       <div class="flex justify-end gap-2">
         <button class="whitebutton" @click="addRow">추가</button

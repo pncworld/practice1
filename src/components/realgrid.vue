@@ -1564,6 +1564,7 @@ const funcshowGrid = async () => {
     if (clickData.itemIndex == undefined) {
       return;
     }
+    grid.checkItem(clickData.itemIndex);
     selectedRowData.value = dataProvider.getRows()[clickData.itemIndex];
     if (selectedRowData.value) {
       selectedRowData.value.index = clickData.itemIndex;
