@@ -43,6 +43,9 @@ const app = createApp(App)
 //     text: "죄송합니다. 애플리케이션에서 에러가 발생했습니다. 개발팀에 문의해주세요.",
 //   });
 // };
+app.config.warnHandler = (msg, instance, trace) => {
+  // console.warn(msg) // 주석 처리하거나 제거하면 경고가 콘솔에 출력되지 않음
+};
 
 app.mount("#app");
 

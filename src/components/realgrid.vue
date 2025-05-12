@@ -1306,6 +1306,7 @@ const funcshowGrid = async () => {
   gridView.groupPanel.visible = false;
   gridView.displayOptions.watchDisplayChange = false;
   gridView.filterMode = "explicit";
+  gridView.checkBar.fieldName = "checkbox";
 
   if (props.suffixColumnPercent != []) {
     for (let i = 0; i < props.suffixColumnPercent.length; i++) {
@@ -1413,14 +1414,27 @@ const funcshowGrid = async () => {
   // };
   gridView.onItemChecked = function (grid, itemIndex, checked) {
     gridView.setCurrent({ dataRow: itemIndex });
+
+    // let isCheckedRow = grid.getColumnNames(true, false).includes("checkbox");
+    // //console.log(isCheckedRow);
+    // if (isCheckedRow && grid.getValue(itemIndex, "checkbox") == true) {
+    //   grid.checkItem(itemIndex, false);
+    // } else if (
+    //   isCheckedRow &&
+    //   (grid.getValue(itemIndex, "checkbox") == false ||
+    //     grid.getValue(itemIndex, "checkbox") == undefined)
+    // ) {
+    //   grid.checkItem(itemIndex);
+    // }
+
     var rows = gridView.getCheckedRows();
     selectedRowData.value = [];
     for (var i in rows) {
       var data = dataProvider.getJsonRow(rows[i]);
       selectedRowData.value.push(data);
     }
+    // //console.log("여기안오냐");
     updatedrowData.value = [...dataProvider.getJsonRows()];
-
     selectedRowData.value.index = itemIndex;
     emit("checkedRowData", selectedRowData.value);
   };
@@ -1450,7 +1464,7 @@ const funcshowGrid = async () => {
     // selectedRowData.value = []
 
     emit("allStateRows", dataProvider.getAllStateRows());
-    emit("checkedRowData", a);
+    //emit("checkedRowData", a);
   };
 
   gridView.onCellItemClicked = function (grid, clickData) {
@@ -1491,6 +1505,9 @@ const funcshowGrid = async () => {
   };
 
   gridView.onCellClicked = function (grid, clickData) {
+    if (clickData.cellType == "check") {
+      return;
+    }
     if (clickData.cellType === "header") {
       gridView.setCurrent({ dataRow: selectedindex.value });
     }
@@ -1502,6 +1519,51 @@ const funcshowGrid = async () => {
     if (current.itemIndex !== -1) {
       emit("selectedIndex", current.dataRow);
       emit("selectedIndex2", current.dataRow);
+
+      // //console.log(gridView.isCheckedRow(clickData.itemIndex));
+      ////console.log(grid.getValue(clickData.itemIndex, "checkbox"));
+      ////console.log(grid.getColumnNames(true, false));
+
+      // let isCheckedRow = grid.getColumnNames(true, false).includes("checkbox");
+      // if (
+      //   isCheckedRow &&
+      //   (grid.getValue(clickData.itemIndex, "checkbox") == undefined ||
+      //     grid.getValue(clickData.itemIndex, "checkbox") == false)
+      // ) {
+      //   grid.setValue(clickData.itemIndex, "checkbox", true);
+      //   var rows = grid.getCheckedRows();
+      //   //console.log(grid.getCheckedRows());
+      //   selectedRowData.value = [];
+      //   for (var i in rows) {
+      //     var data = dataProvider.getJsonRow(rows[i]);
+      //     selectedRowData.value.push(data);
+      //   }
+      //   //updatedrowData.value = [...dataProvider.getJsonRows()];
+      //   //selectedRowData.value.index = itemIndex;
+      //   emit("checkedRowData", selectedRowData.value);
+      // } else if (
+      //   isCheckedRow &&
+      //   grid.getValue(clickData.itemIndex, "checkbox") == true
+      // ) {
+      //   grid.setValue(clickData.itemIndex, "checkbox", false);
+      //   var rows = grid.getCheckedRows();
+      //   //console.log(grid.getCheckedRows());
+      //   selectedRowData.value = [];
+      //   for (var i in rows) {
+      //     var data = dataProvider.getJsonRow(rows[i]);
+      //     selectedRowData.value.push(data);
+      //   }
+      //   //updatedrowData.value = [...dataProvider.getJsonRows()];
+      //   //selectedRowData.value.index = itemIndex;
+      //   emit("checkedRowData", selectedRowData.value);
+      // }
+
+      if (gridView.isCheckedRow(clickData.itemIndex)) {
+        grid.checkItem(clickData.itemIndex, false);
+      } else {
+        grid.checkItem(clickData.itemIndex);
+      }
+
       selectedRowData.value = dataProvider.getRows()[current.dataRow];
       if (selectedRowData.value) {
         const rowState = dataProvider.getRowState(clickData.dataRow);
@@ -1564,7 +1626,7 @@ const funcshowGrid = async () => {
     if (clickData.itemIndex == undefined) {
       return;
     }
-    grid.checkItem(clickData.itemIndex);
+
     selectedRowData.value = dataProvider.getRows()[clickData.itemIndex];
     if (selectedRowData.value) {
       selectedRowData.value.index = clickData.itemIndex;
@@ -1619,6 +1681,9 @@ watch(
     //comsole.log(props.changeColid);
     //comsole.log(props.changeValue2);
     //comsole.log(dataProvider.getJsonRows());
+    //console.log(props.changeRow);
+    //console.log(props.changeColid);
+    //console.log(props.changeValue2);
     if (props.changeRow !== "" && props.changeRow != -1) {
       if (
         dataProvider != null &&

@@ -449,6 +449,15 @@
             </div>
             <div class="justify-center items-center bg-gray-100 border flex">
               잔금반환비율
+              <div class="relative group inline-block">
+                <button class="size-3 flex justify-center items-center">
+                  <img src="../../assets/circle-question-regular.svg" alt="" />
+                </button>
+                <div
+                  class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-sm px-2 py-1 rounded whitespace-nowrap z-10">
+                  잔금반환비율에 대한 설명입니다.
+                </div>
+              </div>
             </div>
             <div class="flex justify-center items-center">
               <input
@@ -675,6 +684,8 @@
             :changeValue2="changeValue3"
             :changeColid="changeColid2"
             :changeRow="changeRow2"
+            :showCheckBar="true"
+            :hideColumnsId="['checkbox']"
             @updatedRowData="updatedRowData2"
             @selectedIndex="selectedIndex2"></Realgrid>
           <!-- :searchColId2="'majorGroupCd,subGroupCd'" :searchColId="'menuCd,menuNm'" :searchColValue2="searchColValue3" :searchWord="searchWord2" -->
@@ -706,6 +717,8 @@
             :uncheckAct="uncheckAct"
             :maintaincheckColumn="'lngCode'"
             @checkedRowData="checkedRowData2"
+            :showCheckBar="true"
+            :hideColumnsId="['checkbox']"
             :rowStateeditable="false"
             @updatedRowData="updatedRowData3"></Realgrid>
           <!-- :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" :searchWord="searchWord3"  -->
@@ -1272,39 +1285,13 @@ const changeRow2 = ref();
 const changeValue3 = ref(true);
 const changeColid2 = ref("checkbox");
 const changeNow2 = ref(false);
-const checkedRowData = (e) => {
+const checkedRowData = async (e) => {
   const temp = e.map((item) => item.menuCd);
-  //comsole.log(e, updateRow.value);
-  // const rowDataMap = new Map(
-  //   rowData.value.map((row) => [
-  //     row.sequence !== undefined ? row.sequence : row.lngCode.toString(),
-  //     row,
-  //   ])
-  // );
-
-  // const targetKey =
-  //   isNew.value == false ? gridvalue5.value.toString() : clickaddrowSeq.value;
-
-  // const targetRow = rowDataMap.get(targetKey);
-
-  // if (targetRow) {
-  //   targetRow.checkedMenu = temp.join(",");
-
-  //   rowData.value = [...rowData.value]; // Trigger reactivity
-  // } else {
-  //   const targetKey2 = clickaddrowSeq.value.toString();
-  //   const targetRow2 = rowDataMap.get(targetKey2);
-  //   if (targetRow2) {
-  //     targetRow2.checkedMenu = temp.join(",");
-  //     rowData.value = [...rowData.value]; // Ensure reactivity here too
-  //   } else {
-  //     console.error("Both target rows not found!");
-  //   }
-  // }
-
   changeColid.value = "checkedMenu";
   changeValue2.value = temp.join(",");
   changeNow.value = !changeNow.value;
+
+  await nextTick();
 };
 const checkedRowData2 = async (e) => {
   changeColid.value = "unchecklngCode";
@@ -1314,8 +1301,8 @@ const checkedRowData2 = async (e) => {
     .filter((item) => item.lngCode != gridvalue5.value)
     .filter((item) => !arr.includes(Number(item.lngCode)))
     .map((item) => item.lngCode);
-  // console.log(filtered2);
-  // console.log(arr);
+  // //console.log(filtered2);
+  // //console.log(arr);
   changeValue2.value = filtered2.join(";");
   changeNow.value = !changeNow.value;
 
@@ -1389,10 +1376,21 @@ watch(gridvalue9, () => {
 
 const saveButton = () => {
   //comsole.log(updateRow.value);
+  //console.log(updateDeleteInsertrowIndex.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
       text: "조회를 먼저 진행해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (updateDeleteInsertrowIndex.value.length == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "변경된 사항이 없습니다.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -1555,6 +1553,7 @@ const saveButton = () => {
           deleteCd.join(",")
         );
         //comsole.log(res);
+        //console.log(res);
 
         Swal.fire({
           title: "저장 되었습니다.",

@@ -20,8 +20,8 @@
       @update:ischanged="handleinitAll"
       @update:ischanged2="searchinit"></PickStore>
   </div>
-  <div class="grid grid-rows-1 grid-cols-[3fr,5fr] h-[86%] w-full">
-    <div class="flex flex-col w-full h-full">
+  <div class="grid grid-rows-1 grid-cols-[3fr,5fr] h-[65vh] w-full">
+    <div class="flex flex-col w-full h-[55vh]">
       <div
         class="flex justify-between mt-5 ml-10 w-full border-b border-b-gray-300">
         <div class="flex justify-start font-bold text-xl">메뉴코드 목록</div>
@@ -75,9 +75,9 @@
         </div>
       </div>
 
-      <div class="ml-10 mt-1 w-full h-full">
+      <div class="ml-10 mt-1 w-full h-[55vh]">
         <Realgrid
-          class="w-full h-full"
+          class="w-full h-[55vh]"
           :progname="'MST01_033INS_VUE'"
           :progid="1"
           :rowData="rowData"
@@ -817,6 +817,8 @@
             :checkBarInactive="'lngMenu'"
             :initSelect="true"
             :ExceptionCheck="'lngMenu'"
+            :hideColumnsId="['checkbox']"
+            :showCheckBar="true"
             :showTooltip="true"></Realgrid>
           <!-- :searchColId2="'majorGroupCd,subGroupCd'" :searchColId="'menuCd,menuNm'" :searchColValue2="searchColValue3" :searchWord="searchWord2" -->
         </div>
