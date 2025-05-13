@@ -6,6 +6,7 @@
         조회
       </button>
       <button @click="saveButton" class="button save w-auto">저장</button>
+      <button @click="copyButton" class="button save w-auto">복사</button>
     </div>
   </div>
   <br />
@@ -30,7 +31,7 @@
       </select>
     </div>
   </div>
-  <!-- <div class="z-[90]">
+  <div class="z-[90]">
     <DupliPopUp6
       :isVisible="showPopup2"
       @close="showPopup2 = false"
@@ -39,12 +40,12 @@
       :areaCd="nowStoreAreaCd"
       :posNo="posNo"
       :progname="'MST01_004INS_VUE'"
-      :dupliapiname="'DUPLITABLEKEY'"
+      :dupliapiname="'DUPLITABLEKEY2'"
       :progid="2"
       :poskiosk="'getStoreAndPosList3'"
       naming2="테이블">
     </DupliPopUp6>
-  </div> -->
+  </div>
   <div
     v-if="showSetScreenKey"
     class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-[89]">
@@ -195,7 +196,7 @@
             class="border rounded-lg border-gray-200 px-2"
             v-model="clickedtableNm"
             @input="changetableProperty"
-            :disabled="clickedtableNo == 1" />
+            :disabled="!clickTable" />
         </div>
       </div>
       <div class="grid grid-cols-2">
@@ -208,7 +209,7 @@
             class="border rounded-lg border-gray-200 px-2"
             v-model="clickedtableSeats"
             @input="changetableProperty"
-            :disabled="clickedtableNo == 1" />
+            :disabled="!clickTable || clickedtableNo == 1" />
         </div>
       </div>
       <div class="grid grid-cols-4">
@@ -353,7 +354,7 @@ import { useStore } from "vuex";
 const ScreenKeyOrigin = ref([]);
 const changeMode = ref(false);
 const Category = ref([]);
-
+const clickedKey = ref(true);
 const store = useStore();
 const userData = store.state.userData;
 const groupCd = ref(userData.lngStoreGroup);
@@ -645,109 +646,6 @@ const clickedtableColor = ref("");
 let count = ref(0);
 let info = ref("");
 let items = ref([]);
-// Initialize GridStack on mount
-// onMounted(() => {
-
-//             grid = GridStack.init({ // DO NOT use grid.value = GridStack.init(), see above
-//               float: true,
-//               cellHeight: 'auto',
-//               column : 90 ,
-//               resizable: { handles: 'e,se' },
-//               minRow : 56 ,
-//               maxRow: 56
-//             })
-
-//             grid.on("dragstop", function (event, element) {
-//               const node = element.gridstackNode;
-//               info.value = `you just dragged node #${node.id} to ${node.x},${node.y} – good job!`;
-//               const findtableindex = filteredtableList.value.findIndex(item => item.id == node.id)
-//               filteredtableList.value[findtableindex].x = node.x
-//               filteredtableList.value[findtableindex].y = node.y
-
-//               grid.getGridItems().forEach(item => {
-//            // 현재 그리드에 있는 모든 아이템들 순회
-//                if (item.gridstackNode.id !== node.id) { // 드래그된 요소를 제외한 나머지
-//                 const itemIndex = filteredtableList.value.findIndex(e => e.id == item.gridstackNode.id);
-//                  if (itemIndex !== -1) {
-//         // 밀린 요소의 새로운 위치 업데이트
-//         filteredtableList.value[itemIndex].x = item.gridstackNode.x;
-//         filteredtableList.value[itemIndex].y = item.gridstackNode.y;
-//       }
-//     }
-//   });
-
-//   filteredtableList.value.forEach(item => {
-//     const tableItem = tableList.value.find(item2 => item2.intScreenNo == item.intScreenNo && item2.lngKeyscrNo == item.lngKeyscrNo )
-//     if(tableItem){
-//       Object.keys(item).forEach(key => {
-//         if(key =='w'){
-//           tableItem['w'] = item['w']
-//         } else if(key == 'h'){
-//           tableItem['h'] = item['h']
-//         } else if(key =='x') {
-//           tableItem['x'] = item['x']
-//         } else if (key =='y'){
-//           tableItem['y'] = item['y']
-//         } else {
-//           tableItem[key] = item[key]
-//         }
-//       })
-//     }
-//   })
-
-//    //comsole.log(tableList.value)
-//               const widgetElement = document.querySelector(`[gs-id="${node.id}"]`);
-//                  if (widgetElement) {
-//                  widgetElement.click(); // 클릭 이벤트 발생
-//                }
-
-//             });
-
-//             grid.on("resizestop", function (event, element) {
-//   const node = element.gridstackNode;
-//   info.value = `you just resized node #${node.id} to width: ${node.w}, height: ${node.h} – good job!`;
-
-//   // 리사이즈된 아이템의 정보 업데이트
-//   const findtableindex = filteredtableList.value.findIndex(item => item.id == node.id);
-//   if (findtableindex !== -1) {
-//     filteredtableList.value[findtableindex].w = node.w;
-//     filteredtableList.value[findtableindex].h = node.h;
-//   }
-
-//   grid.getGridItems().forEach(item => {
-//            // 현재 그리드에 있는 모든 아이템들 순회
-//                if (item.gridstackNode.id !== node.id) { // 드래그된 요소를 제외한 나머지
-//                 const itemIndex = filteredtableList.value.findIndex(e => e.id == item.gridstackNode.id);
-//                  if (itemIndex !== -1) {
-//         // 밀린 요소의 새로운 위치 업데이트
-//         filteredtableList.value[itemIndex].x = item.gridstackNode.x;
-//         filteredtableList.value[itemIndex].y = item.gridstackNode.y;
-//       }
-//     }
-//   });
-
-//   filteredtableList.value.forEach(item => {
-//     const tableItem = tableList.value.find(item2 => item2.intScreenNo == item.intScreenNo && item2.lngKeyscrNo == item.lngKeyscrNo )
-//     if(tableItem){
-//       Object.keys(item).forEach(key => {
-//         if(key =='w'){
-//           tableItem['w'] = item['w']
-//         } else if(key == 'h'){
-//           tableItem['h'] = item['h']
-//         } else if(key =='x') {
-//           tableItem['x'] = item['x']
-//         } else if (key =='y'){
-//           tableItem['y'] = item['y']
-//         } else {
-//           tableItem[key] = item[key]
-//         }
-//       })
-//     }
-//   })
-//   //comsole.log(tableList.value)
-// });
-
-//           });
 
 function initializeGrid() {
   const grid = GridStack.init({
@@ -768,8 +666,25 @@ function initializeGrid() {
 
 function handleDragStop(grid, element) {
   const node = element.gridstackNode;
-  info.value = `You just dragged node #${node.id} to ${node.x},${node.y} – good job!`;
+  let changed = false;
 
+  if (node.w <= 3) {
+    node.w = 3;
+    changed = true;
+  }
+
+  if (node.h <= 3) {
+    node.h = 3;
+    changed = true;
+  }
+  if (changed) {
+    grid.update(element, {
+      w: node.w,
+      h: node.h,
+      minW: node.w,
+      minH: node.h,
+    });
+  }
   updateNodePosition(grid, node);
   syncFilteredTableList();
   updateTableListFromFiltered();
@@ -783,8 +698,25 @@ function handleDragStop(grid, element) {
 
 function handleResizeStop(grid, element) {
   const node = element.gridstackNode;
-  info.value = `You just resized node #${node.id} to width: ${node.w}, height: ${node.h} – good job!`;
+  let changed = false;
 
+  if (node.w <= 3) {
+    node.w = 3;
+    changed = true;
+  }
+
+  if (node.h <= 3) {
+    node.h = 3;
+    changed = true;
+  }
+  if (changed) {
+    grid.update(element, {
+      w: node.w,
+      h: node.h,
+      minW: node.w,
+      minH: node.h,
+    });
+  }
   updateNodeSize(node);
   syncFilteredTableList();
   updateTableListFromFiltered();
@@ -2018,9 +1950,9 @@ onDeactivated(() => {
 
 .table_style {
   width: 900px;
-  height: 600px !important;
+  height: 622px !important;
   border: 1px solid #e4e4e4;
-  border-radius: 10px;
+  border-radius: 1px;
   background-image: url("../../assets/tablegrid-bg.jpg");
   background-size: 106%;
   margin-right: 30px;

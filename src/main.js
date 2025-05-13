@@ -47,8 +47,6 @@ app.config.warnHandler = (msg, instance, trace) => {
   // console.warn(msg) // 주석 처리하거나 제거하면 경고가 콘솔에 출력되지 않음
 };
 
-app.mount("#app");
-
 // 전역 오류 핸들러 설정
 app.config.errorHandler = (err, vm, info) => {
   console.error("Vue 전역 에러 발생:", err, "Info:", info);
@@ -65,6 +63,8 @@ app.config.errorHandler = (err, vm, info) => {
     vm.rollback();
   }
 };
+
+app.mount("#app");
 
 //   // Vue 경고 핸들러 추가 (개발 중 경고를 잡기 위해)
 //   app.config.warnHandler = (msg, vm, trace) => {

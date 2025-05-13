@@ -574,6 +574,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  hideCheckBarList: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const realgridname = ref(
@@ -1276,7 +1280,7 @@ const funcshowGrid = async () => {
   // 데이터 추가
 
   dataProvider.setRows(props.rowData);
-
+  //
   // 기타 옵션
   gridView.rowIndicator.width = 50;
   gridView.setFooters({ visible: props.setFooter == false ? false : true });
@@ -1402,41 +1406,22 @@ const funcshowGrid = async () => {
     updatedrowData.value = [...dataProvider.getJsonRows()];
     emit("updatedRowData", updatedrowData.value);
   };
-  // gridView.onCellItemClicked = function (grid, index, clickData) {
-  //   if (clickData.index == undefined || clickData.index == -1) {
-  //     return;
-  //   }
-  //   selectedRowData.value = dataProvider.getRows()[index];
-  //   // var current = gridView.getCurrent();
-  //   // selectedindex.value = current.dataRow;
-  //   // //comsole.log(selectedindex.value);
-  //   emit("buttonClicked", selectedRowData.value);
-  // };
+
   gridView.onItemChecked = function (grid, itemIndex, checked) {
     gridView.setCurrent({ dataRow: itemIndex });
 
-    // let isCheckedRow = grid.getColumnNames(true, false).includes("checkbox");
-    // //console.log(isCheckedRow);
-    // if (isCheckedRow && grid.getValue(itemIndex, "checkbox") == true) {
-    //   grid.checkItem(itemIndex, false);
-    // } else if (
-    //   isCheckedRow &&
-    //   (grid.getValue(itemIndex, "checkbox") == false ||
-    //     grid.getValue(itemIndex, "checkbox") == undefined)
-    // ) {
-    //   grid.checkItem(itemIndex);
-    // }
-
     var rows = gridView.getCheckedRows();
+
     selectedRowData.value = [];
     for (var i in rows) {
       var data = dataProvider.getJsonRow(rows[i]);
       selectedRowData.value.push(data);
     }
-    // //console.log("여기안오냐");
-    updatedrowData.value = [...dataProvider.getJsonRows()];
-    selectedRowData.value.index = itemIndex;
     emit("checkedRowData", selectedRowData.value);
+    //console.log(selectedRowData.value);
+    //console.log("여기안오냐");
+    updatedrowData.value = [...dataProvider.getJsonRows()];
+    //selectedRowData.value.index = itemIndex;
   };
   gridView.onItemAllChecked = (grid, checked) => {
     //comsole.log("전체체크");
@@ -1558,10 +1543,30 @@ const funcshowGrid = async () => {
       //   emit("checkedRowData", selectedRowData.value);
       // }
 
+      selectedRowData.value = dataProvider.getRows()[clickData.dataRow];
+
       if (gridView.isCheckedRow(clickData.itemIndex)) {
-        grid.checkItem(clickData.itemIndex, false);
+        if (props.hideCheckBarList == false) {
+          grid.checkItem(clickData.itemIndex, false);
+        } else {
+          if (
+            props.hideCheckBarList == true &&
+            selectedRowData.value[4] != "0"
+          ) {
+            grid.checkItem(clickData.itemIndex, false);
+          }
+        }
       } else {
-        grid.checkItem(clickData.itemIndex);
+        if (props.hideCheckBarList == false) {
+          grid.checkItem(clickData.itemIndex);
+        } else {
+          if (
+            props.hideCheckBarList == true &&
+            selectedRowData.value[4] != "0"
+          ) {
+            grid.checkItem(clickData.itemIndex);
+          }
+        }
       }
 
       selectedRowData.value = dataProvider.getRows()[current.dataRow];
@@ -2360,19 +2365,6 @@ onMounted(async () => {
 
       tabInitSetArray.value.push(...res.data.List);
     }
-
-    // if (props.setDynamicGrid3 == true) {
-    //   //comsole.log(tabInitSetArray.value);
-    //   const res = await getDynamicGrid3(
-    //     store.state.userData.lngStoreGroup,
-    //     props.dynamicStoreCd,
-    //     result.length
-    //   );
-    //   //comsole.log(tabInitSetArray.value);
-    //   //comsole.log(res);
-    //   tabInitSetArray.value.push(...res.data.List);
-    //   //comsole.log(tabInitSetArray.value);
-    // }
 
     // 동적 스타일 생성
     let styleContent = "";

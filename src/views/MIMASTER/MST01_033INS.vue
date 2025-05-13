@@ -10,6 +10,91 @@
   </div>
   <br />
   <div
+    class="absolute z-50 inset-0 bg-black bg-opacity-50 w-full h-full"
+    v-if="showPopUp">
+    <div class="fixed top-[30%] left-[30%] h-[50%] w-[50%] bg-white rounded-lg">
+      <div
+        class="grid grid-rows-[1fr,11fr,1fr] grid-cols-1 text-xl p-5 font-semibold">
+        <div class="flex justify-between">
+          <div>할인설정 복사</div>
+          <div>
+            <button class="button primary" @click="copyButton">복사</button>
+          </div>
+        </div>
+        <div class="grid grid-rows-1 grid-cols-2 space-x-3">
+          <div class="grid grid-rows-[1fr,3fr,7fr]">
+            <div class="flex justify-start text-base">기준 메뉴코드</div>
+            <div class="grid grid-rows-2 grid-cols-[1fr,3fr] text-sm h-20">
+              <div
+                class="bg-gray-100 flex justify-center items-center rounded-tl-lg border border-gray-600">
+                메뉴코드
+              </div>
+              <div
+                class="flex justify-center items-center border border-gray-600 rounded-tr-lg p-1">
+                <input
+                  type="text"
+                  v-model="gridvalue3"
+                  disabled
+                  class="h-full w-full p-1" />
+              </div>
+              <div
+                class="bg-gray-100 flex justify-center items-center rounded-bl-lg border border-gray-600">
+                메뉴명
+              </div>
+              <div
+                class="flex justify-center items-center border border-gray-600 rounded-br-lg p-1">
+                <input
+                  type="text"
+                  v-model="gridvalue6"
+                  disabled
+                  class="h-full w-full p-1" />
+              </div>
+            </div>
+            <div>
+              <Realgrid
+                :progname="'MST36_001INS_VUE'"
+                :progid="5"
+                :rowData="rowData4"
+                :setStateBar="false"
+                :rowStateeditable="false">
+              </Realgrid>
+            </div>
+          </div>
+          <div class="grid grid-rows-[1fr,1fr,7fr]">
+            <div class="text-base flex justify-start">대상 메뉴코드 선택</div>
+            <div class="grid grid-rows-1 grid-cols-[2fr,3fr] text-sm h-8">
+              <div class="text-sm flex justify-center items-center">
+                메뉴코드/메뉴명
+              </div>
+              <div class="rounded-lg border">
+                <input
+                  type="text"
+                  v-model="searchWord5"
+                  class="h-full w-full pl-1" />
+              </div>
+            </div>
+            <div>
+              <Realgrid
+                :progname="'MST36_001INS_VUE'"
+                :progid="4"
+                :showCheckBar="true"
+                :setStateBar="false"
+                :rowStateeditable="false"
+                :rowData="rowData5"
+                :searchColId="'menuCd,menuNm'"
+                :searchWord3="searchWord5"
+                @checkedRowData="checkedRowData5">
+              </Realgrid>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end mt-2">
+          <button @click="closePopUp" class="whitebutton">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
     class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
     <PickStore
       @update:storeGroup="lngStoreGroup"
@@ -791,7 +876,11 @@
         <div v-show="selectedMenu == 2" class="h-[80%] w-[90%]">
           <div class="flex justify-between mt-3 w-full">
             <div class="font-bold text-xl">할인설정</div>
-            <div><button class="whitebutton">할인설정복사</button></div>
+            <div>
+              <button class="whitebutton" @click="copyButton2">
+                할인설정복사
+              </button>
+            </div>
           </div>
           <div class="grid grid-rows-1 grid-cols-[1fr,3fr] mt-3">
             <div class="customtableIndex border border-gray-400 rounded-l-lg">
@@ -817,8 +906,8 @@
             :checkBarInactive="'lngMenu'"
             :initSelect="true"
             :ExceptionCheck="'lngMenu'"
-            :hideColumnsId="['checkbox']"
-            :showCheckBar="true"
+            :hideCheckBarList="true"
+            :rowStateeditable="false"
             :showTooltip="true"></Realgrid>
           <!-- :searchColId2="'majorGroupCd,subGroupCd'" :searchColId="'menuCd,menuNm'" :searchColValue2="searchColValue3" :searchWord="searchWord2" -->
         </div>
@@ -888,6 +977,8 @@
 
 <script setup>
 import {
+  copyMenuListByCode,
+  getAmountListByMenuCode,
   getMenuCodeEnroll,
   getMenuList,
   saveMenuCode,
@@ -897,7 +988,6 @@ import PageName from "@/components/pageName.vue";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
 import { insertPageLog } from "@/customFunc/customFunc";
-import router from "@/router";
 import axios from "axios";
 import RealGrid from "realgrid";
 import Swal from "sweetalert2";
@@ -1051,6 +1141,7 @@ const selectedIndex2 = (e) => {
   rowIndex.value = e;
 };
 const clickedRowData = async (newvalue) => {
+  console.log(newvalue);
   afterClick.value = false;
   if (newvalue[9] == 0 || newvalue[12] == 1) {
     rowData2.value = [];
@@ -2008,6 +2099,59 @@ const resetKPG = (e) => {
   } else {
     showKPG.value = false;
   }
+};
+
+const showPopUp = ref(false);
+const rowData4 = ref([]);
+const rowData5 = ref([]);
+const copyButton2 = async () => {
+  const res = await getAmountListByMenuCode(groupCd.value, gridvalue3.value);
+  rowData4.value = res.data.List;
+  rowData5.value = res.data.List2;
+  showPopUp.value = true;
+};
+
+const copyButton = async () => {
+  if (selectedMenuCd.value.length == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "복사할 메뉴코드를 선택하세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  try {
+    store.state.loading = true;
+    const res = await copyMenuListByCode(
+      groupCd.value,
+      gridvalue3.value,
+      selectedMenuCd.value.join("\U200B")
+    );
+
+    console.log(res);
+    Swal.fire({
+      title: "성공",
+      text: "복사에 성공하였습니다.",
+      icon: "success",
+      confirmButtonText: "확인",
+    });
+  } catch (error) {
+  } finally {
+    store.state.loading = false;
+  }
+};
+
+const closePopUp = () => {
+  showPopUp.value = false;
+};
+
+const searchWord5 = ref("");
+
+const selectedMenuCd = ref([]);
+const checkedRowData5 = (e) => {
+  selectedMenuCd.value = e.map((item) => item.menuCd);
+  console.log(e);
 };
 </script>
 

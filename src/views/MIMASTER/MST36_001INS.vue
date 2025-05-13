@@ -10,6 +10,91 @@
   </div>
   <br />
   <div
+    class="absolute z-50 inset-0 bg-black bg-opacity-50 w-full h-full"
+    v-if="discountMenuShow">
+    <div class="fixed top-[30%] left-[30%] h-[50%] w-[50%] bg-white rounded-lg">
+      <div
+        class="grid grid-rows-[1fr,11fr,1fr] grid-cols-1 text-xl p-5 font-semibold">
+        <div class="flex justify-between">
+          <div>할인대상메뉴 복사</div>
+          <div>
+            <button class="button primary" @click="copyButton">복사</button>
+          </div>
+        </div>
+        <div class="grid grid-rows-1 grid-cols-2 space-x-3">
+          <div class="grid grid-rows-[1fr,3fr,7fr]">
+            <div class="flex justify-start text-base">기준 결제코드</div>
+            <div class="grid grid-rows-2 grid-cols-[1fr,3fr] text-sm h-20">
+              <div
+                class="bg-gray-100 flex justify-center items-center rounded-tl-lg border border-gray-600">
+                결제코드
+              </div>
+              <div
+                class="flex justify-center items-center border border-gray-600 rounded-tr-lg p-1">
+                <input
+                  type="text"
+                  v-model="gridvalue5"
+                  disabled
+                  class="h-full w-full p-1" />
+              </div>
+              <div
+                class="bg-gray-100 flex justify-center items-center rounded-bl-lg border border-gray-600">
+                결제코드명
+              </div>
+              <div
+                class="flex justify-center items-center border border-gray-600 rounded-br-lg p-1">
+                <input
+                  type="text"
+                  v-model="gridvalue3"
+                  disabled
+                  class="h-full w-full p-1" />
+              </div>
+            </div>
+            <div>
+              <Realgrid
+                :progname="'MST36_001INS_VUE'"
+                :progid="4"
+                :rowData="rowData4"
+                :setStateBar="false"
+                :rowStateeditable="false">
+              </Realgrid>
+            </div>
+          </div>
+          <div class="grid grid-rows-[1fr,1fr,7fr]">
+            <div class="text-base flex justify-start">대상 결제코드 선택</div>
+            <div class="grid grid-rows-1 grid-cols-[2fr,3fr] text-sm h-8">
+              <div class="text-sm flex justify-center items-center">
+                결제코드/결제코드명
+              </div>
+              <div class="rounded-lg border">
+                <input
+                  type="text"
+                  v-model="searchWord5"
+                  class="h-full w-full pl-1" />
+              </div>
+            </div>
+            <div>
+              <Realgrid
+                :progname="'MST36_001INS_VUE'"
+                :progid="5"
+                :showCheckBar="true"
+                :setStateBar="false"
+                :rowStateeditable="false"
+                :rowData="rowData5"
+                :searchColId="'lngCode,strName'"
+                :searchWord3="searchWord5"
+                @checkedRowData="checkedRowData5">
+              </Realgrid>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end mt-2">
+          <button @click="closePopUp" class="whitebutton">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
     class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
     <PickStore
       @update:storeGroup="lngStoreGroup"
@@ -620,7 +705,11 @@
         <div class="h-[50vh] w-[40vw]" v-show="selectedMenu == 2">
           <div class="flex justify-between mt-3 w-full">
             <div class="font-bold text-xl">메뉴 목록</div>
-            <div><button class="whitebutton">할인대상메뉴복사</button></div>
+            <div>
+              <button class="whitebutton" @click="showPopUp">
+                할인대상메뉴복사
+              </button>
+            </div>
           </div>
           <div class="mt-3 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
             <div class="customtableIndex border border-gray-400 rounded-tl-lg">
@@ -730,8 +819,10 @@
 
 <script setup>
 import {
+  CopyDiscountMenuList,
   getMenuListIncludeCommon,
   getPayCodeEnrollInfo,
+  getPayCodeListbyCode,
   savePayCode,
 } from "@/api/master";
 import PageName from "@/components/pageName.vue";
@@ -747,7 +838,7 @@ const selectedMenu = ref(1);
 const selectMenu = (newValue) => {
   selectedMenu.value = newValue;
 };
-
+const searchWord5 = ref("");
 const searchWord2 = ref("");
 const nowStoreCd = ref(0);
 const rowData = ref([]);
@@ -798,7 +889,27 @@ const valuesData = ref([
   ["1", "2", "3"],
   ["0", "1"],
 ]);
+const discountMenuShow = ref(false);
+const rowData4 = ref([]);
+const rowData5 = ref([]);
+const showPopUp = async () => {
+  let checkRowDataArr = clickedrowdata.value.split(",");
+  console.log(rowData2.value);
+  rowData4.value = rowData2.value.filter((item) =>
+    checkRowDataArr.includes(item.menuCd)
+  );
 
+  const res3 = await getPayCodeListbyCode(groupCd.value, gridvalue5.value);
+  console.log(res3);
+  console.log(rowData4.value);
+  rowData5.value = res3.data.List;
+  store.state.inActiveBackGround = true;
+  discountMenuShow.value = true;
+};
+
+const closePopUp = () => {
+  discountMenuShow.value = false;
+};
 const realgrid2Name = ref("");
 const realgrid3Name = ref("");
 const realgridname = (e) => {
@@ -905,7 +1016,7 @@ const clickedRowData = (newvalue) => {
       }
     }
   }
-
+  console.log(newvalue);
   clickedrowdata.value = newvalue[27];
   gridvalue1.value = newvalue[4];
   gridvalue2.value = newvalue[21];
@@ -938,20 +1049,15 @@ const clickedRowData = (newvalue) => {
   gridvalue24.value = newvalue[17];
   gridvalue25.value = newvalue[26];
 
-  if (newvalue[4] == "1") {
-    if (newvalue[21] != "0") {
-      selectedPayDistinct.value = false;
-    } else {
-      selectedPayDistinct.value = true;
-    }
+  if (
+    (newvalue[2].toString().startsWith("24") ||
+      newvalue[2].toString().startsWith("1")) &&
+    newvalue[4] == "1" &&
+    newvalue[21] == "1"
+  ) {
+    selectedPayDistinct.value = false;
   } else {
-    if (
-      newvalue[2] == undefined ? false : newvalue[2].toString().startsWith("24")
-    ) {
-      selectedPayDistinct.value = false;
-    } else {
-      selectedPayDistinct.value = true;
-    }
+    selectedPayDistinct.value = true;
   }
 
   if (newvalue[4] == "1" && newvalue[6] == "0") {
@@ -1110,6 +1216,7 @@ const searchButton = async () => {
     disCountGroup.value = res.data.DISGROUP;
     approveGroup.value = res.data.APPROVE;
     const res2 = await getMenuListIncludeCommon(groupCd.value, 0);
+    console.log(res2.data.menuList);
     rowData2.value = res2.data.menuList;
     SubMenuGroup.value = res2.data.submenuGroup;
     MenuGroup.value = res2.data.menuGroup;
@@ -1307,6 +1414,40 @@ const checkedRowData2 = async (e) => {
   changeNow.value = !changeNow.value;
 
   await nextTick();
+};
+
+const forCopyArr = ref([]);
+const checkedRowData5 = (e) => {
+  console.log(e);
+  forCopyArr.value = e.map((item) => item.lngCode);
+};
+
+const copyButton = async () => {
+  if (forCopyArr.value.length == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "복사할 결제코드가 없습니다.",
+    });
+    return;
+  }
+  try {
+    store.state.loading = true;
+    const res = await CopyDiscountMenuList(
+      groupCd.value,
+      gridvalue5.value,
+      forCopyArr.value.join("\u200B")
+    );
+
+    Swal.fire({
+      title: "성공",
+      text: "복사가 완료되었습니다.",
+      icon: "success",
+      confirmButtonText: "확인",
+    });
+  } catch (error) {
+  } finally {
+    store.state.loading = false;
+  }
 };
 
 const setAllCheck2 = ref(false);

@@ -14,7 +14,7 @@
       <main class="popup-body flex-grow">
         <div class="flex justify-start font-bold text-xl ml-12">기준매장</div>
         <div
-          class="grid grid-rows-1 grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[25vw] ml-12 h-[4vh] rounded-lg">
+          class="grid grid-rows-2 grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[25vw] ml-12 h-[8vh] rounded-lg">
           <div
             class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">
             기준매장
@@ -25,6 +25,18 @@
               type="text"
               class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md bg-gray-200"
               :value="'[' + storeCd + ']' + storeNm"
+              disabled />
+          </div>
+          <div
+            class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">
+            포스번호
+          </div>
+          <div
+            class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center">
+            <input
+              type="text"
+              class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md bg-gray-200"
+              :value="posNo"
               disabled />
           </div>
         </div>
@@ -73,13 +85,12 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
-import style from "../customStyle/style.css";
-import realgrid from "./realgrid.vue";
-import * as api from "@/api/common";
 import * as api2 from "@/api/master";
-import { useStore } from "vuex";
+import * as api from "@/api/common";
 import Swal from "sweetalert2";
+import { ref } from "vue";
+import { useStore } from "vuex";
+import realgrid from "./realgrid.vue";
 const {
   isVisible,
   storeCd,
@@ -110,6 +121,7 @@ const userData = store.state.userData;
 const groupCd = ref(userData.lngStoreGroup);
 const searchWord = ref("");
 const checked = ref(false);
+
 const emit = defineEmits(["close"]);
 
 function close() {
@@ -192,18 +204,25 @@ const dupliStore = async () => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           store.state.loading = true;
+          let res3;
+          try {
+            res3 = await api2[dupliapiname](
+              groupCd.value,
+              storeCd,
+              areaCd,
+              posNo,
+              groupCd2.join(","),
+              storeCd2.join(","),
+              areaCd2.join(","),
+              posNo2.join(",")
+            );
+          } catch (error) {
+            console.log(error);
+          } finally {
+            store.state.loading = false;
+          }
 
-          const res3 = await api2[dupliapiname](
-            groupCd.value,
-            storeCd,
-            areaCd,
-            posNo,
-            groupCd2.join(","),
-            storeCd2.join(","),
-            areaCd2.join(","),
-            posNo2.join(",")
-          );
-          //comsole.log(res3.data);
+          console.log(res3);
           if (res3.data.RESULT_CD == "00") {
             store.state.loading = false;
             Swal.fire({

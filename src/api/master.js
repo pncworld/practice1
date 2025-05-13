@@ -1182,6 +1182,29 @@ export const DUPLITABLEKEY = (
     T_POS_NO: t_posNo,
   });
 };
+
+export const DUPLITABLEKEY2 = (
+  groupCd,
+  storeCd,
+  areaCd,
+  posNo,
+  t_groupCd,
+  t_storeCd,
+  t_areaCd,
+  t_posNo
+) => {
+  return api2.post("/MIMASTER/MST_001INS.asmx/DUPLITABLEKEY2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+    POSNO: posNo,
+    T_GROUP_CD: t_groupCd,
+    T_STORE_CD: t_storeCd,
+    T_AREA_CD: t_areaCd,
+    T_POS_NO: t_posNo,
+  });
+};
+
 export const DUPLIPAYCD = (groupCd, storeCd, groupCd2, storeCd2) => {
   return api2.post("/MIMASTER/MST36_055INS.asmx/DUPLIPAYCD", {
     GROUP_CD: groupCd,
@@ -2141,5 +2164,32 @@ export const deleteMasterList = (
     POS_NO: posNo,
     TABLE_ID: tableIds,
     DTM_DATE: date,
+  });
+};
+
+export const getPayCodeListbyCode = (groupCd, lngcode) => {
+  return api2.post("/MIMASTER/MST36_001INS.asmx/getPayCodeListbyCode", {
+    GROUP_CD: groupCd,
+    LNGCODE: lngcode,
+  });
+};
+export const CopyDiscountMenuList = (groupCd, lngcode, copyList) => {
+  return api2.post("/MIMASTER/MST36_001INS.asmx/CopyDiscountMenuList", {
+    GROUP_CD: groupCd,
+    LNGCODE: lngcode,
+    COPYLIST: copyList,
+  });
+};
+export const getAmountListByMenuCode = (groupCd, lngcode) => {
+  return api2.post("/MIMASTER/MST01_033INS.asmx/getAmountListByMenuCode", {
+    GROUP_CD: groupCd,
+    MENUCODE: lngcode,
+  });
+};
+export const copyMenuListByCode = (groupCd, lngcode, menucdlist) => {
+  return api2.post("/MIMASTER/MST01_033INS.asmx/copyMenuListByCode", {
+    GROUP_CD: groupCd,
+    MENUCODE: lngcode,
+    COPYLIST: menucdlist,
   });
 };
