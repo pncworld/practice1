@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : MST43_001INS.vue                                                  
+# Description : 마스터관리 > 매출 마스터 > 신용카드 매입사 등록.                
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회 조건 -->
   <div class="h-[80%]">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
@@ -17,6 +24,8 @@
         @update:ischanged="handleinitAll">
       </PickStore>
     </div>
+    <!-- 조회 조건 -->
+    <!-- 그리드 영역 -->
     <span class="grid grid-rows-1 grid-cols-2 mt-5">
       <div class="ml-10 flex justify-start font-bold text-xl">카드 정보</div>
       <div class="flex justify-between ml-44">
@@ -55,7 +64,8 @@
           :addField="'new'">
         </Realgrid>
       </div>
-
+      <!-- 그리드 영역 -->
+      <!-- 연동 데이터 영역 -->
       <div class="grid grid-cols-[1fr,6fr] grid-rows-6 w-[70%] ml-44 h-[30%]">
         <div
           class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500 rounded-tl-lg">
@@ -148,18 +158,51 @@
       </div>
     </div>
   </div>
+  <!-- 연동 데이터 영역 -->
 </template>
 
 <script setup>
 import { getCardInfo, saveCreditCardEnroll } from "@/api/master";
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
 
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 });
@@ -175,6 +218,10 @@ const clickStoreNm = ref();
 const addNew = ref(true);
 const valuesData = ref([]);
 const labelsData = ref([]);
+/**
+ * 추가 버튼 함수
+ */
+
 const addRow = ref(false);
 const changeNow = ref(false);
 const changeValue2 = ref();
@@ -188,9 +235,17 @@ const gridvalue5 = ref();
 const gridvalue6 = ref();
 const gridvalue7 = ref();
 
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndex = (newValue) => {
   changeRow.value = newValue;
 };
+/**
+ *  추가 버튼
+ */
+
 const addButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -211,7 +266,15 @@ const addButton = () => {
   addrowDefault.value = clickStoreCd.value + "," + clickStoreNm.value;
   addRow.value = !addRow.value;
 };
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRow = ref(false);
+/**
+ * 삭제 버튼
+ */
+
 const deleteButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -225,6 +288,10 @@ const deleteButton = () => {
 const disableCd = ref(false);
 
 const tempgridValue5 = ref();
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData = (newValue) => {
   isFirstInput.value = true;
 
@@ -241,9 +308,17 @@ const clickedRowData = (newValue) => {
     addNew.value = true;
   }
 };
+/**
+ * 페이지 매장 그룹 세팅
+ */
+
 const handleGroupCd = (newValue) => {
   groupCd.value = newValue;
 };
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = (newValue) => {
   rowData.value = [];
   gridvalue1.value = "";
@@ -258,6 +333,10 @@ const handleStoreCd = (newValue) => {
   //comsole.log(newValue);
 };
 const updateRow = ref([]);
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData = (newValue) => {
   updateRow.value = newValue;
   //comsole.log(newValue);
@@ -270,6 +349,11 @@ const makeToFixed2 = (e) => {
   }
 };
 const isFirstInput = ref(true);
+
+/**
+ * INPUT , SELECT 수정 데이터 갱신
+ */
+
 const changeInfo = (e) => {
   const rowName = e.target.name;
   const rowValue = e.target.value;
@@ -303,6 +387,10 @@ const addrowDefault = ref("");
 const storeList = ref([]);
 const addrowProp = ref("lngStoreCode,strStoreName");
 const store = useStore();
+/**
+ *  조회 함수
+ */
+
 const searchButton = async () => {
   store.state.loading = true;
   try {
@@ -335,6 +423,10 @@ const searchButton = async () => {
 const storeNm = (newValue) => {
   clickStoreNm.value = newValue;
 };
+
+/**
+ *  저장 버튼 함수
+ */
 
 const saveButton = async () => {
   //comsole.log(updateRow.value);

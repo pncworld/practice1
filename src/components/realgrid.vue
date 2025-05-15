@@ -17,9 +17,109 @@ import { v4 as uuidv4 } from "uuid";
 import { nextTick, onMounted, ref, watch } from "vue";
 let gridView;
 let dataProvider;
+
 /*
-  사용법 progname => SQL mstgridInfo 에 저장된 설정값 가져오는 부분
-  사용법 progid => SQL mstgridInfo 에 저장된 설정값 가져오는 부분
+
+  - 리얼그리드.vue 파일 구조 및 사용 방법
+
+  RealGrid2의 개념도와 주요 객체들을 살펴보겠습니다.
+
+    GridView: 눈에 보이는 부분을 담당하는 중요한 객체입니다.
+    DataProvider: 데이터를 관리하는 중요한 객체입니다.
+    DataField: 데이터 저장을 위한 논리적 장소를 담당하는 객체입니다.
+    DataColumn: DataField의 정보를 화면에 표현하기 위한 속성을 담고 있는 객체입니다.
+    ItemModel 또는 GridItem: 그리드에 보여지는 행 정보를 담고 있는 모델 객체입니다.
+    Controller: 그리드에서 Item을 조작하기 위한 여러 가지 내부적인 객체들을 아우르는 의미의 명칭입니다.
+
+   (출처 : https://docs.realgrid.com/tutorial/introductions-concepts) https://docs.realgrid.com/tutorial/realgrid-column-field-setup
+  우리테크의 RealGrid2 는 외부 종속성 없이 TypeScript로 개발된 웹 DataGrid UI 라이브러리로 최신 웹 브라우저에서 직접 사용할 수 있는 
+  ES5 형식의 순수 JavaScript 파일로 제공합니다. "RealGridJS 1.0"의 Canvas 방식에서 DOM 방식으로 작동 방식이 변경되었지만 상당부분 1.0과 호환성을 가지고 있습니다.
+  
+  RealGrid를 사용하려면 RealGrid의 개념을 이해 해야 합니다. 아래 이미지는 RealGrid의 구성을 간략하게 표현한 도식 입니다. 
+  RealGrid는 효과적인 데이터 관리를 위해 별도의 데이터 셋를 가지고 있고 "DataProvider"라고 합니다. 그리드에 넣을 데이터를 DataProvider에 로드해 사용합니다. 
+  그리드 데이터 셋에 담을 수 있는 형식은 Json, XML, CSV 와 Javascript Array 형식을 지원합니다. 
+  RealGrid의 MVC 모델의 장점으로 하나의 데이터 셋에 여러 개의 그리드 뷰를 연결할 수 있습니다
+  
+  1구간 에서는 부모(각 페이지) 컴포넌트에서 전달 받는 변수들을 정의 
+  2구간 에서는 리얼그리드 컴포넌트 내에서 사용하는 변수들을 정의
+  3구간 에서는 리얼그리드 정의에 따른 컬럼과 필드 설정 , DB 에서 불러오는 컬럼에 대한 정보를 각각의 양식에 맞게 붙여서 정의를 함. 
+            그리고 gridView.setColumns(columns); 함수로 컬럼을 설정하고 4구간 주변에서 사전에 별도로 설정할 값을 변수로 받아서 설정을 필요에 따라 해줌.
+  4구간 에서는 부모 컴포넌트에서 미리 정의된 변수들로 기존 3구간에서 정의하기 어려운 부분들을 재정의 해줌 .
+  5구간 에서는 리얼그리드에서 기본적으로 설정되어야할 값들을 설정 해주는 부분.
+  6구간 에서는 리얼그리드 함수에 대한 정의를 커스텀 한 부분이고 각각의 이벤트가 발생할때마다 필요로 하는 설정이나 다시 emit 으로 부모 컴포넌트에 전달하는 역할을 함
+  7구간 에서는 동적으로 부모 컴포넌트에서 동적으로 제어하는 변수들의 값들을 감지해서 필요로하는 동작을 해줌 ( 예를 들어 검색 )
+  
+
+  예시)
+
+  gridView.onCellClicked = function (grid, clickData) { // 셀을 클릭할때 발생되는 이벤트 
+    if (clickData.cellType == "check") { // 해당 셀이 체크박스 타입이면 종료하고
+      return;
+    }
+    if (clickData.cellType === "header") { // 해당 셀이 컬럼부분이면 미리 설정된 행의 인덱스 부분으로 선택하는 행을 옮겨주고
+      gridView.setCurrent({ dataRow: selectedindex.value });
+    }
+    if (clickData.itemIndex == undefined || clickData.itemIndex == -1) { // 그외의 정상적인 행 부분이 아니면 종료시켜줌.
+      return;
+    }
+    var current = gridView.getCurrent(); // 모든 예외처리를 거쳤으면 이제 선택된 행이 있으므로 해당 행의 정보들을 불러와서
+    //comsole.log(current);
+    if (current.itemIndex !== -1) { // 그 행의 인덱스를 다시 검사해서 정상적인 인덱스면
+      emit("selectedIndex", current.dataRow); // 선택한 행의 인덱스를 부모 컴포넌트로 보냄
+      emit("selectedIndex2", current.dataRow); // 선택한 행의 인덱스를 부모 컴포넌트로 보냄
+
+
+      selectedRowData.value = dataProvider.getRows()[clickData.dataRow]; // 그리고 해당 행의 실질적인 정보들을 불러오고
+
+      if (gridView.isCheckedRow(clickData.itemIndex)) { //  해당 행이 체크된 행이면 
+        if (props.hideCheckBarList == false) {       // 미리 설정된 값에 따라서 체크를 해주거나 안해주는 부분
+          grid.checkItem(clickData.itemIndex, false);
+        } else {
+          if (
+            props.hideCheckBarList == true &&
+            selectedRowData.value[4] != "0"
+          ) {
+            grid.checkItem(clickData.itemIndex, false);
+          }
+        }
+      } else {
+        if (props.hideCheckBarList == false) {
+          grid.checkItem(clickData.itemIndex);
+        } else {
+          if (
+            props.hideCheckBarList == true &&
+            selectedRowData.value[4] != "0"
+          ) {
+            grid.checkItem(clickData.itemIndex);
+          }
+        }
+      }
+
+      selectedRowData.value = dataProvider.getRows()[current.dataRow]; // 해당 행의 정보를 다시 불러와서 ( 이부분은 없어도 될것으로 보임)
+      if (selectedRowData.value) {    // 해당행이 undefined 가 아니면 해당 행의 상태값과 인덱스를 붙여서 emit을 통해서 부모 컴포넌트로 보냄 emit("sendRowState", rowState); 이부분은 행의 상태를  ,     emit("clickedRowData", selectedRowData.value); 이부분은 클릭한 행의 데이터 전부를
+        const rowState = dataProvider.getRowState(clickData.dataRow);
+        if (selectedRowData.value) {
+          selectedRowData.value.index = current.dataRow;
+          selectedRowData.value.rowState = rowState;
+        }
+        selectedindex.value = current.dataRow;
+
+        //comsole.log(rowState);
+        emit("sendRowState", rowState);
+
+        emit("clickedRowData", selectedRowData.value);
+      }
+    }
+  };
+  
+  
+  
+  emit updatedRowData 사용시에는 가급적 불가피한경우가 아니라면 기존 rowData와 교체 하지 말 것. updatedRowData로 수정된 사항을 별도의
+  변수로 저장해두고 추후에 그 데이터를 저장하는게 옳다고봄
+
+  사용법
+  progname => SQL mstgridInfo 에 저장된 설정값 가져오는 부분  
+  progid => SQL mstgridInfo 에 저장된 설정값 가져오는 부분
   rowData => 실제 데이터 입력 부분
   showGrid => 변수로 그리드를 보여주거나 안 보여주게 설정
   showCheckBar => 변수로 그리드 내의 체크바를 보여주거나 안 보여주게 설정
@@ -27,559 +127,685 @@ let dataProvider;
   searchColId => 검색하려는 필드명 ( 예)strName,SubName) , 로 나눠서 해당 필드들을 함께 조회 가능
   addRow => true false로 값이 변할때마다 행을 추가
   deleteRow =>  true false로 값이 변할때마다 행을 삭제
-  사용법 emit updatedRowData 사용시에는 가급적 불가피한경우가 아니라면 기존 rowData와 교체 하지 말 것. updatedRowData로 수정된 사항을 별도의
-  변수로 저장해두고 추후에 그 데이터를 저장하는게 옳다고봄
+  deleteRow3 => 
 
-
-
-  gridView.columnByName("colName").footer.valueCallback = function(grid, column, footerIndex, columnFooter, value){
-    var sum = 0;
-    var checkedItems = gridView.getCheckedItems();
-    for(var i = 0; i < checkedItems.length; i++){
-        sum += grid.getValue(checkedItems[i], "fieldName")
-    }
-
-    return sum;
 }
+
 */
+
+// 1구간
 const props = defineProps({
   progname: {
+    // DB 에서 불러올 사전에 정의된 컬럼 정보들을 가지고 있는 부분의 프로그램이름
     type: String,
     default: "",
   },
   progid: {
+    // DB 에서 불러올 사전에 정의된 컬럼 정보들을 가지고 있는 부분의 프로그램 ID
     type: Number,
     default: 0,
   },
   rowData: {
+    // 실제 나타낼 데이터
     type: Array,
     default: () => [],
   },
   showGrid: {
+    //  변수로 그리드를 보이게 하거나 안 보이게 하려는 목적이었음 ( 현재는 폐기됨)
     type: Boolean,
     default: false,
   },
   showCheckBar: {
+    //  변수로 체크바를 보이게 하거나 안보이게
     type: Boolean,
     default: false,
   },
   searchWord: {
+    // 폐기
     type: String,
     default: "",
   },
   renderProgname: {
+    //  폐기
     type: String,
     default: "",
   },
   searchColId: {
+    // 검색할 검색어 외에 컬럼의 값으로 조회하기 위한 추가적인 컬럼id
     type: String,
     default: "",
   },
   addRow: {
+    // 행 추가버튼
     type: Boolean,
     default: false,
   },
   deleteRow: {
+    // 행 삭제버튼
     type: Boolean,
     default: false,
   },
   editableColId: {
+    // 행 자체에서 데이터를 수정할 컬럼 설정
     type: String,
     default: "",
   },
   changeColid: {
+    // 그리드 안에 데이터를 수정할 컬럼 ID
     type: String,
     default: "",
   },
   changeRow: {
+    // 그리드 안에 데이터를 수정할 컬럼 인덱스
     type: Number,
     default: "",
   },
   changeValue: {
+    // 그리드 안에 데이터를 수정할 컬럼의 값
     type: String,
     default: "",
   },
   rowStateeditable: {
+    // 그리드 전체 행의 자체 수정 여부
     type: Boolean,
     default: true,
   },
   addRow2: {
+    // 행 추가 버튼
     type: Boolean,
     default: true,
   },
   addrowProp: {
+    // 행 추가할때 기본값으로 설정할 컬럼
     type: String,
     default: true,
   },
   addrowDefault: {
+    // 행 추가할때 기본값으로 설정할 컬럼의 값
     type: String,
     default: true,
   },
   reload: {
+    // 그리드 갱신
     type: Boolean,
     default: false,
   },
   fixedColumn: {
+    // 그리드 컬럼의 가로 길이에 대한 고정 여부
     type: Boolean,
     default: false,
   },
   mergeColumns: {
+    // 그리드 컬럼 그룹핑 여부
     type: Boolean,
     default: false,
   },
   mergeColumnGroupName: {
+    // 그리드 컬럼 상위 그룹 컬럼명
     type: String,
     default: "",
   },
   mergeColumnGroupSubList: {
+    // 그리드 컬럼 그룹핑할 컬럼명
     type: String,
     default: "",
   },
   exporttoExcel: {
+    // 엑셀 내보내기
     type: Boolean,
     default: false,
   },
   ExcelNm: {
+    // 폐기
     type: String,
     default: false,
   },
   deleteAll: {
+    // 모든 행 삭제
     type: Boolean,
     default: false,
   },
   commitAll: {
+    // 모든 행 커밋
     type: Boolean,
     default: false,
   },
   inputOnlyNumberColumn: {
+    // 데이터 입력 숫자로 제한
     type: String,
     default: "",
   },
   dragOn: {
+    // 고정 컬럼 여부
     type: Boolean,
     default: false,
   },
   notsoftDelete: {
+    // 행 삭제시 바로삭제 혹은 행상태 변경 여부
     type: Boolean,
     default: false,
   },
   searchColId2: {
+    //  폐기
     type: String,
     default: "",
   },
   searchColValue2: {
-    // 숫자로만 오게
+    //  폐기
     type: String,
     default: "",
   },
   addRow3: {
-    // 숫자로만 오게
+    // 행 추가
+
     type: Boolean,
     default: true,
   },
   selectionStyle: {
+    // 셀 클릭시 전체 행을 선택한것처럼 보이게 할건지 아니면 셀만 선택된것처럼 보이게 할건지
     // 숫자로만 오게
     type: String,
     default: "singleRow",
   },
   initFocus: {
+    // 셀 선택 초기화
     // 숫자로만 오게
     type: Boolean,
     default: false,
   },
   addRow4: {
+    // 행 추가
     // 숫자로만 오게
     type: Boolean,
     default: false,
   },
   addRow5: {
+    // 행 추가
     // 숫자로만 오게
     type: Boolean,
     default: false,
   },
   deleteRow2: {
+    // 행 삭제
     // 숫자로만 오게
     type: Boolean,
     default: false,
   },
   addField: {
+    // 컬럼을 추가하는 역할인데 사실상 폐기
     // 숫자로만 오게
     type: String,
     default: "",
   },
   labelsData: {
+    // 데이터 행의 실제 값에 따른 라벨 값
     // 숫자로만 오게
     type: Array,
     default: () => [],
   },
   valuesData: {
+    // 데이터 행의 라벨 값에 따른 실제 값
     // 숫자로만 오게
     type: Array,
     default: () => [],
   },
   labelingColumns: {
+    // 라벨링할 컬럼 목록
     // 숫자로만 오게
     type: String,
     default: "",
   },
   deleteRow3: {
+    // 삭제 버튼
     // 숫자로만 오게
     type: Boolean,
     default: false,
   },
   useCheckboxfordelete: {
+    // 체크박스 상태에 따른 행상태 변경
     // 숫자로만 오게
     type: Boolean,
     default: false,
   },
   changeNow: {
+    // 세팅된 데이터 값으로 즉시 변경
     type: Boolean,
     default: false,
   },
   changeValue2: {
+    // 변경할 데이터의 값
     type: String,
     default: "",
   },
   setNumberformatColumn: {
+    // 천단위로 숫자 포맷을 세팅할 컬럼 but 사실상 폐기 (DB에서 관리 가능함)
     type: String,
     default: "",
   },
   setAllCheck: {
+    // 모든 행 체크 false
     type: Boolean,
     default: false,
   },
   deleteRow4: {
+    // 행 삭제
     type: Boolean,
     default: false,
   },
   deleteRow5: {
+    // 행 삭제
     type: Boolean,
     default: false,
   },
   defaultSearchAllValue: {
+    // 폐기
     type: Number,
     default: 0,
   },
   initCheckColumn: {
+    // 인위적으로 체크할 컬럼
     type: String,
     default: "",
   },
   initCheckValue: {
+    // 인위적으로 체크할 행의 값
     type: String,
     default: "",
   },
   initCheckAct: {
+    // 인위적으로 체크 시행
     type: Boolean,
     default: false,
   },
   initSelect: {
+    // 그리드가 로드될때 선택되는 행의 인덱스 값을 초기화
     type: Boolean,
     default: false,
   },
   setAllCheck2: {
+    // 그리드 모든 체크박스 강제체크
     type: Boolean,
     default: false,
   },
   uncheckColumn: {
+    // 인위적으로 체크 하지 않을 컬럼
     type: String,
     default: "",
   },
   uncheckValue: {
+    // 인위적으로 체크 하지 않을 컬럼의 값
     type: String,
     default: "",
   },
   uncheckAct: {
+    // 인위적으로 체크해제 시행
     type: Boolean,
     default: false,
   },
   maintaincheckColumn: {
+    // 폐기
     type: String,
     default: "",
   },
   hideRow: {
+    // 숨길 행 설정
     type: Number,
     default: 0,
   },
   hideNow: {
+    // 설정된 숨길행 숨기기 실행
     type: Boolean,
     default: "",
   },
   changeOriginRow: {
+    // 폐기
     type: Number,
     default: "",
   },
   checkBarInactive: {
+    // 비활성화 시킬 체크바 인덱스 위치들
     type: String,
     default: "",
   },
   ExceptionCheck: {
+    // 인위적으로 체크되는 것에서 제외할 인덱스 값들
     type: String,
     default: "",
   },
   showTooltip: {
+    // 툴팁 보이기
     type: Boolean,
     default: false,
   },
 
   searchPrimaryId: {
+    // 폐기
     type: String,
     default: "",
   },
   setStateBar: {
+    // 행 상태 보이기 여부
     type: Boolean,
     default: true,
   },
   setFooter: {
+    // 그리드 푸터 설정 여부
     type: Boolean,
     default: false,
   },
   setGroupFooter: {
+    // 그리드 그룹 푸터 설정 여부
     type: Boolean,
     default: false,
   },
   setFooterExpressions: {
+    // 푸터 표현식
     type: Array,
     default: [],
   },
   setFooterColID: {
+    //  푸터 표현식을 설정할 컬럼명
     type: Array,
     default: [],
   },
   showOnlyChecked: {
+    // 체크된 것만 보이기 여부
     type: Boolean,
     default: false,
   },
   setGroupColumnId: {
+    // 그룹핑할 컬럼명
     type: String,
     default: "dtmDate",
   },
   setGroupSumCustomText: {
+    //  그룹 푸터에서 임의로 설정할 텍스트
     type: Array,
     default: [],
   },
   setGroupSumCustomColumnId: {
+    //  그룹 푸터에서 임의로 설정할 텍스트 컬럼명
     type: Array,
     default: [],
   },
   setGroupCustomLevel: {
+    //  그룹 푸터에서 임의로 설정할 텍스트 컬럼의 레벨 설정
     type: String,
     default: "1",
   },
 
   setGroupSummaryCenterIds: {
+    // 폐기
     type: String,
     default: " ",
   },
   hideColumnNow: {
+    // 동적으로 숨길 컬럼에 대한 숨김 실행
     type: Boolean,
     default: false,
   },
   hideColumn: {
+    // 동적으로 숨길 컬럼명 설정
     type: String,
     default: "",
   },
   setRowGroupSpan: {
+    // 셀 병합
     type: String,
     default: "",
   },
   documentTitle: {
+    // 내보낼 엑셀파일명 설정
     type: String,
     default: "",
   },
   documentSubTitle: {
+    // 내보낼 엑셀 부제목 설정
     type: String,
     default: "",
   },
   hideColumnsId: {
+    // 숨길 엑셀 컬럼명들 설정
     type: Array,
     default: [],
   },
   setGroupFooterExpressions: {
+    // 그룹 푸터에서 나타낼 값
     type: Array,
     default: [],
   },
   setGroupFooterColID: {
+    // 그룹 푸터에서 나타낼 값들의 컬럼명
     type: Array,
     default: [],
   },
   setGroupSumCustomLevel: {
+    // 그룹 푸터에서 나타낼 값들의 레벨
     type: String,
     default: 1,
   },
   setGroupSumCustomLevel2: {
+    // 그룹 푸터에서 나타낼 값들의 레벨2
     type: String,
     default: 1,
   },
   mergeColumns2: {
+    // 그룹핑할 컬럼들의 작동 여부
     type: Boolean,
     default: false,
   },
   mergeColumnGroupName2: {
+    // 그룹핑된 컬럼들의 상위 컬럼명
     type: Array,
     default: [],
   },
   mergeColumnGroupSubList2: {
+    // 그룹핑할 컬럼들
     type: Array,
     default: [[]],
   },
   getJson: {
+    // 현재 데이터를 JSON 데이터로 전달할 변수
     type: Boolean,
     default: false,
   },
   suffixColumnPercent: {
+    // 컬럼에 % 붙일 컬럼들
     type: Array,
     default: [],
   },
   mergeMask: {
+    //
     type: String,
     default: "",
   },
 
   setRowGroupSpan2: {
+    // 셀병합
     type: String,
     default: "",
   },
   setMergeMode: {
+    //
     type: Boolean,
     default: true,
   },
   setFooterCustomText: {
+    // 푸터에서 임의로 넣을 텍스트 값들
     type: Array,
     default: [],
   },
   setFooterCustomColumnId: {
+    // 푸터에서 임의로 넣을 텍스트들이 들어갈 컬럼명들
     type: Array,
     default: [],
   },
   setGroupOrderByColumnId: {
+    // 그리드에서 그룹핑을 할때 순서 설정할 컬럼
     type: String,
     default: "",
   },
   setGroupSumCustomText2: {
+    // 그룹푸터에서 나타날 텍스트 값들
     type: Array,
     default: [[]],
   },
   setGroupSumCustomText3: {
+    // 그룹푸터에서 나타날 텍스트 값들
     type: Array,
     default: [],
   },
 
   setGroupSumCustomColumnId2: {
+    // 그룹푸터에서 나타날 텍스트 값이 있을 컬럼들
     type: Array,
     default: [],
   },
   setGroupSumCustomColumnId3: {
+    // 그룹푸터에서 나타날 텍스트 값이 있을 컬럼들
     type: Array,
     default: [],
   },
   setGroupCustomLevel: {
+    // 그룹푸터에서 나타날 텍스트 값이 있을 레벨값
     type: String,
     default: 1,
   },
   setRowStyleCalls: {
+    // 그룹푸터에서 레벨별로 나타날 색상에 대한 설정
     type: Boolean,
     default: false,
   },
   setRowStyleLevel: {
+    // 그룹푸터에서 레벨별로 나타날 색상에 대한 설정
     type: Number,
     default: 1,
   },
 
   setRowGroupSpan3: {
+    //폐기
     type: String,
     default: "",
   },
 
   customFooterCalculate: {
+    // 폐기
     type: String,
     default: "",
   },
   customFooterShowLast: {
+    // 폐기
     type: Boolean,
     default: false,
   },
   customStyleColumnID: {
+    // 폐기
     type: Array,
     default: [],
   },
   setRowIndicator: {
+    // 나타나는 그리드에서 맨 왼쪽 보이는 숫자 나타낼지 여부
     type: Boolean,
     default: true,
   },
   moveFocusbyIndex: {
+    // 강제 선택된 행 이동
     type: String,
     default: "",
   },
   deleteCreated: {
+    // 추가된 행 삭제 방법 여부
     type: Boolean,
     default: true,
   },
   setDynamicGrid: {
+    // 동적 그리드 관련
     type: Boolean,
     default: false,
   },
   setDynamicGrid2: {
+    // 동적 그리드 관련
     type: Boolean,
     default: false,
   },
   dynamicStoreCd: {
+    // 동적 그리드 관련
     type: String,
     default: "",
   },
   setDynamicGrid3: {
+    // 동적 그리드 관련
     type: Boolean,
     default: false,
   },
   searchWord3: {
+    // 검색어
     type: String,
     default: "",
   },
   changeNow2: {
+    // 그리드 데이터 변경시 재 클릭 이벤트 발생 여부에 따른 실행  (changeNow 와 차이)
     type: Boolean,
     default: false,
   },
   searchColId3: {
+    // 검색할 데이터의 컬럼
     type: Array,
     default: [],
   },
   searchValue: {
+    // 검색할 데이터의 컬럼의값
     type: Array,
     default: [],
   },
   deleteRow6: {
+    // 행 삭제
     type: Boolean,
     default: false,
   },
   suffixColumnJul: {
+    // 컬럼에 데이터 뒤에 '줄' 붙이는 방법
     type: Array,
     default: [],
   },
   suffixColumnheng: {
+    // 컬럼에 데이터 뒤에 '행' 붙이는 방법
     type: Array,
     default: [],
   },
   searchSpecialCond: {
+    // 검색할 데이터의 컬럼조건
     type: Boolean,
     default: true,
   },
   searchSpecialColId: {
+    // 검색할 데이터의 컬럼명
     type: Array,
     default: [],
   },
   activeSearchSpecial: {
+    // 검색할 데이터의 특정 조건 실행 여부
     type: Boolean,
     default: false,
   },
   setReFocus: {
+    // 강제 재클릭 이벤트 발생
     type: Boolean,
     default: false,
   },
   hideCheckBarList: {
+    // 체크바 관련 변수
     type: Boolean,
     default: false,
   },
+  suffixColumnwon: {
+    // 체크바 관련 변수
+    type: Array,
+    default: [],
+  },
 });
 
+// 2구간
 const realgridname = ref(
   `realgrid-${props.progname}-${props.progid}-${uuidv4()}`
 ); // 동적 ID 설정
@@ -607,6 +833,7 @@ const emit = defineEmits([
   "allStateRows",
   "buttonClicked",
 ]);
+// 3구간
 const funcshowGrid = async () => {
   if (gridView !== undefined && gridView !== null) {
     dataProvider.clearRows();
@@ -634,12 +861,16 @@ const funcshowGrid = async () => {
   gridView = new GridView(container);
   gridView.setDataSource(dataProvider);
 
+  window.gridView = gridView;
+
   // 필드 정의
   const fields = tabInitSetArray.value.map((item) => ({
     fieldName: item.strColID,
     dataType:
-      item.strColID.includes("checkbox") ||
-      item.strColID.includes("lngSupplierID")
+      props.suffixColumnwon == "lngPrice" && item.strColID == "lngPrice"
+        ? "number"
+        : item.strColID.includes("checkbox") ||
+          item.strColID.includes("lngSupplierID")
         ? "boolean"
         : item.strColType == "number" ||
           item.strColType === "float" ||
@@ -867,7 +1098,9 @@ const funcshowGrid = async () => {
     datetimeFormat: item.strMask == "" ? "yyyy-MM-dd" : item.strMask, // sql 에서 mstgridinfo 에서 date  일때 기본값이 있고 정의할 수 있음
     width: item.intHdWidth,
     numberFormat:
-      item.strColType == "float"
+      props.suffixColumnwon == "lngPrice" && item.strColID == "lngPrice"
+        ? "#,##0"
+        : item.strColType == "float"
         ? "#,##0"
         : item.strColType == "double" && item.strDisplay == "double"
         ? "#,##0.00"
@@ -905,6 +1138,7 @@ const funcshowGrid = async () => {
           : item.strColType.includes("dropdown")
           ? "list"
           : "text",
+      editable: false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
     },
     buttonVisibility: "always",
     styleCallback: function (grid, dataCell) {
@@ -1015,39 +1249,8 @@ const funcshowGrid = async () => {
     }
   }
 
-  // if (props.setRowGroupSpan3 != '') {
-  //   //comsole.log(props.setRowGroupSpan3)
-  //   const mergeColumn = props.setRowGroupSpan3.split(',')
-  //   const maskColumns = props.mergeMask.split(',')
-  //   for (var i = 0; i < maskColumns.length; i++) {
-  //     const rowGroupSpanColumn = columns.find(item => item.fieldName == maskColumns[i])
-  //     let maskdata = 'value' ;
-  //     if(props.mergeMask != ''){
-  //       const mask = maskColumns.map(item => item)
-
-  //     for(let j=0 ; j < mask.length ; j++ ){
-  //       if(mask[j] == maskColumns[i]){
-  //         maskdata = "values['"+mask[j]+"']+"
-  //       } else {
-  //         maskdata = ''
-  //       }
-
-  //     }
-  //     maskdata = maskdata+"value"
-  //     } else {
-  //       maskdata = "value"
-  //     }
-  //      //comsole.log(maskdata)
-  //      if(rowGroupSpanColumn){
-  //       rowGroupSpanColumn.mergeRule = { criteria: maskdata}
-  //      }
-
-  //   }
-
-  // }
-
   gridView.setColumns(columns);
-
+  // 4구간
   if (props.setRowStyleCalls) {
     gridView.setRowStyleCallback((grid, item, fixed) => {
       if (props.setRowStyleLevel == 1) {
@@ -1278,7 +1481,7 @@ const funcshowGrid = async () => {
   }
 
   // 데이터 추가
-
+  // 5구간
   dataProvider.setRows(props.rowData);
   //
   // 기타 옵션
@@ -1286,31 +1489,35 @@ const funcshowGrid = async () => {
   gridView.setFooters({ visible: props.setFooter == false ? false : true });
   gridView.setRowIndicator({ visible: props.setRowIndicator });
   gridView.setCheckBar({ visible: props.showCheckBar });
-  gridView.displayOptions.fitStyle = "even";
+  //gridView.displayOptions.fitStyle = "even";
   gridView.sortingOptions.enabled = true;
-  //gridView.editOptions.editable = false;
+  gridView.editOptions.editable = false;
   gridView.editOptions.updatable = true;
   gridView.editOptions.deletable = true;
   gridView.displayOptions.fitStyle =
     props.fixedColumn == false ? "even" : "none";
+  gridView.editOptions.commitByCell = true;
   gridView.editOptions.commitByCell = true;
   gridView.editOptions.commitWhenLeave = true;
   gridView.displayOptions.showInnerFocus = false;
   dataProvider.softDeleting = props.notsoftDelete == false ? true : false;
   dataProvider.deleteCreated = props.deleteCreated;
   gridView.filteringOptions.handleVisibility = "hidden";
-  //gridView.sortingOptions.enabled = false; // 정렬기능 비활성화
+  gridView.sortingOptions.enabled = false; // 정렬기능 비활성화
   dataProvider.autoCommit = true; // 자동 커밋 활성화
   dataProvider.commitBeforeDataEdit = true;
   gridView.editOptions.movable = props.dragOn == true ? true : false;
   gridView.displayOptions.selectAndImmediateDrag =
     props.dragOn == true ? true : false;
-  gridView.displayOptions.selectionStyle = props.selectionStyle;
+  gridView.displayOptions.selectionStyle =
+    props.dragOn == true ? "block" : props.selectionStyle;
+  // props.selectionStyle;deleteRow
   gridView.displayOptions.showTooltip = true;
   gridView.groupPanel.visible = false;
   gridView.displayOptions.watchDisplayChange = false;
   gridView.filterMode = "explicit";
   gridView.checkBar.fieldName = "checkbox";
+  gridView.rowIndicator.draggableSelectedRows = true;
 
   if (props.suffixColumnPercent != []) {
     for (let i = 0; i < props.suffixColumnPercent.length; i++) {
@@ -1329,6 +1536,12 @@ const funcshowGrid = async () => {
       gridView.columnByName(props.suffixColumnheng[i]).suffix = "회";
     }
   }
+  if (props.suffixColumnwon == "lngPrice") {
+    if (gridView.columnByName(props.suffixColumnwon)) {
+      gridView.columnByName(props.suffixColumnwon).suffix = "원";
+    }
+  }
+
   if (props.hideColumnNow == true) {
     if (gridView.columnByField(props.hideColumn)) {
       gridView.columnByField(props.hideColumn).visible = false;
@@ -1394,6 +1607,7 @@ const funcshowGrid = async () => {
       }
     }
   }
+  // 6구간
   // 이벤트 설정
   gridView.onDataLoadComplated = function (grid) {
     grid.refresh(true);
@@ -1410,6 +1624,11 @@ const funcshowGrid = async () => {
   gridView.onItemChecked = function (grid, itemIndex, checked) {
     gridView.setCurrent({ dataRow: itemIndex });
 
+    // if (gridView.isCheckedRow(itemIndex)) {
+    //   grid.checkItem(itemIndex, false);
+    // } else {
+    //   grid.checkItem(itemIndex);
+    // }
     var rows = gridView.getCheckedRows();
 
     selectedRowData.value = [];
@@ -1490,6 +1709,7 @@ const funcshowGrid = async () => {
   };
 
   gridView.onCellClicked = function (grid, clickData) {
+    console.log(clickData);
     if (clickData.cellType == "check") {
       return;
     }
@@ -1504,44 +1724,6 @@ const funcshowGrid = async () => {
     if (current.itemIndex !== -1) {
       emit("selectedIndex", current.dataRow);
       emit("selectedIndex2", current.dataRow);
-
-      // //console.log(gridView.isCheckedRow(clickData.itemIndex));
-      ////console.log(grid.getValue(clickData.itemIndex, "checkbox"));
-      ////console.log(grid.getColumnNames(true, false));
-
-      // let isCheckedRow = grid.getColumnNames(true, false).includes("checkbox");
-      // if (
-      //   isCheckedRow &&
-      //   (grid.getValue(clickData.itemIndex, "checkbox") == undefined ||
-      //     grid.getValue(clickData.itemIndex, "checkbox") == false)
-      // ) {
-      //   grid.setValue(clickData.itemIndex, "checkbox", true);
-      //   var rows = grid.getCheckedRows();
-      //   //console.log(grid.getCheckedRows());
-      //   selectedRowData.value = [];
-      //   for (var i in rows) {
-      //     var data = dataProvider.getJsonRow(rows[i]);
-      //     selectedRowData.value.push(data);
-      //   }
-      //   //updatedrowData.value = [...dataProvider.getJsonRows()];
-      //   //selectedRowData.value.index = itemIndex;
-      //   emit("checkedRowData", selectedRowData.value);
-      // } else if (
-      //   isCheckedRow &&
-      //   grid.getValue(clickData.itemIndex, "checkbox") == true
-      // ) {
-      //   grid.setValue(clickData.itemIndex, "checkbox", false);
-      //   var rows = grid.getCheckedRows();
-      //   //console.log(grid.getCheckedRows());
-      //   selectedRowData.value = [];
-      //   for (var i in rows) {
-      //     var data = dataProvider.getJsonRow(rows[i]);
-      //     selectedRowData.value.push(data);
-      //   }
-      //   //updatedrowData.value = [...dataProvider.getJsonRows()];
-      //   //selectedRowData.value.index = itemIndex;
-      //   emit("checkedRowData", selectedRowData.value);
-      // }
 
       selectedRowData.value = dataProvider.getRows()[clickData.dataRow];
 
@@ -1640,6 +1822,7 @@ const funcshowGrid = async () => {
   };
 };
 
+// 7구간
 watch(
   () => props.changeValue,
   () => {
@@ -1967,7 +2150,7 @@ watch(
   (newVal) => {
     gridView.commit();
     const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
-    //comsole.log(curr.dataRow);
+    console.log(curr.dataRow);
     if (curr.dataRow == -1) {
       return;
     }
@@ -2020,7 +2203,7 @@ watch(
   () => props.deleteRow3,
   (newVal) => {
     gridView.commit();
-    const curr = gridView.getCurrent();
+    const curr = gridView.getCurrent(); // gridView 가뭔지  dataProvider 가 뭔지 개념을 설명
     if (curr.dataRow == -1) {
       return;
     }

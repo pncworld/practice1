@@ -1,3 +1,9 @@
+/*--############################################################################
+# Filename : MST01_033INS.vue                                                  
+# Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
   <div class="h-full w-full" @click="resetScreen">
     <div class="mt-[6vh]">
@@ -63,7 +69,15 @@
 
 <script setup>
 import { getAppStoreList, getMobileSeatInfo } from "@/api/mobile";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref, watch } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -82,6 +96,10 @@ const selectStoreCd = ref("");
 const selectSeat = ref(0);
 
 const StoreList = ref([]);
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(async () => {
   const res = await getAppStoreList(
     store.state.userData.GROUP_CD,
@@ -144,6 +162,10 @@ watch([selectStoreCd, selectSeat], async () => {
 
   //comsole.log(rowData.value);
 });
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(() => {});
 </script>

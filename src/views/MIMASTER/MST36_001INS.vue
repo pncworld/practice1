@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : MST36_001INS.vue                                                  
+# Description : 마스터관리 > 매장 마스터 > 결제 코드 등록                      
+  # Date :2025-05-14                                                           
+  # Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회 조건 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName> </PageName>
     <div class="flex justify-center mr-9 space-x-2 pr-5">
@@ -104,6 +111,8 @@
       @update:ischanged="handleinitAll"
       @update:ischanged2="searchinit"></PickStore>
   </div>
+  <!-- 조회 조건 -->
+  <!-- 그리드 데이터 부분 -->
   <div class="grid grid-rows-1 grid-cols-[4fr,5fr] h-[86%] w-full">
     <div class="flex flex-col w-full h-full">
       <div
@@ -202,6 +211,8 @@
         <!-- :searchWord="searchWord" :searchColId2="'blnInactive,payDistinct'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" -->
       </div>
     </div>
+    <!-- 그리드 데이터 부분 -->
+    <!-- 연동 데이터 부분 -->
     <div class="grid grid-cols-1 grid-rows-[1fr,9fr] ml-24 w-[40vw]">
       <div class="flex space-x-1 mt-10">
         <button
@@ -815,6 +826,7 @@
       </div>
     </div>
   </div>
+  <!-- 연동 데이터 부분 -->
 </template>
 
 <script setup>
@@ -825,13 +837,49 @@ import {
   getPayCodeListbyCode,
   savePayCode,
 } from "@/api/master";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ * 	그리드 생성
+ */
+
+/**
+ *  리얼그리드 라이브러리 호출
+ *  */
+
 import RealGrid from "realgrid";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { nextTick, onMounted, ref, watch } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
 
 const selectedMenu = ref(1);
@@ -843,9 +891,21 @@ const searchWord2 = ref("");
 const nowStoreCd = ref(0);
 const rowData = ref([]);
 const filteredrowData = ref([]);
+/**
+ * 추가 버튼 함수
+ */
+
 const addRow4 = ref(false);
 const updateRow = ref([]);
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRow3 = ref(false);
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword1 = ref("");
 const MenuGroup = ref("");
 const SubMenuGroup = ref("");
@@ -868,6 +928,10 @@ const payOptions = ref([]);
 const rounding = ref([]);
 const taxs = ref([]);
 const isNew = ref(false);
+
+/**
+ * 페이지 매장 그룹 세팅
+ */
 
 const lngStoreGroup = (e) => {
   groupCd.value = e;
@@ -918,6 +982,10 @@ const realgridname = (e) => {
 const realgridname2 = (e) => {
   realgrid3Name.value = e;
 };
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -985,6 +1053,10 @@ const clickedrowdata = ref([]);
 const clickrowData4 = ref([]);
 const filteredrowData5 = ref([]);
 const afterClickrow = ref(true);
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData = (newvalue) => {
   clickrowData4.value = [];
   filteredrowData5.value = [];
@@ -1146,12 +1218,24 @@ const clickedRowData = (newvalue) => {
   afterClickrow.value = false;
 };
 
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndex = (e) => {
   changeRow.value = e;
 };
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndex2 = (e) => {
   changeRow2.value = e;
 };
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = async (newValue) => {
   //comsole.log(newValue);
   if (newValue == "-1") {
@@ -1170,13 +1254,24 @@ const handleStoreCd = async (newValue) => {
   searchButton();
 };
 const clickmappingData = ref([]);
+/**
+ * 페이지 매장명 세팅
+ */
+
 const handlestoreNm = (newData) => {
   clickedStoreNm.value = newData;
 };
+/**
+ * 조회 상태 초기화
+ */
 
 const searchinit = (newvalue) => {
   afterSearch.value = false;
 };
+
+/**
+ * 조회 초기화
+ */
 
 const handleinitAll = (newvalue) => {
   MenuGroup.value = [];
@@ -1190,6 +1285,10 @@ const handleinitAll = (newvalue) => {
 };
 
 const confirmData = ref([]);
+/**
+ *  조회 함수
+ */
+
 const searchButton = async () => {
   items.value = [];
 
@@ -1273,9 +1372,17 @@ const searchColumn = (e) => {
   }
 };
 
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword = (e) => {
   searchWord.value = e.target.value;
 };
+
+/**
+ * INPUT , SELECT 수정 데이터 갱신
+ */
 
 const changeInfo = (e) => {
   const tagName = e.target.name;
@@ -1392,6 +1499,10 @@ const changeRow2 = ref();
 const changeValue3 = ref(true);
 const changeColid2 = ref("checkbox");
 const changeNow2 = ref(false);
+/**
+ * 체크된 데이터 갱신
+ */
+
 const checkedRowData = async (e) => {
   const temp = e.map((item) => item.menuCd);
   changeColid.value = "checkedMenu";
@@ -1400,6 +1511,10 @@ const checkedRowData = async (e) => {
 
   await nextTick();
 };
+/**
+ * 체크된 데이터 갱신
+ */
+
 const checkedRowData2 = async (e) => {
   changeColid.value = "unchecklngCode";
   const arr = e.map((item) => Number(item.lngCode));
@@ -1417,11 +1532,18 @@ const checkedRowData2 = async (e) => {
 };
 
 const forCopyArr = ref([]);
+/**
+ * 체크된 데이터 갱신
+ */
+
 const checkedRowData5 = (e) => {
   console.log(e);
   forCopyArr.value = e.map((item) => item.lngCode);
 };
 
+/**
+ * 복사 팝업 - 복사 함수
+ */
 const copyButton = async () => {
   if (forCopyArr.value.length == 0) {
     Swal.fire({
@@ -1459,6 +1581,11 @@ const addrowProp = ref();
 const addrowDefault = ref();
 const addrowSeq = ref(1);
 const clickaddrowSeq = ref();
+
+/**
+ * 추가 버튼 함수
+ */
+
 const addRow = () => {
   const today = new Date();
   const formattedDate = today.toLocaleDateString("en-CA");
@@ -1499,6 +1626,10 @@ const addRow = () => {
   clickaddrowSeq.value = "new" + addrowSeq.value;
 };
 const deleteOn = ref(false);
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRow = () => {
   deleteRow3.value = !deleteRow3.value;
   deleteOn.value = true;
@@ -1514,6 +1645,10 @@ watch(gridvalue9, () => {
     (item) => item.strDCode1 == selectedCode
   );
 });
+
+/**
+ *  저장 버튼 함수
+ */
 
 const saveButton = () => {
   //comsole.log(updateRow.value);
@@ -1716,10 +1851,19 @@ const saveButton = () => {
 };
 
 const updateDeleteInsertrowIndex = ref([]);
+
+/**
+ * 상태 변화된 행 세팅
+ */
+
 const allStateRows = (e) => {
   updateDeleteInsertrowIndex.value = e;
   //comsole.log(e);
 };
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData = (newvalue) => {
   //comsole.log(newvalue);
   updateRow.value = newvalue;
@@ -1742,6 +1886,10 @@ const updatedRowData = (newvalue) => {
   // }
 };
 const updatedList2 = ref([]);
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData2 = (newvalue) => {
   //  for(var i = 0 ; i < newvalue.length ; i++){
   //     if(newvalue[i].checkbox == true){
@@ -1774,6 +1922,10 @@ const updatedRowData2 = (newvalue) => {
   // rowData.value = [...rowData.value]
   // //comsole.log(rowData.value)
 };
+
+/**
+ * 입력창 수정 데이터 갱신
+ */
 
 const updatedRowData3 = (newvalue) => {
   for (var i = 0; i < newvalue.length; i++) {
@@ -1819,6 +1971,10 @@ const updatedRowData3 = (newvalue) => {
 //   }
 //   deleteOn.value = true;
 // });
+
+/**
+ * 데이터셋 상세정보 셋팅
+ */
 
 const clickedRowData2 = (e) => {
   // ////comsole.log(e)
@@ -1868,6 +2024,9 @@ const clickedRowData2 = (e) => {
   //   }
   // }
 };
+/**
+ * 페이지 초기화
+ */
 
 const initAll = () => {
   selectedMenu.value = 1;

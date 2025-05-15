@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { tablePosMenu } from "@/api/master";
+import { getCategoryInfo, tablePosMenu } from "@/api/master";
 import axios from "axios";
 import { ref, watch } from "vue";
 import { useStore } from "vuex";
@@ -93,14 +93,12 @@ watch(
       changed2.value = "0";
       return;
     }
-    const res = await axios.post(
-      "/api/MIMASTER/MST57_001INS.asmx/getCategoryInfo",
-      {
-        GROUP_CD: groupCd.value,
-        STORE_CD: currStoreCd.value,
-        AREA_CD: currStoreAreaCd.value,
-      }
+    const res = await getCategoryInfo(
+      groupCd.value,
+      currStoreCd.value,
+      currStoreAreaCd.value
     );
+
     mainCategories.value = res.data.MainCategory.map((item) => ({
       MajorCode: item.MajorCode,
       MajorName: item.MajorName,

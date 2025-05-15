@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : MST01_033INS.vue                                                  
+# Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회조건  START-->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
     <div class="flex justify-center mr-9 space-x-2 pr-5">
@@ -12,7 +19,8 @@
   <div
     class="absolute z-50 inset-0 bg-black bg-opacity-50 w-full h-full"
     v-if="showPopUp">
-    <div class="fixed top-[30%] left-[30%] h-[50%] w-[50%] bg-white rounded-lg">
+    <div
+      class="fixed top-[25%] left-[25%] h-[55vh] w-[55vw] bg-white rounded-lg">
       <div
         class="grid grid-rows-[1fr,11fr,1fr] grid-cols-1 text-xl p-5 font-semibold">
         <div class="flex justify-between">
@@ -105,6 +113,8 @@
       @update:ischanged="handleinitAll"
       @update:ischanged2="searchinit"></PickStore>
   </div>
+  <!-- 조회조건  END-->
+  <!-- 그리드영역 -->
   <div class="grid grid-rows-1 grid-cols-[3fr,5fr] h-[65vh] w-full">
     <div class="flex flex-col w-full h-[55vh]">
       <div
@@ -159,7 +169,6 @@
             v-model="searchWord" />
         </div>
       </div>
-
       <div class="ml-10 mt-1 w-full h-[55vh]">
         <Realgrid
           class="w-full h-[55vh]"
@@ -194,10 +203,13 @@
           :searchColId3="['lngMainGroup', 'lngSubGroup']"
           :searchValue="searchValue"
           :searchWord3="searchWord"
+          :suffixColumnwon="'lngPrice'"
           :initFocus="initFocus"></Realgrid>
         <!-- :searchWord="searchWord" :searchColId2="'blnInactive,payDistinct'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" -->
       </div>
     </div>
+    <!-- 그리드영역 -->
+    <!-- 탭영역 -->
     <div class="grid grid-cols-1 grid-rows-[1fr,9fr] ml-20">
       <div class="flex space-x-1 mt-10">
         <button
@@ -973,6 +985,7 @@
       </div>
     </div>
   </div>
+  <!-- 탭영역 -->
 </template>
 
 <script setup>
@@ -984,19 +997,68 @@ import {
   saveMenuCode,
   uploadFile,
 } from "@/api/master";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
-import { insertPageLog } from "@/customFunc/customFunc";
-import axios from "axios";
+
+/**
+ * 	그리드 생성
+ */
+
+/**
+ *  리얼그리드 라이브러리 호출
+ *  */
+
 import RealGrid from "realgrid";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
+import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  이미지 별도 호출
+ *  */
+import axios from "axios";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+
+/*
+ * 랜덤 값 도출 라이브러리
+ */
+
 import { v4 as uuidv4 } from "uuid";
+/*
+ * 공통 표준  Function
+ */
+
 import { nextTick, onMounted, ref, watch } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
 
 const hidesub = ref(true);
 const hideAttr = ref(true);
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   //comsole.log(store.state.userData.lngCommonMenu);
@@ -1033,6 +1095,10 @@ const realgridname = (e) => {
   realgrid2Name.value = e;
 };
 const updateDeleteInsertrowIndex = ref([]);
+/**
+ * 상태 변화된 행 세팅
+ */
+
 const allStateRows = (e) => {
   updateDeleteInsertrowIndex.value = e;
   //comsole.log(e);
@@ -1043,6 +1109,10 @@ const selectMenu = (newValue) => {
   selectedMenu.value = newValue;
 };
 
+/*
+ * 공통 표준  Function
+ */
+
 watch(selectedMenu, () => {
   const reagrid2 = document.getElementById(realgrid2Name.value);
   setTimeout(() => {
@@ -1052,9 +1122,21 @@ watch(selectedMenu, () => {
 
   //comsole.log(RealGrid.getGridInstance(reagrid2));
 });
+/**
+ * 추가 버튼 함수
+ */
+
 const addRow4 = ref(false);
 const updateRow = ref([]);
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRow3 = ref(false);
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword1 = ref("");
 const MenuGroup = ref("");
 const SubMenuGroup = ref("");
@@ -1137,13 +1219,23 @@ const rowIndex = ref();
 const duplilfirstarr = ref();
 const tempRowData2 = ref();
 
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndex2 = (e) => {
   rowIndex.value = e;
 };
+
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData = async (newvalue) => {
   console.log(newvalue);
   afterClick.value = false;
   if (newvalue[9] == 0 || newvalue[12] == 1) {
+    // 판매가 할인여부
     rowData2.value = [];
     clickrowData2.value = [];
     if (selectedMenu.value == 2) {
@@ -1289,14 +1381,24 @@ const clickedRowData = async (newvalue) => {
     afterClick.value = false;
   }
 };
+/**
+ * 수정용 데이터 행 설정
+ */
 
 const selectedIndex = (e) => {
   changeRow.value = e;
 };
+/**
+ * 페이지 매장 그룹 세팅
+ */
 
 const lngStoreGroup = (e) => {
   groupCd.value = e;
 };
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = async (newValue) => {
   //comsole.log(newValue);
   if (newValue == "-1") {
@@ -1317,13 +1419,26 @@ const handleStoreCd = async (newValue) => {
   searchButton();
 };
 const clickmappingData = ref([]);
+/**
+ * 페이지 매장명 세팅
+ */
+
 const handlestoreNm = (newData) => {
   clickedStoreNm.value = newData;
 };
+/**
+ * 조회 상태 초기화
+ */
+/**
+ * 조회 상태 초기화
+ */
 
 const searchinit = (newvalue) => {
   afterSearch.value = false;
 };
+/**
+ * 조회 초기화
+ */
 
 const handleinitAll = (newvalue) => {
   MenuGroup.value = [];
@@ -1341,6 +1456,14 @@ const optionGroup = ref([]);
 const subTitle = ref([]);
 const menuOrderOption = ref([]);
 const menuOptionCode = ref([]);
+
+/**
+ * 	조회버튼  처리 함수 (그리드 데이터 조회)
+ */
+/**
+ *  조회 함수
+ */
+
 const searchButton = async () => {
   items.value = [];
   //comsole.log(nowStoreCd.value);
@@ -1416,6 +1539,10 @@ const searchColValue2 = ref("");
 const searchC1 = ref(-1);
 const searchC2 = ref(-1);
 
+/**
+ * INPUT , SELECT 수정 데이터 갱신
+ */
+
 const changeInfo = (e) => {
   const tagName = e.target.name;
   const value2 = e.target.value;
@@ -1427,6 +1554,9 @@ const changeInfo = (e) => {
 const searchColValue3 = ref("0,0");
 const filteredSubMenuGroup = ref([]);
 const searchValue = ref([]);
+/**
+ * 조회 조건 설정
+ */
 const setSubCd = (e) => {
   const name = e.target.name;
   const value = e.target.value;
@@ -1442,11 +1572,6 @@ const setSubCd = (e) => {
     forsearchSub.value = value;
     searchValue.value = [forsearchMain.value, value];
   }
-};
-
-const setSubCd2 = () => {
-  searchColValue3.value =
-    searchColValue3.value.split(",")[0] + "," + forsearchSub.value;
 };
 
 const filteredSubMenuGroup2 = ref([]);
@@ -1483,9 +1608,20 @@ const changeRow2 = ref();
 const changeValue3 = ref(true);
 const changeColid2 = ref("checkbox");
 const changeNow2 = ref(false);
+/**
+ * 체크된 데이터 갱신
+ */
+
 const checkedRowData = (e) => {
   //comsole.log(e);
 };
+/**
+ * 체크된 값 데이터 세팅
+ */
+/**
+ * 체크된 데이터 갱신
+ */
+
 const checkedRowData2 = (e) => {
   changeColid.value = "strAmtCodeList";
   //comsole.log(updateRow.value);
@@ -1509,6 +1645,13 @@ const addrowProp = ref();
 const addrowDefault = ref();
 const addrowSeq = ref(1);
 const clickaddrowSeq = ref();
+/**
+ * 그리드 행 추가 버튼 함수
+ */
+/**
+ * 추가 버튼 함수
+ */
+
 const addRow = () => {
   const today = new Date();
   const formattedDate = today.toLocaleDateString("en-CA");
@@ -1543,6 +1686,13 @@ const addRow = () => {
   });
   clickaddrowSeq.value = "new" + addrowSeq.value;
 };
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRow = () => {
   deleteRow3.value = !deleteRow3.value;
 };
@@ -1557,6 +1707,10 @@ watch(gridvalue9, () => {
     (item) => item.strDCode1 == selectedCode
   );
 });
+
+/**
+ *  저장 버튼 함수
+ */
 
 const saveButton = () => {
   //comsole.log(updateRow.value);
@@ -1745,57 +1899,18 @@ const saveButton = () => {
   });
 };
 
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData = (newvalue) => {
   updateRow.value = newvalue;
-  //   newvalue.forEach((newItem) => {
-  //   const targetRow = rowData.value.find(row => row.lngCode == newItem.lngCode);
-  //   if (targetRow) {
-  //     Object.keys(newItem).forEach(key => {
-  //       targetRow[key] = newItem[key]; // 속성 업데이트
-
-  //     });
-  //   } else {
-  //     const targetRow2 = rowData.value.find(row => row.sequence == clickaddrowSeq.value);
-  //     //comsole.log(targetRow2)
-  //     Object.keys(newItem).forEach(key => {
-  //       targetRow2[key] = newItem[key]; // 속성 업데이트
-
-  //     });
-  //   }
-  // });
-
-  // rowData를 Map으로 변환 (기존 배열의 특정 필드를 key로 사용)
-
-  // const rowDataMap = new Map(
-  //   rowData.value.map((row) => [
-  //     row.sequence !== undefined ? row.sequence : row.lngCode.toString(),
-  //     row,
-  //   ])
-  // );
-
-  // newvalue.forEach((newItem) => {
-  //   const targetRow = rowDataMap.get(
-  //     newItem.new == true ? clickaddrowSeq.value : newItem.lngCode.toString()
-  //   ); // Map을 통해 빠르게 찾기
-
-  //   if (targetRow) {
-  //     // targetRow가 있으면 값을 업데이트
-  //     Object.keys(newItem).forEach((key) => {
-  //       targetRow[key] = newItem[key]; // 속성 업데이트
-  //     });
-  //   } else {
-  //     // find 방식 대신 sequence로 찾기
-  //     const targetRow2 = rowDataMap.get(clickaddrowSeq.value.toString());
-
-  //     Object.keys(newItem).forEach((key) => {
-  //       targetRow2[key] = newItem[key]; // 속성 업데이트
-  //     });
-  //   }
-  // });
-
-  // rowData.value = [...rowData.value];
 };
 const updatedList2 = ref([]);
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData2 = (newvalue) => {
   for (var i = 0; i < newvalue.length; i++) {
     if (newvalue[i].checkbox == true) {
@@ -1827,6 +1942,10 @@ const updatedRowData2 = (newvalue) => {
     findrow.checkedMenu = temp.value.join(",");
   }
 };
+
+/**
+ * 입력창 수정 데이터 갱신
+ */
 
 const updatedRowData3 = (newvalue) => {
   for (var i = 0; i < newvalue.length; i++) {
@@ -1881,6 +2000,10 @@ watch(clickrowData2, () => {
   // }
 });
 
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData2 = (e) => {
   const clickedRow = rowData.value.find(
     (item) => item.lngCode == gridvalue3.value.toString()
@@ -1923,6 +2046,14 @@ const clickedRowData2 = (e) => {
 };
 
 const initFocus = ref(true);
+
+/**
+ * 페이지 로딩 시 초기화 (롤백)
+ */
+/**
+ * 페이지 초기화
+ */
+
 const initAll = () => {
   selectedMenu.value = 1;
   clickrowData4.value = [];
@@ -1970,41 +2101,6 @@ const initAll = () => {
 const searchPayCd = (e) => {
   const value = e.target.value;
   searchWord2.value = value;
-  // clickrowData2.value = rowData2.value.filter(
-  //   (item) =>
-  //     item.strName.includes(value) || item.lngCode.toString().includes(value)
-  // );
-
-  // duplilfirstarr.value = rowData.value
-  //   .filter((item) => item.lngCode == gridvalue3.value)
-  //   .map((item) => item.strAmtCodeList)[0]
-  //   .split(";");
-
-  // if (clickrowData2.value.length > 0) {
-  //   let dupliarr = JSON.parse(JSON.stringify(clickrowData2.value));
-  //   dupliarr.sort((a, b) => {
-  //     const aIndex = duplilfirstarr.value.indexOf(a.lngCode.toString());
-  //     const bIndex = duplilfirstarr.value.indexOf(b.lngCode.toString());
-
-  //     if (aIndex === -1 && bIndex === -1) return 0; // 둘 다 우선순위에 없음
-  //     if (aIndex === -1) return 1; // a가 우선순위에 없음
-  //     if (bIndex === -1) return -1; // b가 우선순위에 없음
-  //     return aIndex - bIndex; // 우선순위 배열에 따라 정렬
-  //   });
-
-  //   if (duplilfirstarr.value.length > 0 && duplilfirstarr.value[0] !== "") {
-  //     for (var i = 0; i < duplilfirstarr.value.length; i++) {
-  //       const change = dupliarr.find(
-  //         (item) => item.lngCode == duplilfirstarr.value[i]
-  //       );
-
-  //       if (change) {
-  //         change.checkbox = true;
-  //       }
-  //     }
-  //   }
-  //   clickrowData2.value = dupliarr;
-  // }
 };
 const uploadImage = ref({ name: "" });
 const uploadImages = ref([]);
@@ -2042,14 +2138,12 @@ const handleFileUpload = async (e) => {
 };
 
 const downloadFile = async () => {
+  console.log(store.state.StoreToken);
   try {
     const response = await axios.get(
       `http://211.238.145.30:8085/Uploads/${fileName.value}`,
       {
         responseType: "blob", // 응답을 Blob 형태로 받음
-        headers: {
-          Authorization: "Bearer " + store.state.StoreToken,
-        },
       }
     );
 
@@ -2064,6 +2158,7 @@ const downloadFile = async () => {
     // 다운로드 후 Blob URL 해제
     window.URL.revokeObjectURL(url);
   } catch (error) {
+    console.log(error);
     Swal.fire({
       title: "오류",
       text: "파일 다운로드 실패",
@@ -2104,12 +2199,19 @@ const resetKPG = (e) => {
 const showPopUp = ref(false);
 const rowData4 = ref([]);
 const rowData5 = ref([]);
+/**
+ * 할인설정복사 팝업
+ */
+
 const copyButton2 = async () => {
   const res = await getAmountListByMenuCode(groupCd.value, gridvalue3.value);
   rowData4.value = res.data.List;
   rowData5.value = res.data.List2;
   showPopUp.value = true;
 };
+/**
+ * 할인설정복사 팝업 - 복사 함수
+ */
 
 const copyButton = async () => {
   if (selectedMenuCd.value.length == 0) {
@@ -2149,6 +2251,10 @@ const closePopUp = () => {
 const searchWord5 = ref("");
 
 const selectedMenuCd = ref([]);
+/**
+ * 체크된 데이터 갱신
+ */
+
 const checkedRowData5 = (e) => {
   selectedMenuCd.value = e.map((item) => item.menuCd);
   console.log(e);

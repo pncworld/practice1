@@ -1,3 +1,9 @@
+/*--############################################################################
+# Filename : MST01_033INS.vue                                                  
+# Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
   <div>
     <div class="flex justify-center pl-4 pt-4">
@@ -101,11 +107,23 @@ import { format } from "date-fns";
 // 뷰에서 제공 하는 기능, computed 반응형 상태를 기반으로 다른 로직을 실행해 결과값을 생성 , ref 반응형 변수 선언
 import { computed, ref } from "vue";
 // vuex에서 제공하는 중앙 상태관리
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
 // 각 탭 마다 필요한 그리드 설정 속성 불러오기
 import { getGridInfoList } from "@/api/common";
 // alert 창 자동 꾸미기 위한 라이브러리
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
 import { dailySaleReport } from "@/api/misales";
 import DateRangePicker3 from "../component/DateRangePicker3.vue";
@@ -163,6 +181,10 @@ const daysInKorean = [
   "금요일",
   "토요일",
 ];
+/**
+ *  조회 함수
+ */
+
 const searchButton = () => {
   //comsole.log("왓냐");
 
@@ -244,7 +266,15 @@ const searchButton = () => {
   readsales(); // 세팅된 함수 실행
 };
 // 달력 초기 설정값 지정을 위한 변수 설정
+/**
+ * 선택한 매출 시작일자
+ */
+
 const startDate = ref(format(new Date(), "yyyy-MM-dd"));
+/**
+ * 선택한 매출 종료일자
+ */
+
 const endDate = ref(format(new Date(), "yyyy-MM-dd"));
 
 const handleDateRangeUpdate = (newDateRange) => {

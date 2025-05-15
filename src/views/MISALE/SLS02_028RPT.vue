@@ -1,3 +1,9 @@
+/*--############################################################################
+# Filename : SLS02_028RPT.vue                                                  
+# Description : 매출관리 > 매출 집계 현황 > 일일 정산 레포트(포스별)           #
+Date :2025-05-14                                                              #
+Author : 권맑음                     
+################################################################################*/
 <template>
   <div class="h-full" @click="handleParentClick">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
@@ -147,16 +153,60 @@
 
 <script setup>
 import { getSalesDayReportByPos } from "@/api/misales";
+/**
+ *  매출 일자 세팅 컴포넌트
+ *  */
+
 import Datepicker2 from "@/components/Datepicker2.vue";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+/**
+ *  매장 선택 컴포넌트
+ *  */
+
 import PickStoreRenew3 from "@/components/pickStoreRenew.vue";
+/**
+ *  포스번호 호출 컴포넌트
+ *  */
+
 import PosList from "@/components/posList.vue";
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+/**
+ *  엑셀 내보내기 관련 라이브러리
+ */
+
 import { utils, writeFile } from "xlsx-js-style";
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -168,15 +218,28 @@ const selectedStoreAttr = ref();
 
 const getJson = ref(false);
 
+/**
+ * 페이지 매장 그룹 세팅
+ */
+
 const lngStoreGroup = (e) => {
   selectedGroup.value = e;
   groupCd.value = e;
   //comsole.log(e);
 };
+
+/**
+ * 페이지 매장 분류 세팅
+ */
+
 const lngStoreAttrs = (e) => {
   selectedStoreAttr.value = e;
   //comsole.log(e);
 };
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const lngStoreCode = (e) => {
   init.value = !init.value;
   selectedStore.value = e;
@@ -184,6 +247,10 @@ const lngStoreCode = (e) => {
   //comsole.log(e);
   initGrid();
 };
+/**
+ * 엑셀용 매장 세팅 함수
+ */
+
 const excelStore = (e) => {
   excelstore.value = e;
 };
@@ -196,14 +263,26 @@ const loginedlngLang = store.state.userData.lngLanguage;
 //comsole.log(store);
 const selectedstartDate = ref();
 const selectedendDate = ref();
+/**
+ * 선택한 매출 시작일자
+ */
+
 const startDate = (e) => {
   //comsole.log(e);
   selectedstartDate.value = e;
 };
+/**
+ * 선택한 매출 종료일자
+ */
+
 const endDate = (e) => {
   selectedendDate.value = e;
 };
 const afterSearch = ref(false);
+/**
+ *  조회 함수
+ */
+
 const searchButton = async () => {
   // initCheckBox.value = !initCheckBox.value
   // initSearchWord.value = !initSearchWord.value
@@ -286,6 +365,10 @@ const getJsonData7 = (e) => {
 };
 
 const exceloutput = ref(false);
+/**
+ * 엑셀 내보내기 함수
+ */
+
 const excelButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -573,6 +656,10 @@ const excelButton = () => {
     writeFile(wb, "일일 정산 레포트.xlsx");
   }, 100);
 };
+
+/**
+ * 프린트 기능 버튼
+ */
 
 const printButton = () => {
   getJson.value = !getJson.value;
@@ -925,6 +1012,10 @@ const printButton = () => {
 //   return buf;
 // }
 
+/**
+ * 그리드 초기화
+ */
+
 const initGrid = () => {
   if (rowData.value.length != 0) {
     rowData.value = [];
@@ -959,6 +1050,10 @@ const checkBill = (e) => {
 
 const closePopUp = ref(false);
 const datepicker = ref(null);
+/**
+ * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
+ */
+
 const handleParentClick = (e) => {
   const datepickerEl = datepicker.value?.$el;
 
@@ -969,6 +1064,10 @@ const handleParentClick = (e) => {
 };
 
 const selectedPosNo = ref(0);
+/**
+ * 선택한 포스 번호 호출 함수
+ */
+
 const posNo = (e) => {
   selectedPosNo.value = e;
 };

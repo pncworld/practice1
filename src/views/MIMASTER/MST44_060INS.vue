@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : MST44_060INS.vue                                                  
+# Description : 마스터관리 > POS 마스터 > 연령키 설정.                        #
+Date :2025-05-14                                                              #
+Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회조건 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
     <div class="flex justify-center mr-9 space-x-2 pr-5">
@@ -22,6 +29,8 @@
       @update:ischanged="handleinitAll"
       @update:ischanged2="searchinit"></PickStore>
   </div>
+  <!-- 조회조건 -->
+  <!-- 그리드 영역  -->
   <div class="z-50">
     <DupliPopUp
       :isVisible="showPopup2"
@@ -110,6 +119,8 @@
         </div>
       </div>
     </div>
+    <!-- 그리드 영역  -->
+    <!-- 드래그 영역  -->
     <div
       v-if="showOtherKeys == false"
       class="grid grid-rows-[1fr,4fr] grid-cols-1 mt-5 w-full h-full z-20">
@@ -148,20 +159,61 @@
       </div>
     </div>
   </div>
+  <!-- 드래그 영역  -->
 </template>
 
 <script setup>
 import { getAgeList, getAllScreenList, saveAllAge } from "@/api/master";
+/**
+ *  복사 팝업 컴포넌트
+ *  */
+
 import DupliPopUp from "@/components/dupliPopUp.vue";
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref, watch } from "vue";
+/*
+ * 드래그 라이브러리 호출
+ */
+
 import { VueDraggableNext } from "vue-draggable-next";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
 
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -174,7 +226,15 @@ const clickedFuncSelection = ref(false);
 const clickedFuncSelection2 = ref(false);
 const ScreenKeys = ref([]);
 const currentMenuorTLU = ref(false);
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword1 = ref();
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword3 = ref();
 const forsearchMain = ref("0");
 const forsearchSub = ref("0");
@@ -185,6 +245,10 @@ const afterSearch2 = ref(false);
 // 드래그 가능한 요소를 설정하는 메서드
 const currentsubPage = ref(1);
 const changeMode = ref(false);
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRows = ref(false);
 const clickedKey1 = ref();
 const clickedKey2 = ref();
@@ -192,6 +256,10 @@ const subsubKeyList3 = ref();
 const subsubKeyList4 = ref();
 const confirmitem4 = ref();
 const clickedStoreNm = ref();
+/**
+ * 페이지 매장명 세팅
+ */
+
 const handlestoreNm = (newData) => {
   clickedStoreNm.value = newData;
 };
@@ -200,12 +268,24 @@ const showPopup2 = ref(false);
 const confirmitem1 = ref([]);
 
 const maxSubCode = ref();
+/**
+ * 선택한 포스 번호 호출 함수
+ */
+
 const posNo = ref();
 
 const currmenuKeyPage = ref(1);
 const AllscreenKeyPage = ref(1);
+/**
+ * 추가 버튼 함수
+ */
+
 const addRows = ref(false);
 const currentMenu = ref(false);
+
+/**
+ * 복사 팝업 - 복사 함수
+ */
 
 const copyButton = () => {
   if (afterSearch.value == false) {
@@ -222,6 +302,10 @@ const copyButton = () => {
 
 const updateMenuKey = ref(false);
 
+/**
+ * 추가 버튼 함수
+ */
+
 const addRow = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -236,6 +320,10 @@ const addRow = () => {
   addRows.value = !addRows.value;
 };
 const nowStoreAreaCd = ref();
+/**
+ *  pickStore - 지역코드 세팅
+ */
+
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
   ////comsole.log(nowStoreAreaCd.value)
@@ -243,6 +331,10 @@ const handleStoreAreaCd = (newValue) => {
 
 const nowStoreCd = ref();
 const afterCategory = ref(false);
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = async (newValue) => {
   if (newValue == "0") {
     afterSearch.value = false;
@@ -250,6 +342,10 @@ const handleStoreCd = async (newValue) => {
   nowStoreCd.value = newValue;
 };
 const Category = ref([]);
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRow = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -292,6 +388,10 @@ const subsubKeyList2 = ref([]);
 const screenList = ref([]);
 const clickedScreenOrMenu = ref(false);
 const TLUList = ref([]);
+
+/**
+ *  조회 함수
+ */
 
 const searchButton = async () => {
   changeMode.value = false;
@@ -392,6 +492,10 @@ const calculateMaxSubCode = () => {
 };
 
 const updatedrowData = ref([]);
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData = (newValue) => {
   updatedrowData.value = newValue;
   //comsole.log(updatedrowData.value);
@@ -441,6 +545,10 @@ const onEnd = (evt) => {
   clickedKey1.value = targetItemIndex2;
   //comsole.log("KeyList:", KeyList.value);
 };
+
+/**
+ *  저장 버튼 함수
+ */
 
 const saveButton = async () => {
   if (afterSearch.value == false) {
@@ -565,6 +673,10 @@ const saveButton = async () => {
 
 let dataProvider;
 
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(() => {
   showMenuKeys();
 });
@@ -577,12 +689,20 @@ const clickedTLUCD = ref();
 const deleteException = ref(false);
 const clickedstrName = ref();
 const clickedCode = ref();
+/**
+ * 선택한 행의 상세정보 셋팅
+ */
+
 const selcetedrowData = (newValue) => {
   //comsole.log(newValue);
   clickedstrName.value = newValue[2];
   clickedCode.value = newValue[1];
   addKey();
 };
+
+/**
+ * 데이터셋 상세정보 셋팅
+ */
 
 const clickedRowData = (newValue) => {
   //comsole.log(newValue);
@@ -621,6 +741,10 @@ const searchAmountList3 = (e) => {
 const currentpaymentType = ref("기본");
 const currentpaymentCd = ref(3);
 
+/**
+ * pickStore - 포스번호 세팅
+ */
+
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
   // //comsole.log(posNo.value)
@@ -658,6 +782,10 @@ const addKey = () => {
   //comsole.log(KeyList.value);
 };
 
+/**
+ * 삭제 버튼
+ */
+
 const deletekey = () => {
   KeyList.value[clickedRealIndex.value] = "";
 };
@@ -665,6 +793,10 @@ const deletekey = () => {
 const clickedMenukeys = () => {
   clickedScreenOrMenu.value = true;
 };
+
+/**
+ * 조회 초기화
+ */
 
 const handleinitAll = (newvalue) => {
   MenuGroup.value = [];
@@ -680,6 +812,10 @@ const handleinitAll = (newvalue) => {
   searchword3.value = "";
   afterSearch.value = false;
 };
+/**
+ * 조회 상태 초기화
+ */
+
 const searchinit = (newvalue) => {
   afterSearch.value = false;
 };

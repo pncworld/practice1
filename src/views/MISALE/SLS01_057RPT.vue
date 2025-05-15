@@ -1,3 +1,9 @@
+/*--############################################################################
+# Filename : SLS01_057RPT.vue                                                  
+# Description : 매출관리 > 코너별 매출 현황 > 코너별 영수증별 매출조회         #
+Date :2025-05-14                                                              #
+Author : 권맑음                     
+################################################################################*/
 <template>
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
@@ -125,33 +131,90 @@ import {
   getReceiptDatas,
 } from "@/api/misales";
 import PickStoreCorner from "@/components/pickStoreCorner.vue";
+/**
+ *  매출 일자 호출 컴포넌트
+ *  */
+
 import Datepicker1 from "@/components/Datepicker1.vue";
+/**
+ *  할인 코드 호출 컴포넌트
+ *  */
+
 import DisCountCdList from "@/components/disCountCdList.vue";
+/**
+ *  결제 코드 호출 컴포넌트
+ *  */
+
 import PayCodeList from "@/components/payCodeList.vue";
+/**
+ *  포스번호 호출 컴포넌트
+ *  */
+
 import PosList from "@/components/posList.vue";
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 });
 const selectedDate = ref();
 
+/**
+ * 	매출 일자 가져오는 함수
+ */
+
 const dateValue = (e) => {
   selectedDate.value = e;
   //comsole.log(selectedDate.value);
   initGrid();
 };
+/**
+ * 	매출 년도
+ */
 const year = (e) => {
   //comsole.log(e);
 };
+/**
+ * 	매출 월
+ */
 const month = (e) => {
   //comsole.log(e);
 };
+/**
+ * 	매출 일
+ */
 const day = (e) => {
   //comsole.log(e);
 };
@@ -164,6 +227,10 @@ const loginedstrLang = store.state.userData.lngLanguage;
 //comsole.log(store);
 
 const afterSearch = ref(false);
+/**
+ *  조회 함수
+ */
+
 const searchButton = async () => {
   // initCheckBox.value = !initCheckBox.value
   // initSearchWord.value = !initSearchWord.value
@@ -207,6 +274,10 @@ const selectedExcelDate = ref();
 const selectedStoreAreaCode = ref();
 const init = ref(false);
 const documentSubTitle = ref("");
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const lngStoreCode = async (e) => {
   //comsole.log(e);
   storeCd.value = e;
@@ -216,6 +287,10 @@ const lngStoreCode = async (e) => {
   receiptNo.value = "";
   init.value = !init.value;
 };
+/**
+ * 페이지 매장 그룹 세팅
+ */
+
 const lngStoreGroup = (e) => {
   //comsole.log(e);
   groupCd.value = e;
@@ -225,10 +300,18 @@ const lngAreaCode = (e) => {
   //comsole.log(e);
   selectedStoreAreaCode.value = e;
 };
+/**
+ * 엑셀용 매장 세팅 함수
+ */
+
 const excelStore = (e) => {
   //comsole.log(e);
   selectedExcelStore.value = e;
 };
+/**
+ * 엑셀용 일자 세팅 함수
+ */
+
 const excelDate = (e) => {
   //comsole.log(e);
   selectedExcelDate.value = e;
@@ -239,6 +322,10 @@ const rowData3 = ref([]);
 const rowData4 = ref([]);
 
 const selectedPosNo = ref();
+/**
+ * 선택한 포스 번호 호출 함수
+ */
+
 const posNo = (e) => {
   //comsole.log(e);
   if (e == null) {
@@ -250,6 +337,10 @@ const posNo = (e) => {
 
 const disCountCd = ref("");
 const disCountNm = ref("");
+/**
+ * 선택한 할인 코드 호출 함수
+ */
+
 const DisCountCd = (e) => {
   //comsole.log(e);
   if (e == null) {
@@ -265,6 +356,10 @@ const discountNm = (e) => {
 
 const payCd = ref("");
 const paynm = ref("");
+/**
+ * 선택한 결제 코드 호출 함수
+ */
+
 const selectedpayCd = (e) => {
   if (e == null) {
     payCd.value = 0;
@@ -272,6 +367,10 @@ const selectedpayCd = (e) => {
     payCd.value = e;
   }
 };
+
+/**
+ * 선택한 결제 코드명 호출 함수
+ */
 const payNm = (e) => {
   paynm.value = e;
 };
@@ -280,6 +379,10 @@ const valuesData = ref([
   ["Sales Cancellation", "Menu Correction", "Order Cancellation"],
 ]);
 const labelsData = ref([["매출취소", "메뉴정정", "주문취소"]]);
+
+/**
+ * 데이터셋 상세정보 셋팅
+ */
 
 const clickedRowData = async (e) => {
   //comsole.log(e);
@@ -306,6 +409,10 @@ const clickedRowData = async (e) => {
 };
 
 const exceloutput = ref(false);
+/**
+ * 엑셀 내보내기 함수
+ */
+
 const excelButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -339,6 +446,10 @@ const excelButton = () => {
     cond4;
   exceloutput.value = !exceloutput.value;
 };
+/**
+ * 그리드 초기화
+ */
+
 const initGrid = () => {
   if (rowData.value.length != 0) {
     rowData.value = [];
@@ -355,6 +466,11 @@ const initGrid = () => {
 };
 
 const selectedStoreAttr = ref();
+
+/**
+ * 페이지 매장 분류 세팅
+ */
+
 const lngStoreAttrs = (e) => {
   selectedStoreAttr.value = e;
   initGrid();

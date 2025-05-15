@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : MST01_008INS.vue                                                  
+# Description : 마스터관리 > 메뉴 마스터 > 대그룹코드등록                      
+  # Date :2025-05-14                                                           
+  # Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회조건 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
     <div class="flex justify-center mr-9 space-x-2 pr-5">
@@ -20,7 +27,8 @@
       @update:ischanged2="searchinit"></PickStore>
   </div>
   <div class="z-50"></div>
-
+  <!-- 조회조건 -->
+  <!-- 그리드 영역 -->
   <div class="flex justify-center w-[80%] h-[60vh] gap-5 ml-10 mt-5">
     <div class="w-full h-full">
       <div class="flex justify-end gap-2">
@@ -78,17 +86,50 @@
         :commitAll="commitAll"></Realgrid>
     </div>
   </div>
+  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
 import { getMenuLists, saveMenuManage } from "@/api/master";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -96,8 +137,16 @@ onMounted(async () => {
 
 const nowStoreAreaCd = ref();
 const nowStoreCd = ref();
+/**
+ * 선택한 포스 번호 호출 함수
+ */
+
 const posNo = ref();
 const deleteAll = ref(false);
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword1 = ref("");
 const MenuGroup = ref("");
 const SubMenuGroup = ref("");
@@ -113,6 +162,10 @@ const userData = store.state.userData;
 const groupCd = ref(userData.lngStoreGroup);
 const currentsubNo = ref();
 
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = async (newValue) => {
   if (newValue == "0") {
     afterSearch.value = false;
@@ -121,13 +174,25 @@ const handleStoreCd = async (newValue) => {
   searchButton();
 };
 
+/**
+ * 페이지 매장명 세팅
+ */
+
 const handlestoreNm = (newData) => {
   clickedStoreNm.value = newData;
 };
 
+/**
+ * 조회 상태 초기화
+ */
+
 const searchinit = (newvalue) => {
   afterSearch.value = false;
 };
+
+/**
+ * 조회 초기화
+ */
 
 const handleinitAll = (newvalue) => {
   MenuGroup.value = [];
@@ -143,6 +208,10 @@ const confirmData = ref();
 const confirmData2 = ref();
 const rowData = ref([]);
 const rowData2 = ref([]);
+/**
+ *  조회 함수
+ */
+
 const searchButton = async () => {
   commitAlls();
   items.value = [];
@@ -195,10 +264,18 @@ const searchButton = async () => {
   }
 };
 const addbutton = ref(false);
+/**
+ * 추가 버튼 함수
+ */
+
 const addRow = () => {
   addbutton.value = !addbutton.value;
 };
 const addbutton2 = ref(false);
+/**
+ * 추가 버튼 함수
+ */
+
 const addRow2 = () => {
   if (
     rowData2.value.filter((item) => item.lngMajor == selectedlngCode.value)
@@ -227,6 +304,10 @@ const filteredRowData2 = ref([]);
 const selectedlngCode = ref();
 const changeRow = ref();
 const changeValue = ref("0");
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData = (newValue) => {
   //comsole.log(newValue);
   filteredRowData2.value = rowData2.value.filter(
@@ -236,9 +317,17 @@ const clickedRowData = (newValue) => {
   changeRow.value = newValue.index;
   //comsole.log(changeRow.value);
 };
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData2 = (newValue) => {
   //comsole.log(newValue);
 };
+
+/**
+ * 입력창 수정 데이터 갱신
+ */
 
 const updatedRowData = (newValue) => {
   //comsole.log(newValue);
@@ -254,6 +343,10 @@ const updatedRowData = (newValue) => {
   //comsole.log(newValue.length);
 };
 const forsaveRowData = ref();
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData1 = (newValue) => {
   //comsole.log(newValue);
   const validate = newValue.map((item) => item.lngCode);
@@ -279,13 +372,26 @@ const updatedRowData1 = (newValue) => {
 };
 const deleterow = ref(false);
 const deleterow2 = ref(false);
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRow2 = () => {
   deleterow2.value = !deleterow2.value;
 };
+
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRow = () => {
   deleterow.value = !deleterow.value;
   deleteAlls();
 };
+
+/**
+ *  저장 버튼 함수
+ */
 
 const saveButton = () => {
   commitAlls().then((newvalue) => {
@@ -414,6 +520,10 @@ const saveButton = () => {
   });
 };
 const exporttoExcel = ref(false);
+/**
+ * 엑셀 내보내기 함수
+ */
+
 const excelButton = () => {
   exporttoExcel.value = !exporttoExcel.value;
 };

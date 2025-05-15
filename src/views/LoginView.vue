@@ -1,3 +1,9 @@
+/*--############################################################################
+# Filename : MST01_033INS.vue                                                  
+# Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
   <div class="flex flex-col h-full bg-slate-100">
     <div class="flex items-center justify-center h-full bg-slate-100">
@@ -76,8 +82,16 @@
 
 <script setup>
 import loading from "@/components/loading.vue";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
 import {
   alreadyLogined,
@@ -177,6 +191,10 @@ const login2 = async () => {
     store.dispatch("convertLoading", false);
   }
 };
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   store.state.loading = true;

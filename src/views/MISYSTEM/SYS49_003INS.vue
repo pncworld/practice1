@@ -1,3 +1,9 @@
+/*--############################################################################
+# Filename : MST01_033INS.vue                                                  
+# Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
@@ -143,14 +149,42 @@ import {
   getUserPassWordEnroll,
   saveUserPassWordEnroll,
 } from "@/api/system";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref, watch } from "vue";
+
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
 
 import { useStore } from "vuex";
 const selectedDate = ref();
+
+/**
+ * 선택한 매장 코드 호출 함수
+ */
 
 const selectedStoreCd = ref(null);
 const clickedOrNot = ref(true);
@@ -164,13 +198,18 @@ const selectedUserSequence = ref("0");
 const selectedUserChargerCode = ref("");
 const storeList = ref([]);
 const forupdateDisabled = ref(true);
-// const lngStoreCode = (e) => {
-//     selectedStoreCd.value = e
-//     //comsole.log(e)
-// }
+
 const moveFocusbyIndex = ref("");
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRow2 = ref(false);
 const selectedBlnHQ = ref("0");
+/**
+ * 추가 버튼 함수
+ */
+
 const addRow4 = ref(false);
 watch(selectedStoreCd, () => {
   if (selectedStoreCd.value == null) {
@@ -209,6 +248,10 @@ const addrowDefault = ref("");
 const addrowProp = ref(
   "lngPosition,strStoreName,lngLanguage,strLockType,strChargerName,strUserID,strUserAdminID,lngSupplierID,strIdNo,strPassword,lngUserAdminID,chkSupplierID,blnSupervisor,blnCompanyAdmin,lngSuperAttrCd,lngSequence,lngChargerCode"
 );
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
@@ -232,6 +275,10 @@ onMounted(async () => {
   }
 });
 const rowData2 = ref([]);
+/**
+ *  조회 함수
+ */
+
 const searchButton = async () => {
   try {
     store.state.loading = true;
@@ -299,6 +346,10 @@ const prevRowState = ref([]);
 const prevIndex = ref([]);
 const prevSequence = ref([]);
 
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData = async (e) => {
   selectedUserSequence.value = e[6];
   //comsole.log(e);
@@ -312,6 +363,10 @@ const clickedRowData = async (e) => {
 };
 
 const exceloutput = ref(false);
+
+/**
+ * 그리드 초기화
+ */
 
 const initGrid = () => {
   if (rowData.value.length != 0) {
@@ -330,6 +385,10 @@ const selectedStoreAttr = ref();
 const blnCheckDupli = ref(false);
 
 const currentAddState = ref(false);
+
+/**
+ *  저장 버튼 함수
+ */
 
 const saveButton = async () => {
   if (afterSearch.value == "0") {
@@ -420,8 +479,16 @@ const saveButton = async () => {
   });
 };
 
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRowSequences = ref([]);
 const updateRowData = ref([]);
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData = (e) => {
   let convertArray = e.map(({ deleted, lngSupplierID, ...rest }) => ({
     ...rest,
@@ -433,7 +500,15 @@ const updatedRowData = (e) => {
 };
 
 const selectedindex = ref("");
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndexArray = ref([]);
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndex = (e) => {
   selectedindex.value = e;
   //comsole.log(e);

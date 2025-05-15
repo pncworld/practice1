@@ -1,12 +1,19 @@
+/*--############################################################################
+# Filename : MST44_055INS.vue                                                  
+# Description : 마스터관리 > POS 마스터 > 결제키 설정                           
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회조건 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
     <div class="flex justify-center mr-10 space-x-2 pr-5">
-      <button @click="searchAmount" class="button search md:w-auto w-14">
+      <button @click="searchButton" class="button search md:w-auto w-14">
         조회
       </button>
 
-      <button @click="savePosMenu" class="button save w-auto">저장</button>
+      <button @click="saveButton" class="button save w-auto">저장</button>
       <button @click="showPopupf" class="button copy w-auto">복사</button>
     </div>
   </div>
@@ -22,6 +29,8 @@
       @update:ischanged="handleinitAll"
       @update:ischanged2="searchinit"></PickStore>
   </div>
+  <!-- 조회조건 -->
+  <!-- 팝업 및 그리드 영역 -->
   <div class="z-50">
     <DupliPopUp
       :isVisible="showPopup2"
@@ -90,6 +99,8 @@
       </button></span
     >
   </span>
+  <!-- 팝업 및 그리드 영역 -->
+  <!-- 드래그 영역-->
   <div class="flex h-[65vh] w-full -mt-5">
     <div class="flex flex-col w-2/5 h-5/6">
       <div
@@ -234,6 +245,7 @@
       &nbsp;&nbsp;&nbsp;{{ clickedGroupPage }} / 5
     </div>
   </div>
+  <!-- 드래그 영역-->
 </template>
 
 <script setup>
@@ -243,18 +255,58 @@ import {
   saveGroupPayKey,
   savePayKey,
 } from "@/api/master";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref, watch } from "vue";
+/*
+ * 드래그 라이브러리 호출
+ */
+
 import { VueDraggableNext } from "vue-draggable-next";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+
+/**
+ *  복사 팝업 컴포넌트
+ *  */
 
 import DupliPopUp from "@/components/dupliPopUp.vue";
 
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
 
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -266,7 +318,15 @@ const ScreenKeyOrigin = ref([]);
 const clickedMenuKey = ref();
 const ScreenKeys = ref([]);
 const currentMenuorTLU = ref(false);
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword1 = ref();
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword3 = ref();
 const forsearchMain = ref("0");
 const forsearchSub = ref("0");
@@ -289,6 +349,10 @@ const changingMode = (data) => {
 const clickedGroupPage = ref(1);
 const nowscreenNo = ref();
 const clickedStoreNm = ref();
+/**
+ * 페이지 매장명 세팅
+ */
+
 const handlestoreNm = (newData) => {
   clickedStoreNm.value = newData;
 };
@@ -297,6 +361,10 @@ const showChangeScreenKey = ref(false);
 const confirmitem = ref([]);
 const currentscreenKeyNm = ref("");
 const maxSubCode = ref();
+/**
+ * 선택한 포스 번호 호출 함수
+ */
+
 const posNo = ref();
 const changeScreenKey = ref(false);
 const currmenuKeyPage = ref(1);
@@ -311,6 +379,10 @@ const movePage = () => {
     strTitle: "결제 코드 등록.",
   };
 };
+/**
+ * 팝업 보이는 함수
+ */
+
 const showPopupf = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -374,6 +446,10 @@ const showPrev = () => {
 const updateMenuKey = ref(false);
 
 const nowStoreAreaCd = ref();
+/**
+ *  pickStore - 지역코드 세팅
+ */
+
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
   //comsole.log(nowStoreAreaCd.value);
@@ -381,6 +457,10 @@ const handleStoreAreaCd = (newValue) => {
 
 const nowStoreCd = ref();
 const afterCategory = ref(false);
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = async (newValue) => {
   if (newValue == "0") {
     afterSearch.value = false;
@@ -409,7 +489,12 @@ const confirmitem3 = ref([]);
 const clickedScreenOrMenu = ref(false);
 const TLUList = ref([]);
 const clickedScreenNo = ref();
-const searchAmount = async () => {
+
+/**
+ * 조회 함수
+ */
+
+const searchButton = async () => {
   rowData.value = [];
   KeyList.value = [];
   KeyList2.value = [];
@@ -660,8 +745,10 @@ const onEnd2 = (evt) => {
   clickedMenuKey.value = targetItemIndex2;
   showKeys(targetScreenNo);
 };
-
-const savePosMenu = async () => {
+/**
+ * 저장 함수
+ */
+const saveButton = async () => {
   //comsole.log(KeyList.value);
   if (afterSearch.value == false) {
     Swal.fire({
@@ -757,7 +844,7 @@ const savePosMenu = async () => {
           confirmButtonText: "확인",
         });
 
-        searchAmount();
+        searchButton();
       }
     }
   });
@@ -768,6 +855,10 @@ let gridView;
 let dataProvider;
 const currentSelectedMenuCode = ref("");
 const currentSelectedMenuImgUrl = ref("");
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(() => {});
 
 let gridView2;
@@ -777,6 +868,10 @@ const clickedsort = ref();
 const clickedstrName = ref();
 const clickedCode = ref();
 const clickedPrice = ref();
+/**
+ * 선택한 행의 상세정보 셋팅
+ */
+
 const selcetedrowData = (newValue) => {
   //comsole.log(newValue);
   if (newValue[0] == "결제코드") {
@@ -831,6 +926,10 @@ const searchAmountList3 = (e) => {
 const currentpaymentType = ref("할인");
 const currentpaymentCd = ref(3);
 
+/**
+ * pickStore - 포스번호 세팅
+ */
+
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
   //comsole.log(posNo.value);
@@ -840,7 +939,7 @@ const handlePosNo = (newValue) => {
     posNo.value !== undefined &&
     posNo.value !== 0
   ) {
-    searchAmount();
+    searchButton();
   }
 };
 
@@ -986,6 +1085,10 @@ const addKey = () => {
   //comsole.log(KeyList2.value);
 };
 
+/**
+ * 삭제 버튼
+ */
+
 const deletekey = () => {
   if (changeGrid.value == false) {
     KeyList.value = KeyList.value.map((item) => {
@@ -1027,6 +1130,10 @@ const clickedMenukeys = () => {
 const clickedScreenKeys = () => {
   clickedScreenOrMenu.value = false;
 };
+/**
+ * 조회 초기화
+ */
+
 const handleinitAll = (newvalue) => {
   AmountList.value = [];
   MenuGroup.value = [];
@@ -1044,6 +1151,10 @@ const handleinitAll = (newvalue) => {
   searchword3.value = "";
   afterSearch.value = false;
 };
+/**
+ * 조회 상태 초기화
+ */
+
 const searchinit = (newvalue) => {
   afterSearch.value = false;
 };

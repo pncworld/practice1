@@ -1,3 +1,9 @@
+/*--############################################################################
+# Filename : MST01_033INS.vue                                                  
+# Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
   <div
     class="w-[100vw] h-[9vh] absolute top-[6vh] bg-black grid grid-rows-1 grid-cols-[1fr,3fr,1fr]">
@@ -100,9 +106,21 @@
 import { getAppStoreList } from "@/api/mobile";
 import { formatLocalDate } from "@/customFunc/customFunc";
 import store from "@/store";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref, watch } from "vue";
 
+/**
+ * 선택한 매출 시작일자
+ */
+
 const startDate = ref(formatLocalDate(new Date()));
+/**
+ * 선택한 매출 종료일자
+ */
+
 const endDate = ref(formatLocalDate(new Date()));
 const selectedStoreName = ref("");
 const show = ref(false);
@@ -171,6 +189,10 @@ const showStoreAndDate = () => {
     GROUP_CD: store.state.userData.GROUP_CD,
   };
 };
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(async () => {
   const res = await getAppStoreList(
     store.state.userData.GROUP_CD,
@@ -209,7 +231,15 @@ watch(
   }
 );
 
+/**
+ * 선택한 매장 코드 호출 함수
+ */
+
 const selectedStoreCd = ref(0);
+/**
+ * 선택한 매장 코드 호출 함수
+ */
+
 const selectedStoreCd2 = ref(0);
 const sendSearch = () => {
   //comsole.log(selectedStoreCd.value.GROUP_CD);

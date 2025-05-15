@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : MST36_055INS.vue                                                  
+# Description : 마스터관리 > 매장 마스터 > 매장별 결제코드 등록                 
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회 조건  -->
   <div class="h-[80%]">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
@@ -16,6 +23,8 @@
         @storeNm="storeNm">
       </PickStore>
     </div>
+    <!-- 조회 조건  -->
+    <!-- 팝업 및 그리드  -->
     <div class="z-50">
       <DupliPopUp7
         :isVisible="showPopup2"
@@ -84,20 +93,53 @@
         :deleteRow4="deleteRow5"></Realgrid>
     </div>
   </div>
+  <!-- 팝업 및 그리드  -->
 </template>
 
 <script setup>
 import { getAllPayList, saveStorePayCd } from "@/api/master";
 
 import DupliPopUp7 from "@/components/dupliPopUp7.vue";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
 
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 });
@@ -112,15 +154,27 @@ const clickStoreNm = ref();
 const addNew = ref(true);
 const valuesData = ref([["0", "1", "2"]]);
 const labelsData = ref([["할인", "지불", "할증"]]);
+/**
+ * 추가 버튼 함수
+ */
+
 const addRow = ref(false);
 const clickedStoreNm = ref();
 
 const changeRow = ref();
 
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndex = (newValue) => {
   changeRow.value = newValue;
   //comsole.log(changeRow.value);
 };
+/**
+ *  추가 버튼
+ */
+
 const addButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -131,14 +185,30 @@ const addButton = () => {
   }
   addRow.value = !addRow.value;
 };
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRow4 = ref(false);
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRow5 = ref(false);
 
 const disableCd = ref(false);
 
+/**
+ * 페이지 매장 그룹 세팅
+ */
+
 const handleGroupCd = (newValue) => {
   groupCd.value = newValue;
 };
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = (newvalue) => {
   storeCd.value = newvalue;
   rowData.value = [];
@@ -146,19 +216,35 @@ const handleStoreCd = (newvalue) => {
 };
 
 const updateRow = ref([]);
+/**
+ * 체크된 데이터 갱신
+ */
+
 const checkedRowData = (newValue) => {
   updateRow.value = newValue;
   //comsole.log(newValue);
 };
 const updateRow2 = ref([]);
+/**
+ * 체크된 데이터 갱신
+ */
+
 const checkedRowData2 = (newValue) => {
   updateRow2.value = newValue;
   //comsole.log(newValue);
 };
 
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData = (newValue) => {
   rowData.value = newValue;
 };
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData2 = (newValue) => {
   rowData2.value = newValue;
 };
@@ -166,6 +252,10 @@ const validatearr = ref([]);
 const exporttoExcel = ref(false);
 const addrowProp = ref("lngStoreGroup");
 const store = useStore();
+/**
+ * 엑셀 내보내기 함수
+ */
+
 const excelButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -176,6 +266,11 @@ const excelButton = () => {
   }
   exporttoExcel.value = !exporttoExcel.value;
 };
+
+/**
+ *  조회 함수
+ */
+
 const searchButton = async () => {
   if (storeCd.value == 0) {
     Swal.fire({
@@ -208,6 +303,10 @@ const searchButton = async () => {
 const storeNm = (newValue) => {
   clickStoreNm.value = newValue;
 };
+
+/**
+ *  저장 버튼 함수
+ */
 
 const saveButton = async () => {
   //comsole.log(rowData2.value);
@@ -320,6 +419,10 @@ const moveLeft = () => {
   //comsole.log(rowData2.value);
 };
 const showPopup2 = ref(false);
+/**
+ * 복사 팝업 - 복사 함수
+ */
+
 const copyButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({

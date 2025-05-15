@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : MST01_010INS.vue                                                  
+# Description : 마스터관리 > 메뉴 마스터 > TLU 메뉴 등록.                       
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회 조건 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
     <div class="flex justify-center mr-10 space-x-2 pr-5">
@@ -19,7 +26,8 @@
       @GroupNm="handleGroupNm">
     </PickStore>
   </div>
-
+  <!-- 조회 조건 -->
+  <!-- 그리드 및 버튼 영역 -->
   <span
     class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[700px] z-40">
     <h1 class="font-bold text-xl z-40">TLU 설정</h1>
@@ -160,6 +168,8 @@
         </div>
       </div>
     </div>
+    <!-- 그리드 및 버튼 영역 -->
+    <!-- 드래그 영역 -->
     <div class="grid grid-rows-[2fr,5fr] grid-cols-1 ml-10 w-full h-full z-20">
       <div v-show="afterSearch" class="flex mt-8 w-[950px] h-[95%]">
         <div class="flex w-full h-full">
@@ -196,19 +206,57 @@
       </div>
     </div>
   </div>
+  <!-- 드래그 영역 -->
 </template>
 
 <script setup>
 import { getTLUManageInfo, saveTLUList } from "@/api/master";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { nextTick, onMounted, ref, watch } from "vue";
+
+/*
+ * 드래그 라이브러리 호출
+ */
+
 import { VueDraggableNext } from "vue-draggable-next";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
 
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -236,8 +284,16 @@ const changingMode = (data) => {
     changeMode.value = true;
   }
 };
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword = ref("");
 const clickedStoreNm = ref();
+/**
+ * 페이지 매장명 세팅
+ */
+
 const handlestoreNm = (newData) => {
   clickedStoreNm.value = newData;
 };
@@ -245,13 +301,25 @@ const showChangeScreenKey = ref(false);
 const addrowDefault = ref("");
 const confirmitem = ref([]);
 
+/**
+ * 추가 버튼 함수
+ */
+
 const addRow3 = ref(false);
 
 const AllscreenKeyPage = ref(1);
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRow = ref(false);
 
 const nowStoreCd = ref();
 const afterCategory = ref(false);
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = async (newValue) => {
   if (newValue == "0") {
     afterSearch.value = false;
@@ -267,7 +335,15 @@ const MenuGroup = ref([]);
 const SubMenuGroup = ref([]);
 
 const store = useStore();
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword1 = ref();
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword3 = ref();
 const userData = store.state.userData;
 const groupCd = ref(userData.lngStoreGroup);
@@ -277,6 +353,10 @@ const MenuList = ref([]);
 const MenuKeyList = ref([]);
 const searchColValue2 = ref("0");
 const TLUList = ref([]);
+
+/**
+ *  조회 함수
+ */
 
 const searchButton = async () => {
   changeMode.value = false;
@@ -552,6 +632,10 @@ function formatNumber(value) {
   return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+/**
+ *  저장 버튼 함수
+ */
+
 const saveButton = async () => {
   //comsole.log(updatedRowData2.value);
   if (afterSearch.value == false) {
@@ -750,6 +834,10 @@ const searchMenuList = (e) => {
   searchword1.value = e.target.value;
 };
 
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData = (newValue) => {
   //comsole.log(newValue);
   clickedTLUCd.value = newValue[0];
@@ -800,6 +888,10 @@ const saveKey = (index) => {
   //comsole.log(currIndexKey.value);
 };
 
+/**
+ * 삭제 버튼
+ */
+
 const deletekey = () => {
   // const filtered = TLUList.value.find((item,index) => item.lngCode == Number(clickedTLUCd.value)).find((item,index) => index == currIndexKey.value+2)
 
@@ -838,9 +930,17 @@ const changeColid = ref();
 const changeNow = ref(false);
 const changeNow2 = ref(false);
 
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndex2 = (e) => {
   changeRow.value = e;
 };
+/**
+ * 선택한 행의 상세정보 셋팅
+ */
+
 const selcetedrowData = (newValue) => {
   //comsole.log(currIndexKey.value);
   //comsole.log(newValue);
@@ -879,7 +979,15 @@ const selcetedrowData = (newValue) => {
   // finditem2.lngPrice = newValue[2];
 };
 
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData2 = ref([]);
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData = (newvalue) => {
   //comsole.log(newvalue);
   // const updatename = newvalue.filter(item => Number(item.lngCode) == Number(clickedTLUCd.value))[0].strName
@@ -890,6 +998,10 @@ const updatedRowData = (newvalue) => {
   updatedRowData2.value = newvalue;
   //comsole.log(TLUList.value);
 };
+/**
+ * 조회 초기화
+ */
+
 const handleinitAll = (newvalue) => {
   MenuGroup.value = [];
   SubMenuGroup.value = [];

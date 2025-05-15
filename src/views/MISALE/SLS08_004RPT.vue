@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : SLS08_004RPT.vue                                                  
+# Description : 매출관리 > 매출 정정 현황 > 매출 변환 현황.                     
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회 조건 -->
   <div class="h-full" @click="handleParentClick">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
@@ -59,7 +66,8 @@
       </div>
       <div></div>
     </div>
-
+    <!-- 조회 조건 -->
+    <!-- 그리드 영역 -->
     <div class="w-full h-[80%]">
       <Realgrid
         :progname="'SLS08_004RPT_VUE'"
@@ -85,6 +93,7 @@
       </Realgrid>
     </div>
   </div>
+  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
@@ -93,12 +102,40 @@ import {
   getSalesChangeData,
   getSalesChangeDetailData,
 } from "@/api/misales";
+/**
+ *  매출 일자 세팅 컴포넌트
+ *  */
+
 import Datepicker2 from "@/components/Datepicker2.vue";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+/**
+ *  매장  단일 선택 컴포넌트
+ *  */
+
 import PickStoreSingle2 from "@/components/pickStoreSingle.vue";
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
 
 const orderPay = ref(1);
@@ -122,10 +159,18 @@ const selectedendDate = ref();
 const hideColumnNow = ref(true);
 const setGroupColumnId = ref("dtmDate");
 const hideColumnsId = ref(["strStore"]);
+/**
+ * 선택한 매출 시작일자
+ */
+
 const startDate = (e) => {
   //comsole.log(e);
   selectedstartDate.value = e;
 };
+/**
+ * 선택한 매출 종료일자
+ */
+
 const endDate = (e) => {
   selectedendDate.value = e;
 };
@@ -136,6 +181,10 @@ const selectedCause = ref(null);
 const store = useStore();
 const causeList = ref([]);
 const mergeMask = ref();
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
@@ -147,6 +196,10 @@ onMounted(async () => {
 });
 
 const loginedstrLang = store.state.userData.lngLanguage;
+/**
+ *  조회 함수
+ */
+
 const searchButton = async () => {
   store.state.loading = true;
   try {
@@ -243,26 +296,51 @@ const selectedStores = ref();
 const selectedStoreAttrs = ref();
 const selectedStoreTeam = ref();
 const selectedStoreSuperVisor = ref();
+/**
+ * 페이지 매장 그룹 세팅
+ */
+
 const lngStoreGroup = (e) => {
   //comsole.log(e);
   selectedGroup.value = e;
 };
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const lngStoreCodes = (e) => {
   selectedStores.value = e;
   //comsole.log(e);
 };
+
+/**
+ * 페이지 매장 분류 세팅
+ */
+
 const lngStoreAttrs = (e) => {
   selectedStoreAttrs.value = e;
   //comsole.log(e);
 };
+/**
+ * 페이지 매장 슈퍼바이저 세팅
+ */
+
 const lngSupervisor = (e) => {
   selectedStoreSuperVisor.value = e;
   //comsole.log(e);
 };
+/**
+ * 페이지 매장 팀 세팅
+ */
+
 const lngStoreTeam = (e) => {
   selectedStoreTeam.value = e;
   //comsole.log(e);
 };
+
+/**
+ * 그리드 초기화
+ */
 
 const initGrid = () => {
   if (rowData.value.length > 0) {
@@ -273,6 +351,10 @@ const initGrid = () => {
 const exportExcel = ref(false);
 
 //comsole.log(store.state.minorCategory);
+
+/**
+ * 엑셀 내보내기 함수
+ */
 
 const excelButton = () => {
   // let condition = '조건 :';
@@ -311,6 +393,10 @@ const resetVselect2 = () => {
 };
 const datepicker = ref(null);
 const closePopUp = ref(false);
+/**
+ * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
+ */
+
 const handleParentClick = (e) => {
   const datepickerEl = datepicker.value?.$el;
 
@@ -321,10 +407,18 @@ const handleParentClick = (e) => {
 };
 const documentSubTitle = ref("");
 const selectedExcelDate = ref("");
+/**
+ * 엑셀용 일자 세팅 함수
+ */
+
 const excelDate = (e) => {
   selectedExcelDate.value = e;
 };
 const selectedExcelStore = ref("");
+/**
+ * 엑셀용 매장 세팅 함수
+ */
+
 const excelStore = (e) => {
   selectedExcelStore.value = e;
 };
@@ -359,6 +453,10 @@ const showSum = (e) => {
     reload.value = !reload.value;
   }
 };
+/**
+ *  컴포넌트 변동시 감지 함수
+ */
+
 const changeInit = (e) => {
   initGrid();
 };

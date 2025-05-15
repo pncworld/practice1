@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : SLS01_001INS.vue                                                  
+# Description : 매출관리 > 매출 목표 관리 > 일별 매출 계획 등록.               
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회 조건 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
     <div class="flex justify-center mr-9 space-x-2 pr-5">
@@ -183,29 +190,65 @@
       </div>
     </div>
   </div>
-
+  <!-- 조회 조건 -->
+  <!--달력 영역-->
   <div class="h-[70%] mt-1">
     <FullCalendar :options="calendarOptions" class="h-full" ref="calendarRef">
     </FullCalendar>
   </div>
+  <!--달력 영역-->
 </template>
 
 <script setup>
 import { getProjByMonth, saveExcelDataPlan } from "@/api/misales";
+/**
+ *  해당연월 컴포넌트
+ *  */
+
 import Datepicker3 from "@/components/Datepicker3.vue";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+
+/**
+ *  매장 단일 선택 컴포넌트
+ *  */
+
 import PickStoreSingle from "@/components/pickStoreSingle.vue";
 import {
   excelSerialDateToJSDate,
   insertPageLog,
 } from "@/customFunc/customFunc";
+
+/**
+ *  달력 관련 라이브러리
+ *  */
+
 import koLocale from "@fullcalendar/core/locales/ko";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import FullCalendar from "@fullcalendar/vue3";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref, watch } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+
+/**
+ *  엑셀 내보내기 관련 라이브러리
+ */
 import { read, utils, write, writeFile } from "xlsx-js-style";
 
 const resetFileInput = (e) => {
@@ -238,6 +281,10 @@ const clickedComment = ref("");
 const clickedProj = ref("");
 const clickedDate = ref("");
 
+/**
+ * 	시작 월
+ */
+
 const startMonth = (e) => {
   currentMonth.value = e;
 
@@ -256,6 +303,10 @@ const startMonth = (e) => {
   }
   initGrid();
 };
+/**
+ * 	시작 년
+ */
+
 const startYear = (e) => {
   currentYear.value = e;
 
@@ -389,6 +440,10 @@ const saveUploadFile = async () => {
   }
 };
 
+/**
+ *  저장 버튼 함수
+ */
+
 const saveButton = async () => {
   if (currentYear.value == null || currentMonth.value == null) {
     Swal.fire({
@@ -513,6 +568,10 @@ const handleDateClick = (e) => {
   }
 };
 
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
   const nextBtn = document.getElementsByClassName("fc-next-button")[0];
@@ -623,9 +682,17 @@ const WeekDays = ref([
 const prevMonth = ref(false);
 const nextMonth = ref(false);
 
+/**
+ * 엑셀용 일자 세팅 함수
+ */
+
 const excelDate = (e) => {
   selectedExcelDate.value = e;
 };
+/**
+ * 엑셀용 매장 세팅 함수
+ */
+
 const excelStore = (e) => {
   selectedExcelStore.value = e;
 };
@@ -637,26 +704,47 @@ const lngstorecode = ref();
 const maxSaleTarget = ref("");
 const checked = ref(0);
 
+/**
+ * 페이지 매장 그룹 세팅
+ */
+
 const lngStoreGroup = (e) => {
   lngstoregroup.value = e;
   //comsole.log(e);
   initGrid();
 };
+
+/**
+ * 페이지 매장 분류 세팅
+ */
+
 const lngStoreAttrs = (e) => {
   lngstoreattr.value = e;
   //comsole.log(e);
   initGrid();
 };
+/**
+ * 페이지 매장 팀 세팅
+ */
+
 const lngStoreTeam = (e) => {
   lngstoreteam.value = e;
   //comsole.log(e);
   initGrid();
 };
+/**
+ * 페이지 매장 슈퍼바이저 세팅
+ */
+
 const lngSupervisor = (e) => {
   lngstoresupervisor.value = e;
   //comsole.log(e);
   initGrid();
 };
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const lngStoreCode = (e) => {
   lngstorecode.value = e;
   //comsole.log(e);
@@ -668,6 +756,10 @@ const store = useStore();
 //comsole.log(store);
 
 const afterSearch = ref(false);
+/**
+ *  조회 함수
+ */
+
 const searchButton = async () => {
   // initCheckBox.value = !initCheckBox.value
   // initSearchWord.value = !initSearchWord.value
@@ -821,6 +913,10 @@ const downloadSample = () => {
 };
 
 const calendarRef = ref(null);
+/**
+ * 엑셀 내보내기 함수
+ */
+
 const excelButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -948,6 +1044,10 @@ const excelButton = () => {
     `${currentYear.value}년 ${currentMonth.value}월 계획 달력.xlsx`
   );
 };
+/**
+ * 그리드 초기화
+ */
+
 const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];

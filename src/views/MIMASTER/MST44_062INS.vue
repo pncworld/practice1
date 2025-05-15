@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : MST44_062INS.vue                                                  
+# Description : 마스터관리 > POS 마스터 > 출력관리                        
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회 조건 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
        <PageName></pageName>
     <div class="flex justify-center mr-10 space-x-2 pr-5">
@@ -12,6 +19,7 @@
     <PickStore @areaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" @posNo="handlePosNo" @storeNm="handlestoreNm"
       @update:ischanged="handleinitAll"></PickStore>
   </div>
+    <!-- 조회 조건 -->
   <div class="z-50">
     <DupliPopUp5 :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm"
       :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST44_061INS_VUE'" :dupliapiname="'DUPLIALLKDS'" :progid="3"
@@ -38,6 +46,7 @@
             @click="dupliData">복사</button><button class="whitebutton" @click="dupliAllData">붙여넣기</button></div>
 
       </div>
+            <!-- 그리드 영역 -->
       <div class="h-full" v-show="currentMenu == 1">
         <div class="ml-10 mt-5 w-full h-full">
           <Realgrid class="w-full h-[400%]" :progname="'MST44_062INS_VUE'" :progid="1" :rowData="rowData" :rowStateeditable="false"
@@ -54,6 +63,7 @@
           <Realgrid class="w-full h-[400%]" :progname="'MST44_062INS_VUE'" :progid="2" :rowData="rowData2" :rowStateeditable="false"
             :showGrid="showGrid" :showCheckBar="false" @realgridname="realgridname2"></Realgrid>
         </div>
+              <!-- 그리드 영역 -->
       </div>
 
       <div class="h-4/6 w-[80vw]" v-show="currentMenu == 2">
@@ -76,6 +86,7 @@
               class="border w-full h-full px-1 border-gray-400 rounded-lg" @input="searchMenuList"
               v-model="searchword1"></div>
         </div>
+              <!-- 그리드 영역 -->
         <div class="ml-10 mt-5 w-full h-full">
           <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="4" :reload="reload"
             :rowData="rowData3" :showGrid="showGrid" :showCheckBar="false" @selcetedrowData="selcetedrowData" :rowStateeditable="false"
@@ -85,16 +96,19 @@
             :setDynamicGrid3="true" :dynamicStoreCd="nowStoreCd" @realgridname="realgridname3"
           ></Realgrid>
         </div>
+              <!-- 그리드 영역 -->
       </div>
 
       <div class="h-[55vh]" v-show="currentMenu == 3">
         <div class="h-[15vh] w-[45vw] ml-10 mt-5" v-show="currentMenu == 3">
           <div class="w-full h-full ">
+                  <!-- 그리드 영역 -->
             <Realgrid class="w-[100%] h-[130%] " :progname="'MST44_062INS_VUE'" :progid="3" :reload="reload" :rowStateeditable="false"
               :rowData="rowData4" @clickedRowData="clickedRowData2" @realgridname="realgridname4" @selectedIndex2="selectedIndex2"
               @updatedRowData="updatedRowData3" :changeColid="changeColid" :changeRow="changeRow" :changeNow="changeNow2"
               :changeValue2="changeValue" :initSelect="initSelect" ></Realgrid>
           </div>
+                <!-- 그리드 영역 -->
         </div>
 
         <div v-show="currentMenu == 3" class="mt-12 flex flex-col justify-start ml-10 h-[40vh] w-[45vw] rounded-lg ">
@@ -247,17 +261,59 @@
 
 <script setup>
 import { getKitchenSettingList, getPrintList, getStorePosList, saveKitchenSettingAll, savePrintNm, saveReceiptData } from '@/api/master';
+
+/*
+ * 공통 표준  Function
+ */
+
 import { nextTick, onMounted, ref, watch } from 'vue';
+
+/**
+ * 	Vuex 상태관리 및 로그인 세션 호출
+ */
+
 import { useStore } from 'vuex';
 
+/**
+ * 	복사 팝업 컴포넌트
+ */
+
 import DupliPopUp5 from '@/components/dupliPopUp5.vue';
+
+/**
+ * 	매장 조건 정보 컴포넌트 호출
+ */
+
 import PickStore from '@/components/pickStore.vue';
+
+/**
+ * 	그리드 컴포넌트 및 라이브러리 호출
+ */
+
 import Realgrid from '@/components/realgrid.vue';
 import RealGrid from 'realgrid';
+/**
+ * 	알림창 라이브러리 호출
+ */
+
 import Swal from 'sweetalert2';
+
+/**
+ * 	페이지 로그 공통 함수 호출
+ */
+
 import { insertPageLog } from '@/customFunc/customFunc';
+
+/**
+ * 	페이지 명칭 공통 호출 컴포넌트
+ */
+
 import PageName from '@/components/pageName.vue';
 
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -279,6 +335,10 @@ const PrintList = ref([])
 const clickedNm = ref('')
 const clickedNo = ref()
 const clickedStoreNm = ref()
+/**
+ * 페이지 매장명 세팅
+ */
+
 const handlestoreNm = (newData) => {
   clickedStoreNm.value = newData
 }
@@ -291,6 +351,10 @@ const receiptD2 = ref('')
 const receiptD3 = ref('')
 const receiptD4 = ref('')
 const receiptD5 = ref('')
+/**
+ * 선택한 포스 번호 호출 함수
+ */
+
 const posNo = ref();
 const addrowDefault = ref()
 const currmenuKeyPage = ref(1)
@@ -381,17 +445,29 @@ watch(currentMenu, () => {
 const hidesub = ref(false)
 
 const nowStoreAreaCd = ref();
+/**
+ *  pickStore - 지역코드 세팅
+ */
+
 const handleStoreAreaCd = (newValue) => {
 
   nowStoreAreaCd.value = newValue;
   //comsole.log(nowStoreAreaCd.value)
 }
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData = (newValue) => {
   updatedList.value = newValue
   //comsole.log(updatedList.value)
 }
 
 const forSaveMenu = ref([])
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData2 = (newValue) => {
   updatedList2.value = newValue
   //comsole.log(newValue)
@@ -399,12 +475,20 @@ const updatedRowData2 = (newValue) => {
 }
 
 const updatedList3 = ref([])
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData3 = (newValue) => {
   updatedList3.value = newValue
   //comsole.log(updatedList3.value)
 }
 const nowStoreCd = ref();
 const afterCategory = ref(false);
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = async (newValue) => {
   afterSearch.value = false;
   rowData.value = []
@@ -542,7 +626,15 @@ const changeValues = (e) => {
 }
 
 const store = useStore();
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword1 = ref()
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword3 = ref()
 const userData = store.state.userData;
 
@@ -556,8 +648,20 @@ const MenuKeyList = ref([])
 const clickedScreenOrMenu = ref(false)
 const TLUList = ref([])
 const checked = ref()
+/**
+ * 추가 버튼 함수
+ */
+
 const addRows = ref(false)
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRows = ref(false)
+/**
+ * 추가 버튼 함수
+ */
+
 const addRow = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -583,6 +687,10 @@ const addRow = () => {
 }
 
 const printNameList = ref([])
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRow = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -595,7 +703,11 @@ const deleteRow = () => {
   }
   deleteRows.value = !deleteRows.value
 }
-const copyButton = () => {
+/**
+ * 복사 팝업 - 복사 함수
+ */
+ 
+ const copyButton = () => {
 
   if (afterSearch.value == false) {
     Swal.fire({
@@ -610,13 +722,22 @@ const copyButton = () => {
 
 }
 
+/**
+ * 선택한 행의 상세정보 셋팅
+ */
+
 const selcetedrowData = (newValue) => {
   //comsole.log(newValue)
 
 }
 const originRowData3 = ref([])
 const initSelect = ref(false)
-const searchButton = async () => {
+/**
+ *  조회 함수
+ */
+
+ 
+const searchButton= async () => {
   changeMode.value = false
   Category.value = [];
   items.value = []
@@ -740,7 +861,12 @@ const searchMenuList = (e) => {
 
 
 
-const saveButton = async () => {
+/**
+ *  저장 버튼 함수
+ */
+
+ 
+const saveButton  = async () => {
   //comsole.log(updatedList2.value)
   if (currentMenu.value == 1) {
     if (afterSearch.value == false) {
@@ -876,7 +1002,11 @@ const saveButton = async () => {
 
         } else if (currentMenu.value == 3) {
           //comsole.log(updatedList3.value)
-          const posNos = updatedList3.value.map(item => item.intPosNo)
+          /**
+ * 선택한 포스 번호 호출 함수
+ */
+
+const posNos = updatedList3.value.map(item => item.intPosNo)
           const areaCodes = updatedList3.value.map(item => item.lngAreaCode)
           const strreceipts = updatedList3.value.map(item => item.strReceiptU)
           const strreceipts2 = updatedList3.value.map(item => item.strReceiptD)
@@ -934,10 +1064,18 @@ const saveButton = async () => {
 //    }
 //    //comsole.log(rowData3.value)
 // })
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndex =(e) => {
   changeRow.value = e
 }
 const changeRow = ref()
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData = (newValue) => {
   disabled.value = false
   clickedNo.value = newValue[2]
@@ -959,6 +1097,10 @@ const caculateByte3 = (e) => {
 
   changeNow2.value = !changeNow2.value
 }
+
+/**
+ * 페이지 초기화
+ */
 
 const initAllSection = async () => {
   receiptU.value = ''
@@ -1146,10 +1288,18 @@ function splitStringByByteLength(str, maxByteLength) {
 
   return chunks;
 }
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndex2 = (e) => {
   changeRow.value = e
 
 }
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData2 = (newValue) => {
   //comsole.log(newValue)
   receiptU.value = newValue[2]
@@ -1161,6 +1311,10 @@ const clickedRowData2 = (newValue) => {
   receiptD5.value = result[4]
 
 }
+
+/**
+ * pickStore - 포스번호 세팅
+ */
 
 const handlePosNo = (newValue) => {
   posNo.value = newValue
@@ -1178,6 +1332,10 @@ const handlePosNo = (newValue) => {
 
 
 
+
+/**
+ * 조회 초기화
+ */
 
 const handleinitAll = (newvalue) => {
   MenuGroup.value = []

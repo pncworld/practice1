@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : MST36_003INS.vue                                                  
+# Description : 마스터관리 > 매장 마스터 > 결제그룹등록                        
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회 조건 -->
   <div class="h-[80%]">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
@@ -24,6 +31,8 @@
         </div>
       </div>
     </span>
+    <!-- 조회 조건 -->
+    <!-- 그리드 영역 -->
     <div
       class="grid grid-rows-1 grid-cols-2 h-[65vh] w-full justify-center mt-2">
       <div class="w-[110%] ml-10 h-[65vh]">
@@ -49,7 +58,8 @@
           :exporttoExcel="exporttoExcel"
           :ExcelNm="'결제그룹등록'"></Realgrid>
       </div>
-
+      <!-- 그리드 영역 -->
+      <!-- 연동 데이터 영역 -->
       <div class="grid grid-cols-[2fr,6fr] grid-rows-3 w-[70%] ml-44 h-[15%]">
         <div
           class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500 rounded-tl-lg">
@@ -94,18 +104,52 @@
       </div>
     </div>
   </div>
+  <!-- 연동 데이터 영역 -->
 </template>
 
 <script setup>
 import { getAmountGroup, savePayGroup } from "@/api/master";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+
+/**
+ *  페이지명 매장 그룹 호출 컴포넌트
+ *  */
+
 import PickGroup from "@/components/pickGroup.vue";
 
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -128,10 +172,18 @@ const gridvalue3 = ref();
 const gridvalue4 = ref(false);
 const gridvalue5 = ref();
 
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndex = (newValue) => {
   changeRow.value = newValue;
   //comsole.log(changeRow.value);
 };
+/**
+ *  추가 버튼
+ */
+
 const addButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -142,7 +194,15 @@ const addButton = () => {
   }
   addRow.value = !addRow.value;
 };
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRow = ref(false);
+/**
+ * 삭제 버튼
+ */
+
 const deleteButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -154,6 +214,10 @@ const deleteButton = () => {
   deleteRow.value = !deleteRow.value;
 };
 const disableCd = ref(false);
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData = (newValue) => {
   gridvalue1.value = newValue[0];
   gridvalue2.value = newValue[1];
@@ -166,6 +230,10 @@ const clickedRowData = (newValue) => {
     addNew.value = true;
   }
 };
+/**
+ * 페이지 매장 그룹 세팅
+ */
+
 const handleGroupCd = (newValue) => {
   groupCd.value = newValue;
   rowData.value = [];
@@ -178,10 +246,18 @@ const handleGroupCd = (newValue) => {
 };
 
 const updateRow = ref([]);
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData = (newValue) => {
   updateRow.value = newValue;
   //comsole.log(newValue);
 };
+
+/**
+ * INPUT , SELECT 수정 데이터 갱신
+ */
 
 const changeInfo = (e) => {
   const rowName = e.target.name;
@@ -204,6 +280,11 @@ const addrowDefault = ref();
 const exporttoExcel = ref(false);
 const addrowProp = ref("lngStoreGroup");
 const store = useStore();
+
+/**
+ * 엑셀 내보내기 함수
+ */
+
 const excelButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -214,6 +295,10 @@ const excelButton = () => {
   }
   exporttoExcel.value = !exporttoExcel.value;
 };
+/**
+ *  조회 함수
+ */
+
 const searchButton = async () => {
   if (groupCd.value == 0) {
     Swal.fire({
@@ -245,6 +330,10 @@ const searchButton = async () => {
     store.state.loading = false;
   }
 };
+
+/**
+ *  저장 버튼 함수
+ */
 
 const saveButton = async () => {
   if (afterSearch.value == false) {
@@ -309,6 +398,10 @@ const saveButton = async () => {
         const lngGroupCode = updateRow.value
           .filter((item) => item.deleted !== true)
           .map((item) => item.lngGroupCode);
+        /**
+         * 페이지 매장 그룹 세팅
+         */
+
         const lngStoreGroup = updateRow.value
           .filter((item) => item.deleted !== true)
           .map((item) => item.lngStoreGroup);

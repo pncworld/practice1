@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : MST44_043INS.vue                                                  
+# Description : 마스터관리 > POS 마스터 > 기능키 설정(#)                       #
+Date :2025-05-14                                                              #
+Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회 조건 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
     <div class="flex justify-center mr-9 space-x-2 pr-5">
@@ -42,7 +49,8 @@
       :naming2="'기능키'">
     </DupliPopUp>
   </div>
-
+  <!-- 조회 조건 -->
+  <!-- 그리드 영역 -->
   <div
     v-if="changeScreenKey"
     class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
@@ -188,6 +196,8 @@
         </div>
       </div>
     </div>
+    <!-- 그리드 영역 -->
+    <!-- 드래그 영역 -->
     <div
       v-if="showOtherKeys == false"
       class="grid grid-rows-[1fr,4fr] grid-cols-1 mt-5 w-full h-full z-20">
@@ -299,6 +309,7 @@
       </VueDraggableNext>
     </div>
   </div>
+  <!-- 드래그 영역 -->
 </template>
 
 <script setup>
@@ -308,15 +319,51 @@ import {
   getFuncKeys,
   saveAllFuncKey,
 } from "@/api/master";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref, watch } from "vue";
+/*
+ * 드래그 라이브러리 호출
+ */
+
 import { VueDraggableNext } from "vue-draggable-next";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
 
+/**
+ *  복사 팝업 컴포넌트
+ *  */
+
 import DupliPopUp from "@/components/dupliPopUp.vue";
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
 
 // 더미 데이터
@@ -325,7 +372,15 @@ const ScreenKeyOrigin = ref([]);
 
 const ScreenKeys = ref([]);
 const currentMenuorTLU = ref(false);
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword1 = ref();
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword3 = ref();
 const forsearchMain = ref("0");
 const forsearchSub = ref("0");
@@ -341,6 +396,10 @@ const clickedKey1 = ref();
 const clickedKey2 = ref();
 const clickedKey3 = ref();
 const clickedStoreNm = ref();
+/**
+ * 페이지 매장명 세팅
+ */
+
 const handlestoreNm = (newData) => {
   clickedStoreNm.value = newData;
 };
@@ -349,15 +408,27 @@ const showChangeScreenKey = ref(false);
 const confirmitem = ref([]);
 const currentscreenKeyNm = ref("");
 const maxSubCode = ref();
+/**
+ * 선택한 포스 번호 호출 함수
+ */
+
 const posNo = ref();
 const changeScreenKey = ref(false);
 const currmenuKeyPage = ref(1);
 const AllscreenKeyPage = ref(1);
 
 const currentMenu = ref(false);
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 });
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(async () => {
   const res4 = await getFuncKeyList();
   //comsole.log(res4);
@@ -371,6 +442,10 @@ onMounted(async () => {
   rowData.value = [...commonKeyList.value];
   //comsole.log(commonKeyList.value);
 });
+/**
+ * 복사 팝업 - 복사 함수
+ */
+
 const copyButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -387,6 +462,10 @@ const copyButton = () => {
 const updateMenuKey = ref(false);
 
 const nowStoreAreaCd = ref();
+/**
+ *  pickStore - 지역코드 세팅
+ */
+
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
   //comsole.log(nowStoreAreaCd.value);
@@ -394,6 +473,10 @@ const handleStoreAreaCd = (newValue) => {
 
 const nowStoreCd = ref();
 const afterCategory = ref(false);
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = async (newValue) => {
   if (newValue == "0") {
     afterSearch.value = false;
@@ -425,6 +508,10 @@ const clickedScreenOrMenu = ref(false);
 const TLUList = ref([]);
 const clickedScreenNo = ref();
 const initFocus = ref(false);
+/**
+ *  조회 함수
+ */
+
 const searchButton = async () => {
   changeMode.value = false;
   Category.value = [];
@@ -856,6 +943,10 @@ const onEnd3 = (evt) => {
   //comsole.log("subKeyList8:", subKeyList8.value);
 };
 
+/**
+ *  저장 버튼 함수
+ */
+
 const saveButton = async () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -925,6 +1016,10 @@ const saveButton = async () => {
 
 let dataProvider;
 
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(() => {
   showMenuKeys();
 });
@@ -937,6 +1032,10 @@ const clickedTLUCD = ref();
 const clickedTLUNM = ref();
 const clickedstrName = ref();
 const clickedCode = ref();
+/**
+ * 선택한 행의 상세정보 셋팅
+ */
+
 const selcetedrowData = (newValue) => {
   //comsole.log(newValue);
   clickedstrName.value = newValue[1];
@@ -971,6 +1070,11 @@ const searchAmountList3 = (e) => {
 
 const currentpaymentType = ref("기본");
 const currentpaymentCd = ref(3);
+
+/**
+ * 결제키 구분 세팅
+ */
+
 const updatePaymentType = (newValue) => {
   //comsole.log(newValue);
   currentpaymentCd.value = newValue;
@@ -984,6 +1088,10 @@ const updatePaymentType = (newValue) => {
   ScreenKeyOrigin.value = [];
   ScreenKeys.value = [];
 };
+
+/**
+ * pickStore - 포스번호 세팅
+ */
 
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
@@ -1150,6 +1258,10 @@ const addKey = () => {
   //comsole.log(KeyList.value);
 };
 
+/**
+ * 삭제 버튼
+ */
+
 const deletekey = () => {
   if (clickedSection.value == 1) {
     subsubKeyList1.value[clickedRealIndex.value] = "";
@@ -1165,6 +1277,10 @@ const clickedMenukeys = () => {
   clickedScreenOrMenu.value = true;
 };
 
+/**
+ * 조회 초기화
+ */
+
 const handleinitAll = (newvalue) => {
   MenuGroup.value = [];
   SubMenuGroup.value = [];
@@ -1179,6 +1295,10 @@ const handleinitAll = (newvalue) => {
   searchword3.value = "";
   afterSearch.value = false;
 };
+/**
+ * 조회 상태 초기화
+ */
+
 const searchinit = (newvalue) => {
   afterSearch.value = false;
 };

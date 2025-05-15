@@ -1,14 +1,23 @@
+/*--############################################################################
+# Filename : MST57_001INS.vue                                                  
+# Description : 마스터관리 > POS 마스터 > 메뉴 카테고리 관리                    
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회 조건 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <div class="flex justify-start pl-4 pt-0">
       <PageName></PageName>
       <div class="flex justify-end space-x-2 ml-[1168px]">
         <div class="flex justify-center space-x-2 mt-2">
-          <button @click="searchMenu" class="button search md:w-auto w-14">
+          <button @click="searchButton" class="button search md:w-auto w-14">
             조회
           </button>
 
-          <button @click="saveMenus" class="button save text-sm md:w-auto w-14">
+          <button
+            @click="saveButton"
+            class="button save text-sm md:w-auto w-14">
             저장
           </button>
         </div>
@@ -24,6 +33,8 @@
       @update:storeCd="handleStoreCd"
       :showAreaCd="true"></PickStore>
   </div>
+  <!-- 조회 조건 -->
+  <!-- 데이터 영역 -->
   <div class="inline-block md:flex w-full">
     <span class="md:hidden font-bold flex justify-center w-auto">
       클릭하시면 아래 페이지에서 다국어 정보가 나옵니다.</span
@@ -249,10 +260,11 @@
       </div>
       <div
         class="text-white rounded-md h-8 w-28 flex items-center justify-center mt-5 mr-1">
-        <button class="button save" @click="saveMenus">저장</button>
+        <button class="button save" @click="saveButton">저장</button>
       </div>
     </div>
   </div>
+  <!-- 데이터 영역 -->
   <br />
   <br />
   <br />
@@ -269,12 +281,40 @@ import {
   setSubCategoryINSERT,
   setSubCategoryUPDATE,
 } from "@/api/master";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref, watch } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -292,6 +332,10 @@ const nowStoreCd = ref();
 const afterCategory = ref(false);
 const currentMajorCode = ref();
 const newMainCategoryCode = ref([]);
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = (newValue) => {
   // if (newValue == "0") {
   afterSearch.value = false;
@@ -327,6 +371,10 @@ watch(nowStoreCd, (newvalue, oldvalue) => {
   }
 });
 const nowStoreAreaCd = ref();
+/**
+ *  pickStore - 지역코드 세팅
+ */
+
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
 };
@@ -516,7 +564,7 @@ const deleteSubCategory = async (categoryCode) => {
           confirmButtonText: "확인",
         });
 
-        await searchMenu();
+        await searchButton();
         bringCategory(currentMajorCode.value);
       }
     } catch (error) {
@@ -569,7 +617,7 @@ const deleteMainCategory = () => {
           icon: "success",
           confirmButtonText: "확인",
         });
-        searchMenu();
+        searchButton();
       }
     } else {
       return;
@@ -608,7 +656,7 @@ const deleteAllsubCategory = async () => {
             icon: "success",
             confirmButtonText: "확인",
           }).then(async () => {
-            await searchMenu().then(() => {
+            await searchButton().then(() => {
               bringCategory(currentMajorCode.value);
             });
           });
@@ -618,7 +666,10 @@ const deleteAllsubCategory = async () => {
   });
 };
 
-const searchMenu = async () => {
+/**
+ *  조회 함수
+ */
+const searchButton = async () => {
   subMultiLang.value = [];
   Category.value = [];
   languageName0.value = "";
@@ -676,7 +727,11 @@ const searchMenu = async () => {
   }
   //comsole.log(Category.value);
 };
-const saveMenus = async () => {
+
+/***
+ *  저장 함수
+ */
+const saveButton = async () => {
   // if(newMainCategoryCode.value.includes(currentMajorCode.value) && ){
 
   // }
@@ -801,7 +856,7 @@ const saveMenus = async () => {
 
         // 이제 res2를 사용하여 상태 확인 가능
         if (res2.status === 200 && res3.status === 200) {
-          await searchMenu(); // searchMenu()도 await
+          await searchButton(); // searchMenu()도 await
           bringCategory(currentMajorCode.value);
 
           Swal.fire({

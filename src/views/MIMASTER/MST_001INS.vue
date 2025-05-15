@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : MST_001INS.vue                                                   #
+Description : 마스터관리 > 매장 마스터 > 좌석정보등록                        #
+Date :2025-05-14                                                              #
+Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회 태그 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
     <div class="flex justify-center mr-10 space-x-2 pr-5">
@@ -31,6 +38,8 @@
       </select>
     </div>
   </div>
+  <!-- 조회 태그 -->
+  <!-- 팝업 및 gridStack 부분 -->
   <div class="z-[90]">
     <DupliPopUp6
       :isVisible="showPopup2"
@@ -128,7 +137,8 @@
       테이블 추가
     </button>
   </div>
-
+  <!-- 팝업 및 gridStack 부분 -->
+  <!-- 데이터 입력 부분 -->
   <div class="flex z-81 mt-2">
     <div
       class="grid-stack table_style overflow-hidden !w-[1000px] !h-[630px]"
@@ -335,20 +345,48 @@
       </div>
     </div>
   </div>
+  <!-- 데이터 입력 부분 -->
 </template>
 
 <script setup>
 import { getTableList2, saveTables2 } from "@/api/master";
 import DupliPopUp6 from "@/components/dupliPopUp6.vue";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
 
+/**
+ *  그림 이동 라이브러리
+ *  */
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.min.css";
 
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+
+/*
+ * 공통 표준  Function
+ */
 import { onActivated, onDeactivated, onMounted, ref, watch } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
 
 const ScreenKeyOrigin = ref([]);
@@ -361,6 +399,10 @@ const groupCd = ref(userData.lngStoreGroup);
 const nowStoreCd = ref("0");
 const currentMenu = ref(1);
 const clickTable = ref(false);
+/**
+ * 선택한 포스 번호 호출 함수
+ */
+
 const posNo = ref("");
 const afterSearch = ref(false);
 const nowStoreAreaCd = ref("0");
@@ -483,15 +525,26 @@ const getScreenNos = ref([
   { lngKeyscrNo: 14 },
   { lngKeyscrNo: 15 },
 ]);
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = async (newValue) => {
   afterSearch.value = false;
 
   nowStoreCd.value = newValue;
 };
 
+/**
+ * 페이지 매장명 세팅
+ */
+
 const handlestoreNm = (newValue) => {
   clickedStoreNm.value = newValue;
 };
+/**
+ * pickStore - 포스번호 세팅
+ */
 
 const handlePosNo = async (newValue) => {
   //comsole.log(newValue);
@@ -513,12 +566,19 @@ watch(selectedScreenNo, () => {
     searchButton();
   }
 });
+/**
+ *  pickStore - 지역코드 세팅
+ */
 
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
   //comsole.log(nowStoreAreaCd.value);
 };
 let grid = null; // DO NOT use ref(null) as proxies GS will break all logic when comparing structures... see https://github.com/gridstack/gridstack.js/issues/2115
+
+/**
+ *  조회 함수
+ */
 
 const searchButton = async () => {
   items.value = [];
@@ -794,6 +854,10 @@ function updateTableListFromFiltered() {
 }
 
 // Usage in onMounted
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
@@ -1603,6 +1667,10 @@ const deleteScreenKey = (newValue) => {
   });
 };
 
+/**
+ *  저장 버튼 함수
+ */
+
 const saveButton = async () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -1762,6 +1830,10 @@ const changetableProperty = (e) => {
     }
   });
 };
+/**
+ * 페이지 초기화
+ */
+
 const initAllTable = () => {
   Swal.fire({
     title: "테이블 초기화",
@@ -1783,6 +1855,10 @@ const initAllTable = () => {
   });
 };
 
+/**
+ * 복사 팝업 - 복사 함수
+ */
+
 const copyButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -1795,6 +1871,10 @@ const copyButton = () => {
   showPopup2.value = true;
 };
 let savedGrid = null;
+/**
+ * 재활성화시 기존 정보 재로딩
+ */
+
 onActivated(() => {
   if (savedGrid != null) {
     grid = GridStack.init({
@@ -1912,7 +1992,9 @@ onActivated(() => {
     });
   }
 });
-
+/**
+ * 컴포넌트 비활성화시
+ */
 onDeactivated(() => {
   //comsole.log(grid);
   if (grid) {

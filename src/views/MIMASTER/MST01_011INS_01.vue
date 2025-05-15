@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : MST01_011INS_01.vue                                                
+  # Description : 마스터관리 > 메뉴 마스터 > 선택 메뉴 그룹 등록.(U)           
+  # Date :2025-05-14                                                           
+  # Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회 조건  -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
     <div class="flex justify-center mr-10 space-x-2 pr-5">
@@ -20,7 +27,8 @@
       @update:ischanged="handleinitAll">
     </PickStore>
   </div>
-
+  <!-- 조회 조건  -->
+  <!--그리드 영역 및 연동 데이터 영역 -->
   <div
     v-if="addMenu"
     class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
@@ -429,6 +437,7 @@
               @selectedIndex2="selectedIndex4"
               :notsoftDelete="true"
               @realgridname="realgridname3"
+              :rowStateeditable="false"
               :deleteRow="deleterow3"
               :deleteAll="deleteAll1"
               :initSelect="initSelect"
@@ -490,6 +499,7 @@
               @updatedRowData="updatedRowData2"
               @realgridname="realgridname4"
               @selectedIndex2="selectedIndex3"
+              :rowStateeditable="false"
               :initSelect="initSelect"
               class="mt-5"
               :dragOn="true"
@@ -502,6 +512,7 @@
       </div>
     </div>
   </div>
+  <!--그리드 영역 및 연동 데이터 영역 -->
 </template>
 
 <script setup>
@@ -511,15 +522,55 @@ import {
   saveOptions,
   saveOptions2,
 } from "@/api/master";
+/*
+ * 공통 표준  Function
+ */
+
 import { nextTick, onMounted, ref, watch } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
 
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/**
+ * 	그리드 생성
+ */
+
+/**
+ *  리얼그리드 라이브러리 호출
+ *  */
+
 import RealGrid from "realgrid";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -533,6 +584,10 @@ const items = ref([]);
 const selectedOptionCd = ref();
 const ScreenKeyOrigin = ref([]);
 const rowData1 = ref([]);
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData4 = ref([]);
 const rowData2 = ref([]);
 const rowData3 = ref([]);
@@ -546,7 +601,15 @@ const initFocus = ref(false);
 const searchColValue2 = ref("0,0,0,0");
 const forsearchMain = ref("0");
 const forsearchSub = ref("0");
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword2 = ref();
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword4 = ref();
 const optionGroupCd = ref("");
 const optionGroupNm = ref("");
@@ -562,6 +625,10 @@ const mainCategory = ref(0);
 
 const addMenu = ref(false);
 const clickedStoreNm = ref();
+/**
+ * 페이지 매장명 세팅
+ */
+
 const handlestoreNm = (newData) => {
   clickedStoreNm.value = newData;
 };
@@ -608,6 +675,10 @@ watch(currentMenu, () => {
   }, 100);
 });
 
+/**
+ * 선택한 포스 번호 호출 함수
+ */
+
 const posNo = ref();
 
 const AllscreenKeyPage = ref(1);
@@ -620,6 +691,10 @@ const selectMenuGroup = ref(false);
 let dupliitems = [];
 
 const nowStoreAreaCd = ref();
+/**
+ *  pickStore - 지역코드 세팅
+ */
+
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
   //comsole.log(nowStoreAreaCd.value);
@@ -627,6 +702,10 @@ const handleStoreAreaCd = (newValue) => {
 
 const nowStoreCd = ref();
 const afterCategory = ref(false);
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = async (newValue) => {
   if (newValue == "0") {
     afterSearch.value = false;
@@ -642,7 +721,15 @@ const MenuGroup = ref([]);
 const SubMenuGroup = ref([]);
 
 const store = useStore();
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword1 = ref();
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword3 = ref();
 const userData = store.state.userData;
 const groupCd = ref(userData.lngStoreGroup);
@@ -674,9 +761,16 @@ const initSelect = ref(false);
 const isNewColumn = ref(false);
 const isNewColumn2 = ref(false);
 const clickrowData1 = ref(false);
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData = (newValue) => {
   clickrowData1.value = true;
-  //comsole.log(newValue);
+  console.log(newValue);
+  if (newValue == undefined) {
+    return;
+  }
   selectedOptionCd.value = Number(newValue[0]);
   isNewColumn.value = newValue[26] == true ? true : false;
   filteredrowData2.value = [];
@@ -703,9 +797,15 @@ const clickedRowData = (newValue) => {
 };
 const selectedOptionGroupCd = ref();
 const clickrowData2 = ref(false);
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData2 = (newValue) => {
   //comsole.log(newValue);
-
+  if (newValue == undefined) {
+    return;
+  }
   clickrowData2.value = true;
   selectedOptionGroupCd.value = newValue[0];
   isNewColumn2.value = newValue[23] == true ? true : false;
@@ -730,12 +830,24 @@ const clickedRowData2 = (newValue) => {
 };
 const selectedaddMenu = ref();
 const selectedaddMenu2 = ref();
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData3 = (newValue) => {
   selectedaddMenu.value = newValue;
 };
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData4 = (newValue) => {
   selectedaddMenu2.value = newValue;
 };
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData5 = (newValue) => {
   //comsole.log(newValue);
 };
@@ -746,6 +858,10 @@ const searchWord3 = (e) => {
 watch(rowData3, () => {
   //comsole.log(rowData3.value);
 });
+/**
+ *  조회 함수
+ */
+
 const searchButton = async () => {
   filteredrowData2.value = [];
   rowData1.value = [];
@@ -813,6 +929,10 @@ watch(mainCategory, () => {
   );
   subCategory.value = 0;
 });
+
+/**
+ *  저장 버튼 함수
+ */
 
 const saveButton = async () => {
   if (afterSearch.value == false) {
@@ -1132,18 +1252,34 @@ const saveButton = async () => {
   // 빈공간 데이터를 넣으려고하는데 안 들어가고 조회가 안됨 // 빈 칸에 대한 것도 데이터를 불러와야 메뉴키위치를 정할 수 있음.
 };
 
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData3 = (e) => {
   updatedRowData4.value = e;
 };
 
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData5 = ref([]);
+
+/**
+ * 입력창 수정 데이터 갱신
+ */
 
 const updatedRowData6 = (e) => {
   updatedRowData5.value = e;
 };
+/**
+ * 입력창 수정 데이터 갱신
+ */
+
 const updatedRowData = (newValue) => {
   //comsole.log(optionCd.value);
-
+  filteredrowData2.value = newValue;
   const change = updatedRowData4.value.find(
     (item) => item.lngCode == Number(optionCd.value)
   );
@@ -1183,13 +1319,17 @@ const updatedRowData = (newValue) => {
       newValue[20] == undefined ? 0 : newValue[20].lngCode;
     //comsole.log(change);
   }
-  rowData1.value = [...rowData1.value];
+  // rowData1.value = [...rowData1.value];
   //comsole.log(newValue);
 };
 
-const updatedRowData2 = (newValue) => {
-  //comsole.log(newValue);
+/**
+ * 입력창 수정 데이터 갱신
+ */
 
+const updatedRowData2 = (newValue) => {
+  console.log(newValue);
+  filteredrowData4.value = newValue;
   const change = updatedRowData5.value.find(
     (item) => item.lngCode == Number(selectedOptionGroupCd.value)
   );
@@ -1227,7 +1367,7 @@ const updatedRowData2 = (newValue) => {
     //comsole.log(change);
   }
   // rowData3.value = [...rowData3.value];
-  //comsole.log(newValue);
+  console.log(updatedRowData5.value);
 };
 
 const changeColid = ref("");
@@ -1579,6 +1719,10 @@ const deleterow2 = ref(false);
 const deleterow3 = ref(false);
 const deleterow4 = ref(false);
 
+/**
+ * 추가 버튼 함수
+ */
+
 const addRowData1 = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -1596,16 +1740,11 @@ const addRowData1 = () => {
   clickrowData1.value = true;
   addrow1.value = !addrow1.value;
 };
-// const addRowData2 = () => {
-//   if (afterSearch.value == false) {
-//     Swal.fire({
-//       title: "조회를 먼저 해주세요.",
-//       confirmButtonText: "확인",
-//     });
-//     return;
-//   }
-//   addrow4.value = !addrow4.value;
-// };
+
+/**
+ * 추가 버튼 함수
+ */
+
 const addRowData3 = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -1621,6 +1760,10 @@ const addRowData3 = () => {
   clickrowData2.value = true;
   addrow3.value = !addrow3.value;
 };
+/**
+ * 추가 버튼 함수
+ */
+
 const addRowData4 = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -1639,6 +1782,10 @@ const addRowData4 = () => {
 
   selectMenuGroup.value = true;
 };
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRowData1 = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -1649,6 +1796,10 @@ const deleteRowData1 = () => {
   }
   deleterow1.value = !deleterow1.value;
 };
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
 const deleteRowData3 = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -1659,7 +1810,11 @@ const deleteRowData3 = () => {
   }
   deleterow2.value = !deleterow2.value;
 };
-const deleteRowData2 = () => {
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
+const deleteRowData2 = async () => {
   if (afterSearch.value == false) {
     Swal.fire({
       title: "조회를 먼저 해주세요.",
@@ -1667,14 +1822,33 @@ const deleteRowData2 = () => {
     });
     return;
   }
+  console.log(filteredrowData2.value);
 
-  changeColid.value = "lngChainMenu" + (changeRow2.value + 1);
-  changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  const updateLngCode = filteredrowData2.value
+    .filter((item, index) => index != changeRow2.value)
+    .map((item) => item.lngCode);
+
+  for (let i = 0; i < updateLngCode.length; i++) {
+    changeColid.value = "lngChainMenu" + (i + 1);
+    changeValue.value = updateLngCode[i];
+    changeNow.value = !changeNow.value;
+    await nextTick();
+  }
+  for (let j = 0; j < 21 - updateLngCode.length; j++) {
+    changeColid.value = "lngChainMenu" + (21 - j);
+    changeValue.value = 0;
+    changeNow.value = !changeNow.value;
+    await nextTick();
+  }
+
   //changeNow
   //deleterow3.value = !deleterow3.value;
 };
-const deleteRowData4 = () => {
+/**
+ * 그리드 행 삭제 버튼 함수
+ */
+
+const deleteRowData4 = async () => {
   if (afterSearch.value == false) {
     Swal.fire({
       title: "조회를 먼저 해주세요.",
@@ -1683,9 +1857,23 @@ const deleteRowData4 = () => {
     return;
   }
 
-  changeColid.value = "lngChainGroup" + (changeRow3.value + 1);
-  changeValue2.value = 0;
-  changeNow2.value = !changeNow2.value;
+  console.log(filteredrowData4.value);
+  const updateLngCode = filteredrowData4.value
+    .filter((item, index) => index != changeRow3.value)
+    .map((item) => item.lngCode);
+
+  for (let i = 0; i < updateLngCode.length; i++) {
+    changeColid.value = "lngChainGroup" + (i + 1);
+    changeValue2.value = updateLngCode[i];
+    changeNow2.value = !changeNow2.value;
+    await nextTick();
+  }
+  for (let j = 0; j < 20 - updateLngCode.length; j++) {
+    changeColid.value = "lngChainGroup" + (20 - j);
+    changeValue2.value = 0;
+    changeNow2.value = !changeNow2.value;
+    await nextTick();
+  }
 };
 
 const addMenus = () => {
@@ -1717,10 +1905,18 @@ const closeMenus = () => {
 const closeMenus2 = () => {
   selectMenuGroup.value = false;
 };
+/**
+ * 페이지 매장 그룹 이름 세팅
+ */
+
 const handleGroupNm = (newValue) => {
   selectedGroupNm.value = newValue;
   //comsole.log(selectedGroupNm.value);
 };
+/**
+ * 페이지 매장 그룹 세팅
+ */
+
 const handleGroupCd = (newValue) => {
   groupCd.value = newValue;
 };
@@ -1769,6 +1965,10 @@ const clickaddMenu2 = (newValue) => {
   }
   dblclickedRowData2(newValue);
 };
+/**
+ * 행 더블 클릭시 작동 함수
+ */
+
 const dblclickedRowData = (newValue) => {
   //comsole.log(newValue);
   const a = updatedRowData4.value.find(
@@ -1830,6 +2030,10 @@ const dblclickedRowData = (newValue) => {
 
   closeMenus();
 };
+/**
+ * 행 더블 클릭시 작동 함수
+ */
+
 const dblclickedRowData2 = (newValue) => {
   //comsole.log(newValue);
   //comsole.log(updatedRowData5.value);
@@ -1847,44 +2051,23 @@ const dblclickedRowData2 = (newValue) => {
   changeValue2.value = newValue[0];
   changeNow2.value = !changeNow2.value;
 
-  // const a = rowData3.value.find((item) => item.lngCode == optionGroupCd.value);
-
-  // filteredrowData4.value = [];
-  // const keys = Object.keys(a);
-  // for (const key of keys) {
-  //   if (key.startsWith("lngChainGroup")) {
-  //     //comsole.log(a[key]);
-  //     if (a[key] == "0" || a[key] == undefined || a[key] == NaN) {
-  //       a[key] = Number(newValue[0]);
-  //       filteredrowData4.value.push({
-  //         lngCode: newValue[0],
-  //         strName: newValue[1],
-  //       });
-  //       break;
-  //     } else {
-  //       const seleced = rowData4.value.find((item) => item.lngCode == a[key]);
-  //       if (seleced != undefined) {
-  //         filteredrowData4.value.push({
-  //           lngCode: seleced.lngCode,
-  //           strName: seleced.strName,
-  //         });
-  //       }
-  //     }
-  //   }
-  // }
-  // rowData3.value = [...rowData3.value];
-
-  // //comsole.log(a);
-
   closeMenus2();
 };
 const selectedindex = ref(0);
 const selectedindex2 = ref(0);
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndex = (newValue) => {
   changeRow.value = newValue;
   selectedindex.value = newValue;
   //comsole.log(selectedindex.value);
 };
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndex2 = (newValue) => {
   changeRow2.value = newValue;
   selectedindex2.value = newValue;
@@ -1892,13 +2075,25 @@ const selectedIndex2 = (newValue) => {
 };
 
 const changeRow2 = ref();
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndex4 = (newValue) => {
   changeRow2.value = newValue;
 };
 const changeRow3 = ref();
+/**
+ * 수정용 데이터 행 설정
+ */
+
 const selectedIndex3 = (newValue) => {
   changeRow3.value = newValue;
 };
+/**
+ * 조회 초기화
+ */
+
 const handleinitAll = (newvalue) => {
   MenuGroup.value = [];
   SubMenuGroup.value = [];

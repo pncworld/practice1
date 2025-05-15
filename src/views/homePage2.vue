@@ -10,11 +10,19 @@
 
 <script setup>
 import { onMounted } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
 
 const store = useStore();
 
 const isMobile = store.state.isMobile;
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(() => {
   store.state.loading = false;

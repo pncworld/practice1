@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : SLS02_014RPT.vue                                                  
+# Description : 매출관리 > 매장별 매출 현황 > 지역/업종별 매출 현황.           
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회조건 -->
   <div class="h-full" @click="handleParentClick">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
@@ -64,6 +71,8 @@
           @excelStore="excelStore"></PickStorePlural>
       </div>
     </div>
+    <!-- 조회조건 -->
+    <!-- 그리드 영역 -->
     <div class="w-full h-[85%]">
       <Realgrid
         :progname="'SLS02_014RPT_VUE'"
@@ -88,18 +97,52 @@
       </Realgrid>
     </div>
   </div>
+  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
 import { getAreaIndustrySalesReport } from "@/api/misales";
+/**
+ *  매출 일자 세팅 컴포넌트
+ *  */
+
 import Datepicker2 from "@/components/Datepicker2.vue";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+
+/**
+ * 	다중 매장 선택 컴포넌트
+ */
+
 import PickStorePlural from "@/components/pickStorePlural.vue";
 
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -178,10 +221,20 @@ const rowData = ref([]);
 const afterSearch = ref(false);
 const selectedstartDate = ref();
 const selectedendDate = ref();
+
+/**
+ * 선택한 매출 시작일자
+ */
+
 const startDate = (e) => {
   //comsole.log(e);
   selectedstartDate.value = e;
 };
+
+/**
+ * 선택한 매출 종료일자
+ */
+
 const endDate = (e) => {
   selectedendDate.value = e;
 };
@@ -232,6 +285,11 @@ const loginedstrLang = store.state.userData.lngLanguage;
 
 const datepicker = ref(null);
 const closePopUp = ref(false);
+
+/**
+ * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
+ */
+
 const handleParentClick = (e) => {
   const datepickerEl = datepicker.value?.$el;
   if (datepickerEl && datepickerEl.contains(e.target)) {
@@ -240,9 +298,10 @@ const handleParentClick = (e) => {
   closePopUp.value = !closePopUp.value;
 };
 
-/*
- *조회 처리 함수
+/**
+ *  조회 함수
  */
+
 const searchButton = async () => {
   store.state.loading = true;
   try {
@@ -327,25 +386,39 @@ const searchButton = async () => {
 const selectedGroup = ref();
 const selectedStores = ref();
 const selectedStoreAttrs = ref();
+/**
+ * 페이지 매장 그룹 세팅
+ */
+
 const lngStoreGroup = (e) => {
   initGrid();
   //comsole.log(e);
   selectedGroup.value = e;
 };
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const lngStoreCodes = (e) => {
   initGrid();
   selectedStores.value = e;
   //comsole.log(e);
 };
+
+/**
+ * 페이지 매장 분류 세팅
+ */
+
 const lngStoreAttrs = (e) => {
   initGrid();
   selectedStoreAttrs.value = e;
   //comsole.log(e);
 };
 
-/*
-  그리드 초기화
-  */
+/**
+ * 그리드 초기화
+ */
+
 const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
@@ -354,6 +427,10 @@ const initGrid = () => {
 
 //엑셀 버튼 처리 함수
 const exportExcel = ref(false);
+/**
+ * 엑셀 내보내기 함수
+ */
+
 const excelButton = () => {
   documentSubTitle.value =
     selectedExcelDate.value + "\n" + selectedExcelStore.value;
@@ -365,11 +442,21 @@ const excelButton = () => {
 // 엑셀 추출
 const documentSubTitle = ref("");
 const selectedExcelDate = ref("");
+
+/**
+ * 엑셀용 일자 세팅 함수
+ */
+
 const excelDate = (e) => {
   selectedExcelDate.value = e;
   //comsole.log(e);
 };
 const selectedExcelStore = ref("");
+
+/**
+ * 엑셀용 매장 세팅 함수
+ */
+
 const excelStore = (e) => {
   selectedExcelStore.value = e;
   //comsole.log(e);

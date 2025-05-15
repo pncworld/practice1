@@ -1,3 +1,9 @@
+/*--############################################################################
+# Filename : MST01_033INS.vue                                                  
+# Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
   <div
     class="h-screen overflow-y-auto"
@@ -135,6 +141,10 @@ import MobileMenu from "@/components/MenuComponent/mobileMenu.vue";
 import router from "@/router";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
 import MobileTotalMenu from "../MOBILE/component/mobileTotalMenu.vue";
 import { getNoticeDetail, getNoticeList } from "@/api/mobile";
@@ -445,6 +455,10 @@ const handleScroll3 = async (e) => {
 };
 
 const searchNotice = ref("");
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword = (e) => {
   searchNotice.value = e;
 };
@@ -466,6 +480,10 @@ const searchNow = async (e) => {
   notices.value = res.data.List;
 };
 const notices = ref([]);
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(async () => {
   if (scrollContainer.value) {
     scrollContainer.value.addEventListener("scroll", handleScroll); // 스크롤 컨테이너에 이벤트 등록
@@ -493,25 +511,6 @@ onBeforeUnmount(() => {
 });
 
 // 컴포넌트가 마운트될 때 IntersectionObserver 설정
-// onMounted(() => {
-//   nextTick(() => {
-//     if (stickyElement.value) {
-//       const observer = new IntersectionObserver(handleIntersection, {
-//         root: null, // 뷰포트를 기준으로 검사
-//         threshold: 0, // 요소가 0%라도 보이면 callback 실행
-//       });
-//       //comsole.log(stickyElement.value)
-//       observer.observe(stickyElement.value);
-
-//       // 컴포넌트가 언마운트될 때 observer 해제
-//       onBeforeUnmount(() => {
-//         observer.disconnect();
-//       });
-//     } else {
-//       console.error('stickyElement is null');
-//     }
-//   });
-// });
 
 const changeSalesIconState = ref(true);
 const changeIcon = ref(0);

@@ -146,7 +146,15 @@ import {
   formatLocalDate2,
   formatNumberWithCommas,
 } from "@/customFunc/customFunc";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
 const lastDaySale = ref("");
 const todaySale = ref("");
@@ -164,6 +172,10 @@ const lastWeekSale2 = ref("");
 
 const store = useStore();
 const selectedStoreCode = ref("");
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const lngStoreCode = (e) => {
   selectedStoreCode.value = e;
 };
@@ -183,6 +195,10 @@ const difmonthSale2 = ref(0);
 const isMobile = store.state.isMobile;
 const StoreName = ref("");
 const today = ref(formatLocalDate2(new Date()));
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(async () => {
   store.state.loading2 = false;
 

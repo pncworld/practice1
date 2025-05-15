@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : SLS05_002RPT.vue                                                  
+# Description : 매출관리 > 카드별 매출 현황 > 카드 매출 세부 현황.                        
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회조건 -->
     <div class="h-full" @click="handleParentClick">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
        <PageName></PageName>
@@ -32,6 +39,8 @@
         <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @lngSupervisor="lngSupervisor" @excelStore="excelStore"></pickStoreSingle>
       </div>
     </div>
+      <!-- 조회조건 -->
+      <!-- 그리드 영역 -->
     <div class="w-full h-[82%]">
       <!-- <Realgrid :progname="'SLS02_014RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload" 
          :setFooter="true" :setGroupFooter="setGroupFooter" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
@@ -45,16 +54,49 @@
       </Realgrid>
     </div>
     </div>
+       <!-- 그리드 영역 -->
   </template>
   
   <script setup>
   import { getCardCorp, getCardSalesDetailReport } from '@/api/misales';
+/**
+ *  매출일자 조회 컴포넌트
+ */
 import Datepicker2 from '@/components/Datepicker2.vue';
+
+/**
+ *  리얼그리드 컴포넌트
+ */
+
 import Realgrid from '@/components/realgrid.vue';
+
+/**
+ *  매장 단일 호출 컴포넌트
+ */
+
 import pickStoreSingle from '@/components/pickStoreSingle.vue';
+
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref, watch } from 'vue';
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from 'vuex';
+
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from '@/customFunc/customFunc';
+
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from '@/components/pageName.vue';
   
   const setFooterColID = ref(['lngAmount'])
@@ -65,11 +107,19 @@ import PageName from '@/components/pageName.vue';
   const afterSearch = ref(false)
   const selectedstartDate = ref()
   const selectedendDate = ref()
-  const startDate = (e) => {
+  /**
+ * 선택한 매출 시작일자
+ */
+
+const startDate = (e) => {
     //comsole.log(e)
     selectedstartDate.value = e
   }
-  const endDate = (e) => {
+  /**
+ * 선택한 매출 종료일자
+ */
+
+const endDate = (e) => {
     selectedendDate.value = e
   }
   const store = useStore()
@@ -77,7 +127,11 @@ import PageName from '@/components/pageName.vue';
 
   const datepicker = ref(null)
   const closePopUp = ref(false)
-  const handleParentClick = (e) => {
+  /**
+ * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
+ */
+
+const handleParentClick = (e) => {
     const datepickerEl = datepicker.value?.$el;
     if (datepickerEl && datepickerEl.contains(e.target)) {
         return;
@@ -88,10 +142,13 @@ import PageName from '@/components/pageName.vue';
   // 조회조건 라디오박스(승인, 취소)
   const selectedRadioBox = ref('0') // 기본 선택값
 
-  /* 
-   *조회 처리 함수
-   */
-  const searchButton = async () => {
+
+  /**
+ *  조회 함수
+ */
+
+ 
+const searchButton= async () => {
     store.state.loading = true;
     try {
       initGrid()
@@ -143,23 +200,39 @@ import PageName from '@/components/pageName.vue';
   const selectedStores = ref()
   const selectedStoreAttrs = ref()
   const selectedSupervisor = ref()
-  const lngStoreGroup = (e) => {
+  /**
+ * 페이지 매장 그룹 세팅
+ */
+
+const lngStoreGroup = (e) => {
     initGrid()
     //comsole.log(e)
     selectedGroup.value = e
   }
-  const lngStoreCodes = (e) => {
+  /**
+ * 페이지 매장 코드 세팅
+ */
+
+const lngStoreCodes = (e) => {
     initGrid()
     selectCardCorp.value = null
     selectedStores.value = e
     //comsole.log(e)
   }
-  const lngStoreAttrs = (e) => {
+
+
+  
+
+const lngStoreAttrs = (e) => {
     initGrid()
     selectedStoreAttrs.value = e
     //comsole.log(e)
   }
-  const lngSupervisor = (e) => {
+  /**
+ * 페이지 매장 슈퍼바이저 세팅
+ */
+
+const lngSupervisor = (e) => {
     initGrid()
     selectedSupervisor.value = e
     //comsole.log(e)
@@ -172,7 +245,11 @@ import PageName from '@/components/pageName.vue';
   const cardCorp = ref([])
   const selectedBuyCode = ref("")
 
-  onMounted(async () => {
+  /**
+ * 	화면 Load시 실행 스크립트
+ */
+
+onMounted(async () => {
 
 
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -195,10 +272,12 @@ import PageName from '@/components/pageName.vue';
     //comsole.log(selectedBuyCode.value)
   })
   
-  /*
-  그리드 초기화
-  */
-  const initGrid = () => {
+
+  /**
+ * 그리드 초기화
+ */
+
+const initGrid = () => {
     if (rowData.value.length > 0) {
       rowData.value = []
     }
@@ -206,7 +285,11 @@ import PageName from '@/components/pageName.vue';
   
   //엑셀 버튼 처리 함수
   const exportExcel = ref(false)
-  const excelButton = () => {
+  /**
+ * 엑셀 내보내기 함수
+ */
+
+const excelButton = () => {
     if(selectedExcelStore.value == '매장명 : 선택'){
       documentSubTitle.value = selectedExcelDate.value +'\n'+ '매장명 : 전체'
     } else {
@@ -220,12 +303,20 @@ import PageName from '@/components/pageName.vue';
   // 엑셀 추출
   const documentSubTitle = ref('')
   const selectedExcelDate = ref('')
-  const excelDate = (e)=> {
+  /**
+ * 엑셀용 일자 세팅 함수
+ */
+
+const excelDate = (e)=> {
    selectedExcelDate.value = e
    //comsole.log(e)
   }
   const selectedExcelStore = ref('')
-  const excelStore = (e) =>{
+  /**
+ * 엑셀용 매장 세팅 함수
+ */
+
+const excelStore = (e) =>{
     selectedExcelStore.value = e
     //comsole.log(e)
   }

@@ -1,9 +1,15 @@
+/*--############################################################################
+# Filename : MST57_002INS.vue                                                  
+# Description : 마스터관리 > 테이블포스 관리 > 메뉴 배치 관리                   
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
   <div class="flex justify-start pl-4 pt-0">
     <PageName></PageName>
     <div class="absolute right-16 space-x-3 flex mt-3">
-      <button class="button search" @click="searchPosMenu">조회</button
-      ><button class="button save" @click="savePosMenu">저장</button>
+      <button class="button search" @click="searchButton">조회</button
+      ><button class="button save" @click="saveButton">저장</button>
     </div>
   </div>
   <br />
@@ -141,15 +147,39 @@ import {
   tablePosMenu,
   tablePosMenuKey,
 } from "@/api/master";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
 import PickCategory from "@/components/pickCategory.vue";
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
 import { computed, onMounted, ref } from "vue";
 
 import { Container, Draggable } from "vue3-smooth-dnd";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -225,9 +255,17 @@ const afterSearch = ref(false);
 const ischanged = (value) => {
   ischange.value = value;
 };
+/**
+ *  pickStore - 지역코드 세팅
+ */
+
 const handleStoreAreaCd = (value) => {
   currAreaCd.value = value == "" ? "1000001" : value.toString();
 };
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = (value) => {
   currAreaCd.value = "0";
   currstoreCd.value = value;
@@ -244,7 +282,11 @@ const emitmaincate = (value) => {
 const majorGroup = ref([]);
 const deleteAllitems = ref([]);
 const confirmitem = ref([]);
-const searchPosMenu = async () => {
+
+/**
+ * 조회 함수
+ */
+const searchButton = async () => {
   if (currstoreCd.value == "0") {
     Swal.fire({
       title: "경고",
@@ -325,7 +367,10 @@ const deleteitem = (value, value2) => {
     (item) => !(item.lngKeyscrNo === value && item.intKeySeq === value2)
   );
 };
-const savePosMenu = async () => {
+/**
+ * 저장 함수
+ */
+const saveButton = async () => {
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -390,7 +435,7 @@ const savePosMenu = async () => {
           confirmButtonText: "확인",
         });
 
-        searchPosMenu();
+        searchButton();
       }
     }
   });

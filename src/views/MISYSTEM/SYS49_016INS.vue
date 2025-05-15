@@ -1,3 +1,9 @@
+/*--############################################################################
+# Filename : MST01_033INS.vue                                                  
+# Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
   <img
     src="../../assets/resetPassword.jpg"
@@ -71,9 +77,25 @@
 </template>
 <script setup>
 import { savePassWord, validatePassWord } from "@/api/system";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref } from "vue";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
 
 const currentPassWord = ref("");
@@ -83,6 +105,10 @@ const newPassWordVali = ref("");
 const store = useStore();
 const userSequence = ref("");
 const userlngGroup = ref("");
+/**
+ * 	화면 Load시 실행 스크립트
+ */
+
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
@@ -90,6 +116,10 @@ onMounted(async () => {
   userlngGroup.value = store.state.userData.lngStoreGroup;
   //comsole.log(userSequence.value);
 });
+/**
+ *  저장 버튼 함수
+ */
+
 const saveButton = (e) => {
   if (newPassWord.value != newPassWordVali.value) {
     Swal.fire({

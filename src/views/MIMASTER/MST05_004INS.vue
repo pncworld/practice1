@@ -1,15 +1,22 @@
+/*--############################################################################
+# Filename : MST05_004INS.vue                                                  
+# Description : 마스터관리 > POS 마스터 > 메뉴키 설정                          
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회 조건 -->
   <div class="flex flex-col w-full overflow-y-hidden">
     <div class="flex justify-between w-full pl-10">
       <pageName></pageName>
       <div class="flex space-x-6 pr-12 pt-2">
-        <button class="button search" @click="searchMenu">조회</button
-        ><button class="button save" @click="saveMenuKey">저장</button
-        ><button class="button copy" @click="showPopupf">
-          <font-awesome-icon icon="copy" />&nbsp;&nbsp;메뉴키&nbsp;복사
+        <button class="button search" @click="searchButton">조회</button
+        ><button class="button save" @click="saveButton">저장</button
+        ><button class="button copy" @click="copyButton">
+          메뉴키&nbsp;복사
         </button>
-        <button class="button primary" @click="SpecificMenuDupli">
-          <font-awesome-icon icon="copy" />&nbsp;&nbsp;메뉴키화면키&nbsp;복사
+        <button class="button copy" @click="copyButton2">
+          메뉴키화면키&nbsp;복사
         </button>
       </div>
     </div>
@@ -28,6 +35,8 @@
       </PickStore>
     </div>
   </div>
+  <!-- 조회 조건 -->
+  <!-- 팝업 및 그리드 영역 -->
   <br />
   <div class="z-50">
     <DupliPopUp
@@ -117,7 +126,8 @@
       </div>
     </div>
   </div>
-
+  <!-- 팝업 및 그리드 영역 -->
+  <!-- 드래그 영역 -->
   <div
     v-show="showChangeScreenKey"
     class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
@@ -196,7 +206,18 @@
         </div>
         <div class="mt-3">
           <!-- <button class="whitebutton" @click="searchMenuList3">조회</button> -->
-          <button class="whitebutton" v-if="currentMenu != 3">추가</button>
+          <button
+            class="whitebutton"
+            v-if="currentMenu == 1"
+            @click="movePage1">
+            추가
+          </button>
+          <button
+            class="whitebutton"
+            v-if="currentMenu == 2"
+            @click="movePage2">
+            추가
+          </button>
         </div>
       </div>
       <div class="h-4/6" v-show="currentMenu == 1">
@@ -247,6 +268,7 @@
             :rowData="MenuList"
             @selcetedrowData="selcetedrowData"
             @realgridname="realgridname3"
+            :rowStateeditable="false"
             :searchColId="'menuCd,menuNm'"
             :searchColId3="['majorGroupCd', 'subGroupCd']"
             :searchValue="searchValue"
@@ -347,6 +369,7 @@
       </div>
     </div>
   </div>
+  <!-- 드래그 영역 -->
 </template>
 
 <script setup>
@@ -359,17 +382,68 @@ import {
   saveMenuKey2,
   saveScreenKeys,
 } from "@/api/master";
+
+/**
+ *  복사 팝업 컴포넌트
+ *  */
+
 import DupliPopUp from "@/components/dupliPopUp.vue";
+
+/**
+ *  복사 팝업 컴포넌트
+ *  */
+
 import DupliPopUp2 from "@/components/dupliPopUp2.vue";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+/**
+ * 매장 공통 컴포넌트
+ */
+
 import PickStore from "@/components/pickStore.vue";
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
-import RealGrid, { GridView, LocalDataProvider } from "realgrid";
+
+/**
+ *  리얼그리드 라이브러리 호출
+ *  */
+
+import RealGrid from "realgrid";
+/**
+ *  경고창 호출 라이브러리
+ *  */
+
 import Swal from "sweetalert2";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref, watch } from "vue";
+/*
+ * 드래그 라이브러리 호출
+ */
+
 import { VueDraggableNext } from "vue-draggable-next";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -398,6 +472,10 @@ const changingMode = (data) => {
   }
 };
 const clickedStoreNm = ref();
+/**
+ * 페이지 매장명 세팅
+ */
+
 const handlestoreNm = (newData) => {
   clickedStoreNm.value = newData;
 };
@@ -415,12 +493,20 @@ const languageName4 = ref("");
 const currentscreenKeyNm = ref("");
 const clickedSubCode = ref();
 const maxSubCode = ref();
+/**
+ * 선택한 포스 번호 호출 함수
+ */
+
 const posNo = ref();
 const changeScreenKey = ref(false);
 const currmenuKeyPage = ref(1);
 const AllscreenKeyPage = ref(1);
 const currentSelectedMenuNm = ref("");
 const showSpecificMenukey = ref(false);
+/**
+ *  그리드 검색어 세팅
+ */
+
 const searchword3 = ref("");
 const rowData = ref([
   { screenName: "화면1", add: "추가", screenNo: 1 },
@@ -447,7 +533,10 @@ const rowData = ref([
 
 const isNew = ref(false);
 const currentMenu = ref("1");
-const SpecificMenuDupli = () => {
+/**
+ * 복사 함수
+ */
+const copyButton2 = () => {
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고.",
@@ -460,6 +549,10 @@ const SpecificMenuDupli = () => {
   showSpecificMenukey.value = true;
 };
 const TLUSubList = ref([]);
+/**
+ * 데이터셋 상세정보 셋팅
+ */
+
 const clickedRowData = (e) => {
   TLUSubList.value = [];
   for (let i = 1; i <= 29; i++) {
@@ -507,6 +600,10 @@ watch(currentMenu, () => {
 const currentSelectedMenuCode = ref();
 const currentSelectedMenuPrice = ref();
 
+/**
+ * 선택한 행의 상세정보 셋팅
+ */
+
 const selcetedrowData = (e) => {
   if (clickedRealIndex.value == null) {
     return;
@@ -517,6 +614,10 @@ const selcetedrowData = (e) => {
   currentSelectedMenuPrice.value = e[2];
   addMenuKey();
 };
+
+/**
+ * 선택한 행의 상세정보 셋팅
+ */
 
 const selcetedrowData2 = (e) => {
   if (clickedRealIndex.value == null) {
@@ -529,7 +630,11 @@ const selcetedrowData2 = (e) => {
   addMenuKey2();
 };
 
-const showPopupf = () => {
+/**
+ * 복사 함수
+ */
+
+const copyButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고.",
@@ -541,6 +646,10 @@ const showPopupf = () => {
   }
   showPopup2.value = true;
 };
+
+/**
+ *  그리드 검색어 세팅
+ */
 
 const searchword1 = ref("");
 function formatStrKeyName(strKeyName) {
@@ -568,7 +677,7 @@ const changed2 = (newvalue) => {
 const updateMenuKey = ref(false);
 let dupliitems = [];
 
-const saveMenuKey = () => {
+const saveButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고.",
@@ -627,12 +736,16 @@ const saveMenuKey = () => {
       } catch (error) {
       } finally {
         store.state.loading = false;
-        searchMenu();
+        searchButton();
       }
     }
   });
 };
 const nowStoreAreaCd = ref();
+/**
+ *  pickStore - 지역코드 세팅
+ */
+
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
   //comsole.log(nowStoreAreaCd.value);
@@ -640,6 +753,10 @@ const handleStoreAreaCd = (newValue) => {
 
 const nowStoreCd = ref();
 const afterCategory = ref(false);
+/**
+ * 페이지 매장 코드 세팅
+ */
+
 const handleStoreCd = async (newValue) => {
   if (newValue == "0") {
     afterSearch.value = false;
@@ -686,7 +803,7 @@ const TLUList = ref([]);
 const confirmitem2 = ref([]);
 const clickedScreenNo = ref();
 const changePage = ref(false);
-const searchMenu = async () => {
+const searchButton = async () => {
   changeMode.value = false;
   Category.value = [];
   items.value = [];
@@ -960,6 +1077,21 @@ watch(items, (newvalue) => {
   //comsole.log(MenuKeyList.value);
 });
 
+const movePage1 = () => {
+  store.state.moveOtherTab = {
+    strUrl: "MIMASTER::MST01_033INS.xml",
+    lngProgramID: 73762,
+    strTitle: "메뉴 코드 등록.",
+  };
+};
+
+const movePage2 = () => {
+  store.state.moveOtherTab = {
+    strUrl: "MIMASTER::MST01_010INS.xml",
+    lngProgramID: 73712,
+    strTitle: "TLU 메뉴 등록.",
+  };
+};
 const savePosMenu = async () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -1051,7 +1183,7 @@ const savePosMenu = async () => {
           confirmButtonText: "확인",
         });
 
-        searchMenu();
+        searchButton();
       }
     }
   });
@@ -1070,6 +1202,10 @@ const searchMenuList2 = (e) => {
   searchWord2 = e.target.value;
 };
 
+/**
+ * pickStore - 포스번호 세팅
+ */
+
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
   //comsole.log(posNo.value);
@@ -1080,7 +1216,7 @@ const handleScreenNo = (newValue) => {
   //comsole.log(nowscreenNo.value);
   //showMenuKey(newValue);
   if (newValue != "0") {
-    searchMenu();
+    searchButton();
   }
 };
 watch(nowscreenNo, (newvalue) => {
@@ -1447,6 +1583,10 @@ const showMenus = (value) => {
     currentMenu.value = value;
   }
 };
+/**
+ * 삭제 버튼
+ */
+
 const deletekey = () => {
   if (clickedScreenOrMenu.value == true) {
     const filteredMenuKeyList = MenuKeyList.value.filter(
@@ -1463,6 +1603,10 @@ const clickedMenukeys = () => {
 const clickedScreenKeys = () => {
   clickedScreenOrMenu.value = false;
 };
+/**
+ * 조회 초기화
+ */
+
 const handleinitAll = (newvalue) => {
   afterSearch.value = false;
   MenuList.value = [];

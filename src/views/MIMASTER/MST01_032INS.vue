@@ -1,4 +1,11 @@
+/*--############################################################################
+# Filename : MST01_032INS.vue                                                  
+# Description : 마스터관리 > POS 마스터 > 마스터자동다운로드 등록.             
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
+  <!-- 조회 조건 -->
   <div>
     <!-- <div class="flex items-center w-full space-x-10">
       <h1 class="flex-grow text-center ml-72 text-xl">마스터자동다운로드 등록 </h1>
@@ -102,6 +109,8 @@
       <div></div>
     </div>
   </div>
+  <!-- 조회 조건 -->
+  <!--그리드 영역 -->
   <div
     class="grid grid-cols-[1fr,2fr] grid-rows-1 justify-between h-[65vh] space-x-10 w-[97%] mt-1">
     <Realgrid
@@ -117,12 +126,25 @@
       :rowStateeditable="false"
       @checkedRowData="checkedRowData2"></Realgrid>
   </div>
+  <!--그리드 영역 -->
 </template>
 
 <script setup>
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref } from "vue";
 
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
+
+/**
+ *  경고창 호출 라이브러리
+ *  */
 
 import Swal from "sweetalert2";
 
@@ -135,9 +157,25 @@ import {
   insertMasterList,
 } from "@/api/master";
 import Datepicker1_1 from "@/components/Datepicker1_1.vue";
+/**
+ * 	그리드 생성
+ */
+
 import Realgrid from "@/components/realgrid.vue";
+/**
+ *  페이지로그 자동 입력
+ *  */
+
 import { insertPageLog } from "@/customFunc/customFunc";
+/**
+ *  페이지명 자동 입력 컴포넌트
+ *  */
+
 import PageName from "@/components/pageName.vue";
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -181,6 +219,10 @@ const colDefs2 = ref([]);
 const gridApi = ref(null);
 const gridApi2 = ref(null);
 
+/**
+ * 선택한 포스 번호 호출 함수
+ */
+
 const posNos = ref([]);
 const getPosNo = async () => {
   const response = await getPosList(groupCd.value, storeCd.value);
@@ -190,6 +232,10 @@ const getPosNo = async () => {
   lngAreaCd.value = 0;
   areaCd.value = [];
 };
+/**
+ * 선택한 포스 번호 호출 함수
+ */
+
 const posNo = ref(0);
 const areaCd = ref(0);
 const getAreaCd = async (e) => {
@@ -203,12 +249,23 @@ const getAreaCd = async (e) => {
   lngAreaCd.value = 0;
 };
 const selectedDate = ref();
+/**
+ *  날짜 호출  함수
+ */
+
+/**
+ * 	매출 일자 가져오는 함수
+ */
+
 const dateValue = (e) => {
   //comsole.log(e);
   selectedDate.value = e;
 };
 
-// 조회 함수.
+/**
+ *  조회 함수
+ */
+
 const searchButton = async () => {
   store.state.loading = true;
   try {
@@ -236,6 +293,10 @@ const searchButton = async () => {
     //areaCd.value = [];
   }
 };
+/**
+ * 그리드 초기화
+ */
+
 const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
@@ -250,9 +311,17 @@ const deleteTables = ref([]);
 const deleteTablesStoreCds = ref([]);
 const deleteTablesAreaCds = ref([]);
 const deleteTablesPosNos = ref([]);
+/**
+ * 체크된 데이터 갱신
+ */
+
 const checkedRowData = (e) => {
   saveTables.value = e.map((item) => item.lngTableID);
 };
+/**
+ * 체크된 데이터 갱신
+ */
+
 const checkedRowData2 = (e) => {
   //comsole.log(e);
   deleteTables.value = e.map((item) => item.lngTableID);
@@ -260,6 +329,10 @@ const checkedRowData2 = (e) => {
   deleteTablesAreaCds.value = e.map((item) => item.lngAreaCode);
   deleteTablesPosNos.value = e.map((item) => item.intPosNO);
 };
+
+/**
+ *  저장 버튼 함수
+ */
 
 const saveButton = async () => {
   if (!afterSearch.value) {
@@ -286,6 +359,10 @@ const saveButton = async () => {
 
   searchButton();
 };
+/**
+ * 삭제 버튼
+ */
+
 const deleteButton = async () => {
   if (!afterSearch.value) {
     Swal.fire({

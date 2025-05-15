@@ -1,3 +1,9 @@
+/*--############################################################################
+# Filename : MST01_033INS.vue                                                  
+# Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
+################################################################################*/
 <template>
   <div
     class="h-screen top-0 fixed w-64 z-[60] bg-white overflow-y-auto overflow-x-hidden">
@@ -80,8 +86,16 @@
 <script setup>
 import { insertMobilePageLog } from "@/customFunc/customFunc";
 import router from "@/router";
+/*
+ * 공통 표준  Function
+ */
+
 import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+/**
+ *  Vuex 상태관리 및 로그인세션 관련 라이브러리
+ */
+
 import { useStore } from "vuex";
 const menuItems = ref([
   //   {
@@ -217,6 +231,10 @@ watch(
   },
   { immediate: true } // 새로고침할때 반응해주게 하는 설정
 );
+
+/**
+ * 	화면 Load시 실행 스크립트
+ */
 
 onMounted(() => {
   StoreName.value = store.state.userData.USER_NM;
