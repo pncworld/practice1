@@ -43,6 +43,8 @@
       :dupliapiname="'DUPLIALLPAYKEY'"
       :progid="1"
       :poskiosk="'getStoreAndPosList'"
+      :summary="'선택하신 매장의 결제키배치정보가 모두 삭제 후 복사됩니다. 계속 진행하시겠습니까?'"
+      :naming2="'결제키'"
       :naming="'POS번호'">
     </DupliPopUp>
   </div>
@@ -142,9 +144,9 @@
           <div class="flex justify-start">
             ※ 사용여부가 미사용인 결제코드는 목록에서 노출되지 않습니다.
           </div>
-          <div class="flex justify-start">
+          <!-- <div class="flex justify-start">
             ※ 복사시 결제코드 항목을 추가해야 결제키 화면에 노출됩니다.
-          </div>
+          </div> -->
         </div>
       </div>
     </div>

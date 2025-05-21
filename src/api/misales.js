@@ -99,6 +99,18 @@ export const getpayCodeList = (groupCd, storeCd) => {
     STORE_CD: storeCd,
   });
 };
+export const getpayCodeList3 = (groupCd, storeCd) => {
+  return api2.post("/MISALES/SLS02_031RPT.asmx/getpayCodeList3", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+export const getMenuCdList = (groupCd, storeCd) => {
+  return api2.post("/MISALES/SLS02_031RPT.asmx/getMenuCdList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
 export const getpayCodeList2 = (groupCd, storeCd) => {
   return api2.post("/MISALES/SLS12_019RPT.asmx/getpayCodeList2", {
     GROUP_CD: groupCd,
@@ -1092,6 +1104,27 @@ export const isDynamicGrid = (groupCd) => {
     GROUP_CD: groupCd,
   });
 };
+export const getDaySalesReport2 = (
+  groupCd,
+  storeCd,
+  reportday,
+  compday,
+  compday2,
+  reportday_1,
+  compday_1,
+  compday2_1
+) => {
+  return api2.post("/MISALES/SLS07_006INS.asmx/getDaySalesReport2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    REPORT_DAY: reportday,
+    COMP_DAY: compday,
+    COMP_DAY2: compday2,
+    REPORT_DAY_1: reportday_1,
+    COMP_DAY_1: compday_1,
+    COMP_DAY2_1: compday2_1,
+  });
+};
 export const getSalesByPaymentType2Report = (
   groupCd,
   storecds,
@@ -1123,6 +1156,7 @@ export const getProjByMonth = (groupCd, storecd, startdate) => {
     DTM_DATE: startdate,
   });
 };
+
 export const saveExcelDataPlan = (groupCd, storecd, date, proj, comment) => {
   return api2.post("/MISALES/SLS01_001INS.asmx/saveExcelDataPlan", {
     GROUP_CD: groupCd,
@@ -1130,5 +1164,66 @@ export const saveExcelDataPlan = (groupCd, storecd, date, proj, comment) => {
     DTM_DATE: date,
     PROJ: proj,
     COMMENT: comment,
+  });
+};
+export const getReceiptDetailStatus = (
+  groupCd,
+  storecd,
+  paycd,
+  menucd,
+  selectedstartDate,
+  selectedendDate
+) => {
+  return api2.post("/MISALES/SLS02_031RPT.asmx/getReceiptDetailStatus", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    PAY_CD: paycd,
+    MENU_CD: menucd,
+    START_DATE: selectedstartDate,
+    END_DATE: selectedendDate,
+  });
+};
+export const saveDailyReportComments = (
+  groupCd,
+  storecd,
+  reportday,
+  comment
+) => {
+  return api2.post("/MISALES/SLS07_006INS.asmx/saveDailyReportComments", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    REPORT_DAY: reportday,
+    COMMENT: comment,
+  });
+};
+export const sendSMS = (
+  groupCd,
+  storecd,
+  strtitle,
+  comment,
+  smstype,
+  strfile,
+  strreserve,
+  strrevdate,
+  strrevtime,
+  strsender,
+  strrecv,
+  userid,
+  userip
+) => {
+  return api2.post("/MISALES/SLS07_006INS.asmx/sendSMS", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    STRTITLE: strtitle,
+    COMMENT: comment,
+    SMSTYPE: smstype,
+    STRFILE: strfile,
+    STRRESERVE: strreserve,
+    STRREVDATE: strrevdate,
+    STRREVTIME: strrevtime,
+    STRSENDER: strsender,
+    STRRECV: strrecv,
+    USER_ID: userid,
+    USER_IP: userip,
   });
 };

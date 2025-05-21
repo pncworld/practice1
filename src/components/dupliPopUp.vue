@@ -104,6 +104,7 @@ const {
   poskiosk,
   naming,
   naming2,
+  summary,
 } = defineProps({
   isVisible: { type: Boolean, default: false }, // 팝업 가시성 관리
   storeCd: { type: String, default: "" },
@@ -116,6 +117,11 @@ const {
   poskiosk: { type: String },
   naming: { type: String },
   naming2: { type: String, default: "메뉴키" },
+  summary: {
+    type: String,
+    default:
+      "선택하신 POS의 메뉴배치정보 및 화면정보가 모두 삭제 후 복사됩니다. 계속 진행하시겠습니까?",
+  },
 });
 const store = useStore(); // vuex store
 const userData = store.state.userData;
@@ -198,7 +204,7 @@ const dupliStore = async () => {
     } else {
       Swal.fire({
         title: "복사",
-        text: "선택하신 POS의 메뉴배치정보 및 화면정보가 모두 삭제 후 복사됩니다. 계속 진행하시겠습니까?",
+        text: `${summary}`,
         icon: "question",
         showCancelButton: true,
         confirmButtonText: "복사",

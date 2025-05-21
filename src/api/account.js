@@ -99,3 +99,26 @@ export const getEmployeeDetailSummary = (
     OPTION_VALUE: optionValue,
   });
 };
+
+export const getAccCodeList = (groupcd) => {
+  return api2.post("/MIACCOUNT/ACT04_002RPT.asmx/getAccCodeList", {
+    GROUP_CD: groupcd,
+  });
+};
+export const getDWDetail = (groupcd, storecd, startdate, enddate, cond) => {
+  return api2.post("/MIACCOUNT/ACT04_002RPT.asmx/getDWDetail", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    START_DATE: startdate,
+    END_DATE: enddate,
+    COND: cond,
+  });
+};
+export const getDWAggDetail = (groupcd, storecd, startdate, enddate) => {
+  return api2.post("/MIACCOUNT/ACT04_003RPT.asmx/getDWAggDetail", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    START_DATE: startdate,
+    END_DATE: enddate,
+  });
+};

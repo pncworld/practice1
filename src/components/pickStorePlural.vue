@@ -90,8 +90,9 @@
         :setStateBar="false"
         @checkedRowData="checkedRowData"
         @selcetedrowData="selcetedrowData"
-        :searchWord="searchWord"
+        :searchWord3="searchWord"
         :searchColId="'strName'"
+        :rowStateeditable="false"
         @updatedRowData="updatedRowData"
         :labelsData="labelsData"
         :valuesData="valuesData"
@@ -474,6 +475,7 @@ watch(settingDisable, () => {
 
 const showStore = ref(false);
 const showStoreList = () => {
+  searchWord.value = "";
   showStore.value = !showStore.value;
 };
 
@@ -568,7 +570,7 @@ watch(initSearchWord, () => {
 const resetChecked = () => {
   rowData.value.forEach((item) => (item.checkbox = false));
   rowData.value = [...rowData.value];
-
+  searchWord.value = "";
   emit("lngStoreGroup", store.state.storeGroup[0].lngStoreGroup);
   emit("lngStoreCodes", 0);
   emit("lngStoreAttrs", 0);

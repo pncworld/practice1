@@ -170,7 +170,7 @@
         </div>
         <div class="mt-3">
           <!-- <button class="whitebutton" @click="searchMenuList3">조회</button> -->
-          <button class="whitebutton">추가</button>
+          <button class="whitebutton" @click="movePage">추가</button>
         </div>
       </div>
       <div class="h-[30vh]" v-show="currentMenu == false">
@@ -516,6 +516,14 @@ const showNext = () => {
   currentsubPage.value++;
 
   addfor8ScreenKey();
+};
+
+const movePage = () => {
+  store.state.moveOtherTab = {
+    strUrl: "MIMASTER::MST01_033INS.xml",
+    lngProgramID: 73762,
+    strTitle: "메뉴 코드 등록.",
+  };
 };
 const showPrev = () => {
   //comsole.log(ScreenKeyOrigin.value);

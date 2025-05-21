@@ -133,6 +133,22 @@
   </div>
 
   <div
+    v-if="changePay2"
+    class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white p-6 rounded shadow-lg w-[25%] h-[40%]">
+      <h2 class="text-lg font-bold">비고</h2>
+      <div class="flex flex-col justify-center w-full">
+        <input
+          type="text"
+          v-model="strIcon"
+          class="border pl-1 h-7 border-b-2 shadow-lg" />
+      </div>
+
+      <button @click="setStrIcon" class="button primary">확인</button>
+    </div>
+  </div>
+
+  <!-- <div
     v-show="showChangeScreenKey"
     class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
     <div class="bg-white p-6 rounded shadow-lg w-2/3 h-3/4 overflow-auto">
@@ -140,7 +156,7 @@
       <div class="border-gray-500 text-xl">
         화면키를 끌어서 이동하면 순서가 변경됩니다.
       </div>
-      <!-- VueDraggableNext 사용 -->
+      <!-- VueDraggableNext 사용 
       <VueDraggableNext
         v-model="ScreenKeyOrigin"
         :group="{ name: 'subCategory', pull: 'clone', put: true }"
@@ -163,7 +179,7 @@
         </button>
       </div>
     </div>
-  </div>
+  </div> -->
   <span
     class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[700px] z-40">
     <h1 class="font-bold text-xl z-40 ml-20">
@@ -196,7 +212,7 @@
         </div>
         <div class="mt-3">
           <!-- <button class="whitebutton" @click="searchAmountList3">조회</button> -->
-          <button class="whitebutton">추가</button>
+          <button class="whitebutton" @click="movePage">추가</button>
         </div>
       </div>
       <div class="h-[55vh]" v-show="currentMenu == false">
@@ -221,23 +237,35 @@
             :showGrid="showGrid"
             :showCheckBar="false"
             @selcetedrowData="selcetedrowData"
+            :row-stateeditable="false"
             :searchWord="searchword1"
             :searchColId="'lngCode,strName'"></Realgrid>
           <div class="flex justify-start">
             ※ 사용여부가 미사용인 결제코드는 목록에서 노출되지 않습니다.
           </div>
-          <div class="flex justify-start">
+          <!-- <div class="flex justify-start">
             ※ 복사시 결제코드 항목을 추가해야 결제키 화면에 노출됩니다.
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
     <!-- 팝업 영역 및 그리드 영역 -->
     <!--드래그 영역-->
     <div class="w-2/5 h-[60%] mt-28 ml-32">
+      <div class="flex" v-show="afterSearch">
+        <div class="text-base">현재 비고</div>
+        <div>
+          <input
+            type="text"
+            v-model="clickedStrIcon"
+            disabled
+            class="border-black border-2 shadow-lg -mt-2" />
+        </div>
+      </div>
       <VueDraggableNext
         v-model="KeyList"
         :move="onMove"
+        @choose="onChoose"
         @end="onEnd"
         animation="200"
         class="grid grid-rows-3 grid-cols-2 h-full w-full gap-1">
@@ -355,6 +383,9 @@ const searchWord = ref("");
 const searchWord2 = ref("");
 const afterSearch2 = ref(false);
 const changePay = ref(false);
+const changePay2 = ref(false);
+const strIcon = ref("");
+const clickedStrIcon = ref("");
 // 드래그 가능한 요소를 설정하는 메서드
 const currentsubPage = ref(1);
 const changeMode = ref(false);
@@ -407,25 +438,6 @@ const copyButton = () => {
   showPopup2.value = true;
 };
 
-const showNext = () => {
-  if (currentsubPage.value >= AllscreenKeyPage.value) {
-    return;
-  }
-  currentsubPage.value++;
-
-  addfor4ScreenKey();
-};
-const showPrev = () => {
-  //comsole.log(ScreenKeyOrigin.value);
-  if (currentsubPage.value == 1) {
-    return;
-  }
-  currentsubPage.value--;
-  ScreenKeys.value = ScreenKeyOrigin.value.slice(
-    4 * (currentsubPage.value - 1),
-    4 * (currentsubPage.value - 1) + 4
-  );
-};
 const updateMenuKey = ref(false);
 
 const nowStoreAreaCd = ref();
@@ -471,6 +483,13 @@ const clickedScreenOrMenu = ref(false);
 const TLUList = ref([]);
 const clickedScreenNo = ref();
 
+const movePage = () => {
+  store.state.moveOtherTab = {
+    strUrl: "MIMASTER::MST36_001INS.xml",
+    lngProgramID: 73645,
+    strTitle: "결제 코드 등록.",
+  };
+};
 /**
  * 조회 함수
  */
@@ -493,7 +512,7 @@ const searchButton = async () => {
   if (nowStoreAreaCd.value == "0" || nowStoreAreaCd.value == undefined) {
     Swal.fire({
       title: "경고",
-      text: "POS번호를 선택하세요.",
+      text: "KIOSK번호를 선택하세요.",
       icon: "warning",
       showCancelButton: false,
       confirmButtonColor: "#3085d6",
@@ -510,7 +529,7 @@ const searchButton = async () => {
       posNo.value,
       Number(currentpaymentCd.value)
     );
-    //comsole.log(res4);
+    //console.log(res4);
     AmountList.value = res4.data.AmountList;
     KeyList.value = res4.data.AmountKeyList;
     if (KeyList.value == null) {
@@ -544,6 +563,7 @@ const searchButton = async () => {
     modified.value = false;
     afterCategory.value = false;
     afterSearch.value = true;
+    strIcon.value = "";
   }
 
   calculateMaxSubCode();
@@ -614,6 +634,12 @@ const showScreenKeysOrder = () => {
   showChangeScreenKey.value = !showChangeScreenKey.value;
 };
 
+const onChoose = (e) => {
+  // console.log(e.oldIndex);
+  // console.log(KeyList.value);
+  clickedStrIcon.value = KeyList.value[e.oldIndex].strIcon;
+};
+
 let targetItemIndex2;
 const onMove = (evt) => {
   // 예: 드래그 중 이동할 때의 조건 등을 설정할 수 있음
@@ -637,6 +663,9 @@ const onMove2 = (evt) => {
 };
 const clickedMove = ref(false);
 const onEnd = (evt) => {
+  if (targetItemIndex2 == undefined) {
+    targetItemIndex2 = evt.oldIndex;
+  }
   // Swap을 처리할 조건
   if (changeMode.value === false) {
     const oldIndex = evt.oldIndex; // 드래그된 아이템의 기존 인덱스
@@ -667,20 +696,6 @@ const onEnd = (evt) => {
   clickedMenuKey.value =
     changeMode.value == false ? targetItemIndex2 : evt.newIndex;
   //comsole.log("KeyList:", KeyList.value);
-};
-function formatNumber(value) {
-  if (!value) return "";
-  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-const onEnd2 = (evt) => {
-  const originScreenNo = dupliScreenKeyOrigin[evt.oldIndex].intScreenNo;
-  const targetScreenNo = dupliScreenKeyOrigin[targetItemIndex3].intScreenNo;
-
-  addfor4ScreenKey();
-  //comsole.log(items.value);
-  //comsole.log(KeyList.value);
-  //comsole.log(ScreenKeyOrigin.value);
-  showKeys(targetScreenNo);
 };
 
 const saveButton = async () => {
@@ -732,6 +747,9 @@ const saveButton = async () => {
         const menuKeyNmarr = KeyList.value
           .filter((item) => item.lngKeyScrNo != undefined)
           .map((item) => item.strKeyName);
+        const strIconsarr = KeyList.value
+          .filter((item) => item.lngKeyScrNo != undefined)
+          .map((item) => item.strIcon);
 
         //comsole.log(intKeySeqs);
         //comsole.log(lngScrarr);
@@ -744,10 +762,11 @@ const saveButton = async () => {
           intKeySeqs.join(","),
           lngScrarr.join(","),
           menuKeyNmarr.join(","),
+          strIconsarr.join(","),
           currentpaymentCd.value
         );
 
-        //comsole.log(res2);
+        //console.log(res2);
       } catch (error) {
       } finally {
         store.state.loading = false;
@@ -788,13 +807,27 @@ const clickedCode = ref();
  */
 
 const selcetedrowData = (newValue) => {
-  if (newValue[0] == 2001) {
-    changePay.value = true;
+  if (clickedRealIndex.value == null) {
     return;
   }
-  clickedstrName.value = newValue[1];
-  clickedCode.value = newValue[0];
-  addKey();
+
+  if (newValue[0] == 2001 && currentpaymentCd.value == 4) {
+    clickedstrName.value = newValue[1];
+    clickedCode.value = newValue[0];
+    changePay.value = true;
+    //  addKey();
+    return;
+  } else {
+    clickedstrName.value = newValue[1];
+    clickedCode.value = newValue[0];
+    changePay2.value = true;
+    // addKey();
+    return;
+  }
+
+  // clickedstrName.value = newValue[1];
+  // clickedCode.value = newValue[0];
+  // addKey();
 };
 
 const changeCard = (value) => {
@@ -803,9 +836,14 @@ const changeCard = (value) => {
     clickedCode.value = "2001";
   } else if (value == 2) {
     clickedstrName.value = "삼성엘지페이";
+
     clickedCode.value = "2001";
   }
   changePay.value = false;
+  addKey();
+};
+const setStrIcon = (value) => {
+  changePay2.value = false;
   addKey();
 };
 
@@ -836,6 +874,7 @@ const searchAmountList3 = (e) => {
 
 const currentpaymentType = ref("할인");
 const currentpaymentCd = ref(3);
+//const currentstrIcon= ref('');
 /**
  * 결제키 구분 세팅
  */
@@ -848,6 +887,8 @@ const updatePaymentType = (newValue) => {
   } else {
     currentpaymentType.value = "지불";
   }
+  clickedStrIcon.value = "";
+  strIcon.value = "";
   KeyList.value = [];
   rowData.value = [];
 };
@@ -871,24 +912,6 @@ watch(
     showMenuKeys(); // MenuKeyList 값이 변경될 때마다 그리드 업데이트
   }
 );
-
-const editScreenKey = (value, value2, value3) => {
-  currentscreenKeyNm.value = value2;
-  //comsole.log(value3);
-  currentProduct.value = value3;
-  clickedScreenNo.value = value;
-  changeScreenKey.value = true;
-  const disclength = ScreenKeyOrigin.value.filter(
-    (item) => item.itemDiscYn == 1
-  ).length;
-  //comsole.log(ScreenKeyOrigin.value);
-  //comsole.log(disclength);
-  if (disclength == 1 && currentProduct.value == 0) {
-    showEditProduct.value = true;
-  } else if (disclength == 1 && currentProduct.value == 1) {
-    showEditProduct.value = false;
-  }
-};
 
 const exitScreenKey = () => {
   changeScreenKey.value = false;
@@ -970,49 +993,8 @@ const addfor4ScreenKey = () => {
   }
 };
 
-const addfor30MenuKeys = () => {
-  const length = items.value.length;
-  if (length < 30) {
-    for (var i = 0; i < 30 - length; i++) {
-      items.value.push({ strScreenName: "", intScreenNo: "" });
-    }
-  }
-};
-
-const addScreenKey = (value) => {
-  currentscreenKeyNm.value = "";
-  addscreenKey.value = true;
-  //comsole.log(value);
-  clickedScreenNo.value = value + 1;
-};
-
-const confirmaddScreenKey = () => {
-  if (currentscreenKeyNm.value == "" || currentscreenKeyNm.value == null) {
-    Swal.fire({
-      title: "오류",
-      text: "화면키 이름을 입력하세요.",
-      icon: "error",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  const newScreenNo =
-    ScreenKeyOrigin.value[ScreenKeyOrigin.value.length - 1].intScreenNo + 1;
-  ScreenKeyOrigin.value.push({
-    strScreenName: currentscreenKeyNm.value,
-    intScreenNo: newScreenNo,
-    intScreenType: currentpaymentCd.value,
-  });
-  addscreenKey.value = false;
-  addfor4ScreenKey();
-  //comsole.log(ScreenKeyOrigin.value);
-  currentscreenKeyNm.value = "";
-  //comsole.log(clickedScreenNo.value);
-  showKeys(clickedScreenNo.value + (currentsubPage.value - 1) * 10);
-};
-
 const existMenuKey = ref(false);
-const clickedRealIndex = ref();
+const clickedRealIndex = ref(null);
 const saveMenuKeyposition = (index) => {
   clickedRealIndex.value = index + 1;
 };
@@ -1029,6 +1011,7 @@ const addKey = () => {
       intPosNo: posNo.value,
       intScreenNo: currScreenNo,
       lngKeyScrNo: Number(clickedCode.value),
+      strIcon: strIcon.value,
       strName: clickedstrName.value,
       strKeyName: clickedstrName.value,
       itemDiscYn: 0,
@@ -1040,15 +1023,24 @@ const addKey = () => {
       intPosNo: posNo.value,
       intScreenNo: currScreenNo,
       lngKeyScrNo: Number(clickedCode.value),
+      strIcon: strIcon.value,
       strName: clickedstrName.value,
       strKeyName: clickedstrName.value,
       itemDiscYn: 0,
     };
   }
+  clickedStrIcon.value = strIcon.value;
 
+  strIcon.value = "";
   //comsole.log(KeyList.value);
 };
 
+watch(
+  () => KeyList.value,
+  () => {
+    console.log(KeyList.value);
+  }
+);
 /**
  * 삭제 버튼
  */

@@ -1,7 +1,7 @@
 /*--############################################################################
-# Filename : MST01_033INS.vue                                                  
-# Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
-# Date :2025-05-14                                                             
+# Filename : ACT04_003RPT.vue                                                  
+# Description : 입출금관리 > 입출금 관리 >입출금 집계 현황                     
+# Date :2025-05-21                                                             
 # Author : 권맑음                     
 ################################################################################*/
 <template>
@@ -26,103 +26,52 @@
           :closePopUp="closePopUp"
           ref="datepicker"
           @excelDate="excelDate"
-          :mainName="'일자'"
+          :mainName="'기간'"
           :initToday="1"></Datepicker2>
-        <div
-          class="flex justify-start items-center text-nowrap ml-36 space-x-10 mt-1">
-          <div class="flex items-center mr-2">
-            <div class="font-semibold text-base">거래 구분 :</div>
-            <div>
-              <select
-                name=""
-                id=""
-                class="rounded-lg h-8 ml-2 w-24"
-                v-model="tranType">
-                <option :value="1">포인트</option>
-                <option :value="2">급여공제</option>
-              </select>
-            </div>
-          </div>
-          <div class="flex items-center">
-            <div class="font-semibold text-base ml-3">조회 옵션:</div>
-            <select
-              name=""
-              id=""
-              class="rounded-lg h-8 ml-3 w-24"
-              v-model="lngOption"
-              @change="resetOptionValue">
-              <option :value="0">선택</option>
-              <option :value="1">부서</option>
-              <option :value="2">소속사</option>
-            </select>
-            <input
-              type="text"
-              class="rounded-lg h-8 ml-2 pl-1 disabled:bg-gray-100 border"
-              v-model="optionValue"
-              :disabled="lngOption == 0" />
-          </div>
-
-          <div class="flex items-center pl-[85px]">
-            <div class="font-semibold text-base">사원명 :</div>
-            <input
-              type="text"
-              class="rounded-lg h-8 ml-3"
-              v-model="empId"
-              readonly
-              @keydown="resetInputBox" />
-            <input
-              type="text"
-              class="rounded-lg h-8 ml-3"
-              v-model="empName"
-              readonly
-              @keydown="resetInputBox" />
-            <button
-              class="button primary !h-7 !w-16 ml-2"
-              @click="openPopUp"
-              ref="button">
-              조회
-            </button>
-            <EmployeePopUp
-              @custId="custId"
-              @custName="custName"
-              :open="open"
-              ref="employee"
-              @updateOpen="updateOpen"
-              class="absolute right-56 top-56 z-40"></EmployeePopUp>
+        <div class="flex space-x-3 text-base font-semibold ml-44 mt-3">
+          <div class="space-x-3">
+            <label for="sum"
+              ><input
+                type="checkbox"
+                id="sum"
+                v-model="cond"
+                @click="checkCond" />소계</label
+            >
+            <label for="cellUnite"
+              ><input
+                type="checkbox"
+                id="cellUnite"
+                v-model="cond2"
+                @click="checkCond2" />셀병합</label
+            >
           </div>
         </div>
       </div>
-      <div class="ml-20 -mt-10">
-        <PickStoreRenew3
+      <div class="ml-20">
+        <PickStoreSingle
           @lngStoreCode="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"
           @excelStore="excelStore"
           @lngStoreAttrs="lngStoreAttrs"
           @changeInit="changeInit">
-        </PickStoreRenew3>
+        </PickStoreSingle>
       </div>
       <div></div>
     </div>
 
     <div class="w-full h-[80%]">
       <Realgrid
-        :progname="'ACT09_001RPT_VUE'"
-        :progid="2"
+        :progname="'ACT04_003RPT_VUE'"
+        :progid="1"
         :rowData="rowData"
         :reload="reload"
+        :setRowGroupSpan2="setRowGroupSpan2"
+        :documentTitle="'ACT04_003RPT'"
         :setFooter="true"
-        :setFooterExpressions="['sum', 'sum']"
-        :setFooterColID="['lngUseCnt', 'dblSaleAmt']"
+        :setGroupFooter="cond"
+        :setGroupColumnId="'strName,dtmDate'"
         :setFooterCustomColumnId="['strName']"
-        :setFooterCustomText="['합계']"
-        :setGroupFooterColID="['strName', 'lngUseCnt', 'dblSaleAmt']"
-        :setGroupFooterExpressions="['custom', 'sum', 'sum']"
-        :setGroupSumCustomColumnId="['strSaleCustID']"
-        :setGroupSumCustomText="['매장소계']"
-        :setGroupFooter="true"
-        :setMergeMode="false"
-        :setGroupColumnId="'strName'"
-        :documentTitle="'ACT09_001RPT'"
+        :setFooterCustomText="['총합계']"
         :documentSubTitle="documentSubTitle"
         :exporttoExcel="exportExcel">
       </Realgrid>
@@ -131,14 +80,17 @@
 </template>
 
 <script setup>
-import { getEmployeeSummary } from "@/api/account";
-import { getCauseList, getPastSalesChanges } from "@/api/misales";
+import {
+  getAccCodeList,
+  getDWAggDetail,
+  getDWDetail,
+  getEmployeeSummary,
+} from "@/api/account";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
 
 import Datepicker2 from "@/components/Datepicker2.vue";
-import EmployeePopUp from "@/components/employeePopUp.vue";
 /**
  *  페이지명 자동 입력 컴포넌트
  *  */
@@ -148,7 +100,7 @@ import PageName from "@/components/pageName.vue";
  *  매장 선택 컴포넌트
  *  */
 
-import PickStoreRenew3 from "@/components/pickStoreRenew.vue";
+import PickStoreSingle from "@/components/pickStoreSingle.vue";
 /**
  * 	그리드 생성
  */
@@ -170,65 +122,6 @@ import { onMounted, ref } from "vue";
 
 import { useStore } from "vuex";
 
-const orderPay = ref(1);
-const setFooterColID = ref([
-  "lngRecCnt",
-  "lngRecAmt",
-  "lngCustCnt",
-  "lngCustAmt",
-  "lngSalAmt",
-  "lngDiscount",
-  "lngActAmt",
-  "lngVAT",
-  "lngSupplyAmt",
-  "dblDistRate",
-  "lngTotAmt",
-  "dtmDate",
-]);
-const setGroupFooterColID = ref([
-  "lngRecCnt",
-  "lngRecAmt",
-  "lngCustCnt",
-  "lngCustAmt",
-  "lngSalAmt",
-  "lngDiscount",
-  "lngActAmt",
-  "lngVAT",
-  "lngSupplyAmt",
-  "dblDistRate",
-  "lngTotAmt",
-  "dtmDate",
-]);
-const setFooterExpressions = ref([
-  "sum",
-  "avg",
-  "sum",
-  "avg",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "custom",
-]);
-const setGroupFooterExpressions = ref([
-  "sum",
-  "avg",
-  "sum",
-  "avg",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "custom",
-]);
-const setGroupSummaryCenterIds = ref("strTime");
-const progid = ref(1);
 const setRowGroupSpan = ref("");
 const reload = ref(false);
 const rowData = ref([]);
@@ -237,7 +130,34 @@ const selectedstartDate = ref();
 const selectedendDate = ref();
 const hideColumnNow = ref(true);
 const setGroupColumnId = ref("strName");
-const hideColumnsId = ref([]);
+const CondList = ref([]);
+const selectedCond = ref(0);
+const setRowGroupSpan2 = ref("strName");
+const mergeMask = ref("lngStoreCode");
+const cond2 = ref(true);
+const cond = ref(true);
+
+const checkCond = (e) => {
+  if (e.target.checked) {
+    cond.value = true;
+
+    reload.value = !reload.value;
+  } else {
+    reload.value = !reload.value;
+    cond.value = false;
+  }
+};
+const checkCond2 = (e) => {
+  if (e.target.checked) {
+    cond2.value = true;
+    setRowGroupSpan2.value = "strName";
+    reload.value = !reload.value;
+  } else {
+    setRowGroupSpan2.value = "";
+    reload.value = !reload.value;
+    cond2.value = false;
+  }
+};
 /**
  * 선택한 매출 시작일자
  */
@@ -273,9 +193,13 @@ onMounted(async () => {
 
   const userGroup = store.state.storeGroup[0].lngStoreGroup;
 
-  const res = await getCauseList(userGroup, 0);
-  causeList.value = res.data.List;
-  //comsole.log(res);
+  //   const res = await getCauseList(userGroup, 0);
+  //   causeList.value = res.data.List;
+  //   //comsole.log(res);
+
+  // const res2 = await getAccCodeList(userGroup);
+  // //console.log(res2);
+  // CondList.value = res2.data.List;
 });
 
 const loginedstrLang = store.state.userData.lngLanguage;
@@ -296,18 +220,13 @@ const searchButton = async () => {
 
     reload.value = !reload.value;
 
-    const res = await getEmployeeSummary(
+    const res = await getDWAggDetail(
       selectedGroup.value,
-      selectedStoreAttrs.value,
       selectedStores.value,
       selectedstartDate.value,
-      selectedendDate.value,
-      tranType.value,
-      empId.value,
-      lngOption.value,
-      optionValue.value
+      selectedendDate.value
     );
-    //comsole.log(res);
+    console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -366,36 +285,8 @@ const exportExcel = ref(false);
  */
 
 const excelButton = () => {
-  let condition = "거래 구분 :";
-
-  if (tranType.value == 1) {
-    condition += "포인트";
-  } else {
-    condition += "급여공제";
-  }
-
-  let condition2 = "조회 옵션 :";
-  if (lngOption.value == 0) {
-    condition2 += "선택";
-  } else if (lngOption.value == 1) {
-    condition2 += "부서";
-  } else if (lngOption.value == 2) {
-    condition2 += "소속사";
-  }
-  condition2 += optionValue.value;
-
-  let condition3 = "사원명 : " + empId.value + "," + empName.value;
-
   documentSubTitle.value =
-    selectedExcelDate.value +
-    "\n" +
-    selectedExcelStore.value +
-    "\n" +
-    condition +
-    "\n" +
-    condition2 +
-    "\n" +
-    condition3;
+    selectedExcelDate.value + "\n" + selectedExcelStore.value;
   //comsole.log(documentSubTitle.value);
   exportExcel.value = !exportExcel.value;
 };

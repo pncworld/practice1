@@ -147,12 +147,16 @@
         ><input
           type="radio"
           name="changingMode"
+          value="false"
+          v-model="changeMode"
           @click.stop="changingMode(1)"
           checked />교체하기 </label
       ><label class="z-40"
         ><input
           type="radio"
           name="changingMode"
+          value="true"
+          v-model="changeMode"
           @click.stop="changingMode(2)" />밀어내기</label
       ><button class="whitebutton z-40" @click.stop="deletekey">
         삭제
@@ -764,6 +768,7 @@ const searchButton = async () => {
     store.state.loading = false; // 로딩 상태 종료
     modified.value = false;
     afterCategory.value = false;
+    changeMode.value = false;
   }
 
   calculateMaxSubCode();

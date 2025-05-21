@@ -107,7 +107,7 @@
             :changeValue2="changeValue"
             :changeNow="changeNow"
             @realgridname="realgridname2"
-            :rowStateeditable="rowStateeditable"></Realgrid>
+            :rowStateeditable="false"></Realgrid>
         </div>
       </div>
 
@@ -169,10 +169,12 @@
             :searchSpecialCond="searchSpecialCond"
             :activeSearchSpecial="true"
             :searchValue="[forsearchMain, forsearchSub]"
+            :selectionStyle="'block'"
             @updatedRowData="updatedRowData2"
             @realgridname="realgridname"
-            :editableColId="'strName'"
+            :rowStateeditable="false"
             :fixedColumn="fixedColumn"
+            :checkRenderEditable="true"
             :setDynamicGrid2="true"></Realgrid>
         </div>
       </div>

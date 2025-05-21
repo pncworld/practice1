@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex justify-center items-center space-x-3 w-[600px] pl-20 pr-2 ml-9">
+    class="flex justify-center items-center space-x-3 w-[500px] pl-20 pr-2 ml-9">
     <div
       class="w-auto font-semibold flex items-center text-nowrap text-base ml-20">
       {{ mainName }} :
@@ -157,17 +157,17 @@ const props = defineProps({
     type: String,
     default: "9999-12-31",
   },
+  makeSevenTerm: {
+    type: Boolean,
+    default: false,
+  },
 });
 const formatDate = (date) => {
   //comsole.log(date);
   return date.toISOString().split("T")[0];
 };
 const today = new Date();
-if (props.initToday == 0) {
-  today.setDate(today.getDate() - 1);
-} else {
-  today.setDate(today.getDate() + props.initToday - 1);
-}
+
 const mainName = ref(props.mainName);
 const selectedStartDate = ref();
 const selectedEndDate = ref();
@@ -176,10 +176,22 @@ const emitDate1 = (e) => {};
 const maxEndDate = ref("9999-12-31");
 onMounted(() => {
   const today = new Date();
+  if (props.initToday == 0) {
+    today.setDate(today.getDate() - 1);
+  } else {
+    today.setDate(today.getDate() + props.initToday - 1);
+  }
   tempStartDateStack.push(selectedStartDate.value);
   tempEndDateStack.push(selectedEndDate.value);
-  selectedStartDate.value = formatDate(today);
+
   selectedEndDate.value = formatDate(today);
+
+  if (props.makeSevenTerm == true) {
+    today.setDate(today.getDate() - 6);
+    selectedStartDate.value = formatDate(today);
+  } else {
+    selectedStartDate.value = formatDate(today);
+  }
   maxEndDate.value = props.limitEndDate;
   emit("startDate", selectedStartDate.value);
   emit("endDate", selectedEndDate.value);

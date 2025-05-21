@@ -27,7 +27,7 @@
           ref="datepicker"
           @excelDate="excelDate"
           :mainName="'일자'"
-          :initToday="'1'"></Datepicker2>
+          :initToday="1"></Datepicker2>
         <div
           class="flex justify-start items-center text-nowrap ml-36 space-x-10 mt-1">
           <div class="flex items-center">

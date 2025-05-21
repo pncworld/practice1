@@ -31,6 +31,8 @@
         @storeNm="handlestoreNm"
         @update:ischanged="handleinitAll"
         @screenNo="handleScreenNo"
+        :showMakeScreen="true"
+        :renew="renew"
         @changed2="changed2">
       </PickStore>
     </div>
@@ -197,12 +199,12 @@
             @click="showMenus(2)">
             TLU관리
           </button>
-          <!-- <button
+          <button
             class="contents_tab-button"
             :class="{ 'text-blue-600': currentMenu == 3 }"
             @click="showMenus(3)">
             화면관리
-          </button> -->
+          </button>
         </div>
         <div class="mt-3">
           <!-- <button class="whitebutton" @click="searchMenuList3">조회</button> -->
@@ -261,7 +263,7 @@
               v-model="searchword1" />
           </div>
         </div>
-        <div class="ml-10 w-full h-[170%]">
+        <div class="ml-10 w-full h-[160%] flex flex-col">
           <Realgrid
             :progname="'MST05_011INS_VUE'"
             :progid="1"
@@ -273,6 +275,85 @@
             :searchColId3="['majorGroupCd', 'subGroupCd']"
             :searchValue="searchValue"
             :searchWord3="searchword1"></Realgrid>
+
+          <div class="text-start font-semibold text-xl mt-2">색상선택</div>
+          <div class="border border-gray-600">
+            <div class="flex space-x-5">
+              <button @click="changeMenuColor(16777215)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#ffffff] border border-black"></div>
+                <!-- 16777215  -->
+              </button>
+              <button @click="changeMenuColor(16773365)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FFF0F5] border border-black"></div>
+              </button>
+              <button @click="changeMenuColor(16502449)">
+                <!-- <-! 16773365 -> -->
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FBCEB1] border border-black"></div>
+                <!-- 16502449 -->
+              </button>
+              <button @click="changeMenuColor(16777184)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FFFFE0] border border-black"></div>
+                <!-- 16777184 -->
+              </button>
+              <button @click="changeMenuColor(15138802)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#E6FFF2] border border-black"></div>
+                <!-- 15138802 -->
+              </button>
+              <button @click="changeMenuColor(14150655)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#d6ebff] border border-black"></div>
+                <!-- 14150655 -->
+              </button>
+              <button @click="changeMenuColor(15792383)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#F0E6FF] border border-black"></div>
+                <!-- 15792383 -->
+              </button>
+            </div>
+            <div class="flex space-x-5">
+              <button @click="changeMenuColor(16772894)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FFDDEE] border border-black"></div>
+              </button>
+              <!-- 16772894 -->
+
+              <button @click="changeMenuColor(14737632)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#e0e0e0] border border-black"></div>
+                <!-- 14737632 -->
+              </button>
+              <button @click="changeMenuColor(15761536)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#F08080] border border-black"></div>
+                <!-- 15761536 -->
+              </button>
+              <button @click="changeMenuColor(16752762)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FFA07A] border border-black"></div>
+                <!-- 16752762 -->
+              </button>
+              <button @click="changeMenuColor(16777152)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#ffffc0] border border-black"></div>
+                <!-- 16777152 -->
+              </button>
+              <button @click="changeMenuColor(10025880)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#98FB98] border border-black"></div>
+                <!-- 10025880 -->
+              </button>
+              <button @click="changeMenuColor(11393254)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#ADD8E6] border border-black"></div>
+                <!-- 11393254 -->
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -292,7 +373,7 @@
         </div>
         <div class="ml-10 mt-5 w-full h-full">
           <Realgrid
-            class="h-[30vh]"
+            class="h-[22vh]"
             :progname="'MST05_011INS_VUE'"
             :progid="2"
             :rowData="TLUList"
@@ -302,25 +383,185 @@
             :searchColId="'lngCode,strName'"
             :searchWord3="searchword3"></Realgrid>
           <Realgrid
-            class="h-[30vh] mt-5"
+            class="h-[22vh] mt-5"
             :progname="'MST05_011INS_VUE'"
             :progid="3"
             :rowData="TLUSubList"
             @realgridname="realgridname2"></Realgrid>
+
+          <div class="text-start font-semibold text-xl mt-2">색상선택</div>
+          <div class="border border-gray-600">
+            <div class="flex space-x-5">
+              <button @click="changeMenuColor(16777215)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#ffffff] border border-black"></div>
+                <!-- 16777215  -->
+              </button>
+              <button @click="changeMenuColor(16773365)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FFF0F5] border border-black"></div>
+              </button>
+              <button @click="changeMenuColor(16502449)">
+                <!-- <-! 16773365 -> -->
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FBCEB1] border border-black"></div>
+                <!-- 16502449 -->
+              </button>
+              <button @click="changeMenuColor(16777184)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FFFFE0] border border-black"></div>
+                <!-- 16777184 -->
+              </button>
+              <button @click="changeMenuColor(15138802)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#E6FFF2] border border-black"></div>
+                <!-- 15138802 -->
+              </button>
+              <button @click="changeMenuColor(14150655)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#d6ebff] border border-black"></div>
+                <!-- 14150655 -->
+              </button>
+              <button @click="changeMenuColor(15792383)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#F0E6FF] border border-black"></div>
+                <!-- 15792383 -->
+              </button>
+            </div>
+            <div class="flex space-x-5">
+              <button @click="changeMenuColor(16772894)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FFDDEE] border border-black"></div>
+              </button>
+              <!-- 16772894 -->
+
+              <button @click="changeMenuColor(14737632)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#e0e0e0] border border-black"></div>
+                <!-- 14737632 -->
+              </button>
+              <button @click="changeMenuColor(15761536)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#F08080] border border-black"></div>
+                <!-- 15761536 -->
+              </button>
+              <button @click="changeMenuColor(16752762)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FFA07A] border border-black"></div>
+                <!-- 16752762 -->
+              </button>
+              <button @click="changeMenuColor(16777152)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#ffffc0] border border-black"></div>
+                <!-- 16777152 -->
+              </button>
+              <button @click="changeMenuColor(10025880)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#98FB98] border border-black"></div>
+                <!-- 10025880 -->
+              </button>
+              <button @click="changeMenuColor(11393254)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#ADD8E6] border border-black"></div>
+                <!-- 11393254 -->
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="h-full" v-show="currentMenu == 3">
-        <div class="mt-7 ml-10 w-full h-[160%]">
+        <div class="mt-7 ml-10 w-full h-[50vh]">
           <Realgrid
             class="h-full"
-            :progname="'MST05_011INS_VUE'"
-            :progid="1"
-            :rowData="MenuList"
-            @selcetedrowData="selcetedrowData"
+            :progname="'MST05_004INS_VUE'"
+            :progid="4"
+            :rowData="rowData"
+            @selcetedrowData="selcetedrowData4"
             :searchColId="'menuCd,menuNm'"
             :searchColId3="['majorGroupCd', 'subGroupCd']"
             :searchValue="searchValue"
+            :rowStateeditable="false"
+            @realgridname="realgridname4"
             :searchWord3="searchword1"></Realgrid>
+
+          <div class="text-start font-semibold text-xl mt-2">색상선택</div>
+          <div class="border border-gray-600">
+            <div class="flex space-x-5">
+              <button @click="changeMenuColor(16777215)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#ffffff] border border-black"></div>
+                <!-- 16777215  -->
+              </button>
+              <button @click="changeMenuColor(16773365)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FFF0F5] border border-black"></div>
+              </button>
+              <button @click="changeMenuColor(16502449)">
+                <!-- <-! 16773365 -> -->
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FBCEB1] border border-black"></div>
+                <!-- 16502449 -->
+              </button>
+              <button @click="changeMenuColor(16777184)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FFFFE0] border border-black"></div>
+                <!-- 16777184 -->
+              </button>
+              <button @click="changeMenuColor(15138802)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#E6FFF2] border border-black"></div>
+                <!-- 15138802 -->
+              </button>
+              <button @click="changeMenuColor(14150655)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#d6ebff] border border-black"></div>
+                <!-- 14150655 -->
+              </button>
+              <button @click="changeMenuColor(15792383)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#F0E6FF] border border-black"></div>
+                <!-- 15792383 -->
+              </button>
+            </div>
+            <div class="flex space-x-5">
+              <button @click="changeMenuColor(16772894)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FFDDEE] border border-black"></div>
+              </button>
+              <!-- 16772894 -->
+
+              <button @click="changeMenuColor(14737632)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#e0e0e0] border border-black"></div>
+                <!-- 14737632 -->
+              </button>
+              <button @click="changeMenuColor(15761536)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#F08080] border border-black"></div>
+                <!-- 15761536 -->
+              </button>
+              <button @click="changeMenuColor(16752762)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#FFA07A] border border-black"></div>
+                <!-- 16752762 -->
+              </button>
+              <button @click="changeMenuColor(16777152)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#ffffc0] border border-black"></div>
+                <!-- 16777152 -->
+              </button>
+              <button @click="changeMenuColor(10025880)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#98FB98] border border-black"></div>
+                <!-- 10025880 -->
+              </button>
+              <button @click="changeMenuColor(11393254)">
+                <div
+                  class="w-[2vw] h-[4vh] bg-[#ADD8E6] border border-black"></div>
+                <!-- 11393254 -->
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -335,7 +576,10 @@
           <div
             v-for="(item, index) in items"
             class="flex items-center justify-center h-[7vh] w-[9vw] rounded-2xl shadow-sm border border-gray-500"
-            :class="{ '!bg-orange-500': clickedMenuKey == index }"
+            :class="{
+              '!border-orange-500 border-4': clickedMenuKey == index,
+            }"
+            :style="{ backgroundColor: decimalToHexColor(item.lngKeyColor) }"
             @click="
               saveMenuKeyposition(index);
               clickedMenuKey = index;
@@ -471,6 +715,7 @@ const changingMode = (data) => {
     changeMode.value = true;
   }
 };
+const renew = ref(false);
 const clickedStoreNm = ref();
 /**
  * 페이지 매장명 세팅
@@ -497,6 +742,20 @@ const maxSubCode = ref();
  * 선택한 포스 번호 호출 함수
  */
 
+function decimalToHexColor(decimal) {
+  // 문자열이면 숫자로 변환
+
+  const num = typeof decimal === "string" ? parseInt(decimal, 10) : decimal;
+
+  if (isNaN(num) || num <= 0 || num > 16777215) {
+    return "16777215"; // 또는 적절한 기본값 리턴
+  }
+
+  const hex = num.toString(16).padStart(6, "0");
+  console.log(hex.toLowerCase());
+  return `#${hex.toLowerCase()}`;
+}
+
 const posNo = ref();
 const changeScreenKey = ref(false);
 const currmenuKeyPage = ref(1);
@@ -509,26 +768,26 @@ const showSpecificMenukey = ref(false);
 
 const searchword3 = ref("");
 const rowData = ref([
-  { screenName: "화면1", add: "추가", screenNo: 1 },
-  { screenName: "화면2", add: "추가", screenNo: 2 },
-  { screenName: "화면3", add: "추가", screenNo: 3 },
-  { screenName: "화면4", add: "추가", screenNo: 4 },
-  { screenName: "화면5", add: "추가", screenNo: 5 },
-  { screenName: "화면6", add: "추가", screenNo: 6 },
-  { screenName: "화면7", add: "추가", screenNo: 7 },
-  { screenName: "화면8", add: "추가", screenNo: 8 },
-  { screenName: "화면9", add: "추가", screenNo: 9 },
-  { screenName: "화면10", add: "추가", screenNo: 10 },
-  { screenName: "화면11", add: "추가", screenNo: 11 },
-  { screenName: "화면12", add: "추가", screenNo: 12 },
-  { screenName: "화면13", add: "추가", screenNo: 13 },
-  { screenName: "화면14", add: "추가", screenNo: 14 },
-  { screenName: "화면15", add: "추가", screenNo: 15 },
-  { screenName: "화면16", add: "추가", screenNo: 16 },
-  { screenName: "화면17", add: "추가", screenNo: 17 },
-  { screenName: "화면18", add: "추가", screenNo: 18 },
-  { screenName: "화면19", add: "추가", screenNo: 19 },
-  { screenName: "화면20", add: "추가", screenNo: 20 },
+  { strName: "화면1", add: "추가", lngCode: 1, intKeyNo: 1 },
+  { strName: "화면2", add: "추가", lngCode: 2, intKeyNo: 1 },
+  { strName: "화면3", add: "추가", lngCode: 3, intKeyNo: 1 },
+  { strName: "화면4", add: "추가", lngCode: 4, intKeyNo: 1 },
+  { strName: "화면5", add: "추가", lngCode: 5, intKeyNo: 1 },
+  { strName: "화면6", add: "추가", lngCode: 6, intKeyNo: 1 },
+  { strName: "화면7", add: "추가", lngCode: 7, intKeyNo: 1 },
+  { strName: "화면8", add: "추가", lngCode: 8, intKeyNo: 1 },
+  { strName: "화면9", add: "추가", lngCode: 9, intKeyNo: 1 },
+  { strName: "화면10", add: "추가", lngCode: 10, intKeyNo: 1 },
+  { strName: "화면11", add: "추가", lngCode: 11, intKeyNo: 1 },
+  { strName: "화면12", add: "추가", lngCode: 12, intKeyNo: 1 },
+  { strName: "화면13", add: "추가", lngCode: 13, intKeyNo: 1 },
+  { strName: "화면14", add: "추가", lngCode: 14, intKeyNo: 1 },
+  { strName: "화면15", add: "추가", lngCode: 15, intKeyNo: 1 },
+  { strName: "화면16", add: "추가", lngCode: 16, intKeyNo: 1 },
+  { strName: "화면17", add: "추가", lngCode: 17, intKeyNo: 1 },
+  { strName: "화면18", add: "추가", lngCode: 18, intKeyNo: 1 },
+  { strName: "화면19", add: "추가", lngCode: 19, intKeyNo: 1 },
+  { strName: "화면20", add: "추가", lngCode: 20, intKeyNo: 1 },
 ]);
 
 const isNew = ref(false);
@@ -574,8 +833,12 @@ const realgridname2 = (e) => {
   realgrid3Name.value = e;
 };
 const realgrid4Name = ref("");
+const realgrid5Name = ref("");
 const realgridname3 = (e) => {
   realgrid4Name.value = e;
+};
+const realgridname4 = (e) => {
+  realgrid5Name.value = e;
 };
 
 watch(currentMenu, () => {
@@ -595,6 +858,12 @@ watch(currentMenu, () => {
   setTimeout(() => {
     RealGrid.getGridInstance(realgrid4).resetSize();
     RealGrid.getGridInstance(realgrid4).refresh(true);
+  }, 100);
+
+  const realgrid5 = document.getElementById(realgrid5Name.value);
+  setTimeout(() => {
+    RealGrid.getGridInstance(realgrid5).resetSize();
+    RealGrid.getGridInstance(realgrid5).refresh(true);
   }, 100);
 });
 const currentSelectedMenuCode = ref();
@@ -628,6 +897,32 @@ const selcetedrowData2 = (e) => {
   currentSelectedMenuCode.value = e[0];
   currentSelectedMenuPrice.value = "";
   addMenuKey2();
+};
+const selcetedrowData4 = (e) => {
+  if (clickedRealIndex.value == null) {
+    return;
+  }
+  //comsole.log(e);
+
+  Swal.fire({
+    title: "화면명을 입력하세요.",
+    input: "text",
+    inputPlaceholder: "여기에 입력...",
+    showCancelButton: true,
+    confirmButtonText: "확인",
+    cancelButtonText: "취소",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const userInput = result.value;
+
+      currentSelectedMenuNm.value = userInput;
+      currentSelectedMenuCode.value = e[0];
+      currentSelectedMenuPrice.value = "";
+      addScreenKeyf();
+    } else {
+      //console.log("입력 취소됨");
+    }
+  });
 };
 
 /**
@@ -736,6 +1031,7 @@ const saveButton = () => {
       } catch (error) {
       } finally {
         store.state.loading = false;
+        renew.value = !renew.value;
         searchButton();
       }
     }
@@ -863,6 +1159,7 @@ const searchButton = async () => {
     );
 
     MenuKeyList.value = res4.data.MenukeyList;
+
     screenNoList.value = res3.data.ScreenList;
 
     confirmitem.value = JSON.parse(JSON.stringify(MenuKeyList.value));
@@ -874,7 +1171,9 @@ const searchButton = async () => {
         item.intKeySeq >= (nowscreenNo.value - 1) * 45 &&
         item.intKeySeq <= nowscreenNo.value * 45
     );
-
+    console.log(nowscreenNo.value);
+    console.log(items.value);
+    items.value = [];
     const startIndex = (nowscreenNo.value - 1) * 45;
     const endIndex = nowscreenNo.value * 45;
     //comsole.log(items.value);
@@ -893,7 +1192,7 @@ const searchButton = async () => {
         });
       }
     }
-    //comsole.log(items.value);
+    console.log(items.value);
 
     afterSearch.value = true;
   } catch (error) {
@@ -1270,87 +1569,19 @@ const addfor10ScreenKey = () => {
   }
 };
 
-const addfor30MenuKeys = () => {
-  const length = items.value.length;
-  if (length < 30) {
-    for (var i = 0; i < 30 - length; i++) {
-      items.value.push({ strScreenName: "", intScreenNo: "" });
-    }
-  }
-};
-
-const addScreenKey = (value) => {
-  addscreenKey.value = true;
-  //comsole.log(value);
-  clickedScreenNo.value = value + 1;
-};
-
-const confirmaddScreenKey = () => {
-  if (currentscreenKeyNm.value == "" || currentscreenKeyNm.value == null) {
-    Swal.fire({
-      title: "오류",
-      text: "화면키 이름을 입력하세요.",
-      icon: "error",
-      confirmButtonText: "확인",
-    });
+const changeMenuColor = (e) => {
+  if (clickedMenuKeyIndex.value == null) {
     return;
   }
-  const newScreenNo =
-    ScreenKeyOrigin.value[ScreenKeyOrigin.value.length - 1].intScreenNo + 1;
-  ScreenKeyOrigin.value.push({
-    strScreenName: currentscreenKeyNm.value,
-    intScreenNo: newScreenNo,
-  });
-  addscreenKey.value = false;
-  addfor10ScreenKey();
-  //comsole.log(ScreenKeyOrigin.value);
-  currentscreenKeyNm.value = "";
-  //comsole.log(clickedScreenNo.value);
-  showMenuKey(clickedScreenNo.value + (currentsubPage.value - 1) * 10);
-};
 
-const prevMenuKey = () => {
-  if (currmenuKeyPage.value == 1) {
-    return;
+  const a = items.value.find(
+    (item) => item.intKeySeq == clickedMenuKeyIndex.value
+  );
+  if (a != undefined) {
+    a.lngKeyColor = e;
   }
-  currmenuKeyPage.value--;
-  items.value = [...Array(30).fill(null)];
-  MenuKeyList.value
-    .filter(
-      (item) =>
-        item.intPosNo == posNo.value &&
-        item.intScreenNo == clickedintScreenNo.value
-    )
-    .forEach((item) => {
-      //comsole.log(item);
-
-      const position = item.intKeySeq - (currmenuKeyPage.value - 1) * 30 - 1;
-      if (position >= 0 && position < 30) {
-        items.value[position] = item;
-      }
-    });
 };
-const nextMenuKey = () => {
-  if (currmenuKeyPage.value == 33) {
-    return;
-  }
-  currmenuKeyPage.value++;
 
-  items.value = [...Array(30).fill(null)];
-  MenuKeyList.value
-    .filter(
-      (item) =>
-        item.intPosNo == posNo.value &&
-        item.intScreenNo == clickedintScreenNo.value
-    )
-    .forEach((item) => {
-      //comsole.log(item);
-      const position = item.intKeySeq - (currmenuKeyPage.value - 1) * 30 - 1;
-      if (position >= 0 && position < 30) {
-        items.value[position] = item;
-      }
-    });
-};
 const existMenuKey = ref(false);
 const clickedRealIndex = ref();
 const saveMenuKeyposition = (index) => {
@@ -1413,26 +1644,6 @@ const addMenuKey = () => {
       lngPrice: currentSelectedMenuPrice.value,
     });
   }
-
-  // const foraddIndex = MenuKeyList.value.find(
-  //   (item) =>
-  //     item.intPosNo == posNo.value &&
-  //     item.intKeySeq == clickedMenuKeyIndex.value
-  // );
-
-  // //comsole.log(foraddIndex);
-  // if (foraddIndex == undefined) {
-  //   MenuKeyList.value.push({
-  //     intKeyNo: 6,
-  //     intKeySeq: clickedRealIndex.value,
-  //     intPosNo: posNo.value,
-  //     lngKeyscrNo: Number(currentSelectedMenuCode.value),
-  //     strKeyName: currentSelectedMenuNm.value,
-  //   });
-  // } else {
-  //   foraddIndex.lngKeyscrNo = Number(currentSelectedMenuCode.value);
-  //   foraddIndex.strKeyName = currentSelectedMenuNm.value;
-  // }
 
   showMenuKey(nowscreenNo.value);
   //comsole.log(MenuKeyList.value);

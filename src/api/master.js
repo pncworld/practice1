@@ -653,6 +653,7 @@ export const saveAllMenuKey3 = (
   intKeySeq_arr,
   menuCd_arr,
   strKeyName_arr,
+  stricon_arr,
   screenType
 ) => {
   return api2.post("/MIMASTER/MST44_058INS.asmx/saveKeys", {
@@ -663,6 +664,7 @@ export const saveAllMenuKey3 = (
     INTKEYSEQ_ARR: intKeySeq_arr,
     LNGKEYSCRNO_ARR: menuCd_arr,
     STRKEYNAME_ARR: strKeyName_arr,
+    STRICON_ARR: stricon_arr,
     SCREEN_TYPE: screenType,
   });
 };

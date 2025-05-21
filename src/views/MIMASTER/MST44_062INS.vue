@@ -88,7 +88,7 @@
         </div>
               <!-- 그리드 영역 -->
         <div class="ml-10 mt-5 w-full h-full">
-          <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="4" :reload="reload"
+          <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="4" :reload="reload"       :checkRenderEditable="true"
             :rowData="rowData3" :showGrid="showGrid" :showCheckBar="false" @selcetedrowData="selcetedrowData" :rowStateeditable="false"
             :activeSearchSpecial="true" :searchSpecialColId="searchSpecialColId"  :searchSpecialCond="searchSpecialCond"
             :searchWord3="searchword1" :searchColId="'lngCode,strName'" :searchColId3="['mainCode','subCode']" :searchValue="[forsearchMain,forsearchSub]"

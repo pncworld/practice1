@@ -21,6 +21,19 @@ export function formatLocalDate2(date) {
   const day = String(d.getDate()).padStart(2, "0");
   return `${year}-${month}-${day} (${weekday})`;
 }
+
+export function formatLocalDate3(date) {
+  if (!date) return "";
+
+  const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
+  const weekday = weekDays[date.getDay()];
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}년 ${month}월 ${day}일  ${weekday}요일`;
+}
+
 export function formatDateTime(date) {
   const options = {
     timeZone: "Asia/Seoul", // 한국 시간대 설정

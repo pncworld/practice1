@@ -10,6 +10,7 @@ import miattendRouter from "./miattendRouter";
 import mobileRouter from "./mobileRouter";
 import salesRouter from "./salesRouter";
 import systemRouter from "./systemRouter";
+import micrmRouter from "./micrmRouter";
 
 const isMobile = () => {
   const userAgent = window.navigator.userAgent;
@@ -40,6 +41,11 @@ const routes = [
     path: "/MIATTEND",
     //component : BasicLayout ,
     children: miattendRouter(),
+  },
+  {
+    path: "/MICRM",
+    //component : BasicLayout ,
+    children: micrmRouter(),
   },
   {
     path: "/m",

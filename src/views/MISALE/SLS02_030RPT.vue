@@ -26,7 +26,7 @@ Author : 권맑음                     
           :closePopUp="closePopUp"
           ref="datepicker"
           @excelDate="excelDate"
-          :initToday="'Y'"></Datepicker2>
+          :initToday="1"></Datepicker2>
         <div
           class="flex justify-start items-center text-base text-nowrap font-semibold ml-48">
           구분 :

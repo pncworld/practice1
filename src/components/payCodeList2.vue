@@ -1,17 +1,12 @@
 <template>
   <div class="flex justify-center items-center space-x-3">
-    <div class="text-base font-semibold">지불코드 :</div>
-    <!-- <select name="" id="" class="font-thin w-44 h-10 rounded-lg border ml-1 pl-1 " @change="changePayCd" v-model="selectedPayCd">
-        <option value="0">전체</option>
-        <option :value="i.lngCode" v-for="i in payCodeList" >{{ i.strName }}</option>
-     </select> -->
-
+    <div class="text-base font-semibold text-nowrap">결제코드 :</div>
     <v-select
       v-model="selectedPayCd"
       :options="payCodeList"
       label="strName"
       placeholder="전체"
-      class="!w-48 !h-7 -mt-3 custom-select"
+      class="!w-48 !h-7 mt-3 custom-select5 !pr-20"
       :reduce="(store) => (store != null ? store.lngCode : null)"
       clearable="true"
       @click="clickPayCd" />
@@ -19,7 +14,7 @@
 </template>
 
 <script setup>
-import { getpayCodeList } from "@/api/misales";
+import { getpayCodeList, getpayCodeList3 } from "@/api/misales";
 import store from "@/store";
 import { onMounted, ref, watch } from "vue";
 const props = defineProps({
@@ -42,15 +37,16 @@ const selectedPayCd = ref(null);
 onMounted(async () => {
   emit("payNm", "전체");
 
-  const res = await getpayCodeList(store.state.userData.lngStoreGroup, 0);
+  const res = await getpayCodeList3(store.state.userData.lngStoreGroup, 0);
   // console.log(res);
-  payCodeList.value = res.data.PAYCDLIST;
+  payCodeList.value = res.data.List;
+  console.log(payCodeList.value);
 });
 watch(
   () => props.storeCd,
   async () => {
-    const res = await getpayCodeList(props.groupCd, props.storeCd);
-    payCodeList.value = res.data.PAYCDLIST;
+    const res = await getpayCodeList3(props.groupCd, props.storeCd);
+    payCodeList.value = res.data.List;
     console.log(res);
     ////comsole.log(res)
   }

@@ -147,6 +147,26 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
   margin-right: 5px;
   margin-top: 1px;
 }
+.button.sms {
+  background-color: #5782FF;
+  color: #fff;
+  width: 120px;
+  white-space: nowrap; 
+  display: flex;
+  border-radius: 5px;
+  justify-content: center;
+}
+
+
+.button.sms:before {
+  content: "";
+  width: 35px;
+  height: 24px;
+  background: url(../assets/envelope-regular.svg) no-repeat;
+  color: #fff;
+  margin-right: 5px;
+  margin-top: 1px;
+}
 
 .button.search:disabled {
   background-color: #dddddd;
@@ -283,8 +303,9 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
 }
 .custom-select5 .vs__dropdown-menu {
   height: auto !important; 
+
   max-width: 272px !important;
-  margin-left: 50px !important;
+  margin-left : 10px !important;
   margin-top: -10px !important;
   
 }

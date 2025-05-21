@@ -122,7 +122,7 @@ const emitStoreType = (value) => {
 onMounted(() => {
   defaultPlaceHolder.value = props.placeholderName;
   selectedGroup.value = store.state.storeGroup[0].lngStoreGroup;
-
+  console.log(storeCd.value);
   if (
     store.state.userData.blnBrandAdmin == "True" ||
     store.state.userData.lngPositionType == "1"
@@ -138,6 +138,7 @@ onMounted(() => {
     disabled1.value = true;
     emit("lngStoreGroup", store.state.userData.lngStoreGroup);
     emit("lngStoreCodes", store.state.userData.lngPosition);
+    emit("lngStoreCode", store.state.userData.lngPosition);
     emit("lngStoreAttrs", store.state.userData.lngJoinType);
     emit("excelStore", "매장명 : " + store.state.userData.strStoreName);
     selectedStoreType.value = store.state.userData.lngJoinType;
@@ -262,7 +263,7 @@ const resetSelectedStore = (e) => {
   height: 100% !important;
 
   min-width: 110% !important;
-  padding-top: 14px !important; /* 텍스트를 좀 더 아래로 이동 */
+  padding-top: 25px !important; /* 텍스트를 좀 더 아래로 이동 */
 
   overflow: hidden !important;
 }

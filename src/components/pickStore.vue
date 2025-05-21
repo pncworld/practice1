@@ -1,6 +1,8 @@
 <template>
   <div class="flex justify-center md:justify-end space-x-4 text-sm mr-5">
-    <div class="items-center font-bold hidden md:flex pl-12">매장명 :</div>
+    <div class="items-center font-bold hidden md:flex pl-12 text-nowrap">
+      매장명 :
+    </div>
     <div v-show="hideit2">
       <select
         :disabled="isDisabled"
@@ -101,6 +103,12 @@
           {{ item.strDName }}
         </option>
       </select>
+      <button
+        v-if="showMakeScreen"
+        class="whitebutton bg-white border border-black ml-5"
+        @click="makeNewScreen">
+        새화면
+      </button>
     </div>
     <div class="" v-if="showKioskNo">
       <span class="font-bold text-sm"> KIOSK번호 : &nbsp;</span>
@@ -165,7 +173,6 @@ const selectedStoreType = ref(store.state.userData.lngJoinType);
 const selectedStoreCode = ref(store.state.userData.lngPosition);
 const isDisabled1 = ref(false);
 const isDisabled = ref(false);
-const hideit2 = ref(true);
 
 const userData = store.state.userData;
 
@@ -203,15 +210,29 @@ const props = defineProps({
     type: String,
     default: "선택",
   },
+  showMakeScreen: {
+    type: Boolean,
+    default: false,
+  },
+  renew: {
+    type: Boolean,
+    default: false,
+  },
+  hideGroup: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const hideit = ref(props.hidesub);
+const hideit2 = ref(props.hideGroup);
 const hideit3 = ref(props.hideAttr);
 const showAreaCd = ref(props.showAreaCd);
 const showPosNo = ref(props.showPosNo);
 const showScreenNo = ref(props.showScreenNo);
 const showKioskNo = ref(props.showKioskNo);
 const showPayType = ref(props.showPayType);
+const showMakeScreen = ref(props.showMakeScreen);
 const defaultStoreNm = ref("선택");
 watch(
   () => props.hidesub,
@@ -249,6 +270,7 @@ const emit = defineEmits([
   "screenNo",
   "kioskNo",
   "updatePaymentType",
+  "makeNewScreen",
 ]);
 const emitStoreGroup = (value) => {
   emit("update:storeGroup", value);
@@ -258,6 +280,35 @@ const emitStoreAreaCd = (value) => {
   emit("update:storeAreaCd", value);
 };
 
+const newscreen = ref(false);
+const useMakeScreen = ref(false);
+const makeNewScreen = () => {
+  if (useMakeScreen.value == false) {
+    const maxStrDCode = Math.max(
+      ...ScreenList.value.map((item) => Number(item.strDCode))
+    );
+    const newScreen = {
+      strMCode: 86,
+      strLanguage: "01",
+      strDCode: maxStrDCode + 1,
+      strDName: "화면" + (maxStrDCode + 1),
+    };
+
+    // console.log(ScreenList.value);
+    ScreenList.value.push(newScreen);
+    selectedScreenNo.value = maxStrDCode + 1;
+    //newscreen.value = !newscreen.value;
+    emit("screenNo", selectedScreenNo.value);
+    useMakeScreen.value = true;
+  }
+};
+
+watch(
+  () => props.renew,
+  () => {
+    useMakeScreen.value = false;
+  }
+);
 watch(
   () => store.state.storeCd,
   () => {

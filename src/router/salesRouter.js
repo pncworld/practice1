@@ -40,224 +40,187 @@ import SLS01_056RPT from "@/views/MISALE/SLS01_056RPT.vue";
 import SLS01_057RPT from "@/views/MISALE/SLS01_057RPT.vue";
 import SLS02_023RPT from "@/views/MISALE/SLS02_023RPT.vue";
 import SLS01_001INS from "@/views/MISALE/SLS01_001INS.vue";
+import SLS02_031RPT from "@/views/MISALE/SLS02_031RPT.vue";
+import SLS07_006INS from "@/views/MISALE/SLS07_006INS.vue";
 
 export default function salesRouter() {
-    return [
-      {
-        path : "SLS02_011RPT.xml",
-        component : SLS02_011RPT
-      } 
-  
-      ,
-      {
-        path : "SLS02_021RPT.xml",
-        component : SLS02_021RPT
-      }
-      ,
-      {
-        path : "SLS02_030RPT.xml",
-        component : SLS02_030RPT
-      }
-      ,
-      {
-        path : "SLS02_014RPT.xml",
-        component : SLS02_014RPT
-      }
-      ,
-      {
-        path : "SLS04_002RPT.xml",
-        component : SLS04_002RPT
-      }
-      ,
-      {
-        path : "SLS04_003RPT.xml",
-        component : SLS04_003RPT
-      }
-      ,
-      {
-        path : "SLS05_002RPT.xml",
-        component : SLS05_002RPT
-      }
-      ,
-      {
-        path : "SLS06_002RPT.xml",
-        component : SLS06_002RPT
-      }
-      ,
-      {
-        path : "SLS06_004RPT.xml",
-        component : SLS06_004RPT
-      }
-      ,
-      {
-        path : "SLS05_004RPT.xml",
-        component : SLS05_004RPT
-      }
-      ,
-      {
-        path : "SLS06_001RPT.xml",
-        component : SLS06_001RPT
-      }
-      ,
-      {
-        path : "SLS04_004RPT.xml",
-        component : SLS04_004RPT
-      }
-      ,
-      {
-        path : "SLS06_005RPT.xml",
-        component : SLS06_005RPT
-      }
-      ,
-      {
-        path : "SLS02_017RPT.xml",
-        component : SLS02_017RPT
-      }
-      ,
-      {
-        path : "SLS02_028RPT.xml",
-        component : SLS02_028RPT
-      }
-      ,
-      {
-        path : "SLS06_003RPT.xml",
-        component : SLS06_003RPT
-      }
-      ,
-      {
-        path : "SLS08_001RPT.xml",
-        component : SLS08_001RPT
-      }
-      ,
-      {
-        path : "SLS08_002RPT.xml",
-        component : SLS08_002RPT
-      }
-      ,
-      {
-        path : "SLS08_003RPT.xml",
-        component : SLS08_003RPT
-      }
-      ,
-      {
-        path : "SLS08_004RPT.xml",
-        component : SLS08_004RPT
-      }
-      ,
-      {
-        path : "SLS08_005RPT.xml",
-        component : SLS08_005RPT
-      }
-      ,
-      {
-        path : "SLS11_007RPT.xml",
-        component : SLS11_007RPT
-      }
-      ,
-      {
-        path : "SLS11_006RPT.xml",
-        component : SLS11_006RPT
-      }
-      ,
-      {
-        path : "SLS11_013RPT.xml",
-        component : SLS11_013RPT
-      }
-      ,
-      {
-        path : "SLS11_009RPT.xml",
-        component : SLS11_009RPT
-      }
-      ,
-      {
-        path : "SLS11_012RPT.xml",
-        component : SLS11_012RPT
-      }
-      ,
-      {
-        path : "SLS11_014RPT.xml",
-        component : SLS11_014RPT
-      }
-      ,
-      {
-        path : "SLS11_004RPT.xml",
-        component : SLS11_004RPT
-      }
-      ,
-      {
-        path : "SLS11_008RPT.xml",
-        component : SLS11_008RPT
-      }
-      ,
-      {
-        path : "SLS12_011RPT.xml",
-        component : SLS12_011RPT
-      }
-      ,
-      {
-        path : "SLS12_019RPT.xml",
-        component : SLS12_019RPT
-      }
-      ,
-      {
-        path : "SLS14_032RPT.xml",
-        component : SLS14_032RPT
-      }
-      ,
-      {
-        path : "SLS01_091RPT.xml",
-        component : SLS01_091RPT
-      }
-      ,
-      {
-        path : "SLS01_092RPT.xml",
-        component : SLS01_092RPT
-      }
-      ,
-      {
-        path : "SLS02_006RPT.xml",
-        component : SLS02_006RPT
-      }
-      ,
-      {
-        path : "SLS02_022RPT.xml",
-        component : SLS02_022RPT
-      }
-      ,
-      {
-        path : "SLS01_093RPT.xml",
-        component : SLS01_093RPT
-      }
-      ,
-      {
-        path : "SLS01_055RPT.xml",
-        component : SLS01_055RPT
-      }
-      ,
-      {
-        path : "SLS01_056RPT.xml",
-        component : SLS01_056RPT
-      }
-      ,
-      {
-        path : "SLS01_057RPT.xml",
-        component : SLS01_057RPT
-      }
-      ,
-      {
-        path : "SLS02_023RPT.xml",
-        component : SLS02_023RPT
-      }
-      ,
-      {
-        path : "SLS01_001INS.xml",
-        component : SLS01_001INS
-      }
+  return [
+    {
+      path: "SLS02_011RPT.xml",
+      component: SLS02_011RPT,
+    },
 
-      
-    
-      
-
-    ];
-  }
-  
+    {
+      path: "SLS02_021RPT.xml",
+      component: SLS02_021RPT,
+    },
+    {
+      path: "SLS02_030RPT.xml",
+      component: SLS02_030RPT,
+    },
+    {
+      path: "SLS02_014RPT.xml",
+      component: SLS02_014RPT,
+    },
+    {
+      path: "SLS04_002RPT.xml",
+      component: SLS04_002RPT,
+    },
+    {
+      path: "SLS04_003RPT.xml",
+      component: SLS04_003RPT,
+    },
+    {
+      path: "SLS05_002RPT.xml",
+      component: SLS05_002RPT,
+    },
+    {
+      path: "SLS06_002RPT.xml",
+      component: SLS06_002RPT,
+    },
+    {
+      path: "SLS06_004RPT.xml",
+      component: SLS06_004RPT,
+    },
+    {
+      path: "SLS05_004RPT.xml",
+      component: SLS05_004RPT,
+    },
+    {
+      path: "SLS06_001RPT.xml",
+      component: SLS06_001RPT,
+    },
+    {
+      path: "SLS04_004RPT.xml",
+      component: SLS04_004RPT,
+    },
+    {
+      path: "SLS06_005RPT.xml",
+      component: SLS06_005RPT,
+    },
+    {
+      path: "SLS02_017RPT.xml",
+      component: SLS02_017RPT,
+    },
+    {
+      path: "SLS02_028RPT.xml",
+      component: SLS02_028RPT,
+    },
+    {
+      path: "SLS06_003RPT.xml",
+      component: SLS06_003RPT,
+    },
+    {
+      path: "SLS08_001RPT.xml",
+      component: SLS08_001RPT,
+    },
+    {
+      path: "SLS08_002RPT.xml",
+      component: SLS08_002RPT,
+    },
+    {
+      path: "SLS08_003RPT.xml",
+      component: SLS08_003RPT,
+    },
+    {
+      path: "SLS08_004RPT.xml",
+      component: SLS08_004RPT,
+    },
+    {
+      path: "SLS08_005RPT.xml",
+      component: SLS08_005RPT,
+    },
+    {
+      path: "SLS11_007RPT.xml",
+      component: SLS11_007RPT,
+    },
+    {
+      path: "SLS11_006RPT.xml",
+      component: SLS11_006RPT,
+    },
+    {
+      path: "SLS11_013RPT.xml",
+      component: SLS11_013RPT,
+    },
+    {
+      path: "SLS11_009RPT.xml",
+      component: SLS11_009RPT,
+    },
+    {
+      path: "SLS11_012RPT.xml",
+      component: SLS11_012RPT,
+    },
+    {
+      path: "SLS11_014RPT.xml",
+      component: SLS11_014RPT,
+    },
+    {
+      path: "SLS11_004RPT.xml",
+      component: SLS11_004RPT,
+    },
+    {
+      path: "SLS11_008RPT.xml",
+      component: SLS11_008RPT,
+    },
+    {
+      path: "SLS12_011RPT.xml",
+      component: SLS12_011RPT,
+    },
+    {
+      path: "SLS12_019RPT.xml",
+      component: SLS12_019RPT,
+    },
+    {
+      path: "SLS14_032RPT.xml",
+      component: SLS14_032RPT,
+    },
+    {
+      path: "SLS01_091RPT.xml",
+      component: SLS01_091RPT,
+    },
+    {
+      path: "SLS01_092RPT.xml",
+      component: SLS01_092RPT,
+    },
+    {
+      path: "SLS02_006RPT.xml",
+      component: SLS02_006RPT,
+    },
+    {
+      path: "SLS02_022RPT.xml",
+      component: SLS02_022RPT,
+    },
+    {
+      path: "SLS01_093RPT.xml",
+      component: SLS01_093RPT,
+    },
+    {
+      path: "SLS01_055RPT.xml",
+      component: SLS01_055RPT,
+    },
+    {
+      path: "SLS01_056RPT.xml",
+      component: SLS01_056RPT,
+    },
+    {
+      path: "SLS01_057RPT.xml",
+      component: SLS01_057RPT,
+    },
+    {
+      path: "SLS02_023RPT.xml",
+      component: SLS02_023RPT,
+    },
+    {
+      path: "SLS01_001INS.xml",
+      component: SLS01_001INS,
+    },
+    {
+      path: "SLS02_031RPT.xml",
+      component: SLS02_031RPT,
+    },
+    {
+      path: "SLS07_006INS.xml",
+      component: SLS07_006INS,
+    },
+  ];
+}

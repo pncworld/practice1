@@ -86,6 +86,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  initMonth2: {
+    type: Boolean,
+    default: false,
+  },
 });
 const hideEndDates = ref(props.hideEndDate);
 const FirstName = ref(props.firstName);
@@ -119,7 +123,10 @@ watch(
     emit("startYear", startyear.value);
     emit("startMonth", startmonth.value);
 
-    emit("excelDate", "해당월 : " + startyear.value + "-" + startmonth.value);
+    emit(
+      "excelDate",
+      FirstName.value + " : " + startyear.value + "-" + startmonth.value
+    );
   }
 );
 watch(
@@ -141,7 +148,10 @@ watch(
     emit("startYear", startyear.value);
     emit("startMonth", startmonth.value);
 
-    emit("excelDate", "해당월 : " + startyear.value + "-" + startmonth.value);
+    emit(
+      "excelDate",
+      FirstName.value + " : " + startyear.value + "-" + startmonth.value
+    );
   }
 );
 onMounted(() => {
@@ -154,7 +164,7 @@ onMounted(() => {
 
   startyear.value = lastMonth.getFullYear();
   endyear.value = currentYear;
-  startmonth.value = lastMonth.getMonth() + 1;
+  startmonth.value = lastMonth.getMonth() + (props.initMonth2 == true ? 2 : 1);
   endmonth.value = currentMonth;
   for (let i = currentYear - 8; i <= currentYear + 5; i++) {
     settingYears.value.push(i);
@@ -178,7 +188,8 @@ onMounted(() => {
   tempEndDateStack.push(endDate);
   emit(
     "excelDate",
-    "해당월 : " +
+    FirstName.value +
+      " : " +
       currentYear +
       "-" +
       currentMonth +
@@ -261,7 +272,8 @@ watch(endmonth, () => {
     emit("endMonth", endmonth.value);
     emit(
       "excelDate",
-      "해당월 : " +
+      FirstName.value +
+        " : " +
         startyear.value +
         "-" +
         startmonth.value +
@@ -320,7 +332,8 @@ watch(endmonth, () => {
   emit("endMonth", endmonth.value);
   emit(
     "excelDate",
-    "해당월 : " +
+    FirstName.value +
+      " : " +
       startyear.value +
       "-" +
       startmonth.value +
@@ -366,7 +379,8 @@ watch(endyear, () => {
     emit("endYear", endyear.value);
     emit(
       "excelDate",
-      "해당월 : " +
+      FirstName.value +
+        " : " +
         startyear.value +
         "-" +
         startmonth.value +
@@ -425,7 +439,8 @@ watch(endyear, () => {
   emit("endYear", endyear.value);
   emit(
     "excelDate",
-    "해당월 : " +
+    FirstName.value +
+      " : " +
       startyear.value +
       "-" +
       startmonth.value +
@@ -472,7 +487,8 @@ watch(startmonth, () => {
     emit("startMonth", startmonth.value);
     emit(
       "excelDate",
-      "해당월 : " +
+      FirstName.value +
+        " : " +
         startyear.value +
         "-" +
         startmonth.value +
@@ -531,7 +547,8 @@ watch(startmonth, () => {
   emit("startMonth", startmonth.value);
   emit(
     "excelDate",
-    "해당월 : " +
+    FirstName.value +
+      " : " +
       startyear.value +
       "-" +
       startmonth.value +
@@ -548,7 +565,8 @@ watch(startyear, () => {
     emit("startYear", startyear.value);
     emit(
       "excelDate",
-      "해당월 : " +
+      FirstName.value +
+        " : " +
         startyear.value +
         "-" +
         startmonth.value +
@@ -608,7 +626,8 @@ watch(startyear, () => {
   emit("startYear", startyear.value);
   emit(
     "excelDate",
-    "해당월 : " +
+    FirstName.value +
+      " : " +
       startyear.value +
       "-" +
       startmonth.value +

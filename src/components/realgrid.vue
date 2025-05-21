@@ -799,9 +799,15 @@ const props = defineProps({
     default: false,
   },
   suffixColumnwon: {
-    // 체크바 관련 변수
+    // 그리드 안에 원 붙일때 사용
+
     type: Array,
     default: [],
+  },
+  checkRenderEditable: {
+    // 체크바 수정 관련 변수
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -1138,7 +1144,7 @@ const funcshowGrid = async () => {
           : item.strColType.includes("dropdown")
           ? "list"
           : "text",
-      editable: false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
+      editable: props.checkRenderEditable == true ? true : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
     },
     buttonVisibility: "always",
     styleCallback: function (grid, dataCell) {
@@ -1491,7 +1497,8 @@ const funcshowGrid = async () => {
   gridView.setCheckBar({ visible: props.showCheckBar });
   //gridView.displayOptions.fitStyle = "even";
   gridView.sortingOptions.enabled = true;
-  gridView.editOptions.editable = false;
+  gridView.editOptions.editable =
+    props.checkRenderEditable == true ? true : false;
   gridView.editOptions.updatable = true;
   gridView.editOptions.deletable = true;
   gridView.displayOptions.fitStyle =
@@ -1568,12 +1575,14 @@ const funcshowGrid = async () => {
         return true;
       },
     });
+
     gridView.groupBy(props.setGroupColumnId.split(","));
+
     if (props.setGroupOrderByColumnId != "") {
       //comsole.log(props.setGroupColumnId);
       if (gridView) {
         //comsole.log(props.setGroupOrderByColumnId);
-        //gridView.orderBy(props.setGroupOrderByColumnId.split(","));
+        gridView.orderBy(props.setGroupOrderByColumnId.split(","));
       }
     }
   }
@@ -1727,6 +1736,7 @@ const funcshowGrid = async () => {
 
       selectedRowData.value = dataProvider.getRows()[clickData.dataRow];
 
+      console.log(gridView.isCheckedRow(clickData.itemIndex));
       if (gridView.isCheckedRow(clickData.itemIndex)) {
         if (props.hideCheckBarList == false) {
           grid.checkItem(clickData.itemIndex, false);
