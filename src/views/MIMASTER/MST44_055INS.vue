@@ -642,6 +642,9 @@ const onMove2 = (evt) => {
 
 const onEnd = (evt) => {
   // Swap을 처리할 조건
+  if (targetItemIndex2 == undefined) {
+    targetItemIndex2 = evt.oldIndex;
+  }
   let oldIndex = evt.oldIndex;
   if (changeMode.value === false) {
     if (changeGrid.value == false) {

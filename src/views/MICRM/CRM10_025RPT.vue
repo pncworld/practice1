@@ -1,7 +1,7 @@
 /*--############################################################################
-# Filename : CRM10_021RPT.vue                                                  
-# Description : 고객관리 > 고객 예약 관리 > 예약변경내역.                      
-# Date :2025-05-21                                                             
+# Filename : CRM10_025RPT.vue                                                  
+# Description : 고객관리 > 고객 예약 관리 > 예약고객명단.                      
+# Date :2025-05-22                                                              
 # Author : 권맑음                     
 ################################################################################*/
 <template>
@@ -19,24 +19,40 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-4 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10">
+      class="grid grid-cols-5 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10">
       <div>
         <PickStore
+          class="!-mr-4"
           :hideGroup="false"
           :hideAttr="false"
           @update:storeCd="lngStoreCode"
           @update:storeGroup="lngStoreGroup"
-          @storeNm="excelStore">
+          @storeNm="excelStore"
+          :defaultStoreNm="'전체'">
         </PickStore>
       </div>
-      <div>
+      <div class="w-[80%] ml-5">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
           @excelDate="excelDate"
           :initToday="1"
-          :mainName="'접수일'"
-          class="!w-[400px] !pr-12"></Datepicker2>
+          :mainName="'예약일'"
+          class="!w-[350px] !pr-0 !ml-5"></Datepicker2>
+      </div>
+      <div class="flex ml-48 space-x-1">
+        <div class="text-base font-semibold text-nowrap">상태 :</div>
+        <div>
+          <select name="" id="" class="w-32" v-model="status">
+            <option value="99">전체</option>
+            <option value="0">예약</option>
+            <option value="1">방문</option>
+            <option value="2">대기</option>
+            <option value="3">입장</option>
+            <option value="4">취소</option>
+            <option value="5">NO SHOW</option>
+          </select>
+        </div>
       </div>
       <div class="flex ml-20">
         <div class="text-base font-semibold">고객명 :</div>
@@ -52,12 +68,12 @@
     <!-- 그리드 영역 -->
     <div class="w-full h-[75%]">
       <Realgrid
-        :progname="'CRM10_021RPT_VUE'"
+        :progname="'CRM10_025RPT_VUE'"
         :progid="1"
         :rowData="rowData"
         :reload="reload"
         :setStateBar="false"
-        :documentTitle="'CRM10_021RPT'"
+        :documentTitle="'CRM10_025RPT'"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :exporttoExcel="exportExcel">
@@ -68,7 +84,12 @@
 </template>
 
 <script setup>
-import { getBelongCustList, getReservedChangeHistory } from "@/api/micrm";
+import {
+  getBelongCustList,
+  getReservedChangeHistory,
+  getReservedCustomorSearch,
+  getReservedSearch,
+} from "@/api/micrm";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -123,7 +144,7 @@ const afterSearch = ref(false);
 const cond = ref("");
 const cond2 = ref("");
 const store = useStore();
-
+const status = ref(99);
 const datepicker = ref(null);
 const closePopUp = ref(false);
 const custId = ref("");
@@ -161,27 +182,29 @@ const handleParentClick = (e) => {
  */
 
 const searchButton = async () => {
-  if (selectedStores.value == 0) {
-    Swal.fire({
-      title: "경고",
-      text: "매장명을 먼저 선택하세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
+  // if (selectedStores.value == 0) {
+  //   Swal.fire({
+  //     title: "경고",
+  //     text: "매장명을 먼저 선택하세요.",
+  //     icon: "warning",
+  //     confirmButtonText: "확인",
+  //   });
+  //   return;
+  // }
   try {
     store.state.loading = true;
     initGrid();
 
-    const res = await getReservedChangeHistory(
+    const res = await getReservedCustomorSearch(
       selectedGroup.value,
       selectedStores.value,
       startdate.value,
       enddate.value,
+      status.value,
       cond.value,
       cond2.value
     );
+    console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;

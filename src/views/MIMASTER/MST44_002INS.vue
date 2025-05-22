@@ -546,6 +546,9 @@ const onMove = (evt) => {
 
 const onEnd = (evt) => {
   // Swap을 처리할 조건
+  if (targetItemIndex2 == undefined) {
+    targetItemIndex2 = evt.oldIndex;
+  }
   if (changeMode.value === false) {
     const oldIndex = evt.oldIndex; // 드래그된 아이템의 기존 인덱스
 

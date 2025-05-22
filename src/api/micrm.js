@@ -189,3 +189,59 @@ export const getReservedSearch = (
     COND2: cond2,
   });
 };
+export const getReservedSearchByDays = (
+  groupcd,
+  storecd,
+  startdate,
+  enddate
+) => {
+  return api2.post("/MICRM/CRM10_023RPT.asmx/getReservedSearchByDays", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    START_DATE: startdate,
+    END_DATE: enddate,
+  });
+};
+export const getReservedDetail = (groupcd, storecd, startdate, cond, cond2) => {
+  return api2.post("/MICRM/CRM10_024RPT.asmx/getReservedDetail", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    START_DATE: startdate,
+    COND: cond,
+    COND2: cond2,
+  });
+};
+export const getReservedDetail2 = (
+  groupcd,
+  storecd,
+  startdate,
+  cond,
+  cond2
+) => {
+  return api2.post("/MICRM/CRM10_024RPT.asmx/getReservedDetail2", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    START_DATE: startdate,
+    COND: cond,
+    COND2: cond2,
+  });
+};
+export const getReservedCustomorSearch = (
+  groupcd,
+  storecd,
+  startdate,
+  enddate,
+  status,
+  cond,
+  cond2
+) => {
+  return api2.post("/MICRM/CRM10_025RPT.asmx/getReservedCustomorSearch", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    START_DATE: startdate,
+    END_DATE: enddate,
+    STATUS: status,
+    COND: cond,
+    COND2: cond2,
+  });
+};

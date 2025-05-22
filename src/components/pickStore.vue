@@ -144,6 +144,65 @@
           :value="4" /><span class="font-bold">[2]지불</span>
       </label>
     </div>
+    <div class="flex justify-center items-center space-x-2" v-if="showFuncType">
+      <span class="font-bold text-sm">화면키 구분 : &nbsp;</span>
+
+      <label for="discount" class="flex justify-center items-center"
+        ><input
+          type="radio"
+          id="discount"
+          v-model="paymentType"
+          :value="3" /><span class="font-bold">[1]주문화면</span>
+      </label>
+      <label for="payment" class="flex justify-center items-center"
+        ><input
+          type="radio"
+          v-model="paymentType"
+          id="payment"
+          :value="4" /><span class="font-bold">[2]결제화면</span>
+      </label>
+    </div>
+
+    <div
+      v-if="showFuncScreen"
+      class="flex text-nowrap justify-center items-center space-x-2">
+      <div class="text-sm font-semibold">화면번호 :</div>
+      <select
+        name=""
+        id=""
+        class="w-40 border border-black rounded-lg h-8"
+        v-model="selectedFuncScreen"
+        @change="changeFunc">
+        <option value="0">선택</option>
+        <option value="1">테이블 화면</option>
+        <option value="2">선불에서 작업자 등록 화면</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">객층,객수 화면</option>
+        <option value="6">메뉴 등록 화면</option>
+        <option value="7">개별 계산 화면</option>
+        <option value="8">계산 화면</option>
+        <option value="9">주문 재발행 화면</option>
+        <option value="10">주문 취소 화면</option>
+        <option value="11">계량 화면</option>
+        <option value="12">Order Stop</option>
+      </select>
+    </div>
+
+    <div
+      v-if="showTime"
+      class="flex text-nowrap justify-center items-center space-x-2">
+      <select
+        name=""
+        id=""
+        class="w-20 border border-black rounded-lg h-10"
+        v-model="selectedTime"
+        @change="changeTime">
+        <option value="0">선택</option>
+        <option value="1">런치</option>
+        <option value="2">디너</option>
+      </select>
+    </div>
   </div>
 </template>
 
@@ -173,7 +232,15 @@ const selectedStoreType = ref(store.state.userData.lngJoinType);
 const selectedStoreCode = ref(store.state.userData.lngPosition);
 const isDisabled1 = ref(false);
 const isDisabled = ref(false);
-
+const selectedFuncScreen = ref(0);
+const changeFunc = (e) => {
+  selectedFuncScreen.value = e.target.value;
+  emit("updateFuncScreenType", selectedFuncScreen.value);
+};
+const changeTime = (e) => {
+  selectedTime.value = e.target.value;
+  emit("updateTime", selectedTime.value);
+};
 const userData = store.state.userData;
 
 const props = defineProps({
@@ -222,6 +289,18 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  showFuncType: {
+    type: Boolean,
+    default: false,
+  },
+  showFuncScreen: {
+    type: Boolean,
+    default: false,
+  },
+  showTime: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const hideit = ref(props.hidesub);
@@ -233,7 +312,12 @@ const showScreenNo = ref(props.showScreenNo);
 const showKioskNo = ref(props.showKioskNo);
 const showPayType = ref(props.showPayType);
 const showMakeScreen = ref(props.showMakeScreen);
+const showFuncType = ref(props.showFuncType);
+const showFuncScreen = ref(props.showFuncScreen);
 const defaultStoreNm = ref("선택");
+const showTime = ref(props.showTime);
+const selectedTime = ref(0);
+
 watch(
   () => props.hidesub,
   () => {
@@ -271,6 +355,8 @@ const emit = defineEmits([
   "kioskNo",
   "updatePaymentType",
   "makeNewScreen",
+  "updateFuncScreenType",
+  "updateTime",
 ]);
 const emitStoreGroup = (value) => {
   emit("update:storeGroup", value);
@@ -354,6 +440,7 @@ onMounted(() => {
   emit("update:storeCd", store.state.userData.lngPosition);
   emit("storeNm", store.state.userData.strStoreName);
   emit("posNo", 0);
+  emit("updateFuncScreenType", 0);
   //emit("update:storeAreaCd", 0);
   emit("GroupNm", store.state.userData.strStoreGroupName);
   setPosNo(store.state.userData.lngPosition);

@@ -1,7 +1,7 @@
 /*--############################################################################
-# Filename : CRM10_021RPT.vue                                                  
-# Description : 고객관리 > 고객 예약 관리 > 예약변경내역.                      
-# Date :2025-05-21                                                             
+# Filename : CRM10_023RPT.vue                                                  
+# Description : 고객관리 > 고객 예약 관리 > 일별 예약근황.                      
+# Date :2025-05-22                                                             
 # Author : 권맑음                     
 ################################################################################*/
 <template>
@@ -19,47 +19,43 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-4 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10">
+      class="grid grid-cols-5 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10">
       <div>
         <PickStore
+          class="!-mr-4"
           :hideGroup="false"
           :hideAttr="false"
           @update:storeCd="lngStoreCode"
           @update:storeGroup="lngStoreGroup"
-          @storeNm="excelStore">
+          @storeNm="excelStore"
+          :defaultStoreNm="'선택'">
         </PickStore>
       </div>
-      <div>
+      <div class="w-[80%] ml-5">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
           @excelDate="excelDate"
-          :initToday="1"
-          :mainName="'접수일'"
-          class="!w-[400px] !pr-12"></Datepicker2>
-      </div>
-      <div class="flex ml-20">
-        <div class="text-base font-semibold">고객명 :</div>
-        <div><input type="text" class="pl-1" v-model="cond" /></div>
-      </div>
-      <div class="flex">
-        <div class="text-base font-semibold">전화번호 :</div>
-        <div><input type="text" class="pl-1" v-model="cond2" /></div>
-        <div>(뒷4자리)</div>
+          :mainName="'예약일'"
+          class="!w-[350px] !pr-0 !ml-5"></Datepicker2>
       </div>
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
     <div class="w-full h-[75%]">
       <Realgrid
-        :progname="'CRM10_021RPT_VUE'"
+        :progname="'CRM10_023RPT_VUE'"
         :progid="1"
         :rowData="rowData"
         :reload="reload"
         :setStateBar="false"
-        :documentTitle="'CRM10_021RPT'"
+        :documentTitle="'CRM10_023RPT'"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
+        :mergeColumns2="true"
+        :mergeColumnGroupName2="mergeColumnGroupName2"
+        :mergeColumnGroupSubList2="mergeColumnGroupSubList2"
+        :setFooter="true"
         :exporttoExcel="exportExcel">
       </Realgrid>
     </div>
@@ -68,7 +64,12 @@
 </template>
 
 <script setup>
-import { getBelongCustList, getReservedChangeHistory } from "@/api/micrm";
+import {
+  getBelongCustList,
+  getReservedChangeHistory,
+  getReservedSearch,
+  getReservedSearchByDays,
+} from "@/api/micrm";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -119,22 +120,52 @@ onMounted(async () => {
 const reload = ref(false);
 const rowData = ref([]);
 const afterSearch = ref(false);
-
+const mergeColumnGroupName2 = ref([
+  "매장",
+  "런치1부",
+  "런치2부",
+  "디너1부",
+  "디너2부",
+]);
+const mergeColumnGroupSubList2 = ref([
+  ["strDate", "strDayOfTheWeek"],
+  [
+    "lngTime101",
+    "lngTime102",
+    "lngTime103",
+    "lngTime104",
+    "lngTime105",
+    "lngTime106",
+    "lngTime107",
+  ],
+  [
+    "lngTime201",
+    "lngTime202",
+    "lngTime2025",
+    "lngTime203",
+    "lngTime204",
+    "lngTime205",
+    "lngTime206",
+  ],
+  [
+    "lngTime301",
+    "lngTime302",
+    "lngTime303",
+    "lngTime304",
+    "lngTime305",
+    "lngTime306",
+    "lngTime307",
+    "lngTime308",
+    "lngTime309",
+  ],
+  ["lngTimeD2_1930", "lngTime401", "lngTime402"],
+]);
 const cond = ref("");
 const cond2 = ref("");
 const store = useStore();
-
+const status = ref(99);
 const datepicker = ref(null);
 const closePopUp = ref(false);
-const custId = ref("");
-const strSaleCustID = (e) => {
-  custId.value = e;
-  initGrid();
-};
-const custNm = ref("");
-const strSaleCustName = (e) => {
-  custNm.value = e;
-};
 
 const startdate = ref("");
 const startDate = (e) => {
@@ -174,14 +205,16 @@ const searchButton = async () => {
     store.state.loading = true;
     initGrid();
 
-    const res = await getReservedChangeHistory(
+    const sd = startdate.value.replaceAll("-", "");
+    const ed = enddate.value.replaceAll("-", "");
+    const res = await getReservedSearchByDays(
       selectedGroup.value,
       selectedStores.value,
-      startdate.value,
-      enddate.value,
-      cond.value,
-      cond2.value
+      sd,
+      ed
     );
+
+    console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;

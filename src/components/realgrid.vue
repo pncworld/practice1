@@ -809,6 +809,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  dynamicRowHeight: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
 });
 
 // 2구간
@@ -1112,7 +1117,9 @@ const funcshowGrid = async () => {
         ? "#,##0.00"
         : "#,##0.0",
     styleName:
-      item.strAlign == "left"
+      props.dynamicRowHeight == true
+        ? "realgrid-pre-wrap"
+        : item.strAlign == "left"
         ? "setTextAlignLeft"
         : item.strAlign == "center"
         ? "setTextAlignCenter"
@@ -1520,6 +1527,7 @@ const funcshowGrid = async () => {
     props.dragOn == true ? "block" : props.selectionStyle;
   // props.selectionStyle;deleteRow
   gridView.displayOptions.showTooltip = true;
+  gridView.displayOptions.rowHeight = props.dynamicRowHeight == true ? -1 : 1;
   gridView.groupPanel.visible = false;
   gridView.displayOptions.watchDisplayChange = false;
   gridView.filterMode = "explicit";
@@ -2842,5 +2850,10 @@ watch(
 .skyblue {
   background: #d0e9f5;
   text-align: right;
+}
+
+.realgrid-pre-wrap {
+  white-space: pre-wrap;
+  text-align: center;
 }
 </style>

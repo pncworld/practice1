@@ -876,6 +876,14 @@ export const getFuncKeys = (groupCd, storeCd, areaCd, posNo) => {
     POSNO: posNo,
   });
 };
+export const getFuncKeys2 = (groupCd, storeCd, areaCd, posNo) => {
+  return api2.post("/MIMASTER/MST44_059INS.asmx/getFuncKeys2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+    POSNO: posNo,
+  });
+};
 export const getCustomorList = (groupCd, storeCd, areaCd, posNo) => {
   return api2.post("/MIMASTER/MST44_002INS.asmx/getCustomorList", {
     GROUP_CD: groupCd,
@@ -1238,16 +1246,16 @@ export const saveAllFuncKey2 = (
   storeCd,
   areaCd,
   posNo,
-  lngDCodes,
-  lngDCodes2
+  screenNo,
+  lngDCodes
 ) => {
   return api2.post("/MIMASTER/MST44_059INS.asmx/saveAllFuncKey", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     AREA_CD: areaCd,
     POSNO: posNo,
+    SCREEN_NO: screenNo,
     LNGDCODES: lngDCodes,
-    LNGDCODES2: lngDCodes2,
   });
 };
 export const saveKDSList = (groupCd, kdsNo, kdsNm, id, deleteNo) => {

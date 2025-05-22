@@ -36,6 +36,7 @@
           @endDate="endDate"
           @startDate="startDate"
           @excelDate="excelDate"
+          :initToday="1"
           :mainName="'접수일'"
           class="!w-[350px] !pr-0 !ml-5"></Datepicker2>
       </div>

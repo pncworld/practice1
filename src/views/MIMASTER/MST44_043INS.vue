@@ -25,7 +25,7 @@ Author : 권맑음                     
       @update:storeCd="handleStoreCd"
       @posNo="handlePosNo"
       :showPosNo="true"
-      :showPayType="true"
+      :showFuncType="true"
       @storeNm="handlestoreNm"
       @update:ischanged="handleinitAll"
       @update:ischanged2="searchinit"
@@ -825,6 +825,9 @@ const onMove3 = (evt) => {
 const clickedMove = ref(false);
 const onEnd = (evt) => {
   // Swap을 처리할 조건
+  if (targetItemIndex2 == undefined) {
+    targetItemIndex2 = evt.oldIndex;
+  }
   if (changeMode.value === false) {
     const oldIndex = evt.oldIndex; // 드래그된 아이템의 기존 인덱스
     //comsole.log(subsubKeyList1.value);
@@ -859,6 +862,9 @@ const onEnd = (evt) => {
 const onEnd2 = (evt) => {
   // Swap을 처리할 조건
   //comsole.log(evt.oldIndex);
+  if (targetItemIndex2 == undefined) {
+    targetItemIndex2 = evt.oldIndex;
+  }
   if (
     evt.oldIndex == 12 ||
     evt.oldIndex == 13 ||
@@ -901,6 +907,10 @@ const onEnd2 = (evt) => {
   //comsole.log("subsubKeyList2:", subsubKeyList2.value);
 };
 const onEnd3 = (evt) => {
+  if (targetItemIndex2 == undefined) {
+    targetItemIndex2 = evt.oldIndex;
+  }
+
   if (
     evt.oldIndex == 12 ||
     evt.oldIndex == 13 ||

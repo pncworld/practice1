@@ -34,7 +34,7 @@
     <button class="contents_tab-button" :class="{ 'text-blue-600': currentMenu == 3 }" @click="showMenus(3)">영수증
       문구출력</button>
   </div>
-  <div class="flex h-[55vh] w-full mt-5">
+  <div class="flex h-[50vh] w-full mt-5">
     <div class="flex flex-col w-3/5 h-4/6">
       <div class="flex justify-between mt-0 ml-10  border-b  border-b-gray-300"
         :class="currentMenu == 1 ? 'w-full' : currentMenu == 3 ? 'w-[45vw]' : 'w-[54%]'">
@@ -99,7 +99,7 @@
               <!-- 그리드 영역 -->
       </div>
 
-      <div class="h-[55vh]" v-show="currentMenu == 3">
+      <div class="h-[50vh]" v-show="currentMenu == 3">
         <div class="h-[15vh] w-[45vw] ml-10 mt-5" v-show="currentMenu == 3">
           <div class="w-full h-full ">
                   <!-- 그리드 영역 -->
@@ -111,9 +111,9 @@
                 <!-- 그리드 영역 -->
         </div>
 
-        <div v-show="currentMenu == 3" class="mt-12 flex flex-col justify-start ml-10 h-[40vh] w-[45vw] rounded-lg ">
+        <div v-show="currentMenu == 3" class="mt-12 flex flex-col justify-start ml-10 h-[35vh] w-[45vw] rounded-lg ">
           <h1 class="text-xl font-bold flex justify-start">영수증 문구</h1>
-          <div class="grid grid-rows-[1fr,4fr] grid-cols-[2fr,9fr] h-[80%]">
+          <div class="grid grid-rows-[1fr,4fr] grid-cols-[2fr,9fr] h-[70%]">
             <div class="bg-gray-100 flex justify-center items-center rounded-tl-lg border border-gray-600">
               영수증 상단 문구
             </div>
@@ -170,13 +170,13 @@
       </div>
     </div>
 
-    <div class="w-[52%] h-[20%] ml-10 mt-48 flex flex-col justify-center" v-if="currentMenu == 3">
+    <div class="w-[52%] h-[20%] ml-10 mt-44 flex flex-col justify-center" v-if="currentMenu == 3">
       <div class="font-bold text-xl flex justify-start items-center">영수증 예시</div>
-      <div class="flex justify-center items-center h-[50vh] w-[20vw] bg-gray-100 ml-28 mt-10">
-        <div class="w-full h-[110%] bg-white p-5 border shadow-lg rounded-lg">
+      <div class="flex justify-center items-center h-[45vh] w-[20vw] bg-gray-100 ml-28 mt-10">
+        <div class="w-full h-[130%] bg-white p-5 border shadow-lg rounded-lg">
           <!-- 상단 수정 가능 영역 -->
           <div class="text-center space-y-2">
-            <input type="text" v-model="receiptU" class="flex justify-start w-full">
+            <input type="text" v-model="receiptU" class="flex justify-start w-full disabled:bg-white"  disabled>
             <div>선불 데모매장 0212345678</div>
             <div>주소상세주소</div>
             <div>111-11-11111</div>
@@ -236,11 +236,11 @@
 
             <div class="flex flex-col mt-2">
 
-              <input type="text" v-model="receiptD1">
-              <input type="text" v-model="receiptD2">
-              <input type="text" v-model="receiptD3">
-              <input type="text" v-model="receiptD4">
-              <input type="text" v-model="receiptD5">
+              <input type="text" v-model="receiptD1" disabled class="disabled:bg-white">
+              <input type="text" v-model="receiptD2"  disabled class="disabled:bg-white">
+              <input type="text" v-model="receiptD3"  disabled class="disabled:bg-white">
+              <input type="text" v-model="receiptD4"  disabled class="disabled:bg-white">
+              <input type="text" v-model="receiptD5"  disabled class="disabled:bg-white">
 
             </div>
           </div>
@@ -381,11 +381,12 @@ const searchSpecialColId = ref([])
 const searchSpecialCond = ref(false)
 watch(ischecked, () => {
   searchSpecialColId.value = [];
-  for (let i = 1; i <= rowData.value.length; i++) {
+  console.log(printNameList.value.length)
+  for (let i = 1; i <= printNameList.value.length; i++) {
     searchSpecialColId.value.push("checkbox" + i);
   }
   if (ischecked.value == true) {
-    //comsole.log(searchSpecialColId.value);
+   // console.log(searchSpecialColId.value);
 
     searchSpecialCond.value = false;
   } else {
@@ -502,6 +503,7 @@ const handleStoreCd = async (newValue) => {
   ischecked.value = false
 
   nowStoreCd.value = newValue;
+  searchButton()
   //comsole.log(nowStoreCd.value)
   reload.value = !reload.value
 }
@@ -774,7 +776,7 @@ const searchButton= async () => {
       afterSearch.value = true
     } else if (currentMenu.value == 2) {
       res = await getKitchenSettingList(groupCd.value, nowStoreCd.value)
-      //comsole.log(res)
+      console.log(res)
 
       SettingList.value = [...res.data.KITCHENMENU]
       MenuGroup.value = res.data.MAINGROUP
@@ -817,16 +819,11 @@ const searchButton= async () => {
   } finally {
       ischecked.value = false
 
-      const temp1 = forsearchMain.value
-      forsearchMain.value = '0'
-      setTimeout(() => {
-        forsearchMain.value = temp1
-      }, 1)
-      const temp2 = forsearchSub.value
-      forsearchSub.value = '0'
-      setTimeout(() => {
-        forsearchSub.value = temp2
-      }, 1)
+     
+      forsearchMain.value = '-1'
+  
+      forsearchSub.value = '-1'
+    
     
 
     store.state.loading = false; // 로딩 상태 종료

@@ -25,11 +25,11 @@
       @update:storeCd="handleStoreCd"
       @posNo="handlePosNo"
       :showPosNo="true"
-      :showPayType="true"
+      :showFuncScreen="true"
       @storeNm="handlestoreNm"
       @update:ischanged="handleinitAll"
       @update:ischanged2="searchinit"
-      @updatePaymentType="updatePaymentType"></PickStore>
+      @updateFuncScreenType="updateFuncScreenType"></PickStore>
   </div>
   <!-- 조회 조건 -->
   <!-- 팝업 및 그리드 영역 -->
@@ -210,6 +210,7 @@
           <VueDraggableNext
             v-model="subsubKeyList1"
             :move="onMove"
+            @choose="onChoose"
             @end="onEnd"
             animation="200"
             class="grid grid-cols-5 grid-rows-1 mt-8 ml-6 w-[87%] h-[50%] gap-1">
@@ -239,7 +240,7 @@
         </div>
 
         <div
-          v-show="showOtherKeys == false"
+          v-show="showOtherKeys == false && showFuncKeySettings"
           class="flex flex-col mt-4 w-11/12 h-5/6">
           <h1 class="font-bold text-xl ml-20 w-auto flex justify-start">
             기능 선택키 설정
@@ -280,7 +281,7 @@
         </div>
       </div>
 
-      <div
+      <!-- <div
         v-if="showOtherKeys == true"
         class="grid grid-rows-[1fr,4fr] grid-cols-1 mt-5 w-full h-[80%] z-20">
         <div
@@ -357,7 +358,7 @@
             </VueDraggableNext>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
   <!-- 드래그 영역 -->
@@ -368,6 +369,7 @@ import {
   getAllScreenList,
   getFuncKeyList,
   getFuncKeys,
+  getFuncKeys2,
   saveAllFuncKey2,
 } from "@/api/master";
 /**
@@ -596,9 +598,20 @@ const searchButton = async () => {
     });
     return;
   }
+  if (currScreenNo.value == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "화면번호를 선택하세요.",
+      icon: "warning",
+      showCancelButton: false,
+      confirmButtonColor: "#3085d6",
+      allowOutsideClick: false,
+    });
+    return;
+  }
   store.state.loading = true;
   try {
-    const res4 = await getFuncKeys(
+    const res4 = await getFuncKeys2(
       groupCd.value,
       nowStoreCd.value,
       nowStoreAreaCd.value,
@@ -606,7 +619,7 @@ const searchButton = async () => {
     );
     KeyList.value = res4.data.FuncKeys;
 
-    //comsole.log(KeyList.value);
+    console.log(res4);
     const res2 = await getAllScreenList(
       groupCd.value,
       nowStoreCd.value,
@@ -622,65 +635,45 @@ const searchButton = async () => {
     afterSearch.value = false;
   } finally {
     //comsole.log(KeyList.value);
-    if (
-      KeyList.value == null ||
-      KeyList.value == {} ||
-      KeyList.value.length == 0
-    ) {
-      KeyList.value = [
-        {
-          intKeySeq: 1,
-          lngKeyNo1: 0,
-          lngKeyNo2: 0,
-          lngKeyNo3: 0,
-          lngKeyNo4: 0,
-          lngKeyNo5: 0,
-          lngKeyNo6: 0,
-          lngKeyNo7: 0,
-          lngKeyNo8: 0,
-          lngKeyNo9: 0,
-          lngKeyNo10: 0,
-          lngKeyNo11: 0,
-          lngKeyNo12: 0,
-          lngKeyNo13: 0,
-          lngKeyNo14: 0,
-          lngKeyNo15: 0,
-          lngKeyNo16: 0,
-          lngKeyNo17: 0,
-          lngKeyNo18: 0,
-          lngKeyNo19: 0,
-        },
-        {
-          intKeySeq: 8,
-          lngKeyNo1: 0,
-          lngKeyNo2: 0,
-          lngKeyNo3: 0,
-          lngKeyNo4: 0,
-          lngKeyNo5: 0,
-          lngKeyNo6: 0,
-          lngKeyNo7: 0,
-          lngKeyNo8: 0,
-          lngKeyNo9: 0,
-          lngKeyNo10: 0,
-          lngKeyNo11: 0,
-          lngKeyNo12: 0,
-          lngKeyNo13: 0,
-          lngKeyNo14: 0,
-          lngKeyNo15: 0,
-          lngKeyNo16: 0,
-          lngKeyNo17: 0,
-          lngKeyNo18: 0,
-          lngKeyNo19: 0,
-        },
-      ];
+    if (KeyList.value.length < 12) {
+      for (let i = 0; i < 12; i++) {
+        if (KeyList.value[i] && KeyList.value[i].intKeySeq == i + 1) {
+          continue;
+        } else {
+          KeyList.value.push({
+            intKeySeq: i + 1,
+            lngKeyNo1: 0,
+            lngKeyNo2: 0,
+            lngKeyNo3: 0,
+            lngKeyNo4: 0,
+            lngKeyNo5: 0,
+            lngKeyNo6: 0,
+            lngKeyNo7: 0,
+            lngKeyNo8: 0,
+            lngKeyNo9: 0,
+            lngKeyNo10: 0,
+            lngKeyNo11: 0,
+            lngKeyNo12: 0,
+            lngKeyNo13: 0,
+            lngKeyNo14: 0,
+            lngKeyNo15: 0,
+            lngKeyNo16: 0,
+            lngKeyNo17: 0,
+            lngKeyNo18: 0,
+            lngKeyNo19: 0,
+          });
+        }
+      }
     }
-    subKeyList1.value = Object.keys(KeyList.value[0]).reduce((result, key) => {
+    subKeyList1.value = Object.keys(
+      KeyList.value[currScreenNo.value - 1]
+    ).reduce((result, key) => {
       //comsole.log(key);
       if (key == "intKeySeq") {
-        result[key] = KeyList.value[0][key];
+        result[key] = KeyList.value[currScreenNo.value - 1][key];
         return result;
       }
-      const keyValue = KeyList.value[0][key];
+      const keyValue = KeyList.value[currScreenNo.value - 1][key];
       const mappeditem = commonKeyList.value.find(
         (item) => item.lngDCode == keyValue
       );
@@ -875,7 +868,22 @@ const onMove3 = (evt) => {
   return true;
 };
 const clickedMove = ref(false);
+
+const onChoose = (e) => {
+  const keyName = "lngKeyNo" + (e.oldIndex + 1);
+  // if(KeyList.value[currScreenNo.value-1][keyName])
+  //console.log(KeyList.value[currScreenNo.value - 1][keyName]);
+  console.log(subsubKeyList1.value);
+  if (subsubKeyList1.value[e.oldIndex].lngDCode == 2) {
+    showFuncKeySettings.value = true;
+  } else {
+    showFuncKeySettings.value = false;
+  }
+};
 const onEnd = (evt) => {
+  if (targetItemIndex2 == undefined) {
+    targetItemIndex2 = evt.oldIndex;
+  }
   // Swap을 처리할 조건
   if (changeMode.value === false) {
     const oldIndex = evt.oldIndex; // 드래그된 아이템의 기존 인덱스
@@ -909,6 +917,9 @@ const onEnd = (evt) => {
 };
 
 const onEnd2 = (evt) => {
+  if (targetItemIndex2 == undefined) {
+    targetItemIndex2 = evt.oldIndex;
+  }
   // Swap을 처리할 조건
   //comsole.log(evt.oldIndex);
   if (
@@ -949,6 +960,9 @@ const onEnd2 = (evt) => {
   //comsole.log("subsubKeyList2:", subsubKeyList2.value);
 };
 const onEnd3 = (evt) => {
+  if (targetItemIndex2 == undefined) {
+    targetItemIndex2 = evt.oldIndex;
+  }
   if (
     evt.oldIndex == 14 ||
     targetItemIndex2 == undefined ||
@@ -988,6 +1002,9 @@ const onEnd3 = (evt) => {
 };
 
 const onEnd4 = (evt) => {
+  if (targetItemIndex2 == undefined) {
+    targetItemIndex2 = evt.oldIndex;
+  }
   if (
     evt.oldIndex == 14 ||
     targetItemIndex2 == undefined ||
@@ -1064,8 +1081,6 @@ const saveButton = async () => {
       store.state.loading = true;
       const lngDCodes = subsubKeyList1.value.map((item) => item.lngDCode);
       const lngDCodes2 = subsubKeyList2.value.map((item) => item.lngDCode);
-      const lngDCodes3 = subsubKeyList3.value.map((item) => item.lngDCode);
-      const lngDCodes4 = subsubKeyList4.value.map((item) => item.lngDCode);
       //comsole.log(lngDCodes.join(",") + "," + lngDCodes2.join(","));
       //comsole.log(lngDCodes3.join(",") + "," + lngDCodes4.join(","));
 
@@ -1075,10 +1090,10 @@ const saveButton = async () => {
           nowStoreCd.value,
           nowStoreAreaCd.value,
           posNo.value,
-          lngDCodes.join(",") + "," + lngDCodes2.join(","),
-          lngDCodes3.join(",") + "," + lngDCodes4.join(",")
+          currScreenNo.value,
+          lngDCodes.join(",") + "," + lngDCodes2.join(",")
         );
-        //comsole.log(res2);
+        console.log(res2);
       } catch (error) {
         console.error("API 호출 중 오류 발생:", error);
       } finally {
@@ -1101,6 +1116,7 @@ let dataProvider;
 // const showMenuKeys = () => {};
 
 const showOtherKeys = ref(false);
+const showFuncKeySettings = ref(false);
 let dataProvider2;
 const clickedTLUCD = ref();
 const clickedTLUNM = ref();
@@ -1148,22 +1164,40 @@ const currentpaymentCd = ref(3);
  * 결제키 구분 세팅
  */
 
-const updatePaymentType = (newValue) => {
-  currentpaymentCd.value = newValue;
-  clickedFuncSelection.value = false;
-  clickedFuncSelection2.value = false;
-  if (newValue == 3) {
-    showOtherKeys.value = false;
-    currentpaymentType.value = "기본";
-  } else {
+const currScreenNo = ref(0);
+const updateFuncScreenType = (newValue) => {
+  //console.log(currScreenNo.value);
+  currScreenNo.value = newValue;
+  if (newValue == 0) {
     showOtherKeys.value = true;
-    currentpaymentType.value = "결제";
+  } else {
+    showOtherKeys.value = false;
   }
-  ScreenKeyOrigin.value = [];
-  ScreenKeys.value = [];
 
-  clickedKey1.value = -1;
-  clickedKey2.value = -1;
+  if (
+    nowStoreAreaCd.value != undefined &&
+    posNo.value != undefined &&
+    posNo.value != 0 &&
+    currScreenNo.value != 0
+  ) {
+    searchButton();
+  }
+
+  // currentpaymentCd.value = newValue;
+  // clickedFuncSelection.value = false;
+  // clickedFuncSelection2.value = false;
+  // if (newValue == 3) {
+  //   showOtherKeys.value = false;
+  //   currentpaymentType.value = "기본";
+  // } else {
+  //   showOtherKeys.value = true;
+  //   currentpaymentType.value = "결제";
+  // }
+  // ScreenKeyOrigin.value = [];
+  // ScreenKeys.value = [];
+
+  // clickedKey1.value = -1;
+  // clickedKey2.value = -1;
 };
 
 /**
@@ -1174,10 +1208,12 @@ const handlePosNo = (newValue) => {
   posNo.value = newValue;
   //comsole.log(posNo.value);
   //comsole.log(nowStoreAreaCd.value);
+  console.log(currScreenNo.value);
   if (
     nowStoreAreaCd.value != undefined &&
     posNo.value != undefined &&
-    posNo.value != 0
+    posNo.value != 0 &&
+    currScreenNo.value != 0
   ) {
     searchButton();
   }
