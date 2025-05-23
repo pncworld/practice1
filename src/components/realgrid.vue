@@ -814,12 +814,15 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  syncGridHeight: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
 });
 
 // 2구간
-const realgridname = ref(
-  `realgrid-${props.progname}-${props.progid}-${uuidv4()}`
-); // 동적 ID 설정
+const realgridname = ref(); // 동적 ID 설정
 const tabInitSetArray = ref([]);
 const selectedRowData = ref([]);
 const result2 = ref([]);
@@ -837,6 +840,7 @@ const emit = defineEmits([
   "dblclickedRowData",
   "selectedIndex",
   "checkedRowData",
+  "checkedRowIndex",
   "getJsonData",
   "sendRowState",
   "deleteRows",
@@ -860,12 +864,12 @@ const funcshowGrid = async () => {
   dataProvider = new LocalDataProvider();
 
   // nextTick으로 DOM 업데이트 후 초기화
-  await nextTick();
+  //
 
   const container = document.getElementById(realgridname.value);
-
+  await nextTick();
   if (!container) {
-    console.error(`Invalid grid container element: ${realgridname.value}`);
+    //console.error(`Invalid grid container element: ${realgridname.value}`);
     return;
   }
 
@@ -1533,6 +1537,8 @@ const funcshowGrid = async () => {
   gridView.filterMode = "explicit";
   gridView.checkBar.fieldName = "checkbox";
   gridView.rowIndicator.draggableSelectedRows = true;
+  gridView.displayOptions.syncGridHeight =
+    props.syncGridHeight == true ? "always" : "none";
 
   if (props.suffixColumnPercent != []) {
     for (let i = 0; i < props.suffixColumnPercent.length; i++) {
@@ -1640,7 +1646,7 @@ const funcshowGrid = async () => {
 
   gridView.onItemChecked = function (grid, itemIndex, checked) {
     gridView.setCurrent({ dataRow: itemIndex });
-
+    dataProvider.beginUpdate();
     // if (gridView.isCheckedRow(itemIndex)) {
     //   grid.checkItem(itemIndex, false);
     // } else {
@@ -1656,11 +1662,14 @@ const funcshowGrid = async () => {
     emit("checkedRowData", selectedRowData.value);
     //console.log(selectedRowData.value);
     //console.log("여기안오냐");
+    emit("checkedRowIndex", rows);
     updatedrowData.value = [...dataProvider.getJsonRows()];
+    dataProvider.endUpdate();
     //selectedRowData.value.index = itemIndex;
   };
   gridView.onItemAllChecked = (grid, checked) => {
     //comsole.log("전체체크");
+    dataProvider.beginUpdate();
     selectedRowData.value = gridView
       .getCheckedItems()
       .map((index) => dataProvider.getRows()[index]);
@@ -1672,6 +1681,7 @@ const funcshowGrid = async () => {
       selectedRowData.value.push(data);
     }
     emit("checkedRowData", selectedRowData.value);
+    dataProvider.endUpdate();
     // updatedrowData.value = [...dataProvider.getJsonRows()];
     // emit("updatedRowData", updatedrowData.value);
   };
@@ -1726,7 +1736,6 @@ const funcshowGrid = async () => {
   };
 
   gridView.onCellClicked = function (grid, clickData) {
-    console.log(clickData);
     if (clickData.cellType == "check") {
       return;
     }
@@ -1744,7 +1753,6 @@ const funcshowGrid = async () => {
 
       selectedRowData.value = dataProvider.getRows()[clickData.dataRow];
 
-      console.log(gridView.isCheckedRow(clickData.itemIndex));
       if (gridView.isCheckedRow(clickData.itemIndex)) {
         if (props.hideCheckBarList == false) {
           grid.checkItem(clickData.itemIndex, false);
@@ -1788,6 +1796,7 @@ const funcshowGrid = async () => {
 
   gridView.onColumnCheckedChanged = function (grid, col, chk) {
     var rowCount = dataProvider.getRowCount(); // 전체 행의 개수
+    dataProvider.beginUpdate();
     if (props.ExceptionCheck != "") {
       for (var i = 0; i < rowCount; i++) {
         if (grid.getValue(i, props.ExceptionCheck) !== "0") {
@@ -1799,7 +1808,16 @@ const funcshowGrid = async () => {
         dataProvider.setValue(i, col.fieldName, chk);
       }
     }
-
+    dataProvider.endUpdate();
+    var rows = gridView.getCheckedRows();
+    //console.log(rows)
+    selectedRowData.value = [];
+    for (var i in rows) {
+      var data = dataProvider.getJsonRow(rows[i]);
+      selectedRowData.value.push(data);
+    }
+    emit("checkedRowData", selectedRowData.value);
+    emit("checkedRowIndex", rows);
     //comsole.log(col.fieldName + "was checked as: " + chk);
   };
 
@@ -2540,6 +2558,7 @@ watch(
 //   }
 // })
 onMounted(async () => {
+  realgridname.value = `realgrid-${props.progname}-${props.progid}-${uuidv4()}`;
   emit("realgridname", realgridname.value);
   try {
     if (props.renderProgname != "") {
@@ -2581,7 +2600,7 @@ onMounted(async () => {
       "beforeend",
       `<style>${styleContent}</style>`
     );
-
+    await nextTick();
     await funcshowGrid();
   } catch (error) {
     console.error("Failed to fetch data:", error);

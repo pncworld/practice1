@@ -68,6 +68,7 @@
         :setRowGroupSpan2="setRowGroupSpan2"
         :documentTitle="'ACT04_003RPT'"
         :setFooter="true"
+        :rowStateeditable="false"
         :setGroupFooter="cond"
         :setGroupColumnId="'strName,dtmDate'"
         :setFooterCustomColumnId="['strName']"

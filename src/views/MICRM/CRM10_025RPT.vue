@@ -76,6 +76,7 @@
         :documentTitle="'CRM10_025RPT'"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
+        :dynamicRowHeight="true"
         :exporttoExcel="exportExcel">
       </Realgrid>
     </div>
@@ -193,7 +194,7 @@ const searchButton = async () => {
   // }
   try {
     store.state.loading = true;
-    initGrid();
+    //initGrid();
 
     const res = await getReservedCustomorSearch(
       selectedGroup.value,
@@ -231,7 +232,7 @@ const lngStoreCode = async (e) => {
   console.log(e);
 };
 const lngStoreGroup = async (e) => {
-  initGrid();
+  //initGrid();
   selectedGroup.value = e;
   console.log(e);
 };
@@ -244,6 +245,9 @@ const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
   }
+  status.value = 99;
+  cond.value = "";
+  cond2.value = "";
 };
 
 //엑셀 버튼 처리 함수

@@ -34,6 +34,7 @@
           @endDate="endDate"
           @startDate="startDate"
           @excelDate="excelDate"
+          ref="datepicker"
           :initToday="1"
           :mainName="'접수일'"
           class="!w-[400px] !pr-12"></Datepicker2>
@@ -50,7 +51,7 @@
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
-    <div class="w-full h-[75%]">
+    <div class="w-full h-[80%]">
       <Realgrid
         :progname="'CRM10_021RPT_VUE'"
         :progid="1"
@@ -58,6 +59,7 @@
         :reload="reload"
         :setStateBar="false"
         :documentTitle="'CRM10_021RPT'"
+        :dynamicRowHeight="true"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :exporttoExcel="exportExcel">
@@ -68,7 +70,7 @@
 </template>
 
 <script setup>
-import { getBelongCustList, getReservedChangeHistory } from "@/api/micrm";
+import { getReservedChangeHistory } from "@/api/micrm";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -114,6 +116,9 @@ import { useStore } from "vuex";
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
+  const userGroup = store.state.storeGroup[0].lngStoreGroup;
+  reload.value = !reload.value;
 });
 
 const reload = ref(false);
@@ -172,8 +177,8 @@ const searchButton = async () => {
   }
   try {
     store.state.loading = true;
-    initGrid();
-
+    // initGrid();
+    reload.value = !reload.value;
     const res = await getReservedChangeHistory(
       selectedGroup.value,
       selectedStores.value,
@@ -208,7 +213,7 @@ const lngStoreCode = async (e) => {
   console.log(e);
 };
 const lngStoreGroup = async (e) => {
-  initGrid();
+  //initGrid();
   selectedGroup.value = e;
   console.log(e);
 };
@@ -221,6 +226,8 @@ const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
   }
+  cond.value = "";
+  cond2.value = "";
 };
 
 //엑셀 버튼 처리 함수

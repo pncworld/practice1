@@ -20,16 +20,18 @@
     <div
       class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
       <div class="grid grid-cols-1 grid-rows-2 mt-1">
-        <Datepicker2
-          @endDate="endDate"
-          @startDate="startDate"
-          :closePopUp="closePopUp"
-          ref="datepicker"
-          @excelDate="excelDate"
-          :mainName="'기간'"
-          :initToday="1"></Datepicker2>
-        <div class="flex space-x-3 text-base font-semibold ml-40 mt-3">
-          <div>계정과목:</div>
+        <div>
+          <Datepicker2
+            @endDate="endDate"
+            @startDate="startDate"
+            :closePopUp="closePopUp"
+            ref="datepicker"
+            @excelDate="excelDate"
+            :mainName="'기간'"
+            :initToday="1"></Datepicker2>
+        </div>
+        <div class="flex space-x-3 text-base font-semibold ml-24 mt-3">
+          <div class="pl-2">계정과목:</div>
           <div>
             <select name="" id="" v-model="selectedCond" class="w-40">
               <option value="0">전체</option>

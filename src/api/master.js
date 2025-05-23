@@ -2203,3 +2203,50 @@ export const copyMenuListByCode = (groupCd, lngcode, menucdlist) => {
     COPYLIST: menucdlist,
   });
 };
+export const getMenuGroupList = (groupCd, storecd, cond) => {
+  return api2.post("/MIMASTER/MST01_014INS.asmx/getMenuGroupList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    COND: cond,
+  });
+};
+export const getSalesUnitbyStore = (
+  groupCd,
+  storecd,
+  maincode,
+  subcode,
+  stype,
+  cond
+) => {
+  return api2.post("/MIMASTER/MST01_014INS.asmx/getSalesUnitbyStore", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    MAINCODE: maincode,
+    SUBCODE: subcode,
+    SEARCH_TYPE: stype,
+    COND: cond,
+  });
+};
+export const getMenuStoreList = (groupCd) => {
+  return api2.post("/MIMASTER/MST37_068INS.asmx/getMenuStoreList", {
+    GROUP_CD: groupCd,
+  });
+};
+export const getSubGroup = (groupCd) => {
+  return api2.post("/MIMASTER/MST37_068INS.asmx/getSubGroup", {
+    GROUP_CD: groupCd,
+  });
+};
+export const getMultiGroup = (groupCd) => {
+  return api2.post("/MIMASTER/MST37_068INS.asmx/getMultiGroup", {
+    GROUP_CD: groupCd,
+  });
+};
+export const getMultiPrice = (groupCd, multigroup, subgroup, searchword) => {
+  return api2.post("/MIMASTER/MST37_068INS.asmx/getMultiPrice", {
+    GROUP_CD: groupCd,
+    MULTIGROUP: multigroup,
+    SUBGROUP: subgroup,
+    SEARCH_WORD: searchword,
+  });
+};

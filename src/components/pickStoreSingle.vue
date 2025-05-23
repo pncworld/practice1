@@ -9,6 +9,7 @@
           value="1"
           v-model="settingDisable"
           @click="initSearchBox"
+          :disabled="settingDisable2"
       /></label>
     </div>
     <div class="w-24">
@@ -58,6 +59,7 @@
           value="2"
           v-model="settingDisable"
           @click="initSearchBox"
+          :disabled="settingDisable2"
       /></label>
     </div>
     <div class="w-32">
@@ -136,6 +138,7 @@ const selectedStoreGroup2 = ref(store.state.storeGroup[0].lngStoreGroup);
 const selectedStoreType = ref(0);
 const selectedStoreTeam = ref(0);
 const selectedSuperVisor = ref(0);
+const settingDisable2 = ref(false);
 const emit = defineEmits([
   "lngStoreGroups",
   "lngStoreCode",
@@ -206,6 +209,7 @@ onMounted(() => {
     selectedStoreTeam.value = store.state.userData.lngTeamCode;
     selectedSuperVisor.value = store.state.userData.lngSupervisor;
     disabled1.value = true;
+    settingDisable2.value = true;
   }
   // labelsData.value.push(store.state.storeGroup.map(item => item.strName))
   // valuesData.value.push(store.state.storeGroup.map(item => item.lngStoreGroup))

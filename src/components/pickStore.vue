@@ -47,6 +47,7 @@
           setStoreAreaCd($event.target.value);
           setPosNo($event.target.value);
           setKioskNo($event.target.value);
+          setScreenNo2($event.target.value);
         ">
         <option value="0">{{ defaultStoreNm }}</option>
         <option
@@ -82,6 +83,7 @@
         @change="
           setScreenNo();
           posChanged();
+          setScreenNo2();
         ">
         <option value="0">선택</option>
         <option
@@ -170,7 +172,7 @@
       <select
         name=""
         id=""
-        class="w-40 border border-black rounded-lg h-8"
+        class="w-52 border border-black rounded-lg h-10"
         v-model="selectedFuncScreen"
         @change="changeFunc">
         <option value="0">선택</option>
@@ -550,6 +552,10 @@ const setKioskNo = async (value) => {
   } finally {
     storeKioskNo.value = response.data.pos;
   }
+};
+
+const setScreenNo2 = (e) => {
+  selectedFuncScreen.value = 0;
 };
 const emitPosInfo = (value1, value2) => {
   emit("areaCd", value1);

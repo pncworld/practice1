@@ -74,6 +74,7 @@
         :reload="reload"
         :setStateBar="false"
         :documentTitle="'CRM10_022RPT'"
+        :dynamicRowHeight="true"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :exporttoExcel="exportExcel">
@@ -192,7 +193,7 @@ const searchButton = async () => {
   // }
   try {
     store.state.loading = true;
-    initGrid();
+    // initGrid();
 
     const res = await getReservedSearch(
       selectedGroup.value,
@@ -229,7 +230,7 @@ const lngStoreCode = async (e) => {
   console.log(e);
 };
 const lngStoreGroup = async (e) => {
-  initGrid();
+  //initGrid();
   selectedGroup.value = e;
   console.log(e);
 };
@@ -242,6 +243,9 @@ const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
   }
+  cond.value = "";
+  cond2.value = "";
+  status.value = 99;
 };
 
 //엑셀 버튼 처리 함수

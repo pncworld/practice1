@@ -13,10 +13,10 @@
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="excelButton" class="button save w-auto excel">
+        <button @click="excelButton2" class="button save w-auto excel">
           엑셀
         </button>
-        <button @click="excelButton2" class="button save w-auto excel">
+        <button @click="excelButton" class="button save w-auto excel">
           엑셀
         </button>
       </div>
@@ -71,6 +71,7 @@
             :mergeColumnGroupName2="mergeColumnGroupName2"
             :mergeColumnGroupSubList2="mergeColumnGroupSubList2"
             :rowStateeditable="false"
+            :syncGridHeight="true"
             :exporttoExcel="exportExcel">
           </Realgrid>
         </div>
@@ -86,6 +87,7 @@
             :mergeColumnGroupName2="mergeColumnGroupName2"
             :mergeColumnGroupSubList2="mergeColumnGroupSubList3"
             :documentSubTitle="documentSubTitle"
+            :syncGridHeight="true"
             :rowStateeditable="false"
             :exporttoExcel="exportExcel">
           </Realgrid>
@@ -98,6 +100,7 @@
             :rowData="rowData3"
             :reload="reload"
             :setStateBar="false"
+            :syncGridHeight="true"
             :documentTitle="'CRM10_024RPT'"
             :documentSubTitle="documentSubTitle"
             :rowStateeditable="false">
@@ -113,12 +116,13 @@
             :setStateBar="false"
             :documentTitle="'CRM10_024RPT'"
             :dynamicRowHeight="true"
+            :syncGridHeight="true"
             :documentSubTitle="documentSubTitle"
             :rowStateeditable="false">
           </Realgrid>
         </div>
         <div class="mt-4">
-          <div class="flex justify-start bg-purple-200 w-20">▣단체예약</div>
+          <div class="flex justify-start bg-purple-200 w-20">▣예약취소</div>
           <Realgrid
             :progname="'CRM10_024RPT_VUE'"
             :progid="4"
@@ -126,6 +130,7 @@
             :reload="reload"
             :setStateBar="false"
             :documentTitle="'CRM10_024RPT'"
+            :syncGridHeight="true"
             :documentSubTitle="documentSubTitle"
             :rowStateeditable="false">
           </Realgrid>
@@ -263,14 +268,15 @@ const mergeColumnGroupSubList3 = ref([
 ]);
 
 const changeTime = ref(false);
+const selectedTime = ref(0);
 const updateTime = (e) => {
   initGrid();
+  selectedTime.value = e;
+
   if (e == 1) {
     changeTime.value = false;
   } else if (e == 2) {
     changeTime.value = true;
-  } else {
-    changeTime.value = null;
   }
 };
 /**
@@ -299,7 +305,7 @@ const searchButton = async () => {
     });
     return;
   }
-  if (changeTime.value == null) {
+  if (selectedTime.value == 0) {
     Swal.fire({
       title: "경고",
       text: "시간대를 먼저 선택하세요.",
@@ -310,7 +316,7 @@ const searchButton = async () => {
   }
   try {
     store.state.loading = true;
-    initGrid();
+    // initGrid();
     console.log(changeTime.value);
     if (changeTime.value == false) {
       const res = await getReservedDetail(
@@ -364,7 +370,7 @@ const lngStoreCode = async (e) => {
   console.log(e);
 };
 const lngStoreGroup = async (e) => {
-  initGrid();
+  //initGrid();
   selectedGroup.value = e;
   console.log(e);
 };
@@ -389,6 +395,9 @@ const initGrid = () => {
   if (rowData5.value.length > 0) {
     rowData5.value = [];
   }
+
+  cond.value = "";
+  cond2.value = "";
 };
 
 //엑셀 버튼 처리 함수
@@ -415,11 +424,11 @@ const excelButton2 = () => {
     return;
   }
 
-  if (changeTime.value == null) {
+  if (selectedTime.value == 0) {
     return;
   }
   const time = ref("런치");
-  if (changeTime.value == false) {
+  if (selectedTime.value == 1) {
     time.value = "런치";
   } else {
     time.value = "디너";
@@ -536,6 +545,8 @@ const excelButton2 = () => {
       const cellValue = row[col];
       const cellType = typeof cellValue === "number" ? "n" : "s";
       worksheet[cellAddress] = { t: cellType, v: cellValue };
+      if (!worksheet[excelRow + rowIndex]) worksheet[excelRow + rowIndex] = [];
+      worksheet[excelRow + rowIndex][colIndex] = { hpt: 150 };
     });
   });
 
@@ -571,19 +582,36 @@ const excelButton2 = () => {
     rowData4.value.length +
     rowData5.value.length +
     2; // 데이터 끝나는 행
+  for (let i = 0; i < lastRow; i++) {
+    for (let j = 0; j < lastRow; j++) {
+      const colLetter = String.fromCharCode(65 + j); // A, B, C...
+      const cellRef = `${colLetter}${i + 1}`; // Excel은 1-based
+
+      if (worksheet[cellRef]) {
+        worksheet[cellRef].s = {
+          font: { name: "맑은 고딕", sz: 11 },
+          alignment: {
+            horizontal: "center",
+            vertical: "center",
+            wrapText: true,
+          },
+        };
+      }
+    }
+  }
   worksheet["!ref"] = `A1:${lastCol}${lastRow}`;
   worksheet["!cols"] = [
-    { wch: 10 }, // strRoom
-    { wch: 16 }, // dtmRsvTime
-    { wch: 12 }, // strRsvName
-    { wch: 6 }, // lngAdultCnt
-    { wch: 6 }, // lngChildCnt
-    { wch: 14 }, // strRsvTelNo
-    { wch: 10 }, // strTable
-    { wch: 10 }, // strChargerName
+    { wch: 20 }, // strRoom
+    { wch: 12 }, // dtmRsvTime
+    { wch: 18 }, // strRsvName
+    { wch: 12 }, // lngAdultCnt
+    { wch: 12 }, // lngChildCnt
+    { wch: 20 }, // strRsvTelNo
+    { wch: 20 }, // strTable
+    { wch: 20 }, // strChargerName
     { wch: 16 }, // dtmInsert
-    { wch: 10 }, // strRAmount
-    { wch: 20 }, // strRRemark
+    { wch: 20 }, // strRAmount
+    { wch: 60 }, // strRRemark
   ];
 
   // 워크북에 시트 추가

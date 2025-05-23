@@ -1182,6 +1182,7 @@ const updateFuncScreenType = (newValue) => {
   ) {
     searchButton();
   }
+  showFuncKeySettings.value = false;
 
   // currentpaymentCd.value = newValue;
   // clickedFuncSelection.value = false;
@@ -1215,7 +1216,7 @@ const handlePosNo = (newValue) => {
     posNo.value != 0 &&
     currScreenNo.value != 0
   ) {
-    searchButton();
+    // searchButton();
   }
 };
 

@@ -1,7 +1,7 @@
 /*--############################################################################
-# Filename : CRM10_023RPT.vue                                                  
-# Description : 고객관리 > 고객 예약 관리 > 일별 예약근황.                      
-# Date :2025-05-22                                                             
+# Filename : MST01_014INS.vue                                                  
+# Description : 마스터관리 > 메뉴 마스터 > 매장별 판매단가 변경                
+# Date :2025-05-23                                                             
 # Author : 권맑음                     
 ################################################################################*/
 <template>
@@ -9,54 +9,80 @@
   <div class="h-full" @click="handleParentClick">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
+
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
+        </button>
+        <button @click="saveButton" class="button search md:w-auto w-14">
+          저장
         </button>
         <button @click="excelButton" class="button save w-auto excel">
           엑셀
         </button>
       </div>
     </div>
+    <div class="text-red-400 flex justify-start ml-10">
+      ※검색된 내용 판매가 변경 후 재 조회시에 저장 후 조회 하셔야 변경된 내용이
+      반영 됩니다.
+    </div>
     <div
-      class="grid grid-cols-5 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10">
-      <div>
+      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10">
+      <div class="flex justify-center mr-40">
         <PickStore
-          class="!-mr-4"
           :hideGroup="false"
           :hideAttr="false"
           @update:storeCd="lngStoreCode"
           @update:storeGroup="lngStoreGroup"
-          @storeNm="excelStore"
-          :defaultStoreNm="'선택'">
+          @storeNm="excelStore">
         </PickStore>
       </div>
-      <div class="w-[80%] ml-5">
-        <Datepicker2
-          @endDate="endDate"
-          @startDate="startDate"
-          @excelDate="excelDate"
-          :initToday="1"
-          :mainName="'예약일'"
-          class="!w-[350px] !pr-0 !ml-5"></Datepicker2>
+      <div class="flex justify-center mr-96">
+        <MenuGroup
+          :storeCd="selectedStores"
+          :groupCd="selectedGroup"
+          @mainCode="mainCode"
+          @subCode="subCode"></MenuGroup>
+      </div>
+      <div class="flex justify-center ml-20 space-x-2 items-center">
+        <div class="text-base font-semibold">검색 :</div>
+        <div>
+          <select
+            name=""
+            id=""
+            class="w-40 border border-black h-8"
+            v-model="searchType">
+            <option value="0">메뉴명</option>
+            <option value="1">바코드</option>
+          </select>
+        </div>
+        <div>
+          <input
+            type="text"
+            v-model="cond"
+            class="w-40 border border-black pl-1 h-8" />
+        </div>
+      </div>
+      <div class="flex space-x-3 items-center ml-10">
+        <div class="text-base font-semibold">할인율 :</div>
+        <div><input type="number" class="pl-1" v-model="cond2" /></div>
+        <div>%</div>
+        <div><button class="whitebutton bg-white">적용</button></div>
       </div>
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
-    <div class="w-full h-[75%]">
+    <div class="w-full h-[80%]">
       <Realgrid
-        :progname="'CRM10_023RPT_VUE'"
+        :progname="'MST01_014INS_VUE'"
         :progid="1"
         :rowData="rowData"
         :reload="reload"
         :setStateBar="false"
-        :documentTitle="'CRM10_023RPT'"
+        :documentTitle="'MST01_014INS'"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
-        :mergeColumns2="true"
-        :mergeColumnGroupName2="mergeColumnGroupName2"
-        :mergeColumnGroupSubList2="mergeColumnGroupSubList2"
-        :setFooter="true"
+        :suffixColumnPercent="['lngMargin', 'lngRateD']"
         :exporttoExcel="exportExcel">
       </Realgrid>
     </div>
@@ -65,13 +91,8 @@
 </template>
 
 <script setup>
-import {
-  getBelongCustList,
-  getReservedChangeHistory,
-  getReservedSearch,
-  getReservedSearchByDays,
-} from "@/api/micrm";
-import Datepicker2 from "@/components/Datepicker2.vue";
+import { getSalesUnitbyStore } from "@/api/master";
+import MenuGroup from "@/components/menuGroup.vue";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -116,66 +137,32 @@ import { useStore } from "vuex";
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
+  const userGroup = store.state.storeGroup[0].lngStoreGroup;
+  reload.value = !reload.value;
 });
 
 const reload = ref(false);
 const rowData = ref([]);
 const afterSearch = ref(false);
-const mergeColumnGroupName2 = ref([
-  "매장",
-  "런치1부",
-  "런치2부",
-  "디너1부",
-  "디너2부",
-]);
-const mergeColumnGroupSubList2 = ref([
-  ["strDate", "strDayOfTheWeek"],
-  [
-    "lngTime101",
-    "lngTime102",
-    "lngTime103",
-    "lngTime104",
-    "lngTime105",
-    "lngTime106",
-    "lngTime107",
-  ],
-  [
-    "lngTime201",
-    "lngTime202",
-    "lngTime2025",
-    "lngTime203",
-    "lngTime204",
-    "lngTime205",
-    "lngTime206",
-  ],
-  [
-    "lngTime301",
-    "lngTime302",
-    "lngTime303",
-    "lngTime304",
-    "lngTime305",
-    "lngTime306",
-    "lngTime307",
-    "lngTime308",
-    "lngTime309",
-  ],
-  ["lngTimeD2_1930", "lngTime401", "lngTime402"],
-]);
+
 const cond = ref("");
 const cond2 = ref("");
 const store = useStore();
-const status = ref(99);
+
 const datepicker = ref(null);
 const closePopUp = ref(false);
+const searchType = ref("0");
 
-const startdate = ref("");
-const startDate = (e) => {
-  startdate.value = e;
+const selectedSubCode = ref(0);
+const subCode = (e) => {
+  selectedSubCode.value = e;
 };
-const enddate = ref("");
-const endDate = (e) => {
-  enddate.value = e;
+const selectedMainCode = ref(0);
+const mainCode = (e) => {
+  selectedMainCode.value = e;
 };
+
 /**
  * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
  */
@@ -204,17 +191,16 @@ const searchButton = async () => {
   }
   try {
     store.state.loading = true;
-    //initGrid();
-
-    const sd = startdate.value.replaceAll("-", "");
-    const ed = enddate.value.replaceAll("-", "");
-    const res = await getReservedSearchByDays(
+    // initGrid();
+    reload.value = !reload.value;
+    const res = await getSalesUnitbyStore(
       selectedGroup.value,
       selectedStores.value,
-      sd,
-      ed
+      selectedMainCode.value,
+      selectedSubCode.value,
+      searchType.value,
+      cond.value
     );
-
     console.log(res);
     rowData.value = res.data.List;
 
@@ -255,6 +241,8 @@ const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
   }
+  cond.value = "";
+  cond2.value = "";
 };
 
 //엑셀 버튼 처리 함수
