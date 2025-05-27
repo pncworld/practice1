@@ -2,7 +2,7 @@
   <div
     class="grid grid-rows-1 grid-cols-[repeat(4,1fr)] justify-center text-sm items-center w-[500px] space-x-2">
     <div class="items-center font-bold text-base flex w-20 pl-5">매장명 :</div>
-    <div>
+    <div v-if="hideit">
       <select
         :disabled="true"
         v-model="selectedGroup"
@@ -17,7 +17,7 @@
         </option>
       </select>
     </div>
-    <div>
+    <div v-if="hideit2">
       <select
         :disabled="disabled1"
         v-model="selectedStoreType"
@@ -74,17 +74,32 @@ const props = defineProps({
     type: String,
     default: "전체",
   },
+  hideit: {
+    type: Boolean,
+    default: true,
+  },
+  hideit2: {
+    type: Boolean,
+    default: true,
+  },
+  disableStore: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+const hideit = ref(props.hideit);
+const hideit2 = ref(props.hideit2);
 const is9999 = ref(store.state.userData.lngStoreGroup[0] !== "9999");
-const hideit = ref(props.hidesub);
+//const hideit = ref(props.hidesub);
 const defaultPlaceHolder = ref(props.placeholderName);
 const selectedStoreType = ref(0);
-watch(
-  () => props.hidesub,
-  () => {
-    hideit.value = props.hidesub;
-  }
-);
+// watch(
+//   () => props.hidesub,
+//   () => {
+//     hideit.value = props.hidesub;
+//   }
+// );
 const { groupCdDisabled } = props;
 isDisabled1.value = groupCdDisabled;
 const changed = ref(false);
@@ -119,6 +134,13 @@ const emitStoreType = (value) => {
 // watch(() => store.state.storeCd , () => {
 
 // })
+
+watch(
+  () => props.disableStore,
+  () => {
+    disabled1.value = props.disableStore;
+  }
+);
 onMounted(() => {
   defaultPlaceHolder.value = props.placeholderName;
   selectedGroup.value = store.state.storeGroup[0].lngStoreGroup;

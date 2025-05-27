@@ -32,27 +32,27 @@ let dataProvider;
     Controller: 그리드에서 Item을 조작하기 위한 여러 가지 내부적인 객체들을 아우르는 의미의 명칭입니다.
 
    (출처 : https://docs.realgrid.com/tutorial/introductions-concepts) https://docs.realgrid.com/tutorial/realgrid-column-field-setup
-  우리테크의 RealGrid2 는 외부 종속성 없이 TypeScript로 개발된 웹 DataGrid UI 라이브러리로 최신 웹 브라우저에서 직접 사용할 수 있는 
+  우리테크의 RealGrid2 는 외부 종속성 없이 TypeScript로 개발된 웹 DataGrid UI 라이브러리로 최신 웹 브라우저에서 직접 사용할 수 있는
   ES5 형식의 순수 JavaScript 파일로 제공합니다. "RealGridJS 1.0"의 Canvas 방식에서 DOM 방식으로 작동 방식이 변경되었지만 상당부분 1.0과 호환성을 가지고 있습니다.
-  
-  RealGrid를 사용하려면 RealGrid의 개념을 이해 해야 합니다. 아래 이미지는 RealGrid의 구성을 간략하게 표현한 도식 입니다. 
-  RealGrid는 효과적인 데이터 관리를 위해 별도의 데이터 셋를 가지고 있고 "DataProvider"라고 합니다. 그리드에 넣을 데이터를 DataProvider에 로드해 사용합니다. 
-  그리드 데이터 셋에 담을 수 있는 형식은 Json, XML, CSV 와 Javascript Array 형식을 지원합니다. 
+
+  RealGrid를 사용하려면 RealGrid의 개념을 이해 해야 합니다. 아래 이미지는 RealGrid의 구성을 간략하게 표현한 도식 입니다.
+  RealGrid는 효과적인 데이터 관리를 위해 별도의 데이터 셋를 가지고 있고 "DataProvider"라고 합니다. 그리드에 넣을 데이터를 DataProvider에 로드해 사용합니다.
+  그리드 데이터 셋에 담을 수 있는 형식은 Json, XML, CSV 와 Javascript Array 형식을 지원합니다.
   RealGrid의 MVC 모델의 장점으로 하나의 데이터 셋에 여러 개의 그리드 뷰를 연결할 수 있습니다
-  
-  1구간 에서는 부모(각 페이지) 컴포넌트에서 전달 받는 변수들을 정의 
+
+  1구간 에서는 부모(각 페이지) 컴포넌트에서 전달 받는 변수들을 정의
   2구간 에서는 리얼그리드 컴포넌트 내에서 사용하는 변수들을 정의
-  3구간 에서는 리얼그리드 정의에 따른 컬럼과 필드 설정 , DB 에서 불러오는 컬럼에 대한 정보를 각각의 양식에 맞게 붙여서 정의를 함. 
+  3구간 에서는 리얼그리드 정의에 따른 컬럼과 필드 설정 , DB 에서 불러오는 컬럼에 대한 정보를 각각의 양식에 맞게 붙여서 정의를 함.
             그리고 gridView.setColumns(columns); 함수로 컬럼을 설정하고 4구간 주변에서 사전에 별도로 설정할 값을 변수로 받아서 설정을 필요에 따라 해줌.
   4구간 에서는 부모 컴포넌트에서 미리 정의된 변수들로 기존 3구간에서 정의하기 어려운 부분들을 재정의 해줌 .
   5구간 에서는 리얼그리드에서 기본적으로 설정되어야할 값들을 설정 해주는 부분.
   6구간 에서는 리얼그리드 함수에 대한 정의를 커스텀 한 부분이고 각각의 이벤트가 발생할때마다 필요로 하는 설정이나 다시 emit 으로 부모 컴포넌트에 전달하는 역할을 함
   7구간 에서는 동적으로 부모 컴포넌트에서 동적으로 제어하는 변수들의 값들을 감지해서 필요로하는 동작을 해줌 ( 예를 들어 검색 )
-  
+
 
   예시)
 
-  gridView.onCellClicked = function (grid, clickData) { // 셀을 클릭할때 발생되는 이벤트 
+  gridView.onCellClicked = function (grid, clickData) { // 셀을 클릭할때 발생되는 이벤트
     if (clickData.cellType == "check") { // 해당 셀이 체크박스 타입이면 종료하고
       return;
     }
@@ -71,7 +71,7 @@ let dataProvider;
 
       selectedRowData.value = dataProvider.getRows()[clickData.dataRow]; // 그리고 해당 행의 실질적인 정보들을 불러오고
 
-      if (gridView.isCheckedRow(clickData.itemIndex)) { //  해당 행이 체크된 행이면 
+      if (gridView.isCheckedRow(clickData.itemIndex)) { //  해당 행이 체크된 행이면
         if (props.hideCheckBarList == false) {       // 미리 설정된 값에 따라서 체크를 해주거나 안해주는 부분
           grid.checkItem(clickData.itemIndex, false);
         } else {
@@ -111,14 +111,14 @@ let dataProvider;
       }
     }
   };
-  
-  
-  
+
+
+
   emit updatedRowData 사용시에는 가급적 불가피한경우가 아니라면 기존 rowData와 교체 하지 말 것. updatedRowData로 수정된 사항을 별도의
   변수로 저장해두고 추후에 그 데이터를 저장하는게 옳다고봄
 
   사용법
-  progname => SQL mstgridInfo 에 저장된 설정값 가져오는 부분  
+  progname => SQL mstgridInfo 에 저장된 설정값 가져오는 부분
   progid => SQL mstgridInfo 에 저장된 설정값 가져오는 부분
   rowData => 실제 데이터 입력 부분
   showGrid => 변수로 그리드를 보여주거나 안 보여주게 설정
@@ -127,7 +127,7 @@ let dataProvider;
   searchColId => 검색하려는 필드명 ( 예)strName,SubName) , 로 나눠서 해당 필드들을 함께 조회 가능
   addRow => true false로 값이 변할때마다 행을 추가
   deleteRow =>  true false로 값이 변할때마다 행을 삭제
-  deleteRow3 => 
+  deleteRow3 =>
 
 }
 
@@ -788,6 +788,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  searchSpecialCond2: {
+    // 검색할 데이터의 특정 조건 실행 여부
+    type: String,
+    default: `(value = 'false') or (value is null )`,
+  },
   setReFocus: {
     // 강제 재클릭 이벤트 발생
     type: Boolean,
@@ -815,6 +820,26 @@ const props = defineProps({
     default: false,
   },
   syncGridHeight: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
+  changeNow3: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
+  getRowChanged: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
+  excludeCheck: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
+  checkonlyone: {
     // 행높이
     type: Boolean,
     default: false,
@@ -885,7 +910,8 @@ const funcshowGrid = async () => {
       props.suffixColumnwon == "lngPrice" && item.strColID == "lngPrice"
         ? "number"
         : item.strColID.includes("checkbox") ||
-          item.strColID.includes("lngSupplierID")
+          (item.strColID.includes("lngSupplierID") &&
+            props.checkBarInactive == "lngSupplierID")
         ? "boolean"
         : item.strColType == "number" ||
           item.strColType === "float" ||
@@ -1150,7 +1176,8 @@ const funcshowGrid = async () => {
         item.strColID == "add"
           ? "button"
           : item.strColID.includes("checkbox") ||
-            item.strColID.includes("lngSupplierID")
+            (item.strColID.includes("lngSupplierID") &&
+              props.checkBarInactive == "lngSupplierID")
           ? "check"
           : item.strColType.includes("dropdown")
           ? "list"
@@ -1505,7 +1532,10 @@ const funcshowGrid = async () => {
   gridView.rowIndicator.width = 50;
   gridView.setFooters({ visible: props.setFooter == false ? false : true });
   gridView.setRowIndicator({ visible: props.setRowIndicator });
-  gridView.setCheckBar({ visible: props.showCheckBar });
+  gridView.setCheckBar({
+    visible: props.showCheckBar,
+    exclusive: props.excludeCheck,
+  });
   //gridView.displayOptions.fitStyle = "even";
   gridView.sortingOptions.enabled = true;
   gridView.editOptions.editable =
@@ -1639,6 +1669,25 @@ const funcshowGrid = async () => {
 
   gridView.onCellEdited = function (grid, itemIndex, row, field) {
     gridView.commit();
+    console.log(field);
+    if (props.checkonlyone == true) {
+      if (field == 0) {
+        const bool = dataProvider.getValue(row, field);
+        console.log(bool);
+        if (bool == true) {
+          dataProvider.setValue(row, "checkbox2", false);
+        }
+      } else if (field == 1) {
+        const bool = dataProvider.getValue(row, field);
+        console.log(bool);
+        if (bool == true) {
+          dataProvider.setValue(row, "checkbox1", false);
+        }
+      }
+    }
+    // console.log(field);
+    // console.log(grid);
+    // console.log(row);
 
     updatedrowData.value = [...dataProvider.getJsonRows()];
     emit("updatedRowData", updatedrowData.value);
@@ -1752,7 +1801,10 @@ const funcshowGrid = async () => {
       emit("selectedIndex2", current.dataRow);
 
       selectedRowData.value = dataProvider.getRows()[clickData.dataRow];
-
+      //dataProvider.checkRowStates(false);
+      if (props.excludeCheck == true) {
+        gridView.checkAll(false); // checkrowstates
+      }
       if (gridView.isCheckedRow(clickData.itemIndex)) {
         if (props.hideCheckBarList == false) {
           grid.checkItem(clickData.itemIndex, false);
@@ -1777,6 +1829,7 @@ const funcshowGrid = async () => {
         }
       }
 
+      // dataProvider.checkRowStates(true);
       selectedRowData.value = dataProvider.getRows()[current.dataRow];
       if (selectedRowData.value) {
         const rowState = dataProvider.getRowState(clickData.dataRow);
@@ -1880,13 +1933,14 @@ watch(
     //comsole.log(props.changeColid);
     //comsole.log(props.changeValue2);
     //comsole.log(dataProvider.getJsonRows());
+    dataProvider.beginUpdate();
     if (props.changeRow !== "" && props.changeRow != -1) {
       dataProvider.setValue(
         props.changeRow,
         props.changeColid,
         props.changeValue2
       );
-
+      dataProvider.endUpdate();
       updatedrowData.value = [...dataProvider.getJsonRows()];
 
       const dataRow = gridView.getCurrent().dataRow;
@@ -1902,12 +1956,7 @@ watch(
   () => props.changeNow2,
   () => {
     //comsole.log(props.changeRow);
-    //comsole.log(props.changeColid);
-    //comsole.log(props.changeValue2);
-    //comsole.log(dataProvider.getJsonRows());
-    //console.log(props.changeRow);
-    //console.log(props.changeColid);
-    //console.log(props.changeValue2);
+
     if (props.changeRow !== "" && props.changeRow != -1) {
       if (
         dataProvider != null &&
@@ -1931,6 +1980,41 @@ watch(
   }
 );
 
+watch(
+  () => props.changeNow3,
+  () => {
+    //comsole.log(props.changeRow);
+    dataProvider.beginUpdate();
+    if (props.changeRow !== "" && props.changeRow != -1) {
+      if (
+        dataProvider != null &&
+        dataProvider != undefined &&
+        dataProvider.getJsonRows().length != 0
+      ) {
+        dataProvider.setValue(
+          props.changeRow,
+          props.changeColid,
+          props.changeValue2
+        );
+      }
+      dataProvider.endUpdate();
+      // updatedrowData.value = [...dataProvider.getJsonRows()];
+
+      // const dataRow = gridView.getCurrent().dataRow;
+      // selectedRowData.value = dataProvider.getRows()[dataRow];
+    }
+  }
+);
+
+watch(
+  () => props.getRowChanged,
+  () => {
+    emit("allStateRows", dataProvider.getAllStateRows());
+    updatedrowData.value = [...dataProvider.getJsonRows()];
+    emit("updatedRowData", updatedrowData.value);
+  }
+);
+
 // onMounted(() => {
 //   //comsole.log("asdf");
 // });
@@ -1947,7 +2031,7 @@ watch(
     let filter4 = [
       {
         name: "미설정메뉴",
-        criteria: "(value = 'false') or (value is null ) ",
+        criteria: props.searchSpecialCond2,
         active: true,
       },
     ];

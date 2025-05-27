@@ -12,7 +12,10 @@ import MST36_001INS from "@/views/MIMASTER/MST36_001INS.vue";
 import MST36_003INS from "@/views/MIMASTER/MST36_003INS.vue";
 import MST36_055INS from "@/views/MIMASTER/MST36_055INS.vue";
 import MST37_068INS from "@/views/MIMASTER/MST37_068INS.vue";
+import MST37_069INS from "@/views/MIMASTER/MST37_069INS.vue";
+import MST37_071INS from "@/views/MIMASTER/MST37_071INS.vue";
 import MST40_001INS from "@/views/MIMASTER/MST40_001INS.vue";
+import MST42_001INS from "@/views/MIMASTER/MST42_001INS.vue";
 import MST43_001INS from "@/views/MIMASTER/MST43_001INS.vue";
 import MST44_002INS from "@/views/MIMASTER/MST44_002INS.vue";
 import MST44_043INS from "@/views/MIMASTER/MST44_043INS.vue";
@@ -163,6 +166,18 @@ export default function masterRouter() {
     {
       path: "MST37_068INS.xml",
       component: MST37_068INS,
+    },
+    {
+      path: "MST37_069INS.xml",
+      component: MST37_069INS,
+    },
+    {
+      path: "MST37_071INS.xml",
+      component: MST37_071INS,
+    },
+    {
+      path: "MST42_001INS.xml",
+      component: MST42_001INS,
     },
   ];
 }

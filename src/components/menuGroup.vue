@@ -37,20 +37,22 @@ const props = defineProps({
     default: false,
   },
 });
-const emit = defineEmits(["mainCode", "subCode"]);
+const emit = defineEmits(["mainCode", "subCode", "mainNm", "subNm"]);
 const mainList = ref([]);
 const subList = ref([]);
 const subsubList = ref([]);
 const selectedMain = ref(0);
 const selectedSub = ref(0);
 onMounted(async () => {
-  //emit("payNm", "전체");
-  // const res = await getMenuGroupList(props.groupCd, props.storeCd, 1);
-  // console.log(res);
-  // mainList.value = res.data.List;
-  // subList.value = res.data.List2;
+  emit("payNm", "전체");
+  const res = await getMenuGroupList(props.groupCd, props.storeCd, 1);
+  console.log(res);
+  mainList.value = res.data.List;
+  subList.value = res.data.List2;
   emit("mainCode", 0);
   emit("subCode", 0);
+  emit("mainNm", "전체");
+  emit("subNm", "전체");
 });
 
 const setSub = (e) => {
@@ -77,9 +79,25 @@ watch(
 );
 watch(selectedSub, () => {
   emit("subCode", selectedSub.value);
+  if (selectedSub.value == 0) {
+    emit("subNm", "전체");
+  } else {
+    const nm = subsubList.value.filter(
+      (item) => item.lngCode == selectedSub.value
+    )[0].strName;
+    emit("subNm", nm);
+  }
 });
 watch(selectedMain, () => {
   emit("mainCode", selectedMain.value);
+  if (selectedMain.value == 0) {
+    emit("mainNm", "전체");
+  } else {
+    const nm = mainList.value.filter(
+      (item) => item.lngCode == selectedMain.value
+    )[0].strName;
+    emit("mainNm", nm);
+  }
 });
 // const changePayCd = (e) => {
 //     emit('payCd' , e.target.value)

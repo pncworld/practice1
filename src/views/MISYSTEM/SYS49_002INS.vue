@@ -1,7 +1,7 @@
 /*--############################################################################
-# Filename : MST01_033INS.vue                                                  
-# Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
-# Date :2025-05-14                                                             
+# Filename : SYS49_002INS.vue                                                  
+# Description : 시스템 등록 > 사용자 관리 > 사용자 등록                        
+# Date :2025-05-27                                                             
 # Author : 권맑음                     
 ################################################################################*/
 <template>
@@ -68,6 +68,7 @@
         :deleteRow5="deleteRow2"
         @updatedRowData2="updatedRowData"
         :setStateBar="true"
+        :rowStateeditable="false"
         @deleteRows="deleteRows"
         :checkBarInactive="'lngSupplierID'"
         :exporttoExcel="exceloutput"

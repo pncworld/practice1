@@ -42,6 +42,8 @@
           :storeCd="selectedStores"
           :groupCd="selectedGroup"
           @mainCode="mainCode"
+          @mainNm="mainNm"
+          @subNm="subNm"
           @subCode="subCode"></MenuGroup>
       </div>
       <div class="flex justify-center ml-20 space-x-2 items-center">
@@ -67,7 +69,11 @@
         <div class="text-base font-semibold">할인율 :</div>
         <div><input type="number" class="pl-1" v-model="cond2" /></div>
         <div>%</div>
-        <div><button class="whitebutton bg-white">적용</button></div>
+        <div>
+          <button class="whitebutton bg-white" @click="setDiscountPrice">
+            적용
+          </button>
+        </div>
       </div>
     </div>
     <!-- 조회조건 -->
@@ -82,6 +88,13 @@
         :documentTitle="'MST01_014INS'"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
+        :editableColId="'lngPrice'"
+        :changeNow="changeNow"
+        :changeRow="changeRow"
+        :changeColid="'lngPrice'"
+        :changeValue2="changeValue2"
+        @updatedRowData="updatedRowData"
+        :inputOnlyNumberColumn="'lngPrice'"
         :suffixColumnPercent="['lngMargin', 'lngRateD']"
         :exporttoExcel="exportExcel">
       </Realgrid>
@@ -91,7 +104,7 @@
 </template>
 
 <script setup>
-import { getSalesUnitbyStore } from "@/api/master";
+import { getSalesUnitbyStore, saveUpdatelngPrice } from "@/api/master";
 import MenuGroup from "@/components/menuGroup.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -125,7 +138,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -147,7 +160,7 @@ const rowData = ref([]);
 const afterSearch = ref(false);
 
 const cond = ref("");
-const cond2 = ref("");
+const cond2 = ref(0);
 const store = useStore();
 
 const datepicker = ref(null);
@@ -201,13 +214,53 @@ const searchButton = async () => {
       searchType.value,
       cond.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
     //comsole.log(error);
+  } finally {
+    store.state.loading = false;
+  }
+};
+
+const saveButton = async () => {
+  if (selectedStores.value == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "매장명을 먼저 선택하세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  try {
+    //updaterowdata.value;
+    store.state.loading = true;
+    const MenuCds = updaterowdata.value
+      .map((item) => item.lngMenuCode)
+      .join("\u200B");
+    const lngPrices = updaterowdata.value
+      .map((item) => item.lngPrice)
+      .join("\u200B");
+    const res = await saveUpdatelngPrice(
+      selectedGroup.value,
+      selectedStores.value,
+      MenuCds,
+      lngPrices
+    );
+    console.log(res);
+
+    Swal.fire({
+      title: "성공",
+      text: "저장이 완료되었습니다.",
+      icon: "success",
+      confirmButtonText: "확인",
+    });
+  } catch (error) {
   } finally {
     store.state.loading = false;
   }
@@ -242,7 +295,7 @@ const initGrid = () => {
     rowData.value = [];
   }
   cond.value = "";
-  cond2.value = "";
+  cond2.value = 0;
 };
 
 //엑셀 버튼 처리 함수
@@ -253,7 +306,12 @@ const exportExcel = ref(false);
 
 const excelButton = () => {
   documentSubTitle.value =
-    selectedExcelStore.value + "\n" + selectedExcelDate.value;
+    selectedExcelStore.value +
+    "\n" +
+    " 메뉴그룹명 :" +
+    MainName.value +
+    "," +
+    SubName.value;
 
   //documentSubTitle.value += "\n";
   exportExcel.value = !exportExcel.value;
@@ -276,5 +334,38 @@ const excelStore = (e) => {
 const excelDate = (e) => {
   selectedExcelDate.value = e;
   //comsole.log(e);
+};
+
+const changeNow = ref(false);
+const changeRow = ref(0);
+const changeValue2 = ref("");
+
+const setDiscountPrice = async () => {
+  let n = rowData.value.length;
+  for (let i = 0; i < n; i++) {
+    changeRow.value = i;
+    changeValue2.value = parseInt(
+      rowData.value[i].lngDCPrice * ((100 - cond2.value) / 100)
+    );
+
+    changeNow.value = !changeNow.value;
+
+    await nextTick();
+  }
+};
+
+const updaterowdata = ref([]);
+const updatedRowData = (e) => {
+  //console.log(e);
+  updaterowdata.value = e;
+};
+
+const MainName = ref("");
+const mainNm = (e) => {
+  MainName.value = e;
+};
+const SubName = ref("");
+const subNm = (e) => {
+  SubName.value = e;
 };
 </script>

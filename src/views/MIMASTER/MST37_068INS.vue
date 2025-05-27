@@ -109,13 +109,16 @@
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :showCheckBar="false"
-        :checkRenderEditable="true"
-        :changeNow="changeNow"
+        :checkRenderEditable="false"
+        :changeNow3="changeNow"
         :changeRow="changeRow"
         :changeColid="changeColid"
         :changeValue2="changeValue2"
         @checkedRowData="checkedRowData"
         @checkedRowIndex="checkedRowIndex"
+        @updatedRowData="updatedRowData"
+        @allStateRows="allStateRows"
+        :getRowChanged="getRowChanged"
         :exporttoExcel="exportExcel">
       </Realgrid>
     </div>
@@ -129,6 +132,7 @@ import {
   getMultiGroup,
   getMultiPrice,
   getSubGroup,
+  saveMultiPrice,
 } from "@/api/master";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -152,6 +156,7 @@ import Realgrid from "@/components/realgrid.vue";
  *  */
 
 import { insertPageLog } from "@/customFunc/customFunc";
+import Swal from "sweetalert2";
 /**
  *  경고창 호출 라이브러리
  *  */
@@ -160,7 +165,7 @@ import { insertPageLog } from "@/customFunc/customFunc";
  * 공통 표준  Function
  */
 
-import { nextTick, onMounted, ref } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -215,6 +220,7 @@ const mainCode = (e) => {
 
 const checkedDatas = ref([]);
 const checkedRowData = (e) => {
+  console.log(e);
   checkedDatas.value = e.map((item) => item.lngMenuPrice);
   console.log(checkedDatas.value);
 };
@@ -222,6 +228,17 @@ const checkedIndexs = ref([]);
 const checkedRowIndex = (e) => {
   checkedIndexs.value = e;
   // console.log(e);
+};
+
+const updateRowData = ref([]);
+const updatedRowData = (e) => {
+  updateRowData.value = e;
+};
+
+const getRowChanged = ref(false);
+const updatedRows = ref([]);
+const allStateRows = (e) => {
+  updatedRows.value = e.updated;
 };
 
 const changeNow = ref(false);
@@ -246,6 +263,8 @@ const changeMultiPrice = async (e) => {
     changeNow.value = !changeNow.value;
     await nextTick();
   }
+
+  getRowChanged.value = !getRowChanged.value;
 };
 
 const deleteMultiPrice = async () => {
@@ -258,6 +277,8 @@ const deleteMultiPrice = async () => {
     changeNow.value = !changeNow.value;
     await nextTick();
   }
+
+  getRowChanged.value = !getRowChanged.value;
 };
 /**
  * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
@@ -297,11 +318,60 @@ const searchButton = async () => {
     );
     console.log(res);
     rowData.value = res.data.List;
-
+    updateRowData.value = JSON.parse(JSON.stringify(res.data.List));
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
     //comsole.log(error);
+  } finally {
+    store.state.loading = false;
+  }
+};
+
+const saveButton = async (e) => {
+  // if (selectedStore.value == 0) {
+  //   Swal.fire({
+  //     title: "경고",
+  //     text: "매장명을 먼저 선택하세요.",
+  //     icon: "warning",
+  //     confirmButtonText: "확인",
+  //   });
+  //   return;
+  // }
+  //console.log(updateRowData.value);
+  // const filteredData = updateRowData.value.filter(
+  //   (item) => item.lngMultiPrice != undefined
+  // );
+  // console.log(filteredData);
+  // console.log(store.state.userData.lngStoreGroup);
+  try {
+    store.state.loading = true;
+    // initGrid();
+    // reload.value = !reload.value;
+    const multipricecodes = updateRowData.value
+      .filter((i, index) => updatedRows.value.includes(index))
+      .map((item) => item.lngMultiPriceGroupCode)
+      .join("\u200B");
+    const lngMenucodes = updateRowData.value
+      .filter((i, index) => updatedRows.value.includes(index))
+      .map((item) => item.lngMenuCode)
+      .join("\u200B");
+    const lngMultiPrice = updateRowData.value
+      .filter((i, index) => updatedRows.value.includes(index))
+      .map((item) =>
+        item.lngMultiPrice == undefined ? -1 : item.lngMultiPrice
+      )
+      .join("\u200B");
+    const res = await saveMultiPrice(
+      store.state.userData.lngStoreGroup,
+      multipricecodes,
+      lngMenucodes,
+      lngMultiPrice
+    );
+    console.log(res);
+    store.state.loading = false;
+  } catch (error) {
+    console.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -337,8 +407,11 @@ const initGrid = () => {
     rowData.value = [];
   }
   cond.value = "";
-  cond2.value = "";
 };
+
+watch([selectedSubGroup, selectedMultiGroup, selectedStore], () => {
+  initGrid();
+});
 
 //엑셀 버튼 처리 함수
 const exportExcel = ref(false);
@@ -347,8 +420,42 @@ const exportExcel = ref(false);
  */
 
 const excelButton = () => {
+  let storeNm;
+  if (selectedStore.value == 0) {
+    storeNm = "선택";
+  } else {
+    storeNm = GroupList.value.filter(
+      (item) => item.lngStoreCode == selectedStore.value
+    )[0].strStoreName;
+  }
+
+  let storeGroup;
+  if (selectedStore.value == 0) {
+    storeGroup = "전체";
+  } else {
+    storeGroup = MultiGroupList.value.filter(
+      (item) => item.lngCode == selectedMultiGroup.value
+    )[0].strName;
+  }
+
+  let menuSubGroup;
+  if (selectedStore.value == 0) {
+    menuSubGroup = "전체";
+  } else {
+    menuSubGroup = MultiSubList.value.filter(
+      (item) => item.lngCode == selectedSubGroup.value
+    )[0].strName;
+  }
+
   documentSubTitle.value =
-    selectedExcelStore.value + "\n" + selectedExcelDate.value;
+    "매장명 : " +
+    storeNm +
+    "\n" +
+    "멀티단가그룹 : " +
+    storeGroup +
+    "\n" +
+    "메뉴서브그룹 : " +
+    menuSubGroup;
 
   //documentSubTitle.value += "\n";
   exportExcel.value = !exportExcel.value;

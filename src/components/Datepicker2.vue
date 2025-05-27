@@ -9,6 +9,7 @@
       class="grid grid-cols-[2fr,1fr,2fr,1fr,1fr] grid-rows-1 justify-start h-11 pr-14 space-x-1">
       <input
         type="date"
+        :disabled="disable"
         class="border rounded-lg h-10 w-36 text-base mr-2 pl-5"
         v-model="selectedStartDate"
         @change="changeStartDate"
@@ -16,18 +17,19 @@
       <span class="items-center flex">~</span>
       <input
         type="date"
+        :disabled="disable"
         class="border rounded-lg h-10 w-36 text-base pl-5 ml-2"
         v-model="selectedEndDate"
         @change="changeEndDate"
         :max="maxEndDate" />
-      <button class="w-[30px] ml-2" @click="toggleRadio">
+      <button class="w-[30px] ml-2" @click="toggleRadio" :disabled="disable">
         <img src="../assets/choiceCalendar.png" class="w-full" alt="" />
       </button>
     </div>
     <div class="flex justify-start">
       <div
         v-show="showRadio"
-        class="-mt-2 p-1 -ml-10 w-40 h-40 bg-gray-100 rounded-lg shadow-md z-10 absolute">
+        class="-mt-2 p-1 -ml-10 w-40 h-40 bg-gray-100 rounded-lg shadow-md z-[70] absolute">
         <div class="flex justify-end mr-3">
           <button @click="toggleRadio">닫기</button>
         </div>
@@ -161,6 +163,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disableAll: {
+    type: Boolean,
+    default: false,
+  },
 });
 const formatDate = (date) => {
   //comsole.log(date);
@@ -174,7 +180,9 @@ const selectedEndDate = ref();
 
 const emitDate1 = (e) => {};
 const maxEndDate = ref("9999-12-31");
+const disable = ref(true);
 onMounted(() => {
+  disable.value = props.disableAll;
   const today = new Date();
   if (props.initToday == 0) {
     today.setDate(today.getDate() - 1);
@@ -205,6 +213,12 @@ onMounted(() => {
   );
 });
 
+watch(
+  () => props.disableAll,
+  () => {
+    disable.value = props.disableAll;
+  }
+);
 watch(
   () => props.limitEndDate,
   () => {

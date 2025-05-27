@@ -412,6 +412,12 @@ export const getMenuList = (groupCd, storeCd) => {
     STORE_CD: 0,
   });
 };
+export const getMenuList2 = (groupCd, storeCd) => {
+  return api2.post("/MIMASTER/MST37_069INS.asmx/getMenuList2", {
+    GROUP_CD: groupCd,
+    STORE_CD: 0,
+  });
+};
 export const getKitchenGroupList = (groupCd) => {
   return api2.post("/MIMASTER/MST44_064INS.asmx/getKitchenGroupList", {
     GROUP_CD: groupCd,
@@ -2210,6 +2216,7 @@ export const getMenuGroupList = (groupCd, storecd, cond) => {
     COND: cond,
   });
 };
+
 export const getSalesUnitbyStore = (
   groupCd,
   storecd,
@@ -2237,9 +2244,38 @@ export const getSubGroup = (groupCd) => {
     GROUP_CD: groupCd,
   });
 };
+export const getSubGroup2 = (groupCd, storeCd) => {
+  return api2.post("/MIMASTER/MST37_069INS.asmx/getSubGroup2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
 export const getMultiGroup = (groupCd) => {
   return api2.post("/MIMASTER/MST37_068INS.asmx/getMultiGroup", {
     GROUP_CD: groupCd,
+  });
+};
+export const getMenuStock = (groupCd, storecd, cond) => {
+  return api2.post("/MIMASTER/MST37_071INS.asmx/getMenuStock", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    COND: cond,
+  });
+};
+
+export const saveMenuStock = (groupCd, storecd, cond) => {
+  return api2.post("/MIMASTER/MST37_071INS.asmx/saveMenuStock", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    COND: cond,
+  });
+};
+export const saveUpdatelngPrice = (groupCd, storecd, menucds, lngprices) => {
+  return api2.post("/MIMASTER/MST01_014INS.asmx/saveUpdatelngPrice", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    MENU_CD: menucds,
+    LNG_PRICE: lngprices,
   });
 };
 export const getMultiPrice = (groupCd, multigroup, subgroup, searchword) => {
@@ -2248,5 +2284,93 @@ export const getMultiPrice = (groupCd, multigroup, subgroup, searchword) => {
     MULTIGROUP: multigroup,
     SUBGROUP: subgroup,
     SEARCH_WORD: searchword,
+  });
+};
+export const overLapCheck = (
+  groupCd,
+  menucodes,
+  storecodes,
+  startdate,
+  enddate
+) => {
+  return api2.post("/MIMASTER/MST37_069INS.asmx/overLapCheck", {
+    GROUP_CD: groupCd,
+    MENU_CD: menucodes,
+    STORE_CD: storecodes,
+    START_DATE: startdate,
+    END_DATE: enddate,
+  });
+};
+
+export const saveMultiPrice = (
+  groupCd,
+  multipricegroupcode,
+  lngMenuCode,
+  lngMultiPrice
+) => {
+  return api2.post("/MIMASTER/MST37_068INS.asmx/saveMultiPrice", {
+    GROUP_CD: groupCd,
+    MULTI_GROUPCODE: multipricegroupcode,
+    MENU_CODES: lngMenuCode,
+    MULTI_PRICES: lngMultiPrice,
+  });
+};
+
+export const getSpecialPriceList = (
+  groupCd,
+  startdate,
+  enddate,
+  subgroup,
+  cond2,
+  storeCd
+) => {
+  return api2.post("/MIMASTER/MST37_069INS.asmx/getSpecialPriceList", {
+    GROUP_CD: groupCd,
+    START_DATE: startdate,
+    END_DATE: enddate,
+    SUBGROUP: subgroup,
+    COND: cond2,
+    STORE_CD: storeCd,
+  });
+};
+export const saveExceptionSpecialPrice = (
+  groupCd,
+  storeCd,
+  menucodes,
+  prices,
+  startdate,
+  enddate,
+  cond,
+  cond2
+) => {
+  return api2.post("/MIMASTER/MST37_069INS.asmx/saveExceptionSpecialPrice", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    MENU_CD: menucodes,
+    PRICES: prices,
+    START_DATE: startdate,
+    END_DATE: enddate,
+    APPLY: cond,
+    IGNORE: cond2,
+  });
+};
+export const deleteSpecialPrices = (SpecialMenuCode) => {
+  return api2.post("/MIMASTER/MST37_069INS.asmx/deleteSpecialPrices", {
+    MENU_CD: SpecialMenuCode,
+  });
+};
+export const updateMultiPrice = (SpecialMenuCode, prices, date) => {
+  return api2.post("/MIMASTER/MST37_069INS.asmx/updateMultiPrice", {
+    MENU_CDS: SpecialMenuCode,
+    PRICES: prices,
+    DATE: date,
+  });
+};
+
+export const getClientList = (groupCd, clientcd, clientNm) => {
+  return api2.post("/MIMASTER/MST42_001INS.asmx/getClientList", {
+    GROUP_CD: groupCd,
+    CLIENT_CD: clientcd,
+    CLIENT_NM: clientNm,
   });
 };
