@@ -48,6 +48,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  showDataLabel: {
+    type: Boolean,
+    default: true,
+  },
 });
 Chart.register(zoomPlugin);
 
@@ -86,7 +90,7 @@ onMounted(() => {
           },
 
           datalabels: {
-            display: true, // 항상 표시
+            display: props.showDataLabel, // 항상 표시
             color: "black", // 텍스트 색상
             anchor: "end", // 데이터 포인트의 끝에 라벨을 붙임
             align: "top", // 위쪽 정렬
@@ -145,7 +149,7 @@ watch(
               display: props.showLegend, // 범례를 표시하지 않도록 설정
             },
             datalabels: {
-              display: true, // 항상 표시
+              display: props.showDataLabel, // 항상 표시
               color: "black", // 텍스트 색상
               anchor: "end", // 데이터 포인트의 끝에 라벨을 붙임
               align: "top", // 위쪽 정렬

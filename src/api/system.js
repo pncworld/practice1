@@ -95,6 +95,7 @@ export const checkId = (strName) => {
     USER_ID: strName,
   });
 };
+
 export const getStoreListforUserEnroll = (groupcd) => {
   return api2.post("/MISYSTEM/SYS49_002INS.asmx/getStoreListforUserEnroll", {
     GROUP_CD: groupcd,

@@ -2374,3 +2374,52 @@ export const getClientList = (groupCd, clientcd, clientNm) => {
     CLIENT_NM: clientNm,
   });
 };
+export const saveClientInfo = (
+  groupCd,
+  sd,
+  sn,
+  rn,
+  sdr,
+  dt,
+  dk,
+  sds,
+  sz,
+  st,
+  sf,
+  sm,
+  smt,
+  sh,
+  se,
+  at,
+  cc,
+  sl
+) => {
+  return api2.post("/MIMASTER/MST42_001INS.asmx/saveClientInfo", {
+    GROUP_CDS: groupCd,
+    SUPPLIER_ID: sd,
+    SUPPLIER_NM: sn,
+    REGISTER_NO: rn,
+    STR_DIRECTOR: sdr,
+    DEALTYPE: dt,
+    DEALKIND: dk,
+    STRADDRESS: sds,
+    STRZIPCODE: sz,
+    STRTELNO: st,
+    STRFAXNO: sf,
+    STRMANAGER: sm,
+    STRMANAGERTELNO: smt,
+    STRHPNO: sh,
+    STREMAIL: se,
+    ACCTYPE: at,
+    CONVCODE: cc,
+    SUPPLIERTYPE: sl,
+  });
+};
+
+export const deleteClientInfo = (groupCd, supid, suptype) => {
+  return api2.post("/MIMASTER/MST42_001INS.asmx/deleteClientInfo", {
+    GROUP_CD: groupCd,
+    SUP_ID: supid,
+    SUP_TYPE: suptype,
+  });
+};

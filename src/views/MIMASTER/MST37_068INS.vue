@@ -14,11 +14,11 @@
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="saveButton" class="button search md:w-auto w-14">
+        <button @click="saveButton" class="button save md:w-auto w-14">
           <!-- 여기서부터 -->
           저장
         </button>
-        <button @click="excelButton" class="button save w-auto excel">
+        <button @click="excelButton" class="button excel w-auto excel">
           엑셀
         </button>
       </div>

@@ -223,3 +223,26 @@ export const getCommonList = (code) => {
     CODE: code,
   });
 };
+
+export const MainDashBoard = (groupcd, storecd, sublease, sequence, lang) => {
+  return api2.post("/SYSTEM/sysCom.asmx/getYesterdayClose", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    SUBLEASE: sublease,
+    SEQUENCE: sequence,
+    LANGUAGE: lang,
+  });
+};
+export const MainDashBoard2 = (groupcd, storecd, sequence) => {
+  return api2.post("/SYSTEM/sysCom.asmx/MainDashBoard2", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    SEQUENCE: sequence,
+  });
+};
+export const MainDashBoard3 = (groupcd, storecd) => {
+  return api2.post("/SYSTEM/sysCom.asmx/MainDashBoard3", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+  });
+};

@@ -1948,6 +1948,7 @@ watch(
       emit("clickedRowData", selectedRowData.value);
       emit("updatedRowData", updatedrowData.value);
       emit("updatedRowData2", updatedrowData.value);
+      emit("allStateRows", dataProvider.getAllStateRows());
     }
   }
 );
