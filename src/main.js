@@ -18,6 +18,8 @@ import "./customStyle/style.css";
 import router from "./router";
 import store from "./store";
 import Swal from "sweetalert2";
+import VueQuill from "vue3-quill"; // plugin (전역 등록용)
+import "quill/dist/quill.snow.css"; // CSS 스타일
 
 library.add(fas, far);
 window.addEventListener("storage", (event) => {
@@ -30,6 +32,8 @@ const app = createApp(App)
   .use(store)
   .use(useLoading) // 'Loading' 제거
   .use(VueKonva)
+  .use(VueQuill)
+
   .component("VueDatePicker", VueDatePicker)
   .component("font-awesome-icon", FontAwesomeIcon)
   .component("VDatePicker", DatePicker)

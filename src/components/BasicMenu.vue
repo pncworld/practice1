@@ -407,9 +407,9 @@ const selectCategory = (strUrl, lngProgramID2, strTitle) => {
     });
   }
 
-  const matchingtab = categories.value
-    .flatMap((item) => item.subcategories)
-    .filter((sub) => sub.lngProgramID == lngProgramID2); // 조건 넣어서 필터
+  // const matchingtab = categories.value
+  //   .flatMap((item) => item.subcategories)
+  //   .filter((sub) => sub.lngProgramID == lngProgramID2); // 조건 넣어서 필터
 
   //comsole.log(matchingtab);
   //store.dispatch("saveActiveTab", matchingtab[0]);

@@ -1,8 +1,8 @@
 <template>
   <div class="flex justify-center items-center mt-10">
     <div
-      class="grid grid-rows-3 grid-cols-1 border w-[70vw] h-[70vh] items-center">
-      <div class="flex w-[80vw] h-[20vh] space-x-10 justify-start ml-10">
+      class="grid grid-rows-3 grid-cols-1 w-[80vw] h-[80vh] items-center shadow-lg border-2">
+      <div class="flex w-[90vw] h-[20vh] space-x-10 justify-start ml-10">
         <div class="w-[40%] h-full flex justify-start flex-col items-start">
           <span>◎전일마감현황</span>
           <Realgrid
@@ -34,14 +34,20 @@
             :showDataLabel="false"></Chart>
         </div>
       </div>
-      <div class="flex w-[80vw] h-[20vh] space-x-10 justify-start ml-10">
+      <div class="flex w-[90vw] h-[20vh] space-x-10 justify-start ml-10">
         <div class="w-[40%] h-full flex justify-start flex-col items-start">
-          <span class="">◎공지사항</span>
+          <span class="flex space-x-3"
+            ><span>◎공지사항</span
+            ><button class="whitebutton -mt-2" @click="moveNoticePage">
+              공지사항 목록가기
+            </button></span
+          >
           <Realgrid
             :progname="'MainDashBoard_VUE'"
             :progid="3"
             :rowStateeditable="false"
             :setStateBar="false"
+            @dblclickedRowData="dblclickedRowData"
             :rowData="rowData3"></Realgrid>
         </div>
         <div class="w-[40%] h-full flex justify-start flex-col items-start">
@@ -70,8 +76,6 @@ import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
-
-const isMobile = store.state.isMobile;
 
 /**
  * 	화면 Load시 실행 스크립트
@@ -169,6 +173,18 @@ onMounted(async () => {
     today.getFullYear() + "-" + (today.getMonth() + 1),
   ];
 });
+
+const dblclickedRowData = (e) => {
+  //console.log(e);
+};
+
+const moveNoticePage = (e) => {
+  store.state.moveOtherTab = {
+    strUrl: "MINOTICE::NOT01_001INS.xml",
+    lngProgramID: 800101,
+    strTitle: "공지사항 목록",
+  };
+};
 </script>
 
 <style lang="scss" scoped></style>

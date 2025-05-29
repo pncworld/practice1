@@ -11,6 +11,7 @@ import mobileRouter from "./mobileRouter";
 import salesRouter from "./salesRouter";
 import systemRouter from "./systemRouter";
 import micrmRouter from "./micrmRouter";
+import minoticeRouter from "./minoticeRouter";
 
 const isMobile = () => {
   const userAgent = window.navigator.userAgent;
@@ -66,6 +67,10 @@ const routes = [
   {
     path: "/MISYSTEM",
     children: systemRouter(),
+  },
+  {
+    path: "/MINOTICE",
+    children: minoticeRouter(),
   },
 ];
 
