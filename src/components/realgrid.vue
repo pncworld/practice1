@@ -844,6 +844,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  checkAll: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
 });
 
 // 2구간
@@ -2591,6 +2596,15 @@ watch(
 );
 
 watch(
+  () => props.checkAll,
+  () => {
+    if (gridView != null) {
+      gridView.checkAll(false);
+    }
+  }
+);
+
+watch(
   () => props.hideNow,
   (newValue) => {
     dataProvider.hideRows(props.hideRow);
@@ -2766,6 +2780,13 @@ watch(
     }
     addrow4activated.value = true;
     funcshowGrid().then(() => {
+      var rows = gridView.getCheckedRows();
+      selectedRowData.value = [];
+      for (var i in rows) {
+        var data = dataProvider.getJsonRow(rows[i]);
+        selectedRowData.value.push(data);
+      }
+      emit("checkedRowData", selectedRowData.value);
       setTimeout(function () {
         if (selectedindex.value == -1) {
           dataProvider.clearRowStates();

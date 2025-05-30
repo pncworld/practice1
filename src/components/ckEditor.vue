@@ -11,6 +11,7 @@
             <ckeditor
               v-if="editor && config"
               :modelValue="config.initialData"
+              v-model="editorData"
               :editor="editor"
               :config="config"
               @ready="onReady" />
@@ -38,6 +39,7 @@ import {
   AutoLink,
   Autosave,
   BalloonToolbar,
+  Base64UploadAdapter,
   Bold,
   Code,
   Emoji,
@@ -99,6 +101,7 @@ import {
 import translations from "ckeditor5/translations/ko.js";
 
 import "ckeditor5/ckeditor5.css";
+import { watch } from "vue";
 
 /**
  * Create a free account with a trial: https://portal.ckeditor.com/checkout?plan=free
@@ -111,7 +114,16 @@ const editorMenuBar = useTemplateRef("editorMenuBarElement");
 const isLayoutReady = ref(false);
 
 const editor = DecoupledEditor;
+const props = defineProps({
+  content: {
+    type: String,
+    default: "여기에 입력하세요.",
+  },
+});
 
+onMounted(() => {
+  editorData.value = props.content;
+});
 const config = computed(() => {
   if (!isLayoutReady.value) {
     return null;
@@ -155,6 +167,7 @@ const config = computed(() => {
       AutoLink,
       Autosave,
       BalloonToolbar,
+      Base64UploadAdapter,
       Bold,
       Code,
       Emoji,
@@ -295,7 +308,8 @@ const config = computed(() => {
         "resizeImage",
       ],
     },
-    initialData: "",
+
+    initialData: props.content,
     language: "ko",
     licenseKey: LICENSE_KEY,
     link: {
@@ -353,6 +367,18 @@ function onReady(editor) {
   editorToolbar.value.appendChild(editor.ui.view.toolbar.element);
   editorMenuBar.value.appendChild(editor.ui.view.menuBarView.element);
 }
+
+const editorData = ref(props.content);
+watch(
+  () => props.content,
+  (newVal) => {
+    editorData.value = newVal;
+  }
+);
+const emit = defineEmits(["editorData"]);
+watch(editorData, () => {
+  emit("editorData", editorData.value);
+});
 </script>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap");

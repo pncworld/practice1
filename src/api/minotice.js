@@ -98,3 +98,95 @@ export const getSCUserList = (groupCd, sccds) => {
     SC_CD: sccds,
   });
 };
+export const saveNoticeDoc = (
+  writer,
+  groupCd,
+  allstore,
+  adminlist,
+  teamlist,
+  sclist,
+  storelist,
+  important,
+  topdist,
+  posdown,
+  apppush,
+  pnotice,
+  pfdate,
+  ptdate,
+  allinform,
+  informfdate,
+  informtdate,
+  realarm,
+  realarmfdate,
+  realarmtdate,
+  pass,
+  ntype,
+  subject,
+  body,
+  seq,
+  filecount,
+  savetype,
+  noticeseq
+) => {
+  return api2.post("/MINOTICE/NOT01_001INS.asmx/saveNoticeDoc", {
+    WRITER: writer,
+    GROUP_CD: groupCd,
+    ALLSTORE: allstore,
+    ADMINLIST: adminlist,
+    TEAMLIST: teamlist,
+    SCLIST: sclist,
+    STORELIST: storelist,
+    IMPORTANT: important,
+    TOP_DIST: topdist,
+    POS_DOWN: posdown,
+    APP_PUSH: apppush,
+    P_NOTICE: pnotice,
+    P_FDATE: pfdate,
+    P_TDATE: ptdate,
+    ALL_INFORM: allinform,
+    INFORMF_DATE: informfdate,
+    INFORMT_DATE: informtdate,
+    REALARM: realarm,
+    REALARMF_DATE: realarmfdate,
+    REALARMT_DATE: realarmtdate,
+    PASSWORD: pass,
+    NOTICE_TYPE: ntype,
+    SUBJECT: subject,
+    BODY: body,
+    SEQUENCE: seq,
+    FILE_COUNT: filecount,
+    SAVETYPE: savetype,
+    NOTICE_SEQ: noticeseq,
+  });
+};
+
+export const saveNoticeFileInsert = (
+  groupCd,
+  noticeseq,
+  seqno,
+  filepath,
+  file,
+  filesize
+) => {
+  return api2.post("/MINOTICE/NOT01_001INS.asmx/saveNoticeFileInsert", {
+    GROUP_CD: groupCd,
+    NOTICE_SEQ: noticeseq,
+    SEQNO: seqno,
+    FILE_PATH: filepath,
+    STR_FILE: file,
+    FILE_SIZE: filesize,
+  });
+};
+export const getNoticeDocDetail = (groupCd, storeCd, adminid, seqid) => {
+  return api2.post("/MINOTICE/NOT01_001INS.asmx/getNoticeDocDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    ADMINID: adminid,
+    SEQNO: seqid,
+  });
+};
+export const deleteNoticeDoc = (seqid) => {
+  return api2.post("/MINOTICE/NOT01_001INS.asmx/deleteNoticeDoc", {
+    SEQNO: seqid,
+  });
+};
