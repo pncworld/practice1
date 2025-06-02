@@ -2780,13 +2780,16 @@ watch(
     }
     addrow4activated.value = true;
     funcshowGrid().then(() => {
-      var rows = gridView.getCheckedRows();
-      selectedRowData.value = [];
-      for (var i in rows) {
-        var data = dataProvider.getJsonRow(rows[i]);
-        selectedRowData.value.push(data);
+      if (gridView) {
+        var rows = gridView.getCheckedRows();
+        selectedRowData.value = [];
+        for (var i in rows) {
+          var data = dataProvider.getJsonRow(rows[i]);
+          selectedRowData.value.push(data);
+        }
+        emit("checkedRowData", selectedRowData.value);
       }
-      emit("checkedRowData", selectedRowData.value);
+
       setTimeout(function () {
         if (selectedindex.value == -1) {
           dataProvider.clearRowStates();

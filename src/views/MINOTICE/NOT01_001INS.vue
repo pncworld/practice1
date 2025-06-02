@@ -62,7 +62,7 @@
     <div
       class="bg-white p-6 rounded-xl shadow-xl w-[85vw] h-[90vh] overflow-y-auto">
       <div class="flex justify-between">
-        <div class="text-2xl font-bold">◎공지사항 등록</div>
+        <div class="text-2xl font-bold">◎공지사항 {{ NoticeDefault }}</div>
         <div class="flex justify-center items-center space-x-3">
           <button class="button primary" @click="openFileEdit">파일첨부</button>
           <input
@@ -231,6 +231,7 @@
             :progname="'NOT01_001INS_VUE'"
             :progid="8"
             :rowData="rowData10"
+            @checkedRowData="checkedRowData6"
             :rowStateeditable="false"></Realgrid>
         </div>
       </div>
@@ -428,7 +429,8 @@
               <input
                 type="text"
                 class="border h-[85%] w-[60%]"
-                v-model="gridvalue21" />
+                v-model="gridvalue21"
+                disabled />
             </div>
             <div
               class="bg-gray-100 font-semibold text-lg flex justify-center items-center border-l border-t">
@@ -438,7 +440,8 @@
               <input
                 type="text"
                 class="border h-[85%] w-[60%]"
-                v-model="gridvalue22" />
+                v-model="gridvalue22"
+                disabled />
             </div>
           </div>
           <div
@@ -449,13 +452,15 @@
             <input
               type="text"
               class="border h-[85%] w-[80%]"
-              v-model="gridvalue23" />
+              v-model="gridvalue23"
+              disabled />
           </div>
         </div>
         <div class="w-[80vw] h-[60vh] border">
           <div
             v-html="content"
-            class="border border-black w-full h-full overflow-auto"></div>
+            disabled
+            class="border border-black w-full h-full overflow-auto content-wrapper"></div>
         </div>
         <div class="h-[10vh] w-[97%]">
           <div class="text-lg font-semibold flex justify-start">◎첨부파일</div>
@@ -479,7 +484,9 @@
 import { getCommonList } from "@/api/common";
 import { uploadFile } from "@/api/master";
 import {
+  deleteFiles,
   deleteNoticeDoc,
+  deleteNoticeFiles,
   getAdminUserList,
   getInitNoticeInfo,
   getNoticeDocCount,
@@ -537,7 +544,7 @@ const showteam = ref(false);
 const showsc = ref(false);
 
 onMounted(async () => {
-  console.log(store.state.userData);
+  //console.log(store.state.userData);
 
   gridvalue1.value = store.state.userData.strChargerName;
 
@@ -829,7 +836,7 @@ const reMount = async () => {
     store.state.loading = false;
   }
 };
-
+const editorInsert = ref(false);
 const Writepopup = ref(false);
 const closePopUp = () => {
   Writepopup.value = false;
@@ -842,6 +849,14 @@ const WritePopUp = () => {
   Writepopup.value = true;
 };
 
+const NoticeDefault = ref("등록");
+watch(editorInsert, () => {
+  if (editorInsert.value == false) {
+    NoticeDefault.value = "등록";
+  } else {
+    NoticeDefault.value = "수정";
+  }
+});
 const showadmin = ref(false);
 const showAdmin = () => {
   showadmin.value = true;
@@ -880,7 +895,7 @@ const checkedRowData4 = (e) => {
 };
 const checkRows5 = ref([]);
 const checkedRowData5 = (e) => {
-  console.log(e);
+  // console.log(e);
   checkRows5.value = e;
 };
 
@@ -935,6 +950,25 @@ const selectedSeqId = ref(0);
 const saveButton = async () => {
   try {
     store.state.loading = true;
+
+    if (filesEditForDelete.value.length > 0 && editorInsert.value == true) {
+      try {
+        const res = await deleteNoticeFiles(
+          store.state.userData.lngStoreGroup,
+          selectedSeqId.value,
+          filesEditForDelete.value.join("\u200b")
+        );
+
+        const res2 = await deleteFiles(
+          filesEditForDelete2.value.join("\u200b")
+        );
+      } catch (error) {
+        store.state.loading = false;
+        return;
+      } finally {
+        store.state.loading = false;
+      }
+    }
     const res = await saveNoticeDoc(
       gridvalue1.value,
       gridvalue2.value,
@@ -965,6 +999,7 @@ const saveButton = async () => {
       editorInsert.value == false ? "I" : "U",
       selectedSeqId.value
     );
+
     const newSeq = res.data.List[0].lngSeqID;
     const tempFileName = ref([]);
     if (rowData10.value.length > 0) {
@@ -973,7 +1008,7 @@ const saveButton = async () => {
       rowData10.value.forEach((file, index) => {
         if (file.checkbox !== true) {
           const currv4 = v4();
-          console.log(file.strFileName);
+          // console.log(file.strFileName);
           formData.append(
             `file${index}`,
             file.strFile,
@@ -1124,25 +1159,39 @@ const currWriterSeq = ref("");
 const currNoticeSeq = ref("");
 const editInfo = ref("");
 const clickedRowData = async (e) => {
-  console.log(e);
+  try {
+    store.state.loading = true;
+    const res = await getNoticeDocDetail(
+      store.state.userData.lngStoreGroup,
+      store.state.userData.lngPosition,
+      store.state.userData.lngUserAdminID,
+      e[7],
+      1
+    );
+    //console.log(res);
+    editInfo.value = res.data;
+    gridvalue21.value = res.data.List[0].strWriter;
+    gridvalue22.value = res.data.List[0].dtmWriteDate;
+    gridvalue23.value = res.data.List[0].strSubject;
+    currWriterSeq.value = res.data.List[0].lngWriteUser;
+    currNoticeSeq.value = res.data.List[0].lngSeqID;
+    content.value = res.data.List[0].strBody;
+    rowData11.value = res.data.List2;
+    showNoticeDetail.value = true;
+  } catch (error) {
+  } finally {
+    store.state.loading = false;
+  }
+};
 
-  const res = await getNoticeDocDetail(
-    store.state.userData.lngStoreGroup,
-    store.state.userData.lngPosition,
-    store.state.userData.lngUserAdminID,
-    e[7],
-    1
+const filesEditForDelete = ref([]);
+const filesEditForDelete2 = ref([]);
+const checkedRowData6 = (e) => {
+  filesEditForDelete.value = e.map((item) => item.lngSeqNo);
+  filesEditForDelete2.value = e.map(
+    (item) => item.strFilePath.split("/Uploads/")[1]
   );
-  //console.log(res);
-  editInfo.value = res.data;
-  gridvalue21.value = res.data.List[0].strWriter;
-  gridvalue22.value = res.data.List[0].dtmWriteDate;
-  gridvalue23.value = res.data.List[0].strSubject;
-  currWriterSeq.value = res.data.List[0].lngWriteUser;
-  currNoticeSeq.value = res.data.List[0].lngSeqID;
-  content.value = res.data.List[0].strBody;
-  rowData11.value = res.data.List2;
-  showNoticeDetail.value = true;
+  console.log(e);
 };
 const rowData11 = ref([]);
 const content = ref("");
@@ -1186,11 +1235,10 @@ const deleteNotice = async () => {
   }
 };
 
-const editorInsert = ref(false);
 const editPopUp = () => {
   editorInsert.value = true;
   showNoticeDetail.value = false;
-  console.log(editInfo.value);
+
   gridvalue1.value = editInfo.value.List[0].strWriter;
   gridvalue2.value = editInfo.value.List[0].lngStoreGroup;
   cond.value = false;
@@ -1227,7 +1275,6 @@ const editPopUp = () => {
 };
 
 const clickedRowData2 = async (e) => {
-  console.log(e);
   try {
     const response = await axios.get(`${e[4]}`, {
       responseType: "blob", // 응답을 Blob 형태로 받음
@@ -1244,15 +1291,16 @@ const clickedRowData2 = async (e) => {
     // 다운로드 후 Blob URL 해제
     window.URL.revokeObjectURL(url);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     Swal.fire({
       title: "오류",
       text: "파일 다운로드 실패",
       icon: "error",
       confirmButtonText: "확인",
     });
+    return;
   }
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

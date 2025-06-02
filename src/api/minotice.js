@@ -190,3 +190,23 @@ export const deleteNoticeDoc = (seqid) => {
     SEQNO: seqid,
   });
 };
+export const deleteNoticeFiles = (groupcd, noticeseq, seqid) => {
+  return api2.post("/MINOTICE/NOT01_001INS.asmx/deleteNoticeFiles", {
+    GROUP_CD: groupcd,
+    NOTICE_SEQ: noticeseq,
+    SEQNO: seqid,
+  });
+};
+export const deleteFiles = (filename) => {
+  return api2.post(
+    "/MINOTICE/FileDelete.ashx",
+    {
+      filename: filename,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json", // 일부 서버에서 필요할 수 있음
+      },
+    }
+  );
+};

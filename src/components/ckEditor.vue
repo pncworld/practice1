@@ -123,6 +123,7 @@ const props = defineProps({
 
 onMounted(() => {
   editorData.value = props.content;
+  emit("editorData", editorData.value);
 });
 const config = computed(() => {
   if (!isLayoutReady.value) {
