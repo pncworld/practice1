@@ -849,6 +849,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  checkRowAuto: {
+    // 행높이
+    type: Boolean,
+    default: true,
+  },
 });
 
 // 2구간
@@ -1187,7 +1192,10 @@ const funcshowGrid = async () => {
           : item.strColType.includes("dropdown")
           ? "list"
           : "text",
-      editable: props.checkRenderEditable == true ? true : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
+      editable:
+        props.checkRenderEditable == true && item.strColID == "checkbox"
+          ? true
+          : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
     },
     buttonVisibility: "always",
     styleCallback: function (grid, dataCell) {
@@ -1810,30 +1818,32 @@ const funcshowGrid = async () => {
       if (props.excludeCheck == true) {
         gridView.checkAll(false); // checkrowstates
       }
-      if (gridView.isCheckedRow(clickData.itemIndex)) {
-        if (props.hideCheckBarList == false) {
-          grid.checkItem(clickData.itemIndex, false);
-        } else {
-          if (
-            props.hideCheckBarList == true &&
-            selectedRowData.value[4] != "0"
-          ) {
+
+      if (props.checkRowAuto == true) {
+        if (gridView.isCheckedRow(clickData.itemIndex)) {
+          if (props.hideCheckBarList == false) {
             grid.checkItem(clickData.itemIndex, false);
+          } else {
+            if (
+              props.hideCheckBarList == true &&
+              selectedRowData.value[4] != "0"
+            ) {
+              grid.checkItem(clickData.itemIndex, false);
+            }
           }
-        }
-      } else {
-        if (props.hideCheckBarList == false) {
-          grid.checkItem(clickData.itemIndex);
         } else {
-          if (
-            props.hideCheckBarList == true &&
-            selectedRowData.value[4] != "0"
-          ) {
+          if (props.hideCheckBarList == false) {
             grid.checkItem(clickData.itemIndex);
+          } else {
+            if (
+              props.hideCheckBarList == true &&
+              selectedRowData.value[4] != "0"
+            ) {
+              grid.checkItem(clickData.itemIndex);
+            }
           }
         }
       }
-
       // dataProvider.checkRowStates(true);
       selectedRowData.value = dataProvider.getRows()[current.dataRow];
       if (selectedRowData.value) {

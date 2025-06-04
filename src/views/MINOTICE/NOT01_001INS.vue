@@ -999,7 +999,7 @@ const saveButton = async () => {
       editorInsert.value == false ? "I" : "U",
       selectedSeqId.value
     );
-
+    console.log(res);
     const newSeq = res.data.List[0].lngSeqID;
     const tempFileName = ref([]);
     if (rowData10.value.length > 0) {
@@ -1052,6 +1052,7 @@ const saveButton = async () => {
 
     // console.log(res);
   } catch (error) {
+    console.log(error);
   } finally {
     initNoticeEnroll();
     store.state.loading = false;

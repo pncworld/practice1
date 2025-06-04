@@ -245,3 +245,82 @@ export const getReservedCustomorSearch = (
     COND2: cond2,
   });
 };
+export const getReservedTimeTable = (groupcd, storecd) => {
+  return api2.post("/MICRM/CRM10_007INS_shy.asmx/getReservedTimeTable", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+  });
+};
+export const getReservedNum = (groupcd, storecd) => {
+  return api2.post("/MICRM/CRM10_019INS.asmx/getReservedNum", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+  });
+};
+export const getReserveTeamTable = (groupcd, storecd) => {
+  return api2.post("/MICRM/CRM10_020INS.asmx/getReserveTeamTable", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+  });
+};
+export const saveReserveTimeTable = (
+  groupcd,
+  storecd,
+  holiday,
+  rsvtype,
+  rsvtime,
+  rsvhour,
+  dtmrsvtime,
+  lngactive,
+  update
+) => {
+  return api2.post("/MICRM/CRM10_007INS_shy.asmx/saveReserveTimeTable", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    COND1: holiday,
+    COND2: rsvtype,
+    COND3: rsvtime,
+    COND4: rsvhour,
+    COND5: dtmrsvtime,
+    COND6: lngactive,
+    UPDATE: update,
+  });
+};
+export const saveReserveNum = (
+  groupcd,
+  storecd,
+  holiday,
+  rsvtype,
+  rsvtime,
+  max,
+  update
+) => {
+  return api2.post("/MICRM/CRM10_019INS.asmx/saveReserveNum", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    COND1: holiday,
+    COND2: rsvtype,
+    COND3: rsvtime,
+    COND4: max,
+    UPDATE: update,
+  });
+};
+export const saveReserveTeamTable = (
+  groupcd,
+  storecd,
+  cond1,
+  cond2,
+  cond3,
+  cond4,
+  update
+) => {
+  return api2.post("/MICRM/CRM10_020INS.asmx/saveReserveTeamTable", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    COND1: cond1,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+    UPDATE: update,
+  });
+};
