@@ -1,7 +1,7 @@
 /*--############################################################################
-# Filename : ATT07_001INS.vue                                                  
-# Description : 인사관리 > 사원 마스터 > 직위등록.                              
-# Date :2025-06-04                                                             
+# Filename : ATT07_003INS.vue                                                  
+# Description : 인사관리 > 마스터 관리 > 근무장소등록.                          
+# Date :2025-06-05                                                             
 # Author : 권맑음                     
 ################################################################################*/
 <template>
@@ -32,7 +32,7 @@
     <!-- 그리드 영역 -->
     <div class="w-full h-[80%] grid grid-rows-1 grid-cols-[7fr,5fr] mt-5">
       <Realgrid
-        :progname="'ATT07_001INS_M_VUE'"
+        :progname="'ATT07_003INS_M_VUE'"
         :progid="1"
         :rowData="rowData"
         :reload="reload"
@@ -45,9 +45,9 @@
         @selectedIndex="selectedIndex"
         @updatedRowData="updatedRowData"
         :addRow4="addRow4"
-        :addrowProp="'checkbox,lngRankCode,strRank,lngOrder,lngPOSSecurityRating,checkbox2,lngEmpInsert,dtmInsert,strInsertIP,lngEmpEdit,dtmEdit,strEditIP'"
-        :addrowDefault="'false, , , , ,false, , , , , , ,'"
-        :documentTitle="'ATT07_001INS'"
+        :addrowProp="'checkbox,lngAreaCode,strArea,checkbox2,lngEmpInsert,dtmInsert,strInsertIP,lngEmpEdit,dtmEdit,strEditIP'"
+        :addrowDefault="'false, , ,false, ,, , , , , , ,'"
+        :documentTitle="'ATT07_003INS'"
         :changeValue2="changeValue2"
         :changeColid="changeColid"
         :changeRow="changeRow"
@@ -58,71 +58,37 @@
         :checkRenderEditable="true"
         :exporttoExcel="exportExcel">
       </Realgrid>
-      <div class="w-[70%] h-[40vh] mt-10 ml-10">
+      <div class="w-[70%] h-[30vh] mt-10 ml-10">
         <div
-          class="grid grid-rows-8 grid-cols-[1fr,3fr] border w-full h-full border-black">
+          class="grid grid-rows-6 grid-cols-[1fr,3fr] border w-full h-full border-black">
           <div
             class="border border-black flex justify-center items-center bg-orange-100">
-            직위코드
+            근무장소코드
             <span class="text-red-400 flex justify-center items-center">*</span>
           </div>
           <div class="border border-black flex justify-center items-center">
             <input
               type="number"
               :disabled="disablegrid"
-              name="lngRankCode"
+              name="lngAreaCode"
               v-model="gridvalue1"
               @input="changeValue"
               class="w-[70%] h-[70%] border border-black pl-1" />
           </div>
           <div
             class="border border-black flex justify-center items-center bg-orange-100">
-            직위명
+            근무장소명
             <span class="text-red-400 flex justify-center items-center">*</span>
           </div>
           <div class="border border-black flex justify-center items-center">
             <input
               type="text"
-              name="strRank"
+              name="strArea"
               @input="changeValue"
               v-model="gridvalue2"
               class="w-[70%] h-[70%] border border-black pl-1" />
           </div>
-          <div class="border border-black flex justify-center items-center">
-            구 분
-          </div>
-          <div
-            class="border border-black flex justify-center items-center space-x-5">
-            <label for="cond"
-              ><input
-                type="radio"
-                id="cond"
-                name="intGrade"
-                @change="changeValue"
-                :value="1"
-                v-model="gridvalue3" />정직원</label
-            >
-            <label for="cond2"
-              ><input
-                type="radio"
-                id="cond2"
-                :value="2"
-                @change="changeValue"
-                name="intGrade"
-                v-model="gridvalue3" />PT</label
-            >
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            정렬
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            <input
-              type="number"
-              name="lngOrder"
-              @input="changeValue"
-              class="w-[70%] h-[70%] border border-black pl-1"
-              v-model="gridvalue4" />
-          </div>
+
           <div class="border border-black flex justify-center items-center">
             등록자
           </div>
@@ -171,7 +137,6 @@
 </template>
 
 <script setup>
-import { saveReserveTeamTable } from "@/api/micrm";
 import "vue3-timepicker/dist/VueTimepicker.css";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -209,7 +174,14 @@ import { onMounted, ref } from "vue";
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
-import { deletePosition, getPositionList, savePosition } from "@/api/miattend";
+import {
+  deleteRole,
+  deleteWorkLocation,
+  getRoleList,
+  getWorkLocation,
+  saveRole,
+  saveWorkLocation,
+} from "@/api/miattend";
 import { useStore } from "vuex";
 /**
  * 	화면 Load시 실행 스크립트
@@ -241,17 +213,15 @@ const store = useStore();
 
 const clickedRowData = (e) => {
   //disablegrid.value = true;
-  insertupdatedelete.value = 2;
-
+  //insertupdatedelete.value = 2;
+  //console.log(e);
   gridvalue1.value = e[1];
   gridvalue2.value = e[2];
-  gridvalue3.value = e[12];
-  gridvalue4.value = e[3];
 
-  gridvalue5.value = e[6];
-  gridvalue6.value = e[7];
-  gridvalue7.value = e[9];
-  gridvalue8.value = e[10];
+  gridvalue5.value = e[4];
+  gridvalue6.value = e[5];
+  gridvalue7.value = e[7];
+  gridvalue8.value = e[8];
 };
 
 const updateStateRow = ref([]);
@@ -295,7 +265,7 @@ const searchButton = async () => {
     store.state.loading = true;
     initGrid();
     reload.value = !reload.value;
-    const res = await getPositionList(store.state.userData.lngStoreGroup, 0);
+    const res = await getWorkLocation(store.state.userData.lngStoreGroup, 0);
     console.log(res);
     rowData.value = res.data.List;
 
@@ -320,12 +290,6 @@ const addButton = () => {
     });
     return;
   }
-  //   insertupdatedelete.value = 1;
-  //   disablegrid.value = false;
-  //   gridvalue1.value = "";
-  //   gridvalue2.value = "";
-  //   gridvalue3.value = 0;
-  //   gridvalue4.value = 0;
 
   addRow4.value = !addRow4.value;
 };
@@ -342,7 +306,6 @@ const saveButton = async () => {
   }
   // console.log(updateStateRow.value);
   if (
-    updateStateRow.value.deleted.length == 0 &&
     updateStateRow.value.updated.length == 0 &&
     updateStateRow.value.created.length == 0
   ) {
@@ -354,13 +317,13 @@ const saveButton = async () => {
     });
     return;
   }
-  const hashstate = new Set(updateRow.value.map((item) => item.lngRankCode));
+  const hashstate = new Set(updateRow.value.map((item) => item.lngAreaCode));
   const size = updateRow.value.length;
   const setsize = hashstate.size;
   if (size != setsize) {
     Swal.fire({
       title: "경고",
-      text: "중복된 직위코드가 존재합니다.",
+      text: "중복된 근무장소코드가 존재합니다.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -372,78 +335,58 @@ const saveButton = async () => {
     const result = await fetch("https://api64.ipify.org", { timeout: 3000 });
     const data = await result.text();
     let userIp = data;
-
+    let res;
     if (updateStateRow.value.created.length > 0) {
-      const rankcode = updateRow.value
+      const areacode = updateRow.value
         .filter((item, index) => updateStateRow.value.created.includes(index))
-        .map((item) => item.lngRankCode);
-      const strrank = updateRow.value
+        .map((item) => item.lngAreaCode);
+      const strarea = updateRow.value
         .filter((item, index) => updateStateRow.value.created.includes(index))
-        .map((item) => item.strRank);
-      const lngOrder = updateRow.value
-        .filter((item, index) => updateStateRow.value.created.includes(index))
-        .map((item) => item.lngOrder);
+        .map((item) => item.strArea);
+
       const checkbox2 = updateRow.value
         .filter((item, index) => updateStateRow.value.created.includes(index))
         .map((item) => (item.checkbox2 == false ? 0 : 1));
       const userID = store.state.userData.lngSequence;
       const userIP = userIp;
 
-      const intGrade = updateRow.value
-        .filter((item, index) => updateStateRow.value.created.includes(index))
-        .map((item) => item.intGrade);
-
-      const res = await savePosition(
+      res = await saveWorkLocation(
         store.state.userData.lngStoreGroup,
-        rankcode.join("\u200b"),
-        strrank.join("\u200b"),
-        lngOrder.join("\u200b"),
+        areacode.join("\u200b"),
+        strarea.join("\u200b"),
         checkbox2.join("\u200b"),
         userID,
         userIP,
-        "I",
-        intGrade.join("\u200b")
+        "I"
       );
-
-      console.log(res);
     }
 
     if (updateStateRow.value.updated.length > 0) {
-      const rankcode = updateRow.value
+      const areacode = updateRow.value
         .filter((item, index) => updateStateRow.value.updated.includes(index))
-        .map((item) => item.lngRankCode);
-      const strrank = updateRow.value
+        .map((item) => item.lngAreaCode);
+      const strarea = updateRow.value
         .filter((item, index) => updateStateRow.value.updated.includes(index))
-        .map((item) => item.strRank);
-      const lngOrder = updateRow.value
-        .filter((item, index) => updateStateRow.value.updated.includes(index))
-        .map((item) => item.lngOrder);
+        .map((item) => item.strArea);
+
       const checkbox2 = updateRow.value
         .filter((item, index) => updateStateRow.value.updated.includes(index))
         .map((item) => (item.checkbox2 == false ? 0 : 1));
       const userID = store.state.userData.lngSequence;
       const userIP = userIp;
 
-      const intGrade = updateRow.value
-        .filter((item, index) => updateStateRow.value.updated.includes(index))
-        .map((item) => item.intGrade);
-
-      const res = await savePosition(
+      res = await saveWorkLocation(
         store.state.userData.lngStoreGroup,
-        rankcode.join("\u200b"),
-        strrank.join("\u200b"),
-        lngOrder.join("\u200b"),
+        areacode.join("\u200b"),
+        strarea.join("\u200b"),
         checkbox2.join("\u200b"),
         userID,
         userIP,
-        "U",
-        intGrade.join("\u200b")
+        "U"
       );
-
-      console.log(res);
     }
 
-    //console.log(res);
+    console.log(res);
     if (res.data.RESULT_CD == "99") {
       Swal.fire({
         title: "실패",
@@ -498,11 +441,11 @@ const deleteButton = async () => {
 
     const rankcode = updateRow.value
       .filter((item) => item.checkbox == true)
-      .map((item) => item.lngRankCode);
+      .map((item) => item.lngAreaCode);
     const userID = store.state.userData.lngSequence;
     const userIP = userIp;
 
-    const res = await deletePosition(
+    const res = await deleteWorkLocation(
       store.state.userData.lngStoreGroup,
       rankcode.join("\u200b"),
 

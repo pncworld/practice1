@@ -86,3 +86,111 @@ export const saveEMP = (
     DELETECODE: dcode,
   });
 };
+
+export const savePosition = (
+  groupCd,
+  rankcode,
+  strrank,
+  lngorder,
+  lngdelete,
+  userid,
+  userip,
+  settype,
+  intgrade
+) => {
+  return api2.post("/MIATTEND/ATT07_001INS.asmx/savePosition", {
+    GROUP_CD: groupCd,
+    RANKCODE: rankcode,
+    STRRANK: strrank,
+    LNGORDER: lngorder,
+    LNGDELETE: lngdelete,
+    USERID: userid,
+    USERIP: userip,
+    SETTYPE: settype,
+    INTGRADE: intgrade,
+  });
+};
+export const saveRole = (
+  groupCd,
+  classcode,
+  strclass,
+  possetting,
+  lngdelete,
+  userid,
+  userip,
+  settype,
+  intgrade
+) => {
+  return api2.post("/MIATTEND/ATT07_002INS.asmx/saveRole", {
+    GROUP_CD: groupCd,
+    CLASSCODE: classcode,
+    STRCLASS: strclass,
+    POS_SET: possetting,
+    LNGDELETE: lngdelete,
+    USERID: userid,
+    USERIP: userip,
+    SETTYPE: settype,
+    INTGRADE: intgrade,
+  });
+};
+
+export const saveWorkLocation = (
+  groupCd,
+  areacd,
+  strarea,
+  lngdelete,
+  userid,
+  userip,
+  settype
+) => {
+  return api2.post("/MIATTEND/ATT07_003INS.asmx/saveWorkLocation", {
+    GROUP_CD: groupCd,
+    AREACODE: areacd,
+    STRAREA: strarea,
+    LNGDELETE: lngdelete,
+    USERID: userid,
+    USERIP: userip,
+    SETTYPE: settype,
+  });
+};
+
+export const deletePosition = (groupCd, rankcode, userid, userip) => {
+  return api2.post("/MIATTEND/ATT07_001INS.asmx/deletePosition", {
+    GROUP_CD: groupCd,
+    RANKCODE: rankcode,
+
+    USERID: userid,
+    USERIP: userip,
+  });
+};
+export const deleteRole = (groupCd, rankcode, userid, userip) => {
+  return api2.post("/MIATTEND/ATT07_002INS.asmx/deleteRole", {
+    GROUP_CD: groupCd,
+    CLASSCODE: rankcode,
+
+    USERID: userid,
+    USERIP: userip,
+  });
+};
+export const deleteWorkLocation = (groupCd, rankcode, userid, userip) => {
+  return api2.post("/MIATTEND/ATT07_003INS.asmx/deleteWorkLocation", {
+    GROUP_CD: groupCd,
+    AREACODE: rankcode,
+
+    USERID: userid,
+    USERIP: userip,
+  });
+};
+
+export const getRoleList = (groupCd, order) => {
+  return api2.post("/MIATTEND/ATT07_002INS.asmx/getRoleList", {
+    GROUP_CD: groupCd,
+    ORDER: order,
+  });
+};
+export const getWorkLocation = (groupCd, order) => {
+  return api2.post("/MIATTEND/ATT07_003INS.asmx/getWorkLocation", {
+    GROUP_CD: groupCd,
+    ORDER: order,
+  });
+};

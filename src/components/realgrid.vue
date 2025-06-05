@@ -854,6 +854,11 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  headerCheckBar: {
+    // 행높이
+    type: String,
+    default: "",
+  },
 });
 
 // 2구간
@@ -946,7 +951,11 @@ const funcshowGrid = async () => {
     header: {
       text: item.strHdText,
       styleName: `header-style-${index}`,
-      checkLocation: item.strColID.includes("checkbox") ? "left" : "none",
+      checkLocation:
+        item.strColID.includes("checkbox") &&
+        props.headerCheckBar != item.strColID
+          ? "left"
+          : "none",
     },
     groupFooter: {
       text: props.setGroupSumCustomText[
@@ -1536,7 +1545,7 @@ const funcshowGrid = async () => {
 
     gridView.setColumnLayout(layout);
   }
-
+  emit("allStateRows", dataProvider.getAllStateRows());
   // 데이터 추가
   // 5구간
   dataProvider.setRows(props.rowData);

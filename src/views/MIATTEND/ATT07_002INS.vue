@@ -1,7 +1,7 @@
 /*--############################################################################
-# Filename : ATT07_001INS.vue                                                  
-# Description : 인사관리 > 사원 마스터 > 직위등록.                              
-# Date :2025-06-04                                                             
+# Filename : ATT07_002INS.vue                                                  
+# Description : 인사관리 > 마스터 관리 > 직책등록.                              
+# Date :2025-06-05                                                             
 # Author : 권맑음                     
 ################################################################################*/
 <template>
@@ -32,7 +32,7 @@
     <!-- 그리드 영역 -->
     <div class="w-full h-[80%] grid grid-rows-1 grid-cols-[7fr,5fr] mt-5">
       <Realgrid
-        :progname="'ATT07_001INS_M_VUE'"
+        :progname="'ATT07_002INS_M_VUE'"
         :progid="1"
         :rowData="rowData"
         :reload="reload"
@@ -45,9 +45,9 @@
         @selectedIndex="selectedIndex"
         @updatedRowData="updatedRowData"
         :addRow4="addRow4"
-        :addrowProp="'checkbox,lngRankCode,strRank,lngOrder,lngPOSSecurityRating,checkbox2,lngEmpInsert,dtmInsert,strInsertIP,lngEmpEdit,dtmEdit,strEditIP'"
-        :addrowDefault="'false, , , , ,false, , , , , , ,'"
-        :documentTitle="'ATT07_001INS'"
+        :addrowProp="'checkbox,lngClassCode,strClass,lngHRColYN,checkbox2,lngSalary,lngEmpInsert,dtmInsert,strInsertIP,lngEmpEdit,dtmEdit,strEditIP'"
+        :addrowDefault="'false, , , ,false,, , , , , , ,'"
+        :documentTitle="'ATT07_002INS'"
         :changeValue2="changeValue2"
         :changeColid="changeColid"
         :changeRow="changeRow"
@@ -63,27 +63,27 @@
           class="grid grid-rows-8 grid-cols-[1fr,3fr] border w-full h-full border-black">
           <div
             class="border border-black flex justify-center items-center bg-orange-100">
-            직위코드
+            직책코드
             <span class="text-red-400 flex justify-center items-center">*</span>
           </div>
           <div class="border border-black flex justify-center items-center">
             <input
               type="number"
               :disabled="disablegrid"
-              name="lngRankCode"
+              name="lngClassCode"
               v-model="gridvalue1"
               @input="changeValue"
               class="w-[70%] h-[70%] border border-black pl-1" />
           </div>
           <div
             class="border border-black flex justify-center items-center bg-orange-100">
-            직위명
+            직책명
             <span class="text-red-400 flex justify-center items-center">*</span>
           </div>
           <div class="border border-black flex justify-center items-center">
             <input
               type="text"
-              name="strRank"
+              name="strClass"
               @input="changeValue"
               v-model="gridvalue2"
               class="w-[70%] h-[70%] border border-black pl-1" />
@@ -113,12 +113,12 @@
             >
           </div>
           <div class="border border-black flex justify-center items-center">
-            정렬
+            POS 보안등급
           </div>
           <div class="border border-black flex justify-center items-center">
             <input
               type="number"
-              name="lngOrder"
+              name="lngPOSSecurityRating"
               @input="changeValue"
               class="w-[70%] h-[70%] border border-black pl-1"
               v-model="gridvalue4" />
@@ -171,7 +171,6 @@
 </template>
 
 <script setup>
-import { saveReserveTeamTable } from "@/api/micrm";
 import "vue3-timepicker/dist/VueTimepicker.css";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -209,7 +208,7 @@ import { onMounted, ref } from "vue";
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
-import { deletePosition, getPositionList, savePosition } from "@/api/miattend";
+import { deleteRole, getRoleList, saveRole } from "@/api/miattend";
 import { useStore } from "vuex";
 /**
  * 	화면 Load시 실행 스크립트
@@ -241,12 +240,12 @@ const store = useStore();
 
 const clickedRowData = (e) => {
   //disablegrid.value = true;
-  insertupdatedelete.value = 2;
-
+  //insertupdatedelete.value = 2;
+  //console.log(e);
   gridvalue1.value = e[1];
   gridvalue2.value = e[2];
   gridvalue3.value = e[12];
-  gridvalue4.value = e[3];
+  gridvalue4.value = e[13];
 
   gridvalue5.value = e[6];
   gridvalue6.value = e[7];
@@ -295,7 +294,7 @@ const searchButton = async () => {
     store.state.loading = true;
     initGrid();
     reload.value = !reload.value;
-    const res = await getPositionList(store.state.userData.lngStoreGroup, 0);
+    const res = await getRoleList(store.state.userData.lngStoreGroup, 0);
     console.log(res);
     rowData.value = res.data.List;
 
@@ -320,12 +319,6 @@ const addButton = () => {
     });
     return;
   }
-  //   insertupdatedelete.value = 1;
-  //   disablegrid.value = false;
-  //   gridvalue1.value = "";
-  //   gridvalue2.value = "";
-  //   gridvalue3.value = 0;
-  //   gridvalue4.value = 0;
 
   addRow4.value = !addRow4.value;
 };
@@ -342,7 +335,6 @@ const saveButton = async () => {
   }
   // console.log(updateStateRow.value);
   if (
-    updateStateRow.value.deleted.length == 0 &&
     updateStateRow.value.updated.length == 0 &&
     updateStateRow.value.created.length == 0
   ) {
@@ -354,13 +346,13 @@ const saveButton = async () => {
     });
     return;
   }
-  const hashstate = new Set(updateRow.value.map((item) => item.lngRankCode));
+  const hashstate = new Set(updateRow.value.map((item) => item.lngClassCode));
   const size = updateRow.value.length;
   const setsize = hashstate.size;
   if (size != setsize) {
     Swal.fire({
       title: "경고",
-      text: "중복된 직위코드가 존재합니다.",
+      text: "중복된 직책코드가 존재합니다.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -376,13 +368,13 @@ const saveButton = async () => {
     if (updateStateRow.value.created.length > 0) {
       const rankcode = updateRow.value
         .filter((item, index) => updateStateRow.value.created.includes(index))
-        .map((item) => item.lngRankCode);
-      const strrank = updateRow.value
+        .map((item) => item.lngClassCode);
+      const strclass = updateRow.value
         .filter((item, index) => updateStateRow.value.created.includes(index))
-        .map((item) => item.strRank);
-      const lngOrder = updateRow.value
+        .map((item) => item.strClass);
+      const lngPOSSecurityRating = updateRow.value
         .filter((item, index) => updateStateRow.value.created.includes(index))
-        .map((item) => item.lngOrder);
+        .map((item) => item.lngPOSSecurityRating);
       const checkbox2 = updateRow.value
         .filter((item, index) => updateStateRow.value.created.includes(index))
         .map((item) => (item.checkbox2 == false ? 0 : 1));
@@ -393,11 +385,11 @@ const saveButton = async () => {
         .filter((item, index) => updateStateRow.value.created.includes(index))
         .map((item) => item.intGrade);
 
-      const res = await savePosition(
+      const res = await saveRole(
         store.state.userData.lngStoreGroup,
         rankcode.join("\u200b"),
-        strrank.join("\u200b"),
-        lngOrder.join("\u200b"),
+        strclass.join("\u200b"),
+        lngPOSSecurityRating.join("\u200b"),
         checkbox2.join("\u200b"),
         userID,
         userIP,
@@ -411,13 +403,13 @@ const saveButton = async () => {
     if (updateStateRow.value.updated.length > 0) {
       const rankcode = updateRow.value
         .filter((item, index) => updateStateRow.value.updated.includes(index))
-        .map((item) => item.lngRankCode);
-      const strrank = updateRow.value
+        .map((item) => item.lngClassCode);
+      const strclass = updateRow.value
         .filter((item, index) => updateStateRow.value.updated.includes(index))
-        .map((item) => item.strRank);
-      const lngOrder = updateRow.value
+        .map((item) => item.strClass);
+      const lngPOSSecurityRating = updateRow.value
         .filter((item, index) => updateStateRow.value.updated.includes(index))
-        .map((item) => item.lngOrder);
+        .map((item) => item.lngPOSSecurityRating);
       const checkbox2 = updateRow.value
         .filter((item, index) => updateStateRow.value.updated.includes(index))
         .map((item) => (item.checkbox2 == false ? 0 : 1));
@@ -428,11 +420,11 @@ const saveButton = async () => {
         .filter((item, index) => updateStateRow.value.updated.includes(index))
         .map((item) => item.intGrade);
 
-      const res = await savePosition(
+      const res = await saveRole(
         store.state.userData.lngStoreGroup,
         rankcode.join("\u200b"),
-        strrank.join("\u200b"),
-        lngOrder.join("\u200b"),
+        strclass.join("\u200b"),
+        lngPOSSecurityRating.join("\u200b"),
         checkbox2.join("\u200b"),
         userID,
         userIP,
@@ -498,11 +490,11 @@ const deleteButton = async () => {
 
     const rankcode = updateRow.value
       .filter((item) => item.checkbox == true)
-      .map((item) => item.lngRankCode);
+      .map((item) => item.lngClassCode);
     const userID = store.state.userData.lngSequence;
     const userIP = userIp;
 
-    const res = await deletePosition(
+    const res = await deleteRole(
       store.state.userData.lngStoreGroup,
       rankcode.join("\u200b"),
 
