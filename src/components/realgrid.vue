@@ -12,6 +12,7 @@ import {
   formatLocalDate,
 } from "@/customFunc/customFunc";
 import store from "@/store";
+import { start } from "@popperjs/core";
 import { GridView, LocalDataProvider } from "realgrid";
 import { v4 as uuidv4 } from "uuid";
 import { nextTick, onMounted, ref, watch } from "vue";
@@ -859,6 +860,21 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  useAlternateRowStyle: {
+    // 행높이
+    type: Boolean,
+    default: true,
+  },
+  TimeArray: {
+    // 행높이
+    type: Array,
+    default: [],
+  },
+  autoPlusColumn: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
 });
 
 // 2구간
@@ -940,6 +956,46 @@ const funcshowGrid = async () => {
   fields.push({ fieldName: "deleted", dataType: "boolean" });
   if (props.addField == "new") {
     fields.push({ fieldName: "new", dataType: "boolean" });
+  }
+
+  if (props.autoPlusColumn) {
+    const labelingcolumn = fields.find((item) => item.fieldName == "strWTime");
+
+    labelingcolumn.valueCallback = function (
+      prod,
+      dataRow,
+      fieldName,
+      fieldNames,
+      values
+    ) {
+      let stime = values[fieldNames.indexOf("strSTime")];
+      let etime = values[fieldNames.indexOf("strETime")];
+
+      let s1 = Number(stime.split(":")[0]);
+      let s2 = Number(stime.split(":")[1]);
+      let e1 = Number(etime.split(":")[0]);
+      let e2 = Number(etime.split(":")[1]);
+      if (isNaN(s1) || isNaN(s2) || isNaN(e1) || isNaN(e2)) {
+        return undefined;
+      } else {
+        let hour = e1 - s1;
+        let minute = e2 - s2;
+
+        // 분 음수일 때 보정
+        if (minute < 0) {
+          hour -= 1;
+          minute += 60;
+        }
+
+        // 시간/분 앞에 0 붙이기
+        const formattedHour = String(hour).padStart(2, "0");
+        const formattedMinute = String(minute).padStart(2, "0");
+
+        return `${formattedHour}:${formattedMinute}`;
+      }
+    };
+
+    console.log(labelingcolumn);
   }
 
   dataProvider.setFields(fields);
@@ -1182,7 +1238,23 @@ const funcshowGrid = async () => {
       domainOnly: true,
       textReadOnly: true,
       datetimeFormat: "yyyy-MM-dd",
-
+      mask: {
+        definitions:
+          item.strColID == "strSTime" ||
+          item.strColID == "strETime" ||
+          item.strColID == "strWTime"
+            ? {
+                b: "[0-2]",
+                c: "[0-9]",
+                d: "[0-5]",
+                e: "[0-9]",
+              }
+            : {},
+        editMask: "bc:de",
+        includedFormat: true,
+        overWrite: true,
+        allowEmpty: true,
+      },
       commitOnSelect: true,
       inputCharacters:
         item.strColID == props.inputOnlyNumberColumn
@@ -1217,7 +1289,7 @@ const funcshowGrid = async () => {
         props.rowStateeditable
       ) {
         ret.editable = true;
-      } else if (item.strColID == props.editableColId) {
+      } else if (props.editableColId.includes(item.strColID)) {
         ret.editable = true;
       } else if (
         props.rowStateeditable == true &&
@@ -1570,6 +1642,9 @@ const funcshowGrid = async () => {
   gridView.editOptions.commitByCell = true;
   gridView.editOptions.commitWhenLeave = true;
   gridView.displayOptions.showInnerFocus = false;
+  gridView.displayOptions.useAlternateRowStyle = props.useAlternateRowStyle
+    ? true
+    : false;
   dataProvider.softDeleting = props.notsoftDelete == false ? true : false;
   dataProvider.deleteCreated = props.deleteCreated;
   gridView.filteringOptions.handleVisibility = "hidden";
@@ -2664,6 +2739,32 @@ watch(
     emit("clickedRowData", selectedRowData.value);
   }
 );
+
+// 컬럼 색상 설정
+
+watch(
+  () => props.TimeArray,
+  () => {
+    if (gridView.columnByName("workTime")) {
+      gridView.columnByName("workTime").styleCallback = (grid, dataCell) => {
+        const times = props.TimeArray;
+        const timecode = grid.getValue(dataCell.index.itemIndex, "lngtimeCode");
+        const isin = times.some(([start, end]) => {
+          return Number(timecode) >= start && Number(timecode) < end;
+        });
+        //console.log(timecode);
+        // console.log(isin);
+        if (isin) {
+          return { styleName: "blue-column" };
+        }
+        // const name = grid.getValue(dataCell.index.itemIndex, 'KorName')
+        // if(name === '박영호'){
+        //     return {styleName : "orange-column"}
+        // }
+      };
+    }
+  }
+);
 // watch(() => props.setRowGroupSpan  , () => {
 //   if(props.setRowGroupSpan != ''){
 //    //comsole.log(props.setRowGroupSpan)
@@ -3002,5 +3103,9 @@ watch(
 .realgrid-pre-wrap {
   white-space: pre-wrap;
   text-align: center;
+}
+
+.blue-column {
+  background: #007bff !important; /* 밝은 파란색 */
 }
 </style>

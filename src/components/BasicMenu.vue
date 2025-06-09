@@ -237,6 +237,7 @@ const toggleCategory = (id) => {
   } else {
     openCategoryId.value.push(id);
   }
+
   nextTick(() => {
     const element = document.getElementById(id);
     if (element) {
@@ -282,7 +283,7 @@ onMounted(() => {
   currentFavorite.value = [...store.state.favoriteList];
 
   cMenu = store.state.mainCategory
-    .filter((item) => item.lngCode == selectedCategoryId.value)
+    .filter((item) => item.lngCode === selectedCategoryId.value)
     .map((item) => item.strTitle)[0];
 
   const subCategory = store.state.subCategory;
@@ -290,17 +291,20 @@ onMounted(() => {
   let category = [];
 
   category = subCategory.filter(
-    (item) => item.lngCode == selectedCategoryId.value
+    (item) => item.lngCode === selectedCategoryId.value
   );
+
   category.forEach((element) => {
     const matchedMinorCategory = minorCategory.filter(
-      (item) => item.lngProgramSub == element.lngProgramSub
+      (item) =>
+        item.lngProgramSub == element.lngProgramSub &&
+        item.lngCode == element.lngCode
     );
     element.subcategories = matchedMinorCategory;
   });
 
   categories.value = category;
-  //comsole.log(categories.value);
+
   detectMobile();
   //comsole.log(isMobile);
 
@@ -415,7 +419,8 @@ const selectCategory = (strUrl, lngProgramID2, strTitle) => {
   //store.dispatch("saveActiveTab", matchingtab[0]);
 };
 var cMenu = ref("매출관리");
-const selectedCategoryId = computed(() => store.state.selectedCategoryId);
+//const selectedCategoryId = computed(() => store.state.selectedCategoryId);
+const selectedCategoryId = ref("1");
 
 watch(
   () => [props.selectCategoryId, props.triggerNow],
@@ -436,7 +441,9 @@ watch(
     );
     category.forEach((element) => {
       const matchedMinorCategory = minorCategory.filter(
-        (item) => item.lngProgramSub == element.lngProgramSub
+        (item) =>
+          item.lngProgramSub == element.lngProgramSub &&
+          item.lngCode == element.lngCode
       );
       element.subcategories = matchedMinorCategory;
     });

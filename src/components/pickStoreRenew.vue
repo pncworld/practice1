@@ -156,6 +156,7 @@ onMounted(() => {
     emit("lngStoreAttrs", 0);
     emit("lngStoreCode", 0);
     emit("excelStore", "매장명 : 전체");
+    emit("storeNm", "전체");
   } else {
     disabled1.value = true;
     emit("lngStoreGroup", store.state.userData.lngStoreGroup);
@@ -163,6 +164,7 @@ onMounted(() => {
     emit("lngStoreCode", store.state.userData.lngPosition);
     emit("lngStoreAttrs", store.state.userData.lngJoinType);
     emit("excelStore", "매장명 : " + store.state.userData.strStoreName);
+    emit("storeNm", store.state.userData.strStoreName);
     selectedStoreType.value = store.state.userData.lngJoinType;
     selectedStore.value = store.state.storeCd[0];
     //comsole.log(store.state.storeCd);
@@ -208,6 +210,7 @@ watch(selectedStore, () => {
     emit("lngStoreGroup", selectedGroup.value);
     emit("lngStoreCode", 0);
     emit("excelStore", "매장명 : 전체");
+    emit("storeNm", "전체");
   } else {
     emit("update:storeGroup", selectedGroup.value);
     emit("update:storeCd", selectedStore.value.lngStoreCode);
@@ -217,6 +220,7 @@ watch(selectedStore, () => {
       (item) => item.lngStoreCode == selectedStore.value.lngStoreCode
     )[0].strName;
     emit("excelStore", "매장명 : " + name);
+    emit("storeNm", name);
   }
   //comsole.log(selectedStore.value);
   emit("changeInit", true);

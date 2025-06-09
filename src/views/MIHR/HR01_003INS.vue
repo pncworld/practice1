@@ -100,10 +100,13 @@ import { nextTick, onMounted, ref } from "vue";
  */
 
 import {
+  deleteAttendTypeList,
   deletePayItemList,
   getAttType,
+  saveAttendType,
   saveHRPay,
   saveHRPay2,
+  updateAttendType,
 } from "@/api/mihr";
 import { useStore } from "vuex";
 /**
@@ -301,11 +304,33 @@ const addButton = () => {
         "," +
         result.value.radioValue2;
 
-      addRow4.value = !addRow4.value;
+      try {
+        store.state.loading = true;
+        const res = await saveAttendType(
+          store.state.userData.lngStoreGroup,
+          result.value.textValue,
+          result.value.radioValue,
+          result.value.radioValue2,
+          result.value.textValue2,
+          result.value.textValue4,
+          result.value.textValue5,
+          result.value.textValue3
+        );
+
+        // console.log(res);
+        store.state.loading = false;
+      } catch (error) {
+      } finally {
+        store.state.loading = false;
+      }
+
+      //addRow4.value = !addRow4.value;
+      searchButton();
     }
   });
 };
 // 저장부터
+
 const editButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -326,33 +351,96 @@ const editButton = () => {
     });
     return;
   }
-  console.log(changeRow.value);
-  console.log(updateRow.value);
+  console.log(
+    updateRow.value.filter((item, index) => index == changeRow.value)
+  );
+
   const editname = ref(
     updateRow.value.filter((item, index) => index == changeRow.value)[0].strName
   );
   const editradio = ref(
     updateRow.value.filter((item, index) => index == changeRow.value)[0]
-      .lngItemCls
+      .lngTypeCls
   );
-  Swal.fire({
-    title: "급여 항목 등록(신규/수정)",
-    html: `
-    <div style="display : flex ;  white-space: nowrap; align-items: center; justify-content: center;"><div class="font-semibold">급여 항목명</div>
-    <input type="text" id="myText" class="swal2-input" value="${
-      editname.value
-    }"></div>
-   <div style="display : flex ;  white-space: nowrap; align-items: center; justify-content: start ;" >
-     <div style="display : flex ;  white-space: nowrap; align-items: center; justify-content: start ;" class="mt-5 font-semibold">구분</div>
-    <div class="ml-20 flex mt-5">
+  const editradio2 = ref(
+    updateRow.value.filter((item, index) => index == changeRow.value)[0]
+      .lngTimeCls
+  );
 
+  const edittime = ref(
+    updateRow.value.filter((item, index) => index == changeRow.value)[0]
+      .timSetTime
+  );
+
+  const editincludetime = ref(
+    updateRow.value.filter((item, index) => index == changeRow.value)[0]
+      .timIncludOT
+  );
+
+  const editapprovaltime = ref(
+    updateRow.value.filter((item, index) => index == changeRow.value)[0]
+      .timApprovalTime
+  );
+
+  const editAlias = ref(
+    updateRow.value.filter((item, index) => index == changeRow.value)[0]
+      .strAlias
+  );
+
+  const lngCode = ref(
+    updateRow.value.filter((item, index) => index == changeRow.value)[0].lngCode
+  );
+
+  Swal.fire({
+    title: "근태유형 등록(신규/수정)",
+    html: `
+    <div class="h-[20%] !w-[70%] flex justify-start items-center text-nowrap">
+      <div class="font-semibold text-base">근태 유형명</div>
+    <div class="flex justify-center items-center w-[95%] ml-10"><input type="text" id="myText" class="swal2-input !h-[70%] " placeholder="입력" value="${
+      editname.value
+    }" ></div></div>
+   <div style="display : flex ;  white-space: nowrap; align-items: center; justify-content: start ;" >
+     <div style="display : flex ;  white-space: nowrap; align-items: center; justify-content: start ;" class="mt-5 font-semibold text-base">구분</div>
+    <div class="ml-20 flex mt-5 space-x-4">
       <label><input type="radio" name="myRadio" value="1" ${
         editradio.value == "1" ? "checked" : ""
-      }> 수당</label><br>
+      }> 휴무</label><br>
       <label><input type="radio" name="myRadio" value="2" ${
         editradio.value == "2" ? "checked" : ""
-      }> 공제</label>
+      }> 근무인정</label>
     </div>
+    </div>
+
+     <div class="h-[20%] flex justify-start items-center text-nowrap" >
+     <div style="display : flex ;  white-space: nowrap; align-items: center; justify-content: start ;" class="mt-5 font-semibold text-base">시간관리</div>
+    <div class="ml-12 flex mt-2 space-x-4">
+      <label><input type="radio" name="myRadio2" value="1" ${
+        editradio2.value == "1" ? "checked" : ""
+      }> 고정</label><br>
+      <label><input type="radio" name="myRadio2" value="2" ${
+        editradio2.value == "2" ? "checked" : ""
+      }> 설정</label>
+    </div>
+    </div>
+
+    <div class="flex justify-center items-center"><div class="font-semibold text-nowrap text-base">설정 시간</div>
+    <input type="number" id="myText2" class="swal2-input !h-[70%] !w-[30%]" placeholder="입력" value="${
+      edittime.value
+    }" min='0'>
+    <div class="font-semibold text-base">약칭</div>
+    <input type="text" id="myText3" class="swal2-input !h-[70%] !w-[30%]" placeholder="입력" value="${
+      editAlias.value
+    }">
+    </div>
+
+    <div class="flex justify-center items-center space-x-4"><div class="font-semibold text-nowrap text-sm">근무 인정 시간</div>
+    <input type="number" id="myText4" class="swal2-input !h-[70%] !w-[100px]" placeholder="입력"  min='0' value="${
+      editapprovaltime.value
+    }">
+    <div class="font-semibold text-nowrap text-sm">연장근무포함시간</div>
+    <input type="number" id="myText5" class="swal2-input !h-[70%] !w-[100px] " placeholder="입력"  min='0' value="${
+      editincludetime.value
+    }">
     </div>
   `,
     focusConfirm: false,
@@ -361,153 +449,78 @@ const editButton = () => {
     cancelButtonText: "닫기",
     preConfirm: () => {
       const text = document.getElementById("myText").value;
-      const radio = document.querySelector('input[name="myRadio"]:checked');
-      if (!text || !radio) {
-        Swal.showValidationMessage("모든 값을 입력해주세요.");
+      const radio = document.querySelector(
+        'input[name="myRadio"]:checked'
+      ).value;
+      const radio2 = document.querySelector(
+        'input[name="myRadio2"]:checked'
+      ).value;
+
+      const text2 = document.getElementById("myText2").value;
+      const text3 = document.getElementById("myText3").value;
+      const text4 = document.getElementById("myText4").value;
+      const text5 = document.getElementById("myText5").value;
+      if (!text || text == "") {
+        Swal.showValidationMessage("근태유형명을 입력해주세요.");
         return false;
       }
       return {
         textValue: text,
-        radioValue: radio.value,
+        radioValue: radio,
+        radioValue2: radio2,
+        textValue2: text2,
+        textValue3: text3,
+        textValue4: text4,
+        textValue5: text5,
       };
     },
   }).then(async (result) => {
     if (result.isConfirmed) {
-      if (result.value.textValue == null || result.value.textValue == "") {
-        Swal.fire({
-          title: "경고",
-          text: "항목명을 입력해주세요.",
-          icon: "warning",
-          confirmButtonText: "확인",
-        });
-        return;
-      } else {
-        changeColid.value = "strName";
-        changeValue2.value = result.value.textValue;
+      addrowDefault.value =
+        "false," +
+        result.value.textValue +
+        "," +
+        (result.value.radioValue == 1 ? "휴무" : "근무인정") +
+        "," +
+        (result.value.radioValue2 == 1 ? "고정" : "설정") +
+        "," +
+        result.value.textValue2 +
+        "," +
+        result.value.textValue4 +
+        "," +
+        result.value.textValue5 +
+        "," +
+        result.value.textValue3 +
+        ", ," +
+        result.value.radioValue +
+        "," +
+        result.value.radioValue2;
 
-        changeNow.value = !changeNow.value;
+      try {
+        store.state.loading = true;
+        const res = await updateAttendType(
+          store.state.userData.lngStoreGroup,
+          lngCode.value,
+          result.value.textValue,
+          result.value.radioValue,
+          result.value.radioValue2,
+          result.value.textValue2,
+          result.value.textValue4,
+          result.value.textValue5,
+          result.value.textValue3
+        );
 
-        await nextTick();
-
-        changeColid.value = "lngItemCls";
-        changeValue2.value = result.value.radioValue;
-
-        changeNow.value = !changeNow.value;
-
-        await nextTick();
-
-        changeColid.value = "strItemCls";
-        changeValue2.value = result.value.radioValue == "1" ? "수당" : "공제";
-
-        changeNow.value = !changeNow.value;
-
-        await nextTick();
-
-        saveButton();
+        console.log(res);
+        store.state.loading = false;
+      } catch (error) {
+      } finally {
+        store.state.loading = false;
       }
+
+      //addRow4.value = !addRow4.value;
+      searchButton();
     }
   });
-};
-
-const saveButton = async () => {
-  if (afterSearch.value == false) {
-    Swal.fire({
-      title: "경고",
-      text: "조회를 먼저 해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  // console.log(updateStateRow.value);
-  if (
-    updateStateRow.value.updated.length == 0 &&
-    updateStateRow.value.created.length == 0
-  ) {
-    Swal.fire({
-      title: "경고",
-      text: "변경된 사항이 없습니다.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  const hashstate = new Set(updateRow.value.map((item) => item.strName));
-  const size = updateRow.value.length;
-  const setsize = hashstate.size;
-  if (size != setsize) {
-    Swal.fire({
-      title: "경고",
-      text: "중복된 급여항목이 존재합니다.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  try {
-    store.state.loading = true;
-
-    // const result = await fetch("https://api64.ipify.org", { timeout: 3000 });
-    // const data = await result.text();
-    // let userIp = data;
-    // let res;
-    if (updateStateRow.value.created.length > 0) {
-      const strnames = updateRow.value
-        .filter((item, index) => updateStateRow.value.created.includes(index))
-        .map((item) => item.strName);
-      const lngitemcls = updateRow.value
-        .filter((item, index) => updateStateRow.value.created.includes(index))
-        .map((item) => item.lngItemCls);
-
-      res = await saveHRPay(
-        store.state.userData.lngStoreGroup,
-        strnames.join("\u200b"),
-        lngitemcls.join("\u200b")
-      );
-    }
-
-    if (updateStateRow.value.updated.length > 0) {
-      const strnames = updateRow.value
-        .filter((item, index) => updateStateRow.value.updated.includes(index))
-        .map((item) => item.strName);
-      const lngitemcls = updateRow.value
-        .filter((item, index) => updateStateRow.value.updated.includes(index))
-        .map((item) => item.lngItemCls);
-      const lngcodes = updateRow.value
-        .filter((item, index) => updateStateRow.value.updated.includes(index))
-        .map((item) => item.lngCode);
-
-      res = await saveHRPay2(
-        store.state.userData.lngStoreGroup,
-        lngcodes.join("\u200b"),
-        strnames.join("\u200b"),
-        lngitemcls.join("\u200b")
-      );
-    }
-
-    console.log(res);
-    if (res.data.RESULT_CD == "99") {
-      Swal.fire({
-        title: "실패",
-        text: "저장에 실패하였습니다.",
-        icon: "error",
-        confirmButtonText: "확인",
-      });
-    } else {
-      Swal.fire({
-        title: "성공",
-        text: "저장이 완료되었습니다.",
-        icon: "success",
-        confirmButtonText: "확인",
-      });
-    }
-
-    //console.log(res);
-  } catch (error) {
-  } finally {
-    store.state.loading = false;
-    searchButton();
-  }
 };
 
 const deleteButton = async () => {
@@ -539,7 +552,7 @@ const deleteButton = async () => {
       .map((item) => item.lngCode);
 
     if (rankcode.length > 0) {
-      const res = await deletePayItemList(
+      const res = await deleteAttendTypeList(
         store.state.userData.lngStoreGroup,
         rankcode.join("\u200b")
       );

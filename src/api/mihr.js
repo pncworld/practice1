@@ -57,6 +57,57 @@ export const getAttType = (groupCd) => {
     GROUP_CD: groupCd,
   });
 };
+export const getWorkShiftList = (groupCd, storeCd) => {
+  return api2.post("/MIHR/HR01_006INS.asmx/getWorkShiftList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+export const saveWorkShift = (groupCd, storeCd, groupNm) => {
+  return api2.post("/MIHR/HR01_006INS.asmx/saveWorkShift", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    GROUP_NM: groupNm,
+  });
+};
+export const updateWorkShift = (groupCd, storeCd, groupNm, lngcode) => {
+  return api2.post("/MIHR/HR01_006INS.asmx/updateWorkShift", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    GROUP_NM: groupNm,
+    LNG_CODE: lngcode,
+  });
+};
+export const saveWorkShiftDetail = (
+  groupCd,
+  storeCd,
+  workcode,
+  stime,
+  etime
+) => {
+  return api2.post("/MIHR/HR01_006INS.asmx/saveWorkShiftDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    WORK_CD: workcode,
+    S_TIME: stime,
+    E_TIME: etime,
+  });
+};
+export const updateWorkShiftDetail = (
+  groupCd,
+  storeCd,
+  lngcode,
+  stime,
+  etime
+) => {
+  return api2.post("/MIHR/HR01_006INS.asmx/updateWorkShiftDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LNG_CODE: lngcode,
+    S_TIME: stime,
+    E_TIME: etime,
+  });
+};
 export const saveHRPay = (groupCd, strname, lngitemcls) => {
   return api2.post("/MIHR/HR01_002INS.asmx/saveHRPay", {
     GROUP_CD: groupCd,
@@ -72,9 +123,73 @@ export const saveHRPay2 = (groupCd, lngcode, strname, lngitemcls) => {
     LNGITEMCLS: lngitemcls,
   });
 };
+export const saveAttendType = (
+  groupCd,
+  strname,
+  tylecls,
+  timecls,
+  settime,
+  approvetime,
+  inlcudeot,
+  stralias
+) => {
+  return api2.post("/MIHR/HR01_003INS.asmx/saveAttendType", {
+    GROUP_CD: groupCd,
+    STRNAME: strname,
+    TYPE_CLS: tylecls,
+    TIME_CLS: timecls,
+    SETTIME: settime,
+    APPROVETIME: approvetime,
+    INCLUDEOT: inlcudeot,
+    ALIAS: stralias,
+  });
+};
+export const updateAttendType = (
+  groupCd,
+  lngcode,
+  strname,
+  tylecls,
+  timecls,
+  settime,
+  approvetime,
+  inlcudeot,
+  stralias
+) => {
+  return api2.post("/MIHR/HR01_003INS.asmx/updateAttendType", {
+    GROUP_CD: groupCd,
+    LNG_CODE: lngcode,
+    STRNAME: strname,
+    TYPE_CLS: tylecls,
+    TIME_CLS: timecls,
+    SETTIME: settime,
+    APPROVETIME: approvetime,
+    INCLUDEOT: inlcudeot,
+    ALIAS: stralias,
+  });
+};
 export const deletePayItemList = (groupCd, lngcode) => {
   return api2.post("/MIHR/HR01_002INS.asmx/deletePayItemList", {
     GROUP_CD: groupCd,
+    LNGCODE: lngcode,
+  });
+};
+export const deleteAttendTypeList = (groupCd, lngcode) => {
+  return api2.post("/MIHR/HR01_003INS.asmx/deleteAttendTypeList", {
+    GROUP_CD: groupCd,
+    LNGCODE: lngcode,
+  });
+};
+export const deleteWorkShifts = (groupCd, store, lngcode) => {
+  return api2.post("/MIHR/HR01_006INS.asmx/deleteWorkShifts", {
+    GROUP_CD: groupCd,
+    STORE_CD: store,
+    LNGCODE: lngcode,
+  });
+};
+export const deleteWorkShifts2 = (groupCd, store, lngcode) => {
+  return api2.post("/MIHR/HR01_006INS.asmx/deleteWorkShifts2", {
+    GROUP_CD: groupCd,
+    STORE_CD: store,
     LNGCODE: lngcode,
   });
 };

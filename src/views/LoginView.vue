@@ -130,7 +130,7 @@ const login2 = async () => {
         );
 
         const result = response.data.sysMenu;
-        //comsole.log(result);
+        console.log(result);
         const mainCategoryData = result.filter(
           (item) => Number(item.strMenuLevel) == 1
         ); // 숫자
