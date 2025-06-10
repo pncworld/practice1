@@ -14,7 +14,7 @@
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="saveButton" class="button search md:w-auto w-14">
+        <button @click="saveButton" class="button save md:w-auto w-14">
           저장
         </button>
         <button @click="excelButton" class="button save w-auto excel">

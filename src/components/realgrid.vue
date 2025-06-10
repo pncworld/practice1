@@ -1229,6 +1229,43 @@ const funcshowGrid = async () => {
         : item.strAlign == "center"
         ? "setTextAlignCenter"
         : "setTextAlignRight",
+    // editor: {
+    //   type: item.strColType.includes("dropdown")
+    //     ? "dropdown"
+    //     : item.strDisplay.includes("date")
+    //     ? "date"
+    //     : "line",
+    //   domainOnly: true,
+    //   textReadOnly: true,
+    //   datetimeFormat: "yyyy-MM-dd",
+    //   mask: {
+    //     definitions:
+    //       item.strColID == "strSTime" ||
+    //       item.strColID == "strETime" ||
+    //       item.strColID == "strWTime"
+    //         ? {
+    //             b: "[0-2]",
+    //             c: "[0-9]",
+    //             d: "[0-5]",
+    //             e: "[0-9]",
+    //           }
+    //         : {},
+    //     editMask:
+    //       item.strColID == "strSTime" ||
+    //       item.strColID == "strETime" ||
+    //       item.strColID == "strWTime"
+    //         ? "bc:de"
+    //         : "",
+    //     includedFormat: true,
+    //     overWrite: true,
+    //     allowEmpty: true,
+    //   },
+    //   commitOnSelect: true,
+    //   inputCharacters:
+    //     item.strColID == props.inputOnlyNumberColumn
+    //       ? "0123456789"
+    //       : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ㄱ-힣!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ",
+    // },
     editor: {
       type: item.strColType.includes("dropdown")
         ? "dropdown"
@@ -1238,23 +1275,23 @@ const funcshowGrid = async () => {
       domainOnly: true,
       textReadOnly: true,
       datetimeFormat: "yyyy-MM-dd",
-      mask: {
-        definitions:
-          item.strColID == "strSTime" ||
-          item.strColID == "strETime" ||
-          item.strColID == "strWTime"
-            ? {
+      mask:
+        item.strColID == "strSTime" ||
+        item.strColID == "strETime" ||
+        item.strColID == "strWTime"
+          ? {
+              definitions: {
                 b: "[0-2]",
                 c: "[0-9]",
                 d: "[0-5]",
                 e: "[0-9]",
-              }
-            : {},
-        editMask: "bc:de",
-        includedFormat: true,
-        overWrite: true,
-        allowEmpty: true,
-      },
+              },
+              editMask: "bc:de",
+              includedFormat: true,
+              overWrite: true,
+              allowEmpty: true,
+            }
+          : null,
       commitOnSelect: true,
       inputCharacters:
         item.strColID == props.inputOnlyNumberColumn

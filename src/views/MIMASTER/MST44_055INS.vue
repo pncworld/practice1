@@ -144,9 +144,9 @@
           <div class="flex justify-start">
             ※ 사용여부가 미사용인 결제코드는 목록에서 노출되지 않습니다.
           </div>
-          <!-- <div class="flex justify-start">
-            ※ 복사시 결제코드 항목을 추가해야 결제키 화면에 노출됩니다.
-          </div> -->
+          <div class="flex justify-start">
+            ※ 결제코드 목록은 해당 매장의 결제코드 등록이 선행되어야 노출됩니다.
+          </div>
         </div>
       </div>
     </div>

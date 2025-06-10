@@ -194,3 +194,96 @@ export const getWorkLocation = (groupCd, order) => {
     ORDER: order,
   });
 };
+export const getInitEmpInfo = (groupCd) => {
+  return api2.post("/MIATTEND/ATT01_002INS.asmx/getInitEmpInfo", {
+    GROUP_CD: groupCd,
+  });
+};
+export const getChargerInfo2 = (
+  groupCd,
+  storeCd,
+  storeType,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6
+) => {
+  return api2.post("/MIATTEND/ATT01_002INS.asmx/getChargerInfo2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    STORE_TYPE: storeType,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+    COND5: cond5,
+    COND6: cond6,
+  });
+};
+export const saveEMP2 = (
+  chargercode,
+  chargername,
+  stridno,
+  classcode,
+  rankcode,
+  areacode,
+  joindate,
+  expiredate,
+  healthexpiredate,
+  birthdate,
+  telnum,
+  zipcode,
+  address,
+  password,
+  bankcode,
+  banknum,
+  expireclass,
+  cardnum,
+  email,
+  cphone,
+  lngposition,
+  luner,
+  paycode,
+  changedate,
+  useradminid,
+  retiredate,
+  changepaycode,
+  lngstoregroup,
+  sequence,
+  workclass
+) => {
+  return api2.post("/MIATTEND/ATT01_002INS.asmx/saveEMP2", {
+    CHARGER_CD: chargercode,
+    CHARGER_NM: chargername,
+    STRID_NO: stridno,
+    CLASS_CD: classcode,
+    RANK_CD: rankcode,
+    AREA_CD: areacode,
+    JOINDATE: joindate,
+    EXPIREDATE: expiredate,
+    HEALTHEXPIREDATE: healthexpiredate,
+    BIRTHDATE: birthdate,
+    TELNUM: telnum,
+    ZIPCODE: zipcode,
+    ADDRESS: address,
+    PASSWORD: password,
+    BANKCODE: bankcode,
+    BANKNUM: banknum,
+    EXPIRECLASS: expireclass,
+    CARDNUM: cardnum,
+    EMAIL: email,
+    PHONE: cphone,
+    LNGPOSITION: lngposition,
+    LUNER: luner,
+    PAYCODE: paycode,
+    CHANGEDATE: changedate,
+    ADMIN_ID: useradminid,
+    RETIRE_DATE: retiredate,
+    CHANGEPAY_CD: changepaycode,
+    GROUP_CD: lngstoregroup,
+    SEQUENCE: sequence,
+    WORKCLASS: workclass,
+  });
+};
