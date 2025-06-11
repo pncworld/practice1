@@ -193,3 +193,134 @@ export const deleteWorkShifts2 = (groupCd, store, lngcode) => {
     LNGCODE: lngcode,
   });
 };
+
+export const getSalaryPolicy = (groupCd) => {
+  return api2.post("/MIHR/HR01_004INS.asmx/getSalaryPolicy", {
+    GROUP_CD: groupCd,
+  });
+};
+export const saveSalaryPolicy = (
+  groupcd,
+  cond,
+  cond1,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  cond9,
+  cond10,
+  cond11,
+  cond12,
+  cond13,
+  cond14,
+  cond15,
+  cond16,
+  cond17,
+  cond18
+) => {
+  return api2.post("/MIHR/HR01_004INS.asmx/saveSalaryPolicy", {
+    GROUPCD: groupcd,
+    strStndName: cond,
+    lngWorkType: cond1,
+    lngOTPayRate: cond2,
+    lngHWPayRate: cond3,
+    lngNWPayRate: cond4,
+    timNWStime: cond5,
+    timNWETime: cond6,
+    lngWHPayRate: cond7,
+    lngPayAcntS: cond8,
+    lngPayAcntE: cond9,
+    lngPayDay: cond10,
+    lngEPayDay: cond11,
+    dtmApplyDate: cond12,
+    timFixWorkHour: cond13,
+    timLimitHourWeek: cond14,
+    timLimitHourWeekAvg: cond15,
+    timLimitHourDay: cond16,
+    lngPeriod: cond17,
+    lngPeriodCls: cond18,
+  });
+};
+export const updateSalaryPolicy = (
+  groupcd,
+  cond,
+  lngcode,
+  cond1,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  cond9,
+  cond10,
+  cond11,
+  cond12,
+  cond13,
+  cond14,
+  cond15,
+  cond16,
+  cond17,
+  cond18
+) => {
+  return api2.post("/MIHR/HR01_004INS.asmx/updateSalaryPolicy", {
+    GROUPCD: groupcd,
+    LNG_CODE: lngcode,
+    strStndName: cond,
+    lngWorkType: cond1,
+    lngOTPayRate: cond2,
+    lngHWPayRate: cond3,
+    lngNWPayRate: cond4,
+    timNWStime: cond5,
+    timNWETime: cond6,
+    lngWHPayRate: cond7,
+    lngPayAcntS: cond8,
+    lngPayAcntE: cond9,
+    lngPayDay: cond10,
+    lngEPayDay: cond11,
+    dtmApplyDate: cond12,
+    timFixWorkHour: cond13,
+    timLimitHourWeek: cond14,
+    timLimitHourWeekAvg: cond15,
+    timLimitHourDay: cond16,
+    lngPeriod: cond17,
+    lngPeriodCls: cond18,
+  });
+};
+
+export const deleteSalaryPolicy = (groupCd, lngcodes) => {
+  return api2.post("/MIHR/HR01_004INS.asmx/deleteSalaryPolicy", {
+    GROUP_CD: groupCd,
+    LNG_CODE: lngcodes,
+  });
+};
+export const getInitEmpContractInfo = (groupCd) => {
+  return api2.post("/MIHR/HR01_005INS.asmx/getInitEmpContractInfo", {
+    GROUP_CD: groupCd,
+  });
+};
+export const getEmpContractList = (
+  groupCd,
+  storecd,
+  option,
+  loption,
+  sdate,
+  edate,
+  soption,
+  sword
+) => {
+  return api2.post("/MIHR/HR01_005INS.asmx/getEmpContractList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    PAYANDCODE: option,
+    LOPTION: loption,
+    FROMDATE: sdate,
+    TODATE: edate,
+    COND2: soption,
+    CONDVALUE: sword,
+  });
+};

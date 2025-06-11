@@ -1,7 +1,7 @@
 /*--############################################################################
-# Filename : ATT01_002INS.vue                                                  
-# Description : 마스터관리 > 사원 마스터 > 사원 등록.                          
-# Date :2025-05-14                                                             
+# Filename : HR01_005INS.vue                                                    
+# Description : 인사관리 > 마스터 관리 > 근무계약 등록.                        
+# Date :2025-06-11                                                             
 # Author : 권맑음                     
 ################################################################################*/
 <template>
@@ -13,6 +13,7 @@
         <button @click="searchButton" class="button search">조회</button>
         <button @click="addButton" class="button new">신규</button>
         <button @click="saveButton" class="button save">저장</button>
+        <button @click="deleteButton" class="button delete">삭제</button>
         <button @click="excelButton" class="button excel">엑셀</button>
       </div>
     </div>
@@ -29,21 +30,36 @@
             @update:ischanged="handleinitAll">
           </PickStore>
         </div>
-        <div class="flex justify-center items-center space-x-3 ml-60">
-          <div class="text-base font-semibold">검색 :</div>
-          <select
-            name=""
-            id=""
-            class="w-20 h-10 rounded-lg"
-            v-model="searchoption">
-            <option value="0">전체</option>
-            <option value="1">사원명</option>
-            <option value="2">사원코드</option>
-          </select>
-          <input
-            type="text"
-            v-model="searchword"
-            class="w-72 h-10 pl-1 rounded-lg" />
+        <div class="flex justify-center items-center space-x-3 ml-20">
+          <div class="flex items-center justify-center">
+            <div class="text-base font-semibold">구분 :</div>
+            <select
+              name=""
+              id=""
+              class="w-20 h-8 ml-2 rounded-lg"
+              v-model="selectedOption">
+              <option value="0">전체</option>
+              <option :value="i.lngCode" v-for="i in optionList">
+                {{ i.strStndName }}
+              </option>
+            </select>
+          </div>
+          <div class="flex items-center justify-center space-x-3 pl-10">
+            <div class="text-base font-semibold ml-10">검색 :</div>
+            <select
+              name=""
+              id=""
+              class="w-20 h-10 rounded-lg"
+              v-model="searchoption">
+              <option value="0">전체</option>
+              <option value="1">사원명</option>
+              <option value="2">사원코드</option>
+            </select>
+            <input
+              type="text"
+              v-model="searchword"
+              class="w-72 h-10 pl-1 rounded-lg" />
+          </div>
         </div>
       </div>
       <div class="flex mt-3 space-x-10 items-center">
@@ -64,50 +80,24 @@
           >
         </div>
 
-        <div class="flex">
-          <div class="text-base font-semibold">직책:</div>
-          <div>
-            <select name="" id="" v-model="cond4" class="w-60 ml-1">
-              <option value="0">전체</option>
-              <option :value="i.lngClassCode" v-for="i in dataList2">
-                {{ i.strClass }}
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <div class="flex">
-          <div class="text-base font-semibold">직위 :</div>
-          <div>
-            <select name="" id="" v-model="cond5" class="w-60 ml-1">
-              <option value="0">전체</option>
-              <option :value="i.lngRankCode" v-for="i in dataList3">
-                {{ i.strRank }}
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <div class="flex">
-          <div class="text-base font-semibold">근무장소:</div>
-          <div>
-            <select name="" id="" v-model="cond6" class="w-60 ml-1">
-              <option value="0">전체</option>
-              <option :value="i.lngAreaCode" v-for="i in dataList">
-                {{ i.strArea }}
-              </option>
-            </select>
-          </div>
+        <div class="flex pl-24 -mt-2">
+          <input type="checkbox" v-model="disableAll" />
+          <Datepicker2
+            class="!pr-48"
+            :mainName="'기간'"
+            @endDate="endDate"
+            @startDate="startDate"
+            :disableAll="disableAll"></Datepicker2>
         </div>
       </div>
     </div>
     <!-- 조회 조건 -->
     <!-- 그리드 영역-->
     <div
-      class="grid grid-rows-2 grid-cols-1 h-[70vh] w-full justify-center mt-1">
-      <div class="w-full h-[30vh]">
+      class="grid grid-rows-1 grid-cols-2 h-[70vh] w-full justify-center mt-1">
+      <div class="w-full h-full">
         <Realgrid
-          :progname="'ATT01_002INS_VUE2'"
+          :progname="'HR01_005INS_VUE'"
           :progid="1"
           :rowData="rowData"
           @clickedRowData="clickedRowData"
@@ -123,401 +113,437 @@
           :changeRow="changeRow"
           :exporttoExcel="exporttoExcel"
           :documentSubTitle="documentSubTitle"
-          :documentTitle="'ATT01_002INS'"
+          :documentTitle="'HR01_005INS'"
           @selectedIndex="selectedIndex"
           :rowStateeditable="false"
           @sendRowState="sendRowState"
           @allStateRows="allStateRows"
           :addField="'new'"></Realgrid>
       </div>
-      <div class="w-full h-[40vh] -mt-10">
-        <div
-          class="grid grid-rows-9 grid-cols-[1fr,2fr,1fr,2fr,1fr,2fr] h-[30vh]">
+      <div class="w-full h-[40vh] mt-5">
+        <div class="text-base font-semibold pl-2">
+          근무 계약 등록(신규/수정)
+        </div>
+        <div class="grid grid-rows-5 grid-cols-[1fr,2fr,1fr,2fr] h-[20vh]">
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            <span
-              class="flex justify-center items-center text-red-400 text-justify"
-              >*</span
-            >매장코드
+            사원
           </div>
           <div
             class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select
-              name="lngPosition"
-              id=""
-              v-model="gridvalue1"
-              @change="changeInfo"
-              class="border border-black w-[80%] h-[80%]">
-              <option :value="i.lngStoreCode" v-for="i in dataList4">
-                {{ i.strName }}
-              </option>
-            </select>
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            <span
-              class="flex justify-center items-center text-red-400 text-justify"
-              >*</span
-            >사원이름
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strChargerName"
-              @input="changeInfo"
-              class="border border-black w-[80%] h-[80%]"
-              v-model="gridvalue2" />
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            <span
-              class="flex justify-center items-center text-red-400 text-justify"
-              >*</span
-            >사원 코드
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="lngChargerCode"
-              @input="changeInfo"
-              class="border border-black w-[80%] h-[80%]"
-              v-model="gridvalue3" />
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            주민번호
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strIdNo"
-              @input="changeInfo"
-              class="border border-black w-[80%] h-[80%]"
-              v-model="gridvalue4" />
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            비밀번호
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strPassword"
-              @input="changeInfo"
-              class="border border-black w-[80%] h-[80%]"
-              v-model="gridvalue5" />
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            생년월일
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="date"
-              name="dtmBirthDate"
-              @input="changeInfo"
-              v-model="gridvalue6"
-              class="border border-black w-[60%] h-[80%]" />
-            <select
-              name="blnLuner"
-              id=""
-              @input="changeInfo"
-              v-model="gridvalue7"
-              class="border border-black w-[20%] h-[80%]">
-              <option :value="true">양력</option>
-              <option :value="false">음력</option>
-            </select>
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            <span
-              class="flex justify-center items-center text-red-400 text-justify"
-              >*</span
-            >직책
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select
-              name="lngClassCode"
-              id=""
-              @input="changeInfo"
-              v-model="gridvalue8"
-              class="border border-black w-[80%] h-[80%]">
-              <option value="0">선택</option>
-              <option :value="i.lngClassCode" v-for="i in dataList2">
-                {{ i.strClass }}
-              </option>
-            </select>
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            <span
-              class="flex justify-center items-center text-red-400 text-justify"
-              >*</span
-            >직위
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select
-              name="lngRankCode"
-              id=""
-              @input="changeInfo"
-              v-model="gridvalue9"
-              class="border border-black w-[80%] h-[80%]">
-              <option value="0">선택</option>
-              <option :value="i.lngRankCode" v-for="i in dataList3">
-                {{ i.strRank }}
-              </option>
-            </select>
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            <span
-              class="flex justify-center items-center text-red-400 text-justify"
-              >*</span
-            >근무장소
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select
-              name="lngAreaCode"
-              id=""
-              @input="changeInfo"
-              v-model="gridvalue10"
-              class="border border-black w-[80%] h-[80%]">
-              <option value="0">선택</option>
-              <option :value="i.lngAreaCode" v-for="i in dataList">
-                {{ i.strArea }}
-              </option>
-            </select>
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            입사일자
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="date"
-              name="dtmJoinDate"
-              @input="changeInfo"
-              v-model="gridvalue11"
-              class="border border-black w-[80%] h-[80%]" />
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            카드번호
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strCardNumber"
-              @input="changeInfo"
-              v-model="gridvalue12"
-              class="border border-black w-[80%] h-[80%]" />
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            <span
-              class="flex justify-center items-center text-red-400 text-justify"
-              >*</span
-            >재직구분
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select
-              name="blnExpireClass"
-              @input="changeInfo"
-              v-model="gridvalue13"
-              class="border border-black w-[80%] h-[80%]">
-              <option value="0">재직</option>
-              <option value="1">퇴직</option>
-              <option value="2">휴직</option>
-            </select>
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            우편번호
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strZipCode"
-              @input="changeInfo"
-              v-model="gridvalue14"
-              class="border border-black w-[50%] h-[80%]" />
-            <button class="whitebutton" @click="showZipCode">
-              우편번호 찾기
+            <button @click="selectEMP">
+              <input
+                type="text"
+                disabled
+                class="border border-black w-[80%] h-[80%] pointer-events-none" />
             </button>
           </div>
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            주소
+            급여기준
           </div>
           <div
-            class="border-l border-t border-gray-600 flex justify-center items-center col-span-3">
+            class="border-l border-t border-gray-600 flex justify-center items-center">
+            <select name="" id="" class="border border-black w-[80%] h-[80%]">
+              <option value=""></option>
+            </select>
+          </div>
+          <div
+            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
+            계약 시작일/종료일
+          </div>
+          <div
+            class="border-l border-t border-gray-600 flex justify-center items-center">
+            <input type="date" class="border border-black w-[30%] h-[80%]" /> /
+            <input type="date" class="border border-black w-[30%] h-[80%]" />
+          </div>
+          <div
+            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
+            계약일
+          </div>
+          <div
+            class="border-l border-t border-gray-600 flex justify-center items-center">
+            <input type="date" class="border border-black w-[80%] h-[80%]" />
+          </div>
+          <div
+            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
+            급여/시급
+          </div>
+          <div
+            class="border-l border-t border-gray-600 flex justify-center items-center">
+            <input type="number" class="border border-black w-[30%] h-[80%]" />
+            <input type="number" class="border border-black w-[30%] h-[80%]" />
+          </div>
+          <div
+            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
+            주휴수당 포함여부
+          </div>
+          <div
+            class="border-l border-t border-gray-600 flex justify-start pl-8 items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
+            소정근무시간 주/월
+          </div>
+          <div
+            class="border-l border-t border-gray-600 flex justify-center items-center">
+            <input type="number" class="border border-black w-[30%] h-[80%]" />
+            <input type="number" class="border border-black w-[30%] h-[80%]" />
+          </div>
+          <div
+            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
+            근로계약서 첨부
+          </div>
+          <div
+            class="border-l border-t border-gray-600 flex justify-center items-center">
+            <input type="file" class="border border-black w-[70%] h-[90%]" />
+            <button class="whitebutton">파일삭제</button>
+          </div>
+          <div
+            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
+            비고
+          </div>
+          <div
+            class="border-l border-t border-gray-600 flex justify-start pl-10 items-center col-span-3">
+            <input type="text" class="border border-black w-[80%] h-[80%]" />
+          </div>
+        </div>
+        <div class="text-base font-semibold pl-2 mt-2">※계약 스케쥴 등록</div>
+        <div
+          class="grid grid-rows-7 grid-cols-[2fr,1fr,1fr,1fr,1fr,1fr,1fr,1fr,3fr] h-[25vh] w-[95%] min-w-0">
+          <div
+            class="border-l border-t border-black bg-gray-200 justify-center flex items-center">
+            요일
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            월
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            화
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            수
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            목
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            금
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            토
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            일
+          </div>
+          <div class="row-span-7 h-[160%]">
+            <Realgrid
+              :progname="'HR01_005INS_VUE'"
+              :progid="2"
+              :setStateBar="false"
+              :setRowIndicator="false"
+              :rowData="rowData"></Realgrid>
+          </div>
+          <div
+            class="border-l border-t border-black bg-gray-200 justify-center flex items-center">
+            근로일
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="border-l border-t border-black bg-gray-200 justify-center flex items-center">
+            주휴일
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input type="checkbox" />
+          </div>
+          <div
+            class="border-l border-t border-black bg-gray-200 justify-center flex items-center">
+            근로시간
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
-              name="strAddress"
-              @input="changeInfo"
-              v-model="gridvalue15"
-              class="border border-black w-[80%] h-[80%] mr-28" />
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black bg-gray-200 justify-center flex items-center">
+            출근시간
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black bg-gray-200 justify-center flex items-center">
+            퇴근시간
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
+          </div>
+          <div
+            class="border-l border-t border-black justify-center flex items-center">
+            <input
+              type="text"
+              min="0"
+              class="w-[80%] border border-black"
+              value="12:00" />
           </div>
 
           <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            전화번호
+            class="border-l border-t border-black bg-gray-200 justify-center flex items-center">
+            상세보기
           </div>
           <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strTelNumber"
-              @input="changeInfo"
-              v-model="gridvalue16"
-              class="border border-black w-[80%] h-[80%]" />
+            class="border-l border-t border-black justify-center flex items-center">
+            <button class="whitebutton">확인</button>
           </div>
           <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            휴대폰번호
+            class="border-l border-t border-black justify-center flex items-center">
+            <button class="whitebutton">확인</button>
           </div>
           <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strCPhone"
-              @input="changeInfo"
-              v-model="gridvalue17"
-              class="border border-black w-[80%] h-[80%]" />
+            class="border-l border-t border-black justify-center flex items-center">
+            <button class="whitebutton">확인</button>
           </div>
           <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            퇴직일자
+            class="border-l border-t border-black justify-center flex items-center">
+            <button class="whitebutton">확인</button>
           </div>
           <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="date"
-              name="dtmRetireDate"
-              @input="changeInfo"
-              v-model="gridvalue18"
-              class="border border-black w-[80%] h-[80%]" />
+            class="border-l border-t border-black justify-center flex items-center">
+            <button class="whitebutton">확인</button>
           </div>
           <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            이메일
+            class="border-l border-t border-black justify-center flex items-center">
+            <button class="whitebutton">확인</button>
           </div>
           <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strEmail"
-              @input="changeInfo"
-              v-model="gridvalue19"
-              class="border border-black w-[80%] h-[80%]" />
+            class="border-l border-t border-black justify-center flex items-center">
+            <button class="whitebutton">확인</button>
           </div>
-          <div
-            class="border-t border-gray-600 flex justify-center items-center"></div>
-          <div
-            class="border-t border-gray-600 flex justify-center items-center"></div>
-          <div
-            class="border-t border-gray-600 flex justify-center items-center"></div>
-          <div
-            class="border-t border-gray-600 flex justify-center items-center"></div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            계약 만기일
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="date"
-              name="dtmExpireDate"
-              @input="changeInfo"
-              v-model="gridvalue20"
-              class="border border-black w-[80%] h-[80%]" />
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            보건증만기일
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="date"
-              name="dtmHealthExpireDate"
-              @input="changeInfo"
-              v-model="gridvalue21"
-              class="border border-black w-[80%] h-[80%]" />
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            정규직/PT
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select
-              name="lngWorkClass"
-              id=""
-              @change="changeInfo"
-              v-model="gridvalue22"
-              class="border border-black w-[80%] h-[80%]">
-              <option value="0">해당 사항 없음</option>
-              <option value="1">정직원</option>
-              <option value="2">PT</option>
-            </select>
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            거래은행
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select
-              name="lngBankCode"
-              id=""
-              @change="changeInfo"
-              v-model="gridvalue23"
-              class="border border-black w-[80%] h-[80%]">
-              <option value="0">선택</option>
-              <option :value="i.lngBankCode" v-for="i in dataList5">
-                {{ i.strBankName }}
-              </option>
-            </select>
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            계좌번호
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strBankNumber"
-              id=""
-              @input="changeInfo"
-              v-model="gridvalue24"
-              class="border border-black w-[80%] h-[80%]" />
-          </div>
+        </div>
+        <div class="w-[71%] h-[16vh]">
+          <Realgrid
+            :progname="'HR01_005INS_VUE'"
+            :progid="3"
+            :setStateBar="false"
+            :setRowIndicator="false"
+            :rowData="rowData"></Realgrid>
         </div>
       </div>
       <!-- 그리드 영역-->
       <!-- 연동 데이터 영역-->
     </div>
-
-    <GetZipCode
-      v-if="zipCode"
-      @closePopUp="closeZipCode"
-      @address="address"
-      @zipCode="zipCode2"></GetZipCode>
   </div>
+
   <!-- 연동 데이터 영역-->
 </template>
 
@@ -529,6 +555,12 @@ import {
   saveEMP,
   saveEMP2,
 } from "@/api/miattend";
+import { getEmpContractList, getInitEmpContractInfo } from "@/api/mihr";
+import Datepicker1 from "@/components/Datepicker1.vue";
+import Datepicker2 from "@/components/Datepicker2.vue";
+import DateRangePicker from "@/components/DateRangePicker.vue";
+import DateRangePicker2 from "@/components/DateRangePicker2.vue";
+import EmployeePopUp from "@/components/employeePopUp.vue";
 import GetZipCode from "@/components/getZipCode.vue";
 /**
  *  페이지명 자동 입력 컴포넌트
@@ -570,6 +602,13 @@ import { Store, useStore } from "vuex";
 /**
  * 	화면 Load시 실행 스크립트
  */
+
+const selectEMP = () => {
+  openPopUp.value = true;
+  console.log("왓음");
+};
+const openPopUp = ref(false);
+const disableAll = ref(true);
 const store = useStore();
 const dataList = ref([]);
 const dataList2 = ref([]);
@@ -629,27 +668,27 @@ const zipCode2 = async (e) => {
   }, 10);
 };
 
+const selectedOption = ref(0);
 const searchoption = ref(0);
 const searchword = ref("");
 
 const cond = ref(true);
-const cond2 = ref(true);
-const cond3 = ref(true);
-const cond4 = ref(0);
-const cond5 = ref(0);
-const cond6 = ref(0);
-
+const cond2 = ref(false);
+const cond3 = ref(false);
+const EndDate = ref("");
+const StartDate = ref("");
+const endDate = (e) => {
+  EndDate.value = e;
+};
+const startDate = (e) => {
+  StartDate.value = e;
+};
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
-  const res = await getInitEmpInfo(store.state.userData.lngStoreGroup);
-  dataList.value = res.data.List;
-  dataList2.value = res.data.List2;
-  dataList3.value = res.data.List3;
-  dataList4.value = res.data.List4;
-  dataList5.value = res.data.List5;
+  const res = await getInitEmpContractInfo(store.state.userData.lngStoreGroup);
+  optionList.value = res.data.List;
 
-  gridvalue1.value = store.state.userData.lngPosition;
   //console.log(res);
 });
 const rowData = ref([]);
@@ -662,7 +701,7 @@ const isNewRow = ref(true);
 /**
  * 추가 버튼 함수
  */
-
+const optionList = ref([]);
 const addRow = ref(false);
 const changeNow = ref(false);
 const changeValue2 = ref();
@@ -726,30 +765,30 @@ const addButton = () => {
 
 const clickedRowData = (newValue) => {
   console.log(newValue);
-  gridvalue1.value = newValue[1];
-  gridvalue2.value = newValue[4];
-  gridvalue3.value = newValue[3];
-  gridvalue4.value = newValue[35];
-  gridvalue5.value = newValue[14];
-  gridvalue6.value = newValue[31].split(" ")[0];
-  gridvalue7.value = newValue[28] == "True" ? true : false;
-  gridvalue8.value = newValue[23];
-  gridvalue9.value = newValue[24];
-  gridvalue10.value = newValue[25];
-  gridvalue11.value = newValue[16].split(" ")[0];
-  gridvalue12.value = newValue[15];
-  gridvalue13.value = newValue[29];
-  gridvalue14.value = newValue[32];
-  gridvalue15.value = newValue[12];
-  gridvalue16.value = newValue[10];
-  gridvalue17.value = newValue[11];
-  gridvalue18.value = newValue[19].split(" ")[0];
-  gridvalue19.value = newValue[22];
-  gridvalue20.value = newValue[17].split(" ")[0];
-  gridvalue21.value = newValue[18].split(" ")[0];
-  gridvalue22.value = newValue[36];
-  gridvalue23.value = newValue[30];
-  gridvalue24.value = newValue[21];
+  // gridvalue1.value = newValue[1];
+  // gridvalue2.value = newValue[4];
+  // gridvalue3.value = newValue[3];
+  // gridvalue4.value = newValue[35];
+  // gridvalue5.value = newValue[14];
+  // gridvalue6.value = newValue[31].split(" ")[0];
+  // gridvalue7.value = newValue[28] == "True" ? true : false;
+  // gridvalue8.value = newValue[23];
+  // gridvalue9.value = newValue[24];
+  // gridvalue10.value = newValue[25];
+  // gridvalue11.value = newValue[16].split(" ")[0];
+  // gridvalue12.value = newValue[15];
+  // gridvalue13.value = newValue[29];
+  // gridvalue14.value = newValue[32];
+  // gridvalue15.value = newValue[12];
+  // gridvalue16.value = newValue[10];
+  // gridvalue17.value = newValue[11];
+  // gridvalue18.value = newValue[19].split(" ")[0];
+  // gridvalue19.value = newValue[22];
+  // gridvalue20.value = newValue[17].split(" ")[0];
+  // gridvalue21.value = newValue[18].split(" ")[0];
+  // gridvalue22.value = newValue[36];
+  // gridvalue23.value = newValue[30];
+  // gridvalue24.value = newValue[21];
 };
 /**
  * 페이지 매장 그룹 세팅
@@ -865,18 +904,6 @@ const addrowDefault = ref("");
  */
 
 const searchButton = async () => {
-  // if (storeCd.value == "0" || storeCd.value == undefined) {
-  //   Swal.fire({
-  //     title: "경고",
-  //     text: "매장을 선택하세요.",
-  //     icon: "warning",
-  //     showCancelButton: false,
-  //     confirmButtonColor: "#3085d6",
-  //     allowOutsideClick: false,
-  //   });
-  //   return;
-  // }
-
   try {
     store.state.loading = true;
     let res;
@@ -887,16 +914,18 @@ const searchButton = async () => {
       (cond.value == true ? "1" : "") +
       (cond2.value == true ? "2" : "") +
       (cond3.value == true ? "3" : "");
-    res = await getChargerInfo2(
+
+    let sdate = disableAll.value == true ? "1980-01-01" : StartDate.value;
+    let edate = disableAll.value == true ? "9999-12-01" : EndDate.value;
+    res = await getEmpContractList(
       groupCd.value,
       storeCd.value,
-      storeType.value,
+      selectedOption.value,
+      lngoption,
+      sdate,
+      edate,
       searchoption.value,
-      searchword.value,
-      cond4.value,
-      cond5.value,
-      cond6.value,
-      lngoption
+      searchword.value
     );
 
     rowData.value = res.data.List;

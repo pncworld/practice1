@@ -10,7 +10,7 @@
       <input
         type="date"
         :disabled="disable"
-        class="border rounded-lg h-10 w-36 text-base mr-2 pl-5"
+        class="border rounded-lg h-10 w-36 text-base mr-2 pl-5 disabled:bg-gray-500"
         v-model="selectedStartDate"
         @change="changeStartDate"
         :max="maxEndDate" />
@@ -18,7 +18,7 @@
       <input
         type="date"
         :disabled="disable"
-        class="border rounded-lg h-10 w-36 text-base pl-5 ml-2"
+        class="border rounded-lg h-10 w-36 text-base pl-5 ml-2 disabled:bg-gray-500"
         v-model="selectedEndDate"
         @change="changeEndDate"
         :max="maxEndDate" />

@@ -875,6 +875,26 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  mergeColumns3: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
+  mergeColumnGroupSubList3: {
+    // 행높이
+    type: Array,
+    default: [],
+  },
+  mergeColumnGroupName4: {
+    // 행높이
+    type: Array,
+    default: [],
+  },
+  mergeColumnGroupName3: {
+    // 행높이
+    type: Array,
+    default: [],
+  },
 });
 
 // 2구간
@@ -1654,6 +1674,92 @@ const funcshowGrid = async () => {
 
     gridView.setColumnLayout(layout);
   }
+
+  if (props.mergeColumns3 == true) {
+    const subList3 = props.mergeColumnGroupSubList3; // [[['column1','column2'],['column3','column4']]]
+    const groupList3 = props.mergeColumnGroupName4; // ['최상위그룹컬럼']
+    const groupList2 = props.mergeColumnGroupName3; // [['그룹컬럼1','그룹컬럼2']]
+    let layout = [];
+    tabInitSetArray.value.forEach((item) => {
+      if (subList3.flat(2).includes(item.strColID)) {
+        const index = subList3.findIndex((group2D) =>
+          group2D.some((group1D) => group1D.includes(item.strColID))
+        );
+        const innerIndex = subList3[index]?.findIndex((group1D) =>
+          group1D.includes(item.strColID)
+        );
+
+        if (layout.find((item) => item.name == groupList3[index])) {
+          const findit = layout.find((item) => item.name == groupList3[index]);
+
+          if (findit) {
+            let target = findit.items.find(
+              (i) => i.name === groupList2[index][innerIndex]
+            );
+
+            if (target) {
+              console.log(target.items);
+              target.items = [
+                ...target.items,
+                {
+                  column: item.strColID,
+                  width: 100,
+                },
+              ];
+            }
+          }
+        } else {
+          const secondItems = ref([]);
+          for (let i = 0; i < groupList2[index].length; i++) {
+            if (i == 0) {
+              secondItems.value.push({
+                name: groupList2[index][i],
+                direction: "horizontal",
+                header: {
+                  styleName: `header-style-0`,
+                },
+                items: [
+                  {
+                    column: subList3[index][innerIndex][i],
+                    width: 100,
+                  },
+                ],
+              });
+            } else {
+              secondItems.value.push({
+                name: groupList2[index][i],
+                direction: "horizontal",
+                header: {
+                  styleName: `header-style-0`,
+                },
+                items: [],
+              });
+            }
+          }
+          layout.push({
+            name: groupList3[index],
+            direction: "horizontal",
+            header: {
+              styleName: `header-style-0`,
+            },
+            items: secondItems.value,
+          });
+          // layout.push(tempgroupList)
+        }
+      } else {
+        layout.push({
+          column: item.strColID,
+          name: item.strHdText,
+          header: { visible: true, text: item.strHdText },
+          visible: item.intHdWidth !== 0,
+          width: item.intHdWidth,
+        });
+      }
+    });
+    console.log(layout);
+    gridView.setColumnLayout(layout);
+  }
+
   emit("allStateRows", dataProvider.getAllStateRows());
   // 데이터 추가
   // 5구간
