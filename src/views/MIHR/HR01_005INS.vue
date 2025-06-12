@@ -21,14 +21,14 @@
       class="flex flex-col justify-start space-x-5 bg-gray-200 rounded-lg h-24 items-start pt-3 pl-36">
       <div class="flex">
         <div>
-          <PickStore
-            @update:storeGroup="handleGroupCd"
-            @update:storeCd="handleStoreCd"
-            @update:storeType="handleStoreType"
+          <PickStoreRenew
+            @lngStoreGroup="handleGroupCd"
+            @lngStoreCode="handleStoreCd"
+            @lngStoreAttrs="handleStoreType"
             :defaultStoreNm="'전체'"
             @storeNm="storeNm"
             @update:ischanged="handleinitAll">
-          </PickStore>
+          </PickStoreRenew>
         </div>
         <div class="flex justify-center items-center space-x-3 ml-20">
           <div class="flex items-center justify-center">
@@ -572,6 +572,7 @@ import PageName from "@/components/pageName.vue";
  */
 
 import PickStore from "@/components/pickStore.vue";
+import PickStoreRenew from "@/components/pickStoreRenew.vue";
 
 /**
  * 	그리드 생성

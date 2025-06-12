@@ -1,3 +1,9 @@
+import CRM02_002RPT from "@/views/MICRM/CRM02_002RPT.vue";
+import CRM03_002INS from "@/views/MICRM/CRM03_002INS.vue";
+import CRM02_003RPT from "@/views/MICRM/CRM03_002INS.vue";
+import CRM03_004INS from "@/views/MICRM/CRM03_004INS.vue";
+import CRM03_011RPT from "@/views/MICRM/CRM03_011RPT.vue";
+import CRM03_012RPT from "@/views/MICRM/CRM03_012RPT.vue";
 import CRM10_007INS_shy from "@/views/MICRM/CRM10_007INS_shy.vue";
 import CRM10_019INS from "@/views/MICRM/CRM10_019INS.vue";
 import CRM10_020INS from "@/views/MICRM/CRM10_020INS.vue";
@@ -75,6 +81,26 @@ export default function micrmRouter() {
     {
       path: "CRM10_020INS.xml",
       component: CRM10_020INS,
+    },
+    {
+      path: "CRM02_002RPT.xml",
+      component: CRM02_002RPT,
+    },
+    {
+      path: "CRM03_002INS.xml",
+      component: CRM03_002INS,
+    },
+    {
+      path: "CRM03_012RPT.xml",
+      component: CRM03_012RPT,
+    },
+    {
+      path: "CRM03_011RPT.xml",
+      component: CRM03_011RPT,
+    },
+    {
+      path: "CRM03_004INS.xml",
+      component: CRM03_004INS,
     },
   ];
 }

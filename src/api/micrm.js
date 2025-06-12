@@ -263,6 +263,64 @@ export const getReserveTeamTable = (groupcd, storecd) => {
     STORE_CD: storecd,
   });
 };
+export const getCustInfo2 = (groupcd, option, word) => {
+  return api2.post("/MICRM/CRM02_002RPT.asmx/getCustInfo2", {
+    GROUP_CD: groupcd,
+    OPTION: option,
+    WORD: word,
+  });
+};
+export const getCustRecord = (
+  groupcd,
+  searchNum,
+  sdate,
+  edate,
+  cond,
+  cond2
+) => {
+  return api2.post("/MICRM/CRM02_002RPT.asmx/getCustRecord", {
+    GROUP_CD: groupcd,
+    SEARCHNUM: searchNum,
+    START_DATE: sdate,
+    END_DATE: edate,
+    COND: cond,
+    COND2: cond2,
+  });
+};
+export const getCustPointInfo = (groupcd, cond) => {
+  return api2.post("/MICRM/CRM02_002RPT.asmx/getCustPointInfo", {
+    GROUP_CD: groupcd,
+    COND: cond,
+  });
+};
+export const getReceiptDataDetail2 = (groupcd, storecd, receiptNo) => {
+  return api2.post("/MICRM/CRM02_002RPT.asmx/getReceiptDataDetail2", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    RECEIPT_NO: receiptNo,
+  });
+};
+export const getCustBuyList = (
+  groupcd,
+  jointype,
+  teamcode,
+  supervisor,
+  storecd,
+  sdate,
+  edate,
+  pointcls
+) => {
+  return api2.post("/MICRM/CRM03_002INS.asmx/getCustBuyList", {
+    GROUP_CD: groupcd,
+    JOIN_TYPE: jointype,
+    TEAM_CD: teamcode,
+    SUPERVISOR: supervisor,
+    STORE_CD: storecd,
+    START_DATE: sdate,
+    END_DATE: edate,
+    POINT_CLS: pointcls,
+  });
+};
 export const saveReserveTimeTable = (
   groupcd,
   storecd,
@@ -322,5 +380,77 @@ export const saveReserveTeamTable = (
     COND3: cond3,
     COND4: cond4,
     UPDATE: update,
+  });
+};
+export const getInitDataCustPurchase = (groupcd) => {
+  return api2.post("/MICRM/CRM03_012RPT.asmx/getInitDataCustPurchase", {
+    GROUP_CD: groupcd,
+  });
+};
+export const getCustBuyAggList = (
+  groupcd,
+  storeCd,
+  jointype,
+  supervisor,
+  teamCd,
+  sdate,
+  edate,
+  level,
+  reporttype
+) => {
+  return api2.post("/MICRM/CRM03_012RPT.asmx/getCustBuyAggList", {
+    GROUP_CD: groupcd,
+    STORE_CD: storeCd,
+    JOIN_TYPE: jointype,
+    SUPER: supervisor,
+    TEAM: teamCd,
+    SDATE: sdate,
+    EDATE: edate,
+    LEVEL: level,
+    REPORT_TYPE: reporttype,
+  });
+};
+export const getCustBuyDetailList = (
+  groupcd,
+  storeCd,
+  jointype,
+  supervisor,
+  teamCd,
+  sdate,
+  edate,
+  level,
+  cond2
+) => {
+  return api2.post("/MICRM/CRM03_011RPT.asmx/getCustBuyDetailList", {
+    GROUP_CD: groupcd,
+    STORE_CD: storeCd,
+    JOIN_TYPE: jointype,
+    SUPER: supervisor,
+    TEAM: teamCd,
+    SDATE: sdate,
+    EDATE: edate,
+    LEVEL: level,
+    COND2: cond2,
+  });
+};
+export const getCustCardDisList = (
+  groupcd,
+  storeCd,
+  jointype,
+  teamCd,
+  supervisor,
+  sdate,
+  edate,
+  cond
+) => {
+  return api2.post("/MICRM/CRM03_004INS.asmx/getCustCardDisList", {
+    GROUP_CD: groupcd,
+    STORE_CD: storeCd,
+    JOIN_TYPE: jointype,
+    SUPER: supervisor,
+    TEAM: teamCd,
+    SDATE: sdate,
+    EDATE: edate,
+    COND: cond,
   });
 };

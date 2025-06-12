@@ -570,6 +570,11 @@ const props = defineProps({
     type: Array,
     default: [],
   },
+  hideColumnsId2: {
+    // 숨길 엑셀 컬럼명들 설정
+    type: Array,
+    default: [],
+  },
   setGroupFooterExpressions: {
     // 그룹 푸터에서 나타낼 값
     type: Array,
@@ -1846,6 +1851,26 @@ const funcshowGrid = async () => {
       }
     }
   }
+
+  watch(
+    () => props.hideColumnsId,
+    () => {
+      if (gridView != null) {
+        for (let i = 0; i < gridView.getColumns().length; i++) {
+          if (gridView.getColumns()[i].width != 0) {
+            gridView.columnByField(
+              gridView.getColumns()[i].name
+            ).visible = true;
+          }
+        }
+        for (var i = 0; i < props.hideColumnsId.length; i++) {
+          if (gridView.columnByField(props.hideColumnsId[i])) {
+            gridView.columnByField(props.hideColumnsId[i]).visible = false;
+          }
+        }
+      }
+    }
+  );
 
   if (props.setGroupFooter == true) {
     gridView.setRowGroup({
