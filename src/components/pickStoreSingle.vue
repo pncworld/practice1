@@ -162,6 +162,10 @@ const props = defineProps({
     type: String,
     default: "전체",
   },
+  setDisableType: {
+    type: Boolean,
+    default: false,
+  },
 });
 const disabled1 = ref(false);
 const disabled2 = ref(true);
@@ -208,6 +212,13 @@ onMounted(() => {
     //comsole.log(selectedStoreList.value);
     selectedStoreTeam.value = store.state.userData.lngTeamCode;
     selectedSuperVisor.value = store.state.userData.lngSupervisor;
+    disabled1.value = true;
+    settingDisable2.value = true;
+  }
+
+  if (props.setDisableType == true) {
+    settingDisable.value = 2;
+    disabled2.value = false;
     disabled1.value = true;
     settingDisable2.value = true;
   }

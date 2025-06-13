@@ -22,7 +22,11 @@
         v-model="selectedEndDate"
         @change="changeEndDate"
         :max="maxEndDate" />
-      <button class="w-[30px] ml-2" @click="toggleRadio" :disabled="disable">
+      <button
+        class="w-[30px] ml-2"
+        @click="toggleRadio"
+        :disabled="disable"
+        v-if="disable2">
         <img src="../assets/choiceCalendar.png" class="w-full" alt="" />
       </button>
     </div>
@@ -167,6 +171,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  removeDefault: {
+    type: Boolean,
+    default: false,
+  },
+  disableBox: {
+    type: Boolean,
+    default: true,
+  },
 });
 const formatDate = (date) => {
   //comsole.log(date);
@@ -181,8 +193,10 @@ const selectedEndDate = ref();
 const emitDate1 = (e) => {};
 const maxEndDate = ref("9999-12-31");
 const disable = ref(true);
+const disable2 = ref(true);
 onMounted(() => {
   disable.value = props.disableAll;
+  disable2.value = props.disableBox;
   const today = new Date();
   if (props.initToday == 0) {
     today.setDate(today.getDate() - 1);
@@ -201,6 +215,10 @@ onMounted(() => {
     selectedStartDate.value = formatDate(today);
   }
   maxEndDate.value = props.limitEndDate;
+  if (props.removeDefault == true) {
+    selectedStartDate.value = "";
+    selectedEndDate.value = "";
+  }
   emit("startDate", selectedStartDate.value);
   emit("endDate", selectedEndDate.value);
   emit(

@@ -1,7 +1,7 @@
 <template>
   <div class="flex justify-center md:justify-end space-x-4 text-sm mr-5">
     <div class="items-center font-bold hidden md:flex pl-12 text-nowrap">
-      매장명 :
+      {{ MainName }} :
     </div>
     <div v-show="hideit2">
       <select
@@ -303,8 +303,17 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  mainName: {
+    type: String,
+    default: "매장명",
+  },
+  defaultStore: {
+    type: Boolean,
+    default: false,
+  },
 });
 
+const MainName = ref("");
 const hideit = ref(props.hidesub);
 const hideit2 = ref(props.hideGroup);
 const hideit3 = ref(props.hideAttr);
@@ -436,10 +445,16 @@ onMounted(() => {
   storeCd2.value = store.state.storeCd;
   storeAreaCd2.value = store.state.storeAreaCd;
   selectedStoreAreaCd.value = 0;
+  MainName.value = props.mainName;
 
+  if (props.defaultStore == true) {
+    selectedStoreCode.value = 0;
+  } else {
+    selectedStoreCode.value = store.state.userData.lngPosition;
+  }
   emit("update:storeGroup", store.state.userData.lngStoreGroup);
   emit("update:storeType", store.state.userData.lngJoinType);
-  emit("update:storeCd", store.state.userData.lngPosition);
+  emit("update:storeCd", selectedStoreCode.value);
   emit("storeNm", store.state.userData.strStoreName);
   emit("posNo", 0);
   emit("updateFuncScreenType", 0);

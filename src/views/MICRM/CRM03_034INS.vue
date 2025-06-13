@@ -1,6 +1,6 @@
 /*--############################################################################
-# Filename : CRM03_011RPT.vue                                                  
-# Description : 고객관리 > 고객 실적 관리 > 고객 구매 상세 현황                 
+# Filename : CRM03_034INS.vue                                                  
+# Description : 고객관리 > 고객 실적 관리 > 고객 메뉴별 할인 현황.              
 # Date :2025-06-12                                                             
 # Author : 권맑음                     
 ################################################################################*/
@@ -19,49 +19,43 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-28 items-center z-10 -space-x-20">
-      <div class="justify-start flex -space-x-10">
+      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-28 items-center z-10 space-x-5">
+      <div class="justify-start flex">
         <Datepicker2
           :mainName="'기간'"
-          :initToday="1"
           @endDate="endDate"
+          :initToday="1"
           ref="datepicker"
           :closePopUp="closePopUp"
           @excelDate="excelDate"
           @startDate="startDate">
         </Datepicker2>
       </div>
-
-      <div class="h-[75%] mt-1 justify-start flex">
-        <PickStoreSingle
+      <div class="h-[75%] ml-5 mt-1 justify-start flex">
+        <PickStoreRenew
           @lngStoreGroup="lngStoreGroup"
           @lngStoreAttrs="lngStoreAttrs"
           @lngStoreCode="lngStoreCode"
-          @lngSupervisor="lngSupervisor"
-          @lngStoreTeam="lngTeamCode"
-          @excelStore="excelStore"></PickStoreSingle>
+          @excelStore="excelStore"></PickStoreRenew>
       </div>
-
-      <div class="flex justify-start pl-52 space-x-5 items-center">
-        <div class="text-base font-semibold">등급 :</div>
+      <div class="flex justify-start pl-6 space-x-5 items-center">
+        <div class="text-base font-semibold">고객등급(소속사) :</div>
         <div>
-          <select name="" id="" class="w-48 h-8" v-model="cond">
+          <select name="" id="" v-model="cond" class="w-40 h-8">
             <option value="0">전체</option>
             <option :value="i.intLevel" v-for="i in optionList">
               {{ i.strLevelName }}
             </option>
           </select>
         </div>
-      </div>
-      <div class="flex justify-start pl-1 space-x-5 items-center mt-2">
-        <div class="text-base font-semibold">거래 구분 :</div>
         <div>
-          <select name="" id="" class="w-48 h-8" v-model="cond2">
-            <option value="0">전체</option>
-            <option value="2">사용</option>
-            <option value="3">적립</option>
-            <option value="4">보너스</option>
-          </select>
+          <label for="cond2">
+            <input
+              type="checkbox"
+              id="cond2"
+              @change="cond2 = $event.target.checked" />
+            셀병합
+          </label>
         </div>
       </div>
     </div>
@@ -70,17 +64,16 @@
     <div class="w-full h-[75vh]">
       <div class="w-full h-[80%]">
         <Realgrid
-          :progname="'CRM03_011RPT_VUE'"
+          :progname="'CRM03_034INS_VUE'"
           :progid="1"
           :rowData="rowData"
           :reload="reload"
           :setFooterCustomColumnId="['strName']"
           :setFooterCustomText="['합계']"
+          :setRowGroupSpan2="setRowGroupSpan2"
           :setFooter="true"
-          :setGroupFooter="true"
-          :setGroupColumnId="'strName'"
           :hideColumnsId="hideColumnsId"
-          :documentTitle="'CRM03_011RPT'"
+          :documentTitle="'CRM03_034INS'"
           @clickedRowData="clickedRowData"
           :documentSubTitle="documentSubTitle"
           :rowStateeditable="false"
@@ -94,13 +87,9 @@
 
 <script setup>
 import {
-  getCustBuyAggList,
-  getCustBuyDetailList,
   getCustBuyList,
-  getCustPointInfo,
-  getCustRecord,
+  getCustDisCountList,
   getInitDataCustPurchase,
-  getReceiptDataDetail2,
 } from "@/api/micrm";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
@@ -112,7 +101,7 @@ import Datepicker2 from "@/components/Datepicker2.vue";
  *  */
 
 import PageName from "@/components/pageName.vue";
-import PickStoreSingle from "@/components/pickStoreSingle.vue";
+import PickStoreRenew from "@/components/pickStoreRenew.vue";
 /**
  * 	매장 단일 선택 컴포넌트
  */
@@ -146,63 +135,35 @@ import { useStore } from "vuex";
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
-});
 
+  const res = await getInitDataCustPurchase(store.state.userData.lngStoreGroup);
+  optionList.value = res.data.List;
+});
+const optionList = ref([]);
 const reload = ref(false);
 const rowData = ref([]);
 const afterSearch = ref(false);
-
+const cond3 = ref(true);
 const rowData2 = ref([]);
 const rowData3 = ref([]);
 const rowData4 = ref([]);
 const condValue = ref(0);
 const store = useStore();
 const cond = ref(0);
-const cond2 = ref(0);
-const cond3 = ref(0);
-const optionList = ref([]);
+const cond2 = ref(false);
 const datepicker = ref(null);
 const closePopUp = ref(false);
 
-watch(cond, () => {
-  if (cond.value == true) {
-    if (cond2.value == true) {
-      hideColumnsId.value = [];
-      setGroupFooter.value = true;
-    } else {
-      hideColumnsId.value = ["strName"];
-      setGroupFooter.value = false;
-    }
-  } else {
-    if (cond2.value == true) {
-      hideColumnsId.value = ["dtmDate"];
-      setGroupFooter.value = false;
-    } else {
-      hideColumnsId.value = ["strName", "dtmDate"];
-      setGroupFooter.value = false;
-    }
-  }
-});
+const setRowGroupSpan2 = ref("");
 watch(cond2, () => {
-  if (cond.value == true) {
-    if (cond2.value == true) {
-      hideColumnsId.value = [];
-      setGroupFooter.value = true;
-    } else {
-      hideColumnsId.value = ["strName"];
-      setGroupFooter.value = false;
-    }
+  if (cond2.value) {
+    setRowGroupSpan2.value =
+      "dtmDate,strStoreName,strCdNumber,strCustName,strLevelName";
   } else {
-    if (cond2.value == true) {
-      hideColumnsId.value = ["dtmDate"];
-      setGroupFooter.value = false;
-    } else {
-      hideColumnsId.value = ["strName", "dtmDate"];
-      setGroupFooter.value = false;
-    }
+    setRowGroupSpan2.value = "";
   }
+  reload.value = !reload.value;
 });
-
 /**
  * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
  */
@@ -229,14 +190,6 @@ const excelDate = (e) => {
   selectedDate.value = e;
 };
 
-const teamcode = ref();
-const lngTeamCode = (e) => {
-  teamcode.value = e;
-};
-const supervisor = ref();
-const lngSupervisor = (e) => {
-  supervisor.value = e;
-};
 const storeCode = ref();
 const lngStoreCode = (e) => {
   storeCode.value = e;
@@ -254,24 +207,18 @@ const lngStoreGroup = (e) => {
 /**
  *  조회 함수
  */
-
-const setGroupFooter = ref(false);
 const hideColumnsId = ref([]);
 const searchButton = async () => {
   try {
     store.state.loading = true;
     initGrid();
 
-    const res = await getCustBuyDetailList(
+    const res = await getCustDisCountList(
       groupCd.value,
       storeCode.value,
-      storeAttr.value,
-      supervisor.value,
-      teamcode.value,
       sDate.value,
       eDate.value,
-      cond.value,
-      cond2.value
+      cond.value
     );
 
     rowData.value = res.data.List;
@@ -323,6 +270,10 @@ const selectedExcelStore = ref("");
 
 const excelStore = (e) => {
   selectedExcelStore.value = e;
+  //comsole.log(e);
+};
+const excelList = (e) => {
+  selectedExcelList.value = e;
   //comsole.log(e);
 };
 </script>

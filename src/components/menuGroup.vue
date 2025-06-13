@@ -1,6 +1,6 @@
 <template>
   <div class="flex justify-center items-center space-x-3">
-    <div class="text-base font-semibold">메뉴그룹명 :</div>
+    <div class="text-base font-semibold">{{ mainName }} :</div>
 
     <select
       name=""
@@ -22,6 +22,7 @@
 
 <script setup>
 import { getMenuGroupList } from "@/api/master";
+import store from "@/store";
 import { onMounted, ref, watch } from "vue";
 const props = defineProps({
   groupCd: {
@@ -36,6 +37,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  initName: {
+    type: String,
+    default: "메뉴그룹명",
+  },
 });
 const emit = defineEmits(["mainCode", "subCode", "mainNm", "subNm"]);
 const mainList = ref([]);
@@ -43,8 +48,11 @@ const subList = ref([]);
 const subsubList = ref([]);
 const selectedMain = ref(0);
 const selectedSub = ref(0);
+
+const mainName = ref("");
 onMounted(async () => {
   emit("payNm", "전체");
+  mainName.value = props.initName;
   const res = await getMenuGroupList(props.groupCd, props.storeCd, 1);
   console.log(res);
   mainList.value = res.data.List;
@@ -69,6 +77,16 @@ const setSub = (e) => {
 };
 watch(
   () => props.storeCd,
+  async () => {
+    const res = await getMenuGroupList(props.groupCd, props.storeCd, 1);
+    console.log(res);
+    mainList.value = res.data.List;
+    subList.value = res.data.List2;
+    subsubList.value = res.data.List2;
+  }
+);
+watch(
+  () => props.groupCd,
   async () => {
     const res = await getMenuGroupList(props.groupCd, props.storeCd, 1);
     console.log(res);

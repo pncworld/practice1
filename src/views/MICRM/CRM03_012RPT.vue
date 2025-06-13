@@ -26,6 +26,8 @@
           :mainName="'기간'"
           :initToday="1"
           @endDate="endDate"
+          ref="datepicker"
+          :closePopUp="closePopUp"
           @excelDate="excelDate"
           @startDate="startDate">
         </Datepicker2>

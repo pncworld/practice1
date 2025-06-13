@@ -1,7 +1,7 @@
 /*--############################################################################
-# Filename : CRM03_011RPT.vue                                                  
-# Description : 고객관리 > 고객 실적 관리 > 고객 구매 상세 현황                 
-# Date :2025-06-12                                                             
+# Filename : CRM03_010RPT.vue                                                  
+# Description : 고객관리 > 고객 실적 관리 > 고객메뉴군분석자료.                 
+# Date :2025-06-13                                                             
 # Author : 권맑음                     
 ################################################################################*/
 <template>
@@ -19,20 +19,18 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-28 items-center z-10 -space-x-20">
-      <div class="justify-start flex -space-x-10">
+      class="grid grid-cols-1 grid-rows-4 bg-gray-200 rounded-lg h-48 items-center z-10 -space-x-20">
+      <div class="justify-start flex space-x-36 mt-6">
         <Datepicker2
           :mainName="'기간'"
           :initToday="1"
-          @endDate="endDate"
+          class="-mt-3"
           ref="datepicker"
           :closePopUp="closePopUp"
+          @endDate="endDate"
           @excelDate="excelDate"
           @startDate="startDate">
         </Datepicker2>
-      </div>
-
-      <div class="h-[75%] mt-1 justify-start flex">
         <PickStoreSingle
           @lngStoreGroup="lngStoreGroup"
           @lngStoreAttrs="lngStoreAttrs"
@@ -41,47 +39,97 @@
           @lngStoreTeam="lngTeamCode"
           @excelStore="excelStore"></PickStoreSingle>
       </div>
-
-      <div class="flex justify-start pl-52 space-x-5 items-center">
-        <div class="text-base font-semibold">등급 :</div>
+      <div class="flex justify-start pl-[72px] space-x-5 items-center">
         <div>
-          <select name="" id="" class="w-48 h-8" v-model="cond">
+          <Datepicker2
+            :mainName="'가입일'"
+            :disableBox="false"
+            :removeDefault="true"
+            @endDate="endDate2"
+            @excelDate="excelDate2"
+            @startDate="startDate2"></Datepicker2>
+        </div>
+      </div>
+      <div class="flex justify-start pl-20 space-x-5 items-center">
+        <div class="flex justify-center items-center">
+          <div class="text-base font-semibold ml-32">지역 :</div>
+          <select name="" id="" class="border w-32 h-8 ml-2" v-model="cond">
+            <option value="0">전체</option>
+            <option value="10">서울</option>
+          </select>
+        </div>
+        <div class="flex justify-center items-center">
+          <div class="text-base font-semibold ml-32">성별 :</div>
+          <select name="" id="" class="border w-32 h-8 ml-2" v-model="cond2">
+            <option :value="null">전체</option>
+            <option value="1">남자</option>
+            <option value="0">여자</option>
+            <option value="2">외국인</option>
+          </select>
+        </div>
+
+        <div class="flex justify-center items-center">
+          <div class="text-base font-semibold ml-32">등급 :</div>
+          <select name="" id="" class="border w-32 h-8 ml-2" v-model="cond3">
             <option value="0">전체</option>
             <option :value="i.intLevel" v-for="i in optionList">
               {{ i.strLevelName }}
             </option>
           </select>
         </div>
+
+        <div class="flex justify-center items-center">
+          <Datepicker2
+            :mainName="'연령'"
+            @endDate="endDate3"
+            :removeDefault="true"
+            :disableBox="false"
+            @excelDate="excelDate3"
+            @startDate="startDate3"></Datepicker2>
+        </div>
       </div>
-      <div class="flex justify-start pl-1 space-x-5 items-center mt-2">
-        <div class="text-base font-semibold">거래 구분 :</div>
-        <div>
-          <select name="" id="" class="w-48 h-8" v-model="cond2">
-            <option value="0">전체</option>
-            <option value="2">사용</option>
-            <option value="3">적립</option>
-            <option value="4">보너스</option>
+      <div class="flex justify-start pl-44 space-x-5 items-center">
+        <div class="flex justify-center items-center">
+          <!-- <div class="text-base font-semibold ml-32">메뉴구분 :</div>
+          <select name="" id="" class="w-16 ml-1 h-8" v-model="cond4">
+            <option value="1"><</option>
+            <option value="2">=</option>
+            <option value="3">></option>
+          </select> -->
+          <MenuGroup
+            :storeCd="0"
+            :groupCd="groupCd"
+            @subCode="subCode"
+            :initName="'메뉴구분'"
+            @mainCode="mainCode"></MenuGroup>
+
+          <input type="text" v-model="cond4" class="ml-5 h-8" />
+        </div>
+
+        <div class="flex justify-center items-center">
+          <div class="text-base font-semibold ml-32">방문횟수 :</div>
+          <select name="" id="" class="w-16 ml-1 h-8" v-model="cond5">
+            <option value="1"><</option>
+            <option value="2">=</option>
+            <option value="3">></option>
           </select>
+
+          <div class="flex ml-1 h-8 justify-center items-center">
+            <input type="number" class="w-32 h-8" v-model="cond6" />
+          </div>
         </div>
       </div>
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
-    <div class="w-full h-[75vh]">
-      <div class="w-full h-[80%]">
+    <div class="w-full h-[60vh]">
+      <div class="w-full h-[100%]">
         <Realgrid
-          :progname="'CRM03_011RPT_VUE'"
+          :progname="'CRM03_010RPT_VUE'"
           :progid="1"
           :rowData="rowData"
           :reload="reload"
-          :setFooterCustomColumnId="['strName']"
-          :setFooterCustomText="['합계']"
-          :setFooter="true"
-          :setGroupFooter="true"
-          :setGroupColumnId="'strName'"
-          :hideColumnsId="hideColumnsId"
-          :documentTitle="'CRM03_011RPT'"
-          @clickedRowData="clickedRowData"
+          :documentTitle="'CRM03_010RPT'"
           :documentSubTitle="documentSubTitle"
           :rowStateeditable="false"
           :exporttoExcel="exportExcel">
@@ -94,15 +142,12 @@
 
 <script setup>
 import {
-  getCustBuyAggList,
-  getCustBuyDetailList,
-  getCustBuyList,
-  getCustPointInfo,
-  getCustRecord,
+  getCustMenuAnalyInfo,
+  getCustPointAnalyInfo,
   getInitDataCustPurchase,
-  getReceiptDataDetail2,
 } from "@/api/micrm";
 import Datepicker2 from "@/components/Datepicker2.vue";
+import MenuGroup from "@/components/menuGroup.vue";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -134,7 +179,7 @@ import { insertPageLog } from "@/customFunc/customFunc";
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -146,6 +191,9 @@ import { useStore } from "vuex";
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+  groupCd.value = store.state.userData.lngStoreGroup;
+  const res = await getInitDataCustPurchase(store.state.userData.lngStoreGroup);
+  optionList.value = res.data.List;
 });
 
 const reload = ref(false);
@@ -156,53 +204,32 @@ const rowData2 = ref([]);
 const rowData3 = ref([]);
 const rowData4 = ref([]);
 const condValue = ref(0);
+
+const MainMenu = ref(0);
+const mainCode = (e) => {
+  MainMenu.value = e;
+};
+
+const SubMenu = ref(0);
+const subCode = (e) => {
+  SubMenu.value = e;
+};
 const store = useStore();
 const cond = ref(0);
-const cond2 = ref(0);
+const cond2 = ref(null);
 const cond3 = ref(0);
 const optionList = ref([]);
 const datepicker = ref(null);
 const closePopUp = ref(false);
 
-watch(cond, () => {
-  if (cond.value == true) {
-    if (cond2.value == true) {
-      hideColumnsId.value = [];
-      setGroupFooter.value = true;
-    } else {
-      hideColumnsId.value = ["strName"];
-      setGroupFooter.value = false;
-    }
-  } else {
-    if (cond2.value == true) {
-      hideColumnsId.value = ["dtmDate"];
-      setGroupFooter.value = false;
-    } else {
-      hideColumnsId.value = ["strName", "dtmDate"];
-      setGroupFooter.value = false;
-    }
-  }
-});
-watch(cond2, () => {
-  if (cond.value == true) {
-    if (cond2.value == true) {
-      hideColumnsId.value = [];
-      setGroupFooter.value = true;
-    } else {
-      hideColumnsId.value = ["strName"];
-      setGroupFooter.value = false;
-    }
-  } else {
-    if (cond2.value == true) {
-      hideColumnsId.value = ["dtmDate"];
-      setGroupFooter.value = false;
-    } else {
-      hideColumnsId.value = ["strName", "dtmDate"];
-      setGroupFooter.value = false;
-    }
-  }
-});
+const cond4 = ref("");
+const cond5 = ref(1);
 
+const cond6 = ref("");
+const cond7 = ref(null);
+
+const cond8 = ref(1);
+const cond9 = ref(null);
 /**
  * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
  */
@@ -222,6 +249,24 @@ const startDate = (e) => {
 };
 const endDate = (e) => {
   eDate.value = e;
+};
+
+const sDate2 = ref();
+const eDate2 = ref();
+const startDate2 = (e) => {
+  sDate2.value = e;
+};
+const endDate2 = (e) => {
+  eDate2.value = e;
+};
+
+const sDate3 = ref();
+const eDate3 = ref();
+const startDate3 = (e) => {
+  sDate3.value = e;
+};
+const endDate3 = (e) => {
+  eDate3.value = e;
 };
 
 const selectedDate = ref();
@@ -262,16 +307,26 @@ const searchButton = async () => {
     store.state.loading = true;
     initGrid();
 
-    const res = await getCustBuyDetailList(
+    const res = await getCustMenuAnalyInfo(
       groupCd.value,
       storeCode.value,
-      storeAttr.value,
-      supervisor.value,
-      teamcode.value,
       sDate.value,
       eDate.value,
       cond.value,
-      cond2.value
+      storeAttr.value,
+      teamcode.value,
+      supervisor.value,
+      cond2.value,
+      sDate2.value,
+      eDate2.value,
+      sDate3.value,
+      eDate3.value,
+      MainMenu.value,
+      SubMenu.value,
+      cond4.value,
+      cond5.value,
+      cond6.value,
+      cond3.value
     );
 
     rowData.value = res.data.List;
