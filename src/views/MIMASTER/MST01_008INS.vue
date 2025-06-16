@@ -23,6 +23,8 @@
     <PickStore
       @update:storeCd="handleStoreCd"
       @storeNm="handlestoreNm"
+      :hidesub="hideAll"
+      :hideAttr="hideAll"
       @update:ischanged="handleinitAll"
       @update:ischanged2="searchinit"></PickStore>
   </div>
@@ -131,8 +133,14 @@ import { useStore } from "vuex";
  * 	화면 Load시 실행 스크립트
  */
 
+const hideAll = ref(true);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+  if (store.state.userData.lngCommonMenu == "1") {
+    hideAll.value = false;
+  } else {
+    hideAll.value = true;
+  }
 });
 
 const nowStoreAreaCd = ref();
@@ -167,7 +175,7 @@ const currentsubNo = ref();
  */
 
 const handleStoreCd = async (newValue) => {
-  if (newValue == "0") {
+  if (newValue == "0" && store.state.userData.lngCommonMenu == "0") {
     afterSearch.value = false;
   }
   nowStoreCd.value = newValue;
@@ -217,7 +225,10 @@ const searchButton = async () => {
   items.value = [];
   rowData.value = [];
   rowData2.value = [];
-  if (nowStoreCd.value == "0" || nowStoreCd.value == undefined) {
+  if (
+    (nowStoreCd.value == "0" || nowStoreCd.value == undefined) &&
+    store.state.userData.lngCommonMenu == "0"
+  ) {
     Swal.fire({
       title: "경고",
       text: "매장을 선택하세요.",
@@ -244,14 +255,16 @@ const searchButton = async () => {
     //comsole.log(groupCd.value);
     //comsole.log(nowStoreCd.value);
     //comsole.log(clickedStoreNm.value);
-
+    if (store.state.userData.lngCommonMenu == "1") {
+      nowStoreCd.value = 0;
+    }
     let res = await getMenuLists(groupCd.value, nowStoreCd.value);
     rowData.value = res.data.MAINMENU;
     rowData2.value = res.data.SUBMENU;
 
     confirmData.value = rowData.value;
     confirmData2.value = rowData2.value;
-    //comsole.log(res);
+    console.log(res);
     //comsole.log(rowData2.value);
   } catch (error) {
     afterSearch.value = false;
@@ -277,6 +290,9 @@ const addbutton2 = ref(false);
  */
 
 const addRow2 = () => {
+  if ((clickFirst.value = false)) {
+    return;
+  }
   if (
     rowData2.value.filter((item) => item.lngMajor == selectedlngCode.value)
       .length > 0
@@ -308,8 +324,10 @@ const changeValue = ref("0");
  * 데이터셋 상세정보 셋팅
  */
 
+const clickFirst = ref(false);
 const clickedRowData = (newValue) => {
   //comsole.log(newValue);
+  clickFirst.value = true;
   filteredRowData2.value = rowData2.value.filter(
     (item) => item.lngMajor == newValue[0]
   );

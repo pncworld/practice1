@@ -637,7 +637,7 @@ export const getCustomerInfo = (
   cond37,
   cond38
 ) => {
-  return api2.post("/MICRM/CRM03_034INS.asmx/getCustomerInfo", {
+  return api2.post("/MICRM/CRM01_001INS.asmx/getCustomerInfo", {
     GROUP_CD: cond,
     JOINTYPE: cond2,
     TEAM: cond3,
@@ -676,5 +676,11 @@ export const getCustomerInfo = (
     PRECD: cond36,
     SLEEPSTS: cond37,
     CUSTAGREE: cond38,
+  });
+};
+
+export const getCustInitData = (groupcd) => {
+  return api2.post("/MICRM/CRM01_001INS.asmx/getCustInitData", {
+    GROUP_CD: groupcd,
   });
 };

@@ -1491,7 +1491,7 @@ const searchButton = async () => {
     filteredrowData3.value = [...filteredrowData3.value];
 
     const res = await getMenuCodeEnroll(groupCd.value, nowStoreCd.value);
-    //comsole.log(res);
+    console.log(res);
     rowData.value = res.data.MENULIST;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
     MENUDEPEND.value = res.data.MENUDEPEND;
@@ -1499,7 +1499,7 @@ const searchButton = async () => {
     menuOrderOption.value = res.data.MENUORDEROPTION;
     menuOptionCode.value = res.data.MENUOPTIONCODE;
     confirmData.value = JSON.parse(JSON.stringify(rowData.value));
-    //comsole.log(res);
+
     optionGroup.value = res.data.OPTIONGROUP;
     tempRowData2.value = res.data.PAYCD;
     const res2 = await getMenuList(groupCd.value, 0);
@@ -1507,7 +1507,7 @@ const searchButton = async () => {
     SubMenuGroup.value = res2.data.submenuGroup;
     MenuGroup.value = res2.data.menuGroup;
     //  //comsole.log(res)
-    //  //comsole.log(res2)
+    console.log(res2);
   } catch (error) {
     afterSearch.value = false;
   } finally {
