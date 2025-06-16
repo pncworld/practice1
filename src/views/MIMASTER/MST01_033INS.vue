@@ -1064,11 +1064,10 @@ onMounted(async () => {
   //comsole.log(store.state.userData.lngCommonMenu);
 
   const pageLog = await insertPageLog(store.state.activeTab2);
-
+  console.log(store.state.userData.lngCommonMenu);
   if (store.state.userData.lngCommonMenu == "1") {
     hidesub.value = false;
     hideAttr.value = false;
-    nowStoreCd.value = "0";
   } else {
     hidesub.value = true;
     hideAttr.value = true;
@@ -1400,7 +1399,7 @@ const lngStoreGroup = (e) => {
  */
 
 const handleStoreCd = async (newValue) => {
-  //comsole.log(newValue);
+  console.log(newValue);
   if (newValue == "-1") {
     afterSearch.value = false;
     afterClick.value = true;
@@ -1414,8 +1413,12 @@ const handleStoreCd = async (newValue) => {
     gridvalue3.value = "";
     initAll();
   }
+  if (store.state.userData.lngCommonMenu == "1") {
+    nowStoreCd.value = 0;
+  } else {
+    nowStoreCd.value = newValue;
+  }
 
-  nowStoreCd.value = 0;
   searchButton();
 };
 const clickmappingData = ref([]);
@@ -1476,9 +1479,7 @@ const searchButton = async () => {
     });
     return;
   }
-  if (store.state.userData.lngCommonMenu == "1") {
-    nowStoreCd.value = "0";
-  }
+
   //comsole.log(groupCd.value, nowStoreCd.value);
   store.state.loading = true;
   try {
@@ -1502,7 +1503,8 @@ const searchButton = async () => {
 
     optionGroup.value = res.data.OPTIONGROUP;
     tempRowData2.value = res.data.PAYCD;
-    const res2 = await getMenuList(groupCd.value, 0);
+    console.log(nowStoreCd.value);
+    const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
     //rowData2.value = res2.data.menuList
     SubMenuGroup.value = res2.data.submenuGroup;
     MenuGroup.value = res2.data.menuGroup;

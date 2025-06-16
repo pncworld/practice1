@@ -274,6 +274,7 @@ const searchButton = async () => {
     store.state.loading = false; // 로딩 상태 종료
     filteredRowData2.value = "";
     afterSearch.value = true;
+    clickFirst.value = false;
   }
 };
 const addbutton = ref(false);
@@ -290,7 +291,7 @@ const addbutton2 = ref(false);
  */
 
 const addRow2 = () => {
-  if ((clickFirst.value = false)) {
+  if (clickFirst.value == false) {
     return;
   }
   if (

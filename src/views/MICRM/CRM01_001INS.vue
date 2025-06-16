@@ -13,8 +13,8 @@
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="searchButton" class="button save md:w-auto w-14">
-          저장
+        <button @click="addButton" class="button new md:w-auto w-14">
+          신규
         </button>
         <button @click="excelButton" class="button save w-auto excel">
           엑셀
@@ -309,7 +309,7 @@
         class="grid grid-rows-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_4fr] grid-cols-[1fr,4fr,1fr,4fr] h-[95%]">
         <div
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
-          고객카드번호
+          <span class="text-red-500">*</span>고객카드번호
         </div>
         <div
           class="border-l border-t border-black flex justify-start items-center pl-5">
@@ -320,7 +320,7 @@
         </div>
         <div
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
-          구분
+          <span class="text-red-500">*</span>구분
         </div>
         <div
           class="border-l border-t border-black flex justify-start items-center pl-5 space-x-3">
@@ -329,19 +329,19 @@
               type="radio"
               id="cond"
               v-model="pcond2"
-              value="0" />개인</label
+              value="1" />개인</label
           ><label for="cond2"
             ><input
               type="radio"
               id="cond2"
               v-model="pcond2"
-              value="1" />법인</label
+              value="2" />법인</label
           >
         </div>
 
         <div
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
-          고객명
+          <span class="text-red-500">*</span>고객명
         </div>
         <div
           class="border-l border-t border-black flex justify-start items-center pl-5">
@@ -357,7 +357,7 @@
         </div>
         <div
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
-          성별
+          <span class="text-red-500">*</span>성별
         </div>
         <div
           class="border-l border-t border-black flex justify-start items-center pl-5 space-x-3">
@@ -366,26 +366,21 @@
               type="radio"
               id="cond"
               name="pcond5"
+              value="0"
               v-model="pcond5" />여자</label
           ><label for="cond2"
             ><input
               type="radio"
               id="cond2"
+              value="1"
               name="pcond5"
               v-model="pcond5" />남자</label
-          >
-          <label for="cond3"
-            ><input
-              type="radio"
-              id="cond3"
-              name="pcond5"
-              v-model="pcond5" />외국인</label
           >
         </div>
 
         <div
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
-          휴대폰번호
+          <span class="text-red-500">*</span>휴대폰번호
         </div>
         <div
           class="border-l border-t border-black flex justify-start items-center pl-5 space-x-2">
@@ -415,12 +410,12 @@
         </div>
         <div
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
-          등급
+          <span class="text-red-500">*</span> 등급
         </div>
         <div
           class="border-l border-t border-black flex justify-start items-center pl-5">
           <select name="" id="" class="border w-32 h-7 ml-2" v-model="pcond10">
-            <option value="0">전체</option>
+            <option value="0">선택</option>
             <option :value="i.intLevel" v-for="i in optionList">
               {{ i.strLevelName }}
             </option>
@@ -510,7 +505,7 @@
                 id=""
                 class="w-[90%] border border-black"
                 v-model="pcond18">
-                <option value="0">미선택</option>
+                <option value="">미선택</option>
                 <option :value="i.lngStoreCode" v-for="i in optionList2">
                   {{ i.strName }}
                 </option>
@@ -540,15 +535,19 @@
               v-model="pcond21" />
             <label for="cond6"
               ><input
-                type="checkbox"
+                type="radio"
                 id="cond6"
+                name="pcond22"
+                value="0"
                 v-model="pcond22" />집주소</label
             >
             <label for="cond7"
               ><input
-                type="checkbox"
+                type="radio"
                 id="cond7"
-                v-model="pcond23" />사무실주소</label
+                name="pcond22"
+                value="1"
+                v-model="pcond22" />사무실주소</label
             >
           </div>
         </div>
@@ -586,12 +585,14 @@
                 type="radio"
                 id="cond8"
                 name="cond8"
+                value="false"
                 v-model="pcond28" />음력</label
             >
             <label for="cond9"
               ><input
                 type="radio"
                 id="cond9"
+                value="true"
                 name="cond8"
                 v-model="pcond28" />양력</label
             >
@@ -609,6 +610,7 @@
               ><input
                 type="radio"
                 id="cond10"
+                value="true"
                 name="cond10"
                 v-model="pcond30" />생일</label
             >
@@ -616,6 +618,7 @@
               ><input
                 type="radio"
                 id="cond11"
+                value="false"
                 name="cond10"
                 v-model="pcond30" />결혼기념일</label
             >
@@ -632,6 +635,7 @@
             ><input
               type="radio"
               id="cond8"
+              value="false"
               name="cond8"
               v-model="pcond31" />미혼</label
           >
@@ -640,6 +644,7 @@
               type="radio"
               id="cond9"
               name="cond8"
+              value="true"
               v-model="pcond31" />기혼</label
           >
         </div>
@@ -654,6 +659,7 @@
               type="checkbox"
               class="border"
               id="cond11"
+              value="true"
               v-model="pcond32" />활용 동의함</label
           >
         </div>
@@ -721,7 +727,7 @@
       </div>
       <div class="flex justify-end space-x-3 mt-5">
         <button
-          @click="visible = false"
+          @click="saveButton"
           class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
           저장
         </button>
@@ -772,7 +778,8 @@ import Realgrid from "@/components/realgrid.vue";
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog } from "@/customFunc/customFunc";
+import { formatLocalDate, insertPageLog } from "@/customFunc/customFunc";
+import Swal from "sweetalert2";
 /**
  *  경고창 호출 라이브러리
  *  */
@@ -841,28 +848,28 @@ const point2 = ref();
 const point3 = ref();
 const point4 = ref();
 
-const pcond = ref();
-const pcond2 = ref();
-const pcond3 = ref();
-const pcond4 = ref();
-const pcond5 = ref();
-const pcond6 = ref();
-const pcond7 = ref();
-const pcond8 = ref();
-const pcond9 = ref();
-const pcond10 = ref();
-const pcond11 = ref();
-const pcond12 = ref();
-const pcond13 = ref();
-const pcond14 = ref();
-const pcond15 = ref();
-const pcond16 = ref();
+const pcond = ref("");
+const pcond2 = ref(0);
+const pcond3 = ref("");
+const pcond4 = ref("");
+const pcond5 = ref(0);
+const pcond6 = ref("010");
+const pcond7 = ref("");
+const pcond8 = ref("");
+const pcond9 = ref(false);
+const pcond10 = ref(0);
+const pcond11 = ref("");
+const pcond12 = ref("");
+const pcond13 = ref("");
+const pcond14 = ref("");
+const pcond15 = ref(false);
+const pcond16 = ref("");
 const pcond17 = ref();
-const pcond18 = ref();
+const pcond18 = ref(0);
 const pcond19 = ref("");
 const pcond20 = ref("");
 const pcond21 = ref("");
-const pcond22 = ref(false);
+const pcond22 = ref(0);
 const pcond23 = ref(false);
 const pcond24 = ref("");
 const pcond25 = ref("");
@@ -966,46 +973,6 @@ const searchButton = async () => {
     store.state.loading = true;
     initGrid();
 
-    console.log(
-      groupCd.value,
-      0,
-      team.value,
-      supervisor.value,
-      storeCd.value,
-      null,
-      cond.value,
-      cond2.value,
-      cond8.value,
-      null,
-      cond3.value,
-      cond4.value,
-      cond9.value,
-      cond6.value,
-      cond5.value,
-      cond7.value,
-      null,
-      null,
-      null,
-      sDate.value,
-      eDate.value,
-      sDate2.value,
-      eDate2.value,
-      sDate3.value,
-      eDate3.value,
-      cond11.value,
-      cond12.value,
-      cond13.value,
-      cond14.value,
-      cond18.value,
-      cond19.value,
-      cond15.value,
-      cond16.value,
-      cond10.value,
-      cond17.value,
-      pstore.value,
-      cond21.value,
-      cond20.value
-    );
     if (cond19.value == "") {
       cond19.value = null;
     }
@@ -1067,6 +1034,32 @@ const searchButton = async () => {
   }
 };
 
+const saveButton = async () => {
+  if (
+    pcond.value == "" ||
+    pcond2.value == undefined ||
+    pcond3.value == "" ||
+    pcond4.value == "" ||
+    pcond5.value == undefined ||
+    pcond6.value == undefined ||
+    pcond7.value == "" ||
+    pcond8.value == "" ||
+    pcond10.value == "0"
+  ) {
+    Swal.fire({
+      title: "경고",
+      text: "필수값이 누락되었습니다. 확인해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  try {
+    const res = await updateCustomerInfo();
+  } catch (error) {}
+};
+
 // const clickedRowData = async (e) => {
 //   console.log(e);
 //   // const res = await getReceiptDataDetail2(e[1], e[2], e[0]);
@@ -1076,9 +1069,48 @@ const searchButton = async () => {
 //   // rowData4.value = res.data.List3;
 // };
 
+const ccustomorNum = ref();
 const dblclickedRowData = (e) => {
   console.log(e);
+  ccustomorNum.value = e[0];
   visible.value = true;
+  pcond.value = e[4].replace("[", "").replace("]", "");
+  pcond2.value = e[49];
+  pcond3.value = e[1];
+  pcond4.value = e[35];
+  pcond5.value = e[37] == "True" ? 1 : 0;
+  pcond6.value = e[6].split("-")[0];
+  pcond7.value = e[6].split("-")[1];
+  pcond8.value = e[6].split("-")[2];
+  pcond9.value = e[7] == "True" ? true : false;
+  pcond10.value = e[36];
+  pcond11.value = e[10];
+  pcond12.value = e[55];
+  pcond13.value = e[56];
+  pcond14.value = e[8];
+  pcond15.value = e[9] == "True" ? true : false;
+  pcond16.value = formatLocalDate(e[20]);
+  pcond17.value = e[57];
+  pcond18.value = e[24];
+  pcond19.value = e[11];
+  pcond20.value = e[12];
+  pcond21.value = e[13];
+  pcond22.value = e[50];
+
+  pcond24.value = e[14];
+  pcond25.value = e[15];
+  pcond26.value = e[16];
+  pcond27.value = formatLocalDate(e[17]);
+  pcond28.value = e[47] == "True" ? true : false;
+  pcond29.value = formatLocalDate(e[19]);
+  pcond30.value = e[40] == "True" ? true : false;
+  pcond31.value = e[41] == "True" ? true : false;
+  pcond32.value = e[58] == "True" ? true : false;
+  pcond33.value = e[42];
+  pcond34.value = e[43];
+  pcond35.value = e[45];
+  pcond36.value = e[44];
+  pcond37.value = e[46];
 };
 
 /**
