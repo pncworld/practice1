@@ -239,22 +239,9 @@ const searchButton = async () => {
     });
     return;
   }
-  //   if(nowStoreAreaCd.value == '0' || nowStoreAreaCd.value == undefined) {
-  //       Swal.fire({
-  //           title: '경고',
-  //           text: 'POS번호를 선택하세요.',
-  //           icon: 'warning',
-  //           showCancelButton: false,
-  //           confirmButtonColor: '#3085d6',
-  //           allowOutsideClick: false
-  //       })
-  //       return;
-  //   }
+
   store.state.loading = true;
   try {
-    //comsole.log(groupCd.value);
-    //comsole.log(nowStoreCd.value);
-    //comsole.log(clickedStoreNm.value);
     if (store.state.userData.lngCommonMenu == "1") {
       nowStoreCd.value = 0;
     }

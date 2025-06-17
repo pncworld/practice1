@@ -1,4 +1,5 @@
 import CRM01_001INS from "@/views/MICRM/CRM01_001INS.vue";
+import CRM01_008INS from "@/views/MICRM/CRM01_008INS.vue";
 import CRM02_002RPT from "@/views/MICRM/CRM02_002RPT.vue";
 import CRM03_002INS from "@/views/MICRM/CRM03_002INS.vue";
 import CRM02_003RPT from "@/views/MICRM/CRM03_002INS.vue";
@@ -126,6 +127,10 @@ export default function micrmRouter() {
     {
       path: "CRM01_001INS.xml",
       component: CRM01_001INS,
+    },
+    {
+      path: "CRM01_008INS.xml",
+      component: CRM01_008INS,
     },
   ];
 }

@@ -1,9 +1,9 @@
-/*--############################################################################
+<!-- /*--############################################################################
 # Filename : CRM01_001INS.vue                                                  
 # Description : 고객관리 > 고객신상정보 > 고객정보                              
 # Date :2025-06-13                                                             
 # Author : 권맑음                     
-################################################################################*/
+################################################################################*/ -->
 <template>
   <!-- 조회조건 -->
   <div class="h-full" @click="handleParentClick">
@@ -15,6 +15,9 @@
         </button>
         <button @click="addButton" class="button new md:w-auto w-14">
           신규
+        </button>
+        <button @click="deleteButton" class="button leave md:w-auto w-14">
+          탈퇴
         </button>
         <button @click="excelButton" class="button save w-auto excel">
           엑셀
@@ -29,6 +32,7 @@
           @lngStoreCode="lngStoreCode"
           @lngStoreGroup="lngStoreGroup"
           @lngSupervisor="lngSupervisor"
+          @excelStore="excelStore"
           @lngStoreTeam="lngStoreTeam"></PickStoreSingle>
       </div>
       <div
@@ -220,9 +224,9 @@
           :mainName="'최종사용일'"></Datepicker2>
       </div>
 
-      <div class="flex justify-start space-x-5 mt-3 !pl-12">
+      <div class="flex justify-start space-x-5 mt-3 !pl-16">
         <div class="text-center font-semibold text-sm">방문횟수</div>
-        <select name="" id="" class="border w-10 h-7 ml-2" v-model="cond15">
+        <select name="" id="" class="border w-10 h-7 !ml-4" v-model="cond15">
           <option value="1"><</option>
           <option value="2">=</option>
           <option value="3">></option>
@@ -230,9 +234,9 @@
         <input type="number" class="w-32" v-model="cond16" />
       </div>
 
-      <div class="flex justify-start space-x-5 mt-3 !pl-5">
+      <div class="flex justify-start space-x-5 mt-3 !pl-4">
         <div class="text-center font-semibold text-sm">SMS수신동의</div>
-        <select name="" id="" class="border w-32 h-7 ml-2" v-model="cond17">
+        <select name="" id="" class="border w-32 h-7 !ml-2" v-model="cond17">
           <option value="2">전체</option>
           <option value="0">동의</option>
           <option value="1">비동의</option>
@@ -241,7 +245,7 @@
 
       <div class="flex justify-start space-x-5 mt-3 !ml-12">
         <div class="text-center font-semibold text-sm">실매출액</div>
-        <select name="" id="" class="border w-10 h-7 ml-2" v-model="cond18">
+        <select name="" id="" class="border w-10 h-7 !ml-6" v-model="cond18">
           <option value="1"><</option>
           <option value="2">=</option>
           <option value="3">></option>
@@ -249,16 +253,16 @@
         <input type="number" class="w-32" v-model="cond19" />
       </div>
 
-      <div class="flex justify-start space-x-5 mt-0 !pl-12">
+      <div class="flex justify-start space-x-5 mt-0 !pl-6">
         <div class="text-center font-semibold text-sm">마케팅수신동의</div>
-        <select name="" id="" class="border w-32 h-7 ml-2" v-model="cond20">
+        <select name="" id="" class="border w-32 h-7 !ml-4" v-model="cond20">
           <option value="2">전체</option>
           <option value="0">동의</option>
           <option value="1">비동의</option>
         </select>
       </div>
 
-      <div class="flex justify-start space-x-5 mt-0 !pl-5">
+      <div class="flex justify-start space-x-5 mt-0 !pl-2">
         <div class="text-center font-semibold text-sm">휴면회원여부</div>
         <select name="" id="" class="border w-32 h-7 ml-2" v-model="cond21">
           <option value="-1">전체</option>
@@ -267,9 +271,9 @@
         </select>
       </div>
 
-      <div class="flex justify-start items-center space-x-5 mt-0 !ml-12">
+      <div class="flex justify-start items-center space-x-5 mt-0 !ml-14">
         <div class="text-center font-semibold text-sm">선호매장</div>
-        <select name="" id="" class="border w-32 h-7 ml-2" v-model="pstore">
+        <select name="" id="" class="border w-32 h-7 !ml-4" v-model="pstore">
           <option value="0">전체</option>
           <option :value="i.lngStoreCode" v-for="i in optionList2">
             {{ i.strName }}
@@ -279,9 +283,11 @@
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
-    <span class="text-red-500"
-      >※더블클릭하시면 고객 정보를 수정하실수 있습니다.</span
-    >
+    <div class="flex justify-between">
+      <span class="text-red-500"
+        >※더블클릭하시면 고객 정보를 수정하실수 있습니다.</span
+      >
+    </div>
     <div class="grid grid-rows-1 grid-cols-1 w-full h-[40vh]">
       <div class="w-full h-full">
         <Realgrid
@@ -290,8 +296,12 @@
           :rowData="rowData"
           :reload="reload"
           :documentTitle="'CRM01_001INS'"
+          :showCheckBar="true"
           @clickedRowData="clickedRowData"
+          @checkedRowIndex="checkedRowIndex"
           @dblclickedRowData="dblclickedRowData"
+          @allStateRows="allStateRows"
+          :deleteRow6="deleteRow"
           :documentSubTitle="documentSubTitle"
           :rowStateeditable="false"
           :exporttoExcel="exportExcel">
@@ -304,9 +314,12 @@
     v-if="visible"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
     <div
-      class="bg-white p-6 rounded-2xl shadow-xl w-[60vw] h-[70vh] text-center">
+      class="bg-white p-6 rounded-2xl shadow-xl w-[80vw] h-[90vh] text-center">
+      <div class="text-2xl font-bold flex justify-start">
+        고객정보 생성 / 수정
+      </div>
       <div
-        class="grid grid-rows-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_4fr] grid-cols-[1fr,4fr,1fr,4fr] h-[95%]">
+        class="grid grid-rows-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_4fr] grid-cols-[1fr,4fr,1fr,4fr] h-[85%]">
         <div
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           <span class="text-red-500">*</span>고객카드번호
@@ -319,6 +332,7 @@
             :class="{ '!w-[60%]': InsertNew == true }"
             :disabled="InsertNew == false"
             @change="checkCard = false"
+            @input="InputPcond"
             v-model="pcond" />
           <button
             class="whitebutton ml-5"
@@ -410,10 +424,12 @@
           <input
             type="text"
             class="border w-24 border-black"
+            @input="limitFourDigitsPcond7"
             v-model="pcond7" />
           <input
             type="text"
             class="border w-24 border-black"
+            @input="limitFourDigitsPcond8"
             v-model="pcond8" />
           <label for="cond4"
             ><input type="checkbox" id="cond4" v-model="pcond9" />SMS 수신
@@ -545,19 +561,19 @@
               type="text"
               class="w-56 border border-black"
               v-model="pcond21" />
-            <label for="cond6"
+            <label for="cond10"
               ><input
                 type="radio"
-                id="cond6"
-                name="pcond22"
+                id="cond10"
+                name="pcond23"
                 value="0"
                 v-model="pcond22" />집주소</label
             >
-            <label for="cond7"
+            <label for="cond11"
               ><input
                 type="radio"
-                id="cond7"
-                name="pcond22"
+                id="cond11"
+                name="pcond23"
                 value="1"
                 v-model="pcond22" />사무실주소</label
             >
@@ -666,11 +682,11 @@
         </div>
         <div
           class="border-l border-t border-black flex justify-start pl-5 items-center">
-          <label for="cond32"
+          <label for="cond34"
             ><input
               type="checkbox"
               class="border"
-              id="cond32"
+              id="cond34"
               value="1"
               v-model="pcond32" />활용 동의함</label
           >
@@ -744,7 +760,10 @@
           저장
         </button>
         <button
-          @click="visible = false"
+          @click="
+            visible = false;
+            InsertNew = false;
+          "
           class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
           닫기
         </button>
@@ -764,6 +783,7 @@
 
 <script setup>
 import {
+  deleteCustomors,
   getCustInitData,
   getCustomerInfo,
   getInitDataCustPurchase,
@@ -1097,10 +1117,31 @@ const saveButton = async () => {
     pcond29.value.split("-")[1],
     pcond29.value.split("-")[2]
   );
+
+  if (pcond.value.length != 16) {
+    Swal.fire({
+      title: "경고",
+      text: "카드번호 16자리를 입력해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (checkCard.value == false && InsertNew.value == true) {
+    Swal.fire({
+      title: "경고",
+      text: "카드번호에 대한 중복검사를 먼저 해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
   try {
     store.state.loading = true;
     let res;
-    if ((InsertNew.value = false)) {
+    if (InsertNew.value == false) {
       res = await updateCustomerInfo(
         ccustomorGroup.value,
         pcond17.value,
@@ -1334,6 +1375,15 @@ function resetPconds() {
 
 const InsertNew = ref(false);
 const addButton = (e) => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "조회를 먼저해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   InsertNew.value = true;
   resetPconds();
 
@@ -1343,6 +1393,41 @@ const addButton = (e) => {
   visible.value = true;
 };
 
+const InputPcond = (e) => {
+  let ppcond = e.target.value;
+
+  ppcond = ppcond.replace(/\D/g, "");
+
+  if (ppcond.length > 16) {
+    ppcond = ppcond.slice(0, 16);
+  }
+
+  pcond.value = ppcond;
+};
+
+const limitFourDigitsPcond7 = (e) => {
+  let ppcond = e.target.value;
+
+  ppcond = ppcond.replace(/\D/g, "");
+
+  if (ppcond.length > 4) {
+    ppcond = ppcond.slice(0, 4);
+  }
+
+  pcond7.value = ppcond;
+};
+
+const limitFourDigitsPcond8 = (e) => {
+  let ppcond = e.target.value;
+
+  ppcond = ppcond.replace(/\D/g, "");
+
+  if (ppcond.length > 4) {
+    ppcond = ppcond.slice(0, 4);
+  }
+
+  pcond8.value = ppcond;
+};
 /**
  * 페이지 매장 코드 세팅
  */
@@ -1379,6 +1464,16 @@ const initGrid = () => {
 
 const checkCard = ref(false);
 const checkCardNo = async () => {
+  if (pcond.value.length != 16) {
+    Swal.fire({
+      title: "경고",
+      text: "카드번호 16자리를 입력해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
   try {
     const res = await validCardNo(groupCd.value, pcond.value);
 
@@ -1404,6 +1499,84 @@ const checkCardNo = async () => {
   } catch (error) {}
 };
 
+const clickedRow = ref(false);
+const deleteRow = ref(false);
+const deleteCustomor = async () => {
+  if (clickedRow.value == false) {
+    return;
+  }
+  deleteRow.value = !deleteRow.value;
+};
+const clickedRowData = (e) => {
+  clickedRow.value = true;
+};
+const forDeleteRows = ref([]);
+const checkedRowIndex = (e) => {
+  forDeleteRows.value = e;
+};
+
+// const allStateRows = (e) => {
+//   forDeleteRows.value = e.deleted;
+// };
+
+const deleteButton = async () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "먼저 조회를 해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (forDeleteRows.value.length == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "삭제할 대상을 선택해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  try {
+    store.state.loading = true;
+    const groups = rowData.value
+      .filter((item, index) => forDeleteRows.value.includes(index))
+      .map((item) => item.lngStoreGroup);
+    const custno = rowData.value
+      .filter((item, index) => forDeleteRows.value.includes(index))
+      .map((item) => item.A01_lngCustNo);
+    const cardid = rowData.value
+      .filter((item, index) => forDeleteRows.value.includes(index))
+      .map((item) => item.A05_strCCardID.replace("[", "").replace("]", ""));
+    const joinsts = rowData.value
+      .filter((item, index) => forDeleteRows.value.includes(index))
+      .map((item) => item.intJoinSts);
+
+    const res = await deleteCustomors(
+      groups.join("\u200b"),
+      custno.join("\u200b"),
+      cardid.join("\u200b"),
+      joinsts.join("\u200b"),
+      store.state.userData.lngSequence
+    );
+
+    console.log(res);
+    Swal.fire({
+      title: "성공",
+      text: "탈퇴가 완료되었습니다.",
+      icon: "success",
+      confirmButtonText: "확인",
+    });
+    return;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    store.state.loading = false;
+    searchButton();
+  }
+};
 //엑셀 버튼 처리 함수
 const exportExcel = ref(false);
 /**
@@ -1411,7 +1584,7 @@ const exportExcel = ref(false);
  */
 
 const excelButton = () => {
-  documentSubTitle.value = selectedDate.value + "\n" + selectedExcelList.value;
+  documentSubTitle.value = selectedExcelStore.value;
 
   //documentSubTitle.value += "\n";
   exportExcel.value = !exportExcel.value;

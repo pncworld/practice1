@@ -876,3 +876,47 @@ export const validCardNo = (cond, cond2) => {
     CARD_NO: cond2,
   });
 };
+export const deleteCustomors = (cond, cond2, cond3, cond4, cond5) => {
+  return api2.post("/MICRM/CRM01_001INS.asmx/deleteCustomor", {
+    GROUP_CDS: cond,
+    CUST_NOS: cond2,
+    CARD_ID: cond3,
+    JOIN_STS: cond4,
+    USERID: cond5,
+  });
+};
+export const getCardChangeInfo = (cond, cond2, cond3, cond4) => {
+  return api2.post("/MICRM/CRM01_008INS.asmx/getCardChangeInfo", {
+    GROUP_CD: cond,
+    CUST_NO: cond2,
+    CARD_ID: cond3,
+    CUST_NM: cond4,
+  });
+};
+export const changeCardNo = (
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8
+) => {
+  return api2.post("/MICRM/CRM01_008INS.asmx/changeCardNo", {
+    GROUP_CD: cond,
+    STORE_CD: cond2,
+    USER_SEQ: cond3,
+    CUST_NO: cond4,
+    CARD_OLD: cond5,
+    CARD_NEW: cond6,
+    CARD_RSN: cond7,
+    REASON: cond8,
+  });
+};
+export const getCardChangeList = (cond, cond2) => {
+  return api2.post("/MICRM/CRM01_008INS.asmx/getCardChangeList", {
+    GROUP_CD: cond,
+    CUST_NO: cond2,
+  });
+};

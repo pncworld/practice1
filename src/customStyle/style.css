@@ -49,6 +49,20 @@
   margin-top: 1px;
 }
 
+.button.leave {
+  background-color: #5782FF;
+  color: #fff;
+}
+.button.leave:before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background: url(../assets/leave.svg) no-repeat;
+  color: #fff;
+  margin-right: 5px;
+  margin-top: 1px;
+}
+
 .button.print {
   background-color: #5782FF;
   color: #fff;
