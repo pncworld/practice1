@@ -505,7 +505,7 @@
                 id=""
                 class="w-[90%] border border-black"
                 v-model="pcond18">
-                <option value="">미선택</option>
+                <option value="0">미선택</option>
                 <option :value="i.lngStoreCode" v-for="i in optionList2">
                   {{ i.strName }}
                 </option>
@@ -585,14 +585,14 @@
                 type="radio"
                 id="cond8"
                 name="cond8"
-                value="false"
+                value="0"
                 v-model="pcond28" />음력</label
             >
             <label for="cond9"
               ><input
                 type="radio"
                 id="cond9"
-                value="true"
+                value="1"
                 name="cond8"
                 v-model="pcond28" />양력</label
             >
@@ -610,7 +610,7 @@
               ><input
                 type="radio"
                 id="cond10"
-                value="true"
+                value="1"
                 name="cond10"
                 v-model="pcond30" />생일</label
             >
@@ -618,7 +618,7 @@
               ><input
                 type="radio"
                 id="cond11"
-                value="false"
+                value="2"
                 name="cond10"
                 v-model="pcond30" />결혼기념일</label
             >
@@ -631,20 +631,20 @@
         </div>
         <div
           class="border-l border-t border-black flex justify-start items-center pl-5 space-x-2">
-          <label for="cond8"
+          <label for="cond31"
             ><input
               type="radio"
-              id="cond8"
-              value="false"
-              name="cond8"
+              id="cond31"
+              value="0"
+              name="cond31"
               v-model="pcond31" />미혼</label
           >
-          <label for="cond9"
+          <label for="cond32"
             ><input
               type="radio"
-              id="cond9"
-              name="cond8"
-              value="true"
+              id="cond32"
+              name="cond31"
+              value="1"
               v-model="pcond31" />기혼</label
           >
         </div>
@@ -654,12 +654,12 @@
         </div>
         <div
           class="border-l border-t border-black flex justify-start pl-5 items-center">
-          <label for="cond11"
+          <label for="cond32"
             ><input
               type="checkbox"
               class="border"
-              id="cond11"
-              value="true"
+              id="cond32"
+              value="1"
               v-model="pcond32" />활용 동의함</label
           >
         </div>
@@ -739,8 +739,14 @@
       </div>
     </div>
   </div>
-  <GetZipCode v-if="show1" @closePopUp="show1 = false"></GetZipCode>
-  <GetZipCode v-if="show2" @closePopUp="show2 = false"></GetZipCode>
+  <GetZipCode
+    v-if="show1"
+    @closePopUp="show1 = false"
+    @zipAndAddress="zipAndAddress"></GetZipCode>
+  <GetZipCode
+    v-if="show2"
+    @closePopUp="show2 = false"
+    @zipAndAddress="zipAndAddress2"></GetZipCode>
   <!-- 그리드 영역 -->
 </template>
 
@@ -748,10 +754,8 @@
 import {
   getCustInitData,
   getCustomerInfo,
-  getCustPointInfo,
-  getCustRecord,
   getInitDataCustPurchase,
-  getReceiptDataDetail2,
+  updateCustomerInfo,
 } from "@/api/micrm";
 import Datepicker2 from "@/components/Datepicker2.vue";
 import GetZipCode from "@/components/getZipCode.vue";
@@ -764,7 +768,6 @@ import GetZipCode from "@/components/getZipCode.vue";
  *  */
 
 import PageName from "@/components/pageName.vue";
-import PickStore from "@/components/pickStore.vue";
 import PickStoreSingle from "@/components/pickStoreSingle.vue";
 /**
  * 	매장 단일 선택 컴포넌트
@@ -874,10 +877,10 @@ const pcond23 = ref(false);
 const pcond24 = ref("");
 const pcond25 = ref("");
 const pcond26 = ref("");
-const pcond27 = ref();
+const pcond27 = ref("--");
 const pcond28 = ref(0);
-const pcond29 = ref();
-const pcond30 = ref(0);
+const pcond29 = ref("--");
+const pcond30 = ref(1);
 const pcond31 = ref(0);
 const pcond32 = ref(false);
 const pcond33 = ref(0);
@@ -902,6 +905,23 @@ const lngStoreGroup = (e) => {
 const storeCd = ref();
 const lngStoreCode = (e) => {
   storeCd.value = e;
+};
+
+const zipAndAddress = (e) => {
+  setTimeout(() => {
+    pcond19.value = e.split(",")[0];
+  }, 10);
+
+  pcond20.value = e.split(",")[1];
+  pcond21.value = "";
+};
+const zipAndAddress2 = (e) => {
+  setTimeout(() => {
+    pcond24.value = e.split(",")[0];
+  }, 10);
+
+  pcond25.value = e.split(",")[1];
+  pcond26.value = "";
 };
 
 const pstore = ref(0);
@@ -1054,10 +1074,84 @@ const saveButton = async () => {
     });
     return;
   }
-
+  console.log(
+    pcond27.value.split("-")[0],
+    pcond27.value.split("-")[1],
+    pcond27.value.split("-")[2],
+    pcond28.value,
+    pcond29.value.split("-")[0],
+    pcond29.value.split("-")[1],
+    pcond29.value.split("-")[2]
+  );
   try {
-    const res = await updateCustomerInfo();
-  } catch (error) {}
+    store.state.loading = true;
+    const res = await updateCustomerInfo(
+      ccustomorGroup.value,
+      pcond17.value,
+      ccustomorStatus.value,
+      store.state.userData.lngSequence,
+      ccustomorNum.value,
+      pcond3.value,
+      pcond4.value,
+      pcond2.value,
+      pcond5.value,
+      pcond31.value == false ? 0 : 1,
+      pcond12.value,
+      pcond13.value,
+      pcond9.value == false ? 0 : 1,
+      pcond15.value == false ? 0 : 1,
+      pcond6.value + "-" + pcond7.value + "-" + pcond8.value,
+      pcond14.value,
+      pcond11.value,
+      pcond19.value,
+      pcond20.value,
+      pcond21.value,
+      "",
+      pcond24.value,
+      pcond25.value,
+      pcond26.value,
+      pcond22.value,
+      pcond30.value,
+      pcond33.value,
+      pcond34.value,
+      pcond36.value,
+      pcond35.value,
+      pcond27.value.split("-")[0] == undefined
+        ? ""
+        : pcond27.value.split("-")[0],
+      pcond27.value.split("-")[1] == undefined
+        ? ""
+        : pcond27.value.split("-")[1],
+      pcond27.value.split("-")[2] == undefined
+        ? ""
+        : pcond27.value.split("-")[2],
+      pcond28.value,
+      pcond29.value.split("-")[0] == undefined
+        ? ""
+        : pcond29.value.split("-")[0],
+      pcond29.value.split("-")[1] == undefined
+        ? ""
+        : pcond29.value.split("-")[1],
+      pcond29.value.split("-")[2] == undefined
+        ? ""
+        : pcond29.value.split("-")[2],
+      pcond32.value == false ? 0 : 1,
+      pcond10.value,
+      pcond37.value,
+      null,
+      null,
+      pcond18.value
+    );
+    console.log(res);
+    store.state.loading = false;
+  } catch (error) {
+    console.log(error);
+    store.state.loading = false;
+  } finally {
+    store.state.loading = false;
+    visible.value = false;
+    searchButton();
+  }
 };
 
 // const clickedRowData = async (e) => {
@@ -1070,9 +1164,13 @@ const saveButton = async () => {
 // };
 
 const ccustomorNum = ref();
+const ccustomorGroup = ref();
+const ccustomorStatus = ref();
 const dblclickedRowData = (e) => {
   console.log(e);
   ccustomorNum.value = e[0];
+  ccustomorGroup.value = e[59];
+  ccustomorStatus.value = e[60];
   visible.value = true;
   pcond.value = e[4].replace("[", "").replace("]", "");
   pcond2.value = e[49];
@@ -1091,7 +1189,7 @@ const dblclickedRowData = (e) => {
   pcond15.value = e[9] == "True" ? true : false;
   pcond16.value = formatLocalDate(e[20]);
   pcond17.value = e[57];
-  pcond18.value = e[24];
+  pcond18.value = e[61];
   pcond19.value = e[11];
   pcond20.value = e[12];
   pcond21.value = e[13];
@@ -1101,16 +1199,21 @@ const dblclickedRowData = (e) => {
   pcond25.value = e[15];
   pcond26.value = e[16];
   pcond27.value = formatLocalDate(e[17]);
-  pcond28.value = e[47] == "True" ? true : false;
+  pcond28.value = e[47] == "True" ? 1 : 0;
   pcond29.value = formatLocalDate(e[19]);
-  pcond30.value = e[40] == "True" ? true : false;
-  pcond31.value = e[41] == "True" ? true : false;
+  pcond30.value = e[39];
+  pcond31.value = e[40] == "True" ? 1 : 0;
   pcond32.value = e[58] == "True" ? true : false;
   pcond33.value = e[42];
   pcond34.value = e[43];
   pcond35.value = e[45];
   pcond36.value = e[44];
   pcond37.value = e[46];
+};
+
+const visible2 = ref(false);
+const addButton = (e) => {
+  visible2.value = true;
 };
 
 /**

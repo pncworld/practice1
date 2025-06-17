@@ -4,6 +4,7 @@ module.exports = defineConfig({
   transpileDependencies: true,
   lintOnSave: false,
   devServer: {
+    allowedHosts: "all",
     port: 80,
     proxy: {
       "^/api": {
