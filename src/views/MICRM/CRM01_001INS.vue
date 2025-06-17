@@ -316,6 +316,7 @@
           <input
             type="text"
             class="border w-[80%] h-[80%] border-black"
+            :disabled="InsertNew == false"
             v-model="pcond" />
         </div>
         <div
@@ -755,6 +756,7 @@ import {
   getCustInitData,
   getCustomerInfo,
   getInitDataCustPurchase,
+  insertCustomerInfo,
   updateCustomerInfo,
 } from "@/api/micrm";
 import Datepicker2 from "@/components/Datepicker2.vue";
@@ -852,7 +854,7 @@ const point3 = ref();
 const point4 = ref();
 
 const pcond = ref("");
-const pcond2 = ref(0);
+const pcond2 = ref(1);
 const pcond3 = ref("");
 const pcond4 = ref("");
 const pcond5 = ref(0);
@@ -1085,63 +1087,125 @@ const saveButton = async () => {
   );
   try {
     store.state.loading = true;
-    const res = await updateCustomerInfo(
-      ccustomorGroup.value,
-      pcond17.value,
-      ccustomorStatus.value,
-      store.state.userData.lngSequence,
-      ccustomorNum.value,
-      pcond3.value,
-      pcond4.value,
-      pcond2.value,
-      pcond5.value,
-      pcond31.value == false ? 0 : 1,
-      pcond12.value,
-      pcond13.value,
-      pcond9.value == false ? 0 : 1,
-      pcond15.value == false ? 0 : 1,
-      pcond6.value + "-" + pcond7.value + "-" + pcond8.value,
-      pcond14.value,
-      pcond11.value,
-      pcond19.value,
-      pcond20.value,
-      pcond21.value,
-      "",
-      pcond24.value,
-      pcond25.value,
-      pcond26.value,
-      pcond22.value,
-      pcond30.value,
-      pcond33.value,
-      pcond34.value,
-      pcond36.value,
-      pcond35.value,
-      pcond27.value.split("-")[0] == undefined
-        ? ""
-        : pcond27.value.split("-")[0],
-      pcond27.value.split("-")[1] == undefined
-        ? ""
-        : pcond27.value.split("-")[1],
-      pcond27.value.split("-")[2] == undefined
-        ? ""
-        : pcond27.value.split("-")[2],
-      pcond28.value,
-      pcond29.value.split("-")[0] == undefined
-        ? ""
-        : pcond29.value.split("-")[0],
-      pcond29.value.split("-")[1] == undefined
-        ? ""
-        : pcond29.value.split("-")[1],
-      pcond29.value.split("-")[2] == undefined
-        ? ""
-        : pcond29.value.split("-")[2],
-      pcond32.value == false ? 0 : 1,
-      pcond10.value,
-      pcond37.value,
-      null,
-      null,
-      pcond18.value
-    );
+    let res;
+    if ((InsertNew.value = false)) {
+      res = await updateCustomerInfo(
+        ccustomorGroup.value,
+        pcond17.value,
+        ccustomorStatus.value,
+        store.state.userData.lngSequence,
+        ccustomorNum.value,
+        pcond3.value,
+        pcond4.value,
+        pcond2.value,
+        pcond5.value,
+        pcond31.value == false ? 0 : 1,
+        pcond12.value,
+        pcond13.value,
+        pcond9.value == false ? 0 : 1,
+        pcond15.value == false ? 0 : 1,
+        pcond6.value + "-" + pcond7.value + "-" + pcond8.value,
+        pcond14.value,
+        pcond11.value,
+        pcond19.value,
+        pcond20.value,
+        pcond21.value,
+        "",
+        pcond24.value,
+        pcond25.value,
+        pcond26.value,
+        pcond22.value,
+        pcond30.value,
+        pcond33.value,
+        pcond34.value,
+        pcond36.value,
+        pcond35.value,
+        pcond27.value.split("-")[0] == undefined
+          ? ""
+          : pcond27.value.split("-")[0],
+        pcond27.value.split("-")[1] == undefined
+          ? ""
+          : pcond27.value.split("-")[1],
+        pcond27.value.split("-")[2] == undefined
+          ? ""
+          : pcond27.value.split("-")[2],
+        pcond28.value,
+        pcond29.value.split("-")[0] == undefined
+          ? ""
+          : pcond29.value.split("-")[0],
+        pcond29.value.split("-")[1] == undefined
+          ? ""
+          : pcond29.value.split("-")[1],
+        pcond29.value.split("-")[2] == undefined
+          ? ""
+          : pcond29.value.split("-")[2],
+        pcond32.value == false ? 0 : 1,
+        pcond10.value,
+        pcond37.value,
+        null,
+        null,
+        pcond18.value
+      );
+    } else {
+      res = await insertCustomerInfo(
+        ccustomorGroup.value,
+        pcond17.value,
+        ccustomorStatus.value,
+        store.state.userData.lngSequence,
+        ccustomorNum.value,
+        pcond3.value,
+        pcond4.value,
+        pcond2.value,
+        pcond5.value,
+        pcond31.value == false ? 0 : 1,
+        pcond12.value,
+        pcond13.value,
+        pcond9.value == false ? 0 : 1,
+        pcond15.value == false ? 0 : 1,
+        pcond6.value + "-" + pcond7.value + "-" + pcond8.value,
+        pcond14.value,
+        pcond11.value,
+        pcond19.value,
+        pcond20.value,
+        pcond21.value,
+        "",
+        pcond24.value,
+        pcond25.value,
+        pcond26.value,
+        pcond22.value,
+        pcond30.value,
+        pcond33.value,
+        pcond34.value,
+        pcond36.value,
+        pcond35.value,
+        pcond27.value.split("-")[0] == undefined
+          ? ""
+          : pcond27.value.split("-")[0],
+        pcond27.value.split("-")[1] == undefined
+          ? ""
+          : pcond27.value.split("-")[1],
+        pcond27.value.split("-")[2] == undefined
+          ? ""
+          : pcond27.value.split("-")[2],
+        pcond28.value,
+        pcond29.value.split("-")[0] == undefined
+          ? ""
+          : pcond29.value.split("-")[0],
+        pcond29.value.split("-")[1] == undefined
+          ? ""
+          : pcond29.value.split("-")[1],
+        pcond29.value.split("-")[2] == undefined
+          ? ""
+          : pcond29.value.split("-")[2],
+        pcond32.value == false ? 0 : 1,
+        pcond10.value,
+        pcond37.value,
+        null,
+        null,
+        pcond18.value,
+        pcond.value
+      );
+    }
     console.log(res);
     store.state.loading = false;
   } catch (error) {
@@ -1167,6 +1231,7 @@ const ccustomorNum = ref();
 const ccustomorGroup = ref();
 const ccustomorStatus = ref();
 const dblclickedRowData = (e) => {
+  InsertNew.value = false;
   console.log(e);
   ccustomorNum.value = e[0];
   ccustomorGroup.value = e[59];
@@ -1214,7 +1279,55 @@ const dblclickedRowData = (e) => {
 const initVar = () => {
   pcond.value = "";
 };
+
+function resetPconds() {
+  pcond.value = "";
+  pcond2.value = 1;
+  pcond3.value = "";
+  pcond4.value = "";
+  pcond5.value = 0;
+  pcond6.value = "010";
+  pcond7.value = "";
+  pcond8.value = "";
+  pcond9.value = false;
+  pcond10.value = 0;
+  pcond11.value = "";
+  pcond12.value = "";
+  pcond13.value = "";
+  pcond14.value = "";
+  pcond15.value = false;
+  pcond16.value = "";
+  pcond17.value = undefined; // 초기값 명확히 필요시 수정
+  pcond18.value = 0;
+  pcond19.value = "";
+  pcond20.value = "";
+  pcond21.value = "";
+  pcond22.value = 0;
+  pcond23.value = false;
+  pcond24.value = "";
+  pcond25.value = "";
+  pcond26.value = "";
+  pcond27.value = "--";
+  pcond28.value = 0;
+  pcond29.value = "--";
+  pcond30.value = 1;
+  pcond31.value = 0;
+  pcond32.value = false;
+  pcond33.value = 0;
+  pcond34.value = "";
+  pcond35.value = "";
+  pcond36.value = "";
+  pcond37.value = "";
+}
+
+const InsertNew = ref(false);
 const addButton = (e) => {
+  InsertNew.value = true;
+  resetPconds();
+
+  ccustomorNum.value = "";
+  ccustomorGroup.value = groupCd.value;
+  ccustomorStatus.value = 1;
   visible.value = true;
 };
 
