@@ -869,3 +869,10 @@ export const insertCustomerInfo = (
     CARD_ID: cond44,
   });
 };
+
+export const validCardNo = (cond, cond2) => {
+  return api2.post("/MICRM/CRM01_001INS.asmx/validCardNo", {
+    GROUP_CD: cond,
+    CARD_NO: cond2,
+  });
+};

@@ -316,9 +316,18 @@
           <input
             type="text"
             class="border w-[80%] h-[80%] border-black"
+            :class="{ '!w-[60%]': InsertNew == true }"
             :disabled="InsertNew == false"
+            @change="checkCard = false"
             v-model="pcond" />
+          <button
+            class="whitebutton ml-5"
+            v-if="InsertNew == true"
+            @click="checkCardNo">
+            중복검사
+          </button>
         </div>
+
         <div
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           <span class="text-red-500">*</span>구분
@@ -329,12 +338,14 @@
             ><input
               type="radio"
               id="cond"
+              name="cond"
               v-model="pcond2"
               value="1" />개인</label
           ><label for="cond2"
             ><input
               type="radio"
               id="cond2"
+              name="cond"
               v-model="pcond2"
               value="2" />법인</label
           >
@@ -362,17 +373,17 @@
         </div>
         <div
           class="border-l border-t border-black flex justify-start items-center pl-5 space-x-3">
-          <label for="cond"
+          <label for="cond5"
             ><input
               type="radio"
-              id="cond"
+              id="cond5"
               name="pcond5"
               value="0"
               v-model="pcond5" />여자</label
-          ><label for="cond2"
+          ><label for="cond6"
             ><input
               type="radio"
-              id="cond2"
+              id="cond6"
               value="1"
               name="pcond5"
               v-model="pcond5" />남자</label
@@ -758,6 +769,7 @@ import {
   getInitDataCustPurchase,
   insertCustomerInfo,
   updateCustomerInfo,
+  validCardNo,
 } from "@/api/micrm";
 import Datepicker2 from "@/components/Datepicker2.vue";
 import GetZipCode from "@/components/getZipCode.vue";
@@ -1297,7 +1309,7 @@ function resetPconds() {
   pcond14.value = "";
   pcond15.value = false;
   pcond16.value = "";
-  pcond17.value = undefined; // 초기값 명확히 필요시 수정
+  pcond17.value = store.state.userData.lngPosition;
   pcond18.value = 0;
   pcond19.value = "";
   pcond20.value = "";
@@ -1363,6 +1375,33 @@ const initGrid = () => {
   point2.value = "";
   point3.value = "";
   point4.value = "";
+};
+
+const checkCard = ref(false);
+const checkCardNo = async () => {
+  try {
+    const res = await validCardNo(groupCd.value, pcond.value);
+
+    if (res.data.List[0].lngCustNo == "") {
+      Swal.fire({
+        title: "확인",
+        text: "사용가능한 카드번호입니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      checkCard.value = true;
+      return;
+    } else {
+      Swal.fire({
+        title: "경고",
+        text: "이미 사용중인 카드번호입니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      checkCard.value = false;
+      return;
+    }
+  } catch (error) {}
 };
 
 //엑셀 버튼 처리 함수
