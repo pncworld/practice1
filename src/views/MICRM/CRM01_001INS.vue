@@ -1211,9 +1211,11 @@ const dblclickedRowData = (e) => {
   pcond37.value = e[46];
 };
 
-const visible2 = ref(false);
+const initVar = () => {
+  pcond.value = "";
+};
 const addButton = (e) => {
-  visible2.value = true;
+  visible.value = true;
 };
 
 /**
