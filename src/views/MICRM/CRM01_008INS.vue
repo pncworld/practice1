@@ -197,53 +197,22 @@
     </div>
   </div>
 
-  <div
+  <CustomerSearch
     v-if="showPopup"
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <!-- 팝업 박스 -->
-    <div class="bg-white rounded-xl p-6 w-[35vw] h-[30vh] shadow-lg relative">
-      <h2 class="text-xl font-bold mb-4">카드번호 검색</h2>
-      <div class="grid grid-rows-[1fr,7fr] grid-cols-1 items-center w-[90%]">
-        <div class="grid grid-rows-1 grid-cols-[1fr,4fr,1fr]">
-          <div
-            class="border-l border-t flex justify-center items-center border-black">
-            검색
-          </div>
-          <div
-            class="flex border-l border-t border-black justify-center items-center space-x-2">
-            <select
-              name=""
-              id=""
-              class="flex border-black border items-center justify-center"
-              v-model="cond">
-              <option value="0">카드번호</option>
-              <option value="1">고객명</option>
-              <option value="2">휴대폰</option>
-            </select>
-            <input
-              type="text"
-              class="border border-black"
-              v-model="cond2"
-              @keydown.enter="searchButton" />
-          </div>
-          <div class="flex border-l border-t border-black space-x-2 pl-2">
-            <button class="whitebutton" @click="searchButton">조회</button
-            ><button class="whitebutton" @click="showPopup = false">
-              닫기
-            </button>
-          </div>
-        </div>
-        <div class="h-full w-full">
-          <Realgrid
-            :progname="'CRM01_008INS_VUE'"
-            :progid="2"
-            :rowData="rowData2"
-            @dblclickedRowData="dblclickedRowData"
-            :rowStateeditable="false"></Realgrid>
-        </div>
-      </div>
-    </div>
-  </div>
+    @strCCardID="strCCardID"
+    @strCustName="strCustName"
+    @strMobile="strMobile"
+    @strHomeAddr1="strHomeAddr1"
+    @lngVisitCnt="lngVisitCnt"
+    @lngActAmt="lngActAmt"
+    @lngSalePoint="lngSalePoint"
+    @lngBonusPoint="lngBonusPoint"
+    @lngUsedPoint="lngUsedPoint"
+    @lngRemPoint="lngRemPoint"
+    @strRemark="strRemark"
+    @lngStoreCode="lngStoreCode"
+    @lngCustNo="lngCustNo"
+    @closePopUp="showPopup = false"></CustomerSearch>
 
   <!-- 그리드 영역 -->
 </template>
@@ -255,6 +224,7 @@ import {
   getCardChangeList,
   validCardNo,
 } from "@/api/micrm";
+import CustomerSearch from "@/components/customerSearch.vue";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -389,8 +359,30 @@ const searchButton = async () => {
 
 const selectedStoreCd = ref();
 const selectedCustNo = ref();
+
+const strCCardID = (e) => {
+  pcond.value = e;
+};
+// const strCustName = (e) => {
+//   pcond3.value = e
+// }
+// const strCCardID = (e) => {
+//   pcond5.value = e
+// }
+// const strCCardID = (e) => {
+//   pcond.value = e
+// }
+// const strCCardID = (e) => {
+//   pcond.value = e
+// }
+// const strCCardID = (e) => {
+//   pcond.value = e
+// }
+// const strCCardID = (e) => {
+//   pcond.value = e
+// }
 const dblclickedRowData = async (e) => {
-  //console.log(e);
+  console.log(e);
   pcond.value = e[0];
   pcond3.value = e[1];
   pcond5.value = e[2];

@@ -185,7 +185,7 @@ const showStoreAndDate = () => {
   show.value = true;
 
   selectedStoreCd2.value = {
-    STORE_CD: 0,
+    STORE_CD: store.state.userData.STORE_CD,
     GROUP_CD: store.state.userData.GROUP_CD,
   };
 };
@@ -208,7 +208,7 @@ onMounted(async () => {
   };
 
   selectedStoreCd2.value = {
-    STORE_CD: 0,
+    STORE_CD: store.state.userData.STORE_CD,
     GROUP_CD: store.state.userData.GROUP_CD,
   };
   //comsole.log(selectedStoreCd.value);

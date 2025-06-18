@@ -27,15 +27,18 @@
           월매출
         </div>
         <div class="text-gray-500 h-full -mt-[20%]">
-          전일 / {{ lastDaySale }}원
+          전일 / <br />
+          {{ lastDaySale }}원 <br />
           <div class="text-blue-400">{{ todaySale }}원</div>
         </div>
         <div class="text-gray-500 h-full -mt-[20%]">
-          전주 / {{ lastWeekSale }}원
+          전주 / <br />
+          {{ lastWeekSale }}원 <br />
           <div class="text-blue-400">{{ WeekSale }}원</div>
         </div>
         <div class="text-gray-500 h-full -mt-[20%]">
-          전월 / {{ lastMonthSale }}원
+          전월 / <br />
+          {{ lastMonthSale }}원 <br />
           <div class="text-blue-400">{{ MonthSale }}원</div>
         </div>
       </div>
@@ -44,8 +47,8 @@
     <div class="h-[6%] w-[95%] flex space-x-1">
       <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white">
         <div class="flex flex-col h-[10vh]">
-          <div class="flex justify-end text-gray-500 mr-[2vw]">전일대비</div>
-          <div>
+          <div class="flex justify-center text-gray-500 mr-[2vw]">전일대비</div>
+          <div class="pl-1">
             <font-awesome-icon
               :icon="['fas', 'circle-arrow-up']"
               class="text-red-500 size-[3vw]"
@@ -58,8 +61,8 @@
       </div>
       <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white">
         <div class="flex flex-col h-[10vh]">
-          <div class="flex justify-end text-gray-500 mr-[2vw]">전주대비</div>
-          <div>
+          <div class="flex justify-center text-gray-500 mr-[2vw]">전주대비</div>
+          <div class="pl-1">
             <font-awesome-icon
               :icon="['fas', 'circle-arrow-up']"
               class="text-red-500 size-[3vw]"
@@ -73,8 +76,8 @@
 
       <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white relative">
         <div class="flex flex-col h-[10vh]">
-          <div class="flex justify-end text-gray-500 mr-[2vw]">전월대비</div>
-          <div>
+          <div class="flex justify-center text-gray-500 mr-[2vw]">전월대비</div>
+          <div class="pl-1">
             <font-awesome-icon
               :icon="['fas', 'circle-arrow-up']"
               class="text-red-500 size-[3vw]"
@@ -103,7 +106,7 @@
           }}</span>
         </div>
       </div>
-      <div class="size-[1vw] absolute text-nowrap">단위 (만원)</div>
+      <div class="size-[1vw] absolute text-nowrap">단위 (천원)</div>
       <div class="flex items-end justify-center space-x-4 h-[90%] relative">
         <div
           class="bg-green-500 opacity-60 w-[10vw] flex relative"
@@ -227,22 +230,29 @@ onMounted(async () => {
     Number(data.TODAY_SAL) - Number(data.YESTERDAY_SAL)
   );
 
-  todaySale2.value = Math.round(Number(data.TODAY_SAL) / 10000);
-  lastDaySale2.value = Math.round(Number(data.YESTERDAY_SAL) / 10000);
+  todaySale2.value = Math.round(Number(data.TODAY_SAL) / 1000);
+  lastDaySale2.value = Math.round(Number(data.YESTERDAY_SAL) / 1000);
 
-  MonthSale2.value = Math.round(Number(data.THISMONTH_SAL) / 10000);
+  MonthSale2.value = Math.round(Number(data.THISMONTH_SAL) / 1000);
 
-  lastMonthSale2.value = Math.round(Number(data.LASTMONTH_SAL) / 10000);
+  lastMonthSale2.value = Math.round(Number(data.LASTMONTH_SAL) / 1000);
 
-  WeekSale2.value = Math.round(Number(data.THISWEEK_SAL) / 10000);
-  lastWeekSale2.value = Math.round(Number(data.LASTWEEK_SAL) / 10000);
+  WeekSale2.value = Math.round(Number(data.THISWEEK_SAL) / 1000);
+  lastWeekSale2.value = Math.round(Number(data.LASTWEEK_SAL) / 1000);
 
-  nextsaleH.value = Number(data.TODAY_SAL) / 5000000 + "vh";
-  prevsaleH.value = Number(data.YESTERDAY_SAL) / 5000000 + "vh";
-  nextWeeksaleH.value = Number(data.THISWEEK_SAL) / 15000000 + "vh";
-  prevWeeksaleH.value = Number(data.LASTWEEK_SAL) / 15000000 + "vh";
-  nextMonthsaleH.value = Number(data.THISMONTH_SAL) / 150000000 + "vh";
-  prevMonthsaleH.value = Number(data.LASTMONTH_SAL) / 150000000 + "vh";
+  // nextsaleH.value = Number(data.TODAY_SAL) / 5000000 + "vh";
+  // prevsaleH.value = Number(data.YESTERDAY_SAL) / 5000000 + "vh";
+  // nextWeeksaleH.value = Number(data.THISWEEK_SAL) / 15000000 + "vh";
+  // prevWeeksaleH.value = Number(data.LASTWEEK_SAL) / 15000000 + "vh";
+  // nextMonthsaleH.value = Number(data.THISMONTH_SAL) / 150000000 + "vh";
+  // prevMonthsaleH.value = Number(data.LASTMONTH_SAL) / 150000000 + "vh";
+
+  nextsaleH.value = Number(data.TODAY_SAL) / 50000 + "vh";
+  prevsaleH.value = Number(data.YESTERDAY_SAL) / 50000 + "vh";
+  nextWeeksaleH.value = Number(data.THISWEEK_SAL) / 150000 + "vh";
+  prevWeeksaleH.value = Number(data.LASTWEEK_SAL) / 150000 + "vh";
+  nextMonthsaleH.value = Number(data.THISMONTH_SAL) / 1500000 + "vh";
+  prevMonthsaleH.value = Number(data.LASTMONTH_SAL) / 1500000 + "vh";
 
   difweekSale.value = Number(data.THISWEEK_SAL) - Number(data.LASTWEEK_SAL);
   difweekSale2.value = formatNumberWithCommas(
