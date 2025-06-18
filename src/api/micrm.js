@@ -885,12 +885,13 @@ export const deleteCustomors = (cond, cond2, cond3, cond4, cond5) => {
     USERID: cond5,
   });
 };
-export const getCardChangeInfo = (cond, cond2, cond3, cond4) => {
+export const getCardChangeInfo = (cond, cond2, cond3, cond4, cond5) => {
   return api2.post("/MICRM/CRM01_008INS.asmx/getCardChangeInfo", {
     GROUP_CD: cond,
     CUST_NO: cond2,
     CARD_ID: cond3,
     CUST_NM: cond4,
+    JOIN_STS: cond5,
   });
 };
 export const changeCardNo = (

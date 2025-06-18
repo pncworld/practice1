@@ -363,45 +363,44 @@ const selectedCustNo = ref();
 const strCCardID = (e) => {
   pcond.value = e;
 };
-// const strCustName = (e) => {
-//   pcond3.value = e
-// }
-// const strCCardID = (e) => {
-//   pcond5.value = e
-// }
-// const strCCardID = (e) => {
-//   pcond.value = e
-// }
-// const strCCardID = (e) => {
-//   pcond.value = e
-// }
-// const strCCardID = (e) => {
-//   pcond.value = e
-// }
-// const strCCardID = (e) => {
-//   pcond.value = e
-// }
-const dblclickedRowData = async (e) => {
-  console.log(e);
-  pcond.value = e[0];
-  pcond3.value = e[1];
-  pcond5.value = e[2];
-  pcond6.value = e[4];
-  pcond7.value = e[5];
-  pcond8.value = e[6];
-  pcond9.value = e[7];
-  pcond10.value = e[8];
-  pcond11.value = e[9];
-  pcond12.value = e[10];
-  selectedStoreCd.value = e[11];
-  selectedCustNo.value = e[12];
-  showPopup.value = false;
+const strCustName = (e) => {
+  pcond3.value = e;
+};
+const strMobile = (e) => {
+  pcond5.value = e;
+};
+const lngVisitCnt = (e) => {
+  pcond6.value = e;
+};
+const lngActAmt = (e) => {
+  pcond7.value = e;
+};
+const lngSalePoint = (e) => {
+  pcond8.value = e;
+};
+const lngBonusPoint = (e) => {
+  pcond9.value = e;
+};
+const lngUsedPoint = (e) => {
+  pcond10.value = e;
+};
+const lngRemPoint = (e) => {
+  pcond11.value = e;
+};
+const strRemark = (e) => {
+  pcond12.value = e;
+};
+const lngStoreCode = (e) => {
+  selectedStoreCd.value = e;
+};
+const lngCustNo = async (e) => {
+  selectedCustNo.value = e;
 
   try {
     store.state.loading = true;
     const res = await getCardChangeList(
       store.state.userData.lngStoreGroup,
-      e[12]
+      selectedCustNo.value
     );
 
     rowData.value = res.data.List;

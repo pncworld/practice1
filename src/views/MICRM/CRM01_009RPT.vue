@@ -19,7 +19,7 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 bg-gray-200 rounded-lg h-1 items-center z-10 -space-x-20">
+      class="grid grid-cols-2 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10 -space-x-20">
       <div class="justify-start flex -space-x-10">
         <Datepicker2
           :mainName="'기간'"
@@ -32,7 +32,22 @@
         </Datepicker2>
       </div>
 
-      <div class="h-[75%] mt-1 justify-start flex"></div>
+      <div class="h-[75%] mt-1 justify-start items-center flex space-x-3">
+        <span class="text-base font-semibold">고객명 :</span>
+        <input
+          type="text"
+          disabled
+          class="disabled:bg-white w-32 h-8"
+          v-model="cond" />
+        <input
+          type="text"
+          disabled
+          class="disabled:bg-white w-32 h-8"
+          v-model="cond2" />
+        <button class="whitebutton !bg-white" @click="visible = true">
+          조회
+        </button>
+      </div>
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
@@ -56,11 +71,18 @@
       </div>
     </div>
   </div>
+  <CustomerSearch
+    v-if="visible"
+    @lngCustNo="lngCustNo"
+    @strCustName="strCustName"
+    @closePopUp="visible = false"
+    :joinSts="3"></CustomerSearch>
   <!-- 그리드 영역 -->
 </template>
 
 <script setup>
 import { getCustBuyDetailList, getCustCardDisList } from "@/api/micrm";
+import CustomerSearch from "@/components/customerSearch.vue";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -110,14 +132,14 @@ onMounted(async () => {
 const reload = ref(false);
 const rowData = ref([]);
 const afterSearch = ref(false);
-
+const visible = ref(false);
 const rowData2 = ref([]);
 const rowData3 = ref([]);
 const rowData4 = ref([]);
 const condValue = ref(0);
 const store = useStore();
 const cond = ref("");
-const cond2 = ref(0);
+const cond2 = ref("");
 const cond3 = ref(0);
 const optionList = ref([]);
 const datepicker = ref(null);
@@ -149,27 +171,11 @@ const excelDate = (e) => {
   selectedDate.value = e;
 };
 
-const teamcode = ref();
-const lngTeamCode = (e) => {
-  teamcode.value = e;
+const lngCustNo = (e) => {
+  cond.value = e;
 };
-const supervisor = ref();
-const lngSupervisor = (e) => {
-  supervisor.value = e;
-};
-const storeCode = ref();
-const lngStoreCode = (e) => {
-  storeCode.value = e;
-};
-
-const storeAttr = ref();
-const lngStoreAttrs = (e) => {
-  storeAttr.value = e;
-};
-
-const groupCd = ref();
-const lngStoreGroup = (e) => {
-  groupCd.value = e;
+const strCustName = (e) => {
+  cond2.value = e;
 };
 /**
  *  조회 함수

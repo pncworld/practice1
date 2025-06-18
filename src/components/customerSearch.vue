@@ -59,6 +59,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  joinSts: {
+    type: String,
+    default: "1",
+  },
 });
 
 const emit = defineEmits([
@@ -105,21 +109,24 @@ const searchButton = async () => {
         store.state.userData.lngStoreGroup,
         null,
         cond2.value,
-        null
+        null,
+        props.joinSts
       );
     } else if (cond.value == 1) {
       res = await getCardChangeInfo(
         store.state.userData.lngStoreGroup,
         null,
         null,
-        cond2.value
+        cond2.value,
+        props.joinSts
       );
     } else {
       res = await getCardChangeInfo(
         store.state.userData.lngStoreGroup,
         cond2.value,
         null,
-        null
+        null,
+        props.joinSts
       );
     }
     console.log(res);

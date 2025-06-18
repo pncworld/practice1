@@ -94,31 +94,31 @@
         <div
           class="bg-red-500 opacity-60 w-[10vw] flex relative"
           :style="{ height: prevsaleH }">
-          <span class="text-black absolute bottom-full mb-1">{{
+          <span class="text-black absolute bottom-full mb-1 ml-1">{{
             lastDaySale2
           }}</span>
         </div>
         <div
           class="bg-red-500 flex relative w-[10vw]"
           :style="{ height: nextsaleH }">
-          <span class="text-black absolute bottom-full mb-1">{{
+          <span class="text-black absolute bottom-full mb-1 ml-1">{{
             todaySale2
           }}</span>
         </div>
       </div>
-      <div class="size-[1vw] absolute text-nowrap">단위 (천원)</div>
-      <div class="flex items-end justify-center space-x-4 h-[90%] relative">
+      <div class="size-[1vw] absolute text-nowrap">단위 (만원)</div>
+      <div class="flex items-end justify-center space-x-4 h-[90%]">
         <div
           class="bg-green-500 opacity-60 w-[10vw] flex relative"
           :style="{ height: prevWeeksaleH }">
-          <span class="text-black absolute bottom-full mb-1">{{
+          <span class="text-black absolute bottom-full mb-1 ml-1">{{
             lastWeekSale2
           }}</span>
         </div>
         <div
           class="bg-green-500 flex relative w-[10vw]"
           :style="{ height: nextWeeksaleH }">
-          <span class="text-black absolute bottom-full mb-1">{{
+          <span class="text-black absolute bottom-full mb-1 ml-1">{{
             WeekSale2
           }}</span>
         </div>
@@ -127,14 +127,14 @@
         <div
           class="bg-blue-500 opacity-60 w-[10vw] flex relative"
           :style="{ height: prevMonthsaleH }">
-          <span class="text-black absolute bottom-full mb-1">{{
+          <span class="text-black absolute bottom-full mb-1 ml-1">{{
             lastMonthSale2
           }}</span>
         </div>
         <div
           class="bg-blue-500 flex w-[10vw] relative"
           :style="{ height: nextMonthsaleH }">
-          <span class="text-black absolute bottom-full mb-1">{{
+          <span class="text-black absolute bottom-full mb-1 ml-1">{{
             MonthSale2
           }}</span>
         </div>
@@ -230,15 +230,15 @@ onMounted(async () => {
     Number(data.TODAY_SAL) - Number(data.YESTERDAY_SAL)
   );
 
-  todaySale2.value = Math.round(Number(data.TODAY_SAL) / 1000);
-  lastDaySale2.value = Math.round(Number(data.YESTERDAY_SAL) / 1000);
+  todaySale2.value = Math.round(Number(data.TODAY_SAL) / 10000);
+  lastDaySale2.value = Math.round(Number(data.YESTERDAY_SAL) / 10000);
 
-  MonthSale2.value = Math.round(Number(data.THISMONTH_SAL) / 1000);
+  MonthSale2.value = Math.round(Number(data.THISMONTH_SAL) / 10000);
 
-  lastMonthSale2.value = Math.round(Number(data.LASTMONTH_SAL) / 1000);
+  lastMonthSale2.value = Math.round(Number(data.LASTMONTH_SAL) / 10000);
 
-  WeekSale2.value = Math.round(Number(data.THISWEEK_SAL) / 1000);
-  lastWeekSale2.value = Math.round(Number(data.LASTWEEK_SAL) / 1000);
+  WeekSale2.value = Math.round(Number(data.THISWEEK_SAL) / 10000);
+  lastWeekSale2.value = Math.round(Number(data.LASTWEEK_SAL) / 10000);
 
   // nextsaleH.value = Number(data.TODAY_SAL) / 5000000 + "vh";
   // prevsaleH.value = Number(data.YESTERDAY_SAL) / 5000000 + "vh";
@@ -247,13 +247,46 @@ onMounted(async () => {
   // nextMonthsaleH.value = Number(data.THISMONTH_SAL) / 150000000 + "vh";
   // prevMonthsaleH.value = Number(data.LASTMONTH_SAL) / 150000000 + "vh";
 
-  nextsaleH.value = Number(data.TODAY_SAL) / 50000 + "vh";
-  prevsaleH.value = Number(data.YESTERDAY_SAL) / 50000 + "vh";
-  nextWeeksaleH.value = Number(data.THISWEEK_SAL) / 150000 + "vh";
-  prevWeeksaleH.value = Number(data.LASTWEEK_SAL) / 150000 + "vh";
-  nextMonthsaleH.value = Number(data.THISMONTH_SAL) / 1500000 + "vh";
-  prevMonthsaleH.value = Number(data.LASTMONTH_SAL) / 1500000 + "vh";
+  nextsaleH.value =
+    Math.round(
+      (Number(data.TODAY_SAL) /
+        (Number(data.YESTERDAY_SAL) + Number(data.TODAY_SAL))) *
+        85
+    ) + "%";
+  prevsaleH.value =
+    Math.round(
+      (Number(data.YESTERDAY_SAL) /
+        (Number(data.YESTERDAY_SAL) + Number(data.TODAY_SAL))) *
+        85
+    ) + "%";
 
+  nextWeeksaleH.value =
+    Math.round(
+      (Number(data.THISWEEK_SAL) /
+        (Number(data.LASTWEEK_SAL) + Number(data.THISWEEK_SAL))) *
+        85
+    ) + "%";
+  prevWeeksaleH.value =
+    Math.round(
+      (Number(data.LASTWEEK_SAL) /
+        (Number(data.LASTWEEK_SAL) + Number(data.THISWEEK_SAL))) *
+        85
+    ) + "%";
+  nextMonthsaleH.value =
+    Math.round(
+      (Number(data.THISMONTH_SAL) /
+        (Number(data.THISMONTH_SAL) + Number(data.LASTMONTH_SAL))) *
+        85
+    ) + "%";
+  prevMonthsaleH.value =
+    Math.round(
+      (Number(data.LASTMONTH_SAL) /
+        (Number(data.LASTMONTH_SAL) + Number(data.THISMONTH_SAL))) *
+        85
+    ) + "%";
+  console.log(prevsaleH.value);
+  console.log(prevWeeksaleH.value);
+  console.log(nextMonthsaleH.value);
   difweekSale.value = Number(data.THISWEEK_SAL) - Number(data.LASTWEEK_SAL);
   difweekSale2.value = formatNumberWithCommas(
     Number(data.THISWEEK_SAL) - Number(data.LASTWEEK_SAL)
