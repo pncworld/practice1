@@ -18,10 +18,10 @@
       <div
         :class="i.SALE_DT.includes('[') ? 'bg-gray-300' : 'bg-blue-50'"
         class="grid grid-rows-1 grid-cols-[1fr,1fr,1.8fr,1fr] h-[7vh] justify-center items-center font-medium">
-        <div>{{ i.SESSIONSTATUS }}</div>
-        <div>{{ i.POS_NO }}</div>
-        <div>{{ i.WORK_TM }}</div>
-        <div>{{ i.EMP_NM }}</div>
+        <div class="flex justify-center">{{ i.SESSIONSTATUS }}</div>
+        <div class="flex justify-center">{{ i.POS_NO }}</div>
+        <div class="flex justify-center">{{ i.WORK_TM }}</div>
+        <div class="flex justify-center">{{ i.EMP_NM }}</div>
       </div>
     </div>
   </div>

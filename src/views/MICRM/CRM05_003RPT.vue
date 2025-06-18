@@ -1,6 +1,6 @@
 <!-- /*--############################################################################
-# Filename : CRM01_009RPT.vue                                                  
-# Description : 고객관리 > 고객신상정보 > 고객탈퇴조회.                 
+# Filename : CRM05_003RPT.vue                                                  
+# Description : 고객관리 > 고객 포인트 관리 > 멤버십 소멸예정포인트               
 # Date :2025-06-18                                                             
 # Author : 권맑음                     
 ################################################################################*/ -->
@@ -19,11 +19,11 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10 -space-x-20">
-      <div class="justify-start flex -space-x-10">
+      class="grid grid-cols-[1fr,1fr,1fr] grid-rows-1 bg-gray-200 rounded-lg h-20 items-center z-10 space-x-5">
+      <div class="justify-start flex items-center -space-x-14">
         <Datepicker2
-          :mainName="'기간'"
-          :initToday="1"
+          :mainName="'소멸예정기간'"
+          :initToday="2"
           ref="datepicker"
           :closePopUp="closePopUp"
           @endDate="endDate"
@@ -32,21 +32,31 @@
         </Datepicker2>
       </div>
 
-      <div class="h-[75%] mt-1 justify-start items-center flex space-x-3">
-        <span class="text-base font-semibold">고객명 :</span>
-        <input
-          type="text"
-          disabled
-          class="disabled:bg-white w-32 h-8"
-          v-model="cond" />
-        <input
-          type="text"
-          disabled
-          class="disabled:bg-white w-32 h-8"
-          v-model="cond2" />
-        <button class="whitebutton !bg-white" @click="visible = true">
-          조회
-        </button>
+      <div
+        class="h-[75%] mt-1 justify-start items-center flex space-x-5 !ml-20">
+        <span class="text-base font-semibold">소멸포인트(>=) :</span>
+        <input type="number" class="h-8 w-48" v-model="cond" />
+      </div>
+      <div class="flex justify-start items-center !mr-10">
+        <div class="flex items-center justify-start space-x-3 !mr-10">
+          <span class="text-nowrap text-base font-semibold">고객명 :</span>
+          <input
+            type="text"
+            class="h-8 w-32 disabled:bg-white"
+            v-model="cond2"
+            disabled />
+          <input
+            type="text"
+            class="h-8 w-32 disabled:bg-white"
+            v-model="cond3"
+            disabled />
+          <button class="whitebutton !bg-white z-50" @click="setCond">
+            조회
+          </button>
+          <button class="whitebutton !bg-white z-50" @click="initAll2">
+            초기화
+          </button>
+        </div>
       </div>
     </div>
     <!-- 조회조건 -->
@@ -54,19 +64,13 @@
     <div class="w-full h-[75vh]">
       <div class="w-full h-[80%]">
         <Realgrid
-          :progname="'CRM01_009RPT_VUE'"
+          :progname="'CRM05_003RPT_VUE'"
           :progid="1"
           :rowData="rowData"
           :reload="reload"
-          :setFooterCustomColumnId="['strStoreName']"
-          :setFooterCustomText="['합계']"
-          :setFooter="true"
-          :setGroupFooter="true"
-          :setGroupColumnId="'strStoreName'"
-          :documentTitle="'CRM01_009RPT'"
+          :documentTitle="'CRM05_003RPT'"
           :documentSubTitle="documentSubTitle"
           :rowStateeditable="false"
-          @buttonClicked="buttonClicked"
           :exporttoExcel="exportExcel">
         </Realgrid>
       </div>
@@ -76,13 +80,16 @@
     v-if="visible"
     @lngCustNo="lngCustNo"
     @strCustName="strCustName"
-    @closePopUp="visible = false"
-    :joinSts="3"></CustomerSearch>
+    @closePopUp="visible = false"></CustomerSearch>
   <!-- 그리드 영역 -->
 </template>
 
 <script setup>
-import { getStopCustList, restoreCustomor } from "@/api/micrm";
+import {
+  getInitDataCustPurchase,
+  getMemberShipExpirePoint,
+  restoreCustomor,
+} from "@/api/micrm";
 import CustomerSearch from "@/components/customerSearch.vue";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
@@ -133,17 +140,28 @@ const reload = ref(false);
 const rowData = ref([]);
 const afterSearch = ref(false);
 const visible = ref(false);
-const rowData2 = ref([]);
-const rowData3 = ref([]);
-const rowData4 = ref([]);
-const condValue = ref(0);
+const initAll = ref(false);
 const store = useStore();
 const cond = ref("");
 const cond2 = ref("");
-const cond3 = ref(0);
+const cond3 = ref("");
 const optionList = ref([]);
 const datepicker = ref(null);
 const closePopUp = ref(false);
+const setFooter = ref(false);
+const setCond = () => {
+  visible.value = true;
+};
+const initAll2 = () => {
+  cond2.value = "";
+  cond3.value = "";
+};
+const strCustName = (e) => {
+  cond3.value = e;
+};
+const lngCustNo = (e) => {
+  cond2.value = e;
+};
 
 /**
  * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
@@ -171,28 +189,23 @@ const excelDate = (e) => {
   selectedDate.value = e;
 };
 
-const lngCustNo = (e) => {
-  cond.value = e;
-};
-const strCustName = (e) => {
-  cond2.value = e;
-};
 /**
  *  조회 함수
  */
 
 const setGroupFooter = ref(false);
-const hideColumnsId = ref([]);
+const hideColumnsId = ref(["dtmDate"]);
 const searchButton = async () => {
   try {
     store.state.loading = true;
     initGrid();
 
-    const res = await getStopCustList(
+    const res = await getMemberShipExpirePoint(
       store.state.userData.lngStoreGroup,
-      cond.value,
       sDate.value,
-      eDate.value
+      eDate.value,
+      cond.value == "" || cond.value == undefined ? 0 : cond.value,
+      cond2.value
     );
 
     rowData.value = res.data.List;
@@ -206,19 +219,6 @@ const searchButton = async () => {
   }
 };
 
-const buttonClicked = async (e) => {
-  try {
-    const res = await restoreCustomor(
-      store.state.userData.lngStoreGroup,
-      e[8],
-      store.state.userData.lngSequence
-    );
-    console.log(res);
-  } catch (error) {
-  } finally {
-    searchButton();
-  }
-};
 /**
  * 페이지 매장 코드 세팅
  */

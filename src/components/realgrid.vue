@@ -1932,6 +1932,8 @@ const funcshowGrid = async () => {
     grid.resetSize();
   };
 
+
+
   gridView.onCellEdited = function (grid, itemIndex, row, field) {
     gridView.commit();
     console.log(field);
@@ -2020,6 +2022,7 @@ const funcshowGrid = async () => {
     var current = gridView.getCurrent();
     selectedindex.value = current.dataRow;
     selectedRowData.value = dataProvider.getRows()[current.dataRow];
+    emit('buttonClicked' , selectedRowData.value )
     emit("selcetedrowData", selectedRowData.value);
     emit("selectedIndex", clickData.itemIndex);
     emit("selectedIndex2", clickData.dataRow);

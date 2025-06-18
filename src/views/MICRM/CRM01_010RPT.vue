@@ -1,6 +1,6 @@
 <!-- /*--############################################################################
-# Filename : CRM01_009RPT.vue                                                  
-# Description : 고객관리 > 고객신상정보 > 고객탈퇴조회.                 
+# Filename : CRM01_010RPT.vue                                                  
+# Description : 고객관리 > 고객신상정보 > 고객 가입 현황.                 
 # Date :2025-06-18                                                             
 # Author : 권맑음                     
 ################################################################################*/ -->
@@ -19,8 +19,11 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10 -space-x-20">
-      <div class="justify-start flex -space-x-10">
+      class="grid grid-cols-[2fr,2fr,1fr] grid-rows-1 bg-gray-200 rounded-lg h-20 items-center z-10 space-x-5">
+      <div class="justify-start flex items-center -space-x-14">
+        <div class="pl-14 z-50">
+          <input type="checkbox" v-model="cond" @input="cond = !cond" />
+        </div>
         <Datepicker2
           :mainName="'기간'"
           :initToday="1"
@@ -32,21 +35,26 @@
         </Datepicker2>
       </div>
 
-      <div class="h-[75%] mt-1 justify-start items-center flex space-x-3">
-        <span class="text-base font-semibold">고객명 :</span>
-        <input
-          type="text"
-          disabled
-          class="disabled:bg-white w-32 h-8"
-          v-model="cond" />
-        <input
-          type="text"
-          disabled
-          class="disabled:bg-white w-32 h-8"
-          v-model="cond2" />
-        <button class="whitebutton !bg-white" @click="visible = true">
-          조회
-        </button>
+      <div class="h-[75%] mt-1 justify-start items-center flex space-x-5">
+        <div class="pl-5 z-50">
+          <input type="checkbox" v-model="cond2" @input="cond2 = !cond2" />
+        </div>
+        <PickStoreSingle
+          @lngStoreGroup="lngStoreGroup"
+          @lngStoreCode="lngStoreCode"
+          @lngStoreAttrs="lngStoreAttrs"
+          @lngStoreTeam="lngStoreTeam"
+          @excelStore="excelStore"
+          @lngSupervisor="lngSupervisor"></PickStoreSingle>
+      </div>
+      <div class="flex justify-start items-center">
+        <span class="text-base font-semibold">등급 :</span>
+        <select name="" id="" class="border w-32 h-7 ml-2" v-model="cond3">
+          <option value="0">전체</option>
+          <option :value="i.intLevel" v-for="i in optionList">
+            {{ i.strLevelName }}
+          </option>
+        </select>
       </div>
     </div>
     <!-- 조회조건 -->
@@ -54,16 +62,20 @@
     <div class="w-full h-[75vh]">
       <div class="w-full h-[80%]">
         <Realgrid
-          :progname="'CRM01_009RPT_VUE'"
+          :progname="'CRM01_010RPT_VUE'"
           :progid="1"
           :rowData="rowData"
           :reload="reload"
           :setFooterCustomColumnId="['strStoreName']"
+          :hideColumnsId="hideColumnsId"
           :setFooterCustomText="['합계']"
-          :setFooter="true"
-          :setGroupFooter="true"
-          :setGroupColumnId="'strStoreName'"
-          :documentTitle="'CRM01_009RPT'"
+          :setGroupSumCustomColumnId="['strStoreName']"
+          :setGroupSumCustomText="['일자별']"
+          :setFooter="setFooter"
+          :setGroupFooter="setGroupFooter"
+          :setMergeMode="false"
+          :setGroupColumnId="'dtmDate'"
+          :documentTitle="'CRM01_010RPT'"
           :documentSubTitle="documentSubTitle"
           :rowStateeditable="false"
           @buttonClicked="buttonClicked"
@@ -82,7 +94,12 @@
 </template>
 
 <script setup>
-import { getStopCustList, restoreCustomor } from "@/api/micrm";
+import {
+  getInitDataCustPurchase,
+  getRegisterCustomer,
+  getStopCustList,
+  restoreCustomor,
+} from "@/api/micrm";
 import CustomerSearch from "@/components/customerSearch.vue";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
@@ -94,6 +111,7 @@ import Datepicker2 from "@/components/Datepicker2.vue";
  *  */
 
 import PageName from "@/components/pageName.vue";
+import PickStoreSingle from "@/components/pickStoreSingle.vue";
 /**
  * 	매장 단일 선택 컴포넌트
  */
@@ -115,7 +133,7 @@ import { insertPageLog } from "@/customFunc/customFunc";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -127,6 +145,9 @@ import { useStore } from "vuex";
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
+  const res = await getInitDataCustPurchase(store.state.userData.lngStoreGroup);
+  optionList.value = res.data.List;
 });
 
 const reload = ref(false);
@@ -138,13 +159,34 @@ const rowData3 = ref([]);
 const rowData4 = ref([]);
 const condValue = ref(0);
 const store = useStore();
-const cond = ref("");
-const cond2 = ref("");
+const cond = ref(false);
+const cond2 = ref(false);
 const cond3 = ref(0);
 const optionList = ref([]);
 const datepicker = ref(null);
 const closePopUp = ref(false);
+const setFooter = ref(false);
+const groupCd = ref(0);
+const storeCd = ref(0);
+const joinType = ref(0);
+const superVisor = ref(0);
+const TeamCd = ref(0);
 
+const lngSupervisor = (e) => {
+  superVisor.value = e;
+};
+const lngStoreTeam = (e) => {
+  TeamCd.value = e;
+};
+const lngStoreAttrs = (e) => {
+  joinType.value = e;
+};
+const lngStoreCode = (e) => {
+  storeCd.value = e;
+};
+const lngStoreGroup = (e) => {
+  groupCd.value = e;
+};
 /**
  * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
  */
@@ -171,28 +213,53 @@ const excelDate = (e) => {
   selectedDate.value = e;
 };
 
-const lngCustNo = (e) => {
-  cond.value = e;
-};
-const strCustName = (e) => {
-  cond2.value = e;
-};
 /**
  *  조회 함수
  */
 
 const setGroupFooter = ref(false);
-const hideColumnsId = ref([]);
+const hideColumnsId = ref(["dtmDate"]);
 const searchButton = async () => {
   try {
     store.state.loading = true;
     initGrid();
 
-    const res = await getStopCustList(
-      store.state.userData.lngStoreGroup,
-      cond.value,
+    if (cond.value == true) {
+      hideColumnsId.value = [];
+    } else {
+      hideColumnsId.value = ["dtmDate"];
+    }
+    if (cond2.value == true && cond.value == true) {
+      hideColumnsId.value = [];
+      setFooter.value = true;
+    } else if (cond2.value == false && cond.value == false) {
+      hideColumnsId.value = [
+        "lngStoreGroup",
+        "strSubLeaseName",
+        "strTeamName",
+        "strSupervisorName",
+        "lngStoreCode",
+        "strStoreName",
+      ];
+      cond.value = true;
+      setFooter.value = false;
+    }
+
+    if (cond.value == true && cond2.value == true) {
+      setGroupFooter.value = true;
+    } else {
+      setGroupFooter.value = false;
+    }
+    const res = await getRegisterCustomer(
+      groupCd.value,
+      storeCd.value,
+      joinType.value,
+      superVisor.value,
+      TeamCd.value,
       sDate.value,
-      eDate.value
+      eDate.value,
+      cond3.value,
+      cond.value == true ? 1 : 0
     );
 
     rowData.value = res.data.List;

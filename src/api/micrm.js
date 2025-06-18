@@ -921,3 +921,88 @@ export const getCardChangeList = (cond, cond2) => {
     CUST_NO: cond2,
   });
 };
+
+export const getStopCustList = (cond, cond2, cond3, cond4) => {
+  return api2.post("/MICRM/CRM01_009RPT.asmx/getStopCustList", {
+    GROUP_CD: cond,
+    CUST_NO: cond2,
+    S_DATE: cond3,
+    E_DATE: cond4,
+  });
+};
+export const restoreCustomor = (cond, cond2, cond3) => {
+  return api2.post("/MICRM/CRM01_009RPT.asmx/restoreCustomor", {
+    GROUP_CD: cond,
+    CUST_NO: cond2,
+    USER_ID: cond3,
+  });
+};
+export const getRegisterCustomer = (
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  cond9
+) => {
+  return api2.post("/MICRM/CRM01_010RPT.asmx/getRegisterCustomer", {
+    GROUP_CD: cond,
+    STORE_CD: cond2,
+    JOIN_TYPE: cond3,
+    SUPERVISOR: cond4,
+    TEAMCD: cond5,
+    SDATE: cond6,
+    EDATE: cond7,
+    LEVEL: cond8,
+    REPORT_TYPE: cond9,
+  });
+};
+export const getMemberShipExpirePoint = (cond, cond2, cond3, cond4, cond5) => {
+  return api2.post("/MICRM/CRM05_003RPT.asmx/getMemberShipExpirePoint", {
+    GROUP_CD: cond,
+    SDATE: cond2,
+    EDATE: cond3,
+    POINT: cond4,
+    CUSTNO: cond5,
+  });
+};
+export const getMemberShipExpirePoint2 = (cond, cond2, cond3, cond4, cond5) => {
+  return api2.post("/MICRM/CRM05_004RPT.asmx/getMemberShipExpirePoint2", {
+    GROUP_CD: cond,
+    SDATE: cond2,
+    EDATE: cond3,
+    POINT: cond4,
+    CUSTNO: cond5,
+  });
+};
+export const getPointHistoryList = (cond, cond2, cond3) => {
+  return api2.post("/MICRM/CRM05_007INS.asmx/getPointHistoryList", {
+    GROUP_CD: cond,
+    CUST_NO: cond2,
+    CARD_ID: cond3,
+  });
+};
+export const updateBonusPoint = (cond, cond2, cond3, cond4, cond5, cond6) => {
+  return api2.post("/MICRM/CRM05_007INS.asmx/updateBonusPoint", {
+    GROUP_CD: cond,
+    STORE_CD: cond2,
+    CUST_NO: cond3,
+    USER_ID: cond4,
+    POINT: cond5,
+    POINT_RSN: cond6,
+  });
+};
+export const mergeCard = (cond, cond2, cond3, cond4, cond5, cond6, cond7) => {
+  return api2.post("/MICRM/CRM05_008INS.asmx/mergeCard", {
+    GROUP_CD: cond,
+    CUST_NO1: cond2,
+    CUST_NO2: cond3,
+    CARD_NO1: cond4,
+    CARD_NO2: cond5,
+    USER: cond6,
+    REASON: cond7,
+  });
+};

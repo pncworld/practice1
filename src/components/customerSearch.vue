@@ -50,8 +50,7 @@
 <script setup>
 import { getCardChangeInfo } from "@/api/micrm";
 import store from "@/store";
-import { ref } from "vue";
-import { watch } from "vue";
+import { ref, watch } from "vue";
 import Realgrid from "./realgrid.vue";
 
 const props = defineProps({
