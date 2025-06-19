@@ -184,10 +184,7 @@ const emit = defineEmits([
 const showStoreAndDate = () => {
   show.value = true;
 
-  selectedStoreCd2.value = {
-    STORE_CD: store.state.userData.STORE_CD,
-    GROUP_CD: store.state.userData.GROUP_CD,
-  };
+  selectedStoreCd2.value = selectedStoreCd.value;
 };
 /**
  * 	화면 Load시 실행 스크립트
