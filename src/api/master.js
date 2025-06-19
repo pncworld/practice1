@@ -847,6 +847,7 @@ export const getDynamicGrid3 = (groupCd, storeCd, count) => {
     COUNT: count,
   });
 };
+
 export const getAmountList3 = (groupCd, storeCd, areaCd, posNo) => {
   return api2.post("/MIMASTER/MST44_055INS.asmx/getAmountList", {
     GROUP_CD: groupCd,

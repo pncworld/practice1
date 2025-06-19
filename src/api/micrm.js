@@ -1006,3 +1006,87 @@ export const mergeCard = (cond, cond2, cond3, cond4, cond5, cond6, cond7) => {
     REASON: cond7,
   });
 };
+export const getInitGftData = (cond) => {
+  return api2.post("/MICRM/CRM65_001RPT.asmx/getInitGftData", {
+    GROUP_CD: cond,
+  });
+};
+export const getGftLedgerList = (
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  cond9,
+  cond10
+) => {
+  return api2.post("/MICRM/CRM65_001RPT.asmx/getGftLedgerList", {
+    GROUP_CD: cond,
+    START_DATE: cond2,
+    END_DATE: cond3,
+    CATEGORY: cond4,
+    TYPE: cond5,
+    STATUS: cond6,
+    CARD_NO: cond7,
+    CHECK: cond8,
+    START_DATE2: cond9,
+    END_DATE2: cond10,
+  });
+};
+export const getGftLedgerTradeList = (
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8
+) => {
+  return api2.post("/MICRM/CRM65_002RPT.asmx/getGftLedgerTradeList", {
+    GROUP_CD: cond,
+    STORE_CDS: cond2,
+    COND: cond3,
+    COND2: cond4,
+    START_DATE: cond5,
+    END_DATE: cond6,
+    COND3: cond7,
+    LANG: cond8,
+  });
+};
+export const getGftLedgerTradeAggList = (
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8
+) => {
+  return api2.post("/MICRM/CRM65_004RPT.asmx/getGftLedgerTradeAggList", {
+    GROUP_CD: cond,
+    STORE_CDS: cond2,
+    COND: cond3,
+    COND2: cond4,
+    START_DATE: cond5,
+    END_DATE: cond6,
+    COND3: cond7,
+    LANG: cond8,
+  });
+};
+
+export const getDynamicGrid4 = (groupCd, count) => {
+  return api2.post("/MICRM/CRM65_005RPT.asmx/getDynamicGrid4", {
+    GROUP_CD: groupCd,
+    COUNT: count,
+  });
+};
+export const getGftList = (groupCd) => {
+  return api2.post("/MICRM/CRM65_005RPT.asmx/getGftList", {
+    GROUP_CD: groupCd,
+  });
+};

@@ -31,6 +31,10 @@ import CRM20_009RPT from "@/views/MICRM/CRM20_009RPT.vue";
 import CRM20_010RPT from "@/views/MICRM/CRM20_010RPT.vue";
 import CRM20_012INS from "@/views/MICRM/CRM20_012INS.vue";
 import CRM20_013RPT from "@/views/MICRM/CRM20_013RPT.vue";
+import CRM65_001RPT from "@/views/MICRM/CRM65_001RPT.vue";
+import CRM65_002RPT from "@/views/MICRM/CRM65_002RPT.vue";
+import CRM65_004RPT from "@/views/MICRM/CRM65_004RPT.vue";
+import CRM65_005RPT from "@/views/MICRM/CRM65_005RPT.vue";
 
 export default function micrmRouter() {
   return [
@@ -161,6 +165,22 @@ export default function micrmRouter() {
     {
       path: "CRM05_008INS.xml",
       component: CRM05_008INS,
+    },
+    {
+      path: "CRM65_001RPT.xml",
+      component: CRM65_001RPT,
+    },
+    {
+      path: "CRM65_002RPT.xml",
+      component: CRM65_002RPT,
+    },
+    {
+      path: "CRM65_004RPT.xml",
+      component: CRM65_004RPT,
+    },
+    {
+      path: "CRM65_005RPT.xml",
+      component: CRM65_005RPT,
     },
   ];
 }

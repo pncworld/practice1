@@ -5,6 +5,7 @@
 <script setup>
 import { getGridInfoList } from "@/api/common";
 import { getDynamicGrid2, getDynamicGrid3 } from "@/api/master";
+import { getDynamicGrid4 } from "@/api/micrm";
 import { getDynamicGrid } from "@/api/misales";
 import {
   excelTitle,
@@ -899,6 +900,26 @@ const props = defineProps({
     // 행높이
     type: Array,
     default: [],
+  },
+  setDynamicGrid4: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
+  setDynamicGrid4Cond: {
+    // 행높이
+    type: String,
+    default: "0",
+  },
+  initCheckRows: {
+    // 행높이
+    type: Array,
+    default: [],
+  },
+  initCheckRowNow: {
+    // 행높이
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -1932,8 +1953,6 @@ const funcshowGrid = async () => {
     grid.resetSize();
   };
 
-
-
   gridView.onCellEdited = function (grid, itemIndex, row, field) {
     gridView.commit();
     console.log(field);
@@ -2022,7 +2041,7 @@ const funcshowGrid = async () => {
     var current = gridView.getCurrent();
     selectedindex.value = current.dataRow;
     selectedRowData.value = dataProvider.getRows()[current.dataRow];
-    emit('buttonClicked' , selectedRowData.value )
+    emit("buttonClicked", selectedRowData.value);
     emit("selcetedrowData", selectedRowData.value);
     emit("selectedIndex", clickData.itemIndex);
     emit("selectedIndex2", clickData.dataRow);
@@ -2283,6 +2302,16 @@ watch(
     emit("allStateRows", dataProvider.getAllStateRows());
     updatedrowData.value = [...dataProvider.getJsonRows()];
     emit("updatedRowData", updatedrowData.value);
+  }
+);
+
+watch(
+  () => props.initCheckRowNow,
+  () => {
+    gridView.checkAll(false);
+    for (let i = 0; i < props.initCheckRows.length; i++) {
+      gridView.checkRow(props.initCheckRows[i], true);
+    }
   }
 );
 
@@ -2975,6 +3004,16 @@ onMounted(async () => {
 
       tabInitSetArray.value.push(...res.data.List);
     }
+    if (props.setDynamicGrid4 == true) {
+      const res = await getDynamicGrid4(
+        store.state.userData.lngStoreGroup,
+        props.setDynamicGrid4Cond
+      );
+      console.log(res);
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+    }
 
     // 동적 스타일 생성
     let styleContent = "";
@@ -3037,6 +3076,17 @@ const setupGrid = async () => {
         result.length
       );
 
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+    }
+
+    if (props.setDynamicGrid4 == true) {
+      const res = await getDynamicGrid4(
+        store.state.userData.lngStoreGroup,
+        props.setDynamicGrid4Cond
+      );
+      console.log(res);
       if (res.data.List.length > 0) {
         tabInitSetArray.value.push(...res.data.List);
       }

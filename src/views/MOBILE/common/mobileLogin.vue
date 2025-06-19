@@ -102,7 +102,7 @@
 </template>
 
 <script setup>
-import { alreadyLogined, alreadyMobileLogined } from "@/api/common";
+import { alreadyMobileLogined } from "@/api/common";
 import { getMobileProgList, mobileLogin } from "@/api/mobile";
 import loading from "@/components/loading.vue";
 /*
@@ -129,7 +129,6 @@ const showPassword = () => {
 const username = ref(""); // 사용자 ID
 const password = ref(""); // 사용자 비밀번호
 const message = ref(""); // 상태 메시지
-const userData = store.state.userData;
 
 const login2 = async () => {
   // /store.state.loading2 = true;
