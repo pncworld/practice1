@@ -44,9 +44,13 @@
         :setDynamicGrid4="true"
         :setDynamicGrid4Cond="setDynamicGrid4Cond"
         :mergeColumns3="true"
+        :setFooter="true"
+        :showCheckBar="false"
         :mergeColumnGroupName3="mergeColumnGroupName3"
         :mergeColumnGroupSubList3="mergeColumnGroupSubList3"
         :mergeColumnGroupName4="mergeColumnGroupName4"
+        :setFooterCustomColumnId="['strStore']"
+        :setFooterCustomText="['합계']"
         :documentTitle="'CRM65_005RPT'"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
@@ -89,7 +93,11 @@
 </template>
 
 <script setup>
-import { getGftLedgerTradeAggList, getGftList } from "@/api/micrm";
+import {
+  getGftCardStockList,
+  getGftLedgerTradeAggList,
+  getGftList,
+} from "@/api/micrm";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -172,8 +180,9 @@ const checkedRowIndex = (e) => {
 };
 
 const initCheckRows = ref([]);
-const setDynamicGrid4Cond = ref(1);
+const setDynamicGrid4Cond = ref(0);
 const setSearchCond = () => {
+  initGrid();
   cond.value = checkedRows.value;
   console.log(cond.value);
   savedcheckedIndex.value = checkedIndex.value;
@@ -185,19 +194,19 @@ const setSearchCond = () => {
 
   for (let i = 0; i < cond.value.length; i++) {
     const group = [];
-    for (let j = 1; j <= 7; j++) {
+    for (let j = 1 + i * 7; j <= 7 + i * 7; j++) {
       group.push(`column${j}`);
     }
     mergeColumnGroupSubList3.value.push([group]); // 대괄호 한 번 더 감싸는 거 잊지 마
   }
-  mergeColumnGroupName3.value = [];
-  for (let i = 1; i <= cond.value.length; i++) {
-    const group = Array(7).fill(`G${i}`);
+  mergeColumnGroupName3.value = [[""]];
+  mergeColumnGroupSubList3.value.push([`column${cond.value.length * 7 + 1}`]);
+  for (let i = 1; i <= cond.value.length + 1; i++) {
+    const group = ["", "", "출고", "출고", " ", " ", " "];
     mergeColumnGroupName3.value.push(group);
   }
-  console.log(mergeColumnGroupName4.value);
-  console.log(mergeColumnGroupSubList3.value);
-  console.log(mergeColumnGroupName3.value);
+  mergeColumnGroupName3.value.push(["합계"]);
+
   setDynamicGrid4Cond.value = cond.value.length;
   reload.value = !reload.value;
   visible.value = false;
@@ -286,20 +295,13 @@ const searchButton = async () => {
   try {
     store.state.loading = true;
     initGrid();
-    if (cond.value == true) {
-      hideColumnsId.value = [];
-    } else {
-      hideColumnsId.value = ["strStoreName"];
-    }
-    const res = await getGftLedgerTradeAggList(
-      groupCd.value,
-      storeCds.value,
-      cond2.value,
-      cond3.value,
+    console.log(cond.value.map((item) => item.lngGftType + "|"));
+    const res = await getGftCardStockList(
+      store.state.userData.lngStoreGroup,
+      0,
       sd.value,
       ed.value,
-      cond.value == true ? 1 : 0,
-      store.state.userData.strLanguage
+      cond.value.map((item) => item.lngGftType).join("|")
     );
     console.log(res);
     rowData.value = res.data.List;

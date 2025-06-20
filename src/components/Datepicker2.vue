@@ -143,6 +143,14 @@ const props = defineProps({
     type: Number,
     default: 0, // 기본값: 현재 날짜
   },
+  initToday2: {
+    type: Number,
+    default: 0, // 기본값: 현재 날짜
+  },
+  initToday3: {
+    type: Boolean,
+    default: false, // 기본값: 현재 날짜
+  },
   selectedRadioBox: {
     type: String,
     default: "01",
@@ -212,6 +220,15 @@ onMounted(() => {
     today.setDate(today.getDate() - 6);
     selectedStartDate.value = formatDate(today);
   } else {
+    selectedStartDate.value = formatDate(today);
+  }
+
+  if (props.initToday2 !== 0) {
+    today.setDate(today.getDate() + props.initToday2);
+    selectedStartDate.value = formatDate(today);
+  }
+  if (props.initToday3 == true) {
+    today.setDate(1);
     selectedStartDate.value = formatDate(today);
   }
   maxEndDate.value = props.limitEndDate;

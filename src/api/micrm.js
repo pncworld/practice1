@@ -1090,3 +1090,81 @@ export const getGftList = (groupCd) => {
     GROUP_CD: groupCd,
   });
 };
+export const getGftCardStockList = (groupCd, cond, cond2, cond3, cond4) => {
+  return api2.post("/MICRM/CRM65_005RPT.asmx/getGftCardStockList", {
+    GROUP_CD: groupCd,
+    STORE_CD: cond,
+    START_DATE: cond2,
+    END_DATE: cond3,
+    COND: cond4,
+  });
+};
+export const getGftLedgerCreateList = (groupCd, cond, cond2, cond3, cond4) => {
+  return api2.post("/MICRM/CRM60_004INS.asmx/getGftLedgerCreateList", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+    SDATE: cond3,
+    EDATE: cond4,
+  });
+};
+export const getGftLedgerSaleList = (groupCd, cond, cond2, cond3, cond4) => {
+  return api2.post("/MICRM/CRM60_006INS.asmx/getGftLedgerSaleList", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+    SDATE: cond3,
+    EDATE: cond4,
+  });
+};
+export const getCreditCompanyList = (groupCd, cond) => {
+  return api2.post("/MICRM/CRM60_006INS.asmx/getCreditCompanyList", {
+    GROUP_CD: groupCd,
+    STORE_CD: cond,
+  });
+};
+export const saveNewGftCard = (
+  groupCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6
+) => {
+  return api2.post("/MICRM/CRM60_004INS.asmx/saveNewGftCard", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+    DESIGN: cond3,
+    CNT: cond4,
+    DATE: cond5,
+    EMP_CNT: cond6,
+  });
+};
+
+export const saveGftCardSaleEnroll = (
+  groupCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  cond9
+) => {
+  return api2.post("/MICRM/CRM60_006INS.asmx/saveGftCardSaleEnroll", {
+    GROUP_CD: groupCd,
+    STORE_CD: cond,
+    DATE: cond2,
+    CARD_NO: cond3,
+    CARD_NO_E: cond4,
+    CCARD: cond5,
+    BUYCODE: cond6,
+    EMPSALE: cond7,
+    STRCARD_NO: cond8,
+    CARD_APPROVE_NO: cond9,
+  });
+};

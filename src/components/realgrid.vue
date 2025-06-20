@@ -114,7 +114,7 @@ let dataProvider;
     }
   };
 
-
+  
 
   emit updatedRowData 사용시에는 가급적 불가피한경우가 아니라면 기존 rowData와 교체 하지 말 것. updatedRowData로 수정된 사항을 별도의
   변수로 저장해두고 추후에 그 데이터를 저장하는게 옳다고봄
@@ -130,6 +130,10 @@ let dataProvider;
   addRow => true false로 값이 변할때마다 행을 추가
   deleteRow =>  true false로 값이 변할때마다 행을 삭제
   deleteRow3 =>
+
+
+  index 는 dataRow 를 대부분 활용하는게 좋음
+  itemindex는 정렬에 따라 가변해서 dataprovider에 정확한 위치를 보장하지 않음.
 
 }
 
@@ -1469,7 +1473,7 @@ const funcshowGrid = async () => {
       }
     }
   }
-
+  //console.log(columns);
   gridView.setColumns(columns);
   // 4구간
   if (props.setRowStyleCalls) {
@@ -1659,6 +1663,20 @@ const funcshowGrid = async () => {
     gridView.setColumnLayout(layout1);
   }
 
+  function getInnerMostIndex(colID, subList3) {
+    for (let i = 0; i < subList3.length; i++) {
+      const group2D = subList3[i];
+      for (let j = 0; j < group2D.length; j++) {
+        const group1D = group2D[j];
+        const innerMostIndex = group1D.indexOf(colID);
+        if (innerMostIndex !== -1) {
+          return innerMostIndex;
+        }
+      }
+    }
+    return -1; // 못 찾으면 -1
+  }
+
   if (props.mergeColumns2 == true) {
     const subList = props.mergeColumnGroupSubList2; // [['column1','column2'],['column3','column4']]
     const groupList = props.mergeColumnGroupName2; // ['그룹컬럼1','그룹컬럼2']
@@ -1705,6 +1723,10 @@ const funcshowGrid = async () => {
     const subList3 = props.mergeColumnGroupSubList3; // [[['column1','column2'],['column3','column4']]]
     const groupList3 = props.mergeColumnGroupName4; // ['최상위그룹컬럼']
     const groupList2 = props.mergeColumnGroupName3; // [['그룹컬럼1','그룹컬럼2']]
+
+    console.log(JSON.stringify(subList3));
+    console.log(groupList3);
+    console.log(groupList2);
     let layout = [];
     tabInitSetArray.value.forEach((item) => {
       if (subList3.flat(2).includes(item.strColID)) {
@@ -1715,27 +1737,32 @@ const funcshowGrid = async () => {
           group1D.includes(item.strColID)
         );
 
+        const innerIndex2 = getInnerMostIndex(item.strColID, subList3);
+        console.log(innerIndex);
+
         if (layout.find((item) => item.name == groupList3[index])) {
           const findit = layout.find((item) => item.name == groupList3[index]);
 
           if (findit) {
             let target = findit.items.find(
-              (i) => i.name === groupList2[index][innerIndex]
+              (i) => i.name === groupList2[index][innerIndex2]
             );
 
             if (target) {
-              console.log(target.items);
+              // console.log(target.items);
               target.items = [
                 ...target.items,
                 {
                   column: item.strColID,
-                  width: 100,
+                  width: item.intHdWidth,
                 },
               ];
             }
           }
         } else {
           const secondItems = ref([]);
+          //console.log(groupList2[index]);
+
           for (let i = 0; i < groupList2[index].length; i++) {
             if (i == 0) {
               secondItems.value.push({
@@ -1746,43 +1773,57 @@ const funcshowGrid = async () => {
                 },
                 items: [
                   {
-                    column: subList3[index][innerIndex][i],
-                    width: 100,
+                    column: subList3[index][innerIndex2][i],
+                    width: item.intHdWidth,
                   },
                 ],
               });
             } else {
+              // console.log(index);
+              // console.log(innerIndex);
+              // console.log(i);
               secondItems.value.push({
                 name: groupList2[index][i],
                 direction: "horizontal",
                 header: {
                   styleName: `header-style-0`,
                 },
+                width: item.intHdWidth,
                 items: [],
               });
             }
           }
-          layout.push({
-            name: groupList3[index],
-            direction: "horizontal",
-            header: {
-              styleName: `header-style-0`,
-            },
-            items: secondItems.value,
-          });
+          if (groupList3[index] == undefined) {
+            layout.push(item.strColID);
+          } else {
+            layout.push({
+              name: groupList3[index],
+              direction: "horizontal",
+              header: {
+                styleName: `header-style-0`,
+              },
+              width: item.intHdWidth,
+              items: secondItems.value,
+            });
+          }
+
           // layout.push(tempgroupList)
         }
       } else {
         layout.push({
           column: item.strColID,
           name: item.strHdText,
-          header: { visible: true, text: item.strHdText },
+          header: {
+            visible: true,
+            text: item.strHdText,
+            styleName: `header-style-0`,
+          },
           visible: item.intHdWidth !== 0,
           width: item.intHdWidth,
         });
       }
     });
-    console.log(layout);
+    //console.log(layout);
     gridView.setColumnLayout(layout);
   }
 
@@ -1801,6 +1842,7 @@ const funcshowGrid = async () => {
   });
   //gridView.displayOptions.fitStyle = "even";
   gridView.sortingOptions.enabled = true;
+  gridView.sortingOptions.commitBeforeSorting = true;
   gridView.editOptions.editable =
     props.checkRenderEditable == true ? true : false;
   gridView.editOptions.updatable = true;
@@ -1817,7 +1859,7 @@ const funcshowGrid = async () => {
   dataProvider.softDeleting = props.notsoftDelete == false ? true : false;
   dataProvider.deleteCreated = props.deleteCreated;
   gridView.filteringOptions.handleVisibility = "hidden";
-  gridView.sortingOptions.enabled = false; // 정렬기능 비활성화
+  //gridView.sortingOptions.enabled = false; // 정렬기능 비활성화
   dataProvider.autoCommit = true; // 자동 커밋 활성화
   dataProvider.commitBeforeDataEdit = true;
   gridView.editOptions.movable = props.dragOn == true ? true : false;
@@ -2043,7 +2085,7 @@ const funcshowGrid = async () => {
     selectedRowData.value = dataProvider.getRows()[current.dataRow];
     emit("buttonClicked", selectedRowData.value);
     emit("selcetedrowData", selectedRowData.value);
-    emit("selectedIndex", clickData.itemIndex);
+    emit("selectedIndex", clickData.dataRow);
     emit("selectedIndex2", clickData.dataRow);
   };
 
@@ -2077,6 +2119,14 @@ const funcshowGrid = async () => {
     }
     if (clickData.cellType === "header") {
       gridView.setCurrent({ dataRow: selectedindex.value });
+
+      // gridView.sortingOptions.enabled = false;
+
+      // if(gridView.getSortedFields()[0].direction == "ascending"){
+      //       gridView.orderBy(clickData.fieldName, "descending");
+      //   }else{
+      //       gridView.orderBy(clickData.fieldName, "ascending");
+      //   }
     }
     if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
       return;
@@ -2548,6 +2598,7 @@ watch(
     }
 
     emit("selectedIndex", selectedRowIndex);
+    emit("selectedIndex2", current.dataRow);
 
     //comsole.log(props.rowData);
     addrow4activated.value = true;
@@ -3328,5 +3379,18 @@ watch(
 
 .blue-column {
   background: #007bff !important; /* 밝은 파란색 */
+}
+
+.rg-header-sort-descending {
+  background: url(data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTYgMTYiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDE2IDE2OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHN0eWxlIHR5cGU9InRleHQvY3NzIj4uc3Qwe2ZpbGw6I0ZGRkZGRjt9LnN0MXtmaWxsOiNGRkZGRkY7fS5zdDJ7ZmlsbDojRkZGRkZGO30uc3Qze2ZpbGw6I0ZGRkZGRjt9LnN0NHtmaWxsOiNGRkZGRkY7fS5zdDV7ZmlsbDojRkZGRkZGO30uc3Q2e2ZpbGw6I0ZGRkZGRjt9LnN0N3tmaWxsOiNGRkZGRkY7fS5zdDh7ZmlsbDojRkZGRkZGO30uc3Q5e2ZpbGw6I0ZGRkZGRjt9LnN0MTB7ZmlsbDojRkZGRkZGO30uc3QxMXtmaWxsOiNGRkZGRkY7fS5zdDEye2ZpbGw6I0ZGRkZGRjt9PC9zdHlsZT48cG9seWdvbiBjbGFzcz0ic3QxIiBwb2ludHM9IjkuNCw3LjIgOS40LDQuNSA2LjYsNC41IDYuNiw3LjIgMyw3LjIgOCwxMS41IDEzLDcuMiAiLz48L3N2Zz4=)
+    no-repeat center 70%;
+  font-size: 8px;
+  vertical-align: middle;
+}
+.rg-header-sort-ascending {
+  background: url(data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTYgMTYiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDE2IDE2OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHN0eWxlIHR5cGU9InRleHQvY3NzIj4uc3Qwe2ZpbGw6I0ZGRkZGRjt9LnN0MXtmaWxsOiNGRkZGRkY7fS5zdDJ7ZmlsbDojRkZGRkZGO30uc3Qze2ZpbGw6I0ZGRkZGRjt9LnN0NHtmaWxsOiNGRkZGRkY7fS5zdDV7ZmlsbDojRkZGRkZGO30uc3Q2e2ZpbGw6I0ZGRkZGRjt9LnN0N3tmaWxsOiNGRkZGRkY7fS5zdDh7ZmlsbDojRkZGRkZGO30uc3Q5e2ZpbGw6I0ZGRkZGRjt9LnN0MTB7ZmlsbDojRkZGRkZGO30uc3QxMXtmaWxsOiNGRkZGRkY7fS5zdDEye2ZpbGw6I0ZGRkZGRjt9PC9zdHlsZT48cG9seWdvbiBjbGFzcz0ic3QxIiBwb2ludHM9IjEzLDguOCA4LDQuNSAzLDguOCA2LjYsOC44IDYuNiwxMS41IDkuNCwxMS41IDkuNCw4LjgiIC8+PC9zdmc+)
+    no-repeat center 70%;
+  font-size: 8px;
+  vertical-align: middle;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="flex justify-center md:justify-end space-x-4 text-sm mr-5">
     <div class="items-center font-bold hidden md:flex pl-12 text-nowrap">
-      {{ MainName }} :
+      {{ MainName }}
     </div>
     <div v-show="hideit2">
       <select
@@ -305,7 +305,7 @@ const props = defineProps({
   },
   mainName: {
     type: String,
-    default: "매장명",
+    default: "매장명 :",
   },
   defaultStore: {
     type: Boolean,
