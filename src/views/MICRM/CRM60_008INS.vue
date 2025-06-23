@@ -1,6 +1,6 @@
 <!-- /*--############################################################################
-# Filename : CRM60_006INS.vue                                                  
-# Description : 고객관리 > 전자상품권 마스터 관리 > 전자상품권 판매     
+# Filename : CRM60_008INS.vue                                                  
+# Description : 고객관리 > 전자상품권 마스터 관리 > 전자상품권 출고     
 # Date :2025-06-20                                                            
 # Author : 권맑음                     
 ################################################################################*/ -->
@@ -14,10 +14,10 @@
           조회
         </button>
         <button @click="addButton" class="button new md:w-auto w-14">
-          신규
+          출고
         </button>
         <button @click="deleteButton" class="button delete md:w-auto w-14">
-          취소
+          취소처리
         </button>
         <button @click="excelButton" class="button save w-auto excel">
           엑셀
@@ -28,7 +28,7 @@
       class="grid grid-cols-[1fr,1fr,1.5fr] grid-rows-2 bg-gray-200 rounded-lg h-16 items-center pt-5 z-10 space-x-2 justify-start">
       <div class="justify-start">
         <Datepicker2
-          :mainName="'생성일자'"
+          :mainName="'출고일자'"
           @startDate="startDate"
           :initToday="1"
           :initToday3="true"
@@ -36,21 +36,22 @@
           @endDate="endDate"></Datepicker2>
       </div>
       <div class="justify-center flex items-center !-mr-16">
-        <span class="text-base font-semibold">상품권구분 : </span>
-        <select name="" id="" class="ml-4 w-40 h-8" v-model="cond">
-          <option value="0">전체</option>
-          <option :value="i.lngGftCategory" v-for="i in optionList">
-            {{ i.strGftCategory }}
-          </option>
-        </select>
+        <PickStore
+          :hideGroup="false"
+          class="!-ml-12"
+          @update:storeCd="lngStoreCode"
+          :hideAttr="false"
+          :defaultStoreNm="'전체'"
+          :defaultStore="true"
+          :mainName="'매장 : '"></PickStore>
       </div>
 
       <div class="text-base flex justify-start font-semibold pl-32">
-        <span class="text-base font-semibold"> 권종 :</span>
+        <span class="text-base font-semibold"> 출고상태 :</span>
         <select name="" id="" class="w-40 ml-3 h-8" v-model="cond3">
           <option value="0">전체</option>
-          <option :value="i.lngGftType" v-for="i in optionList2">
-            {{ i.strGftType }}
+          <option :value="i.strDCode" v-for="i in optionList3">
+            {{ i.strDName }}
           </option>
         </select>
       </div>
@@ -59,12 +60,12 @@
     <!-- 그리드 영역 -->
     <div class="w-full h-[75%]">
       <Realgrid
-        :progname="'CRM60_006INS_VUE'"
+        :progname="'CRM60_008INS_VUE'"
         :progid="1"
         :rowData="rowData"
         :reload="reload"
         @clickedRowData="clickedRowData"
-        :documentTitle="'CRM60_006INS'"
+        :documentTitle="'CRM60_008INS'"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :exporttoExcel="exportExcel">
@@ -75,33 +76,51 @@
   <div
     v-if="visible"
     class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-    <div class="bg-white rounded-2xl shadow-lg p-6 w-[40vw] h-[60vh]">
-      <h2 class="text-lg font-bold mb-4 text-center">전자상품권 판매등록</h2>
+    <div class="bg-white rounded-2xl shadow-lg p-6 w-[30vw] h-[40vh]">
+      <h2 class="text-lg font-bold mb-4 text-center">상품권 출고 등록</h2>
       <div
-        class="grid grid-rows-[1fr,1fr,1fr,1fr,1fr,1fr,1fr,1fr] grid-cols-[1fr,3fr] h-[60%]">
+        class="grid grid-rows-[1fr,1fr,1fr,1fr,1fr] grid-cols-[1fr,3fr] h-[60%]">
         <div
           class="text-base font-semibold border-l border-t border-black flex justify-center items-center bg-gray-100">
-          <span class="text-red-500 text-xl">*</span>매장명
+          <span class="text-red-500 text-xl">*</span>매장
         </div>
         <div
           class="text-base font-semibold border-l border-t border-black flex justify-start items-center">
           <PickStore
             :hideGroup="false"
             class="!-ml-12"
-            @update:storeCd="lngStoreCode"
+            @update:storeCd="lngStoreCode2"
             :hideAttr="false"
-            :mainName="''"></PickStore>
+            :defaultStore="true"
+            :mainName="''">
+          </PickStore>
         </div>
         <div
           class="text-base font-semibold border-l border-t border-black flex justify-center bg-gray-100 items-center">
-          <span class="text-red-500 text-xl">*</span>출고일자
+          <span class="text-red-500 text-xl">*</span>유형
         </div>
         <div
           class="text-base font-semibold border-l border-t border-black flex justify-start pl-2 items-center">
+          <select
+            name=""
+            id=""
+            class="border ml-1 border-black w-[80%] h-[80%]"
+            v-model="pcond21">
+            <option value="0">선택</option>
+            <option value="10">출고</option>
+            <option value="12">분실</option>
+          </select>
+        </div>
+        <div
+          class="text-base font-semibold border-l border-t border-black flex justify-center items-center bg-gray-100">
+          <span class="text-red-500 text-xl">*</span>일자
+        </div>
+        <div
+          class="text-base font-semibold border-l border-t border-black flex justify-start items-center">
           <input
             type="date"
             class="w-[80%] ml-3 h-[90%] border border-black"
-            v-model="pcond1" />
+            v-model="pcond22" />
         </div>
         <div
           class="text-base font-semibold border-l border-t border-black flex justify-center bg-gray-100 items-center">
@@ -112,7 +131,7 @@
           <input
             type="number"
             class="w-[80%] ml-3 h-[90%] border border-black"
-            v-model="pcond2" />
+            v-model="pcond23" />
         </div>
         <div
           class="text-base font-semibold border-l border-t border-black flex justify-center bg-gray-100 items-center">
@@ -123,63 +142,7 @@
           <input
             type="number"
             class="w-[80%] ml-3 h-[90%] border border-black"
-            v-model="pcond3" />
-        </div>
-        <div
-          class="text-base font-semibold border-l border-t border-black flex justify-center bg-gray-100 items-center">
-          <span class="text-red-500 text-xl">*</span>결제구분
-        </div>
-        <div
-          class="text-base font-semibold border-l border-t border-black flex justify-centeritems-center items-center">
-          <select
-            name=""
-            id=""
-            v-model="pcond5"
-            class="w-[70%] h-[80%] border border-black ml-2">
-            <option value="0">선택</option>
-            <option value="1">현금</option>
-            <option value="2">카드</option>
-            <option value="3">기타</option>
-          </select>
-        </div>
-        <div
-          class="text-base font-semibold border-l border-t border-black flex justify-center bg-gray-100 items-center">
-          <span class="text-red-500 text-xl">*</span>매입사
-        </div>
-        <div
-          class="text-base font-semibold border-l border-t border-black flex justify-centeritems-center items-center">
-          <select
-            name=""
-            id=""
-            class="w-[70%] h-[80%] border border-black ml-2"
-            v-model="pcond4">
-            <option value="0">선택</option>
-            <option :value="i.strBuyCode" v-for="i in optionList3">
-              {{ i.strBuyName }}
-            </option>
-          </select>
-        </div>
-        <div
-          class="text-base font-semibold border-l border-t border-black flex justify-center bg-gray-100 items-center">
-          신용카드
-        </div>
-        <div
-          class="text-base font-semibold border-l border-t border-black flex justify-centeritems-center items-center">
-          <input
-            type="text"
-            class="w-[70%] h-[80%] border border-black ml-2"
-            v-model="pcond6" />
-        </div>
-        <div
-          class="text-base font-semibold border-l border-t border-black flex justify-center bg-gray-100 items-center">
-          승인구분
-        </div>
-        <div
-          class="text-base font-semibold border-l border-t border-black flex justify-centeritems-center items-center">
-          <input
-            type="text"
-            class="w-[70%] h-[80%] border border-black ml-2"
-            v-model="pcond7" />
+            v-model="pcond24" />
         </div>
       </div>
 
@@ -192,10 +155,80 @@
 
         <button
           class="mt-4 w-full bg-gray-800 text-white py-2 rounded-xl"
-          @click="
-            visible = false;
-            initGrid();
-          ">
+          @click="visible = false">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    v-if="visible2"
+    class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+    <div class="bg-white rounded-2xl shadow-lg p-6 w-[30vw] h-[30vh]">
+      <h2 class="text-lg font-bold mb-4 text-center">상품권 출고 취소</h2>
+      <div class="grid grid-rows-[1fr,1fr,1fr,1fr] grid-cols-[1fr,3fr] h-[60%]">
+        <div
+          class="text-base font-semibold border-l border-t border-black flex justify-center items-center bg-gray-100">
+          <span class="text-red-500 text-xl">*</span>취소일자
+        </div>
+        <div
+          class="text-base font-semibold border-l border-t border-black flex justify-start items-center">
+          <input
+            type="date"
+            class="w-[80%] ml-3 h-[90%] border border-black"
+            v-model="pcond1" />
+        </div>
+        <div
+          class="text-base font-semibold border-l border-t border-black flex justify-center bg-gray-100 items-center">
+          <span class="text-red-500 text-xl">*</span>유형
+        </div>
+        <div
+          class="text-base font-semibold border-l border-t border-black flex justify-start pl-2 items-center">
+          <select
+            name=""
+            id=""
+            class="border ml-1 border-black w-[80%] h-[80%]"
+            v-model="pcond2">
+            <option value="0">선택</option>
+            <option value="10">출고</option>
+            <option value="12">분실</option>
+          </select>
+        </div>
+        <div
+          class="text-base font-semibold border-l border-t border-black flex justify-center bg-gray-100 items-center">
+          <span class="text-red-500 text-xl">*</span>시작번호
+        </div>
+        <div
+          class="text-base font-semibold border-l border-t border-black flex justify-start items-center">
+          <input
+            type="number"
+            class="w-[80%] ml-3 h-[90%] border border-black"
+            v-model="pcond3" />
+        </div>
+        <div
+          class="text-base font-semibold border-l border-t border-black flex justify-center bg-gray-100 items-center">
+          <span class="text-red-500 text-xl">*</span>끝번호
+        </div>
+        <div
+          class="text-base font-semibold border-l border-t border-black flex justify-centeritems-center items-center">
+          <input
+            type="number"
+            class="w-[80%] ml-3 h-[90%] border border-black"
+            v-model="pcond4" />
+        </div>
+      </div>
+
+      <div class="flex space-x-2">
+        <button
+          class="mt-4 w-full bg-gray-800 text-white py-2 rounded-xl"
+          @click="saveButton2">
+          저장
+        </button>
+
+        <button
+          class="mt-4 w-full bg-gray-800 text-white py-2 rounded-xl"
+          @click="visible2 = false">
           닫기
         </button>
       </div>
@@ -208,13 +241,11 @@
 <script setup>
 import { getCommonList } from "@/api/common";
 import {
-  cancelGftCardSale,
   getCreditCompanyList,
-  getGftLedgerCreateList,
-  getGftLedgerSaleList,
-  getInitGftData,
+  getGftLedgerReleaseList,
+  saveGftCardReleaseCancel,
+  saveGftCardReleaseEnroll,
   saveGftCardSaleEnroll,
-  saveNewGftCard,
 } from "@/api/micrm";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
@@ -262,14 +293,15 @@ import { useStore } from "vuex";
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
-  const res = await getCommonList(254);
+  const res = await getCommonList(297);
 
   optionList3.value = res.data.List;
-  const res2 = await getInitGftData(store.state.userData.lngStoreGroup);
+  //   const res2 = await getInitGftData(store.state.userData.lngStoreGroup);
 
-  optionList.value = res2.data.List;
-  optionList2.value = res2.data.List2;
+  //   optionList.value = res2.data.List;
+  //   optionList2.value = res2.data.List2;
 
+  pcond22.value = today.value.toISOString().split("T")[0];
   pcond1.value = today.value.toISOString().split("T")[0];
 });
 
@@ -280,13 +312,16 @@ const selectedCond = ref(0);
 const condValue = ref(0);
 const cond = ref(0);
 const cond2 = ref(null);
-
+const pcond21 = ref(0);
+const pcond22 = ref("");
+const pcond23 = ref("");
+const pcond24 = ref("");
 const today = ref(new Date());
 const cond3 = ref(0);
 const pcond1 = ref();
-const pcond2 = ref("");
+const pcond2 = ref("0");
 const pcond3 = ref("");
-const pcond4 = ref(0);
+const pcond4 = ref("");
 const pcond5 = ref(0);
 const pcond6 = ref("");
 const pcond7 = ref("");
@@ -315,13 +350,6 @@ const excelDate = (e) => {
   selectedDate.value = e;
 };
 
-const FileChange = (e) => {
-  const file = event.target.files[0];
-  if (file) {
-    cond2.value = file; // cond2에 파일 객체 저장
-    console.log("선택한 파일:", cond2.value);
-  }
-};
 /**
  * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
  */
@@ -338,6 +366,7 @@ const handleParentClick = (e) => {
  *  조회 함수
  */
 const visible = ref(false);
+const visible2 = ref(false);
 const addButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -354,7 +383,7 @@ const searchButton = async () => {
   if (sd.value == null || ed.value == null) {
     Swal.fire({
       title: "경고",
-      text: "생성일자을 선택하세요.",
+      text: "출고일자을 선택하세요.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -365,12 +394,12 @@ const searchButton = async () => {
     store.state.loading = true;
     initGrid();
 
-    const res = await getGftLedgerSaleList(
+    const res = await getGftLedgerReleaseList(
       store.state.userData.lngStoreGroup,
-      cond.value,
-      cond3.value,
+      selectedStores.value,
       sd.value,
-      ed.value
+      ed.value,
+      cond3.value
     );
     console.log(res);
     rowData.value = res.data.List;
@@ -387,19 +416,17 @@ const searchButton = async () => {
 /* 매장 컴포넌트 관련 함수 */
 const selectedGroup = ref();
 const selectedStores = ref();
+const selectedStores2 = ref();
 const selectedStoreAttrs = ref();
 
 const saveButton = async () => {
-  console.log(optionList3.value, optionList4.value);
   if (
-    selectedStores.value == 0 ||
-    pcond1.value == null ||
-    pcond2.value == null ||
-    pcond3.value == null ||
-    pcond2.value == undefined ||
-    pcond3.value == undefined ||
-    pcond4.value === 0 ||
-    pcond5.value === 0
+    selectedStores2.value == 0 ||
+    pcond21.value == "" ||
+    pcond21.value == undefined ||
+    pcond22.value == "0" ||
+    pcond23.value == "" ||
+    pcond24.value == ""
   ) {
     Swal.fire({
       title: "경고",
@@ -410,23 +437,55 @@ const saveButton = async () => {
     return;
   }
   try {
-    const res = await saveGftCardSaleEnroll(
+    const res = await saveGftCardReleaseEnroll(
       store.state.userData.lngStoreGroup,
-      selectedStores.value,
-      pcond1.value,
-      pcond2.value,
-      pcond3.value,
-      pcond5.value,
-      pcond4.value,
-      store.state.userData.lngSequence,
-      pcond6.value == null ? "" : pcond6.value,
-      pcond7.value == null ? "" : pcond7.value
+      selectedStores2.value,
+      pcond21.value,
+      pcond23.value,
+      pcond24.value,
+      pcond22.value,
+      store.state.userData.lngSequence
     );
     console.log(res);
   } catch (error) {
     console.log(error);
   } finally {
     visible.value = false;
+    initGrid();
+    searchButton();
+  }
+};
+
+const saveButton2 = async () => {
+  if (
+    pcond1.value == null ||
+    pcond1.value == undefined ||
+    pcond2.value == "0" ||
+    pcond3.value == "" ||
+    pcond4.value == ""
+  ) {
+    Swal.fire({
+      title: "경고",
+      text: "필수 사항이 누락되었습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  try {
+    const res = await saveGftCardReleaseCancel(
+      store.state.userData.lngStoreGroup,
+      pcond2.value,
+      pcond3.value,
+      pcond4.value,
+      pcond1.value,
+      store.state.userData.lngSequence
+    );
+    console.log(res);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    visible2.value = false;
     initGrid();
     searchButton();
   }
@@ -440,21 +499,12 @@ const lngStoreCode = async (e) => {
   selectedStores.value = e;
   console.log(e);
 };
+const lngStoreCode2 = async (e) => {
+  //initGrid();
+  selectedStores2.value = e;
+  console.log(e);
+};
 
-watch(selectedStores, async () => {
-  if (selectedStores.value == 0) {
-    return;
-  }
-  try {
-    const res = await getCreditCompanyList(
-      store.state.userData.lngStoreGroup,
-      selectedStores.value
-    );
-
-    optionList3.value = res.data.List;
-    pcond4.value = 0;
-  } catch (error) {}
-});
 /**
  * 그리드 초기화
  */
@@ -463,12 +513,14 @@ const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
   }
-  pcond1.value = null;
-  pcond2.value = null;
-  pcond3.value = null;
-  pcond4.value = null;
-  pcond5.value = null;
-  pcond6.value = null;
+  pcond21.value = 0;
+  pcond22.value = today.value.toISOString().split("T")[0];
+  pcond23.value = "";
+  pcond24.value = "";
+  pcond1.value = today.value.toISOString().split("T")[0];
+  pcond2.value = 0;
+  pcond3.value = "";
+  pcond4.value = "";
 };
 
 //엑셀 버튼 처리 함수
@@ -501,42 +553,7 @@ const clickedRowData = (e) => {
   selectedStoreCd.value = e[14];
 };
 const deleteButton = async (e) => {
-  if (
-    selectedCardNo.value == "" ||
-    selectedDate2.value == "" ||
-    selectedStoreCd.value == ""
-  ) {
-    Swal.fire({
-      title: "경고",
-      text: "취소할 대상을 선택해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-
-  try {
-    store.state.loading = true;
-    const res = await cancelGftCardSale(
-      store.state.userData.lngStoreGroup,
-      selectedStoreCd.value,
-      selectedDate2.value,
-      selectedCardNo.value,
-      store.state.userData.lngSequence
-    );
-    console.log(res);
-    Swal.fire({
-      title: "성공",
-      text: "취소가 완료되었습니다.",
-      icon: "success",
-      confirmButtonText: "확인",
-    });
-    return;
-  } catch (error) {
-  } finally {
-    store.state.loading = false;
-    searchButton();
-  }
+  visible2.value = true;
 };
 const excelStore = (e) => {
   selectedExcelStore.value = e;

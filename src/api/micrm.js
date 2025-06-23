@@ -1168,3 +1168,110 @@ export const saveGftCardSaleEnroll = (
     CARD_APPROVE_NO: cond9,
   });
 };
+export const cancelGftCardSale = (groupCd, cond, cond2, cond3, cond4) => {
+  return api2.post("/MICRM/CRM60_006INS.asmx/cancelGftCardSale", {
+    GROUP_CD: groupCd,
+    STORE_CD: cond,
+    DATE: cond2,
+    APPROVE_NO: cond3,
+    EMPSALE: cond4,
+  });
+};
+
+export const getGftLedgerReleaseList = (groupCd, cond, cond2, cond3, cond4) => {
+  return api2.post("/MICRM/CRM60_008INS.asmx/getGftLedgerReleaseList", {
+    GROUP_CD: groupCd,
+    STORE_CD: cond,
+    SDATE: cond2,
+    EDATE: cond3,
+    STATUS: cond4,
+  });
+};
+
+export const saveGftCardReleaseEnroll = (
+  groupCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6
+) => {
+  return api2.post("/MICRM/CRM60_008INS.asmx/saveGftCardReleaseEnroll", {
+    GROUP_CD: groupCd,
+    STORE_CD: cond,
+    STATUS: cond2,
+    CARD_NO: cond3,
+    CARD_NO_E: cond4,
+    DATE: cond5,
+    USERID: cond6,
+  });
+};
+export const saveGftCardReleaseCancel = (
+  groupCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5
+) => {
+  return api2.post("/MICRM/CRM60_008INS.asmx/saveGftCardReleaseCancel", {
+    GROUP_CD: groupCd,
+    STATUS: cond,
+    CARD_NO: cond2,
+    CARD_NO_E: cond3,
+    DATE: cond4,
+    USERID: cond5,
+  });
+};
+
+export const getGFTMaster = (groupCd) => {
+  return api2.post("/MICRM/CRM60_009INS.asmx/getGFTMaster", {
+    GROUP_CD: groupCd,
+  });
+};
+export const getGFTMaster2 = (groupCd, cond) => {
+  return api2.post("/MICRM/CRM60_009INS.asmx/getGFTMaster2", {
+    GROUP_CD: groupCd,
+    LNGGROUP: cond,
+  });
+};
+
+export const saveGftCardClientEnroll = (
+  groupCd,
+  group,
+  lngcode,
+  strname,
+  div,
+  saveflag
+) => {
+  return api2.post("/MICRM/CRM60_009INS.asmx/saveGftCardClientEnroll", {
+    GROUP_CD: groupCd,
+    GROUP: group,
+    LNGCODE: lngcode,
+    STRNAME: strname,
+    DIV: div,
+    SAVEFLAG: saveflag,
+  });
+};
+export const saveExcelDataGft = (
+  groupCd,
+  group,
+  lngcode,
+  strname,
+  div,
+  saveflag,
+  cond,
+  cond2
+) => {
+  return api2.post("/MICRM/CRM60_007INS.asmx/saveExcelDataGft", {
+    GROUP_CD: groupCd,
+    EMPNO: group,
+    AMOUNT: lngcode,
+    GFTCARDNO: strname,
+    SALEDATE: div,
+    FROMDATE: saveflag,
+    TODATE: cond,
+    SALESTORE: cond2,
+  });
+};

@@ -73,7 +73,7 @@
     class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
     <div class="bg-white rounded-2xl shadow-lg p-6 w-[40vw] h-[40vh]">
       <h2 class="text-lg font-bold mb-4 text-center">전자상품권 신규 생성</h2>
-      <div class="grid grid-rows-5 grid-cols-[1fr,3fr] h-[60%]">
+      <div class="grid grid-rows-4 grid-cols-[1fr,3fr] h-[60%]">
         <div
           class="text-base font-semibold border-l border-t border-black flex justify-center items-center bg-gray-100">
           <span class="text-red-500 text-xl">*</span>구분
@@ -108,7 +108,7 @@
             </option>
           </select>
         </div>
-        <div
+        <!-- <div
           class="text-base font-semibold border-l border-t border-black flex justify-center bg-gray-100 items-center">
           이미지
         </div>
@@ -119,7 +119,7 @@
             class="w-[80%] ml-3 h-[90%] border border-black"
             accept=".jpg, .jpeg, image/jpeg"
             @change="FileChange" />
-        </div>
+        </div> -->
         <div
           class="text-base font-semibold border-l border-t border-black flex justify-center bg-gray-100 items-center">
           <span class="text-red-500 text-xl">*</span>생성수량
@@ -352,9 +352,7 @@ const saveButton = async () => {
       store.state.userData.lngStoreGroup,
       pcond.value,
       pcond3.value,
-      cond2.value.name == null || cond2.value.name == undefined
-        ? ""
-        : cond2.value.name,
+      "",
       pcond4.value,
       cond4.value,
       1
