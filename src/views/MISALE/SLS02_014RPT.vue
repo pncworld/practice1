@@ -25,6 +25,7 @@
           @endDate="endDate"
           @startDate="startDate"
           :closePopUp="closePopUp"
+          class="ml-10"
           ref="datepicker"
           @excelDate="excelDate"></Datepicker2>
         <div

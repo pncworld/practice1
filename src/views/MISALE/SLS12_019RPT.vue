@@ -23,6 +23,7 @@
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
+          class="ml-10"
           :closePopUp="closePopUp"
           ref="datepicker"
           @excelDate="excelDate"></Datepicker2>

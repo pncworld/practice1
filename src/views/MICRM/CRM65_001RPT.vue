@@ -24,10 +24,11 @@
         <Datepicker2
           :mainName="'생성일자'"
           @startDate="startDate"
+          class="!pr-12"
           @excelDate="excelDate"
           @endDate="endDate"></Datepicker2>
       </div>
-      <div class="justify-center flex items-center !-mr-16">
+      <div class="justify-center flex items-center !ml-32 w-[60%]">
         <span class="text-base font-semibold">상품권구분 : </span>
         <select name="" id="" class="ml-4 w-40 h-8" v-model="cond">
           <option value="0">전체</option>
@@ -40,7 +41,7 @@
         <input type="checkbox" class="" v-model="cond2" />
         <Datepicker2
           :mainName="'회수일자'"
-          class="!pr-32"
+          class="!pr-52"
           @startDate="startDate2"
           @endDate="endDate2"></Datepicker2>
       </div>

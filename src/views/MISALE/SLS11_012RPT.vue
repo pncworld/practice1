@@ -27,6 +27,7 @@
             @startDate="startDate"
             :closePopUp="closePopUp"
             ref="datepicker"
+            class="ml-10"
             @excelDate="excelDate"
             :mainName="'일자'"></Datepicker2>
         </div>

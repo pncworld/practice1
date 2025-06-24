@@ -26,6 +26,7 @@
           @endDate="endDate"
           :closePopUp="closePopUp"
           ref="datepicker"
+          class="ml-10"
           @excelDate="excelDate"
           :mainName="'기간'" />
         <div class="flex justify-center items-center mr-36 ml-2">

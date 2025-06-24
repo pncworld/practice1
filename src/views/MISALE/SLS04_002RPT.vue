@@ -26,7 +26,7 @@
       class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-36 items-center z-10">
       <div class="grid grid-cols-1 grid-rows-4 -space-y-3 mt-12">
         <Datepicker2
-          class="pl-16 pr-4"
+          class="ml-9"
           @endDate="endDate"
           @startDate="startDate"
           :closePopUp="closePopUp"

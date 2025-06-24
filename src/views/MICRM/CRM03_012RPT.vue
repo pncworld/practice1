@@ -27,6 +27,7 @@
           :initToday="1"
           @endDate="endDate"
           ref="datepicker"
+          class="!pr-32"
           :closePopUp="closePopUp"
           @excelDate="excelDate"
           @startDate="startDate">

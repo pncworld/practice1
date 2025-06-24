@@ -25,7 +25,7 @@
         @endDate="endDate"
         @excelDate="excelDate"
         :initToday="1"
-        class="ml-5">
+        class="ml-10">
       </Datepicker2>
       <div
         class="flex justify-center items-center ml-72 mr-2 space-x-3 text-nowrap">

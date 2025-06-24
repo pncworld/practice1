@@ -30,7 +30,7 @@
               class="ml-20 mt-5" />
           </label>
           <Datepicker2
-            class="pr-52"
+            class="!pr-32"
             @startDate="startDate"
             @endDate="endDate"
             @acceptDate="acceptDate"

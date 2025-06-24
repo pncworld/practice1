@@ -1,6 +1,5 @@
 <template>
-  <div
-    class="flex justify-center items-center space-x-3 w-[500px] pl-20 pr-2 ml-9">
+  <div class="flex justify-center items-center space-x-3 w-[500px] pl-44 pr-2">
     <div
       class="w-auto font-semibold flex items-center text-nowrap text-base ml-20">
       {{ mainName }} :
@@ -449,17 +448,11 @@ watch(
 const changeStartDate = (e) => {
   const date1 = new Date(e.target.value);
   const date2 = new Date(selectedEndDate.value);
-  if (date1.getTime() > date2.getTime()) {
-    Swal.fire({
-      title: "시작일이 종료일을 앞섭니다.",
-      text: "시작일과 종료일을 다시 선택하세요.",
-      icon: "error",
-      confirmButtonText: "확인",
-    });
-    selectedStartDate.value = tempStartDateStack.pop();
-    tempStartDateStack.push(selectedStartDate.value);
-    selectedEndDate.value = tempEndDateStack.pop();
-    tempEndDateStack.push(selectedEndDate.value);
+  if (date1.getTime() > date2.getTime() && date1.getFullYear() >= 2000) {
+    // selectedStartDate.value = tempStartDateStack.pop();
+    // tempStartDateStack.push(selectedStartDate.value);
+    selectedEndDate.value = selectedStartDate.value;
+    //  tempEndDateStack.push(selectedEndDate.value);
     emit(
       "excelDate",
       mainName.value +
@@ -469,9 +462,19 @@ const changeStartDate = (e) => {
         selectedEndDate.value
     );
     return;
+  } else if (1000 < date1.getFullYear()) {
+    selectedStartDate.value = new Date().toISOString().split("T")[0];
+    emit(
+      "excelDate",
+      mainName.value +
+        " : " +
+        selectedStartDate.value +
+        "~" +
+        selectedEndDate.value
+    );
   } else {
-    tempStartDateStack.push(e.target.value);
-    tempEndDateStack.push(selectedEndDate.value);
+    // tempStartDateStack.push(e.target.value);
+    // tempEndDateStack.push(selectedEndDate.value);
     emit(
       "excelDate",
       mainName.value +
@@ -486,17 +489,18 @@ const changeStartDate = (e) => {
 const changeEndDate = (e) => {
   const date1 = new Date(selectedStartDate.value);
   const date2 = new Date(e.target.value);
-  if (date1.getTime() > date2.getTime()) {
-    Swal.fire({
-      title: "시작일이 종료일을 앞섭니다.",
-      text: "시작일과 종료일을 다시 선택하세요.",
-      icon: "error",
-      confirmButtonText: "확인",
-    });
-    selectedStartDate.value = tempStartDateStack.pop();
-    tempStartDateStack.push(selectedStartDate.value);
-    selectedEndDate.value = tempEndDateStack.pop();
-    tempEndDateStack.push(selectedEndDate.value);
+  console.log(date2.getFullYear());
+  if (date1.getTime() > date2.getTime() && date2.getFullYear() >= 2000) {
+    // Swal.fire({
+    //   title: "시작일이 종료일을 앞섭니다.",
+    //   text: "시작일과 종료일을 다시 선택하세요.",
+    //   icon: "error",
+    //   confirmButtonText: "확인",
+    // });
+    selectedStartDate.value = selectedEndDate.value;
+    // tempStartDateStack.push(selectedStartDate.value);
+    // selectedEndDate.value = tempEndDateStack.pop();
+    // tempEndDateStack.push(selectedEndDate.value);
     emit(
       "excelDate",
       mainName.value +
@@ -506,9 +510,19 @@ const changeEndDate = (e) => {
         selectedEndDate.value
     );
     return;
+  } else if (1000 < date2.getFullYear()) {
+    selectedEndDate.value = new Date().toISOString().split("T")[0];
+    emit(
+      "excelDate",
+      mainName.value +
+        " : " +
+        selectedStartDate.value +
+        "~" +
+        selectedEndDate.value
+    );
   } else {
-    tempStartDateStack.push(selectedStartDate.value);
-    tempEndDateStack.push(e.target.value);
+    // tempStartDateStack.push(selectedStartDate.value);
+    // tempEndDateStack.push(e.target.value);
     emit(
       "excelDate",
       mainName.value +

@@ -24,6 +24,7 @@
         @dateValue="dateValue"
         @year="year"
         @month="month"
+        class="ml-36"
         @day="day"
         @excelDate="excelDate"></Datepicker1>
       <div class="flex justify-center items-center ml-28 mr-3 space-x-3">

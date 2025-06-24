@@ -16,7 +16,7 @@
     </div>
     <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-32 items-center z-10">
       <div class="grid grid-cols-1 grid-rows-3">
-        <Datepicker2 class="ml-4" @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker" @excelDate="excelDate"></Datepicker2>
+        <Datepicker2    class="ml-10" @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker" @excelDate="excelDate"></Datepicker2>
         <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-44 "> 매입사 : 
           <div class="flex ml-7 space-x-3 mt-1">
             <v-select v-model="selectCardCorp" :options="cardCorp" placeholder="전체" label="strBuyName" class="w-48 !h-8 bg-white " clearable="true"/>

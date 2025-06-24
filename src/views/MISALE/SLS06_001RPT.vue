@@ -36,7 +36,7 @@
             ref="datepicker"
             :selectedGroup="selectedGroup"
             @excelDate="excelDate"
-            class="pr-72"></Datepicker2>
+            class="pr-56"></Datepicker2>
         </div>
         <div
           class="flex justify-start items-center text-base text-nowrap font-semibold ml-36 pl-1">

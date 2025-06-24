@@ -26,6 +26,7 @@
       <Datepicker2
         @endDate="endDate"
         @startDate="startDate"
+        class="ml-10"
         @excelDate="excelDate"></Datepicker2>
       <div
         class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 pl-1">

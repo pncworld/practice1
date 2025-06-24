@@ -23,6 +23,7 @@
       <div class="grid grid-cols-1 grid-rows-3 mt-5">
         <Datepicker2
           @endDate="endDate"
+          class="ml-10"
           @startDate="startDate"
           :closePopUp="closePopUp"
           ref="datepicker"
