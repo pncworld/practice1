@@ -289,7 +289,7 @@ const searchButton = async () => {
     let res;
 
     res = await getAllPayList(groupCd.value, storeCd.value);
-    //comsole.log(res);
+    console.log(res);
     rowData.value = res.data.PAYCODE;
     rowData2.value = res.data.STOREPAYCODE;
     validatearr.value = JSON.parse(JSON.stringify(rowData2.value));

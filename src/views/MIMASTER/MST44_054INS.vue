@@ -624,6 +624,9 @@ const searchButton = async () => {
     AllscreenKeyPage.value = Math.ceil(ScreenKeyOrigin.value.length / 4);
     confirmitem.value = JSON.parse(JSON.stringify(KeyList.value));
     confirmitem2.value = JSON.parse(JSON.stringify(ScreenKeyOrigin.value));
+
+    console.log(res4);
+    console.log(res2);
   } catch (error) {
     afterSearch.value = false;
   } finally {
@@ -1024,8 +1027,9 @@ const confirmScreenKey = () => {
         //comsole.log(ScreenKeyOrigin.value[index].itemDiscYn);
         //comsole.log(currentProduct.value);
         if (ScreenKeyOrigin.value[index].itemDiscYn != currentProduct.value) {
+          console.log(clickedScreenNo.value);
           KeyList.value = KeyList.value.filter(
-            (item) => item.intScreenNo !== clickedScreenNo.value
+            (item) => item.intScreenNo != clickedScreenNo.value
           );
         }
 
@@ -1033,7 +1037,7 @@ const confirmScreenKey = () => {
         ScreenKeyOrigin.value[index].itemDiscYn = currentProduct.value;
 
         changeScreenKey.value = false;
-        //comsole.log(ScreenKeyOrigin.value);
+        console.log(KeyList.value);
         addfor4ScreenKey();
         currentscreenKeyNm.value = "";
         showKeys(clickedScreenNo.value);

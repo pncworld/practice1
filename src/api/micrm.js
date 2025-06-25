@@ -505,6 +505,11 @@ export const getInitCouponType = (groupcd) => {
     GROUP_CD: groupcd,
   });
 };
+export const getInitCouponType2 = (groupcd) => {
+  return api2.post("/MICRM/CRM11_013RPT.asmx/getInitCouponType2", {
+    GROUP_CD: groupcd,
+  });
+};
 
 export const getCustCouponAnalyInfo = (
   groupcd,
@@ -1273,5 +1278,163 @@ export const saveExcelDataGft = (
     FROMDATE: saveflag,
     TODATE: cond,
     SALESTORE: cond2,
+  });
+};
+
+export const getPromoCouponList = (
+  groupcd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5
+) => {
+  return api2.post("/MICRM/CRM11_006RPT.asmx/getPromoCouponList", {
+    GROUP_CD: groupcd,
+    CUST_NO: cond,
+    COUPON_NO: cond2,
+    SDATE: cond3,
+    EDATE: cond4,
+    COUPON_ID: cond5,
+  });
+};
+export const saveExtendExpireDate = (
+  groupcd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5
+) => {
+  return api2.post("/MICRM/CRM11_006RPT.asmx/saveExtendExpireDate", {
+    GROUP_CD: groupcd,
+    CUST_NO: cond,
+    COUPON_NO: cond2,
+    MEMBER_DIV: cond3,
+    DATE: cond4,
+    USER_ID: cond5,
+  });
+};
+export const getSMSSendList = (
+  groupcd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  cond9,
+  cond10,
+  cond11,
+  cond12
+) => {
+  return api2.post("/MICRM/CRM11_007RPT.asmx/getSMSSendList", {
+    GROUP_CD: groupcd,
+    STORE_CD: cond,
+    JOIN_TYPE: cond2,
+    TEAM_CODE: cond3,
+    SUPERVISOR: cond4,
+    STRYM: cond5,
+    DATETYPE: cond6,
+    SDATE: cond7,
+    EDATE: cond8,
+    STRHP: cond9,
+    SENDRESULT: cond10,
+    SMSTYPE: cond11,
+    CALLBACK: cond12,
+  });
+};
+
+export const getReceiptEventList = (
+  groupcd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7
+) => {
+  return api2.post("/MICRM/CRM10_004RPT.asmx/getReceiptEventList", {
+    GROUP_CD: groupcd,
+    STORE_CD: cond,
+    JOIN_TYPE: cond2,
+    SUPERVISOR: cond3,
+    TEAM_CODE: cond4,
+    SDATE: cond5,
+    EDATE: cond6,
+    TYPE: cond7,
+  });
+};
+
+export const getEventCouponList = (
+  groupcd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5
+) => {
+  return api2.post("/MICRM/CRM11_013RPT.asmx/getEventCouponList", {
+    GROUP_CD: groupcd,
+    MOBILE: cond,
+    COUPON_NO: cond2,
+    SDATE: cond3,
+    EDATE: cond4,
+    TYPE: cond5,
+  });
+};
+
+export const saveExtendEventExpireDate = (groupcd, cond, cond2, cond3) => {
+  return api2.post("/MICRM/CRM11_013RPT.asmx/saveExtendEventExpireDate", {
+    GROUP_CD: groupcd,
+    MOBILE: cond,
+    COUPON_NO: cond2,
+    DATE: cond3,
+  });
+};
+
+export const getKakaoAlarmDetail = (
+  groupcd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7
+) => {
+  return api2.post("/MICRM/CRM40_056RPT.asmx/getKakaoAlarmDetail", {
+    GROUP_CD: groupcd,
+    STORE_CD: cond,
+    JOIN_TYPE: cond2,
+    SUPERVISOR: cond3,
+    TEAM_CODE: cond4,
+    SDATE: cond5,
+    EDATE: cond6,
+    TYPE: cond7,
+  });
+};
+export const getKakaoAlarmAgg = (
+  groupcd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7
+) => {
+  return api2.post("/MICRM/CRM40_057RPT.asmx/getKakaoAlarmAgg", {
+    GROUP_CD: groupcd,
+    STORE_CD: cond,
+    JOIN_TYPE: cond2,
+    SUPERVISOR: cond3,
+    TEAM_CODE: cond4,
+    SDATE: cond5,
+    EDATE: cond6,
+    TYPE: cond7,
   });
 };

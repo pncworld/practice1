@@ -953,6 +953,7 @@ const emit = defineEmits([
   "realgridName",
   "allStateRows",
   "buttonClicked",
+  "clickedButtonCol",
 ]);
 // 3구간
 const funcshowGrid = async () => {
@@ -1351,7 +1352,9 @@ const funcshowGrid = async () => {
     visible: item.intHdWidth !== 0,
     renderer: {
       type:
-        item.strColID == "add"
+        item.strColID == "add" ||
+        item.strColID == "add1" ||
+        item.strColID == "add2"
           ? "button"
           : item.strColID.includes("checkbox") ||
             (item.strColID.includes("lngSupplierID") &&
@@ -2079,11 +2082,12 @@ const funcshowGrid = async () => {
     if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
       return;
     }
-
+    console.log(clickData);
     var current = gridView.getCurrent();
     selectedindex.value = current.dataRow;
     selectedRowData.value = dataProvider.getRows()[current.dataRow];
     emit("buttonClicked", selectedRowData.value);
+    emit("clickedButtonCol", clickData.fieldName);
     emit("selcetedrowData", selectedRowData.value);
     emit("selectedIndex", clickData.dataRow);
     emit("selectedIndex2", clickData.dataRow);

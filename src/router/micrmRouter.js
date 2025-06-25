@@ -16,6 +16,7 @@ import CRM05_003RPT from "@/views/MICRM/CRM05_003RPT.vue";
 import CRM05_004RPT from "@/views/MICRM/CRM05_004RPT.vue";
 import CRM05_007INS from "@/views/MICRM/CRM05_007INS.vue";
 import CRM05_008INS from "@/views/MICRM/CRM05_008INS.vue";
+import CRM10_004RPT from "@/views/MICRM/CRM10_004RPT.vue";
 import CRM10_007INS_shy from "@/views/MICRM/CRM10_007INS_shy.vue";
 import CRM10_019INS from "@/views/MICRM/CRM10_019INS.vue";
 import CRM10_020INS from "@/views/MICRM/CRM10_020INS.vue";
@@ -24,6 +25,9 @@ import CRM10_022RPT from "@/views/MICRM/CRM10_022RPT.vue";
 import CRM10_023RPT from "@/views/MICRM/CRM10_023RPT.vue";
 import CRM10_024RPT from "@/views/MICRM/CRM10_024RPT.vue";
 import CRM10_025RPT from "@/views/MICRM/CRM10_025RPT.vue";
+import CRM11_006RPT from "@/views/MICRM/CRM11_006RPT.vue";
+import CRM11_007RPT from "@/views/MICRM/CRM11_007RPT.vue";
+import CRM11_013RPT from "@/views/MICRM/CRM11_013RPT.vue";
 import CRM20_005RPT from "@/views/MICRM/CRM20_005RPT.vue";
 import CRM20_006RPT from "@/views/MICRM/CRM20_006RPT.vue";
 import CRM20_007RPT from "@/views/MICRM/CRM20_007RPT.vue";
@@ -31,6 +35,8 @@ import CRM20_009RPT from "@/views/MICRM/CRM20_009RPT.vue";
 import CRM20_010RPT from "@/views/MICRM/CRM20_010RPT.vue";
 import CRM20_012INS from "@/views/MICRM/CRM20_012INS.vue";
 import CRM20_013RPT from "@/views/MICRM/CRM20_013RPT.vue";
+import CRM40_056RPT from "@/views/MICRM/CRM40_056RPT.vue";
+import CRM40_057RPT from "@/views/MICRM/CRM40_057RPT.vue";
 import CRM60_004INS from "@/views/MICRM/CRM60_004INS.vue";
 import CRM60_006INS from "@/views/MICRM/CRM60_006INS.vue";
 import CRM60_007INS from "@/views/MICRM/CRM60_007INS.vue";
@@ -206,6 +212,30 @@ export default function micrmRouter() {
     {
       path: "CRM60_007INS.xml",
       component: CRM60_007INS,
+    },
+    {
+      path: "CRM11_006RPT.xml",
+      component: CRM11_006RPT,
+    },
+    {
+      path: "CRM11_007RPT.xml",
+      component: CRM11_007RPT,
+    },
+    {
+      path: "CRM10_004RPT.xml",
+      component: CRM10_004RPT,
+    },
+    {
+      path: "CRM11_013RPT.xml",
+      component: CRM11_013RPT,
+    },
+    {
+      path: "CRM40_056RPT.xml",
+      component: CRM40_056RPT,
+    },
+    {
+      path: "CRM40_057RPT.xml",
+      component: CRM40_057RPT,
     },
   ];
 }

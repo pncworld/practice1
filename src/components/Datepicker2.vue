@@ -462,7 +462,7 @@ const changeStartDate = (e) => {
         selectedEndDate.value
     );
     return;
-  } else if (1000 < date1.getFullYear()) {
+  } else if (1000 < date1.getFullYear() && date1.getFullYear() < 2000) {
     selectedStartDate.value = new Date().toISOString().split("T")[0];
     emit(
       "excelDate",
@@ -510,7 +510,7 @@ const changeEndDate = (e) => {
         selectedEndDate.value
     );
     return;
-  } else if (1000 < date2.getFullYear()) {
+  } else if (1000 < date2.getFullYear() && date2.getFullYear() < 2000) {
     selectedEndDate.value = new Date().toISOString().split("T")[0];
     emit(
       "excelDate",
