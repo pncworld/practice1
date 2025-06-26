@@ -105,6 +105,7 @@
     class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
     <PickStore
       @update:storeGroup="lngStoreGroup"
+      @update:storeCd="handleStoreCd"
       @storeNm="handlestoreNm"
       :hidesub="false"
       :hideAttr="false"
@@ -936,6 +937,11 @@ const isNew = ref(false);
 const lngStoreGroup = (e) => {
   groupCd.value = e;
 };
+
+const lngStoreCode = (e) => {
+  console.log(e);
+  nowStoreCd.value = e;
+};
 const initCheckColumn = ref("menuCd");
 const disCountGroup = ref([]);
 const approveGroup = ref([]);
@@ -946,11 +952,11 @@ const initCheckAct = ref(false);
 const uncheckValue = ref();
 const uncheckAct = ref(false);
 const labelsData = ref([
-  ["할인", "지불", "할증"],
+  ["할인", "지불", "할증", "적립"],
   ["사용", "미사용"],
 ]);
 const valuesData = ref([
-  ["1", "2", "3"],
+  ["1", "2", "3", "4"],
   ["0", "1"],
 ]);
 const discountMenuShow = ref(false);
@@ -1301,7 +1307,7 @@ const searchButton = async () => {
     filteredrowData3.value = [];
     rowData.value = [...rowData.value];
     filteredrowData3.value = [...filteredrowData3.value];
-    const res = await getPayCodeEnrollInfo(groupCd.value, 0);
+    const res = await getPayCodeEnrollInfo(groupCd.value, nowStoreCd.value);
 
     rowData.value = res.data.PAYCODE;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
@@ -1314,8 +1320,13 @@ const searchButton = async () => {
     taxs.value = res.data.TAX;
     disCountGroup.value = res.data.DISGROUP;
     approveGroup.value = res.data.APPROVE;
-    const res2 = await getMenuListIncludeCommon(groupCd.value, 0);
-    console.log(res2.data.menuList);
+    const res2 = await getMenuListIncludeCommon(
+      groupCd.value,
+      nowStoreCd.value
+    );
+    console.log(res);
+    console.log(res2);
+    // console.log(res2.data.menuList);
     rowData2.value = res2.data.menuList;
     SubMenuGroup.value = res2.data.submenuGroup;
     MenuGroup.value = res2.data.menuGroup;

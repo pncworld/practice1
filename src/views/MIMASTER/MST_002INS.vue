@@ -634,6 +634,8 @@ const searchButton = async () => {
       posNo.value,
       nowStoreAreaCd.value
     );
+
+    console.log(res2);
     tableList.value = res2.data.TABLELISTS;
     //comsole.log(tableList.value);
     filteredtableList.value = tableList.value

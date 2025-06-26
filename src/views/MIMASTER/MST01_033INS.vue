@@ -256,7 +256,7 @@
                 "
                 v-model="gridvalue1"
                 :disabled="afterClick">
-                <option value="0">전체</option>
+                <option value="0">선택</option>
                 <option :value="i.GroupCd" v-for="i in MenuGroup">
                   [{{ i.GroupCd }}]{{ i.majorGroupNm }}
                 </option>
@@ -268,7 +268,7 @@
                 v-model="gridvalue2"
                 @change="changeInfo"
                 :disabled="afterClick">
-                <option value="0">전체</option>
+                <option value="0">선택</option>
                 <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup2">
                   [{{ i.GroupCd }}]{{ i.subGroupNm }}
                 </option>
@@ -367,7 +367,7 @@
                 class="disabled:bg-gray-100 border rounded-lg w-[50%] h-full p-1"
                 v-model="gridvalue9"
                 @change="changeInfo">
-                <option value="0">[0]선택</option>
+                <option value="">선택</option>
                 <option :value="i.lngCode" v-for="i in optionGroup">
                   [{{ i.lngCode }}]{{ i.strName }}
                 </option>
@@ -629,7 +629,7 @@
                   id="receipt1"
                   name="blnReceipt"
                   v-model="gridvalue20"
-                  value="0"
+                  value="1"
                   @input="changeInfo"
                   :disabled="afterClick"
                   class="disabled:bg-gray-200" />예</label
@@ -639,7 +639,7 @@
                   id="receipt2"
                   name="blnReceipt"
                   v-model="gridvalue20"
-                  value="1"
+                  value="0"
                   @input="changeInfo"
                   :disabled="afterClick"
                   class="disabled:bg-gray-200" />아니오</label
@@ -656,7 +656,6 @@
                 v-model="gridvalue21"
                 @change="changeInfo"
                 :disabled="afterClick">
-                <option value="">선택</option>
                 <option :value="i.strDCode" v-for="i in menuOrderOption">
                   [{{ i.strDCode }}]{{ i.strDName }}
                 </option>
@@ -672,7 +671,7 @@
                   id="discountfor1"
                   name="blnRedPrint"
                   v-model="gridvalue22"
-                  value="0"
+                  value="1"
                   @input="changeInfo"
                   :disabled="afterClick"
                   class="disabled:bg-gray-200" />전체 선택</label
@@ -682,7 +681,7 @@
                   id="discountfor2"
                   name="blnRedPrint"
                   v-model="gridvalue22"
-                  value="1"
+                  value="0"
                   @input="changeInfo"
                   :disabled="afterClick"
                   class="disabled:bg-gray-200" />부분 선택</label
@@ -742,7 +741,7 @@
                 :disabled="afterClick"
                 v-model="gridvalue25"
                 @change="changeInfo">
-                <option :value="0">선택</option>
+                <option value="">선택</option>
                 <option :value="i.lngCode" v-for="i in subTitle">
                   {{ i.strName }}
                 </option>
@@ -1555,7 +1554,7 @@ const changeInfo = (e) => {
 };
 const searchColValue3 = ref("0,0");
 const filteredSubMenuGroup = ref([]);
-const searchValue = ref([]);
+const searchValue = ref([-1, -1]);
 /**
  * 조회 조건 설정
  */
@@ -1658,7 +1657,7 @@ const addRow = () => {
   const today = new Date();
   const formattedDate = today.toLocaleDateString("en-CA");
   addrowProp.value =
-    "lngMainGroup,lngSubGroup,dtmFromDate,dtmToDate,strName,lngPrice,lngTax,blnInactive,strAmtCodeList";
+    "lngMainGroup,lngSubGroup,dtmFromDate,dtmToDate,strName,lngPrice,lngTax,blnInactive,strAmtCodeList,lngDCPrice,lngChain,blnDCPriceYN,lngDiscount,intCustCount,lngOrder,blnReceipt,lngMenuOption,blnRedPrint,strIcon,blnKitSingle,lngSubTitle,blnServing,blnOpen,blnDeliveryYN";
   addrowDefault.value =
     "0,0," +
     formattedDate +
@@ -1673,7 +1672,37 @@ const addRow = () => {
     "," +
     "0" +
     "," +
-    " ";
+    "0" +
+    "," +
+    "0" +
+    "," +
+    "" + // lngChain
+    "," +
+    "0" +
+    "," +
+    "0" +
+    "," +
+    "0" +
+    "," +
+    "0" +
+    "," +
+    "0" +
+    "," +
+    "0" +
+    "," +
+    "0" +
+    "," +
+    "" +
+    "," +
+    "0" +
+    "," +
+    "" +
+    "," +
+    "0" +
+    "," +
+    "0" +
+    "," +
+    "0";
 
   //comsole.log(addrowProp.value);
   addRow4.value = !addRow4.value;
@@ -1747,9 +1776,9 @@ const saveButton = () => {
       item.strName === "" ||
       item.strName === undefined ||
       item.lngMainGroup === undefined ||
-      item.lngMainGroup === 0 ||
+      item.lngMainGroup == 0 ||
       item.lngSubGroup === undefined ||
-      item.lngSubGroup === 0 ||
+      item.lngSubGroup == 0 ||
       item.dtmToDate === undefined ||
       item.dtmFromDate === undefined ||
       item.lngPrice === undefined ||
@@ -1850,7 +1879,7 @@ const saveButton = () => {
           filterAndMap("strUserFileName"),
           deleteCd.join(",")
         );
-        //comsole.log(res);
+        console.log(res);
 
         //comsole.log(updatedAndInsertRow);
 
@@ -2060,8 +2089,13 @@ const initAll = () => {
   selectedMenu.value = 1;
   clickrowData4.value = [];
   filteredrowData5.value = [];
-  rowData.value = [];
-  rowData2.value = [];
+  if (rowData.value.length > 0) {
+    rowData.value = [];
+  }
+  if (rowData2.value.length > 0) {
+    rowData2.value = [];
+  }
+
   clickrowData2.value = [];
   updateRow.value = [];
   forsearchMain.value = -1;

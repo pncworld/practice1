@@ -454,9 +454,10 @@ export const saveKitchenGroupList = (
     ID: loginid,
   });
 };
-export const saveMenuKPG = (groupCd, lngCodes, lngkpg) => {
+export const saveMenuKPG = (groupCd, storeCd, lngCodes, lngkpg) => {
   return api2.post("/MIMASTER/MST44_064INS.asmx/saveMenuKPG", {
     GROUP_CD: groupCd,
+    STORE_CD: storeCd,
     LNG_CODE: lngCodes,
     LNG_KPG: lngkpg,
   });

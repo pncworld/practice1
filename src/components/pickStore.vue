@@ -455,6 +455,7 @@ onMounted(() => {
   emit("update:storeGroup", store.state.userData.lngStoreGroup);
   emit("update:storeType", store.state.userData.lngJoinType);
   emit("update:storeCd", selectedStoreCode.value);
+
   emit("storeNm", store.state.userData.strStoreName);
   emit("posNo", 0);
   emit("updateFuncScreenType", 0);

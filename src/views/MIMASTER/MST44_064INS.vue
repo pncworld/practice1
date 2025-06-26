@@ -192,6 +192,7 @@
             :changeRow="changeRow"
             :changeValue2="changeValue"
             :changeNow="changeNow2"
+            :rowStateeditable="rowStateeditable"
             @updatedRowData="updatedRowData2"
             @realgridname="realgridname"></Realgrid>
         </div>
@@ -948,25 +949,33 @@ const showMenus = async (value) => {
     hidesub.value = false;
   } else if (value == 2) {
     currentMenu.value = 2;
-    hidesub.value = false;
+    if (store.state.userData.lngCommonMenu == "1") {
+      hidesub.value = false;
 
-    const res = await getMenuCodeEnroll(groupCd.value, 0);
+      //  hideAttr.value = false;
+    } else {
+      hidesub.value = true;
+      //  hideAttr.value = true;
+    }
+
+    const res = await getMenuCodeEnroll(groupCd.value, nowStoreCd.value);
     //comsole.log(res);
     rowData2.value = res.data.MENULIST;
     updatedList2.value = JSON.parse(JSON.stringify(rowData2.value));
-    const res2 = await getMenuList(groupCd.value, 0);
+    const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
     //rowData2.value = res2.data.menuList
     SubMenuGroup.value = res2.data.submenuGroup;
     MenuGroup.value = res2.data.menuGroup;
-
-    const res3 = await getKitchenGroupList2(groupCd.value, 0);
+    console.log(MenuGroup.value);
+    console.log(res2);
+    const res3 = await getKitchenGroupList2(groupCd.value, nowStoreCd.value);
 
     KitchenGroup.value = res3.data.List;
     afterSearch2.value = true;
   } else {
     currentMenu.value = 3;
-
-    const res3 = await getKitchenGroupList2(groupCd.value, 0);
+    nowStoreCd.value = saveStoreCode.value;
+    const res3 = await getKitchenGroupList2(groupCd.value, nowStoreCd.value);
 
     KitchenGroup.value = res3.data.List;
     hidesub.value = true;
@@ -1020,8 +1029,9 @@ const afterCategory = ref(false);
 /**
  * 페이지 매장 코드 세팅
  */
-
+const saveStoreCode = ref("");
 const handleStoreCd = async (newValue) => {
+  saveStoreCode.value = newValue;
   //   afterSearch.value = false;
   //   rowData2.value = [];
   //   KDSSettingList.value = [];
@@ -1030,7 +1040,18 @@ const handleStoreCd = async (newValue) => {
   //   MenuGroup.value = [];
   //   SubMenuGroup.value = [];
   //   ischecked.value = false;
-  nowStoreCd.value = newValue;
+  if (store.state.userData.lngCommonMenu == "1" && currentMenu.value !== 3) {
+    nowStoreCd.value = 0;
+  } else if (
+    store.state.userData.lngCommonMenu == "0" &&
+    currentMenu.value !== 3
+  ) {
+    nowStoreCd.value = newValue;
+  } else {
+    nowStoreCd.value = newValue;
+  }
+
+  //console.log(newValue);
   afterClick2.value = true;
   afterClick.value = true;
   afterClick3.value = true;
@@ -1206,6 +1227,7 @@ const searchButton = async () => {
   changeMode.value = false;
   Category.value = [];
   items.value = [];
+  console.log(nowStoreCd.value);
   if (currentMenu.value == 3) {
     if (nowStoreCd.value == "0" || nowStoreCd.value == undefined) {
       Swal.fire({
@@ -1235,13 +1257,26 @@ const searchButton = async () => {
       confirmitem.value = JSON.parse(JSON.stringify(rowData.value));
       afterSearch.value = true;
     } else if (currentMenu.value == 2) {
-      const res = await getMenuCodeEnroll(groupCd.value, 0);
-      //comsole.log(res);
+      if (store.state.userData.lngCommonMenu == "1") {
+        nowStoreCd.value = 0;
+      }
+      const res = await getMenuCodeEnroll(groupCd.value, nowStoreCd.value);
+      console.log(res);
       rowData2.value = res.data.MENULIST;
       updatedList2.value = JSON.parse(JSON.stringify(rowData2.value));
       confirmitem2.value = JSON.parse(JSON.stringify(rowData2.value));
       // updatedList2.value = rowData.value;
       afterSearch2.value = true;
+
+      const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
+      //rowData2.value = res2.data.menuList
+      SubMenuGroup.value = res2.data.submenuGroup;
+      MenuGroup.value = res2.data.menuGroup;
+      console.log(MenuGroup.value);
+      console.log(res2);
+      const res3 = await getKitchenGroupList2(groupCd.value, nowStoreCd.value);
+
+      KitchenGroup.value = res3.data.List;
     } else {
       //comsole.log(groupCd.value, nowStoreCd.value, nowStoreAreaCd.value);
       const res = await getKitchenPortList(
@@ -1262,7 +1297,7 @@ const searchButton = async () => {
     store.state.loading = false;
   } finally {
     //comsole.log(KDSList.value);
-
+    nowStoreCd.value = saveStoreCode.value;
     ischecked.value = false;
 
     store.state.loading = false; // 로딩 상태 종료
@@ -1277,6 +1312,8 @@ const searchButton = async () => {
     afterClick2.value = true;
     afterClick3.value = true;
     tempDisabled2.value = true;
+    forsearchSub.value = -1;
+    forsearchMain.value = -1;
   }
 };
 const filteredSubMenuGroup = ref([]);
@@ -1458,9 +1495,11 @@ const saveButton = async () => {
           );
           res = await saveMenuKPG(
             groupCd.value,
+            nowStoreCd.value,
             filteredSave.map((item) => item.lngCode).join("\u200B"),
             filteredSave.map((item) => item.lngKPG).join("\u200B")
           );
+          console.log(res);
         } else if (currentMenu.value == 3) {
           updatedList3.value;
 

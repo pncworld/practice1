@@ -52,7 +52,7 @@ Author : 권맑음                     
   <span
     class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[700px] z-40">
     <h1 class="font-bold text-xl z-40">
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;객체키 설정
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;객층키 설정
     </h1>
     <span class="flex space-x-3 ml-32 pl-56 items-center"
       >순서변경 &nbsp; &nbsp;<label class="z-40"

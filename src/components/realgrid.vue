@@ -2381,7 +2381,7 @@ watch(
     let criteria3 = `(value match '${props.searchWord3}')`;
 
     let criteria4 = props.searchSpecialColId;
-
+    console.log(props.searchWord3, props.searchValue, props.searchColId);
     let filter4 = [
       {
         name: "미설정메뉴",

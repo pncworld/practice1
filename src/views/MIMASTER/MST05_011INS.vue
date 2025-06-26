@@ -654,16 +654,29 @@ const afterCategory = ref(false);
  */
 
 const handleStoreCd = async (newValue) => {
+  nowStoreCd.value = newValue;
+  if (store.state.userData.lngCommonMenu == "1") {
+    const res2 = await getMenuList(groupCd.value, 0);
+
+    //comsole.log(res2);
+    MenuList.value = res2.data.menuList;
+    MenuGroup.value = res2.data.menuGroup;
+    SubMenuGroup.value = res2.data.submenuGroup;
+  } else {
+    const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
+
+    //comsole.log(res2);
+    MenuList.value = res2.data.menuList;
+    MenuGroup.value = res2.data.menuGroup;
+    SubMenuGroup.value = res2.data.submenuGroup;
+  }
+
   if (newValue == "0") {
     afterSearch.value = false;
+    if (MenuList.value.length > 0) {
+      MenuList.value = [];
+    }
   }
-  nowStoreCd.value = newValue;
-  const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
-
-  //comsole.log(res2);
-  MenuList.value = res2.data.menuList;
-  MenuGroup.value = res2.data.menuGroup;
-  SubMenuGroup.value = res2.data.submenuGroup;
 
   MenuList.value = MenuList.value.map((item) => {
     return {
@@ -751,6 +764,7 @@ const searchButton = async () => {
       nowStoreCd.value,
       nowStoreAreaCd.value
     );
+    console.log(res4);
     MenuKeyList.value = res4.data.MenuKeyList;
     ScreenKeyOrigin.value = res3.data.ScreenList;
     //comsole.log(ScreenKeyOrigin.value);
