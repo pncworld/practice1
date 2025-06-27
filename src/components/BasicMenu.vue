@@ -1,6 +1,12 @@
 <template>
   <div class="bg-gray-100 text-gray-600 w-full scroll-container h-full m-0">
     <div class="">
+      <ul
+        class="flex w-full justify-center items-center overflow-hidden font-mono">
+        <li class="text-xs text-white bg-black">
+          {{ loginName }} / {{ storeName }} ({{ lStoreCd }})
+        </li>
+      </ul>
       <h1 class="flex text-2xl font-bold h-12 items-center bg-gray-100 p-5">
         {{ cMenu }}
       </h1>
@@ -44,6 +50,7 @@
           즐겨찾기
         </button>
       </div>
+
       <ul>
         <li
           v-for="i in favoriteProgList"
@@ -140,6 +147,9 @@ const props = defineProps({
   },
 });
 
+const storeName = ref("");
+const loginName = ref("");
+const lStoreCd = ref("");
 const store = useStore();
 const clickFavorite = ref(false);
 const favoriteProgList = ref([]);
@@ -279,6 +289,10 @@ const detectMobile = () => {
 };
 
 onMounted(() => {
+  //console.log(store.state.userData);
+  loginName.value = store.state.userData.strChargerName;
+  storeName.value = store.state.userData.strStoreName;
+  lStoreCd.value = store.state.userData.lngPosition;
   currentFavorite.value = [];
   currentFavorite.value = [...store.state.favoriteList];
 
