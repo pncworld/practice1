@@ -201,17 +201,38 @@ onMounted(() => {
     emit("lngStoreTeam", 0);
     emit("excelStore", "매장명 : 전체");
   } else {
+    console.log(store.state.userData.lngTeamCode);
     emit("lngStoreGroup", store.state.userData.lngStoreGroup);
     emit("lngStoreCode", store.state.userData.lngPosition);
     emit("lngStoreAttrs", store.state.userData.lngJoinType);
-    emit("lngSupervisor", store.state.userData.lngSupervisor);
-    emit("lngStoreTeam", store.state.userData.lngTeamCode);
+    emit(
+      "lngSupervisor",
+      store.state.userData.lngSupervisor == undefined ||
+        store.state.userData.lngSupervisor == ""
+        ? 0
+        : store.state.userData.lngSupervisor
+    );
+    emit(
+      "lngStoreTeam",
+      store.state.userData.lngTeamCode == undefined ||
+        store.state.userData.lngTeamCode == ""
+        ? 0
+        : store.state.userData.lngTeamCode
+    );
     emit("excelStore", "매장명 : " + store.state.userData.strStoreName);
     selectedStoreType.value = store.state.userData.lngJoinType;
     selectedStoreList.value = Number(store.state.userData.lngPosition);
     //comsole.log(selectedStoreList.value);
-    selectedStoreTeam.value = store.state.userData.lngTeamCode;
-    selectedSuperVisor.value = store.state.userData.lngSupervisor;
+    selectedStoreTeam.value =
+      store.state.userData.lngTeamCode == undefined ||
+      store.state.userData.lngTeamCode == ""
+        ? 0
+        : store.state.userData.lngTeamCode;
+    selectedSuperVisor.value =
+      store.state.userData.lngSupervisor == undefined ||
+      store.state.userData.lngSupervisor == ""
+        ? 0
+        : store.state.userData.lngSupervisor;
     disabled1.value = true;
     settingDisable2.value = true;
   }

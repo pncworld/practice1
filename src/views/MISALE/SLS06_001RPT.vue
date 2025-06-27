@@ -34,6 +34,7 @@
             @endDate="endDate"
             :closePopUp="closePopUp"
             ref="datepicker"
+            :initToday="1"
             :selectedGroup="selectedGroup"
             @excelDate="excelDate"
             class="pr-56"></Datepicker2>

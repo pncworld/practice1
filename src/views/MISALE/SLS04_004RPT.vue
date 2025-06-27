@@ -24,7 +24,7 @@
         class="grid grid-cols-1 grid-rows-4 -space-y-3 justify-start -ml-36 mt-10">
         <div class="flex justify-start ml-9">
           <Datepicker2
-            class="pr-20"
+            class="pr-0"
             @endDate="endDate"
             @startDate="startDate"
             :closePopUp="closePopUp"

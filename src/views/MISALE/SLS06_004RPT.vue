@@ -37,6 +37,7 @@
               type="checkbox"
               id="detail"
               class="ml-5"
+              checked
               @change="seeDetail" />상세보기</label
           >
         </div>
@@ -303,7 +304,7 @@ const seeUnite = (e) => {
   }
   reload.value = !reload.value;
 };
-const tempSeeDetail = ref(1);
+const tempSeeDetail = ref(2);
 const seeDetail = (e) => {
   if (e.target.checked) {
     tempSeeDetail.value = 2;

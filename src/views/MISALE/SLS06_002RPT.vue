@@ -28,6 +28,7 @@
           @endDate="endDate"
           @startDate="startDate"
           :closePopUp="closePopUp"
+          :initToday="1"
           ref="datepicker"
           class="ml-8"
           @excelDate="excelDate"></Datepicker2>
