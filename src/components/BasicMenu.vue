@@ -3,7 +3,7 @@
     <div class="">
       <ul
         class="flex w-full justify-center items-center overflow-hidden font-mono">
-        <li class="text-xs text-white bg-black">
+        <li class="text-xs text-black bg-blue-100 font-bold">
           {{ loginName }} / {{ storeName }} ({{ lStoreCd }})
         </li>
       </ul>
@@ -290,7 +290,7 @@ const detectMobile = () => {
 
 onMounted(() => {
   //console.log(store.state.userData);
-  loginName.value = store.state.userData.strChargerName;
+  loginName.value = store.state.userData.loginID;
   storeName.value = store.state.userData.strStoreName;
   lStoreCd.value = store.state.userData.lngPosition;
   currentFavorite.value = [];
