@@ -170,7 +170,7 @@ const login2 = async () => {
           PROGID: item.PROGRAM_ID,
           PROGNM: item.PROGRAM_NM,
         }));
-        //comsole.log(result);
+        console.log(result);
 
         const result3 = response.data.List3;
 
@@ -247,7 +247,6 @@ onMounted(async () => {
         PROGNM: item.PROGRAM_NM,
       })
     );
-    //comsole.log(result);
 
     const result3 = response.data.List3;
 

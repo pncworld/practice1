@@ -143,6 +143,12 @@ const menuItems = ref([
       { code: 30501, name: "반품삭제" },
     ],
   },
+  {
+    title: "TablePos",
+    mainCode: 50,
+    isOpen: false,
+    children: [{ code: 50001, name: "카테고리관리" }],
+  },
 ]);
 
 const menuItems2 = ref([
@@ -190,6 +196,12 @@ const menuItems2 = ref([
       { code: 30500, name: "주문수정" },
       { code: 30501, name: "반품삭제" },
     ],
+  },
+  {
+    title: "TablePos",
+    mainCode: 50,
+    isOpen: false,
+    children: [{ code: 50001, name: "카테고리관리" }],
   },
 ]);
 const store = useStore();
