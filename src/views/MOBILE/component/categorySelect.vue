@@ -49,7 +49,7 @@
         </div>
       </div>
       <div class="flex mt-[5vh] space-x-5">
-        <div class="text-lg font-medium ml-[4vw]">소카테고리</div>
+        <div class="text-lg font-medium ml-[4vw]">중카테고리</div>
         <div class="border border-gray-600 w-[60vw]">
           <select name="" id="" class="w-full h-full" v-model="selectedCond2">
             <option value="0">전체</option>
@@ -193,6 +193,23 @@ watch(selectedCond, async () => {
 const selectedStoreCd2 = ref(0);
 const sendSearch = () => {
   const filteredData = ref([]);
+  if (selectedStoreCd.value == 0) {
+    //filteredData.value = optionList2.value;
+    Swal.fire({
+      title: "경고",
+      text: "지점을 선택해주세요.",
+    });
+    return;
+  }
+  if (selectedCond.value == 0) {
+    //filteredData.value = optionList2.value;
+    Swal.fire({
+      title: "경고",
+      text: "대카테고리를 선택해주세요.",
+    });
+    return;
+  }
+
   if (selectedCond2.value == 0) {
     //filteredData.value = optionList2.value;
     Swal.fire({
@@ -214,7 +231,7 @@ const sendSearch = () => {
   emit("FILTERDATA", filteredData.value);
 
   //comsole.log(selectedStoreCd2.value);
-  selectedStoreCd.value = selectedStoreCd2.value;
+  //selectedStoreCd.value = selectedStoreCd2.value;
   emit("SEARCHNOW", true);
 
   const filteredNm = StoreList.value.filter(

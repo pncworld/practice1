@@ -24,3 +24,32 @@ export const GetSClassInfo = async (cond, cond2, cond3, cond4) => {
     SCLASS_CD: cond4,
   });
 };
+export const saveStockInfo = async (
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  cond9,
+  cond10,
+  cond11,
+  cond12
+) => {
+  return api2.post("StockManagementService.asmx/saveStockInfo", {
+    GROUP_CD: cond,
+    STORE_CD: cond2,
+    LCLASS_CD: cond3,
+    SCLASS_CD: cond4,
+    USE_YN: cond5,
+    ALL_DATE: cond6,
+    FROM_DATE: cond7,
+    TO_DATE: cond8,
+    SEL_DAY: cond9,
+    ALL_TIME: cond10,
+    FROM_TIME: cond11,
+    TO_TIME: cond12,
+  });
+};

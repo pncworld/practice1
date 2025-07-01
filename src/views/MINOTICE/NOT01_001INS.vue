@@ -1169,7 +1169,7 @@ const clickedRowData = async (e) => {
       e[7],
       1
     );
-    //console.log(res);
+    console.log(res);
     editInfo.value = res.data;
     gridvalue21.value = res.data.List[0].strWriter;
     gridvalue22.value = res.data.List[0].dtmWriteDate;
