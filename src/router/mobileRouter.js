@@ -13,6 +13,7 @@ import OpenAndClose from "@/views/MOBILE/sales/openAndClose.vue";
 import TaxReport from "@/views/MOBILE/sales/taxReport.vue";
 import TableReport from "@/views/MOBILE/sales/tableReport.vue";
 import CategoryManage from "@/views/MOBILE/tablepos/categoryManage.vue";
+import MenuSoldOut from "@/views/MOBILE/tablepos/menuSoldOut.vue";
 
 export default function mobileRouter() {
   return [
@@ -99,6 +100,11 @@ export default function mobileRouter() {
       path: "50001",
       //component : BasicLayout ,
       component: CategoryManage,
+    },
+    {
+      path: "50002",
+      //component : BasicLayout ,
+      component: MenuSoldOut,
     },
   ];
 }

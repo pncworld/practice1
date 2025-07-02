@@ -281,7 +281,7 @@ const disableBg = () => {
 };
 </script>
 
-<style>
+<style scoped>
 input[type="checkbox"] {
   -webkit-appearance: none;
   -moz-appearance: none;

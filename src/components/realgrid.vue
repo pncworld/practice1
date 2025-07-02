@@ -2900,6 +2900,7 @@ watch(
   (newVal) => {
     //comsole.log(props.initCheckValue);
     //comsole.log(props.initCheckColumn);
+    // console.log("왓냐?");
     gridView.checkAll(false);
     let itemCount = gridView.getItemCount();
     const checkValues = props.initCheckValue.split(",");

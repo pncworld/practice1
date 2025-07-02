@@ -100,6 +100,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  reSearch: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const setIcon = ref(0);
@@ -188,6 +192,10 @@ watch(selectedCond, async () => {
   console.log(res2);
   optionList2.value = res2.data.SClassList;
   selectedCond2.value = 0;
+  const maincategory = optionList.value.filter(
+    (item) => item.LCLASS_CD == selectedCond.value
+  )[0].LCLASS_NM;
+  emit("mainCategory", maincategory);
 });
 
 const selectedStoreCd2 = ref(0);
@@ -242,6 +250,34 @@ const sendSearch = () => {
   selectedStoreName.value = filteredNm;
   show.value = false;
 };
+
+watch(
+  () => props.reSearch,
+  async () => {
+    const res1 = await GetLClassInfo(
+      store.state.userData.GROUP_CD,
+      selectedStoreCd.value.STORE_CD
+    );
+    console.log(res1);
+    optionList.value = res1.data.LClassList;
+
+    const res2 = await GetSClassInfo(
+      store.state.userData.GROUP_CD,
+      selectedStoreCd.value.STORE_CD,
+      selectedCond.value,
+      0
+    );
+    console.log(res2);
+    optionList2.value = res2.data.SClassList;
+    // selectedCond2.value = 0;
+    const maincategory = optionList.value.filter(
+      (item) => item.LCLASS_CD == selectedCond.value
+    )[0].LCLASS_NM;
+    emit("mainCategory", maincategory);
+
+    sendSearch();
+  }
+);
 </script>
 
 <style lang="scss" scoped></style>

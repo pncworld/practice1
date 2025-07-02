@@ -31,13 +31,13 @@
     <div class="flex justify-center items-center mt-2 w-full">
       <div
         class="grid grid-rows-6 grid-cols-[1fr,3fr] text-sm w-[95vw] h-[60vh]">
-        <div
+        <!-- <div
           class="bg-gray-200 flex justify-center border-l border-t border-black items-center">
-          중카테고리명
-        </div>
+          카테고리명
+        </div> -->
         <div
-          class="border-l border-t border-black flex justify-start pl-2 text-lg items-center">
-          {{ cond1 }}
+          class="border-l border-t border-black flex justify-center pl-2 text-lg items-center overflow-hidden col-span-2 bg-green-200 ">
+         {{ category }} <span class="text-xl pl-2 pr-2">></span> {{ cond1 }}
         </div>
 
         <div
@@ -214,8 +214,10 @@
     @click.stop
     class="z-[10]"
     :changeState="changeState"
+    :reSearch="reSearch"
     @currState="currState"
     @FILTERDATA="FILTERDATA"
+    @mainCategory="mainCategory"
     @GROUP_CD="GROUP_CD"
     @STORE_CD="STORE_CD"></CategorySelect>
 </template>
@@ -233,6 +235,7 @@ import { onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 import CategorySelect from "../component/categorySelect.vue";
 import Swal from "sweetalert2";
+import { SetSClassStkRgst } from "@/api/etc";
 
 const store = useStore();
 const changeState = ref(true);
@@ -446,9 +449,44 @@ watch((alltime) ,() => {
 
 })
 
+const reSearch = ref(false)
 const saveButton = async (e) => {
-  console.log(cond2.value)
+  // console.log(alldate.value)
+  // console.log(cond2.value == undefined)
 
+  if(alldate.value == true){
+    cond2.value = new Date().toISOString().split('T')[0]
+    cond5.value = new Date().toISOString().split('T')[0]
+  }
+
+  if(alldate.value == false && cond2.value ==''){
+    Swal.fire({
+        title: "경고",
+        text: "사용시작날짜를 정확히 지정해주세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+  }
+  if(alldate.value == false && cond5.value ==''){
+    Swal.fire({
+        title: "경고",
+        text: "사용종료날짜를 정확히 지정해주세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+  }
+
+  if(alldate.value == false && (new Date(cond2.value) > new Date(cond5.value))){
+    Swal.fire({
+        title: "경고",
+        text: "종료날짜가 시작날짜보다 앞섭니다. 수정을 해주세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+  }
   if(LCLASS_CD.value ==''){
     Swal.fire({
         title: "경고",
@@ -459,6 +497,8 @@ const saveButton = async (e) => {
       return;
   }
 
+  // console.log(cond2.value)
+  // console.log(cond5.value)
   if(cond3.value == cond6.value && cond4.value == cond7.value){
     Swal.fire({
         title: "경고",
@@ -517,13 +557,38 @@ seeday += '0'
     } else {
     seeday += '0'
     }
+
     let ftime = String(cond3.value).padStart(2, '0') +String(cond4.value).padStart(2, '0')
-    let etime = String(cond5.value).padStart(2, '0') +String(cond6.value).padStart(2, '0')
-    const res = await saveStockInfo(selectGroupCd.value , selectStoreCd.value , LCLASS_CD.value , SCLASS_CD.value , cond8.value , alldate.value == true ? 1 : 0 , cond2.value , cond5.value , seeday , alltime.value == true ? 1 : 0 , ftime, etime )
+    let etime = String(cond6.value).padStart(2, '0') +String(cond7.value).padStart(2, '0')
+    const res = await SetSClassStkRgst(selectGroupCd.value , selectStoreCd.value , LCLASS_CD.value , SCLASS_CD.value , cond8.value , alldate.value == true ? 1 : 0 , cond2.value , cond5.value , seeday , alltime.value == true ? 1 : 0 , ftime, etime )
+     console.log(res)
+
+    if(res.data.Result =='00'){
+      Swal.fire({
+        title: "성공",
+        text: "저장을 완료하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+    } else {
+      Swal.fire({
+        title: "실패",
+        text: `저장에 실패하였습니다. ${res.data.Result}`,
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+    }
   } catch (error) {
     
+  } finally {
+    reSearch.value = !reSearch.value
   }
 };
+
+const category = ref('')
+const mainCategory = (e) =>{
+  category.value =e
+}
 // const SEARCHNOW = async (e) => {
 //   try {
 //     store.state.loading2 = true;

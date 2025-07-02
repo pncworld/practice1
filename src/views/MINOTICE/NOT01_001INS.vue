@@ -255,6 +255,9 @@
                 :progname="'NOT01_001INS_VUE'"
                 :progid="1"
                 :rowStateeditable="false"
+                :initCheckAct="initCheckAct"
+                :initCheckValue="initCheckValue"
+                :initCheckColumn="initCheckColumn"
                 :setStateBar="false"
                 :checkAll="checkAll3"
                 @checkedRowData="checkedRowData"
@@ -295,6 +298,9 @@
                 :progname="'NOT01_001INS_VUE'"
                 :progid="3"
                 :checkAll="checkAll4"
+                :initCheckAct="initCheckAct2"
+                :initCheckValue="initCheckValue2"
+                :initCheckColumn="initCheckColumn2"
                 :rowStateeditable="false"
                 :setStateBar="false"
                 @checkedRowData="checkedRowData2"
@@ -334,6 +340,9 @@
                 :progid="5"
                 :rowStateeditable="false"
                 :setStateBar="false"
+                :initCheckAct="initCheckAct3"
+                :initCheckValue="initCheckValue3"
+                :initCheckColumn="initCheckColumn3"
                 @checkedRowData="checkedRowData3"
                 :rowData="rowData6"></Realgrid>
             </div>
@@ -375,6 +384,9 @@
                 :setStateBar="false"
                 :checkAll="checkAll"
                 :searchWord3="searchWord"
+                :initCheckAct="initCheckAct4"
+                :initCheckValue="initCheckValue4"
+                :initCheckColumn="initCheckColumn4"
                 :searchColId="'strName'"
                 @checkedRowData="checkedRowData4"
                 :rowData="rowData8"></Realgrid>
@@ -739,16 +751,19 @@ const moveNow2 = async () => {
 const AdminCodes = ref([]);
 const checkedRowData = (e) => {
   AdminCodes.value = e.map((item) => item.lngUserAdminID);
+  initCheckValue.value = e.map((item) => item.lngUserAdminID).join(",");
   //console.log(e);
 };
 const TeamCodes = ref([]);
 const checkedRowData2 = (e) => {
   TeamCodes.value = e.map((item) => item.lngCode);
+  initCheckValue2.value = e.map((item) => item.lngCode).join(",");
   //console.log(e);
 };
 const ScCodes = ref([]);
 const checkedRowData3 = (e) => {
   ScCodes.value = e.map((item) => item.lngCode);
+  initCheckValue3.value = e.map((item) => item.lngCode).join(",");
   //console.log(e);
 };
 const showUser = async () => {
@@ -774,6 +789,10 @@ const showUser = async () => {
 
 const showTeam = async () => {
   showteam.value = true;
+
+  setTimeout(() => {
+    initCheckAct2.value = !initCheckAct2.value;
+  }, 300);
 };
 
 const showTeamUser = async () => {
@@ -860,14 +879,26 @@ watch(editorInsert, () => {
 const showadmin = ref(false);
 const showAdmin = () => {
   showadmin.value = true;
+
+  setTimeout(() => {
+    initCheckAct.value = !initCheckAct.value;
+  }, 300);
 };
 
 const showSC = () => {
   showsc.value = true;
+
+  setTimeout(() => {
+    initCheckAct3.value = !initCheckAct3.value;
+  }, 300);
 };
 
 const showStore = () => {
   showst.value = true;
+
+  setTimeout(() => {
+    initCheckAct4.value = !initCheckAct4.value;
+  }, 300);
 };
 
 const showSCUser = async () => {
@@ -892,6 +923,8 @@ const showst = ref(false);
 const checkRows4 = ref([]);
 const checkedRowData4 = (e) => {
   checkRows4.value = e;
+
+  initCheckValue4.value = e.map((item) => item.lngStoreCode).join(",");
 };
 const checkRows5 = ref([]);
 const checkedRowData5 = (e) => {
@@ -1159,6 +1192,20 @@ const gridvalue23 = ref("");
 const currWriterSeq = ref("");
 const currNoticeSeq = ref("");
 const editInfo = ref("");
+
+const initCheckAct = ref(false);
+const initCheckAct2 = ref(false);
+const initCheckAct3 = ref(false);
+const initCheckAct4 = ref(false);
+
+const initCheckValue = ref("");
+const initCheckColumn = ref("lngUserAdminID");
+const initCheckValue2 = ref("");
+const initCheckColumn2 = ref("lngCode");
+const initCheckValue3 = ref("");
+const initCheckColumn3 = ref("lngCode");
+const initCheckValue4 = ref("");
+const initCheckColumn4 = ref("lngStoreCode");
 const clickedRowData = async (e) => {
   try {
     store.state.loading = true;
@@ -1169,7 +1216,7 @@ const clickedRowData = async (e) => {
       e[7],
       1
     );
-    console.log(res);
+    //console.log(res.data);
     editInfo.value = res.data;
     gridvalue21.value = res.data.List[0].strWriter;
     gridvalue22.value = res.data.List[0].dtmWriteDate;
@@ -1179,6 +1226,26 @@ const clickedRowData = async (e) => {
     content.value = res.data.List[0].strBody;
     rowData11.value = res.data.List2;
     showNoticeDetail.value = true;
+
+    initCheckValue.value = res.data.List3.filter((item) => item.lngCheck == "1")
+      .map((item) => item.lngUserAdminID)
+      .join(",");
+
+    initCheckValue2.value = res.data.List4.filter(
+      (item) => item.lngCheck == "1"
+    )
+      .map((item) => item.lngCode)
+      .join(",");
+    initCheckValue3.value = res.data.List5.filter(
+      (item) => item.lngCheck == "1"
+    )
+      .map((item) => item.lngCode)
+      .join(",");
+    initCheckValue4.value = res.data.List6.filter(
+      (item) => item.lngCheck == "1"
+    )
+      .map((item) => item.lngStoreCode)
+      .join(",");
   } catch (error) {
   } finally {
     store.state.loading = false;
