@@ -70,3 +70,11 @@ export const SetSClassStkRgst = async (
     TO_TIME: cond12,
   });
 };
+
+export const SetMenuStkRgst = async (cond, cond2, cond3) => {
+  return api2.post("StockManagementService.asmx/SetMenuStkRgst", {
+    GROUP_CD: cond,
+    STORE_CD: cond2,
+    MenuList: cond3,
+  });
+};

@@ -56,7 +56,7 @@
 
         <div
           class="bg-gray-200 flex justify-center border-l border-t border-b border-black items-center">
-          상품명검색
+          메뉴명
         </div>
         <div
           class="border-l border-t border-b border-black flex justify-start pl-2 text-lg items-center">
@@ -67,7 +67,13 @@
         </div>
       </div>
     </div>
-    <div class="flex justify-end pr-2 mt-2">
+    <div class="flex justify-between pr-2 mt-2 items-center">
+      <label for="allcheck" class="pl-3"
+        ><input
+          type="checkbox"
+          id="allcheck"
+          @click="allCheck" />전체선택</label
+      >
       <button class="button search" @click="searchButton">조회</button>
     </div>
     <div class="flex justify-center items-center mt-2">
@@ -107,8 +113,7 @@
           </div>
           <div
             class="border-l border-t bg-sky-50 border-black"
-            :class="ischecked(menu.MENU_CD) ? 'bg-red-300' : ''"
-            @click="showMenuNm(menu.MENU_NAME)">
+            :class="ischecked(menu.MENU_CD) ? 'bg-red-300' : ''">
             {{ menu.MENU_NAME }}
           </div>
           <div
@@ -160,7 +165,7 @@
             type="radio"
             name="savecond"
             id="sale"
-            value="1"
+            value="0"
             v-model="salecond" />판매중</label
         >
       </div>
@@ -171,7 +176,7 @@
             type="radio"
             name="savecond"
             id="tsoldout"
-            value="2"
+            value="1"
             v-model="salecond" />당일품절</label
         >
       </div>
@@ -182,7 +187,7 @@
             type="radio"
             name="savecond"
             id="csoldout"
-            value="3"
+            value="2"
             v-model="salecond" />계속품절</label
         >
       </div>
@@ -211,16 +216,16 @@
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
+import { GetMenuStkInfo, SetMenuStkRgst } from "@/api/etc";
 import { formatNumberWithCommas } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
 import { useStore } from "vuex";
 import CategorySelect from "../component/categorySelect.vue";
-import { GetMenuStkInfo } from "@/api/etc";
 
 const store = useStore();
 const changeState = ref(true);
@@ -234,24 +239,17 @@ const resetScreen = async (e) => {
 const currState = (e) => {
   changeState.value = e;
 };
-const selectStartDate = ref("");
-const selectEndDate = ref("");
+
 const selectGroupCd = ref("");
 const selectStoreCd = ref("");
 /**
  * 선택한 매출 시작일자
  */
 
-const startDate = (e) => {
-  selectStartDate.value = e;
-};
 /**
  * 선택한 매출 종료일자
  */
 
-const endDate = (e) => {
-  selectEndDate.value = e;
-};
 const GROUP_CD = (e) => {
   selectGroupCd.value = e;
 };
@@ -259,43 +257,7 @@ const STORE_CD = (e) => {
   selectStoreCd.value = e;
 };
 
-const rowData = ref([]);
 const menuList = ref([]);
-const optionList = ref([
-  { lngCode: 0, strName: 0 },
-  { lngCode: 1, strName: 1 },
-  { lngCode: 2, strName: 2 },
-  { lngCode: 3, strName: 3 },
-  { lngCode: 4, strName: 4 },
-  { lngCode: 5, strName: 5 },
-  { lngCode: 6, strName: 6 },
-  { lngCode: 7, strName: 7 },
-  { lngCode: 8, strName: 8 },
-  { lngCode: 9, strName: 9 },
-  { lngCode: 10, strName: 10 },
-  { lngCode: 11, strName: 11 },
-  { lngCode: 12, strName: 12 },
-  { lngCode: 13, strName: 13 },
-  { lngCode: 14, strName: 14 },
-  { lngCode: 15, strName: 15 },
-  { lngCode: 16, strName: 16 },
-  { lngCode: 17, strName: 17 },
-  { lngCode: 18, strName: 18 },
-  { lngCode: 19, strName: 19 },
-  { lngCode: 20, strName: 20 },
-  { lngCode: 21, strName: 21 },
-  { lngCode: 22, strName: 22 },
-  { lngCode: 23, strName: 23 },
-]);
-
-const optionList2 = ref([
-  { lngCode: 0, strName: 0 },
-  { lngCode: 10, strName: 10 },
-  { lngCode: 20, strName: 20 },
-  { lngCode: 30, strName: 30 },
-  { lngCode: 40, strName: 40 },
-  { lngCode: 50, strName: 50 },
-]);
 
 const cond1 = ref("");
 const cond2 = ref("");
@@ -309,46 +271,42 @@ const cond6 = ref("");
 const cond7 = ref("");
 const cond8 = ref("Y");
 
-const handleDate = (e) => {
-  alldate.value = !alldate.value;
-};
-const handleTime = (e) => {
-  alltime.value = !alltime.value;
-};
-
-const handleHoli = (e) => {
-  holiday.value = !holiday.value;
-};
-
 const LCLASS_CD = ref("");
 const SCLASS_CD = ref("");
 const FILTERDATA = (e) => {
   console.log(e);
+  tempcheckedList.value = [];
+
+  document.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+    cb.checked = false;
+  });
+  menuList.value = [];
+  showSave.value = false;
   LCLASS_CD.value = e[0].LCLASS_CD;
   SCLASS_CD.value = e[0].SCLASS_CD;
   cond1.value = e[0].FULL_NM;
-  cond2.value = e[0].FROM_DATE;
-  cond3.value = parseInt(e[0].FROM_TIME.substring(0, 2));
-  cond4.value = parseInt(e[0].FROM_TIME.substring(2));
+  // cond2.value = e[0].FROM_DATE;
+  // cond3.value = parseInt(e[0].FROM_TIME.substring(0, 2));
+  // cond4.value = parseInt(e[0].FROM_TIME.substring(2));
 
-  cond5.value = e[0].TO_DATE;
-  cond6.value = parseInt(e[0].TO_TIME.substring(0, 2));
-  cond7.value = parseInt(e[0].TO_TIME.substring(2));
+  // cond5.value = e[0].TO_DATE;
+  // cond6.value = parseInt(e[0].TO_TIME.substring(0, 2));
+  // cond7.value = parseInt(e[0].TO_TIME.substring(2));
 
-  cond8.value = e[0].USE_YN;
+  // cond8.value = e[0].USE_YN;
 
-  mon.value = e[0].SEL_DAY.substring(0, 1) == "1" ? true : false;
-  tue.value = e[0].SEL_DAY.substring(1, 2) == "1" ? true : false;
-  wed.value = e[0].SEL_DAY.substring(2, 3) == "1" ? true : false;
-  thu.value = e[0].SEL_DAY.substring(3, 4) == "1" ? true : false;
-  fri.value = e[0].SEL_DAY.substring(4, 5) == "1" ? true : false;
-  sat.value = e[0].SEL_DAY.substring(5, 6) == "1" ? true : false;
-  sun.value = e[0].SEL_DAY.substring(6, 7) == "1" ? true : false;
+  // mon.value = e[0].SEL_DAY.substring(0, 1) == "1" ? true : false;
+  // tue.value = e[0].SEL_DAY.substring(1, 2) == "1" ? true : false;
+  // wed.value = e[0].SEL_DAY.substring(2, 3) == "1" ? true : false;
+  // thu.value = e[0].SEL_DAY.substring(3, 4) == "1" ? true : false;
+  // fri.value = e[0].SEL_DAY.substring(4, 5) == "1" ? true : false;
+  // sat.value = e[0].SEL_DAY.substring(5, 6) == "1" ? true : false;
+  // sun.value = e[0].SEL_DAY.substring(6, 7) == "1" ? true : false;
 
-  holiday.value = e[0].SEL_DAY.substring(7, 8) == "1" ? true : false;
+  // holiday.value = e[0].SEL_DAY.substring(7, 8) == "1" ? true : false;
 
-  alldate.value = e[0].ALL_DATE == "1" ? true : false;
-  alltime.value = e[0].ALL_TIME == "1" ? true : false;
+  // alldate.value = e[0].ALL_DATE == "1" ? true : false;
+  // alltime.value = e[0].ALL_TIME == "1" ? true : false;
 };
 
 const mon = ref(false);
@@ -359,233 +317,49 @@ const fri = ref(false);
 const sat = ref(false);
 const sun = ref(false);
 
-const disable1 = ref(false);
-const disable2 = ref(false);
-const handleday = (e) => {
-  const id = e.target.id;
-  const val = e.target.value;
-
-  if (id == "mon") {
-    mon.value = !mon.value;
-  } else if (id == "tue") {
-    tue.value = !tue.value;
-  } else if (id == "wed") {
-    wed.value = !wed.value;
-  } else if (id == "thu") {
-    thu.value = !thu.value;
-  } else if (id == "fri") {
-    fri.value = !fri.value;
-  } else if (id == "sat") {
-    sat.value = !sat.value;
-  } else if (id == "sun") {
-    sun.value = !sun.value;
-  }
-};
-
-const allcheck = ref(false);
-const checkDays = (e) => {
-  allcheck.value = e.target.checked;
-  if (e.target.checked) {
-    holiday.value = true;
-    mon.value = true;
-    tue.value = true;
-    wed.value = true;
-    thu.value = true;
-    fri.value = true;
-    sat.value = true;
-    sun.value = true;
-  } else {
-    holiday.value = false;
-    mon.value = false;
-    tue.value = false;
-    wed.value = false;
-    thu.value = false;
-    fri.value = false;
-    sat.value = false;
-    sun.value = false;
-  }
-};
-
-watch([mon, tue, wed, thu, fri, sat, sun, holiday], () => {
-  if (
-    mon.value == false ||
-    tue.value == false ||
-    wed.value == false ||
-    thu.value == false ||
-    fri.value == false ||
-    sat.value == false ||
-    sun.value == false ||
-    holiday.value == false
-  ) {
-    allcheck.value = false;
-  } else {
-    allcheck.value = true;
-  }
-});
-
-watch(alldate, () => {
-  if (alldate.value == true) {
-    disable1.value = true;
-  } else {
-    disable1.value = false;
-  }
-});
-
-watch(alltime, () => {
-  if (alltime.value == true) {
-    disable2.value = true;
-  } else {
-    disable2.value = false;
-  }
-});
-
 const reSearch = ref(false);
 const saveButton = async (e) => {
-  // console.log(alldate.value)
-  // console.log(cond2.value == undefined)
-
-  //   if (alldate.value == true) {
-  //     cond2.value = new Date().toISOString().split("T")[0];
-  //     cond5.value = new Date().toISOString().split("T")[0];
-  //   }
-
-  //   if (alldate.value == false && cond2.value == "") {
-  //     Swal.fire({
-  //       title: "경고",
-  //       text: "사용시작날짜를 정확히 지정해주세요.",
-  //       icon: "warning",
-  //       confirmButtonText: "확인",
-  //     });
-  //     return;
-  //   }
-  //   if (alldate.value == false && cond5.value == "") {
-  //     Swal.fire({
-  //       title: "경고",
-  //       text: "사용종료날짜를 정확히 지정해주세요.",
-  //       icon: "warning",
-  //       confirmButtonText: "확인",
-  //     });
-  //     return;
-  //   }
-
-  //   if (alldate.value == false && new Date(cond2.value) > new Date(cond5.value)) {
-  //     Swal.fire({
-  //       title: "경고",
-  //       text: "종료날짜가 시작날짜보다 앞섭니다. 수정을 해주세요.",
-  //       icon: "warning",
-  //       confirmButtonText: "확인",
-  //     });
-  //     return;
-  //   }
-  //   if (LCLASS_CD.value == "") {
-  //     Swal.fire({
-  //       title: "경고",
-  //       text: "조회를 먼저 진행해주세요.",
-  //       icon: "warning",
-  //       confirmButtonText: "확인",
-  //     });
-  //     return;
-  //   }
-
-  // console.log(cond2.value)
-  // console.log(cond5.value)
-  //   if (cond3.value == cond6.value && cond4.value == cond7.value) {
-  //     Swal.fire({
-  //       title: "경고",
-  //       text: "같은 시간을 선택하셨습니다. 다른 시간으로 변경해주세요.",
-  //       icon: "warning",
-  //       confirmButtonText: "확인",
-  //     });
-  //     return;
-  //   }
   try {
-    // let seeday = "";
+    console.log(tempcheckedList.value);
+    const menuCdList = tempcheckedList.value.map((item) => ({
+      MENU_CD: item,
+      MENU_STATUS: salecond.value,
+    }));
 
-    // if (mon.value == true) {
-    //   seeday += "1";
-    // } else {
-    //   seeday += "0";
-    // }
-
-    // if (tue.value == true) {
-    //   seeday += "1";
-    // } else {
-    //   seeday += "0";
-    // }
-
-    // if (wed.value == true) {
-    //   seeday += "1";
-    // } else {
-    //   seeday += "0";
-    // }
-
-    // if (thu.value == true) {
-    //   seeday += "1";
-    // } else {
-    //   seeday += "0";
-    // }
-
-    // if (fri.value == true) {
-    //   seeday += "1";
-    // } else {
-    //   seeday += "0";
-    // }
-    // if (sat.value == true) {
-    //   seeday += "1";
-    // } else {
-    //   seeday += "0";
-    // }
-
-    // if (sun.value == true) {
-    //   seeday += "1";
-    // } else {
-    //   seeday += "0";
-    // }
-    // if (holiday.value == true) {
-    //   seeday += "1";
-    // } else {
-    //   seeday += "0";
-    // }
-
-    // let ftime =
-    //   String(cond3.value).padStart(2, "0") +
-    //   String(cond4.value).padStart(2, "0");
-    // let etime =
-    //   String(cond6.value).padStart(2, "0") +
-    //   String(cond7.value).padStart(2, "0");
-    // const res = await setMenuSoldOut(
-    //   selectGroupCd.value,
-    //   selectStoreCd.value,
-    //   LCLASS_CD.value,
-    //   SCLASS_CD.value,
-    //   cond8.value,
-    //   alldate.value == true ? 1 : 0,
-    //   cond2.value,
-    //   cond5.value,
-    //   seeday,
-    //   alltime.value == true ? 1 : 0,
-    //   ftime,
-    //   etime
-    // );
+    const res = await SetMenuStkRgst(
+      selectGroupCd.value,
+      selectStoreCd.value,
+      menuCdList
+    );
     console.log(res);
-    // if (res.data.Result == "00") {
-    //   Swal.fire({
-    //     title: "성공",
-    //     text: "저장을 완료하였습니다.",
-    //     icon: "success",
-    //     confirmButtonText: "확인",
-    //   });
-    // } else {
-    //   Swal.fire({
-    //     title: "실패",
-    //     text: `저장에 실패하였습니다. ${res.data.Result}`,
-    //     icon: "error",
-    //     confirmButtonText: "확인",
-    //   });
-    // }
+    //showSave.value = false;
+    showSave.value = false;
+
+    if (res.data.Result == "00") {
+      Swal.fire({
+        title: "성공",
+        text: "저장을 완료하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      return;
+    } else {
+      Swal.fire({
+        title: "실패",
+        text: `저장에 실패하였습니다. ${res.data.ResultMessage}`,
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
   } catch (error) {
   } finally {
     //reSearch.value = !reSearch.value;
+    tempcheckedList.value = [];
+
+    document.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+      cb.checked = false;
+    });
     searchButton();
   }
 };
@@ -611,6 +385,12 @@ const toggleSelection = (e) => {
     showSave.value = false;
   }
 
+  if (tempcheckedList.value.length != menuList.value.length) {
+    document.getElementById("allcheck").checked = false;
+  } else {
+    document.getElementById("allcheck").checked = true;
+  }
+
   selectedLeng.value = tempcheckedList.value.length;
   //console.log("여긴왓지?");
   // console.log(tempcheckedList.value.length);
@@ -627,7 +407,7 @@ const showSave = ref(false);
 
 const scond = ref(9);
 const scond2 = ref("");
-const salecond = ref(1);
+const salecond = ref("0");
 const searchButton = async () => {
   if (showSave.value == true) {
     await Swal.fire({
@@ -693,11 +473,35 @@ const searchButton = async () => {
 /**
  * 	화면 Load시 실행 스크립트
  */
-const menuNm = ref("");
-const openPu = ref(false);
-const showMenuNm = (e) => {
-  menuNm.value = e;
-  openPu.value = true;
+// const menuNm = ref("");
+// const openPu = ref(false);
+// const showMenuNm = (e) => {
+//   menuNm.value = e;
+//   openPu.value = true;
+// };
+
+const allCheck = (e) => {
+  if (menuList.value.length == 0) {
+    return;
+  }
+  if (e.target.checked) {
+    document.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+      cb.checked = true;
+    });
+
+    tempcheckedList.value = menuList.value.map((item) => item.MENU_CD);
+    //console.log(tempcheckedList.value);
+    selectedLeng.value = tempcheckedList.value.length;
+    showSave.value = true;
+  } else {
+    document.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+      cb.checked = false;
+    });
+
+    tempcheckedList.value = [];
+    selectedLeng.value = 0;
+    showSave.value = false;
+  }
 };
 onMounted(() => {});
 </script>

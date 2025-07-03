@@ -54,7 +54,7 @@
           <select name="" id="" class="w-full h-full" v-model="selectedCond2">
             <option value="0">전체</option>
             <option :value="i.SCLASS_CD" v-for="i in optionList2">
-              {{ i.SCLASS_NM }}
+              {{ i.FULL_NM }}
             </option>
           </select>
         </div>
