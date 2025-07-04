@@ -1386,6 +1386,11 @@ export const getEventCouponList = (
     TYPE: cond5,
   });
 };
+export const getEventCouponEnrollList = (groupcd) => {
+  return api2.post("/MICRM/CRM22_001INS.asmx/getEventCouponEnrollList", {
+    GROUP_CD: groupcd,
+  });
+};
 
 export const saveExtendEventExpireDate = (groupcd, cond, cond2, cond3) => {
   return api2.post("/MICRM/CRM11_013RPT.asmx/saveExtendEventExpireDate", {
@@ -1436,5 +1441,27 @@ export const getKakaoAlarmAgg = (
     SDATE: cond5,
     EDATE: cond6,
     TYPE: cond7,
+  });
+};
+
+export const getPromotionList = (groupcd, cond, cond2) => {
+  return api2.post("/MICRM/CRM10_001INS.asmx/getPromotionList", {
+    GROUP_CD: groupcd,
+    PROMO_CD: cond,
+    GRADE: cond2,
+  });
+};
+
+export const getEventCouponDetail = (groupcd, cond, cond2) => {
+  return api2.post("/MICRM/CRM22_001INS.asmx/getEventCouponDetail", {
+    GROUP_CD: groupcd,
+    COUPON_NO: cond,
+    STORE_CD: cond2,
+  });
+};
+
+export const getCouponGroup = (groupcd) => {
+  return api2.post("/MICRM/CRM22_001INS.asmx/getCouponGroup", {
+    GROUP_CD: groupcd,
   });
 };
