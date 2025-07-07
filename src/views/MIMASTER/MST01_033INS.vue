@@ -1303,7 +1303,7 @@ const clickedRowData = async (newvalue) => {
   } else {
     gridvalue100.value = 0;
     disabledKPG.value = false;
-    showKPG.value = false;
+    showKPG.value = true;
   }
   discountDisabled.value =
     (newvalue[9] == 0 || newvalue[12] == 1) &&
@@ -2213,7 +2213,7 @@ const disableKPG = (e) => {
   const kpg = e.target.value;
   if (kpg == 1) {
     disabledKPG.value = true;
-    showKPG.value = false;
+    showKPG.value = true;
   } else {
     disabledKPG.value = false;
     showKPG.value = true;

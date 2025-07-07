@@ -1465,3 +1465,79 @@ export const getCouponGroup = (groupcd) => {
     GROUP_CD: groupcd,
   });
 };
+export const getStoreSearch = (groupcd, type, Name) => {
+  return api2.post("/MICRM/CRM22_001INS.asmx/getStoreSearch", {
+    GROUP_CD: groupcd,
+    TYPE: type,
+    NAME: Name,
+  });
+};
+export const getMenuList3 = (groupcd, cond, cond2, cond3, cond4) => {
+  return api2.post("/MICRM/CRM22_001INS.asmx/getMenuList3", {
+    GROUP_CD: groupcd,
+    MGROUP: cond,
+    SGROUP: cond2,
+    MENUCD: cond3,
+    MENUNM: cond4,
+  });
+};
+export const saveEventCoupon = (
+  groupcd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  cond9,
+  cond10,
+  cond11,
+  cond12,
+  cond13,
+  cond14,
+  cond15,
+  cond16,
+  cond17,
+  cond18,
+  cond19,
+  cond20,
+  cond21,
+  cond22,
+  cond23
+) => {
+  return api2.post("/MICRM/CRM22_001INS.asmx/saveEventCoupon", {
+    GROUP_CD: groupcd,
+    COUPON_CD: cond,
+    COUPON_NM: cond2,
+    APPLYTYPE: cond3,
+    LNGTERM: cond4,
+    FROMDATE: cond5,
+    TODATE: cond6,
+    DUPLIYN: cond7,
+    COUPONGROUP: cond8,
+    STYPE: cond9,
+    COUPONNOTYPE: cond10,
+    SMSSENDYN: cond11,
+    SMSTYPE: cond12,
+    SMSTITLE: cond13,
+    SMSSENDER: cond14,
+    SMSTEXT: cond15,
+    SMSIMG: cond16,
+    USER: cond17,
+    MENU00: cond18,
+    MENU10: cond19,
+    MENU01: cond20,
+    COUPONSTORE: cond21,
+    CMENU00: cond22,
+    CMENU01: cond23,
+  });
+};
+
+export const getSenderList = (groupcd, cond) => {
+  return api2.post("/MICRM/CRM22_001INS.asmx/getSenderList", {
+    GROUP_CD: groupcd,
+    STORE_CD: cond,
+  });
+};

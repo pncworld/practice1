@@ -22,7 +22,6 @@
 
 <script setup>
 import { getMenuGroupList } from "@/api/master";
-import store from "@/store";
 import { onMounted, ref, watch } from "vue";
 const props = defineProps({
   groupCd: {

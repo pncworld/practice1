@@ -925,6 +925,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disabled: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
 });
 
 // 2구간
@@ -1880,7 +1885,7 @@ const funcshowGrid = async () => {
   gridView.rowIndicator.draggableSelectedRows = true;
   gridView.displayOptions.syncGridHeight =
     props.syncGridHeight == true ? "always" : "none";
-
+  gridView.disabled = props.disabled;
   if (props.suffixColumnPercent != []) {
     for (let i = 0; i < props.suffixColumnPercent.length; i++) {
       if (gridView.columnByName(props.suffixColumnPercent[i])) {
@@ -3222,6 +3227,19 @@ watch(
   }
 );
 
+watch(
+  () => props.disabled,
+  () => {
+    //console.log("왓지?");
+    if (gridView) {
+      if (props.disabled == true) {
+        gridView.disabled = true;
+      } else {
+        gridView.disabled = false;
+      }
+    }
+  }
+);
 watch(
   () => props.showOnlyChecked,
   () => {
