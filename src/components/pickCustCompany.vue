@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { getCustCompany } from "@/api/micrm";
+import { getCustCompany, getCustCompany2 } from "@/api/micrm";
 import { defineProps, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
@@ -46,6 +46,10 @@ const props = defineProps({
   placeholderName: {
     type: String,
     default: "선택",
+  },
+  setAPI: {
+    type: String,
+    default: "0",
   },
 });
 const is9999 = ref(store.state.userData.lngStoreGroup[0] !== "9999");
@@ -82,18 +86,34 @@ const emit = defineEmits([
 
 onMounted(async () => {
   console.log(store.state.userData);
-  const res = await getCustCompany(
-    store.state.userData.lngStoreGroup,
-    store.state.userData.lngPosition,
-    store.state.userData.lngPositionType
-  );
 
-  console.log(res);
+  if (props.setAPI == "0") {
+    const res = await getCustCompany(
+      store.state.userData.lngStoreGroup,
+      store.state.userData.lngPosition,
+      store.state.userData.lngPositionType
+    );
 
-  storeCd.value = res.data.List;
-  emit("excelStore", "사업장명 : 전체");
-  if (selectedStore.value == null) {
-    emit("lngStoreCode", 0);
+    console.log(res);
+
+    storeCd.value = res.data.List;
+    emit("excelStore", "사업장명 : 전체");
+    if (selectedStore.value == null) {
+      emit("lngStoreCode", 0);
+    }
+  } else {
+    const res = await getCustCompany2(
+      store.state.userData.lngStoreGroup,
+      store.state.userData.lngPosition
+    );
+
+    console.log(res);
+
+    storeCd.value = res.data.List;
+    emit("excelStore", "사업장명 : 전체");
+    if (selectedStore.value == null) {
+      emit("lngStoreCode", 0);
+    }
   }
 });
 

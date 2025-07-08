@@ -54,6 +54,31 @@ export const getCustCompany = (groupCd, storecd, positiontype) => {
     LNG_POSITION: positiontype,
   });
 };
+export const getCustCompany2 = (groupCd, storecd) => {
+  return api2.post("/MICRM/CRM01_013INS.asmx/getCustCompany2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+  });
+};
+export const getAccCust = (
+  companyCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6
+) => {
+  return api2.post("/MICRM/CRM01_013INS.asmx/getAccCust", {
+    COMPANY_CD: companyCd,
+    CARD_NO: cond,
+    CUST_ID: cond2,
+    CUST_NM: cond3,
+    DEPT_NM: cond4,
+    COMP_NM: cond5,
+    REPORT_TYPE: cond6,
+  });
+};
 export const getBelongCust = (custcode, searchword, type) => {
   return api2.post("/MICRM/CRM20_005RPT.asmx/getBelongCust", {
     CUST_CD: custcode,
@@ -1539,5 +1564,66 @@ export const getSenderList = (groupcd, cond) => {
   return api2.post("/MICRM/CRM22_001INS.asmx/getSenderList", {
     GROUP_CD: groupcd,
     STORE_CD: cond,
+  });
+};
+
+export const saveEmployeeCustInfo = (
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6
+) => {
+  return api2.post("/MICRM/CRM01_013INS.asmx/saveEmployeeCustInfo", {
+    COMP_CD: cond,
+    CUST_ID: cond2,
+    CARD_NO: cond3,
+    NCARD_NO: cond4,
+    CARD_S: cond5,
+    USERID: cond6,
+  });
+};
+export const deleteCustomors2 = (cond, cond2, cond3, cond4, cond5) => {
+  return api2.post("/MICRM/CRM01_013INS.asmx/deleteCustomors2", {
+    COMP_CD: cond,
+    CUST_ID: cond2,
+    CARD_NO: cond3,
+    USERID: cond4,
+    USERIP: cond5,
+  });
+};
+
+export const saveCustomorsInfo = (
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  cond9,
+  cond10,
+  cond11,
+  cond12,
+  cond13,
+  cond14
+) => {
+  return api2.post("/MICRM/CRM01_013INS.asmx/saveCustomorsInfo", {
+    COMP_CD: cond,
+    CUST_ID: cond2,
+    LIMITAMT: cond3,
+    CUSTSTS: cond4,
+    CARDSTS: cond5,
+    CARDNO: cond6,
+    CUSTNM: cond7,
+    DEPTCD: cond8,
+    DEPTNM: cond9,
+    TELNOS: cond10,
+    COMPCD: cond11,
+    COMPNM: cond12,
+    ADDRESS: cond13,
+    USERID: cond14,
   });
 };

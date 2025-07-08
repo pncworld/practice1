@@ -1,7 +1,7 @@
 <!-- /*--############################################################################
-# Filename : CRM60_007INS.vue                                                  
-# Description : 고객관리 > 전자상품권 마스터 관리 > 전자상품권 업로드.     
-# Date :2025-06-23                                                            
+# Filename : CRM22_002INS.vue                                                  
+# Description : 고객관리 > 프로모션 쿠폰 관리 > 이벤트 쿠폰 생성     
+# Date :2025-07-08                                                            
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
@@ -11,17 +11,17 @@
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <!-- <button @click="searchButton" class="button search md:w-auto w-14">
-          조회
-        </button>
-        <button @click="addButton" class="button new md:w-auto w-14">
-          출고
-        </button>
-        <button @click="deleteButton" class="button delete md:w-auto w-14">
-          취소처리
-        </button>
-        <button @click="excelButton" class="button save w-auto excel">
-          엑셀
-        </button> -->
+            조회
+          </button>
+          <button @click="addButton" class="button new md:w-auto w-14">
+            출고
+          </button>
+          <button @click="deleteButton" class="button delete md:w-auto w-14">
+            취소처리
+          </button>
+          <button @click="excelButton" class="button save w-auto excel">
+            엑셀
+          </button> -->
         <button @click="saveButton" class="button save md:w-auto w-14">
           저장
         </button>
@@ -29,22 +29,17 @@
     </div>
     <div
       class="grid grid-cols-[1fr,1fr] grid-rows-2 bg-gray-200 rounded-lg h-24 items-center pt-1 z-10 pl-5 justify-end">
-      <div class="flex justify-start items-center">
+      <div class="flex justify-start items-center col-span-2">
         <span class="text-base font-semibold">구분</span>
-        <select name="" id="" class="w-60 h-8 ml-10" v-model="cond">
+        <select
+          name=""
+          id=""
+          class="w-60 h-8 ml-10"
+          v-model="cond"
+          @change="setCoupon">
           <option value="0">선택</option>
-          <option :value="i.lngGftCategory" v-for="i in optionList">
-            {{ i.strGftCategory }}
-          </option>
-        </select>
-      </div>
-
-      <div>
-        <span class="text-base font-semibold">권종</span>
-        <select name="" id="" class="w-60 h-8 ml-10" v-model="cond2">
-          <option value="0">선택</option>
-          <option :value="i.lngGftType" v-for="i in optionList2">
-            {{ i.strGftType }}
+          <option :value="i.lngCouponType" v-for="i in optionList">
+            {{ i.strCouponName }}
           </option>
         </select>
       </div>
@@ -77,14 +72,59 @@
       </div>
       ※ 1. 샘플파일 다운받아 작성. 2. 엑셀파일 import 후 저장클릭.
       <br />※ Excel 97~2003 호환버전만 지원합니다. <br />
-      ※ 상품코드 번호는 최대 16자리 숫자만 등록 가능합니다. <br />
+      ※ 쿠폰코드 번호는 최대 16자리 숫자만 등록 가능합니다. <br />
+      ※ 파일 작성 시 필요한 부분만 작성해 주시면 됩니다.(예 -쿠폰번호 자동 생성
+      시 수신 번호만 작성) <br />
       <div class="text-red-500">
-        ※ 반드시 구분선택, 권종선택 후 등록 하십시오.
+        ※ 반드시 쿠폰 정보 확인 후 등록 하십시오.(프로모션 관리 > 이벤트
+        쿠폰등록 에서 수정)
+      </div>
+    </div>
+
+    <div class="grid grid-rows-1 grid-cols-3">
+      <div class="flex space-x-1">
+        <div>◎쿠폰정보: 문자</div>
+        <div>
+          <input
+            type="text"
+            class="border border-black"
+            disabled
+            v-model="cond2" />
+        </div>
+      </div>
+
+      <div class="flex space-x-1">
+        <div>쿠폰번호</div>
+        <div>
+          <input
+            type="text"
+            class="border border-black"
+            disabled
+            v-model="cond3" />
+        </div>
+      </div>
+
+      <div class="flex space-x-1">
+        <div>유효기간</div>
+        <div>
+          <input
+            type="text"
+            class="border border-black"
+            disabled
+            v-model="cond4" />
+        </div>
+        <div>
+          <input
+            type="text"
+            class="border border-black"
+            disabled
+            v-model="cond5" />
+        </div>
       </div>
     </div>
     <div class="w-full h-[60%] mt-3">
       <Realgrid
-        :progname="'CRM60_007INS_VUE'"
+        :progname="'CRM22_002INS_VUE'"
         :progid="1"
         :rowData="rowData"
         :reload="reload"
@@ -117,11 +157,10 @@
 
 <script setup>
 import {
+  getEventCouponEnrollList,
   getGFTMaster,
   getGFTMaster2,
-  getInitGftData,
   saveExcelDataGft,
-  saveGftCardClientEnroll,
 } from "@/api/micrm";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -160,7 +199,7 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
-import { read, utils, write, writeFile } from "xlsx-js-style";
+import { read, utils } from "xlsx-js-style";
 /**
  * 	화면 Load시 실행 스크립트
  */
@@ -168,19 +207,37 @@ import { read, utils, write, writeFile } from "xlsx-js-style";
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
-  const res2 = await getInitGftData(store.state.userData.lngStoreGroup);
+  const res2 = await getEventCouponEnrollList(
+    store.state.userData.lngStoreGroup
+  );
   console.log(res2);
   optionList.value = res2.data.List;
-  optionList2.value = res2.data.List2;
+  //optionList2.value = res2.data.List2;
 });
+
+const setCoupon = (e) => {
+  if (e.target.value == 0) {
+    return;
+  }
+  console.log(optionList.value);
+
+  const filtered = optionList.value.filter(
+    (item) => item.lngCouponType == e.target.value
+  )[0];
+
+  cond2.value = filtered.strSMSSendYN == "N" ? "미전송" : "전송";
+  cond3.value = filtered.lngCouponType;
+  cond4.value = filtered.strFrom;
+  cond5.value = filtered.strTo;
+};
 const fileInput = ref(null);
 
 const beforeFileSelect = () => {
   // 여기서 점검: 권한, 사용자 상태 등
-  if (cond.value == "0" || cond2.value == "0") {
+  if (cond.value == "0") {
     Swal.fire({
       title: "경고",
-      text: "구분과 권종 부분을 미리 선택해주세요.",
+      text: "쿠폰을 미리 선택해주세요.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -195,7 +252,7 @@ const handleFileChange = async (e) => {
   console.log(file);
   currentFile.value = file;
   cond3.value = 1;
-
+  SheetList.value = [];
   if (file) {
     const arrayBuffer = await file.arrayBuffer();
     // XLSX 라이브러리에서 arrayBuffer 사용 가능
@@ -208,7 +265,7 @@ const handleFileChange = async (e) => {
     }
 
     const result = await readFileWithArrayBuffer(file);
-    console.log(result);
+    //console.log(result);
   }
 };
 
@@ -221,14 +278,7 @@ async function readFileWithArrayBuffer(file) {
   const sheet = workbook.Sheets[sheetName];
   const jsonData = utils.sheet_to_json(sheet, { header: 1 });
 
-  const header = [
-    "lngAmount",
-    "strGftCardno",
-    "lngSaleStore",
-    "dtmSaledate",
-    "dtmFromdate",
-    "dtmTodate",
-  ];
+  const header = ["strMobile", "strCouponNo"];
 
   const rows = jsonData.slice(1); // 실제 데이터 행들
 
@@ -257,8 +307,8 @@ const afterSearch = ref(false);
 const selectedCond = ref(0);
 const condValue = ref(0);
 const cond = ref("0");
-const cond2 = ref("0");
-const cond3 = ref(1);
+const cond2 = ref("");
+const cond3 = ref("");
 const cond4 = ref("");
 const cond5 = ref("");
 
@@ -442,8 +492,8 @@ const lngStoreCode2 = async (e) => {
  */
 const downloadFile = () => {
   const link = document.createElement("a");
-  link.href = "/GiftCreateSample.xls"; // public 폴더 또는 정적 자원 경로
-  link.download = "GiftCreateSample.xls";
+  link.href = "/CouponCreate.xls"; // public 폴더 또는 정적 자원 경로
+  link.download = "CouponCreate.xls";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
