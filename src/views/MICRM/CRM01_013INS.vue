@@ -109,7 +109,7 @@
   <!-- 그리드 부분 -->
   <!-- 데이터 부분 -->
   <div class="mt-10">
-    <div class="grid grid-cols-4 grid-rows-8 gap-0 w-full">
+    <div class="grid grid-cols-[2fr,3fr,2fr,3fr] grid-rows-8 gap-0 w-full">
       <div
         class="border flex h-7 items-center text-sm font-semibold justify-center bg rounded-ss-xl bg-gray-100 text-blue-500">
         *카드번호

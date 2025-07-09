@@ -2425,3 +2425,25 @@ export const deleteClientInfo = (groupCd, supid, suptype) => {
     SUP_TYPE: suptype,
   });
 };
+
+export const getCustCompany3 = (groupCd) => {
+  return api2.post("/MIMASTER/MST49_008INS.asmx/getCustCompany3", {
+    GROUP_CD: groupCd,
+  });
+};
+export const getStoreInfoList = (compCode, storeCd) => {
+  return api2.post("/MIMASTER/MST49_008INS.asmx/getStoreInfoList", {
+    COMP_CD: compCode,
+    STORE_CD: storeCd,
+  });
+};
+export const saveCompInfo = (groupCd, compCode, bpid, bpnm, useyn, regid) => {
+  return api2.post("/MIMASTER/MST49_008INS.asmx/saveCompInfo", {
+    GROUP_CD: groupCd,
+    COMP_CD: compCode,
+    BP_ID: bpid,
+    BP_NM: bpnm,
+    USE_YN: useyn,
+    REG_ID: regid,
+  });
+};

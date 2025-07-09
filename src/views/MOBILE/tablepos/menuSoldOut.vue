@@ -108,7 +108,7 @@
 
         <template v-for="(menu, idx) in menuList" :key="idx">
           <div
-            class="border-l border-t bg-sky-50 border-black flex justify-center items-center"
+            class="border-l border-t bg-sky-50 border-black flex justify-center items-center min-h-10"
             :class="{
               'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
@@ -116,7 +116,7 @@
             <input type="checkbox" @change="toggleSelection(menu.MENU_CD)" />
           </div>
           <div
-            class="border-l border-t bg-sky-50 border-black"
+            class="border-l border-t bg-sky-50 border-black min-h-10"
             :class="{
               'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
@@ -124,7 +124,7 @@
             {{ menu.MENU_CD }}
           </div>
           <div
-            class="border-l border-t bg-sky-50 border-black leading-normal"
+            class="border-l border-t bg-sky-50 border-black leading-normal min-h-10"
             :class="{
               'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
@@ -132,7 +132,7 @@
             {{ menu.MENU_NAME }}
           </div>
           <div
-            class="border-l border-t bg-sky-50 border-black flex justify-end"
+            class="border-l border-t bg-sky-50 border-black flex justify-end min-h-10"
             :class="{
               'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
@@ -140,7 +140,7 @@
             {{ formatNumberWithCommas(menu.MENU_PRICE) }}
           </div>
           <div
-            class="border-l border-t border-r bg-sky-50 border-black"
+            class="border-l border-t border-r bg-sky-50 border-black min-h-10"
             :class="{
               'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
