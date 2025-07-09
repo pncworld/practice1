@@ -1,7 +1,7 @@
 <!-- /*--############################################################################
 # Filename : CRM01_013INS.vue                                                  
 # Description : 마스터관리 > 직원후불 마스터 > 직원후불 고객정보관리            
-# Date :2025-05-14                                                             
+# Date :2025-07-09                                                             
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
@@ -74,7 +74,12 @@
       <button @click="addButton" class="whitebutton" :disabled="disableButton">
         추가
       </button>
-      <!-- <button @click="deleteButton" class="whitebutton">삭제</button> -->
+      <button
+        @click="deleteButton"
+        class="whitebutton"
+        :disabled="disableButton">
+        삭제
+      </button>
     </div>
     <Realgrid
       class="w-full h-full mt-2"
@@ -91,7 +96,7 @@
       @sendRowState="sendRowState"
       :valuesData="valuesData"
       :labelsData="labelsData"
-      :deleteRow="deleted"
+      :deleteRow3="deleted"
       :changeColid="changeColid"
       :changeRow="changeRow"
       :changeValue2="changeValue"
@@ -103,6 +108,7 @@
       :addrowProp="addrowProp"
       :addField="'new'"
       :rowStateeditable="false"
+      :documentSubTitle="documentSubTitle"
       :documentTitle="'CRM01_013INS'"
       :exporttoExcel="exExcel"></Realgrid>
   </div>
@@ -689,6 +695,12 @@ const documentSubTitle = ref("");
 const excelStore = (e) => {
   documentSubTitle.value = e;
   p2cond.value = e.split("사업장명 : ")[1];
+
+  documentSubTitle.value += "\n" + "조회조건 :";
+  documentSubTitle.value +=
+    (cond3.value == true ? "퇴사자 제외 ," : "" + " , ") +
+    (cond4.value == true ? "분실/교체 제외" : "");
+
   //console.log(p2cond.value);
 };
 const exportToExcel = () => {
@@ -702,14 +714,6 @@ const rowData = ref([]);
 /**
  * 페이지 매장 분류 세팅
  */
-
-const initlngStoreAttr = ref(-1);
-
-const initlngJoinType = ref(-1);
-
-const initlngSubLease = ref(-1);
-
-const initlngStoreArea = ref(-1);
 
 /**
  * 페이지 매장 슈퍼바이저 세팅
@@ -893,6 +897,9 @@ const addButton = () => {
   addRow4.value = !addRow4.value;
 };
 
+const deleteButton = () => {
+  deleted.value = !deleted.value;
+};
 /**
  *  저장 버튼 함수
  */
@@ -1269,7 +1276,7 @@ const sendRowState = (e) => {
 
 const checkedRows = ref([]);
 const checkedRowData = (e) => {
-  //console.log(e);
+  console.log(e);
 
   checkedRows.value = e;
 };

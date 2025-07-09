@@ -2691,6 +2691,7 @@ watch(
     const checkedIndexes = [];
 
     alldata.forEach((item, index) => {
+      console.log(item);
       if (item.checkbox === true) {
         checkedIndexes.push(index); // 체크된 항목의 인덱스를 저장
       }
@@ -2781,6 +2782,38 @@ watch(
     emit("allStateRows", dataProvider.getAllStateRows());
   }
 );
+
+// watch( / /전체 체크 여부 검사?
+//   () => props.deleteRow7,
+//   (newVal) => {
+//     gridView.commit();
+//     const curr = gridView.getCurrent(); // gridView 가뭔지  dataProvider 가 뭔지 개념을 설명
+//     if (curr.dataRow == -1) {
+//       return;
+//     }
+//     const alldata = dataProvider.getJsonRows();
+//     const checkedIndexes = [];
+
+//     alldata.forEach((item, index) => {
+//       console.log(item);
+//       if (item.checkbox === true) {
+//         checkedIndexes.push(index); // 체크된 항목의 인덱스를 저장
+//       }
+//     });
+
+//     for (var i = 0; i < checkedIndexes.length; i++) {
+//       props.rowData[checkedIndexes[i]].deleted = true;
+//       dataProvider.setValue(checkedIndexes[i], "deleted", true); // "deleted" 속성을 true로 설정
+//       dataProvider.removeRow(checkedIndexes[i]);
+//     }
+//     updatedrowData.value = [...dataProvider.getJsonRows()];
+//     emit("updatedRowData", updatedrowData.value);
+//     deleted2activated.value = true;
+//     addrow4activated.value = true;
+//     //deletedIndex.value = curr.dataRow
+//   }
+// );
+
 watch(
   () => props.deleteAll,
   (newVal) => {
