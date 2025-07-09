@@ -86,23 +86,23 @@
       <div
         class="w-[95vw] h-10 grid grid-rows-none auto-rows-auto grid-cols-[1fr,2fr,4fr,1.6fr,1.5fr]">
         <div
-          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center">
+          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
           선택
         </div>
         <div
-          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center">
+          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
           메뉴코드
         </div>
         <div
-          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center">
+          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
           메뉴명
         </div>
         <div
-          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center">
+          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
           단가
         </div>
         <div
-          class="border-l border-t border-b bg-sky-200 border-r border-black flex justify-center items-center">
+          class="border-l border-t border-b bg-sky-200 border-r border-black flex justify-center items-center h-8">
           판매상태
         </div>
 
