@@ -108,7 +108,7 @@
 
         <template v-for="(menu, idx) in menuList" :key="idx">
           <div
-            class="border-l border-t bg-sky-50 border-black flex justify-center items-center min-h-10"
+            class="border-l border-t bg-sky-50 border-black flex justify-center items-center min-h-10 max-h-none"
             :class="{
               'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
@@ -116,7 +116,7 @@
             <input type="checkbox" @change="toggleSelection(menu.MENU_CD)" />
           </div>
           <div
-            class="border-l border-t bg-sky-50 border-black min-h-10"
+            class="border-l border-t bg-sky-50 border-black min-h-10 max-h-none items-center flex"
             :class="{
               'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
@@ -124,15 +124,19 @@
             {{ menu.MENU_CD }}
           </div>
           <div
-            class="border-l border-t bg-sky-50 border-black leading-normal min-h-10"
+            class="border-l border-t bg-sky-50 border-black flex min-h-[2.5rem] whitespace-normal"
             :class="{
               'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
             }">
-            {{ menu.MENU_NAME }}
+            <span
+              class="whitespace-normal break-words flex"
+              :class="{ 'items-center': wordLength(menu.MENU_NAME) }">
+              {{ menu.MENU_NAME }}
+            </span>
           </div>
           <div
-            class="border-l border-t bg-sky-50 border-black flex justify-end min-h-10"
+            class="border-l border-t bg-sky-50 border-black flex justify-end min-h-10 max-h-none items-center"
             :class="{
               'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
@@ -140,7 +144,7 @@
             {{ formatNumberWithCommas(menu.MENU_PRICE) }}
           </div>
           <div
-            class="border-l border-t border-r bg-sky-50 border-black min-h-10"
+            class="border-l border-t border-r bg-sky-50 border-black min-h-10 max-h-none items-center flex"
             :class="{
               'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
@@ -339,6 +343,14 @@ const fri = ref(false);
 const sat = ref(false);
 const sun = ref(false);
 
+const wordLength = (e) => {
+  console.log(e.Length);
+  if (e.length <= 16) {
+    return true;
+  } else {
+    return false;
+  }
+};
 const reSearch = ref(false);
 const saveButton = async (e) => {
   try {
