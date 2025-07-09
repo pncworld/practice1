@@ -74,7 +74,7 @@
           사용기간
         </div>
         <div
-          class="border-l border-t border-r border-black flex flex-col justify-start p-2 items-start  space-y-2 ">
+          class="border-l border-t border-r border-black flex flex-col justify-center p-2 items-start  space-y-2 ">
           <div class="flex justify-start text-lg">
             <label for="alldate"
               ><input
@@ -98,7 +98,7 @@
           사용시간
         </div>
         <div
-          class="border-l border-t border-r border-black flex flex-col justify-start p-2 items-start  space-y-2  text-lg" >
+          class="border-l border-t border-r border-black flex flex-col justify-center p-2 items-start  space-y-2  text-lg" >
           <div  class="">
             <label for="alltime"
               ><input
@@ -148,7 +148,7 @@
           사용요일
         </div>
         <div
-          class="border-l border-t border-r border-black flex flex-col justify-start p-2 items-start  space-y-2  text-lg border-b">
+          class="border-l border-t border-r border-black flex flex-col justify-center p-2 items-start  space-y-2  text-lg border-b">
           <div ><label for="allcheck"><input @click="checkDays" type="checkbox" id="allcheck" v-model="allcheck">전체체크</input></label></div>
           <div class="flex flex-col">
             <div class="space-x-3">
