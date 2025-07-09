@@ -116,7 +116,7 @@
             <input type="checkbox" @change="toggleSelection(menu.MENU_CD)" />
           </div>
           <div
-            class="border-l border-t bg-sky-50 border-black h-auto flex"
+            class="border-l border-t bg-sky-50 border-black h-auto flex items-center"
             :class="{
               'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
@@ -124,7 +124,7 @@
             {{ menu.MENU_CD }}
           </div>
           <div
-            class="border-l border-t bg-sky-50 border-black flex h-auto whitespace-normal"
+            class="border-l border-t bg-sky-50 border-black flex h-auto whitespace-normal items-center"
             :class="{
               'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
@@ -135,7 +135,7 @@
             </div>
           </div>
           <div
-            class="border-l border-t bg-sky-50 border-black flex h-auto justify-end"
+            class="border-l border-t bg-sky-50 border-black flex h-auto justify-end items-center"
             :class="{
               'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
@@ -143,7 +143,7 @@
             {{ formatNumberWithCommas(menu.MENU_PRICE) }}
           </div>
           <div
-            class="border-l border-t border-r bg-sky-50 border-black h-auto flex"
+            class="border-l border-t border-r bg-sky-50 border-black h-auto flex items-center"
             :class="{
               'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
