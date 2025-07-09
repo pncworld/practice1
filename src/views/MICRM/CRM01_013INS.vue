@@ -1,19 +1,24 @@
-/*--############################################################################
-# Filename : MST01_002INS.vue                                                  
-# Description : 마스터관리 > 매장 마스터 > 매장정보등록                        
+<!-- /*--############################################################################
+# Filename : CRM01_013INS.vue                                                  
+# Description : 마스터관리 > 직원후불 마스터 > 직원후불 고객정보관리            
 # Date :2025-05-14                                                             
 # Author : 권맑음                     
-################################################################################*/
+################################################################################*/ -->
 <template>
   <!-- 조회 부분 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
     <div class="flex justify-center mr-10 space-x-2 pr-5">
-      <button @click="receiveButton" class="button primary" v-if="showReceive">
-        수신
+      <button
+        @click="receiveButton"
+        class="button primary !w-24 !text-nowrap"
+        v-if="disableButton">
+        정보 수신
       </button>
       <button @click="searchButton" class="button search">조회</button>
-      <button @click="saveButton" class="button save">저장</button>
+      <button @click="saveButton" class="button save" :disabled="disableButton">
+        저장
+      </button>
       <button @click="exportToExcel" class="button excel">엑셀</button>
     </div>
   </div>
@@ -22,6 +27,8 @@
     <PickCustCompany
       :setAPI="1"
       @excelStore="excelStore"
+      @lngIFChk="lngIFChk"
+      @BP_ID="BP_ID"
       @lngStoreCode="setCompanyCode"></PickCustCompany>
     <div class="flex items-center justify-center space-x-2">
       <div class="font-semibold text-base">조회조건:</div>
@@ -64,7 +71,9 @@
   <!-- 그리드 부분 -->
   <div class="h-[32vh] w-full">
     <div class="flex justify-end gap-1 mt-1">
-      <button @click="addButton" class="whitebutton">추가</button>
+      <button @click="addButton" class="whitebutton" :disabled="disableButton">
+        추가
+      </button>
       <!-- <button @click="deleteButton" class="whitebutton">삭제</button> -->
     </div>
     <Realgrid
@@ -115,7 +124,12 @@
           :disabled="disabled"
           name="strSaleCardNo"
           @input="updateGridValue" />
-        <button class="whitebutton" @click="cardChange">카드변경</button>
+        <button
+          class="whitebutton"
+          @click="cardChange"
+          :disabled="disableButton">
+          카드변경
+        </button>
       </div>
       <div
         class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
@@ -357,10 +371,16 @@
   <div class="text-base font-semibold">※후불 고객 정보 엑셀 업로드</div>
   <div class="flex justify-start items-center pl-10">
     <span class="text-base font-semibold">파일</span>
-    <button @click="beforeFileSelect" class="whitebutton bg-white ml-10">
+    <button
+      @click="beforeFileSelect"
+      class="whitebutton bg-white ml-10"
+      :disabled="disableButton">
       파일 업로드
     </button>
-    <button class="whitebutton bg-white ml-10" @click="getExcelFiles">
+    <button
+      class="whitebutton bg-white ml-10"
+      @click="getExcelFiles"
+      :disabled="disableButton">
       엑셀파일 불러오기
     </button>
     <span class="font-semibold text-base ml-10">Sheet</span>
@@ -376,7 +396,10 @@
       </select>
     </div>
     <div class="pl-10">
-      <button class="whitebutton !bg-blue-500 !text-white" @click="saveButton3">
+      <button
+        class="whitebutton !bg-blue-500 !text-white"
+        @click="saveButton3"
+        :disabled="disableButton">
         업로드
       </button>
     </div>
@@ -478,6 +501,77 @@
       </div>
     </div>
   </div>
+
+  <div
+    v-if="openpopup2"
+    class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+    <div class="bg-white rounded-2xl shadow-lg p-6 w-[30vw] h-[40vh]">
+      <h2 class="text-lg font-bold mb-4 text-center">고객정보 수신 작업</h2>
+      <div
+        class="grid grid-rows-[1fr,1fr,1fr,1fr,1fr] grid-cols-[1fr,3fr] h-[60%]">
+        <div
+          class="text-base font-semibold border-l border-t border-black flex justify-center items-center bg-gray-100">
+          사업장명
+        </div>
+        <div
+          class="text-base font-semibold border-l border-t border-black flex justify-start pl-3 items-center">
+          <input
+            type="text"
+            class="border border-black h-[80%] w-[80%]"
+            v-model="p2cond"
+            disabled />
+        </div>
+        <div
+          class="text-base font-semibold border-l border-t border-black flex justify-center bg-gray-100 items-center">
+          수신유형
+        </div>
+        <div
+          class="text-base font-semibold border-l border-t border-black flex justify-start pl-3 items-center space-x-3">
+          <label for="p2cond2"
+            ><input
+              type="radio"
+              v-model="p2cond2"
+              value="1"
+              id="p2cond2" />수정내역 수신</label
+          >
+          <label for="p2cond22"
+            ><input
+              type="radio"
+              v-model="p2cond2"
+              value="0"
+              id="p2cond22" />전체 수신</label
+          >
+        </div>
+        <div
+          class="text-base font-semibold border-l border-t border-b border-black flex justify-center items-center bg-gray-100">
+          수정일자
+        </div>
+        <div
+          class="text-base font-semibold border-l border-t border-b border-black flex justify-start pl-3 items-center">
+          <input
+            type="date"
+            class="border border-black"
+            v-model="p2cond3"
+            :disabled="disabled2" />
+        </div>
+      </div>
+
+      <div class="flex space-x-2">
+        <button
+          class="mt-4 w-full bg-gray-800 text-white py-2 rounded-xl"
+          @click="receiveButton2">
+          수신
+        </button>
+
+        <button
+          class="mt-4 w-full bg-gray-800 text-white py-2 rounded-xl"
+          @click="openpopup2 = false">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+
   <input
     type="file"
     ref="fileInput"
@@ -488,6 +582,7 @@
 </template>
 
 <script setup>
+import { setEmployeeInfo, setEmployeeInfo2 } from "@/api/etc";
 import {
   deleteCustomors2,
   getAccCust,
@@ -542,7 +637,7 @@ onMounted(async () => {
   }
 });
 
-const result = ref([]);
+const disableButton = ref(false);
 const store = useStore();
 const groupCd = ref();
 
@@ -593,6 +688,8 @@ const documentSubTitle = ref("");
 
 const excelStore = (e) => {
   documentSubTitle.value = e;
+  p2cond.value = e.split("사업장명 : ")[1];
+  //console.log(p2cond.value);
 };
 const exportToExcel = () => {
   exExcel.value = !exExcel.value;
@@ -629,6 +726,7 @@ const cond2 = ref("");
 const cond3 = ref(true);
 const cond4 = ref(true);
 const disabled = ref(true);
+const disabled2 = ref(false);
 const searchButton = async () => {
   if (CompanyCode.value == 0) {
     Swal.fire({
@@ -688,8 +786,79 @@ const searchButton = async () => {
   }
 };
 
-const receiveButton = (e) => {
-  showReceive.value;
+const openpopup2 = ref(false);
+const receiveButton = async (e) => {
+  if (currIFCHK.value == 1) {
+    //http://www.pncoffice.com:8081/CJFWBaeminEmpSaleService.asmx/GET_EMP_CUST_LIST
+    openpopup2.value = true;
+    const currDate = new Date().toISOString().split("T")[0];
+    p2cond3.value = currDate;
+  } else if (currIFCHK.value == 2) {
+    const currDate = new Date().toISOString().split("T")[0];
+    try {
+      store.state.loading = true;
+      const res = await setEmployeeInfo(
+        CompanyCode.value,
+        currDate,
+        store.state.userData.lngSequence
+      );
+
+      store.state.loading = false;
+      if (res.data.d == "success") {
+        Swal.fire({
+          title: "성공",
+          text: "수신을 성공하였습니다.",
+          icon: "success",
+          confirmButtonText: "확인",
+        });
+        return;
+      } else {
+        Swal.fire({
+          title: "실패",
+          text: "수신에 실패하였습니다. 피앤시월드로 문의해주세요.",
+          icon: "error",
+          confirmButtonText: "확인",
+        });
+        return;
+      }
+    } catch (error) {}
+  }
+};
+
+const receiveButton2 = async () => {
+  // strRcvID , strDate , strRegID , strBpID
+  const currDate = new Date().toISOString().split("T")[0];
+  let regId = "";
+  if (p2cond2.value == 0) {
+    regId = "";
+  } else {
+    regId = p2cond3.value;
+  }
+  const res = await setEmployeeInfo2(
+    CompanyCode.value,
+    currDate,
+    store.state.userData.lngSequence,
+    regId,
+    currBPID.value
+  );
+  openpopup2.value = false;
+  if (res.data.d == "성공했습니다.") {
+    Swal.fire({
+      title: "성공",
+      text: "수신 완료하였습니다.",
+      icon: "success",
+      confirmButtonText: "확인",
+    });
+    return;
+  } else {
+    Swal.fire({
+      title: "실패",
+      text: "수신에 실패하였습니다. 피앤시월드로 문의 바랍니다.",
+      icon: "error",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
 };
 const deleted = ref(false);
 
@@ -697,18 +866,6 @@ const deleted = ref(false);
  * 삭제 버튼
  */
 
-const deleteButton = () => {
-  if (afterSearch.value == false) {
-    Swal.fire({
-      title: "경고",
-      text: "조회를 먼저 진행해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  deleted.value = !deleted.value;
-};
 const addrowDefault = ref("");
 const addrowProp = ref("");
 /**
@@ -1239,6 +1396,33 @@ const downloadFile = () => {
   link.click();
   document.body.removeChild(link);
 };
+
+const currIFCHK = ref(0);
+const currBPID = ref(0);
+const lngIFChk = (e) => {
+  currIFCHK.value = e;
+  if (e == 0) {
+    disableButton.value = false;
+  } else if (e == 1 || e == 2) {
+    disableButton.value = true;
+  }
+};
+const BP_ID = (e) => {
+  console.log(e);
+  currBPID.value = e;
+};
+
+const p2cond = ref("");
+const p2cond2 = ref("1");
+const p2cond3 = ref("");
+
+watch(p2cond2, () => {
+  if (p2cond2.value == 1) {
+    disabled2.value = false;
+  } else {
+    disabled2.value = true;
+  }
+});
 </script>
 
 <style></style>

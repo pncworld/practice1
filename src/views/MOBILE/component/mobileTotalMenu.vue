@@ -46,11 +46,12 @@
             <font-awesome-icon
               :icon="['far', 'calendar-days']"
               class="size-8"
-              v-if="index == 0" />
-            <font-awesome-icon
-              :icon="['fas', 'truck']"
-              class="size-8"
-              v-if="index == 1" />
+              v-if="i.mainCode == 20" />
+            <img
+              v-if="i.mainCode == 50"
+              src="../../../assets/tablet-screen-button-solid.svg"
+              alt=""
+              class="size-8" />
             <div class="text-xl ml-4">{{ i.title }}</div>
           </button>
 

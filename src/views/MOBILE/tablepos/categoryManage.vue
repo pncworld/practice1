@@ -30,13 +30,18 @@
     </div> -->
     <div class="flex justify-center items-center mt-2 w-full">
       <div
-        class="grid grid-rows-6 grid-cols-[1fr,3fr] text-sm w-[95vw] h-[60vh]">
+        class="grid grid-rows-[3fr,3fr,5fr,5fr,5fr] grid-cols-[1fr,3fr] text-sm w-[95vw] h-[70vh]">
         <!-- <div
           class="bg-gray-200 flex justify-center border-l border-t border-black items-center">
           카테고리명
         </div> -->
-        <div
-          class="border-l border-t border-black flex justify-center pl-2 text-lg items-center overflow-hidden col-span-2 bg-green-200 ">
+        <div v-if="!FirstSearch"
+          class="border-l border-t border-r border-black flex justify-center items-center  text-lg  p-2 overflow-hidden col-span-2 bg-green-200 ">
+          <span>카테고리를 먼저 선택해주세요. ↗</span>
+        </div>
+
+        <div v-if="FirstSearch"
+          class="border-l border-t border-r border-black flex justify-center pl-2 text-lg items-center overflow-hidden col-span-2 bg-green-200 ">
          {{ category }} <span class="text-xl pl-2 pr-2">></span> {{ cond1 }}
         </div>
 
@@ -45,7 +50,7 @@
           사용여부
         </div>
         <div
-          class="border-l border-t border-black flex justify-start pl-2 text-lg items-center space-x-10">
+          class="border-l border-t border-r border-black flex justify-start pl-2 text-lg items-center space-x-10">
           <label for="use"
             ><input
               type="radio"
@@ -65,12 +70,12 @@
         </div>
 
         <div
-          class="bg-gray-200 flex justify-center border-l border-t border-black items-center row-span-2">
+          class="bg-gray-200 flex justify-center border-l border-t border-black items-center ">
           사용기간
         </div>
         <div
-          class="border-l border-t border-black flex flex-col justify-start  row-span-2 space-y-4">
-          <div class="pl-2 mt-2">
+          class="border-l border-t border-r border-black flex flex-col justify-start p-2 items-start  space-y-2 ">
+          <div class="flex justify-start text-lg">
             <label for="alldate"
               ><input
                 type="checkbox"
@@ -80,20 +85,21 @@
                 @click="handleDate" />전체기간</label
             >
           </div>
-          <div class="grid grid-rows-1 grid-cols-[3fr,0.5fr,3fr] space-x-0 ">
-            <input type="date" v-model="cond2" class="text-sm  w-[35vw] disabled:bg-gray-400 !mr-2 " :disabled="disable1" />
-            <span class="flex justify-center items-center">~</span>
-            <input type="date" v-model="cond5"  class="text-sm  w-[35vw] disabled:bg-gray-400 !mr-2 " :disabled="disable1" />
+          <div class="flex flex-col space-y-2 text-lg ">
+            <div class="flex"><span>시작일 : </span><input type="date" v-model="cond2" class="text-lg ml-1  w-[35vw] disabled:bg-gray-400 !mr-2 " :disabled="disable1" /></div>
+           
+            <!-- <span class="flex justify-center items-center">~</span> -->
+            <div class="flex "><span>종료일 : </span><input type="date" v-model="cond5"  class=" ml-1 w-[35vw] disabled:bg-gray-400 !mr-2 text-lg " :disabled="disable1" /></div>
           </div>
         </div>
 
         <div
-          class="bg-gray-200 flex justify-center border-l border-t border-black items-center row-span-2">
+          class="bg-gray-200 flex justify-center border-l border-t border-black items-center ">
           사용시간
         </div>
         <div
-          class="border-l border-t border-black flex flex-col justify-start row-span-2 space-y-3" >
-          <div  class="pl-2 mt-2">
+          class="border-l border-t border-r border-black flex flex-col justify-start p-2 items-start  space-y-2  text-lg" >
+          <div  class="">
             <label for="alltime"
               ><input
                 type="checkbox"
@@ -102,30 +108,32 @@
                 @click="handleTime" />전체시간</label
             >
           </div>
-          <div class="grid grid-rows-1 grid-cols-[3fr,1fr,3fr] pl-2 ">
+          <div class="flex flex-col space-y-2 ">
             <div class="pr-2">
-              <select name="" id="" v-model="cond3" :disabled="disable2">
+              <span>시작시간 : </span>
+              <select name="" id="" v-model="cond3" :disabled="disable2" class="ml-1 text-lg disabled:bg-gray-400  disabled:opacity-100">
                 <option :value="i.lngCode" v-for="i in optionList">
                   {{ i.strName }}
                 </option>
               </select>
               <span>시</span>
-              <select name="" id="" v-model="cond4" :disabled="disable2">
+              <select name="" id="" v-model="cond4" :disabled="disable2" class="text-lg  disabled:bg-gray-400  disabled:opacity-100">
                 <option :value="i.lngCode" v-for="i in optionList2">
                   {{ i.strName }}
                 </option>
               </select>
               <span>분</span>
             </div>
-            <span>~</span>
+    
             <div class="pr-2">
-              <select name="" id="" v-model="cond6" :disabled="disable2">
+              <span>종료시간 : </span>
+              <select name="" id="" v-model="cond6" :disabled="disable2" class=" text-lg ml-1 disabled:bg-gray-400 disabled:opacity-100">
                 <option :value="i.lngCode" v-for="i in optionList">
                   {{ i.strName }}
                 </option>
               </select>
               <span>시</span>
-              <select name="" id="" v-model="cond7" :disabled="disable2">
+              <select name="" id="" v-model="cond7" :disabled="disable2" class=" text-lg disabled:bg-gray-400  disabled:opacity-100">
                 <option :value="i.lngCode" v-for="i in optionList2">
                   {{ i.strName }}
                 </option>
@@ -136,13 +144,14 @@
         </div>
 
         <div
-          class="bg-gray-200 flex justify-center border-l border-t border-b border-black items-center row-span-2">
+          class="bg-gray-200 flex justify-center border-l border-t border-b border-black items-center ">
           사용요일
         </div>
         <div
-          class="border-l border-t border-b border-black flex flex-col justify-center pl-2 row-span-2 space-y-3">
+          class="border-l border-t border-r border-black flex flex-col justify-start p-2 items-start  space-y-2  text-lg border-b">
           <div ><label for="allcheck"><input @click="checkDays" type="checkbox" id="allcheck" v-model="allcheck">전체체크</input></label></div>
-          <div class="flex">
+          <div class="flex flex-col">
+            <div class="space-x-3">
           <label for="mon"
             ><input
               type="checkbox"
@@ -178,6 +187,8 @@
               v-model="fri"
               @click="handleday" />금</label
           >
+        </div>
+        <div class="space-x-3">
           <label for="sat"
             ><input
               type="checkbox"
@@ -199,6 +210,7 @@
               v-model="holiday"
               @click="handleHoli" />공휴일</label
           >
+        </div>
         </div>
         </div>
 
@@ -339,6 +351,7 @@ const handleHoli = (e) => {
 const LCLASS_CD = ref('')
 const SCLASS_CD = ref('')
 const FILTERDATA = (e) => {
+  FirstSearch.value = true
   console.log(e);
   LCLASS_CD.value = e[0].LCLASS_CD;
   SCLASS_CD.value = e[0].SCLASS_CD;
@@ -617,7 +630,7 @@ const mainCategory = (e) =>{
 /**
  * 	화면 Load시 실행 스크립트
  */
-
+const FirstSearch = ref(false)
 onMounted(() => {});
 </script>
 

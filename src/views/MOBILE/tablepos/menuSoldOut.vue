@@ -36,7 +36,13 @@
             카테고리명
           </div> -->
         <div
-          class="border-l border-t border-black flex justify-center pl-2 text-lg items-center overflow-hidden col-span-4 bg-green-200">
+          v-if="!FirstSearch"
+          class="border-l border-t border-r border-black flex justify-center pl-2 text-lg items-center overflow-hidden col-span-4 bg-green-200">
+          카테고리를 먼저 선택해주세요. ↗
+        </div>
+        <div
+          v-if="FirstSearch"
+          class="border-l border-t border-black border-r flex justify-center pl-2 text-lg items-center overflow-hidden col-span-4 bg-green-200">
           {{ category }} <span class="text-xl pl-2 pr-2">></span> {{ cond1 }}
         </div>
 
@@ -59,7 +65,7 @@
           메뉴명
         </div>
         <div
-          class="border-l border-t border-b border-black flex justify-start pl-2 text-lg items-center">
+          class="border-l border-t border-b border-r border-black flex justify-start pl-2 text-lg items-center">
           <input
             type="text"
             class="border border-black w-[90%]"
@@ -78,52 +84,65 @@
     </div>
     <div class="flex justify-center items-center mt-2">
       <div
-        class="w-[95vw] h-auto grid grid-rows-none auto-rows-auto grid-cols-[1fr,2fr,4fr,1.6fr,1.5fr]">
+        class="w-[95vw] h-10 grid grid-rows-none auto-rows-auto grid-cols-[1fr,2fr,4fr,1.6fr,1.5fr]">
         <div
-          class="border-l border-t bg-sky-200 border-black flex justify-center items-center">
+          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center">
           선택
         </div>
         <div
-          class="border-l border-t bg-sky-200 border-black flex justify-center items-center">
+          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center">
           메뉴코드
         </div>
         <div
-          class="border-l border-t bg-sky-200 border-black flex justify-center items-center">
+          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center">
           메뉴명
         </div>
         <div
-          class="border-l border-t bg-sky-200 border-black flex justify-center items-center">
+          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center">
           단가
         </div>
         <div
-          class="border-l border-t bg-sky-200 border-black flex justify-center items-center">
+          class="border-l border-t border-b bg-sky-200 border-r border-black flex justify-center items-center">
           판매상태
         </div>
 
         <template v-for="(menu, idx) in menuList" :key="idx">
           <div
             class="border-l border-t bg-sky-50 border-black flex justify-center items-center"
-            :class="ischecked(menu.MENU_CD) ? 'bg-red-300' : ''">
+            :class="{
+              'border-b': idx == menuList.length - 1,
+              'bg-red-300': ischecked(menu.MENU_CD),
+            }">
             <input type="checkbox" @change="toggleSelection(menu.MENU_CD)" />
           </div>
           <div
             class="border-l border-t bg-sky-50 border-black"
-            :class="ischecked(menu.MENU_CD) ? 'bg-red-300' : ''">
+            :class="{
+              'border-b': idx == menuList.length - 1,
+              'bg-red-300': ischecked(menu.MENU_CD),
+            }">
             {{ menu.MENU_CD }}
           </div>
           <div
-            class="border-l border-t bg-sky-50 border-black"
-            :class="ischecked(menu.MENU_CD) ? 'bg-red-300' : ''">
+            class="border-l border-t bg-sky-50 border-black leading-normal"
+            :class="{
+              'border-b': idx == menuList.length - 1,
+              'bg-red-300': ischecked(menu.MENU_CD),
+            }">
             {{ menu.MENU_NAME }}
           </div>
           <div
             class="border-l border-t bg-sky-50 border-black flex justify-end"
-            :class="ischecked(menu.MENU_CD) ? 'bg-red-300' : ''">
+            :class="{
+              'border-b': idx == menuList.length - 1,
+              'bg-red-300': ischecked(menu.MENU_CD),
+            }">
             {{ formatNumberWithCommas(menu.MENU_PRICE) }}
           </div>
           <div
-            class="border-l border-t bg-sky-50 border-black"
+            class="border-l border-t border-r bg-sky-50 border-black"
             :class="{
+              'border-b': idx == menuList.length - 1,
               'bg-red-300': ischecked(menu.MENU_CD),
               'text-red-500':
                 menu.MENU_STATUS.includes(1) || menu.MENU_STATUS.includes(2),
@@ -274,6 +293,7 @@ const cond8 = ref("Y");
 const LCLASS_CD = ref("");
 const SCLASS_CD = ref("");
 const FILTERDATA = (e) => {
+  FirstSearch.value = true;
   console.log(e);
   tempcheckedList.value = [];
 
@@ -368,7 +388,7 @@ const category = ref("");
 const mainCategory = (e) => {
   category.value = e;
 };
-
+const FirstSearch = ref(false);
 const selectedLeng = ref("");
 const tempcheckedList = ref([]);
 const toggleSelection = (e) => {

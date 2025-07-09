@@ -173,13 +173,21 @@ const selectedStoreCd = ref(0);
  */
 
 watch(selectedStoreCd, async () => {
-  const res2 = await GetLClassInfo(
-    store.state.userData.GROUP_CD,
-    selectedStoreCd.value.STORE_CD
-  );
-  console.log(res2);
-  optionList.value = res2.data.LClassList;
-  selectedCond.value = 0;
+  if (selectedStoreCd.value != 0) {
+    const res2 = await GetLClassInfo(
+      store.state.userData.GROUP_CD,
+      selectedStoreCd.value.STORE_CD
+    );
+    console.log(res2);
+    optionList.value = res2.data.LClassList;
+    selectedCond.value = 0;
+    selectedCond2.value = 0;
+  } else {
+    optionList.value = [];
+    selectedCond.value = 0;
+    optionList2.value = [];
+    selectedCond2.value = 0;
+  }
 });
 
 watch(selectedCond, async () => {

@@ -82,6 +82,8 @@ const emit = defineEmits([
   "lngStoreGroup",
   "lngStoreAttrs",
   "changeInit",
+  "BP_ID",
+  "lngIFChk",
 ]);
 
 onMounted(async () => {
@@ -94,7 +96,7 @@ onMounted(async () => {
       store.state.userData.lngPositionType
     );
 
-    console.log(res);
+    //console.log(res);
 
     storeCd.value = res.data.List;
     emit("excelStore", "사업장명 : 전체");
@@ -113,6 +115,8 @@ onMounted(async () => {
     emit("excelStore", "사업장명 : 전체");
     if (selectedStore.value == null) {
       emit("lngStoreCode", 0);
+      emit("BP_ID", 0);
+      emit("lngIFChk", "");
     }
   }
 });
@@ -121,9 +125,13 @@ watch(selectedStore, () => {
   if (selectedStore.value == null) {
     emit("lngStoreCode", 0);
     emit("excelStore", "사업장명 : 전체");
+    emit("BP_ID", 0);
+    emit("lngIFChk", "");
   } else {
     emit("lngStoreCode", selectedStore.value.strSaleCompCode);
-    console.log(selectedStore.value);
+    emit("BP_ID", selectedStore.value.BP_ID);
+    emit("lngIFChk", selectedStore.value.lngIFChk);
+
     const name = storeCd.value.filter(
       (item) => item.strSaleCompCode == selectedStore.value.strSaleCompCode
     )[0].strSaleCompName;

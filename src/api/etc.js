@@ -78,3 +78,19 @@ export const SetMenuStkRgst = async (cond, cond2, cond3) => {
     MenuList: cond3,
   });
 };
+export const setEmployeeInfo = async (cond, cond2, cond3) => {
+  return api2.post("CJFWBaeminEmpSaleService.asmx/GET_EMP_CUST_LIST", {
+    strCustCompCode: cond,
+    strRcvID: cond2,
+    REG_ID: cond3,
+  });
+};
+export const setEmployeeInfo2 = async (cond, cond2, cond3, cond4, cond5) => {
+  return api2.post("FoodistInterfaceService.asmx/GET_EMP_CUST_LIST", {
+    strCustCompCode: cond,
+    strRcvID: cond2,
+    strRegID: cond3,
+    strDate: cond4,
+    strBpID: cond5,
+  });
+};
