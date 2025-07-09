@@ -52,7 +52,7 @@
         <div class="text-lg font-medium ml-[4vw]">중카테고리</div>
         <div class="border border-gray-600 w-[60vw]">
           <select name="" id="" class="w-full h-full" v-model="selectedCond2">
-            <option value="0">전체</option>
+            <option value="0">선택</option>
             <option :value="i.SCLASS_CD" v-for="i in optionList2">
               {{ i.FULL_NM }}
             </option>

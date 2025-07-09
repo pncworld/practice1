@@ -56,6 +56,7 @@
               type="radio"
               name="cond8"
               id="use"
+              :disabled="!FirstSearch"
               v-model="cond8"
               value="Y" />사용</label
           >
@@ -64,6 +65,7 @@
               type="radio"
               name="cond8"
               id="nuse"
+               :disabled="!FirstSearch"
               v-model="cond8"
               value="N" />미사용</label
           >
@@ -81,15 +83,16 @@
                 type="checkbox"
                 class=""
                 id="alldate"
+                 :disabled="!FirstSearch"
                 v-model="alldate"
                 @click="handleDate" />전체기간</label
             >
           </div>
           <div class="flex flex-col space-y-2 text-lg ">
-            <div class="flex"><span>시작일 : </span><input type="date" v-model="cond2" class="text-lg ml-1  w-[42vw] disabled:bg-gray-400 !mr-2 " :disabled="disable1" /></div>
+            <div class="flex"><span>시작일 : </span><input type="date"  v-model="cond2" class="text-lg ml-1  w-[42vw] disabled:bg-gray-400 !mr-2 " :disabled="!FirstSearch || disable1" /></div>
            
             <!-- <span class="flex justify-center items-center">~</span> -->
-            <div class="flex "><span>종료일 : </span><input type="date" v-model="cond5"  class=" ml-1 w-[42vw] disabled:bg-gray-400 !mr-2 text-lg " :disabled="disable1" /></div>
+            <div class="flex "><span>종료일 : </span><input type="date" v-model="cond5"  class=" ml-1 w-[42vw] disabled:bg-gray-400 !mr-2 text-lg " :disabled="!FirstSearch || disable1" /></div>
           </div>
         </div>
 
@@ -104,6 +107,7 @@
               ><input
                 type="checkbox"
                 id="alltime"
+                 :disabled="!FirstSearch"
                 v-model="alltime"
                 @click="handleTime" />전체시간</label
             >
@@ -111,13 +115,13 @@
           <div class="flex flex-col space-y-2 ">
             <div class="pr-2">
               <span>시작시간 : </span>
-              <select name="" id="" v-model="cond3" :disabled="disable2" class="ml-1 text-lg disabled:bg-gray-400  disabled:opacity-100">
+              <select name="" id="" v-model="cond3" :disabled="!FirstSearch || disable2" class="ml-1 text-lg disabled:bg-gray-400  disabled:opacity-100">
                 <option :value="i.lngCode" v-for="i in optionList">
                   {{ i.strName }}
                 </option>
               </select>
               <span>시</span>
-              <select name="" id="" v-model="cond4" :disabled="disable2" class="text-lg  disabled:bg-gray-400  disabled:opacity-100">
+              <select name="" id="" v-model="cond4" :disabled="!FirstSearch || disable2" class="text-lg  disabled:bg-gray-400  disabled:opacity-100">
                 <option :value="i.lngCode" v-for="i in optionList2">
                   {{ i.strName }}
                 </option>
@@ -127,13 +131,13 @@
     
             <div class="pr-2">
               <span>종료시간 : </span>
-              <select name="" id="" v-model="cond6" :disabled="disable2" class=" text-lg ml-1 disabled:bg-gray-400 disabled:opacity-100">
+              <select name="" id="" v-model="cond6" :disabled="disable2 || !FirstSearch" class=" text-lg ml-1 disabled:bg-gray-400 disabled:opacity-100">
                 <option :value="i.lngCode" v-for="i in optionList">
                   {{ i.strName }}
                 </option>
               </select>
               <span>시</span>
-              <select name="" id="" v-model="cond7" :disabled="disable2" class=" text-lg disabled:bg-gray-400  disabled:opacity-100">
+              <select name="" id="" v-model="cond7" :disabled="disable2 || !FirstSearch" class=" text-lg disabled:bg-gray-400  disabled:opacity-100">
                 <option :value="i.lngCode" v-for="i in optionList2">
                   {{ i.strName }}
                 </option>
@@ -149,7 +153,7 @@
         </div>
         <div
           class="border-l border-t border-r border-black flex flex-col justify-center pl-2 items-start  space-y-2  text-lg border-b">
-          <div ><label for="allcheck"><input @click="checkDays" type="checkbox" id="allcheck" v-model="allcheck">전체체크</input></label></div>
+          <div ><label for="allcheck"><input @click="checkDays" type="checkbox" id="allcheck" v-model="allcheck" :disabled="!FirstSearch">전체체크</input></label></div>
           <div class="flex flex-col">
             <div class="space-x-3">
           <label for="mon"
@@ -157,13 +161,14 @@
               type="checkbox"
               id="mon"
               v-model="mon"
-              
+               :disabled="!FirstSearch"
               @click="handleday" />월</label
           >
           <label for="tue"
             ><input
               type="checkbox"
               id="tue"
+               :disabled="!FirstSearch"
               v-model="tue"
               @click="handleday" />화</label
           >
@@ -171,6 +176,7 @@
             ><input
               type="checkbox"
               id="wed"
+               :disabled="!FirstSearch"
               v-model="wed"
               @click="handleday" />수</label
           >
@@ -178,6 +184,7 @@
             ><input
               type="checkbox"
               id="thu"
+               :disabled="!FirstSearch"
               v-model="thu"
               @click="handleday" />목</label
           >
@@ -185,6 +192,7 @@
             ><input
               type="checkbox"
               id="fri"
+               :disabled="!FirstSearch"
               v-model="fri"
               @click="handleday" />금</label
           >
@@ -194,6 +202,7 @@
             ><input
               type="checkbox"
               id="sat"
+               :disabled="!FirstSearch"
               v-model="sat"
               @click="handleday" />토</label
           >
@@ -201,6 +210,7 @@
             ><input
               type="checkbox"
               id="sun"
+               :disabled="!FirstSearch"
               v-model="sun"
               @click="handleday" />일</label
           >
@@ -208,6 +218,7 @@
             ><input
               type="checkbox"
               id="holiday"
+               :disabled="!FirstSearch"
               v-model="holiday"
               @click="handleHoli" />공휴일</label
           >
@@ -220,7 +231,7 @@
       
     </div>
     <div class="flex justify-end pr-2 mt-2 ">
-      <button class="button save" @click="saveButton">저장</button>
+      <button class="button save" @click="saveButton"  :disabled="!FirstSearch">저장</button>
     </div>
   </div>
   <CategorySelect

@@ -328,6 +328,7 @@ const FILTERDATA = (e) => {
 
   // alldate.value = e[0].ALL_DATE == "1" ? true : false;
   // alltime.value = e[0].ALL_TIME == "1" ? true : false;
+  searchButton();
 };
 
 const mon = ref(false);
@@ -430,6 +431,14 @@ const scond = ref(9);
 const scond2 = ref("");
 const salecond = ref("0");
 const searchButton = async () => {
+  if (FirstSearch.value == false) {
+    Swal.fire({
+      title: "카테고리를 먼저 선택해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   if (showSave.value == true) {
     await Swal.fire({
       title: "변경하신 사항이 존재합니다. 저장하시겠습니까?",
