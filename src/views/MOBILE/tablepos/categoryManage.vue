@@ -30,7 +30,7 @@
     </div> -->
     <div class="flex justify-center items-center mt-2 w-full">
       <div
-        class="grid grid-rows-[3fr,3fr,5fr,5fr,5fr] grid-cols-[1fr,3fr] text-sm w-[95vw] h-[70vh]">
+        class="grid grid-rows-[3fr,1.8fr,5fr,5fr,5fr] grid-cols-[1fr,3fr] text-sm w-[95vw] h-[55vh]">
         <!-- <div
           class="bg-gray-200 flex justify-center border-l border-t border-black items-center">
           카테고리명
@@ -74,7 +74,7 @@
           사용기간
         </div>
         <div
-          class="border-l border-t border-r border-black flex flex-col justify-center p-2 items-start  space-y-2 ">
+          class="border-l border-t border-r border-black flex flex-col justify-center pl-2 items-start  space-y-2 ">
           <div class="flex justify-start text-lg">
             <label for="alldate"
               ><input
@@ -86,10 +86,10 @@
             >
           </div>
           <div class="flex flex-col space-y-2 text-lg ">
-            <div class="flex"><span>시작일 : </span><input type="date" v-model="cond2" class="text-lg ml-1  w-[35vw] disabled:bg-gray-400 !mr-2 " :disabled="disable1" /></div>
+            <div class="flex"><span>시작일 : </span><input type="date" v-model="cond2" class="text-lg ml-1  w-[42vw] disabled:bg-gray-400 !mr-2 " :disabled="disable1" /></div>
            
             <!-- <span class="flex justify-center items-center">~</span> -->
-            <div class="flex "><span>종료일 : </span><input type="date" v-model="cond5"  class=" ml-1 w-[35vw] disabled:bg-gray-400 !mr-2 text-lg " :disabled="disable1" /></div>
+            <div class="flex "><span>종료일 : </span><input type="date" v-model="cond5"  class=" ml-1 w-[42vw] disabled:bg-gray-400 !mr-2 text-lg " :disabled="disable1" /></div>
           </div>
         </div>
 
@@ -98,7 +98,7 @@
           사용시간
         </div>
         <div
-          class="border-l border-t border-r border-black flex flex-col justify-center p-2 items-start  space-y-2  text-lg" >
+          class="border-l border-t border-r border-black flex flex-col justify-center pl-2 items-start  space-y-2  text-lg" >
           <div  class="">
             <label for="alltime"
               ><input
@@ -148,7 +148,7 @@
           사용요일
         </div>
         <div
-          class="border-l border-t border-r border-black flex flex-col justify-center p-2 items-start  space-y-2  text-lg border-b">
+          class="border-l border-t border-r border-black flex flex-col justify-center pl-2 items-start  space-y-2  text-lg border-b">
           <div ><label for="allcheck"><input @click="checkDays" type="checkbox" id="allcheck" v-model="allcheck">전체체크</input></label></div>
           <div class="flex flex-col">
             <div class="space-x-3">
@@ -157,6 +157,7 @@
               type="checkbox"
               id="mon"
               v-model="mon"
+              
               @click="handleday" />월</label
           >
           <label for="tue"
@@ -289,16 +290,16 @@ const STORE_CD = (e) => {
 const rowData = ref([]);
 
 const optionList = ref([
-  { lngCode: 0, strName: 0 },
-  { lngCode: 1, strName: 1 },
-  { lngCode: 2, strName: 2 },
-  { lngCode: 3, strName: 3 },
-  { lngCode: 4, strName: 4 },
-  { lngCode: 5, strName: 5 },
-  { lngCode: 6, strName: 6 },
-  { lngCode: 7, strName: 7 },
-  { lngCode: 8, strName: 8 },
-  { lngCode: 9, strName: 9 },
+  { lngCode: 0, strName: '00' },
+  { lngCode: 1, strName: '01' },
+  { lngCode: 2, strName: '02' },
+  { lngCode: 3, strName: '03' },
+  { lngCode: 4, strName: '04' },
+  { lngCode: 5, strName: '05' },
+  { lngCode: 6, strName: '06' },
+  { lngCode: 7, strName: '07' },
+  { lngCode: 8, strName: '08' },
+  { lngCode: 9, strName: '09' },
   { lngCode: 10, strName: 10 },
   { lngCode: 11, strName: 11 },
   { lngCode: 12, strName: 12 },
@@ -316,7 +317,7 @@ const optionList = ref([
 ]);
 
 const optionList2 = ref([
-  { lngCode: 0, strName: 0 },
+  { lngCode: 0, strName: '00' },
   { lngCode: 10, strName: 10 },
   { lngCode: 20, strName: 20 },
   { lngCode: 30, strName: 30 },

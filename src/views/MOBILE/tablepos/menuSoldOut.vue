@@ -156,10 +156,11 @@
             }}
           </div>
         </template>
+        <div class="!h-[20vh] w-full bg-gray-100"></div>
       </div>
     </div>
-    <div class="h-[25vh] w-full"></div>
   </div>
+
   <CategorySelect
     @click.stop
     class="z-[10]"

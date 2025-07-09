@@ -191,6 +191,10 @@ watch(selectedStoreCd, async () => {
 });
 
 watch(selectedCond, async () => {
+  if (selectedCond.value == 0) {
+    emit("mainCategory", "선택");
+    return;
+  }
   const res2 = await GetSClassInfo(
     store.state.userData.GROUP_CD,
     selectedStoreCd.value.STORE_CD,
