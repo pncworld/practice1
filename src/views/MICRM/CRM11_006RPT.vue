@@ -224,11 +224,14 @@ const setCond = () => {
 const initAll2 = () => {
   cond2.value = "";
   cond3.value = "";
+  cond4.value = "";
+  initGrid();
 };
 const strCustName = (e) => {
   cond4.value = e;
 };
 const lngCustNo = (e) => {
+  initGrid();
   cond3.value = e;
 };
 
@@ -263,6 +266,7 @@ const handleParentClick = (e) => {
 const sDate = ref();
 const eDate = ref();
 const startDate = (e) => {
+  initGrid();
   sDate.value = e;
 };
 const endDate = (e) => {

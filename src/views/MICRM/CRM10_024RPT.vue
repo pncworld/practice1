@@ -55,43 +55,49 @@
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
+    <div class="flex justify-center">
+      <div
+        class="overflow-y-auto h-40 w-[95%] flex justify-center items-center"
+        v-if="changeTime == false">
+        <Realgrid
+          :progname="'CRM10_024RPT_VUE'"
+          :progid="1"
+          :rowData="rowData"
+          :reload="reload"
+          :setStateBar="false"
+          :documentTitle="'CRM10_024RPT'"
+          :documentSubTitle="documentSubTitle"
+          :mergeColumns2="true"
+          :mergeColumnGroupName2="mergeColumnGroupName2"
+          :mergeColumnGroupSubList2="mergeColumnGroupSubList2"
+          :rowStateeditable="false"
+          :syncGridHeight="true"
+          :exporttoExcel="exportExcel">
+        </Realgrid>
+      </div>
+      <div
+        v-if="changeTime == true"
+        class="overflow-y-auto h-40 w-[95%] flex justify-center items-center">
+        <Realgrid
+          :progname="'CRM10_024RPT_VUE'"
+          :progid="2"
+          :rowData="rowData2"
+          :reload="reload"
+          :setStateBar="false"
+          :documentTitle="'CRM10_024RPT'"
+          :mergeColumns2="true"
+          :mergeColumnGroupName2="mergeColumnGroupName2"
+          :mergeColumnGroupSubList2="mergeColumnGroupSubList3"
+          :documentSubTitle="documentSubTitle"
+          :syncGridHeight="true"
+          :rowStateeditable="false"
+          :exporttoExcel="exportExcel">
+        </Realgrid>
+      </div>
+    </div>
     <div class="flex justify-center h-full">
       <div
         class="grid grid-rows-[2fr,3fr,6fr,3fr] grid-cols-1 h-[150%] w-[95%] gap-2">
-        <div class="overflow-y-auto" v-if="changeTime == false">
-          <Realgrid
-            :progname="'CRM10_024RPT_VUE'"
-            :progid="1"
-            :rowData="rowData"
-            :reload="reload"
-            :setStateBar="false"
-            :documentTitle="'CRM10_024RPT'"
-            :documentSubTitle="documentSubTitle"
-            :mergeColumns2="true"
-            :mergeColumnGroupName2="mergeColumnGroupName2"
-            :mergeColumnGroupSubList2="mergeColumnGroupSubList2"
-            :rowStateeditable="false"
-            :syncGridHeight="true"
-            :exporttoExcel="exportExcel">
-          </Realgrid>
-        </div>
-        <div v-if="changeTime == true">
-          <Realgrid
-            :progname="'CRM10_024RPT_VUE'"
-            :progid="2"
-            :rowData="rowData2"
-            :reload="reload"
-            :setStateBar="false"
-            :documentTitle="'CRM10_024RPT'"
-            :mergeColumns2="true"
-            :mergeColumnGroupName2="mergeColumnGroupName2"
-            :mergeColumnGroupSubList2="mergeColumnGroupSubList3"
-            :documentSubTitle="documentSubTitle"
-            :syncGridHeight="true"
-            :rowStateeditable="false"
-            :exporttoExcel="exportExcel">
-          </Realgrid>
-        </div>
         <div>
           <div class="flex justify-start bg-purple-300 w-20">▣단체예약</div>
           <Realgrid

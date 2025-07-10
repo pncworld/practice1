@@ -11,9 +11,9 @@
     <div class="flex justify-center mr-10 space-x-2 pr-5">
       <button
         @click="receiveButton"
-        class="button primary !w-24 !text-nowrap"
+        class="button received !w-44 !text-nowrap"
         v-if="disableButton">
-        정보 수신
+        수동고객정보수신
       </button>
       <button @click="searchButton" class="button search">조회</button>
       <button @click="saveButton" class="button save" :disabled="disableButton">
@@ -54,14 +54,18 @@
 
       <div class="flex flex-col justify-center pl-5">
         <div>
-          <label for=""
-            ><input type="checkbox" checked v-model="cond3" />퇴사자 제외</label
+          <label for="fire"
+            ><input type="checkbox" checked v-model="cond3" id="fire" />퇴사자
+            제외</label
           >
         </div>
         <div>
-          <label for=""
-            ><input type="checkbox" checked v-model="cond4" />분실/교체
-            제외</label
+          <label for="lost"
+            ><input
+              type="checkbox"
+              checked
+              v-model="cond4"
+              id="lost" />분실/교체 제외</label
           >
         </div>
       </div>
@@ -96,7 +100,7 @@
       @sendRowState="sendRowState"
       :valuesData="valuesData"
       :labelsData="labelsData"
-      :deleteRow3="deleted"
+      :deleteRow7="deleted"
       :changeColid="changeColid"
       :changeRow="changeRow"
       :changeValue2="changeValue"
@@ -131,7 +135,7 @@
           name="strSaleCardNo"
           @input="updateGridValue" />
         <button
-          class="whitebutton"
+          class="whitebutton !ml-[7%]"
           @click="cardChange"
           :disabled="disableButton">
           카드변경
@@ -370,6 +374,10 @@
           v-model="gridvalue15"
           name="strCustDeptName"
           @input="updateGridValue" />
+      </div>
+      <div class="col-span-2 text-blue-500">
+        ※직원후불 기준정보 관리에 한도구분이 '한도없음' 이면 한도금액을 등록
+        해도 한도금액이0으로 반영됩니다.
       </div>
     </div>
   </div>
@@ -693,17 +701,17 @@ const exExcelNm = ref("매장정보등록");
 const documentSubTitle = ref("");
 
 const excelStore = (e) => {
-  documentSubTitle.value = e;
+  exExcelNm.value = e;
   p2cond.value = e.split("사업장명 : ")[1];
-
-  documentSubTitle.value += "\n" + "조회조건 :";
-  documentSubTitle.value +=
-    (cond3.value == true ? "퇴사자 제외 ," : "" + " , ") +
-    (cond4.value == true ? "분실/교체 제외" : "");
 
   //console.log(p2cond.value);
 };
 const exportToExcel = () => {
+  documentSubTitle.value = exExcelNm.value + "\n" + "조회조건 :";
+  documentSubTitle.value +=
+    (cond3.value == true ? "퇴사자 제외 ," : "" + " , ") +
+    (cond4.value == true ? "분실/교체 제외" : "");
+
   exExcel.value = !exExcel.value;
 };
 
@@ -782,6 +790,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
+    updateRowData.value = res.data.List;
     store.state.loading = false;
     afterSearch.value = true;
   } catch (error) {
@@ -878,6 +887,8 @@ const addrowProp = ref("");
 const CompanyCode = ref("");
 const setCompanyCode = (e) => {
   CompanyCode.value = e;
+  afterSearch.value = false;
+  initGrid();
 };
 
 const addButton = () => {
@@ -905,24 +916,107 @@ const deleteButton = () => {
  */
 
 const saveButton = async () => {
+  if (JSON.stringify(rowData.value) == JSON.stringify(updateRowData.value)) {
+    Swal.fire({
+      title: "경고",
+      text: `변경된 사항이 없습니다.`,
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  const custidsl = updateRowData.value
+    .filter(
+      (item, index) =>
+        stateRows.value.updated.includes(index) ||
+        stateRows.value.created.includes(index)
+    )
+    .map((item) => item.strSaleCustID)
+    .filter(
+      (item2) => item2 == "" || item2 == undefined || item2 == null
+    ).length;
+
+  const cardnos = updateRowData.value
+    .filter(
+      (item, index) =>
+        stateRows.value.updated.includes(index) ||
+        stateRows.value.created.includes(index)
+    )
+    .map((item) => item.strSaleCardNo)
+    .filter(
+      (item2) => item2 == "" || item2 == undefined || item2 == null
+    ).length;
+
+  const custnms = updateRowData.value
+    .filter(
+      (item, index) =>
+        stateRows.value.updated.includes(index) ||
+        stateRows.value.created.includes(index)
+    )
+    .map((item) => item.strSaleCustName)
+    .filter(
+      (item2) => item2 == "" || item2 == undefined || item2 == null
+    ).length;
+  if (custidsl + cardnos + custnms > 0) {
+    Swal.fire({
+      title: "경고",
+      text: `미입력된 필수값이 존재합니다. 확인해주세요.`,
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (stateRows.value.deleted.length > 0) {
+    const custSts = updateRowData.value
+      .filter((item, index) => stateRows.value.deleted.includes(index))
+      .map((item) => item.strSaleCustStatus)
+      .filter((item) => item == 0);
+
+    if (custSts.length > 0) {
+      Swal.fire({
+        title: "경고",
+        text: `퇴사 처리된 고객만 삭제가 가능합니다.`,
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  }
+
   try {
     store.state.loading = true;
-    if (checkedRows.value.length > 0) {
-      const compcds = checkedRows.value
+    if (stateRows.value.deleted.length > 0) {
+      const compcds = updateRowData.value
+        .filter((item, index) => stateRows.value.deleted.includes(index))
         .map((item) => item.strSaleCustID)
         .join("\u200b");
-      const cardNos = checkedRows.value
+      const cardNos = updateRowData.value
+        .filter((item, index) => stateRows.value.deleted.includes(index))
         .map((item) => item.strSaleCardNo)
         .join("\u200b");
 
-      const res = await deleteCustomors2(
-        CompanyCode.value,
-        compcds,
-        cardNos,
-        store.state.userData.lngSequence,
-        ""
-      );
-      console.log(res);
+      await Swal.fire({
+        title: "경고",
+        text: `고객 삭제시 복구가 불가능합니다. 정말 삭제하시겠습니까? `,
+        icon: "warning",
+        confirmButtonText: "확인",
+        cancelButtonText: "취소",
+        showCancelButton: true, // ← 취소 버튼 표시
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const res = await deleteCustomors2(
+            CompanyCode.value,
+            compcds,
+            cardNos,
+            store.state.userData.lngSequence,
+            ""
+          );
+        } else {
+          //searchButton();
+          throw new Error();
+        }
+      });
     }
 
     const custids = updateRowData.value
@@ -1037,7 +1131,7 @@ const saveButton = async () => {
       address,
       store.state.userData.lngSequence
     );
-    console.log(res);
+    //console.log(res);
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
         title: "성공",
@@ -1045,12 +1139,14 @@ const saveButton = async () => {
         icon: "success",
         confirmButtonText: "확인",
       });
-      return;
+      // return;
     }
+    searchButton();
   } catch (error) {
+    //console.log(error);
+    return;
   } finally {
     store.state.loading = false;
-    searchButton();
   }
 };
 
@@ -1184,7 +1280,8 @@ const clickedRowData3 = (e) => {
   gridvalue5.value = e[2];
   gridvalue6.value = e[14];
   gridvalue7.value = e[3];
-  gridvalue8.value = e[9].toISOString().split("T")[0];
+  gridvalue8.value =
+    e[9] != undefined && e[9] != "" ? e[9].toISOString().split("T")[0] : "";
   gridvalue9.value = e[4];
   gridvalue10.value = e[15];
   gridvalue11.value = e[5];
@@ -1282,7 +1379,9 @@ const checkedRowData = (e) => {
 };
 const updatedRowData = (newvalue) => {
   updateRowData.value = newvalue;
-  console.log(updateRowData.value);
+  //console.log(updateRowData.value);
+
+  console.log(rowData.value);
 };
 
 watch(dtmOpenDate, () => {
@@ -1321,7 +1420,13 @@ const fileInput = ref(null);
 const SheetList = ref([]);
 const beforeFileSelect = () => {
   // 여기서 점검: 권한, 사용자 상태 등
-  if (CompanyCode.value == 0) {
+  if (CompanyCode.value == 0 || afterSearch.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: `조회를 먼저 해주세요.`,
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
     return;
   }
   fileInput.value.click();
@@ -1333,7 +1438,7 @@ const handleFileChange = async (e) => {
   console.log(file);
   currentFile.value = file;
   excelcond.value = 1;
-
+  SheetList.value = [];
   if (file) {
     const arrayBuffer = await file.arrayBuffer();
     // XLSX 라이브러리에서 arrayBuffer 사용 가능
@@ -1342,12 +1447,13 @@ const handleFileChange = async (e) => {
     const sheetLength = workbook.SheetNames.length;
 
     for (let i = 0; i < sheetLength; i++) {
-      SheetList.value.push({ lngCode: i + 1, strName: "시트" + (i + 1) });
+      SheetList.value.push({ lngCode: i + 1, strName: workbook.SheetNames[i] });
     }
 
     const result = await readFileWithArrayBuffer(file);
-    console.log(result);
+    //console.log(result);
   }
+  e.target.value = "";
 };
 
 const currentFile = ref();
@@ -1389,7 +1495,11 @@ async function readFileWithArrayBuffer(file) {
     });
     return obj;
   });
-
+  rowData.value = rowData.value.map((item) => ({
+    ...item,
+    strSaleCustStatus: 0,
+    strSaleCustStatusTxt: "정상",
+  }));
   updateRowData.value = JSON.parse(JSON.stringify(rowData.value));
   console.log(updateRowData.value);
   return jsonData;
@@ -1397,8 +1507,8 @@ async function readFileWithArrayBuffer(file) {
 
 const downloadFile = () => {
   const link = document.createElement("a");
-  link.href = "/SaleCustList.xls"; // public 폴더 또는 정적 자원 경로
-  link.download = "SaleCustList.xls";
+  link.href = "/SaleCustList.xlsx"; // public 폴더 또는 정적 자원 경로
+  link.download = "SaleCustList.xlsx";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

@@ -164,9 +164,11 @@ const sDate = ref();
 const eDate = ref();
 const startDate = (e) => {
   sDate.value = e;
+  initGrid();
 };
 const endDate = (e) => {
   eDate.value = e;
+  initGrid();
 };
 
 const selectedDate = ref();
@@ -185,6 +187,7 @@ const lngSupervisor = (e) => {
 const storeCode = ref();
 const lngStoreCode = (e) => {
   storeCode.value = e;
+  initGrid();
 };
 
 const storeAttr = ref();

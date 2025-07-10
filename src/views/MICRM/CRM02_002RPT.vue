@@ -35,7 +35,7 @@
               type="checkbox"
               id="cond"
               name="condtype"
-              value="0"
+              @change="cond = !cond"
               v-model="cond" />전체기간</label
           >
           <label for="cond2"
@@ -43,7 +43,7 @@
               type="checkbox"
               id="cond2"
               name="condtype"
-              value="1"
+              @change="cond = !cond"
               v-model="cond2" />집계내역</label
           >
         </div>
@@ -248,8 +248,9 @@ const handleParentClick = (e) => {
 const Name = (e) => {
   console.log(e);
 };
-const searchNum = ref(0);
+const searchNum = ref("");
 const ID = (e) => {
+  initGrid();
   searchNum.value = e;
 };
 

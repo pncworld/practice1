@@ -930,6 +930,15 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  deleteRow7: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
+  removeInitProp: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // 2구간
@@ -1009,9 +1018,11 @@ const funcshowGrid = async () => {
         : "text",
     datetimeFormat: "yyyy-MM-dd",
   }));
-  fields.push({ fieldName: "deleted", dataType: "boolean" });
-  if (props.addField == "new") {
-    fields.push({ fieldName: "new", dataType: "boolean" });
+  if (props.removeInitProp == true) {
+    fields.push({ fieldName: "deleted", dataType: "boolean" });
+    if (props.addField == "new") {
+      fields.push({ fieldName: "new", dataType: "boolean" });
+    }
   }
 
   if (props.autoPlusColumn) {
@@ -1062,7 +1073,7 @@ const funcshowGrid = async () => {
     fieldName: item.strColID,
     header: {
       text: item.strHdText,
-      styleName: `header-style-${index}`,
+      styleName: `header-style-${realgridname.value}${index}`,
       checkLocation:
         item.strColID.includes("checkbox") &&
         props.headerCheckBar != item.strColID
@@ -2783,36 +2794,50 @@ watch(
   }
 );
 
-// watch( / /전체 체크 여부 검사?
-//   () => props.deleteRow7,
-//   (newVal) => {
-//     gridView.commit();
-//     const curr = gridView.getCurrent(); // gridView 가뭔지  dataProvider 가 뭔지 개념을 설명
-//     if (curr.dataRow == -1) {
-//       return;
-//     }
-//     const alldata = dataProvider.getJsonRows();
-//     const checkedIndexes = [];
+watch(
+  () => props.deleteRow7,
+  (newVal) => {
+    console.log(gridView.getCheckedItems());
 
-//     alldata.forEach((item, index) => {
-//       console.log(item);
-//       if (item.checkbox === true) {
-//         checkedIndexes.push(index); // 체크된 항목의 인덱스를 저장
-//       }
-//     });
+    const checkedArr = gridView.getCheckedItems();
+    for (let i = 0; i < checkedArr.length; i++) {
+      dataProvider.removeRow(checkedArr[i]);
+    }
+    emit("allStateRows", dataProvider.getAllStateRows());
 
-//     for (var i = 0; i < checkedIndexes.length; i++) {
-//       props.rowData[checkedIndexes[i]].deleted = true;
-//       dataProvider.setValue(checkedIndexes[i], "deleted", true); // "deleted" 속성을 true로 설정
-//       dataProvider.removeRow(checkedIndexes[i]);
-//     }
-//     updatedrowData.value = [...dataProvider.getJsonRows()];
-//     emit("updatedRowData", updatedrowData.value);
-//     deleted2activated.value = true;
-//     addrow4activated.value = true;
-//     //deletedIndex.value = curr.dataRow
-//   }
-// );
+    updatedrowData.value = [...dataProvider.getJsonRows()];
+    if (checkedArr.length != 0) {
+      emit("updatedRowData", updatedrowData.value);
+    }
+
+    // gridView.commit();
+    // const curr = gridView.getCurrent(); // gridView 가뭔지  dataProvider 가 뭔지 개념을 설명
+    // if (curr.dataRow == -1) {
+    //   return;
+    // }
+    // const alldata = dataProvider.getJsonRows();
+    // const checkedIndexes = [];
+
+    // alldata.forEach((item, index) => {
+    //   console.log(item);
+    //   if (item.checkbox === true) {
+    //     checkedIndexes.push(index); // 체크된 항목의 인덱스를 저장
+    //   }
+    // });
+
+    //   for (var i = 0; i < checkedIndexes.length; i++) {
+    //     props.rowData[checkedIndexes[i]].deleted = true;
+    //     dataProvider.setValue(checkedIndexes[i], "deleted", true); // "deleted" 속성을 true로 설정
+    //     dataProvider.removeRow(checkedIndexes[i]);
+    //   }
+    //   updatedrowData.value = [...dataProvider.getJsonRows()];
+    //   emit("updatedRowData", updatedrowData.value);
+    //   deleted2activated.value = true;
+    //   addrow4activated.value = true;
+    //   deletedIndex.value = curr.dataRow;
+    // }
+  }
+);
 
 watch(
   () => props.deleteAll,
@@ -3113,7 +3138,7 @@ onMounted(async () => {
     let styleContent = "";
     tabInitSetArray.value.forEach((item, index) => {
       styleContent += `
-        .header-style-${index} {
+        .header-style-${realgridname.value}${index} {
           background-color: ${item.strHdBkColor} !important;
           color: ${item.strHdColor} !important;
         }
@@ -3190,7 +3215,7 @@ const setupGrid = async () => {
     let styleContent = "";
     tabInitSetArray.value.forEach((item, index) => {
       styleContent += `
-        .header-style-${index} {
+        .header-style-${realgridname.value}${index} {
           background-color: ${item.strHdBkColor} !important;
           color: ${item.strHdColor} !important;
         }
@@ -3343,34 +3368,6 @@ watch(
     }
   }
 );
-
-// window.onbeforeprint = () => {
-//   var gridContainer = document.querySelector('[id^="realgrid"]');
-//   var gridBody = document.querySelector("#realgrid .rg-body");
-//   window.orgWidth = gridBody.style.width;
-//   gridContainer.style.width = "600px";
-//   gridView.resetSize();
-
-//   gridBody.style.width = "526px";
-//   var gridHeader = document.querySelector("#realgrid .rg-header");
-//   gridHeader.style.width = "526px";
-//   var gridFooter = document.querySelector("#realgrid .rg-footer");
-//   gridFooter.style.width = "526px";
-// };
-
-// window.onafterprint = () => {
-//   var gridContainer = document.querySelector('[id^="realgrid"]');
-//   var gridBody = document.querySelector("#realgrid .rg-body");
-//   window.orgWidth = gridBody.style.width;
-//   gridContainer.style.width = "100%";
-//   gridView.resetSize();
-
-//   gridBody.style.width = "100%";
-//   var gridHeader = document.querySelector("#realgrid .rg-header");
-//   gridHeader.style.width = "100%";
-//   var gridFooter = document.querySelector("#realgrid .rg-footer");
-//   gridFooter.style.width = "100%";
-// };
 </script>
 
 <style>
@@ -3448,5 +3445,9 @@ watch(
     no-repeat center 70%;
   font-size: 8px;
   vertical-align: middle;
+}
+.header-style-0 {
+  background-color: #545876;
+  color: white;
 }
 </style>

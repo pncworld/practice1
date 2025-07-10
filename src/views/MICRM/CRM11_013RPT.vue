@@ -298,9 +298,11 @@ const sDate = ref();
 const eDate = ref();
 const startDate = (e) => {
   sDate.value = e;
+  initGrid();
 };
 const endDate = (e) => {
   eDate.value = e;
+  initGrid();
 };
 
 const selectedDate = ref();

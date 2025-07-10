@@ -55,7 +55,9 @@
           <div class="text-base font-semibold ml-32">지역 :</div>
           <select name="" id="" class="border w-32 h-8 ml-2" v-model="cond">
             <option value="0">전체</option>
-            <option value="10">서울</option>
+            <option :value="i.lngStoreArea" v-for="i in optionList2">
+              {{ i.strName }}
+            </option>
           </select>
         </div>
         <div class="flex justify-center items-center">
@@ -218,6 +220,7 @@ onMounted(async () => {
 
   const res = await getInitDataCustPurchase(store.state.userData.lngStoreGroup);
   optionList.value = res.data.List;
+  optionList2.value = res.data.List2;
 });
 
 const reload = ref(false);
@@ -233,6 +236,7 @@ const cond = ref(0);
 const cond2 = ref(null);
 const cond3 = ref(0);
 const optionList = ref([]);
+const optionList2 = ref([]);
 const datepicker = ref(null);
 const closePopUp = ref(false);
 
@@ -259,6 +263,7 @@ const handleParentClick = (e) => {
 const sDate = ref();
 const eDate = ref();
 const startDate = (e) => {
+  initGrid();
   sDate.value = e;
 };
 const endDate = (e) => {
@@ -298,6 +303,7 @@ const lngSupervisor = (e) => {
 };
 const storeCode = ref();
 const lngStoreCode = (e) => {
+  initGrid();
   storeCode.value = e;
 };
 

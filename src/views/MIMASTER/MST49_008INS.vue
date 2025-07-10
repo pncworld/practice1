@@ -68,7 +68,7 @@
             type="text"
             disabled
             v-model="gridvalue1"
-            class="w-[80%] h-[80%] border border-black" />
+            class="w-[80%] h-[80%] border border-black disabled:bg-gray-400" />
         </div>
         <div
           class="bg-gray-100 flex justify-center items-center border-t border-black">
@@ -80,12 +80,12 @@
             type="text"
             disabled
             v-model="gridvalue2"
-            class="w-[80%] h-[80%] border border-black" />
+            class="w-[80%] h-[80%] border border-black disabled:bg-gray-400" />
         </div>
 
         <div
-          class="bg-gray-50 flex justify-center items-center border-t border-black">
-          <span class="text-orange-500 flex justify-center text-center">*</span
+          class="bg-gray-50 flex justify-center items-center border-t border-black text-blue-500">
+          <span class="text-red-500 flex justify-center text-center">*</span
           >업장코드
         </div>
         <div
@@ -99,8 +99,8 @@
         </div>
 
         <div
-          class="bg-gray-50 flex justify-center items-center border-t border-black">
-          <span class="text-orange-500 flex justify-center text-center">*</span
+          class="bg-gray-50 flex justify-center items-center border-t border-black text-blue-500">
+          <span class="text-red-500 flex justify-center text-center">*</span
           >업장명
         </div>
         <div
@@ -149,7 +149,7 @@
             type="text"
             disabled
             v-model="gridvalue6"
-            class="w-[80%] h-[80%] border border-black" />
+            class="w-[80%] h-[80%] border border-black disabled:bg-gray-400" />
         </div>
 
         <div
@@ -162,7 +162,7 @@
             type="text"
             disabled
             v-model="gridvalue7"
-            class="w-[80%] h-[80%] border border-black" />
+            class="w-[80%] h-[80%] border border-black disabled:bg-gray-400" />
         </div>
       </div>
     </div>
@@ -386,6 +386,22 @@ const deleterow2 = ref(false);
  */
 
 const saveButton = async () => {
+  const bpids = updatedRows.value
+    .map((item) => item.BP_ID)
+    .filter((item) => item == undefined || item == "" || item == null).length;
+  const bpnms = updatedRows.value
+    .map((item) => item.BP_NM)
+    .filter((item) => item == undefined || item == "" || item == null).length;
+
+  if (bpids + bpnms > 0) {
+    Swal.fire({
+      title: "경고",
+      text: "누락된 필수값이 존재합니다. 확인해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   try {
     store.state.loading = true;
     const compcds = updatedRows.value

@@ -42,7 +42,12 @@
       <div class="flex justify-start pl-20 space-x-5 items-center">
         <div class="text-base font-semibold">거래 구분 :</div>
         <div>
-          <select name="" id="" class="w-48 h-8" v-model="cond">
+          <select
+            name=""
+            id=""
+            class="w-48 h-8"
+            v-model="cond"
+            @change="initGrid()">
             <option value="0">전체</option>
             <option value="2">사용</option>
             <option value="3">적립</option>
@@ -79,12 +84,7 @@
 </template>
 
 <script setup>
-import {
-  getCustBuyList,
-  getCustPointInfo,
-  getCustRecord,
-  getReceiptDataDetail2,
-} from "@/api/micrm";
+import { getCustBuyList } from "@/api/micrm";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -117,7 +117,7 @@ import { insertPageLog } from "@/customFunc/customFunc";
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -160,6 +160,7 @@ const handleParentClick = (e) => {
 const sDate = ref();
 const eDate = ref();
 const startDate = (e) => {
+  initGrid();
   sDate.value = e;
 };
 const endDate = (e) => {
@@ -181,6 +182,7 @@ const lngSupervisor = (e) => {
 };
 const storeCode = ref();
 const lngStoreCode = (e) => {
+  initGrid();
   storeCode.value = e;
 };
 
@@ -254,7 +256,23 @@ const exportExcel = ref(false);
  */
 
 const excelButton = () => {
-  documentSubTitle.value = selectedDate.value + "\n" + selectedExcelStore.value;
+  let asdf = "";
+  if (cond.value == 0) {
+    asdf = "전체";
+  } else if (cond.value == 2) {
+    asdf = "사용";
+  } else if (cond.value == 3) {
+    asdf = "적립";
+  } else if (cond.value == 4) {
+    asdf = "보너스";
+  }
+  documentSubTitle.value =
+    selectedDate.value +
+    "\n" +
+    selectedExcelStore.value +
+    "\n" +
+    "거래 구분 :" +
+    asdf;
 
   //documentSubTitle.value += "\n";
   exportExcel.value = !exportExcel.value;

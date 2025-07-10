@@ -203,6 +203,7 @@ const handleParentClick = (e) => {
 const sDate = ref();
 const eDate = ref();
 const startDate = (e) => {
+  initGrid();
   sDate.value = e;
 };
 const endDate = (e) => {
@@ -225,6 +226,7 @@ const lngSupervisor = (e) => {
 const storeCode = ref();
 const lngStoreCode = (e) => {
   storeCode.value = e;
+  initGrid();
 };
 
 const storeAttr = ref();

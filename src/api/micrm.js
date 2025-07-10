@@ -412,6 +412,16 @@ export const getInitDataCustPurchase = (groupcd) => {
     GROUP_CD: groupcd,
   });
 };
+export const getCompanyforpay = (groupcd) => {
+  return api2.post("/MICRM/CRM01_012INS.asmx/getCompanyforpay", {
+    GROUP_CD: groupcd,
+  });
+};
+export const getBasisOfEmpPay = (groupcd) => {
+  return api2.post("/MICRM/CRM01_012INS.asmx/getBasisOfEmpPay", {
+    COMP_CD: groupcd,
+  });
+};
 export const getCustBuyAggList = (
   groupcd,
   storeCd,
