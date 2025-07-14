@@ -19,7 +19,7 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-3 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10 space-x-5">
+      class="grid grid-cols-3 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10">
       <div class="mt-1 justify-start flex">
         <Datepicker2
           @startDate="startDate"
@@ -39,8 +39,8 @@
           @lngStoreAttrs="lngStoreAttrs"
           :placeholderName="'선택'"></pickStoreRenew>
       </div>
-      <div class="flex justify-center items-center">
-        <div class="text-base font-semibold">포스선택 :</div>
+      <div class="flex justify-center items-center space-x-5">
+        <div class="text-base font-semibold">포스선택</div>
         <select name="" id="" class="w-32 rounded-lg h-8" v-model="selectedPos">
           <option :value="0">전체</option>
           <option :value="i.lngCode" v-for="i in posList">
@@ -48,8 +48,8 @@
           </option>
         </select>
       </div>
-      <div class="flex justify-center items-center space-x-2 ml-6">
-        <div class="text-base font-semibold">조회조건 :</div>
+      <div class="flex justify-start items-center space-x-5 ml-12">
+        <div class="text-base font-semibold">조회조건</div>
         <select
           name=""
           id=""
@@ -62,10 +62,8 @@
           <option :value="4">부서카드</option>
         </select>
       </div>
-      <div class="flex justify-start items-center h-8 space-x-1">
-        <div class="text-base font-semibold w-24 text-nowrap pr-10">
-          검색조건 :
-        </div>
+      <div class="flex justify-start items-center h-8 space-x-5 pl-9">
+        <div class="text-base font-semibold text-nowrap">검색조건</div>
         <select
           name=""
           id=""
@@ -100,8 +98,8 @@
           새로고침
         </button>
       </div>
-      <div class="flex justify-center items-center pr-10">
-        <div class="text-base font-semibold w-24 text-nowrap">조회옵션 :</div>
+      <div class="flex justify-center items-center space-x-5 !-ml-12">
+        <div class="text-base font-semibold text-nowrap">조회옵션</div>
         <label for="retire"
           ><input
             type="checkbox"

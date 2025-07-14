@@ -22,25 +22,24 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-32 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-3 mt-5">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-32 z-10">
+      <div class="grid grid-cols-1 grid-rows-3 mt-2">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
           :closePopUp="closePopUp"
           :initToday="1"
           ref="datepicker"
-          class="ml-8"
           @excelDate="excelDate"></Datepicker2>
-        <div class="flex flex-col justify-start items-start text-nowrap ml-40">
+        <div class="flex flex-col justify-center items-start text-nowrap">
           <div
-            class="text-nowrap flex justify-start items-center space-x-3 ml-4">
-            <div class="text-base font-semibold">시간대 :</div>
-            <div>
+            class="text-nowrap flex justify-center items-center space-x-2 ml-[62px]">
+            <div class="text-base font-semibold">시간대</div>
+            <div class="pl-3">
               <select
                 name=""
                 id=""
-                class="border rounded-lg w-16 h-8 mr-3"
+                class="border rounded-lg w-16 h-8"
                 v-model="orderPay">
                 <option :value="1">주문</option>
                 <option :value="2">계산</option>
@@ -85,8 +84,8 @@
             </div>
           </div>
         </div>
-        <div class="flex justify-center mr-12 space-x-7">
-          <div class="text-base font-semibold">요일조건 :</div>
+        <div class="flex justify-start space-x-5 ml-12 items-center">
+          <div class="text-base font-semibold">요일조건</div>
           <label for="mon"
             ><input
               type="checkbox"
@@ -145,7 +144,7 @@
           >
         </div>
       </div>
-      <div class="ml-10 -mt-10">
+      <div class="">
         <PickStoreSingle2
           @lngStoreCode="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"

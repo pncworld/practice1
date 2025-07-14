@@ -19,8 +19,8 @@ Author : 권맑음                     
       </div>
     </div>
     <div
-      class="grid grid-rows-2 grid-cols-2 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div class="mt-2">
+      class="grid grid-rows-2 grid-cols-2 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
+      <div class="">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
@@ -28,7 +28,7 @@ Author : 권맑음                     
           :closePopUp="closePopUp"
           ref="datepicker"></Datepicker2>
       </div>
-      <div class="mt-2 ml-2">
+      <div class="">
         <PickStoreRenew3
           @lngStoreCode="lngStoreCode"
           @lngStoreGroup="lngStoreGroup"
@@ -37,7 +37,7 @@ Author : 권맑음                     
           @excelStore="excelStore">
         </PickStoreRenew3>
       </div>
-      <div class="-ml-96 mr-5">
+      <div class="ml-12 mt-5">
         <label for="bill"
           ><input
             type="checkbox"
@@ -45,7 +45,7 @@ Author : 권맑음                     
             @click="checkBill" />지폐권종표시</label
         >
       </div>
-      <div class="-ml-[73%] mt-1">
+      <div class="-ml-[74%] mt-1">
         <PosList
           :groupCd="groupCd"
           :storeCd="storeCd"

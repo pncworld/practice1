@@ -19,9 +19,9 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-3 mt-12">
-        <div class="flex">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
+      <div class="grid grid-cols-1 grid-rows-3">
+        <div class="flex ml-8">
           <Datepicker2
             @endDate="endDate"
             @startDate="startDate"
@@ -32,8 +32,8 @@
             :initToday="1"></Datepicker2>
         </div>
         <div
-          class="text-nowrap flex justify-start items-center -space-x-7 ml-36 pl-1 -mt-1">
-          <div class="text-base font-semibold">할인코드 :</div>
+          class="text-nowrap flex justify-start items-center -space-x-7 ml-12 -mt-1">
+          <div class="text-base font-semibold">할인코드</div>
           <div class="flex mt-2 items-center justify-start">
             <v-select
               v-model="selectedDiscountCode"
@@ -46,7 +46,7 @@
           </div>
         </div>
       </div>
-      <div class="ml-10">
+      <div class="">
         <PickStoreSingle2
           @lngStoreCode="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"

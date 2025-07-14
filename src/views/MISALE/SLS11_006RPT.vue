@@ -19,7 +19,7 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
       <div class="grid grid-cols-1 grid-rows-2">
         <Datepicker2
           @startDate="startDate"
@@ -29,9 +29,9 @@
           :selectedGroup="selectedGroup"
           @excelDate="excelDate" />
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-44">
-          시간대 :
-          <div class="ml-4">
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-16">
+          시간대
+          <div class="ml-5">
             <v-select
               v-model="selectedStartTime"
               :options="times"

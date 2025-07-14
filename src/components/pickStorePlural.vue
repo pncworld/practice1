@@ -1,8 +1,13 @@
 <template>
-  <div class="grid grid-cols-[1fr,2fr,2fr,2fr] grid-rows-2 h-16 w-[770px]">
-    <div>
+  <div
+    class="grid grid-cols-[1fr,1fr,2fr,2fr,2fr] grid-rows-2 h-16 w-[830px] mt-2">
+    <div
+      class="font-semibold text-base row-span-2 text-nowrap flex items-center justify-center pl-2">
+      매장명
+    </div>
+    <div class="flex justify-center items-center">
       <label for="searchType1" class="text-base" :disabled="disabled1"
-        >직/가맹<input
+        >직/가맹&nbsp;<input
           type="radio"
           id="searchType1"
           value="1"
@@ -64,7 +69,7 @@
         <div
           class="font-medium w-[90%] flex items-center justify-start ml-5 space-x-4">
           <div class="text-center">
-            매장명 :
+            매장명
             <input
               type="text"
               class="border ml-5 pl-2 rounded-lg"
@@ -99,9 +104,9 @@
         :labelingColumns="labelingColumns"
         :showOnlyChecked="showOnlycheck"></Realgrid>
     </div>
-    <div>
+    <div class="flex justify-center items-center">
       <label for="searchType2" class="text-base ml-2" :disabled="disabled1"
-        >팀/SC<input
+        >팀/SC&nbsp;<input
           type="radio"
           id="searchType2"
           value="2"
@@ -153,7 +158,7 @@
         </div>
       </div>
     </div>
-    <div class="ml-5 pr-10 w-[200px]">
+    <div class="ml-4 pr-10 w-[200px]">
       <input
         type="button"
         class="bg-white border w-full ml-4 rounded-lg h-7 disabled:bg-gray-100 text-center overflow-hidden mr-5"

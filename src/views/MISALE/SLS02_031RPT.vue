@@ -89,14 +89,12 @@ import Datepicker2 from "@/components/Datepicker2.vue";
  *  할인 코드 호출 컴포넌트
  *  */
 
-import DisCountCdList from "@/components/disCountCdList.vue";
 import MenuCdList from "@/components/menuCdList.vue";
 /**
  *  페이지명 자동 입력 컴포넌트
  *  */
 
 import PageName from "@/components/pageName.vue";
-import PayCodeList from "@/components/payCodeList.vue";
 import PayCodeList2 from "@/components/payCodeList2.vue";
 
 /**

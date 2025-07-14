@@ -1,6 +1,6 @@
 <template>
-  <div class="flex justify-center items-center space-x-3">
-    <div class="font-semibold text-base flex pl-5">POS번호 :</div>
+  <div class="flex justify-center items-center space-x-5 mt-2">
+    <div class="font-semibold text-base flex pl-5">POS번호</div>
     <!-- <select name="" id="" class="border rounded-lg w-44 h-10 font-thin pl-1" v-model="selectedPosNo" @change="changePosNo">
         <option :value="0">전체</option>
         <option :value="i.lngCode" v-for="i in POSLIST">{{ i.strName }}</option>

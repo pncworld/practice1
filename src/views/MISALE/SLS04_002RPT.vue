@@ -23,19 +23,19 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-36 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-4 -space-y-3 mt-12">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-40 items-start z-10">
+      <div class="grid grid-cols-1 grid-rows-4 h-full mt-1">
         <Datepicker2
-          class="ml-9"
+          class=""
           @endDate="endDate"
           @startDate="startDate"
           :closePopUp="closePopUp"
           ref="datepicker"
           @excelDate="excelDate"></Datepicker2>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-40">
-          메뉴구분 :
-          <div class="flex ml-3 space-x-3 mt-1">
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-12">
+          메뉴구분
+          <div class="flex ml-5 space-x-5 mt-1">
             <v-select
               v-model="selectedMenu"
               :options="mainMenu"
@@ -56,8 +56,8 @@
           </div>
         </div>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 -mt-20 h-8 -space-x-2">
-          조회조건 :
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-12 h-8 space-x-2">
+          조회조건
           <div>
             <label for="store" class="font-normal"
               ><input
@@ -132,8 +132,8 @@
           </div>
         </div>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 !-mt-6 h-8">
-          요일조건 :
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-12 h-8">
+          요일조건
           <div>
             <label for="mon" class="font-normal"
               ><input
@@ -205,8 +205,8 @@
             >
           </div>
 
-          <div class="ml-20 -mt-2">
-            공휴일 :
+          <div class="ml-20">
+            공휴일
             <select
               name=""
               id=""
@@ -219,7 +219,7 @@
           </div>
         </div>
       </div>
-      <div class="ml-10 -mt-14">
+      <div class="flex items-start">
         <PickStorePlural
           @lngStoreCodes="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"

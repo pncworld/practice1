@@ -19,7 +19,7 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
       <div class="grid grid-cols-1 grid-rows-2">
         <div class="flex">
           <label for="daily" class="font-thin inline-flex ml-4">
@@ -27,7 +27,7 @@
               type="checkbox"
               id="daily"
               @change="seeDaily"
-              class="ml-20 mt-2" />
+              class="ml-5 mt-2 z-50" />
           </label>
           <Datepicker2
             @startDate="startDate"
@@ -37,12 +37,12 @@
             :initToday="1"
             :selectedGroup="selectedGroup"
             @excelDate="excelDate"
-            class="pr-56"></Datepicker2>
+            class=""></Datepicker2>
         </div>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-36 pl-1">
-          요일명 :
-          <div class="flex ml-7 space-x-3 mt-1">
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-28">
+          요일명
+          <div class="flex ml-5 space-x-3 -mt-1">
             <v-select
               v-model="selectWeekDay"
               :options="weekDay"

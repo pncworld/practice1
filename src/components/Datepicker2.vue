@@ -1,8 +1,8 @@
 <template>
-  <div class="flex justify-center items-center space-x-3 w-[500px] pl-44 pr-2">
+  <div class="flex justify-start items-center space-x-5 w-[500px] mt-2">
     <div
-      class="w-auto font-semibold flex items-center text-nowrap text-base ml-20">
-      {{ mainName }} :
+      class="w-auto font-semibold flex items-center text-nowrap text-base ml-12">
+      {{ mainName }}
     </div>
     <div
       class="grid grid-cols-[2fr,1fr,2fr,1fr,1fr] grid-rows-1 justify-start h-11 pr-14 space-x-1">

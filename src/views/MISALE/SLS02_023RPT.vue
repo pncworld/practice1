@@ -19,18 +19,18 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-32 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-3 mt-2">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-32 items-start z-10">
+      <div class="grid grid-cols-1 grid-rows-3">
         <Datepicker2
           @startDate="startDate"
           @endDate="endDate"
           :closePopUp="closePopUp"
           ref="datepicker"
-          class="ml-10"
+          class=""
           @excelDate="excelDate"
           :mainName="'기간'" />
-        <div class="flex justify-center items-center mr-36 ml-2">
-          <div class="text-base font-semibold">구분 :</div>
+        <div class="flex justify-start items-center ml-12">
+          <div class="text-base font-semibold">구분</div>
           <div class="flex justify-center space-x-5 ml-5">
             <select
               name=""
@@ -56,8 +56,8 @@
           </div>
         </div>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-36 pl-1">
-          조회조건 :
+          class="flex justify-start items-start text-base text-nowrap font-semibold ml-5">
+          조회조건
           <div>
             <label for="daily" class="font-normal">
               <input

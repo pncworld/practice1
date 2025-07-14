@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <span class="ml-10 font-semibold text-base">{{ mainname }} : </span
+  <div class="space-x-5">
+    <span class="font-semibold text-base">{{ mainname }} </span
     ><input
       type="date"
       class="border rounded-lg h-10 w-36 text-base pl-5"

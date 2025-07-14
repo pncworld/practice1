@@ -1,9 +1,9 @@
-/*--############################################################################
+<!-- /*--############################################################################
 # Filename : SLS01_056RPT.vue                                                  
 # Description : 매출관리 > 코너별 매출 현황 > 코너별 결제 형태별 매출 현황      
 # Date :2025-05-14                                                             
 # Author : 권맑음                     
-################################################################################*/
+################################################################################*/ -->
 <template>
   <div class="h-full" @click="handleParentClick">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
@@ -18,20 +18,20 @@
       </div>
     </div>
     <div
-      class="grid grid-rows-1 grid-cols-[1fr,10fr,1fr,10fr] justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <input type="checkbox" class="-mt-12 ml-20" @click="checkDate" />
+      class="grid grid-rows-1 grid-cols-[0.1fr,10fr,1fr,10fr] justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
+      <input type="checkbox" class="-mt-12 ml-2" @click="checkDate" />
       <div class="grid grid-cols-1 grid-rows-2 ml-10">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
           @excelDate="excelDate"
           :initToday="1"
-          class="pr-48"
+          class="!-ml-16"
           :closePopUp="closePopUp"
           ref="datepicker"></Datepicker2>
         <div
-          class="flex justify-start ml-16 items-center space-x-3 text-nowrap">
-          <div class="text-base font-semibold ml-2">조회조건 :</div>
+          class="flex justify-start -ml-6 items-center space-x-5 text-nowrap">
+          <div class="text-base font-semibold ml-2">조회조건</div>
           <label for="sum"
             ><input
               id="sum"

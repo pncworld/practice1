@@ -19,18 +19,18 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
       <div class="grid grid-cols-1 grid-rows-2">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
           :closePopUp="closePopUp"
-          class="ml-10"
+          class=""
           ref="datepicker"
           @excelDate="excelDate"></Datepicker2>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 pl-1">
-          조회조건 :
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-12">
+          조회조건
           <div>
             <label for="daily" class="font-normal"
               ><input
@@ -64,7 +64,7 @@
           </div>
         </div>
       </div>
-      <div class="ml-10">
+      <div class="">
         <PickStorePlural
           @lngStoreCodes="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"

@@ -14,15 +14,15 @@
         <button @click="excelButton" class="button save w-auto excel">엑셀</button>
       </div>
     </div>
-    <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-32 items-center z-10">
+    <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-32 items-start z-10">
       <div class="grid grid-cols-1 grid-rows-3">
-        <Datepicker2    class="ml-10" @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker" @excelDate="excelDate"></Datepicker2>
-        <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-44 "> 매입사 : 
-          <div class="flex ml-7 space-x-3 mt-1">
+        <Datepicker2    class="" @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker" @excelDate="excelDate"></Datepicker2>
+        <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-16 "> 매입사 
+          <div class="flex ml-5 space-x-3 ">
             <v-select v-model="selectCardCorp" :options="cardCorp" placeholder="전체" label="strBuyName" class="w-48 !h-8 bg-white " clearable="true"/>
           </div>
         </div>
-        <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 ">조회조건 :
+        <div class="flex justify-start items-start text-base text-nowrap font-semibold ml-12 ">조회조건
           <div>
             <label for="accept" class="font-normal">
               <input type="radio" id="accept" value="0" v-model="selectedRadioBox" class="ml-5"> 승인
@@ -35,7 +35,7 @@
           </div>
         </div>
       </div>
-      <div class="h-[75%] ml-12">
+      <div class="h-[75%] ">
         <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @lngSupervisor="lngSupervisor" @excelStore="excelStore"></pickStoreSingle>
       </div>
     </div>

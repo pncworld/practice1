@@ -1,9 +1,9 @@
-/*--############################################################################
+<!-- /*--############################################################################
 # Filename : SLS04_004RPT.vue                                                  
 # Description : 매출관리 > 메뉴별 매출 현황 > 메뉴별/시간별 매출현황.           
 # Date :2025-05-14                                                             
 # Author : 권맑음                     
-################################################################################*/
+################################################################################*/ -->
 <template>
   <!-- 조회 조건 -->
   <div class="h-full" @click="handleParentClick">
@@ -19,10 +19,9 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-[10fr,10fr] grid-rows-1 justify-between bg-gray-200 rounded-lg h-40 items-center z-10 p-5">
-      <div
-        class="grid grid-cols-1 grid-rows-4 -space-y-3 justify-start -ml-36 mt-10">
-        <div class="flex justify-start ml-9">
+      class="grid grid-cols-[10fr,10fr] grid-rows-1 justify-between bg-gray-200 rounded-lg h-32 z-10">
+      <div class="grid grid-cols-1 grid-rows-3 justify-start">
+        <div class="flex justify-start items-start">
           <Datepicker2
             class="pr-0"
             @endDate="endDate"
@@ -31,9 +30,10 @@
             ref="datepicker"
             @excelDate="excelDate"></Datepicker2>
         </div>
-        <div class="justify-start flex items-center space-x-5 w-[600px] pl-48">
-          <div class="text-base font-semibold">조건 :</div>
-          <div>
+        <div
+          class="justify-start flex items-center space-x-5 w-[600px] ml-[78px]">
+          <div class="text-base font-semibold">조건</div>
+          <div class="flex">
             <label for="store"
               ><input
                 type="checkbox"
@@ -64,9 +64,9 @@
           </div>
         </div>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-40">
-          메뉴구분 :
-          <div class="flex ml-3 space-x-3 -mt-1">
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-12">
+          메뉴구분
+          <div class="flex space-x-5 ml-5 -mt-1">
             <v-select
               v-model="selectedMenu"
               :options="mainMenu"
@@ -95,24 +95,24 @@
               type="text"
               v-model="searchText"
               class="pl-2 w-44 !h-8 bg-white" />
+          </div>
 
-            <div class="flex justify-start space-x-2 items-center pl-20">
-              객층구분 :
-              <v-select
-                v-model="selectedGuest"
-                :options="GuestType"
-                placeholder="전체"
-                label="strName"
-                class="w-44 !h-8 bg-white ml-5"
-                clearable="true" />
-            </div>
+          <div class="flex justify-end space-x-2 items-center ml-5">
+            객층구분
+            <v-select
+              v-model="selectedGuest"
+              :options="GuestType"
+              placeholder="전체"
+              label="strName"
+              class="w-44 !h-8 bg-white ml-5"
+              clearable="true" />
           </div>
         </div>
         <!-- <div class="pt-1 space-x-2 ml-10">
         
         </div> -->
       </div>
-      <div class="ml-96 -mt-10">
+      <div class="flex justify-start items-start">
         <PickStorePlural
           @lngStoreCodes="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"
@@ -123,6 +123,8 @@
           :setFooterColID="setFooterColID"
           :setFooterExpressions="setFooterExpressions">
         </PickStorePlural>
+        <div></div>
+        <div></div>
       </div>
     </div>
     <!-- 조회 조건 -->

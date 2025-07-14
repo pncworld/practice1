@@ -19,19 +19,19 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-32 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-3 mt-5">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-32 items-start z-10">
+      <div class="grid grid-cols-1 grid-rows-3">
         <Datepicker2
           @endDate="endDate"
-          class="ml-10"
+          class=""
           @startDate="startDate"
           :closePopUp="closePopUp"
           ref="datepicker"
           @excelDate="excelDate"></Datepicker2>
-        <div class="flex flex-col justify-start items-start text-nowrap ml-44">
+        <div class="flex flex-col justify-start items-start text-nowrap ml-12">
           <div
-            class="text-nowrap flex justify-start items-center space-x-10 -ml-3 mt-2">
-            <div class="text-base font-semibold">승인구분 :</div>
+            class="text-nowrap flex justify-start items-center space-x-5 mt-2">
+            <div class="text-base font-semibold">승인구분</div>
             <div class="flex space-x-10">
               <label for="unite"
                 ><input
@@ -53,8 +53,8 @@
             </div>
           </div>
         </div>
-        <div class="flex justify-start ml-40 pl-1 space-x-5">
-          <div class="text-base font-semibold">조회조건 :</div>
+        <div class="flex justify-start ml-12 space-x-5">
+          <div class="text-base font-semibold">조회조건</div>
           <label for="cunite"
             ><input
               type="checkbox"
@@ -71,7 +71,7 @@
           >
 
           <div class="flex pl-24 space-x-5">
-            <div class="text-base font-semibold">발급구분 :</div>
+            <div class="text-base font-semibold">발급구분</div>
             <label for="all"
               ><input
                 type="radio"
@@ -99,7 +99,7 @@
           </div>
         </div>
       </div>
-      <div class="ml-10 flex flex-col">
+      <div class="flex flex-col">
         <PickStoreSingle2
           @lngStoreCode="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"

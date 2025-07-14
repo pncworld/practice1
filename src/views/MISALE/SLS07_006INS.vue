@@ -22,8 +22,8 @@
     </div>
   </div>
   <div
-    class="grid grid-rows-2 grid-cols-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-    <div class="mt-3 ml-10">
+    class="grid grid-rows-2 grid-cols-1 justify-between bg-gray-200 rounded-lg h-28 items-start z-10">
+    <div class="ml-16">
       <PickStoreRenew
         @lngStoreCode="lngStoreCode"
         @lngStoreGroup="lngStoreGroup"
@@ -31,7 +31,7 @@
         @excelStore="excelStore"
         :placeholderName="'선택'"></PickStoreRenew>
     </div>
-    <div class="!pr-[20%]">
+    <div class="ml-12">
       <div class="flex space-x-5">
         <Datepicker1
           :initToday="1"

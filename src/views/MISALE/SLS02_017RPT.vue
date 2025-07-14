@@ -20,8 +20,8 @@
       </div>
     </div>
     <div
-      class="grid grid-rows-2 grid-cols-2 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div class="mt-5">
+      class="grid grid-rows-2 grid-cols-2 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
+      <div class="">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
@@ -29,7 +29,7 @@
           :closePopUp="closePopUp"
           ref="datepicker"></Datepicker2>
       </div>
-      <div class="mt-10">
+      <div class="">
         <PickStoreSingle2
           @lngStoreCode="lngStoreCode"
           @lngStoreGroup="lngStoreGroup"

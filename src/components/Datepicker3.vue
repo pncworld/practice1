@@ -1,8 +1,6 @@
 <template>
-  <div class="flex items-center ml-20 space-x-2">
-    <span class="ml-10 font-semibold text-base text-nowrap"
-      >{{ FirstName }} :
-    </span>
+  <div class="flex items-center space-x-5 mt-2 ml-12">
+    <span class="font-semibold text-base text-nowrap">{{ FirstName }} </span>
     <!-- <select name="" id="" class="w-32 h-8 rounded-lg border border-gray-500" v-model="startyear" @change="setStartYear">
             <option :value="i" v-for="i in settingYears">{{ i }}</option>
         </select> -->

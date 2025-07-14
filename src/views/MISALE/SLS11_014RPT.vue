@@ -18,8 +18,8 @@ Author : 권맑음                     
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-16 items-center z-10">
-      <div class="mt-1">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-16 items-start z-10">
+      <div class="">
         <Datepicker2
           @startDate="startDate"
           @endDate="endDate"
@@ -28,7 +28,7 @@ Author : 권맑음                     
           :selectedGroup="selectedGroup"
           @excelDate="excelDate" />
       </div>
-      <div class="h-[75%] ml-5 mt-1">
+      <div class="h-[75%]">
         <pickStoreRenew
           @lngStoreCode="lngStoreCode"
           @lngStoreGroup="lngStoreGroup"

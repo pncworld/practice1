@@ -18,20 +18,20 @@
       </div>
     </div>
     <div
-      class="grid grid-rows-1 grid-cols-[1fr,10fr,1fr,10fr] justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <input type="checkbox" class="-mt-12 ml-20" @click="checkDate" />
-      <div class="grid grid-cols-1 grid-rows-2 ml-10">
+      class="grid grid-rows-1 grid-cols-[0.1fr,10fr,1fr,10fr] justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
+      <input type="checkbox" class="-mt-12 ml-2" @click="checkDate" />
+      <div class="grid grid-cols-1 grid-rows-2 justify-start !pr-10">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
           @excelDate="excelDate"
           :initToday="1"
-          class="pr-48"
+          class="!-ml-5"
           :closePopUp="closePopUp"
           ref="datepicker"></Datepicker2>
         <div
-          class="flex justify-start ml-16 items-center space-x-3 text-nowrap">
-          <div class="text-base font-semibold ml-2">조회조건 :</div>
+          class="flex justify-start ml-12 items-center space-x-5 text-nowrap">
+          <div class="text-base font-semibold -ml-5">조회조건</div>
           <label for="sum"
             ><input
               id="sum"
@@ -51,7 +51,7 @@
       <div class="-mt-10 -ml-10">
         <input type="checkbox" :value="1" @click="updateShowStore" />
       </div>
-      <div class="-mt-10">
+      <div class="-mt-12">
         <PickStoreCorner
           @lngStoreGroup="lngStoreGroup"
           @lngStoreCode="lngStoreCode"

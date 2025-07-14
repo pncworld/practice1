@@ -18,17 +18,17 @@
     </div>
   </div>
   <div
-    class="grid grid-rows-1 grid-cols-[7fr,1fr,7fr] justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-    <div class="grid grid-cols-1 grid-rows-2 mr-60">
+    class="grid grid-rows-1 grid-cols-[7fr,0.1fr,7fr] justify-start bg-gray-200 rounded-lg h-24 items-center z-10">
+    <div class="grid grid-cols-1 grid-rows-2">
       <Datepicker1
         @dateValue="dateValue"
         @year="year"
         @month="month"
-        class="ml-36"
+        class="ml-12"
         @day="day"
         @excelDate="excelDate"></Datepicker1>
-      <div class="flex justify-center items-center ml-28 mr-3 space-x-3">
-        <div class="text-base font-semibold">매출목표 :</div>
+      <div class="flex justify-start items-center ml-12 space-x-5">
+        <div class="text-base font-semibold">매출목표</div>
         <input
           type="text"
           class="rounded-lg pl-1 h-8 disabled:bg-white text-right"
@@ -36,8 +36,10 @@
           disabled />
       </div>
     </div>
-    <div><input type="checkbox" :value="1" @click="updateShowStore" /></div>
-    <div>
+    <div class="flex justify-center items-center -mt-4">
+      <input type="checkbox" :value="1" @click="updateShowStore" />
+    </div>
+    <div class="-mt-5">
       <PickStoreSingle
         @lngStoreGroup="lngStoreGroup"
         @lngSupervisor="lngSupervisor"

@@ -18,18 +18,18 @@
     </div>
   </div>
   <div
-    class="grid grid-cols-[15fr,1fr,15fr] grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
+    class="grid grid-cols-[15fr,1fr,15fr] grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
     <div class="grid grid-cols-1 grid-rows-2">
       <Datepicker3
-        class="pl-2"
+        class=""
         @endMonth="endMonth"
         @endYear="endYear"
         @startMonth="startMonth"
         @startYear="startYear"
         @excelDate="excelDate"></Datepicker3>
       <div
-        class="flex items-center text-base text-nowrap font-semibold pl-32 mt-3">
-        조회조건 :
+        class="flex items-center text-base text-nowrap font-semibold pl-12 mt-3">
+        조회조건
         <div>
           <label for="sum" class="font-normal"
             ><input
@@ -41,7 +41,9 @@
         </div>
       </div>
     </div>
-    <div><input type="checkbox" name="" id="" @change="showStore" /></div>
+    <div class="mt-8 ml-12">
+      <input type="checkbox" name="" id="" @change="showStore" />
+    </div>
     <div class="ml-5">
       <PickStorePlural
         @lngStoreCodes="lngStoreCodes"

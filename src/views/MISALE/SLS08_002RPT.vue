@@ -19,19 +19,18 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-3 mt-12">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
+      <div class="grid grid-cols-1 grid-rows-3">
         <Datepicker2
-          class="ml-9"
+          class=""
           @endDate="endDate"
           @startDate="startDate"
           :closePopUp="closePopUp"
           ref="datepicker"
           @excelDate="excelDate"></Datepicker2>
-        <div class="flex justify-between items-center text-nowrap ml-40 -mt-2">
-          <div
-            class="text-nowrap flex justify-start items-center space-x-10 ml-8">
-            <div class="text-base font-semibold">조건 :</div>
+        <div class="flex justify-between items-center text-nowrap ml-20 -mt-2">
+          <div class="text-nowrap flex justify-start items-center space-x-5">
+            <div class="text-base font-semibold">조건</div>
             <div class="flex space-x-10">
               <label for="store"
                 ><input
@@ -48,8 +47,8 @@
               <!-- <label for="sum"><input type="checkbox" id="sum" @click="showSum">합계</label> -->
             </div>
           </div>
-          <div class="flex justify-end -space-x-5 mt-3 ml-[422px]">
-            <div class="text-base font-semibold">사유코드 :</div>
+          <div class="flex justify-end items-start -space-x-7 mt-3 ml-[73%]">
+            <div class="text-base font-semibold">사유코드</div>
             <v-select
               v-model="selectedCause"
               :options="causeList"
@@ -61,7 +60,7 @@
           </div>
         </div>
       </div>
-      <div class="ml-10 -mt-10">
+      <div class="">
         <PickStoreRenew3
           @lngStoreCode="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"

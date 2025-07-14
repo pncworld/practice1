@@ -19,12 +19,11 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-[10fr,10fr] grid-rows-1 justify-between bg-gray-200 rounded-lg h-20 items-center z-10 p-5">
-      <div
-        class="grid grid-cols-1 grid-rows-4 -space-y-3 justify-start ml-10 mt-20">
-        <div class="flex justify-start space-x-4">
+      class="grid grid-cols-[10fr,10fr] grid-rows-1 justify-between bg-gray-200 rounded-lg h-20 z-10">
+      <div class="grid grid-cols-1 grid-rows-2 justify-center ml-12">
+        <div class="flex justify-start items-center space-x-4 mt-2">
           <div class="text-base font-semibold text-nowrap">
-            비교년도/기준년도 :
+            비교년도/기준년도
           </div>
           <div>
             <select
@@ -47,8 +46,8 @@
           </div>
         </div>
         <div
-          class="justify-start flex items-center space-x-5 w-[600px] pl-16 pt-2">
-          <div class="text-base font-semibold">매출 구분 :</div>
+          class="justify-start flex items-center space-x-5 w-[500px] pl-[60px]">
+          <div class="text-base font-semibold">매출 구분</div>
           <div>
             <label for="searchType"
               ><input
@@ -71,7 +70,7 @@
           </div>
         </div>
       </div>
-      <div class="ml-96 mt-3">
+      <div class="ml-90">
         <PickStoreSingle2
           @lngStoreCode="lngStoreCode"
           @lngStoreGroup="lngStoreGroup"

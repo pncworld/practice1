@@ -1,6 +1,6 @@
 <template>
-  <div class="flex justify-center items-center space-x-3">
-    <div class="text-base font-semibold">지불코드 :</div>
+  <div class="flex justify-center items-center space-x-5">
+    <div class="text-base font-semibold">지불코드</div>
     <!-- <select name="" id="" class="font-thin w-44 h-10 rounded-lg border ml-1 pl-1 " @change="changePayCd" v-model="selectedPayCd">
         <option value="0">전체</option>
         <option :value="i.lngCode" v-for="i in payCodeList" >{{ i.strName }}</option>

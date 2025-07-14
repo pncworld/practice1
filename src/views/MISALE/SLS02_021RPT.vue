@@ -18,7 +18,7 @@ Author : 권맑음                     
       </div>
     </div>
     <div
-      class="grid grid-rows-1 grid-cols-2 justify-between bg-gray-200 rounded-lg h-14 items-center z-10">
+      class="grid grid-rows-1 grid-cols-2 justify-between bg-gray-200 rounded-lg h-14 items-start z-10">
       <div>
         <Datepicker2
           @endDate="endDate"

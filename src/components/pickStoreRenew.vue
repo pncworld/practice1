@@ -1,7 +1,7 @@
 <template>
   <div
-    class="grid grid-rows-1 grid-cols-[repeat(4,1fr)] justify-center text-sm items-center w-[500px] space-x-2">
-    <div class="items-center font-bold text-base flex w-20 pl-5">매장명 :</div>
+    class="grid grid-rows-1 grid-cols-[repeat(4,1fr)] justify-start text-sm items-center w-[500px] space-x-3 mt-2">
+    <div class="items-center font-bold text-base flex pr-2">매장명</div>
     <div v-if="hideit">
       <select
         :disabled="true"

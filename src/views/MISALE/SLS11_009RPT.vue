@@ -19,30 +19,31 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-28 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-3 mt-12">
-        <div class="flex -space-x-24">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-28 items-start z-10">
+      <div class="grid grid-cols-1 grid-rows-3">
+        <div class="flex">
           <input
             type="checkbox"
-            class="ml-16 z-30 mt-5"
+            class="ml-2 z-50 mt-2"
             @click="checkReportType"
             :value="1" />
           <Datepicker2
             @endDate="endDate"
             @startDate="startDate"
             :closePopUp="closePopUp"
+            class="-ml-5"
             ref="datepicker"
             @excelDate="excelDate"
             :mainName="'일자'"></Datepicker2>
 
           <input
             type="checkbox"
-            class="!ml-40 mt-5"
+            class="!ml-72 mt-5"
             @click="checkReportType"
             :value="2" />
         </div>
-        <div class="flex justify-center mt-2 pr-16">
-          <div class="text-base font-semibold">객층구분 :</div>
+        <div class="flex justify-start mt-2 ml-5 -space-x-7">
+          <div class="text-base font-semibold">객층구분</div>
           <v-select
             v-model="selectedCust"
             :options="customerList"
@@ -53,7 +54,7 @@
             @click="resetVselect2" />
         </div>
       </div>
-      <div class="ml-10">
+      <div class="">
         <PickStoreSingle2
           @lngStoreCode="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"
@@ -65,7 +66,7 @@
         </PickStoreSingle2>
         <div
           class="text-nowrap flex justify-start items-center space-x-10 ml-8 mt-2">
-          <div class="text-base font-semibold">조건 :</div>
+          <div class="text-base font-semibold">조건</div>
           <div class="flex space-x-10">
             <label for="store"
               ><input

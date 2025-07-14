@@ -24,18 +24,18 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-2 mt-2 space-y-1">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
+      <div class="grid grid-cols-1 grid-rows-2">
         <Datepicker2
-          class="ml-9"
+          class=""
           @endDate="endDate"
           @startDate="startDate"
           :closePopUp="closePopUp"
           ref="datepicker"
           @excelDate="excelDate"></Datepicker2>
 
-        <div class="flex justify-center mr-20 -space-x-5">
-          <div class="text-base font-semibold ml-5">사유코드 :</div>
+        <div class="flex justify-start ml-12 -space-x-7">
+          <div class="text-base font-semibold">사유코드</div>
           <div class="flex justify-center -space-x-48">
             <v-select
               v-model="selectedCause"
@@ -53,7 +53,7 @@
           </div>
         </div>
       </div>
-      <div class="ml-10 mt-2">
+      <div class="">
         <PickStoreSingle2
           @lngStoreCode="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"

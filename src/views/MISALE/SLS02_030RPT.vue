@@ -18,8 +18,8 @@ Author : 권맑음                     
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-28 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-3 -space-y-5 mt-5">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-28 items-start z-10">
+      <div class="grid grid-cols-1 grid-rows-3">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
@@ -28,9 +28,9 @@ Author : 권맑음                     
           @excelDate="excelDate"
           :initToday="1"></Datepicker2>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-48">
-          구분 :
-          <div class="flex ml-3 space-x-3">
+          class="flex justify-start items-start text-base text-nowrap font-semibold ml-20 space-x-5">
+          구분
+          <div class="flex ml-5 space-x-5">
             <select name="" id="" class="border w-40 h-7 rounded-lg">
               <option value="">직가맹</option>
             </select>
@@ -40,8 +40,8 @@ Author : 권맑음                     
           </div>
         </div>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-40 !-mt-10">
-          조회조건 :
+          class="flex justify-start items-start text-base text-nowrap font-semibold ml-12 -mt-5">
+          조회조건
           <div>
             <label for="detail" class="font-normal"
               ><input
@@ -53,7 +53,7 @@ Author : 권맑음                     
           </div>
         </div>
       </div>
-      <div class="ml-10">
+      <div class="">
         <PickStorePlural
           @lngStoreCodes="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"

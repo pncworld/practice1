@@ -19,21 +19,21 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-3 mt-14">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
+      <div class="grid grid-cols-1 grid-rows-3">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
           :closePopUp="closePopUp"
           ref="datepicker"
-          class="ml-10"
+          class=""
           @excelDate="excelDate"
           :initToday="0"
           :limitEndDate="limitEndDate"></Datepicker2>
-        <div class="flex flex-col justify-start items-start text-nowrap ml-40">
+        <div class="flex flex-col justify-start items-start text-nowrap ml-12">
           <div
-            class="text-nowrap flex justify-start items-center space-x-10 ml-8 mt-2">
-            <div class="text-base font-semibold">조건 :</div>
+            class="text-nowrap flex justify-start items-center space-x-5 mt-2 ml-7">
+            <div class="text-base font-semibold">조건</div>
             <div class="flex space-x-5">
               <label for="day">
                 <input
@@ -78,7 +78,7 @@
           </div>
         </div>
       </div>
-      <div class="ml-10 flex flex-col">
+      <div class="">
         <PickStoreSingle2
           @lngStoreCode="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"

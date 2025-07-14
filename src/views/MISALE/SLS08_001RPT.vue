@@ -19,19 +19,19 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-32 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-3 mt-5">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-32 items-start z-10">
+      <div class="grid grid-cols-1 grid-rows-3">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
           :closePopUp="closePopUp"
           ref="datepicker"
-          class="ml-9"
+          class=""
           @excelDate="excelDate"></Datepicker2>
-        <div class="flex flex-col justify-start items-start text-nowrap ml-40">
+        <div class="flex flex-col justify-start items-start text-nowrap ml-12">
           <div
-            class="text-nowrap flex justify-start items-center space-x-10 ml-8 mt-2">
-            <div class="text-base font-semibold">조건 :</div>
+            class="text-nowrap flex justify-start items-center space-x-5 ml-8 mt-2">
+            <div class="text-base font-semibold">조건</div>
             <div class="flex space-x-10">
               <label for="store"
                 ><input
@@ -51,8 +51,8 @@
             </div>
           </div>
         </div>
-        <div class="flex justify-center -mr-16 -space-x-5">
-          <div class="text-base font-semibold ml-5">사유코드 :</div>
+        <div class="flex justify-start -space-x-7 items-start -mt-3">
+          <div class="text-base font-semibold ml-12">사유코드</div>
           <v-select
             v-model="selectedCause"
             :options="causeList"
@@ -63,7 +63,7 @@
             @click="resetVselect2" />
         </div>
       </div>
-      <div class="ml-10 -mt-10">
+      <div class="">
         <PickStoreSingle2
           @lngStoreCode="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"

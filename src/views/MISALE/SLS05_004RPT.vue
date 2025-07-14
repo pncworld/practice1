@@ -19,18 +19,18 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-32 items-center z-10">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-32 items-start z-10">
       <div class="grid grid-cols-1 grid-rows-3">
-        <div class="flex">
-          <label for="daily" class="font-thin inline-flex">
+        <div class="flex items-center">
+          <label for="daily" class="font-thin inline-flex z-50">
             <input
               type="checkbox"
               id="daily"
               @change="seeDaily"
-              class="ml-20 mt-5" />
+              class="ml-5 mt-2" />
           </label>
           <Datepicker2
-            class="!pr-32"
+            class="-ml-8"
             @startDate="startDate"
             @endDate="endDate"
             @acceptDate="acceptDate"
@@ -42,9 +42,9 @@
             @excelDate="excelDate"></Datepicker2>
         </div>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-44">
-          매입사 :
-          <div class="flex ml-7 space-x-3 mt-1">
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-16">
+          매입사
+          <div class="flex ml-5 space-x-3 mt-1">
             <v-select
               v-model="selectCardCorp"
               :options="cardCorp"
@@ -55,8 +55,8 @@
           </div>
         </div>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-40">
-          조회조건 :
+          class="flex justify-start items-start text-base text-nowrap font-semibold ml-12">
+          조회조건
           <div>
             <label for="saleDay" class="font-normal">
               <input
@@ -83,7 +83,7 @@
       </div>
       <div class="h-[75%] ml-5">
         <label for="daily" class="font-thin inline-flex">
-          <input type="checkbox" id="daily" @change="seeStore" />
+          <input type="checkbox" id="daily" @change="seeStore" class="mt-1" />
           <pickStoreSingle
             @lngStoreCode="lngStoreCodes"
             @lngStoreGroup="lngStoreGroup"

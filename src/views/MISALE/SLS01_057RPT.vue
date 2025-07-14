@@ -18,7 +18,7 @@ Author : 권맑음                     
   </div>
   <div
     class="grid grid-rows-2 grid-cols-3 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-    <div>
+    <div class="ml-[68px]">
       <Datepicker1
         @dateValue="dateValue"
         @year="year"
@@ -41,25 +41,25 @@ Author : 권맑음                     
         class="!ml-3"
         :init="init"></PosList>
     </div>
-    <div class="text-base font-semibold w-[90%] ml-10 z-10">
-      영수증 번호:
+    <div class="space-x-5 flex items-center ml-12">
+      <div class="text-base font-semibold z-10 text-nowrap">영수증 번호</div>
       <input
         type="text"
         class="border rounded-lg pl-1 h-10 !w-36 z-30"
         v-model="receiptNo" />
     </div>
-    <div class="grid !mr-80 items-center relative">
+    <div class="items-center justify-start flex -translate-x-[75px]">
       <DisCountCdList
-        class="flex absolute -right-1 w-[150%]"
+        class="flex w-[150%]"
         @disCountCd="DisCountCd"
         @discountNm="discountNm"
         :groupCd="groupCd"
         :storeCd="storeCd"
         :init="init"></DisCountCdList>
     </div>
-    <div class="flex justify-center items-center mt-3 ml-9">
+    <div class="flex justify-center items-center ml-9">
       <PayCodeList
-        class="flex -mt-5"
+        class="flex"
         @payCd="selectedpayCd"
         @payNm="payNm"
         :groupCd="groupCd"

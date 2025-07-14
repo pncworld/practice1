@@ -19,19 +19,19 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
       <div class="grid grid-cols-1 grid-rows-2">
         <Datepicker2
           @startDate="startDate"
           @endDate="endDate"
           :closePopUp="closePopUp"
           ref="datepicker"
-          class="ml-10"
+          class=""
           :selectedGroup="selectedGroup"
           @excelDate="excelDate" />
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-48">
-          조건 :
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-20">
+          조건
           <div class="ml-4">
             <label for="byday"
               ><input

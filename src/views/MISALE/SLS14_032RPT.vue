@@ -18,7 +18,7 @@
     </div>
   </div>
   <div
-    class="flex justify-between bg-gray-200 rounded-lg h-16 items-center z-10">
+    class="flex justify-between bg-gray-200 rounded-lg h-16 items-start z-10">
     <div>
       <Datepicker3
         @endMonth="endMonth"

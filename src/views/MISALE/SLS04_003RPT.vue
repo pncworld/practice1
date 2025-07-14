@@ -19,8 +19,8 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-[1fr,10fr,10fr] grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div class="w-10 ml-2 -mt-10">
+      class="grid grid-cols-[1fr,10fr,10fr] grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
+      <div class="w-10 ml-12 mt-2">
         <select
           name=""
           id=""
@@ -31,33 +31,27 @@
           <option :value="3">월별</option>
         </select>
       </div>
-      <div
-        class="grid grid-cols-1 grid-rows-2 -space-y-3 justify-start -ml-36 mt-3">
-        <div class="flex justify-start ml-8">
+      <div class="grid grid-cols-1 grid-rows-2 justify-start items-start">
+        <div class="flex justify-start">
           <Datepicker2
             @endDate="endDate"
             @startDate="startDate"
             :closePopUp="closePopUp"
             ref="datepicker"
             @excelDate="excelDate"></Datepicker2>
-          <div class="mt-2">
-            <label for="detail"
+          <div class="mt-2 items-center flex">
+            <label for="detail" class="flex items-center"
               ><input
                 type="checkbox"
                 id="detail"
                 @change="detailView" />상세보기</label
             >
           </div>
-          <div class="mt-2 ml-44">
-            <label for="StoreName"
-              ><input type="checkbox" id="StoreName" @change="showStore"
-            /></label>
-          </div>
         </div>
         <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-48 pl-1">
-          메뉴구분 :
-          <div class="flex ml-3 space-x-3 mt-1">
+          class="flex justify-start items-center text-base text-nowrap font-semibold ml-12">
+          메뉴구분
+          <div class="flex ml-5 space-x-3 mt-1">
             <v-select
               v-model="selectedMenu"
               :options="mainMenu"
@@ -84,7 +78,12 @@
           </div>
         </div>
       </div>
-      <div class="ml-0">
+      <div class="ml-0 flex items-center">
+        <div class="mt-2">
+          <label for="StoreName"
+            ><input type="checkbox" id="StoreName" @change="showStore"
+          /></label>
+        </div>
         <PickStorePlural
           @lngStoreCodes="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"

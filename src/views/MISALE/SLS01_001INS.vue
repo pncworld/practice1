@@ -19,33 +19,32 @@
     </div>
   </div>
   <div
-    class="grid grid-rows-1 grid-cols-[7fr,7fr] justify-between bg-gray-200 rounded-lg h-48 items-center z-10">
-    <div class="grid grid-cols-1 grid-rows-2 mr-60">
+    class="grid grid-rows-1 grid-cols-[7fr,7fr] justify-between bg-gray-200 rounded-lg h-48 items-start z-10">
+    <div class="grid grid-cols-1 grid-rows-4 h-full">
       <Datepicker3
         @startYear="startYear"
         @startMonth="startMonth"
         :hideEndDate="false"
         @excelDate="excelDate"
         :firstName="'날짜'"
-        class="ml-20 mt-5 h-8"
+        class="ml-28"
         :prevMonth="prevMonth"
         :nextMonth="nextMonth"
         :initMonth="1"
         :stopLimit="true">
       </Datepicker3>
 
-      <div
-        class="grid grid-rows-3 grid-cols-[1fr,4fr] justify-center items-center ml-10 -mt-8">
+      <div class="flex items-center justify-start">
         <div
-          class="text-base font-semibold text-nowrap justify-center flex items-center ml-8">
-          매출목표액 :
+          class="text-base font-semibold text-nowrap justify-center flex items-center ml-16">
+          매출목표액
         </div>
 
-        <div class="flex">
+        <div class="flex items-center">
           <select
             name=""
             id=""
-            class="w-32 h-8 rounded-lg ml-2"
+            class="w-32 h-8 rounded-lg ml-5"
             v-model="selectWeek">
             <option :value="0">전체</option>
             <option :value="i.lngCode" v-for="i in WeekDays">
@@ -62,26 +61,30 @@
             적용
           </button>
         </div>
+      </div>
+      <div class="flex items-center justify-start ml-12">
         <div
-          class="text-base font-semibold text-nowrap justify-center flex items-center ml-3 mt-1">
-          월매출목표액 :
+          class="text-base font-semibold text-nowrap justify-center flex items-center">
+          월매출목표액
         </div>
         <div class="flex">
           <input
             type="text"
-            class="w-52 h-8 rounded-lg pl-1 mt-1 ml-2 disabled:bg-gray-50 text-right"
+            class="w-52 h-8 rounded-lg mt-1 ml-5 disabled:bg-gray-50 text-right"
             v-model="targetMonthSales"
             disabled />
         </div>
+      </div>
+      <div class="flex justify-start ml-2">
         <div
-          class="text-base font-semibold text-nowrap justify-center flex items-center ml-8">
-          파일선택 :
+          class="text-base font-semibold text-nowrap justify-center flex items-center ml-[70px]">
+          파일선택
         </div>
-        <div class="flex">
-          <div class="flex w-[300%]">
+        <div class="flex ml-5 items-center">
+          <div class="flex w-[300%] items-center">
             <input
               type="text"
-              class="w-52 h-8 rounded-lg pl-1 mt-1 ml-2 disabled:bg-white"
+              class="w-52 h-8 rounded-lg disabled:bg-white"
               disabled
               v-model="excelName" />
             <label
@@ -151,7 +154,7 @@
         </tbody>
       </table>
     </div>
-    <div class="flex flex-col">
+    <div class="flex flex-col -ml-20">
       <PickStoreSingle
         @lngStoreGroup="lngStoreGroup"
         @lngSupervisor="lngSupervisor"
@@ -160,19 +163,19 @@
         @lngStoreCode="lngStoreCode"
         @excelStore="excelStore"
         :placeholderName="'선택'"></PickStoreSingle>
-      <div class="flex mt-12 items-center -ml-20">
-        <div class="text-base font-semibold text-nowrap">sheet선택:</div>
+      <div class="flex mt-12 items-center -ml-1">
+        <div class="text-base font-semibold text-nowrap">sheet선택</div>
         <select
           name=""
           id=""
-          class="w-32 h-8 rounded-lg ml-2"
+          class="w-32 h-8 rounded-lg ml-5"
           v-model="selectSheet">
           <option :value="i.lngCode" v-for="i in sheetArr">
             {{ i.strName }}
           </option>
         </select>
         <button
-          class="button primary h-7 flex items-center ml-96"
+          class="button primary h-7 flex items-center ml-4"
           @click="saveUploadFile">
           업로드 파일 저장
         </button>
@@ -183,7 +186,7 @@
         ※ 1.샘플파일 다운받아 작성(Download버튼) 2.파일선택 후 "업로드
         파일저장"버튼 클릭
       </div>
-      <div>
+      <div class="flex justify-start -translate-x-48">
         <button @click="downloadSample" class="button primary h-6">
           download
         </button>

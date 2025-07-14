@@ -1,7 +1,11 @@
 <template>
   <div
-    class="grid grid-cols-[100px,150px,150px,300px] grid-rows-2 h-16 w-[750px]">
-    <div>
+    class="grid grid-cols-[80px,80px,150px,150px,300px] grid-rows-2 h-16 w-[750px] mt-2">
+    <div
+      class="font-semibold text-nowrap text-base row-span-2 flex justify-center items-center">
+      매장명
+    </div>
+    <div class="flex justify-center items-center">
       <label for="searchType1" class="text-base font-normal"
         >직/가맹<input
           type="radio"
@@ -51,7 +55,7 @@
           :reduce="(store) => store.lngStoreCode" />
       </div>
     </div>
-    <div>
+    <div class="flex justify-center items-center">
       <label for="searchType2" class="text-base font-normal ml-2"
         >팀/SC<input
           type="radio"

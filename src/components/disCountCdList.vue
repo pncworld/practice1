@@ -1,7 +1,7 @@
 div
 <template>
-  <div class="flex justify-center items-center space-x-3">
-    <div class="text-base font-semibold">할인코드 :</div>
+  <div class="flex justify-start items-center space-x-5">
+    <div class="text-base font-semibold">할인코드</div>
     <!-- <select name="" id="" class="font-thin w-64 h-10 rounded-lg border " @change="changeDiscount" v-model="selectedDiscountNo">
         <option value="0">전체</option>
         <option :value="i.lngCode" v-for="i in disCountList" >{{ i.strName }}</option>

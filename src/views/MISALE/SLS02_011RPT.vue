@@ -1,9 +1,9 @@
-/*--############################################################################
+<!-- /*--############################################################################
 # Filename : SLS02_011RPT.vue                                                  
 # Description : 매출관리 > 당일 매출 조회 > 영수증별 매출 조회.                #
 Date :2025-05-14                                                              #
 Author : 권맑음                     
-################################################################################*/
+################################################################################*/ -->
 <template>
   <!-- 조회조건 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
@@ -18,15 +18,15 @@ Author : 권맑음                     
     </div>
   </div>
   <div
-    class="grid grid-rows-2 grid-cols-3 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-    <div>
+    class="grid grid-rows-2 grid-cols-[1fr,1.2fr,1fr] justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
+    <div class="ml-[67px]">
       <Datepicker1
         @dateValue="dateValue"
         @year="year"
         @month="month"
         @day="day"></Datepicker1>
     </div>
-    <div>
+    <div class="ml-9">
       <PickStoreRenew3
         @lngStoreCode="selectedStoreCd"
         @lngStoreGroup="selectedGroupCd"
@@ -41,24 +41,24 @@ Author : 권맑음                     
         class="!ml-3"
         :init="init"></PosList>
     </div>
-    <div class="text-base font-semibold w-[90%] ml-10 z-10">
-      영수증 번호:
+    <div class="space-x-5 flex items-center">
+      <div class="text-base font-semibold ml-12 z-10">영수증 번호</div>
       <input
         type="text"
-        class="border rounded-lg pl-1 h-10 !w-36 z-30"
+        class="border rounded-lg h-10 !w-36 z-30"
         v-model="receiptNo" />
     </div>
-    <div class="grid !mr-32 items-center relative">
+    <div class="flex justify-start items-center ml-5">
       <DisCountCdList
-        class="flex absolute -right-1 w-[150%]"
+        class="flex w-[150%]"
         @disCountCd="DisCountCd"
         :groupCd="groupCd"
         :storeCd="storeCd"
         :init="init"></DisCountCdList>
     </div>
-    <div class="flex justify-center items-center mt-3 ml-9">
+    <div class="flex justify-center items-center ml-9">
       <PayCodeList
-        class="flex -mt-5"
+        class="flex"
         @payCd="selectedpayCd"
         :groupCd="groupCd"
         :storeCd="storeCd"

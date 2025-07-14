@@ -19,21 +19,21 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-3 mt-12">
-        <div class="flex -space-x-20">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
+      <div class="grid grid-cols-1 grid-rows-3">
+        <div class="flex">
           <Datepicker2
             @endDate="endDate"
             @startDate="startDate"
             :closePopUp="closePopUp"
             ref="datepicker"
-            class="ml-10"
+            class=""
             @excelDate="excelDate"
             :mainName="'일자'"></Datepicker2>
         </div>
         <div
-          class="text-nowrap flex justify-start items-center space-x-10 ml-44 pl-1 mt-2">
-          <div class="text-base font-semibold">조건 :</div>
+          class="text-nowrap flex justify-start items-center space-x-5 ml-12 mt-2">
+          <div class="text-base font-semibold">조건</div>
           <div class="flex space-x-10">
             <label for="day"
               ><input type="checkbox" id="day" @click="byDay" />일자별</label
@@ -56,7 +56,7 @@
           </div>
         </div>
       </div>
-      <div class="ml-10">
+      <div class="">
         <PickStoreSingle2
           @lngStoreCode="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"
