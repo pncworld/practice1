@@ -65,7 +65,8 @@
           <select
             name="strLimitGubun"
             id=""
-            class="w-[80%] h-[80%] border border-black"
+            :disabled="disabled"
+            class="w-[80%] h-[80%] border border-black disabled:bg-gray-400"
             v-model="gridvalue1"
             @change="changeValue">
             <option value="0">한도없음</option>
@@ -81,6 +82,7 @@
           class="flex justify-center items-center border-t border-l border-black">
           <input
             type="number"
+            :disabled="disabled"
             name="dblLimitAmt"
             @input="changeValue"
             v-model="gridvalue2"
@@ -96,8 +98,9 @@
           <select
             name="strLimitResetPeriod"
             id=""
+            :disabled="disabled"
             @change="changeValue"
-            class="w-[80%] h-[80%] border border-black"
+            class="w-[80%] h-[80%] border border-black disabled:bg-gray-400"
             v-model="gridvalue3">
             <option value="1">1개월</option>
             <option value="2">2개월</option>
@@ -122,9 +125,10 @@
           class="flex justify-center items-center border-t border-l border-black">
           <input
             type="date"
+            :disabled="disabled"
             @input="changeValue"
             name="dtmApplyDate"
-            class="w-[80%] h-[80%] border border-black"
+            class="w-[80%] h-[80%] border border-black disabled:bg-gray-400"
             v-model="gridvalue4" />
         </div>
 
@@ -136,16 +140,18 @@
           class="flex justify-start pl-10 space-x-5 items-center border-t border-l border-black">
           <input
             type="time"
+            :disabled="disabled"
             name="strSaleStartTime"
             v-model="gridvalue5"
             @change="changeValue"
-            class="w-[30%] h-[80%] border border-black" />~
+            class="w-[30%] h-[80%] border border-black disabled:bg-gray-400" />~
           <input
             type="time"
+            :disabled="disabled"
             name="strSaleEndTime"
             v-model="gridvalue6"
             @change="changeValue"
-            class="w-[30%] h-[80%] border border-black" />
+            class="w-[30%] h-[80%] border border-black disabled:bg-gray-400" />
         </div>
 
         <div
@@ -159,6 +165,7 @@
               type="radio"
               v-model="gridvalue7"
               value="0"
+              :disabled="disabled"
               @change="changeValue"
               name="strLimitModify"
               id="cond" />가능</label
@@ -167,6 +174,7 @@
             ><input
               type="radio"
               v-model="gridvalue7"
+              :disabled="disabled"
               value="1"
               @change="changeValue"
               name="strLimitModify"
@@ -181,7 +189,11 @@
 
 <script setup>
 import { getStoreInfoList, saveCompInfo } from "@/api/master";
-import { getBasisOfEmpPay, getCompanyforpay } from "@/api/micrm";
+import {
+  getBasisOfEmpPay,
+  getCompanyforpay,
+  saveCustCompInfo,
+} from "@/api/micrm";
 /**
  *  페이지명 자동 입력 컴포넌트
  *  */
@@ -200,7 +212,11 @@ import Realgrid from "@/components/realgrid.vue";
  *  페이지로그 자동 입력
  *  */
 
-import { formatLocalDate, insertPageLog } from "@/customFunc/customFunc";
+import {
+  formatLocalDate,
+  formatTime,
+  insertPageLog,
+} from "@/customFunc/customFunc";
 /**
  *  경고창 호출 라이브러리
  *  */
@@ -222,6 +238,7 @@ import { useStore } from "vuex";
  */
 
 const hideAll = ref(true);
+const disabled = ref(true);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
   if (store.state.userData.lngCommonMenu == "1") {
@@ -298,7 +315,7 @@ const searchButton = async () => {
     initGrid();
     let res = await getBasisOfEmpPay(cond.value);
     rowData.value = res.data.List;
-
+    updatedRows.value = res.data.List;
     console.log(rowData.value);
   } catch (error) {
     afterSearch.value = false;
@@ -434,6 +451,7 @@ const selectedIndex = (e) => {
 const clickFirst = ref(false);
 const clickedRowData = async (e) => {
   //console.log(formatLocalDate(e[3]));
+  disabled.value = false;
   gridvalue1.value = e[7];
   gridvalue2.value = e[1];
   gridvalue3.value = e[8];
@@ -493,54 +511,77 @@ const deleterow2 = ref(false);
  */
 //저장부터
 const saveButton = async () => {
-  //   const bpids = updatedRows.value
-  //     .map((item) => item.BP_ID)
-  //     .filter((item) => item == undefined || item == "" || item == null).length;
-  //   const bpnms = updatedRows.value
-  //     .map((item) => item.BP_NM)
-  //     .filter((item) => item == undefined || item == "" || item == null).length;
-
-  //   if (bpids + bpnms > 0) {
-  //     Swal.fire({
-  //       title: "경고",
-  //       text: "누락된 필수값이 존재합니다. 확인해주세요.",
-  //       icon: "warning",
-  //       confirmButtonText: "확인",
-  //     });
-  //     return;
-  //   }
   try {
     store.state.loading = true;
     const compcds = updatedRows.value
       .filter((item, index) => stateRows.value.updated.includes(index))
       .map((item) => item.strSaleCompCode)
       .join("\u200b");
-    const bpids = updatedRows.value
+    const custtypes = updatedRows.value
       .filter((item, index) => stateRows.value.updated.includes(index))
-      .map((item) => item.BP_ID)
+      .map((item) => item.strSaleCustType)
       .join("\u200b");
-    const bpnms = updatedRows.value
+    const limitgubuns = updatedRows.value
       .filter((item, index) => stateRows.value.updated.includes(index))
-      .map((item) => item.BP_NM)
+      .map((item) => item.strLimitGubun)
       .join("\u200b");
-    const usevals = updatedRows.value
+    const limitamts = updatedRows.value
       .filter((item, index) => stateRows.value.updated.includes(index))
-      .map((item) => item.USE_VAL)
+      .map((item) => item.dblLimitAmt)
       .join("\u200b");
 
-    const res = await saveCompInfo(
-      store.state.userData.lngStoreGroup,
+    const resetperiods = updatedRows.value
+      .filter((item, index) => stateRows.value.updated.includes(index))
+      .map((item) => item.strLimitResetPeriod)
+      .join("\u200b");
+
+    const resetdays = updatedRows.value
+      .filter((item, index) => stateRows.value.updated.includes(index))
+      .map((item) => item.strLimitResetDay)
+      .join("\u200b");
+
+    const applydates = updatedRows.value
+      .filter((item, index) => stateRows.value.updated.includes(index))
+      .map((item) =>
+        item.dtmApplyDate
+          ? formatLocalDate(item.dtmApplyDate).split(" ")[0]
+          : ""
+      )
+      .join("\u200b");
+    console.log(applydates);
+    const starttimes = updatedRows.value
+      .filter((item, index) => stateRows.value.updated.includes(index))
+      .map((item) => item.strSaleStartTime)
+      .join("\u200b");
+
+    const endtimes = updatedRows.value
+      .filter((item, index) => stateRows.value.updated.includes(index))
+      .map((item) => item.strSaleEndTime)
+      .join("\u200b");
+
+    const limitmodify = updatedRows.value
+      .filter((item, index) => stateRows.value.updated.includes(index))
+      .map((item) => item.strLimitModify)
+      .join("\u200b");
+
+    const res = await saveCustCompInfo(
       compcds,
-      bpids,
-      bpnms,
-      usevals,
+      custtypes,
+      limitgubuns,
+      limitamts,
+      resetperiods,
+      resetdays,
+      applydates,
+      starttimes,
+      endtimes,
+      limitmodify,
       store.state.userData.lngSequence
     );
 
-    //console.log(res);
+    console.log(res);
     store.state.loading = false;
 
-    if (res.data.List[0].ERR_CODE == "00") {
+    if (res.data.RESULT_CD == "00") {
       Swal.fire({
         title: "성공",
         text: "저장하였습니다.",
@@ -551,13 +592,14 @@ const saveButton = async () => {
     } else {
       Swal.fire({
         title: "실패",
-        text: `저장을 실패하였습니다. ${res.data.List[0].ERR_MSG}`,
+        text: `저장을 실패하였습니다. ${res.data.RESULT_NM}`,
         icon: "error",
         confirmButtonText: "확인",
       });
       return;
     }
   } catch (error) {
+    // console.log(error);
   } finally {
     searchButton();
   }
@@ -574,6 +616,7 @@ const initGrid = () => {
   if (rowData2.value.length > 0) {
     rowData2.value = [];
   }
+  disabled.value = true;
 };
 /**
  * 엑셀 내보내기 함수

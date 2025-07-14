@@ -1637,3 +1637,31 @@ export const saveCustomorsInfo = (
     USERID: cond14,
   });
 };
+
+export const saveCustCompInfo = (
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  cond9,
+  cond10,
+  cond11
+) => {
+  return api2.post("/MICRM/CRM01_012INS.asmx/saveCustCompInfo", {
+    COMP_CD: cond,
+    CUST_TP: cond2,
+    LIMIT_GBN: cond3,
+    LIMIT_AMT: cond4,
+    RESET_PERIOD: cond5,
+    RESET_DAY: cond6,
+    APPDATE: cond7,
+    STIME: cond8,
+    ETIME: cond9,
+    MODIFY: cond10,
+    USERID: cond11,
+  });
+};
