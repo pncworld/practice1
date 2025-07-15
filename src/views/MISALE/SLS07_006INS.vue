@@ -23,7 +23,7 @@
   </div>
   <div
     class="grid grid-rows-2 grid-cols-1 justify-between bg-gray-200 rounded-lg h-28 items-start z-10">
-    <div class="ml-16">
+    <div class="ml-4">
       <PickStoreRenew
         @lngStoreCode="lngStoreCode"
         @lngStoreGroup="lngStoreGroup"

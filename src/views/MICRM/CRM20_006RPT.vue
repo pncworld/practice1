@@ -19,24 +19,24 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10 space-x-5">
+      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-24 items-start z-10">
       <div class="mt-1 justify-start flex flex-col">
         <PickCustCompany
-          class="ml-32"
+          class=""
           @excelStore="excelStore"
           @lngStoreCode="lngStoreCode"></PickCustCompany>
       </div>
-      <div class="h-[75%] ml-5 mt-1 justify-start flex">
+      <div class="ml-5 mt-1 justify-start flex">
         <PickBelongCust
           :lngStoreCode="selectedStores"
           @excelList="excelList"
           @strSaleCustName="strSaleCustName"
           @strSaleCustID="strSaleCustID"></PickBelongCust>
       </div>
-      <div class="!mr-20 !pr-20">
+      <div class="-mt-1">
         <Datepicker2
           :mainName="'조회기간'"
-          class="!mr-20 !pr-20"
+          class=""
           :closePopUp="closePopUp"
           ref="datepicker"
           :initToday="1"
@@ -44,7 +44,7 @@
           @endDate="endDate"
           @startDate="startDate"></Datepicker2>
       </div>
-      <div class="mt-4 space-x-2 flex justify-start ml-20">
+      <div class="mt-4 space-x-2 flex justify-start ml-[82px]">
         <label for="cond"
           ><input
             type="radio"

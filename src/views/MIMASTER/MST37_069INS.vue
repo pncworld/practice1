@@ -36,7 +36,7 @@
     <div
       class="grid grid-cols-1 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10">
       <div
-        class="flex justify-center mr-40 items-center text-base font-semibold space-x-10">
+        class="flex justify-start mr-40 items-center text-base font-semibold space-x-10">
         <Datepicker2
           :mainName="'적용일'"
           :initToday="1"
@@ -52,9 +52,13 @@
         </div>
 
         <div class="flex justify-center items-center">
-          <div>메뉴서브그룹 :</div>
+          <div>메뉴서브그룹</div>
           <div>
-            <select name="" id="" class="w-40 h-8" v-model="selectedSubGroup">
+            <select
+              name=""
+              id=""
+              class="w-40 h-8 ml-5"
+              v-model="selectedSubGroup">
               <option value="0">전체</option>
               <option :value="i.lngCode" v-for="i in MultiSubList">
                 {{ i.strName }}
@@ -63,12 +67,12 @@
           </div>
         </div>
         <div class="flex justify-center items-center">
-          <div>메뉴명 :</div>
-          <div><input type="text" class="w-40 h-8" v-model="cond2" /></div>
+          <div>메뉴명</div>
+          <div><input type="text" class="w-40 h-8 ml-5" v-model="cond2" /></div>
         </div>
       </div>
 
-      <div class="flex justify-center mr-96 pr-40 items-center">
+      <div class="flex justify-start items-center">
         <PickStoreRenew
           :hideit="false"
           :hideit2="false"

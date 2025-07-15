@@ -18,8 +18,7 @@
         </button>
       </div>
     </div>
-    <div
-      class="grid grid-cols-4 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10">
+    <div class="flex bg-gray-200 rounded-lg h-16 items-start z-10">
       <div>
         <PickStore
           :hideGroup="false"
@@ -39,13 +38,13 @@
           :mainName="'접수일'"
           class="!w-[400px] !pr-12"></Datepicker2>
       </div>
-      <div class="flex ml-20">
-        <div class="text-base font-semibold">고객명 :</div>
-        <div><input type="text" class="pl-1" v-model="cond" /></div>
+      <div class="flex ml-20 mt-5 items-center">
+        <div class="text-base font-semibold">고객명</div>
+        <div><input type="text" class="pl-1 ml-5" v-model="cond" /></div>
       </div>
-      <div class="flex">
-        <div class="text-base font-semibold">전화번호 :</div>
-        <div><input type="text" class="pl-1" v-model="cond2" /></div>
+      <div class="flex mt-5 items-center">
+        <div class="text-base font-semibold ml-5">전화번호</div>
+        <div><input type="text" class="pl-1 ml-5" v-model="cond2" /></div>
         <div>(뒷4자리)</div>
       </div>
     </div>

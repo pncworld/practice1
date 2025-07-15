@@ -7,7 +7,7 @@
 <template>
   <!-- 조회 조건 -->
   <div class="flex flex-col w-full overflow-y-hidden">
-    <div class="flex justify-between w-full pl-10">
+    <div class="flex justify-between w-full">
       <pageName></pageName>
       <div class="flex space-x-6 pr-12 pt-2">
         <button class="button search" @click="searchButton">조회</button
@@ -1309,8 +1309,8 @@ const onMove2 = (evt) => {
 
 const onEnd = (evt) => {
   // Swap을 처리할 조건
-  if(targetItemIndex2 == undefined){
-    targetItemIndex2 = evt.oldIndex
+  if (targetItemIndex2 == undefined) {
+    targetItemIndex2 = evt.oldIndex;
   }
   if (changeMode.value === false) {
     //comsole.log(MenuKeyList.value);

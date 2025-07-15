@@ -19,8 +19,8 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 bg-gray-200 rounded-lg h-20 items-center z-10 space-x-5">
-      <div class="justify-start flex items-center w-64 ml-20 -space-x-20">
+      class="grid grid-cols-2 grid-rows-1 bg-gray-200 rounded-lg h-20 items-start z-10">
+      <div class="justify-start flex items-center ml-1">
         <input
           type="checkbox"
           v-model="cond"
@@ -29,6 +29,7 @@
         <Datepicker2
           :mainName="'기간'"
           @endDate="endDate"
+          class="-ml-4"
           ref="datepicker"
           :initToday="1"
           :closePopUp="closePopUp"
@@ -36,7 +37,7 @@
           @startDate="startDate">
         </Datepicker2>
       </div>
-      <div class="h-[75%] ml-5 mt-1 justify-start flex">
+      <div class="justify-start flex">
         <input
           type="checkbox"
           v-model="cond2"

@@ -21,7 +21,7 @@
   <div
     class="flex justify-start space-x-5 bg-gray-200 rounded-lg h-16 items-center mt-3">
     <div class="flex justify-start ml-12">
-      <div class="text-lg font-semibold">고객사명 :</div>
+      <div class="text-lg font-semibold">고객사명</div>
       <select
         name=""
         id=""

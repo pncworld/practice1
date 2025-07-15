@@ -18,13 +18,12 @@
         </button>
       </div>
     </div>
-    <div
-      class="grid grid-cols-2 grid-rows-1 bg-gray-200 rounded-lg h-24 items-center z-10 space-x-5">
-      <div class="mt-1 justify-start flex flex-col">
+    <div class="flex bg-gray-200 rounded-lg h-24 items-start z-10 space-x-5">
+      <div class="justify-start items-start flex flex-col mt-2">
         <PickCustCompany
           @excelStore="excelStore"
           @lngStoreCode="lngStoreCode"></PickCustCompany>
-        <div class="mt-8 space-x-2 flex justify-start ml-20">
+        <div class="mt-5 space-x-2 flex justify-start ml-32">
           <label for="cond"
             ><input
               type="radio"
@@ -51,7 +50,7 @@
           >
         </div>
       </div>
-      <div class="h-[75%] ml-5 mt-1 justify-start flex">
+      <div class="ml-5 justify-start flex items-center">
         <PickBelongCust
           :lngStoreCode="selectedStores"
           @excelList="excelList"

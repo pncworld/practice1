@@ -20,8 +20,8 @@
     </div>
     <div
       class="grid grid-cols-[2fr,2fr,1fr] grid-rows-1 bg-gray-200 rounded-lg h-20 items-center z-10 space-x-5">
-      <div class="justify-start flex items-center -space-x-14">
-        <div class="pl-14 z-50">
+      <div class="justify-start flex items-center -space-x-10">
+        <div class="pl-7 z-50">
           <input type="checkbox" v-model="cond" @input="cond = !cond" />
         </div>
         <Datepicker2
@@ -35,8 +35,8 @@
         </Datepicker2>
       </div>
 
-      <div class="h-[75%] mt-1 justify-start items-center flex space-x-5">
-        <div class="pl-5 z-50">
+      <div class="h-[75%] justify-start items-center flex space-x-2">
+        <div class="pl-2 z-50">
           <input type="checkbox" v-model="cond2" @input="cond2 = !cond2" />
         </div>
         <PickStoreSingle
@@ -47,8 +47,8 @@
           @excelStore="excelStore"
           @lngSupervisor="lngSupervisor"></PickStoreSingle>
       </div>
-      <div class="flex justify-start items-center">
-        <span class="text-base font-semibold">등급 :</span>
+      <div class="flex justify-start items-center !ml-12">
+        <span class="text-base font-semibold">등급 </span>
         <select name="" id="" class="border w-32 h-7 ml-2" v-model="cond3">
           <option value="0">전체</option>
           <option :value="i.intLevel" v-for="i in optionList">

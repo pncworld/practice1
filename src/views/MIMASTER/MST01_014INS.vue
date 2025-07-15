@@ -28,7 +28,7 @@
     </div>
     <div
       class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div class="flex justify-center mr-40">
+      <div class="flex justify-start mr-40">
         <PickStore
           :hideGroup="false"
           :hideAttr="false"
@@ -37,7 +37,7 @@
           @storeNm="excelStore">
         </PickStore>
       </div>
-      <div class="flex justify-center mr-96">
+      <div class="flex justify-start">
         <MenuGroup
           :storeCd="selectedStores"
           :groupCd="selectedGroup"
@@ -46,13 +46,13 @@
           @subNm="subNm"
           @subCode="subCode"></MenuGroup>
       </div>
-      <div class="flex justify-center ml-20 space-x-2 items-center">
-        <div class="text-base font-semibold">검색 :</div>
+      <div class="flex justify-start ml-[62px] items-center">
+        <div class="text-base font-semibold">검색</div>
         <div>
           <select
             name=""
             id=""
-            class="w-40 border border-black h-8"
+            class="w-40 border border-black h-8 ml-5"
             v-model="searchType">
             <option value="0">메뉴명</option>
             <option value="1">바코드</option>
@@ -62,15 +62,15 @@
           <input
             type="text"
             v-model="cond"
-            class="w-40 border border-black pl-1 h-8" />
+            class="w-40 border border-black pl-1 h-8 ml-5" />
         </div>
       </div>
-      <div class="flex space-x-3 items-center ml-10">
-        <div class="text-base font-semibold">할인율 :</div>
-        <div><input type="number" class="pl-1" v-model="cond2" /></div>
+      <div class="flex justify-start items-center ml-7">
+        <div class="text-base font-semibold">할인율</div>
+        <div><input type="number" class="pl-1 ml-5" v-model="cond2" /></div>
         <div>%</div>
         <div>
-          <button class="whitebutton bg-white" @click="setDiscountPrice">
+          <button class="whitebutton bg-white ml-5" @click="setDiscountPrice">
             적용
           </button>
         </div>

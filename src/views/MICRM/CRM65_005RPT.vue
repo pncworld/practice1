@@ -19,8 +19,8 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-[1fr,1fr] grid-rows-2 bg-gray-200 rounded-lg h-16 items-center z-10 space-x-2 justify-start">
-      <div class="justify-start ml-4 mt-8">
+      class="grid grid-cols-[1fr,1fr] grid-rows-2 bg-gray-200 rounded-lg h-16 items-start z-10 justify-start">
+      <div class="">
         <Datepicker2
           :mainName="'조회 기간'"
           @startDate="startDate"
@@ -28,7 +28,7 @@
           @endDate="endDate"></Datepicker2>
       </div>
       <div>
-        <button class="whitebutton bg-white mt-8" @click="visible = true">
+        <button class="whitebutton bg-white mt-2" @click="visible = true">
           상품권선택
         </button>
       </div>

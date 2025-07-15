@@ -18,14 +18,13 @@
         </button>
       </div>
     </div>
-    <div
-      class="grid grid-cols-2 grid-rows-1 bg-gray-200 rounded-lg h-14 items-center z-10 space-x-5">
-      <div class="mt-1 justify-start flex flex-col">
+    <div class="flex bg-gray-200 rounded-lg h-14 items-start z-10">
+      <div class="mt-2">
         <PickCustCompany
           @excelStore="excelStore"
           @lngStoreCode="lngStoreCode"></PickCustCompany>
       </div>
-      <div class="h-[75%] ml-5 mt-5 justify-start flex">
+      <div class="ml-5 mt-2 justify-start items-start flex">
         <PickBelongCust
           :lngStoreCode="selectedStores"
           @excelList="excelList"

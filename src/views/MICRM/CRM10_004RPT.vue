@@ -19,24 +19,25 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 bg-gray-200 rounded-lg h-20 items-center z-10 space-x-5">
-      <div class="justify-center flex items-center w-64 -space-x-32">
+      class="grid grid-cols-2 grid-rows-1 bg-gray-200 rounded-lg h-20 items-start z-10">
+      <div class="justify-start flex items-center w-64 pl-2">
         <input
           type="checkbox"
           v-model="cond"
-          class="pl-32 ml-96 z-[60]"
+          class="z-[60]"
           @change="changeCond" />
         <Datepicker2
           :mainName="'기간'"
           @endDate="endDate"
           ref="datepicker"
           :initToday="1"
+          class="-ml-5"
           :closePopUp="closePopUp"
           @excelDate="excelDate"
           @startDate="startDate">
         </Datepicker2>
       </div>
-      <div class="h-[75%] ml-5 mt-1 justify-start flex">
+      <div class="ml-5 justify-start flex">
         <PickStoreSingle
           @lngStoreGroup="lngStoreGroup"
           @lngStoreAttrs="lngStoreAttrs"

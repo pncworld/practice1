@@ -17,14 +17,14 @@
     </div>
   </div>
   <div
-    class="flex justify-center space-x-44 bg-gray-200 rounded-lg h-16 items-center mt-3 pr-10">
-    <div class="text-nowrap flex justify-start">
-      <div class="text-base font-semibold">거래처코드 :</div>
-      <input type="number" v-model="cond1" class="pl-1" />
+    class="flex justify-start space-x-44 bg-gray-200 rounded-lg h-16 items-center mt-3 pr-10">
+    <div class="text-nowrap flex justify-start ml-12">
+      <div class="text-base font-semibold">거래처코드</div>
+      <input type="number" v-model="cond1" class="pl-1 ml-5" />
     </div>
     <div class="text-nowrap flex justify-end">
-      <div class="text-base font-semibold">거래처명 :</div>
-      <input type="text" v-model="cond2" class="pl-1" />
+      <div class="text-base font-semibold">거래처명</div>
+      <input type="text" v-model="cond2" class="pl-1 ml-5" />
     </div>
   </div>
   <!-- 조회 부분 -->

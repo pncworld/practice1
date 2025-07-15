@@ -26,10 +26,10 @@ Author : 권맑음                     
       :showPosNo="true"
       @storeNm="handlestoreNm"
       @update:ischanged="handleinitAll"></PickStore>
-    <div class="">
-      <span class="font-bold text-sm">화면번호 : &nbsp;</span>
+    <div class="ml-5">
+      <span class="font-bold text-sm">화면번호</span>
       <select
-        class="w-32 text-sm border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="w-32 text-sm border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         v-model="selectedScreenNo">
         <option value="0">선택</option>
         <option :value="i.lngKeyscrNo" v-for="i in getScreenNos">

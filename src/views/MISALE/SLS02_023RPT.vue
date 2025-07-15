@@ -26,10 +26,10 @@
           @endDate="endDate"
           :closePopUp="closePopUp"
           ref="datepicker"
-          class=""
+          class="ml-8"
           @excelDate="excelDate"
           :mainName="'기간'" />
-        <div class="flex justify-start items-center ml-12">
+        <div class="flex justify-start items-center ml-20">
           <div class="text-base font-semibold">구분</div>
           <div class="flex justify-center space-x-5 ml-5">
             <select
@@ -56,7 +56,7 @@
           </div>
         </div>
         <div
-          class="flex justify-start items-start text-base text-nowrap font-semibold ml-5">
+          class="flex justify-start items-start text-base text-nowrap font-semibold ml-12">
           조회조건
           <div>
             <label for="daily" class="font-normal">

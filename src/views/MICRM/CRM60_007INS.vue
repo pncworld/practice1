@@ -28,10 +28,10 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-[1fr,1fr] grid-rows-2 bg-gray-200 rounded-lg h-24 items-center pt-1 z-10 pl-5 justify-end">
-      <div class="flex justify-start items-center">
+      class="grid grid-cols-[1fr,1fr] grid-rows-2 bg-gray-200 rounded-lg h-24 items-start z-10 mt-2 justify-end">
+      <div class="flex justify-start items-center ml-12 mt-2">
         <span class="text-base font-semibold">구분</span>
-        <select name="" id="" class="w-60 h-8 ml-10" v-model="cond">
+        <select name="" id="" class="w-60 h-8 ml-5" v-model="cond">
           <option value="0">선택</option>
           <option :value="i.lngGftCategory" v-for="i in optionList">
             {{ i.strGftCategory }}
@@ -39,9 +39,9 @@
         </select>
       </div>
 
-      <div>
-        <span class="text-base font-semibold">권종</span>
-        <select name="" id="" class="w-60 h-8 ml-10" v-model="cond2">
+      <div class="flex items-center mt-2">
+        <span class="text-base font-semibold flex">권종</span>
+        <select name="" id="" class="w-60 h-8 ml-5" v-model="cond2">
           <option value="0">선택</option>
           <option :value="i.lngGftType" v-for="i in optionList2">
             {{ i.strGftType }}
@@ -49,9 +49,9 @@
         </select>
       </div>
 
-      <div class="flex justify-start items-center">
+      <div class="flex justify-start items-center ml-12">
         <span class="text-base font-semibold">파일</span>
-        <button @click="beforeFileSelect" class="whitebutton bg-white ml-10">
+        <button @click="beforeFileSelect" class="whitebutton bg-white ml-5">
           파일 업로드
         </button>
         <button class="whitebutton bg-white ml-10" @click="getExcelFiles">

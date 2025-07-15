@@ -28,8 +28,7 @@
       </div>
     </div>
 
-    <div
-      class="grid grid-cols-4 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10">
+    <div class="flex bg-gray-200 rounded-lg h-16 items-start z-10">
       <div>
         <PickStore
           :hideGroup="false"

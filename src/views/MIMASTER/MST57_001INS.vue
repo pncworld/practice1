@@ -7,7 +7,7 @@
 <template>
   <!-- 조회 조건 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <div class="flex justify-start pl-4 pt-0">
+    <div class="flex justify-start pt-0">
       <PageName></PageName>
       <div class="flex justify-end space-x-2 ml-[1168px]">
         <div class="flex justify-center space-x-2 mt-2">

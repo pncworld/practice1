@@ -30,9 +30,9 @@
       @lngIFChk="lngIFChk"
       @BP_ID="BP_ID"
       @lngStoreCode="setCompanyCode"></PickCustCompany>
-    <div class="flex items-center justify-center space-x-2">
-      <div class="font-semibold text-base">조회조건:</div>
-      <div class="pl-2">
+    <div class="flex items-center justify-center">
+      <div class="font-semibold text-base">조회조건</div>
+      <div class="pl-5">
         <select
           name=""
           id=""
@@ -48,7 +48,7 @@
       <div>
         <input
           type="text"
-          class="border border-black w-48 h-8"
+          class="border border-black w-48 h-8 ml-5"
           v-model="cond2" />
       </div>
 

@@ -19,20 +19,20 @@ Author : 권맑음                     
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10 space-x-5">
-      <div class="mt-1 justify-start flex flex-col">
+      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-28 items-start z-10">
+      <div class="justify-start items-start mt-2 flex flex-col">
         <PickCustCompany
-          class="ml-32"
+          class=""
           @excelStore="excelStore"
           @lngStoreCode="lngStoreCode"></PickCustCompany>
       </div>
-      <div class="h-[75%] !-ml-2 mt-1 justify-start flex flex-col">
+      <div class="!-ml-2 justify-start flex flex-col">
         <PickBelongCust
           :lngStoreCode="selectedStores"
           @excelList="excelList"
           @strSaleCustName="strSaleCustName"
           @strSaleCustID="strSaleCustID"></PickBelongCust>
-        <div class="flex justify-start ml-20">
+        <div class="flex justify-start ml-16 -mt-2">
           <label for="cond2"
             ><input
               type="checkbox"
@@ -54,7 +54,7 @@ Author : 권맑음                     
           @excelDate="excelDate"
           @startDate="startDate"></Datepicker2>
       </div>
-      <div class="space-x-2 flex justify-start !ml-6 items-center">
+      <div class="flex justify-start -ml-14 items-center">
         <PickStoreRenew
           @lngStoreAttrs="lngStoreAttrs"
           @lngStoreCode="lngStoreCode2"

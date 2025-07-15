@@ -34,23 +34,23 @@
 
       <div
         class="h-[75%] mt-1 justify-start items-center flex space-x-5 !ml-20">
-        <span class="text-base font-semibold">소멸포인트(>=) :</span>
+        <span class="text-base font-semibold">소멸포인트(>=)</span>
         <input type="number" class="h-8 w-48" v-model="cond" />
       </div>
       <div class="flex justify-start items-center !mr-10">
-        <div class="flex items-center justify-start space-x-3 !mr-10">
-          <span class="text-nowrap text-base font-semibold">고객명 :</span>
+        <div class="flex items-center justify-start !mr-10">
+          <span class="text-nowrap text-base font-semibold">고객명</span>
           <input
             type="text"
-            class="h-8 w-32 disabled:bg-white"
+            class="h-8 w-32 ml-5 disabled:bg-white"
             v-model="cond2"
             disabled />
           <input
             type="text"
-            class="h-8 w-32 disabled:bg-white"
+            class="h-8 w-32 ml-5 disabled:bg-white"
             v-model="cond3"
             disabled />
-          <button class="whitebutton !bg-white z-50" @click="setCond">
+          <button class="whitebutton !bg-white z-50 ml-5" @click="setCond">
             조회
           </button>
           <button class="whitebutton !bg-white z-50" @click="initAll2">

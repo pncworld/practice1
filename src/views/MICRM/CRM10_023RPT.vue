@@ -1,6 +1,6 @@
 /*--############################################################################
 # Filename : CRM10_023RPT.vue                                                  
-# Description : 고객관리 > 고객 예약 관리 > 일별 예약근황.                      
+# Description : 고객관리 > 고객 예약 관리 > 일별 예약현황.                      
 # Date :2025-05-22                                                             
 # Author : 권맑음                     
 ################################################################################*/
@@ -18,8 +18,7 @@
         </button>
       </div>
     </div>
-    <div
-      class="grid grid-cols-5 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10">
+    <div class="flex bg-gray-200 rounded-lg h-16 items-start z-10">
       <div>
         <PickStore
           class="!-mr-4"

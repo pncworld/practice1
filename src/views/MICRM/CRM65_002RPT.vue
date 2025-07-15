@@ -19,30 +19,30 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-[1fr,1fr] grid-rows-3 bg-gray-200 rounded-lg h-36 items-center z-10 space-x-2 justify-start">
-      <div class="justify-start ml-4">
+      class="grid grid-cols-[1fr,1fr] grid-rows-3 bg-gray-200 rounded-lg h-36 items-start z-10 justify-start">
+      <div class="justify-start">
         <Datepicker2
           :mainName="'일자'"
           @startDate="startDate"
           @excelDate="excelDate"
           @endDate="endDate"></Datepicker2>
       </div>
-      <div class="mt-8">
+      <div class="-ml-16">
         <PickStorePlural
           @lngStoreGroup="lngStoreGroup"
           @lngStoreCodes="lngStoreCodes"></PickStorePlural>
       </div>
-      <div class="justify-center flex items-center !mr-40">
-        <span class="text-base font-semibold">구분 : </span>
-        <select name="" id="" class="ml-4 w-40 h-8" v-model="cond">
+      <div class="justify-start flex items-center ml-12 mt-2">
+        <span class="text-base font-semibold">구분</span>
+        <select name="" id="" class="ml-5 w-40 h-8" v-model="cond">
           <option value="0">전체</option>
           <option :value="i.lngGftCategory" v-for="i in optionList">
             {{ i.strGftCategory }}
           </option>
         </select>
 
-        <span class="text-base font-semibold ml-10"> 권종 :</span>
-        <select name="" id="" class="w-40 ml-3 h-8" v-model="cond3">
+        <span class="text-base font-semibold ml-10"> 권종 </span>
+        <select name="" id="" class="w-40 ml-5 h-8" v-model="cond3">
           <option value="0">전체</option>
           <option :value="i.lngGftType" v-for="i in optionList2">
             {{ i.strGftType }}
@@ -52,8 +52,8 @@
       <div></div>
 
       <div
-        class="text-base flex justify-start font-semibold pl-28 w-[150%] space-x-5">
-        <span class="text-base font-semibold"> 조회조건 :</span>
+        class="text-base flex justify-start font-semibold pl-12 w-[150%] space-x-5 mt-2">
+        <span class="text-base font-semibold"> 조회조건 </span>
         <label for="cond4"
           ><input type="checkbox" id="cond4" v-model="cond4" />전체</label
         >

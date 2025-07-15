@@ -32,17 +32,17 @@
         </Datepicker2>
       </div>
 
-      <div class="h-[75%] mt-1 justify-start items-center flex space-x-3">
-        <span class="text-base font-semibold">고객명 :</span>
+      <div class="h-[75%] mt-1 justify-start items-center flex">
+        <span class="text-base font-semibold">고객명 </span>
         <input
           type="text"
           disabled
-          class="disabled:bg-white w-32 h-8"
+          class="disabled:bg-white w-32 h-8 ml-5"
           v-model="cond" />
         <input
           type="text"
           disabled
-          class="disabled:bg-white w-32 h-8"
+          class="disabled:bg-white w-32 h-8 ml-5"
           v-model="cond2" />
         <button class="whitebutton !bg-white" @click="visible = true">
           조회

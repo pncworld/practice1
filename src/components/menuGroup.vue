@@ -1,17 +1,17 @@
 <template>
-  <div class="flex justify-center items-center space-x-3">
-    <div class="text-base font-semibold">{{ mainName }} :</div>
+  <div class="flex justify-center items-center">
+    <div class="text-base font-semibold">{{ mainName }}</div>
 
     <select
       name=""
       id=""
-      class="w-40 h-8"
+      class="w-40 h-8 ml-5"
       v-model="selectedMain"
       @change="setSub">
       <option value="0">전체</option>
       <option :value="i.lngCode" v-for="i in mainList">{{ i.strName }}</option>
     </select>
-    <select name="" id="" class="w-40 h-8" v-model="selectedSub">
+    <select name="" id="" class="w-40 h-8 ml-5" v-model="selectedSub">
       <option value="0">전체</option>
       <option :value="i.lngCode" v-for="i in subsubList">
         {{ i.strName }}

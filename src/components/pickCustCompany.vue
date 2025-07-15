@@ -1,8 +1,7 @@
 <template>
-  <div
-    class="grid grid-rows-1 grid-cols-[repeat(4,1fr)] justify-center text-sm items-center w-[500px] space-x-2 ml-16">
-    <div class="items-center font-bold text-base flex w-20 pl-5 text-nowrap">
-      사업장명 :
+  <div class="flex justify-start text-sm items-center w-[500px] ml-12 !mt-2">
+    <div class="items-center font-bold text-base flex text-nowrap">
+      사업장명
     </div>
     <div>
       <v-select
@@ -11,7 +10,7 @@
         :disabled="disabled1"
         label="strSaleCompName"
         :placeholder="defaultPlaceHolder"
-        class="!w-72 !h-7 -mt-3 custom-select ml-3"
+        class="!w-72 !h-7 -mt-3 custom-select ml-5"
         :clearable="!disabled1"
         @click="resetSelectedStore" />
     </div>
@@ -21,7 +20,6 @@
 <script setup>
 import { getCustCompany, getCustCompany2 } from "@/api/micrm";
 import { defineProps, onMounted, ref, watch } from "vue";
-import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
 const store = useStore();

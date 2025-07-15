@@ -1,6 +1,6 @@
 <template>
-  <div class="flex justify-center md:justify-end space-x-4 text-sm mr-5">
-    <div class="items-center font-bold hidden md:flex pl-12 text-nowrap">
+  <div class="flex justify-center md:justify-end text-base mt-2">
+    <div class="items-center font-bold hidden md:flex ml-12 text-nowrap">
       {{ MainName }}
     </div>
     <div v-show="hideit2">
@@ -8,7 +8,7 @@
         :disabled="isDisabled"
         v-model="selectedGroupCd"
         id="storeGroup"
-        class="hidden md:inline-block border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="hidden md:inline-block border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         @change="emitStoreGroup($event.target.value)">
         <option
           :value="item.lngStoreGroup"
@@ -21,7 +21,7 @@
     <div v-show="hideit3">
       <select
         :disabled="isDisabled"
-        class="hidden md:inline-block border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="hidden md:inline-block border border-gray-800 rounded-md p-2 ml-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         @change="
           setStore($event.target.value);
           emitStoreType($event.target.value);
@@ -39,7 +39,7 @@
     <div class="w-full md:w-auto" v-show="hideit">
       <select
         :disabled="isDisabled"
-        class="w-full md:w-auto border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="w-full md:w-auto border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         v-model="selectedStoreCode"
         @change="
           emitStoreCode($event.target.value);
@@ -58,11 +58,11 @@
         </option>
       </select>
     </div>
-    <div class="inline-block" v-if="showAreaCd">
-      <span class="font-bold text-sm">지역코드 : &nbsp;</span>
+    <div class="ml-5" v-if="showAreaCd">
+      <span class="font-bold text-sm">지역코드 </span>
       <select
         :disabled="isDisabled4"
-        class="w-32 border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="w-32 border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         v-model="selectedStoreAreaCd"
         @change="emitStoreAreaCd($event.target.value)">
         <option value="0">선택</option>
@@ -74,11 +74,11 @@
         </option>
       </select>
     </div>
-    <div class="" v-if="showPosNo">
-      <span class="font-bold text-sm">포스번호 : &nbsp;</span>
+    <div class="ml-5" v-if="showPosNo">
+      <span class="font-bold text-sm">포스번호 </span>
       <select
         :disabled="isDisabled4"
-        class="w-32 text-sm border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="w-32 text-sm border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         v-model="selectedPosNo"
         @change="
           setScreenNo();
@@ -94,11 +94,11 @@
         </option>
       </select>
     </div>
-    <div class="" v-if="showScreenNo">
-      <span class="font-bold text-sm"> &nbsp; &nbsp;화면번호 : &nbsp;</span>
+    <div class="ml-5" v-if="showScreenNo">
+      <span class="font-bold text-sm">화면번호</span>
       <select
         :disabled="isDisabled4"
-        class="w-32 text-sm border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="w-32 text-sm border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         v-model="selectedScreenNo">
         <option value="0">선택</option>
         <option :value="item.strDCode" v-for="item in ScreenList">
@@ -112,11 +112,11 @@
         새화면
       </button>
     </div>
-    <div class="" v-if="showKioskNo">
-      <span class="font-bold text-sm"> KIOSK번호 : &nbsp;</span>
+    <div class="ml-5" v-if="showKioskNo">
+      <span class="font-bold text-sm">KIOSK번호</span>
       <select
         :disabled="isDisabled4"
-        class="w-32 text-sm border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="w-32 text-sm border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         v-model="selectedKioskNo"
         @change="ischanged()">
         <option value="0">선택</option>
@@ -128,17 +128,17 @@
         </option>
       </select>
     </div>
-    <div class="flex justify-center items-center space-x-2" v-if="showPayType">
-      <span class="font-bold text-sm">결제키구분 : &nbsp;</span>
+    <div class="flex justify-center items-center ml-5" v-if="showPayType">
+      <span class="font-bold text-sm">결제키구분</span>
 
-      <label for="discount" class="flex justify-center items-center"
+      <label for="discount" class="flex justify-center items-center ml-5"
         ><input
           type="radio"
           id="discount"
           v-model="paymentType"
           :value="3" /><span class="font-bold">[1]할인</span>
       </label>
-      <label for="payment" class="flex justify-center items-center"
+      <label for="payment" class="flex justify-center items-center ml-5"
         ><input
           type="radio"
           v-model="paymentType"
@@ -146,17 +146,17 @@
           :value="4" /><span class="font-bold">[2]지불</span>
       </label>
     </div>
-    <div class="flex justify-center items-center space-x-2" v-if="showFuncType">
-      <span class="font-bold text-sm">화면키 구분 : &nbsp;</span>
+    <div class="flex justify-center items-center ml-5" v-if="showFuncType">
+      <span class="font-bold text-sm">화면키 구분 </span>
 
-      <label for="discount" class="flex justify-center items-center"
+      <label for="discount" class="flex justify-center items-center ml-5"
         ><input
           type="radio"
           id="discount"
           v-model="paymentType"
           :value="3" /><span class="font-bold">[1]주문화면</span>
       </label>
-      <label for="payment" class="flex justify-center items-center"
+      <label for="payment" class="flex justify-center items-center ml-5"
         ><input
           type="radio"
           v-model="paymentType"
@@ -167,12 +167,12 @@
 
     <div
       v-if="showFuncScreen"
-      class="flex text-nowrap justify-center items-center space-x-2">
-      <div class="text-sm font-semibold">화면번호 :</div>
+      class="flex text-nowrap justify-center items-center ml-5">
+      <div class="text-sm font-semibold">화면번호</div>
       <select
         name=""
         id=""
-        class="w-52 border border-black rounded-lg h-10"
+        class="w-52 border border-black rounded-lg h-10 ml-5"
         v-model="selectedFuncScreen"
         @change="changeFunc">
         <option value="0">선택</option>
@@ -193,7 +193,7 @@
 
     <div
       v-if="showTime"
-      class="flex text-nowrap justify-center items-center space-x-2">
+      class="flex text-nowrap justify-center items-center ml-2">
       <select
         name=""
         id=""
@@ -305,7 +305,7 @@ const props = defineProps({
   },
   mainName: {
     type: String,
-    default: "매장명 :",
+    default: "매장명",
   },
   defaultStore: {
     type: Boolean,

@@ -1,13 +1,12 @@
 <template>
-  <div
-    class="grid grid-rows-1 grid-cols-[repeat(4,1fr)] justify-start text-sm items-center w-[500px] space-x-3 mt-2">
-    <div class="items-center font-bold text-base flex pr-2">매장명</div>
+  <div class="flex justify-start text-sm items-center w-[500px] ml-12 mt-2">
+    <div class="items-center font-bold text-base flex">매장명</div>
     <div v-if="hideit">
       <select
         :disabled="true"
         v-model="selectedGroup"
         id="storeGroup"
-        class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         @change="emitStoreGroup($event.target.value)">
         <option
           :value="item.lngStoreGroup"
@@ -21,7 +20,7 @@
       <select
         :disabled="disabled1"
         v-model="selectedStoreType"
-        class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         @change="initGrid">
         <option value="0">전체</option>
         <option
@@ -39,7 +38,7 @@
         :disabled="disabled1"
         label="strName"
         :placeholder="defaultPlaceHolder"
-        class="!w-72 !h-7 -mt-3 custom-select"
+        class="!w-72 !h-7 -mt-3 custom-select ml-5"
         :clearable="!disabled1"
         @click="resetSelectedStore" />
     </div>

@@ -43,12 +43,13 @@
           :hideAttr="false"
           :defaultStoreNm="'전체'"
           :defaultStore="true"
-          :mainName="'매장 : '"></PickStore>
+          :mainName="'매장'"></PickStore>
       </div>
 
-      <div class="text-base flex justify-start font-semibold pl-32">
-        <span class="text-base font-semibold"> 출고상태 :</span>
-        <select name="" id="" class="w-40 ml-3 h-8" v-model="cond3">
+      <div
+        class="text-base flex justify-start font-semibold pl-32 items-center">
+        <span class="text-base font-semibold"> 출고상태</span>
+        <select name="" id="" class="w-40 ml-5 h-8" v-model="cond3">
           <option value="0">전체</option>
           <option :value="i.strDCode" v-for="i in optionList3">
             {{ i.strDName }}

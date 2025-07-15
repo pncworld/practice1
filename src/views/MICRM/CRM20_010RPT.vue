@@ -19,25 +19,22 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-1 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10 space-x-5">
-      <div class="mt-1 justify-start flex space-x-36 ml-32 items-center">
-        <div class="ml-1">
-          <PickStoreCorner
-            @excelStore="excelStore"
-            @lngAreaCode="lngAreaCode"
-            @lngStoreGroup="lngStoreGroup"
-            @lngStoreCode="lngStoreCode"></PickStoreCorner>
-        </div>
+      class="grid grid-cols-1 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10">
+      <div class="justify-start flex space-x-36 items-center">
+        <PickStoreCorner
+          @excelStore="excelStore"
+          @lngAreaCode="lngAreaCode"
+          @lngStoreGroup="lngStoreGroup"
+          @lngStoreCode="lngStoreCode"></PickStoreCorner>
       </div>
-      <div class="mt-4 space-x-2 grid grid-rows-1 grid-cols-2 !ml-28">
-        <div class="">
-          <PickBelongCust
-            :lngStoreCode="selectedGroup"
-            @excelList="excelList"
-            @strSaleCustName="strSaleCustName"
-            @strSaleCustID="strSaleCustID"></PickBelongCust>
-        </div>
-        <div class="flex justify-start space-x-6">
+      <div class="mt-4 space-x-2 flex ml-[68px] items-center justify-start">
+        <PickBelongCust
+          :lngStoreCode="selectedGroup"
+          @excelList="excelList"
+          @strSaleCustName="strSaleCustName"
+          @strSaleCustID="strSaleCustID"></PickBelongCust>
+
+        <div class="flex justify-start space-x-6 !ml-[540px] items-center">
           <label for="cond"
             ><input
               type="radio"

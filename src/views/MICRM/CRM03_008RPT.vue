@@ -19,12 +19,11 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-1 grid-rows-4 bg-gray-200 rounded-lg h-48 items-center z-10 -space-x-20">
-      <div class="justify-start flex space-x-36 mt-6">
+      class="grid grid-cols-1 grid-rows-4 bg-gray-200 rounded-lg h-48 items-start z-10 -space-x-20">
+      <div class="justify-start items-start flex space-x-36">
         <Datepicker2
           :mainName="'기간'"
           :initToday="1"
-          class="-mt-3"
           ref="datepicker"
           :closePopUp="closePopUp"
           @endDate="endDate"
@@ -39,7 +38,7 @@
           @lngStoreTeam="lngTeamCode"
           @excelStore="excelStore"></PickStoreSingle>
       </div>
-      <div class="flex justify-start pl-[72px] space-x-5 items-center">
+      <div class="flex justify-start pl-16 space-x-5 items-center">
         <div>
           <Datepicker2
             :mainName="'가입일'"
@@ -50,10 +49,10 @@
             @startDate="startDate2"></Datepicker2>
         </div>
       </div>
-      <div class="flex justify-start pl-20 space-x-5 items-center">
+      <div class="flex justify-start pl-0 space-x-5 items-center">
         <div class="flex justify-center items-center">
-          <div class="text-base font-semibold ml-32">지역 :</div>
-          <select name="" id="" class="border w-32 h-8 ml-2" v-model="cond">
+          <div class="text-base font-semibold ml-32">지역</div>
+          <select name="" id="" class="border w-32 h-8 ml-5" v-model="cond">
             <option value="0">전체</option>
             <option :value="i.lngStoreArea" v-for="i in optionList2">
               {{ i.strName }}
@@ -61,8 +60,8 @@
           </select>
         </div>
         <div class="flex justify-center items-center">
-          <div class="text-base font-semibold ml-32">성별 :</div>
-          <select name="" id="" class="border w-32 h-8 ml-2" v-model="cond2">
+          <div class="text-base font-semibold ml-32">성별</div>
+          <select name="" id="" class="border w-32 h-8 ml-5" v-model="cond2">
             <option :value="null">전체</option>
             <option value="1">남자</option>
             <option value="0">여자</option>
@@ -71,8 +70,8 @@
         </div>
 
         <div class="flex justify-center items-center">
-          <div class="text-base font-semibold ml-32">등급 :</div>
-          <select name="" id="" class="border w-32 h-8 ml-2" v-model="cond3">
+          <div class="text-base font-semibold ml-32">등급</div>
+          <select name="" id="" class="border w-32 h-8 ml-5" v-model="cond3">
             <option value="0">전체</option>
             <option :value="i.intLevel" v-for="i in optionList">
               {{ i.strLevelName }}
@@ -90,10 +89,10 @@
             @startDate="startDate3"></Datepicker2>
         </div>
       </div>
-      <div class="flex justify-start pl-20 space-x-5 items-center">
-        <div class="flex justify-center items-center">
-          <div class="text-base font-semibold ml-32">적립포인트 :</div>
-          <select name="" id="" class="w-16 ml-1 h-8" v-model="cond4">
+      <div class="flex justify-start space-x-5 items-center mt-1">
+        <div class="flex justify-center items-center pl-1">
+          <div class="text-base font-semibold ml-20">적립포인트</div>
+          <select name="" id="" class="w-16 ml-5 h-8" v-model="cond4">
             <option value="1"><</option>
             <option value="2">=</option>
             <option value="3">></option>
@@ -106,8 +105,8 @@
         </div>
 
         <div class="flex justify-center items-center">
-          <div class="text-base font-semibold ml-32">실매출액 :</div>
-          <select name="" id="" class="w-16 ml-1 h-8" v-model="cond6">
+          <div class="text-base font-semibold ml-32">실매출액</div>
+          <select name="" id="" class="w-16 ml-5 h-8" v-model="cond6">
             <option value="1"><</option>
             <option value="2">=</option>
             <option value="3">></option>
@@ -119,8 +118,8 @@
         </div>
 
         <div class="flex justify-center items-center">
-          <div class="text-base font-semibold ml-32">방문횟수 :</div>
-          <select name="" id="" class="w-16 ml-1 h-8" v-model="cond8">
+          <div class="text-base font-semibold ml-32">방문횟수</div>
+          <select name="" id="" class="w-16 ml-5 h-8" v-model="cond8">
             <option value="1"><</option>
             <option value="2">=</option>
             <option value="3">></option>

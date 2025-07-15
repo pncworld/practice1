@@ -27,7 +27,7 @@
         :hideEndDate="false"
         @excelDate="excelDate"
         :firstName="'날짜'"
-        class="ml-28"
+        class="ml-[109px]"
         :prevMonth="prevMonth"
         :nextMonth="nextMonth"
         :initMonth="1"

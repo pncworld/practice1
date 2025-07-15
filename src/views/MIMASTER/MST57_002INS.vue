@@ -5,7 +5,7 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div class="flex justify-start pl-4 pt-0">
+  <div class="flex justify-start pt-0">
     <PageName></PageName>
     <div class="absolute right-16 space-x-3 flex mt-3">
       <button class="button search" @click="searchButton">조회</button
@@ -13,9 +13,9 @@
     </div>
   </div>
   <br />
-  <div class="bg-gray-200 h-24 flex flex-col items-start rounded-md pt-2">
+  <div class="bg-gray-200 h-28 flex flex-col items-start rounded-md pt-2">
     <PickStore
-      class="flex justify-start space-x-5 bg-gray-200 rounded-lg h-16 items-center"
+      class="flex justify-start bg-gray-200 rounded-lg items-center"
       @update:storeAreaCd="handleStoreAreaCd"
       @update:storeCd="handleStoreCd"
       @update:ischanged="ischanged"
@@ -25,6 +25,7 @@
       :storeCd="currstoreCd"
       :storeAreaCd="currAreaCd"
       :ischange="ischange"
+      class="!ml-2"
       @emitsub="emitsubcate"
       @emitmain="emitmaincate"></PickCategory>
   </div>

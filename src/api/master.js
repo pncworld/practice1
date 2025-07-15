@@ -2447,3 +2447,24 @@ export const saveCompInfo = (groupCd, compCode, bpid, bpnm, useyn, regid) => {
     REG_ID: regid,
   });
 };
+export const getMasterAutoDownloadList = (
+  groupCd,
+  attr,
+  storeCd,
+  cond,
+  cond2
+) => {
+  return api2.post("/MIMASTER/MST01_032RPT.asmx/getMasterAutoDownloadList", {
+    GROUP_CD: groupCd,
+    ATTR: attr,
+    STORE_CD: storeCd,
+    SDATE: cond,
+    EDATE: cond2,
+  });
+};
+export const getSubTitleList = (groupCd, storeCd) => {
+  return api2.post("/MIMASTER/MST37_001INS.asmx/getSubTitleList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};

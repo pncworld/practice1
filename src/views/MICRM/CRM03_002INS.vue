@@ -19,7 +19,7 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-28 items-center z-10 space-x-5">
+      class="grid grid-cols-2 grid-rows-[1fr,1fr] bg-gray-200 rounded-lg h-32 items-start z-10">
       <div class="justify-start flex">
         <Datepicker2
           :mainName="'기간'"
@@ -30,7 +30,7 @@
           @startDate="startDate">
         </Datepicker2>
       </div>
-      <div class="h-[75%] ml-5 mt-1 justify-start flex">
+      <div class="flex justify-start items-center">
         <PickStoreSingle
           @lngStoreGroup="lngStoreGroup"
           @lngStoreAttrs="lngStoreAttrs"
@@ -39,13 +39,13 @@
           @lngStoreTeam="lngTeamCode"
           @excelStore="excelStore"></PickStoreSingle>
       </div>
-      <div class="flex justify-start pl-20 space-x-5 items-center">
-        <div class="text-base font-semibold">거래 구분 :</div>
+      <div class="flex justify-start pl-3 items-center">
+        <div class="text-base font-semibold">거래 구분</div>
         <div>
           <select
             name=""
             id=""
-            class="w-48 h-8"
+            class="w-48 h-8 ml-5"
             v-model="cond"
             @change="initGrid()">
             <option value="0">전체</option>

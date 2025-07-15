@@ -28,13 +28,13 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-[1fr,1fr] grid-rows-2 bg-gray-200 rounded-lg h-24 items-center pt-1 z-10 pl-5 justify-end">
+      class="grid grid-cols-[1fr,1fr] grid-rows-2 bg-gray-200 rounded-lg h-24 items-center pt-1 z-10 pl-12 justify-start">
       <div class="flex justify-start items-center col-span-2">
         <span class="text-base font-semibold">구분</span>
         <select
           name=""
           id=""
-          class="w-60 h-8 ml-10"
+          class="w-60 h-8 ml-5"
           v-model="cond"
           @change="setCoupon">
           <option value="0">선택</option>
@@ -46,7 +46,7 @@
 
       <div class="flex justify-start items-center">
         <span class="text-base font-semibold">파일</span>
-        <button @click="beforeFileSelect" class="whitebutton bg-white ml-10">
+        <button @click="beforeFileSelect" class="whitebutton bg-white ml-5">
           파일 업로드
         </button>
         <button class="whitebutton bg-white ml-10" @click="getExcelFiles">

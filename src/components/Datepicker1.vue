@@ -1,5 +1,5 @@
 <template>
-  <div class="space-x-5">
+  <div class="space-x-5 mt-2">
     <span class="font-semibold text-base">{{ mainname }} </span
     ><input
       type="date"

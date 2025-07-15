@@ -19,10 +19,10 @@
       </div>
     </div>
     <div
-      class="grid grid-rows-2 grid-cols-[5fr,5fr] justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div class="!pr-[20%]">
+      class="grid grid-rows-2 grid-cols-[5fr,5fr] justify-start bg-gray-200 rounded-lg h-24 items-start z-10">
+      <div class="">
         <Datepicker2
-          class="!pr-[23%]"
+          class="ml-8"
           :initToday="0"
           ref="datepicker"
           :closePopUp="closePopUp"
@@ -32,7 +32,7 @@
           :mainName="'기간'"></Datepicker2>
       </div>
       <!-- <div><input type="checkbox" /></div> -->
-      <div class="mt-8">
+      <div class="-ml-10">
         <PickStorePlural
           @lngStoreCodes="selectedStoreCd"
           @lngStoreGroup="selectedGroupCd"
@@ -41,16 +41,16 @@
           :placeholderName="'선택'"></PickStorePlural>
       </div>
 
-      <div class="flex justify-center items-center mt-3 ml-10 space-x-5">
+      <div class="flex justify-start items-center ml-12 space-x-5">
         <PayCodeList2
-          class="flex -mt-5 ml-20 w-[25vw]"
+          class="flex w-[25vw]"
           @payCd="selectedpayCd"
           :groupCd="groupCd"
           :storeCd="0"
           :init="init">
         </PayCodeList2>
         <MenuCdList
-          class="flex -mt-5 w-[15vw]"
+          class="flex w-[15vw]"
           @menuCd="selectedmenuCd"
           :groupCd="groupCd"
           :storeCd="0"

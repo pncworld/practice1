@@ -61,11 +61,11 @@
     </div> -->
     <div
       class="flex justify-between bg-gray-200 rounded-lg h-16 items-center z-10 text-base">
-      <div class="flex justify-center space-x-32 ml-36">
+      <div class="flex justify-center items-center space-x-32 ml-12">
         <div
-          class="items-center w-3/12 justify-start flex whitespace-nowrap text-base">
-          매장 : &nbsp;&nbsp;<select
-            class="text-base border border-gray-800 rounded-md pl-1 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-48 h-8"
+          class="items-center w-3/12 justify-start flex whitespace-nowrap text-base font-semibold">
+          매장<select
+            class="text-base border border-gray-800 rounded-md pl-1 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-48 h-8"
             v-model="storeCd"
             @change="getPosNo">
             <option value="0">전체</option>
@@ -77,10 +77,10 @@
             </option>
           </select>
         </div>
-        <div class="items-center w-3/12 whitespace-nowrap">
-          포스번호 :
+        <div class="items-center w-3/12 whitespace-nowrap font-semibold">
+          포스번호
           <select
-            class="border border-gray-800 rounded-md pl-1 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-48 h-8 text-base"
+            class="border border-gray-800 rounded-md pl-1 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-48 h-8 text-base"
             v-model="posNo"
             @change="getAreaCd">
             <option value="0">전체</option>
@@ -89,10 +89,10 @@
             </option>
           </select>
         </div>
-        <div class="items-center w-3/12 whitespace-nowrap">
-          지역 :
+        <div class="items-center w-3/12 whitespace-nowrap font-semibold">
+          지역
           <select
-            class="border border-gray-800 rounded-md pl-1 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-48 h-8 text-base"
+            class="border border-gray-800 rounded-md pl-1 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-48 h-8 text-base"
             v-model="lngAreaCd">
             <option value="0">전체</option>
             <option v-for="item in areaCd" :key="item.id" :value="item.lngCode">

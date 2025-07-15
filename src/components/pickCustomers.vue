@@ -1,18 +1,22 @@
 <template>
-  <div class="flex w-32 h-10 space-x-5">
-    <div class="text-base text-nowrap font-semibold">{{ mainName }} :</div>
+  <div class="flex w-32 items-center">
+    <div class="text-base text-nowrap font-semibold">{{ mainName }}</div>
     <div>
       <input
         type="text"
         disabled
-        class="disabled: bg-gray-100"
+        class="disabled: bg-gray-100 ml-5"
         v-model="lngCode" />
     </div>
     <div>
-      <input type="text" v-model="strName" disabled class="disabled:bg-white" />
+      <input
+        type="text"
+        v-model="strName"
+        disabled
+        class="disabled:bg-white ml-5" />
     </div>
     <div>
-      <button class="whitebutton bg-white" @click="showPopUp">조회</button>
+      <button class="whitebutton bg-white ml-5" @click="showPopUp">조회</button>
     </div>
     <div>
       <button class="whitebutton bg-white" @click="reset">초기화</button>

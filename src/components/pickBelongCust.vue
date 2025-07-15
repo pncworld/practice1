@@ -1,6 +1,6 @@
 <template>
-  <div class="flex w-32 h-10 space-x-5">
-    <div class="text-base text-nowrap font-semibold">{{ mainName }} :</div>
+  <div class="flex w-32 h-10 space-x-5 mt-2">
+    <div class="text-base text-nowrap font-semibold">{{ mainName }}</div>
     <div>
       <input
         type="text"

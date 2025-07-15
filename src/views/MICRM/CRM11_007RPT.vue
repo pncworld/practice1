@@ -19,13 +19,13 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-3 bg-gray-200 rounded-lg h-36 items-center z-10 space-x-5">
-      <div class="justify-start grid grid-rows-1 grid-cols-2 w-64">
-        <div class="z-[60] pl-32 mt-1">
+      class="grid grid-cols-2 grid-rows-3 bg-gray-200 rounded-lg h-36 items-start z-10">
+      <div class="justify-start flex items-center">
+        <div class="z-[60] pl-2 mt-2">
           <select
             name=""
             id=""
-            class="w-32 h-8 border border-black"
+            class="w-20 h-8 border border-black"
             v-model="cond">
             <option value="0">요청일자</option>
             <option value="1">응답일자</option>
@@ -34,13 +34,14 @@
         <Datepicker2
           :mainName="'기간'"
           @endDate="endDate"
+          class="-ml-9"
           ref="datepicker"
           :closePopUp="closePopUp"
           @excelDate="excelDate"
           @startDate="startDate">
         </Datepicker2>
       </div>
-      <div class="h-[75%] ml-5 mt-1 justify-start flex">
+      <div class="ml-5 justify-start flex">
         <PickStoreSingle
           @lngStoreGroup="lngStoreGroup"
           @lngStoreAttrs="lngStoreAttrs"
@@ -49,8 +50,9 @@
           @lngStoreTeam="lngTeamCode"
           @excelStore="excelStore"></PickStoreSingle>
       </div>
-      <div class="flex justify-start pl-52 space-x-5 items-center col-span-2">
-        <div class="text-base font-semibold">수신 번호 :</div>
+      <div
+        class="flex justify-start pl-12 space-x-5 mt-2 items-center col-span-2">
+        <div class="text-base font-semibold">수신 번호</div>
         <div>
           <input
             type="number"
@@ -58,7 +60,7 @@
             v-model="cond2" />
         </div>
 
-        <div class="text-base font-semibold">발신 번호 :</div>
+        <div class="text-base font-semibold">발신 번호</div>
         <div>
           <input
             type="number"
@@ -66,8 +68,8 @@
             v-model="cond3" />
         </div>
       </div>
-      <div class="flex justify-start pl-52 space-x-5 items-center">
-        <div class="text-base font-semibold">전송결과 :</div>
+      <div class="flex justify-start pl-12 space-x-5 items-center">
+        <div class="text-base font-semibold">전송 결과</div>
         <div>
           <select
             name=""
@@ -79,8 +81,8 @@
           </select>
         </div>
       </div>
-      <div class="flex justify-start pl-20 space-x-5 items-center">
-        <div class="text-base font-semibold">SMS 유형 :</div>
+      <div class="flex justify-start pl-3 space-x-5 items-center">
+        <div class="text-base font-semibold">SMS 유형</div>
         <div>
           <select
             name=""

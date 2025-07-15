@@ -1,27 +1,26 @@
 <template>
-  <div class="ml-4 font-bold text-sm mt-2 flex">
+  <div class="ml-12 font-bold text-sm mt-2 flex">
     <div>
-      메인카테고리: &nbsp;&nbsp;
-      <select
+      메인카테고리<select
         v-model="changed"
         @change="
           viewsubCategories($event.target.value);
           emitmaincate($event.target.value);
         "
-        class="w-36 border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        class="w-36 border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
         <option value="0">선택</option>
         <option :value="i.MajorCode" v-for="i in mainCategories">
           {{ i.MajorName }}
         </option>
       </select>
     </div>
-    &nbsp; &nbsp;
-    <div>
-      서브카테고리: &nbsp; &nbsp;
+
+    <div class="ml-5">
+      서브카테고리
       <select
         v-model="changed2"
         @change="emitsubcate($event.target.value)"
-        class="w-36 border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        class="w-36 border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
         <option value="0">선택</option>
         <option :value="i.SubCode" v-for="i in subCategories">
           {{ i.SubName }}

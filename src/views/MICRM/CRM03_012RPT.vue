@@ -19,22 +19,23 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-3 grid-rows-2 bg-gray-200 rounded-lg h-28 items-center z-10 -space-x-52">
-      <div class="justify-start flex -space-x-10">
-        <input type="checkbox" v-model="cond" class="ml-32 z-50" />
+      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-28 items-start z-10 -space-x-52">
+      <div class="justify-start items-center flex -space-x-10 ml-7">
+        <input type="checkbox" v-model="cond" class="z-50" />
         <Datepicker2
           :mainName="'기간'"
           :initToday="1"
           @endDate="endDate"
           ref="datepicker"
-          class="!pr-32"
+          class=""
           :closePopUp="closePopUp"
           @excelDate="excelDate"
           @startDate="startDate">
         </Datepicker2>
       </div>
-      <input type="checkbox" v-model="cond2" class="z-50 w-5 !ml-48" />
-      <div class="h-[75%] mt-1 justify-start flex">
+
+      <div class="justify-start flex">
+        <input type="checkbox" v-model="cond2" class="z-50 !ml-48" />
         <PickStoreSingle
           @lngStoreGroup="lngStoreGroup"
           @lngStoreAttrs="lngStoreAttrs"
@@ -44,8 +45,8 @@
           @excelStore="excelStore"></PickStoreSingle>
       </div>
 
-      <div class="flex justify-start pl-96 space-x-5 items-center">
-        <div class="text-base font-semibold">등급 :</div>
+      <div class="flex justify-start pl-64 space-x-5 items-center">
+        <div class="text-base font-semibold">등급</div>
         <div>
           <select name="" id="" class="w-48 h-8" v-model="cond3">
             <option value="0">전체</option>

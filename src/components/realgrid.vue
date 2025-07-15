@@ -13,7 +13,6 @@ import {
   formatLocalDate,
 } from "@/customFunc/customFunc";
 import store from "@/store";
-import { start } from "@popperjs/core";
 import { GridView, LocalDataProvider } from "realgrid";
 import { v4 as uuidv4 } from "uuid";
 import { nextTick, onMounted, ref, watch } from "vue";

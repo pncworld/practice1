@@ -1,6 +1,6 @@
 <template>
-  <div class="flex justify-center items-center space-x-3">
-    <div class="text-base font-semibold text-nowrap">결제코드 :</div>
+  <div class="flex justify-center items-center space-x-3 ml-12">
+    <div class="text-base font-semibold text-nowrap">결제코드</div>
     <v-select
       v-model="selectedPayCd"
       :options="payCodeList"

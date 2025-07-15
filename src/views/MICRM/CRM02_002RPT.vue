@@ -19,7 +19,7 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10 space-x-5">
+      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10">
       <div class="justify-start flex">
         <Datepicker2
           :mainName="'기간'"
@@ -29,7 +29,7 @@
           @excelDate="excelDate"
           @startDate="startDate">
         </Datepicker2>
-        <div class="mt-1 space-x-5 flex justify-start ml-20">
+        <div class="items-center space-x-5 flex justify-start ml-20">
           <label for="cond"
             ><input
               type="checkbox"
@@ -48,47 +48,47 @@
           >
         </div>
       </div>
-      <div class="h-[75%] ml-5 mt-1 justify-start flex">
+      <div class="ml-5 justify-start flex">
         <PickCustomers
           @Name="Name"
           @ID="ID"
           @CustId="CustId"
           @excelList="excelList"></PickCustomers>
       </div>
-      <div class="flex justify-center space-x-5">
+      <div class="flex justify-start font-semibold text-base ml-1">
         <div>누적포인트</div>
         <div>
           <input
             type="text"
-            class="pl-1 disabled:bg-white"
+            class="pl-1 disabled:bg-white ml-5"
             disabled
             v-model="point1" />
         </div>
-        <div>사용포인트</div>
+        <div class="ml-5">사용포인트</div>
         <div>
           <input
             type="text"
-            class="pl-1 disabled:bg-white"
+            class="pl-1 disabled:bg-white ml-5"
             disabled
             v-model="point2" />
         </div>
       </div>
 
-      <div class="flex justify-center space-x-5">
-        <div>잔여포인트</div>
+      <div class="flex justify-start items-center -ml-2">
+        <div class="text-base font-semibold">잔여포인트</div>
         <div>
           <input
             type="text"
-            class="pl-1 disabled:bg-white"
+            class="pl-1 ml-5 disabled:bg-white"
             disabled
             v-model="point3" />
         </div>
 
-        <div>보너스포인트</div>
+        <div class="ml-5 font-semibold text-base">보너스포인트</div>
         <div>
           <input
             type="text"
-            class="pl-1 disabled:bg-white"
+            class="pl-1 ml-5 disabled:bg-white"
             disabled
             v-model="point4" />
         </div>

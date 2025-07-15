@@ -25,8 +25,8 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-3 grid-rows-7 bg-gray-200 rounded-lg h-80 items-center z-10 space-x-5 pt-4">
-      <div class="justify-start ml-16 flex col-span-2">
+      class="grid grid-cols-3 grid-rows-7 bg-gray-200 rounded-lg h-80 items-center z-10 pt-4">
+      <div class="justify-start flex col-span-2 ml-7">
         <PickStoreSingle
           :setDisableType="true"
           @lngStoreCode="lngStoreCode"
@@ -38,22 +38,22 @@
       <div
         class="h-full !-ml-52 mt-1 justify-center items-center flex flex-col space-y-3">
         <div class="flex justify-start items-center">
-          <div class="text-center font-semibold text-sm">고객카드번호 :</div>
+          <div class="text-center font-semibold text-sm">고객카드번호</div>
           <div class="ml-5">
             <input type="text" class="h-6 w-32" v-model="cond" />
           </div>
           <span class="text-red-400">※ '-'없이 기입</span>
         </div>
-        <div class="flex justify-start items-center mr-10">
-          <div class="text-center font-semibold text-sm">고객명 :</div>
+        <div class="flex justify-start items-center mr-11">
+          <div class="text-center font-semibold text-sm">고객명</div>
           <div class="ml-5">
             <input type="text" class="h-6 w-32" v-model="cond2" />
           </div>
         </div>
       </div>
-      <div class="flex justify-start space-x-5 mt-6 !ml-20">
+      <div class="flex justify-start space-x-5 mt-6 !ml-12 items-center">
         <div class="text-center font-semibold text-sm">생년월일</div>
-        <div class="flex w-20">
+        <div class="flex w-20 items-center">
           <select name="" id="" class="w-12 h-7" v-model="cond3">
             <option value="0"></option>
             <option value="1">1</option>
@@ -72,7 +72,7 @@
           월
         </div>
 
-        <div>
+        <div class="flex justify-center items-center">
           <select name="" id="" class="w-12 h-7" v-model="cond4">
             <option value="0"></option>
             <option value="1">1</option>
@@ -111,7 +111,7 @@
         </div>
       </div>
 
-      <div class="flex justify-start space-x-5 mt-6 !ml-20">
+      <div class="flex justify-start items-center space-x-5 mt-6 !ml-20">
         <div class="text-center font-semibold text-sm">직종</div>
         <select name="" id="" class="w-32 h-7" v-model="cond5">
           <option value="0">전체</option>
@@ -125,7 +125,7 @@
         </select>
       </div>
 
-      <div class="flex justify-start space-x-5 mt-6 !ml-20">
+      <div class="flex justify-start space-x-5 mt-6 !ml-[72px] items-center">
         <div class="text-center font-semibold text-sm">성별</div>
         <select name="" id="" class="w-32 h-7" v-model="cond6">
           <option value="0">전체</option>
@@ -134,15 +134,15 @@
         </select>
       </div>
 
-      <div class="flex justify-start space-x-5 mt-6 !ml-20">
+      <div class="flex justify-start space-x-5 mt-6 !ml-12 items-center">
         <div class="text-center font-semibold text-sm">전화번호</div>
-        <div class="flex w-20 h-7">
-          <input type="text" v-model="cond7" />
+        <div class="flex w-20 items-center">
+          <input type="text " v-model="cond7" class="h-7" />
           <span class="text-nowrap">※010-0000-0000</span>
         </div>
       </div>
 
-      <div class="flex justify-start space-x-5 mt-6 !ml-14">
+      <div class="flex justify-start space-x-5 mt-6 !ml-[54px]">
         <div class="text-center font-semibold text-sm">가입상태</div>
         <select name="" id="" class="w-32 h-7" v-model="cond8">
           <option value="0">전체</option>
@@ -155,7 +155,7 @@
         </select>
       </div>
 
-      <div class="flex justify-start space-x-5 mt-6 !ml-14">
+      <div class="flex justify-start space-x-5 mt-6 !ml-[46px] items-center">
         <div class="text-center font-semibold text-sm">결혼여부</div>
         <select name="" id="" class="w-32 h-7" v-model="cond9">
           <option value="0">전체</option>
@@ -164,10 +164,10 @@
         </select>
       </div>
 
-      <div class="flex justify-start space-x-5 mt-6 !pr-20">
+      <div class="flex justify-start space-x-5 mt-6">
         <Datepicker2
           :disableBox="false"
-          class="!-ml-10"
+          class="ml-2"
           @endDate="endDate"
           @startDate="startDate"
           :removeDefault="true"
@@ -177,14 +177,14 @@
       <div class="flex justify-start space-x-5 mt-6 !pr-20">
         <Datepicker2
           :disableBox="false"
-          class="!-ml-20"
+          class="-ml-4"
           @endDate="endDate2"
           @startDate="startDate2"
           :removeDefault="true"
           :mainName="'최초사용일'"></Datepicker2>
       </div>
 
-      <div class="flex justify-start space-x-5 mt-6 !ml-20">
+      <div class="flex justify-start space-x-5 mt-6 !ml-[70px]">
         <div class="text-center font-semibold text-sm">등급</div>
         <select name="" id="" class="border w-32 h-7 ml-2" v-model="cond10">
           <option value="0">전체</option>
@@ -194,39 +194,39 @@
         </select>
       </div>
 
-      <div class="flex justify-start space-x-5 mt-6 !pl-12">
+      <div class="flex justify-start space-x-5 mt-6 !pl-9 items-center">
         <div class="text-center font-semibold text-sm">누적포인트</div>
         <select name="" id="" class="border w-10 h-7 ml-2" v-model="cond11">
           <option value="1"><</option>
           <option value="2">=</option>
           <option value="3">></option>
         </select>
-        <input type="number" class="w-32" v-model="cond12" />
+        <input type="number" class="w-32 h-7" v-model="cond12" />
       </div>
 
-      <div class="flex justify-start space-x-5 mt-6 !pl-5">
+      <div class="flex justify-start mt-6 ml-10">
         <div class="text-center font-semibold text-sm">잔여포인트</div>
-        <select name="" id="" class="border w-10 h-7 ml-2" v-model="cond13">
+        <select name="" id="" class="border w-10 h-7 ml-5" v-model="cond13">
           <option value="1"><</option>
           <option value="2">=</option>
           <option value="3">></option>
         </select>
-        <input type="number" class="w-32" v-model="cond14" />
+        <input type="number" class="w-32 ml-5" v-model="cond14" />
       </div>
 
       <div class="flex justify-start space-x-5 mt-6">
         <Datepicker2
           :disableBox="false"
-          class="!-ml-20"
+          class="!-ml-[26px]"
           @endDate="endDate3"
           @startDate="startDate3"
           :removeDefault="true"
           :mainName="'최종사용일'"></Datepicker2>
       </div>
 
-      <div class="flex justify-start space-x-5 mt-3 !pl-16">
+      <div class="flex justify-start space-x-5 mt-3 !pl-12">
         <div class="text-center font-semibold text-sm">방문횟수</div>
-        <select name="" id="" class="border w-10 h-7 !ml-4" v-model="cond15">
+        <select name="" id="" class="border w-10 h-7" v-model="cond15">
           <option value="1"><</option>
           <option value="2">=</option>
           <option value="3">></option>
@@ -234,46 +234,46 @@
         <input type="number" class="w-32" v-model="cond16" />
       </div>
 
-      <div class="flex justify-start space-x-5 mt-3 !pl-4">
+      <div class="flex justify-start mt-3 ml-6">
         <div class="text-center font-semibold text-sm">SMS수신동의</div>
-        <select name="" id="" class="border w-32 h-7 !ml-2" v-model="cond17">
+        <select name="" id="" class="border w-32 h-7 ml-5" v-model="cond17">
           <option value="2">전체</option>
           <option value="0">동의</option>
           <option value="1">비동의</option>
         </select>
       </div>
 
-      <div class="flex justify-start space-x-5 mt-3 !ml-12">
+      <div class="flex justify-start space-x-5 mt-4 !ml-11 items-center">
         <div class="text-center font-semibold text-sm">실매출액</div>
-        <select name="" id="" class="border w-10 h-7 !ml-6" v-model="cond18">
+        <select name="" id="" class="border w-10 h-7 !ml-5" v-model="cond18">
           <option value="1"><</option>
           <option value="2">=</option>
           <option value="3">></option>
         </select>
-        <input type="number" class="w-32" v-model="cond19" />
+        <input type="number" class="w-32 h-7" v-model="cond19" />
       </div>
 
-      <div class="flex justify-start space-x-5 mt-0 !pl-6">
+      <div class="flex justify-start space-x-5 mt-0 !pl-2 items-center">
         <div class="text-center font-semibold text-sm">마케팅수신동의</div>
-        <select name="" id="" class="border w-32 h-7 !ml-4" v-model="cond20">
+        <select name="" id="" class="border w-32 h-7 !ml-5" v-model="cond20">
           <option value="2">전체</option>
           <option value="0">동의</option>
           <option value="1">비동의</option>
         </select>
       </div>
 
-      <div class="flex justify-start space-x-5 mt-0 !pl-2">
+      <div class="flex justify-start mt-0 ml-7 items-center">
         <div class="text-center font-semibold text-sm">휴면회원여부</div>
-        <select name="" id="" class="border w-32 h-7 ml-2" v-model="cond21">
+        <select name="" id="" class="border w-32 h-7 ml-5" v-model="cond21">
           <option value="-1">전체</option>
           <option value="1">일반</option>
           <option value="2">휴면</option>
         </select>
       </div>
 
-      <div class="flex justify-start items-center space-x-5 mt-0 !ml-14">
+      <div class="flex justify-start items-center mt-0 !ml-11">
         <div class="text-center font-semibold text-sm">선호매장</div>
-        <select name="" id="" class="border w-32 h-7 !ml-4" v-model="pstore">
+        <select name="" id="" class="border w-32 h-7 !ml-5" v-model="pstore">
           <option value="0">전체</option>
           <option :value="i.lngStoreCode" v-for="i in optionList2">
             {{ i.strName }}

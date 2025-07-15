@@ -1,6 +1,6 @@
 <!-- /*--############################################################################
 # Filename : CRM11_013RPT.vue                                                  
-# Description : 고객관리 > 프로모션 관리 > 이벤트 쿠폰 발행 현황.              
+# Description : 고객관리 > 프로모션 관리 > 이벤트 쿠폰 발행 현황             
 # Date :2025-06-25                                                             
 # Author : 권맑음                     
 ################################################################################*/ -->
@@ -19,12 +19,13 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-[1fr,1fr] grid-rows-[1fr,1fr] bg-gray-200 rounded-lg h-28 items-center z-10 space-x-5">
+      class="grid grid-cols-[1fr,1fr] grid-rows-[1fr,1fr] bg-gray-200 rounded-lg h-28 items-start z-10">
       <div class="justify-start flex items-center -space-x-14">
         <Datepicker2
           :mainName="'기간'"
           :initToday="1"
           ref="datepicker"
+          class="ml-7"
           :closePopUp="closePopUp"
           @endDate="endDate"
           @excelDate="excelDate"
@@ -32,9 +33,8 @@
         </Datepicker2>
       </div>
 
-      <div
-        class="h-[75%] mt-1 justify-start items-center flex space-x-5 !ml-20">
-        <span class="text-base font-semibold">쿠폰명 :</span>
+      <div class="mt-2 justify-start items-center flex space-x-5 !ml-20">
+        <span class="text-base font-semibold">쿠폰명</span>
         <select name="" id="" class="ml-5 w-48 h-8" v-model="cond">
           <option value="0">전체</option>
           <option :value="i.lngCouponType" v-for="i in optionList">
@@ -43,11 +43,11 @@
         </select>
       </div>
       <div class="flex">
-        <div class="ml-20 text-base font-semibold">쿠폰번호 :</div>
+        <div class="ml-12 text-base font-semibold">쿠폰번호</div>
         <div><input type="text" class="ml-5 w-48 h-8" v-model="cond2" /></div>
       </div>
-      <div class="flex justify-start items-center pl-8">
-        <span class="text-nowrap text-base font-semibold">핸드폰번호 :</span>
+      <div class="flex justify-start items-center pl-[50px]">
+        <span class="text-nowrap text-base font-semibold">핸드폰번호</span>
         <input
           type="text"
           class="h-8 w-48 disabled:bg-white ml-5"

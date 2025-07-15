@@ -1227,3 +1227,50 @@ export const sendSMS = (
     USER_IP: userip,
   });
 };
+
+export const getSalesReportbyAmount = (
+  groupCd,
+  jointype,
+  team,
+  supervisor,
+  storecd,
+  sdate,
+  edate,
+  reporttype,
+  amountNum
+) => {
+  return api2.post("/MISALES/SLS11_010RPT.asmx/getSalesReportbyAmount", {
+    GROUP_CD: groupCd,
+    JOIN_TYPE: jointype,
+    TEAM: team,
+    SUPERVISOR: supervisor,
+    STORE_CD: storecd,
+    SDATE: sdate,
+    EDATE: edate,
+    REPORT_TYPE: reporttype,
+    AMOUNTNUM: amountNum,
+  });
+};
+export const getSalesReportbyManager = (
+  groupCd,
+  jointype,
+  team,
+  supervisor,
+  storecd,
+  sdate,
+  edate,
+  reporttype,
+  oper
+) => {
+  return api2.post("/MISALES/SLS11_011RPT.asmx/getSalesReportbyManager", {
+    GROUP_CD: groupCd,
+    JOIN_TYPE: jointype,
+    TEAM: team,
+    SUPERVISOR: supervisor,
+    STORE_CD: storecd,
+    SDATE: sdate,
+    EDATE: edate,
+    REPORT_TYPE: reporttype,
+    OPERATOR: oper,
+  });
+};

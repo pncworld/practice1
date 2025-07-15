@@ -1,14 +1,14 @@
 div
 <template>
-  <div class="flex justify-center items-center space-x-3">
-    <div class="text-base font-semibold text-nowrap">메뉴코드 :</div>
+  <div class="flex justify-center items-center space-x-5">
+    <div class="text-base font-semibold text-nowrap">메뉴코드</div>
 
     <v-select
       v-model="selectedDiscountNo"
       :options="disCountList"
       label="strName"
       placeholder="전체"
-      class="!w-48 !h-7 mt-3 custom-select5 pr-20"
+      class="!w-40 !h-7 mt-3 custom-select5 pr-20"
       :reduce="(store) => (store != null ? store.lngCode : null)"
       clearable="true"
       @click="clickDiscount" />

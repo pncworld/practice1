@@ -24,7 +24,7 @@
     <input
       type="text"
       v-model="searchStoreName"
-      class="rounded-lg h-[53%] items-center border border-black"
+      class="rounded-lg h-9 items-center border border-black"
       :disabled="allstrore"
       @keydown.enter="searchButton" />
   </div>

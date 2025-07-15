@@ -19,12 +19,12 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-1 grid-rows-5 bg-gray-200 rounded-lg h-56 items-center z-10 -space-x-20 pt-4">
-      <div class="justify-start flex space-x-36">
+      class="grid grid-cols-1 grid-rows-5 bg-gray-200 rounded-lg h-56 items-start z-10 -space-x-20">
+      <div class="justify-start flex items-start space-x-36">
         <Datepicker2
           :mainName="'기간'"
           :initToday="1"
-          class="-mt-3"
+          class=""
           ref="datepicker"
           :closePopUp="closePopUp"
           @endDate="endDate"
@@ -39,7 +39,7 @@
           @lngStoreTeam="lngTeamCode"
           @excelStore="excelStore"></PickStoreSingle>
       </div>
-      <div class="flex justify-start pl-[72px] space-x-5 items-center">
+      <div class="flex justify-start pl-16 space-x-5 items-center">
         <div>
           <Datepicker2
             :mainName="'가입일'"
@@ -51,32 +51,32 @@
         </div>
       </div>
 
-      <div class="justify-start items-center flex space-x-2 !ml-5">
-        <div class="text-base font-semibold ml-24">쿠폰명 :</div>
-        <select name="" id="" class="border w-48 h-8 ml-2" v-model="cond">
+      <div class="justify-start items-center flex !ml-8 mt-2">
+        <div class="text-base font-semibold">쿠폰명</div>
+        <select name="" id="" class="border w-48 h-8 ml-5" v-model="cond">
           <option value="0">전체</option>
           <option :value="i.lngCouponId" v-for="i in optionList">
             {{ i.strCouponName }}
           </option>
         </select>
 
-        <div class="text-base font-semibold !ml-64">쿠폰사용여부 :</div>
-        <select name="" id="" class="border w-48 h-8 ml-2" v-model="cond2">
+        <div class="text-base font-semibold !ml-64">쿠폰사용여부</div>
+        <select name="" id="" class="border w-48 h-8 ml-5" v-model="cond2">
           <option :value="null">전체</option>
           <option value="Y">사용</option>
           <option value="N">미사용</option>
         </select>
       </div>
 
-      <div class="justify-start items-center flex space-x-2 !ml-8">
-        <div class="text-base font-semibold ml-24">성별 :</div>
-        <select name="" id="" class="border w-48 h-8 ml-2" v-model="cond3">
+      <div class="justify-start items-center flex !ml-12">
+        <div class="text-base font-semibold">성별</div>
+        <select name="" id="" class="border w-48 h-8 ml-5" v-model="cond3">
           <option :value="null">전체</option>
           <option value="1">남자</option>
           <option value="0">여자</option>
           <option value="2">외국인</option>
         </select>
-        <div class="!ml-48">
+        <div class="!ml-[264px]">
           <Datepicker2
             :mainName="'연령'"
             :removeDefault="true"
@@ -87,15 +87,15 @@
         </div>
       </div>
 
-      <div class="justify-start items-center flex space-x-2 !ml-8">
-        <div class="text-base font-semibold ml-24">지역 :</div>
-        <select name="" id="" class="border w-48 h-8 ml-2" v-model="cond4">
+      <div class="justify-start items-center flex !ml-12 mt-1">
+        <div class="text-base font-semibold">지역</div>
+        <select name="" id="" class="border w-48 h-8 ml-5" v-model="cond4">
           <option value="0">전체</option>
           <option value="1">서울</option>
         </select>
 
-        <div class="text-base font-semibold !ml-80">등급 :</div>
-        <select name="" id="" class="border w-48 h-8 ml-2" v-model="cond5">
+        <div class="text-base font-semibold !ml-[312px]">등급</div>
+        <select name="" id="" class="border w-48 h-8 ml-5" v-model="cond5">
           <option value="0">전체</option>
           <option :value="i.intLevel" v-for="i in optionList2">
             {{ i.strLevelName }}

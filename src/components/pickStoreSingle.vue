@@ -5,7 +5,7 @@
       class="font-semibold text-nowrap text-base row-span-2 flex justify-center items-center">
       매장명
     </div>
-    <div class="flex justify-center items-center">
+    <div class="flex justify-start items-center">
       <label for="searchType1" class="text-base font-normal"
         >직/가맹<input
           type="radio"
@@ -56,7 +56,7 @@
       </div>
     </div>
     <div class="flex justify-center items-center">
-      <label for="searchType2" class="text-base font-normal ml-2"
+      <label for="searchType2" class="text-base font-normal mr-3"
         >팀/SC<input
           type="radio"
           id="searchType2"

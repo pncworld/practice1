@@ -1,9 +1,9 @@
 <template>
   <div>
-    <span class="ml-10 font-semibold text-base">적용일 : </span
+    <span class="ml-10 font-semibold text-base">적용일</span
     ><input
       type="date"
-      class="border rounded-lg h-10 w-36 text-base pl-5"
+      class="border rounded-lg h-10 w-36 text-base pl-5 ml-5"
       v-model="selectedDate"
       @change="emitDate" />
   </div>

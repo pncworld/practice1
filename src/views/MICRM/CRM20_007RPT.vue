@@ -20,23 +20,23 @@
     </div>
     <div
       class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10 space-x-5">
-      <div class="mt-1 justify-start flex flex-col">
+      <div class="justify-start flex flex-col">
         <PickCustCompany
-          class="ml-32"
+          class=""
           @excelStore="excelStore"
           @lngStoreCode="lngStoreCode"></PickCustCompany>
       </div>
-      <div class="h-[75%] ml-5 mt-1 justify-start flex">
+      <div class="ml-5 mt-2 justify-start flex">
         <PickBelongCust
           :lngStoreCode="selectedStores"
           @excelList="excelList"
           @strSaleCustName="strSaleCustName"
           @strSaleCustID="strSaleCustID"></PickBelongCust>
       </div>
-      <div class="!mr-20 !pr-20">
+      <div class="">
         <Datepicker2
           :mainName="'조회기간'"
-          class="!mr-20 !pr-20"
+          class="-ml-5"
           :closePopUp="closePopUp"
           ref="datepicker"
           :initToday="1"
@@ -44,21 +44,21 @@
           @excelDate="excelDate"
           @startDate="startDate"></Datepicker2>
       </div>
-      <div class="space-x-2 flex justify-start ml-20 items-center">
-        <div class="text-base">거래구분 :</div>
-        <div class="flex justify-center items-center">
+      <div class="flex justify-start !ml-2 items-center">
+        <div class="text-base font-semibold">거래구분</div>
+        <div class="flex justify-start items-center">
           <select
             name=""
             id=""
             v-model="cond"
-            class="w-40 h-8 flex justify-center items-center">
+            class="w-40 h-8 flex justify-start items-center ml-5">
             <option value="0">전체</option>
             <option value="1">입금</option>
             <option value="2">매출</option>
           </select>
         </div>
         <div>
-          <label for="cond2"
+          <label for="cond2" class="ml-2"
             ><input
               type="checkbox"
               id="cond2"

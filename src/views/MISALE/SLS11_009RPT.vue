@@ -21,7 +21,7 @@
     <div
       class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-28 items-start z-10">
       <div class="grid grid-cols-1 grid-rows-3">
-        <div class="flex">
+        <div class="flex ml-8">
           <input
             type="checkbox"
             class="ml-2 z-50 mt-2"
@@ -42,7 +42,7 @@
             @click="checkReportType"
             :value="2" />
         </div>
-        <div class="flex justify-start mt-2 ml-5 -space-x-7">
+        <div class="flex justify-start mt-2 ml-12 -space-x-7">
           <div class="text-base font-semibold">객층구분</div>
           <v-select
             v-model="selectedCust"
@@ -65,22 +65,22 @@
           @lngStoreAttrs="lngStoreAttrs">
         </PickStoreSingle2>
         <div
-          class="text-nowrap flex justify-start items-center space-x-10 ml-8 mt-2">
+          class="text-nowrap flex justify-start items-center space-x-5 ml-8 mt-2">
           <div class="text-base font-semibold">조건</div>
-          <div class="flex space-x-10">
+          <div class="flex ml-5">
             <label for="store"
               ><input
                 type="checkbox"
                 id="store"
                 @click="cellUnite" />셀병합</label
             >
-            <label for="unite"
+            <label for="unite" class="ml-5"
               ><input
                 type="checkbox"
                 id="unite"
                 @click="balance" />할인전잔액</label
             >
-            <label for="sum"
+            <label for="sum" class="ml-5"
               ><input type="checkbox" id="sum" @click="showSum" />합계</label
             >
           </div>

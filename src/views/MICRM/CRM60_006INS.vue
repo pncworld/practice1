@@ -25,7 +25,7 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-[1fr,1fr,1.5fr] grid-rows-2 bg-gray-200 rounded-lg h-16 items-center pt-5 z-10 space-x-2 justify-start">
+      class="grid grid-cols-[1fr,1fr,1.5fr] grid-rows-2 bg-gray-200 rounded-lg h-16 items-start z-10 justify-start">
       <div class="justify-start">
         <Datepicker2
           :mainName="'생성일자'"
@@ -35,9 +35,9 @@
           @excelDate="excelDate"
           @endDate="endDate"></Datepicker2>
       </div>
-      <div class="justify-center flex items-center !-mr-16">
-        <span class="text-base font-semibold">상품권구분 : </span>
-        <select name="" id="" class="ml-4 w-40 h-8" v-model="cond">
+      <div class="justify-center flex items-center !-mr-16 mt-2">
+        <span class="text-base font-semibold">상품권구분 </span>
+        <select name="" id="" class="ml-5 w-40 h-8" v-model="cond">
           <option value="0">전체</option>
           <option :value="i.lngGftCategory" v-for="i in optionList">
             {{ i.strGftCategory }}
@@ -45,9 +45,10 @@
         </select>
       </div>
 
-      <div class="text-base flex justify-start font-semibold pl-32">
-        <span class="text-base font-semibold"> 권종 :</span>
-        <select name="" id="" class="w-40 ml-3 h-8" v-model="cond3">
+      <div
+        class="text-base flex justify-start font-semibold pl-32 items-center mt-2">
+        <span class="text-base font-semibold"> 권종 </span>
+        <select name="" id="" class="w-40 ml-5 h-8" v-model="cond3">
           <option value="0">전체</option>
           <option :value="i.lngGftType" v-for="i in optionList2">
             {{ i.strGftType }}

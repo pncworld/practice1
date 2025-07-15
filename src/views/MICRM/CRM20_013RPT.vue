@@ -18,39 +18,43 @@
         </button>
       </div>
     </div>
-    <div
-      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10 space-x-5">
-      <div class="justify-start flex flex-col ml-14">
-        <PickCustCompany
-          @excelStore="excelStore"
-          @lngStoreCode="lngStoreCode"></PickCustCompany>
+    <div class="flex flex-col bg-gray-200 rounded-lg h-24 items-start z-10">
+      <div class="flex">
+        <div class="mt-2">
+          <PickCustCompany
+            @excelStore="excelStore"
+            @lngStoreCode="lngStoreCode"></PickCustCompany>
+        </div>
+        <div class="ml-5 justify-start flex">
+          <PickBelongCust
+            :lngStoreCode="selectedStores"
+            @excelList="excelList"
+            :mainName="'거래처'"
+            :type="'2'"
+            @strSaleCustName="strSaleCustName"
+            @strSaleCustID="strSaleCustID"></PickBelongCust>
+        </div>
       </div>
-      <div class="h-[75%] ml-5 mt-5 justify-start flex">
-        <PickBelongCust
-          :lngStoreCode="selectedStores"
-          @excelList="excelList"
-          :mainName="'거래처'"
-          :type="'2'"
-          @strSaleCustName="strSaleCustName"
-          @strSaleCustID="strSaleCustID"></PickBelongCust>
-      </div>
-      <div>
-        <Datepicker3
-          :firstName="'조회기간'"
-          :initMonth2="true"
-          @endMonth="endMonth"
-          @endYear="endYear"
-          @startMonth="startMonth"
-          @startYear="startYear"
-          @excelDate="excelDate"></Datepicker3>
-      </div>
-      <div class="text-base flex justify-start font-semibold">
-        거래구분 :
-        <select name="" id="" class="w-40 ml-3" v-model="selectedCond">
-          <option value="0">전체</option>
-          <option value="1">충전</option>
-          <option value="2">매출</option>
-        </select>
+      <div class="flex">
+        <div>
+          <Datepicker3
+            :firstName="'조회기간'"
+            :initMonth2="true"
+            @endMonth="endMonth"
+            @endYear="endYear"
+            @startMonth="startMonth"
+            @startYear="startYear"
+            @excelDate="excelDate"></Datepicker3>
+        </div>
+        <div
+          class="text-base flex justify-start font-semibold items-center ml-12 mt-2">
+          <div class="flex">거래구분</div>
+          <select name="" id="" class="w-40 ml-5" v-model="selectedCond">
+            <option value="0">전체</option>
+            <option value="1">충전</option>
+            <option value="2">매출</option>
+          </select>
+        </div>
       </div>
     </div>
     <!-- 조회조건 -->

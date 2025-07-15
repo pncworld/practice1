@@ -27,10 +27,10 @@
     <div
       class="grid grid-cols-1 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10">
       <div
-        class="flex justify-center mr-40 items-center text-base font-semibold space-x-20">
-        <div class="flex justify-center items-center">
-          <div>매장명:</div>
-          <select name="" id="" class="w-40 h-8 ml-2" v-model="selectedStore">
+        class="flex justify-start mr-40 items-center text-base font-semibold space-x-20 ml-12">
+        <div class="flex justify-start items-center">
+          <div>매장명</div>
+          <select name="" id="" class="w-40 h-8 ml-5" v-model="selectedStore">
             <option value="0">선택</option>
             <option :value="i.lngStoreCode" v-for="i in GroupList">
               {{ i.strStoreName }}
@@ -38,9 +38,13 @@
           </select>
         </div>
         <div class="flex justify-center items-center">
-          <div>멀티단가그룹 :</div>
+          <div>멀티단가그룹</div>
           <div>
-            <select name="" id="" class="w-40 h-8" v-model="selectedMultiGroup">
+            <select
+              name=""
+              id=""
+              class="w-40 h-8 ml-5"
+              v-model="selectedMultiGroup">
               <option value="0">전체</option>
               <option :value="i.lngCode" v-for="i in MultiGroupList">
                 {{ i.strName }}
@@ -49,9 +53,13 @@
           </div>
         </div>
         <div class="flex justify-center items-center">
-          <div>메뉴서브그룹 :</div>
+          <div>메뉴서브그룹</div>
           <div>
-            <select name="" id="" class="w-40 h-8" v-model="selectedSubGroup">
+            <select
+              name=""
+              id=""
+              class="w-40 h-8 ml-5"
+              v-model="selectedSubGroup">
               <option value="0">전체</option>
               <option :value="i.lngCode" v-for="i in MultiSubList">
                 {{ i.strName }}
@@ -60,12 +68,12 @@
           </div>
         </div>
         <div class="flex justify-center items-center">
-          <div>메뉴검색 :</div>
-          <div><input type="text" class="w-40 h-8" v-model="cond" /></div>
+          <div>메뉴검색</div>
+          <div><input type="text" class="w-40 h-8 ml-5" v-model="cond" /></div>
         </div>
       </div>
 
-      <div class="flex justify-center ml-40 space-x-20 items-center">
+      <div class="flex justify-center -ml-2 space-x-20 items-center">
         <!-- <div>
           <label for="cond"
             ><input type="checkbox" id="cond" v-model="cond2" />전체 선택</label

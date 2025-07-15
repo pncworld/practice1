@@ -18,8 +18,7 @@
         </button>
       </div>
     </div>
-    <div
-      class="grid grid-cols-5 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10">
+    <div class="flex bg-gray-200 rounded-lg h-16 items-start z-10">
       <div>
         <PickStore
           class="!-mr-4"
@@ -31,7 +30,7 @@
           :defaultStoreNm="'전체'">
         </PickStore>
       </div>
-      <div class="w-[80%] ml-5">
+      <div class="ml-5">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
@@ -40,10 +39,10 @@
           :mainName="'예약일'"
           class="!w-[350px] !pr-0 !ml-5"></Datepicker2>
       </div>
-      <div class="flex ml-48 space-x-1">
-        <div class="text-base font-semibold text-nowrap">상태 :</div>
+      <div class="flex ml-32 mt-5">
+        <div class="text-base font-semibold text-nowrap">상태</div>
         <div>
-          <select name="" id="" class="w-32" v-model="status">
+          <select name="" id="" class="w-32 ml-5" v-model="status">
             <option value="99">전체</option>
             <option value="0">예약</option>
             <option value="1">방문</option>
@@ -54,13 +53,13 @@
           </select>
         </div>
       </div>
-      <div class="flex ml-20">
-        <div class="text-base font-semibold">고객명 :</div>
-        <div><input type="text" class="pl-1" v-model="cond" /></div>
+      <div class="flex ml-6 mt-5">
+        <div class="text-base font-semibold">고객명</div>
+        <div><input type="text" class="ml-5" v-model="cond" /></div>
       </div>
-      <div class="flex">
-        <div class="text-base font-semibold">전화번호 :</div>
-        <div><input type="text" class="pl-1" v-model="cond2" /></div>
+      <div class="flex mt-5 ml-6">
+        <div class="text-base font-semibold">전화번호</div>
+        <div><input type="text" class="ml-5" v-model="cond2" /></div>
         <div>(뒷4자리)</div>
       </div>
     </div>
