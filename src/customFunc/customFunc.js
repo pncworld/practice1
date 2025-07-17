@@ -160,7 +160,7 @@ export async function insertMobilePageLog(progdata) {
   const userGroup = store.state.userData.GROUP_CD;
   const userStoreCd = store.state.userData.STORE_CD;
   const userId = store.state.userData.USER_NO;
-  let userIp = "MOBILE";
+  let userIp = "MOBILE_APP";
   // const userip = async () => {
   //   const result = await fetch("https://api64.ipify.org?format=json");
   //   const data = await result.json();
