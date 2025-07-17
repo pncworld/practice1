@@ -18,20 +18,21 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-2 mt-1">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
+      <div class="grid grid-cols-1 grid-rows-2">
         <div>
           <Datepicker2
             @endDate="endDate"
             @startDate="startDate"
             :closePopUp="closePopUp"
+            class="ml-7"
             ref="datepicker"
             @excelDate="excelDate"
             :mainName="'기간'"
             :initToday="1"></Datepicker2>
         </div>
-        <div class="flex space-x-3 text-base font-semibold ml-24 mt-3">
-          <div class="pl-2">계정과목:</div>
+        <div class="flex space-x-5 text-base font-semibold ml-12 mt-3">
+          <div class="">계정과목</div>
           <div>
             <select name="" id="" v-model="selectedCond" class="w-40">
               <option value="0">전체</option>
@@ -51,7 +52,7 @@
           </div>
         </div>
       </div>
-      <div class="ml-20">
+      <div class="">
         <PickStoreSingle
           @lngStoreCode="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"
@@ -211,7 +212,7 @@ const searchButton = async () => {
       selectedendDate.value,
       selectedCond.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;

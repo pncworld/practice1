@@ -1,4 +1,4 @@
-import { savePageLog } from "@/api/common";
+import { saveLoginLog, savePageLog } from "@/api/common";
 import store from "@/store";
 
 export function formatLocalDate(date) {
@@ -120,7 +120,7 @@ export async function insertPageLog(progdata) {
       const data = await result.text();
       userIp = data;
     } catch (err) {
-      console.warn("IP 가져오기 실패:", err);
+      //console.warn("IP 가져오기 실패:", err);
       // userIp는 기본값 유지
     }
   };
@@ -160,13 +160,13 @@ export async function insertMobilePageLog(progdata) {
   const userGroup = store.state.userData.GROUP_CD;
   const userStoreCd = store.state.userData.STORE_CD;
   const userId = store.state.userData.USER_NO;
-  let userIp;
-  const userip = async () => {
-    const result = await fetch("https://api64.ipify.org?format=json");
-    const data = await result.json();
-    userIp = data.ip;
-  };
-  await userip();
+  let userIp = "MOBILE";
+  // const userip = async () => {
+  //   const result = await fetch("https://api64.ipify.org?format=json");
+  //   const data = await result.json();
+  //   userIp = data.ip;
+  // };
+  // await userip();
   const progname = progdata.strUrl;
   const progid = progdata.lngProgramID;
 
@@ -180,7 +180,71 @@ export async function insertMobilePageLog(progdata) {
     progid,
     2
   );
-  //comsole.log(res);
+  console.log(res);
+  return ``;
+}
+
+export async function insertLoginLog(id, pw, group, storecd) {
+  //const store = useStore()
+  const currenttime = new Date();
+  const inserttime = formatDateTime2(currenttime);
+
+  //comsole.log(store);
+  // const userGroup = store.state.userData.GROUP_CD;
+  // const userStoreCd = store.state.userData.STORE_CD;
+  // console.log(userGroup);
+  // console.log(userStoreCd);
+  //const userId = store.state.userData.USER_NO;
+  let userIp = "";
+  const userip = async () => {
+    const result = await fetch("https://api64.ipify.org?format=json");
+    const data = await result.json();
+    userIp = data.ip;
+  };
+  await userip();
+
+  const res = await saveLoginLog(
+    inserttime,
+    group,
+    storecd,
+    id,
+    pw,
+    userIp,
+    "01",
+    1
+  );
+  console.log(res);
+  return ``;
+}
+
+export async function insertMobileLoginLog(id, pw, group, storecd) {
+  //const store = useStore()
+  const currenttime = new Date();
+  const inserttime = formatDateTime2(currenttime);
+
+  //comsole.log(store);
+  // const userGroup = store.state.userData.GROUP_CD;
+  // const userStoreCd = store.state.userData.STORE_CD;
+  // const userId = store.state.userData.USER_NO;
+  let userIp = "MOBILE";
+  // const userip = async () => {
+  //   const result = await fetch("https://api64.ipify.org?format=json");
+  //   const data = await result.json();
+  //   userIp = data.ip;
+  // };
+  // await userip();
+
+  const res = await saveLoginLog(
+    inserttime,
+    group,
+    storecd,
+    id,
+    pw,
+    userIp,
+    "01",
+    2
+  );
+  console.log(res);
   return ``;
 }
 

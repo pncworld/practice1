@@ -268,7 +268,7 @@ const FileChange = (e) => {
   const file = event.target.files[0];
   if (file) {
     cond2.value = file; // cond2에 파일 객체 저장
-    console.log("선택한 파일:", cond2.value);
+    //console.log("선택한 파일:", cond2.value);
   }
 };
 /**
@@ -321,7 +321,7 @@ const searchButton = async () => {
       sd.value,
       ed.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -358,9 +358,9 @@ const saveButton = async () => {
       cond4.value,
       1
     );
-    console.log(res);
+    //console.log(res);
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   } finally {
     visible.value = false;
     searchButton();
@@ -373,7 +373,7 @@ const saveButton = async () => {
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 /**

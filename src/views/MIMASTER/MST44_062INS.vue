@@ -88,7 +88,7 @@
         </div>
               <!-- 그리드 영역 -->
         <div class="ml-10 mt-5 w-full h-full">
-          <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="4" :reload="reload"       :checkRenderEditable="true"
+          <Realgrid class="w-[103%] h-[200%]" :progname="'MST44_062INS_VUE'" :progid="4" :reload="reload"  :checkRenderEditable="true"
             :rowData="rowData3" :showGrid="showGrid" :showCheckBar="false" @selcetedrowData="selcetedrowData" :rowStateeditable="false"
             :activeSearchSpecial="true" :searchSpecialColId="searchSpecialColId"  :searchSpecialCond="searchSpecialCond"
             :searchWord3="searchword1" :searchColId="'lngCode,strName'" :searchColId3="['mainCode','subCode']" :searchValue="[forsearchMain,forsearchSub]"
@@ -381,12 +381,12 @@ const searchSpecialColId = ref([])
 const searchSpecialCond = ref(false)
 watch(ischecked, () => {
   searchSpecialColId.value = [];
-  console.log(printNameList.value.length)
+  //console.log(printNameList.value.length)
   for (let i = 1; i <= printNameList.value.length; i++) {
     searchSpecialColId.value.push("checkbox" + i);
   }
   if (ischecked.value == true) {
-   // console.log(searchSpecialColId.value);
+   // //console.log(searchSpecialColId.value);
 
     searchSpecialCond.value = false;
   } else {
@@ -776,7 +776,7 @@ const searchButton= async () => {
       afterSearch.value = true
     } else if (currentMenu.value == 2) {
       res = await getKitchenSettingList(groupCd.value, nowStoreCd.value)
-      console.log(res)
+      //console.log(res)
 
       SettingList.value = [...res.data.KITCHENMENU]
       MenuGroup.value = res.data.MAINGROUP

@@ -251,7 +251,7 @@ const searchButton = async () => {
       selectedDay.value,
       selectedStore.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;

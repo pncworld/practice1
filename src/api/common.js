@@ -185,6 +185,29 @@ export const savePageLog = async (
   });
   return res;
 };
+
+export const saveLoginLog = async (
+  time,
+  group,
+  store,
+  id,
+  pw,
+  ip,
+  type,
+  bln
+) => {
+  const res = await api2.post("/SYSTEM/sysCom.asmx/saveLoginLog", {
+    TIME: time,
+    GROUP: group,
+    STORE: store,
+    USERID: id,
+    USERPW: pw,
+    USERIP: ip,
+    TYPE: type,
+    BLN: bln,
+  });
+  return res;
+};
 export const alreadyLogined = (token) => {
   return api2.post("/SYSTEM/VERIFYLOGIN.asmx/alreadyLogined", {
     TOKEN: token,

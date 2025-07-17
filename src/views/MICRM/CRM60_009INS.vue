@@ -329,7 +329,7 @@ const saveButton = async () => {
     });
     return;
   }
-  console.log(cAllStateRow.value);
+  //console.log(cAllStateRow.value);
   try {
     if (cAllStateRow.value.created.length > 0) {
       const IlngCode = updatedRow.value
@@ -346,7 +346,7 @@ const saveButton = async () => {
         1,
         "I"
       );
-      console.log(res);
+      //console.log(res);
     }
 
     if (cAllStateRow.value.updated.length > 0) {
@@ -364,7 +364,7 @@ const saveButton = async () => {
         1,
         "U"
       );
-      console.log(res);
+      //console.log(res);
     }
     Swal.fire({
       title: "성공",
@@ -375,7 +375,7 @@ const saveButton = async () => {
 
     //console.log(res);
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   } finally {
     visible.value = false;
     initGrid();
@@ -392,7 +392,7 @@ const saveButton2 = async () => {
     });
     return;
   }
-  console.log(cAllStateRow2.value);
+  //console.log(cAllStateRow2.value);
   try {
     if (cAllStateRow2.value.created.length > 0) {
       const IlngCode = updatedRow2.value
@@ -409,7 +409,7 @@ const saveButton2 = async () => {
         2,
         "I"
       );
-      console.log(res);
+      //console.log(res);
     }
 
     if (cAllStateRow2.value.updated.length > 0) {
@@ -427,7 +427,7 @@ const saveButton2 = async () => {
         2,
         "U"
       );
-      console.log(res);
+      //console.log(res);
     }
     Swal.fire({
       title: "성공",
@@ -438,7 +438,7 @@ const saveButton2 = async () => {
 
     //console.log(res);
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   } finally {
     visible.value = false;
     initGrid();
@@ -452,12 +452,12 @@ const saveButton2 = async () => {
 const lngStoreCode = async (e) => {
   //initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreCode2 = async (e) => {
   //initGrid();
   selectedStores2.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 /**
@@ -506,13 +506,13 @@ const clickedRowData = async (e) => {
   cond2.value = e[1];
 
   const res = await getGFTMaster2(store.state.userData.lngStoreGroup, e[0]);
-  console.log(res);
+  //console.log(res);
   rowData2.value = res.data.List;
   updatedRow2.value = JSON.parse(JSON.stringify(res.data.List));
   cond3.value = e[0];
 };
 const clickedRowData2 = async (e) => {
-  console.log(e);
+  //console.log(e);
   cond4.value = e[1];
   cond5.value = e[2];
 };

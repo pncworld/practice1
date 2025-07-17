@@ -247,7 +247,7 @@ const buttonClicked = (e) => {
   const newdate = new Date(temp);
 
   newdate.setDate(newdate.getDate() + 61);
-  // console.log(newdate);
+  // //console.log(newdate);
   cond5.value = newdate.toISOString().split("T")[0];
   visible2.value = true;
 };
@@ -299,7 +299,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -319,7 +319,7 @@ const saveButton = async () => {
       store.state.userData.lngSequence
     );
 
-    console.log(res);
+    //console.log(res);
     Swal.fire({
       title: "성공",
       text: "유효기간을 저장하였습니다.",

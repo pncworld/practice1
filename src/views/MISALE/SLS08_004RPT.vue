@@ -77,8 +77,8 @@
         :setFooter="true"
         :mergeMask="''"
         :setMergeMode="false"
-        :setGroupSumCustomColumnId="['dtmDate']"
-        :setGroupSumCustomText="['소계']"
+        :setGroupSumCustomColumnId="['strName']"
+        :setGroupSumCustomText="['매장소계']"
         :setGroupFooter="setGroupFooter"
         :setGroupColumnId="setGroupColumnId"
         :setGroupFooterExpressions="setGroupFooterExpressions"
@@ -310,6 +310,7 @@ const lngStoreGroup = (e) => {
 
 const lngStoreCodes = (e) => {
   selectedStores.value = e;
+  initGrid();
   //comsole.log(e);
 };
 
@@ -319,6 +320,7 @@ const lngStoreCodes = (e) => {
 
 const lngStoreAttrs = (e) => {
   selectedStoreAttrs.value = e;
+  initGrid();
   //comsole.log(e);
 };
 /**
@@ -327,6 +329,7 @@ const lngStoreAttrs = (e) => {
 
 const lngSupervisor = (e) => {
   selectedStoreSuperVisor.value = e;
+  initGrid();
   //comsole.log(e);
 };
 /**
@@ -335,6 +338,7 @@ const lngSupervisor = (e) => {
 
 const lngStoreTeam = (e) => {
   selectedStoreTeam.value = e;
+  initGrid();
   //comsole.log(e);
 };
 
@@ -441,13 +445,13 @@ const cellUnite = (e) => {
 const tempSum = ref(false);
 const showSum = (e) => {
   if (e.target.checked) {
-    //tempSum.value = true
+    tempSum.value = true;
 
     setGroupColumnId.value = "strName";
     setGroupFooter.value = true;
     reload.value = !reload.value;
   } else {
-    //tempSum.value = false
+    tempSum.value = false;
     setGroupColumnId.value = "";
     setGroupFooter.value = false;
     reload.value = !reload.value;
@@ -458,7 +462,7 @@ const showSum = (e) => {
  */
 
 const changeInit = (e) => {
-  initGrid();
+  //initGrid();
 };
 </script>
 

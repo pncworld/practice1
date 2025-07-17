@@ -23,7 +23,7 @@
   </div>
   <div
     class="grid grid-rows-2 grid-cols-1 justify-between bg-gray-200 rounded-lg h-28 items-start z-10">
-    <div class="ml-4">
+    <div class="ml-16">
       <PickStoreRenew
         @lngStoreCode="lngStoreCode"
         @lngStoreGroup="lngStoreGroup"
@@ -180,7 +180,7 @@ const searchButton = async () => {
       compday_1,
       compday2_1
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     preview.value =
@@ -314,7 +314,7 @@ const saveButton = async () => {
       inputview.value
     );
 
-    console.log(res);
+    //console.log(res);
     Swal.fire({
       title: "완료",
       text: "저장이 완료되었습니다.",

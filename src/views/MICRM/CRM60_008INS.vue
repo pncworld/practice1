@@ -402,7 +402,7 @@ const searchButton = async () => {
       ed.value,
       cond3.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -447,9 +447,9 @@ const saveButton = async () => {
       pcond22.value,
       store.state.userData.lngSequence
     );
-    console.log(res);
+    //console.log(res);
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   } finally {
     visible.value = false;
     initGrid();
@@ -482,9 +482,9 @@ const saveButton2 = async () => {
       pcond1.value,
       store.state.userData.lngSequence
     );
-    console.log(res);
+    //console.log(res);
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   } finally {
     visible2.value = false;
     initGrid();
@@ -498,12 +498,12 @@ const saveButton2 = async () => {
 const lngStoreCode = async (e) => {
   //initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreCode2 = async (e) => {
   //initGrid();
   selectedStores2.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 /**
@@ -548,7 +548,7 @@ const selectedCardNo = ref("");
 const selectedDate2 = ref("");
 const selectedStoreCd = ref("");
 const clickedRowData = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedCardNo.value = e[15];
   selectedDate2.value = e[3];
   selectedStoreCd.value = e[14];

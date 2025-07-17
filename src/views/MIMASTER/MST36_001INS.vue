@@ -939,7 +939,7 @@ const lngStoreGroup = (e) => {
 };
 
 const lngStoreCode = (e) => {
-  console.log(e);
+  //console.log(e);
   nowStoreCd.value = e;
 };
 const initCheckColumn = ref("menuCd");
@@ -964,14 +964,14 @@ const rowData4 = ref([]);
 const rowData5 = ref([]);
 const showPopUp = async () => {
   let checkRowDataArr = clickedrowdata.value.split(",");
-  console.log(rowData2.value);
+  //console.log(rowData2.value);
   rowData4.value = rowData2.value.filter((item) =>
     checkRowDataArr.includes(item.menuCd)
   );
 
   const res3 = await getPayCodeListbyCode(groupCd.value, gridvalue5.value);
-  console.log(res3);
-  console.log(rowData4.value);
+  //console.log(res3);
+  //console.log(rowData4.value);
   rowData5.value = res3.data.List;
   store.state.inActiveBackGround = true;
   discountMenuShow.value = true;
@@ -1094,7 +1094,7 @@ const clickedRowData = (newvalue) => {
       }
     }
   }
-  console.log(newvalue);
+  //console.log(newvalue);
   clickedrowdata.value = newvalue[27];
   gridvalue1.value = newvalue[4];
   gridvalue2.value = newvalue[21];
@@ -1127,7 +1127,9 @@ const clickedRowData = (newvalue) => {
   gridvalue24.value = newvalue[17];
   gridvalue25.value = newvalue[26];
 
-  if (
+  if (newvalue[2] == undefined || newvalue[2] == null) {
+    selectedPayDistinct.value = true;
+  } else if (
     (newvalue[2].toString().startsWith("24") ||
       newvalue[2].toString().startsWith("1")) &&
     newvalue[4] == "1" &&
@@ -1324,9 +1326,9 @@ const searchButton = async () => {
       groupCd.value,
       nowStoreCd.value
     );
-    console.log(res);
-    console.log(res2);
-    // console.log(res2.data.menuList);
+    //console.log(res);
+    //console.log(res2);
+    // //console.log(res2.data.menuList);
     rowData2.value = res2.data.menuList;
     SubMenuGroup.value = res2.data.submenuGroup;
     MenuGroup.value = res2.data.menuGroup;
@@ -1548,7 +1550,7 @@ const forCopyArr = ref([]);
  */
 
 const checkedRowData5 = (e) => {
-  console.log(e);
+  //console.log(e);
   forCopyArr.value = e.map((item) => item.lngCode);
 };
 

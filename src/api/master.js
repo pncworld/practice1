@@ -2252,6 +2252,7 @@ export const getSubGroup2 = (groupCd, storeCd) => {
     STORE_CD: storeCd,
   });
 };
+
 export const getMultiGroup = (groupCd) => {
   return api2.post("/MIMASTER/MST37_068INS.asmx/getMultiGroup", {
     GROUP_CD: groupCd,
@@ -2466,5 +2467,41 @@ export const getSubTitleList = (groupCd, storeCd) => {
   return api2.post("/MIMASTER/MST37_001INS.asmx/getSubTitleList", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
+  });
+};
+export const deleteSubTitles = (groupCd, storeCd, lngCode) => {
+  return api2.post("/MIMASTER/MST37_001INS.asmx/deleteSubTitles", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LNG_CODE: lngCode,
+  });
+};
+export const saveSubTitle = (
+  groupCd,
+  storeCd,
+  lngCode,
+  strName,
+  lngmenu1,
+  lngmenu2,
+  lngmenu3,
+  lngmenu4,
+  lngmenu5,
+  lngmenu6,
+  lngmenu7,
+  lngmenu8
+) => {
+  return api2.post("/MIMASTER/MST37_001INS.asmx/saveSubTitle", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LNG_CODE: lngCode,
+    STRNAME: strName,
+    LNGMENU1: lngmenu1,
+    LNGMENU2: lngmenu2,
+    LNGMENU3: lngmenu3,
+    LNGMENU4: lngmenu4,
+    LNGMENU5: lngmenu5,
+    LNGMENU6: lngmenu6,
+    LNGMENU7: lngmenu7,
+    LNGMENU8: lngmenu8,
   });
 };

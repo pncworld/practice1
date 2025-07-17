@@ -119,7 +119,7 @@ onMounted(async () => {
 
     rowData2.value = res.data.List2;
 
-    // console.log(res);
+    // //console.log(res);
   }
 
   if (
@@ -131,7 +131,7 @@ onMounted(async () => {
       userdata.lngPosition,
       userdata.lngSequence
     );
-    // console.log(res);
+    // //console.log(res);
     rowData3.value = res.data.List;
     rowData4.value = res.data.List2;
   }

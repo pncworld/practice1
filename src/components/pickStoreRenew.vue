@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-start text-sm items-center w-[500px] ml-12 mt-2">
+  <div class="flex justify-start text-sm items-center w-[500px] mt-2">
     <div class="items-center font-bold text-base flex">매장명</div>
     <div v-if="hideit">
       <select
@@ -143,7 +143,7 @@ watch(
 onMounted(() => {
   defaultPlaceHolder.value = props.placeholderName;
   selectedGroup.value = store.state.storeGroup[0].lngStoreGroup;
-  console.log(storeCd.value);
+  //console.log(storeCd.value);
   if (
     store.state.userData.blnBrandAdmin == "True" ||
     store.state.userData.lngPositionType == "1"

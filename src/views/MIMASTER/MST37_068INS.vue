@@ -228,14 +228,14 @@ const mainCode = (e) => {
 
 const checkedDatas = ref([]);
 const checkedRowData = (e) => {
-  console.log(e);
+  //console.log(e);
   checkedDatas.value = e.map((item) => item.lngMenuPrice);
-  console.log(checkedDatas.value);
+  //console.log(checkedDatas.value);
 };
 const checkedIndexs = ref([]);
 const checkedRowIndex = (e) => {
   checkedIndexs.value = e;
-  // console.log(e);
+  // //console.log(e);
 };
 
 const updateRowData = ref([]);
@@ -324,7 +324,7 @@ const searchButton = async () => {
       selectedSubGroup.value,
       cond.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
     updateRowData.value = JSON.parse(JSON.stringify(res.data.List));
     afterSearch.value = true;
@@ -350,8 +350,8 @@ const saveButton = async (e) => {
   // const filteredData = updateRowData.value.filter(
   //   (item) => item.lngMultiPrice != undefined
   // );
-  // console.log(filteredData);
-  // console.log(store.state.userData.lngStoreGroup);
+  // //console.log(filteredData);
+  // //console.log(store.state.userData.lngStoreGroup);
   try {
     store.state.loading = true;
     // initGrid();
@@ -376,10 +376,10 @@ const saveButton = async (e) => {
       lngMenucodes,
       lngMultiPrice
     );
-    console.log(res);
+    //console.log(res);
     store.state.loading = false;
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -398,12 +398,12 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreGroup = async (e) => {
   //initGrid();
   selectedGroup.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 /**

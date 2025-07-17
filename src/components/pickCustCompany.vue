@@ -85,7 +85,7 @@ const emit = defineEmits([
 ]);
 
 onMounted(async () => {
-  console.log(store.state.userData);
+  //console.log(store.state.userData);
 
   if (props.setAPI == "0") {
     const res = await getCustCompany(
@@ -107,7 +107,7 @@ onMounted(async () => {
       store.state.userData.lngPosition
     );
 
-    console.log(res);
+    //console.log(res);
 
     storeCd.value = res.data.List;
     emit("excelStore", "사업장명 : 전체");

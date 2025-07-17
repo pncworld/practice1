@@ -635,7 +635,7 @@ const searchButton = async () => {
       nowStoreAreaCd.value
     );
 
-    console.log(res2);
+    //console.log(res2);
     tableList.value = res2.data.TABLELISTS;
     //comsole.log(tableList.value);
     filteredtableList.value = tableList.value
@@ -753,9 +753,7 @@ function handleDragStop(grid, element) {
 
 function handleResizeStop(grid, element) {
   const node = element.gridstackNode;
-  console.log(
-    `You just resized node #${node.id} to width: ${node.w}, height: ${node.h} – good job!`
-  );
+  //console.log(`You just resized node #${node.id} to width: ${node.w}, height: ${node.h} – good job!`);
 
   let changed = false;
 
@@ -1432,7 +1430,7 @@ const saveButton = async () => {
           ScreenKeyNms.join(","),
           ScreenKeyNos.join(",")
         );
-        console.log(res);
+        //console.log(res);
         //comsole.log(tableList.value);
         const intScreenNos = tableList.value.map((item) => item.intScreenNo);
         const ids = tableList.value.map((item) =>
@@ -1503,7 +1501,7 @@ const saveButton = async () => {
           newtableCount.join(",")
         );
 
-        console.log(res2);
+        //console.log(res2);
       } catch (error) {
         //comsole.log(error);
       } finally {

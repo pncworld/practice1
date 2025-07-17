@@ -105,6 +105,7 @@
 import { alreadyMobileLogined } from "@/api/common";
 import { getMobileProgList, mobileLogin } from "@/api/mobile";
 import loading from "@/components/loading.vue";
+import { insertMobileLoginLog } from "@/customFunc/customFunc";
 /*
  * 공통 표준  Function
  */
@@ -146,7 +147,7 @@ const login2 = async () => {
   store.state.selectedCategoryId = null;
   try {
     const response = await mobileLogin(username.value, password.value);
-    //comsole.log(response);
+    console.log(response);
 
     if (response.data.RESULT_CD == "00") {
       // store.state.userData = response.data.loginSession[0];
@@ -154,6 +155,14 @@ const login2 = async () => {
       store.dispatch("updateUserData", response.data.loginSession[0]);
       store.dispatch("setToken", response.data.loginSession[0].SessionToken);
       //comsole.log(response.data.loginSession[0]);
+
+      // const res = await insertMobileLoginLog(
+      //   username.value,
+      //   password.value,
+      //   response.data.loginSession[0].lngStoreGroup,
+      //   response.data.loginSession[0].lngPosition
+      // );
+
       message.value = "로그인 성공";
       const readPrograms = async () => {
         const response = await getMobileProgList(
@@ -170,7 +179,7 @@ const login2 = async () => {
           PROGID: item.PROGRAM_ID,
           PROGNM: item.PROGRAM_NM,
         }));
-        console.log(result);
+        //console.log(result);
 
         const result3 = response.data.List3;
 
@@ -212,7 +221,7 @@ const login2 = async () => {
       throw new Error("로그인 실패");
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
     message.value = "오류 발생";
   } finally {
     store.state.loading2 = false;

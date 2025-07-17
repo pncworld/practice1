@@ -160,7 +160,7 @@ const allStateRows = (e) => {
   updateStateRow.value = e;
 };
 const sendRowState = (e) => {
-  console.log(e);
+  //console.log(e);
   if (e == "created") {
     disablegrid.value = false;
   } else {
@@ -197,7 +197,7 @@ const searchButton = async () => {
     initGrid();
     reload.value = !reload.value;
     const res = await getPayEnroll(store.state.userData.lngStoreGroup);
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
     updateRow.value = JSON.parse(JSON.stringify(res.data.List));
     afterSearch.value = true;
@@ -302,8 +302,8 @@ const editButton = () => {
     });
     return;
   }
-  console.log(changeRow.value);
-  console.log(updateRow.value);
+  //console.log(changeRow.value);
+  //console.log(updateRow.value);
   const editname = ref(
     updateRow.value.filter((item, index) => index == changeRow.value)[0].strName
   );
@@ -395,7 +395,7 @@ const saveButton = async () => {
     });
     return;
   }
-  // console.log(updateStateRow.value);
+  // //console.log(updateStateRow.value);
   if (
     updateStateRow.value.updated.length == 0 &&
     updateStateRow.value.created.length == 0
@@ -461,7 +461,7 @@ const saveButton = async () => {
       );
     }
 
-    console.log(res);
+    //console.log(res);
     if (res.data.RESULT_CD == "99") {
       Swal.fire({
         title: "실패",
@@ -496,7 +496,7 @@ const deleteButton = async () => {
     });
     return;
   }
-  // console.log(updateStateRow.value);
+  // //console.log(updateStateRow.value);
   if (updateRow.value.filter((item) => item.checkbox == true).length == 0) {
     Swal.fire({
       title: "경고",

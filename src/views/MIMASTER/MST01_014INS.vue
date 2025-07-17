@@ -252,7 +252,7 @@ const saveButton = async () => {
       MenuCds,
       lngPrices
     );
-    console.log(res);
+    //console.log(res);
 
     Swal.fire({
       title: "성공",
@@ -278,12 +278,12 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreGroup = async (e) => {
   //initGrid();
   selectedGroup.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 /**

@@ -18,8 +18,8 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-2 mt-1">
+      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
+      <div class="grid grid-cols-1 grid-rows-2">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
@@ -28,7 +28,7 @@
           @excelDate="excelDate"
           :mainName="'기간'"
           :initToday="1"></Datepicker2>
-        <div class="flex space-x-3 text-base font-semibold ml-44 mt-3">
+        <div class="flex space-x-3 text-base font-semibold ml-12 mt-3">
           <div class="space-x-3">
             <label for="sum"
               ><input
@@ -47,7 +47,7 @@
           </div>
         </div>
       </div>
-      <div class="ml-20">
+      <div class="">
         <PickStoreSingle
           @lngStoreCode="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"
@@ -227,7 +227,7 @@ const searchButton = async () => {
       selectedstartDate.value,
       selectedendDate.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;

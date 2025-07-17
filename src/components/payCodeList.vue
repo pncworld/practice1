@@ -43,7 +43,7 @@ onMounted(async () => {
   emit("payNm", "전체");
 
   const res = await getpayCodeList(store.state.userData.lngStoreGroup, 0);
-  // console.log(res);
+  // //console.log(res);
   payCodeList.value = res.data.PAYCDLIST;
 });
 watch(
@@ -51,7 +51,7 @@ watch(
   async () => {
     const res = await getpayCodeList(props.groupCd, props.storeCd);
     payCodeList.value = res.data.PAYCDLIST;
-    console.log(res);
+    //console.log(res);
     ////comsole.log(res)
   }
 );

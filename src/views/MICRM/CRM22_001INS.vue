@@ -622,7 +622,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -668,9 +668,9 @@ const currentCouponCode = ref("");
 
 const addOn = ref(false);
 const buttonClicked = async (e) => {
-  console.log(e);
+  //console.log(e);
   if (e[0] == " ") {
-    console.log(tempCouponInfo.value);
+    //console.log(tempCouponInfo.value);
     gridValue.value = tempCouponInfo.value.gridValue;
     gridValue2.value = tempCouponInfo.value.gridValue2;
     gridValue3.value = tempCouponInfo.value.gridValue3;
@@ -713,7 +713,7 @@ const buttonClicked = async (e) => {
       rowData3.value = res.data.List3;
       rowData4.value = res.data.List4;
       rowData5.value = res.data.List5;
-      console.log(res.data);
+      //console.log(res.data);
 
       clickButton.value = true;
       addOn.value = false;
@@ -774,7 +774,7 @@ watch(gridValue9, () => {
 });
 
 watch(gridValue11, () => {
-  console.log(optionList3.value);
+  //console.log(optionList3.value);
 
   const matchedItem = optionList3.value.find(
     (item) => item.strSenderNumber == gridValue11.value
@@ -944,8 +944,8 @@ const searchMenu = async (e) => {
 
 const moveRight = () => {
   //moveRightList.value = rowData7.value.filter(item => item. )
-  // console.log(rowData7.value);
-  // console.log(moveRightList.value);
+  // //console.log(rowData7.value);
+  // //console.log(moveRightList.value);
   const filteredRowData = moveRightList.value
     .filter(
       (item) => !rowData7.value.some((item2) => item2.lngCode === item.lngCode)
@@ -981,7 +981,7 @@ const setHeaderShare = async () => {
       await nextTick();
     }
   } else {
-    console.log(checkedRightList.value);
+    //console.log(checkedRightList.value);
     for (let i = 0; i < checkedRowIndexArr.value.length; i++) {
       changeRow.value = checkedRowIndexArr.value[i];
       changeValue2.value =
@@ -997,7 +997,7 @@ const setHeaderShare = async () => {
 };
 
 const setMenu = (e) => {
-  // console.log(updateRowData7.value);
+  // //console.log(updateRowData7.value);
   if (e == 1 || e == 3) {
     if (
       updateRowData7.value.filter(
@@ -1025,7 +1025,7 @@ const setMenu = (e) => {
     openpop2.value = false;
   }
 
-  console.log(updateRowData7.value);
+  //console.log(updateRowData7.value);
 };
 
 const hideColumnsId = ref([]);
@@ -1125,7 +1125,7 @@ const saveButton = async () => {
       rowData5.value.map((item) => item.lngCode).join(";")
     );
 
-    console.log(res);
+    //console.log(res);
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
         title: "성공",

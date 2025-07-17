@@ -364,7 +364,7 @@ const LCLASS_CD = ref('')
 const SCLASS_CD = ref('')
 const FILTERDATA = (e) => {
   FirstSearch.value = true
-  console.log(e);
+  //console.log(e);
   LCLASS_CD.value = e[0].LCLASS_CD;
   SCLASS_CD.value = e[0].SCLASS_CD;
   cond1.value = e[0].FULL_NM;
@@ -476,8 +476,8 @@ watch((alltime) ,() => {
 
 const reSearch = ref(false)
 const saveButton = async (e) => {
-  // console.log(alldate.value)
-  // console.log(cond2.value == undefined)
+  // //console.log(alldate.value)
+  // //console.log(cond2.value == undefined)
 
   if(alldate.value == true){
     cond2.value = new Date().toISOString().split('T')[0]
@@ -522,8 +522,8 @@ const saveButton = async (e) => {
       return;
   }
 
-  // console.log(cond2.value)
-  // console.log(cond5.value)
+  // //console.log(cond2.value)
+  // //console.log(cond5.value)
   if(cond3.value == cond6.value && cond4.value == cond7.value){
     Swal.fire({
         title: "경고",
@@ -586,7 +586,7 @@ seeday += '0'
     let ftime = String(cond3.value).padStart(2, '0') +String(cond4.value).padStart(2, '0')
     let etime = String(cond6.value).padStart(2, '0') +String(cond7.value).padStart(2, '0')
     const res = await SetSClassStkRgst(selectGroupCd.value , selectStoreCd.value , LCLASS_CD.value , SCLASS_CD.value , cond8.value , alldate.value == true ? 1 : 0 , cond2.value , cond5.value , seeday , alltime.value == true ? 1 : 0 , ftime, etime )
-     console.log(res)
+     //console.log(res)
 
     if(res.data.Result =='00'){
       Swal.fire({

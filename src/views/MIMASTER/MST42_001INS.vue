@@ -577,7 +577,7 @@ const saveButton = async () => {
         .join("\u200b");
       const res = await deleteClientInfo(groups, supplierid, suppliertype);
 
-      console.log(res);
+      //console.log(res);
     }
     Swal.fire({
       title: "성공",
@@ -586,7 +586,7 @@ const saveButton = async () => {
       confirmButtonText: "확인",
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   } finally {
     store.state.loading = false;
     searchButton();

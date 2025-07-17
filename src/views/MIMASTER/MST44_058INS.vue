@@ -635,8 +635,8 @@ const showScreenKeysOrder = () => {
 };
 
 const onChoose = (e) => {
-  // console.log(e.oldIndex);
-  // console.log(KeyList.value);
+  // //console.log(e.oldIndex);
+  // //console.log(KeyList.value);
   clickedStrIcon.value = KeyList.value[e.oldIndex].strIcon;
 };
 
@@ -1038,7 +1038,7 @@ const addKey = () => {
 watch(
   () => KeyList.value,
   () => {
-    console.log(KeyList.value);
+    //console.log(KeyList.value);
   }
 );
 /**

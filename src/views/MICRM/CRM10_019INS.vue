@@ -216,7 +216,7 @@ const searchButton = async () => {
     initGrid();
     reload.value = !reload.value;
     const res = await getReservedNum(selectedGroup.value, selectedStores.value);
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;

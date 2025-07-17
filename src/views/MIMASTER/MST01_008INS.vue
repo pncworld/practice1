@@ -251,7 +251,7 @@ const searchButton = async () => {
 
     confirmData.value = rowData.value;
     confirmData2.value = rowData2.value;
-    console.log(res);
+    //console.log(res);
     //comsole.log(rowData2.value);
   } catch (error) {
     afterSearch.value = false;

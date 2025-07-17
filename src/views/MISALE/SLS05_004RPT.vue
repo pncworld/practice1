@@ -379,7 +379,7 @@ const searchButton = async () => {
       selectedRadioBox.value,
       selectedBuyCodeValue
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.cardSalesSum;
 
     afterSearch.value = true;
@@ -442,7 +442,7 @@ const lngSupervisor = (e) => {
 const lngStoreTeam = (e) => {
   initGrid();
   selectedStoreTeam.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 /* 매입사 콤보박스 */

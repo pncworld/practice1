@@ -106,6 +106,7 @@
             :changeRow="changeRow"
             :changeValue2="changeValue"
             :changeNow="changeNow"
+            :checkRenderEditable="true"
             @realgridname="realgridname2"
             :rowStateeditable="false"></Realgrid>
         </div>

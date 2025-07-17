@@ -28,7 +28,7 @@
         @excelDate="excelDate"></Datepicker3>
     </div>
 
-    <div class="mr-28">
+    <div class="mr-40">
       <PickStoreRenew
         @lngStoreCode="lngStoreCodes"
         @lngStoreGroup="lngStoreGroup"

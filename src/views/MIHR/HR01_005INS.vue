@@ -606,7 +606,7 @@ import { Store, useStore } from "vuex";
 
 const selectEMP = () => {
   openPopUp.value = true;
-  console.log("왓음");
+  //console.log("왓음");
 };
 const openPopUp = ref(false);
 const disableAll = ref(true);
@@ -744,7 +744,7 @@ const addButton = () => {
   const newCode =
     Math.max(0, ...updateRow.value.map((item) => item.lngChargerCode)) + 1;
   const storeNm = store.state.userData.strStoreName;
-  // /console.log(storeNm);
+  // ///console.log(storeNm);
   addrowDefault.value =
     groupCd.value +
     "," +
@@ -765,7 +765,7 @@ const addButton = () => {
  */
 
 const clickedRowData = (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
   // gridvalue1.value = newValue[1];
   // gridvalue2.value = newValue[4];
   // gridvalue3.value = newValue[3];
@@ -931,7 +931,7 @@ const searchButton = async () => {
 
     rowData.value = res.data.List;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -1141,7 +1141,7 @@ const saveButton = async () => {
           lngSequence.join("\u200b"),
           lngWorkClass.join("\u200b")
         );
-        console.log(res);
+        //console.log(res);
         Swal.fire({
           title: "저장 되었습니다.",
           confirmButtonText: "확인",

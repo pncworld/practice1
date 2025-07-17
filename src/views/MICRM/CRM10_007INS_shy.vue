@@ -214,7 +214,7 @@ onMounted(async () => {
   optionList.value = res.data.List;
   optionList2.value = res2.data.List;
   optionList3.value = res3.data.List;
-  console.log(optionList2.value);
+  //console.log(optionList2.value);
   reload.value = !reload.value;
 });
 
@@ -229,7 +229,7 @@ const store = useStore();
 const clickedRowData = (e) => {
   disablegrid.value = true;
   insertupdatedelete.value = 2;
-  console.log(e);
+  //console.log(e);
   gridvalue1.value = e[6];
   gridvalue2.value = e[7];
   gridvalue3.value = e[8];
@@ -260,7 +260,7 @@ const searchButton = async () => {
       selectedGroup.value,
       selectedStores.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;

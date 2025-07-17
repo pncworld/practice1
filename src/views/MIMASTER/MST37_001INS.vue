@@ -139,7 +139,7 @@
     </div>
   </div>
 
-  <div
+  <!-- <div
     v-if="selectMenuGroup"
     class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
     <div class="bg-white p-6 rounded shadow-lg w-[60%] h-[60%]">
@@ -201,7 +201,7 @@
         </button>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <span
     class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[70%] z-40">
@@ -211,7 +211,7 @@
     <div class="flex flex-col w-full h-full">
       <div
         class="flex justify-between mt-0 ml-10 w-[65%] border-b border-b-gray-300">
-        <div></div>
+        <div class="text-xl font-semibold">서브 타이틀 목록</div>
         <div class="mt-3 gap-1 flex">
           <!-- <button class="whitebutton" @click="searchMenuList3">조회</button> -->
           <button
@@ -224,18 +224,6 @@
             class="whitebutton"
             v-if="currentMenu == false"
             @click="deleteRowData1">
-            삭제
-          </button>
-          <button
-            class="whitebutton"
-            v-if="currentMenu == true"
-            @click="addRowData3">
-            추가
-          </button>
-          <button
-            class="whitebutton"
-            v-if="currentMenu == true"
-            @click="deleteRowData3">
             삭제
           </button>
         </div>
@@ -255,7 +243,7 @@
                 v-model="searchword1" />
             </div>
           </div>
-          <div class="ml-10 mt-5 w-full h-[140%]">
+          <div class="ml-10 mt-5 w-full h-[125%]">
             <!-- 옵션관리 그리드-->
             <Realgrid
               class="w-full h-full mt-2"
@@ -269,15 +257,15 @@
               :changeColid="changeColid"
               :changeValue2="changeValue"
               :searchWord3="searchword1"
-              :labelingColumns="'blnMustSel'"
-              :labelsData="labelData"
-              :valuesData="valueData"
               :searchColId="'lngCode,strName'"
-              :deleteRow="deleterow1"
-              :addRow3="addrow1"
+              :deleteRow6="deleterow1"
+              :addRow5="addrow1"
+              @allStateRows="allStateRows"
               @selectedIndex2="selectedIndex"
               @realgridname="realgridname"
               :addrowProp="addrowProp"
+              :addrowDefault="addrowDefault"
+              @sendRowState="sendRowState"
               :selectionStyle="'singleRow'"
               :rowStateeditable="false"
               :initSelect="initSelect"
@@ -302,7 +290,7 @@
                 name="lngCode"
                 class="border border-gray-300 rounded-lg w-full h-full p-2"
                 v-model="optionCd"
-                :disabled="!(isNewColumn && clickrowData1)"
+                :disabled="isNewColumn"
                 @input="changeOptionManage1" />
             </div>
             <div
@@ -345,9 +333,7 @@
               :rowStateeditable="false"
               :deleteRow="deleterow3"
               :deleteAll="deleteAll1"
-              :initSelect="initSelect"
-              :addrowProp="addrowProp2"
-              :addRow3="addrow4"></Realgrid>
+              :initSelect="initSelect"></Realgrid>
           </div>
         </div>
       </div>
@@ -358,11 +344,12 @@
 
 <script setup>
 import {
-  getAllOptionManageData,
+  deleteSubTitles,
   getMostColumnMenuList,
   getSubTitleList,
   saveOptions,
   saveOptions2,
+  saveSubTitle,
 } from "@/api/master";
 /*
  * 공통 표준  Function
@@ -398,7 +385,6 @@ import Swal from "sweetalert2";
  *  리얼그리드 라이브러리 호출
  *  */
 
-import RealGrid from "realgrid";
 /**
  *  페이지로그 자동 입력
  *  */
@@ -552,8 +538,9 @@ const handleStoreCd = async (newValue) => {
   if (newValue == "0") {
     afterSearch.value = false;
   }
-  console.log(newValue);
+  //console.log(newValue);
   nowStoreCd.value = newValue;
+  addrowDefault.value = `${groupCd.value},${nowStoreCd.value},,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,`;
 };
 const selectedButton = ref();
 const Category = ref([]);
@@ -586,22 +573,15 @@ const optionCd = ref();
 const optionNm = ref();
 const optionNo = ref();
 const addrowProp = ref(
-  "lngCode,strName,blnMustSel,intMultiple,lngChainMenu1,lngChainMenu2,lngChainMenu3,lngChainMenu4,lngChainMenu5,lngChainMenu6,lngChainMenu7,lngChainMenu8,lngChainMenu9,lngChainMenu10,lngChainMenu11,lngChainMenu12,lngChainMenu13,lngChainMenu14,lngChainMenu15,lngChainMenu16,lngChainMenu17,lngChainMenu18,lngChainMenu19,lngChainMenu20,lngChainMenu21"
-);
-const addrowProp2 = ref(
-  "lngCode,strName,lngChainGroup1,lngChainGroup2,lngChainGroup3,lngChainGroup4,lngChainGroup5,lngChainGroup6,lngChainGroup7,lngChainGroup8,lngChainGroup9,lngChainGroup10,lngChainGroup11,lngChainGroup12,lngChainGroup13,lngChainGroup14,lngChainGroup15,lngChainGroup16,lngChainGroup17,lngChainGroup18,lngChainGroup19,lngChainGroup20"
+  "lngStoreGroup,lngStoreCode,lngCode,strName,lngMenu1,strMenuName1,lngPrice1,lngMenu2,strMenuName2,lngPrice2,lngMenu3,strMenuName3,lngPrice3,lngMenu4,strMenuName4,lngPrice4,lngMenu5,strMenuName5,lngPrice5,lngMenu6,strMenuName6,lngPrice6,lngMenu7,strMenuName7,lngPrice7,lngMenu8,strMenuName8,lngPrice8"
 );
 
-const showMenus = (newValue) => {
-  if (newValue == 1) {
-    currentMenu.value = false;
-  } else if (newValue == 2) {
-    currentMenu.value = true;
-  }
-};
+const addrowDefault = ref(
+  `${groupCd.value},${nowStoreCd.value},null,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,`
+);
 
 const initSelect = ref(false);
-const isNewColumn = ref(false);
+const isNewColumn = ref(true);
 const isNewColumn2 = ref(false);
 const clickrowData1 = ref(false);
 /**
@@ -610,15 +590,15 @@ const clickrowData1 = ref(false);
 
 const clickedRowData = (newValue) => {
   clickrowData1.value = true;
-  console.log(newValue);
+  //console.log(newValue);
   if (newValue == undefined) {
     return;
   }
-  selectedOptionCd.value = Number(newValue[3]);
-  isNewColumn.value = newValue[26] == true ? true : false;
+  selectedOptionCd.value = newValue[3] == "" ? "" : Number(newValue[3]);
+
   filteredrowData2.value = [];
   for (var i = 0; i < 8; i++) {
-    if (newValue[5 + 3 * i] != "0") {
+    if (newValue[5 + 3 * i] != "0" && newValue[5 + 3 * i] != "") {
       filteredrowData2.value.push({
         lngCode: newValue[5 + 3 * i],
         strName: newValue[6 + 3 * i],
@@ -629,7 +609,7 @@ const clickedRowData = (newValue) => {
     }
   }
 
-  optionCd.value = Number(newValue[3]);
+  optionCd.value = newValue[3] == "" ? "" : Number(newValue[3]);
   optionNm.value = newValue[4];
 };
 const selectedOptionGroupCd = ref();
@@ -703,8 +683,8 @@ const searchButton = async () => {
     //const res3 = await getAllOptionManageData(groupCd.value, nowStoreCd.value);
     const res3 = await getSubTitleList(groupCd.value, nowStoreCd.value);
     const res4 = await getMostColumnMenuList(groupCd.value, nowStoreCd.value);
-    console.log(res3);
-    console.log(res4);
+    //console.log(res3);
+    //console.log(res4);
     rowData1.value = res3.data.List;
     // rowData2.value = res3.data.MENULIST;
     // rowData3.value = res3.data.OPTIONGROUPMANAGE;
@@ -752,32 +732,19 @@ const saveButton = async () => {
     });
     return;
   }
-  if (currentMenu.value == false) {
-    if (
-      JSON.stringify(confirmitem.value) ===
-      JSON.stringify(updatedRowData4.value)
-    ) {
-      Swal.fire({
-        title: "경고",
-        text: "변경된 사항이 없습니다.",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
-      return;
-    }
-  } else {
-    if (
-      JSON.stringify(confirmitem2.value) ===
-      JSON.stringify(updatedRowData5.value)
-    ) {
-      Swal.fire({
-        title: "경고",
-        text: "변경된 사항이 없습니다.",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
-      return;
-    }
+
+  const sums =
+    allStateRowArr.value.updated.length +
+    allStateRowArr.value.created.length +
+    allStateRowArr.value.deleted.length;
+  if (sums == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "변경된 사항이 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
   }
 
   const undefinededrowlength = updatedRowData4.value
@@ -787,44 +754,18 @@ const saveButton = async () => {
         item.lngCode == "" ||
         item.lngCode == undefined ||
         item.strName == undefined ||
-        item.strName == "" ||
-        item.intMultiple == undefined ||
-        item.intMultiple == "" ||
-        item.blnMustSel == undefined ||
-        item.blnMustSel == ""
-    ).length;
-  const undefinededrow2length = updatedRowData5.value
-    .filter((item) => item.deleted != true)
-    .filter(
-      (item) =>
-        item.lngCode == "" ||
-        item.lngCode == undefined ||
-        item.strName == undefined ||
         item.strName == ""
     ).length;
 
-  if (currentMenu.value == false) {
-    if (undefinededrowlength > 0) {
-      Swal.fire({
-        title: "경고",
-        text: "옵션 정보에 빈 값이 존재합니다",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
-      currentMenu.value = false;
-      return;
-    }
-  } else {
-    if (undefinededrow2length > 0) {
-      Swal.fire({
-        title: "경고",
-        text: "옵션 그룹 정보에 빈 값이 존재합니다",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
-      currentMenu.value = true;
-      return;
-    }
+  if (undefinededrowlength > 0) {
+    Swal.fire({
+      title: "경고",
+      text: "상세 정보에 빈 값이 존재합니다",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    currentMenu.value = false;
+    return;
   }
 
   Swal.fire({
@@ -841,209 +782,185 @@ const saveButton = async () => {
         //comsole.log(updatedRowData4.value);
         //comsole.log(rowData3.value);
 
-        if (currentMenu.value == false) {
+        if (allStateRowArr.value.deleted.length > 0) {
           const lngCodes = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngCode);
-          const strNames = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.strName);
-          const blnMustSels = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.blnMustSel);
-          const intMultiples = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.intMultiple);
-          const lngChainMenu1 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu1);
-          const lngChainMenu2 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu2);
-          const lngChainMenu3 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu3);
-          const lngChainMenu4 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu4);
-          const lngChainMenu5 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu5);
-          const lngChainMenu6 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu6);
-          const lngChainMenu7 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu7);
-          const lngChainMenu8 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu8);
-          const lngChainMenu9 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu9);
-          const lngChainMenu10 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu10);
-          const lngChainMenu11 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu11);
-          const lngChainMenu12 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu12);
-          const lngChainMenu13 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu13);
-          const lngChainMenu14 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu14);
-          const lngChainMenu15 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu15);
-          const lngChainMenu16 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu16);
-          const lngChainMenu17 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu17);
-          const lngChainMenu18 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu18);
-          const lngChainMenu19 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu19);
-          const lngChainMenu20 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu20);
-          const lngChainMenu21 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainMenu21);
+            .filter((item, index) =>
+              allStateRowArr.value.deleted.includes(index)
+            )
+            .map((item) => item.lngCode)
+            .join("\u200b");
+          const groupCds = updatedRowData4.value
+            .filter((item, index) =>
+              allStateRowArr.value.deleted.includes(index)
+            )
+            .map((item) => item.lngStoreGroup)
+            .join("\u200b");
+          const storeCds = updatedRowData4.value
+            .filter((item, index) =>
+              allStateRowArr.value.deleted.includes(index)
+            )
+            .map((item) => item.lngStoreCode)
+            .join("\u200b");
 
-          const res = await saveOptions(
-            groupCd.value,
-            nowStoreCd.value,
-            lngCodes.join(","),
-            strNames.join(","),
-            blnMustSels.join(","),
-            intMultiples.join(","),
-            lngChainMenu1.join(","),
-            lngChainMenu2.join(","),
-            lngChainMenu3.join(","),
-            lngChainMenu4.join(","),
-            lngChainMenu5.join(","),
-            lngChainMenu6.join(","),
-            lngChainMenu7.join(","),
-            lngChainMenu8.join(","),
-            lngChainMenu9.join(","),
-            lngChainMenu10.join(","),
-            lngChainMenu11.join(","),
-            lngChainMenu12.join(","),
-            lngChainMenu13.join(","),
-            lngChainMenu14.join(","),
-            lngChainMenu15.join(","),
-            lngChainMenu16.join(","),
-            lngChainMenu17.join(","),
-            lngChainMenu18.join(","),
-            lngChainMenu19.join(","),
-            lngChainMenu20.join(","),
-            lngChainMenu21.join(",")
-          );
-        } else {
-          const lngCodes2 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngCode);
-          const strNames2 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.strName);
-          const lngChainGroup1 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup1);
-          const lngChainGroup2 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup2);
-          const lngChainGroup3 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup3);
-          const lngChainGroup4 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup4);
-          const lngChainGroup5 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup5);
-          const lngChainGroup6 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup6);
-          const lngChainGroup7 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup7);
-          const lngChainGroup8 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup8);
-          const lngChainGroup9 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup9);
-          const lngChainGroup10 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup10);
-          const lngChainGroup11 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup11);
-          const lngChainGroup12 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup12);
-          const lngChainGroup13 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup13);
-          const lngChainGroup14 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup14);
-          const lngChainGroup15 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup15);
-          const lngChainGroup16 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup16);
-          const lngChainGroup17 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup17);
-          const lngChainGroup18 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup18);
-          const lngChainGroup19 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup19);
-          const lngChainGroup20 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
-            .map((item) => item.lngChainGroup20);
+          const res = await deleteSubTitles(groupCds, storeCds, lngCodes);
 
-          const res = await saveOptions2(
-            groupCd.value,
-            nowStoreCd.value,
-            lngCodes2.join(","),
-            strNames2.join(","),
-            lngChainGroup1.join(","),
-            lngChainGroup2.join(","),
-            lngChainGroup3.join(","),
-            lngChainGroup4.join(","),
-            lngChainGroup5.join(","),
-            lngChainGroup6.join(","),
-            lngChainGroup7.join(","),
-            lngChainGroup8.join(","),
-            lngChainGroup9.join(","),
-            lngChainGroup10.join(","),
-            lngChainGroup11.join(","),
-            lngChainGroup12.join(","),
-            lngChainGroup13.join(","),
-            lngChainGroup14.join(","),
-            lngChainGroup15.join(","),
-            lngChainGroup16.join(","),
-            lngChainGroup17.join(","),
-            lngChainGroup18.join(","),
-            lngChainGroup19.join(","),
-            lngChainGroup20.join(",")
-          );
+          //console.log(res);
         }
 
-        //comsole.log(res);
+        if (currentMenu.value == false) {
+          const lngCodes = updatedRowData4.value
+            .filter(
+              (item, index) =>
+                allStateRowArr.value.created.includes(index) ||
+                allStateRowArr.value.updated.includes(index)
+            )
+            .map((item) => item.lngCode)
+            .join("\u200b");
+          const groupCds = updatedRowData4.value
+            .filter(
+              (item, index) =>
+                allStateRowArr.value.created.includes(index) ||
+                allStateRowArr.value.updated.includes(index)
+            )
+            .map((item) => item.lngStoreGroup)
+            .join("\u200b");
+          const storeCds = updatedRowData4.value
+            .filter(
+              (item, index) =>
+                allStateRowArr.value.created.includes(index) ||
+                allStateRowArr.value.updated.includes(index)
+            )
+            .map((item) => item.lngStoreCode)
+            .join("\u200b");
+          const strNames = updatedRowData4.value
+            .filter(
+              (item, index) =>
+                allStateRowArr.value.created.includes(index) ||
+                allStateRowArr.value.updated.includes(index)
+            )
+            .map((item) => item.strName)
+            .join("\u200b");
+          const lngMenu1s = updatedRowData4.value
+            .filter(
+              (item, index) =>
+                allStateRowArr.value.created.includes(index) ||
+                allStateRowArr.value.updated.includes(index)
+            )
+            .map((item) =>
+              item.lngMenu1 == null || item.lngMenu1 == undefined
+                ? 0
+                : item.lngMenu1
+            )
+            .join("\u200b");
+
+          const lngMenu2s = updatedRowData4.value
+            .filter(
+              (item, index) =>
+                allStateRowArr.value.created.includes(index) ||
+                allStateRowArr.value.updated.includes(index)
+            )
+            .map((item) =>
+              item.lngMenu2 == null || item.lngMenu2 == undefined
+                ? 0
+                : item.lngMenu2
+            )
+            .join("\u200b");
+
+          const lngMenu3s = updatedRowData4.value
+            .filter(
+              (item, index) =>
+                allStateRowArr.value.created.includes(index) ||
+                allStateRowArr.value.updated.includes(index)
+            )
+            .map((item) =>
+              item.lngMenu3 == null || item.lngMenu3 == undefined
+                ? 0
+                : item.lngMenu3
+            )
+            .join("\u200b");
+
+          const lngMenu4s = updatedRowData4.value
+            .filter(
+              (item, index) =>
+                allStateRowArr.value.created.includes(index) ||
+                allStateRowArr.value.updated.includes(index)
+            )
+            .map((item) =>
+              item.lngMenu4 == null || item.lngMenu4 == undefined
+                ? 0
+                : item.lngMenu4
+            )
+            .join("\u200b");
+
+          const lngMenu5s = updatedRowData4.value
+            .filter(
+              (item, index) =>
+                allStateRowArr.value.created.includes(index) ||
+                allStateRowArr.value.updated.includes(index)
+            )
+            .map((item) =>
+              item.lngMenu5 == null || item.lngMenu5 == undefined
+                ? 0
+                : item.lngMenu5
+            )
+            .join("\u200b");
+
+          const lngMenu6s = updatedRowData4.value
+            .filter(
+              (item, index) =>
+                allStateRowArr.value.created.includes(index) ||
+                allStateRowArr.value.updated.includes(index)
+            )
+            .map((item) =>
+              item.lngMenu6 == null || item.lngMenu6 == undefined
+                ? 0
+                : item.lngMenu6
+            )
+            .join("\u200b");
+
+          const lngMenu7s = updatedRowData4.value
+            .filter(
+              (item, index) =>
+                allStateRowArr.value.created.includes(index) ||
+                allStateRowArr.value.updated.includes(index)
+            )
+            .map((item) =>
+              item.lngMenu7 == null || item.lngMenu7 == undefined
+                ? 0
+                : item.lngMenu7
+            )
+            .join("\u200b");
+
+          const lngMenu8s = updatedRowData4.value
+            .filter(
+              (item, index) =>
+                allStateRowArr.value.created.includes(index) ||
+                allStateRowArr.value.updated.includes(index)
+            )
+            .map((item) =>
+              item.lngMenu8 == null || item.lngMenu8 == undefined
+                ? 0
+                : item.lngMenu8
+            )
+            .join("\u200b");
+
+          const res = await saveSubTitle(
+            groupCds,
+            storeCds,
+            lngCodes,
+            strNames,
+            lngMenu1s,
+            lngMenu2s,
+            lngMenu3s,
+            lngMenu4s,
+            lngMenu5s,
+            lngMenu6s,
+            lngMenu7s,
+            lngMenu8s
+          );
+
+          //console.log(res);
+        }
       } catch (error) {
       } finally {
         store.state.loading = false;
@@ -1065,6 +982,7 @@ const saveButton = async () => {
  */
 
 const updatedRowData3 = (e) => {
+  //console.log(e);
   updatedRowData4.value = e;
 };
 
@@ -1078,55 +996,39 @@ const updatedRowData5 = ref([]);
  * 입력창 수정 데이터 갱신
  */
 
-const updatedRowData6 = (e) => {
-  updatedRowData5.value = e;
-};
 /**
  * 입력창 수정 데이터 갱신
  */
 
-const updatedRowData = (newValue) => {
+const updatedFilteredRow = ref([]);
+const updatedRowData = async (newValue) => {
   //comsole.log(optionCd.value);
-  console.log(newValue);
-  filteredrowData2.value = newValue;
-  const change = updatedRowData4.value.find(
-    (item) => item.lngCode == Number(optionCd.value)
-  );
+  updatedFilteredRow.value = newValue;
+  // const change = updatedRowData4.value.find(
+  //   (item) => item.lngCode == Number(optionCd.value)
+  // );
 
-  if (change) {
-    change.lngChainMenu1 = newValue[0] == undefined ? 0 : newValue[0].lngCode;
-    change.lngChainMenu2 = newValue[1] == undefined ? 0 : newValue[1].lngCode;
-    change.lngChainMenu3 = newValue[2] == undefined ? 0 : newValue[2].lngCode;
-    change.lngChainMenu4 = newValue[3] == undefined ? 0 : newValue[3].lngCode;
-    change.lngChainMenu5 = newValue[4] == undefined ? 0 : newValue[4].lngCode;
-    change.lngChainMenu6 = newValue[5] == undefined ? 0 : newValue[5].lngCode;
-    change.lngChainMenu7 = newValue[6] == undefined ? 0 : newValue[6].lngCode;
-    change.lngChainMenu8 = newValue[7] == undefined ? 0 : newValue[7].lngCode;
-    change.lngChainMenu9 = newValue[8] == undefined ? 0 : newValue[8].lngCode;
-    change.lngChainMenu10 = newValue[9] == undefined ? 0 : newValue[9].lngCode;
-    change.lngChainMenu11 =
-      newValue[10] == undefined ? 0 : newValue[10].lngCode;
-    change.lngChainMenu12 =
-      newValue[11] == undefined ? 0 : newValue[11].lngCode;
-    change.lngChainMenu13 =
-      newValue[12] == undefined ? 0 : newValue[12].lngCode;
-    change.lngChainMenu14 =
-      newValue[13] == undefined ? 0 : newValue[13].lngCode;
-    change.lngChainMenu15 =
-      newValue[14] == undefined ? 0 : newValue[14].lngCode;
-    change.lngChainMenu16 =
-      newValue[15] == undefined ? 0 : newValue[15].lngCode;
-    change.lngChainMenu17 =
-      newValue[16] == undefined ? 0 : newValue[16].lngCode;
-    change.lngChainMenu18 =
-      newValue[17] == undefined ? 0 : newValue[17].lngCode;
-    change.lngChainMenu19 =
-      newValue[18] == undefined ? 0 : newValue[18].lngCode;
-    change.lngChainMenu20 =
-      newValue[19] == undefined ? 0 : newValue[19].lngCode;
-    change.lngChainMenu21 =
-      newValue[20] == undefined ? 0 : newValue[20].lngCode;
-    //comsole.log(change);
+  // //console.log(change);
+
+  if (updatedFilteredRow.value.length > 0) {
+    for (let i = 0; i < updatedFilteredRow.value.length; i++) {
+      changeColid.value = `lngMenu${i + 1}`;
+      changeValue.value = updatedFilteredRow.value[i].lngCode;
+      changeNow.value = !changeNow.value;
+
+      await nextTick();
+      changeColid.value = `strMenuName${i + 1}`;
+      changeValue.value = updatedFilteredRow.value[i].strName;
+      changeNow.value = !changeNow.value;
+
+      await nextTick();
+
+      changeColid.value = `lngPrice${i + 1}`;
+      changeValue.value = updatedFilteredRow.value[i].lngPrice;
+      changeNow.value = !changeNow.value;
+
+      await nextTick();
+    }
   }
   // rowData1.value = [...rowData1.value];
   //comsole.log(newValue);
@@ -1369,7 +1271,7 @@ const deleteAll = async () => {
 const addrow1 = ref(false);
 const addrow2 = ref(false);
 const addrow3 = ref(false);
-const addrow4 = ref(false);
+
 const deleterow1 = ref(false);
 const deleterow2 = ref(false);
 const deleterow3 = ref(false);
@@ -1387,7 +1289,8 @@ const addRowData1 = () => {
     });
     return;
   }
-  isNewColumn.value = true;
+
+  // isNewColumn.value = true;
   optionNo.value = "";
   selectedOption.value = "";
   optionNm.value = "";
@@ -1397,29 +1300,19 @@ const addRowData1 = () => {
   addrow1.value = !addrow1.value;
 };
 
-/**
- * 추가 버튼 함수
- */
-
-const addRowData3 = () => {
-  if (afterSearch.value == false) {
-    Swal.fire({
-      title: "조회를 먼저 해주세요.",
-      confirmButtonText: "확인",
-    });
-    return;
+const sendRowState = (e) => {
+  if (e == "created") {
+    isNewColumn.value = false;
+  } else {
+    isNewColumn.value = true;
   }
-  optionGroupNm.value = "";
-  optionGroupCd.value = "";
-  filteredrowData4.value = [];
-  isNewColumn2.value = true;
-  clickrowData2.value = true;
-  addrow3.value = !addrow3.value;
+  // //console.log(e);
 };
-/**
- * 추가 버튼 함수
- */
 
+const allStateRowArr = ref([]);
+const allStateRows = (e) => {
+  allStateRowArr.value = e;
+};
 /**
  * 그리드 행 삭제 버튼 함수
  */
@@ -1438,16 +1331,6 @@ const deleteRowData1 = () => {
  * 그리드 행 삭제 버튼 함수
  */
 
-const deleteRowData3 = () => {
-  if (afterSearch.value == false) {
-    Swal.fire({
-      title: "조회를 먼저 해주세요.",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  deleterow2.value = !deleterow2.value;
-};
 /**
  * 그리드 행 삭제 버튼 함수
  */
@@ -1533,7 +1416,7 @@ const addMenus = () => {
   }
   if (optionCd.value == "" || optionCd.value == undefined) {
     Swal.fire({
-      title: "옵션을 먼저 선택하세요.",
+      title: "서브 타이틀을 먼저 선택하세요.",
       confirmButtonText: "확인",
     });
     return;
@@ -1542,6 +1425,14 @@ const addMenus = () => {
   if (filteredrowData2.value.length == 8) {
     Swal.fire({
       title: "대상선택메뉴는 최대 8개까지 설정할 수 있습니다.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (isNewColumn.value == false) {
+    Swal.fire({
+      title: "먼저 서브타이틀 코드를 생성해주세요.",
       confirmButtonText: "확인",
     });
     return;
@@ -1603,7 +1494,7 @@ const clickaddMenu1 = (newValue) => {
     });
     return;
   }
-  console.log(filteredrowData2.value.length);
+  //console.log(filteredrowData2.value.length);
   if (filteredrowData2.value.length == 8) {
     Swal.fire({
       title: "대상선택메뉴는 최대 8개까지 설정할 수 있습ㄴ디ㅏ.",
@@ -1618,26 +1509,17 @@ const clickaddMenu1 = (newValue) => {
   searchword3.value = "";
   dblclickedRowData(newValue);
 };
-const clickaddMenu2 = (newValue) => {
-  if (newValue == undefined || newValue == "") {
-    Swal.fire({
-      title: "메뉴그룹을 선택하세요.",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  dblclickedRowData2(newValue);
-};
+
 /**
  * 행 더블 클릭시 작동 함수
  */
 
 const dblclickedRowData = async (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
   const a = updatedRowData4.value.find(
     (item) => item.lngCode == optionCd.value
   );
-  console.log(a);
+  //console.log(a);
   let key2 = "";
   let key3 = "";
   for (let i = 1; i <= 8; i++) {
@@ -1651,7 +1533,7 @@ const dblclickedRowData = async (newValue) => {
     }
   }
 
-  console.log(changeColid.value);
+  //console.log(changeColid.value);
   changeValue.value = newValue[2];
   changeNow.value = !changeNow.value;
 
@@ -1671,25 +1553,6 @@ const dblclickedRowData = async (newValue) => {
  * 행 더블 클릭시 작동 함수
  */
 
-const dblclickedRowData2 = (newValue) => {
-  //comsole.log(newValue);
-  //comsole.log(updatedRowData5.value);
-  const a = updatedRowData5.value.find(
-    (item) => item.lngCode == optionGroupCd.value
-  );
-  for (let i = 1; i <= 20; i++) {
-    const key = `lngChainGroup${i}`;
-    if (a[key] == 0 || a[key] === undefined || a[key] == "0") {
-      changeColid.value = key;
-      break; // 첫 번째로 조건 맞는 값만 처리할 경우
-    }
-  }
-
-  changeValue2.value = newValue[0];
-  changeNow2.value = !changeNow2.value;
-
-  closeMenus2();
-};
 const selectedindex = ref(0);
 const selectedindex2 = ref(0);
 /**
@@ -1704,12 +1567,6 @@ const selectedIndex = (newValue) => {
 /**
  * 수정용 데이터 행 설정
  */
-
-const selectedIndex2 = (newValue) => {
-  changeRow2.value = newValue;
-  selectedindex2.value = newValue;
-  ////comsole.log(selectedindex2.value);
-};
 
 const changeRow2 = ref();
 /**

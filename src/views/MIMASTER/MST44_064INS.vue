@@ -966,8 +966,8 @@ const showMenus = async (value) => {
     //rowData2.value = res2.data.menuList
     SubMenuGroup.value = res2.data.submenuGroup;
     MenuGroup.value = res2.data.menuGroup;
-    console.log(MenuGroup.value);
-    console.log(res2);
+    //console.log(MenuGroup.value);
+    //console.log(res2);
     const res3 = await getKitchenGroupList2(groupCd.value, nowStoreCd.value);
 
     KitchenGroup.value = res3.data.List;
@@ -1227,7 +1227,7 @@ const searchButton = async () => {
   changeMode.value = false;
   Category.value = [];
   items.value = [];
-  console.log(nowStoreCd.value);
+  //console.log(nowStoreCd.value);
   if (currentMenu.value == 3) {
     if (nowStoreCd.value == "0" || nowStoreCd.value == undefined) {
       Swal.fire({
@@ -1261,7 +1261,7 @@ const searchButton = async () => {
         nowStoreCd.value = 0;
       }
       const res = await getMenuCodeEnroll(groupCd.value, nowStoreCd.value);
-      console.log(res);
+      //console.log(res);
       rowData2.value = res.data.MENULIST;
       updatedList2.value = JSON.parse(JSON.stringify(rowData2.value));
       confirmitem2.value = JSON.parse(JSON.stringify(rowData2.value));
@@ -1272,8 +1272,8 @@ const searchButton = async () => {
       //rowData2.value = res2.data.menuList
       SubMenuGroup.value = res2.data.submenuGroup;
       MenuGroup.value = res2.data.menuGroup;
-      console.log(MenuGroup.value);
-      console.log(res2);
+      //console.log(MenuGroup.value);
+      //console.log(res2);
       const res3 = await getKitchenGroupList2(groupCd.value, nowStoreCd.value);
 
       KitchenGroup.value = res3.data.List;
@@ -1499,7 +1499,7 @@ const saveButton = async () => {
             filteredSave.map((item) => item.lngCode).join("\u200B"),
             filteredSave.map((item) => item.lngKPG).join("\u200B")
           );
-          console.log(res);
+          //console.log(res);
         } else if (currentMenu.value == 3) {
           updatedList3.value;
 

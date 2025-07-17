@@ -311,7 +311,7 @@ const changeValue = async (e) => {
   await nextTick();
   if (changeColid.value == "USE_VAL") {
     changeColid.value = "USE_YN";
-    console.log(e.target.value);
+    //console.log(e.target.value);
     changeValue2.value = e.target.value == "1" ? "Y" : "N";
 
     changeNow.value = !changeNow.value;
@@ -341,7 +341,7 @@ const clickedRowData = async (e) => {
       e[0]
     );
 
-    // console.log(res);
+    // //console.log(res);
 
     rowData2.value = res.data.List;
   } catch (error) {

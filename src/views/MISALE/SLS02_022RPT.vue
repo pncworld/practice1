@@ -340,7 +340,7 @@ const selectedStoreAttrs = ref();
  */
 
 const lngStoreGroup = (e) => {
-  initGrid();
+  //initGrid();
   //comsole.log(e);
   selectedGroup.value = e;
 };

@@ -148,6 +148,7 @@ import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import MobileTotalMenu from "../MOBILE/component/mobileTotalMenu.vue";
 import { getNoticeDetail, getNoticeList } from "@/api/mobile";
+import { insertMobilePageLog } from "@/customFunc/customFunc";
 const store = useStore();
 
 const notice = ref(false);
@@ -514,9 +515,15 @@ onBeforeUnmount(() => {
 
 const changeSalesIconState = ref(true);
 const changeIcon = ref(0);
-const movePage = (e, e2) => {
+const movePage = async (e, e2) => {
   //comsole.log(e2);
   //store.state.mobileSelectProgName = e2;
+
+  const checkSession = await insertMobilePageLog({
+    strUrl: e2,
+    lngProgramID: e,
+  });
+
   store.dispatch("saveMobileProgName", e2);
   changeIcon.value = 0;
   personal.value = false;

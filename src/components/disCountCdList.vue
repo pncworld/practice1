@@ -56,7 +56,7 @@ watch(
       //comsole.log(res);
       disCountList.value = res.data.DISCOUNTLIST;
     } catch (error) {
-      console.error("API 호출 실패:", error);
+      //console.error("API 호출 실패:", error);
     }
   },
   { flush: "post" }

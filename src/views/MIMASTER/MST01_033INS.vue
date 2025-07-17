@@ -1063,7 +1063,7 @@ onMounted(async () => {
   //comsole.log(store.state.userData.lngCommonMenu);
 
   const pageLog = await insertPageLog(store.state.activeTab2);
-  console.log(store.state.userData.lngCommonMenu);
+  //console.log(store.state.userData.lngCommonMenu);
   if (store.state.userData.lngCommonMenu == "1") {
     hidesub.value = false;
     hideAttr.value = false;
@@ -1230,7 +1230,7 @@ const selectedIndex2 = (e) => {
  */
 
 const clickedRowData = async (newvalue) => {
-  console.log(newvalue);
+  //console.log(newvalue);
   afterClick.value = false;
   if (newvalue[9] == 0 || newvalue[12] == 1) {
     // 판매가 할인여부
@@ -1398,7 +1398,7 @@ const lngStoreGroup = (e) => {
  */
 
 const handleStoreCd = async (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
   if (newValue == "-1") {
     afterSearch.value = false;
     afterClick.value = true;
@@ -1491,7 +1491,7 @@ const searchButton = async () => {
     filteredrowData3.value = [...filteredrowData3.value];
 
     const res = await getMenuCodeEnroll(groupCd.value, nowStoreCd.value);
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.MENULIST;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
     MENUDEPEND.value = res.data.MENUDEPEND;
@@ -1502,13 +1502,13 @@ const searchButton = async () => {
 
     optionGroup.value = res.data.OPTIONGROUP;
     tempRowData2.value = res.data.PAYCD;
-    console.log(nowStoreCd.value);
+    //console.log(nowStoreCd.value);
     const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
     //rowData2.value = res2.data.menuList
     SubMenuGroup.value = res2.data.submenuGroup;
     MenuGroup.value = res2.data.menuGroup;
     //  //comsole.log(res)
-    console.log(res2);
+    //console.log(res2);
   } catch (error) {
     afterSearch.value = false;
   } finally {
@@ -1879,7 +1879,7 @@ const saveButton = () => {
           filterAndMap("strUserFileName"),
           deleteCd.join(",")
         );
-        console.log(res);
+        //console.log(res);
 
         //comsole.log(updatedAndInsertRow);
 
@@ -2174,7 +2174,7 @@ const handleFileUpload = async (e) => {
 };
 
 const downloadFile = async () => {
-  console.log(store.state.StoreToken);
+  //console.log(store.state.StoreToken);
   try {
     const response = await axios.get(
       `http://211.238.145.30:8085/Uploads/${fileName.value}`,
@@ -2194,7 +2194,7 @@ const downloadFile = async () => {
     // 다운로드 후 Blob URL 해제
     window.URL.revokeObjectURL(url);
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     Swal.fire({
       title: "오류",
       text: "파일 다운로드 실패",
@@ -2267,7 +2267,7 @@ const copyButton = async () => {
       selectedMenuCd.value.join("\U200B")
     );
 
-    console.log(res);
+    //console.log(res);
     Swal.fire({
       title: "성공",
       text: "복사에 성공하였습니다.",
@@ -2293,7 +2293,7 @@ const selectedMenuCd = ref([]);
 
 const checkedRowData5 = (e) => {
   selectedMenuCd.value = e.map((item) => item.menuCd);
-  console.log(e);
+  //console.log(e);
 };
 </script>
 

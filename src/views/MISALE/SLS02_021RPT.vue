@@ -27,7 +27,7 @@ Author : 권맑음                     
           ref="datepicker"
           @excelDate="excelDate"></Datepicker2>
       </div>
-      <div class="w-96 ml-40">
+      <div class="w-96 ml-20">
         <PickStoreRenew3
           @lngStoreCode="selectedStoreCd"
           @lngStoreGroup="selectedGroupCd"

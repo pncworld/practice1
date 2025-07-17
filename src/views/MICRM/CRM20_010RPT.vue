@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-import { getBelongCustList, getBelongCustListbyCorner } from "@/api/micrm";
+import { getBelongCustListbyCorner } from "@/api/micrm";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -92,9 +92,7 @@ import { getBelongCustList, getBelongCustListbyCorner } from "@/api/micrm";
 
 import PageName from "@/components/pageName.vue";
 import PickBelongCust from "@/components/pickBelongCust.vue";
-import PickCustCompany from "@/components/pickCustCompany.vue";
 import PickStoreCorner from "@/components/pickStoreCorner.vue";
-import PickStoreRenew from "@/components/pickStoreRenew.vue";
 /**
  * 	매장 단일 선택 컴포넌트
  */
@@ -212,17 +210,17 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngAreaCode = async (e) => {
   initGrid();
   selectedAreaCode.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreGroup = async (e) => {
   initGrid();
   selectedGroup.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 /**

@@ -38,16 +38,16 @@ onMounted(async () => {
   emit("payNm", "전체");
 
   const res = await getpayCodeList3(store.state.userData.lngStoreGroup, 0);
-  // console.log(res);
+  // //console.log(res);
   payCodeList.value = res.data.List;
-  console.log(payCodeList.value);
+  //console.log(payCodeList.value);
 });
 watch(
   () => props.storeCd,
   async () => {
     const res = await getpayCodeList3(props.groupCd, props.storeCd);
     payCodeList.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     ////comsole.log(res)
   }
 );

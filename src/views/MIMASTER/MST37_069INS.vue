@@ -72,7 +72,7 @@
         </div>
       </div>
 
-      <div class="flex justify-start items-center">
+      <div class="flex justify-start items-center ml-12">
         <PickStoreRenew
           :hideit="false"
           :hideit2="false"
@@ -457,7 +457,7 @@ onMounted(async () => {
   reload.value = !reload.value;
 
   const res2 = await getStoreList(userGroup, 0);
-  console.log(res2);
+  //console.log(res2);
 
   rowData2.value = res2.data.store.map((item) => ({
     ...item,
@@ -469,7 +469,7 @@ onMounted(async () => {
   rowData3.value = res3.data.List;
 
   // const res4 = await getMenuGroupList(userGroup, 0, 0);
-  // console.log(res4);
+  // //console.log(res4);
   // MenuGroupList.value = res4.data.List;
   // const res2 = await getMultiGroup(userGroup);
 
@@ -569,21 +569,21 @@ const checkedRowData = (e) => {
 const checkedDatas2 = ref([]);
 const checkedRowData2 = (e) => {
   checkedDatas2.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const checkedDatas3 = ref([]);
 const checkedRowData3 = (e) => {
   checkedDatas3.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const checkedRowData4 = (e) => {
   //checkedDatas3.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const checkedIndexs = ref([]);
 const checkedRowIndex = (e) => {
   checkedIndexs.value = e;
-  // console.log(e);
+  // //console.log(e);
 };
 
 const updateRowData = ref([]);
@@ -896,7 +896,7 @@ const saveButton = async (e) => {
       prices.join(","),
       enddate.value
     );
-    // console.log(res);
+    // //console.log(res);
 
     Swal.fire({
       title: "성공",
@@ -906,7 +906,7 @@ const saveButton = async (e) => {
     });
     store.state.loading = false;
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   } finally {
     store.state.loading = false;
     searchButton();
@@ -921,7 +921,7 @@ const saveButton2 = async () => {
     (item) => item.checkbox2 == true
   ).length;
 
-  console.log(checkedDatas2.value, checkedDatas3.value);
+  //console.log(checkedDatas2.value, checkedDatas3.value);
   if (filtered + filtered2 !== updateRowData2.value.length) {
     Swal.fire({
       title: "경고",
@@ -1027,7 +1027,7 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  // console.log(e);
+  // //console.log(e);
 };
 const lngStoreGroup = async (e) => {
   //initGrid();

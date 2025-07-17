@@ -928,7 +928,7 @@ const checkedRowData4 = (e) => {
 };
 const checkRows5 = ref([]);
 const checkedRowData5 = (e) => {
-  // console.log(e);
+  // //console.log(e);
   checkRows5.value = e;
 };
 
@@ -960,7 +960,7 @@ const searchWord = ref("");
 const rowData10 = ref([]);
 const fileInput = ref(null);
 const handleFile = (e) => {
-  // console.log(e);
+  // //console.log(e);
   let newRow = [];
   const files = e.target.files;
   for (let i = 0; i < files.length; i++) {
@@ -1032,7 +1032,7 @@ const saveButton = async () => {
       editorInsert.value == false ? "I" : "U",
       selectedSeqId.value
     );
-    console.log(res);
+    //console.log(res);
     const newSeq = res.data.List[0].lngSeqID;
     const tempFileName = ref([]);
     if (rowData10.value.length > 0) {
@@ -1041,7 +1041,7 @@ const saveButton = async () => {
       rowData10.value.forEach((file, index) => {
         if (file.checkbox !== true) {
           const currv4 = v4();
-          // console.log(file.strFileName);
+          // //console.log(file.strFileName);
           formData.append(
             `file${index}`,
             file.strFile,
@@ -1074,7 +1074,7 @@ const saveButton = async () => {
         try {
           //comsole.log(formData.entries());
           const res2 = await uploadFile(formData);
-          // console.log(res2);
+          // //console.log(res2);
         } catch (error) {
           store.state.loading = false;
         } finally {
@@ -1083,9 +1083,9 @@ const saveButton = async () => {
       }
     }
 
-    // console.log(res);
+    // //console.log(res);
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   } finally {
     initNoticeEnroll();
     store.state.loading = false;
@@ -1259,7 +1259,7 @@ const checkedRowData6 = (e) => {
   filesEditForDelete2.value = e.map(
     (item) => item.strFilePath.split("/Uploads/")[1]
   );
-  console.log(e);
+  //console.log(e);
 };
 const rowData11 = ref([]);
 const content = ref("");
@@ -1359,7 +1359,7 @@ const clickedRowData2 = async (e) => {
     // 다운로드 후 Blob URL 해제
     window.URL.revokeObjectURL(url);
   } catch (error) {
-    // console.log(error);
+    // //console.log(error);
     Swal.fire({
       title: "오류",
       text: "파일 다운로드 실패",

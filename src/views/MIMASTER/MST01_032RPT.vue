@@ -19,7 +19,7 @@
     </div>
     <div
       class="grid grid-rows-1 grid-cols-2 justify-between bg-gray-200 rounded-lg h-14 items-start z-10">
-      <div>
+      <div class="ml-12">
         <PickStoreRenew3
           @lngStoreCode="selectedStoreCd"
           @lngStoreGroup="selectedGroupCd"
@@ -96,7 +96,7 @@ import { useStore } from "vuex";
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
-  console.log(store.state.userData);
+  //console.log(store.state.userData);
 });
 
 const selectedStartDate = ref();
@@ -155,7 +155,7 @@ const searchButton = async () => {
       selectedStartDate.value,
       selectedEndDate.value
     );
-    console.log(res);
+    //console.log(res);
 
     rowData.value = res.data.List;
     afterSearch.value = true;

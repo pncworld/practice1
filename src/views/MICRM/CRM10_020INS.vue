@@ -205,7 +205,7 @@ const searchButton = async () => {
       selectedGroup.value,
       selectedStores.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;

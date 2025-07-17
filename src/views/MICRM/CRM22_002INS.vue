@@ -210,7 +210,7 @@ onMounted(async () => {
   const res2 = await getEventCouponEnrollList(
     store.state.userData.lngStoreGroup
   );
-  console.log(res2);
+  //console.log(res2);
   optionList.value = res2.data.List;
   //optionList2.value = res2.data.List2;
 });
@@ -219,7 +219,7 @@ const setCoupon = (e) => {
   if (e.target.value == 0) {
     return;
   }
-  console.log(optionList.value);
+  //console.log(optionList.value);
 
   const filtered = optionList.value.filter(
     (item) => item.lngCouponType == e.target.value
@@ -249,7 +249,7 @@ const SheetList = ref([]);
 const currentFile = ref();
 const handleFileChange = async (e) => {
   const file = e.target.files[0];
-  console.log(file);
+  //console.log(file);
   currentFile.value = file;
   cond3.value = 1;
   SheetList.value = [];
@@ -290,7 +290,7 @@ async function readFileWithArrayBuffer(file) {
     return obj;
   });
 
-  console.log(rowData.value);
+  //console.log(rowData.value);
   return jsonData;
 }
 
@@ -421,7 +421,7 @@ const saveButton = async () => {
     });
     return;
   }
-  // console.log(cAllStateRow.value);
+  // //console.log(cAllStateRow.value);
   try {
     const amounts = rowData.value.map((item) => item.lngAmount).join("\u200b");
     const gftCards = rowData.value
@@ -445,7 +445,7 @@ const saveButton = async () => {
       TDates,
       saleStores
     );
-    console.log(res);
+    //console.log(res);
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
         title: "성공",
@@ -464,7 +464,7 @@ const saveButton = async () => {
 
     //console.log(res);
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   } finally {
     visible.value = false;
     initGrid();
@@ -479,12 +479,12 @@ const saveButton = async () => {
 const lngStoreCode = async (e) => {
   //initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreCode2 = async (e) => {
   //initGrid();
   selectedStores2.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 /**
@@ -532,13 +532,13 @@ const clickedRowData = async (e) => {
   cond2.value = e[1];
 
   const res = await getGFTMaster2(store.state.userData.lngStoreGroup, e[0]);
-  console.log(res);
+  //console.log(res);
   rowData2.value = res.data.List;
   updatedRow2.value = JSON.parse(JSON.stringify(res.data.List));
   cond3.value = e[0];
 };
 const clickedRowData2 = async (e) => {
-  console.log(e);
+  //console.log(e);
   cond4.value = e[1];
   cond5.value = e[2];
 };

@@ -424,7 +424,7 @@ const selectedIndex = (e) => {
   changeRow.value = e;
 };
 const clickedRowData = (e) => {
-  console.log(e);
+  //console.log(e);
   gridvalue1.value = e[1];
   gridvalue2.value = e[21];
   gridvalue3.value = e[3];
@@ -454,10 +454,10 @@ const updatedRow2 = ref([]);
 
 const rowData1State = ref([]);
 const allStateRows = (e) => {
-  console.log(e);
+  //console.log(e);
   rowData1State.value = e;
 
-  console.log(rowData1State.value);
+  //console.log(rowData1State.value);
 };
 const cond = ref("");
 const TimeArray = ref([]);
@@ -489,7 +489,7 @@ const searchButton = async () => {
     initGrid();
 
     const res = await getSalaryPolicy(store.state.userData.lngStoreGroup);
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
     updatedRow.value = JSON.parse(JSON.stringify(res.data.List));
     // TimeArray.value = rowData2.value.map(item => Number(item.strSTime))
@@ -515,7 +515,7 @@ const saveButton = async (e) => {
     return;
   }
   try {
-    console.log(rowData1State.value);
+    //console.log(rowData1State.value);
     store.state.loading = true;
     if (rowData1State.value.created.length > 0) {
       const strStndName = updatedRow.value
@@ -618,9 +618,9 @@ const saveButton = async (e) => {
           lngPeriod,
           lngPeriodCls
         );
-        console.log(res);
+        //console.log(res);
       } catch (error) {
-        console.log(error);
+        //console.log(error);
       } finally {
       }
     }
@@ -733,9 +733,9 @@ const saveButton = async (e) => {
           lngPeriod,
           lngPeriodCls
         );
-        console.log(res);
+        //console.log(res);
       } catch (error) {
-        console.log(error);
+        //console.log(error);
       } finally {
       }
     }
@@ -878,7 +878,7 @@ const deleteButton = async () => {
           lngcodes
         );
 
-        console.log(res);
+        //console.log(res);
         store.state.loading = false;
       } catch (error) {
       } finally {
@@ -925,7 +925,7 @@ const deleteButton2 = async () => {
           .join("\u200b");
         const res = await deleteWorkShifts2(groups, stores, lngcodes);
 
-        console.log(res);
+        //console.log(res);
         store.state.loading = false;
       } catch (error) {
       } finally {

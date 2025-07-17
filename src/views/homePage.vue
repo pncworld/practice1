@@ -284,9 +284,9 @@ onMounted(async () => {
         (Number(data.LASTMONTH_SAL) + Number(data.THISMONTH_SAL))) *
         85
     ) + "%";
-  console.log(prevsaleH.value);
-  console.log(prevWeeksaleH.value);
-  console.log(nextMonthsaleH.value);
+  //console.log(prevsaleH.value);
+  //console.log(prevWeeksaleH.value);
+  //console.log(nextMonthsaleH.value);
   difweekSale.value = Number(data.THISWEEK_SAL) - Number(data.LASTWEEK_SAL);
   difweekSale2.value = formatNumberWithCommas(
     Number(data.THISWEEK_SAL) - Number(data.LASTWEEK_SAL)

@@ -48,31 +48,31 @@ const app = createApp(App)
 //   });
 // };
 app.config.warnHandler = (msg, instance, trace) => {
-  // console.warn(msg) // 주석 처리하거나 제거하면 경고가 콘솔에 출력되지 않음
+  // //console.warn(msg) // 주석 처리하거나 제거하면 경고가 콘솔에 출력되지 않음
 };
 
 // 전역 오류 핸들러 설정
-app.config.errorHandler = (err, vm, info) => {
-  console.error("Vue 전역 에러 발생:", err, "Info:", info);
+// app.config.errorHandler = (err, vm, info) => {
+//   //console.error("Vue 전역 에러 발생:", err, "Info:", info);
 
-  Swal.fire({
-    title: "오류 발생",
-    text: "예기치 않은 오류가 발생했습니다. 이전 상태로 복원합니다.",
-    icon: "error",
-    confirmButtonText: "확인",
-  });
+//   Swal.fire({
+//     title: "오류 발생",
+//     text: "예기치 않은 오류가 발생했습니다. 이전 상태로 복원합니다.",
+//     icon: "error",
+//     confirmButtonText: "확인",
+//   });
 
-  // 롤백 처리
-  if (vm?.rollback) {
-    vm.rollback();
-  }
-};
+//   // 롤백 처리
+//   if (vm?.rollback) {
+//     vm.rollback();
+//   }
+// };
 
 app.mount("#app");
 
 //   // Vue 경고 핸들러 추가 (개발 중 경고를 잡기 위해)
 //   app.config.warnHandler = (msg, vm, trace) => {
-//     console.warn('Vue 경고:', msg, trace);
+//     //console.warn('Vue 경고:', msg, trace);
 
 //     Swal.fire({
 //         title: '오류 발생',
@@ -89,7 +89,7 @@ app.mount("#app");
 
 //   // 비동기 오류 캐치
 //   window.onerror = function (message, source, lineno, colno, error) {
-//     console.error('전역 오류 발생:', message, 'Source:', source, 'Line:', lineno, 'Column:', colno, 'Error:', error);
+//     //console.error('전역 오류 발생:', message, 'Source:', source, 'Line:', lineno, 'Column:', colno, 'Error:', error);
 
 //     Swal.fire({
 //       title: '오류 발생',
@@ -101,7 +101,7 @@ app.mount("#app");
 
 //   // Promise 관련 에러 잡기
 //   window.addEventListener('unhandledrejection', event => {
-//     console.error('Unhandled Promise rejection:', event.reason);
+//     //console.error('Unhandled Promise rejection:', event.reason);
 //     Swal.fire({
 //       title: '오류 발생',
 //       text: '비동기 작업 중 오류가 발생했습니다.',

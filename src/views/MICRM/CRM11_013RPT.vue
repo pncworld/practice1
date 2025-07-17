@@ -331,7 +331,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -350,7 +350,7 @@ const saveButton = async () => {
       pcond3.value
     );
 
-    console.log(res);
+    //console.log(res);
     Swal.fire({
       title: "성공",
       text: "기간을 조정하였습니다.",
@@ -374,7 +374,7 @@ const saveButton2 = async () => {
     //   pcond3.value
     // );
 
-    console.log(res);
+    //console.log(res);
     Swal.fire({
       title: "성공",
       text: "문자 재전송을 완료하였습니다.",

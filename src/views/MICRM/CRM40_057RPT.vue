@@ -180,10 +180,12 @@ const excelDate = (e) => {
 const teamcode = ref();
 const lngTeamCode = (e) => {
   teamcode.value = e;
+  initGrid();
 };
 const supervisor = ref();
 const lngSupervisor = (e) => {
   supervisor.value = e;
+  initGrid();
 };
 const storeCode = ref();
 const lngStoreCode = (e) => {
@@ -194,11 +196,13 @@ const lngStoreCode = (e) => {
 const storeAttr = ref();
 const lngStoreAttrs = (e) => {
   storeAttr.value = e;
+  initGrid();
 };
 
 const groupCd = ref();
 const lngStoreGroup = (e) => {
   groupCd.value = e;
+  initGrid();
 };
 /**
  *  조회 함수
@@ -225,14 +229,17 @@ watch([cond, cond2], () => {
     );
     hideColumnsId.value.push("strStoreName");
   }
-  console.log(hideColumnsId.value);
+  //console.log(hideColumnsId.value);
 });
 const hideColumnsId = ref([]);
 const searchButton = async () => {
   try {
     store.state.loading = true;
     initGrid();
-
+    let condition = 3;
+    if (cond.value == false) {
+      condition = 2;
+    }
     const res = await getKakaoAlarmAgg(
       groupCd.value,
       storeCode.value,
@@ -242,11 +249,11 @@ const searchButton = async () => {
 
       sDate.value,
       eDate.value,
-      3
+      condition
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;

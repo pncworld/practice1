@@ -23,7 +23,7 @@ onMounted(() => {
   new daum.Postcode({
     onclose: closePopUp,
     oncomplete: function (data) {
-      // console.log(data);
+      // //console.log(data);
       emit("zipCode", data.zonecode);
       emit("address", data.roadAddress);
       emit("zipAndAddress", data.zonecode + "," + data.roadAddress);

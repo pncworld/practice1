@@ -568,7 +568,7 @@ const deleteSubCategory = async (categoryCode) => {
         bringCategory(currentMajorCode.value);
       }
     } catch (error) {
-      console.error("삭제 중 오류 발생:", error);
+      //console.error("삭제 중 오류 발생:", error);
       Swal.fire({
         title: "오류",
         text: "서브 카테고리 삭제 중 오류가 발생했습니다.",
@@ -870,7 +870,7 @@ const saveButton = async () => {
         }
       } catch (error) {
         // 오류 처리
-        console.error("Error occurred:", error);
+        //console.error("Error occurred:", error);
         Swal.fire({
           title: "저장 실패",
           text: "오류가 발생했습니다.",

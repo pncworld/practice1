@@ -170,13 +170,13 @@ const clickedRowData = (e) => {
     Number(item.strSTime.split(":")[0]),
     Number(item.strETime.split(":")[0]),
   ]);
-  console.log(TimeArray.value);
+  //console.log(TimeArray.value);
   clickedLngCode.value = e[3];
   clickedRow.value = true;
 };
 
 const clickedRowData2 = (e) => {
-  console.log(e);
+  //console.log(e);
 };
 
 const updatedRow = ref([]);
@@ -208,8 +208,8 @@ const updatedRowData2 = (e) => {
     }
   }
 
-  console.log(rowData2.value);
-  // console.log(rowData2.value);
+  //console.log(rowData2.value);
+  // //console.log(rowData2.value);
   updatedRow2.value = e;
   // for(let i=0 ; i < e.length ; i++){
   //   if(e[i].rowStated == 'C'){
@@ -219,10 +219,10 @@ const updatedRowData2 = (e) => {
 
 const rowData1State = ref([]);
 const allStateRows = (e) => {
-  console.log(e);
+  //console.log(e);
   rowData1State.value = e;
 
-  console.log(rowData1State.value);
+  //console.log(rowData1State.value);
 };
 const cond = ref("");
 const TimeArray = ref([]);
@@ -266,7 +266,7 @@ const searchButton = async () => {
       selectedGroup.value,
       selectedStores.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
     rowData2.value = res.data.List2;
     rowData3.value = res.data.List3;
@@ -312,7 +312,7 @@ const saveButton = async (e) => {
           stores.join("\u200b"),
           wgupname.join("\u200b")
         );
-        console.log(res);
+        //console.log(res);
       } catch (error) {
       } finally {
       }
@@ -338,7 +338,7 @@ const saveButton = async (e) => {
           wgupname.join("\u200b"),
           lngcode.join("\u200b")
         );
-        console.log(res);
+        //console.log(res);
       } catch (error) {
       } finally {
       }
@@ -369,9 +369,9 @@ const saveButton = async (e) => {
           strsTime.join("\u200b"),
           streTime.join("\u200b")
         );
-        console.log(res);
+        //console.log(res);
       } catch (error) {
-        console.log(error);
+        //console.log(error);
       } finally {
       }
     }
@@ -402,9 +402,9 @@ const saveButton = async (e) => {
           strsTime.join("\u200b"),
           streTime.join("\u200b")
         );
-        console.log(res);
+        //console.log(res);
       } catch (error) {
-        console.log(error);
+        //console.log(error);
       } finally {
       }
     }
@@ -429,16 +429,16 @@ const addRow5 = ref(false);
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreGroup = async (e) => {
   //initGrid();
   selectedGroup.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const storeNm = (e) => {
   selectedStoreNm.value = e;
-  console.log(e);
+  //console.log(e);
 };
 /**
  * 그리드 초기화
@@ -541,7 +541,7 @@ const deleteButton = async () => {
           .join("\u200b");
         const res = await deleteWorkShifts(groups, stores, lngcodes);
 
-        console.log(res);
+        //console.log(res);
         store.state.loading = false;
       } catch (error) {
       } finally {
@@ -588,7 +588,7 @@ const deleteButton2 = async () => {
           .join("\u200b");
         const res = await deleteWorkShifts2(groups, stores, lngcodes);
 
-        console.log(res);
+        //console.log(res);
         store.state.loading = false;
       } catch (error) {
       } finally {

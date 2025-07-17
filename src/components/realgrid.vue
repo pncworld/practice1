@@ -113,7 +113,7 @@ let dataProvider;
     }
   };
 
-  
+
 
   emit updatedRowData 사용시에는 가급적 불가피한경우가 아니라면 기존 rowData와 교체 하지 말 것. updatedRowData로 수정된 사항을 별도의
   변수로 저장해두고 추후에 그 데이터를 저장하는게 옳다고봄
@@ -970,6 +970,10 @@ const emit = defineEmits([
 ]);
 // 3구간
 const funcshowGrid = async () => {
+  //console.log(tabInitSetArray.value.length);
+  if (tabInitSetArray.value.length == 0) {
+    return;
+  }
   if (gridView !== undefined && gridView !== null) {
     dataProvider.clearRows();
     dataProvider.destroy();
@@ -1061,7 +1065,7 @@ const funcshowGrid = async () => {
       }
     };
 
-    console.log(labelingcolumn);
+    //console.log(labelingcolumn);
   }
 
   dataProvider.setFields(fields);
@@ -1379,7 +1383,7 @@ const funcshowGrid = async () => {
           ? "list"
           : "text",
       editable:
-        props.checkRenderEditable == true && item.strColID == "checkbox"
+        props.checkRenderEditable == true && item.strColID.includes("checkbox")
           ? true
           : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
     },
@@ -1742,9 +1746,9 @@ const funcshowGrid = async () => {
     const groupList3 = props.mergeColumnGroupName4; // ['최상위그룹컬럼']
     const groupList2 = props.mergeColumnGroupName3; // [['그룹컬럼1','그룹컬럼2']]
 
-    console.log(JSON.stringify(subList3));
-    console.log(groupList3);
-    console.log(groupList2);
+    //console.log(JSON.stringify(subList3));
+    //console.log(groupList3);
+    //console.log(groupList2);
     let layout = [];
     tabInitSetArray.value.forEach((item) => {
       if (subList3.flat(2).includes(item.strColID)) {
@@ -1756,7 +1760,7 @@ const funcshowGrid = async () => {
         );
 
         const innerIndex2 = getInnerMostIndex(item.strColID, subList3);
-        console.log(innerIndex);
+        //console.log(innerIndex);
 
         if (layout.find((item) => item.name == groupList3[index])) {
           const findit = layout.find((item) => item.name == groupList3[index]);
@@ -1767,7 +1771,7 @@ const funcshowGrid = async () => {
             );
 
             if (target) {
-              // console.log(target.items);
+              // //console.log(target.items);
               target.items = [
                 ...target.items,
                 {
@@ -1797,9 +1801,9 @@ const funcshowGrid = async () => {
                 ],
               });
             } else {
-              // console.log(index);
-              // console.log(innerIndex);
-              // console.log(i);
+              // //console.log(index);
+              // //console.log(innerIndex);
+              // //console.log(i);
               secondItems.value.push({
                 name: groupList2[index][i],
                 direction: "horizontal",
@@ -1970,8 +1974,10 @@ const funcshowGrid = async () => {
 
     if (props.setGroupOrderByColumnId != "") {
       //comsole.log(props.setGroupColumnId);
-      if (gridView) {
-        //comsole.log(props.setGroupOrderByColumnId);
+      if (gridView && gridView.getDataSource().getOrgFieldNames().length != 0) {
+        //console.log(props.setGroupOrderByColumnId.split(","));
+        // console.log(gridView.getDataSource().getOrgFieldNames());
+        //gridView.orderBy(["strStore"]);
         gridView.orderBy(props.setGroupOrderByColumnId.split(","));
       }
     }
@@ -2015,25 +2021,25 @@ const funcshowGrid = async () => {
 
   gridView.onCellEdited = function (grid, itemIndex, row, field) {
     gridView.commit();
-    console.log(field);
+    //console.log(field);
     if (props.checkonlyone == true) {
       if (field == 0) {
         const bool = dataProvider.getValue(row, field);
-        console.log(bool);
+        //console.log(bool);
         if (bool == true) {
           dataProvider.setValue(row, "checkbox2", false);
         }
       } else if (field == 1) {
         const bool = dataProvider.getValue(row, field);
-        console.log(bool);
+        //console.log(bool);
         if (bool == true) {
           dataProvider.setValue(row, "checkbox1", false);
         }
       }
     }
-    // console.log(field);
-    // console.log(grid);
-    // console.log(row);
+    // //console.log(field);
+    // //console.log(grid);
+    // //console.log(row);
 
     updatedrowData.value = [...dataProvider.getJsonRows()];
     emit("updatedRowData", updatedrowData.value);
@@ -2056,14 +2062,14 @@ const funcshowGrid = async () => {
     }
     emit("checkedRowData", selectedRowData.value);
     //console.log(selectedRowData.value);
-    //console.log("여기안오냐");
+    // console.log("여기안오냐");
     emit("checkedRowIndex", rows);
     updatedrowData.value = [...dataProvider.getJsonRows()];
     dataProvider.endUpdate();
     //selectedRowData.value.index = itemIndex;
   };
   gridView.onItemAllChecked = (grid, checked) => {
-    //comsole.log("전체체크");
+    //console.log("전체체크");
     dataProvider.beginUpdate();
     selectedRowData.value = gridView
       .getCheckedItems()
@@ -2138,7 +2144,7 @@ const funcshowGrid = async () => {
     }
     if (clickData.cellType === "header") {
       gridView.setCurrent({ dataRow: selectedindex.value });
-
+      //console.log("asdf");
       // gridView.sortingOptions.enabled = false;
 
       // if(gridView.getSortedFields()[0].direction == "ascending"){
@@ -2227,8 +2233,12 @@ const funcshowGrid = async () => {
       var data = dataProvider.getJsonRow(rows[i]);
       selectedRowData.value.push(data);
     }
+    //console.log("여긴왓겟.ㅈ");
     emit("checkedRowData", selectedRowData.value);
     emit("checkedRowIndex", rows);
+    updatedrowData.value = [...dataProvider.getJsonRows()];
+
+    emit("updatedRowData", updatedrowData.value);
     //comsole.log(col.fieldName + "was checked as: " + chk);
   };
 
@@ -2396,7 +2406,7 @@ watch(
     let criteria3 = `(value match '${props.searchWord3}')`;
 
     let criteria4 = props.searchSpecialColId;
-    console.log(props.searchWord3, props.searchValue, props.searchColId);
+    //console.log(props.searchWord3, props.searchValue, props.searchColId);
     let filter4 = [
       {
         name: "미설정메뉴",
@@ -2600,6 +2610,8 @@ watch(
     var values = { add: true };
     let propertys = props.addrowProp.split(",");
     const value = props.addrowDefault.split(",");
+
+    //console.log(value);
     for (var i = 0; i < propertys.length; i++) {
       values[propertys[i]] = value[i];
     }
@@ -2640,14 +2652,14 @@ watch(
   (newVal) => {
     gridView.commit();
     const curr = gridView.getCurrent(); // 현재 선택된 셀 또는 행 정보를 가져옴
-    console.log(curr.dataRow);
+    //console.log(curr.dataRow);
     if (curr.dataRow == -1) {
       return;
     }
     if (curr && curr.dataRow >= 0 && props.rowData[curr.dataRow]) {
       // 현재 데이터 행이 유효한 경우
       props.rowData[curr.dataRow].deleted = true;
-      dataProvider.setValue(curr.dataRow, "deleted", true); // "deleted" 속성을 true로 설정
+      //dataProvider.setValue(curr.dataRow, "deleted", true); // "deleted" 속성을 true로 설정
       dataProvider.removeRow(curr.dataRow);
       gridView.commit();
     } else {
@@ -2673,7 +2685,7 @@ watch(
       dataProvider.removeRow(curr.dataRow);
       gridView.commit();
     } else {
-      console.warn("선택된 행이 없습니다.");
+      //console.warn("선택된 행이 없습니다.");
     }
     updatedrowData.value = [...dataProvider.getJsonRows()];
     const curr2 = gridView.getCurrent();
@@ -2701,7 +2713,7 @@ watch(
     const checkedIndexes = [];
 
     alldata.forEach((item, index) => {
-      console.log(item);
+      //console.log(item);
       if (item.checkbox === true) {
         checkedIndexes.push(index); // 체크된 항목의 인덱스를 저장
       }
@@ -2754,7 +2766,7 @@ watch(
 
       gridView.commit();
     } else {
-      console.warn("선택된 행이 없습니다.");
+      //console.warn("선택된 행이 없습니다.");
     }
 
     const curr2 = gridView.getCurrent();
@@ -2796,7 +2808,7 @@ watch(
 watch(
   () => props.deleteRow7,
   (newVal) => {
-    console.log(gridView.getCheckedItems());
+    //console.log(gridView.getCheckedItems());
 
     const checkedArr = gridView.getCheckedItems();
     for (let i = 0; i < checkedArr.length; i++) {
@@ -2818,7 +2830,7 @@ watch(
     // const checkedIndexes = [];
 
     // alldata.forEach((item, index) => {
-    //   console.log(item);
+    //   //console.log(item);
     //   if (item.checkbox === true) {
     //     checkedIndexes.push(index); // 체크된 항목의 인덱스를 저장
     //   }
@@ -2962,7 +2974,7 @@ watch(
   (newVal) => {
     //comsole.log(props.initCheckValue);
     //comsole.log(props.initCheckColumn);
-    // console.log("왓냐?");
+    // //console.log("왓냐?");
     gridView.checkAll(false);
     let itemCount = gridView.getItemCount();
     const checkValues = props.initCheckValue.split(",");
@@ -3071,7 +3083,7 @@ watch(
           return Number(timecode) >= start && Number(timecode) < end;
         });
         //console.log(timecode);
-        // console.log(isin);
+        // //console.log(isin);
         if (isin) {
           return { styleName: "blue-column" };
         }
@@ -3127,7 +3139,7 @@ onMounted(async () => {
         store.state.userData.lngStoreGroup,
         props.setDynamicGrid4Cond
       );
-      console.log(res);
+      //console.log(res);
       if (res.data.List.length > 0) {
         tabInitSetArray.value.push(...res.data.List);
       }
@@ -3148,9 +3160,11 @@ onMounted(async () => {
       `<style>${styleContent}</style>`
     );
     await nextTick();
-    await funcshowGrid();
+    if (tabInitSetArray.value.length != 0) {
+      await funcshowGrid();
+    }
   } catch (error) {
-    console.error("Failed to fetch data:", error);
+    //console.error("Failed to fetch data:", error);
   }
 });
 watch(
@@ -3204,7 +3218,7 @@ const setupGrid = async () => {
         store.state.userData.lngStoreGroup,
         props.setDynamicGrid4Cond
       );
-      console.log(res);
+      //console.log(res);
       if (res.data.List.length > 0) {
         tabInitSetArray.value.push(...res.data.List);
       }
@@ -3225,9 +3239,11 @@ const setupGrid = async () => {
       `<style>${styleContent}</style>`
     );
 
-    await funcshowGrid();
+    if (tabInitSetArray.value.length != 0) {
+      await funcshowGrid();
+    }
   } catch (error) {
-    console.error("Failed to fetch data:", error);
+    //console.error("Failed to fetch data:", error);
   }
 };
 
@@ -3251,9 +3267,11 @@ watch(
 
       setTimeout(function () {
         if (selectedindex.value == -1) {
-          dataProvider.clearRowStates();
-          emit("selectedIndex", selectedindex.value);
-          return;
+          if (dataProvider) {
+            dataProvider.clearRowStates();
+            emit("selectedIndex", selectedindex.value);
+            return;
+          }
         }
 
         if (selectedindex.value !== "" && selectedindex.value != undefined) {

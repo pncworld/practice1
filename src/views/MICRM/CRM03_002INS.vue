@@ -203,16 +203,7 @@ const searchButton = async () => {
   try {
     store.state.loading = true;
     initGrid();
-    console.log(
-      groupCd.value,
-      storeAttr.value,
-      teamcode.value,
-      supervisor.value,
-      storeCode.value,
-      sDate.value,
-      eDate.value,
-      cond.value
-    );
+
     const res = await getCustBuyList(
       groupCd.value,
       storeAttr.value,
@@ -225,7 +216,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;

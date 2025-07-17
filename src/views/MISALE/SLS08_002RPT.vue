@@ -60,7 +60,7 @@
           </div>
         </div>
       </div>
-      <div class="">
+      <div class="ml-1">
         <PickStoreRenew3
           @lngStoreCode="lngStoreCodes"
           @lngStoreGroup="lngStoreGroup"

@@ -67,13 +67,33 @@
                 @change="seeDaily" />일자별
             </label>
           </div>
-          <div>
+          <div v-if="isDynamicGrid2 == 'Y'">
+            <label for="count" class="font-normal">
+              <input
+                type="checkbox"
+                id="count"
+                class="ml-5"
+                @change="seeSum" />건수
+            </label>
+          </div>
+
+          <div v-if="isDynamicGrid2 == 'N'">
+            <label for="unite" class="font-normal">
+              <input
+                type="checkbox"
+                id="unite"
+                class="ml-5"
+                @change="seeUnite" />셀병합
+            </label>
+          </div>
+
+          <div v-if="isDynamicGrid2 == 'N'">
             <label for="sum" class="font-normal">
               <input
                 type="checkbox"
                 id="sum"
                 class="ml-5"
-                @change="seeSum" />건수
+                @change="seeGroup" />합계
             </label>
           </div>
         </div>
@@ -97,10 +117,14 @@
         :rowData="rowData"
         :reload="reload"
         :setFooter="true"
-        :setFooterCustomColumnId="['strJoinType']"
+        :setFooterCustomColumnId="['strStore']"
         :setFooterCustomText="['합계']"
+        :setGroupSumCustomText="['매장소계']"
+        :setGroupSumCustomColumnId="['strStore']"
         :hideColumnsId="hideColumnsId"
         :mergeMask="''"
+        :setGroupFooter="setGroupFooter"
+        :setGroupColumnId="'strStore'"
         :setMergeMode="false"
         :setRowGroupSpan2="setRowGroupSpan"
         :documentTitle="'SLS02_023RPT'"
@@ -238,6 +262,13 @@ const seeDaily = (e) => {
   }
 };
 
+const seeUnite = (e) => {
+  if (e.target.checked) {
+    setRowGroupSpan.value = "strStore";
+  } else {
+    setRowGroupSpan.value = "";
+  }
+};
 const loginedstrLang = store.state.userData.lngLanguage;
 
 const datepicker = ref(null);
@@ -288,7 +319,7 @@ const searchButton = async () => {
       selectedCode.value,
       setCnt.value
     );
-    //comsole.log(res);
+    console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -415,6 +446,15 @@ const seeSum = (e) => {
     setCnt.value = 1;
   } else {
     setCnt.value = 0;
+  }
+};
+
+const setGroupFooter = ref(false);
+const seeGroup = (e) => {
+  if (e.target.checked) {
+    setGroupFooter.value = true;
+  } else {
+    setGroupFooter.value = false;
   }
 };
 

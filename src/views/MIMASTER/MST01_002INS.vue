@@ -641,7 +641,7 @@ const tabInitSetArray = ref([]);
     const result = await getGridInfoList(GridInfo_PROG_ID, GridInfo_GRID_ID);
     tabInitSetArray.value = result;
   } catch (error) {
-    console.error("Failed to fetch data:", error); // 오류 로그 출력
+    //console.error("Failed to fetch data:", error); // 오류 로그 출력
   } finally {
   }
 })();

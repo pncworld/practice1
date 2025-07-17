@@ -24,6 +24,7 @@
     <div class="flex bg-gray-200 rounded-lg h-16 w-full items-center mt-5">
       <PickStore
         @areaCd="handleStoreAreaCd"
+        @update:storeGroup="handleGroupCd"
         @update:storeCd="handleStoreCd"
         @posNo="handlePosNo"
         :showPosNo="true"
@@ -613,6 +614,109 @@
       </div>
     </div>
   </div>
+  <div
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    v-if="showPopUp">
+    <div class="bg-white p-6 rounded-xl shadow-lg w-[40vw] h-[40vh]">
+      <div class="flex justify-between">
+        <h2 class="text-xl font-bold mb-4">메뉴키 추가</h2>
+        <div class="col-span-2 flex justify-end space-x-5">
+          <button class="whitebutton" @click="saveMenuKey">저장</button
+          ><button class="whitebutton" @click="closePopUp">닫기</button>
+        </div>
+      </div>
+
+      <div class="grid grid-rows-4 grid-cols-[2fr,5fr,2fr,5fr] h-[90%] w-[90%]">
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold bg-gray-100 text-blue-500">
+          <span class="text-red-500">*</span>매장
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold">
+          <input
+            type="text"
+            class="disabled:bg-gray-300 w-[80%] h-[50%] flex justify-center items-center text-center"
+            disabled
+            v-model="clickedStoreNm" />
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold bg-gray-100 text-blue-500">
+          <span class="text-red-500">*</span>메뉴명
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold">
+          <input
+            type="text"
+            class="w-[80%] h-[50%] border border-black"
+            v-model="pcond" />
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold bg-gray-100">
+          서브그룹
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold">
+          <select
+            name=""
+            id=""
+            class="w-[80%] h-[50%] border border-black"
+            v-model="pcond2">
+            <option :value="i.lngCode" v-for="i in optionList">
+              {{ i.strName }}
+            </option>
+          </select>
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold bg-gray-100">
+          판매단가
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold">
+          <input
+            type="number"
+            class="w-[80%] h-[50%] border border-black"
+            v-model="pcond3" />
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold bg-gray-100 text-blue-500">
+          <span class="text-red-500">*</span>메뉴코드
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-start items-center text-base font-semibold">
+          <input
+            type="number"
+            v-model="pcond4"
+            :disabled="pcond5"
+            class="w-[50%] h-[50%] border border-black ml-5" />
+          <label for="auto"
+            ><input type="checkbox" id="auto" v-model="pcond5" />자동</label
+          >
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold bg-gray-100 text-blue-500">
+          <span class="text-red-500">*</span>주방출력
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold">
+          <input
+            type="number"
+            class="w-[40%] h-[50%] border border-black"
+            v-model="pcond6" />
+          <div class="text-red-500 text-nowrap">※주방미출력:99</div>
+        </div>
+        <div
+          class="border-l border-t border-b border-black flex justify-center items-center text-base font-semibold bg-gray-100">
+          오픈단가
+        </div>
+        <div
+          class="border-l border-t border-b border-black flex justify-start pl-5 items-center text-base font-semibold col-span-3">
+          <label for="use"
+            ><input type="checkbox" id="use" v-model="pcond7" />사용</label
+          >
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- 드래그 영역 -->
 </template>
 
@@ -623,9 +727,11 @@ import {
   getScreenList2,
   getTLUList,
   saveAllMenuKey,
+  saveMenuCode,
   saveMenuKey2,
   saveScreenKeys,
 } from "@/api/master";
+import { getSubGroup3, InsertMenu } from "@/api/mipos";
 
 /**
  *  복사 팝업 컴포넌트
@@ -695,6 +801,7 @@ onMounted(async () => {
 
 // 더미 데이터
 const items = ref([]);
+const selectedStoreNm = ref("");
 const clickedScreenKeyIndex = ref();
 const ScreenKeyOrigin = ref([]);
 const clickedMenuKey = ref();
@@ -726,22 +833,108 @@ const handlestoreNm = (newData) => {
 };
 const showPopup2 = ref(false);
 const showChangeScreenKey = ref(false);
-const changePopup = ref(false);
-const deleteAllitems = ref([]);
-const popupData = ref([]);
+
+const optionList = ref([]);
+
 const confirmitem = ref([]);
-const languageName0 = ref("");
-const languageName1 = ref("");
-const languageName2 = ref("");
-const languageName3 = ref("");
-const languageName4 = ref("");
+
 const currentscreenKeyNm = ref("");
-const clickedSubCode = ref();
+
 const maxSubCode = ref();
+
+const pcond = ref("");
+const pcond2 = ref("");
+const pcond3 = ref("");
+const pcond4 = ref("");
+const pcond5 = ref(false);
+const pcond6 = ref("");
+const pcond7 = ref(false);
 /**
  * 선택한 포스 번호 호출 함수
  */
 
+const saveMenuKey = async () => {
+  if (pcond.value == undefined || pcond.value == null || pcond.value == "") {
+    Swal.fire({
+      title: "경고.",
+      text: "메뉴명을 먼저 입력해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (
+    (pcond4.value == undefined && pcond5.value == false) ||
+    (pcond4.value == null && pcond5.value == false) ||
+    (pcond4.value == "" && pcond5.value == false)
+  ) {
+    Swal.fire({
+      title: "경고.",
+      text: "메뉴코드를 입력해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (pcond6.value == undefined || pcond6.value == null || pcond6.value == "") {
+    Swal.fire({
+      title: "경고.",
+      text: "주방출력을 입력해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  try {
+    const res = await InsertMenu(
+      groupCd.value,
+      nowStoreCd.value,
+      pcond2.value,
+      pcond3.value,
+      pcond4.value,
+      pcond.value,
+      pcond5.value == true ? 1 : 0,
+      pcond6.value,
+      pcond7.value == true ? 1 : 0
+    );
+    console.log(res);
+
+    if (res.data.RESULT_CD == "00") {
+      Swal.fire({
+        title: "성공.",
+        text: "저장 하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+    } else {
+      Swal.fire({
+        title: "실패",
+        text: "저장에 실패하였습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (error) {
+  } finally {
+    showPopUp.value = false;
+
+    await handleStoreCd(nowStoreCd.value);
+  }
+};
+
+const closePopUp = () => {
+  pcond.value = "";
+  pcond2.value = "";
+  pcond3.value = "";
+  pcond4.value = "";
+  pcond5.value = false;
+  pcond6.value = "";
+  pcond7.value = false;
+  showPopUp.value = false;
+};
 function decimalToHexColor(decimal) {
   // 문자열이면 숫자로 변환
 
@@ -1053,10 +1246,21 @@ const afterCategory = ref(false);
  * 페이지 매장 코드 세팅
  */
 
+const handleGroupCd = (e) => {
+  groupCd.value = e;
+};
 const handleStoreCd = async (newValue) => {
   if (newValue == "0") {
     afterSearch.value = false;
   }
+
+  const res = await getSubGroup3(store.state.userData.lngStoreGroup, newValue);
+  //console.log(res);
+  optionList.value = res.data.List;
+  if (optionList.value.length > 0) {
+    pcond2.value = res.data.List[0].lngCode;
+  }
+
   nowStoreCd.value = newValue;
   const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
   MenuList.value = res2.data.menuList;
@@ -1379,12 +1583,10 @@ watch(items, (newvalue) => {
   //comsole.log(MenuKeyList.value);
 });
 
+const showPopUp = ref(false);
+const showPopUp2 = ref(false);
 const movePage1 = () => {
-  store.state.moveOtherTab = {
-    strUrl: "MIMASTER::MST01_033INS.xml",
-    lngProgramID: 73762,
-    strTitle: "메뉴 코드 등록.",
-  };
+  showPopUp.value = true;
 };
 
 const movePage2 = () => {

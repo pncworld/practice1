@@ -625,8 +625,8 @@ const searchButton = async () => {
     confirmitem.value = JSON.parse(JSON.stringify(KeyList.value));
     confirmitem2.value = JSON.parse(JSON.stringify(ScreenKeyOrigin.value));
 
-    console.log(res4);
-    console.log(res2);
+    //console.log(res4);
+    //console.log(res2);
   } catch (error) {
     afterSearch.value = false;
   } finally {

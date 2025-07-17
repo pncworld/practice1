@@ -691,7 +691,7 @@ const saveButton = async () => {
         );
         //comsole.log(res2);
       } catch (error) {
-        console.error("API 호출 중 오류 발생:", error);
+        //console.error("API 호출 중 오류 발생:", error);
       } finally {
         store.state.loading = false;
         Swal.fire({

@@ -26,7 +26,7 @@ Author : 권맑음                     
           @excelStore="excelStore"
           @lngStoreCode="lngStoreCode"></PickCustCompany>
       </div>
-      <div class="!-ml-2 justify-start flex flex-col">
+      <div class="!-ml-14 justify-start flex flex-col">
         <PickBelongCust
           :lngStoreCode="selectedStores"
           @excelList="excelList"
@@ -211,7 +211,7 @@ const searchButton = async () => {
       selectedStoreAttrs.value,
       selectedStores2.value
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -236,12 +236,12 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreCode2 = async (e) => {
   initGrid();
   selectedStores2.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreGroup = async (e) => {
   initGrid();

@@ -153,11 +153,11 @@ const ey = ref("");
 const em = ref("");
 const selectedDate = ref("");
 const startYear = (e) => {
-  console.log(e);
+  //console.log(e);
   sy.value = e;
 };
 const startMonth = (e) => {
-  console.log(e);
+  //console.log(e);
   sm.value = e;
 };
 const endYear = (e) => {
@@ -249,7 +249,7 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 /**

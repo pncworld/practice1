@@ -37,8 +37,7 @@
               v-model="username"
               placeholder="아이디를 입력하세요"
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              @keyup.enter="login2" />
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
 
           <div class="mb-6">
@@ -51,8 +50,7 @@
               v-model="password"
               placeholder="비밀번호를 입력하세요"
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              @keyup.enter="login2" />
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
 
           <button
@@ -100,6 +98,7 @@ import {
   getFavoriteList,
   login,
 } from "../api/common";
+import { insertLoginLog } from "@/customFunc/customFunc";
 
 const store = useStore(); // Vuex 스토어 가져오기
 const router = useRouter(); // Vue Router 가져오기
@@ -114,13 +113,21 @@ const login2 = async () => {
   store.state.selectedCategoryId = null;
   try {
     const response = await login(username.value, password.value);
-    //comsole.log(response);
-    const loginStatus = response.data.loginSession[0].strUserID;
 
+    const loginStatus = response.data.loginSession[0].strUserID;
+    console.log(loginStatus);
     if (!isNaN(Number(loginStatus))) {
       store.dispatch("updateUserData", response.data.loginSession[0]);
       store.dispatch("setToken", response.data.loginSession[0].SessionToken);
       //comsole.log(response.data.loginSession[0]);
+      //console.trace();
+      const res = await insertLoginLog(
+        username.value,
+        password.value,
+        response.data.loginSession[0].lngStoreGroup,
+        response.data.loginSession[0].lngPosition
+      );
+      //console.log(res);
       message.value = "로그인 성공";
       const readPrograms = async () => {
         const response = await get_sys_list(
@@ -130,7 +137,7 @@ const login2 = async () => {
         );
 
         const result = response.data.sysMenu;
-        console.log(result);
+        //console.log(result);
         const mainCategoryData = result.filter(
           (item) => Number(item.strMenuLevel) == 1
         ); // 숫자
@@ -180,12 +187,15 @@ const login2 = async () => {
         "setFavoriteList",
         res4.data.List.map((item) => Number(item.lngProgramID))
       );
-      router.push("/homepage");
+      await store.dispatch("convertLoading", false);
+      await router.push("/homepage");
+
+      return;
     } else {
       throw new Error("로그인 실패");
     }
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     message.value = "오류 발생";
   } finally {
     store.dispatch("convertLoading", false);

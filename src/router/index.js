@@ -13,6 +13,7 @@ import systemRouter from "./systemRouter";
 import micrmRouter from "./micrmRouter";
 import minoticeRouter from "./minoticeRouter";
 import mihrRouter from "./mihrRouter";
+import miposRouter from "./miposRouter";
 
 const isMobile = () => {
   const userAgent = window.navigator.userAgent;
@@ -76,6 +77,11 @@ const routes = [
   {
     path: "/MIHR",
     children: mihrRouter(),
+  },
+  {
+    path: "/MIPOS",
+    //component : BasicLayout ,
+    children: miposRouter(),
   },
 ];
 

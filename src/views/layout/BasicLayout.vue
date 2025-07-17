@@ -33,6 +33,7 @@
             <button
               v-for="(item, i) in mainCategoryList"
               :key="i"
+              name="categorys"
               @click="selectCategory(item.lngCode)"
               class="px-3 py-2 text-sm sm:text-sm md:text-xs lg:text-sm font-semibold text-gray-700 bg-white border rounded hover:bg-gray-200 whitespace-nowrap">
               {{ item.strTitle }}
@@ -283,7 +284,7 @@ const logout = () => {
 const isMenu = ref(true);
 const mainCategoryList = computed(() => store.state.mainCategory);
 const clickFirstCategory = () => {
-  const buttons = document.querySelectorAll("button"); // 모든 버튼 선택
+  const buttons = document.querySelectorAll('button[name="categorys"]'); // 모든 버튼 선택
   if (buttons.length > 0) {
     buttons[0].click(); // 첫 번째 버튼 클릭
   }

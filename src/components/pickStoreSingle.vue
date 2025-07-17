@@ -205,7 +205,7 @@ onMounted(() => {
     emit("lngStoreTeam", 0);
     emit("excelStore", "매장명 : 전체");
   } else {
-    console.log(store.state.userData.lngTeamCode);
+    //console.log(store.state.userData.lngTeamCode);
     emit("lngStoreGroup", store.state.userData.lngStoreGroup);
     emit("lngStoreCode", store.state.userData.lngPosition);
     emit("lngStoreAttrs", store.state.userData.lngJoinType);

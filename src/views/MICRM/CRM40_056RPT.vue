@@ -159,10 +159,12 @@ const excelDate = (e) => {
 const teamcode = ref();
 const lngTeamCode = (e) => {
   teamcode.value = e;
+  initGrid();
 };
 const supervisor = ref();
 const lngSupervisor = (e) => {
   supervisor.value = e;
+  initGrid();
 };
 const storeCode = ref();
 const lngStoreCode = (e) => {
@@ -173,6 +175,7 @@ const lngStoreCode = (e) => {
 const storeAttr = ref();
 const lngStoreAttrs = (e) => {
   storeAttr.value = e;
+  initGrid();
 };
 
 const groupCd = ref();
@@ -201,7 +204,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;

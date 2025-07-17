@@ -489,7 +489,7 @@ const changeStartDate = (e) => {
 const changeEndDate = (e) => {
   const date1 = new Date(selectedStartDate.value);
   const date2 = new Date(e.target.value);
-  console.log(date2.getFullYear());
+  //console.log(date2.getFullYear());
   if (date1.getTime() > date2.getTime() && date2.getFullYear() >= 2000) {
     // Swal.fire({
     //   title: "시작일이 종료일을 앞섭니다.",
