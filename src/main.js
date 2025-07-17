@@ -51,22 +51,22 @@ app.config.warnHandler = (msg, instance, trace) => {
   // //console.warn(msg) // 주석 처리하거나 제거하면 경고가 콘솔에 출력되지 않음
 };
 
-// 전역 오류 핸들러 설정
-// app.config.errorHandler = (err, vm, info) => {
-//   //console.error("Vue 전역 에러 발생:", err, "Info:", info);
+//전역 오류 핸들러 설정
+app.config.errorHandler = (err, vm, info) => {
+  //console.error("Vue 전역 에러 발생:", err, "Info:", info);
 
-//   Swal.fire({
-//     title: "오류 발생",
-//     text: "예기치 않은 오류가 발생했습니다. 이전 상태로 복원합니다.",
-//     icon: "error",
-//     confirmButtonText: "확인",
-//   });
+  Swal.fire({
+    title: "오류 발생",
+    text: "예기치 않은 오류가 발생했습니다. 이전 상태로 복원합니다.",
+    icon: "error",
+    confirmButtonText: "확인",
+  });
 
-//   // 롤백 처리
-//   if (vm?.rollback) {
-//     vm.rollback();
-//   }
-// };
+  // 롤백 처리
+  if (vm?.rollback) {
+    vm.rollback();
+  }
+};
 
 app.mount("#app");
 

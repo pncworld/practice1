@@ -217,36 +217,36 @@ export async function insertLoginLog(id, pw, group, storecd) {
   return ``;
 }
 
-export async function insertMobileLoginLog(id, pw, group, storecd) {
-  //const store = useStore()
-  const currenttime = new Date();
-  const inserttime = formatDateTime2(currenttime);
+// export async function insertMobileLoginLog(id, pw, group, storecd) {
+//   //const store = useStore()
+//   const currenttime = new Date();
+//   const inserttime = formatDateTime2(currenttime);
 
-  //comsole.log(store);
-  // const userGroup = store.state.userData.GROUP_CD;
-  // const userStoreCd = store.state.userData.STORE_CD;
-  // const userId = store.state.userData.USER_NO;
-  let userIp = "MOBILE";
-  // const userip = async () => {
-  //   const result = await fetch("https://api64.ipify.org?format=json");
-  //   const data = await result.json();
-  //   userIp = data.ip;
-  // };
-  // await userip();
+//   //comsole.log(store);
+//   // const userGroup = store.state.userData.GROUP_CD;
+//   // const userStoreCd = store.state.userData.STORE_CD;
+//   // const userId = store.state.userData.USER_NO;
+//   let userIp = "MOBILE";
+//   // const userip = async () => {
+//   //   const result = await fetch("https://api64.ipify.org?format=json");
+//   //   const data = await result.json();
+//   //   userIp = data.ip;
+//   // };
+//   // await userip();
 
-  const res = await saveLoginLog(
-    inserttime,
-    group,
-    storecd,
-    id,
-    pw,
-    userIp,
-    "01",
-    2
-  );
-  console.log(res);
-  return ``;
-}
+//   const res = await saveLoginLog(
+//     inserttime,
+//     group,
+//     storecd,
+//     id,
+//     pw,
+//     userIp,
+//     "01",
+//     2
+//   );
+//   console.log(res);
+//   return ``;
+// }
 
 export function formatNumberWithCommas(number) {
   // if (typeof number !== 'number') return number; // 숫자가 아닐 경우 그대로 반환

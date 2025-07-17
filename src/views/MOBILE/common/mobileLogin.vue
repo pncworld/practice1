@@ -105,7 +105,6 @@
 import { alreadyMobileLogined } from "@/api/common";
 import { getMobileProgList, mobileLogin } from "@/api/mobile";
 import loading from "@/components/loading.vue";
-import { insertMobileLoginLog } from "@/customFunc/customFunc";
 /*
  * 공통 표준  Function
  */
