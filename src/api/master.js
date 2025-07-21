@@ -2505,3 +2505,71 @@ export const saveSubTitle = (
     LNGMENU8: lngmenu8,
   });
 };
+
+export const getSalesInfoByCorner = (groupCd, type, storeCd, cornerCd) => {
+  return api2.post("/MIMASTER/MST56_001INS.asmx/getSalesInfoByCorner", {
+    GROUP_CD: groupCd,
+    TYPE: type,
+    STORE_CD: storeCd,
+    CORNER_CD: cornerCd,
+  });
+};
+export const getSoldMenuList = (groupCd, storeCd, cornerCd, cond, cond2) => {
+  return api2.post("/MIMASTER/MST56_001INS.asmx/getSoldMenuList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    CORNER_CD: cornerCd,
+    COND: cond,
+    COND2: cond2,
+  });
+};
+export const getMenuConList = (
+  groupCd,
+  storeCd,
+  cornerCd,
+  cond,
+  cond2,
+  cond3
+) => {
+  return api2.post("/MIMASTER/MST56_001INS.asmx/getMenuConList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    CORNER_CD: cornerCd,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+  });
+};
+
+export const saveMenuInfo = (groupCd, storeCd, menuCd, cond, cond2) => {
+  return api2.post("/MIMASTER/MST56_001INS.asmx/saveMenuInfo", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    MENU_CD: menuCd,
+    STS: cond,
+    USER_ID: cond2,
+  });
+};
+export const getSCTeamList = (groupCd) => {
+  return api2.post("/MIMASTER/MST01_005INS.asmx/getSCTeamList", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const saveSCTeamList = (groupCd, teamcd, teamnm, id, ip) => {
+  return api2.post("/MIMASTER/MST01_005INS.asmx/saveSCTeamList", {
+    GROUP_CD: groupCd,
+    TEAM_CD: teamcd,
+    TEAM_NM: teamnm,
+    USER_ID: id,
+    USER_IP: ip,
+  });
+};
+export const deleteSCTeam = (groupCd, teamcd, id, ip) => {
+  return api2.post("/MIMASTER/MST01_005INS.asmx/deleteSCTeam", {
+    GROUP_CD: groupCd,
+    TEAM_CD: teamcd,
+    USER_ID: id,
+    USER_IP: ip,
+  });
+};

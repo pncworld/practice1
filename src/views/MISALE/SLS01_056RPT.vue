@@ -18,8 +18,8 @@
       </div>
     </div>
     <div
-      class="grid grid-rows-1 grid-cols-[0.1fr,10fr,1fr,10fr] justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <input type="checkbox" class="-mt-12 ml-2" @click="checkDate" />
+      class="grid grid-rows-1 grid-cols-[0.1fr,10fr,1fr,10fr] justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
+      <input type="checkbox" class="mt-5 ml-2" @click="checkDate" />
       <div class="grid grid-cols-1 grid-rows-2 ml-10">
         <Datepicker2
           @endDate="endDate"
@@ -48,10 +48,10 @@
           >
         </div>
       </div>
-      <div class="-mt-10 -ml-10">
+      <div class="mt-5">
         <input type="checkbox" :value="1" @click="updateShowStore" />
       </div>
-      <div class="-mt-10">
+      <div class="">
         <PickStoreCorner
           @lngStoreGroup="lngStoreGroup"
           @lngStoreCode="lngStoreCode"

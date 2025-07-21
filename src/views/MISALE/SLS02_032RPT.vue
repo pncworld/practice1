@@ -17,8 +17,8 @@ Author : 권맑음                     
     </div>
   </div>
   <div
-    class="grid grid-rows-2 grid-cols-3 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
-    <div class="ml-[68px]">
+    class="grid grid-rows-2 grid-cols-2 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
+    <div class="ml-12">
       <Datepicker1
         @dateValue="dateValue"
         @year="year"
@@ -33,92 +33,39 @@ Author : 권맑음                     
         @lngAreaCode="lngAreaCode"
         @excelStore="excelStore"></PickStoreCorner>
     </div>
-    <div class="mt-2">
+    <div class="-ml-[494px] mt-1">
       <PosList
         :groupCd="groupCd"
         :storeCd="storeCd"
         @posNo="posNo"
-        class="!ml-3"
+        class=""
         :init="init"></PosList>
     </div>
-    <div class="space-x-5 flex items-center ml-12 mt-1">
+    <div class="space-x-5 flex items-center mt-1 -ml-24 pl-1">
       <div class="text-base font-semibold z-10 text-nowrap">영수증 번호</div>
       <input
         type="text"
         class="border rounded-lg pl-1 h-10 !w-36 z-30"
         v-model="receiptNo" />
     </div>
-    <div class="items-start justify-start flex -translate-x-[75px] mt-3">
-      <DisCountCdList
-        class="flex w-[150%]"
-        @disCountCd="DisCountCd"
-        @discountNm="discountNm"
-        :groupCd="groupCd"
-        :storeCd="storeCd"
-        :init="init"></DisCountCdList>
-    </div>
-    <div class="flex justify-center items-center ml-9 mt-3">
-      <PayCodeList
-        class="flex"
-        @payCd="selectedpayCd"
-        @payNm="payNm"
-        :groupCd="groupCd"
-        :storeCd="storeCd"
-        :init="init">
-      </PayCodeList>
-    </div>
   </div>
 
-  <div class="grid grid-rows-1 grid-cols-[7fr,3fr] h-[80%] mt-5">
-    <div>
-      <span class="flex justify-start"
-        >*영수내역을 선택하시면 상세내역을 확인할 수 있습니다.</span
-      >
-      <Realgrid
-        :progname="'SLS01_057RPT_VUE'"
-        :progid="1"
-        :rowData="rowData"
-        :valuesData="valuesData"
-        :documentTitle="'SLS01_057RPT'"
-        :labelsData="labelsData"
-        :labelingColumns="'strVoidFlag'"
-        :selectionStyle="'singleRow'"
-        @clickedRowData="clickedRowData"
-        :initSelect="true"
-        :setStateBar="false"
-        :exporttoExcel="exceloutput"
-        :rowStateeditable="false"
-        :documentSubTitle="documentSubTitle"></Realgrid>
-    </div>
-    <div class="grid grid-rows-3 grid-cols-1">
-      <div>
-        <span class="flex justify-start">고객 정보</span>
-        <Realgrid
-          :progname="'SLS02_011RPT_VUE'"
-          :progid="2"
-          :rowData="rowData2"
-          :rowStateeditable="false"
-          :setStateBar="false"></Realgrid>
-      </div>
-      <div class="mt-5">
-        <span class="flex justify-start">주문 정보</span>
-        <Realgrid
-          :progname="'SLS02_011RPT_VUE'"
-          :progid="3"
-          :rowData="rowData3"
-          :rowStateeditable="false"
-          :setStateBar="false"></Realgrid>
-      </div>
-      <div class="mt-5">
-        <span class="flex justify-start">결제 정보</span>
-        <Realgrid
-          :progname="'SLS02_011RPT_VUE'"
-          :progid="4"
-          :rowData="rowData4"
-          :rowStateeditable="false"
-          :setStateBar="false"></Realgrid>
-      </div>
-    </div>
+  <div class="h-[70vh] mt-1">
+    <Realgrid
+      :progname="'SLS02_032RPT_VUE'"
+      :progid="1"
+      :rowData="rowData"
+      :valuesData="valuesData"
+      :documentTitle="'SLS02_032RPT'"
+      :labelsData="labelsData"
+      :labelingColumns="'strVoidFlag'"
+      :selectionStyle="'singleRow'"
+      @clickedRowData="clickedRowData"
+      :initSelect="true"
+      :setStateBar="false"
+      :exporttoExcel="exceloutput"
+      :rowStateeditable="false"
+      :documentSubTitle="documentSubTitle"></Realgrid>
   </div>
 </template>
 
@@ -128,7 +75,7 @@ import {
   getOrderInfo,
   getPayInfo,
   getReceiptbyCorner,
-  getReceiptDatas,
+  getReceiptbyCorner2,
 } from "@/api/misales";
 import PickStoreCorner from "@/components/pickStoreCorner.vue";
 /**
@@ -140,12 +87,10 @@ import Datepicker1 from "@/components/Datepicker1.vue";
  *  할인 코드 호출 컴포넌트
  *  */
 
-import DisCountCdList from "@/components/disCountCdList.vue";
 /**
  *  결제 코드 호출 컴포넌트
  *  */
 
-import PayCodeList from "@/components/payCodeList.vue";
 /**
  *  포스번호 호출 컴포넌트
  *  */
@@ -246,18 +191,19 @@ const searchButton = async () => {
   store.state.loading = true;
   try {
     initGrid();
-    const res = await getReceiptbyCorner(
+    let cond = 0;
+    if (receiptNo.value !== "") {
+      cond = receiptNo.value;
+    }
+    const res = await getReceiptbyCorner2(
       groupCd.value,
       storeCd.value,
       selectedStoreAreaCode.value,
-      selectedPosNo.value,
       selectedDate.value,
-      receiptNo.value,
-      disCountCd.value,
-      payCd.value,
-      loginedstrLang
+      selectedPosNo.value,
+      cond
     );
-    //comsole.log(res);
+    console.log(res);
 
     rowData.value = res.data.List;
     afterSearch.value = true;
@@ -427,10 +373,6 @@ const excelButton = () => {
   cond += selectedPosNo.value == 0 ? "전체" : selectedPosNo.value;
   let cond2 = "영수증번호 : ";
   cond2 += receiptNo.value;
-  let cond3 = "할인코드 : ";
-  cond3 += disCountNm.value;
-  let cond4 = "지불코드 : ";
-  cond4 += paynm.value;
 
   documentSubTitle.value =
     selectedExcelDate.value +
@@ -439,11 +381,7 @@ const excelButton = () => {
     "\n" +
     cond +
     "\n" +
-    cond2 +
-    "\n" +
-    cond3 +
-    "\n" +
-    cond4;
+    cond2;
   exceloutput.value = !exceloutput.value;
 };
 /**

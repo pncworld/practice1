@@ -1,7 +1,10 @@
 <template>
   <div
-    class="grid grid-rows-1 grid-cols-[1fr,3fr,3fr,6fr] w-[600px] h-8 items-center justify-start gap-5 ml-12 mt-2">
-    <div class="text-base font-semibold text-nowrap w-auto">매장 코너</div>
+    class="grid grid-rows-1 grid-cols-[1fr,3fr,3fr,6fr] w-[600px] h-8 items-start justify-start gap-5 mt-2">
+    <div
+      class="text-base font-semibold text-nowrap w-auto flex justify-center items-center mt-2">
+      매장 코너
+    </div>
     <div class="w-32">
       <select
         name=""

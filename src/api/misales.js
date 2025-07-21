@@ -1274,3 +1274,46 @@ export const getSalesReportbyManager = (
     OPERATOR: oper,
   });
 };
+
+export const getReceiptbyCorner2 = (
+  groupCd,
+  storeCd,
+  cond,
+  cond2,
+  cond3,
+  cond4
+) => {
+  return api2.post("/MISALES/SLS02_032RPT.asmx/getReceiptbyCorner2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: cond,
+    DATE: cond2,
+    POS_NO: cond3,
+    RECEIPT_NO: cond4,
+  });
+};
+export const getSalesByCornerMenu = (
+  groupCd,
+  storeCd,
+  cond,
+  cond2,
+  cond3,
+  cond4
+) => {
+  return api2.post("/MISALES/SLS04_027RPT.asmx/getSalesByCornerMenu", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: cond,
+    SDATE: cond2,
+    EDATE: cond3,
+    REPORT_TYPE: cond4,
+  });
+};
+export const getSalesByCornerMenu2 = (groupCd, cond, storeCd, cond2) => {
+  return api2.post("/MISALES/SLS04_027RPT.asmx/getSalesByCornerMenu2", {
+    GROUP_CD: groupCd,
+    TYPE: cond,
+    STORE_CD: storeCd,
+    CORNER_CD: cond2,
+  });
+};

@@ -1,5 +1,6 @@
 import ATT01_002INS from "@/views/MIATTEND/ATT01_002INS.vue";
 import MST01_002INS from "@/views/MIMASTER/MST01_002INS.vue";
+import MST01_005INS from "@/views/MIMASTER/MST01_005INS.vue";
 import MST01_008INS from "@/views/MIMASTER/MST01_008INS.vue";
 import MST01_010INS from "@/views/MIMASTER/MST01_010INS.vue";
 import MST01_011INS_01 from "@/views/MIMASTER/MST01_011INS_01.vue";
@@ -33,6 +34,7 @@ import MST44_062INS from "@/views/MIMASTER/MST44_062INS.vue";
 import MST44_063INS from "@/views/MIMASTER/MST44_063INS.vue";
 import MST44_064INS from "@/views/MIMASTER/MST44_064INS.vue";
 import MST49_008INS from "@/views/MIMASTER/MST49_008INS.vue";
+import MST56_001INS from "@/views/MIMASTER/MST56_001INS.vue";
 import MST57_001INS from "@/views/MIMASTER/MST57_001INS.vue";
 import MST57_002INS from "@/views/MIMASTER/MST57_002INS.vue";
 import MST_001INS from "@/views/MIMASTER/MST_001INS.vue";
@@ -198,6 +200,14 @@ export default function masterRouter() {
     {
       path: "MST36_006INS.xml",
       component: MST36_006INS,
+    },
+    {
+      path: "MST56_001INS.xml",
+      component: MST56_001INS,
+    },
+    {
+      path: "MST01_005INS.xml",
+      component: MST01_005INS,
     },
   ];
 }

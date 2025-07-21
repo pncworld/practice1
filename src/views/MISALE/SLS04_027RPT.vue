@@ -18,15 +18,16 @@
       </div>
     </div>
     <div
-      class="grid grid-rows-1 grid-cols-[0.1fr,10fr,1fr,10fr] justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
+      class="grid grid-rows-1 grid-cols-[0.1fr,10fr,10fr] justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
       <input type="checkbox" class="mt-5 ml-2" @click="checkDate" />
       <div class="grid grid-cols-1 grid-rows-2 justify-start !pr-10">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
           @excelDate="excelDate"
+          :mainName="'일자'"
           :initToday="1"
-          class="!-ml-5"
+          class="!ml-2"
           :closePopUp="closePopUp"
           ref="datepicker"></Datepicker2>
         <div
@@ -46,11 +47,14 @@
               @click="checkUnite"
               checked />셀병합</label
           >
+
+          <label for="corner" class="text-red-500 font-semibold"
+            ><input id="corner" type="checkbox" @click="checkByCorner" />코너별
+            매출</label
+          >
         </div>
       </div>
-      <div class="mt-5">
-        <input type="checkbox" :value="1" @click="updateShowStore" />
-      </div>
+
       <div class="">
         <PickStoreCorner
           @lngStoreGroup="lngStoreGroup"
@@ -62,20 +66,20 @@
 
     <div class="h-[80%] mt-5">
       <Realgrid
-        :progname="'SLS01_055RPT_VUE'"
-        :progid="1"
+        :progname="'SLS04_027RPT_VUE'"
+        :progid="progid"
         :rowData="rowData"
         :reload="reload"
         :selectionStyle="'singleRow'"
         :hideColumnsId="hideColumnsId"
         :setFooter="true"
-        :documentTitle="'SLS01_055RPT'"
+        :documentTitle="'SLS04_027RPT'"
         :setGroupFooter="setGroupFooter"
-        :setGroupSumCustomColumnId3="setGroupSumCustomColumnId3"
-        :customStyleColumnID="['strStore', 'dtmDate', 'strCorner']"
+        :customStyleColumnID="['dtmDate', 'CornerNM']"
         :setGroupColumnId="setGroupColumnId"
         :setMergeMode="false"
         :setRowGroupSpan2="setRowGroupSpan2"
+        :mergeMask="'dtmDate,CornerNM'"
         :documentSubTitle="documentSubTitle"
         :exporttoExcel="exporttoExcel"
         :rowStateeditable="false"></Realgrid>
@@ -84,7 +88,7 @@
 </template>
 
 <script setup>
-import { getSalesByCorner } from "@/api/misales";
+import { getSalesByCornerMenu } from "@/api/misales";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -130,17 +134,19 @@ onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 });
 
-const setGroupSumCustomColumnId3 = ref(["strCorner"]);
+const setGroupSumCustomColumnId3 = ref(["CornerNM"]);
 const documentSubTitle = ref();
 const selectedExcelDate = ref();
 const selectedExcelStore = ref();
 const selectedstartDate = ref();
 const selectedendDate = ref();
-const setRowGroupSpan2 = ref("strStore,dtmDate,strCorner");
+const setRowGroupSpan2 = ref("dtmDate,CornerNM");
 const selectedEndYear = ref();
 const selectedStartYear = ref();
 const selectedEndMonth = ref();
 const reload = ref(false);
+
+const progid = ref(2);
 /**
  * 선택한 매출 시작일자
  */
@@ -179,7 +185,7 @@ const lngareacode = ref();
 const maxSaleTarget = ref("");
 const checked = ref(0);
 const setGroupFooter = ref(true);
-const hideColumnsId = ref(["dtmDate", "strStore"]);
+const hideColumnsId = ref(["dtmDate"]);
 /**
  * 페이지 매장 그룹 세팅
  */
@@ -205,7 +211,7 @@ const lngAreaCode = (e) => {
 };
 const receiptNo = ref();
 const initCheckBox = ref(false);
-const setGroupColumnId = ref("strCorner");
+const setGroupColumnId = ref("CornerNM");
 const store = useStore();
 const loginedstrLang = store.state.userData.lngLanguage;
 //comsole.log(store);
@@ -231,29 +237,42 @@ const searchButton = async () => {
   try {
     store.state.loading = true;
     initGrid();
-    let reporttype;
-    if (checkdate.value == true && checkStore.value == true) {
-      reporttype = 123;
-    } else if (checkdate.value == true && checkStore.value == false) {
-      reporttype = 13;
-    } else if (checkdate.value == false && checkStore.value == true) {
-      reporttype = 23;
-    } else {
-      reporttype = 3;
-    }
-    reload.value = !reload.value;
-    //comsole.log(setGroupColumnId.value);
-    const res = await getSalesByCorner(
-      lngstoregroup.value,
-      lngstorecode.value,
-      lngareacode.value,
-      selectedstartDate.value,
-      selectedendDate.value,
-      reporttype
-    );
-    //comsole.log(res);
 
-    rowData.value = res.data.List;
+    if (checkdate.value == false) {
+      hideColumnsId.value = ["dtmDate"];
+    } else {
+      hideColumnsId.value = [];
+    }
+    //let reporttype = 1;
+    if (setCorner.value == false) {
+      progid.value = 2;
+      const res = await getSalesByCornerMenu(
+        lngstoregroup.value,
+        lngstorecode.value,
+        lngareacode.value,
+        selectedstartDate.value,
+        selectedendDate.value,
+        1
+      );
+
+      rowData.value = res.data.List;
+    } else {
+      progid.value = 4;
+      reload.value = !reload.value;
+      console.log(store.state.userData);
+      const res = await getSalesByCornerMenu(
+        lngstoregroup.value,
+        lngstorecode.value,
+        lngareacode.value,
+        selectedstartDate.value,
+        selectedendDate.value,
+        3
+      );
+      rowData.value = res.data.List;
+      console.log(res);
+    }
+
+    //comsole.log(setGroupColumnId.value);
 
     afterSearch.value = true;
   } catch (error) {
@@ -324,88 +343,26 @@ const initGrid = () => {
   }
 };
 const checkStore = ref(false);
-const updateShowStore = (e) => {
-  if (e.target.checked) {
-    if (hideColumnsId.value.includes("dtmDate")) {
-      hideColumnsId.value = ["dtmDate"];
-    } else {
-      hideColumnsId.value = [];
-    }
 
-    if (setGroupColumnId.value.includes("dtmDate")) {
-      setGroupColumnId.value = "dtmDate,strStore,strCorner";
-    } else {
-      setGroupColumnId.value = "strStore,strCorner";
-    }
-    checkStore.value = true;
-    if (setGroupSumCustomColumnId3.value.includes("dtmDate")) {
-      setGroupSumCustomColumnId3.value = ["dtmDate", "strStore", "strCorner"];
-    } else {
-      setGroupSumCustomColumnId3.value = ["strStore", "strCorner"];
-    }
-  } else {
-    if (hideColumnsId.value.includes("dtmDate")) {
-      hideColumnsId.value = ["dtmDate", "strStore"];
-    } else {
-      hideColumnsId.value = ["strStore"];
-    }
-
-    if (setGroupColumnId.value.includes("dtmDate")) {
-      setGroupColumnId.value = "dtmDate,strCorner";
-    } else {
-      setGroupColumnId.value = "strCorner";
-    }
-    checkStore.value = false;
-    if (setGroupSumCustomColumnId3.value.includes("dtmDate")) {
-      setGroupSumCustomColumnId3.value = ["dtmDate", "strCorner"];
-    } else {
-      setGroupSumCustomColumnId3.value = ["strCorner"];
-    }
-  }
-};
 const checkdate = ref(false);
 const checkDate = (e) => {
-  if (e.target.checked) {
-    if (hideColumnsId.value.includes("strStore")) {
-      hideColumnsId.value = ["strStore"];
-    } else {
-      hideColumnsId.value = [];
-    }
+  checkdate.value = e.target.checked;
 
-    if (setGroupColumnId.value.includes("strStore")) {
-      setGroupColumnId.value = "dtmDate,strStore,strCorner";
-    } else {
-      setGroupColumnId.value = "dtmDate,strCorner";
-    }
-    checkdate.value = true;
-    if (setGroupSumCustomColumnId3.value.includes("strStore")) {
-      setGroupSumCustomColumnId3.value = ["dtmDate", "strStore", "strCorner"];
-    } else {
-      setGroupSumCustomColumnId3.value = ["dtmDate", "strCorner"];
-    }
-  } else {
-    if (hideColumnsId.value.includes("strStore")) {
-      hideColumnsId.value = ["strStore", "dtmDate"];
-    } else {
-      hideColumnsId.value = ["dtmDate"];
-    }
-
-    if (setGroupColumnId.value.includes("strStore")) {
-      setGroupColumnId.value = "strStore,strCorner";
-    } else {
-      setGroupColumnId.value = "strCorner";
-    }
-    checkdate.value = false;
-    if (setGroupSumCustomColumnId3.value.includes("strStore")) {
-      setGroupSumCustomColumnId3.value = ["strStore", "strCorner"];
-    } else {
-      setGroupSumCustomColumnId3.value = ["strCorner"];
-    }
+  if (setCorner.value == true && checkdate.value == false) {
+    setGroupFooter.value = false;
+  } else if (setCorner.value == true && checkdate.value == true) {
+    setGroupFooter.value = false;
   }
+
+  //    if (checkdate.value == false ) {
+  //       setGroupFooter.value = false;
+  //     } else {
+  //       setGroupFooter.value = true;
+  //     }
 };
 const checkUnite = (e) => {
   if (e.target.checked) {
-    setRowGroupSpan2.value = "dtmDate,strStore,strCorner";
+    setRowGroupSpan2.value = "dtmDate,CornerNM";
   } else {
     setRowGroupSpan2.value = "";
   }
@@ -417,6 +374,30 @@ const checkSum = (e) => {
   } else {
     setGroupFooter.value = false;
   }
+
+  if (setCorner.value == true && checkdate.value == false) {
+    setGroupFooter.value = false;
+  }
+
   reload.value = !reload.value;
+};
+
+const setCorner = ref(false);
+const checkByCorner = (e) => {
+  if (e.target.checked) {
+    setCorner.value = true;
+    setGroupColumnId.value = "dtmDate";
+  } else {
+    setCorner.value = false;
+    setGroupColumnId.value = "dtmDate,CornerNM";
+  }
+
+  if (setCorner.value == true && checkdate.value == false) {
+    setGroupFooter.value = false;
+  } else if (setCorner.value == true && checkdate.value == true) {
+    setGroupFooter.value = false;
+  }
+
+  //  reload.value = !reload.value;
 };
 </script>

@@ -1344,6 +1344,7 @@ const funcshowGrid = async () => {
         : "line",
       domainOnly: true,
       textReadOnly: true,
+      dropDownWhenClick: true,
       datetimeFormat: "yyyy-MM-dd",
       mask:
         item.strColID == "strSTime" ||
@@ -2047,7 +2048,7 @@ const funcshowGrid = async () => {
 
   gridView.onItemChecked = function (grid, itemIndex, checked) {
     gridView.setCurrent({ dataRow: itemIndex });
-    dataProvider.beginUpdate();
+    // dataProvider.beginUpdate();
     // if (gridView.isCheckedRow(itemIndex)) {
     //   grid.checkItem(itemIndex, false);
     // } else {
@@ -2065,12 +2066,12 @@ const funcshowGrid = async () => {
     // console.log("여기안오냐");
     emit("checkedRowIndex", rows);
     updatedrowData.value = [...dataProvider.getJsonRows()];
-    dataProvider.endUpdate();
+    // dataProvider.endUpdate();
     //selectedRowData.value.index = itemIndex;
   };
   gridView.onItemAllChecked = (grid, checked) => {
     //console.log("전체체크");
-    dataProvider.beginUpdate();
+
     selectedRowData.value = gridView
       .getCheckedItems()
       .map((index) => dataProvider.getRows()[index]);
@@ -2082,7 +2083,7 @@ const funcshowGrid = async () => {
       selectedRowData.value.push(data);
     }
     emit("checkedRowData", selectedRowData.value);
-    dataProvider.endUpdate();
+
     // updatedrowData.value = [...dataProvider.getJsonRows()];
     // emit("updatedRowData", updatedrowData.value);
   };
@@ -2103,7 +2104,7 @@ const funcshowGrid = async () => {
     if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
       return;
     }
-    console.log(clickData);
+
     var current = gridView.getCurrent();
     selectedindex.value = current.dataRow;
     selectedRowData.value = dataProvider.getRows()[current.dataRow];
@@ -2120,7 +2121,7 @@ const funcshowGrid = async () => {
     selectedRowData.value = dataProvider.getRows()[current.dataRow];
     if (selectedRowData.value) {
       selectedRowData.value.index = current.dataRow;
-      //emit('clickedRowData', selectedRowData.value);
+
       emit("selectedIndex", current.dataRow);
     }
   };
@@ -2144,20 +2145,12 @@ const funcshowGrid = async () => {
     }
     if (clickData.cellType === "header") {
       gridView.setCurrent({ dataRow: selectedindex.value });
-      //console.log("asdf");
-      // gridView.sortingOptions.enabled = false;
-
-      // if(gridView.getSortedFields()[0].direction == "ascending"){
-      //       gridView.orderBy(clickData.fieldName, "descending");
-      //   }else{
-      //       gridView.orderBy(clickData.fieldName, "ascending");
-      //   }
     }
     if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
       return;
     }
     var current = gridView.getCurrent();
-    //comsole.log(current);
+    //console.log(current);
     if (current.itemIndex !== -1) {
       emit("selectedIndex", current.dataRow);
       emit("selectedIndex2", current.dataRow);
@@ -2802,6 +2795,16 @@ watch(
     dataProvider.removeRow(curr.dataRow);
     //comsole.log(dataProvider.getAllStateRows());
     emit("allStateRows", dataProvider.getAllStateRows());
+
+    updatedrowData.value = [...dataProvider.getJsonRows()];
+    //const curr = gridView.getCurrent();
+    selectedRowData.value = dataProvider.getRows()[curr.dataRow];
+    if (curr.dataRow > -1) {
+      emit("updatedRowData", updatedrowData.value);
+      emit("clickedRowData", selectedRowData.value);
+      const currRowState2 = dataProvider.getRowState(curr.dataRow);
+      emit("sendRowState", currRowState2);
+    }
   }
 );
 
@@ -2816,9 +2819,17 @@ watch(
     }
     emit("allStateRows", dataProvider.getAllStateRows());
 
+    // if (checkedArr.length != 0) {
+    //   emit("updatedRowData", updatedrowData.value);
+    // }
     updatedrowData.value = [...dataProvider.getJsonRows()];
-    if (checkedArr.length != 0) {
+    const curr = gridView.getCurrent();
+    selectedRowData.value = dataProvider.getRows()[curr.dataRow];
+    if (curr.dataRow > -1) {
       emit("updatedRowData", updatedrowData.value);
+      emit("clickedRowData", selectedRowData.value);
+      const currRowState2 = dataProvider.getRowState(curr.dataRow);
+      emit("sendRowState", currRowState2);
     }
 
     // gridView.commit();
