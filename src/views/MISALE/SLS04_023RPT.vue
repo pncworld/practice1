@@ -1,7 +1,7 @@
 <!-- /*--############################################################################
-# Filename : SLS11_024RPT.vue                                                  
-# Description : 매출관리 > 분류별 매출 현황 > 주문구분 현황.           
-# Date :2025-07-21                                                            
+# Filename : SLS04_023RPT.vue                                                  
+# Description : 매출관리 > 메뉴별 매출 현황 > 메뉴엔지니어링           
+# Date :2025-07-22                                                            
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
@@ -19,14 +19,14 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-3 grid-rows-1 justify-between bg-gray-200 rounded-lg h-14 items-start z-10">
+      class="grid grid-cols-3 grid-rows-2 justify-between bg-gray-200 rounded-lg h-28 items-start z-10">
       <div class="">
         <Datepicker2
           @endDate="endDate"
           @startDate="startDate"
           :closePopUp="closePopUp"
           ref="datepicker"
-          class=""
+          class="ml-7"
           :mainName="'기간'"
           @excelDate="excelDate"
           :initToday="1"
@@ -40,60 +40,65 @@
           @changeInit="changeInit">
         </PickStoreRenew>
       </div>
-      <div class="flex items-center justify-center mt-2">
-        <div class="font-semibold text-base flex items-center justify-center">
-          주문구분
-        </div>
-        <div class="flex items-center justify-center ml-2">
-          <select
-            name=""
-            id=""
-            class="h-10 w-48 border border-black"
-            v-model="cond">
+      <div></div>
+      <div
+        class="flex justify-start items-center text-base text-nowrap font-semibold ml-12 space-x-5">
+        메뉴구분
+        <div class="flex space-x-5 ml-5">
+          <select name="" id="" class="w-48 h-8" v-model="cond">
             <option value="0">전체</option>
-            <option value="1">POS</option>
-            <option value="2">TABLET ORDER</option>
+            <option value="1">대그룹</option>
+            <option value="2">서브그룹</option>
+            <option value="3">메뉴코드</option>
+          </select>
+
+          <select name="" id="" class="w-48 h-8" v-model="cond2">
+            <option :value="i.lngCode" v-for="i in optionList">
+              {{ i.strName }}
+            </option>
           </select>
         </div>
+      </div>
+      <div class="flex items-center justify-start text-base font-bold ml-2">
+        <div>ABC</div>
+        <select name="" id="" class="w-28 h-8 ml-5">
+          <option value="0">A</option>
+          <option value="1">B</option>
+          <option value="2">C</option>
+        </select>
+      </div>
+      <div class="flex items-center justify-center text-base font-bold">
+        <div>평가</div>
+        <select name="" id="" class="w-28 h-8 ml-5">
+          <option value="0">전체</option>
+          <option value="1">Star</option>
+          <option value="2">Plow Horse</option>
+          <option value="3">Puzzle</option>
+          <option value="4">Dog</option>
+        </select>
       </div>
     </div>
     <!-- 조회 조건 -->
     <!--그리드 영역 -->
-    <div class="w-full h-[80vh] grid-rows-2 grid-cols-1">
-      <div class="h-[20%]">
-        <Realgrid
-          :progname="'SLS11_024RPT_VUE'"
-          :progid="2"
-          :rowData="rowData2"
-          :reload="reload"
-          :setFooter="true"
-          :setMergeMode="false"
-          :setGroupCustomLevel="2"
-          :setGroupFooter="setGroupFooter"
-          @clickedRowData="clickedRowData"
-          :setGroupSumCustomColumnId2="['strStoreName']"
-          :suffixColumnPercent="['lngTabOrderRate']"
-          :setGroupColumnId="setGroupColumnId"
-          :documentTitle="'SLS11_024RPT'"
-          :documentSubTitle="documentSubTitle"
-          :exporttoExcel="exportExcel"
-          :rowStateeditable="false">
-        </Realgrid>
-      </div>
-      <div class="h-[70%]">
-        <Realgrid
-          :progname="'SLS11_024RPT_VUE'"
-          :progid="1"
-          :rowData="filteredrowData"
-          :reload="reload"
-          :setRowGroupSpan2="'strStoreName,dtmDate,lngReceipt'"
-          :mergeMask="'strStoreName,dtmDate'"
-          :documentTitle="'SLS11_024RPT'"
-          :documentSubTitle="documentSubTitle"
-          :exporttoExcel="exportExcel"
-          :rowStateeditable="false">
-        </Realgrid>
-      </div>
+    <div class="w-full h-[70vh] grid-rows-2 grid-cols-1">
+      <Realgrid
+        :progname="'SLS11_024RPT_VUE'"
+        :progid="2"
+        :rowData="rowData2"
+        :reload="reload"
+        :setFooter="true"
+        :setMergeMode="false"
+        :setGroupCustomLevel="2"
+        :setGroupFooter="setGroupFooter"
+        @clickedRowData="clickedRowData"
+        :setGroupSumCustomColumnId2="['strStoreName']"
+        :suffixColumnPercent="['lngTabOrderRate']"
+        :setGroupColumnId="setGroupColumnId"
+        :documentTitle="'SLS11_024RPT'"
+        :documentSubTitle="documentSubTitle"
+        :exporttoExcel="exportExcel"
+        :rowStateeditable="false">
+      </Realgrid>
     </div>
   </div>
   <!--그리드 영역 -->

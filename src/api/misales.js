@@ -1317,3 +1317,12 @@ export const getSalesByCornerMenu2 = (groupCd, cond, storeCd, cond2) => {
     CORNER_CD: cond2,
   });
 };
+export const getOrderStatus = (groupCd, storeCd, sdate, edate, cond) => {
+  return api2.post("/MISALES/SLS11_024RPT.asmx/getOrderStatus", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    COND: cond,
+  });
+};

@@ -75,7 +75,6 @@
         :setFooter="true"
         :documentTitle="'SLS04_027RPT'"
         :setGroupFooter="setGroupFooter"
-        :customStyleColumnID="['dtmDate', 'CornerNM']"
         :setGroupColumnId="setGroupColumnId"
         :setMergeMode="false"
         :setRowGroupSpan2="setRowGroupSpan2"
@@ -246,27 +245,40 @@ const searchButton = async () => {
     //let reporttype = 1;
     if (setCorner.value == false) {
       progid.value = 2;
+      let cond = 0;
+      if (checkdate.value == false) {
+        cond = 0;
+      } else {
+        cond = 1;
+      }
       const res = await getSalesByCornerMenu(
         lngstoregroup.value,
         lngstorecode.value,
         lngareacode.value,
         selectedstartDate.value,
         selectedendDate.value,
-        1
+        cond
       );
-
+      console.log(res);
       rowData.value = res.data.List;
     } else {
       progid.value = 4;
       reload.value = !reload.value;
       console.log(store.state.userData);
+      let cond = 2;
+      if (checkdate.value == false) {
+        cond = 2;
+      } else {
+        cond = 3;
+      }
+
       const res = await getSalesByCornerMenu(
         lngstoregroup.value,
         lngstorecode.value,
         lngareacode.value,
         selectedstartDate.value,
         selectedendDate.value,
-        3
+        cond
       );
       rowData.value = res.data.List;
       console.log(res);
@@ -282,10 +294,6 @@ const searchButton = async () => {
     store.state.loading = false;
   }
 };
-const groupCd = ref();
-const storeCd = ref();
-const dtmDate = ref();
-const init = ref(false);
 
 const rowData = ref([]);
 
@@ -347,13 +355,32 @@ const checkStore = ref(false);
 const checkdate = ref(false);
 const checkDate = (e) => {
   checkdate.value = e.target.checked;
+  console.log(setCorner.value);
+  console.log(checkdate.value);
+  console.log(setGroupFooter.value);
+  // if (setCorner.value == true && checkdate.value == false) {
+  //   setGroupFooter.value = false;
+  // } else if (
+  //   setCorner.value == true &&
+  //   checkdate.value == true &&
+  //   setGroupFooter.value == false
+  // ) {
+  //   setGroupFooter.value = false;
+  // } else if (
+  //   setCorner.value == true &&
+  //   checkdate.value == true &&
+  //   setGroupFooter.value == true
+  // ) {
+  //   setGroupFooter.value = true;
+  // }
 
-  if (setCorner.value == true && checkdate.value == false) {
-    setGroupFooter.value = false;
-  } else if (setCorner.value == true && checkdate.value == true) {
-    setGroupFooter.value = false;
-  }
-
+  // if (setCorner.value == true) {
+  //   setGroupColumnId.value = "dtmDate";
+  // } else {
+  //   setGroupColumnId.value = "dtmDate,CornerNm";
+  // }
+  console.log(setGroupFooter.value);
+  console.log(setGroupColumnId.value);
   //    if (checkdate.value == false ) {
   //       setGroupFooter.value = false;
   //     } else {
@@ -366,6 +393,8 @@ const checkUnite = (e) => {
   } else {
     setRowGroupSpan2.value = "";
   }
+
+  //setGroupFooter.value = e.target.checked;
   reload.value = !reload.value;
 };
 const checkSum = (e) => {
@@ -375,9 +404,15 @@ const checkSum = (e) => {
     setGroupFooter.value = false;
   }
 
-  if (setCorner.value == true && checkdate.value == false) {
-    setGroupFooter.value = false;
-  }
+  // if (setCorner.value == true && checkdate.value == false) {
+  //   setGroupFooter.value = false;
+  // }
+
+  // if (setCorner.value == true) {
+  //   setGroupColumnId.value = "dtmDate";
+  // } else {
+  //   setGroupColumnId.value = "dtmDate,CornerNm";
+  // }
 
   reload.value = !reload.value;
 };
@@ -392,11 +427,11 @@ const checkByCorner = (e) => {
     setGroupColumnId.value = "dtmDate,CornerNM";
   }
 
-  if (setCorner.value == true && checkdate.value == false) {
-    setGroupFooter.value = false;
-  } else if (setCorner.value == true && checkdate.value == true) {
-    setGroupFooter.value = false;
-  }
+  // if (setCorner.value == true && checkdate.value == false) {
+  //   setGroupFooter.value = false;
+  // } else if (setCorner.value == true && checkdate.value == true) {
+  //   setGroupFooter.value = false;
+  // }
 
   //  reload.value = !reload.value;
 };
