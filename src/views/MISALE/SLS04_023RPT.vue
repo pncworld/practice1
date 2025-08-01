@@ -61,15 +61,16 @@
       </div>
       <div class="flex items-center justify-start text-base font-bold ml-2">
         <div>ABC</div>
-        <select name="" id="" class="w-28 h-8 ml-5">
-          <option value="0">A</option>
-          <option value="1">B</option>
-          <option value="2">C</option>
+        <select name="" id="" class="w-28 h-8 ml-5" v-model="cond3">
+          <option value="0">전체</option>
+          <option value="1">A</option>
+          <option value="2">B</option>
+          <option value="3">C</option>
         </select>
       </div>
       <div class="flex items-center justify-center text-base font-bold">
         <div>평가</div>
-        <select name="" id="" class="w-28 h-8 ml-5">
+        <select name="" id="" class="w-28 h-8 ml-5" v-model="cond4">
           <option value="0">전체</option>
           <option value="1">Star</option>
           <option value="2">Plow Horse</option>
@@ -82,19 +83,15 @@
     <!--그리드 영역 -->
     <div class="w-full h-[70vh] grid-rows-2 grid-cols-1">
       <Realgrid
-        :progname="'SLS11_024RPT_VUE'"
-        :progid="2"
-        :rowData="rowData2"
+        :progname="'SLS04_023RPT_VUE'"
+        :progid="1"
+        :rowData="rowData"
         :reload="reload"
-        :setFooter="true"
-        :setMergeMode="false"
         :setGroupCustomLevel="2"
-        :setGroupFooter="setGroupFooter"
-        @clickedRowData="clickedRowData"
-        :setGroupSumCustomColumnId2="['strStoreName']"
-        :suffixColumnPercent="['lngTabOrderRate']"
-        :setGroupColumnId="setGroupColumnId"
-        :documentTitle="'SLS11_024RPT'"
+        :mergeColumns2="true"
+        :mergeColumnGroupName2="[['기본단가 기준']]"
+        :mergeColumnGroupSubList2="[['lngPrice', 'oriFloCostRate']]"
+        :documentTitle="'SLS04_023RPT'"
         :documentSubTitle="documentSubTitle"
         :exporttoExcel="exportExcel"
         :rowStateeditable="false">
@@ -105,7 +102,7 @@
 </template>
 
 <script setup>
-import { getOrderStatus } from "@/api/misales";
+import { getMenuDistinct, getMenuEngineer } from "@/api/misales";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -149,6 +146,10 @@ const afterSearch = ref(false);
 const selectedstartDate = ref();
 const selectedendDate = ref();
 const cond = ref(0);
+const cond2 = ref(0);
+const cond3 = ref(0);
+const cond4 = ref(0);
+const optionList = ref([{ lngCode: 0, strName: "전체" }]);
 const setGroupColumnId = ref("");
 
 /**
@@ -199,16 +200,18 @@ const searchButton = async () => {
 
     reload.value = !reload.value;
 
-    const res = await getOrderStatus(
+    const res = await getMenuEngineer(
       selectedGroup.value,
-      selectedStores.value,
       selectedstartDate.value,
       selectedendDate.value,
-      cond.value
+      cond.value,
+      cond2.value,
+      cond3.value,
+      cond4.value
     );
     console.log(res);
-    rowData2.value = res.data.List;
-    rowData.value = res.data.List2;
+
+    rowData.value = res.data.List;
 
     afterSearch.value = true;
   } catch (error) {
@@ -238,6 +241,20 @@ const lngStoreCodes = (e) => {
   //comsole.log(e);
 };
 
+watch(cond, async () => {
+  const res = await getMenuDistinct(
+    store.state.userData.lngStoreGroup,
+    0,
+    cond.value
+  );
+  console.log(res);
+  optionList.value = res.data.List;
+
+  if (optionList.value.length == 0) {
+    optionList.value = [{ lngCode: 0, strName: "전체" }];
+  }
+  cond2.value = 0;
+});
 /**
  * 페이지 매장 분류 세팅
  */
@@ -253,13 +270,6 @@ const lngStoreCodes = (e) => {
 const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
-  }
-
-  if (rowData2.value.length > 0) {
-    rowData2.value = [];
-  }
-  if (filteredrowData.value.length > 0) {
-    filteredrowData.value = [];
   }
 };
 

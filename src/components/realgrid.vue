@@ -938,6 +938,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  showCheckRowDataByForce: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // 2구간
@@ -2063,7 +2067,7 @@ const funcshowGrid = async () => {
     }
     emit("checkedRowData", selectedRowData.value);
     //console.log(selectedRowData.value);
-    // console.log("여기안오냐");
+    //console.log("여기안오냐");
     emit("checkedRowIndex", rows);
     updatedrowData.value = [...dataProvider.getJsonRows()];
     // dataProvider.endUpdate();
@@ -2186,6 +2190,19 @@ const funcshowGrid = async () => {
           }
         }
       }
+
+      // if (props.showCheckRowDataByForce) {
+      //   var rows = gridView.getCheckedRows();
+      //   //console.log(rows)
+      //   selectedRowData.value = [];
+      //   for (var i in rows) {
+      //     var data = dataProvider.getJsonRow(rows[i]);
+      //     selectedRowData.value.push(data);
+      //   }
+
+      //   emit("checkedRowData", selectedRowData.value);
+      // }
+
       // dataProvider.checkRowStates(true);
       selectedRowData.value = dataProvider.getRows()[current.dataRow];
       if (selectedRowData.value) {
@@ -2226,7 +2243,7 @@ const funcshowGrid = async () => {
       var data = dataProvider.getJsonRow(rows[i]);
       selectedRowData.value.push(data);
     }
-    //console.log("여긴왓겟.ㅈ");
+
     emit("checkedRowData", selectedRowData.value);
     emit("checkedRowIndex", rows);
     updatedrowData.value = [...dataProvider.getJsonRows()];

@@ -1326,3 +1326,30 @@ export const getOrderStatus = (groupCd, storeCd, sdate, edate, cond) => {
     COND: cond,
   });
 };
+
+export const getMenuDistinct = (groupCd, storeCd, cond) => {
+  return api2.post("/MISALES/SLS04_023RPT.asmx/getMenuDistinct", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    COND: cond,
+  });
+};
+export const getMenuEngineer = (
+  groupCd,
+  sdate,
+  edate,
+  cond,
+  cond2,
+  cond3,
+  cond4
+) => {
+  return api2.post("/MISALES/SLS04_023RPT.asmx/getMenuEngineer", {
+    GROUP_CD: groupCd,
+    SDATE: sdate,
+    EDATE: edate,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+  });
+};

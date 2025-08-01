@@ -13,7 +13,7 @@
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="excelButton" class="button save w-auto excel">
+        <button @click="downloadExcel" class="button save w-auto excel">
           엑셀
         </button>
       </div>
@@ -125,7 +125,11 @@ import Realgrid from "@/components/realgrid.vue";
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog } from "@/customFunc/customFunc";
+import {
+  formatLocalDate,
+  formatNumberWithCommas,
+  insertPageLog,
+} from "@/customFunc/customFunc";
 /*
  * 공통 표준  Function
  */
@@ -136,6 +140,7 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
+import { utils, write } from "xlsx-js-style";
 
 const reload = ref(false);
 const rowData = ref([]);
@@ -314,6 +319,166 @@ const excelStore = (e) => {
 
 const changeInit = (e) => {
   initGrid();
+};
+
+const downloadExcel = () => {
+  console.log(rowData2.value);
+
+  const filtered = rowData2.value.map((row, index) => [
+    index + 1,
+    row.strStoreName,
+    formatNumberWithCommas(row.lngTotCnt),
+    formatNumberWithCommas(row.lngPosOrderCnt),
+    formatNumberWithCommas(row.lngTabOrderCnt),
+    Math.round(row.lngTabOrderRate, 2) + "%",
+  ]);
+  const worksheet = utils.aoa_to_sheet(filtered, { origin: "A7" });
+
+  worksheet["B1"] = { t: "s", v: "주문구분 현황" };
+  worksheet["B3"] = { t: "s", v: selectedExcelStore.value };
+  worksheet["B4"] = {
+    t: "s",
+    v: "작성일시 :" + new Date().toISOString().split("T")[0],
+  };
+
+  worksheet["A6"] = { t: "s", v: "No" };
+  worksheet["B6"] = { t: "s", v: "매장명" };
+  worksheet["C6"] = { t: "s", v: "총 건수" };
+  worksheet["D6"] = { t: "s", v: "POS" };
+  worksheet["E6"] = { t: "s", v: "TABLET ORDER" };
+  worksheet["F6"] = { t: "s", v: "TABLET ORDER 비율" };
+
+  let secondRowLeng = rowData2.value.length + 7 + 2;
+  utils.sheet_add_aoa(
+    worksheet,
+    [
+      [
+        "No",
+        "매장명",
+        "일자",
+        "영수번호",
+        "주문시간",
+        "주문구분",
+        "메뉴코드",
+        "메뉴명",
+        "판매가",
+        "수량",
+        "금액",
+      ],
+    ],
+    { origin: `A${secondRowLeng}` }
+  );
+
+  // console.log(`A${secondRowLeng}`);
+  // worksheet[`A${secondRowLeng}`] = { t: "s", v: "매장명" };
+  // worksheet[`B${secondRowLeng}`] = { t: "s", v: "일자" };
+  // worksheet[`C${secondRowLeng}`] = { t: "s", v: "영수번호" };
+  // worksheet[`D${secondRowLeng}`] = { t: "s", v: "주문시간" };
+  // worksheet[`E${secondRowLeng}`] = { t: "s", v: "주문구분" };
+  // worksheet[`F${secondRowLeng}`] = { t: "s", v: "메뉴코드" };
+  // worksheet[`G${secondRowLeng}`] = { t: "s", v: "메뉴명" };
+  // worksheet[`H${secondRowLeng}`] = { t: "s", v: "판매가" };
+  // worksheet[`I${secondRowLeng}`] = { t: "s", v: "수량" };
+  // worksheet[`J${secondRowLeng}`] = { t: "s", v: "금액" };
+
+  worksheet["!cols"] = [
+    { wch: 10 }, // No
+    { wch: 40 }, // 매장명
+    { wch: 20 }, // 총 건수
+    { wch: 20 }, // POS
+    { wch: 20 }, // TABLET ORDER
+    { wch: 20 }, // TABLET ORDER 비율
+    { wch: 20 }, // TABLET ORDER 비율
+  ];
+
+  // 헤더에 스타일 적용 예시 (Pro 버전 사용 시)
+  const headerStyle = {
+    fill: { fgColor: { rgb: "FF87CEFA" } },
+    font: { bold: true, size: 16 },
+  };
+
+  const dataStyle = {
+    border: { top: "thin", left: "thin", bottom: "thin", right: "thin" },
+    font: { size: 16 },
+  };
+
+  // ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6", "I6"].forEach((cell) => {
+  //   if (worksheet[cell]) {
+  //     worksheet[cell].s = headerStyle;
+  //   }
+  // });
+
+  for (var i = 0; i < 11; i++) {
+    let cell = String.fromCharCode(65 + i) + "6";
+    let cell2 = String.fromCharCode(65 + i) + secondRowLeng;
+    if (worksheet[cell]) {
+      worksheet[cell].s = headerStyle;
+    }
+    if (worksheet[cell2]) {
+      worksheet[cell2].s = headerStyle;
+    }
+  }
+
+  // ["A7", "B7", "C7", "D7", "A8", "B8", "C8", "D8"].forEach((cell) => {
+  //   if (worksheet[cell]) {
+  //     worksheet[cell].s = dataStyle;
+  //   }
+  // });
+
+  for (var i = 0; i < 9; i++) {
+    let cell = String.fromCharCode(65 + i);
+    for (var j = 0; j < rowData2.value.length; j++) {
+      cell = cell + (j + 7);
+      if (worksheet[cell]) {
+        worksheet[cell].s = dataStyle;
+      }
+    }
+  }
+
+  const filteredData = filteredrowData.value.map((row, index) => [
+    index + 1,
+    row.strStoreName,
+    formatLocalDate(row.dtmDate.split(" ")[0]),
+    row.lngReceipt,
+    row.dtmEndTime,
+    row.strOrderType,
+    row.lngSMenu,
+    row.strMenuName,
+    formatNumberWithCommas(row.lngPrice),
+    formatNumberWithCommas(row.intCount),
+    formatNumberWithCommas(row.lngAmount),
+  ]);
+  utils.sheet_add_aoa(worksheet, filteredData, {
+    origin: `A${secondRowLeng + 1}`,
+  });
+
+  const workbook = utils.book_new();
+  utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+  const workbookOut = write(workbook, { bookType: "xlsx", type: "binary" });
+
+  function s2ab(s) {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i < s.length; i++) {
+      view[i] = s.charCodeAt(i) & 0xff;
+    }
+    return buf;
+  }
+
+  const blob = new Blob([s2ab(workbookOut)], {
+    type: "application/octet-stream",
+  });
+
+  // Blob을 가리키는 URL 생성
+  const url = window.URL.createObjectURL(blob);
+
+  // 임시 링크를 만들어 클릭 이벤트로 다운로드 실행
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "주문구분 현황.xlsx"; // 저장될 파일명
+  document.body.appendChild(a);
+  a.click();
 };
 </script>
 

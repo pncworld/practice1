@@ -996,7 +996,7 @@ const realgridname2 = (e) => {
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
-  //comsole.log(store.state.userData.lngCommonMenu);
+  console.log(store.state.userData.lngCommonMenu);
 
   if (store.state.userData.lngCommonMenu == "1") {
     nowStoreCd.value = 0;
@@ -1258,7 +1258,7 @@ const handleStoreCd = async (newValue) => {
     afterClickrow.value = true;
     return;
   }
-  nowStoreCd.value = newValue;
+  // nowStoreCd.value = newValue;
   searchButton();
 };
 const clickmappingData = ref([]);
@@ -1326,8 +1326,8 @@ const searchButton = async () => {
       groupCd.value,
       nowStoreCd.value
     );
-    //console.log(res);
-    //console.log(res2);
+    console.log(res);
+    console.log(res2);
     // //console.log(res2.data.menuList);
     rowData2.value = res2.data.menuList;
     SubMenuGroup.value = res2.data.submenuGroup;

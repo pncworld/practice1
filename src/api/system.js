@@ -173,3 +173,57 @@ export const savePassWord = (groupcd, sequence, password) => {
     PASSWORD: password,
   });
 };
+export const getProgSecureGroup = (groupcd, cond, cond2) => {
+  return api2.post("/MISYSTEM/SYS50_001INS.asmx/getProgSecureGroup", {
+    GROUP_CD: groupcd,
+    COND: cond,
+    COND2: cond2,
+  });
+};
+export const saveProgSecureGroup = (
+  groupcd,
+  cond,
+  cond2,
+  groupcd2,
+  cond21,
+  cond22
+) => {
+  return api2.post("/MISYSTEM/SYS50_001INS.asmx/saveProgSecureGroup", {
+    GROUP_CD: groupcd,
+    COND: cond,
+    COND2: cond2,
+    GROUP_CD2: groupcd2,
+    COND21: cond21,
+    COND22: cond22,
+  });
+};
+export const deleteSecureGroup = (groupcd, lngcode) => {
+  return api2.post("/MISYSTEM/SYS50_001INS.asmx/deleteSecureGroup", {
+    GROUP_CD: groupcd,
+    LNG_CODE: lngcode,
+  });
+};
+export const getProgAuthGroup = (groupcd, cond, lang) => {
+  return api2.post("/MISYSTEM/SYS50_002INS.asmx/getProgAuthGroup", {
+    GROUP_CD: groupcd,
+    COND: cond,
+    LANG: lang,
+  });
+};
+export const saveProgPriv = (
+  groupcd,
+  progid,
+  progmajor,
+  progsub,
+  useradminids,
+  checkbox
+) => {
+  return api2.post("/MISYSTEM/SYS50_002INS.asmx/saveProgPriv", {
+    GROUP_CD: groupcd,
+    PROG_ID: progid,
+    PROG_MAJOR: progmajor,
+    PROG_SUB: progsub,
+    USER_ADMINIDS: useradminids,
+    LNG_ADMINTYPE: checkbox,
+  });
+};
