@@ -2573,3 +2573,9 @@ export const deleteSCTeam = (groupCd, teamcd, id, ip) => {
     USER_IP: ip,
   });
 };
+export const getSAFMasterDownload = (cond, cond2) => {
+  return api2.post("/MIMASTER/MST44_057INS.asmx/getSAFMasterDownload", {
+    COND: cond,
+    COND2: cond2,
+  });
+};
