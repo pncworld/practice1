@@ -23,8 +23,8 @@
     <PickStore
       @update:storeCd="handleStoreCd"
       @storeNm="handlestoreNm"
-      :hidesub="hideAll"
-      :hideAttr="hideAll"
+      :hidesub="hidesub"
+      :hideAttr="hideAttr"
       @update:ischanged="handleinitAll"
       @update:ischanged2="searchinit"></PickStore>
   </div>
@@ -133,18 +133,22 @@ import { useStore } from "vuex";
  * 	화면 Load시 실행 스크립트
  */
 
-const hideAll = ref(true);
+const hidesub = ref(true);
+const hideAttr = ref(true);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
   if (store.state.userData.lngCommonMenu == "1") {
-    hideAll.value = false;
+    hidesub.value = false;
+    hideAttr.value = false;
   } else {
-    hideAll.value = true;
+    hidesub.value = true;
+    hideAttr.value = true;
   }
 });
 
 const nowStoreAreaCd = ref();
-const nowStoreCd = ref();
+const nowStoreCd = ref(0);
 /**
  * 선택한 포스 번호 호출 함수
  */
@@ -225,10 +229,7 @@ const searchButton = async () => {
   items.value = [];
   rowData.value = [];
   rowData2.value = [];
-  if (
-    (nowStoreCd.value == "0" || nowStoreCd.value == undefined) &&
-    store.state.userData.lngCommonMenu == "0"
-  ) {
+  if (nowStoreCd.value == "0" && store.state.userData.lngCommonMenu == "0") {
     Swal.fire({
       title: "경고",
       text: "매장을 선택하세요.",

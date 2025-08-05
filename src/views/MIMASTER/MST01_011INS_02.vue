@@ -1,7 +1,7 @@
 <!-- /*--############################################################################
-# Filename : MST01_011INS_01.vue                                                
-  # Description : 마스터관리 > 메뉴 마스터 > 선택 메뉴 그룹 등록.(U)           
-  # Date :2025-05-14                                                           
+# Filename : MST01_011INS_02.vue                                                
+  # Description : 마스터관리 > 메뉴 마스터 > 매장별 선택메뉴 등록           
+  # Date :2025-08-05                                                           
   # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
@@ -9,11 +9,19 @@
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
     <div class="flex justify-center mr-10 space-x-2 pr-5">
-      <button @click="searchButton" class="button search md:w-auto w-14">
+      <button
+        @click="searchButton"
+        class="button search md:w-auto w-14"
+        :disabled="disabled">
         조회
       </button>
 
-      <button @click="saveButton" class="button save w-auto">저장</button>
+      <button
+        @click="saveButton"
+        class="button save w-auto"
+        :disabled="disabled">
+        저장
+      </button>
     </div>
   </div>
   <br />
@@ -23,8 +31,6 @@
       @update:storeGroup="handleGroupCd"
       @update:storeCd="handleStoreCd"
       @storeNm="handlestoreNm"
-      :hidesub="hidesub"
-      :hideAttr="hideAttr"
       @GroupNm="handleGroupNm"
       @update:ischanged="handleinitAll">
     </PickStore>
@@ -243,7 +249,7 @@
             @click="deleteRowData1">
             삭제
           </button>
-          <button
+          <!-- <button
             class="whitebutton"
             v-if="currentMenu == true"
             @click="addRowData3">
@@ -254,7 +260,7 @@
             v-if="currentMenu == true"
             @click="deleteRowData3">
             삭제
-          </button>
+          </button> -->
         </div>
       </div>
       <div class="flex h-full w-full gap-10">
@@ -276,7 +282,7 @@
             <!-- 옵션관리 그리드-->
             <Realgrid
               class="w-full h-full mt-2"
-              :progname="'MST01_011INS_01_VUE'"
+              :progname="'MST01_011INS_02_VUE'"
               :progid="1"
               :rowData="rowData1"
               @clickedRowData="clickedRowData"
@@ -294,6 +300,7 @@
               :addRow3="addrow1"
               @selectedIndex2="selectedIndex"
               @realgridname="realgridname"
+              @allStateRows="allStateRows"
               :addrowProp="addrowProp"
               :selectionStyle="'singleRow'"
               :rowStateeditable="false"
@@ -321,7 +328,7 @@
             <!-- 옵션그룹관리 그리드-->
             <Realgrid
               class="w-full h-full mt-2"
-              :progname="'MST01_011INS_01_VUE'"
+              :progname="'MST01_011INS_02_VUE'"
               :progid="2"
               :rowData="rowData3"
               @clickedRowData="clickedRowData2"
@@ -335,6 +342,7 @@
               :changeColid="changeColid"
               :addRow3="addrow3"
               @selectedIndex2="selectedIndex2"
+              @allStateRows="allStateRows2"
               :addrowProp="addrowProp2"
               :selectionStyle="'singleRow'"
               :rowStateeditable="false"
@@ -519,10 +527,15 @@
 
 <script setup>
 import {
+  deleteOptionGroup,
+  deleteStoreConTable,
   getAllOptionManageData,
+  getAllOptionManageData2,
   getMostColumnMenuList,
   saveOptions,
   saveOptions2,
+  saveOptions3,
+  saveOptions4,
 } from "@/api/master";
 /*
  * 공통 표준  Function
@@ -579,13 +592,12 @@ onMounted(async () => {
 
   if (store.state.userData.lngCommonMenu == "1") {
     hidesub.value = false;
-    hideAttr.value = false;
   } else {
-    hidesub.value = true;
-    hideAttr.value = true;
+    disabled.value = true;
   }
 });
 
+const disabled = ref(false);
 // 더미 데이터
 const labelData = ref([["필수", "선택"]]);
 const valueData = ref([["1", "0"]]);
@@ -665,21 +677,28 @@ const realgridname4 = (e) => {
 
 watch(currentMenu, () => {
   const reagrid2 = document.getElementById(realgridName.value);
+
   setTimeout(() => {
     RealGrid.getGridInstance(reagrid2).resetSize();
     RealGrid.getGridInstance(reagrid2).refresh(true);
   }, 100);
+
   const reagrid3 = document.getElementById(realgridName2.value);
+
   setTimeout(() => {
     RealGrid.getGridInstance(reagrid3).resetSize();
     RealGrid.getGridInstance(reagrid3).refresh(true);
   }, 100);
+
   const reagrid4 = document.getElementById(realgridName3.value);
+
   setTimeout(() => {
     RealGrid.getGridInstance(reagrid4).resetSize();
     RealGrid.getGridInstance(reagrid4).refresh(true);
   }, 100);
+
   const reagrid5 = document.getElementById(realgridName4.value);
+
   setTimeout(() => {
     RealGrid.getGridInstance(reagrid5).resetSize();
     RealGrid.getGridInstance(reagrid5).refresh(true);
@@ -721,7 +740,7 @@ const handleStoreCd = async (newValue) => {
   if (newValue == "0") {
     afterSearch.value = false;
   }
-  //  nowStoreCd.value = newValue;
+  nowStoreCd.value = newValue;
 };
 const selectedButton = ref();
 const Category = ref([]);
@@ -778,7 +797,7 @@ const clickrowData1 = ref(false);
 
 const clickedRowData = (newValue) => {
   clickrowData1.value = true;
-  //console.log(newValue);
+  console.log(rowData2.value);
   if (newValue == undefined) {
     return;
   }
@@ -798,9 +817,10 @@ const clickedRowData = (newValue) => {
         });
       }
 
-      //comsole.log(filteredrowData2.value);
+      console.log(filteredrowData2.value);
     }
   }
+  console.log(newValue[2]);
   selectedOption.value = newValue[2];
   optionCd.value = Number(newValue[0]);
   optionNm.value = newValue[1];
@@ -892,11 +912,11 @@ const searchButton = async () => {
     return;
   }
 
-  if (store.state.userData.lngCommonMenu == "1") {
-    nowStoreCd.value = 0;
-  } else {
-    nowStoreCd.value = newValue;
-  }
+  //   if (store.state.userData.lngCommonMenu == "1") {
+  //     nowStoreCd.value = 0;
+  //   } else {
+  //     nowStoreCd.value = newValue;
+  //   }
   store.state.loading = true;
   try {
     optionNo.value = "";
@@ -909,10 +929,10 @@ const searchButton = async () => {
     filteredrowData2.value = [];
     filteredrowData4.value = [];
 
-    const res3 = await getAllOptionManageData(groupCd.value, nowStoreCd.value);
-    const res4 = await getMostColumnMenuList(groupCd.value, nowStoreCd.value);
-    //comsole.log(res3);
-    //comsole.log(res4);
+    const res3 = await getAllOptionManageData2(groupCd.value, nowStoreCd.value);
+    const res4 = await getMostColumnMenuList(groupCd.value, 0);
+    // console.log(res3);
+    // console.log(res4);
     rowData1.value = res3.data.OPTIONMANAGE;
     rowData2.value = res3.data.MENULIST;
     rowData3.value = res3.data.OPTIONGROUPMANAGE;
@@ -1050,83 +1070,233 @@ const saveButton = async () => {
         //comsole.log(rowData3.value);
 
         if (currentMenu.value == false) {
+          console.log(deletedState.value);
+
+          const DlngCodes = updatedRowData4.value
+            .filter((item, index) => deletedState.value.includes(index))
+            .map((item) => item.lngCode);
+
+          const DlngStoreGroup = updatedRowData4.value
+            .filter((item, index) => deletedState.value.includes(index))
+            .map((item) => item.lngStoreGroup);
+
+          const DlngStoreCode = updatedRowData4.value
+            .filter((item, index) => deletedState.value.includes(index))
+            .map((item) => item.lngStoreCode);
+          console.log(DlngCodes);
+          if (DlngCodes.length > 0) {
+            const res2 = await deleteStoreConTable(
+              groupCd.value,
+              nowStoreCd.value,
+
+              DlngCodes.join(",")
+            );
+
+            console.log(res2);
+          }
+
           const lngCodes = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngCode);
           const strNames = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.strName);
           const blnMustSels = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.blnMustSel);
           const intMultiples = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.intMultiple);
           const lngChainMenu1 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu1);
           const lngChainMenu2 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu2);
           const lngChainMenu3 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu3);
           const lngChainMenu4 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu4);
           const lngChainMenu5 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu5);
           const lngChainMenu6 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu6);
           const lngChainMenu7 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu7);
           const lngChainMenu8 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu8);
           const lngChainMenu9 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu9);
           const lngChainMenu10 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu10);
           const lngChainMenu11 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu11);
           const lngChainMenu12 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu12);
           const lngChainMenu13 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu13);
           const lngChainMenu14 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu14);
           const lngChainMenu15 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu15);
           const lngChainMenu16 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu16);
           const lngChainMenu17 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu17);
           const lngChainMenu18 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu18);
           const lngChainMenu19 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu19);
           const lngChainMenu20 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu20);
           const lngChainMenu21 = updatedRowData4.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState.value.includes(index) ||
+                createdState.value.includes(index)
+            )
             .map((item) => item.lngChainMenu21);
 
-          const res = await saveOptions(
+          const res = await saveOptions3(
             groupCd.value,
             nowStoreCd.value,
             lngCodes.join(","),
@@ -1155,75 +1325,207 @@ const saveButton = async () => {
             lngChainMenu20.join(","),
             lngChainMenu21.join(",")
           );
+
+          console.log(res);
         } else {
+          const dlngCodes = updatedRowData5.value
+            .filter((item, index) => deletedState2.value.includes(index))
+            .map((item) => item.lngCode);
+
+          const dlngStoreGroup = updatedRowData5.value
+            .filter((item, index) => deletedState2.value.includes(index))
+            .map((item) => item.lngStoreGroup);
+
+          const dlngStoreCode = updatedRowData5.value
+            .filter((item, index) => deletedState2.value.includes(index))
+            .map((item) => item.lngStoreCode);
+
+          if (dlngCodes.length > 0) {
+            const res = await deleteOptionGroup(
+              groupCd.value,
+              nowStoreCd.value,
+              dlngCodes.join("\u200b")
+            );
+            console.log(res);
+          }
           const lngCodes2 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngCode);
           const strNames2 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.strName);
           const lngChainGroup1 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup1);
           const lngChainGroup2 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup2);
           const lngChainGroup3 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup3);
           const lngChainGroup4 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup4);
           const lngChainGroup5 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup5);
           const lngChainGroup6 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup6);
           const lngChainGroup7 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup7);
           const lngChainGroup8 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup8);
           const lngChainGroup9 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup9);
           const lngChainGroup10 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup10);
           const lngChainGroup11 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup11);
           const lngChainGroup12 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup12);
           const lngChainGroup13 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup13);
           const lngChainGroup14 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup14);
           const lngChainGroup15 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup15);
           const lngChainGroup16 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup16);
           const lngChainGroup17 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup17);
           const lngChainGroup18 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup18);
           const lngChainGroup19 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup19);
           const lngChainGroup20 = updatedRowData5.value
             .filter((item) => item.deleted != true)
+            .filter(
+              (item, index) =>
+                changedState2.value.includes(index) ||
+                createdState2.value.includes(index)
+            )
             .map((item) => item.lngChainGroup20);
 
-          const res = await saveOptions2(
+          const res = await saveOptions4(
             groupCd.value,
             nowStoreCd.value,
             lngCodes2.join(","),
@@ -2079,6 +2381,23 @@ const selectedIndex = (newValue) => {
   changeRow.value = newValue;
   selectedindex.value = newValue;
   //comsole.log(selectedindex.value);
+};
+
+const changedState = ref([]);
+const createdState = ref([]);
+const deletedState = ref([]);
+const allStateRows = (e) => {
+  changedState.value = e.updated;
+  createdState.value = e.created;
+  deletedState.value = e.deleted;
+};
+const changedState2 = ref([]);
+const createdState2 = ref([]);
+const deletedState2 = ref([]);
+const allStateRows2 = (e) => {
+  changedState2.value = e.updated;
+  createdState2.value = e.created;
+  deletedState2.value = e.deleted;
 };
 /**
  * 수정용 데이터 행 설정

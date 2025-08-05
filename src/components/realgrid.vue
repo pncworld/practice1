@@ -2678,6 +2678,7 @@ watch(
     }
     updatedrowData.value = [...dataProvider.getJsonRows()];
     emit("updatedRowData", updatedrowData.value);
+    emit("allStateRows", dataProvider.getAllStateRows());
   }
 );
 watch(

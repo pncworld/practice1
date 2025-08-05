@@ -22,6 +22,8 @@
     <PickStore
       @update:storeGroup="handleGroupCd"
       @update:storeCd="handleStoreCd"
+      :hidesub="hidesub"
+      :hideAttr="hideAttr"
       @storeNm="handlestoreNm"
       @GroupNm="handleGroupNm">
     </PickStore>
@@ -258,8 +260,18 @@ import { insertPageLog } from "@/customFunc/customFunc";
  * 	화면 Load시 실행 스크립트
  */
 
+const hidesub = ref(true);
+const hideAttr = ref(true);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
+  if (store.state.userData.lngCommonMenu == "1") {
+    hidesub.value = false;
+    hideAttr.value = false;
+  } else {
+    hidesub.value = true;
+    hideAttr.value = true;
+  }
 });
 
 // 더미 데이터
@@ -314,7 +326,7 @@ const AllscreenKeyPage = ref(1);
 
 const deleteRow = ref(false);
 
-const nowStoreCd = ref();
+const nowStoreCd = ref(0);
 const afterCategory = ref(false);
 /**
  * 페이지 매장 코드 세팅
@@ -326,7 +338,6 @@ const handleStoreCd = async (newValue) => {
     nowStoreCd.value = newValue;
     return;
   }
-  nowStoreCd.value = newValue;
   searchButton();
 };
 const Category = ref([]);
@@ -363,7 +374,7 @@ const searchButton = async () => {
   Category.value = [];
   items.value = [];
 
-  if (nowStoreCd.value == "0" || nowStoreCd.value == undefined) {
+  if (nowStoreCd.value == "0" && store.state.userData.lngCommonMenu == "0") {
     Swal.fire({
       title: "경고",
       text: "매장을 선택하세요.",
@@ -375,6 +386,9 @@ const searchButton = async () => {
     return;
   }
 
+  if (store.state.userData.lngCommonMenu == "1") {
+    nowStoreCd.value = 0;
+  }
   store.state.loading = true;
   try {
     const res3 = await getTLUManageInfo(groupCd.value, nowStoreCd.value);

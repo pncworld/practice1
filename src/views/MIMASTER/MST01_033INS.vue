@@ -181,6 +181,7 @@
           :selectionStyle="'singleRow'"
           @selcetedrowData="selcetedrowData"
           @allStateRows="allStateRows"
+          @sendRowState="sendRowState"
           :labelsData="labelsData"
           :valuesData="valuesData"
           :labelingColumns="labelingColumns"
@@ -285,7 +286,7 @@
                 type="number"
                 name="lngCode"
                 class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-100"
-                :disabled="!(!afterClick && isNew)"
+                :disabled="!isNew"
                 v-model="gridvalue3"
                 @input="changeInfo" />
             </div>
@@ -1101,6 +1102,15 @@ const allStateRows = (e) => {
   updateDeleteInsertrowIndex.value = e;
   //comsole.log(e);
 };
+const sendRowState = (e) => {
+  if (e == "created") {
+    isNew.value = true;
+  } else {
+    isNew.value = false;
+  }
+
+  //comsole.log(e);
+};
 
 const selectedMenu = ref(1);
 const selectMenu = (newValue) => {
@@ -1314,11 +1324,11 @@ const clickedRowData = async (newvalue) => {
     newvalue[31] != undefined ? newvalue[31].split("_").slice(1).join("_") : "";
   //comsole.log(newvalue);
   if (newvalue[34] == true) {
-    isNew.value = true;
+    //isNew.value = true;
     clickaddrowSeq.value = rowData.value[newvalue.index].sequence;
     //comsole.log(clickaddrowSeq.value);
   } else {
-    isNew.value = false;
+    //isNew.value = false;
   }
 
   const firstarr = newvalue[32] != undefined ? newvalue[32].split(";") : [];
@@ -1599,6 +1609,8 @@ const setSubCd4 = () => {
 const searchMenuList = (e) => {
   searchWord.value = e.target.value;
   hideRow.value = e.target.value;
+  isNew.value = false;
+  afterClick.value = true;
 };
 const changeColid = ref("checkedMenu");
 const changeValue2 = ref("");
