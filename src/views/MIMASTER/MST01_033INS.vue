@@ -1617,10 +1617,6 @@ const changeValue2 = ref("");
 const changeRow = ref();
 const changeNow = ref(false);
 
-const changeRow2 = ref();
-const changeValue3 = ref(true);
-const changeColid2 = ref("checkbox");
-const changeNow2 = ref(false);
 /**
  * 체크된 데이터 갱신
  */
