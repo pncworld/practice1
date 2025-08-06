@@ -1621,9 +1621,6 @@ const changeNow = ref(false);
  * 체크된 데이터 갱신
  */
 
-const checkedRowData = (e) => {
-  //comsole.log(e);
-};
 /**
  * 체크된 값 데이터 세팅
  */
@@ -1645,11 +1642,8 @@ const checkedRowData2 = (e) => {
   //comsole.log(e);
 };
 
-const setAllCheck2 = ref(false);
 const searchWord3 = ref();
-const searchMenuList2 = (e) => {
-  searchWord3.value = e.target.value;
-};
+
 const addrowProp = ref();
 const addrowDefault = ref();
 const addrowSeq = ref(1);

@@ -501,7 +501,7 @@ const handleStoreCd = async (newValue) => {
   MenuGroup.value = []
   SubMenuGroup.value = []
   ischecked.value = false
-
+  console.log(newValue)
   nowStoreCd.value = newValue;
   searchButton()
   //comsole.log(nowStoreCd.value)
@@ -750,7 +750,8 @@ const searchButton= async () => {
   receiptD4.value = ''
   receiptD5.value = ''
 
-  if (nowStoreCd.value == '0' || nowStoreCd.value == undefined) {
+ // console.log(store.state.userData.lngCommonMenu)
+  if ((nowStoreCd.value == '0' && store.state.userData.lngCommonMenu == '0')) {
     Swal.fire({
       title: '경고',
       text: '매장을 선택하세요.',
@@ -775,7 +776,8 @@ const searchButton= async () => {
       //comsole.log(rowData2.value)
       afterSearch.value = true
     } else if (currentMenu.value == 2) {
-      res = await getKitchenSettingList(groupCd.value, nowStoreCd.value)
+      let lngcommonmenu = store.state.userData.lngCommonMenu
+      res = await getKitchenSettingList(groupCd.value, nowStoreCd.value ,lngcommonmenu)
       //console.log(res)
 
       SettingList.value = [...res.data.KITCHENMENU]

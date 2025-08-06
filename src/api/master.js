@@ -920,10 +920,11 @@ export const getMenuLists = (groupCd, storeCd) => {
     STORE_CD: storeCd,
   });
 };
-export const getKitchenSettingList = (groupCd, storeCd) => {
+export const getKitchenSettingList = (groupCd, storeCd, common) => {
   return api2.post("/MIMASTER/MST44_062INS.asmx/getKitchenSettingList", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
+    COMMON: common,
   });
 };
 export const getPortConnectionList = (groupCd, storeCd, areaCd) => {

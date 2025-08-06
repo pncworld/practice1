@@ -311,6 +311,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  hidebyLngCommonMenu: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const MainName = ref("");
@@ -454,8 +458,7 @@ onMounted(() => {
   }
   emit("update:storeGroup", store.state.userData.lngStoreGroup);
   emit("update:storeType", store.state.userData.lngJoinType);
-  emit("update:storeCd", selectedStoreCode.value);
-
+  emit("update:storeCd", store.state.userData.lngPosition);
   emit("storeNm", store.state.userData.strStoreName);
   emit("posNo", 0);
   emit("updateFuncScreenType", 0);
@@ -472,6 +475,20 @@ onMounted(() => {
   } else {
     isDisabled.value = true;
   }
+
+  // if (props.hidebyLngCommonMenu == true) {
+  //   if (store.state.userData.lngCommonMenu == "1") {
+  //     hideit.value = false;
+  //     hideit3.value = false;
+  //     emit("update:storeCd", 0);
+  //   } else {
+  //     hideit.value = true;
+  //     hideit3.value = true;
+  //     emit("update:storeCd", selectedStoreCode.value);
+  //   }
+  // } else {
+  //   emit("update:storeCd", selectedStoreCode.value);
+  // }
 
   defaultStoreNm.value = props.defaultStoreNm;
 });
