@@ -1,6 +1,6 @@
 <template>
   <div class="flex justify-start text-sm items-center w-[500px] mt-2">
-    <div class="items-center font-bold text-base flex">매장명</div>
+    <div class="items-center font-bold text-base flex">{{ mainName }}</div>
     <div v-if="hideit">
       <select
         :disabled="true"
@@ -85,10 +85,15 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  mainName: {
+    type: String,
+    default: "매장명",
+  },
 });
 
 const hideit = ref(props.hideit);
 const hideit2 = ref(props.hideit2);
+const mainName = ref(props.mainName);
 const is9999 = ref(store.state.userData.lngStoreGroup[0] !== "9999");
 //const hideit = ref(props.hidesub);
 const defaultPlaceHolder = ref(props.placeholderName);
