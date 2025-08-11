@@ -458,7 +458,7 @@ onMounted(() => {
   }
   emit("update:storeGroup", store.state.userData.lngStoreGroup);
   emit("update:storeType", store.state.userData.lngJoinType);
-  emit("update:storeCd", store.state.userData.lngPosition);
+  emit("update:storeCd", selectedStoreCode.value);
   emit("storeNm", store.state.userData.strStoreName);
   emit("posNo", 0);
   emit("updateFuncScreenType", 0);
@@ -510,11 +510,6 @@ const emitStoreCode = (value) => {
   }
 };
 
-const deActivate = () => {
-  let storeIndex = storeGroup.value.filter((item) => {
-    return item.lngStoreGroup == userData.lngStoreGroup;
-  });
-};
 const setStore = (value) => {
   if (value == 0) {
     storeCd.value = storeCd2.value;

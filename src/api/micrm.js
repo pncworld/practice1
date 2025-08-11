@@ -1665,3 +1665,19 @@ export const saveCustCompInfo = (
     USERID: cond11,
   });
 };
+
+export const getCustomorInfo = (cond, cond2, cond3, cond4) => {
+  return api2.post("/MICRM/CRM20_003INS.asmx/getCustomorInfo", {
+    COMP_CD: cond,
+    COND: cond2,
+    COND2: cond3,
+    COND3: cond4,
+  });
+};
+export const getCardInfo2 = (cond, cond2, cond3) => {
+  return api2.post("/MICRM/CRM20_003INS.asmx/getCardInfo2", {
+    COMP_CD: cond,
+    COND: cond2,
+    COND2: cond3,
+  });
+};

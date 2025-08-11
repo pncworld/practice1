@@ -281,14 +281,22 @@
               class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">
               *메뉴코드
             </div>
-            <div class="justify-center items-center border flex">
+            <div class="justify-start items-center border flex">
               <input
                 type="number"
                 name="lngCode"
-                class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-100"
-                :disabled="!isNew"
+                class="justify-start rounded-lg items-center h-full w-[80%] border flex disabled:bg-gray-100"
+                :disabled="!isNew || isNewAutoMenuCode"
                 v-model="gridvalue3"
                 @input="changeInfo" />
+              <label for="autoMenuCode"
+                ><input
+                  type="checkbox"
+                  id="autoMenuCode"
+                  :checked="isNewAutoMenuCode"
+                  :disabled="disableMenuAuto"
+                  @change="setAuto" />자동</label
+              >
             </div>
             <div
               class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">
@@ -1097,7 +1105,20 @@ const updateDeleteInsertrowIndex = ref([]);
 /**
  * 상태 변화된 행 세팅
  */
-
+const isNewAutoMenuCode = ref(false);
+const disableMenuAuto = ref(true);
+const setAuto = () => {
+  isNewAutoMenuCode.value = !isNewAutoMenuCode.value;
+  if (isNewAutoMenuCode.value == true) {
+    gridvalue3.value = "";
+    const tagName = "lngCode";
+    const value2 = "";
+    //comsole.log(value2);
+    changeColid.value = tagName;
+    changeValue2.value = value2;
+    changeNow.value = !changeNow.value;
+  }
+};
 const allStateRows = (e) => {
   updateDeleteInsertrowIndex.value = e;
   //comsole.log(e);
@@ -1105,8 +1126,10 @@ const allStateRows = (e) => {
 const sendRowState = (e) => {
   if (e == "created") {
     isNew.value = true;
+    disableMenuAuto.value = false;
   } else {
     isNew.value = false;
+    disableMenuAuto.value = true;
   }
 
   //comsole.log(e);
@@ -1240,7 +1263,6 @@ const selectedIndex2 = (e) => {
  */
 
 const clickedRowData = async (newvalue) => {
-  //console.log(newvalue);
   afterClick.value = false;
   if (newvalue[9] == 0 || newvalue[12] == 1) {
     // 판매가 할인여부
@@ -1540,6 +1562,7 @@ const searchButton = async () => {
     afterSearch.value = true;
     initFocus.value = !initFocus.value;
     initSelect.value = !initSelect.value;
+
     afterClick.value = true;
     uploadImages.value = [];
   }
@@ -1656,68 +1679,71 @@ const clickaddrowSeq = ref();
  */
 
 const addRow = () => {
-  const today = new Date();
-  const formattedDate = today.toLocaleDateString("en-CA");
-  addrowProp.value =
-    "lngMainGroup,lngSubGroup,dtmFromDate,dtmToDate,strName,lngPrice,lngTax,blnInactive,strAmtCodeList,lngDCPrice,lngChain,blnDCPriceYN,lngDiscount,intCustCount,lngOrder,blnReceipt,lngMenuOption,blnRedPrint,strIcon,blnKitSingle,lngSubTitle,blnServing,blnOpen,blnDeliveryYN";
-  addrowDefault.value =
-    "0,0," +
-    formattedDate +
-    "," +
-    "9999-12-31" +
-    "," +
-    "" +
-    "," +
-    "0" +
-    "," +
-    "0" +
-    "," +
-    "0" +
-    "," +
-    "0" +
-    "," +
-    "0" +
-    "," +
-    "" + // lngChain
-    "," +
-    "0" +
-    "," +
-    "0" +
-    "," +
-    "0" +
-    "," +
-    "0" +
-    "," +
-    "0" +
-    "," +
-    "0" +
-    "," +
-    "0" +
-    "," +
-    "" +
-    "," +
-    "0" +
-    "," +
-    "" +
-    "," +
-    "0" +
-    "," +
-    "0" +
-    "," +
-    "0";
+  const length = updateDeleteInsertrowIndex.value.created.length;
+  if (length == 0) {
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString("en-CA");
+    addrowProp.value =
+      "lngMainGroup,lngSubGroup,dtmFromDate,dtmToDate,strName,lngPrice,lngTax,blnInactive,strAmtCodeList,lngDCPrice,lngChain,blnDCPriceYN,lngDiscount,intCustCount,lngOrder,blnReceipt,lngMenuOption,blnRedPrint,strIcon,blnKitSingle,lngSubTitle,blnServing,blnOpen,blnDeliveryYN";
+    addrowDefault.value =
+      "0,0," +
+      formattedDate +
+      "," +
+      "9999-12-31" +
+      "," +
+      "" +
+      "," +
+      "0" +
+      "," +
+      "0" +
+      "," +
+      "0" +
+      "," +
+      "0" +
+      "," +
+      "0" +
+      "," +
+      "" + // lngChain
+      "," +
+      "0" +
+      "," +
+      "0" +
+      "," +
+      "0" +
+      "," +
+      "0" +
+      "," +
+      "0" +
+      "," +
+      "0" +
+      "," +
+      "0" +
+      "," +
+      "" +
+      "," +
+      "0" +
+      "," +
+      "" +
+      "," +
+      "0" +
+      "," +
+      "0" +
+      "," +
+      "0";
 
-  //comsole.log(addrowProp.value);
-  addRow4.value = !addRow4.value;
-  addrowSeq.value++;
-  rowData.value.push({
-    new: true,
-    sequence: "new" + addrowSeq.value,
-    lngStoreCode: nowStoreCd.value,
-    strName: undefined,
-    lngCode: undefined,
-    blnInactive: undefined,
-  });
-  clickaddrowSeq.value = "new" + addrowSeq.value;
+    //comsole.log(addrowProp.value);
+    addRow4.value = !addRow4.value;
+    addrowSeq.value++;
+    rowData.value.push({
+      new: true,
+      sequence: "new" + addrowSeq.value,
+      lngStoreCode: nowStoreCd.value,
+      strName: undefined,
+      lngCode: undefined,
+      blnInactive: undefined,
+    });
+    clickaddrowSeq.value = "new" + addrowSeq.value;
+  }
 };
 /**
  * 그리드 행 삭제 버튼 함수
@@ -1773,7 +1799,7 @@ const saveButton = () => {
 
   const validateRow = updateRow.value.filter(
     (item) =>
-      item.lngCode === "" ||
+      (item.lngCode === "" && isNewAutoMenuCode.value == false) ||
       item.lngCode === undefined ||
       item.strName === "" ||
       item.strName === undefined ||
@@ -1832,6 +1858,8 @@ const saveButton = () => {
             updateDeleteInsertrowIndex.value.updated.includes(index) ||
             updateDeleteInsertrowIndex.value.created.includes(index)
         );
+
+        console.log(updatedAndInsertRow);
         //comsole.log(updateDeleteInsertrowIndex.value);
         //comsole.log(updatedAndInsertRow);
         const filterAndMap = (key) =>
@@ -1879,9 +1907,10 @@ const saveButton = () => {
           filterAndMap("strMenuComment"),
           filterAndMap("strAmtCodeList"),
           filterAndMap("strUserFileName"),
+          isNewAutoMenuCode.value == true ? 1 : 0,
           deleteCd.join(",")
         );
-        //console.log(res);
+        console.log(res);
 
         //comsole.log(updatedAndInsertRow);
 
@@ -2134,6 +2163,10 @@ const initAll = () => {
   fileName.value = "";
   fileSize.value = "";
   fileName2.value = "";
+
+  isNewAutoMenuCode.value = false;
+  isNew.value = false;
+  disableMenuAuto.value = true;
 };
 
 const searchPayCd = (e) => {

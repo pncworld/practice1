@@ -2806,6 +2806,7 @@ watch(
   () => props.deleteRow6,
   () => {
     const curr = gridView.getCurrent();
+    console.log(curr.dataRow);
     if (curr.dataRow == -1 || curr.dataRow == undefined) {
       return;
     }
@@ -2816,11 +2817,17 @@ watch(
 
     updatedrowData.value = [...dataProvider.getJsonRows()];
     //const curr = gridView.getCurrent();
-    selectedRowData.value = dataProvider.getRows()[curr.dataRow];
-    if (curr.dataRow > -1) {
+    const curr2 = gridView.getCurrent();
+    console.log(curr2.dataRow);
+    selectedRowData.value = dataProvider.getRows()[curr2.dataRow];
+    emit("selectedIndex", curr2.dataRow);
+    emit("selectedIndex2", curr2.dataRow);
+    //console.log(curr2);
+    if (curr2.dataRow > -1) {
       emit("updatedRowData", updatedrowData.value);
       emit("clickedRowData", selectedRowData.value);
-      const currRowState2 = dataProvider.getRowState(curr.dataRow);
+
+      const currRowState2 = dataProvider.getRowState(curr2.dataRow);
       emit("sendRowState", currRowState2);
     }
   }

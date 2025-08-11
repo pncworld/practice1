@@ -1647,6 +1647,7 @@ export const saveMenuCode = (
   strMenuComment,
   strAmtCodeList,
   strUserFileName,
+  AutoMenuCode,
   deleteCd
 ) => {
   // POST 요청
@@ -1687,6 +1688,7 @@ export const saveMenuCode = (
     STR_MENU_COMMENT: strMenuComment,
     STR_AMT_CODE_LIST: strAmtCodeList,
     STR_USER_FILE_NAME: strUserFileName,
+    INSERT_AUTO: AutoMenuCode,
     DELETE_CD: deleteCd,
   });
 };
