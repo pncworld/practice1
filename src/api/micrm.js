@@ -1676,7 +1676,14 @@ export const getCustomorInfo = (cond, cond2, cond3, cond4) => {
 };
 export const getCardInfo2 = (cond, cond2, cond3) => {
   return api2.post("/MICRM/CRM20_003INS.asmx/getCardInfo2", {
-    COMP_CD: cond,
+    CUST_CD: cond,
+    COND: cond2,
+    COND2: cond3,
+  });
+};
+export const checkCardNumbyAccount = (cond, cond2, cond3) => {
+  return api2.post("/MICRM/CRM20_003INS.asmx/checkCardNumbyAccount", {
+    CUST_CD: cond,
     COND: cond2,
     COND2: cond3,
   });

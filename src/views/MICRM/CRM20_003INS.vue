@@ -89,12 +89,12 @@
     <div class="">
       <div class="text-sm font-semibold">◎기본정보</div>
       <div
-        class="grid grid-rows-[1fr,1fr,1fr,1fr,1fr,1fr,1fr,1fr,3fr] grid-cols-[1fr,3fr,1fr,3fr]">
+        class="grid grid-rows-[1fr,1fr,1fr,1fr,1fr,1fr,1fr,3fr] grid-cols-[1fr,3fr,1fr,3fr] h-[27vh]">
         <div
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           거래처코드
         </div>
-        <div class="border-l border-t border-black pl-5">
+        <div class="border-l border-t border-black pl-5 items-center flex">
           <input
             type="text"
             class="border border-black disabled:bg-gray-300"
@@ -106,7 +106,7 @@
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           <span class="text-red-500">＊</span>거래처명
         </div>
-        <div class="border-l border-t border-black pl-5">
+        <div class="border-l border-t border-black pl-5 items-center flex">
           <input
             type="text"
             name="strSaleCustName"
@@ -119,7 +119,7 @@
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           사업자(주민)번호
         </div>
-        <div class="border-l border-t border-black pl-5">
+        <div class="border-l border-t border-black pl-5 items-center flex">
           <input
             type="text"
             name="strRegistNo"
@@ -132,7 +132,7 @@
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           대표자명
         </div>
-        <div class="border-l border-t border-black pl-5">
+        <div class="border-l border-t border-black pl-5 items-center flex">
           <input
             type="text"
             name="strDirector"
@@ -145,7 +145,7 @@
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           업종
         </div>
-        <div class="border-l border-t border-black pl-5">
+        <div class="border-l border-t border-black pl-5 items-center flex">
           <input
             type="text"
             name="strDealType"
@@ -158,7 +158,8 @@
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           업태
         </div>
-        <div class="border-l border-t border-black pl-5 flex space-x-5">
+        <div
+          class="border-l border-t border-black pl-5 items-center flex space-x-5">
           <input
             type="text"
             name="strDealKind"
@@ -166,15 +167,15 @@
             v-model="gridvalue6"
             @input="changeValue" />
           <div
-            class="border border-black bg-gray-100 flex justify-center items-center w-44">
+            class="border-l border-r border-black bg-gray-100 flex justify-center items-center w-44 h-full">
             최초등록일
           </div>
-          <div class="border-l border-t border-black">
+          <div class="border-l border-r border-black items-center flex h-full">
             <input
               type="date"
               name="strRegistDate"
               @input="changeValue"
-              class="border border-black"
+              class=""
               v-model="gridvalue7" />
           </div>
         </div>
@@ -183,26 +184,27 @@
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           <span class="text-red-500">＊</span>휴대폰번호
         </div>
-        <div class="border-l border-t border-black pl-5 space-x-5 flex">
+        <div
+          class="border-l border-t border-black pl-5 space-x-5 items-center flex">
           <input
             type="text"
             name="strTelNo1Sub1"
             @input="changeValue"
-            class="border border-black w-24"
+            class="border border-black w-24 h-[90%]"
             v-model="gridvalue8" />
           <span>-</span>
           <input
             type="text"
             name="strTelNo1Sub2"
             @input="changeValue"
-            class="border border-black w-36"
+            class="border border-black w-36 h-[90%]"
             v-model="gridvalue9" />
           <span>-</span>
           <input
             type="text"
             name="strTelNo1Sub3"
             @input="changeValue"
-            class="border border-black w-36"
+            class="border border-black w-36 h-[90%]"
             v-model="gridvalue10" />
         </div>
 
@@ -236,12 +238,13 @@
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           전화번호
         </div>
-        <div class="border-l border-t border-black pl-5 space-x-5 flex">
+        <div
+          class="border-l border-t border-black pl-5 space-x-5 items-center flex">
           <select
             name="strTelNo2Sub1"
             id=""
-            @input="changeValue"
-            class="border border-black"
+            @change="changeValue"
+            class="border border-black w-24 h-[90%]"
             v-model="gridvalue12">
             <option value="02">02</option>
             <option value="051">051</option>
@@ -285,7 +288,7 @@
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           이메일
         </div>
-        <div class="border-l border-t border-black pl-5">
+        <div class="border-l border-t border-black pl-5 items-center flex">
           <input
             type="text"
             name="strEmail"
@@ -301,69 +304,71 @@
         <div
           class="border-l border-t border-black pl-5 flex items-center col-span-3">
           <input
-            type="number"
+            type="text"
             name="strZip"
             @input="changeValue"
             class="border border-black"
             v-model="gridvalue16" />
-          <button @click="findZipCode" class="button primary !h-6 ml-5 mt-1">
+          <button @click="findZipCode" class="button primary !h-6 ml-5">
             우편번호 찾기
           </button>
         </div>
 
         <div
-          class="border-l border-t border-b border-black bg-gray-100 flex justify-center items-center">
+          class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           주소
         </div>
-        <div class="border-l border-t border-black pl-5 flex col-span-3">
+        <div
+          class="border-l border-t border-black pl-5 flex items-center col-span-3 space-x-5">
           <input
             type="text"
             name="strAddress"
             @input="changeValue"
             :disabled="!currRowState"
-            class="border border-black w-96 disabled:bg-gray-300"
+            class="border border-black w-96 disabled:bg-gray-300 h-[80%]"
             v-model="gridvalue17" />
-        </div>
 
-        <div class="border-black flex justify-center items-center"></div>
-        <div class="border-l border-t border-black pl-5 flex col-span-3">
           <input
             type="text"
             name="strAddress2"
             @input="changeValue"
-            class="border border-black w-96"
+            class="border border-black w-40 h-[80%]"
             v-model="gridvalue18" />
         </div>
+
+        <!-- <div class="border-black flex justify-center items-center"></div> -->
+        <!-- <div
+          class="border-l border-t border-black pl-5 flex col-span-4 items-center"></div> -->
 
         <div
           class="border-l border-t border-b border-black bg-gray-100 flex justify-center items-center">
           특이사항
         </div>
         <div
-          class="border-l border-t border-black pl-5 flex col-span-3 border-b">
+          class="border-l border-t border-black pl-5 flex col-span-3 border-b items-center">
           <input
             type="text"
             name="strRemark"
             @input="changeValue"
-            class="border border-black w-96"
+            class="border border-black w-96 h-[80%]"
             v-model="gridvalue19" />
         </div>
       </div>
     </div>
     <div>
       <div class="text-sm font-semibold">◎계좌정보</div>
-      <div class="grid grid-rows-5 grid-cols-[1fr,3fr,1fr,3fr]">
+      <div class="grid grid-rows-5 grid-cols-[1fr,3fr,1fr,3fr] h-[14vh]">
         <div
-          class="border-l border-t border-b border-black bg-gray-100 flex justify-center items-center">
+          class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           <span class="text-red-500">＊</span>계좌상태
         </div>
         <div
-          class="flex space-x-5 border-l border-t border-b border-black justify-start items-center pl-5 col-span-2">
+          class="flex space-x-5 border-l border-t border-black justify-start items-center pl-5 col-span-2">
           <label for="cond3"
             ><input
               type="radio"
               id="cond3"
-              @input="changeValue"
+              @change="changeValue"
               name="strSaleAccStatus"
               value="0"
               v-model="gridvalue20" />정상</label
@@ -372,7 +377,7 @@
             ><input
               type="radio"
               id="cond4"
-              @input="changeValue"
+              @change="changeValue"
               name="strSaleAccStatus"
               value="1"
               v-model="gridvalue20" />불가</label
@@ -418,20 +423,21 @@
           >
         </div>
         <div
-          class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
+          class="border-l border-t border-black bg-gray-100 flex justify-center items-center h-full">
           소속거래처명
         </div>
-        <div class="flex space-x-5 pl-5 h-6 border-l border-t border-black">
+        <div
+          class="flex space-x-5 pl-5 border-l border-t border-black items-center h-full">
           <input
             type="number"
             name="strBelongCustID"
-            class="border border-black disabled:bg-gray-300"
+            class="border border-black disabled:bg-gray-300 h-[80%]"
             :disabled="!currRowState"
             v-model="gridvalue22" />
           <input
             type="text"
             name="strBelongCustName"
-            class="border border-black"
+            class="border border-black h-[80%]"
             @input="changeValue"
             v-model="gridvalue23" />
           <button class="button primary !h-6">조회</button>
@@ -439,52 +445,52 @@
         </div>
 
         <div
-          class="border-l border-t border-b border-black bg-gray-100 flex justify-center items-center">
+          class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           부서명
         </div>
-        <div class="border-l border-t border-black pl-5 flex">
+        <div class="border-l border-t border-black pl-5 flex items-center">
           <input
             type="text"
             name="strCustDeptName"
             @input="changeValue"
-            class="border border-black w-96"
+            class="border border-black w-96 h-[80%]"
             v-model="gridvalue24" />
         </div>
 
         <div
-          class="border-l border-t border-b border-black bg-gray-100 flex justify-center items-center">
+          class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           부서코드
         </div>
-        <div class="border-l border-t border-black pl-5 flex">
+        <div class="border-l border-t border-black items-center pl-5 flex">
           <input
             type="number"
             name="strCustDeptCode"
             @input="changeValue"
-            class="border border-black w-96"
+            class="border border-black w-96 h-[80%]"
             v-model="gridvalue25" />
         </div>
 
         <div
-          class="border-l border-t border-b border-black bg-gray-100 flex justify-center items-center">
+          class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           한도금액
         </div>
-        <div class="border-l border-t border-black pl-5 flex">
+        <div class="border-l border-t border-black pl-5 flex items-center">
           <input
             type="number"
             name="dblLimitAmt"
             @input="changeValue"
-            class="border border-black w-96"
+            class="border border-black w-96 h-[80%]"
             v-model="gridvalue26" />
         </div>
 
         <div
-          class="border-l border-t border-b border-black bg-gray-100 flex justify-center items-center">
+          class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           입금금액
         </div>
-        <div class="border-l border-t border-black pl-5 flex">
+        <div class="border-l border-t border-black pl-5 flex items-center">
           <input
             type="text"
-            class="border border-black w-96 disabled:bg-gray-300"
+            class="border border-black w-96 disabled:bg-gray-300 h-[80%]"
             disabled
             v-model="gridvalue27" />
         </div>
@@ -493,11 +499,12 @@
           class="border-l border-t border-b border-black bg-gray-100 flex justify-center items-center">
           매출금액
         </div>
-        <div class="border-l border-t border-black pl-5 flex">
+        <div
+          class="border-l border-t border-b border-black pl-5 flex items-center">
           <input
             type="text"
             disabled
-            class="border border-black w-96 disabled:bg-gray-300"
+            class="border border-black w-96 disabled:bg-gray-300 h-[80%]"
             v-model="gridvalue28" />
         </div>
 
@@ -505,20 +512,21 @@
           class="border-l border-t border-b border-black bg-gray-100 flex justify-center items-center">
           잔여금액
         </div>
-        <div class="border-l border-t border-black pl-5 flex">
+        <div
+          class="border-l border-t border-b border-black pl-5 flex items-center">
           <input
             type="text"
-            class="border border-black w-96 disabled:bg-gray-300"
+            class="border border-black w-96 disabled:bg-gray-300 h-[80%]"
             disabled
             v-model="gridvalue29" />
         </div>
       </div>
     </div>
-    <div class="flex justify-between w-[40%]">
+    <div class="flex justify-between w-[40%] mt-3">
       <div class="text-sm font-semibold">◎카드정보</div>
       <div class="space-x-5">
-        <button class="button primary !h-5">신규</button>
-        <button class="button primary !h-5">삭제</button>
+        <button class="button primary !h-5" @click="addRow2">신규</button>
+        <button class="button primary !h-5" @click="deleteRow2">삭제</button>
       </div>
     </div>
     <div class="flex space-x-12">
@@ -526,48 +534,61 @@
         <Realgrid
           :progname="'CRM20_003INS_VUE'"
           :progid="2"
-          :rowData="rowData2"></Realgrid>
+          :rowData="rowData2"
+          :changeNow3="changeNow2"
+          :changeValue2="changeValue4"
+          :changeColid="changeColid2"
+          :changeRow="changeRow2"
+          @selectedIndex="selectedIndex2"></Realgrid>
       </div>
-      <div class="grid grid-rows-2 grid-cols-[2fr,3fr] h-12">
+      <div
+        class="grid grid-rows-2 grid-cols-[1.7fr,5.1fr] h-[5.5vh] w-[50vw] pl-[118px]">
         <div
-          class="text-base font-semibold bg-gray-100 flex items-center justify-center border-l border-t border-black">
+          class="text-sm bg-gray-100 flex items-center justify-center border-l border-t border-black">
           카드번호
         </div>
         <div
-          class="text-base font-semibold bg-gray-100 flex items-center justify-center border-l border-t border-black">
+          class="text-base font-semibold flex items-center justify-start pl-5 border-l border-t border-black">
           <input
-            type="text"
-            class="border border-black"
+            type="number"
+            name="strSaleCardNo"
+            class="border border-black h-[80%]"
+            @input="changeValue3"
             v-model="gridvalue30" />
-          <button class="button primary !h-5">중복확인</button>
+          <button class="button primary !h-5" @click="checkDupliCard">
+            중복확인
+          </button>
           <div class="text-red-500 text-xs">반드시 중복검사를 받으십시오</div>
         </div>
 
         <div
-          class="text-base font-semibold bg-gray-100 flex items-center justify-center border-l border-t border-black">
+          class="text-sm bg-gray-100 flex items-center justify-center border-l border-t border-b border-black">
           카드상태
         </div>
         <div
-          class="text-base font-semibold bg-gray-100 flex items-center justify-start pl-5 space-x-5 border-l border-t border-black">
+          class="text-base font-semibold flex items-center justify-start pl-5 space-x-5 border-l border-t border-b border-black">
           <label for="cond8"
             ><input
               type="radio"
-              name="cond8"
+              name="strSaleCardStatus"
               id="cond8"
+              @change="changeValue3"
               v-model="gridvalue31" />정상</label
           >
           <label for="cond9"
             ><input
               type="radio"
-              name="cond8"
+              name="strSaleCardStatus"
               id="cond9"
+              @change="changeValue3"
               v-model="gridvalue31" />교체</label
           >
           <label for="cond10"
             ><input
               type="radio"
-              name="cond8"
+              name="strSaleCardStatus"
               id="cond10"
+              @change="changeValue3"
               v-model="gridvalue31" />분실</label
           >
         </div>
@@ -575,22 +596,24 @@
     </div>
   </div>
 
-  <GetZipCode v-if="visible" @closePopUp="closePopUp"></GetZipCode>
+  <GetZipCode
+    v-if="visible"
+    @closePopUp="closePopUp"
+    @zipAndAddress="zipAndAddress"></GetZipCode>
   <!-- 그리드 영역 -->
 </template>
 
 <script setup>
-import { getStoreList } from "@/api/common";
 import {
   deleteSpecialPrices,
-  getCardInfo,
-  getMenuList2,
-  getMenuStoreList,
   getSubGroup2,
-  saveExceptionSpecialPrice,
   updateMultiPrice,
 } from "@/api/master";
-import { getCardInfo2, getCustomorInfo } from "@/api/micrm";
+import {
+  checkCardNumbyAccount,
+  getCardInfo2,
+  getCustomorInfo,
+} from "@/api/micrm";
 import GetZipCode from "@/components/getZipCode.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -651,33 +674,6 @@ const findZipCode = () => {
 };
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
-
-  // const userGroup = store.state.storeGroup[0].lngStoreGroup;
-  // const res = await getMenuStoreList(userGroup);
-  // GroupList.value = res.data.List;
-  // reload.value = !reload.value;
-
-  // const res2 = await getStoreList(userGroup, 0);
-  // //console.log(res2);
-
-  // rowData2.value = res2.data.store.map((item) => ({
-  //   ...item,
-  //   checkbox: false,
-  // }));
-
-  // const res3 = await getMenuList2(userGroup, 0);
-  // //console.log(res3);
-  // rowData3.value = res3.data.List;
-
-  // // const res4 = await getMenuGroupList(userGroup, 0, 0);
-  // // //console.log(res4);
-  // // MenuGroupList.value = res4.data.List;
-  // // const res2 = await getMultiGroup(userGroup);
-
-  // // MultiGroupList.value = res2.data.List;
-  // const res4 = await getSubGroup2(userGroup, selectedStores.value);
-
-  // MultiSubList.value = res4.data.List;
 });
 
 const reload = ref(false);
@@ -735,14 +731,6 @@ const MultiSubList = ref([]);
 const selectedSubGroup = ref(0);
 const MultiGroupList = ref([]);
 const selectedMultiGroup = ref(0);
-const datepicker = ref(null);
-
-const searchType = ref("0");
-const confirmPopUp = ref(false);
-const confirmPopUp2 = ref(false);
-const selectedSubCode = ref(0);
-
-const searchSpecialCond = ref(false);
 
 const checkedDatas = ref([]);
 const forDeleteDatas = ref([]);
@@ -792,8 +780,32 @@ const clickedRowData = async (e) => {
   } catch (error) {}
 };
 
+const zipAndAddress = async (e) => {
+  // console.log(e);
+  gridvalue16.value = e.split(",")[0];
+  gridvalue17.value = e.split(",")[1];
+
+  changeColid.value = "strZip";
+  changeValue2.value = gridvalue16.value;
+
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+
+  changeColid.value = "strAddress";
+  changeValue2.value = gridvalue17.value;
+
+  changeNow.value = !changeNow.value;
+
+  await nextTick();
+};
 const selectedIndex = (e) => {
   changeRow.value = e;
+};
+
+const changeRow2 = ref("");
+const selectedIndex2 = (e) => {
+  changeRow2.value = e;
 };
 const getRowChanged = ref(false);
 const updatedRows = ref([]);
@@ -824,6 +836,27 @@ const changeValue = async (e) => {
   if (name == "strTelNo1Sub1") {
     gridvalue8.value = e.target.value.replace(/[^0-9]/g, "");
   }
+  if (name == "strTelNo1Sub2") {
+    gridvalue9.value = e.target.value.replace(/[^0-9]/g, "");
+  }
+  if (name == "strTelNo1Sub3") {
+    gridvalue10.value = e.target.value.replace(/[^0-9]/g, "");
+  }
+
+  if (name == "strZip") {
+    gridvalue16.value = e.target.value.replace(/[^0-9]/g, "");
+  }
+
+  // if (name == "strTelNo2Sub1") {
+  //   gridvalue12.value = e.target.value.replace(/[^0-9]/g, "");
+  // }
+  if (name == "strTelNo2Sub2") {
+    gridvalue13.value = e.target.value.replace(/[^0-9]/g, "");
+  }
+  if (name == "strTelNo2Sub3") {
+    gridvalue14.value = e.target.value.replace(/[^0-9]/g, "");
+  }
+
   changeColid.value = name;
   changeValue2.value = value;
 
@@ -843,6 +876,7 @@ const changeValue = async (e) => {
 
   if (name.includes("strTelNo2Sub")) {
     changeColid.value = "strTelNo2";
+
     changeValue2.value =
       gridvalue12.value + "-" + gridvalue13.value + "-" + gridvalue14.value;
 
@@ -856,13 +890,11 @@ const changeValue = async (e) => {
  */
 
 const openPopUp = ref(false);
-const openPopUp2 = ref(false);
+
 const addButton = () => {
   openPopUp.value = !openPopUp.value;
 };
-const closePopUp2 = () => {
-  openPopUp.value = false;
-};
+
 /**
  *  조회 함수
  */
@@ -899,6 +931,58 @@ const searchButton = async () => {
   }
 };
 
+const checkCardNum = ref(false);
+const checkDupliCard = async () => {
+  try {
+    const res = await checkCardNumbyAccount(
+      selectedStores.value,
+      1,
+      gridvalue30.value
+    );
+
+    if (res.data.List[0].CNT == 0) {
+      checkCardNum.value = true;
+
+      Swal.fire({
+        title: "성공",
+        text: "사용가능한 카드번호입니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      return;
+    } else {
+      checkCardNum.value = false;
+
+      Swal.fire({
+        title: "실패",
+        text: "이미 사용중인 카드번호입니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } catch (error) {}
+};
+
+const changeColid2 = ref("");
+const changeValue4 = ref("");
+const changeNow2 = ref(false);
+const changeValue3 = (e) => {
+  const name = e.target.name;
+  const value = e.target.value;
+
+  if (name == "strSaleCardNo") {
+    checkCardNum.value = false;
+  }
+
+  changeColid2.value = name;
+  changeValue4.value = value;
+
+  changeNow2.value = !changeNow2.value;
+};
+
+const deleteRow2 = () => {};
+const addRow2 = () => {};
 const deleteButton = async () => {
   if (forDeleteDatas.value.length == 0) {
     Swal.fire({
@@ -1073,10 +1157,10 @@ const excelDate = (e) => {
   //comsole.log(e);
 };
 
-watch(selectedStores, async () => {
-  //const userGroup = store.state.storeGroup[0].lngStoreGroup;
-  const res4 = await getSubGroup2(selectedGroup.value, selectedStores.value);
+// watch(selectedStores, async () => {
+//   //const userGroup = store.state.storeGroup[0].lngStoreGroup;
+//   const res4 = await getSubGroup2(selectedGroup.value, selectedStores.value);
 
-  MultiSubList.value = res4.data.List;
-});
+//   MultiSubList.value = res4.data.List;
+// });
 </script>

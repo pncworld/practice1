@@ -497,7 +497,7 @@
                   id="discount1"
                   name="lngDiscount"
                   v-model="gridvalue14"
-                  value="0"
+                  value="1"
                   @input="changeInfo"
                   :disabled="afterClick"
                   class="disabled:bg-gray-200" />예</label
@@ -507,7 +507,7 @@
                   id="discount2"
                   name="lngDiscount"
                   v-model="gridvalue14"
-                  value="1"
+                  value="0"
                   @input="changeInfo"
                   :disabled="afterClick"
                   class="disabled:bg-gray-200" />아니오</label
@@ -1264,7 +1264,7 @@ const selectedIndex2 = (e) => {
 
 const clickedRowData = async (newvalue) => {
   afterClick.value = false;
-  if (newvalue[9] == 0 || newvalue[12] == 1) {
+  if (newvalue[9] == 0 || newvalue[12] == 0) {
     // 판매가 할인여부
     rowData2.value = [];
     clickrowData2.value = [];
@@ -1286,7 +1286,7 @@ const clickedRowData = async (newvalue) => {
   //rowIndex.value = newvalue.index;
   clickrowData4.value = [];
   filteredrowData5.value = [];
-  //comsole.log(newvalue);
+  console.log(newvalue);
   // forsearchMain.value = 0
   // forsearchSub.value = 0
   searchWord2.value = "";
@@ -1338,7 +1338,7 @@ const clickedRowData = async (newvalue) => {
     showKPG.value = true;
   }
   discountDisabled.value =
-    (newvalue[9] == 0 || newvalue[12] == 1) &&
+    (newvalue[9] == 0 || newvalue[12] == 0) &&
     afterSearch.value == true &&
     afterClick.value == false;
   fileName.value = newvalue[31];
