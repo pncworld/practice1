@@ -1666,12 +1666,14 @@ export const saveCustCompInfo = (
   });
 };
 
-export const getCustomorInfo = (cond, cond2, cond3, cond4) => {
+export const getCustomorInfo = (cond, cond2, cond3, cond4, cond5, cond6) => {
   return api2.post("/MICRM/CRM20_003INS.asmx/getCustomorInfo", {
     COMP_CD: cond,
     COND: cond2,
     COND2: cond3,
     COND3: cond4,
+    COND4: cond5,
+    COND5: cond6,
   });
 };
 export const getCardInfo2 = (cond, cond2, cond3) => {

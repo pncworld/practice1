@@ -620,7 +620,7 @@
             </div>
             <div class="flex justify-center items-center">
               <input
-                type="number"
+                type="text"
                 name="strBarCode"
                 id=""
                 class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-100"

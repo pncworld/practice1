@@ -151,12 +151,10 @@
 
 <script setup>
 import {
-  getBelongCustList,
   getCustPointInfo,
   getCustRecord,
   getReceiptDataDetail2,
 } from "@/api/micrm";
-import Datepicker1 from "@/components/Datepicker1.vue";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -167,8 +165,6 @@ import Datepicker2 from "@/components/Datepicker2.vue";
  *  */
 
 import PageName from "@/components/pageName.vue";
-import PickBelongCust from "@/components/pickBelongCust.vue";
-import PickCustCompany from "@/components/pickCustCompany.vue";
 import PickCustomers from "@/components/pickCustomers.vue";
 /**
  * 	매장 단일 선택 컴포넌트
@@ -187,7 +183,6 @@ import { insertPageLog } from "@/customFunc/customFunc";
  *  경고창 호출 라이브러리
  *  */
 
-import Swal from "sweetalert2";
 /*
  * 공통 표준  Function
  */

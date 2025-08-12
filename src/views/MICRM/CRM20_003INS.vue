@@ -14,14 +14,7 @@
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="addButton" class="button new md:w-auto w-14">
-          <!-- 여기서부터 -->
-          신규
-        </button>
-        <button @click="deleteButton" class="button delete md:w-auto w-14">
-          <!-- 여기서부터 -->
-          삭제
-        </button>
+
         <button @click="saveButton" class="button save md:w-auto w-14">
           <!-- 여기서부터 -->
           저장
@@ -54,11 +47,29 @@
             <input type="text" class="h-8 w-64 pl-1" v-model="cond2" />
           </div>
         </div>
+
+        <div class="flex flex-col">
+          <label for="cond"
+            ><input type="checkbox" id="cond" checked @click="changeCond" />탈퇴
+            거래처 제외</label
+          >
+          <label for="cond2"
+            ><input
+              type="checkbox"
+              id="cond2"
+              checked
+              @click="changeCond2" />교체/분실 제외</label
+          >
+        </div>
       </div>
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
-    <div class="w-full h-[25%]">
+    <div class="w-full h-[24%]">
+      <div class="flex justify-end space-x-5">
+        <button class="whitebutton">신규</button>
+        <button class="whitebutton">삭제</button>
+      </div>
       <Realgrid
         :progname="'CRM20_003INS_VUE'"
         :progid="1"
@@ -86,10 +97,10 @@
         :exporttoExcel="exportExcel">
       </Realgrid>
     </div>
-    <div class="">
+    <div class="mt-8">
       <div class="text-sm font-semibold">◎기본정보</div>
       <div
-        class="grid grid-rows-[1fr,1fr,1fr,1fr,1fr,1fr,1fr,3fr] grid-cols-[1fr,3fr,1fr,3fr] h-[27vh]">
+        class="grid grid-rows-[1fr,1fr,1fr,1fr,1fr,1fr,1fr] grid-cols-[1fr,3fr,1fr,3fr] h-[20vh]">
         <div
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
           거래처코드
@@ -315,44 +326,29 @@
         </div>
 
         <div
-          class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
+          class="border-l border-t border-b border-black bg-gray-100 flex justify-center items-center">
           주소
         </div>
         <div
-          class="border-l border-t border-black pl-5 flex items-center col-span-3 space-x-5">
+          class="border-l border-t border-b border-black pl-5 flex items-center col-span-3 space-x-5">
           <input
             type="text"
             name="strAddress"
             @input="changeValue"
-            :disabled="!currRowState"
-            class="border border-black w-96 disabled:bg-gray-300 h-[80%]"
+            class="border border-black w-[40%] disabled:bg-gray-300 h-[80%]"
             v-model="gridvalue17" />
-
+          <!-- 
           <input
             type="text"
             name="strAddress2"
             @input="changeValue"
             class="border border-black w-40 h-[80%]"
-            v-model="gridvalue18" />
+            v-model="gridvalue18" /> -->
         </div>
 
         <!-- <div class="border-black flex justify-center items-center"></div> -->
         <!-- <div
           class="border-l border-t border-black pl-5 flex col-span-4 items-center"></div> -->
-
-        <div
-          class="border-l border-t border-b border-black bg-gray-100 flex justify-center items-center">
-          특이사항
-        </div>
-        <div
-          class="border-l border-t border-black pl-5 flex col-span-3 border-b items-center">
-          <input
-            type="text"
-            name="strRemark"
-            @input="changeValue"
-            class="border border-black w-96 h-[80%]"
-            v-model="gridvalue19" />
-        </div>
       </div>
     </div>
     <div>
@@ -363,7 +359,7 @@
           <span class="text-red-500">＊</span>계좌상태
         </div>
         <div
-          class="flex space-x-5 border-l border-t border-black justify-start items-center pl-5 col-span-2">
+          class="flex space-x-5 border-l border-t border-black justify-start items-center pl-5 col-span-3">
           <label for="cond3"
             ><input
               type="radio"
@@ -382,10 +378,6 @@
               value="1"
               v-model="gridvalue20" />불가</label
           >
-        </div>
-        <div class="flex space-x-5 ml-5 h-6">
-          <button class="button primary !h-6">조회</button>
-          <button class="button primary !h-6">초기화</button>
         </div>
 
         <div
@@ -440,7 +432,9 @@
             class="border border-black h-[80%]"
             @input="changeValue"
             v-model="gridvalue23" />
-          <button class="button primary !h-6">조회</button>
+          <button class="button primary !h-6" @click="visible2 = true">
+            조회
+          </button>
           <button class="button primary !h-6">초기화</button>
         </div>
 
@@ -476,7 +470,7 @@
         </div>
         <div class="border-l border-t border-black pl-5 flex items-center">
           <input
-            type="number"
+            type="text"
             name="dblLimitAmt"
             @input="changeValue"
             class="border border-black w-96 h-[80%]"
@@ -524,38 +518,38 @@
     </div>
     <div class="flex justify-between w-[40%] mt-3">
       <div class="text-sm font-semibold">◎카드정보</div>
-      <div class="space-x-5">
-        <button class="button primary !h-5" @click="addRow2">신규</button>
-        <button class="button primary !h-5" @click="deleteRow2">삭제</button>
-      </div>
     </div>
     <div class="flex space-x-12">
-      <div class="h-20 w-[40%] flex">
-        <Realgrid
-          :progname="'CRM20_003INS_VUE'"
-          :progid="2"
-          :rowData="rowData2"
-          :changeNow3="changeNow2"
-          :changeValue2="changeValue4"
-          :changeColid="changeColid2"
-          :changeRow="changeRow2"
-          @selectedIndex="selectedIndex2"></Realgrid>
-      </div>
-      <div
-        class="grid grid-rows-2 grid-cols-[1.7fr,5.1fr] h-[5.5vh] w-[50vw] pl-[118px]">
+      <div class="grid grid-rows-3 grid-cols-[1.9fr,5fr] w-[40vw]">
         <div
           class="text-sm bg-gray-100 flex items-center justify-center border-l border-t border-black">
-          카드번호
+          현재카드번호
         </div>
         <div
           class="text-base font-semibold flex items-center justify-start pl-5 border-l border-t border-black">
           <input
-            type="number"
+            type="text"
             name="strSaleCardNo"
-            class="border border-black h-[80%]"
+            class="border border-black h-[80%] disabled:bg-gray-200"
             @input="changeValue3"
+            disabled
             v-model="gridvalue30" />
-          <button class="button primary !h-5" @click="checkDupliCard">
+        </div>
+
+        <div
+          class="text-sm bg-gray-100 flex items-center justify-center border-l border-t border-black">
+          신규카드번호
+        </div>
+        <div
+          class="text-base font-semibold flex items-center justify-start pl-5 border-l border-t border-black">
+          <input
+            type="text"
+            name="strSaleCardNo"
+            class="border border-black h-[80%] disabled:bg-gray-200"
+            @input="changeValue3"
+            :disabled="disableGridValue31"
+            v-model="gridvalue32" />
+          <button class="button primary !h-5 ml-5" @click="checkDupliCard">
             중복확인
           </button>
           <div class="text-red-500 text-xs">반드시 중복검사를 받으십시오</div>
@@ -572,6 +566,7 @@
               type="radio"
               name="strSaleCardStatus"
               id="cond8"
+              value="0"
               @change="changeValue3"
               v-model="gridvalue31" />정상</label
           >
@@ -580,6 +575,7 @@
               type="radio"
               name="strSaleCardStatus"
               id="cond9"
+              value="1"
               @change="changeValue3"
               v-model="gridvalue31" />교체</label
           >
@@ -587,6 +583,7 @@
             ><input
               type="radio"
               name="strSaleCardStatus"
+              value="2"
               id="cond10"
               @change="changeValue3"
               v-model="gridvalue31" />분실</label
@@ -600,17 +597,50 @@
     v-if="visible"
     @closePopUp="closePopUp"
     @zipAndAddress="zipAndAddress"></GetZipCode>
+  <!-- 탈퇴 거래처 제외
+  교체/분실 제외 -->
+  <div
+    v-if="visible2"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <!-- 팝업 내용 -->
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-[90%] max-w-md h-[30%]">
+      <div class="flex">
+        <div class="text-sm font-semibold mb-4 flex justify-start items-center">
+          소속거래처명
+        </div>
+        <div>
+          <input type="text" class="border border-black" v-model="cond6" />
+        </div>
+        <div>
+          <button class="button primary !h-6" @click="searchButton2">
+            조회
+          </button>
+        </div>
+        <div>
+          <button class="button primary !h-6" @click="visible2 = false">
+            닫기
+          </button>
+        </div>
+      </div>
+      <div class="mb-4 flex justify-center flex-col items-center h-[80%]">
+        <Realgrid
+          :progname="'CRM20_003INS_VUE'"
+          :progid="3"
+          :rowData="rowData2"
+          :rowStateeditable="false"
+          @dblclickedRowData="dblclickedRowData">
+        </Realgrid>
+      </div>
+    </div>
+  </div>
   <!-- 그리드 영역 -->
 </template>
 
 <script setup>
-import {
-  deleteSpecialPrices,
-  getSubGroup2,
-  updateMultiPrice,
-} from "@/api/master";
+import { deleteSpecialPrices, updateMultiPrice } from "@/api/master";
 import {
   checkCardNumbyAccount,
+  getBelongCust,
   getCardInfo2,
   getCustomorInfo,
 } from "@/api/micrm";
@@ -664,6 +694,7 @@ import { useStore } from "vuex";
 const rowData3 = ref([]);
 const rowData4 = ref([]);
 const visible = ref(false);
+const visible2 = ref(false);
 
 const closePopUp = () => {
   visible.value = false;
@@ -683,8 +714,8 @@ const afterSearch = ref(false);
 const GroupList = ref([]);
 const cond = ref("1");
 const cond2 = ref("");
-const cond3 = ref("0");
-const cond4 = ref("0");
+const cond3 = ref(true);
+const cond4 = ref(true);
 const cond5 = ref("0");
 const cond6 = ref("");
 const cond7 = ref("");
@@ -694,6 +725,12 @@ const cond14 = ref("0");
 const cond15 = ref("0");
 const cond16 = ref("2");
 
+const changeCond = () => {
+  cond3.value = !cond3.value;
+};
+const changeCond2 = () => {
+  cond4.value = !cond4.value;
+};
 const gridvalue1 = ref("");
 const gridvalue2 = ref("");
 const gridvalue3 = ref("");
@@ -724,7 +761,8 @@ const gridvalue27 = ref("");
 const gridvalue28 = ref("");
 const gridvalue29 = ref("");
 const gridvalue30 = ref("");
-const gridvalue31 = ref("");
+const gridvalue31 = ref("0");
+const gridvalue32 = ref("");
 
 const store = useStore();
 const MultiSubList = ref([]);
@@ -741,6 +779,7 @@ const updatedRowData = (e) => {
   //console.log(e);
   updateRowData.value = e;
 };
+const disableGridValue31 = ref(true);
 const clickedRowData = async (e) => {
   console.log(e);
   gridvalue1.value = e[2];
@@ -775,8 +814,17 @@ const clickedRowData = async (e) => {
 
   try {
     const res = await getCardInfo2(e[0], e[2], 1);
-
+    console.log(res);
     rowData2.value = res.data.List;
+
+    if (rowData2.value.length == 0) {
+      gridvalue30.value = e[9];
+      gridvalue31.value = 0;
+      disableGridValue31.value = true;
+    } else {
+      gridvalue30.value = rowData2.value[0];
+      disableGridValue31.value = true;
+    }
   } catch (error) {}
 };
 
@@ -841,6 +889,20 @@ const changeValue = async (e) => {
   }
   if (name == "strTelNo1Sub3") {
     gridvalue10.value = e.target.value.replace(/[^0-9]/g, "");
+  }
+  if (name == "dblLimitAmt") {
+    let temp = e.target.value.replaceAll(",", "");
+    gridvalue26.value = formatNumberWithCommas(
+      e.target.value.replace(/[^0-9]/g, "")
+    );
+
+    changeColid.value = name;
+    changeValue2.value = temp;
+
+    changeNow.value = !changeNow.value;
+
+    await nextTick();
+    return;
   }
 
   if (name == "strZip") {
@@ -917,7 +979,9 @@ const searchButton = async () => {
       selectedStores.value,
       cond.value,
       cond2.value,
-      1
+      1,
+      cond3.value ? 1 : 0,
+      cond4.value ? 1 : 0
     );
     //console.log(res);
     rowData.value = res.data.List;
@@ -931,13 +995,47 @@ const searchButton = async () => {
   }
 };
 
+const searchButton2 = async () => {
+  if (selectedStores.value == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "매장명을 먼저 선택하세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  try {
+    store.state.loading = true;
+    // initGrid();
+
+    const res = await getBelongCust(selectedStores.value, cond6.value, 1);
+    //console.log(res);
+    rowData2.value = res.data.List;
+
+    afterSearch.value = true;
+  } catch (error) {
+    afterSearch.value = false;
+    //comsole.log(error);
+  } finally {
+    store.state.loading = false;
+  }
+};
+
+const dblclickedRowData = (e) => {
+  //console.log(e);
+  gridvalue23.value = e[2];
+  gridvalue22.value = e[1];
+
+  visible2.value = false;
+};
 const checkCardNum = ref(false);
 const checkDupliCard = async () => {
   try {
     const res = await checkCardNumbyAccount(
       selectedStores.value,
       1,
-      gridvalue30.value
+      gridvalue32.value
     );
 
     if (res.data.List[0].CNT == 0) {
@@ -975,14 +1073,18 @@ const changeValue3 = (e) => {
     checkCardNum.value = false;
   }
 
+  if (name == "strSaleCardStatus" && e.target.value != 0) {
+    disableGridValue31.value = false;
+  } else {
+    disableGridValue31.value = true;
+  }
+
   changeColid2.value = name;
   changeValue4.value = value;
 
   changeNow2.value = !changeNow2.value;
 };
 
-const deleteRow2 = () => {};
-const addRow2 = () => {};
 const deleteButton = async () => {
   if (forDeleteDatas.value.length == 0) {
     Swal.fire({
@@ -1016,33 +1118,15 @@ const deleteButton = async () => {
 const saveButton = async (e) => {
   try {
     store.state.loading = true;
-    //const updateRowData.value
-    updatedRows.value;
-
-    let menucodes = [];
-    let prices = [];
-    for (let i = 0; i < updatedRows.value.length; i++) {
-      menucodes.push(
-        updateRowData.value[updatedRows.value[i]].lngMenuSpecialPriceCode
-      );
-    }
-
-    for (let i = 0; i < updatedRows.value.length; i++) {
-      prices.push(updateRowData.value[updatedRows.value[i]].lngSpecialPrice);
-    }
-    const res = await updateMultiPrice(
-      menucodes.join(","),
-      prices.join(","),
-      enddate.value
-    );
-    // //console.log(res);
-
+    updateRowData.value;
+    const res = await saveCreditCustomer();
     Swal.fire({
       title: "성공",
       text: "저장하였습니다.",
       icon: "success",
       confirmButtonText: "확인",
     });
+
     store.state.loading = false;
   } catch (error) {
     //console.log(error);

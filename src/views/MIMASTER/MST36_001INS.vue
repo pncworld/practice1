@@ -107,8 +107,8 @@
       @update:storeGroup="lngStoreGroup"
       @update:storeCd="handleStoreCd"
       @storeNm="handlestoreNm"
-      :hidesub="false"
-      :hideAttr="false"
+      :hidesub="hidesub"
+      :hideAttr="hideAttr"
       @update:ischanged="handleinitAll"
       @update:ischanged2="searchinit"></PickStore>
   </div>
@@ -993,13 +993,20 @@ const realgridname2 = (e) => {
  * 	화면 Load시 실행 스크립트
  */
 
+const hideAttr = ref(false);
+const hidesub = ref(false);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
-  console.log(store.state.userData.lngCommonMenu);
+  // console.log(store.state.userData.lngCommonMenu);
 
   if (store.state.userData.lngCommonMenu == "1") {
+    hidesub.value = false;
+    hideAttr.value = false;
     nowStoreCd.value = 0;
+  } else {
+    hidesub.value = true;
+    hideAttr.value = true;
   }
 });
 // onActivated(() => {
@@ -1066,7 +1073,7 @@ const afterClickrow = ref(true);
 const clickedRowData = (newvalue) => {
   clickrowData4.value = [];
   filteredrowData5.value = [];
-
+  console.log(newvalue);
   forsearchMain.value = -1;
   forsearchSub.value = -1;
   searchWord2.value = "";
@@ -1154,6 +1161,7 @@ const clickedRowData = (newvalue) => {
   }
 
   rowData2.value = [...rowData2.value];
+  console.log(rowData2.value);
   const firstarr = newvalue[27] != undefined ? newvalue[27].split(",") : [];
   if (rowData2.value.length > 0) {
     let dupliarr = JSON.parse(JSON.stringify(rowData2.value));
@@ -1258,6 +1266,11 @@ const handleStoreCd = async (newValue) => {
     afterClickrow.value = true;
     return;
   }
+  if (store.state.userData.lngCommonMenu == "1") {
+    nowStoreCd.value = 0;
+  } else {
+    nowStoreCd.value = newValue;
+  }
   // nowStoreCd.value = newValue;
   searchButton();
 };
@@ -1309,7 +1322,7 @@ const searchButton = async () => {
     filteredrowData3.value = [];
     rowData.value = [...rowData.value];
     filteredrowData3.value = [...filteredrowData3.value];
-    const res = await getPayCodeEnrollInfo(groupCd.value, nowStoreCd.value);
+    const res = await getPayCodeEnrollInfo(groupCd.value, 0);
 
     rowData.value = res.data.PAYCODE;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
