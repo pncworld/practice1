@@ -2353,7 +2353,7 @@ watch(
 
       const dataRow = gridView.getCurrent().dataRow;
       selectedRowData.value = dataProvider.getRows()[dataRow];
-      emit("updatedRowData", updatedrowData.value);
+      // emit("updatedRowData", updatedrowData.value);
       emit("updatedRowData2", updatedrowData.value);
     }
   }

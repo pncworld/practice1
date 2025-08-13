@@ -1690,3 +1690,11 @@ export const checkCardNumbyAccount = (cond, cond2, cond3) => {
     COND2: cond3,
   });
 };
+
+export const deleteCustomors3 = (custcode, custid, cond) => {
+  return api2.post("/MICRM/CRM20_003INS.asmx/deleteCustomors3", {
+    CUST_CD: custcode,
+    CUST_ID: custid,
+    COND: cond,
+  });
+};

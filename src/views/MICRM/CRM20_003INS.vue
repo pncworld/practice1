@@ -75,7 +75,7 @@
         :progid="1"
         :rowData="rowData"
         :reload="reload"
-        :setStateBar="false"
+        :setStateBar="true"
         :documentTitle="'CRM20_003INS'"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
@@ -84,7 +84,7 @@
         :labelingColumns="'strSaleCustStatus'"
         :valuesData="[['0', '1']]"
         :labelsData="[['정상', '탈퇴']]"
-        :changeNow3="changeNow"
+        :changeNow2="changeNow"
         :changeRow="changeRow"
         :changeColid="changeColid"
         :changeValue2="changeValue2"
@@ -225,20 +225,20 @@
         </div>
         <div
           class="border-l border-t border-black pl-5 space-x-5 items-center flex">
-          <label for="cond1"
+          <label for="strSaleCustStatus1"
             ><input
               type="radio"
               name="strSaleCustStatus"
-              id="cond1"
+              id="strSaleCustStatus1"
               @input="changeValue"
               v-model="gridvalue11"
               value="0" />정상</label
           >
-          <label for="cond2"
+          <label for="strSaleCustStatus2"
             ><input
               type="radio"
               name="strSaleCustStatus"
-              id="cond2"
+              id="strSaleCustStatus2"
               @input="changeValue"
               v-model="gridvalue11"
               value="1" />탈퇴</label
@@ -774,9 +774,9 @@ const checkedDatas = ref([]);
 const forDeleteDatas = ref([]);
 
 const updateRowData = ref([]);
-const updateRowData2 = ref([]);
+
 const updatedRowData = (e) => {
-  //console.log(e);
+  console.log(e);
   updateRowData.value = e;
 };
 const disableGridValue31 = ref(true);
@@ -858,7 +858,7 @@ const selectedIndex2 = (e) => {
 const getRowChanged = ref(false);
 const updatedRows = ref([]);
 const allStateRows = (e) => {
-  updatedRows.value = e.updated;
+  updatedRows.value = e;
 };
 
 const currRowState = ref(false);
@@ -1116,9 +1116,55 @@ const deleteButton = async () => {
 };
 
 const saveButton = async (e) => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "조회를 먼저 해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  const iulength =
+    updatedRows.value.created.length +
+    updatedRows.value.updated.length +
+    updatedRows.value.deleted.length;
+  if (iulength == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "변경된 사항이 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
   try {
     store.state.loading = true;
-    updateRowData.value;
+
+    if (updatedRows.value.deleted.length > 0) {
+      const compcodes = updateRowData.value
+        .filter((item, index) => {
+          updatedRows.value.deleted.includes(index);
+        })
+        .map((item) => item.strSaleCompCode)
+        .join("\u200b");
+
+      const custids = updateRowData.value
+        .filter((item, index) => {
+          updatedRows.value.deleted.includes(index);
+        })
+        .map((item) => item.strSaleCustID)
+        .join("\u200b");
+
+      try {
+        const res = await deleteCustomors3(compcodes, custids, 1);
+
+        console.log(res);
+      } catch (error) {}
+    }
+
     const res = await saveCreditCustomer();
     Swal.fire({
       title: "성공",

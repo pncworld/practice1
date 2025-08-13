@@ -721,6 +721,13 @@ const handleStoreCd = async (newValue) => {
   if (newValue == "0") {
     afterSearch.value = false;
   }
+
+  if (store.state.userData.lngCommonMenu == "1") {
+    nowStoreCd.value = 0;
+  } else {
+    nowStoreCd.value = newValue;
+  }
+
   //  nowStoreCd.value = newValue;
 };
 const selectedButton = ref();
@@ -892,11 +899,6 @@ const searchButton = async () => {
     return;
   }
 
-  if (store.state.userData.lngCommonMenu == "1") {
-    nowStoreCd.value = 0;
-  } else {
-    nowStoreCd.value = newValue;
-  }
   store.state.loading = true;
   try {
     optionNo.value = "";

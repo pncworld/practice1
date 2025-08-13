@@ -936,7 +936,7 @@
             class="grid grid-rows-1 grid-cols-[2fr,3fr] w-[80%] h-[40%] ml-10 mt-10 border pl-5">
             <div class="flex justify-center items-center">
               <img
-                :src="`http://211.238.145.30:8085/Uploads/${fileName}`"
+                :src="`http://www.pncoffice.com:8085/MenuImage/Image/${fileName}`"
                 @error="handleImageError"
                 class="w-[80%] h-[80%]" />
             </div>
@@ -1341,9 +1341,8 @@ const clickedRowData = async (newvalue) => {
     (newvalue[9] == 0 || newvalue[12] == 0) &&
     afterSearch.value == true &&
     afterClick.value == false;
-  fileName.value = newvalue[31];
-  fileName2.value =
-    newvalue[31] != undefined ? newvalue[31].split("_").slice(1).join("_") : "";
+  fileName.value = newvalue[33];
+  fileName2.value = newvalue[31];
   //comsole.log(newvalue);
   if (newvalue[34] == true) {
     //isNew.value = true;
@@ -1394,7 +1393,7 @@ const clickedRowData = async (newvalue) => {
   }
   try {
     const response = await axios.get(
-      `http://211.238.145.30:8085/Uploads/${fileName.value}`
+      `http://www.pncoffice.com:8085/MenuImage/Image/${fileName.value}`
     );
     await nextTick();
     //comsole.log(response);
@@ -1918,13 +1917,30 @@ const saveButton = () => {
         //comsole.log(updateRow.value);
 
         const formData = new FormData();
+
+        let storecode = "0";
+        if (store.state.userData.lngCommonMenu == "1") {
+          storecode = groupCd.value;
+        }
+
+        if (groupCd.value == "1989" || groupCd.value == "1750") {
+          storecode = groupCd.value;
+        }
         uploadImages.value.forEach((file, index) => {
-          const existedName = updateRow.value.filter(
-            (item) => item.strUserFileName == file.name
-          );
+          const existedName = updateRow.value
+            .filter((item) => item.strUserFileName == file.name)
+            .map((item) => item.lngCode);
 
           if (existedName.length > 0) {
-            formData.append(`file${index}`, file);
+            let newFileName =
+              String(storecode).padStart(10, 0) +
+              "_" +
+              String(existedName[0]).padStart(10, 0) +
+              ".jpg";
+
+            // console.log(newFileName);
+            const newFile = new File([file], newFileName, { type: file.type });
+            formData.append(`file${index}`, newFile);
           }
         });
 
@@ -2196,9 +2212,9 @@ const handleFileUpload = async (e) => {
     return;
   }
   fileName2.value = e.target.files[0].name;
+  //console.log(fileName2.value);
   changeColid.value = "strUserFileName";
-  randomuuid.value = uuidv4();
-  changeValue2.value = randomuuid.value + "_" + fileName2.value;
+  changeValue2.value = fileName2.value;
   //comsole.log(changeValue2.value);
   changeNow.value = !changeNow.value;
 
@@ -2212,7 +2228,7 @@ const downloadFile = async () => {
   //console.log(store.state.StoreToken);
   try {
     const response = await axios.get(
-      `http://211.238.145.30:8085/Uploads/${fileName.value}`,
+      `http://www.pncoffice.com:8085/MenuImage/Image/${fileName.value}`,
       {
         responseType: "blob", // 응답을 Blob 형태로 받음
       }

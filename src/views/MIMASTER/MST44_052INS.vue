@@ -335,7 +335,7 @@
                   "
                   class="h-20 w-28 flex justify-center"
                   ><img
-                    :src="`http://www.pncoffice.net/MenuImage/Image/${item.strUserFileName}`"
+                    :src="`http://www.pncoffice.com:8085/MenuImage/Image/${item.strUserFileName}`"
                     alt=""
                     class="h-full w-full" /></span
                 ><span

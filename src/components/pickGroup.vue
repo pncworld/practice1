@@ -63,18 +63,21 @@ onMounted(() => {
     selectedGroup.value = store.state.userData.lngStoreGroup;
     isDisabled1.value = true;
 
-    let groupnm = storeGroup.value.filter(
+    let groupObj = storeGroup.value.find(
       (item) => item.lngStoreGroup == selectedGroup.value
-    )[0].strName;
+    );
+    let groupnm = groupObj ? groupObj.strName : "선택";
+
     emit("GroupNm", groupnm);
   } else {
     emit("update:storeGroup", 0);
     selectedGroup.value = 0;
     isDisabled1.value = false;
 
-    let groupnm = storeGroup.value.filter(
+    let groupObj = storeGroup.value.find(
       (item) => item.lngStoreGroup == selectedGroup.value
-    )[0].strName;
+    );
+    let groupnm = groupObj ? groupObj.strName : "선택";
     emit("GroupNm", groupnm);
   }
   // if (
