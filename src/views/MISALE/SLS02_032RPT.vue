@@ -74,7 +74,6 @@ import {
   getCustInfo,
   getOrderInfo,
   getPayInfo,
-  getReceiptbyCorner,
   getReceiptbyCorner2,
 } from "@/api/misales";
 import PickStoreCorner from "@/components/pickStoreCorner.vue";

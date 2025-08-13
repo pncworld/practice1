@@ -643,6 +643,7 @@ import {
   getBelongCust,
   getCardInfo2,
   getCustomorInfo,
+  saveCreditCustomer,
 } from "@/api/micrm";
 import GetZipCode from "@/components/getZipCode.vue";
 /**
@@ -859,6 +860,7 @@ const getRowChanged = ref(false);
 const updatedRows = ref([]);
 const allStateRows = (e) => {
   updatedRows.value = e;
+  console.log(e);
 };
 
 const currRowState = ref(false);
@@ -1143,6 +1145,7 @@ const saveButton = async (e) => {
   try {
     store.state.loading = true;
 
+    console.log(updateRowData.value);
     if (updatedRows.value.deleted.length > 0) {
       const compcodes = updateRowData.value
         .filter((item, index) => {
@@ -1165,7 +1168,163 @@ const saveButton = async (e) => {
       } catch (error) {}
     }
 
-    const res = await saveCreditCustomer();
+    if (updatedRows.value.updated.length > 0) {
+      try {
+        const id = store.state.userData.lngSequence;
+        const flag = "U";
+
+        const saleCompCodes = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strSaleCompCode)
+          .join("\u200b");
+
+        const saleCustIds = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strSaleCustID)
+          .join("\u200b");
+
+        const saleCustNames = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strSaleCustName)
+          .join("\u200b");
+
+        const registNos = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strRegistNo)
+          .join("\u200b");
+
+        const telNos = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strTelNo)
+          .join("\u200b");
+
+        const telNos2 = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strTelNo2)
+          .join("\u200b");
+
+        const postTelNo = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strTelNo1Sub3)
+          .join("\u200b");
+
+        const emails = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strEmail)
+          .join("\u200b");
+
+        const strZips = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strZip)
+          .join("\u200b");
+
+        const address = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strAddress)
+          .join("\u200b");
+
+        const address2 = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strAddress2)
+          .join("\u200b");
+
+        const remarks = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strRemark)
+          .join("\u200b");
+
+        const strRegistDates = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => formatLocalDate(item.strRegistDate))
+          .join("\u200b");
+
+        const saleCustStatus = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strSaleCustStatus)
+          .join("\u200b");
+
+        const directors = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strDirector)
+          .join("\u200b");
+
+        const dealtypes = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strDealType)
+          .join("\u200b");
+
+        const dealkinds = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strDealKind)
+          .join("\u200b");
+
+        const saleAccStatus = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strSaleAccStatus)
+          .join("\u200b");
+
+        const custDeptCodes = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strCustDeptCode)
+          .join("\u200b");
+
+        const custDeptNames = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strCustDeptName)
+          .join("\u200b");
+
+        const belongTypes = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strBelongType)
+          .join("\u200b");
+
+        const belongCustids = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strBelongCustID)
+          .join("\u200b");
+
+        const belongCustNames = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.strBelongCustName)
+          .join("\u200b");
+
+        const limitAmts = updateRowData.value
+          .filter((item, index) => updatedRows.value.updated.includes(index))
+          .map((item) => item.dblLimitAmt)
+          .join("\u200b");
+
+        const res = await saveCreditCustomer(
+          id,
+          flag,
+          saleCompCodes,
+          saleCustIds,
+          saleCustNames,
+          registNos,
+          telNos,
+          telNos2,
+          postTelNo,
+          emails,
+          strZips,
+          address,
+          address2,
+          remarks,
+          strRegistDates,
+          saleCustStatus,
+          directors,
+          dealtypes,
+          dealkinds,
+          saleAccStatus,
+          custDeptCodes,
+          custDeptNames,
+          belongTypes,
+          belongCustids,
+          belongCustNames,
+          limitAmts
+        );
+
+        console.log(res);
+      } catch (error) {}
+    }
     Swal.fire({
       title: "성공",
       text: "저장하였습니다.",
