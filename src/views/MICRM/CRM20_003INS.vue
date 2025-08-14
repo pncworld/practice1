@@ -67,8 +67,8 @@
     <!-- 그리드 영역 -->
     <div class="w-full h-[24%]">
       <div class="flex justify-end space-x-5">
-        <button class="whitebutton">신규</button>
-        <button class="whitebutton">삭제</button>
+        <button class="whitebutton" @click="addRow">신규</button>
+        <button class="whitebutton" @click="deleteRow">삭제</button>
       </div>
       <Realgrid
         :progname="'CRM20_003INS_VUE'"
@@ -81,6 +81,9 @@
         :rowStateeditable="false"
         :showCheckBar="false"
         :checkRenderEditable="false"
+        :addRow4="addrow"
+        :addrowProp="'strSaleCompCode,strSaleCompName,strSaleCustID,strSaleCustName,strSaleCardNo,strRegistNo,strDirector,strDealType,strDealKind,strTelNo,strTelNo2,strZip,strAddress,strAddress2,strRemark,strEmail,strRegistDate,strSaleCustStatus,strSaleAccStatus,strBelongType,strBelongCustID,strBelongCustName,strCustDeptName,strCustDeptCode,dblLimitAmt,dblRecvAmt,dblSaleAmt,dblRemAmt,strTelNo1Sub1,strTelNo1Sub2,strTelNo1Sub3,strTelNo2Sub1,strTelNo2Sub2,strTelNo2Sub3'"
+        :addrowDefault="addrowDefault"
         :labelingColumns="'strSaleCustStatus'"
         :valuesData="[['0', '1']]"
         :labelsData="[['정상', '탈퇴']]"
@@ -221,7 +224,7 @@
 
         <div
           class="border-l border-t border-black bg-gray-100 flex justify-center items-center">
-          거래처상태
+          <span class="text-red-500">＊</span>거래처상태
         </div>
         <div
           class="border-l border-t border-black pl-5 space-x-5 items-center flex">
@@ -823,7 +826,7 @@ const clickedRowData = async (e) => {
       gridvalue31.value = 0;
       disableGridValue31.value = true;
     } else {
-      gridvalue30.value = rowData2.value[0];
+      gridvalue30.value = rowData2.value[0].strSaleCardNo;
       disableGridValue31.value = true;
     }
   } catch (error) {}
@@ -1142,6 +1145,35 @@ const saveButton = async (e) => {
     return;
   }
 
+  const filterMust = updateRowData.value.filter(
+    (item) =>
+      item.strSaleCustName === "" ||
+      item.strSaleCustName === undefined ||
+      item.strTelNo === "" ||
+      item.strTelNo === undefined ||
+      item.strTelNo1Sub1 === "" ||
+      item.strTelNo1Sub1 === undefined ||
+      item.strTelNo1Sub2 === "" ||
+      item.strTelNo1Sub2 === undefined ||
+      item.strTelNo1Sub3 === "" ||
+      item.strTelNo1Sub3 === undefined ||
+      item.strSaleCustStatus === "" ||
+      item.strSaleCustStatus === undefined ||
+      item.strSaleAccStatus === "" ||
+      item.strSaleAccStatus === undefined
+  );
+
+  if (filterMust.length > 0) {
+    Swal.fire({
+      title: "경고",
+      text: "미입력된 필수값이 존재합니다. 확인해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+
+    return;
+  }
+
   try {
     store.state.loading = true;
 
@@ -1325,6 +1357,165 @@ const saveButton = async (e) => {
         console.log(res);
       } catch (error) {}
     }
+
+    if (updatedRows.value.created.length > 0) {
+      try {
+        const id = store.state.userData.lngSequence;
+        const flag = "N";
+
+        const saleCompCodes = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strSaleCompCode)
+          .join("\u200b");
+
+        const saleCustIds = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strSaleCustID)
+          .join("\u200b");
+
+        const saleCustNames = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strSaleCustName)
+          .join("\u200b");
+
+        const registNos = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strRegistNo)
+          .join("\u200b");
+
+        const telNos = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strTelNo)
+          .join("\u200b");
+
+        const telNos2 = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strTelNo2)
+          .join("\u200b");
+
+        const postTelNo = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strTelNo1Sub3)
+          .join("\u200b");
+
+        const emails = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strEmail)
+          .join("\u200b");
+
+        const strZips = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strZip)
+          .join("\u200b");
+
+        const address = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strAddress)
+          .join("\u200b");
+
+        const address2 = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strAddress2)
+          .join("\u200b");
+
+        const remarks = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strRemark)
+          .join("\u200b");
+
+        const strRegistDates = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => formatLocalDate(item.strRegistDate))
+          .join("\u200b");
+
+        const saleCustStatus = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strSaleCustStatus)
+          .join("\u200b");
+
+        const directors = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strDirector)
+          .join("\u200b");
+
+        const dealtypes = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strDealType)
+          .join("\u200b");
+
+        const dealkinds = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strDealKind)
+          .join("\u200b");
+
+        const saleAccStatus = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strSaleAccStatus)
+          .join("\u200b");
+
+        const custDeptCodes = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strCustDeptCode)
+          .join("\u200b");
+
+        const custDeptNames = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strCustDeptName)
+          .join("\u200b");
+
+        const belongTypes = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strBelongType)
+          .join("\u200b");
+
+        const belongCustids = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strBelongCustID)
+          .join("\u200b");
+
+        const belongCustNames = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.strBelongCustName)
+          .join("\u200b");
+
+        const limitAmts = updateRowData.value
+          .filter((item, index) => updatedRows.value.created.includes(index))
+          .map((item) => item.dblLimitAmt)
+          .join("\u200b");
+
+        const res = await saveCreditCustomer(
+          id,
+          flag,
+          saleCompCodes,
+          saleCustIds,
+          saleCustNames,
+          registNos,
+          telNos,
+          telNos2,
+          postTelNo,
+          emails,
+          strZips,
+          address,
+          address2,
+          remarks,
+          strRegistDates,
+          saleCustStatus,
+          directors,
+          dealtypes,
+          dealkinds,
+          saleAccStatus,
+          custDeptCodes,
+          custDeptNames,
+          belongTypes,
+          belongCustids,
+          belongCustNames,
+          limitAmts
+        );
+
+        console.log(res);
+      } catch (error) {}
+    }
+
     Swal.fire({
       title: "성공",
       text: "저장하였습니다.",
@@ -1441,9 +1632,17 @@ const excelStore = (e) => {
   selectedExcelStore.value = "매장명 : " + e;
   //comsole.log(e);
 };
-const excelDate = (e) => {
-  selectedExcelDate.value = e;
-  //comsole.log(e);
+
+const addrow = ref(false);
+
+const addrowDefault = ref("");
+const addRow = () => {
+  addrowDefault.value =
+    selectedStores.value +
+    ",,XXXXXX,,,,,,,,,,,,,," +
+    formatLocalDate(new Date()) +
+    ",0,0,1,,,,,0,0,0,0,,,,,,";
+  addrow.value = !addrow.value;
 };
 
 // watch(selectedStores, async () => {

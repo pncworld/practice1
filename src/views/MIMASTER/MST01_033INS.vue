@@ -936,7 +936,7 @@
             class="grid grid-rows-1 grid-cols-[2fr,3fr] w-[80%] h-[40%] ml-10 mt-10 border pl-5">
             <div class="flex justify-center items-center">
               <img
-                :src="`http://www.pncoffice.com:8085/MenuImage/Image/${fileName}`"
+                :src="`http://www.pncoffice.com:8085/MenuImage/Image/${fileName}?v=${Date.now()}`"
                 @error="handleImageError"
                 class="w-[80%] h-[80%]" />
             </div>
