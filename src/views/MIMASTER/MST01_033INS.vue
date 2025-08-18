@@ -171,7 +171,7 @@
       </div>
       <div class="ml-10 mt-1 w-full h-[55vh]">
         <Realgrid
-          class="w-full h-[55vh]"
+          class="w-full h-[60vh]"
           :progname="'MST01_033INS_VUE'"
           :progid="1"
           :rowData="rowData"
@@ -239,7 +239,7 @@
         <div v-show="selectedMenu == 1" class="mt-3 h-[46%]">
           <div class="font-bold flex justify-start text-xl">기본정보</div>
           <div
-            class="grid grid-rows-6 grid-cols-[1fr,3fr,1fr,3fr] h-[60%] mt-3 w-[90%] border rounded-lg">
+            class="grid grid-rows-7 grid-cols-[1fr,3fr,1fr,3fr] h-[70%] mt-3 w-[90%] border rounded-lg">
             <div
               class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">
               *메뉴분류
@@ -481,6 +481,16 @@
                   v-model="gridvalue13"
                   @input="changeInfo" />미사용</label
               >
+            </div>
+
+            <div
+              class="justify-center items-center bg-gray-100 border flex font-bold">
+              주방출력설정
+            </div>
+            <div class="space-x-5 flex items-center border justify-left pl-2">
+              <button class="whitebutton" @click="movePage">
+                주방출력설정
+              </button>
             </div>
           </div>
           <div class="font-bold text-xl flex justify-start mt-5">부가정보</div>
@@ -2346,6 +2356,46 @@ const selectedMenuCd = ref([]);
 const checkedRowData5 = (e) => {
   selectedMenuCd.value = e.map((item) => item.menuCd);
   //console.log(e);
+};
+
+const movePage = () => {
+  if (
+    store.state.minorCategory.filter((item) =>
+      item.strUrl.includes("MIMASTER::MST44_064INS.xml")
+    ).length +
+      store.state.minorCategory.filter((item) =>
+        item.strUrl.includes("MIMASTER::MST44_062INS.xml")
+      ).length ==
+    2
+  ) {
+    return;
+  }
+  if (
+    store.state.minorCategory.filter((item) =>
+      item.strUrl.includes("MIMASTER::MST44_064INS.xml")
+    ).length > 0
+  ) {
+    store.state.moveOtherTab = {
+      strUrl: "MIMASTER::MST44_064INS.xml",
+      lngProgramID: 744064,
+      strTitle: "주방출력관리",
+    };
+  } else if (
+    store.state.minorCategory.filter((item) =>
+      item.strUrl.includes("MIMASTER::MST44_062INS.xml")
+    ).length > 0
+  ) {
+    store.state.moveOtherTab = {
+      strUrl: "MIMASTER::MST44_062INS.xml",
+      lngProgramID: 744062,
+      strTitle: "출력관리",
+    };
+  }
+  // store.state.moveOtherTab = {
+  //   strUrl: "MIMASTER::MST01_033INS.xml",
+  //   lngProgramID: 73762,
+  //   strTitle: "메뉴 코드 등록.",
+  // };
 };
 </script>
 

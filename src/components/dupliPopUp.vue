@@ -223,7 +223,7 @@ const dupliStore = async () => {
             areaCd2.join(","),
             posNo2.join(",")
           );
-          //comsole.log(res3.data);
+          // console.log(res3);
           if (res3.data.RESULT_CD == "00") {
             store.state.loading = false;
             Swal.fire({
@@ -237,6 +237,13 @@ const dupliStore = async () => {
               }
             });
           } else {
+            store.state.loading = false;
+            Swal.fire({
+              title: "복사실패",
+              text: "복사가 실패되었습니다.",
+              icon: "warning",
+              confirmButtonText: "확인",
+            });
             return;
           }
         } else {

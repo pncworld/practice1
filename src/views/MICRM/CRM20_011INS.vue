@@ -1,7 +1,7 @@
 <!-- /*--############################################################################
-# Filename : CRM20_003INS.vue                                                  
-# Description : 마스터관리 > 매출거래처 마스터 > 외상거래처정보                       
-# Date :2025-08-11                                                             
+# Filename : CRM20_011INS.vue                                                  
+# Description : 마스터관리 > 매출거래처 마스터 > 선수금거래처정보                       
+# Date :2025-08-18                                                             
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
@@ -656,6 +656,7 @@ import {
   getCardInfo2,
   getCustomorInfo,
   saveCreditCustomer,
+  saveCreditCustomer2,
   saveNewCardNo,
 } from "@/api/micrm";
 import GetZipCode from "@/components/getZipCode.vue";
@@ -834,7 +835,7 @@ const clickedRowData = async (e) => {
 
 const getCardNo = async (a, b, c) => {
   try {
-    const res = await getCardInfo2(a, b, 1);
+    const res = await getCardInfo2(a, b, 2);
     console.log(res);
     rowData2.value = res.data.List;
 
@@ -1021,7 +1022,7 @@ const searchButton = async () => {
       selectedStores.value,
       cond.value,
       cond2.value,
-      1,
+      2,
       cond3.value ? 1 : 0,
       cond4.value ? 1 : 0
     );
@@ -1051,7 +1052,7 @@ const searchButton2 = async () => {
     store.state.loading = true;
     // initGrid();
 
-    const res = await getBelongCust(selectedStores.value, cond6.value, 1);
+    const res = await getBelongCust(selectedStores.value, cond6.value, 2);
     //console.log(res);
     rowData2.value = res.data.List;
 
@@ -1090,7 +1091,7 @@ const checkDupliCard = async () => {
   try {
     const res = await checkCardNumbyAccount(
       selectedStores.value,
-      1,
+      2,
       gridvalue32.value
     );
 
@@ -1144,36 +1145,6 @@ const changeValue3 = (e) => {
   changeColid.value = name;
   changeValue2.value = value;
   changeNow.value = !changeNow.value;
-};
-
-const deleteButton = async () => {
-  if (forDeleteDatas.value.length == 0) {
-    Swal.fire({
-      title: "경고",
-      text: "삭제할 대상이 존재하지 않습니다.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-
-  try {
-    store.state.loading = true;
-    const res = await deleteSpecialPrices(forDeleteDatas.value.join(","));
-
-    //console.log(res);
-
-    Swal.fire({
-      title: "성공",
-      text: "삭제에 성공하였습니다.",
-      icon: "success",
-      confirmButtonText: "확인",
-    });
-  } catch (error) {
-  } finally {
-    store.state.loading = false;
-    searchButton();
-  }
 };
 
 const saveButton = async (e) => {
@@ -1258,7 +1229,7 @@ const saveButton = async (e) => {
         .join("\u200b");
 
       try {
-        const res = await deleteCustomors3(compcodes, custids, 1);
+        const res = await deleteCustomors3(compcodes, custids, 2);
 
         console.log(res);
       } catch (error) {}
@@ -1389,7 +1360,7 @@ const saveButton = async (e) => {
           .map((item) => item.dblLimitAmt)
           .join("\u200b");
 
-        const res = await saveCreditCustomer(
+        const res = await saveCreditCustomer2(
           id,
           flag,
           saleCompCodes,
@@ -1547,7 +1518,7 @@ const saveButton = async (e) => {
           .map((item) => item.dblLimitAmt)
           .join("\u200b");
 
-        const res = await saveCreditCustomer(
+        const res = await saveCreditCustomer2(
           id,
           flag,
           saleCompCodes,
@@ -1584,7 +1555,7 @@ const saveButton = async (e) => {
       const res = await saveNewCardNo(
         currentCompCd.value,
         gridvalue1.value,
-        1,
+        2,
         gridvalue32.value,
         gridvalue31.value,
         store.state.userData.lngSequence,
@@ -1596,7 +1567,7 @@ const saveButton = async (e) => {
       const res = await saveNewCardNo(
         currentCompCd.value,
         gridvalue1.value,
-        1,
+        2,
         gridvalue30.value,
         gridvalue31.value,
         store.state.userData.lngSequence,
