@@ -84,10 +84,12 @@
         :addRow4="addrow"
         :addrowProp="'strSaleCompCode,strSaleCompName,strSaleCustID,strSaleCustName,strSaleCardNo,strRegistNo,strDirector,strDealType,strDealKind,strTelNo,strTelNo2,strZip,strAddress,strAddress2,strRemark,strEmail,strRegistDate,strSaleCustStatus,strSaleAccStatus,strBelongType,strBelongCustID,strBelongCustName,strCustDeptName,strCustDeptCode,dblLimitAmt,dblRecvAmt,dblSaleAmt,dblRemAmt,strTelNo1Sub1,strTelNo1Sub2,strTelNo1Sub3,strTelNo2Sub1,strTelNo2Sub2,strTelNo2Sub3'"
         :addrowDefault="addrowDefault"
+        :deleteRow6="deleterow"
         :labelingColumns="'strSaleCustStatus'"
         :valuesData="[['0', '1']]"
         :labelsData="[['정상', '탈퇴']]"
         :changeNow2="changeNow"
+        :changeNow3="changeNow3"
         :changeRow="changeRow"
         :changeColid="changeColid"
         :changeValue2="changeValue2"
@@ -547,7 +549,7 @@
           class="text-base font-semibold flex items-center justify-start pl-5 border-l border-t border-black">
           <input
             type="text"
-            name="strSaleCardNo"
+            name="NewstrSaleCardNo"
             class="border border-black h-[80%] disabled:bg-gray-200"
             @input="changeValue3"
             :disabled="disableGridValue31"
@@ -643,10 +645,12 @@
 import { deleteSpecialPrices, updateMultiPrice } from "@/api/master";
 import {
   checkCardNumbyAccount,
+  deleteCustomors3,
   getBelongCust,
   getCardInfo2,
   getCustomorInfo,
   saveCreditCustomer,
+  saveNewCardNo,
 } from "@/api/micrm";
 import GetZipCode from "@/components/getZipCode.vue";
 /**
@@ -778,14 +782,17 @@ const checkedDatas = ref([]);
 const forDeleteDatas = ref([]);
 
 const updateRowData = ref([]);
-
+const strFlags = ref(false);
 const updatedRowData = (e) => {
   console.log(e);
   updateRowData.value = e;
 };
 const disableGridValue31 = ref(true);
+
+const currentCompCd = ref("");
 const clickedRowData = async (e) => {
   console.log(e);
+  currentCompCd.value = e[0];
   gridvalue1.value = e[2];
   gridvalue2.value = e[3];
   gridvalue3.value = e[5];
@@ -816,19 +823,43 @@ const clickedRowData = async (e) => {
   gridvalue28.value = formatNumberWithCommas(e[26]);
   gridvalue29.value = formatNumberWithCommas(e[27]);
 
+  getCardNo(e[0], e[2], e[9]);
+};
+
+const getCardNo = async (a, b, c) => {
   try {
-    const res = await getCardInfo2(e[0], e[2], 1);
+    const res = await getCardInfo2(a, b, 1);
     console.log(res);
     rowData2.value = res.data.List;
 
     if (rowData2.value.length == 0) {
-      gridvalue30.value = e[9];
+      gridvalue30.value = c;
+      gridvalue32.value = c;
       gridvalue31.value = 0;
       disableGridValue31.value = true;
+      strFlags.value = false;
     } else {
-      gridvalue30.value = rowData2.value[0].strSaleCardNo;
-      disableGridValue31.value = true;
+      gridvalue30.value =
+        rowData2.value[rowData2.value.length - 1].strSaleCardNo;
+      gridvalue32.value =
+        rowData2.value[rowData2.value.length - 1].strSaleCardNo;
+      gridvalue31.value =
+        rowData2.value[rowData2.value.length - 1].strSaleCardStatus;
+      disableGridValue31.value = gridvalue31.value == 0 ? true : false;
+      strFlags.value = true;
     }
+
+    // changeColid.value = "strSaleCardNo";
+    // changeValue2.value = gridvalue30.value;
+    // changeNow.value = !changeNow.value;
+
+    // await nextTick();
+
+    // changeColid.value = "strSaleCardStatus";
+    // changeValue2.value = gridvalue31.value;
+    // changeNow.value = !changeNow.value;
+
+    // await nextTick();
   } catch (error) {}
 };
 
@@ -1070,24 +1101,29 @@ const checkDupliCard = async () => {
 const changeColid2 = ref("");
 const changeValue4 = ref("");
 const changeNow2 = ref(false);
+const changeNow3 = ref(false);
 const changeValue3 = (e) => {
   const name = e.target.name;
   const value = e.target.value;
 
-  if (name == "strSaleCardNo") {
-    checkCardNum.value = false;
-  }
+  // if (name == "strSaleCardNo") {
+  //   // checkCardNum.value = false;
+  //   // changeColid.value = name;
+  //   // changeValue2.value = value;
+  //   // changeNow3.value = !changeNow3.value;
+
+  //   return;
+  // }
 
   if (name == "strSaleCardStatus" && e.target.value != 0) {
     disableGridValue31.value = false;
-  } else {
+  } else if (name == "strSaleCardStatus" && e.target.value == 0) {
     disableGridValue31.value = true;
   }
 
-  changeColid2.value = name;
-  changeValue4.value = value;
-
-  changeNow2.value = !changeNow2.value;
+  changeColid.value = name;
+  changeValue2.value = value;
+  changeNow.value = !changeNow.value;
 };
 
 const deleteButton = async () => {
@@ -1130,7 +1166,7 @@ const saveButton = async (e) => {
     });
     return;
   }
-
+  console.log(updatedRows.value);
   const iulength =
     updatedRows.value.created.length +
     updatedRows.value.updated.length +
@@ -1174,22 +1210,30 @@ const saveButton = async (e) => {
     return;
   }
 
+  if (checkCardNum.value == false && gridvalue32.value !== gridvalue30.value) {
+    Swal.fire({
+      title: "경고",
+      text: "변경하시려는 신규카드번호의 중복체크를 먼저 해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+
+    return;
+  }
+
   try {
     store.state.loading = true;
 
     console.log(updateRowData.value);
     if (updatedRows.value.deleted.length > 0) {
+      console.log(updatedRows.value.deleted);
       const compcodes = updateRowData.value
-        .filter((item, index) => {
-          updatedRows.value.deleted.includes(index);
-        })
+        .filter((item, index) => updatedRows.value.deleted.includes(index))
         .map((item) => item.strSaleCompCode)
         .join("\u200b");
 
       const custids = updateRowData.value
-        .filter((item, index) => {
-          updatedRows.value.deleted.includes(index);
-        })
+        .filter((item, index) => updatedRows.value.deleted.includes(index))
         .map((item) => item.strSaleCustID)
         .join("\u200b");
 
@@ -1515,6 +1559,32 @@ const saveButton = async (e) => {
         console.log(res);
       } catch (error) {}
     }
+    console.log(gridvalue31.value);
+    if (gridvalue30.value !== gridvalue32.value) {
+      const res = await saveNewCardNo(
+        currentCompCd.value,
+        gridvalue1.value,
+        1,
+        gridvalue32.value,
+        gridvalue31.value,
+        store.state.userData.lngSequence,
+        "N"
+      );
+
+      console.log(res);
+    } else if (gridvalue30.value == gridvalue32.value) {
+      const res = await saveNewCardNo(
+        currentCompCd.value,
+        gridvalue1.value,
+        1,
+        gridvalue30.value,
+        gridvalue31.value,
+        store.state.userData.lngSequence,
+        "U"
+      );
+
+      console.log(res);
+    }
 
     Swal.fire({
       title: "성공",
@@ -1575,44 +1645,13 @@ const exportExcel = ref(false);
  */
 
 const excelButton = () => {
-  let storeNm;
-  if (selectedStore.value == 0) {
-    storeNm = "선택";
-  } else {
-    storeNm = GroupList.value.filter(
-      (item) => item.lngStoreCode == selectedStore.value
-    )[0].strStoreName;
-  }
-
-  let storeGroup;
-  if (selectedStore.value == 0) {
-    storeGroup = "전체";
-  } else {
-    storeGroup = MultiGroupList.value.filter(
-      (item) => item.lngCode == selectedMultiGroup.value
-    )[0].strName;
-  }
-
-  let menuSubGroup;
-  if (selectedStore.value == 0) {
-    menuSubGroup = "전체";
-  } else {
-    menuSubGroup = MultiSubList.value.filter(
-      (item) => item.lngCode == selectedSubGroup.value
-    )[0].strName;
-  }
-
   documentSubTitle.value =
-    selectedExcelDate.value +
+    selectedExcelStore.value +
     "\n" +
-    "매장명 : " +
-    storeNm +
-    "\n" +
-    "멀티단가그룹 : " +
-    storeGroup +
-    "\n" +
-    "메뉴서브그룹 : " +
-    menuSubGroup;
+    "조회조건 : " +
+    (cond.value == 1 ? "거래처명" : cond.value == 2 ? "카드번호" : "휴대전화") +
+    " / ";
+  cond2.value;
 
   //documentSubTitle.value += "\n";
   exportExcel.value = !exportExcel.value;
@@ -1629,7 +1668,7 @@ const selectedExcelStore = ref("");
  */
 
 const excelStore = (e) => {
-  selectedExcelStore.value = "매장명 : " + e;
+  selectedExcelStore.value = e;
   //comsole.log(e);
 };
 
@@ -1643,6 +1682,11 @@ const addRow = () => {
     formatLocalDate(new Date()) +
     ",0,0,1,,,,,0,0,0,0,,,,,,";
   addrow.value = !addrow.value;
+};
+
+const deleterow = ref(false);
+const deleteRow = () => {
+  deleterow.value = !deleterow.value;
 };
 
 // watch(selectedStores, async () => {

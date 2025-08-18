@@ -1564,6 +1564,7 @@ const searchButton = async () => {
 
     afterClick.value = true;
     uploadImages.value = [];
+    uploadImagesCd.value = [];
   }
 };
 
@@ -1927,26 +1928,22 @@ const saveButton = () => {
           storecode = groupCd.value;
         }
         uploadImages.value.forEach((file, index) => {
-          const existedName = updateRow.value
-            .filter((item) => item.strUserFileName == file.name)
-            .map((item) => item.lngCode);
+          const existedName = uploadImagesCd.value[index];
 
-          if (existedName.length > 0) {
-            let newFileName =
-              String(storecode).padStart(10, 0) +
-              "_" +
-              String(existedName[0]).padStart(10, 0) +
-              ".jpg";
+          let newFileName =
+            String(storecode).padStart(10, 0) +
+            "_" +
+            String(existedName).padStart(10, 0) +
+            ".jpg";
 
-            // console.log(newFileName);
-            const newFile = new File([file], newFileName, { type: file.type });
-            formData.append(`file${index}`, newFile);
-          }
+          // console.log(newFileName);
+          const newFile = new File([file], newFileName, { type: file.type });
+          formData.append(`file${index}`, newFile);
         });
 
         if (uploadImages.value.length >= 1) {
           try {
-            //comsole.log(formData.entries());
+            // console.log(formData);
             const res2 = await uploadFile(formData);
             //comsole.log(res2);
           } catch (error) {
@@ -2183,6 +2180,8 @@ const initAll = () => {
   isNewAutoMenuCode.value = false;
   isNew.value = false;
   disableMenuAuto.value = true;
+  uploadImages.value = [];
+  uploadImagesCd.value = [];
 };
 
 const searchPayCd = (e) => {
@@ -2191,6 +2190,7 @@ const searchPayCd = (e) => {
 };
 const uploadImage = ref({ name: "" });
 const uploadImages = ref([]);
+const uploadImagesCd = ref([]);
 const fileSize = ref();
 const fileName2 = ref();
 const fileDownloadUrl = ref();
@@ -2221,6 +2221,7 @@ const handleFileUpload = async (e) => {
   const file = e.target.files[0];
   uploadImage.value = new File([file], changeValue2.value, { type: file.type });
   uploadImages.value.push(uploadImage.value);
+  uploadImagesCd.value.push(gridvalue3.value);
   //comsole.log(uploadImages.value);
 };
 

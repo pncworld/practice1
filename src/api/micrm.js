@@ -1756,3 +1756,23 @@ export const saveCreditCustomer = (
     LIMITAMT: cond26,
   });
 };
+
+export const saveNewCardNo = (
+  compcd,
+  custid,
+  type,
+  cardNo,
+  cardSts,
+  userid,
+  flag
+) => {
+  return api2.post("/MICRM/CRM20_003INS.asmx/saveNewCardNo", {
+    COMP_CD: compcd,
+    CUST_ID: custid,
+    TYPE: type,
+    CARD_NO: cardNo,
+    CARD_STS: cardSts,
+    USER_ID: userid,
+    FLAG: flag,
+  });
+};
