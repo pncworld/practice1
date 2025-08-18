@@ -572,6 +572,7 @@
               name="strSaleCardStatus"
               id="cond8"
               value="0"
+              :disabled="currRowState"
               @change="changeValue3"
               v-model="gridvalue31" />정상</label
           >
@@ -581,6 +582,7 @@
               name="strSaleCardStatus"
               id="cond9"
               value="1"
+              :disabled="currRowState"
               @change="changeValue3"
               v-model="gridvalue31" />교체</label
           >
@@ -590,6 +592,7 @@
               name="strSaleCardStatus"
               value="2"
               id="cond10"
+              :disabled="currRowState"
               @change="changeValue3"
               v-model="gridvalue31" />분실</label
           >
