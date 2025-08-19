@@ -1,7 +1,6 @@
 <!-- /*--############################################################################
 # Filename : CRM10_001INS.vue                                                  
-# Description : 고객관리 > 프로모션 관리 > 멤버 프로모션 등록
-                     
+# Description : 고객관리 > 프로모션 관리 > 멤버 프로모션 등록         
 # Date :2025-06-25                                                             
 # Author : 권맑음                     
 ################################################################################*/ -->
@@ -258,8 +257,7 @@
 </template>
 
 <script setup>
-import { getPromotionList, getReceiptEventList } from "@/api/micrm";
-import Datepicker2 from "@/components/Datepicker2.vue";
+import { getPromotionList } from "@/api/micrm";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -269,7 +267,6 @@ import Datepicker2 from "@/components/Datepicker2.vue";
  *  */
 
 import PageName from "@/components/pageName.vue";
-import PickStoreSingle from "@/components/pickStoreSingle.vue";
 /**
  * 	매장 단일 선택 컴포넌트
  */
