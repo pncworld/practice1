@@ -2798,3 +2798,147 @@ export const getStockItemList = async (
     LANG: lang,
   });
 };
+
+export const saveMaterialCode = async (
+  groupCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  cond9,
+  cond10,
+  cond11,
+  cond12,
+  cond13,
+  cond14,
+  cond15,
+  cond16,
+  cond17,
+  cond18,
+  cond19,
+  cond20,
+  cond21,
+  cond22,
+  cond23,
+  cond24,
+  cond25,
+  cond26
+) => {
+  return api2.post("/MIMASTER/MST04_001INS.asmx/saveMaterialCode", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+    COND5: cond5,
+    COND6: cond6,
+    COND7: cond7,
+    COND8: cond8,
+    COND9: cond9,
+    COND10: cond10,
+    COND11: cond11,
+    COND12: cond12,
+    COND13: cond13,
+    COND14: cond14,
+    COND15: cond15,
+    COND16: cond16,
+    COND17: cond17,
+    COND18: cond18,
+    COND19: cond19,
+    COND20: cond20,
+    COND21: cond21,
+    COND22: cond22,
+    COND23: cond23,
+    COND24: cond24,
+    COND25: cond25,
+    COND26: cond26,
+  });
+};
+
+export const saveStockAddInfo = async (groupCd, cond, cond2, cond3, cond4) => {
+  return api2.post("/MIMASTER/MST04_001INS.asmx/saveStockAddInfo", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+  });
+};
+export const deleteStockAddInfo = async (groupCd, cond, cond2) => {
+  return api2.post("/MIMASTER/MST04_001INS.asmx/deleteStockAddInfo", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+  });
+};
+export const deleteStockItem = async (groupCd, cond, cond2) => {
+  return api2.post("/MIMASTER/MST04_001INS.asmx/deleteStockItem", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+  });
+};
+
+export const getMaterialDetail = async (groupCd, cond, cond2, cond3) => {
+  return api2.post("/MIMASTER/MST04_001INS.asmx/getMaterialDetail", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+  });
+};
+export const saveStockExcelData = async (
+  groupCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  cond9,
+  cond10,
+  cond11,
+  cond12,
+  cond13,
+  cond14,
+  cond15,
+  cond16,
+  cond17,
+  cond18,
+  cond19,
+  cond20,
+  cond21,
+  cond22
+) => {
+  return api2.post("/MIMASTER/MST04_002INS.asmx/saveStockExcelData", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+    COND5: cond5,
+    COND6: cond6,
+    COND7: cond7,
+    COND8: cond8,
+    COND9: cond9,
+    COND10: cond10,
+    COND11: cond11,
+    COND12: cond12,
+    COND13: cond13,
+    COND14: cond14,
+    COND15: cond15,
+    COND16: cond16,
+    COND17: cond17,
+    COND18: cond18,
+    COND19: cond19,
+    COND20: cond20,
+    COND21: cond21,
+    SEQUENCE: cond22,
+  });
+};
