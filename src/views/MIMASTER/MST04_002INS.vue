@@ -53,7 +53,9 @@
           </select>
         </div>
         <div class="flex space-x-5 items-center">
-          <button class="whitebutton !bg-white">저장</button>
+          <button class="whitebutton !bg-white" @click="saveButton">
+            저장
+          </button>
           <div>★전매장 사용 가능 자재로 등록됩니다.</div>
         </div>
       </div>
@@ -88,30 +90,51 @@
           ['strUseNLossUOM', 'strUseNLossUOMFigure'],
           ['curUnitPrice', 'curSalesUnitPrice'],
         ]"
-        :documentTitle="'MST04_001INS'"
-        :documentSubTitle="documentSubTitle"
-        :exporttoExcel="exportExcel"
         :rowStateeditable="false">
       </Realgrid>
     </div>
 
     <div
-      class="grid grid-cols-1 grid-rows-2 justify-between bg-gray-200 rounded-lg h-20 items-start z-10 mt-2">
+      class="grid grid-cols-1 grid-rows-3 justify-between bg-gray-200 rounded-lg h-24 items-start z-10 mt-2">
       <div class="text-2xl font-bold ml-12 flex space-x-5 items-center">
         <div>자재 마스터 등록 내역 조회.</div>
-        <div><button class="whitebutton bg-white">저장</button></div>
-        <div><button class="whitebutton bg-white">엑셀</button></div>
+        <div>
+          <button class="whitebutton bg-white" @click="searchButton">
+            조회
+          </button>
+        </div>
+        <div>
+          <button class="whitebutton bg-white" @click="excelButton">
+            엑셀
+          </button>
+        </div>
       </div>
       <div class="ml-12 flex space-x-5 items-center">
         <div class="text-base font-semibold">조회조건</div>
         <div class="flex items-center">
-          <select name="" id="" class="h-7">
+          <select
+            name=""
+            id=""
+            class="h-7"
+            @change="changeCond"
+            v-model="searchCond">
             <option value="1">최근업로드</option>
             <option value="2">자재코드</option>
             <option value="3">일자선택</option>
           </select>
         </div>
-        <div>★엑셀 업로드 완료시 신규 업로드 내역이 자동 조회됩니다.</div>
+        <div v-show="searchCond == 2">
+          <input type="text" @input="onlyNumber" v-model="cond" />
+        </div>
+        <div v-show="searchCond == 2">
+          <input type="text" @input="onlyNumber" v-model="cond2" />
+        </div>
+        <div v-show="searchCond == 3">
+          <input type="date" v-model="cond3" />
+        </div>
+      </div>
+      <div class="flex justify-center">
+        ★엑셀 업로드 완료시 신규 업로드 내역이 자동 조회됩니다.
       </div>
     </div>
 
@@ -119,7 +142,7 @@
       <Realgrid
         :progname="'MST04_002INS_VUE'"
         :progid="3"
-        :rowData="rowData"
+        :rowData="rowData2"
         :reload="reload"
         :setStateBar="false"
         :setGroupCustomLevel="2"
@@ -148,7 +171,7 @@
 </template>
 
 <script setup>
-import { getStockItemList, saveMaterialCode } from "@/api/master";
+import { getStockEnrollList, saveStockExcelData } from "@/api/master";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -171,13 +194,13 @@ import Realgrid from "@/components/realgrid.vue";
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog } from "@/customFunc/customFunc";
+import { formatLocalDate, insertPageLog } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
 /*
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -196,7 +219,8 @@ const selectedstartDate = ref();
 const selectedendDate = ref();
 const cond = ref("");
 const cond2 = ref("");
-const cond3 = ref(0);
+const today = new Date();
+const cond3 = ref(formatLocalDate(today));
 const cond4 = ref(0);
 const cond5 = ref(0);
 const cond6 = ref(0);
@@ -289,34 +313,33 @@ const searchButton = async () => {
 
     reload.value = !reload.value;
 
-    const res = await getStockItemList(
+    let searchValue = "";
+    let searchValue2 = "";
+
+    if (searchCond.value == 2) {
+      searchValue = cond.value;
+      searchValue2 = cond2.value;
+    } else if (searchCond.value == 3) {
+      searchValue = cond3.value;
+    } else if (searchCond.value == 1) {
+      searchValue = "";
+      searchValue2 = "";
+    }
+    const res = await getStockEnrollList(
       store.state.userData.lngStoreGroup,
-      cond.value,
-      cond2.value,
-      cond3.value,
-      cond4.value,
-      cond5.value,
-      cond6.value,
-      cond7.value,
-      cond8.value,
-      store.state.userData.strLanguage
+      searchCond.value,
+      searchValue,
+      searchValue2
     );
     console.log(res);
 
-    rowData.value = res.data.List;
+    rowData2.value = res.data.List;
 
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
   } finally {
     store.state.loading = false;
-    deleteLngCode2.value = "";
-    deleteLngCode.value = "";
-    addRow.value = false;
-    addRow2.value = false;
-    addRow3.value = false;
-    addRow4.value = false;
-    addRow5.value = false;
   }
 };
 
@@ -354,37 +377,6 @@ const exportExcel = ref(false);
  */
 
 const excelButton = () => {
-  documentSubTitle.value =
-    "자재코드 :" +
-    cond.value +
-    "\n" +
-    "자재명 :" +
-    cond2.value +
-    "\n" +
-    "자재그룹 : " +
-    (optionList.value.filter((item) => item.lngStockGroupID == cond3.value)[0]
-      ?.strStockGroupName || "선택") +
-    "\n" +
-    "자재분류 : " +
-    (optionList2.value.filter((item) => item.lngCategoryID == cond4.value)[0]
-      ?.strCategoryName || "선택") +
-    "\n" +
-    "자재특성 : " +
-    (optionList3.value.filter((item) => item.lngGenericID == cond5.value)[0]
-      ?.strGenericName || "선택") +
-    "\n" +
-    "거래처 : " +
-    (optionList4.value.filter((item) => item.lngSupplierID == cond6.value)[0]
-      ?.strSupplierName || "선택") +
-    "\n" +
-    "구분(주/부) : " +
-    (optionList5.value.filter((item) => item.strDCode == cond7.value)[0]
-      ?.strDName || "선택") +
-    "\n" +
-    "과세면세구분 : " +
-    (optionList6.value.filter((item) => item.strDCode == cond8.value)[0]
-      ?.strDName || "선택");
-
   exportExcel.value = !exportExcel.value;
 };
 
@@ -420,6 +412,7 @@ const saveButton = async () => {
   }
 
   try {
+    store.state.loading = true;
     const lngStockIDs = updateRowData.value
       .map((item) => item.lngStockID)
       .join("\u200b");
@@ -510,11 +503,11 @@ const saveButton = async () => {
       store.state.userData.lngSequence
     );
     store.state.loading = false;
-
+    console.log(res);
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
         title: "성공",
-        text: "저장에 성공하였습니다.",
+        text: `${res.data.ERROR_MSG}`,
         icon: "success",
         confirmButtonText: "확인",
       });
@@ -532,7 +525,7 @@ const saveButton = async () => {
     store.state.loading = false;
   } finally {
     store.state.loading = false;
-    cleanButton();
+    //cleanButton();
   }
 };
 
@@ -638,6 +631,16 @@ const changeSheet = (e) => {
     return;
   }
   readFileWithArrayBuffer(currentFile.value);
+};
+
+const searchCond = ref(1);
+const changeCond = (e) => {
+  searchCond.value = e.target.value;
+};
+
+const onlyNumber = (e) => {
+  //console.log(e);
+  e.target.value = e.target.value.replace(/[^0-9]/g, "");
 };
 </script>
 
