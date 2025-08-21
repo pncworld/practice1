@@ -2961,8 +2961,20 @@ export const getMenuList4 = async (groupCd) => {
     GROUP_CD: groupCd,
   });
 };
+export const getItemsList = async (groupCd) => {
+  return api2.post("/MIMASTER/MST04_025INS.asmx/getItemsList", {
+    GROUP_CD: groupCd,
+  });
+};
 export const getMenuMasterList = async (groupCd, cond, cond2) => {
   return api2.post("/MIMASTER/MST04_024INS.asmx/getMenuMasterList", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+  });
+};
+export const getProductDetailList = async (groupCd, cond, cond2) => {
+  return api2.post("/MIMASTER/MST04_025INS.asmx/getProductDetailList", {
     GROUP_CD: groupCd,
     COND: cond,
     COND2: cond2,
@@ -2992,5 +3004,104 @@ export const deleteMenuDetail = async (
     COND3: cond3,
     COND4: cond4,
     COND5: cond5,
+  });
+};
+
+export const getStockItemSearch = async (
+  groupCd,
+  cond,
+  cond2,
+  cond3,
+  cond4
+) => {
+  return api2.post("/MIMASTER/MST04_024INS.asmx/getStockItemSearch", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+  });
+};
+
+export const saveMenuDetails = async (
+  groupCd,
+  storeCd,
+  menuCd,
+  fdate,
+  edate,
+  itemids,
+  dblquantity,
+  classtypes,
+  unitids,
+  seqids,
+  classnms,
+  flag,
+  byexcel
+) => {
+  return api2.post("/MIMASTER/MST04_024INS.asmx/saveMenuDetails", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    MENU_CD: menuCd,
+    F_DATE: fdate,
+    E_DATE: edate,
+    ITEMIDS: itemids,
+    DBLQUAN: dblquantity,
+    CLASSTYPES: classtypes,
+    UNITIDS: unitids,
+
+    SEQIDS: seqids,
+    CLASSNMS: classnms,
+    FLAG: flag,
+    EXCEL: byexcel,
+  });
+};
+
+export const saveNewMenuMaster = async (
+  groupCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7
+) => {
+  return api2.post("/MIMASTER/MST04_024INS.asmx/saveNewMenuMaster", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+    COND5: cond5,
+    COND6: cond6,
+    COND7: cond7,
+  });
+};
+
+export const saveProduct = async (
+  groupCd,
+  storeCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5
+) => {
+  return api2.post("/MIMASTER/MST04_025INS.asmx/saveProduct", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+    COND5: cond5,
+  });
+};
+export const getStockItemSearch2 = async (groupCd, cond, cond2, cond3) => {
+  return api2.post("/MIMASTER/MST04_025INS.asmx/getStockItemSearch2", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
   });
 };

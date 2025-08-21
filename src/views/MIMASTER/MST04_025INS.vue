@@ -17,21 +17,21 @@
     <div
       class="grid grid-rows-2 grid-cols-2 justify-start space-x-5 bg-gray-200 rounded-lg h-24 items-center mt-3">
       <div class="flex ml-12 space-x-5">
-        <div class="text-base font-semibold">메뉴코드</div>
+        <div class="text-base font-semibold">제품코드</div>
         <div>
           <input
             type="text"
-            disabled
+            :disabled="disabled"
             v-model="cond"
             class="disabled:bg-white border border-black" />
         </div>
       </div>
       <div class="flex !ml-9 space-x-5">
-        <div class="text-base font-semibold">메뉴명</div>
+        <div class="text-base font-semibold">제품명</div>
         <div>
           <input
             type="text"
-            disabled
+            :disabled="disabled2"
             v-model="cond2"
             class="disabled:bg-white border border-black" />
         </div>
@@ -58,29 +58,24 @@
     <!-- 조회 조건 -->
     <!-- 그리드 영역 -->
     <span class="flex mt-5 space-x-5 items-center">
-      <div class="ml-10 flex justify-start font-bold text-xl">메뉴</div>
+      <div class="ml-10 flex justify-start font-bold text-xl">제품</div>
       <div>
         <input
           type="text"
           class="border border-black w-32"
           @input="searchValue" />
       </div>
-
-      <div><button class="whitebutton" @click="excelButton2">엑셀</button></div>
     </span>
     <div
-      class="grid grid-rows-1 grid-cols-[1fr,2fr,3fr] h-[65vh] w-full justify-center mt-2">
-      <div class="w-[110%] ml-10 h-full">
+      class="grid grid-rows-1 grid-cols-[2fr,2fr] h-[65vh] w-full justify-center mt-2 gap-5">
+      <div class="w-[90%] ml-10 h-full">
         <Realgrid
-          :progname="'MST04_024INS_VUE'"
+          :progname="'MST04_025INS_VUE'"
           :progid="1"
           :rowData="rowData"
           :setStateBar="false"
-          :searchColId="'lngMenuCode,strMenuName'"
+          :searchColId="'lngProductID,strProductName'"
           :searchWord3="searchvalue"
-          :exporttoExcel="exportToExcel2"
-          :documentTitle="'MST04_024INS'"
-          :documentSubTitle="documentSubTitle2"
           @clickedRowData="clickedRowData"
           :rowStateeditable="false">
         </Realgrid>
@@ -88,27 +83,9 @@
       <!-- 그리드 영역 -->
       <!-- 연동 데이터 영역 -->
 
-      <div class="w-[90%] ml-20 -mt-7 h-full">
-        <div class="flex justify-start font-bold text-xl">◎ 메뉴 Master</div>
-        <Realgrid
-          :progname="'MST04_024INS_VUE'"
-          :progid="2"
-          :rowData="rowData2"
-          :changeNow2="changeNow2"
-          :changeRow="changeRow"
-          :changeValue2="changeValue1"
-          :changeColid="changeColid2"
-          @selectedIndex="selectedIndex"
-          @updatedRowData="updatedRowData"
-          @clickedRowData="clickedRowData2"
-          :rowStateeditable="false">
-        </Realgrid>
-      </div>
-
-      <div
-        class="grid grid-rows-[0.4fr,6fr,3fr] grid-cols-1 w-[90%] ml-12 h-full -mt-7">
-        <div class="flex justify-between font-bold text-xl">
-          <div>◎ 메뉴 Detail</div>
+      <div class="w-[90%] -mt-7 h-full">
+        <div class="flex justify-between">
+          <div class="flex justify-start font-bold text-xl">◎ 제품 Detail</div>
           <div class="flex space-x-5">
             <div>
               <button class="whitebutton" @click="addButton">신규</button>
@@ -116,87 +93,24 @@
             <div>
               <button class="whitebutton" @click="saveButton">저장</button>
             </div>
-            <div>
-              <button class="whitebutton" @click="excelButton">엑셀</button>
-            </div>
           </div>
         </div>
-        <div class="h-full">
-          <Realgrid
-            :progname="'MST04_024INS_VUE'"
-            :progid="3"
-            :rowData="rowData3"
-            @clickedRowData="clickedRowData3"
-            @buttonClicked="buttonClicked"
-            @allStateRows="allStateRows"
-            @updatedRowData="updatedRowData4"
-            :exporttoExcel="exportToExcel"
-            :documentTitle="'MST04_024INS'"
-            :documentSubTitle="documentSubTitle"
-            :inputOnlyNumberColumn2="['dblQuantity']"
-            :labelingColumns="'strClassType'"
-            :valuesData="[['01', '02', '03']]"
-            :labelsData="[['자재', '제품', '제조']]"
-            :rowStateeditable="false"
-            :editableColId="['dblQuantity']">
-          </Realgrid>
-        </div>
-        <div class="flex mt-2 flex-col">
-          <div class="flex">
-            <div class="text-base font-semibold">◎메뉴 Detail_Excel Upload</div>
-            <div class="text-red-400 font-medium ml-5">
-              (Detail 최초 등록시에만 가능)
-            </div>
-          </div>
-          <div class="grid grid-rows-2 grid-cols-[1fr,5fr,2fr] h-20">
-            <div
-              class="border-l border-t border-black text-center items-center justify-center flex bg-gray-200">
-              파일선택(xls)
-            </div>
-            <div
-              class="border-l border-t border-black text-center items-center justify-center flex bg-gray-200">
-              <input
-                type="text"
-                class="border border-black w-[80%] h-[80%] disabled:bg-white"
-                v-model="fileNm"
-                disabled />
-            </div>
-            <div
-              class="border-l border-t border-black text-center items-center justify-center flex bg-gray-200">
-              <button class="whitebutton bg-white" @click="findFile">
-                찾기
-              </button>
-              <input
-                type="file"
-                hidden
-                accept=".xls,.xlsx"
-                ref="fileInput"
-                @change="handleFileChange" />
-            </div>
-            <div
-              class="border-l border-t border-b border-black text-center items-center justify-center flex bg-gray-200">
-              SHEET 선택
-            </div>
-            <div
-              class="border-l border-t border-b border-black text-center items-center justify-center flex bg-gray-200">
-              <select
-                name=""
-                id=""
-                class="border border-black w-[80%] h-[80%]"
-                @change="changeExcelData">
-                <option :value="i.lngCode" v-for="i in SheetList">
-                  {{ i.strName }}
-                </option>
-              </select>
-            </div>
-            <div
-              class="border-l border-t border-b border-black text-center items-center justify-center flex bg-gray-200">
-              <button class="whitebutton bg-white" @click="downloadFile">
-                샘플 양식다운로드
-              </button>
-            </div>
-          </div>
-        </div>
+        <Realgrid
+          :progname="'MST04_025INS_VUE'"
+          :progid="2"
+          :rowData="rowData2"
+          :changeNow2="changeNow2"
+          :changeRow="changeRow"
+          :changeValue2="changeValue1"
+          :changeColid="changeColid2"
+          @selectedIndex="selectedIndex"
+          @allStateRows="allStateRows"
+          @updatedRowData="updatedRowData"
+          @clickedRowData="clickedRowData2"
+          :editableColId="['dblQuantity']"
+          :inputOnlyNumberColumn2="['dblQuantity']"
+          :rowStateeditable="false">
+        </Realgrid>
       </div>
     </div>
   </div>
@@ -228,7 +142,7 @@
       </div>
 
       <div
-        class="grid grid-rows-3 grid-cols-[1fr,2fr] w-[50%] justify-center items-center ml-16 space-x-5">
+        class="grid grid-rows-2 grid-cols-[1fr,2fr] w-[50%] justify-center items-center ml-16 space-x-5">
         <div class="font-semibold text-base ml-12">자재분류</div>
         <div class="flex space-x-2">
           <select
@@ -248,74 +162,44 @@
             name=""
             id=""
             class="border border-black w-64"
-            v-model="scond2">
+            v-model="scond4">
             <option :value="i.lngDetail" v-for="i in optionList2">
               {{ i.strDetail }}
             </option>
           </select>
         </div>
-        <div class="font-semibold text-base mt-2 !ml-12">조회구분</div>
-        <div class="flex space-x-2 mt-2">
-          <label for="scond"
-            ><input
-              type="radio"
-              id="scond"
-              name="scond"
-              v-model="scond3"
-              value="01" />자재</label
-          >
-          <label for="scond2"
-            ><input
-              type="radio"
-              id="scond2"
-              name="scond"
-              v-model="scond3"
-              value="02" />제품</label
-          >
-          <label for="scond3"
-            ><input
-              type="radio"
-              id="scond3"
-              name="scond"
-              v-model="scond3"
-              value="03" />제조</label
-          >
-        </div>
+
         <div class="font-semibold text-base mt-2 !ml-12">자재명</div>
         <div class="flex space-x-2 mt-2">
-          <input type="text" class="border border-black" v-model="scond4" />
+          <input type="text" class="border border-black" v-model="scond2" />
         </div>
       </div>
 
       <div class="h-[70%] mt-5">
         <Realgrid
-          :progname="'MST04_024INS_VUE'"
-          :progid="6"
+          :progname="'MST04_025INS_VUE'"
+          :progid="3"
           :setStateBar="false"
-          :hideColumnsId="hideColumnsId"
           :rowStateeditable="false"
           @checkedRowData="checkedRowData"
-          :labelingColumns="'strClassType'"
-          :valuesData="[['01', '02', '03']]"
-          :labelsData="[['자재', '제품', '제조']]"
           :rowData="rowData6"></Realgrid>
       </div>
     </div>
-    <!-- 모달 내용 -->
   </div>
+
   <!-- 연동 데이터 영역 -->
 </template>
 
 <script setup>
 import {
   deleteMenuDetail,
-  getMenuList4,
-  getMenuMasterList,
+  getItemsList,
   getMenuReceipt,
-  getStockItemSearch,
+  getProductDetailList,
+  getStockItemSearch2,
   getStoreForMenuReceipt,
   saveMenuDetails,
-  saveNewMenuMaster,
+  saveProduct,
 } from "@/api/master";
 /**
  * 매장 공통 컴포넌트
@@ -370,7 +254,7 @@ onMounted(async () => {
 
   optionList.value = res.data.List;
 
-  const res2 = await getMenuList4(store.state.userData.lngStoreGroup);
+  const res2 = await getItemsList(store.state.userData.lngStoreGroup);
 
   rowData.value = res2.data.List;
 });
@@ -397,16 +281,9 @@ const labelsData = ref([]);
 const addRow = ref(false);
 const changeNow = ref(false);
 const afterSearch3 = ref(false);
-const changeValue2 = ref();
-const changeColid = ref();
+const disabled2 = ref(true);
+const disabled = ref(true);
 const changeRow = ref();
-const gridvalue1 = ref();
-const gridvalue2 = ref();
-const gridvalue3 = ref();
-const gridvalue4 = ref();
-const gridvalue5 = ref();
-const gridvalue6 = ref();
-const gridvalue7 = ref();
 
 /**
  * 수정용 데이터 행 설정
@@ -443,6 +320,7 @@ const updatedrowdata2 = ref([]);
 const updatedRowData = (e) => {
   updatedrowdata2.value = e;
 };
+
 const deleteButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -461,13 +339,25 @@ const tempgridValue5 = ref();
  */
 
 const clickedRowData = async (e) => {
-  //console.log(e);
+  console.log(e);
   afterSearch3.value = false;
   cond.value = e[0];
   cond2.value = e[1];
+  disabled2.value = false;
+  disabled.value = true;
+  cond4.value =
+    e[2].slice(0, 4) + "-" + e[2].slice(4, 6) + "-" + e[2].slice(6, 8);
+  cond5.value =
+    e[3].slice(0, 4) + "-" + e[3].slice(4, 6) + "-" + e[3].slice(6, 8);
+
+  fcond2.value = e[1];
+  fcond4.value =
+    e[2].slice(0, 4) + "-" + e[2].slice(4, 6) + "-" + e[2].slice(6, 8);
+  fcond5.value =
+    e[3].slice(0, 4) + "-" + e[3].slice(4, 6) + "-" + e[3].slice(6, 8);
 
   try {
-    const res = await getMenuMasterList(
+    const res = await getProductDetailList(
       store.state.userData.lngStoreGroup,
       0,
       cond.value
@@ -476,12 +366,12 @@ const clickedRowData = async (e) => {
     console.log(res);
 
     rowData2.value = res.data.List;
-    if (rowData3.value.length > 0) {
-      rowData3.value = [];
-    }
+    updatedrowdata2.value = res.data.List;
+    afterSearch3.value = true;
   } catch (error) {}
 };
 
+const fcond2 = ref("");
 const fcond4 = ref("");
 const fcond5 = ref("");
 const clickedRowData2 = async (e) => {
@@ -495,6 +385,7 @@ const clickedRowData2 = async (e) => {
   cond5.value =
     e[3].slice(0, 4) + "-" + e[3].slice(4, 6) + "-" + e[3].slice(6, 8);
 
+  fcond2.value = e[1];
   fcond4.value =
     e[2].slice(0, 4) + "-" + e[2].slice(4, 6) + "-" + e[2].slice(6, 8);
   fcond5.value =
@@ -596,19 +487,12 @@ const store = useStore();
  */
 
 const searchButton = async () => {
-  if (scond3.value == "03") {
-    hideColumnsId.value = [];
-  } else {
-    hideColumnsId.value = ["dtmFromDate"];
-  }
-
   try {
-    const res = await getStockItemSearch(
+    const res = await getStockItemSearch2(
       store.state.userData.lngStoreGroup,
-      scond3.value,
       scond1.value,
-      scond2.value,
-      scond4.value
+      scond4.value,
+      scond2.value
     );
 
     console.log(res);
@@ -628,15 +512,9 @@ const byExcel = ref(0);
 const saveButton = async () => {
   //comsole.log(updateRow.value);
   let filterNew;
-  if (byExcel.value == 0) {
-    filterNew = updatedRowData3.value.filter(
-      (item, index) => item.add == "--" || allstaterows.value.includes(index)
-    );
-  } else {
-    filterNew = updatedRowData3.value;
-  }
 
-  if (filterNew.length == 0 && byExcel.value == 0) {
+  filterNew = updatedrowdata2.value;
+  if (JSON.stringify(rowData2.value) == JSON.stringify(updatedrowdata2.value)) {
     Swal.fire({
       title: "경고",
       text: "변경사항이 없습니다.",
@@ -655,7 +533,9 @@ const saveButton = async () => {
       showCancelButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const itemids = filterNew.map((item) => item.lngItemID).join("\u200b");
+        const itemids = filterNew
+          .map((item) => item.lngProductID)
+          .join("\u200b");
         const dblQuantityS = filterNew
           .map((item) => item.dblQuantity)
           .join("\u200b");
@@ -663,23 +543,19 @@ const saveButton = async () => {
           .map((item) => item.lngClass)
           .join("\u200b");
 
-        const lngunitids = filterNew
-          .map((item) => item.lngUnitID)
+        const stockIds = filterNew
+          .map((item) => item.lngStockID)
           .join("\u200b");
 
-        const seqids = filterNew
-          .map((item) => item.lngProductionSeqID)
+        const stockNms = filterNew
+          .map((item) => item.strStockName)
           .join("\u200b");
 
         const classtypenms = filterNew
-          .map((item) =>
-            item.lngClass == "01"
-              ? "자재"
-              : item.lngClass == "02"
-              ? "제품"
-              : "제조"
-          )
+          .map((item) => item.strUnitName)
           .join("\u200b");
+
+        const unitids = filterNew.map((item) => item.lngUnitID).join("\u200b");
         const res = await saveMenuDetails(
           store.state.userData.lngStoreGroup,
           0,
@@ -737,9 +613,9 @@ const saveButton = async () => {
 const optionList2 = ref([]);
 
 const scond1 = ref(0);
-const scond2 = ref(0);
+const scond2 = ref("");
 const scond3 = ref("01");
-const scond4 = ref("");
+const scond4 = ref("0");
 const getOptionList = async (e) => {
   if (e.target.value == 0) {
     scond4.value = 0;
@@ -768,8 +644,6 @@ const hideColumnsId = ref(["dtmFromDate"]);
 const checkedrowdata = ref([]);
 const checkedRowData = (e) => {
   checkedrowdata.value = e;
-  console.log(e);
-  console.log(rowData3.value);
 };
 
 const applyButton = () => {
@@ -777,21 +651,15 @@ const applyButton = () => {
     addRow.value = false;
     return;
   }
-  console.log(checkedrowdata.value);
+  //  console.log(checkedrowdata.value);
 
   checkedrowdata.value = checkedrowdata.value.map((item) => ({
     ...item,
-    lngItemID: item.lngStockID,
-    add: "--",
+    strStockName: item.strItemName,
     dblQuantity: 0,
-    lngClass:
-      item.strClassType == "자재"
-        ? "01"
-        : item.strClassType == "제품"
-        ? "02"
-        : "03",
   }));
-  rowData3.value = rowData3.value.concat(checkedrowdata.value);
+  rowData2.value = rowData2.value.concat(checkedrowdata.value);
+  updatedrowdata2.value = updatedrowdata2.value.concat(checkedrowdata.value);
   addRow.value = false;
 };
 
@@ -818,81 +686,76 @@ const excelButton2 = () => {
 
 const newMenu = ref(false);
 const addButton2 = () => {
-  if (cond.value == "" || cond.value == undefined) {
-    Swal.fire({
-      title: "경고",
-      text: "메뉴를 먼저 선택해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
+  //   if (cond.value == "" || cond.value == undefined) {
+  //     Swal.fire({
+  //       title: "경고",
+  //       text: "메뉴를 먼저 선택해주세요.",
+  //       icon: "warning",
+  //       confirmButtonText: "확인",
+  //     });
+  //     return;
+  //   }
+  disabled.value = false;
+  disabled2.value = false;
+
+  cond.value = "";
+  cond2.value = "";
   cond4.value = formatLocalDate(new Date());
   cond5.value = "9999-12-31";
   newMenu.value = true;
 };
 
 const saveButton2 = async () => {
-  if (newMenu.value == false && afterSearch3.value == false) {
-    Swal.fire({
-      title: "경고",
-      text: "신규버튼을 먼저 클릭해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  } else if (newMenu.value == false && afterSearch3.value == true) {
+  if (disabled.value == true) {
     try {
-      const res = await saveNewMenuMaster(
+      const res = await saveProduct(
         store.state.userData.lngStoreGroup,
         0,
         cond.value,
+        cond2.value,
         cond4.value.replaceAll("-", ""),
         cond5.value.replaceAll("-", ""),
-
-        fcond4.value.replaceAll("-", ""),
-        fcond5.value.replaceAll("-", ""),
         "U"
       );
-      console.log(res);
-    } catch (error) {}
-  } else if (newMenu.value == true) {
-    const fdate = parseInt(cond4.value.replaceAll("-", ""));
-    const edate = parseInt(cond5.value.replaceAll("-", ""));
 
-    const dlength = rowData2.value.filter(
-      (item) =>
-        !(
-          parseInt(item.dtmFromDate) > edate || parseInt(item.dtmToDate) < fdate
-        )
-    ).length;
+      if (res.data.RESULT_CD == "00") {
+        Swal.fire({
+          title: "성공",
+          text: "저장하였습니다.",
+          icon: "success",
+          confirmButtonText: "확인",
+        });
+      } else {
+        Swal.fire({
+          title: "실패",
+          text: "저장에 실패하였습니다.",
+          icon: "error",
+          confirmButtonText: "확인",
+        });
+      }
+      //console.log(res);
+    } catch (error) {
+    } finally {
+      const res2 = await getItemsList(store.state.userData.lngStoreGroup);
 
-    if (dlength > 0) {
-      Swal.fire({
-        title: "경고",
-        text: "중복되는 적용일자가 존재합니다. 확인해주세요.",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
-      return;
+      rowData.value = res2.data.List;
     }
-
+  } else {
     try {
-      const res = await saveNewMenuMaster(
+      const res = await saveProduct(
         store.state.userData.lngStoreGroup,
         0,
         cond.value,
-        fdate,
-        edate,
-        "",
-        "",
+        cond2.value,
+        cond4.value.replaceAll("-", ""),
+        cond5.value.replaceAll("-", ""),
         "I"
       );
 
       if (res.data.RESULT_CD == "00") {
         Swal.fire({
           title: "성공",
-          text: "저장 완료하였습니다.",
+          text: "저장하였습니다.",
           icon: "success",
           confirmButtonText: "확인",
         });
@@ -905,20 +768,13 @@ const saveButton2 = async () => {
         });
       }
       console.log(res);
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      const res2 = await getItemsList(store.state.userData.lngStoreGroup);
+
+      rowData.value = res2.data.List;
+    }
   }
-
-  try {
-    const res = await getMenuMasterList(
-      store.state.userData.lngStoreGroup,
-      0,
-      cond.value
-    );
-
-    console.log(res);
-
-    rowData2.value = res.data.List;
-  } catch (error) {}
 };
 
 const changeNow2 = ref(false);

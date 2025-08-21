@@ -280,6 +280,11 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  inputOnlyNumberColumn2: {
+    // 데이터 입력 숫자로 제한
+    type: String,
+    default: "",
+  },
   dragOn: {
     // 고정 컬럼 여부
     type: Boolean,
@@ -1108,6 +1113,8 @@ const funcshowGrid = async () => {
       numberFormat:
         item.strSubSumexpr != ""
           ? item.strSubSumexpr
+          : item.strColType === "double" && item.strDisplay == "double2"
+          ? "#,##0.000"
           : item.strColType === "double" && item.strDisplay == "double"
           ? "#,##0.00"
           : item.strColType === "double" && item.strDisplay != "double"
@@ -1220,6 +1227,8 @@ const funcshowGrid = async () => {
       numberFormat:
         item.strTotalexpr != ""
           ? item.strTotalexpr
+          : item.strColType === "double" && item.strDisplay == "double2"
+          ? "#,##0.000"
           : item.strColType === "double" && item.strDisplay == "double"
           ? "#,##0.00"
           : item.strColType === "double" && item.strDisplay != "double"
@@ -1294,6 +1303,8 @@ const funcshowGrid = async () => {
         ? "#,##0"
         : item.strColType == "double" && item.strDisplay == "double"
         ? "#,##0.00"
+        : item.strColType == "double" && item.strDisplay == "double2"
+        ? "#,##0.000"
         : "#,##0.0",
     styleName:
       props.dynamicRowHeight == true
@@ -1371,6 +1382,8 @@ const funcshowGrid = async () => {
       inputCharacters:
         item.strColID == props.inputOnlyNumberColumn
           ? "0123456789"
+          : item.strColID == props.inputOnlyNumberColumn2
+          ? "0123456789."
           : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ㄱ-힣!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ",
     },
     visible: item.intHdWidth !== 0,
