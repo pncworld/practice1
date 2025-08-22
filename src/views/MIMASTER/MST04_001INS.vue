@@ -6,19 +6,14 @@
 ################################################################################*/ -->
 <template>
   <!-- 조회 조건 -->
-  <div class="h-full" @click="handleParentClick">
+  <div class="h-full">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <!-- <button @click="addButton" class="button save w-auto excel">
-          신규
-        </button>
-        <button @click="deleteButton" class="button save w-auto excel">
-          삭제
-        </button> -->
+
         <button @click="excelButton" class="button save w-auto excel">
           엑셀
         </button>

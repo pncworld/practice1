@@ -1,8 +1,8 @@
 <!-- /*--############################################################################
-# Filename : MST45_034INS.vue                                                  
-# Description : 마스터관리 > 자재 마스터2 > 배송 주기 관리(청구)                     
+# Filename : MST45_030INS.vue                                                  
+# Description : 마스터관리 > 자재 마스터2 > 거래처별 배송주기 관리                     
 # Date :2025-08-22                                                           
-  # Author : 권맑음                     
+# Author : 권맑음                     
 ################################################################################*/ -->
 <template>
   <!-- 조회조건 -->
@@ -18,29 +18,28 @@
     </div>
   </div>
   <br />
-  <div class="flex space-x-96 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore
-      @update:storeCd="handleStoreCd"
-      @storeNm="handlestoreNm"
-      :hideAttr="false"
-      :hideGroup="false"
-      :defaultStoreNm="'전체'"
-      :defaultStore="true"></PickStore>
+  <div class="flex flex-col bg-gray-200 rounded-lg h-24 items-start">
+    <div class="flex space-x-96">
+      <PickStore
+        @update:storeCd="handleStoreCd"
+        @storeNm="handlestoreNm"
+        :hideAttr="false"
+        :hideGroup="false"
+        :defaultStoreNm="'전체'"
+        class="ml-20"
+        :defaultStore="true"></PickStore>
 
-    <div class="flex items-center justify-center space-x-5">
-      <div class="text-base font-semibold">자재분류</div>
-      <div>
-        <select
-          name=""
-          id=""
-          class="w-64 h-8 border border-black"
-          :disabled="disabled"
-          v-model="cond">
-          <option value="0">전체</option>
-          <option :value="i.lngDetail" v-for="i in optionList">
-            {{ i.strDetail }}
-          </option>
-        </select>
+      <div class="flex items-start justify-center space-x-5">
+        <BusinessClient
+          @SupplierId="SupplierId"
+          @SupplierNm="SupplierNm"></BusinessClient>
+      </div>
+    </div>
+    <div class="ml-12 mt-2 flex space-x-5">
+      <div class="text-base font-semibold">소요일수 일괄적용</div>
+      <div class="flex space-x-5">
+        <input type="text" @input="setValue" v-model="cond" />
+        <button class="whitebutton bg-white">적용</button>
       </div>
     </div>
   </div>
@@ -72,8 +71,9 @@
 </template>
 
 <script setup>
-import { getStockCycle2, saveStockCycle, saveStockCycle2 } from "@/api/master";
+import { getStockCycle2, saveStockCycle2 } from "@/api/master";
 import { getStockDetail } from "@/api/mistock";
+import BusinessClient from "@/components/businessClient.vue";
 /**
  *  페이지명 자동 입력 컴포넌트
  *  */
@@ -168,7 +168,6 @@ const MenuGroup = ref("");
 const SubMenuGroup = ref("");
 const items = ref("");
 const forsearchMain = ref("");
-const cond = ref("0");
 const afterSearch = ref(false);
 const clickedStoreNm = ref();
 const addrowDefault = ref();
@@ -409,6 +408,19 @@ const excelButton = () => {
     "매장명 :" + clickedStoreNm.value + "\n" + "자재분류 : " + name;
 
   exporttoExcel.value = !exporttoExcel.value;
+};
+
+const SupplierId = (e) => {
+  console.log(e);
+};
+
+const SupplierNm = (e) => {
+  console.log(e);
+};
+
+const cond = ref("");
+const setValue = (e) => {
+  cond.value = e.target.value.replace(/[^0-9]/g, "");
 };
 </script>
 
