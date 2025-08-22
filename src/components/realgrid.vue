@@ -1018,6 +1018,7 @@ const funcshowGrid = async () => {
       props.suffixColumnwon == "lngPrice" && item.strColID == "lngPrice"
         ? "number"
         : item.strColID.includes("checkbox") ||
+          item.strDisplay.includes("checkbox") ||
           (item.strColID.includes("lngSupplierID") &&
             props.checkBarInactive == "lngSupplierID")
         ? "boolean"
@@ -1087,7 +1088,8 @@ const funcshowGrid = async () => {
       text: item.strHdText,
       styleName: `header-style-${realgridname.value}${index}`,
       checkLocation:
-        item.strColID.includes("checkbox") &&
+        (item.strColID.includes("checkbox") ||
+          item.strDisplay.includes("checkbox")) &&
         props.headerCheckBar != item.strColID
           ? "left"
           : "none",
@@ -1394,6 +1396,7 @@ const funcshowGrid = async () => {
         item.strColID == "add2"
           ? "button"
           : item.strColID.includes("checkbox") ||
+            item.strDisplay.includes("checkbox") ||
             (item.strColID.includes("lngSupplierID") &&
               props.checkBarInactive == "lngSupplierID")
           ? "check"
@@ -1401,7 +1404,9 @@ const funcshowGrid = async () => {
           ? "list"
           : "text",
       editable:
-        props.checkRenderEditable == true && item.strColID.includes("checkbox")
+        props.checkRenderEditable == true &&
+        (item.strColID.includes("checkbox") ||
+          item.strDisplay.includes("checkbox"))
           ? true
           : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
     },
@@ -1433,7 +1438,10 @@ const funcshowGrid = async () => {
           props.checkBarInactive
         );
 
-        if (inActiveColumn == "0" && item.strColID == "checkbox") {
+        if (
+          inActiveColumn == "0" &&
+          (item.strColID == "checkbox" || item.strDisplay.includes("checkbox"))
+        ) {
           ret.style = { opacity: "0.5" };
           ret.renderer = { type: "check", editable: false };
         }
@@ -2065,18 +2073,22 @@ const funcshowGrid = async () => {
 
   gridView.onItemChecked = function (grid, itemIndex, checked) {
     gridView.setCurrent({ dataRow: itemIndex });
+    console.log(checked);
     // dataProvider.beginUpdate();
     // if (gridView.isCheckedRow(itemIndex)) {
     //   grid.checkItem(itemIndex, false);
     // } else {
     //   grid.checkItem(itemIndex);
     // }
-    var rows = gridView.getCheckedRows();
 
+    //console.log(checked);
+    var rows = gridView.getCheckedRows();
+    //console.log(rows);
     selectedRowData.value = [];
     for (var i in rows) {
       var data = dataProvider.getJsonRow(rows[i]);
       selectedRowData.value.push(data);
+      //console.log(selectedRowData.value);
     }
     emit("checkedRowData", selectedRowData.value);
     //console.log(selectedRowData.value);
@@ -2130,6 +2142,7 @@ const funcshowGrid = async () => {
     emit("selcetedrowData", selectedRowData.value);
     emit("selectedIndex", clickData.dataRow);
     emit("selectedIndex2", clickData.dataRow);
+    emit("allStateRows", dataProvider.getAllStateRows());
   };
 
   gridView.onSelectionChanged = function (grid) {
@@ -2179,6 +2192,7 @@ const funcshowGrid = async () => {
       }
 
       if (props.checkRowAuto == true) {
+        // 내장 체크바와 연동할건지 말건지를 결정하는 부분 false하면 셀 클릭시 내장 체크바는 선택안됨
         if (gridView.isCheckedRow(clickData.itemIndex)) {
           if (props.hideCheckBarList == false) {
             grid.checkItem(clickData.itemIndex, false);
@@ -2232,6 +2246,8 @@ const funcshowGrid = async () => {
         emit("clickedRowData", selectedRowData.value);
       }
     }
+
+    emit("allStateRows", dataProvider.getAllStateRows());
   };
 
   gridView.onColumnCheckedChanged = function (grid, col, chk) {
@@ -2262,6 +2278,7 @@ const funcshowGrid = async () => {
     updatedrowData.value = [...dataProvider.getJsonRows()];
 
     emit("updatedRowData", updatedrowData.value);
+    emit("allStateRows", dataProvider.getAllStateRows());
     //comsole.log(col.fieldName + "was checked as: " + chk);
   };
 

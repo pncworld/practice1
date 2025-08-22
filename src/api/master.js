@@ -3105,3 +3105,158 @@ export const getStockItemSearch2 = async (groupCd, cond, cond2, cond3) => {
     COND3: cond3,
   });
 };
+export const saveProductDetails = async (
+  groupCd,
+  storeCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7
+) => {
+  return api2.post("/MIMASTER/MST04_025INS.asmx/saveProductDetails", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+    COND5: cond5,
+    COND6: cond6,
+    COND7: cond7,
+  });
+};
+
+export const getStockCycle = async (groupCd, cond, cond2) => {
+  return api2.post("/MIMASTER/MST04_027INS.asmx/getStockCycle", {
+    GROUP_CD: groupCd,
+    STORE_CD: cond,
+    COND: cond2,
+  });
+};
+export const getStockCycle2 = async (groupCd, cond, cond2) => {
+  return api2.post("/MIMASTER/MST45_034INS.asmx/getStockCycle2", {
+    GROUP_CD: groupCd,
+    STORE_CD: cond,
+    COND: cond2,
+  });
+};
+
+export const saveStockCycle = async (
+  groupCd,
+  storeCd,
+  cond,
+  leadtimes,
+  blnsun,
+  blnmon,
+  blntue,
+  blnwed,
+  blnthur,
+  blnfri,
+  blnsat
+) => {
+  return api2.post("/MIMASTER/MST04_027INS.asmx/saveStockCycle", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    COND: cond,
+    COND2: leadtimes,
+    COND3: blnsun,
+    COND4: blnmon,
+    COND5: blntue,
+    COND6: blnwed,
+    COND7: blnthur,
+    COND8: blnfri,
+    COND9: blnsat,
+  });
+};
+
+export const saveStockCycle2 = async (
+  groupCd,
+  storeCd,
+  cond,
+  leadtimes,
+  blnsun,
+  blnmon,
+  blntue,
+  blnwed,
+  blnthur,
+  blnfri,
+  blnsat
+) => {
+  return api2.post("/MIMASTER/MST45_034INS.asmx/saveStockCycle2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    COND: cond,
+    COND2: leadtimes,
+    COND3: blnsun,
+    COND4: blnmon,
+    COND5: blntue,
+    COND6: blnwed,
+    COND7: blnthur,
+    COND8: blnfri,
+    COND9: blnsat,
+  });
+};
+
+export const getStockDemandList = async (groupCd, cond) => {
+  return api2.post("/MIMASTER/MST04_016INS.asmx/getStockDemandList", {
+    GROUP_CD: groupCd,
+    COND: cond,
+  });
+};
+
+export const saveStockDemandList = async (groupCd, cond, cond2) => {
+  return api2.post("/MIMASTER/MST04_016INS.asmx/saveStockDemandList", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+  });
+};
+export const getSubLeaseList = async (groupCd, cond) => {
+  return api2.post("/MIMASTER/MST04_016INS.asmx/getSubLeaseList", {
+    GROUP_CD: groupCd,
+    COND: cond,
+  });
+};
+export const copyStockDemand = async (groupCd, cond, cond2) => {
+  return api2.post("/MIMASTER/MST04_016INS.asmx/copyStockDemand", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+  });
+};
+export const getStockItemList2 = async (groupCd, cond, cond2) => {
+  return api2.post("/MIMASTER/MST45_043INS.asmx/getStockItemList2", {
+    GROUP_CD: groupCd,
+    COND: cond,
+    COND2: cond2,
+  });
+};
+export const getStockStoreList = async (groupCd, storetype, storeCd, cond) => {
+  return api2.post("/MIMASTER/MST45_043INS.asmx/getStockStoreList", {
+    GROUP_CD: groupCd,
+    STORE_TY: storetype,
+    STORE_CD: storeCd,
+    COND: cond,
+  });
+};
+
+export const saveStockStore = async (
+  groupCd,
+  storecds,
+  cond,
+  cond2,
+  cond3,
+  cond4
+) => {
+  return api2.post("/MIMASTER/MST45_043INS.asmx/saveStockStore", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecds,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+  });
+};

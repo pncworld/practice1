@@ -200,6 +200,7 @@ import {
   getStoreForMenuReceipt,
   saveMenuDetails,
   saveProduct,
+  saveProductDetails,
 } from "@/api/master";
 /**
  * 매장 공통 컴포넌트
@@ -338,6 +339,7 @@ const tempgridValue5 = ref();
  * 데이터셋 상세정보 셋팅
  */
 
+const oriRowData2 = ref([]);
 const clickedRowData = async (e) => {
   console.log(e);
   afterSearch3.value = false;
@@ -367,6 +369,7 @@ const clickedRowData = async (e) => {
 
     rowData2.value = res.data.List;
     updatedrowdata2.value = res.data.List;
+    oriRowData2.value = res.data.List;
     afterSearch3.value = true;
   } catch (error) {}
 };
@@ -514,7 +517,9 @@ const saveButton = async () => {
   let filterNew;
 
   filterNew = updatedrowdata2.value;
-  if (JSON.stringify(rowData2.value) == JSON.stringify(updatedrowdata2.value)) {
+  if (
+    JSON.stringify(oriRowData2.value) == JSON.stringify(updatedrowdata2.value)
+  ) {
     Swal.fire({
       title: "경고",
       text: "변경사항이 없습니다.",
@@ -533,43 +538,22 @@ const saveButton = async () => {
       showCancelButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const itemids = filterNew
-          .map((item) => item.lngProductID)
-          .join("\u200b");
+        const itemids = filterNew.map((item) => item.lngStockID).join("\u200b");
         const dblQuantityS = filterNew
           .map((item) => item.dblQuantity)
           .join("\u200b");
-        const strclasstypes = filterNew
-          .map((item) => item.lngClass)
-          .join("\u200b");
-
-        const stockIds = filterNew
-          .map((item) => item.lngStockID)
-          .join("\u200b");
-
-        const stockNms = filterNew
-          .map((item) => item.strStockName)
-          .join("\u200b");
-
-        const classtypenms = filterNew
-          .map((item) => item.strUnitName)
-          .join("\u200b");
 
         const unitids = filterNew.map((item) => item.lngUnitID).join("\u200b");
-        const res = await saveMenuDetails(
+        const res = await saveProductDetails(
           store.state.userData.lngStoreGroup,
           0,
           cond.value,
-          cond4.value.replaceAll("-", ""),
-          cond5.value.replaceAll("-", ""),
           itemids,
           dblQuantityS,
-          strclasstypes,
-          lngunitids,
-          seqids,
-          classtypenms,
-          "U",
-          byExcel.value
+          unitids,
+          fcond4.value.replaceAll("-", ""),
+          fcond5.value.replaceAll("-", ""),
+          "U"
         );
 
         console.log(res);
@@ -595,18 +579,17 @@ const saveButton = async () => {
     });
   } catch (error) {
   } finally {
-    const res = await getMenuReceipt(
+    const res = await getProductDetailList(
       store.state.userData.lngStoreGroup,
       0,
-      cond.value,
-      cond4.value.replaceAll("-", ""),
-      cond5.value.replaceAll("-", "")
+      cond.value
     );
 
     console.log(res);
 
-    rowData3.value = res.data.List;
-    updatedRowData3.value = res.data.List;
+    rowData2.value = res.data.List;
+    updatedrowdata2.value = res.data.List;
+    afterSearch3.value = true;
   }
 };
 

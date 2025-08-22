@@ -315,6 +315,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  defaultStoreType: {
+    type: String,
+    default: "전체",
+  },
 });
 
 const MainName = ref("");
@@ -450,16 +454,17 @@ onMounted(() => {
   storeAreaCd2.value = store.state.storeAreaCd;
   selectedStoreAreaCd.value = 0;
   MainName.value = props.mainName;
-
+  let storenm = store.state.userData.strStoreName;
   if (props.defaultStore == true) {
     selectedStoreCode.value = 0;
+    storenm = props.defaultStoreNm;
   } else {
     selectedStoreCode.value = store.state.userData.lngPosition;
   }
   emit("update:storeGroup", store.state.userData.lngStoreGroup);
   emit("update:storeType", store.state.userData.lngJoinType);
   emit("update:storeCd", selectedStoreCode.value);
-  emit("storeNm", store.state.userData.strStoreName);
+  emit("storeNm", storenm);
   emit("posNo", 0);
   emit("updateFuncScreenType", 0);
   //emit("update:storeAreaCd", 0);
@@ -631,9 +636,10 @@ watch(paymentType, (newvalue) => {
 });
 
 watch(selectedGroupCd, (newValue) => {
-  const GroupNm = store.state.storeGroup.filter(
-    (item) => item.lngStoreGroup == selectedGroupCd.value
-  )[0].strName;
+  const GroupNm =
+    store.state.storeGroup.filter(
+      (item) => item.lngStoreGroup == selectedGroupCd.value
+    )[0]?.strName || "선택";
   emit("update:storeGroup", selectedGroupCd.value);
   emit("GroupNm", GroupNm);
 });
