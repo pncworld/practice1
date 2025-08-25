@@ -39,7 +39,7 @@
       <div class="text-base font-semibold">소요일수 일괄적용</div>
       <div class="flex space-x-5">
         <input type="text" @input="setValue" v-model="cond" />
-        <button class="whitebutton bg-white">적용</button>
+        <button class="whitebutton bg-white" @click="setLeadTime">적용</button>
       </div>
     </div>
   </div>
@@ -51,19 +51,25 @@
   <div class="flex justify-center w-[97%] h-[60vh] gap-5 ml-5">
     <Realgrid
       class="w-full h-full mt-2"
-      :progname="'MST45_034INS_VUE'"
-      :progid="1"
+      :progname="'MST45_030INS_VUE'"
+      :progid="2"
       :rowData="rowData"
       @updatedRowData="updatedRowData"
       @clickedRowData="clickedRowData"
       @allStateRows="allStateRows"
+      :getRowChanged="getRowChanged"
       :exporttoExcel="exporttoExcel"
-      :documentTitle="'MST45_034INS'"
+      :documentTitle="'MST45_030INS'"
       :documentSubTitle="documentSubTitle"
       :editableColId="'lngLeadTime'"
       :rowStateeditable="false"
+      :changeRow="changeRow"
+      :changeColid="changeColid"
+      :changeValue2="changeValue2"
+      :changeNow3="changeNow3"
       :checkRenderEditable="true"
       :selectionStyle="'block'"
+      :setRowGroupSpan2="'strSupplierName'"
       :inputOnlyNumberColumn="'lngLeadTime'">
     </Realgrid>
   </div>
@@ -71,7 +77,12 @@
 </template>
 
 <script setup>
-import { getStockCycle2, saveStockCycle2 } from "@/api/master";
+import {
+  getStockCycle2,
+  getStockCycle3,
+  saveStockCycle2,
+  saveStockCycle3,
+} from "@/api/master";
 import { getStockDetail } from "@/api/mistock";
 import BusinessClient from "@/components/businessClient.vue";
 /**
@@ -103,7 +114,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -163,19 +174,12 @@ const deleteAll = ref(false);
  *  그리드 검색어 세팅
  */
 
-const searchword1 = ref("");
-const MenuGroup = ref("");
-const SubMenuGroup = ref("");
-const items = ref("");
-const forsearchMain = ref("");
 const afterSearch = ref(false);
 const clickedStoreNm = ref();
 const addrowDefault = ref();
 const commitAll = ref(false);
 const store = useStore();
 const userData = store.state.userData;
-const groupCd = ref(userData.lngStoreGroup);
-const currentsubNo = ref();
 
 /**
  * 페이지 매장 코드 세팅
@@ -186,7 +190,11 @@ const handleStoreCd = async (newValue) => {
   //     afterSearch.value = false;
   //   }
   nowStoreCd.value = newValue;
-  searchButton();
+  afterSearch.value = false;
+  if (rowData.value.length > 0) {
+    rowData.value = [];
+  }
+  //searchButton();
 };
 
 /**
@@ -211,7 +219,6 @@ const rowData = ref([]);
 const rowData2 = ref([]);
 
 const allStateRows = (e) => {
-  console.log(e);
   allstaterows.value = e.updated;
 };
 /**
@@ -219,14 +226,25 @@ const allStateRows = (e) => {
  */
 
 const searchButton = async () => {
+  if (selectedSupplier.value == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "거래처를 먼저 선택해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   try {
-    const res = await getStockCycle2(
+    store.state.loading = true;
+    const res = await getStockCycle3(
       store.state.userData.lngStoreGroup,
       nowStoreCd.value,
-      cond.value
+      selectedSupplier.value
     );
-
+    store.state.loading = false;
     rowData.value = res.data.List;
+    afterSearch.value = true;
   } catch (error) {
     console.log(error);
   }
@@ -243,7 +261,6 @@ const addbutton2 = ref(false);
 
 const filteredRowData2 = ref([]);
 const selectedlngCode = ref();
-const changeRow = ref();
 const changeValue = ref("0");
 /**
  * 데이터셋 상세정보 셋팅
@@ -274,18 +291,14 @@ const updatedrowdata = ref([]);
  */
 const disabled = ref(false);
 const updatedRowData = (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
   updatedrowdata.value = newValue;
 };
-const deleterow = ref(false);
+
 const deleterow2 = ref(false);
 /**
  * 그리드 행 삭제 버튼 함수
  */
-
-const deleteRow2 = () => {
-  deleterow2.value = !deleterow2.value;
-};
 
 /**
  * 그리드 행 삭제 버튼 함수
@@ -304,6 +317,7 @@ const saveButton = async () => {
 
       confirmButtonText: "확인",
     });
+    return;
   }
   try {
     await Swal.fire({
@@ -319,6 +333,11 @@ const saveButton = async () => {
         const storecds = updatedrowdata.value
           .filter((_, index) => allstaterows.value.includes(index))
           .map((item) => item.lngStoreCode)
+          .join("\u200b");
+
+        const supplierids = updatedrowdata.value
+          .filter((_, index) => allstaterows.value.includes(index))
+          .map((item) => item.lngSupplierID)
           .join("\u200b");
         const leadtimes = updatedrowdata.value
           .filter((_, index) => allstaterows.value.includes(index))
@@ -352,10 +371,10 @@ const saveButton = async () => {
           .filter((_, index) => allstaterows.value.includes(index))
           .map((item) => (item.blnSaturday == true ? 1 : 0))
           .join("\u200b");
-        const res = await saveStockCycle2(
+        const res = await saveStockCycle3(
           store.state.userData.lngStoreGroup,
           storecds,
-          0,
+          supplierids,
           leadtimes,
           blnsun,
           blnmon,
@@ -401,26 +420,70 @@ const exporttoExcel = ref(false);
  */
 const documentSubTitle = ref("");
 const excelButton = () => {
-  const name =
-    optionList.value.filter((item) => item.lngDetail == cond.value)[0]
-      ?.strName || "전체";
   documentSubTitle.value =
-    "매장명 :" + clickedStoreNm.value + "\n" + "자재분류 : " + name;
+    "매장명 :" +
+    clickedStoreNm.value +
+    "\n" +
+    "거래처 : " +
+    selectedSupplierNm.value;
 
   exporttoExcel.value = !exporttoExcel.value;
 };
 
+const selectedSupplier = ref("");
 const SupplierId = (e) => {
-  console.log(e);
+  selectedSupplier.value = e;
+  afterSearch.value = false;
+  if (rowData.value.length > 0) {
+    rowData.value = [];
+  }
+  //console.log(e);
 };
 
+const selectedSupplierNm = ref("");
 const SupplierNm = (e) => {
   console.log(e);
+  selectedSupplierNm.value = e;
 };
 
 const cond = ref("");
 const setValue = (e) => {
   cond.value = e.target.value.replace(/[^0-9]/g, "");
+};
+
+const getRowChanged = ref(false);
+const changeValue2 = ref("");
+const changeColid = ref("lngLeadTime");
+const changeRow = ref("");
+const changeNow3 = ref(false);
+const setLeadTime = async () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "조회를 먼저 해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (cond.value == "" || cond.value == undefined) {
+    Swal.fire({
+      title: "경고",
+      text: "정확한 소요일수를 입력해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  changeValue2.value = cond.value;
+  const alllength = rowData.value.length;
+  for (var i = 0; i < alllength; i++) {
+    changeRow.value = i;
+    changeNow3.value = !changeNow3.value;
+    await nextTick();
+  }
+  getRowChanged.value = !getRowChanged.value;
 };
 </script>
 

@@ -29,6 +29,7 @@ export default createStore({
       moveOtherTab: "",
       mobileReSearch: false,
       currentActiveTab: [],
+      mUSER_NO: "",
     };
   },
   mutations: {
@@ -154,6 +155,9 @@ export default createStore({
     setCurrentActiveTab(state, data) {
       state.currentActiveTab = data;
     },
+    setmUserNo(state, data) {
+      state.mUSER_NO = data;
+    },
     clearSession(state) {
       (state.userData = []), // 사용자 데이터를 저장할 상태
         (state.selectedCategoryId = ""),
@@ -269,6 +273,9 @@ export default createStore({
     },
     saveCurrentTab({ commit }, data) {
       commit("setCurrentActiveTab", data);
+    },
+    saveUserNo({ commit }, data) {
+      commit("setmUserNo", data);
     },
   },
   getters: {

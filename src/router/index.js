@@ -15,6 +15,7 @@ import minoticeRouter from "./minoticeRouter";
 import mihrRouter from "./mihrRouter";
 import miposRouter from "./miposRouter";
 import mistockRouter from "./mistockRouter";
+import mipurRouter from "./mipurRouter";
 
 const isMobile = () => {
   const userAgent = window.navigator.userAgent;
@@ -88,6 +89,11 @@ const routes = [
     path: "/MISTOCK",
     //component : BasicLayout ,
     children: mistockRouter(),
+  },
+  {
+    path: "/MIPUR",
+    //component : BasicLayout ,
+    children: mipurRouter(),
   },
 ];
 

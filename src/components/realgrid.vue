@@ -976,6 +976,7 @@ const emit = defineEmits([
   "allStateRows",
   "buttonClicked",
   "clickedButtonCol",
+  "checkAllorNot",
 ]);
 // 3구간
 const funcshowGrid = async () => {
@@ -2248,6 +2249,7 @@ const funcshowGrid = async () => {
     }
 
     emit("allStateRows", dataProvider.getAllStateRows());
+    emit("clickedButtonCol", clickData.fieldName);
   };
 
   gridView.onColumnCheckedChanged = function (grid, col, chk) {
@@ -2280,6 +2282,8 @@ const funcshowGrid = async () => {
     emit("updatedRowData", updatedrowData.value);
     emit("allStateRows", dataProvider.getAllStateRows());
     //comsole.log(col.fieldName + "was checked as: " + chk);
+
+    emit("checkAllorNot", chk, col.fieldName);
   };
 
   gridView.dataDropOptions.callback = function (
@@ -2868,15 +2872,16 @@ watch(
   (newVal) => {
     //console.log(gridView.getCheckedItems());
 
-    const checkedArr = gridView.getCheckedItems();
-    for (let i = 0; i < checkedArr.length; i++) {
-      dataProvider.removeRow(checkedArr[i]);
-    }
+    const checkedArr = gridView.getCheckedRows();
+    console.log(checkedArr);
+    dataProvider.removeRows(checkedArr);
+
     emit("allStateRows", dataProvider.getAllStateRows());
 
-    // if (checkedArr.length != 0) {
-    //   emit("updatedRowData", updatedrowData.value);
-    // }
+    if (checkedArr.length != 0) {
+      emit("updatedRowData", updatedrowData.value);
+    }
+
     updatedrowData.value = [...dataProvider.getJsonRows()];
     const curr = gridView.getCurrent();
     selectedRowData.value = dataProvider.getRows()[curr.dataRow];
@@ -2886,6 +2891,23 @@ watch(
       const currRowState2 = dataProvider.getRowState(curr.dataRow);
       emit("sendRowState", currRowState2);
     }
+    // for (let i = 0; i < checkedArr.length; i++) {
+    //   dataProvider.removeRow(checkedArr[i]);
+    // }
+    // emit("allStateRows", dataProvider.getAllStateRows());
+
+    // if (checkedArr.length != 0) {
+    //   emit("updatedRowData", updatedrowData.value);
+    // }
+    // updatedrowData.value = [...dataProvider.getJsonRows()];
+    // const curr = gridView.getCurrent();
+    // selectedRowData.value = dataProvider.getRows()[curr.dataRow];
+    // if (curr.dataRow > -1) {
+    //   emit("updatedRowData", updatedrowData.value);
+    //   emit("clickedRowData", selectedRowData.value);
+    //   const currRowState2 = dataProvider.getRowState(curr.dataRow);
+    //   emit("sendRowState", currRowState2);
+    // }
 
     // gridView.commit();
     // const curr = gridView.getCurrent(); // gridView 가뭔지  dataProvider 가 뭔지 개념을 설명

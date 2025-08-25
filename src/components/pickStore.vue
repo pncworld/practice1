@@ -311,6 +311,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  defaultStoreType2: {
+    type: Boolean,
+    default: false,
+  },
   hidebyLngCommonMenu: {
     type: Boolean,
     default: false,
@@ -460,6 +464,12 @@ onMounted(() => {
     storenm = props.defaultStoreNm;
   } else {
     selectedStoreCode.value = store.state.userData.lngPosition;
+  }
+
+  if (props.defaultStoreType2 == true) {
+    selectedStoreType.value = 0;
+  } else {
+    selectedStoreType.value = store.state.userData.lngJoinType;
   }
   emit("update:storeGroup", store.state.userData.lngStoreGroup);
   emit("update:storeType", store.state.userData.lngJoinType);

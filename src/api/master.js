@@ -3260,3 +3260,39 @@ export const saveStockStore = async (
     COND4: cond4,
   });
 };
+
+export const getStockCycle3 = async (groupCd, storeCd, cond) => {
+  return api2.post("/MIMASTER/MST45_030INS.asmx/getStockCycle3", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    COND: cond,
+  });
+};
+
+export const saveStockCycle3 = async (
+  groupCd,
+  storeCd,
+  cond,
+  leadtimes,
+  blnsun,
+  blnmon,
+  blntue,
+  blnwed,
+  blnthur,
+  blnfri,
+  blnsat
+) => {
+  return api2.post("/MIMASTER/MST45_030INS.asmx/saveStockCycle3", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SUPPLIER: cond,
+    COND2: leadtimes,
+    COND3: blnsun,
+    COND4: blnmon,
+    COND5: blntue,
+    COND6: blnwed,
+    COND7: blnthur,
+    COND8: blnfri,
+    COND9: blnsat,
+  });
+};
