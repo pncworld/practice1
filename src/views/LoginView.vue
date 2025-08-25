@@ -172,13 +172,15 @@ const login2 = async () => {
         const result3 = response.data.storeSupervisorTeam;
         const result4 = response.data.storeSupervisor;
         const result5 = response.data.storeArea;
-
+        const result6 = response.data.storeSubLease;
+        // console.log(result6);
         store.dispatch("StoreGroup", result0);
         store.dispatch("StoreType", result1);
         store.dispatch("StoreCd", result2);
         store.dispatch("StoreTeamCode", result3);
         store.dispatch("StoreSupervisor", result4);
         store.dispatch("StoreAreaCd", result5);
+        store.dispatch("StoreSubLease", result6);
       };
       await readsales();
       const res4 = await getFavoriteList(username.value);
@@ -256,13 +258,14 @@ onMounted(async () => {
       const result3 = response2.data.storeSupervisorTeam;
       const result4 = response2.data.storeSupervisor;
       const result5 = response2.data.storeArea;
-
+      const result6 = response2.data.storeSubLease;
       store.dispatch("StoreGroup", result0);
       store.dispatch("StoreType", result1);
       store.dispatch("StoreCd", result2);
       store.dispatch("StoreTeamCode", result3);
       store.dispatch("StoreSupervisor", result4);
       store.dispatch("StoreAreaCd", result5);
+      store.dispatch("StoreSubLease", result6);
 
       //comsole.log(res.data.List[0]);
       const res4 = await getFavoriteList(res.data.List[0].loginID);

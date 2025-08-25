@@ -98,9 +98,10 @@ onMounted(() => {
 
 watch(selectedGroup, () => {
   emit("update:storeGroup", selectedGroup.value);
-  let groupnm = storeGroup.value.filter(
-    (item) => item.lngStoreGroup == selectedGroup.value
-  )[0].strName;
+  let groupnm =
+    storeGroup.value.filter(
+      (item) => item.lngStoreGroup == selectedGroup.value
+    )[0]?.strName || "선택";
   emit("GroupNm", groupnm);
 });
 </script>

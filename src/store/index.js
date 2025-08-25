@@ -16,6 +16,7 @@ export default createStore({
       storeTeamCode: [],
       storeSupervisor: [],
       storeAreaCd: [],
+      storeSubLease: [],
       loading: false,
       loading2: false,
       favoriteList: [],
@@ -109,6 +110,9 @@ export default createStore({
     },
     setstoreAreaCd(state, data) {
       state.storeAreaCd = data;
+    },
+    setstoreSubLease(state, data) {
+      state.storeSubLease = data;
     },
     refreshTAB(state, data) {
       const tab = state.currentTabs.find((tab) => tab.lngProgramID === data);
@@ -220,6 +224,9 @@ export default createStore({
     },
     StoreAreaCd({ commit }, data) {
       commit("setstoreAreaCd", data);
+    },
+    StoreSubLease({ commit }, data) {
+      commit("setstoreSubLease", data);
     },
     refreshTab({ commit }, data) {
       commit("refreshTAB", data);
