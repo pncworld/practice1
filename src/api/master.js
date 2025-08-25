@@ -2717,3 +2717,69 @@ export const deleteOptionGroup = (groupCd, storecd, cond) => {
     COND: cond,
   });
 };
+
+export const getMaterialUnit = (groupCd) => {
+  return api2.post("/MIMASTER/MST45_033INS.asmx/getMaterialUnit", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const saveMaterialUnit = (
+  groupCd,
+  lngUnitID,
+  strUnitName,
+  groupCds,
+  dlngUnitID
+) => {
+  return api2.post("/MIMASTER/MST45_033INS.asmx/saveMaterialUnit", {
+    GROUP_CD  : groupCd,
+    UNIT_ID   : lngUnitID,
+    UNIT_NM   : strUnitName,
+    GROUP_CDS : groupCds,
+    D_UNIT_ID : dlngUnitID
+  });
+};
+
+export const getMaterialGroup = (groupCd) => {
+  return api2.post("/MIMASTER/MST04_026INS.asmx/getMaterialGroup", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const saveMaterialGroup = (
+  groupCd,
+  lngStockGroupID,
+  strStockGroupName,
+  groupCds,
+  dlngStockGroupID
+) => {
+  return api2.post("/MIMASTER/MST04_026INS.asmx/saveMaterialGroup", {
+    GROUP_CD      : groupCd,
+    ST_GROUP_ID   : lngStockGroupID,
+    ST_GROUP_NM   : strStockGroupName,
+    GROUP_CDS     : groupCds,
+    D_GROUP_ID    : dlngStockGroupID
+  });
+};
+
+export const getStandard = (groupCd) => {
+  return api2.post("/MIMASTER/MST45_051INS.asmx/getStandard", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const saveStandard = (
+  groupCd,
+  lngStandardID,
+  strStandardName,
+  groupCds,
+  dlngStandardID
+) => {
+  return api2.post("/MIMASTER/MST45_051INS.asmx/saveStandard", {
+    GROUP_CD      : groupCd,
+    ST_GROUP_ID   : lngStandardID,
+    ST_GROUP_NM   : strStandardName,
+    GROUP_CDS     : groupCds,
+    D_GROUP_ID    : dlngStandardID
+  });
+};
