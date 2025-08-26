@@ -85,6 +85,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  getFilteredData: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const setIcon = ref(0);
@@ -205,6 +209,7 @@ watch(selectedCond, async () => {
 
 watch(selectedCond2, () => {
   emit("SUBCATEGORY", selectedCond2.value);
+  //emit("FILTERDATA");
 });
 
 const selectedStoreCd2 = ref(0);
@@ -259,6 +264,61 @@ const sendSearch = () => {
   selectedStoreName.value = filteredNm;
   show.value = false;
 };
+
+watch(
+  () => props.getFilteredData,
+  () => {
+    const filteredData = ref([]);
+    if (selectedStoreCd.value == 0) {
+      //filteredData.value = optionList2.value;
+      Swal.fire({
+        title: "경고",
+        text: "지점을 선택해주세요.",
+      });
+      return;
+    }
+    if (selectedCond.value == 0) {
+      //filteredData.value = optionList2.value;
+      Swal.fire({
+        title: "경고",
+        text: "대카테고리를 선택해주세요.",
+      });
+      return;
+    }
+
+    if (selectedCond2.value == 0) {
+      //filteredData.value = optionList2.value;
+      Swal.fire({
+        title: "경고",
+        text: "중카테고리를 선택해주세요.",
+      });
+      return;
+    } else {
+      filteredData.value = optionList2.value.filter(
+        (item) => item.SCLASS_CD == selectedCond2.value
+      );
+    }
+
+    //comsole.log(selectedStoreCd.value.GROUP_CD);
+    //   emit("startDate", startDate.value);
+    //   emit("endDate", endDate.value);
+    emit("GROUP_CD", selectedStoreCd.value.GROUP_CD);
+    emit("STORE_CD", selectedStoreCd.value.STORE_CD);
+    emit("FILTERDATA", filteredData.value);
+
+    //comsole.log(selectedStoreCd2.value);
+    //selectedStoreCd.value = selectedStoreCd2.value;
+    emit("SEARCHNOW", true);
+
+    const filteredNm = StoreList.value.filter(
+      (item) =>
+        item.STORE_CD == selectedStoreCd.value.STORE_CD &&
+        item.GROUP_CD == selectedStoreCd.value.GROUP_CD
+    )[0].STORE_NM;
+    selectedStoreName.value = filteredNm;
+    show.value = false;
+  }
+);
 
 watch(
   () => props.reSearch,
