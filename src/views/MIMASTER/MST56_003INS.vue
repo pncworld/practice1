@@ -291,14 +291,17 @@ const subCategory = ref("");
 const MAINCATEGORY = (e) => {
   console.log(e);
   mainCategory.value = e;
+   FirstSearch.value = false
 };
 
 const SUBCATEGORY = (e) => {
   console.log(e);
   subCategory.value = e;
+  FirstSearch.value = false
 };
 const STORE_CD = (e) => {
   selectStoreCd.value = e;
+   FirstSearch.value = false
 };
 
 const GROUP_CD = (e) =>{
