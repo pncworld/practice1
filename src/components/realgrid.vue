@@ -951,6 +951,22 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  checkRowAuto2Col: {
+    type: String,
+    default: "lngCheck",
+  },
+  AutoCalculateDataMainColId: {
+    type: Array,
+    default: [],
+  },
+  AutoCalculateDataSubColId: {
+    type: Array,
+    default: [],
+  },
+  CalculateTaxColId: {
+    type: String,
+    default: "",
+  },
 });
 
 // 2구간
@@ -1035,6 +1051,36 @@ const funcshowGrid = async () => {
         ? "datetime"
         : "text",
     datetimeFormat: "yyyy-MM-dd",
+    valueExpression:
+      props.AutoCalculateDataSubColId[
+        props.AutoCalculateDataMainColId.indexOf(item.strColID)
+      ],
+    // valueCallback: function (prod, dataRow, fieldName, fieldNames, values) {
+    //   if (props.CalculateTaxColId.includes(item.strColID)) {
+    //     let taxType = values[fieldNames.indexOf("lngTaxType")];
+    //     let supply = values[fieldNames.indexOf("curSupply")];
+
+    //     if (taxType == "01") {
+    //       return supply * 0.1;
+    //     } else {
+    //       return 0;
+    //     }
+    //   } else {
+    //     return values[fieldNames.indexOf(item.strColID)];
+    //   }
+    // },
+    valueCallback: props.CalculateTaxColId.includes(item.strColID)
+      ? function (prod, dataRow, fieldName, fieldNames, values) {
+          let taxType = values[fieldNames.indexOf("lngTaxType")];
+          let supply = values[fieldNames.indexOf("curSupply")];
+
+          if (taxType == "01") {
+            return Math.floor(supply * 0.1);
+          } else {
+            return 0;
+          }
+        }
+      : undefined,
   }));
   if (props.removeInitProp == true) {
     fields.push({ fieldName: "deleted", dataType: "boolean" });
@@ -2055,7 +2101,7 @@ const funcshowGrid = async () => {
     gridView.commit();
     //console.log(field);
     if (props.checkRowAuto2 == true) {
-      const val = grid.getDataSource().getValue(row, "lngCheck"); // 셀 클릭시 checkautoRow  = false 하고 셀 클릭과 내장 체크바가 연동안되게하면서 이 방식으로 체크박스가 체크되었을때만체크되게 설정
+      const val = grid.getDataSource().getValue(row, props.checkRowAuto2Col); // 셀 클릭시 checkautoRow  = false 하고 셀 클릭과 내장 체크바가 연동안되게하면서 이 방식으로 체크박스가 체크되었을때만체크되게 설정
       grid.checkRow(row, val);
     }
     if (props.checkonlyone == true) {

@@ -291,3 +291,127 @@ export const getStockItemList4 = (
     NAME: name,
   });
 };
+export const getStockItemDetail = (groupCd, storeCd, orderNo, supplierid) => {
+  return api2.post("/MIPUR/PUR02_031INS.asmx/getStockItemDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    ORDER_NO: orderNo,
+    SUPPLIERID: supplierid,
+  });
+};
+
+export const saveStockMasterDetail = (
+  groupCd,
+  storeCd,
+  storeCd2,
+  date,
+  supplierids,
+  stockids,
+  checkqtys,
+  unitprices,
+  supplys,
+  taxs,
+  orderNo,
+  orderseq,
+  type,
+  userid,
+  comments
+) => {
+  return api2.post("/MIPUR/PUR02_031INS.asmx/saveStockMasterDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    STORE_CD2: storeCd2,
+    DATE: date,
+    SUPPLIERIDS: supplierids,
+    STOCKIDS: stockids,
+    CHECKQTYS: checkqtys,
+    UNITPRICES: unitprices,
+    SUPPLYS: supplys,
+    TAXS: taxs,
+    ORDERNO: orderNo,
+    ORDERSEQ: orderseq,
+    TYPE: type,
+    USERID: userid,
+    COMMENTS: comments,
+  });
+};
+
+export const getStockMasterComment = (groupCd, storeCd, checkNo) => {
+  return api2.post("/MIPUR/PUR02_031INS.asmx/getStockMasterComment", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    CHECK_NO: checkNo,
+  });
+};
+
+export const updateCheckMasterDetails = (
+  groupCd,
+  storeCd,
+  storeCd2,
+  checknos,
+  checkseqs,
+  checkqtys,
+  unitprices,
+  supplys,
+  taxs,
+  orderNo,
+  orderseq,
+  type,
+  userid,
+  comments
+) => {
+  return api2.post("/MIPUR/PUR02_031INS.asmx/updateCheckMasterDetails", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    STORE_CD2: storeCd2,
+    CHECKNOS: checknos,
+    CHECKSEQS: checkseqs,
+    CHECKQTYS: checkqtys,
+    UNITPRICES: unitprices,
+    SUPPLYS: supplys,
+    TAXS: taxs,
+    ORDERNO: orderNo,
+    ORDERSEQ: orderseq,
+    TYPE: type,
+    USERID: userid,
+    COMMENTS: comments,
+  });
+};
+
+export const getCloseDtmDate = (groupCd, storeCd) => {
+  return api2.post("/MIPUR/PUR02_031INS.asmx/getCloseDtmDate", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+export const deleteCheckDetailMasters = (
+  groupCd,
+  storeCd,
+  checknos,
+  userid
+) => {
+  return api2.post("/MIPUR/PUR02_031INS.asmx/deleteCheckDetailMasters", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    CHECK_NOS: checknos,
+    USER_ID: userid,
+  });
+};
+
+export const getStockOrderCheckList = (
+  groupCd,
+  storeCd,
+  supplierid,
+  sdate,
+  edate,
+  sts
+) => {
+  return api2.post("/MIPUR/PUR02_015INS.asmx/getStockOrderCheckList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SUPPLIER_ID: supplierid,
+    SDATE: sdate,
+    EDATE: edate,
+    STATUS: sts,
+  });
+};
