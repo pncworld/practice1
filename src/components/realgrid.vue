@@ -947,6 +947,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  checkRowAuto2: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // 2구간
@@ -1382,12 +1386,13 @@ const funcshowGrid = async () => {
             }
           : null,
       commitOnSelect: true,
-      inputCharacters:
-        item.strColID == props.inputOnlyNumberColumn
-          ? "0123456789"
-          : item.strColID == props.inputOnlyNumberColumn2
-          ? "0123456789."
-          : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ㄱ-힣!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ",
+      inputCharacters: props.inputOnlyNumberColumn
+        .split(",")
+        .includes(item.strColID)
+        ? "0123456789"
+        : item.strColID == props.inputOnlyNumberColumn2
+        ? "0123456789."
+        : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ㄱ-힣!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ",
     },
     visible: item.intHdWidth !== 0,
     renderer: {
@@ -2049,6 +2054,10 @@ const funcshowGrid = async () => {
   gridView.onCellEdited = function (grid, itemIndex, row, field) {
     gridView.commit();
     //console.log(field);
+    if (props.checkRowAuto2 == true) {
+      const val = grid.getDataSource().getValue(row, "lngCheck"); // 셀 클릭시 checkautoRow  = false 하고 셀 클릭과 내장 체크바가 연동안되게하면서 이 방식으로 체크박스가 체크되었을때만체크되게 설정
+      grid.checkRow(row, val);
+    }
     if (props.checkonlyone == true) {
       if (field == 0) {
         const bool = dataProvider.getValue(row, field);
@@ -2192,6 +2201,7 @@ const funcshowGrid = async () => {
         gridView.checkAll(false); // checkrowstates
       }
 
+      //if(props.cellclickcheck)
       if (props.checkRowAuto == true) {
         // 내장 체크바와 연동할건지 말건지를 결정하는 부분 false하면 셀 클릭시 내장 체크바는 선택안됨
         if (gridView.isCheckedRow(clickData.itemIndex)) {
@@ -2617,7 +2627,7 @@ watch(
       values[propertys[i]] = value[i];
     }
     values.new = true;
-    //comsole.log(values);
+    console.log(value);
     emit("sendRowState", "created");
     var dataRow = dataProvider.addRow(values);
     gridView.setCurrent({ dataRow: dataRow });
@@ -2870,7 +2880,7 @@ watch(
 watch(
   () => props.deleteRow7,
   (newVal) => {
-    //console.log(gridView.getCheckedItems());
+    console.log(gridView.getCheckedItems());
 
     const checkedArr = gridView.getCheckedRows();
     console.log(checkedArr);

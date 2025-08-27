@@ -213,11 +213,13 @@
         :exporttoExcel="exporttoExcel"
         :documentTitle="'PUR03_006INS'"
         :documentSubTitle="documentSubTitle"
-        :editableColId="'lngLeadTime'"
+        :editableColId="'dblOrderQty,strOrderComments'"
         :rowStateeditable="false"
+        :checkRowAuto="false"
+        :checkRowAuto2="true"
         :checkRenderEditable="true"
         :selectionStyle="'block'"
-        :inputOnlyNumberColumn="'lngLeadTime'">
+        :inputOnlyNumberColumn="'dblOrderQty'">
       </Realgrid>
     </div>
     <div class="flex flex-col items-center justify-center space-y-5">
@@ -233,7 +235,7 @@
           <button class="whitebutton bg-white" @click="deleteButton">
             삭제
           </button>
-          <button class="whitebutton bg-white">저장</button>
+          <button class="whitebutton bg-white" @click="saveButton">저장</button>
           <button class="whitebutton bg-white" @click="excelButton2">
             엑셀
           </button>
@@ -250,15 +252,19 @@
         :exporttoExcel="exporttoExcel2"
         :documentTitle="'PUR03_006INS'"
         :documentSubTitle="documentSubTitle"
-        :editableColId="'lngLeadTime'"
+        :editableColId="'dblOrderQty,strOrderComments'"
         :rowStateeditable="false"
         :checkRenderEditable="true"
         :selectionStyle="'block'"
         :setFooter="true"
         :notsoftDelete="true"
         :checkRowAuto="false"
+        :checkRowAuto2="true"
         :deleteRow7="deleteRow7"
-        :inputOnlyNumberColumn="'lngLeadTime'">
+        :addRow4="addRow4"
+        :addrowProp="'lngStockID,strStockName,strStandardName,strUnitName,curUnitPrice,dblOrderQty,curSupply,curTax,curTotal,strOrderComments,strGenericName,strSupplierName,dtmExpectedDate,lngStoreGroup,lngStoreCode,strOrderNo,lngOrderSeq,lngSupplierID,dblCheckQty,strStatus,strDemandNo,strCheckComments,lngGenericID,lngOrderAble,lngTaxType,dtmOrderDate'"
+        :addrowDefault="addrowDefault"
+        :inputOnlyNumberColumn="'dblOrderQty'">
       </Realgrid>
     </div>
   </div>
@@ -278,7 +284,11 @@ import {
   getOrderDataByDate,
   getOrderDate,
   getStockItemList3,
+  getSubSequence,
   saveFavoriteStockItem,
+  saveNewOrderTmp,
+  saveNewOrderTmp2,
+  updateOrderTmp,
 } from "@/api/mipur";
 import BusinessClient from "@/components/businessClient.vue";
 /**
@@ -314,7 +324,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -403,7 +413,6 @@ const nowStoreCd = ref(0);
  */
 
 const clickedStoreNm = ref();
-const addrowDefault = ref();
 const commitAll = ref(false);
 const store = useStore();
 const userData = store.state.userData;
@@ -469,6 +478,7 @@ const handlestoreNm = (newData) => {
  */
 
 const allstaterows = ref([]);
+const allstaterows2 = ref([]);
 const confirmData2 = ref();
 const rowData = ref([]);
 const rowData2 = ref([]);
@@ -476,6 +486,10 @@ const rowData2 = ref([]);
 const allStateRows = (e) => {
   console.log(e);
   allstaterows.value = e.updated;
+};
+const allStateRows2 = (e) => {
+  console.log(e);
+  allstaterows2.value = e;
 };
 /**
  *  조회 함수
@@ -675,14 +689,66 @@ const deleteRow2 = () => {
  */
 
 const saveButton = async () => {
-  if (allstaterows.value.length == 0) {
+  const filteredLen = updatedrowdata2.value.filter(
+    (item) => item.dblOrderQty == 0
+  ).length;
+
+  //console.log(updatedrowdata2.value);
+  if (filteredLen > 0) {
     Swal.fire({
       title: "경고",
-      text: "변경된 사항이 없습니다.",
+      text: "발주수량은 0보다 커야합니다.",
       icon: "warning",
 
       confirmButtonText: "확인",
     });
+    return;
+  }
+
+  if (allstaterows2.value.created == 0 && allstaterows2.value.updated == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "변경된 사항이 존재하지 않습니다. 확인해주세요.",
+      icon: "warning", // 'success', 'error', 'warning', 'info', 'question'
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  try {
+    const res = await getOrderDate(
+      groupCd.value,
+      nowStoreCd.value,
+      cond.value.replaceAll("-", ""),
+      2
+    );
+    console.log(res);
+    if (res.data.List[0].strMsg == "1") {
+      Swal.fire({
+        title: "실패",
+        text: "해당 발주일자는 마감 되었습니다. 다른 발주일자로 변경해 주십시오.",
+        icon: "error", // 'success', 'error', 'warning', 'info', 'question'
+
+        confirmButtonText: "확인",
+      });
+      return;
+    } else if (res.data.List[0].strMsg !== "0") {
+      Swal.fire({
+        title: "실패",
+        text: "발주등록 오류. 피앤시월드에 문의해 주십시오.",
+        icon: "error", // 'success', 'error', 'warning', 'info', 'question'
+
+        confirmButtonText: "확인",
+      });
+      return;
+    } else {
+      // return;
+    }
+
+    // if(res.data)
+  } catch (error) {
+    console.log(error);
   }
   try {
     await Swal.fire({
@@ -695,63 +761,206 @@ const saveButton = async () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         store.state.loading = true;
-        const storecds = updatedrowdata.value
-          .filter((_, index) => allstaterows.value.includes(index))
-          .map((item) => item.lngStoreCode)
-          .join("\u200b");
-        const leadtimes = updatedrowdata.value
-          .filter((_, index) => allstaterows.value.includes(index))
-          .map((item) => item.lngLeadTime)
-          .join("\u200b");
-        const blnsun = updatedrowdata.value
-          .filter((_, index) => allstaterows.value.includes(index))
-          .map((item) => (item.blnSunday == true ? 1 : 0))
-          .join("\u200b");
-        const blnmon = updatedrowdata.value
-          .filter((_, index) => allstaterows.value.includes(index))
-          .map((item) => (item.blnMonday == true ? 1 : 0))
-          .join("\u200b");
-        const blntue = updatedrowdata.value
-          .filter((_, index) => allstaterows.value.includes(index))
-          .map((item) => (item.blnThuesday == true ? 1 : 0))
-          .join("\u200b");
-        const blnwed = updatedrowdata.value
-          .filter((_, index) => allstaterows.value.includes(index))
-          .map((item) => (item.blnWednesday == true ? 1 : 0))
-          .join("\u200b");
-        const blnthur = updatedrowdata.value
-          .filter((_, index) => allstaterows.value.includes(index))
-          .map((item) => (item.blnThursday == true ? 1 : 0))
-          .join("\u200b");
-        const blnfri = updatedrowdata.value
-          .filter((_, index) => allstaterows.value.includes(index))
-          .map((item) => (item.blnFriday == true ? 1 : 0))
-          .join("\u200b");
-        const blnsat = updatedrowdata.value
-          .filter((_, index) => allstaterows.value.includes(index))
-          .map((item) => (item.blnSaturday == true ? 1 : 0))
-          .join("\u200b");
-        const res = await saveStockCycle2(
-          store.state.userData.lngStoreGroup,
-          storecds,
-          0,
-          leadtimes,
-          blnsun,
-          blnmon,
-          blntue,
-          blnwed,
-          blnthur,
-          blnfri,
-          blnsat
+        let result = 0;
+        const res2 = await getSubSequence(
+          store.state.userData.lngSequence,
+          groupCd.value,
+          nowStoreCd.value,
+          cond.value.replaceAll("-", "")
         );
-        store.state.loading = false;
-        console.log(res);
 
-        if (res.data.RESULT_CD == "00") {
+        const subsequence = res2.data.List[0].lngSubSequence;
+        console.log(subsequence);
+
+        if (allstaterows2.value.created.length > 0) {
+          const groupcds = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.created.includes(index))
+            .map((item) => item.lngStoreGroup)
+            .join("\u200b");
+          const storecds = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.created.includes(index))
+            .map((item) => item.lngStoreCode)
+            .join("\u200b");
+          const stockids = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.created.includes(index))
+            .map((item) => item.lngStockID)
+            .join("\u200b");
+          const expecteddates = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.created.includes(index))
+            .map((item) => item.dtmExpectedDate)
+            .join("\u200b");
+          const orderdates = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.created.includes(index))
+            .map((item) => item.dtmOrderDate)
+            .join("\u200b");
+          const supplierids = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.created.includes(index))
+            .map((item) => item.lngSupplierID)
+            .join("\u200b");
+          const orderqtys = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.created.includes(index))
+            .map((item) => item.dblOrderQty)
+            .join("\u200b");
+          const curunitprices = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.created.includes(index))
+            .map((item) => item.curUnitPrice)
+            .join("\u200b");
+          const cursupplys = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.created.includes(index))
+            .map((item) => item.curSupply)
+            .join("\u200b");
+
+          const curtaxs = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.created.includes(index))
+            .map((item) => item.curTax)
+            .join("\u200b");
+
+          const comments = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.created.includes(index))
+            .map((item) => item.strOrderComments)
+            .join("\u200b");
+
+          const res = await saveNewOrderTmp(
+            groupcds,
+            storecds,
+            store.state.userData.lngSequence,
+            subsequence,
+            stockids,
+            expecteddates,
+            orderdates,
+            supplierids,
+            orderqtys,
+            curunitprices,
+            cursupplys,
+            curtaxs,
+            comments
+          );
+          console.log(res); // 애매 ?
+          const res2 = await saveNewOrderTmp2(
+            groupCd.value,
+            nowStoreCd.value,
+            store.state.userData.lngSequence,
+            subsequence,
+            cond.value.replaceAll("-", ""),
+            cond3.value
+          );
+          console.log(res2);
+
+          if (res2.data.RESULT_CD == "00") {
+            result += 1;
+          }
+        }
+
+        if (allstaterows2.value.updated.length > 0) {
+          const groupcds = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.updated.includes(index))
+            .map((item) => item.lngStoreGroup)
+            .join("\u200b");
+          const storecds = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.updated.includes(index))
+            .map((item) => item.lngStoreCode)
+            .join("\u200b");
+          const orderNos = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.updated.includes(index))
+            .map((item) => item.strOrderNo)
+            .join("\u200b");
+          const orderseqs = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.updated.includes(index))
+            .map((item) => item.lngOrderSeq)
+            .join("\u200b");
+          const supplierids = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.updated.includes(index))
+            .map((item) => item.lngSupplierID)
+            .join("\u200b");
+
+          const stockids = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.updated.includes(index))
+            .map((item) => item.lngStockID)
+            .join("\u200b");
+          const dblorderqty = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.updated.includes(index))
+            .map((item) => item.dblOrderQty)
+            .join("\u200b");
+          const cursupplys = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.updated.includes(index))
+            .map((item) => item.curSupply)
+            .join("\u200b");
+
+          const curtaxs = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.updated.includes(index))
+            .map((item) => item.curTax)
+            .join("\u200b");
+
+          const curtotals = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.updated.includes(index))
+            .map((item) => item.curTotal)
+            .join("\u200b");
+
+          const comments1 = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.updated.includes(index))
+            .map((item) => item.strCheckComments)
+            .join("\u200b");
+
+          const comments2 = updatedrowdata2.value
+            .filter((_, index) => allstaterows2.value.updated.includes(index))
+            .map((item) => item.strOrderComments)
+            .join("\u200b");
+
+          const res = await updateOrderTmp(
+            groupcds,
+            storecds,
+            orderNos,
+            orderseqs,
+            supplierids,
+            stockids,
+            dblorderqty,
+            cursupplys,
+            curtaxs,
+            comments1,
+            comments2,
+            store.state.userData.lngSequence
+          );
+          console.log(res); // 애매 ?
+          if (res.data.RESULT_CD == "00") {
+            result += 1;
+          }
+        }
+
+        // console.log(result);
+        // console.log(allstaterows2.value);
+        if (
+          allstaterows2.value.updated.length > 0 &&
+          allstaterows2.value.created.length > 0 &&
+          result == 2
+        ) {
           Swal.fire({
             title: "성공",
-            text: "저장에 성공하였습니다.",
-            icon: "success", // 'success', 'error', 'warning', 'info', 'question'
+            text: "저장을 완료하였습니다.",
+            icon: "success",
+
+            confirmButtonText: "확인",
+          });
+        } else if (
+          allstaterows2.value.updated.length > 0 &&
+          allstaterows2.value.created.length == 0 &&
+          result == 1
+        ) {
+          Swal.fire({
+            title: "성공",
+            text: "저장을 완료하였습니다.",
+            icon: "success",
+
+            confirmButtonText: "확인",
+          });
+        } else if (
+          allstaterows2.value.updated.length == 0 &&
+          allstaterows2.value.created.length > 0 &&
+          result == 1
+        ) {
+          Swal.fire({
+            title: "성공",
+            text: "저장을 완료하였습니다.",
+            icon: "success",
 
             confirmButtonText: "확인",
           });
@@ -759,19 +968,22 @@ const saveButton = async () => {
           Swal.fire({
             title: "실패",
             text: "저장에 실패하였습니다.",
-            icon: "error", // 'success', 'error', 'warning', 'info', 'question'
+            icon: "error",
 
             confirmButtonText: "확인",
           });
         }
+        store.state.loading = false;
+
+        searchButton();
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         // 취소 눌렀을 때 실행할 코드
         //console.log("취소 버튼 클릭됨");
       }
     });
   } catch (error) {
+    console.log(error);
   } finally {
-    searchButton();
   }
 };
 const exporttoExcel = ref(false);
@@ -794,11 +1006,21 @@ const excelButton2 = () => {
   exporttoExcel2.value = !exporttoExcel2.value;
 };
 
+const addrowDefault = ref("");
+const addRow4 = ref(false);
 const addButton = async () => {
-  const set1 = new Set(updatedrowdata.value.map((item) => item.lngStockID));
+  const set1 = new Set(
+    updatedrowdata.value
+      .filter((item) => item.lngCheck == true)
+      .map((item) => item.lngStockID)
+  );
 
-  const hasDupli = rowData2.value.some((item) => set1.has(item.lngStockID));
+  const hasDupli = updatedrowdata2.value.some((item) =>
+    set1.has(item.lngStockID)
+  );
 
+  // console.log(updatedrowdata.value);
+  // console.log(rowData2.value);
   if (hasDupli == true) {
     Swal.fire({
       title: "경고",
@@ -809,14 +1031,81 @@ const addButton = async () => {
     });
     return;
   }
-
+  console.log(updatedrowdata.value);
   updatedrowdata.value = updatedrowdata.value
     .filter((item) => item.lngCheck == true)
     .map((item) => ({
       ...item,
       lngCheck: false,
+      dtmOrderDate: cond.value.replaceAll("-", ""),
     }));
-  rowData2.value = rowData2.value.concat(updatedrowdata.value);
+
+  for (let i = 0; i < updatedrowdata.value.length; i++) {
+    addrowDefault.value =
+      updatedrowdata.value[i].lngStockID +
+      "," +
+      updatedrowdata.value[i].strStockName +
+      "," +
+      updatedrowdata.value[i].strStandardName +
+      "," +
+      updatedrowdata.value[i].strUnitName +
+      "," +
+      updatedrowdata.value[i].curUnitPrice +
+      "," +
+      updatedrowdata.value[i].dblOrderQty +
+      "," +
+      updatedrowdata.value[i].curSupply +
+      "," +
+      updatedrowdata.value[i].curTax +
+      "," +
+      updatedrowdata.value[i].curTotal +
+      "," +
+      updatedrowdata.value[i].strOrderComments +
+      "," +
+      updatedrowdata.value[i].strGenericName +
+      "," +
+      updatedrowdata.value[i].strSupplierName +
+      "," +
+      formatLocalDate(updatedrowdata.value[i].dtmExpectedDate).replaceAll(
+        "-",
+        ""
+      ) +
+      "," +
+      updatedrowdata.value[i].lngStoreGroup +
+      "," +
+      updatedrowdata.value[i].lngStoreCode +
+      "," +
+      updatedrowdata.value[i].strOrderNo +
+      "," +
+      updatedrowdata.value[i].lngOrderSeq +
+      "," +
+      updatedrowdata.value[i].lngSupplierID +
+      "," +
+      updatedrowdata.value[i].dblCheckQty +
+      "," +
+      updatedrowdata.value[i].strStatus +
+      "," +
+      updatedrowdata.value[i].strDemandNo +
+      "," +
+      updatedrowdata.value[i].strCheckComments +
+      "," +
+      updatedrowdata.value[i].lngGenericID +
+      "," +
+      updatedrowdata.value[i].lngOrderAble +
+      "," +
+      updatedrowdata.value[i].lngTaxType +
+      "," +
+      updatedrowdata.value[i].dtmOrderDate;
+
+    console.log(addrowDefault.value);
+    addRow4.value = !addRow4.value;
+
+    await nextTick();
+  }
+
+  // rowData2.value = rowData2.value.concat(updatedrowdata.value);
+
+  // updatedrowdata2.value = JSON.parse(JSON.stringify(rowData2.value));
   rowData.value = rowData.value.map((item) => ({
     ...item,
     lngCheck: false,

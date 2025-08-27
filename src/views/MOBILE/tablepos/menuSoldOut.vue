@@ -298,7 +298,7 @@ const LCLASS_CD = ref("");
 const SCLASS_CD = ref("");
 const FILTERDATA = (e) => {
   FirstSearch.value = true;
-  //console.log(e);
+  console.log(e);
   tempcheckedList.value = [];
 
   document.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
@@ -306,6 +306,7 @@ const FILTERDATA = (e) => {
   });
   menuList.value = [];
   showSave.value = false;
+
   LCLASS_CD.value = e[0].LCLASS_CD;
   SCLASS_CD.value = e[0].SCLASS_CD;
   cond1.value = e[0].FULL_NM;

@@ -239,6 +239,7 @@
     class="z-[10]"
     :changeState="changeState"
     :reSearch="reSearch"
+    :defaultChoice="true"
     @currState="currState"
     @FILTERDATA="FILTERDATA"
     @mainCategory="mainCategory"

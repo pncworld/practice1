@@ -1,11 +1,11 @@
 <template>
-  <div class="grid grid-rows-1 grid-cols-4 mt-2 gap-5">
-    <div class="flex ml-12 items-center space-x-5">
+  <div class="grid grid-rows-1 grid-cols-3 mt-2 gap-[5vw]">
+    <div class="flex ml-12 items-center space-x-5 w-[20vw]">
       <div class="text-base font-semibold">매장명</div>
       <select
         name=""
         id=""
-        class="w-64 h-8 border border-black"
+        class="w-[15vw] h-8 border border-black"
         v-model="selectedStoreCd">
         <option
           :value="{
@@ -17,11 +17,11 @@
         </option>
       </select>
     </div>
-    <div class="flex space-x-5 items-center">
+    <div class="flex space-x-5 items-center w-[20vw]">
       <div class="text-lg font-semibold">대카테고리</div>
       <div class="border border-gray-600">
-        <select name="" id="" class="w-64 h-8" v-model="selectedCond">
-          <option value="0">선택</option>
+        <select name="" id="" class="w-[15vw] h-8" v-model="selectedCond">
+          <option value="0">{{ defaultValue }}</option>
           <option :value="i.LCLASS_CD" v-for="i in optionList">
             {{ i.LCLASS_NM }}
           </option>
@@ -29,11 +29,11 @@
       </div>
     </div>
 
-    <div class="flex space-x-5 items-center">
+    <div class="flex space-x-5 items-center w-[20vw]">
       <div class="text-lg font-semibold">중카테고리</div>
       <div class="border border-gray-600">
-        <select name="" id="" class="w-64 h-8" v-model="selectedCond2">
-          <option value="0">선택</option>
+        <select name="" id="" class="w-[15vw] h-8" v-model="selectedCond2">
+          <option value="0">{{ defaultValue }}</option>
           <option :value="i.SCLASS_CD" v-for="i in optionList2">
             {{ i.FULL_NM }}
           </option>
@@ -89,6 +89,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  defaultChoice: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const setIcon = ref(0);
@@ -107,6 +111,7 @@ const showStoreAndDate = () => {
   selectedStoreCd2.value = selectedStoreCd.value;
 };
 
+const defaultValue = ref("전체");
 /**
  * 	화면 Load시 실행 스크립트
  */
@@ -120,7 +125,9 @@ onMounted(async () => {
     store.state.userData.lngPosition,
     store.state.userData.lngSequence
   );
-
+  if (props.defaultChoice == true) {
+    defaultValue.value = "선택";
+  }
   StoreList.value = res?.data?.List;
   //console.log(StoreList.value);
   selectedStoreCd.value = {
@@ -188,23 +195,28 @@ watch(selectedStoreCd, async () => {
 
 watch(selectedCond, async () => {
   emit("MAINCATEGORY", selectedCond.value);
-  if (selectedCond.value == 0) {
-    emit("mainCategory", "선택");
-    return;
-  }
+  // if (selectedCond.value == 0) {
+  //   emit("mainCategory", "선택");
+  //   return;
+  // }
   const res2 = await GetSClassInfo(
     store.state.userData.lngStoreGroup,
     selectedStoreCd.value.STORE_CD,
     selectedCond.value,
     0
   );
-  //console.log(res2);
+  console.log(res2);
+  console.log(optionList.value);
   optionList2.value = res2.data.SClassList;
   selectedCond2.value = 0;
-  const maincategory = optionList.value.filter(
-    (item) => item.LCLASS_CD == selectedCond.value
-  )[0].LCLASS_NM;
-  emit("mainCategory", maincategory);
+  if (selectedCond.value != 0) {
+    const maincategory = optionList.value.filter(
+      (item) => item.LCLASS_CD == selectedCond.value
+    )[0].LCLASS_NM;
+    emit("mainCategory", maincategory);
+  } else {
+    emit("mainCategory", "전체");
+  }
 });
 
 watch(selectedCond2, () => {
@@ -223,34 +235,34 @@ const sendSearch = () => {
     });
     return;
   }
-  if (selectedCond.value == 0) {
-    //filteredData.value = optionList2.value;
-    Swal.fire({
-      title: "경고",
-      text: "대카테고리를 선택해주세요.",
-    });
-    return;
-  }
+  // if (selectedCond.value == 0) {
+  //   //filteredData.value = optionList2.value;
+  //   Swal.fire({
+  //     title: "경고",
+  //     text: "대카테고리를 선택해주세요.",
+  //   });
+  //   return;
+  // }
 
-  if (selectedCond2.value == 0) {
-    //filteredData.value = optionList2.value;
-    Swal.fire({
-      title: "경고",
-      text: "중카테고리를 선택해주세요.",
-    });
-    return;
-  } else {
-    filteredData.value = optionList2.value.filter(
-      (item) => item.SCLASS_CD == selectedCond2.value
-    );
-  }
+  // if (selectedCond2.value == 0) {
+  //   //filteredData.value = optionList2.value;
+  //   Swal.fire({
+  //     title: "경고",
+  //     text: "중카테고리를 선택해주세요.",
+  //   });
+  //   return;
+  // } else {
+  //   filteredData.value = optionList2.value.filter(
+  //     (item) => item.SCLASS_CD == selectedCond2.value
+  //   );
+  // }
 
   //comsole.log(selectedStoreCd.value.GROUP_CD);
   //   emit("startDate", startDate.value);
   //   emit("endDate", endDate.value);
   emit("GROUP_CD", selectedStoreCd.value.GROUP_CD);
   emit("STORE_CD", selectedStoreCd.value.STORE_CD);
-  emit("FILTERDATA", filteredData.value);
+  //emit("FILTERDATA", filteredData.value);
 
   //comsole.log(selectedStoreCd2.value);
   //selectedStoreCd.value = selectedStoreCd2.value;

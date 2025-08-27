@@ -24,6 +24,7 @@
  <CategorySelect
       @click.stop
       class=""
+      :defaultChoice="true"
       :changeState="changeState"
       :reSearch="reSearch"
       @MAINCATEGORY="MAINCATEGORY"
