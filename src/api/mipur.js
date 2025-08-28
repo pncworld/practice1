@@ -415,3 +415,183 @@ export const getStockOrderCheckList = (
     STATUS: sts,
   });
 };
+
+export const getStockOrderDetails = (
+  groupCd,
+  storeCd,
+  orderno,
+  supplierid,
+  date,
+  lang
+) => {
+  return api2.post("/MIPUR/PUR02_015INS.asmx/getStockOrderDetails", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    ORDER_NO: orderno,
+    SUPPLIER_ID: supplierid,
+    DATE: date,
+
+    LANG: lang,
+  });
+};
+
+export const checkStockCloseDate = (groupCd, storeCd, date) => {
+  return api2.post("/MIPUR/PUR02_015INS.asmx/checkStockCloseDate", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+  });
+};
+
+export const saveStockCheckMasterDetail = (
+  groupCd,
+  storeCd,
+  date,
+  comments,
+  checktype,
+  empname,
+  checkno,
+  checkdate,
+  supplierid,
+  stockids,
+  checkqtys,
+  unitprice,
+  supply,
+  tax,
+  ordernos,
+  orderseqs,
+  userid
+) => {
+  return api2.post("/MIPUR/PUR02_015INS.asmx/saveStockCheckMasterDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    COMMENTS: comments,
+    CHECKTYPE: checktype,
+    EMPNAME: empname,
+    CHECKNO: checkno,
+    CHECKDATE: checkdate,
+    SUPPLIERID: supplierid,
+    STOCKIDS: stockids,
+    CHECKQTYS: checkqtys,
+    UNITPRICES: unitprice,
+    SUPPLYS: supply,
+    TAXS: tax,
+    ORDERNOS: ordernos,
+    ORDERSEQS: orderseqs,
+    USERID: userid,
+    COMMENTS2: comments,
+  });
+};
+
+export const cancelStockConfirm = (
+  groupCd,
+  storeCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6
+) => {
+  return api2.post("/MIPUR/PUR02_015INS.asmx/cancelStockConfirm", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    ORDERNO: cond,
+    ORDERDATE: cond2,
+    CHECKNO: cond3,
+    CHECKDATE: cond4,
+    SUPPLIERID: cond5,
+    USERID: cond6,
+  });
+};
+export const getStockAuditReportList = (
+  groupCd,
+  storeCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6
+) => {
+  return api2.post("/MIPUR/PUR02_016RPT.asmx/getStockAuditReportList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: cond,
+    EDATE: cond2,
+    SUPPLIERID: cond3,
+    COND: cond4,
+    COND2: cond5,
+    ATTR: cond6,
+  });
+};
+export const getOrderNCheckChitMasterList = (
+  groupCd,
+  storeCd,
+  cond,
+  cond2,
+  cond3,
+  cond4
+) => {
+  return api2.post("/MIPUR/PUR02_012RPT.asmx/getOrderNCheckChitMasterList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: cond,
+    EDATE: cond2,
+    SUPPLIERID: cond3,
+    COND: cond4,
+  });
+};
+
+export const getOrderNCheckChitDetailList = (
+  groupCd,
+  storeCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5
+) => {
+  return api2.post("/MIPUR/PUR02_012RPT.asmx/getOrderNCheckChitDetailList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SUPPLIER_ID: cond,
+    ODATE: cond2,
+    CDATE: cond3,
+    COND: cond4,
+    COND2: cond5,
+  });
+};
+
+export const getOrderListByType2 = (
+  groupCd,
+  storeCd,
+  sdate,
+  edate,
+  supplierid,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  storeattr,
+  cond5,
+  cond6,
+  cond7
+) => {
+  return api2.post("/MIPUR/PUR01_009RPT.asmx/getOrderListByType2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    SUPPLIERID: supplierid,
+    MASTER: cond,
+    DETAIL: cond2,
+    NAME: cond3,
+    UNITTYPE: cond4,
+    STORE_ATTR: storeattr,
+    SEQUENCE: cond5,
+    IP: cond6,
+    COND5: cond7,
+  });
+};

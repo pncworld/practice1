@@ -1,6 +1,6 @@
 <template>
   <div class="flex space-x-5 items-center mt-2">
-    <div class="text-base font-semibold">거래처</div>
+    <div class="text-base font-semibold">{{ Name }}</div>
     <select
       name=""
       id=""
@@ -36,11 +36,15 @@ const props = defineProps({
     type: String,
     default: 0,
   },
+  defaultName: {
+    type: String,
+    default: "거래처",
+  },
 });
 
 const Nm = ref("");
 const disableBusiness = ref(false);
-
+const Name = ref("");
 watch(
   () => props.disable,
   () => {
@@ -57,7 +61,7 @@ onMounted(async () => {
   const res = await getSuppliers(store.state.userData.lngStoreGroup);
 
   //console.log(res);
-
+  Name.value = props.defaultName;
   optionList.value = res.data.List;
 
   cond.value = 0;

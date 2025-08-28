@@ -20,7 +20,7 @@
   <br />
   <div
     class="grid grid-rows-5 grid-cols-3 bg-gray-200 rounded-lg h-56 items-start justify-start">
-    <div class="flex justify-start ml-10">
+    <div class="flex justify-start ml-11">
       <PickStore
         @update:storeGroup="handleStoreGroup"
         @update:storeCd="handleStoreCd"
@@ -30,7 +30,7 @@
         :defaultStore="true"></PickStore>
     </div>
     <div
-      class="flex items-center justify-start space-x-5 mt-2 col-span-2 ml-20">
+      class="flex items-center justify-start space-x-5 mt-2 col-span-2 ml-28">
       <div class="text-base font-semibold text-red-500">발주일자</div>
       <div class="flex space-x-3">
         <input type="date" class="h-7" v-model="cond" @change="searchButton" />
@@ -51,7 +51,7 @@
     </div>
 
     <div
-      class="flex justify-start mt-3 space-x-5 items-center col-span-2 ml-14">
+      class="flex justify-start mt-3 space-x-5 items-center col-span-2 ml-20 pl-1">
       <div class="text-base font-semibold">코멘트(발주)</div>
       <div>
         <input

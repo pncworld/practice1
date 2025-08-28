@@ -691,6 +691,21 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  setRowStyleCallsDefaultCol: {
+    // 그룹푸터에서 레벨별로 나타날 색상에 대한 설정
+    type: String,
+    default: "seqNum",
+  },
+  setRowStyleCallsDefaultCol2: {
+    // 그룹푸터에서 레벨별로 나타날 색상에 대한 설정
+    type: String,
+    default: "seqNum",
+  },
+  hardCodeSetRowStyleCalls: {
+    // 그룹푸터에서 레벨별로 나타날 색상에 대한 설정
+    type: Boolean,
+    default: false,
+  },
   setRowStyleLevel: {
     // 그룹푸터에서 레벨별로 나타날 색상에 대한 설정
     type: Number,
@@ -1579,17 +1594,32 @@ const funcshowGrid = async () => {
   if (props.setRowStyleCalls) {
     gridView.setRowStyleCallback((grid, item, fixed) => {
       if (props.setRowStyleLevel == 1) {
-        let Value = grid.getValue(item.index, "seqNum");
-        if (Value) {
-          if (
-            Value.toString().substring(Value.length - 1) == "2" ||
-            Value.substring(Value.length - 1) == "3"
-          ) {
+        let Value = grid.getValue(item.index, props.setRowStyleCallsDefaultCol);
+
+        if (props.hardCodeSetRowStyleCalls == false) {
+          if (Value) {
+            if (
+              Value.toString().substring(Value.length - 1) == "2" ||
+              Value.substring(Value.length - 1) == "3"
+            ) {
+              return "blue";
+            } else if (Value.substring(Value.length - 1) == "8") {
+              return "pink";
+            } else if (Value.substring(Value.length - 1) == "9") {
+              return "navy";
+            }
+          }
+        } else {
+          console.log(Value);
+          let Value2 = grid.getValue(
+            item.index,
+            props.setRowStyleCallsDefaultCol2
+          );
+
+          if (Value == "소계" || Value2 == "소계") {
             return "blue";
-          } else if (Value.substring(Value.length - 1) == "8") {
+          } else if (Value == "합계" || Value2 == "합계") {
             return "pink";
-          } else if (Value.substring(Value.length - 1) == "9") {
-            return "navy";
           }
         }
       } else if (props.setRowStyleLevel == 2) {
