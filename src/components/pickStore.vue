@@ -8,7 +8,7 @@
         :disabled="isDisabled"
         v-model="selectedGroupCd"
         id="storeGroup"
-        class="hidden md:inline-block border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-40"
+        class="hidden md:inline-block border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-32"
         @change="emitStoreGroup($event.target.value)">
         <option
           :value="item.lngStoreGroup"
@@ -21,7 +21,7 @@
     <div v-show="hideit3">
       <select
         :disabled="isDisabled"
-        class="hidden md:inline-block border border-gray-800 rounded-md p-2 ml-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-16"
+        class="hidden md:inline-block border border-gray-800 rounded-md p-2 ml-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-20"
         @change="
           setStore($event.target.value);
           emitStoreType($event.target.value);

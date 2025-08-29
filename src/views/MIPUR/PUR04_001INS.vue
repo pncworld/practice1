@@ -39,13 +39,20 @@
       <div class="flex space-x-5 ml-12 mt-3 items-center">
         <div class="font-semibold text-base">자재코드</div>
         <div>
-          <input type="text" class="h-7 border border-black pl-1" />
+          <input
+            type="text"
+            class="h-7 border border-black pl-1"
+            @input="onlyNumber"
+            v-model="cond" />
         </div>
       </div>
       <div class="flex space-x-5 ml-0 mt-3 items-center">
         <div class="text-base font-semibold">자재명</div>
         <div>
-          <input type="text" class="w-64 h-7 border border-black" />
+          <input
+            type="text"
+            class="w-64 h-7 border border-black"
+            v-model="cond2" />
         </div>
       </div>
     </div>
@@ -63,22 +70,23 @@
           :setRowStyleCallsDefaultCol2="'strStockName'"
           :hardCodeSetRowStyleCalls="true"
           :documentTitle="'PUR01_009RPT'"
+          @dblclickedRowData="dblclickedRowData"
           @clickedRowData="clickedRowData"
           :documentSubTitle="documentSubTitle"
           :rowStateeditable="false"
           :exporttoExcel="exportExcel">
         </Realgrid>
       </div>
-      <div class="w-full border border-black">
+      <div class="w-full">
         <div class="grid grid-rows-[1fr,3fr,22fr] grid-cols-1">
           <div class="flex justify-between">
             <div class="text-bold text-red-500">
               ※매입단가 : 발주/매입 금액 단위 금액
             </div>
             <div class="flex space-x-2">
-              <button class="whitebutton">신규</button>
-              <button class="whitebutton">저장</button>
-              <button class="whitebutton">삭제</button>
+              <button class="whitebutton" @click="addButton">신규</button>
+              <button class="whitebutton" @click="saveButton">저장</button>
+              <button class="whitebutton" @click="deleteButton">삭제</button>
             </div>
           </div>
           <div class="grid grid-rows-3 grid-cols-[1fr,3fr,1fr,3fr]">
@@ -88,6 +96,8 @@
             </div>
             <div class="border-l border-t border-black !flex !items-center">
               <BusinessClient
+                @SupplierId="SupplierId2"
+                :selectSupplierId="supplierid2"
                 :defaultName="''"
                 class="!mt-0 !-ml-3"></BusinessClient>
             </div>
@@ -96,12 +106,12 @@
               부가세 구분
             </div>
             <div class="border-l border-t border-black !flex !items-center">
-              <label for="cond"
+              <label for="scond"
                 ><input
                   type="checkbox"
                   class="ml-2"
-                  id="cond"
-                  v-model="cond" />포함</label
+                  id="scond"
+                  v-model="scond" />포함</label
               >
             </div>
             <div
@@ -109,7 +119,13 @@
               단가
             </div>
             <div class="border-l border-t border-black !flex !items-center">
-              <input type="text" class="ml-2 border border-black pl-1" />
+              <input
+                type="text"
+                name="curUnitPrice"
+                class="ml-2 border border-black pl-1 disabled:bg-gray-300"
+                @input="onlyNumber2"
+                :disabled="disabled"
+                v-model="scond2" />
             </div>
             <div
               class="border-l border-t border-black font-semibold text-base bg-gray-100 text-center flex items-center justify-center">
@@ -118,8 +134,11 @@
             <div class="border-l border-t border-black !flex !items-center">
               <input
                 type="text"
+                name="curUnitPrice2"
                 class="ml-2 border border-black pl-1 disabled:bg-gray-300"
-                disabled />
+                @input="onlyNumber2"
+                :disabled="!disabled"
+                v-model="scond3" />
             </div>
             <div
               class="border-l border-t border-b border-black font-semibold text-base bg-gray-100 text-center flex items-center justify-center">
@@ -129,6 +148,7 @@
               class="border-l border-t border-b border-black !flex !items-center">
               <input
                 type="date"
+                v-model="scond4"
                 class="ml-2 border border-black pl-1 disabled:bg-gray-300 w-[65%]" />
             </div>
             <div
@@ -137,8 +157,15 @@
             </div>
             <div
               class="border-l border-t border-b border-black !flex !items-center">
-              <select name="" id="" class="border border-black w-[65%] ml-2">
-                <option value=""></option>
+              <select
+                name=""
+                id=""
+                class="border border-black w-[65%] ml-2"
+                v-model="scond5">
+                <option value="0">선택</option>
+                <option :value="i.strDCode" v-for="i in optionList">
+                  {{ i.strDName }}
+                </option>
               </select>
             </div>
           </div>
@@ -147,8 +174,57 @@
             <Realgrid
               :progname="'PUR04_001INS_VUE'"
               :progid="2"
+              :rowStateeditable="false"
+              @clickedRowData="clickedRowData2"
               :rowData="rowData2"></Realgrid>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    v-if="openCopy"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <!-- 팝업 박스 -->
+    <div class="bg-white rounded-2xl shadow-lg w-[60vw] h-[70vh] p-6 relative">
+      <div class="flex justify-between">
+        <h2 class="text-xl font-bold mb-4">복사</h2>
+        <!-- 버튼 영역 -->
+        <div class="flex justify-end space-x-2">
+          <button
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            @click="confirmAction">
+            복사
+          </button>
+          <button
+            class="px-4 py-2 bg-gray-300 rounded-lg"
+            @click="openCopy = false">
+            닫기
+          </button>
+        </div>
+      </div>
+      <div class="flex items-center space-x-5">
+        <div class="!-ml-12">
+          <PickStore
+            @update:storeGroup="lngStoreGroup"
+            :defaultStoreNm="'공통'"
+            @storeNm="excelStore"
+            :hideGroup="false"
+            :hideAttr="false"
+            :defaultStore="true"
+            @update:storeCd="lngStoreCode"></PickStore>
+        </div>
+      </div>
+      <div class="grid grid-rows-1 grid-cols-[6fr,1fr,6fr] mt-2 h-[80%]">
+        <div class="h-full w-full">
+          <Realgrid
+            :progname="'PUR04_001INS_VUE'"
+            :progid="3"
+            :rowData="rowData3"></Realgrid>
+        </div>
+        <div>&nbsp;</div>
+        <div class="h-full w-full">
+          <Realgrid :progname="'PUR04_001INS_VUE'" :progid="4"></Realgrid>
         </div>
       </div>
     </div>
@@ -158,10 +234,15 @@
 
 <script setup>
 import { getCommonList } from "@/api/common";
-import { getStockCategory, getStockGeneric, getStockGroup } from "@/api/master";
-import { getOrderListByType2 } from "@/api/mipur";
+import {
+  deleteStockPriceHistory,
+  getCheckStoreList,
+  getStockUnitPriceList,
+  getUnitPriceDetailList,
+  saveStockPriceHistory,
+} from "@/api/mipur";
 import BusinessClient from "@/components/businessClient.vue";
-import Datepicker2 from "@/components/Datepicker2.vue";
+import DupliPopUp7 from "@/components/dupliPopUp7.vue";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -184,7 +265,8 @@ import Realgrid from "@/components/realgrid.vue";
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog } from "@/customFunc/customFunc";
+import { formatLocalDate, insertPageLog } from "@/customFunc/customFunc";
+import Swal from "sweetalert2";
 /**
  *  경고창 호출 라이브러리
  *  */
@@ -206,18 +288,19 @@ import { useStore } from "vuex";
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
-  const res = await getCommonList(27);
+  const res = await getCommonList(35);
 
-  optionList.value = res.data.List.filter((item) => item.strDCode !== "01");
+  optionList.value = res.data.List;
+
+  scond4.value = formatLocalDate(new Date());
 });
 
 const reload = ref(false);
 const rowData = ref([]);
 const afterSearch = ref(false);
 
-const cond = ref("02");
-const cond2 = ref(0);
-const cond3 = ref(0);
+const cond = ref("");
+const cond2 = ref("");
 const cond4 = ref("");
 const cond5 = ref(0);
 const store = useStore();
@@ -253,43 +336,6 @@ const excelDate = (e) => {
   selectedDate.value = e;
 };
 const optionList2 = ref([]);
-watch(cond2, async () => {
-  if (cond2.value == 1) {
-    const res2 = await getStockCategory(store.state.userData.lngStoreGroup);
-
-    optionList2.value = res2.data.List;
-
-    optionList2.value = optionList2.value.map((item) => ({
-      ...item,
-      strDCode: item.lngCategoryID,
-      strDName: item.strCategoryName,
-    }));
-  } else if (cond2.value == 2) {
-    const res = await getStockGroup(store.state.userData.lngStoreGroup);
-
-    optionList2.value = res.data.List;
-
-    optionList2.value = optionList2.value.map((item) => ({
-      ...item,
-      strDCode: item.lngStockGroupID,
-      strDName: item.strStockGroupName,
-    }));
-  } else if (cond2.value == 3) {
-    const res3 = await getStockGeneric(store.state.userData.lngStoreGroup);
-
-    optionList2.value = res3.data.List;
-
-    optionList2.value = optionList2.value.map((item) => ({
-      ...item,
-      strDCode: item.lngGenericID,
-      strDName: item.strGenericName,
-    }));
-  } else {
-    optionList2.value = [];
-  }
-  //console.log(optionList2.value);
-  cond3.value = 0;
-});
 
 const teamcode = ref();
 const lngTeamCode = (e) => {
@@ -319,6 +365,11 @@ const supplierid = ref("");
 const SupplierId = (e) => {
   supplierid.value = e;
 };
+
+const supplierid2 = ref("");
+const SupplierId2 = (e) => {
+  supplierid2.value = e;
+};
 /**
  *  조회 함수
  */
@@ -328,24 +379,13 @@ const searchButton = async () => {
     store.state.loading = true;
     initGrid();
 
-    const getIp = await fetch("https://api.ipify.org?format=json");
-
-    const ip = await getIp.json();
-
-    const res = await getOrderListByType2(
+    const res = await getStockUnitPriceList(
       groupCd.value,
       storeCode.value,
-      sDate.value.replaceAll("-", ""),
-      eDate.value.replaceAll("-", ""),
       supplierid.value,
-      cond2.value,
-      cond3.value,
-      cond4.value,
       cond.value,
-      0,
-      store.state.userData.lngSequence,
-      ip.ip,
-      cond5.value
+      cond2.value,
+      store.state.userData.strLanguage
     );
 
     rowData.value = res.data.List;
@@ -372,20 +412,6 @@ const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
   }
-
-  if (cond5.value == 0) {
-    progid.value = 1;
-  } else if (cond5.value == 1) {
-    progid.value = 2;
-  } else if (cond5.value == 2) {
-    progid.value = 3;
-  } else if (cond5.value == 3) {
-    progid.value = 4;
-  } else if (cond5.value == 4) {
-    progid.value = 5;
-  }
-
-  reload.value = !reload.value;
 };
 
 //엑셀 버튼 처리 함수
@@ -417,4 +443,322 @@ const excelList = (e) => {
   selectedExcelList.value = e;
   //comsole.log(e);
 };
+
+const onlyNumber = (e) => {
+  e.target.value = e.target.value.replace(/[^0-9]/g, "");
+};
+
+const onlyNumber2 = (e) => {
+  e.target.value = e.target.value.replace(/[^0-9]/g, "");
+
+  if (e.target.name == "curUnitPrice") {
+    if (isNaN(scond2.value)) {
+      scond3.value = "";
+    } else {
+      scond3.value =
+        parseInt(scond2.value) + Math.floor(parseInt(scond2.value) * 0.1);
+    }
+  } else if (e.target.name == "curUnitPrice2") {
+    if (isNaN(scond3.value)) {
+      scond2.value = "";
+    } else {
+      scond2.value = Math.round((parseInt(scond3.value) * 10) / 11);
+    }
+  }
+};
+
+const rowData2 = ref([]);
+const afterDblClick = ref(false);
+
+const scond = ref(false);
+const scond2 = ref("");
+const scond3 = ref("");
+const scond4 = ref("");
+const scond5 = ref(0);
+const tempStockId = ref("");
+const dblclickedRowData = async (e) => {
+  console.log(e);
+
+  try {
+    const res = await getUnitPriceDetailList(
+      groupCd.value,
+      storeCode.value,
+      supplierid.value,
+      e[1],
+      store.state.userData.strLanguage
+    );
+
+    console.log(res);
+
+    rowData2.value = res.data.List;
+    afterDblClick.value = true;
+    tempStockId.value = e[1];
+    tempFromDate.value = "";
+    tempTodate.value = "";
+    tempSupplierId.value = "";
+  } catch (error) {}
+};
+
+const addButton = () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "조회를 먼저해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (afterDblClick.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "자재코드를 먼저 선택해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  supplierid2.value = 0;
+  scond.value = false;
+  scond2.value = "";
+  scond3.value = "";
+  scond4.value = formatLocalDate(new Date());
+  scond5.value = 0;
+};
+
+const disabled = ref(false);
+watch(scond, () => {
+  if (scond.value == false) {
+    disabled.value = false;
+  } else {
+    disabled.value = true;
+  }
+});
+
+const saveButton = async () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "조회를 먼저해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (afterDblClick.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "자재코드를 먼저 선택해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (supplierid2.value == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "거래처를 선택해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (supplierid2.value == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "거래처를 선택해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (
+    scond2.value == false &&
+    (scond3.value == "" || scond3.value == undefined)
+  ) {
+    Swal.fire({
+      title: "경고",
+      text: "단가를 입력해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (
+    scond2.value == true &&
+    (scond4.value == "" || scond4.value == undefined)
+  ) {
+    Swal.fire({
+      title: "경고",
+      text: "단가를 입력해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (scond5.value == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "구분을 선택해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  try {
+    const res = await saveStockPriceHistory(
+      groupCd.value,
+      storeCode.value,
+      supplierid2.value,
+      tempStockId.value,
+      scond2.value,
+      scond4.value.replaceAll("-", ""),
+      scond5.value,
+      store.state.userData.lngSequence
+    );
+
+    console.log(res);
+
+    if (res.data.RESULT_CD == "00") {
+      Swal.fire({
+        title: "성공",
+        text: "저장을 완료하였습니다.",
+        icon: "success",
+
+        confirmButtonText: "확인",
+      });
+    } else {
+      Swal.fire({
+        title: "실패",
+        text: "저장에 실패하였습니다. 적용일을 확인해주세요.",
+        icon: "error",
+
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (error) {
+  } finally {
+    try {
+      const res = await getUnitPriceDetailList(
+        groupCd.value,
+        storeCode.value,
+        supplierid.value,
+        tempStockId.value,
+        store.state.userData.strLanguage
+      );
+
+      console.log(res);
+
+      rowData2.value = res.data.List;
+      afterDblClick.value = true;
+    } catch (error) {}
+  }
+};
+
+const tempFromDate = ref("");
+const tempTodate = ref("");
+const tempSupplierId = ref("");
+const clickedRowData2 = (e) => {
+  //console.log(e);
+  tempSupplierId.value = e[0];
+  tempFromDate.value = e[3];
+  tempTodate.value = e[5];
+};
+
+const deleteButton = async () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "조회를 먼저해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+  }
+  if (tempSupplierId.value == "" || tempSupplierId.value == undefined) {
+    Swal.fire({
+      title: "경고",
+      text: "삭제할 항목을 선택해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+  }
+
+  try {
+    const res = await deleteStockPriceHistory(
+      groupCd.value,
+      storeCode.value,
+      tempSupplierId.value,
+      tempStockId.value,
+      tempFromDate.value,
+      tempTodate.value
+    );
+
+    if (res.data.RESULT_CD == "00") {
+      Swal.fire({
+        title: "성공",
+        text: "삭제를 완료하였습니다.",
+        icon: "success",
+
+        confirmButtonText: "확인",
+      });
+    } else {
+      Swal.fire({
+        title: "실패",
+        text: "삭제를 실패하였습니다.",
+        icon: "error",
+
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (error) {
+  } finally {
+    try {
+      const res = await getUnitPriceDetailList(
+        groupCd.value,
+        storeCode.value,
+        supplierid.value,
+        tempStockId.value,
+        store.state.userData.strLanguage
+      );
+
+      console.log(res);
+
+      rowData2.value = res.data.List;
+      afterDblClick.value = true;
+    } catch (error) {}
+  }
+};
+
+const openCopy = ref(false);
+const copyButton = async () => {
+  openCopy.value = true;
+
+  try {
+    const res = await getCheckStoreList(groupCd.value, 0);
+
+    rowData3.value = res.data.List;
+  } catch (error) {}
+};
+
+const rowData3 = ref([]);
 </script>

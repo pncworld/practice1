@@ -1610,7 +1610,6 @@ const funcshowGrid = async () => {
             }
           }
         } else {
-          console.log(Value);
           let Value2 = grid.getValue(
             item.index,
             props.setRowStyleCallsDefaultCol2
@@ -2159,7 +2158,7 @@ const funcshowGrid = async () => {
 
   gridView.onItemChecked = function (grid, itemIndex, checked) {
     gridView.setCurrent({ dataRow: itemIndex });
-    console.log(checked);
+
     // dataProvider.beginUpdate();
     // if (gridView.isCheckedRow(itemIndex)) {
     //   grid.checkItem(itemIndex, false);
@@ -2703,7 +2702,7 @@ watch(
       values[propertys[i]] = value[i];
     }
     values.new = true;
-    console.log(value);
+
     emit("sendRowState", "created");
     var dataRow = dataProvider.addRow(values);
     gridView.setCurrent({ dataRow: dataRow });
