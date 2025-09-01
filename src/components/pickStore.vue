@@ -1,6 +1,6 @@
 <template>
-  <div class="flex justify-center md:justify-end text-base mt-2">
-    <div class="items-center font-bold hidden md:flex ml-12 text-nowrap">
+  <div class="flex justify-center md:justify-end text-base mt-2 ml-12">
+    <div class="items-center font-bold hidden md:flex text-nowrap">
       {{ MainName }}
     </div>
     <div v-show="hideit2">
@@ -323,6 +323,10 @@ const props = defineProps({
     type: String,
     default: "전체",
   },
+  disabledAll: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const MainName = ref("");
@@ -491,6 +495,9 @@ onMounted(() => {
     isDisabled.value = true;
   }
 
+  if (props.disabledAll == true) {
+    isDisabled.value = true;
+  }
   // if (props.hidebyLngCommonMenu == true) {
   //   if (store.state.userData.lngCommonMenu == "1") {
   //     hideit.value = false;

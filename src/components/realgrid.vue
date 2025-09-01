@@ -982,6 +982,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  ColCellRedColorColId: {
+    type: Array,
+    default: [],
+  },
 });
 
 // 2구간
@@ -1159,6 +1163,12 @@ const funcshowGrid = async () => {
         props.headerCheckBar != item.strColID
           ? "left"
           : "none",
+    },
+    styleCallback: function (grid, dataCell) {
+      var ret = {};
+      console.log(item.strColID);
+      ret.style = { color: "#FF0000" };
+      return ret;
     },
     groupFooter: {
       text: props.setGroupSumCustomText[
@@ -1478,48 +1488,55 @@ const funcshowGrid = async () => {
           : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
     },
     buttonVisibility: "always",
-    styleCallback: function (grid, dataCell) {
-      var ret = {};
-
-      if (
-        (dataCell.item.rowState == "created" ||
-          dataCell.item.itemState == "appending" ||
-          dataCell.item.itemState == "inserting") &&
-        props.rowStateeditable
-      ) {
-        ret.editable = true;
-      } else if (props.editableColId.includes(item.strColID)) {
-        ret.editable = true;
-      } else if (
-        props.rowStateeditable == true &&
-        dataCell.item.itemState == "normal"
-      ) {
-        ret.editable = true;
-      } else {
-        ret.editable = false;
-      }
-
-      if (props.checkBarInactive != "") {
-        var inActiveColumn = grid.getValue(
-          dataCell.index.itemIndex,
-          props.checkBarInactive
-        );
-
-        if (
-          inActiveColumn == "0" &&
-          (item.strColID == "checkbox" || item.strDisplay.includes("checkbox"))
-        ) {
-          ret.style = { opacity: "0.5" };
-          ret.renderer = { type: "check", editable: false };
+    styleCallback: props.ColCellRedColorColId.includes(item.strColID)
+      ? function (grid, dataCell) {
+          var ret = {};
+          ret.style = { color: "#FF0000" };
+          return ret;
         }
-        if (item.strColID == "lngSupplierID") {
-          ret.style = { opacity: "0.5" };
-          ret.renderer = { type: "check", editable: false };
-        }
-      }
+      : function (grid, dataCell) {
+          var ret = {};
 
-      return ret;
-    },
+          if (
+            (dataCell.item.rowState == "created" ||
+              dataCell.item.itemState == "appending" ||
+              dataCell.item.itemState == "inserting") &&
+            props.rowStateeditable
+          ) {
+            ret.editable = true;
+          } else if (props.editableColId.includes(item.strColID)) {
+            ret.editable = true;
+          } else if (
+            props.rowStateeditable == true &&
+            dataCell.item.itemState == "normal"
+          ) {
+            ret.editable = true;
+          } else {
+            ret.editable = false;
+          }
+
+          if (props.checkBarInactive != "") {
+            var inActiveColumn = grid.getValue(
+              dataCell.index.itemIndex,
+              props.checkBarInactive
+            );
+
+            if (
+              inActiveColumn == "0" &&
+              (item.strColID == "checkbox" ||
+                item.strDisplay.includes("checkbox"))
+            ) {
+              ret.style = { opacity: "0.5" };
+              ret.renderer = { type: "check", editable: false };
+            }
+            if (item.strColID == "lngSupplierID") {
+              ret.style = { opacity: "0.5" };
+              ret.renderer = { type: "check", editable: false };
+            }
+          }
+
+          return ret;
+        },
   }));
 
   if (props.labelingColumns != "") {
@@ -2426,10 +2443,6 @@ watch(
 watch(
   () => props.changeNow,
   () => {
-    //comsole.log(props.changeRow);
-    //comsole.log(props.changeColid);
-    //comsole.log(props.changeValue2);
-    //comsole.log(dataProvider.getJsonRows());
     dataProvider.beginUpdate();
     if (props.changeRow !== "" && props.changeRow != -1) {
       dataProvider.setValue(

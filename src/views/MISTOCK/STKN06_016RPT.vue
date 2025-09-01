@@ -1,7 +1,7 @@
 <!-- /*--############################################################################
-# Filename : PUR02_014RPT.vue                                                  
-# Description : 구매관리2 > 반품 관리 > 매입 반품 현황                      
-# Date :2025-08-29                                                             
+# Filename : STKN06_016RPT.vue                                                  
+# Description : 자재관리2 > 손실 관리 > 손실 현황                      
+# Date :2025-09-01                                                             
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
@@ -39,16 +39,22 @@
           @storeNm="excelStore"
           @update:storeCd="lngStoreCode"></PickStore>
       </div>
-      <div class="flex justify-start pl-16 items-center">
-        <BusinessClient
-          @SupplierId="SupplierId"
-          :defaultNm="'전체'"></BusinessClient>
+      <div class="flex justify-start pl-16 items-center mt-2 space-x-5">
+        <div class="text-base font-semibold">품목구분</div>
+        <div>
+          <select name="" id="" class="w-64 h-7" v-model="cond">
+            <option value="0">전체</option>
+            <option :value="i.strDCode" v-for="i in optionList3">
+              {{ i.strDName }}
+            </option>
+          </select>
+        </div>
       </div>
 
       <div class="flex space-x-5 ml-20 mt-3 items-center">
         <div class="font-semibold text-base">단위</div>
         <div>
-          <select name="" id="" class="w-64 h-7" v-model="cond">
+          <select name="" id="" class="w-64 h-7" v-model="cond2">
             <option :value="i.strDCode" v-for="i in optionList">
               {{ i.strDName }}
             </option>
@@ -58,7 +64,7 @@
       <div class="flex space-x-5 ml-12 mt-3 items-center">
         <div class="text-base font-semibold">자재명</div>
         <div>
-          <select name="" id="" class="w-32 h-7" v-model="cond2">
+          <select name="" id="" class="w-32 h-7" v-model="cond3">
             <option value="0">전체</option>
             <option value="1">분류</option>
             <option value="2">그룹</option>
@@ -67,58 +73,33 @@
           </select>
         </div>
         <div>
-          <select name="" id="" class="w-32 h-7" v-model="cond3">
+          <select name="" id="" class="w-32 h-7" v-model="cond4">
             <option value="0">전체</option>
             <option :value="i.strDCode" v-for="i in optionList2">
               {{ i.strDName }}
             </option>
           </select>
         </div>
-        <div>
-          <input type="text" class="w-52 h-7" v-model="cond4" />
-        </div>
       </div>
-      <div class="flex space-x-5 ml-20 mt-3 items-center">
-        <div class="text-base font-semibold">단가</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="border border-black w-64 h-7"
-            v-model="cond6">
-            <option :value="i.strDCode" v-for="i in optionList3">
-              {{ i.strDName }}
-            </option>
-          </select>
-        </div>
-      </div>
+      <div class="flex space-x-5 ml-20 mt-3 items-center"></div>
 
       <div class="flex ml-12 items-center mt-3 space-x-5">
-        <div class="text-base font-semibold">조회유형</div>
+        <div class="text-base font-semibold">조회조건</div>
         <div class="flex space-x-4">
-          <label for="cond51"
+          <label for="cond5"
             ><input
-              type="radio"
-              v-model="cond5"
-              id="cond51"
-              value="0" />자재별</label
+              type="checkbox"
+              id="cond5"
+              @change="checkCond5"
+              checked />매장별</label
           >
-          <label for="cond52"
-            ><input type="radio" v-model="cond5" id="cond52" value="1" />일자별
-            자재별</label
-          >
-          <label for="cond53"
-            ><input type="radio" v-model="cond5" id="cond53" value="2" />매장별
-            자재별</label
-          >
-
-          <label for="cond54"
+          <label for="cond6"
             ><input
-              type="radio"
-              v-model="cond5"
-              id="cond54"
-              value="3" />거래처별 일자별</label
-          >
+              type="checkbox"
+              id="cond6"
+              @change="checkCond6"
+              checked />일자별
+          </label>
         </div>
       </div>
     </div>
@@ -126,25 +107,14 @@
     <!-- 그리드 영역 -->
     <div class="w-full h-[75vh]">
       <Realgrid
-        :progname="'PUR02_014RPT_VUE'"
+        :progname="'STKN06_016RPT_VUE'"
         :progid="progid"
         :rowData="rowData"
         :reload="reload"
-        :mergeColumns2="true"
-        :mergeColumnGroupSubList2="[
-          ['lngCheckQty', 'chk_curSupply', 'chk_curTax', 'chk_curTotalCost'],
-          ['lngReturnQty', 'rtn_curSupply', 'rtn_curTax', 'rtn_curTotalCost'],
-          ['tot_Qty', 'tot_Supply', 'tot_Tax', 'tot_Cost'],
-        ]"
-        :mergeColumnGroupName2="['매입', '반품', '합계']"
-        :documentTitle="'PUR02_014RPT'"
+        :documentTitle="'STKN06_016RPT'"
         @clickedRowData="clickedRowData"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
-        :hardCodeSetRowStyleCalls="true"
-        :setRowStyleCalls="true"
-        :setRowStyleCallsDefaultCol="setRowStyleCallsDefaultCol"
-        :setRowStyleCallsDefaultCol2="setRowStyleCallsDefaultCol2"
         :exporttoExcel="exportExcel">
       </Realgrid>
     </div>
@@ -155,8 +125,8 @@
 <script setup>
 import { getCommonList } from "@/api/common";
 import { getStockCategory, getStockGeneric, getStockGroup } from "@/api/master";
-import { getCheckReturnReportList, getReturnListByType } from "@/api/mipur";
-import BusinessClient from "@/components/businessClient.vue";
+import { getCheckReturnReportList } from "@/api/mipur";
+import { getLossReportList } from "@/api/mistock";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -205,9 +175,9 @@ onMounted(async () => {
 
   const res = await getCommonList(27);
 
-  optionList.value = res.data.List.filter((item) => item.strDCode !== "01");
+  optionList.value = res.data.List;
 
-  const res2 = await getCommonList(28);
+  const res2 = await getCommonList(52);
   optionList3.value = res2.data.List;
 });
 
@@ -215,12 +185,12 @@ const reload = ref(false);
 const rowData = ref([]);
 const afterSearch = ref(false);
 
-const cond = ref("02");
-const cond2 = ref(0);
-const cond3 = ref(0);
-const cond4 = ref("");
-const cond5 = ref(0);
-const cond6 = ref("01");
+const cond = ref("0");
+const cond2 = ref("01");
+const cond3 = ref("0");
+const cond4 = ref("0");
+const cond5 = ref(true);
+const cond6 = ref(true);
 const store = useStore();
 
 const datepicker = ref(null);
@@ -329,19 +299,28 @@ const searchButton = async () => {
     store.state.loading = true;
     initGrid();
 
-    const res = await getCheckReturnReportList(
+    let reporttype = "";
+
+    if (cond5.value == false && cond6.value == false) {
+      reporttype = "";
+    } else if (cond5.value == false && cond6.value == true) {
+      reporttype = "1";
+    } else if (cond5.value == true && cond6.value == false) {
+      reporttype = "2";
+    } else {
+      reporttype = "12";
+    }
+    const res = await getLossReportList(
       groupCd.value,
       storeCode.value,
+      0,
       sDate.value.replaceAll("-", ""),
       eDate.value.replaceAll("-", ""),
-      supplierid.value,
-      cond2.value,
+      cond.value,
       cond3.value,
       cond4.value,
-      cond.value,
-      0,
-      cond5.value,
-      cond6.value
+      cond2.value,
+      reporttype
     );
 
     rowData.value = res.data.List;
@@ -363,7 +342,7 @@ const searchButton = async () => {
  * 그리드 초기화
  */
 
-const progid = ref(2);
+const progid = ref(1);
 
 const setRowStyleCallsDefaultCol2 = ref("strTaxType");
 const setRowStyleCallsDefaultCol = ref("strTaxType");
@@ -372,22 +351,14 @@ const initGrid = () => {
     rowData.value = [];
   }
 
-  if (cond5.value == 0) {
-    progid.value = 2;
-    setRowStyleCallsDefaultCol2.value = "strTaxType";
-    setRowStyleCallsDefaultCol.value = "strTaxType";
-  } else if (cond5.value == 1) {
+  if (cond5.value == false && cond6.value == false) {
+    progid.value = 1;
+  } else if (cond5.value == true && cond6.value == false) {
     progid.value = 3;
-    setRowStyleCallsDefaultCol2.value = "strTaxType";
-    setRowStyleCallsDefaultCol.value = "strTaxType";
-  } else if (cond5.value == 2) {
-    progid.value = 4;
-    setRowStyleCallsDefaultCol2.value = "strTaxType";
-    setRowStyleCallsDefaultCol.value = "strTaxType";
+  } else if (cond5.value == false && cond6.value == true) {
+    progid.value = 2;
   } else {
-    progid.value = 5;
-    setRowStyleCallsDefaultCol2.value = "dtmDate";
-    setRowStyleCallsDefaultCol.value = "dtmDate";
+    progid.value = 4;
   }
 
   reload.value = !reload.value;
@@ -421,5 +392,13 @@ const excelStore = (e) => {
 const excelList = (e) => {
   selectedExcelList.value = e;
   //comsole.log(e);
+};
+
+const checkCond5 = (e) => {
+  console.log(e.target.checked);
+  cond5.value = e.target.checked;
+};
+const checkCond6 = (e) => {
+  cond6.value = e.target.checked;
 };
 </script>

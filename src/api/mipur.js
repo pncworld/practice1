@@ -267,6 +267,36 @@ export const getReturnListByType = (
   });
 };
 
+export const getCheckReturnReportList = (
+  groupCd,
+  storeCd,
+  sdate,
+  edate,
+  supplierid,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  storeattr,
+  cond5,
+  cond6
+) => {
+  return api2.post("/MIPUR/PUR02_014RPT.asmx/getCheckReturnReportList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    SUPPLIERID: supplierid,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+    STORE_ATTR: storeattr,
+    COND5: cond5,
+    PRICETYPE: cond6,
+  });
+};
+
 export const getPurchaseOrderList = (groupCd, storeCd, sdate, supplierid) => {
   return api2.post("/MIPUR/PUR03_016RPT.asmx/getPurchaseOrderList", {
     GROUP_CD: groupCd,

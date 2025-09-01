@@ -281,8 +281,10 @@
               :rowData="rowData1"
               @clickedRowData="clickedRowData"
               @updatedRowData="updatedRowData3"
+              @sendRowState="sendRowState"
               :changeRow="changeRow"
-              :changeNow="changeNow"
+              :changeNow2="changeNow"
+              :changeNow="changeNow3"
               :changeColid="changeColid"
               :changeValue2="changeValue"
               :searchWord3="searchword1"
@@ -360,7 +362,7 @@
                 name="lngCode"
                 class="border border-gray-300 rounded-lg w-full h-full p-2"
                 v-model="optionCd"
-                :disabled="!(isNewColumn && clickrowData1)"
+                :disabled="!isNewColumn"
                 @input="changeOptionManage1" />
             </div>
             <div
@@ -790,7 +792,12 @@ const clickedRowData = (newValue) => {
     return;
   }
   selectedOptionCd.value = Number(newValue[0]);
-  isNewColumn.value = newValue[26] == true ? true : false;
+  if (currState.value == "created") {
+    isNewColumn.value = true;
+  } else {
+    isNewColumn.value = false;
+  }
+  // isNewColumn.value = newValue[26] == true ? true : false;
   filteredrowData2.value = [];
   for (var i = 0; i < 21; i++) {
     if (newValue[4 + i] != "0") {
@@ -1749,7 +1756,7 @@ const addRowData1 = () => {
     });
     return;
   }
-  isNewColumn.value = true;
+  //isNewColumn.value = true;
   optionNo.value = "";
   selectedOption.value = "";
   optionNm.value = "";
@@ -1987,6 +1994,7 @@ const clickaddMenu2 = (newValue) => {
  * 행 더블 클릭시 작동 함수
  */
 
+const changeNow3 = ref(false);
 const dblclickedRowData = (newValue) => {
   //comsole.log(newValue);
   const a = updatedRowData4.value.find(
@@ -2002,7 +2010,7 @@ const dblclickedRowData = (newValue) => {
   }
 
   changeValue.value = newValue[2];
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
   // const rollbackdata = [...filteredrowData2.value];
   // filteredrowData2.value = [];
   // //comsole.log(a);
@@ -2128,6 +2136,11 @@ const handleinitAll = (newvalue) => {
   searchword1.value = "";
   searchword3.value = "";
   afterSearch.value = false;
+};
+
+const currState = ref("");
+const sendRowState = (e) => {
+  currState.value = e;
 };
 </script>
 
