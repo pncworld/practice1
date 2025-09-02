@@ -14,66 +14,82 @@
           <button @click="searchButton" class="button search md:w-auto w-14">
             조회
           </button>
-
-          <button
-            @click="saveButton"
-            class="button save text-sm md:w-auto w-14">
+          <button @click="saveButton" class="button save text-sm md:w-auto w-14">
             저장
           </button>
         </div>
       </div>
     </div>
   </div>
-  <br />
-
+  <br/>
   <div
     class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore
-      @update:storeAreaCd="handleStoreAreaCd"
-      @update:storeCd="handleStoreCd"
-      :showAreaCd="true"></PickStore>
+    <PickStore @update:storeAreaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" :showAreaCd="true"></PickStore>
   </div>
   <!-- 조회 조건 -->
   <!-- 데이터 영역 -->
   <div class="inline-block md:flex w-full">
     <span class="md:hidden font-bold flex justify-center w-auto">
-      클릭하시면 아래 페이지에서 다국어 정보가 나옵니다.</span
-    >
-    <div
-      class="border border-black md:w-64 w-full h-96 md:ml-5 ml-0 mt-10 overflow-auto">
-      <div
-        v-for="i in Category"
-        :key="i.MajorCode"
-        class="ml-5 w-auto flex justify-start items-start flex-col">
-        <button
-          @click="bringCategory(i.MajorCode)"
-          class="font-bold"
-          style="font-size: 15px">
+      클릭하시면 아래 페이지에서 다국어 정보가 나옵니다.
+    </span>
+    <div class="border border-black md:w-64 w-full h-96 md:ml-5 ml-0 mt-10 overflow-auto">
+      <div v-for="i in Category" :key="i.MajorCode" class="ml-5 w-auto flex justify-start items-start flex-col">
+        <button @click="bringCategory(i.MajorCode)" class="font-bold" style="font-size: 15px">
           {{ i.MajorName }}
         </button>
-        <div
-          v-for="x in i.SubCategory"
-          :key="x.SubCode"
-          class="flex items-start w-auto ml-5"
-          :class="{ 'bg-lightblue': selectedButton === x.SubCode }">
-          <button
-            class="font-thin"
-            @click="bringCategory(i.MajorCode)"
-            style="font-size: 15px">
+        <div v-for="x in i.SubCategory" :key="x.SubCode" class="flex items-start w-auto ml-5" :class="{ 'bg-lightblue': selectedButton === x.SubCode }">
+          <button class="font-thin" @click="bringCategory(i.MajorCode)" style="font-size: 15px">
             {{ x.SubName }}
           </button>
         </div>
       </div>
     </div>
-    <div
-      class="h-60 md:ml-8 ml-1 mt-10 border-t border-b border-black md:w-[71%] w-full"
-      v-if="afterCategory">
-      <div
-        class="text-white h-9 w-24 rounded-md flex items-center -mt-9 float-end md:-mr-10 mr-32 space-x-5">
-        <button
-          class="whitebutton"
-          style="font-size: 14px"
-          @click="deleteMainCategory">
+    <div v-show="testOrderManage2" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white p-6 rounded shadow-lg w-4/5 h-4/5 overflow-auto">
+        <!-- 상단 타이틀 영역 -->
+        <div class="border-gray-500 text-2xl flex justify-between items-center mb-4">
+          <span>카테고리 노출 순서 관리</span>
+          <button @click="saveButtonPopup" class="button save text-sm md:w-auto w-14">
+            저장
+          </button>
+        </div>
+    <!-- 본문 영역: 2컬럼 레이아웃 -->
+    <div class="grid grid-cols-2 gap-6 h-[calc(100%-6rem)]">
+      <!-- 대 카테고리 -->
+      <div class="border border-gray-300 rounded">
+        <div class="bg-gray-100 font-bold p-2 text-center">대 카테고리</div>
+        <VueDraggableNext v-model="Category" item-key="MajorCode" :group="'A'" class="space-y-2 p-2" @end="updateCategoryNumbers">
+          <div v-for="i in Category" :key="i.MajorCode" class="p-3 bg-gray-200 rounded-md shadow-sm cursor-pointer flex items-center" @click="selectCategory(i)">
+            <span class="mr-2">≡</span>
+            <p>{{ i.MajorName }}</p>
+          </div>
+        </VueDraggableNext>
+      </div>
+      <!-- 중 카테고리 -->
+      <div class="border border-gray-300 rounded">
+        <div class="bg-gray-100 font-bold p-2 text-center">중 카테고리</div>
+        <VueDraggableNext v-if="selectedCategory" v-model="selectedCategory.SubCategory" item-key="SubCode" :group="'B'" class="space-y-2 p-2" @end="updateCategoryNumbers">
+          <div v-for="x in selectedCategory.SubCategory" :key="x.SubCode" class="p-3 bg-blue-200 rounded-md shadow-sm cursor-move flex items-center">
+            <span class="mr-2">≡</span>
+            <p>{{ x.SubName }}</p>
+          </div>
+        </VueDraggableNext>
+        <p v-else class="text-gray-500 text-center p-4">
+          중 카테고리 순서 변경을 원하시면<br>대 카테고리를 선택하세요.
+        </p>
+      </div>
+    </div>
+    <!-- 하단 닫기 버튼 -->
+    <div class="flex justify-center mt-6">
+      <button @click="testOrderManage" class="p-2 bg-blue-500 text-white rounded">
+        닫기
+      </button>
+    </div>
+  </div>
+</div>
+    <div class="h-60 md:ml-8 ml-1 mt-10 border-t border-b border-black md:w-[71%] w-full" v-if="afterCategory">
+      <div class="text-white h-9 w-24 rounded-md flex items-center -mt-9 float-end md:-mr-10 mr-32 space-x-5">
+        <button class="whitebutton" style="font-size: 14px" @click="deleteMainCategory">
           삭제
         </button>
       </div>
@@ -125,7 +141,7 @@
             @input="changeMajorName3"
             @keyup="afterModifed" />
         </div>
-        <div class="bg-gray-200 flex justify-start items-center pl-4">
+        <!-- <div class="bg-gray-200 flex justify-start items-center pl-4">
           메인카테고리명(스페인어)
         </div>
         <div class="bg-white md:w-96 w-full">
@@ -135,19 +151,16 @@
             v-model="languageName4"
             @input="changeMajorName4"
             @keyup="afterModifed" />
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
-
-  <div
-    class="justify-start md:ml-5 ml-14 mt-5 space-x-2 hidden md:flex"
-    v-show="afterSearch">
-    <button
-      class="whitebutton"
-      style="font-size: 14px"
-      @click="addMainCategory">
+  <div class="justify-start md:ml-5 ml-14 mt-5 space-x-2 hidden md:flex" v-show="afterSearch">
+    <button class="whitebutton" style="font-size: 14px" @click="addMainCategory">
       메인카테고리추가
+    </button>
+    <button class="whitebutton" style="font-size: 14px" @click="testOrderManage">
+      노출 순서 관리
     </button>
   </div>
   <div class="flex justify-between -mt-36 ml-5" v-if="afterCategory">
@@ -236,7 +249,7 @@
           @input="(event) => changeSubName3(i[0].categoryCode, event)"
           @keyup="afterModifed" />
       </div>
-      <div class="bg-gray-200 flex justify-start items-center pl-4">
+      <!-- <div class="bg-gray-200 flex justify-start items-center pl-4">
         서브카테고리명(스페인어)
       </div>
       <div class="bg-white">
@@ -246,7 +259,7 @@
           :value="i[4] ? i[4].LanguageName : ''"
           @input="(event) => changeSubName4(i[0].categoryCode, event)"
           @keyup="afterModifed" />
-      </div>
+      </div> -->
     </div>
     <div class="float-right -mr-32 space-y-5"></div>
   </div>
@@ -271,6 +284,7 @@
 </template>
 
 <script setup>
+
 import {
   getCategoryInfo,
   getMultiLingual,
@@ -280,42 +294,48 @@ import {
   setSubCategoryDelete,
   setSubCategoryINSERT,
   setSubCategoryUPDATE,
+  saveMajorCategory,
+  saveSubCategory
 } from "@/api/master";
+
 /**
  *  페이지명 자동 입력 컴포넌트
  *  */
-
 import PageName from "@/components/pageName.vue";
+
 /**
  * 매장 공통 컴포넌트
  */
-
 import PickStore from "@/components/pickStore.vue";
+
 /**
  *  페이지로그 자동 입력
  *  */
-
 import { insertPageLog } from "@/customFunc/customFunc";
+
 /**
  *  경고창 호출 라이브러리
  *  */
-
 import Swal from "sweetalert2";
+
 /*
  * 공통 표준  Function
  */
-
 import { onMounted, ref, watch } from "vue";
+
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
-
 import { useStore } from "vuex";
+
+/*
+ * 드래그 라이브러리 호출
+ */
+import { VueDraggableNext } from "vue-draggable-next";
 
 /**
  * 	화면 Load시 실행 스크립트
  */
-
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 });
@@ -323,6 +343,7 @@ onMounted(async () => {
 const searchStoreName = ref();
 const selectedButton = ref();
 const Category = ref([]);
+// const SubCategory = ref([]);
 const getMultiLang = ref([]);
 const mainMultiLang = ref([]);
 const subMultiLang = ref([]);
@@ -332,6 +353,14 @@ const nowStoreCd = ref();
 const afterCategory = ref(false);
 const currentMajorCode = ref();
 const newMainCategoryCode = ref([]);
+
+// 현재 선택된 대카테고리
+const selectedCategory = ref(null)
+
+function selectCategory(category) {
+  selectedCategory.value = category
+}
+
 /**
  * 페이지 매장 코드 세팅
  */
@@ -386,6 +415,16 @@ const languageName3 = ref("");
 const languageName4 = ref("");
 const userData = store.state.userData;
 const groupCd = ref(userData.lngStoreGroup);
+
+const testOrderManage2 = ref(false);
+
+const testOrderManage = () => {
+  // 닫히는 순간(selectedCategory 초기화)
+  if (testOrderManage2.value) {
+    selectedCategory.value = null;
+  }
+  testOrderManage2.value = !testOrderManage2.value;
+}
 
 const addMainCategory = () => {
   afterCategory.value = true;
@@ -672,6 +711,7 @@ const deleteAllsubCategory = async () => {
 const searchButton = async () => {
   subMultiLang.value = [];
   Category.value = [];
+  // SubCategory.value = [];
   languageName0.value = "";
   languageName1.value = "";
   languageName2.value = "";
@@ -709,6 +749,7 @@ const searchButton = async () => {
     );
 
     Category.value = res.data.MainCategory;
+    // console.log(Category.value);
     afterSearch.value = true;
     const res1 = await getMultiLingual(groupCd.value, nowStoreCd.value);
 
@@ -720,6 +761,7 @@ const searchButton = async () => {
     (() => {
       Category.value.filter((item) => {
         item.SubCategory = item.SubCategory.filter((sub) => sub.SubCode !== "");
+        // SubCategory.value = item.SubCategory;
       });
     })();
     modified.value = false;
@@ -746,6 +788,7 @@ const saveButton = async () => {
     });
     return;
   }
+  /*
   if (modified.value == false) {
     Swal.fire({
       title: "경고",
@@ -757,6 +800,7 @@ const saveButton = async () => {
     });
     return;
   }
+    */
   if (fillsubCategory.value == false) {
     Swal.fire({
       title: "경고",
@@ -782,95 +826,124 @@ const saveButton = async () => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       let res;
+     
+      const existingSubMultis = Category.value
+        .filter(cat => cat.MajorCode == currentMajorCode.value)
+        .flatMap(cat => cat.SubCategory.map(sub => sub.SubCode))
+        .flatMap(code => getMultiLang.value.filter(m => m.TypeCode === "3" && m.categoryCode === code));
 
-      if (!newMainCategoryCode.value.includes(currentMajorCode.value)) {
-        res = await setMainCategoryUpdate(
-          groupCd.value,
-          nowStoreCd.value,
-          nowStoreAreaCd.value,
-          currentMajorCode.value,
-          [
-            languageName0.value,
-            languageName1.value,
-            languageName2.value,
-            languageName3.value,
-            languageName4.value,
-          ].join(","),
-          ["0", "1", "2", "3", "4"].join(",")
-        );
-      } else if (newMainCategoryCode.value.includes(currentMajorCode.value)) {
-        res = await setMainCategoryINSERT(
-          groupCd.value,
-          nowStoreCd.value,
-          nowStoreAreaCd.value,
-          currentMajorCode.value,
-          [
-            languageName0.value,
-            languageName1.value,
-            languageName2.value,
-            languageName3.value,
-            languageName4.value,
-          ].join(","),
-          ["0", "1", "2", "3", "4"].join(",")
-        );
-      }
+      // console.log(existingSubMultis);
 
-      const subMultis = subMultiLang.value
-        .flatMap((innerArray) => innerArray) // 이중 배열을 평평하게 만듭니다.
-        .filter((item) => item.Insert === true); // Insert 속성이 true인 요소만 필터링합니다.
+      const newSubMultis = subMultiLang.value.flatMap(inner => inner).filter(item => item.Insert === true);
 
-      const subCd = subMultis.map((item) => item.categoryCode);
-      const subNm = subMultis.map((item) => item.LanguageName);
-      const languageNm = subMultis.map((item) => item.LanguageID);
+      const keyOf = x => `${x.categoryCode}::${x.LanguageID}`;
+      const map = new Map();
+      existingSubMultis.forEach(e => map.set(keyOf(e), e));
+      newSubMultis.forEach(n => map.set(keyOf(n), n));
 
-      const subMultis2 = subMultiLang.value
-        .flatMap((innerArray) => innerArray) // 이중 배열을 평평하게 만듭니다.
-        .filter((item) => item.Insert != true); // Insert 속성이 true인 요소만 필터링합니다.
+      const allSubMultis = Array.from(map.values());
 
-      const subCd2 = subMultis2.map((item) => item.categoryCode);
-      const subNm2 = subMultis2.map((item) => item.LanguageName);
-      const languageNm2 = subMultis2.map((item) => item.LanguageID);
-      //comsole.log(subCd);
-      //comsole.log(subNm);
-      //comsole.log(languageNm);
+      const insertList = allSubMultis.filter(item => item.Insert === true);
+      const updateList = allSubMultis.filter(item => !item.Insert);
+
+      const subCd = insertList.map(i => i.categoryCode);
+      const subNm = insertList.map(i => i.LanguageName);
+      const languageNm = insertList.map(i => i.LanguageID);
+
+      const subCd2 = updateList.map(i => i.categoryCode);
+      const subNm2 = updateList.map(i => i.LanguageName);
+      const languageNm2 = updateList.map(i => i.LanguageID);
+
+      const majorNmBase = [
+        languageName0.value,
+        languageName1.value,
+        languageName2.value,
+        languageName3.value,
+        languageName4.value,
+      ];
+      const makeMajorNmStr = (list) => {
+        const uniqueSubCount = [...new Set(list.map(i => i.categoryCode))].length || 0;
+        if (uniqueSubCount === 0) return "";
+        return Array.from({ length: uniqueSubCount })
+          .flatMap(() => majorNmBase)
+          .join(",");
+      };
+      const majorNmStr = makeMajorNmStr(insertList);
+      const majorNmStr2 = makeMajorNmStr(updateList);
+
       try {
-        const res2 = await setSubCategoryINSERT(
-          groupCd.value,
-          nowStoreCd.value,
-          nowStoreAreaCd.value,
-          currentMajorCode.value,
-          subCd.join(","),
-          subNm.join(","),
-          languageNm.join(",")
-        );
 
-        const res3 = await setSubCategoryUPDATE(
-          groupCd.value,
-          nowStoreCd.value,
-          nowStoreAreaCd.value,
-          currentMajorCode.value,
-          subCd2.join(","),
-          subNm2.join(","),
-          languageNm2.join(",")
-        );
+        // console.log(majorNmStr.length);
 
-        // 이제 res2를 사용하여 상태 확인 가능
-        if (res2.status === 200 && res3.status === 200) {
-          await searchButton(); // searchMenu()도 await
-          bringCategory(currentMajorCode.value);
+        if (majorNmStr.length != 0){
+          if (mainCategoryInsert.value){
+            const res = await setMainCategoryINSERT(
+              groupCd.value,
+              nowStoreCd.value,
+              nowStoreAreaCd.value,
+              currentMajorCode.value,
+              majorNmStr,
+              subCd.join(","),
+              subNm.join(","),
+              languageNm.join(",")
+            );
+        
+            // console.log(res);
 
-          Swal.fire({
-            title: "저장 성공",
-            text: "저장되었습니다.",
-            icon: "success",
-            showCancelButton: false,
-            confirmButtonColor: "#3085d6",
-            allowOutsideClick: false,
-          });
+          } else {
+            const res = await setSubCategoryINSERT(
+              groupCd.value,
+              nowStoreCd.value,
+              nowStoreAreaCd.value,
+              currentMajorCode.value,
+              majorNmStr,
+              subCd.join(","),
+              subNm.join(","),
+              languageNm.join(",")
+            );
+        
+          //  console.log(res);
+
+          }
+        } 
+        
+        // console.log(majorNmStr2.length);
+
+        if(majorNmStr2.length != 0){
+
+          if (!newMainCategoryCode.value.includes(currentMajorCode.value)) {
+            const res = await setMainCategoryUpdate(
+              groupCd.value,
+              nowStoreCd.value,
+              nowStoreAreaCd.value,
+              currentMajorCode.value,
+              majorNmStr2,
+              subCd2.join(","),
+              subNm2.join(","),
+              languageNm2.join(",")
+            );
+        
+            // console.log(res); 
+
+          } else {
+            const res = await setSubCategoryUPDATE(
+              groupCd.value,
+              nowStoreCd.value,
+              nowStoreAreaCd.value,
+              currentMajorCode.value,
+              majorNmStr2,
+              subCd2.join(","),
+              subNm2.join(","),
+              languageNm2.join(",")
+            );
+        
+            // console.log(res);
+
+          }
         }
+
       } catch (error) {
         // 오류 처리
-        //console.error("Error occurred:", error);
         Swal.fire({
           title: "저장 실패",
           text: "오류가 발생했습니다.",
@@ -880,8 +953,21 @@ const saveButton = async () => {
           allowOutsideClick: false,
         });
       } finally {
+        
+        await searchButton(); // searchMenu()도 await
+        bringCategory(currentMajorCode.value);
+
+        Swal.fire({
+            title: "저장 성공",
+            text: "저장되었습니다.",
+            icon: "success",
+            showCancelButton: false,
+            confirmButtonColor: "#3085d6",
+            allowOutsideClick: false,
+        });
         newMainCategoryCode.value = [];
         modified.value = false;
+
       }
     } else {
       return;
@@ -1128,4 +1214,139 @@ const changeSubName4 = (categorycode, event) => {
   };
   changegetMulilang();
 };
+
+const updateCategoryNumbers = () => {
+  // 대카테고리 새 코드 재정렬
+  Category.value.forEach((c, index) => {
+    c.oldMajorCode = c.MajorCode; // 기존 코드 백업
+    c.newMajorCode = index + 1;   // 새 코드 부여
+    c.OrderNo = index + 1;
+  });
+
+  let subCodeCounter = 1; // 전체 SubCode용 카운터
+
+  // 중카테고리 새 코드 재정렬
+  Category.value.forEach((c) => {
+    if (c.SubCategory && c.SubCategory.length > 0) {
+      c.SubCategory.forEach((sub, subIndex) => {
+        sub.oldSubCode = sub.SubCode;       // 기존 코드 백업
+        sub.newSubCode = subCodeCounter++;  // 전체에서 유일하게 증가
+        sub.oldMajorCode = c.oldMajorCode;  // 기존 부모 코드 백업
+        sub.newMajorCode = c.newMajorCode;  // 새 부모 코드 연결
+        sub.OrderNo = subIndex + 1;
+      });
+    }
+  });
+
+  // console.log("대카테고리", Category.value);
+  
+};
+
+
+/**
+ *  저장 버튼 함수 - 팝업 
+ */
+
+const saveButtonPopup = async () => {
+
+  // if (ulength == 0) {
+  //   Swal.fire({
+  //     title: "경고",
+  //     text: "변경된 사항이 없습니다.",
+  //     icon: "warning",
+  //     confirmButtonText: "확인",
+  //   });
+  //   return;
+  // }
+
+  await Swal.fire({
+    title: "저장",
+    text: "저장 하시겠습니까?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "저장",
+    cancelButtonText: "취소",
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      store.state.loading = true;
+      try {
+
+        // 대카테고리 매핑 (기존 → 새)
+        const largeCate = Category.value.map((c) => ({
+          oldMajorCode: c.oldMajorCode,
+          newMajorCode: c.newMajorCode
+        }));
+
+        // 통합 배열
+        const mapping = [...largeCate];
+
+        // 최종 API 호출
+        const oldMajorCodes = mapping.map((item) => item.oldMajorCode);
+        const newMajorCodes = mapping.map((item) => item.newMajorCode);
+
+        const res = await saveMajorCategory(
+          store.state.userData.lngStoreGroup,
+          nowStoreCd.value,
+          oldMajorCodes.join(","),
+          newMajorCodes.join(",")
+        );
+
+        // console.log(res);
+
+        // 중카테고리 매핑 (기존 → 새, 부모 연결 포함)
+        const middleCate = Category.value.flatMap((c) =>
+          c.SubCategory.map((sub) => ({
+            oldSubCode: sub.oldSubCode,
+            newSubCode: sub.newSubCode,
+            oldMajorCode: sub.oldMajorCode,
+            newMajorCode: sub.newMajorCode
+          }))
+        );
+
+        // 통합 배열
+        const mapping2 = [...middleCate];
+
+        // 최종 API 호출
+        const newMajorCodes2  = mapping2.map((item) => item.newMajorCode);
+        const oldSubCodes     = mapping2.map((item) => item.oldSubCode);
+        const newSubCodes     = mapping2.map((item) => item.newSubCode);
+
+        // console.log(newMajorCodes2, oldSubCodes, newSubCodes)
+
+        const res2 = await saveSubCategory(
+          store.state.userData.lngStoreGroup,
+          nowStoreCd.value,
+          newMajorCodes2.join(","),
+          oldSubCodes.join(","),
+          newSubCodes.join(",")
+        );
+
+        // console.log(res2);
+
+        // 이제 res2를 사용하여 상태 확인 가능
+        if (res.status === 200 && res2.status === 200) {
+          Swal.fire({
+            title: "저장 성공",
+            text: "저장되었습니다.",
+            icon: "success",
+            showCancelButton: false,
+            confirmButtonColor: "#3085d6",
+            allowOutsideClick: false,
+          });
+        }
+
+        store.state.loading = false;
+      } catch (error) {
+        Swal.fire({
+          title: "저장이 실패되었습니다.",
+          confirmButtonText: "확인",
+        });
+      } finally {
+        testOrderManage();
+        searchButton();
+      }
+    }
+  });
+};
+
 </script>
