@@ -5,29 +5,36 @@
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <div class="h-full w-full" @click="resetScreen">
-    <div class="h-[15vh] w-full"></div>
-    <!-- <div
-      class="relative h-[7vh] text-sm font-medium w-full bg-white grid grid-rows-1 grid-cols-[0.5fr,0.8fr,1.2fr,1.2fr,1fr] items-center">
-      <div class="font-semibold text-nowrap">일자</div>
-      <div class="font-semibold text-nowrap">객수/조수</div>
-      <div class="font-semibold text-nowrap">총매출</div>
-      <div class="font-semibold text-nowrap">실매출</div>
-      <div class="font-semibold text-nowrap">할인액</div>
-    </div> -->
-    <!-- <div v-for="i in rowData" class="bg-gray-300">
-      <div
-        :class="i.dtmDate.includes('[') ? 'bg-gray-300 text-xs' : 'bg-blue-50'"
-        class="grid grid-rows-1 grid-cols-[0.5fr,0.8fr,1.2fr,1.2fr,1fr] h-[7vh] justify-center items-center font-medium text-xs">
-        <div class="flex justify-start pl-[10%]">{{ i.dtmDate }}</div>
-        <div class="flex justify-center">
-          {{ i.lngCustCnt }}/{{ i.lngRecCnt }}
-        </div>
-        <div class="flex justify-end">{{ i.lngSalAmt }}</div>
-        <div class="flex justify-end">{{ i.lngActAmt }}</div>
-        <div class="flex justify-end pr-[10%]">{{ i.lngDiscountAmt }}</div>
-      </div>
-    </div> -->
+   <div class="" @click="handleParentClick">
+    <div class="flex justify-between items-center w-full overflow-y-hidden">
+      <PageName></PageName>
+      <!-- <div class="flex justify-center mr-9 space-x-2 pr-5">
+        <button @click="searchButton" class="button search md:w-auto w-14">
+          조회
+        </button>
+        <button @click="excelButton" class="button save w-auto excel">
+          엑셀
+        </button>
+      </div> -->
+      <button class="button search" @click="searchButton">조회</button>
+    </div>
+  </div>
+
+  <div  class="flex flex-col bg-gray-200 rounded-lg items-start justify-start h-24">
+ <CategorySelect
+      @click.stop
+      class=""
+      :defaultChoice="true"
+      :changeState="changeState"
+      :reSearch="reSearch"
+      @MAINCATEGORY="MAINCATEGORY"
+      @SUBCATEGORY="SUBCATEGORY"
+      @FILTERDATA="FILTERDATA"
+      :getFilteredData="getFilteredData"
+      @STORE_CD="STORE_CD"
+      @GROUP_CD="GROUP_CD">
+    </CategorySelect>
+  </div>
     <div class="flex justify-center items-center mt-2 w-full">
       <div
         class="grid grid-rows-[3fr,1.8fr,5fr,5fr,5fr] grid-cols-[1fr,3fr] text-sm w-[95vw] h-[55vh]">
@@ -35,7 +42,7 @@
           class="bg-gray-200 flex justify-center border-l border-t border-black items-center">
           카테고리명
         </div> -->
-        <div v-if="!FirstSearch"
+        <!-- <div v-if="!FirstSearch"
           class="border-l border-t border-r border-black flex justify-center items-center  text-lg  p-2 overflow-hidden col-span-2 bg-green-200 ">
           <span>카테고리를 먼저 선택해주세요. ↗</span>
         </div>
@@ -43,7 +50,7 @@
         <div v-if="FirstSearch"
           class="border-l border-t border-r border-black flex justify-center pl-2 text-lg items-center overflow-hidden col-span-2 bg-green-200 ">
          {{ category }} <span class="text-xl pl-2 pr-2">></span> {{ cond1 }}
-        </div>
+        </div> -->
 
         <div
           class="bg-gray-200 flex justify-center border-l border-t border-black items-center">
@@ -233,18 +240,8 @@
     <div class="flex justify-end pr-2 mt-2 ">
       <button class="button save" @click="saveButton"  :disabled="!FirstSearch">저장</button>
     </div>
-  </div>
-  <CategorySelect
-    @click.stop
-    class="z-[10]"
-    :changeState="changeState"
-    :reSearch="reSearch"
-    :defaultChoice="true"
-    @currState="currState"
-    @FILTERDATA="FILTERDATA"
-    @mainCategory="mainCategory"
-    @GROUP_CD="GROUP_CD"
-    @STORE_CD="STORE_CD"></CategorySelect>
+  
+
 </template>
 
 <script setup>
@@ -258,9 +255,10 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
-import CategorySelect from "../component/categorySelect.vue";
 import Swal from "sweetalert2";
 import { SetSClassStkRgst } from "@/api/etc";
+import CategorySelect from "@/components/categorySelect.vue";
+import PageName from "@/components/pageName.vue";
 
 const store = useStore();
 const changeState = ref(true);
@@ -289,15 +287,27 @@ const startDate = (e) => {
  * 선택한 매출 종료일자
  */
 
-const endDate = (e) => {
-  selectEndDate.value = e;
+const mainCategory = ref("");
+const subCategory = ref("");
+const MAINCATEGORY = (e) => {
+  console.log(e);
+  mainCategory.value = e;
+   FirstSearch.value = false
 };
-const GROUP_CD = (e) => {
-  selectGroupCd.value = e;
+
+const SUBCATEGORY = (e) => {
+  console.log(e);
+  subCategory.value = e;
+  FirstSearch.value = false
 };
 const STORE_CD = (e) => {
   selectStoreCd.value = e;
+   FirstSearch.value = false
 };
+
+const GROUP_CD = (e) =>{
+  selectGroupCd.value = e
+}
 
 const rowData = ref([]);
 
@@ -364,8 +374,12 @@ const handleHoli = (e) => {
 const LCLASS_CD = ref('')
 const SCLASS_CD = ref('')
 const FILTERDATA = (e) => {
+  // console.log(e)
+  // if(e == undefined) {
+  //   return ;
+  // }
   FirstSearch.value = true
-  //console.log(e);
+//  console.log(e);
   LCLASS_CD.value = e[0].LCLASS_CD;
   SCLASS_CD.value = e[0].SCLASS_CD;
   cond1.value = e[0].FULL_NM;
@@ -587,7 +601,7 @@ seeday += '0'
     let ftime = String(cond3.value).padStart(2, '0') +String(cond4.value).padStart(2, '0')
     let etime = String(cond6.value).padStart(2, '0') +String(cond7.value).padStart(2, '0')
     const res = await SetSClassStkRgst(selectGroupCd.value , selectStoreCd.value , LCLASS_CD.value , SCLASS_CD.value , cond8.value , alldate.value == true ? 1 : 0 , cond2.value , cond5.value , seeday , alltime.value == true ? 1 : 0 , ftime, etime )
-     //console.log(res)
+     console.log(res)
 
     if(res.data.Result =='00'){
       Swal.fire({
@@ -611,10 +625,7 @@ seeday += '0'
   }
 };
 
-const category = ref('')
-const mainCategory = (e) =>{
-  category.value =e
-}
+
 // const SEARCHNOW = async (e) => {
 //   try {
 //     store.state.loading2 = true;
@@ -645,6 +656,11 @@ const mainCategory = (e) =>{
  */
 const FirstSearch = ref(false)
 onMounted(() => {});
+
+const getFilteredData = ref(false)
+const searchButton = () => {
+   getFilteredData.value = !getFilteredData.value
+}
 </script>
 
 <style scoped>

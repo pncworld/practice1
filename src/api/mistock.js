@@ -94,3 +94,136 @@ export const getWorkList = (
     COND6: cond6,
   });
 };
+
+export const getLossMasterList = (groupCd, storeCd, sdate, edate) => {
+  return api2.post("/MISTOCK/STKN06_012INS.asmx/getLossMasterList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+  });
+};
+
+export const getLossStockDetail = (groupCd, storeCd, loss) => {
+  return api2.post("/MISTOCK/STKN06_012INS.asmx/getLossStockDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LOSSNO: loss,
+  });
+};
+
+export const getLossStockItemList = (groupCd, storeCd, type, name) => {
+  return api2.post("/MISTOCK/STKN06_012INS.asmx/getLossStockItemList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    TYPE: type,
+    NAME: name,
+  });
+};
+
+export const getLossTypeList = (groupCd, type) => {
+  return api2.post("/MISTOCK/STKN06_012INS.asmx/getLossTypeList", {
+    GROUP_CD: groupCd,
+    TYPE: type,
+  });
+};
+
+export const saveLossMaster = (
+  groupCd,
+  storeCd,
+  date,
+  itemids,
+  qtys,
+  losscodes,
+  seq,
+  cond
+) => {
+  return api2.post("/MISTOCK/STKN06_012INS.asmx/saveLossMaster", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    ITEM_IDS: itemids,
+    QTYS: qtys,
+    LOSS_CD: losscodes,
+    SEQ: seq,
+    COND: cond,
+  });
+};
+
+export const getLossStockItemDetailList = (groupCd, storeCd, lossno) => {
+  return api2.post("/MISTOCK/STKN06_012INS.asmx/getLossStockItemDetailList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LOSS_NO: lossno,
+  });
+};
+
+export const updateLossMasterDetail = (
+  groupCd,
+  storeCd,
+  lossNo,
+  itemids,
+  losscodes,
+  qtys,
+  seq
+) => {
+  return api2.post("/MISTOCK/STKN06_012INS.asmx/updateLossMasterDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LOSS_NO: lossNo,
+    ITEM_IDS: itemids,
+    QTYS: qtys,
+    LOSS_CD: losscodes,
+    SEQ: seq,
+  });
+};
+
+export const deleteLossStock = (groupCd, storeCd, lossno) => {
+  return api2.post("/MISTOCK/STKN06_012INS.asmx/deleteLossStock", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LOSS_NO: lossno,
+  });
+};
+
+export const getLossReportList = (
+  groupCd,
+  storeCd,
+  storeattr,
+  sdate,
+  edate,
+  itemtype,
+  groupmaster,
+  groupsub,
+  unit,
+  reporttype
+) => {
+  return api2.post("/MISTOCK/STKN06_016RPT.asmx/getLossReportList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    STORE_ATTR: storeattr,
+    SDATE: sdate,
+    EDATE: edate,
+    ITEMTYPE: itemtype,
+    GROUPMASTER: groupmaster,
+    GROUPSUB: groupsub,
+    UNIT: unit,
+    REPORTTYPE: reporttype,
+  });
+};
+
+export const getStockDailyList = (
+  groupCd,
+  storeCd,
+  date,
+  unittype,
+  showtype
+) => {
+  return api2.post("/MISTOCK/STKN07_018RPT.asmx/getStockDailyList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    UNIT_TYPE: unittype,
+    SHOW_TYPE: showtype,
+  });
+};

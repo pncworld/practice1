@@ -12,6 +12,11 @@ module.exports = defineConfig({
         changeOrigin: true, // CORS 문제 해결
         pathRewrite: { "^/api": "/" },
       },
+      "/SYSTEM": {
+        target: "http://www.pncoffice.com:8085",
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

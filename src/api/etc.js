@@ -1,7 +1,4 @@
-import router from "@/router";
-import store from "@/store";
 import axios from "axios";
-import { ref } from "vue";
 
 export const commonUrl2 = "http://www.pncoffice.com:8081/"; //http://211.238.145.30:8085
 

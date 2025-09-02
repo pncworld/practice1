@@ -41,7 +41,7 @@
         <div class="text-lg font-medium ml-[4vw]">대카테고리</div>
         <div class="border border-gray-600 w-[60vw]">
           <select name="" id="" class="w-full h-full" v-model="selectedCond">
-            <option value="0">선택</option>
+            <option value="0">{{ defaultNm }}</option>
             <option :value="i.LCLASS_CD" v-for="i in optionList">
               {{ i.LCLASS_NM }}
             </option>
@@ -52,7 +52,7 @@
         <div class="text-lg font-medium ml-[4vw]">중카테고리</div>
         <div class="border border-gray-600 w-[60vw]">
           <select name="" id="" class="w-full h-full" v-model="selectedCond2">
-            <option value="0">선택</option>
+            <option value="0">{{ defaultNm }}</option>
             <option :value="i.SCLASS_CD" v-for="i in optionList2">
               {{ i.FULL_NM }}
             </option>
@@ -104,6 +104,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  defaultChoice: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const setIcon = ref(0);
@@ -115,6 +119,7 @@ const showStoreAndDate = () => {
   selectedStoreCd2.value = selectedStoreCd.value;
 };
 
+const defaultNm = ref("전체");
 /**
  * 	화면 Load시 실행 스크립트
  */
@@ -129,6 +134,12 @@ onMounted(async () => {
     store.state.userData.USER_NO
   );
 
+  if (props.defaultChoice == true) {
+    defaultNm.value = "선택";
+    emit("mainCategory", "선택");
+  } else {
+    emit("mainCategory", "전체");
+  }
   StoreList.value = res?.data?.List;
   //console.log(StoreList.value);
   selectedStoreCd.value = {
@@ -191,10 +202,13 @@ watch(selectedStoreCd, async () => {
 });
 
 watch(selectedCond, async () => {
-  if (selectedCond.value == 0) {
-    emit("mainCategory", "선택");
-    return;
+  if (props.defaultChoice == true) {
+    if (selectedCond.value == 0) {
+      emit("mainCategory", "선택");
+      return;
+    }
   }
+
   const res2 = await GetSClassInfo(
     store.state.userData.GROUP_CD,
     selectedStoreCd.value.STORE_CD,
@@ -203,10 +217,11 @@ watch(selectedCond, async () => {
   );
   //console.log(res2);
   optionList2.value = res2.data.SClassList;
+  console.log(optionList2.value);
   selectedCond2.value = 0;
-  const maincategory = optionList.value.filter(
-    (item) => item.LCLASS_CD == selectedCond.value
-  )[0].LCLASS_NM;
+  const maincategory =
+    optionList.value.filter((item) => item.LCLASS_CD == selectedCond.value)[0]
+      ?.LCLASS_NM || "전체";
   emit("mainCategory", maincategory);
 });
 
@@ -221,28 +236,44 @@ const sendSearch = () => {
     });
     return;
   }
-  if (selectedCond.value == 0) {
-    //filteredData.value = optionList2.value;
-    Swal.fire({
-      title: "경고",
-      text: "대카테고리를 선택해주세요.",
-    });
-    return;
-  }
 
-  if (selectedCond2.value == 0) {
-    //filteredData.value = optionList2.value;
-    Swal.fire({
-      title: "경고",
-      text: "중카테고리를 선택해주세요.",
-    });
-    return;
+  if (props.defaultChoice == true) {
+    if (selectedCond.value == 0) {
+      //filteredData.value = optionList2.value;
+      Swal.fire({
+        title: "경고",
+        text: "대카테고리를 선택해주세요.",
+      });
+      return;
+    }
+
+    if (selectedCond2.value == 0) {
+      //filteredData.value = optionList2.value;
+      Swal.fire({
+        title: "경고",
+        text: "중카테고리를 선택해주세요.",
+      });
+      return;
+    } else {
+      filteredData.value = optionList2.value.filter(
+        (item) => item.SCLASS_CD == selectedCond2.value
+      );
+    }
   } else {
-    filteredData.value = optionList2.value.filter(
-      (item) => item.SCLASS_CD == selectedCond2.value
-    );
+    if (selectedCond.value == 0) {
+      filteredData.value = [{ LCLASS_CD: 0, SCLASS_CD: 0, FULL_NM: "전체" }];
+    } else {
+      if (selectedCond2.value == 0) {
+        filteredData.value = [
+          { LCLASS_CD: selectedCond.value, SCLASS_CD: 0, FULL_NM: "전체" },
+        ];
+      } else {
+        filteredData.value = optionList2.value.filter(
+          (item) => item.SCLASS_CD == selectedCond2.value
+        );
+      }
+    }
   }
-
   //comsole.log(selectedStoreCd.value.GROUP_CD);
   //   emit("startDate", startDate.value);
   //   emit("endDate", endDate.value);

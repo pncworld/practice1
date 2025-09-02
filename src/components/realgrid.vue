@@ -691,6 +691,21 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  setRowStyleCallsDefaultCol: {
+    // 그룹푸터에서 레벨별로 나타날 색상에 대한 설정
+    type: String,
+    default: "seqNum",
+  },
+  setRowStyleCallsDefaultCol2: {
+    // 그룹푸터에서 레벨별로 나타날 색상에 대한 설정
+    type: String,
+    default: "seqNum",
+  },
+  hardCodeSetRowStyleCalls: {
+    // 그룹푸터에서 레벨별로 나타날 색상에 대한 설정
+    type: Boolean,
+    default: false,
+  },
   setRowStyleLevel: {
     // 그룹푸터에서 레벨별로 나타날 색상에 대한 설정
     type: Number,
@@ -947,6 +962,30 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  checkRowAuto2: {
+    type: Boolean,
+    default: false,
+  },
+  checkRowAuto2Col: {
+    type: String,
+    default: "lngCheck",
+  },
+  AutoCalculateDataMainColId: {
+    type: Array,
+    default: [],
+  },
+  AutoCalculateDataSubColId: {
+    type: Array,
+    default: [],
+  },
+  CalculateTaxColId: {
+    type: String,
+    default: "",
+  },
+  ColCellRedColorColId: {
+    type: Array,
+    default: [],
+  },
 });
 
 // 2구간
@@ -976,6 +1015,7 @@ const emit = defineEmits([
   "allStateRows",
   "buttonClicked",
   "clickedButtonCol",
+  "checkAllorNot",
 ]);
 // 3구간
 const funcshowGrid = async () => {
@@ -1030,6 +1070,36 @@ const funcshowGrid = async () => {
         ? "datetime"
         : "text",
     datetimeFormat: "yyyy-MM-dd",
+    valueExpression:
+      props.AutoCalculateDataSubColId[
+        props.AutoCalculateDataMainColId.indexOf(item.strColID)
+      ],
+    // valueCallback: function (prod, dataRow, fieldName, fieldNames, values) {
+    //   if (props.CalculateTaxColId.includes(item.strColID)) {
+    //     let taxType = values[fieldNames.indexOf("lngTaxType")];
+    //     let supply = values[fieldNames.indexOf("curSupply")];
+
+    //     if (taxType == "01") {
+    //       return supply * 0.1;
+    //     } else {
+    //       return 0;
+    //     }
+    //   } else {
+    //     return values[fieldNames.indexOf(item.strColID)];
+    //   }
+    // },
+    valueCallback: props.CalculateTaxColId.includes(item.strColID)
+      ? function (prod, dataRow, fieldName, fieldNames, values) {
+          let taxType = values[fieldNames.indexOf("lngTaxType")];
+          let supply = values[fieldNames.indexOf("curSupply")];
+
+          if (taxType == "01") {
+            return Math.floor(supply * 0.1);
+          } else {
+            return 0;
+          }
+        }
+      : undefined,
   }));
   if (props.removeInitProp == true) {
     fields.push({ fieldName: "deleted", dataType: "boolean" });
@@ -1093,6 +1163,12 @@ const funcshowGrid = async () => {
         props.headerCheckBar != item.strColID
           ? "left"
           : "none",
+    },
+    styleCallback: function (grid, dataCell) {
+      var ret = {};
+      console.log(item.strColID);
+      ret.style = { color: "#FF0000" };
+      return ret;
     },
     groupFooter: {
       text: props.setGroupSumCustomText[
@@ -1381,12 +1457,13 @@ const funcshowGrid = async () => {
             }
           : null,
       commitOnSelect: true,
-      inputCharacters:
-        item.strColID == props.inputOnlyNumberColumn
-          ? "0123456789"
-          : item.strColID == props.inputOnlyNumberColumn2
-          ? "0123456789."
-          : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ㄱ-힣!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ",
+      inputCharacters: props.inputOnlyNumberColumn
+        .split(",")
+        .includes(item.strColID)
+        ? "0123456789"
+        : item.strColID == props.inputOnlyNumberColumn2
+        ? "0123456789."
+        : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ㄱ-힣!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ",
     },
     visible: item.intHdWidth !== 0,
     renderer: {
@@ -1411,48 +1488,55 @@ const funcshowGrid = async () => {
           : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
     },
     buttonVisibility: "always",
-    styleCallback: function (grid, dataCell) {
-      var ret = {};
-
-      if (
-        (dataCell.item.rowState == "created" ||
-          dataCell.item.itemState == "appending" ||
-          dataCell.item.itemState == "inserting") &&
-        props.rowStateeditable
-      ) {
-        ret.editable = true;
-      } else if (props.editableColId.includes(item.strColID)) {
-        ret.editable = true;
-      } else if (
-        props.rowStateeditable == true &&
-        dataCell.item.itemState == "normal"
-      ) {
-        ret.editable = true;
-      } else {
-        ret.editable = false;
-      }
-
-      if (props.checkBarInactive != "") {
-        var inActiveColumn = grid.getValue(
-          dataCell.index.itemIndex,
-          props.checkBarInactive
-        );
-
-        if (
-          inActiveColumn == "0" &&
-          (item.strColID == "checkbox" || item.strDisplay.includes("checkbox"))
-        ) {
-          ret.style = { opacity: "0.5" };
-          ret.renderer = { type: "check", editable: false };
+    styleCallback: props.ColCellRedColorColId.includes(item.strColID)
+      ? function (grid, dataCell) {
+          var ret = {};
+          ret.style = { color: "#FF0000" };
+          return ret;
         }
-        if (item.strColID == "lngSupplierID") {
-          ret.style = { opacity: "0.5" };
-          ret.renderer = { type: "check", editable: false };
-        }
-      }
+      : function (grid, dataCell) {
+          var ret = {};
 
-      return ret;
-    },
+          if (
+            (dataCell.item.rowState == "created" ||
+              dataCell.item.itemState == "appending" ||
+              dataCell.item.itemState == "inserting") &&
+            props.rowStateeditable
+          ) {
+            ret.editable = true;
+          } else if (props.editableColId.includes(item.strColID)) {
+            ret.editable = true;
+          } else if (
+            props.rowStateeditable == true &&
+            dataCell.item.itemState == "normal"
+          ) {
+            ret.editable = true;
+          } else {
+            ret.editable = false;
+          }
+
+          if (props.checkBarInactive != "") {
+            var inActiveColumn = grid.getValue(
+              dataCell.index.itemIndex,
+              props.checkBarInactive
+            );
+
+            if (
+              inActiveColumn == "0" &&
+              (item.strColID == "checkbox" ||
+                item.strDisplay.includes("checkbox"))
+            ) {
+              ret.style = { opacity: "0.5" };
+              ret.renderer = { type: "check", editable: false };
+            }
+            if (item.strColID == "lngSupplierID") {
+              ret.style = { opacity: "0.5" };
+              ret.renderer = { type: "check", editable: false };
+            }
+          }
+
+          return ret;
+        },
   }));
 
   if (props.labelingColumns != "") {
@@ -1527,17 +1611,31 @@ const funcshowGrid = async () => {
   if (props.setRowStyleCalls) {
     gridView.setRowStyleCallback((grid, item, fixed) => {
       if (props.setRowStyleLevel == 1) {
-        let Value = grid.getValue(item.index, "seqNum");
-        if (Value) {
-          if (
-            Value.toString().substring(Value.length - 1) == "2" ||
-            Value.substring(Value.length - 1) == "3"
-          ) {
+        let Value = grid.getValue(item.index, props.setRowStyleCallsDefaultCol);
+
+        if (props.hardCodeSetRowStyleCalls == false) {
+          if (Value) {
+            if (
+              Value.toString().substring(Value.length - 1) == "2" ||
+              Value.substring(Value.length - 1) == "3"
+            ) {
+              return "blue";
+            } else if (Value.substring(Value.length - 1) == "8") {
+              return "pink";
+            } else if (Value.substring(Value.length - 1) == "9") {
+              return "navy";
+            }
+          }
+        } else {
+          let Value2 = grid.getValue(
+            item.index,
+            props.setRowStyleCallsDefaultCol2
+          );
+
+          if (Value == "소계" || Value2 == "소계") {
             return "blue";
-          } else if (Value.substring(Value.length - 1) == "8") {
+          } else if (Value == "합계" || Value2 == "합계") {
             return "pink";
-          } else if (Value.substring(Value.length - 1) == "9") {
-            return "navy";
           }
         }
       } else if (props.setRowStyleLevel == 2) {
@@ -2048,6 +2146,10 @@ const funcshowGrid = async () => {
   gridView.onCellEdited = function (grid, itemIndex, row, field) {
     gridView.commit();
     //console.log(field);
+    if (props.checkRowAuto2 == true) {
+      const val = grid.getDataSource().getValue(row, props.checkRowAuto2Col); // 셀 클릭시 checkautoRow  = false 하고 셀 클릭과 내장 체크바가 연동안되게하면서 이 방식으로 체크박스가 체크되었을때만체크되게 설정
+      grid.checkRow(row, val);
+    }
     if (props.checkonlyone == true) {
       if (field == 0) {
         const bool = dataProvider.getValue(row, field);
@@ -2073,7 +2175,7 @@ const funcshowGrid = async () => {
 
   gridView.onItemChecked = function (grid, itemIndex, checked) {
     gridView.setCurrent({ dataRow: itemIndex });
-    console.log(checked);
+
     // dataProvider.beginUpdate();
     // if (gridView.isCheckedRow(itemIndex)) {
     //   grid.checkItem(itemIndex, false);
@@ -2191,6 +2293,7 @@ const funcshowGrid = async () => {
         gridView.checkAll(false); // checkrowstates
       }
 
+      //if(props.cellclickcheck)
       if (props.checkRowAuto == true) {
         // 내장 체크바와 연동할건지 말건지를 결정하는 부분 false하면 셀 클릭시 내장 체크바는 선택안됨
         if (gridView.isCheckedRow(clickData.itemIndex)) {
@@ -2248,6 +2351,7 @@ const funcshowGrid = async () => {
     }
 
     emit("allStateRows", dataProvider.getAllStateRows());
+    emit("clickedButtonCol", clickData.fieldName);
   };
 
   gridView.onColumnCheckedChanged = function (grid, col, chk) {
@@ -2280,6 +2384,8 @@ const funcshowGrid = async () => {
     emit("updatedRowData", updatedrowData.value);
     emit("allStateRows", dataProvider.getAllStateRows());
     //comsole.log(col.fieldName + "was checked as: " + chk);
+
+    emit("checkAllorNot", chk, col.fieldName);
   };
 
   gridView.dataDropOptions.callback = function (
@@ -2337,10 +2443,6 @@ watch(
 watch(
   () => props.changeNow,
   () => {
-    //comsole.log(props.changeRow);
-    //comsole.log(props.changeColid);
-    //comsole.log(props.changeValue2);
-    //comsole.log(dataProvider.getJsonRows());
     dataProvider.beginUpdate();
     if (props.changeRow !== "" && props.changeRow != -1) {
       dataProvider.setValue(
@@ -2613,7 +2715,7 @@ watch(
       values[propertys[i]] = value[i];
     }
     values.new = true;
-    //comsole.log(values);
+
     emit("sendRowState", "created");
     var dataRow = dataProvider.addRow(values);
     gridView.setCurrent({ dataRow: dataRow });
@@ -2866,17 +2968,18 @@ watch(
 watch(
   () => props.deleteRow7,
   (newVal) => {
-    //console.log(gridView.getCheckedItems());
+    console.log(gridView.getCheckedItems());
 
-    const checkedArr = gridView.getCheckedItems();
-    for (let i = 0; i < checkedArr.length; i++) {
-      dataProvider.removeRow(checkedArr[i]);
-    }
+    const checkedArr = gridView.getCheckedRows();
+    console.log(checkedArr);
+    dataProvider.removeRows(checkedArr);
+
     emit("allStateRows", dataProvider.getAllStateRows());
 
-    // if (checkedArr.length != 0) {
-    //   emit("updatedRowData", updatedrowData.value);
-    // }
+    if (checkedArr.length != 0) {
+      emit("updatedRowData", updatedrowData.value);
+    }
+
     updatedrowData.value = [...dataProvider.getJsonRows()];
     const curr = gridView.getCurrent();
     selectedRowData.value = dataProvider.getRows()[curr.dataRow];
@@ -2886,6 +2989,23 @@ watch(
       const currRowState2 = dataProvider.getRowState(curr.dataRow);
       emit("sendRowState", currRowState2);
     }
+    // for (let i = 0; i < checkedArr.length; i++) {
+    //   dataProvider.removeRow(checkedArr[i]);
+    // }
+    // emit("allStateRows", dataProvider.getAllStateRows());
+
+    // if (checkedArr.length != 0) {
+    //   emit("updatedRowData", updatedrowData.value);
+    // }
+    // updatedrowData.value = [...dataProvider.getJsonRows()];
+    // const curr = gridView.getCurrent();
+    // selectedRowData.value = dataProvider.getRows()[curr.dataRow];
+    // if (curr.dataRow > -1) {
+    //   emit("updatedRowData", updatedrowData.value);
+    //   emit("clickedRowData", selectedRowData.value);
+    //   const currRowState2 = dataProvider.getRowState(curr.dataRow);
+    //   emit("sendRowState", currRowState2);
+    // }
 
     // gridView.commit();
     // const curr = gridView.getCurrent(); // gridView 가뭔지  dataProvider 가 뭔지 개념을 설명

@@ -235,6 +235,7 @@ onMounted(() => {
     selectedStartDate.value = "";
     selectedEndDate.value = "";
   }
+  //console.log(selectedStartDate.value);
   emit("startDate", selectedStartDate.value);
   emit("endDate", selectedEndDate.value);
   emit(

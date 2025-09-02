@@ -281,8 +281,10 @@
               :rowData="rowData1"
               @clickedRowData="clickedRowData"
               @updatedRowData="updatedRowData3"
+              @sendRowState="sendRowState"
               :changeRow="changeRow"
-              :changeNow="changeNow"
+              :changeNow2="changeNow"
+              :changeNow="changeNow3"
               :changeColid="changeColid"
               :changeValue2="changeValue"
               :searchWord3="searchword1"
@@ -290,7 +292,7 @@
               :labelsData="labelData"
               :valuesData="valueData"
               :searchColId="'lngCode,strName'"
-              :deleteRow="deleterow1"
+              :deleteRow6="deleterow1"
               :addRow3="addrow1"
               @selectedIndex2="selectedIndex"
               @realgridname="realgridname"
@@ -326,12 +328,14 @@
               :rowData="rowData3"
               @clickedRowData="clickedRowData2"
               @updatedRowData="updatedRowData6"
-              :deleteRow="deleterow2"
+              :deleteRow6="deleterow2"
               :searchColId="'lngCode,strName'"
               :searchWord3="searchword2"
               :changeRow="changeRow2"
               :changeValue2="changeValue2"
-              :changeNow="changeNow2"
+              :changeNow2="changeNow2"
+              :changeNow="changeNow4"
+              @sendRowState="sendRowState2"
               :changeColid="changeColid"
               :addRow3="addrow3"
               @selectedIndex2="selectedIndex2"
@@ -360,7 +364,7 @@
                 name="lngCode"
                 class="border border-gray-300 rounded-lg w-full h-full p-2"
                 v-model="optionCd"
-                :disabled="!(isNewColumn && clickrowData1)"
+                :disabled="!isNewColumn"
                 @input="changeOptionManage1" />
             </div>
             <div
@@ -464,7 +468,7 @@
                 class="border border-gray-300 rounded-lg w-full h-full p-2"
                 name="lngCode"
                 v-model="optionGroupCd"
-                :disabled="!isNewColumn2 || !clickrowData2"
+                :disabled="!isNewColumn2"
                 @input="changeOptionManage2" />
             </div>
             <div
@@ -790,7 +794,12 @@ const clickedRowData = (newValue) => {
     return;
   }
   selectedOptionCd.value = Number(newValue[0]);
-  isNewColumn.value = newValue[26] == true ? true : false;
+  if (currState.value == "created") {
+    isNewColumn.value = true;
+  } else {
+    isNewColumn.value = false;
+  }
+  // isNewColumn.value = newValue[26] == true ? true : false;
   filteredrowData2.value = [];
   for (var i = 0; i < 21; i++) {
     if (newValue[4 + i] != "0") {
@@ -826,7 +835,12 @@ const clickedRowData2 = (newValue) => {
   }
   clickrowData2.value = true;
   selectedOptionGroupCd.value = newValue[0];
-  isNewColumn2.value = newValue[23] == true ? true : false;
+  if (currState2.value == "created") {
+    isNewColumn2.value = true;
+  } else {
+    isNewColumn2.value = false;
+  }
+  //isNewColumn2.value = newValue[23] == true ? true : false;
   filteredrowData4.value = [];
   for (var i = 0; i < 20; i++) {
     if (newValue[2 + i] != "0") {
@@ -1394,6 +1408,7 @@ const changeValue2 = ref("");
 const changeRow = ref(0);
 const changeNow = ref(false);
 const changeNow2 = ref(false);
+const changeNow4 = ref(false);
 const changeOptionManage1 = (e) => {
   changeColid.value = e.target.name;
   changeValue.value = e.target.value;
@@ -1987,6 +2002,7 @@ const clickaddMenu2 = (newValue) => {
  * 행 더블 클릭시 작동 함수
  */
 
+const changeNow3 = ref(false);
 const dblclickedRowData = (newValue) => {
   //comsole.log(newValue);
   const a = updatedRowData4.value.find(
@@ -2002,7 +2018,7 @@ const dblclickedRowData = (newValue) => {
   }
 
   changeValue.value = newValue[2];
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
   // const rollbackdata = [...filteredrowData2.value];
   // filteredrowData2.value = [];
   // //comsole.log(a);
@@ -2067,7 +2083,7 @@ const dblclickedRowData2 = (newValue) => {
   }
 
   changeValue2.value = newValue[0];
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   closeMenus2();
 };
@@ -2128,6 +2144,16 @@ const handleinitAll = (newvalue) => {
   searchword1.value = "";
   searchword3.value = "";
   afterSearch.value = false;
+};
+
+const currState = ref("");
+const sendRowState = (e) => {
+  currState.value = e;
+};
+
+const currState2 = ref("");
+const sendRowState2 = (e) => {
+  currState2.value = e;
 };
 </script>
 

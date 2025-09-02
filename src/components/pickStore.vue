@@ -1,6 +1,6 @@
 <template>
-  <div class="flex justify-center md:justify-end text-base mt-2">
-    <div class="items-center font-bold hidden md:flex ml-12 text-nowrap">
+  <div class="flex justify-center md:justify-end text-base mt-2 ml-12">
+    <div class="items-center font-bold hidden md:flex text-nowrap">
       {{ MainName }}
     </div>
     <div v-show="hideit2">
@@ -8,7 +8,7 @@
         :disabled="isDisabled"
         v-model="selectedGroupCd"
         id="storeGroup"
-        class="hidden md:inline-block border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="hidden md:inline-block border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-32"
         @change="emitStoreGroup($event.target.value)">
         <option
           :value="item.lngStoreGroup"
@@ -21,7 +21,7 @@
     <div v-show="hideit3">
       <select
         :disabled="isDisabled"
-        class="hidden md:inline-block border border-gray-800 rounded-md p-2 ml-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="hidden md:inline-block border border-gray-800 rounded-md p-2 ml-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-20"
         @change="
           setStore($event.target.value);
           emitStoreType($event.target.value);
@@ -39,7 +39,7 @@
     <div class="w-full md:w-auto" v-show="hideit">
       <select
         :disabled="isDisabled"
-        class="w-full md:w-auto border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="w-60 border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         v-model="selectedStoreCode"
         @change="
           emitStoreCode($event.target.value);
@@ -311,6 +311,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  defaultStoreType2: {
+    type: Boolean,
+    default: false,
+  },
   hidebyLngCommonMenu: {
     type: Boolean,
     default: false,
@@ -318,6 +322,10 @@ const props = defineProps({
   defaultStoreType: {
     type: String,
     default: "전체",
+  },
+  disabledAll: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -461,6 +469,12 @@ onMounted(() => {
   } else {
     selectedStoreCode.value = store.state.userData.lngPosition;
   }
+
+  if (props.defaultStoreType2 == true) {
+    selectedStoreType.value = 0;
+  } else {
+    selectedStoreType.value = store.state.userData.lngJoinType;
+  }
   emit("update:storeGroup", store.state.userData.lngStoreGroup);
   emit("update:storeType", store.state.userData.lngJoinType);
   emit("update:storeCd", selectedStoreCode.value);
@@ -481,6 +495,9 @@ onMounted(() => {
     isDisabled.value = true;
   }
 
+  if (props.disabledAll == true) {
+    isDisabled.value = true;
+  }
   // if (props.hidebyLngCommonMenu == true) {
   //   if (store.state.userData.lngCommonMenu == "1") {
   //     hideit.value = false;

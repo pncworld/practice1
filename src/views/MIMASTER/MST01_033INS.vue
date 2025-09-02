@@ -947,7 +947,7 @@
             <div class="flex justify-center items-center">
               <img
                 :src="`http://www.pncoffice.com:8085/MenuImage/Image/${fileName}?v=${Date.now()}`"
-                @error="handleImageError"
+                @error="`../../assets/noimage2.png`"
                 class="w-[80%] h-[80%]" />
             </div>
             <div class="grid grid-rows-[1fr,5fr] grid-cols-[1fr,5fr] border">
@@ -2266,9 +2266,9 @@ const downloadFile = async () => {
   }
 };
 
-const handleImageError = (e) => {
-  e.target.src = "http://211.238.145.30:8085/images/noimage2.png";
-};
+// const handleImageError = (e) => {
+//   e.target.src = "http://211.238.145.30:8085/images/noimage2.png";
+// };
 
 const disabledKPG = ref(true);
 const disableKPG = (e) => {

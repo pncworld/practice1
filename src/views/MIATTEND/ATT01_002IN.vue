@@ -175,11 +175,8 @@ import { onMounted, ref } from "vue";
  */
 
 import {
-  deleteRole,
   deleteWorkLocation,
-  getRoleList,
   getWorkLocation,
-  saveRole,
   saveWorkLocation,
 } from "@/api/miattend";
 import { useStore } from "vuex";

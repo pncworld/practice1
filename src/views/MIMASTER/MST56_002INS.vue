@@ -1,179 +1,156 @@
 <!-- /*--############################################################################
-# Filename : categoryManage.vue                                                  
-# Description : 모바일 >  카테고리 관리                        
-# Date :2025-06-30                                                           
-# Author : 권맑음                     
+# Filename : MST56_002INS.vue                                                  
+# Description : 마스터관리 > 품절관리 > 메뉴품절관리.             #
+#Date :2025-08-25                                                              #
+#Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <div class="h-full w-full" @click="resetScreen">
-    <div class="h-[15vh] w-full"></div>
-    <!-- <div
-        class="relative h-[7vh] text-sm font-medium w-full bg-white grid grid-rows-1 grid-cols-[0.5fr,0.8fr,1.2fr,1.2fr,1fr] items-center">
-        <div class="font-semibold text-nowrap">일자</div>
-        <div class="font-semibold text-nowrap">객수/조수</div>
-        <div class="font-semibold text-nowrap">총매출</div>
-        <div class="font-semibold text-nowrap">실매출</div>
-        <div class="font-semibold text-nowrap">할인액</div>
+  <div class="" @click="handleParentClick">
+    <div class="flex justify-between items-center w-full overflow-y-hidden">
+      <PageName></PageName>
+      <!-- <div class="flex justify-center mr-9 space-x-2 pr-5">
+        <button @click="searchButton" class="button search md:w-auto w-14">
+          조회
+        </button>
+        <button @click="excelButton" class="button save w-auto excel">
+          엑셀
+        </button>
       </div> -->
-    <!-- <div v-for="i in rowData" class="bg-gray-300">
-        <div
-          :class="i.dtmDate.includes('[') ? 'bg-gray-300 text-xs' : 'bg-blue-50'"
-          class="grid grid-rows-1 grid-cols-[0.5fr,0.8fr,1.2fr,1.2fr,1fr] h-[7vh] justify-center items-center font-medium text-xs">
-          <div class="flex justify-start pl-[10%]">{{ i.dtmDate }}</div>
-          <div class="flex justify-center">
-            {{ i.lngCustCnt }}/{{ i.lngRecCnt }}
-          </div>
-          <div class="flex justify-end">{{ i.lngSalAmt }}</div>
-          <div class="flex justify-end">{{ i.lngActAmt }}</div>
-          <div class="flex justify-end pr-[10%]">{{ i.lngDiscountAmt }}</div>
-        </div>
-      </div> -->
-    <div class="flex justify-center items-center mt-2 w-full">
+      <button class="button search" @click="searchButton">조회</button>
+    </div>
+  </div>
+
+  <div
+    class="flex flex-col bg-gray-200 rounded-lg items-start justify-start h-24">
+    <CategorySelect
+      @click.stop
+      class=""
+      :changeState="changeState"
+      :reSearch="reSearch"
+      @MAINCATEGORY="MAINCATEGORY"
+      @SUBCATEGORY="SUBCATEGORY"
+      @STORE_CD="STORE_CD">
+    </CategorySelect>
+
+    <div class="flex space-x-5 ml-12 mt-2">
       <div
-        class="grid grid-rows-2 grid-cols-[1fr,1fr,1fr,3fr] text-sm w-[95vw] h-[15vh]">
-        <!-- <div
-            class="bg-gray-200 flex justify-center border-l border-t border-black items-center">
-            카테고리명
-          </div> -->
-        <div
-          v-if="!FirstSearch"
-          class="border-l border-t border-r border-black flex justify-center pl-2 text-lg items-center overflow-hidden col-span-4 bg-green-200">
-          카테고리를 먼저 선택해주세요. ↗
-        </div>
-        <div
-          v-if="FirstSearch"
-          class="border-l border-t border-black border-r flex justify-center pl-2 text-lg items-center overflow-hidden col-span-4 bg-green-200">
-          {{ category }} <span class="text-xl pl-2 pr-2">></span> {{ cond1 }}
-        </div>
+        class="bg-gray-200 flex justify-center text-base font-semibold items-center">
+        판매상태
+      </div>
+      <div class="flex justify-center p-1 text-lg items-center space-x-10">
+        <select
+          name=""
+          id=""
+          class="border border-black w-36 h-7"
+          v-model="scond">
+          <option value="9">전체</option>
+          <option value="0">판매중</option>
+          <option value="1">당일품절</option>
+          <option value="2">계속품절</option>
+        </select>
+      </div>
 
+      <div class="flex space-x-5">
         <div
-          class="bg-gray-200 flex justify-center border-l border-t border-b border-black items-center">
-          판매상태
-        </div>
-        <div
-          class="border-l border-t border-b border-black flex justify-center p-1 text-lg items-center space-x-10">
-          <select name="" id="" class="border border-black" v-model="scond">
-            <option value="9">전체</option>
-            <option value="0">판매중</option>
-            <option value="1">당일품절</option>
-            <option value="2">계속품절</option>
-          </select>
-        </div>
-
-        <div
-          class="bg-gray-200 flex justify-center border-l border-t border-b border-black items-center">
+          class="bg-gray-200 flex justify-center items-center text-base font-semibold">
           메뉴명
         </div>
-        <div
-          class="border-l border-t border-b border-r border-black flex justify-start pl-2 text-lg items-center">
+        <div class="flex justify-start pl-2 text-lg items-center">
           <input
             type="text"
-            class="border border-black w-[90%]"
+            class="border border-black w-36 h-7"
             v-model="scond2" />
         </div>
       </div>
     </div>
-    <div class="flex justify-between pr-2 mt-2 items-center">
-      <label for="allcheck" class="pl-3"
-        ><input
-          type="checkbox"
-          id="allcheck"
-          @click="allCheck" />전체선택</label
-      >
-      <button class="button search" @click="searchButton">조회</button>
-    </div>
-    <div class="flex justify-center items-center mt-2">
-      <div
-        class="w-[95vw] h-10 grid grid-rows-none auto-rows-auto grid-cols-[1fr,2fr,4fr,1.6fr,1.5fr]">
-        <div
-          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
-          선택
-        </div>
-        <div
-          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
-          메뉴코드
-        </div>
-        <div
-          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
-          메뉴명
-        </div>
-        <div
-          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
-          단가
-        </div>
-        <div
-          class="border-l border-t border-b bg-sky-200 border-r border-black flex justify-center items-center h-8">
-          판매상태
-        </div>
+  </div>
 
-        <template v-for="(menu, idx) in menuList" :key="idx">
-          <div
-            class="border-l border-t bg-sky-50 border-black flex justify-center h-auto"
-            :class="{
-              'border-b': idx == menuList.length - 1,
-              'bg-red-300': ischecked(menu.MENU_CD),
-            }">
-            <input type="checkbox" @change="toggleSelection(menu.MENU_CD)" />
-          </div>
-          <div
-            class="border-l border-t bg-sky-50 border-black h-auto flex items-center"
-            :class="{
-              'border-b': idx == menuList.length - 1,
-              'bg-red-300': ischecked(menu.MENU_CD),
-            }">
-            {{ menu.MENU_CD }}
-          </div>
-          <div
-            class="border-l border-t bg-sky-50 border-black flex h-auto whitespace-normal items-center"
-            :class="{
-              'border-b': idx == menuList.length - 1,
-              'bg-red-300': ischecked(menu.MENU_CD),
-              'items-center min-h-10': wordLength(menu.MENU_NAME),
-            }">
-            <div class="whitespace-normal break-words leading-snug w-full">
-              {{ menu.MENU_NAME }}
-            </div>
-          </div>
-          <div
-            class="border-l border-t bg-sky-50 border-black flex h-auto justify-end items-center"
-            :class="{
-              'border-b': idx == menuList.length - 1,
-              'bg-red-300': ischecked(menu.MENU_CD),
-            }">
-            {{ formatNumberWithCommas(menu.MENU_PRICE) }}
-          </div>
-          <div
-            class="border-l border-t border-r bg-sky-50 border-black h-auto flex items-center"
-            :class="{
-              'border-b': idx == menuList.length - 1,
-              'bg-red-300': ischecked(menu.MENU_CD),
-              'text-red-500':
-                menu.MENU_STATUS.includes(1) || menu.MENU_STATUS.includes(2),
-            }">
-            {{
-              menu.MENU_STATUS == "1"
-                ? "당일품절"
-                : menu.MENU_STATUS == "2"
-                ? "계속품절"
-                : "판매중"
-            }}
-          </div>
-        </template>
-        <div class="!h-[20vh] w-full bg-gray-100"></div>
+  <div class="flex justify-between pr-2 mt-2 items-center">
+    <label for="allcheck" class="pl-3"
+      ><input type="checkbox" id="allcheck" @click="allCheck" />전체선택</label
+    >
+  </div>
+  <div class="flex justify-center items-center mt-2">
+    <div
+      class="w-[95vw] h-10 grid grid-rows-none auto-rows-auto grid-cols-[1fr,2fr,4fr,1.6fr,1.5fr]">
+      <div
+        class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
+        선택
       </div>
+      <div
+        class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
+        메뉴코드
+      </div>
+      <div
+        class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
+        메뉴명
+      </div>
+      <div
+        class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
+        단가
+      </div>
+      <div
+        class="border-l border-t border-b bg-sky-200 border-r border-black flex justify-center items-center h-8">
+        판매상태
+      </div>
+
+      <template v-for="(menu, idx) in menuList" :key="idx">
+        <div
+          class="border-l border-t bg-sky-50 border-black flex justify-center h-auto"
+          :class="{
+            'border-b': idx == menuList.length - 1,
+            'bg-red-300': ischecked(menu.MENU_CD),
+          }">
+          <input type="checkbox" @change="toggleSelection(menu.MENU_CD)" />
+        </div>
+        <div
+          class="border-l border-t bg-sky-50 border-black h-auto flex items-center"
+          :class="{
+            'border-b': idx == menuList.length - 1,
+            'bg-red-300': ischecked(menu.MENU_CD),
+          }">
+          {{ menu.MENU_CD }}
+        </div>
+        <div
+          class="border-l border-t bg-sky-50 border-black flex h-auto whitespace-normal items-center"
+          :class="{
+            'border-b': idx == menuList.length - 1,
+            'bg-red-300': ischecked(menu.MENU_CD),
+            'items-center min-h-10': wordLength(menu.MENU_NAME),
+          }">
+          <div class="whitespace-normal break-words leading-snug w-full">
+            {{ menu.MENU_NAME }}
+          </div>
+        </div>
+        <div
+          class="border-l border-t bg-sky-50 border-black flex h-auto justify-end items-center"
+          :class="{
+            'border-b': idx == menuList.length - 1,
+            'bg-red-300': ischecked(menu.MENU_CD),
+          }">
+          {{ formatNumberWithCommas(menu.MENU_PRICE) }}
+        </div>
+        <div
+          class="border-l border-t border-r bg-sky-50 border-black h-auto flex items-center"
+          :class="{
+            'border-b': idx == menuList.length - 1,
+            'bg-red-300': ischecked(menu.MENU_CD),
+            'text-red-500':
+              menu.MENU_STATUS.includes(1) || menu.MENU_STATUS.includes(2),
+          }">
+          {{
+            menu.MENU_STATUS == "1"
+              ? "당일품절"
+              : menu.MENU_STATUS == "2"
+              ? "계속품절"
+              : "판매중"
+          }}
+        </div>
+      </template>
+      <!-- <div class="!h-[20vh] w-full bg-gray-100"></div> -->
     </div>
   </div>
 
-  <CategorySelect
-    @click.stop
-    class="z-[10]"
-    :changeState="changeState"
-    :reSearch="reSearch"
-    @currState="currState"
-    @FILTERDATA="FILTERDATA"
-    @mainCategory="mainCategory"
-    @GROUP_CD="GROUP_CD"
-    @STORE_CD="STORE_CD"></CategorySelect>
   <div
     class="fixed bottom-[11vh] w-full h-10 text-white font-bold"
     v-if="showSave">
@@ -215,7 +192,7 @@
         >
       </div>
       <div
-        class="flex justify-center items-center border-l border-t border-white bg-white">
+        class="flex justify-start items-center border-l border-t border-white bg-white">
         <button class="button save" @click="saveButton">저장</button>
       </div>
     </div>
@@ -248,7 +225,8 @@ import { GetMenuStkInfo, SetMenuStkRgst } from "@/api/etc";
 import { formatNumberWithCommas } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
 import { useStore } from "vuex";
-import CategorySelect from "../component/categorySelect.vue";
+import CategorySelect from "@/components/categorySelect.vue";
+import PageName from "@/components/pageName.vue";
 
 const store = useStore();
 const changeState = ref(true);
@@ -273,11 +251,23 @@ const selectStoreCd = ref("");
  * 선택한 매출 종료일자
  */
 
-const GROUP_CD = (e) => {
-  selectGroupCd.value = e;
-};
+const GROUP_CD = (e) => {};
 const STORE_CD = (e) => {
-  selectStoreCd.value = e;
+  selectGroupCd.value = e.GROUP_CD;
+  selectStoreCd.value = e.STORE_CD;
+  console.log(e);
+};
+
+const mainCategory = ref("");
+const subCategory = ref("");
+const MAINCATEGORY = (e) => {
+  console.log(e);
+  mainCategory.value = e;
+};
+
+const SUBCATEGORY = (e) => {
+  console.log(e);
+  subCategory.value = e;
 };
 
 const menuList = ref([]);
@@ -306,7 +296,6 @@ const FILTERDATA = (e) => {
   });
   menuList.value = [];
   showSave.value = false;
-
   LCLASS_CD.value = e[0].LCLASS_CD;
   SCLASS_CD.value = e[0].SCLASS_CD;
   cond1.value = e[0].FULL_NM;
@@ -399,9 +388,7 @@ const saveButton = async (e) => {
 };
 
 const category = ref("");
-const mainCategory = (e) => {
-  category.value = e;
-};
+
 const FirstSearch = ref(false);
 const selectedLeng = ref("");
 const tempcheckedList = ref([]);
@@ -443,14 +430,6 @@ const scond = ref(9);
 const scond2 = ref("");
 const salecond = ref("0");
 const searchButton = async () => {
-  if (FirstSearch.value == false) {
-    Swal.fire({
-      title: "카테고리를 먼저 선택해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
   if (showSave.value == true) {
     await Swal.fire({
       title: "변경하신 사항이 존재합니다. 저장하시겠습니까?",
@@ -470,8 +449,8 @@ const searchButton = async () => {
     const res = await GetMenuStkInfo(
       selectGroupCd.value,
       selectStoreCd.value,
-      LCLASS_CD.value,
-      SCLASS_CD.value,
+      mainCategory.value,
+      subCategory.value,
       scond.value,
       scond2.value
     );
