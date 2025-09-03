@@ -22,8 +22,8 @@ app.get(/^\/.*$/, (req, res) => {
 });
 
 const options = {
-  key: fs.readFileSync("C:/PNCOFFICEAI/ssl/www.pncoffice.co.kr.key"), // 개인키 경로
-  cert: fs.readFileSync("C:/PNCOFFICEAI/ssl/www.pncoffice.co.kr.crt"), // 인증서 경로
+  key: fs.readFileSync("/home/pncworld/pncoffice/ssl/www.pncoffice.co.kr.key"),
+  cert: fs.readFileSync("/home/pncworld/pncoffice/ssl/www.pncoffice.co.kr.crt"),
 };
 
 https.createServer(options, app).listen(443, () => {
