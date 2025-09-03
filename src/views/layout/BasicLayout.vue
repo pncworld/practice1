@@ -225,7 +225,7 @@ const closeOtherTab = () => {
 const route = useRoute();
 const store = useStore();
 const userData = computed(() => store.state.userData);
-const strLogoUrl = computed(() => userData.value.strLogoUrl); // .split(".net")[1]
+const strLogoUrl = computed(() => userData.value.strLogoUrl.split(".net")[1]); // .split(".net")[1]
 const mobileShowMenu = ref(false);
 const showMenu = ref(route.path != "/"); // Initialize based on current route
 const componentKey = ref(null);

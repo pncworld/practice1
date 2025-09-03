@@ -227,3 +227,79 @@ export const getStockDailyList = (
     SHOW_TYPE: showtype,
   });
 };
+
+export const getDailyInventoryList = (
+  groupCd,
+  storeCd,
+  category,
+  sdate,
+  edate,
+  opt
+) => {
+  return api2.post("/MISTOCK/STK07_025RPT.asmx/getDailyInventoryList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    CATE: category,
+    SDATE: sdate,
+    EDATE: edate,
+    OPT: opt,
+  });
+};
+
+export const getStockMonthlyInOutList = (
+  groupCd,
+  storeCd,
+  date,
+  cond,
+  cond2,
+  cond3,
+  barcode,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  stockid,
+  reporttype
+) => {
+  return api2.post("/MISTOCK/STK08_008RPT.asmx/getStockMonthlyInOutList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    CATE: cond,
+    GROUP: cond2,
+    GENERIC: cond3,
+    BARCODE: barcode,
+    UNITTYPE: cond4,
+    UNITPRICE: cond5,
+    SHOWTYPE: cond6,
+    STOCK_ID: cond7,
+    STOCK_NM: cond8,
+    SUPPLE_ID: stockid,
+    REPORT_TYPE: reporttype,
+  });
+};
+
+export const getMonthCloseList = (groupCd, storeCd, date) => {
+  return api2.post("/MISTOCK/STK08_021MAN.asmx/getMonthCloseList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+  });
+};
+
+export const saveMonthCloseUpdate = (
+  groupCd,
+  storeCds,
+  date,
+  checkbln,
+  seq
+) => {
+  return api2.post("/MISTOCK/STK08_021MAN.asmx/saveMonthCloseUpdate", {
+    GROUP_CD: groupCd,
+    STORE_CDS: storeCds,
+    DATE: date,
+    CHECKBLNS: checkbln,
+    SEQ: seq,
+  });
+};

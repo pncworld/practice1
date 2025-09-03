@@ -946,7 +946,7 @@
             class="grid grid-rows-1 grid-cols-[2fr,3fr] w-[80%] h-[40%] ml-10 mt-10 border pl-5">
             <div class="flex justify-center items-center">
               <img
-                :src="`http://www.pncoffice.com:8085/MenuImage/Image/${fileName}?v=${Date.now()}`"
+                :src="`https://www.pncapi.kr/MenuImage/Image/${fileName}?v=${Date.now()}`"
                 @error="`../../assets/noimage2.png`"
                 class="w-[80%] h-[80%]" />
             </div>
@@ -1403,7 +1403,7 @@ const clickedRowData = async (newvalue) => {
   }
   try {
     const response = await axios.get(
-      `http://www.pncoffice.com:8085/MenuImage/Image/${fileName.value}`
+      `https://www.pncapi.kr/MenuImage/Image/${fileName.value}`
     );
     await nextTick();
     //comsole.log(response);
@@ -2239,7 +2239,7 @@ const downloadFile = async () => {
   //console.log(store.state.StoreToken);
   try {
     const response = await axios.get(
-      `http://www.pncoffice.com:8085/MenuImage/Image/${fileName.value}`,
+      `https://www.pncapi.kr/MenuImage/Image/${fileName.value}`,
       {
         responseType: "blob", // 응답을 Blob 형태로 받음
       }

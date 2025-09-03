@@ -986,6 +986,11 @@ const props = defineProps({
     type: Array,
     default: [],
   },
+  checkOnlyFalse: {
+    // 체크박스 해제만 되는 설정
+    type: Boolean,
+    default: false,
+  },
 });
 
 // 2구간
@@ -1166,7 +1171,7 @@ const funcshowGrid = async () => {
     },
     styleCallback: function (grid, dataCell) {
       var ret = {};
-      console.log(item.strColID);
+      //console.log(item.strColID);
       ret.style = { color: "#FF0000" };
       return ret;
     },
@@ -2165,9 +2170,9 @@ const funcshowGrid = async () => {
         }
       }
     }
-    // //console.log(field);
-    // //console.log(grid);
-    // //console.log(row);
+    if (props.checkOnlyFalse == true) {
+      dataProvider.setValue(row, "Selected", false);
+    }
 
     updatedrowData.value = [...dataProvider.getJsonRows()];
     emit("updatedRowData", updatedrowData.value);

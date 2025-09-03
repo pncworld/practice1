@@ -7,14 +7,15 @@ const path = require("path");
 const app = express();
 
 app.use(express.static(path.join(__dirname, "dist")));
-// Vue dist 폴더 서비스
-// app.use(
-//   createProxyMiddleware({
-//     target: "http://www.pncoffice.com:8085",
-//     changeOrigin: true,
-//     secure: false,
-//   })
-// );
+// 로고 폴더 서비스
+app.use(
+  "/image",
+  createProxyMiddleware({
+    target: "http://www.pncoffice.net/",
+    changeOrigin: true,
+    secure: false,
+  })
+);
 
 app.get(/^\/.*$/, (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));

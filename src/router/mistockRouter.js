@@ -1,5 +1,7 @@
 import STK05_018RPT from "@/views/MISTOCK/STK05_018RPT.vue";
 import STK07_025RPT from "@/views/MISTOCK/STK07_025RPT.vue";
+import STK08_008RPT from "@/views/MISTOCK/STK08_008RPT.vue";
+import STK08_021MAN from "@/views/MISTOCK/STK08_021MAN.vue";
 import STKN06_012INS from "@/views/MISTOCK/STKN06_012INS.vue";
 import STKN06_016RPT from "@/views/MISTOCK/STKN06_016RPT.vue";
 import STKN07_012RPT from "@/views/MISTOCK/STKN07_012RPT.vue";
@@ -35,6 +37,14 @@ export default function mistockRouter() {
     {
       path: "STK07_025RPT.xml",
       component: STK07_025RPT,
+    },
+    {
+      path: "STK08_008RPT.xml",
+      component: STK08_008RPT,
+    },
+    {
+      path: "STK08_021MAN.xml",
+      component: STK08_021MAN,
     },
   ];
 }
