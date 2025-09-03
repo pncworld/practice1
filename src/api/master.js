@@ -311,7 +311,7 @@ export const setMainCategoryDELETE = (
   majorCd,
   subCd
 ) => {
-  return api2.post("/MIMASTER/MST57_001INS.asmx/setMainCategoryDELETE", {
+  return api2.post("/MIMASTER/MST57_001INS.asmx/setMainCategoryDelete", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     AREA_CD: areaCd,
@@ -338,6 +338,8 @@ export const setMainCategoryUpdate = (
   areaCd,
   majorCd,
   majorNm,
+  subCd,
+  subNm,
   langId
 ) => {
   return api2.post("/MIMASTER/MST57_001INS.asmx/setMainCategoryUpdate", {
@@ -346,6 +348,8 @@ export const setMainCategoryUpdate = (
     AREA_CD: areaCd,
     MAJOR_CD: majorCd,
     MAJOR_NM: majorNm,
+    SUB_CD: subCd,
+    SUB_NM: subNm,
     LANGUAGE_ID: langId,
   });
 };
@@ -355,14 +359,18 @@ export const setMainCategoryINSERT = (
   areaCd,
   majorCd,
   majorNm,
+  subCd,
+  subNm,
   langId
 ) => {
-  return api2.post("/MIMASTER/MST57_001INS.asmx/setMainCategoryINSERT", {
+  return api2.post("/MIMASTER/MST57_001INS.asmx/setMainCategoryInsert", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     AREA_CD: areaCd,
     MAJOR_CD: majorCd,
     MAJOR_NM: majorNm,
+    SUB_CD: subCd,
+    SUB_NM: subNm,
     LANGUAGE_ID: langId,
   });
 };
@@ -372,15 +380,17 @@ export const setSubCategoryINSERT = (
   storeCd,
   areaCd,
   majorCd,
+  majorNm,
   subCd,
   subNm,
   langId
 ) => {
-  return api2.post("/MIMASTER/MST57_001INS.asmx/setSubCategoryINSERT", {
+  return api2.post("/MIMASTER/MST57_001INS.asmx/setSubCategoryInsert", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     AREA_CD: areaCd,
     MAJOR_CD: majorCd,
+    MAJOR_NM: majorNm,
     SUB_CD: subCd,
     SUB_NM: subNm,
     LANGUAGE_ID: langId,
@@ -391,15 +401,17 @@ export const setSubCategoryUPDATE = (
   storeCd,
   areaCd,
   majorCd,
+  majorNm,
   subCd,
   subNm,
   langId
 ) => {
-  return api2.post("/MIMASTER/MST57_001INS.asmx/setSubCategoryUPDATE", {
+  return api2.post("/MIMASTER/MST57_001INS.asmx/setSubCategoryUpdate", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     AREA_CD: areaCd,
     MAJOR_CD: majorCd,
+    MAJOR_NM: majorNm,
     SUB_CD: subCd,
     SUB_NM: subNm,
     LANGUAGE_ID: langId,
@@ -2718,6 +2730,71 @@ export const deleteOptionGroup = (groupCd, storecd, cond) => {
   });
 };
 
+export const getMaterialUnit = (groupCd) => {
+  return api2.post("/MIMASTER/MST45_033INS.asmx/getMaterialUnit", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const saveMaterialUnit = (
+  groupCd,
+  lngUnitID,
+  strUnitName,
+  groupCds,
+  dlngUnitID
+) => {
+  return api2.post("/MIMASTER/MST45_033INS.asmx/saveMaterialUnit", {
+    GROUP_CD  : groupCd,
+    UNIT_ID   : lngUnitID,
+    UNIT_NM   : strUnitName,
+    GROUP_CDS : groupCds,
+    D_UNIT_ID : dlngUnitID
+  });
+};
+
+export const getMaterialGroup = (groupCd) => {
+  return api2.post("/MIMASTER/MST04_026INS.asmx/getMaterialGroup", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const saveMaterialGroup = (
+  groupCd,
+  lngStockGroupID,
+  strStockGroupName,
+  groupCds,
+  dlngStockGroupID
+) => {
+  return api2.post("/MIMASTER/MST04_026INS.asmx/saveMaterialGroup", {
+    GROUP_CD      : groupCd,
+    ST_GROUP_ID   : lngStockGroupID,
+    ST_GROUP_NM   : strStockGroupName,
+    GROUP_CDS     : groupCds,
+    D_GROUP_ID    : dlngStockGroupID
+  });
+};
+
+export const getStandard = (groupCd) => {
+  return api2.post("/MIMASTER/MST45_051INS.asmx/getStandard", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const saveStandard = (
+  groupCd,
+  lngStandardID,
+  strStandardName,
+  groupCds,
+  dlngStandardID
+) => {
+  return api2.post("/MIMASTER/MST45_051INS.asmx/saveStandard", {
+    GROUP_CD      : groupCd,
+    ST_GROUP_ID   : lngStandardID,
+    ST_GROUP_NM   : strStandardName,
+    GROUP_CDS     : groupCds,
+    D_GROUP_ID    : dlngStandardID
+  });
+};
 export const getLossType = async (groupCd, lang) => {
   return api2.post("/MIMASTER/MST04_014INS.asmx/getLossType", {
     GROUP_CD: groupCd,
@@ -3261,6 +3338,80 @@ export const saveStockStore = async (
   });
 };
 
+export const getStockPartInfo = (groupCd) => {
+  return api2.post("/MIMASTER/MST45_031INS.asmx/getStockPartInfo", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const saveStockPartInfo = async (
+  lngstoregroup,
+  partCds,
+  strPartNames,
+  blnUseYn,
+  strRegID
+) => {
+  return api2.post("/MIMASTER/MST45_031INS.asmx/saveStockPartInfo", {
+    GROUP_CD : lngstoregroup,
+    PART_CD  : partCds,
+    PART_NM  : strPartNames,
+    USE_YN   : blnUseYn,
+    REG_ID   : strRegID
+  });
+};
+
+export const getStockStoreInfo = (groupCd, partCd) => {
+  return api2.post("/MIMASTER/MST45_031INS.asmx/getStockStoreInfo", {
+    GROUP_CD : groupCd,
+    PART_CD  : partCd
+  });
+};
+
+export const saveStockStoreInfo = async (
+  lngstoregroup,
+  partCds,
+  storeCds,
+  lngChecks,
+  strRegID
+) => {
+  return api2.post("/MIMASTER/MST45_031INS.asmx/saveStockStoreInfo", {
+    GROUP_CD : lngstoregroup,
+    PART_CD  : partCds,
+    STORE_CD : storeCds,
+    USE_YN   : lngChecks,
+    REG_ID   : strRegID
+  });
+};
+
+export const saveMajorCategory = async (
+  lngstoregroup,
+  lngstoreCode,
+  oldCateValues,
+  NewCateValues,
+) => {
+  return api2.post("/MIMASTER/MST57_001INS.asmx/saveMajorCategory", {
+    GROUP_CD : lngstoregroup,
+    STORE_CD : lngstoreCode,
+    OLD_CATE : oldCateValues,
+    NEW_CATE : NewCateValues
+  });
+};
+
+export const saveSubCategory = async (
+  lngstoregroup,
+  lngstoreCode,
+  orgCateValues,
+  oldCateValues,
+  NewCateValues,
+) => {
+  return api2.post("/MIMASTER/MST57_001INS.asmx/saveSubCategory", {
+    GROUP_CD : lngstoregroup,
+    STORE_CD : lngstoreCode,
+    ORG_CATE : orgCateValues,
+    OLD_CATE : oldCateValues,
+    NEW_CATE : NewCateValues
+  });
+};
 export const getStockCycle3 = async (groupCd, storeCd, cond) => {
   return api2.post("/MIMASTER/MST45_030INS.asmx/getStockCycle3", {
     GROUP_CD: groupCd,

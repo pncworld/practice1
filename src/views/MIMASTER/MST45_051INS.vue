@@ -1,8 +1,8 @@
 /*--############################################################################
-# Filename : MST36_003INS.vue                                                  
-# Description : 마스터관리 > 매장 마스터 > 결제그룹등록                        
-# Date :2025-05-14                                                             
-# Author : 권맑음                     
+# Filename : MST45_051INS.vue                                                  
+# Description : 마스터관리 > 자재 마스터Ⅱ > 자재 규격 등록                        
+# Date :2025-08-22                                                             
+# Author : 권지안                  
 ################################################################################*/
 <template>
   <!-- 조회 조건 -->
@@ -17,11 +17,11 @@
     </div>
     <div
       class="flex justify-start space-x-5 bg-gray-200 rounded-lg h-16 items-center mt-3">
-      <PickGroup @update:storeGroup="handleGroupCd"> </PickGroup>
+      <PickGroup @update:storeGroup="handleGroupCd" @GroupNm = "GroupNm"> </PickGroup>
     </div>
     <span class="grid grid-rows-1 grid-cols-2 mt-5">
       <div class="ml-10 flex justify-start font-bold text-xl">
-        결제그룹 정보
+        자재 규격 정보
       </div>
       <div class="flex justify-between ml-44">
         <div class="flex justify-start font-bold text-xl">상세정보</div>
@@ -37,7 +37,7 @@
       class="grid grid-rows-1 grid-cols-2 h-[65vh] w-full justify-center mt-2">
       <div class="w-[110%] ml-10 h-[65vh]">
         <Realgrid
-          :progname="'MST36_003INS_VUE'"
+          :progname="'MST45_051INS_VUE'"
           :progid="1"
           :rowData="rowData"
           @clickedRowData="clickedRowData"
@@ -48,62 +48,45 @@
           @selectedIndex="selectedIndex"
           @selcetedrowData="selcetedrowData"
           @updatedRowData="updatedRowData"
-          @allStateRows="allStateRows"
           :selectionStyle="'singleRow'"
           :addRow4="addRow"
+          @allStateRows="allStateRows"
           :deleteRow6="deleteRow"
           :addrowDefault="addrowDefault"
           @sendRowState="sendRowState"
           :addrowProp="addrowProp"
           :rowStateeditable="false"
           :addField="'new'"
-          :documentTitle="'MST36_003INS'"
+          :documentTitle="'MST45_051INS'"
           :documentSubTitle="documentSubTitle"
           :exporttoExcel="exporttoExcel"
-          :ExcelNm="'결제그룹등록'"></Realgrid>
+          :ExcelNm="'자재 규격 등록'"></Realgrid>
       </div>
       <!-- 그리드 영역 -->
       <!-- 연동 데이터 영역 -->
       <div class="grid grid-cols-[2fr,6fr] grid-rows-3 w-[70%] ml-44 h-[15%]">
-        <div
-          class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500 rounded-tl-lg">
-          *결제그룹코드
+        <div class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500 rounded-tl-lg">
+          *자재규격코드
         </div>
         <div
           class="border flex h-full items-center text-sm font-semibold justify-center rounded-tr-lg">
           <input
             type="number"
-            class="border text-sm rounded-md w-full pl-2 h-full disabled:bg-gray-200"
+            class="gridvalue1 border text-sm rounded-md w-full pl-2 h-full disabled:bg-gray-200"
             v-model="gridvalue1"
             name="gridvalue1"
             @input="changeInfo"
             :disabled="isNewColumn" />
         </div>
-        <div
-          class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100">
-          결제그룹명
+        <div class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100">
+          자재규격명
         </div>
-        <div
-          class="border flex h-full items-center text-sm font-semibold justify-center">
+        <div class="border flex h-full items-center text-sm font-semibold justify-center">
           <input
             type="text"
-            class="border text-sm rounded-md w-full pl-2 h-full disabled:bg-gray-200"
+            class="gridvalue2 border text-sm rounded-md w-full pl-2 h-full disabled:bg-gray-200"
             v-model="gridvalue2"
             name="gridvalue2"
-            @input="changeInfo"
-            :disabled="!clickrowData1" />
-        </div>
-        <div
-          class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100 rounded-bl-lg">
-          비고
-        </div>
-        <div
-          class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100 rounded-br-lg">
-          <input
-            type="text"
-            class="h-full w-full rounded-lg pl-2"
-            v-model="gridvalue3"
-            name="gridvalue3"
             @input="changeInfo"
             :disabled="!clickrowData1"  />
         </div>
@@ -114,7 +97,7 @@
 </template>
 
 <script setup>
-import { getAmountGroup, savePayGroup } from "@/api/master";
+import { getStandard, saveStandard } from "@/api/master";
 /**
  *  페이지명 자동 입력 컴포넌트
  *  */
@@ -162,7 +145,7 @@ onMounted(async () => {
 });
 const rowData = ref([]);
 const groupCd = ref();
-const storeCd = ref(0);
+
 const afterSearch = ref(false);
 
 const isNewColumn = ref(true);
@@ -175,18 +158,6 @@ const changeColid = ref();
 const changeRow = ref();
 const gridvalue1 = ref();
 const gridvalue2 = ref();
-const gridvalue3 = ref();
-const gridvalue4 = ref(false);
-const gridvalue5 = ref();
-
-const sendRowState = (e) => {
-  if (e == "created") {
-    isNewColumn.value = false;
-  } else {
-    isNewColumn.value = true;
-  }
-  // //console.log(e);
-};
 
 /**
  * 수정용 데이터 행 설정
@@ -216,6 +187,7 @@ const addButton = () => {
  */
 
 const deleteRow = ref(false);
+
 /**
  * 삭제 버튼
  */
@@ -228,8 +200,20 @@ const deleteButton = () => {
     });
     return;
   }
+  
+  /*
+  if (isNewColumn.value == false) {
+    Swal.fire({
+      title: "먼저 자재그룹코드를 생성해주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  */
+
   deleteRow.value = !deleteRow.value;
 };
+
 const disableCd = ref(false);
 /**
  * 데이터셋 상세정보 셋팅
@@ -239,17 +223,18 @@ const clickedRowData = (newValue) => {
   clickrowData1.value = true;
   gridvalue1.value = newValue[0];
   gridvalue2.value = newValue[1];
-  gridvalue3.value = newValue[2];
-  gridvalue4.value = newValue[3] == 1 ? true : false;
-  //comsole.log(newValue);
-  /*
-  if (newValue[5] == true) {
-    addNew.value = false;
-  } else {
-    addNew.value = true;
-  }
-  */
 };
+
+const sendRowState = (e) => {
+  if (e == "created") {
+    isNewColumn.value = false;
+  } else {
+    isNewColumn.value = true;
+  }
+  // //console.log(e);
+};
+
+
 /**
  * 페이지 매장 그룹 세팅
  */
@@ -259,9 +244,6 @@ const handleGroupCd = (newValue) => {
   rowData.value = [];
   gridvalue1.value = "";
   gridvalue2.value = "";
-  gridvalue3.value = "";
-  gridvalue4.value = "";
-  gridvalue5.value = "";
   addrowDefault.value = newValue;
 };
 
@@ -284,15 +266,13 @@ const changeInfo = (e) => {
   const rowValue = e.target.value;
 
   if (rowName == "gridvalue1") {
-    changeColid.value = "lngGroupCode";
+    changeColid.value = "lngStandardID";
     changeValue2.value = rowValue;
-  } else if (rowName == "gridvalue2") {
-    changeValue2.value = rowValue;
-    changeColid.value = "strGroupName";
-  } else if (rowName == "gridvalue3") {
-    changeValue2.value = rowValue;
-    changeColid.value = "strRemark";
   }
+  else if (rowName == "gridvalue2") {
+    changeColid.value = "strStandardName";
+    changeValue2.value = rowValue;
+  } 
   changeNow.value = !changeNow.value;
 };
 
@@ -300,14 +280,24 @@ const addrowDefault = ref();
 const exporttoExcel = ref(false);
 const addrowProp = ref("lngStoreGroup");
 const store = useStore();
+const documentSubTitle = ref("");
 
-/**
- * 엑셀 내보내기 함수
- */
 const allstaterows = ref([]);
 const allStateRows = (e) => {
   allstaterows.value = e;
 };
+
+
+/**
+ * 엑셀 내보내기 함수
+ */
+
+const storeGroupNm = ref();
+
+const GroupNm = (newValue) => {
+  storeGroupNm.value = newValue;
+};
+
 const excelButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -316,11 +306,7 @@ const excelButton = () => {
     });
     return;
   }
-
-  // documentSubTitle.value =
-  //   "자재코드 :" +
-  //   cond.value +
-  //   "\n"
+  documentSubTitle.value = "매장그룹 : " + storeGroupNm.value;
   exporttoExcel.value = !exporttoExcel.value;
 };
 /**
@@ -342,15 +328,13 @@ const searchButton = async () => {
     rowData.value = [];
     gridvalue1.value = "";
     gridvalue2.value = "";
-    gridvalue3.value = "";
 
     let res;
-    //comsole.log(groupCd.value);
-    res = await getAmountGroup(groupCd.value);
+    res = await getStandard(groupCd.value);
 
-    rowData.value = res.data.AMOUNTGROUP;
+    rowData.value = res.data.standardInfo;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
-    //comsole.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -380,6 +364,7 @@ const saveButton = async () => {
     allstaterows.value.created.length +
     allstaterows.value.updated.length +
     allstaterows.value.deleted.length;
+
   if (ulength == 0) {
     Swal.fire({
       title: "경고",
@@ -393,7 +378,7 @@ const saveButton = async () => {
   const validateRow = updateRow.value.filter(
     (item, index) =>
       allstaterows.value.created.includes(index) &&
-      (item.lngGroupCode == "" || item.lngGroupCode == undefined)
+      (item.lngStandardID == "" || item.lngStandardID == undefined)
   ).length;
   if (validateRow > 0) {
     Swal.fire({
@@ -406,13 +391,13 @@ const saveButton = async () => {
   }
 
   const validateRow2 =
-    new Set(updateRow.value.map((item) => item.lngGroupCode)).size ==
-    updateRow.value.map((item) => item.lngGroupCode).length;
+    new Set(updateRow.value.map((item) => item.lngStandardID)).size ==
+    updateRow.value.map((item) => item.lngStandardID).length;
 
   if (validateRow2 == false) {
     Swal.fire({
       title: "경고",
-      text: "중복된 계정코드가 존재합니다. 확인해주세요.",
+      text: "중복된 자재단위코드 존재합니다. 확인해주세요.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -430,35 +415,31 @@ const saveButton = async () => {
     if (result.isConfirmed) {
       store.state.loading = true;
       try {
+
         /**
          * 페이지 매장 그룹 세팅
          */
-        const lngGroupCode = updateRow.value
+        const lngStandardID = updateRow.value
           .filter((item, index) => !allstaterows.value.deleted.includes(index))
-          .map((item) => item.lngGroupCode);
-        const lngStoreGroup = updateRow.value
+          .map((item) => item.lngStandardID);
+        const strStandardName = updateRow.value
           .filter((item, index) => !allstaterows.value.deleted.includes(index))
-          .map((item) => item.lngStoreGroup);
-        const strGroupName = updateRow.value
+          .map((item) => item.strStandardName);
+        const groupCds = updateRow.value
           .filter((item, index) => !allstaterows.value.deleted.includes(index))
-          .map((item) => item.strGroupName);
-        const strRemark = updateRow.value
-          .filter((item, index) => !allstaterows.value.deleted.includes(index))
-          .map((item) => item.strRemark);
-
-        const dlngGroupCode = updateRow.value
+          .map(() => groupCd.value);
+        const dlngStandardID = updateRow.value
           .filter((item, index) => allstaterows.value.deleted.includes(index))
-          .map((item) => item.lngGroupCode);
+          .map((item) => item.lngStandardID);
 
-        const res = await savePayGroup(
+        const res = await saveStandard(
           groupCd.value,
-          lngStoreGroup.join(","),
-          lngGroupCode.join(","),
-          strGroupName.join(","),
-          strRemark.join(","),
-          dlngGroupCode.join(",")
+          lngStandardID.join(","),
+          strStandardName.join(","),
+          groupCds.join(","),
+          dlngStandardID.join(",")
         );
-        //comsole.log(res);
+        console.log(res);
 
         Swal.fire({
           title: "저장 되었습니다.",
@@ -477,8 +458,6 @@ const saveButton = async () => {
     }
   });
 };
-
-const documentSubTitle = ref("");
 </script>
 
 <style scoped></style>
