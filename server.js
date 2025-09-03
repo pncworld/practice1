@@ -1,6 +1,7 @@
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const express = require("express");
 const https = require("https");
+const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
@@ -29,3 +30,12 @@ const options = {
 https.createServer(options, app).listen(443, () => {
   console.log("✅ Vue 앱 HTTPS 실행 중 → https://localhost");
 });
+
+http
+  .createServer((req, res) => {
+    res.writeHead(301, { Location: "https://" + req.headers.host + req.url });
+    res.end();
+  })
+  .listen(80, () => {
+    console.log("HTTP Server running on port 80 (redirecting to HTTPS)");
+  });
