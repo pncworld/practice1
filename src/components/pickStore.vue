@@ -660,4 +660,15 @@ watch(selectedGroupCd, (newValue) => {
   emit("update:storeGroup", selectedGroupCd.value);
   emit("GroupNm", GroupNm);
 });
+
+watch(
+  () => props.disabledAll,
+  () => {
+    if (props.disabledAll == true) {
+      isDisabled.value = true;
+    } else {
+      isDisabled.value = false;
+    }
+  }
+);
 </script>

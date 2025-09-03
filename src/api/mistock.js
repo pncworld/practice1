@@ -303,3 +303,56 @@ export const saveMonthCloseUpdate = (
     SEQ: seq,
   });
 };
+
+export const getMonthCloseList2 = (groupCd, storeCd, date, lang) => {
+  return api2.post("/MISTOCK/STK09_003BAT.asmx/getMonthCloseList2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    LANG: lang,
+  });
+};
+
+export const checkPreMonthCloseStores = (groupCd, storeCd, date) => {
+  return api2.post("/MISTOCK/STK09_003BAT.asmx/checkPreMonthCloseStores", {
+    GROUP_CD: groupCd,
+    STORE_CDS: storeCd,
+    DATE: date,
+  });
+};
+
+export const saveMonthClose = (groupCd, storeCd, date, seq) => {
+  return api2.post("/MISTOCK/STK09_003BAT.asmx/saveMonthClose", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    SEQ: seq,
+  });
+};
+
+export const reserveMonthCloseStores = (groupCd, storeCd, date, seq) => {
+  return api2.post("/MISTOCK/STK09_003BAT.asmx/reserveMonthCloseStores", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    SEQ: seq,
+  });
+};
+
+export const saveTakeDailyRegister = (
+  groupCd,
+  storeCd,
+  date,
+  stockids,
+  takeqtys,
+  unittype
+) => {
+  return api2.post("/MISTOCK/STKN07_018RPT.asmx/saveTakeDailyRegister", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    STOCK_IDS: stockids,
+    TAKEQTYS: takeqtys,
+    UNITTYPES: unittype,
+  });
+};

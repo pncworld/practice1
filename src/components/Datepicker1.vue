@@ -3,7 +3,8 @@
     <span class="font-semibold text-base">{{ mainname }} </span
     ><input
       type="date"
-      class="border rounded-lg h-10 w-36 text-base pl-5"
+      :disabled="disabled"
+      class="border rounded-lg h-10 w-36 text-base pl-5 disabled:bg-gray-300"
       v-model="selectedDate"
       @change="emitDate" />
   </div>
@@ -31,6 +32,10 @@ const props = defineProps({
   reloadDate: {
     type: String,
     default: "", // 기본값: 빈 함수
+  },
+  disable: {
+    type: Boolean,
+    default: false,
   },
 });
 const mainname = ref("");
@@ -70,6 +75,19 @@ watch(
     emit("dateValue", selectedDate.value);
     mainname.value = props.mainName;
     emit("excelDate", mainname.value + ": " + selectedDate.value);
+  }
+);
+
+const disabled = ref(false);
+watch(
+  () => props.disable,
+  () => {
+    console.log(props.disable);
+    if (props.disable == false) {
+      disabled.value = false;
+    } else {
+      disabled.value = true;
+    }
   }
 );
 </script>

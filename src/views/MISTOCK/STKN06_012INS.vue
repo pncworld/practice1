@@ -68,7 +68,6 @@
           :reload="reload"
           :setStateBar="false"
           :documentTitle="'STKN06_012INS'"
-          @dblclickedRowData="dblclickedRowData"
           :rowStateeditable="false">
         </Realgrid>
       </div>
@@ -826,6 +825,7 @@ const deleteButton = async () => {
     }
   } catch (error) {
   } finally {
+    rowData2.value = [];
     searchButton();
   }
 };

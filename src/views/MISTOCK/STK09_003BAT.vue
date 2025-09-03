@@ -12,8 +12,8 @@
       <button @click="searchButton" class="button search md:w-auto w-14">
         조회
       </button>
-      <button @click="excelButton" class="button w-auto save">마감작업</button>
-      <button @click="saveButton" class="button save w-auto text-nowrap">
+      <button @click="saveButton" class="button w-auto save">마감작업</button>
+      <button @click="saveButton2" class="button save w-auto text-nowrap">
         예약 마감작업
       </button>
     </div>
@@ -51,45 +51,50 @@
   <!-- 조회 조건 -->
   <!-- 그리드 영역-->
   <div class="h-[80%]">
-    <div class="flex text-red-500">
-      ※예약 마감 작업은 선택 된 매장을 익일 01시부터 순차적으로 마감 처리를 진행합니다.
-    </div>
-    <div class="flex text-blue-600">
-      ※'미완료'를 클릭 시 해당 페이지로 이동합니다.
-    </div>
-    <div class="ml-1">
-        <label for="cond3"><input type="checkbox" id="cond3"></input>전체선택</label>
-    </div>
-    <div class="grid grid-rows-1 grid-cols-[4fr,2fr] h-full gap-2">
-    <Realgrid
-      :progname="'STK09_003BAT_VUE'"
-      :progid="1"
-      :rowData="rowData"
-      :setStateBar="false"
-      @updatedRowData="updatedRowData"
-      @allStateRows="allStateRows"
- 
-      :rowStateeditable="false"
-      :checkRenderEditable="true"
-      :headerCheckBar="'Selected'"
-      :checkOnlyFalse="true"
-  
-   ></Realgrid>
-
-        <Realgrid
-      :progname="'STK09_003BAT_VUE'"
-      :progid="2"
-      :rowData="rowData2"
-      :setStateBar="false"
-      @updatedRowData="updatedRowData"
-      @allStateRows="allStateRows"
-      :rowStateeditable="false"
-      :checkRenderEditable="true"
-      :headerCheckBar="'Selected'"
-      :checkOnlyFalse="true"
-      :selectionStyle="'block'"
-  ></Realgrid>
+    <div class="flex justify-between">
+      <div>
+        <div class="flex text-red-500">
+          ※예약 마감 작업은 선택 된 매장을 익일 01시부터 순차적으로 마감 처리를
+          진행합니다.
+        </div>
+        <div class="flex text-blue-600">
+          ※'미완료'를 클릭 시 해당 페이지로 이동합니다.
+        </div>
       </div>
+      <div class="flex justify-start items-center mr-20">
+        <input
+          type="text"
+          class="bg-white border border-black h-8 rounded-lg w-96 disabled:bg-white text-indigo-600 font-bold"
+          disabled
+          v-model="cond3" />
+      </div>
+    </div>
+
+    <div class="grid grid-rows-1 grid-cols-[4fr,2fr] h-full gap-2">
+      <Realgrid
+        :progname="'STK09_003BAT_VUE'"
+        :progid="1"
+        :rowData="rowData"
+        :setStateBar="false"
+        @updatedRowData="updatedRowData"
+        @allStateRows="allStateRows"
+        :rowStateeditable="false"
+        :checkRowAuto="true"
+        :checkRenderEditable="true"></Realgrid>
+
+      <Realgrid
+        :progname="'STK09_003BAT_VUE'"
+        :progid="2"
+        :rowData="rowData2"
+        :setStateBar="false"
+        @updatedRowData="updatedRowData"
+        @allStateRows="allStateRows"
+        :rowStateeditable="false"
+        :checkRenderEditable="true"
+        :headerCheckBar="'Selected'"
+        :checkOnlyFalse="true"
+        :selectionStyle="'block'"></Realgrid>
+    </div>
   </div>
   <!-- 그리드 영역-->
 </template>
@@ -99,7 +104,14 @@
  *  매출 일자 호출 컴포넌트
  *  */
 
-import { getMonthCloseList, saveMonthCloseUpdate } from "@/api/mistock";
+import {
+  checkPreMonthCloseStores,
+  getMonthCloseList,
+  getMonthCloseList2,
+  reserveMonthCloseStores,
+  saveMonthClose,
+  saveMonthCloseUpdate,
+} from "@/api/mistock";
 /**
  *  페이지명 자동 입력 컴포넌트
  *  */
@@ -189,6 +201,7 @@ const Project = ref(null);
 
 const cond = ref("");
 const cond2 = ref("");
+const cond3 = ref("");
 const lngstoregroup = ref();
 const optionList = ref([]);
 const optionList2 = ref([]);
@@ -243,10 +256,11 @@ const searchButton = async () => {
   try {
     initGrid();
 
-    const res = await getMonthCloseList(
+    const res = await getMonthCloseList2(
       lngstoregroup.value,
       lngstorecode.value,
-      cond.value + cond2.value
+      cond.value + cond2.value,
+      store.state.userData.lngSequence
     );
     //console.log(res);
 
@@ -325,6 +339,8 @@ watch([cond, cond2], () => {
   selectedExcelDate.value =
     "조회기간 : " + cond.value + "년" + cond2.value + "월";
 });
+
+const rowData2 = ref([]);
 const saveButton = async () => {
   if (allstaterows.value.length == 0) {
     Swal.fire({
@@ -336,30 +352,157 @@ const saveButton = async () => {
     });
     return;
   }
+  //console.log(updatedrowdata.value);
 
   try {
-    const lngCds = updatedrowdata.value
+    store.state.loading = true;
+
+    const checkStoreCd = updatedrowdata.value
       .filter((item, index) => allstaterows.value.includes(index))
+      .filter((item) => item.Selected == true)
+      .map((item) => item.lngStoreCode)
+      .join(";");
+
+    const res = await checkPreMonthCloseStores(
+      lngstoregroup.value,
+      checkStoreCd,
+      cond.value + cond2.value
+    );
+    console.log(res);
+    store.state.loading = false;
+
+    const storenm = res.data.List2.map((item) => item.strStoreName).join(",");
+    if (res.data.List[0].STATUS !== "0000") {
+      await Swal.fire({
+        title: "실패",
+        text: `${storenm} 전월 마감이 되지 않았습니다. 처리 후 마감해주세요.`,
+        icon: "warning",
+
+        confirmButtonText: "확인",
+      });
+
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    rowData2.value = [
+      ...updatedrowdata.value.filter((item) => item.Selected == true),
+    ];
+  }
+
+  try {
+    const checkStoreCd = updatedrowdata.value
+      .filter((item, index) => allstaterows.value.includes(index))
+      .filter((item) => item.Selected == true)
+      .map((item) => item.lngStoreCode);
+
+    const checkStoreNm = updatedrowdata.value
+      .filter((item, index) => allstaterows.value.includes(index))
+      .filter((item) => item.Selected == true)
+      .map((item) => item.strStoreName);
+    const res = ref("");
+    for (let i = 0; i < checkStoreCd.length; i++) {
+      res.value = await saveMonthClose(
+        lngstoregroup.value,
+        checkStoreCd[i],
+        cond.value + cond2.value,
+        store.state.userData.lngSequence
+      );
+
+      //console.log(res);
+      cond3.value =
+        checkStoreNm[i] + " 진행 중..." + `${i + 1} / ${checkStoreNm.length}`;
+
+      rowData2.value = rowData2.value.filter(
+        (item) => item.lngStoreCode != checkStoreCd[i]
+      );
+    }
+    cond3.value = "";
+
+    if (res.value.data.RESULT_CD == "00") {
+      Swal.fire({
+        title: "성공",
+        text: "마감 작업을 완료하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    rowData2.value = [];
+  }
+};
+
+const saveButton2 = async () => {
+  if (allstaterows.value.length == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "수정하신 사항이 존재하지 않습니다.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  //console.log(updatedrowdata.value);
+
+  try {
+    store.state.loading = true;
+
+    const checkStoreCd = updatedrowdata.value
+      .filter((item, index) => allstaterows.value.includes(index))
+      .filter((item) => item.Selected == true)
+      .map((item) => item.lngStoreCode)
+      .join(";");
+
+    const res = await checkPreMonthCloseStores(
+      lngstoregroup.value,
+      checkStoreCd,
+      cond.value + cond2.value
+    );
+    console.log(res);
+    store.state.loading = false;
+
+    const storenm = res.data.List2.map((item) => item.strStoreName).join(",");
+    if (res.data.List[0].STATUS !== "0000") {
+      await Swal.fire({
+        title: "실패",
+        text: `${storenm} 전월 마감이 되지 않았습니다. 처리 후 마감해주세요.`,
+        icon: "warning",
+
+        confirmButtonText: "확인",
+      });
+
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    rowData2.value = [
+      ...updatedrowdata.value.filter((item) => item.Selected == true),
+    ];
+  }
+
+  try {
+    const checkStoreCd = updatedrowdata.value
+      .filter((item, index) => allstaterows.value.includes(index))
+      .filter((item) => item.Selected == true)
       .map((item) => item.lngStoreCode)
       .join("\u200b");
-    // const checkbln = updatedrowdata.value
-    //   .filter((item, index) => allstaterows.value.includes(index))
-    //   .map((item) => (item.Selected == true ? 1 : 0))
-    //   .join("\u200b");
-    const res = await saveMonthCloseUpdate(
-      store.state.userData.lngStoreGroup,
-      lngCds,
+    const res = await reserveMonthCloseStores(
+      lngstoregroup.value,
+      checkStoreCd,
       cond.value + cond2.value,
-      0,
       store.state.userData.lngSequence
     );
-
-    //console.log(res);
 
     if (res.data.RESULT_CD == "00") {
       await Swal.fire({
         title: "성공",
-        text: "저장을 완료하였습니다.",
+        text: `마감 예약을 완료하였습니다. `,
         icon: "success",
 
         confirmButtonText: "확인",
@@ -367,12 +510,15 @@ const saveButton = async () => {
     } else {
       await Swal.fire({
         title: "실패",
-        text: "저장에 실패하였습니다.",
+        text: `마감 예약에 실패하였습니다. `,
         icon: "error",
 
         confirmButtonText: "확인",
       });
     }
-  } catch (error) {}
+  } catch (error) {
+  } finally {
+    rowData2.value = [];
+  }
 };
 </script>
