@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const commonUrl2 = "https://www.pncapi.kr:8083/"; //http://www.pncoffice.com:8081/
+export const commonUrl2 = "https://pncapi.kr:8083/"; //http://www.pncoffice.com:8081/
 
 const api2 = axios.create({
   baseURL: commonUrl2, // API 기본 URL
