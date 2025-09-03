@@ -213,7 +213,7 @@ onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
   const res = await getInitCouponType2(store.state.userData.lngStoreGroup);
-  //console.log(res);
+  ////console.log(res);
   optionList.value = res.data.List;
 });
 
@@ -262,10 +262,10 @@ const clickedButtonCol = (e) => {
     visible2.value = false;
     visible3.value = true;
   }
-  //console.log(e);
+  ////console.log(e);
 };
 const buttonClicked = (e) => {
-  //console.log(e);
+  ////console.log(e);
   pcond.value = e[0];
   pcond2.value = e[1];
   //pcond3.value = e[5]
@@ -277,7 +277,7 @@ const buttonClicked = (e) => {
   const newdate = new Date(temp);
 
   newdate.setDate(newdate.getDate() + 60);
-  //console.log(newdate);
+  ////console.log(newdate);
   pcond3.value = newdate.toISOString().split("T")[0];
   pcond4.value = e[0].replace("-", "").replace("-", "");
   // visible2.value = true;
@@ -331,7 +331,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    //console.log(res);
+    ////console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -350,7 +350,7 @@ const saveButton = async () => {
       pcond3.value
     );
 
-    //console.log(res);
+    ////console.log(res);
     Swal.fire({
       title: "성공",
       text: "기간을 조정하였습니다.",
@@ -374,7 +374,7 @@ const saveButton2 = async () => {
     //   pcond3.value
     // );
 
-    //console.log(res);
+    ////console.log(res);
     Swal.fire({
       title: "성공",
       text: "문자 재전송을 완료하였습니다.",

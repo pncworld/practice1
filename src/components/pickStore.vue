@@ -407,7 +407,7 @@ const makeNewScreen = () => {
       strDName: "화면" + (maxStrDCode + 1),
     };
 
-    // //console.log(ScreenList.value);
+    // ////console.log(ScreenList.value);
     ScreenList.value.push(newScreen);
     selectedScreenNo.value = maxStrDCode + 1;
     //newscreen.value = !newscreen.value;

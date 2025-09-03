@@ -259,7 +259,7 @@ watch(cond2, async () => {
   } else {
     optionList2.value = [];
   }
-  //console.log(optionList2.value);
+  ////console.log(optionList2.value);
   cond3.value = 0;
 });
 
@@ -320,7 +320,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;

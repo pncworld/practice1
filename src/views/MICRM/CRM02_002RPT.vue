@@ -241,7 +241,7 @@ const handleParentClick = (e) => {
 };
 
 const Name = (e) => {
-  //console.log(e);
+  ////console.log(e);
 };
 const searchNum = ref("");
 const ID = (e) => {
@@ -295,7 +295,7 @@ const searchButton = async () => {
       point4.value = res.data.List[0].lngBonusPoint;
     }
     rowData.value = res.data.List;
-    //console.log(res);
+    ////console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -307,7 +307,7 @@ const searchButton = async () => {
 
 const clickedRowData = async (e) => {
   const res = await getReceiptDataDetail2(e[1], e[2], e[0]);
-  //console.log(res);
+  ////console.log(res);
   rowData2.value = res.data.List;
   rowData3.value = res.data.List2;
   rowData4.value = res.data.List3;

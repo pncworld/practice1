@@ -92,7 +92,7 @@ const label = ref([]);
 onMounted(async () => {
   store.state.loading = false;
 
-  //console.log(store.state.userData);
+  ////console.log(store.state.userData);
   const userdata = store.state.userData;
   let lngStoreCode = "";
 
@@ -119,7 +119,7 @@ onMounted(async () => {
 
     rowData2.value = res.data.List2;
 
-    // //console.log(res);
+    // ////console.log(res);
   }
 
   if (
@@ -131,7 +131,7 @@ onMounted(async () => {
       userdata.lngPosition,
       userdata.lngSequence
     );
-    // //console.log(res);
+    // ////console.log(res);
     rowData3.value = res.data.List;
     rowData4.value = res.data.List2;
   }
@@ -164,9 +164,9 @@ onMounted(async () => {
     res.data.List.map((item) => parseInt(item.nowTotAmt)),
   ];
 
-  //console.log(datas.value);
+  ////console.log(datas.value);
   labels.value = res.data.List.map((item) => item.dtmDay);
-  //console.log(res);
+  ////console.log(res);
   const today = new Date();
   label.value = [
     today.getFullYear() - 1 + "-" + (today.getMonth() + 1),
@@ -175,7 +175,7 @@ onMounted(async () => {
 });
 
 const dblclickedRowData = (e) => {
-  //console.log(e);
+  ////console.log(e);
 };
 
 const moveNoticePage = (e) => {

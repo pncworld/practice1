@@ -217,12 +217,12 @@ const dupliStore = async () => {
               posNo2.join(",")
             );
           } catch (error) {
-            //console.log(error);
+            ////console.log(error);
           } finally {
             store.state.loading = false;
           }
 
-          //console.log(res3);
+          ////console.log(res3);
           if (res3.data.RESULT_CD == "00") {
             store.state.loading = false;
             Swal.fire({

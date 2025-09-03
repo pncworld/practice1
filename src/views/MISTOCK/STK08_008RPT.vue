@@ -288,7 +288,7 @@ onMounted(async () => {
 
   const res = await getStockDetail(store.state.userData.lngStoreGroup, "01");
 
-  console.log(res);
+  //console.log(res);
   optionList.value = res.data.List;
 
   const res2 = await getStockGroup(store.state.userData.lngStoreGroup);
@@ -428,7 +428,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;

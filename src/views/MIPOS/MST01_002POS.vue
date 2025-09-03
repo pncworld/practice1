@@ -780,7 +780,7 @@ const handleStoreCd = async (newValue) => {
       store.state.userData.lngStoreGroup,
       newValue
     );
-    //console.log(res);
+    ////console.log(res);
     optionList.value = res.data.List;
     if (optionList.value.length > 0) {
       pcond2.value = res.data.List[0].lngCode;
@@ -798,7 +798,7 @@ const handleStoreCd = async (newValue) => {
       store.state.userData.lngStoreGroup,
       nowStoreCd.value
     );
-    //console.log(res);
+    ////console.log(res);
     optionList.value = res.data.List;
     if (optionList.value.length > 0) {
       pcond2.value = res.data.List[0].lngCode;
@@ -898,7 +898,7 @@ const searchButton = async () => {
       nowStoreCd.value,
       nowStoreAreaCd.value
     );
-    //console.log(res4);
+    ////console.log(res4);
     MenuKeyList.value = res4.data.MenuKeyList;
     ScreenKeyOrigin.value = res3.data.ScreenList;
     //comsole.log(ScreenKeyOrigin.value);
@@ -1693,7 +1693,7 @@ const saveMenuKey = async () => {
       pcond6.value,
       pcond7.value == true ? 1 : 0
     );
-    console.log(res);
+    //console.log(res);
 
     if (res.data.RESULT_CD == "00") {
       Swal.fire({

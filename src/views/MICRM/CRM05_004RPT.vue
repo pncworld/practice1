@@ -210,7 +210,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    //console.log(res);
+    ////console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;

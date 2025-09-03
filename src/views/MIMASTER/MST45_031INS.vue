@@ -12,24 +12,40 @@
     </div>
     <!-- 조회 조건 -->
     <div class="flex gap-2">
-      <div class="grid grid-cols-1 grid-rows-1 bg-gray-200 rounded-lg h-12 w-[50%] z-10 mt-2">
+      <div
+        class="grid grid-cols-1 grid-rows-1 bg-gray-200 rounded-lg h-12 w-[50%] z-10 mt-2">
         <div class="flex items-center justify-between">
           <div class="ml-12">발주 파트 관리</div>
           <div class="flex gap-2 mr-12">
-            <button class="whitebutton bg-white" @click="searchButton">조회</button>
-            <button class="whitebutton bg-white" @click="saveButton">저장</button>
+            <button class="whitebutton bg-white" @click="searchButton">
+              조회
+            </button>
+            <button class="whitebutton bg-white" @click="saveButton">
+              저장
+            </button>
           </div>
         </div>
       </div>
-      <div class="grid grid-cols-1 grid-rows-1 bg-gray-200 rounded-lg h-12 w-[50%] z-10 mt-2">
+      <div
+        class="grid grid-cols-1 grid-rows-1 bg-gray-200 rounded-lg h-12 w-[50%] z-10 mt-2">
         <div class="flex items-center justify-between">
           <div class="ml-12">매장 선택</div>
           <div class="flex gap-2 mr-20">
-            <input type="text" class="border rounded-md px-2 py-1 text-sm w-32 bg-white disabled:bg-white text-red-600 font-bold" v-model="gridvalue1" disabled/>
-            <input type="text" class="border rounded-md px-2 py-1 text-sm w-48 bg-white disabled:bg-white text-red-600 font-bold" v-model="gridvalue2" disabled/>
+            <input
+              type="text"
+              class="border rounded-md px-2 py-1 text-sm w-32 bg-white disabled:bg-white text-red-600 font-bold"
+              v-model="gridvalue1"
+              disabled />
+            <input
+              type="text"
+              class="border rounded-md px-2 py-1 text-sm w-48 bg-white disabled:bg-white text-red-600 font-bold"
+              v-model="gridvalue2"
+              disabled />
           </div>
           <div class="flex gap-2 mr-12">
-            <button class="whitebutton bg-white" @click="saveButton2">저장</button>
+            <button class="whitebutton bg-white" @click="saveButton2">
+              저장
+            </button>
           </div>
         </div>
       </div>
@@ -47,7 +63,8 @@
       <!-- 오른쪽 문구 -->
       <div class="w-1/2 flex justify-start pl-4">
         <div class="text-red-600 font-bold">
-        ◎ 신규로 생성 된 매장이 있을 경우 발주 파트를 설정해 주셔야 발주가 가능합니다.
+          ◎ 신규로 생성 된 매장이 있을 경우 발주 파트를 설정해 주셔야 발주가
+          가능합니다.
         </div>
       </div>
     </div>
@@ -99,7 +116,12 @@
 </template>
 
 <script setup>
-import { getStockPartInfo, getStockStoreInfo, saveStockPartInfo, saveStockStoreInfo } from "@/api/master";
+import {
+  getStockPartInfo,
+  getStockStoreInfo,
+  saveStockPartInfo,
+  saveStockStoreInfo,
+} from "@/api/master";
 /**
  *  페이지명 자동 입력 컴포넌트
  *  */
@@ -146,7 +168,7 @@ const afterSearch = ref(false);
 const addNew = ref(true);
 const addRow = ref(false);
 const addrowProp = ref("lngStoreGroup");
-const addrowDefault = ref('');
+const addrowDefault = ref("");
 
 const changeRow = ref();
 const gridvalue1 = ref();
@@ -169,7 +191,7 @@ const selectedIndex = (newValue) => {
  */
 
 const addButton = () => {
-  // console.log(afterSearch.value);
+  // //console.log(afterSearch.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "조회를 먼저 해주세요.",
@@ -186,11 +208,11 @@ const addButton = () => {
 
 const deleteRow = ref(false);
 
-const currentRowState = ref('')
-const sendRowState = (e) =>{
-  // console.log(e)
-  currentRowState.value = e
-}
+const currentRowState = ref("");
+const sendRowState = (e) => {
+  // //console.log(e)
+  currentRowState.value = e;
+};
 const deleteButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -200,7 +222,7 @@ const deleteButton = () => {
     return;
   }
 
-  if(currentRowState.value != 'created'){
+  if (currentRowState.value != "created") {
     Swal.fire({
       title: "신규행만 삭제 가능합니다.",
       confirmButtonText: "확인",
@@ -209,7 +231,6 @@ const deleteButton = () => {
   }
 
   deleteRow.value = !deleteRow.value;
-
 };
 
 /**
@@ -226,11 +247,7 @@ const clickedRowData = async (e) => {
     );
 
     rowData2.value = res.data.stockStoreInfo;
-
-  } catch (error) {
-
-  }
-
+  } catch (error) {}
 };
 
 /**
@@ -247,13 +264,13 @@ const clickedRowData2 = async (e) => {
 
 const allstaterows = ref([]);
 const allStateRows = (e) => {
-  // console.log(e);
+  // //console.log(e);
   allstaterows.value = e;
 };
 
 const allStaterows2 = ref([]);
 const allStateRows2 = (e) => {
-  // console.log(e);
+  // //console.log(e);
   allStaterows2.value = e;
 };
 
@@ -263,7 +280,7 @@ const allStateRows2 = (e) => {
 
 const updatedrowdata = ref([]);
 const updatedRowData = (newValue) => {
-  // console.log(newValue);
+  // //console.log(newValue);
   updatedrowdata.value = newValue;
 };
 
@@ -273,14 +290,14 @@ const updatedRowData = (newValue) => {
 
 const updatedrowdata2 = ref([]);
 const updatedRowData2 = (newValue) => {
-  // console.log(newValue);
+  // //console.log(newValue);
   updatedrowdata2.value = newValue;
 };
 
 const checkedrowdata = ref([]);
 const checkedRowData = (e) => {
   checkedrowdata.value = e;
-  // console.log(e);
+  // //console.log(e);
 };
 
 /**
@@ -295,14 +312,11 @@ const searchButton = async () => {
     rowData.value = [];
 
     let res;
-    res = await getStockPartInfo(
-      store.state.userData.lngStoreGroup
-    );
+    res = await getStockPartInfo(store.state.userData.lngStoreGroup);
 
     rowData.value = res.data.stockPartInfo;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
-    // console.log(res);
-
+    // //console.log(res);
   } catch (error) {
     afterSearch.value = false;
   } finally {
@@ -328,13 +342,13 @@ const saveButton = async () => {
     });
     return;
   }
-  
+
   const ulength =
     allstaterows.value.created.length +
     allstaterows.value.updated.length +
     allstaterows.value.deleted.length;
 
-  // console.log(ulength);
+  // //console.log(ulength);
 
   if (ulength == 0) {
     Swal.fire({
@@ -346,7 +360,7 @@ const saveButton = async () => {
     return;
   }
 
-  // console.log(updatedrowdata.value);
+  // //console.log(updatedrowdata.value);
 
   await Swal.fire({
     title: "저장",
@@ -380,7 +394,7 @@ const saveButton = async () => {
           store.state.userData.lngSequence
         );
 
-        // console.log(res);
+        // //console.log(res);
 
         Swal.fire({
           title: "저장 되었습니다.",
@@ -401,7 +415,6 @@ const saveButton = async () => {
   });
 };
 
-
 /**
  *  저장 버튼 함수
  */
@@ -416,13 +429,13 @@ const saveButton2 = async () => {
     });
     return;
   }
-  
+
   const ulength =
     allStaterows2.value.created.length +
     allStaterows2.value.updated.length +
     allStaterows2.value.deleted.length;
 
-  // console.log(ulength);
+  // //console.log(ulength);
 
   if (ulength == 0) {
     Swal.fire({
@@ -434,7 +447,7 @@ const saveButton2 = async () => {
     return;
   }
 
-  // console.log(updatedrowdata2.value);
+  // //console.log(updatedrowdata2.value);
 
   await Swal.fire({
     title: "저장",
@@ -457,7 +470,7 @@ const saveButton2 = async () => {
           .map((item) => (item.lngCheck == true ? 1 : 0))
           .join("\u200b");
 
-        // console.log(gridvalue1.value);
+        // //console.log(gridvalue1.value);
 
         const res = await saveStockStoreInfo(
           store.state.userData.lngStoreGroup,
@@ -467,7 +480,7 @@ const saveButton2 = async () => {
           store.state.userData.lngSequence
         );
 
-        // console.log(res);
+        // //console.log(res);
 
         Swal.fire({
           title: "저장 되었습니다.",
@@ -486,7 +499,6 @@ const saveButton2 = async () => {
     }
   });
 };
-
 </script>
 
 <style scoped></style>

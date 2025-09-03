@@ -85,7 +85,7 @@ onMounted(async () => {
     lngStoreCode,
     lngAreaCode
   );
-  //console.log(res);
+  ////console.log(res);
   storeAreaList.value = res.data.List;
   //comsole.log(storeAreaList.value);
   // selectedAreaCode.value = storeAreaList.value[0].lngAreaCode

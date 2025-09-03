@@ -140,20 +140,20 @@ onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
   //reload.value = !reload.value;
-  //console.log(store.state.userData);
+  ////console.log(store.state.userData);
   const res = await getSecureList(store.state.userData.lngStoreGroup);
-  //console.log(res);
+  ////console.log(res);
   optionList.value = res.data.List;
 
   cond.value = optionList.value[0].lngUserAdminID;
-  // console.log(cond.value);
+  // //console.log(cond.value);
   searchButton();
 });
 
 const selectedGroup = ref("");
 const selectedGroupNm = ref("");
 const setStoreGroup = (e) => {
-  //console.log(e);
+  ////console.log(e);
   selectedGroup.value = e;
 };
 
@@ -171,7 +171,7 @@ const allStateRows = (e) => {
   updateStateRow.value = e;
 };
 const sendRowState = (e) => {
-  //console.log(e);
+  ////console.log(e);
   if (e == "created") {
     disablegrid.value = false;
   } else {
@@ -203,7 +203,7 @@ const searchButton = async () => {
       cond.value,
       "01"
     );
-    // console.log(res);
+    // //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -226,7 +226,7 @@ const saveButton = async () => {
     });
     return;
   }
-  // //console.log(updateStateRow.value);
+  // ////console.log(updateStateRow.value);
   if (
     updateStateRow.value.updated.length == 0 &&
     updateStateRow.value.created.length == 0
@@ -304,9 +304,9 @@ const saveButton = async () => {
       checkboxs
     );
 
-    console.log(res);
-
     //console.log(res);
+
+    ////console.log(res);
     if (res.data.RESULT_CD == "99") {
       Swal.fire({
         title: "실패",
@@ -323,7 +323,7 @@ const saveButton = async () => {
       });
     }
 
-    //console.log(res);
+    ////console.log(res);
   } catch (error) {
   } finally {
     store.state.loading = false;
@@ -381,6 +381,6 @@ const selectedExcelStore = ref("");
  */
 
 const checkedRowData = (e) => {
-  console.log(e);
+  //console.log(e);
 };
 </script>

@@ -389,7 +389,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -477,7 +477,7 @@ const scond4 = ref("");
 const scond5 = ref(0);
 const tempStockId = ref("");
 const dblclickedRowData = async (e) => {
-  console.log(e);
+  //console.log(e);
 
   try {
     const res = await getUnitPriceDetailList(
@@ -488,7 +488,7 @@ const dblclickedRowData = async (e) => {
       store.state.userData.strLanguage
     );
 
-    console.log(res);
+    //console.log(res);
 
     rowData2.value = res.data.List;
     afterDblClick.value = true;
@@ -635,7 +635,7 @@ const saveButton = async () => {
       store.state.userData.lngSequence
     );
 
-    console.log(res);
+    //console.log(res);
 
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
@@ -665,7 +665,7 @@ const saveButton = async () => {
         store.state.userData.strLanguage
       );
 
-      console.log(res);
+      //console.log(res);
 
       rowData2.value = res.data.List;
       afterDblClick.value = true;
@@ -677,7 +677,7 @@ const tempFromDate = ref("");
 const tempTodate = ref("");
 const tempSupplierId = ref("");
 const clickedRowData2 = (e) => {
-  //console.log(e);
+  ////console.log(e);
   tempSupplierId.value = e[0];
   tempFromDate.value = e[3];
   tempTodate.value = e[5];
@@ -741,7 +741,7 @@ const deleteButton = async () => {
         store.state.userData.strLanguage
       );
 
-      console.log(res);
+      //console.log(res);
 
       rowData2.value = res.data.List;
       afterDblClick.value = true;

@@ -289,7 +289,7 @@ const detectMobile = () => {
 };
 
 onMounted(() => {
-  //console.log(store.state.userData);
+  ////console.log(store.state.userData);
   loginName.value = store.state.userData.loginID;
   storeName.value = store.state.userData.strStoreName;
   lStoreCd.value = store.state.userData.lngPosition;

@@ -322,7 +322,7 @@ const searchButton = async () => {
   try {
     store.state.loading = true;
     // initGrid();
-    //console.log(changeTime.value);
+    ////console.log(changeTime.value);
     if (changeTime.value == false) {
       const res = await getReservedDetail(
         selectedGroup.value,
@@ -331,7 +331,7 @@ const searchButton = async () => {
         cond.value,
         cond2.value
       );
-      //console.log(res);
+      ////console.log(res);
       rowData.value = res.data.List;
       rowData3.value = res.data.List2;
       rowData4.value = res.data.List3;
@@ -344,7 +344,7 @@ const searchButton = async () => {
         cond.value,
         cond2.value
       );
-      //console.log(res);
+      ////console.log(res);
       rowData2.value = res.data.List;
       rowData3.value = res.data.List2;
       rowData4.value = res.data.List3;
@@ -372,12 +372,12 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 const lngStoreGroup = async (e) => {
   //initGrid();
   selectedGroup.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 
 /**

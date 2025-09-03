@@ -56,7 +56,7 @@ onMounted(() => {
   storeType.value = store.state.storeType;
   storeCd.value = store.state.storeCd;
   storeCd2.value = store.state.storeCd;
-  //console.log(store.state.userData);
+  ////console.log(store.state.userData);
 
   if (props.initGroup == true) {
     emit("update:storeGroup", store.state.userData.lngStoreGroup);

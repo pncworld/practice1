@@ -790,14 +790,14 @@ const forDeleteDatas = ref([]);
 const updateRowData = ref([]);
 const strFlags = ref(false);
 const updatedRowData = (e) => {
-  console.log(e);
+  //console.log(e);
   updateRowData.value = e;
 };
 const disableGridValue31 = ref(true);
 
 const currentCompCd = ref("");
 const clickedRowData = async (e) => {
-  console.log(e);
+  //console.log(e);
   currentCompCd.value = e[0];
   gridvalue1.value = e[2];
   gridvalue2.value = e[3];
@@ -835,7 +835,7 @@ const clickedRowData = async (e) => {
 const getCardNo = async (a, b, c) => {
   try {
     const res = await getCardInfo2(a, b, 1);
-    console.log(res);
+    //console.log(res);
     rowData2.value = res.data.List;
 
     if (rowData2.value.length == 0) {
@@ -870,7 +870,7 @@ const getCardNo = async (a, b, c) => {
 };
 
 const zipAndAddress = async (e) => {
-  // console.log(e);
+  // //console.log(e);
   gridvalue16.value = e.split(",")[0];
   gridvalue17.value = e.split(",")[1];
 
@@ -900,7 +900,7 @@ const getRowChanged = ref(false);
 const updatedRows = ref([]);
 const allStateRows = (e) => {
   updatedRows.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 const currRowState = ref(false);
@@ -1025,7 +1025,7 @@ const searchButton = async () => {
       cond3.value ? 1 : 0,
       cond4.value ? 1 : 0
     );
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
     updateRowData.value = JSON.parse(JSON.stringify(res.data.List));
     afterSearch.value = true;
@@ -1052,7 +1052,7 @@ const searchButton2 = async () => {
     // initGrid();
 
     const res = await getBelongCust(selectedStores.value, cond6.value, 1);
-    //console.log(res);
+    ////console.log(res);
     rowData2.value = res.data.List;
 
     afterSearch.value = true;
@@ -1065,7 +1065,7 @@ const searchButton2 = async () => {
 };
 
 const dblclickedRowData = async (e) => {
-  //console.log(e);
+  ////console.log(e);
   gridvalue23.value = e[2];
   gridvalue22.value = e[1];
 
@@ -1161,7 +1161,7 @@ const deleteButton = async () => {
     store.state.loading = true;
     const res = await deleteSpecialPrices(forDeleteDatas.value.join(","));
 
-    //console.log(res);
+    ////console.log(res);
 
     Swal.fire({
       title: "성공",
@@ -1186,7 +1186,7 @@ const saveButton = async (e) => {
     });
     return;
   }
-  console.log(updatedRows.value);
+  //console.log(updatedRows.value);
   const iulength =
     updatedRows.value.created.length +
     updatedRows.value.updated.length +
@@ -1244,9 +1244,9 @@ const saveButton = async (e) => {
   try {
     store.state.loading = true;
 
-    console.log(updateRowData.value);
+    //console.log(updateRowData.value);
     if (updatedRows.value.deleted.length > 0) {
-      console.log(updatedRows.value.deleted);
+      //console.log(updatedRows.value.deleted);
       const compcodes = updateRowData.value
         .filter((item, index) => updatedRows.value.deleted.includes(index))
         .map((item) => item.strSaleCompCode)
@@ -1260,7 +1260,7 @@ const saveButton = async (e) => {
       try {
         const res = await deleteCustomors3(compcodes, custids, 1);
 
-        console.log(res);
+        //console.log(res);
       } catch (error) {}
     }
 
@@ -1418,7 +1418,7 @@ const saveButton = async (e) => {
           limitAmts
         );
 
-        console.log(res);
+        //console.log(res);
       } catch (error) {}
     }
 
@@ -1576,10 +1576,10 @@ const saveButton = async (e) => {
           limitAmts
         );
 
-        console.log(res);
+        //console.log(res);
       } catch (error) {}
     }
-    console.log(gridvalue31.value);
+    //console.log(gridvalue31.value);
     if (gridvalue30.value !== gridvalue32.value) {
       const res = await saveNewCardNo(
         currentCompCd.value,
@@ -1591,7 +1591,7 @@ const saveButton = async (e) => {
         "N"
       );
 
-      console.log(res);
+      //console.log(res);
     } else if (gridvalue30.value == gridvalue32.value) {
       const res = await saveNewCardNo(
         currentCompCd.value,
@@ -1603,7 +1603,7 @@ const saveButton = async (e) => {
         "U"
       );
 
-      console.log(res);
+      //console.log(res);
     }
 
     Swal.fire({
@@ -1615,7 +1615,7 @@ const saveButton = async (e) => {
 
     store.state.loading = false;
   } catch (error) {
-    //console.log(error);
+    ////console.log(error);
   } finally {
     store.state.loading = false;
     searchButton();
@@ -1635,12 +1635,12 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const lngStoreGroup = async (e) => {
   //initGrid();
   selectedGroup.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 
 /**

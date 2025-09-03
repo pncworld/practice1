@@ -237,15 +237,15 @@ onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
   const res = await getStockGroup(store.state.userData.lngStoreGroup);
-  console.log(res);
+  //console.log(res);
   optionList.value = res.data.List;
 
   const res2 = await getStockCategory(store.state.userData.lngStoreGroup);
-  console.log(res2);
+  //console.log(res2);
   optionList2.value = res2.data.List;
 
   const res3 = await getStockGeneric(store.state.userData.lngStoreGroup);
-  console.log(res3);
+  //console.log(res3);
   optionList3.value = res3.data.List;
 
   // const
@@ -279,7 +279,7 @@ const handleParentClick = (e) => {
 };
 
 const dateValue = (e) => {
-  //console.log(e);
+  ////console.log(e);
   sDate.value = e;
 };
 const sDate = ref();
@@ -346,7 +346,7 @@ const searchButton = async () => {
 
     rowData.value = res.data.List2;
     Notice.value = res.data.List[0].RESULT_MSG;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -417,7 +417,7 @@ const excelList = (e) => {
 };
 const Notice = ref("");
 const setCond3 = (e) => {
-  //console.log(e.target.checked);
+  ////console.log(e.target.checked);
   cond3.value = e.target.checked;
 };
 </script>

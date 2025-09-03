@@ -53,7 +53,7 @@ onMounted(async () => {
   emit("payNm", "전체");
   mainName.value = props.initName;
   const res = await getMenuGroupList(props.groupCd, props.storeCd, 1);
-  //console.log(res);
+  ////console.log(res);
   mainList.value = res.data.List;
   subList.value = res.data.List2;
   emit("mainCode", 0);
@@ -63,7 +63,7 @@ onMounted(async () => {
 });
 
 const setSub = (e) => {
-  //console.log(e);
+  ////console.log(e);
   if (e.target.value == "0") {
     subsubList.value = subList.value;
     selectedSub.value = 0;
@@ -78,7 +78,7 @@ watch(
   () => props.storeCd,
   async () => {
     const res = await getMenuGroupList(props.groupCd, props.storeCd, 1);
-    //console.log(res);
+    ////console.log(res);
     mainList.value = res.data.List;
     subList.value = res.data.List2;
     subsubList.value = res.data.List2;
@@ -88,7 +88,7 @@ watch(
   () => props.groupCd,
   async () => {
     const res = await getMenuGroupList(props.groupCd, props.storeCd, 1);
-    //console.log(res);
+    ////console.log(res);
     mainList.value = res.data.List;
     subList.value = res.data.List2;
     subsubList.value = res.data.List2;

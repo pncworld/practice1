@@ -311,7 +311,7 @@ const changeValue = async (e) => {
   await nextTick();
   if (changeColid.value == "USE_VAL") {
     changeColid.value = "USE_YN";
-    //console.log(e.target.value);
+    ////console.log(e.target.value);
     changeValue2.value = e.target.value == "1" ? "Y" : "N";
 
     changeNow.value = !changeNow.value;
@@ -327,7 +327,7 @@ const selectedIndex = (e) => {
 
 const clickFirst = ref(false);
 const clickedRowData = async (e) => {
-  //console.log(e);
+  ////console.log(e);
   gridvalue1.value = e[0];
   gridvalue2.value = e[1];
   gridvalue3.value = e[2];
@@ -341,7 +341,7 @@ const clickedRowData = async (e) => {
       e[0]
     );
 
-    // //console.log(res);
+    // ////console.log(res);
 
     rowData2.value = res.data.List;
   } catch (error) {
@@ -368,7 +368,7 @@ const forsaveRowData = ref();
 
 const updatedRows = ref([]);
 const updatedRowData1 = (newValue) => {
-  //console.log(newValue);
+  ////console.log(newValue);
   updatedRows.value = newValue;
 };
 const deleterow = ref(false);
@@ -430,7 +430,7 @@ const saveButton = async () => {
       store.state.userData.lngSequence
     );
 
-    //console.log(res);
+    ////console.log(res);
     store.state.loading = false;
 
     if (res.data.List[0].ERR_CODE == "00") {

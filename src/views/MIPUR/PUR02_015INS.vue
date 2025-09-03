@@ -373,7 +373,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -458,7 +458,7 @@ const scond6 = ref("");
 const scond8 = ref("");
 const scond9 = ref("");
 const dblclickedRowData = async (e) => {
-  console.log(e);
+  //console.log(e);
 
   if (e[6] == "" || e[6] == undefined) {
     disabled1.value = false;
@@ -484,7 +484,7 @@ const dblclickedRowData = async (e) => {
   scond9.value = e[17];
   scond6.value = e[16];
 
-  console.log(scond7.value);
+  //console.log(scond7.value);
   try {
     const res = await getStockOrderDetails(
       e[13],
@@ -494,7 +494,7 @@ const dblclickedRowData = async (e) => {
       e[5],
       store.state.userData.strLanguage
     );
-    console.log(res);
+    //console.log(res);
     rowData2.value = res.data.List;
     updatedrowdata2.value = res.data.List;
   } catch (error) {}
@@ -540,7 +540,7 @@ const saveButton = async () => {
       scond7.value.replaceAll("-", "")
     );
 
-    //console.log(res);
+    ////console.log(res);
 
     const result = res.data.List.filter((item) =>
       item.dtmMonth.includes(scond7.value.replaceAll("-", "").slice(0, 6))
@@ -555,7 +555,7 @@ const saveButton = async () => {
       });
       return;
     }
-    console.log(result);
+    //console.log(result);
   } catch (error) {}
 
   try {
@@ -637,7 +637,7 @@ const cancelButton = async () => {
       scond7.value.replaceAll("-", "")
     );
 
-    //console.log(res);
+    ////console.log(res);
 
     const result = res.data.List.filter((item) =>
       item.dtmMonth.includes(scond7.value.replaceAll("-", "").slice(0, 6))
@@ -652,7 +652,7 @@ const cancelButton = async () => {
       });
       return;
     }
-    console.log(result);
+    //console.log(result);
   } catch (error) {}
   try {
     const res = await cancelStockConfirm(

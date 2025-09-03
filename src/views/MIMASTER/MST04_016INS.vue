@@ -130,7 +130,7 @@ const selectedIndex = (newValue) => {
 const selectedSubLease = ref("");
 const SubLease = (e) => {
   selectedSubLease.value = e;
-  console.log(e);
+  //console.log(e);
 
   if (rowData.value.length > 0) {
     rowData.value = [];
@@ -188,7 +188,7 @@ const clickedRowData = (newValue) => {
 
 const allstaterows = ref([]);
 const allStateRows = (e) => {
-  console.log(e);
+  //console.log(e);
   allstaterows.value = e.updated;
 };
 
@@ -229,7 +229,7 @@ const documentSubTitle = ref("");
 const store = useStore();
 
 const lngStoreType = (e) => {
-  console.log(e);
+  //console.log(e);
 };
 /**
  * 엑셀 내보내기 함수
@@ -265,7 +265,7 @@ const searchButton = async () => {
 
     rowData.value = res.data.List;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -288,7 +288,7 @@ const saveButton = async () => {
     });
     return;
   }
-  console.log(updateRow.value);
+  //console.log(updateRow.value);
   if (allstaterows.value.length == 0) {
     Swal.fire({
       title: "경고",
@@ -298,7 +298,7 @@ const saveButton = async () => {
     });
     return;
   }
-  //console.log(updateRow.value);
+  ////console.log(updateRow.value);
   await Swal.fire({
     title: "저장",
     text: "저장 하시겠습니까?",
@@ -323,7 +323,7 @@ const saveButton = async () => {
           selectedSubLease.value,
           lngStockids
         );
-        console.log(res);
+        //console.log(res);
 
         Swal.fire({
           title: "저장 되었습니다.",

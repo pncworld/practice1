@@ -183,7 +183,7 @@ onMounted(async () => {
   //   //comsole.log(res);
 
   const res2 = await getAccCodeList(userGroup);
-  //console.log(res2);
+  ////console.log(res2);
   CondList.value = res2.data.List;
 });
 
@@ -212,7 +212,7 @@ const searchButton = async () => {
       selectedendDate.value,
       selectedCond.value
     );
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;

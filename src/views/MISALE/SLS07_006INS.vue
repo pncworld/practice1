@@ -180,7 +180,7 @@ const searchButton = async () => {
       compday_1,
       compday2_1
     );
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
 
     preview.value =
@@ -314,7 +314,7 @@ const saveButton = async () => {
       inputview.value
     );
 
-    //console.log(res);
+    ////console.log(res);
     Swal.fire({
       title: "완료",
       text: "저장이 완료되었습니다.",
@@ -356,7 +356,7 @@ const sendButton = async () => {
       "111.111.111.111"
     );
 
-    //console.log(res);
+    ////console.log(res);
     store.state.loading = false;
     if (res.status == 200) {
       Swal.fire({

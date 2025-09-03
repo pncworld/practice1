@@ -148,7 +148,7 @@ watch(
 onMounted(() => {
   defaultPlaceHolder.value = props.placeholderName;
   selectedGroup.value = store.state.storeGroup[0].lngStoreGroup;
-  //console.log(storeCd.value);
+  ////console.log(storeCd.value);
   if (
     store.state.userData.blnBrandAdmin == "True" ||
     store.state.userData.lngPositionType == "1"

@@ -248,7 +248,7 @@ onMounted(async () => {
   }
 
   const res = await getCompanyforpay(store.state.userData.lngStoreGroup);
-  //console.log(res);
+  ////console.log(res);
   optionList.value = res.data.List;
   if (optionList.value.length > 0) {
     cond.value = optionList.value[0].strSaleCompCode;
@@ -316,7 +316,7 @@ const searchButton = async () => {
     let res = await getBasisOfEmpPay(cond.value);
     rowData.value = res.data.List;
     updatedRows.value = res.data.List;
-    //console.log(rowData.value);
+    ////console.log(rowData.value);
   } catch (error) {
     afterSearch.value = false;
   } finally {
@@ -334,7 +334,7 @@ const searchButton = async () => {
  * 추가 버튼 함수
  */
 watch(gridvalue5, () => {
-  //console.log(gridvalue5.value);
+  ////console.log(gridvalue5.value);
 });
 const selectedlngCode = ref();
 const changeRow = ref(0);
@@ -354,9 +354,9 @@ const changeValue = async (e) => {
     await nextTick();
 
     changeColid.value = "strSaleTime";
-    // //console.log(e.target.value);
+    // ////console.log(e.target.value);
     changeValue2.value = e.target.value + "~" + gridvalue6.value;
-    // //console.log(changeValue2.value);
+    // ////console.log(changeValue2.value);
 
     changeNow.value = !changeNow.value;
     await nextTick();
@@ -372,9 +372,9 @@ const changeValue = async (e) => {
     await nextTick();
 
     changeColid.value = "strSaleTime";
-    // //console.log(e.target.value);
+    // ////console.log(e.target.value);
     changeValue2.value = gridvalue5.value + "~" + e.target.value;
-    // //console.log(changeValue2.value);
+    // ////console.log(changeValue2.value);
 
     changeNow.value = !changeNow.value;
     await nextTick();
@@ -386,7 +386,7 @@ const changeValue = async (e) => {
   await nextTick();
   if (changeColid.value == "strLimitGubun") {
     changeColid.value = "strLimitGubunTxt";
-    //console.log(e.target.value);
+    ////console.log(e.target.value);
     changeValue2.value =
       e.target.value == "0"
         ? "한도제한"
@@ -399,7 +399,7 @@ const changeValue = async (e) => {
 
   if (changeColid.value == "strLimitResetPeriod") {
     changeColid.value = "strLimitResetPeriodTxt";
-    //console.log(e.target.value);
+    ////console.log(e.target.value);
     let period = "";
     if (e.target.value == "1") {
       period = "1개월";
@@ -450,7 +450,7 @@ const selectedIndex = (e) => {
 
 const clickFirst = ref(false);
 const clickedRowData = async (e) => {
-  //console.log(formatLocalDate(e[3]));
+  ////console.log(formatLocalDate(e[3]));
   disabled.value = false;
   gridvalue1.value = e[7];
   gridvalue2.value = e[1];
@@ -466,7 +466,7 @@ const clickedRowData = async (e) => {
       e[0]
     );
 
-    // //console.log(res);
+    // ////console.log(res);
 
     rowData2.value = res.data.List;
   } catch (error) {
@@ -493,7 +493,7 @@ const forsaveRowData = ref();
 
 const updatedRows = ref([]);
 const updatedRowData1 = (newValue) => {
-  //console.log(newValue);
+  ////console.log(newValue);
   updatedRows.value = newValue;
 };
 const deleterow = ref(false);
@@ -548,7 +548,7 @@ const saveButton = async () => {
           : ""
       )
       .join("\u200b");
-    //console.log(applydates);
+    ////console.log(applydates);
     const starttimes = updatedRows.value
       .filter((item, index) => stateRows.value.updated.includes(index))
       .map((item) => item.strSaleStartTime)
@@ -578,7 +578,7 @@ const saveButton = async () => {
       store.state.userData.lngSequence
     );
 
-    //console.log(res);
+    ////console.log(res);
     store.state.loading = false;
 
     if (res.data.RESULT_CD == "00") {
@@ -599,7 +599,7 @@ const saveButton = async () => {
       return;
     }
   } catch (error) {
-    // //console.log(error);
+    // ////console.log(error);
   } finally {
     searchButton();
   }

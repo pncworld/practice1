@@ -619,7 +619,7 @@ const searchButton = async () => {
     );
     KeyList.value = res4.data.FuncKeys;
 
-    //console.log(res4);
+    ////console.log(res4);
     const res2 = await getAllScreenList(
       groupCd.value,
       nowStoreCd.value,
@@ -872,8 +872,8 @@ const clickedMove = ref(false);
 const onChoose = (e) => {
   const keyName = "lngKeyNo" + (e.oldIndex + 1);
   // if(KeyList.value[currScreenNo.value-1][keyName])
-  //console.log(KeyList.value[currScreenNo.value - 1][keyName]);
-  //console.log(subsubKeyList1.value);
+  ////console.log(KeyList.value[currScreenNo.value - 1][keyName]);
+  ////console.log(subsubKeyList1.value);
   if (subsubKeyList1.value[e.oldIndex].lngDCode == 2) {
     showFuncKeySettings.value = true;
   } else {
@@ -1093,7 +1093,7 @@ const saveButton = async () => {
           currScreenNo.value,
           lngDCodes.join(",") + "," + lngDCodes2.join(",")
         );
-        //console.log(res2);
+        ////console.log(res2);
       } catch (error) {
         //console.error("API 호출 중 오류 발생:", error);
       } finally {
@@ -1166,7 +1166,7 @@ const currentpaymentCd = ref(3);
 
 const currScreenNo = ref(0);
 const updateFuncScreenType = (newValue) => {
-  //console.log(currScreenNo.value);
+  ////console.log(currScreenNo.value);
   currScreenNo.value = newValue;
   if (newValue == 0) {
     showOtherKeys.value = true;
@@ -1209,7 +1209,7 @@ const handlePosNo = (newValue) => {
   posNo.value = newValue;
   //comsole.log(posNo.value);
   //comsole.log(nowStoreAreaCd.value);
-  //console.log(currScreenNo.value);
+  ////console.log(currScreenNo.value);
   if (
     nowStoreAreaCd.value != undefined &&
     posNo.value != undefined &&

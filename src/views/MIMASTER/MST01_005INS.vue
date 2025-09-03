@@ -202,7 +202,7 @@ const allStateRows = (e) => {
   updateStateRow.value = e;
 };
 const sendRowState = (e) => {
-  //console.log(e);
+  ////console.log(e);
   if (e == "created") {
     disablegrid.value = false;
   } else {
@@ -239,7 +239,7 @@ const searchButton = async () => {
     initGrid();
     reload.value = !reload.value;
     const res = await getSCTeamList(store.state.userData.lngStoreGroup);
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -264,7 +264,7 @@ const addButton = () => {
     return;
   }
   const today = formatLocalDate(new Date());
-  //console.log(today);
+  ////console.log(today);
   addrowDefault.value =
     "0, , ," +
     store.state.userData.lngSequence +
@@ -273,7 +273,7 @@ const addButton = () => {
     "," +
     store.state.userData.lngSequence;
 
-  //console.log(addrowDefault.value);
+  ////console.log(addrowDefault.value);
   addRow4.value = !addRow4.value;
 };
 
@@ -287,7 +287,7 @@ const saveButton = async () => {
     });
     return;
   }
-  // //console.log(updateStateRow.value);
+  // ////console.log(updateStateRow.value);
   if (
     updateStateRow.value.updated.length == 0 &&
     updateStateRow.value.created.length == 0
@@ -355,9 +355,9 @@ const saveButton = async () => {
       userIP
     );
 
-    console.log(res);
-
     //console.log(res);
+
+    ////console.log(res);
     if (res.data.RESULT_CD == "99") {
       Swal.fire({
         title: "실패",
@@ -374,7 +374,7 @@ const saveButton = async () => {
       });
     }
 
-    //console.log(res);
+    ////console.log(res);
   } catch (error) {
   } finally {
     store.state.loading = false;
@@ -392,7 +392,7 @@ const deleteButton = async () => {
     });
     return;
   }
-  // //console.log(updateStateRow.value);
+  // ////console.log(updateStateRow.value);
   if (updateRow.value.filter((item) => item.checkbox == true).length == 0) {
     Swal.fire({
       title: "경고",
@@ -425,7 +425,7 @@ const deleteButton = async () => {
       userIP
     );
 
-    //console.log(res);
+    ////console.log(res);
     if (res.data.RESULT_CD == "99") {
       Swal.fire({
         title: "실패",
@@ -442,7 +442,7 @@ const deleteButton = async () => {
       });
     }
 
-    //console.log(res);
+    ////console.log(res);
   } catch (error) {
   } finally {
     store.state.loading = false;

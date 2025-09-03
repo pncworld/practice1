@@ -197,7 +197,7 @@ const searchButton = async () => {
       selectedstartDate.value,
       selectedendDate.value
     );
-    //console.log(res);
+    ////console.log(res);
 
     rowData.value = res.data.List;
     afterSearch.value = true;
@@ -216,7 +216,7 @@ const init = ref(false);
  */
 
 const selectedStoreCd = (e) => {
-  //console.log(e);
+  ////console.log(e);
   storeCd.value = e;
 
   initGrid();

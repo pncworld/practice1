@@ -223,7 +223,7 @@ const dupliStore = async () => {
             areaCd2.join(","),
             posNo2.join(",")
           );
-          // console.log(res3);
+          // //console.log(res3);
           if (res3.data.RESULT_CD == "00") {
             store.state.loading = false;
             Swal.fire({

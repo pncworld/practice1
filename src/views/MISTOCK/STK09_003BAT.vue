@@ -1,7 +1,7 @@
 <!-- /*--############################################################################
-# Filename : STK08_021MAN.vue                                                  
-# Description : 자재 관리 > 월마감 관리 > 월마감 관리.            
-# Date :2025-09-02                                                             
+# Filename : STK09_003BAT.vue                                                  
+# Description : 자재 관리 > 마감 관리 > 월 일괄 마감 관리.            
+# Date :2025-09-03                                                             
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
@@ -12,14 +12,16 @@
       <button @click="searchButton" class="button search md:w-auto w-14">
         조회
       </button>
-      <button @click="excelButton" class="button w-auto excel">엑셀</button>
-      <button @click="saveButton" class="button save w-auto">저장</button>
+      <button @click="excelButton" class="button w-auto save">마감작업</button>
+      <button @click="saveButton" class="button save w-auto text-nowrap">
+        예약 마감작업
+      </button>
     </div>
   </div>
   <div
     class="flex justify-start bg-gray-200 rounded-lg h-16 items-center z-10 space-x-96">
     <div class="flex space-x-5 items-center ml-12">
-      <div class="font-semibold text-base">조회기간</div>
+      <div class="font-semibold text-base">마감월</div>
       <select name="" id="" class="w-32 h-8 border border-black" v-model="cond">
         <option :value="i.lngCode" v-for="i in optionList">
           {{ i.strName }}
@@ -50,24 +52,44 @@
   <!-- 그리드 영역-->
   <div class="h-[80%]">
     <div class="flex text-red-500">
-      ※월마감 관리 기능은 마감 해지 관리기능만 있습니다. 수정하시고 재마감을
-      해야 할 경우 마감관리> 월마감 작업에서 하셔야 합니다.
+      ※예약 마감 작업은 선택 된 매장을 익일 01시부터 순차적으로 마감 처리를 진행합니다.
     </div>
+    <div class="flex text-blue-600">
+      ※'미완료'를 클릭 시 해당 페이지로 이동합니다.
+    </div>
+    <div class="ml-1">
+        <label for="cond3"><input type="checkbox" id="cond3"></input>전체선택</label>
+    </div>
+    <div class="grid grid-rows-1 grid-cols-[4fr,2fr] h-full gap-2">
     <Realgrid
-      :progname="'STK08_021MAN_VUE'"
+      :progname="'STK09_003BAT_VUE'"
       :progid="1"
       :rowData="rowData"
       :setStateBar="false"
       @updatedRowData="updatedRowData"
       @allStateRows="allStateRows"
-      :documentTitle="'STK08_021MAN'"
+ 
+      :rowStateeditable="false"
+      :checkRenderEditable="true"
+      :headerCheckBar="'Selected'"
+      :checkOnlyFalse="true"
+  
+   ></Realgrid>
+
+        <Realgrid
+      :progname="'STK09_003BAT_VUE'"
+      :progid="2"
+      :rowData="rowData2"
+      :setStateBar="false"
+      @updatedRowData="updatedRowData"
+      @allStateRows="allStateRows"
       :rowStateeditable="false"
       :checkRenderEditable="true"
       :headerCheckBar="'Selected'"
       :checkOnlyFalse="true"
       :selectionStyle="'block'"
-      :documentSubTitle="documentSubTitle"
-      :exporttoExcel="exporttoExcel"></Realgrid>
+  ></Realgrid>
+      </div>
   </div>
   <!-- 그리드 영역-->
 </template>
@@ -152,7 +174,7 @@ onMounted(async () => {
   const today = new Date();
   cond.value = today.getFullYear();
 
-  cond2.value = String(today.getMonth()).padStart(2, "0");
+  cond2.value = String(today.getMonth() + 1).padStart(2, "0");
 });
 
 const selectedDate = ref();

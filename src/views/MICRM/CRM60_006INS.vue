@@ -320,7 +320,7 @@ const FileChange = (e) => {
   const file = event.target.files[0];
   if (file) {
     cond2.value = file; // cond2에 파일 객체 저장
-    //console.log("선택한 파일:", cond2.value);
+    ////console.log("선택한 파일:", cond2.value);
   }
 };
 /**
@@ -373,7 +373,7 @@ const searchButton = async () => {
       sd.value,
       ed.value
     );
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -391,7 +391,7 @@ const selectedStores = ref();
 const selectedStoreAttrs = ref();
 
 const saveButton = async () => {
-  //console.log(optionList3.value, optionList4.value);
+  ////console.log(optionList3.value, optionList4.value);
   if (
     selectedStores.value == 0 ||
     pcond1.value == null ||
@@ -423,9 +423,9 @@ const saveButton = async () => {
       pcond6.value == null ? "" : pcond6.value,
       pcond7.value == null ? "" : pcond7.value
     );
-    //console.log(res);
+    ////console.log(res);
   } catch (error) {
-    //console.log(error);
+    ////console.log(error);
   } finally {
     visible.value = false;
     initGrid();
@@ -439,7 +439,7 @@ const saveButton = async () => {
 const lngStoreCode = async (e) => {
   //initGrid();
   selectedStores.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 
 watch(selectedStores, async () => {
@@ -496,7 +496,7 @@ const selectedCardNo = ref("");
 const selectedDate2 = ref("");
 const selectedStoreCd = ref("");
 const clickedRowData = (e) => {
-  //console.log(e);
+  ////console.log(e);
   selectedCardNo.value = e[15];
   selectedDate2.value = e[3];
   selectedStoreCd.value = e[14];
@@ -525,7 +525,7 @@ const deleteButton = async (e) => {
       selectedCardNo.value,
       store.state.userData.lngSequence
     );
-    //console.log(res);
+    ////console.log(res);
     Swal.fire({
       title: "성공",
       text: "취소가 완료되었습니다.",

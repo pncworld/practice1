@@ -899,7 +899,7 @@ const store = useStore();
 
 const deleteLngCode = ref("");
 const clickedRowData = (e) => {
-  //console.log(e);
+  ////console.log(e);
   deleteLngCode.value = e[0];
   sscond.value = e[0];
   sscond2.value = e[1];
@@ -1005,7 +1005,7 @@ onMounted(async () => {
   optionList.value = res.data.List;
 
   rowData2.value = res.data.List;
-  console.log(optionList.value);
+  //console.log(optionList.value);
 
   const res2 = await getStockCategory(store.state.userData.lngStoreGroup);
 
@@ -1049,7 +1049,7 @@ onMounted(async () => {
   optionList10.value = res10.data.List;
 
   //optionList3;
-  //console.log(formattedDate.value);
+  ////console.log(formattedDate.value);
 });
 
 /**
@@ -1076,7 +1076,7 @@ const searchButton = async () => {
       cond8.value,
       store.state.userData.strLanguage
     );
-    console.log(res);
+    //console.log(res);
 
     rowData.value = res.data.List;
 
@@ -1428,7 +1428,7 @@ const saveButton = async () => {
       store.state.userData.lngSequence
     );
 
-    console.log(res);
+    //console.log(res);
     store.state.loading = false;
     cleanButton();
     if (res.data.RESULT_CD == "00") {
@@ -1493,7 +1493,7 @@ const saveButton2 = async () => {
       saveNew2.value == true ? "I" : "U"
     );
 
-    console.log(res);
+    //console.log(res);
   } catch (error) {
   } finally {
     const res = await getStockGroup(store.state.userData.lngStoreGroup);
@@ -1521,7 +1521,7 @@ const deleteButton2 = async () => {
       0,
       deleteLngCode.value
     );
-    console.log(res);
+    //console.log(res);
   } catch (error) {
   } finally {
     const res = await getStockGroup(store.state.userData.lngStoreGroup);
@@ -1571,7 +1571,7 @@ const saveButton3 = async () => {
       saveNew3.value == true ? "I" : "U"
     );
 
-    console.log(res);
+    //console.log(res);
   } catch (error) {
   } finally {
     const res2 = await getStockCategory(store.state.userData.lngStoreGroup);
@@ -1599,7 +1599,7 @@ const deleteButton3 = async () => {
       1,
       deleteLngCode.value
     );
-    console.log(res);
+    //console.log(res);
   } catch (error) {
   } finally {
     const res2 = await getStockCategory(store.state.userData.lngStoreGroup);
@@ -1649,7 +1649,7 @@ const saveButton4 = async () => {
       saveNew4.value == true ? "I" : "U"
     );
 
-    console.log(res);
+    //console.log(res);
   } catch (error) {
   } finally {
     const res3 = await getStockGeneric(store.state.userData.lngStoreGroup);
@@ -1677,7 +1677,7 @@ const deleteButton4 = async () => {
       2,
       deleteLngCode.value
     );
-    console.log(res);
+    //console.log(res);
   } catch (error) {
   } finally {
     const res3 = await getStockGeneric(store.state.userData.lngStoreGroup);
@@ -1727,7 +1727,7 @@ const saveButton5 = async () => {
       saveNew5.value == true ? "I" : "U"
     );
 
-    console.log(res);
+    //console.log(res);
   } catch (error) {
   } finally {
     const res9 = await getStandardList(store.state.userData.lngStoreGroup);
@@ -1755,7 +1755,7 @@ const deleteButton5 = async () => {
       3,
       deleteLngCode.value
     );
-    console.log(res);
+    //console.log(res);
   } catch (error) {
   } finally {
     const res9 = await getStandardList(store.state.userData.lngStoreGroup);
@@ -1770,12 +1770,12 @@ const deleteButton5 = async () => {
 
 const deleteLngCode2 = ref("");
 const clickedRowData6 = (e) => {
-  //console.log(e);
+  ////console.log(e);
   deleteLngCode2.value = e[0];
 };
 
 const dblclickedRowData = async (e) => {
-  console.log(e);
+  //console.log(e);
 
   try {
     const res = await getMaterialDetail(
@@ -1785,7 +1785,7 @@ const dblclickedRowData = async (e) => {
       0
     );
 
-    console.log(res);
+    //console.log(res);
 
     scond.value = res.data.List[0].lngStockID;
     scond2.value = res.data.List[0].strStockName;
@@ -1813,7 +1813,7 @@ const dblclickedRowData = async (e) => {
 };
 
 const deleteButton = async () => {
-  console.log(deleteLngCode2.value);
+  //console.log(deleteLngCode2.value);
   if (deleteLngCode2.value == "" || deleteLngCode2.value == undefined) {
     Swal.fire({
       title: "경고",
@@ -1831,7 +1831,7 @@ const deleteButton = async () => {
       store.state.userData.lngSequence
     );
 
-    console.log(res);
+    //console.log(res);
   } catch (error) {
   } finally {
     searchButton();

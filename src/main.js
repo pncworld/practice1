@@ -62,7 +62,7 @@ app.config.errorHandler = (err, vm, info) => {
     confirmButtonText: "확인",
   });
 
-  console.log(err);
+  //console.log(err);
   // 롤백 처리
   if (vm?.rollback) {
     vm.rollback();

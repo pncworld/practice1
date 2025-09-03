@@ -199,7 +199,7 @@ const store = useStore();
 const clickedRowData = (e) => {
   disablegrid.value = true;
   insertupdatedelete.value = 2;
-  //console.log(e);
+  ////console.log(e);
   gridvalue1.value = e[4];
   gridvalue2.value = e[5];
   gridvalue3.value = e[6];
@@ -216,7 +216,7 @@ const searchButton = async () => {
     initGrid();
     reload.value = !reload.value;
     const res = await getReservedNum(selectedGroup.value, selectedStores.value);
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -290,7 +290,7 @@ const saveButton = async () => {
       icon: "success",
       confirmButtonText: "확인",
     });
-    //console.log(res);
+    ////console.log(res);
   } catch (error) {
   } finally {
     store.state.loading = false;

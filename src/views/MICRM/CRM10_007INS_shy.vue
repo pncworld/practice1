@@ -214,7 +214,7 @@ onMounted(async () => {
   optionList.value = res.data.List;
   optionList2.value = res2.data.List;
   optionList3.value = res3.data.List;
-  //console.log(optionList2.value);
+  ////console.log(optionList2.value);
   reload.value = !reload.value;
 });
 
@@ -229,12 +229,12 @@ const store = useStore();
 const clickedRowData = (e) => {
   disablegrid.value = true;
   insertupdatedelete.value = 2;
-  //console.log(e);
+  ////console.log(e);
   gridvalue1.value = e[6];
   gridvalue2.value = e[7];
   gridvalue3.value = e[8];
   gridvalue4.value = e[3];
-  //console.log(e[4]);
+  ////console.log(e[4]);
   gridvalue5.value = e[4];
   gridvalue6.value = e[9];
   setGridValue5.value = setGridValue5.value + 1;
@@ -260,7 +260,7 @@ const searchButton = async () => {
       selectedGroup.value,
       selectedStores.value
     );
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -359,7 +359,7 @@ const saveButton = async () => {
       icon: "success",
       confirmButtonText: "확인",
     });
-    //console.log(res);
+    ////console.log(res);
   } catch (error) {
   } finally {
     store.state.loading = false;

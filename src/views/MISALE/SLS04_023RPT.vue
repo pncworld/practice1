@@ -172,7 +172,7 @@ const setGroupFooter = ref(true);
 
 const store = useStore();
 const clickedRowData = (e) => {
-  // console.log(e);
+  // //console.log(e);
 
   filteredrowData.value = rowData.value.filter((item) =>
     item.strStoreName.includes(e[0])
@@ -185,7 +185,7 @@ const clickedRowData = (e) => {
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
-  //console.log(formattedDate.value);
+  ////console.log(formattedDate.value);
 });
 
 /**
@@ -209,7 +209,7 @@ const searchButton = async () => {
       cond3.value,
       cond4.value
     );
-    console.log(res);
+    //console.log(res);
 
     rowData.value = res.data.List;
 
@@ -247,7 +247,7 @@ watch(cond, async () => {
     0,
     cond.value
   );
-  console.log(res);
+  //console.log(res);
   optionList.value = res.data.List;
 
   if (optionList.value.length == 0) {

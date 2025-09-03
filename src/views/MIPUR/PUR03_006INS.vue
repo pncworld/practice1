@@ -363,7 +363,7 @@ onMounted(async () => {
     0
   );
 
-  //console.log(res);
+  ////console.log(res);
 
   cond.value =
     res.data.List[0].dtmOrderDate.slice(0, 4) +
@@ -428,7 +428,7 @@ const cond6 = ref("");
 const selectedSupplier = ref("");
 const SupplierId = (e) => {
   selectedSupplier.value = e;
-  // /console.log(e);
+  // ///console.log(e);
 };
 const handleStoreGroup = (e) => {
   groupCd.value = e;
@@ -443,8 +443,8 @@ const handleStoreCd = async (newValue) => {
 };
 
 const checkAllorNot = async (e, e2) => {
-  // console.log(e);
-  // console.log(e2);
+  // //console.log(e);
+  // //console.log(e2);
   const stockids = updatedrowdata.value
     .map((item) => item.lngStockID)
     .join("\u200b");
@@ -457,7 +457,7 @@ const checkAllorNot = async (e, e2) => {
         e == true ? 1 : 0
       );
 
-      // console.log(res);
+      // //console.log(res);
     } catch (error) {}
   }
 };
@@ -484,11 +484,11 @@ const rowData = ref([]);
 const rowData2 = ref([]);
 
 const allStateRows = (e) => {
-  console.log(e);
+  //console.log(e);
   allstaterows.value = e.updated;
 };
 const allStateRows2 = (e) => {
-  console.log(e);
+  //console.log(e);
   allstaterows2.value = e;
 };
 /**
@@ -534,7 +534,7 @@ const searchButton = async () => {
       nowStoreCd.value,
       cond.value.replaceAll("-", "")
     );
-    console.log(res);
+    //console.log(res);
     rowData2.value = res.data.List;
     cond3.value = res.data.List2[0].strMComments;
 
@@ -552,7 +552,7 @@ const searchButton = async () => {
 
     cond6.value = formatNumberWithCommas(cond6.value);
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   }
 };
 
@@ -601,10 +601,10 @@ const searchButton2 = async () => {
       cond13.value
     );
     store.state.loading = false;
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   }
 };
 
@@ -614,7 +614,7 @@ const searchButton2 = async () => {
 
 const clickFirst = ref(false);
 const clickedButtonCol = async (e) => {
-  console.log(e);
+  //console.log(e);
   //saveFavoriteId.value = e;
   if (e == "lngCheckFovorites") {
     try {
@@ -625,7 +625,7 @@ const clickedButtonCol = async (e) => {
         saveFavoriteValue.value == true ? 1 : 0
       );
 
-      console.log(res);
+      //console.log(res);
     } catch (error) {}
   }
 };
@@ -634,7 +634,7 @@ const saveFavoriteStore = ref("");
 const saveFavoriteId = ref("");
 const saveFavoriteValue = ref("");
 const clickedRowData = async (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
 
   saveFavoriteGroup.value = newValue[15];
   saveFavoriteStore.value = newValue[16];
@@ -663,11 +663,11 @@ const updatedrowdata2 = ref([]);
  */
 const disabled = ref(false);
 const updatedRowData = (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
   updatedrowdata.value = newValue;
 };
 const updatedRowData2 = (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
   updatedrowdata2.value = newValue;
 };
 const deleterow = ref(false);
@@ -693,7 +693,7 @@ const saveButton = async () => {
     (item) => item.dblOrderQty == 0
   ).length;
 
-  //console.log(updatedrowdata2.value);
+  ////console.log(updatedrowdata2.value);
   if (filteredLen > 0) {
     Swal.fire({
       title: "경고",
@@ -723,7 +723,7 @@ const saveButton = async () => {
       cond.value.replaceAll("-", ""),
       2
     );
-    console.log(res);
+    //console.log(res);
     if (res.data.List[0].strMsg == "1") {
       Swal.fire({
         title: "실패",
@@ -748,7 +748,7 @@ const saveButton = async () => {
 
     // if(res.data)
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   }
   try {
     await Swal.fire({
@@ -770,7 +770,7 @@ const saveButton = async () => {
         );
 
         const subsequence = res2.data.List[0].lngSubSequence;
-        console.log(subsequence);
+        //console.log(subsequence);
 
         if (allstaterows2.value.created.length > 0) {
           const groupcds = updatedrowdata2.value
@@ -835,7 +835,7 @@ const saveButton = async () => {
             curtaxs,
             comments
           );
-          console.log(res); // 애매 ?
+          //console.log(res); // 애매 ?
           const res2 = await saveNewOrderTmp2(
             groupCd.value,
             nowStoreCd.value,
@@ -844,7 +844,7 @@ const saveButton = async () => {
             cond.value.replaceAll("-", ""),
             cond3.value
           );
-          console.log(res2);
+          //console.log(res2);
 
           if (res2.data.RESULT_CD == "00") {
             result += 1;
@@ -920,14 +920,14 @@ const saveButton = async () => {
             comments2,
             store.state.userData.lngSequence
           );
-          console.log(res); // 애매 ?
+          //console.log(res); // 애매 ?
           if (res.data.RESULT_CD == "00") {
             result += 1;
           }
         }
 
-        // console.log(result);
-        // console.log(allstaterows2.value);
+        // //console.log(result);
+        // //console.log(allstaterows2.value);
         if (
           allstaterows2.value.updated.length > 0 &&
           allstaterows2.value.created.length > 0 &&
@@ -978,11 +978,11 @@ const saveButton = async () => {
         searchButton();
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         // 취소 눌렀을 때 실행할 코드
-        //console.log("취소 버튼 클릭됨");
+        ////console.log("취소 버튼 클릭됨");
       }
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   } finally {
   }
 };
@@ -1019,8 +1019,8 @@ const addButton = async () => {
     set1.has(item.lngStockID)
   );
 
-  // console.log(updatedrowdata.value);
-  // console.log(rowData2.value);
+  // //console.log(updatedrowdata.value);
+  // //console.log(rowData2.value);
   if (hasDupli == true) {
     Swal.fire({
       title: "경고",
@@ -1031,7 +1031,7 @@ const addButton = async () => {
     });
     return;
   }
-  console.log(updatedrowdata.value);
+  //console.log(updatedrowdata.value);
   updatedrowdata.value = updatedrowdata.value
     .filter((item) => item.lngCheck == true)
     .map((item) => ({
@@ -1097,7 +1097,7 @@ const addButton = async () => {
       "," +
       updatedrowdata.value[i].dtmOrderDate;
 
-    console.log(addrowDefault.value);
+    //console.log(addrowDefault.value);
     addRow4.value = !addRow4.value;
 
     await nextTick();
@@ -1114,7 +1114,7 @@ const addButton = async () => {
 
 const deleteRow7 = ref(false);
 const deleteButton = async () => {
-  console.log(updatedrowdata2.value);
+  //console.log(updatedrowdata2.value);
 
   const checkedRows = updatedrowdata2.value.filter(
     (item) => item.lngCheck == true
@@ -1148,7 +1148,7 @@ const deleteButton = async () => {
       store.state.userData.lngSequence
     );
 
-    console.log(res);
+    //console.log(res);
     store.state.loading = false;
     deleteRow7.value = !deleteRow7.value;
   } catch (error) {}

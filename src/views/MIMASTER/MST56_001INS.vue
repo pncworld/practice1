@@ -348,14 +348,14 @@ const searchButton = async () => {
   store.state.loading = true;
   try {
     initGrid();
-    //  console.log(store.state.userData);
+    //  //console.log(store.state.userData);
     const res = await getSalesInfoByCorner(
       store.state.userData.lngStoreGroup,
       store.state.userData.lngPositionType,
       store.state.userData.lngPosition,
       0
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -382,7 +382,7 @@ const clickedRowData = async (e) => {
       cond2.value
     );
 
-    console.log(res);
+    //console.log(res);
 
     rowData2.value = res.data.List;
   } catch (error) {}
@@ -407,7 +407,7 @@ const searchButton2 = async () => {
       cond2.value
     );
 
-    //console.log(res);
+    ////console.log(res);
 
     rowData2.value = res.data.List;
   } catch (error) {}
@@ -416,7 +416,7 @@ const searchButton2 = async () => {
 const visible = ref(false);
 const clickedMenuCd = ref("");
 const buttonClicked = async (e) => {
-  console.log(e);
+  //console.log(e);
   clickedMenuNm.value = e[2];
   clickedMenuCd.value = e[1];
   visible.value = true;
@@ -461,7 +461,7 @@ const saveButton2 = async () => {
       stss,
       store.state.userData.lngSequence
     );
-    console.log(res);
+    //console.log(res);
   } catch (error) {}
 };
 

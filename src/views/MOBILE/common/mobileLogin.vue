@@ -146,7 +146,7 @@ const login2 = async () => {
   store.state.selectedCategoryId = null;
   try {
     const response = await mobileLogin(username.value, password.value);
-    console.log(response);
+    //console.log(response);
 
     if (response.data.RESULT_CD == "00") {
       // store.state.userData = response.data.loginSession[0];
@@ -178,7 +178,7 @@ const login2 = async () => {
           PROGID: item.PROGRAM_ID,
           PROGNM: item.PROGRAM_NM,
         }));
-        //console.log(result);
+        ////console.log(result);
 
         const result3 = response.data.List3;
 
@@ -220,7 +220,7 @@ const login2 = async () => {
       throw new Error("로그인 실패");
     }
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     message.value = "오류 발생";
   } finally {
     store.state.loading2 = false;

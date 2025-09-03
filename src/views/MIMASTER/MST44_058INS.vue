@@ -529,7 +529,7 @@ const searchButton = async () => {
       posNo.value,
       Number(currentpaymentCd.value)
     );
-    //console.log(res4);
+    ////console.log(res4);
     AmountList.value = res4.data.AmountList;
     KeyList.value = res4.data.AmountKeyList;
     if (KeyList.value == null) {
@@ -635,8 +635,8 @@ const showScreenKeysOrder = () => {
 };
 
 const onChoose = (e) => {
-  // //console.log(e.oldIndex);
-  // //console.log(KeyList.value);
+  // ////console.log(e.oldIndex);
+  // ////console.log(KeyList.value);
   clickedStrIcon.value = KeyList.value[e.oldIndex].strIcon;
 };
 
@@ -766,7 +766,7 @@ const saveButton = async () => {
           currentpaymentCd.value
         );
 
-        //console.log(res2);
+        ////console.log(res2);
       } catch (error) {
       } finally {
         store.state.loading = false;
@@ -1038,7 +1038,7 @@ const addKey = () => {
 watch(
   () => KeyList.value,
   () => {
-    //console.log(KeyList.value);
+    ////console.log(KeyList.value);
   }
 );
 /**

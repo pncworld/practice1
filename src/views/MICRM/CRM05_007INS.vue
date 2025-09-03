@@ -326,10 +326,10 @@ const searchButton = async () => {
         null
       );
     }
-    //console.log(res);
+    ////console.log(res);
 
     rowData2.value = res.data.List;
-    //console.log(res);
+    ////console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;

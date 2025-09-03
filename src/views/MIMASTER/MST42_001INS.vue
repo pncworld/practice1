@@ -407,7 +407,7 @@ const searchButton = async () => {
       cond2.value
     );
 
-    //console.log(res);
+    ////console.log(res);
 
     rowData.value = res.data.List;
     updateRowData.value = JSON.parse(JSON.stringify(res.data.List));
@@ -577,7 +577,7 @@ const saveButton = async () => {
         .join("\u200b");
       const res = await deleteClientInfo(groups, supplierid, suppliertype);
 
-      //console.log(res);
+      ////console.log(res);
     }
     Swal.fire({
       title: "성공",
@@ -586,7 +586,7 @@ const saveButton = async () => {
       confirmButtonText: "확인",
     });
   } catch (error) {
-    //console.log(error);
+    ////console.log(error);
   } finally {
     store.state.loading = false;
     searchButton();
@@ -616,14 +616,14 @@ const sendRowState = (e) => {
 const statesrows = ref([]);
 const deleterows = ref([]);
 const allStateRows = (e) => {
-  //console.log(e);
+  ////console.log(e);
   statesrows.value = [...e.updated, ...e.created];
   deleterows.value = e.deleted;
-  //console.log(statesrows.value);
+  ////console.log(statesrows.value);
 };
 const afterClick = ref(false);
 const clickedRowData = (e) => {
-  //console.log(e);
+  ////console.log(e);
   afterClick.value = true;
   gridvalue1.value = e[1];
   gridvalue2.value = e[2];
@@ -698,7 +698,7 @@ const changeColid = ref();
 const changeNow = ref(false);
 const changeNow2 = ref(false);
 const updatedRowData = (e) => {
-  //console.log(e);
+  ////console.log(e);
   updateRowData.value = e;
 };
 const updateRowData = ref([]);

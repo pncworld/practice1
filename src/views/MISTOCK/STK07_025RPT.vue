@@ -287,7 +287,7 @@ const searchButton = async () => {
       cond2.value,
 
     );
-    console.log(res);
+    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -356,7 +356,7 @@ onMounted(async () => {
   
   const res = await getStockDetail(store.state.userData.lngStoreGroup, "01");
 
-  console.log(res);
+  //console.log(res);
   optionList.value = res.data.List;
 
   const today = new Date();
@@ -409,7 +409,7 @@ const changeOption = async (e) => {
     store.state.userData.lngStoreGroup,
     e.target.value
   );
-  console.log(res);
+  //console.log(res);
   optionList2.value = res.data.List;
 };
 

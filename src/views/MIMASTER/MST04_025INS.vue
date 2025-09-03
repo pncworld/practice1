@@ -341,7 +341,7 @@ const tempgridValue5 = ref();
 
 const oriRowData2 = ref([]);
 const clickedRowData = async (e) => {
-  console.log(e);
+  //console.log(e);
   afterSearch3.value = false;
   cond.value = e[0];
   cond2.value = e[1];
@@ -365,7 +365,7 @@ const clickedRowData = async (e) => {
       cond.value
     );
 
-    console.log(res);
+    //console.log(res);
 
     rowData2.value = res.data.List;
     updatedrowdata2.value = res.data.List;
@@ -378,7 +378,7 @@ const fcond2 = ref("");
 const fcond4 = ref("");
 const fcond5 = ref("");
 const clickedRowData2 = async (e) => {
-  //console.log(e);
+  ////console.log(e);
 
   cond.value = e[0];
   cond2.value = e[1];
@@ -402,7 +402,7 @@ const clickedRowData2 = async (e) => {
       e[3]
     );
 
-    console.log(res);
+    //console.log(res);
 
     rowData3.value = res.data.List;
     updatedRowData3.value = res.data.List;
@@ -427,7 +427,7 @@ const buttonClicked = async (e) => {
     rowData3.value = rowData3.value.filter((item) => item.lngItemID !== e[2]);
     return;
   }
-  console.log(e);
+  //console.log(e);
   await Swal.fire({
     title: "확인",
     text: "정말로 삭제하시겠습니까?",
@@ -446,7 +446,7 @@ const buttonClicked = async (e) => {
         e[0]
       );
 
-      console.log(res);
+      //console.log(res);
     } else {
       return;
     }
@@ -462,7 +462,7 @@ const buttonClicked = async (e) => {
       cond5.value.replaceAll("-", "")
     );
 
-    console.log(res);
+    //console.log(res);
 
     rowData3.value = res.data.List;
     updatedRowData3.value = res.data.List;
@@ -498,7 +498,7 @@ const searchButton = async () => {
       scond2.value
     );
 
-    console.log(res);
+    //console.log(res);
 
     rowData6.value = res.data.List;
   } catch (error) {}
@@ -556,7 +556,7 @@ const saveButton = async () => {
           "U"
         );
 
-        console.log(res);
+        //console.log(res);
 
         if (res.data.RESULT_CD == "00") {
           Swal.fire({
@@ -585,7 +585,7 @@ const saveButton = async () => {
       cond.value
     );
 
-    console.log(res);
+    //console.log(res);
 
     rowData2.value = res.data.List;
     updatedrowdata2.value = res.data.List;
@@ -610,7 +610,7 @@ const getOptionList = async (e) => {
       e.target.value
     );
 
-    console.log(res);
+    //console.log(res);
 
     optionList2.value = res.data.List;
 
@@ -634,7 +634,7 @@ const applyButton = () => {
     addRow.value = false;
     return;
   }
-  //  console.log(checkedrowdata.value);
+  //  //console.log(checkedrowdata.value);
 
   checkedrowdata.value = checkedrowdata.value.map((item) => ({
     ...item,
@@ -647,7 +647,7 @@ const applyButton = () => {
 };
 
 const updatedRowData4 = (e) => {
-  console.log(e);
+  //console.log(e);
   updatedRowData3.value = e;
 };
 
@@ -716,7 +716,7 @@ const saveButton2 = async () => {
           confirmButtonText: "확인",
         });
       }
-      //console.log(res);
+      ////console.log(res);
     } catch (error) {
     } finally {
       const res2 = await getItemsList(store.state.userData.lngStoreGroup);
@@ -750,7 +750,7 @@ const saveButton2 = async () => {
           confirmButtonText: "확인",
         });
       }
-      console.log(res);
+      //console.log(res);
     } catch (error) {
     } finally {
       const res2 = await getItemsList(store.state.userData.lngStoreGroup);
@@ -782,7 +782,7 @@ const changeValue = (e) => {
   } else {
   }
 
-  console.log(e);
+  //console.log(e);
 };
 
 const searchvalue = ref("");
@@ -835,7 +835,7 @@ const fileNm = ref("");
 const handleFileChange = async (e) => {
   const file = e.target.files[0];
   fileNm.value = file.name;
-  //console.log(file);
+  ////console.log(file);
   currentFile.value = file;
   currentSheet.value = 1;
 
@@ -851,7 +851,7 @@ const handleFileChange = async (e) => {
     }
 
     const result = await readFileWithArrayBuffer(file);
-    console.log(result);
+    //console.log(result);
   }
 };
 
@@ -895,7 +895,7 @@ async function readFileWithArrayBuffer(file) {
   }));
   updatedRowData3.value = rowData3.value;
   byExcel.value = 1;
-  console.log(rowData3.value);
+  //console.log(rowData3.value);
   return jsonData;
 }
 

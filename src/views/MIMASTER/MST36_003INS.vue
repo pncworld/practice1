@@ -105,7 +105,7 @@
             v-model="gridvalue3"
             name="gridvalue3"
             @input="changeInfo"
-            :disabled="!clickrowData1"  />
+            :disabled="!clickrowData1" />
         </div>
       </div>
     </div>
@@ -185,7 +185,7 @@ const sendRowState = (e) => {
   } else {
     isNewColumn.value = true;
   }
-  // //console.log(e);
+  // ////console.log(e);
 };
 
 /**

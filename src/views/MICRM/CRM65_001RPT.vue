@@ -147,7 +147,7 @@ onMounted(async () => {
 
   optionList3.value = res.data.List;
   const res2 = await getInitGftData(store.state.userData.lngStoreGroup);
-  //console.log(res2);
+  ////console.log(res2);
   optionList.value = res2.data.List;
   optionList2.value = res2.data.List2;
 });
@@ -252,7 +252,7 @@ const searchButton = async () => {
       sd2.value,
       ed2.value
     );
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -276,7 +276,7 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 
 /**

@@ -21,7 +21,7 @@ import { onMounted } from "vue";
 const cond = ref(0);
 const emit = defineEmits(["SubLease", "SubLeaseName"]);
 onMounted(() => {
-  console.log(store.state.storeSubLease);
+  //console.log(store.state.storeSubLease);
 
   optionList.value = store.state.storeSubLease;
 

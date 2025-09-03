@@ -180,7 +180,7 @@ export async function insertMobilePageLog(progdata) {
     progid,
     2
   );
-  console.log(res);
+  //console.log(res);
   return ``;
 }
 
@@ -192,8 +192,8 @@ export async function insertLoginLog(id, pw, group, storecd) {
   //comsole.log(store);
   // const userGroup = store.state.userData.GROUP_CD;
   // const userStoreCd = store.state.userData.STORE_CD;
-  // console.log(userGroup);
-  // console.log(userStoreCd);
+  // //console.log(userGroup);
+  // //console.log(userStoreCd);
   //const userId = store.state.userData.USER_NO;
   let userIp = "";
   const userip = async () => {
@@ -213,7 +213,7 @@ export async function insertLoginLog(id, pw, group, storecd) {
     "01",
     1
   );
-  console.log(res);
+  //console.log(res);
   return ``;
 }
 
@@ -244,7 +244,7 @@ export async function insertLoginLog(id, pw, group, storecd) {
 //     "01",
 //     2
 //   );
-//   console.log(res);
+//   //console.log(res);
 //   return ``;
 // }
 

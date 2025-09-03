@@ -28,7 +28,7 @@ const options = {
 };
 
 https.createServer(options, app).listen(443, () => {
-  console.log("✅ Vue 앱 HTTPS 실행 중 → https://localhost");
+  //console.log("✅ Vue 앱 HTTPS 실행 중 → https://localhost");
 });
 
 http
@@ -37,5 +37,5 @@ http
     res.end();
   })
   .listen(80, () => {
-    console.log("HTTP Server running on port 80 (redirecting to HTTPS)");
+    //console.log("HTTP Server running on port 80 (redirecting to HTTPS)");
   });

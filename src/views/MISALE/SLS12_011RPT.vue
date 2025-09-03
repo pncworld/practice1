@@ -196,13 +196,13 @@ onMounted(async () => {
 
   const res = await getSalesCloseMaxDate(store.state.userData.lngStoreGroup);
 
-  //console.log(res);
+  ////console.log(res);
   if (res.data.closeMaxDate.length > 0) {
     formattedDate.value = res.data.closeMaxDate[0].dtmCloseDate.split(" ")[0];
   } else {
     formattedDate.value = new Date().toISOString().split("T")[0];
   }
-  //console.log(formattedDate.value);
+  ////console.log(formattedDate.value);
 });
 
 /**

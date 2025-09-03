@@ -704,7 +704,7 @@ const excelStore = (e) => {
   exExcelNm.value = e;
   p2cond.value = e.split("사업장명 : ")[1];
 
-  //console.log(p2cond.value);
+  ////console.log(p2cond.value);
 };
 const exportToExcel = () => {
   documentSubTitle.value = exExcelNm.value + "\n" + "조회조건 :";
@@ -1131,7 +1131,7 @@ const saveButton = async () => {
       address,
       store.state.userData.lngSequence
     );
-    //console.log(res);
+    ////console.log(res);
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
         title: "성공",
@@ -1143,7 +1143,7 @@ const saveButton = async () => {
     }
     searchButton();
   } catch (error) {
-    //console.log(error);
+    ////console.log(error);
     return;
   } finally {
     store.state.loading = false;
@@ -1161,7 +1161,7 @@ const saveButton2 = async () => {
       pcond5.value,
       store.state.userData.lngSequence
     );
-    //console.log(res);
+    ////console.log(res);
 
     if (res.data.List[0].strErr == "0000") {
       Swal.fire({
@@ -1243,7 +1243,7 @@ const saveButton3 = async () => {
       address,
       store.state.userData.lngSequence
     );
-    //console.log(res);
+    ////console.log(res);
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
         title: "성공",
@@ -1272,7 +1272,7 @@ const selectedIndex2 = (e) => {
  */
 
 const clickedRowData3 = (e) => {
-  //console.log(e);
+  ////console.log(e);
   gridvalue1.value = e[0];
   gridvalue2.value = e[12];
   gridvalue3.value = e[1];
@@ -1333,7 +1333,7 @@ const updateGridValue = async (e) => {
   const value = e.target.value;
 
   if (name == "strSaleCustStatus") {
-    //console.log(value);
+    ////console.log(value);
     changeColid.value = "strSaleCustStatusTxt";
     changeValue.value = value == 0 ? "정상" : "퇴사";
     changeNow.value = !changeNow.value;
@@ -1357,7 +1357,7 @@ const updateRowData = ref([]);
  */
 const stateRows = ref([]);
 const allStateRows = (e) => {
-  //console.log(e);
+  ////console.log(e);
   stateRows.value = e;
 };
 
@@ -1373,15 +1373,15 @@ const sendRowState = (e) => {
 
 const checkedRows = ref([]);
 const checkedRowData = (e) => {
-  //console.log(e);
+  ////console.log(e);
 
   checkedRows.value = e;
 };
 const updatedRowData = (newvalue) => {
   updateRowData.value = newvalue;
-  //console.log(updateRowData.value);
+  ////console.log(updateRowData.value);
 
-  //console.log(rowData.value);
+  ////console.log(rowData.value);
 };
 
 watch(dtmOpenDate, () => {
@@ -1435,7 +1435,7 @@ const beforeFileSelect = () => {
 const excelcond = ref(1);
 const handleFileChange = async (e) => {
   const file = e.target.files[0];
-  //console.log(file);
+  ////console.log(file);
   currentFile.value = file;
   excelcond.value = 1;
   SheetList.value = [];
@@ -1451,7 +1451,7 @@ const handleFileChange = async (e) => {
     }
 
     const result = await readFileWithArrayBuffer(file);
-    //console.log(result);
+    ////console.log(result);
   }
   e.target.value = "";
 };
@@ -1501,7 +1501,7 @@ async function readFileWithArrayBuffer(file) {
     strSaleCustStatusTxt: "정상",
   }));
   updateRowData.value = JSON.parse(JSON.stringify(rowData.value));
-  //console.log(updateRowData.value);
+  ////console.log(updateRowData.value);
   return jsonData;
 }
 
@@ -1525,7 +1525,7 @@ const lngIFChk = (e) => {
   }
 };
 const BP_ID = (e) => {
-  //console.log(e);
+  ////console.log(e);
   currBPID.value = e;
 };
 

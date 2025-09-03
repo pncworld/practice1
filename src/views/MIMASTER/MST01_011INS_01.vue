@@ -789,7 +789,7 @@ const clickrowData1 = ref(false);
 
 const clickedRowData = (newValue) => {
   clickrowData1.value = true;
-  //console.log(newValue);
+  ////console.log(newValue);
   if (newValue == undefined) {
     return;
   }
@@ -1360,7 +1360,7 @@ const updatedRowData = (newValue) => {
  */
 
 const updatedRowData2 = (newValue) => {
-  //console.log(newValue);
+  ////console.log(newValue);
   filteredrowData4.value = newValue;
   const change = updatedRowData5.value.find(
     (item) => item.lngCode == Number(selectedOptionGroupCd.value)
@@ -1399,7 +1399,7 @@ const updatedRowData2 = (newValue) => {
     //comsole.log(change);
   }
   // rowData3.value = [...rowData3.value];
-  //console.log(updatedRowData5.value);
+  ////console.log(updatedRowData5.value);
 };
 
 const changeColid = ref("");
@@ -1855,7 +1855,7 @@ const deleteRowData2 = async () => {
     });
     return;
   }
-  //console.log(filteredrowData2.value);
+  ////console.log(filteredrowData2.value);
 
   const updateLngCode = filteredrowData2.value
     .filter((item, index) => index != changeRow2.value)
@@ -1890,7 +1890,7 @@ const deleteRowData4 = async () => {
     return;
   }
 
-  //console.log(filteredrowData4.value);
+  ////console.log(filteredrowData4.value);
   const updateLngCode = filteredrowData4.value
     .filter((item, index) => index != changeRow3.value)
     .map((item) => item.lngCode);

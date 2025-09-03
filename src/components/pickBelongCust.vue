@@ -102,7 +102,7 @@ watch(
     lngCode.value = "";
     emit("strSaleCustID", lngCode.value);
     emit("strSaleCustName", strName.value);
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
   }
 );
@@ -130,7 +130,7 @@ const closePopUp = async () => {
 };
 
 const dblclickedRowData = (e) => {
-  //console.log(e);
+  ////console.log(e);
   strName.value = e[1];
   lngCode.value = e[0];
   emit("strSaleCustID", lngCode.value);

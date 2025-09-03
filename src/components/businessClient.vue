@@ -60,7 +60,7 @@ watch(
 onMounted(async () => {
   const res = await getSuppliers(store.state.userData.lngStoreGroup);
 
-  //console.log(res);
+  ////console.log(res);
   Name.value = props.defaultName;
   optionList.value = res.data.List;
 
