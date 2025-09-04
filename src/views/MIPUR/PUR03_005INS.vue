@@ -553,6 +553,10 @@ const dblclickedRowData = async (e) => {
     );
 
     rowData2.value = res.data.List;
+    //console.log(rowData2.value);
+    if (rowData2.value.length > 0) {
+      scond5.value = rowData2.value[0].strComments;
+    }
   } catch (error) {}
   openpop.value = true;
 };
@@ -626,7 +630,7 @@ const searchButton2 = async () => {
   }
   try {
     store.state.loading = true;
-    initGrid();
+    //initGrid();
 
     const res = await getStockReturnDetailList(
       groupCd.value,
@@ -694,9 +698,9 @@ const saveButton2 = async () => {
     const res = await getStockCloseDate(
       groupCd.value,
       storeCode.value,
-      ssscond.value
+      ssscond.value.replaceAll("-", "")
     );
-
+    console.log(res);
     const result = res.data.List[0].blnClosed;
 
     if (result !== "0") {
@@ -781,6 +785,31 @@ const deleteButton = async () => {
     });
     return;
   }
+
+  const date = checkedrowdata.value.map((item) => item.dtmReturnDate);
+
+  try {
+    for (let i = 0; i < date.length; i++) {
+      const res = await getStockCloseDate(
+        groupCd.value,
+        storeCode.value,
+        date[i]
+      );
+      console.log(res);
+      const result = res.data.List[0].blnClosed;
+
+      if (result !== "0") {
+        await Swal.fire({
+          title: "경고",
+          text: "자재마감이 끝난 월의 반품전표는 삭제가 불가능합니다.",
+          icon: "warning",
+
+          confirmButtonText: "확인",
+        });
+        return;
+      }
+    }
+  } catch (error) {}
 
   try {
     const returnnos = checkedrowdata.value

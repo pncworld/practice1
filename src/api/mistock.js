@@ -356,3 +356,11 @@ export const saveTakeDailyRegister = (
     UNITTYPES: unittype,
   });
 };
+
+export const getStockCheckLossByUpdate = (groupCd, storeCd, loss) => {
+  return api2.post("/MISTOCK/STKN06_012INS.asmx/getStockCheckLossByUpdate", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LOSSNO: loss,
+  });
+};

@@ -186,7 +186,7 @@ const rowData = ref([]);
 const afterSearch = ref(false);
 
 const cond = ref("0");
-const cond2 = ref("01");
+const cond2 = ref("04");
 const cond3 = ref("0");
 const cond4 = ref("0");
 const cond5 = ref(true);

@@ -371,6 +371,9 @@ const saveButton = async () => {
     console.log(res);
     store.state.loading = false;
 
+    rowData2.value = [
+      ...updatedrowdata.value.filter((item) => item.Selected == true),
+    ];
     const storenm = res.data.List2.map((item) => item.strStoreName).join(",");
     if (res.data.List[0].STATUS !== "0000") {
       await Swal.fire({
@@ -380,15 +383,12 @@ const saveButton = async () => {
 
         confirmButtonText: "확인",
       });
-
+      rowData2.value = [];
       return;
     }
   } catch (error) {
     console.log(error);
   } finally {
-    rowData2.value = [
-      ...updatedrowdata.value.filter((item) => item.Selected == true),
-    ];
   }
 
   try {
@@ -467,6 +467,11 @@ const saveButton2 = async () => {
     store.state.loading = false;
 
     const storenm = res.data.List2.map((item) => item.strStoreName).join(",");
+
+    rowData2.value = [
+      ...updatedrowdata.value.filter((item) => item.Selected == true),
+    ];
+
     if (res.data.List[0].STATUS !== "0000") {
       await Swal.fire({
         title: "실패",
@@ -475,15 +480,12 @@ const saveButton2 = async () => {
 
         confirmButtonText: "확인",
       });
-
+      rowData2.value = [];
       return;
     }
   } catch (error) {
     console.log(error);
   } finally {
-    rowData2.value = [
-      ...updatedrowdata.value.filter((item) => item.Selected == true),
-    ];
   }
 
   try {

@@ -261,6 +261,7 @@ import {
   getLossStockItemDetailList,
   getLossStockItemList,
   getLossTypeList,
+  getStockCheckLossByUpdate,
   saveLossMaster,
   updateLossMasterDetail,
 } from "@/api/mistock";
@@ -612,7 +613,7 @@ const saveButton2 = async () => {
       store.state.userData.lngSequence,
       scond2.value
     );
-
+    console.log(res);
     if (res.data.RESULT_CD == "00") {
       await Swal.fire({
         title: "성공",
@@ -624,11 +625,12 @@ const saveButton2 = async () => {
     } else {
       await Swal.fire({
         title: "실패",
-        text: "저장에 실패하였습니다.",
+        text: `${res.data.RESULT_NM}`,
         icon: "error",
 
         confirmButtonText: "확인",
       });
+      return;
     }
     //console.log(res);
   } catch (error) {
@@ -733,6 +735,27 @@ const saveButton3 = async () => {
     });
     return;
   }
+
+  try {
+    const res = await getStockCheckLossByUpdate(
+      groupCd2.value,
+      storeCode2.value,
+      tempLossNo.value
+    );
+    console.log(res);
+
+    if (res.data.List[0].blnClosed != "False") {
+      await Swal.fire({
+        title: "경고",
+        text: "해당 일자는 이미 마감되어 수정하실 수 없습니다.",
+        icon: "warning",
+
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } catch (error) {}
+
   try {
     const itemids = updatedrowdata3.value
       .filter((item, index) => allstaterows3.value.includes(index))
