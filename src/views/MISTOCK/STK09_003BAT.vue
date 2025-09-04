@@ -235,6 +235,7 @@ const startYear = (e) => {
  */
 
 const lngStoreCode = (e) => {
+  initGrid();
   lngstorecode.value = e;
   //comsole.log(e);
 };
@@ -412,7 +413,7 @@ const saveButton = async () => {
 
       //console.log(res);
       cond3.value =
-        checkStoreNm[i] + " 진행 중..." + `${i + 1} / ${checkStoreNm.length}`;
+        `[${i + 1} / ${checkStoreNm.length}]` + checkStoreNm[i] + " 진행 중...";
 
       rowData2.value = rowData2.value.filter(
         (item) => item.lngStoreCode != checkStoreCd[i]
@@ -523,4 +524,8 @@ const saveButton2 = async () => {
     rowData2.value = [];
   }
 };
+
+watch([cond, cond2], () => {
+  initGrid();
+});
 </script>
