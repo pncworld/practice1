@@ -1864,13 +1864,13 @@ const deleteRowData2 = async () => {
   for (let i = 0; i < updateLngCode.length; i++) {
     changeColid.value = "lngChainMenu" + (i + 1);
     changeValue.value = updateLngCode[i];
-    changeNow.value = !changeNow.value;
+    changeNow3.value = !changeNow3.value;
     await nextTick();
   }
   for (let j = 0; j < 21 - updateLngCode.length; j++) {
     changeColid.value = "lngChainMenu" + (21 - j);
     changeValue.value = 0;
-    changeNow.value = !changeNow.value;
+    changeNow3.value = !changeNow3.value;
     await nextTick();
   }
 
@@ -1898,13 +1898,13 @@ const deleteRowData4 = async () => {
   for (let i = 0; i < updateLngCode.length; i++) {
     changeColid.value = "lngChainGroup" + (i + 1);
     changeValue2.value = updateLngCode[i];
-    changeNow2.value = !changeNow2.value;
+    changeNow4.value = !changeNow4.value;
     await nextTick();
   }
   for (let j = 0; j < 20 - updateLngCode.length; j++) {
     changeColid.value = "lngChainGroup" + (20 - j);
     changeValue2.value = 0;
-    changeNow2.value = !changeNow2.value;
+    changeNow4.value = !changeNow4.value;
     await nextTick();
   }
 };
