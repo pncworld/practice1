@@ -324,3 +324,19 @@ export const getEmpContractList = (
     CONDVALUE: sword,
   });
 };
+
+export const getWorkContractDetail = (
+  groupCd,
+  storecd,
+  chargecd,
+  paystndcd,
+  date
+) => {
+  return api2.post("/MIHR/HR01_005INS.asmx/getWorkContractDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    CHARGER_CD: chargecd,
+    PAY_STCD: paystndcd,
+    DATE: date,
+  });
+};

@@ -835,7 +835,6 @@ const props = defineProps({
   },
   suffixColumnwon: {
     // 그리드 안에 원 붙일때 사용
-
     type: Array,
     default: [],
   },
@@ -982,6 +981,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  CalculateTimeColId: {
+    type: String,
+    default: "",
+  },
   ColCellRedColorColId: {
     type: Array,
     default: [],
@@ -990,6 +993,16 @@ const props = defineProps({
     // 체크박스 해제만 되는 설정
     type: Boolean,
     default: false,
+  },
+  hideChildHeader: {
+    // 체크박스 해제만 되는 설정
+    type: Boolean,
+    default: false,
+  },
+  setCellStyleColId: {
+    // 체크박스 해제만 되는 설정
+    type: Array,
+    default: [],
   },
 });
 
@@ -1104,6 +1117,21 @@ const funcshowGrid = async () => {
             return 0;
           }
         }
+      : props.CalculateTimeColId.includes(item.strColID)
+      ? function (prod, dataRow, fieldName, fieldNames, values) {
+          let stime = values[fieldNames.indexOf("strSTime")];
+          let etime = values[fieldNames.indexOf("strETime")];
+
+          return (
+            String(
+              parseInt(etime.split(":")[0]) - parseInt(stime.split(":")[0])
+            ).padStart(2, "0") +
+            ":" +
+            String(
+              parseInt(etime.split(":")[1]) - parseInt(stime.split(":")[1])
+            ).padStart(2, "0")
+          );
+        }
       : undefined,
   }));
   if (props.removeInitProp == true) {
@@ -1169,12 +1197,29 @@ const funcshowGrid = async () => {
           ? "left"
           : "none",
     },
-    styleCallback: function (grid, dataCell) {
-      var ret = {};
-      ////console.log(item.strColID);
-      ret.style = { color: "#FF0000" };
-      return ret;
-    },
+    // styleCallback: props.setCellStyleColId.includes(item.strColID)
+    //   ? function (grid, dataCell) {
+    //       // 시간값에 따라서 배경 색상 지정
+    //       var ret = {};
+    //       ////console.log(item.strColID);
+    //       //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
+    //       //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
+    //       console.log(dataCell.value);
+    //       dataCell.value == "1"
+    //         ? (ret.style = { backgroundColor: "#ADD8E6" })
+    //         : "";
+
+    //       return ret;
+    //     }
+    //   : function (grid, dataCell) {
+    //       // 시간값에 따라서 배경 색상 지정
+    //       var ret = {};
+    //       ////console.log(item.strColID);
+    //       // const 시간대 = grid.getValue(dataCell.index.itemIndex, '시간대')
+    //       //09:29
+    //       ret.style = { color: "#FF0000" };
+    //       return ret;
+    //     },
     groupFooter: {
       text: props.setGroupSumCustomText[
         props.setGroupSumCustomColumnId.indexOf(item.strColID)
@@ -1493,7 +1538,21 @@ const funcshowGrid = async () => {
           : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
     },
     buttonVisibility: "always",
-    styleCallback: props.ColCellRedColorColId.includes(item.strColID)
+    styleCallback: props.setCellStyleColId.includes(item.strColID)
+      ? function (grid, dataCell) {
+          // 시간값에 따라서 배경 색상 지정
+          var ret = {};
+          ////console.log(item.strColID);
+          //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
+          //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
+          console.log(dataCell.value);
+          dataCell.value == "1"
+            ? (ret.style = { backgroundColor: "#ADD8E6", color: "#ADD8E6" })
+            : (ret.style = { backgroundColor: "#FFFFFF", color: "#FFFFFF" });
+
+          return ret;
+        }
+      : props.ColCellRedColorColId.includes(item.strColID)
       ? function (grid, dataCell) {
           var ret = {};
           ret.style = { color: "#FF0000" };
@@ -1810,7 +1869,7 @@ const funcshowGrid = async () => {
     if (groupItems) {
       layout1.unshift(groupItems); // layout1의 첫 번째에 그룹 객체를 추가
     }
-
+    console.log(layout1);
     gridView.setColumnLayout(layout1);
   }
 
@@ -1848,6 +1907,7 @@ const funcshowGrid = async () => {
           layout.push({
             name: groupList[index],
             direction: "horizontal",
+            hideChildHeaders: props.hideChildHeader,
             items: [item.strColID],
             header: {
               text: groupList[index],
@@ -1860,6 +1920,7 @@ const funcshowGrid = async () => {
         layout.push({
           column: item.strColID,
           name: item.strHdText,
+          hideChildHeaders: props.hideChildHeader,
           header: { visible: true, text: item.strHdText },
           visible: item.intHdWidth !== 0,
           width: item.intHdWidth,
@@ -2021,6 +2082,7 @@ const funcshowGrid = async () => {
   // props.selectionStyle;deleteRow
   gridView.displayOptions.showTooltip = true;
   gridView.displayOptions.rowHeight = props.dynamicRowHeight == true ? -1 : 1;
+
   gridView.groupPanel.visible = false;
   gridView.displayOptions.watchDisplayChange = false;
   gridView.filterMode = "explicit";

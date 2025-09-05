@@ -1,9 +1,9 @@
-/*--############################################################################
+<!-- /*--############################################################################
 # Filename : HR01_005INS.vue                                                    
 # Description : 인사관리 > 마스터 관리 > 근무계약 등록.                        
 # Date :2025-06-11                                                             
 # Author : 권맑음                     
-################################################################################*/
+################################################################################*/ -->
 <template>
   <!-- 조회 조건 -->
   <div class="h-[80%]">
@@ -18,8 +18,8 @@
       </div>
     </div>
     <div
-      class="flex flex-col justify-start space-x-5 bg-gray-200 rounded-lg h-24 items-start pt-3 pl-36">
-      <div class="flex">
+      class="flex flex-col justify-start space-x-5 bg-gray-200 rounded-lg h-28 items-start pt-2">
+      <div class="flex ml-12">
         <div>
           <PickStoreRenew
             @lngStoreGroup="handleGroupCd"
@@ -30,13 +30,13 @@
             @update:ischanged="handleinitAll">
           </PickStoreRenew>
         </div>
-        <div class="flex justify-center items-center space-x-3 ml-20">
-          <div class="flex items-center justify-center">
-            <div class="text-base font-semibold">구분 :</div>
+        <div class="flex justify-center items-center ml-20">
+          <div class="flex items-center justify-center space-x-5">
+            <div class="text-base font-semibold">구분</div>
             <select
               name=""
               id=""
-              class="w-20 h-8 ml-2 rounded-lg"
+              class="w-20 h-10 ml-2 rounded-lg"
               v-model="selectedOption">
               <option value="0">전체</option>
               <option :value="i.lngCode" v-for="i in optionList">
@@ -45,7 +45,7 @@
             </select>
           </div>
           <div class="flex items-center justify-center space-x-3 pl-10">
-            <div class="text-base font-semibold ml-10">검색 :</div>
+            <div class="text-base font-semibold ml-10">검색</div>
             <select
               name=""
               id=""
@@ -62,7 +62,7 @@
           </div>
         </div>
       </div>
-      <div class="flex mt-3 space-x-10 items-center">
+      <div class="flex mt-2 space-x-10 items-center !ml-12">
         <div class="text-base font-semibold">조회옵션</div>
         <div>
           <label for="cond" class="text-sm"
@@ -80,10 +80,10 @@
           >
         </div>
 
-        <div class="flex pl-24 -mt-2">
+        <div class="flex pl-44 -mt-2 items-center">
           <input type="checkbox" v-model="disableAll" />
           <Datepicker2
-            class="!pr-48"
+            class="pl-2"
             :mainName="'기간'"
             @endDate="endDate"
             @startDate="startDate"
@@ -93,14 +93,16 @@
     </div>
     <!-- 조회 조건 -->
     <!-- 그리드 영역-->
-    <div
-      class="grid grid-rows-1 grid-cols-2 h-[70vh] w-full justify-center mt-1">
+    <div class="flex h-[70vh] w-full justify-center mt-1">
       <div class="w-full h-full">
         <Realgrid
           :progname="'HR01_005INS_VUE'"
           :progid="1"
           :rowData="rowData"
+          :setStateBar="false"
+          :checkRowAuto="false"
           @clickedRowData="clickedRowData"
+          @dblclickedRowData="dblclickedRowData"
           @selcetedrowData="selcetedrowData"
           @updatedRowData="updatedRowData"
           :addRow4="addRow"
@@ -116,14 +118,33 @@
           :documentTitle="'HR01_005INS'"
           @selectedIndex="selectedIndex"
           :rowStateeditable="false"
+          :checkRenderEditable="true"
           @sendRowState="sendRowState"
           @allStateRows="allStateRows"
+          :checkRowAuto2="true"
+          :checkRowAuto2Col="'checkbox'"
           :addField="'new'"></Realgrid>
       </div>
-      <div class="w-full h-[40vh] mt-5">
-        <div class="text-base font-semibold pl-2">
-          근무 계약 등록(신규/수정)
+
+      <!-- 그리드 영역-->
+      <!-- 연동 데이터 영역-->
+    </div>
+  </div>
+
+  <div
+    v-if="open"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-[50vw] h-[80vh]">
+      <div class="flex justify-between">
+        <h2 class="text-xl font-bold mb-4">근무 계약 등록(신규/수정)</h2>
+        <div class="flex justify-end space-x-4">
+          <button class="whitebutton" @click="searchButton2">추가</button>
+          <button class="whitebutton" @click="saveButton2">삭제</button>
+          <button @click="open = false" class="whitebutton">저장</button>
+          <button @click="open = false" class="whitebutton">닫기</button>
         </div>
+      </div>
+      <div class="w-full h-[60%]">
         <div class="grid grid-rows-5 grid-cols-[1fr,2fr,1fr,2fr] h-[20vh]">
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
@@ -131,11 +152,14 @@
           </div>
           <div
             class="border-l border-t border-gray-600 flex justify-center items-center">
-            <button @click="selectEMP">
+            <button
+              @click="selectEMP"
+              class="border border-black w-[80%] h-[80%]">
               <input
                 type="text"
                 disabled
-                class="border border-black w-[80%] h-[80%] pointer-events-none" />
+                class="w-full h-full"
+                v-model="gridvalue1" />
             </button>
           </div>
           <div
@@ -144,8 +168,15 @@
           </div>
           <div
             class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select name="" id="" class="border border-black w-[80%] h-[80%]">
-              <option value=""></option>
+            <select
+              name=""
+              id=""
+              disabled
+              class="border border-black w-[80%] h-[80%]"
+              v-model="gridvalue2">
+              <option :value="i.lngCode" v-for="i in optionList3">
+                {{ i.strStndName }}
+              </option>
             </select>
           </div>
           <div
@@ -154,8 +185,15 @@
           </div>
           <div
             class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input type="date" class="border border-black w-[30%] h-[80%]" /> /
-            <input type="date" class="border border-black w-[30%] h-[80%]" />
+            <input
+              type="date"
+              class="border border-black w-[38%] h-[80%]"
+              v-model="gridvalue3" />
+            <span class="text-3xl">/</span>
+            <input
+              type="date"
+              class="border border-black w-[38%] h-[80%]"
+              v-model="gridvalue4" />
           </div>
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
@@ -163,16 +201,25 @@
           </div>
           <div
             class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input type="date" class="border border-black w-[80%] h-[80%]" />
+            <input
+              type="date"
+              class="border border-black w-[80%] h-[80%]"
+              v-model="gridvalue5" />
           </div>
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
             급여/시급
           </div>
           <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input type="number" class="border border-black w-[30%] h-[80%]" />
-            <input type="number" class="border border-black w-[30%] h-[80%]" />
+            class="border-l border-t border-gray-600 flex justify-center items-center space-x-1">
+            <input
+              type="number"
+              class="border border-black w-[39%] h-[80%]"
+              v-model="gridvalue6" />
+            <input
+              type="number"
+              class="border border-black w-[39%] h-[80%]"
+              v-model="gridvalue7" />
           </div>
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
@@ -180,36 +227,56 @@
           </div>
           <div
             class="border-l border-t border-gray-600 flex justify-start pl-8 items-center">
-            <input type="checkbox" />
+            <input type="checkbox" v-model="gridvalue8" />
           </div>
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
             소정근무시간 주/월
           </div>
           <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input type="number" class="border border-black w-[30%] h-[80%]" />
-            <input type="number" class="border border-black w-[30%] h-[80%]" />
+            class="border-l border-t border-gray-600 flex justify-start pl-8 items-center space-x-1 col-span-3">
+            <input
+              type="number"
+              class="border border-black w-[10%] h-[80%]"
+              v-model="gridvalue9" />
+            <input
+              type="number"
+              class="border border-black w-[10%] h-[80%]"
+              v-model="gridvalue10" />
           </div>
-          <div
+          <!-- <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
             근로계약서 첨부
           </div>
           <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input type="file" class="border border-black w-[70%] h-[90%]" />
-            <button class="whitebutton">파일삭제</button>
-          </div>
+            class="border-l border-t border-gray-600 flex justify-start pl-8 items-center col-span-3">
+            <input
+              type="text"
+              disabled
+              class="border border-black h-[80%] w-[50%]"
+              v-model="gridvalue47" />
+            <input
+              type="file"
+              class="border border-black w-[70%] h-[90%]"
+              hidden />
+            <div class="flex space-x-2">
+              <button class="whitebutton">파일선택</button>
+              <button class="whitebutton">파일삭제</button>
+            </div>
+          </div> -->
           <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
+            class="bg-gray-100 border-l border-t border-b border-gray-600 flex justify-center items-center">
             비고
           </div>
           <div
-            class="border-l border-t border-gray-600 flex justify-start pl-10 items-center col-span-3">
-            <input type="text" class="border border-black w-[80%] h-[80%]" />
+            class="border-l border-t border-b border-gray-600 flex justify-start pl-8 items-center col-span-3">
+            <input
+              type="text"
+              class="border border-black w-[80%] h-[80%]"
+              v-model="gridvalue11" />
           </div>
         </div>
-        <div class="text-base font-semibold pl-2 mt-2">※계약 스케쥴 등록</div>
+        <div class="text-xl font-semibold mt-5">계약 스케쥴 등록</div>
         <div
           class="grid grid-rows-7 grid-cols-[2fr,1fr,1fr,1fr,1fr,1fr,1fr,1fr,3fr] h-[25vh] w-[95%] min-w-0">
           <div
@@ -241,16 +308,23 @@
             토
           </div>
           <div
-            class="border-l border-t border-black justify-center flex items-center">
+            class="border-l border-t border-r border-black justify-center flex items-center">
             일
           </div>
-          <div class="row-span-7 h-[160%]">
+          <div class="row-span-7 h-[164%] ml-1">
             <Realgrid
               :progname="'HR01_005INS_VUE'"
               :progid="2"
+              :useAlternateRowStyle="false"
+              :mergeColumns2="true"
+              :setCellStyleColId="['workTime', 'workTime2']"
+              :mergeColumnGroupSubList2="[['workTime', 'workTime2']]"
+              :mergeColumnGroupName2="['근무여부']"
+              :hideChildHeader="true"
               :setStateBar="false"
+              :rowStateeditable="false"
               :setRowIndicator="false"
-              :rowData="rowData"></Realgrid>
+              :rowData="rowData2"></Realgrid>
           </div>
           <div
             class="border-l border-t border-black bg-gray-200 justify-center flex items-center">
@@ -258,31 +332,59 @@
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <input type="checkbox" />
+            <input
+              type="radio"
+              v-model="gridvalue12"
+              name="gridvalue12"
+              value="true" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <input type="checkbox" />
+            <input
+              type="radio"
+              v-model="gridvalue13"
+              value="true"
+              name="gridvalue13" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <input type="checkbox" />
+            <input
+              type="radio"
+              v-model="gridvalue14"
+              value="true"
+              name="gridvalue14" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <input type="checkbox" />
+            <input
+              type="radio"
+              v-model="gridvalue15"
+              value="true"
+              name="gridvalue15" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <input type="checkbox" />
+            <input
+              type="radio"
+              v-model="gridvalue16"
+              value="true"
+              name="gridvalue16" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <input type="checkbox" />
+            <input
+              type="radio"
+              v-model="gridvalue17"
+              value="true"
+              name="gridvalue17" />
           </div>
           <div
-            class="border-l border-t border-black justify-center flex items-center">
-            <input type="checkbox" />
+            class="border-l border-t border-r border-black justify-center flex items-center">
+            <input
+              type="radio"
+              v-model="gridvalue18"
+              value="true"
+              name="gridvalue18" />
           </div>
           <div
             class="border-l border-t border-black bg-gray-200 justify-center flex items-center">
@@ -290,31 +392,59 @@
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <input type="checkbox" />
+            <input
+              type="radio"
+              v-model="gridvalue19"
+              name="gridvalue12"
+              value="true" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <input type="checkbox" />
+            <input
+              type="radio"
+              v-model="gridvalue20"
+              value="true"
+              name="gridvalue13" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <input type="checkbox" />
+            <input
+              type="radio"
+              v-model="gridvalue21"
+              value="true"
+              name="gridvalue14" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <input type="checkbox" />
+            <input
+              type="radio"
+              v-model="gridvalue22"
+              value="true"
+              name="gridvalue15" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <input type="checkbox" />
+            <input
+              type="radio"
+              v-model="gridvalue23"
+              value="true"
+              name="gridvalue16" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <input type="checkbox" />
+            <input
+              type="radio"
+              v-model="gridvalue24"
+              value="true"
+              name="gridvalue17" />
           </div>
           <div
-            class="border-l border-t border-black justify-center flex items-center">
-            <input type="checkbox" />
+            class="border-l border-t border-r border-black justify-center flex items-center">
+            <input
+              type="radio"
+              v-model="gridvalue25"
+              value="true"
+              name="gridvalue18" />
           </div>
           <div
             class="border-l border-t border-black bg-gray-200 justify-center flex items-center">
@@ -325,56 +455,63 @@
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue26"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue27"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue28"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue29"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue30"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue31"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
-            class="border-l border-t border-black justify-center flex items-center">
+            class="border-l border-t border-r border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue32"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black bg-gray-200 justify-center flex items-center">
@@ -385,56 +522,63 @@
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue33"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue34"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue35"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue36"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue37"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue38"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
-            class="border-l border-t border-black justify-center flex items-center">
+            class="border-l border-t border-r border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue39"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black bg-gray-200 justify-center flex items-center">
@@ -445,89 +589,96 @@
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue40"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue41"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue42"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue43"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue44"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue45"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
           <div
-            class="border-l border-t border-black justify-center flex items-center">
+            class="border-l border-t border-r border-black justify-center flex items-center">
             <input
               type="text"
               min="0"
-              class="w-[80%] border border-black"
-              value="12:00" />
+              v-model="gridvalue46"
+              class="w-[80%] border border-black disabled:bg-white"
+              disabled />
           </div>
 
           <div
-            class="border-l border-t border-black bg-gray-200 justify-center flex items-center">
+            class="border-l border-t border-r border-black bg-gray-200 justify-center flex items-center">
             상세보기
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <button class="whitebutton">확인</button>
+            <button class="whitebutton" @click="setRowData3(2)">확인</button>
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <button class="whitebutton">확인</button>
+            <button class="whitebutton" @click="setRowData3(3)">확인</button>
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <button class="whitebutton">확인</button>
+            <button class="whitebutton" @click="setRowData3(4)">확인</button>
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <button class="whitebutton">확인</button>
+            <button class="whitebutton" @click="setRowData3(5)">확인</button>
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <button class="whitebutton">확인</button>
+            <button class="whitebutton" @click="setRowData3(6)">확인</button>
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
-            <button class="whitebutton">확인</button>
+            <button class="whitebutton" @click="setRowData3(7)">확인</button>
           </div>
           <div
-            class="border-l border-t border-black justify-center flex items-center">
-            <button class="whitebutton">확인</button>
+            class="border-l border-t border-r border-black justify-center flex items-center">
+            <button class="whitebutton" @click="setRowData3(1)">확인</button>
           </div>
         </div>
         <div class="w-[71%] h-[16vh]">
@@ -536,32 +687,30 @@
             :progid="3"
             :setStateBar="false"
             :setRowIndicator="false"
-            :rowData="rowData"></Realgrid>
+            :rowStateeditable="false"
+            :editableColId="'lngAtndType,strSTime,strETime'"
+            :checkRowAuto="false"
+            :labelingColumns="'lngAtndType'"
+            :CalculateTimeColId="'strWTime'"
+            @updatedRowData="updatedRowData2"
+            :valuesData="valuesData"
+            :labelsData="labelsData"
+            :rowData="rowData3"></Realgrid>
         </div>
       </div>
-      <!-- 그리드 영역-->
-      <!-- 연동 데이터 영역-->
     </div>
   </div>
-
   <!-- 연동 데이터 영역-->
 </template>
 
 <script setup>
+import { saveEMP2 } from "@/api/miattend";
 import {
-  getChargerInfo,
-  getChargerInfo2,
-  getInitEmpInfo,
-  saveEMP,
-  saveEMP2,
-} from "@/api/miattend";
-import { getEmpContractList, getInitEmpContractInfo } from "@/api/mihr";
-import Datepicker1 from "@/components/Datepicker1.vue";
+  getEmpContractList,
+  getInitEmpContractInfo,
+  getWorkContractDetail,
+} from "@/api/mihr";
 import Datepicker2 from "@/components/Datepicker2.vue";
-import DateRangePicker from "@/components/DateRangePicker.vue";
-import DateRangePicker2 from "@/components/DateRangePicker2.vue";
-import EmployeePopUp from "@/components/employeePopUp.vue";
-import GetZipCode from "@/components/getZipCode.vue";
 /**
  *  페이지명 자동 입력 컴포넌트
  *  */
@@ -571,7 +720,6 @@ import PageName from "@/components/pageName.vue";
  * 매장 공통 컴포넌트
  */
 
-import PickStore from "@/components/pickStore.vue";
 import PickStoreRenew from "@/components/pickStoreRenew.vue";
 
 /**
@@ -593,12 +741,12 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { nextTick, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
-import { Store, useStore } from "vuex";
+import { useStore } from "vuex";
 
 /**
  * 	화면 Load시 실행 스크립트
@@ -617,30 +765,53 @@ const dataList3 = ref([]);
 const dataList4 = ref([]);
 const dataList5 = ref([]);
 
-const gridvalue1 = ref();
-const gridvalue2 = ref();
-const gridvalue3 = ref();
-const gridvalue4 = ref();
-const gridvalue5 = ref();
-const gridvalue6 = ref();
-const gridvalue7 = ref();
-const gridvalue8 = ref();
-const gridvalue9 = ref();
-const gridvalue10 = ref();
-const gridvalue11 = ref();
-const gridvalue12 = ref();
-const gridvalue13 = ref();
-const gridvalue14 = ref();
-const gridvalue15 = ref();
-const gridvalue16 = ref();
-const gridvalue17 = ref();
-const gridvalue18 = ref();
-const gridvalue19 = ref();
-const gridvalue20 = ref();
-const gridvalue21 = ref();
-const gridvalue22 = ref();
-const gridvalue23 = ref();
-const gridvalue24 = ref();
+const gridvalue1 = ref("");
+const gridvalue2 = ref("");
+const gridvalue3 = ref("");
+const gridvalue4 = ref("");
+const gridvalue5 = ref("");
+const gridvalue6 = ref("");
+const gridvalue7 = ref("");
+const gridvalue8 = ref("");
+const gridvalue9 = ref("");
+const gridvalue10 = ref("");
+const gridvalue11 = ref("");
+const gridvalue12 = ref("");
+const gridvalue13 = ref("");
+const gridvalue14 = ref("");
+const gridvalue15 = ref("");
+const gridvalue16 = ref("");
+const gridvalue17 = ref("");
+const gridvalue18 = ref("");
+const gridvalue19 = ref("");
+const gridvalue20 = ref("");
+const gridvalue21 = ref("");
+const gridvalue22 = ref("");
+const gridvalue23 = ref("");
+const gridvalue24 = ref("");
+const gridvalue25 = ref("");
+const gridvalue26 = ref("");
+const gridvalue27 = ref("");
+const gridvalue28 = ref("");
+const gridvalue29 = ref("");
+const gridvalue30 = ref("");
+const gridvalue31 = ref("");
+const gridvalue32 = ref("");
+const gridvalue33 = ref("");
+const gridvalue34 = ref("");
+const gridvalue35 = ref("");
+const gridvalue36 = ref("");
+const gridvalue37 = ref("");
+const gridvalue38 = ref("");
+const gridvalue39 = ref("");
+const gridvalue40 = ref("");
+const gridvalue41 = ref("");
+const gridvalue42 = ref("");
+const gridvalue43 = ref("");
+const gridvalue44 = ref("");
+const gridvalue45 = ref("");
+const gridvalue46 = ref("");
+const gridvalue47 = ref("");
 
 const zipCode = ref(false);
 const showZipCode = () => {
@@ -684,15 +855,32 @@ const endDate = (e) => {
 const startDate = (e) => {
   StartDate.value = e;
 };
+
+const optionList2 = ref([]);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
   const res = await getInitEmpContractInfo(store.state.userData.lngStoreGroup);
   optionList.value = res.data.List;
+  optionList2.value = res.data.List2;
+  optionList3.value = res.data.List3;
+  labelsData.value = [optionList2.value.map((item) => item.strDName)];
+  valuesData.value = [optionList2.value.map((item) => item.strDCode)];
 
   ////console.log(res);
+
+  rowData2.value = Array.from({ length: 17 }, (_, i) => {
+    const hour = String(i + 8).padStart(2, "0"); // 08 ~ 24
+    return {
+      strTime: `${hour}:00`,
+      workTime: "",
+      workTime2: "",
+    };
+  });
 });
 const rowData = ref([]);
+const labelsData = ref([]);
+const valuesData = ref([]);
 const groupCd = ref();
 const storeCd = ref();
 const afterSearch = ref(false);
@@ -703,6 +891,7 @@ const isNewRow = ref(true);
  * 추가 버튼 함수
  */
 const optionList = ref([]);
+const optionList3 = ref([]);
 const addRow = ref(false);
 const changeNow = ref(false);
 const changeValue2 = ref();
@@ -931,7 +1120,7 @@ const searchButton = async () => {
 
     rowData.value = res.data.List;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
-    ////console.log(res);
+    console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -1183,6 +1372,226 @@ const excelButton = () => {
     "매장명 : " + excelNm.value + "\n" + (a + ":" + b) + "\n" + c;
   exporttoExcel.value = !exporttoExcel.value;
 };
+
+const open = ref(false);
+const tempRowData3 = ref([]);
+const dblclickedRowData = async (e) => {
+  console.log(e);
+  rowData2.value = [];
+  rowData3.value = [];
+  gridvalue1.value = e[3];
+  gridvalue2.value = e[25];
+  gridvalue3.value = e[5];
+  gridvalue4.value = e[6];
+  gridvalue5.value = e[19];
+  gridvalue6.value = e[7];
+  gridvalue7.value = e[8];
+  gridvalue8.value = e[20] == "1" ? true : false;
+  gridvalue9.value = e[10];
+  gridvalue10.value = e[10] * 4;
+  gridvalue47.value = e[14];
+  gridvalue11.value = e[13];
+
+  try {
+    const res = await getWorkContractDetail(e[16], e[17], e[18], e[25], e[19]);
+    tempRowData3.value = res.data.List;
+    console.log(res);
+    // 12 19
+    const workDate = res.data.List2.filter(
+      (item) => item.lngWorkChk == "1"
+    ).map((item) => item.lngDayWeek);
+    const restDate = res.data.List2.filter(
+      (item) => item.lngWorkChk == "0"
+    ).map((item) => item.lngDayWeek);
+
+    const workHour = res.data.List2.map((item) => item.strWorkHour);
+
+    const goworkHour = res.data.List2.map((item) => item.strOnTime);
+
+    const leaveworkHour = res.data.List2.map((item) => item.strOffTime);
+
+    for (let i = 0; i < workDate.length; i++) {
+      if (workDate[i] == "1") {
+        gridvalue18.value = true;
+        gridvalue25.value = false;
+      } else if (workDate[i] == "2") {
+        gridvalue12.value = true;
+        gridvalue19.value = false;
+      } else if (workDate[i] == "3") {
+        gridvalue13.value = true;
+        gridvalue20.value = false;
+      } else if (workDate[i] == "4") {
+        gridvalue14.value = true;
+        gridvalue21.value = false;
+      } else if (workDate[i] == "5") {
+        gridvalue15.value = true;
+        gridvalue22.value = false;
+      } else if (workDate[i] == "6") {
+        gridvalue16.value = true;
+        gridvalue23.value = false;
+      } else if (workDate[i] == "7") {
+        gridvalue17.value = true;
+        gridvalue24.value = false;
+      }
+    }
+
+    for (let i = 0; i < restDate.length; i++) {
+      if (restDate[i] == "1") {
+        gridvalue25.value = true;
+        gridvalue18.value = false;
+      } else if (restDate[i] == "2") {
+        gridvalue19.value = true;
+        gridvalue12.value = false;
+      } else if (restDate[i] == "3") {
+        gridvalue20.value = true;
+        gridvalue13.value = false;
+      } else if (restDate[i] == "4") {
+        gridvalue21.value = true;
+        gridvalue14.value = false;
+      } else if (restDate[i] == "5") {
+        gridvalue22.value = true;
+        gridvalue15.value = false;
+      } else if (restDate[i] == "6") {
+        gridvalue23.value = true;
+        gridvalue16.value = false;
+      } else if (restDate[i] == "7") {
+        gridvalue24.value = true;
+        gridvalue17.value = false;
+      }
+    }
+
+    gridvalue32.value = workHour[0];
+    gridvalue39.value = goworkHour[0];
+    gridvalue46.value = leaveworkHour[0];
+
+    gridvalue26.value = workHour[1];
+    gridvalue33.value = goworkHour[1];
+    gridvalue40.value = leaveworkHour[1];
+
+    gridvalue27.value = workHour[2];
+    gridvalue34.value = goworkHour[2];
+    gridvalue41.value = leaveworkHour[2];
+
+    gridvalue28.value = workHour[3];
+    gridvalue35.value = goworkHour[3];
+    gridvalue42.value = leaveworkHour[3];
+
+    gridvalue29.value = workHour[4];
+    gridvalue36.value = goworkHour[4];
+    gridvalue43.value = leaveworkHour[4];
+
+    gridvalue30.value = workHour[5];
+    gridvalue37.value = goworkHour[5];
+    gridvalue44.value = leaveworkHour[5];
+
+    gridvalue31.value = workHour[6];
+    gridvalue38.value = goworkHour[6];
+    gridvalue45.value = leaveworkHour[6];
+    open.value = true;
+  } catch (error) {}
+};
+
+const rowData3 = ref([]);
+const tempDayWeek = ref("");
+const setRowData3 = (e) => {
+  tempDayWeek.value = e;
+  const result = tempRowData3.value.filter((item) => item.lngDayWeek == e);
+  console.log(result);
+  rowData3.value = result;
+
+  rowData2.value = Array.from({ length: 17 }, (_, j) => {
+    let hourC = false;
+    let minute = false;
+
+    const hour3 = String(j + 8).padStart(2, "0"); // 08 ~ 24
+    for (let i = 0; i < rowData3.value.length; i++) {
+      const hour = rowData3.value[i].strSTime;
+      const hour2 = rowData3.value[i].strETime;
+
+      //데이터의 시간
+      const chour = parseInt(hour.split(":")[0]);
+      const chour2 = parseInt(hour2.split(":")[0]);
+
+      //데이터의 분
+      const cminute = parseInt(hour.split(":")[1]);
+      const cminute2 = parseInt(hour2.split(":")[1]);
+
+      if (chour <= j + 8 && j + 8 < chour2) {
+        hourC = true;
+
+        if (cminute + 31 > 30) {
+          minute = true;
+          // return;
+        }
+      }
+
+      console.log(chour2, cminute);
+      if (j + 8 == chour2 && cminute2 > 0) {
+        hourC = true;
+
+        if (cminute2 >= 30) {
+          minute = true;
+          // return;
+        }
+      }
+    }
+    return {
+      strTime: `${hour3}:00`,
+      workTime: hourC == true ? "1" : "0",
+      workTime2: minute == true ? "1" : "0",
+    };
+  });
+
+  console.log(rowData2.value);
+};
+
+const updatedRowData2 = (e) => {
+  console.log(e);
+
+  const strSTime = e[0].strSTime;
+  const strETime = e[e.length - 1].strETime;
+  let totalWHour = 0;
+  let totalWMin = 0;
+
+  for (let i = 0; i < e.length; i++) {
+    totalWHour += parseInt(String(e[i].strWTime).split(":")[0]);
+    totalWMin += parseInt(String(e[i].strWTime).split(":")[1]);
+  }
+
+  totalWHour = String(totalWHour).padStart(2, "0");
+  totalWMin = String(totalWMin).padStart(2, "0");
+  if (tempDayWeek.value == "1") {
+    gridvalue32.value = totalWHour + ":" + totalWMin;
+    gridvalue39.value = strSTime;
+    gridvalue46.value = strETime;
+  } else if (tempDayWeek.value == "2") {
+    gridvalue26.value = totalWHour + ":" + totalWMin;
+    gridvalue33.value = strSTime;
+    gridvalue40.value = strETime;
+  } else if (tempDayWeek.value == "3") {
+    gridvalue27.value = totalWHour + ":" + totalWMin;
+    gridvalue34.value = strSTime;
+    gridvalue41.value = strETime;
+  } else if (tempDayWeek.value == "4") {
+    gridvalue28.value = totalWHour + ":" + totalWMin;
+    gridvalue35.value = strSTime;
+    gridvalue42.value = strETime;
+  } else if (tempDayWeek.value == "5") {
+    gridvalue29.value = totalWHour + ":" + totalWMin;
+    gridvalue36.value = strSTime;
+    gridvalue43.value = strETime;
+  } else if (tempDayWeek.value == "6") {
+    gridvalue30.value = totalWHour + ":" + totalWMin;
+    gridvalue37.value = strSTime;
+    gridvalue44.value = strETime;
+  } else if (tempDayWeek.value == "7") {
+    gridvalue31.value = totalWHour + ":" + totalWMin;
+    gridvalue38.value = strSTime;
+    gridvalue45.value = strETime;
+  }
+};
+
+const rowData2 = ref([]);
 </script>
 
 <style scoped></style>

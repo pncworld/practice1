@@ -1079,8 +1079,8 @@ const saveButton = async () => {
           menuKeyNmarr.join("\u200B")
         );
 
-        //comsole.log(res);
-        //comsole.log(res2);
+        console.log(res);
+        console.log(res2);
       } catch (error) {
       } finally {
         store.state.loading = false;

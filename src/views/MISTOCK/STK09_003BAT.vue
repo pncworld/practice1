@@ -57,9 +57,9 @@
           ※예약 마감 작업은 선택 된 매장을 익일 01시부터 순차적으로 마감 처리를
           진행합니다.
         </div>
-        <div class="flex text-blue-600">
+        <!-- <div class="flex text-blue-600">
           ※'미완료'를 클릭 시 해당 페이지로 이동합니다.
-        </div>
+        </div> -->
       </div>
       <div class="flex justify-start items-center mr-20">
         <input
