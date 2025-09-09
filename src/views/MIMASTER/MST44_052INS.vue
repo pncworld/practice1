@@ -336,7 +336,7 @@
                   "
                   class="h-20 w-28 flex justify-center"
                   ><img
-                    :src="`https://www.pncapi.kr/MenuImage/Image/${item.strUserFileName}`"
+                    :src="`https://www.pncapi.kr/MenuImage/Image/${item.strUserFileName}?v=${Date.now()}`"
                     alt=""
                     class="h-full w-full" /></span
                 ><span
