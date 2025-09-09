@@ -1,6 +1,6 @@
 <!-- /*--############################################################################
-# Filename : HR02_001INS.vue                                                   
-# Description : 인사관리 > 근태 관리 > 스케쥴 등록                           
+# Filename : HR02_002INS.vue                                                   
+# Description : 인사관리 > 근태 관리 > 출퇴근 확정                           
 # Date :2025-09-09                                                              
 # Author : 권맑음                     
 ################################################################################*/ -->
@@ -14,86 +14,185 @@
           조회
         </button>
         <button @click="saveButton" class="button save w-auto">저장</button>
-        <button @click="draftButton" class="button save w-auto">기안</button>
-        <button @click="copyButton" class="button copy w-auto">복사</button>
-        <button @click="excelButton" class="button save w-auto">엑셀</button>
-        <button @click="saveButton2" class="button save w-auto">
-          근무계약적용
-        </button>
+
+        <button @click="excelButton" class="button excel w-auto">엑셀</button>
       </div>
     </div>
     <div
-      class="grid grid-cols-3 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10 justify-center">
+      class="grid grid-cols-4 grid-rows-2 bg-gray-200 rounded-lg h-28 items-center z-10 justify-center">
       <div class="ml-12">
         <PickStoreRenew
           @storeNm="storeNm"
           @lngStoreGroup="lngStoreGroup"
           @lngStoreCode="lngStoreCode"></PickStoreRenew>
       </div>
-      <div class="flex space-x-5 text-nowrap items-center">
-        <Datepicker2 :mainName="'기간'"></Datepicker2>
-        <label for="cond"
-          ><input type="checkbox" id="cond" />휴무일 자동지정</label
-        >
-        <label for="cond2"
-          ><input type="checkbox" id="cond2" />근무조 자동지정</label
-        >
+      <div class="flex space-x-5 text-nowrap items-center ml-56">
+        <Datepicker2
+          @endDate="endDate"
+          @startDate="startDate"
+          :mainName="'기간'"></Datepicker2>
       </div>
-      <div class="ml-56">
-        <select name="" id="" class="border border-black w-48 h-8"></select>
+      <div class="flex items-center space-x-5 ml-72 col-span-2">
+        <div class="font-semibold text-base">정렬 순서</div>
+        <select
+          name=""
+          id=""
+          class="border border-black w-48 h-8"
+          v-model="scond">
+          <option value="1">일자</option>
+          <option value="2">사원명</option>
+        </select>
+      </div>
+      <div class="flex items-center space-x-5 ml-12">
+        <div class="font-semibold text-base">사원명</div>
+        <div>
+          <input
+            type="text"
+            class="border border-black h-8 w-48"
+            v-model="scond2" />
+        </div>
+      </div>
+      <div class="flex items-center space-x-5 ml-12">
+        <div class="font-semibold text-base">직책</div>
+        <div>
+          <select
+            name=""
+            id=""
+            class="border border-black w-48 h-8"
+            v-model="scond3">
+            <option value="0">전체</option>
+            <option :value="i.lngClassCode" v-for="i in optionList">
+              {{ i.strClass }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="flex items-center space-x-5 ml-12">
+        <div class="font-semibold text-base">직위</div>
+        <div>
+          <select
+            name=""
+            id=""
+            class="border border-black w-48 h-8"
+            v-model="scond4">
+            <option value="0">전체</option>
+            <option :value="i.lngRankCode" v-for="i in optionList2">
+              {{ i.strRank }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="flex items-center space-x-5 ml-12">
+        <div class="font-semibold text-base">근무장소</div>
+        <div>
+          <select
+            name=""
+            id=""
+            class="border border-black w-48 h-8"
+            v-model="scond5">
+            <option value="0">전체</option>
+            <option :value="i.lngAreaCode" v-for="i in optionList3">
+              {{ i.strArea }}
+            </option>
+          </select>
+        </div>
       </div>
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
-    <div
-      class="grid grid-rows-1 grid-cols-[5fr,2fr] w-[99%] h-[80vh] space-x-3">
-      <div class="w-full h-[85%] space-y-1 mt-2">
+    <div class="grid grid-rows-1 grid-cols-[3fr,1fr,1fr,1fr] w-full h-[75vh]">
+      <div class="h-full w-full">
         <Realgrid
-          :progname="'HR01_006INS_VUE'"
+          :progname="'HR02_002INS_VUE'"
           :progid="1"
           :rowData="rowData"
-          :reload="reload"
-          @clickedRowData="clickedRowData"
-          @updatedRowData="updatedRowData"
-          :addRow4="addRow4"
-          @allStateRows="allStateRows"
-          :addrowProp="'checkbox,lngCode,lngStoreCode,lngStoreGroup,storeName,strWorkGupName'"
-          :addrowDefault="addrowDefault"
-          :editableColId="'strWorkGupName'"
           :setStateBar="false"
-          :checkRowAuto="false"
-          :checkRenderEditable="true"
-          :rowStateeditable="false"
-          :dynamicRowHeight="true">
+          :mergeColumnGroupName2="['스케쥴', '기록', '확정']"
+          @clickedRowData="clickedRowData"
+          :mergeColumnGroupSubList2="[
+            ['strPSTime', 'strPETime', 'strPTTime', 'strPWTime', 'strPRTime'],
+            ['strWSTime', 'strWETime', 'strWTTime', 'strWWTime', 'strWRTime'],
+            ['strRSTime', 'strRETime', 'strRTTime', 'strRWTime', 'strRRTime'],
+          ]"
+          :mergeColumns2="true"
+          :editableColId="'strWorkGupName'"
+          :setCellStyleColId2="[
+            'strPSTime',
+            'strPETime',
+            'strPTTime',
+            'strPWTime',
+            'strPRTime',
+            'strWSTime',
+            'strWETime',
+            'strWTTime',
+            'strWWTime',
+            'strWRTime',
+            'strRSTime',
+            'strRETime',
+            'strRTTime',
+            'strRWTime',
+            'strRRTime',
+          ]"
+          :rowStateeditable="false">
         </Realgrid>
       </div>
-      <div class="w-full h-[85%] space-y-1 mt-2">
-        <div class="h-[40%]">
-          <Realgrid
-            :progname="'HR02_001INS_VUE'"
-            :progid="2"
-            :rowData="filteredrowData2"
-            :reload="reload"
-            :checkRowAuto="false"
-            :addRow4="addRow5"
-            @clickedRowData="clickedRowData2"
-            @updatedRowData="updatedRowData2"
-            :addrowProp="'checkbox,strSTime,strETime,strWTime,lngCode,lngWorkGroupCode,lngStoreGroup,lngStoreCode,rowStated'"
-            :addrowDefault="addrowDefault2"
-            :checkRenderEditable="true"
-            :editableColId="'strSTime,strETime'"
-            :setStateBar="false"
-            :autoPlusColumn="true"
-            :rowStateeditable="false"
-            :dynamicRowHeight="true">
-          </Realgrid>
+      <div class="h-full w-full">
+        <Realgrid
+          :progname="'HR02_002INS_VUE'"
+          :progid="2"
+          :rowData="filteredrowData2"
+          :setStateBar="false"
+          :mergeColumnGroupName2="['스케쥴']"
+          :mergeColumnGroupSubList2="[
+            ['lngAtndType', 'strSTime', 'strETime', 'strWTime'],
+          ]"
+          :labelsData="labelsData"
+          :valuesData="valuesData"
+          :labelingColumns="'lngAtndType'"
+          :mergeColumns2="true"
+          :rowStateeditable="false">
+        </Realgrid>
+      </div>
+      <div class="h-full w-full">
+        <Realgrid
+          :progname="'HR02_002INS_VUE'"
+          :progid="3"
+          :rowData="filteredrowData3"
+          :labelsData="labelsData"
+          :valuesData="valuesData"
+          :labelingColumns="'lngAtndType'"
+          :mergeColumnGroupName2="['기록']"
+          :mergeColumnGroupSubList2="[
+            ['lngAtndType', 'strSTime', 'strETime', 'strWTime'],
+          ]"
+          :mergeColumns2="true"
+          :editableColId="'strWorkGupName'"
+          :setStateBar="false"
+          :rowStateeditable="false">
+        </Realgrid>
+      </div>
+      <div class="h-[95%] w-full space-y-1">
+        <div class="flex justify-end space-x-5 items-center mt-1">
+          <div><button class="whitebutton">신규</button></div>
+          <div><button class="whitebutton">삭제</button></div>
         </div>
-        <div class="bg-blue-800 text-white flex justify-center">
-          일메모 등록
-        </div>
-        <div class="border border-black h-[55%]">
-          <textarea name="" id="" class="h-full w-full"></textarea>
-        </div>
+        <Realgrid
+          :progname="'HR02_002INS_VUE'"
+          :progid="4"
+          :rowData="filteredrowData4"
+          :labelsData="labelsData"
+          :valuesData="valuesData"
+          :labelingColumns="'lngAtndType'"
+          :setStateBar="false"
+          :mergeColumnGroupName2="['확정']"
+          :mergeColumnGroupSubList2="[
+            ['lngAtndType', 'strSTime', 'strETime', 'strWTime'],
+          ]"
+          :mergeColumns2="true"
+          :CalculateTimeColId="['strWTime']"
+          :editableColId="'lngAtndType,strSTime,strETime'"
+          :rowStateeditable="false">
+        </Realgrid>
       </div>
     </div>
   </div>
@@ -101,10 +200,10 @@
 </template>
 
 <script setup>
+import { getInitEmpInfo } from "@/api/miattend";
 import {
-  deleteWorkShifts,
-  deleteWorkShifts2,
-  getWorkShiftList,
+  getWorkEmpList,
+  getWorkTypeList,
   saveWorkShift,
   saveWorkShiftDetail,
   updateWorkShift,
@@ -134,6 +233,7 @@ import Realgrid from "@/components/realgrid.vue";
  *  */
 
 import { insertPageLog } from "@/customFunc/customFunc";
+import { es } from "date-fns/locale";
 /**
  *  경고창 호출 라이브러리
  *  */
@@ -155,78 +255,42 @@ import { useStore } from "vuex";
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
+  const res = await getInitEmpInfo(store.state.userData.lngStoreGroup);
+
+  optionList.value = res.data.List2;
+  optionList2.value = res.data.List3;
+  optionList3.value = res.data.List;
+
+  const res2 = await getWorkTypeList(store.state.userData.lngStoreGroup);
+
+  valuesData.value = [res2.data.List.map((item) => item.lngCode)];
+  labelsData.value = [res2.data.List.map((item) => item.strName)];
 });
+
+const valuesData = ref([]);
+const labelsData = ref([]);
+const optionList = ref([]);
+const optionList2 = ref([]);
+const optionList3 = ref([]);
 
 const reload = ref(false);
 const rowData = ref([]);
 const rowData2 = ref([]);
 const filteredrowData2 = ref([]);
+const filteredrowData3 = ref([]);
+const filteredrowData4 = ref([]);
 const rowData3 = ref([]);
 const afterSearch = ref(false);
 const clickedRow = ref(false);
 const clickedLngCode = ref();
-const clickedRowData = (e) => {
-  filteredrowData2.value = rowData2.value.filter(
-    (item) => item.lngWorkGroupCode == e[3]
-  );
-  TimeArray.value = filteredrowData2.value.map((item) => [
-    Number(item.strSTime.split(":")[0]),
-    Number(item.strETime.split(":")[0]),
-  ]);
-  ////console.log(TimeArray.value);
-  clickedLngCode.value = e[3];
-  clickedRow.value = true;
-};
-
-const clickedRowData2 = (e) => {
-  ////console.log(e);
-};
 
 const updatedRow = ref([]);
-const updatedRowData = (e) => {
-  updatedRow.value = e;
-};
+
 const updatedRow2 = ref([]);
-const updatedRowData2 = (e) => {
-  for (let i = 0; i < e.length; i++) {
-    const neworupdate = rowData2.value.find(
-      (item) =>
-        item.lngCode == e[i].lngCode &&
-        item.lngWorkGroupCode == e[i].lngWorkGroupCode
-    );
-
-    if (neworupdate) {
-      neworupdate.strSTime = e[i].strSTime;
-      neworupdate.strETime = e[i].strETime;
-    } else {
-      rowData2.value.push({
-        lngStoreGroup: e[i].lngStoreGroup,
-        lngStoreCode: e[i].lngStoreCode,
-        lngCode: e[i].lngCode,
-        lngWorkGroupCode: e[i].lngWorkGroupCode,
-        rowStated: e[i].rowStated,
-        strETime: e[i].strETime,
-        strSTime: e[i].strSTime,
-      });
-    }
-  }
-
-  ////console.log(rowData2.value);
-  // ////console.log(rowData2.value);
-  updatedRow2.value = e;
-  // for(let i=0 ; i < e.length ; i++){
-  //   if(e[i].rowStated == 'C'){
-  //   }
-  // }
-};
 
 const rowData1State = ref([]);
-const allStateRows = (e) => {
-  ////console.log(e);
-  rowData1State.value = e;
 
-  ////console.log(rowData1State.value);
-};
 const cond = ref("");
 const TimeArray = ref([]);
 const store = useStore();
@@ -251,6 +315,7 @@ const handleParentClick = (e) => {
  *  조회 함수
  */
 
+const rowData4 = ref([]);
 const searchButton = async () => {
   if (selectedStores.value == 0) {
     Swal.fire({
@@ -265,19 +330,22 @@ const searchButton = async () => {
     store.state.loading = true;
     initGrid();
 
-    const res = await getWorkShiftList(
+    const res = await getWorkEmpList(
       selectedGroup.value,
-      selectedStores.value
+      selectedStores.value,
+      sdate.value,
+      edate.value,
+      scond2.value,
+      scond3.value,
+      scond4.value,
+      scond5.value,
+      scond.value
     );
-    ////console.log(res);
-    rowData.value = res.data.List;
-    rowData2.value = res.data.List2;
-    rowData3.value = res.data.List3;
-    updatedRow.value = JSON.parse(JSON.stringify(res.data.List));
-    updatedRow2.value = JSON.parse(JSON.stringify(res.data.List2));
-    // TimeArray.value = rowData2.value.map(item => Number(item.strSTime))
-    // TimeArray.value = rowData2.value.map(item => Number(item.strETime))
-
+    console.log(res);
+    rowData.value = res.data.List2;
+    rowData2.value = res.data.List3;
+    rowData3.value = res.data.List4;
+    rowData4.value = res.data.List5;
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -464,146 +532,33 @@ const initGrid = () => {
   afterSearch.value = false;
 };
 
-const addrowDefault = ref("");
-const addrowDefault2 = ref("");
-const addButton = () => {
-  if (afterSearch.value == false) {
-    return;
-  }
-
-  addrowDefault.value =
-    "false, ," +
-    selectedStores.value +
-    "," +
-    selectedGroup.value +
-    "," +
-    selectedStoreNm.value +
-    ", ,";
-  addRow4.value = !addRow4.value;
+const sdate = ref("");
+const startDate = (e) => {
+  sdate.value = e;
 };
 
-const newlngCode = ref("신규");
-const newlngCode2 = ref(1);
-const addButton2 = () => {
-  if (afterSearch.value == false) {
-    return;
-  }
-  if (clickedRow.value == false) {
-    return;
-  }
-  if (clickedLngCode.value == null || clickedLngCode.value == undefined) {
-    return;
-  }
-  newlngCode2.value = newlngCode2.value + 1;
-  addrowDefault2.value =
-    "false, , , ," +
-    (newlngCode.value + newlngCode2.value) +
-    "," +
-    clickedLngCode.value +
-    "," +
-    selectedGroup.value +
-    "," +
-    selectedStores.value +
-    ",C";
-
-  addRow5.value = !addRow5.value;
-};
-const deleteButton = async () => {
-  if (updatedRow.value.filter((item) => item.checkbox == true).length == 0) {
-    Swal.fire({
-      title: "경고",
-      text: "삭제 대상을 먼저 체크하세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-
-  Swal.fire({
-    title: "경고",
-    text: "정말 삭제하시겠습니까?",
-    icon: "warning",
-    confirmButtonText: "확인",
-    cancelButtonText: "취소",
-    showCancelButton: true,
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-        store.state.loading = true;
-        const groups = updatedRow.value
-          .filter((item) => item.checkbox == true)
-          .map((item) => item.lngStoreGroup)
-          .join("\u200b");
-        const stores = updatedRow.value
-          .filter((item) => item.checkbox == true)
-          .map((item) => item.lngStoreCode)
-          .join("\u200b");
-        const lngcodes = updatedRow.value
-          .filter((item) => item.checkbox == true)
-          .map((item) => item.lngCode)
-          .join("\u200b");
-        const res = await deleteWorkShifts(groups, stores, lngcodes);
-
-        ////console.log(res);
-        store.state.loading = false;
-      } catch (error) {
-      } finally {
-        searchButton();
-      }
-    } else {
-      return;
-    }
-  });
-};
-const deleteButton2 = async () => {
-  if (updatedRow2.value.filter((item) => item.checkbox == true).length == 0) {
-    Swal.fire({
-      title: "경고",
-      text: "삭제 대상을 먼저 체크하세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-
-  Swal.fire({
-    title: "경고",
-    text: "정말 삭제하시겠습니까?",
-    icon: "warning",
-    confirmButtonText: "확인",
-    cancelButtonText: "취소",
-    showCancelButton: true,
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-        store.state.loading = true;
-        const groups = updatedRow2.value
-          .filter((item) => item.checkbox == true)
-          .map((item) => item.lngStoreGroup)
-          .join("\u200b");
-        const stores = updatedRow2.value
-          .filter((item) => item.checkbox == true)
-          .map((item) => item.lngStoreCode)
-          .join("\u200b");
-        const lngcodes = updatedRow2.value
-          .filter((item) => item.checkbox == true)
-          .map((item) => item.lngCode)
-          .join("\u200b");
-        const res = await deleteWorkShifts2(groups, stores, lngcodes);
-
-        ////console.log(res);
-        store.state.loading = false;
-      } catch (error) {
-      } finally {
-        searchButton();
-      }
-    } else {
-      return;
-    }
-  });
+const edate = ref("");
+const endDate = (e) => {
+  edate.value = e;
 };
 
-const selectedExcelDate = ref("");
+const scond = ref("1");
+const scond2 = ref("");
+const scond3 = ref("0");
+const scond4 = ref("0");
+const scond5 = ref("0");
 
-const selectedExcelStore = ref("");
+const clickedRowData = (e) => {
+  filteredrowData2.value = rowData2.value.filter(
+    (item) => item.dtmDate == e[3] && item.lngCharger == e[21]
+  );
+  filteredrowData3.value = rowData3.value.filter(
+    (item) =>
+      item.dtmDate == e[3] && item.lngCharger == e[21] && item.lngType == "2"
+  );
+  filteredrowData4.value = rowData3.value.filter(
+    (item) =>
+      item.dtmDate == e[3] && item.lngCharger == e[21] && item.lngType == "3"
+  );
+};
 </script>

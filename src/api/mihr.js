@@ -511,3 +511,33 @@ export const getUnContractEmpList = (
     WORKCLASS: workclass,
   });
 };
+
+export const getWorkEmpList = (
+  groupCd,
+  storecd,
+  sdate,
+  edate,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5
+) => {
+  return api2.post("/MIHR/HR02_002INS.asmx/getWorkEmpList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    SDATE: sdate,
+    EDATE: edate,
+    NAME: cond,
+    ROLE: cond2,
+    RANK: cond3,
+    WORKPLACE: cond4,
+    ORDER: cond5,
+  });
+};
+
+export const getWorkTypeList = (groupCd) => {
+  return api2.post("/MIHR/HR02_002INS.asmx/getWorkTypeList", {
+    GROUP_CD: groupCd,
+  });
+};
