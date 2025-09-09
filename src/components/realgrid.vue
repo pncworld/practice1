@@ -1956,23 +1956,7 @@ const funcshowGrid = async () => {
         );
       }
 
-      console.log(
-        "colID:",
-        item.strColID,
-        "groupIndex:",
-        groupIndex,
-        "innerIndex:",
-        innerIndex
-      );
-
       if (groupIndex !== -1) {
-        console.log(
-          "상위그룹:",
-          groupList3[groupIndex],
-          "중간그룹:",
-          groupList2[groupIndex][innerIndex]
-        );
-
         if (
           groupList3[groupIndex] == undefined &&
           groupList2[groupIndex][innerIndex] != undefined
@@ -1990,28 +1974,18 @@ const funcshowGrid = async () => {
               column: item.strColID,
               width: item.intHdWidth,
             });
-          } else if (
-            groupList3[groupIndex] != undefined &&
-            groupList2[groupIndex][innerIndex] != undefined
-          ) {
+          } else {
             const findit = layout.find(
-              (item) => item.name == groupList3[groupIndex]
+              (item) => item.name == groupList2[groupIndex][innerIndex]
             );
             if (findit == undefined) {
               layout.push({
-                name: groupList3[groupIndex],
+                name: groupList2[groupIndex][innerIndex],
                 direction: "horizontal",
                 header: {
                   styleName: `header-style-0`,
                 },
-                items: [
-                  {
-                    name: groupList2[groupIndex][innerIndex],
-                    direction: "horizontal",
-                    header: { styleName: "header-style-0" },
-                    items: [{ column: item.strColID, width: item.intHdWidth }],
-                  },
-                ],
+                items: [{ column: item.strColID, width: item.intHdWidth }],
               });
             } else {
               const findit2 = findit.items.find(
@@ -2023,6 +1997,51 @@ const funcshowGrid = async () => {
               });
             }
           }
+        } else if (
+          groupList3[groupIndex] != undefined &&
+          groupList2[groupIndex][innerIndex] != undefined
+        ) {
+          if (layout.find((item) => item.name == groupList3[groupIndex])) {
+            const findit = layout.find(
+              (item) => item.name == groupList3[groupIndex]
+            );
+
+            if (
+              findit.items.find(
+                (i) => i.name == groupList2[groupIndex][innerIndex]
+              )
+            ) {
+              let middleGroup = findit.items.find(
+                (i) => i.name == groupList2[groupIndex][innerIndex]
+              );
+
+              middleGroup.items.push({
+                column: item.strColID,
+                width: item.intHdWidth,
+              });
+            } else {
+              findit.items.push({
+                name: groupList2[groupIndex][innerIndex],
+                direction: "horizontal",
+                header: { styleName: "header-style-0" },
+                items: [{ column: item.strColID, width: item.intHdWidth }],
+              });
+            }
+          } else {
+            layout.push({
+              name: groupList3[groupIndex],
+              direction: "horizontal",
+              header: { styleName: "header-style-0" },
+              items: [
+                {
+                  name: groupList2[groupIndex][innerIndex],
+                  direction: "horizontal",
+                  header: { styleName: "header-style-0" },
+                  items: [{ column: item.strColID, width: item.intHdWidth }],
+                },
+              ],
+            });
+          }
         }
       } else {
         layout.push({
@@ -2032,10 +2051,11 @@ const funcshowGrid = async () => {
           width: item.intHdWidth,
         });
       }
+      console.log(layout);
+      gridView.setColumnLayout(layout);
     });
-    console.log(layout);
-    gridView.setColumnLayout(layout);
   }
+
   /* 3단 예시
   [
       {
