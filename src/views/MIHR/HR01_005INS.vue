@@ -727,23 +727,38 @@
    <div v-if="openSearchPopUp" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="w-[50%] h-[70%] border border-black bg-white rounded-lg shadow-lg p-2">
       <div class="flex justify-between space-x-5">
-        <div class="font-semibold text-base">
+        <div class="font-semibold text-xl">
           근무계약 미등록 고객조회
         </div>
         <div class="flex space-x-5">
-        <div><button class="whitebutton">조회</button></div>
-        <div><button class="whitebutton">엑셀</button></div>
+        <div><button class="whitebutton" @click="searchButton3">조회</button></div>
+        <div><button class="whitebutton" @click="excelButton3">엑셀</button></div>
         <div><button class="whitebutton" @click="openSearchPopUp = false">닫기</button></div>
         </div>
       </div>
       <div class="flex justify-start space-x-5 -ml-12">
-        <PickStore></PickStore>
+        <PickStore :defaultStoreNm="'전체'" :defaultStore="true" @update:storeGroup="lngStoreGroup3" @update:storeCd="lngStoreCode3"></PickStore>
         <div class="flex space-x-5 items-center mt-2">
           <div class="text-base font-semibold">계약 시작일</div>
           <div>
-            <input type="date" class="border border-black w-48 h-8">
+            <input type="date" class="border border-black w-48 h-8" v-model="scond">
           </div>
         </div>
+      </div>
+      <div class="flex space-x-5 mt-3 items-center">
+        <div class="text-base font-semibold">사원검색</div>
+        <div><select name="" id="" class="border border-black w-30 h-8"  v-model="scond2">
+          <option value="0">전체</option>
+          <option value="1">사원명</option>
+          <option value="2">사원코드</option>
+        </select></div>
+        <div>
+          <input type="text" class="h-8 w-48 border border-black"  v-model="scond3">
+        </div>
+      </div>
+      <div class="h-[80%] mt-2">
+        <Realgrid :progname="'HR01_005INS_VUE'" :rowData="rowData4" :setStateBar="false" :rowStateeditable="false" :exporttoExcel="exportExcel3" :documentTitle="'HR01_005INS'" :documentSubTitle="documentSubTitle3"
+            :progid="5" :mergeColumns2="true" :mergeColumnGroupName2="['최종 근무계약일']" :mergeColumnGroupSubList2="[['dtmConStartDate','dtmConEndDate']]" ></Realgrid>
       </div>
     </div>
    </div>
@@ -754,6 +769,7 @@ import {
   deleteEmpContract,
   getEmpContractList,
   getInitEmpContractInfo,
+  getUnContractEmpList,
   getWorkContractDetail,
   saveEmpContract,
 } from "@/api/mihr";
@@ -918,7 +934,9 @@ onMounted(async () => {
   valuesData.value = [optionList2.value.map((item) => item.strDCode)];
 
   ////console.log(res);
-
+  const today = new Date()
+  today.setDate(1)
+  scond.value = formatLocalDate(today)
   rowData2.value = Array.from({ length: 17 }, (_, i) => {
     const hour = String(i + 8).padStart(2, "0"); // 08 ~ 24
     return {
@@ -1853,6 +1871,39 @@ const deleteButton = async() => {
 const openSearchPopUp = ref(false)
 const searchButton2 = async() =>{
     openSearchPopUp.value = true
+}
+
+const scond = ref('')
+const scond2 = ref('0')
+const scond3 = ref('')
+
+const storecd3 = ref('')
+const lngStoreCode3 = (e) => {
+storecd3.value =e
+}
+
+const groupcd3 = ref('')
+const lngStoreGroup3 = (e) => {
+groupcd3.value =e
+}
+
+const rowData4 = ref([])
+const searchButton3 = async() => {
+
+  try {
+    const res = await getUnContractEmpList(groupcd3.value , 0 , storecd3.value ,scond2.value ,scond3.value , scond.value, 0)
+    console.log(res)
+    rowData4.value = res.data.List
+  } catch (error) {
+    
+  }
+}
+
+const exportExcel3 = ref(false)
+const documentSubTitle3 = ref(false)
+const excelButton3 = () =>{
+  documentSubTitle3.value = '계약 시작일 :' +scond.value
+  exportExcel3.value = !exportExcel3.value
 }
 </script>
 

@@ -71,7 +71,7 @@
           ]"
           :checkRenderEditable="true"
           :rowStateeditable="false"
-          :dynamicRowHeight="true">
+          :dynamicRowHeight="false">
         </Realgrid>
       </div>
       <div class="w-full h-full">

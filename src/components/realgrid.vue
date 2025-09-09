@@ -1941,108 +1941,211 @@ const funcshowGrid = async () => {
     const groupList3 = props.mergeColumnGroupName4; // ['최상위그룹컬럼']
     const groupList2 = props.mergeColumnGroupName3; // [['그룹컬럼1','그룹컬럼2']]
 
-    ////console.log(JSON.stringify(subList3));
-    ////console.log(groupList3);
-    ////console.log(groupList2);
     let layout = [];
     tabInitSetArray.value.forEach((item) => {
-      if (subList3.flat(2).includes(item.strColID)) {
-        const index = subList3.findIndex((group2D) =>
-          group2D.some((group1D) => group1D.includes(item.strColID))
-        );
-        const innerIndex = subList3[index]?.findIndex((group1D) =>
+      // 1) subList3 전체 1차 그룹 인덱스 찾기
+      const groupIndex = subList3.findIndex((group2D) =>
+        group2D.some((group1D) => group1D.includes(item.strColID))
+      );
+
+      // 2) 만약 그룹에 속한다면, 그 안에서 몇 번째 subgroup인지(innerIndex)
+      let innerIndex = -1;
+      if (groupIndex !== -1) {
+        innerIndex = subList3[groupIndex].findIndex((group1D) =>
           group1D.includes(item.strColID)
         );
+      }
 
-        const innerIndex2 = getInnerMostIndex(item.strColID, subList3);
-        ////console.log(innerIndex);
+      console.log(
+        "colID:",
+        item.strColID,
+        "groupIndex:",
+        groupIndex,
+        "innerIndex:",
+        innerIndex
+      );
 
-        if (layout.find((item) => item.name == groupList3[index])) {
-          const findit = layout.find((item) => item.name == groupList3[index]);
+      if (groupIndex !== -1) {
+        console.log(
+          "상위그룹:",
+          groupList3[groupIndex],
+          "중간그룹:",
+          groupList2[groupIndex][innerIndex]
+        );
 
-          if (findit) {
-            let target = findit.items.find(
-              (i) => i.name === groupList2[index][innerIndex2]
+        if (
+          groupList3[groupIndex] == undefined &&
+          groupList2[groupIndex][innerIndex] != undefined
+        ) {
+          if (
+            layout.find(
+              (item) => item.name == groupList2[groupIndex][innerIndex]
+            )
+          ) {
+            const target = layout.find(
+              (item) => item.name == groupList2[groupIndex][innerIndex]
             );
 
-            if (target) {
-              // ////console.log(target.items);
-              target.items = [
-                ...target.items,
-                {
-                  column: item.strColID,
-                  width: item.intHdWidth,
-                },
-              ];
-            }
-          }
-        } else {
-          const secondItems = ref([]);
-          ////console.log(groupList2[index]);
-
-          for (let i = 0; i < groupList2[index].length; i++) {
-            if (i == 0) {
-              secondItems.value.push({
-                name: groupList2[index][i],
+            target.items.push({
+              column: item.strColID,
+              width: item.intHdWidth,
+            });
+          } else if (
+            groupList3[groupIndex] != undefined &&
+            groupList2[groupIndex][innerIndex] != undefined
+          ) {
+            const findit = layout.find(
+              (item) => item.name == groupList3[groupIndex]
+            );
+            if (findit == undefined) {
+              layout.push({
+                name: groupList3[groupIndex],
                 direction: "horizontal",
                 header: {
                   styleName: `header-style-0`,
                 },
                 items: [
                   {
-                    column: subList3[index][innerIndex2][i],
-                    width: item.intHdWidth,
+                    name: groupList2[groupIndex][innerIndex],
+                    direction: "horizontal",
+                    header: { styleName: "header-style-0" },
+                    items: [{ column: item.strColID, width: item.intHdWidth }],
                   },
                 ],
               });
             } else {
-              // ////console.log(index);
-              // ////console.log(innerIndex);
-              // ////console.log(i);
-              secondItems.value.push({
-                name: groupList2[index][i],
-                direction: "horizontal",
-                header: {
-                  styleName: `header-style-0`,
-                },
+              const findit2 = findit.items.find(
+                (item) => item.name == groupList2[groupIndex][innerIndex]
+              );
+              findit2.items.push({
+                column: item.strColID,
                 width: item.intHdWidth,
-                items: [],
               });
             }
           }
-          if (groupList3[index] == undefined) {
-            layout.push(item.strColID);
-          } else {
-            layout.push({
-              name: groupList3[index],
-              direction: "horizontal",
-              header: {
-                styleName: `header-style-0`,
-              },
-              width: item.intHdWidth,
-              items: secondItems.value,
-            });
-          }
-
-          // layout.push(tempgroupList)
         }
       } else {
         layout.push({
           column: item.strColID,
-          name: item.strHdText,
-          header: {
-            visible: true,
-            text: item.strHdText,
-            styleName: `header-style-0`,
-          },
+
           visible: item.intHdWidth !== 0,
           width: item.intHdWidth,
         });
       }
     });
-    ////console.log(layout);
+    console.log(layout);
     gridView.setColumnLayout(layout);
   }
+  /* 3단 예시
+  [
+      {
+        column: "checkbox",
+        visible: true,
+        width: 50,
+      },
+      {
+        column: "strStndName",
+        visible: true,
+        width: 100,
+      },
+      {
+        column: "strWorkType",
+        visible: true,
+        width: 100,
+      },
+      {
+        column: "lngOTPayRate",
+        visible: true,
+        width: 90,
+      },
+      {
+        column: "lngHWPayRate",
+        visible: true,
+        width: 90,
+      },
+      {
+        name: "야간근무시간",
+        direction: "horizontal",
+        header: { styleName: "header-style-0" },
+        items: [
+          { column: "timNWStime", width: 50 },
+          { column: "timNWETime", width: 50 },
+        ],
+      },
+      {
+        column: "lngWHPayRate",
+        visible: true,
+        width: 70,
+      },
+      {
+        name: "급여기산일",
+        direction: "horizontal",
+        header: { styleName: "header-style-0" },
+        items: [
+          { column: "lngPayAcntS", width: 50 },
+          { column: "lngPayAcntE", width: 50 },
+        ],
+      },
+      {
+        column: "lngPayDay",
+        visible: true,
+        width: 50,
+      },
+      {
+        column: "lngEPayDay",
+        visible: true,
+        width: 80,
+      },
+      {
+        column: "lngPeriod",
+        visible: false,
+        width: 0,
+      },
+      {
+        column: "lngPeriodCls",
+        visible: false,
+        width: 0,
+      },
+      {
+        column: "lngWorkType",
+
+        visible: false,
+        width: 0,
+      },
+      {
+        column: "lngCode",
+        visible: false,
+        width: 0,
+      },
+      {
+        name: "탄력근무제 관련",
+        direction: "horizontal",
+        header: { styleName: "header-style-0" },
+        items: [
+          {
+            name: "기본",
+            direction: "horizontal",
+            header: { styleName: "header-style-0" },
+            items: [
+              { column: "strPeriod", width: 50 },
+              { column: "dtmApplyDate", width: 50 },
+              { column: "timFixWorkHour", width: 50 },
+            ],
+          },
+          {
+            name: "연장제한시간",
+            direction: "horizontal",
+            header: { styleName: "header-style-0" },
+            items: [
+              { column: "timLimitHourWeek", width: 50 },
+              { column: "timLimitHourWeekAvg", width: 50 },
+              { column: "timLimitHourDay", width: 50 },
+            ],
+          },
+        ],
+      },
+    ]
+  */
 
   emit("allStateRows", dataProvider.getAllStateRows());
   // 데이터 추가
