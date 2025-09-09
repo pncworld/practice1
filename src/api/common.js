@@ -124,8 +124,23 @@ export const getPosList2 = async (groupCd, storeCd) => {
   });
   return res;
 };
+
+export const getPosList3 = async (groupCd, storeCd) => {
+  const res = await api2.post("/SYSTEM/sysCom.asmx/getPosList3", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+  return res;
+};
 export const getKioskList = async (groupCd, storeCd) => {
   const res = await api2.post("/SYSTEM/sysCom.asmx/getKioskList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+  return res;
+};
+export const getTablePosList = async (groupCd, storeCd) => {
+  const res = await api2.post("/SYSTEM/sysCom.asmx/getTablePosList", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
   });
@@ -141,6 +156,14 @@ export const getStoreAndPosList = async (groupCd, storeCd, posNo) => {
 };
 export const getStoreAndPosList2 = async (groupCd, storeCd, posNo) => {
   const res = await api2.post("/SYSTEM/sysCom.asmx/getStoreAndPosList2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    POSNO: posNo,
+  });
+  return res;
+};
+export const getStoreAndPosList4 = async (groupCd, storeCd, posNo) => {
+  const res = await api2.post("/SYSTEM/sysCom.asmx/getStoreAndPosList4", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     POSNO: posNo,

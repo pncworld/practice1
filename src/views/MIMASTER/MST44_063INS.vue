@@ -804,7 +804,7 @@ import {
   savePosInfo,
   savePrintConfig,
 } from "@/api/master";
-import { getCommonList, getPosList } from "@/api/common";
+import { getCommonList, getPosList, getPosList3 } from "@/api/common";
 
 /*
  * 공통 표준  Function
@@ -896,9 +896,9 @@ const commonList11 = ref([]);
 const settingPosList = async (e1, e2) => {
   labelsData1.value = ["선택"];
   valueData1.value = [0];
-  const res = await getPosList(e1, e2);
+  const res = await getPosList3(e1, e2);
+  console.log(res);
 
-  //comsole.log(res);
   const datas = res.data.pos;
   commonList11.value = res.data.pos;
   for (let i = 0; i < datas.length; i++) {

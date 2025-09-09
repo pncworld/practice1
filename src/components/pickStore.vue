@@ -128,6 +128,22 @@
         </option>
       </select>
     </div>
+    <div class="ml-5" v-if="showTablePosNo">
+      <span class="font-bold text-sm">테이블POS번호</span>
+      <select
+        :disabled="isDisabled4"
+        class="w-32 text-sm border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        v-model="selectedTablePosNo"
+        @change="ischanged()">
+        <option value="0">선택</option>
+        <option
+          :value="{ lngCode: item.lngCode, lngAreaCode: item.lngAreaCode }"
+          v-for="item in storeTablePosNo"
+          :key="item.lngAreaCode">
+          {{ item.strName }}
+        </option>
+      </select>
+    </div>
     <div class="flex justify-center items-center ml-5" v-if="showPayType">
       <span class="font-bold text-sm">결제키구분</span>
 
@@ -209,7 +225,7 @@
 </template>
 
 <script setup>
-import { getKioskList, getPosList } from "@/api/common";
+import { getKioskList, getPosList, getTablePosList } from "@/api/common";
 import { getScreenList2 } from "@/api/master";
 import { defineProps, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
@@ -223,11 +239,13 @@ const storeAreaCd2 = ref([]);
 const storeAreaCd = ref([]);
 const storePosNo = ref([]);
 const storeKioskNo = ref([]);
+const storeTablePosNo = ref([]);
 const ScreenList = ref([]);
 const selectedStoreAreaCd = ref();
 const selectedPosNo = ref("0");
 const selectedScreenNo = ref("0");
 const selectedKioskNo = ref("0");
+const selectedTablePosNo = ref("0");
 const selectedGroupCd = ref(store.state.userData.lngStoreGroup);
 const paymentType = ref(3);
 const selectedStoreType = ref(store.state.userData.lngJoinType);
@@ -268,6 +286,10 @@ const props = defineProps({
     default: false,
   },
   showKioskNo: {
+    type: Boolean,
+    default: false,
+  },
+  showTablePosNo: {
     type: Boolean,
     default: false,
   },
@@ -337,6 +359,7 @@ const showAreaCd = ref(props.showAreaCd);
 const showPosNo = ref(props.showPosNo);
 const showScreenNo = ref(props.showScreenNo);
 const showKioskNo = ref(props.showKioskNo);
+const showTablePosNo = ref(props.showTablePosNo);
 const showPayType = ref(props.showPayType);
 const showMakeScreen = ref(props.showMakeScreen);
 const showFuncType = ref(props.showFuncType);
@@ -380,6 +403,7 @@ const emit = defineEmits([
   "posNo",
   "screenNo",
   "kioskNo",
+  "tablePosNo",
   "updatePaymentType",
   "makeNewScreen",
   "updateFuncScreenType",
@@ -442,6 +466,7 @@ watch(
     setPosNo(store.state.userData.lngPosition);
     setStoreAreaCd(store.state.userData.lngPosition);
     setKioskNo(store.state.userData.lngPosition);
+    setTablePosNo(store.state.userData.lngPosition);
     if (
       store.state.userData.blnBrandAdmin == "True" ||
       store.state.userData.lngPositionType == "1"
@@ -486,6 +511,8 @@ onMounted(() => {
   setPosNo(store.state.userData.lngPosition);
   setStoreAreaCd(store.state.userData.lngPosition);
   setKioskNo(store.state.userData.lngPosition);
+  setTablePosNo(store.state.userData.lngPosition);
+  
   if (
     store.state.userData.blnBrandAdmin == "True" ||
     store.state.userData.lngPositionType == "1"
@@ -560,9 +587,12 @@ const setStoreAreaCd = (value) => {
     storeAreaCd.value = "0";
     return;
   }
+
   storeAreaCd.value = storeAreaCd2.value.filter((item) => {
     return item.lngStoreCode == value;
   });
+
+  // console.log(storeAreaCd.value)
 
   //comsole.log(storeAreaCd.value);
   selectedStoreAreaCd.value = storeAreaCd.value[0]
@@ -603,6 +633,20 @@ const setKioskNo = async (value) => {
     storeKioskNo.value = response.data.pos;
   }
 };
+const setTablePosNo = async (value) => {
+  selectedTablePosNo.value = "0";
+  storeTablePosNo.value = [];
+  let response;
+  if (value == undefined || storeGroup.value.length == 0) return;
+  try {
+    response = await getTablePosList(storeGroup.value[0].lngStoreGroup, value);
+
+    //comsole.log(storePosNo.value);
+  } catch (error) {
+  } finally {
+    storeTablePosNo.value = response.data.tablePos;
+  }
+};
 
 const setScreenNo2 = (e) => {
   selectedFuncScreen.value = 0;
@@ -614,6 +658,10 @@ const emitPosInfo = (value1, value2) => {
 const emitKioskInfo = (value1, value2) => {
   emit("areaCd", value1);
   emit("kioskNo", value2);
+};
+const emitTablePosInfo = (value1, value2) => {
+  emit("areaCd", value1);
+  emit("tablePosNo", value2);
 };
 
 watch(selectedPosNo, (newValue) => {
@@ -646,6 +694,11 @@ const posChanged = () => {
 watch(selectedKioskNo, (newValue) => {
   //comsole.log(newValue);
   emitKioskInfo(newValue.lngAreaCode, newValue.lngCode);
+});
+
+watch(selectedTablePosNo, (newValue) => {
+  //comsole.log(newValue);
+  emitTablePosInfo(newValue.lngAreaCode, newValue.lngCode);
 });
 
 watch(paymentType, (newvalue) => {
