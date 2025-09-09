@@ -491,3 +491,23 @@ export const deleteEmpContract = (
     SDATE: sdate,
   });
 };
+
+export const getUnContractEmpList = (
+  groupCd,
+  attrCd,
+  storecd,
+  searchType,
+  searchText,
+  sdate,
+  workclass
+) => {
+  return api2.post("/MIHR/HR01_005INS.asmx/getUnContractEmpList", {
+    GROUP_CD: groupCd,
+    ATTR_CD: attrCd,
+    STORE_CD: storecd,
+    SEARCH_TYPE: searchType,
+    SEARCH_TEXT: searchText,
+    SDATE: sdate,
+    WORKCLASS: workclass,
+  });
+};
