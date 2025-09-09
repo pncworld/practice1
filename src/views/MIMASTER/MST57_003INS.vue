@@ -1,18 +1,15 @@
 /*--############################################################################
-# Filename : MST44_052INS.vue                                                  
-# Description : 마스터관리 > POS 마스터 > 메뉴키설정(kiosk)                    
-  # Date :2025-05-14                                                           
-  # Author : 권맑음                     
+# Filename : MST57_003INS.vue
+# Description : 마스터관리 > POS 마스터 > 메뉴키 설정(테이블포스)
+# Date :2025-08-27
+# Author : 권지안
 ################################################################################*/
 <template>
   <!-- 조회 조건 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
     <PageName></PageName>
     <div class="flex justify-center mr-10 space-x-2 pr-5">
-      <button @click="searchButton" class="button search md:w-auto w-14">
-        조회
-      </button>
-
+      <button @click="searchButton" class="button search md:w-auto w-14">조회</button>
       <button @click="saveButton" class="button save w-auto">저장</button>
       <button @click="copyButton" class="button copy w-auto">복사</button>
     </div>
@@ -23,8 +20,8 @@
     <PickStore
       @areaCd="handleStoreAreaCd"
       @update:storeCd="handleStoreCd"
-      @kioskNo="handlePosNo"
-      :showKioskNo="true"
+      @tablePosNo="handlePosNo"
+      :showTablePosNo="true"
       @storeNm="handlestoreNm"
       @update:ischanged2="searchinit">
     </PickStore>
@@ -39,14 +36,13 @@
       :storeNm="clickedStoreNm"
       :areaCd="nowStoreAreaCd"
       :posNo="posNo"
-      :progname="'MST44_052INS_VUE'"
-      :dupliapiname="'DUPLIALLPOSDATA'"
+      :progname="'MST57_003INS_VUE'"
+      :dupliapiname="'dupliAllTablePosData'"
       :progid="1"
-      :poskiosk="'getStoreAndPosList2'"
-      :naming="'KIOSK번호'">
+      :poskiosk="'getStoreAndPosList4'"
+      :naming="'테이블POS번호'">
     </DupliPopUp>
   </div>
-
   <div
     v-if="changeScreenKey"
     class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
@@ -77,7 +73,6 @@
       </div>
     </div>
   </div>
-
   <div
     v-if="addscreenKey"
     class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
@@ -108,7 +103,6 @@
       </div>
     </div>
   </div>
-
   <div
     v-show="showChangeScreenKey"
     class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
@@ -143,23 +137,25 @@
   </div>
   <span
     class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[700px] z-40">
-    <h1 class="font-bold text-xl z-40">키오스크 메뉴키 배치정보</h1>
-    <span class="flex space-x-3 ml-32 pl-56 items-center"
-      >순서변경 &nbsp; &nbsp;<label class="z-40"
-        ><input
+    <h1 class="font-bold text-xl z-40">테이블포스 메뉴키 배치정보</h1>
+    <span class="flex space-x-3 ml-32 pl-56 items-center">순서변경 &nbsp; &nbsp;
+      <label class="z-40">
+        <input
           type="radio"
           name="changingMode"
           @click.stop="changingMode(1)"
-          checked />교체하기 </label
-      ><label class="z-40"
-        ><input
+          checked />교체하기 
+      </label>
+      <label class="z-40">
+        <input
           type="radio"
           name="changingMode"
-          @click.stop="changingMode(2)" />밀어내기</label
-      ><button class="whitebutton z-40" @click.stop="deletekey">
+          @click.stop="changingMode(2)" />밀어내기
+      </label>
+      <button class="whitebutton z-40" @click.stop="deletekey">
         삭제
-      </button></span
-    >
+      </button>
+    </span>
   </span>
   <div class="flex h-5/6 w-full -mt-5">
     <div class="flex flex-col w-3/5 h-4/6">
@@ -271,15 +267,16 @@
               v-if="item.strScreenName != ''"
               @click="showMenuKey(item.intScreenNo)"
               class="flex items-center justify-center w-full h-full">
-              <button class="">{{ item.strScreenName }}</button
-              ><button
+              <!-- <button class="">{{ item.strScreenName2 + item.strScreenName }}</button> -->
+              <button class="">{{ item.strScreenName2 }}<br>{{ item.strScreenName }}</button>
+              <!-- <button
                 @click.stop="
                   editScreenKey(item.intScreenNo, item.strScreenName)
                 ">
                 <font-awesome-icon :icon="['far', 'pen-to-square']" />
-              </button>
+              </button> -->
             </p>
-            <p
+            <!-- <p
               v-else-if="item.new == true"
               @click="addScreenKey(index)"
               class="flex items-center justify-center w-full h-full">
@@ -287,7 +284,7 @@
                 class="w-full h-full text-gray-300 flex justify-center items-center">
                 <img src="../../assets/ic_add_gray_24.png" alt="" /> 화면키 추가
               </button>
-            </p>
+            </p> -->
             <p v-else class="flex items-center justify-center"></p>
           </div>
         </div>
@@ -296,11 +293,13 @@
             class="border border-[#CCCCCC] w-full h-full rounded-md"
             @click="showPrev">
             <img src="../../assets/arrow_up_wo_border.svg" alt="" /></button
-          ><button
+          >
+          <!-- <button
             class="border border-[#CCCCCC] h-full rounded-md"
             @click="showScreenKeysOrder">
-            <img src="../../assets/table-change_2.svg" alt="" /></button
-          ><button
+            <img src="../../assets/table-change_2.svg" alt="" />
+          </button> -->
+          <button
             class="border border-[#CCCCCC] w-full h-full rounded-md"
             @click="showNext">
             <img src="../../assets/arrow_down_wo_border.svg" alt="" />
@@ -336,7 +335,7 @@
                   "
                   class="h-20 w-28 flex justify-center"
                   ><img
-                    :src="`https://www.pncapi.kr/MenuImage/Image/${item.strUserFileName}`"
+                    :src="`http://www.pncoffice.com:8085/MenuImage/Image/${item.strUserFileName}`"
                     alt=""
                     class="h-full w-full" /></span
                 ><span
@@ -373,9 +372,9 @@
 
 <script setup>
 import {
-  getMenuKeyList3,
+  getMenuKeyList4,
   getMenuList,
-  getScreenList,
+  getLSCategoryList,
   getTLUList,
   saveAllMenuKey,
   saveScreenKeys,
@@ -546,7 +545,7 @@ const nowStoreAreaCd = ref();
 
 const handleStoreAreaCd = (newValue) => {
   nowStoreAreaCd.value = newValue;
-  //comsole.log(nowStoreAreaCd.value);
+  // console.log(nowStoreAreaCd.value);
 };
 
 const nowStoreCd = ref();
@@ -562,12 +561,10 @@ const handleStoreCd = async (newValue) => {
   nowStoreCd.value = newValue;
 
   // const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
-  // console.log(res2.data.menuList);
   // MenuList.value = res2.data.menuList;
   // MenuGroup.value = res2.data.menuGroup;
   // SubMenuGroup.value = res2.data.submenuGroup;
-  // console.log(MenuList.value);
-
+  
   if (store.state.userData.lngCommonMenu == "1") {
     const res2 = await getMenuList(groupCd.value, 0);
 
@@ -584,6 +581,8 @@ const handleStoreCd = async (newValue) => {
     SubMenuGroup.value = res2.data.submenuGroup;
   }
 
+
+  //comsole.log(MenuList.value);
   MenuList.value = MenuList.value.map((item) => {
     return {
       ...item,
@@ -640,7 +639,7 @@ const searchButton = async () => {
   if (nowStoreAreaCd.value == "0" || nowStoreAreaCd.value == undefined) {
     Swal.fire({
       title: "경고",
-      text: "KIOSK번호를 선택하세요.",
+      text: "테이블POS번호를 선택하세요.",
       icon: "warning",
       showCancelButton: false,
       confirmButtonColor: "#3085d6",
@@ -650,23 +649,26 @@ const searchButton = async () => {
   }
   store.state.loading = true;
   try {
-    const res3 = await getScreenList(
+    const res3 = await getLSCategoryList(
+      groupCd.value,
+      nowStoreCd.value,
+    );
+    const res4 = await getMenuKeyList4(
       groupCd.value,
       nowStoreCd.value,
       nowStoreAreaCd.value,
-      posNo.value
+      posNo.value,
     );
-    const res4 = await getMenuKeyList3(
-      groupCd.value,
-      nowStoreCd.value,
-      nowStoreAreaCd.value
-    );
+
+    // console.log(res4);
+
+    ScreenKeyOrigin.value = res3.data.LSCategoryList;
     MenuKeyList.value = res4.data.MenuKeyList;
-    ScreenKeyOrigin.value = res3.data.ScreenList;
-    console.log(MenuKeyList.value);
+    
+    // console.log(ScreenKeyOrigin.value)
+    // console.log(MenuKeyList.value)
 
     addfor8ScreenKey();
-    //comsole.log(ScreenKeys.value);
     AllscreenKeyPage.value = Math.ceil(ScreenKeyOrigin.value.length / 8);
 
     confirmitem.value = JSON.parse(JSON.stringify(MenuKeyList.value));
@@ -878,14 +880,16 @@ const saveButton = async () => {
         );
         //comsole.log(screenKeyNoarr.join(","));
         //comsole.log(screenKeyNamearr.join(","));
-        const res = await saveScreenKeys(
-          groupCd.value,
-          nowStoreCd.value,
-          nowStoreAreaCd.value,
-          posNo.value,
-          screenKeyNoarr.join("\u200B"),
-          screenKeyNamearr.join("\u200B")
-        );
+        // const res = await saveScreenKeys(
+        //   groupCd.value,
+        //   nowStoreCd.value,
+        //   nowStoreAreaCd.value,
+        //   posNo.value,
+        //   screenKeyNoarr.join("\u200B"),
+        //   screenKeyNamearr.join("\u200B")
+        // );
+
+        // console.log(res);
 
         const intKeySeqs = MenuKeyList.value
           .filter((item) => item.intPosNo == posNo.value)
@@ -915,8 +919,8 @@ const saveButton = async () => {
           menuKeyNmarr.join("\u200B")
         );
 
-        console.log(res);
-        console.log(res2);
+        // console.log(res2);
+
       } catch (error) {
       } finally {
         store.state.loading = false;
@@ -1114,7 +1118,7 @@ const selcetedrowData = (e) => {
 
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
-  //comsole.log(posNo.value);
+  // console.log(posNo.value);
   //comsole.log(nowStoreAreaCd.value);
   if (
     nowStoreAreaCd.value != undefined &&
@@ -1273,8 +1277,8 @@ const saveMenuKeyposition = (index) => {
 };
 
 const addMenuKey = () => {
-  console.log(MenuKeyList.value);
-  console.log(clickedRealIndex.value);
+  //comsole.log(MenuKeyList.value);
+  //comsole.log(clickedRealIndex.value);
   const foraddIndex = MenuKeyList.value.findIndex(
     (item) =>
       item.intPosNo == posNo.value &&
@@ -1305,7 +1309,7 @@ const addMenuKey = () => {
     };
   }
   showMenuKey(clickedintScreenNo.value);
-  console.log(MenuKeyList.value);
+  //comsole.log(MenuKeyList.value);
 };
 
 const addTLUKey = () => {
@@ -1342,19 +1346,31 @@ const addTLUKey = () => {
 
 const deletekey = () => {
   if (clickedScreenOrMenu.value == false) {
-    ScreenKeyOrigin.value = ScreenKeyOrigin.value.filter(
-      (item) => item.intScreenNo != clickedintScreenNo.value
-    );
-    addscreenKey.value = false;
-    addfor8ScreenKey();
+    // ScreenKeyOrigin.value = ScreenKeyOrigin.value.filter(
+    //   (item) => item.intScreenNo != clickedintScreenNo.value
+    // );
+    // addscreenKey.value = false;
+    // addfor8ScreenKey();
 
-    MenuKeyList.value = MenuKeyList.value.filter(
-      (item) => item.intScreenNo != clickedintScreenNo.value
-    );
-    currentscreenKeyNm.value = "";
+    // MenuKeyList.value = MenuKeyList.value.filter(
+    //   (item) => item.intScreenNo != clickedintScreenNo.value
+    // );
+    // currentscreenKeyNm.value = "";
 
-    clickedintScreenNo.value = clickedintScreenNo.value + 1;
+    // clickedintScreenNo.value = clickedintScreenNo.value + 1;
+    // showMenuKey(clickedintScreenNo.value);
+
+    if (clickedScreenOrMenu.value == false) {
+      Swal.fire({
+        title: "경고",
+        html: "카테고리 삭제는 불가능합니다.<br>메뉴 카테고리 관리 페이지를 이용해주세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    } 
     showMenuKey(clickedintScreenNo.value);
+    
   } else {
     MenuKeyList.value = MenuKeyList.value.filter(
       (item) =>

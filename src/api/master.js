@@ -1,6 +1,7 @@
 import axios from "axios";
 import store from "@/store";
 import { commonUrl, commonUrl2 } from "./common";
+import { toDate } from "date-fns";
 
 const url = commonUrl;
 // Axios 인스턴스 생성 (기본 설정)
@@ -340,17 +341,35 @@ export const setMainCategoryUpdate = (
   majorNm,
   subCd,
   subNm,
-  langId
+  langId,
+  useYn,
+  allDate,
+  fromDate,
+  toDate,
+  allTime,
+  fromTime,
+  toTime,
+  selDay,
+  extraNm,
 ) => {
   return api2.post("/MIMASTER/MST57_001INS.asmx/setMainCategoryUpdate", {
-    GROUP_CD: groupCd,
-    STORE_CD: storeCd,
-    AREA_CD: areaCd,
-    MAJOR_CD: majorCd,
-    MAJOR_NM: majorNm,
-    SUB_CD: subCd,
-    SUB_NM: subNm,
-    LANGUAGE_ID: langId,
+    GROUP_CD    : groupCd,
+    STORE_CD    : storeCd,
+    AREA_CD     : areaCd,
+    MAJOR_CD    : majorCd,
+    MAJOR_NM    : majorNm,
+    SUB_CD      : subCd,
+    SUB_NM      : subNm,
+    LANGUAGE_ID : langId,
+    USE_YN      : useYn,
+    ALL_DATE    : allDate,
+    FROM_DATE   : fromDate,
+    TO_DATE     : toDate,
+    ALL_TIME    : allTime,
+    FROM_TIME   : fromTime,
+    TO_TIME     : toTime,
+    SEL_DAY     : selDay,
+    EXTRA_NM    : extraNm,
   });
 };
 export const setMainCategoryINSERT = (
@@ -361,17 +380,35 @@ export const setMainCategoryINSERT = (
   majorNm,
   subCd,
   subNm,
-  langId
+  langId,
+  useYn,
+  allDate,
+  fromDate,
+  toDate,
+  allTime,
+  fromTime,
+  toTime,
+  selDay,
+  extraNm,
 ) => {
   return api2.post("/MIMASTER/MST57_001INS.asmx/setMainCategoryInsert", {
-    GROUP_CD: groupCd,
-    STORE_CD: storeCd,
-    AREA_CD: areaCd,
-    MAJOR_CD: majorCd,
-    MAJOR_NM: majorNm,
-    SUB_CD: subCd,
-    SUB_NM: subNm,
-    LANGUAGE_ID: langId,
+    GROUP_CD    : groupCd,
+    STORE_CD    : storeCd,
+    AREA_CD     : areaCd,
+    MAJOR_CD    : majorCd,
+    MAJOR_NM    : majorNm,
+    SUB_CD      : subCd,
+    SUB_NM      : subNm,
+    LANGUAGE_ID : langId,
+    USE_YN      : useYn,
+    ALL_DATE    : allDate,
+    FROM_DATE   : fromDate,
+    TO_DATE     : toDate,
+    ALL_TIME    : allTime,
+    FROM_TIME   : fromTime,
+    TO_TIME     : toTime,
+    SEL_DAY     : selDay,
+    EXTRA_NM    : extraNm,
   });
 };
 
@@ -383,17 +420,35 @@ export const setSubCategoryINSERT = (
   majorNm,
   subCd,
   subNm,
-  langId
+  langId,
+  useYn,
+  allDate,
+  fromDate,
+  toDate,
+  allTime,
+  fromTime,
+  toTime,
+  selDay,
+  extraNm,
 ) => {
   return api2.post("/MIMASTER/MST57_001INS.asmx/setSubCategoryInsert", {
-    GROUP_CD: groupCd,
-    STORE_CD: storeCd,
-    AREA_CD: areaCd,
-    MAJOR_CD: majorCd,
-    MAJOR_NM: majorNm,
-    SUB_CD: subCd,
-    SUB_NM: subNm,
-    LANGUAGE_ID: langId,
+    GROUP_CD    : groupCd,
+    STORE_CD    : storeCd,
+    AREA_CD     : areaCd,
+    MAJOR_CD    : majorCd,
+    MAJOR_NM    : majorNm,
+    SUB_CD      : subCd,
+    SUB_NM      : subNm,
+    LANGUAGE_ID : langId,
+    USE_YN      : useYn,
+    ALL_DATE    : allDate,
+    FROM_DATE   : fromDate,
+    TO_DATE     : toDate,
+    ALL_TIME    : allTime,
+    FROM_TIME   : fromTime,
+    TO_TIME     : toTime,
+    SEL_DAY     : selDay,
+    EXTRA_NM    : extraNm,
   });
 };
 export const setSubCategoryUPDATE = (
@@ -404,17 +459,35 @@ export const setSubCategoryUPDATE = (
   majorNm,
   subCd,
   subNm,
-  langId
+  langId,
+  useYn,
+  allDate,
+  fromDate,
+  toDate,
+  allTime,
+  fromTime,
+  toTime,
+  selDay,
+  extraNm,
 ) => {
   return api2.post("/MIMASTER/MST57_001INS.asmx/setSubCategoryUpdate", {
-    GROUP_CD: groupCd,
-    STORE_CD: storeCd,
-    AREA_CD: areaCd,
-    MAJOR_CD: majorCd,
-    MAJOR_NM: majorNm,
-    SUB_CD: subCd,
-    SUB_NM: subNm,
-    LANGUAGE_ID: langId,
+    GROUP_CD    : groupCd,
+    STORE_CD    : storeCd,
+    AREA_CD     : areaCd,
+    MAJOR_CD    : majorCd,
+    MAJOR_NM    : majorNm,
+    SUB_CD      : subCd,
+    SUB_NM      : subNm,
+    LANGUAGE_ID : langId,
+    USE_YN      : useYn,
+    ALL_DATE    : allDate,
+    FROM_DATE   : fromDate,
+    TO_DATE     : toDate,
+    ALL_TIME    : allTime,
+    FROM_TIME   : fromTime,
+    TO_TIME     : toTime,
+    SEL_DAY     : selDay,
+    EXTRA_NM    : extraNm,
   });
 };
 
@@ -556,6 +629,12 @@ export const getScreenList = (groupCd, storeCd, areaCd, posNo) => {
     POSNO: posNo,
   });
 };
+export const getLSCategoryList = (groupCd, storeCd) => {
+  return api2.post("/MIMASTER/MST57_003INS.asmx/getLSCategoryList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
 
 export const getMenuKeyList = (groupCd, storeCd, areaCd) => {
   return api2.post("/MIMASTER/MST05_011INS.asmx/getMenuKeyList", {
@@ -569,6 +648,14 @@ export const getMenuKeyList3 = (groupCd, storeCd, areaCd) => {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     AREA_CD: areaCd,
+  });
+};
+export const getMenuKeyList4 = (groupCd, storeCd, areaCd, posNo) => {
+  return api2.post("/MIMASTER/MST57_003INS.asmx/getMenuKeyList", {
+    GROUP_CD : groupCd,
+    STORE_CD : storeCd,
+    AREA_CD  : areaCd,
+    POS_NO   : posNo,
   });
 };
 
@@ -716,6 +803,29 @@ export const DUPLIALLPOSDATA = async (
   tposNo
 ) => {
   const res = await api2.post("/MIMASTER/MST05_011INS.asmx/DUPLIALLPOSDATA", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+    POSNO: posNo,
+    T_GROUP_CD: tgroupCd,
+    T_STORE_CD: tstoreCd,
+    T_AREA_CD: tareaCd,
+    T_POSNO: tposNo,
+  });
+  return res;
+};
+
+export const dupliAllTablePosData = async (
+  groupCd,
+  storeCd,
+  areaCd,
+  posNo,
+  tgroupCd,
+  tstoreCd,
+  tareaCd,
+  tposNo
+) => {
+  const res = await api2.post("/MIMASTER/MST57_003INS.asmx/dupliAllTablePosData", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     AREA_CD: areaCd,

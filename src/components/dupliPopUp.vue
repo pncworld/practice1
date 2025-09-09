@@ -145,6 +145,9 @@ const showStoreList = async () => {
   //comsole.log(posNo);
   try {
     res = await api[poskiosk](groupCd.value, storeCd, posNo);
+
+    // console.log(res);
+
   } catch (error) {
     //comsole.log(error);
   } finally {
@@ -159,7 +162,8 @@ const showStoreList = async () => {
       );
     }
 
-    //comsole.log(rowData.value);
+    // console.log(rowData.value);
+
   }
 };
 const selectedRows = ref([]);
@@ -223,7 +227,9 @@ const dupliStore = async () => {
             areaCd2.join(","),
             posNo2.join(",")
           );
-          // //console.log(res3);
+
+          // console.log(res3);
+
           if (res3.data.RESULT_CD == "00") {
             store.state.loading = false;
             Swal.fire({
