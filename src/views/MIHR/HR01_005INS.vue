@@ -10,9 +10,10 @@
     <div class="flex justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-10 space-x-2 pr-5">
+        <button @click="searchButton2" class="button search w-44">미등록 직원조회</button>
         <button @click="searchButton" class="button search">조회</button>
         <button @click="addButton" class="button new">신규</button>
-        <button @click="saveButton" class="button save">저장</button>
+        <!-- <button @click="saveButton" class="button save">저장</button> -->
         <button @click="deleteButton" class="button delete">삭제</button>
         <button @click="excelButton" class="button excel">엑셀</button>
       </div>
@@ -138,9 +139,9 @@
       <div class="flex justify-between">
         <h2 class="text-xl font-bold mb-4">근무 계약 등록(신규/수정)</h2>
         <div class="flex justify-end space-x-4">
-          <button class="whitebutton" @click="searchButton2">추가</button>
-          <button class="whitebutton" @click="saveButton2">삭제</button>
-          <button @click="open = false" class="whitebutton">저장</button>
+          <button class="whitebutton" @click="addButton2">추가</button>
+          <button class="whitebutton" @click="deleteButton2">삭제</button>
+          <button @click="saveButton" class="whitebutton">저장</button>
           <button @click="open = false" class="whitebutton">닫기</button>
         </div>
       </div>
@@ -152,16 +153,14 @@
           </div>
           <div
             class="border-l border-t border-gray-600 flex justify-center items-center">
-            <button
+            <input
+            type="text"
               @click="selectEMP"
-              class="border border-black w-[80%] h-[80%]">
-              <input
-                type="text"
-                disabled
-                class="w-full h-full"
-                v-model="gridvalue1" />
-            </button>
-          </div>
+              :disabled="disabled"
+              :value="gridvalue1"
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
+          </input>
+        </div>
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
             급여기준
@@ -172,7 +171,7 @@
               name=""
               id=""
               disabled
-              class="border border-black w-[80%] h-[80%]"
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue2">
               <option :value="i.lngCode" v-for="i in optionList3">
                 {{ i.strStndName }}
@@ -187,7 +186,8 @@
             class="border-l border-t border-gray-600 flex justify-center items-center">
             <input
               type="date"
-              class="border border-black w-[38%] h-[80%]"
+              :disabled="disabled"
+              class="border border-black w-[38%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue3" />
             <span class="text-3xl">/</span>
             <input
@@ -213,8 +213,9 @@
           <div
             class="border-l border-t border-gray-600 flex justify-center items-center space-x-1">
             <input
-              type="number"
-              class="border border-black w-[39%] h-[80%]"
+              type="text"
+              disabled
+              class="border border-black w-[39%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue6" />
             <input
               type="number"
@@ -236,12 +237,14 @@
           <div
             class="border-l border-t border-gray-600 flex justify-start pl-8 items-center space-x-1 col-span-3">
             <input
-              type="number"
-              class="border border-black w-[10%] h-[80%]"
+              type="text"
+              class="border border-black w-[10%] h-[80%] disabled:bg-gray-300"
+              disabled
               v-model="gridvalue9" />
             <input
-              type="number"
-              class="border border-black w-[10%] h-[80%]"
+              type="text"
+              class="border border-black w-[10%] h-[80%] disabled:bg-gray-300"
+              disabled
               v-model="gridvalue10" />
           </div>
           <!-- <div
@@ -394,56 +397,56 @@
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="radio"
-              v-model="gridvalue19"
+              v-model="gridvalue12"
               name="gridvalue12"
-              value="true" />
+              value="false" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="radio"
-              v-model="gridvalue20"
-              value="true"
+              v-model="gridvalue13"
+              value="false"
               name="gridvalue13" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="radio"
-              v-model="gridvalue21"
-              value="true"
+              v-model="gridvalue14"
+              value="false"
               name="gridvalue14" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="radio"
-              v-model="gridvalue22"
-              value="true"
+              v-model="gridvalue15"
+              value="false"
               name="gridvalue15" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="radio"
-              v-model="gridvalue23"
-              value="true"
+              v-model="gridvalue16"
+              value="false"
               name="gridvalue16" />
           </div>
           <div
             class="border-l border-t border-black justify-center flex items-center">
             <input
               type="radio"
-              v-model="gridvalue24"
-              value="true"
+              v-model="gridvalue17"
+              value="false"
               name="gridvalue17" />
           </div>
           <div
             class="border-l border-t border-r border-black justify-center flex items-center">
             <input
               type="radio"
-              v-model="gridvalue25"
-              value="true"
+              v-model="gridvalue18"
+              value="false"
               name="gridvalue18" />
           </div>
           <div
@@ -688,11 +691,18 @@
             :setStateBar="false"
             :setRowIndicator="false"
             :rowStateeditable="false"
+            :addRow5="addRow5"
+            :addrowProp="addrowProp"
+            :addrowDefault="addrowDefault"
             :editableColId="'lngAtndType,strSTime,strETime'"
-            :checkRowAuto="false"
+         
             :labelingColumns="'lngAtndType'"
             :CalculateTimeColId="'strWTime'"
             @updatedRowData="updatedRowData2"
+            :checkRenderEditable="true"
+            :checkRowAuto="false"
+            :checkRowAuto2="true"
+            :checkRowAuto2Col="'checkbox'"
             :valuesData="valuesData"
             :labelsData="labelsData"
             :rowData="rowData3"></Realgrid>
@@ -700,22 +710,61 @@
       </div>
     </div>
   </div>
+
+  <EmployeePopUp2
+    v-if="openPopUp"
+    @updateOpen="updateOpen"
+    @empType="empType"
+    @empName="empName"
+    @empId="empId"
+    @empSalType="empSalType"
+    @storeCd="storeCd2"
+    @groupCd="groupCd2"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"></EmployeePopUp2>
   <!-- 연동 데이터 영역-->
+
+
+   <div v-if="openSearchPopUp" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="w-[50%] h-[70%] border border-black bg-white rounded-lg shadow-lg p-2">
+      <div class="flex justify-between space-x-5">
+        <div class="font-semibold text-base">
+          근무계약 미등록 고객조회
+        </div>
+        <div class="flex space-x-5">
+        <div><button class="whitebutton">조회</button></div>
+        <div><button class="whitebutton">엑셀</button></div>
+        <div><button class="whitebutton" @click="openSearchPopUp = false">닫기</button></div>
+        </div>
+      </div>
+      <div class="flex justify-start space-x-5 -ml-12">
+        <PickStore></PickStore>
+        <div class="flex space-x-5 items-center mt-2">
+          <div class="text-base font-semibold">계약 시작일</div>
+          <div>
+            <input type="date" class="border border-black w-48 h-8">
+          </div>
+        </div>
+      </div>
+    </div>
+   </div>
 </template>
 
 <script setup>
-import { saveEMP2 } from "@/api/miattend";
 import {
+  deleteEmpContract,
   getEmpContractList,
   getInitEmpContractInfo,
   getWorkContractDetail,
+  saveEmpContract,
 } from "@/api/mihr";
 import Datepicker2 from "@/components/Datepicker2.vue";
+import EmployeePopUp2 from "@/components/employeePopUp2.vue";
 /**
  *  페이지명 자동 입력 컴포넌트
  *  */
 
 import PageName from "@/components/pageName.vue";
+import PickStore from "@/components/pickStore.vue";
 /**
  * 매장 공통 컴포넌트
  */
@@ -731,7 +780,7 @@ import Realgrid from "@/components/realgrid.vue";
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog } from "@/customFunc/customFunc";
+import { formatLocalDate, insertPageLog } from "@/customFunc/customFunc";
 /**
  *  경고창 호출 라이브러리
  *  */
@@ -741,7 +790,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -752,9 +801,10 @@ import { useStore } from "vuex";
  * 	화면 Load시 실행 스크립트
  */
 
+const disabled = ref(true);
 const selectEMP = () => {
   openPopUp.value = true;
-  ////console.log("왓음");
+  //console.log("왓음");
 };
 const openPopUp = ref(false);
 const disableAll = ref(true);
@@ -770,19 +820,19 @@ const gridvalue2 = ref("");
 const gridvalue3 = ref("");
 const gridvalue4 = ref("");
 const gridvalue5 = ref("");
-const gridvalue6 = ref("");
-const gridvalue7 = ref("");
-const gridvalue8 = ref("");
+const gridvalue6 = ref("0");
+const gridvalue7 = ref("0");
+const gridvalue8 = ref(false);
 const gridvalue9 = ref("");
 const gridvalue10 = ref("");
 const gridvalue11 = ref("");
-const gridvalue12 = ref("");
-const gridvalue13 = ref("");
-const gridvalue14 = ref("");
-const gridvalue15 = ref("");
-const gridvalue16 = ref("");
-const gridvalue17 = ref("");
-const gridvalue18 = ref("");
+const gridvalue12 = ref(true);
+const gridvalue13 = ref(true);
+const gridvalue14 = ref(true);
+const gridvalue15 = ref(true);
+const gridvalue16 = ref(true);
+const gridvalue17 = ref(true);
+const gridvalue18 = ref(true);
 const gridvalue19 = ref("");
 const gridvalue20 = ref("");
 const gridvalue21 = ref("");
@@ -930,20 +980,81 @@ const addButton = () => {
     return;
   }
   // isNewRow.value = false;
-  const newCode =
-    Math.max(0, ...updateRow.value.map((item) => item.lngChargerCode)) + 1;
-  const storeNm = store.state.userData.strStoreName;
-  // /////console.log(storeNm);
-  addrowDefault.value =
-    groupCd.value +
-    "," +
-    store.state.userData.lngPosition +
-    "," +
-    storeNm +
-    "," +
-    newCode +
-    ", ,,,,,,,,재직,,,, , , , , ,,0,0,0, ,0,0,0,0,,,,,,0,0,0";
-  addRow.value = !addRow.value;
+  // const newCode =
+  //   Math.max(0, ...updateRow.value.map((item) => item.lngChargerCode)) + 1;
+  // const storeNm = store.state.userData.strStoreName;
+  // // /////console.log(storeNm);
+  // addrowDefault.value =
+  //   groupCd.value +
+  //   "," +
+  //   store.state.userData.lngPosition +
+  //   "," +
+  //   storeNm +
+  //   "," +
+  //   newCode +
+  //   ", ,,,,,,,,재직,,,, , , , , ,,0,0,0, ,0,0,0,0,,,,,,0,0,0";
+  // addRow.value = !addRow.value;
+  initGrid2();
+  gridvalue3.value = formatLocalDate(new Date())
+  gridvalue4.value = formatLocalDate(new Date())
+  gridvalue5.value = formatLocalDate(new Date())
+  disabled.value = false;
+  updateOrInsert.value = true
+  open.value = true;
+};
+
+const initGrid2 = () => {
+  gridvalue1.value = "";
+  gridvalue2.value = "";
+  gridvalue3.value = "";
+  gridvalue4.value = "";
+  gridvalue5.value = "";
+  gridvalue6.value = "0";
+  gridvalue7.value = "0";
+  gridvalue8.value = false;
+  gridvalue9.value = "";
+  gridvalue10.value = "";
+  gridvalue11.value = "";
+  gridvalue12.value = true;
+  gridvalue13.value = true;
+  gridvalue14.value = true;
+  gridvalue15.value = true;
+  gridvalue16.value = true;
+  gridvalue17.value = true;
+  gridvalue18.value = true;
+  gridvalue19.value = "";
+  gridvalue20.value = "";
+  gridvalue21.value = "";
+  gridvalue22.value = "";
+  gridvalue23.value = "";
+  gridvalue24.value = "";
+  gridvalue25.value = "";
+  gridvalue26.value = "0";
+  gridvalue27.value = "0";
+  gridvalue28.value = "0";
+  gridvalue29.value = "0";
+  gridvalue30.value = "0";
+  gridvalue31.value = "0";
+  gridvalue32.value = "0";
+  gridvalue33.value = "00:00";
+  gridvalue34.value = "00:00";
+  gridvalue35.value = "00:00";
+  gridvalue36.value ="00:00";
+  gridvalue37.value = "00:00";
+  gridvalue38.value = "00:00";
+  gridvalue39.value ="00:00";
+  gridvalue40.value = "00:00";
+  gridvalue41.value = "00:00";
+  gridvalue42.value = "00:00";
+  gridvalue43.value ="00:00";
+  gridvalue44.value = "00:00";
+  gridvalue45.value = "00:00";
+  gridvalue46.value ="00:00";
+  gridvalue47.value = "";
+
+  tempRowData3.value = []
+  tempDayWeek.value = ''
+  tempempId.value = ''
 };
 /**
  * 그리드 행 삭제 버튼 함수
@@ -1087,8 +1198,6 @@ const changeInfo = (e) => {
   changeNow.value = !changeNow.value;
 };
 
-const addrowDefault = ref("");
-
 /**
  *  조회 함수
  */
@@ -1134,97 +1243,10 @@ const searchButton = async () => {
  */
 
 const saveButton = async () => {
-  if (afterSearch.value == false) {
+  if (tempempId.value == '' || tempempId.value == undefined ) {
     Swal.fire({
       title: "경고",
-      text: "조회를 먼저 진행해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  if (JSON.stringify(updateRow.value) === JSON.stringify(rowData.value)) {
-    Swal.fire({
-      title: "경고",
-      text: "변경된 사항이 없습니다.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-
-  const validateRow2 = updateRow.value.filter(
-    (item) => item.strChargerName == "" || item.strChargerName == undefined
-  ).length;
-  if (validateRow2 > 0) {
-    Swal.fire({
-      title: "경고",
-      text: "사원이름이 미입력되었습니다. 확인해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-
-  const validateRow3 = updateRow.value.filter(
-    (item) => item.lngChargerCode == "" || item.lngChargerCode == undefined
-  ).length;
-  if (validateRow3 > 0) {
-    Swal.fire({
-      title: "경고",
-      text: "사원번호가 미입력되었습니다. 확인해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-
-  const validateRow4 = updateRow.value.filter(
-    (item) => item.lngClassCode == "0" || item.lngClassCode == undefined
-  ).length;
-  if (validateRow4 > 0) {
-    Swal.fire({
-      title: "경고",
-      text: "직책이 미입력되었습니다. 확인해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-
-  const validateRow5 = updateRow.value.filter(
-    (item) => item.lngRankCode == "0" || item.lngRankCode == undefined
-  ).length;
-  if (validateRow5 > 0) {
-    Swal.fire({
-      title: "경고",
-      text: "직위가 미입력되었습니다. 확인해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-
-  const validateRow6 = updateRow.value.filter(
-    (item) => item.lngAreaCode == "0" || item.lngAreaCode == undefined
-  ).length;
-  if (validateRow6 > 0) {
-    Swal.fire({
-      title: "경고",
-      text: "근무장소가 미입력되었습니다. 확인해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-
-  const validateRow7 = updateRow.value.filter(
-    (item) => item.blnExpireClass == undefined
-  ).length;
-  if (validateRow7 > 0) {
-    Swal.fire({
-      title: "경고",
-      text: "재직구분이 미입력되었습니다. 확인해주세요.",
+      text: "사원조회를 먼저 진행해주세요.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -1244,93 +1266,77 @@ const saveButton = async () => {
       try {
         //comsole.log(updateRow.value);
 
-        const chargerCode = updateRow.value.map((item) => item.lngChargerCode);
-        const chargerName = updateRow.value.map((item) => item.strChargerName);
+      
+        console.log(tempRowData3.value)
+        const dayweeks = tempRowData3.value.map(item => item.lngDayWeek).join('\u200b')
+        const lngCodes = tempRowData3.value.map(item => item.lngCode).join('\u200b')
+        const atndType = tempRowData3.value.map(item => item.lngAtndType).join('\u200b')
+        const sTimes = tempRowData3.value.map(item => item.strSTime).join('\u200b')
+        const eTimes = tempRowData3.value.map(item => item.strETime).join('\u200b')
+        const res = await saveEmpContract(
+              tempGroupCd.value ,
+              tempStoreCd.value ,
+              tempempId.value ,
+              gridvalue2.value , 
+              gridvalue3.value,
+              gridvalue4.value ,
+              gridvalue5.value ,
+              gridvalue6.value ,
+              gridvalue7.value ,
+              gridvalue8.value == false ? 0 : 1 ,
+              gridvalue9.value ,
+              gridvalue11.value ,
+              2 ,
+              gridvalue12.value == true ? 1 : 0 ,
+              gridvalue12.value == true ? 0 : 1 ,
+              gridvalue26.value ,
+              gridvalue33.value ,
+              gridvalue40.value ,
+               3 ,
+              gridvalue13.value == true ? 1 : 0 ,
+              gridvalue13.value == true ? 0 : 1 ,
+              gridvalue27.value ,
+              gridvalue34.value ,
+              gridvalue41.value ,
+              4 ,
+              gridvalue14.value == true ? 1 : 0 ,
+              gridvalue14.value == true ? 0 : 1 ,
+              gridvalue28.value ,
+              gridvalue35.value ,
+              gridvalue42.value ,
+              5 ,
+              gridvalue15.value == true ? 1 : 0 ,
+              gridvalue15.value == true ? 0 : 1 ,
+              gridvalue29.value ,
+              gridvalue36.value ,
+              gridvalue43.value ,
+              6 ,
+              gridvalue16.value == true ? 1 : 0 ,
+              gridvalue16.value == true ? 0 : 1 ,
+              gridvalue30.value ,
+              gridvalue37.value ,
+              gridvalue44.value ,
+              7 ,
+              gridvalue16.value == true ? 1 : 0 ,
+              gridvalue16.value == true ? 0 : 1 ,
+              gridvalue31.value ,
+              gridvalue38.value ,
+              gridvalue45.value ,
+              1 ,
+              gridvalue17.value == true ? 1 : 0 ,
+              gridvalue17.value == true ? 0 : 1 ,
+              gridvalue32.value ,
+              gridvalue39.value ,
+              gridvalue46.value ,
+              dayweeks,
+              lngCodes,
+              atndType,
+              sTimes,
+              eTimes,
+              updateOrInsert.value == true ? 1 : 0
 
-        const strIdNo = updateRow.value.map((item) => item.strIdNo);
-        const lngClassCode = updateRow.value.map((item) => item.lngClassCode);
-        const lngRankCode = updateRow.value.map((item) => item.lngRankCode);
-        const lngAreaCode = updateRow.value.map((item) => item.lngAreaCode);
-        const dtmJoinDate = updateRow.value.map(
-          (item) => item.dtmJoinDate.split(" ")[0]
         );
-        const dtmExpireDate = updateRow.value.map(
-          (item) => item.dtmExpireDate.split(" ")[0]
-        );
-        const dtmHealthExpireDate = updateRow.value.map(
-          (item) => item.dtmHealthExpireDate.split(" ")[0]
-        );
-        const dtmBirthDate = updateRow.value.map(
-          (item) => item.dtmBirthDate.split(" ")[0]
-        );
-        const strTelNumber = updateRow.value.map((item) => item.strTelNumber);
-        const strZipCode = updateRow.value.map((item) => item.strZipCode);
-        const strAddress = updateRow.value.map((item) => item.strAddress);
-        const strPassword = updateRow.value.map((item) => item.strPassword);
-        const lngBankCode = updateRow.value.map((item) => item.lngBankCode);
-        const strBankNumber = updateRow.value.map((item) => item.strBankNumber);
-        const blnExpireClass = updateRow.value.map(
-          (item) => item.blnExpireClass
-        );
-        const strCardNumber = updateRow.value.map((item) => item.strCardNumber);
-        const strEmail = updateRow.value.map((item) => item.strEmail);
-        const strCPhone = updateRow.value.map((item) => item.strCPhone);
-        const blnLuner = updateRow.value.map((item) =>
-          item.blnLuner == "True" ? 1 : item.blnLuner == true ? 1 : 0
-        );
-
-        const lngPayCode = updateRow.value.map((item) => item.lngPayCode);
-        const dtmChangeDate = updateRow.value.map(
-          (item) => item.dtmChangeDate.split(" ")[0]
-        );
-        const lngUserAdminID = updateRow.value.map(
-          (item) => item.lngUserAdminID
-        );
-        const dtmRetireDate = updateRow.value.map(
-          (item) => item.dtmRetireDate.split(" ")[0]
-        );
-        const lngChangePayCode = updateRow.value.map(
-          (item) => item.lngChangePayCode
-        );
-        const lngStoreGroup = updateRow.value.map((item) => item.lngStoreGroup);
-        const lngSequence = updateRow.value.map((item) => item.lngSequence);
-        const lngPosition = updateRow.value.map((item) => item.lngPosition);
-
-        const lngWorkClass = updateRow.value.map((item) => item.lngWorkClass);
-
-        const res = await saveEMP2(
-          chargerCode.join("\u200b"),
-          chargerName.join("\u200b"),
-          strIdNo.join("\u200b"),
-          lngClassCode.join("\u200b"),
-          lngRankCode.join("\u200b"),
-          lngAreaCode.join("\u200b"),
-          dtmJoinDate.join("\u200b"),
-          dtmExpireDate.join("\u200b"),
-          dtmHealthExpireDate.join("\u200b"),
-          dtmBirthDate.join("\u200b"),
-          strTelNumber.join("\u200b"),
-          strZipCode.join("\u200b"),
-          strAddress.join("\u200b"),
-          strPassword.join("\u200b"),
-          lngBankCode.join("\u200b"),
-          strBankNumber.join("\u200b"),
-          blnExpireClass.join("\u200b"),
-          strCardNumber.join("\u200b"),
-          strEmail.join("\u200b"),
-          strCPhone.join("\u200b"),
-          lngPosition.join("\u200b"),
-          blnLuner.join("\u200b"),
-          lngPayCode.join("\u200b"),
-          dtmChangeDate.join("\u200b"),
-          lngUserAdminID.join("\u200b"),
-          dtmRetireDate.join("\u200b"),
-          lngChangePayCode.join("\u200b"),
-          lngStoreGroup.join("\u200b"),
-          lngSequence.join("\u200b"),
-          lngWorkClass.join("\u200b")
-        );
-        ////console.log(res);
+        console.log(res);
         Swal.fire({
           title: "저장 되었습니다.",
           confirmButtonText: "확인",
@@ -1379,6 +1385,10 @@ const dblclickedRowData = async (e) => {
   console.log(e);
   rowData2.value = [];
   rowData3.value = [];
+
+     tempGroupCd.value  = e[16]
+              tempStoreCd.value =e[17]
+  tempempId.value = e[18]
   gridvalue1.value = e[3];
   gridvalue2.value = e[25];
   gridvalue3.value = e[5];
@@ -1391,7 +1401,8 @@ const dblclickedRowData = async (e) => {
   gridvalue10.value = e[10] * 4;
   gridvalue47.value = e[14];
   gridvalue11.value = e[13];
-
+  updateOrInsert.value = false
+  disabled.value = true;
   try {
     const res = await getWorkContractDetail(e[16], e[17], e[18], e[25], e[19]);
     tempRowData3.value = res.data.List;
@@ -1413,49 +1424,49 @@ const dblclickedRowData = async (e) => {
     for (let i = 0; i < workDate.length; i++) {
       if (workDate[i] == "1") {
         gridvalue18.value = true;
-        gridvalue25.value = false;
+        //gridvalue25.value = false;
       } else if (workDate[i] == "2") {
         gridvalue12.value = true;
-        gridvalue19.value = false;
+       // gridvalue19.value = false;
       } else if (workDate[i] == "3") {
         gridvalue13.value = true;
-        gridvalue20.value = false;
+       // gridvalue20.value = false;
       } else if (workDate[i] == "4") {
         gridvalue14.value = true;
-        gridvalue21.value = false;
+      //  gridvalue21.value = false;
       } else if (workDate[i] == "5") {
         gridvalue15.value = true;
-        gridvalue22.value = false;
+       // gridvalue22.value = false;
       } else if (workDate[i] == "6") {
         gridvalue16.value = true;
-        gridvalue23.value = false;
+      //  gridvalue23.value = false;
       } else if (workDate[i] == "7") {
         gridvalue17.value = true;
-        gridvalue24.value = false;
+      //  gridvalue24.value = false;
       }
     }
 
     for (let i = 0; i < restDate.length; i++) {
       if (restDate[i] == "1") {
-        gridvalue25.value = true;
+      //  gridvalue25.value = true;
         gridvalue18.value = false;
       } else if (restDate[i] == "2") {
-        gridvalue19.value = true;
+      //  gridvalue19.value = true;
         gridvalue12.value = false;
       } else if (restDate[i] == "3") {
-        gridvalue20.value = true;
+      //  gridvalue20.value = true;
         gridvalue13.value = false;
       } else if (restDate[i] == "4") {
-        gridvalue21.value = true;
+       // gridvalue21.value = true;
         gridvalue14.value = false;
       } else if (restDate[i] == "5") {
-        gridvalue22.value = true;
+      //  gridvalue22.value = true;
         gridvalue15.value = false;
       } else if (restDate[i] == "6") {
-        gridvalue23.value = true;
+      //  gridvalue23.value = true;
         gridvalue16.value = false;
       } else if (restDate[i] == "7") {
-        gridvalue24.value = true;
+       // gridvalue24.value = true;
         gridvalue17.value = false;
       }
     }
@@ -1525,7 +1536,7 @@ const setRowData3 = (e) => {
         }
       }
 
-      console.log(chour2, cminute);
+
       if (j + 8 == chour2 && cminute2 > 0) {
         hourC = true;
 
@@ -1542,12 +1553,25 @@ const setRowData3 = (e) => {
     };
   });
 
-  console.log(rowData2.value);
+
 };
 
+const checkedRowData = (e) => {
+  console.log(e)
+}
+const tempCheckedRowData = ref([])
 const updatedRowData2 = (e) => {
-  console.log(e);
+  // console.log(e);
+  // console.log(tempRowData3.value)
+  tempCheckedRowData.value = e.filter(item => item.checkbox == true)
+  //console.log(tempCheckedRowData.value)
+  tempRowData3.value = tempRowData3.value.filter(item => item.lngDayWeek != tempDayWeek.value)
 
+  for(let i=0 ; i< e.length ; i++){
+    tempRowData3.value.push({
+      checkbox :'0' , dtmConStartDate : gridvalue3.value , lngAtndType : e[i].lngAtndType , lngChargerCode : tempempId.value , lngCode : e[i].lngCode , lngDayWeek : tempDayWeek.value , lngPayStndCode : gridvalue2.value , lngStoreGroup: tempGroupCd.value , lngStoreCode :tempStoreCd.value , rowState: e[i].rowState , strETime : e[i].strETime , strSTime : e[i].strSTime , strWTime : e[i].strWTime
+    })
+  }
   const strSTime = e[0].strSTime;
   const strETime = e[e.length - 1].strETime;
   let totalWHour = 0;
@@ -1555,7 +1579,13 @@ const updatedRowData2 = (e) => {
 
   for (let i = 0; i < e.length; i++) {
     totalWHour += parseInt(String(e[i].strWTime).split(":")[0]);
-    totalWMin += parseInt(String(e[i].strWTime).split(":")[1]);
+    if(parseInt(String(e[i].strWTime).split(":")[1]) < 0){
+      totalWHour -= 1
+      totalWMin = -parseInt(String(e[i].strWTime).split(":")[1])
+    } else {
+  totalWMin += parseInt(String(e[i].strWTime).split(":")[1]);
+    }
+  
   }
 
   totalWHour = String(totalWHour).padStart(2, "0");
@@ -1592,6 +1622,238 @@ const updatedRowData2 = (e) => {
 };
 
 const rowData2 = ref([]);
+
+const updateOpen = (e) => {
+  //console.log('왓냐')
+  openPopUp.value = false
+}
+
+const empType = (e) => {
+  console.log(e)
+ 
+}
+const empSalType = (e) =>{
+  gridvalue2.value =e
+  //console.log(e)
+}
+const empName = (e) => {
+ // console.log(e)
+  gridvalue1.value = e
+}
+const tempempId = ref('')
+const empId = (e) => {
+  console.log(e)
+  tempempId.value = e
+}
+const tempGroupCd = ref('')
+const groupCd2 = (e) => {
+tempGroupCd.value = e
+}
+
+const tempStoreCd = ref('')
+const storeCd2 = (e) => {
+tempStoreCd.value = e
+}
+
+watch(([gridvalue26 , gridvalue27, gridvalue28, gridvalue29, gridvalue30, gridvalue31, gridvalue32]) ,() => {
+    const hours = (
+  parseInt(gridvalue26.value.split(':')[0] || 0) +
+  parseInt(gridvalue27.value.split(':')[0] || 0) +
+  parseInt(gridvalue28.value.split(':')[0] || 0) +
+  parseInt(gridvalue29.value.split(':')[0] || 0) +
+  parseInt(gridvalue30.value.split(':')[0] || 0) +
+  parseInt(gridvalue31.value.split(':')[0] || 0) +
+  parseInt(gridvalue32.value.split(':')[0] || 0)
+);
+
+const minutes = (
+  parseInt(gridvalue26.value.split(':')[1] || 0) +
+  parseInt(gridvalue27.value.split(':')[1] || 0) +
+  parseInt(gridvalue28.value.split(':')[1] || 0) +
+  parseInt(gridvalue29.value.split(':')[1] || 0) +
+  parseInt(gridvalue30.value.split(':')[1] || 0) +
+  parseInt(gridvalue31.value.split(':')[1] || 0) +
+  parseInt(gridvalue32.value.split(':')[1] || 0)
+);
+
+const total = hours + minutes / 60;
+gridvalue10.value = hours * 4
+gridvalue9.value = total.toFixed(2); 
+})
+
+
+const addRow5 = ref(false)
+const addrowProp = ref('checkbox,lngAtndType,strSTime,strETime,strWTime')
+const addrowDefault = ref('false,,08:00,18:00,,')
+const addButton2 = () => {
+
+  if(updateOrInsert.value == true){
+
+  if(tempempId.value == '' || tempempId.value == undefined){
+     Swal.fire({
+      title: "사원조회를 먼저 해주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+    }
+
+   if(tempDayWeek.value == '' || tempDayWeek.value == undefined){
+     Swal.fire({
+      title: "상세보기를 먼저 선택해주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+
+  tempRowData3.value.push({checkbox : false , dtmConStartDate: formatLocalDate(new Date()), lngAtndType: 0 , lngChargerCode: tempempId.value , lngCode: 0 , lngDayWeek : tempDayWeek.value , lngPayStndCode : gridvalue2.value , lngStoreCode: tempStoreCd.value , lngStoreGroup : tempGroupCd.value ,  strSTime: '00:00' ,strETime: '00:00', strWTime: ''})
+  console.log(tempRowData3.value)
+  setRowData3(tempDayWeek.value)
+}
+
+
+const deleteButton2 = () => {
+  if(tempCheckedRowData.value.length == 0){
+     Swal.fire({
+      title: "경고",
+      text: "삭제할 대상을 먼저 체크해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  for(let i=0 ; i < tempCheckedRowData.value.length ; i++){
+    tempRowData3.value = tempRowData3.value.filter(item =>  !(item.strETime == tempCheckedRowData.value[i].strETime && item.strSTime == tempCheckedRowData.value[i].strSTime && item.lngAtndType == tempCheckedRowData.value[i].lngAtndType) )
+  }
+  setRowData3(tempDayWeek.value)
+
+  const ctempRowData3 = tempRowData3.value.filter(item => item.lngDayWeek == tempDayWeek.value)
+
+  console.log(ctempRowData3)
+
+  if(ctempRowData3.length > 0){
+
+   const strSTime = ctempRowData3[0].strSTime;
+  const strETime = ctempRowData3[ctempRowData3.length - 1].strETime;
+  let totalWHour = 0;
+  let totalWMin = 0;
+
+  for (let i = 0; i < ctempRowData3.length; i++) {
+    totalWHour += parseInt(String(ctempRowData3[i].strWTime).split(":")[0]);
+    totalWMin += parseInt(String(ctempRowData3[i].strWTime).split(":")[1]);
+  }
+
+  totalWHour = String(totalWHour).padStart(2, "0");
+  totalWMin = String(totalWMin).padStart(2, "0");
+  console.log(totalWHour)
+  console.log(totalWMin)
+  if (tempDayWeek.value == "1") {
+    gridvalue32.value = totalWHour + ":" + totalWMin;
+    gridvalue39.value = strSTime;
+    gridvalue46.value = strETime;
+  } else if (tempDayWeek.value == "2") {
+    gridvalue26.value = totalWHour + ":" + totalWMin;
+    gridvalue33.value = strSTime;
+    gridvalue40.value = strETime;
+  } else if (tempDayWeek.value == "3") {
+    gridvalue27.value = totalWHour + ":" + totalWMin;
+    gridvalue34.value = strSTime;
+    gridvalue41.value = strETime;
+  } else if (tempDayWeek.value == "4") {
+    gridvalue28.value = totalWHour + ":" + totalWMin;
+    gridvalue35.value = strSTime;
+    gridvalue42.value = strETime;
+  } else if (tempDayWeek.value == "5") {
+    gridvalue29.value = totalWHour + ":" + totalWMin;
+    gridvalue36.value = strSTime;
+    gridvalue43.value = strETime;
+  } else if (tempDayWeek.value == "6") {
+    gridvalue30.value = totalWHour + ":" + totalWMin;
+    gridvalue37.value = strSTime;
+    gridvalue44.value = strETime;
+  } else if (tempDayWeek.value == "7") {
+    gridvalue31.value = totalWHour + ":" + totalWMin;
+    gridvalue38.value = strSTime;
+    gridvalue45.value = strETime;
+  }
+    } else {
+      if (tempDayWeek.value == "1") {
+    gridvalue32.value = '00:00'
+    gridvalue39.value = '00:00'
+    gridvalue46.value = '00:00'
+  } else if (tempDayWeek.value == "2") {
+    gridvalue26.value = '00:00'
+    gridvalue33.value = '00:00'
+    gridvalue40.value = '00:00'
+  } else if (tempDayWeek.value == "3") {
+    gridvalue27.value = '00:00'
+    gridvalue34.value = '00:00'
+    gridvalue41.value = '00:00'
+  } else if (tempDayWeek.value == "4") {
+    gridvalue28.value = '00:00'
+    gridvalue35.value = '00:00'
+    gridvalue42.value = '00:00'
+  } else if (tempDayWeek.value == "5") {
+    gridvalue29.value = '00:00'
+    gridvalue36.value = '00:00'
+    gridvalue43.value = '00:00'
+  } else if (tempDayWeek.value == "6") {
+    gridvalue30.value = '00:00'
+    gridvalue37.value = '00:00'
+    gridvalue44.value = '00:00'
+  } else if (tempDayWeek.value == "7") {
+    gridvalue31.value = '00:00'
+    gridvalue38.value = '00:00'
+    gridvalue45.value = '00:00'
+  }
+    }
+}
+
+const updateOrInsert = ref(false)
+
+
+const deleteButton = async() => {
+    console.log(updateRow.value)
+
+
+  const groupcds = updateRow.value.filter(item => item.checkbox == true).map(item => item.lngStoreGroup).join('\u200b')
+  const storecds = updateRow.value.filter(item => item.checkbox == true).map(item => item.lngStoreCode).join('\u200b')
+  const chargercodes = updateRow.value.filter(item => item.checkbox == true).map(item => item.lngChargerCode).join('\u200b')
+  const payndcds = updateRow.value.filter(item => item.checkbox == true).map(item => item.lngPayStndCode).join('\u200b')
+  const sdates = updateRow.value.filter(item => item.checkbox == true).map(item => item.dtmConStartDate).join('\u200b')
+  try {
+    const res = await deleteEmpContract(groupcds,storecds,chargercodes,payndcds,sdates)
+
+    console.log(res)
+
+    if(res.data.RESULT_CD == '00'){
+       Swal.fire({
+      title: "성공",
+      text: "선택하신 근무계약을 삭제하였습니다.",
+      icon: "success",
+      confirmButtonText: "확인",
+    });
+    } else {
+        Swal.fire({
+      title: "실패",
+      text: "선택하신 근무계약 삭제에 실패하였습니다.",
+      icon: "error",
+      confirmButtonText: "확인",
+    });
+    }
+  } catch (error) {
+    
+  } finally {
+    searchButton()
+  }
+}
+
+const openSearchPopUp = ref(false)
+const searchButton2 = async() =>{
+    openSearchPopUp.value = true
+}
 </script>
 
 <style scoped></style>

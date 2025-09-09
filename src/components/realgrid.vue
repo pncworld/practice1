@@ -1122,14 +1122,19 @@ const funcshowGrid = async () => {
           let stime = values[fieldNames.indexOf("strSTime")];
           let etime = values[fieldNames.indexOf("strETime")];
 
+          let cstime =
+            parseInt(etime.split(":")[0]) - parseInt(stime.split(":")[0]);
+          let cetime =
+            parseInt(etime.split(":")[1]) - parseInt(stime.split(":")[1]);
+
+          if (cetime < 0) {
+            cstime -= 1;
+            cetime = -cetime;
+          }
           return (
-            String(
-              parseInt(etime.split(":")[0]) - parseInt(stime.split(":")[0])
-            ).padStart(2, "0") +
+            String(cstime).padStart(2, "0") +
             ":" +
-            String(
-              parseInt(etime.split(":")[1]) - parseInt(stime.split(":")[1])
-            ).padStart(2, "0")
+            String(cetime).padStart(2, "0")
           );
         }
       : undefined,
@@ -1545,7 +1550,7 @@ const funcshowGrid = async () => {
           ////console.log(item.strColID);
           //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
           //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
-          console.log(dataCell.value);
+
           dataCell.value == "1"
             ? (ret.style = { backgroundColor: "#ADD8E6", color: "#ADD8E6" })
             : (ret.style = { backgroundColor: "#FFFFFF", color: "#FFFFFF" });
