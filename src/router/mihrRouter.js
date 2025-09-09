@@ -31,6 +31,8 @@ export default function mihrRouter() {
     {
       path: "HR04_002RPT.xml",
       component: HR04_002RPT,
+    },
+    {
       path: "HR02_001INS.xml",
       component: HR02_001INS,
     },
