@@ -269,7 +269,7 @@ const searchButton = async () => {
       endDate,
       tempChecked.value ? 1 : 0
     );
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;

@@ -21,6 +21,7 @@
           <img
             :src="strLogoUrl"
             alt="Logo"
+            @error="handleError2"
             class="w-24 sm:w-36 md:w-48 lg:w-52 sm:h-8 md:h-12 lg:h-16 rounded-lg" />
         </div>
 
@@ -225,7 +226,10 @@ const closeOtherTab = () => {
 const route = useRoute();
 const store = useStore();
 const userData = computed(() => store.state.userData);
-const strLogoUrl = computed(() => userData.value.strLogoUrl.split(".net")[1]);
+const strLogoUrl = computed(
+  () =>
+    userData.value.strLogoUrl?.split(".net")[1] || "../../assets/noimage2.png"
+); // .split(".net")[1]
 const mobileShowMenu = ref(false);
 const showMenu = ref(route.path != "/"); // Initialize based on current route
 const componentKey = ref(null);

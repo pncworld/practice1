@@ -342,7 +342,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -428,7 +428,7 @@ const scond7 = ref("");
 const scond8 = ref("");
 const scond9 = ref("");
 const dblclickedRowData = async (e) => {
-  console.log(e);
+  //console.log(e);
 
   scond.value = e[2];
   scond2.value = e[3];
@@ -449,7 +449,7 @@ const dblclickedRowData = async (e) => {
       e[2],
       e[3]
     );
-    console.log(res);
+    //console.log(res);
     rowData2.value = res.data.List;
   } catch (error) {}
   openPopUp.value = true;

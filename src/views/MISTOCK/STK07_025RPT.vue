@@ -24,6 +24,7 @@
         <PickStoreRenew
           @lngStoreCode="lngStoreCode"
           @excelStore="excelStore"
+          :placeholderName="'선택'"
           :mainName="'매장명'"
           :hideit2="false"
           :hideit="false"></PickStoreRenew>
@@ -55,9 +56,9 @@
             id=""
             class="w-32 h-7 border border-black"
             v-model="cond2">
-            <option value="0">전체품목</option>
-            <option value="1">사용가능 품목</option>
-            <option value="2">수불 있는 품목</option>
+            <option value="A">전체품목</option>
+            <option value="Y">사용가능 품목</option>
+            <option value="I">수불 있는 품목</option>
           </select>
         </div>
       </div>
@@ -125,13 +126,36 @@
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
-    <div class="w-full h-[70%]">
+    <div class="w-full h-[70%] overflow-x-scroll overflow-y-hidden">
+      <div class="grid grid-rows-1 grid-cols-[290px,422px,118px,282px,282px,282px,282px,282px,282px,282px,320px] w-[160%] h-14">
+        <div class="bg-green-400 font-semibold grid grid-rows-2 grid-cols-1 border-l border-t border-black">
+          <div class="flex justify-center items-center">{{ storeNm }}</div>
+          <div class="flex justify-center items-center">{{ CateNm }}</div>
+        </div>
+        <div class="bg-yellow-300 font-semibold flex justify-center items-center border-l border-t border-black">WEEK ENDING : {{ cond7 }} </div>
+        <div class="bg-white font-semibold flex justify-center items-center border-l border-t border-black">{{ scond }}</div>
+        <div class="bg-white font-semibold flex justify-center items-center border-l border-t border-black">{{ scond2 }} </div>
+        <div class="bg-white font-semibold flex justify-center items-center border-l border-t border-black">{{ scond3 }} </div>
+        <div class="bg-white font-semibold flex justify-center items-center border-l border-t border-black">{{ scond4 }} </div>
+        <div class="bg-white font-semibold flex justify-center items-center border-l border-t border-black">{{ scond5 }} </div>
+        <div class="bg-white font-semibold flex justify-center items-center border-l border-t border-black">{{ scond6 }} </div>
+        <div class="bg-white font-semibold flex justify-center items-center border-l border-t border-black">{{ scond7 }} </div>
+        <div class="bg-white font-semibold flex justify-center items-center border-l border-t border-black">{{ cond7 }} </div>
+        <div class="bg-green-100 font-semibold flex justify-center items-center border-l border-t border-r border-black">WEEKLY</div>
+      </div>
       <Realgrid
         :progname="'STK07_025RPT_VUE'"
         :progid="1"
         :rowData="rowData"
         :reload="reload"
+        class="w-[188%]"
+        :setStateBar="false"
+        :fixedColumn="true"
+        :setRowIndicator="false"
         :documentTitle="'STK07_025RPT'"
+        :mergeColumns2="true"
+        :mergeColumnGroupSubList2="[['curWeeekCnt','curWeeekAmt'],['dblBeginInv'],['COL1','COL2','COL3'],['COL4','COL5','COL6'],['COL7','COL8','COL9'],['COL10','COL11','COL12'],['COL13','COL14','COL15'],['COL16','COL17','COL18'],['COL19','COL20','COL21'],['dblDelivery','curDeliveryAmt','dblUsage','curUsageAmt']]"
+        :mergeColumnGroupName2="['WEEK ENDING INVENTORY','BEGIN','MONDAY','TUESDAY' ,'WEDNESDAY' ,'THURSDAY','FRIDAY','SATURDAY' ,'SUNDAY','TOTAL COUNT']"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :exporttoExcel="exportExcel">
@@ -146,7 +170,7 @@
 </template>
 
 <script setup>
-import { getStockDetail, getWorkList } from "@/api/mistock";
+import { getDailyInventoryList, getStockDetail, getWorkList } from "@/api/mistock";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -171,11 +195,12 @@ import Realgrid from "@/components/realgrid.vue";
  *  */
 
 import { formatLocalDate, insertPageLog } from "@/customFunc/customFunc";
+import Swal from "sweetalert2";
 /*
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -201,7 +226,7 @@ const selectedendDate = ref();
  */
 
 const cond = ref(0);
-const cond2 = ref(0);
+const cond2 = ref("A");
 const cond3 = ref("");
 const cond4 = ref(1);
 const tempSeeStore = ref(false);
@@ -237,20 +262,30 @@ const checkCond = (e) => {
   cond6.value = e.target.checked;
 };
 const searchButton = async () => {
-  store.state.loading = true;
+
+  if( selectedStore.value == '0'){
+      Swal.fire({
+      title: "경고",
+      text: "매장을 먼저 선택해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
   try {
+     store.state.loading = true;
     initGrid();
 
-    const res = await getWorkList(
+    const res = await getDailyInventoryList(
       store.state.userData.lngStoreGroup,
       selectedStore.value,
       cond.value,
+      cond6.value.replaceAll('-',''),
+      cond7.value.replaceAll('-',''),
       cond2.value,
-      cond3.value,
-      cond4.value,
-      selectedDate.value,
-      cond5.value,
-      cond6.value == true ? 1 : 0
+
     );
     //console.log(res);
     rowData.value = res.data.List;
@@ -318,9 +353,10 @@ onMounted(async () => {
   //     cond8.value = optionList6.value[0].strDCode;
   //   }
 
+  
   const res = await getStockDetail(store.state.userData.lngStoreGroup, "01");
 
-  console.log(res);
+  //console.log(res);
   optionList.value = res.data.List;
 
   const today = new Date();
@@ -332,14 +368,40 @@ onMounted(async () => {
   }
 
   cond3.value = maxyear;
-  //comsole.log(weekDay.value);
+  cond4.value = (today.getMonth()+1);
 
-  optionList3.value = [
-    { lngCode: 1, strName: 1 },
-    { lngCode: 2, strName: 2 },
-    { lngCode: 3, strName: 3 },
-    { lngCode: 4, strName: 4 },
-  ];
+ 
+  //comsole.log(weekDay.value);
+   
+   const result =  getWeekDateRange(cond3.value, cond4.value, cond5.value)
+
+  cond6.value = result.monday
+  cond7.value = result.sunday
+
+  const maxweek =getMonthWeeksByMonday(cond3.value, cond4.value)
+  optionList3.value = [];
+  for (let i = 0; i < maxweek; i++) {
+    optionList3.value.push({ lngCode: i + 1, strName: i + 1 });
+  }
+
+
+   const startdate = new Date(cond6.value)
+
+  startdate.setDate(startdate.getDate() -1)
+  scond.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond2.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond3.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond4.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond5.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond6.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond7.value = formatLocalDate(new Date(startdate))
+
 });
 
 const changeOption = async (e) => {
@@ -347,7 +409,7 @@ const changeOption = async (e) => {
     store.state.userData.lngStoreGroup,
     e.target.value
   );
-  console.log(res);
+  //console.log(res);
   optionList2.value = res.data.List;
 };
 
@@ -369,7 +431,7 @@ const exportExcel = ref(false);
 
 const excelButton = () => {
   documentSubTitle.value =
-    selectedExcelDate.value + "\n" + selectedExcelStore.value;
+    '기간 :' + cond6.value +"~" + cond7.value + "\n" + selectedExcelStore.value;
   //comsole.log(documentSubTitle.value); // 맑음 소스 pickStorePlural.vue 소스의 excelStore 받아야 함.
   // 엑셀 기능 실행
   exportExcel.value = !exportExcel.value;
@@ -400,8 +462,10 @@ const selectedExcelStore = ref("");
  * 엑셀용 매장 세팅 함수
  */
 
+ const storeNm = ref('')
 const excelStore = (e) => {
   selectedExcelStore.value = e;
+  storeNm.value = e.split(':')[1]
   //comsole.log(e);
 };
 
@@ -446,6 +510,28 @@ const setWeeks = (e) => {
     optionList3.value.push({ lngCode: i + 1, strName: i + 1 });
   }
 
+  const result =  getWeekDateRange(cond3.value, cond4.value, cond5.value)
+
+  cond6.value = result.monday
+  cond7.value = result.sunday
+
+
+  const startdate = new Date(cond6.value)
+
+  startdate.setDate(startdate.getDate() -1)
+  scond.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond2.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond3.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond4.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond5.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond6.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond7.value = formatLocalDate(new Date(startdate))
 
 };
 
@@ -456,24 +542,24 @@ function getWeekDateRange(year, month, weekNumber) {
   // 첫 주 월요일 찾기
   const firstMonday = new Date(firstDay);
   const day = firstDay.getDay(); // 0=일,1=월,...6=토
- let offset= 0
+   let offset= 0
   if(day == 0){
-    offset =1
+    offset =2
   } else if (day == 1){
     offset = 0
   } else if (day ==2){
-    offset = 7
+    offset = -1
   } else if (day ==3){
-    offset = 6
+    offset = -2
   } else if (day ==4){
-    offset = 5
+    offset = -3
   } else if (day ==5){
-    offset = 4
+    offset = -4
   } else if (day ==6){
-    offset = 3
+    offset = -5
   }
   //const offset = day === 0 ? 8 : (8 - day); // 첫 주 월요일까지 일수
-  firstMonday.setDate(firstDay.getDate() + (offset - 1));
+  firstMonday.setDate(firstDay.getDate() + (offset ));
 
   // 요청 주 월요일 계산
   const monday = new Date(firstMonday);
@@ -489,10 +575,39 @@ function getWeekDateRange(year, month, weekNumber) {
   };
 }
 
+const scond = ref('')
+const scond2 = ref('')
+const scond3 = ref('')
+const scond4 = ref('')
+const scond5 = ref('')
+const scond6 = ref('')
+const scond7 = ref('')
 const setDates = (e) => {
   const result =  getWeekDateRange(cond3.value, cond4.value, cond5.value)
 
   cond6.value = result.monday
   cond7.value = result.sunday
+
+  const startdate = new Date(cond6.value)
+
+  startdate.setDate(startdate.getDate() -1)
+  scond.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond2.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond3.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond4.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond5.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond6.value = formatLocalDate(new Date(startdate))
+  startdate.setDate(startdate.getDate() +1)
+  scond7.value = formatLocalDate(new Date(startdate))
 }
+
+const CateNm = ref('전체')
+watch((cond) , () => {
+  CateNm.value = optionList.value.filter(item => item.lngDetail == cond.value)[0]?.strDetail || '전체'
+})
 </script>

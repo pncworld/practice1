@@ -457,7 +457,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -517,7 +517,7 @@ const excelList = (e) => {
 };
 
 const startDate = (e) => {
-  console.log(e);
+  //console.log(e);
   sDate.value = e;
 };
 const endDate = (e) => {
@@ -536,7 +536,7 @@ const scond5 = ref("");
 const rowData2 = ref([]);
 const tempReturnNo = ref("");
 const dblclickedRowData = async (e) => {
-  console.log(e);
+  //console.log(e);
   scond.value = e[4];
   scond2.value = e[3];
   scond3.value = e[2];
@@ -553,6 +553,10 @@ const dblclickedRowData = async (e) => {
     );
 
     rowData2.value = res.data.List;
+    //console.log(rowData2.value);
+    if (rowData2.value.length > 0) {
+      scond5.value = rowData2.value[0].strComments;
+    }
   } catch (error) {}
   openpop.value = true;
 };
@@ -589,7 +593,7 @@ watch(sscond3, () => {
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, "0");
-    //console.log(year, month);
+    ////console.log(year, month);
     sscond.value = year + "-" + month + "-01";
   }
 });
@@ -626,7 +630,7 @@ const searchButton2 = async () => {
   }
   try {
     store.state.loading = true;
-    initGrid();
+    //initGrid();
 
     const res = await getStockReturnDetailList(
       groupCd.value,
@@ -643,7 +647,7 @@ const searchButton2 = async () => {
     );
 
     rowData3.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -656,7 +660,7 @@ const searchButton2 = async () => {
 const rowData4 = ref([]);
 const tempSupplierid = ref("");
 const dblclickedRowData2 = async (e) => {
-  console.log(e);
+  //console.log(e);
   ssscond.value =
     e[2].slice(0, 4) + "-" + e[2].slice(4, 6) + "-" + e[2].slice(6, 8);
   try {
@@ -685,7 +689,7 @@ const ssscond2 = ref("");
 
 const updatedrowdata = ref([]);
 const updatedRowData = (e) => {
-  console.log(e);
+  //console.log(e);
   updatedrowdata.value = e;
 };
 
@@ -694,9 +698,9 @@ const saveButton2 = async () => {
     const res = await getStockCloseDate(
       groupCd.value,
       storeCode.value,
-      ssscond.value
+      ssscond.value.replaceAll("-", "")
     );
-
+    console.log(res);
     const result = res.data.List[0].blnClosed;
 
     if (result !== "0") {
@@ -782,6 +786,31 @@ const deleteButton = async () => {
     return;
   }
 
+  const date = checkedrowdata.value.map((item) => item.dtmReturnDate);
+
+  try {
+    for (let i = 0; i < date.length; i++) {
+      const res = await getStockCloseDate(
+        groupCd.value,
+        storeCode.value,
+        date[i]
+      );
+      console.log(res);
+      const result = res.data.List[0].blnClosed;
+
+      if (result !== "0") {
+        await Swal.fire({
+          title: "경고",
+          text: "자재마감이 끝난 월의 반품전표는 삭제가 불가능합니다.",
+          icon: "warning",
+
+          confirmButtonText: "확인",
+        });
+        return;
+      }
+    }
+  } catch (error) {}
+
   try {
     const returnnos = checkedrowdata.value
       .map((item) => item.strReturnNo)
@@ -818,7 +847,7 @@ const deleteButton = async () => {
 
 const checkedrowdata = ref([]);
 const checkedRowData = (e) => {
-  console.log(e);
+  //console.log(e);
 
   checkedrowdata.value = e;
 };

@@ -84,6 +84,7 @@
           <select
             name=""
             id=""
+            :disabled="disabled"
             class="border border-black w-64 h-7"
             v-model="cond6">
             <option :value="i.strDCode" v-for="i in optionList3">
@@ -208,7 +209,7 @@ onMounted(async () => {
   optionList.value = res.data.List.filter((item) => item.strDCode !== "01");
 
   const res2 = await getCommonList(28);
-  optionList3.value = res2.data.List;
+  optionList3.value = res2.data.List.filter((item) => item.strDCode !== "02");
 });
 
 const reload = ref(false);
@@ -288,7 +289,7 @@ watch(cond2, async () => {
   } else {
     optionList2.value = [];
   }
-  //console.log(optionList2.value);
+  ////console.log(optionList2.value);
   cond3.value = 0;
 });
 
@@ -345,7 +346,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -422,4 +423,14 @@ const excelList = (e) => {
   selectedExcelList.value = e;
   //comsole.log(e);
 };
+
+const disabled = ref(true);
+
+watch(cond5, () => {
+  if (cond5.value == "1") {
+    disabled.value = false;
+  } else {
+    disabled.value = true;
+  }
+});
 </script>

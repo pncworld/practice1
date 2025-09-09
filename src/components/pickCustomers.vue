@@ -119,7 +119,7 @@ watch(
     emit("ID", lngCode.value);
     emit("CustId", "");
     emit("Name", strName.value);
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
   }
 );
@@ -130,7 +130,7 @@ const searchButton = async () => {
     searchOption.value,
     searchword.value
   );
-  //console.log(res);
+  ////console.log(res);
   rowData.value = res.data.List;
 };
 const closePopUp = async () => {

@@ -329,7 +329,7 @@ const searchButton = async () => {
       cond5.value,
       cond6.value == true ? 1 : 0
     );
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -403,7 +403,7 @@ const changeOption = async (e) => {
     store.state.userData.lngStoreGroup,
     e.target.value
   );
-  console.log(res);
+  //console.log(res);
   optionList2.value = res.data.List;
 };
 

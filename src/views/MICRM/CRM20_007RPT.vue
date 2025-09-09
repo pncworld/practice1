@@ -202,7 +202,7 @@ const searchButton = async () => {
       cond.value,
       ccond2
     );
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -226,7 +226,7 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 
 /**

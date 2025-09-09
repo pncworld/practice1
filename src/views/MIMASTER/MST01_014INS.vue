@@ -214,7 +214,7 @@ const searchButton = async () => {
       searchType.value,
       cond.value
     );
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -252,7 +252,7 @@ const saveButton = async () => {
       MenuCds,
       lngPrices
     );
-    //console.log(res);
+    ////console.log(res);
 
     Swal.fire({
       title: "성공",
@@ -278,12 +278,12 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 const lngStoreGroup = async (e) => {
   //initGrid();
   selectedGroup.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 
 /**
@@ -356,7 +356,7 @@ const setDiscountPrice = async () => {
 
 const updaterowdata = ref([]);
 const updatedRowData = (e) => {
-  //console.log(e);
+  ////console.log(e);
   updaterowdata.value = e;
 };
 

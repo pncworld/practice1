@@ -840,3 +840,12 @@ export const deleteStockReturnChits = (groupCd, storeCd, returnos, userid) => {
     USERID: userid,
   });
 };
+
+export const copyPurchasePrice = (groupCd, storeCd, storeCds, stockIds) => {
+  return api2.post("/MIPUR/PUR04_001INS.asmx/copyPurchasePrice", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    STORE_CDS: storeCds,
+    STOCK_IDS: stockIds,
+  });
+};

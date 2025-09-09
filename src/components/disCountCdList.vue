@@ -43,7 +43,7 @@ const disCountList = ref([]);
 const selectedDiscountNo = ref(null);
 onMounted(async () => {
   emit("discountNm", "전체");
-  //console.log(store.state);
+  ////console.log(store.state);
   const res = await getDiscountCdList(store.state.userData.lngStoreGroup, 0);
   //comsole.log(res);
   disCountList.value = res.data.DISCOUNTLIST;

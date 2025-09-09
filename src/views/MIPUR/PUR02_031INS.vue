@@ -412,7 +412,7 @@ const searchButton = async () => {
   try {
     store.state.loading = true;
     initGrid();
-    console.log(store.state.userData);
+    //console.log(store.state.userData);
     const res = await getPurChaseEnrollList(
       groupCd.value,
       storeCode.value,
@@ -424,7 +424,7 @@ const searchButton = async () => {
 
     rowData.value = res.data.List;
 
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -504,12 +504,12 @@ const updatedRowData2 = (e) => {
 
 const allstaterows = ref([]);
 const allStateRows = (e) => {
-  console.log(e);
+  //console.log(e);
   allstaterows.value = e.updated;
 };
 const selectedSupplierid2 = ref("");
 const SupplierId2 = (e) => {
-  //console.log(e);
+  ////console.log(e);
   selectedSupplierid2.value = e;
 };
 const searchButton2 = async () => {
@@ -524,7 +524,7 @@ const searchButton2 = async () => {
       cond2.value
     );
 
-    console.log(res);
+    //console.log(res);
     rowData3.value = res.data.List;
     showp.value = true;
   } catch (error) {}
@@ -534,7 +534,7 @@ const showp = ref(false);
 const showp2 = ref(false);
 
 const dblclickedRowData = (e) => {
-  console.log(e);
+  //console.log(e);
   const stockcds = updatedrowdata2.value.map((item) =>
     item.lngStockID.includes(e[0])
   );
@@ -550,19 +550,19 @@ const dtmDate = ref("");
 const selectSupplierId = ref("0");
 const originmemo = ref("");
 const clickedRowData = async (e) => {
-  console.log(e);
+  //console.log(e);
   dtmDate.value = formatLocalDate(e[6]);
   try {
     store.state.loading = true;
     const res = await getStockItemDetail(e[1], e[2], e[4], e[7]);
-    console.log(res);
+    //console.log(res);
     store.state.loading = false;
     rowData2.value = res.data.List;
     updatedrowdata2.value = JSON.parse(JSON.stringify(res.data.List));
     disabledBusiness.value = true;
     selectSupplierId.value = e[7];
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   }
 
   try {
@@ -582,7 +582,7 @@ const scond = ref("");
 
 const selectedSupplier3 = ref("");
 const SupplierId3 = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedSupplier3.value = e;
 };
 
@@ -623,7 +623,7 @@ const searchButton3 = async () => {
       cond3.value
     );
 
-    console.log(res);
+    //console.log(res);
     store.state.loading = false;
     rowData4.value = res.data.List;
     updatedrowdata3.value = res.data.List;
@@ -686,7 +686,7 @@ const saveButton3 = async () => {
       scond2.value
     );
 
-    //console.log(res);
+    ////console.log(res);
     store.state.loading = false;
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
@@ -714,7 +714,7 @@ const updatedrowdata3 = ref([]);
 const updatedRowData3 = (e) => {
   updatedrowdata3.value = e;
 
-  console.log(e);
+  //console.log(e);
 };
 
 const memo = ref("");
@@ -784,7 +784,7 @@ const saveButton = async () => {
       memo.value
     );
     store.state.loading = false;
-    console.log(res);
+    //console.log(res);
   } catch (error) {
   } finally {
     searchButton();
@@ -796,7 +796,7 @@ const getclosedtmdate = async (groupcd, storecd) => {
   try {
     const res = await getCloseDtmDate(groupcd, storecd);
 
-    console.log(res);
+    //console.log(res);
     closeDtmDate.value = res.data.List[0].dtmDate;
   } catch (error) {}
 };
@@ -804,7 +804,7 @@ const getclosedtmdate = async (groupcd, storecd) => {
 const checkedrowdata = ref([]);
 const checkedRowData = (e) => {
   checkedrowdata.value = e;
-  console.log(e);
+  //console.log(e);
 };
 
 const deleteButton = async () => {
@@ -847,7 +847,7 @@ const deleteButton = async () => {
       store.state.userData.lngSequence
     );
 
-    console.log(res);
+    //console.log(res);
 
     if (res.data.RESULT_CD == "00") {
       await Swal.fire({

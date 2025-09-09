@@ -431,7 +431,7 @@ const makeNewScreen = () => {
       strDName: "화면" + (maxStrDCode + 1),
     };
 
-    // //console.log(ScreenList.value);
+    // ////console.log(ScreenList.value);
     ScreenList.value.push(newScreen);
     selectedScreenNo.value = maxStrDCode + 1;
     //newscreen.value = !newscreen.value;
@@ -713,4 +713,15 @@ watch(selectedGroupCd, (newValue) => {
   emit("update:storeGroup", selectedGroupCd.value);
   emit("GroupNm", GroupNm);
 });
+
+watch(
+  () => props.disabledAll,
+  () => {
+    if (props.disabledAll == true) {
+      isDisabled.value = true;
+    } else {
+      isDisabled.value = false;
+    }
+  }
+);
 </script>

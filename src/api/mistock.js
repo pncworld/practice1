@@ -227,3 +227,140 @@ export const getStockDailyList = (
     SHOW_TYPE: showtype,
   });
 };
+
+export const getDailyInventoryList = (
+  groupCd,
+  storeCd,
+  category,
+  sdate,
+  edate,
+  opt
+) => {
+  return api2.post("/MISTOCK/STK07_025RPT.asmx/getDailyInventoryList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    CATE: category,
+    SDATE: sdate,
+    EDATE: edate,
+    OPT: opt,
+  });
+};
+
+export const getStockMonthlyInOutList = (
+  groupCd,
+  storeCd,
+  date,
+  cond,
+  cond2,
+  cond3,
+  barcode,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  stockid,
+  reporttype
+) => {
+  return api2.post("/MISTOCK/STK08_008RPT.asmx/getStockMonthlyInOutList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    CATE: cond,
+    GROUP: cond2,
+    GENERIC: cond3,
+    BARCODE: barcode,
+    UNITTYPE: cond4,
+    UNITPRICE: cond5,
+    SHOWTYPE: cond6,
+    STOCK_ID: cond7,
+    STOCK_NM: cond8,
+    SUPPLE_ID: stockid,
+    REPORT_TYPE: reporttype,
+  });
+};
+
+export const getMonthCloseList = (groupCd, storeCd, date) => {
+  return api2.post("/MISTOCK/STK08_021MAN.asmx/getMonthCloseList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+  });
+};
+
+export const saveMonthCloseUpdate = (
+  groupCd,
+  storeCds,
+  date,
+  checkbln,
+  seq
+) => {
+  return api2.post("/MISTOCK/STK08_021MAN.asmx/saveMonthCloseUpdate", {
+    GROUP_CD: groupCd,
+    STORE_CDS: storeCds,
+    DATE: date,
+    CHECKBLNS: checkbln,
+    SEQ: seq,
+  });
+};
+
+export const getMonthCloseList2 = (groupCd, storeCd, date, lang) => {
+  return api2.post("/MISTOCK/STK09_003BAT.asmx/getMonthCloseList2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    LANG: lang,
+  });
+};
+
+export const checkPreMonthCloseStores = (groupCd, storeCd, date) => {
+  return api2.post("/MISTOCK/STK09_003BAT.asmx/checkPreMonthCloseStores", {
+    GROUP_CD: groupCd,
+    STORE_CDS: storeCd,
+    DATE: date,
+  });
+};
+
+export const saveMonthClose = (groupCd, storeCd, date, seq) => {
+  return api2.post("/MISTOCK/STK09_003BAT.asmx/saveMonthClose", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    SEQ: seq,
+  });
+};
+
+export const reserveMonthCloseStores = (groupCd, storeCd, date, seq) => {
+  return api2.post("/MISTOCK/STK09_003BAT.asmx/reserveMonthCloseStores", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    SEQ: seq,
+  });
+};
+
+export const saveTakeDailyRegister = (
+  groupCd,
+  storeCd,
+  date,
+  stockids,
+  takeqtys,
+  unittype
+) => {
+  return api2.post("/MISTOCK/STKN07_018RPT.asmx/saveTakeDailyRegister", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    STOCK_IDS: stockids,
+    TAKEQTYS: takeqtys,
+    UNITTYPES: unittype,
+  });
+};
+
+export const getStockCheckLossByUpdate = (groupCd, storeCd, loss) => {
+  return api2.post("/MISTOCK/STKN06_012INS.asmx/getStockCheckLossByUpdate", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LOSSNO: loss,
+  });
+};

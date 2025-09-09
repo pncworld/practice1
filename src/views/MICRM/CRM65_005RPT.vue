@@ -175,7 +175,7 @@ const checkedRowData = (e) => {
 const checkedIndex = ref([]);
 const savedcheckedIndex = ref([]);
 const checkedRowIndex = (e) => {
-  //console.log(e);
+  ////console.log(e);
   checkedIndex.value = e;
 };
 
@@ -184,7 +184,7 @@ const setDynamicGrid4Cond = ref(0);
 const setSearchCond = () => {
   initGrid();
   cond.value = checkedRows.value;
-  //console.log(cond.value);
+  ////console.log(cond.value);
   savedcheckedIndex.value = checkedIndex.value;
 
   mergeColumnGroupName4.value = [
@@ -216,7 +216,7 @@ const setInitCheck = () => {
   cond.value = rowData2.value.filter((item, index) =>
     savedcheckedIndex.value.includes(index)
   );
-  //console.log(cond.value);
+  ////console.log(cond.value);
   initCheckRows.value = savedcheckedIndex.value;
   initCheckRowNow.value = !initCheckRowNow.value;
   visible.value = false;
@@ -227,7 +227,7 @@ const mergeColumnGroupSubList3 = ref([[["strStore"]]]);
 const gridName = ref("");
 const realgridname = (e) => {
   gridName.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 
 watch(visible, () => {
@@ -295,7 +295,7 @@ const searchButton = async () => {
   try {
     store.state.loading = true;
     initGrid();
-    //console.log(cond.value.map((item) => item.lngGftType + "|"));
+    ////console.log(cond.value.map((item) => item.lngGftType + "|"));
     const res = await getGftCardStockList(
       store.state.userData.lngStoreGroup,
       0,
@@ -303,13 +303,13 @@ const searchButton = async () => {
       ed.value,
       cond.value.map((item) => item.lngGftType).join("|")
     );
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    //console.log(error);
+    ////console.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -327,7 +327,7 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 
 /**

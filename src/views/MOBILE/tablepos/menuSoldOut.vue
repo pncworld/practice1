@@ -298,7 +298,7 @@ const LCLASS_CD = ref("");
 const SCLASS_CD = ref("");
 const FILTERDATA = (e) => {
   FirstSearch.value = true;
-  console.log(e);
+  //console.log(e);
   tempcheckedList.value = [];
 
   document.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
@@ -344,7 +344,7 @@ const sat = ref(false);
 const sun = ref(false);
 
 const wordLength = (e) => {
-  //console.log(e.Length);
+  ////console.log(e.Length);
   if (e.length <= 19) {
     return true;
   } else {
@@ -354,7 +354,7 @@ const wordLength = (e) => {
 const reSearch = ref(false);
 const saveButton = async (e) => {
   try {
-    //console.log(tempcheckedList.value);
+    ////console.log(tempcheckedList.value);
     const menuCdList = tempcheckedList.value.map((item) => ({
       MENU_CD: item,
       MENU_STATUS: salecond.value,
@@ -365,7 +365,7 @@ const saveButton = async (e) => {
       selectStoreCd.value,
       menuCdList
     );
-    //console.log(res);
+    ////console.log(res);
     //showSave.value = false;
     showSave.value = false;
 
@@ -426,8 +426,8 @@ const toggleSelection = (e) => {
   }
 
   selectedLeng.value = tempcheckedList.value.length;
-  //console.log("여긴왓지?");
-  // //console.log(tempcheckedList.value.length);
+  ////console.log("여긴왓지?");
+  // ////console.log(tempcheckedList.value.length);
 };
 
 const ischecked = (e) => {
@@ -532,7 +532,7 @@ const allCheck = (e) => {
     });
 
     tempcheckedList.value = menuList.value.map((item) => item.MENU_CD);
-    //console.log(tempcheckedList.value);
+    ////console.log(tempcheckedList.value);
     selectedLeng.value = tempcheckedList.value.length;
     showSave.value = true;
   } else {

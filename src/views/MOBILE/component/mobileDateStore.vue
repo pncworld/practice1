@@ -197,10 +197,10 @@ onMounted(async () => {
     store.state.userData.USER_NO
   );
 
-  //console.log(store.state.userData);
+  ////console.log(store.state.userData);
 
   StoreList.value = res?.data?.List;
-  //console.log(StoreList.value);
+  ////console.log(StoreList.value);
   selectedStoreCd.value = {
     STORE_CD: store.state.userData.STORE_CD,
     GROUP_CD: store.state.userData.GROUP_CD,

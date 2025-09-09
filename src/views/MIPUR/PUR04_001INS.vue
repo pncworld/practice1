@@ -13,7 +13,10 @@
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="copyButton" class="button copy w-auto excel">
+        <button
+          @click="copyButton"
+          class="button copy w-auto excel disabled:opacity-90"
+          :disabled="disabled2">
           복사
         </button>
       </div>
@@ -23,7 +26,7 @@
       <div class="justify-start flex ml-4">
         <PickStore
           @update:storeGroup="lngStoreGroup"
-          :defaultStoreNm="'전체'"
+          :defaultStoreNm="'공통'"
           @storeNm="excelStore"
           :hideGroup="false"
           :hideAttr="false"
@@ -65,13 +68,12 @@
           :progid="1"
           :rowData="rowData"
           :reload="reload"
-          :setRowStyleCalls="true"
-          :setRowStyleCallsDefaultCol="'strTaxType'"
-          :setRowStyleCallsDefaultCol2="'strStockName'"
-          :hardCodeSetRowStyleCalls="true"
+          :setStateBar="false"
           :documentTitle="'PUR01_009RPT'"
+          @updatedRowData="updatedRowData"
           @dblclickedRowData="dblclickedRowData"
-          @clickedRowData="clickedRowData"
+          @clickedRowData="dblclickedRowData"
+          :checkRenderEditable="true"
           :documentSubTitle="documentSubTitle"
           :rowStateeditable="false"
           :exporttoExcel="exportExcel">
@@ -193,7 +195,7 @@
         <div class="flex justify-end space-x-2">
           <button
             class="px-4 py-2 bg-blue-600 text-white rounded-lg"
-            @click="confirmAction">
+            @click="copyButton2">
             복사
           </button>
           <button
@@ -206,13 +208,14 @@
       <div class="flex items-center space-x-5">
         <div class="!-ml-12">
           <PickStore
-            @update:storeGroup="lngStoreGroup"
+            @update:storeGroup="lngStoreGroup2"
             :defaultStoreNm="'공통'"
-            @storeNm="excelStore"
+            :mainName="'원본 매장'"
+            @storeNm="excelStore2"
             :hideGroup="false"
             :hideAttr="false"
             :defaultStore="true"
-            @update:storeCd="lngStoreCode"></PickStore>
+            @update:storeCd="lngStoreCode2"></PickStore>
         </div>
       </div>
       <div class="grid grid-rows-1 grid-cols-[6fr,1fr,6fr] mt-2 h-[80%]">
@@ -220,11 +223,18 @@
           <Realgrid
             :progname="'PUR04_001INS_VUE'"
             :progid="3"
+            :rowStateeditable="false"
+            :checkRenderEditable="true"
+            :setStateBar="false"
+            @updatedRowData="updatedRowData2"
             :rowData="rowData3"></Realgrid>
         </div>
         <div>&nbsp;</div>
         <div class="h-full w-full">
-          <Realgrid :progname="'PUR04_001INS_VUE'" :progid="4"></Realgrid>
+          <Realgrid
+            :progname="'PUR04_001INS_VUE'"
+            :progid="4"
+            :rowData="rowData4"></Realgrid>
         </div>
       </div>
     </div>
@@ -235,6 +245,7 @@
 <script setup>
 import { getCommonList } from "@/api/common";
 import {
+  copyPurchasePrice,
   deleteStockPriceHistory,
   getCheckStoreList,
   getStockUnitPriceList,
@@ -242,7 +253,6 @@ import {
   saveStockPriceHistory,
 } from "@/api/mipur";
 import BusinessClient from "@/components/businessClient.vue";
-import DupliPopUp7 from "@/components/dupliPopUp7.vue";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -275,7 +285,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -293,6 +303,18 @@ onMounted(async () => {
   optionList.value = res.data.List;
 
   scond4.value = formatLocalDate(new Date());
+
+  if (store.state.userData.lngPositionType == "0") {
+    disabled2.value = true;
+  }
+
+  if (
+    store.state.userData.lngStoreGroup == "3183" ||
+    store.state.userData.lngStoreGroup == "5001"
+  ) {
+    disabled2.value = true;
+  }
+  //하드코딩
 });
 
 const reload = ref(false);
@@ -301,7 +323,7 @@ const afterSearch = ref(false);
 
 const cond = ref("");
 const cond2 = ref("");
-const cond4 = ref("");
+const disabled2 = ref(false);
 const cond5 = ref(0);
 const store = useStore();
 
@@ -337,18 +359,14 @@ const excelDate = (e) => {
 };
 const optionList2 = ref([]);
 
-const teamcode = ref();
-const lngTeamCode = (e) => {
-  teamcode.value = e;
-};
-const supervisor = ref();
-const lngSupervisor = (e) => {
-  supervisor.value = e;
-};
 const storeCode = ref();
 const lngStoreCode = (e) => {
   initGrid();
   storeCode.value = e;
+};
+const storeCode2 = ref();
+const lngStoreCode2 = (e) => {
+  storeCode2.value = e;
 };
 
 const storeAttr = ref();
@@ -359,6 +377,11 @@ const lngStoreAttrs = (e) => {
 const groupCd = ref();
 const lngStoreGroup = (e) => {
   groupCd.value = e;
+};
+
+const groupCd2 = ref();
+const lngStoreGroup2 = (e) => {
+  groupCd2.value = e;
 };
 
 const supplierid = ref("");
@@ -389,7 +412,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -412,6 +435,11 @@ const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
   }
+
+  if (rowData2.value.length > 0) {
+    rowData2.value = [];
+  }
+  afterSearch.value = false;
 };
 
 //엑셀 버튼 처리 함수
@@ -477,7 +505,7 @@ const scond4 = ref("");
 const scond5 = ref(0);
 const tempStockId = ref("");
 const dblclickedRowData = async (e) => {
-  console.log(e);
+  //console.log(e);
 
   try {
     const res = await getUnitPriceDetailList(
@@ -488,7 +516,7 @@ const dblclickedRowData = async (e) => {
       store.state.userData.strLanguage
     );
 
-    console.log(res);
+    //console.log(res);
 
     rowData2.value = res.data.List;
     afterDblClick.value = true;
@@ -635,7 +663,7 @@ const saveButton = async () => {
       store.state.userData.lngSequence
     );
 
-    console.log(res);
+    //console.log(res);
 
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
@@ -665,7 +693,7 @@ const saveButton = async () => {
         store.state.userData.strLanguage
       );
 
-      console.log(res);
+      //console.log(res);
 
       rowData2.value = res.data.List;
       afterDblClick.value = true;
@@ -676,8 +704,9 @@ const saveButton = async () => {
 const tempFromDate = ref("");
 const tempTodate = ref("");
 const tempSupplierId = ref("");
+
 const clickedRowData2 = (e) => {
-  //console.log(e);
+  ////console.log(e);
   tempSupplierId.value = e[0];
   tempFromDate.value = e[3];
   tempTodate.value = e[5];
@@ -692,7 +721,9 @@ const deleteButton = async () => {
 
       confirmButtonText: "확인",
     });
+    return;
   }
+
   if (tempSupplierId.value == "" || tempSupplierId.value == undefined) {
     Swal.fire({
       title: "경고",
@@ -701,9 +732,11 @@ const deleteButton = async () => {
 
       confirmButtonText: "확인",
     });
+    return;
   }
 
   try {
+    store.state.loading = true;
     const res = await deleteStockPriceHistory(
       groupCd.value,
       storeCode.value,
@@ -712,7 +745,7 @@ const deleteButton = async () => {
       tempFromDate.value,
       tempTodate.value
     );
-
+    store.state.loading = false;
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
         title: "성공",
@@ -741,7 +774,7 @@ const deleteButton = async () => {
         store.state.userData.strLanguage
       );
 
-      console.log(res);
+      //console.log(res);
 
       rowData2.value = res.data.List;
       afterDblClick.value = true;
@@ -756,9 +789,95 @@ const copyButton = async () => {
   try {
     const res = await getCheckStoreList(groupCd.value, 0);
 
-    rowData3.value = res.data.List;
+    rowData3.value = JSON.parse(JSON.stringify(res.data.List));
   } catch (error) {}
 };
 
 const rowData3 = ref([]);
+const rowData4 = ref([]);
+
+const copyButton2 = async () => {
+  console.log(updatedrowdata.value);
+  const checkedStock = updatedrowdata.value
+    .filter((item) => item.lngCheck == true)
+    .map((item) => item.lngStockID);
+
+  if (checkedStock.length == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "복사하실 자재코드를 먼저 선택해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  // if (storeCode2.value == "0") {
+  //   Swal.fire({
+  //     title: "경고",
+  //     text: "원본매장을 먼저 선택해주세요.",
+  //     icon: "warning",
+
+  //     confirmButtonText: "확인",
+  //   });
+  //   return;
+  // }
+  try {
+    let res = "";
+    const storecds = updatedrowdata2.value
+      .filter((item) => item.lngCheck == true)
+      .map((item) => item.lngStoreCode);
+
+    rowData4.value = updatedrowdata2.value.filter(
+      (item) => item.lngCheck == true
+    );
+    for (let i = 0; i < storecds.length; i++) {
+      res = await copyPurchasePrice(
+        groupCd2.value,
+        storeCode2.value,
+        storecds[i],
+        checkedStock.join(";")
+      );
+
+      rowData4.value = rowData4.value.filter(
+        (item) => item.lngStoreCode != storecds[i]
+      );
+    }
+
+    console.log(res);
+
+    if (res.data.RESULT_CD == "00") {
+      await Swal.fire({
+        title: "성공",
+        text: "매입단가 복사에 성공하였습니다.",
+        icon: "success",
+
+        confirmButtonText: "확인",
+      });
+    } else {
+      await Swal.fire({
+        title: "실패",
+        text: "매입단가 복사에 실패하였습니다.",
+        icon: "error",
+
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (error) {
+  } finally {
+    openCopy.value = false;
+    searchButton();
+  }
+};
+const updatedrowdata = ref([]);
+const updatedRowData = (e) => {
+  updatedrowdata.value = e;
+  //console.log(e);
+};
+
+const updatedrowdata2 = ref([]);
+const updatedRowData2 = (e) => {
+  updatedrowdata2.value = e;
+  //console.log(e);
+};
 </script>

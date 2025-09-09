@@ -128,10 +128,10 @@ const searchButton = async () => {
         props.joinSts
       );
     }
-    //console.log(res);
+    ////console.log(res);
 
     rowData2.value = res.data.List;
-    //console.log(res);
+    ////console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -142,7 +142,7 @@ const searchButton = async () => {
 };
 const initGrid = () => {};
 const dblclickedRowData = async (e) => {
-  //console.log(e);
+  ////console.log(e);
 
   emit("strCCardID", e[0]);
   emit("strCustName", e[1]);

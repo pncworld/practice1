@@ -344,10 +344,10 @@ const searchButton = async () => {
         null
       );
     }
-    //console.log(res);
+    ////console.log(res);
 
     rowData2.value = res.data.List;
-    //console.log(res);
+    ////console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -485,7 +485,7 @@ const saveButton = async () => {
       pcond4.value,
       pcond12.value
     );
-    //console.log(res);
+    ////console.log(res);
     Swal.fire({
       title: "성공",
       text: "카드 번호 변경 완료하였습니다.",

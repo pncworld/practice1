@@ -291,7 +291,7 @@ const rowData = ref([]);
 const rowData2 = ref([]);
 
 const allStateRows = (e) => {
-  console.log(e);
+  //console.log(e);
   allstaterows.value = e.updated;
 };
 /**
@@ -361,7 +361,7 @@ const updatedrowdata = ref([]);
  */
 const disabled = ref(false);
 const updatedRowData = (newValue) => {
-  console.log(newValue);
+  //console.log(newValue);
   updatedrowdata.value = newValue;
 };
 const deleterow = ref(false);
@@ -427,7 +427,7 @@ const saveButton = async () => {
           store.state.userData.lngSequence
         );
         store.state.loading = false;
-        console.log(res);
+        //console.log(res);
 
         if (res.data.RESULT_CD == "00") {
           Swal.fire({
@@ -448,7 +448,7 @@ const saveButton = async () => {
         }
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         // 취소 눌렀을 때 실행할 코드
-        //console.log("취소 버튼 클릭됨");
+        ////console.log("취소 버튼 클릭됨");
       }
     });
   } catch (error) {
@@ -486,7 +486,7 @@ const searchStock = () => {
 };
 
 const searchButton2 = async () => {
-  //console.log("안와?");
+  ////console.log("안와?");
   try {
     store.state.loading = true;
     const res = await getStockItemList2(
@@ -506,7 +506,7 @@ const cond3 = ref("");
 const cond4 = ref("");
 const cond5 = ref("");
 const dblclickedRowData = (e) => {
-  // console.log(e);
+  // //console.log(e);
   cond.value = e[2];
   cond2.value = e[3];
   cond3.value = e[4];

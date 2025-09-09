@@ -547,12 +547,12 @@ const searchSpecialColId = ref([]);
 const searchSpecialCond = ref(false);
 watch(ischecked, () => {
   searchSpecialColId.value = [];
-  //console.log(printNameList.value.length)
+  ////console.log(printNameList.value.length)
   for (let i = 1; i <= printNameList.value.length; i++) {
     searchSpecialColId.value.push("checkbox" + i);
   }
   if (ischecked.value == true) {
-    // //console.log(searchSpecialColId.value);
+    // ////console.log(searchSpecialColId.value);
 
     searchSpecialCond.value = false;
   } else {
@@ -941,7 +941,7 @@ const searchButton = async () => {
       afterSearch.value = true;
     } else if (currentMenu.value == 2) {
       res = await getKitchenSettingList(groupCd.value, nowStoreCd.value);
-      //console.log(res)
+      ////console.log(res)
 
       SettingList.value = [...res.data.KITCHENMENU];
       MenuGroup.value = res.data.MAINGROUP;

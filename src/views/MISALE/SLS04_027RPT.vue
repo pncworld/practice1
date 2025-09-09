@@ -259,12 +259,12 @@ const searchButton = async () => {
         selectedendDate.value,
         cond
       );
-      console.log(res);
+      //console.log(res);
       rowData.value = res.data.List;
     } else {
       progid.value = 4;
       reload.value = !reload.value;
-      console.log(store.state.userData);
+      //console.log(store.state.userData);
       let cond = 2;
       if (checkdate.value == false) {
         cond = 2;
@@ -281,7 +281,7 @@ const searchButton = async () => {
         cond
       );
       rowData.value = res.data.List;
-      console.log(res);
+      //console.log(res);
     }
 
     //comsole.log(setGroupColumnId.value);
@@ -355,9 +355,9 @@ const checkStore = ref(false);
 const checkdate = ref(false);
 const checkDate = (e) => {
   checkdate.value = e.target.checked;
-  console.log(setCorner.value);
-  console.log(checkdate.value);
-  console.log(setGroupFooter.value);
+  //console.log(setCorner.value);
+  //console.log(checkdate.value);
+  //console.log(setGroupFooter.value);
   // if (setCorner.value == true && checkdate.value == false) {
   //   setGroupFooter.value = false;
   // } else if (
@@ -379,8 +379,8 @@ const checkDate = (e) => {
   // } else {
   //   setGroupColumnId.value = "dtmDate,CornerNm";
   // }
-  console.log(setGroupFooter.value);
-  console.log(setGroupColumnId.value);
+  //console.log(setGroupFooter.value);
+  //console.log(setGroupColumnId.value);
   //    if (checkdate.value == false ) {
   //       setGroupFooter.value = false;
   //     } else {

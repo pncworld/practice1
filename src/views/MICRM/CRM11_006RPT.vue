@@ -196,7 +196,7 @@ onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
   const res = await getInitCouponType(store.state.userData.lngStoreGroup);
-  //console.log(res);
+  ////console.log(res);
   optionList.value = res.data.List;
 });
 
@@ -238,7 +238,7 @@ const lngCustNo = (e) => {
 const selectedCustNo = ref("");
 const selectedMemberDiv = ref("");
 const buttonClicked = (e) => {
-  //console.log(e);
+  ////console.log(e);
   const temp = e[7];
   pcond.value = e[1];
   pcond2.value = e[3];
@@ -247,7 +247,7 @@ const buttonClicked = (e) => {
   const newdate = new Date(temp);
 
   newdate.setDate(newdate.getDate() + 61);
-  // //console.log(newdate);
+  // ////console.log(newdate);
   cond5.value = newdate.toISOString().split("T")[0];
   visible2.value = true;
 };
@@ -299,7 +299,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    //console.log(res);
+    ////console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -319,7 +319,7 @@ const saveButton = async () => {
       store.state.userData.lngSequence
     );
 
-    //console.log(res);
+    ////console.log(res);
     Swal.fire({
       title: "성공",
       text: "유효기간을 저장하였습니다.",

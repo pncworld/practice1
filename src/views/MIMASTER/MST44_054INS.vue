@@ -625,8 +625,8 @@ const searchButton = async () => {
     confirmitem.value = JSON.parse(JSON.stringify(KeyList.value));
     confirmitem2.value = JSON.parse(JSON.stringify(ScreenKeyOrigin.value));
 
-    //console.log(res4);
-    //console.log(res2);
+    ////console.log(res4);
+    ////console.log(res2);
   } catch (error) {
     afterSearch.value = false;
   } finally {
@@ -728,8 +728,8 @@ const onEnd = (evt) => {
   if (targetItemIndex2 == undefined) {
     targetItemIndex2 = evt.oldIndex;
   }
-  //console.log(targetItemIndex2);
-  //console.log(items.value);
+  ////console.log(targetItemIndex2);
+  ////console.log(items.value);
   const discyn = items.value.filter((item) => item.itemDiscYn == 1).length;
   if (evt.oldIndex == 29 || targetItemIndex2 == 29 || discyn > 0) {
     return;
@@ -1033,7 +1033,7 @@ const confirmScreenKey = () => {
         //comsole.log(ScreenKeyOrigin.value[index].itemDiscYn);
         //comsole.log(currentProduct.value);
         if (ScreenKeyOrigin.value[index].itemDiscYn != currentProduct.value) {
-          //console.log(clickedScreenNo.value);
+          ////console.log(clickedScreenNo.value);
           KeyList.value = KeyList.value.filter(
             (item) => item.intScreenNo != clickedScreenNo.value
           );
@@ -1043,7 +1043,7 @@ const confirmScreenKey = () => {
         ScreenKeyOrigin.value[index].itemDiscYn = currentProduct.value;
 
         changeScreenKey.value = false;
-        //console.log("여기오냐");
+        ////console.log("여기오냐");
         addfor4ScreenKey();
         currentscreenKeyNm.value = "";
         showKeys(clickedScreenNo.value);

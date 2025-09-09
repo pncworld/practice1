@@ -171,7 +171,7 @@ const setGroupFooter = ref(true);
 
 const store = useStore();
 const clickedRowData = (e) => {
-  // console.log(e);
+  // //console.log(e);
 
   filteredrowData.value = rowData.value.filter((item) =>
     item.strStoreName.includes(e[0])
@@ -184,7 +184,7 @@ const clickedRowData = (e) => {
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
-  //console.log(formattedDate.value);
+  ////console.log(formattedDate.value);
 });
 
 /**
@@ -206,7 +206,7 @@ const searchButton = async () => {
       selectedendDate.value,
       cond.value
     );
-    console.log(res);
+    //console.log(res);
     rowData2.value = res.data.List;
     rowData.value = res.data.List2;
 
@@ -322,7 +322,7 @@ const changeInit = (e) => {
 };
 
 const downloadExcel = () => {
-  console.log(rowData2.value);
+  //console.log(rowData2.value);
 
   const filtered = rowData2.value.map((row, index) => [
     index + 1,
@@ -369,7 +369,7 @@ const downloadExcel = () => {
     { origin: `A${secondRowLeng}` }
   );
 
-  // console.log(`A${secondRowLeng}`);
+  // //console.log(`A${secondRowLeng}`);
   // worksheet[`A${secondRowLeng}`] = { t: "s", v: "매장명" };
   // worksheet[`B${secondRowLeng}`] = { t: "s", v: "일자" };
   // worksheet[`C${secondRowLeng}`] = { t: "s", v: "영수번호" };

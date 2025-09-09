@@ -71,13 +71,13 @@ onMounted(async () => {
 
 const checkedrowdata = ref([]);
 const checkedRowData = (e) => {
-  console.log(e);
+  //console.log(e);
 
   checkedrowdata.value = e.filter((item) => item.Selected == true);
 };
 
 const copyButton = async () => {
-  console.log(checkedrowdata.value);
+  //console.log(checkedrowdata.value);
   if (checkedrowdata.value.length == 0) {
     Swal.fire({
       title: "복사할 매장유형을 선택해주세요.",
@@ -97,7 +97,7 @@ const copyButton = async () => {
       checksublease
     );
 
-    // /console.log(res);
+    // ///console.log(res);
     store.state.loading = false;
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
@@ -116,7 +116,7 @@ const copyButton = async () => {
       });
     }
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   }
 };
 </script>

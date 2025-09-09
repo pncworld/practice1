@@ -773,7 +773,7 @@ const searchButton = async () => {
       nowStoreCd.value,
       nowStoreAreaCd.value
     );
-    //console.log(res4);
+    ////console.log(res4);
     MenuKeyList.value = res4.data.MenuKeyList;
     ScreenKeyOrigin.value = res3.data.ScreenList;
     //comsole.log(ScreenKeyOrigin.value);
@@ -1079,8 +1079,8 @@ const saveButton = async () => {
           menuKeyNmarr.join("\u200B")
         );
 
-        //comsole.log(res);
-        //comsole.log(res2);
+        console.log(res);
+        console.log(res2);
       } catch (error) {
       } finally {
         store.state.loading = false;

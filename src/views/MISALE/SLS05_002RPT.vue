@@ -180,7 +180,7 @@ const searchButton= async () => {
           selectedGroup.value, selectedStoreAttrs.value, selectedSupervisor.value, selectedStores.value
         , selectedstartDate.value, selectedendDate.value, 0, selectedRadioBox.value, selectedBuyCodeValue
       )
-      //console.log(res)
+      ////console.log(res)
       rowData.value = res.data.cardSalesDetail
   
       afterSearch.value = true

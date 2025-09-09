@@ -939,7 +939,7 @@ const lngStoreGroup = (e) => {
 };
 
 const lngStoreCode = (e) => {
-  //console.log(e);
+  ////console.log(e);
   nowStoreCd.value = e;
 };
 const initCheckColumn = ref("menuCd");
@@ -964,14 +964,14 @@ const rowData4 = ref([]);
 const rowData5 = ref([]);
 const showPopUp = async () => {
   let checkRowDataArr = clickedrowdata.value.split(",");
-  //console.log(rowData2.value);
+  ////console.log(rowData2.value);
   rowData4.value = rowData2.value.filter((item) =>
     checkRowDataArr.includes(item.menuCd)
   );
 
   const res3 = await getPayCodeListbyCode(groupCd.value, gridvalue5.value);
-  //console.log(res3);
-  //console.log(rowData4.value);
+  ////console.log(res3);
+  ////console.log(rowData4.value);
   rowData5.value = res3.data.List;
   store.state.inActiveBackGround = true;
   discountMenuShow.value = true;
@@ -998,7 +998,7 @@ const hidesub = ref(false);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
-  // console.log(store.state.userData.lngCommonMenu);
+  // //console.log(store.state.userData.lngCommonMenu);
 
   if (store.state.userData.lngCommonMenu == "1") {
     hidesub.value = false;
@@ -1073,7 +1073,7 @@ const afterClickrow = ref(true);
 const clickedRowData = (newvalue) => {
   clickrowData4.value = [];
   filteredrowData5.value = [];
-  console.log(newvalue);
+  //console.log(newvalue);
   forsearchMain.value = -1;
   forsearchSub.value = -1;
   searchWord2.value = "";
@@ -1101,7 +1101,7 @@ const clickedRowData = (newvalue) => {
       }
     }
   }
-  //console.log(newvalue);
+  ////console.log(newvalue);
   clickedrowdata.value = newvalue[27];
   gridvalue1.value = newvalue[4];
   gridvalue2.value = newvalue[21];
@@ -1161,7 +1161,7 @@ const clickedRowData = (newvalue) => {
   }
 
   rowData2.value = [...rowData2.value];
-  console.log(rowData2.value);
+  //console.log(rowData2.value);
   const firstarr = newvalue[27] != undefined ? newvalue[27].split(",") : [];
   if (rowData2.value.length > 0) {
     let dupliarr = JSON.parse(JSON.stringify(rowData2.value));
@@ -1339,9 +1339,9 @@ const searchButton = async () => {
       groupCd.value,
       nowStoreCd.value
     );
-    console.log(res);
-    console.log(res2);
-    // //console.log(res2.data.menuList);
+    //console.log(res);
+    //console.log(res2);
+    // ////console.log(res2.data.menuList);
     rowData2.value = res2.data.menuList;
     SubMenuGroup.value = res2.data.submenuGroup;
     MenuGroup.value = res2.data.menuGroup;
@@ -1549,8 +1549,8 @@ const checkedRowData2 = async (e) => {
     .filter((item) => item.lngCode != gridvalue5.value)
     .filter((item) => !arr.includes(Number(item.lngCode)))
     .map((item) => item.lngCode);
-  // //console.log(filtered2);
-  // //console.log(arr);
+  // ////console.log(filtered2);
+  // ////console.log(arr);
   changeValue2.value = filtered2.join(";");
   changeNow.value = !changeNow.value;
 
@@ -1563,7 +1563,7 @@ const forCopyArr = ref([]);
  */
 
 const checkedRowData5 = (e) => {
-  //console.log(e);
+  ////console.log(e);
   forCopyArr.value = e.map((item) => item.lngCode);
 };
 
@@ -1678,7 +1678,7 @@ watch(gridvalue9, () => {
 
 const saveButton = () => {
   //comsole.log(updateRow.value);
-  //console.log(updateDeleteInsertrowIndex.value);
+  ////console.log(updateDeleteInsertrowIndex.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -1855,7 +1855,7 @@ const saveButton = () => {
           deleteCd.join(",")
         );
         //comsole.log(res);
-        //console.log(res);
+        ////console.log(res);
 
         Swal.fire({
           title: "저장 되었습니다.",

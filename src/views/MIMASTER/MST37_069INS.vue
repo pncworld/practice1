@@ -457,7 +457,7 @@ onMounted(async () => {
   reload.value = !reload.value;
 
   const res2 = await getStoreList(userGroup, 0);
-  //console.log(res2);
+  ////console.log(res2);
 
   rowData2.value = res2.data.store.map((item) => ({
     ...item,
@@ -465,11 +465,11 @@ onMounted(async () => {
   }));
 
   const res3 = await getMenuList2(userGroup, 0);
-  //console.log(res3);
+  ////console.log(res3);
   rowData3.value = res3.data.List;
 
   // const res4 = await getMenuGroupList(userGroup, 0, 0);
-  // //console.log(res4);
+  // ////console.log(res4);
   // MenuGroupList.value = res4.data.List;
   // const res2 = await getMultiGroup(userGroup);
 
@@ -527,7 +527,7 @@ const cond20 = ref(false);
 const disableAll = ref(false);
 watch(cond20, () => {
   disableAll.value = cond20.value;
-  //console.log(cond20.value);
+  ////console.log(cond20.value);
 });
 const store = useStore();
 const MultiSubList = ref([]);
@@ -559,9 +559,9 @@ const mainCode = (e) => {
 const checkedDatas = ref([]);
 const forDeleteDatas = ref([]);
 const checkedRowData = (e) => {
-  //console.log(e);
+  ////console.log(e);
   checkedDatas.value = e.map((item) => item.lngMenuPrice);
-  //console.log(checkedDatas.value);
+  ////console.log(checkedDatas.value);
 
   forDeleteDatas.value = e.map((item) => item.lngMenuSpecialPriceCode);
 };
@@ -569,27 +569,27 @@ const checkedRowData = (e) => {
 const checkedDatas2 = ref([]);
 const checkedRowData2 = (e) => {
   checkedDatas2.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 const checkedDatas3 = ref([]);
 const checkedRowData3 = (e) => {
   checkedDatas3.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 const checkedRowData4 = (e) => {
   //checkedDatas3.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 const checkedIndexs = ref([]);
 const checkedRowIndex = (e) => {
   checkedIndexs.value = e;
-  // //console.log(e);
+  // ////console.log(e);
 };
 
 const updateRowData = ref([]);
 const updateRowData2 = ref([]);
 const updatedRowData = (e) => {
-  //console.log(e);
+  ////console.log(e);
   updateRowData.value = e;
 };
 const updatedRowData2 = (e) => {
@@ -624,8 +624,8 @@ const setMenu = (e) => {
 };
 
 const addNewSpecial = async (e) => {
-  //console.log(checkedDatas3.value);
-  //console.log(checkedDatas2.value);
+  ////console.log(checkedDatas3.value);
+  ////console.log(checkedDatas2.value);
 
   if (cond6.value == "") {
     Swal.fire({
@@ -665,7 +665,7 @@ const addNewSpecial = async (e) => {
     startdate2.value,
     enddate2.value
   );
-  //console.log(res);
+  ////console.log(res);
   const dupliarr = res.data.List;
   if (dupliarr.length > 0) {
     Swal.fire({
@@ -832,7 +832,7 @@ const searchButton = async () => {
       cond2.value,
       sst
     );
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
     updateRowData.value = JSON.parse(JSON.stringify(res.data.List));
     afterSearch.value = true;
@@ -859,7 +859,7 @@ const deleteButton = async () => {
     store.state.loading = true;
     const res = await deleteSpecialPrices(forDeleteDatas.value.join(","));
 
-    //console.log(res);
+    ////console.log(res);
 
     Swal.fire({
       title: "성공",
@@ -896,7 +896,7 @@ const saveButton = async (e) => {
       prices.join(","),
       enddate.value
     );
-    // //console.log(res);
+    // ////console.log(res);
 
     Swal.fire({
       title: "성공",
@@ -906,7 +906,7 @@ const saveButton = async (e) => {
     });
     store.state.loading = false;
   } catch (error) {
-    //console.log(error);
+    ////console.log(error);
   } finally {
     store.state.loading = false;
     searchButton();
@@ -921,7 +921,7 @@ const saveButton2 = async () => {
     (item) => item.checkbox2 == true
   ).length;
 
-  //console.log(checkedDatas2.value, checkedDatas3.value);
+  ////console.log(checkedDatas2.value, checkedDatas3.value);
   if (filtered + filtered2 !== updateRowData2.value.length) {
     Swal.fire({
       title: "경고",
@@ -1027,12 +1027,12 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  // //console.log(e);
+  // ////console.log(e);
 };
 const lngStoreGroup = async (e) => {
   //initGrid();
   selectedGroup.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 
 /**

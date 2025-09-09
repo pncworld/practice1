@@ -241,7 +241,7 @@ const changeColid = ref("lngStkQty");
 const changeNow = ref(false);
 const changeValue = ref("");
 const clickedRowData = (e) => {
-  //console.log(e);
+  ////console.log(e);
   clicked.value = true;
   gridvalue1.value = e[0];
   gridvalue2.value = e[1];
@@ -252,7 +252,7 @@ const clickedRowData = (e) => {
 
 const updatedRowData = (e) => {
   updateRowData.value = e;
-  // //console.log(e);
+  // ////console.log(e);
 };
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -263,7 +263,7 @@ onMounted(async () => {
   // reload.value = !reload.value;
 
   const res2 = await getStoreList(userGroup, 0);
-  //console.log(res2);
+  ////console.log(res2);
 
   rowData2.value = res2.data.store.sort((a, b) =>
     a.strName.localeCompare(b.strName)
@@ -401,7 +401,7 @@ const searchButton = async () => {
       selectedStore.value,
       searchWord3.value
     );
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
     updateRowData.value = JSON.parse(JSON.stringify(res.data.List));
     afterSearch.value = true;
@@ -437,7 +437,7 @@ const saveButton = async (e) => {
       selectedStore.value,
       contain.join("|")
     );
-    //console.log(res);
+    ////console.log(res);
     store.state.loading = false;
 
     Swal.fire({
@@ -447,7 +447,7 @@ const saveButton = async (e) => {
       confirmButtonText: "확인",
     });
   } catch (error) {
-    //console.log(error);
+    ////console.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -466,12 +466,12 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 const lngStoreGroup = async (e) => {
   //initGrid();
   selectedGroup.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 
 /**

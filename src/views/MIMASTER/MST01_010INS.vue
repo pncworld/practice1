@@ -336,7 +336,7 @@ const handleStoreCd = async (newValue) => {
   afterSearch.value = false;
   nowStoreCd.value = newValue;
 
-  //console.log(newValue);
+  ////console.log(newValue);
   searchButton();
 };
 const Category = ref([]);
@@ -372,7 +372,7 @@ const searchButton = async () => {
   changeMode.value = false;
   Category.value = [];
   items.value = [];
-  console.log(nowStoreCd.value);
+  //console.log(nowStoreCd.value);
   if (nowStoreCd.value == "0" && store.state.userData.lngCommonMenu == "0") {
     Swal.fire({
       title: "경고",

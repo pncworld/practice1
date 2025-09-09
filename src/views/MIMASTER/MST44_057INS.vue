@@ -112,7 +112,7 @@ import { useStore } from "vuex";
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
-  //console.log(store.state.userData);
+  ////console.log(store.state.userData);
 
   searchButton();
 });
@@ -154,7 +154,7 @@ const searchButton = async () => {
 
     const res = await getSAFMasterDownload(cond.value, "SAF");
     const res2 = await getCommonList(358);
-    //console.log(res);
+    ////console.log(res);
 
     rowData.value = res.data.List;
     rowData2.value = res2.data.List;

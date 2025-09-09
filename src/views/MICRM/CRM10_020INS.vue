@@ -205,7 +205,7 @@ const searchButton = async () => {
       selectedGroup.value,
       selectedStores.value
     );
-    //console.log(res);
+    ////console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -273,7 +273,7 @@ const saveButton = async () => {
         : "D"
     );
 
-    //console.log(res);
+    ////console.log(res);
     if (res.data.RESULT_CD == "99") {
       Swal.fire({
         title: "실패",
@@ -290,7 +290,7 @@ const saveButton = async () => {
       });
     }
 
-    //console.log(res);
+    ////console.log(res);
   } catch (error) {
   } finally {
     store.state.loading = false;

@@ -141,7 +141,7 @@ onMounted(async () => {
     emit("mainCategory", "전체");
   }
   StoreList.value = res?.data?.List;
-  //console.log(StoreList.value);
+  ////console.log(StoreList.value);
   selectedStoreCd.value = {
     STORE_CD: store.state.userData.STORE_CD,
     GROUP_CD: store.state.userData.GROUP_CD,
@@ -158,7 +158,7 @@ onMounted(async () => {
     store.state.userData.GROUP_CD,
     store.state.userData.STORE_CD
   );
-  //console.log(res2);
+  ////console.log(res2);
   optionList.value = res2.data.LClassList;
 });
 
@@ -189,7 +189,7 @@ watch(selectedStoreCd, async () => {
       store.state.userData.GROUP_CD,
       selectedStoreCd.value.STORE_CD
     );
-    //console.log(res2);
+    ////console.log(res2);
     optionList.value = res2.data.LClassList;
     selectedCond.value = 0;
     selectedCond2.value = 0;
@@ -215,9 +215,9 @@ watch(selectedCond, async () => {
     selectedCond.value,
     0
   );
-  //console.log(res2);
+  ////console.log(res2);
   optionList2.value = res2.data.SClassList;
-  console.log(optionList2.value);
+  //console.log(optionList2.value);
   selectedCond2.value = 0;
   const maincategory =
     optionList.value.filter((item) => item.LCLASS_CD == selectedCond.value)[0]
@@ -301,7 +301,7 @@ watch(
       store.state.userData.GROUP_CD,
       selectedStoreCd.value.STORE_CD
     );
-    //console.log(res1);
+    ////console.log(res1);
     optionList.value = res1.data.LClassList;
 
     const res2 = await GetSClassInfo(
@@ -310,7 +310,7 @@ watch(
       selectedCond.value,
       0
     );
-    //console.log(res2);
+    ////console.log(res2);
     optionList2.value = res2.data.SClassList;
     // selectedCond2.value = 0;
     const maincategory = optionList.value.filter(

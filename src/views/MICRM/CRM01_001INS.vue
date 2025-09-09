@@ -976,7 +976,7 @@ const handleParentClick = (e) => {
 };
 
 const Name = (e) => {
-  //console.log(e);
+  ////console.log(e);
 };
 const searchNum = ref(0);
 const ID = (e) => {
@@ -1078,7 +1078,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    //console.log(res);
+    ////console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -1250,10 +1250,10 @@ const saveButton = async () => {
         pcond.value
       );
     }
-    //console.log(res);
+    ////console.log(res);
     store.state.loading = false;
   } catch (error) {
-    //console.log(error);
+    ////console.log(error);
     store.state.loading = false;
   } finally {
     store.state.loading = false;
@@ -1263,9 +1263,9 @@ const saveButton = async () => {
 };
 
 // const clickedRowData = async (e) => {
-//   //console.log(e);
+//   ////console.log(e);
 //   // const res = await getReceiptDataDetail2(e[1], e[2], e[0]);
-//   // //console.log(res);
+//   // ////console.log(res);
 //   // rowData2.value = res.data.List;
 //   // rowData3.value = res.data.List2;
 //   // rowData4.value = res.data.List3;
@@ -1276,7 +1276,7 @@ const ccustomorGroup = ref();
 const ccustomorStatus = ref();
 const dblclickedRowData = (e) => {
   InsertNew.value = false;
-  //console.log(e);
+  ////console.log(e);
   ccustomorNum.value = e[0];
   ccustomorGroup.value = e[59];
   ccustomorStatus.value = e[60];
@@ -1553,7 +1553,7 @@ const deleteButton = async () => {
       store.state.userData.lngSequence
     );
 
-    //console.log(res);
+    ////console.log(res);
     Swal.fire({
       title: "성공",
       text: "탈퇴가 완료되었습니다.",
@@ -1562,7 +1562,7 @@ const deleteButton = async () => {
     });
     return;
   } catch (error) {
-    //console.log(error);
+    ////console.log(error);
   } finally {
     store.state.loading = false;
     searchButton();

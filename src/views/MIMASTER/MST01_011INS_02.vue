@@ -797,7 +797,7 @@ const clickrowData1 = ref(false);
 
 const clickedRowData = (newValue) => {
   clickrowData1.value = true;
-  console.log(rowData2.value);
+  //console.log(rowData2.value);
   if (newValue == undefined) {
     return;
   }
@@ -817,10 +817,10 @@ const clickedRowData = (newValue) => {
         });
       }
 
-      console.log(filteredrowData2.value);
+      //console.log(filteredrowData2.value);
     }
   }
-  console.log(newValue[2]);
+  //console.log(newValue[2]);
   selectedOption.value = newValue[2];
   optionCd.value = Number(newValue[0]);
   optionNm.value = newValue[1];
@@ -931,8 +931,8 @@ const searchButton = async () => {
 
     const res3 = await getAllOptionManageData2(groupCd.value, nowStoreCd.value);
     const res4 = await getMostColumnMenuList(groupCd.value, 0);
-    // console.log(res3);
-    // console.log(res4);
+    // //console.log(res3);
+    // //console.log(res4);
     rowData1.value = res3.data.OPTIONMANAGE;
     rowData2.value = res3.data.MENULIST;
     rowData3.value = res3.data.OPTIONGROUPMANAGE;
@@ -1070,7 +1070,7 @@ const saveButton = async () => {
         //comsole.log(rowData3.value);
 
         if (currentMenu.value == false) {
-          console.log(deletedState.value);
+          //console.log(deletedState.value);
 
           const DlngCodes = updatedRowData4.value
             .filter((item, index) => deletedState.value.includes(index))
@@ -1083,7 +1083,7 @@ const saveButton = async () => {
           const DlngStoreCode = updatedRowData4.value
             .filter((item, index) => deletedState.value.includes(index))
             .map((item) => item.lngStoreCode);
-          console.log(DlngCodes);
+          //console.log(DlngCodes);
           if (DlngCodes.length > 0) {
             const res2 = await deleteStoreConTable(
               groupCd.value,
@@ -1092,7 +1092,7 @@ const saveButton = async () => {
               DlngCodes.join(",")
             );
 
-            console.log(res2);
+            //console.log(res2);
           }
 
           const lngCodes = updatedRowData4.value
@@ -1326,7 +1326,7 @@ const saveButton = async () => {
             lngChainMenu21.join(",")
           );
 
-          console.log(res);
+          //console.log(res);
         } else {
           const dlngCodes = updatedRowData5.value
             .filter((item, index) => deletedState2.value.includes(index))
@@ -1346,7 +1346,7 @@ const saveButton = async () => {
               nowStoreCd.value,
               dlngCodes.join("\u200b")
             );
-            console.log(res);
+            //console.log(res);
           }
           const lngCodes2 = updatedRowData5.value
             .filter((item) => item.deleted != true)
@@ -1646,7 +1646,7 @@ const updatedRowData = (newValue) => {
  */
 
 const updatedRowData2 = (newValue) => {
-  //console.log(newValue);
+  ////console.log(newValue);
   filteredrowData4.value = newValue;
   const change = updatedRowData5.value.find(
     (item) => item.lngCode == Number(selectedOptionGroupCd.value)
@@ -1685,7 +1685,7 @@ const updatedRowData2 = (newValue) => {
     //comsole.log(change);
   }
   // rowData3.value = [...rowData3.value];
-  //console.log(updatedRowData5.value);
+  ////console.log(updatedRowData5.value);
 };
 
 const changeColid = ref("");
@@ -2140,7 +2140,7 @@ const deleteRowData2 = async () => {
     });
     return;
   }
-  //console.log(filteredrowData2.value);
+  ////console.log(filteredrowData2.value);
 
   const updateLngCode = filteredrowData2.value
     .filter((item, index) => index != changeRow2.value)
@@ -2175,7 +2175,7 @@ const deleteRowData4 = async () => {
     return;
   }
 
-  //console.log(filteredrowData4.value);
+  ////console.log(filteredrowData4.value);
   const updateLngCode = filteredrowData4.value
     .filter((item, index) => index != changeRow3.value)
     .map((item) => item.lngCode);

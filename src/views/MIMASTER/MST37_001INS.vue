@@ -538,7 +538,7 @@ const handleStoreCd = async (newValue) => {
   if (newValue == "0") {
     afterSearch.value = false;
   }
-  //console.log(newValue);
+  ////console.log(newValue);
   nowStoreCd.value = newValue;
   addrowDefault.value = `${groupCd.value},${nowStoreCd.value},,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,`;
 };
@@ -590,7 +590,7 @@ const clickrowData1 = ref(false);
 
 const clickedRowData = (newValue) => {
   clickrowData1.value = true;
-  //console.log(newValue);
+  ////console.log(newValue);
   if (newValue == undefined) {
     return;
   }
@@ -683,8 +683,8 @@ const searchButton = async () => {
     //const res3 = await getAllOptionManageData(groupCd.value, nowStoreCd.value);
     const res3 = await getSubTitleList(groupCd.value, nowStoreCd.value);
     const res4 = await getMostColumnMenuList(groupCd.value, nowStoreCd.value);
-    //console.log(res3);
-    //console.log(res4);
+    ////console.log(res3);
+    ////console.log(res4);
     rowData1.value = res3.data.List;
     // rowData2.value = res3.data.MENULIST;
     // rowData3.value = res3.data.OPTIONGROUPMANAGE;
@@ -804,7 +804,7 @@ const saveButton = async () => {
 
           const res = await deleteSubTitles(groupCds, storeCds, lngCodes);
 
-          //console.log(res);
+          ////console.log(res);
         }
 
         if (currentMenu.value == false) {
@@ -959,7 +959,7 @@ const saveButton = async () => {
             lngMenu8s
           );
 
-          //console.log(res);
+          ////console.log(res);
         }
       } catch (error) {
       } finally {
@@ -982,7 +982,7 @@ const saveButton = async () => {
  */
 
 const updatedRowData3 = (e) => {
-  //console.log(e);
+  ////console.log(e);
   updatedRowData4.value = e;
 };
 
@@ -1008,7 +1008,7 @@ const updatedRowData = async (newValue) => {
   //   (item) => item.lngCode == Number(optionCd.value)
   // );
 
-  // //console.log(change);
+  // ////console.log(change);
 
   if (updatedFilteredRow.value.length > 0) {
     for (let i = 0; i < updatedFilteredRow.value.length; i++) {
@@ -1306,7 +1306,7 @@ const sendRowState = (e) => {
   } else {
     isNewColumn.value = true;
   }
-  // //console.log(e);
+  // ////console.log(e);
 };
 
 const allStateRowArr = ref([]);
@@ -1352,7 +1352,7 @@ const deleteRowData2 = async () => {
     return;
   }
 
-  //console.log(filteredrowData2.value);
+  ////console.log(filteredrowData2.value);
 
   const updateLngCode = filteredrowData2.value
     .filter((item, index) => index != changeRow2.value)
@@ -1494,7 +1494,7 @@ const clickaddMenu1 = (newValue) => {
     });
     return;
   }
-  //console.log(filteredrowData2.value.length);
+  ////console.log(filteredrowData2.value.length);
   if (filteredrowData2.value.length == 8) {
     Swal.fire({
       title: "대상선택메뉴는 최대 8개까지 설정할 수 있습ㄴ디ㅏ.",
@@ -1515,11 +1515,11 @@ const clickaddMenu1 = (newValue) => {
  */
 
 const dblclickedRowData = async (newValue) => {
-  //console.log(newValue);
+  ////console.log(newValue);
   const a = updatedRowData4.value.find(
     (item) => item.lngCode == optionCd.value
   );
-  //console.log(a);
+  ////console.log(a);
   let key2 = "";
   let key3 = "";
   for (let i = 1; i <= 8; i++) {
@@ -1533,7 +1533,7 @@ const dblclickedRowData = async (newValue) => {
     }
   }
 
-  //console.log(changeColid.value);
+  ////console.log(changeColid.value);
   changeValue.value = newValue[2];
   changeNow.value = !changeNow.value;
 

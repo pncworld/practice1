@@ -210,7 +210,7 @@ const eDate = ref();
 const dateValue = (e) => {
   initGrid();
   sDate.value = e;
-  //console.log(e);
+  ////console.log(e);
 };
 
 const selectedDate = ref();
@@ -252,7 +252,7 @@ watch(cond2, async () => {
   } else {
     optionList2.value = [];
   }
-  //console.log(optionList2.value);
+  ////console.log(optionList2.value);
   cond3.value = 0;
 });
 
@@ -301,7 +301,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -383,8 +383,8 @@ const excelList = (e) => {
 const openPopUp = ref(false);
 
 const clickedButtonCol = async (e) => {
-  //   console.log(e);
-  //   console.log(forPopupOrderNo.value);
+  //   //console.log(e);
+  //   //console.log(forPopupOrderNo.value);
 
   if (e == "strOrderNo") {
     const res = await getOrderInfoDetail(
@@ -393,7 +393,7 @@ const clickedButtonCol = async (e) => {
       forPopupOrderNo.value
     );
 
-    console.log(res);
+    //console.log(res);
     rowData2.value = res.data.List;
     openPopUp.value = true;
   }
@@ -402,7 +402,7 @@ const rowData2 = ref([]);
 const forPopupOrderStoreCd = ref("");
 const forPopupOrderNo = ref("");
 const clickedRowData = (e) => {
-  console.log(e);
+  //console.log(e);
   forPopupOrderStoreCd.value = e[1];
   forPopupOrderNo.value = e[5];
 };
@@ -411,7 +411,7 @@ const checkedrowdata = ref([]);
 const checkedRowData = (e) => {
   checkedrowdata.value = e;
 
-  console.log(e);
+  //console.log(e);
 };
 const printButton = () => {
   if (checkedrowdata.value.length == 0) {

@@ -46,6 +46,7 @@
         :showCheckBar="false"
         :addRow="addbutton"
         @selcetedrowData="selcetedrowData"
+        @allStateRows="allStateRows"
         :changeRow="changeRow"
         :deleteRow="deleterow"
         :changeColid="'lngCode'"
@@ -72,6 +73,7 @@
         :showGrid="showGrid"
         :showCheckBar="false"
         :addRow2="addbutton2"
+        @allStateRows="allStateRows2"
         :addrowProp="'lngCode,lngMajor'"
         :deleteRow="deleterow2"
         :addrowDefault="addrowDefault"
@@ -79,6 +81,7 @@
         :changeRow="changeRow"
         :changeColid="'strName'"
         :changeValue="changeValue2"
+        :inputOnlyNumberColumn="'lngCode'"
         @updatedRowData="updatedRowData"
         @clickedRowData="clickedRowData2"
         :editableColId="'strName'"
@@ -252,7 +255,7 @@ const searchButton = async () => {
 
     confirmData.value = rowData.value;
     confirmData2.value = rowData2.value;
-    //console.log(res);
+    ////console.log(res);
     //comsole.log(rowData2.value);
   } catch (error) {
     afterSearch.value = false;
@@ -282,14 +285,10 @@ const addRow2 = () => {
   if (clickFirst.value == false) {
     return;
   }
-  if (
-    rowData2.value.filter((item) => item.lngMajor == selectedlngCode.value)
-      .length > 0
-  ) {
+  //rowData2.value.filter((item) => item.lngMajor == selectedlngCode.value)
+  if (updatedrowdata2.value.length > 0) {
     currentsubNo.value = Math.max(
-      ...rowData2.value
-        .filter((item) => item.lngMajor == selectedlngCode.value)
-        .map((item) => item.lngCode)
+      ...updatedrowdata2.value.map((item) => item.lngCode)
     );
   } else {
     currentsubNo.value = selectedlngCode.value * 100;
@@ -314,12 +313,15 @@ const changeValue = ref("0");
  */
 
 const clickFirst = ref(false);
+const tempMainCode = ref("");
 const clickedRowData = (newValue) => {
-  //comsole.log(newValue);
+  //console.log(newValue);
+  tempMainCode.value = newValue[0];
   clickFirst.value = true;
   filteredRowData2.value = rowData2.value.filter(
     (item) => item.lngMajor == newValue[0]
   );
+  updatedrowdata2.value = filteredRowData2.value;
   selectedlngCode.value = newValue[0];
   changeRow.value = newValue.index;
   //comsole.log(changeRow.value);
@@ -335,17 +337,28 @@ const clickedRowData2 = (newValue) => {
 /**
  * 입력창 수정 데이터 갱신
  */
+const allstaterows2 = ref([]);
+const allStateRows2 = (e) => {
+  allstaterows2.value = e;
+};
 
+const allstaterows = ref([]);
+const allStateRows = (e) => {
+  allstaterows.value = e;
+};
+const updatedrowdata2 = ref([]);
 const updatedRowData = (newValue) => {
   //comsole.log(newValue);
   //comsole.log(filteredRowData2.value);
-  rowData2.value = rowData2.value.filter(
-    (item) => Number(item.lngMajor) !== Number(selectedlngCode.value)
-  );
+  // rowData2.value = rowData2.value.filter(
+  //   (item) => Number(item.lngMajor) !== Number(selectedlngCode.value)
+  // );
 
-  for (var i = 0; i < newValue.length; i++) {
-    rowData2.value.push(newValue[i]);
-  }
+  // for (var i = 0; i < newValue.length; i++) {
+  //   rowData2.value.push(newValue[i]);
+  // }
+  console.log(newValue);
+  updatedrowdata2.value = newValue;
   //comsole.log(rowData2.value);
   //comsole.log(newValue.length);
 };
@@ -435,8 +448,12 @@ const saveButton = () => {
     }
 
     if (
-      JSON.stringify(confirmData2.value) === JSON.stringify(rowData2.value) &&
-      forsaveRowData.value == undefined
+      allstaterows2.value.deleted.length == 0 &&
+      allstaterows2.value.updated.length == 0 &&
+      allstaterows2.value.created.length == 0 &&
+      allstaterows.value.deleted.length == 0 &&
+      allstaterows.value.updated.length == 0 &&
+      allstaterows.value.created.length == 0
     ) {
       Swal.fire({
         title: "경고",
@@ -491,15 +508,21 @@ const saveButton = () => {
             );
           }
 
-          //comsole.log(rowData2.value);
-          const subMenulngCode = rowData2.value
-            .filter((item) => item.deleted !== true)
+          console.log(updatedrowdata2.value);
+          const subMenulngCode = updatedrowdata2.value
+            .filter(
+              (item, index) => !allstaterows2.value.deleted.includes(index)
+            )
             .map((item) => item.lngCode);
-          const subMenuNm = rowData2.value
-            .filter((item) => item.deleted !== true)
+          const subMenuNm = updatedrowdata2.value
+            .filter(
+              (item, index) => !allstaterows2.value.deleted.includes(index)
+            )
             .map((item) => item.strName);
-          const subMenuMajorCode = rowData2.value
-            .filter((item) => item.deleted !== true)
+          const subMenuMajorCode = updatedrowdata2.value
+            .filter(
+              (item, index) => !allstaterows2.value.deleted.includes(index)
+            )
             .map((item) => item.lngMajor);
           let res = await saveMenuManage(
             groupCd.value,
@@ -508,8 +531,10 @@ const saveButton = () => {
             mainMenuNm.join(","),
             subMenulngCode.join(","),
             subMenuNm.join(","),
-            subMenuMajorCode.join(",")
+            subMenuMajorCode.join(","),
+            tempMainCode.value
           );
+          console.log(res);
           //comsole.log(res);
         } catch (error) {
           //comsole.log(error);

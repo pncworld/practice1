@@ -68,7 +68,6 @@
           :reload="reload"
           :setStateBar="false"
           :documentTitle="'STKN06_012INS'"
-          @dblclickedRowData="dblclickedRowData"
           :rowStateeditable="false">
         </Realgrid>
       </div>
@@ -262,6 +261,7 @@ import {
   getLossStockItemDetailList,
   getLossStockItemList,
   getLossTypeList,
+  getStockCheckLossByUpdate,
   saveLossMaster,
   updateLossMasterDetail,
 } from "@/api/mistock";
@@ -399,7 +399,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -420,7 +420,7 @@ const searchButton2 = async () => {
     try {
       const res = await getLossTypeList(groupCd2.value, scond2.value);
 
-      console.log(res);
+      //console.log(res);
       labelsData.value = [res.data.List.map((item) => item.strLossName)];
       valuesData.value = [res.data.List.map((item) => item.lngLossCode)];
     } catch (error) {}
@@ -433,7 +433,7 @@ const searchButton2 = async () => {
     );
 
     rowData3.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch2.value = true;
   } catch (error) {
     afterSearch2.value = false;
@@ -526,7 +526,7 @@ const clickedRowData = async (e) => {
     rowData2.value = res.data.List;
     tempDeleteLoss.value = e;
   } catch (error) {}
-  console.log(e);
+  //console.log(e);
 };
 
 const open = ref(false);
@@ -542,11 +542,11 @@ const addButton = async () => {
     return;
   }
   open.value = true;
-  //console.log(groupCd2.value);
+  ////console.log(groupCd2.value);
   try {
     const res = await getLossTypeList(groupCd2.value, scond2.value);
 
-    console.log(res);
+    //console.log(res);
 
     labelsData.value = [res.data.List.map((item) => item.strLossName)];
     valuesData.value = [res.data.List.map((item) => item.lngLossCode)];
@@ -613,7 +613,7 @@ const saveButton2 = async () => {
       store.state.userData.lngSequence,
       scond2.value
     );
-
+    console.log(res);
     if (res.data.RESULT_CD == "00") {
       await Swal.fire({
         title: "성공",
@@ -625,13 +625,14 @@ const saveButton2 = async () => {
     } else {
       await Swal.fire({
         title: "실패",
-        text: "저장에 실패하였습니다.",
+        text: `${res.data.RESULT_NM}`,
         icon: "error",
 
         confirmButtonText: "확인",
       });
+      return;
     }
-    console.log(res);
+    //console.log(res);
   } catch (error) {
   } finally {
     open.value = false;
@@ -641,25 +642,25 @@ const saveButton2 = async () => {
 
 const allstaterows2 = ref([]);
 const allStateRows2 = (e) => {
-  // console.log(e);
+  // //console.log(e);
   allstaterows2.value = e.updated;
 };
 
 const allstaterows3 = ref([]);
 const allStateRows3 = (e) => {
-  // console.log(e);
+  // //console.log(e);
   allstaterows3.value = e.updated;
 };
 
 const updatedrowdata2 = ref([]);
 const updatedRowData2 = (e) => {
-  // console.log(e);
+  // //console.log(e);
   updatedrowdata2.value = e;
 };
 
 const updatedrowdata3 = ref([]);
 const updatedRowData3 = (e) => {
-  // console.log(e);
+  // //console.log(e);
   updatedrowdata3.value = e;
 };
 
@@ -669,7 +670,7 @@ const afterSearch3 = ref(false);
 
 const tempLossNo = ref("");
 const dblclickedRowData = async (e) => {
-  console.log(e);
+  //console.log(e);
   open2.value = true;
   tempLossNo.value = e[4];
   try {
@@ -679,7 +680,7 @@ const dblclickedRowData = async (e) => {
     try {
       const res = await getLossTypeList(groupCd2.value, scond2.value);
 
-      console.log(res);
+      //console.log(res);
       labelsData.value = [res.data.List.map((item) => item.strLossName)];
       valuesData.value = [res.data.List.map((item) => item.lngLossCode)];
     } catch (error) {}
@@ -687,7 +688,7 @@ const dblclickedRowData = async (e) => {
     const res = await getLossStockItemDetailList(e[0], e[1], e[4]);
 
     rowData4.value = res.data.List;
-    console.log(res);
+    //console.log(res);
     afterSearch3.value = true;
   } catch (error) {
     afterSearch3.value = false;
@@ -698,7 +699,7 @@ const dblclickedRowData = async (e) => {
 };
 
 const searchRow = (e) => {
-  console.log(e.target.value);
+  //console.log(e.target.value);
   scond3.value = e.target.value;
 };
 
@@ -734,6 +735,27 @@ const saveButton3 = async () => {
     });
     return;
   }
+
+  try {
+    const res = await getStockCheckLossByUpdate(
+      groupCd2.value,
+      storeCode2.value,
+      tempLossNo.value
+    );
+    console.log(res);
+
+    if (res.data.List[0].blnClosed != "False") {
+      await Swal.fire({
+        title: "경고",
+        text: "해당 일자는 이미 마감되어 수정하실 수 없습니다.",
+        icon: "warning",
+
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } catch (error) {}
+
   try {
     const itemids = updatedrowdata3.value
       .filter((item, index) => allstaterows3.value.includes(index))
@@ -774,7 +796,7 @@ const saveButton3 = async () => {
         confirmButtonText: "확인",
       });
     }
-    console.log(res);
+    //console.log(res);
   } catch (error) {
   } finally {
     open2.value = false;
@@ -797,7 +819,7 @@ const deleteButton = async () => {
     });
     return;
   }
-  console.log(tempDeleteLoss.value);
+  //console.log(tempDeleteLoss.value);
   try {
     const res = await deleteLossStock(
       tempDeleteLoss.value[0],
@@ -805,7 +827,7 @@ const deleteButton = async () => {
       tempDeleteLoss.value[4]
     );
 
-    console.log(res);
+    //console.log(res);
 
     if (res.data.RESULT_CD == "00") {
       await Swal.fire({
@@ -826,6 +848,7 @@ const deleteButton = async () => {
     }
   } catch (error) {
   } finally {
+    rowData2.value = [];
     searchButton();
   }
 };

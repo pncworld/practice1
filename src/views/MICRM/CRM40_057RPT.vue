@@ -229,7 +229,7 @@ watch([cond, cond2], () => {
     );
     hideColumnsId.value.push("strStoreName");
   }
-  //console.log(hideColumnsId.value);
+  ////console.log(hideColumnsId.value);
 });
 const hideColumnsId = ref([]);
 const searchButton = async () => {
@@ -253,7 +253,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    //console.log(res);
+    ////console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;

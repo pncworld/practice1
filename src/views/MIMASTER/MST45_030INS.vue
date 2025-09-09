@@ -246,7 +246,7 @@ const searchButton = async () => {
     rowData.value = res.data.List;
     afterSearch.value = true;
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   }
 };
 const addbutton = ref(false);
@@ -291,7 +291,7 @@ const updatedrowdata = ref([]);
  */
 const disabled = ref(false);
 const updatedRowData = (newValue) => {
-  //console.log(newValue);
+  ////console.log(newValue);
   updatedrowdata.value = newValue;
 };
 
@@ -385,7 +385,7 @@ const saveButton = async () => {
           blnsat
         );
         store.state.loading = false;
-        console.log(res);
+        //console.log(res);
 
         if (res.data.RESULT_CD == "00") {
           Swal.fire({
@@ -406,7 +406,7 @@ const saveButton = async () => {
         }
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         // 취소 눌렀을 때 실행할 코드
-        //console.log("취소 버튼 클릭됨");
+        ////console.log("취소 버튼 클릭됨");
       }
     });
   } catch (error) {
@@ -437,12 +437,12 @@ const SupplierId = (e) => {
   if (rowData.value.length > 0) {
     rowData.value = [];
   }
-  //console.log(e);
+  ////console.log(e);
 };
 
 const selectedSupplierNm = ref("");
 const SupplierNm = (e) => {
-  console.log(e);
+  //console.log(e);
   selectedSupplierNm.value = e;
 };
 

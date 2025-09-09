@@ -13,7 +13,10 @@
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="saveButton" class="button save md:w-auto w-14">
+        <button
+          @click="saveButton"
+          class="button save md:w-auto w-14"
+          :disabled="disabled">
           저장
         </button>
         <button @click="excelButton" class="button save w-auto excel">
@@ -27,6 +30,7 @@
         <Datepicker1
           :mainName="'일자'"
           @dateValue="dateValue"
+          :disable="!disabled4"
           ref="datepicker"
           :initToday="1"
           @excelDate="excelDate">
@@ -35,8 +39,11 @@
       <div class="flex justify-start items-center col-span-2 ml-10">
         <PickStore
           @update:storeGroup="lngStoreGroup"
-          :defaultStoreNm="'전체'"
+          :defaultStoreNm="'선택'"
           class=""
+          :hideGroup="false"
+          :hideAttr="false"
+          :disabledAll="!disabled4"
           @storeNm="excelStore"
           @update:storeCd="lngStoreCode"></PickStore>
       </div>
@@ -63,7 +70,7 @@
       <div class="flex space-x-5 ml-12 mt-5 items-center">
         <div>
           <label for="cond3"
-            ><input type="checkbox" id="cond3" @change="setCond3" />전체
+            ><input type="checkbox" id="cond3" @change="setCond3" checked />전체
             품목보기</label
           >
         </div>
@@ -122,22 +129,55 @@
           <input
             type="text"
             disabled
+            v-model="fileNm"
             class="border border-black h-7 w-64 disabled:bg-white ml-5" />
         </div>
-        <button class="whitebutton bg-white ml-2">찾기</button>
-        <button class="whitebutton bg-white">불러오기</button>
+        <button
+          class="whitebutton bg-white ml-2 disabled:opacity-30"
+          @click="findFile"
+          :disabled="disabled2">
+          찾기
+        </button>
+        <input
+          type="file"
+          ref="fileInput"
+          hidden
+          accept=".xls,.xlsx"
+          @change="handleFileChange" />
+        <!-- <button
+          class="whitebutton bg-white disabled:opacity-30"
+          :disabled="disabled3">
+          불러오기
+        </button> -->
       </div>
 
       <div class="flex ml-12 mt-5 items-center col-span-2">
         <div class="font-semibold text-base text-nowrap">SHEET 선택</div>
         <div>
-          <input
-            type="text"
-            disabled
-            class="border border-black h-7 w-64 disabled:bg-white ml-5" />
+          <select
+            name=""
+            id=""
+            @change="changeSheet"
+            class="border border-black h-7 w-64 disabled:bg-white ml-5 disabled:opacity-30"
+            v-model="excelcond"
+            :disabled="disabled3">
+            <option :value="i.lngCode" v-for="i in SheetList">
+              {{ i.strName }}
+            </option>
+          </select>
         </div>
-        <button class="whitebutton bg-white ml-2">업로드</button>
-        <button class="whitebutton bg-white !text-nowrap">업로드 초기화</button>
+        <button
+          class="whitebutton bg-white ml-2 disabled:opacity-30"
+          @click="saveButton2"
+          :disabled="disabled3">
+          업로드
+        </button>
+        <button
+          class="whitebutton bg-white !text-nowrap disabled:opacity-30"
+          @click="searchButton"
+          :disabled="disabled3">
+          업로드 초기화
+        </button>
       </div>
 
       <div
@@ -155,13 +195,18 @@
       <div
         class="flex ml-12 mt-1 space-x-5 items-center justify-start col-span-3">
         <div class="font-semibold text-sm text-nowrap text-blue-500">
-          Notice
+          <span
+            :class="NoticeRes !== '0000' ? 'text-red-500' : 'text-green-400'"
+            >⬤</span
+          >
+          NOTICE
         </div>
 
         <input
           type="text"
           disabled
-          class="border border-black bg-white w-[85%] h-7 text-red-500 disabled:bg-white"
+          :class="NoticeRes !== '0000' ? 'text-red-500' : 'text-green-600'"
+          class="border border-black bg-white w-[85%] h-7 disabled:bg-white"
           v-model="Notice" />
       </div>
     </div>
@@ -175,8 +220,11 @@
         :reload="reload"
         :documentTitle="'STKN07_018RPT'"
         @clickedRowData="clickedRowData"
+        @updatedRowData="updatedRowData"
+        @allStateRows="allStateRows"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
+        :editableColId="editableColId"
         :ColCellRedColorColId="['strRegDT', 'strRegYN']"
         :exporttoExcel="exportExcel">
       </Realgrid>
@@ -186,9 +234,8 @@
 </template>
 
 <script setup>
-import { getCommonList } from "@/api/common";
 import { getStockCategory, getStockGeneric, getStockGroup } from "@/api/master";
-import { getLossReportList, getStockDailyList } from "@/api/mistock";
+import { getStockDailyList, saveTakeDailyRegister } from "@/api/mistock";
 import BusinessClient from "@/components/businessClient.vue";
 import Datepicker1 from "@/components/Datepicker1.vue";
 /**
@@ -214,6 +261,7 @@ import Realgrid from "@/components/realgrid.vue";
  *  */
 
 import { insertPageLog } from "@/customFunc/customFunc";
+import Swal from "sweetalert2";
 /**
  *  경고창 호출 라이브러리
  *  */
@@ -222,12 +270,13 @@ import { insertPageLog } from "@/customFunc/customFunc";
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
 import { useStore } from "vuex";
+import { read, utils } from "xlsx-js-style";
 /**
  * 	화면 Load시 실행 스크립트
  */
@@ -237,18 +286,18 @@ onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
   const res = await getStockGroup(store.state.userData.lngStoreGroup);
-  console.log(res);
+  //console.log(res);
   optionList.value = res.data.List;
 
   const res2 = await getStockCategory(store.state.userData.lngStoreGroup);
-  console.log(res2);
+  //console.log(res2);
   optionList2.value = res2.data.List;
 
   const res3 = await getStockGeneric(store.state.userData.lngStoreGroup);
-  console.log(res3);
+  //console.log(res3);
   optionList3.value = res3.data.List;
 
-  // const
+  groupCd.value = store.state.userData.lngStoreGroup;
 });
 
 const reload = ref(false);
@@ -257,7 +306,7 @@ const afterSearch = ref(false);
 
 const cond = ref("");
 const cond2 = ref("");
-const cond3 = ref(false);
+const cond3 = ref(true);
 const cond4 = ref("0");
 const cond5 = ref("0");
 const cond6 = ref("0");
@@ -279,19 +328,12 @@ const handleParentClick = (e) => {
 };
 
 const dateValue = (e) => {
-  //console.log(e);
+  ////console.log(e);
   sDate.value = e;
+
+  searchButton();
 };
 const sDate = ref();
-const eDate = ref();
-const startDate = (e) => {
-  initGrid();
-  sDate.value = e;
-};
-const endDate = (e) => {
-  initGrid();
-  eDate.value = e;
-};
 
 const selectedDate = ref();
 const excelDate = (e) => {
@@ -299,18 +341,12 @@ const excelDate = (e) => {
 };
 const optionList2 = ref([]);
 
-const teamcode = ref();
-const lngTeamCode = (e) => {
-  teamcode.value = e;
-};
-const supervisor = ref();
-const lngSupervisor = (e) => {
-  supervisor.value = e;
-};
 const storeCode = ref();
 const lngStoreCode = (e) => {
   initGrid();
   storeCode.value = e;
+
+  searchButton();
 };
 
 const storeAttr = ref();
@@ -332,6 +368,19 @@ const SupplierId = (e) => {
  */
 const hideColumnsId = ref([]);
 const searchButton = async () => {
+  if (storeCode.value == "0") {
+    Swal.fire({
+      title: "경고",
+      text: `매장을 먼저 선택해주세요.`,
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    if (rowData.value.length > 0) {
+      rowData.value = [];
+    }
+    return;
+  }
   try {
     store.state.loading = true;
     initGrid();
@@ -345,8 +394,20 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List2;
-    Notice.value = res.data.List[0].RESULT_MSG;
     console.log(res);
+    NoticeRes.value = res.data.List[0].RESULT_CD;
+
+    if (NoticeRes.value == "0000") {
+      disabled.value = false;
+      disabled2.value = false;
+      editableColId.value = "dblTakeQty";
+    } else {
+      disabled.value = true;
+      disabled2.value = true;
+      editableColId.value = "";
+    }
+    Notice.value = res.data.List[0].RESULT_MSG;
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -373,17 +434,21 @@ const initGrid = () => {
     rowData.value = [];
   }
 
-  if (cond5.value == false && cond6.value == false) {
-    progid.value = 1;
-  } else if (cond5.value == true && cond6.value == false) {
-    progid.value = 3;
-  } else if (cond5.value == false && cond6.value == true) {
-    progid.value = 2;
-  } else {
-    progid.value = 4;
-  }
+  currentFile.value = null;
+  cond.value = "";
+  cond2.value = "";
+  cond3.value = true;
+  cond4.value = "0";
+  cond5.value = "0";
+  cond6.value = "0";
+  fileNm.value = "";
 
-  reload.value = !reload.value;
+  disabled.value = true;
+  disabled2.value = true;
+  disabled3.value = true;
+  disabled4.value = true;
+  SheetList.value = [];
+  excelcond.value = "";
 };
 
 //엑셀 버튼 처리 함수
@@ -417,7 +482,217 @@ const excelList = (e) => {
 };
 const Notice = ref("");
 const setCond3 = (e) => {
-  //console.log(e.target.checked);
+  ////console.log(e.target.checked);
   cond3.value = e.target.checked;
 };
+
+const NoticeRes = ref("0000");
+
+const disabled = ref(true);
+const disabled2 = ref(true);
+const disabled3 = ref(true);
+const disabled4 = ref(true);
+
+const editableColId = ref("dblTakeQty");
+
+const saveButton = async () => {
+  try {
+    console.log(updatedrowdata.value);
+    const storeCd = updatedrowdata.value
+      .filter((item, index) => allstaterows.value.includes(index))
+      .map((item) => item.lngStoreCode)
+      .join("\u200b");
+    const stockIds = updatedrowdata.value
+      .filter((item, index) => allstaterows.value.includes(index))
+      .map((item) => item.lngStockID)
+      .join("\u200b");
+    const takeqtys = updatedrowdata.value
+      .filter((item, index) => allstaterows.value.includes(index))
+      .map((item) => item.dblTakeQty)
+      .join("\u200b");
+
+    const res = await saveTakeDailyRegister(
+      groupCd.value,
+      storeCd,
+      sDate.value.replaceAll("-", ""),
+      stockIds,
+      takeqtys,
+      5
+    );
+    if (res.data.RESULT_CD == "00") {
+      await Swal.fire({
+        title: "성공",
+        text: `저장을 완료하였습니다.`,
+        icon: "success",
+
+        confirmButtonText: "확인",
+      });
+    } else {
+      await Swal.fire({
+        title: "실패",
+        text: `저장에 실패하였습니다.`,
+        icon: "error",
+
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (error) {
+  } finally {
+    searchButton();
+  }
+};
+
+const saveButton2 = async () => {
+  try {
+    console.log(updatedrowdata.value);
+    const storeCd = updatedrowdata.value
+      .map((item) => storeCode.value)
+      .join("\u200b");
+    const stockIds = updatedrowdata.value
+      .map((item) => item.lngStockID)
+      .join("\u200b");
+    const takeqtys = updatedrowdata.value
+      .map((item) => item.dblTakeQty)
+      .join("\u200b");
+
+    const res = await saveTakeDailyRegister(
+      groupCd.value,
+      storeCd,
+      sDate.value.replaceAll("-", ""),
+      stockIds,
+      takeqtys,
+      5
+    );
+    if (res.data.RESULT_CD == "00") {
+      await Swal.fire({
+        title: "성공",
+        text: `저장을 완료하였습니다.`,
+        icon: "success",
+
+        confirmButtonText: "확인",
+      });
+    } else {
+      await Swal.fire({
+        title: "실패",
+        text: `저장에 실패하였습니다.`,
+        icon: "error",
+
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (error) {
+  } finally {
+    searchButton();
+  }
+};
+
+const updatedrowdata = ref([]);
+const updatedRowData = (e) => {
+  updatedrowdata.value = e;
+};
+
+const allstaterows = ref([]);
+const allStateRows = (e) => {
+  console.log(e);
+  allstaterows.value = e.updated;
+};
+
+const clickedRowData = (e) => {
+  console.log(e);
+};
+
+const excelcond = ref(1);
+const fileInput = ref(null);
+const findFile = (e) => {
+  disabled4.value = false;
+
+  fileInput.value.click();
+};
+
+const currentFile = ref(null);
+const SheetList = ref([]);
+const fileNm = ref("");
+const handleFileChange = async (e) => {
+  const file = e.target.files[0];
+  fileNm.value = file.name;
+  console.log(file);
+  currentFile.value = file;
+  excelcond.value = 1;
+  SheetList.value = [];
+  if (file) {
+    const arrayBuffer = await file.arrayBuffer();
+    // XLSX 라이브러리에서 arrayBuffer 사용 가능
+    const workbook = read(arrayBuffer, { type: "array" });
+
+    const sheetLength = workbook.SheetNames.length;
+
+    for (let i = 0; i < sheetLength; i++) {
+      SheetList.value.push({ lngCode: i + 1, strName: workbook.SheetNames[i] });
+    }
+
+    const result = await readFileWithArrayBuffer(file);
+    // console.log(result);
+  }
+  e.target.value = "";
+
+  disabled3.value = false;
+};
+
+const changeSheet = (e) => {
+  excelcond.value = e.target.value;
+  getExcelFiles();
+};
+const getExcelFiles = () => {
+  if (currentFile.value == null || currentFile.value == undefined) {
+    return;
+  }
+  readFileWithArrayBuffer(currentFile.value);
+};
+
+async function readFileWithArrayBuffer(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  // XLSX 라이브러리에서 arrayBuffer 사용 가능
+  const workbook = read(arrayBuffer, { type: "array" });
+
+  const sheetName = workbook.SheetNames[excelcond.value - 1];
+  const sheet = workbook.Sheets[sheetName];
+  const jsonData = utils.sheet_to_json(sheet, { header: 1 });
+
+  const header = [
+    "No",
+    "strStockGroupName",
+    "strCategoryName",
+    "strGenericName",
+    "lngStockID",
+    "strStockName",
+    "strStandardName",
+    "strUnitName",
+    "dblPreQty",
+    "dblInQty",
+    "dblTakeQty",
+    "strRegYN",
+    "strRegDT",
+    "lngStoreCode",
+  ];
+
+  const rows = jsonData.slice(3); // 실제 데이터 행들
+  // console.log(rows);
+  rowData.value = rows.map((row) => {
+    const obj = {};
+    header.forEach((key, i) => {
+      obj[key] = row[i];
+    });
+    return obj;
+  });
+
+  rowData.value = rowData.value.filter((item) => item.dblTakeQty != 0);
+  // rowData.value = rowData.value.map((item) => ({
+  //   ...item,
+  //   strSaleCustStatus: 0,
+  //   strSaleCustStatusTxt: "정상",
+  // }));
+  updatedrowdata.value = JSON.parse(JSON.stringify(rowData.value));
+
+  return jsonData;
+}
 </script>

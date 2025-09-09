@@ -336,7 +336,7 @@
                   "
                   class="h-20 w-28 flex justify-center"
                   ><img
-                    :src="`http://www.pncoffice.com:8085/MenuImage/Image/${item.strUserFileName}`"
+                    :src="`https://www.pncapi.kr/MenuImage/Image/${item.strUserFileName}`"
                     alt=""
                     class="h-full w-full" /></span
                 ><span
@@ -663,7 +663,7 @@ const searchButton = async () => {
     );
     MenuKeyList.value = res4.data.MenuKeyList;
     ScreenKeyOrigin.value = res3.data.ScreenList;
-    //comsole.log(MenuKeyList.value);
+    console.log(MenuKeyList.value);
 
     addfor8ScreenKey();
     //comsole.log(ScreenKeys.value);
@@ -915,8 +915,8 @@ const saveButton = async () => {
           menuKeyNmarr.join("\u200B")
         );
 
-        //comsole.log(res);
-        //comsole.log(res2);
+        console.log(res);
+        console.log(res2);
       } catch (error) {
       } finally {
         store.state.loading = false;
@@ -1273,8 +1273,8 @@ const saveMenuKeyposition = (index) => {
 };
 
 const addMenuKey = () => {
-  //comsole.log(MenuKeyList.value);
-  //comsole.log(clickedRealIndex.value);
+  console.log(MenuKeyList.value);
+  console.log(clickedRealIndex.value);
   const foraddIndex = MenuKeyList.value.findIndex(
     (item) =>
       item.intPosNo == posNo.value &&
@@ -1305,7 +1305,7 @@ const addMenuKey = () => {
     };
   }
   showMenuKey(clickedintScreenNo.value);
-  //comsole.log(MenuKeyList.value);
+  console.log(MenuKeyList.value);
 };
 
 const addTLUKey = () => {

@@ -900,7 +900,7 @@ const saveMenuKey = async () => {
       pcond6.value,
       pcond7.value == true ? 1 : 0
     );
-    console.log(res);
+    //console.log(res);
 
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
@@ -945,7 +945,7 @@ function decimalToHexColor(decimal) {
   }
 
   const hex = num.toString(16).padStart(6, "0");
-  //console.log(hex.toLowerCase());
+  ////console.log(hex.toLowerCase());
   return `#${hex.toLowerCase()}`;
 }
 
@@ -1070,7 +1070,7 @@ const selcetedrowData = (e) => {
   if (clickedRealIndex.value == null) {
     return;
   }
-  console.log(e);
+  //console.log(e);
   currentSelectedMenuNm.value = e[1];
   currentSelectedMenuCode.value = e[0];
   currentSelectedMenuPrice.value = e[2];
@@ -1113,7 +1113,7 @@ const selcetedrowData4 = (e) => {
       currentSelectedMenuPrice.value = "";
       addScreenKeyf();
     } else {
-      //console.log("입력 취소됨");
+      ////console.log("입력 취소됨");
     }
   });
 };
@@ -1255,7 +1255,7 @@ const handleStoreCd = async (newValue) => {
   }
 
   const res = await getSubGroup3(store.state.userData.lngStoreGroup, newValue);
-  //console.log(res);
+  ////console.log(res);
   optionList.value = res.data.List;
   if (optionList.value.length > 0) {
     pcond2.value = res.data.List[0].lngCode;
@@ -1375,8 +1375,8 @@ const searchButton = async () => {
         item.intKeySeq >= (nowscreenNo.value - 1) * 45 &&
         item.intKeySeq <= nowscreenNo.value * 45
     );
-    //console.log(nowscreenNo.value);
-    //console.log(items.value);
+    ////console.log(nowscreenNo.value);
+    ////console.log(items.value);
     items.value = [];
     const startIndex = (nowscreenNo.value - 1) * 45;
     const endIndex = nowscreenNo.value * 45;
@@ -1396,7 +1396,7 @@ const searchButton = async () => {
         });
       }
     }
-    //console.log(items.value);
+    ////console.log(items.value);
 
     afterSearch.value = true;
   } catch (error) {
@@ -1447,14 +1447,14 @@ const showMenuKey = (value) => {
       item.intKeySeq >= (nowscreenNo.value - 1) * 45 + 1 &&
       item.intKeySeq <= nowscreenNo.value * 45
   );
-  console.log(filteredList);
+  //console.log(filteredList);
   const startIndex = (nowscreenNo.value - 1) * 45 + 1;
   const endIndex = nowscreenNo.value * 45;
   // 중간에 비어 있는 번호 확인 및 채우기
   for (let i = startIndex; i <= endIndex; i++) {
     // 해당 번호가 없는 경우 기본값 추가
     const existingItem = filteredList.find((item) => item.intKeySeq === i);
-    console.log(existingItem);
+    //console.log(existingItem);
     const targetIndex = items.value.findIndex(
       (item) => item.intKeySeq === i - startIndex + 1
     );
@@ -1465,7 +1465,7 @@ const showMenuKey = (value) => {
     }
   }
 
-  //console.log(items.value);
+  ////console.log(items.value);
 
   // if (clickedintScreenNo.value != value) {
   //   currmenuKeyPage.value = 1;
@@ -1532,7 +1532,7 @@ const onEnd = (evt) => {
       ...item, // 기존 객체의 다른 속성 유지
       intKeySeq: index + (nowscreenNo.value - 1) * 45 + 1, // 배열 순서대로 intKeySeq 재정렬
     }));
-    console.log(items.value);
+    //console.log(items.value);
   } else {
     updateMenuKey.value = true;
     items.value = items.value.map((item, index) => ({
@@ -1808,7 +1808,7 @@ const addMenuKey = () => {
   const a = items.value.find(
     (item) => item.intKeySeq == clickedMenuKeyIndex.value
   );
-  console.log(a);
+  //console.log(a);
   if (a !== undefined) {
     a.intKeyNo = currentMenu.value == 1 ? 6 : 1;
     a.intKeySeq = clickedMenuKeyIndex.value;
@@ -1818,7 +1818,7 @@ const addMenuKey = () => {
     a.strKeyName = currentSelectedMenuNm.value;
     a.lngPrice = currentSelectedMenuPrice.value;
   }
-  //console.log(a);
+  ////console.log(a);
   //comsole.log(items.value);
   //comsole.log(posNo.value);
   //comsole.log(clickedMenuKeyIndex.value);
@@ -1829,7 +1829,7 @@ const addMenuKey = () => {
       item.intPosNo == posNo.value
   );
 
-  //console.log(b);
+  ////console.log(b);
 
   if (b !== undefined) {
     b.intKeyNo = currentMenu.value == 1 ? 6 : 1;
@@ -1850,7 +1850,7 @@ const addMenuKey = () => {
       lngPrice: currentSelectedMenuPrice.value,
     });
   }
-  // console.log(b);
+  // //console.log(b);
   showMenuKey(nowscreenNo.value);
   //comsole.log(MenuKeyList.value);
 };

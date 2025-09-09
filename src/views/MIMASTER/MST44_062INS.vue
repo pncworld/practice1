@@ -381,12 +381,12 @@ const searchSpecialColId = ref([])
 const searchSpecialCond = ref(false)
 watch(ischecked, () => {
   searchSpecialColId.value = [];
-  //console.log(printNameList.value.length)
+  ////console.log(printNameList.value.length)
   for (let i = 1; i <= printNameList.value.length; i++) {
     searchSpecialColId.value.push("checkbox" + i);
   }
   if (ischecked.value == true) {
-   // //console.log(searchSpecialColId.value);
+   // ////console.log(searchSpecialColId.value);
 
     searchSpecialCond.value = false;
   } else {
@@ -501,7 +501,7 @@ const handleStoreCd = async (newValue) => {
   MenuGroup.value = []
   SubMenuGroup.value = []
   ischecked.value = false
-  console.log(newValue)
+  //console.log(newValue)
   nowStoreCd.value = newValue;
   searchButton()
   //comsole.log(nowStoreCd.value)
@@ -750,7 +750,7 @@ const searchButton= async () => {
   receiptD4.value = ''
   receiptD5.value = ''
 
- // console.log(store.state.userData.lngCommonMenu)
+ // //console.log(store.state.userData.lngCommonMenu)
   if ((nowStoreCd.value == '0' && store.state.userData.lngCommonMenu == '0')) {
     Swal.fire({
       title: '경고',
@@ -778,7 +778,7 @@ const searchButton= async () => {
     } else if (currentMenu.value == 2) {
       let lngcommonmenu = store.state.userData.lngCommonMenu
       res = await getKitchenSettingList(groupCd.value, nowStoreCd.value ,lngcommonmenu)
-      //console.log(res)
+      ////console.log(res)
 
       SettingList.value = [...res.data.KITCHENMENU]
       MenuGroup.value = res.data.MAINGROUP

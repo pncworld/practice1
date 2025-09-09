@@ -331,7 +331,7 @@ const searchButton = async () => {
       searchValue,
       searchValue2
     );
-    console.log(res);
+    //console.log(res);
 
     rowData2.value = res.data.List;
 
@@ -503,7 +503,7 @@ const saveButton = async () => {
       store.state.userData.lngSequence
     );
     store.state.loading = false;
-    console.log(res);
+    //console.log(res);
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
         title: "성공",
@@ -552,7 +552,7 @@ const updateRowData = ref([]);
 const fileName = ref("");
 const onFileChange = async (e) => {
   const file = e.target.files[0];
-  console.log(file);
+  //console.log(file);
   fileName.value = file.name;
   currentFile.value = file;
   excelcond.value = 1;
@@ -569,7 +569,7 @@ const onFileChange = async (e) => {
     }
 
     const result = await readFileWithArrayBuffer(file);
-    console.log(result);
+    //console.log(result);
   }
   e.target.value = "";
 };
@@ -622,7 +622,7 @@ async function readFileWithArrayBuffer(file) {
   //     strSaleCustStatusTxt: "정상",
   //   }));
   updateRowData.value = JSON.parse(JSON.stringify(rowData.value));
-  //console.log(updateRowData.value);
+  ////console.log(updateRowData.value);
   return jsonData;
 }
 
@@ -639,7 +639,7 @@ const changeCond = (e) => {
 };
 
 const onlyNumber = (e) => {
-  //console.log(e);
+  ////console.log(e);
   e.target.value = e.target.value.replace(/[^0-9]/g, "");
 };
 </script>

@@ -789,7 +789,7 @@ const clickrowData1 = ref(false);
 
 const clickedRowData = (newValue) => {
   clickrowData1.value = true;
-  //console.log(newValue);
+  ////console.log(newValue);
   if (newValue == undefined) {
     return;
   }
@@ -1360,7 +1360,7 @@ const updatedRowData = (newValue) => {
  */
 
 const updatedRowData2 = (newValue) => {
-  //console.log(newValue);
+  ////console.log(newValue);
   filteredrowData4.value = newValue;
   const change = updatedRowData5.value.find(
     (item) => item.lngCode == Number(selectedOptionGroupCd.value)
@@ -1399,7 +1399,7 @@ const updatedRowData2 = (newValue) => {
     //comsole.log(change);
   }
   // rowData3.value = [...rowData3.value];
-  //console.log(updatedRowData5.value);
+  ////console.log(updatedRowData5.value);
 };
 
 const changeColid = ref("");
@@ -1468,126 +1468,126 @@ const deleteAll1 = ref(false);
 const deleteAll = async () => {
   changeColid.value = "lngChainMenu1";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu2";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu3";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu4";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu5";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu6";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu7";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu8";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu9";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu10";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu11";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu12";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu13";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu14";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu15";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
   changeColid.value = "lngChainMenu16";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu17";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu18";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu19";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu20";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 
   changeColid.value = "lngChainMenu21";
   changeValue.value = 0;
-  changeNow.value = !changeNow.value;
+  changeNow3.value = !changeNow3.value;
 
   await nextTick();
 };
@@ -1595,120 +1595,120 @@ const deleteAll2 = ref(false);
 const deleteAlls = async () => {
   changeColid.value = "lngChainGroup1";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup2";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup3";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup4";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup5";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup6";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup7";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup8";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup9";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup10";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup11";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup12";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup13";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup14";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup15";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup16";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup17";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
   changeColid.value = "lngChainGroup18";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup19";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 
   changeColid.value = "lngChainGroup20";
   changeValue.value = 0;
-  changeNow2.value = !changeNow2.value;
+  changeNow4.value = !changeNow4.value;
 
   await nextTick();
 };
@@ -1855,7 +1855,7 @@ const deleteRowData2 = async () => {
     });
     return;
   }
-  //console.log(filteredrowData2.value);
+  ////console.log(filteredrowData2.value);
 
   const updateLngCode = filteredrowData2.value
     .filter((item, index) => index != changeRow2.value)
@@ -1864,13 +1864,13 @@ const deleteRowData2 = async () => {
   for (let i = 0; i < updateLngCode.length; i++) {
     changeColid.value = "lngChainMenu" + (i + 1);
     changeValue.value = updateLngCode[i];
-    changeNow.value = !changeNow.value;
+    changeNow3.value = !changeNow3.value;
     await nextTick();
   }
   for (let j = 0; j < 21 - updateLngCode.length; j++) {
     changeColid.value = "lngChainMenu" + (21 - j);
     changeValue.value = 0;
-    changeNow.value = !changeNow.value;
+    changeNow3.value = !changeNow3.value;
     await nextTick();
   }
 
@@ -1890,7 +1890,7 @@ const deleteRowData4 = async () => {
     return;
   }
 
-  //console.log(filteredrowData4.value);
+  ////console.log(filteredrowData4.value);
   const updateLngCode = filteredrowData4.value
     .filter((item, index) => index != changeRow3.value)
     .map((item) => item.lngCode);
@@ -1898,13 +1898,13 @@ const deleteRowData4 = async () => {
   for (let i = 0; i < updateLngCode.length; i++) {
     changeColid.value = "lngChainGroup" + (i + 1);
     changeValue2.value = updateLngCode[i];
-    changeNow2.value = !changeNow2.value;
+    changeNow4.value = !changeNow4.value;
     await nextTick();
   }
   for (let j = 0; j < 20 - updateLngCode.length; j++) {
     changeColid.value = "lngChainGroup" + (20 - j);
     changeValue2.value = 0;
-    changeNow2.value = !changeNow2.value;
+    changeNow4.value = !changeNow4.value;
     await nextTick();
   }
 };

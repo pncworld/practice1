@@ -1,8 +1,8 @@
 /*--############################################################################
 # Filename : MST04_026INS.vue                                                  
-# Description : 마스터관리 > 자재 마스터Ⅱ > 자재 그룹 등록                        
-# Date :2025-08-22                                                             
-# Author : 권지안                  
+# Description : 마스터관리 > 자재 마스터Ⅱ > 자재 그룹 등록                      
+  # Date :2025-08-22                                                           
+  # Author : 권지안                  
 ################################################################################*/
 <template>
   <!-- 조회 조건 -->
@@ -17,7 +17,8 @@
     </div>
     <div
       class="flex justify-start space-x-5 bg-gray-200 rounded-lg h-16 items-center mt-3">
-      <PickGroup @update:storeGroup="handleGroupCd" @GroupNm = "GroupNm"> </PickGroup>
+      <PickGroup @update:storeGroup="handleGroupCd" @GroupNm="GroupNm">
+      </PickGroup>
     </div>
     <span class="grid grid-rows-1 grid-cols-2 mt-5">
       <div class="ml-10 flex justify-start font-bold text-xl">
@@ -65,7 +66,8 @@
       <!-- 그리드 영역 -->
       <!-- 연동 데이터 영역 -->
       <div class="grid grid-cols-[2fr,6fr] grid-rows-3 w-[70%] ml-44 h-[15%]">
-        <div class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500 rounded-tl-lg">
+        <div
+          class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500 rounded-tl-lg">
           *자재그룹코드
         </div>
         <div
@@ -78,17 +80,19 @@
             @input="changeInfo"
             :disabled="isNewColumn" />
         </div>
-        <div class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100">
+        <div
+          class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100">
           자재그룹명
         </div>
-        <div class="border flex h-full items-center text-sm font-semibold justify-center">
+        <div
+          class="border flex h-full items-center text-sm font-semibold justify-center">
           <input
             type="text"
             class="gridvalue2 border text-sm rounded-md w-full pl-2 h-full disabled:bg-gray-200"
             v-model="gridvalue2"
             name="gridvalue2"
             @input="changeInfo"
-            :disabled="!clickrowData1"  />
+            :disabled="!clickrowData1" />
         </div>
       </div>
     </div>
@@ -200,7 +204,7 @@ const deleteButton = () => {
     });
     return;
   }
-  
+
   /*
   if (isNewColumn.value == false) {
     Swal.fire({
@@ -231,9 +235,8 @@ const sendRowState = (e) => {
   } else {
     isNewColumn.value = true;
   }
-  // //console.log(e);
+  // ////console.log(e);
 };
-
 
 /**
  * 페이지 매장 그룹 세팅
@@ -268,11 +271,10 @@ const changeInfo = (e) => {
   if (rowName == "gridvalue1") {
     changeColid.value = "lngStockGroupID";
     changeValue2.value = rowValue;
-  }
-  else if (rowName == "gridvalue2") {
+  } else if (rowName == "gridvalue2") {
     changeColid.value = "strStockGroupName";
     changeValue2.value = rowValue;
-  } 
+  }
   changeNow.value = !changeNow.value;
 };
 
@@ -286,7 +288,6 @@ const allstaterows = ref([]);
 const allStateRows = (e) => {
   allstaterows.value = e;
 };
-
 
 /**
  * 엑셀 내보내기 함수
@@ -416,7 +417,6 @@ const saveButton = async () => {
     if (result.isConfirmed) {
       store.state.loading = true;
       try {
-
         /**
          * 페이지 매장 그룹 세팅
          */
@@ -440,7 +440,7 @@ const saveButton = async () => {
           groupCds.join(","),
           dlngStockGroupID.join(",")
         );
-        //console.log(res);
+        ////console.log(res);
 
         Swal.fire({
           title: "저장 되었습니다.",
