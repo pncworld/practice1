@@ -541,3 +541,33 @@ export const getWorkTypeList = (groupCd) => {
     GROUP_CD: groupCd,
   });
 };
+
+export const saveWorkDetail = (
+  groupCd,
+  storecd,
+  lngcode,
+  dtmdate,
+  lngtype,
+  charger,
+  atndtype,
+  stime,
+  etime,
+  lngcode2,
+  dtmdate2,
+  lngcharger2
+) => {
+  return api2.post("/MIHR/HR02_002INS.asmx/saveWorkDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    LNGCODE: lngcode,
+    DTMDATE: dtmdate,
+    LNGTYPE: lngtype,
+    CHARGER: charger,
+    ATNDTYPE: atndtype,
+    STIME: stime,
+    ETIME: etime,
+    LNGCODE2: lngcode2,
+    DTMDATE2: dtmdate2,
+    CHARGER2: lngcharger2,
+  });
+};

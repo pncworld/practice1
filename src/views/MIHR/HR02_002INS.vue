@@ -173,8 +173,12 @@
       </div>
       <div class="h-[95%] w-full space-y-1">
         <div class="flex justify-end space-x-5 items-center mt-1">
-          <div><button class="whitebutton">신규</button></div>
-          <div><button class="whitebutton">삭제</button></div>
+          <div>
+            <button class="whitebutton" @click="addButton">신규</button>
+          </div>
+          <div>
+            <button class="whitebutton" @click="deleteButton">삭제</button>
+          </div>
         </div>
         <Realgrid
           :progname="'HR02_002INS_VUE'"
@@ -183,7 +187,14 @@
           :labelsData="labelsData"
           :valuesData="valuesData"
           :labelingColumns="'lngAtndType'"
+          @clickedRowData="clickedRowData2"
+          @updatedRowData="updatedRowData2"
           :setStateBar="false"
+          :addRow5="addRow"
+          :deleteRow6="deleteRow"
+          :notsoftDelete="true"
+          :addrowDefault="'0,00:00,00:00,,'"
+          :addrowProp="'lngAtndType,strSTime,strETime,strWTime'"
           :mergeColumnGroupName2="['확정']"
           :mergeColumnGroupSubList2="[
             ['lngAtndType', 'strSTime', 'strETime', 'strWTime'],
@@ -204,6 +215,7 @@ import { getInitEmpInfo } from "@/api/miattend";
 import {
   getWorkEmpList,
   getWorkTypeList,
+  saveWorkDetail,
   saveWorkShift,
   saveWorkShiftDetail,
   updateWorkShift,
@@ -365,120 +377,71 @@ const saveButton = async (e) => {
     });
     return;
   }
+
+  const updatedlength = rowData3.value.filter((item) => item.updated == true);
+
+  if (updatedlength == 0 && deleterows.value.length == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "수정된 사항이 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   try {
     store.state.loading = true;
-    if (rowData1State.value.created.length > 0) {
-      const groups = updatedRow.value
-        .filter((item, index) => rowData1State.value.created.includes(index))
-        .map((item) => item.lngStoreGroup);
-      const stores = updatedRow.value
-        .filter((item, index) => rowData1State.value.created.includes(index))
-        .map((item) => item.lngStoreCode);
-      const wgupname = updatedRow.value
-        .filter((item, index) => rowData1State.value.created.includes(index))
-        .map((item) => item.strWorkGupName);
-      try {
-        const res = await saveWorkShift(
-          groups.join("\u200b"),
-          stores.join("\u200b"),
-          wgupname.join("\u200b")
-        );
-        ////console.log(res);
-      } catch (error) {
-      } finally {
-      }
-    }
 
-    if (rowData1State.value.updated.length > 0) {
-      const groups = updatedRow.value
-        .filter((item, index) => rowData1State.value.updated.includes(index))
-        .map((item) => item.lngStoreGroup);
-      const stores = updatedRow.value
-        .filter((item, index) => rowData1State.value.updated.includes(index))
-        .map((item) => item.lngStoreCode);
-      const wgupname = updatedRow.value
-        .filter((item, index) => rowData1State.value.updated.includes(index))
-        .map((item) => item.strWorkGupName);
-      const lngcode = updatedRow.value
-        .filter((item, index) => rowData1State.value.updated.includes(index))
-        .map((item) => item.lngCode);
-      try {
-        const res = await updateWorkShift(
-          groups.join("\u200b"),
-          stores.join("\u200b"),
-          wgupname.join("\u200b"),
-          lngcode.join("\u200b")
-        );
-        ////console.log(res);
-      } catch (error) {
-      } finally {
-      }
-    }
-    if (rowData2.value.filter((item) => item.rowStated == "C").length > 0) {
-      try {
-        const groups = rowData2.value
-          .filter((item) => item.rowStated == "C")
-          .map((item) => item.lngStoreGroup);
-        const stores = rowData2.value
-          .filter((item) => item.rowStated == "C")
-          .map((item) => item.lngStoreCode);
-        const workgroupcode = rowData2.value
-          .filter((item) => item.rowStated == "C")
-          .map((item) => item.lngWorkGroupCode);
+    const lngCodes = rowData3.value
+      .filter((item) => item.updated == true)
+      .map((item) => item.lngCode)
+      .join("\u200b");
+    const dtmDates = rowData3.value
+      .filter((item) => item.updated == true)
+      .map((item) => item.dtmDate)
+      .join("\u200b");
+    const lngChargers = rowData3.value
+      .filter((item) => item.updated == true)
+      .map((item) => item.lngCharger)
+      .join("\u200b");
+    const AtndTypes = rowData3.value
+      .filter((item) => item.updated == true)
+      .map((item) => item.lngAtndType)
+      .join("\u200b");
+    const stimes = rowData3.value
+      .filter((item) => item.updated == true)
+      .map((item) => item.strSTime)
+      .join("\u200b");
+    const etimes = rowData3.value
+      .filter((item) => item.updated == true)
+      .map((item) => item.strETime)
+      .join("\u200b");
 
-        const strsTime = rowData2.value
-          .filter((item) => item.rowStated == "C")
-          .map((item) => item.strSTime);
-        const streTime = rowData2.value
-          .filter((item) => item.rowStated == "C")
-          .map((item) => item.strETime);
+    const lngCodes2 = deleterows.value
+      .map((item) => item.lngCode)
+      .join("\u200b");
+    const dtmDate2 = deleterows.value
+      .map((item) => item.dtmDate)
+      .join("\u200b");
+    const lngChargers2 = deleterows.value
+      .map((item) => item.lngCharger)
+      .join("\u200b");
+    const res = await saveWorkDetail(
+      selectedGroup.value,
+      selectedStores.value,
+      lngCodes,
+      dtmDates,
+      3,
+      lngChargers,
+      AtndTypes,
+      stimes,
+      etimes,
+      lngCodes2,
+      dtmDate2,
+      lngChargers2
+    );
 
-        const res = await saveWorkShiftDetail(
-          groups.join("\u200b"),
-          stores.join("\u200b"),
-          workgroupcode.join("\u200b"),
-          strsTime.join("\u200b"),
-          streTime.join("\u200b")
-        );
-        ////console.log(res);
-      } catch (error) {
-        ////console.log(error);
-      } finally {
-      }
-    }
-
-    if (rowData2.value.filter((item) => item.rowStated !== "C").length > 0) {
-      try {
-        const groups = rowData2.value
-          .filter((item) => item.rowStated !== "C")
-          .map((item) => item.lngStoreGroup);
-        const stores = rowData2.value
-          .filter((item) => item.rowStated !== "C")
-          .map((item) => item.lngStoreCode);
-        const lngcodes = rowData2.value
-          .filter((item) => item.rowStated !== "C")
-          .map((item) => item.lngCode);
-
-        const strsTime = rowData2.value
-          .filter((item) => item.rowStated !== "C")
-          .map((item) => item.strSTime);
-        const streTime = rowData2.value
-          .filter((item) => item.rowStated !== "C")
-          .map((item) => item.strETime);
-
-        const res = await updateWorkShiftDetail(
-          groups.join("\u200b"),
-          stores.join("\u200b"),
-          lngcodes.join("\u200b"),
-          strsTime.join("\u200b"),
-          streTime.join("\u200b")
-        );
-        ////console.log(res);
-      } catch (error) {
-        ////console.log(error);
-      } finally {
-      }
-    }
+    console.log(res);
 
     store.state.loading = false;
   } catch (error) {
@@ -530,6 +493,7 @@ const initGrid = () => {
   }
 
   afterSearch.value = false;
+  tempEmpId.value = "";
 };
 
 const sdate = ref("");
@@ -548,7 +512,12 @@ const scond3 = ref("0");
 const scond4 = ref("0");
 const scond5 = ref("0");
 
+const tempEmpId = ref("");
+const tempdtmDate = ref("");
 const clickedRowData = (e) => {
+  console.log(e);
+  tempEmpId.value = e[21];
+  tempdtmDate.value = e[3];
   filteredrowData2.value = rowData2.value.filter(
     (item) => item.dtmDate == e[3] && item.lngCharger == e[21]
   );
@@ -560,5 +529,144 @@ const clickedRowData = (e) => {
     (item) =>
       item.dtmDate == e[3] && item.lngCharger == e[21] && item.lngType == "3"
   );
+
+  updatedrowdata2.value = filteredrowData4.value;
+};
+
+const addRow = ref(false);
+const addButton = () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "조회를 먼저 해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (tempEmpId.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "추가하실 스케쥴을 먼저 선택해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  rowData3.value.push({
+    dtmDate: tempdtmDate.value,
+    lngCharger: tempEmpId.value,
+    lngType: 3,
+    lngAtndType: 0,
+    lngCode: "",
+    lngStoreGroup: selectedGroup.value,
+    lngStoreCode: selectedStores.value,
+    strETime: "00:00",
+    strSTime: "00:00",
+    strWTime: "",
+  });
+  addRow.value = !addRow.value;
+};
+
+const tempAtndType = ref(false);
+
+const tempAtndType1 = ref("");
+const tempsTime = ref("");
+const tempeTime = ref("");
+const tempLngCode = ref("");
+const clickedRowData2 = (e) => {
+  console.log(e);
+  tempAtndType.value = true;
+  tempAtndType1.value = e[0];
+  tempsTime.value = e[1];
+  tempeTime.value = e[2];
+  tempLngCode.value = e[4];
+};
+
+const deleteRow = ref(false);
+const deleterows = ref([]);
+const deleteButton = () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "조회를 먼저 해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (tempEmpId.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "추가하실 스케쥴을 먼저 선택해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (tempAtndType.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "삭제하실 스케쥴을 먼저 선택해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  rowData3.value = rowData3.value.filter(
+    (item) =>
+      item.lngCharger != tempEmpId.value &&
+      item.dtmDate != tempdtmDate.value &&
+      item.lngAtndType != tempAtndType1.value &&
+      item.strSTime != tempsTime.value &&
+      item.strETime != tempeTime.value
+  );
+
+  deleterows.value.push({
+    lngStoreGroup: selectedGroup.value,
+    lngStoreCode: selectedStores.value,
+    lngCode: tempLngCode.value,
+    dtmDate: tempdtmDate.value,
+    lngType: 3,
+    lngCharger: tempEmpId.value,
+  });
+  deleteRow.value = !deleteRow.value;
+};
+
+const updatedrowdata2 = ref([]);
+const updatedRowData2 = (e) => {
+  console.log(e);
+  rowData3.value = rowData3.value.filter(
+    (item) =>
+      item.lngCharger != tempEmpId.value && item.dtmDate != tempdtmDate.value
+  );
+
+  for (let i = 0; i < e.length; i++) {
+    rowData3.value.push({
+      dtmDate: tempdtmDate.value,
+      lngCharger: tempEmpId.value,
+      lngType: 3,
+      lngAtndType: e[i].lngAtndType,
+      lngCode: e[i].lngCode || "0",
+      lngStoreGroup: selectedGroup.value,
+      lngStoreCode: selectedStores.value,
+      strETime: e[i].strETime,
+      strSTime: e[i].strSTime,
+      strWTime: e[i].strWTime,
+      updated: true,
+    });
+  }
+
+  console.log(
+    rowData3.value.filter(
+      (item) => item.lngType == 3 && item.lngCharger == "169107"
+    )
+  );
+  updatedrowdata2.value = e;
 };
 </script>
