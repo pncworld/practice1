@@ -193,8 +193,8 @@
           :addRow5="addRow"
           :deleteRow6="deleteRow"
           :notsoftDelete="true"
-          :addrowDefault="'0,00:00,00:00,,'"
-          :addrowProp="'lngAtndType,strSTime,strETime,strWTime'"
+          :addrowDefault="addrowDefault"
+          :addrowProp="'lngAtndType,strSTime,strETime,strWTime,lngCode,lngCharger'"
           :mergeColumnGroupName2="['확정']"
           :mergeColumnGroupSubList2="[
             ['lngAtndType', 'strSTime', 'strETime', 'strWTime'],
@@ -390,58 +390,85 @@ const saveButton = async (e) => {
     return;
   }
   try {
-    store.state.loading = true;
+    await Swal.fire({
+      title: "저장",
+      text: "저장 하시겠습니까?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "저장",
+      cancelButtonText: "취소",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        store.state.loading = true;
 
-    const lngCodes = rowData3.value
-      .filter((item) => item.updated == true)
-      .map((item) => item.lngCode)
-      .join("\u200b");
-    const dtmDates = rowData3.value
-      .filter((item) => item.updated == true)
-      .map((item) => item.dtmDate)
-      .join("\u200b");
-    const lngChargers = rowData3.value
-      .filter((item) => item.updated == true)
-      .map((item) => item.lngCharger)
-      .join("\u200b");
-    const AtndTypes = rowData3.value
-      .filter((item) => item.updated == true)
-      .map((item) => item.lngAtndType)
-      .join("\u200b");
-    const stimes = rowData3.value
-      .filter((item) => item.updated == true)
-      .map((item) => item.strSTime)
-      .join("\u200b");
-    const etimes = rowData3.value
-      .filter((item) => item.updated == true)
-      .map((item) => item.strETime)
-      .join("\u200b");
+        const lngCodes = rowData3.value
+          .filter((item) => item.updated == true)
+          .map((item) => item.lngCode)
+          .join("\u200b");
+        const dtmDates = rowData3.value
+          .filter((item) => item.updated == true)
+          .map((item) => item.dtmDate)
+          .join("\u200b");
+        const lngChargers = rowData3.value
+          .filter((item) => item.updated == true)
+          .map((item) => item.lngCharger)
+          .join("\u200b");
+        const AtndTypes = rowData3.value
+          .filter((item) => item.updated == true)
+          .map((item) => item.lngAtndType)
+          .join("\u200b");
+        const stimes = rowData3.value
+          .filter((item) => item.updated == true)
+          .map((item) => item.strSTime)
+          .join("\u200b");
+        const etimes = rowData3.value
+          .filter((item) => item.updated == true)
+          .map((item) => item.strETime)
+          .join("\u200b");
 
-    const lngCodes2 = deleterows.value
-      .map((item) => item.lngCode)
-      .join("\u200b");
-    const dtmDate2 = deleterows.value
-      .map((item) => item.dtmDate)
-      .join("\u200b");
-    const lngChargers2 = deleterows.value
-      .map((item) => item.lngCharger)
-      .join("\u200b");
-    const res = await saveWorkDetail(
-      selectedGroup.value,
-      selectedStores.value,
-      lngCodes,
-      dtmDates,
-      3,
-      lngChargers,
-      AtndTypes,
-      stimes,
-      etimes,
-      lngCodes2,
-      dtmDate2,
-      lngChargers2
-    );
+        const lngCodes2 = deleterows.value
+          .map((item) => item.lngCode)
+          .join("\u200b");
+        const dtmDate2 = deleterows.value
+          .map((item) => item.dtmDate)
+          .join("\u200b");
+        const lngChargers2 = deleterows.value
+          .map((item) => item.lngCharger)
+          .join("\u200b");
+        const res = await saveWorkDetail(
+          selectedGroup.value,
+          selectedStores.value,
+          lngCodes,
+          dtmDates,
+          3,
+          lngChargers,
+          AtndTypes,
+          stimes,
+          etimes,
+          lngCodes2,
+          dtmDate2,
+          lngChargers2
+        );
 
-    console.log(res);
+        if (res.data.RESULT_CD == "00") {
+          await Swal.fire({
+            title: "성공",
+            text: "저장을 완료하였습니다.",
+            icon: "success",
+            confirmButtonText: "확인",
+          });
+        } else {
+          await Swal.fire({
+            title: "실패",
+            text: "저장에 실패하였습니다.",
+            icon: "error",
+            confirmButtonText: "확인",
+          });
+        }
+      }
+    });
+
+    //console.log(res);
 
     store.state.loading = false;
   } catch (error) {
@@ -534,6 +561,8 @@ const clickedRowData = (e) => {
 };
 
 const addRow = ref(false);
+
+const addrowDefault = ref("0,00:00,00:00,,,");
 const addButton = () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -545,7 +574,7 @@ const addButton = () => {
     return;
   }
 
-  if (tempEmpId.value == false) {
+  if (tempEmpId.value == "") {
     Swal.fire({
       title: "경고",
       text: "추가하실 스케쥴을 먼저 선택해주세요.",
@@ -560,13 +589,15 @@ const addButton = () => {
     lngCharger: tempEmpId.value,
     lngType: 3,
     lngAtndType: 0,
-    lngCode: "",
+    lngCode: "0",
     lngStoreGroup: selectedGroup.value,
     lngStoreCode: selectedStores.value,
     strETime: "00:00",
     strSTime: "00:00",
     strWTime: "",
   });
+
+  addrowDefault.value = "0,00:00,00:00,,0" + "," + tempEmpId.value;
   addRow.value = !addRow.value;
 };
 
@@ -627,20 +658,24 @@ const deleteButton = () => {
       item.strETime != tempeTime.value
   );
 
-  deleterows.value.push({
-    lngStoreGroup: selectedGroup.value,
-    lngStoreCode: selectedStores.value,
-    lngCode: tempLngCode.value,
-    dtmDate: tempdtmDate.value,
-    lngType: 3,
-    lngCharger: tempEmpId.value,
-  });
+  if (tempLngCode.value != "0" || tempLngCode.value != undefined) {
+    deleterows.value.push({
+      lngStoreGroup: selectedGroup.value,
+      lngStoreCode: selectedStores.value,
+      lngCode: tempLngCode.value,
+      dtmDate: tempdtmDate.value,
+      lngType: 3,
+      lngCharger: tempEmpId.value,
+    });
+  }
+
   deleteRow.value = !deleteRow.value;
 };
 
 const updatedrowdata2 = ref([]);
 const updatedRowData2 = (e) => {
   console.log(e);
+  console.log(tempEmpId.value);
   rowData3.value = rowData3.value.filter(
     (item) =>
       item.lngCharger != tempEmpId.value && item.dtmDate != tempdtmDate.value
