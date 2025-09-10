@@ -1118,7 +1118,7 @@ const selcetedrowData = (e) => {
 
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
-  // console.log(posNo.value);
+  console.log(posNo.value);
   //comsole.log(nowStoreAreaCd.value);
   if (
     nowStoreAreaCd.value != undefined &&

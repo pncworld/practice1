@@ -47,6 +47,7 @@
           setStoreAreaCd($event.target.value);
           setPosNo($event.target.value);
           setKioskNo($event.target.value);
+          setTablePosNo($event.target.value);
           setScreenNo2($event.target.value);
         ">
         <option value="0">{{ defaultStoreNm }}</option>
@@ -627,7 +628,7 @@ const setKioskNo = async (value) => {
   try {
     response = await getKioskList(storeGroup.value[0].lngStoreGroup, value);
 
-    //comsole.log(storePosNo.value);
+    console.log(response);
   } catch (error) {
   } finally {
     storeKioskNo.value = response.data.pos;
@@ -640,8 +641,7 @@ const setTablePosNo = async (value) => {
   if (value == undefined || storeGroup.value.length == 0) return;
   try {
     response = await getTablePosList(storeGroup.value[0].lngStoreGroup, value);
-
-    //comsole.log(storePosNo.value);
+    console.log(response);
   } catch (error) {
   } finally {
     storeTablePosNo.value = response.data.tablePos;

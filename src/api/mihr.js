@@ -512,6 +512,39 @@ export const getUnContractEmpList = (
   });
 };
 
+export const getPersonnelStatus = (
+  groupCd,
+  storeCd,
+  chargerNo,
+  startDate,
+  endDate,
+  reporttype,
+) => {
+  return api2.post("/MIHR/HR04_002RPT.asmx/getPersonnelStatus", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    CHARGER_NO: chargerNo,
+    START_DATE: startDate,
+    END_DATE: endDate,
+    REPORT_TYPE: reporttype,
+  });
+};
+
+export const getConfirmStatus = (
+  groupCd,
+  storeCd,
+  startMonth,
+  endMonth,
+  chargerNm,
+) => {
+  return api2.post("/MIHR/HR04_009RPT.asmx/getConfirmStatus", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    START_MONTH: startMonth,
+    END_MONTH: endMonth,
+    CHARGER_NM: chargerNm,
+  });
+};
 export const getWorkEmpList = (
   groupCd,
   storecd,
