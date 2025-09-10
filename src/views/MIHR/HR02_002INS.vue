@@ -133,7 +133,10 @@
             'strRWTime',
             'strRRTime',
           ]"
-          :rowStateeditable="false">
+          :rowStateeditable="false"
+          :exporttoExcel="exporttoExcel"
+          :documentTitle="'HR02_002INS'"
+          :documentSubTitle="documentSubTitle">
         </Realgrid>
       </div>
       <div class="h-full w-full">
@@ -212,15 +215,7 @@
 
 <script setup>
 import { getInitEmpInfo } from "@/api/miattend";
-import {
-  getWorkEmpList,
-  getWorkTypeList,
-  saveWorkDetail,
-  saveWorkShift,
-  saveWorkShiftDetail,
-  updateWorkShift,
-  updateWorkShiftDetail,
-} from "@/api/mihr";
+import { getWorkEmpList, getWorkTypeList, saveWorkDetail } from "@/api/mihr";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -245,7 +240,6 @@ import Realgrid from "@/components/realgrid.vue";
  *  */
 
 import { insertPageLog } from "@/customFunc/customFunc";
-import { es } from "date-fns/locale";
 /**
  *  경고창 호출 라이브러리
  *  */
@@ -674,8 +668,6 @@ const deleteButton = () => {
 
 const updatedrowdata2 = ref([]);
 const updatedRowData2 = (e) => {
-  console.log(e);
-  console.log(tempEmpId.value);
   rowData3.value = rowData3.value.filter(
     (item) =>
       item.lngCharger != tempEmpId.value && item.dtmDate != tempdtmDate.value
@@ -697,11 +689,28 @@ const updatedRowData2 = (e) => {
     });
   }
 
-  console.log(
-    rowData3.value.filter(
-      (item) => item.lngType == 3 && item.lngCharger == "169107"
-    )
-  );
   updatedrowdata2.value = e;
+};
+
+const exporttoExcel = ref(false);
+const documentSubTitle = ref("");
+const excelButton = () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "조회를 먼저 해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  documentSubTitle.value =
+    "매장명 :" +
+    selectedStoreNm.value +
+    "\n 기간 : " +
+    sdate.value +
+    "~" +
+    edate.value;
+  exporttoExcel.value = !exporttoExcel.value;
 };
 </script>

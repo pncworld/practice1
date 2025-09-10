@@ -513,7 +513,7 @@ onMounted(() => {
   setStoreAreaCd(store.state.userData.lngPosition);
   setKioskNo(store.state.userData.lngPosition);
   setTablePosNo(store.state.userData.lngPosition);
-  
+
   if (
     store.state.userData.blnBrandAdmin == "True" ||
     store.state.userData.lngPositionType == "1"
