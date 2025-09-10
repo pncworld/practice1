@@ -1,6 +1,6 @@
 <!-- /*--############################################################################
-# Filename : HR02_001INS.vue                                                   
-# Description : 인사관리 > 근태 관리 > 스케쥴 등록                           
+# Filename : HR02_003INS.vue                                                   
+# Description : 인사관리 > 근태 관리 > 급여확정                           
 # Date :2025-09-09                                                              
 # Author : 권맑음                     
 ################################################################################*/ -->
@@ -13,88 +13,92 @@
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="saveButton" class="button save w-auto">저장</button>
-        <button @click="draftButton" class="button save w-auto">기안</button>
-        <button @click="copyButton" class="button copy w-auto">복사</button>
-        <button @click="excelButton" class="button save w-auto">엑셀</button>
-        <button @click="saveButton2" class="button save w-auto">
-          근무계약적용
+        <button @click="saveButton" class="button save w-auto">근태확정</button>
+        <button @click="cancelButton" class="button save w-auto">
+          확정취소
         </button>
+        <button @click="cancelButton2" class="button copy w-auto">
+          전표취소
+        </button>
+        <button @click="excelButton" class="button save w-auto">엑셀</button>
       </div>
     </div>
     <div
-      class="grid grid-cols-3 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10 justify-center">
+      class="grid grid-cols-4 grid-rows-1 bg-gray-200 rounded-lg h-16 items-center z-10 justify-center">
       <div class="ml-12">
         <PickStoreRenew
           @storeNm="storeNm"
           @lngStoreGroup="lngStoreGroup"
           @lngStoreCode="lngStoreCode"></PickStoreRenew>
       </div>
-      <div class="flex space-x-5 text-nowrap items-center">
-        <Datepicker2 :mainName="'기간'"></Datepicker2>
-        <label for="cond"
-          ><input type="checkbox" id="cond" />휴무일 자동지정</label
-        >
-        <label for="cond2"
-          ><input type="checkbox" id="cond2" />근무조 자동지정</label
-        >
+      <div class="flex space-x-5 text-nowrap items-center ml-48">
+        <div class="font-semibold text-base">해당월</div>
+        <div>
+          <select name="" id="" class="w-32 h-8 border border-black">
+            <option value="2030">2030</option>
+            <option value="2029">2029</option>
+            <option value="2028">2028</option>
+            <option value="2027">2027</option>
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2022">2022</option>
+            <option value="2021">2021</option>
+            <option value="2020">2020</option>
+          </select>
+        </div>
+        <div>
+          <select name="" id="" class="w-14 h-8 border border-black">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+          </select>
+        </div>
       </div>
-      <div class="ml-56">
-        <select name="" id="" class="border border-black w-48 h-8"></select>
+      <div class="flex items-center space-x-5 ml-28">
+        <div class="font-semibold text-base">사원 구분</div>
+        <select name="" id="" class="border border-black w-48 h-8">
+          <option value="0">전체</option>
+          <option value="1">정직원</option>
+          <option value="2">PT</option>
+        </select>
+      </div>
+      <div class="flex items-center space-x-5">
+        <div class="font-semibold text-base">사원명/사원코드</div>
+        <div><input type="text" class="border border-black h-8 w-48" /></div>
       </div>
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
-    <div
-      class="grid grid-rows-1 grid-cols-[5fr,2fr] w-[99%] h-[80vh] space-x-3">
-      <div class="w-full h-[85%] space-y-1 mt-2">
-        <Realgrid
-          :progname="'HR01_006INS_VUE'"
-          :progid="1"
-          :rowData="rowData"
-          :reload="reload"
-          @clickedRowData="clickedRowData"
-          @updatedRowData="updatedRowData"
-          :addRow4="addRow4"
-          @allStateRows="allStateRows"
-          :addrowProp="'checkbox,lngCode,lngStoreCode,lngStoreGroup,storeName,strWorkGupName'"
-          :addrowDefault="addrowDefault"
-          :editableColId="'strWorkGupName'"
-          :setStateBar="false"
-          :checkRowAuto="false"
-          :checkRenderEditable="true"
-          :rowStateeditable="false"
-          :dynamicRowHeight="true">
-        </Realgrid>
-      </div>
-      <div class="w-full h-[85%] space-y-1 mt-2">
-        <div class="h-[40%]">
-          <Realgrid
-            :progname="'HR02_001INS_VUE'"
-            :progid="2"
-            :rowData="filteredrowData2"
-            :reload="reload"
-            :checkRowAuto="false"
-            :addRow4="addRow5"
-            @clickedRowData="clickedRowData2"
-            @updatedRowData="updatedRowData2"
-            :addrowProp="'checkbox,strSTime,strETime,strWTime,lngCode,lngWorkGroupCode,lngStoreGroup,lngStoreCode,rowStated'"
-            :addrowDefault="addrowDefault2"
-            :checkRenderEditable="true"
-            :editableColId="'strSTime,strETime'"
-            :setStateBar="false"
-            :autoPlusColumn="true"
-            :rowStateeditable="false"
-            :dynamicRowHeight="true">
-          </Realgrid>
-        </div>
-        <div class="bg-blue-800 text-white flex justify-center">
-          일메모 등록
-        </div>
-        <div class="border border-black h-[55%]">
-          <textarea name="" id="" class="h-full w-full"></textarea>
-        </div>
-      </div>
+    <div class="h-[75vh] flex justify-center mt-2">
+      <Realgrid
+        :progname="'HR01_006INS_VUE'"
+        :progid="1"
+        :rowData="rowData"
+        :reload="reload"
+        @clickedRowData="clickedRowData"
+        @updatedRowData="updatedRowData"
+        :addRow4="addRow4"
+        @allStateRows="allStateRows"
+        :addrowProp="'checkbox,lngCode,lngStoreCode,lngStoreGroup,storeName,strWorkGupName'"
+        :addrowDefault="addrowDefault"
+        :editableColId="'strWorkGupName'"
+        :setStateBar="false"
+        :checkRowAuto="false"
+        :checkRenderEditable="true"
+        :rowStateeditable="false"
+        :dynamicRowHeight="true">
+      </Realgrid>
     </div>
   </div>
   <!-- 그리드 영역 -->

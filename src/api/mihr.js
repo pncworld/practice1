@@ -545,3 +545,62 @@ export const getConfirmStatus = (
     CHARGER_NM: chargerNm,
   });
 };
+export const getWorkEmpList = (
+  groupCd,
+  storecd,
+  sdate,
+  edate,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5
+) => {
+  return api2.post("/MIHR/HR02_002INS.asmx/getWorkEmpList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    SDATE: sdate,
+    EDATE: edate,
+    NAME: cond,
+    ROLE: cond2,
+    RANK: cond3,
+    WORKPLACE: cond4,
+    ORDER: cond5,
+  });
+};
+
+export const getWorkTypeList = (groupCd) => {
+  return api2.post("/MIHR/HR02_002INS.asmx/getWorkTypeList", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const saveWorkDetail = (
+  groupCd,
+  storecd,
+  lngcode,
+  dtmdate,
+  lngtype,
+  charger,
+  atndtype,
+  stime,
+  etime,
+  lngcode2,
+  dtmdate2,
+  lngcharger2
+) => {
+  return api2.post("/MIHR/HR02_002INS.asmx/saveWorkDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    LNGCODE: lngcode,
+    DTMDATE: dtmdate,
+    LNGTYPE: lngtype,
+    CHARGER: charger,
+    ATNDTYPE: atndtype,
+    STIME: stime,
+    ETIME: etime,
+    LNGCODE2: lngcode2,
+    DTMDATE2: dtmdate2,
+    CHARGER2: lngcharger2,
+  });
+};

@@ -6,6 +6,8 @@ import HR01_006INS from "@/views/MIHR/HR01_006INS.vue";
 import HR04_002RPT from "@/views/MIHR/HR04_002RPT.vue";
 import HR02_001INS from "@/views/MIHR/HR02_001INS.vue";
 import HR04_009RPT from "@/views/MIHR/HR04_009RPT.vue";
+import HR02_003INS from "@/views/MIHR/HR02_003INS.vue";
+import HR02_002INS from "@/views/MIHR/HR02_002INS.vue";
 
 export default function mihrRouter() {
   return [
@@ -40,6 +42,14 @@ export default function mihrRouter() {
     {
       path: "HR04_009RPT.xml",
       component: HR04_009RPT,
+    },
+    {
+      path: "HR02_003INS.xml",
+      component: HR02_003INS,
+    },
+    {
+      path: "HR02_002INS.xml",
+      component: HR02_002INS,
     },
   ];
 }

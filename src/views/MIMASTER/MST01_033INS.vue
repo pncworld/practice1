@@ -1403,10 +1403,10 @@ const clickedRowData = async (newvalue) => {
   }
   try {
     const response = await axios.get(
-      `https://www.pncapi.kr/MenuImage/Image/${fileName.value}`
+      `https://www.pncapi.kr/MenuImage/Image/${fileName.value}?v=${Date.now()}`
     );
     await nextTick();
-    //comsole.log(response);
+    console.log(response);
     uploadImage.value.name = newvalue[31];
     fileSize.value = response.headers["content-length"];
 
@@ -1929,7 +1929,7 @@ const saveButton = () => {
 
         const formData = new FormData();
 
-        let storecode = "0";
+        let storecode = nowStoreCd.value;
         if (store.state.userData.lngCommonMenu == "1") {
           storecode = groupCd.value;
         }
@@ -1946,7 +1946,7 @@ const saveButton = () => {
             String(existedName).padStart(10, 0) +
             ".jpg";
 
-          // //console.log(newFileName);
+          console.log(newFileName);
           const newFile = new File([file], newFileName, { type: file.type });
           formData.append(`file${index}`, newFile);
         });
@@ -2222,7 +2222,7 @@ const handleFileUpload = async (e) => {
     return;
   }
   fileName2.value = e.target.files[0].name;
-  ////console.log(fileName2.value);
+  console.log(fileName2.value);
   changeColid.value = "strUserFileName";
   changeValue2.value = fileName2.value;
   //comsole.log(changeValue2.value);
