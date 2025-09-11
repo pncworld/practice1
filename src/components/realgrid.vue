@@ -6,7 +6,7 @@
 import { getGridInfoList } from "@/api/common";
 import { getDynamicGrid2, getDynamicGrid3 } from "@/api/master";
 import { getDynamicGrid4 } from "@/api/micrm";
-import { getDynamicGrid5 } from "@/api/mihr";
+import { getDynamicGrid5, getDynamicGrid6 } from "@/api/mihr";
 import { getDynamicGrid } from "@/api/misales";
 import {
   excelTitle,
@@ -949,6 +949,16 @@ const props = defineProps({
     type: String,
     default: "2025-09-01",
   },
+  setDynamicGrid6: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
+  setDynamicGrid6Cond: {
+    // 행높이
+    type: String,
+    default: "9999",
+  },
   initCheckRows: {
     // 행높이
     type: Array,
@@ -1587,7 +1597,10 @@ const funcshowGrid = async () => {
             //   "lngErrorCode"
             // );
 
-            if (dataCell.value == "휴무" || dataCell.value == "교") {
+            if (
+              dataCell.value == "휴무" ||
+              (dataCell.value.length == 1 && isNaN(parseInt(dataCell.value)))
+            ) {
               ret.style = { backgroundColor: "#D3D3D3" };
             }
 
@@ -2536,6 +2549,7 @@ const funcshowGrid = async () => {
 
     updatedrowData.value = [...dataProvider.getJsonRows()];
     emit("updatedRowData", updatedrowData.value);
+    emit("allStateRows", dataProvider.getAllStateRows());
   };
 
   gridView.onItemChecked = function (grid, itemIndex, checked) {
@@ -2588,11 +2602,11 @@ const funcshowGrid = async () => {
     gridView.commit();
     updatedrowData.value = [...dataProvider.getJsonRows()];
 
-    emit("updatedRowData", updatedrowData.value);
+    // emit("updatedRowData", updatedrowData.value);
     const a = updatedrowData.value.filter((item) => item.checkbox == true);
     // selectedRowData.value = []
 
-    emit("allStateRows", dataProvider.getAllStateRows());
+    //emit("allStateRows", dataProvider.getAllStateRows());
     //emit("checkedRowData", a);
   };
 
@@ -2831,7 +2845,7 @@ watch(
 watch(
   () => props.changeNow2,
   () => {
-    //comsole.log(props.changeRow);
+    console.log(props.changeNow2);
 
     if (props.changeRow !== "" && props.changeRow != -1) {
       if (
@@ -3700,10 +3714,19 @@ onMounted(async () => {
         props.setDynamicGrid5Cond,
         props.setDynamicGrid5Cond2
       );
-      console.log(res);
+
       if (res.data.List.length > 0) {
         tabInitSetArray.value.push(...res.data.List);
       }
+    }
+
+    if (props.setDynamicGrid6 == true) {
+      const res = await getDynamicGrid6(props.setDynamicGrid6Cond);
+
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+      console.log(res);
     }
 
     // 동적 스타일 생성
@@ -3790,7 +3813,15 @@ const setupGrid = async () => {
         props.setDynamicGrid5Cond,
         props.setDynamicGrid5Cond2
       );
-      ////console.log(res);
+
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+    }
+
+    if (props.setDynamicGrid6 == true) {
+      const res = await getDynamicGrid6(props.setDynamicGrid6Cond);
+
       if (res.data.List.length > 0) {
         tabInitSetArray.value.push(...res.data.List);
       }
