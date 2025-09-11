@@ -27,26 +27,27 @@
         @startYear="startYear"
         @excelDate="excelDate">
       </Datepicker3>
-      <!-- <div
-        class="flex items-center text-base text-nowrap font-semibold pl-12 mt-3">
-        조회조건
+      <div class="flex items-center text-base text-nowrap font-semibold pl-16">
+        사원명
         <div>
-          <label for="sum" class="font-normal"
-            ><input
-              type="checkbox"
-              id="sum"
+          <label for="sum" class="font-normal">
+            <input
               class="ml-5"
-              @change="seeSum" />합계</label
-          >
+              type="text"
+              id="chargerNm"
+              v-model="chargerNm"
+              @input="onChargerInput">
+          </label>
         </div>
-      </div> -->
+      </div>
     </div>
     <div class="flex items-start">
       <PickStorePlural
         @lngStoreCodes="lngStoreCodes"
         @lngStoreGroup="lngStoreGroup"
         @lngStoreAttrs="lngStoreAttrs"
-        @excelStore="excelStore">
+        @excelStore="excelStore"
+        >
       </PickStorePlural>
     </div>
     <div></div>
@@ -60,8 +61,9 @@
       :rowData="rowData"
       :reload="reload"
       :setFooter="true"
-      :setGroupFooter="setGroupFooter"
-      :setGroupColumnId="'strStoreName'"
+      :setFooterColID="setFooterColID"
+      :setFooterExpressions="setFooterExpressions"
+      :timeColumns="['strPWTime','strPWWeekAvg', 'strRWTime', 'strRWWeekAvg', 'strRGapTime', 'strRGapTimeAvg', 'strEWTime', 'strEWWeekAvg', 'strEGapTime', 'strEGapTimeAvg']"
       :documentTitle="'HR04_009RPT'"
       :documentSubTitle="documentSubTitle"
       :exporttoExcel="exportExcel"
@@ -128,7 +130,42 @@ onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 });
 
-const setGroupFooter = ref(false);
+const setFooterColID = ref([
+   "strStoreName"
+  ,"strArea"
+  ,"strWorkCls"
+  ,"lngEmpID"
+  ,"strChargerName"
+  ,"strPWTime"
+  ,"strPWWeekAvg"
+  ,"strRWTime"
+  ,"strRWWeekAvg"
+  ,"strRGapTime"
+  ,"strRGapTimeAvg"
+  ,"strEWTime"
+  ,"strEWWeekAvg"
+  ,"strEGapTime"
+  ,"strEGapTimeAvg"
+]);
+
+const setFooterExpressions = ref([
+   "custom"
+  ,"custom"
+  ,"custom"
+  ,"custom"
+  ,"custom"
+  ,"avg"
+  ,"avg"
+  ,"avg"
+  ,"avg"
+  ,"avg"
+  ,"avg"
+  ,"avg"
+  ,"avg"
+  ,"avg"
+  ,"avg"
+]);
+
 const reload = ref(false);
 const rowData = ref([]);
 const afterSearch = ref(false);
@@ -175,6 +212,13 @@ const endYear = (e) => {
 
 const store = useStore();
 
+const chargerNm = ref("");
+
+function onChargerInput(e) {
+  // console.log("현재 입력값:", e.target.value);
+  initGrid();
+}
+
 /**
  *  조회 함수
  */
@@ -201,6 +245,8 @@ const searchButton = async () => {
     
     reload.value = !reload.value;
     
+    // console.log(chargerNm.value);
+    
     /* 선택한 매출 시작일자 */
     const startMonth = `${selectedstartYear.value}-${String(
       selectedstartMonth.value
@@ -216,10 +262,10 @@ const searchButton = async () => {
       selectedStores.value,
       startMonth,
       endMonth,
-      '젠코',
+      chargerNm.value,
     );
 
-    console.log(res);
+    // console.log(res);
 
     rowData.value = res.data.confirmStatus;
     afterSearch.value = true;
@@ -234,6 +280,7 @@ const searchButton = async () => {
 const selectedGroup = ref();
 const selectedStores = ref();
 const selectedStoreAttrs = ref();
+
 /**
  * 페이지 매장 그룹 세팅
  */
@@ -283,6 +330,7 @@ const exportExcel = ref(false);
 const selectedExcelStore = ref("");
 const selectedExcelDate = ref("");
 const documentSubTitle = ref("");
+
 /**
  * 엑셀용 매장 세팅 함수
  */
@@ -290,6 +338,7 @@ const documentSubTitle = ref("");
 const excelStore = (e) => {
   selectedExcelStore.value = e;
 };
+
 /**
  * 엑셀용 일자 세팅 함수
  */
@@ -297,6 +346,7 @@ const excelStore = (e) => {
 const excelDate = (e) => {
   selectedExcelDate.value = e;
 };
+
 /**
  * 엑셀 내보내기 함수
  */

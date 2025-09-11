@@ -513,6 +513,11 @@ const props = defineProps({
     type: Array,
     default: [],
   },
+  timeColumns: {
+    // 푸터 표현식
+    type: Array,
+    default: [],
+  },
   setFooterColID: {
     //  푸터 표현식을 설정할 컬럼명
     type: Array,
@@ -1004,11 +1009,6 @@ const props = defineProps({
     type: Array,
     default: [],
   },
-  setCellStyleColId2: {
-    // 체크박스 해제만 되는 설정
-    type: Array,
-    default: [],
-  },
 });
 
 // 2구간
@@ -1134,7 +1134,7 @@ const funcshowGrid = async () => {
 
           if (cetime < 0) {
             cstime -= 1;
-            cetime = 60 + cetime;
+            cetime = -cetime;
           }
           return (
             String(cstime).padStart(2, "0") +
@@ -1374,6 +1374,114 @@ const funcshowGrid = async () => {
           : "#,##0",
       suffix: props.suffixColumnPercent.includes(item.strColID) ? "%" : "",
       valueCallback: function (grid, column, footerIndex, columnFooter, value) {
+
+        // "시:분" 문자열 평균 계산
+        if (
+          props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)] ===
+            "avg" &&
+          props.timeColumns.includes(item.strColID) // 👉 시간 평균을 계산할 컬럼ID만 지정
+        ) {
+          const cnt = grid.getItemCount();
+          if (cnt === 0) return ""; // 조회 전 초기화 상태 -> 빈칸
+
+          // secondsMode: true이면 MM:SS(분:초) 입력 처리, false이면 HH:MM(시:분)
+          const secondsMode = props.timeColumnsSeconds && props.timeColumnsSeconds.includes(item.strColID);
+
+          // 총 초(정수) 합계
+          let totalSeconds = 0;
+          let rowCount = 0;
+
+          for (let i = 0; i < cnt; i++) {
+            let raw = grid.getValue(i, item.strColID);
+            if (raw === null || raw === undefined) continue;
+            let str = String(raw).trim();
+            if (str === "") continue;
+
+            // 부호 처리
+            let sign = 1;
+            if (str.startsWith("-")) {
+              sign = -1;
+              str = str.substring(1);
+            } else if (str.startsWith("+")) {
+              str = str.substring(1);
+            }
+
+            const parts = str.split(":").map(p => p === "" ? NaN : Number(p));
+
+            if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+              // HH:MM:SS 형태
+              const hh = parts[0], mm = parts[1], ss = parts[2];
+              totalSeconds += sign * (hh * 3600 + mm * 60 + ss);
+              rowCount++;
+            } else if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+              if (secondsMode) {
+                // MM:SS -> 초 단위
+                const mm = parts[0], ss = parts[1];
+                totalSeconds += sign * (mm * 60 + ss);
+              } else {
+                // HH:MM -> 초 단위
+                const hh = parts[0], mm = parts[1];
+                totalSeconds += sign * (hh * 3600 + mm * 60);
+              }
+              rowCount++;
+            } else {
+              // 포맷 이상하면 무시
+              continue;
+            }
+          }
+
+          if (rowCount === 0) return ""; // 계산 대상 없음
+
+          // === 정수 기반 반올림 (부호 고려, 반올림: half-up) ===
+          // secondsMode: 평균을 "초 단위"로 반올림
+          // minutesMode: 평균을 "분 단위"로 반올림(그 후 HH:MM으로 표현)
+          if (secondsMode) {
+            // 반올림 기준: 분모 = rowCount
+            // round(totalSeconds / rowCount) 안전 구현:
+            //   if totalSeconds >= 0: floor((2*totalSeconds + rowCount) / (2*rowCount))
+            //   else:                 ceil ((2*totalSeconds - rowCount) / (2*rowCount))
+            let roundedSeconds;
+            if (totalSeconds >= 0) {
+              roundedSeconds = Math.floor((2 * totalSeconds + rowCount) / (2 * rowCount));
+            } else {
+              roundedSeconds = Math.ceil((2 * totalSeconds - rowCount) / (2 * rowCount));
+            }
+
+            if (roundedSeconds === 0) return "00:00"; // 0 -> "00:00" (사인 없음)
+
+            const signStr = roundedSeconds < 0 ? "-" : "+";
+            const absSec = Math.abs(roundedSeconds);
+            const mm = Math.floor(absSec / 60);
+            const ss = absSec % 60;
+
+            return `${signStr}${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
+          } else {
+            // minutesMode: 반올림 대상 단위 = 분 (즉 초를 분으로 나눈 값의 반올림)
+            // 안전 정수식:
+            //   denom = rowCount * 60
+            //   if totalSeconds >=0: floor( (totalSeconds + rowCount*30) / (rowCount*60) )
+            //   else:                ceil ( (totalSeconds - rowCount*30) / (rowCount*60) )
+            // 위 식은 half-up 기준의 반올림(부호 고려)을 정수 연산으로 수행
+            const denom = rowCount * 60;
+            let roundedMinutes;
+            if (totalSeconds >= 0) {
+              roundedMinutes = Math.floor((totalSeconds + rowCount * 30) / denom);
+            } else {
+              roundedMinutes = Math.ceil((totalSeconds - rowCount * 30) / denom);
+            }
+
+            if (roundedMinutes === 0) return "00:00";
+
+            const signStr = roundedMinutes < 0 ? "-" : "";
+            const absMin = Math.abs(roundedMinutes);
+            const hh = Math.floor(absMin / 60);
+            const mm = absMin % 60;
+
+            return `${signStr}${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
+          }
+
+        }
+
         if (
           props.customFooterCalculate != "" &&
           props.customFooterCalculate == item.strColID
@@ -1548,124 +1656,7 @@ const funcshowGrid = async () => {
           : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
     },
     buttonVisibility: "always",
-    styleCallback: props.setCellStyleColId2.includes(item.strColID) // 하드코딩
-      ? function (grid, dataCell) {
-          // 시간값에 따라서 배경 색상 지정
-          var ret = {};
-          ////console.log(item.strColID);
-          const value = grid.getValue(dataCell.index.itemIndex, "lngErrorCode");
-          if (
-            item.strColID == "strPSTime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPSTime") {
-            ret.style = { backgroundColor: "#8EE0FF" };
-          } else if (
-            item.strColID == "strPETime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPETime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strPTTime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPTTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strPWTime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPWTime") {
-            ret.style = { backgroundColor: "#BDFFCF" };
-          } else if (
-            item.strColID == "strPRTime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPRTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strWSTime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWSTime") {
-            ret.style = { backgroundColor: "#8EE0FF" };
-          } else if (
-            item.strColID == "strWETime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWETime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strWTTime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWTTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strWWTime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWWTime") {
-            ret.style = { backgroundColor: "#BDFFCF" };
-          } else if (
-            item.strColID == "strWRTime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWRTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strRSTime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRSTime") {
-            ret.style = { backgroundColor: "#8EE0FF" };
-          } else if (
-            item.strColID == "strRETime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRETime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strRTTime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRTTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strRWTime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRWTime") {
-            ret.style = { backgroundColor: "#BDFFCF" };
-          } else if (
-            item.strColID == "strRRTime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRRTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          }
-          //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
-          //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
-
-          return ret;
-        }
-      : props.setCellStyleColId.includes(item.strColID)
+    styleCallback: props.setCellStyleColId.includes(item.strColID)
       ? function (grid, dataCell) {
           // 시간값에 따라서 배경 색상 지정
           var ret = {};
@@ -2078,7 +2069,23 @@ const funcshowGrid = async () => {
         );
       }
 
+      console.log(
+        "colID:",
+        item.strColID,
+        "groupIndex:",
+        groupIndex,
+        "innerIndex:",
+        innerIndex
+      );
+
       if (groupIndex !== -1) {
+        console.log(
+          "상위그룹:",
+          groupList3[groupIndex],
+          "중간그룹:",
+          groupList2[groupIndex][innerIndex]
+        );
+
         if (
           groupList3[groupIndex] == undefined &&
           groupList2[groupIndex][innerIndex] != undefined
@@ -2096,18 +2103,28 @@ const funcshowGrid = async () => {
               column: item.strColID,
               width: item.intHdWidth,
             });
-          } else {
+          } else if (
+            groupList3[groupIndex] != undefined &&
+            groupList2[groupIndex][innerIndex] != undefined
+          ) {
             const findit = layout.find(
-              (item) => item.name == groupList2[groupIndex][innerIndex]
+              (item) => item.name == groupList3[groupIndex]
             );
             if (findit == undefined) {
               layout.push({
-                name: groupList2[groupIndex][innerIndex],
+                name: groupList3[groupIndex],
                 direction: "horizontal",
                 header: {
                   styleName: `header-style-0`,
                 },
-                items: [{ column: item.strColID, width: item.intHdWidth }],
+                items: [
+                  {
+                    name: groupList2[groupIndex][innerIndex],
+                    direction: "horizontal",
+                    header: { styleName: "header-style-0" },
+                    items: [{ column: item.strColID, width: item.intHdWidth }],
+                  },
+                ],
               });
             } else {
               const findit2 = findit.items.find(
@@ -2119,51 +2136,6 @@ const funcshowGrid = async () => {
               });
             }
           }
-        } else if (
-          groupList3[groupIndex] != undefined &&
-          groupList2[groupIndex][innerIndex] != undefined
-        ) {
-          if (layout.find((item) => item.name == groupList3[groupIndex])) {
-            const findit = layout.find(
-              (item) => item.name == groupList3[groupIndex]
-            );
-
-            if (
-              findit.items.find(
-                (i) => i.name == groupList2[groupIndex][innerIndex]
-              )
-            ) {
-              let middleGroup = findit.items.find(
-                (i) => i.name == groupList2[groupIndex][innerIndex]
-              );
-
-              middleGroup.items.push({
-                column: item.strColID,
-                width: item.intHdWidth,
-              });
-            } else {
-              findit.items.push({
-                name: groupList2[groupIndex][innerIndex],
-                direction: "horizontal",
-                header: { styleName: "header-style-0" },
-                items: [{ column: item.strColID, width: item.intHdWidth }],
-              });
-            }
-          } else {
-            layout.push({
-              name: groupList3[groupIndex],
-              direction: "horizontal",
-              header: { styleName: "header-style-0" },
-              items: [
-                {
-                  name: groupList2[groupIndex][innerIndex],
-                  direction: "horizontal",
-                  header: { styleName: "header-style-0" },
-                  items: [{ column: item.strColID, width: item.intHdWidth }],
-                },
-              ],
-            });
-          }
         }
       } else {
         layout.push({
@@ -2173,11 +2145,10 @@ const funcshowGrid = async () => {
           width: item.intHdWidth,
         });
       }
-      console.log(layout);
-      gridView.setColumnLayout(layout);
     });
+    console.log(layout);
+    gridView.setColumnLayout(layout);
   }
-
   /* 3단 예시
   [
       {
