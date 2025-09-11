@@ -518,7 +518,7 @@ export const getPersonnelStatus = (
   chargerNo,
   startDate,
   endDate,
-  reporttype,
+  reporttype
 ) => {
   return api2.post("/MIHR/HR04_002RPT.asmx/getPersonnelStatus", {
     GROUP_CD: groupCd,
@@ -535,7 +535,7 @@ export const getConfirmStatus = (
   storeCd,
   startMonth,
   endMonth,
-  chargerNm,
+  chargerNm
 ) => {
   return api2.post("/MIHR/HR04_009RPT.asmx/getConfirmStatus", {
     GROUP_CD: groupCd,
@@ -602,5 +602,28 @@ export const saveWorkDetail = (
     LNGCODE2: lngcode2,
     DTMDATE2: dtmdate2,
     CHARGER2: lngcharger2,
+  });
+};
+
+export const getInitScheduleData = (groupCd, storeCd) => {
+  return api2.post("/MIHR/HR02_001INS.asmx/getInitScheduleData", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+
+export const getDynamicGrid5 = (sdate, edate) => {
+  return api2.post("/MIHR/HR02_001INS.asmx/getDynamicGrid5", {
+    SDATE: sdate,
+    EDATE: edate,
+  });
+};
+
+export const getEmpScheduleList = (groupCd, storeCd, sdate, edate) => {
+  return api2.post("/MIHR/HR02_001INS.asmx/getEmpScheduleList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
   });
 };

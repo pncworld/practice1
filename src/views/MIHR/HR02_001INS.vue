@@ -14,12 +14,9 @@
           조회
         </button>
         <button @click="saveButton" class="button save w-auto">저장</button>
-        <button @click="draftButton" class="button save w-auto">기안</button>
+
         <button @click="copyButton" class="button copy w-auto">복사</button>
-        <button @click="excelButton" class="button save w-auto">엑셀</button>
-        <button @click="saveButton2" class="button save w-auto">
-          근무계약적용
-        </button>
+        <button @click="excelButton" class="button excel w-auto">엑셀</button>
       </div>
     </div>
     <div
@@ -27,65 +24,106 @@
       <div class="ml-12">
         <PickStoreRenew
           @storeNm="storeNm"
+          :placeholderName="'선택'"
           @lngStoreGroup="lngStoreGroup"
           @lngStoreCode="lngStoreCode"></PickStoreRenew>
       </div>
-      <div class="flex space-x-5 text-nowrap items-center">
-        <Datepicker2 :mainName="'기간'"></Datepicker2>
+      <div class="flex space-x-5 text-nowrap items-center ml-16">
+        <Datepicker2
+          :mainName="'기간'"
+          @endDate="endDate"
+          @startDate="startDate"></Datepicker2>
+      </div>
+      <div
+        class="ml-1 flex space-x-5 justify-center items-center border border-black bg-zinc-300 w-[100%] rounded-lg h-12">
         <label for="cond"
-          ><input type="checkbox" id="cond" />휴무일 자동지정</label
+          ><input
+            type="radio"
+            id="cond"
+            name="cond"
+            v-model="cond"
+            value="1" />휴무일 자동지정</label
         >
         <label for="cond2"
-          ><input type="checkbox" id="cond2" />근무조 자동지정</label
+          ><input
+            type="radio"
+            id="cond2"
+            name="cond"
+            v-model="cond"
+            value="2" />근무조 자동지정</label
         >
-      </div>
-      <div class="ml-56">
-        <select name="" id="" class="border border-black w-48 h-8"></select>
+        <label for="cond3"
+          ><input
+            type="radio"
+            id="cond3"
+            name="cond"
+            v-model="cond"
+            value="3" />미지정</label
+        >
+        <select
+          name=""
+          id=""
+          class="border border-black w-48 h-8"
+          v-model="cond2">
+          <option :value="i.lngCode" v-for="i in optionList">
+            {{ i.strWorkGupName }}
+          </option>
+        </select>
       </div>
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
     <div
       class="grid grid-rows-1 grid-cols-[5fr,2fr] w-[99%] h-[80vh] space-x-3">
-      <div class="w-full h-[85%] space-y-1 mt-2">
+      <div class="w-full h-[90%] space-y-1 mt-2">
         <Realgrid
-          :progname="'HR01_006INS_VUE'"
+          :progname="'HR02_001INS_VUE'"
           :progid="1"
           :rowData="rowData"
           :reload="reload"
           @clickedRowData="clickedRowData"
-          @updatedRowData="updatedRowData"
-          :addRow4="addRow4"
-          @allStateRows="allStateRows"
-          :addrowProp="'checkbox,lngCode,lngStoreCode,lngStoreGroup,storeName,strWorkGupName'"
-          :addrowDefault="addrowDefault"
-          :editableColId="'strWorkGupName'"
-          :setStateBar="false"
-          :checkRowAuto="false"
-          :checkRenderEditable="true"
-          :rowStateeditable="false"
-          :dynamicRowHeight="true">
+          @clickedButtonCol="clickedButtonCol"
+          @selectedIndex="selectedIndex"
+          :selectionStyle="'block'"
+          :setCellStyleColId3="true"
+          :setDynamicGrid5="true"
+          :dynamicRowHeight="true"
+          :fixedColumn="true"
+          :changeValue2="changeValue2"
+          :changeNow2="changeNow2"
+          :changeColid="changeColid"
+          :changeRow="changeRow"
+          :setDynamicGrid5Cond="setDynamicGrid5Cond"
+          :setDynamicGrid5Cond2="setDynamicGrid5Cond2">
         </Realgrid>
       </div>
       <div class="w-full h-[85%] space-y-1 mt-2">
+        <div
+          class="flex items-center space-x-3 border border-black bg-slate-300 rounded-lg h-10 justify-center">
+          <select name="" id="" class="border border-black w-48 h-8">
+            <option :value="i.lngCode" v-for="i in optionList">
+              {{ i.strWorkGupName }}
+            </option>
+          </select>
+          <label for="scond"
+            ><input type="checkbox" id="scond" />휴무일 자동지정</label
+          >
+          <div class="space-x-5">
+            <button class="whitebutton bg-white">신규</button>
+            <button class="whitebutton bg-white">삭제</button>
+          </div>
+        </div>
         <div class="h-[40%]">
           <Realgrid
             :progname="'HR02_001INS_VUE'"
             :progid="2"
-            :rowData="filteredrowData2"
-            :reload="reload"
-            :checkRowAuto="false"
-            :addRow4="addRow5"
-            @clickedRowData="clickedRowData2"
-            @updatedRowData="updatedRowData2"
-            :addrowProp="'checkbox,strSTime,strETime,strWTime,lngCode,lngWorkGroupCode,lngStoreGroup,lngStoreCode,rowStated'"
-            :addrowDefault="addrowDefault2"
-            :checkRenderEditable="true"
-            :editableColId="'strSTime,strETime'"
-            :setStateBar="false"
-            :autoPlusColumn="true"
+            :rowData="filteredRowData2"
+            :labelsData="labelsData"
+            :valuesData="valuesData"
             :rowStateeditable="false"
-            :dynamicRowHeight="true">
+            :editableColId="'strETime,strSTime,lngAtndType'"
+            :CalculateTimeColId="'strWorkTime'"
+            :labelingColumns="'lngAtndType'">
           </Realgrid>
         </div>
         <div class="bg-blue-800 text-white flex justify-center">
@@ -104,7 +142,10 @@
 import {
   deleteWorkShifts,
   deleteWorkShifts2,
+  getEmpScheduleList,
+  getInitScheduleData,
   getWorkShiftList,
+  getWorkTypeList,
   saveWorkShift,
   saveWorkShiftDetail,
   updateWorkShift,
@@ -133,7 +174,7 @@ import Realgrid from "@/components/realgrid.vue";
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog } from "@/customFunc/customFunc";
+import { formatLocalDate, insertPageLog } from "@/customFunc/customFunc";
 /**
  *  경고창 호출 라이브러리
  *  */
@@ -153,29 +194,76 @@ import { useStore } from "vuex";
  * 	화면 Load시 실행 스크립트
  */
 
+const optionList = ref([]);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
+  const res = await getWorkTypeList(store.state.userData.lngStoreGroup);
+
+  console.log(res);
+
+  labelsData.value = [res.data.List.map((item) => item.strName)];
+  valuesData.value = [res.data.List.map((item) => item.lngCode)];
 });
 
 const reload = ref(false);
 const rowData = ref([]);
 const rowData2 = ref([]);
-const filteredrowData2 = ref([]);
+const filteredRowData2 = ref([]);
 const rowData3 = ref([]);
 const afterSearch = ref(false);
 const clickedRow = ref(false);
-const clickedLngCode = ref();
+const labelsData = ref([]);
+const valuesData = ref([]);
+
+const tempCharger = ref("");
 const clickedRowData = (e) => {
-  filteredrowData2.value = rowData2.value.filter(
-    (item) => item.lngWorkGroupCode == e[3]
+  console.log(e);
+  tempCharger.value = e[9];
+  //filteredRowData2.value = rowData2.value.filter(item => item.lngCharger == e[9] && item.)
+};
+const cond2 = ref(0);
+const changeColid = ref("");
+const changeValue2 = ref("");
+const changeRow = ref("");
+const changeNow2 = ref(false);
+
+const selectedIndex = (e) => {
+  changeRow.value = e;
+};
+const clickedButtonCol = (e) => {
+  const count = parseInt(e.slice(1));
+
+  const today = new Date(sdate.value);
+  console.log(today);
+  console.log(count);
+  today.setDate(today.getDate() + count);
+  console.log(today);
+  const cdate = formatLocalDate(today);
+  console.log(cdate);
+  filteredRowData2.value = rowData2.value.filter(
+    (item) => item.lngCharger == tempCharger.value && item.dtmDate == cdate
   );
-  TimeArray.value = filteredrowData2.value.map((item) => [
-    Number(item.strSTime.split(":")[0]),
-    Number(item.strETime.split(":")[0]),
-  ]);
-  ////console.log(TimeArray.value);
-  clickedLngCode.value = e[3];
-  clickedRow.value = true;
+  console.log(filteredRowData2.value);
+
+  changeColid.value = e;
+  if (cond.value == "3") {
+    return;
+  }
+  const filteredOption = optionList.value
+    .filter((item) => item.lngCode == cond2.value)[0]
+    .strWorkGupName.slice(0, 5);
+  const filteredOption2 = optionList.value
+    .filter((item) => item.lngCode == cond2.value)[0]
+    .strWorkGupName.slice(6, 11);
+  console.log(cond.value);
+  if (cond.value == "2") {
+    changeValue2.value = filteredOption + filteredOption2;
+  } else if (cond.value == "1") {
+    changeValue2.value = "휴무";
+  }
+
+  changeNow2.value = !changeNow2.value;
 };
 
 const clickedRowData2 = (e) => {
@@ -227,7 +315,7 @@ const allStateRows = (e) => {
 
   ////console.log(rowData1State.value);
 };
-const cond = ref("");
+const cond = ref(3);
 const TimeArray = ref([]);
 const store = useStore();
 const status = ref(99);
@@ -264,24 +352,44 @@ const searchButton = async () => {
   try {
     store.state.loading = true;
     initGrid();
-
-    const res = await getWorkShiftList(
+    reload.value = !reload.value;
+    const res = await getEmpScheduleList(
       selectedGroup.value,
-      selectedStores.value
+      selectedStores.value,
+      sdate.value,
+      edate.value
     );
-    ////console.log(res);
-    rowData.value = res.data.List;
-    rowData2.value = res.data.List2;
-    rowData3.value = res.data.List3;
-    updatedRow.value = JSON.parse(JSON.stringify(res.data.List));
-    updatedRow2.value = JSON.parse(JSON.stringify(res.data.List2));
-    // TimeArray.value = rowData2.value.map(item => Number(item.strSTime))
-    // TimeArray.value = rowData2.value.map(item => Number(item.strETime))
+    console.log(res);
+    rowData.value = res.data.List4;
+    let tempRowData = res.data.List4;
 
+    let tempMergeRowData = res.data.List;
+    for (let i = 0; i < tempRowData.length; i++) {
+      const tempCharger = tempRowData[i].lngSequence;
+
+      console.log(tempCharger);
+      const filterData = tempMergeRowData.filter(
+        (item) => item.lngCharger == tempCharger
+      );
+      for (let j = 1; j <= filterData.length; j++) {
+        const findit = rowData.value.find(
+          (item) => item.lngSequence == tempCharger
+        );
+        findit[`G${j}`] =
+          filterData[j - 1].strAlias != ""
+            ? filterData[j - 1].strAlias
+            : filterData[j - 1].lngOffyn == "1"
+            ? "휴무"
+            : filterData[j - 1].strSTime + filterData[j - 1].strETime;
+      }
+    }
+
+    rowData.value = [...rowData.value];
+    rowData2.value = res.data.List2;
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    //comsole.log(error);
+    console.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -432,6 +540,15 @@ const addRow5 = ref(false);
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
+
+  const res = await getInitScheduleData(store.state.userData.lngStoreGroup, e);
+  //console.log(res);
+  optionList.value = res.data.List;
+
+  if (optionList.value.length > 0) {
+    cond2.value = optionList.value[0].lngCode;
+  }
+
   ////console.log(e);
 };
 const lngStoreGroup = async (e) => {
@@ -456,9 +573,6 @@ const initGrid = () => {
   }
   if (rowData3.value.length > 0) {
     rowData3.value = [];
-  }
-  if (filteredrowData2.value.length > 0) {
-    filteredrowData2.value = [];
   }
 
   afterSearch.value = false;
@@ -603,7 +717,19 @@ const deleteButton2 = async () => {
   });
 };
 
-const selectedExcelDate = ref("");
+const setDynamicGrid5Cond2 = ref("");
 
-const selectedExcelStore = ref("");
+const setDynamicGrid5Cond = ref("");
+
+const sdate = ref("");
+const edate = ref("");
+const startDate = (e) => {
+  setDynamicGrid5Cond.value = e;
+  sdate.value = e;
+};
+
+const endDate = (e) => {
+  setDynamicGrid5Cond2.value = e;
+  edate.value = e;
+};
 </script>

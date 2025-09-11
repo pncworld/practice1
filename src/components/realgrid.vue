@@ -6,6 +6,7 @@
 import { getGridInfoList } from "@/api/common";
 import { getDynamicGrid2, getDynamicGrid3 } from "@/api/master";
 import { getDynamicGrid4 } from "@/api/micrm";
+import { getDynamicGrid5 } from "@/api/mihr";
 import { getDynamicGrid } from "@/api/misales";
 import {
   excelTitle,
@@ -938,6 +939,21 @@ const props = defineProps({
     type: String,
     default: "0",
   },
+  setDynamicGrid5: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
+  setDynamicGrid5Cond: {
+    // 행높이
+    type: String,
+    default: "2025-09-01",
+  },
+  setDynamicGrid5Cond2: {
+    // 행높이
+    type: String,
+    default: "2025-09-01",
+  },
   initCheckRows: {
     // 행높이
     type: Array,
@@ -1008,6 +1024,16 @@ const props = defineProps({
     // 체크박스 해제만 되는 설정
     type: Array,
     default: [],
+  },
+  setCellStyleColId2: {
+    // 체크박스 해제만 되는 설정
+    type: Array,
+    default: [],
+  },
+  setCellStyleColId3: {
+    // HR02_001INS 색상 설정용
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -1656,69 +1682,213 @@ const funcshowGrid = async () => {
           : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
     },
     buttonVisibility: "always",
-    styleCallback: props.setCellStyleColId.includes(item.strColID)
-      ? function (grid, dataCell) {
-          // 시간값에 따라서 배경 색상 지정
-          var ret = {};
-          ////console.log(item.strColID);
-          //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
-          //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
+    styleCallback:
+      props.setCellStyleColId3 == true
+        ? function (grid, dataCell) {
+            // 시간값에 따라서 배경 색상 지정
 
-          dataCell.value == "1"
-            ? (ret.style = { backgroundColor: "#ADD8E6", color: "#ADD8E6" })
-            : (ret.style = { backgroundColor: "#FFFFFF", color: "#FFFFFF" });
+            var ret = {};
 
-          return ret;
-        }
-      : props.ColCellRedColorColId.includes(item.strColID)
-      ? function (grid, dataCell) {
-          var ret = {};
-          ret.style = { color: "#FF0000" };
-          return ret;
-        }
-      : function (grid, dataCell) {
-          var ret = {};
+            if (dataCell.dataColumn.header.text.includes("토")) {
+              ret.style = { backgroundColor: "#ADD8E6" };
+            } else if (dataCell.dataColumn.header.text.includes("/일")) {
+              ret.style = { backgroundColor: "#FFC0CB" };
+            }
 
-          if (
-            (dataCell.item.rowState == "created" ||
-              dataCell.item.itemState == "appending" ||
-              dataCell.item.itemState == "inserting") &&
-            props.rowStateeditable
-          ) {
-            ret.editable = true;
-          } else if (props.editableColId.includes(item.strColID)) {
-            ret.editable = true;
-          } else if (
-            props.rowStateeditable == true &&
-            dataCell.item.itemState == "normal"
-          ) {
-            ret.editable = true;
-          } else {
-            ret.editable = false;
+            //  const value = grid.getValue(
+            //   dataCell.index.itemIndex,
+            //   "lngErrorCode"
+            // );
+
+            if (dataCell.value == "휴무" || dataCell.value == "교") {
+              ret.style = { backgroundColor: "#D3D3D3" };
+            }
+
+            return ret;
           }
-
-          if (props.checkBarInactive != "") {
-            var inActiveColumn = grid.getValue(
+        : props.setCellStyleColId2.includes(item.strColID) // 하드코딩
+        ? function (grid, dataCell) {
+            // 시간값에 따라서 배경 색상 지정
+            var ret = {};
+            ////console.log(item.strColID);
+            const value = grid.getValue(
               dataCell.index.itemIndex,
-              props.checkBarInactive
+              "lngErrorCode"
             );
+            if (
+              item.strColID == "strPSTime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPSTime") {
+              ret.style = { backgroundColor: "#8EE0FF" };
+            } else if (
+              item.strColID == "strPETime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPETime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strPTTime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPTTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strPWTime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPWTime") {
+              ret.style = { backgroundColor: "#BDFFCF" };
+            } else if (
+              item.strColID == "strPRTime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPRTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strWSTime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWSTime") {
+              ret.style = { backgroundColor: "#8EE0FF" };
+            } else if (
+              item.strColID == "strWETime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWETime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strWTTime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWTTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strWWTime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWWTime") {
+              ret.style = { backgroundColor: "#BDFFCF" };
+            } else if (
+              item.strColID == "strWRTime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWRTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strRSTime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRSTime") {
+              ret.style = { backgroundColor: "#8EE0FF" };
+            } else if (
+              item.strColID == "strRETime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRETime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strRTTime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRTTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strRWTime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRWTime") {
+              ret.style = { backgroundColor: "#BDFFCF" };
+            } else if (
+              item.strColID == "strRRTime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRRTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            }
+            //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
+            //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
+
+            return ret;
+          }
+        : props.setCellStyleColId.includes(item.strColID)
+        ? function (grid, dataCell) {
+            // 시간값에 따라서 배경 색상 지정
+            var ret = {};
+            ////console.log(item.strColID);
+            //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
+            //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
+
+            dataCell.value == "1"
+              ? (ret.style = { backgroundColor: "#ADD8E6", color: "#ADD8E6" })
+              : (ret.style = { backgroundColor: "#FFFFFF", color: "#FFFFFF" });
+
+            return ret;
+          }
+        : props.ColCellRedColorColId.includes(item.strColID)
+        ? function (grid, dataCell) {
+            var ret = {};
+            ret.style = { color: "#FF0000" };
+            return ret;
+          }
+        : function (grid, dataCell) {
+            var ret = {};
 
             if (
-              inActiveColumn == "0" &&
-              (item.strColID == "checkbox" ||
-                item.strDisplay.includes("checkbox"))
+              (dataCell.item.rowState == "created" ||
+                dataCell.item.itemState == "appending" ||
+                dataCell.item.itemState == "inserting") &&
+              props.rowStateeditable
             ) {
-              ret.style = { opacity: "0.5" };
-              ret.renderer = { type: "check", editable: false };
+              ret.editable = true;
+            } else if (props.editableColId.includes(item.strColID)) {
+              ret.editable = true;
+            } else if (
+              props.rowStateeditable == true &&
+              dataCell.item.itemState == "normal"
+            ) {
+              ret.editable = true;
+            } else {
+              ret.editable = false;
             }
-            if (item.strColID == "lngSupplierID") {
-              ret.style = { opacity: "0.5" };
-              ret.renderer = { type: "check", editable: false };
-            }
-          }
 
-          return ret;
-        },
+            if (props.checkBarInactive != "") {
+              var inActiveColumn = grid.getValue(
+                dataCell.index.itemIndex,
+                props.checkBarInactive
+              );
+
+              if (
+                inActiveColumn == "0" &&
+                (item.strColID == "checkbox" ||
+                  item.strDisplay.includes("checkbox"))
+              ) {
+                ret.style = { opacity: "0.5" };
+                ret.renderer = { type: "check", editable: false };
+              }
+              if (item.strColID == "lngSupplierID") {
+                ret.style = { opacity: "0.5" };
+                ret.renderer = { type: "check", editable: false };
+              }
+            }
+
+            return ret;
+          },
   }));
 
   if (props.labelingColumns != "") {
@@ -1787,7 +1957,7 @@ const funcshowGrid = async () => {
       }
     }
   }
-  ////console.log(columns);
+
   gridView.setColumns(columns);
   // 4구간
   if (props.setRowStyleCalls) {
@@ -3618,6 +3788,16 @@ onMounted(async () => {
         tabInitSetArray.value.push(...res.data.List);
       }
     }
+    if (props.setDynamicGrid5 == true) {
+      const res = await getDynamicGrid5(
+        props.setDynamicGrid5Cond,
+        props.setDynamicGrid5Cond2
+      );
+      console.log(res);
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+    }
 
     // 동적 스타일 생성
     let styleContent = "";
@@ -3691,6 +3871,17 @@ const setupGrid = async () => {
       const res = await getDynamicGrid4(
         store.state.userData.lngStoreGroup,
         props.setDynamicGrid4Cond
+      );
+      ////console.log(res);
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+    }
+
+    if (props.setDynamicGrid5 == true) {
+      const res = await getDynamicGrid5(
+        props.setDynamicGrid5Cond,
+        props.setDynamicGrid5Cond2
       );
       ////console.log(res);
       if (res.data.List.length > 0) {
