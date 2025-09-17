@@ -120,6 +120,9 @@
         :mergeColumns2="true"
         :setDynamicGrid6="true"
         :fixedColumn="true"
+        :documentTitle="'HR02_003INS'"
+        :documentSubTitle="documentSubTitle"
+        :exporttoExcel="exporttoExcel"
         :setDynamicGrid6Cond="setDynamicGrid6Cond">
       </Realgrid>
     </div>
@@ -129,16 +132,10 @@
 
 <script setup>
 import {
-  deleteWorkShifts,
-  deleteWorkShifts2,
+  cancelWorkConfirm,
   getEmpPayList,
-  getWorkShiftList,
-  saveWorkShift,
-  saveWorkShiftDetail,
-  updateWorkShift,
-  updateWorkShiftDetail,
+  setFinalWorkConfirm,
 } from "@/api/mihr";
-import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -270,9 +267,16 @@ const searchButton = async () => {
         (item) => item.lngCode == list3[i].lngPayItemCode
       );
 
-      const total = columnindex.filter(
-        (item) => item.lngItemCls == list3[i].lngPayItemCls
-      ).length;
+      let total = 0;
+      for (var j = 0; j < parseInt(list3[i].lngPayItemCls); j++) {
+        if (list3[i].lngPayItemCode != "0") {
+          total += columnindex.filter(
+            (item) => item.lngItemCls == j + 1
+          ).length;
+        }
+      }
+
+      //console.log((parseInt(list3[i].lngPayItemCls) - 1) * 10 + 16 + total);
       if (fintindex != -1) {
         const findit = rowData.value.find(
           (item) => item.lngCharger == list3[i].lngCharger
@@ -318,6 +322,29 @@ const saveButton = async (e) => {
   try {
     store.state.loading = true;
 
+    const res = await setFinalWorkConfirm(
+      selectedGroup.value,
+      selectedStores.value,
+      cond.value + "-" + cond2.value + "-01"
+    );
+
+    console.log(res);
+
+    if (res.data.RESULT_CD == "00") {
+      await Swal.fire({
+        title: "성공",
+        text: "근태확정이 되었습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+    } else {
+      await Swal.fire({
+        title: "실패",
+        text: `${res.data.RESULT_NM}`,
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+    }
     store.state.loading = false;
   } catch (error) {
   } finally {
@@ -325,12 +352,56 @@ const saveButton = async (e) => {
     searchButton();
   }
 };
+
+const cancelButton = async (e) => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "조회를 먼저 해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  try {
+    store.state.loading = true;
+
+    const res = await cancelWorkConfirm(
+      selectedGroup.value,
+      selectedStores.value,
+      cond.value + "-" + cond2.value + "-01"
+    );
+
+    console.log(res);
+
+    if (res.data.RESULT_CD == "00") {
+      await Swal.fire({
+        title: "성공",
+        text: "근태취소가 완료 되었습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+    } else {
+      await Swal.fire({
+        title: "실패",
+        text: `${res.data.RESULT_NM}`,
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+    }
+    store.state.loading = false;
+  } catch (error) {
+  } finally {
+    store.state.loading = false;
+    searchButton();
+  }
+};
+
 /* 매장 컴포넌트 관련 함수 */
 const selectedGroup = ref();
 const selectedStores = ref();
 const selectedStoreNm = ref();
-const addRow4 = ref(false);
-const addRow5 = ref(false);
+
 /**
  * 페이지 매장 코드 세팅
  */
@@ -371,13 +442,17 @@ const initGrid = () => {
   afterSearch.value = false;
 };
 
-const addrowDefault = ref("");
-const addrowDefault2 = ref("");
-
-const newlngCode = ref("신규");
-const newlngCode2 = ref(1);
-
-const selectedExcelDate = ref("");
-
-const selectedExcelStore = ref("");
+const exporttoExcel = ref(false);
+const documentSubTitle = ref("");
+const excelButton = () => {
+  documentSubTitle.value =
+    "매장명 : " +
+    selectedStoreNm.value +
+    "\n" +
+    "년월 :" +
+    cond.value +
+    "-" +
+    cond2.value;
+  exporttoExcel.value = !exporttoExcel.value;
+};
 </script>

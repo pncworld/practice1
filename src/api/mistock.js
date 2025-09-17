@@ -364,3 +364,160 @@ export const getStockCheckLossByUpdate = (groupCd, storeCd, loss) => {
     LOSSNO: loss,
   });
 };
+
+export const getLossMasterPartList = (groupCd, storeCd) => {
+  return api2.post("/MISTOCK/STKN06_013INS.asmx/getLossMasterPartList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+
+export const getLossMasterListbyPart = (
+  groupCd,
+  storeCd,
+  part,
+  sdate,
+  edate
+) => {
+  return api2.post("/MISTOCK/STKN06_013INS.asmx/getLossMasterListbyPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    PART: part,
+    SDATE: sdate,
+    EDATE: edate,
+  });
+};
+
+export const getLossStockDetailbyPart = (groupCd, storeCd, lossno) => {
+  return api2.post("/MISTOCK/STKN06_013INS.asmx/getLossStockDetailbyPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LOSS_NO: lossno,
+  });
+};
+
+export const updateLossMasterDetailbyPart = (
+  groupCd,
+  storeCd,
+  lossNo,
+  itemids,
+  losscodes,
+  qtys,
+  seq
+) => {
+  return api2.post("/MISTOCK/STKN06_013INS.asmx/updateLossMasterDetailbyPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LOSS_NO: lossNo,
+    ITEM_IDS: itemids,
+    QTYS: qtys,
+    LOSS_CD: losscodes,
+    SEQ: seq,
+  });
+};
+
+export const saveLossMasterbyPart = (
+  groupCd,
+  storeCd,
+  date,
+  itemids,
+  qtys,
+  losscodes,
+  seq,
+  cond,
+  part
+) => {
+  return api2.post("/MISTOCK/STKN06_013INS.asmx/saveLossMasterbyPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    ITEM_IDS: itemids,
+    QTYS: qtys,
+    LOSS_CD: losscodes,
+    SEQ: seq,
+    COND: cond,
+    PART: part,
+  });
+};
+
+export const getTakeWorkSheetListbyPart = (
+  groupCd,
+  storeCd,
+  master,
+  slave,
+  stocknm,
+  slave2,
+  takedate,
+  partcd,
+  checkall
+) => {
+  return api2.post("/MISTOCK/STKN07_015RPT.asmx/getTakeWorkSheetListbyPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    MASTER: master,
+    SLAVE: slave,
+    STOCKNM: stocknm,
+    SLAVE2: slave2,
+    TDATE: takedate,
+    PARTCD: partcd,
+    CHECKALL: checkall,
+  });
+};
+
+export const getStockTakeCountListbyPart = (
+  groupCd,
+  storeCd,
+  date,
+  cycle,
+  unittype,
+  showtype,
+  part
+) => {
+  return api2.post("/MISTOCK/STKN07_016RPT.asmx/getStockTakeCountListbyPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    CYCLE: cycle,
+    UNITTYPE: unittype,
+    SHOWTYPE: showtype,
+    PART: part,
+  });
+};
+
+export const saveStockTakeCountByPart = (
+  closetype,
+  groupCd,
+  storeCd,
+  date,
+  stockid,
+  takeqty,
+  unittype,
+  partcd
+) => {
+  return api2.post("/MISTOCK/STKN07_016RPT.asmx/saveStockTakeCountByPart", {
+    CLOSETYPE: closetype,
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    STOCKID: stockid,
+    TAKEQTY: takeqty,
+    UNITTYPE: unittype,
+    PART: partcd,
+  });
+};
+
+export const deleteStockTakeByPart = (
+  groupCd,
+  storeCd,
+  date,
+  stockid,
+  partcd
+) => {
+  return api2.post("/MISTOCK/STKN07_016RPT.asmx/deleteStockTakeByPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    STOCKID: stockid,
+    PARTCD: partcd,
+  });
+};

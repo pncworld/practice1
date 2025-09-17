@@ -752,3 +752,19 @@ export const getEmpPayList = (
     USERADMIN: useradmin,
   });
 };
+
+export const setFinalWorkConfirm = (groupcd, storecd, date) => {
+  return api2.post("/MIHR/HR02_003INS.asmx/setFinalWorkConfirm", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    DATE: date,
+  });
+};
+
+export const cancelWorkConfirm = (groupcd, storecd, date) => {
+  return api2.post("/MIHR/HR02_003INS.asmx/cancelWorkConfirm", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    DATE: date,
+  });
+};

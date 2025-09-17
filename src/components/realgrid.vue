@@ -1410,18 +1410,20 @@ const funcshowGrid = async () => {
           : "#,##0",
       suffix: props.suffixColumnPercent.includes(item.strColID) ? "%" : "",
       valueCallback: function (grid, column, footerIndex, columnFooter, value) {
-
         // "시:분" 문자열 평균 계산
         if (
-          props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)] ===
-            "avg" &&
+          props.setFooterExpressions[
+            props.setFooterColID.indexOf(item.strColID)
+          ] === "avg" &&
           props.timeColumns.includes(item.strColID) // 👉 시간 평균을 계산할 컬럼ID만 지정
         ) {
           const cnt = grid.getItemCount();
           if (cnt === 0) return ""; // 조회 전 초기화 상태 -> 빈칸
 
           // secondsMode: true이면 MM:SS(분:초) 입력 처리, false이면 HH:MM(시:분)
-          const secondsMode = props.timeColumnsSeconds && props.timeColumnsSeconds.includes(item.strColID);
+          const secondsMode =
+            props.timeColumnsSeconds &&
+            props.timeColumnsSeconds.includes(item.strColID);
 
           // 총 초(정수) 합계
           let totalSeconds = 0;
@@ -1442,21 +1444,36 @@ const funcshowGrid = async () => {
               str = str.substring(1);
             }
 
-            const parts = str.split(":").map(p => p === "" ? NaN : Number(p));
+            const parts = str
+              .split(":")
+              .map((p) => (p === "" ? NaN : Number(p)));
 
-            if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+            if (
+              parts.length === 3 &&
+              !isNaN(parts[0]) &&
+              !isNaN(parts[1]) &&
+              !isNaN(parts[2])
+            ) {
               // HH:MM:SS 형태
-              const hh = parts[0], mm = parts[1], ss = parts[2];
+              const hh = parts[0],
+                mm = parts[1],
+                ss = parts[2];
               totalSeconds += sign * (hh * 3600 + mm * 60 + ss);
               rowCount++;
-            } else if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+            } else if (
+              parts.length === 2 &&
+              !isNaN(parts[0]) &&
+              !isNaN(parts[1])
+            ) {
               if (secondsMode) {
                 // MM:SS -> 초 단위
-                const mm = parts[0], ss = parts[1];
+                const mm = parts[0],
+                  ss = parts[1];
                 totalSeconds += sign * (mm * 60 + ss);
               } else {
                 // HH:MM -> 초 단위
-                const hh = parts[0], mm = parts[1];
+                const hh = parts[0],
+                  mm = parts[1];
                 totalSeconds += sign * (hh * 3600 + mm * 60);
               }
               rowCount++;
@@ -1478,9 +1495,13 @@ const funcshowGrid = async () => {
             //   else:                 ceil ((2*totalSeconds - rowCount) / (2*rowCount))
             let roundedSeconds;
             if (totalSeconds >= 0) {
-              roundedSeconds = Math.floor((2 * totalSeconds + rowCount) / (2 * rowCount));
+              roundedSeconds = Math.floor(
+                (2 * totalSeconds + rowCount) / (2 * rowCount)
+              );
             } else {
-              roundedSeconds = Math.ceil((2 * totalSeconds - rowCount) / (2 * rowCount));
+              roundedSeconds = Math.ceil(
+                (2 * totalSeconds - rowCount) / (2 * rowCount)
+              );
             }
 
             if (roundedSeconds === 0) return "00:00"; // 0 -> "00:00" (사인 없음)
@@ -1490,7 +1511,9 @@ const funcshowGrid = async () => {
             const mm = Math.floor(absSec / 60);
             const ss = absSec % 60;
 
-            return `${signStr}${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
+            return `${signStr}${String(mm).padStart(2, "0")}:${String(
+              ss
+            ).padStart(2, "0")}`;
           } else {
             // minutesMode: 반올림 대상 단위 = 분 (즉 초를 분으로 나눈 값의 반올림)
             // 안전 정수식:
@@ -1501,9 +1524,13 @@ const funcshowGrid = async () => {
             const denom = rowCount * 60;
             let roundedMinutes;
             if (totalSeconds >= 0) {
-              roundedMinutes = Math.floor((totalSeconds + rowCount * 30) / denom);
+              roundedMinutes = Math.floor(
+                (totalSeconds + rowCount * 30) / denom
+              );
             } else {
-              roundedMinutes = Math.ceil((totalSeconds - rowCount * 30) / denom);
+              roundedMinutes = Math.ceil(
+                (totalSeconds - rowCount * 30) / denom
+              );
             }
 
             if (roundedMinutes === 0) return "00:00";
@@ -1513,9 +1540,10 @@ const funcshowGrid = async () => {
             const hh = Math.floor(absMin / 60);
             const mm = absMin % 60;
 
-            return `${signStr}${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
+            return `${signStr}${String(hh).padStart(2, "0")}:${String(
+              mm
+            ).padStart(2, "0")}`;
           }
-
         }
 
         if (
@@ -2916,6 +2944,7 @@ watch(
   () => props.changeNow,
   () => {
     dataProvider.beginUpdate();
+
     if (props.changeRow !== "" && props.changeRow != -1) {
       dataProvider.setValue(
         props.changeRow,
@@ -2958,6 +2987,7 @@ watch(
       const dataRow = gridView.getCurrent().dataRow;
       selectedRowData.value = dataProvider.getRows()[dataRow];
       // emit("updatedRowData", updatedrowData.value);
+      emit("allStateRows", dataProvider.getAllStateRows());
       emit("updatedRowData2", updatedrowData.value);
     }
   }
@@ -3075,6 +3105,9 @@ watch(
       }
     }
 
+    console.log(props.searchColId3);
+    console.log(filter2);
+    console.log(criteria2);
     if (gridView != undefined) {
       if (props.searchWord3 == "" && props.searchColId3 == []) {
         gridView.setColumnFilters(criteria2[0], []);
