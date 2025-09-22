@@ -107,6 +107,15 @@
         :documentTitle="'STKN07_015RPT'"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
+        :exportExcelHiddenColumns="[
+          'lngStoreCode',
+          'strStockGroupName',
+          'strCategoryName',
+          'strGenericName',
+          'strUnitName',
+          'lngPartCode',
+          'strCloseDt',
+        ]"
         :exporttoExcel="exportExcel">
       </Realgrid>
       <!-- <Realgrid :progname="'SLS05_004RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" 
@@ -329,7 +338,7 @@ const exportExcel = ref(false);
 const excelButton = () => {
   documentSubTitle.value =
     selectedExcelDate.value + "\n" + selectedExcelStore.value;
-  //comsole.log(documentSubTitle.value); // 맑음 소스 pickStorePlural.vue 소스의 excelStore 받아야 함.
+
   // 엑셀 기능 실행
   exportExcel.value = !exportExcel.value;
 };

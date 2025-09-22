@@ -1125,7 +1125,6 @@ import {
   getOperateStoreList,
   getReceiptEventDetail,
   getReceiptEventList2,
-  saveMemberPromotion,
   saveReceiptEvent,
 } from "@/api/micrm";
 /**
@@ -1150,7 +1149,6 @@ import Realgrid from "@/components/realgrid.vue";
  *  */
 
 import { formatLocalDate, insertPageLog } from "@/customFunc/customFunc";
-import { faStoreSlash } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { read, utils } from "xlsx-js-style";
 /**
@@ -2484,7 +2482,8 @@ async function readFileWithArrayBuffer(file) {
   rowData8.value = rows.map((row) => {
     const obj = {};
     header.forEach((key, i) => {
-      obj[key] = row[i];
+      const value = row[i];
+      obj[key] = value[Object.keys(value)[0]];
     });
     return obj;
   });

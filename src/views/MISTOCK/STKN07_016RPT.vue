@@ -133,7 +133,7 @@
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
-    <div class="w-full h-[82%]">
+    <div class="w-full h-[70%]">
       <div class="flex text-red-400 text-nowrap">
         ※월마감인 경우는 실사일자를 반드시 월의 마지막날로 선택해야 합니다.
       </div>
@@ -157,8 +157,120 @@
     </div>
   </div>
   <!-- 그리드 영역 -->
-  <div v-if="open">
-    <div class=""></div>
+  <div
+    v-if="open"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-[60vw] h-[60vh]">
+      <div class="flex justify-between">
+        <h2 class="text-lg font-bold mb-4">실사 재고 시트 업로드</h2>
+        <div class="flex space-x-2">
+          <button
+            class="px-4 py-2 bg-blue-500 text-white rounded"
+            @click="initExcel">
+            초기화
+          </button>
+          <button
+            class="px-4 py-2 bg-blue-500 text-white rounded"
+            @click="saveButton2">
+            저장
+          </button>
+          <button
+            class="px-4 py-2 bg-gray-400 text-white rounded"
+            @click="open = false">
+            닫기
+          </button>
+        </div>
+      </div>
+      <div
+        class="grid grid-rows-2 grid-cols-[1fr,2fr,0.5fr,2fr,1fr,2fr] h-[15%] mt-2">
+        <div
+          class="bg-gray-100 flex justify-center items-center border-l border-t border-black">
+          업로드 파일
+        </div>
+        <div
+          class="flex justify-center items-center border-l border-t border-black space-x-2">
+          <input
+            type="text"
+            class="border border-black h-[80%] w-[70%] disabled:bg-gray-50"
+            disabled
+            v-model="fileNm" />
+          <input
+            type="file"
+            hidden
+            ref="fileInput"
+            accept=".xls,.xlsx"
+            @change="handleFileChange" />
+          <button class="whitebutton" @click="searchFile">찾기</button>
+        </div>
+        <div class="border-l border-t border-black"></div>
+        <div class="border-t border-black"></div>
+        <div
+          class="bg-gray-100 border-l border-t border-black flex justify-center items-center">
+          SHEET 선택
+        </div>
+        <div
+          class="border-t border-l border-r border-black flex justify-center items-center">
+          <select
+            name=""
+            id=""
+            class="w-[80%] h-[80%] border border-black"
+            v-model="excelcond"
+            @change="getExcelFiles">
+            <option :value="i.lngCode" v-for="i in SheetList">
+              {{ i.strName }}
+            </option>
+          </select>
+        </div>
+        <div
+          class="bg-gray-100 border-l border-t border-b border-black flex justify-center items-center">
+          마감일
+        </div>
+        <div
+          class="flex justify-center items-center border-l border-t border-b border-black">
+          <input
+            type="date"
+            class="border border-black w-[80%] h-[80%]"
+            v-model="scond"
+            disabled />
+        </div>
+        <!-- <div
+          class="bg-gray-100 border-l border-t border-black flex justify-center items-center">
+          매장
+        </div> -->
+        <div class="col-span-2 border-l border-t border-b border-black pr-6">
+          <pickStore
+            :mainName="'매장'"
+            :disabledAll="true"
+            :setDynamicStoreClass="'!ml-5 !h-8 !p-0 '"
+            :setDefaultStoreCd="scond2"
+            :hideGroup="false"
+            :hideAttr="false"></pickStore>
+        </div>
+        <div
+          class="bg-gray-100 border-l border-t border-b border-black flex justify-center items-center">
+          파트
+        </div>
+        <div
+          class="flex justify-center items-center border-l border-r border-t border-b border-black">
+          <select
+            name=""
+            id=""
+            v-model="scond3"
+            class="border border-black w-[80%] h-[80%]"
+            disabled>
+            <option :value="i.lngPartCode" v-for="i in optionList">
+              {{ i.strPartName }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="h-[70%] w-full">
+        <Realgrid
+          :progname="'STKN07_016RPT_VUE'"
+          :progid="3"
+          :rowData="rowData2"></Realgrid>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -211,6 +323,8 @@ import {
 } from "@/api/master";
 import Datepicker1 from "@/components/Datepicker1.vue";
 import { useStore } from "vuex";
+import PickStore from "@/components/pickStore.vue";
+import { read, utils, writeXLSX } from "xlsx-js-style";
 
 const optionList = ref([]);
 const optionList2 = ref([]);
@@ -220,6 +334,7 @@ const optionList5 = ref([]);
 
 const reload = ref(false);
 const rowData = ref([]);
+const rowData2 = ref([]);
 const afterSearch = ref(false);
 
 /**
@@ -524,5 +639,159 @@ const deleteButton = async () => {
 const open = ref(false);
 const uploadButton = () => {
   open.value = true;
+};
+
+const fileInput = ref(null);
+const searchFile = () => {
+  fileInput.value.value = null;
+  fileInput.value.click();
+};
+
+const currentFile = ref(null);
+const SheetList = ref([]);
+const fileNm = ref("");
+const excelcond = ref("1");
+const handleFileChange = async (e) => {
+  const file = e.target.files[0];
+
+  fileNm.value = file.name;
+  console.log(file);
+  currentFile.value = file;
+  excelcond.value = 1;
+  SheetList.value = [];
+  if (file) {
+    const arrayBuffer = await file.arrayBuffer();
+    // XLSX 라이브러리에서 arrayBuffer 사용 가능
+    const workbook = read(arrayBuffer, { type: "array" });
+
+    const sheetLength = workbook.SheetNames.length;
+
+    for (let i = 0; i < sheetLength; i++) {
+      SheetList.value.push({ lngCode: i + 1, strName: workbook.SheetNames[i] });
+    }
+
+    const result = await readFileWithArrayBuffer(file);
+    console.log(result);
+  }
+  e.target.value = "";
+};
+
+async function readFileWithArrayBuffer(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  // XLSX 라이브러리에서 arrayBuffer 사용 가능
+  const workbook = read(arrayBuffer, { type: "array" });
+
+  console.log(workbook);
+  const sheetName = workbook.SheetNames[excelcond.value - 1];
+  const sheet = workbook.Sheets[sheetName];
+  const jsonData = utils.sheet_to_json(sheet, {
+    header: [
+      "No",
+      "lngStoreCode",
+      "lngCheck",
+      "strStockGroupName",
+      "strCategoryName",
+      "strGenericName",
+      "lngStockID",
+      "strStockName",
+      "strStandardName",
+      "strUnitName",
+      "dblTakeQty",
+      "lngPartCode",
+      "strCloseDt",
+      "dblPreMonthQty",
+      "dblCheckQty",
+    ],
+    range: 4,
+  }); // 컬럼명 지칭할 헤더row 위치
+
+  console.log(jsonData);
+
+  rowData2.value = JSON.parse(JSON.stringify(jsonData));
+
+  if (rowData2.value.length > 0) {
+    scond.value =
+      rowData2.value[0].strCloseDt.slice(0, 4) +
+      "-" +
+      rowData2.value[0].strCloseDt.slice(4, 6) +
+      "-" +
+      rowData2.value[0].strCloseDt.slice(6, 8);
+
+    scond2.value = rowData2.value[0].lngStoreCode;
+    scond3.value = rowData2.value[0].lngPartCode;
+  }
+  return jsonData;
+}
+
+const getExcelFiles = () => {
+  if (currentFile.value == null || currentFile.value == undefined) {
+    return;
+  }
+  readFileWithArrayBuffer(currentFile.value);
+};
+
+const scond = ref("");
+const scond2 = ref("");
+const scond3 = ref("");
+
+const initExcel = () => {
+  fileNm.value = "";
+  scond.value = "";
+  scond2.value = store.state.userData.lngPosition;
+  scond3.value = "";
+  excelcond.value = "";
+  currentFile.value = "";
+
+  rowData2.value = [];
+};
+
+const saveButton2 = async () => {
+  if (rowData2.value.length == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "업로드할 실사 재고 사항이 없습니다.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  try {
+    const stockids = rowData2.value
+      .map((item) => item.lngStockID)
+      .join("\u200b");
+    const dblTakeQtys = rowData2.value
+      .map((item) => item.dblTakeQty)
+      .join("\u200b");
+    const res = await saveStockTakeCountByPart(
+      "01",
+      store.state.userData.lngStoreGroup,
+      scond2.value,
+      scond.value.replaceAll("-", ""),
+      stockids,
+      dblTakeQtys,
+      5,
+      scond3.value
+    );
+
+    if (res.data.RESULT_CD != "00") {
+      await Swal.fire({
+        title: "실패",
+        text: `${res.data.RESULT_NM}`,
+        icon: "error",
+
+        confirmButtonText: "확인",
+      });
+    } else {
+      await Swal.fire({
+        title: "성공",
+        text: `저장하였습니다.`,
+        icon: "success",
+
+        confirmButtonText: "확인",
+      });
+    }
+    initExcel();
+  } catch (error) {}
 };
 </script>

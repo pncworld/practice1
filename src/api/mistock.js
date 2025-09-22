@@ -521,3 +521,80 @@ export const deleteStockTakeByPart = (
     PARTCD: partcd,
   });
 };
+
+export const getStockResultByPart = (
+  groupCd,
+  storeCd,
+  date,
+  takecycle,
+  unittype,
+  showtype,
+  partcd
+) => {
+  return api2.post("/MISTOCK/STKN07_017RPT.asmx/getStockResultByPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    TAKECYCLE: takecycle,
+    UNITTYPE: unittype,
+    SHOWTYPE: showtype,
+    PARTCD: partcd,
+  });
+};
+
+export const getStockMonthlyInOutListByPart = (
+  groupCd,
+  storeCd,
+  part,
+  month,
+  cate,
+  group,
+  generic,
+  unittype,
+  pricetype,
+  showtype,
+  stockid,
+  stocknm,
+  supplierid,
+  reporttype
+) => {
+  return api2.post(
+    "/MISTOCK/STK08_019RPT.asmx/getStockMonthlyInOutListByPart",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      PART: part,
+      MONTH: month,
+      CATE: cate,
+      GROUP: group,
+      GENERIC: generic,
+      UNITTYPE: unittype,
+      PRICETYPE: pricetype,
+      SHOWTYPE: showtype,
+      STOCKID: stockid,
+      STOCKNM: stocknm,
+      SUPPLIERID: supplierid,
+      REPORTTYPE: reporttype,
+    }
+  );
+};
+
+export const getStockOrderList = (
+  groupCd,
+  storeCd,
+  sdate,
+  edate,
+  supplierid,
+  part,
+  lang
+) => {
+  return api2.post("/MIPUR/PUR03_035INS.asmx/getStockOrderList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    SUPPLIERID: supplierid,
+    PART: part,
+    LANG: lang,
+  });
+};

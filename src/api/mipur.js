@@ -849,3 +849,247 @@ export const copyPurchasePrice = (groupCd, storeCd, storeCds, stockIds) => {
     STOCK_IDS: stockIds,
   });
 };
+
+export const getStockItemListWithFavorite = (
+  groupCd,
+  storeCd,
+  part,
+  div,
+  udate
+) => {
+  return api2.post("/MIPUR/PUR03_035INS.asmx/getStockItemListWithFavorite", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    PART: part,
+    DIV: div,
+    UDATE: udate,
+  });
+};
+
+export const saveFavoriteStockItemBypart = (
+  groupCd,
+  storeCd,
+  stockid,
+  value,
+  part
+) => {
+  return api2.post("/MIPUR/PUR03_035INS.asmx/saveFavoriteStockItemBypart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    STOCKID: stockid,
+    VALUE: value,
+    PART: part,
+  });
+};
+
+export const getCloseDtmDate2 = (groupCd, storeCd, date, generic) => {
+  return api2.post("/MIPUR/PUR03_035INS.asmx/getCloseDtmDate2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    GENERIC: generic,
+  });
+};
+
+export const saveOrderMasterDetailByPart = (
+  groupCd,
+  storeCd,
+  sdate,
+  edate,
+  comment,
+  sequence,
+  interfacediv,
+  supplierid,
+  stockids,
+  qty,
+  unitprice,
+  supply,
+  tax,
+  comment2,
+  partcd
+) => {
+  return api2.post("/MIPUR/PUR03_035INS.asmx/saveOrderMasterDetailByPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    COMMENT: comment,
+    SEQUENCE: sequence,
+    INTERFACE: interfacediv,
+    SUPPLIERID: supplierid,
+    STOCKIDS: stockids,
+    QTY: qty,
+    UNITPRICE: unitprice,
+    SUPPLY: supply,
+    TAX: tax,
+    COMMENT2: comment2,
+    PART: partcd,
+  });
+};
+
+export const getOrderListPartByType = (
+  groupCd,
+  storeCd,
+  sdate,
+  edate,
+  supplierid,
+  stockmaster,
+  detail,
+  name,
+  unittype,
+  part,
+  sequence,
+  ip,
+  stype
+) => {
+  return api2.post("/MIPUR/PUR03_036RPT.asmx/getOrderListPartByType", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    SUPPLIERID: supplierid,
+    STOCKMASTER: stockmaster,
+    DETAIL: detail,
+    NAME: name,
+    UNITTYPE: unittype,
+    PART: part,
+    SEQUENCE: sequence,
+    IP: ip,
+    STYPE: stype,
+  });
+};
+
+export const getPurchaseOrderListByPart = (
+  groupCd,
+  storeCd,
+  part,
+  date,
+  supplier
+) => {
+  return api2.post("/MIPUR/PUR03_037RPT.asmx/getPurchaseOrderListByPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    PART: part,
+    DATE: date,
+    SUPPLIER: supplier,
+  });
+};
+
+export const getStockOrderCheckListByPart = (
+  groupCd,
+  storeCd,
+  part,
+  supplier,
+  sdate,
+  edate,
+  status
+) => {
+  return api2.post("/MIPUR/PUR02_017INS.asmx/getStockOrderCheckListByPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    PART: part,
+    SUPPLIER: supplier,
+    SDATE: sdate,
+    EDATE: edate,
+    STATUS: status,
+  });
+};
+
+export const saveStockCheckMasterDetailByPart = (
+  groupCd,
+  storeCd,
+  date,
+  comments,
+  checktype,
+  empname,
+  partno,
+  supplierid,
+  stockid,
+  checkqty,
+  unitprice,
+  supply,
+  tax,
+  orderno,
+  orderseqs,
+  userid,
+  comments2
+) => {
+  return api2.post(
+    "/MIPUR/PUR02_017INS.asmx/saveStockCheckMasterDetailByPart",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      DATE: date,
+      COMMENTS: comments,
+      CHECKTYPE: checktype,
+      EMPNAME: empname,
+      PARTNO: partno,
+      SUPPLIERID: supplierid,
+      STOCKIDS: stockid,
+      CHECKQTYS: checkqty,
+      UNITPRICES: unitprice,
+      SUPPLYS: supply,
+      TAXS: tax,
+      ORDERNOS: orderno,
+      ORDERSEQS: orderseqs,
+      USERID: userid,
+      COMMENTS2: comments2,
+    }
+  );
+};
+
+export const saveStockCheckedAllByPart = (
+  groupCd,
+  storeCd,
+  part,
+  orderno,
+  date,
+  edate
+) => {
+  return api2.post("/MIPUR/PUR02_017INS.asmx/saveStockCheckedAllByPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    PART: part,
+    ORDERNO: orderno,
+    DATE: date,
+    EDATE: edate,
+  });
+};
+
+export const getStockMasterListByPart = (
+  groupCd,
+  storeCd,
+  part,
+  sdate,
+  edate,
+  supplier,
+  empname
+) => {
+  return api2.post("/MIPUR/PUR02_018INS.asmx/getStockMasterListByPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    PART: part,
+    SDATE: sdate,
+    EDATE: edate,
+    SUPPLIER: supplier,
+    ENAME: empname,
+  });
+};
+
+export const getStockCheckDetail = (
+  groupCd,
+  storeCd,
+  checkno,
+  supplierid,
+  date,
+  lang
+) => {
+  return api2.post("/MIPUR/PUR02_018INS.asmx/getStockCheckDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    CHECKNO: checkno,
+    SUPPLIERID: supplierid,
+    DATE: date,
+    LANG: lang,
+  });
+};
