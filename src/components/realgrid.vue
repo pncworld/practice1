@@ -1035,6 +1035,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+   CalculateShortQty : {
+    // HR02_001INS 색상 설정용
+    type: String,
+    default: '',
+  },
+
 });
 
 // 2구간
@@ -1137,7 +1143,23 @@ const funcshowGrid = async () => {
     //     return values[fieldNames.indexOf(item.strColID)];
     //   }
     // },
-    valueCallback: props.CalculateTaxColId.includes(item.strColID)
+    valueCallback: props.CalculateShortQty.includes(item.strColID) ?
+    function (prod, dataRow, fieldName, fieldNames, values) {
+      let dblResultQty = values[fieldNames.indexOf("dblResultQty")];
+      let dblTakeQty  = values[fieldNames.indexOf("dblTakeQty")];
+      
+      if (dblResultQty > 0)
+      {
+        return parseInt(dblTakeQty) - parseInt(dblResultQty);
+      }
+      else
+      {
+        return parseInt(dblTakeQty) + parseInt(dblResultQty);
+      }
+
+    }
+    
+    : props.CalculateTaxColId.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
           let taxType = values[fieldNames.indexOf("lngTaxType")];
           let supply = values[fieldNames.indexOf("curSupply")];

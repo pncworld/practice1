@@ -627,3 +627,35 @@ export const getEmpScheduleList = (groupCd, storeCd, sdate, edate) => {
     EDATE: edate,
   });
 };
+
+export const getCommuteDeadline = async (groupCd, yearNo) => {
+  return api2.post("/MIHR/HR06_002INS.asmx/getCommuteDeadline", {
+    GROUP_CD : groupCd,
+    YEAR_NO  : yearNo,
+  });
+};
+
+export const setCommuteDeadline = async (
+  groupCd,
+  dtmMonths,
+  strNotes,
+  lngFlags,
+) => {
+  return api2.post("/MIHR/HR06_002INS.asmx/setCommuteDeadline", {
+    GROUP_CD  : groupCd,
+    DTM_MONTH : dtmMonths,
+    STR_NOTE  : strNotes,
+    LNG_FLAG  : lngFlags,
+  });
+};
+
+export const getMonthlyMagamStatus = async (groupCd, attrCd, storeCd, yearNo, monthNo, closeStatus) => {
+  return api2.post("/MIHR/HR06_002INS.asmx/getMonthlyMagamStatus", {
+    GROUP_CD      : groupCd,
+    ATTR_CD       : attrCd,
+    STORE_CD      : storeCd,
+    DTM_YEAR      : yearNo,
+    DTM_MONTH     : monthNo,
+    SEARCH_TYPE   : closeStatus,
+  });
+};
