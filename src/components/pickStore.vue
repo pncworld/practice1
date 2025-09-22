@@ -39,6 +39,7 @@
     <div class="w-full md:w-auto" v-show="hideit">
       <select
         :disabled="isDisabled"
+        :class="dynamicStoreClass"
         class="w-60 border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         v-model="selectedStoreCode"
         @change="
@@ -350,6 +351,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  setDynamicStoreClass: {
+    type: String,
+    default: "",
+  },
+  setDefaultStoreCd: {
+    type: String,
+    default: "",
+  },
 });
 
 const MainName = ref("");
@@ -480,7 +489,10 @@ watch(
     defaultStoreNm.value = props.defaultStoreNm;
   }
 );
+
+const dynamicStoreClass = ref("");
 onMounted(() => {
+  dynamicStoreClass.value = props.setDynamicStoreClass;
   storeGroup.value = store.state.storeGroup;
   storeType.value = store.state.storeType;
   storeCd.value = store.state.storeCd;
@@ -503,6 +515,9 @@ onMounted(() => {
   }
   emit("update:storeGroup", store.state.userData.lngStoreGroup);
   emit("update:storeType", store.state.userData.lngJoinType);
+  if (props.setDefaultStoreCd != "") {
+    selectedStoreCode.value = props.setDefaultStoreCd;
+  }
   emit("update:storeCd", selectedStoreCode.value);
   emit("storeNm", storenm);
   emit("posNo", 0);
@@ -721,6 +736,16 @@ watch(
       isDisabled.value = true;
     } else {
       isDisabled.value = false;
+    }
+  }
+);
+
+watch(
+  () => props.setDefaultStoreCd,
+  () => {
+    console.log(props.setDefaultStoreCd);
+    if (props.setDefaultStoreCd != "") {
+      selectedStoreCode.value = props.setDefaultStoreCd;
     }
   }
 );

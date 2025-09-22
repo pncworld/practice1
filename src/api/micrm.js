@@ -1834,3 +1834,280 @@ export const saveNewCardNo = (
     FLAG: flag,
   });
 };
+
+export const getOperateStoreList = (groupCd, usertype, storeCd) => {
+  return api2.post("/MICRM/CRM10_001INS.asmx/getOperateStoreList", {
+    GROUP_CD: groupCd,
+    USER_TYPE: usertype,
+    STORE_CD: storeCd,
+  });
+};
+
+export const getCrmMenuList = (groupCd, storeCd) => {
+  return api2.post("/MICRM/CRM10_001INS.asmx/getCrmMenuList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+
+export const getCouponList = (groupCd) => {
+  return api2.post("/MICRM/CRM10_001INS.asmx/getCouponList", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const saveMemberPromotion = (
+  groupCd,
+  storeCd,
+  userid,
+  promocd,
+  promonm,
+  sdate,
+  edate,
+  membershipdiv,
+  campaign,
+  remark,
+  lnggrade,
+  applystorecd,
+  essentialcount,
+  essentialcd,
+  choicecd,
+  choicecd2,
+  couponcd,
+  couponcd2,
+  couponusestore,
+  point,
+  datecount,
+  sizeupdailycnt,
+  sizeupcd,
+  applymenucd,
+  appdown
+) => {
+  return api2.post("/MICRM/CRM10_001INS.asmx/saveMemberPromotion", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    USER_ID: userid,
+    PROMO_CD: promocd,
+    PROMO_NM: promonm,
+    SDATE: sdate,
+    EDATE: edate,
+    MEMBERSHIP: membershipdiv,
+    CAMPAIGN: campaign,
+    REMARK: remark,
+    LNG_GRADE: lnggrade,
+    APPLY_STORECD: applystorecd,
+    ESSENTIAL_CNT: essentialcount,
+    ESSENTIAL_CD: essentialcd,
+    CHOICE_CD: choicecd,
+    CHOICE_CD2: choicecd2,
+    COUPON_CD: couponcd,
+    COUPON_CD2: couponcd2,
+    COUPONUSESTORE: couponusestore,
+    POINT: point,
+    DATE_COUNT: datecount,
+    SIZE_DAILY_CNT: sizeupdailycnt,
+    SIZEUP_CD: sizeupcd,
+    APPLY_MENU_CD: applymenucd,
+    APP_DOWN: appdown,
+  });
+};
+
+export const getReceiptEventList2 = (groupCd) => {
+  return api2.post("/MICRM/CRM21_004INS.asmx/getReceiptEventList2", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const getReceiptEventDetail = (groupCd, eventCd) => {
+  return api2.post("/MICRM/CRM21_004INS.asmx/getReceiptEventDetail", {
+    GROUP_CD: groupCd,
+    EVENT_CD: eventCd,
+  });
+};
+
+export const saveReceiptEvent = (
+  groupCd,
+  eventCd,
+  eventnm,
+  sdate,
+  edate,
+  eventamt,
+  eventcust,
+  eventcount,
+  cutting,
+  logo,
+  reissue,
+  header,
+  body,
+  footer,
+  numbertype,
+  userid,
+  strmenu,
+  strstore,
+  rdomenuopt,
+  issueopt,
+  eventamtopt,
+  custtype,
+  amttype,
+  eventweekday,
+  stiem,
+  etime,
+  barcodetn,
+  printopt,
+  recissuetype,
+  couponcd,
+  coouponnm,
+  applytype,
+  term,
+  sdate2,
+  edate2,
+  headshare,
+  couponmenu,
+  couponstore,
+  couponlist,
+  duplicateyn,
+  coupongroup,
+  discounttype,
+  discountamt,
+  servicetype,
+  menu10,
+  menu01
+) => {
+  return api2.post("/MICRM/CRM21_004INS.asmx/saveReceiptEvent", {
+    GROUP_CD: groupCd,
+    EVENT_CD: eventCd,
+    EVENT_NM: eventnm,
+    SDATE: sdate,
+    EDATE: edate,
+    EVENT_AMT: eventamt,
+    EVENT_CUST: eventcust,
+    EVENT_CNT: eventcount,
+    CUTTING: cutting,
+    LOGO: logo,
+    REISSUE: reissue,
+    HEADER: header,
+    BODY: body,
+    FOOTER: footer,
+    NUM_TYPE: numbertype,
+    USER_ID: userid,
+    STRMENU: strmenu,
+    STRSTORE: strstore,
+    MENUOPT: rdomenuopt,
+    ISSUEOPT: issueopt,
+    EVENTAMTOPT: eventamtopt,
+    CUSTTYPE: custtype,
+    AMTTYPE: amttype,
+    WEEKDAY: eventweekday,
+    STIME: stiem,
+    ETIME: etime,
+    BARCODETN: barcodetn,
+    PRINTOPT: printopt,
+    RECISSUETYPE: recissuetype,
+    COUPON_CD: couponcd,
+    COUPON_NM: coouponnm,
+    APPLY_TYPE: applytype,
+    TERM: term,
+    SDATE2: sdate2,
+    EDATE2: edate2,
+    HEADSHARE: headshare,
+    COUPONMENU: couponmenu,
+    COUPONSTORE: couponstore,
+    COUPONLIST: couponlist,
+    DUPLIYN: duplicateyn,
+    COUPONGROUP: coupongroup,
+    DISCOUNTTYPE: discounttype,
+    DISCOUNTAMT: discountamt,
+    SERVICETYPE: servicetype,
+    MENU10: menu10,
+    MENU01: menu01,
+  });
+};
+export const getMemberShipList = (groupCd) => {
+  return api2.post("/MICRM/CRM21_002INS.asmx/getMemberShipList", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const getMemberShipCouponDetail = (groupcd, storecd, couponcd) => {
+  return api2.post("/MICRM/CRM21_002INS.asmx/getMemberShipCouponDetail", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    COUPON_CD: couponcd,
+  });
+};
+
+export const saveMemberShipCoupon = (
+  couponCd,
+  couponnm,
+  coupontype,
+  amountrate,
+  applytype,
+  sdate,
+  edate,
+  sterm,
+  eterm,
+  groupcd,
+  storecd,
+  couponprefix,
+  lngleng,
+  lngcount,
+  dupyn,
+  smssendyn,
+  smstitle,
+  smssender,
+  smstext,
+  smsimg,
+  smstiem,
+  insertuser,
+  applystoretype,
+  smstype,
+  sharetype,
+  headshare,
+  storeshare,
+  benefityn,
+  svctype,
+  coupongroup,
+  discounttype,
+  notice,
+  menu,
+  menu2,
+  menu3
+) => {
+  return api2.post("/MICRM/CRM21_002INS.asmx/saveMemberShipCoupon", {
+    COUPON_CD: couponCd,
+    COUPON_NM: couponnm,
+    COUPON_TYPE: coupontype,
+    AMT_RATE: amountrate,
+    AP_TYPE: applytype,
+    SDATE: sdate,
+    EDATE: edate,
+    STIME: sterm,
+    ETIME: eterm,
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    COUPON_PREFIX: couponprefix,
+    LNGLENG: lngleng,
+    LNGCOUNT: lngcount,
+    DUPYN: dupyn,
+    SENDYN: smssendyn,
+    SMSTITLE: smstitle,
+    SMSSENDER: smssender,
+    SMSTEXT: smstext,
+    SMSIMG: smsimg,
+    SMSTIME: smstiem,
+    USER_ID: insertuser,
+    APSTORE_TYPE: applystoretype,
+    SMSTYPE: smstype,
+    SHARETYPE: sharetype,
+    HEADSHARE: headshare,
+    STORESHARE: storeshare,
+    BENEFITYN: benefityn,
+    SVCTYPE: svctype,
+    COUPONGROUP: coupongroup,
+    DISTYPE: discounttype,
+    NOTICE: notice,
+    MENU1: menu,
+    MENU2: menu2,
+    MENU3: menu3,
+  });
+};

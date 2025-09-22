@@ -448,3 +448,236 @@ export const setDiligenceRegistration = (
     CLOSE_YN   : isClose,
   });
 };
+export const getLossMasterPartList = (groupCd, storeCd) => {
+  return api2.post("/MISTOCK/STKN06_013INS.asmx/getLossMasterPartList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+
+export const getLossMasterListbyPart = (
+  groupCd,
+  storeCd,
+  part,
+  sdate,
+  edate
+) => {
+  return api2.post("/MISTOCK/STKN06_013INS.asmx/getLossMasterListbyPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    PART: part,
+    SDATE: sdate,
+    EDATE: edate,
+  });
+};
+
+export const getLossStockDetailbyPart = (groupCd, storeCd, lossno) => {
+  return api2.post("/MISTOCK/STKN06_013INS.asmx/getLossStockDetailbyPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LOSS_NO: lossno,
+  });
+};
+
+export const updateLossMasterDetailbyPart = (
+  groupCd,
+  storeCd,
+  lossNo,
+  itemids,
+  losscodes,
+  qtys,
+  seq
+) => {
+  return api2.post("/MISTOCK/STKN06_013INS.asmx/updateLossMasterDetailbyPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LOSS_NO: lossNo,
+    ITEM_IDS: itemids,
+    QTYS: qtys,
+    LOSS_CD: losscodes,
+    SEQ: seq,
+  });
+};
+
+export const saveLossMasterbyPart = (
+  groupCd,
+  storeCd,
+  date,
+  itemids,
+  qtys,
+  losscodes,
+  seq,
+  cond,
+  part
+) => {
+  return api2.post("/MISTOCK/STKN06_013INS.asmx/saveLossMasterbyPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    ITEM_IDS: itemids,
+    QTYS: qtys,
+    LOSS_CD: losscodes,
+    SEQ: seq,
+    COND: cond,
+    PART: part,
+  });
+};
+
+export const getTakeWorkSheetListbyPart = (
+  groupCd,
+  storeCd,
+  master,
+  slave,
+  stocknm,
+  slave2,
+  takedate,
+  partcd,
+  checkall
+) => {
+  return api2.post("/MISTOCK/STKN07_015RPT.asmx/getTakeWorkSheetListbyPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    MASTER: master,
+    SLAVE: slave,
+    STOCKNM: stocknm,
+    SLAVE2: slave2,
+    TDATE: takedate,
+    PARTCD: partcd,
+    CHECKALL: checkall,
+  });
+};
+
+export const getStockTakeCountListbyPart = (
+  groupCd,
+  storeCd,
+  date,
+  cycle,
+  unittype,
+  showtype,
+  part
+) => {
+  return api2.post("/MISTOCK/STKN07_016RPT.asmx/getStockTakeCountListbyPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    CYCLE: cycle,
+    UNITTYPE: unittype,
+    SHOWTYPE: showtype,
+    PART: part,
+  });
+};
+
+export const saveStockTakeCountByPart = (
+  closetype,
+  groupCd,
+  storeCd,
+  date,
+  stockid,
+  takeqty,
+  unittype,
+  partcd
+) => {
+  return api2.post("/MISTOCK/STKN07_016RPT.asmx/saveStockTakeCountByPart", {
+    CLOSETYPE: closetype,
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    STOCKID: stockid,
+    TAKEQTY: takeqty,
+    UNITTYPE: unittype,
+    PART: partcd,
+  });
+};
+
+export const deleteStockTakeByPart = (
+  groupCd,
+  storeCd,
+  date,
+  stockid,
+  partcd
+) => {
+  return api2.post("/MISTOCK/STKN07_016RPT.asmx/deleteStockTakeByPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    STOCKID: stockid,
+    PARTCD: partcd,
+  });
+};
+
+export const getStockResultByPart = (
+  groupCd,
+  storeCd,
+  date,
+  takecycle,
+  unittype,
+  showtype,
+  partcd
+) => {
+  return api2.post("/MISTOCK/STKN07_017RPT.asmx/getStockResultByPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    TAKECYCLE: takecycle,
+    UNITTYPE: unittype,
+    SHOWTYPE: showtype,
+    PARTCD: partcd,
+  });
+};
+
+export const getStockMonthlyInOutListByPart = (
+  groupCd,
+  storeCd,
+  part,
+  month,
+  cate,
+  group,
+  generic,
+  unittype,
+  pricetype,
+  showtype,
+  stockid,
+  stocknm,
+  supplierid,
+  reporttype
+) => {
+  return api2.post(
+    "/MISTOCK/STK08_019RPT.asmx/getStockMonthlyInOutListByPart",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      PART: part,
+      MONTH: month,
+      CATE: cate,
+      GROUP: group,
+      GENERIC: generic,
+      UNITTYPE: unittype,
+      PRICETYPE: pricetype,
+      SHOWTYPE: showtype,
+      STOCKID: stockid,
+      STOCKNM: stocknm,
+      SUPPLIERID: supplierid,
+      REPORTTYPE: reporttype,
+    }
+  );
+};
+
+export const getStockOrderList = (
+  groupCd,
+  storeCd,
+  sdate,
+  edate,
+  supplierid,
+  part,
+  lang
+) => {
+  return api2.post("/MIPUR/PUR03_035INS.asmx/getStockOrderList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    SUPPLIERID: supplierid,
+    PART: part,
+    LANG: lang,
+  });
+};

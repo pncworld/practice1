@@ -659,3 +659,143 @@ export const getMonthlyMagamStatus = async (groupCd, attrCd, storeCd, yearNo, mo
     SEARCH_TYPE   : closeStatus,
   });
 };
+export const getWorkTypeDetail = (groupCd, storeCd, workCode) => {
+  return api2.post("/MIHR/HR02_001INS.asmx/getWorkTypeDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    WORK_CD: workCode,
+  });
+};
+
+export const saveWorkPlanAll = (
+  groupCd,
+  storeCd,
+  dtmdate,
+  lngtype,
+  lngcharger,
+  offyn
+) => {
+  return api2.post("/MIHR/HR02_001INS.asmx/saveWorkPlanAll", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DTMDATE: dtmdate,
+    LNGTYPE: lngtype,
+    LNGCHARGER: lngcharger,
+    OFFYN: offyn,
+  });
+};
+export const deleteWorkPlan = (
+  groupCd,
+  storeCd,
+  lngcode,
+  dtmdate,
+  lngtype,
+  charger
+) => {
+  return api2.post("/MIHR/HR02_001INS.asmx/deleteWorkPlan", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LNGCODE: lngcode,
+    DTMDATE: dtmdate,
+    LNGTYPE: lngtype,
+    LNGCHARGER: charger,
+  });
+};
+
+export const setWorkNote = (groupCd, storeCd, dtmdate, lngtype, strNote) => {
+  return api2.post("/MIHR/HR02_001INS.asmx/setWorkNote", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DTMDATE: dtmdate,
+    LNGTYPE: lngtype,
+    STRNOTE: strNote,
+  });
+};
+
+export const setWorkPlanDetail = (
+  groupCd,
+  storeCd,
+  lngcode,
+  dtmdate,
+  lngtype,
+  charger,
+  atndtype,
+  stime,
+  etime
+) => {
+  return api2.post("/MIHR/HR02_001INS.asmx/setWorkPlanDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LNGCODE: lngcode,
+    DTMDATE: dtmdate,
+    LNGTYPE: lngtype,
+    LNGCHARGER: charger,
+    ATNDTYPE: atndtype,
+    STIME: stime,
+    ETIME: etime,
+  });
+};
+
+export const setCopyWorkPlan = (
+  groupCd,
+  storeCd,
+  div,
+  charger,
+  sdate,
+  edate,
+  sdate2,
+  edate2
+) => {
+  return api2.post("/MIHR/HR02_001INS.asmx/setCopyWorkPlan", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DIV: div,
+    CHARGER: charger,
+    SDATE: sdate,
+    EDATE: edate,
+    SDATE2: sdate2,
+    EDATE2: edate2,
+  });
+};
+
+export const getDynamicGrid6 = (groupcd) => {
+  return api2.post("/MIHR/HR02_003INS.asmx/getDynamicGrid6", {
+    GROUP_CD: groupcd,
+  });
+};
+
+export const getEmpPayList = (
+  groupCd,
+  storeCd,
+  date,
+  workclass,
+  strcharger,
+  datatype,
+  useradmin
+) => {
+  return api2.post("/MIHR/HR02_003INS.asmx/getEmpPayList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    WORKCLASS: workclass,
+    CHARGER: strcharger,
+    DATETYPE: datatype,
+    USERADMIN: useradmin,
+  });
+};
+
+export const setFinalWorkConfirm = (groupcd, storecd, date) => {
+  return api2.post("/MIHR/HR02_003INS.asmx/setFinalWorkConfirm", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    DATE: date,
+  });
+};
+
+export const cancelWorkConfirm = (groupcd, storecd, date) => {
+  return api2.post("/MIHR/HR02_003INS.asmx/cancelWorkConfirm", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    DATE: date,
+  });
+};

@@ -195,7 +195,7 @@
           :deleteRow6="deleteRow3"
           :addrowDefault="addrowDefault"
           :addrowProp="addrowProp"
-          @updatedRowData="updatedRowData"
+          @updatedRowData2="updatedRowData"
           :rowStateeditable="false"
           :addField="'new'"
           :hideRow="hideRow"
@@ -1131,7 +1131,7 @@ const setAuto = () => {
 };
 const allStateRows = (e) => {
   updateDeleteInsertrowIndex.value = e;
-  //comsole.log(e);
+  console.log(e);
 };
 const sendRowState = (e) => {
   if (e == "created") {
@@ -1273,6 +1273,7 @@ const selectedIndex2 = (e) => {
  */
 
 const clickedRowData = async (newvalue) => {
+  console.log(newvalue);
   afterClick.value = false;
   if (newvalue[9] == 0 || newvalue[12] == 0) {
     // 판매가 할인여부
@@ -1807,6 +1808,7 @@ const saveButton = () => {
     return;
   }
 
+  console.log(updateRow.value);
   const validateRow = updateRow.value.filter(
     (item) =>
       (item.lngCode === "" && isNewAutoMenuCode.value == false) ||
@@ -1920,6 +1922,7 @@ const saveButton = () => {
           isNewAutoMenuCode.value == true ? 1 : 0,
           deleteCd.join(",")
         );
+        console.log(res);
         //console.log(res);
 
         //comsole.log(updatedAndInsertRow);
@@ -1989,6 +1992,7 @@ const saveButton = () => {
  */
 
 const updatedRowData = (newvalue) => {
+  console.log(newvalue);
   updateRow.value = newvalue;
 };
 const updatedList2 = ref([]);

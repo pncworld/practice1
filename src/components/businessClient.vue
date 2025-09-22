@@ -5,6 +5,7 @@
       name=""
       id=""
       class="w-64 h-7 border border-black"
+      :class="dynamicClass"
       v-model="cond"
       :disabled="disableBusiness">
       <option value="0">{{ Nm }}</option>
@@ -40,6 +41,10 @@ const props = defineProps({
     type: String,
     default: "거래처",
   },
+  setDynamicClass: {
+    type: String,
+    default: "",
+  },
 });
 
 const Nm = ref("");
@@ -57,6 +62,7 @@ watch(
     cond.value = props.selectSupplierId;
   }
 );
+const dynamicClass = ref("");
 onMounted(async () => {
   const res = await getSuppliers(store.state.userData.lngStoreGroup);
 
@@ -68,6 +74,14 @@ onMounted(async () => {
   Nm.value = props.defaultNm;
   emit("SupplierId", cond.value);
   emit("SupplierNm", Nm.value);
+
+  if (props.setDynamicClass != "") {
+    dynamicClass.value = props.setDynamicClass;
+  }
+
+  if (props.disable == true) {
+    disableBusiness.value = props.disable;
+  }
 });
 
 watch(cond, () => {
