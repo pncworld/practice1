@@ -1,7 +1,7 @@
 <template>
   <div class="flex space-x-5">
     <div class="flex items-center justify-center text-base font-semibold">
-      마감월
+      {{ currentNm }}
     </div>
     <div>
       <select
@@ -40,7 +40,17 @@ const optionList2 = ref([]);
 
 const cond = ref("");
 const cond2 = ref("");
+
+const props = defineProps({
+  mainName: {
+    type: String,
+    default: "마감월",
+  },
+});
+
+const currentNm = ref("");
 onMounted(() => {
+  currentNm.value = props.mainName;
   for (let i = 0; i < 10; i++) {
     optionList.value.push({
       lngCode: 2020 + i,

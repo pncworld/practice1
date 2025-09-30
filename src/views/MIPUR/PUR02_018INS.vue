@@ -1,6 +1,6 @@
 <!-- /*--############################################################################
 # Filename : PUR02_018INS.vue                                                  
-# Description : 마스터관리 > 매입 관리 > 매입 등(파트별)                     
+# Description : 마스터관리 > 매입 관리 > 매입 등록(파트별)                     
 # Date :2025-09-18                                                           
 # Author : 권맑음                     
 ################################################################################*/ -->
@@ -32,6 +32,7 @@
       <PickStore
         :setDynamicStoreClass="'!h-8 !p-0'"
         :defaultStoreNm="'전체'"
+        :defaultStore="true"
         @update:storeCd="handleStoreCd"
         @storeNm="storeNm"
         :hideGroup="false"
@@ -76,7 +77,11 @@
       :progname="'PUR02_018INS_VUE'"
       :exporttoExcel="exporttoExcel"
       :setStateBar="false"
+      :checkRenderEditable="true"
+      :checkRowAuto="false"
+      :checkRowAuto2="true"
       @dblclickedRowData="dblclickedRowData"
+      @updatedRowData="updatedRowData"
       :documentSubTitle="documentSubTitle"
       :documentTitle="'PUR02_018INS'"
       :rowData="rowData"></Realgrid>
@@ -115,7 +120,8 @@
             name=""
             id=""
             v-model="scond"
-            :disabled="!currentEdit"
+            @change="setRowData2"
+            :disabled="currentEdit"
             class="w-[80%] h-[80%] border border-black">
             <option :value="i.strDCode" v-for="i in optionList3">
               {{ i.strDName }}
@@ -134,6 +140,7 @@
             :hideGroup="false"
             :hideAttr="false"
             :disabledAll="true"
+            @storeNm="storeNm2"
             :setDefaultStoreCd="storeCd2"
             :setDynamicStoreClass="'!h-7 !p-0 !-ml-6 !-mt-1'"
             :mainName="''"></pickStore>
@@ -167,8 +174,14 @@
         <div
           class="flex justify-center items-center border-l border-t border-r border-black col-span-2 space-x-3">
           <button class="whitebutton" @click="saveButton2">저장</button>
-          <button class="whitebutton">전표삭제</button>
+          <button
+            class="whitebutton"
+            @click="deleteStock3"
+            :disabled="currentEdit">
+            전표삭제
+          </button>
           <button class="whitebutton" @click="deleteStock2">자재제거</button>
+          <button class="whitebutton" @click="excelButton2">엑셀</button>
         </div>
         <div
           class="bg-orange-200 text-base font-semibold flex justify-center items-center border-l border-t border-b border-black">
@@ -216,13 +229,19 @@
           :progid="2"
           :progname="'PUR02_018INS_VUE'"
           @updatedRowData="updatedRowData2"
-          :editableColId="'dblOrderQty,strOrderComments'"
+          :editableColId="'dblCheckQty,strComments'"
+          :CalculateTaxColId="'curTax'"
+          :CalculateSumColId="'curTotal'"
+          :CalculateTaxColId3="'curSupply'"
           :checkRowAuto="false"
           :setFooter="true"
           :checkRowAuto2="true"
+          :exporttoExcel="exporttoExcel2"
+          :documentSubTitle="documentSubTitle2"
+          :documentTitle="'PUR02_018INS'"
           :checkRenderEditable="true"
           :rowStateeditable="false"
-          :rowData="rowData2"></Realgrid>
+          :rowData="filteredrowData2"></Realgrid>
       </div>
       <div class="flex justify-between mt-2 space-x-3">
         <div class="flex items-center justify-center space-x-3">
@@ -251,7 +270,7 @@
             <input
               type="text"
               class="border border-black w-[80%] h-8"
-              v-model="scond6"
+              v-model="scond9"
               :disabled="!currentEdit"
               @input="setScond6" />
           </div>
@@ -274,21 +293,22 @@
       <div class="h-[35%] mt-5" v-if="currentEdit">
         <Realgrid
           :progid="3"
-          :progname="'PUR03_035INS_VUE'"
+          :progname="'PUR02_018INS_VUE'"
           :rowStateeditable="false"
           :setFooter="true"
           :CalculateTaxColId="'curTax'"
           :searchColId3="['lngSupplierID']"
           :searchValue="searchValue2"
-          :inputOnlyNumberColumn="'dblOrderQty'"
-          :CalculateTaxColId2="'curSupply'"
-          :editableColId="'dblOrderQty,strOrderComments'"
+          :inputOnlyNumberColumn="'dblCheckQty'"
+          :CalculateSumColId="'curTotal'"
+          :CalculateTaxColId3="'curSupply'"
+          :editableColId="'dblCheckQty,strComments'"
           @updatedRowData="updatedRowData3"
           :checkRowAuto="false"
           :checkRowAuto2="true"
           :checkRenderEditable="true"
           :searchColId="'lngStockID,strStockName'"
-          :searchWord3="scond6"
+          :searchWord3="scond9"
           :rowData="rowData3"></Realgrid>
       </div>
     </div>
@@ -374,14 +394,20 @@
 import { getCommonList } from "@/api/common";
 import { getStockGeneric } from "@/api/master";
 import {
+  deleteStockListBypart,
   getCloseDtmDate,
   getCloseDtmDate2,
   getStockCheckDetail,
   getStockCloseDate,
   getStockItemListWithFavorite,
+  getStockItemListWithFavorite2,
   getStockMasterListByPart,
+  saveFavoriteStockItem,
+  saveFavoriteStockItem2,
   saveFavoriteStockItemBypart,
   saveOrderMasterDetailByPart,
+  saveStockMasterDetailByPart,
+  saveStockMasterDetailByPart2,
 } from "@/api/mipur";
 import { getLossMasterPartList, getStockOrderList } from "@/api/mistock";
 import BusinessClient from "@/components/businessClient.vue";
@@ -534,7 +560,7 @@ const updatedrowdata2 = ref([]);
  */
 const disabled = ref(false);
 const updatedRowData = (newValue) => {
-  //console.log(newValue);
+  console.log(newValue);
   updatedrowdata.value = newValue;
 };
 const updatedRowData2 = (newValue) => {
@@ -585,19 +611,35 @@ const addButton = async () => {
     return;
   }
   scond2.value = formatLocalDate(new Date());
-  scond3.value = formatLocalDate(new Date().setDate(new Date().getDate() + 1));
+  scond3.value = formatLocalDate(new Date());
 
+  tempGroupCd.value = store.state.userData.lngStoreGroup;
+  tempStoreCd.value = storeCd.value;
+
+  //console.log(optionList3.value);
+  storeCd2.value = storeCd.value;
+  currentEdit.value = true;
   try {
-    const res = await getCloseDtmDate2(
+    const res = await getStockCloseDate(
       store.state.userData.lngStoreGroup,
       storeCd.value,
-      scond3.value.replaceAll("-", ""),
-      0
+      scond2.value.replaceAll("-", "")
     );
-    console.log(res);
-  } catch (error) {}
 
-  openpopup.value = true;
+    if (res.data.List[0].blnClosed == "1") {
+      Swal.fire({
+        title: "경고",
+        text: "마감된 일자는 매입 등록이 불가능합니다.",
+        icon: "warning",
+
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (error) {
+  } finally {
+    scond.value = "01";
+    openpopup.value = true;
+  }
 };
 
 const scond = ref("01");
@@ -607,16 +649,16 @@ const scond4 = ref("0");
 const scond5 = ref("");
 const openpopup2 = ref(false);
 const showStockList = () => {
-  if (scond4.value == "0") {
-    Swal.fire({
-      title: "경고",
-      text: "파트를 먼저 선택해주세요.",
-      icon: "warning",
+  // if (scond4.value == "0") {
+  //   Swal.fire({
+  //     title: "경고",
+  //     text: "파트를 먼저 선택해주세요.",
+  //     icon: "warning",
 
-      confirmButtonText: "확인",
-    });
-    return;
-  }
+  //     confirmButtonText: "확인",
+  //   });
+  //   return;
+  // }
 
   openpopup2.value = true;
   searchButton2();
@@ -630,12 +672,11 @@ const rowData4 = ref([]);
 const searchButton2 = async () => {
   try {
     store.state.loading = true;
-    const res = await getStockItemListWithFavorite(
+    const res = await getStockItemListWithFavorite2(
       store.state.userData.lngStoreGroup,
-      storeCd.value,
-      scond4.value,
+      storeCd2.value,
       3,
-      ""
+      scond3.value.replaceAll("-", "")
     );
 
     console.log(res);
@@ -660,12 +701,12 @@ const searchWord = (e) => {
 };
 
 const checkedRowData2 = async (e) => {
-  const res = await saveFavoriteStockItemBypart(
+  console.log(e);
+  const res = await saveFavoriteStockItem2(
     store.state.userData.lngStoreGroup,
     storeCd.value,
     e[3],
-    e[1] == true ? 0 : 1,
-    scond4.value
+    e[1] == true ? 0 : 1
   );
   console.log(res);
 };
@@ -694,33 +735,24 @@ const addButton2 = () => {
     return;
   }
 
-  rowData3.value = updatedrowdata4.value.map((item) => ({
+  const temprow = updatedrowdata4.value.map((item) => ({
     ...item,
-    dblOrderQty: 0,
+    dblCheckQty: 0,
     curSupply: 0,
     lngCheck: "0",
   }));
+
+  rowData3.value = [...rowData3.value, ...temprow];
   openpopup2.value = false;
 };
 
 const searchButton3 = async (e) => {
-  if (scond4.value == "0") {
-    Swal.fire({
-      title: "경고",
-      text: "파트를 먼저 선택해주세요.",
-      icon: "warning",
-
-      confirmButtonText: "확인",
-    });
-    return;
-  }
   try {
-    const res = await getStockItemListWithFavorite(
+    const res = await getStockItemListWithFavorite2(
       store.state.userData.lngStoreGroup,
-      storeCd.value,
-      scond4.value,
+      storeCd2.value,
       e.target.value,
-      ""
+      scond3.value.replaceAll("-", "")
     );
     console.log(res);
     updatedrowdata3.value = res.data.List;
@@ -739,9 +771,10 @@ const SupplierId2 = (e) => {
 };
 
 const scond6 = ref("");
+const scond9 = ref("");
 
 const setScond6 = (e) => {
-  scond6.value = e.target.value;
+  scond9.value = e.target.value;
 };
 
 const updatedrowdata3 = ref([]);
@@ -749,10 +782,15 @@ const updatedRowData3 = (e) => {
   console.log(e);
   updatedrowdata3.value = e;
 
-  const filtered = e.filter((item) => item.dblOrderQty != "0");
+  const filtered = e
+    .filter((item) => item.dblCheckQty != "0")
+    .map((item) => ({
+      ...item,
+      lngCheck: false,
+    }));
 
   updatedrowdata2.value = filtered;
-  rowData2.value = filtered;
+  filteredrowData2.value = filtered;
 };
 
 const deleteStock = () => {
@@ -762,52 +800,83 @@ const deleteStock = () => {
 };
 
 const deleteStock2 = async () => {
+  if (currentEdit.value == false) {
+    if (updatedrowdata2.value.length == 0) {
+      Swal.fire({
+        title: "경고",
+        text: "삭제할 자재를 선택해주세요.",
+        icon: "warning",
+
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+    const tempRowDataLength = filteredrowData2.value.length;
+    try {
+      const checkseqs = updatedrowdata2.value
+        .filter((item) => item.lngCheck == true)
+        .map((item) => item.lngCheckSeq)
+        .join("\u200b");
+      const orderseqs = updatedrowdata2.value
+        .filter((item) => item.lngCheck == true)
+        .map((item) => item.lngOrderSeq)
+        .join("\u200b");
+      const res = await deleteStockListBypart(
+        tempGroupCd.value,
+        tempStoreCd.value,
+        tempCheckNo.value,
+        checkseqs,
+        tempOrderNo.value,
+        orderseqs,
+        store.state.userData.lngSequence,
+        tempRowDataLength,
+        updatedrowdata2.value.filter((item) => item.lngCheck == true).length
+      );
+
+      console.log(res);
+      if (res.data.RESULT_CD == "00") {
+        await Swal.fire({
+          title: "성공",
+          text: "삭제에 성공하였습니다.",
+          icon: "success",
+
+          confirmButtonText: "확인",
+        });
+        openpopup.value = false;
+        openpopup2.value = false;
+        searchButton();
+      } else {
+        await Swal.fire({
+          title: "실패",
+          text: "삭제에 실패하였습니다.",
+          icon: "error",
+
+          confirmButtonText: "확인",
+        });
+      }
+    } catch (error) {}
+  } else {
+    console.log(filteredrowData2.value);
+    filteredrowData2.value = updatedrowdata2.value.filter(
+      (item) => item.lngCheck == false
+    );
+  }
+};
+
+const deleteStock3 = async () => {
   console.log(updatedrowdata2.value);
 
   try {
-    const res = await deleteStock;
-  } catch (error) {}
-};
-
-const saveButton2 = async () => {
-  try {
-    const supplierid = updatedrowdata2.value
-      .map((item) => item.lngSupplierID)
-      .join("\u200b");
-    const stockids = updatedrowdata2.value
-      .map((item) => item.lngStockID)
-      .join("\u200b");
-    const qty = updatedrowdata2.value
-      .map((item) => item.dblOrderQty)
-      .join("\u200b");
-    const unitprice = updatedrowdata2.value
-      .map((item) => item.curUnitPrice)
-      .join("\u200b");
-    const supplys = updatedrowdata2.value
-      .map((item) => item.curSupply)
-      .join("\u200b");
-    const taxs = updatedrowdata2.value
-      .map((item) => item.curTax)
-      .join("\u200b");
-    const comments = updatedrowdata2.value
-      .map((item) => item.strOrderComments)
-      .join("\u200b");
-    const res = await saveOrderMasterDetailByPart(
-      store.state.userData.lngStoreGroup,
-      storeCd.value,
-      scond2.value.replaceAll("-", ""),
-      scond3.value.replaceAll("-", ""),
-      scond5.value,
+    const res = await deleteStockListBypart(
+      tempGroupCd.value,
+      tempStoreCd.value,
+      tempCheckNo.value,
+      "",
+      tempOrderNo.value,
+      "",
       store.state.userData.lngSequence,
-      "N",
-      supplierid,
-      stockids,
-      qty,
-      unitprice,
-      supplys,
-      taxs,
-      comments,
-      scond4.value
+      1,
+      1
     );
 
     console.log(res);
@@ -815,28 +884,199 @@ const saveButton2 = async () => {
     if (res.data.RESULT_CD == "00") {
       await Swal.fire({
         title: "성공",
-        text: "저장에 성공하였습니다.",
+        text: "삭제에 성공하였습니다.",
         icon: "success",
 
         confirmButtonText: "확인",
       });
+      openpopup.value = false;
+      openpopup2.value = false;
+      searchButton();
     } else {
       await Swal.fire({
         title: "실패",
-        text: "저장에 실패하였습니다.",
+        text: "삭제에 실패하였습니다.",
         icon: "error",
 
         confirmButtonText: "확인",
       });
     }
-    initGrid2();
-    openpopup.value = false;
-    openpopup2.value = false;
-    searchButton();
   } catch (error) {}
 };
 
-const setScond3 = (e) => {
+const saveButton2 = async () => {
+  try {
+    const res = await getStockCloseDate(
+      store.state.userData.lngStoreGroup,
+      storeCd2.value,
+      scond2.value.replaceAll("-", "")
+    );
+
+    if (res.data.List[0].blnClosed == "1") {
+      Swal.fire({
+        title: "경고",
+        text: "마감된 일자는 매입 등록이 불가능합니다.",
+        icon: "warning",
+
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+  }
+
+  if (updatedrowdata2.value.length == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "매입 확정할 데이터가 존재하지 않습니다. 확인해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (scond4.value == "0") {
+    Swal.fire({
+      title: "경고",
+      text: "파트를 선택해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (currentEdit.value == false) {
+    try {
+      const checkseqs = updatedrowdata2.value
+        .map((item) => item.lngCheckSeq)
+        .join("\u200b");
+      const dblcheckqtys = updatedrowdata2.value
+        .map((item) => item.dblCheckQty)
+        .join("\u200b");
+      const unitprice = updatedrowdata2.value
+        .map((item) => item.curUnitPrice)
+        .join("\u200b");
+      const supplys = updatedrowdata2.value
+        .map((item) => item.curSupply)
+        .join("\u200b");
+      const taxs = updatedrowdata2.value
+        .map((item) => item.curTax)
+        .join("\u200b");
+      const comments = updatedrowdata2.value
+        .map((item) => item.strComments)
+        .join("\u200b");
+      const res = await saveStockMasterDetailByPart(
+        tempGroupCd.value,
+        tempStoreCd.value,
+        tempCheckNo.value,
+        scond5.value,
+        scond6.value,
+        checkseqs,
+        dblcheckqtys,
+        unitprice,
+        supplys,
+        taxs,
+        comments,
+        store.state.userData.lngSequence
+      );
+
+      console.log(res);
+
+      if (res.data.RESULT_CD == "00") {
+        await Swal.fire({
+          title: "성공",
+          text: "저장에 성공하였습니다.",
+          icon: "success",
+
+          confirmButtonText: "확인",
+        });
+      } else {
+        await Swal.fire({
+          title: "실패",
+          text: "저장에 실패하였습니다.",
+          icon: "error",
+
+          confirmButtonText: "확인",
+        });
+      }
+      initGrid2();
+      openpopup.value = false;
+      openpopup2.value = false;
+      searchButton();
+    } catch (error) {}
+  } else {
+    try {
+      const supplierids = updatedrowdata2.value
+        .map((item) => item.lngSupplierID)
+        .join("\u200b");
+      const stockids = updatedrowdata2.value
+        .map((item) => item.lngStockID)
+        .join("\u200b");
+      const orderqtys = updatedrowdata2.value
+        .map((item) => item.dblCheckQty)
+        .join("\u200b");
+      const unitprices = updatedrowdata2.value
+        .map((item) => item.curUnitPrice)
+        .join("\u200b");
+      const supplys = updatedrowdata2.value
+        .map((item) => item.curSupply)
+        .join("\u200b");
+      const taxes = updatedrowdata2.value
+        .map((item) => item.curTax)
+        .join("\u200b");
+      const orderComments = updatedrowdata2.value
+        .map((item) => item.strComments)
+        .join("\u200b");
+      const res = await saveStockMasterDetailByPart2(
+        tempGroupCd.value,
+        tempStoreCd.value,
+        scond2.value.replaceAll("-", ""),
+        scond5.value,
+        scond6.value,
+        store.state.userData.lngSequence,
+        supplierids,
+        stockids,
+        orderqtys,
+        unitprices,
+        supplys,
+        taxes,
+        orderComments,
+        scond4.value,
+        scond3.value.replaceAll("-", "")
+      );
+      console.log(res);
+      if (res.data.RESULT_CD == "00") {
+        await Swal.fire({
+          title: "성공",
+          text: "저장에 성공하였습니다.",
+          icon: "success",
+
+          confirmButtonText: "확인",
+        });
+      } else {
+        await Swal.fire({
+          title: "실패",
+          text: "저장에 실패하였습니다.",
+          icon: "error",
+
+          confirmButtonText: "확인",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      openpopup.value = false;
+      openpopup2.value = false;
+      searchButton();
+    }
+  }
+};
+
+const setScond3 = async (e) => {
   if (
     parseInt(e.target.value.replaceAll("-", "")) >=
     parseInt(scond3.value.replaceAll("-", ""))
@@ -845,6 +1085,26 @@ const setScond3 = (e) => {
     date.setDate(date.getDate() + 1);
 
     scond3.value = date.toISOString().slice(0, 10);
+  }
+
+  try {
+    const res = await getStockCloseDate(
+      store.state.userData.lngStoreGroup,
+      storeCd2.value,
+      scond2.value.replaceAll("-", "")
+    );
+
+    if (res.data.List[0].blnClosed == "1") {
+      Swal.fire({
+        title: "경고",
+        text: "마감된 일자는 매입 등록이 불가능합니다.",
+        icon: "warning",
+
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (error) {
+  } finally {
   }
 };
 
@@ -857,18 +1117,6 @@ watch(scond3, async () => {
       0
     );
     console.log(res);
-
-    scond.value =
-      res.data.List[0].dtmOrderCloseDate.slice(0, 4) +
-      "년" +
-      res.data.List[0].dtmOrderCloseDate.slice(4, 6) +
-      "월" +
-      res.data.List[0].dtmOrderCloseDate.slice(6, 8) +
-      "일" +
-      " " +
-      res.data.List[0].dtmOrderCloseDate.slice(8, 10) +
-      ":" +
-      res.data.List[0].dtmOrderCloseDate.slice(10, 12);
   } catch (error) {}
 });
 
@@ -892,14 +1140,26 @@ const searchButton4 = async (e) => {
       scond7.value,
       ""
     );
-    console.log(res);
-    updatedrowdata3.value = res.data.List;
-    rowData3.value = res.data.List;
+    //console.log(res);
+    if (res.data.List.length > 0) {
+      updatedrowdata3.value = res.data.List.map((item) => ({
+        ...item,
+        dblCheckQty: item.dblOrderQty,
+      }));
+
+      rowData3.value = res.data.List.map((item) => ({
+        ...item,
+        dblCheckQty: item.dblOrderQty,
+      }));
+    } else {
+      updatedrowdata3.value = res.data.List;
+      rowData3.value = res.data.List;
+    }
   } catch (error) {}
 };
 
 const initGrid2 = () => {
-  scond.value = "";
+  scond.value = "01";
   scond2.value = "";
   scond3.value = "";
   scond4.value = "0";
@@ -908,7 +1168,7 @@ const initGrid2 = () => {
   scond7.value = "1";
   scond6.value = "";
 
-  rowData2.value = [];
+  filteredrowData2.value = [];
 
   rowData3.value = [];
 
@@ -923,6 +1183,10 @@ const closeOpenpopup = () => {
 
 const storeCd2 = ref(0);
 const currentEdit = ref(false);
+const tempGroupCd = ref("");
+const tempStoreCd = ref("");
+const tempCheckNo = ref("");
+const tempOrderNo = ref("");
 const dblclickedRowData = async (e) => {
   console.log(e);
 
@@ -953,6 +1217,7 @@ const dblclickedRowData = async (e) => {
 
     storeCd2.value = e[13];
     rowData2.value = res.data.List;
+    filteredrowData2.value = res.data.List;
     currentEdit.value = false;
 
     scond2.value =
@@ -960,9 +1225,98 @@ const dblclickedRowData = async (e) => {
     console.log(res);
 
     scond4.value = e[15];
+    tempGroupCd.value = e[12];
+    tempStoreCd.value = e[13];
+    tempCheckNo.value = e[4];
+    tempOrderNo.value = e[5];
+    scond.value = "01";
   } catch (error) {}
 
   openpopup.value = true;
+};
+
+const exporttoExcel2 = ref(false);
+const documentSubTitle2 = ref("");
+
+const clickedStoreNm2 = ref("");
+const storeNm2 = (e) => {
+  clickedStoreNm2.value = e;
+};
+const excelButton2 = () => {
+  documentSubTitle2.value = "매장명 :" + clickedStoreNm2.value;
+  exporttoExcel2.value = !exporttoExcel2.value;
+};
+
+const filteredrowData2 = ref([]);
+const setRowData2 = (e) => {
+  console.log(rowData2.value);
+
+  if (e.target.value == "02") {
+    filteredrowData2.value = rowData2.value.map((item) => ({
+      ...item,
+      curUnitPrice: item.curSalesUnitPrice,
+      curTotal: item.curSalesTotal,
+      curTax: item.curSalesTax,
+      curSupply: item.curSalesSupply,
+    }));
+  } else {
+    filteredrowData2.value = rowData2.value;
+  }
+};
+
+const deleteButton = async () => {
+  try {
+    const groupcds = updatedrowdata.value
+      .filter((item) => item.lngCheck == true)
+      .map((item) => item.lngStoreGroup)
+      .join("\u200b");
+    const storeCds = updatedrowdata.value
+      .filter((item) => item.lngCheck == true)
+      .map((item) => item.lngStoreCode)
+      .join("\u200b");
+    const checknos = updatedrowdata.value
+      .filter((item) => item.lngCheck == true)
+      .map((item) => item.strCheckNo)
+      .join("\u200b");
+    const ordernos = updatedrowdata.value
+      .filter((item) => item.lngCheck == true)
+      .map((item) => item.strOrderNo)
+      .join("\u200b");
+
+    const res = await deleteStockListBypart(
+      groupcds,
+      storeCds,
+      checknos,
+      "",
+      ordernos,
+      "",
+      "",
+      1,
+      1
+    );
+
+    console.log(res);
+    if (res.data.RESULT_CD == "00") {
+      await Swal.fire({
+        title: "성공",
+        text: "삭제에 성공하였습니다.",
+        icon: "success",
+
+        confirmButtonText: "확인",
+      });
+      openpopup.value = false;
+      openpopup2.value = false;
+      searchButton();
+    } else {
+      await Swal.fire({
+        title: "실패",
+        text: "삭제에 실패하였습니다.",
+        icon: "error",
+
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (error) {}
 };
 </script>
 

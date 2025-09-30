@@ -98,6 +98,10 @@
         :searchWord3="searchWord"
         :searchColId="'strName'"
         :rowStateeditable="false"
+        :checkRenderEditable="true"
+        :checkRowAuto="false"
+        :checkRowAuto2="true"
+        :checkRowAuto2Col="'checkbox'"
         @updatedRowData="updatedRowData"
         :labelsData="labelsData"
         :valuesData="valuesData"
@@ -489,18 +493,80 @@ const sendStoreCodes = ref([]);
 const sendStoreAttrs = ref([]);
 const selectedStores = ref([]);
 const checkedRowData = (e) => {
-  sendStoreGroups.value = rowData.value
-    .filter((item) => item.checkbox == true)
-    .map((item) => item.lngStoreGroup);
-  sendStoreCodes.value = rowData.value
-    .filter((item) => item.checkbox == true)
-    .map((item) => item.lngStoreCode);
-  sendStoreAttrs.value = rowData.value
-    .filter((item) => item.checkbox == true)
-    .map((item) => item.lngStoreAttr);
-  selectedStores.value = rowData.value
-    .filter((item) => item.checkbox == true)
-    .map((item) => item.strName);
+  // sendStoreGroups.value = rowData.value
+  //   .filter((item) => item.checkbox == true)
+  //   .map((item) => item.lngStoreGroup);
+  // sendStoreCodes.value = rowData.value
+  //   .filter((item) => item.checkbox == true)
+  //   .map((item) => item.lngStoreCode);
+  // sendStoreAttrs.value = rowData.value
+  //   .filter((item) => item.checkbox == true)
+  //   .map((item) => item.lngStoreAttr);
+  // selectedStores.value = rowData.value
+  //   .filter((item) => item.checkbox == true)
+  //   .map((item) => item.strName);
+  // if (settingDisable.value == 1) {
+  //   teamscList.value = "전체";
+  //   if (selectedStores.value.length > 1) {
+  //     selectedStoreList.value =
+  //       selectedStores.value[0] +
+  //       " 외" +
+  //       (selectedStores.value.length - 1) +
+  //       "건";
+  //   } else if (selectedStores.value.length == 1) {
+  //     selectedStoreList.value = selectedStores.value;
+  //   } else {
+  //     selectedStoreList.value = "전체";
+  //   }
+  //   emit("excelStore", "매장명 : " + selectedStoreList.value);
+  // } else {
+  //   selectedStoreList.value = "전체";
+  //   if (selectedStores.value.length > 1) {
+  //     selectedStoreList.value =
+  //       selectedStores.value[0] +
+  //       " 외" +
+  //       (selectedStores.value.length - 1) +
+  //       "건";
+  //   } else if (selectedStores.value.length == 1) {
+  //     selectedStoreList.value = selectedStores.value;
+  //   } else {
+  //     selectedStoreList.value = "전체";
+  //   }
+  //   emit("excelStore", "매장명 : " + selectedStoreList.value);
+  // }
+  // emit("lngStoreGroups", sendStoreGroups.value);
+  // if (sendStoreCodes.value.length == 0) {
+  //   let senditem = rowData.value.map((item) => item.lngStoreCode).join(",");
+  //   emit("lngStoreCodes", senditem);
+  // } else {
+  //   emit("lngStoreCodes", sendStoreCodes.value.join(","));
+  // }
+  // emit("lngStoreAttrs", selectedStoreType.value);
+  // const sendSupervisor = selectedSuperVisor.value;
+  // emit("lngSupervisor", sendSupervisor);
+  // emit("lngStoreTeam", selectedStoreTeam.value);
+};
+const searchword = (e) => {
+  searchWord.value = e.target.value;
+};
+
+const updatedRowData = (e) => {
+  console.log(e);
+  const storecodes = e.map((item) => item.lngStoreCode);
+  const checkeds = e.map((item) => item.checkbox);
+  for (var i = 0; i < storecodes.length; i++) {
+    const change = rowData.value.find(
+      (item) => item.lngStoreCode == storecodes[i]
+    );
+    change.checkbox = checkeds[i];
+  }
+
+  const checkedRowData = e.filter((item) => item.checkbox == true);
+
+  sendStoreGroups.value = checkedRowData.map((item) => item.lngStoreGroup);
+  sendStoreCodes.value = checkedRowData.map((item) => item.lngStoreCode);
+  sendStoreAttrs.value = checkedRowData.map((item) => item.lngStoreAttr);
+  selectedStores.value = checkedRowData.map((item) => item.strName);
   if (settingDisable.value == 1) {
     teamscList.value = "전체";
     if (selectedStores.value.length > 1) {
@@ -532,7 +598,7 @@ const checkedRowData = (e) => {
   }
   emit("lngStoreGroups", sendStoreGroups.value);
   if (sendStoreCodes.value.length == 0) {
-    let senditem = rowData.value.map((item) => item.lngStoreCode).join(",");
+    let senditem = checkedRowData.map((item) => item.lngStoreCode).join(",");
     emit("lngStoreCodes", senditem);
   } else {
     emit("lngStoreCodes", sendStoreCodes.value.join(","));
@@ -542,20 +608,6 @@ const checkedRowData = (e) => {
   const sendSupervisor = selectedSuperVisor.value;
   emit("lngSupervisor", sendSupervisor);
   emit("lngStoreTeam", selectedStoreTeam.value);
-};
-const searchword = (e) => {
-  searchWord.value = e.target.value;
-};
-
-const updatedRowData = (e) => {
-  const storecodes = e.map((item) => item.lngStoreCode);
-  const checkeds = e.map((item) => item.checkbox);
-  for (var i = 0; i < storecodes.length; i++) {
-    const change = rowData.value.find(
-      (item) => item.lngStoreCode == storecodes[i]
-    );
-    change.checkbox = checkeds[i];
-  }
 };
 const initCheckBoxRef = toRef(props, "initCheckBox");
 const initSearchWord = toRef(props, "initCheckBox");
