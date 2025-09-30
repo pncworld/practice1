@@ -14,7 +14,12 @@ import {
   formatLocalDate,
 } from "@/customFunc/customFunc";
 import store from "@/store";
-import { GridView, LocalDataProvider } from "realgrid";
+import {
+  GridView,
+  LocalDataProvider,
+  LocalTreeDataProvider,
+  TreeView,
+} from "realgrid";
 import { v4 as uuidv4 } from "uuid";
 import { nextTick, onMounted, ref, watch } from "vue";
 let gridView;
@@ -854,6 +859,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  dynamicRowHeight2: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
   syncGridHeight: {
     // 행높이
     type: Boolean,
@@ -1016,6 +1026,22 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  CalculateTaxColId3: {
+    type: String,
+    default: "",
+  },
+  CalculateTaxColId4: {
+    type: String,
+    default: "",
+  },
+  CalculateSumColId: {
+    type: String,
+    default: "",
+  },
+  CalculateSumColId2: {
+    type: String,
+    default: "",
+  },
   CalculateTimeColId: {
     type: String,
     default: "",
@@ -1071,6 +1097,22 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  checkAbleExpressionCol3: {
+    type: String,
+    default: "",
+  },
+  checkAbleExpressionCol4: {
+    type: String,
+    default: "",
+  },
+  checkAbleExpressionVal2: {
+    type: String,
+    default: "",
+  },
+  setTreeView: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // 2구간
@@ -1119,7 +1161,11 @@ const funcshowGrid = async () => {
     // 기존 그리드 인스턴스 제거
   }
 
-  dataProvider = new LocalDataProvider();
+  if (props.setTreeView == false) {
+    dataProvider = new LocalDataProvider();
+  } else {
+    dataProvider = new LocalTreeDataProvider();
+  }
 
   // nextTick으로 DOM 업데이트 후 초기화
   //
@@ -1131,9 +1177,13 @@ const funcshowGrid = async () => {
     return;
   }
 
-  gridView = new GridView(container);
-  gridView.setDataSource(dataProvider);
-
+  if (props.setTreeView == false) {
+    gridView = new GridView(container);
+    gridView.setDataSource(dataProvider);
+  } else {
+    gridView = new TreeView(container);
+    gridView.setDataSource(dataProvider);
+  }
   window.gridView = gridView;
 
   // 필드 정의
@@ -1160,7 +1210,39 @@ const funcshowGrid = async () => {
         props.AutoCalculateDataMainColId.indexOf(item.strColID)
       ],
 
-    valueCallback: props.CalculateTaxColId2.includes(item.strColID)
+    valueCallback: props.CalculateSumColId2.includes(item.strColID)
+      ? function (prod, dataRow, fieldName, fieldNames, values) {
+          let qty = parseInt(values[fieldNames.indexOf("dblDemandQty")]);
+          let supply = parseInt(values[fieldNames.indexOf("curUnitPrice")]);
+
+          return Math.floor(supply * qty);
+        }
+      : props.CalculateSumColId.includes(item.strColID)
+      ? function (prod, dataRow, fieldName, fieldNames, values) {
+          let unitp = parseInt(values[fieldNames.indexOf("curTax")]);
+          let qty = parseInt(values[fieldNames.indexOf("curSupply")]);
+
+          return Math.floor(unitp + qty);
+        }
+      : props.CalculateTaxColId4.includes(item.strColID)
+      ? function (prod, dataRow, fieldName, fieldNames, values) {
+          let unitp = values[fieldNames.indexOf("curUnitPrice")];
+          let taxType = values[fieldNames.indexOf("lngTaxType")];
+          let qty = values[fieldNames.indexOf("dblDemandQty")];
+          if (taxType == "01") {
+            return Math.floor(unitp * qty * 0.1);
+          } else {
+            return 0;
+          }
+        }
+      : props.CalculateTaxColId3.includes(item.strColID)
+      ? function (prod, dataRow, fieldName, fieldNames, values) {
+          let unitp = values[fieldNames.indexOf("curUnitPrice")];
+          let qty = values[fieldNames.indexOf("dblCheckQty")];
+
+          return Math.floor(unitp * qty);
+        }
+      : props.CalculateTaxColId2.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
           let unitp = values[fieldNames.indexOf("curUnitPrice")];
           let qty = values[fieldNames.indexOf("dblOrderQty")];
@@ -1637,7 +1719,9 @@ const funcshowGrid = async () => {
         ? "#,##0.000"
         : "#,##0.0",
     styleName:
-      props.dynamicRowHeight == true
+      props.dynamicRowHeight2 == true && item.strAlign == "left"
+        ? "setTextAlignLeft"
+        : props.dynamicRowHeight == true
         ? "realgrid-pre-wrap"
         : item.strAlign == "left"
         ? "setTextAlignLeft"
@@ -1722,7 +1806,8 @@ const funcshowGrid = async () => {
       type:
         item.strColID == "add" ||
         item.strColID == "add1" ||
-        item.strColID == "add2"
+        item.strColID == "add2" ||
+        item.strDisplay.includes("button")
           ? "button"
           : item.strColID.includes("checkbox") ||
             item.strDisplay.includes("checkbox") ||
@@ -1742,15 +1827,70 @@ const funcshowGrid = async () => {
     buttonVisibility: "always",
     styleCallback: props.checkAbleExpressionCol.includes(item.strColID)
       ? function (grid, dataCell) {
-          const blnChk = grid
-            .getDataSource()
-            .getValue(dataCell.index.dataRow, props.checkAbleExpressionCol2);
-          if (blnChk !== props.checkAbleExpressionVal) {
+          if (item.strColID == "Selected") {
+            const blnChk = grid
+              .getDataSource()
+              .getValue(dataCell.index.dataRow, props.checkAbleExpressionCol2);
+
+            if (props.checkAbleExpressionVal.includes(blnChk)) {
+              return {
+                editable: props.rowStateeditable,
+                renderer: {
+                  type: "check",
+                  editable: false,
+                  readOnlySetDisabled: true,
+                },
+              };
+            }
             return {
+              editable: props.rowStateeditable,
               renderer: {
                 type: "check",
-                editable: false,
-                readOnlySetDisabled: true,
+                editable: true,
+              },
+            };
+          } else if (item.strColID == "cancled") {
+            const blnChk = grid
+              .getDataSource()
+              .getValue(dataCell.index.dataRow, props.checkAbleExpressionCol3);
+
+            if (props.checkAbleExpressionVal2.includes(blnChk)) {
+              return {
+                editable: props.rowStateeditable,
+                renderer: {
+                  type: "check",
+                  editable: false,
+                  readOnlySetDisabled: true,
+                },
+              };
+            }
+            return {
+              editable: props.rowStateeditable,
+              renderer: {
+                type: "check",
+                editable: true,
+              },
+            };
+          } else {
+            const blnChk = grid
+              .getDataSource()
+              .getValue(dataCell.index.dataRow, props.checkAbleExpressionCol2);
+
+            if (blnChk != props.checkAbleExpressionVal) {
+              return {
+                editable: props.rowStateeditable,
+                renderer: {
+                  type: "check",
+                  editable: false,
+                  readOnlySetDisabled: true,
+                },
+              };
+            }
+            return {
+              editable: props.rowStateeditable,
+              renderer: {
+                type: "check",
+                editable: true,
               },
             };
           }
@@ -2056,7 +2196,7 @@ const funcshowGrid = async () => {
             props.setRowStyleCallsDefaultCol2
           );
 
-          if (Value == "소계" || Value2 == "소계") {
+          if (Value == "소계" || Value2 == "소계" || Value2 == "매장 계") {
             return "blue";
           } else if (Value == "합계" || Value2 == "합계") {
             return "pink";
@@ -2489,7 +2629,12 @@ const funcshowGrid = async () => {
   emit("allStateRows", dataProvider.getAllStateRows());
   // 데이터 추가
   // 5구간
-  dataProvider.setRows(props.rowData);
+  if (props.setTreeView == false) {
+    dataProvider.setRows(props.rowData);
+  } else {
+    dataProvider.setRows(props.rowData, "TreeNum", false, null, "iconField");
+  }
+
   //
   // 기타 옵션
   gridView.rowIndicator.width = 50;
@@ -2528,9 +2673,21 @@ const funcshowGrid = async () => {
     props.dragOn == true ? "block" : props.selectionStyle;
   // props.selectionStyle;deleteRow
   gridView.displayOptions.showTooltip = true;
-  gridView.displayOptions.rowHeight = props.dynamicRowHeight == true ? -1 : 1;
+  gridView.displayOptions.rowHeight =
+    props.dynamicRowHeight == true && props.setTreeView == false
+      ? -1
+      : props.dynamicRowHeight2 == true && props.setTreeView == true
+      ? -1
+      : 1;
 
-  gridView.groupPanel.visible = false;
+  if (props.setTreeView == false) {
+    gridView.groupPanel.visible = false;
+  } else {
+    gridView.treeOptions.iconImagesRoot = "/icon/";
+    gridView.treeOptions.iconImages = ["favicon.png", "favicon.png"];
+    gridView.treeOptions.defaultIcon = 1;
+  }
+
   gridView.displayOptions.watchDisplayChange = false;
   gridView.filterMode = "explicit";
   gridView.checkBar.fieldName = "checkbox";
@@ -2636,7 +2793,7 @@ const funcshowGrid = async () => {
   for (let i = dataProvider.getRowCount() - 1; i >= 0; i--) {
     // 역순으로 순회
     const rowData = dataProvider.getJsonRow(i);
-    if (rowData.deleted) {
+    if (rowData != null && rowData.deleted && props.setTreeView == false) {
       dataProvider.removeRow(i); // 해당 행 삭제
     }
   }
@@ -2699,7 +2856,7 @@ const funcshowGrid = async () => {
   };
 
   gridView.onItemChecked = function (grid, itemIndex, checked) {
-    gridView.setCurrent({ dataRow: itemIndex });
+    gridView.setCurrent({ dataRow: grid.getDataRow(itemIndex) });
 
     // dataProvider.beginUpdate();
     // if (gridView.isCheckedRow(itemIndex)) {
@@ -2763,7 +2920,11 @@ const funcshowGrid = async () => {
 
     var current = gridView.getCurrent();
     selectedindex.value = current.dataRow;
-    selectedRowData.value = dataProvider.getRows()[current.dataRow];
+    if (props.setTreeView == false) {
+      selectedRowData.value = dataProvider.getRows()[current.dataRow];
+    } else {
+      selectedRowData.value = dataProvider.getJsonRow(current.dataRow);
+    }
     emit("buttonClicked", selectedRowData.value);
     emit("clickedButtonCol", clickData.fieldName);
     emit("selcetedrowData", selectedRowData.value);
@@ -2775,7 +2936,11 @@ const funcshowGrid = async () => {
   gridView.onSelectionChanged = function (grid) {
     var current = gridView.getCurrent();
 
-    selectedRowData.value = dataProvider.getRows()[current.dataRow];
+    if (props.setTreeView == false) {
+      selectedRowData.value = dataProvider.getRows()[current.dataRow];
+    } else {
+      selectedRowData.value = dataProvider.getJsonRow(current.dataRow);
+    }
     if (selectedRowData.value) {
       selectedRowData.value.index = current.dataRow;
 
@@ -2813,7 +2978,11 @@ const funcshowGrid = async () => {
       emit("selectedIndex", current.dataRow);
       emit("selectedIndex2", current.dataRow);
 
-      selectedRowData.value = dataProvider.getRows()[clickData.dataRow];
+      if (props.setTreeView == false) {
+        selectedRowData.value = dataProvider.getRows()[current.dataRow];
+      } else {
+        selectedRowData.value = dataProvider.getJsonRow(current.dataRow);
+      }
       //dataProvider.checkRowStates(false);
       if (props.excludeCheck == true) {
         gridView.checkAll(false); // checkrowstates
@@ -2860,7 +3029,11 @@ const funcshowGrid = async () => {
       // }
 
       // dataProvider.checkRowStates(true);
-      selectedRowData.value = dataProvider.getRows()[current.dataRow];
+      if (props.setTreeView == false) {
+        selectedRowData.value = dataProvider.getRows()[current.dataRow];
+      } else {
+        selectedRowData.value = dataProvider.getJsonRow(current.dataRow);
+      }
       if (selectedRowData.value) {
         const rowState = dataProvider.getRowState(clickData.dataRow);
         if (selectedRowData.value) {
@@ -2893,6 +3066,19 @@ const funcshowGrid = async () => {
       if (props.checkAbleExpressionCol == "") {
         for (var i = 0; i < rowCount; i++) {
           dataProvider.setValue(i, col.fieldName, chk);
+        }
+      } else if (props.checkAbleExpressionCol3 != "") {
+        for (var i = 0; i < rowCount; i++) {
+          const getblnCheck = dataProvider.getValue(
+            i,
+            props.checkAbleExpressionCol3
+          );
+
+          if (getblnCheck == props.checkAbleExpressionVal2) {
+            dataProvider.setValue(i, col.fieldName, chk);
+            const index = dataProvider.getDataRowId(i);
+            gridView.checkRow(index, chk);
+          }
         }
       } else {
         for (var i = 0; i < rowCount; i++) {
@@ -2958,7 +3144,14 @@ const funcshowGrid = async () => {
       return;
     }
 
-    selectedRowData.value = dataProvider.getRows()[clickData.itemIndex];
+    const current = clickData.dataRow;
+
+    if (props.setTreeView == false) {
+      selectedRowData.value = dataProvider.getRows()[current];
+    } else {
+      selectedRowData.value = dataProvider.getJsonRow(current);
+    }
+
     if (selectedRowData.value) {
       selectedRowData.value.index = clickData.itemIndex;
       emit("dblclickedRowData", selectedRowData.value);
@@ -3170,7 +3363,11 @@ watch(
       if (current.itemIndex !== -1) {
         emit("selectedIndex", current.dataRow);
         emit("selectedIndex2", current.dataRow);
-        selectedRowData.value = dataProvider.getRows()[current.dataRow];
+        if (props.setTreeView == false) {
+          selectedRowData.value = dataProvider.getRows()[current.dataRow];
+        } else {
+          selectedRowData.value = dataProvider.getJsonRow(current.dataRow);
+        }
         if (selectedRowData.value) {
           const rowState = dataProvider.getRowState(current.dataRow);
           if (selectedRowData.value) {
@@ -4225,5 +4422,9 @@ watch(
 .header-style-0 {
   background-color: #545876;
   color: white;
+}
+
+img.rg-tree-icon {
+  display: inline !important;
 }
 </style>

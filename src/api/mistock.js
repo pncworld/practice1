@@ -598,3 +598,315 @@ export const getStockOrderList = (
     LANG: lang,
   });
 };
+
+export const getDemCloseTime = (groupCd, storeCd) => {
+  return api2.post("/MISTOCK/STK01_002INS.asmx/getDemCloseTime", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+
+export const getDemandAuditList = (groupCd) => {
+  return api2.post("/MISTOCK/STK01_002INS.asmx/getDemandAuditList", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const saveDemCloseAndAuditList = (
+  groupCd,
+  storeArea,
+  time,
+  date,
+  storecds,
+  permissions
+) => {
+  return api2.post("/MISTOCK/STK01_002INS.asmx/saveDemCloseAndAuditList", {
+    GROUP_CD: groupCd,
+    STORE_AREA: storeArea,
+    TIME: time,
+    DATE: date,
+    STORECDS: storecds,
+    PERMISSIONS: permissions,
+  });
+};
+
+export const getDemandStoreList = (groupCd, attr) => {
+  return api2.post("/MISTOCK/STK01_011INS.asmx/getDemandStoreList", {
+    GROUP_CD: groupCd,
+    ATTR: attr,
+  });
+};
+
+export const getStockDemandList2 = (groupCd, storeCd, lang, sdate, edate) => {
+  return api2.post("/MISTOCK/STK01_011INS.asmx/getStockDemandList2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LANG: lang,
+    SDATE: sdate,
+    EDATE: edate,
+  });
+};
+
+export const getStockDetail2 = (
+  groupCd,
+  storecd,
+  lang,
+  demandno,
+  demanddate
+) => {
+  return api2.post("/MISTOCK/STK01_011INS.asmx/getStockDetail2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    LANG: lang,
+    DEMANDNO: demandno,
+    DEMANDDATE: demanddate,
+  });
+};
+
+export const updateDemandMaster = (
+  groupCd,
+  storecd,
+  date,
+  demandno,
+  comment
+) => {
+  return api2.post("/MISTOCK/STK01_011INS.asmx/updateDemandMaster", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DATE: date,
+    DEMANDNO: demandno,
+    COMMENT: comment,
+  });
+};
+
+export const InsertDemandMasterDetail = (
+  groupCd,
+  storecd,
+  date,
+  comments,
+  classtype,
+  ddate,
+  edate,
+  stockids,
+  qtys,
+  userid,
+  specialyn,
+  char,
+  comments2
+) => {
+  return api2.post("/MISTOCK/STK01_011INS.asmx/InsertDemandMasterDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DATE: date,
+    COMMENT: comments,
+    CLASSTYPE: classtype,
+    DDATE: ddate,
+    EDATE: edate,
+    STOCKIDS: stockids,
+    QTYS: qtys,
+    USERID: userid,
+    SPECIAL: specialyn,
+    CHAR: char,
+    COMMENTS: comments2,
+  });
+};
+
+export const deleteDemandMaster = (
+  groupCd,
+  storecd,
+  demandno,
+  date,
+  userid
+) => {
+  return api2.post("/MISTOCK/STK01_011INS.asmx/deleteDemandMaster", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DEMANDNO: demandno,
+    DATE: date,
+    USERID: userid,
+  });
+};
+
+export const getOptionStoreList = (groupCd, storecd) => {
+  return api2.post("/MISTOCK/STK32_001INS.asmx/getOptionStoreList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+  });
+};
+
+export const getStockOrderReleaseList = (
+  groupCd,
+  storecd,
+  dstorecd,
+  sdate,
+  edate,
+  mdate,
+  status,
+  lang
+) => {
+  return api2.post("/MISTOCK/STK32_001INS.asmx/getStockOrderReleaseList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DSTORE_CD: dstorecd,
+    SDATE: sdate,
+    EDATE: edate,
+    MDATE: mdate,
+    STATUS: status,
+    LANG: lang,
+  });
+};
+
+export const getStockDetail3 = (
+  groupCd,
+  storecd,
+  demandno,
+  movedate,
+  outstore
+) => {
+  return api2.post("/MISTOCK/STK32_001INS.asmx/getStockDetail3", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DEMAND_NO: demandno,
+    MDATE: movedate,
+    MOVEOUTSTORE: outstore,
+  });
+};
+
+export const saveStockConfirm = (
+  groupCd,
+  storecd,
+  storecd2,
+  mdate,
+  itemids,
+  qtys,
+  unitprices,
+  cursupplys,
+  curtaxes,
+  demandnos,
+  demandseqs,
+  lngsequence,
+  comment
+) => {
+  return api2.post("/MISTOCK/STK32_001INS.asmx/saveStockConfirm", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    STORE_CD2: storecd2,
+    MDATE: mdate,
+    ITEMIDS: itemids,
+    QTYS: qtys,
+    UNITPRICES: unitprices,
+    SUPPLYS: cursupplys,
+    CURTAXES: curtaxes,
+    DEMANDNOS: demandnos,
+    DEMANDSEQS: demandseqs,
+    LNGSEQUENCE: lngsequence,
+    COMMENTS: comment,
+  });
+};
+
+export const deleteStockConfirmList = (
+  groupCd,
+  storecd,
+  dstorecd,
+  demandno,
+  mdate,
+  edate,
+  userid
+) => {
+  return api2.post("/MISTOCK/STK32_001INS.asmx/deleteStockConfirmList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DSTORE_CD: dstorecd,
+    DEMANDNO: demandno,
+    MDATE: mdate,
+    EDATE: edate,
+    USERID: userid,
+  });
+};
+
+export const saveStockConfirmAll = (
+  groupCd,
+  storecd,
+  dstorecd,
+  demandno,
+  mdate,
+  edate,
+  userid
+) => {
+  return api2.post("/MISTOCK/STK32_001INS.asmx/saveStockConfirmAll", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DSTORE_CD: dstorecd,
+    DEMANDNO: demandno,
+    MDATE: mdate,
+    EDATE: edate,
+    USERID: userid,
+  });
+};
+
+export const getShippingInfo = (groupCd) => {
+  return api2.post("/MISTOCK/STK05_013RPT.asmx/getShippingInfo", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const getOrderOutList = (
+  groupCd,
+  storecd,
+  storecd2,
+  sdate,
+  edate,
+  shipcd
+) => {
+  return api2.post("/MISTOCK/STK05_013RPT.asmx/getOrderOutList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    STORE_CD2: storecd2,
+    SDATE: sdate,
+    EDATE: edate,
+    SHIPCD: shipcd,
+  });
+};
+
+export const getOutDetailList = (groupCd, storecd, storecd2, moveno) => {
+  return api2.post("/MISTOCK/STK05_013RPT.asmx/getOutDetailList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    STORE_CD2: storecd2,
+    MOVENO: moveno,
+  });
+};
+
+export const getOrderStockReturnList = (
+  groupCd,
+  storecd,
+  sdate,
+  edate,
+  attr,
+  storecd2,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  lang,
+  cond7
+) => {
+  return api2.post("/MISTOCK/STK05_018RPT.asmx/getOrderStockReturnList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    SDATE: sdate,
+    EDATE: edate,
+    ATTR: attr,
+    STORE_CD2: storecd2,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+    COND5: cond5,
+    COND6: cond6,
+    LANG: lang,
+    COND7: cond7,
+  });
+};

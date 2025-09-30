@@ -16,49 +16,49 @@
         <button @click="excelButton" class="button save w-auto excel">
           엑셀
         </button>
+
+        <button
+          @click="printButton"
+          class="button print w-auto"
+          v-if="cond7 == '2' && afterSearch">
+          인쇄
+        </button>
       </div>
     </div>
     <div
-      class="grid grid-cols-[1fr,3fr] grid-rows-5 justify-start bg-gray-200 rounded-lg h-48 items-start z-10 w-full">
+      class="grid grid-cols-[1fr,1fr,1fr] grid-rows-5 justify-start bg-gray-200 rounded-lg h-40 items-start z-10 w-full gap-5">
       <div class="flex ml-7">
         <Datepicker2
-          @dateValue="dateValue"
+          @endDate="endDate"
+          @startDate="startDate"
           :mainName="'일자'"
           :initToday="1"
           @excelDate="excelDate"></Datepicker2>
       </div>
 
-      <div class="flex -space-x-32">
-        <PickStoreRenew
+      <div class="flex col-span-2">
+        <!-- <PickStoreRenew
           @lngStoreCode="lngStoreCode"
           @excelStore="excelStore"
           :mainName="'이동매장'"
+          :disableStore="true"
           :hideit2="false"
-          :hideit="false"></PickStoreRenew>
+          :hideit="false"></PickStoreRenew> -->
+
+        <PickStore
+          :hideGroup="false"
+          :hideAttr="false"
+          :mainName="'이동매장'"
+          @update:storeCd="lngStoreCode"></PickStore>
 
         <PickStoreRenew
-          @lngStoreCode="lngStoreCode"
+          @lngStoreCode="lngStoreCode2"
           @excelStore="excelStore"
           :mainName="''"></PickStoreRenew>
-        <!-- <div class="flex items-center space-x-5 -ml-11">
-          <div class="text-base font-semibold">재고조사주기</div>
-          <div>
-            <select
-              name=""
-              id=""
-              class="border border-black w-32 h-7"
-              v-model="cond4">
-              <option value="0">전체</option>
-              <option :value="i.lngDCode" v-for="i in optionList3">
-                {{ i.strDName }}
-              </option>
-            </select>
-          </div>
-        </div> -->
       </div>
 
       <div
-        class="flex justify-start items-center text-base text-nowrap font-semibold ml-12 mt-7 col-span-2">
+        class="flex justify-start items-center text-base text-nowrap font-semibold ml-12 mt-7 col-span-3">
         자재분류
         <div class="flex ml-5 space-x-3 -mt-1">
           <div>
@@ -93,105 +93,82 @@
               v-model="cond3" />
           </div>
         </div>
-        <!-- <div class="flex justify-end ml-48">
-          <div>조회단위</div>
-          <div>
-            <select
-              name=""
-              id=""
-              class="w-32 ml-5 h-7 flex items-center"
-              v-model="cond5">
-              <option :value="i.strDCode" v-for="i in optionList4">
-                {{ i.strDName }}
-              </option>
-            </select>
-          </div>
-
-          <div class="ml-5 flex items-center">
-            <label for="item"
-              ><input
-                type="checkbox"
-                id="item"
-                class="font-semibold text-base"
-                @change="checkCond"
-                checked />소모품제거</label
-            >
-          </div>
-        </div> -->
       </div>
-      <div class="flex mt-5 ml-20 items-center">
+      <div class="flex mt-6 ml-4 items-center space-x-5">
+        <div class="text-base font-semibold">주문/반품유형</div>
+        <div class="items-center ml-5">
+          <select
+            name=""
+            id=""
+            class="w-32 h-7 border border-black"
+            v-model="cond4">
+            <option value="0">전체</option>
+            <option :value="i.strDCode" v-for="i in optionList3">
+              {{ i.strDName }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="flex mt-6 ml-20 items-center">
         <div class="text-base font-semibold">단위</div>
         <div class="items-center ml-5">
           <select
             name=""
             id=""
             class="w-32 h-7 border border-black"
-            v-model="cond7">
-            <option :value="i.strDCode" v-for="i in optionList5">
+            v-model="cond5">
+            <option :value="i.strDCode" v-for="i in optionList4">
               {{ i.strDName }}
             </option>
           </select>
         </div>
       </div>
-      <div class="flex mt-5 ml-20 items-center">
+      <div class="flex mt-6 ml-20 items-center">
         <div class="text-base font-semibold">단가</div>
         <div class="items-center ml-5">
           <select
             name=""
             id=""
             class="w-32 h-7 border border-black"
-            v-model="cond8">
-            <option :value="i.strDCode" v-for="i in optionList6">
+            v-model="cond6">
+            <option :value="i.strDCode" v-for="i in optionList5">
               {{ i.strDName }}
             </option>
           </select>
         </div>
       </div>
-      <div class="flex mt-5 ml-5 items-center space-x-5 col-span-2">
-        <div class="text-base font-semibold">주문/반품유형</div>
-        <div>
-          <label for="cond"
-            ><input
-              type="radio"
-              id="cond"
-              name="cond"
-              checked />주문반품현황</label
-          >
-        </div>
-        <div>
-          <label for="cond2"
-            ><input type="radio" id="cond2" name="cond" />주문현황</label
-          >
-        </div>
-        <div>
-          <label for="cond3"
-            ><input type="radio" id="cond3" name="cond" />반품현황</label
-          >
-        </div>
-      </div>
-      <div class="flex mt-3 ml-12 items-center space-x-5 pl-1">
+
+      <div class="flex mt-5 ml-12 items-center space-x-5 pl-1">
         <div class="text-base font-semibold">조회유형</div>
 
         <div>
-          <label for="cond4"
-            ><input type="radio" id="cond4" name="cond4" />자재별</label
+          <label for="cond7"
+            ><input
+              type="radio"
+              id="cond7"
+              name="cond7"
+              value="0"
+              v-model="cond7" />자재별</label
           >
         </div>
         <div>
           <label for="cond5"
-            ><input type="radio" id="cond5" name="cond4" />일자별 자재별</label
+            ><input
+              type="radio"
+              id="cond5"
+              name="cond7"
+              value="1"
+              v-model="cond7" />일자별 자재별</label
           >
         </div>
         <div>
           <label for="cond6"
-            ><input type="radio" id="cond6" name="cond4" checked />매장별
-            자재별</label
-          >
-        </div>
-
-        <div>
-          <label for="cond7"
-            ><input type="radio" id="cond7" name="cond4" />하겐다즈용</label
+            ><input
+              type="radio"
+              id="cond6"
+              name="cond7"
+              value="2"
+              v-model="cond7" />매장별 자재별</label
           >
         </div>
       </div>
@@ -200,19 +177,19 @@
     <!-- 그리드 영역 -->
     <div class="w-full h-[70%]">
       <Realgrid
-        :progname="'STKN07_014RPT_VUE'"
-        :progid="1"
+        :progname="'STK05_018RPT_M_VUE'"
+        :progid="progid"
         :rowData="rowData"
         :reload="reload"
-        :documentTitle="'STKN07_014RPT'"
+        :documentTitle="'STK05_018RPT'"
+        :setRowStyleCallsDefaultCol="'lngMoveType'"
+        :setRowStyleCallsDefaultCol2="'lngMoveType'"
+        :setRowStyleCalls="true"
+        :hardCodeSetRowStyleCalls="true"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :exporttoExcel="exportExcel">
       </Realgrid>
-      <!-- <Realgrid :progname="'SLS05_004RPT_VUE'" :progid="1" :rowData="rowData" :reload="reload" 
-         :setFooter="true" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
-         :exporttoExcel="exportExcel" :documentTitle="'SLS05_004RPT'" :documentSubTitle="documentSubTitle" 
-      </Realgrid> -->
     </div>
   </div>
   <!-- 그리드 영역 -->
@@ -220,8 +197,11 @@
 
 <script setup>
 import { getCommonList } from "@/api/common";
-import { getStockDetail, getWorkList, getWorkSheetList } from "@/api/mistock";
-import Datepicker1 from "@/components/Datepicker1.vue";
+import {
+  getOrderStockReturnList,
+  getStockDetail,
+  getWorkList,
+} from "@/api/mistock";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -248,6 +228,7 @@ import Realgrid from "@/components/realgrid.vue";
  *  */
 
 import { insertPageLog } from "@/customFunc/customFunc";
+import Swal from "sweetalert2";
 /*
  * 공통 표준  Function
  */
@@ -264,9 +245,7 @@ const optionList2 = ref([]);
 const optionList3 = ref([]);
 const optionList4 = ref([]);
 const optionList5 = ref([]);
-const optionList6 = ref([]);
-const setGroupSumCustomColumnId = ref(["strWeek"]);
-const setGroupColumnId = ref("");
+
 const reload = ref(false);
 const rowData = ref([]);
 const afterSearch = ref(false);
@@ -281,9 +260,8 @@ const cond = ref(0);
 const cond2 = ref(0);
 const cond3 = ref("");
 const cond4 = ref(0);
-const tempSeeStore = ref(false);
-const reportCheckData = ref("0");
-const progId = ref("1");
+
+const progid = ref("2");
 
 const store = useStore();
 const loginedstrLang = store.state.userData.lngLanguage;
@@ -313,23 +291,55 @@ const cond8 = ref(0);
 const checkCond = (e) => {
   cond6.value = e.target.checked;
 };
+
+const sdate = ref("");
+const edate = ref("");
+const endDate = (e) => {
+  edate.value = e;
+};
+const startDate = (e) => {
+  sdate.value = e;
+};
 const searchButton = async () => {
+  if (selectedStore.value == "0") {
+    Swal.fire({
+      title: "경고",
+      text: "이동매장을 선택해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   store.state.loading = true;
   try {
     initGrid();
 
-    const res = await getWorkList(
+    if (cond7.value == "0") {
+      progid.value = 1;
+    } else if (cond7.value == "1") {
+      progid.value = 2;
+    } else {
+      progid.value = 3;
+    }
+    reload.value = !reload.value;
+    const res = await getOrderStockReturnList(
       store.state.userData.lngStoreGroup,
       selectedStore.value,
+      sdate.value.replaceAll("-", ""),
+      edate.value.replaceAll("-", ""),
+      0,
+      selectedStore2.value,
       cond.value,
       cond2.value,
       cond3.value,
       cond4.value,
-      selectedDate.value,
       cond5.value,
-      cond6.value == true ? 1 : 0
+      cond6.value,
+      store.state.userData.strLanguage,
+      cond7.value
     );
-    ////console.log(res);
+    console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -344,9 +354,8 @@ const searchButton = async () => {
 /* 매장 컴포넌트 관련 함수 */
 const selectedGroup = ref();
 const selectedStore = ref(0);
-const selectedStoreAttrs = ref();
-const selectedStoreTeam = ref();
-const selectedStoreSuperVisor = ref();
+const selectedStore2 = ref(0);
+
 /**
  * 페이지 매장 그룹 세팅
  */
@@ -374,25 +383,21 @@ const selectedWeekDay = ref("");
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
   const res = await getCommonList("07");
-  const res2 = await getCommonList("73");
-  const res3 = await getCommonList("67");
+
   const res4 = await getCommonList("166");
   const res5 = await getCommonList("164");
+  const res6 = await getCommonList("170");
 
   optionList.value = res.data.List;
-  optionList3.value = res2.data.List;
-  optionList4.value = res3.data.List;
-  optionList5.value = res4.data.List;
-  optionList6.value = res5.data.List;
+  optionList3.value = res6.data.List;
+  optionList4.value = res4.data.List;
+  optionList5.value = res5.data.List;
 
   if (optionList4.value.length > 0) {
     cond5.value = optionList4.value[0].strDCode;
   }
   if (optionList5.value.length > 0) {
-    cond7.value = optionList5.value[0].strDCode;
-  }
-  if (optionList6.value.length > 0) {
-    cond8.value = optionList6.value[0].strDCode;
+    cond6.value = optionList5.value[0].strDCode;
   }
 
   //comsole.log(weekDay.value);
@@ -415,6 +420,8 @@ const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
   }
+
+  afterSearch.value = false;
 };
 
 //엑셀 버튼 처리 함수
@@ -451,6 +458,9 @@ const dateValue = (e) => {
 const lngStoreCode = (e) => {
   selectedStore.value = e;
 };
+const lngStoreCode2 = (e) => {
+  selectedStore2.value = e;
+};
 const selectedExcelStore = ref("");
 /**
  * 엑셀용 매장 세팅 함수
@@ -460,4 +470,33 @@ const excelStore = (e) => {
   selectedExcelStore.value = e;
   //comsole.log(e);
 };
+
+const printButton = () => {
+  const filtered = rowData.value.filter((item) => item.Sorty == "0");
+
+  const storecds = filtered.map((item) => item.lngStoreCode).join(",");
+  const storecds2 = filtered.map((item) => item.lngDesStoreCode).join(",");
+  const ordercds = filtered.map((item) => item.strMoveNo).join(",");
+  window.open(
+    `http://222.231.31.99/Report/CRPrint.aspx?pCount=${
+      filtered.length
+    }&Report=ReturnOut&@P_lngStoreGroup=${
+      store.state.userData.lngStoreGroup
+    }&@P_lngStoreCode=${
+      selectedStore2.value
+    }&@P_lngDesStoreAttr=0&@P_lngDesStoreCode=${
+      selectedStore.value
+    }&@P_dtmFromDate=${sdate.value.replaceAll(
+      "-",
+      ""
+    )}&@P_dtmToDate=${edate.value.replaceAll("-", "")}`,
+    "_blank",
+    "width=1600,height=1200"
+  );
+};
+
+//http://222.231.31.99/Report/CRPrint.aspx?pCount=6&Report=ReturnOut&@P_lngStoreGroup=5001&@P_lngStoreCode=0&@P_lngDesStoreAttr=0&@P_lngDesStoreCode=500100&@P_dtmFromDate=20240901&@P_dtmToDate=20250929
+
+//http://222.231.31.99/Report/CRPrint.aspx?pCount=6&Report=ReturnOut&@P_lngStoreGroup=5001&@P_lngStoreCode=0&@P_lngDesStoreAttr=0&@P_lngDesStoreCode=500100&@P_dtmFromDate=20240901&@P_dtmToDate=20250929
+//http://222.231.31.99/Report/CRPrint.aspx?pCount=6&Report=ReturnOut&@P_lngStoreGroup=5001&@P_lngStoreCode=500100&@P_lngDesStoreAttr=0&@P_lngDesStoreCode=0&@P_dtmFromDate=20240929&@P_dtmToDate=20250929
 </script>

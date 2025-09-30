@@ -1,5 +1,7 @@
 <template>
-  <div class="flex justify-center md:justify-end text-base mt-2 ml-12">
+  <div
+    class="flex justify-center md:justify-end text-base mt-2 ml-12"
+    :class="dynamicStoreClass2">
     <div class="items-center font-bold hidden md:flex text-nowrap">
       {{ MainName }}
     </div>
@@ -355,6 +357,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  setDynamicStoreClass2: {
+    type: String,
+    default: "",
+  },
   setDefaultStoreCd: {
     type: String,
     default: "",
@@ -491,8 +497,10 @@ watch(
 );
 
 const dynamicStoreClass = ref("");
+const dynamicStoreClass2 = ref("");
 onMounted(() => {
   dynamicStoreClass.value = props.setDynamicStoreClass;
+  dynamicStoreClass2.value = props.setDynamicStoreClass2;
   storeGroup.value = store.state.storeGroup;
   storeType.value = store.state.storeType;
   storeCd.value = store.state.storeCd;
@@ -517,9 +525,17 @@ onMounted(() => {
   emit("update:storeType", store.state.userData.lngJoinType);
   if (props.setDefaultStoreCd != "") {
     selectedStoreCode.value = props.setDefaultStoreCd;
+
+    const selectedNm = storeCd.value.filter(
+      (item) => item.lngStoreCode == props.setDefaultStoreCd
+    )[0].strName;
+
+    emit("storeNm", selectedNm);
+  } else {
+    emit("storeNm", storenm);
   }
   emit("update:storeCd", selectedStoreCode.value);
-  emit("storeNm", storenm);
+
   emit("posNo", 0);
   emit("updateFuncScreenType", 0);
   //emit("update:storeAreaCd", 0);
@@ -746,6 +762,11 @@ watch(
     console.log(props.setDefaultStoreCd);
     if (props.setDefaultStoreCd != "") {
       selectedStoreCode.value = props.setDefaultStoreCd;
+      const selectedNm = storeCd.value.filter(
+        (item) => item.lngStoreCode == props.setDefaultStoreCd
+      )[0].strName;
+
+      emit("storeNm", selectedNm);
     }
   }
 );
