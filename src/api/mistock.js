@@ -365,6 +365,89 @@ export const getStockCheckLossByUpdate = (groupCd, storeCd, loss) => {
   });
 };
 
+export const getDiligenceRegistration = (
+  groupCd,
+  storeCd,
+  date,
+  lngTakeCycle,
+  lngUnitType,
+  strShowType,
+  lngSupplierID,
+  lngGroupID,
+  lngCategoryID,
+  lngGenericID,
+) => {
+  return api2.post("/MISTOCK/STKN07_013RPT.asmx/getDiligenceRegistration", {
+    GROUP_CD   : groupCd,
+    STORE_CD   : storeCd,
+    DATE       : date,
+    TAKE_CYCLE : lngTakeCycle,
+    UNIT_TYPE  : lngUnitType,
+    SHOW_TYPE  : strShowType,
+    SUPP_ID    : lngSupplierID,
+    GROUP_ID   : lngGroupID,
+    CATE_ID    : lngCategoryID,
+    GEN_ID     : lngGenericID,
+  });
+};
+
+export const getDiligenceRegistration2 = (
+  groupCd,
+  storeCd,
+  date,
+  lngTakeCycle,
+  lngUnitType,
+  strShowType,
+) => {
+  return api2.post("/MISTOCK/STKN07_013RPT.asmx/getDiligenceRegistration2", {
+    GROUP_CD   : groupCd,
+    STORE_CD   : storeCd,
+    DATE       : date,
+    TAKE_CYCLE : lngTakeCycle,
+    UNIT_TYPE  : lngUnitType,
+    SHOW_TYPE  : strShowType,
+  });
+};
+
+export const delDiligenceRegistration = (
+  groupCd,
+  storeCd,
+  date,
+  stockId,
+  closeYn,
+) => {
+  return api2.post("/MISTOCK/STKN07_013RPT.asmx/delDiligenceRegistration", {
+    GROUP_CD  : groupCd,
+    STORE_CD  : storeCd,
+    DATE      : date,
+    STOCK_ID  : stockId,
+    CLOSE_YN  : closeYn,
+  });
+};
+
+export const setDiligenceRegistration = (
+  lngTakeCycle,
+  groupCd,
+  storeCd,
+  date,
+  stockId,
+  dblTakeQty,
+  dblShortQty,
+  unitType,
+  isClose,
+) => {
+  return api2.post("/MISTOCK/STKN07_013RPT.asmx/setDiligenceRegistration", {
+    TAKE_CYCLE : lngTakeCycle,
+    GROUP_CD   : groupCd,
+    STORE_CD   : storeCd,
+    DATE       : date,
+    STOCK_ID   : stockId,
+    TAKE_QTY   : dblTakeQty,
+    SHORT_QTY  : dblShortQty,
+    UNIT_TYPE  : unitType,
+    CLOSE_YN   : isClose,
+  });
+};
 export const getLossMasterPartList = (groupCd, storeCd) => {
   return api2.post("/MISTOCK/STKN06_013INS.asmx/getLossMasterPartList", {
     GROUP_CD: groupCd,

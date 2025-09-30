@@ -17,6 +17,7 @@ import STKN07_015RPT from "@/views/MISTOCK/STKN07_015RPT.vue";
 import STKN07_016RPT from "@/views/MISTOCK/STKN07_016RPT.vue";
 import STKN07_017RPT from "@/views/MISTOCK/STKN07_017RPT.vue";
 import STKN07_018RPT from "@/views/MISTOCK/STKN07_018RPT.vue";
+import STKN07_013RPT from "@/views/MISTOCK/STKN07_013RPT.vue";
 
 export default function mistockRouter() {
   return [
@@ -59,6 +60,10 @@ export default function mistockRouter() {
     {
       path: "STK09_003BAT.xml",
       component: STK09_003BAT,
+    },
+    {
+      path: "STKN07_013RPT.xml",
+      component: STKN07_013RPT,
     },
     {
       path: "STKN06_013INS.xml",

@@ -1075,6 +1075,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  CalculateShortQty: {
+    // HR02_001INS 색상 설정용
+    type: String,
+    default: "",
+  },
+
   exportExcelHiddenColumns: {
     // 엑셀 내보내기시 감춘컬럼 감춰서 export 하기
     type: Array,
@@ -1210,37 +1216,25 @@ const funcshowGrid = async () => {
         props.AutoCalculateDataMainColId.indexOf(item.strColID)
       ],
 
-    valueCallback: props.CalculateSumColId2.includes(item.strColID)
+    //     if (taxType == "01") {
+    //       return supply * 0.1;
+    //     } else {
+    //       return 0;
+    //     }
+    //   } else {
+    //     return values[fieldNames.indexOf(item.strColID)];
+    //   }
+    // },
+    valueCallback: props.CalculateShortQty.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
-          let qty = parseInt(values[fieldNames.indexOf("dblDemandQty")]);
-          let supply = parseInt(values[fieldNames.indexOf("curUnitPrice")]);
+          let dblResultQty = values[fieldNames.indexOf("dblResultQty")];
+          let dblTakeQty = values[fieldNames.indexOf("dblTakeQty")];
 
-          return Math.floor(supply * qty);
-        }
-      : props.CalculateSumColId.includes(item.strColID)
-      ? function (prod, dataRow, fieldName, fieldNames, values) {
-          let unitp = parseInt(values[fieldNames.indexOf("curTax")]);
-          let qty = parseInt(values[fieldNames.indexOf("curSupply")]);
-
-          return Math.floor(unitp + qty);
-        }
-      : props.CalculateTaxColId4.includes(item.strColID)
-      ? function (prod, dataRow, fieldName, fieldNames, values) {
-          let unitp = values[fieldNames.indexOf("curUnitPrice")];
-          let taxType = values[fieldNames.indexOf("lngTaxType")];
-          let qty = values[fieldNames.indexOf("dblDemandQty")];
-          if (taxType == "01") {
-            return Math.floor(unitp * qty * 0.1);
+          if (dblResultQty > 0) {
+            return parseInt(dblTakeQty) - parseInt(dblResultQty);
           } else {
-            return 0;
+            return parseInt(dblTakeQty) + parseInt(dblResultQty);
           }
-        }
-      : props.CalculateTaxColId3.includes(item.strColID)
-      ? function (prod, dataRow, fieldName, fieldNames, values) {
-          let unitp = values[fieldNames.indexOf("curUnitPrice")];
-          let qty = values[fieldNames.indexOf("dblCheckQty")];
-
-          return Math.floor(unitp * qty);
         }
       : props.CalculateTaxColId2.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {

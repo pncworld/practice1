@@ -89,6 +89,7 @@ const props = defineProps({
     type: String,
     default: "매장명",
   },
+  resetFlag: Boolean
 });
 
 const hideit = ref(props.hideit);
@@ -229,6 +230,15 @@ watch(selectedStore, () => {
   //comsole.log(selectedStore.value);
   emit("changeInit", true);
 });
+
+watch(
+  () => props.resetFlag,
+  (newVal, oldVal) => {
+    // console.log("watch 감지됨:", oldVal, "→", newVal); // ← watch가 실행되는지 확인
+    selectedStore.value = null;  // UI 초기화
+    // console.log("selectedStore 초기화됨:", selectedStore.value); // ← 초기화 적용됐는지 확인
+  }
+);
 
 storeGroup.value = store.state.storeGroup;
 storeType.value = store.state.storeType;
