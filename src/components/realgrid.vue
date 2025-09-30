@@ -1054,6 +1054,18 @@ const props = defineProps({
     type: String,
     default: '',
   },
+    CalculateSupplyPrice: {
+    type: String,
+    default: '',
+  },
+    CalculateVatPrice: {
+    type: String,
+    default: '',
+  },
+    CalculateTotalPrice: {
+    type: String,
+    default: '',
+  },
 
   exportExcelHiddenColumns: {
     // 엑셀 내보내기시 감춘컬럼 감춰서 export 하기
@@ -1190,7 +1202,37 @@ const funcshowGrid = async () => {
       }
 
     }
-    
+
+      : props.CalculateSupplyPrice.includes(item.strColID)
+      ? function (prod, dataRow, fieldName, fieldNames, values) {
+          let curUnitPrice = values[fieldNames.indexOf("curUnitPrice")];
+          let dblCheckQty  = values[fieldNames.indexOf("dblCheckQty")];
+          
+          let supplyPrice = curUnitPrice * dblCheckQty;
+
+          return supplyPrice;
+      }
+      : props.CalculateVatPrice.includes(item.strColID)
+      ? function (prod, dataRow, fieldName, fieldNames, values) {
+          let curUnitPrice = values[fieldNames.indexOf("curUnitPrice")];
+          let dblCheckQty  = values[fieldNames.indexOf("dblCheckQty")];
+          
+          let supplyPrice = curUnitPrice * dblCheckQty;
+          let vat         = supplyPrice * 0.1; // 예: 부가세
+
+          return vat;
+      }
+      : props.CalculateTotalPrice.includes(item.strColID)
+      ? function (prod, dataRow, fieldName, fieldNames, values) {
+          let curUnitPrice = values[fieldNames.indexOf("curUnitPrice")];
+          let dblCheckQty  = values[fieldNames.indexOf("dblCheckQty")];
+          
+          let supplyPrice = curUnitPrice * dblCheckQty;
+          let vat         = supplyPrice * 0.1; // 예: 부가세
+          let total       = supplyPrice + vat; // 합계
+
+          return total;
+      }
       : props.CalculateTaxColId2.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
           let unitp = values[fieldNames.indexOf("curUnitPrice")];

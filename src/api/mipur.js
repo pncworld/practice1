@@ -1093,3 +1093,74 @@ export const getStockCheckDetail = (
     LANG: lang,
   });
 };
+
+export const getOrderConfirmDelivery = (
+  groupCd,
+  storeCd,
+  supplierid,
+  date,
+) => {
+  return api2.post("/MIPUR/PUR01_019INS.asmx/getOrderConfirmDelivery", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SUPPLIER_ID: supplierid,
+    DTM_DATE: date,
+  });
+};
+
+
+export const getOrderConfirmDeliveryDetail = (
+  groupCd,
+  storeCd,
+  supplierid,
+  orderNo,
+  date,
+) => {
+  return api2.post("/MIPUR/PUR01_019INS.asmx/getOrderConfirmDeliveryDetail", {
+    GROUP_CD    : groupCd,
+    STORE_CD    : storeCd,
+    SUPPLIER_ID : supplierid,
+    ORDER_NO    : orderNo,
+    DTM_DATE    : date,
+  });
+};
+
+export const setOrderConfirmDelivery = (
+  groupCd,
+  storeCd,
+  orderNo,
+  orderSeq,
+  checkQty,
+  stockCheckComments
+) => {
+  return api2.post("/MIPUR/PUR01_019INS.asmx/setOrderConfirmDelivery", {
+    GROUP_CD  : groupCd,
+    STORE_CD  : storeCd,
+    ORDER_NO  : orderNo,
+    ORDER_SEQ : orderSeq,
+    CHECK_QTY : checkQty,
+    STK_COM   : stockCheckComments,
+  });
+};
+
+export const getOrderUnconfirmedStatus = (
+  groupCd,
+  storeCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6
+) => {
+  return api2.post("/MIPUR/PUR01_026RPT.asmx/getOrderUnconfirmedStatus", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: cond,
+    EDATE: cond2,
+    SUPPLIERID: cond3,
+    COND: cond4,
+    COND2: cond5,
+    ATTR: cond6,
+  });
+};

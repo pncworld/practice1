@@ -15,6 +15,8 @@ import PUR03_035INS from "@/views/MIPUR/PUR03_035INS.vue";
 import PUR03_036RPT from "@/views/MIPUR/PUR03_036RPT.vue";
 import PUR03_037RPT from "@/views/MIPUR/PUR03_037RPT.vue";
 import PUR04_001INS from "@/views/MIPUR/PUR04_001INS.vue";
+import PUR01_019INS from "@/views/MIPUR/PUR01_019INS.vue";
+import PUR01_026RPT from "@/views/MIPUR/PUR01_026RPT.vue";
 
 export default function mipurRouter() {
   return [
@@ -85,6 +87,14 @@ export default function mipurRouter() {
     {
       path: "PUR02_018INS.xml",
       component: PUR02_018INS,
+    },
+    {
+      path: "PUR01_019INS.xml",
+      component: PUR01_019INS,
+    },
+    {
+      path: "PUR01_026RPT.xml",
+      component: PUR01_026RPT,
     },
   ];
 }

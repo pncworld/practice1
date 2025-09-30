@@ -345,7 +345,7 @@ const updatedRowData = (newvalue) => {
 const allstaterows = ref([]);
 
 const allStateRows = (e) => {
-  console.log(e);
+  // console.log(e);
   allstaterows.value = e.updated;
 };
 
@@ -471,7 +471,7 @@ const deleteButton = async () => {
         );
         store.state.loading = false;
 
-        console.log(res);
+        // console.log(res);
 
         if (res.data.RESULT_CD == "00") {
           Swal.fire({
@@ -579,7 +579,7 @@ const saveButton = async () => {
         );
         store.state.loading = false;
 
-        console.log(res);
+        // console.log(res);
 
         if (res.data.RESULT_CD == "00") {
           Swal.fire({

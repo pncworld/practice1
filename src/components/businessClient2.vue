@@ -32,11 +32,12 @@ import { onMounted, ref, watch } from "vue";
 
 const optionList = ref([]);
 const selectedSupplier = ref('');
-const emit = defineEmits(["SupplierId"]);
+const selectedSupplierNm = ref('');
+const emit = defineEmits(["SupplierId", "SupplierNm"]);
 const props = defineProps({
-  defaultNm: {
+  selectSupplierNm : {
     type: String,
-    default: "선택",
+    default: "전체",
   },
   disable: {
     type: Boolean,
@@ -52,7 +53,6 @@ const props = defineProps({
   },
 });
 
-const Nm = ref("");
 const disableBusiness = ref(false);
 const Name = ref("");
 watch(
@@ -67,6 +67,13 @@ watch(
     selectedSupplier.value = props.selectSupplierId;
   }
 );
+watch(
+  () => props.selectSupplierNm,
+  () => {
+    selectedSupplierNm.value = props.selectSupplierNm;
+  }
+);
+
 onMounted(async () => {
   const res = await getSuppliers(store.state.userData.lngStoreGroup);
   optionList.value = res.data.List;
@@ -79,18 +86,33 @@ onMounted(async () => {
 
   Name.value = props.defaultName;
 
-  selectedSupplier.value = '';
-  // Nm.value = props.defaultNm;
+  // props.selectSupplierId가 있으면 선택값과 이름 설정
+  if (props.selectSupplierId) {
+    selectedSupplier.value = props.selectSupplierId;
+    const found = optionList.value.find(i => String(i.lngSupplierID) === String(props.selectSupplierId));
+    selectedSupplierNm.value = found ? found.strSupplierName : '';
+  } else {
+    selectedSupplier.value = '';
+    selectedSupplierNm.value = '전체';
+  }
+
+  // selectedSupplier.value = '';
+  // selectedSupplierNm.value = '';
   emit("SupplierId", selectedSupplier.value);
-  // emit("SupplierNm", Nm.value);
+  emit("SupplierNm", selectedSupplierNm.value);
 });
 
-watch(selectedSupplier, () => {
-  if (selectedSupplier.value == null || selectedSupplier.value == undefined) {
+watch(selectedSupplier, (newVal) => {
+  if (newVal === null || newVal === undefined || newVal === '') {
+    selectedSupplierNm.value = '전체';
     emit("SupplierId", '');
-  } else {
-    emit("SupplierId", selectedSupplier.value);
-  }
+    emit("SupplierNm", '전체');
+    return;
+  } 
+  const found = optionList.value.find(i => String(i.lngSupplierID) === String(newVal));
+  selectedSupplierNm.value = found ? found.strSupplierName : '';
+  emit("SupplierId", selectedSupplier.value);
+  emit("SupplierNm", selectedSupplierNm.value);
 });
 
 </script>
