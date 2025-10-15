@@ -281,7 +281,9 @@
               :rowData="rowData1"
               @clickedRowData="clickedRowData"
               @updatedRowData="updatedRowData3"
+              @updatedRowData2="updatedRowData3"
               @sendRowState="sendRowState"
+              @allStateRows="allStateRows"
               :changeRow="changeRow"
               :changeNow2="changeNow"
               :changeNow="changeNow3"
@@ -293,10 +295,11 @@
               :valuesData="valueData"
               :searchColId="'lngCode,strName'"
               :deleteRow6="deleterow1"
-              :addRow3="addrow1"
+              :addRow5="addrow1"
               @selectedIndex2="selectedIndex"
               @realgridname="realgridname"
               :addrowProp="addrowProp"
+              :addrowDefault="',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,'"
               :selectionStyle="'singleRow'"
               :rowStateeditable="false"
               :initSelect="initSelect"
@@ -328,6 +331,8 @@
               :rowData="rowData3"
               @clickedRowData="clickedRowData2"
               @updatedRowData="updatedRowData6"
+              @updatedRowData2="updatedRowData6"
+              @allStateRows="allStateRows2"
               :deleteRow6="deleterow2"
               :searchColId="'lngCode,strName'"
               :searchWord3="searchword2"
@@ -337,9 +342,10 @@
               :changeNow="changeNow4"
               @sendRowState="sendRowState2"
               :changeColid="changeColid"
-              :addRow3="addrow3"
+              :addRow5="addrow3"
               @selectedIndex2="selectedIndex2"
               :addrowProp="addrowProp2"
+              :addrowDefault="',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,'"
               :selectionStyle="'singleRow'"
               :rowStateeditable="false"
               :initSelect="initSelect"
@@ -788,8 +794,11 @@ const clickrowData1 = ref(false);
  */
 
 const clickedRowData = (newValue) => {
+  if (isNewColumn.value == true) {
+  } else {
+  }
   clickrowData1.value = true;
-  ////console.log(newValue);
+  console.log(newValue);
   if (newValue == undefined) {
     return;
   }
@@ -978,8 +987,9 @@ const saveButton = async () => {
   }
   if (currentMenu.value == false) {
     if (
-      JSON.stringify(confirmitem.value) ===
-      JSON.stringify(updatedRowData4.value)
+      allstaterows.value.deleted.length == 0 &&
+      allstaterows.value.created.length == 0 &&
+      allstaterows.value.updated.length == 0
     ) {
       Swal.fire({
         title: "경고",
@@ -1067,79 +1077,79 @@ const saveButton = async () => {
 
         if (currentMenu.value == false) {
           const lngCodes = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngCode);
           const strNames = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.strName);
           const blnMustSels = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.blnMustSel);
           const intMultiples = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.intMultiple);
           const lngChainMenu1 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu1);
           const lngChainMenu2 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu2);
           const lngChainMenu3 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu3);
           const lngChainMenu4 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu4);
           const lngChainMenu5 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu5);
           const lngChainMenu6 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu6);
           const lngChainMenu7 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu7);
           const lngChainMenu8 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu8);
           const lngChainMenu9 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu9);
           const lngChainMenu10 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu10);
           const lngChainMenu11 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu11);
           const lngChainMenu12 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu12);
           const lngChainMenu13 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu13);
           const lngChainMenu14 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu14);
           const lngChainMenu15 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu15);
           const lngChainMenu16 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu16);
           const lngChainMenu17 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu17);
           const lngChainMenu18 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu18);
           const lngChainMenu19 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu19);
           const lngChainMenu20 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu20);
           const lngChainMenu21 = updatedRowData4.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows.value.deleted.includes(index))
             .map((item) => item.lngChainMenu21);
 
           const res = await saveOptions(
@@ -1173,70 +1183,70 @@ const saveButton = async () => {
           );
         } else {
           const lngCodes2 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngCode);
           const strNames2 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.strName);
           const lngChainGroup1 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup1);
           const lngChainGroup2 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup2);
           const lngChainGroup3 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup3);
           const lngChainGroup4 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup4);
           const lngChainGroup5 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup5);
           const lngChainGroup6 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup6);
           const lngChainGroup7 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup7);
           const lngChainGroup8 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup8);
           const lngChainGroup9 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup9);
           const lngChainGroup10 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup10);
           const lngChainGroup11 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup11);
           const lngChainGroup12 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup12);
           const lngChainGroup13 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup13);
           const lngChainGroup14 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup14);
           const lngChainGroup15 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup15);
           const lngChainGroup16 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup16);
           const lngChainGroup17 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup17);
           const lngChainGroup18 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup18);
           const lngChainGroup19 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup19);
           const lngChainGroup20 = updatedRowData5.value
-            .filter((item) => item.deleted != true)
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
             .map((item) => item.lngChainGroup20);
 
           const res = await saveOptions2(
@@ -1266,9 +1276,8 @@ const saveButton = async () => {
             lngChainGroup20.join(",")
           );
         }
-
-        //comsole.log(res);
       } catch (error) {
+        console.log(error);
       } finally {
         store.state.loading = false;
         Swal.fire({
@@ -1289,6 +1298,7 @@ const saveButton = async () => {
  */
 
 const updatedRowData3 = (e) => {
+  console.log(e);
   updatedRowData4.value = e;
 };
 
@@ -2004,7 +2014,8 @@ const clickaddMenu2 = (newValue) => {
 
 const changeNow3 = ref(false);
 const dblclickedRowData = (newValue) => {
-  //console.log(newValue);
+  // console.log(newValue);
+  // console.log(updatedRowData4.value);
   const a = updatedRowData4.value.find(
     (item) => item.lngCode == optionCd.value
   );
@@ -2017,7 +2028,7 @@ const dblclickedRowData = (newValue) => {
       });
       return;
     }
-    if (a[key] == "0" || a[key] === undefined) {
+    if (a[key] === "0" || a[key] === undefined || a[key] === "") {
       changeColid.value = key;
       changeValue.value = newValue[2];
       changeNow3.value = !changeNow3.value;
@@ -2089,7 +2100,7 @@ const dblclickedRowData2 = (newValue) => {
       });
       return;
     }
-    if (a[key] == 0 || a[key] === undefined || a[key] == "0") {
+    if (a[key] == 0 || a[key] === undefined || a[key] == "0" || a[key] === "") {
       changeColid.value = key;
       changeValue2.value = newValue[0];
       changeNow4.value = !changeNow4.value;
@@ -2166,6 +2177,18 @@ const sendRowState = (e) => {
 const currState2 = ref("");
 const sendRowState2 = (e) => {
   currState2.value = e;
+};
+
+const allstaterows = ref([]);
+const allStateRows = (e) => {
+  console.log(e);
+  allstaterows.value = e;
+};
+
+const allstaterows2 = ref([]);
+const allStateRows2 = (e) => {
+  console.log(e);
+  allstaterows2.value = e;
 };
 </script>
 

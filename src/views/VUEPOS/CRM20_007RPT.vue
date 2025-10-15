@@ -99,7 +99,7 @@
 
 <script setup>
 import { getBalancebyCustAndDate } from "@/api/micrm";
-import { getCustCompany4 } from "@/api/vuepos";
+import { getBalancebyCustAndDate2, getCustCompany4 } from "@/api/vuepos";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -216,7 +216,7 @@ const handleParentClick = (e) => {
  */
 
 const searchButton = async () => {
-  if (selectedStores.value == 0) {
+  if (lngStoreCode.value == 0) {
     Swal.fire({
       title: "경고",
       text: "사업장을 선택하세요.",
@@ -230,8 +230,8 @@ const searchButton = async () => {
     initGrid();
 
     const ccond2 = cond2.value == false ? 0 : 1;
-    const res = await getBalancebyCustAndDate(
-      selectedStores.value,
+    const res = await getBalancebyCustAndDate2(
+      lngStoreCode.value,
       custId.value,
       startdate.value,
       enddate.value,

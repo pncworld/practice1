@@ -3571,7 +3571,7 @@ watch(
     gridView.setCurrent({ dataRow: dataRow });
     const current = gridView.getCurrent();
     emit("allStateRows", dataProvider.getAllStateRows());
-    props.rowData.push(values);
+    // props.rowData.push(values);
     const selectedRowIndex = current ? current.dataRow : null;
     if (selectedRowIndex !== null) {
       //comsole.log("현재 선택된 인덱스:", selectedRowIndex); // 선택된 행의 인덱스 출력

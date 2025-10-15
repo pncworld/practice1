@@ -238,6 +238,186 @@ export const getCustCompany4 = (groupCd, storecd, positiontype) => {
   });
 };
 
+export const getBalancebyCustAndDate2 = (
+  custcode,
+  custid,
+  startdate,
+  enddate,
+  cond,
+  cond2
+) => {
+  return api2.post("/VUEPOS/CRM20_007RPT.asmx/getBalancebyCustAndDate2", {
+    CUST_CD: custcode,
+    CUST_ID: custid,
+    START_DATE: startdate,
+    END_DATE: enddate,
+    COND: cond,
+    COND2: cond2,
+  });
+};
+
+export const saveCreditCustomer4 = (
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8,
+  cond9,
+  cond10,
+  cond11,
+  cond12,
+  cond13,
+  cond14,
+  cond15,
+  cond16,
+  cond17,
+  cond18,
+  cond19,
+  cond20,
+  cond21,
+  cond22,
+  cond23,
+  cond24,
+  cond25,
+  cond26
+) => {
+  return api2.post("/VUEPOS/CRM20_011INS.asmx/saveCreditCustomer4", {
+    USER_ID: cond,
+    FLAG: cond2,
+    SALECOMPCD: cond3,
+    CUSTID: cond4,
+    CUSTNAME: cond5,
+    REGISTNO: cond6,
+    TELNO: cond7,
+    TELNO2: cond8,
+    POSTTELNO: cond9,
+    EMAIL: cond10,
+    STRZIP: cond11,
+    ADDRESS: cond12,
+    ADDRESS2: cond13,
+    REMARK: cond14,
+    REGISTDATE: cond15,
+    CUSTSTS: cond16,
+    DIRECTER: cond17,
+    DEALKIND: cond18,
+    DEALTYPE: cond19,
+    ACCSTS: cond20,
+    DEPTCD: cond21,
+    DEPTNM: cond22,
+    BTYPE: cond23,
+    BCUSTID: cond24,
+    BCUSTNM: cond25,
+    LIMITAMT: cond26,
+  });
+};
+
+export const getDemandStoreList2 = (groupCd, attr) => {
+  return api2.post("/VUEPOS/STK01_011INS.asmx/getDemandStoreList2", {
+    GROUP_CD: groupCd,
+    ATTR: attr,
+  });
+};
+
+export const getDemCloseTime2 = (groupCd, storeCd) => {
+  return api2.post("/VUEPOS/STK01_011INS.asmx/getDemCloseTime2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+
+export const updateDemandMaster2 = (
+  groupCd,
+  storecd,
+  date,
+  demandno,
+  comment
+) => {
+  return api2.post("/VUEPOS/STK01_011INS.asmx/updateDemandMaster2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DATE: date,
+    DEMANDNO: demandno,
+    COMMENT: comment,
+  });
+};
+
+export const InsertDemandMasterDetail2 = (
+  groupCd,
+  storecd,
+  date,
+  comments,
+  classtype,
+  ddate,
+  edate,
+  stockids,
+  qtys,
+  userid,
+  specialyn,
+  char,
+  comments2
+) => {
+  return api2.post("/VUEPOS/STK01_011INS.asmx/InsertDemandMasterDetail2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DATE: date,
+    COMMENT: comments,
+    CLASSTYPE: classtype,
+    DDATE: ddate,
+    EDATE: edate,
+    STOCKIDS: stockids,
+    QTYS: qtys,
+    USERID: userid,
+    SPECIAL: specialyn,
+    CHAR: char,
+    COMMENTS: comments2,
+  });
+};
+
+export const getStockDemandList22 = (groupCd, storeCd, lang, sdate, edate) => {
+  return api2.post("/VUEPOS/STK01_011INS.asmx/getStockDemandList22", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LANG: lang,
+    SDATE: sdate,
+    EDATE: edate,
+  });
+};
+
+export const getStockDetail22 = (
+  groupCd,
+  storecd,
+  lang,
+  demandno,
+  demanddate
+) => {
+  return api2.post("/VUEPOS/STK01_011INS.asmx/getStockDetail22", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    LANG: lang,
+    DEMANDNO: demandno,
+    DEMANDDATE: demanddate,
+  });
+};
+
+export const deleteDemandMaster2 = (
+  groupCd,
+  storecd,
+  demandno,
+  date,
+  userid
+) => {
+  return api2.post("/VUEPOS/STK01_011INS.asmx/deleteDemandMaster2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DEMANDNO: demandno,
+    DATE: date,
+    USERID: userid,
+  });
+};
+
 export const InsertMenu = async (
   cond,
   cond2,
