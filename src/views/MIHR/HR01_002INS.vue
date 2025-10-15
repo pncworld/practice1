@@ -16,7 +16,7 @@
         <button @click="addButton" class="button new md:w-auto w-14">
           신규
         </button>
-        <button @click="editButton" class="button primary md:w-auto w-14">
+        <button @click="editButton" class="button edit md:w-auto w-14">
           수정
         </button>
         <button @click="deleteButton" class="button delete md:w-auto w-14">
@@ -418,6 +418,7 @@ const saveButton = async () => {
       icon: "warning",
       confirmButtonText: "확인",
     });
+    searchButton();
     return;
   }
   try {
@@ -426,7 +427,7 @@ const saveButton = async () => {
     // const result = await fetch("https://api64.ipify.org", { timeout: 3000 });
     // const data = await result.text();
     // let userIp = data;
-    // let res;
+    let res;
     if (updateStateRow.value.created.length > 0) {
       const strnames = updateRow.value
         .filter((item, index) => updateStateRow.value.created.includes(index))
@@ -478,7 +479,7 @@ const saveButton = async () => {
       });
     }
 
-    ////console.log(res);
+    // console.log(res);
   } catch (error) {
   } finally {
     store.state.loading = false;

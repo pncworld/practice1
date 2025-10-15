@@ -21,6 +21,16 @@
     <div
       class="grid grid-cols-2 grid-rows-3 bg-gray-200 rounded-lg h-36 items-start z-10">
       <div class="justify-start flex items-center">
+        <Datepicker2
+          :mainName="'기간'"
+          @endDate="endDate"
+          class="ml-8"
+          ref="datepicker"
+          :closePopUp="closePopUp"
+          @excelDate="excelDate"
+          @startDate="startDate">
+        </Datepicker2>
+
         <div class="z-[60] pl-2 mt-2">
           <select
             name=""
@@ -31,15 +41,6 @@
             <option value="1">응답일자</option>
           </select>
         </div>
-        <Datepicker2
-          :mainName="'기간'"
-          @endDate="endDate"
-          class="-ml-9"
-          ref="datepicker"
-          :closePopUp="closePopUp"
-          @excelDate="excelDate"
-          @startDate="startDate">
-        </Datepicker2>
       </div>
       <div class="ml-5 justify-start flex">
         <PickStoreSingle
@@ -55,16 +56,18 @@
         <div class="text-base font-semibold">수신 번호</div>
         <div>
           <input
-            type="number"
+            type="text"
             class="w-32 h-8 border border-black"
+            @input="onlyNumber"
             v-model="cond2" />
         </div>
 
         <div class="text-base font-semibold">발신 번호</div>
         <div>
           <input
-            type="number"
+            type="text"
             class="w-32 h-8 border border-black"
+            @input="onlyNumber2"
             v-model="cond3" />
         </div>
       </div>
@@ -332,5 +335,12 @@ const excelStore = (e) => {
 const excelList = (e) => {
   selectedExcelList.value = e;
   //comsole.log(e);
+};
+
+const onlyNumber = (e) => {
+  cond2.value = e.target.value.replace(/[^0-9-]/g, "");
+};
+const onlyNumber2 = (e) => {
+  cond3.value = e.target.value.replace(/[^0-9-]/g, "");
 };
 </script>

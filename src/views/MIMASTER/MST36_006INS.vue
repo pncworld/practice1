@@ -940,8 +940,13 @@ const searchButton = async () => {
       //comsole.log(rowData2.value)
       afterSearch.value = true;
     } else if (currentMenu.value == 2) {
-      res = await getKitchenSettingList(groupCd.value, nowStoreCd.value);
-      ////console.log(res)
+      console.log(store.state.userData);
+      res = await getKitchenSettingList(
+        groupCd.value,
+        nowStoreCd.value,
+        store.state.userData.lngCommonMenu
+      );
+      console.log(res);
 
       SettingList.value = [...res.data.KITCHENMENU];
       MenuGroup.value = res.data.MAINGROUP;

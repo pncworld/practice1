@@ -84,6 +84,7 @@
             @endDate="endDate3"
             :removeDefault="true"
             :disableBox="false"
+            :setLimitYear="true"
             @excelDate="excelDate3"
             @startDate="startDate3"></Datepicker2>
         </div>
@@ -284,6 +285,7 @@ const lngSupervisor = (e) => {
 };
 const storeCode = ref();
 const lngStoreCode = (e) => {
+  initGrid();
   storeCode.value = e;
 };
 
@@ -330,7 +332,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    ////console.log(res);
+    console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;

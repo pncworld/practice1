@@ -25,6 +25,7 @@
           :mainName="'기간'"
           @endDate="endDate"
           ref="datepicker"
+          :initToday="1"
           :closePopUp="closePopUp"
           @excelDate="excelDate"
           @startDate="startDate">
@@ -35,7 +36,7 @@
               type="checkbox"
               id="cond"
               name="condtype"
-              @change="cond = !cond"
+              @change="setCond"
               v-model="cond" />전체기간</label
           >
           <label for="cond2"
@@ -43,7 +44,7 @@
               type="checkbox"
               id="cond2"
               name="condtype"
-              @change="cond = !cond"
+              @change="setCond2"
               v-model="cond2" />집계내역</label
           >
         </div>
@@ -369,5 +370,12 @@ const excelStore = (e) => {
 const excelList = (e) => {
   selectedExcelList.value = e;
   //comsole.log(e);
+};
+
+const setCond2 = (e) => {
+  cond2.value = !cond2.value;
+};
+const setCond = (e) => {
+  cond.value = !cond.value;
 };
 </script>

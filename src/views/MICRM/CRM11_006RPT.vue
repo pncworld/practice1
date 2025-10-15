@@ -35,7 +35,7 @@
 
       <div class="mt-2 justify-start items-center flex">
         <span class="text-base font-semibold">쿠폰명</span>
-        <select name="" id="" class="ml-5 w-48 h-8" v-model="cond">
+        <select name="" id="" class="ml-5 w-[276px] h-8" v-model="cond">
           <option value="0">전체</option>
           <option :value="i.lngCouponId" v-for="i in optionList">
             {{ i.strCouponName }}

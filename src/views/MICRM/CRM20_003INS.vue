@@ -95,6 +95,7 @@
         :changeValue2="changeValue2"
         @clickedRowData="clickedRowData"
         @selectedIndex="selectedIndex"
+        @updatedRowData2="updatedRowData"
         @updatedRowData="updatedRowData"
         @allStateRows="allStateRows"
         @sendRowState="sendRowState"

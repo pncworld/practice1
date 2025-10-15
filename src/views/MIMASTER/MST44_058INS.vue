@@ -766,7 +766,7 @@ const saveButton = async () => {
           currentpaymentCd.value
         );
 
-        ////console.log(res2);
+        console.log(res2);
       } catch (error) {
       } finally {
         store.state.loading = false;

@@ -684,7 +684,7 @@ const searchButton = async () => {
       checkdays.join(","),
       selectedHoliday.value
     );
-    //comsole.log(res);
+    //console.log(res);
     rowData.value = res.data.MENUS;
 
     afterSearch.value = true;
@@ -737,7 +737,7 @@ const searchButton2 = async () => {
     if (selectOption.value == 1) {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
-      ].slice(); // 반응형 Proxy에서 일반 배열로 변환
+      ].sort((a, b) => new Date(a) - new Date(b)); // 반응형 Proxy에서 일반 배열로 변환
       //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
@@ -778,11 +778,12 @@ const searchButton2 = async () => {
         datas.value.push(data1);
       }
       datas.value = [...datas.value];
+
       //comsole.log(datas.value);
     } else if (selectOption.value == 2) {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
-      ].slice(); // 반응형 Proxy에서 일반 배열로 변환
+      ].sort((a, b) => new Date(a) - new Date(b)); // 반응형 Proxy에서 일반 배열로 변환
       //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
@@ -827,7 +828,7 @@ const searchButton2 = async () => {
     } else if (selectOption.value == 3) {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
-      ].slice(); // 반응형 Proxy에서 일반 배열로 변환
+      ].sort((a, b) => new Date(a) - new Date(b)); // 반응형 Proxy에서 일반 배열로 변환
       //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
@@ -871,7 +872,7 @@ const searchButton2 = async () => {
     } else if (selectOption.value == 4) {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
-      ].slice(); // 반응형 Proxy에서 일반 배열로 변환
+      ].sort((a, b) => new Date(a) - new Date(b)); // 반응형 Proxy에서 일반 배열로 변환
       //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
@@ -915,7 +916,7 @@ const searchButton2 = async () => {
     } else if (selectOption.value == 5) {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
-      ].slice(); // 반응형 Proxy에서 일반 배열로 변환
+      ].sort((a, b) => new Date(a) - new Date(b)); // 반응형 Proxy에서 일반 배열로 변환
       //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
@@ -959,7 +960,7 @@ const searchButton2 = async () => {
     } else if (selectOption.value == 6) {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
-      ].slice(); // 반응형 Proxy에서 일반 배열로 변환
+      ].sort((a, b) => new Date(a) - new Date(b)); // 반응형 Proxy에서 일반 배열로 변환
       //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
@@ -1003,7 +1004,7 @@ const searchButton2 = async () => {
     } else if (selectOption.value == 7) {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
-      ].slice(); // 반응형 Proxy에서 일반 배열로 변환
+      ].sort((a, b) => new Date(a) - new Date(b)); // 반응형 Proxy에서 일반 배열로 변환
       //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
@@ -1047,7 +1048,7 @@ const searchButton2 = async () => {
     } else if (selectOption.value == 8) {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
-      ].slice(); // 반응형 Proxy에서 일반 배열로 변환
+      ].sort((a, b) => new Date(a) - new Date(b)); // 반응형 Proxy에서 일반 배열로 변환
       //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(
@@ -1091,7 +1092,7 @@ const searchButton2 = async () => {
     } else if (selectOption.value == 9) {
       labels.value = [
         ...new Set(res.data.MENUS.map((item) => item.dtmDate.split(" ")[0])),
-      ].slice(); // 반응형 Proxy에서 일반 배열로 변환
+      ].sort((a, b) => new Date(a) - new Date(b)); // 반응형 Proxy에서 일반 배열로 변환
       //comsole.log(labels.value); // 이 부분은 배열로 변환된 결과
 
       let menus = Object.values(

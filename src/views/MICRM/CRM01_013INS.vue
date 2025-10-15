@@ -94,7 +94,7 @@
       :checkRowAuto="false"
       @clickedRowData="clickedRowData3"
       @selcetedrowData="selcetedrowData"
-      @updatedRowData="updatedRowData"
+      @updatedRowData2="updatedRowData"
       @allStateRows="allStateRows"
       @checkedRowData="checkedRowData"
       @sendRowState="sendRowState"
@@ -916,7 +916,11 @@ const deleteButton = () => {
  */
 
 const saveButton = async () => {
-  if (JSON.stringify(rowData.value) == JSON.stringify(updateRowData.value)) {
+  if (
+    stateRows.value.updated.length == 0 &&
+    stateRows.value.created.length == 0 &&
+    stateRows.value.deleted.length == 0
+  ) {
     Swal.fire({
       title: "경고",
       text: `변경된 사항이 없습니다.`,

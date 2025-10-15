@@ -7,7 +7,11 @@ import { getGridInfoList } from "@/api/common";
 import { getDynamicGrid2, getDynamicGrid3 } from "@/api/master";
 import { getDynamicGrid4 } from "@/api/micrm";
 import { getDynamicGrid5, getDynamicGrid6 } from "@/api/mihr";
-import { getDynamicGrid } from "@/api/misales";
+import {
+  getDynamicGrid,
+  getDynamicGrid7,
+  getDynamicGrid8,
+} from "@/api/misales";
 import {
   excelTitle,
   formatDateTime,
@@ -854,6 +858,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  checkRenderEditable2Col: {
+    // 체크바 수정 관련 변수
+    type: String,
+    default: "",
+  },
   dynamicRowHeight: {
     // 행높이
     type: Boolean,
@@ -974,6 +983,16 @@ const props = defineProps({
     type: String,
     default: "9999",
   },
+  setDynamicGrid7: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
+  setDynamicGrid8: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
   initCheckRows: {
     // 행높이
     type: Array,
@@ -1080,17 +1099,17 @@ const props = defineProps({
     type: String,
     default: "",
   },
-    CalculateSupplyPrice: {
+  CalculateSupplyPrice: {
     type: String,
-    default: '',
+    default: "",
   },
-    CalculateVatPrice: {
+  CalculateVatPrice: {
     type: String,
-    default: '',
+    default: "",
   },
-    CalculateTotalPrice: {
+  CalculateTotalPrice: {
     type: String,
-    default: '',
+    default: "",
   },
 
   exportExcelHiddenColumns: {
@@ -1187,7 +1206,7 @@ const funcshowGrid = async () => {
 
   // nextTick으로 DOM 업데이트 후 초기화
   //
-
+  await nextTick();
   const container = document.getElementById(realgridname.value);
   await nextTick();
   if (!container) {
@@ -1242,47 +1261,42 @@ const funcshowGrid = async () => {
           let dblResultQty = values[fieldNames.indexOf("dblResultQty")];
           let dblTakeQty = values[fieldNames.indexOf("dblTakeQty")];
 
-      if (dblResultQty > 0)
-      {
-        return parseInt(dblTakeQty) - parseInt(dblResultQty);
-      }
-      else
-      {
-        return parseInt(dblTakeQty) + parseInt(dblResultQty);
-      }
-    }
-
+          if (dblResultQty > 0) {
+            return parseInt(dblTakeQty) - parseInt(dblResultQty);
+          } else {
+            return parseInt(dblTakeQty) + parseInt(dblResultQty);
+          }
+        }
       : props.CalculateSupplyPrice.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
           let curUnitPrice = values[fieldNames.indexOf("curUnitPrice")];
-          let dblCheckQty  = values[fieldNames.indexOf("dblCheckQty")];
-          
+          let dblCheckQty = values[fieldNames.indexOf("dblCheckQty")];
+
           let supplyPrice = curUnitPrice * dblCheckQty;
 
           return supplyPrice;
-      }
+        }
       : props.CalculateVatPrice.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
           let curUnitPrice = values[fieldNames.indexOf("curUnitPrice")];
-          let dblCheckQty  = values[fieldNames.indexOf("dblCheckQty")];
-          
+          let dblCheckQty = values[fieldNames.indexOf("dblCheckQty")];
+
           let supplyPrice = curUnitPrice * dblCheckQty;
-          let vat         = supplyPrice * 0.1; // 예: 부가세
+          let vat = supplyPrice * 0.1; // 예: 부가세
 
           return vat;
-      }
+        }
       : props.CalculateTotalPrice.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
           let curUnitPrice = values[fieldNames.indexOf("curUnitPrice")];
-          let dblCheckQty  = values[fieldNames.indexOf("dblCheckQty")];
-          
+          let dblCheckQty = values[fieldNames.indexOf("dblCheckQty")];
+
           let supplyPrice = curUnitPrice * dblCheckQty;
-          let vat         = supplyPrice * 0.1; // 예: 부가세
-          let total       = supplyPrice + vat; // 합계
+          let vat = supplyPrice * 0.1; // 예: 부가세
+          let total = supplyPrice + vat; // 합계
 
           return total;
-      }
-      
+        }
       : props.CalculateTaxColId2.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
           let unitp = values[fieldNames.indexOf("curUnitPrice")];
@@ -1813,7 +1827,7 @@ const funcshowGrid = async () => {
         ? "date"
         : "line",
       domainOnly: true,
-      textReadOnly: true,
+      textReadOnly: false,
       dropDownWhenClick: true,
       datetimeFormat: "yyyy-MM-dd",
       mask:
@@ -1831,6 +1845,11 @@ const funcshowGrid = async () => {
               includedFormat: true,
               overWrite: true,
               allowEmpty: true,
+            }
+          : item.strColType.includes("date")
+          ? {
+              editMask: "9999-99-99",
+              includedFormat: true,
             }
           : null,
       commitOnSelect: true,
@@ -1860,9 +1879,13 @@ const funcshowGrid = async () => {
           : "text",
       editable:
         props.checkRenderEditable == true &&
+        item.strColID != props.checkRenderEditable2Col &&
         (item.strColID.includes("checkbox") ||
           item.strDisplay.includes("checkbox"))
           ? true
+          : props.checkRenderEditable == true &&
+            item.strColID == props.checkRenderEditable2Col
+          ? false
           : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
     },
     buttonVisibility: "always",
@@ -2478,12 +2501,13 @@ const funcshowGrid = async () => {
     const groupList2 = props.mergeColumnGroupName3; // [['그룹컬럼1','그룹컬럼2']]
 
     let layout = [];
+    console.log(tabInitSetArray.value);
     tabInitSetArray.value.forEach((item) => {
       // 1) subList3 전체 1차 그룹 인덱스 찾기
       const groupIndex = subList3.findIndex((group2D) =>
         group2D.some((group1D) => group1D.includes(item.strColID))
       );
-
+      console.log(groupIndex);
       // 2) 만약 그룹에 속한다면, 그 안에서 몇 번째 subgroup인지(innerIndex)
       let innerIndex = -1;
       if (groupIndex !== -1) {
@@ -2510,33 +2534,80 @@ const funcshowGrid = async () => {
               column: item.strColID,
               width: item.intHdWidth,
             });
-          } else if (
-            groupList3[groupIndex] != undefined &&
-            groupList2[groupIndex][innerIndex] != undefined
-          ) {
-            const findit = layout.find(
-              (item) => item.name == groupList3[groupIndex]
-            );
-            if (findit == undefined) {
-              layout.push({
-                name: groupList3[groupIndex],
-                direction: "horizontal",
-                header: {
-                  styleName: `header-style-0`,
+            // } else if (
+            //   groupList3[groupIndex] != undefined &&
+            //   groupList2[groupIndex][innerIndex] != undefined
+            // ) {
+            //   console.log(groupList3[groupIndex]);
+            //   const findit = layout.find(
+            //     (item) => item.name == groupList3[groupIndex]
+            //   );
+            //   console.log(findit);
+            //   if (findit == undefined) {
+            //     layout.push({
+            //       name: groupList3[groupIndex],
+            //       direction: "horizontal",
+            //       header: {
+            //         styleName: `header-style-0`,
+            //       },
+            //       items: [
+            //         {
+            //           name: groupList2[groupIndex][innerIndex],
+            //           direction: "horizontal",
+            //           header: { styleName: "header-style-0" },
+            //           items: [{ column: item.strColID, width: item.intHdWidth }],
+            //         },
+            //       ],
+            //     });
+
+            //     console.log(layout);
+            //   } else {
+            //     const findit2 = findit.items.find(
+            //       (item) => item.name == groupList2[groupIndex][innerIndex]
+            //     );
+            //     findit2.items.push({
+            //       column: item.strColID,
+            //       width: item.intHdWidth,
+            //     });
+            //   }
+          }
+        } else if (
+          groupList3[groupIndex] != undefined &&
+          groupList2[groupIndex][innerIndex] != undefined
+        ) {
+          const findit = layout.find(
+            (item) => item.name == groupList3[groupIndex]
+          );
+
+          if (findit == undefined) {
+            layout.push({
+              name: groupList3[groupIndex],
+              direction: "horizontal",
+              header: {
+                styleName: `header-style-0`,
+              },
+              items: [
+                {
+                  name: groupList2[groupIndex][innerIndex],
+                  direction: "horizontal",
+                  header: { styleName: "header-style-0" },
+                  items: [{ column: item.strColID, width: item.intHdWidth }],
                 },
-                items: [
-                  {
-                    name: groupList2[groupIndex][innerIndex],
-                    direction: "horizontal",
-                    header: { styleName: "header-style-0" },
-                    items: [{ column: item.strColID, width: item.intHdWidth }],
-                  },
-                ],
+              ],
+            });
+          } else {
+            const findit2 = findit.items.find(
+              (item) => item.name == groupList2[groupIndex][innerIndex]
+            );
+
+            if (findit2 == undefined) {
+              findit.items.push({
+                name: groupList2[groupIndex][innerIndex],
+                direction: "horizontal",
+                header: { styleName: "header-style-0" },
+                items: [{ column: item.strColID, width: item.intHdWidth }],
               });
             } else {
-              const findit2 = findit.items.find(
-                (item) => item.name == groupList2[groupIndex][innerIndex]
-              );
               findit2.items.push({
                 column: item.strColID,
                 width: item.intHdWidth,
@@ -2554,6 +2625,7 @@ const funcshowGrid = async () => {
       }
     });
 
+    console.log(layout);
     gridView.setColumnLayout(layout);
   }
   /* 3단 예시
@@ -2691,11 +2763,12 @@ const funcshowGrid = async () => {
   gridView.editOptions.editable =
     props.checkRenderEditable == true ? true : false;
   gridView.editOptions.updatable = true;
+
   gridView.editOptions.deletable = true;
   gridView.displayOptions.fitStyle =
     props.fixedColumn == false ? "even" : "none";
   gridView.editOptions.commitByCell = true;
-  gridView.editOptions.commitByCell = true;
+
   gridView.editOptions.commitWhenLeave = true;
   gridView.displayOptions.showInnerFocus = false;
   gridView.displayOptions.useAlternateRowStyle = props.useAlternateRowStyle
@@ -2704,8 +2777,8 @@ const funcshowGrid = async () => {
   dataProvider.softDeleting = props.notsoftDelete == false ? true : false;
   dataProvider.deleteCreated = props.deleteCreated;
   gridView.filteringOptions.handleVisibility = "hidden";
-  //gridView.sortingOptions.enabled = false; // 정렬기능 비활성화
-  dataProvider.autoCommit = true; // 자동 커밋 활성화
+  gridView.sortingOptions.enabled = false; // 정렬기능 비활성화
+  //dataProvider.autoCommit = true; // 자동 커밋 활성화
   dataProvider.commitBeforeDataEdit = true;
   gridView.editOptions.movable = props.dragOn == true ? true : false;
   gridView.displayOptions.selectAndImmediateDrag =
@@ -2720,7 +2793,7 @@ const funcshowGrid = async () => {
       : props.dynamicRowHeight2 == true && props.setTreeView == true
       ? -1
       : 1;
-
+  gridView.displayOptions.wheelScrollLines = 1;
   if (props.setTreeView == false) {
     gridView.groupPanel.visible = false;
   } else {
@@ -2858,8 +2931,10 @@ const funcshowGrid = async () => {
 
   gridView.onCellEdited = function (grid, itemIndex, row, field) {
     gridView.commit();
+    const isCheckCell =
+      gridView.columnByField(field).renderer?.type === "check";
 
-    if (props.checkRowAuto2 == true) {
+    if (props.checkRowAuto2 == true && isCheckCell) {
       const val = grid.getDataSource().getValue(row, props.checkRowAuto2Col); // 셀 클릭시 checkautoRow  = false 하고 셀 클릭과 내장 체크바가 연동안되게하면서 이 방식으로 체크박스가 체크되었을때만체크되게 설정
       grid.checkRow(row, val);
     }
@@ -3242,8 +3317,6 @@ watch(
 watch(
   () => props.changeNow2,
   () => {
-    console.log(props.changeNow2);
-
     if (props.changeRow !== "" && props.changeRow != -1) {
       if (
         dataProvider != null &&
@@ -3312,10 +3385,6 @@ watch(
     }
   }
 );
-
-// onMounted(() => {
-//   //comsole.log("asdf");
-// });
 
 watch(
   () => [props.searchWord3, props.searchValue, props.searchSpecialCond],
@@ -3788,7 +3857,7 @@ watch(
     //   emit("sendRowState", currRowState2);
     // }
 
-    // gridView.commit();
+    // //gridView.commit();
     // const curr = gridView.getCurrent(); // gridView 가뭔지  dataProvider 가 뭔지 개념을 설명
     // if (curr.dataRow == -1) {
     //   return;
@@ -4047,26 +4116,25 @@ watch(
     if (gridView.columnByName("workTime")) {
       gridView.columnByName("workTime").styleCallback = (grid, dataCell) => {
         const times = props.TimeArray;
+        console.log(times);
         const timecode = grid.getValue(dataCell.index.itemIndex, "lngtimeCode");
+        console.log(timecode);
         const isin = times.some(([start, end]) => {
-          return Number(timecode) >= start && Number(timecode) < end;
+          return Number(timecode) > start - 0.5 && Number(timecode) < end;
         });
-        ////console.log(timecode);
-        // ////console.log(isin);
+
         if (isin) {
           return { styleName: "blue-column" };
         }
-        // const name = grid.getValue(dataCell.index.itemIndex, 'KorName')
-        // if(name === '박영호'){
-        //     return {styleName : "orange-column"}
-        // }
       };
     }
   }
 );
 
 onMounted(async () => {
+  await nextTick();
   realgridname.value = `realgrid-${props.progname}-${props.progid}-${uuidv4()}`;
+
   emit("realgridname", realgridname.value);
   try {
     if (props.renderProgname != "") {
@@ -4116,6 +4184,24 @@ onMounted(async () => {
 
     if (props.setDynamicGrid6 == true) {
       const res = await getDynamicGrid6(props.setDynamicGrid6Cond);
+
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+      console.log(res);
+    }
+
+    if (props.setDynamicGrid7 == true) {
+      const res = await getDynamicGrid7(store.state.userData.lngStoreGroup);
+
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+      console.log(res);
+    }
+
+    if (props.setDynamicGrid8 == true) {
+      const res = await getDynamicGrid8(store.state.userData.lngStoreGroup);
 
       if (res.data.List.length > 0) {
         tabInitSetArray.value.push(...res.data.List);
@@ -4219,6 +4305,24 @@ const setupGrid = async () => {
       if (res.data.List.length > 0) {
         tabInitSetArray.value.push(...res.data.List);
       }
+    }
+
+    if (props.setDynamicGrid7 == true) {
+      const res = await getDynamicGrid7(store.state.userData.lngStoreGroup);
+
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+      console.log(res);
+    }
+
+    if (props.setDynamicGrid8 == true) {
+      const res = await getDynamicGrid8(store.state.userData.lngStoreGroup);
+
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+      console.log(res);
     }
 
     // Dynamic style generation

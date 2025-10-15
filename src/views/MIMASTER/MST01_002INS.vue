@@ -45,7 +45,7 @@
       :selectionStyle="'singleRow'"
       :initFocus="initFocus"
       :labelingColumns="'lngSupervisor,lngSaleType,lngMultiPriceGroupCode,lngJoinType,lngSubLease,lngStoreAttr,lngStoreArea'"
-      @updatedRowData="updatedRowData"
+      @updatedRowData2="updatedRowData"
       :valuesData="valuesData"
       :labelsData="labelsData"
       :deleteRow="deleted"
@@ -53,7 +53,9 @@
       :changeRow="changeRow"
       :changeValue2="changeValue"
       :changeNow2="changeNow"
-      @selectedIndex2="selectedIndex2"
+      @selectedIndex="selectedIndex2"
+      @sendRowState="sendRowState"
+      @allStateRows="allStateRows"
       :useCheckboxfordelete="true"
       :addRow4="addRow4"
       :addrowDefault="addrowDefault"
@@ -78,7 +80,7 @@
           id="storeCode"
           class="text-sm border rounded-md w-full pl-2 h-7 disabled:bg-gray-300"
           v-model="lngStoreCode"
-          :disabled="disableStoreCode"
+          :disabled="rowstate != 'created'"
           name="lngStoreCode"
           @input="updateGridValue" />
       </div>
@@ -948,7 +950,7 @@ const saveButton = async () => {
     });
     return;
   }
-  //comsole.log(updateRowData.value);
+  console.log(updateRowData.value);
 
   const validateRow = updateRowData.value.filter(
     (item) =>
@@ -999,176 +1001,176 @@ const saveButton = async () => {
       try {
         //comsole.log(updateRowData.value);
         const deleteStore = updateRowData.value
-          .filter((item) => item.checkbox == true || item.deleted == true)
+          .filter((item, index) => allstaterows.value.deleted.includes(index))
           .map((item) => item.lngStoreCode);
         const updateStoreCd = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.lngStoreCode);
         const updateStoreNm = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strName);
         const updatestrRegistNo = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strRegistNo);
         const updatestrDirector = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strDirector);
         const updatestrDealType = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strDealType);
         const updatestrDealKind = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strDealKind);
         const updatelngJoinType = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.lngJoinType);
         const updatelngSubLease = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.lngSubLease);
         const updatelngStoreAttr = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.lngStoreAttr);
         const updatelngStoreArea = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.lngStoreArea);
         const updatedtmOpenDate = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.dtmOpenDate);
         const updatedtmStop = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.dtmStop);
         const updatestrConvCode = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strConvCode);
         const updatestrZipCode = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strZipCode);
         const updatestrAddress = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strAddress);
         const updatestrAddressETC = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strAddressEtc);
         const updatestrTel = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strTel);
         const updatestrPhone = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strPhone);
         const updatestrFax = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strFax);
         const updatelngFloorSpace = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.lngFloorSpace);
         const updatelngLease = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.lngLease);
         const updatelngBEP = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.lngBEP);
         const updatelngSaleType = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.lngSaleType);
         const updatelngSupervisor = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.lngSupervisor);
         const updatestrDev1 = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strDev1);
         const updatelngTable = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.lngTable);
         const updatestrStoreHistory = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strStoreHistory);
         const updatelngMultiPriceGroupCode = updateRowData.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.lngMultiPriceGroupCode);
 
         const insertStoreCd = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.lngStoreCode);
         const insertStoreNm = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strName);
         const insertstrRegistNo = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strRegistNo);
         const insertstrDirector = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strDirector);
         const insertstrDealType = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strDealType);
         const insertstrDealKind = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strDealKind);
         const insertlngJoinType = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.lngJoinType);
         const insertlngSubLease = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.lngSubLease);
         const insertlngStoreAttr = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.lngStoreAttr);
         const insertlngStoreArea = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.lngStoreArea);
         const insertedtmOpenDate = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.dtmOpenDate);
         const insertedtmStop = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.dtmStop);
         const insertstrConvCode = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strConvCode);
         const insertstrZipCode = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strZipCode);
         const insertstrAddress = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strAddress);
         const insertstrAddressETC = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strAddressEtc);
         const insertstrTel = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strTel);
         const insertstrPhone = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strPhone);
         const insertstrFax = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strFax);
         const insertlngFloorSpace = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.lngFloorSpace);
         const insertlngLease = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.lngLease);
         const insertlngBEP = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.lngBEP);
         const insertlngSaleType = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.lngSaleType);
         const insertlngSupervisor = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.lngSupervisor);
         const insertstrDev1 = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strDev1);
         const insertlngTable = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.lngTable);
         const insertstrStoreHistory = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strStoreHistory);
         const insertlngMultiPriceGroupCode = updateRowData.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.lngMultiPriceGroupCode);
 
         const id = store.state.userData.strUserID;
@@ -1393,7 +1395,7 @@ const updateRowData = ref([]);
 
 const updatedRowData = (newvalue) => {
   updateRowData.value = newvalue;
-  //comsole.log(updateRowData.value);
+  console.log(newvalue);
 };
 
 watch(dtmOpenDate, () => {
@@ -1402,6 +1404,17 @@ watch(dtmOpenDate, () => {
 watch(dtmStop, () => {
   //comsole.log(dtmStop.value);
 });
+
+const rowstate = ref("none");
+const sendRowState = (e) => {
+  rowstate.value = e;
+};
+
+const allstaterows = ref([]);
+const allStateRows = (e) => {
+  allstaterows.value = e;
+  console.log(e);
+};
 </script>
 
 <style>

@@ -85,7 +85,7 @@
               <select
                 name=""
                 id=""
-                class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="border w-48 border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 v-model="mainCategory">
                 <option value="0">전체</option>
                 <option :value="i.lngCode" v-for="i in MenuGroup">
@@ -95,7 +95,7 @@
               <select
                 name=""
                 id=""
-                class="border border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="border w-48 border-gray-800 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 v-model="subCategory">
                 <option value="0">전체</option>
                 <option :value="i.lngCode" v-for="i in filteredSubMenuGroup">
@@ -120,6 +120,7 @@
           :rowData="rowData5"
           @clickedRowData="clickedRowData3"
           :searchWord="searchword3"
+          :rowStateeditable="false"
           :searchColId="'lngCode,strName'"
           :searchColId2="'blnSetMenu,blnDeliveryYN,mainLngCode,subLngCode'"
           :searchColValue2="searchColValue2"
@@ -145,7 +146,7 @@
     v-if="selectMenuGroup"
     class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
     <div class="bg-white p-6 rounded shadow-lg w-[60%] h-[60%]">
-      <h1 class="text-2xl font-bold flex justify-start">메뉴 조회 팝업</h1>
+      <h1 class="text-2xl font-bold flex justify-start">옵션 조회 팝업</h1>
       <div class="flex flex-col justify-start h-12">
         <div class="flex flex-col justify-start space-x-4 text-sm">
           <div
@@ -185,7 +186,6 @@
           @clickedRowData="clickedRowData4"
           :searchWord3="searchword4"
           :searchColId="'lngCode,strName'"
-          :searchColValues="searchColValues"
           @dblclickedRowData="dblclickedRowData2"
           :selectionStyle="'singleRow'"
           :rowStateeditable="false"></Realgrid>
@@ -2004,21 +2004,27 @@ const clickaddMenu2 = (newValue) => {
 
 const changeNow3 = ref(false);
 const dblclickedRowData = (newValue) => {
-  //comsole.log(newValue);
+  //console.log(newValue);
   const a = updatedRowData4.value.find(
     (item) => item.lngCode == optionCd.value
   );
   for (let i = 1; i <= 21; i++) {
     const key = `lngChainMenu${i}`;
-    //comsole.log(a[key]);
+    if (a[key] == newValue[2]) {
+      Swal.fire({
+        title: "이미 등록된 메뉴코드입니다.",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
     if (a[key] == "0" || a[key] === undefined) {
       changeColid.value = key;
+      changeValue.value = newValue[2];
+      changeNow3.value = !changeNow3.value;
       break; // 첫 번째로 조건 맞는 값만 처리할 경우
     }
   }
 
-  changeValue.value = newValue[2];
-  changeNow3.value = !changeNow3.value;
   // const rollbackdata = [...filteredrowData2.value];
   // filteredrowData2.value = [];
   // //comsole.log(a);
@@ -2069,21 +2075,27 @@ const dblclickedRowData = (newValue) => {
  */
 
 const dblclickedRowData2 = (newValue) => {
-  //comsole.log(newValue);
+  //console.log(newValue);
   //comsole.log(updatedRowData5.value);
   const a = updatedRowData5.value.find(
     (item) => item.lngCode == optionGroupCd.value
   );
   for (let i = 1; i <= 20; i++) {
     const key = `lngChainGroup${i}`;
+    if (a[key] == newValue[0]) {
+      Swal.fire({
+        title: "이미 등록된 옵션코드입니다.",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
     if (a[key] == 0 || a[key] === undefined || a[key] == "0") {
       changeColid.value = key;
+      changeValue2.value = newValue[0];
+      changeNow4.value = !changeNow4.value;
       break; // 첫 번째로 조건 맞는 값만 처리할 경우
     }
   }
-
-  changeValue2.value = newValue[0];
-  changeNow4.value = !changeNow4.value;
 
   closeMenus2();
 };

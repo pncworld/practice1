@@ -186,6 +186,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  setLimitYear: {
+    type: Boolean,
+    default: false,
+  },
 });
 const formatDate = (date) => {
   //comsole.log(date);
@@ -454,37 +458,25 @@ const changeStartDate = (e) => {
     // tempStartDateStack.push(selectedStartDate.value);
     selectedEndDate.value = selectedStartDate.value;
     //  tempEndDateStack.push(selectedEndDate.value);
-    emit(
-      "excelDate",
-      mainName.value +
-        " : " +
-        selectedStartDate.value +
-        "~" +
-        selectedEndDate.value
-    );
-    return;
   } else if (1000 < date1.getFullYear() && date1.getFullYear() < 2000) {
-    selectedStartDate.value = new Date().toISOString().split("T")[0];
-    emit(
-      "excelDate",
-      mainName.value +
-        " : " +
-        selectedStartDate.value +
-        "~" +
-        selectedEndDate.value
-    );
-  } else {
-    // tempStartDateStack.push(e.target.value);
-    // tempEndDateStack.push(selectedEndDate.value);
-    emit(
-      "excelDate",
-      mainName.value +
-        " : " +
-        selectedStartDate.value +
-        "~" +
-        selectedEndDate.value
-    );
+    if (props.setLimitYear == false) {
+      selectedStartDate.value = new Date().toISOString().split("T")[0];
+    }
+  } else if (
+    props.setLimitYear == true &&
+    date1.getTime() > date2.getTime() &&
+    date2.getFullYear() >= 0
+  ) {
+    selectedEndDate.value = selectedStartDate.value;
   }
+  emit(
+    "excelDate",
+    mainName.value +
+      " : " +
+      selectedStartDate.value +
+      "~" +
+      selectedEndDate.value
+  );
   emit("startDate", selectedStartDate.value);
 };
 const changeEndDate = (e) => {
@@ -502,38 +494,26 @@ const changeEndDate = (e) => {
     // tempStartDateStack.push(selectedStartDate.value);
     // selectedEndDate.value = tempEndDateStack.pop();
     // tempEndDateStack.push(selectedEndDate.value);
-    emit(
-      "excelDate",
-      mainName.value +
-        " : " +
-        selectedStartDate.value +
-        "~" +
-        selectedEndDate.value
-    );
-    return;
-  } else if (1000 < date2.getFullYear() && date2.getFullYear() < 2000) {
-    selectedEndDate.value = new Date().toISOString().split("T")[0];
-    emit(
-      "excelDate",
-      mainName.value +
-        " : " +
-        selectedStartDate.value +
-        "~" +
-        selectedEndDate.value
-    );
-  } else {
-    // tempStartDateStack.push(selectedStartDate.value);
-    // tempEndDateStack.push(e.target.value);
-    emit(
-      "excelDate",
-      mainName.value +
-        " : " +
-        selectedStartDate.value +
-        "~" +
-        selectedEndDate.value
-    );
+  } else if (
+    props.setLimitYear == false &&
+    1000 < date2.getFullYear() &&
+    date2.getFullYear() < 2000
+  ) {
+  } else if (
+    props.setLimitYear == true &&
+    date1.getTime() > date2.getTime() &&
+    date2.getFullYear() >= 0
+  ) {
+    selectedStartDate.value = selectedEndDate.value;
   }
-
+  emit(
+    "excelDate",
+    mainName.value +
+      " : " +
+      selectedStartDate.value +
+      "~" +
+      selectedEndDate.value
+  );
   emit("endDate", selectedEndDate.value);
 };
 </script>

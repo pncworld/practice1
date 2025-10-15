@@ -73,7 +73,7 @@
               name="lngAreaCode"
               v-model="gridvalue1"
               @input="changeValue"
-              class="w-[70%] h-[70%] border border-black pl-1" />
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300" />
           </div>
           <div
             class="border border-black flex justify-center items-center bg-orange-100">

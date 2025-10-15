@@ -38,6 +38,7 @@
           :rowData="rowData"
           :reload="reload"
           @clickedRowData="clickedRowData"
+          @updatedRowData2="updatedRowData"
           @updatedRowData="updatedRowData"
           @selectedIndex="selectedIndex"
           :addRow4="addRow4"
@@ -46,30 +47,36 @@
           :changeValue2="changeValue2"
           :changeNow2="changeNow"
           @allStateRows="allStateRows"
-          :addrowProp="'strStndName,lngWorkType,strWorkType,lngOTPayRate,lngHWPayRate,lngNWPayRate,timNWStime'"
+          :checkRowAuto="false"
+          :checkRowAuto2="true"
+          :checkRowAuto2Col="'checkbox'"
+          :checkRenderEditable="true"
+          :addrowProp="'strStndName,lngWorkType,strWorkType,lngOTPayRate,lngHWPayRate,lngNWPayRate,timNWStime,lngPeriodCls'"
           :addrowDefault="addrowDefault"
           :editableColId="'strWorkGupName'"
           :setStateBar="false"
-          :checkRowAuto="false"
           :mergeColumns3="true"
           :documentTitle="'HR01_004INS'"
           :exporttoExcel="exporttoExcel"
-          :mergeColumnGroupName4="['탄력근무제 관련']"
+          :mergeColumnGroupName4="[
+            '야간근무시간',
+            '급여기산일',
+            '탄력근무제 관련',
+          ]"
           :mergeColumnGroupName3="[
+            ['', ''],
+            ['', ''],
             ['기본', '연장제한시간'],
-            ['야간근무시간', '급여기산일'],
           ]"
           :mergeColumnGroupSubList3="[
+            [['timNWStime', 'timNWETime']],
+            [['lngPayAcntS', 'lngPayAcntE']],
+
             [
               ['strPeriod', 'dtmApplyDate', 'timFixWorkHour'],
               ['timLimitHourWeek', 'timLimitHourWeekAvg', 'timLimitHourDay'],
             ],
-            [
-              ['timNWStime', 'timNWETime'],
-              ['lngPayAcntS', 'lngPayAcntE'],
-            ],
           ]"
-          :checkRenderEditable="true"
           :rowStateeditable="false"
           :dynamicRowHeight="false">
         </Realgrid>
@@ -84,8 +91,9 @@
             class="flex justify-center items-center border-l border-t border-black">
             <input
               type="text"
-              class="border border-black w-[80%] h-[80%]"
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300"
               name="strStndName"
+              :disabled="disableGrid"
               @input="changeInfo"
               v-model="gridvalue1" />
           </div>
@@ -100,6 +108,8 @@
                 type="radio"
                 id="cond"
                 name="lngWorkType"
+                :disabled="disableGrid"
+                class="disabled:bg-gray-300"
                 @change="changeInfo"
                 v-model="gridvalue2"
                 value="1" />정직원</label
@@ -108,6 +118,8 @@
               ><input
                 type="radio"
                 id="cond2"
+                class="disabled:bg-gray-300"
+                :disabled="disableGrid"
                 name="lngWorkType"
                 @change="changeInfo"
                 v-model="gridvalue2"
@@ -123,8 +135,9 @@
             <input
               type="number"
               name="lngOTPayRate"
+              :disabled="disableGrid"
               @change="changeInfo"
-              class="border border-black w-[40%] h-[80%]"
+              class="border border-black w-[40%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue3" />%
           </div>
           <div
@@ -135,9 +148,10 @@
             class="flex justify-start items-center border-l border-t border-black pl-10">
             <input
               type="number"
+              :disabled="disableGrid"
               name="lngHWPayRate"
               @change="changeInfo"
-              class="border border-black w-[40%] h-[80%]"
+              class="border border-black w-[40%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue4" />%
           </div>
           <div
@@ -148,9 +162,10 @@
             class="flex justify-start items-center border-l border-t border-black pl-10">
             <input
               type="number"
+              :disabled="disableGrid"
               name="lngNWPayRate"
               @change="changeInfo"
-              class="border border-black w-[40%] h-[80%]"
+              class="border border-black w-[40%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue5" />%
           </div>
           <div
@@ -163,14 +178,16 @@
               <input
                 type="number"
                 name="timNWStime"
+                :disabled="disableGrid"
                 @change="changeInfo"
-                class="border border-black w-[10%] h-[80%]"
+                class="border border-black w-[10%] h-[80%] disabled:bg-gray-300"
                 v-model="gridvalue6" />~
               <input
                 type="number"
                 name="timNWETime"
+                :disabled="disableGrid"
                 @change="changeInfo"
-                class="border border-black w-[10%] h-[80%]"
+                class="border border-black w-[10%] h-[80%] disabled:bg-gray-300"
                 v-model="gridvalue7" />
             </div>
           </div>
@@ -184,7 +201,8 @@
               type="number"
               name="lngWHPayRate"
               @change="changeInfo"
-              class="border border-black w-[40%] h-[80%]"
+              :disabled="disableGrid"
+              class="border border-black w-[40%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue8" />%
           </div>
           <div
@@ -198,13 +216,15 @@
                 type="number"
                 name="lngPayAcntS"
                 @change="changeInfo"
-                class="border border-black w-[10%] h-[80%]"
+                :disabled="disableGrid"
+                class="border border-black w-[10%] h-[80%] disabled:bg-gray-300"
                 v-model="gridvalue9" />~
               <input
                 type="number"
                 name="lngPayAcntE"
                 @change="changeInfo"
-                class="border border-black w-[10%] h-[80%]"
+                :disabled="disableGrid"
+                class="border border-black w-[10%] h-[80%] disabled:bg-gray-300"
                 v-model="gridvalue10" />
             </div>
           </div>
@@ -217,8 +237,9 @@
             <input
               type="number"
               name="lngPayDay"
+              :disabled="disableGrid"
               @change="changeInfo"
-              class="border border-black w-[40%] h-[80%]"
+              class="border border-black w-[40%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue11" />
           </div>
           <div
@@ -230,8 +251,9 @@
             <input
               type="number"
               name="lngEPayDay"
+              :disabled="disableGrid"
               @change="changeInfo"
-              class="border border-black w-[40%] h-[80%]"
+              class="border border-black w-[40%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue12" />
           </div>
           <div
@@ -243,14 +265,16 @@
             <input
               type="number"
               name="lngPeriod"
+              :disabled="disableGrid"
               @change="changeInfo"
-              class="border border-black w-[40%] h-[80%]"
+              class="border border-black w-[40%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue13" />
             <select
               id=""
               name="lngPeriodCls"
+              :disabled="disableGrid"
               @change="changeInfo"
-              class="border border-black w-16 ml-5"
+              class="border border-black w-16 ml-5 disabled:bg-gray-300"
               v-model="gridvalue14">
               <option value="1">월</option>
               <option value="2">주</option>
@@ -266,8 +290,9 @@
             <input
               type="number"
               name="timFixWorkHour"
+              :disabled="disableGrid"
               @change="changeInfo"
-              class="border border-black w-[40%] h-[80%]"
+              class="border border-black w-[40%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue15" />
           </div>
           <div
@@ -279,8 +304,9 @@
             <input
               type="date"
               name="dtmApplyDate"
+              :disabled="disableGrid"
               @change="changeInfo"
-              class="border border-black w-[40%] h-[80%]"
+              class="border border-black w-[40%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue16" />
           </div>
           <div
@@ -292,8 +318,9 @@
             <input
               type="number"
               name="timLimitHourWeekAvg"
+              :disabled="disableGrid"
               @change="changeInfo"
-              class="border border-black w-[40%] h-[80%]"
+              class="border border-black w-[40%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue17" />
           </div>
           <div
@@ -304,9 +331,10 @@
             class="flex justify-start items-center border-l border-t border-black pl-10">
             <input
               type="number"
+              :disabled="disableGrid"
               name="timLimitHourWeek"
               @change="changeInfo"
-              class="border border-black w-[40%] h-[80%]"
+              class="border border-black w-[40%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue18" />
           </div>
           <div
@@ -317,9 +345,10 @@
             class="flex justify-start items-center border-l border-t border-black pl-10">
             <input
               type="number"
+              :disabled="disableGrid"
               name="timLimitHourDay"
               @change="changeInfo"
-              class="border border-black w-[40%] h-[80%]"
+              class="border border-black w-[40%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue19" />
           </div>
         </div>
@@ -332,16 +361,10 @@
 <script setup>
 import {
   deleteSalaryPolicy,
-  deleteWorkShifts,
   deleteWorkShifts2,
   getSalaryPolicy,
-  getWorkShiftList,
   saveSalaryPolicy,
-  saveWorkShift,
-  saveWorkShiftDetail,
   updateSalaryPolicy,
-  updateWorkShift,
-  updateWorkShiftDetail,
 } from "@/api/mihr";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -424,30 +447,34 @@ const selectedIndex = (e) => {
   changeRow.value = e;
 };
 const clickedRowData = (e) => {
-  ////console.log(e);
+  console.log(e);
+  disableGrid.value = false;
   gridvalue1.value = e[1];
-  gridvalue2.value = e[21];
+  gridvalue2.value = e[20];
   gridvalue3.value = e[3];
   gridvalue4.value = e[4];
-  gridvalue5.value = e[5];
-  gridvalue6.value = e[6];
-  gridvalue7.value = e[7];
-  gridvalue8.value = e[8];
-  gridvalue9.value = e[9];
-  gridvalue10.value = e[10];
-  gridvalue11.value = e[11];
-  gridvalue12.value = e[12];
-  gridvalue13.value = e[19];
-  gridvalue14.value = e[20];
-  gridvalue15.value = e[15];
-  gridvalue16.value = e[14];
-  gridvalue17.value = e[16];
-  gridvalue18.value = e[17];
-  gridvalue19.value = e[18];
+  gridvalue5.value = e[22];
+  gridvalue6.value = e[5];
+  gridvalue7.value = e[6];
+  gridvalue8.value = e[7];
+  gridvalue9.value = e[8];
+  gridvalue10.value = e[9];
+  gridvalue11.value = e[10];
+  gridvalue12.value = e[11];
+  gridvalue13.value =
+    e[12] == "" || e[12] == undefined ? 0 : e[12].split("월")[0];
+  gridvalue14.value = e[19];
+  gridvalue15.value = e[14];
+  gridvalue16.value = e[13];
+  gridvalue17.value = e[15];
+  gridvalue18.value = e[16];
+  gridvalue19.value = e[17];
+  // gridvalue20.value = e[18];
 };
 
 const updatedRow = ref([]);
 const updatedRowData = (e) => {
+  //console.log(e);
   updatedRow.value = e;
 };
 const updatedRow2 = ref([]);
@@ -466,7 +493,7 @@ const status = ref(99);
 const datepicker = ref(null);
 const closePopUp = ref(false);
 const custId = ref("");
-
+const disableGrid = ref(true);
 /**
  * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
  */
@@ -517,6 +544,7 @@ const saveButton = async (e) => {
   try {
     ////console.log(rowData1State.value);
     store.state.loading = true;
+    let res;
     if (rowData1State.value.created.length > 0) {
       const strStndName = updatedRow.value
         .filter((item, index) => rowData1State.value.created.includes(index))
@@ -596,7 +624,7 @@ const saveButton = async (e) => {
         .map((item) => item.lngPeriodCls)
         .join("\u200b");
       try {
-        const res = await saveSalaryPolicy(
+        res = await saveSalaryPolicy(
           store.state.userData.lngStoreGroup,
           strStndName,
           lngWorkType,
@@ -618,7 +646,7 @@ const saveButton = async (e) => {
           lngPeriod,
           lngPeriodCls
         );
-        ////console.log(res);
+        console.log(res);
       } catch (error) {
         ////console.log(error);
       } finally {
@@ -710,7 +738,7 @@ const saveButton = async (e) => {
         .map((item) => item.lngPeriodCls)
         .join("\u200b");
       try {
-        const res = await updateSalaryPolicy(
+        res = await updateSalaryPolicy(
           store.state.userData.lngStoreGroup,
           strStndName,
           lngCode,
@@ -733,11 +761,28 @@ const saveButton = async (e) => {
           lngPeriod,
           lngPeriodCls
         );
-        ////console.log(res);
+        console.log(res);
       } catch (error) {
         ////console.log(error);
       } finally {
       }
+    }
+
+    if (res.data.RESULT_CD == "00") {
+      await Swal.fire({
+        title: "성공",
+        text: "저장에 성공하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      return;
+    } else {
+      await Swal.fire({
+        title: "실패",
+        text: "저장에 실패하였습니다.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
     }
 
     store.state.loading = false;
@@ -765,6 +810,7 @@ const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
   }
+  disableGrid.value = true;
   gridvalue1.value = "";
   gridvalue2.value = "";
   gridvalue3.value = "";
@@ -778,7 +824,7 @@ const initGrid = () => {
   gridvalue11.value = "";
   gridvalue12.value = "";
   gridvalue13.value = "";
-  gridvalue14.value = "";
+  gridvalue14.value = "1";
   gridvalue15.value = "";
   gridvalue16.value = "";
   gridvalue17.value = "";
@@ -795,7 +841,7 @@ const addButton = () => {
     return;
   }
 
-  addrowDefault.value = ",1,정직원,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,";
+  addrowDefault.value = ",1,정직원,,,,,1,,,,";
   addRow4.value = !addRow4.value;
 };
 
@@ -880,6 +926,22 @@ const deleteButton = async () => {
 
         ////console.log(res);
         store.state.loading = false;
+
+        if (res.data.RESULT_CD == "00") {
+          await Swal.fire({
+            title: "성공",
+            text: "선택하신 급여기준을 삭제하였습니다.",
+            icon: "success",
+            confirmButtonText: "확인",
+          });
+        } else {
+          await Swal.fire({
+            title: "실패",
+            text: "선택하신 급여기준 삭제에 실패하였습니다.",
+            icon: "error",
+            confirmButtonText: "확인",
+          });
+        }
       } catch (error) {
       } finally {
         searchButton();

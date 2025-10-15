@@ -136,6 +136,21 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
   background-color: #5782FF;
   color: #fff;
 }
+
+.button.edit:before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background: url(../assets/pencil-solid-full.svg) no-repeat;
+  color: #fff;
+  margin-right: 5px;
+  margin-top: 1px;
+}
+.button.edit {
+  background-color: #5782FF;
+  color: #fff;
+}
+
 .button.primary {
   background-color: #5782FF;
   color: #fff;
@@ -347,7 +362,7 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
   height: auto !important; 
 
   max-width: 272px !important;
-  margin-left : 10px !important;
+  margin-left : 50px !important;
   margin-top: -10px !important;
   
 }

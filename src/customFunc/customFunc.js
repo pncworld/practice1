@@ -85,6 +85,35 @@ function formatDateTime2(dateString) {
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
+export function formatDateTime3(date) {
+  if (!date) return "";
+
+  const options = {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  };
+
+  // Intl.DateTimeFormat으로 한국 시간 문자열 얻기
+  const formatter = new Intl.DateTimeFormat("ko-KR", options);
+  const parts = formatter.formatToParts(date);
+
+  // 필요한 부분만 뽑아서 YYYY-MM-DD HH:mm:ss 형태로
+  const year = parts.find((p) => p.type === "year").value;
+  const month = parts.find((p) => p.type === "month").value;
+  const day = parts.find((p) => p.type === "day").value;
+  const hour = parts.find((p) => p.type === "hour").value;
+  const minute = parts.find((p) => p.type === "minute").value;
+  const second = parts.find((p) => p.type === "second").value;
+
+  return `${year}년${month}월${day}일 ${hour}시${minute}분${second}초`;
+}
+
 // const dateString = '2025 02 20 18:05:34';
 // const formattedDate = formatDate(dateString);
 // //comsole.log(formattedDate); // 출력: 2025-02-20 18:05:34
@@ -148,6 +177,50 @@ export async function insertPageLog(progdata) {
     1
   );
   //comsole.log(res);
+  return ``;
+}
+
+export async function insertPageLog2(
+  page,
+  lngStoreGroup,
+  lngStoreCode,
+  userid
+) {
+  //const store = useStore()
+  const currenttime = new Date();
+  const inserttime = formatDateTime2(currenttime);
+  const userGroup = lngStoreGroup;
+  const userStoreCd = lngStoreCode;
+  const userId = userid;
+  let userIp = "0.0.0.0"; // 기본값
+
+  const userip = async () => {
+    try {
+      const result = await fetch("https://api64.ipify.org", { timeout: 3000 });
+      const data = await result.text();
+      userIp = data;
+    } catch (err) {
+      //console.warn("IP 가져오기 실패:", err);
+      // userIp는 기본값 유지
+    }
+  };
+
+  await userip();
+
+  const progname = page.split(".xml")[0];
+  const progid = "0";
+
+  const res = await savePageLog(
+    inserttime,
+    userGroup,
+    userStoreCd,
+    userId,
+    userIp,
+    progname,
+    progid,
+    1
+  );
+
   return ``;
 }
 

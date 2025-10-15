@@ -40,7 +40,7 @@
               :options="discountCodeList"
               placeholder="전체"
               label="strName"
-              class="custom-select5"
+              class="!w-48 !h-7 custom-select5"
               clearable="true"
               @click="resetVselect2" />
           </div>
