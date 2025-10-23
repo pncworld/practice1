@@ -167,6 +167,34 @@
     </div>
   </div>
 
+  <div v-if="openPop" class="fixed inset-0 flex items-center justify-center">
+    <div class="bg-white p-6 rounded shadow-lg w-[500px] h-96">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold mb-4">기 등록 동일 코드 품목 조회</h2>
+        <div class="space-x-2">
+          <button
+            @click="excelButton2"
+            class="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+            엑셀
+          </button>
+          <button
+            @click="openPop = false"
+            class="mt-4 px-4 py-2 bg-gray-300 text-white rounded">
+            닫기
+          </button>
+        </div>
+      </div>
+      <div class="w-full h-[70%]">
+        <Realgrid
+          :progname="'MST04_002INS_VUE'"
+          :progid="4"
+          :rowStateeditable="false"
+          :exporttoExcel="exportExcel2"
+          :documentTitle="'MST04_002INS'"
+          :rowData="ErrorRowData"></Realgrid>
+      </div>
+    </div>
+  </div>
   <!--그리드 영역 -->
 </template>
 
@@ -221,68 +249,7 @@ const cond = ref("");
 const cond2 = ref("");
 const today = new Date();
 const cond3 = ref(formatLocalDate(today));
-const cond4 = ref(0);
-const cond5 = ref(0);
-const cond6 = ref(0);
-const cond7 = ref(0);
-const cond8 = ref("");
 
-const scond = ref("");
-const scond2 = ref("");
-const scond3 = ref("0");
-const scond4 = ref("0");
-const scond5 = ref("0");
-const scond6 = ref("0");
-const scond7 = ref("0");
-const scond8 = ref("0");
-const scond9 = ref("0");
-const scond10 = ref("0");
-const scond11 = ref("");
-const scond12 = ref("0");
-const scond13 = ref("");
-const scond14 = ref("0");
-const scond15 = ref("");
-const scond16 = ref("0");
-const scond17 = ref("");
-const scond18 = ref("0");
-const scond19 = ref("");
-const scond20 = ref("0");
-const scond21 = ref(false);
-const scond22 = ref("");
-const scond23 = ref("");
-const scond24 = ref("");
-const scond25 = ref("");
-const scond26 = ref("");
-const scond27 = ref("Y");
-
-const sscond = ref("");
-const sscond2 = ref("");
-
-const sscond3 = ref("");
-const sscond4 = ref("");
-
-const sscond5 = ref("");
-const sscond6 = ref("");
-
-const sscond7 = ref("");
-const sscond8 = ref("");
-
-const optionList = ref([]);
-const optionList2 = ref([]);
-const optionList3 = ref([]);
-const optionList4 = ref([]);
-const optionList5 = ref([]);
-const optionList6 = ref([]);
-const optionList7 = ref([]);
-const optionList8 = ref([]);
-const optionList9 = ref([]);
-const optionList10 = ref([]);
-const setGroupColumnId = ref("");
-
-const addRow2 = ref(false);
-const addRow3 = ref(false);
-const addRow4 = ref(false);
-const addRow5 = ref(false);
 /**
  * 선택한 매출 시작일자
  */
@@ -369,6 +336,7 @@ const initGrid = () => {
 };
 
 const exportExcel = ref(false);
+const exportExcel2 = ref(false);
 
 //comsole.log(store.state.minorCategory);
 
@@ -378,6 +346,9 @@ const exportExcel = ref(false);
 
 const excelButton = () => {
   exportExcel.value = !exportExcel.value;
+};
+const excelButton2 = () => {
+  exportExcel2.value = !exportExcel2.value;
 };
 
 const datepicker = ref(null);
@@ -390,6 +361,8 @@ const documentSubTitle = ref("");
 const selectedExcelDate = ref("");
 
 const saveNew = ref(true);
+const ErrorRowData = ref([]);
+const openPop = ref(false);
 const saveButton = async () => {
   if (currentFile.value == null || currentFile.value == undefined) {
     Swal.fire({
@@ -503,22 +476,40 @@ const saveButton = async () => {
       store.state.userData.lngSequence
     );
     store.state.loading = false;
-    //console.log(res);
-    if (res.data.RESULT_CD == "00") {
-      Swal.fire({
-        title: "성공",
-        text: `${res.data.ERROR_MSG}`,
-        icon: "success",
+    console.log(res);
+    if (res.data.ERROR_CD == "99") {
+      await Swal.fire({
+        title: "실패",
+        text: `이미 등록된 품목과 동일한 코드의번호가 엑셀파일에 존재합니다. 엑셀파일의 자재코드 번호를 수정하십시오.  동일한 코드 번호의 품목을 확인 하시겠습니까?`,
+        icon: "error",
         confirmButtonText: "확인",
+        cancelButtonText: "취소",
+        showCancelButton: true,
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          ErrorRowData.value = res.data.ERROR_LIST;
+          openPop.value = true;
+        } else {
+          fileName.value = "";
+          rowData.value = [];
+          SheetList.value = [];
+
+          openPop.value = false;
+        }
       });
       return;
     } else {
-      Swal.fire({
-        title: "실패",
-        text: "저장에 실패하였습니다.",
-        icon: "warning",
+      await Swal.fire({
+        title: "성공",
+        text: "저장에 성공하였습니다.",
+        icon: "success",
         confirmButtonText: "확인",
       });
+      SheetList.value = [];
+      excelcond.value = 1;
+      fileName.value = "";
+      rowData.value = [];
+      updateRowData.value = [];
       return;
     }
   } catch (error) {
@@ -608,14 +599,16 @@ async function readFileWithArrayBuffer(file) {
   ];
 
   const rows = jsonData.slice(2); // 실제 데이터 행들
-
-  rowData.value = rows.map((row) => {
-    const obj = {};
-    header.forEach((key, i) => {
-      obj[key] = row[i];
+  console.log(rows);
+  rowData.value = rows
+    .filter((item) => item.length !== 0)
+    .map((row) => {
+      const obj = {};
+      header.forEach((key, i) => {
+        obj[key] = row[i];
+      });
+      return obj;
     });
-    return obj;
-  });
   //   rowData.value = rowData.value.map((item) => ({
   //     ...item,
   //     strSaleCustStatus: 0,

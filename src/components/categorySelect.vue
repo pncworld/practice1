@@ -125,6 +125,7 @@ onMounted(async () => {
     store.state.userData.lngPosition,
     store.state.userData.lngSequence
   );
+  console.log(res);
   if (props.defaultChoice == true) {
     defaultValue.value = "선택";
   }
@@ -146,7 +147,7 @@ onMounted(async () => {
     store.state.userData.lngStoreGroup,
     store.state.userData.lngPosition
   );
-  ////console.log(res2);
+  console.log(res2);
   optionList.value = res2.data.LClassList;
 
   emit("SUBCATEGORY", selectedCond2.value);

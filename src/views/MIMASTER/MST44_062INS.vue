@@ -171,15 +171,15 @@
     </div>
 
     <div class="w-[52%] h-[20%] ml-10 mt-44 flex flex-col justify-center" v-if="currentMenu == 3">
-      <div class="font-bold text-xl flex justify-start items-center">영수증 예시</div>
-      <div class="flex justify-center items-center h-[45vh] w-[20vw] bg-gray-100 ml-28 mt-10">
+      <div class="font-bold text-xl flex justify-start items-center mt-28 ml-60">영수증 예시</div>
+      <div class="flex justify-start items-center h-[45vh] w-[20vw] bg-gray-100 ml-28 mt-20">
         <div class="w-full h-[130%] bg-white p-5 border shadow-lg rounded-lg">
           <!-- 상단 수정 가능 영역 -->
           <div class="text-center space-y-2">
             <input type="text" v-model="receiptU" class="flex justify-start w-full disabled:bg-white"  disabled>
-            <div>선불 데모매장 0212345678</div>
-            <div>주소상세주소</div>
-            <div>111-11-11111</div>
+            <div>{{receiptP1}}</div>
+            <div>{{ receiptP3 }}</div>
+            <div>{{receiptP2}}</div>
           </div>
           <hr class="my-3 border-gray-300" />
 
@@ -260,7 +260,7 @@
 </template>
 
 <script setup>
-import { getKitchenSettingList, getPrintList, getStorePosList, saveKitchenSettingAll, savePrintNm, saveReceiptData } from '@/api/master';
+import { getKitchenSettingList, getMstBasic, getPrintList, getStorePosList, saveKitchenSettingAll, savePrintNm, saveReceiptData } from '@/api/master';
 
 /*
  * 공통 표준  Function
@@ -314,10 +314,13 @@ import PageName from '@/components/pageName.vue';
 /**
  * 	화면 Load시 실행 스크립트
  */
-
+const store = useStore();
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
 });
+
+
 // 더미 데이터
 const disabled = ref(true)
 const items = ref([]);
@@ -484,7 +487,7 @@ const updatedRowData3 = (newValue) => {
   updatedList3.value = newValue
   //comsole.log(updatedList3.value)
 }
-const nowStoreCd = ref();
+const nowStoreCd = ref(store.state.userData.lngPosition);
 const afterCategory = ref(false);
 /**
  * 페이지 매장 코드 세팅
@@ -502,6 +505,19 @@ const handleStoreCd = async (newValue) => {
   SubMenuGroup.value = []
   ischecked.value = false
   //console.log(newValue)
+
+  const res = await getMstBasic(store.state.userData.lngStoreGroup , newValue)
+  
+  if(res.data.List.length > 0){
+  receiptP1.value = res.data.List[0].strName + ' ' + res.data.List[0].strTel
+  receiptP2.value = res.data.List[0].strRegistNo.slice(0,3) + '-' + res.data.List[0].strRegistNo.slice(3,6) + '-' + res.data.List[0].strRegistNo.slice(6,11)
+    receiptP3.value = res.data.List[0].strAddr
+  } else {
+    receiptP1.value = ''
+    receiptP2.value = ''
+    receiptP3.value = ''
+  }
+ 
   nowStoreCd.value = newValue;
   searchButton()
   //comsole.log(nowStoreCd.value)
@@ -625,7 +641,6 @@ const changeValues = (e) => {
   changeNow.value = !changeNow.value
 }
 
-const store = useStore();
 /**
  *  그리드 검색어 세팅
  */
@@ -1356,6 +1371,12 @@ const handleinitAll = (newvalue) => {
   searchword3.value = ''
   afterSearch.value = false
 }
+
+const receiptP2 = ref('선불 데모매장')
+const receiptP1 = ref('111-11-1111')
+const receiptP3 = ref('')
+
+
 </script>
 
 

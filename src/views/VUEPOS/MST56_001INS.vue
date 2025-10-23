@@ -389,12 +389,15 @@ const searchButton = async () => {
   try {
     initGrid();
     //  //console.log(store.state.userData);
+    store.state.loading = true;
     const res = await getSalesInfoByCorner2(
       lngStoreGroup.value,
       "0",
       lngStoreCode.value,
-      0
+      lngOperator.value
     );
+
+    store.state.loading = false;
 
     rowData.value = res.data.List;
 

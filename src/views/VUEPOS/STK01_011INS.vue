@@ -179,12 +179,6 @@
 </template>
 
 <script setup>
-import {
-  deleteDemandMaster,
-  getStockDemandList2,
-  getStockDetail2,
-  InsertDemandMasterDetail,
-} from "@/api/mistock";
 import Realgrid from "@/components/realgrid.vue";
 import { formatLocalDate, insertPageLog2 } from "@/customFunc/customFunc";
 import { onMounted, ref } from "vue";
@@ -272,7 +266,7 @@ onMounted(async () => {
     lngStoreCode.value,
     lngOperator.value
   );
-  const res = await getDemandStoreList2(store.state.userData.lngStoreGroup, 0);
+  const res = await getDemandStoreList2(lngStoreGroup.value, 0);
 
   optionList.value = res.data.List;
 

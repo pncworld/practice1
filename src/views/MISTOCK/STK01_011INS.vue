@@ -13,7 +13,10 @@
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="addButton" class="button new md:w-auto w-14">
+        <button
+          @click="addButton"
+          class="button new md:w-auto w-14 disabled:bg-opacity-50"
+          :disabled="limitStore == '2'">
           신규
         </button>
         <button @click="deleteButton" class="button delete md:w-auto w-14">
@@ -78,13 +81,13 @@
     class="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
     v-if="open">
     <!-- 팝업 내용 -->
-    <div class="bg-white p-6 rounded-2xl shadow-lg w-[50vw] h-[60vh]">
+    <div class="bg-white p-6 rounded-2xl shadow-lg w-[900px] h-[700px]">
       <div class="flex justify-between">
         <h2 class="text-xl font-bold mb-4">청구 등록 팝업</h2>
         <div class="flex space-x-3">
           <button
             class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            :disabled="disabled"
+            :disabled="limitStore == '2'"
             @click="saveButton">
             저장
           </button>
@@ -157,6 +160,7 @@
           :rowStateeditable="false"
           :editableColId="editableColId"
           @updatedRowData="updatedRowData2"
+          :editableColByCondition="true"
           :CalculateTaxColId4="'curTax'"
           :CalculateSumColId2="'curSupply'"
           :documentSubTitle="documentSubTitle2"
@@ -172,6 +176,7 @@
           name=""
           id=""
           v-model="scond4"
+          :disabled="disabled2"
           class="border border-black w-full h-full"></textarea>
       </div>
     </div>
@@ -182,6 +187,7 @@
 <script setup>
 import {
   deleteDemandMaster,
+  getCheckAbility,
   getDemandStoreList,
   getDemCloseTime,
   getStockDemandList2,
@@ -191,7 +197,11 @@ import {
 } from "@/api/mistock";
 import PageName from "@/components/pageName.vue";
 import Realgrid from "@/components/realgrid.vue";
-import { formatLocalDate, insertPageLog } from "@/customFunc/customFunc";
+import {
+  formatLocalDate,
+  insertPageLog,
+  formatDateTime2,
+} from "@/customFunc/customFunc";
 import { onMounted, ref } from "vue";
 
 import Datepicker2 from "@/components/Datepicker2.vue";
@@ -250,6 +260,7 @@ const selectedStore = ref(0);
  * 	화면 Load시 실행 스크립트
  */
 
+const limitStore = ref("0");
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
@@ -260,12 +271,28 @@ onMounted(async () => {
   if (res.data.List.length > 0) {
     cond.value = res.data.List[0].lngStoreCode;
   }
+
+  const res2 = await getCheckAbility(
+    store.state.userData.lngStoreGroup,
+    store.state.userData.lngPosition
+  );
+  limitStore.value = res2.data.List[0].lngChk;
+
+  if (limitStore.value == "2") {
+    await Swal.fire({
+      title: "경고",
+      text: "현재 매장은 청구 제한 매장입니다. 조회만 가능합니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
 });
 
 /**
  * 그리드 초기화
  */
-
+const disabled2 = ref(false);
 const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
@@ -345,9 +372,10 @@ const saveButton = async () => {
         scond2.value,
         scond.value.replaceAll("-", ""),
         scond3.value,
-        scond4.value
+        scond4.value,
+        tempdtmEndDate.value + ":00"
       );
-      console.log(res);
+
       store.state.loading = false;
       if (res.data.RESULT_CD == "00") {
         await Swal.fire({
@@ -360,7 +388,7 @@ const saveButton = async () => {
       } else {
         await Swal.fire({
           title: "경고",
-          text: "청구등록 저장을 실패하였습니다.",
+          text: `${res.data.RESULT_NM}`,
           icon: "warning",
           confirmButtonText: "확인",
         });
@@ -472,6 +500,7 @@ const rowData2 = ref([]);
 const scond4 = ref("");
 
 const editableColId = ref("");
+const tempdtmEndDate = ref("");
 const dblclickedRowData = async (e) => {
   console.log(e);
   //   console.log(tempColID.value);
@@ -499,6 +528,12 @@ const dblclickedRowData = async (e) => {
       store.state.loading = false;
       rowData2.value = res.data.List;
       scond4.value = res.data.List2[0].strComments;
+
+      disabled2.value =
+        new Date(formatDateTime2(new Date()).slice(0, 16)) >
+        new Date(rowData2.value[0].dtmEndDate);
+
+      tempdtmEndDate.value = rowData2.value[0].dtmEndDate;
     } catch (error) {}
     open.value = true;
   }

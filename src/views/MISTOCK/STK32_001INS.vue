@@ -250,6 +250,7 @@ const progId = ref("1");
 const mdate = ref("");
 const dateValue = (e) => {
   mdate.value = e.replaceAll("-", "");
+  scond.value = e;
 };
 const lngStoreCode = (e) => {
   cond2.value = e;
@@ -376,7 +377,7 @@ const saveButton = async () => {
     const demandseqs = updatedrowdata2.value
       .map((item) => item.lngDemandSeq)
       .join("\u200b");
-
+    store.state.loading = true;
     const res = await saveStockConfirm(
       store.state.userData.lngStoreGroup,
       tempStoreCd.value,
@@ -393,8 +394,7 @@ const saveButton = async () => {
       scond4.value
     );
 
-    console.log(res);
-
+    store.state.loading = false;
     if (res.data.RESULT_CD == "00") {
       await Swal.fire({
         title: "성공",
@@ -484,7 +484,7 @@ const dblclickedRowData = async (e) => {
     tempColID.value == "strStoreName" ||
     tempColID.value == "strDemandNo_Dummy"
   ) {
-    if (e[11] == "01") {
+    if (e[11] == "01" || e[11] == "04") {
       disabled.value = false;
     } else {
       disabled.value = true;
@@ -492,7 +492,7 @@ const dblclickedRowData = async (e) => {
 
     //disabled.value = false;
 
-    scond.value = formatLocalDate(new Date());
+    //scond.value = formatLocalDate(new Date());
     scond2.value =
       store.state.storeCd.filter((item) => item.lngStoreCode == e[1])[0]
         ?.strName || "";

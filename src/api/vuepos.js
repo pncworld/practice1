@@ -98,7 +98,7 @@ export const getMenuStock2 = (groupCd, storecd, cond) => {
 };
 
 export const saveMenuStock2 = (groupCd, storecd, cond) => {
-  return api2.post("/VUEPOS/MST37_071INS.asmx/saveMenuStock", {
+  return api2.post("/VUEPOS/MST37_071INS.asmx/saveMenuStock2", {
     GROUP_CD: groupCd,
     STORE_CD: storecd,
     COND: cond,
@@ -415,6 +415,156 @@ export const deleteDemandMaster2 = (
     DEMANDNO: demandno,
     DATE: date,
     USERID: userid,
+  });
+};
+
+export const getMenuList3 = (groupCd, storeCd) => {
+  return api2.post("/VUEPOS/MST01_002POS.asmx/getMenuList3", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+
+export const getSubGroup4 = async (cond, cond2) => {
+  return api2.post("/VUEPOS/MST01_002POS.asmx/getSubGroup4", {
+    GROUP_CD: cond,
+    STORE_CD: cond2,
+  });
+};
+
+export const getTLUList2 = (groupCd, storeCd) => {
+  return api2.post("/VUEPOS/MST01_002POS.asmx/getTLUList2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+
+export const getAreaCode = (groupCd, storeCd) => {
+  return api2.post("/VUEPOS/MST01_002POS.asmx/getAreaCode", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+
+export const getScreenList4 = (groupCd, storeCd, areaCd) => {
+  return api2.post("/VUEPOS/MST01_002POS.asmx/getScreenList4", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+  });
+};
+
+export const getMenuKeyList5 = (groupCd, storeCd, areaCd) => {
+  return api2.post("/VUEPOS/MST01_002POS.asmx/getMenuKeyList5", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+  });
+};
+
+export const saveAllMenuKey2 = (
+  groupCd,
+  storeCd,
+  areaCd,
+  posNo,
+  intKeySeq_arr,
+  intScreenNo_arr,
+  lngScrNo_arr,
+  strKeyName_arr
+) => {
+  return api2.post("/VUEPOS/MST01_002POS.asmx/saveMenuKeys2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+    POSNO: posNo,
+    INTKEYSEQ_ARR: intKeySeq_arr,
+    INTSCREENNO_ARR: intScreenNo_arr,
+    LNGKEYSCRNO_ARR: lngScrNo_arr,
+    STRKEYNAME_ARR: strKeyName_arr,
+  });
+};
+
+export const saveScreenKeys2 = (
+  groupCd,
+  storeCd,
+  areaCd,
+  posNo,
+  screenNo_arr,
+  screenName_arr
+) => {
+  return api2.post("/VUEPOS/MST01_002POS.asmx/saveScreenKeys2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+    POSNO: posNo,
+    SCREEN_NO_ARR: screenNo_arr,
+    SCREEN_NAME_ARR: screenName_arr,
+  });
+};
+
+export const getReservedSearch2 = (
+  groupCd,
+  storeCd,
+  datetype,
+  sdate,
+  edate,
+  cond,
+  cond2,
+  cond3,
+  cond4
+) => {
+  return api2.post("/VUEPOS/CRM31_008POS.asmx/getReservedSearch2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATETYPE: datetype,
+    SDATE: sdate,
+    EDATE: edate,
+    STIME: cond,
+    ETIME: cond2,
+    NOTE: cond3,
+    SEAT: cond4,
+  });
+};
+
+export const saveReserveEnroll = (
+  groupCd,
+  storeCd,
+  seq,
+  sdate,
+  edate,
+  time,
+  status,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  savetype
+) => {
+  return api2.post("/VUEPOS/CRM31_008POS.asmx/saveReserveEnroll", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SEQ: seq,
+    SDATE: sdate,
+    EDATE: edate,
+    TIME: time,
+    STATUS: status,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+    COND5: cond5,
+    COND6: cond6,
+    SAVETYPE: savetype,
+  });
+};
+
+export const deleteReserveEnroll = (groupCd, storeCd, seq) => {
+  return api2.post("/VUEPOS/CRM31_008POS.asmx/deleteReserveEnroll", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SEQ: seq,
   });
 };
 

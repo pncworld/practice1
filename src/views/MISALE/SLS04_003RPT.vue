@@ -838,11 +838,23 @@ const showStore = (e) => {
 
 const changeSearchType = (e) => {
   if (e.target.value == 1) {
-    hideColumnsId.value = ["strStoreName", "dtmDate", "dtmDate2"];
+    if (selectedDetail.value == true) {
+      hideColumnsId.value = ["strStoreName", "dtmDate", "dtmDate2"];
+    } else {
+      hideColumnsId.value = ["strStoreName", "dtmDate", "dtmDate2"];
+    }
   } else if (e.target.value == 2) {
-    hideColumnsId.value = ["strStoreName", "dtmDate2"];
+    if (selectedDetail.value == true) {
+      hideColumnsId.value = ["strStoreName", "dtmDate2"];
+    } else {
+      hideColumnsId.value = ["strStoreName", "dtmDate2", "dtmDate"];
+    }
   } else {
-    hideColumnsId.value = ["strStoreName", "dtmDate"];
+    if (selectedDetail.value == true) {
+      hideColumnsId.value = ["strStoreName", "dtmDate"];
+    } else {
+      hideColumnsId.value = ["strStoreName", "dtmDate2", "dtmDate"];
+    }
   }
 };
 </script>

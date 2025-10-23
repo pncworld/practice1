@@ -15,6 +15,7 @@ import {
 import {
   excelTitle,
   formatDateTime,
+  formatDateTime2,
   formatLocalDate,
 } from "@/customFunc/customFunc";
 import store from "@/store";
@@ -266,6 +267,11 @@ const props = defineProps({
     default: "",
   },
   exporttoExcel: {
+    // 엑셀 내보내기
+    type: Boolean,
+    default: false,
+  },
+  exporttoExcel2: {
     // 엑셀 내보내기
     type: Boolean,
     default: false,
@@ -1150,6 +1156,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  editableColByCondition: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // 2구간
@@ -1889,282 +1899,317 @@ const funcshowGrid = async () => {
           : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
     },
     buttonVisibility: "always",
-    styleCallback: props.checkAbleExpressionCol.includes(item.strColID)
-      ? function (grid, dataCell) {
-          if (item.strColID == "Selected") {
-            const blnChk = grid
-              .getDataSource()
-              .getValue(dataCell.index.dataRow, props.checkAbleExpressionCol2);
+    styleCallback:
+      props.editableColByCondition == true
+        ? // 시간값에 따라서 배경 색상 지정
+          function (grid, dataCell) {
+            var ret = {};
 
-            if (props.checkAbleExpressionVal.includes(blnChk)) {
+            if (item.strColID == "dblDemandQty") {
+              const val = grid
+                .getDataSource()
+                .getValue(dataCell.index.dataRow, "dtmEndDate");
+              const val2 = formatDateTime2(new Date());
+              const val3 = grid
+                .getDataSource()
+                .getValue(dataCell.index.dataRow, "strStatus");
+
+              return {
+                editable:
+                  new Date(val.replace(" ", "T")) >
+                    new Date(val2.slice(0, 16).replace(" ", "T")) &&
+                  val3 !== "출고완료",
+              };
+            }
+          }
+        : props.checkAbleExpressionCol.includes(item.strColID)
+        ? function (grid, dataCell) {
+            if (item.strColID == "Selected") {
+              const blnChk = grid
+                .getDataSource()
+                .getValue(
+                  dataCell.index.dataRow,
+                  props.checkAbleExpressionCol2
+                );
+
+              if (props.checkAbleExpressionVal.includes(blnChk)) {
+                return {
+                  editable: props.rowStateeditable,
+                  renderer: {
+                    type: "check",
+                    editable: false,
+                    readOnlySetDisabled: true,
+                  },
+                };
+              }
               return {
                 editable: props.rowStateeditable,
                 renderer: {
                   type: "check",
-                  editable: false,
-                  readOnlySetDisabled: true,
+                  editable: true,
                 },
               };
-            }
-            return {
-              editable: props.rowStateeditable,
-              renderer: {
-                type: "check",
-                editable: true,
-              },
-            };
-          } else if (item.strColID == "cancled") {
-            const blnChk = grid
-              .getDataSource()
-              .getValue(dataCell.index.dataRow, props.checkAbleExpressionCol3);
+            } else if (item.strColID == "cancled") {
+              const blnChk = grid
+                .getDataSource()
+                .getValue(
+                  dataCell.index.dataRow,
+                  props.checkAbleExpressionCol3
+                );
 
-            if (props.checkAbleExpressionVal2.includes(blnChk)) {
+              if (props.checkAbleExpressionVal2.includes(blnChk)) {
+                return {
+                  editable: props.rowStateeditable,
+                  renderer: {
+                    type: "check",
+                    editable: false,
+                    readOnlySetDisabled: true,
+                  },
+                };
+              }
               return {
                 editable: props.rowStateeditable,
                 renderer: {
                   type: "check",
-                  editable: false,
-                  readOnlySetDisabled: true,
+                  editable: true,
                 },
               };
-            }
-            return {
-              editable: props.rowStateeditable,
-              renderer: {
-                type: "check",
-                editable: true,
-              },
-            };
-          } else {
-            const blnChk = grid
-              .getDataSource()
-              .getValue(dataCell.index.dataRow, props.checkAbleExpressionCol2);
+            } else {
+              const blnChk = grid
+                .getDataSource()
+                .getValue(
+                  dataCell.index.dataRow,
+                  props.checkAbleExpressionCol2
+                );
 
-            if (blnChk != props.checkAbleExpressionVal) {
+              if (blnChk != props.checkAbleExpressionVal) {
+                return {
+                  editable: props.rowStateeditable,
+                  renderer: {
+                    type: "check",
+                    editable: false,
+                    readOnlySetDisabled: true,
+                  },
+                };
+              }
               return {
                 editable: props.rowStateeditable,
                 renderer: {
                   type: "check",
-                  editable: false,
-                  readOnlySetDisabled: true,
+                  editable: true,
                 },
               };
             }
-            return {
-              editable: props.rowStateeditable,
-              renderer: {
-                type: "check",
-                editable: true,
-              },
-            };
           }
-        }
-      : props.setCellStyleColId3 == true
-      ? function (grid, dataCell) {
-          // 시간값에 따라서 배경 색상 지정
+        : props.setCellStyleColId3 == true
+        ? function (grid, dataCell) {
+            // 시간값에 따라서 배경 색상 지정
 
-          var ret = {};
+            var ret = {};
 
-          if (dataCell.dataColumn.header.text.includes("토")) {
-            ret.style = { backgroundColor: "#ADD8E6" };
-          } else if (dataCell.dataColumn.header.text.includes("/일")) {
-            ret.style = { backgroundColor: "#FFC0CB" };
-          }
+            if (dataCell.dataColumn.header.text.includes("토")) {
+              ret.style = { backgroundColor: "#ADD8E6" };
+            } else if (dataCell.dataColumn.header.text.includes("/일")) {
+              ret.style = { backgroundColor: "#FFC0CB" };
+            }
 
-          //  const value = grid.getValue(
-          //   dataCell.index.itemIndex,
-          //   "lngErrorCode"
-          // );
-
-          if (
-            dataCell.value == "휴무" ||
-            (dataCell.value.length == 1 && isNaN(parseInt(dataCell.value)))
-          ) {
-            ret.style = { backgroundColor: "#D3D3D3" };
-          }
-
-          return ret;
-        }
-      : props.setCellStyleColId2.includes(item.strColID) // 하드코딩
-      ? function (grid, dataCell) {
-          // 시간값에 따라서 배경 색상 지정
-          var ret = {};
-          ////console.log(item.strColID);
-          const value = grid.getValue(dataCell.index.itemIndex, "lngErrorCode");
-          if (
-            item.strColID == "strPSTime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPSTime") {
-            ret.style = { backgroundColor: "#8EE0FF" };
-          } else if (
-            item.strColID == "strPETime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPETime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strPTTime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPTTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strPWTime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPWTime") {
-            ret.style = { backgroundColor: "#BDFFCF" };
-          } else if (
-            item.strColID == "strPRTime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPRTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strWSTime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWSTime") {
-            ret.style = { backgroundColor: "#8EE0FF" };
-          } else if (
-            item.strColID == "strWETime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWETime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strWTTime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWTTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strWWTime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWWTime") {
-            ret.style = { backgroundColor: "#BDFFCF" };
-          } else if (
-            item.strColID == "strWRTime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWRTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strRSTime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRSTime") {
-            ret.style = { backgroundColor: "#8EE0FF" };
-          } else if (
-            item.strColID == "strRETime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRETime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strRTTime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRTTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strRWTime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRWTime") {
-            ret.style = { backgroundColor: "#BDFFCF" };
-          } else if (
-            item.strColID == "strRRTime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRRTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          }
-          //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
-          //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
-
-          return ret;
-        }
-      : props.setCellStyleColId.includes(item.strColID)
-      ? function (grid, dataCell) {
-          // 시간값에 따라서 배경 색상 지정
-          var ret = {};
-          ////console.log(item.strColID);
-          //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
-          //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
-
-          dataCell.value == "1"
-            ? (ret.style = { backgroundColor: "#ADD8E6", color: "#ADD8E6" })
-            : (ret.style = { backgroundColor: "#FFFFFF", color: "#FFFFFF" });
-
-          return ret;
-        }
-      : props.ColCellRedColorColId.includes(item.strColID)
-      ? function (grid, dataCell) {
-          var ret = {};
-          ret.style = { color: "#FF0000" };
-          return ret;
-        }
-      : function (grid, dataCell) {
-          var ret = {};
-
-          if (
-            (dataCell.item.rowState == "created" ||
-              dataCell.item.itemState == "appending" ||
-              dataCell.item.itemState == "inserting") &&
-            props.rowStateeditable
-          ) {
-            ret.editable = true;
-          } else if (props.editableColId.includes(item.strColID)) {
-            ret.editable = true;
-          } else if (
-            props.rowStateeditable == true &&
-            dataCell.item.itemState == "normal"
-          ) {
-            ret.editable = true;
-          } else {
-            ret.editable = false;
-          }
-
-          if (props.checkBarInactive != "") {
-            var inActiveColumn = grid.getValue(
-              dataCell.index.itemIndex,
-              props.checkBarInactive
-            );
+            //  const value = grid.getValue(
+            //   dataCell.index.itemIndex,
+            //   "lngErrorCode"
+            // );
 
             if (
-              inActiveColumn == "0" &&
-              (item.strColID == "checkbox" ||
-                item.strDisplay.includes("checkbox"))
+              dataCell.value == "휴무" ||
+              (dataCell.value.length == 1 && isNaN(parseInt(dataCell.value)))
             ) {
-              ret.style = { opacity: "0.5" };
-              ret.renderer = { type: "check", editable: false };
+              ret.style = { backgroundColor: "#D3D3D3" };
             }
-            if (item.strColID == "lngSupplierID") {
-              ret.style = { opacity: "0.5" };
-              ret.renderer = { type: "check", editable: false };
-            }
-          }
 
-          return ret;
-        },
+            return ret;
+          }
+        : props.setCellStyleColId2.includes(item.strColID) // 하드코딩
+        ? function (grid, dataCell) {
+            // 시간값에 따라서 배경 색상 지정
+            var ret = {};
+            ////console.log(item.strColID);
+            const value = grid.getValue(
+              dataCell.index.itemIndex,
+              "lngErrorCode"
+            );
+            if (
+              item.strColID == "strPSTime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPSTime") {
+              ret.style = { backgroundColor: "#8EE0FF" };
+            } else if (
+              item.strColID == "strPETime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPETime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strPTTime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPTTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strPWTime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPWTime") {
+              ret.style = { backgroundColor: "#BDFFCF" };
+            } else if (
+              item.strColID == "strPRTime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPRTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strWSTime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWSTime") {
+              ret.style = { backgroundColor: "#8EE0FF" };
+            } else if (
+              item.strColID == "strWETime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWETime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strWTTime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWTTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strWWTime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWWTime") {
+              ret.style = { backgroundColor: "#BDFFCF" };
+            } else if (
+              item.strColID == "strWRTime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWRTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strRSTime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRSTime") {
+              ret.style = { backgroundColor: "#8EE0FF" };
+            } else if (
+              item.strColID == "strRETime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRETime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strRTTime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRTTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strRWTime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRWTime") {
+              ret.style = { backgroundColor: "#BDFFCF" };
+            } else if (
+              item.strColID == "strRRTime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRRTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            }
+            //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
+            //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
+
+            return ret;
+          }
+        : props.setCellStyleColId.includes(item.strColID)
+        ? function (grid, dataCell) {
+            // 시간값에 따라서 배경 색상 지정
+            var ret = {};
+            ////console.log(item.strColID);
+            //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
+            //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
+
+            dataCell.value == "1"
+              ? (ret.style = { backgroundColor: "#ADD8E6", color: "#ADD8E6" })
+              : (ret.style = { backgroundColor: "#FFFFFF", color: "#FFFFFF" });
+
+            return ret;
+          }
+        : props.ColCellRedColorColId.includes(item.strColID)
+        ? function (grid, dataCell) {
+            var ret = {};
+            ret.style = { color: "#FF0000" };
+            return ret;
+          }
+        : function (grid, dataCell) {
+            var ret = {};
+
+            if (
+              (dataCell.item.rowState == "created" ||
+                dataCell.item.itemState == "appending" ||
+                dataCell.item.itemState == "inserting") &&
+              props.rowStateeditable
+            ) {
+              ret.editable = true;
+            } else if (props.editableColId.includes(item.strColID)) {
+              ret.editable = true;
+            } else if (
+              props.rowStateeditable == true &&
+              dataCell.item.itemState == "normal"
+            ) {
+              ret.editable = true;
+            } else {
+              ret.editable = false;
+            }
+
+            if (props.checkBarInactive != "") {
+              var inActiveColumn = grid.getValue(
+                dataCell.index.itemIndex,
+                props.checkBarInactive
+              );
+
+              if (
+                inActiveColumn == "0" &&
+                (item.strColID == "checkbox" ||
+                  item.strDisplay.includes("checkbox"))
+              ) {
+                ret.style = { opacity: "0.5" };
+                ret.renderer = { type: "check", editable: false };
+              }
+              if (item.strColID == "lngSupplierID") {
+                ret.style = { opacity: "0.5" };
+                ret.renderer = { type: "check", editable: false };
+              }
+            }
+
+            return ret;
+          },
   }));
 
   if (props.labelingColumns != "") {
@@ -2777,7 +2822,7 @@ const funcshowGrid = async () => {
   dataProvider.softDeleting = props.notsoftDelete == false ? true : false;
   dataProvider.deleteCreated = props.deleteCreated;
   gridView.filteringOptions.handleVisibility = "hidden";
-  gridView.sortingOptions.enabled = false; // 정렬기능 비활성화
+  // gridView.sortingOptions.enabled = false; // 정렬기능 비활성화
   //dataProvider.autoCommit = true; // 자동 커밋 활성화
   dataProvider.commitBeforeDataEdit = true;
   gridView.editOptions.movable = props.dragOn == true ? true : false;
@@ -3996,6 +4041,62 @@ watch(
     });
   }
 );
+
+watch(
+  () => props.exporttoExcel2,
+  (newVal) => {
+    // const documentTitle = excelTitle(
+    //   store.state.minorCategory.find((item) =>
+    //     item.strUrl.includes(props.documentTitle)
+    //   )
+    // );
+    //const excelNm = documentTitle.split("-")[2];
+    // const user = store.state.userData.strChargerName;
+    // const userID = store.state.userData.loginID;
+    const today = formatDateTime(new Date());
+
+    gridView.exportGrid({
+      type: "excel",
+      target: "local",
+      numberCallback: function (index, column, value) {
+        if (value === Infinity) {
+          return 0;
+        } else {
+          return value;
+        }
+      },
+      documentTitle: {
+        //제목
+        message: props.documentTitle,
+        visible: true,
+        spaceTop: 1,
+        spaceBottom: 0,
+        height: 30,
+        styleName: "documentStyle",
+      },
+      documentSubtitle: {
+        //부제
+        message:
+          props.documentSubTitle + "\n" + "조회시간 : " + today + "\n" + ")",
+        visible: true,
+        height: 80,
+        styleName: "documentSubtitleStyle",
+      },
+      fileName: props.documentTitle + ".xlsx",
+      showProgress: true,
+      progressMessage: "엑셀 Export중입니다.",
+      indicator: true,
+      header: true,
+      footer: true,
+      compatibility: true,
+      lookupDisplay: true,
+      applyDynamicStyles: true,
+      hiddenColumns: props.exportExcelHiddenColumns,
+      allColumns: props.exportExcelHiddenColumns.length != 0 ? true : false,
+    });
+  }
+);
+
 watch(
   () => props.initFocus,
   (newVal) => {

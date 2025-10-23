@@ -51,7 +51,6 @@
         :changeColid="changeColid"
         :changeRow="changeRow"
         :changeNow="changeNow"
-        :dynamicRowHeight="true"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :checkRenderEditable="true"
@@ -293,7 +292,7 @@ const searchButton = async () => {
       store.state.userData.lngStoreGroup,
       store.state.userData.strLanguage
     );
-    ////console.log(res);
+    console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;

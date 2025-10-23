@@ -1,9 +1,9 @@
 <template>
   <div class="flex justify-center items-center mt-10">
     <div
-      class="grid grid-rows-3 grid-cols-1 w-[80vw] h-[80vh] items-center shadow-lg border-2">
-      <div class="flex w-[90vw] h-[20vh] space-x-10 justify-start ml-10">
-        <div class="w-[40%] h-full flex justify-start flex-col items-start">
+      class="grid grid-rows-3 grid-cols-1 w-[85vw] h-[85vh] items-center shadow-lg border-2">
+      <div class="flex w-full h-[20vh] -mt-5 space-x-10 justify-start ml-10">
+        <div class="w-[45%] h-full flex justify-start flex-col items-start">
           <span>◎전일마감현황</span>
           <Realgrid
             :progname="'MainDashBoard_VUE'"
@@ -12,7 +12,7 @@
             :setStateBar="false"
             :rowData="rowData"></Realgrid>
         </div>
-        <div class="w-[40%] h-full flex justify-start flex-col items-start">
+        <div class="w-[45%] h-full flex justify-start flex-col items-start">
           <span>◎과거(이전달) vs 현재 매출현황</span>
           <Realgrid
             :progname="'MainDashBoard_VUE'"
@@ -26,7 +26,7 @@
         <div class="w-full flex justify-start flex-col items-start">
           <span class="mt-10">◎전년 월누계 대비실적</span>
           <Chart
-            class="!h-80"
+            class="!h-80 !w-[97%]"
             :type="'line'"
             :labels="labels"
             :label="label"
@@ -34,8 +34,8 @@
             :showDataLabel="false"></Chart>
         </div>
       </div>
-      <div class="flex w-[90vw] h-[20vh] space-x-10 justify-start ml-10">
-        <div class="w-[40%] h-full flex justify-start flex-col items-start">
+      <div class="flex w-[85vw] h-[20vh] space-x-10 justify-start ml-10">
+        <div class="w-[45%] h-full flex justify-start flex-col items-start">
           <span class="flex space-x-3"
             ><span>◎공지사항</span
             ><button class="whitebutton -mt-2" @click="moveNoticePage">
@@ -50,7 +50,7 @@
             @dblclickedRowData="dblclickedRowData"
             :rowData="rowData3"></Realgrid>
         </div>
-        <div class="w-[40%] h-full flex justify-start flex-col items-start">
+        <div class="w-[45%] h-full flex justify-start flex-col items-start">
           <span class="">◎게시판</span>
           <Realgrid
             :progname="'MainDashBoard_VUE'"

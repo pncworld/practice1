@@ -713,7 +713,8 @@ export const saveAllMenuKey = (
   intKeySeq_arr,
   intScreenNo_arr,
   lngScrNo_arr,
-  strKeyName_arr
+  strKeyName_arr,
+  intKeyNos
 ) => {
   return api2.post("/MIMASTER/MST05_011INS.asmx/saveMenuKeys", {
     GROUP_CD: groupCd,
@@ -724,6 +725,7 @@ export const saveAllMenuKey = (
     INTSCREENNO_ARR: intScreenNo_arr,
     LNGKEYSCRNO_ARR: lngScrNo_arr,
     STRKEYNAME_ARR: strKeyName_arr,
+    INTKEYNOS: intKeyNos,
   });
 };
 export const saveAllMenuKey2 = (
@@ -3622,5 +3624,12 @@ export const saveCornerInfoList = (
     CLOSEHOURS: closehours,
     CLOSEMINS: closemins,
     USERID: userid,
+  });
+};
+
+export const getMstBasic = (groupCd, storeCd) => {
+  return api2.post("/MIMASTER/MST44_062INS.asmx/getMstBasic", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
   });
 };

@@ -72,7 +72,7 @@ export function formatTime(date) {
   return timeString; //
 }
 
-function formatDateTime2(dateString) {
+export function formatDateTime2(dateString) {
   const date = new Date(dateString);
 
   const year = date.getFullYear();

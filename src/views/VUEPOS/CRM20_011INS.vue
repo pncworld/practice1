@@ -658,21 +658,11 @@
 </template>
 
 <script setup>
-import { deleteSpecialPrices, updateMultiPrice } from "@/api/master";
-import {
-  checkCardNumbyAccount,
-  deleteCustomors3,
-  getBelongCust,
-  getCardInfo2,
-  getCustomorInfo,
-  saveCreditCustomer,
-  saveCreditCustomer2,
-  saveNewCardNo,
-} from "@/api/micrm";
 import {
   checkCardNumbyAccount2,
   deleteCustomors32,
   getBelongCust2,
+  getCardInfo22,
   getCustCompany4,
   getCustomorInfo2,
   saveCreditCustomer4,
@@ -687,8 +677,6 @@ import GetZipCode from "@/components/getZipCode.vue";
  *  페이지명 자동 입력 컴포넌트
  *  */
 
-import PageName from "@/components/pageName.vue";
-import PickCustCompany from "@/components/pickCustCompany.vue";
 /**
  * 	매장 단일 선택 컴포넌트
  */
@@ -704,7 +692,6 @@ import Realgrid from "@/components/realgrid.vue";
 import {
   formatLocalDate,
   formatNumberWithCommas,
-  insertPageLog,
   insertPageLog2,
 } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
@@ -883,7 +870,7 @@ const clickedRowData = async (e) => {
 
 const getCardNo = async (a, b, c) => {
   try {
-    const res = await getCardInfo2(a, b, 2);
+    const res = await getCardInfo22(a, b, 2);
     //console.log(res);
     rowData2.value = res.data.List;
 
@@ -1285,9 +1272,9 @@ const saveButton = async (e) => {
 
     if (updatedRows.value.updated.length > 0) {
       try {
-        const id = store.state.userData.lngSequence;
+        const id = lngOperator.value;
         const flag = "U";
-
+        let res;
         const saleCompCodes = updateRowData.value
           .filter((item, index) => updatedRows.value.updated.includes(index))
           .map((item) => item.strSaleCompCode)
@@ -1408,7 +1395,7 @@ const saveButton = async (e) => {
           .map((item) => item.dblLimitAmt)
           .join("\u200b");
 
-        const res = await saveCreditCustomer4(
+        res = await saveCreditCustomer4(
           id,
           flag,
           saleCompCodes,
@@ -1443,7 +1430,7 @@ const saveButton = async (e) => {
 
     if (updatedRows.value.created.length > 0) {
       try {
-        const id = store.state.userData.lngSequence;
+        const id = lngOperator.value;
         const flag = "N";
 
         const saleCompCodes = updateRowData.value
@@ -1566,7 +1553,7 @@ const saveButton = async (e) => {
           .map((item) => item.dblLimitAmt)
           .join("\u200b");
 
-        const res = await saveCreditCustomer4(
+        res = await saveCreditCustomer4(
           id,
           flag,
           saleCompCodes,
@@ -1606,7 +1593,7 @@ const saveButton = async (e) => {
         2,
         gridvalue32.value,
         gridvalue31.value,
-        store.state.userData.lngSequence,
+        lngOperator.value,
         "N"
       );
 
@@ -1618,7 +1605,7 @@ const saveButton = async (e) => {
         2,
         gridvalue30.value,
         gridvalue31.value,
-        store.state.userData.lngSequence,
+        lngOperator.value,
         "U"
       );
 

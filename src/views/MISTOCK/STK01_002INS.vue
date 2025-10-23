@@ -171,9 +171,9 @@ onMounted(async () => {
     cond.value
   );
 
-  cond2.value = res2.data.List[0].dtmClosehour;
-  cond3.value = res2.data.List[0].dtmCloseMin;
-  cond4.value = res2.data.List[0].pre_date;
+  cond2.value = res2.data.List[0].pre_date;
+  cond3.value = res2.data.List[0].dtmClosehour;
+  cond4.value = res2.data.List[0].dtmCloseMin;
 
   const res3 = await getDemandAuditList(store.state.userData.lngStoreGroup);
 

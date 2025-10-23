@@ -1,48 +1,38 @@
-/*--############################################################################
-# Filename : MST05_011INS.vue                                                  
-# Description : 마스터관리 > POS 마스터 > 메뉴키 설정(#)                       
-# Date :2025-05-14                                                             
-# Author : 권맑음                     
-################################################################################*/
+<!-- /*--############################################################################
+# Filename : MST01_002POS.vue                                              
+# Description : 마스터관리 > POS 마스터 > 메뉴키 설정 간편(#)               
+#Date :2025-10-15                                                     
+# Author :권맑음                     
+################################################################################*/ -->
 <template>
   <!-- 조회조건 -->
-  <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <PageName> </PageName>
+  <div class="flex justify-end items-center w-full overflow-y-hidden">
     <div class="flex justify-center mr-10 space-x-2 pr-5">
       <button @click="searchButton" class="button search md:w-auto w-14">
         조회
       </button>
 
       <button @click="saveButton" class="button save w-auto">저장</button>
-      <button @click="copyButton" class="button copy w-auto">복사</button>
+      <!-- <button @click="copyButton" class="button copy w-auto">복사</button> -->
     </div>
   </div>
   <br />
   <div
-    class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore
-      @areaCd="handleStoreAreaCd"
-      @update:storeCd="handleStoreCd"
-      @posNo="handlePosNo"
-      @storeNm="handlestoreNm"
-      @update:ischanged="handleinitAll"
-      :showPosNo="true"></PickStore>
+    class="flex justify-center space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
+    <div class="flex items-center space-x-5">
+      <div class="text-base font-semibold">지역코드</div>
+      <select name="" id="" class="w-64 h-8" v-model="lngAreaCode">
+        <option :value="i.lngAreaCode" v-for="i in optionList2">
+          {{ i.lngAreaCode }}
+        </option>
+      </select>
+    </div>
+    <div
+      class="bg-black text-white font-semibold text-base h-full items-center justify-center flex">
+      저장하시면 전체 포스에 적용이 됩니다.
+    </div>
   </div>
-  <div class="z-50">
-    <DupliPopUp
-      :isVisible="showPopup2"
-      @close="showPopup2 = false"
-      :storeCd="nowStoreCd"
-      :storeNm="clickedStoreNm"
-      :areaCd="nowStoreAreaCd"
-      :posNo="posNo"
-      :progname="'MST01_011INS_VUE'"
-      :dupliapiname="'DUPLIALLPOSDATA'"
-      :progid="1"
-      :poskiosk="'getStoreAndPosList'"
-      :naming="'POS번호'">
-    </DupliPopUp>
-  </div>
+
   <!-- 조회조건 -->
   <!-- 그리드 영역 -->
   <div
@@ -140,7 +130,7 @@
     </div>
   </div>
   <span
-    class="h-5 mt-3 flex justify-between items-center w-[55%] ml-[41.5%] z-40">
+    class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[40%] z-40">
     <h1 class="font-bold text-xl z-40">메뉴키 설정</h1>
     <span class="flex space-x-3 ml-32 pl-56 items-center"
       >순서변경 &nbsp; &nbsp;<label class="z-40"
@@ -372,10 +362,7 @@
                   item.strKeyName ? covertKeyName(item.strKeyName) : ""
                 }}</span
                 ><span class="flex justify-end pr-3">{{
-                  item.lngPrice !== null &&
-                  item.lngPrice !== undefined &&
-                  item.lngPrice !== "" &&
-                  item.lngPrice !== " "
+                  item.lngPrice !== null && item.lngPrice !== undefined
                     ? formatNumber(item.lngPrice) + "원"
                     : ""
                 }}</span></span
@@ -400,33 +387,139 @@
       </div>
     </div>
   </div>
+
+  <div
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    v-if="showPopUp">
+    <div class="bg-white p-6 rounded-xl shadow-lg w-[40vw] h-[40vh]">
+      <div class="flex justify-between">
+        <h2 class="text-xl font-bold mb-4">메뉴키 추가</h2>
+        <div class="col-span-2 flex justify-end space-x-5">
+          <button class="whitebutton" @click="saveMenuKey">저장</button
+          ><button class="whitebutton" @click="closePopUp">닫기</button>
+        </div>
+      </div>
+
+      <div class="grid grid-rows-4 grid-cols-[2fr,5fr,2fr,5fr] h-[90%] w-[90%]">
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold bg-gray-100 text-blue-500">
+          <span class="text-red-500">*</span>매장
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold">
+          <input
+            type="text"
+            class="disabled:bg-gray-300 w-[80%] h-[50%] flex justify-center items-center text-center"
+            disabled
+            v-model="clickedStoreNm" />
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold bg-gray-100 text-blue-500">
+          <span class="text-red-500">*</span>메뉴명
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold">
+          <input
+            type="text"
+            class="w-[80%] h-[50%] border border-black"
+            v-model="pcond" />
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold bg-gray-100">
+          서브그룹
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold">
+          <select
+            name=""
+            id=""
+            class="w-[80%] h-[50%] border border-black"
+            v-model="pcond2">
+            <option :value="i.lngCode" v-for="i in optionList">
+              {{ i.strName }}
+            </option>
+          </select>
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold bg-gray-100">
+          판매단가
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold">
+          <input
+            type="number"
+            class="w-[80%] h-[50%] border border-black"
+            v-model="pcond3" />
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold bg-gray-100 text-blue-500">
+          <span class="text-red-500">*</span>메뉴코드
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-start items-center text-base font-semibold">
+          <input
+            type="number"
+            v-model="pcond4"
+            :disabled="pcond5"
+            class="w-[50%] h-[50%] border border-black ml-5" />
+          <label for="auto"
+            ><input type="checkbox" id="auto" v-model="pcond5" />자동</label
+          >
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold bg-gray-100 text-blue-500">
+          <span class="text-red-500">*</span>주방출력
+        </div>
+        <div
+          class="border-l border-t border-black flex justify-center items-center text-base font-semibold">
+          <input
+            type="number"
+            class="w-[40%] h-[50%] border border-black"
+            v-model="pcond6" />
+          <div class="text-red-500 text-nowrap">※주방미출력:99</div>
+        </div>
+        <div
+          class="border-l border-t border-b border-black flex justify-center items-center text-base font-semibold bg-gray-100">
+          오픈단가
+        </div>
+        <div
+          class="border-l border-t border-b border-black flex justify-start pl-5 items-center text-base font-semibold col-span-3">
+          <label for="use"
+            ><input type="checkbox" id="use" v-model="pcond7" />사용</label
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 드래그 영역 -->
 </template>
 
 <script setup>
+import { getMenuList, getTLUList } from "@/api/master";
+import { getSubGroup3, InsertMenu } from "@/api/mipos";
 import {
-  getMenuKeyList,
-  getMenuList,
-  getScreenList,
-  getTLUList,
-  saveAllMenuKey,
-  saveScreenKeys,
-} from "@/api/master";
+  getAreaCode,
+  getMenuKeyList5,
+  getMenuList3,
+  getScreenList4,
+  getSubGroup4,
+  getTLUList2,
+  saveAllMenuKey2,
+  saveScreenKeys2,
+} from "@/api/vuepos";
 /**
  *  복사 팝업 컴포넌트
  *  */
 
-import DupliPopUp from "@/components/dupliPopUp.vue";
 /**
  *  페이지명 자동 입력 컴포넌트
  *  */
 
-import PageName from "@/components/pageName.vue";
 /**
  * 매장 공통 컴포넌트
  */
 
-import PickStore from "@/components/pickStore.vue";
 /**
  * 	그리드 생성
  */
@@ -436,7 +529,7 @@ import Realgrid from "@/components/realgrid.vue";
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog } from "@/customFunc/customFunc";
+import { insertPageLog2 } from "@/customFunc/customFunc";
 /**
  * 	그리드 생성
  */
@@ -461,6 +554,7 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { VueDraggableNext } from "vue-draggable-next";
+import { useRoute } from "vue-router";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -470,9 +564,73 @@ import { useStore } from "vuex";
 /**
  * 	화면 Load시 실행 스크립트
  */
+const route = useRoute();
 
+const path = ref("");
+const lngStoreGroup = ref("");
+const templngStoreCode = ref("");
+const lngOperator = ref("");
+
+// const optionList = ref([]);
+
+const optionList2 = ref([]);
+
+const lngAreaCode = ref("");
 onMounted(async () => {
-  const pageLog = await insertPageLog(store.state.activeTab2);
+  path.value = route.path.split("/")[2];
+  lngStoreGroup.value = route.query.lngStoreGroup;
+  templngStoreCode.value = route.query.lngStoreCode;
+  lngOperator.value = route.query.lngOperator;
+  const pageLog = await insertPageLog2(
+    path.value,
+    lngStoreGroup.value,
+    templngStoreCode.value,
+    lngOperator.value
+  );
+
+  posNo.value = 1;
+  const res3 = await getAreaCode(lngStoreGroup.value, templngStoreCode.value);
+
+  optionList2.value = res3.data.List;
+
+  lngAreaCode.value = optionList2.value[0].lngAreaCode;
+  nowStoreCd.value = templngStoreCode.value;
+  const res2 = await getMenuList3(lngStoreGroup.value, nowStoreCd.value);
+
+  //comsole.log(res2);
+  MenuList.value = res2.data.menuList;
+  MenuGroup.value = res2.data.menuGroup;
+  SubMenuGroup.value = res2.data.submenuGroup;
+
+  const res = await getSubGroup4(lngStoreGroup.value, nowStoreCd.value);
+  ////console.log(res);
+  optionList.value = res.data.List;
+  if (optionList.value.length > 0) {
+    pcond2.value = res.data.List[0].lngCode;
+  }
+
+  // if (newValue == "0") {
+  //   afterSearch.value = false;
+  //   if (MenuList.value.length > 0) {
+  //     MenuList.value = [];
+  //   }
+  // }
+
+  MenuList.value = MenuList.value.map((item) => {
+    return {
+      ...item,
+      add: "추가",
+    };
+  });
+  const res5 = await getTLUList2(lngStoreGroup.value, nowStoreCd.value);
+  //comsole.log(res5);
+  TLUList.value = res5.data.TLUList;
+  TLUList.value = TLUList.value.map((item) => {
+    return {
+      ...item,
+      add: "추가",
+    };
+  });
 });
 
 // 더미 데이터
@@ -662,6 +820,7 @@ const afterCategory = ref(false);
  * 페이지 매장 코드 세팅
  */
 
+const optionList = ref([]);
 const handleStoreCd = async (newValue) => {
   nowStoreCd.value = newValue;
   if (store.state.userData.lngCommonMenu == "1") {
@@ -671,6 +830,17 @@ const handleStoreCd = async (newValue) => {
     MenuList.value = res2.data.menuList;
     MenuGroup.value = res2.data.menuGroup;
     SubMenuGroup.value = res2.data.submenuGroup;
+
+    const res = await getSubGroup3(
+      store.state.userData.lngStoreGroup,
+      newValue
+    );
+    ////console.log(res);
+    optionList.value = res.data.List;
+    if (optionList.value.length > 0) {
+      pcond2.value = res.data.List[0].lngCode;
+    }
+    // pcond2.value = res.data.List[0].lngCode;
   } else {
     const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
 
@@ -678,6 +848,16 @@ const handleStoreCd = async (newValue) => {
     MenuList.value = res2.data.menuList;
     MenuGroup.value = res2.data.menuGroup;
     SubMenuGroup.value = res2.data.submenuGroup;
+
+    const res = await getSubGroup3(
+      store.state.userData.lngStoreGroup,
+      nowStoreCd.value
+    );
+    ////console.log(res);
+    optionList.value = res.data.List;
+    if (optionList.value.length > 0) {
+      pcond2.value = res.data.List[0].lngCode;
+    }
   }
 
   if (newValue == "0") {
@@ -738,40 +918,39 @@ const searchButton = async () => {
   Category.value = [];
   items.value = [];
 
-  if (nowStoreCd.value == "0" || nowStoreCd.value == undefined) {
-    Swal.fire({
-      title: "경고",
-      text: "매장을 선택하세요.",
-      icon: "warning",
-      showCancelButton: false,
-      confirmButtonColor: "#3085d6",
-      allowOutsideClick: false,
-    });
-    return;
-  }
-  if (nowStoreAreaCd.value == "0" || nowStoreAreaCd.value == undefined) {
-    Swal.fire({
-      title: "경고",
-      text: "포스번호를 선택하세요.",
-      icon: "warning",
-      showCancelButton: false,
-      confirmButtonColor: "#3085d6",
-      allowOutsideClick: false,
-    });
-    return;
-  }
+  // if (nowStoreCd.value == "0" || nowStoreCd.value == undefined) {
+  //   Swal.fire({
+  //     title: "경고",
+  //     text: "매장을 선택하세요.",
+  //     icon: "warning",
+  //     showCancelButton: false,
+  //     confirmButtonColor: "#3085d6",
+  //     allowOutsideClick: false,
+  //   });
+  //   return;
+  // }
+  // if (nowStoreAreaCd.value == "0" || nowStoreAreaCd.value == undefined) {
+  //   Swal.fire({
+  //     title: "경고",
+  //     text: "포스번호를 선택하세요.",
+  //     icon: "warning",
+  //     showCancelButton: false,
+  //     confirmButtonColor: "#3085d6",
+  //     allowOutsideClick: false,
+  //   });
+  //   return;
+  // }
   store.state.loading = true;
   try {
-    const res3 = await getScreenList(
-      groupCd.value,
+    const res3 = await getScreenList4(
+      lngStoreGroup.value,
       nowStoreCd.value,
-      nowStoreAreaCd.value,
-      posNo.value
+      lngAreaCode.value
     );
-    const res4 = await getMenuKeyList(
-      groupCd.value,
+    const res4 = await getMenuKeyList5(
+      lngStoreGroup.value,
       nowStoreCd.value,
-      nowStoreAreaCd.value
+      lngAreaCode.value
     );
     ////console.log(res4);
     MenuKeyList.value = res4.data.MenuKeyList;
@@ -786,6 +965,7 @@ const searchButton = async () => {
 
     afterSearch.value = true;
   } catch (error) {
+    console.log(error);
     afterSearch.value = false;
   } finally {
     store.state.loading = false; // 로딩 상태 종료
@@ -847,7 +1027,6 @@ const selcetedrowData = (e) => {
     return;
   }
   //comsole.log(e);
-  TLUorNot.value = false;
   currentSelectedMenuNm.value = e[1];
   currentSelectedMenuCode.value = e[0];
   currentSelectedMenuPrice.value = e[2];
@@ -858,13 +1037,11 @@ const selcetedrowData = (e) => {
  * 선택한 행의 상세정보 셋팅
  */
 
-const TLUorNot = ref(false);
 const selcetedrowData2 = (e) => {
   if (clickedRealIndex.value == null) {
     return;
   }
   //comsole.log(e);
-  TLUorNot.value = true;
   currentSelectedMenuNm.value = e[1];
   currentSelectedMenuCode.value = e[0];
   currentSelectedMenuPrice.value = "";
@@ -956,6 +1133,7 @@ function covertKeyName(e) {
     return e;
   }
 }
+
 const onEnd2 = (evt) => {
   const originScreenNo = dupliScreenKeyOrigin[evt.oldIndex].intScreenNo;
   const targetScreenNo = dupliScreenKeyOrigin[targetItemIndex3].intScreenNo;
@@ -1021,7 +1199,7 @@ const saveButton = async () => {
 
   Swal.fire({
     title: "저장",
-    text: "저장 하시겠습니까?",
+    text: "전체 포스에 저장 하시겠습니까?",
     icon: "question",
     showCancelButton: true,
     confirmButtonText: "저장",
@@ -1030,6 +1208,7 @@ const saveButton = async () => {
     if (result.isConfirmed) {
       store.state.loading = true;
       try {
+        let res;
         const screenKeyNoarr = ScreenKeyOrigin.value.map(
           (item) => item.intScreenNo
         );
@@ -1038,10 +1217,10 @@ const saveButton = async () => {
         );
         //comsole.log(screenKeyNoarr.join(","));
         //comsole.log(screenKeyNamearr.join(","));
-        const res = await saveScreenKeys(
-          groupCd.value,
+        res = await saveScreenKeys2(
+          lngStoreGroup.value,
           nowStoreCd.value,
-          nowStoreAreaCd.value,
+          lngAreaCode.value,
           posNo.value,
           screenKeyNoarr.join("\u200B"),
           screenKeyNamearr.join("\u200B")
@@ -1050,7 +1229,6 @@ const saveButton = async () => {
         const saveScreenInt = ScreenKeyOrigin.value.map(
           (item) => item.intScreenNo
         );
-        console.log(MenuKeyList.value);
         const intKeySeqs = MenuKeyList.value
           .filter((item) => item.intPosNo == posNo.value)
           .filter((item2) => saveScreenInt.includes(item2.intScreenNo))
@@ -1067,37 +1245,47 @@ const saveButton = async () => {
           .filter((item) => item.intPosNo == posNo.value)
           .filter((item2) => saveScreenInt.includes(item2.intScreenNo))
           .map((item) => item.strKeyName);
-
-        const intKeyNos = MenuKeyList.value
-          .filter((item) => item.intPosNo == posNo.value)
-          .filter((item2) => saveScreenInt.includes(item2.intScreenNo))
-          .map((item) => item.intKeyNo);
         //comsole.log(posNo.value);
         //comsole.log(intKeySeqs.join(","));
         //comsole.log(screenNumarr.join(","));
         //comsole.log(lngScrarr.join(","));
         //comsole.log(menuKeyNmarr.join(","));
-        const res2 = await saveAllMenuKey(
-          groupCd.value,
+        res = await saveAllMenuKey2(
+          lngStoreGroup.value,
           nowStoreCd.value,
-          nowStoreAreaCd.value,
+          lngAreaCode.value,
           posNo.value,
           intKeySeqs.join("\u200B"),
           screenNumarr.join("\u200B"),
           lngScrarr.join("\u200B"),
-          menuKeyNmarr.join("\u200B"),
-          intKeyNos.join("\u200b")
+          menuKeyNmarr.join("\u200B")
         );
 
-        console.log(res);
-        console.log(res2);
+        //comsole.log(res);
+        //comsole.log(res2);
+
+        if (res.data.RESULT_CD == "00") {
+          Swal.fire({
+            title: "성공",
+            text: "수정하신 메뉴 사항을 저장하였습니다.",
+            icon: "success",
+            confirmButtonText: "확인",
+          });
+        } else {
+          Swal.fire({
+            title: "실패",
+            text: "수정하신 메뉴 사항을 저장에 실패하였습니다.",
+            icon: "error",
+            confirmButtonText: "확인",
+          });
+        }
       } catch (error) {
       } finally {
         store.state.loading = false;
-        Swal.fire({
-          title: "저장 되었습니다.",
-          confirmButtonText: "확인",
-        });
+        // Swal.fire({
+        //   title: "저장 되었습니다.",
+        //   confirmButtonText: "확인",
+        // });
 
         searchButton();
       }
@@ -1109,6 +1297,78 @@ const saveButton = async () => {
 
 const currentSelectedMenuCode = ref("");
 const currentSelectedMenuPrice = ref("");
+
+//   watch(clickedTLUCD, (newValue) => {
+//     const TLUMenuCd = TLUList.value
+//       .filter(item => item.lngCode == newValue)  // lngCode가 newValue와 일치하는 항목 필터링
+//       .map(item => {
+//         // 객체의 모든 키를 가져오고 'lngMenu'로 시작하는 키들만 필터링
+//         const filteredMenus = Object.keys(item)
+//           .filter(key => key.startsWith('lngMenu') && item[key] !== 0)   // 'lngMenu'로 시작하는 키들만 필터링
+//           .reduce((result, key) => {
+//             result[key] = item[key];  // 필터링된 속성만 포함
+//             return result;
+//           }, {});
+//         return filteredMenus;  // 필터링된 항목 반환
+//       });
+
+//     //comsole.log(TLUMenuCd[0])
+//     const newTLUMenus = [];
+
+//     Object.keys(TLUMenuCd[0]).forEach(key => {
+
+//       const menuValue = TLUMenuCd[0][key]; // menu1, menu2, ..., menu29 값 가져오기
+
+//       const filteredMenus = MenuList.value.filter(menuItem => menuItem.menuCd === menuValue.toString());
+//       newTLUMenus.push(...filteredMenus); // 결과 배열에 필터링된 메뉴들을 추가
+//     });
+
+//     //comsole.log(newTLUMenus);
+
+//     dataProvider3.setRows(newTLUMenus);
+//   })
+// }
+// const searchMenuList = (e) => {
+//   const searchWord1 = e.target.value;
+//   searchWord.value = e.target.value;
+//   const filteredList = MenuList.value.filter(
+//     (item) =>
+//       (forsearchMain.value === "0" ||
+//         item.majorGroupCd === forsearchMain.value) &&
+//       (forsearchSub.value === "0" || item.subGroupCd === forsearchSub.value) &&
+//       (item.menuCd.includes(searchWord1) || item.menuNm.includes(searchWord1))
+//   );
+//   dataProvider.setRows(filteredList);
+// };
+// const searchMenuList3 = (e) => {
+//   if (currentMenuorTLU.value == false) {
+//     const filteredList = MenuList.value.filter(
+//       (item) =>
+//         (forsearchMain.value === "0" ||
+//           item.majorGroupCd === forsearchMain.value) &&
+//         (forsearchSub.value === "0" ||
+//           item.subGroupCd === forsearchSub.value) &&
+//         (item.menuCd.includes(searchWord.value) ||
+//           item.menuNm.includes(searchWord.value))
+//     );
+//     dataProvider.setRows(filteredList);
+//   } else {
+//     const filteredList = TLUList.value.filter(
+//       (item) =>
+//         item.lngCode.toString().includes(searchWord2.value) ||
+//         item.strName.includes(searchWord2.value)
+//     );
+//     dataProvider2.setRows(filteredList);
+//   }
+// };
+// watch(forsearchSub, (newValue) => {
+//   searchMenuList3();
+// });
+// const searchMenuList2 = (e) => {
+
+/**
+ * pickStore - 포스번호 세팅
+ */
 
 const handlePosNo = (newValue) => {
   posNo.value = newValue;
@@ -1286,7 +1546,7 @@ const addMenuKey = () => {
   }
   //comsole.log(items.value);
   items.value[clickedMenuKeyIndex.value] = {
-    intKeyNo: TLUorNot.value == false ? 6 : 7,
+    intKeyNo: 6,
     intKeySeq: clickedRealIndex.value,
     intPosNo: posNo.value,
     intScreenNo: clickedintScreenNo.value,
@@ -1312,7 +1572,7 @@ const addMenuKey = () => {
   //comsole.log(foraddIndex);
   if (foraddIndex == undefined) {
     MenuKeyList.value.push({
-      intKeyNo: TLUorNot.value == false ? 6 : 7,
+      intKeyNo: 6,
       intKeySeq: clickedRealIndex.value,
       intPosNo: posNo.value,
       intScreenNo: clickedintScreenNo.value,
@@ -1330,40 +1590,39 @@ const addMenuKey = () => {
       0,
       currentSelectedMenuPrice.value.length - 1
     );
-    foraddIndex.intKeyNo = TLUorNot.value == false ? 6 : 7;
   }
 
   showMenuKey(clickedintScreenNo.value);
   //comsole.log(MenuKeyList.value);
 };
 
-// const addTLUKey = () => {
-//   //comsole.log(MenuKeyList.value);
-//   const foraddIndex = MenuKeyList.value.findIndex(
-//     (item) => item.intKeySeq == clickedRealIndex.value
-//   );
-//   //comsole.log(foraddIndex);
-//   if (foraddIndex == -1) {
-//     MenuKeyList.value.push({
-//       intKeyNo: 6,
-//       intKeySeq: clickedRealIndex.value,
-//       intPosNo: posNo.value,
-//       intScreenNo: clickedintScreenNo.value,
-//       lngKeyscrNo: Number(clickedTLUCD.value),
-//       strKeyName: clickedTLUNM.value,
-//     });
-//   } else {
-//     MenuKeyList.value[foraddIndex] = {
-//       intKeyNo: 6,
-//       intKeySeq: clickedRealIndex.value,
-//       intPosNo: posNo.value,
-//       intScreenNo: clickedintScreenNo.value,
-//       lngKeyscrNo: Number(clickedTLUCD.value),
-//       strKeyName: clickedTLUNM.value,
-//     };
-//   }
-//   showMenuKey(clickedintScreenNo.value);
-// };
+const addTLUKey = () => {
+  //comsole.log(MenuKeyList.value);
+  const foraddIndex = MenuKeyList.value.findIndex(
+    (item) => item.intKeySeq == clickedRealIndex.value
+  );
+  //comsole.log(foraddIndex);
+  if (foraddIndex == -1) {
+    MenuKeyList.value.push({
+      intKeyNo: 6,
+      intKeySeq: clickedRealIndex.value,
+      intPosNo: posNo.value,
+      intScreenNo: clickedintScreenNo.value,
+      lngKeyscrNo: Number(clickedTLUCD.value),
+      strKeyName: clickedTLUNM.value,
+    });
+  } else {
+    MenuKeyList.value[foraddIndex] = {
+      intKeyNo: 6,
+      intKeySeq: clickedRealIndex.value,
+      intPosNo: posNo.value,
+      intScreenNo: clickedintScreenNo.value,
+      lngKeyscrNo: Number(clickedTLUCD.value),
+      strKeyName: clickedTLUNM.value,
+    };
+  }
+  showMenuKey(clickedintScreenNo.value);
+};
 
 const showMenus = (value) => {
   if (value == 1) {
@@ -1435,12 +1694,100 @@ const handleinitAll = (newvalue) => {
   afterSearch.value = false;
 };
 
+const pcond = ref("");
+const pcond2 = ref("");
+const pcond3 = ref("");
+const pcond4 = ref("");
+const pcond5 = ref(false);
+const pcond6 = ref("");
+const pcond7 = ref(false);
+
+const showPopUp = ref(false);
 const movePage1 = () => {
-  store.state.moveOtherTab = {
-    strUrl: "MIMASTER::MST01_033INS.xml",
-    lngProgramID: 73762,
-    strTitle: "메뉴 코드 등록.",
-  };
+  showPopUp.value = true;
+};
+
+const closePopUp = () => {
+  pcond.value = "";
+  pcond2.value = "";
+  pcond3.value = "";
+  pcond4.value = "";
+  pcond5.value = false;
+  pcond6.value = "";
+  pcond7.value = false;
+  showPopUp.value = false;
+};
+
+const saveMenuKey = async () => {
+  if (pcond.value == undefined || pcond.value == null || pcond.value == "") {
+    Swal.fire({
+      title: "경고.",
+      text: "메뉴명을 먼저 입력해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (
+    (pcond4.value == undefined && pcond5.value == false) ||
+    (pcond4.value == null && pcond5.value == false) ||
+    (pcond4.value == "" && pcond5.value == false)
+  ) {
+    Swal.fire({
+      title: "경고.",
+      text: "메뉴코드를 입력해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (pcond6.value == undefined || pcond6.value == null || pcond6.value == "") {
+    Swal.fire({
+      title: "경고.",
+      text: "주방출력을 입력해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  try {
+    const res = await InsertMenu(
+      groupCd.value,
+      nowStoreCd.value,
+      pcond2.value,
+      pcond3.value,
+      pcond4.value,
+      pcond.value,
+      pcond5.value == true ? 1 : 0,
+      pcond6.value,
+      pcond7.value == true ? 1 : 0
+    );
+    //console.log(res);
+
+    if (res.data.RESULT_CD == "00") {
+      Swal.fire({
+        title: "성공.",
+        text: "저장 하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+    } else {
+      Swal.fire({
+        title: "실패",
+        text: "저장에 실패하였습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (error) {
+  } finally {
+    showPopUp.value = false;
+
+    // await handleStoreCd(nowStoreCd.value);
+  }
 };
 
 const movePage2 = () => {

@@ -133,7 +133,7 @@
     </div>
   </div>
 
-  <div v-if="addRow" class="fixed top-64 right-96 w-[30vw] h-[50vh]">
+  <div v-if="addRow" class="fixed top-64 right-96 w-[600px] h-[500px]">
     <div class="bg-white border border-black w-full h-full">
       <div class="flex justify-end space-x-2">
         <div>
@@ -479,7 +479,7 @@
             :disabled="disabled2"
             @input="onlyNumber"
             name="scond22"
-            class="h-[80%] w-[29%] border border-black disabled:bg-gray-300"
+            class="h-[80%] w-[70%] border border-black disabled:bg-gray-300"
             v-model="scond22" />
         </div>
         <div
@@ -493,7 +493,7 @@
             :disabled="disabled2"
             @input="onlyNumber"
             name="scond23"
-            class="h-[80%] w-[29%] border border-black disabled:bg-gray-300"
+            class="h-[80%] w-[70%] border border-black disabled:bg-gray-300"
             v-model="scond23" />
         </div>
         <div
@@ -507,7 +507,7 @@
             :disabled="!disabled2"
             @input="onlyNumber"
             name="scond24"
-            class="h-[80%] w-[29%] border border-black disabled:bg-gray-300"
+            class="h-[80%] w-[70%] border border-black disabled:bg-gray-300"
             v-model="scond24" />
         </div>
         <div
@@ -521,7 +521,7 @@
             @input="onlyNumber"
             name="scond25"
             :disabled="!disabled2"
-            class="h-[80%] w-[29%] border border-black disabled:bg-gray-300"
+            class="h-[80%] w-[70%] border border-black disabled:bg-gray-300"
             v-model="scond25" />
         </div>
 
@@ -533,7 +533,7 @@
           class="border-l border-t border-b border-black flex justify-start pl-1 items-center">
           <input
             type="text"
-            class="h-[80%] w-[29%] border border-black disabled:bg-gray-300"
+            class="h-[80%] w-[70%] border border-black disabled:bg-gray-300"
             v-model="scond26" />
         </div>
         <div
@@ -545,7 +545,7 @@
           <select
             name=""
             id=""
-            class="w-[29%] h-[80%] border border-black"
+            class="w-[70%] h-[80%] border border-black"
             v-model="scond27">
             <option value="Y">Y</option>
             <option value="N">N</option>
@@ -555,7 +555,7 @@
     </div>
   </div>
 
-  <div v-if="addRow2" class="fixed top-64 right-12 w-[16vw] h-[50vh]">
+  <div v-if="addRow2" class="fixed top-64 right-8 w-[350px] h-[500px]">
     <div class="bg-white border border-black w-full h-full">
       <div class="flex justify-end space-x-2">
         <div>
@@ -899,7 +899,6 @@ const store = useStore();
 
 const deleteLngCode = ref("");
 const clickedRowData = (e) => {
-  ////console.log(e);
   deleteLngCode.value = e[0];
   sscond.value = e[0];
   sscond2.value = e[1];
@@ -1076,7 +1075,7 @@ const searchButton = async () => {
       cond8.value,
       store.state.userData.strLanguage
     );
-    //console.log(res);
+    console.log(res);
 
     rowData.value = res.data.List;
 
@@ -1107,6 +1106,7 @@ const addButton = () => {
     });
     return;
   }
+  cleanButton();
   saveNew.value = true;
   addRow.value = true;
 };
@@ -1432,17 +1432,20 @@ const saveButton = async () => {
     store.state.loading = false;
     cleanButton();
     if (res.data.RESULT_CD == "00") {
-      Swal.fire({
+      await Swal.fire({
         title: "성공",
         text: "저장에 성공하였습니다.",
         icon: "success",
         confirmButtonText: "확인",
       });
+
+      addRow.value = false;
+      searchButton();
       return;
     } else {
-      Swal.fire({
+      await Swal.fire({
         title: "실패",
-        text: "저장에 실패하였습니다.",
+        text: "저장에 실패하였습니다. 중복되지 않은 자재코드를 입력해주세요",
         icon: "warning",
         confirmButtonText: "확인",
       });
@@ -1494,6 +1497,24 @@ const saveButton2 = async () => {
     );
 
     //console.log(res);
+
+    if (res.data.RESULT_CD == "00") {
+      Swal.fire({
+        title: "성공",
+        text: "저장에 성공하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      return;
+    } else {
+      Swal.fire({
+        title: "실패",
+        text: "저장에 실패하였습니다. 중복되지 않은 자재그룹코드를 입력해주세요",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
   } catch (error) {
   } finally {
     const res = await getStockGroup(store.state.userData.lngStoreGroup);
@@ -1571,7 +1592,23 @@ const saveButton3 = async () => {
       saveNew3.value == true ? "I" : "U"
     );
 
-    //console.log(res);
+    if (res.data.RESULT_CD == "00") {
+      Swal.fire({
+        title: "성공",
+        text: "저장에 성공하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      return;
+    } else {
+      Swal.fire({
+        title: "실패",
+        text: "저장에 실패하였습니다. 중복되지 않은 자재분류코드를 입력해주세요",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
   } catch (error) {
   } finally {
     const res2 = await getStockCategory(store.state.userData.lngStoreGroup);
@@ -1649,7 +1686,23 @@ const saveButton4 = async () => {
       saveNew4.value == true ? "I" : "U"
     );
 
-    //console.log(res);
+    if (res.data.RESULT_CD == "00") {
+      Swal.fire({
+        title: "성공",
+        text: "저장에 성공하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      return;
+    } else {
+      Swal.fire({
+        title: "실패",
+        text: "저장에 실패하였습니다. 중복되지 않은 자재특성코드를 입력해주세요",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
   } catch (error) {
   } finally {
     const res3 = await getStockGeneric(store.state.userData.lngStoreGroup);
@@ -1727,6 +1780,24 @@ const saveButton5 = async () => {
       saveNew5.value == true ? "I" : "U"
     );
 
+    if (res.data.RESULT_CD == "00") {
+      Swal.fire({
+        title: "성공",
+        text: "저장에 성공하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      return;
+    } else {
+      Swal.fire({
+        title: "실패",
+        text: "저장에 실패하였습니다. 중복되지 않은 자재규격코드를 입력해주세요",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+
     //console.log(res);
   } catch (error) {
   } finally {
@@ -1770,7 +1841,11 @@ const deleteButton5 = async () => {
 
 const deleteLngCode2 = ref("");
 const clickedRowData6 = (e) => {
-  ////console.log(e);
+  scond11.value = e[18];
+  scond13.value = e[17];
+  scond15.value = e[20];
+  scond17.value = e[19];
+  scond19.value = e[21];
   deleteLngCode2.value = e[0];
 };
 
@@ -1785,7 +1860,7 @@ const dblclickedRowData = async (e) => {
       0
     );
 
-    //console.log(res);
+    console.log(res);
 
     scond.value = res.data.List[0].lngStockID;
     scond2.value = res.data.List[0].strStockName;
@@ -1831,7 +1906,23 @@ const deleteButton = async () => {
       store.state.userData.lngSequence
     );
 
-    //console.log(res);
+    if (res.data.RESULT_CD == "00") {
+      await Swal.fire({
+        title: "성공",
+        text: "삭제에 성공하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      return;
+    } else {
+      await Swal.fire({
+        title: "실패",
+        text: "출고 또는 매입이력이 있을경우 삭제가 불가능합니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
   } catch (error) {
   } finally {
     searchButton();

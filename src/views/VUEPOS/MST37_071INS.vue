@@ -446,7 +446,7 @@ const saveButton = async (e) => {
       lngStoreCode.value,
       contain.join("|")
     );
-    ////console.log(res);
+    console.log(res);
     store.state.loading = false;
 
     await Swal.fire({

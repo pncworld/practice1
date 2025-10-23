@@ -752,6 +752,7 @@ onMounted(async () => {
     templngStoreCode.value,
     "0"
   );
+  console.log(res);
   optionList.value = res.data.List;
 
   lngStoreCode.value = res.data.List[0].strSaleCompCode;
@@ -1061,7 +1062,7 @@ const searchButton = async () => {
       cond3.value ? 1 : 0,
       cond4.value ? 1 : 0
     );
-    //console.log(res);
+    console.log(res);
     rowData.value = res.data.List;
     updateRowData.value = JSON.parse(JSON.stringify(res.data.List));
     afterSearch.value = true;

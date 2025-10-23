@@ -65,8 +65,14 @@
           class="border border-black w-32"
           @input="searchValue" />
       </div>
-
-      <div><button class="whitebutton" @click="excelButton2">엑셀</button></div>
+      <div class="flex space-x-1 !ml-1">
+        <div>
+          <button class="whitebutton" @click="searchButton2">조회</button>
+        </div>
+        <div>
+          <button class="whitebutton" @click="excelButton2">엑셀</button>
+        </div>
+      </div>
     </span>
     <div
       class="grid grid-rows-1 grid-cols-[1fr,2fr,3fr] h-[65vh] w-full justify-center mt-2">
@@ -340,7 +346,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -366,15 +372,40 @@ const cond5 = ref("");
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
-  const res = await getStoreForMenuReceipt(store.state.userData.lngStoreGroup);
+  store.state.loading = true;
+  try {
+    const res = await getStoreForMenuReceipt(
+      store.state.userData.lngStoreGroup
+    );
 
-  optionList.value = res.data.List;
+    optionList.value = res.data.List;
 
-  const res2 = await getMenuList4(store.state.userData.lngStoreGroup);
+    const res2 = await getMenuList4(store.state.userData.lngStoreGroup);
 
-  rowData.value = res2.data.List;
+    rowData.value = res2.data.List;
+    store.state.loading = false;
+  } catch (error) {
+    console.log(error);
+  }
 });
 
+const searchButton2 = async () => {
+  store.state.loading = true;
+  try {
+    const res2 = await getMenuList4(store.state.userData.lngStoreGroup);
+
+    rowData.value = res2.data.List;
+    store.state.loading = false;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    const temp = searchvalue.value;
+    searchvalue.value = "";
+    setTimeout(() => {
+      searchvalue.value = temp;
+    }, 100);
+  }
+};
 const rowData = ref([]);
 const rowData2 = ref([]);
 const rowData3 = ref([]);
@@ -473,7 +504,7 @@ const clickedRowData = async (e) => {
       cond.value
     );
 
-    //console.log(res);
+    console.log(res);
 
     rowData2.value = res.data.List;
     if (rowData3.value.length > 0) {
@@ -484,6 +515,7 @@ const clickedRowData = async (e) => {
 
 const fcond4 = ref("");
 const fcond5 = ref("");
+const thisFirst = ref(false);
 const clickedRowData2 = async (e) => {
   ////console.log(e);
 
@@ -508,16 +540,21 @@ const clickedRowData2 = async (e) => {
       e[3]
     );
 
-    //console.log(res);
+    console.log(res);
 
     rowData3.value = res.data.List;
+    if (rowData3.value.length == 0) {
+      thisFirst.value = true;
+    } else {
+      thisFirst.value = false;
+    }
     updatedRowData3.value = res.data.List;
     afterSearch3.value = true;
     newMenu.value = false;
     fileInput.value.value = "";
     fileNm.value = "";
     SheetList.value = [];
-    byExcel.value = false;
+    byExcel.value = 0;
   } catch (error) {}
 };
 /**
@@ -530,7 +567,10 @@ const allStateRows = (e) => {
 
 const buttonClicked = async (e) => {
   if (e[7] == "--") {
-    rowData3.value = rowData3.value.filter((item) => item.lngItemID !== e[2]);
+    rowData3.value = updatedRowData3.value.filter(
+      (item) => item.lngItemID !== e[2]
+    );
+    updatedRowData3.value = rowData3.value;
     return;
   }
   //console.log(e);
@@ -603,6 +643,7 @@ const searchButton = async () => {
   }
 
   try {
+    store.state.loading = true;
     const res = await getStockItemSearch(
       store.state.userData.lngStoreGroup,
       scond3.value,
@@ -610,8 +651,8 @@ const searchButton = async () => {
       scond2.value,
       scond4.value
     );
-
-    //console.log(res);
+    store.state.loading = false;
+    console.log(res);
 
     rowData6.value = res.data.List;
   } catch (error) {}
@@ -645,6 +686,7 @@ const saveButton = async () => {
     });
     return;
   }
+  console.log(filterNew);
   try {
     await Swal.fire({
       title: "확인",
@@ -660,26 +702,28 @@ const saveButton = async () => {
           .map((item) => item.dblQuantity)
           .join("\u200b");
         const strclasstypes = filterNew
-          .map((item) => item.lngClass)
+          .map((item) => (byExcel.value == 0 ? item.lngClass : "00"))
           .join("\u200b");
 
         const lngunitids = filterNew
-          .map((item) => item.lngUnitID)
+          .map((item) => (item.lngUnitID == undefined ? "0" : item.lngUnitID))
           .join("\u200b");
 
         const seqids = filterNew
-          .map((item) => item.lngProductionSeqID)
-          .join("\u200b");
-
-        const classtypenms = filterNew
           .map((item) =>
-            item.lngClass == "01"
-              ? "자재"
-              : item.lngClass == "02"
-              ? "제품"
-              : "제조"
+            item.lngProductionSeqID == undefined ? "0" : item.lngProductionSeqID
           )
           .join("\u200b");
+
+        let classtypenms;
+        if (byExcel.value == 0) {
+          classtypenms = filterNew.map((item) => item.lngClass).join("\u200b");
+        } else {
+          classtypenms = filterNew
+            .map((item) => item.strClassType)
+            .join("\u200b");
+        }
+
         const res = await saveMenuDetails(
           store.state.userData.lngStoreGroup,
           0,
@@ -696,7 +740,7 @@ const saveButton = async () => {
           byExcel.value
         );
 
-        //console.log(res);
+        console.log(res);
 
         if (res.data.RESULT_CD == "00") {
           Swal.fire({
@@ -777,22 +821,22 @@ const applyButton = () => {
     addRow.value = false;
     return;
   }
-  //console.log(checkedrowdata.value);
 
+  // console.log(rowData3.value);
+  checkedrowdata.value = checkedrowdata.value.filter(
+    (item) =>
+      !rowData3.value.some((item2) => item.lngStockID == item2.lngStockID)
+  );
   checkedrowdata.value = checkedrowdata.value.map((item) => ({
     ...item,
     lngItemID: item.lngStockID,
     add: "--",
     dblQuantity: 0,
-    lngClass:
-      item.strClassType == "자재"
-        ? "01"
-        : item.strClassType == "제품"
-        ? "02"
-        : "03",
+    lngClass: item.strClassType,
   }));
   rowData3.value = rowData3.value.concat(checkedrowdata.value);
-  addRow.value = false;
+  updatedRowData3.value = rowData3.value;
+  //addRow.value = false;
 };
 
 const updatedRowData4 = (e) => {
@@ -854,7 +898,21 @@ const saveButton2 = async () => {
         fcond5.value.replaceAll("-", ""),
         "U"
       );
-      //console.log(res);
+      if (res.data.RESULT_CD == "00") {
+        Swal.fire({
+          title: "성공",
+          text: "저장 완료하였습니다.",
+          icon: "success",
+          confirmButtonText: "확인",
+        });
+      } else {
+        Swal.fire({
+          title: "실패",
+          text: "저장에 실패하였습니다.",
+          icon: "error",
+          confirmButtonText: "확인",
+        });
+      }
     } catch (error) {}
   } else if (newMenu.value == true) {
     const fdate = parseInt(cond4.value.replaceAll("-", ""));
@@ -976,7 +1034,7 @@ const downloadFile = () => {
 
 const fileInput = ref(null);
 const findFile = (e) => {
-  if (afterSearch3.value == true && rowData3.value.length == 0) {
+  if (afterSearch3.value == true && thisFirst.value == true) {
     fileInput.value.click();
   } else {
     Swal.fire({
@@ -994,6 +1052,10 @@ const currentFile = ref();
 
 const fileNm = ref("");
 const handleFileChange = async (e) => {
+  console.log(e);
+  if (e.target.files.length == 0) {
+    return;
+  }
   const file = e.target.files[0];
   fileNm.value = file.name;
   ////console.log(file);
@@ -1008,12 +1070,13 @@ const handleFileChange = async (e) => {
     const sheetLength = workbook.SheetNames.length;
 
     for (let i = 0; i < sheetLength; i++) {
-      SheetList.value.push({ lngCode: i + 1, strName: "시트" + (i + 1) });
+      SheetList.value.push({ lngCode: i + 1, strName: workbook.SheetNames[i] });
     }
 
     const result = await readFileWithArrayBuffer(file);
     //console.log(result);
   }
+  e.target.value = "";
 };
 
 async function readFileWithArrayBuffer(file) {
