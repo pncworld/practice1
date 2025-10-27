@@ -705,6 +705,28 @@ export const saveScreenKeys2 = (
   });
 };
 
+export const saveTablePosMenuKey = (
+  groupCd,
+  storeCd,
+  areaCd,
+  posNo,
+  intKeySeq_arr,
+  intScreenNo_arr,
+  lngScrNo_arr,
+  strKeyName_arr
+) => {
+  return api2.post("/MIMASTER/MST57_003INS.asmx/saveMenuKeys", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+    POSNO: posNo,
+    INTKEYSEQ_ARR: intKeySeq_arr,
+    INTSCREENNO_ARR: intScreenNo_arr,
+    LNGKEYSCRNO_ARR: lngScrNo_arr,
+    STRKEYNAME_ARR: strKeyName_arr,
+  });
+};
+
 export const saveAllMenuKey = (
   groupCd,
   storeCd,
