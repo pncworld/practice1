@@ -494,7 +494,7 @@
           </div>
           <div class="font-bold text-xl flex justify-start mt-5">부가정보</div>
           <div
-            class="grid grid-cols-[1fr,3fr,1fr,3fr] grid-rows-12 h-[120%] mt-3 w-[90%]">
+            class="grid grid-cols-[1fr,3fr,1fr,3fr] grid-rows-13 h-[120%] mt-3 w-[90%]">
             <div
               class="justify-center items-center bg-gray-100 border flex rounded-tl-lg">
               할인여부
@@ -888,7 +888,7 @@
             <div class="justify-center items-center bg-gray-100 border flex">
               메뉴설명
             </div>
-            <div class="flex justify-center items-center w-[233%]">
+            <div class="flex justify-center items-center w-[100%] col-span-3">
               <input
                 type="text"
                 name="strMenuComment"
@@ -898,8 +898,70 @@
                 @input="changeInfo"
                 :disabled="afterClick" />
             </div>
-            <div class="w-0"></div>
-            <div class="w-0"></div>
+            <div
+              class="flex justify-center items-center bg-gray-100 border-l border-b">
+              판매 시간대
+            </div>
+            <div class="flex justify-start pl-2 items-center border-b">
+              <input
+                type="time"
+                class="border border-black w-[40%] h-[80%]"
+                v-model="gridvalue32"
+                name="dtmStart"
+                @change="changeInfo"
+                :disabled="afterClick" />
+              ~
+              <input
+                type="time"
+                class="border border-black w-[40%] h-[80%]"
+                v-model="gridvalue33"
+                name="dtmEnd"
+                @change="changeInfo"
+                :disabled="afterClick" />
+            </div>
+            <div
+              class="flex justify-center items-center bg-gray-100 border-l border-b">
+              판매일 설정
+            </div>
+            <div
+              class="flex justify-start pl-2 space-x-2 items-center border-b border-r">
+              <label for="lngType1"
+                ><input
+                  type="checkbox"
+                  name="lngType1"
+                  id="lngType1"
+                  v-model="gridvalue34"
+                  @change="changeInfo"
+                  :disabled="afterClick" />평일</label
+              >
+              <label for="lngType2"
+                ><input
+                  type="checkbox"
+                  name="lngType2"
+                  id="lngType2"
+                  v-model="gridvalue35"
+                  @change="changeInfo"
+                  :disabled="afterClick" />토요일</label
+              >
+              <label for="lngType3"
+                ><input
+                  type="checkbox"
+                  name="lngType3"
+                  id="lngType3"
+                  @change="changeInfo"
+                  v-model="gridvalue36"
+                  :disabled="afterClick" />일요일</label
+              >
+              <label for="lngType4"
+                ><input
+                  type="checkbox"
+                  name="lngType4"
+                  id="lngType4"
+                  @change="changeInfo"
+                  v-model="gridvalue37"
+                  :disabled="afterClick" />휴일</label
+              >
+            </div>
           </div>
         </div>
         <div v-show="selectedMenu == 2" class="h-[80%] w-[90%]">
@@ -1249,6 +1311,12 @@ const gridvalue28 = ref("");
 const gridvalue29 = ref("");
 const gridvalue30 = ref("");
 const gridvalue31 = ref("");
+const gridvalue32 = ref("");
+const gridvalue33 = ref("");
+const gridvalue34 = ref(false);
+const gridvalue35 = ref(false);
+const gridvalue36 = ref(false);
+const gridvalue37 = ref(false);
 const gridvalue100 = ref("");
 const clickedrowdata = ref([]);
 const clickrowData4 = ref([]);
@@ -1270,6 +1338,33 @@ const selectedIndex2 = (e) => {
 /**
  * 데이터셋 상세정보 셋팅
  */
+
+function convertTo24Hour(timeStr) {
+  console.log(timeStr);
+  if (!timeStr) return "";
+
+  // "오전 12:00:00" → ["오전", "12:00:00"]
+
+  const [no, ampm, time] = timeStr.split(" ");
+  let [hour, minute, second] = time.split(":").map(Number);
+  console.log(hour);
+  console.log(minute);
+  console.log(second);
+  if (ampm === "오전") {
+    // 오전 12시는 0시로 변환
+    if (hour === 12) hour = 0;
+  } else if (ampm === "오후") {
+    // 오후인데 12시는 그대로, 나머지는 12 더함
+    if (hour !== 12) hour += 12;
+  }
+
+  // 항상 두 자리로 표시
+  const hh = String(hour).padStart(2, "0");
+  const mm = String(minute).padStart(2, "0");
+  const ss = String(second).padStart(2, "0");
+
+  return `${hh}:${mm}`;
+}
 
 const clickedRowData = async (newvalue) => {
   console.log(newvalue);
@@ -1333,6 +1428,18 @@ const clickedRowData = async (newvalue) => {
   gridvalue29.value = newvalue[27];
   gridvalue30.value = newvalue[28];
   gridvalue31.value = newvalue[29];
+
+  gridvalue32.value = newvalue[35];
+  gridvalue33.value = newvalue[36];
+
+  gridvalue34.value =
+    newvalue[34] != "" ? (Number(newvalue[34]) & 1) !== 0 : false;
+  gridvalue35.value =
+    newvalue[34] != "" ? (Number(newvalue[34]) & 2) !== 0 : false;
+  gridvalue36.value =
+    newvalue[34] != "" ? (Number(newvalue[34]) & 4) !== 0 : false;
+  gridvalue37.value =
+    newvalue[34] != "" ? (Number(newvalue[34]) & 8) !== 0 : false;
 
   if (gridvalue16.value == 1) {
     gridvalue100.value = 1;
@@ -1591,6 +1698,18 @@ const changeInfo = (e) => {
   const tagName = e.target.name;
   const value2 = e.target.value;
   //comsole.log(value2);
+
+  if (tagName.includes("lngType")) {
+    changeColid.value = "lngType";
+    changeValue2.value = 0;
+    changeValue2.value += gridvalue34.value == true ? 1 : 0;
+    changeValue2.value += gridvalue35.value == true ? 2 : 0;
+    changeValue2.value += gridvalue36.value == true ? 4 : 0;
+    changeValue2.value += gridvalue37.value == true ? 8 : 0;
+
+    changeNow.value = !changeNow.value;
+    return;
+  }
   changeColid.value = tagName;
   changeValue2.value = value2;
   changeNow.value = !changeNow.value;
@@ -1918,6 +2037,9 @@ const saveButton = () => {
           filterAndMap("strMenuComment"),
           filterAndMap("strAmtCodeList"),
           filterAndMap("strUserFileName"),
+          filterAndMap("lngType"),
+          filterAndMap("dtmStart"),
+          filterAndMap("dtmEnd"),
           isNewAutoMenuCode.value == true ? 1 : 0,
           deleteCd.join(",")
         );

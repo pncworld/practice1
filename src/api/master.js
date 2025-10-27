@@ -1776,6 +1776,9 @@ export const saveMenuCode = (
   strMenuComment,
   strAmtCodeList,
   strUserFileName,
+  lngtype,
+  dtmstart,
+  dtmend,
   AutoMenuCode,
   deleteCd
 ) => {
@@ -1819,6 +1822,10 @@ export const saveMenuCode = (
     STR_USER_FILE_NAME: strUserFileName,
     INSERT_AUTO: AutoMenuCode,
     DELETE_CD: deleteCd,
+
+    LNGTYPE: lngtype,
+    DTMSTART: dtmstart,
+    DTMEND: dtmend,
   });
 };
 
@@ -2508,6 +2515,12 @@ export const getSubGroup2 = (groupCd, storeCd) => {
 export const getMultiGroup = (groupCd) => {
   return api2.post("/MIMASTER/MST37_068INS.asmx/getMultiGroup", {
     GROUP_CD: groupCd,
+  });
+};
+export const getMultiGroup2 = (groupCd, multiNm) => {
+  return api2.post("/MIMASTER/MST37_067INS.asmx/getMultiGroup2", {
+    GROUP_CD: groupCd,
+    MULTINAME: multiNm,
   });
 };
 export const getMenuStock = (groupCd, storecd, cond) => {
@@ -3631,5 +3644,19 @@ export const getMstBasic = (groupCd, storeCd) => {
   return api2.post("/MIMASTER/MST44_062INS.asmx/getMstBasic", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
+  });
+};
+
+export const saveMultiPriceGroup = (
+  groupCd,
+  multipricegroupcode,
+  multipricegroupNm,
+  order
+) => {
+  return api2.post("/MIMASTER/MST37_067INS.asmx/saveMultiPriceGroup", {
+    GROUP_CD: groupCd,
+    MULTI_GROUPCODE: multipricegroupcode,
+    MULTI_GROUPNM: multipricegroupNm,
+    ORDER: order,
   });
 };
