@@ -1700,3 +1700,56 @@ export const getTotalSumList = (
     COND: cond,
   });
 };
+
+export const getOrderCloseTime = (groupCd, storeCd) => {
+  return api2.post("/MIPUR/PUR01_032INS.asmx/getOrderCloseTime", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+
+export const getOrderAuditList = (groupCd) => {
+  return api2.post("/MIPUR/PUR01_032INS.asmx/getOrderAuditList", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const setOrderCloseAndAuditList = (
+  groupCd,
+  storeArea,
+  hour,
+  minute,
+  date,
+  storecds,
+  permissions
+) => {
+  return api2.post("/MIPUR/PUR01_032INS.asmx/setOrderCloseAndAuditList", {
+    GROUP_CD: groupCd,
+    STORE_AREA: storeArea,
+    HOUR : hour,
+    MINUTE: minute,
+    DATE: date,
+    STORECDS: storecds,
+    PERMISSIONS: permissions,
+  });
+};
+
+export const getPrintPurchasePriceSheet = (
+  groupcd,
+  storecd,
+  date,
+  allYn,
+  unitType,
+  orderType,
+  desc,
+) => {
+  return api2.post("/MIPUR/PUR01_099RPT.asmx/getPrintPurchasePriceSheet", {
+    GROUP_CD   : groupcd,
+    STORE_CD   : storecd,
+    DATE       : date,
+    ALL_YN     : allYn,
+    UNIT_TYPE  : unitType,
+    ORDER_TYPE : orderType,
+    DESC       : desc,
+  });
+};

@@ -376,7 +376,7 @@ import {
   getMenuList,
   getLSCategoryList,
   getTLUList,
-  saveAllMenuKey,
+  saveTablePosMenuKey,
   saveScreenKeys,
 } from "@/api/master";
 /**
@@ -908,7 +908,7 @@ const saveButton = async () => {
         //comsole.log(screenNumarr.join(","));
         //comsole.log(lngScrarr.join(","));
         //comsole.log(menuKeyNmarr.join(","));
-        const res2 = await saveAllMenuKey(
+        const res2 = await saveTablePosMenuKey(
           groupCd.value,
           nowStoreCd.value,
           nowStoreAreaCd.value,
