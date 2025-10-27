@@ -126,6 +126,8 @@ import Realgrid from "@/components/realgrid.vue";
  *  */
 
 import {
+  formatDateTime,
+  formatDateTime3,
   formatLocalDate,
   formatNumberWithCommas,
   insertPageLog,
@@ -334,11 +336,28 @@ const downloadExcel = () => {
   ]);
   const worksheet = utils.aoa_to_sheet(filtered, { origin: "A7" });
 
+  const sum1 = rowData2.value.reduce(
+    (acc, item) => acc + parseInt(item.lngTotCnt),
+    0
+  );
+  const sum2 = rowData2.value.reduce(
+    (acc, item) => acc + parseInt(item.lngPosOrderCnt),
+    0
+  );
+  const sum3 = rowData2.value.reduce(
+    (acc, item) => acc + parseInt(item.lngTabOrderCnt),
+    0
+  );
+  const sum4 = rowData2.value.reduce(
+    (acc, item) => acc + parseInt(item.lngTabOrderRate),
+    0
+  );
+
   worksheet["B1"] = { t: "s", v: "주문구분 현황" };
   worksheet["B3"] = { t: "s", v: selectedExcelStore.value };
   worksheet["B4"] = {
     t: "s",
-    v: "작성일시 :" + new Date().toISOString().split("T")[0],
+    v: "작성일시 :" + formatDateTime3(new Date()),
   };
 
   worksheet["A6"] = { t: "s", v: "No" };
@@ -348,7 +367,32 @@ const downloadExcel = () => {
   worksheet["E6"] = { t: "s", v: "TABLET ORDER" };
   worksheet["F6"] = { t: "s", v: "TABLET ORDER 비율" };
 
-  let secondRowLeng = rowData2.value.length + 7 + 2;
+  let secondRowLeng = rowData2.value.length + 7 + 3;
+
+  // console.log(sum1);
+  // console.log(formatNumberWithCommas(sum1));
+  worksheet[`B${secondRowLeng - 2}`] = {
+    t: "s",
+    v: "합계",
+  };
+
+  worksheet[`C${secondRowLeng - 2}`] = {
+    t: "s",
+    v: formatNumberWithCommas(sum1),
+  };
+  worksheet[`D${secondRowLeng - 2}`] = {
+    t: "s",
+    v: formatNumberWithCommas(sum2),
+  };
+  worksheet[`E${secondRowLeng - 2}`] = {
+    t: "s",
+    v: formatNumberWithCommas(sum3),
+  };
+  worksheet[`F${secondRowLeng - 2}`] = {
+    t: "s",
+    v: formatNumberWithCommas(sum4) + "%",
+  };
+
   utils.sheet_add_aoa(
     worksheet,
     [

@@ -56,9 +56,10 @@
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :checkRenderEditable="true"
+        :checkRenderEditable2Col="'checkbox2'"
         :exporttoExcel="exportExcel">
       </Realgrid>
-      <div class="w-[70%] h-[30vh] mt-10 ml-10">
+      <div class="w-[70%] h-[30vh] ml-10">
         <div
           class="grid grid-rows-6 grid-cols-[1fr,3fr] border w-full h-full border-black">
           <div
@@ -73,7 +74,7 @@
               name="lngAreaCode"
               v-model="gridvalue1"
               @input="changeValue"
-              class="w-[70%] h-[70%] border border-black pl-1" />
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300" />
           </div>
           <div
             class="border border-black flex justify-center items-center bg-orange-100">
@@ -84,9 +85,10 @@
             <input
               type="text"
               name="strArea"
+              :disabled="disablegrid2"
               @input="changeValue"
               v-model="gridvalue2"
-              class="w-[70%] h-[70%] border border-black pl-1" />
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300" />
           </div>
 
           <div class="border border-black flex justify-center items-center">
@@ -95,7 +97,7 @@
           <div class="border border-black flex justify-center items-center">
             <input
               type="text"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-white"
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300"
               v-model="gridvalue5"
               disabled />
           </div>
@@ -106,7 +108,7 @@
             <input
               type="text"
               v-model="gridvalue6"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-white"
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300"
               disabled />
           </div>
           <div class="border border-black flex justify-center items-center">
@@ -116,7 +118,7 @@
             <input
               type="text"
               v-model="gridvalue7"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-white"
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300"
               disabled />
           </div>
           <div class="border border-black flex justify-center items-center">
@@ -126,7 +128,7 @@
             <input
               type="text"
               v-model="gridvalue8"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-white"
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300"
               disabled />
           </div>
         </div>
@@ -212,7 +214,7 @@ const afterSearch = ref(false);
 const store = useStore();
 
 const clickedRowData = (e) => {
-  //disablegrid.value = true;
+  disablegrid2.value = false;
   //insertupdatedelete.value = 2;
   ////console.log(e);
   gridvalue1.value = e[1];
@@ -232,8 +234,10 @@ const sendRowState = (e) => {
   ////console.log(e);
   if (e == "created") {
     disablegrid.value = false;
+    disablegrid2.value = false;
   } else {
     disablegrid.value = true;
+    disablegrid2.value = true;
   }
 };
 
@@ -278,6 +282,7 @@ const searchButton = async () => {
   }
 };
 const disablegrid = ref(true);
+const disablegrid2 = ref(true);
 const insertupdatedelete = ref(1);
 const addRow4 = ref(false);
 const addButton = () => {
@@ -492,7 +497,8 @@ const initGrid = () => {
     rowData.value = [];
   }
   afterSearch.value = false;
-
+  disablegrid.value = true;
+  disablegrid2.value = true;
   gridvalue1.value = "";
   gridvalue2.value = "";
   gridvalue3.value = "1";

@@ -21,6 +21,7 @@
       <div class="ml-20">
         <PickStoreRenew
           @storeNm="storeNm"
+          :placeholderName="'선택'"
           @lngStoreGroup="lngStoreGroup"
           @lngStoreCode="lngStoreCode"></PickStoreRenew>
       </div>
@@ -54,9 +55,14 @@
         </Realgrid>
       </div>
       <div class="w-full h-[85%] space-y-1">
-        <div class="flex space-x-3 justify-end mt-1">
-          <button class="whitebutton" @click="addButton2">신규</button
-          ><button class="whitebutton" @click="deleteButton2">삭제</button>
+        <div class="flex space-x-3 justify-between mt-1">
+          <div class="font-semibold text-red-500">
+            *시작시간과 종료시간을 클릭해서 수정하실 수 있습니다.
+          </div>
+          <div>
+            <button class="whitebutton" @click="addButton2">신규</button
+            ><button class="whitebutton" @click="deleteButton2">삭제</button>
+          </div>
         </div>
         <Realgrid
           :progname="'HR01_006INS_VUE'"
@@ -65,6 +71,7 @@
           :reload="reload"
           :checkRowAuto="false"
           :addRow4="addRow5"
+          @allStateRows="allStateRows2"
           @clickedRowData="clickedRowData2"
           @updatedRowData="updatedRowData2"
           :addrowProp="'checkbox,strSTime,strETime,strWTime,lngCode,lngWorkGroupCode,lngStoreGroup,lngStoreCode,rowStated'"
@@ -87,7 +94,6 @@
           :setRowGroupSpan2="'strTime'"
           :TimeArray="TimeArray"
           :setStateBar="false"
-          @clickedRowData="clickedRowData3"
           :rowStateeditable="false"
           :dynamicRowHeight="true">
         </Realgrid>
@@ -98,7 +104,6 @@
 </template>
 
 <script setup>
-import { getReservedCustomorSearch } from "@/api/micrm";
 import {
   deleteWorkShifts,
   deleteWorkShifts2,
@@ -167,8 +172,16 @@ const clickedRowData = (e) => {
     (item) => item.lngWorkGroupCode == e[3]
   );
   TimeArray.value = filteredrowData2.value.map((item) => [
-    Number(item.strSTime.split(":")[0]),
-    Number(item.strETime.split(":")[0]),
+    Number(item.strSTime.split(":")[0]) +
+      "." +
+      (String(Number(item.strSTime.split(":")[1]) / 60) == "0"
+        ? "0"
+        : String(Number(item.strSTime.split(":")[1]) / 60).split(".")[1]),
+    Number(item.strETime.split(":")[0]) +
+      "." +
+      (String(Number(item.strETime.split(":")[1]) / 60) == "0"
+        ? "0"
+        : String(Number(item.strETime.split(":")[1]) / 60).split(".")[1]),
   ]);
   ////console.log(TimeArray.value);
   clickedLngCode.value = e[3];
@@ -221,6 +234,13 @@ const rowData1State = ref([]);
 const allStateRows = (e) => {
   ////console.log(e);
   rowData1State.value = e;
+
+  ////console.log(rowData1State.value);
+};
+const rowData2State = ref([]);
+const allStateRows2 = (e) => {
+  ////console.log(e);
+  rowData2State.value = e;
 
   ////console.log(rowData1State.value);
 };
@@ -294,8 +314,24 @@ const saveButton = async (e) => {
     });
     return;
   }
+
+  if (
+    rowData1State.value.updated.length == 0 &&
+    rowData1State.value.created.length == 0 &&
+    rowData2State.value.updated.length == 0 &&
+    rowData2State.value.created.length == 0
+  ) {
+    Swal.fire({
+      title: "경고",
+      text: "변경된 사항이 없습니다. ",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   try {
     store.state.loading = true;
+    let res;
     if (rowData1State.value.created.length > 0) {
       const groups = updatedRow.value
         .filter((item, index) => rowData1State.value.created.includes(index))
@@ -307,7 +343,7 @@ const saveButton = async (e) => {
         .filter((item, index) => rowData1State.value.created.includes(index))
         .map((item) => item.strWorkGupName);
       try {
-        const res = await saveWorkShift(
+        res = await saveWorkShift(
           groups.join("\u200b"),
           stores.join("\u200b"),
           wgupname.join("\u200b")
@@ -332,7 +368,7 @@ const saveButton = async (e) => {
         .filter((item, index) => rowData1State.value.updated.includes(index))
         .map((item) => item.lngCode);
       try {
-        const res = await updateWorkShift(
+        res = await updateWorkShift(
           groups.join("\u200b"),
           stores.join("\u200b"),
           wgupname.join("\u200b"),
@@ -362,7 +398,7 @@ const saveButton = async (e) => {
           .filter((item) => item.rowStated == "C")
           .map((item) => item.strETime);
 
-        const res = await saveWorkShiftDetail(
+        res = await saveWorkShiftDetail(
           groups.join("\u200b"),
           stores.join("\u200b"),
           workgroupcode.join("\u200b"),
@@ -395,7 +431,7 @@ const saveButton = async (e) => {
           .filter((item) => item.rowStated !== "C")
           .map((item) => item.strETime);
 
-        const res = await updateWorkShiftDetail(
+        res = await updateWorkShiftDetail(
           groups.join("\u200b"),
           stores.join("\u200b"),
           lngcodes.join("\u200b"),
@@ -409,6 +445,22 @@ const saveButton = async (e) => {
       }
     }
 
+    if (res.data.RESULT_CD == "00") {
+      await Swal.fire({
+        title: "성공",
+        text: "저장에 성공하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      return;
+    } else {
+      await Swal.fire({
+        title: "실패",
+        text: "저장에 실패하였습니다.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+    }
     store.state.loading = false;
   } catch (error) {
   } finally {

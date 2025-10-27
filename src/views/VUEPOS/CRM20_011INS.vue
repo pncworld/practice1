@@ -1,15 +1,13 @@
 <!-- /*--############################################################################
 # Filename : CRM20_011INS.vue                                                  
 # Description : 마스터관리 > 매출거래처 마스터 > 선수금거래처정보                       
-# Date :2025-08-18                                                             
+# Date :2025-10-15                                                             
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
   <!-- 조회조건 -->
   <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <PageName></PageName>
-
+    <div class="flex justify-end items-center w-full overflow-y-hidden">
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
@@ -30,9 +28,20 @@
       class="grid grid-cols-1 grid-rows-2 bg-gray-200 rounded-lg h-14 items-start z-10">
       <div
         class="flex justify-start mr-40 items-start text-base font-semibold space-x-10 mt-2">
-        <PickCustCompany
-          @excelStore="excelStore"
-          @lngStoreCode="lngStoreCode"></PickCustCompany>
+        <div class="justify-start flex flex-col ml-12">
+          <div class="flex space-x-5 items-center">
+            <div class="font-semibold text-base">사업장명</div>
+            <select
+              name=""
+              id=""
+              class="w-64 h-8 border border-black"
+              v-model="lngStoreCode">
+              <option :value="i.strSaleCompCode" v-for="i in optionList">
+                {{ i.strSaleCompName }}
+              </option>
+            </select>
+          </div>
+        </div>
 
         <div class="flex items-center">
           <div class="text-base font-semibold">조회조건</div>
@@ -649,17 +658,16 @@
 </template>
 
 <script setup>
-import { deleteSpecialPrices, updateMultiPrice } from "@/api/master";
 import {
-  checkCardNumbyAccount,
-  deleteCustomors3,
-  getBelongCust,
-  getCardInfo2,
-  getCustomorInfo,
-  saveCreditCustomer,
-  saveCreditCustomer2,
-  saveNewCardNo,
-} from "@/api/micrm";
+  checkCardNumbyAccount2,
+  deleteCustomors32,
+  getBelongCust2,
+  getCardInfo22,
+  getCustCompany4,
+  getCustomorInfo2,
+  saveCreditCustomer4,
+  saveNewCardNo2,
+} from "@/api/vuepos";
 import GetZipCode from "@/components/getZipCode.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -669,8 +677,6 @@ import GetZipCode from "@/components/getZipCode.vue";
  *  페이지명 자동 입력 컴포넌트
  *  */
 
-import PageName from "@/components/pageName.vue";
-import PickCustCompany from "@/components/pickCustCompany.vue";
 /**
  * 	매장 단일 선택 컴포넌트
  */
@@ -686,7 +692,7 @@ import Realgrid from "@/components/realgrid.vue";
 import {
   formatLocalDate,
   formatNumberWithCommas,
-  insertPageLog,
+  insertPageLog2,
 } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
 /**
@@ -698,6 +704,7 @@ import Swal from "sweetalert2";
  */
 
 import { nextTick, onMounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -719,8 +726,35 @@ const closePopUp = () => {
 const findZipCode = () => {
   visible.value = true;
 };
+
+const route = useRoute();
+
+const path = ref("");
+const lngStoreGroup = ref("");
+const templngStoreCode = ref("");
+const lngOperator = ref("");
+
+const optionList = ref([]);
 onMounted(async () => {
-  const pageLog = await insertPageLog(store.state.activeTab2);
+  path.value = route.path.split("/")[2];
+  lngStoreGroup.value = route.query.lngStoreGroup;
+  templngStoreCode.value = route.query.lngStoreCode;
+  lngOperator.value = route.query.lngOperator;
+  const pageLog = await insertPageLog2(
+    path.value,
+    lngStoreGroup.value,
+    templngStoreCode.value,
+    lngOperator.value
+  );
+
+  const res = await getCustCompany4(
+    lngStoreGroup.value,
+    templngStoreCode.value,
+    "0"
+  );
+  optionList.value = res.data.List;
+
+  lngStoreCode.value = res.data.List[0].strSaleCompCode;
 });
 
 const reload = ref(false);
@@ -836,7 +870,7 @@ const clickedRowData = async (e) => {
 
 const getCardNo = async (a, b, c) => {
   try {
-    const res = await getCardInfo2(a, b, 2);
+    const res = await getCardInfo22(a, b, 2);
     //console.log(res);
     rowData2.value = res.data.List;
 
@@ -1006,7 +1040,7 @@ const addButton = () => {
  */
 
 const searchButton = async () => {
-  if (selectedStores.value == 0) {
+  if (lngStoreCode.value == 0) {
     Swal.fire({
       title: "경고",
       text: "매장명을 먼저 선택하세요.",
@@ -1019,8 +1053,8 @@ const searchButton = async () => {
     store.state.loading = true;
     // initGrid();
 
-    const res = await getCustomorInfo(
-      selectedStores.value,
+    const res = await getCustomorInfo2(
+      lngStoreCode.value,
       cond.value,
       cond2.value,
       2,
@@ -1053,7 +1087,7 @@ const searchButton2 = async () => {
     store.state.loading = true;
     // initGrid();
 
-    const res = await getBelongCust(selectedStores.value, cond6.value, 2);
+    const res = await getBelongCust2(lngStoreCode.value, cond6.value, 2);
     ////console.log(res);
     rowData2.value = res.data.List;
 
@@ -1090,7 +1124,7 @@ const dblclickedRowData = async (e) => {
 const checkCardNum = ref(false);
 const checkDupliCard = async () => {
   try {
-    const res = await checkCardNumbyAccount(
+    const res = await checkCardNumbyAccount2(
       selectedStores.value,
       2,
       gridvalue32.value
@@ -1230,7 +1264,7 @@ const saveButton = async (e) => {
         .join("\u200b");
 
       try {
-        const res = await deleteCustomors3(compcodes, custids, 2);
+        const res = await deleteCustomors32(compcodes, custids, 2);
 
         //console.log(res);
       } catch (error) {}
@@ -1238,9 +1272,9 @@ const saveButton = async (e) => {
 
     if (updatedRows.value.updated.length > 0) {
       try {
-        const id = store.state.userData.lngSequence;
+        const id = lngOperator.value;
         const flag = "U";
-
+        let res;
         const saleCompCodes = updateRowData.value
           .filter((item, index) => updatedRows.value.updated.includes(index))
           .map((item) => item.strSaleCompCode)
@@ -1361,7 +1395,7 @@ const saveButton = async (e) => {
           .map((item) => item.dblLimitAmt)
           .join("\u200b");
 
-        const res = await saveCreditCustomer2(
+        res = await saveCreditCustomer4(
           id,
           flag,
           saleCompCodes,
@@ -1396,7 +1430,7 @@ const saveButton = async (e) => {
 
     if (updatedRows.value.created.length > 0) {
       try {
-        const id = store.state.userData.lngSequence;
+        const id = lngOperator.value;
         const flag = "N";
 
         const saleCompCodes = updateRowData.value
@@ -1519,7 +1553,7 @@ const saveButton = async (e) => {
           .map((item) => item.dblLimitAmt)
           .join("\u200b");
 
-        const res = await saveCreditCustomer2(
+        res = await saveCreditCustomer4(
           id,
           flag,
           saleCompCodes,
@@ -1553,25 +1587,25 @@ const saveButton = async (e) => {
     }
     //console.log(gridvalue31.value);
     if (gridvalue30.value !== gridvalue32.value) {
-      const res = await saveNewCardNo(
+      const res = await saveNewCardNo2(
         currentCompCd.value,
         gridvalue1.value,
         2,
         gridvalue32.value,
         gridvalue31.value,
-        store.state.userData.lngSequence,
+        lngOperator.value,
         "N"
       );
 
       //console.log(res);
     } else if (gridvalue30.value == gridvalue32.value) {
-      const res = await saveNewCardNo(
+      const res = await saveNewCardNo2(
         currentCompCd.value,
         gridvalue1.value,
         2,
         gridvalue30.value,
         gridvalue31.value,
-        store.state.userData.lngSequence,
+        lngOperator.value,
         "U"
       );
 
@@ -1603,17 +1637,17 @@ const selectedStoreAttrs = ref();
 /**
  * 페이지 매장 코드 세팅
  */
-
-const lngStoreCode = async (e) => {
-  initGrid();
-  selectedStores.value = e;
-  //console.log(e);
-};
-const lngStoreGroup = async (e) => {
-  //initGrid();
-  selectedGroup.value = e;
-  ////console.log(e);
-};
+const lngStoreCode = ref("");
+// const lngStoreCode = async (e) => {
+//   initGrid();
+//   selectedStores.value = e;
+//   //console.log(e);
+// };
+// const lngStoreGroup = async (e) => {
+//   //initGrid();
+//   selectedGroup.value = e;
+//   ////console.log(e);
+// };
 
 /**
  * 그리드 초기화

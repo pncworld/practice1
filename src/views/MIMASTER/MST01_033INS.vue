@@ -483,8 +483,7 @@
               >
             </div>
 
-            <div
-              class="justify-center items-center bg-gray-100 border flex font-bold">
+            <div class="justify-center items-center bg-gray-100 border flex">
               주방출력설정
             </div>
             <div class="space-x-5 flex items-center border justify-left pl-2">
@@ -1533,7 +1532,7 @@ const searchButton = async () => {
     filteredrowData3.value = [...filteredrowData3.value];
 
     const res = await getMenuCodeEnroll(groupCd.value, nowStoreCd.value);
-    ////console.log(res);
+    console.log(res);
     rowData.value = res.data.MENULIST;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
     MENUDEPEND.value = res.data.MENUDEPEND;

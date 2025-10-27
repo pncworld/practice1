@@ -16,17 +16,17 @@
         <button @click="excelButton" class="button save w-auto excel">
           엑셀
         </button>
-
+        <!-- 
         <button
           @click="printButton"
           class="button print w-auto"
           v-if="cond7 == '2' && afterSearch">
           인쇄
-        </button>
+        </button> -->
       </div>
     </div>
     <div
-      class="grid grid-cols-[1fr,1fr,1fr] grid-rows-5 justify-start bg-gray-200 rounded-lg h-40 items-start z-10 w-full gap-5">
+      class="grid grid-cols-[1fr,1fr,1fr] grid-rows-5 justify-start bg-gray-200 rounded-lg h-48 items-start z-10 w-full gap-3">
       <div class="flex ml-7">
         <Datepicker2
           @endDate="endDate"
@@ -94,21 +94,7 @@
           </div>
         </div>
       </div>
-      <div class="flex mt-6 ml-4 items-center space-x-5">
-        <div class="text-base font-semibold">주문/반품유형</div>
-        <div class="items-center ml-5">
-          <select
-            name=""
-            id=""
-            class="w-32 h-7 border border-black"
-            v-model="cond4">
-            <option value="0">전체</option>
-            <option :value="i.strDCode" v-for="i in optionList3">
-              {{ i.strDName }}
-            </option>
-          </select>
-        </div>
-      </div>
+
       <div class="flex mt-6 ml-20 items-center">
         <div class="text-base font-semibold">단위</div>
         <div class="items-center ml-5">
@@ -116,59 +102,132 @@
             name=""
             id=""
             class="w-32 h-7 border border-black"
-            v-model="cond5">
+            v-model="cond4">
             <option :value="i.strDCode" v-for="i in optionList4">
               {{ i.strDName }}
             </option>
           </select>
         </div>
       </div>
-      <div class="flex mt-6 ml-20 items-center">
+      <div class="flex mt-6 ml-20 items-center col-span-2">
         <div class="text-base font-semibold">단가</div>
         <div class="items-center ml-5">
           <select
             name=""
             id=""
             class="w-32 h-7 border border-black"
-            v-model="cond6">
+            v-model="cond5">
             <option :value="i.strDCode" v-for="i in optionList5">
               {{ i.strDName }}
             </option>
           </select>
         </div>
       </div>
+      <div class="flex mt-5 ml-4 items-center space-x-5 pl-1 col-span-3">
+        <div class="text-base font-semibold">주문/반품유형</div>
 
-      <div class="flex mt-5 ml-12 items-center space-x-5 pl-1">
-        <div class="text-base font-semibold">조회유형</div>
-
-        <div>
-          <label for="cond7"
-            ><input
-              type="radio"
-              id="cond7"
-              name="cond7"
-              value="0"
-              v-model="cond7" />자재별</label
-          >
-        </div>
-        <div>
-          <label for="cond5"
-            ><input
-              type="radio"
-              id="cond5"
-              name="cond7"
-              value="1"
-              v-model="cond7" />일자별 자재별</label
-          >
-        </div>
         <div>
           <label for="cond6"
             ><input
               type="radio"
               id="cond6"
-              name="cond7"
+              name="cond6"
+              value="0"
+              v-model="cond6" />주문반품현황</label
+          >
+        </div>
+        <div>
+          <label for="cond7"
+            ><input
+              type="radio"
+              id="cond7"
+              name="cond6"
+              value="1"
+              v-model="cond6" />주문현황</label
+          >
+        </div>
+        <div>
+          <label for="cond8"
+            ><input
+              type="radio"
+              id="cond8"
+              name="cond6"
+              value="2"
+              v-model="cond6" />반품현황</label
+          >
+        </div>
+      </div>
+      <div class="flex mt-2 ml-12 items-center space-x-5 pl-1 w-[150%]">
+        <div class="text-base font-semibold">조회유형</div>
+
+        <div class="flex items-center text-center">
+          <label for="cond9"
+            ><input
+              type="radio"
+              id="cond9"
+              name="cond9"
+              value="0"
+              v-model="cond7" />자재별</label
+          >
+        </div>
+        <div class="flex items-center text-center">
+          <label for="cond10"
+            ><input
+              type="radio"
+              id="cond10"
+              name="cond9"
+              value="1"
+              v-model="cond7" />일자별 자재별</label
+          >
+        </div>
+        <div class="flex items-center text-center">
+          <label for="cond11"
+            ><input
+              type="radio"
+              id="cond11"
+              name="cond9"
               value="2"
               v-model="cond7" />매장별 자재별</label
+          >
+        </div>
+        <div v-if="cond6 == '1'" class="flex items-center text-center">
+          <label for="cond12"
+            ><input
+              type="radio"
+              id="cond12"
+              name="cond9"
+              value="3"
+              v-model="cond7" />일자별 매장별</label
+          >
+        </div>
+        <div v-if="cond6 == '1'" class="flex items-center text-center">
+          <label for="cond13"
+            ><input
+              type="radio"
+              id="cond13"
+              name="cond9"
+              value="4"
+              v-model="cond7" />자재별 일자별</label
+          >
+        </div>
+        <div v-if="cond6 == '1'">
+          <label for="cond14" class="flex items-center text-center"
+            ><input
+              type="radio"
+              id="cond14"
+              name="cond9"
+              value="5"
+              v-model="cond7" />자재별 매장별</label
+          >
+        </div>
+        <div v-if="cond6 != '1' && hagendasz == true">
+          <label for="cond15" class="flex items-center text-center"
+            ><input
+              type="radio"
+              id="cond15"
+              name="cond9"
+              value="6"
+              v-model="cond7" />하겐다즈용</label
           >
         </div>
       </div>
@@ -182,8 +241,9 @@
         :rowData="rowData"
         :reload="reload"
         :documentTitle="'STK05_018RPT'"
-        :setRowStyleCallsDefaultCol="'lngMoveType'"
-        :setRowStyleCallsDefaultCol2="'lngMoveType'"
+        :setRowStyleCallsDefaultCol="setRowStyleCallsDefaultCol"
+        :setRowStyleCallsDefaultCol2="setRowStyleCallsDefaultCol"
+        :hideColumnsId="hideColumnsId"
         :setRowStyleCalls="true"
         :hardCodeSetRowStyleCalls="true"
         :documentSubTitle="documentSubTitle"
@@ -197,11 +257,7 @@
 
 <script setup>
 import { getCommonList } from "@/api/common";
-import {
-  getOrderStockReturnList,
-  getStockDetail,
-  getWorkList,
-} from "@/api/mistock";
+import { getOrderStockReturnList, getStockDetail } from "@/api/mistock";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -233,7 +289,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -259,9 +315,9 @@ const selectedendDate = ref();
 const cond = ref(0);
 const cond2 = ref(0);
 const cond3 = ref("");
-const cond4 = ref(0);
+const cond4 = ref("03");
 
-const progid = ref("2");
+const progid = ref("1");
 
 const store = useStore();
 const loginedstrLang = store.state.userData.lngLanguage;
@@ -284,14 +340,14 @@ const handleParentClick = (e) => {
  *  조회 함수
  */
 
-const cond5 = ref(0);
-const cond6 = ref(true);
-const cond7 = ref(0);
+const cond5 = ref("1");
+const cond6 = ref(0);
+const cond7 = ref(2);
 const cond8 = ref(0);
 const checkCond = (e) => {
   cond6.value = e.target.checked;
 };
-
+const hideColumnsId = ref(["lngMoveType"]);
 const sdate = ref("");
 const edate = ref("");
 const endDate = (e) => {
@@ -315,14 +371,12 @@ const searchButton = async () => {
   try {
     initGrid();
 
-    if (cond7.value == "0") {
-      progid.value = 1;
-    } else if (cond7.value == "1") {
-      progid.value = 2;
-    } else {
-      progid.value = 3;
-    }
     reload.value = !reload.value;
+    if (progid.value == "1") {
+      setRowStyleCallsDefaultCol.value = "lngMoveType";
+    } else {
+      setRowStyleCallsDefaultCol.value = "strStoreName";
+    }
     const res = await getOrderStockReturnList(
       store.state.userData.lngStoreGroup,
       selectedStore.value,
@@ -379,7 +433,7 @@ const selectedWeekDay = ref("");
 /**
  * 	화면 Load시 실행 스크립트
  */
-
+const hagendasz = ref(false);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
   const res = await getCommonList("07");
@@ -394,10 +448,16 @@ onMounted(async () => {
   optionList5.value = res5.data.List;
 
   if (optionList4.value.length > 0) {
-    cond5.value = optionList4.value[0].strDCode;
+    cond4.value = optionList4.value[0].strDCode;
   }
   if (optionList5.value.length > 0) {
-    cond6.value = optionList5.value[0].strDCode;
+    cond5.value = optionList5.value[0].strDCode;
+  }
+
+  if (store.state.userData.lngStoreGroup == "1028") {
+    hagendasz.value = true;
+  } else {
+    hagendasz.value = false;
   }
 
   //comsole.log(weekDay.value);
@@ -471,32 +531,81 @@ const excelStore = (e) => {
   //comsole.log(e);
 };
 
-const printButton = () => {
-  const filtered = rowData.value.filter((item) => item.Sorty == "0");
+watch(cond6, () => {
+  cond7.value = "2";
+});
 
-  const storecds = filtered.map((item) => item.lngStoreCode).join(",");
-  const storecds2 = filtered.map((item) => item.lngDesStoreCode).join(",");
-  const ordercds = filtered.map((item) => item.strMoveNo).join(",");
-  window.open(
-    `http://222.231.31.99/Report/CRPrint.aspx?pCount=${
-      filtered.length
-    }&Report=ReturnOut&@P_lngStoreGroup=${
-      store.state.userData.lngStoreGroup
-    }&@P_lngStoreCode=${
-      selectedStore2.value
-    }&@P_lngDesStoreAttr=0&@P_lngDesStoreCode=${
-      selectedStore.value
-    }&@P_dtmFromDate=${sdate.value.replaceAll(
-      "-",
-      ""
-    )}&@P_dtmToDate=${edate.value.replaceAll("-", "")}`,
-    "_blank",
-    "width=1600,height=1200"
-  );
-};
+const setRowStyleCallsDefaultCol = ref("lngMoveType");
+watch([cond7, cond6], () => {
+  if (cond7.value == "6" && cond6.value == "0") {
+    progid.value = "2";
 
-//http://222.231.31.99/Report/CRPrint.aspx?pCount=6&Report=ReturnOut&@P_lngStoreGroup=5001&@P_lngStoreCode=0&@P_lngDesStoreAttr=0&@P_lngDesStoreCode=500100&@P_dtmFromDate=20240901&@P_dtmToDate=20250929
-
-//http://222.231.31.99/Report/CRPrint.aspx?pCount=6&Report=ReturnOut&@P_lngStoreGroup=5001&@P_lngStoreCode=0&@P_lngDesStoreAttr=0&@P_lngDesStoreCode=500100&@P_dtmFromDate=20240901&@P_dtmToDate=20250929
-//http://222.231.31.99/Report/CRPrint.aspx?pCount=6&Report=ReturnOut&@P_lngStoreGroup=5001&@P_lngStoreCode=500100&@P_lngDesStoreAttr=0&@P_lngDesStoreCode=0&@P_dtmFromDate=20240929&@P_dtmToDate=20250929
+    return;
+  } else {
+    progid.value = "1";
+  }
+  if (cond6.value == "0") {
+    if (cond7.value == "0") {
+      hideColumnsId.value = [
+        "lngMoveType",
+        "lngStoreCode",
+        "dtmMoveReturnDate",
+      ];
+    } else if (cond7.value == "1") {
+      hideColumnsId.value = ["lngMoveType", "lngStoreCode"];
+    } else if (cond7.value == "2") {
+      hideColumnsId.value = ["lngMoveType", "dtmMoveReturnDate"];
+    }
+  } else if (cond6.value == "1") {
+    if (cond7.value == "0") {
+      hideColumnsId.value = [
+        "lngStoreCode",
+        "dtmMoveReturnDate",
+        "lngReturnQty",
+        "strStoreName",
+      ];
+    } else if (cond7.value == "1") {
+      hideColumnsId.value = ["lngStoreCode", "lngReturnQty", "strStoreName"];
+    } else if (cond7.value == "2") {
+      hideColumnsId.value = [
+        "dtmMoveReturnDate",
+        "lngReturnQty",
+        "lngStoreCode",
+      ];
+    } else if (cond7.value == "3") {
+      hideColumnsId.value = ["lngReturnQty", "lngReturnQty", "lngStoreCode"];
+    } else if (cond7.value == "4") {
+      hideColumnsId.value = ["lngStoreCode", "lngReturnQty", "strStoreName"];
+    } else if (cond7.value == "5") {
+      hideColumnsId.value = [
+        "lngStoreCode",
+        "lngReturnQty",
+        "dtmMoveReturnDate",
+      ];
+    }
+  } else if (cond6.value == "2") {
+    if (cond7.value == "0") {
+      hideColumnsId.value = [
+        "strStoreName",
+        "lngStoreCode",
+        "dtmMoveReturnDate",
+        "lngReturnQty",
+      ];
+    } else if (cond7.value == "1") {
+      hideColumnsId.value = ["strStoreName", "lngStoreCode", "lngReturnQty"];
+    } else if (cond7.value == "2") {
+      hideColumnsId.value = [
+        "lngStoreCode",
+        "dtmMoveReturnDate",
+        "lngReturnQty",
+      ];
+    } else if (cond7.value == "6") {
+      hideColumnsId.value = [
+        "lngStoreCode",
+        "dtmMoveReturnDate",
+        "lngReturnQty",
+      ];
+    }
+  }
+});
 </script>

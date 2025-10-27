@@ -1,8 +1,10 @@
 <script setup>
 import JSZip from "jszip";
-import { defineAsyncComponent, onMounted, ref } from "vue";
+import { defineAsyncComponent, onMounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import LoadingScreen from "./components/LoadingScreen.vue";
+import EmptyLayout from "./views/layout/EmptyLayout.vue";
 
 const isMobile = ref(false);
 const store = useStore();
@@ -17,9 +19,19 @@ const MobileLayout = defineAsyncComponent(() =>
 const BasicLayout = defineAsyncComponent(() =>
   import("../src/views/layout/BasicLayout.vue")
 );
+const route = useRoute();
+const exception = ref(false);
 onMounted(() => {
   detectMobile();
   store.state.isMobile = isMobile.value;
+});
+
+watch(route, () => {
+  if (route.fullPath.includes("VUEPOS")) {
+    exception.value = true;
+  } else {
+    exception.value = false;
+  }
 });
 
 window.JSZip = JSZip;
@@ -29,7 +41,15 @@ window.JSZip = JSZip;
   <Suspense>
     <template #default>
       <!-- isMobile에 따라 레이아웃을 동적으로 선택 -->
-      <component :is="isMobile ? MobileLayout : BasicLayout" class="">
+      <component
+        :is="
+          isMobile
+            ? MobileLayout
+            : exception == false
+            ? BasicLayout
+            : EmptyLayout
+        "
+        class="">
         <router-view></router-view>
         <!-- 자식 컴포넌트를 여기에 렌더링 -->
       </component>

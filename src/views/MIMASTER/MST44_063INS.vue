@@ -1462,19 +1462,19 @@ watch(currentMenu, () => {
         RealGrid.getGridInstance(reagrid2).resetSize();
         RealGrid.getGridInstance(reagrid2).refresh(true);
       }
-    }, 100);
+    }, 500);
   } else if (currentMenu.value == 2) {
     const reagrid3 = document.getElementById(realgrid3Name.value);
     setTimeout(() => {
       RealGrid.getGridInstance(reagrid3).resetSize();
       RealGrid.getGridInstance(reagrid3).refresh(true);
-    }, 100);
+    }, 500);
   } else if (currentMenu.value == 3) {
     const reagrid4 = document.getElementById(realgrid4Name.value);
     setTimeout(() => {
       RealGrid.getGridInstance(reagrid4).resetSize();
       RealGrid.getGridInstance(reagrid4).refresh(true);
-    }, 100);
+    }, 500);
   } else if (currentMenu.value == 4) {
     const reagrid5 = document.getElementById(realgrid5Name.value);
     setTimeout(() => {
@@ -1482,7 +1482,7 @@ watch(currentMenu, () => {
         RealGrid.getGridInstance(reagrid5).resetSize();
         RealGrid.getGridInstance(reagrid5).refresh(true);
       }
-    }, 100);
+    }, 500);
   }
 });
 

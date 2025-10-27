@@ -1,7 +1,7 @@
 /*--############################################################################
 # Filename : MST37_071INS.vue                                                  
 # Description : 마스터관리 > 메뉴 마스터 > 메뉴 재고 등록                       
-# Date :2025-05-26                                                             
+# Date :2025-10-15                                                             
 # Author : 권맑음                     
 ################################################################################*/
 <template>
@@ -9,8 +9,6 @@
 
   <div class="">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <PageName></PageName>
-
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <!-- 
         <button @click="saveButton" class="button save md:w-auto w-14">
@@ -51,7 +49,6 @@
             :progid="1"
             :rowData="rowData"
             :reload="reload"
-            :rowStateeditable="false"
             :changeRow="changeRow"
             :changeColid="changeColid"
             :changeNow="changeNow"
@@ -175,7 +172,7 @@
 
 <script setup>
 import { getStoreList } from "@/api/common";
-import { getMenuStock, saveMenuStock } from "@/api/master";
+import { getMenuStock2, saveMenuStock2 } from "@/api/vuepos";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -184,7 +181,6 @@ import { getMenuStock, saveMenuStock } from "@/api/master";
  *  페이지명 자동 입력 컴포넌트
  *  */
 
-import PageName from "@/components/pageName.vue";
 /**
  * 	매장 단일 선택 컴포넌트
  */
@@ -197,7 +193,7 @@ import Realgrid from "@/components/realgrid.vue";
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog } from "@/customFunc/customFunc";
+import { insertPageLog2 } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
 /**
  *  경고창 호출 라이브러리
@@ -208,6 +204,7 @@ import Swal from "sweetalert2";
  */
 
 import { onMounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -250,10 +247,26 @@ const updatedRowData = (e) => {
   updateRowData.value = e;
   // ////console.log(e);
 };
-onMounted(async () => {
-  const pageLog = await insertPageLog(store.state.activeTab2);
+const route = useRoute();
 
-  const userGroup = store.state.storeGroup[0].lngStoreGroup;
+const path = ref("");
+const lngStoreGroup = ref("");
+const lngStoreCode = ref("");
+const lngOperator = ref("");
+
+onMounted(async () => {
+  path.value = route.path.split("/")[2];
+  lngStoreGroup.value = route.query.lngStoreGroup;
+  lngStoreCode.value = route.query.lngStoreCode;
+  lngOperator.value = route.query.lngOperator;
+  const pageLog = await insertPageLog2(
+    path.value,
+    lngStoreGroup.value,
+    lngStoreCode.value,
+    lngOperator.value
+  );
+
+  const userGroup = lngStoreGroup.value;
   // const res = await getMenuStoreList(userGroup);
   // GroupList.value = res.data.List;
   // reload.value = !reload.value;
@@ -265,8 +278,8 @@ onMounted(async () => {
     a.strName.localeCompare(b.strName)
   );
 
-  selectedStore.value = store.state.userData.lngPosition;
-  const res = await getMenuStock(
+  selectedStore.value = lngStoreCode.value;
+  const res = await getMenuStock2(
     userGroup,
     selectedStore.value,
     searchWord3.value
@@ -392,9 +405,9 @@ const searchButton = async () => {
     store.state.loading = true;
     // initGrid();
     reload.value = !reload.value;
-    const res = await getMenuStock(
-      store.state.userData.lngStoreGroup,
-      selectedStore.value,
+    const res = await getMenuStock2(
+      lngStoreGroup.value,
+      lngStoreCode.value,
       searchWord3.value
     );
     ////console.log(res);
@@ -428,12 +441,12 @@ const saveButton = async (e) => {
         contain.push(str);
       }
     }
-    const res = await saveMenuStock(
-      store.state.userData.lngStoreGroup,
-      selectedStore.value,
+    const res = await saveMenuStock2(
+      lngStoreGroup.value,
+      lngStoreCode.value,
       contain.join("|")
     );
-    ////console.log(res);
+    console.log(res);
     store.state.loading = false;
 
     await Swal.fire({
@@ -460,16 +473,16 @@ const selectedStoreAttrs = ref();
  * 페이지 매장 코드 세팅
  */
 
-const lngStoreCode = async (e) => {
-  initGrid();
-  selectedStores.value = e;
-  ////console.log(e);
-};
-const lngStoreGroup = async (e) => {
-  //initGrid();
-  selectedGroup.value = e;
-  ////console.log(e);
-};
+// const lngStoreCode = async (e) => {
+//   initGrid();
+//   selectedStores.value = e;
+//   ////console.log(e);
+// };
+// const lngStoreGroup = async (e) => {
+//   //initGrid();
+//   selectedGroup.value = e;
+//   ////console.log(e);
+// };
 
 /**
  * 그리드 초기화

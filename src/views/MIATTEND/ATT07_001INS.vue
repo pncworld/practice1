@@ -56,9 +56,10 @@
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :checkRenderEditable="true"
+        :checkRenderEditable2Col="'checkbox2'"
         :exporttoExcel="exportExcel">
       </Realgrid>
-      <div class="w-[70%] h-[40vh] mt-10 ml-10">
+      <div class="w-[70%] h-[40vh] mt-0 ml-10">
         <div
           class="grid grid-rows-8 grid-cols-[1fr,3fr] border w-full h-full border-black">
           <div
@@ -73,7 +74,7 @@
               name="lngRankCode"
               v-model="gridvalue1"
               @input="changeValue"
-              class="w-[70%] h-[70%] border border-black pl-1" />
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300" />
           </div>
           <div
             class="border border-black flex justify-center items-center bg-orange-100">
@@ -85,8 +86,9 @@
               type="text"
               name="strRank"
               @input="changeValue"
+              :disabled="disablegrid2"
               v-model="gridvalue2"
-              class="w-[70%] h-[70%] border border-black pl-1" />
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300" />
           </div>
           <div class="border border-black flex justify-center items-center">
             구 분
@@ -98,6 +100,8 @@
                 type="radio"
                 id="cond"
                 name="intGrade"
+                :disabled="disablegrid2"
+                class="disabled:bg-gray-300"
                 @change="changeValue"
                 :value="1"
                 v-model="gridvalue3" />정직원</label
@@ -107,6 +111,8 @@
                 type="radio"
                 id="cond2"
                 :value="2"
+                :disabled="disablegrid2"
+                class="disabled:bg-gray-300"
                 @change="changeValue"
                 name="intGrade"
                 v-model="gridvalue3" />PT</label
@@ -119,8 +125,9 @@
             <input
               type="number"
               name="lngOrder"
+              :disabled="disablegrid2"
               @input="changeValue"
-              class="w-[70%] h-[70%] border border-black pl-1"
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300"
               v-model="gridvalue4" />
           </div>
           <div class="border border-black flex justify-center items-center">
@@ -129,7 +136,7 @@
           <div class="border border-black flex justify-center items-center">
             <input
               type="text"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-white"
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300"
               v-model="gridvalue5"
               disabled />
           </div>
@@ -140,7 +147,7 @@
             <input
               type="text"
               v-model="gridvalue6"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-white"
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300"
               disabled />
           </div>
           <div class="border border-black flex justify-center items-center">
@@ -150,7 +157,7 @@
             <input
               type="text"
               v-model="gridvalue7"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-white"
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300"
               disabled />
           </div>
           <div class="border border-black flex justify-center items-center">
@@ -160,7 +167,7 @@
             <input
               type="text"
               v-model="gridvalue8"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-white"
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300"
               disabled />
           </div>
         </div>
@@ -239,8 +246,11 @@ const afterSearch = ref(false);
 
 const store = useStore();
 
+const afterClick = ref(false);
 const clickedRowData = (e) => {
-  //disablegrid.value = true;
+  console.log(e);
+  disablegrid2.value = false;
+  afterClick.value = true;
   insertupdatedelete.value = 2;
 
   gridvalue1.value = e[1];
@@ -262,8 +272,10 @@ const sendRowState = (e) => {
   ////console.log(e);
   if (e == "created") {
     disablegrid.value = false;
+    disablegrid2.value = false;
   } else {
     disablegrid.value = true;
+    disablegrid2.value = true;
   }
 };
 
@@ -284,6 +296,7 @@ const changeValue = (e) => {
 
 const updateRow = ref([]);
 const updatedRowData = (e) => {
+  console.log(e);
   updateRow.value = e;
 };
 /**
@@ -308,6 +321,7 @@ const searchButton = async () => {
   }
 };
 const disablegrid = ref(true);
+const disablegrid2 = ref(true);
 const insertupdatedelete = ref(1);
 const addRow4 = ref(false);
 const addButton = () => {
@@ -368,7 +382,7 @@ const saveButton = async () => {
   }
   try {
     store.state.loading = true;
-
+    let res;
     const result = await fetch("https://api64.ipify.org", { timeout: 3000 });
     const data = await result.text();
     let userIp = data;
@@ -393,7 +407,7 @@ const saveButton = async () => {
         .filter((item, index) => updateStateRow.value.created.includes(index))
         .map((item) => item.intGrade);
 
-      const res = await savePosition(
+      res = await savePosition(
         store.state.userData.lngStoreGroup,
         rankcode.join("\u200b"),
         strrank.join("\u200b"),
@@ -428,7 +442,7 @@ const saveButton = async () => {
         .filter((item, index) => updateStateRow.value.updated.includes(index))
         .map((item) => item.intGrade);
 
-      const res = await savePosition(
+      res = await savePosition(
         store.state.userData.lngStoreGroup,
         rankcode.join("\u200b"),
         strrank.join("\u200b"),
@@ -440,10 +454,9 @@ const saveButton = async () => {
         intGrade.join("\u200b")
       );
 
-      ////console.log(res);
+      console.log(res);
     }
 
-    ////console.log(res);
     if (res.data.RESULT_CD == "99") {
       Swal.fire({
         title: "실패",
@@ -558,6 +571,8 @@ const initGrid = () => {
   gridvalue6.value = "";
   gridvalue7.value = "";
   gridvalue8.value = "";
+  disablegrid.value = true;
+  disablegrid2.value = true;
 };
 
 //엑셀 버튼 처리 함수

@@ -375,19 +375,19 @@ export const getDiligenceRegistration = (
   lngSupplierID,
   lngGroupID,
   lngCategoryID,
-  lngGenericID,
+  lngGenericID
 ) => {
   return api2.post("/MISTOCK/STKN07_013RPT.asmx/getDiligenceRegistration", {
-    GROUP_CD   : groupCd,
-    STORE_CD   : storeCd,
-    DATE       : date,
-    TAKE_CYCLE : lngTakeCycle,
-    UNIT_TYPE  : lngUnitType,
-    SHOW_TYPE  : strShowType,
-    SUPP_ID    : lngSupplierID,
-    GROUP_ID   : lngGroupID,
-    CATE_ID    : lngCategoryID,
-    GEN_ID     : lngGenericID,
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    TAKE_CYCLE: lngTakeCycle,
+    UNIT_TYPE: lngUnitType,
+    SHOW_TYPE: strShowType,
+    SUPP_ID: lngSupplierID,
+    GROUP_ID: lngGroupID,
+    CATE_ID: lngCategoryID,
+    GEN_ID: lngGenericID,
   });
 };
 
@@ -397,15 +397,15 @@ export const getDiligenceRegistration2 = (
   date,
   lngTakeCycle,
   lngUnitType,
-  strShowType,
+  strShowType
 ) => {
   return api2.post("/MISTOCK/STKN07_013RPT.asmx/getDiligenceRegistration2", {
-    GROUP_CD   : groupCd,
-    STORE_CD   : storeCd,
-    DATE       : date,
-    TAKE_CYCLE : lngTakeCycle,
-    UNIT_TYPE  : lngUnitType,
-    SHOW_TYPE  : strShowType,
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    TAKE_CYCLE: lngTakeCycle,
+    UNIT_TYPE: lngUnitType,
+    SHOW_TYPE: strShowType,
   });
 };
 
@@ -414,14 +414,14 @@ export const delDiligenceRegistration = (
   storeCd,
   date,
   stockId,
-  closeYn,
+  closeYn
 ) => {
   return api2.post("/MISTOCK/STKN07_013RPT.asmx/delDiligenceRegistration", {
-    GROUP_CD  : groupCd,
-    STORE_CD  : storeCd,
-    DATE      : date,
-    STOCK_ID  : stockId,
-    CLOSE_YN  : closeYn,
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    STOCK_ID: stockId,
+    CLOSE_YN: closeYn,
   });
 };
 
@@ -434,18 +434,18 @@ export const setDiligenceRegistration = (
   dblTakeQty,
   dblShortQty,
   unitType,
-  isClose,
+  isClose
 ) => {
   return api2.post("/MISTOCK/STKN07_013RPT.asmx/setDiligenceRegistration", {
-    TAKE_CYCLE : lngTakeCycle,
-    GROUP_CD   : groupCd,
-    STORE_CD   : storeCd,
-    DATE       : date,
-    STOCK_ID   : stockId,
-    TAKE_QTY   : dblTakeQty,
-    SHORT_QTY  : dblShortQty,
-    UNIT_TYPE  : unitType,
-    CLOSE_YN   : isClose,
+    TAKE_CYCLE: lngTakeCycle,
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DATE: date,
+    STOCK_ID: stockId,
+    TAKE_QTY: dblTakeQty,
+    SHORT_QTY: dblShortQty,
+    UNIT_TYPE: unitType,
+    CLOSE_YN: isClose,
   });
 };
 export const getLossMasterPartList = (groupCd, storeCd) => {
@@ -719,6 +719,12 @@ export const getDemandStoreList = (groupCd, attr) => {
     ATTR: attr,
   });
 };
+export const getCheckAbility = (groupCd, storeCd) => {
+  return api2.post("/MISTOCK/STK01_011INS.asmx/getCheckAbility", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
 
 export const getStockDemandList2 = (groupCd, storeCd, lang, sdate, edate) => {
   return api2.post("/MISTOCK/STK01_011INS.asmx/getStockDemandList2", {
@@ -751,7 +757,8 @@ export const updateDemandMaster = (
   storecd,
   date,
   demandno,
-  comment
+  comment,
+  endDate
 ) => {
   return api2.post("/MISTOCK/STK01_011INS.asmx/updateDemandMaster", {
     GROUP_CD: groupCd,
@@ -759,6 +766,7 @@ export const updateDemandMaster = (
     DATE: date,
     DEMANDNO: demandno,
     COMMENT: comment,
+    ENDDATE: endDate,
   });
 };
 

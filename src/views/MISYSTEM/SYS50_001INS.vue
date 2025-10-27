@@ -125,9 +125,10 @@
               <input
                 type="text"
                 name="strUserAdminID"
+                :disabled="disablegrid2"
                 @input="changeValue"
                 v-model="gridvalue4"
-                class="border border-black flex justify-center items-center" />
+                class="border border-black flex justify-center items-center disabled:bg-gray-300" />
             </div>
           </div>
         </div>
@@ -221,7 +222,7 @@ const afterSearch = ref(false);
 const store = useStore();
 
 const clickedRowData = (e) => {
-  //disablegrid.value = true;
+  disablegrid2.value = false;
   //insertupdatedelete.value = 2;
   // //console.log(e);
   gridvalue1.value = e[0];
@@ -238,8 +239,10 @@ const sendRowState = (e) => {
   ////console.log(e);
   if (e == "created") {
     disablegrid.value = false;
+    disablegrid2.value = false;
   } else {
     disablegrid.value = true;
+    disablegrid2.value = true;
   }
 };
 
@@ -282,9 +285,9 @@ const searchButton = async () => {
       cond3,
       cond2.value
     );
-    //console.log(res);
+    console.log(res);
     rowData.value = res.data.List;
-
+    updateRow.value = res.data.List;
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -294,6 +297,7 @@ const searchButton = async () => {
   }
 };
 const disablegrid = ref(true);
+const disablegrid2 = ref(true);
 const addrowDefault = ref("");
 const addRow4 = ref(false);
 const addButton = () => {
@@ -352,7 +356,8 @@ const saveButton = async () => {
   }
   try {
     store.state.loading = true;
-
+    // console.log(updateRow.value);
+    // console.log(updateStateRow.value);
     const groups = updateRow.value
       .filter((item, index) => updateStateRow.value.created.includes(index))
       .map((item) => item.lngStoreGroup)
@@ -388,7 +393,7 @@ const saveButton = async () => {
       struseradminid2
     );
 
-    //console.log(res);
+    console.log(res);
 
     ////console.log(res);
     if (res.data.RESULT_CD == "99") {
@@ -425,7 +430,7 @@ const deleteButton = async () => {
     });
     return;
   }
-  // ////console.log(updateStateRow.value);
+  console.log(updateRow.value.filter((item) => item.checkbox == true).length);
   if (updateRow.value.filter((item) => item.checkbox == true).length == 0) {
     Swal.fire({
       title: "경고",
@@ -489,9 +494,10 @@ const initGrid = () => {
     rowData.value = [];
   }
   afterSearch.value = false;
-
-  cond.value = "";
-  cond2.value = "";
+  disablegrid2.value = true;
+  disablegrid.value = true;
+  // cond.value = "";
+  // cond2.value = "";
   gridvalue1.value = "";
   gridvalue2.value = "";
   gridvalue3.value = "";

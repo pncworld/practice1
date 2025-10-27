@@ -55,6 +55,12 @@
       @click="showMenus(3)">
       주방출력구성
     </button>
+    <button
+      class="contents_tab-button"
+      :class="{ 'text-blue-600': currentMenu == 4 }"
+      @click="showMenus(4)">
+      영수증 문구출력
+    </button>
   </div>
   <div class="flex h-4/6 w-full mt-5">
     <div class="flex flex-col w-6/12 h-4/6">
@@ -76,6 +82,12 @@
           v-if="currentMenu == 3">
           포트주방출력 목록
         </div>
+        <div
+          class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold"
+          v-if="currentMenu == 4">
+          영수증 출력
+        </div>
+         
 
         <div class="mt-3">
           <button
@@ -93,6 +105,12 @@
             삭제
           </button>
         </div>
+
+        <div class="" v-if="currentMenu == 4">
+          <button
+            class="whitebutton" @click="initAllSection">초기화</button>
+            <button class="whitebutton"
+            @click="dupliData">복사</button><button class="whitebutton" @click="dupliAllData">붙여넣기</button></div>
       </div>
 
       <div class="h-[25vh]" v-show="currentMenu == 1">
@@ -218,6 +236,61 @@
           @updatedRowData="updatedRowData3"
           @clickedRowData="clickedRowData3"
           @realgridname="realgridname3"></Realgrid>
+      </div>
+
+     <div class="h-[50vh]" v-show="currentMenu == 4">
+        <div class="h-[15vh] w-[45vw] ml-10 mt-5" v-show="currentMenu == 4">
+          <div class="w-full h-full ">
+                  <!-- 그리드 영역 -->
+            <Realgrid class="w-[100%] h-[130%] " :progname="'MST44_062INS_VUE'" :progid="3" :reload="reload" :rowStateeditable="false"
+              :rowData="rowData4" @clickedRowData="clickedRowData4" @realgridname="realgridname4" @selectedIndex2="selectedIndex5"
+              @updatedRowData="updatedRowData4" :changeColid="changeColid" :changeRow="changeRow" :changeNow="changeNow4"
+              :changeValue2="changeValue" :initSelect="false" ></Realgrid>
+          </div>
+                <!-- 그리드 영역 -->
+        </div>
+
+        <div v-show="currentMenu == 4" class="mt-12 flex flex-col justify-start ml-10 h-[35vh] w-[45vw] rounded-lg ">
+          <h1 class="text-xl font-bold flex justify-start">영수증 문구</h1>
+          <div class="grid grid-rows-[1fr,4fr] grid-cols-[2fr,9fr] h-[70%]">
+            <div class="bg-gray-100 flex justify-center items-center rounded-tl-lg border border-gray-600">
+              영수증 상단 문구
+            </div>
+            <div
+              class="justify-center items-center rounded-tr-lg border border-gray-600 grid grid-rows-2 grid-cols-1 w-full px-2 py-2 gap-1">
+              <div class=" w-full h-full px-2 py-2 rounded-lg  text-red-500">
+                ({{ receiptUByte }}byte)
+              </div>
+              <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
+                v-model="receiptU" @input="handleInput" @click="caculateByte3" :disabled="!afterSearch4"
+               >
+              </input>
+            </div>
+            <div class="bg-gray-100 flex justify-center items-center rounded-bl-lg border border-gray-600">
+              영수증 하단 문구
+            </div>
+            <div
+              class="justify-center items-center rounded-br-lg border border-gray-600 grid grid-rows-6 grid-cols-1 w-full px-2 py-2 gap-1">
+              <div class=" w-full h-full px-2 py-2 rounded-lg  flex justify-center text-red-500">({{ receiptDByte }}byte)
+              </div>
+              <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
+                :value="receiptD1" name="receiptD1"  @input="handleInput2" @blur="handleBlur" @click="selecedReceiptSection(1)"
+                :disabled="!afterSearch4"></input>
+              <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
+                 :value="receiptD2"  name="receiptD2" @input="handleInput2" @blur="handleBlur" @click="selecedReceiptSection(2)"
+                :disabled="!afterSearch4"></input>
+              <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
+                 :value="receiptD3"  name="receiptD3" @input="handleInput2" @blur="handleBlur" @click="selecedReceiptSection(3)"
+                :disabled="!afterSearch4"></input>
+              <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
+                 :value="receiptD4"  name="receiptD4" @input="handleInput2"  @blur="handleBlur" @click="selecedReceiptSection(4)"
+                :disabled="!afterSearch4"></input>
+              <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
+                 :value="receiptD5" name="receiptD5"  @input="handleInput2" @blur="handleBlur" @click="selecedReceiptSection(5)"
+                :disabled="!afterSearch4"></input>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div
@@ -743,6 +816,84 @@
         </div>
       </div>
     </div>
+
+     <div class="w-[52%] h-[20%] ml-10 mt-44 flex flex-col justify-center" v-if="currentMenu == 4">
+      <div class="font-bold text-xl flex justify-start items-center mt-28 ml-60">영수증 예시</div>
+      <div class="flex justify-start items-center h-[45vh] w-[20vw] bg-gray-100 ml-28 mt-20">
+        <div class="w-full h-[130%] bg-white p-5 border shadow-lg rounded-lg">
+          <!-- 상단 수정 가능 영역 -->
+          <div class="text-center space-y-2">
+            <input type="text" v-model="receiptU" class="flex justify-start w-full disabled:bg-white"  disabled>
+            <div>{{receiptP1}}</div>
+            <div>{{ receiptP3 }}</div>
+            <div>{{receiptP2}}</div>
+          </div>
+          <hr class="my-3 border-gray-300" />
+
+          <!-- 영수증 본문 -->
+          <div class="text-sm">
+            <div class="flex justify-between">
+              <span>YYYY-MM-DD 00:00:00</span>
+              <span>01-0001</span>
+            </div>
+            <div class="mt-1 flex justify-end">
+              <span>T:01 Guest Type: 0 Count: 0</span>
+            </div>
+            <hr class="my-3 border-gray-300" />
+
+            <!-- 메뉴 리스트 -->
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span>메뉴1</span>
+                <span>1</span>
+                <span>0</span>
+              </div>
+              <div class="flex justify-between">
+                <span>메뉴2</span>
+                <span>2</span>
+                <span>0</span>
+              </div>
+            </div>
+            <hr class="my-3 border-gray-300" />
+
+            <!-- 합계 -->
+            <div class="flex justify-between font-semibold">
+              <span>합 계</span>
+              <span>0</span>
+            </div>
+            <div class="flex justify-between">
+              <span>부가세 과세 물품 가액</span>
+              <span>0</span>
+            </div>
+            <div class="flex justify-between">
+              <span>부가세</span>
+              <span>0</span>
+            </div>
+            <hr class="my-3 border-gray-300" />
+
+            <!-- 하단 수정 가능 영역 -->
+            <div class="flex justify-between font-semibold">
+              <span>현 금</span>
+              <div>0</div>
+            </div>
+            <div class="text-sm mt-1 flex justify-between">
+              <span>IN-00:00:00</span>
+              <span class="float-right">CASHIER: 점장</span>
+            </div>
+
+            <div class="flex flex-col mt-2">
+
+              <input type="text" v-model="receiptD1" disabled class="disabled:bg-white">
+              <input type="text" v-model="receiptD2"  disabled class="disabled:bg-white">
+              <input type="text" v-model="receiptD3"  disabled class="disabled:bg-white">
+              <input type="text" v-model="receiptD4"  disabled class="disabled:bg-white">
+              <input type="text" v-model="receiptD5"  disabled class="disabled:bg-white">
+
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
   </div>
   <!-- 탭3 영역\-->
 </template>
@@ -754,15 +905,18 @@ import {
   getKitchenPortList,
   getMenuCodeEnroll,
   getMenuList,
+  getMstBasic,
+  getStorePosList,
   saveKitchenGroupList,
   saveMenuKPG,
   savePortKitchenConfig,
+  saveReceiptData,
 } from "@/api/master";
 /*
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -856,6 +1010,7 @@ const currentMenu = ref(1);
 const realgrid2Name = ref("");
 const realgrid3Name = ref("");
 const realgrid4Name = ref("");
+const realgrid5Name = ref("");
 const selectedKitchenGroup = ref("");
 const selectedmenuNm = ref("");
 const selectedmenuCode = ref("");
@@ -869,6 +1024,9 @@ const realgridname2 = (e) => {
 };
 const realgridname3 = (e) => {
   realgrid4Name.value = e;
+};
+const realgridname4 = (e) => {
+  realgrid5Name.value = e;
 };
 
 const searchSpecialColId = ref([]);
@@ -888,6 +1046,12 @@ watch(currentMenu, () => {
   setTimeout(() => {
     RealGrid.getGridInstance(reagrid4).resetSize();
     RealGrid.getGridInstance(reagrid4).refresh(true);
+  }, 100);
+
+  const reagrid5 = document.getElementById(realgrid5Name.value);
+  setTimeout(() => {
+    RealGrid.getGridInstance(reagrid5).resetSize();
+    RealGrid.getGridInstance(reagrid5).refresh(true);
   }, 100);
 });
 
@@ -972,13 +1136,16 @@ const showMenus = async (value) => {
 
     KitchenGroup.value = res3.data.List;
     afterSearch2.value = true;
-  } else {
+  } else if (value == 3) {
     currentMenu.value = 3;
     nowStoreCd.value = saveStoreCode.value;
     const res3 = await getKitchenGroupList2(groupCd.value, nowStoreCd.value);
 
     KitchenGroup.value = res3.data.List;
     hidesub.value = true;
+  } else {
+    currentMenu.value = value;
+    hidesub.value = true
   }
 };
 
@@ -1030,6 +1197,9 @@ const afterCategory = ref(false);
  * 페이지 매장 코드 세팅
  */
 const saveStoreCode = ref("");
+const receiptP1 = ref('')
+const receiptP2 = ref('')
+const receiptP3 = ref('')
 const handleStoreCd = async (newValue) => {
   saveStoreCode.value = newValue;
   //   afterSearch.value = false;
@@ -1049,6 +1219,19 @@ const handleStoreCd = async (newValue) => {
     nowStoreCd.value = newValue;
   } else {
     nowStoreCd.value = newValue;
+  }
+
+
+    const res = await getMstBasic(store.state.userData.lngStoreGroup , saveStoreCode.value)
+   
+  if(res.data.List.length > 0){
+  receiptP1.value = res.data.List[0].strName + ' ' + res.data.List[0].strTel
+  receiptP2.value = res.data.List[0].strRegistNo.slice(0,3) + '-' + res.data.List[0].strRegistNo.slice(3,6) + '-' + res.data.List[0].strRegistNo.slice(6,11)
+    receiptP3.value = res.data.List[0].strAddr
+  } else {
+    receiptP1.value = ''
+    receiptP2.value = ''
+    receiptP3.value = ''
   }
 
   ////console.log(newValue);
@@ -1102,6 +1285,9 @@ const selectedIndex3 = (e) => {
 const selectedIndex4 = (e) => {
   changeRow.value = e;
 };
+const selectedIndex5 = (e) => {
+  changeRow.value = e;
+};
 const changeValues = (e) => {
   if (e.target.name == "lngGroupCd") {
     changeColid.value = "lngGroupCd";
@@ -1133,6 +1319,7 @@ const modified = ref(false);
 const afterSearch = ref(false);
 const afterSearch2 = ref(false);
 const afterSearch3 = ref(false);
+const afterSearch4 = ref(false);
 const MenuList = ref([]);
 const MenuKeyList = ref([]);
 const clickedScreenOrMenu = ref(false);
@@ -1222,7 +1409,7 @@ const selcetedrowData = (newValue) => {
 /**
  *  조회 함수
  */
-
+const rowData4 = ref([])
 const searchButton = async () => {
   changeMode.value = false;
   Category.value = [];
@@ -1241,8 +1428,9 @@ const searchButton = async () => {
       return;
     }
   }
-  store.state.loading = true;
+  
   try {
+    store.state.loading = true;
     let res;
     if (currentMenu.value == 1) {
       res = await getKitchenGroupList(groupCd.value);
@@ -1277,6 +1465,24 @@ const searchButton = async () => {
       const res3 = await getKitchenGroupList2(groupCd.value, nowStoreCd.value);
 
       KitchenGroup.value = res3.data.List;
+    } else if (currentMenu.value == '4'){
+      receiptD1.value = ''
+      receiptD2.value = ''
+      receiptD3.value = ''
+      receiptD4.value = ''
+      receiptD5.value = ''
+      receiptU.value = ''
+
+    
+      receiptDByte.value = ''
+      receiptUByte.value = ''
+      rowData4.value = []
+      res = await getStorePosList(groupCd.value, nowStoreCd.value)
+      //comsole.log(res)
+      rowData4.value = res.data.RECEIPTLIST
+      afterSearch4.value = true
+
+
     } else {
       //comsole.log(groupCd.value, nowStoreCd.value, nowStoreAreaCd.value);
       const res = await getKitchenPortList(
@@ -1358,6 +1564,16 @@ const saveButton = async () => {
     }
   } else if (currentMenu.value == 2) {
     if (afterSearch2.value == false) {
+      Swal.fire({
+        title: "경고",
+        text: "조회를 먼저 진행해주세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } else if (currentMenu.value == '4'){
+     if (afterSearch4.value == false) {
       Swal.fire({
         title: "경고",
         text: "조회를 먼저 진행해주세요.",
@@ -1623,6 +1839,14 @@ const saveButton = async () => {
             lngPKitchen20s,
             strNames
           );
+        } else if ( currentMenu.value == '4'){
+          const posNos = updatedList4.value.map(item => item.intPosNo)
+          const areaCodes = updatedList4.value.map(item => item.lngAreaCode)
+          const strreceipts = updatedList4.value.map(item => item.strReceiptU)
+          const strreceipts2 = updatedList4.value.map(item => item.strReceiptD)
+
+          res = await saveReceiptData(groupCd.value, saveStoreCode.value, posNos.join(','), areaCodes.join(','), strreceipts.join(','), strreceipts2.join(','))
+          console.log(res)
         }
 
         //comsole.log(res);
@@ -1796,6 +2020,286 @@ const initGrid3 = () => {
   gridValue23.value = "";
   gridValue24.value = "";
 };
+
+
+const changeNow4 = ref(false)
+const receiptU = ref('')
+const receiptD1 = ref('')
+const receiptD2 = ref('')
+const receiptD3 = ref('')
+const receiptD4 = ref('')
+const receiptD5 = ref('')
+function getByteLength2(str) {
+  let byteLen = 0;
+ 
+  if(str !=undefined){
+     for (let i = 0; i < str.length; i++) {
+    byteLen += str.charCodeAt(i) > 127 ? 2 : 1;
+  }
+  return byteLen;
+  } else {
+    return 0
+  }
+ 
+}
+function splitStringByByteLength(str, maxByteLength) {
+
+  let chunks = [];
+  let currentByteLength = 0;
+  let currentChunk = "";
+ 
+  for (const char of str) {
+    const byte = getByteLength2(char)
+
+    if (currentByteLength + byte > maxByteLength) {
+      chunks.push(currentChunk); // 현재 청크를 추가
+      currentChunk = ""; // 청크 초기화
+      currentByteLength = 0; // 바이트 길이 초기화
+    }
+
+    currentChunk += char
+    currentByteLength += byte;
+  }
+
+  // 마지막 청크 추가
+  if (currentChunk) {
+    chunks.push(currentChunk);
+  }
+
+  return chunks;
+}
+
+const clickedRowData4 = (newValue) => {
+  
+  receiptU.value = newValue[2]
+   const result = splitStringByByteLength(newValue[3], 42)
+
+  receiptD1.value = result[0]
+  receiptD2.value = result[1]
+  receiptD3.value = result[2]
+  receiptD4.value = result[3]
+  receiptD5.value = result[4]
+}
+
+const updatedList4 = ref([])
+const updatedRowData4 = (e) => {
+
+  updatedList4.value = e
+  console.log(e)
+}
+
+const handleInput = (e) => {
+  changeColid.value = 'strReceiptU'
+  changeValue.value = e.target.value
+
+  changeNow4.value = !changeNow4.value
+
+}
+let isSwalOpen = false;
+const handleInput2 = (e) => {
+  const isValid = calculateByte2(e);
+  changeColid.value = 'strReceiptD';
+  if (!isValid) return;
+
+  const name = e.target.name;
+  const value = e.target.value;
+  if(value == undefined) value = '';
+  if (name === 'receiptD1') receiptD1.value = value;
+  else if (name === 'receiptD2') receiptD2.value = value;
+  else if (name === 'receiptD3') receiptD3.value = value;
+  else if (name === 'receiptD4') receiptD4.value = value;
+  else if (name === 'receiptD5') receiptD5.value = value;
+};
+
+const calculateByte2 = async(e) => {
+
+let inputValue = e.target.value
+//comsole.log(inputValue)
+receiptDByte.value = getByteLength2(inputValue)
+if (receiptDByte.value >= 43) {
+  //comsole.log(inputValue)
+  isSwalOpen = true ; 
+    const result = await Swal.fire({
+    title: '경고',
+    text: '43바이트 이상 입력할 수 없습니다.',
+    icon: 'warning',
+    confirmButtonText: '확인'
+  }).then((result) => {
+    
+    if (result.isConfirmed) {
+
+      isSwalOpen = false
+      while (receiptDByte.value >= 43) {
+        inputValue = inputValue.slice(0, inputValue.length - 1)
+
+      
+  
+        receiptDByte.value = getByteLength2(inputValue)
+      }
+      if (e.target.name == 'receiptD1') {
+        receiptD1.value = inputValue
+      } else if (e.target.name == 'receiptD2') {
+        receiptD2.value = inputValue
+      } else if (e.target.name == 'receiptD3') {
+        receiptD3.value = inputValue
+      } else if (e.target.name == 'receiptD4') {
+        receiptD4.value = inputValue
+      } else if (e.target.name == 'receiptD5') {
+        receiptD5.value = inputValue
+      }
+
+    
+    }
+
+
+  }
+  )
+
+
+  return false;
+} else {
+  return true
+}
+
+
+}
+const receiptUByte = ref('0')
+const receiptDByte = ref('0')
+
+const caculateByte3 = (e) => {
+  changeColid.value = 'strReceiptU'
+ 
+  let inputValue = e.target.value
+  receiptUByte.value = getByteLength2(inputValue)
+  changeValue.value = e.target.value
+
+  changeNow4.value = !changeNow4.value
+}
+const selecedSection = ref()
+const selecedReceiptSection = (value) => {
+  changeColid.value = 'strReceiptD'
+  selecedSection.value = value
+
+  if (value == 1) {
+    receiptDByte.value = getByteLength2(receiptD1.value)
+
+  } else if (value == 2) {
+    receiptDByte.value = getByteLength2(receiptD2.value)
+
+  } else if (value == 3) {
+    receiptDByte.value = getByteLength2(receiptD3.value)
+  } else if (value == 4) {
+    receiptDByte.value = getByteLength2(receiptD4.value)
+  } else if (value == 5) {
+    receiptDByte.value = getByteLength2(receiptD5.value)
+  }
+}
+
+const addSpace42Text = (value) => {
+  let prechangeValue = value
+  
+  let byteLength = getByteLength2(prechangeValue)
+
+  while (byteLength < 42) {
+    prechangeValue += ' ';  // 공백을 추가
+    byteLength = getByteLength2(prechangeValue) // 바이트 길이를 다시 계산
+  }
+  return prechangeValue
+}
+
+const handleBlur = (e) => {
+  if(isSwalOpen == true){
+    return
+  }
+
+  receiptD1.value = receiptD1.value == undefined ? '' : receiptD1.value
+  receiptD2.value =receiptD2.value == undefined ? '' : receiptD2.value
+  receiptD3.value =receiptD3.value == undefined ? '' : receiptD3.value
+  receiptD4.value = receiptD4.value == undefined ? '' : receiptD4.value
+  receiptD5.value = receiptD5.value == undefined ? '' : receiptD5.value
+  if(e.target.name == 'receiptD1'){
+    changeValue.value = addSpace42Text(e.target.value) + addSpace42Text(receiptD2.value) + addSpace42Text(receiptD3.value) + addSpace42Text( receiptD4.value) + addSpace42Text(receiptD5.value) 
+  } else if(e.target.name == 'receiptD2'){
+    changeValue.value = addSpace42Text( receiptD1.value)+ addSpace42Text(e.target.value) + addSpace42Text(receiptD3.value) + addSpace42Text(receiptD4.value) + addSpace42Text(receiptD5.value) 
+  } else if(e.target.name == 'receiptD3'){
+    changeValue.value =addSpace42Text(receiptD1.value)+ addSpace42Text(receiptD2.value) + addSpace42Text(e.target.value)  + addSpace42Text(receiptD4.value) + addSpace42Text(receiptD5.value) 
+  } else if(e.target.name == 'receiptD4'){
+    changeValue.value = addSpace42Text(receiptD1.value) + addSpace42Text(receiptD2.value) +addSpace42Text(receiptD3.value)+ addSpace42Text(e.target.value) + addSpace42Text(receiptD5.value)
+  } else if(e.target.name == 'receiptD5'){
+    changeValue.value = addSpace42Text(receiptD1.value) + addSpace42Text(receiptD2.value) + addSpace42Text(receiptD3.value)+ addSpace42Text(receiptD4.value) + addSpace42Text(e.target.value)
+  }
+  
+
+  changeNow4.value = !changeNow4.value
+}
+const initAllSection = async () => {
+  receiptU.value = ''
+  receiptD1.value = ''
+  receiptD2.value = ''
+  receiptD3.value = ''
+  receiptD4.value = ''
+  receiptD5.value = ''
+  changeColid.value = 'strReceiptU'
+  changeValue.value = ''
+  changeNow4.value = !changeNow4.value
+
+  await nextTick() // DOM 업데이트 기다림
+
+  changeColid.value = 'strReceiptD'
+  changeValue.value = ''
+  changeNow4.value = !changeNow4.value
+}
+
+let changedupliindex = ''
+let savedreceiptU = ''
+let savedreceiptD1 = ''
+let savedreceiptD2 = ''
+let savedreceiptD3 = ''
+let savedreceiptD4 = ''
+let savedreceiptD5 = ''
+
+const dupliData = () => {
+  changedupliindex = changeRow.value
+  savedreceiptU = receiptU.value
+  savedreceiptD1 = receiptD1.value
+  savedreceiptD2 = receiptD2.value
+  savedreceiptD3 = receiptD3.value
+  savedreceiptD4 = receiptD4.value
+  savedreceiptD5 = receiptD5.value
+
+  Swal.fire({
+      title: '완료',
+      text: '복사 완료',
+      icon: 'success',
+      confirmButtonText: '확인'
+    })
+    return ;
+}
+
+const dupliAllData = async() => {
+  receiptU.value = savedreceiptU
+  //comsole.log(savedreceiptU)
+  //comsole.log(changeNow2.value)
+  changeColid.value = 'strReceiptU'
+  changeValue.value = savedreceiptU
+  changeNow4.value = !changeNow4.value
+
+
+  await nextTick()
+ 
+  receiptD1.value = savedreceiptD1
+  receiptD2.value = savedreceiptD2
+  receiptD3.value = savedreceiptD3
+  receiptD4.value = savedreceiptD4
+  receiptD5.value = savedreceiptD5
+   changeColid.value = 'strReceiptD'
+   changeValue.value = savedreceiptD1 + savedreceiptD2 + savedreceiptD3 + savedreceiptD4 + savedreceiptD5
+
+   //comsole.log(changeValue.value)
+   //comsole.log(changeNow2.value)
+   changeNow4.value = !changeNow4.value
+
+}
 </script>
 
 <style scoped></style>

@@ -171,15 +171,15 @@
     </div>
 
     <div class="w-[52%] h-[20%] ml-10 mt-44 flex flex-col justify-center" v-if="currentMenu == 3">
-      <div class="font-bold text-xl flex justify-start items-center">영수증 예시</div>
-      <div class="flex justify-center items-center h-[45vh] w-[20vw] bg-gray-100 ml-28 mt-10">
+      <div class="font-bold text-xl flex justify-start items-center mt-28 ml-60">영수증 예시</div>
+      <div class="flex justify-start items-center h-[45vh] w-[20vw] bg-gray-100 ml-28 mt-20">
         <div class="w-full h-[130%] bg-white p-5 border shadow-lg rounded-lg">
           <!-- 상단 수정 가능 영역 -->
           <div class="text-center space-y-2">
             <input type="text" v-model="receiptU" class="flex justify-start w-full disabled:bg-white"  disabled>
-            <div>선불 데모매장 0212345678</div>
-            <div>주소상세주소</div>
-            <div>111-11-11111</div>
+            <div>{{receiptP1}}</div>
+            <div>{{ receiptP3 }}</div>
+            <div>{{receiptP2}}</div>
           </div>
           <hr class="my-3 border-gray-300" />
 
@@ -260,7 +260,7 @@
 </template>
 
 <script setup>
-import { getKitchenSettingList, getPrintList, getStorePosList, saveKitchenSettingAll, savePrintNm, saveReceiptData } from '@/api/master';
+import { getKitchenSettingList, getMstBasic, getPrintList, getStorePosList, saveKitchenSettingAll, savePrintNm, saveReceiptData } from '@/api/master';
 
 /*
  * 공통 표준  Function
@@ -314,10 +314,13 @@ import PageName from '@/components/pageName.vue';
 /**
  * 	화면 Load시 실행 스크립트
  */
-
+const store = useStore();
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
 });
+
+
 // 더미 데이터
 const disabled = ref(true)
 const items = ref([]);
@@ -484,7 +487,7 @@ const updatedRowData3 = (newValue) => {
   updatedList3.value = newValue
   //comsole.log(updatedList3.value)
 }
-const nowStoreCd = ref();
+const nowStoreCd = ref(store.state.userData.lngPosition);
 const afterCategory = ref(false);
 /**
  * 페이지 매장 코드 세팅
@@ -502,6 +505,19 @@ const handleStoreCd = async (newValue) => {
   SubMenuGroup.value = []
   ischecked.value = false
   //console.log(newValue)
+
+  const res = await getMstBasic(store.state.userData.lngStoreGroup , newValue)
+  
+  if(res.data.List.length > 0){
+  receiptP1.value = res.data.List[0].strName + ' ' + res.data.List[0].strTel
+  receiptP2.value = res.data.List[0].strRegistNo.slice(0,3) + '-' + res.data.List[0].strRegistNo.slice(3,6) + '-' + res.data.List[0].strRegistNo.slice(6,11)
+    receiptP3.value = res.data.List[0].strAddr
+  } else {
+    receiptP1.value = ''
+    receiptP2.value = ''
+    receiptP3.value = ''
+  }
+ 
   nowStoreCd.value = newValue;
   searchButton()
   //comsole.log(nowStoreCd.value)
@@ -544,7 +560,7 @@ let isSwalOpen = false;
 const handleInput2 = (e) => {
   const isValid = calculateByte2(e);
   changeColid.value = 'strReceiptD';
-
+  console.log(e)
   if (!isValid) return;
 
   const name = e.target.name;
@@ -560,10 +576,9 @@ const handleInput2 = (e) => {
 
 const calculateByte2 = async(e) => {
 
-const encoder = new TextEncoder();
 let inputValue = e.target.value
 //comsole.log(inputValue)
-receiptDByte.value = encoder.encode(inputValue).length
+receiptDByte.value = getByteLength2(inputValue)
 if (receiptDByte.value >= 43) {
   //comsole.log(inputValue)
   isSwalOpen = true ; 
@@ -581,9 +596,8 @@ if (receiptDByte.value >= 43) {
         inputValue = inputValue.slice(0, inputValue.length - 1)
 
       
-        //comsole.log(receiptU.value)
-        //comsole.log(inputValue)
-        receiptDByte.value = encoder.encode(inputValue).length
+  
+        receiptDByte.value = getByteLength2(inputValue)
       }
       if (e.target.name == 'receiptD1') {
         receiptD1.value = inputValue
@@ -627,7 +641,6 @@ const changeValues = (e) => {
   changeNow.value = !changeNow.value
 }
 
-const store = useStore();
 /**
  *  그리드 검색어 세팅
  */
@@ -1089,9 +1102,9 @@ const changeColid = ref('')
 
 const caculateByte3 = (e) => {
   changeColid.value = 'strReceiptU'
-  const encoder = new TextEncoder();
+ 
   let inputValue = e.target.value
-  receiptUByte.value = encoder.encode(inputValue).length
+  receiptUByte.value = getByteLength2(inputValue)
   changeValue.value = e.target.value
 
   changeNow2.value = !changeNow2.value
@@ -1155,19 +1168,19 @@ const selecedSection = ref()
 const selecedReceiptSection = (value) => {
   changeColid.value = 'strReceiptD'
   selecedSection.value = value
-  const encoder = new TextEncoder();
+
   if (value == 1) {
-    receiptDByte.value = encoder.encode(receiptD1.value).length
+    receiptDByte.value = getByteLength2(receiptD1.value)
 
   } else if (value == 2) {
-    receiptDByte.value = encoder.encode(receiptD2.value).length
+    receiptDByte.value = getByteLength2(receiptD2.value)
 
   } else if (value == 3) {
-    receiptDByte.value = encoder.encode(receiptD3.value).length
+    receiptDByte.value = getByteLength2(receiptD3.value)
   } else if (value == 4) {
-    receiptDByte.value = encoder.encode(receiptD4.value).length
+    receiptDByte.value = getByteLength2(receiptD4.value)
   } else if (value == 5) {
-    receiptDByte.value = encoder.encode(receiptD5.value).length
+    receiptDByte.value = getByteLength2(receiptD5.value)
   }
 }
 
@@ -1175,12 +1188,12 @@ const selecedReceiptSection = (value) => {
 
 const addSpace42Text = (value) => {
   let prechangeValue = value
-  const encoder = new TextEncoder();
-  let byteLength = encoder.encode(prechangeValue).length;
+  
+  let byteLength = getByteLength2(prechangeValue)
 
   while (byteLength < 42) {
     prechangeValue += ' ';  // 공백을 추가
-    byteLength = encoder.encode(prechangeValue).length;  // 바이트 길이를 다시 계산
+    byteLength = getByteLength2(prechangeValue) // 바이트 길이를 다시 계산
   }
   return prechangeValue
 }
@@ -1258,26 +1271,30 @@ watch(receiptD5, () => {
   }, 5);
 })
 
-
+function getByteLength2(str) {
+  let byteLen = 0;
+  for (let i = 0; i < str.length; i++) {
+    byteLen += str.charCodeAt(i) > 127 ? 2 : 1;
+  }
+  return byteLen;
+}
 function splitStringByByteLength(str, maxByteLength) {
-  const encoder = new TextEncoder(); // UTF-8로 인코딩
-  const bytes = encoder.encode(str); // 문자열을 바이트 배열로 변환
+
   let chunks = [];
   let currentByteLength = 0;
   let currentChunk = "";
-
-  for (let i = 0; i < str.length; i++) {
-    const charBytes = encoder.encode(str[i]); // 현재 문자의 바이트 배열
-    const charByteLength = charBytes.length; // 현재 문자의 바이트 길이
-
-    if (currentByteLength + charByteLength > maxByteLength) {
+  console.log(str)
+  for (const char of str) {
+    const byte = getByteLength2(char)
+    console.log(byte)
+    if (currentByteLength + byte > maxByteLength) {
       chunks.push(currentChunk); // 현재 청크를 추가
       currentChunk = ""; // 청크 초기화
       currentByteLength = 0; // 바이트 길이 초기화
     }
 
-    currentChunk += str[i];
-    currentByteLength += charByteLength;
+    currentChunk += char
+    currentByteLength += byte;
   }
 
   // 마지막 청크 추가
@@ -1300,9 +1317,10 @@ const selectedIndex2 = (e) => {
  */
 
 const clickedRowData2 = (newValue) => {
-  //comsole.log(newValue)
+
   receiptU.value = newValue[2]
-  const result = splitStringByByteLength(newValue[3], 42)
+   const result = splitStringByByteLength(newValue[3], 42)
+
   receiptD1.value = result[0]
   receiptD2.value = result[1]
   receiptD3.value = result[2]
@@ -1353,6 +1371,12 @@ const handleinitAll = (newvalue) => {
   searchword3.value = ''
   afterSearch.value = false
 }
+
+const receiptP2 = ref('선불 데모매장')
+const receiptP1 = ref('111-11-1111')
+const receiptP3 = ref('')
+
+
 </script>
 
 

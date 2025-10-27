@@ -386,6 +386,25 @@ const deleterow2 = ref(false);
  */
 
 const saveButton = async () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "조회를 먼저해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (stateRows.value.updated.length == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "변경된 사항이 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   const bpids = updatedRows.value
     .map((item) => item.BP_ID)
     .filter((item) => item == undefined || item == "" || item == null).length;

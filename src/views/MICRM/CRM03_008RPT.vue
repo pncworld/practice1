@@ -99,7 +99,11 @@
           </select>
 
           <div class="flex ml-1 h-8 justify-center items-center">
-            <input type="number" class="w-32 h-8" v-model="cond5" />
+            <input
+              type="number"
+              class="w-32 h-8"
+              v-model="cond5"
+              @input="setCond5" />
             <div class="text-base font-semibold">Point</div>
           </div>
         </div>
@@ -113,7 +117,11 @@
           </select>
 
           <div class="flex ml-1 h-8 justify-center items-center">
-            <input type="number" class="w-32 h-8" v-model="cond7" />
+            <input
+              type="number"
+              class="w-32 h-8"
+              v-model="cond7"
+              @input="setCond7" />
           </div>
         </div>
 
@@ -126,7 +134,11 @@
           </select>
 
           <div class="flex ml-1 h-8 justify-center items-center">
-            <input type="number" class="w-32 h-8" v-model="cond9" />
+            <input
+              type="number"
+              class="w-32 h-8"
+              v-model="cond9"
+              @input="setCond9" />
           </div>
         </div>
       </div>
@@ -341,16 +353,16 @@ const searchButton = async () => {
       sDate3.value,
       eDate3.value,
       cond4.value,
-      cond5.value,
+      cond5.value == "" ? null : cond5.value,
       cond6.value,
-      cond7.value,
+      cond7.value == "" ? null : cond7.value,
       cond8.value,
-      cond9.value,
+      cond9.value == "" ? null : cond9.value,
       cond3.value
     );
 
     rowData.value = res.data.List;
-    ////console.log(res);
+    console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -399,5 +411,15 @@ const selectedExcelStore = ref("");
 const excelStore = (e) => {
   selectedExcelStore.value = e;
   //comsole.log(e);
+};
+
+const setCond5 = (e) => {
+  cond5.value = e.target.value;
+};
+const setCond7 = (e) => {
+  cond7.value = e.target.value;
+};
+const setCond9 = (e) => {
+  cond9.value = e.target.value;
 };
 </script>

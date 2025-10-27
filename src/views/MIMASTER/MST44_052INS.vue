@@ -336,7 +336,9 @@
                   "
                   class="h-20 w-28 flex justify-center"
                   ><img
-                    :src="`https://www.pncapi.kr/MenuImage/Image/${item.strUserFileName}?v=${Date.now()}`"
+                    :src="`https://www.pncapi.kr/MenuImage/Image/${
+                      item.strUserFileName
+                    }?v=${Date.now()}`"
                     alt=""
                     class="h-full w-full" /></span
                 ><span
@@ -899,6 +901,10 @@ const saveButton = async () => {
         const menuKeyNmarr = MenuKeyList.value
           .filter((item) => item.intPosNo == posNo.value)
           .map((item) => item.strKeyName);
+
+        const intKeyNos = MenuKeyList.value
+          .filter((item) => item.intPosNo == posNo.value)
+          .map((item) => item.intKeyNo);
         //comsole.log(posNo.value);
         //comsole.log(intKeySeqs.join(","));
         //comsole.log(screenNumarr.join(","));
@@ -912,7 +918,8 @@ const saveButton = async () => {
           intKeySeqs.join("\u200B"),
           screenNumarr.join("\u200B"),
           lngScrarr.join("\u200B"),
-          menuKeyNmarr.join("\u200B")
+          menuKeyNmarr.join("\u200B"),
+          intKeyNos.join("\u200B")
         );
 
         console.log(res);

@@ -5,17 +5,18 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomePage2 from "@/views/homePage2.vue";
 import LoginView from "../views/LoginView.vue";
 import accountRouter from "./accountRouter";
+import exceptRouter from "./exceptRouter";
 import masterRouter from "./masterRouter";
 import miattendRouter from "./miattendRouter";
+import micrmRouter from "./micrmRouter";
+import mihrRouter from "./mihrRouter";
+import minoticeRouter from "./minoticeRouter";
+import miposRouter from "./miposRouter";
+import mipurRouter from "./mipurRouter";
+import mistockRouter from "./mistockRouter";
 import mobileRouter from "./mobileRouter";
 import salesRouter from "./salesRouter";
 import systemRouter from "./systemRouter";
-import micrmRouter from "./micrmRouter";
-import minoticeRouter from "./minoticeRouter";
-import mihrRouter from "./mihrRouter";
-import miposRouter from "./miposRouter";
-import mistockRouter from "./mistockRouter";
-import mipurRouter from "./mipurRouter";
 
 const isMobile = () => {
   const userAgent = window.navigator.userAgent;
@@ -26,6 +27,10 @@ const routes = [
   {
     path: "/",
     component: LoginView,
+  },
+  {
+    path: "/VUEPOS",
+    children: exceptRouter(),
   },
   {
     path: "/dashboard",

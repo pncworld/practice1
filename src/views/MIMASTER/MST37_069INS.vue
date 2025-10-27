@@ -14,7 +14,7 @@
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="addButton" class="button primary md:w-auto w-14">
+        <button @click="addButton" class="button new md:w-auto w-14">
           <!-- 여기서부터 -->
           신규
         </button>
@@ -96,7 +96,10 @@
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
-    <div class="w-full h-[80%]">
+    <div class="w-full h-[77%]">
+      <div class="text-base font-semibold text-red-500">
+        ※[특별 단가] 클릭 후 수정가능
+      </div>
       <Realgrid
         :progname="'MST37_069INS_VUE'"
         :progid="1"
@@ -107,13 +110,16 @@
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :showCheckBar="false"
-        :checkRenderEditable="false"
-        :editableColId="'lngSpecialPrice'"
+        :checkRenderEditable="true"
+        :checkRowAuto="false"
+        :checkRowAuto2="true"
+        :checkRowAuto2Col="'checkbox'"
+        :editableColId="'lngSpecialPrice,dtmDateTo'"
         :changeNow3="changeNow"
         :changeRow="changeRow"
         :changeColid="changeColid"
         :changeValue2="changeValue2"
-        @checkedRowData="checkedRowData"
+        :selectionStyle="'block'"
         @checkedRowIndex="checkedRowIndex"
         @updatedRowData="updatedRowData"
         @allStateRows="allStateRows"
@@ -389,16 +395,12 @@
 import { getStoreList } from "@/api/common";
 import {
   deleteSpecialPrices,
-  getMenuGroupList,
-  getMenuList,
   getMenuList2,
   getMenuStoreList,
   getSpecialPriceList,
-  getSubGroup,
   getSubGroup2,
   overLapCheck,
   saveExceptionSpecialPrice,
-  saveMultiPrice,
   updateMultiPrice,
 } from "@/api/master";
 import Datepicker2 from "@/components/Datepicker2.vue";
@@ -424,7 +426,7 @@ import Realgrid from "@/components/realgrid.vue";
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog } from "@/customFunc/customFunc";
+import { formatLocalDate, insertPageLog } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
 /**
  *  경고창 호출 라이브러리
@@ -434,7 +436,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { nextTick, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -558,13 +560,13 @@ const mainCode = (e) => {
 
 const checkedDatas = ref([]);
 const forDeleteDatas = ref([]);
-const checkedRowData = (e) => {
-  ////console.log(e);
-  checkedDatas.value = e.map((item) => item.lngMenuPrice);
-  ////console.log(checkedDatas.value);
+// const checkedRowData = (e) => {
+//   ////console.log(e);
+//   checkedDatas.value = e.map((item) => item.lngMenuPrice);
+//   ////console.log(checkedDatas.value);
 
-  forDeleteDatas.value = e.map((item) => item.lngMenuSpecialPriceCode);
-};
+//   forDeleteDatas.value = e.map((item) => item.lngMenuSpecialPriceCode);
+// };
 
 const checkedDatas2 = ref([]);
 const checkedRowData2 = (e) => {
@@ -574,7 +576,6 @@ const checkedRowData2 = (e) => {
 const checkedDatas3 = ref([]);
 const checkedRowData3 = (e) => {
   checkedDatas3.value = e;
-  ////console.log(e);
 };
 const checkedRowData4 = (e) => {
   //checkedDatas3.value = e;
@@ -591,6 +592,10 @@ const updateRowData2 = ref([]);
 const updatedRowData = (e) => {
   ////console.log(e);
   updateRowData.value = e;
+
+  forDeleteDatas.value = e
+    .filter((item) => item.checkbox == true)
+    .map((item) => item.lngMenuSpecialPriceCode);
 };
 const updatedRowData2 = (e) => {
   updateRowData2.value = e;
@@ -654,10 +659,29 @@ const addNewSpecial = async (e) => {
     });
     return;
   }
-  const menucodes = checkedDatas3.value.map((item) => item.lngCode).join(",");
-  const storecodes = checkedDatas2.value
-    .map((item) => item.lngStoreCode)
-    .join(",");
+  let menucodes = "";
+  for (let i = 0; i < checkedDatas2.value.length; i++) {
+    for (let j = 0; j < checkedDatas3.value.length; j++) {
+      menucodes += checkedDatas3.value[j].lngCode + ",";
+    }
+  }
+  menucodes = menucodes.slice(0, menucodes.length - 1);
+  let storecodes = "";
+
+  if (checkedDatas2.value.length == 1) {
+    for (let i = 0; i < checkedDatas3.value.length; i++) {
+      storecodes += checkedDatas2.value[0].lngStoreCode + ",";
+    }
+    storecodes = storecodes.slice(0, storecodes.length - 1);
+  } else {
+    for (let i = 0; i < checkedDatas2.value.length; i++) {
+      for (let j = 0; j < checkedDatas3.value.length; j++) {
+        storecodes += checkedDatas2.value[i].lngStoreCode + ",";
+      }
+    }
+    storecodes = storecodes.slice(0, storecodes.length - 1);
+  }
+
   const res = await overLapCheck(
     selectedGroup.value,
     menucodes,
@@ -679,22 +703,27 @@ const addNewSpecial = async (e) => {
     return;
   } else {
     let specialPrice = [];
+
     if (cond5.value == 0) {
-      for (let i = 0; i < menucodes.length; i++) {
-        specialPrice.push(cond13.value);
+      for (let i = 0; i < checkedDatas2.value.length; i++) {
+        for (let j = 0; j < checkedDatas3.value.length; j++) {
+          specialPrice.push(cond13.value);
+        }
       }
     } else if (cond5.value == 1) {
-      for (let i = 0; i < menucodes.length; i++) {
-        let initPrice = rowData3.value.filter(
-          (item) => item.lngCode == menucodes[i]
-        )[0].lngPrice;
-        initPrice =
-          cond16.value == "1"
-            ? Math.round(initPrice * (cond14.value / 100), cond15.value)
-            : cond16.value == "0"
-            ? Math.floor(initPrice * (cond14.value / 100), cond15.value)
-            : Math.ceil(initPrice * (cond14.value / 100), cond15.value);
-        specialPrice.push(initPrice);
+      for (let j = 0; j < checkedDatas2.value.length; j++) {
+        for (let i = 0; i < checkedDatas3.value.length; i++) {
+          let initPrice = rowData3.value.filter(
+            (item) => item.lngCode == checkedDatas3.value[i]
+          )[0].lngPrice;
+          initPrice =
+            cond16.value == "1"
+              ? Math.round(initPrice * (cond14.value / 100), cond15.value)
+              : cond16.value == "0"
+              ? Math.floor(initPrice * (cond14.value / 100), cond15.value)
+              : Math.ceil(initPrice * (cond14.value / 100), cond15.value);
+          specialPrice.push(initPrice);
+        }
       }
     }
 
@@ -710,7 +739,7 @@ const addNewSpecial = async (e) => {
         "",
         ""
       );
-
+      console.log(res);
       Swal.fire({
         title: "완료",
         text: "저장이 완료되었습니다.",
@@ -727,6 +756,17 @@ const addNewSpecial = async (e) => {
       confirmPopUp2.value = false;
       openPopUp2.value = false;
       store.state.loading = false;
+
+      selectedType.value = "0";
+      cond6.value = "";
+      cond7.value = "";
+      cond11.value = "";
+      cond12.value = "";
+      cond5.value = "0";
+      cond14.value = "0";
+      cond15.value = "";
+      cond16.value = "";
+      searchButton();
     }
   }
   //const res = await saveAddSpecialPrice();
@@ -788,7 +828,21 @@ watch(cond3, () => {
 const openPopUp = ref(false);
 const openPopUp2 = ref(false);
 const addButton = () => {
+  initPopUp();
   openPopUp.value = !openPopUp.value;
+};
+
+const initPopUp = () => {
+  selectedType.value = "0";
+  cond7.value = "";
+  cond6.value = "";
+  cond11.value = "";
+  cond12.value = "";
+  cond13.value = "";
+  cond15.value = "0";
+  cond14.value = "0";
+  cond5.value = "0";
+  cond16.value = "2";
 };
 const closePopUp2 = () => {
   openPopUp.value = false;
@@ -894,8 +948,13 @@ const saveButton = async (e) => {
     const res = await updateMultiPrice(
       menucodes.join(","),
       prices.join(","),
-      enddate.value
+      updateRowData.value
+        .filter((item, index) => updatedRows.value.includes(index))
+        .map((item) => formatLocalDate(item.dtmDateTo))
+        .join("\u200b")
     );
+
+    console.log(res);
     // ////console.log(res);
 
     Swal.fire({

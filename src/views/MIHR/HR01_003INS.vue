@@ -16,7 +16,7 @@
         <button @click="addButton" class="button new md:w-auto w-14">
           신규
         </button>
-        <button @click="editButton" class="button primary md:w-auto w-14">
+        <button @click="editButton" class="button edit md:w-auto w-14">
           수정
         </button>
         <button @click="deleteButton" class="button delete md:w-auto w-14">
@@ -318,6 +318,21 @@ const addButton = () => {
         );
 
         // ////console.log(res);
+        if (res.data.RESULT_CD == "99") {
+          await Swal.fire({
+            title: "실패",
+            text: "저장에 실패하였습니다.",
+            icon: "error",
+            confirmButtonText: "확인",
+          });
+        } else {
+          await Swal.fire({
+            title: "성공",
+            text: "저장이 완료되었습니다.",
+            icon: "success",
+            confirmButtonText: "확인",
+          });
+        }
         store.state.loading = false;
       } catch (error) {
       } finally {
@@ -507,6 +522,22 @@ const editButton = () => {
           result.value.textValue5,
           result.value.textValue3
         );
+
+        if (res.data.RESULT_CD == "99") {
+          await Swal.fire({
+            title: "실패",
+            text: "저장에 실패하였습니다.",
+            icon: "error",
+            confirmButtonText: "확인",
+          });
+        } else {
+          await Swal.fire({
+            title: "성공",
+            text: "저장이 완료되었습니다.",
+            icon: "success",
+            confirmButtonText: "확인",
+          });
+        }
 
         ////console.log(res);
         store.state.loading = false;

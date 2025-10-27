@@ -27,10 +27,7 @@
     <div
       class="grid grid-cols-3 grid-rows-4 bg-gray-200 rounded-lg h-48 items-start z-10">
       <div class="justify-start flex ml-28 space-x-5 mt items-center">
-        <Datepicker1
-          @dateValue="dateValue"
-          :mainName="'일자'"
-          :initToday="1">
+        <Datepicker1 @dateValue="dateValue" :mainName="'일자'" :initToday="1">
         </Datepicker1>
       </div>
       <div class="flex justify-start items-center !-ml-1">
@@ -41,8 +38,7 @@
           @storeNm="excelStore"
           @update:storeCd="lngStoreCode"></PickStore>
       </div>
-      <div class="flex justify-start pl-20 items-center mt-2 space-x-5">
-      </div>
+      <div class="flex justify-start pl-20 items-center mt-2 space-x-5"></div>
       <div class="flex space-x-5 ml-16 mt-3 items-center">
         <div class="font-semibold text-base">자재코드/명</div>
         <div class="flex space-x-3">
@@ -62,22 +58,21 @@
       </div>
       <div class="flex space-x-5 mt-3 items-center">
         <div class="text-base font-semibold">재고조사주기</div>
-          <div>
-            <select
-              name=""
-              id=""
-              class="w-64 h-8 border border-black"
-              v-model="cond3">
-              <option value="0">선택</option>
-              <option :value="i.strDCode" v-for="i in optionList4">
-                {{ i.strDName }}
-              </option>
-            </select>
-          </div>
+        <div>
+          <select
+            name=""
+            id=""
+            class="w-64 h-8 border border-black"
+            v-model="cond3">
+            <option value="0">선택</option>
+            <option :value="i.strDCode" v-for="i in optionList4">
+              {{ i.strDName }}
+            </option>
+          </select>
+        </div>
       </div>
       <div class="flex space-x-5 ml-14 mt-3 items-center">
-        <BusinessClient2
-          @SupplierId="SupplierId" />
+        <BusinessClient2 @SupplierId="SupplierId" />
       </div>
       <div class="flex ml-10 pl-11 items-center mt-3 space-x-5">
         <div class="font-semibold text-base">자재그룹</div>
@@ -109,7 +104,7 @@
           </select>
         </div>
       </div>
-       <div class="flex ml-10 items-center mt-3 space-x-5">
+      <div class="flex ml-10 items-center mt-3 space-x-5">
         <div class="text-base font-semibold">자재특성</div>
         <div>
           <select
@@ -126,31 +121,29 @@
       </div>
       <div class="justify-start flex ml-28 space-x-5 mt items-center">
         <div class="text-base font-semibold">파일</div>
-          <input
-              type="text"
-              class="h-8 w-64 bg-white border border-black"
-              disabled
-              v-model="excelName" />
-            <label
-              for="hiddenFile"
-              class="button primary h-7 flex items-center ml-2 mt-1 cursor-pointer"
-              @click="beforeFileSelect">
-              파일선택
-            </label>
+        <input
+          type="text"
+          class="h-8 w-64 bg-white border border-black"
+          disabled
+          v-model="excelName" />
+        <label
+          for="hiddenFile"
+          class="button primary h-7 flex items-center ml-2 mt-1 cursor-pointer"
+          @click="beforeFileSelect">
+          파일선택
+        </label>
       </div>
       <div class="flex space-x-5 mt-3 ml-28 items-center">
-          <label for="cond7">
-            <input
-              type="checkbox"
-              id="cond7"
-              @change="setCond7" /> 전체보기
-          </label>
+        <label for="cond7">
+          <input type="checkbox" id="cond7" @change="setCond7" /> 전체보기
+        </label>
       </div>
-      <div class="flex justify-start pl-20 items-center mt-2 space-x-5">
-      </div>
+      <div class="flex justify-start pl-20 items-center mt-2 space-x-5"></div>
     </div>
     <!-- 조회조건 -->
-    <div class="font-bold text-blue-600">* 월마감인 경우는 실사일자를 반드시 월의 마지막날로 선택해야 합니다.</div>
+    <div class="font-bold text-blue-600">
+      * 월마감인 경우는 실사일자를 반드시 월의 마지막날로 선택해야 합니다.
+    </div>
     <!-- 그리드 영역 -->
     <div class="w-full h-[65vh]">
       <Realgrid
@@ -173,7 +166,7 @@
         :selectionStyle="'block'"
         :exporttoExcel="exportExcel">
       </Realgrid>
-        <!-- :reload="reload"
+      <!-- :reload="reload"
         :setStateBar="false" -->
     </div>
   </div>
@@ -189,7 +182,13 @@
 <script setup>
 import { getCommonList } from "@/api/common";
 import { getStockGeneric, getStockGroup } from "@/api/master";
-import { getStockDetail, getDiligenceRegistration, getDiligenceRegistration2, delDiligenceRegistration, setDiligenceRegistration } from "@/api/mistock";
+import {
+  getStockDetail,
+  getDiligenceRegistration,
+  getDiligenceRegistration2,
+  delDiligenceRegistration,
+  setDiligenceRegistration,
+} from "@/api/mistock";
 
 /**
  *  매출 일자 세팅 컴포넌트
@@ -255,7 +254,6 @@ onMounted(async () => {
 
   const res4 = await getCommonList("73");
   optionList4.value = res4.data.List;
-
 });
 const reload = ref(false);
 const rowData = ref([]);
@@ -333,9 +331,10 @@ const deleteRowData = ref([]);
 const updatedRowData = (newvalue) => {
   updateRowData.value = newvalue;
   // console.log(updateRowData.value);
-  deleteRowData.value = updateRowData.value.filter(item => item.lngCheck === true);
-  // console.log(deleteRowData.value); 
-  
+  deleteRowData.value = updateRowData.value.filter(
+    (item) => item.lngCheck === true
+  );
+  console.log(deleteRowData.value);
 };
 
 /**
@@ -375,49 +374,45 @@ const searchButton = async () => {
     store.state.loading = true;
     initGrid();
 
-    convCond3.value = parseInt(cond3.value, 10);  // "01" → 1
+    convCond3.value = parseInt(cond3.value, 10); // "01" → 1
     // console.log(convCond3.value);
 
-    if(groupCd.value == "3183"){
-
+    if (groupCd.value == "3183") {
       const res = await getDiligenceRegistration(
         groupCd.value,
         storeCode.value,
         selectedDate.value.replaceAll("-", ""),
         convCond3.value,
-        '5',
+        "5",
         cond7.value == true ? "02" : "01",
         supplierid.value,
         cond4.value,
         cond5.value,
-        cond6.value,
+        cond6.value
       );
-    
+
       // console.log(res);
 
       rowData.value = res.data.List;
       updateRowData.value = res.data.List;
 
       afterSearch.value = true;
-
-    }
-    else {
+    } else {
       const res = await getDiligenceRegistration2(
         groupCd.value,
         storeCode.value,
         selectedDate.value.replaceAll("-", ""),
         convCond3.value,
-        '5',
-        cond7.value == true ? "02" : "01",
+        "5",
+        cond7.value == true ? "02" : "01"
       );
-      
+
       // console.log(res);
 
       rowData.value = res.data.List;
       updateRowData.value = res.data.List;
 
       afterSearch.value = true;
-
     }
   } catch (error) {
     afterSearch.value = false;
@@ -431,8 +426,7 @@ const searchButton = async () => {
  *  삭제 처리 함수
  */
 const deleteButton = async () => {
-  if (allstaterows.value.length == 0) 
-  {
+  if (allstaterows.value.length == 0) {
     Swal.fire({
       title: "경고",
       text: "변경된 사항이 없습니다.",
@@ -467,11 +461,11 @@ const deleteButton = async () => {
           storeCode.value,
           selectedDate.value.replaceAll("-", ""),
           lngStockIDs,
-          "",
+          ""
         );
         store.state.loading = false;
 
-        // console.log(res);
+        console.log(res);
 
         if (res.data.RESULT_CD == "00") {
           Swal.fire({
@@ -489,7 +483,6 @@ const deleteButton = async () => {
           });
         }
       } else if (result.dismiss === Swal.DismissReason.cancel) {
-
       }
     });
   } catch (error) {
@@ -535,15 +528,17 @@ const saveButton = async () => {
 
         // console.log(updateRowData.value);
 
-        convCond3.value = parseInt(cond3.value, 10);  // "01" → 1
+        convCond3.value = parseInt(cond3.value, 10); // "01" → 1
 
         const lngStockIDs = updateRowData.value
           .filter((_, index) => allstaterows.value.includes(index))
           .map((item) => item.lngStockID)
           .join("\u200b");
 
-        const selectedRows = updateRowData.value.filter((_, index) => allstaterows.value.includes(index));
-        const hasNegative = selectedRows.some(item => item.dblTakeQty < 0);
+        const selectedRows = updateRowData.value.filter((_, index) =>
+          allstaterows.value.includes(index)
+        );
+        const hasNegative = selectedRows.some((item) => item.dblTakeQty < 0);
 
         if (hasNegative) {
           Swal.fire({
@@ -575,7 +570,7 @@ const saveButton = async () => {
           dblTakeQtys,
           dblShortQtys,
           "5",
-          "",
+          ""
         );
         store.state.loading = false;
 
@@ -597,7 +592,6 @@ const saveButton = async () => {
           });
         }
       } else if (result.dismiss === Swal.DismissReason.cancel) {
-
       }
     });
   } catch (error) {
@@ -653,10 +647,9 @@ const handleFileChange = async (e) => {
     for (let i = 0; i < sheetLength; i++) {
       SheetList.value.push({ lngCode: i + 1, strName: workbook.SheetNames[i] });
     }
-    
+
     const result = await readFileWithArrayBuffer(file);
     // console.log(result);
-
   }
   e.target.value = "";
 };
@@ -690,7 +683,7 @@ async function readFileWithArrayBuffer(file) {
   rowData.value = rows.map((row) => {
     const obj = {};
     header.forEach((key, i) => {
-      obj[key] = row[i+2];
+      obj[key] = row[i + 2];
     });
     return obj;
   });
@@ -736,6 +729,4 @@ const excelList = (e) => {
   selectedExcelList.value = e;
   //comsole.log(e);
 };
-
-
 </script>

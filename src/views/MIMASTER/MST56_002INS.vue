@@ -261,12 +261,10 @@ const STORE_CD = (e) => {
 const mainCategory = ref("");
 const subCategory = ref("");
 const MAINCATEGORY = (e) => {
-  //console.log(e);
   mainCategory.value = e;
 };
 
 const SUBCATEGORY = (e) => {
-  //console.log(e);
   subCategory.value = e;
 };
 

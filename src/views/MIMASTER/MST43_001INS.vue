@@ -45,7 +45,7 @@
           :rowData="rowData"
           @clickedRowData="clickedRowData"
           @selcetedrowData="selcetedrowData"
-          @updatedRowData="updatedRowData"
+          @updatedRowData2="updatedRowData"
           :selectionStyle="'singleRow'"
           :setNumberformatColumn="'lngRate'"
           :labelingColumns="'lngStoreCode'"
@@ -56,8 +56,10 @@
           :changeColid="changeColid"
           :changeRow="changeRow"
           @selectedIndex="selectedIndex"
+          @allStateRows="allStateRows"
+          @sendRowState="sendRowState"
           :addRow4="addRow"
-          :deleteRow2="deleteRow"
+          :deleteRow7="deleteRow"
           :addrowDefault="addrowDefault"
           :addrowProp="addrowProp"
           :rowStateeditable="false"
@@ -93,7 +95,7 @@
             v-model="gridvalue2"
             name="gridvalue2"
             @input="changeInfo"
-            :disabled="addNew" />
+            :disabled="rowstate != 'created'" />
         </div>
         <div
           class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100">
@@ -359,16 +361,16 @@ const changeInfo = (e) => {
   const rowValue = e.target.value;
 
   if (rowName == "gridvalue5") {
-    gridvalue5.value = rowValue;
+    gridvalue5.value = rowValue
+      .replace(/[^0-9.]/g, "")
+      .replace(/(\..*?)\..*/g, "$1");
 
     changeColid.value = "lngRate";
-    changeValue2.value = rowValue;
+    changeValue2.value = gridvalue5.value;
   } else if (rowName == "gridvalue2") {
-    if (/^\d+$/.test(rowValue) == false) {
-      gridvalue2.value = e.target.value.replace(/[^\d]/g, "");
-      return;
-    }
-    changeValue2.value = rowValue;
+    gridvalue2.value = e.target.value.replace(/[^0-9.]/g, "");
+
+    changeValue2.value = gridvalue2.value;
     changeColid.value = "strBuyCode";
   } else if (rowName == "gridvalue3") {
     changeValue2.value = rowValue;
@@ -439,7 +441,11 @@ const saveButton = async () => {
     });
     return;
   }
-  if (JSON.stringify(updateRow.value) === JSON.stringify(rowData.value)) {
+  if (
+    allstaterows.value.updated.length == 0 &&
+    allstaterows.value.created.length == 0 &&
+    allstaterows.value.deleted.length == 0
+  ) {
     Swal.fire({
       title: "경고",
       text: "변경된 사항이 없습니다.",
@@ -450,9 +456,7 @@ const saveButton = async () => {
   }
 
   const validateRow = updateRow.value.filter(
-    (item) =>
-      item.new == true &&
-      (item.strBuyCode == "" || item.strBuyCode == undefined)
+    (item) => item.strBuyCode == "" || item.strBuyCode == undefined
   ).length;
   if (validateRow > 0) {
     Swal.fire({
@@ -511,48 +515,48 @@ const saveButton = async () => {
       store.state.loading = true;
       try {
         const chargeStoreCd = updateRow.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.lngStoreCode);
         const chargeBuyCd = updateRow.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strBuyCode);
         const chargeBuyNm = updateRow.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strBuyName);
         const chargeBuyENm = updateRow.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strBuyEName);
         const chargelngRate = updateRow.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.lngRate);
         const chargestrIFCode = updateRow.value
-          .filter((item) => item.deleted != true && item.new != true)
+          .filter((item, index) => allstaterows.value.updated.includes(index))
           .map((item) => item.strIFCode);
 
         const insertStoreCd = updateRow.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.lngStoreCode);
         const insertBuyCd = updateRow.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strBuyCode);
         const insertBuyNm = updateRow.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strBuyName);
         const insertBuyENm = updateRow.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strBuyEName);
         const insertlngRate = updateRow.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.lngRate);
         const insertstrIFCode = updateRow.value
-          .filter((item) => item.deleted != true && item.new == true)
+          .filter((item, index) => allstaterows.value.created.includes(index))
           .map((item) => item.strIFCode);
 
         const deleteCode = updateRow.value
-          .filter((item) => item.deleted == true)
+          .filter((item, index) => allstaterows.value.deleted.includes(index))
           .map((item) => item.strBuyCode);
         const deleteStoreCd = updateRow.value
-          .filter((item) => item.deleted == true)
+          .filter((item, index) => allstaterows.value.deleted.includes(index))
           .map((item) => item.lngStoreCode);
         const res = await saveCreditCardEnroll(
           groupCd.value,
@@ -588,6 +592,16 @@ const saveButton = async () => {
       }
     }
   });
+};
+
+const allstaterows = ref([]);
+const allStateRows = (e) => {
+  allstaterows.value = e;
+};
+
+const rowstate = ref("none");
+const sendRowState = (e) => {
+  rowstate.value = e;
 };
 </script>
 

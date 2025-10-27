@@ -1,13 +1,12 @@
 <!-- /*--############################################################################
 # Filename : MST56_001INS.vue                                                  
 # Description : 마스터관리 > 품절관리 > 품절정보등록.             #
-#Date :2025-07-21                                                              #
+#Date :2025-10-15                                                              #
 #Author : 권맑음                     
 ################################################################################*/ -->
 <template>
   <div class="h-full" @click="handleParentClick">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <PageName></PageName>
       <!-- <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
@@ -287,12 +286,12 @@
 
 <script setup>
 import {
-  getMenuConList,
-  getSalesInfoByCorner,
-  getSoldMenuList,
-  saveCornerInfoList,
-  saveMenuInfo,
-} from "@/api/master";
+  getMenuConList2,
+  getSalesInfoByCorner2,
+  getSoldMenuList2,
+  saveCornerInfoList2,
+  saveMenuInfo2,
+} from "@/api/vuepos";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -301,7 +300,6 @@ import {
  *  페이지명 자동 입력 컴포넌트
  *  */
 
-import PageName from "@/components/pageName.vue";
 /**
  * 	매장 단일 선택 컴포넌트
  */
@@ -310,17 +308,18 @@ import PageName from "@/components/pageName.vue";
  */
 
 import Realgrid from "@/components/realgrid.vue";
+import { insertPageLog2 } from "@/customFunc/customFunc";
 /**
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
 /*
  * 공통 표준  Function
  */
 
 import { onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -330,8 +329,24 @@ import { useStore } from "vuex";
  * 	화면 Load시 실행 스크립트
  */
 
+const route = useRoute();
+
+const path = ref("");
+const lngStoreGroup = ref("");
+const lngStoreCode = ref("");
+const lngOperator = ref("");
+
 onMounted(async () => {
-  const pageLog = await insertPageLog(store.state.activeTab2);
+  path.value = route.path.split("/")[2];
+  lngStoreGroup.value = route.query.lngStoreGroup;
+  lngStoreCode.value = route.query.lngStoreCode;
+  lngOperator.value = route.query.lngOperator;
+  const pageLog = await insertPageLog2(
+    path.value,
+    lngStoreGroup.value,
+    lngStoreCode.value,
+    lngOperator.value
+  );
 });
 
 const reload = ref(false);
@@ -374,13 +389,16 @@ const searchButton = async () => {
   try {
     initGrid();
     //  //console.log(store.state.userData);
-    const res = await getSalesInfoByCorner(
-      store.state.userData.lngStoreGroup,
-      store.state.userData.lngPositionType,
-      store.state.userData.lngPosition,
-      0
+    store.state.loading = true;
+    const res = await getSalesInfoByCorner2(
+      lngStoreGroup.value,
+      "0",
+      lngStoreCode.value,
+      lngOperator.value
     );
-    console.log(res);
+
+    store.state.loading = false;
+
     rowData.value = res.data.List;
 
     afterSearch.value = true;
@@ -402,9 +420,9 @@ const clickedRowData = async (e) => {
   clickedCornerNm.value = e[1];
   initGrid2();
   try {
-    const res = await getSoldMenuList(
-      store.state.userData.lngStoreGroup,
-      store.state.userData.lngPosition,
+    const res = await getSoldMenuList2(
+      lngStoreGroup.value,
+      lngStoreCode.value,
       e[0],
       cond.value,
       cond2.value
@@ -436,9 +454,9 @@ const searchButton2 = async () => {
     return;
   }
   try {
-    const res = await getSoldMenuList(
-      store.state.userData.lngStoreGroup,
-      store.state.userData.lngPosition,
+    const res = await getSoldMenuList2(
+      lngStoreGroup.value,
+      lngStoreCode.value,
       clickedCornerCd.value,
       cond.value,
       cond2.value
@@ -461,9 +479,9 @@ const buttonClicked = async (e) => {
   visible.value = true;
 
   try {
-    const res = await getMenuConList(
-      store.state.userData.lngStoreGroup,
-      store.state.userData.lngPosition,
+    const res = await getMenuConList2(
+      lngStoreGroup.value,
+      lngStoreCode.value,
       clickedCornerCd.value,
       clickedMenuCd.value,
       pcond.value,
@@ -493,12 +511,12 @@ const saveButton2 = async () => {
     const stss = updatedrowdata2.value
       .map((item) => item.lngStkStsType)
       .join("\u200b");
-    const res = await saveMenuInfo(
-      store.state.userData.lngStoreGroup,
-      store.state.userData.lngPosition,
+    const res = await saveMenuInfo2(
+      lngStoreGroup.value,
+      lngStoreCode.value,
       menucds,
       stss,
-      store.state.userData.lngSequence
+      lngOperator.value
     );
 
     if (res.data.RESULT_CD == "00") {
@@ -523,9 +541,9 @@ const saveButton2 = async () => {
 const searchButton3 = async () => {
   try {
     store.state.loading = true;
-    const res = await getMenuConList(
-      store.state.userData.lngStoreGroup,
-      store.state.userData.lngPosition,
+    const res = await getMenuConList2(
+      lngStoreGroup.value,
+      lngStoreCode.value,
       clickedCornerCd.value,
       clickedMenuCd.value,
       pcond.value,
@@ -567,7 +585,7 @@ const updatedRowData = (e) => {
   updatedrowdata.value = e;
 };
 const saveButton = async () => {
-  console.log(updatedrowdata.value);
+  //console.log(updatedrowdata.value);
   try {
     const cornercds = updatedrowdata.value
       .map((item) => item.lngCornerCD)
@@ -587,16 +605,16 @@ const saveButton = async () => {
     const closemins = updatedrowdata.value
       .map((item) => item.lngCloseMin)
       .join("\u200b");
-    const res = await saveCornerInfoList(
-      store.state.userData.lngStoreGroup,
-      store.state.userData.lngPosition,
+    const res = await saveCornerInfoList2(
+      lngStoreGroup.value,
+      lngStoreCode.value,
       cornercds,
       stktypes,
       openhours,
       openmins,
       closehours,
       closemins,
-      store.state.userData.lngSequence
+      lngOperator.value
     );
 
     if (res.data.RESULT_CD == "00") {
@@ -632,12 +650,12 @@ const saveButton3 = async () => {
     const stss = updatedrowdata3.value
       .map((item) => item.lngStkStsType)
       .join("\u200b");
-    const res = await saveMenuInfo(
-      store.state.userData.lngStoreGroup,
-      store.state.userData.lngPosition,
+    const res = await saveMenuInfo2(
+      lngStoreGroup.value,
+      lngStoreCode.value,
       menucds,
       stss,
-      store.state.userData.lngSequence
+      lngOperator.value
     );
 
     if (res.data.RESULT_CD == "00") {

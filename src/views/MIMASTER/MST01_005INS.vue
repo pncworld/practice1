@@ -58,7 +58,7 @@
         :checkRenderEditable="true"
         :exporttoExcel="exportExcel">
       </Realgrid>
-      <div class="w-[70%] h-[20vh] mt-10 ml-10">
+      <div class="w-[70%] h-[20vh] mt-0 ml-10">
         <div
           class="grid grid-rows-4 grid-cols-[1fr,3fr] border w-full h-full border-black">
           <div
@@ -69,11 +69,11 @@
           <div class="border border-black flex justify-center items-center">
             <input
               type="number"
-              :disabled="disablegrid"
+              :disabled="disablegrid && !clickedRow"
               name="lngTeamCode"
               v-model="gridvalue1"
               @input="changeValue"
-              class="w-[70%] h-[70%] border border-black pl-1" />
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300" />
           </div>
           <div
             class="border border-black flex justify-center items-center bg-orange-100">
@@ -84,9 +84,10 @@
             <input
               type="text"
               name="strTeamName"
+              :disabled="!clickedRow"
               @input="changeValue"
               v-model="gridvalue2"
-              class="w-[70%] h-[70%] border border-black pl-1" />
+              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300" />
           </div>
           <div
             class="border border-black flex justify-center items-center bg-gray-100">
@@ -187,7 +188,9 @@ const afterSearch = ref(false);
 
 const store = useStore();
 
+const clickedRow = ref(false);
 const clickedRowData = (e) => {
+  clickedRow.value = true;
   //disablegrid.value = true;
   //insertupdatedelete.value = 2;
 
@@ -248,6 +251,7 @@ const searchButton = async () => {
     //comsole.log(error);
   } finally {
     store.state.loading = false;
+    clickedRow.value = false;
   }
 };
 const disablegrid = ref(true);

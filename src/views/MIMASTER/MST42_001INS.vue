@@ -10,7 +10,7 @@
     <PageName></PageName>
     <div class="flex justify-center mr-10 space-x-2 pr-5">
       <button @click="searchButton" class="button search">조회</button>
-      <button @click="addButton" class="button primary">신규</button>
+      <button @click="addButton" class="button new">신규</button>
       <button @click="saveButton" class="button save">저장</button>
       <button @click="exportToExcel" class="button excel">엑셀</button>
       <button @click="deleteButton" class="button delete">삭제</button>
@@ -41,8 +41,8 @@
       :changeColid="changeColid"
       :changeValue2="changeValue2"
       :labelingColumns="'lngAccType'"
-      :valuesData="[['', '1', '2']]"
-      :labelsData="[['', '현금', '어음']]"
+      :valuesData="[['0', '', '1', '2']]"
+      :labelsData="[['선택', '선택', '현금', '어음']]"
       :addRow4="addRow"
       :addrowProp="'lngStoreGroup,lngSupplierID,strSupplierName,strRegistNo,strDirector,strDealType,strDealKind,strAddress,strZipCode,strTelNo,strFaxNo,strManager,strManagerTelNo,strHPNo,strEmail,lngAccType,strConvCode,lngSupplierType'"
       :addrowDefault="addrowDefault"
@@ -275,16 +275,117 @@
       </div>
     </div>
   </div>
+  <div class="flex mt-4 h-7 w-[33.6vw]" v-if="showMailEnroll">
+    <div
+      class="border text-base font-semibold flex justify-center items-center bg-gray-100 w-[67%]">
+      <div class="flex justify-center items-center">발주내역 전송메일</div>
+    </div>
+    <div
+      class="border text-base font-semibold flex justify-center items-center w-full">
+      <button
+        class="button primary !h-6"
+        @click="MailEnroll"
+        :disabled="!afterClick">
+        메일등록
+      </button>
+    </div>
+  </div>
   <GetZipCode
     v-if="openPopUp"
     @closePopUp="closePopUp"
     @zipAndAddress="zipAndAddress">
   </GetZipCode>
   <!-- 데이터 부분 -->
+
+  <div
+    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    v-if="openPopUp3">
+    <!-- 팝업 박스 -->
+    <div class="bg-white rounded-lg p-6 w-[40vw] h-[50vh]">
+      <div class="flex justify-between">
+        <h2 class="text-lg font-bold mb-4">거래처 발주 메일 주소 등록</h2>
+        <div class="flex space-x-3">
+          <button
+            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            @click="checkandAdd">
+            추가
+          </button>
+          <button
+            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            @click="openPopUp3 = false">
+            닫기
+          </button>
+        </div>
+      </div>
+      <div class="grid grid-rows-3 grid-cols-[1fr,2fr,1fr,2fr]">
+        <div
+          class="border-l border-t border-black text-sm font-semibold bg-gray-100 flex justify-center">
+          거래처코드
+        </div>
+        <div class="border-l border-t border-black text-sm font-semibold">
+          <input
+            type="text"
+            class="border border-black disabled:bg-gray-200"
+            v-model="gridvalue1"
+            disabled />
+        </div>
+        <div
+          class="border-l border-t border-black text-sm font-semibold bg-gray-100 flex justify-center">
+          거래처명
+        </div>
+        <div
+          class="border-l border-t border-r border-black text-sm font-semibold">
+          <input
+            type="text"
+            class="border border-black disabled:bg-gray-200"
+            v-model="gridvalue2"
+            disabled />
+        </div>
+        <div
+          class="border-l border-t border-black text-sm font-semibold bg-gray-100 flex justify-center">
+          메일주소<span class="text-red-500">*</span>
+        </div>
+        <div
+          class="border-l border-t border-r border-black text-sm font-semibold col-span-3">
+          <input
+            type="text"
+            class="border border-black w-[80%]"
+            v-model="scond" />
+        </div>
+        <div
+          class="border-l border-t border-b border-black text-sm font-semibold bg-gray-100 flex justify-center">
+          담당자명/메모
+        </div>
+        <div
+          class="border-l border-t border-b border-r border-black text-sm font-semibold col-span-3">
+          <input
+            type="text"
+            class="border border-black w-[80%]"
+            v-model="scond2" />
+        </div>
+      </div>
+      <div class="h-[70%]">
+        <Realgrid
+          :progname="'MST42_001INS_VUE'"
+          :progid="3"
+          :rowData="rowData2"
+          @buttonClicked="buttonClicked"
+          :setStateBar="false"></Realgrid>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { deleteClientInfo, getClientList, saveClientInfo } from "@/api/master";
+import {
+  deleteClientInfo,
+  deleteOrderEmail,
+  getClientList,
+  getNewSupplierID,
+  getOrderEmailList,
+  saveClientInfo,
+  setSupplierEmail,
+} from "@/api/master";
 import GetZipCode from "@/components/getZipCode.vue";
 /**
  *  페이지명 자동 입력 컴포넌트
@@ -327,8 +428,16 @@ import { useStore } from "vuex";
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
+  if (
+    store.state.userData.lngStoreGroup == "3183" ||
+    store.state.userData.lngStoreGroup == "3264"
+  ) {
+    showMailEnroll.value = true;
+  }
 });
 
+const showMailEnroll = ref(false);
 const cond1 = ref("");
 const cond2 = ref("");
 const gridvalue1 = ref("");
@@ -446,7 +555,7 @@ const addrowProp = ref("");
  *  추가 버튼
  */
 
-const addButton = () => {
+const addButton = async () => {
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -456,8 +565,18 @@ const addButton = () => {
     });
     return;
   }
+
+  let newNo = "";
+  try {
+    const res = await getNewSupplierID(store.state.userData.lngStoreGroup);
+
+    newNo = res.data.List[0].lngSupplierID;
+  } catch (error) {}
   addrowDefault.value =
-    store.state.userData.lngStoreGroup + ", , , , , , , , , , , , , , , , ,1";
+    store.state.userData.lngStoreGroup +
+    "," +
+    newNo +
+    ", , , , , , , , , , , , , , , , ,1";
   addRow.value = !addRow.value;
 };
 
@@ -725,23 +844,119 @@ const initGrid = () => {
   gridvalue15.value = "";
   gridvalue16.value = "";
 };
+
+const openPopUp3 = ref(false);
+const rowData2 = ref([]);
+const MailEnroll = async () => {
+  openPopUp3.value = true;
+
+  try {
+    const res = await getOrderEmailList(
+      store.state.userData.lngStoreGroup,
+      gridvalue1.value
+    );
+
+    rowData2.value = res.data.List;
+  } catch (error) {}
+};
+
+const scond2 = ref("");
+const scond = ref("");
+const checkandAdd = async () => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (scond.value == "" || scond.value == undefined) {
+    Swal.fire({
+      title: "경고",
+      text: "메일주소를 입력해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (!re.test(scond.value)) {
+    Swal.fire({
+      title: "경고",
+      text: "올바른 이메일 주소를 적어주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  try {
+    const res = await setSupplierEmail(
+      store.state.userData.lngStoreGroup,
+      gridvalue1.value,
+      scond.value,
+      scond2.value,
+      store.state.userData.lngSequence
+    );
+    // console.log(res);
+
+    if (res.data.RESULT_CD == "00") {
+      await Swal.fire({
+        title: "성공",
+        text: "메일 주소를 등록하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+    } else {
+      await Swal.fire({
+        title: "실패",
+        text: "메일 주소 등록에 실패하였습니다.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (error) {
+  } finally {
+    scond.value = "";
+    scond2.value = "";
+    MailEnroll();
+  }
+};
+
+const buttonClicked = (e) => {
+  Swal.fire({
+    title: "알림",
+    text: "정말로 삭제하시겠습니까?",
+    icon: "question",
+    confirmButtonText: "확인",
+    showCancelButton: true,
+    cancelButtonText: "취소",
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const res = await deleteOrderEmail(
+          store.state.userData.lngStoreGroup,
+          gridvalue1.value,
+          e[0],
+          store.state.userData.lngSequence
+        );
+
+        if (res.data.RESULT_CD == "00") {
+          await Swal.fire({
+            title: "성공",
+            text: "메일 주소를 삭제하였습니다.",
+            icon: "success",
+            confirmButtonText: "확인",
+          });
+        } else {
+          await Swal.fire({
+            title: "실패",
+            text: "메일 주소 삭제를 실패하였습니다.",
+            icon: "error",
+            confirmButtonText: "확인",
+          });
+        }
+      } catch (error) {
+      } finally {
+        MailEnroll();
+      }
+    }
+  });
+};
 </script>
 
-<style>
-.ag-theme-alpine {
-  height: 100%;
-  width: 100%;
-  --ag-row-height: 20px !important;
-}
-
-.ag-header-cell-label {
-  justify-content: left !important;
-  margin-right: -5px !important;
-}
-
-.custom-grid {
-  --ag-header-background-color: #545876 !important;
-  --ag-header-foreground-color: white !important;
-  --ag-font-size: 11px !important;
-}
-</style>
+<style></style>

@@ -1353,3 +1353,19 @@ export const getMenuEngineer = (
     COND4: cond4,
   });
 };
+
+export const getDynamicGrid7 = (groupCd) => {
+  return api2.post("/MISALES/SLS04_003RPT.asmx/getDynamicGrid7", {
+    GROUP_CD: groupCd,
+  });
+};
+export const getDynamicGrid8 = (groupCd) => {
+  return api2.post("/MISALES/SLS04_003RPT.asmx/getDynamicGrid8", {
+    GROUP_CD: groupCd,
+  });
+};
+export const getMenuPayColumns = (groupCd) => {
+  return api2.post("/MISALES/SLS04_003RPT.asmx/getMenuPayColumns", {
+    GROUP_CD: groupCd,
+  });
+};

@@ -145,9 +145,10 @@
             <select
               name="lngPosition"
               id=""
+              :disabled="disableGrid"
               v-model="gridvalue1"
               @change="changeInfo"
-              class="border border-black w-[80%] h-[80%]">
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
               <option :value="i.lngStoreCode" v-for="i in dataList4">
                 {{ i.strName }}
               </option>
@@ -166,7 +167,8 @@
               type="text"
               name="strChargerName"
               @input="changeInfo"
-              class="border border-black w-[80%] h-[80%]"
+              :disabled="disableGrid"
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue2" />
           </div>
           <div
@@ -182,7 +184,8 @@
               type="text"
               name="lngChargerCode"
               @input="changeInfo"
-              class="border border-black w-[80%] h-[80%]"
+              :disabled="disableGrid"
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue3" />
           </div>
           <div
@@ -195,7 +198,8 @@
               type="text"
               name="strIdNo"
               @input="changeInfo"
-              class="border border-black w-[80%] h-[80%]"
+              :disabled="disableGrid"
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue4" />
           </div>
           <div
@@ -208,7 +212,8 @@
               type="text"
               name="strPassword"
               @input="changeInfo"
-              class="border border-black w-[80%] h-[80%]"
+              :disabled="disableGrid"
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300"
               v-model="gridvalue5" />
           </div>
           <div
@@ -221,14 +226,16 @@
               type="date"
               name="dtmBirthDate"
               @input="changeInfo"
+              :disabled="disableGrid"
               v-model="gridvalue6"
-              class="border border-black w-[60%] h-[80%]" />
+              class="border border-black w-[60%] h-[80%] disabled:bg-gray-300" />
             <select
               name="blnLuner"
               id=""
               @input="changeInfo"
               v-model="gridvalue7"
-              class="border border-black w-[20%] h-[80%]">
+              :disabled="disableGrid"
+              class="border border-black w-[20%] h-[80%] disabled:bg-gray-300">
               <option :value="true">양력</option>
               <option :value="false">음력</option>
             </select>
@@ -247,7 +254,8 @@
               id=""
               @input="changeInfo"
               v-model="gridvalue8"
-              class="border border-black w-[80%] h-[80%]">
+              :disabled="disableGrid"
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
               <option value="0">선택</option>
               <option :value="i.lngClassCode" v-for="i in dataList2">
                 {{ i.strClass }}
@@ -268,7 +276,8 @@
               id=""
               @input="changeInfo"
               v-model="gridvalue9"
-              class="border border-black w-[80%] h-[80%]">
+              :disabled="disableGrid"
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
               <option value="0">선택</option>
               <option :value="i.lngRankCode" v-for="i in dataList3">
                 {{ i.strRank }}
@@ -288,8 +297,9 @@
               name="lngAreaCode"
               id=""
               @input="changeInfo"
+              :disabled="disableGrid"
               v-model="gridvalue10"
-              class="border border-black w-[80%] h-[80%]">
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
               <option value="0">선택</option>
               <option :value="i.lngAreaCode" v-for="i in dataList">
                 {{ i.strArea }}
@@ -305,9 +315,10 @@
             <input
               type="date"
               name="dtmJoinDate"
+              :disabled="disableGrid"
               @input="changeInfo"
               v-model="gridvalue11"
-              class="border border-black w-[80%] h-[80%]" />
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
           </div>
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
@@ -319,8 +330,9 @@
               type="text"
               name="strCardNumber"
               @input="changeInfo"
+              :disabled="disableGrid"
               v-model="gridvalue12"
-              class="border border-black w-[80%] h-[80%]" />
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
           </div>
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
@@ -335,7 +347,8 @@
               name="blnExpireClass"
               @input="changeInfo"
               v-model="gridvalue13"
-              class="border border-black w-[80%] h-[80%]">
+              :disabled="disableGrid"
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
               <option value="0">재직</option>
               <option value="1">퇴직</option>
               <option value="2">휴직</option>
@@ -352,8 +365,12 @@
               name="strZipCode"
               @input="changeInfo"
               v-model="gridvalue14"
-              class="border border-black w-[50%] h-[80%]" />
-            <button class="whitebutton" @click="showZipCode">
+              :disabled="disableGrid"
+              class="border border-black w-[50%] h-[80%] disabled:bg-gray-300" />
+            <button
+              class="whitebutton"
+              @click="showZipCode"
+              :disabled="disableGrid">
               우편번호 찾기
             </button>
           </div>
@@ -367,8 +384,9 @@
               type="text"
               name="strAddress"
               @input="changeInfo"
+              :disabled="disableGrid"
               v-model="gridvalue15"
-              class="border border-black w-[80%] h-[80%] mr-28" />
+              class="border border-black w-[80%] h-[80%] mr-28 disabled:bg-gray-300" />
           </div>
 
           <div
@@ -380,9 +398,10 @@
             <input
               type="text"
               name="strTelNumber"
+              :disabled="disableGrid"
               @input="changeInfo"
               v-model="gridvalue16"
-              class="border border-black w-[80%] h-[80%]" />
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
           </div>
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
@@ -393,9 +412,10 @@
             <input
               type="text"
               name="strCPhone"
+              :disabled="disableGrid"
               @input="changeInfo"
               v-model="gridvalue17"
-              class="border border-black w-[80%] h-[80%]" />
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
           </div>
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
@@ -406,9 +426,10 @@
             <input
               type="date"
               name="dtmRetireDate"
+              :disabled="disableGrid"
               @input="changeInfo"
               v-model="gridvalue18"
-              class="border border-black w-[80%] h-[80%]" />
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
           </div>
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
@@ -418,10 +439,11 @@
             class="border-l border-t border-gray-600 flex justify-center items-center">
             <input
               type="text"
+              :disabled="disableGrid"
               name="strEmail"
               @input="changeInfo"
               v-model="gridvalue19"
-              class="border border-black w-[80%] h-[80%]" />
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
           </div>
           <div
             class="border-t border-gray-600 flex justify-center items-center"></div>
@@ -439,10 +461,11 @@
             class="border-l border-t border-gray-600 flex justify-center items-center">
             <input
               type="date"
+              :disabled="disableGrid"
               name="dtmExpireDate"
               @input="changeInfo"
               v-model="gridvalue20"
-              class="border border-black w-[80%] h-[80%]" />
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
           </div>
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
@@ -452,10 +475,11 @@
             class="border-l border-t border-gray-600 flex justify-center items-center">
             <input
               type="date"
+              :disabled="disableGrid"
               name="dtmHealthExpireDate"
               @input="changeInfo"
               v-model="gridvalue21"
-              class="border border-black w-[80%] h-[80%]" />
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
           </div>
           <div
             class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
@@ -466,9 +490,10 @@
             <select
               name="lngWorkClass"
               id=""
+              :disabled="disableGrid"
               @change="changeInfo"
               v-model="gridvalue22"
-              class="border border-black w-[80%] h-[80%]">
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
               <option value="0">해당 사항 없음</option>
               <option value="1">정직원</option>
               <option value="2">PT</option>
@@ -483,9 +508,10 @@
             <select
               name="lngBankCode"
               id=""
+              :disabled="disableGrid"
               @change="changeInfo"
               v-model="gridvalue23"
-              class="border border-black w-[80%] h-[80%]">
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
               <option value="0">선택</option>
               <option :value="i.lngBankCode" v-for="i in dataList5">
                 {{ i.strBankName }}
@@ -500,11 +526,12 @@
             class="border-l border-t border-gray-600 flex justify-center items-center">
             <input
               type="text"
+              :disabled="disableGrid"
               name="strBankNumber"
               id=""
               @input="changeInfo"
               v-model="gridvalue24"
-              class="border border-black w-[80%] h-[80%]" />
+              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
           </div>
         </div>
       </div>
@@ -602,6 +629,7 @@ const gridvalue22 = ref();
 const gridvalue23 = ref();
 const gridvalue24 = ref();
 
+const disableGrid = ref(true);
 const zipCode = ref(false);
 const showZipCode = () => {
   zipCode.value = true;
@@ -726,6 +754,7 @@ const addButton = () => {
 
 const clickedRowData = (newValue) => {
   ////console.log(newValue);
+  disableGrid.value = false;
   gridvalue1.value = newValue[1];
   gridvalue2.value = newValue[4];
   gridvalue3.value = newValue[3];

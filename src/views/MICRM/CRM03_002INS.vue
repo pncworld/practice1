@@ -25,6 +25,7 @@
           :mainName="'기간'"
           @endDate="endDate"
           ref="datepicker"
+          :initToday="1"
           :closePopUp="closePopUp"
           @excelDate="excelDate"
           @startDate="startDate">
@@ -216,7 +217,7 @@ const searchButton = async () => {
     );
 
     rowData.value = res.data.List;
-    ////console.log(res);
+    //console.log(res);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;

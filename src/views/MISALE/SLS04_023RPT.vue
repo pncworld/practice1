@@ -42,6 +42,28 @@
       </div>
       <div></div>
       <div
+        class="flex justify-start items-center text-base text-nowrap font-semibold ml-12">
+        메뉴구분
+        <div class="flex ml-5 space-x-5 mt-1">
+          <v-select
+            v-model="cond"
+            :options="mainMenu"
+            placeholder="전체"
+            label="strName"
+            class="w-36 !h-8 bg-white"
+            clearable="true" />
+
+          <v-select
+            v-model="cond2"
+            :options="optionList"
+            placeholder="전체"
+            label="strName"
+            class="w-60 !h-8 bg-white"
+            clearable="true" />
+        </div>
+      </div>
+
+      <!-- <div
         class="flex justify-start items-center text-base text-nowrap font-semibold ml-12 space-x-5">
         메뉴구분
         <div class="flex space-x-5 ml-5">
@@ -58,7 +80,7 @@
             </option>
           </select>
         </div>
-      </div>
+      </div> -->
       <div class="flex items-center justify-start text-base font-bold ml-2">
         <div>ABC</div>
         <select name="" id="" class="w-28 h-8 ml-5" v-model="cond3">
@@ -102,7 +124,7 @@
 </template>
 
 <script setup>
-import { getMenuDistinct, getMenuEngineer } from "@/api/misales";
+import { getMenuEngineer, getTableSearchCondition } from "@/api/misales";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -145,8 +167,8 @@ const rowData2 = ref([]);
 const afterSearch = ref(false);
 const selectedstartDate = ref();
 const selectedendDate = ref();
-const cond = ref(0);
-const cond2 = ref(0);
+const cond = ref({ lngCode: 0, strName: "전체" });
+const cond2 = ref({ lngCode: 0, strName: "전체" });
 const cond3 = ref(0);
 const cond4 = ref(0);
 const optionList = ref([{ lngCode: 0, strName: "전체" }]);
@@ -204,12 +226,12 @@ const searchButton = async () => {
       selectedGroup.value,
       selectedstartDate.value,
       selectedendDate.value,
-      cond.value,
-      cond2.value,
+      cond.value == null ? 0 : cond.value.lngCode,
+      cond2.value == null ? 0 : cond2.value.lngCode,
       cond3.value,
       cond4.value
     );
-    //console.log(res);
+    console.log(res);
 
     rowData.value = res.data.List;
 
@@ -241,20 +263,44 @@ const lngStoreCodes = (e) => {
   //comsole.log(e);
 };
 
-watch(cond, async () => {
-  const res = await getMenuDistinct(
-    store.state.userData.lngStoreGroup,
-    0,
-    cond.value
-  );
-  //console.log(res);
-  optionList.value = res.data.List;
+// watch(cond, async () => {
+//   const res = await getMenuDistinct(
+//     store.state.userData.lngStoreGroup,
+//     0,
+//     cond.value
+//   );
+//   //console.log(res);
+//   optionList.value = res.data.List;
 
-  if (optionList.value.length == 0) {
-    optionList.value = [{ lngCode: 0, strName: "전체" }];
+//   if (optionList.value.length == 0) {
+//     optionList.value = [{ lngCode: 0, strName: "전체" }];
+//   }
+//   cond2.value = 0;
+// });
+const mainMenu = ref([
+  { lngCode: 0, strName: "전체" },
+  { lngCode: 1, strName: "대그룹" },
+  { lngCode: 2, strName: "서브그룹" },
+  { lngCode: 3, strName: "메뉴코드" },
+]);
+
+watch(cond, async () => {
+  if (cond.value == null) {
+    cond2.value = { lngCode: 0, strName: "전체" };
+    optionList.value = [];
+    return;
   }
-  cond2.value = 0;
+  const res = await getTableSearchCondition(
+    selectedGroup.value,
+    selectedStores.value,
+    cond.value.lngCode
+  );
+  console.log(res);
+  optionList.value = res.data.SUBLIST;
+  //comsole.log(subList.value);
+  cond2.value = { lngCode: 0, strName: "전체" };
 });
+
 /**
  * 페이지 매장 분류 세팅
  */

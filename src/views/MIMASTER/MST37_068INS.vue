@@ -29,13 +29,17 @@
       <div
         class="flex justify-start mr-40 items-center text-base font-semibold space-x-20 ml-12">
         <div class="flex justify-start items-center">
-          <div>매장명</div>
+          <!-- <div>매장명</div>
           <select name="" id="" class="w-40 h-8 ml-5" v-model="selectedStore">
-            <option value="0">선택</option>
             <option :value="i.lngStoreCode" v-for="i in GroupList">
               {{ i.strStoreName }}
             </option>
-          </select>
+          </select> -->
+
+          <PickStore
+            :hideAttr="false"
+            :hideGroup="false"
+            @update:storeCd="updatelngStoreCode"></PickStore>
         </div>
         <div class="flex justify-center items-center">
           <div>멀티단가그룹</div>
@@ -117,11 +121,17 @@
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :showCheckBar="false"
-        :checkRenderEditable="false"
+        :checkRenderEditable="true"
+        :checkRowAuto="false"
+        :checkRowAuto2="true"
+        :checkRowAuto2Col="'checkbox'"
+        :editableColId="'lngMultiPrice'"
+        :inputOnlyNumberColumn="'lngMultiPrice'"
         :changeNow3="changeNow"
         :changeRow="changeRow"
         :changeColid="changeColid"
         :changeValue2="changeValue2"
+        :selectionStyle="'block'"
         @checkedRowData="checkedRowData"
         @checkedRowIndex="checkedRowIndex"
         @updatedRowData="updatedRowData"
@@ -151,6 +161,7 @@ import {
  *  */
 
 import PageName from "@/components/pageName.vue";
+import PickStore from "@/components/pickStore.vue";
 /**
  * 	매장 단일 선택 컴포넌트
  */
@@ -240,6 +251,7 @@ const checkedRowIndex = (e) => {
 
 const updateRowData = ref([]);
 const updatedRowData = (e) => {
+  console.log(e);
   updateRowData.value = e;
 };
 
@@ -255,12 +267,18 @@ const changeColid = ref("lngMultiPrice");
 const changeRow = ref(0);
 
 const changeMultiPrice = async (e) => {
-  if (checkedIndexs.value.length == 0) return;
+  if (updateRowData.value.filter((item) => item.checkbox == true).length == 0)
+    return;
 
-  for (let i = 0; i < checkedIndexs.value.length; i++) {
-    changeRow.value = checkedIndexs.value[i];
+  const checkedIndex = updateRowData.value.map((item, index) => ({
+    ...item,
+    originIndex: index,
+  }));
+  const filtered = checkedIndex.filter((item) => item.checkbox == true);
+  for (let i = 0; i < filtered.length; i++) {
+    changeRow.value = filtered[i].originIndex;
     changeValue2.value =
-      checkedDatas.value[i] == undefined ? 0 : checkedDatas.value[i];
+      filtered[i].lngMenuPrice == undefined ? 0 : filtered[i].lngMenuPrice;
 
     changeValue2.value =
       cond5.value == "0"
@@ -276,10 +294,16 @@ const changeMultiPrice = async (e) => {
 };
 
 const deleteMultiPrice = async () => {
-  if (checkedIndexs.value.length == 0) return;
+  if (updateRowData.value.filter((item) => item.checkbox == true).length == 0)
+    return;
 
-  for (let i = 0; i < checkedIndexs.value.length; i++) {
-    changeRow.value = checkedIndexs.value[i];
+  const checkedIndex = updateRowData.value.map((item, index) => ({
+    ...item,
+    originIndex: index,
+  }));
+  const filtered = checkedIndex.filter((item) => item.checkbox == true);
+  for (let i = 0; i < filtered.length; i++) {
+    changeRow.value = filtered[i].originIndex;
     changeValue2.value = undefined;
 
     changeNow.value = !changeNow.value;
@@ -337,21 +361,6 @@ const searchButton = async () => {
 };
 
 const saveButton = async (e) => {
-  // if (selectedStore.value == 0) {
-  //   Swal.fire({
-  //     title: "경고",
-  //     text: "매장명을 먼저 선택하세요.",
-  //     icon: "warning",
-  //     confirmButtonText: "확인",
-  //   });
-  //   return;
-  // }
-  ////console.log(updateRowData.value);
-  // const filteredData = updateRowData.value.filter(
-  //   (item) => item.lngMultiPrice != undefined
-  // );
-  // ////console.log(filteredData);
-  // ////console.log(store.state.userData.lngStoreGroup);
   try {
     store.state.loading = true;
     // initGrid();
@@ -377,11 +386,28 @@ const saveButton = async (e) => {
       lngMultiPrice
     );
     ////console.log(res);
+
+    if (res.data.RESULT_CD == "00") {
+      await Swal.fire({
+        title: "성공",
+        text: "수정하신 멀티단가를 저장하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+    } else {
+      await Swal.fire({
+        title: "실패",
+        text: "수정하신 멀티단가 저장에 실패하였습니다.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+    }
     store.state.loading = false;
   } catch (error) {
     ////console.log(error);
   } finally {
     store.state.loading = false;
+    searchButton();
   }
 };
 
@@ -399,6 +425,11 @@ const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
   ////console.log(e);
+};
+
+const updatelngStoreCode = (e) => {
+  initGrid();
+  selectedStores.value = e;
 };
 const lngStoreGroup = async (e) => {
   //initGrid();

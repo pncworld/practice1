@@ -7,10 +7,15 @@ import { getGridInfoList } from "@/api/common";
 import { getDynamicGrid2, getDynamicGrid3 } from "@/api/master";
 import { getDynamicGrid4 } from "@/api/micrm";
 import { getDynamicGrid5, getDynamicGrid6 } from "@/api/mihr";
-import { getDynamicGrid } from "@/api/misales";
+import {
+  getDynamicGrid,
+  getDynamicGrid7,
+  getDynamicGrid8,
+} from "@/api/misales";
 import {
   excelTitle,
   formatDateTime,
+  formatDateTime2,
   formatLocalDate,
 } from "@/customFunc/customFunc";
 import store from "@/store";
@@ -262,6 +267,11 @@ const props = defineProps({
     default: "",
   },
   exporttoExcel: {
+    // 엑셀 내보내기
+    type: Boolean,
+    default: false,
+  },
+  exporttoExcel2: {
     // 엑셀 내보내기
     type: Boolean,
     default: false,
@@ -854,6 +864,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  checkRenderEditable2Col: {
+    // 체크바 수정 관련 변수
+    type: String,
+    default: "",
+  },
   dynamicRowHeight: {
     // 행높이
     type: Boolean,
@@ -974,6 +989,16 @@ const props = defineProps({
     type: String,
     default: "9999",
   },
+  setDynamicGrid7: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
+  setDynamicGrid8: {
+    // 행높이
+    type: Boolean,
+    default: false,
+  },
   initCheckRows: {
     // 행높이
     type: Array,
@@ -1080,17 +1105,17 @@ const props = defineProps({
     type: String,
     default: "",
   },
-    CalculateSupplyPrice: {
+  CalculateSupplyPrice: {
     type: String,
-    default: '',
+    default: "",
   },
-    CalculateVatPrice: {
+  CalculateVatPrice: {
     type: String,
-    default: '',
+    default: "",
   },
-    CalculateTotalPrice: {
+  CalculateTotalPrice: {
     type: String,
-    default: '',
+    default: "",
   },
 
   exportExcelHiddenColumns: {
@@ -1128,6 +1153,10 @@ const props = defineProps({
     default: "",
   },
   setTreeView: {
+    type: Boolean,
+    default: false,
+  },
+  editableColByCondition: {
     type: Boolean,
     default: false,
   },
@@ -1187,7 +1216,7 @@ const funcshowGrid = async () => {
 
   // nextTick으로 DOM 업데이트 후 초기화
   //
-
+  await nextTick();
   const container = document.getElementById(realgridname.value);
   await nextTick();
   if (!container) {
@@ -1242,47 +1271,42 @@ const funcshowGrid = async () => {
           let dblResultQty = values[fieldNames.indexOf("dblResultQty")];
           let dblTakeQty = values[fieldNames.indexOf("dblTakeQty")];
 
-      if (dblResultQty > 0)
-      {
-        return parseInt(dblTakeQty) - parseInt(dblResultQty);
-      }
-      else
-      {
-        return parseInt(dblTakeQty) + parseInt(dblResultQty);
-      }
-    }
-
+          if (dblResultQty > 0) {
+            return parseInt(dblTakeQty) - parseInt(dblResultQty);
+          } else {
+            return parseInt(dblTakeQty) + parseInt(dblResultQty);
+          }
+        }
       : props.CalculateSupplyPrice.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
           let curUnitPrice = values[fieldNames.indexOf("curUnitPrice")];
-          let dblCheckQty  = values[fieldNames.indexOf("dblCheckQty")];
-          
+          let dblCheckQty = values[fieldNames.indexOf("dblCheckQty")];
+
           let supplyPrice = curUnitPrice * dblCheckQty;
 
           return supplyPrice;
-      }
+        }
       : props.CalculateVatPrice.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
           let curUnitPrice = values[fieldNames.indexOf("curUnitPrice")];
-          let dblCheckQty  = values[fieldNames.indexOf("dblCheckQty")];
-          
+          let dblCheckQty = values[fieldNames.indexOf("dblCheckQty")];
+
           let supplyPrice = curUnitPrice * dblCheckQty;
-          let vat         = supplyPrice * 0.1; // 예: 부가세
+          let vat = supplyPrice * 0.1; // 예: 부가세
 
           return vat;
-      }
+        }
       : props.CalculateTotalPrice.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
           let curUnitPrice = values[fieldNames.indexOf("curUnitPrice")];
-          let dblCheckQty  = values[fieldNames.indexOf("dblCheckQty")];
-          
+          let dblCheckQty = values[fieldNames.indexOf("dblCheckQty")];
+
           let supplyPrice = curUnitPrice * dblCheckQty;
-          let vat         = supplyPrice * 0.1; // 예: 부가세
-          let total       = supplyPrice + vat; // 합계
+          let vat = supplyPrice * 0.1; // 예: 부가세
+          let total = supplyPrice + vat; // 합계
 
           return total;
-      }
-      
+        }
       : props.CalculateTaxColId2.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
           let unitp = values[fieldNames.indexOf("curUnitPrice")];
@@ -1813,7 +1837,7 @@ const funcshowGrid = async () => {
         ? "date"
         : "line",
       domainOnly: true,
-      textReadOnly: true,
+      textReadOnly: false,
       dropDownWhenClick: true,
       datetimeFormat: "yyyy-MM-dd",
       mask:
@@ -1831,6 +1855,11 @@ const funcshowGrid = async () => {
               includedFormat: true,
               overWrite: true,
               allowEmpty: true,
+            }
+          : item.strColType.includes("date")
+          ? {
+              editMask: "9999-99-99",
+              includedFormat: true,
             }
           : null,
       commitOnSelect: true,
@@ -1860,288 +1889,327 @@ const funcshowGrid = async () => {
           : "text",
       editable:
         props.checkRenderEditable == true &&
+        item.strColID != props.checkRenderEditable2Col &&
         (item.strColID.includes("checkbox") ||
           item.strDisplay.includes("checkbox"))
           ? true
+          : props.checkRenderEditable == true &&
+            item.strColID == props.checkRenderEditable2Col
+          ? false
           : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
     },
     buttonVisibility: "always",
-    styleCallback: props.checkAbleExpressionCol.includes(item.strColID)
-      ? function (grid, dataCell) {
-          if (item.strColID == "Selected") {
-            const blnChk = grid
-              .getDataSource()
-              .getValue(dataCell.index.dataRow, props.checkAbleExpressionCol2);
+    styleCallback:
+      props.editableColByCondition == true
+        ? // 시간값에 따라서 배경 색상 지정
+          function (grid, dataCell) {
+            var ret = {};
 
-            if (props.checkAbleExpressionVal.includes(blnChk)) {
+            if (item.strColID == "dblDemandQty") {
+              const val = grid
+                .getDataSource()
+                .getValue(dataCell.index.dataRow, "dtmEndDate");
+              const val2 = formatDateTime2(new Date());
+              const val3 = grid
+                .getDataSource()
+                .getValue(dataCell.index.dataRow, "strStatus");
+
+              return {
+                editable:
+                  new Date(val.replace(" ", "T")) >
+                    new Date(val2.slice(0, 16).replace(" ", "T")) &&
+                  val3 !== "출고완료",
+              };
+            }
+          }
+        : props.checkAbleExpressionCol.includes(item.strColID)
+        ? function (grid, dataCell) {
+            if (item.strColID == "Selected") {
+              const blnChk = grid
+                .getDataSource()
+                .getValue(
+                  dataCell.index.dataRow,
+                  props.checkAbleExpressionCol2
+                );
+
+              if (props.checkAbleExpressionVal.includes(blnChk)) {
+                return {
+                  editable: props.rowStateeditable,
+                  renderer: {
+                    type: "check",
+                    editable: false,
+                    readOnlySetDisabled: true,
+                  },
+                };
+              }
               return {
                 editable: props.rowStateeditable,
                 renderer: {
                   type: "check",
-                  editable: false,
-                  readOnlySetDisabled: true,
+                  editable: true,
                 },
               };
-            }
-            return {
-              editable: props.rowStateeditable,
-              renderer: {
-                type: "check",
-                editable: true,
-              },
-            };
-          } else if (item.strColID == "cancled") {
-            const blnChk = grid
-              .getDataSource()
-              .getValue(dataCell.index.dataRow, props.checkAbleExpressionCol3);
+            } else if (item.strColID == "cancled") {
+              const blnChk = grid
+                .getDataSource()
+                .getValue(
+                  dataCell.index.dataRow,
+                  props.checkAbleExpressionCol3
+                );
 
-            if (props.checkAbleExpressionVal2.includes(blnChk)) {
+              if (props.checkAbleExpressionVal2.includes(blnChk)) {
+                return {
+                  editable: props.rowStateeditable,
+                  renderer: {
+                    type: "check",
+                    editable: false,
+                    readOnlySetDisabled: true,
+                  },
+                };
+              }
               return {
                 editable: props.rowStateeditable,
                 renderer: {
                   type: "check",
-                  editable: false,
-                  readOnlySetDisabled: true,
+                  editable: true,
                 },
               };
-            }
-            return {
-              editable: props.rowStateeditable,
-              renderer: {
-                type: "check",
-                editable: true,
-              },
-            };
-          } else {
-            const blnChk = grid
-              .getDataSource()
-              .getValue(dataCell.index.dataRow, props.checkAbleExpressionCol2);
+            } else {
+              const blnChk = grid
+                .getDataSource()
+                .getValue(
+                  dataCell.index.dataRow,
+                  props.checkAbleExpressionCol2
+                );
 
-            if (blnChk != props.checkAbleExpressionVal) {
+              if (blnChk != props.checkAbleExpressionVal) {
+                return {
+                  editable: props.rowStateeditable,
+                  renderer: {
+                    type: "check",
+                    editable: false,
+                    readOnlySetDisabled: true,
+                  },
+                };
+              }
               return {
                 editable: props.rowStateeditable,
                 renderer: {
                   type: "check",
-                  editable: false,
-                  readOnlySetDisabled: true,
+                  editable: true,
                 },
               };
             }
-            return {
-              editable: props.rowStateeditable,
-              renderer: {
-                type: "check",
-                editable: true,
-              },
-            };
           }
-        }
-      : props.setCellStyleColId3 == true
-      ? function (grid, dataCell) {
-          // 시간값에 따라서 배경 색상 지정
+        : props.setCellStyleColId3 == true
+        ? function (grid, dataCell) {
+            // 시간값에 따라서 배경 색상 지정
 
-          var ret = {};
+            var ret = {};
 
-          if (dataCell.dataColumn.header.text.includes("토")) {
-            ret.style = { backgroundColor: "#ADD8E6" };
-          } else if (dataCell.dataColumn.header.text.includes("/일")) {
-            ret.style = { backgroundColor: "#FFC0CB" };
-          }
+            if (dataCell.dataColumn.header.text.includes("토")) {
+              ret.style = { backgroundColor: "#ADD8E6" };
+            } else if (dataCell.dataColumn.header.text.includes("/일")) {
+              ret.style = { backgroundColor: "#FFC0CB" };
+            }
 
-          //  const value = grid.getValue(
-          //   dataCell.index.itemIndex,
-          //   "lngErrorCode"
-          // );
-
-          if (
-            dataCell.value == "휴무" ||
-            (dataCell.value.length == 1 && isNaN(parseInt(dataCell.value)))
-          ) {
-            ret.style = { backgroundColor: "#D3D3D3" };
-          }
-
-          return ret;
-        }
-      : props.setCellStyleColId2.includes(item.strColID) // 하드코딩
-      ? function (grid, dataCell) {
-          // 시간값에 따라서 배경 색상 지정
-          var ret = {};
-          ////console.log(item.strColID);
-          const value = grid.getValue(dataCell.index.itemIndex, "lngErrorCode");
-          if (
-            item.strColID == "strPSTime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPSTime") {
-            ret.style = { backgroundColor: "#8EE0FF" };
-          } else if (
-            item.strColID == "strPETime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPETime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strPTTime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPTTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strPWTime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPWTime") {
-            ret.style = { backgroundColor: "#BDFFCF" };
-          } else if (
-            item.strColID == "strPRTime" &&
-            (value == 1 || value == 3 || value == 5 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strPRTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strWSTime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWSTime") {
-            ret.style = { backgroundColor: "#8EE0FF" };
-          } else if (
-            item.strColID == "strWETime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWETime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strWTTime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWTTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strWWTime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWWTime") {
-            ret.style = { backgroundColor: "#BDFFCF" };
-          } else if (
-            item.strColID == "strWRTime" &&
-            (value == 2 || value == 3 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strWRTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strRSTime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRSTime") {
-            ret.style = { backgroundColor: "#8EE0FF" };
-          } else if (
-            item.strColID == "strRETime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRETime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strRTTime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRTTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          } else if (
-            item.strColID == "strRWTime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRWTime") {
-            ret.style = { backgroundColor: "#BDFFCF" };
-          } else if (
-            item.strColID == "strRRTime" &&
-            (value == 4 || value == 5 || value == 6 || value == 7)
-          ) {
-            ret.style = { backgroundColor: "#FF0000" };
-          } else if (item.strColID == "strRRTime") {
-            ret.style = { backgroundColor: "#FFFFFF" };
-          }
-          //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
-          //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
-
-          return ret;
-        }
-      : props.setCellStyleColId.includes(item.strColID)
-      ? function (grid, dataCell) {
-          // 시간값에 따라서 배경 색상 지정
-          var ret = {};
-          ////console.log(item.strColID);
-          //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
-          //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
-
-          dataCell.value == "1"
-            ? (ret.style = { backgroundColor: "#ADD8E6", color: "#ADD8E6" })
-            : (ret.style = { backgroundColor: "#FFFFFF", color: "#FFFFFF" });
-
-          return ret;
-        }
-      : props.ColCellRedColorColId.includes(item.strColID)
-      ? function (grid, dataCell) {
-          var ret = {};
-          ret.style = { color: "#FF0000" };
-          return ret;
-        }
-      : function (grid, dataCell) {
-          var ret = {};
-
-          if (
-            (dataCell.item.rowState == "created" ||
-              dataCell.item.itemState == "appending" ||
-              dataCell.item.itemState == "inserting") &&
-            props.rowStateeditable
-          ) {
-            ret.editable = true;
-          } else if (props.editableColId.includes(item.strColID)) {
-            ret.editable = true;
-          } else if (
-            props.rowStateeditable == true &&
-            dataCell.item.itemState == "normal"
-          ) {
-            ret.editable = true;
-          } else {
-            ret.editable = false;
-          }
-
-          if (props.checkBarInactive != "") {
-            var inActiveColumn = grid.getValue(
-              dataCell.index.itemIndex,
-              props.checkBarInactive
-            );
+            //  const value = grid.getValue(
+            //   dataCell.index.itemIndex,
+            //   "lngErrorCode"
+            // );
 
             if (
-              inActiveColumn == "0" &&
-              (item.strColID == "checkbox" ||
-                item.strDisplay.includes("checkbox"))
+              dataCell.value == "휴무" ||
+              (dataCell.value.length == 1 && isNaN(parseInt(dataCell.value)))
             ) {
-              ret.style = { opacity: "0.5" };
-              ret.renderer = { type: "check", editable: false };
+              ret.style = { backgroundColor: "#D3D3D3" };
             }
-            if (item.strColID == "lngSupplierID") {
-              ret.style = { opacity: "0.5" };
-              ret.renderer = { type: "check", editable: false };
-            }
-          }
 
-          return ret;
-        },
+            return ret;
+          }
+        : props.setCellStyleColId2.includes(item.strColID) // 하드코딩
+        ? function (grid, dataCell) {
+            // 시간값에 따라서 배경 색상 지정
+            var ret = {};
+            ////console.log(item.strColID);
+            const value = grid.getValue(
+              dataCell.index.itemIndex,
+              "lngErrorCode"
+            );
+            if (
+              item.strColID == "strPSTime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPSTime") {
+              ret.style = { backgroundColor: "#8EE0FF" };
+            } else if (
+              item.strColID == "strPETime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPETime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strPTTime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPTTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strPWTime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPWTime") {
+              ret.style = { backgroundColor: "#BDFFCF" };
+            } else if (
+              item.strColID == "strPRTime" &&
+              (value == 1 || value == 3 || value == 5 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strPRTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strWSTime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWSTime") {
+              ret.style = { backgroundColor: "#8EE0FF" };
+            } else if (
+              item.strColID == "strWETime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWETime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strWTTime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWTTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strWWTime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWWTime") {
+              ret.style = { backgroundColor: "#BDFFCF" };
+            } else if (
+              item.strColID == "strWRTime" &&
+              (value == 2 || value == 3 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strWRTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strRSTime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRSTime") {
+              ret.style = { backgroundColor: "#8EE0FF" };
+            } else if (
+              item.strColID == "strRETime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRETime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strRTTime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRTTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            } else if (
+              item.strColID == "strRWTime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRWTime") {
+              ret.style = { backgroundColor: "#BDFFCF" };
+            } else if (
+              item.strColID == "strRRTime" &&
+              (value == 4 || value == 5 || value == 6 || value == 7)
+            ) {
+              ret.style = { backgroundColor: "#FF0000" };
+            } else if (item.strColID == "strRRTime") {
+              ret.style = { backgroundColor: "#FFFFFF" };
+            }
+            //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
+            //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
+
+            return ret;
+          }
+        : props.setCellStyleColId.includes(item.strColID)
+        ? function (grid, dataCell) {
+            // 시간값에 따라서 배경 색상 지정
+            var ret = {};
+            ////console.log(item.strColID);
+            //  const hour = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[0]
+            //  const minute = grid.getValue(dataCell.index.itemIndex, 'strTime').split(':')[1]
+
+            dataCell.value == "1"
+              ? (ret.style = { backgroundColor: "#ADD8E6", color: "#ADD8E6" })
+              : (ret.style = { backgroundColor: "#FFFFFF", color: "#FFFFFF" });
+
+            return ret;
+          }
+        : props.ColCellRedColorColId.includes(item.strColID)
+        ? function (grid, dataCell) {
+            var ret = {};
+            ret.style = { color: "#FF0000" };
+            return ret;
+          }
+        : function (grid, dataCell) {
+            var ret = {};
+
+            if (
+              (dataCell.item.rowState == "created" ||
+                dataCell.item.itemState == "appending" ||
+                dataCell.item.itemState == "inserting") &&
+              props.rowStateeditable
+            ) {
+              ret.editable = true;
+            } else if (props.editableColId.includes(item.strColID)) {
+              ret.editable = true;
+            } else if (
+              props.rowStateeditable == true &&
+              dataCell.item.itemState == "normal"
+            ) {
+              ret.editable = true;
+            } else {
+              ret.editable = false;
+            }
+
+            if (props.checkBarInactive != "") {
+              var inActiveColumn = grid.getValue(
+                dataCell.index.itemIndex,
+                props.checkBarInactive
+              );
+
+              if (
+                inActiveColumn == "0" &&
+                (item.strColID == "checkbox" ||
+                  item.strDisplay.includes("checkbox"))
+              ) {
+                ret.style = { opacity: "0.5" };
+                ret.renderer = { type: "check", editable: false };
+              }
+              if (item.strColID == "lngSupplierID") {
+                ret.style = { opacity: "0.5" };
+                ret.renderer = { type: "check", editable: false };
+              }
+            }
+
+            return ret;
+          },
   }));
 
   if (props.labelingColumns != "") {
@@ -2478,12 +2546,13 @@ const funcshowGrid = async () => {
     const groupList2 = props.mergeColumnGroupName3; // [['그룹컬럼1','그룹컬럼2']]
 
     let layout = [];
+    console.log(tabInitSetArray.value);
     tabInitSetArray.value.forEach((item) => {
       // 1) subList3 전체 1차 그룹 인덱스 찾기
       const groupIndex = subList3.findIndex((group2D) =>
         group2D.some((group1D) => group1D.includes(item.strColID))
       );
-
+      console.log(groupIndex);
       // 2) 만약 그룹에 속한다면, 그 안에서 몇 번째 subgroup인지(innerIndex)
       let innerIndex = -1;
       if (groupIndex !== -1) {
@@ -2510,33 +2579,80 @@ const funcshowGrid = async () => {
               column: item.strColID,
               width: item.intHdWidth,
             });
-          } else if (
-            groupList3[groupIndex] != undefined &&
-            groupList2[groupIndex][innerIndex] != undefined
-          ) {
-            const findit = layout.find(
-              (item) => item.name == groupList3[groupIndex]
-            );
-            if (findit == undefined) {
-              layout.push({
-                name: groupList3[groupIndex],
-                direction: "horizontal",
-                header: {
-                  styleName: `header-style-0`,
+            // } else if (
+            //   groupList3[groupIndex] != undefined &&
+            //   groupList2[groupIndex][innerIndex] != undefined
+            // ) {
+            //   console.log(groupList3[groupIndex]);
+            //   const findit = layout.find(
+            //     (item) => item.name == groupList3[groupIndex]
+            //   );
+            //   console.log(findit);
+            //   if (findit == undefined) {
+            //     layout.push({
+            //       name: groupList3[groupIndex],
+            //       direction: "horizontal",
+            //       header: {
+            //         styleName: `header-style-0`,
+            //       },
+            //       items: [
+            //         {
+            //           name: groupList2[groupIndex][innerIndex],
+            //           direction: "horizontal",
+            //           header: { styleName: "header-style-0" },
+            //           items: [{ column: item.strColID, width: item.intHdWidth }],
+            //         },
+            //       ],
+            //     });
+
+            //     console.log(layout);
+            //   } else {
+            //     const findit2 = findit.items.find(
+            //       (item) => item.name == groupList2[groupIndex][innerIndex]
+            //     );
+            //     findit2.items.push({
+            //       column: item.strColID,
+            //       width: item.intHdWidth,
+            //     });
+            //   }
+          }
+        } else if (
+          groupList3[groupIndex] != undefined &&
+          groupList2[groupIndex][innerIndex] != undefined
+        ) {
+          const findit = layout.find(
+            (item) => item.name == groupList3[groupIndex]
+          );
+
+          if (findit == undefined) {
+            layout.push({
+              name: groupList3[groupIndex],
+              direction: "horizontal",
+              header: {
+                styleName: `header-style-0`,
+              },
+              items: [
+                {
+                  name: groupList2[groupIndex][innerIndex],
+                  direction: "horizontal",
+                  header: { styleName: "header-style-0" },
+                  items: [{ column: item.strColID, width: item.intHdWidth }],
                 },
-                items: [
-                  {
-                    name: groupList2[groupIndex][innerIndex],
-                    direction: "horizontal",
-                    header: { styleName: "header-style-0" },
-                    items: [{ column: item.strColID, width: item.intHdWidth }],
-                  },
-                ],
+              ],
+            });
+          } else {
+            const findit2 = findit.items.find(
+              (item) => item.name == groupList2[groupIndex][innerIndex]
+            );
+
+            if (findit2 == undefined) {
+              findit.items.push({
+                name: groupList2[groupIndex][innerIndex],
+                direction: "horizontal",
+                header: { styleName: "header-style-0" },
+                items: [{ column: item.strColID, width: item.intHdWidth }],
               });
             } else {
-              const findit2 = findit.items.find(
-                (item) => item.name == groupList2[groupIndex][innerIndex]
-              );
               findit2.items.push({
                 column: item.strColID,
                 width: item.intHdWidth,
@@ -2554,6 +2670,7 @@ const funcshowGrid = async () => {
       }
     });
 
+    console.log(layout);
     gridView.setColumnLayout(layout);
   }
   /* 3단 예시
@@ -2691,11 +2808,12 @@ const funcshowGrid = async () => {
   gridView.editOptions.editable =
     props.checkRenderEditable == true ? true : false;
   gridView.editOptions.updatable = true;
+
   gridView.editOptions.deletable = true;
   gridView.displayOptions.fitStyle =
     props.fixedColumn == false ? "even" : "none";
   gridView.editOptions.commitByCell = true;
-  gridView.editOptions.commitByCell = true;
+
   gridView.editOptions.commitWhenLeave = true;
   gridView.displayOptions.showInnerFocus = false;
   gridView.displayOptions.useAlternateRowStyle = props.useAlternateRowStyle
@@ -2704,8 +2822,8 @@ const funcshowGrid = async () => {
   dataProvider.softDeleting = props.notsoftDelete == false ? true : false;
   dataProvider.deleteCreated = props.deleteCreated;
   gridView.filteringOptions.handleVisibility = "hidden";
-  //gridView.sortingOptions.enabled = false; // 정렬기능 비활성화
-  dataProvider.autoCommit = true; // 자동 커밋 활성화
+  // gridView.sortingOptions.enabled = false; // 정렬기능 비활성화
+  //dataProvider.autoCommit = true; // 자동 커밋 활성화
   dataProvider.commitBeforeDataEdit = true;
   gridView.editOptions.movable = props.dragOn == true ? true : false;
   gridView.displayOptions.selectAndImmediateDrag =
@@ -2720,7 +2838,7 @@ const funcshowGrid = async () => {
       : props.dynamicRowHeight2 == true && props.setTreeView == true
       ? -1
       : 1;
-
+  gridView.displayOptions.wheelScrollLines = 1;
   if (props.setTreeView == false) {
     gridView.groupPanel.visible = false;
   } else {
@@ -2858,8 +2976,10 @@ const funcshowGrid = async () => {
 
   gridView.onCellEdited = function (grid, itemIndex, row, field) {
     gridView.commit();
+    const isCheckCell =
+      gridView.columnByField(field).renderer?.type === "check";
 
-    if (props.checkRowAuto2 == true) {
+    if (props.checkRowAuto2 == true && isCheckCell) {
       const val = grid.getDataSource().getValue(row, props.checkRowAuto2Col); // 셀 클릭시 checkautoRow  = false 하고 셀 클릭과 내장 체크바가 연동안되게하면서 이 방식으로 체크박스가 체크되었을때만체크되게 설정
       grid.checkRow(row, val);
     }
@@ -3242,8 +3362,6 @@ watch(
 watch(
   () => props.changeNow2,
   () => {
-    console.log(props.changeNow2);
-
     if (props.changeRow !== "" && props.changeRow != -1) {
       if (
         dataProvider != null &&
@@ -3312,10 +3430,6 @@ watch(
     }
   }
 );
-
-// onMounted(() => {
-//   //comsole.log("asdf");
-// });
 
 watch(
   () => [props.searchWord3, props.searchValue, props.searchSpecialCond],
@@ -3502,7 +3616,7 @@ watch(
     gridView.setCurrent({ dataRow: dataRow });
     const current = gridView.getCurrent();
     emit("allStateRows", dataProvider.getAllStateRows());
-    props.rowData.push(values);
+    // props.rowData.push(values);
     const selectedRowIndex = current ? current.dataRow : null;
     if (selectedRowIndex !== null) {
       //comsole.log("현재 선택된 인덱스:", selectedRowIndex); // 선택된 행의 인덱스 출력
@@ -3788,7 +3902,7 @@ watch(
     //   emit("sendRowState", currRowState2);
     // }
 
-    // gridView.commit();
+    // //gridView.commit();
     // const curr = gridView.getCurrent(); // gridView 가뭔지  dataProvider 가 뭔지 개념을 설명
     // if (curr.dataRow == -1) {
     //   return;
@@ -3927,6 +4041,62 @@ watch(
     });
   }
 );
+
+watch(
+  () => props.exporttoExcel2,
+  (newVal) => {
+    // const documentTitle = excelTitle(
+    //   store.state.minorCategory.find((item) =>
+    //     item.strUrl.includes(props.documentTitle)
+    //   )
+    // );
+    //const excelNm = documentTitle.split("-")[2];
+    // const user = store.state.userData.strChargerName;
+    // const userID = store.state.userData.loginID;
+    const today = formatDateTime(new Date());
+
+    gridView.exportGrid({
+      type: "excel",
+      target: "local",
+      numberCallback: function (index, column, value) {
+        if (value === Infinity) {
+          return 0;
+        } else {
+          return value;
+        }
+      },
+      documentTitle: {
+        //제목
+        message: props.documentTitle,
+        visible: true,
+        spaceTop: 1,
+        spaceBottom: 0,
+        height: 30,
+        styleName: "documentStyle",
+      },
+      documentSubtitle: {
+        //부제
+        message:
+          props.documentSubTitle + "\n" + "조회시간 : " + today + "\n" + ")",
+        visible: true,
+        height: 80,
+        styleName: "documentSubtitleStyle",
+      },
+      fileName: props.documentTitle + ".xlsx",
+      showProgress: true,
+      progressMessage: "엑셀 Export중입니다.",
+      indicator: true,
+      header: true,
+      footer: true,
+      compatibility: true,
+      lookupDisplay: true,
+      applyDynamicStyles: true,
+      hiddenColumns: props.exportExcelHiddenColumns,
+      allColumns: props.exportExcelHiddenColumns.length != 0 ? true : false,
+    });
+  }
+);
+
 watch(
   () => props.initFocus,
   (newVal) => {
@@ -4047,26 +4217,25 @@ watch(
     if (gridView.columnByName("workTime")) {
       gridView.columnByName("workTime").styleCallback = (grid, dataCell) => {
         const times = props.TimeArray;
+        console.log(times);
         const timecode = grid.getValue(dataCell.index.itemIndex, "lngtimeCode");
+        console.log(timecode);
         const isin = times.some(([start, end]) => {
-          return Number(timecode) >= start && Number(timecode) < end;
+          return Number(timecode) > start - 0.5 && Number(timecode) < end;
         });
-        ////console.log(timecode);
-        // ////console.log(isin);
+
         if (isin) {
           return { styleName: "blue-column" };
         }
-        // const name = grid.getValue(dataCell.index.itemIndex, 'KorName')
-        // if(name === '박영호'){
-        //     return {styleName : "orange-column"}
-        // }
       };
     }
   }
 );
 
 onMounted(async () => {
+  await nextTick();
   realgridname.value = `realgrid-${props.progname}-${props.progid}-${uuidv4()}`;
+
   emit("realgridname", realgridname.value);
   try {
     if (props.renderProgname != "") {
@@ -4116,6 +4285,24 @@ onMounted(async () => {
 
     if (props.setDynamicGrid6 == true) {
       const res = await getDynamicGrid6(props.setDynamicGrid6Cond);
+
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+      console.log(res);
+    }
+
+    if (props.setDynamicGrid7 == true) {
+      const res = await getDynamicGrid7(store.state.userData.lngStoreGroup);
+
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+      console.log(res);
+    }
+
+    if (props.setDynamicGrid8 == true) {
+      const res = await getDynamicGrid8(store.state.userData.lngStoreGroup);
 
       if (res.data.List.length > 0) {
         tabInitSetArray.value.push(...res.data.List);
@@ -4219,6 +4406,24 @@ const setupGrid = async () => {
       if (res.data.List.length > 0) {
         tabInitSetArray.value.push(...res.data.List);
       }
+    }
+
+    if (props.setDynamicGrid7 == true) {
+      const res = await getDynamicGrid7(store.state.userData.lngStoreGroup);
+
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+      console.log(res);
+    }
+
+    if (props.setDynamicGrid8 == true) {
+      const res = await getDynamicGrid8(store.state.userData.lngStoreGroup);
+
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+      console.log(res);
     }
 
     // Dynamic style generation
