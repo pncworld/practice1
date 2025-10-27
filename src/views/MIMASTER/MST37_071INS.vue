@@ -51,6 +51,7 @@
             :progid="1"
             :rowData="rowData"
             :reload="reload"
+            :rowStateeditable="false"
             :changeRow="changeRow"
             :changeColid="changeColid"
             :changeNow="changeNow"
