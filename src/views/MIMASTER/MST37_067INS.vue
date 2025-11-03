@@ -40,7 +40,7 @@
           @dblclickedRowData="dblclickedRowData"
           :setStateBar="false"
           :rowStateeditable="false"
-          :documentTitle="'MST04_026INS'"
+          :documentTitle="'MST37_067INS'"
           :documentSubTitle="documentSubTitle"
           :exporttoExcel="exporttoExcel"
           :ExcelNm="'자재 그룹 등록'"></Realgrid>
@@ -101,6 +101,7 @@
 
 <script setup>
 import {
+  deleteMultiPriceGroup,
   getMultiGroup2,
   saveMaterialGroup,
   saveMultiPrice,
@@ -198,28 +199,6 @@ const deleteRow = ref(false);
  * 삭제 버튼
  */
 
-const deleteButton = () => {
-  if (afterSearch.value == false) {
-    Swal.fire({
-      title: "조회를 먼저 해주세요.",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-
-  /*
-  if (isNewColumn.value == false) {
-    Swal.fire({
-      title: "먼저 자재그룹코드를 생성해주세요.",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  */
-
-  deleteRow.value = !deleteRow.value;
-};
-
 const disableCd = ref(false);
 /**
  * 데이터셋 상세정보 셋팅
@@ -294,12 +273,6 @@ const allStateRows = (e) => {
  * 엑셀 내보내기 함수
  */
 
-const storeGroupNm = ref();
-
-const GroupNm = (newValue) => {
-  storeGroupNm.value = newValue;
-};
-
 const cond = ref("");
 const excelButton = () => {
   if (afterSearch.value == false) {
@@ -309,7 +282,7 @@ const excelButton = () => {
     });
     return;
   }
-  documentSubTitle.value = "매장그룹 : " + storeGroupNm.value;
+  documentSubTitle.value = "멀티단가명 : " + cond.value;
   exporttoExcel.value = !exporttoExcel.value;
 };
 /**
@@ -494,6 +467,52 @@ const scond = ref("");
 const scond2 = ref("0");
 const onlyNumber = (e) => {
   scond2.value = e.target.value.replace(/[^0-9]/g, "");
+};
+
+const deleteButton = async () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "조회를 먼저 해주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (afterClick.value == false) {
+    Swal.fire({
+      title: "경고",
+      text: "삭제하실 멀티단가 그룹을 선택해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  try {
+    const res = await deleteMultiPriceGroup(
+      store.state.userData.lngStoreGroup,
+      tempMultiCode.value
+    );
+    console.log(res);
+    if (res.data.ERROR_CD == "0000") {
+      Swal.fire({
+        title: "성공",
+        text: "선택하신 멀티그룹을 삭제하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+    } else {
+      Swal.fire({
+        title: "실패",
+        text: "이미 사용중인 멀티단가그룹은 삭제할 수 없습니다.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (error) {
+  } finally {
+    searchButton();
+  }
 };
 </script>
 

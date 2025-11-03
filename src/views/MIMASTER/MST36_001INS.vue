@@ -204,7 +204,7 @@
           :deleteRow6="deleteRow3"
           :addrowDefault="addrowDefault"
           :addrowProp="addrowProp"
-          @updatedRowData="updatedRowData"
+          @updatedRowData2="updatedRowData"
           @allStateRows="allStateRows"
           :rowStateeditable="false"
           :addField="'new'">
@@ -1855,7 +1855,7 @@ const saveButton = () => {
           deleteCd.join(",")
         );
         //comsole.log(res);
-        ////console.log(res);
+        console.log(res);
 
         Swal.fire({
           title: "저장 되었습니다.",
@@ -1891,7 +1891,7 @@ const allStateRows = (e) => {
  */
 
 const updatedRowData = (newvalue) => {
-  //comsole.log(newvalue);
+  console.log(newvalue);
   updateRow.value = newvalue;
   // rowData.value = newvalue;
   // //comsole.log(newvalue);

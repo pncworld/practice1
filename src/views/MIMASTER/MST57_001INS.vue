@@ -264,9 +264,9 @@
           <label class="flex items-center space-x-1">
             <input
               type="radio"
-              :name="'useyn-' + i[0].categoryCode"
+              :name="'useyn-' + (i[0]?.categoryCode ? i[0].categoryCode : '')"
               value="Y"
-              :checked="i[0].USE_YN === 'Y'"
+              :checked="i[0]?.USE_YN === 'Y'"
               @change="(event) => changeUseYn(i[0].categoryCode, event)"
             />
             <span>사용</span>
@@ -274,9 +274,9 @@
           <label class="flex items-center space-x-1">
             <input
               type="radio"
-              :name="'useyn-' + i[0].categoryCode"
+              :name="'useyn-' + (i[0]?.categoryCode ? i[0].categoryCode : '')"
               value="N"
-              :checked="i[0].USE_YN === 'N'"
+              :checked="i[0]?.USE_YN === 'N'"
               @change="(event) => changeUseYn(i[0].categoryCode, event)"
             />
             <span>미사용</span>
@@ -293,7 +293,7 @@
               <input
                 type="checkbox"
                 class="h-4 w-4"
-                :checked="i[0].ALL_DATE === '1'"
+                :checked="i[0]?.ALL_DATE === '1'"
                 @change="(event) => changeAllDate(i[0].categoryCode, event.target.checked)"
                 @keyup="afterModifed"
               />
@@ -307,7 +307,7 @@
                 class="h-8 text-sm ml-1 w-[6vw] disabled:bg-gray-400"
                 :value="i[0] ? i[0].FROM_DATE : ''"
                 @input="(event) => changeFromDate(i[0].categoryCode, event)"
-                :disabled="(i[0].ALL_DATE === '1')"
+                :disabled="(i[0]?.ALL_DATE === '1')"
               />
             </div>
             <!-- 종료일 -->
@@ -318,7 +318,7 @@
                 class="h-8 text-sm ml-1 w-[6vw] disabled:bg-gray-400"
                 :value="i[0] ? i[0].TO_DATE : ''"
                 @input="(event) => changeToDate(i[0].categoryCode, event)"
-                :disabled="(i[0].ALL_DATE === '1')"
+                :disabled="(i[0]?.ALL_DATE === '1')"
               />
             </div>
           </div>
@@ -334,7 +334,7 @@
               <input
                 type="checkbox"
                 class="h-4 w-4"
-                :checked="i[0].ALL_TIME === '1'"
+                :checked="i[0]?.ALL_TIME === '1'"
                 @change="(event) => changeAllTime(i[0].categoryCode, event.target.checked)"
                 @keyup="afterModifed"
               />
@@ -345,18 +345,18 @@
             <div class="flex items-center">
               <span>시작시간 : </span>
               <select name="" id="" class="ml-1 text-lg disabled:bg-gray-400  disabled:opacity-100"
-                    :value="parseInt(i[0].FROM_TIME.substring(0, 2))" 
+                    :value="parseInt(i[0]?.FROM_TIME.substring(0, 2))" 
                     @change="(event) => changeFromTime(i[0].categoryCode, 'hour', event.target.value)"
-                    :disabled="(i[0].ALL_TIME === '1')" >
+                    :disabled="(i[0]?.ALL_TIME === '1')" >
                 <option :value="i.lngCode" v-for="i in optionList">
                   {{ i.strName }}
                 </option>
               </select>
               <span>시</span>
               <select name="" id="" class="text-lg  disabled:bg-gray-400  disabled:opacity-100"
-                    :value="parseInt(i[0].FROM_TIME.substring(2))"
+                    :value="parseInt(i[0]?.FROM_TIME.substring(2))"
                     @change="(event) => changeFromTime(i[0].categoryCode, 'minute', event.target.value)"
-                    :disabled="(i[0].ALL_TIME === '1')" >
+                    :disabled="(i[0]?.ALL_TIME === '1')" >
                 <option :value="i.lngCode" v-for="i in optionList2">
                   {{ i.strName }}
                 </option>
@@ -367,18 +367,18 @@
             <div class="flex items-center">
                 <span>종료시간 : </span>
                 <select name="" id="" class=" text-lg ml-1 disabled:bg-gray-400 disabled:opacity-100"
-                       :value="parseInt(i[0].TO_TIME.substring(0, 2))"
+                       :value="parseInt(i[0]?.TO_TIME.substring(0, 2))"
                        @change="(event) => changeToTime(i[0].categoryCode, 'hour', event.target.value)"
-                       :disabled="(i[0].ALL_TIME === '1')">
+                       :disabled="(i[0]?.ALL_TIME === '1')">
                   <option :value="i.lngCode" v-for="i in optionList">
                     {{ i.strName }}
                   </option>
                 </select>
                 <span>시</span>
                 <select name="" id="" class=" text-lg disabled:bg-gray-400  disabled:opacity-100"
-                      :value="parseInt(i[0].TO_TIME.substring(2))"
+                      :value="parseInt(i[0]?.TO_TIME.substring(2))"
                       @change="(event) => changeToTime(i[0].categoryCode, 'minute', event.target.value)"
-                      :disabled="(i[0].ALL_TIME === '1')">
+                      :disabled="(i[0]?.ALL_TIME === '1')">
                   <option :value="i.lngCode" v-for="i in optionList2">
                     {{ i.strName }}
                   </option>
@@ -394,7 +394,7 @@
         <div class="flex items-center space-x-4">
             <label class="inline-flex items-center space-x-2">
               <input type="checkbox" id="allcheck" class="h-4 w-4" 
-                  :checked="i[0].SEL_DAY === '11111111'" 
+                  :checked="i[0]?.SEL_DAY === '11111111'" 
                   @change="(event) => toggleAllDays(i[0].categoryCode, event.target.checked)">
                 <span class="text-sm">전체체크</span>
               </input>
@@ -403,42 +403,42 @@
               <div class="space-x-3">
               <label for="mon">
                 <input type="checkbox" id="mon" 
-                    :checked="i[0].SEL_DAY.substring(0, 1) === '1'"
+                    :checked="i[0]?.SEL_DAY.substring(0, 1) === '1'"
                     @change="(event) => changeDay(i[0].categoryCode, 0, event.target.checked)" />월
               </label>
               <label for="tue"> 
                 <input type="checkbox" id="tue" 
-                    :checked="i[0].SEL_DAY.substring(1, 2) === '1'"
+                    :checked="i[0]?.SEL_DAY.substring(1, 2) === '1'"
                     @change="(event) => changeDay(i[0].categoryCode, 1, event.target.checked)" />화
               </label>
               <label for="wed">    
                 <input type="checkbox" id="wed" 
-                    :checked="i[0].SEL_DAY.substring(2, 3) === '1'"
+                    :checked="i[0]?.SEL_DAY.substring(2, 3) === '1'"
                     @change="(event) => changeDay(i[0].categoryCode, 2, event.target.checked)" />수
               </label>
               <label for="thu">
                 <input type="checkbox" id="thu" 
-                    :checked="i[0].SEL_DAY.substring(3, 4) === '1'"
+                    :checked="i[0]?.SEL_DAY.substring(3, 4) === '1'"
                     @change="(event) => changeDay(i[0].categoryCode, 3, event.target.checked)" />목
               </label>
               <label for="fri">
                 <input type="checkbox" id="fri" 
-                    :checked="i[0].SEL_DAY.substring(4, 5) === '1'"
+                    :checked="i[0]?.SEL_DAY.substring(4, 5) === '1'"
                     @change="(event) => changeDay(i[0].categoryCode, 4, event.target.checked)" />금
               </label>
               <label for="sat">
                 <input type="checkbox" id="sat" 
-                    :checked="i[0].SEL_DAY.substring(5, 6) === '1'"
+                    :checked="i[0]?.SEL_DAY.substring(5, 6) === '1'"
                     @change="(event) => changeDay(i[0].categoryCode, 5, event.target.checked)" />토
               </label>
               <label for="sun">
                 <input type="checkbox" id="sun" 
-                    :checked="i[0].SEL_DAY.substring(6, 7) === '1'"
+                    :checked="i[0]?.SEL_DAY.substring(6, 7) === '1'"
                     @change="(event) => changeDay(i[0].categoryCode, 6, event.target.checked)" />일
               </label>
               <label for="holiday">
                 <input type="checkbox" id="holiday" 
-                    :checked="i[0].SEL_DAY.substring(7, 8) === '1'"
+                    :checked="i[0]?.SEL_DAY.substring(7, 8) === '1'"
                     @change="(event) => changeDay(i[0].categoryCode, 7, event.target.checked)" />공휴일
               </label>
              </div>
@@ -987,7 +987,7 @@ const searchButton = async () => {
     );
 
     Category.value = res.data.MainCategory;
-    // console.log(Category.value);
+  
     afterSearch.value = true;
     const res1 = await getMultiLingual(groupCd.value, nowStoreCd.value);
     getMultiLang.value = res1.data.MultiLingual;
@@ -1294,6 +1294,7 @@ const convertedsubMultiLang = ref([]);
 const subCode3 = ref();
 const userInputData = ref([]);
 const bringCategory = (value) => {
+  console.log(value)
   afterCategory.value = true;
   if (newMainCategoryCode.value.includes(value)) {
     mainCategoryInsert.value = true;
@@ -1402,7 +1403,7 @@ const bringCategory = (value) => {
     }).flat();
   });
 
-  // console.log(subMultiLang.value);
+
 
 };
 

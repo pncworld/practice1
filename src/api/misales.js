@@ -1369,3 +1369,22 @@ export const getMenuPayColumns = (groupCd) => {
     GROUP_CD: groupCd,
   });
 };
+export const getSalesBySeatsAndMenus = (
+  groupCd,
+  storeCd,
+  sdate,
+  edate,
+  cond,
+  cond2,
+  cond3
+) => {
+  return api2.post("/MISALES/SLS11_021RPT.asmx/getSalesBySeatsAndMenus", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+  });
+};

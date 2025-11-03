@@ -315,11 +315,99 @@ onMounted(async () => {
   }
 }
 
+@keyframes rise-bounce {
+  0% {
+    opacity: 0;
+    transform: translateX(-300px) translateY(-300px);
+  }
+  20% {
+    transform: translateX(-100px) translateY(-70px); /* 위로 살짝 튐 */
+  }
+  30% {
+    transform: translateX(-50px) translateY(50px); /* 다시 살짝 내려옴 */
+  }
+  33% {
+    transform: translateX(-40px) translateY(40px); /* 다시 살짝 내려옴 */
+  }
+  36% {
+    transform: translateX(-30px) translateY(-40px); /* 다시 살짝 내려옴 */
+  }
+  39% {
+    transform: translateX(-25px) translateY(30px); /* 다시 살짝 내려옴 */
+  }
+  43% {
+    transform: translateX(-20px) translateY(-30px); /* 다시 살짝 내려옴 */
+  }
+  46% {
+    transform: translateX(-15px) translateY(20px); /* 다시 살짝 내려옴 */
+  }
+  49% {
+    transform: translateX(-10px) translateY(-20px); /* 다시 살짝 내려옴 */
+  }
+  53% {
+    transform: translateX(-5px) translateY(10px); /* 다시 살짝 내려옴 */
+  }
+  56% {
+    transform: translateX(-3px) translateY(-10px); /* 다시 살짝 내려옴 */
+  }
+  59% {
+    transform: translateX(-1px) translateY(5px); /* 다시 살짝 내려옴 */
+  }
+  63% {
+    transform: translateX(0px) translateY(-5px); /* 다시 살짝 내려옴 */
+  }
+  66% {
+    transform: translateX(0px) translateY(1px); /* 다시 살짝 내려옴 */
+  }
+  69% {
+    transform: translateX(0px) translateY(-1px); /* 다시 살짝 내려옴 */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rise-rebounce {
+  0% {
+    opacity: 0;
+    transform: translateY(500px) translateX(500px) rotate(-50deg);
+  }
+  60% {
+    transform: translateX(-70px) rotate(50deg); /* 위로 살짝 튐 */
+  }
+  80% {
+    transform: translateX(100px) rotate(-50deg); /* 다시 살짝 내려옴 */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateY(5px);
+  }
+
+  33% {
+    transform: translateY(-5px);
+  }
+
+  66% {
+    transform: translateY(0px);
+  }
+
+  100% {
+    transform: translateY(5px);
+  }
+}
+
 .animate-fall {
-  animation: fall 1s ease-out forwards;
+  animation: rise-rebounce 2s ease-out forwards;
 }
 
 .animate-rise {
-  animation: rise 1s ease-out forwards;
+  animation: rise-bounce 2s ease-in-out forwards;
 }
 </style>

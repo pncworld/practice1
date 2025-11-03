@@ -2451,16 +2451,24 @@ const copyButton = async () => {
     const res = await copyMenuListByCode(
       groupCd.value,
       gridvalue3.value,
-      selectedMenuCd.value.join("\U200B")
+      selectedMenuCd.value.join("\u200b")
     );
 
-    ////console.log(res);
-    Swal.fire({
-      title: "성공",
-      text: "복사에 성공하였습니다.",
-      icon: "success",
-      confirmButtonText: "확인",
-    });
+    if (res.data.RESULT_CD == "00") {
+      Swal.fire({
+        title: "성공",
+        text: "복사를 완료하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+    } else {
+      Swal.fire({
+        title: "실패",
+        text: `복사에 실패하였습니다. ${res.data.RESULT_NM}`,
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+    }
   } catch (error) {
   } finally {
     store.state.loading = false;
@@ -2480,7 +2488,6 @@ const selectedMenuCd = ref([]);
 
 const checkedRowData5 = (e) => {
   selectedMenuCd.value = e.map((item) => item.menuCd);
-  ////console.log(e);
 };
 
 const movePage = () => {

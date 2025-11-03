@@ -672,7 +672,6 @@ const setTablePosNo = async (value) => {
   if (value == undefined || storeGroup.value.length == 0) return;
   try {
     response = await getTablePosList(storeGroup.value[0].lngStoreGroup, value);
-    // console.log(response);
   } catch (error) {
   } finally {
     storeTablePosNo.value = response.data.tablePos;

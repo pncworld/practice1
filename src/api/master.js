@@ -3682,3 +3682,41 @@ export const saveMultiPriceGroup = (
     ORDER: order,
   });
 };
+
+export const deleteMultiPriceGroup = (groupCd, multipricegroupcode) => {
+  return api2.post("/MIMASTER/MST37_067INS.asmx/deleteMultiPriceGroup", {
+    GROUP_CD: groupCd,
+    MULTI_GROUPCODE: multipricegroupcode,
+  });
+};
+export const getCustomerControlDisp = (groupCd, storeCd, areaCd, posNo) => {
+  return api2.post("/MIMASTER/MST44_065INS.asmx/getCustomerControlDisp", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+    POS_NO: posNo,
+  });
+};
+export const saveCustDispInfo = (
+  groupCd,
+  storeCd,
+  areaCd,
+  posNo,
+  operTypes,
+  seqs,
+  dispTypes,
+  dispTimes,
+  strNames
+) => {
+  return api2.post("/MIMASTER/MST44_065INS.asmx/saveCustDispInfo", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+    POS_NO: posNo,
+    OPER_TYPE: operTypes,
+    SEQ: seqs,
+    DISTYPES: dispTypes,
+    DISPTIMES: dispTimes,
+    STRNAMES: strNames,
+  });
+};
