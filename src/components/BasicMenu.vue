@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-gray-100 text-gray-600 w-full scroll-container h-full m-0">
+  <div
+    :style="{ backgroundColor: rgbaBackColor }"
+    class="text-gray-600 w-full scroll-container h-full m-0">
     <div class="">
       <ul
         class="flex w-full justify-center items-center overflow-hidden font-mono">
@@ -7,7 +9,9 @@
           {{ loginName }} / {{ storeName }} ({{ lStoreCd }})
         </li>
       </ul>
-      <h1 class="flex text-2xl font-bold h-12 items-center bg-gray-100 p-5">
+      <h1
+        :style="{ backgroundColor: rgbaBackColor }"
+        class="flex text-2xl font-bold h-12 items-center p-5">
         {{ cMenu }}
       </h1>
 
@@ -25,9 +29,11 @@
             @click="setProgramList"
             alt="" /> -->
       </div>
-      <div class="flex justify-between bg-gray-100">
-        <label class="bg-gray-100">
-          <div class="flex justify-start bg-gray-100 h-8 items-center">
+      <div
+        :style="{ backgroundColor: rgbaBackColor }"
+        class="flex justify-between">
+        <label>
+          <div class="flex justify-start h-8 items-center">
             <input
               type="checkbox"
               @click="showAll"
@@ -55,7 +61,8 @@
         <li
           v-for="i in favoriteProgList"
           v-if="clickFavorite"
-          class="bg-gray-100 overflow-y-auto">
+          :style="{ backgroundColor: rgbaBackColor }"
+          class="overflow-y-auto">
           <div class="flex ml-4">
             <button
               @click="favoriteadd(i.lngProgramID)"
@@ -79,6 +86,7 @@
         <li
           v-if="!clickFavorite"
           v-for="category in categories"
+          :style="{ backgroundColor: rgbaBackColor }"
           :key="category.lngProgramSub"
           :id="category.lngProgramSub"
           class="bg-gray-100">
@@ -287,9 +295,22 @@ const detectMobile = () => {
   const userAgent = window.navigator.userAgent;
   isMobile.value = /iPhone|iPad|iPod|Android/i.test(userAgent);
 };
+const backColor = ref("#f3f4f6");
+
+function hexToRgba(hex, alpha = 0.5) {
+  // #RRGGBB
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// RGBA로 변환
+const rgbaBackColor = ref(""); // 50% 투명
 
 onMounted(() => {
-  ////console.log(store.state.userData);
+  backColor.value = store.state.userData.strBackColor;
+  rgbaBackColor.value = hexToRgba(backColor.value, 0.2);
   loginName.value = store.state.userData.loginID;
   storeName.value = store.state.userData.strStoreName;
   lStoreCd.value = store.state.userData.lngPosition;

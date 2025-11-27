@@ -3486,7 +3486,9 @@ watch(
   () => {
     let criteria2 = props.searchColId.split(",");
 
-    let criteria3 = `(value match '${props.searchWord3}')`;
+    let searchword3 = props.searchWord3;
+
+    let criteria3 = `(value ilike '%${searchword3}%')`;
 
     let criteria4 = props.searchSpecialColId;
     ////console.log(props.searchWord3, props.searchValue, props.searchColId);
@@ -3515,7 +3517,7 @@ watch(
     }
     for (let i = 1; i < criteria2.length; i++) {
       criteria3 +=
-        " or (values['" + criteria2[i] + `'] match '${props.searchWord3}')`;
+        " or (values['" + criteria2[i] + `'] ilike '%${searchword3}%')`;
     }
     let filter = [
       {

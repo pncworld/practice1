@@ -116,7 +116,7 @@ const login2 = async () => {
 
     const loginStatus = response.data.loginSession[0].strUserID;
 
-    if (!isNaN(Number(loginStatus))) {
+    if (loginStatus != undefined) {
       store.dispatch("updateUserData", response.data.loginSession[0]);
       store.dispatch("setToken", response.data.loginSession[0].SessionToken);
       //comsole.log(response.data.loginSession[0]);
@@ -129,14 +129,15 @@ const login2 = async () => {
       );
 
       message.value = "로그인 성공";
+
       const readPrograms = async () => {
-        const response = await get_sys_list(
-          store.state.userData.lngStoreGroup,
-          store.state.userData.lngUserAdminID,
-          store.state.userData.strLanguage
+        const response2 = await get_sys_list(
+          response.data.loginSession[0].lngStoreGroup,
+          response.data.loginSession[0].lngUserAdminID,
+          response.data.loginSession[0].strLanguage
         );
 
-        const result = response.data.sysMenu;
+        const result = response2.data.sysMenu;
 
         const mainCategoryData = result.filter(
           (item) => Number(item.strMenuLevel) == 1
@@ -197,7 +198,7 @@ const login2 = async () => {
       throw new Error("로그인 실패");
     }
   } catch (error) {
-    //console.error(error);
+    console.log(error);
     message.value = "오류 발생";
   } finally {
     store.dispatch("convertLoading", false);

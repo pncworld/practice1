@@ -92,7 +92,7 @@ const label = ref([]);
 onMounted(async () => {
   store.state.loading = false;
 
-  ////console.log(store.state.userData);
+  console.log(store.state.userData);
   const userdata = store.state.userData;
   let lngStoreCode = "";
 

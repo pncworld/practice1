@@ -10,10 +10,12 @@
 
     <header
       v-if="showMenu"
-      class="bg-gray-100 border rounded-3xl text-gray-600 p-2 w-full h-10 md:h-14 box-content">
+      :style="{ backgroundColor: backColor }"
+      class="border rounded-lg text-gray-600 p-2 w-full h-10 md:h-14 box-content">
       <!-- 상단 영역 -->
       <div
-        class="flex items-center justify-between bg-gray-100 p-4 rounded-lg fixed top-0 h-12 w-full -mt-3 pb-0">
+        :style="{ backgroundColor: backColor }"
+        class="flex items-center justify-between p-4 rounded-lg fixed top-0 h-12 w-full -mt-3 pb-0">
         <!-- 로고 영역 -->
         <div class="flex-shrink-0 items-center mt-8 hidden md:block">
           <img
@@ -84,15 +86,15 @@
         <div class="items-center space-x-4 flex mr-5 w-96">
           <button @click="moveleft">
             <img
-              src="../../assets/arrow2.png"
+              src="../../assets/arrow-left-solid-full.svg"
               alt="Delete"
               class="w-5 sm:w-6 md:w-7 h-4" />
           </button>
           <button @click="moveright">
             <img
-              src="../../assets/arrow2.png"
+              src="../../assets/arrow-right-solid-full.svg"
               alt="Delete"
-              class="w-5 sm:w-6 md:w-7 h-4 rotate-180" />
+              class="w-5 sm:w-6 md:w-7 h-4" />
           </button>
           <button @click="deleteAllTabs">
             <img
@@ -212,9 +214,6 @@ const moveleft = () => {
  * 	화면 Load시 실행 스크립트
  */
 
-onMounted(() => {
-  // router.push("/homepage");
-});
 // 화면 크기 감지 및 업데이트
 
 const closeOtherTab = () => {
@@ -231,11 +230,17 @@ const mobileShowMenu = ref(false);
 const showMenu = ref(route.path != "/"); // Initialize based on current route
 const componentKey = ref(null);
 // Watch for route changes
-
+const backColor = ref("#f3f4f6");
+onMounted(() => {
+  backColor.value = store.state.userData.strBackColor;
+  console.log(backColor.value);
+  // router.push("/homepage");
+});
 watch(
   () => route.path,
   (newPath) => {
     showMenu.value = newPath != "/"; // Update based on new route
+    backColor.value = store.state.userData.strBackColor;
   }
 );
 store.dispatch("convertLoading", false);

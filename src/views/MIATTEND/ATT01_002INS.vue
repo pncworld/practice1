@@ -300,7 +300,7 @@
               :disabled="disableGrid"
               v-model="gridvalue10"
               class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
-              <option value="0">선택</option>
+              <option value="null">선택</option>
               <option :value="i.lngAreaCode" v-for="i in dataList">
                 {{ i.strArea }}
               </option>
@@ -613,7 +613,7 @@ const gridvalue6 = ref();
 const gridvalue7 = ref();
 const gridvalue8 = ref();
 const gridvalue9 = ref();
-const gridvalue10 = ref();
+const gridvalue10 = ref(null);
 const gridvalue11 = ref();
 const gridvalue12 = ref();
 const gridvalue13 = ref();
@@ -753,7 +753,7 @@ const addButton = () => {
  */
 
 const clickedRowData = (newValue) => {
-  ////console.log(newValue);
+  console.log(newValue);
   disableGrid.value = false;
   gridvalue1.value = newValue[1];
   gridvalue2.value = newValue[4];
@@ -764,7 +764,7 @@ const clickedRowData = (newValue) => {
   gridvalue7.value = newValue[28] == "True" ? true : false;
   gridvalue8.value = newValue[23];
   gridvalue9.value = newValue[24];
-  gridvalue10.value = newValue[25];
+  gridvalue10.value = isNaN(newValue[25]) ? null : newValue[25];
   gridvalue11.value = newValue[16].split(" ")[0];
   gridvalue12.value = newValue[15];
   gridvalue13.value = newValue[29];
@@ -852,10 +852,25 @@ const changeInfo = (e) => {
 
   if (rowName == "lngAreaCode") {
     setTimeout(() => {
-      changeValue2.value = dataList.value.filter(
-        (item) => item.lngAreaCode == rowValue
-      )[0].strArea;
-      changeColid.value = "strAreaName";
+      console.log(rowValue);
+      if (rowValue == null || rowValue == "null") {
+        changeValue2.value = "선택";
+        changeColid.value = "strAreaName";
+
+        changeNow.value = !changeNow.value;
+      } else {
+        changeValue2.value = dataList.value.filter(
+          (item) => item.lngAreaCode == rowValue
+        )[0].strArea;
+        changeColid.value = "strAreaName";
+
+        changeNow.value = !changeNow.value;
+      }
+    }, 10);
+
+    setTimeout(() => {
+      changeValue2.value = rowValue;
+      changeColid.value = "lngAreaCode";
 
       changeNow.value = !changeNow.value;
     }, 10);
@@ -1016,7 +1031,10 @@ const saveButton = async () => {
   }
 
   const validateRow6 = updateRow.value.filter(
-    (item) => item.lngAreaCode == "0" || item.lngAreaCode == undefined
+    (item) =>
+      item.lngAreaCode == null ||
+      item.lngAreaCode == undefined ||
+      isNaN(item.lngAreaCode)
   ).length;
   if (validateRow6 > 0) {
     Swal.fire({
