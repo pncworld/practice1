@@ -89,7 +89,7 @@ const props = defineProps({
     type: String,
     default: "매장명",
   },
-  resetFlag: Boolean
+  resetFlag: Boolean,
 });
 
 const hideit = ref(props.hideit);
@@ -167,7 +167,8 @@ onMounted(() => {
     emit("lngStoreGroup", store.state.userData.lngStoreGroup);
     emit("lngStoreCodes", store.state.userData.lngPosition);
     emit("lngStoreCode", store.state.userData.lngPosition);
-    emit("lngStoreAttrs", store.state.userData.lngJoinType);
+    // emit("lngStoreAttrs", store.state.userData.lngJoinType); 임시조치
+    emit("lngStoreAttrs", 0);
     emit("excelStore", "매장명 : " + store.state.userData.strStoreName);
     emit("storeNm", store.state.userData.strStoreName);
     selectedStoreType.value = store.state.userData.lngJoinType;
@@ -205,7 +206,8 @@ watch(selectedStoreType, () => {
     selectedStore.value = null;
   }
 
-  emit("lngStoreAttrs", selectedStoreType.value);
+  //emit("lngStoreAttrs", selectedStoreType.value);
+  emit("lngStoreAttrs", 0);
   emit("changeInit", true);
 });
 watch(selectedStore, () => {
@@ -235,7 +237,7 @@ watch(
   () => props.resetFlag,
   (newVal, oldVal) => {
     // console.log("watch 감지됨:", oldVal, "→", newVal); // ← watch가 실행되는지 확인
-    selectedStore.value = null;  // UI 초기화
+    selectedStore.value = null; // UI 초기화
     // console.log("selectedStore 초기화됨:", selectedStore.value); // ← 초기화 적용됐는지 확인
   }
 );

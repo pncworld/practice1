@@ -1,5 +1,5 @@
 /*--############################################################################
-# Filename : MST01_033INS.vue                                                  
+# Filename : MST01_003INS.vue                                                  
 # Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
 # Date :2025-05-14                                                             
 # Author : 권맑음                     
@@ -391,7 +391,7 @@
             </div>
             <div>
               <input
-                type="number"
+                type="text"
                 name="lngPrice"
                 class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-100"
                 :disabled="afterClick"
@@ -834,8 +834,19 @@
                   class="disabled:bg-gray-200" />아니오</label
               >
             </div>
-            <div class="w-0"></div>
-            <div class="w-0"></div>
+            <div class="justify-center items-center bg-gray-100 border flex">
+              주방출력명
+            </div>
+            <div
+              class="space-x-5 flex justify-left items-center border w-[100%]">
+              <input
+                type="text"
+                v-model="gridvalue39"
+                :disabled="afterClick"
+                name="strNameK"
+                class="w-full rounded-lg border pl-1 h-full"
+                @input="changeInfo" />
+            </div>
             <div
               class="justify-center items-center bg-gray-100 border flex rounded-bl-lg">
               배달메뉴
@@ -1329,6 +1340,7 @@ const gridvalue35 = ref(false);
 const gridvalue36 = ref(false);
 const gridvalue37 = ref(false);
 const gridvalue38 = ref("");
+const gridvalue39 = ref("");
 const gridvalue100 = ref("");
 const clickedrowdata = ref([]);
 const clickrowData4 = ref([]);
@@ -1412,9 +1424,7 @@ const clickedRowData = async (newvalue) => {
   //rowIndex.value = newvalue.index;
   clickrowData4.value = [];
   filteredrowData5.value = [];
-  //console.log(newvalue);
-  // forsearchMain.value = 0
-  // forsearchSub.value = 0
+
   searchWord2.value = "";
   searchWord3.value = "";
   clickedrowdata.value = newvalue[27];
@@ -1427,7 +1437,7 @@ const clickedRowData = async (newvalue) => {
   gridvalue7.value = newvalue[6];
   gridvalue8.value = newvalue[7];
   gridvalue9.value = newvalue[8];
-  gridvalue10.value = newvalue[9];
+  gridvalue10.value = String(newvalue[9]).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   gridvalue11.value = newvalue[10];
   gridvalue12.value = newvalue[11];
   gridvalue13.value = newvalue[2];
@@ -1463,6 +1473,7 @@ const clickedRowData = async (newvalue) => {
     newvalue[34] != "" ? (Number(newvalue[34]) & 8) !== 0 : false;
 
   gridvalue38.value = newvalue[37];
+  gridvalue39.value = newvalue[38];
 
   if (gridvalue16.value == 1) {
     gridvalue100.value = 1;
@@ -1662,7 +1673,7 @@ const searchButton = async () => {
     filteredrowData3.value = [...filteredrowData3.value];
 
     const res = await getMenuCodeEnroll(groupCd.value, nowStoreCd.value);
-    console.log(res);
+
     rowData.value = res.data.MENULIST;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
     MENUDEPEND.value = res.data.MENUDEPEND;
@@ -1719,8 +1730,13 @@ const searchC2 = ref(-1);
 
 const changeInfo = (e) => {
   const tagName = e.target.name;
-  const value2 = e.target.value;
-  //comsole.log(value2);
+  let value2 = e.target.value;
+  if (tagName.includes("lngPrice")) {
+    let val = value2.replace(/[^0-9]/g, "");
+    value2 = val;
+
+    gridvalue10.value = value2.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
 
   if (tagName.includes("lngType")) {
     changeColid.value = "lngType";
@@ -2064,6 +2080,7 @@ const saveButton = () => {
           filterAndMap("dtmStart"),
           filterAndMap("dtmEnd"),
           filterAndMap("lngKDS"),
+          filterAndMap("strNameK"),
           isNewAutoMenuCode.value == true ? 1 : 0,
           deleteCd.join(",")
         );
@@ -2339,6 +2356,7 @@ const initAll = () => {
   gridvalue37.value = false;
 
   gridvalue38.value = "";
+  gridvalue39.value = "";
   gridvalue100.value = "";
   //initFocus.value = !initFocus.value
   fileName.value = "";

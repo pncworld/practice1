@@ -186,7 +186,7 @@ const handleStoreCd = async (newValue) => {
     afterSearch.value = false;
   }
   nowStoreCd.value = newValue;
-  searchButton();
+  //searchButton();
 };
 
 /**

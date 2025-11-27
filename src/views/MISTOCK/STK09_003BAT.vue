@@ -106,11 +106,9 @@
 
 import {
   checkPreMonthCloseStores,
-  getMonthCloseList,
   getMonthCloseList2,
   reserveMonthCloseStores,
   saveMonthClose,
-  saveMonthCloseUpdate,
 } from "@/api/mistock";
 /**
  *  페이지명 자동 입력 컴포넌트
@@ -389,10 +387,10 @@ const saveButton = async () => {
     }
   } catch (error) {
     console.log(error);
-  } finally {
   }
 
   try {
+    store.state.loading = true;
     const checkStoreCd = updatedrowdata.value
       .filter((item, index) => allstaterows.value.includes(index))
       .filter((item) => item.Selected == true)
@@ -402,37 +400,45 @@ const saveButton = async () => {
       .filter((item, index) => allstaterows.value.includes(index))
       .filter((item) => item.Selected == true)
       .map((item) => item.strStoreName);
-    const res = ref("");
+
+    let res;
     for (let i = 0; i < checkStoreCd.length; i++) {
-      res.value = await saveMonthClose(
-        lngstoregroup.value,
-        checkStoreCd[i],
-        cond.value + cond2.value,
-        store.state.userData.lngSequence
-      );
+      try {
+        console.log(cond.value + cond2.value);
+        cond3.value =
+          `[${i + 1} / ${checkStoreNm.length}]` +
+          checkStoreNm[i] +
+          " 진행 중...";
+        res = await saveMonthClose(
+          lngstoregroup.value,
+          checkStoreCd[i],
+          cond.value + cond2.value,
+          store.state.userData.lngSequence
+        );
 
-      //console.log(res);
-      cond3.value =
-        `[${i + 1} / ${checkStoreNm.length}]` + checkStoreNm[i] + " 진행 중...";
-
-      rowData2.value = rowData2.value.filter(
-        (item) => item.lngStoreCode != checkStoreCd[i]
-      );
+        rowData2.value = rowData2.value.filter(
+          (item) => item.lngStoreCode != checkStoreCd[i]
+        );
+        store.state.loading = false;
+      } catch (error) {
+        store.state.loading = false;
+        console.log(error);
+      }
     }
     cond3.value = "";
 
-    if (res.value.data.RESULT_CD == "00") {
+    if (res.data.RESULT_CD == "00") {
       Swal.fire({
         title: "성공",
         text: "마감 작업을 완료하였습니다.",
         icon: "success",
         confirmButtonText: "확인",
       });
-      return;
     }
   } catch (error) {
     console.log(error);
   } finally {
+    searchButton();
     rowData2.value = [];
   }
 };
@@ -520,6 +526,7 @@ const saveButton2 = async () => {
       });
     }
   } catch (error) {
+    console.log(error);
   } finally {
     rowData2.value = [];
   }

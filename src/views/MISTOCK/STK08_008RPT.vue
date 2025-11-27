@@ -61,13 +61,14 @@
       </div>
       <div class="flex justify-start items-center !-ml-5">
         <PickStore
+          :setDynamicStoreClass="'w-[100%]'"
           @update:storeGroup="lngStoreGroup"
           :defaultStoreNm="'전체'"
           class=""
           @storeNm="excelStore"
           @update:storeCd="lngStoreCode"></PickStore>
       </div>
-      <div class="flex justify-start items-center mt-2 ml-16 space-x-5">
+      <div class="flex justify-start items-center mt-2 ml-20 space-x-5">
         <div class="text-base font-semibold">바코드</div>
         <div>
           <input type="text" class="border border-black h-8" v-model="cond" />
@@ -120,20 +121,17 @@
         </div>
       </div>
       <div class="flex space-x-5 ml-12 mt-3 items-center">
-        <div class="font-semibold text-base">자재코드/이름</div>
+        <div class="font-semibold text-base text-nowrap">자재코드/이름</div>
         <div class="flex space-x-3">
-          <div>
-            <input
-              type="text"
-              class="h-8 w-40 border border-black"
-              v-model="cond5" />
-          </div>
-          <div>
-            <input
-              type="text"
-              class="h-8 w-40 border border-black"
-              v-model="cond6" />
-          </div>
+          <input
+            type="text"
+            class="h-8 w-[60%] border border-black"
+            v-model="cond5" />
+
+          <input
+            type="text"
+            class="h-8 w-[60%] border border-black"
+            v-model="cond6" />
         </div>
       </div>
 
@@ -158,7 +156,7 @@
           <select
             name=""
             id=""
-            class="border border-black w-64 h-8"
+            class="border border-black w-[120%] h-8"
             v-model="cond8">
             <option :value="i.strDCode" v-for="i in optionList5">
               {{ i.strDName }}
@@ -299,9 +297,9 @@ onMounted(async () => {
 
   optionList3.value = res3.data.List;
 
-  const res4 = await getCommonList(27);
+  const res4 = await getCommonList(166);
 
-  optionList4.value = res4.data.List.filter((item) => item.strDCode != "01");
+  optionList4.value = res4.data.List;
 
   const res5 = await getCommonList(172);
 
@@ -326,7 +324,7 @@ const cond3 = ref("0");
 const cond4 = ref("0");
 const cond5 = ref("");
 const cond6 = ref("");
-const cond7 = ref("02");
+const cond7 = ref("05");
 const cond8 = ref("01");
 
 const store = useStore();

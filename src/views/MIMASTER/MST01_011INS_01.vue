@@ -48,7 +48,7 @@
                 <option>[{{ groupCd }}]{{ selectedGroupNm }}</option>
               </select>
             </div>
-            <div>
+            <div v-if="hidesub">
               매장명 :
               <select
                 disabled
@@ -936,8 +936,8 @@ const searchButton = async () => {
 
     const res3 = await getAllOptionManageData(groupCd.value, nowStoreCd.value);
     const res4 = await getMostColumnMenuList(groupCd.value, nowStoreCd.value);
-    //comsole.log(res3);
-    //comsole.log(res4);
+    // console.log(res3);
+    // console.log(res4);
     rowData1.value = res3.data.OPTIONMANAGE;
     rowData2.value = res3.data.MENULIST;
     rowData3.value = res3.data.OPTIONGROUPMANAGE;

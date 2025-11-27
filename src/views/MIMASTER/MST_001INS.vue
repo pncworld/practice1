@@ -1273,6 +1273,10 @@ watch(
           h: item.h,
           id: item.id,
         };
+
+        if (grid == null) {
+          return;
+        }
         grid.addWidget(node); // Add widget to the grid
 
         const widgetElement = document.querySelector(`[gs-id="${item.id}"]`);

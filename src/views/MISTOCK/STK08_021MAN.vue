@@ -58,6 +58,7 @@
       :progid="1"
       :rowData="rowData"
       :setStateBar="false"
+      :fixedColumn="true"
       @updatedRowData="updatedRowData"
       @allStateRows="allStateRows"
       :documentTitle="'STK08_021MAN'"

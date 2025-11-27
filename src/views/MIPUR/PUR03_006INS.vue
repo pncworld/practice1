@@ -30,7 +30,7 @@
         :defaultStore="true"></PickStore>
     </div>
     <div
-      class="flex items-center justify-start space-x-5 mt-2 col-span-2 ml-28">
+      class="flex items-center justify-start space-x-5 mt-2 col-span-2 ml-[35%]">
       <div class="text-base font-semibold text-red-500">발주일자</div>
       <div class="flex space-x-3">
         <input type="date" class="h-7" v-model="cond" @change="searchButton" />
@@ -51,7 +51,7 @@
     </div>
 
     <div
-      class="flex justify-start mt-3 space-x-5 items-center col-span-2 ml-20 pl-1">
+      class="flex justify-start mt-3 space-x-5 items-center col-span-2 ml-[5%] pl-1">
       <div class="text-base font-semibold">코멘트(발주)</div>
       <div>
         <input
@@ -72,7 +72,7 @@
       </div>
     </div>
 
-    <div class="flex ml-20 pl-4 mt-2 space-x-5">
+    <div class="flex ml-[16%] pl-4 mt-2 space-x-5">
       <div class="text-base font-semibold">부가세</div>
       <div>
         <input
@@ -94,7 +94,7 @@
       </div>
     </div>
 
-    <div class="flex ml-20 mt-2 items-center col-span-3 space-x-20">
+    <div class="flex ml-20 mt-2 items-center col-span-3 space-x-10">
       <div class="flex space-x-5 items-center">
         <div class="text-base font-semibold">자재목록</div>
         <div>
@@ -188,7 +188,7 @@
   <!-- 조회조건 -->
   <!-- 그리드 영역 -->
   <div
-    class="grid grid-rows-1 grid-cols-[7fr,1fr,7fr] justify-center w-[97%] h-[50vh] gap-5 ml-5">
+    class="grid grid-rows-1 grid-cols-[12fr,1fr,12fr] justify-center w-[98%] h-[50vh] ml-5">
     <div class="mt-2">
       <div class="flex justify-between bg-yellow-100">
         <div class="text-base font-semibold">검색 자재</div>
@@ -205,11 +205,12 @@
         :progid="1"
         :rowData="rowData"
         @updatedRowData="updatedRowData"
+        @sendRowState="sendRowState"
         @clickedRowData="clickedRowData"
         @allStateRows="allStateRows"
         @clickedButtonCol="clickedButtonCol"
         @checkAllorNot="checkAllorNot"
-        @checkedRowData="checkedRowData"
+        :cellEditthenCheck="true"
         :exporttoExcel="exporttoExcel"
         :documentTitle="'PUR03_006INS'"
         :documentSubTitle="documentSubTitle"
@@ -226,7 +227,11 @@
       <div class="whitebutton !font-extrabold !text-black" @click="addButton">
         >
       </div>
-      <div class="whitebutton !font-extrabold !text-black"><</div>
+      <div
+        class="whitebutton !font-extrabold !text-black"
+        @click="deleteButton">
+        <
+      </div>
     </div>
     <div class="mt-2">
       <div class="flex justify-between bg-yellow-100">
@@ -438,8 +443,29 @@ const handleStoreCd = async (newValue) => {
   //   if (newValue == "0" && store.state.userData.lngCommonMenu == "0") {
   //     afterSearch.value = false;
   //   }
+  initAll();
   nowStoreCd.value = newValue;
-  searchButton();
+
+  const res = await getOrderDate(
+    groupCd.value,
+    nowStoreCd.value,
+    cond.value.replaceAll("-", ""),
+    1
+  );
+  // console.log(res);
+  cond2.value =
+    res.data.List[0].dtmOrderCloseTime == ""
+      ? cond.value + " 12:00"
+      : res.data.List[0].dtmOrderCloseTime.slice(0, 4) +
+        "-" +
+        res.data.List[0].dtmOrderCloseTime.slice(4, 6) +
+        "-" +
+        res.data.List[0].dtmOrderCloseTime.slice(6, 8) +
+        " " +
+        res.data.List[0].dtmOrderCloseTime.slice(8, 10) +
+        ":" +
+        res.data.List[0].dtmOrderCloseTime.slice(10, 12);
+  //searchButton();
 };
 
 const checkAllorNot = async (e, e2) => {
@@ -496,6 +522,26 @@ const allStateRows2 = (e) => {
  */
 
 const searchButton = async () => {
+  const res2 = await getOrderDate(
+    groupCd.value,
+    nowStoreCd.value,
+    cond.value.replaceAll("-", ""),
+    1
+  );
+
+  cond2.value =
+    res2.data.List[0].dtmOrderCloseTime == ""
+      ? cond.value + " 12:00"
+      : res2.data.List[0].dtmOrderCloseTime.slice(0, 4) +
+        "-" +
+        res2.data.List[0].dtmOrderCloseTime.slice(4, 6) +
+        "-" +
+        res2.data.List[0].dtmOrderCloseTime.slice(6, 8) +
+        " " +
+        res2.data.List[0].dtmOrderCloseTime.slice(8, 10) +
+        ":" +
+        res2.data.List[0].dtmOrderCloseTime.slice(10, 12);
+
   if (first.value == false) {
     first.value = true;
     return;
@@ -536,6 +582,7 @@ const searchButton = async () => {
     );
     //console.log(res);
     rowData2.value = res.data.List;
+    updatedrowdata2.value = res.data.List;
     cond3.value = res.data.List2[0].strMComments;
 
     cond4.value = rowData2.value.reduce((sum, item) => {
@@ -552,7 +599,7 @@ const searchButton = async () => {
 
     cond6.value = formatNumberWithCommas(cond6.value);
   } catch (error) {
-    //console.log(error);
+    console.log(error);
   }
 };
 
@@ -614,8 +661,6 @@ const searchButton2 = async () => {
 
 const clickFirst = ref(false);
 const clickedButtonCol = async (e) => {
-  //console.log(e);
-  //saveFavoriteId.value = e;
   if (e == "lngCheckFovorites") {
     try {
       const res = await saveFavoriteStockItem(
@@ -634,7 +679,7 @@ const saveFavoriteStore = ref("");
 const saveFavoriteId = ref("");
 const saveFavoriteValue = ref("");
 const clickedRowData = async (newValue) => {
-  //console.log(newValue);
+  console.log(newValue);
 
   saveFavoriteGroup.value = newValue[15];
   saveFavoriteStore.value = newValue[16];
@@ -661,10 +706,13 @@ const updatedrowdata2 = ref([]);
 /**
  * 입력창 수정 데이터 갱신
  */
-const disabled = ref(false);
+const rowstate = ref("");
 const updatedRowData = (newValue) => {
-  //console.log(newValue);
   updatedrowdata.value = newValue;
+};
+
+const sendRowState = (e) => {
+  rowstate.value = e;
 };
 const updatedRowData2 = (newValue) => {
   //console.log(newValue);
@@ -1019,8 +1067,6 @@ const addButton = async () => {
     set1.has(item.lngStockID)
   );
 
-  // //console.log(updatedrowdata.value);
-  // //console.log(rowData2.value);
   if (hasDupli == true) {
     Swal.fire({
       title: "경고",
@@ -1120,38 +1166,92 @@ const deleteButton = async () => {
     (item) => item.lngCheck == true
   );
 
-  try {
-    store.state.loading = true;
+  if (checkedRows.length == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "삭제할 품목이 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
 
-    const groupcds = checkedRows
-      .map((item) => item.lngStoreGroup)
-      .join("\u200b");
-    const storecds = checkedRows
-      .map((item) => item.lngStoreCode)
-      .join("\u200b");
-    const ordernos = checkedRows.map((item) => item.strOrderNo).join("\u200b");
-    const orderseqs = checkedRows
-      .map((item) => item.lngOrderSeq)
-      .join("\u200b");
-    const stockids = checkedRows.map((item) => item.lngStockID).join("\u200b");
-    const supplierids = checkedRows
-      .map((item) => item.lngSupplierID)
-      .join("\u200b");
+  Swal.fire({
+    title: "경고",
+    text: "정말 삭제하시겠습니까?",
+    icon: "warning",
+    confirmButtonText: "확인",
+    cancelButtonText: "취소",
+    showCancelButton: true,
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        store.state.loading = true;
 
-    const res = await deleteStockOrderItem(
-      groupcds,
-      storecds,
-      ordernos,
-      orderseqs,
-      stockids,
-      supplierids,
-      store.state.userData.lngSequence
-    );
+        const groupcds = checkedRows
+          .map((item) => item.lngStoreGroup)
+          .join("\u200b");
+        const storecds = checkedRows
+          .map((item) => item.lngStoreCode)
+          .join("\u200b");
+        const ordernos = checkedRows
+          .map((item) => item.strOrderNo)
+          .join("\u200b");
+        const orderseqs = checkedRows
+          .map((item) => item.lngOrderSeq)
+          .join("\u200b");
+        const stockids = checkedRows
+          .map((item) => item.lngStockID)
+          .join("\u200b");
+        const supplierids = checkedRows
+          .map((item) => item.lngSupplierID)
+          .join("\u200b");
 
-    //console.log(res);
-    store.state.loading = false;
-    deleteRow7.value = !deleteRow7.value;
-  } catch (error) {}
+        const res = await deleteStockOrderItem(
+          groupcds,
+          storecds,
+          ordernos,
+          orderseqs,
+          stockids,
+          supplierids,
+          store.state.userData.lngSequence
+        );
+
+        //console.log(res);
+        store.state.loading = false;
+
+        deleteRow7.value = !deleteRow7.value;
+
+        if (res.data.RESULT_CD == "00") {
+          Swal.fire({
+            title: "삭제 성공",
+            text: "선택 하신 사항이 삭제되었습니다.",
+            icon: "success",
+            confirmButtonText: "확인",
+          });
+        } else {
+          Swal.fire({
+            title: "삭제 실패",
+            text: "선택 사항 삭제가 실패되었습니다.",
+            icon: "error",
+            confirmButtonText: "확인",
+          });
+        }
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+    } else {
+      return;
+    }
+  });
+};
+
+const initAll = () => {
+  rowData.value = [];
+  rowData2.value = [];
+  updatedrowdata2.value = [];
+  updatedrowdata.value = [];
 };
 </script>
 

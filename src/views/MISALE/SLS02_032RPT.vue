@@ -31,14 +31,15 @@ Author : 권맑음                     
         @lngStoreGroup="lngStoreGroup"
         @lngStoreCode="lngStoreCode"
         @lngAreaCode="lngAreaCode"
+        :setOrigin="true"
         @excelStore="excelStore"></PickStoreCorner>
     </div>
-    <div class="-ml-[494px] mt-1">
+    <div class="mt-1">
       <PosList
         :groupCd="groupCd"
         :storeCd="storeCd"
+        class="!mr-[20vw]"
         @posNo="posNo"
-        class=""
         :init="init"></PosList>
     </div>
     <div class="space-x-5 flex items-center mt-1 -ml-24 pl-1">

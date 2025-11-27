@@ -1,9 +1,9 @@
-/*--############################################################################
+<!-- /*--############################################################################
 # Filename : MST44_064INS.vue                                                  
 # Description : 마스터관리 > POS 마스터 > 주방출력관리                          
 # Date :2025-05-14                                                             
 # Author : 권맑음                     
-################################################################################*/
+################################################################################*/ -->
 <template>
   <!-- 조회조건 -->
   <div class="flex justify-between items-center w-full overflow-y-hidden">
@@ -14,12 +14,7 @@
       </button>
 
       <button @click="saveButton" class="button save w-auto">저장</button>
-      <!-- <button
-        @click="copyButton"
-        class="button copy w-auto"
-        v-if="currentMenu == true">
-        복사
-      </button> -->
+  
     </div>
   </div>
   <br />
@@ -1004,6 +999,15 @@ onMounted(async () => {
 
   //comsole.log(labelsData.value);
   printTypeList.value = res.data.List;
+
+     if (
+      store.state.userData.lngCommonMenu == '1'
+    ) {
+      hidesub.value = false;
+    } else {
+      hidesub.value = true;
+    }
+
 });
 
 const currentMenu = ref(1);
@@ -1110,38 +1114,44 @@ const AllscreenKeyPage = ref(1);
 const showMenus = async (value) => {
   if (value == 1) {
     currentMenu.value = 1;
+     if (
+      store.state.userData.lngCommonMenu == '1'
+    ) {
+      hidesub.value = false;
+    } else {
+      hidesub.value = true;
+    }
     hidesub.value = false;
   } else if (value == 2) {
     currentMenu.value = 2;
-    if (store.state.userData.lngCommonMenu == "1") {
+      if (
+      store.state.userData.lngCommonMenu == '1'
+    ) {
       hidesub.value = false;
-
-      //  hideAttr.value = false;
     } else {
       hidesub.value = true;
-      //  hideAttr.value = true;
     }
 
-    const res = await getMenuCodeEnroll(groupCd.value, nowStoreCd.value);
-    //comsole.log(res);
-    rowData2.value = res.data.MENULIST;
-    updatedList2.value = JSON.parse(JSON.stringify(rowData2.value));
-    const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
-    //rowData2.value = res2.data.menuList
-    SubMenuGroup.value = res2.data.submenuGroup;
-    MenuGroup.value = res2.data.menuGroup;
-    ////console.log(MenuGroup.value);
-    ////console.log(res2);
-    const res3 = await getKitchenGroupList2(groupCd.value, nowStoreCd.value);
+    // const res = await getMenuCodeEnroll(groupCd.value, nowStoreCd.value);
+    // //comsole.log(res);
+    // rowData2.value = res.data.MENULIST;
+    // updatedList2.value = JSON.parse(JSON.stringify(rowData2.value));
+    // const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
+    // //rowData2.value = res2.data.menuList
+    // SubMenuGroup.value = res2.data.submenuGroup;
+    // MenuGroup.value = res2.data.menuGroup;
+    // ////console.log(MenuGroup.value);
+    // ////console.log(res2);
+    // const res3 = await getKitchenGroupList2(groupCd.value, nowStoreCd.value);
 
-    KitchenGroup.value = res3.data.List;
-    afterSearch2.value = true;
+    // KitchenGroup.value = res3.data.List;
+    // afterSearch2.value = true;
   } else if (value == 3) {
     currentMenu.value = 3;
-    nowStoreCd.value = saveStoreCode.value;
-    const res3 = await getKitchenGroupList2(groupCd.value, nowStoreCd.value);
+    // nowStoreCd.value = saveStoreCode.value;
+    // const res3 = await getKitchenGroupList2(groupCd.value, nowStoreCd.value);
 
-    KitchenGroup.value = res3.data.List;
+    // KitchenGroup.value = res3.data.List;
     hidesub.value = true;
   } else {
     currentMenu.value = value;
@@ -1202,25 +1212,6 @@ const receiptP2 = ref('')
 const receiptP3 = ref('')
 const handleStoreCd = async (newValue) => {
   saveStoreCode.value = newValue;
-  //   afterSearch.value = false;
-  //   rowData2.value = [];
-  //   KDSSettingList.value = [];
-  //   checked.value = [];
-  //   kdsList.value = [];
-  //   MenuGroup.value = [];
-  //   SubMenuGroup.value = [];
-  //   ischecked.value = false;
-  if (store.state.userData.lngCommonMenu == "1" && currentMenu.value !== 3) {
-    nowStoreCd.value = 0;
-  } else if (
-    store.state.userData.lngCommonMenu == "0" &&
-    currentMenu.value !== 3
-  ) {
-    nowStoreCd.value = newValue;
-  } else {
-    nowStoreCd.value = newValue;
-  }
-
 
     const res = await getMstBasic(store.state.userData.lngStoreGroup , saveStoreCode.value)
    
@@ -1235,21 +1226,17 @@ const handleStoreCd = async (newValue) => {
   }
 
   ////console.log(newValue);
-  afterClick2.value = true;
-  afterClick.value = true;
+  // afterClick2.value = true;
+  // afterClick.value = true;
   afterClick3.value = true;
 
-  if (rowData.value.length != 0) {
-    rowData.value = [];
-    updatedList.value = [];
-  }
-  if (rowData2.value.length != 0) {
-    rowData2.value = [];
-    updatedList2.value = [];
-  }
   if (rowData3.value.length != 0) {
     rowData3.value = [];
     updatedList3.value = [];
+  }
+  if (rowData4.value.length != 0) {
+    rowData4.value = [];
+    updatedList4.value = [];
   }
   initGrid3();
 };
@@ -1415,8 +1402,8 @@ const searchButton = async () => {
   Category.value = [];
   items.value = [];
   ////console.log(nowStoreCd.value);
-  if (currentMenu.value == 3) {
-    if (nowStoreCd.value == "0" || nowStoreCd.value == undefined) {
+  if (currentMenu.value == 3 || currentMenu.value == 4) {
+    if (saveStoreCode.value== "0" || saveStoreCode.value == undefined) {
       Swal.fire({
         title: "경고",
         text: "매장을 선택하세요.",
@@ -1428,44 +1415,62 @@ const searchButton = async () => {
       return;
     }
   }
-  
+
   try {
     store.state.loading = true;
     let res;
-    if (currentMenu.value == 1) {
-      res = await getKitchenGroupList(groupCd.value);
+    
+      if (store.state.userData.lngCommonMenu == "1" && currentMenu.value != '4') {
+          nowStoreCd.value = 0;
+      } else if (
+        store.state.userData.lngCommonMenu == "0" &&
+        currentMenu.value !== '4'
+      ) {
+        nowStoreCd.value = saveStoreCode.value
+      } else {
+        nowStoreCd.value = saveStoreCode.value
+      }
 
-      //comsole.log(res);
+
+
+    if (currentMenu.value == 1 || currentMenu.value == 2) {
+      res = await getKitchenGroupList(groupCd.value);
+      let store2 = ''
+        if (store.state.userData.lngCommonMenu == "1") {
+        store2 = 0
+      } else {
+        store2 = nowStoreCd.value
+      }
+      const res2 = await getMenuCodeEnroll(groupCd.value, store2);
+      const res3 = await getMenuList(groupCd.value, store2);
+       const res4 = await getKitchenGroupList2(groupCd.value, store2);
+
+      KitchenGroup.value = res4.data.List;
+      SubMenuGroup.value = res3.data.submenuGroup;
+      MenuGroup.value = res3.data.menuGroup;
+
+      rowData2.value = res2.data.MENULIST;
+      updatedList2.value = JSON.parse(JSON.stringify(rowData2.value));
+      confirmitem2.value = JSON.parse(JSON.stringify(rowData2.value));
+
       rowData.value = res.data.List;
-      //   res = await getKDSList(groupCd.value);
-      //   KDSList.value = res.data.KDS;
-      //   rowData.value = [...KDSList.value];
-      //   updatedList.value = [...KDSList.value];
+
       updatedList.value = rowData.value;
       confirmitem.value = JSON.parse(JSON.stringify(rowData.value));
       afterSearch.value = true;
-    } else if (currentMenu.value == 2) {
-      if (store.state.userData.lngCommonMenu == "1") {
-        nowStoreCd.value = 0;
-      }
-      const res = await getMenuCodeEnroll(groupCd.value, nowStoreCd.value);
-      ////console.log(res);
-      rowData2.value = res.data.MENULIST;
-      updatedList2.value = JSON.parse(JSON.stringify(rowData2.value));
-      confirmitem2.value = JSON.parse(JSON.stringify(rowData2.value));
-      // updatedList2.value = rowData.value;
       afterSearch2.value = true;
+    }  else if (currentMenu.value == '4' || currentMenu.value == '3'){
 
-      const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
-      //rowData2.value = res2.data.menuList
-      SubMenuGroup.value = res2.data.submenuGroup;
-      MenuGroup.value = res2.data.menuGroup;
-      ////console.log(MenuGroup.value);
-      ////console.log(res2);
-      const res3 = await getKitchenGroupList2(groupCd.value, nowStoreCd.value);
+       const res2 = await getKitchenPortList(
+        groupCd.value,
+        saveStoreCode.value,
+        nowStoreAreaCd.value
+      );
+      rowData3.value = res2.data.List;
+      updatedList3.value = JSON.parse(JSON.stringify(rowData3.value));
+      confirmitem3.value = JSON.parse(JSON.stringify(rowData3.value));
+      afterSearch3.value = true;
 
-      KitchenGroup.value = res3.data.List;
-    } else if (currentMenu.value == '4'){
       receiptD1.value = ''
       receiptD2.value = ''
       receiptD3.value = ''
@@ -1477,33 +1482,19 @@ const searchButton = async () => {
       receiptDByte.value = ''
       receiptUByte.value = ''
       rowData4.value = []
-      res = await getStorePosList(groupCd.value, nowStoreCd.value)
-      //comsole.log(res)
+      res = await getStorePosList(groupCd.value, saveStoreCode.value)
+      console.log(res)
       rowData4.value = res.data.RECEIPTLIST
       afterSearch4.value = true
 
 
-    } else {
-      //comsole.log(groupCd.value, nowStoreCd.value, nowStoreAreaCd.value);
-      const res = await getKitchenPortList(
-        groupCd.value,
-        nowStoreCd.value,
-        nowStoreAreaCd.value
-      );
-
-      //comsole.log(res);
-
-      rowData3.value = res.data.List;
-      updatedList3.value = JSON.parse(JSON.stringify(rowData3.value));
-      confirmitem3.value = JSON.parse(JSON.stringify(rowData3.value));
-      afterSearch3.value = true;
-    }
+    } 
   } catch (error) {
-    //comsole.log(error);
+    console.log(error);
     store.state.loading = false;
   } finally {
     //comsole.log(KDSList.value);
-    nowStoreCd.value = saveStoreCode.value;
+    // nowStoreCd.value = saveStoreCode.value;
     ischecked.value = false;
 
     store.state.loading = false; // 로딩 상태 종료
@@ -1514,9 +1505,9 @@ const searchButton = async () => {
     selectedKitchenGroup.value = "";
     selectedmenuNm.value = "";
     selectedmenuCode.value = "";
-    afterClick.value = true;
-    afterClick2.value = true;
-    afterClick3.value = true;
+    // afterClick.value = true;
+    // afterClick2.value = true;
+    // afterClick3.value = true;
     tempDisabled2.value = true;
     forsearchSub.value = -1;
     forsearchMain.value = -1;
@@ -1973,6 +1964,7 @@ const clickedRowData3 = (newValue) => {
  */
 
 const handleinitAll = (newvalue) => {
+  
   MenuGroup.value = [];
   SubMenuGroup.value = [];
   MenuKeyList.value = [];
@@ -1987,7 +1979,7 @@ const handleinitAll = (newvalue) => {
   filteredSubMenuGroup.value = [];
   searchword1.value = "";
   searchword3.value = "";
-  afterSearch.value = false;
+
 };
 
 /**

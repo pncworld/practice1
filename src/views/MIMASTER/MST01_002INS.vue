@@ -21,12 +21,12 @@
       @update:storeGroup="handleGroupCd"
       @update:storeCd="handleStoreCd">
     </PickStore>
-    <input
+    <!-- <input
       type="text"
       v-model="searchStoreName"
       class="rounded-lg h-9 items-center border border-black"
       :disabled="allstrore"
-      @keydown.enter="searchButton" />
+      @keydown.enter="searchButton" /> -->
   </div>
   <!-- 조회 부분 -->
   <!-- 그리드 부분 -->

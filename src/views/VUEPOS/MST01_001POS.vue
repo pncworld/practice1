@@ -1,9 +1,9 @@
-/*--############################################################################
-# Filename : MST05_004INS.vue                                                  
-# Description : 마스터관리 > POS 마스터 > 메뉴키 설정                          
-# Date :2025-05-14                                                             
+<!-- /*--############################################################################
+# Filename : MST01_001POS.vue                                                  
+# Description : 마스터관리 > POS 마스터 > 메뉴키 설정 (간편)                         
+# Date :2025-11-04                                                             
 # Author : 권맑음                     
-################################################################################*/
+################################################################################*/ -->
 <template>
   <!-- 조회 조건 -->
   <div class="flex flex-col w-full overflow-y-hidden">
@@ -11,31 +11,34 @@
       <pageName></pageName>
       <div class="flex space-x-6 pr-12 pt-2">
         <button class="button search" @click="searchButton">조회</button
-        ><button class="button save" @click="saveButton">저장</button
-        ><button class="button copy" @click="copyButton">
-          메뉴키&nbsp;복사
-        </button>
-        <button class="button copy" @click="copyButton2">
-          메뉴키화면키&nbsp;복사
-        </button>
+        ><button class="button save" @click="saveButton">저장</button>
       </div>
     </div>
 
-    <div class="flex bg-gray-200 rounded-lg h-16 w-full items-center mt-5">
-      <PickStore
-        @areaCd="handleStoreAreaCd"
-        @update:storeGroup="handleGroupCd"
-        @update:storeCd="handleStoreCd"
-        @posNo="handlePosNo"
-        :showPosNo="true"
-        :showScreenNo="true"
-        @storeNm="handlestoreNm"
-        @update:ischanged="handleinitAll"
-        @screenNo="handleScreenNo"
-        :showMakeScreen="true"
-        :renew="renew"
-        @changed2="changed2">
-      </PickStore>
+    <div
+      class="flex bg-gray-200 rounded-lg h-16 w-full items-center mt-5 justify-center space-x-5">
+      <div class="flex items-center space-x-5">
+        <div class="text-base font-semibold">지역코드</div>
+        <select name="" id="" class="w-64 h-8" v-model="lngAreaCode">
+          <option :value="i.lngAreaCode" v-for="i in optionList2">
+            {{ i.lngAreaCode }}
+          </option>
+        </select>
+      </div>
+
+      <div class="flex items-center space-x-5">
+        <div class="text-base font-semibold">화면번호</div>
+        <select name="" id="" class="w-64 h-8" v-model="lngScreenCode">
+          <option :value="i.strDCode" v-for="i in ScreenList">
+            {{ i.strDName }}
+          </option>
+        </select>
+      </div>
+
+      <div
+        class="bg-black text-white font-semibold text-base h-full items-center justify-center flex">
+        저장하시면 전체 포스에 적용이 됩니다.
+      </div>
     </div>
   </div>
   <!-- 조회 조건 -->
@@ -45,9 +48,9 @@
     <DupliPopUp
       :isVisible="showPopup2"
       @close="showPopup2 = false"
-      :storeCd="nowStoreCd"
+      :storeCd="templngStoreCode"
       :storeNm="clickedStoreNm"
-      :areaCd="nowStoreAreaCd"
+      :areaCd="lngAreaCode"
       :posNo="posNo"
       :progname="'MST01_004INS_VUE'"
       :dupliapiname="'dupliPos'"
@@ -58,14 +61,14 @@
     <DupliPopUp2
       :isVisible="showSpecificMenukey"
       @close="showSpecificMenukey = false"
-      :storeCd="nowStoreCd"
+      :storeCd="templngStoreCode"
       :storeNm="clickedStoreNm"
-      :areaCd="nowStoreAreaCd"
+      :areaCd="lngAreaCode"
       :posNo="posNo"
       :progname="'MST01_004INS_VUE'"
       :progid="2"
       :dupliapiname="'dupliPos2'"
-      :nowscreenNo="nowscreenNo"></DupliPopUp2>
+      :lngScreenCode="lngScreenCode"></DupliPopUp2>
   </div>
 
   <div
@@ -164,7 +167,7 @@
     </div>
   </div>
   <span
-    class="h-5 -mt-1 flex justify-between items-center w-[930px] ml-[680px] z-40">
+    class="h-5 -mt-1 flex justify-between items-center w-[930px] ml-[780px] z-40">
     <h1 class="font-bold text-xl z-40">메뉴키 설정</h1>
     <span class="flex space-x-3 ml-32 pl-56 items-center"
       >순서변경 &nbsp; &nbsp;<label class="z-40"
@@ -231,25 +234,27 @@
           </div>
           <div class="px-4 py-2 border border-gray-300 rounded-tr-lg flex">
             <select
-              name="majorGroupCd"
+              name="majorlngStoreGroup"
               id=""
               class="flex-1"
               @change="setSubCd"
               v-model="forsearchMain">
               <option value="-1">전체</option>
-              <option :value="i.GroupCd" v-for="i in MenuGroup">
-                [{{ i.GroupCd }}]{{ i.majorGroupNm }}
+              <option :value="i.lngStoreGroup" v-for="i in MenuGroup">
+                [{{ i.lngStoreGroup }}]{{ i.majorGroupNm }}
               </option>
             </select>
             <select
-              name="subGroupCd"
+              name="sublngStoreGroup"
               id=""
               class="flex-1"
               v-model="forsearchSub"
               @change="setSubCd">
               <option value="-1">전체</option>
-              <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup">
-                [{{ i.GroupCd }}]{{ i.subGroupNm }}
+              <option
+                :value="i.lngStoreGroup"
+                v-for="i in filteredSubMenuGroup">
+                [{{ i.lngStoreGroup }}]{{ i.subGroupNm }}
               </option>
             </select>
           </div>
@@ -273,7 +278,7 @@
             @realgridname="realgridname3"
             :rowStateeditable="false"
             :searchColId="'menuCd,menuNm'"
-            :searchColId3="['majorGroupCd', 'subGroupCd']"
+            :searchColId3="['majorlngStoreGroup', 'sublngStoreGroup']"
             :searchValue="searchValue"
             :searchWord3="searchword1"></Realgrid>
 
@@ -479,7 +484,7 @@
             :rowData="rowData"
             @selcetedrowData="selcetedrowData4"
             :searchColId="'menuCd,menuNm'"
-            :searchColId3="['majorGroupCd', 'subGroupCd']"
+            :searchColId3="['majorlngStoreGroup', 'sublngStoreGroup']"
             :searchValue="searchValue"
             :rowStateeditable="false"
             @realgridname="realgridname4"
@@ -728,9 +733,11 @@ import {
   getTLUList2,
   saveAllMenuKey,
   saveMenuKey2,
+  saveMenuKey3,
   saveScreenKeys,
 } from "@/api/master";
 import { getSubGroup3, InsertMenu } from "@/api/mipos";
+import { getAreaCode, getSubGroup4 } from "@/api/vuepos";
 
 /**
  *  복사 팝업 컴포넌트
@@ -752,7 +759,6 @@ import PageName from "@/components/pageName.vue";
  * 매장 공통 컴포넌트
  */
 
-import PickStore from "@/components/pickStore.vue";
 /**
  * 	그리드 생성
  */
@@ -762,7 +768,7 @@ import Realgrid from "@/components/realgrid.vue";
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog } from "@/customFunc/customFunc";
+import { insertPageLog2 } from "@/customFunc/customFunc";
 
 /**
  *  리얼그리드 라이브러리 호출
@@ -784,6 +790,7 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { VueDraggableNext } from "vue-draggable-next";
+import { useRoute } from "vue-router";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -793,9 +800,85 @@ import { useStore } from "vuex";
 /**
  * 	화면 Load시 실행 스크립트
  */
-
+const route = useRoute();
+const path = ref("");
+const lngStoreGroup = ref("");
+const templngStoreCode = ref("");
+const lngOperator = ref("");
+const lngAreaCode = ref("");
+const lngScreenCode = ref("");
+const optionList2 = ref([]);
+const ScreenList = ref([]);
 onMounted(async () => {
-  const pageLog = await insertPageLog(store.state.activeTab2);
+  path.value = route.path.split("/")[2];
+  lngStoreGroup.value = route.query.lngStoreGroup;
+  templngStoreCode.value = route.query.lngStoreCode;
+  lngOperator.value = route.query.lngOperator;
+  const pageLog = await insertPageLog2(
+    path.value,
+    lngStoreGroup.value,
+    templngStoreCode.value,
+    lngOperator.value
+  );
+
+  const res3 = await getAreaCode(lngStoreGroup.value, templngStoreCode.value);
+
+  optionList2.value = res3.data.List;
+
+  lngAreaCode.value = optionList2.value[0].lngAreaCode;
+  templngStoreCode.value = templngStoreCode.value;
+  const res2 = await getMenuList3(lngStoreGroup.value, templngStoreCode.value);
+
+  //comsole.log(res2);
+  MenuList.value = res2.data.menuList;
+  MenuGroup.value = res2.data.menuGroup;
+  SubMenuGroup.value = res2.data.submenuGroup;
+
+  const res = await getSubGroup4(lngStoreGroup.value, templngStoreCode.value);
+  ////console.log(res);
+  optionList.value = res.data.List;
+  if (optionList.value.length > 0) {
+    pcond2.value = res.data.List[0].lngCode;
+  }
+
+  // if (newValue == "0") {
+  //   afterSearch.value = false;
+  //   if (MenuList.value.length > 0) {
+  //     MenuList.value = [];
+  //   }
+  // }
+
+  MenuList.value = MenuList.value.map((item) => {
+    return {
+      ...item,
+      add: "추가",
+    };
+  });
+  const res5 = await getTLUList2(lngStoreGroup.value, templngStoreCode.value);
+  //comsole.log(res5);
+  TLUList.value = res5.data.TLUList;
+  TLUList.value = TLUList.value.map((item) => {
+    return {
+      ...item,
+      add: "추가",
+    };
+  });
+
+  const res4 = await getScreenList2(
+    lngStoreGroup.value,
+    templngStoreCode.value,
+    lngAreaCode.value,
+    1
+  );
+
+  ScreenList.value = res4.data.ScreenList;
+  if (ScreenList.value.length > 0) {
+    lngScreenCode.value = ScreenList.value[0].strDCode;
+  } else {
+    lngScreenCode.value = 1;
+  }
+
+  //comsole.log(ScreenList.value);
 });
 
 // 더미 데이터
@@ -889,8 +972,8 @@ const saveMenuKey = async () => {
 
   try {
     const res = await InsertMenu(
-      groupCd.value,
-      nowStoreCd.value,
+      lngStoreGroup.value,
+      templngStoreCode.value,
       pcond2.value,
       pcond3.value,
       pcond4.value,
@@ -920,7 +1003,7 @@ const saveMenuKey = async () => {
   } finally {
     showPopUp.value = false;
 
-    await handleStoreCd(nowStoreCd.value);
+    await handleStoreCd(templngStoreCode.value);
   }
 };
 
@@ -1202,18 +1285,18 @@ const saveButton = () => {
     if (result.isConfirmed) {
       try {
         store.state.loading = true;
-        const res = await saveMenuKey2(
-          groupCd.value,
-          nowStoreCd.value,
-          nowStoreAreaCd.value,
-          posNo.value,
+        const res = await saveMenuKey3(
+          lngStoreGroup.value,
+          templngStoreCode.value,
+          lngAreaCode.value,
+          1,
           keyseq.join("\u200B"),
           keyname.join("\u200B"),
           keyscrno.join("\u200B"),
           keycolor.join("\u200B"),
           keyno.join("\u200B")
         );
-        //comsole.log(res);
+        console.log(res);
         if (res.data.RESULT_CD == "00") {
           Swal.fire({
             title: "저장 되었습니다.",
@@ -1229,25 +1312,21 @@ const saveButton = () => {
     }
   });
 };
-const nowStoreAreaCd = ref();
+
 /**
  *  pickStore - 지역코드 세팅
  */
 
 const handleStoreAreaCd = (newValue) => {
-  nowStoreAreaCd.value = newValue;
-  //comsole.log(nowStoreAreaCd.value);
+  lngAreaCode.value = newValue;
+  //comsole.log(lngAreaCode.value);
 };
 
-const nowStoreCd = ref();
 const afterCategory = ref(false);
 /**
  * 페이지 매장 코드 세팅
  */
 
-const handleGroupCd = (e) => {
-  groupCd.value = e;
-};
 const handleStoreCd = async (newValue) => {
   if (newValue == "0") {
     afterSearch.value = false;
@@ -1260,8 +1339,8 @@ const handleStoreCd = async (newValue) => {
     pcond2.value = res.data.List[0].lngCode;
   }
 
-  nowStoreCd.value = newValue;
-  const res2 = await getMenuList3(groupCd.value, nowStoreCd.value);
+  templngStoreCode.value = newValue;
+  const res2 = await getMenuList3(lngStoreGroup.value, templngStoreCode.value);
 
   MenuList.value = res2.data.menuList;
   MenuGroup.value = res2.data.menuGroup;
@@ -1273,7 +1352,7 @@ const handleStoreCd = async (newValue) => {
       add: "추가",
     };
   });
-  const res5 = await getTLUList2(groupCd.value, nowStoreCd.value);
+  const res5 = await getTLUList2(lngStoreGroup.value, templngStoreCode.value);
   TLUList.value = res5.data.TLUList;
   TLUList.value = TLUList.value.map((item) => {
     return {
@@ -1293,7 +1372,6 @@ const store = useStore();
 
 const showMenuKeyList = ref([]);
 const userData = store.state.userData;
-const groupCd = ref(userData.lngStoreGroup);
 const modified = ref(false);
 const afterSearch = ref(false);
 const MenuList = ref([]);
@@ -1308,7 +1386,7 @@ const searchButton = async () => {
   Category.value = [];
   items.value = [];
 
-  if (nowStoreCd.value == "0" || nowStoreCd.value == undefined) {
+  if (lngStoreGroup.value == "0" || lngStoreGroup.value == undefined) {
     Swal.fire({
       title: "경고",
       text: "매장을 선택하세요.",
@@ -1319,18 +1397,8 @@ const searchButton = async () => {
     });
     return;
   }
-  if (posNo.value == "0" || posNo.value == undefined) {
-    Swal.fire({
-      title: "경고",
-      text: "포스번호를 선택하세요.",
-      icon: "warning",
-      showCancelButton: false,
-      confirmButtonColor: "#3085d6",
-      allowOutsideClick: false,
-    });
-    return;
-  }
-  if (nowscreenNo.value == "0" || nowscreenNo.value == undefined) {
+
+  if (lngScreenCode.value == "0" || lngScreenCode.value == undefined) {
     Swal.fire({
       title: "경고",
       text: "화면번호를 선택하세요.",
@@ -1347,19 +1415,19 @@ const searchButton = async () => {
     items.value = [];
 
     const res3 = await getScreenList2(
-      groupCd.value,
-      nowStoreCd.value,
-      nowStoreAreaCd.value,
-      posNo.value
+      lngStoreGroup.value,
+      templngStoreCode.value,
+      lngAreaCode.value,
+      1
     );
 
     //comsole.log(res3);
     const res4 = await getMenuKeyList2(
-      groupCd.value,
-      nowStoreCd.value,
-      nowStoreAreaCd.value,
-      posNo.value,
-      nowscreenNo.value
+      lngStoreGroup.value,
+      templngStoreCode.value,
+      lngAreaCode.value,
+      1,
+      lngScreenCode.value
     );
 
     MenuKeyList.value = res4.data.MenukeyList;
@@ -1372,14 +1440,14 @@ const searchButton = async () => {
 
     const filteredList = MenuKeyList.value.filter(
       (item) =>
-        item.intKeySeq >= (nowscreenNo.value - 1) * 45 &&
-        item.intKeySeq <= nowscreenNo.value * 45
+        item.intKeySeq >= (lngScreenCode.value - 1) * 45 &&
+        item.intKeySeq <= lngScreenCode.value * 45
     );
-    ////console.log(nowscreenNo.value);
+    ////console.log(lngScreenCode.value);
     ////console.log(items.value);
     items.value = [];
-    const startIndex = (nowscreenNo.value - 1) * 45;
-    const endIndex = nowscreenNo.value * 45;
+    const startIndex = (lngScreenCode.value - 1) * 45;
+    const endIndex = lngScreenCode.value * 45;
     //comsole.log(items.value);
     // 중간에 비어 있는 번호 확인 및 채우기
     for (let i = startIndex; i < endIndex; i++) {
@@ -1418,13 +1486,13 @@ const setSubCd = (e) => {
   const value = e.target.value;
   //comsole.log(SubMenuGroup.value);
   //comsole.log(MenuGroup.value);
-  if (name == "majorGroupCd") {
+  if (name == "majorlngStoreGroup") {
     filteredSubMenuGroup.value = SubMenuGroup.value.filter(
       (item) => item.sublngMajor == value
     );
     forsearchSub.value = -1;
     searchValue.value = [value, forsearchSub.value];
-  } else if (name == "subGroupCd") {
+  } else if (name == "sublngStoreGroup") {
     searchValue.value = [forsearchMain.value, value];
   }
 };
@@ -1441,15 +1509,15 @@ const showMenuKey = (value) => {
     intKeySeq: index + 1,
   }));
   //comsole.log(MenuKeyList.value);
-  //comsole.log(nowscreenNo.value);
+  //comsole.log(lngScreenCode.value);
   const filteredList = MenuKeyList.value.filter(
     (item) =>
-      item.intKeySeq >= (nowscreenNo.value - 1) * 45 + 1 &&
-      item.intKeySeq <= nowscreenNo.value * 45
+      item.intKeySeq >= (lngScreenCode.value - 1) * 45 + 1 &&
+      item.intKeySeq <= lngScreenCode.value * 45
   );
   //console.log(filteredList);
-  const startIndex = (nowscreenNo.value - 1) * 45 + 1;
-  const endIndex = nowscreenNo.value * 45;
+  const startIndex = (lngScreenCode.value - 1) * 45 + 1;
+  const endIndex = lngScreenCode.value * 45;
   // 중간에 비어 있는 번호 확인 및 채우기
   for (let i = startIndex; i <= endIndex; i++) {
     // 해당 번호가 없는 경우 기본값 추가
@@ -1476,7 +1544,7 @@ const showMenuKey = (value) => {
   // }));
 
   // MenuKeyList.value
-  //   .filter((item) => item.intPosNo == posNo.value && item.intScreenNo == value)
+  //   .filter((item) => item.intPosNo == 1 && item.intScreenNo == value)
   //   .forEach((item) => {
   //     const position = item.intKeySeq - (currmenuKeyPage.value - 1) * 30 - 1;
   //     if (position >= 0 && position < 30) {
@@ -1530,14 +1598,14 @@ const onEnd = (evt) => {
 
     items.value = swappedItems.map((item, index) => ({
       ...item, // 기존 객체의 다른 속성 유지
-      intKeySeq: index + (nowscreenNo.value - 1) * 45 + 1, // 배열 순서대로 intKeySeq 재정렬
+      intKeySeq: index + (lngScreenCode.value - 1) * 45 + 1, // 배열 순서대로 intKeySeq 재정렬
     }));
     //console.log(items.value);
   } else {
     updateMenuKey.value = true;
     items.value = items.value.map((item, index) => ({
       ...item, // 기존 객체의 다른 속성 유지
-      intKeySeq: index + (nowscreenNo.value - 1) * 45 + 1, // 배열 순서대로 intKeySeq 재정렬
+      intKeySeq: index + (lngScreenCode.value - 1) * 45 + 1, // 배열 순서대로 intKeySeq 재정렬
     }));
   }
   //comsole.log(evt);
@@ -1554,7 +1622,7 @@ const onEnd2 = (evt) => {
     item.intScreenNo = index + 1;
   });
   MenuKeyList.value
-    .filter((item) => item.intPosNo == posNo.value)
+    .filter((item) => item.intPosNo == 1)
     .forEach((item, index) => {
       if (item.intScreenNo == originScreenNo) {
         item.intScreenNo = targetItemIndex3 + 1;
@@ -1639,36 +1707,36 @@ const savePosMenu = async () => {
         //comsole.log(screenKeyNoarr.join(","));
         //comsole.log(screenKeyNamearr.join(","));
         const res = await saveScreenKeys(
-          groupCd.value,
-          nowStoreCd.value,
-          nowStoreAreaCd.value,
-          posNo.value,
+          lngStoreGroup.value,
+          templngStoreCode.value,
+          lngAreaCode.value,
+          1,
           screenKeyNoarr.join(","),
           screenKeyNamearr.join(",")
         );
 
         const intKeySeqs = MenuKeyList.value
-          .filter((item) => item.intPosNo == posNo.value)
+          .filter((item) => item.intPosNo == 1)
           .map((item) => item.intKeySeq);
         const screenNumarr = MenuKeyList.value
-          .filter((item) => item.intPosNo == posNo.value)
+          .filter((item) => item.intPosNo == 1)
           .map((item) => item.intScreenNo);
         const lngScrarr = MenuKeyList.value
-          .filter((item) => item.intPosNo == posNo.value)
+          .filter((item) => item.intPosNo == 1)
           .map((item) => item.lngKeyscrNo);
         const menuKeyNmarr = MenuKeyList.value
-          .filter((item) => item.intPosNo == posNo.value)
+          .filter((item) => item.intPosNo == 1)
           .map((item) => item.strKeyName);
-        //comsole.log(posNo.value);
+        //comsole.log(1);
         //comsole.log(intKeySeqs.join(","));
         //comsole.log(screenNumarr.join(","));
         //comsole.log(lngScrarr.join(","));
         //comsole.log(menuKeyNmarr.join(","));
         const res2 = await saveAllMenuKey(
-          groupCd.value,
-          nowStoreCd.value,
-          nowStoreAreaCd.value,
-          posNo.value,
+          lngStoreGroup.value,
+          templngStoreCode.value,
+          lngAreaCode.value,
+          1,
           intKeySeqs.join(","),
           screenNumarr.join(","),
           lngScrarr.join(","),
@@ -1710,20 +1778,7 @@ const searchMenuList2 = (e) => {
  * pickStore - 포스번호 세팅
  */
 
-const handlePosNo = (newValue) => {
-  posNo.value = newValue;
-  //comsole.log(posNo.value);
-};
-const nowscreenNo = ref();
-const handleScreenNo = (newValue) => {
-  nowscreenNo.value = newValue;
-  //comsole.log(nowscreenNo.value);
-  //showMenuKey(newValue);
-  if (newValue != "0") {
-    searchButton();
-  }
-};
-watch(nowscreenNo, (newvalue) => {
+watch(lngScreenCode, (newvalue) => {
   changePage.value = true;
   if (afterSearch.value) {
     // showMenuKey(newvalue);
@@ -1791,8 +1846,8 @@ const existMenuKey = ref(false);
 const clickedRealIndex = ref();
 const saveMenuKeyposition = (index) => {
   clickedScreenOrMenu.value = true;
-  clickedMenuKeyIndex.value = index + 1 + (nowscreenNo.value - 1) * 45;
-  clickedRealIndex.value = (nowscreenNo.value - 1) * 45 + index;
+  clickedMenuKeyIndex.value = index + 1 + (lngScreenCode.value - 1) * 45;
+  clickedRealIndex.value = (lngScreenCode.value - 1) * 45 + index;
 };
 
 const clickedMenuKeyIndex = ref(null);
@@ -1802,8 +1857,8 @@ const addMenuKey = () => {
     return;
   }
   const onScreenKey =
-    nowscreenNo.value * 45 - clickedMenuKeyIndex.value >= 0 &&
-    nowscreenNo.value * 45 - clickedMenuKeyIndex.value <= 10;
+    lngScreenCode.value * 45 - clickedMenuKeyIndex.value >= 0 &&
+    lngScreenCode.value * 45 - clickedMenuKeyIndex.value <= 10;
   //comsole.log(clickedMenuKeyIndex.value);
   const a = items.value.find(
     (item) => item.intKeySeq == clickedMenuKeyIndex.value
@@ -1812,7 +1867,7 @@ const addMenuKey = () => {
   if (a !== undefined) {
     a.intKeyNo = currentMenu.value == 1 ? 6 : 1;
     a.intKeySeq = clickedMenuKeyIndex.value;
-    a.intPosNo = posNo.value;
+    a.intPosNo = 1;
     a.lngKeyColor = "16769216";
     a.lngKeyscrNo = Number(currentSelectedMenuCode.value);
     a.strKeyName = currentSelectedMenuNm.value;
@@ -1820,13 +1875,11 @@ const addMenuKey = () => {
   }
   ////console.log(a);
   //comsole.log(items.value);
-  //comsole.log(posNo.value);
+  //comsole.log(1);
   //comsole.log(clickedMenuKeyIndex.value);
   //comsole.log(MenuKeyList.value);
   const b = MenuKeyList.value.find(
-    (item) =>
-      item.intKeySeq == clickedMenuKeyIndex.value &&
-      item.intPosNo == posNo.value
+    (item) => item.intKeySeq == clickedMenuKeyIndex.value && item.intPosNo == 1
   );
 
   ////console.log(b);
@@ -1834,7 +1887,7 @@ const addMenuKey = () => {
   if (b !== undefined) {
     b.intKeyNo = currentMenu.value == 1 ? 6 : 1;
     b.intKeySeq = clickedMenuKeyIndex.value;
-    b.intPosNo = posNo.value;
+    b.intPosNo = 1;
     b.lngKeyColor = "16769216";
     b.lngKeyscrNo = Number(currentSelectedMenuCode.value);
     b.strKeyName = currentSelectedMenuNm.value;
@@ -1843,7 +1896,7 @@ const addMenuKey = () => {
     MenuKeyList.value.push({
       intKeyNo: currentMenu.value == 1 ? 6 : 1,
       intKeySeq: clickedMenuKeyIndex.value,
-      intPosNo: posNo.value,
+      intPosNo: 1,
       lngKeyColor: "16769216",
       lngKeyscrNo: Number(currentSelectedMenuCode.value),
       strKeyName: currentSelectedMenuNm.value,
@@ -1851,7 +1904,7 @@ const addMenuKey = () => {
     });
   }
   // //console.log(b);
-  showMenuKey(nowscreenNo.value);
+  showMenuKey(lngScreenCode.value);
   //comsole.log(MenuKeyList.value);
 };
 
@@ -1869,19 +1922,17 @@ const addMenuKey2 = () => {
   if (a !== undefined) {
     a.intKeyNo = 7;
     a.intKeySeq = clickedMenuKeyIndex.value;
-    a.intPosNo = posNo.value;
+    a.intPosNo = 1;
     a.lngKeyColor = "16769216";
     a.lngKeyscrNo = Number(currentSelectedMenuCode.value);
     a.strKeyName = currentSelectedMenuNm.value;
   }
   //comsole.log(items.value);
-  //comsole.log(posNo.value);
+  //comsole.log(1);
   //comsole.log(clickedMenuKeyIndex.value);
   //comsole.log(MenuKeyList.value);
   const b = MenuKeyList.value.find(
-    (item) =>
-      item.intKeySeq == clickedMenuKeyIndex.value &&
-      item.intPosNo == posNo.value
+    (item) => item.intKeySeq == clickedMenuKeyIndex.value && item.intPosNo == 1
   );
 
   //comsole.log(b);
@@ -1889,7 +1940,7 @@ const addMenuKey2 = () => {
   if (b !== undefined) {
     b.intKeyNo = 7;
     b.intKeySeq = clickedMenuKeyIndex.value;
-    b.intPosNo = posNo.value;
+    b.intPosNo = 1;
     b.lngKeyColor = "16769216";
     b.lngKeyscrNo = Number(currentSelectedMenuCode.value);
     b.strKeyName = currentSelectedMenuNm.value;
@@ -1897,7 +1948,7 @@ const addMenuKey2 = () => {
     MenuKeyList.value.push({
       intKeyNo: 7,
       intKeySeq: clickedMenuKeyIndex.value,
-      intPosNo: posNo.value,
+      intPosNo: 1,
       lngKeyColor: "16769216",
       lngKeyscrNo: Number(currentSelectedMenuCode.value),
       strKeyName: currentSelectedMenuNm.value,
@@ -1906,7 +1957,7 @@ const addMenuKey2 = () => {
 
   // const foraddIndex = MenuKeyList.value.find(
   //   (item) =>
-  //     item.intPosNo == posNo.value &&
+  //     item.intPosNo == 1 &&
   //     item.intKeySeq == clickedMenuKeyIndex.value
   // );
 
@@ -1915,7 +1966,7 @@ const addMenuKey2 = () => {
   //   MenuKeyList.value.push({
   //     intKeyNo: 6,
   //     intKeySeq: clickedRealIndex.value,
-  //     intPosNo: posNo.value,
+  //     intPosNo: 1,
   //     lngKeyscrNo: Number(currentSelectedMenuCode.value),
   //     strKeyName: currentSelectedMenuNm.value,
   //   });
@@ -1924,7 +1975,7 @@ const addMenuKey2 = () => {
   //   foraddIndex.strKeyName = currentSelectedMenuNm.value;
   // }
 
-  showMenuKey(nowscreenNo.value);
+  showMenuKey(lngScreenCode.value);
   //comsole.log(MenuKeyList.value);
 };
 
@@ -1934,14 +1985,14 @@ const addScreenKeyf = () => {
   const foraddIndex = MenuKeyList.value.findIndex(
     (item) =>
       item.intKeySeq ==
-      (nowscreenNo.value - 1) * 45 + clickedRealIndex.value + 1
+      (lngScreenCode.value - 1) * 45 + clickedRealIndex.value + 1
   );
   //comsole.log(foraddIndex);
   if (foraddIndex == -1) {
     MenuKeyList.value.push({
       intKeyNo: 1,
-      intKeySeq: (nowscreenNo.value - 1) * 45 + clickedRealIndex.value + 1,
-      intPosNo: posNo.value,
+      intKeySeq: (lngScreenCode.value - 1) * 45 + clickedRealIndex.value + 1,
+      intPosNo: 1,
       lngKeyscrNo: Number(currentSelectedMenuCode.value),
       strKeyName: currentSelectedMenuNm.value,
       lngKeyColor: "16769216",
@@ -1949,8 +2000,8 @@ const addScreenKeyf = () => {
   } else {
     MenuKeyList.value[foraddIndex] = {
       intKeyNo: 1,
-      intKeySeq: (nowscreenNo.value - 1) * 45 + clickedRealIndex.value + 1,
-      intPosNo: posNo.value,
+      intKeySeq: (lngScreenCode.value - 1) * 45 + clickedRealIndex.value + 1,
+      intPosNo: 1,
       lngKeyscrNo: Number(currentSelectedMenuCode.value),
       strKeyName: currentSelectedMenuNm.value,
       lngKeyColor: "16769216",
@@ -1971,7 +2022,7 @@ const addTLUKey = () => {
     MenuKeyList.value.push({
       intKeyNo: 6,
       intKeySeq: clickedRealIndex.value + 1,
-      intPosNo: posNo.value,
+      intPosNo: 1,
       intScreenNo: clickedintScreenNo.value,
       lngKeyscrNo: Number(clickedTLUCD.value),
       strKeyName: clickedTLUNM.value,
@@ -1980,7 +2031,7 @@ const addTLUKey = () => {
     MenuKeyList.value[foraddIndex] = {
       intKeyNo: 6,
       intKeySeq: clickedRealIndex.value + 1,
-      intPosNo: posNo.value,
+      intPosNo: 1,
       intScreenNo: clickedintScreenNo.value,
       lngKeyscrNo: Number(clickedTLUCD.value),
       strKeyName: clickedTLUNM.value,
@@ -2037,12 +2088,11 @@ const handleinitAll = (newvalue) => {
   ScreenKeys.value = [];
   items.value = [];
   items.value = [];
-  nowStoreAreaCd.value = "0";
-  posNo.value = "0";
+  lngAreaCode.value = "0";
 };
-// watch(forsearchSub, (newvalue) => {
-//   searchMenuList3();
-// });
+watch(lngScreenCode, () => {
+  searchButton();
+});
 </script>
 
 <style scoped></style>

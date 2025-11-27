@@ -37,8 +37,9 @@
           @update:storeGroup="lngStoreGroup"
           :defaultStoreNm="'전체'"
           @storeNm="excelStore"
-          :defaultStoreType2="true"
-          :defaultStore="true"
+          :defaultStoreType2="defaultStoreType2"
+          :defaultStore="defaultStore"
+          :disabledAll2="disabledAll2"
           @update:storeCd="lngStoreCode"></PickStore>
       </div>
     </div>
@@ -83,7 +84,7 @@
         <button class="whitebutton" @click="saveButton2">저장</button>
         <button @click="open = false" class="whitebutton">닫기</button>
       </div>
-      <div class="grid grid-rows-2 grid-cols-[1fr,3fr,1fr,3fr]">
+      <div class="grid grid-rows-3 grid-cols-[1fr,3fr,1fr,3fr] h-[20%]">
         <div
           class="border-l border-t border-black flex justify-center items-center font-semibold text-base">
           일자
@@ -104,7 +105,13 @@
           class="border-l border-t border-r border-black flex justify-center items-center">
           <PickStore
             :mainName="''"
-            class="!ml-0"
+            :hideGroup="false"
+            :hideAttr="false"
+            :defaultStoreNm="'전체'"
+            :setDynamicStoreClass="'!w-[150%] !-ml-[90%] h-[90%] !p-0 '"
+            :defaultStoreType2="defaultStoreType2"
+            :defaultStore="defaultStore"
+            :disabledAll2="disabledAll2"
             @update:storeGroup="lngStoreGroup2"
             @update:storeCd="lngStoreCode2"></PickStore>
         </div>
@@ -138,8 +145,20 @@
             class="w-[80%] h-[80%] border border-black"
             v-model="scond3" />
         </div>
+        <div
+          class="border-l border-t border-b border-black flex justify-center items-center font-semibold text-base">
+          손실번호
+        </div>
+        <div
+          class="border-l border-t border-b border-r border-black flex justify-start pl-2 items-center">
+          <input
+            type="text"
+            disabled
+            class="w-[80%] h-[80%] border border-black disabled:bg-white"
+            v-model="scond4" />
+        </div>
       </div>
-      <div class="h-[70%] w-full mt-2">
+      <div class="h-[65%] w-full mt-2">
         <realgrid
           :progname="'STKN06_012INS_VUE'"
           :progid="3"
@@ -171,7 +190,7 @@
         <button class="whitebutton" @click="saveButton3">저장</button>
         <button @click="open2 = false" class="whitebutton">닫기</button>
       </div>
-      <div class="grid grid-rows-2 grid-cols-[1fr,3fr,1fr,3fr]">
+      <div class="grid grid-rows-3 grid-cols-[1fr,3fr,1fr,3fr] h-[20%]">
         <div
           class="border-l border-t border-black flex justify-center items-center font-semibold text-base">
           일자
@@ -193,8 +212,11 @@
           class="border-l border-t border-r border-black flex justify-center items-center">
           <PickStore
             :mainName="''"
+            :hideGroup="false"
+            :hideAttr="false"
+            :setDefaultStoreCd="tempStoreCd"
             :disabledAll="true"
-            class="!ml-0"
+            :setDynamicStoreClass="'!w-[150%] !-ml-[90%] h-[90%] !p-0 text-center'"
             @update:storeGroup="lngStoreGroup2"
             @update:storeCd="lngStoreCode2"></PickStore>
         </div>
@@ -230,8 +252,21 @@
             class="w-[80%] h-[80%] border border-black"
             v-model="scond3" />
         </div>
+
+        <div
+          class="border-l border-t border-b border-black flex justify-center items-center font-semibold text-base">
+          손실번호
+        </div>
+        <div
+          class="border-l border-t border-b border-r border-black flex justify-start pl-2 items-center">
+          <input
+            type="text"
+            disabled
+            class="w-[80%] h-[80%] border border-black disabled:bg-white"
+            v-model="scond4" />
+        </div>
       </div>
-      <div class="h-[70%] w-full mt-2">
+      <div class="h-[65%] w-full mt-2">
         <realgrid
           :progname="'STKN06_012INS_VUE'"
           :progid="3"
@@ -307,8 +342,15 @@ import { useStore } from "vuex";
 /**
  * 	화면 Load시 실행 스크립트
  */
-
+const disabledAll2 = ref(false);
+const defaultStore = ref(false);
+const defaultStoreType2 = ref(true);
 onMounted(async () => {
+  if (store.state.userData.lngPositionType == "1") {
+    defaultStore.value = true;
+  } else {
+    defaultStore.value = false;
+  }
   const pageLog = await insertPageLog(store.state.activeTab2);
 
   const res = await getCommonList(52);
@@ -336,6 +378,7 @@ const optionList2 = ref([]);
 const scond = ref("");
 const scond2 = ref("01");
 const scond3 = ref("");
+const scond4 = ref("");
 /**
  * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
  */
@@ -413,6 +456,16 @@ const rowData3 = ref([]);
 const labelsData = ref([[]]);
 const valuesData = ref([[]]);
 const searchButton2 = async () => {
+  if (storeCode2.value == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "매장을 먼저 선택해주세요.",
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   try {
     store.state.loading = true;
     initGrid2();
@@ -541,6 +594,7 @@ const addButton = async () => {
     });
     return;
   }
+  scond4.value = "";
   open.value = true;
   ////console.log(groupCd2.value);
   try {
@@ -569,6 +623,16 @@ const saveButton2 = async () => {
     });
     return;
   }
+  // if (storeCode2.value == 0) {
+  //   Swal.fire({
+  //     title: "경고",
+  //     text: "매장을 먼저 선택해주세요.",
+  //     icon: "warning",
+
+  //     confirmButtonText: "확인",
+  //   });
+  //   return;
+  // }
 
   const filtered = updatedrowdata2.value
     .filter((item, index) => allstaterows2.value.includes(index))
@@ -590,54 +654,69 @@ const saveButton2 = async () => {
     });
     return;
   }
-  try {
-    const itemids = updatedrowdata2.value
-      .filter((item, index) => allstaterows2.value.includes(index))
-      .map((item) => item.lngItemID)
-      .join("\u200b");
-    const qtys = updatedrowdata2.value
-      .filter((item, index) => allstaterows2.value.includes(index))
-      .map((item) => item.lngQty)
-      .join("\u200b");
-    const losscodes = updatedrowdata2.value
-      .filter((item, index) => allstaterows2.value.includes(index))
-      .map((item) => item.lngLossCode)
-      .join("\u200b");
-    const res = await saveLossMaster(
-      groupCd2.value,
-      storeCode2.value,
-      scond.value.replaceAll("-", ""),
-      itemids,
-      qtys,
-      losscodes,
-      store.state.userData.lngSequence,
-      scond2.value
-    );
-    console.log(res);
-    if (res.data.RESULT_CD == "00") {
-      await Swal.fire({
-        title: "성공",
-        text: "저장을 완료하였습니다.",
-        icon: "success",
 
-        confirmButtonText: "확인",
-      });
+  Swal.fire({
+    title: "알림",
+    text: "저장 하시겠습니까?",
+    icon: "question",
+
+    confirmButtonText: "확인",
+    cancelButtonText: "취소",
+    showCancelButton: true,
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const itemids = updatedrowdata2.value
+          .filter((item, index) => allstaterows2.value.includes(index))
+          .map((item) => item.lngItemID)
+          .join("\u200b");
+        const qtys = updatedrowdata2.value
+          .filter((item, index) => allstaterows2.value.includes(index))
+          .map((item) => item.lngQty)
+          .join("\u200b");
+        const losscodes = updatedrowdata2.value
+          .filter((item, index) => allstaterows2.value.includes(index))
+          .map((item) => item.lngLossCode)
+          .join("\u200b");
+        const res = await saveLossMaster(
+          groupCd2.value,
+          storeCode2.value,
+          scond.value.replaceAll("-", ""),
+          itemids,
+          qtys,
+          losscodes,
+          store.state.userData.lngSequence,
+          scond2.value
+        );
+        console.log(res);
+        if (res.data.RESULT_CD == "00") {
+          await Swal.fire({
+            title: "성공",
+            text: "저장을 완료하였습니다.",
+            icon: "success",
+
+            confirmButtonText: "확인",
+          });
+        } else {
+          await Swal.fire({
+            title: "실패",
+            text: `${res.data.RESULT_NM}`,
+            icon: "error",
+
+            confirmButtonText: "확인",
+          });
+          return;
+        }
+        //console.log(res);
+      } catch (error) {
+      } finally {
+        open.value = false;
+        searchButton();
+      }
     } else {
-      await Swal.fire({
-        title: "실패",
-        text: `${res.data.RESULT_NM}`,
-        icon: "error",
-
-        confirmButtonText: "확인",
-      });
       return;
     }
-    //console.log(res);
-  } catch (error) {
-  } finally {
-    open.value = false;
-    searchButton();
-  }
+  });
 };
 
 const allstaterows2 = ref([]);
@@ -669,8 +748,11 @@ const rowData4 = ref([]);
 const afterSearch3 = ref(false);
 
 const tempLossNo = ref("");
+const tempStoreCd = ref("");
 const dblclickedRowData = async (e) => {
   //console.log(e);
+  scond4.value = e[4];
+  tempStoreCd.value = e[1];
   open2.value = true;
   tempLossNo.value = e[4];
   try {
@@ -736,72 +818,86 @@ const saveButton3 = async () => {
     return;
   }
 
-  try {
-    const res = await getStockCheckLossByUpdate(
-      groupCd2.value,
-      storeCode2.value,
-      tempLossNo.value
-    );
-    console.log(res);
+  Swal.fire({
+    title: "알림",
+    text: "저장 하시겠습니까?",
+    icon: "question",
 
-    if (res.data.List[0].blnClosed != "False") {
-      await Swal.fire({
-        title: "경고",
-        text: "해당 일자는 이미 마감되어 수정하실 수 없습니다.",
-        icon: "warning",
+    confirmButtonText: "확인",
+    cancelButtonText: "취소",
+    showCancelButton: true,
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const res = await getStockCheckLossByUpdate(
+          groupCd2.value,
+          storeCode2.value,
+          tempLossNo.value
+        );
+        console.log(res);
 
-        confirmButtonText: "확인",
-      });
+        if (res.data.List[0].blnClosed != "False") {
+          await Swal.fire({
+            title: "경고",
+            text: "해당 일자는 이미 마감되어 수정하실 수 없습니다.",
+            icon: "warning",
+
+            confirmButtonText: "확인",
+          });
+          return;
+        }
+      } catch (error) {}
+
+      try {
+        const itemids = updatedrowdata3.value
+          .filter((item, index) => allstaterows3.value.includes(index))
+          .map((item) => item.lngItemID)
+          .join("\u200b");
+        const qtys = updatedrowdata3.value
+          .filter((item, index) => allstaterows3.value.includes(index))
+          .map((item) => item.lngQty)
+          .join("\u200b");
+        const losscodes = updatedrowdata3.value
+          .filter((item, index) => allstaterows3.value.includes(index))
+          .map((item) => item.lngLossCode)
+          .join("\u200b");
+        const res = await updateLossMasterDetail(
+          groupCd2.value,
+          storeCode2.value,
+          tempLossNo.value,
+          itemids,
+          losscodes,
+          qtys,
+          store.state.userData.lngSequence
+        );
+
+        if (res.data.RESULT_CD == "00") {
+          await Swal.fire({
+            title: "성공",
+            text: "저장을 완료하였습니다.",
+            icon: "success",
+
+            confirmButtonText: "확인",
+          });
+        } else {
+          await Swal.fire({
+            title: "실패",
+            text: "저장에 실패하였습니다.",
+            icon: "error",
+
+            confirmButtonText: "확인",
+          });
+        }
+        //console.log(res);
+      } catch (error) {
+      } finally {
+        open2.value = false;
+        searchButton();
+      }
+    } else {
       return;
     }
-  } catch (error) {}
-
-  try {
-    const itemids = updatedrowdata3.value
-      .filter((item, index) => allstaterows3.value.includes(index))
-      .map((item) => item.lngItemID)
-      .join("\u200b");
-    const qtys = updatedrowdata3.value
-      .filter((item, index) => allstaterows3.value.includes(index))
-      .map((item) => item.lngQty)
-      .join("\u200b");
-    const losscodes = updatedrowdata3.value
-      .filter((item, index) => allstaterows3.value.includes(index))
-      .map((item) => item.lngLossCode)
-      .join("\u200b");
-    const res = await updateLossMasterDetail(
-      groupCd2.value,
-      storeCode2.value,
-      tempLossNo.value,
-      itemids,
-      losscodes,
-      qtys,
-      store.state.userData.lngSequence
-    );
-
-    if (res.data.RESULT_CD == "00") {
-      await Swal.fire({
-        title: "성공",
-        text: "저장을 완료하였습니다.",
-        icon: "success",
-
-        confirmButtonText: "확인",
-      });
-    } else {
-      await Swal.fire({
-        title: "실패",
-        text: "저장에 실패하였습니다.",
-        icon: "error",
-
-        confirmButtonText: "확인",
-      });
-    }
-    //console.log(res);
-  } catch (error) {
-  } finally {
-    open2.value = false;
-    searchButton();
-  }
+  });
 };
 
 const deleteButton = async () => {
@@ -820,36 +916,51 @@ const deleteButton = async () => {
     return;
   }
   //console.log(tempDeleteLoss.value);
-  try {
-    const res = await deleteLossStock(
-      tempDeleteLoss.value[0],
-      tempDeleteLoss.value[1],
-      tempDeleteLoss.value[4]
-    );
 
-    //console.log(res);
+  Swal.fire({
+    title: "알림",
+    text: "삭제 하시겠습니까?",
+    icon: "question",
 
-    if (res.data.RESULT_CD == "00") {
-      await Swal.fire({
-        title: "성공",
-        text: "삭제를 완료하였습니다.",
-        icon: "success",
+    confirmButtonText: "확인",
+    cancelButtonText: "취소",
+    showCancelButton: true,
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const res = await deleteLossStock(
+          tempDeleteLoss.value[0],
+          tempDeleteLoss.value[1],
+          tempDeleteLoss.value[4]
+        );
 
-        confirmButtonText: "확인",
-      });
+        //console.log(res);
+
+        if (res.data.RESULT_CD == "00") {
+          await Swal.fire({
+            title: "성공",
+            text: "삭제를 완료하였습니다.",
+            icon: "success",
+
+            confirmButtonText: "확인",
+          });
+        } else {
+          await Swal.fire({
+            title: "실패",
+            text: "삭제에 실패하였습니다.",
+            icon: "error",
+
+            confirmButtonText: "확인",
+          });
+        }
+      } catch (error) {
+      } finally {
+        rowData2.value = [];
+        searchButton();
+      }
     } else {
-      await Swal.fire({
-        title: "실패",
-        text: "삭제에 실패하였습니다.",
-        icon: "error",
-
-        confirmButtonText: "확인",
-      });
+      return;
     }
-  } catch (error) {
-  } finally {
-    rowData2.value = [];
-    searchButton();
-  }
+  });
 };
 </script>

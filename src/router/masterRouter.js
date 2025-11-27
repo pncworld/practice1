@@ -62,6 +62,7 @@ import MST57_003INS from "@/views/MIMASTER/MST57_003INS.vue";
 import NotFound from "@/views/NotFound.vue";
 import MST37_067INS from "@/views/MIMASTER/MST37_067INS.vue";
 import MST44_065INS from "@/views/MIMASTER/MST44_065INS.vue";
+import MST01_003INS from "@/views/MIMASTER/MST01_003INS.vue";
 
 export default function masterRouter() {
   return [
@@ -314,6 +315,10 @@ export default function masterRouter() {
     {
       path: "MST44_065INS.xml",
       component: MST44_065INS,
+    },
+    {
+      path: "MST01_003INS.xml",
+      component: MST01_003INS,
     },
   ];
 }

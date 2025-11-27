@@ -42,6 +42,7 @@
       <div class="flex justify-start pl-16 items-center">
         <BusinessClient
           @SupplierId="SupplierId"
+          :setDynamicClass2="'!ml-[40%]'"
           :defaultNm="'전체'"></BusinessClient>
       </div>
 

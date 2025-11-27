@@ -11,7 +11,7 @@ const api = axios.create({
 });
 const api2 = axios.create({
   baseURL: url2, // API 기본 URL
-  timeout: 120000, // 요청 타임아웃 설정
+  timeout: 1200000, // 요청 타임아웃 설정
 });
 
 api2.interceptors.request.use(

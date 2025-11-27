@@ -115,7 +115,7 @@ const login2 = async () => {
     const response = await login(username.value, password.value);
 
     const loginStatus = response.data.loginSession[0].strUserID;
-    //console.log(loginStatus);
+
     if (!isNaN(Number(loginStatus))) {
       store.dispatch("updateUserData", response.data.loginSession[0]);
       store.dispatch("setToken", response.data.loginSession[0].SessionToken);
@@ -127,7 +127,7 @@ const login2 = async () => {
         response.data.loginSession[0].lngStoreGroup,
         response.data.loginSession[0].lngPosition
       );
-      ////console.log(res);
+
       message.value = "로그인 성공";
       const readPrograms = async () => {
         const response = await get_sys_list(
@@ -137,7 +137,7 @@ const login2 = async () => {
         );
 
         const result = response.data.sysMenu;
-        ////console.log(result);
+
         const mainCategoryData = result.filter(
           (item) => Number(item.strMenuLevel) == 1
         ); // 숫자

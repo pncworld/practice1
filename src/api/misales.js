@@ -1009,12 +1009,13 @@ export const getPlanbyMonths = (
   });
 };
 
-export const getStoreCorner = (groupCd, position, storeCd, areacd) => {
+export const getStoreCorner = (groupCd, position, storeCd, areacd, origin) => {
   return api2.post("/MISALES/SLS01_055RPT.asmx/getStoreCorner", {
     GROUP_CD: groupCd,
     POSITION: position,
     STORE_CD: storeCd,
     AREA_CD: areacd,
+    ORIGIN: origin,
   });
 };
 export const getSalesByCorner = (

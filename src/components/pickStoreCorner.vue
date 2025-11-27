@@ -26,7 +26,8 @@
         :placeholder="'선택'"
         class="custom-select9 bg-white w-52 h-10 mr-10 disabled:bg-gray-50"
         :clearable="lngPositionType !== 0"
-        @click="resetStore" />
+        @click="resetStore"
+        @update:modelValue="setAreaCd" />
     </div>
     <div class="pl-20">
       <v-select
@@ -35,7 +36,7 @@
         :disabled="lngPositionType == 0"
         label="strName"
         :placeholder="'전체'"
-        class="custom-select9 bg-white w-80 h-10 disabled:bg-gray-100"
+        class="custom-select9 bg-white w-[170%] h-10 disabled:bg-gray-100"
         @click="resetArea"
         :clearable="lngPositionType !== 0"
         @change="sendStoreCode" />
@@ -45,8 +46,7 @@
 
 <script setup>
 import { getStoreCorner } from "@/api/misales";
-import { ref, watch } from "vue";
-import { onMounted } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -56,6 +56,14 @@ const storeGroups = ref();
 const storeList = ref();
 const selectedAreaCode = ref(null);
 const storeAreaList = ref([]);
+
+const props = defineProps({
+  setOrigin: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const emit = defineEmits([
   "lngStoreGroup",
   "lngAreaCode",
@@ -63,31 +71,39 @@ const emit = defineEmits([
   "excelStore",
 ]);
 const lngPositionType = ref(0);
+const mounted = ref(false);
 onMounted(async () => {
-  //comsole.log(store.state.storeGroup);
-  //comsole.log(store.state);
   storeGroups.value = store.state.storeGroup;
   storeList.value = store.state.storeCd;
+
   storeGroup.value = store.state.storeGroup[0].lngStoreGroup;
-  storeStore.value = store.state.storeCd[0];
+  storeStore.value = store.state.userData.lngPosition;
   lngPositionType.value =
     store.state.userData.lngPositionType == "1" ||
     store.state.userData.blnBrandAdmin == "True"
       ? 1
       : 0;
-  let lngStoreCode = store.state.userData.lngPosition;
+
+  let lngStoreCode = storeList.value.filter((_, index) => index == 0)[0]
+    .lngStoreCode;
+  console.log(lngStoreCode);
   let lngAreaCode = store.state.userData.lngAreaCode;
+
+  if (store.state.userData.lngStoreGroup == "7838") {
+    lngAreaCode = store.state.userData.lngSuperAttrCd;
+  }
 
   let userGroup = store.state.userData.lngStoreGroup;
   const res = await getStoreCorner(
     userGroup,
     lngPositionType.value,
     lngStoreCode,
-    lngAreaCode
+    lngAreaCode,
+    props.setOrigin == false ? 0 : 1
   );
-  ////console.log(res);
+  // console.log(res);
   storeAreaList.value = res.data.List;
-  //comsole.log(storeAreaList.value);
+
   // selectedAreaCode.value = storeAreaList.value[0].lngAreaCode
   if (
     store.state.userData.lngPositionType == "1" ||
@@ -122,19 +138,51 @@ onMounted(async () => {
     emit("excelStore", "매장 코너 : " + excelName);
     emit("lngAreaCode", selectedAreaCode.value);
   }
+
+  mounted.value = true;
 });
 
 const sendStoreCode = (e) => {};
-watch(storeStore, () => {
+
+watch(storeStore, async () => {
+  // if (mounted.value == true) {
+  //   if (storeStore.value == null) {
+  //     emit("lngStoreCode", 0);
+  //   } else {
+  //     emit("lngStoreCode", storeStore.value.lngStoreCode);
+  //   }
+  //   const res = await getStoreCorner(
+  //     store.state.userData.lngStoreGroup,
+  //     lngPositionType.value,
+  //     storeStore.value == null ? 0 : storeStore.value.lngStoreCode,
+  //     0,
+  //     props.setOrigin == false ? 0 : 1
+  //   );
+  //   storeAreaList.value = res.data.List;
+  //   selectedAreaCode.value = null;
+  //   emit("lngAreaCode", 0);
+  // }
+  // console.log(storeStore.value);
+});
+
+const setAreaCd = async (e) => {
   if (storeStore.value == null) {
     emit("lngStoreCode", 0);
   } else {
     emit("lngStoreCode", storeStore.value.lngStoreCode);
   }
-
+  const res = await getStoreCorner(
+    store.state.userData.lngStoreGroup,
+    lngPositionType.value,
+    storeStore.value == null ? 0 : storeStore.value.lngStoreCode,
+    0,
+    props.setOrigin == false ? 0 : 1
+  );
+  storeAreaList.value = res.data.List;
   selectedAreaCode.value = null;
   emit("lngAreaCode", 0);
-});
+};
+
 watch(selectedAreaCode, () => {
   if (selectedAreaCode.value == null) {
     emit("lngAreaCode", 0);

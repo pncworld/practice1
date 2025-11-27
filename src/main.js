@@ -20,6 +20,14 @@ import store from "./store";
 import Swal from "sweetalert2";
 import VueQuill from "vue3-quill"; // plugin (전역 등록용)
 import "quill/dist/quill.snow.css"; // CSS 스타일
+import { createVuetify } from "vuetify";
+import * as components from "vuetify/components";
+import * as directives from "vuetify/directives";
+
+const vuetify = createVuetify({
+  components,
+  directives,
+});
 
 library.add(fas, far);
 window.addEventListener("storage", (event) => {
@@ -33,6 +41,7 @@ const app = createApp(App)
   .use(useLoading) // 'Loading' 제거
   .use(VueKonva)
   .use(VueQuill)
+  .use(vuetify)
 
   .component("VueDatePicker", VueDatePicker)
   .component("font-awesome-icon", FontAwesomeIcon)

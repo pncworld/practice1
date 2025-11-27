@@ -37,9 +37,10 @@
           @storeNm="excelStore"
           @update:storeCd="lngStoreCode"></PickStore>
       </div>
-      <div class="flex justify-start pl-3 items-center">
+      <div class="flex justify-start pl-3 ml-[50%] items-center">
         <BusinessClient
           @SupplierId="SupplierId"
+          :setDynamicClass="'!w-[100%]'"
           :defaultNm="'전체'"></BusinessClient>
       </div>
 
@@ -79,7 +80,7 @@
 
       <div class="flex ml-12 items-center mt-3 space-x-5">
         <div class="text-base font-semibold">조회유형</div>
-        <div class="flex space-x-4">
+        <div class="flex space-x-4 text-nowrap">
           <label for="cond51"
             ><input
               type="radio"

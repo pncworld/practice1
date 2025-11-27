@@ -971,10 +971,6 @@ function addNewWidget() {
     clickedtableH.value = finditem.h * 120 <= 360 ? 360 : finditem.h * 120;
     clickTable.value = true;
     clickedtableSeats.value = finditem.lngCount;
-    //comsole.log(`x: ${finditem.x}, y: ${finditem.y}`);
-    //comsole.log(`너비: ${finditem.w}, 높이: ${finditem.h}`);
-    //comsole.log(clickedtableColor.value);
-    // 원하는 추가 작업을 여기에 작성
   });
   widgetElement.click();
   //comsole.log(tableList.value);
@@ -993,6 +989,10 @@ watch(
           h: item.h,
           id: item.id,
         };
+
+        if (grid == null) {
+          return;
+        }
         grid.addWidget(node); // Add widget to the grid
 
         const widgetElement = document.querySelector(`[gs-id="${item.id}"]`);

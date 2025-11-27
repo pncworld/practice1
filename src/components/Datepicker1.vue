@@ -52,6 +52,13 @@ onMounted(() => {
   mainname.value = props.mainName;
   emit("excelDate", mainname.value + ": " + selectedDate.value);
 });
+
+watch(
+  () => props.mainName,
+  () => {
+    mainname.value = props.mainName;
+  }
+);
 const emitDate = () => {
   //comsole.log(selectedDate.value);
   emit("dateValue", selectedDate.value);

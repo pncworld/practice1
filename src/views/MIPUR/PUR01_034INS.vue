@@ -41,7 +41,7 @@
           :hideGroup="false"
           :defaultStore="true"
           @storeNm="excelStore"
-          :setDynamicStoreClass="'!h-8 !p-0'"
+          :setDynamicStoreClass="'!h-8 !p-0 '"
           @update:storeCd="lngStoreCode"></PickStore>
       </div>
       <div class="flex justify-start pl-3 items-center">

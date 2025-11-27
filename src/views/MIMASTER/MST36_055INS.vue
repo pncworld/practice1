@@ -386,10 +386,18 @@ const moveRight = () => {
       strName: updateRow.value[i].strName,
       lngAmountType: updateRow.value[i].lngAmountType,
     });
-  }
-  updateRow.value = [];
 
-  deleteRow4.value = !deleteRow4.value;
+    rowData.value = rowData.value.filter(
+      (item) => item.lngCode !== updateRow.value[i].lngCode
+    );
+  }
+  rowData2.value = rowData2.value.sort(
+    (a, b) => Number(a.lngCode) - Number(b.lngCode)
+  );
+
+  updateRow.value = [];
+  updateRow2.value = [];
+  // deleteRow4.value = !deleteRow4.value;
   rowData2.value = [...rowData2.value];
 
   //comsole.log(rowData.value);
@@ -411,10 +419,18 @@ const moveLeft = () => {
       strName: updateRow2.value[i].strName,
       lngAmountType: updateRow2.value[i].lngAmountType,
     });
-  }
-  updateRow2.value = [];
 
-  deleteRow5.value = !deleteRow5.value;
+    rowData2.value = rowData2.value.filter(
+      (item) => item.lngCode !== updateRow2.value[i].lngCode
+    );
+  }
+  rowData.value = rowData.value.sort(
+    (a, b) => Number(a.lngCode) - Number(b.lngCode)
+  );
+  console.log(rowData2.value);
+  updateRow.value = [];
+  updateRow2.value = [];
+  // deleteRow5.value = !deleteRow5.value;
   rowData.value = [...rowData.value];
   //comsole.log(rowData2.value);
 };

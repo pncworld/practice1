@@ -1349,18 +1349,27 @@ const addTLUKey = () => {
 
 const deletekey = () => {
   if (clickedScreenOrMenu.value == false) {
-    ScreenKeyOrigin.value = ScreenKeyOrigin.value.filter(
-      (item) => item.intScreenNo != clickedintScreenNo.value
-    );
+    ScreenKeyOrigin.value = ScreenKeyOrigin.value
+      .filter((item) => item.intScreenNo != clickedintScreenNo.value)
+      .map((item, index) => ({
+        ...item,
+        intScreenNo: index + 1,
+      }));
     addscreenKey.value = false;
     addfor8ScreenKey();
 
-    MenuKeyList.value = MenuKeyList.value.filter(
-      (item) => item.intScreenNo != clickedintScreenNo.value
-    );
+    MenuKeyList.value = MenuKeyList.value
+      .filter((item) => item.intScreenNo != clickedintScreenNo.value)
+      .map((item, index) => ({
+        ...item,
+        intScreenNo:
+          item.intScreenNo > clickedintScreenNo.value
+            ? item.intScreenNo - 1
+            : item.intScreenNo,
+      }));
     currentscreenKeyNm.value = "";
 
-    clickedintScreenNo.value = clickedintScreenNo.value + 1;
+    clickedintScreenNo.value = clickedintScreenNo.value;
     showMenuKey(clickedintScreenNo.value);
   } else {
     MenuKeyList.value = MenuKeyList.value.filter(

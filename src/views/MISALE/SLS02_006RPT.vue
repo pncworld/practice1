@@ -56,10 +56,9 @@
           class="w-64 h-8 rounded-lg"
           v-model="selectedCond">
           <option :value="0">전체</option>
-          <option :value="1">개인후불</option>
-          <option :value="2">부서후불</option>
-          <option :value="3">개인카드</option>
-          <option :value="4">부서카드</option>
+          <option :value="i.strDCode" v-for="i in optionList">
+            {{ i.strDName }}
+          </option>
         </select>
       </div>
       <div class="flex justify-start items-center h-8 space-x-5 pl-9">
@@ -134,7 +133,7 @@
 </template>
 
 <script setup>
-import { getPosList2 } from "@/api/common";
+import { getCommonList, getPosList2 } from "@/api/common";
 import { getCondition4List, getSalesbyDateAndMonth } from "@/api/misales";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -179,8 +178,20 @@ import { useStore } from "vuex";
  * 	화면 Load시 실행 스크립트
  */
 
+const optionList = ref([]);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
+  if (store.state.userData.lngStoreGroup == "1592") {
+    const res = await getCommonList(342);
+    optionList.value = res.data.List;
+  } else if (store.state.userData.lngStoreGroup == "3193") {
+    const res = await getCommonList(351);
+    optionList.value = res.data.List;
+  } else {
+    const res = await getCommonList(89);
+    optionList.value = res.data.List;
+  }
 });
 const setFooterColID = ref(["strStoreName"]);
 const setFooterExpressions = ref(["custom"]);

@@ -194,6 +194,7 @@ const searchButton = async () => {
     initGrid();
 
     const ccond2 = cond2.value == false ? 0 : 1;
+    store.state.loading = true;
     const res = await getBalancebyCustAndDate(
       selectedStores.value,
       custId.value,
@@ -202,7 +203,8 @@ const searchButton = async () => {
       cond.value,
       ccond2
     );
-    ////console.log(res);
+    store.state.loading = false;
+    // console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;

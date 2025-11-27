@@ -1,19 +1,22 @@
 import DetailGroupSales from "@/views/MOBILE/sales/detailGroupSales.vue";
 import DetailSales from "@/views/MOBILE/sales/detailSales.vue";
+import OpenAndClose from "@/views/MOBILE/sales/openAndClose.vue";
+import SalesbyCorner from "@/views/MOBILE/sales/SalesByCorner2.vue";
 import SalesByCreditCard from "@/views/MOBILE/sales/salesByCreditCard.vue";
+import SalesByDays from "@/views/MOBILE/sales/salesByDays.vue";
 import SalesByMenu from "@/views/MOBILE/sales/SalesByMenu.vue";
 import SalesByRealTime from "@/views/MOBILE/sales/salesByRealTime.vue";
 import SalesByStore from "@/views/MOBILE/sales/salesByStore.vue";
 import SalesByTime from "@/views/MOBILE/sales/salesByTime.vue";
-import mobileMaster from "./mobileMaster";
-import mobileSales from "./mobileSales";
-import SalesByDays from "@/views/MOBILE/sales/salesByDays.vue";
 import SalesVoidReport from "@/views/MOBILE/sales/salesVoidReport.vue";
-import OpenAndClose from "@/views/MOBILE/sales/openAndClose.vue";
-import TaxReport from "@/views/MOBILE/sales/taxReport.vue";
 import TableReport from "@/views/MOBILE/sales/tableReport.vue";
+import TaxReport from "@/views/MOBILE/sales/taxReport.vue";
 import CategoryManage from "@/views/MOBILE/tablepos/categoryManage.vue";
 import MenuSoldOut from "@/views/MOBILE/tablepos/menuSoldOut.vue";
+import mobileMaster from "./mobileMaster";
+import mobileSales from "./mobileSales";
+import SalesbyCornerMenu from "@/views/MOBILE/sales/SalesbyCornerMenu.vue";
+import VanFeeList from "@/views/MOBILE/sales/VanFeeList.vue";
 
 export default function mobileRouter() {
   return [
@@ -95,6 +98,21 @@ export default function mobileRouter() {
       path: "20013",
       //component : BasicLayout ,
       component: TableReport,
+    },
+    {
+      path: "20014",
+      //component : BasicLayout ,
+      component: SalesbyCorner,
+    },
+    {
+      path: "20015",
+      //component : BasicLayout ,
+      component: SalesbyCornerMenu,
+    },
+    {
+      path: "20016",
+      //component : BasicLayout ,
+      component: VanFeeList,
     },
     {
       path: "50001",

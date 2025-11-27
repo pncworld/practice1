@@ -1,9 +1,7 @@
-/*--############################################################################
-# Filename : MST01_033INS.vue                                                  
-# Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
-# Date :2025-05-14                                                             
-# Author : 권맑음                     
-################################################################################*/
+<!-- /*--############################################################################
+                  # Date :2025-05-14                                            
+                 # Author : 권맑음                     
+################################################################################*/ -->
 <template>
   <div
     class="flex flex-col h-screen overflow-hidden bg-gray-100"
@@ -168,8 +166,7 @@
       </aside>
 
       <!-- Main Content -->
-      <main
-        class="w-full h-full bg-white p-1 overflow-y-auto overflow-x-hidden">
+      <main class="w-full h-full bg-white p-1 overflow-y-auto overflow-x-auto">
         <router-view v-slot="{ Component, route }">
           <keep-alive>
             <component

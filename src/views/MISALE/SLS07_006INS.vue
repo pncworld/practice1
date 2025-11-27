@@ -343,7 +343,7 @@ const sendButton = async () => {
     const res = await sendSMS(
       groupCd.value,
       storeCd.value,
-      "일 매출 보고",
+      `${storeNm.value}-일 매출 보고`,
       preview.value,
       2,
       "",

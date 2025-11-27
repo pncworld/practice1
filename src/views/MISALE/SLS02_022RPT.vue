@@ -1,9 +1,9 @@
-/*--############################################################################
+<!-- /*--############################################################################
 # Filename : SLS02_022RPT.vue                                                  
 # Description : 매출관리 > 사원카드 매출현황 > 후불결제별 매출현황.            
 # Date :2025-05-14                                                             
 # Author : 권맑음                     
-################################################################################*/
+################################################################################*/ -->
 <template>
   <!-- 조회 조건 -->
   <div class="h-full" @click="handleParentClick">
@@ -47,10 +47,9 @@
           class="w-64 h-8 rounded-lg"
           v-model="selectedCond">
           <option :value="0">전체</option>
-          <option :value="1">개인후불</option>
-          <option :value="2">부서후불</option>
-          <option :value="3">개인카드</option>
-          <option :value="4">부서카드</option>
+          <option :value="i.strDCode" v-for="i in optionList">
+            {{ i.strDName }}
+          </option>
         </select>
       </div>
       <div class="flex justify-start items-center mt-2 space-x-5 !-ml-4">
@@ -96,15 +95,26 @@
           id=""
           class="w-64 h-8 rounded-lg"
           v-model="selectedCond4"
-          v-if="selectedCond2 == 3 || selectedCond2 == 4">
+          v-if="
+            exception == false && (selectedCond2 == 3 || selectedCond2 == 4)
+          ">
           <option :value="i.strBelongNM" v-for="i in condition4List">
             {{ i.strBelongNM }}
           </option>
         </select>
+        <input
+          type="text"
+          class="w-64 h-8 rounded-lg"
+          v-model="selectedCond4"
+          v-if="
+            exception == true && (selectedCond2 == 3 || selectedCond2 == 4)
+          " />
         <button
           @click="searchCondition"
           class="button primary"
-          v-if="selectedCond2 == 3 || selectedCond2 == 4">
+          v-if="
+            exception == false && (selectedCond2 == 3 || selectedCond2 == 4)
+          ">
           새로고침
         </button>
       </div>
@@ -152,7 +162,7 @@
 </template>
 
 <script setup>
-import { getPosList2 } from "@/api/common";
+import { getCommonList, getPosList2 } from "@/api/common";
 import { getCondition4List, getSalesbyPostPay } from "@/api/misales";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -197,8 +207,27 @@ import { useStore } from "vuex";
  * 	화면 Load시 실행 스크립트
  */
 
+const exception = ref(false);
+const optionList = ref([]);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
+  if (store.state.userData.lngStoreGroup == "3193") {
+    exception.value = true;
+  } else {
+    exception.value = false;
+  }
+
+  if (store.state.userData.lngStoreGroup == "1592") {
+    const res = await getCommonList(342);
+    optionList.value = res.data.List;
+  } else if (store.state.userData.lngStoreGroup == "3193") {
+    const res = await getCommonList(351);
+    optionList.value = res.data.List;
+  } else {
+    const res = await getCommonList(89);
+    optionList.value = res.data.List;
+  }
 });
 const setFooterColID = ref(["strStoreName"]);
 const setFooterExpressions = ref(["custom"]);
@@ -481,20 +510,24 @@ const setUnite = (e) => {
   reload.value = !reload.value;
 };
 watch(selectedCond2, async () => {
-  if (selectedCond2.value == 3) {
+  if (selectedCond2.value == 3 && exception.value == false) {
     const res2 = await getCondition4List(
       selectedGroup.value,
       selectedStores.value,
       4
     );
+
     condition4List.value = res2.data.List;
-  } else if (selectedCond2.value == 4) {
+  } else if (selectedCond2.value == 4 && exception.value == false) {
     const res2 = await getCondition4List(
       selectedGroup.value,
       selectedStores.value,
       5
     );
     condition4List.value = res2.data.List;
+  } else if (exception.value == true) {
+    selectedCond4.value = "";
+    return;
   }
   selectedCond4.value = "전체";
 });

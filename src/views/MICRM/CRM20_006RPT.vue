@@ -195,7 +195,7 @@ const searchButton = async () => {
       startdate.value,
       enddate.value
     );
-    ////console.log(res);
+    console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;

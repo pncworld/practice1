@@ -30,7 +30,7 @@
           @startDate="startDate">
         </Datepicker2>
       </div>
-      <div class="flex justify-start items-center">
+      <div class="flex justify-start items-center ml-[10%]">
         <PickStore
           @update:storeGroup="lngStoreGroup"
           :defaultStoreNm="'전체'"
@@ -59,41 +59,37 @@
           :defaultNm="'전체'"></BusinessClient>
       </div>
 
-      <div class="flex space-x-5 ml-16 mt-3 items-center">
+      <div class="flex space-x-5 ml-[25%] mt-3 items-center">
         <div class="font-semibold text-base">단위</div>
         <div>
-          <select name="" id="" class="w-64 h-7" v-model="cond2">
+          <select name="" id="" class="w-[100%] h-7" v-model="cond2">
             <option :value="i.strDCode" v-for="i in optionList3">
               {{ i.strDName }}
             </option>
           </select>
         </div>
       </div>
-      <div class="flex space-x-5 -ml-1 mt-3 items-center">
+      <div class="flex space-x-3 ml-1 mt-3 items-center w-[80%]">
         <div class="text-base font-semibold">자재명</div>
-        <div>
-          <select name="" id="" class="w-32 h-7" v-model="cond3">
-            <option value="0">전체</option>
-            <option value="1">분류</option>
-            <option value="2">그룹</option>
-            <option value="3">특성</option>
-            <option value="4">재고조사주기</option>
-          </select>
-        </div>
-        <div>
-          <select name="" id="" class="w-32 h-7" v-model="cond4">
-            <option value="0">전체</option>
-            <option :value="i.strDCode" v-for="i in optionList2">
-              {{ i.strDName }}
-            </option>
-          </select>
-        </div>
-        <div>
-          <input type="text" class="w-40 h-7" v-model="cond5" />
-        </div>
+        <select name="" id="" class="w-[30%] h-7" v-model="cond3">
+          <option value="0">전체</option>
+          <option value="1">분류</option>
+          <option value="2">그룹</option>
+          <option value="3">특성</option>
+          <option value="4">재고조사주기</option>
+        </select>
+
+        <select name="" id="" class="w-[30%] h-7" v-model="cond4">
+          <option value="0">전체</option>
+          <option :value="i.strDCode" v-for="i in optionList2">
+            {{ i.strDName }}
+          </option>
+        </select>
+
+        <input type="text" class="w-[30%] h-7" v-model="cond5" />
       </div>
 
-      <div class="flex ml-12 items-center mt-3 space-x-5">
+      <div class="flex ml-12 items-center mt-3 space-x-5 text-nowrap">
         <div class="text-base font-semibold">조회유형</div>
         <div class="flex space-x-4">
           <label for="cond51"

@@ -103,18 +103,10 @@
         :rowData="rowData"
         :reload="reload"
         :setFooter="true"
-        :setFooterExpressions="setFooterExpressions"
-        :setFooterColID="setFooterColID"
-        :setGroupFooter="setGroupFooter"
-        :setGroupColumnId="'strStoreName,dtmDate'"
-        :setGroupSumCustomText="['소계']"
-        :setGroupSumCustomColumnId="setGroupSumCustomColumnId"
-        :setGroupSumCustomLevel="3"
-        :setGroupSummaryCenterIds="setGroupSummaryCenterIds"
-        :setGroupFooterExpressions="setGroupFooterExpressions"
-        :setGroupFooterColID="setGroupFooterColID"
         :documentTitle="'SLS05_004RPT'"
         :rowStateeditable="false"
+        :setGroupColumnId="setGroupColumnId"
+        :setGroupFooter="true"
         :documentSubTitle="documentSubTitle"
         :exporttoExcel="exportExcel">
       </Realgrid>
@@ -171,52 +163,6 @@ import { onMounted, ref, watch } from "vue";
 
 import { useStore } from "vuex";
 
-const setFooterColID = ref([
-  "lngTotalCnt",
-  "lngTotalAmt",
-  "lngApprovalCnt",
-  "lngApprovalAmt",
-  "lngCancleCnt",
-  "lngCancleAmt",
-  "lngSumCnt",
-  "lngSumAmt",
-  "lngCommission",
-]);
-const setFooterExpressions = ref([
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-]);
-const setGroupFooter = ref(true);
-const setGroupFooterColID = ref([
-  "lngTotalCnt",
-  "lngTotalAmt",
-  "lngApprovalCnt",
-  "lngApprovalAmt",
-  "lngCancleCnt",
-  "lngCancleAmt",
-  "lngSumCnt",
-  "lngSumAmt",
-  "lngCommission",
-]);
-const setGroupFooterExpressions = ref([
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-  "sum",
-]);
-const setGroupSummaryCenterIds = ref("dtmDate, strBuyName");
 const setGroupSumCustomColumnId = ref(["strBuyName"]);
 const reload = ref(false);
 const rowData = ref([]);
@@ -272,6 +218,7 @@ const acceptDate = (e) => {
   orgAcceptDate.value = e;
 };
 
+const setGroupColumnId = ref("");
 const tempSeeDaily = ref(false);
 const tempSeeStore = ref(false);
 const reportCheckData = ref("0");
@@ -279,30 +226,41 @@ const progId = ref("1");
 
 const seeDaily = (e) => {
   tempSeeDaily.value = e.target.checked;
+  if (tempSeeStore.value == true) {
+    setGroupColumnId.value = "strStoreName,dtmDate";
+  } else {
+    setGroupColumnId.value = "dtmDate";
+  }
   updateProgid();
 };
 
 const seeStore = (e) => {
   tempSeeStore.value = e.target.checked;
+
+  if (tempSeeDaily.value == true) {
+    setGroupColumnId.value = "strStoreName,dtmDate";
+  } else {
+    setGroupColumnId.value = "strStoreName";
+  }
   updateProgid();
 };
 
 const updateProgid = () => {
   if (tempSeeDaily.value && tempSeeStore.value) {
     reportCheckData.value = "012";
-    setGroupSumCustomColumnId.value = ["strBuyName"];
+
     progId.value = "4";
   } else if (tempSeeDaily.value) {
     reportCheckData.value = "01";
-    setGroupSumCustomColumnId.value = ["strBuyName"];
+
     progId.value = "2";
   } else if (tempSeeStore.value) {
     reportCheckData.value = "02";
-    setGroupSumCustomColumnId.value = ["strBuyName"];
+
     progId.value = "3";
   } else {
     reportCheckData.value = "0";
-    setGroupSumCustomColumnId.value = ["strBuyName"];
+
     progId.value = "1";
   }
 };

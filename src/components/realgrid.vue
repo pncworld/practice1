@@ -651,7 +651,7 @@ const props = defineProps({
     default: [],
   },
   mergeMask: {
-    //
+    // 셀병합시 데이터끼리 통합할지 말지 선택하는
     type: String,
     default: "",
   },
@@ -662,7 +662,7 @@ const props = defineProps({
     default: "",
   },
   setMergeMode: {
-    //
+    // 셀병합시 데이터끼리 통합할지 말지 선택하는
     type: Boolean,
     default: true,
   },
@@ -723,7 +723,7 @@ const props = defineProps({
     default: "seqNum",
   },
   hardCodeSetRowStyleCalls: {
-    // 그룹푸터에서 레벨별로 나타날 색상에 대한 설정
+    // 그룹푸터에서 레벨별로 나타날 색상에 대한 설정 ( 하드코딩적으로)
     type: Boolean,
     default: false,
   },
@@ -870,208 +870,202 @@ const props = defineProps({
     default: "",
   },
   dynamicRowHeight: {
-    // 행높이
+    // 동적 행 높이
     type: Boolean,
     default: false,
   },
   dynamicRowHeight2: {
-    // 행높이
+    // 동적 행 높이 2 트리뷰
     type: Boolean,
     default: false,
   },
   syncGridHeight: {
-    // 행높이
+    // 행 높이 동기화
     type: Boolean,
     default: false,
   },
   changeNow3: {
-    // 행높이
+    // 데이터 변경시 트리거
     type: Boolean,
     default: false,
   },
   getRowChanged: {
-    // 행높이
+    // 변경된 데이터 props에 올리는 변수
     type: Boolean,
     default: false,
   },
   excludeCheck: {
-    // 행높이
+    // 데이터에서 체크할때 체크바에 대한 부분을 같이 동작할지 말지설정
     type: Boolean,
     default: false,
   },
   checkonlyone: {
-    // 행높이
+    // 체크박스 연동 선택
     type: Boolean,
     default: false,
   },
   checkAll: {
-    // 행높이
+    // 전체 체크박스 선택할지 말지
     type: Boolean,
     default: false,
   },
   checkRowAuto: {
-    // 행높이
+    // 내장 체크바 연동할지 말지
     type: Boolean,
     default: true,
   },
   headerCheckBar: {
-    // 행높이
+    // 헤더 체크바 나타낼지 말지
     type: String,
     default: "",
   },
   useAlternateRowStyle: {
-    // 행높이
+    // 그리드 사이트 참조 // 짝수행의 className에 "rg-alternate-row" 추가를 설정한다.
     type: Boolean,
     default: true,
   },
   TimeArray: {
-    // 행높이
+    // 시간 데이터에 따른 컬럼 색상 연동
     type: Array,
     default: [],
   },
   autoPlusColumn: {
-    // 행높이
+    // 시간 관련 변수
     type: Boolean,
     default: false,
   },
   mergeColumns3: {
-    // 행높이
+    // 컬럼 그룹핑 3단
     type: Boolean,
     default: false,
   },
   mergeColumnGroupSubList3: {
-    // 행높이
+    // 컬럼 그룹핑 3단
     type: Array,
     default: [],
   },
   mergeColumnGroupName4: {
-    // 행높이
+    // 컬럼 그룹핑 3단
     type: Array,
     default: [],
   },
   mergeColumnGroupName3: {
-    // 행높이
+    // 컬럼 그룹핑 3단
     type: Array,
     default: [],
   },
   setDynamicGrid4: {
-    // 행높이
+    // 동적 그리드
     type: Boolean,
     default: false,
   },
   setDynamicGrid4Cond: {
-    // 행높이
+    // 동적 그리드 조건
     type: String,
     default: "0",
   },
   setDynamicGrid5: {
-    // 행높이
+    // 동적 그리드
     type: Boolean,
     default: false,
   },
   setDynamicGrid5Cond: {
-    // 행높이
+    // 동적 그리드 조건
     type: String,
     default: "2025-09-01",
   },
   setDynamicGrid5Cond2: {
-    // 행높이
+    // 동적 그리드 조건
     type: String,
     default: "2025-09-01",
   },
   setDynamicGrid6: {
-    // 행높이
+    // 동적 그리드 조건
     type: Boolean,
     default: false,
   },
   setDynamicGrid6Cond: {
-    // 행높이
+    // 동적 그리드 조건
     type: String,
     default: "9999",
   },
   setDynamicGrid7: {
-    // 행높이
+    // 동적 그리드 조건
     type: Boolean,
     default: false,
   },
   setDynamicGrid8: {
-    // 행높이
+    // 동적 그리드
     type: Boolean,
     default: false,
   },
   initCheckRows: {
-    // 행높이
+    // 강제 체크할 컬럼들
     type: Array,
     default: [],
   },
   initCheckRowNow: {
-    // 행높이
+    // 강제 체크
     type: Boolean,
     default: false,
   },
   disabled: {
-    // 행높이
+    // 그리드 비활성화
     type: Boolean,
     default: false,
   },
   deleteRow7: {
-    // 행높이
+    // 행삭제 방법
     type: Boolean,
     default: false,
   },
   removeInitProp: {
+    // 그리드에 추가 컬럼 넣을지 말지
     type: Boolean,
     default: false,
   },
   showCheckRowDataByForce: {
+    //폐기
     type: Boolean,
     default: false,
   },
   checkRowAuto2: {
+    // 셀 클릭시 체크바연동 여부2
     type: Boolean,
     default: false,
   },
   checkRowAuto2Col: {
+    // 셀 클릭시 체크바연동 컬럼
     type: String,
     default: "lngCheck",
   },
   AutoCalculateDataMainColId: {
+    // 자동 계산할 메인 컬럼명들
     type: Array,
     default: [],
   },
   AutoCalculateDataSubColId: {
+    // 자동 계산할 서브 컬럼명들
     type: Array,
     default: [],
   },
   CalculateTaxColId: {
+    // 자동 세금 계산 할 컬럼 방법1
     type: String,
     default: "",
   },
   CalculateTaxColId2: {
-    type: String,
-    default: "",
-  },
-  CalculateTaxColId3: {
-    type: String,
-    default: "",
-  },
-  CalculateTaxColId4: {
-    type: String,
-    default: "",
-  },
-  CalculateSumColId: {
-    type: String,
-    default: "",
-  },
-  CalculateSumColId2: {
+    // 자동 세금 계산 할 컬럼 방법2
     type: String,
     default: "",
   },
   CalculateTimeColId: {
+    // 자동 시간 계산 컬럼
     type: String,
     default: "",
   },
   ColCellRedColorColId: {
+    // 빨간색 색칠 컬럼들
     type: Array,
     default: [],
   },
@@ -1081,17 +1075,17 @@ const props = defineProps({
     default: false,
   },
   hideChildHeader: {
-    // 체크박스 해제만 되는 설정
+    // 컬럼 그룹핑할때 자식 컬럼 없게 설정할때
     type: Boolean,
     default: false,
   },
   setCellStyleColId: {
-    // 체크박스 해제만 되는 설정
+    // 시간 값에 따른 배경색 설정
     type: Array,
     default: [],
   },
   setCellStyleColId2: {
-    // 체크박스 해제만 되는 설정
+    // 시간 값에 따른 배경색 설정
     type: Array,
     default: [],
   },
@@ -1101,19 +1095,22 @@ const props = defineProps({
     default: false,
   },
   CalculateShortQty: {
-    // HR02_001INS 색상 설정용
+    // 자동 수량 계산
     type: String,
     default: "",
   },
   CalculateSupplyPrice: {
+    // 자동 가격 계산
     type: String,
     default: "",
   },
   CalculateVatPrice: {
+    // 자동 부가세 계산
     type: String,
     default: "",
   },
   CalculateTotalPrice: {
+    // 자동 부가세 계산2
     type: String,
     default: "",
   },
@@ -1124,39 +1121,53 @@ const props = defineProps({
     default: [],
   },
   checkedRowData2Col: {
-    // 엑셀 내보내기시 감춘컬럼 감춰서 export 하기
+    // 체크시 다른 emit으로 체크 데이터 받기 위한 설정
     type: String,
     default: "",
   },
   checkAbleExpressionCol: {
+    // 체크가능한 컬럼
     type: String,
     default: "",
   },
   checkAbleExpressionCol2: {
+    // 체크가능한 컬럼2
     type: String,
     default: "",
   },
   checkAbleExpressionVal: {
+    // 체크가능한 컬럼의 값
     type: String,
     default: "",
   },
   checkAbleExpressionCol3: {
+    // 체크가능한 컬럼3
     type: String,
     default: "",
   },
-  checkAbleExpressionCol4: {
-    type: String,
-    default: "",
-  },
+
   checkAbleExpressionVal2: {
+    // 체크가능한 컬럼의 값 2
     type: String,
     default: "",
   },
   setTreeView: {
+    // 트리뷰 설정
     type: Boolean,
     default: false,
   },
   editableColByCondition: {
+    // 조건에 따른 수정 가능 컬럼
+    type: Boolean,
+    default: false,
+  },
+  headerColors: {
+    // 헤더 적용 스타일 이름
+    type: Array,
+    default: [],
+  },
+  cellEditthenCheck: {
+    // 셀 변경시 체크
     type: Boolean,
     default: false,
   },
@@ -1763,7 +1774,31 @@ const funcshowGrid = async () => {
               returnText += tokens[i].operator;
             }
           }
-          ////comsole.log(returnText)
+
+          if (item.strDisplay == "time") {
+            let cnt = grid.getItemCount();
+            let result = 0;
+            let result2 = 0;
+            for (var i = 0; i < cnt; i++) {
+              let value = grid.getValue(i, item.strColID);
+
+              if (value == "" || value == undefined) {
+                value = "00:00";
+              }
+              result += parseInt(value.split(":")[0]);
+              result2 += parseInt(value.split(":")[1]);
+            }
+
+            let remain = Math.floor(result2 / 60);
+            result += remain;
+            result2 = result2 % 60;
+            return (
+              String(result).padStart(2, "0") +
+              ":" +
+              String(result2).padStart(2, "0")
+            );
+          }
+
           return eval(returnText) == "Infinity" ? 0 : eval(returnText);
         } else {
           return value;
@@ -1843,7 +1878,9 @@ const funcshowGrid = async () => {
       mask:
         item.strColID == "strSTime" ||
         item.strColID == "strETime" ||
-        item.strColID == "strWTime"
+        item.strColID == "strWTime" ||
+        item.strColID == "dtmAttendPlan" ||
+        item.strColID == "dtmLeavePlan"
           ? {
               definitions: {
                 b: "[0-2]",
@@ -1872,6 +1909,7 @@ const funcshowGrid = async () => {
         : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ㄱ-힣!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ",
     },
     visible: item.intHdWidth !== 0,
+    sortable: true,
     renderer: {
       type:
         item.strColID == "add" ||
@@ -2520,7 +2558,12 @@ const funcshowGrid = async () => {
             items: [item.strColID],
             header: {
               text: groupList[index],
-              styleName: `header-style-0`,
+              styleName:
+                `header-style-` +
+                (props.headerColors[index] == undefined ||
+                props.headerColors[index] == ""
+                  ? "0"
+                  : props.headerColors[index]),
             },
           });
           // layout.push(tempgroupList)
@@ -2838,6 +2881,7 @@ const funcshowGrid = async () => {
       : props.dynamicRowHeight2 == true && props.setTreeView == true
       ? -1
       : 1;
+  gridView.displayOptions.useFocusClass = false;
   gridView.displayOptions.wheelScrollLines = 1;
   if (props.setTreeView == false) {
     gridView.groupPanel.visible = false;
@@ -2997,6 +3041,10 @@ const funcshowGrid = async () => {
           dataProvider.setValue(row, "checkbox1", false);
         }
       }
+    }
+    //console.log(field);
+    if (props.cellEditthenCheck == true && field == 4) {
+      dataProvider.setValue(row, "lngCheck", true);
     }
     if (props.checkOnlyFalse == true) {
       dataProvider.setValue(row, "Selected", false);
@@ -3225,9 +3273,11 @@ const funcshowGrid = async () => {
       }
     } else {
       if (props.checkAbleExpressionCol == "") {
+        // console.log("여기오냐");
         for (var i = 0; i < rowCount; i++) {
           dataProvider.setValue(i, col.fieldName, chk);
         }
+        gridView.setAllCheck(chk);
       } else if (props.checkAbleExpressionCol3 != "") {
         for (var i = 0; i < rowCount; i++) {
           const getblnCheck = dataProvider.getValue(
@@ -3247,7 +3297,7 @@ const funcshowGrid = async () => {
             i,
             props.checkAbleExpressionCol2
           );
-
+          console.log(getblnCheck);
           if (getblnCheck == props.checkAbleExpressionVal) {
             dataProvider.setValue(i, col.fieldName, chk);
             const index = dataProvider.getDataRowId(i);
@@ -3866,7 +3916,7 @@ watch(
     //console.log(gridView.getCheckedItems());
 
     const checkedArr = gridView.getCheckedRows();
-    //console.log(checkedArr);
+    console.log(checkedArr);
     dataProvider.removeRows(checkedArr);
 
     emit("allStateRows", dataProvider.getAllStateRows());
@@ -4217,9 +4267,9 @@ watch(
     if (gridView.columnByName("workTime")) {
       gridView.columnByName("workTime").styleCallback = (grid, dataCell) => {
         const times = props.TimeArray;
-        console.log(times);
+
         const timecode = grid.getValue(dataCell.index.itemIndex, "lngtimeCode");
-        console.log(timecode);
+
         const isin = times.some(([start, end]) => {
           return Number(timecode) > start - 0.5 && Number(timecode) < end;
         });
@@ -4667,6 +4717,14 @@ watch(
 }
 .header-style-0 {
   background-color: #545876;
+  color: white;
+}
+.header-style-red {
+  background-color: #800020;
+  color: white;
+}
+.header-style-green {
+  background-color: #006400;
   color: white;
 }
 

@@ -55,11 +55,12 @@
         </div>
       </div>
 
-      <div class="">
+      <div class="-ml-20">
         <PickStoreCorner
           @lngStoreGroup="lngStoreGroup"
           @lngStoreCode="lngStoreCode"
           @lngAreaCode="lngAreaCode"
+          :setOrigin="true"
           @excelStore="excelStore"></PickStoreCorner>
       </div>
     </div>
@@ -245,6 +246,7 @@ const searchButton = async () => {
     //let reporttype = 1;
     if (setCorner.value == false) {
       progid.value = 2;
+      reload.value = !reload.value;
       let cond = 0;
       if (checkdate.value == false) {
         cond = 0;

@@ -139,7 +139,7 @@ export async function insertPageLog(progdata) {
   const currenttime = new Date();
   const inserttime = formatDateTime2(currenttime);
   const userGroup = store.state.userData.lngCompanyCode;
-  const userStoreCd = store.state.userData.lngChargerCode;
+  const userStoreCd = store.state.userData.lngPosition;
   const userId = store.state.userData.lngSequence;
   let userIp = "0.0.0.0"; // 기본값
 

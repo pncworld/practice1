@@ -159,7 +159,7 @@
   <!-- 그리드 영역 -->
   <div
     v-if="open"
-    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[60vw] h-[60vh]">
       <div class="flex justify-between">
         <h2 class="text-lg font-bold mb-4">실사 재고 시트 업로드</h2>
@@ -241,7 +241,7 @@
           <pickStore
             :mainName="'매장'"
             :disabledAll="true"
-            :setDynamicStoreClass="'!ml-5 !h-8 !p-0 '"
+            :setDynamicStoreClass="'!w-[80%] !mr-20 h-[100%] !p-0 !-mt-5  text-center'"
             :setDefaultStoreCd="scond2"
             :hideGroup="false"
             :hideAttr="false"></pickStore>
@@ -472,44 +472,58 @@ const saveButton = async () => {
     return;
   }
 
-  try {
-    const updatedrows = updatedrowdata.value.filter((item, index) =>
-      allstaterows.value.includes(index)
-    );
+  Swal.fire({
+    title: "알림",
+    text: "저장 하시겠습니까?",
+    icon: "question",
 
-    const res = await saveStockTakeCountByPart(
-      "01",
-      store.state.userData.lngStoreGroup,
-      selectedStore.value,
-      sdate.value.replaceAll("-", ""),
-      updatedrows.map((item) => item.lngStockID).join("\u200b"),
-      updatedrows.map((item) => item.dblTakeQty).join("\u200b"),
-      5,
-      cond.value
-    );
-    //console.log(res);
+    confirmButtonText: "확인",
+    cancelButtonText: "취소",
+    showCancelButton: true,
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const updatedrows = updatedrowdata.value.filter((item, index) =>
+          allstaterows.value.includes(index)
+        );
 
-    if (res.data.RESULT_CD != "00") {
-      Swal.fire({
-        title: "실패",
-        text: `${res.data.RESULT_NM}`,
-        icon: "error",
+        const res = await saveStockTakeCountByPart(
+          "01",
+          store.state.userData.lngStoreGroup,
+          selectedStore.value,
+          sdate.value.replaceAll("-", ""),
+          updatedrows.map((item) => item.lngStockID).join("\u200b"),
+          updatedrows.map((item) => item.dblTakeQty).join("\u200b"),
+          5,
+          cond.value
+        );
+        //console.log(res);
 
-        confirmButtonText: "확인",
-      });
+        if (res.data.RESULT_CD != "00") {
+          Swal.fire({
+            title: "실패",
+            text: `${res.data.RESULT_NM}`,
+            icon: "error",
+
+            confirmButtonText: "확인",
+          });
+        } else {
+          Swal.fire({
+            title: "성공",
+            text: `저장하였습니다.`,
+            icon: "success",
+
+            confirmButtonText: "확인",
+          });
+        }
+      } catch (error) {
+      } finally {
+        searchButton();
+      }
     } else {
-      Swal.fire({
-        title: "성공",
-        text: `저장하였습니다.`,
-        icon: "success",
-
-        confirmButtonText: "확인",
-      });
+      return;
     }
-  } catch (error) {
-  } finally {
-    searchButton();
-  }
+  });
 };
 
 /**
@@ -603,37 +617,55 @@ const deleteButton = async () => {
     });
   }
 
-  try {
-    const stockids = result.map((item) => item.lngStockID).join("\u200b");
-    const res = await deleteStockTakeByPart(
-      store.state.userData.lngStoreGroup,
-      selectedStore.value,
-      sdate.value.replaceAll("-", ""),
-      stockids,
-      cond.value
-    );
+  Swal.fire({
+    title: "알림",
+    text: "삭제 하시겠습니까?",
+    icon: "question",
 
-    if (res.data.RESULT_CD != "00") {
-      await Swal.fire({
-        title: "실패",
-        text: `삭제에 실패하였습니다.`,
-        icon: "error",
+    confirmButtonText: "확인",
+    cancelButtonText: "취소",
+    showCancelButton: true,
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      const result2 = updatedrowdata.value.filter(
+        (item) => item.lngCheck == true
+      );
+      try {
+        const stockids = result2.map((item) => item.lngStockID).join("\u200b");
+        const res = await deleteStockTakeByPart(
+          store.state.userData.lngStoreGroup,
+          selectedStore.value,
+          sdate.value.replaceAll("-", ""),
+          stockids,
+          cond.value
+        );
+        console.log(res);
+        if (res.data.RESULT_CD != "00") {
+          await Swal.fire({
+            title: "실패",
+            text: `삭제에 실패하였습니다.`,
+            icon: "error",
 
-        confirmButtonText: "확인",
-      });
+            confirmButtonText: "확인",
+          });
+        } else {
+          await Swal.fire({
+            title: "성공",
+            text: `삭제 완료하였습니다.`,
+            icon: "success",
+
+            confirmButtonText: "확인",
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        searchButton();
+      }
     } else {
-      await Swal.fire({
-        title: "성공",
-        text: `삭제 완료하였습니다.`,
-        icon: "success",
-
-        confirmButtonText: "확인",
-      });
+      return;
     }
-  } catch (error) {
-  } finally {
-    searchButton();
-  }
+  });
 };
 
 const open = ref(false);

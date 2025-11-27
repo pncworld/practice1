@@ -287,3 +287,143 @@ export const saveEMP2 = (
     WORKCLASS: workclass,
   });
 };
+
+export const getEmpCode = (groupCd, storeCd, lngleave, lngtype) => {
+  return api2.post("/MIATTEND/ATT04_004RPT.asmx/getEmpCode", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LNG_LEAVE: lngleave,
+    LNG_TYPE: lngtype,
+  });
+};
+
+export const getEmpClassCode = (groupCd, order) => {
+  return api2.post("/MIATTEND/ATT04_004RPT.asmx/getEmpClassCode", {
+    GROUP_CD: groupCd,
+    ORDER_BY: order,
+  });
+};
+export const getCommuteList = (
+  groupCd,
+  attr,
+  storeCd,
+  sdate,
+  edate,
+  cond,
+  cond2
+) => {
+  return api2.post("/MIATTEND/ATT04_004RPT.asmx/getCommuteList", {
+    GROUP_CD: groupCd,
+    ATTR: attr,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    COND: cond,
+    COND2: cond2,
+  });
+};
+
+export const getEmpCode2 = (groupCd, storeCd, area_cd, lngleave, lngtype) => {
+  return api2.post("/MIATTEND/ATT02_003INS.asmx/getEmpCode2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: area_cd,
+    LNG_LEAVE: lngleave,
+    LNG_TYPE: lngtype,
+  });
+};
+
+export const getEmpRankCode = (groupCd, order) => {
+  return api2.post("/MIATTEND/ATT02_003INS.asmx/getEmpRankCode", {
+    GROUP_CD: groupCd,
+    ORDER_BY: order,
+  });
+};
+
+export const getCommuteList2 = (
+  groupCd,
+  storeCd,
+  attr,
+  sdate,
+  edate,
+  cond,
+  cond2,
+  cond3,
+  cond4
+) => {
+  return api2.post("/MIATTEND/ATT02_003INS.asmx/getCommuteList2", {
+    GROUP_CD: groupCd,
+    ATTR: attr,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+  });
+};
+
+export const saveCommuteList = (
+  groupCd,
+  storeCd,
+  lngseq,
+  dtmdate,
+  chargercd,
+  areacd,
+  rankcd,
+  attendplan,
+  leaveplan,
+  worktime,
+  resttime,
+  nighttime,
+  holidaytime,
+  overtime,
+  wholidaytime,
+  curworkpay,
+  curnightpay,
+  curholidaypay,
+  curoverpay,
+  curwholidaypay,
+  curtraffic,
+  curphysicalexam,
+  dtmwovertime,
+  curwoverpay,
+  curannualleavepay,
+  strworktype,
+  userid,
+  userip,
+  status
+) => {
+  return api2.post("/MIATTEND/ATT02_003INS.asmx/saveCommuteList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LNGSEQ: lngseq,
+    DTMDATE: dtmdate,
+    CHARGERCD: chargercd,
+    AREACD: areacd,
+    RANKCD: rankcd,
+    ATTENDPLAN: attendplan,
+    LEAVEPLAN: leaveplan,
+    WORKTIME: worktime,
+    RESTTIME: resttime,
+    NIGHTTIME: nighttime,
+    HOLIDAYTIME: holidaytime,
+    OVERTIME: overtime,
+    WHOLIDAYTIME: wholidaytime,
+    CURWORKPAY: curworkpay,
+    CURNIGHTPAY: curnightpay,
+    CURHOLIDAYPAY: curholidaypay,
+    CUROVERPAY: curoverpay,
+    CURWHOLIDAYPAY: curwholidaypay,
+    CURTRAFFIC: curtraffic,
+    CURPHYSICALEXAM: curphysicalexam,
+    DTMWOVERTIME: dtmwovertime,
+    CURWOVERPAY: curwoverpay,
+    CURANNUALLEAVEPAY: curannualleavepay,
+    STRWORKTYPE: strworktype,
+    USERID: userid,
+    USERIP: userip,
+    STATUS: status,
+  });
+};

@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <div class="flex bg-gray-200 rounded-lg h-16 w-full items-center mt-5">
+    <div class="flex bg-gray-200 rounded-lg h-16 w-full items-center mt-5 z-40">
       <PickStore
         @areaCd="handleStoreAreaCd"
         @update:storeCd="handleStoreCd"
@@ -163,7 +163,7 @@
     </div>
   </div>
   <span
-    class="h-5 -mt-1 flex justify-between items-center w-[930px] ml-[680px] z-40">
+    class="h-5 -mt-1 flex justify-between items-center w-[50%] ml-[37vw] z-40 text-nowrap">
     <h1 class="font-bold text-xl z-40">메뉴키 설정</h1>
     <span class="flex space-x-3 ml-32 pl-56 items-center"
       >순서변경 &nbsp; &nbsp;<label class="z-40"
@@ -620,8 +620,10 @@
 import {
   getMenuKeyList2,
   getMenuList,
+  getMenuList3,
   getScreenList2,
   getTLUList,
+  getTLUList2,
   saveAllMenuKey,
   saveMenuKey2,
   saveScreenKeys,
@@ -1058,7 +1060,9 @@ const handleStoreCd = async (newValue) => {
     afterSearch.value = false;
   }
   nowStoreCd.value = newValue;
-  const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
+  const res2 = await getMenuList3(groupCd.value, nowStoreCd.value);
+
+  console.log(res2);
   MenuList.value = res2.data.menuList;
   MenuGroup.value = res2.data.menuGroup;
   SubMenuGroup.value = res2.data.submenuGroup;
@@ -1069,7 +1073,7 @@ const handleStoreCd = async (newValue) => {
       add: "추가",
     };
   });
-  const res5 = await getTLUList(groupCd.value, nowStoreCd.value);
+  const res5 = await getTLUList2(groupCd.value, nowStoreCd.value);
   TLUList.value = res5.data.TLUList;
   TLUList.value = TLUList.value.map((item) => {
     return {

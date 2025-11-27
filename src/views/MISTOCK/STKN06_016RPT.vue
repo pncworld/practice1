@@ -39,10 +39,10 @@
           @storeNm="excelStore"
           @update:storeCd="lngStoreCode"></PickStore>
       </div>
-      <div class="flex justify-start pl-16 items-center mt-2 space-x-5">
+      <div class="flex justify-start ml-[40%] items-center mt-2 space-x-5">
         <div class="text-base font-semibold">품목구분</div>
         <div>
-          <select name="" id="" class="w-64 h-7" v-model="cond">
+          <select name="" id="" class="w-[120%] h-[80%]" v-model="cond">
             <option value="0">전체</option>
             <option :value="i.strDCode" v-for="i in optionList3">
               {{ i.strDName }}

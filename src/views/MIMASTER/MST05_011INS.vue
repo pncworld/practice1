@@ -140,7 +140,7 @@
     </div>
   </div>
   <span
-    class="h-5 mt-3 flex justify-between items-center w-[55%] ml-[41.5%] z-40">
+    class="h-5 mt-3 flex justify-between items-center w-[50%] ml-[40vw] z-40 text-nowrap">
     <h1 class="font-bold text-xl z-40">메뉴키 설정</h1>
     <span class="flex space-x-3 ml-32 pl-56 items-center"
       >순서변경 &nbsp; &nbsp;<label class="z-40"
@@ -674,7 +674,7 @@ const handleStoreCd = async (newValue) => {
   } else {
     const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
 
-    //comsole.log(res2);
+    console.log(res2);
     MenuList.value = res2.data.menuList;
     MenuGroup.value = res2.data.menuGroup;
     SubMenuGroup.value = res2.data.submenuGroup;
@@ -694,7 +694,7 @@ const handleStoreCd = async (newValue) => {
     };
   });
   const res5 = await getTLUList(groupCd.value, nowStoreCd.value);
-  //comsole.log(res5);
+  console.log(res5);
   TLUList.value = res5.data.TLUList;
   TLUList.value = TLUList.value.map((item) => {
     return {
@@ -1383,18 +1383,28 @@ const showMenus = (value) => {
 const deletekey = () => {
   if (clickedScreenOrMenu.value == false) {
     //comsole.log(ScreenKeyOrigin.value);
-    ScreenKeyOrigin.value = ScreenKeyOrigin.value.filter(
-      (item) => item.intScreenNo != clickedintScreenNo.value
-    );
+    ScreenKeyOrigin.value = ScreenKeyOrigin.value
+      .filter((item) => item.intScreenNo != clickedintScreenNo.value)
+      .map((item, index) => ({
+        ...item,
+        intScreenNo: index + 1,
+      }));
+
     addscreenKey.value = false;
     addfor10ScreenKey();
 
-    MenuKeyList.value = MenuKeyList.value.filter(
-      (item) => item.intScreenNo != clickedintScreenNo.value
-    );
+    MenuKeyList.value = MenuKeyList.value
+      .filter((item) => item.intScreenNo != clickedintScreenNo.value)
+      .map((item, index) => ({
+        ...item,
+        intScreenNo:
+          item.intScreenNo > clickedintScreenNo.value
+            ? item.intScreenNo - 1
+            : item.intScreenNo,
+      }));
     currentscreenKeyNm.value = "";
 
-    clickedintScreenNo.value = clickedintScreenNo.value + 1;
+    clickedintScreenNo.value = clickedintScreenNo.value;
     showMenuKey(clickedintScreenNo.value);
   } else {
     MenuKeyList.value = MenuKeyList.value.filter(

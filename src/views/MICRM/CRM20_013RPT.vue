@@ -153,18 +153,17 @@ const ey = ref("");
 const em = ref("");
 const selectedDate = ref("");
 const startYear = (e) => {
-  ////console.log(e);
-  sy.value = e;
+  sy.value = String(e);
 };
 const startMonth = (e) => {
   ////console.log(e);
-  sm.value = e;
+  sm.value = String(e);
 };
 const endYear = (e) => {
-  ey.value = e;
+  ey.value = String(e);
 };
 const endMonth = (e) => {
-  em.value = e;
+  em.value = String(e);
 };
 
 const excelDate = (e) => {
@@ -225,13 +224,13 @@ const searchButton = async () => {
       enddate,
       selectedCond.value
     );
-    ////console.log(res);
+    // console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    //comsole.log(error);
+    console.log(error);
   } finally {
     store.state.loading = false;
   }

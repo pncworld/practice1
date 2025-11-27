@@ -1189,11 +1189,7 @@ const saveButton = async () => {
           .filter((item) => item.intPosNo == posNo.value)
           .filter((item2) => saveScreenInt.includes(item2.intScreenNo))
           .map((item) => item.strKeyName);
-        //comsole.log(posNo.value);
-        //comsole.log(intKeySeqs.join(","));
-        //comsole.log(screenNumarr.join(","));
-        //comsole.log(lngScrarr.join(","));
-        //comsole.log(menuKeyNmarr.join(","));
+
         const res2 = await saveAllMenuKey(
           groupCd.value,
           nowStoreCd.value,
@@ -1204,9 +1200,6 @@ const saveButton = async () => {
           lngScrarr.join("\u200B"),
           menuKeyNmarr.join("\u200B")
         );
-
-        //comsole.log(res);
-        //comsole.log(res2);
       } catch (error) {
       } finally {
         store.state.loading = false;
@@ -1570,18 +1563,27 @@ const showMenus = (value) => {
 const deletekey = () => {
   if (clickedScreenOrMenu.value == false) {
     //comsole.log(ScreenKeyOrigin.value);
-    ScreenKeyOrigin.value = ScreenKeyOrigin.value.filter(
-      (item) => item.intScreenNo != clickedintScreenNo.value
-    );
+    ScreenKeyOrigin.value = ScreenKeyOrigin.value
+      .filter((item) => item.intScreenNo != clickedintScreenNo.value)
+      .map((item, index) => ({
+        ...item,
+        intScreenNo: index + 1,
+      }));
     addscreenKey.value = false;
     addfor10ScreenKey();
 
-    MenuKeyList.value = MenuKeyList.value.filter(
-      (item) => item.intScreenNo != clickedintScreenNo.value
-    );
+    MenuKeyList.value = MenuKeyList.value
+      .filter((item) => item.intScreenNo != clickedintScreenNo.value)
+      .map((item, index) => ({
+        ...item,
+        intScreenNo:
+          item.intScreenNo > clickedintScreenNo.value
+            ? item.intScreenNo - 1
+            : item.intScreenNo,
+      }));
     currentscreenKeyNm.value = "";
 
-    clickedintScreenNo.value = clickedintScreenNo.value + 1;
+    clickedintScreenNo.value = clickedintScreenNo.value;
     showMenuKey(clickedintScreenNo.value);
   } else {
     MenuKeyList.value = MenuKeyList.value.filter(

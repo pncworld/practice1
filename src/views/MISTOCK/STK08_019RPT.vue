@@ -94,20 +94,17 @@
         </div>
       </div>
       <div class="flex space-x-5 ml-12 mt-3 items-center">
-        <div class="font-semibold text-base">자재코드/이름</div>
-        <div class="flex space-x-3">
-          <div>
-            <input
-              type="text"
-              class="h-8 w-40 border border-black"
-              v-model="cond5" />
-          </div>
-          <div>
-            <input
-              type="text"
-              class="h-8 w-40 border border-black"
-              v-model="cond6" />
-          </div>
+        <div class="font-semibold text-base text-nowrap">자재코드/이름</div>
+        <div class="flex space-x-0">
+          <input
+            type="text"
+            class="h-8 w-[47%] border border-black"
+            v-model="cond5" />
+
+          <input
+            type="text"
+            class="h-8 w-[47%] border border-black"
+            v-model="cond6" />
         </div>
       </div>
 
@@ -132,7 +129,7 @@
           <select
             name=""
             id=""
-            class="border border-black w-64 h-8"
+            class="border border-black w-[130%] h-8"
             v-model="cond8">
             <option :value="i.strDCode" v-for="i in optionList5">
               {{ i.strDName }}
@@ -184,6 +181,7 @@
           ['dblTakeQty', 'curTakeCost'],
           ['dblUsageQty', 'curUsageCost'],
         ]"
+        :headerColors="['', '', '', 'green', '', '', 'green', '', 'red']"
         :mergeColumns2="true"
         :documentTitle="'STK08_019RPT'"
         @clickedRowData="clickedRowData"
@@ -256,7 +254,7 @@ onMounted(async () => {
 
   const res = await getStockDetail(store.state.userData.lngStoreGroup, "01");
 
-  //console.log(res);
+  console.log(res);
   optionList.value = res.data.List;
 
   const res2 = await getStockGroup(store.state.userData.lngStoreGroup);
@@ -268,11 +266,11 @@ onMounted(async () => {
   optionList3.value = res3.data.List;
 
   const res4 = await getCommonList(166);
-
+  console.log(res4);
   optionList4.value = res4.data.List.filter((item) => item.strDCode != "01");
 
   const res5 = await getCommonList(171);
-
+  console.log(res5);
   optionList5.value = res5.data.List;
 
   const today = new Date();

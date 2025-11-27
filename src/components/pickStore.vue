@@ -8,6 +8,7 @@
     <div v-show="hideit2">
       <select
         :disabled="isDisabled"
+        :class="dynamicStoreClass3"
         v-model="selectedGroupCd"
         id="storeGroup"
         class="hidden md:inline-block border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-32"
@@ -23,6 +24,7 @@
     <div v-show="hideit3">
       <select
         :disabled="isDisabled"
+        :class="dynamicStoreClass3"
         class="hidden md:inline-block border border-gray-800 rounded-md p-2 ml-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-20"
         @change="
           setStore($event.target.value);
@@ -38,8 +40,8 @@
         </option>
       </select>
     </div>
-    <div class="w-full md:w-auto" v-show="hideit">
-      <select
+    <div class="w-64 relative ml-5" v-show="hideit">
+      <!-- <select
         :disabled="isDisabled"
         :class="dynamicStoreClass"
         class="w-60 border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -53,14 +55,58 @@
           setTablePosNo($event.target.value);
           setScreenNo2($event.target.value);
         ">
-        <option value="0">{{ defaultStoreNm }}</option>
+        <option value="0" class="text-left">{{ defaultStoreNm }}</option>
         <option
+          class="text-left"
           :value="item.lngStoreCode"
           v-for="item in storeCd"
           :key="item.lngStoreCode">
           {{ item.strName }}
         </option>
-      </select>
+      </select> -->
+
+      <!-- <v-autocomplete
+        v-model="selectedStoreCode"
+        :items="storeCd"
+        dense
+        flat
+        item-title="strName"
+        item-value="lngStoreCode"
+        @change="
+          emitStoreCode($event);
+          ischanged();
+          setStoreAreaCd($event);
+          setPosNo($event);
+          setKioskNo($event);
+          setTablePosNo($event);
+          setScreenNo2($event);
+        "
+        class="w-60 h-[40%] mx-3"
+        label="매장을 선택하세요" /> -->
+      <div
+        class="h-[40px] w-[85%] bg-white border border-black rounded-lg text-xs text-nowrap"
+        :disabled="isDisabled"
+        :class="dynamicStoreClass">
+        <v-select
+          :reduce="(option) => option.lngStoreCode"
+          class="style-chooser h-full text-sm !disabled:text-black"
+          v-model="selectedStoreCode"
+          :disabled="isDisabled"
+          :clearable="!isDisabled"
+          label="strName"
+          :placeholder="defaultStoreNm"
+          @click="resetStoreCode"
+          append-to-body
+          :options="storeCd">
+          <template #no-options>
+            <div>검색된 항목이 없습니다.</div>
+          </template>
+
+          <template #no-results>
+            <div>검색된 항목이 없습니다.</div>
+          </template>
+        </v-select>
+      </div>
     </div>
     <div class="ml-5" v-if="showAreaCd">
       <span class="font-bold text-sm">지역코드 </span>
@@ -231,14 +277,38 @@
 <script setup>
 import { getKioskList, getPosList, getTablePosList } from "@/api/common";
 import { getScreenList2 } from "@/api/master";
-import { defineProps, onMounted, ref, watch } from "vue";
+import { defineProps, nextTick, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
+
+const store = useStore();
+const selectedStoreCode = ref(null);
+
+const resetStoreCode = () => {
+  if (isDisabled.value == true) {
+    return;
+  }
+  selectedStoreCode.value = null;
+};
+//////////////////////////////////////////////////////////////////////////////////
+watch(selectedStoreCode, () => {
+  let converted =
+    selectedStoreCode.value == null ? "0" : selectedStoreCode.value;
+
+  emitStoreCode(converted);
+  ischanged();
+  setStoreAreaCd(converted);
+  setPosNo(converted);
+  setKioskNo(converted);
+  setTablePosNo(converted);
+  setScreenNo2(converted);
+});
+
 const storeGroup = ref([]);
 const storeType = ref([]);
 const storeCd = ref([]);
 const storeCd2 = ref([]);
-const store = useStore();
+
 const storeAreaCd2 = ref([]);
 const storeAreaCd = ref([]);
 const storePosNo = ref([]);
@@ -253,7 +323,7 @@ const selectedTablePosNo = ref("0");
 const selectedGroupCd = ref(store.state.userData.lngStoreGroup);
 const paymentType = ref(3);
 const selectedStoreType = ref(store.state.userData.lngJoinType);
-const selectedStoreCode = ref(store.state.userData.lngPosition);
+
 const isDisabled1 = ref(false);
 const isDisabled = ref(false);
 const selectedFuncScreen = ref(0);
@@ -353,6 +423,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disabledAll2: {
+    type: Boolean,
+    default: false,
+  },
   setDynamicStoreClass: {
     type: String,
     default: "",
@@ -362,6 +436,10 @@ const props = defineProps({
     default: "",
   },
   setDefaultStoreCd: {
+    type: String,
+    default: "",
+  },
+  dynamicStoreClass3: {
     type: String,
     default: "",
   },
@@ -483,14 +561,6 @@ watch(
     setStoreAreaCd(store.state.userData.lngPosition);
     setKioskNo(store.state.userData.lngPosition);
     setTablePosNo(store.state.userData.lngPosition);
-    if (
-      store.state.userData.blnBrandAdmin == "True" ||
-      store.state.userData.lngPositionType == "1"
-    ) {
-      isDisabled.value = false;
-    } else {
-      isDisabled.value = true;
-    }
 
     defaultStoreNm.value = props.defaultStoreNm;
   }
@@ -498,43 +568,58 @@ watch(
 
 const dynamicStoreClass = ref("");
 const dynamicStoreClass2 = ref("");
-onMounted(() => {
+const dynamicStoreClass3 = ref("");
+onMounted(async () => {
   dynamicStoreClass.value = props.setDynamicStoreClass;
   dynamicStoreClass2.value = props.setDynamicStoreClass2;
+  dynamicStoreClass3.value = props.dynamicStoreClass3;
   storeGroup.value = store.state.storeGroup;
   storeType.value = store.state.storeType;
+
   storeCd.value = store.state.storeCd;
   storeCd2.value = store.state.storeCd;
   storeAreaCd2.value = store.state.storeAreaCd;
   selectedStoreAreaCd.value = 0;
   MainName.value = props.mainName;
   let storenm = store.state.userData.strStoreName;
-  if (props.defaultStore == true) {
-    selectedStoreCode.value = 0;
-    storenm = props.defaultStoreNm;
+
+  await nextTick();
+  if (
+    store.state.userData.blnBrandAdmin == "True" ||
+    store.state.userData.lngPositionType == "1"
+  ) {
+    selectedStoreCode.value = null;
+    selectedStoreType.value = 0;
+    // hideit.value = false;
+    // hideit3.value = false;
   } else {
-    selectedStoreCode.value = store.state.userData.lngPosition;
+    selectedStoreCode.value = parseInt(store.state.userData.lngPosition);
+    selectedStoreType.value = store.state.userData.lngJoinType;
+    // hideit.value = true;
+    // hideit3.value = true;
   }
 
-  if (props.defaultStoreType2 == true) {
-    selectedStoreType.value = 0;
-  } else {
-    selectedStoreType.value = store.state.userData.lngJoinType;
-  }
   emit("update:storeGroup", store.state.userData.lngStoreGroup);
-  emit("update:storeType", store.state.userData.lngJoinType);
+  emit("update:storeType", selectedStoreType.value);
   if (props.setDefaultStoreCd != "") {
     selectedStoreCode.value = props.setDefaultStoreCd;
 
-    const selectedNm = storeCd.value.filter(
-      (item) => item.lngStoreCode == props.setDefaultStoreCd
-    )[0].strName;
+    if (selectedStoreCode.value != null) {
+      const selectedNm = storeCd.value.filter(
+        (item) => item.lngStoreCode == props.setDefaultStoreCd
+      )[0].strName;
 
-    emit("storeNm", selectedNm);
+      emit("storeNm", selectedNm);
+    } else {
+      emit("storeNm", "전체");
+    }
   } else {
     emit("storeNm", storenm);
   }
-  emit("update:storeCd", selectedStoreCode.value);
+  emit(
+    "update:storeCd",
+    selectedStoreCode.value == null ? "0" : selectedStoreCode.value
+  );
 
   emit("posNo", 0);
   emit("updateFuncScreenType", 0);
@@ -571,13 +656,18 @@ onMounted(() => {
   //   emit("update:storeCd", selectedStoreCode.value);
   // }
 
+  if (props.disabledAll2 == true) {
+    isDisabled.value = false;
+  }
   defaultStoreNm.value = props.defaultStoreNm;
 });
+
 const emitStoreType = (value) => {
   emit("update:storeType", value);
 };
 
 const emitStoreCode = (value) => {
+  console.log(value);
   if (value != "0") {
     const selectedNm = storeCd.value.filter(
       (item) => item.lngStoreCode == value
@@ -769,4 +859,81 @@ watch(
     }
   }
 );
+watch(
+  () => props.defaultStore,
+  () => {
+    console.log(props.defaultStore);
+    if (props.defaultStore == true) {
+      selectedStoreCode.value = "0";
+      emit("update:storeCd", "0");
+      emit("storeNm", "전체");
+    } else {
+      selectedStoreCode.value = store.state.userData.lngPosition;
+      emit("update:storeCd", selectedStoreCode.value);
+
+      const selectedNm = storeCd.value.filter(
+        (item) => item.lngStoreCode == selectedStoreCode.value
+      )[0].strName;
+      emit("storeNm", selectedNm);
+    }
+  }
+);
 </script>
+<style>
+.style-chooser .vs__search::placeholder {
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+  font-size: 14px;
+}
+.style-chooser .vs__dropdown-toggle {
+  height: 100% !important;
+  min-height: 0 !important; /* vue-select 기본값 제거 */
+  max-height: 100% !important;
+  display: flex; /* 내부 텍스트 가운데 배치 */
+  align-items: center;
+  overflow: hidden !important;
+  position: relative;
+  z-index: 40 !important;
+}
+.style-chooser .vs__dropdown-menu {
+  background: white;
+  border: none;
+  color: #394066;
+  text-transform: lowercase;
+  font-variant: small-caps;
+  height: max-content;
+  position: absolute;
+  z-index: 40 !important;
+}
+
+.style-chooser .vs__clear,
+.style-chooser .vs__open-indicator {
+  fill: #394066;
+}
+.style-chooser .vs__selected {
+  background-color: white !important;
+  justify-content: left;
+  align-items: left;
+  text-align: left;
+  overflow: hidden !important;
+  width: 100% !important;
+  position: absolute;
+  white-space: nowrap; /* 한 줄로 만들기 */
+  text-overflow: ellipsis;
+}
+
+.style-chooser.vs--disabled .vs__selected {
+  font-size: 14px !important;
+  font-weight: 500;
+  background: rgb(230, 230, 230);
+  color: black !important; /* Tailwind text-gray-700 */
+  display: flex;
+  justify-content: left !important;
+  align-items: center;
+  height: 100% !important;
+  min-width: 110% !important;
+  z-index: 45;
+  overflow: hidden !important;
+}
+</style>

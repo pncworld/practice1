@@ -27,7 +27,9 @@
           @excelStore="excelStore"></PickStoreRenew3> -->
         <Datepicker1 :mainName="'수신 기준일'"> </Datepicker1>
         <div class="ml-5 mt-2">
-          <button class="button received !w-20">수신</button>
+          <button class="button received !w-20" @click="receiveButton">
+            수신
+          </button>
         </div>
       </div>
     </div>
@@ -50,27 +52,38 @@
         :progname="'MST44_057INS_VUE'"
         :progid="1"
         :rowData="rowData"
+        @checkedRowData="checkedRowData"
         :rowStateeditable="false">
       </Realgrid>
       <Realgrid
         :progname="'MST44_057INS_VUE'"
         :progid="2"
         :rowData="rowData2"
+        @checkedRowData="checkedRowData2"
         :rowStateeditable="false">
       </Realgrid>
-      <Realgrid
-        :progname="'MST44_057INS_VUE'"
-        :progid="3"
-        :rowData="rowData3"
-        :rowStateeditable="false">
-      </Realgrid>
+      <div class="h-[95%]">
+        <div class="h-[5%] border border-black">
+          <input
+            type="text"
+            class="h-full w-full text-red-600"
+            disabled
+            v-model="currentState" />
+        </div>
+        <Realgrid
+          :progname="'MST44_057INS_VUE'"
+          :progid="3"
+          :rowData="rowData3"
+          :rowStateeditable="false">
+        </Realgrid>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { getCommonList } from "@/api/common";
-import { getSAFMasterDownload } from "@/api/master";
+import { getSAFMasterDownload, pncInterFaceAPI } from "@/api/master";
 import Datepicker1 from "@/components/Datepicker1.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -94,7 +107,8 @@ import Realgrid from "@/components/realgrid.vue";
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog } from "@/customFunc/customFunc";
+import { formatLocalDate, insertPageLog } from "@/customFunc/customFunc";
+import Swal from "sweetalert2";
 /*
  * 공통 표준  Function
  */
@@ -218,7 +232,110 @@ const handleParentClick = (e) => {
   closePopUp.value = !closePopUp.value;
 };
 
-/**
- * 엑셀용 일자 세팅 함수
- */
+const checkedrowdata = ref([]);
+const checkedRowData = (e) => {
+  checkedrowdata.value = e;
+};
+const checkedrowdata2 = ref([]);
+const checkedRowData2 = (e) => {
+  checkedrowdata2.value = e;
+};
+
+const currentState = ref("");
+const receiveButton = async (e) => {
+  if (checkedrowdata.value.length == 0) {
+    await Swal.fire({
+      title: "경고",
+      text: `하나 이상의 브랜드코드를 체크해주세요.`,
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (checkedrowdata2.value.length == 0) {
+    await Swal.fire({
+      title: "경고",
+      text: `하나 이상의 수신항목을 체크해주세요.`,
+      icon: "warning",
+
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  Swal.fire({
+    title: "알림",
+    text: `정말 수신 하시겠습니까?`,
+    icon: "info",
+    cancelButtonText: "취소",
+    showCancelButton: true,
+    confirmButtonText: "확인",
+  }).then(async (result) => {
+    if (result.isConfirmed == true) {
+      try {
+        store.state.loading = true;
+        rowData3.value = checkedrowdata.value.flatMap((item1) =>
+          checkedrowdata2.value.map((item2) => ({
+            ...item1,
+            ...item2,
+          }))
+        );
+        const date = new Date();
+
+        const date2 = formatLocalDate(date);
+        let sum = checkedrowdata.value.length * checkedrowdata2.value.length;
+        let cur = 0;
+        let res;
+
+        for (let i = 0; i < checkedrowdata.value.length; i++) {
+          for (let j = 0; j < checkedrowdata2.value.length; j++) {
+            res = await pncInterFaceAPI(
+              "SAFMasterInfoGetService.asmx/GET_SAF_MASTER_INFO",
+              "BrandCode\u200bDeptCode\u200bLastUpdateTime\u200bMenuType",
+              `${
+                checkedrowdata.value[i].lngStoreGroup
+              }\u200b${0}\u200b${date2}\u200b${
+                checkedrowdata2.value[j].strDCode
+              }`
+            );
+
+            if (res.data.List.includes("SUCCESS")) {
+              cur += 1;
+              currentState.value =
+                checkedrowdata.value[i].strName +
+                "-" +
+                checkedrowdata2.value[j].strDName +
+                `수신 중 ( ${cur}/${sum} )`;
+              rowData3.value = rowData3.value.filter(
+                (item) =>
+                  !(
+                    item.strDCode == checkedrowdata2.value[j].strDCode &&
+                    item.lngStoreGroup == checkedrowdata.value[i].lngStoreGroup
+                  )
+              );
+            } else {
+              Swal.fire({
+                title: "경고",
+                text: `${checkedrowdata.value[i].strName}
+                -${checkedrowdata2.value[j].strDName}에서 오류가 발생하였습니다. 확인해주세요.`,
+                icon: "error",
+
+                confirmButtonText: "확인",
+              });
+              return;
+            }
+          }
+        }
+      } catch (error) {
+      } finally {
+        store.state.loading = false;
+        searchButton();
+        currentState.value = "";
+      }
+    } else {
+      return;
+    }
+  });
+};
 </script>

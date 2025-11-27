@@ -497,6 +497,12 @@ export const getMenuList = (groupCd, storeCd) => {
     STORE_CD: storeCd,
   });
 };
+export const getMenuList3 = (groupCd, storeCd) => {
+  return api2.post("/MIMASTER/MST05_004INS.asmx/getMenuList3", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
 export const getMenuList2 = (groupCd, storeCd) => {
   return api2.post("/MIMASTER/MST37_069INS.asmx/getMenuList2", {
     GROUP_CD: groupCd,
@@ -661,6 +667,12 @@ export const getMenuKeyList4 = (groupCd, storeCd, areaCd, posNo) => {
 
 export const getTLUList = (groupCd, storeCd) => {
   return api2.post("/MIMASTER/MST05_011INS.asmx/getTLUList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+export const getTLUList2 = (groupCd, storeCd) => {
+  return api2.post("/MIMASTER/MST05_004INS.asmx/getTLUList2", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
   });
@@ -919,6 +931,31 @@ export const saveMenuKey2 = (
     KEYNO: keyNo,
   });
 };
+
+export const saveMenuKey3 = (
+  groupCd,
+  storeCd,
+  areaCd,
+  posNo,
+  keyseq,
+  keyname,
+  keyscrno,
+  keycolor,
+  keyNo
+) => {
+  return api2.post("/VUEPOS/MST01_001POS.asmx/saveMenuKeys3", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+    POSNO: posNo,
+    KEYSEQ: keyseq,
+    KEYNAME: keyname,
+    KEYSCRNO: keyscrno,
+    KEYCOLOR: keycolor,
+    KEYNO: keyNo,
+  });
+};
+
 export const dupliPos = (
   groupCd,
   storeCd,
@@ -1801,6 +1838,8 @@ export const saveMenuCode = (
   lngtype,
   dtmstart,
   dtmend,
+  lngkds,
+  strnamek,
   AutoMenuCode,
   deleteCd
 ) => {
@@ -1848,6 +1887,8 @@ export const saveMenuCode = (
     LNGTYPE: lngtype,
     DTMSTART: dtmstart,
     DTMEND: dtmend,
+    LNGKDS: lngkds,
+    STRNAMEK: strnamek,
   });
 };
 
@@ -2801,13 +2842,21 @@ export const getSalesInfoByCorner = (groupCd, type, storeCd, cornerCd) => {
     CORNER_CD: cornerCd,
   });
 };
-export const getSoldMenuList = (groupCd, storeCd, cornerCd, cond, cond2) => {
+export const getSoldMenuList = (
+  groupCd,
+  storeCd,
+  cornerCd,
+  cond,
+  cond2,
+  sortType
+) => {
   return api2.post("/MIMASTER/MST56_001INS.asmx/getSoldMenuList", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     CORNER_CD: cornerCd,
     COND: cond,
     COND2: cond2,
+    SORT: sortType,
   });
 };
 export const getMenuConList = (
@@ -3662,6 +3711,30 @@ export const saveCornerInfoList = (
   });
 };
 
+export const saveCornerInfoList2 = (
+  groupCd,
+  storecds,
+  menucds,
+  stktypes,
+  openhours,
+  openmins,
+  closehours,
+  closemins,
+  userid
+) => {
+  return api2.post("/MIMASTER/MST56_001INS.asmx/saveCornerInfoList2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecds,
+    MENU_CD: menucds,
+    STK_TYPES: stktypes,
+    OPENHOURS: openhours,
+    OPENMINS: openmins,
+    CLOSEHOURS: closehours,
+    CLOSEMINS: closemins,
+    USERID: userid,
+  });
+};
+
 export const getMstBasic = (groupCd, storeCd) => {
   return api2.post("/MIMASTER/MST44_062INS.asmx/getMstBasic", {
     GROUP_CD: groupCd,
@@ -3718,5 +3791,23 @@ export const saveCustDispInfo = (
     DISTYPES: dispTypes,
     DISPTIMES: dispTimes,
     STRNAMES: strNames,
+  });
+};
+
+export const getSoldMenuList3 = (groupCd, potype, position, cond, sortType) => {
+  return api2.post("/MIMASTER/MST56_001INS.asmx/getSoldMenuList3", {
+    GROUP_CD: groupCd,
+    POSITION_TYPE: potype,
+    POSITION: position,
+    COND: cond,
+    SORT: sortType,
+  });
+};
+
+export const pncInterFaceAPI = (path, paraNm, paraCd) => {
+  return api2.post("/MIMASTER/MST44_057INS.asmx/pncInterFaceAPI", {
+    PATH: path,
+    PARANM: paraNm,
+    PARACD: paraCd,
   });
 };

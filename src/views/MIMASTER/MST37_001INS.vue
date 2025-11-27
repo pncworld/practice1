@@ -46,7 +46,7 @@
                 <option>[{{ groupCd }}]{{ selectedGroupNm }}</option>
               </select>
             </div>
-            <div>
+            <div v-if="hideAttr">
               매장명 :
               <select
                 disabled
@@ -399,9 +399,13 @@ import PageName from "@/components/pageName.vue";
 /**
  * 	화면 Load시 실행 스크립트
  */
-
+const hideAttr = ref(true);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
+  if (store.state.userData.lngCommonMenu == "1") {
+    hideAttr.value = false;
+  }
 });
 
 // 더미 데이터
@@ -682,7 +686,15 @@ const searchButton = async () => {
 
     //const res3 = await getAllOptionManageData(groupCd.value, nowStoreCd.value);
     const res3 = await getSubTitleList(groupCd.value, nowStoreCd.value);
-    const res4 = await getMostColumnMenuList(groupCd.value, nowStoreCd.value);
+
+    let storecd = "0";
+
+    if (store.state.userData.lngCommonMenu == "1") {
+      storecd = "0";
+    } else {
+      storecd = nowStoreCd.value;
+    }
+    const res4 = await getMostColumnMenuList(groupCd.value, storecd);
     ////console.log(res3);
     ////console.log(res4);
     rowData1.value = res3.data.List;

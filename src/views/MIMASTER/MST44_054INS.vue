@@ -31,8 +31,7 @@
       @update:ischanged2="searchinit"
       @updatePaymentType="updatePaymentType"></PickStore>
   </div>
-  <!-- 조회 조건 -->
-  <!-- 그리드 영역-->
+
   <div class="z-50">
     <DupliPopUp3
       :isVisible="showPopup2"
@@ -399,6 +398,7 @@ import { insertPageLog } from "@/customFunc/customFunc";
  *  */
 
 import PageName from "@/components/pageName.vue";
+import Autocompletecomponet from "@/components/autocompletecomponet.vue";
 
 /**
  * 	화면 Load시 실행 스크립트

@@ -1,10 +1,10 @@
 <template>
-  <div class="flex space-x-5 items-center mt-2">
+  <div class="flex space-x-5 items-center mt-2" :class="dynamicClass2">
     <div class="text-base font-semibold">{{ Name }}</div>
     <select
       name=""
       id=""
-      class="w-64 h-7 border border-black"
+      class="w-[60%] h-7 border border-black"
       :class="dynamicClass"
       v-model="cond"
       :disabled="disableBusiness">
@@ -45,6 +45,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  setDynamicClass2: {
+    type: String,
+    default: "",
+  },
 });
 
 const Nm = ref("");
@@ -63,20 +67,66 @@ watch(
   }
 );
 const dynamicClass = ref("");
+const dynamicClass2 = ref("");
 onMounted(async () => {
-  const res = await getSuppliers(store.state.userData.lngStoreGroup);
+  // if(lngSupplierID == 0)
+  // {//거래처가 아닌 아이디로 들어갔을 경우
+  // 	DivSearch.cbSupplier.Index = 0;
+  // 	DivSearch.cbSupplier.Editable = true;
+  // 	DivSearch.cbSupplier.Enable = true;
+  // }
+  // else
+  // {
+  // 	var nFindRow = ds_Supplier.FindRow("lngSupplierID",lngSupplierID);
 
-  ////console.log(res);
-  Name.value = props.defaultName;
+  // 	if(nFindRow >= 0)
+  // 	{
+  // 		DivSearch.cbSupplier.Value = lngSupplierID;
+  // 	}
+  // 	else
+  // 	{
+  // 		DivSearch.com_supplier.Index = -1;
+  // 	}
+
+  // 	DivSearch.cbSupplier.Editable = false;
+  // 	DivSearch.cbSupplier.Enable = false;
+  // }
+
+  const res = await getSuppliers(store.state.userData.lngStoreGroup);
   optionList.value = res.data.List;
 
-  cond.value = 0;
-  Nm.value = props.defaultNm;
+  let lngSupplierID = store.state.userData.lngSupplierID;
+  console.log(res);
+  if (lngSupplierID == 0) {
+    disableBusiness.value = false;
+    cond.value = 0;
+    Nm.value = props.defaultNm;
+  } else {
+    let find = optionList.value.find(
+      (item) => item.lngSupplierID == lngSupplierID
+    );
+
+    if (find != undefined) {
+      disableBusiness.value = true;
+      cond.value = find.lngSupplierID;
+      Nm.value = find.strSupplierName;
+    } else {
+      disableBusiness.value = true;
+      Nm.value = " ";
+      cond.value = -1;
+    }
+  }
+
+  Name.value = props.defaultName;
+
   emit("SupplierId", cond.value);
   emit("SupplierNm", Nm.value);
 
   if (props.setDynamicClass != "") {
     dynamicClass.value = props.setDynamicClass;
+  }
+  if (props.setDynamicClass2 != "") {
+    dynamicClass2.value = props.setDynamicClass2;
   }
 
   if (props.disable == true) {

@@ -104,9 +104,10 @@
             :addrowDefault="addrowDefault"
             :rowStateeditable="false"
             :editableColId="'strName'"
-            :deleteRow2="deleteRow"
+            :deleteRow6="deleteRow"
             :initFocus="initFocus"
             @updatedRowData="updatedRowData"
+            @updatedRowData2="updatedRowData"
             :addField="'new'">
           </Realgrid>
         </div>
@@ -337,7 +338,7 @@ const handleStoreCd = async (newValue) => {
   nowStoreCd.value = newValue;
 
   ////console.log(newValue);
-  searchButton();
+  //searchButton();
 };
 const Category = ref([]);
 
@@ -392,7 +393,6 @@ const searchButton = async () => {
   try {
     const res3 = await getTLUManageInfo(groupCd.value, nowStoreCd.value);
 
-    //comsole.log(res3);
     TLUList.value = res3.data.TLULIST;
     MenuList.value = res3.data.MENULIST;
     filteredMenuList.value = [...MenuList.value];
@@ -452,7 +452,6 @@ const onEnd = async (evt) => {
 
     swappedItems[targetItemIndex2] = temp;
 
-    // 배열을 업데이트
     items.value = swappedItems;
     //comsole.log(TLUList.value);
 
@@ -462,7 +461,6 @@ const onEnd = async (evt) => {
 };
 
 watch(items, async () => {
-  //comsole.log(items.value);
   if (items.value.length == 0) return;
 
   changeValue.value = items.value[0].lngCode;
@@ -650,7 +648,7 @@ function formatNumber(value) {
  */
 
 const saveButton = async () => {
-  //comsole.log(updatedRowData2.value);
+  console.log(updatedRowData2.value);
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -826,8 +824,9 @@ const saveButton = async () => {
           lngMenu28.join(","),
           lngMenu29.join(",")
         );
-        //comsole.log(res);
+        console.log(res);
       } catch (error) {
+        console.log(error);
       } finally {
         store.state.loading = false;
         Swal.fire({
@@ -916,10 +915,9 @@ const deletekey = () => {
   // }
 
   // TLUList.value = [...TLUList.value];
-
   changeValue.value = 0;
   changeColid.value = `lngMenu${currIndexKey.value + 1}`;
-  changeNow.value = !changeNow.value;
+  changeNow2.value = !changeNow2.value;
   const finditem2 = items.value.find(
     (item, index) => index == currIndexKey.value
   );

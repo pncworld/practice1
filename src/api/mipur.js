@@ -1094,12 +1094,7 @@ export const getStockCheckDetail = (
   });
 };
 
-export const getOrderConfirmDelivery = (
-  groupCd,
-  storeCd,
-  supplierid,
-  date,
-) => {
+export const getOrderConfirmDelivery = (groupCd, storeCd, supplierid, date) => {
   return api2.post("/MIPUR/PUR01_019INS.asmx/getOrderConfirmDelivery", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
@@ -1108,20 +1103,19 @@ export const getOrderConfirmDelivery = (
   });
 };
 
-
 export const getOrderConfirmDeliveryDetail = (
   groupCd,
   storeCd,
   supplierid,
   orderNo,
-  date,
+  date
 ) => {
   return api2.post("/MIPUR/PUR01_019INS.asmx/getOrderConfirmDeliveryDetail", {
-    GROUP_CD    : groupCd,
-    STORE_CD    : storeCd,
-    SUPPLIER_ID : supplierid,
-    ORDER_NO    : orderNo,
-    DTM_DATE    : date,
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SUPPLIER_ID: supplierid,
+    ORDER_NO: orderNo,
+    DTM_DATE: date,
   });
 };
 
@@ -1131,15 +1125,17 @@ export const setOrderConfirmDelivery = (
   orderNo,
   orderSeq,
   checkQty,
-  stockCheckComments
+  stockCheckComments,
+  CheckComments
 ) => {
   return api2.post("/MIPUR/PUR01_019INS.asmx/setOrderConfirmDelivery", {
-    GROUP_CD  : groupCd,
-    STORE_CD  : storeCd,
-    ORDER_NO  : orderNo,
-    ORDER_SEQ : orderSeq,
-    CHECK_QTY : checkQty,
-    STK_COM   : stockCheckComments,
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    ORDER_NO: orderNo,
+    ORDER_SEQ: orderSeq,
+    CHECK_QTY: checkQty,
+    STK_COM: stockCheckComments,
+    CHECK_COMMENTS: CheckComments,
   });
 };
 
@@ -1726,7 +1722,7 @@ export const setOrderCloseAndAuditList = (
   return api2.post("/MIPUR/PUR01_032INS.asmx/setOrderCloseAndAuditList", {
     GROUP_CD: groupCd,
     STORE_AREA: storeArea,
-    HOUR : hour,
+    HOUR: hour,
     MINUTE: minute,
     DATE: date,
     STORECDS: storecds,
@@ -1741,15 +1737,15 @@ export const getPrintPurchasePriceSheet = (
   allYn,
   unitType,
   orderType,
-  desc,
+  desc
 ) => {
   return api2.post("/MIPUR/PUR01_099RPT.asmx/getPrintPurchasePriceSheet", {
-    GROUP_CD   : groupcd,
-    STORE_CD   : storecd,
-    DATE       : date,
-    ALL_YN     : allYn,
-    UNIT_TYPE  : unitType,
-    ORDER_TYPE : orderType,
-    DESC       : desc,
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    DATE: date,
+    ALL_YN: allYn,
+    UNIT_TYPE: unitType,
+    ORDER_TYPE: orderType,
+    DESC: desc,
   });
 };

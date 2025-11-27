@@ -208,7 +208,7 @@ const searchButton = async () => {
       cendDate,
       ccond2,
       selectedGroup.value,
-      selectedStoreAttrs.value,
+      0,
       selectedStores2.value
     );
     ////console.log(res);

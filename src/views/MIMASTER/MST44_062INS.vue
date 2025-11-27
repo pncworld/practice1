@@ -560,7 +560,7 @@ let isSwalOpen = false;
 const handleInput2 = (e) => {
   const isValid = calculateByte2(e);
   changeColid.value = 'strReceiptD';
-  console.log(e)
+
   if (!isValid) return;
 
   const name = e.target.name;
@@ -1169,6 +1169,7 @@ const selecedReceiptSection = (value) => {
   changeColid.value = 'strReceiptD'
   selecedSection.value = value
 
+ 
   if (value == 1) {
     receiptDByte.value = getByteLength2(receiptD1.value)
 
@@ -1272,6 +1273,10 @@ watch(receiptD5, () => {
 })
 
 function getByteLength2(str) {
+
+  if (str == ''){
+    str = ' '
+  }
   let byteLen = 0;
   for (let i = 0; i < str.length; i++) {
     byteLen += str.charCodeAt(i) > 127 ? 2 : 1;
@@ -1283,10 +1288,10 @@ function splitStringByByteLength(str, maxByteLength) {
   let chunks = [];
   let currentByteLength = 0;
   let currentChunk = "";
-  console.log(str)
+
   for (const char of str) {
     const byte = getByteLength2(char)
-    console.log(byte)
+
     if (currentByteLength + byte > maxByteLength) {
       chunks.push(currentChunk); // 현재 청크를 추가
       currentChunk = ""; // 청크 초기화
@@ -1317,15 +1322,15 @@ const selectedIndex2 = (e) => {
  */
 
 const clickedRowData2 = (newValue) => {
-
+  //console.log(newValue)
   receiptU.value = newValue[2]
-   const result = splitStringByByteLength(newValue[3], 42)
+  const result = splitStringByByteLength(newValue[3], 42)
 
-  receiptD1.value = result[0]
-  receiptD2.value = result[1]
-  receiptD3.value = result[2]
-  receiptD4.value = result[3]
-  receiptD5.value = result[4]
+  receiptD1.value = result[0] == undefined ? '' : result[0]
+  receiptD2.value = result[1]  == undefined ? '' : result[1]
+  receiptD3.value = result[2]  == undefined ? '' : result[2]
+  receiptD4.value = result[3]  == undefined ? '' : result[3]
+  receiptD5.value = result[4]  == undefined ? '' : result[4]
 
 }
 

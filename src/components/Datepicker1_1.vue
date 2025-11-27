@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 
 const formatDate = (date) => date.toISOString().split("T")[0];
 const selectedDate = ref(formatDate(new Date()));

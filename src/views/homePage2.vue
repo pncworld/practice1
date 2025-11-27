@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center items-center mt-10">
+  <div class="flex justify-center items-center mt-10 w-full overflow-auto">
     <div
       class="grid grid-rows-3 grid-cols-1 w-[85vw] h-[85vh] items-center shadow-lg border-2">
       <div class="flex w-full h-[20vh] -mt-5 space-x-10 justify-start ml-10">

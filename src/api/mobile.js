@@ -211,3 +211,44 @@ export const getNoticeDetail = (groupcd, storecd, userno, noticeid) => {
     NOITICE_ID: noticeid,
   });
 };
+export const getMobileSalesByCorner = (
+  groupcd,
+  storecd,
+  sdate,
+  edate,
+  userno
+) => {
+  return api2.post("/MOBILE/TOTAL_SALES_CORNER.asmx/getMobileSalesByCorner", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    SDATE: sdate,
+    EDATE: edate,
+    USERNO: userno,
+  });
+};
+export const getSalesByCornerMenu3 = (
+  groupcd,
+  storecd,
+  sdate,
+  edate,
+  userno
+) => {
+  return api2.post(
+    "/MOBILE/TOTAL_SALES_CORNERMENU.asmx/getSalesByCornerMenu3",
+    {
+      GROUP_CD: groupcd,
+      STORE_CD: storecd,
+      SDATE: sdate,
+      EDATE: edate,
+      USERNO: userno,
+    }
+  );
+};
+export const getVanFeeList = (groupcd, storecd, sdate, edate) => {
+  return api2.post("/MOBILE/VAN_FEE_LIST.asmx/getVanFeeList", {
+    GROUP_CD: groupcd,
+    STORE_CD: storecd,
+    SDATE: sdate,
+    EDATE: edate,
+  });
+};

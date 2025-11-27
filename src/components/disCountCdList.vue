@@ -1,4 +1,3 @@
-div
 <template>
   <div class="flex justify-start items-center space-x-5">
     <div class="text-base font-semibold">할인코드</div>
