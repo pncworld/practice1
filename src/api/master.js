@@ -1840,6 +1840,8 @@ export const saveMenuCode = (
   dtmend,
   lngkds,
   strnamek,
+  discountyn,
+  bigo,
   AutoMenuCode,
   deleteCd
 ) => {
@@ -1889,6 +1891,8 @@ export const saveMenuCode = (
     DTMEND: dtmend,
     LNGKDS: lngkds,
     STRNAMEK: strnamek,
+    DISCOUNTYN: discountyn,
+    STRBIGO: bigo,
   });
 };
 
@@ -3809,5 +3813,69 @@ export const pncInterFaceAPI = (path, paraNm, paraCd) => {
     PATH: path,
     PARANM: paraNm,
     PARACD: paraCd,
+  });
+};
+
+export const getMenuDiscCount = (groupCd) => {
+  return api2.post("/MIMASTER/MST01_033INS.asmx/getMenuDiscCount", {
+    GROUP_CD: groupCd,
+  });
+};
+
+export const getMultiLingual2 = (groupCd, storeCd, menuCd) => {
+  return api2.post("/MIMASTER/MST44_066INS.asmx/getMultiLingual2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    MENU_CD: menuCd,
+  });
+};
+export const saveMultiLang = (
+  groupCd,
+  storeCd,
+  lngtype,
+  managecode,
+  langid,
+  managenm,
+  dgroupCd,
+  dstoreCd,
+  dlngtype,
+  dmanagecode,
+  dlangid
+) => {
+  return api2.post("/MIMASTER/MST44_066INS.asmx/saveMultiLang", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LNGTYPE: lngtype,
+    MANAGECODE: managecode,
+    LANGID: langid,
+    MAANGENM: managenm,
+    DGROUP_CD: dgroupCd,
+    DSTORE_CD: dstoreCd,
+    DLNGTYPE: dlngtype,
+    DMANAGECODE: dmanagecode,
+    DLANGID: dlangid,
+  });
+};
+
+export const getMenuList5 = (groupCd, storeCd) => {
+  return api2.post("/MIMASTER/MST44_066INS.asmx/getMenuList5", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+export const getScreenList5 = (groupCd, storeCd, areaCd, posNo) => {
+  return api2.post("/MIMASTER/MST44_066INS.asmx/getScreenList5", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+    POS_NO: posNo,
+  });
+};
+
+export const getMultiLingual3 = (groupCd, storeCd, screenNo) => {
+  return api2.post("/MIMASTER/MST44_066INS.asmx/getMultiLingual3", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SCREEN_NO: screenNo,
   });
 };

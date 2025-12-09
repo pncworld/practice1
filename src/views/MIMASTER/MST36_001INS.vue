@@ -226,7 +226,7 @@
           class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border disabled:bg-gray-50 disabled:text-gray-200"
           @click="selectMenu(2)"
           :class="{ 'text-blue-400 bg-blue-100': selectedMenu == 2 }"
-          :disabled="selectedPayDistinct">
+          :disabled="selectedPayDistinct || disableWithMenuDisc">
           할인대상메뉴
         </button>
         <button
@@ -833,6 +833,7 @@
 <script setup>
 import {
   CopyDiscountMenuList,
+  getMenuDiscCount,
   getMenuListIncludeCommon,
   getPayCodeEnrollInfo,
   getPayCodeListbyCode,
@@ -993,6 +994,7 @@ const realgridname2 = (e) => {
  * 	화면 Load시 실행 스크립트
  */
 
+const disableWithMenuDisc = ref(false);
 const hideAttr = ref(false);
 const hidesub = ref(false);
 onMounted(async () => {
@@ -1007,6 +1009,14 @@ onMounted(async () => {
   } else {
     hidesub.value = true;
     hideAttr.value = true;
+  }
+
+  const res = await getMenuDiscCount(store.state.userData.lngStoreGroup);
+
+  if (res.data.List[0].count == "0") {
+    disableWithMenuDisc.value = true;
+  } else {
+    disableWithMenuDisc.value = false;
   }
 });
 // onActivated(() => {

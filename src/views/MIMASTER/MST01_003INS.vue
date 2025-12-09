@@ -13,6 +13,7 @@
         조회
       </button>
       <button @click="saveButton" class="button save w-auto">저장</button>
+      <button @click="excelButton" class="button excel w-auto">엑셀</button>
     </div>
   </div>
   <br />
@@ -205,7 +206,10 @@
           :searchValue="searchValue"
           :searchWord3="searchWord"
           :suffixColumnwon="'lngPrice'"
-          :initFocus="initFocus"></Realgrid>
+          :initFocus="initFocus"
+          :exporttoExcel="exporttoExcel"
+          :exportExcelShowColumns="['strBarCode', 'strBigo']"
+          :documentTitle="'MST01_003INS'"></Realgrid>
         <!-- :searchWord="searchWord" :searchColId2="'blnInactive,payDistinct'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" -->
       </div>
     </div>
@@ -223,7 +227,7 @@
           class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border disabled:bg-gray-50 disabled:text-gray-200"
           @click="selectMenu(2)"
           :class="{ 'text-blue-400 bg-blue-100': selectedMenu == 2 }"
-          :disabled="discountDisabled">
+          :disabled="discountDisabled || disableWithMenuDisc">
           할인선택
         </button>
         <button
@@ -497,14 +501,16 @@
             class="grid grid-cols-[1fr,3fr,1fr,3fr] grid-rows-13 h-[120%] mt-3 w-[90%]">
             <div
               class="justify-center items-center bg-gray-100 border flex rounded-tl-lg">
-              할인여부
+              {{ disableWithMenuDisc ? "할인허용" : "할인여부" }}
             </div>
-            <div class="space-x-5 flex items-center border justify-left pl-2">
+            <div
+              class="space-x-5 flex items-center border justify-left pl-2"
+              v-if="!disableWithMenuDisc">
               <label for="discount1"
                 ><input
                   type="radio"
                   id="discount1"
-                  name="lngDiscount"
+                  name="discountYN"
                   v-model="gridvalue14"
                   value="1"
                   @input="changeInfo"
@@ -514,13 +520,26 @@
                 ><input
                   type="radio"
                   id="discount2"
-                  name="lngDiscount"
+                  name="discountYN"
                   v-model="gridvalue14"
                   value="0"
                   @input="changeInfo"
                   :disabled="afterClick"
                   class="disabled:bg-gray-200" />아니오</label
               >
+            </div>
+
+            <div
+              class="space-x-5 flex items-center border justify-left"
+              v-if="disableWithMenuDisc">
+              <input
+                type="text"
+                id="discount1"
+                name="lngDiscount"
+                v-model="gridvalue40"
+                @input="changeInfo"
+                :disabled="afterClick"
+                class="disabled:bg-gray-200 w-full" />
             </div>
             <div class="justify-center items-center bg-gray-100 border flex">
               메뉴당객수
@@ -984,6 +1003,20 @@
                   :disabled="afterClick" />휴일</label
               >
             </div>
+
+            <div
+              class="flex justify-center items-center bg-gray-100 border-l border-b">
+              비고
+            </div>
+            <div class="flex justify-start items-center border-b col-span-3">
+              <input
+                type="text"
+                class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200"
+                v-model="gridvalue41"
+                name="strBigo"
+                @change="changeInfo"
+                :disabled="afterClick" />
+            </div>
           </div>
         </div>
         <div v-show="selectedMenu == 2" class="h-[80%] w-[90%]">
@@ -1094,6 +1127,7 @@ import {
   copyMenuListByCode,
   getAmountListByMenuCode,
   getMenuCodeEnroll,
+  getMenuDiscCount,
   getMenuList,
   saveMenuCode,
   uploadFile,
@@ -1172,6 +1206,14 @@ onMounted(async () => {
   } else {
     hidesub.value = true;
     hideAttr.value = true;
+  }
+
+  const res = await getMenuDiscCount(store.state.userData.lngStoreGroup);
+
+  if (res.data.List[0].count == "0") {
+    disableWithMenuDisc.value = true;
+  } else {
+    disableWithMenuDisc.value = false;
   }
 });
 const searchWord2 = ref("");
@@ -1293,6 +1335,7 @@ const initCheckAct = ref(false);
 const uncheckValue = ref();
 const initSelect = ref(false);
 const discountDisabled = ref(true);
+const disableWithMenuDisc = ref(true);
 const labelsData = ref([
   ["할인", "지불", "할증"],
   ["사용", "미사용"],
@@ -1341,6 +1384,8 @@ const gridvalue36 = ref(false);
 const gridvalue37 = ref(false);
 const gridvalue38 = ref("");
 const gridvalue39 = ref("");
+const gridvalue40 = ref("");
+const gridvalue41 = ref("");
 const gridvalue100 = ref("");
 const clickedrowdata = ref([]);
 const clickrowData4 = ref([]);
@@ -1441,7 +1486,7 @@ const clickedRowData = async (newvalue) => {
   gridvalue11.value = newvalue[10];
   gridvalue12.value = newvalue[11];
   gridvalue13.value = newvalue[2];
-  gridvalue14.value = newvalue[12];
+  gridvalue14.value = newvalue[39];
   gridvalue15.value = newvalue[13];
   gridvalue16.value = newvalue[14];
   gridvalue17.value = newvalue[15];
@@ -1462,6 +1507,8 @@ const clickedRowData = async (newvalue) => {
 
   gridvalue32.value = newvalue[35];
   gridvalue33.value = newvalue[36];
+  gridvalue40.value = newvalue[12];
+  gridvalue41.value = newvalue[40];
 
   gridvalue34.value =
     newvalue[34] != "" ? (Number(newvalue[34]) & 1) !== 0 : false;
@@ -1489,7 +1536,7 @@ const clickedRowData = async (newvalue) => {
     showKPG.value = true;
   }
   discountDisabled.value =
-    (newvalue[9] == 0 || newvalue[12] == 0) &&
+    (newvalue[9] == 0 || newvalue[39] == 0) &&
     afterSearch.value == true &&
     afterClick.value == false;
   fileName.value = newvalue[33];
@@ -1736,6 +1783,13 @@ const changeInfo = (e) => {
     value2 = val;
 
     gridvalue10.value = value2.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  if (tagName.includes("lngDiscount")) {
+    let val = value2.replace(/[^0-9]/g, "");
+    value2 = val;
+
+    gridvalue14.value = val;
   }
 
   if (tagName.includes("lngType")) {
@@ -2081,6 +2135,8 @@ const saveButton = () => {
           filterAndMap("dtmEnd"),
           filterAndMap("lngKDS"),
           filterAndMap("strNameK"),
+          filterAndMap("discountYN"),
+          filterAndMap("strBigo"),
           isNewAutoMenuCode.value == true ? 1 : 0,
           deleteCd.join(",")
         );
@@ -2358,6 +2414,8 @@ const initAll = () => {
   gridvalue38.value = "";
   gridvalue39.value = "";
   gridvalue100.value = "";
+  gridvalue40.value = "";
+  gridvalue41.value = "";
   //initFocus.value = !initFocus.value
   fileName.value = "";
   fileSize.value = "";
@@ -2579,6 +2637,13 @@ const movePage = () => {
   //   lngProgramID: 73762,
   //   strTitle: "메뉴 코드 등록.",
   // };
+};
+
+const exporttoExcel = ref(false);
+const documentTitle = ref("");
+const excelButton = () => {
+  documentTitle.value = "메뉴코드";
+  exporttoExcel.value = !exporttoExcel.value;
 };
 </script>
 

@@ -38,7 +38,7 @@ api2.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status == 401) {
-      alert("로그인 시간이 1분 이상 지났습니다. 재로그인 해주세요.");
+      //alert("로그인 시간이 1분 이상 지났습니다. 재로그인 해주세요.");
       store.commit("clearSession");
       router.push("/");
       return new Promise(() => {});
@@ -630,8 +630,8 @@ export const getEmpScheduleList = (groupCd, storeCd, sdate, edate) => {
 
 export const getCommuteDeadline = async (groupCd, yearNo) => {
   return api2.post("/MIHR/HR06_002INS.asmx/getCommuteDeadline", {
-    GROUP_CD : groupCd,
-    YEAR_NO  : yearNo,
+    GROUP_CD: groupCd,
+    YEAR_NO: yearNo,
   });
 };
 
@@ -639,24 +639,31 @@ export const setCommuteDeadline = async (
   groupCd,
   dtmMonths,
   strNotes,
-  lngFlags,
+  lngFlags
 ) => {
   return api2.post("/MIHR/HR06_002INS.asmx/setCommuteDeadline", {
-    GROUP_CD  : groupCd,
-    DTM_MONTH : dtmMonths,
-    STR_NOTE  : strNotes,
-    LNG_FLAG  : lngFlags,
+    GROUP_CD: groupCd,
+    DTM_MONTH: dtmMonths,
+    STR_NOTE: strNotes,
+    LNG_FLAG: lngFlags,
   });
 };
 
-export const getMonthlyMagamStatus = async (groupCd, attrCd, storeCd, yearNo, monthNo, closeStatus) => {
+export const getMonthlyMagamStatus = async (
+  groupCd,
+  attrCd,
+  storeCd,
+  yearNo,
+  monthNo,
+  closeStatus
+) => {
   return api2.post("/MIHR/HR06_002INS.asmx/getMonthlyMagamStatus", {
-    GROUP_CD      : groupCd,
-    ATTR_CD       : attrCd,
-    STORE_CD      : storeCd,
-    DTM_YEAR      : yearNo,
-    DTM_MONTH     : monthNo,
-    SEARCH_TYPE   : closeStatus,
+    GROUP_CD: groupCd,
+    ATTR_CD: attrCd,
+    STORE_CD: storeCd,
+    DTM_YEAR: yearNo,
+    DTM_MONTH: monthNo,
+    SEARCH_TYPE: closeStatus,
   });
 };
 export const getWorkTypeDetail = (groupCd, storeCd, workCode) => {

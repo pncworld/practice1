@@ -10,12 +10,10 @@
 
     <header
       v-if="showMenu"
-      :style="{ backgroundColor: backColor }"
-      class="border rounded-lg text-gray-600 p-2 w-full h-10 md:h-14 box-content">
+      class="bg-gray-100 border rounded-3xl text-gray-600 p-2 w-full h-10 md:h-14 box-content">
       <!-- 상단 영역 -->
       <div
-        :style="{ backgroundColor: backColor }"
-        class="flex items-center justify-between p-4 rounded-lg fixed top-0 h-12 w-full -mt-3 pb-0">
+        class="flex items-center justify-between bg-gray-100 p-4 rounded-lg fixed top-0 h-12 w-full -mt-3 pb-0">
         <!-- 로고 영역 -->
         <div class="flex-shrink-0 items-center mt-8 hidden md:block">
           <img
@@ -29,7 +27,7 @@
           class="flex justify-start mx-auto pb-1 scrollbar-hide max-w-[75%] w-full">
           <!-- 부모 div -->
           <div
-            class="flex overflow-x-auto space-x-2 md:space-x-1 w-full mt-4 md:mt-2 ml-4">
+            class="flex overflow-x-hidden space-x-2 md:space-x-1 w-full mt-4 md:mt-2 ml-4">
             <!-- 내부 div -->
             <button
               v-for="(item, i) in mainCategoryList"
@@ -168,7 +166,8 @@
       </aside>
 
       <!-- Main Content -->
-      <main class="w-full h-full bg-white p-1 overflow-y-auto overflow-x-auto">
+      <main
+        class="w-full h-full bg-white p-1 overflow-y-auto overflow-x-hidden">
         <router-view v-slot="{ Component, route }">
           <keep-alive>
             <component
@@ -214,6 +213,9 @@ const moveleft = () => {
  * 	화면 Load시 실행 스크립트
  */
 
+onMounted(() => {
+  // router.push("/homepage");
+});
 // 화면 크기 감지 및 업데이트
 
 const closeOtherTab = () => {
@@ -230,17 +232,11 @@ const mobileShowMenu = ref(false);
 const showMenu = ref(route.path != "/"); // Initialize based on current route
 const componentKey = ref(null);
 // Watch for route changes
-const backColor = ref("#f3f4f6");
-onMounted(() => {
-  backColor.value = store.state.userData.strBackColor;
-  console.log(backColor.value);
-  // router.push("/homepage");
-});
+
 watch(
   () => route.path,
   (newPath) => {
     showMenu.value = newPath != "/"; // Update based on new route
-    backColor.value = store.state.userData.strBackColor;
   }
 );
 store.dispatch("convertLoading", false);

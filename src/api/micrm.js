@@ -2111,3 +2111,26 @@ export const saveMemberShipCoupon = (
     MENU3: menu3,
   });
 };
+
+export const getGftCard = (groupCd, cardNo, gftcard) => {
+  return api2.post("/MICRM/CRM60_010INS.asmx/getGftCard", {
+    GROUP_CD: groupCd,
+    CARD_NO: cardNo,
+    GFT_CARD: gftcard,
+  });
+};
+export const checkGftCard = (groupCd, cardNo, gftcard) => {
+  return api2.post("/MICRM/CRM60_010INS.asmx/checkGftCard", {
+    GROUP_CD: groupCd,
+    CARD_NO: cardNo,
+    GFT_CARD: gftcard,
+  });
+};
+export const setWelFareCardNo = (groupCd, ocardNo, cardNo, gftcard) => {
+  return api2.post("/MICRM/CRM60_010INS.asmx/setWelFareCardNo", {
+    GROUP_CD: groupCd,
+    CARD_NO: ocardNo,
+    CARD_NO2: cardNo,
+    GFT_CARD: gftcard,
+  });
+};

@@ -152,12 +152,7 @@
 </template>
 
 <script setup>
-import {
-  getacc,
-  getCustomerControlDisp,
-  saveAccInfo,
-  saveCustDispInfo,
-} from "@/api/master";
+import { getCustomerControlDisp, saveCustDispInfo } from "@/api/master";
 /**
  *  페이지명 매장 그룹 호출 컴포넌트
  *  */
@@ -191,9 +186,9 @@ import { onMounted, ref } from "vue";
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
+import { getCommonList } from "@/api/common";
 import PickStore from "@/components/pickStore.vue";
 import { useStore } from "vuex";
-import { getCommonList } from "@/api/common";
 
 /**
  * 	화면 Load시 실행 스크립트

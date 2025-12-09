@@ -283,11 +283,22 @@ const receiveButton = async (e) => {
         );
         const date = new Date();
 
-        const date2 = formatLocalDate(date);
+        const date2 = formatLocalDate(date).replaceAll("-", "");
         let sum = checkedrowdata.value.length * checkedrowdata2.value.length;
         let cur = 0;
         let res;
+        // currentState.value =
+        //   checkedrowdata.value[0].strName +
+        //   "-" +
+        //   checkedrowdata2.value[0].strDName +
+        //   `수신 중 ( ${cur}/${sum} )`;
 
+        // console.log(
+        //   checkedrowdata.value[0].lngStoreGroup,
+        //   checkedrowdata2.value[0].strDCode
+        // );
+        console.log(checkedrowdata.value);
+        console.log(checkedrowdata2.value);
         for (let i = 0; i < checkedrowdata.value.length; i++) {
           for (let j = 0; j < checkedrowdata2.value.length; j++) {
             res = await pncInterFaceAPI(
@@ -299,7 +310,7 @@ const receiveButton = async (e) => {
                 checkedrowdata2.value[j].strDCode
               }`
             );
-
+            console.log(res);
             if (res.data.List.includes("SUCCESS")) {
               cur += 1;
               currentState.value =
@@ -328,6 +339,7 @@ const receiveButton = async (e) => {
           }
         }
       } catch (error) {
+        console.log(error);
       } finally {
         store.state.loading = false;
         searchButton();

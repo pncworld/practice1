@@ -449,7 +449,7 @@
         <div
           class="text-base font-semibold border-l border-t border-black flex justify-start pl-3 items-center">
           <input
-            type="number"
+            type="text"
             class="border border-black h-[80%] w-[80%]"
             v-model="pcond2"
             disabled />
@@ -461,7 +461,7 @@
         <div
           class="text-base font-semibold border-l border-t border-black flex justify-start pl-3 items-center">
           <input
-            type="number"
+            type="text"
             class="border border-black h-[80%] w-[80%]"
             v-model="pcond3"
             disabled />
@@ -473,7 +473,7 @@
         <div
           class="text-base font-semibold border-l border-t border-black flex justify-start pl-3 items-center">
           <input
-            type="number"
+            type="text"
             class="border border-black h-[80%] w-[80%]"
             v-model="pcond4" />
         </div>
@@ -1304,6 +1304,7 @@ const cardChange = (e) => {
   }
   visible.value = !visible.value;
 
+  console.log(gridvalue1.value, gridvalue3.value, gridvalue5.value);
   pcond.value = gridvalue5.value;
   pcond2.value = gridvalue3.value;
   pcond3.value = gridvalue1.value;

@@ -55,6 +55,8 @@
         :mergeColumns2="true"
         :mergeColumnGroupName2="mergeColumnGroupName2"
         :mergeColumnGroupSubList2="mergeColumnGroupSubList2"
+        :setFooterCustomColumnId="['strDate']"
+        :setFooterCustomText="['합계']"
         :setFooter="true"
         :exporttoExcel="exportExcel">
       </Realgrid>
@@ -64,12 +66,7 @@
 </template>
 
 <script setup>
-import {
-  getBelongCustList,
-  getReservedChangeHistory,
-  getReservedSearch,
-  getReservedSearchByDays,
-} from "@/api/micrm";
+import { getReservedSearchByDays } from "@/api/micrm";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -158,7 +155,7 @@ const mergeColumnGroupSubList2 = ref([
     "lngTime308",
     "lngTime309",
   ],
-  ["lngTimeD2_1930", "lngTime401", "lngTime402"],
+  ["lngTimeD2_1930", "lngTime401", "lngTime402", "lngTime403"],
 ]);
 const cond = ref("");
 const cond2 = ref("");

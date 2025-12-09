@@ -216,6 +216,7 @@ const dupliStore = async () => {
               areaCd2.join(","),
               posNo2.join(",")
             );
+            console.log(res3);
           } catch (error) {
             ////console.log(error);
           } finally {

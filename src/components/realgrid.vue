@@ -1120,6 +1120,11 @@ const props = defineProps({
     type: Array,
     default: [],
   },
+  exportExcelShowColumns: {
+    // 엑셀 내보내기시 감춘컬럼 보여서 export 하기
+    type: Array,
+    default: [],
+  },
   checkedRowData2Col: {
     // 체크시 다른 emit으로 체크 데이터 받기 위한 설정
     type: String,
@@ -1906,7 +1911,7 @@ const funcshowGrid = async () => {
         ? "0123456789"
         : item.strColID == props.inputOnlyNumberColumn2
         ? "0123456789."
-        : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_ㄱ-힣!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ",
+        : "",
     },
     visible: item.intHdWidth !== 0,
     sortable: true,
@@ -4043,6 +4048,10 @@ watch(
     const userID = store.state.userData.loginID;
     const today = formatDateTime(new Date());
 
+    for (let col of props.exportExcelShowColumns) {
+      gridView.columnByName(col).width = 100;
+    }
+
     gridView.exportGrid({
       type: "excel",
       target: "local",
@@ -4088,8 +4097,15 @@ watch(
       compatibility: true,
       lookupDisplay: true,
       applyDynamicStyles: true,
+      showColumns: props.exportExcelShowColumns,
       hiddenColumns: props.exportExcelHiddenColumns,
       allColumns: props.exportExcelHiddenColumns.length != 0 ? true : false,
+      done: () => {
+        // 다시 원복
+        for (let col of props.exportExcelShowColumns) {
+          gridView.columnByName(col).width = 0;
+        }
+      },
     });
   }
 );

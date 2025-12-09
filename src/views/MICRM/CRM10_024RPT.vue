@@ -147,15 +147,8 @@
 </template>
 
 <script setup>
-import { getMostColumnMenuList } from "@/api/master";
-import {
-  getBelongCustList,
-  getReservedChangeHistory,
-  getReservedDetail,
-  getReservedDetail2,
-} from "@/api/micrm";
+import { getReservedDetail, getReservedDetail2 } from "@/api/micrm";
 import Datepicker1 from "@/components/Datepicker1.vue";
-import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -269,7 +262,7 @@ const mergeColumnGroupSubList3 = ref([
     "lngTime307",
     "lngTime308",
   ],
-  ["lngTimeD2_1930", "lngTime401", "lngTime402"],
+  ["lngTimeD2_1930", "lngTime401", "lngTime402", "lngTime403"],
 ]);
 
 const changeTime = ref(false);

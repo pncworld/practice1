@@ -37,7 +37,7 @@
           @excelStore="excelStore"
           class=""
           @lngStoreAttrs="lngStoreAttrs"
-          :placeholderName="'선택'"></pickStoreRenew>
+          :placeholderName="'전체'"></pickStoreRenew>
       </div>
       <div class="flex justify-start items-center space-x-5 ml-12 mt-2">
         <div class="text-base font-semibold">조회조건</div>
@@ -298,15 +298,15 @@ const handleParentClick = (e) => {
  */
 
 const searchButton = async () => {
-  if (selectedStores.value == 0) {
-    Swal.fire({
-      title: "경고",
-      text: "매장을 선택하세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
+  // if (selectedStores.value == 0) {
+  //   Swal.fire({
+  //     title: "경고",
+  //     text: "매장을 선택하세요.",
+  //     icon: "warning",
+  //     confirmButtonText: "확인",
+  //   });
+  //   return;
+  // }
   try {
     store.state.loading = true;
     initGrid();

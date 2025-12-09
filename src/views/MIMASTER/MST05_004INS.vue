@@ -236,8 +236,8 @@
               @change="setSubCd"
               v-model="forsearchMain">
               <option value="-1">전체</option>
-              <option :value="i.GroupCd" v-for="i in MenuGroup">
-                [{{ i.GroupCd }}]{{ i.majorGroupNm }}
+              <option :value="i.majorGroupCd" v-for="i in MenuGroup">
+                [{{ i.majorGroupCd }}]{{ i.majorGroupNm }}
               </option>
             </select>
             <select
@@ -247,8 +247,8 @@
               v-model="forsearchSub"
               @change="setSubCd">
               <option value="-1">전체</option>
-              <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup">
-                [{{ i.GroupCd }}]{{ i.subGroupNm }}
+              <option :value="i.subGroupCd" v-for="i in filteredSubMenuGroup">
+                [{{ i.subGroupCd }}]{{ i.subGroupNm }}
               </option>
             </select>
           </div>
@@ -619,10 +619,8 @@
 <script setup>
 import {
   getMenuKeyList2,
-  getMenuList,
   getMenuList3,
   getScreenList2,
-  getTLUList,
   getTLUList2,
   saveAllMenuKey,
   saveMenuKey2,
@@ -1023,7 +1021,7 @@ const saveButton = () => {
           keycolor.join("\u200B"),
           keyno.join("\u200B")
         );
-        //comsole.log(res);
+
         if (res.data.RESULT_CD == "00") {
           Swal.fire({
             title: "저장 되었습니다.",
@@ -1062,8 +1060,8 @@ const handleStoreCd = async (newValue) => {
   nowStoreCd.value = newValue;
   const res2 = await getMenuList3(groupCd.value, nowStoreCd.value);
 
-  console.log(res2);
   MenuList.value = res2.data.menuList;
+  // console.log(res2);
   MenuGroup.value = res2.data.menuGroup;
   SubMenuGroup.value = res2.data.submenuGroup;
 
@@ -1153,7 +1151,7 @@ const searchButton = async () => {
       posNo.value
     );
 
-    //comsole.log(res3);
+    //console.log(res3);
     const res4 = await getMenuKeyList2(
       groupCd.value,
       nowStoreCd.value,
@@ -1161,7 +1159,7 @@ const searchButton = async () => {
       posNo.value,
       nowscreenNo.value
     );
-
+    //console.log(res4);
     MenuKeyList.value = res4.data.MenukeyList;
 
     screenNoList.value = res3.data.ScreenList;
@@ -1175,8 +1173,7 @@ const searchButton = async () => {
         item.intKeySeq >= (nowscreenNo.value - 1) * 45 &&
         item.intKeySeq <= nowscreenNo.value * 45
     );
-    ////console.log(nowscreenNo.value);
-    ////console.log(items.value);
+
     items.value = [];
     const startIndex = (nowscreenNo.value - 1) * 45;
     const endIndex = nowscreenNo.value * 45;
@@ -1196,7 +1193,6 @@ const searchButton = async () => {
         });
       }
     }
-    ////console.log(items.value);
 
     afterSearch.value = true;
   } catch (error) {
@@ -1217,8 +1213,9 @@ const setSubCd = (e) => {
   const name = e.target.name;
   const value = e.target.value;
   //comsole.log(SubMenuGroup.value);
-  //comsole.log(MenuGroup.value);
+  //console.log(MenuGroup.value, value, forsearchMain.value);
   if (name == "majorGroupCd") {
+    forsearchMain.value = value;
     filteredSubMenuGroup.value = SubMenuGroup.value.filter(
       (item) => item.sublngMajor == value
     );
@@ -1247,14 +1244,14 @@ const showMenuKey = (value) => {
       item.intKeySeq >= (nowscreenNo.value - 1) * 45 + 1 &&
       item.intKeySeq <= nowscreenNo.value * 45
   );
-  //console.log(filteredList);
+
   const startIndex = (nowscreenNo.value - 1) * 45 + 1;
   const endIndex = nowscreenNo.value * 45;
   // 중간에 비어 있는 번호 확인 및 채우기
   for (let i = startIndex; i <= endIndex; i++) {
     // 해당 번호가 없는 경우 기본값 추가
     const existingItem = filteredList.find((item) => item.intKeySeq === i);
-    //console.log(existingItem);
+
     const targetIndex = items.value.findIndex(
       (item) => item.intKeySeq === i - startIndex + 1
     );

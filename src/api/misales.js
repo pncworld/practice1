@@ -38,7 +38,7 @@ api2.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status == 401) {
-      alert("로그인 시간이 1분 이상 지났습니다. 재로그인 해주세요.");
+      //alert("로그인 시간이 1분 이상 지났습니다. 재로그인 해주세요.");
       store.commit("clearSession");
       router.push("/");
       return new Promise(() => {});
@@ -1387,5 +1387,125 @@ export const getSalesBySeatsAndMenus = (
     COND: cond,
     COND2: cond2,
     COND3: cond3,
+  });
+};
+export const getGftCardTypeList = (groupCd) => {
+  return api2.post("/MISALES/SLS12_002RPT.asmx/getGftCardTypeList", {
+    GROUP_CD: groupCd,
+  });
+};
+export const getGftCardTranDetailList = (
+  groupCd,
+  storeCds,
+  sdate,
+  edate,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  cond7,
+  cond8
+) => {
+  return api2.post("/MISALES/SLS12_002RPT.asmx/getGftCardTranDetailList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCds,
+    SDATE: sdate,
+    EDATE: edate,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+    COND5: cond5,
+    COND6: cond6,
+    COND7: cond7,
+    COND8: cond8,
+  });
+};
+
+export const getCouponTypeList = (groupCd, storeCd) => {
+  return api2.post("/MISALES/SLS14_004RPT.asmx/getCouponTypeList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+export const getMemberCouponDetail = (
+  groupCd,
+  storeCd,
+  sdate,
+  edate,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5
+) => {
+  return api2.post("/MISALES/SLS14_004RPT.asmx/getMemberCouponDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+    COND4: cond4,
+    COND5: cond5,
+  });
+};
+
+export const getPayCoDetailList = (
+  groupCd,
+  storeCd,
+  sdate,
+  edate,
+  cond,
+  cond2
+) => {
+  return api2.post("/MISALES/SLS14_043RPT.asmx/getPayCoDetailList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    COND: cond,
+    COND2: cond2,
+  });
+};
+
+export const getPayCoAggList = (
+  groupCd,
+  storeCd,
+  sdate,
+  edate,
+  cond,
+  cond2,
+  cond3
+) => {
+  return api2.post("/MISALES/SLS14_044RPT.asmx/getPayCoAggList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    COND: cond,
+    COND2: cond2,
+    COND3: cond3,
+  });
+};
+
+export const getCustSaleList = (groupCd, storeCd, sdate, edate) => {
+  return api2.post("/MISALES/SLS11_023RPT.asmx/getCustSaleList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+  });
+};
+export const getCustCardDisAggList = (groupCd, storeCd, sdate, edate, cond) => {
+  return api2.post("/MICRM/CRM03_019RPT.asmx/getCustCardDisAggList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    COND: cond,
   });
 };

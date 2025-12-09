@@ -614,7 +614,11 @@ onMounted(async () => {
       emit("storeNm", "전체");
     }
   } else {
-    emit("storeNm", storenm);
+    if (props.defaultStoreNm == "") {
+      emit("storeNm", storenm);
+    } else {
+      emit("storeNm", props.defaultStoreNm);
+    }
   }
   emit(
     "update:storeCd",
@@ -876,6 +880,13 @@ watch(
       )[0].strName;
       emit("storeNm", selectedNm);
     }
+  }
+);
+
+watch(
+  () => props.showPosNo,
+  () => {
+    showPosNo.value = props.showPosNo;
   }
 );
 </script>
