@@ -44,18 +44,36 @@
             <label for="password" class="block text-gray-700 font-medium mb-2"
               >비밀번호</label
             >
-            <input
-              type="password"
-              id="password"
-              v-model="password"
-              placeholder="비밀번호를 입력하세요"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <div class="relative w-full">
+              <input
+                :type="passwordVisible ? 'text' : 'password'"
+                id="password"
+                v-model="password"
+                placeholder="비밀번호를 입력하세요"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <button
+                type="button"
+                class="absolute inset-y-0 right-3 flex items-center text-sm text-gray-600"
+                @click="showPassword">
+                {{ passwordVisible ? "숨기기" : "보기" }}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label for="saveid"
+              ><input
+                type="checkbox"
+                id="saveid"
+                @change="setSaveId"
+                v-model="checkid" />아이디 저장</label
+            >
           </div>
 
           <button
             type="submit"
-            class="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            class="w-full py-2 mt-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
             로그인
           </button>
         </form>
@@ -190,6 +208,14 @@ const login2 = async () => {
         "setFavoriteList",
         res4.data.List.map((item) => Number(item.lngProgramID))
       );
+
+      //console.log(checkid.value);
+      if (checkid.value == true) {
+        localStorage.setItem("saveId", username.value);
+      } else {
+        localStorage.setItem("saveId", "");
+      }
+
       await store.dispatch("convertLoading", false);
       await router.push("/homepage");
 
@@ -284,13 +310,32 @@ onMounted(async () => {
 
   store.state.inActiveBackGround = false;
   //comsole.log(localStorage.getItem("saveID"));
-  if (localStorage.getItem("saveID") === "true") {
+  if (localStorage.getItem("saveId") == "") {
     //comsole.log(localStorage.getItem("username"));
-    saveID.value = true;
-    username.value = localStorage.getItem("username");
+    username.value = "";
+    checkid.value = false;
+  } else {
+    username.value = localStorage.getItem("saveId");
+    //console.log(username.value);
+    checkid.value = true;
   }
   store.state.loading2 = false;
 });
+
+const passwordVisible = ref(false);
+
+const showPassword = () => {
+  passwordVisible.value = !passwordVisible.value;
+};
+
+const checkid = ref(false);
+const setSaveId = (e) => {
+  if (e.target.checked == true) {
+    localStorage.setItem("saveId", username.value);
+  } else {
+    localStorage.setItem("saveId", "");
+  }
+};
 </script>
 
 <style>
@@ -410,5 +455,11 @@ onMounted(async () => {
 
 .animate-rise {
   animation: rise-bounce 2s ease-in-out forwards;
+}
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none;
 }
 </style>

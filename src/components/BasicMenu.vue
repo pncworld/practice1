@@ -361,8 +361,8 @@ const selectCategory = (strUrl, lngProgramID2, strTitle) => {
   }
   currentTab.value = strTitle;
 
-  const existingTab = tabs.value.find((tab) =>
-    tab.lngProgramID.startsWith(lngProgramID2)
+  const existingTab = tabs.value.find(
+    (tab) => tab.lngProgramID.split("_")[0] == lngProgramID2
   );
   //comsole.log(existingTab);
   if (existingTab) {

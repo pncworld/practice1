@@ -276,7 +276,7 @@ const selectCategory = (category) => {
 
 const logout = () => {
   store.dispatch("logout");
-  localStorage.clear();
+  //localStorage.clear();
   sessionStorage.clear();
   window.location.href = "/";
 

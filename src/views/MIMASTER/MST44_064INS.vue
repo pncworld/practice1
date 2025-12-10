@@ -999,12 +999,20 @@ onMounted(async () => {
 
   //comsole.log(labelsData.value);
   printTypeList.value = res.data.List;
-
+ 
+  //console.log(store.state.userData.lngCommonMenu)
      if (
       store.state.userData.lngCommonMenu == '1'
     ) {
+    
+       setTimeout(() => {
+        hidesub.value = true
+       },100)
       hidesub.value = false;
     } else {
+         setTimeout(() => {
+        hidesub.value = false
+       },100)
       hidesub.value = true;
     }
 
@@ -1467,6 +1475,7 @@ const searchButton = async () => {
         nowStoreAreaCd.value
       );
       rowData3.value = res2.data.List;
+      console.log(rowData3.value)
       updatedList3.value = JSON.parse(JSON.stringify(rowData3.value));
       confirmitem3.value = JSON.parse(JSON.stringify(rowData3.value));
       afterSearch3.value = true;
@@ -1609,9 +1618,21 @@ const saveButton = async () => {
       });
       return;
     }
-  } else {
+  } else if (currentMenu.value == 3) {
     if (
       JSON.stringify(confirmitem3.value) === JSON.stringify(updatedList3.value)
+    ) {
+      Swal.fire({
+        title: "경고",
+        text: "변경된 사항이 없습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } else if (currentMenu.value == 4) {
+    if (
+      JSON.stringify(rowData4.value) === JSON.stringify(updatedList4.value)
     ) {
       Swal.fire({
         title: "경고",
