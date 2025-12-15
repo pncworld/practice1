@@ -1509,3 +1509,26 @@ export const getCustCardDisAggList = (groupCd, storeCd, sdate, edate, cond) => {
     COND: cond,
   });
 };
+
+export const getDailySalesStatusByFloor = (groupCd, storeCd, startDate, endDate, intRegNo1, intRegNo2, lngExceptionMenuSubGroup) => {
+  return api2.post("/MISALES/SLS02_007RPT.asmx/getDailySalesStatusByFloor", {
+    GROUP_CD : groupCd,
+    STORE_CD : storeCd,
+    START_DATE : startDate,
+    END_DATE : endDate,
+    POS_NO_1 : intRegNo1,
+    POS_NO_2 : intRegNo2,
+    SUB_GRP_CD : lngExceptionMenuSubGroup,
+  });
+};
+
+export const getMonthlyMenuUseStatus = (groupCd, storeCd, startDate, endDate, lngExceptionMenuSubGroup, intRegNo) => {
+  return api2.post("/MISALES/SLS02_008RPT.asmx/getMonthlyMenuUseStatus", {
+    GROUP_CD : groupCd,
+    STORE_CD : storeCd,
+    START_DATE : startDate,
+    END_DATE : endDate,
+    SUB_GRP_CD : lngExceptionMenuSubGroup,
+    POS_NO : intRegNo,
+  });
+};

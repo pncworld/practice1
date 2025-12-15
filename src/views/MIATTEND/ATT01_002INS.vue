@@ -753,7 +753,7 @@ const addButton = () => {
  */
 
 const clickedRowData = (newValue) => {
-  console.log(newValue);
+  // console.log(newValue);
   disableGrid.value = false;
   gridvalue1.value = newValue[1];
   gridvalue2.value = newValue[4];
@@ -852,7 +852,7 @@ const changeInfo = (e) => {
 
   if (rowName == "lngAreaCode") {
     setTimeout(() => {
-      console.log(rowValue);
+      // console.log(rowValue);
       if (rowValue == null || rowValue == "null") {
         changeValue2.value = "선택";
         changeColid.value = "strAreaName";
@@ -943,9 +943,11 @@ const searchButton = async () => {
       lngoption
     );
 
+    // console.log(res);
+
     rowData.value = res.data.List;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
-    ////console.log(res);
+    
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;

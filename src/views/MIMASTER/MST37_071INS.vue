@@ -241,7 +241,7 @@ const clickedRowData = (e) => {
   clicked.value = true;
   gridvalue1.value = e[0];
   gridvalue2.value = e[1];
-  gridvalue3.value = e[2];
+  gridvalue3.value = e[5];
   gridvalue4.value = e[3];
   gridvalue5.value = e[4];
 };

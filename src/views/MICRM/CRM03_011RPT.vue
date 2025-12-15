@@ -146,6 +146,9 @@ import { useStore } from "vuex";
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+  
+  const res = await getInitDataCustPurchase(store.state.userData.lngStoreGroup);
+  optionList.value = res.data.List;
 });
 
 const reload = ref(false);

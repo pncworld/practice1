@@ -150,6 +150,10 @@ const props = defineProps({
     type: Boolean,
     default: false, // 기본값: 현재 날짜
   },
+  initToday4: {
+    type: Boolean,
+    default: false, // 기본값: 현재 날짜
+  },
   selectedRadioBox: {
     type: String,
     default: "01",
@@ -210,9 +214,9 @@ onMounted(() => {
   disable2.value = props.disableBox;
   const today = new Date();
   if (props.initToday == 0) {
-    today.setDate(today.getDate() - 1);
+    today.setDate(today.getDate());
   } else {
-    today.setDate(today.getDate() + props.initToday - 1);
+    today.setDate(today.getDate() + props.initToday);
   }
   tempStartDateStack.push(selectedStartDate.value);
   tempEndDateStack.push(selectedEndDate.value);
@@ -232,6 +236,11 @@ onMounted(() => {
   }
   if (props.initToday3 == true) {
     today.setDate(1);
+    selectedStartDate.value = formatDate(today);
+  }
+  if (props.initToday4 == true) {
+    today.setMonth(0); // 월을 1월(0)로 설정
+    today.setDate(1);  // 일을 1일로 설정
     selectedStartDate.value = formatDate(today);
   }
   maxEndDate.value = props.limitEndDate;
@@ -281,7 +290,7 @@ const toggleRadio = (e) => {
 };
 const updateDateRange = (e) => {
   const TODAY = new Date();
-  TODAY.setDate(TODAY.getDate() - 1);
+  // TODAY.setDate(TODAY.getDate() - 1);
   if (e.target.value == "lastweek") {
     const lastWeekStart = new Date(TODAY);
     lastWeekStart.setDate(TODAY.getDate() - TODAY.getDay() - 6); // 지난 주 시작 날짜
@@ -294,12 +303,13 @@ const updateDateRange = (e) => {
     const currentWeekStart = new Date(TODAY);
     currentWeekStart.setDate(TODAY.getDate() - TODAY.getDay() + 1); // 이번 주 시작 날짜
     const currentWeekEnd = new Date(TODAY);
-    currentWeekEnd.setDate(TODAY.getDate() + 1); // 이번 주 종료 날짜
+    currentWeekEnd.setDate(TODAY.getDate()); // 이번 주 종료 날짜
     selectedStartDate.value = formatDateToYYYYMMDD(currentWeekStart);
     selectedEndDate.value = formatDateToYYYYMMDD(currentWeekEnd);
   } else if (e.target.value == "lastMonth") {
     const lastMonth = new Date(TODAY);
-    lastMonth.setMonth(TODAY.getMonth() - 1);
+    // lastMonth.setMonth(TODAY.getMonth() - 1);
+    lastMonth.setMonth(TODAY.getMonth());
     const lastMonthStart = new Date(
       lastMonth.getFullYear(),
       lastMonth.getMonth(),
