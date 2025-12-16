@@ -725,6 +725,12 @@ export const getCustInitData = (groupcd) => {
   });
 };
 
+export const getCrmPolicy = (groupcd) => {
+  return api2.post("/MICRM/CRM01_001INS.asmx/getCrmPolicy", {
+    GROUP_CD : groupcd,    
+  });
+};
+
 export const updateCustomerInfo = (
   cond,
   cond2,

@@ -786,6 +786,7 @@ import {
   deleteCustomors,
   getCustInitData,
   getCustomerInfo,
+  getCrmPolicy,
   getInitDataCustPurchase,
   insertCustomerInfo,
   updateCustomerInfo,
@@ -837,6 +838,8 @@ import { useStore } from "vuex";
 
 const optionList = ref([]);
 const optionList2 = ref([]);
+const policyInfo = ref([]);
+
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
@@ -845,6 +848,10 @@ onMounted(async () => {
 
   const res2 = await getCustInitData(store.state.userData.lngStoreGroup);
   optionList2.value = res2.data.List;
+
+  const crmPolicy = await getCrmPolicy(store.state.userData.lngStoreGroup);
+  policyInfo.value = crmPolicy.data.List;
+
 });
 
 const reload = ref(false);
@@ -1092,8 +1099,7 @@ const saveButton = async () => {
   if (
     pcond.value == "" ||
     pcond2.value == undefined ||
-    pcond3.value == "" ||
-    pcond4.value == "" ||
+    pcond3.value == "" ||   
     pcond5.value == undefined ||
     pcond6.value == undefined ||
     pcond7.value == "" ||
@@ -1109,16 +1115,18 @@ const saveButton = async () => {
     return;
   }
 
-  if (pcond.value.length != 16) {
+  if (policyInfo.value[0].lngCardLen != 99 && 
+      pcond.value.length != policyInfo.value[0].lngCardLen
+    ) {
     Swal.fire({
       title: "경고",
-      text: "카드번호 16자리를 입력해주세요.",
+      text: "카드번호 자리수를 확인해 주세요.",
       icon: "warning",
       confirmButtonText: "확인",
     });
     return;
   }
-
+  
   if (checkCard.value == false && InsertNew.value == true) {
     Swal.fire({
       title: "경고",
@@ -1366,6 +1374,7 @@ function resetPconds() {
 
 const InsertNew = ref(false);
 const addButton = (e) => {
+  /*
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
@@ -1375,6 +1384,7 @@ const addButton = (e) => {
     });
     return;
   }
+  */
   InsertNew.value = true;
   resetPconds();
 
@@ -1455,6 +1465,7 @@ const initGrid = () => {
 
 const checkCard = ref(false);
 const checkCardNo = async () => {
+  /*
   if (pcond.value.length != 16) {
     Swal.fire({
       title: "경고",
@@ -1464,30 +1475,43 @@ const checkCardNo = async () => {
     });
     return;
   }
+*/
 
-  try {
-    const res = await validCardNo(groupCd.value, pcond.value);
+  if (policyInfo.value[0].lngCardLen == 99 || pcond.value.length == policyInfo.value[0].lngCardLen){
+     try {
+      const res = await validCardNo(groupCd.value, pcond.value);
 
-    if (res.data.List[0].lngCustNo == "") {
-      Swal.fire({
-        title: "확인",
-        text: "사용가능한 카드번호입니다.",
-        icon: "success",
-        confirmButtonText: "확인",
-      });
-      checkCard.value = true;
-      return;
-    } else {
-      Swal.fire({
-        title: "경고",
-        text: "이미 사용중인 카드번호입니다.",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
-      checkCard.value = false;
-      return;
-    }
-  } catch (error) {}
+      if (res.data.List[0].lngCustNo == "") {
+        Swal.fire({
+          title: "확인",
+          text: "사용가능한 카드번호입니다.",
+          icon: "success",
+          confirmButtonText: "확인",
+        });
+        checkCard.value = true;
+        return;
+      } else {
+        Swal.fire({
+          title: "경고",
+          text: "이미 사용중인 카드번호입니다.",
+          icon: "warning",
+          confirmButtonText: "확인",
+        });
+        checkCard.value = false;
+        return;
+      }
+    } catch (error) {}
+  }
+  else{
+     Swal.fire({
+      title: "경고",
+      text: "카드번호 자리수를 확인해 주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+ 
 };
 
 const clickedRow = ref(false);
