@@ -146,6 +146,7 @@
         :setFooterCustomColumnId="['dtmDate']"
         :setMergeMode="false"
         :setFooterCustomText="['합계']"
+        :exportExcelShowColumns="['SubGroupNm']"
         :setGroupSumCustomColumnId2="['dtmDate', 'strCompName']"
         :setGroupSumCustomText2="[
           ['', '소계'],
