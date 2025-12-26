@@ -18,11 +18,19 @@ import "./customStyle/style.css";
 import router from "./router";
 import store from "./store";
 import Swal from "sweetalert2";
+import { customSwal } from "./config/swalConfig";
 import VueQuill from "vue3-quill"; // plugin (전역 등록용)
 import "quill/dist/quill.snow.css"; // CSS 스타일
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
+//디자인, 퍼블리싱 적용
+import '@/assets/css/common.css'
+import '@/assets/css/component.css'
+import '@/assets/css/layout.css'
+import '@/assets/css/main.css'
+import '@/assets/css/login.css'
+import '@/assets/css/style.css'
 
 const vuetify = createVuetify({
   components,

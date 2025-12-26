@@ -1,0 +1,60 @@
+/* =========================
+    Dashboard Layout
+========================= */
+.dashboard-content {display:grid; grid-template-rows: minmax(500px, 2fr) minmax(240px, 1fr); gap:30px; height:100%;}
+.dashboard-top {display:grid; grid-template-columns: minmax(360px, 2fr) 3fr;grid-template-rows:auto auto; gap:30px; grid-template-rows: 1fr 2fr;}
+
+/* =========================
+    Box Common
+========================= */
+.board-box {padding:16px 30px 26px; background:var(--tint-100); border-radius:10px;}
+.chart-box-wrap {background: var(--tint-300);}
+.grid-box-wrap {grid-column:1 / 2; grid-row:2 / 3; background: var(--white); border: 1px solid var(--black-10);}
+
+/* =========================
+    KPI
+========================= */
+.kpi-area {display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+.kpi-card {background:#f0f7ff; border-radius:10px; padding:16px 20px 14px; max-height: 150px;}
+
+.kpi-title { font-weight:700; color:var(--primary-deep);}
+.kpi-value {font-weight:600; color:var(--black); text-align: right; letter-spacing: 0;}
+.kpi-rate {margin-top:1px; text-align: right; letter-spacing: 0;}
+.kpi-rate.up {color:var(--red);}
+.kpi-rate.down {color:var(--primary-dark);}
+
+/* =========================
+    Chart
+========================= */
+.chart-box-wrap {grid-column:2 / 3; grid-row:1 / 3;}
+.chart-box {flex:1; background:var(--white); border-radius:8px;}
+
+/* =========================
+    Board
+========================= */
+.dashboard-board {display:grid; grid-template-columns:1fr 1fr; gap:30px; flex: 1;}
+.btn-more {color: var(--black); font-weight: 500; text-decoration:none; display: flex; justify-content: center; align-items: center; gap: 8px; transition: all 0.2s;}
+.btn-more .ic-more {display: inline-block; background: url('../images/ic-more.png') no-repeat center / cover; width: 23px; height: 23px;}
+.btn-more:hover {opacity: 0.7;}
+
+
+
+
+
+
+
+
+
+
+
+@media (max-width: 1440px) {
+    .dashboard-content {grid-template-rows: auto auto; height: auto;}
+    .dashboard-top, .dashboard-board {grid-template-columns: 1fr; grid-template-rows: auto;}
+
+    .chart-box-wrap, .grid-box-wrap {grid-column: auto; grid-row: auto;}
+    .dashboard-top, .dashboard-content, .dashboard-board {gap: 20px;}
+    .kpi-area {gap: 16px;}
+    .board-box {padding: 14px 24px 18px;}
+    
+
+}

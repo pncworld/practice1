@@ -1833,7 +1833,6 @@ export const saveMenuCode = (
   strNutrInfo,
   strCntryOrg,
   strMenuComment,
-  strAmtCodeList,
   strUserFileName,
   lngtype,
   dtmstart,
@@ -1881,7 +1880,6 @@ export const saveMenuCode = (
     STR_NUTR_INFO: strNutrInfo,
     STR_CNTRY_ORG: strCntryOrg,
     STR_MENU_COMMENT: strMenuComment,
-    STR_AMT_CODE_LIST: strAmtCodeList,
     STR_USER_FILE_NAME: strUserFileName,
     INSERT_AUTO: AutoMenuCode,
     DELETE_CD: deleteCd,
@@ -1893,6 +1891,27 @@ export const saveMenuCode = (
     STRNAMEK: strnamek,
     DISCOUNTYN: discountyn,
     STRBIGO: bigo,
+  });
+};
+
+export const saveDiscountCode = (
+  groupCd,
+  storeCd,
+  lngCode,
+  strAmtCodeList,
+  lngPrice,
+  discountyn,
+  insertAuto
+) => {
+  // POST 요청
+  return api2.post("/MIMASTER/MST01_033INS.asmx/saveDiscountCode", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LNG_CODE: lngCode,
+    STR_AMT_CODE_LIST: strAmtCodeList,
+    LNG_PRICE: lngPrice,
+    DISCOUNTYN: discountyn,
+    INSERT_AUTO: insertAuto,
   });
 };
 

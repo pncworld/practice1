@@ -1130,6 +1130,7 @@ import {
   getMenuDiscCount,
   getMenuList,
   saveMenuCode,
+  saveDiscountCode,
   uploadFile,
 } from "@/api/master";
 /**
@@ -1256,7 +1257,7 @@ const setAuto = () => {
 };
 const allStateRows = (e) => {
   updateDeleteInsertrowIndex.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const sendRowState = (e) => {
   if (e == "created") {
@@ -1336,6 +1337,9 @@ const uncheckValue = ref();
 const initSelect = ref(false);
 const discountDisabled = ref(true);
 const disableWithMenuDisc = ref(true);
+// 할인선택 변경 감지용
+const originalDiscountData = ref({}); // { menuCode: "strAmtCodeList" } 형태로 저장
+const discountChanged = ref(false); // 할인선택 변경 여부 플래그
 const labelsData = ref([
   ["할인", "지불", "할증"],
   ["사용", "미사용"],
@@ -1418,16 +1422,16 @@ const selectedIndex2 = (e) => {
  */
 
 function convertTo24Hour(timeStr) {
-  console.log(timeStr);
+  //console.log(timeStr);
   if (!timeStr) return "";
 
   // "오전 12:00:00" → ["오전", "12:00:00"]
 
   const [no, ampm, time] = timeStr.split(" ");
   let [hour, minute, second] = time.split(":").map(Number);
-  console.log(hour);
-  console.log(minute);
-  console.log(second);
+  //console.log(hour);
+  //console.log(minute);
+  //console.log(second);
   if (ampm === "오전") {
     // 오전 12시는 0시로 변환
     if (hour === 12) hour = 0;
@@ -1445,7 +1449,7 @@ function convertTo24Hour(timeStr) {
 }
 
 const clickedRowData = async (newvalue) => {
-  console.log(newvalue);
+  //console.log(newvalue);
   afterClick.value = false;
   if (newvalue[9] == 0 || newvalue[12] == 0) {
     // 판매가 할인여부
@@ -1552,6 +1556,13 @@ const clickedRowData = async (newvalue) => {
 
   const firstarr = newvalue[32] != undefined ? newvalue[32].split(";") : [];
   duplilfirstarr.value = firstarr;
+  
+  // 할인선택 원본 데이터 저장 (변경 감지용)
+  const currentMenuCode = newvalue[0]?.toString();
+  if (currentMenuCode) {
+    originalDiscountData.value[currentMenuCode] = newvalue[32] || "";
+    discountChanged.value = false; // 행 클릭 시 변경 플래그 초기화
+  }
   if (rowData2.value.length > 0) {
     let dupliarr = JSON.parse(JSON.stringify(rowData2.value));
     dupliarr.sort((a, b) => {
@@ -1594,7 +1605,7 @@ const clickedRowData = async (newvalue) => {
       `https://www.pncapi.kr/MenuImage/Image/${fileName.value}?v=${Date.now()}`
     );
     await nextTick();
-    console.log(response);
+    //console.log(response);
     uploadImage.value.name = newvalue[31];
     fileSize.value = response.headers["content-length"];
 
@@ -1606,6 +1617,12 @@ const clickedRowData = async (newvalue) => {
     fileSize.value = "";
   } finally {
     afterClick.value = false;
+    
+    // 파일 input 리셋
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput) {
+      fileInput.value = "";
+    }
   }
 };
 /**
@@ -1877,10 +1894,27 @@ const checkedRowData2 = (e) => {
   changeColid.value = "strAmtCodeList";
   //comsole.log(updateRow.value);
   //comsole.log(e);
-  changeValue2.value = e
+  const newDiscountValue = e
     .filter((item) => item.lngMenu !== "0")
     .map((item2) => Number(item2.lngCode))
     .join(";");
+  
+  changeValue2.value = newDiscountValue;
+
+  // 할인선택 변경 감지: 원본 데이터와 비교
+  const currentMenuCode = gridvalue3.value?.toString();
+  if (currentMenuCode && originalDiscountData.value[currentMenuCode] !== undefined) {
+    const originalValue = originalDiscountData.value[currentMenuCode] || "";
+    if (originalValue !== newDiscountValue) {
+      discountChanged.value = true;
+    } else {
+      // 원본과 동일하면 변경 없음으로 표시
+      discountChanged.value = false;
+    }
+  } else {
+    // 원본 데이터가 없으면 변경된 것으로 간주
+    discountChanged.value = true;
+  }
 
   //changeValue2.value = e.changeRow.value = rowIndex.value;
   changeNow.value = !changeNow.value;
@@ -2019,7 +2053,7 @@ const saveButton = () => {
     return;
   }
 
-  console.log(updateRow.value);
+  //console.log(updateRow.value);
   const validateRow = updateRow.value.filter(
     (item) =>
       (item.lngCode === "" && isNewAutoMenuCode.value == false) ||
@@ -2128,7 +2162,6 @@ const saveButton = () => {
           filterAndMap("strNutrInfo"),
           filterAndMap("strCntryOrg"),
           filterAndMap("strMenuComment"),
-          filterAndMap("strAmtCodeList"),
           filterAndMap("strUserFileName"),
           filterAndMap("lngType"),
           filterAndMap("dtmStart"),
@@ -2140,7 +2173,7 @@ const saveButton = () => {
           isNewAutoMenuCode.value == true ? 1 : 0,
           deleteCd.join(",")
         );
-        console.log(res);
+        //console.log(res);
         //console.log(res);
 
         //comsole.log(updatedAndInsertRow);
@@ -2167,7 +2200,7 @@ const saveButton = () => {
             String(existedName).padStart(10, 0) +
             ".jpg";
 
-          console.log(newFileName);
+          //console.log(newFileName);
           const newFile = new File([file], newFileName, { type: file.type });
           formData.append(`file${index}`, newFile);
         });
@@ -2181,6 +2214,35 @@ const saveButton = () => {
             store.state.loading = false;
           } finally {
             store.state.loading = false;
+          }
+        }
+
+        // 할인선택 변경이 있을 때만 저장
+        if (discountChanged.value) {
+          try {
+            const res3 = await saveDiscountCode(
+              groupCd.value,
+              nowStoreCd.value,
+              filterAndMap("lngCode"),
+              filterAndMap("strAmtCodeList"),
+              filterAndMap("lngPrice"),
+              filterAndMap("discountYN"),
+              isNewAutoMenuCode.value == true ? 1 : 0
+            );
+            
+            console.log(res3);
+            
+            // 저장 후 원본 데이터 업데이트 및 플래그 초기화
+            updatedAndInsertRow.forEach((item) => {
+              const menuCode = item.lngCode?.toString();
+              if (menuCode) {
+                originalDiscountData.value[menuCode] = item.strAmtCodeList || "";
+              }
+            });
+            discountChanged.value = false;
+          } catch (error) {
+            console.error("할인선택 저장 실패:", error);
+            // 에러 발생 시에도 계속 진행
           }
         }
 
@@ -2199,6 +2261,12 @@ const saveButton = () => {
       } finally {
         store.state.loading = false;
 
+        // 파일 input 리셋
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) {
+          fileInput.value = "";
+        }
+
         searchButton();
       }
     }
@@ -2210,7 +2278,7 @@ const saveButton = () => {
  */
 
 const updatedRowData = (newvalue) => {
-  console.log(newvalue);
+  //console.log(newvalue);
   updateRow.value = newvalue;
 };
 const updatedList2 = ref([]);
@@ -2426,6 +2494,9 @@ const initAll = () => {
   disableMenuAuto.value = true;
   uploadImages.value = [];
   uploadImagesCd.value = [];
+  // 할인선택 관련 초기화
+  originalDiscountData.value = {};
+  discountChanged.value = false;
 };
 
 const searchPayCd = (e) => {
@@ -2456,7 +2527,7 @@ const handleFileUpload = async (e) => {
     return;
   }
   fileName2.value = e.target.files[0].name;
-  console.log(fileName2.value);
+  //console.log(fileName2.value);
   changeColid.value = "strUserFileName";
   changeValue2.value = fileName2.value;
   //comsole.log(changeValue2.value);
@@ -2464,8 +2535,20 @@ const handleFileUpload = async (e) => {
 
   const file = e.target.files[0];
   uploadImage.value = new File([file], changeValue2.value, { type: file.type });
+  
+  // 같은 메뉴코드에 대한 기존 파일 제거
+  const existingIndex = uploadImagesCd.value.findIndex(cd => cd === gridvalue3.value);
+  if (existingIndex !== -1) {
+    uploadImages.value.splice(existingIndex, 1);
+    uploadImagesCd.value.splice(existingIndex, 1);
+  }
+  
+  // 새 파일 추가
   uploadImages.value.push(uploadImage.value);
   uploadImagesCd.value.push(gridvalue3.value);
+  
+  // 파일 input 리셋 (같은 파일을 다시 선택할 수 있도록)
+  e.target.value = "";
   //comsole.log(uploadImages.value);
 };
 

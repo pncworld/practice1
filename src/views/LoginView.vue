@@ -1,98 +1,94 @@
 /*--############################################################################
-# Filename : MST01_033INS.vue                                                  
-# Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
-# Date :2025-05-14                                                             
-# Author : 권맑음                     
+# Filename : LoginView.vue                                                  
+# Description : 로그인 화면(퍼블리싱 버젼)
+# Date : 2025-12-19                                                             
+# Author : 권지안                     
 ################################################################################*/
 <template>
-  <div class="flex flex-col h-full bg-slate-100">
-    <div class="flex items-center justify-center h-full bg-slate-100">
-      <loading></loading>
-      <!-- <div><img class="mr-20 size-4/5" src="../assets/login_visual.png" alt=""></div> -->
-      <div class="flex">
-        <img
-          src="../assets/cashier.png"
-          class="hidden sm:block mr-40 w-60 h-auto animate-rise"
-          alt="" />
-        <img
-          src="../assets/swipe.png"
-          class="hidden sm:block mr-40 w-60 h-auto animate-fall"
-          alt="" />
-      </div>
-      <div
-        class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full border border-gray-500">
-        <h1
-          class="text-2xl font-bold text-center mb-6 text-blue-600 flex justify-center">
-          PNC Office
-        </h1>
+  <div class="page-login">
+    <loading></loading>
+    <div class="login-wrap">
+      <div class="login-center">
+        <div class="login-card">
+          <div class="login-inner">
+            <!-- Logo -->
+            <div class="login-logo">
+              <img src="@/assets/images/pncoffice_logo.png" alt="PNC Office">
+            </div>
 
-        <form @submit.prevent="login2">
-          <div class="mb-4">
-            <label for="username" class="block text-gray-700 font-medium mb-2"
-              >아이디</label
-            >
-            <input
-              type="text"
-              id="username"
-              v-model="username"
-              placeholder="아이디를 입력하세요"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
+            <!-- Form -->
+            <div class="login-form">
+              <form @submit.prevent="login2">
+                <div class="input-warp">
+                  <input
+                    type="text"
+                    id="username"
+                    class="input"
+                    v-model="username"
+                    placeholder="아이디를 입력해주세요."
+                    required
+                  />
+                  <div class="input-password">
+                    <input
+                      :type="passwordVisible ? 'text' : 'password'"
+                      id="password"
+                      class="input js-password"
+                      v-model="password"
+                      placeholder="비밀번호를 입력해주세요."
+                      required
+                    />
+                    <button
+                      type="button"
+                      class="btn-eye js-toggle-password"
+                      @click="showPassword"
+                    ></button>
+                  </div>
+                </div>
 
-          <div class="mb-6">
-            <label for="password" class="block text-gray-700 font-medium mb-2"
-              >비밀번호</label
-            >
-            <div class="relative w-full">
-              <input
-                :type="passwordVisible ? 'text' : 'password'"
-                id="password"
-                v-model="password"
-                placeholder="비밀번호를 입력하세요"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <button
-                type="button"
-                class="absolute inset-y-0 right-3 flex items-center text-sm text-gray-600"
-                @click="showPassword">
-                {{ passwordVisible ? "숨기기" : "보기" }}
-              </button>
+                <label class="chk">
+                  <input
+                    type="checkbox"
+                    id="saveid"
+                    @change="setSaveId"
+                    v-model="checkid"
+                  />
+                  <span></span>아이디 저장
+                </label>
+
+                <div class="btn-warp">
+                  <button type="submit" class="btn btn-login">로그인</button>
+                  <button type="button" class="btn btn-order" @click="goToOrder">소모품 발주</button>
+                </div>
+              </form>
+              <br/>
+              <p v-if="message" class="message-text" style="text-align: center;">{{ message }}</p>
             </div>
           </div>
 
-          <div>
-            <label for="saveid"
-              ><input
-                type="checkbox"
-                id="saveid"
-                @change="setSaveId"
-                v-model="checkid" />아이디 저장</label
-            >
+          <!-- Info -->
+          <div class="login-info">
+            <ul class="info-text">
+              <li>· 문의 : 1588-7443</li>
+              <li>· 메일 : customer@pncworld.com</li>
+              <li>· 영업시간 : 연중 무휴 09:00~21:00</li>
+            </ul>
+            <button class="f15 btn-kakao" @click="goToKakao">
+              <img src="@/assets/images/kakao_channel_talk.svg" alt="카카오 채널톡">
+              카카오 채널톡 상담
+            </button>
           </div>
+        </div>
+      </div>
 
-          <button
-            type="submit"
-            class="w-full py-2 mt-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            로그인
-          </button>
-        </form>
-
-        <p class="mt-4 text-center text-gray-600">{{ message }}</p>
+      <!-- Footer -->
+      <div class="login-footer">
+        <div class="f15 text">
+          본 시스템은 Chrome, Windows Edge 브라우저에 최적화 되어있습니다. <br />
+          Internet Explorer 8 이하 버전의 경우 정상 작동하지 않을 수 있습니다.
+        </div>
+        <div class="f14 copyright">Copyright©1997 PnCworld ALL RIGHT RESERVED.</div>
       </div>
     </div>
-    <!-- <div class="bg-green-700 h-24 rounded-lg">
-      <p class="text-white break-normal">
-        개인정보취급방침 | 이메일무단수집거부 | 사이트맵 | CONTACT US
-        <br />
-        (주)피앤시월드 | 사업자등록번호 : 211-86-21837 서울시 송파구 송파대로
-        <br />
-        167(문정동)문정역 테라타워 B동 1323호 | 1588-7443 | 02)2023-6848
-        <br />
-        대표자명 : 권종택 | 개인정보관리 책임자 : 서성우 | customer@pncworld.com
-        Copyright(c)1997 PnCworld ALL RIGHT RESERVED. admin
-      </p>
-    </div> -->
   </div>
 </template>
 
@@ -335,6 +331,14 @@ const setSaveId = (e) => {
   } else {
     localStorage.setItem("saveId", "");
   }
+};
+
+const goToOrder = () => {
+  window.open("https://sopumzip.shop/main/index", "_blank");
+};
+
+const goToKakao = () => {
+  window.open("https://pf.kakao.com/_Ztrxks", "_blank");
 };
 </script>
 

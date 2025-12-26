@@ -3,180 +3,160 @@
                  # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <div
-    class="flex flex-col h-screen overflow-hidden bg-gray-100"
-    @click="closeOtherTab">
-    <Loading style="z-index: 100"></Loading>
+  <div class="flex-col po-layout" @click="closeOtherTab">
+    <Loading style="z-index: 100" />
 
-    <header
-      v-if="showMenu"
-      class="bg-gray-100 border rounded-3xl text-gray-600 p-2 w-full h-10 md:h-14 box-content">
-      <!-- 상단 영역 -->
-      <div
-        class="flex items-center justify-between bg-gray-100 p-4 rounded-lg fixed top-0 h-12 w-full -mt-3 pb-0">
-        <!-- 로고 영역 -->
-        <div class="flex-shrink-0 items-center mt-8 hidden md:block">
+    <div class="w100 po-gradient"></div>
+
+    <!-- ===============================
+        Header
+    =============================== -->
+    <div v-if="showMenu" class="po-header flex-between">
+      <div class="w-left h-left">
+        <div class="h-logo hidden md:block">
+          <!-- <img src="@/assets/images/logo.jpg" class="w100"> -->
           <img
             :src="strLogoUrl"
-            alt="Logo"
+            class="w100"
             @error="handleError2"
-            class="w-24 sm:w-36 md:w-48 lg:w-52 sm:h-8 md:h-12 lg:h-16 rounded-lg" />
-        </div>
-
-        <div
-          class="flex justify-start mx-auto pb-1 scrollbar-hide max-w-[75%] w-full">
-          <!-- 부모 div -->
-          <div
-            class="flex overflow-x-hidden space-x-2 md:space-x-1 w-full mt-4 md:mt-2 ml-4">
-            <!-- 내부 div -->
-            <button
-              v-for="(item, i) in mainCategoryList"
-              :key="i"
-              name="categorys"
-              @click="selectCategory(item.lngCode)"
-              class="px-3 py-2 text-sm sm:text-sm md:text-xs lg:text-sm font-semibold text-gray-700 bg-white border rounded hover:bg-gray-200 whitespace-nowrap">
-              {{ item.strTitle }}
-            </button>
-            <button
-              class="flex md:hidden w-5 md:w-7 px-3 py-2 text-sm sm:text-sm md:text-xs lg:text-sm font-semibold text-gray-700 bg-white border rounded hover:bg-gray-200 whitespace-nowrap">
-              <img src="../../assets/table_star.svg" alt="Star" />
-            </button>
-            <button @click="deleteAllTabs" class="block md:hidden">
-              <img
-                src="../../assets/ic_delete.svg"
-                alt="Delete"
-                class="w-1 sm:w-6 md:w-7" />
-            </button>
-            <button @click="reLoad" class="block md:hidden">
-              <img
-                src="../../assets/ic_refresh.svg"
-                alt="Refresh"
-                class="w-1 sm:w-6 md:w-7" />
-            </button>
-            <button @click.stop="showMenus" class="block md:hidden">
-              <img
-                src="../../assets/ic_menu.svg"
-                alt="Menu"
-                class="w-1 sm:w-6 md:w-7" />
-            </button>
-            <button @click="hideMenu" class="block md:hidden">
-              <img
-                src="../../assets/ic_extent.svg"
-                alt="Extend"
-                class="w-5 sm:w-6 md:w-7" />
-            </button>
-            <button @click="logout" class="block md:hidden">
-              <img
-                src="../../assets/logout_icon.svg"
-                alt="Logout"
-                class="w-3 sm:w-4 md:w-5" />
-            </button>
-          </div>
-        </div>
-        <div
-          class="absolute top-12 right-10 bg-white w-52 rounded-lg h-auto text-lg overflow-x-hidden"
-          v-show="showmenus">
-          <button v-for="i in tabs" @click="setActiveTab(i)">
-            {{ i.strTitle }}
-          </button>
-        </div>
-        <!-- 우측 버튼 영역 -->
-        <div class="items-center space-x-4 flex mr-5 w-96">
-          <button @click="moveleft">
-            <img
-              src="../../assets/arrow-left-solid-full.svg"
-              alt="Delete"
-              class="w-5 sm:w-6 md:w-7 h-4" />
-          </button>
-          <button @click="moveright">
-            <img
-              src="../../assets/arrow-right-solid-full.svg"
-              alt="Delete"
-              class="w-5 sm:w-6 md:w-7 h-4" />
-          </button>
-          <button @click="deleteAllTabs">
-            <img
-              src="../../assets/ic_delete.svg"
-              alt="Delete"
-              class="w-5 sm:w-6 md:w-7" />
-          </button>
-          <button @click="reLoad">
-            <img
-              src="../../assets/ic_refresh.svg"
-              alt="Refresh"
-              class="w-5 sm:w-6 md:w-7" />
-          </button>
-          <button @click.stop="showMenus">
-            <img
-              src="../../assets/ic_menu.svg"
-              alt="Menu"
-              class="w-5 sm:w-6 md:w-7" />
-          </button>
-          <button @click="hideMenu">
-            <img
-              src="../../assets/ic_extent.svg"
-              alt="Extend"
-              class="w-5 sm:w-6 md:w-7" />
-          </button>
-          <button @click="logout">
-            <img
-              src="../../assets/logout_icon.svg"
-              alt="Logout"
-              class="w-3 sm:w-4 md:w-5" />
-          </button>
+          />
         </div>
       </div>
 
-      <!-- 탭 영역 -->
-      <div
-        class="overflow-x-hidden space-x-2 mt-8 ml-60 hidden md:flex scroll-smooth"
-        ref="scrollContainer">
-        <div
-          v-for="tab in tabs"
-          :key="tab.lngProgramID"
-          @click="setActiveTab(tab)"
-          class="flex items-center space-x-2 px-4 py-2 border bg-white text-xs rounded-md cursor-pointer font-bold hover:bg-blue-50 transition whitespace-nowrap"
-          :class="{
-            'text-blue-400': currentActiveTab.lngProgramID == tab.lngProgramID,
-          }">
-          <span>{{ tab.strTitle }}</span>
-          <button @click.stop="removeTab(tab)" class="w-3 h-3">
-            <img
-              src="../../assets/deleteIcon.png"
-              alt="Delete"
-              class="w-3 h-3 text-blue-300" />
+      <div class="pd20 pt0 pb0 flex-between w-right h-right">
+        <!-- GNB -->
+        <nav class="flex items-center h-gnb">
+          <a
+            v-for="item in mainCategoryList"
+            :key="item.lngCode"
+            @click="selectCategory(item.lngCode)"
+            :class="{ active: selectCategoryId === item.lngCode }"
+          >
+            {{ item.strTitle }}
+          </a>
+        </nav>
+
+        <!-- Header Buttons -->
+        <div class="h-controller">
+          <button type="button" class="btn-action close" @click="deleteAllTabs">
+            <i class="ico ico-close"></i>
+          </button>
+          <button type="button" class="btn-action refresh" @click="reLoad">
+            <i class="ico ico-refresh"></i>
+          </button>
+          <button type="button" class="btn-action menu" @click.stop="showMenus">
+            <i class="ico ico-menu"></i>
           </button>
         </div>
-      </div>
-    </header>
 
-    <div class="flex flex-1 overflow-hidden">
-      <!-- Sidebar -->
+        <button class="bd-white-40 br5 f15 fw700 fc-white trs btn-logout" @click="logout">
+          <!-- <img src="/src/assets/images/logout.svg"> -->
+          <img src="@/assets/images/logout.svg">
+          <span>로그아웃</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ===============================
+        GNB Dropdown
+    =============================== -->
+    <div class="gnb-dropdown" v-show="showmenus">
+      <a
+        v-for="item in mainCategoryList"
+        :key="item.lngCode"
+        @click="selectCategory(item.lngCode)"
+        :class="{ active: selectCategoryId === item.lngCode }"
+      >
+        {{ item.strTitle }}
+      </a>
+    </div>
+
+    <!-- ===============================
+        Content
+    =============================== -->
+    <div class="po-content">
+      <!-- ===============================
+          Left Menu
+      =============================== -->
       <aside
         v-show="isMenu && showMenu"
-        class="bg-white text-gray-600 p-0 m-0 border-gray-200 border justify-center items-center hidden md:flex w-full md:w-[14%]">
+        class="w-left sidemenu"
+      >
         <BasicMenu
           v-if="showMenu"
+          class="w100 h100"
           @emittab="emittab"
           @activeTab="activeTab"
           :selectCategoryId="selectCategoryId"
           :tabs="tabs"
           :triggerNow="triggerNow"
-          class="w-full h-full border hidden md:block" />
+        />
       </aside>
 
-      <!-- Main Content -->
-      <main
-        class="w-full h-full bg-white p-1 overflow-y-auto overflow-x-hidden">
+      <!-- ===============================
+          Right Content
+      =============================== -->
+      <div class="pd20 pl0 pt0 w-right">
+        <!-- Tabs -->
+        <div class="flex-between po-tabs">
+          <div class="flex po-tabs-inner" ref="scrollContainer">
+            <div
+              v-for="tab in tabs"
+              :key="tab.lngProgramID"
+              class="po-tab-item"
+              :class="{ active: currentActiveTab.lngProgramID === tab.lngProgramID }"
+              @click="setActiveTab(tab)"
+            >
+              <span class="title">{{ tab.strTitle }}</span>
+              <button class="btn-close" @click.stop="removeTab(tab)"></button>
+            </div>
+          </div>
+
+          <div class="tab-actions">
+            <button class="btn-action prev" @click="moveleft">
+              <i class="ico ico-prev"></i>
+            </button>
+            <button class="btn-action next" @click="moveright">
+              <i class="ico ico-next"></i>
+            </button>
+            <button class="btn-action close" @click="deleteAllTabs">
+              <i class="ico ico-close"></i>
+            </button>
+            <button class="btn-action refresh" @click="reLoad">
+              <i class="ico ico-refresh"></i>
+            </button>
+            <div class="btn-menu-group">
+              <button class="btn-action menu" @click.stop="showMenus">
+                <i class="ico ico-menu"></i>
+              </button>
+              <div class="tab-menu-popup" :class="{ open: showmenus }">
+                <ul class="tab-menu-list">
+                  <li
+                    v-for="tab in tabs"
+                    :key="tab.lngProgramID"
+                    @click="setActiveTab(tab); showmenus = false;"
+                  >
+                    {{ tab.strTitle }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <button class="btn-action expand" @click="hideMenu">
+              <i class="ico ico-expand"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Router View -->
         <router-view v-slot="{ Component, route }">
           <keep-alive>
             <component
               :is="Component"
               :key="`${route.path}-${componentKey}`"
-              class="bg-white" />
+            />
           </keep-alive>
         </router-view>
-      </main>
+      </div>
     </div>
   </div>
 </template>
@@ -201,12 +181,15 @@ import { useStore } from "vuex";
 
 const scrollContainer = ref(null);
 const moveright = () => {
+  if (!scrollContainer.value) return;
   scrollContainer.value.scrollLeft += 200;
 };
 const moveMaxright = () => {
+  if (!scrollContainer.value) return;
   scrollContainer.value.scrollLeft = scrollContainer.value.scrollWidth + 2000;
 };
 const moveleft = () => {
+  if (!scrollContainer.value) return;
   scrollContainer.value.scrollLeft -= 200;
 };
 /**

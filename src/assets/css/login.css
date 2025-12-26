@@ -1,0 +1,73 @@
+/* Layout */
+.page-login {min-height: 100vh; background: linear-gradient(135deg, #a5eeef, #b5b8ef, #ffb4c2, #ffd39f); display: flex; flex-direction: column; align-items: center; justify-content: center;}
+.page-login .login-wrap {display: flex; flex-direction: column; min-height: 100%; flex: 1;}
+.page-login .login-center {flex: 1; display: flex; align-items: center;}
+.page-login .login-card {width: 580px; background: #fff; border-radius: 16px; padding: 60px 0; box-shadow: 0 15px 40px rgba(0,0,0,0.1); flex-shrink: 0; margin: 60px 0 40px;  background: #fff url('../images/login_box_bg.png') no-repeat right bottom / cover;}
+.page-login .login-inner {padding: 0 80px;}
+.page-login .login-logo {width: 100%; max-width: 152px; margin-bottom: 24px;}
+.page-login .login-logo img {width: 100%;}
+
+/* Form */
+.page-login .login-form {display: flex; flex-direction: column; }
+.page-login .input-warp {display: flex; flex-direction: column; gap: 10px;}
+.page-login .input-warp .input {font-size: 16px; height: 56px; max-width: none; padding: 0 18px; border: 1px solid var(--black-20);}
+.page-login .input-warp .input-password {position: relative; display: flex; align-items: center;}
+.page-login .input-warp .input-password .input {padding-right: 44px;}
+.page-login .input-warp .btn-eye {position: absolute; right: 12px; width: 24px; height: 24px; border: none; cursor: pointer; background-color: #999; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z'/%3E%3C/svg%3E") no-repeat center / contain; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z'/%3E%3C/svg%3E");}
+.page-login .input-warp .btn-eye.on {background-color: var(--black);}
+.page-login .chk {font-size: 15px; margin-top: 16px;}
+.page-login .chk input:checked + span{background:var(--gray-222) url('../images/check_w.svg') no-repeat center/12px 8px; border: 1px solid var(--gray-222);}
+.page-login .btn-warp {width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 32px;}
+.page-login .btn-warp .btn {height: 60px; font-size: 16px; font-weight: 600; transition: all 0.2s;}
+.page-login .btn-login {background: #222; color: #fff; border: none;}
+.page-login .btn-order {background: #fff; border: 1px solid #222; color: #222;}
+.page-login .btn-warp .btn:hover {opacity: 0.7;}
+
+/* Info */
+.page-login .login-info {padding: 22px 20px; border: 1px solid #e3e3e3; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; margin: 46px 40px 0;}
+.page-login .info-text {font-size: 14px; color: #444;}
+.page-login .info-text li:not(:last-child) {margin-bottom: 8px;}
+.page-login .btn-kakao {background: #ffde00; color: #231916; font-weight: 600; border: none;  padding: 16px; border-radius: 10px; display: flex; justify-content: center; align-items: center; gap: 8px; white-space: nowrap; width: 100%; max-width: 188px; height: 56px; transition: all 0.2s;}
+.page-login .btn-kakao img {max-width: 20px;}
+.page-login .btn-kakao:hover {opacity: 0.7;}
+
+/* Footer */
+.page-login .login-footer {display: flex; flex-direction: column; gap: 25px; text-align: center; padding-bottom: 20px;}
+.page-login .login-footer .text {text-align: center; color: var(--black-80);}
+.page-login .login-footer .copyright {color: var(--black-60);}
+
+
+
+
+
+
+
+
+
+@media (max-height: 1000px) {
+    body {overflow-y: auto;}
+}
+
+
+@media (max-width: 1200px) {
+    .page-login .login-logo {max-width: 130px;}
+    .page-login .login-inner {padding: 0 60px;}
+    .page-login .login-card {padding: 50px 0;}
+    .page-login .input-warp .input {height: 52px; font-size: 15px;}
+    .page-login .btn-warp {margin-top: 24px;}
+    .page-login .btn-warp .btn {font-size: 15px; height: 56px;}
+    .page-login .login-info {border-radius: 10px; padding: 18px 16px; margin: 36px 40px 0;}
+    .page-login .btn-kakao {height: 52px;}
+    .page-login .login-footer {gap: 15px;}
+}
+
+
+
+
+
+
+
+
+
+
+

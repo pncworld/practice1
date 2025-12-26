@@ -1,10 +1,12 @@
 <script setup>
 import JSZip from "jszip";
-import { defineAsyncComponent, onMounted, ref, watch } from "vue";
+import { defineAsyncComponent, onMounted, ref, watch, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import LoadingScreen from "./components/LoadingScreen.vue";
 import EmptyLayout from "./views/layout/EmptyLayout.vue";
+import ModalAlert from "./components/ModalAlert.vue";
+import { useModalAlert } from "./utils/modalAlert";
 
 const isMobile = ref(false);
 const store = useStore();
@@ -34,22 +36,45 @@ watch(route, () => {
   }
 });
 
+// 로그인 페이지("/")에서는 레이아웃을 사용하지 않음
+const isLoginPage = computed(() => route.path === "/");
+
+// 레이아웃 컴포넌트 결정
+const layoutComponent = computed(() => {
+  // 로그인 페이지는 레이아웃 없이 직접 렌더링
+  if (isLoginPage.value) {
+    return null;
+  }
+  
+  // 모바일이면 MobileLayout
+  if (isMobile.value) {
+    return MobileLayout;
+  }
+  
+  // VUEPOS 경로면 EmptyLayout
+  if (exception.value) {
+    return EmptyLayout;
+  }
+  
+  // 기본적으로 BasicLayout
+  return BasicLayout;
+});
+
 window.JSZip = JSZip;
+
+// 전역 Modal Alert
+const { modal, handleModalConfirm, handleModalSave, handleModalCancel } = useModalAlert();
 </script>
 
 <template>
   <Suspense>
     <template #default>
-      <!-- isMobile에 따라 레이아웃을 동적으로 선택 -->
-      <component
-        :is="
-          isMobile
-            ? MobileLayout
-            : exception == false
-            ? BasicLayout
-            : EmptyLayout
-        "
-        class="">
+      <!-- 로그인 페이지는 레이아웃 없이 직접 렌더링 -->
+      <template v-if="isLoginPage">
+        <router-view></router-view>
+      </template>
+      <!-- 그 외 페이지는 레이아웃 컴포넌트 사용 -->
+      <component v-else :is="layoutComponent" class="">
         <router-view></router-view>
         <!-- 자식 컴포넌트를 여기에 렌더링 -->
       </component>
@@ -59,6 +84,21 @@ window.JSZip = JSZip;
       <LoadingScreen />
     </template>
   </Suspense>
+  
+  <!-- 전역 Modal Alert -->
+  <ModalAlert
+    :isVisible="modal.visible"
+    :type="modal.type"
+    :title="modal.title"
+    :message="modal.message"
+    :showConfirm="modal.showConfirm"
+    :showSave="modal.showSave"
+    :showCancel="modal.showCancel"
+    @close="modal.visible = false"
+    @confirm="handleModalConfirm"
+    @save="handleModalSave"
+    @cancel="handleModalCancel"
+  />
 </template>
 
 <style>

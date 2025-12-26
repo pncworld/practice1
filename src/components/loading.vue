@@ -2,11 +2,11 @@
   <div
     v-if="isLoading"
     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-[95]">
-    <div class="text-white text-lg mt-4">
-      <img src="../assets/spinner1.gif" alt="Loading" />
+    <div class="loading-wrap" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+      <img src="../assets/images/loading.gif" alt="로딩 중" style="width: auto; height: auto; max-width: 80px; max-height: 80px;">
+      <!-- <div class="f15 loading-text">처리 중입니다.</div> -->
     </div>
   </div>
-  <!-- <LoadingScreen v-if="isLoading"></LoadingScreen> -->
 </template>
 
 <script setup>

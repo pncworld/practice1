@@ -1,127 +1,108 @@
 <template>
-  <div class="bg-gray-100 text-gray-600 w-full scroll-container h-full m-0">
-    <div class="">
-      <ul
-        class="flex w-full justify-center items-center overflow-hidden font-mono">
-        <li class="text-xs text-black bg-blue-100 font-bold">
-          {{ loginName }} / {{ storeName }} ({{ lStoreCd }})
-        </li>
-      </ul>
-      <h1 class="flex text-2xl font-bold h-12 items-center bg-gray-100 p-5">
-        {{ cMenu }}
-      </h1>
-
-      <div class="flex h-14 bg-white">
-        <input
-          type="text"
-          class="rounded-2xl bg-transparent border border-solid placeholder-opacity-30 y-3 mx-2 my-2 px-3"
-          style="height: 39px; width: 190px; border-radius: 19px"
-          v-model="searchword"
-          @input="setProgramList"
-          placeholder="검색어입력" />
-        <!-- <img
-            src="../assets/finder_icon.svg"
-            class="inline-block w-9"
-            @click="setProgramList"
-            alt="" /> -->
+  <!-- 좌측 메뉴 / 퍼블리셔 마크업 기반 -->
+  <aside class="w-left sidemenu">
+    <!-- 사용자 정보 -->
+    <div class="pd20 user-info">
+      <div class="flex f13 fc-white bd-white-20 br50 items-center inner">
+        <span class="flex-center bg-black-50 br50p user-icon">
+          <img src="../assets/images/ic_user.png">
+        </span>
+        <span class="user-id">{{ loginName }}</span>
+        <span class="user-store">
+          {{ storeName }} ({{ lStoreCd }})
+        </span>
       </div>
-      <div class="flex justify-between bg-gray-100">
-        <label class="bg-gray-100">
-          <div class="flex justify-start bg-gray-100 h-8 items-center">
-            <input
-              type="checkbox"
-              @click="showAll"
-              class="ml-3"
-              :value="true"
-              v-model="countShow" />전체
-          </div>
-        </label>
-        <button
-          class="mr-7 mt-1 text-black flex size-6 items-center justify-center"
-          @click.stop="showFavorite">
-          <img
-            src="../../src/assets/table_star.svg"
-            alt="Star"
-            v-show="!clickFavorite" />
-          <img
-            v-show="clickFavorite"
-            src="../assets/table_star-checked.svg"
-            alt="" />
-          즐겨찾기
-        </button>
-      </div>
-
-      <ul>
-        <li
-          v-for="i in favoriteProgList"
-          v-if="clickFavorite"
-          class="bg-gray-100 overflow-y-auto">
-          <div class="flex ml-4">
-            <button
-              @click="favoriteadd(i.lngProgramID)"
-              v-if="!currentFavorite.includes(i.lngProgramID)">
-              <img src="../assets/table_star.svg" alt="" />
-            </button>
-            <button
-              @click="favoritedelete(i.lngProgramID)"
-              v-if="currentFavorite.includes(i.lngProgramID)">
-              <img src="../assets/table_star-checked.svg" alt="" />
-            </button>
-            <button
-              class="w-full h-10 text-left px-2 text-gray-900 rounded-lg hover:bg-blue-100 focus:outline-none flex items-center justify-between"
-              @click="selectCategory(i.strUrl, i.lngProgramID, i.strTitle)">
-              {{ i.strTitle }}
-            </button>
-          </div>
-        </li>
-      </ul>
-      <ul>
-        <li
-          v-if="!clickFavorite"
-          v-for="category in categories"
-          :key="category.lngProgramSub"
-          :id="category.lngProgramSub"
-          class="bg-gray-100">
-          <button
-            @click="toggleCategory(category.lngProgramSub)"
-            class="w-full h-12 text-left px-2 text-gray-900 rounded-lg hover:bg-blue-100 focus:outline-none flex items-center justify-between">
-            <span> {{ category.strTitle }}</span
-            ><img
-              src="../assets/arrow2.png"
-              alt=""
-              class="transition-transform duration-300"
-              :class="{
-                'rotate-0': !rotateStates[category.lngProgramSub],
-                '-rotate-90': rotateStates[category.lngProgramSub],
-              }" />
-          </button>
-          <ul v-if="isOpen(category.lngProgramSub)" class="pl-4 mt-2">
-            <li v-for="sub in category.subcategories" :key="sub.id">
-              <div class="flex">
-                <button
-                  @click="favoriteadd(sub.lngProgramID)"
-                  v-if="!currentFavorite.includes(sub.lngProgramID)">
-                  <img src="../assets/table_star.svg" alt="" />
-                </button>
-                <button
-                  @click="favoritedelete(sub.lngProgramID)"
-                  v-if="currentFavorite.includes(sub.lngProgramID)">
-                  <img src="../assets/table_star-checked.svg" alt="" /></button
-                ><a
-                  href="#"
-                  class="flex items-center bg-gray-100 text-gray-900 rounded hover:bg-blue-100 h-10"
-                  @click="
-                    selectCategory(sub.strUrl, sub.lngProgramID, sub.strTitle)
-                  ">
-                  {{ sub.strTitle }}
-                </a>
-              </div>
-            </li>
-          </ul>
-        </li>
-      </ul>
+      <button class="btn-sidemenu-toggle" type="button">
+        <span></span>
+      </button>
     </div>
-  </div>
+
+    <!-- 검색 -->
+    <div class="search-box">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="검색어를 입력해주세요"
+        v-model="searchword"
+        @input="setProgramList"
+      >
+      <button class="search-btn"></button>
+    </div>
+
+    <!-- 상단 페이지 타이틀 -->
+    <div class="menu-header">
+      <div class="f30 fw700 fc-000 flex-center menu-title-main">
+        {{ cMenu }}
+      </div>
+    </div>
+
+    <!-- 메뉴 / 즐겨찾기 탭 (UI는 jQuery가 active 제어) -->
+    <div class="flex items-center menu-top">
+      <div class="menu-tab active">
+        <span class="ico-menu"></span>
+        <span class="label">메뉴</span>
+      </div>
+      <div class="menu-favorite">
+        <span class="ico-star-off"></span>
+        <span class="label">즐겨찾기</span>
+      </div>
+    </div>
+
+    <!-- 전체 열기 (동작은 jQuery, 데이터 필터는 Vue) -->
+    <div class="pd20 flex menu-toggle">
+      <span class="f14 fw500 label toggle-text">전체 열기</span>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="toggleAll">
+        <span class="toggle-ui"></span>
+      </label>
+    </div>
+
+    <!-- 메뉴 그룹 -->
+    <div class="pd20 pt0 menu-group">
+      <div
+        class="menu-section"
+        v-for="category in categories"
+        :key="category.lngProgramSub"
+      >
+        <div class="menu-section-head">
+          <div class="menu-section-title">
+            <span class="ico-folder"></span>
+            {{ category.strTitle }}
+          </div>
+          <button class="btn-collapse"></button>
+        </div>
+
+        <ul class="menu-list">
+          <li
+            v-for="sub in category.subcategories"
+            :key="sub.lngProgramID"
+          >
+            <a
+              href="#"
+              @click.prevent="
+                selectCategory(sub.strUrl, sub.lngProgramID, sub.strTitle)
+              "
+            >
+              <div class="menu-list-title">
+                <button
+                  class="btn-star"
+                  :class="{ active: currentFavorite.includes(sub.lngProgramID) }"
+                  aria-label="즐겨찾기 추가/해제"
+                  @click.stop="
+                    currentFavorite.includes(sub.lngProgramID)
+                      ? favoritedelete(sub.lngProgramID)
+                      : favoriteadd(sub.lngProgramID)
+                  "
+                ></button>
+                {{ sub.strTitle }}
+              </div>
+              <span class="ico-arrow"></span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
 </template>
 
 <script setup>
@@ -181,13 +162,8 @@ watch(
   }
 );
 
-const setProgramList = (e) => {
-  //comsole.log(e.target.value);
-
-  cMenu = store.state.mainCategory
-    .filter((item) => item.lngCode == props.selectCategoryId)
-    .map((item) => item.strTitle)[0];
-
+// 초기 메뉴 리스트 구성 함수
+const initializeCategories = () => {
   const subCategory = store.state.subCategory;
   const minorCategory = store.state.minorCategory;
   let category = [];
@@ -195,30 +171,72 @@ const setProgramList = (e) => {
   category = subCategory.filter(
     (item) => item.lngCode == props.selectCategoryId
   );
-  category.forEach((element) => {
+  
+  // 깊은 복사본을 만들어서 원본 데이터 보호
+  category = category.map((element) => {
     const matchedMinorCategory = minorCategory.filter(
-      (item) => item.lngProgramSub == element.lngProgramSub
+      (item) =>
+        item.lngProgramSub == element.lngProgramSub &&
+        item.lngCode == element.lngCode
     );
-    element.subcategories = matchedMinorCategory;
+    // 깊은 복사본 생성
+    return {
+      ...element,
+      subcategories: matchedMinorCategory.map((sub) => ({ ...sub }))
+    };
   });
 
-  categories.value = category;
+  return category;
+};
+
+const setProgramList = (e) => {
+  //comsole.log(e.target.value);
+
+  cMenu = store.state.mainCategory
+    .filter((item) => item.lngCode == props.selectCategoryId)
+    .map((item) => item.strTitle)[0];
+
   if (e.target.value == "") {
+    // 검색어가 비어있을 때 초기 데이터로 복원
     searchword.value = "";
+    countShow.value = false;
     openCategoryId.value = [];
-    showAll();
+    categories.value = initializeCategories();
     return;
   } else {
-    //comsole.log(categories.value);
-    categories.value.forEach((item) => {
-      item.subcategories = item.subcategories.filter((subitem) =>
-        subitem.strProgramName.includes(e.target.value)
+    // 검색어가 있을 때 필터링 (원본 데이터 보호를 위해 깊은 복사본 사용)
+    const subCategory = store.state.subCategory;
+    const minorCategory = store.state.minorCategory;
+    let category = [];
+
+    category = subCategory.filter(
+      (item) => item.lngCode == props.selectCategoryId
+    );
+    
+    // 깊은 복사본을 만들어서 필터링
+    category = category.map((element) => {
+      const matchedMinorCategory = minorCategory.filter(
+        (item) =>
+          item.lngProgramSub == element.lngProgramSub &&
+          item.lngCode == element.lngCode
       );
+      // 검색어로 필터링 (깊은 복사본에서)
+      const filteredSubcategories = matchedMinorCategory
+        .filter((subitem) => subitem.strProgramName.includes(e.target.value))
+        .map((sub) => ({ ...sub }));
+      
+      return {
+        ...element,
+        subcategories: filteredSubcategories
+      };
     });
 
-    categories.value = categories.value.filter(
+    // 빈 카테고리 제거
+    category = category.filter(
       (item) => item.subcategories.length !== 0
     );
+
+    categories.value = category;
     showAll2();
   }
 };
@@ -300,27 +318,54 @@ onMounted(() => {
     .filter((item) => item.lngCode === selectedCategoryId.value)
     .map((item) => item.strTitle)[0];
 
-  const subCategory = store.state.subCategory;
-  const minorCategory = store.state.minorCategory;
-  let category = [];
-
-  category = subCategory.filter(
-    (item) => item.lngCode === selectedCategoryId.value
-  );
-
-  category.forEach((element) => {
-    const matchedMinorCategory = minorCategory.filter(
-      (item) =>
-        item.lngProgramSub == element.lngProgramSub &&
-        item.lngCode == element.lngCode
-    );
-    element.subcategories = matchedMinorCategory;
-  });
-
-  categories.value = category;
+  // 초기화 함수 사용
+  categories.value = initializeCategories();
 
   detectMobile();
   //comsole.log(isMobile);
+
+  // Vue가 DOM을 업데이트한 후 jQuery 초기화 함수 호출
+  nextTick(() => {
+    // DOM이 렌더링되었는지 확인
+    const domElements = document.querySelectorAll('.menu-list li').length;
+    //console.log('onMounted - categories:', categories.value.length, 'DOM elements:', domElements);
+    
+    // jQuery가 로드되었는지 확인
+    if (typeof $ === 'undefined') {
+      //console.error('jQuery is not loaded!');
+      return;
+    }
+    
+    const $menuSections = $('.menu-section');
+    //console.log('jQuery menu sections:', $menuSections.length);
+    
+    if (typeof window.initActiveMenu === 'function') {
+      window.initActiveMenu();
+    }
+    
+        // active 메뉴가 없으면 아무것도 열지 않음 (초기 상태 유지)
+        // 사용자가 직접 클릭하거나 전체 열기 버튼을 사용하도록 함
+    
+    // 전체 열기 버튼 이벤트 재바인딩 확인
+    const $toggleAll = $('#toggleAll');
+    if ($toggleAll.length > 0) {
+      //console.log('ToggleAll checkbox found:', $toggleAll.length);
+      // 이벤트가 바인딩되었는지 확인
+      const events = $._data($toggleAll[0], 'events');
+      //console.log('ToggleAll events:', events);
+    }
+    
+    // DOM이 아직 준비되지 않았으면 한 번 더 시도
+    if (domElements === 0 && categories.value.length > 0) {
+      setTimeout(() => {
+        const retryElements = document.querySelectorAll('.menu-list li').length;
+        //console.log('retry - DOM elements:', retryElements);
+        if (typeof window.initActiveMenu === 'function') {
+          window.initActiveMenu();
+        }
+      }, 100);
+    }
+  });
 
   router.push("/homepage");
 });
@@ -442,34 +487,66 @@ watch(
     clickFavorite.value = false;
     searchword.value = "";
     openCategoryId.value = [];
+    countShow.value = false;
     cMenu = store.state.mainCategory
       .filter((item) => item.lngCode == props.selectCategoryId)
       .map((item) => item.strTitle)[0];
 
-    const subCategory = store.state.subCategory;
-    const minorCategory = store.state.minorCategory;
-    let category = [];
-
-    category = subCategory.filter(
-      (item) => item.lngCode == props.selectCategoryId
-    );
-    category.forEach((element) => {
-      const matchedMinorCategory = minorCategory.filter(
-        (item) =>
-          item.lngProgramSub == element.lngProgramSub &&
-          item.lngCode == element.lngCode
-      );
-      element.subcategories = matchedMinorCategory;
-    });
-
-    categories.value = category;
+    // 초기화 함수 사용
+    categories.value = initializeCategories();
     //comsole.log(categories.value);
   }
+);
+
+// categories가 변경될 때마다 DOM 업데이트 후 jQuery 초기화
+watch(
+  () => categories.value,
+  (newCategories, oldCategories) => {
+    if (newCategories && newCategories.length > 0) {
+      nextTick(() => {
+        const domElements = document.querySelectorAll('.menu-list li').length;
+        //console.log('categories watch - categories:', newCategories.length, 'DOM elements:', domElements);
+        
+        // jQuery 이벤트가 제대로 바인딩되었는지 확인
+        const $menuList = $('.menu-list li');
+        //console.log('jQuery elements:', $menuList.length);
+        
+        // active 메뉴가 있으면 초기화, 없으면 첫 번째 섹션 열기
+        if (typeof window.initActiveMenu === 'function') {
+          window.initActiveMenu();
+        }
+        
+        // active 메뉴가 없으면 아무것도 열지 않음 (초기 상태 유지)
+        
+        // DOM이 아직 준비되지 않았으면 재시도
+        if (domElements === 0) {
+          setTimeout(() => {
+            const retryElements = document.querySelectorAll('.menu-list li').length;
+            //console.log('categories watch retry - DOM elements:', retryElements);
+            if (typeof window.initActiveMenu === 'function' && retryElements > 0) {
+              window.initActiveMenu();
+            }
+          }, 200);
+        }
+      });
+    }
+  },
+  { deep: true }
 );
 </script>
 <style scoped>
 .scroll-container {
   overflow-y: auto;
   scrollbar-gutter: stable;
+}
+
+/* 초기 진입 시: 모든 메뉴 리스트 접힌 상태 */
+.menu-section .menu-list {
+  display: none;
+}
+
+/* jQuery에서 open 클래스를 주거나 slideDown을 호출하면 펼쳐짐 */
+.menu-section.open .menu-list {
+  display: block;
 }
 </style>

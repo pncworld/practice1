@@ -1,0 +1,698 @@
+/* =========================================
+    FONT IMPORT
+========================================= */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css");
+
+
+/* =========================================
+    BASE FONT
+========================================= */
+html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address,cite,code,del,dfn,em,img,ins,kbd,q,samp,small,strong,sub,sup,var,b,i,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary,time,mark,audio,video,input,button,textarea,select{font-family: "Pretendard GOV Variable", "Pretendard GOV", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;}
+
+
+/* =========================================
+    TYPOGRAPHY SYSTEM (FONT SIZE + WEIGHT)
+========================================= */
+.f30 {font-size:30px; font-weight:800; line-height:42px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f28 {font-size:28px; font-weight:800; line-height:38px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f26 {font-size:26px; font-weight:600; line-height:36px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f24 {font-size:24px; font-weight:700; line-height:34px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f22 {font-size:22px; font-weight:700; line-height:32px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f20 {font-size:20px; font-weight:700; line-height:30px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f19 {font-size:19px; font-weight:500; line-height:29px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f18 {font-size:18px; font-weight:500; line-height:28px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f17 {font-size:17px; font-weight:400; line-height:26px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f16 {font-size:16px; font-weight:400; line-height:24px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f15 {font-size:15px; font-weight:400; line-height:23px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f14 {font-size:14px; font-weight:400; line-height:22px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f13 {font-size:13px; font-weight:400; line-height:20px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f12 {font-size:12px; font-weight:400; line-height:18px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f11 {font-size:11px; font-weight:400; line-height:16px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+.f10 {font-size:10px; font-weight:400; line-height:14px; color:#222; letter-spacing:-0.5px; word-break:keep-all;}
+
+/* FONT WEIGHTS */
+.fw400 {font-weight:400;}
+.fw500 {font-weight:500;}
+.fw600 {font-weight:600;}
+.fw700 {font-weight:700;}
+.fw800 {font-weight:800;}
+
+
+/* =========================================
+    COLOR TOKENS (CSS VARIABLES)
+========================================= */
+:root {
+    /* 고객사 로고 컬러에 맞춰 색상 변경 필요할 때는 아래 두 변수만 수정 */
+    /* BRAND GRADIENT (HEADER / TAB BG) */
+    --gradient-primary: linear-gradient(90deg, #318cec 0%, #41b6e7 100%);
+    /* --gradient-primary: linear-gradient(90deg, #dc2626 0%, #fca5a5 100%); */
+    /* BRAND BACKGROUND */
+    --brand-bg: #f5f8fc;
+
+    /* PRIMARY COLORS */
+    --primary: #2f80ed;
+    --primary-dark: #0063c0;
+    --primary-deep: #1a3c70;
+
+    /* SEMANTIC COLORS */
+    --red: #C10000;
+
+    /* BASE COLORS */
+    --white: #fff;
+    --black: #000;
+    --gray-222: #222;
+    --gray-666: #666;
+    --gray-888: #888;
+    --gray-e1: #e1e4e9;
+
+    /* BACKGROUND TINTS */
+    --tint-100: #f7f8fa;
+    --tint-200: #f5f8fc;
+    --tint-300: #f3f6fc;
+    --tint-400: #eaf1fa;
+    --tint-500: #ddedff;
+
+    /* HIGHLIGHTS */
+    --hl-yellow: #fff2df;
+    --hl-red: #ffe8e8;
+
+      /* BLACK alpha */
+    --black-10: rgba(0,0,0,0.1);
+    --black-20: rgba(0,0,0,0.2);
+    --black-30: rgba(0,0,0,0.3);
+    --black-40: rgba(0,0,0,0.4);
+    --black-50: rgba(0,0,0,0.5);
+    --black-60: rgba(0,0,0,0.6);
+    --black-70: rgba(0,0,0,0.7);
+    --black-80: rgba(0,0,0,0.8);
+    --black-90: rgba(0,0,0,0.9);
+
+    /* WHITE alpha */
+    --white-10: rgba(255,255,255,0.1);
+    --white-20: rgba(255,255,255,0.2);
+    --white-30: rgba(255,255,255,0.3);
+    --white-40: rgba(255,255,255,0.4);
+    --white-50: rgba(255,255,255,0.5);
+    --white-60: rgba(255,255,255,0.6);
+    --white-70: rgba(255,255,255,0.7);
+    --white-80: rgba(255,255,255,0.8);
+    --white-90: rgba(255,255,255,0.9);
+
+    /* BLACK border alpha */
+    --border-black-10: rgba(0,0,0,0.1);
+    --border-black-20: rgba(0,0,0,0.2);
+    --border-black-30: rgba(0,0,0,0.3);
+    --border-black-40: rgba(0,0,0,0.4);
+    --border-black-50: rgba(0,0,0,0.5);
+    --border-black-60: rgba(0,0,0,0.6);
+    --border-black-70: rgba(0,0,0,0.7);
+    --border-black-80: rgba(0,0,0,0.8);
+    --border-black-90: rgba(0,0,0,0.9);
+
+    /* WHITE border alpha */
+    --border-white-10: rgba(255,255,255,0.1);
+    --border-white-20: rgba(255,255,255,0.2);
+    --border-white-30: rgba(255,255,255,0.3);
+    --border-white-40: rgba(255,255,255,0.4);
+    --border-white-50: rgba(255,255,255,0.5);
+    --border-white-60: rgba(255,255,255,0.6);
+    --border-white-70: rgba(255,255,255,0.7);
+    --border-white-80: rgba(255,255,255,0.8);
+    --border-white-90: rgba(255,255,255,0.9);
+}
+
+
+/* =========================================
+    COLOR UTILITIES
+========================================= */
+.fc-primary {color:var(--primary);}
+.fc-primary-dark {color:var(--primary-dark);}
+.fc-primary-deep {color:var(--primary-deep);}
+.fc-strong {color:var(--danger);}
+.fc-white {color:var(--white);}
+.fc-black {color:var(--black);}
+.fc-666 {color:var(--gray-666);}
+.fc-888 {color:var(--gray-888);}
+
+/* BACKGROUND */
+.bg-primary {background:var(--primary);}
+.bg-primary-dark {background:var(--primary-dark);}
+.bg-hl-y {background:var(--hl-yellow);}
+.bg-hl-r {background:var(--hl-red);}
+.bg-tint-100 {background:var(--tint-100);}
+.bg-tint-200 {background:var(--tint-200);}
+.bg-tint-300 {background:var(--tint-300);}
+.bg-tint-400 {background:var(--tint-400);}
+.bg-tint-500 {background:var(--tint-500);}
+
+/* BLACK background opacity */
+.bg-black-10 {background: var(--black-10);}
+.bg-black-20 {background: var(--black-20);}
+.bg-black-30 {background: var(--black-30);}
+.bg-black-40 {background: var(--black-40);}
+.bg-black-50 {background: var(--black-50);}
+.bg-black-60 {background: var(--black-60);}
+.bg-black-70 {background: var(--black-70);}
+.bg-black-80 {background: var(--black-80);}
+.bg-black-90 {background: var(--black-90);}
+
+/* WHITE background opacity */
+.bg-white-10 {background: var(--white-10);}
+.bg-white-20 {background: var(--white-20);}
+.bg-white-30 {background: var(--white-30);}
+.bg-white-40 {background: var(--white-40);}
+.bg-white-50 {background: var(--white-50);}
+.bg-white-60 {background: var(--white-60);}
+.bg-white-70 {background: var(--white-70);}
+.bg-white-80 {background: var(--white-80);}
+.bg-white-90 {background: var(--white-90);}
+
+
+/* =========================================
+    SPACING UTILITIES (MARGIN / PADDING)
+========================================= */
+.mb16 {margin-bottom:16px;} 
+.mb30 {margin-bottom:30px;} 
+.mt10 {margin-top:10px;} 
+.mt15 {margin-top:15px;} 
+.mt30 {margin-top:30px;} 
+.pd12 {padding:12px;}
+.pd16 {padding:16px;}
+.pd20 {padding:20px;}
+.pd24 {padding:24px;}
+.pt0 {padding-top: 0 !important;}
+.pb0 {padding-bottom: 0 !important;}
+.pl0 {padding-left: 0 !important;}
+.pr0 {padding-right: 0 !important;}
+
+
+/* =========================================
+    FLEX UTILITIES
+========================================= */
+.flex {display:flex;}
+.flex-center {display:flex; justify-content:center; align-items:center;}
+.flex-between {display:flex; justify-content:space-between; align-items:center;}
+.flex-col {display:flex; flex-direction:column;}
+.items-center {align-items:center;}
+.justify-center {justify-content:center;}
+.justify-end {justify-content:flex-end;}
+.align-self-start {align-self: flex-start;}
+@media (max-width: 1440px) {.flex-none {flex: none !important;}} /* flex-none: flex:1 해제용 (반응형 높이 고정 시 사용) */
+
+
+/* =========================================
+    SIZE UTILITIES
+========================================= */
+.w100 {width:100%;}
+.h100 {height: 100%;}
+.h180 {height: 180px;}
+.h250 {height: 250px;}
+.h320 {height: 320px;}
+@media (max-width: 1440px) {
+    .h300 {height: 300px;}
+    .h240 {height: 240px;}
+}
+
+
+/* =========================================
+    BORDER / RADIUS UTILITIES
+========================================= */
+/* BLACK Borders */
+.bd-black-10 {border:1px solid var(--border-black-10);}
+.bd-black-20 {border:1px solid var(--border-black-20);}
+.bd-black-30 {border:1px solid var(--border-black-30);}
+.bd-black-40 {border:1px solid var(--border-black-40);}
+.bd-black-50 {border:1px solid var(--border-black-50);}
+.bd-black-60 {border:1px solid var(--border-black-60);}
+.bd-black-70 {border:1px solid var(--border-black-70);}
+.bd-black-80 {border:1px solid var(--border-black-80);}
+.bd-black-90 {border:1px solid var(--border-black-90);}
+
+/* WHITE Borders */
+.bd-white-10 {border:1px solid var(--border-white-10);}
+.bd-white-20 {border:1px solid var(--border-white-20);}
+.bd-white-30 {border:1px solid var(--border-white-30);}
+.bd-white-40 {border:1px solid var(--border-white-40);}
+.bd-white-50 {border:1px solid var(--border-white-50);}
+.bd-white-60 {border:1px solid var(--border-white-60);}
+.bd-white-70 {border:1px solid var(--border-white-70)}
+.bd-white-80 {border:1px solid var(--border-white-80);}
+.bd-white-90 {border:1px solid var(--border-white-90);}
+
+/* Border Radius */
+.bd0 {border:0;}
+.br5 {border-radius:5px;}
+.br10 {border-radius:10px;}
+.br12 {border-radius:12px;}
+.br15 {border-radius:15px;}
+.br50 {border-radius:50px;}
+.br50p { border-radius: 50%; }
+
+
+/* =========================================
+    TRANSITION UTILITIES
+========================================= */
+.trs { transition: all 0.3s; }
+
+
+/* =========================================
+    GLOBAL SCROLLBAR STYLE
+========================================= */
+::-webkit-scrollbar {width: 4px; height: 4px; }
+::-webkit-scrollbar-track {background: transparent;}
+::-webkit-scrollbar-thumb {background: #222;  border-radius: 10px;}
+::-webkit-scrollbar-thumb:hover {background: #666; }
+
+
+/* =========================================
+    즐겨찾기 ICON
+========================================= */
+.btn-star {width:18px; height: 18px; border:0; background:url('../images/ic_star_off.svg') no-repeat center / cover; cursor:pointer; opacity: 0.3;}
+.btn-star.active {background:url('../images/ic_star_on.svg') no-repeat center / cover; opacity: 1;}
+
+
+/* =========================================
+    BUTTON UTILITIES
+========================================= */
+/* 공통 버튼 */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:0 16px; height:38px; font-size:14px; font-weight: 600; border:none; border-radius:999px; cursor:pointer; white-space:nowrap; transition:all 0.15s;}
+.btn i{display:inline-block; width:14px; height:14px; background-size:contain; background-repeat:no-repeat;}
+
+/* Primary (페이지 상단 버튼) */
+.page-top-btns {display: flex; align-items: center; gap: 8px;}
+.btn-primary{background: var(--primary-dark); color:#fff; padding: 0 20px 0 18px}
+.btn-primary:hover{background:#0056a6;}
+
+/* Secondary (필터/상세입력 버튼) */
+.filter-btns {display: flex; align-items: center; gap: 4px;}
+.btn-secondary {background:var(--primary); color:#fff; height:36px; padding:0 16px; border-radius:5px;}
+.btn-secondary.dark {background:var(--black-70);}
+.btn-secondary-icon {background:var(--primary); color:#fff; width: 36px; height:36px; padding:0; border-radius:5px; }
+.btn-secondary:hover, .btn-secondary-icon:hover  {background:#1e6bd1;}
+.btn-secondary.dark:hover {background:var(--black-80);}
+/* 필터 옵션 */
+.filter-option-wrap {position: relative; display: inline-block;}
+.filter-option-wrap .filter-option-popup {position: absolute; top: 40px; right: 0; background: #fff; border-radius: 8px; padding: 10px 16px;  width: 120px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); overflow: hidden; z-index: 20; opacity: 0; transform: translateY(-6px); transition: all 0.18s ease; pointer-events: none;}
+.filter-option-wrap .filter-option-popup.open {opacity: 1; transform: translateY(0); pointer-events: auto; }
+.filter-option-inner {display: flex; flex-flow: column;}
+.filter-option-inner > label {padding: 4px 0;}
+
+/* Icon-only (아이콘 버튼) */
+.btn-icon {background:none; padding:4px; width:28px; height:28px; border-radius:4px;}
+.btn-icon i {width: 18px; height: 18px;}
+.btn-icon:hover{opacity: 0.6;}
+
+/* Disabled (비활성화) */
+.disabled {background: #d0d1d5;}
+.disabled:hover {background: #d0d1d5; cursor:default;}
+
+/* 아이콘들 */
+.ic-search {background:url('../images/button/search_w.svg') no-repeat center/cover;}/* 조회 */
+.ic-save {background:url('../images/button/save_w.svg') no-repeat center/cover;}/* 저장 */
+.ic-excel {background:url('../images/button/excel_w.svg') no-repeat center/cover;}/* 엑셀 */
+.ic-print {background:url('../images/button/print_w.svg') no-repeat center/cover;}/* 인쇄 */
+.ic-plus {background:url('../images/button/plus_w.svg') no-repeat center/cover;}/* 신규 */
+.ic-copy {background:url('../images/button/copy_w.svg') no-repeat center/cover;}/* 복사 */
+.ic-filter {background:url('../images/button/filter_w.svg') no-repeat center/cover;}/* 필터 */
+.ic-edit {background:url('../images/button/edit_b.svg') no-repeat center/cover;}/* 수정 - 검은색 */
+.ic-edit-blue {background:url('../images/button/edit_blue.svg') no-repeat center/cover;}/* 수정 - 파란색 */
+.ic-edit-gray {background: url('../images/button/edit_g.svg') no-repeat center / cover;} /* 수정 - 회색 */
+.ic-add {background:url('../images/button/add_b.svg') no-repeat center/cover;}/* 추가 - 검은색 */
+.ic-add-gray {background:url('../images/button/add_g.svg') no-repeat center/cover;}/* 추가  - 회색 */
+.ic-refresh {background:url('../images/button/refresh_w.svg') no-repeat center/cover;}/* 새로고침 */
+.ico-up {background: url('../images/ico_up.svg') no-repeat center/cover;;}
+.ico-down {background: url('../images/ico_down.svg') no-repeat center/cover;;}
+
+
+/* =========================================
+    UI CONTROLS
+========================================= */
+.tab-actions {display: flex; align-items: center; gap: 18px;}
+.btn-action { background: none; border: none; padding: 0; cursor: pointer; transition: all 0.2s;}
+.btn-action:hover {opacity: 0.7;}
+.btn-action .ico {display: block; width: 20px; height: 20px; background-size: cover; background-repeat: no-repeat;}
+.ico-prev {background-image: url('../images/ico_prev.svg');}
+.ico-next {background-image: url('../images/ico_next.svg');}
+.ico-close {background-image: url('../images/ico_close.svg');}
+.ico-refresh {background-image: url('../images/ico_refresh.svg');}
+.ico-menu {background-image: url('../images/ico_menu.svg');}
+.ico-expand {background-image: url('../images/ico_expand.svg');}
+
+
+
+/* =========================================
+    TITLE
+========================================= */
+.title-page {display: flex; align-items: center; gap: 8px;}
+.title-page .text {color: #000; font-weight: 700}
+.title-section-wrap {display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;}
+.title-section {display: flex; align-items: center; gap: 6px;}
+.title-section .icon {background: url('../images/bullet1.svg') no-repeat center / cover; width: 10px; height: 10px;}
+.title-section .text {color: #000; font-weight: 700}
+.title-group {display: flex; align-items: center; gap: 6px; margin-bottom: 10px;}
+.title-group .icon {background: url('../images/bullet2.svg') no-repeat center / cover; width: 3px; height: 3px;}
+.title-group .text {color: #222; font-weight: 700;}
+
+
+
+/* =========================================
+    FORM ELEMENTS (Select / Input / Checkbox / Radio)
+========================================= */
+/* 공통 */
+.combo-field {display: flex; gap: 4px; width: 100%;} /* select, input */
+.combo-field2 {display: flex; gap: 15px;} /* check, radio */
+.combo-field3 {display: flex; gap: 4px; width: 86%;} /* select, input */
+.combo-field.column {flex-direction: column; align-items: flex-start;}
+/* 인풋 */
+.input{width: 100%; max-width:300px; height:36px; padding:0 12px; border:1px solid rgba(0,0,0,0.3); border-radius:5px; font-size:14px; font-weight: 400;}
+.input:focus{border-color:#000;}
+.input::placeholder {color:#999;}
+.input:disabled{background:#f5f5f5; color:#999; border:1px solid #e6e6e6; cursor:not-allowed;}
+input[type="button"] {cursor: pointer;}
+/* 셀렉트 */
+.select{width: 100%; max-width:300px; height:36px; padding:0 24px 0 12px; border:1px solid rgba(0,0,0,0.3); border-radius:5px; font-size:14px; appearance:none; background:#fff url('../images/select_arrow.png') no-repeat right 10px center/9px 6px;}
+.select:focus{border-color:#000;}
+.select:disabled{background:#f5f5f5 url('../images/select_arrow_disabled.png') no-repeat right 10px center/9px 6px; color:#999; border:1px solid #e6e6e6; cursor:not-allowed; border-color:#d0d1d5;}
+/* 체크박스 */
+.chk{display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight: 400; cursor:pointer;}
+.chk input{position:absolute; opacity:0; cursor: pointer; width: 16px; height: 16px;}
+.chk span{width:16px; height:16px; border:1px solid rgba(0,0,0,0.3); border-radius:3px; display:inline-block; background:#fff; color: #222;}
+.chk input:checked + span{background:var(--primary) url('../images/check_w.svg') no-repeat center/12px 8px; border: 1px solid var(--primary);}
+.chk input:disabled + span{background:#f5f5f5; border-color:#d7d7d7;}
+.chk input:disabled:checked + span{background:#d0d1d5 url('../images/check_w.svg') no-repeat center/12px 8px; cursor:not-allowed;}
+/* 라디오 */
+.radio{display:inline-flex; align-items:center; gap:6px; font-size:14px;   font-weight: 400; cursor:pointer;}
+.radio input{position:absolute; opacity:0; width: 16px; height: 16px; cursor: pointer;}
+.radio span{width:16px; height:16px; border:1px solid rgba(0,0,0,0.3);  border-radius:50%; display:inline-block; background:#fff; color: #222;}
+.radio input:checked + span{background:#fff url('../images/radio_on.svg') no-repeat center/8px;}
+.radio input:disabled + span{background:#f5f5f5; border-color:#d7d7d7;}
+.radio input:disabled:checked + span{background:#fff url('../images/radio_on_g.svg') no-repeat center/8px; border-color:#d0d1d5;}
+/* 날짜, 시간 */
+.input-range {display: flex; align-items: center; gap:4px; width: 100%; min-width: 0 !important; flex: 1 1 0 !important;}
+.dash {color: #666; font-size: 13px;}
+.input-wrap {flex: 1 1 0;  min-width: 0; max-width: 300px;}
+.input-wrap .input {width: 100%;  min-width: 0; }
+input[type="date"], input[type="time"] {padding-right: 6px;}
+
+
+/* =========================================
+    RECEIPT PREVIEW (영수증 출력 미리보기)
+========================================= */
+.receipt-preview {display: flex; flex-direction: column; align-items: center; padding: 16px; height: 100%; width: 100%;}
+.receipt-paper {width: 100%; max-width: 360px; height: 100%; padding: 30px 20px; background: #fff; border: 1px solid #d9d9d9; box-sizing: border-box; flex: 1;}
+.receipt-box {margin-top: 35px; gap: 22px; display: flex; flex-direction: column;}
+.receipt-barcode {width: 100%; max-width: 200px; margin: 0 auto;}
+.receipt-barcode img {max-width: 100%; object-fit: cover;}
+.receipt-box .receipt-line {font-size: 14px; text-align: center; color: #222;}
+.receipt-footer .receipt-line {text-align: left;}
+
+
+/* =========================================
+    안내 메세지
+========================================= */
+.info-box {display:flex; align-items:flex-start; gap:12px; padding:20px; background: var(--tint-100); border:1px solid var(--gray-e1);}
+.info-box .ic-info {flex:0 0 auto; width:22px; height:22px; background:url('../images/ic-info.svg') no-repeat center;}
+.info-box .info-text {color: var(--black);}
+
+
+/* =========================================
+    이미지 없음
+========================================= */
+.no-image {width: 100%; height: 100%; background: url('../images/no-img.jpg') no-repeat center / cover;}
+
+
+
+
+
+
+@media (max-width: 1440px) {
+    .f30 {font-size:29px;}
+    .f28 {font-size:27px;}
+    .f26 {font-size:25px}
+    .f24 {font-size:23px;}
+    .f22 {font-size:21px;}
+    .f20 {font-size:19px;}
+    .f19 {font-size:18px;}
+    .f18 {font-size:17px;}
+    .f17 {font-size:16px;}
+    .f16 {font-size:15px;}
+    .f15 {font-size:14px;}
+    .f14 {font-size:14px;}
+    .f13 {font-size:13px;}
+    .f12 {font-size:12px;}
+    .f11 {font-size:11px;}
+    .f10 {font-size:10px;}
+    .pd24 {padding: 20px;}
+    .pd20 {padding: 16px;}
+}
+
+
+@media (max-width: 1200px) {
+    .f30 {font-size:26px;}
+    .f28 {font-size:24px;}
+    .f26 {font-size:23px}
+    .f24 {font-size:22px;}
+    .f22 {font-size:20px;}
+    .f20 {font-size:18px;}
+    .f19 {font-size:17px;}
+    .f18 {font-size:16px;}
+}
+
+
+@media (max-width: 1024px) {
+    .f30 {font-size:24px;}
+    .f28 {font-size:22px;}
+    .f26 {font-size:21px}
+    .f24 {font-size:20px;}
+    .f22 {font-size:19px;}
+    .f20 {font-size:18px;}
+    .f19 {font-size:17px;}
+    .f18 {font-size:16px;}
+    .mt30 {margin-top: 24px;}
+    .page-top-btns {gap: 6px;}
+}
+
+
+/* =========================================
+    V-SELECT (Vue Select) CUSTOM STYLES
+========================================= */
+/* v-select 컨테이너 - .select와 동일하게 */
+.custom-vselect {
+  width: 100%;
+  max-width: 300px;
+}
+
+/* 메인 토글 - .select와 완전히 동일 */
+.custom-vselect .vs__dropdown-toggle {
+  width: 100%;
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  padding: 0 24px 0 12px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  font-size: 14px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* focus 상태 - .select:focus와 동일 */
+.custom-vselect .vs__dropdown-toggle:focus-within,
+.custom-vselect.vs--open .vs__dropdown-toggle {
+  border-color: #000;
+  outline: none;
+}
+
+/* disabled 상태 - .select:disabled와 동일 */
+.custom-vselect.vs--disabled .vs__dropdown-toggle {
+  background: #f5f5f5;
+  color: #999;
+  border: 1px solid #d0d1d5;
+  cursor: not-allowed;
+}
+
+/* 선택된 옵션 영역 */
+.custom-vselect .vs__selected-options {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  flex-wrap: nowrap;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* 선택된 값 */
+.custom-vselect .vs__selected {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 검색 입력 */
+.custom-vselect .vs__search {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 14px;
+  line-height: 1;
+  color: inherit;
+  flex: 1;
+  min-width: 0;
+}
+
+.custom-vselect .vs__search:focus {
+  outline: none;
+}
+
+.custom-vselect .vs__search::placeholder {
+  color: #999;
+}
+
+/* disabled 시 텍스트 색상 */
+.custom-vselect.vs--disabled .vs__selected,
+.custom-vselect.vs--disabled .vs__search,
+.custom-vselect.vs--disabled .vs__search::placeholder {
+  color: #999;
+}
+
+/* 오른쪽 액션 영역 */
+.custom-vselect .vs__actions {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  gap: 6px;
+  pointer-events: auto;
+  z-index: 10;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* 화살표 아이콘 */
+.custom-vselect .vs__open-indicator {
+  fill: rgba(0, 0, 0, 0.5);
+  transform: scale(0.7);
+  transition: transform 0.15s;
+  cursor: pointer;
+}
+
+/* 열렸을 때 화살표 회전 */
+.custom-vselect.vs--open .vs__open-indicator {
+  transform: scale(0.7) rotate(180deg);
+}
+
+/* disabled 시 화살표 */
+.custom-vselect.vs--disabled .vs__open-indicator {
+  fill: #999;
+  cursor: not-allowed;
+}
+
+/* clear 버튼 - 스타일만 조정, 표시/숨김은 v-select 기본 동작 사용 */
+.custom-vselect .vs__clear {
+  fill: rgba(0, 0, 0, 0.5);
+  transform: scale(1.3) translateY(2px);
+  cursor: pointer;
+  transition: fill 0.2s, transform 0.2s;
+  pointer-events: auto;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 2px;
+  display: flex;
+}
+
+/* 값이 없을 때 clear 버튼 숨김 */
+.custom-vselect.vs--single .vs__selected-options:empty ~ .vs__actions .vs__clear {
+  display: none !important;
+}
+
+/* disabled이면 숨김 */
+.custom-vselect.vs--disabled .vs__clear {
+  display: none !important;
+}
+
+.custom-vselect .vs__clear:hover {
+  fill: rgba(0, 0, 0, 0.9);
+  transform: scale(1.4) translateY(2px);
+}
+
+.custom-vselect .vs__clear:active {
+  transform: scale(1.2) translateY(2px);
+}
+
+.custom-vselect .vs__clear svg {
+  cursor: pointer;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+}
+
+.custom-vselect .vs__clear * {
+  cursor: pointer;
+}
+
+/* spinner */
+.custom-vselect .vs__spinner {
+  border-left-color: rgba(0, 0, 0, 0.3);
+}
+
+/* 드롭다운 메뉴 */
+.custom-vselect .vs__dropdown-menu {
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 2px;
+  background: #fff;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+/* 드롭다운 옵션 */
+.custom-vselect .vs__dropdown-option {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.custom-vselect .vs__dropdown-option--highlight {
+  background-color: #f5f5f5;
+  color: #000;
+}
+
+.custom-vselect .vs__dropdown-option--selected {
+  background-color: #e6e6e6;
+  color: #000;
+  font-weight: 500;
+}
+
+/* no-options 메시지 */
+.custom-vselect .vs__no-options {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+}
+
+
+
+
+
+

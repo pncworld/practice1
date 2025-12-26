@@ -1,15 +1,9 @@
 <template>
-  <div class="flex justify-start w-full pl-12 pt-4">
-    <div class="flex justify-start">
-      <h1 class="font-bold text-sm md:text-2xl w-full">{{ currentTabName }}</h1>
-      <button class="" @click="deleteFavoriteF" v-if="isFavoriteOrNot">
-        <img src="../assets/table_star-checked.svg" alt="" />
-      </button>
-      <button class="" @click="saveFavoriteF" v-if="!isFavoriteOrNot">
-        <img src="../../src/assets/table_star.svg" alt="" />
-      </button>
+                            <div class="flex items-center f24 fc-000 page-title">
+      {{ currentTabName }}
+      <button class="btn-star active" @click="deleteFavoriteF" v-if="isFavoriteOrNot"/>
+      <button class="btn-star " @click="saveFavoriteF" v-if="!isFavoriteOrNot"/>
     </div>
-  </div>
 </template>
 
 <script setup>
