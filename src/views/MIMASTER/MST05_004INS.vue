@@ -575,17 +575,21 @@
           class="grid grid-cols-5 grid-rows-9 gap-1 w-[950px] h-[65vh]">
           <div
             v-for="(item, index) in items"
-            class="flex items-center justify-center h-[7vh] w-[9vw] rounded-2xl shadow-sm border border-gray-500"
+            class="flex items-center justify-center h-[7vh] w-[9vw] rounded-2xl shadow-sm border border-gray-500 cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105"
             :class="{
-              '!border-orange-500 border-4': clickedMenuKey == index,
+              '!border-red-600 !border-4 shadow-xl scale-105 ring-4 ring-red-500 ring-opacity-75': clickedMenuKey == index,
             }"
-            :style="{ backgroundColor: decimalToHexColor(item.lngKeyColor) }"
+            :style="{ 
+              backgroundColor: (!item.strKeyName || item.strKeyName.trim() === '' || !item.intKeyNo) 
+                ? '#ffffff' 
+                : decimalToHexColor(item.lngKeyColor) 
+            }"
             @click="
               saveMenuKeyposition(index);
               clickedMenuKey = index;
               clickedMenukeys();
             ">
-            <span class="flex flex-col">
+            <span class="flex flex-col" v-if="item.strKeyName && item.strKeyName.trim() !== '' && item.intKeyNo">
               <span v-if="item.intKeyNo == 1"
                 >(Screen. {{ item.lngKeyscrNo }} )</span
               >
@@ -982,8 +986,22 @@ const saveButton = () => {
     });
     return;
   }
+  // 변경 감지를 위해 현재 포스번호에 해당하는 유효한 항목만 필터링
+  const validCurrentMenuKeys = MenuKeyList.value.filter(
+    (item) => 
+      item.intPosNo == posNo.value && 
+      item.strKeyName && 
+      item.strKeyName.trim() !== ""
+  );
+  const validConfirmMenuKeys = (confirmitem.value || []).filter(
+    (item) => 
+      item.intPosNo == posNo.value && 
+      item.strKeyName && 
+      item.strKeyName.trim() !== ""
+  );
+  
   if (
-    JSON.stringify(confirmitem.value) === JSON.stringify(MenuKeyList.value) &&
+    JSON.stringify(validConfirmMenuKeys) === JSON.stringify(validCurrentMenuKeys) &&
     JSON.stringify(confirmitem2.value) === JSON.stringify(ScreenKeyOrigin.value)
   ) {
     Swal.fire({
@@ -994,11 +1012,15 @@ const saveButton = () => {
     });
     return;
   }
-  const keyseq = MenuKeyList.value.map((item) => item.intKeySeq);
-  const keyname = MenuKeyList.value.map((item) => item.strKeyName);
-  const keyscrno = MenuKeyList.value.map((item) => item.lngKeyscrNo);
-  const keycolor = MenuKeyList.value.map((item) => item.lngKeyColor);
-  const keyno = MenuKeyList.value.map((item) => item.intKeyNo);
+  
+  // 저장을 위해 현재 포스번호에 해당하는 항목만 필터링하고, 빈 항목(strKeyName이 없는)은 제외
+  const validMenuKeys = validCurrentMenuKeys;
+  
+  const keyseq = validMenuKeys.map((item) => item.intKeySeq);
+  const keyname = validMenuKeys.map((item) => item.strKeyName);
+  const keyscrno = validMenuKeys.map((item) => item.lngKeyscrNo);
+  const keycolor = validMenuKeys.map((item) => item.lngKeyColor);
+  const keyno = validMenuKeys.map((item) => item.intKeyNo);
   Swal.fire({
     title: "저장",
     text: "저장 하시겠습니까?",
@@ -1364,21 +1386,74 @@ const onEnd2 = (evt) => {
 
   showMenuKey(clickedintScreenNo.value);
 };
-watch(items, (newvalue) => {
+watch(items, (newvalue, oldvalue) => {
   //comsole.log(newvalue);
-  items.value.forEach((item) => {
+  // 현재 화면번호 범위만 처리 (다른 화면번호 항목에 영향 주지 않음)
+  const currentScreenStartSeq = (nowscreenNo.value - 1) * 45 + 1;
+  const currentScreenEndSeq = nowscreenNo.value * 45;
+  
+  // oldvalue가 없으면 초기화 중이므로 무시
+  if (!oldvalue || oldvalue.length === 0) {
+    return;
+  }
+  
+  items.value.forEach((item, idx) => {
+    // 현재 화면번호 범위가 아니면 무시 (안전장치)
+    if (!item.intKeySeq || item.intKeySeq < currentScreenStartSeq || item.intKeySeq > currentScreenEndSeq) {
+      return;
+    }
+    
+    const oldItem = oldvalue[idx];
+    
+    // 빈 항목(strKeyName이 없거나 비어있는) 처리
+    if (!item.strKeyName || item.strKeyName.trim() === "") {
+      // 이전에 내용이 있었는데 지금 비어있게 된 경우만 삭제
+      if (oldItem && oldItem.strKeyName && oldItem.strKeyName.trim() !== "") {
+        const emptyIndex = MenuKeyList.value.findIndex(
+          (m) => 
+            m.intKeySeq == item.intKeySeq && 
+            m.intPosNo == posNo.value &&
+            m.intKeySeq >= currentScreenStartSeq &&
+            m.intKeySeq <= currentScreenEndSeq
+        );
+        if (emptyIndex !== -1) {
+          MenuKeyList.value.splice(emptyIndex, 1);
+        }
+      }
+      // 처음부터 빈 항목이면 아무것도 하지 않음
+      return;
+    }
+
+    // 내용이 있는 항목만 처리
+    // 이전 항목과 비교하여 실제로 변경된 경우만 업데이트
+    const isChanged = !oldItem || 
+      oldItem.strKeyName !== item.strKeyName ||
+      oldItem.lngKeyscrNo !== item.lngKeyscrNo ||
+      oldItem.lngKeyColor !== item.lngKeyColor ||
+      oldItem.intKeyNo !== item.intKeyNo ||
+      oldItem.lngPrice !== item.lngPrice;
+
+    if (!isChanged) {
+      return; // 변경사항이 없으면 무시
+    }
+
+    // 현재 화면번호 범위에 해당하는 항목만 찾아서 업데이트
     const index = MenuKeyList.value.findIndex(
-      (m) => m.intKeySeq == item.intKeySeq
+      (m) => 
+        m.intKeySeq == item.intKeySeq && 
+        m.intPosNo == posNo.value &&
+        m.intKeySeq >= currentScreenStartSeq &&
+        m.intKeySeq <= currentScreenEndSeq
     );
 
     if (index !== -1) {
-      MenuKeyList.value[index] = item; // 💥 여기서 items 걸로 덮어씌움
+      MenuKeyList.value[index] = { ...item, intPosNo: posNo.value };
     } else {
-      MenuKeyList.value.push(item); // 💥 없으면 추가
+      MenuKeyList.value.push({ ...item, intPosNo: posNo.value });
     }
   });
   //comsole.log(MenuKeyList.value);
-});
+}, { deep: true });
 
 const movePage1 = () => {
   store.state.moveOtherTab = {
@@ -1578,11 +1653,28 @@ const changeMenuColor = (e) => {
     return;
   }
 
+  // items에서 색상 업데이트
   const a = items.value.find(
     (item) => item.intKeySeq == clickedMenuKeyIndex.value
   );
   if (a != undefined) {
     a.lngKeyColor = e;
+  }
+
+  // MenuKeyList에서도 색상 업데이트 (저장을 위해)
+  const currentScreenStartSeq = (nowscreenNo.value - 1) * 45 + 1;
+  const currentScreenEndSeq = nowscreenNo.value * 45;
+  
+  const b = MenuKeyList.value.find(
+    (item) =>
+      item.intKeySeq == clickedMenuKeyIndex.value &&
+      item.intPosNo == posNo.value &&
+      item.intKeySeq >= currentScreenStartSeq &&
+      item.intKeySeq <= currentScreenEndSeq
+  );
+
+  if (b != undefined) {
+    b.lngKeyColor = e;
   }
 };
 
@@ -1622,10 +1714,16 @@ const addMenuKey = () => {
   //comsole.log(posNo.value);
   //comsole.log(clickedMenuKeyIndex.value);
   //comsole.log(MenuKeyList.value);
+  // 현재 화면번호 범위에 해당하는 항목만 찾기
+  const currentScreenStartSeq = (nowscreenNo.value - 1) * 45 + 1;
+  const currentScreenEndSeq = nowscreenNo.value * 45;
+  
   const b = MenuKeyList.value.find(
     (item) =>
       item.intKeySeq == clickedMenuKeyIndex.value &&
-      item.intPosNo == posNo.value
+      item.intPosNo == posNo.value &&
+      item.intKeySeq >= currentScreenStartSeq &&
+      item.intKeySeq <= currentScreenEndSeq
   );
 
   ////console.log(b);
@@ -1677,10 +1775,16 @@ const addMenuKey2 = () => {
   //comsole.log(posNo.value);
   //comsole.log(clickedMenuKeyIndex.value);
   //comsole.log(MenuKeyList.value);
+  // 현재 화면번호 범위에 해당하는 항목만 찾기
+  const currentScreenStartSeq2 = (nowscreenNo.value - 1) * 45 + 1;
+  const currentScreenEndSeq2 = nowscreenNo.value * 45;
+  
   const b = MenuKeyList.value.find(
     (item) =>
       item.intKeySeq == clickedMenuKeyIndex.value &&
-      item.intPosNo == posNo.value
+      item.intPosNo == posNo.value &&
+      item.intKeySeq >= currentScreenStartSeq2 &&
+      item.intKeySeq <= currentScreenEndSeq2
   );
 
   //comsole.log(b);
@@ -1730,16 +1834,22 @@ const addMenuKey2 = () => {
 const addScreenKeyf = () => {
   //comsole.log(MenuKeyList.value);
   //comsole.log(clickedRealIndex.value);
+  const targetKeySeq = (nowscreenNo.value - 1) * 45 + clickedRealIndex.value + 1;
+  const currentScreenStartSeq3 = (nowscreenNo.value - 1) * 45 + 1;
+  const currentScreenEndSeq3 = nowscreenNo.value * 45;
+  
   const foraddIndex = MenuKeyList.value.findIndex(
     (item) =>
-      item.intKeySeq ==
-      (nowscreenNo.value - 1) * 45 + clickedRealIndex.value + 1
+      item.intKeySeq == targetKeySeq &&
+      item.intPosNo == posNo.value &&
+      item.intKeySeq >= currentScreenStartSeq3 &&
+      item.intKeySeq <= currentScreenEndSeq3
   );
   //comsole.log(foraddIndex);
   if (foraddIndex == -1) {
     MenuKeyList.value.push({
       intKeyNo: 1,
-      intKeySeq: (nowscreenNo.value - 1) * 45 + clickedRealIndex.value + 1,
+      intKeySeq: targetKeySeq,
       intPosNo: posNo.value,
       lngKeyscrNo: Number(currentSelectedMenuCode.value),
       strKeyName: currentSelectedMenuNm.value,
@@ -1748,7 +1858,7 @@ const addScreenKeyf = () => {
   } else {
     MenuKeyList.value[foraddIndex] = {
       intKeyNo: 1,
-      intKeySeq: (nowscreenNo.value - 1) * 45 + clickedRealIndex.value + 1,
+      intKeySeq: targetKeySeq,
       intPosNo: posNo.value,
       lngKeyscrNo: Number(currentSelectedMenuCode.value),
       strKeyName: currentSelectedMenuNm.value,
@@ -1804,11 +1914,33 @@ const showMenus = (value) => {
  */
 
 const deletekey = () => {
-  if (clickedScreenOrMenu.value == true) {
+  if (clickedScreenOrMenu.value == true && clickedMenuKeyIndex.value != null) {
+    // 현재 화면번호 범위에 해당하는 항목만 삭제 (다른 화면번호 항목 보호)
+    const currentScreenStartSeq = (nowscreenNo.value - 1) * 45 + 1;
+    const currentScreenEndSeq = nowscreenNo.value * 45;
+    
+    // 현재 화면번호와 포스번호에 해당하는 항목 중에서만 삭제
     const filteredMenuKeyList = MenuKeyList.value.filter(
-      (item) => item.intKeySeq != clickedRealIndex.value + 1
+      (item) => !(
+        item.intKeySeq == clickedMenuKeyIndex.value && 
+        item.intPosNo == posNo.value &&
+        item.intKeySeq >= currentScreenStartSeq &&
+        item.intKeySeq <= currentScreenEndSeq
+      )
     );
     MenuKeyList.value = filteredMenuKeyList;
+    // items에서도 삭제
+    const itemIndex = items.value.findIndex(
+      (item) => item.intKeySeq == clickedMenuKeyIndex.value
+    );
+    if (itemIndex !== -1) {
+      items.value[itemIndex] = {
+        intKeySeq: clickedMenuKeyIndex.value,
+        strKeyName: ``,
+      };
+    }
+    clickedMenuKeyIndex.value = null;
+    clickedMenuKey.value = null;
     showMenuKey();
   }
 };

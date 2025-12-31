@@ -371,6 +371,53 @@
     </div>
   </div>
   <!--드래그 영역 -->
+
+  <!-- MEALTICKET 메뉴 선택 팝업 -->
+  <div
+    v-if="showMealTicketMenuPopup"
+    class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60]">
+    <div
+      class="bg-white rounded-lg shadow-lg w-[50vw] h-[50vh] p-4 flex flex-col">
+      <div class="flex justify-between border-b">
+        <h2 class="text-lg font-bold">MEALTICKET 메뉴 선택</h2>
+        <button
+          @click="showMealTicketMenuPopup = false"
+          class="text-gray-500 hover:text-gray-700">
+          ✕
+        </button>
+      </div>
+      <div class="flex mt-3 space-x-2">
+        <div>
+          메뉴명/코드 :
+          <input
+            type="text"
+            class="border pl-1"
+            v-model="mealTicketSearchWord"
+            @input="searchMealTicketMenu" />
+        </div>
+      </div>
+      <div class="w-full h-full flex justify-center mt-5 flex-1 overflow-hidden">
+        <Realgrid
+          :progname="'MST44_052INS_VUE'"
+          :progid="2"
+          :rowData="filteredMealTicketMenuList"
+          @clickedRowData="selectMealTicketMenu"
+          :searchColId="'menuCd,menuNm'"
+          :searchWord3="mealTicketSearchWord"
+          :selectionStyle="'singleRow'"
+          :setStateBar="false"
+          :rowStateeditable="false">
+        </Realgrid>
+      </div>
+      <div class="flex justify-end mt-2 p-4 border-t">
+        <button
+          @click="showMealTicketMenuPopup = false"
+          class="whitebutton">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -905,6 +952,48 @@ const saveButton = async () => {
         const intKeyNos = MenuKeyList.value
           .filter((item) => item.intPosNo == posNo.value)
           .map((item) => item.intKeyNo);
+        
+        // lngKeyColor와 strIcon 필드 추가
+        // DELETE-INSERT 구조이므로 기존 데이터(confirmitem)에서 값을 가져와야 함
+        const lngKeyColorarr = MenuKeyList.value
+          .filter((item) => item.intPosNo == posNo.value)
+          .map((item) => {
+            // lngKeyColor가 있으면 사용, 없으면 기존 데이터에서 찾기
+            if (item.lngKeyColor !== undefined && item.lngKeyColor !== null && item.lngKeyColor !== "") {
+              return item.lngKeyColor;
+            }
+            // 기존 데이터에서 같은 메뉴키 찾기
+            const originalItem = confirmitem.value.find(
+              (orig) =>
+                orig.intPosNo == item.intPosNo &&
+                orig.intScreenNo == item.intScreenNo &&
+                orig.intKeySeq == item.intKeySeq
+            );
+            // 기존 데이터에 lngKeyColor가 있으면 사용, 없으면 빈 문자열
+            return originalItem && originalItem.lngKeyColor !== undefined && originalItem.lngKeyColor !== null && originalItem.lngKeyColor !== ""
+              ? originalItem.lngKeyColor
+              : "";
+          });
+        const strIconarr = MenuKeyList.value
+          .filter((item) => item.intPosNo == posNo.value)
+          .map((item) => {
+            // strIcon이 있으면 사용, 없으면 기존 데이터에서 찾기
+            if (item.strIcon !== undefined && item.strIcon !== null && item.strIcon !== "") {
+              return item.strIcon;
+            }
+            // 기존 데이터에서 같은 메뉴키 찾기
+            const originalItem = confirmitem.value.find(
+              (orig) =>
+                orig.intPosNo == item.intPosNo &&
+                orig.intScreenNo == item.intScreenNo &&
+                orig.intKeySeq == item.intKeySeq
+            );
+            // 기존 데이터에 strIcon이 있으면 사용, 없으면 빈 문자열
+            return originalItem && originalItem.strIcon !== undefined && originalItem.strIcon !== null && originalItem.strIcon !== ""
+              ? originalItem.strIcon
+              : "";
+          });
+        
         //comsole.log(posNo.value);
         //comsole.log(intKeySeqs.join(","));
         //comsole.log(screenNumarr.join(","));
@@ -919,7 +1008,9 @@ const saveButton = async () => {
           screenNumarr.join("\u200B"),
           lngScrarr.join("\u200B"),
           menuKeyNmarr.join("\u200B"),
-          intKeyNos.join("\u200B")
+          intKeyNos.join("\u200B"),
+          lngKeyColorarr.join("\u200B"),
+          strIconarr.join("\u200B")
         );
 
         console.log(res);
@@ -943,6 +1034,11 @@ const saveButton = async () => {
 const currentSelectedMenuCode = ref("");
 const currentSelectedMenuImgUrl = ref("");
 const currentSelectedMenuPrice = ref("");
+const showMealTicketMenuPopup = ref(false);
+const mealTicketSearchWord = ref("");
+const filteredMealTicketMenuList = ref([]);
+const pendingLinkMealTicketMenu = ref(null); // LINKMEALTICKET 메뉴 정보 임시 저장
+const selectedMealTicketMenu = ref(null); // 선택한 MEALTICKET 메뉴
 /**
  * 	화면 Load시 실행 스크립트
  */
@@ -1070,15 +1166,47 @@ const clickedTLUNM = ref();
 
 const selcetedrowData = (e) => {
   if (clickedRealIndex.value == null) {
+    Swal.fire({
+      title: "경고",
+      text: "메뉴키 배치 위치를 먼저 선택해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
     return;
   }
   //comsole.log(e);
-  currentSelectedMenuNm.value = e[1];
-  currentSelectedMenuCode.value = e[0];
-  currentSelectedMenuPrice.value = e[2];
-  currentSelectedMenuImgUrl.value = e[6];
+  
+  // strIcon이 "LINKMEALTICKET"인지 체크
+  // e는 배열 형태로 전달되므로 MenuList에서 원본 데이터 찾기
+  const selectedMenu = MenuList.value.find((item) => item.menuCd === e[0]);
+  const strIcon = selectedMenu ? selectedMenu.strIcon : (e.strIcon || e[7]);
+  
+  if (strIcon === "LINKMEALTICKET") {
+    // LINKMEALTICKET인 경우 메뉴 선택 팝업 표시
+    pendingLinkMealTicketMenu.value = {
+      menuNm: e[1],
+      menuCd: e[0],
+      menuPrice: e[2],
+      menuImgUrl: e[6],
+      strIcon: strIcon,
+    };
+    
+    // MEALTICKET 메뉴만 필터링
+    filteredMealTicketMenuList.value = MenuList.value.filter(
+      (item) => item.strIcon === "MEALTICKET"
+    );
+    
+    mealTicketSearchWord.value = "";
+    showMealTicketMenuPopup.value = true;
+  } else {
+    // 일반 메뉴는 기존대로 처리
+    currentSelectedMenuNm.value = e[1];
+    currentSelectedMenuCode.value = e[0];
+    currentSelectedMenuPrice.value = e[2];
+    currentSelectedMenuImgUrl.value = e[6];
 
-  addMenuKey();
+    addMenuKey();
+  }
 };
 
 // const searchMenuList = (e) => {
@@ -1315,6 +1443,111 @@ const addMenuKey = () => {
   console.log(MenuKeyList.value);
 };
 
+/**
+ * MEALTICKET 메뉴 선택 처리
+ */
+const selectMealTicketMenu = (menuData) => {
+  selectedMealTicketMenu.value = menuData;
+  showMealTicketMenuPopup.value = false;
+  
+  // 수량 입력 팝업 표시
+  showQuantityInputPopup();
+};
+
+/**
+ * 수량 입력 팝업 표시
+ */
+const showQuantityInputPopup = async () => {
+  const { value: quantity } = await Swal.fire({
+    title: "수량 입력",
+    text: "식권 수량을 입력해주세요.",
+    input: "number",
+    inputPlaceholder: "수량을 입력하세요",
+    inputAttributes: {
+      min: "1",
+      step: "1",
+    },
+    showCancelButton: true,
+    confirmButtonText: "확인",
+    cancelButtonText: "취소",
+    inputValidator: (value) => {
+      if (!value || Number(value) < 1) {
+        return "1 이상의 수량을 입력해주세요.";
+      }
+    },
+  });
+
+  if (quantity && selectedMealTicketMenu.value && pendingLinkMealTicketMenu.value) {
+    // 메뉴키 추가 (LINKMEALTICKET + MEALTICKET)
+    addMenuKeyWithMealTicket(
+      pendingLinkMealTicketMenu.value,
+      selectedMealTicketMenu.value,
+      quantity
+    );
+    
+    // 초기화
+    selectedMealTicketMenu.value = null;
+    pendingLinkMealTicketMenu.value = null;
+  }
+};
+
+/**
+ * LINKMEALTICKET 메뉴 추가 시 MEALTICKET도 함께 추가
+ */
+const addMenuKeyWithMealTicket = (linkMenuData, mealTicketMenu, quantity) => {
+  console.log(MenuKeyList.value);
+  console.log(clickedRealIndex.value);
+  
+  // 메뉴 정보 저장
+  currentSelectedMenuNm.value = linkMenuData.menuNm;
+  currentSelectedMenuCode.value = linkMenuData.menuCd;
+  currentSelectedMenuPrice.value = linkMenuData.menuPrice;
+  currentSelectedMenuImgUrl.value = linkMenuData.menuImgUrl;
+  
+  // 같은 위치에 이미 LINKMEALTICKET 메뉴가 있는지 확인 (lngKeyscrNo로 확인)
+  const existingIndex = MenuKeyList.value.findIndex(
+    (item) =>
+      item.intPosNo == posNo.value &&
+      item.intScreenNo == clickedintScreenNo.value &&
+      item.intKeySeq == clickedRealIndex.value &&
+      item.lngKeyscrNo == Number(linkMenuData.menuCd) // 같은 LINKMEALTICKET 메뉴인지 확인
+  );
+
+  const mealTicketMenuCd = mealTicketMenu[0] || mealTicketMenu.menuCd;
+  
+  if (existingIndex == -1) {
+    // 같은 위치에 같은 LINKMEALTICKET 메뉴가 없으면 새로 추가
+    MenuKeyList.value.push({
+      intKeyNo: 6,
+      intKeySeq: clickedRealIndex.value,
+      intPosNo: posNo.value,
+      intScreenNo: clickedintScreenNo.value,
+      lngKeyscrNo: Number(currentSelectedMenuCode.value),
+      strKeyName: currentSelectedMenuNm.value,
+      strUserFileName: currentSelectedMenuImgUrl.value,
+      lngKeyColor: Number(mealTicketMenuCd), // MEALTICKET 메뉴코드
+      strIcon: quantity, // 수량
+    });
+  } else {
+    // 같은 위치에 같은 LINKMEALTICKET 메뉴가 있으면 lngKeyColor와 strIcon만 업데이트
+    MenuKeyList.value[existingIndex] = {
+      ...MenuKeyList.value[existingIndex], // 기존 데이터 유지
+      lngKeyColor: Number(mealTicketMenuCd), // MEALTICKET 메뉴코드
+      strIcon: quantity, // 수량
+    };
+  }
+  
+  showMenuKey(clickedintScreenNo.value);
+  console.log(MenuKeyList.value);
+};
+
+/**
+ * MEALTICKET 메뉴 검색
+ */
+const searchMealTicketMenu = () => {
+  // Realgrid의 searchWord3 prop이 자동으로 필터링하므로 별도 처리 불필요
+};
+
 const addTLUKey = () => {
   //comsole.log(MenuKeyList.value);
   const foraddIndex = MenuKeyList.value.findIndex(
@@ -1372,8 +1605,20 @@ const deletekey = () => {
     clickedintScreenNo.value = clickedintScreenNo.value;
     showMenuKey(clickedintScreenNo.value);
   } else {
+    // 메뉴키 삭제
+    if (clickedRealIndex.value == null || clickedRealIndex.value == undefined) {
+      Swal.fire({
+        title: "경고",
+        text: "삭제할 메뉴키를 선택해주세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+    
     MenuKeyList.value = MenuKeyList.value.filter(
       (item) =>
+        item.intPosNo != posNo.value ||
         item.intScreenNo != clickedintScreenNo.value ||
         item.intKeySeq != clickedRealIndex.value
     );

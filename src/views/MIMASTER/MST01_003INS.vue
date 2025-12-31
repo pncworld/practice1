@@ -2230,7 +2230,7 @@ const saveButton = () => {
               isNewAutoMenuCode.value == true ? 1 : 0
             );
             
-            console.log(res3);
+            // console.log(res3);
             
             // 저장 후 원본 데이터 업데이트 및 플래그 초기화
             updatedAndInsertRow.forEach((item) => {

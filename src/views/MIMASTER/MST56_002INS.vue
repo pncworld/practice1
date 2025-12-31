@@ -5,198 +5,159 @@
 #Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <div class="" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <PageName></PageName>
-      <!-- <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="searchButton" class="button search md:w-auto w-14">
-          조회
-        </button>
-        <button @click="excelButton" class="button save w-auto excel">
-          엑셀
-        </button>
-      </div> -->
-      <button class="button search" @click="searchButton">조회</button>
-    </div>
-  </div>
-
-  <div
-    class="flex flex-col bg-gray-200 rounded-lg items-start justify-start h-24">
-    <CategorySelect
-      @click.stop
-      class=""
-      :changeState="changeState"
-      :reSearch="reSearch"
-      @MAINCATEGORY="MAINCATEGORY"
-      @SUBCATEGORY="SUBCATEGORY"
-      @STORE_CD="STORE_CD">
-    </CategorySelect>
-
-    <div class="flex space-x-5 ml-12 mt-2">
-      <div
-        class="bg-gray-200 flex justify-center text-base font-semibold items-center">
-        판매상태
+  <div class="br12 po-page">
+    <div class="pd24 flex-between sub-header">
+      <div class="title-page">
+        <div class="f24 text">메뉴품절관리</div>
+        <button class="btn-star" aria-label="즐겨찾기 추가/해제"></button>
       </div>
-      <div class="flex justify-center p-1 text-lg items-center space-x-10">
-        <select
-          name=""
-          id=""
-          class="border border-black w-36 h-7"
-          v-model="scond">
-          <option value="9">전체</option>
-          <option value="0">판매중</option>
-          <option value="1">당일품절</option>
-          <option value="2">계속품절</option>
-        </select>
-      </div>
-
-      <div class="flex space-x-5">
-        <div
-          class="bg-gray-200 flex justify-center items-center text-base font-semibold">
-          메뉴명
-        </div>
-        <div class="flex justify-start pl-2 text-lg items-center">
-          <input
-            type="text"
-            class="border border-black w-36 h-7"
-            v-model="scond2" />
-        </div>
+      <div class="page-top-btns">
+        <button class="btn btn-primary" @click="searchButton">
+          <i class="ic-search"></i>조회
+        </button>
       </div>
     </div>
-  </div>
 
-  <div class="flex justify-between pr-2 mt-2 items-center">
-    <label for="allcheck" class="pl-3"
-      ><input type="checkbox" id="allcheck" @click="allCheck" />전체선택</label
-    >
-  </div>
-  <div class="flex justify-center items-center mt-2">
-    <div
-      class="w-[95vw] h-10 grid grid-rows-none auto-rows-auto grid-cols-[1fr,2fr,4fr,1.6fr,1.5fr]">
+    <div class="page-scroll">
       <div
-        class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
-        선택
-      </div>
-      <div
-        class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
-        메뉴코드
-      </div>
-      <div
-        class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
-        메뉴명
-      </div>
-      <div
-        class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
-        단가
-      </div>
-      <div
-        class="border-l border-t border-b bg-sky-200 border-r border-black flex justify-center items-center h-8">
-        판매상태
-      </div>
+        class="flex flex-col bg-gray-200 rounded-lg items-start justify-start h-24">
+        <CategorySelect
+          @click.stop
+          class=""
+          :changeState="changeState"
+          :reSearch="reSearch"
+          @MAINCATEGORY="MAINCATEGORY"
+          @SUBCATEGORY="SUBCATEGORY"
+          @STORE_CD="STORE_CD">
+        </CategorySelect>
 
-      <template v-for="(menu, idx) in menuList" :key="idx">
-        <div
-          class="border-l border-t bg-sky-50 border-black flex justify-center h-auto"
-          :class="{
-            'border-b': idx == menuList.length - 1,
-            'bg-red-300': ischecked(menu.MENU_CD),
-          }">
-          <input type="checkbox" @change="toggleSelection(menu.MENU_CD)" />
-        </div>
-        <div
-          class="border-l border-t bg-sky-50 border-black h-auto flex items-center"
-          :class="{
-            'border-b': idx == menuList.length - 1,
-            'bg-red-300': ischecked(menu.MENU_CD),
-          }">
-          {{ menu.MENU_CD }}
-        </div>
-        <div
-          class="border-l border-t bg-sky-50 border-black flex h-auto whitespace-normal items-center"
-          :class="{
-            'border-b': idx == menuList.length - 1,
-            'bg-red-300': ischecked(menu.MENU_CD),
-            'items-center min-h-10': wordLength(menu.MENU_NAME),
-          }">
-          <div class="whitespace-normal break-words leading-snug w-full">
-            {{ menu.MENU_NAME }}
+        <div class="flex space-x-5 ml-12 mt-2">
+          <div
+            class="bg-gray-200 flex justify-center text-base font-semibold items-center">
+            판매상태
+          </div>
+          <div class="flex justify-center p-1 text-lg items-center space-x-10">
+            <select
+              name=""
+              id=""
+              class="border border-black w-36 h-7"
+              v-model="scond">
+              <option value="9">전체</option>
+              <option value="0">판매중</option>
+              <option value="1">당일품절</option>
+              <option value="2">계속품절</option>
+            </select>
+          </div>
+
+          <div class="flex space-x-5">
+            <div
+              class="bg-gray-200 flex justify-center items-center text-base font-semibold">
+              메뉴명
+            </div>
+            <div class="flex justify-start pl-2 text-lg items-center">
+              <input
+                type="text"
+                class="border border-black w-36 h-7"
+                v-model="scond2" />
+            </div>
           </div>
         </div>
-        <div
-          class="border-l border-t bg-sky-50 border-black flex h-auto justify-end items-center"
-          :class="{
-            'border-b': idx == menuList.length - 1,
-            'bg-red-300': ischecked(menu.MENU_CD),
-          }">
-          {{ formatNumberWithCommas(menu.MENU_PRICE) }}
-        </div>
-        <div
-          class="border-l border-t border-r bg-sky-50 border-black h-auto flex items-center"
-          :class="{
-            'border-b': idx == menuList.length - 1,
-            'bg-red-300': ischecked(menu.MENU_CD),
-            'text-red-500':
-              menu.MENU_STATUS.includes(1) || menu.MENU_STATUS.includes(2),
-          }">
-          {{
-            menu.MENU_STATUS == "1"
-              ? "당일품절"
-              : menu.MENU_STATUS == "2"
-              ? "계속품절"
-              : "판매중"
-          }}
-        </div>
-      </template>
-      <!-- <div class="!h-[20vh] w-full bg-gray-100"></div> -->
-    </div>
-  </div>
+      </div>
 
-  <div
-    class="fixed bottom-[11vh] w-full h-10 text-white font-bold"
-    v-if="showSave">
-    <div class="w-full h-auto pl-2 bg-red-500">
-      선택하신 메뉴수 : {{ selectedLeng }}
+      <div class="pd24 pt0 mt30 grid-area">
+        <!-- grid-area: 남은 화면 높이 전체 채움 / grid-fixed: 콘텐츠 높이만큼만 출력 -->
+
+        <div class="div-table">
+          <!-- table header -->
+          <div class="div-table-head">
+            <div class="th">
+              <label class="chk">
+                <input type="checkbox" id="allcheck" class="js-menu-status-toggle-all" @click="allCheck">
+                <span></span>
+              </label>
+            </div>
+            <div class="th code">메뉴코드</div>
+            <div class="th name">메뉴명</div>
+            <div class="th price">단가</div>
+            <div class="th status">판매상태</div>
+          </div>
+
+          <!-- table body -->
+          <div class="div-table-body">
+            <div
+              v-for="(menu, idx) in menuList"
+              :key="idx"
+              class="tr">
+              <div class="td">
+                <label class="chk">
+                  <input
+                    type="checkbox"
+                    class="js-menu-status-toggle"
+                    :checked="ischecked(menu.MENU_CD)"
+                    @change="toggleSelection(menu.MENU_CD)"
+                  />
+                  <span></span>
+                </label>
+              </div>
+              <div class="td code ta-left">{{ menu.MENU_CD }}</div>
+              <div class="td name ta-left">{{ menu.MENU_NAME }}</div>
+              <div class="td price ta-right">{{ formatNumberWithCommas(menu.MENU_PRICE) }}</div>
+              <div
+                class="td status"
+                :class="{
+                  'selling': menu.MENU_STATUS == '0' || menu.MENU_STATUS == '',
+                  'soldout': menu.MENU_STATUS == '1' || menu.MENU_STATUS == '2'
+                }">
+                {{
+                  menu.MENU_STATUS == "1"
+                    ? "당일품절"
+                    : menu.MENU_STATUS == "2"
+                    ? "계속품절"
+                    : "판매중"
+                }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- menu status bar -->
+        <div class="menu-status-bar" :class="{ show: showSave }">
+          <div class="menu-status-left">
+            <span class="label">선택하신 메뉴수</span>
+            <strong class="count">{{ selectedLeng }}</strong>
+          </div>
+
+          <div class="menu-status-center">
+            <button
+              type="button"
+              class="btn-menu-status"
+              :class="{ active: salecond == '0' }"
+              @click="salecond = '0'"
+              data-value="SALE">판매중</button>
+            <button
+              type="button"
+              class="btn-menu-status"
+              :class="{ active: salecond == '1' }"
+              @click="salecond = '1'"
+              data-value="TODAY_SOLDOUT">당일품절</button>
+            <button
+              type="button"
+              class="btn-menu-status"
+              :class="{ active: salecond == '2' }"
+              @click="salecond = '2'"
+              data-value="SOLDOUT">계속품절</button>
+          </div>
+
+          <div class="menu-status-right">
+            <button class="f17 btn-menu-save" @click="saveButton">저장</button>
+          </div>
+        </div>
+      </div>
+      <!-- grid-area, grid-fixed -->
     </div>
-    <div class="grid grid-rows-1 grid-cols-[1fr,1fr,1fr,1fr] w-full h-full">
-      <div
-        class="flex justify-center items-center border-l border-t border-white bg-red-500">
-        <label for="sale"
-          ><input
-            type="radio"
-            name="savecond"
-            id="sale"
-            value="0"
-            v-model="salecond" />판매중</label
-        >
-      </div>
-      <div
-        class="flex justify-center items-center border-l border-t border-white bg-red-500">
-        <label for="tsoldout"
-          ><input
-            type="radio"
-            name="savecond"
-            id="tsoldout"
-            value="1"
-            v-model="salecond" />당일품절</label
-        >
-      </div>
-      <div
-        class="flex justify-center items-center border-l border-t border-white bg-red-500">
-        <label for="csoldout"
-          ><input
-            type="radio"
-            name="savecond"
-            id="csoldout"
-            value="2"
-            v-model="salecond" />계속품절</label
-        >
-      </div>
-      <div
-        class="flex justify-start items-center border-l border-t border-white bg-white">
-        <button class="button save" @click="saveButton">저장</button>
-      </div>
-    </div>
+    <!-- page-scroll -->
   </div>
+  <!-- po-page -->
   <!-- <div class="absolute inset-0 bg-black bg-opacity-40" v-if="openPu">
     <button
       @click="openPu = false"
@@ -223,10 +184,10 @@ import { onMounted, ref } from "vue";
 
 import { GetMenuStkInfo, SetMenuStkRgst } from "@/api/etc";
 import { formatNumberWithCommas } from "@/customFunc/customFunc";
-import Swal from "sweetalert2";
 import { useStore } from "vuex";
 import CategorySelect from "@/components/categorySelect.vue";
 import PageName from "@/components/pageName.vue";
+import { showModalAlert } from "@/utils/modalAlert";
 
 const store = useStore();
 const changeState = ref(true);
@@ -357,20 +318,10 @@ const saveButton = async (e) => {
     showSave.value = false;
 
     if (res.data.Result == "00") {
-      Swal.fire({
-        title: "성공",
-        text: "저장을 완료하였습니다.",
-        icon: "success",
-        confirmButtonText: "확인",
-      });
+      showModalAlert('success', '성공', '저장을 완료하였습니다.', true, false, false);
       return;
     } else {
-      Swal.fire({
-        title: "실패",
-        text: `저장에 실패하였습니다. ${res.data.ResultMessage}`,
-        icon: "error",
-        confirmButtonText: "확인",
-      });
+      showModalAlert('warning', '실패', `저장에 실패하였습니다. ${res.data.ResultMessage}`, true, false, false);
       return;
     }
   } catch (error) {
@@ -429,20 +380,20 @@ const scond2 = ref("");
 const salecond = ref("0");
 const searchButton = async () => {
   if (showSave.value == true) {
-    await Swal.fire({
-      title: "변경하신 사항이 존재합니다. 저장하시겠습니까?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "네",
-      cancelButtonText: "아니요",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        saveButton();
-      } else if (result.isDismissed) {
-        return;
+    showModalAlert('warning', '경고', '변경하신 사항이 존재합니다. 저장하시겠습니까?', true, false, true, (action) => {
+      if (action === 'confirm') {
+        saveButton().then(() => {
+          // 저장 후 조회 실행
+          executeSearch();
+        });
       }
     });
+    return;
   }
+  executeSearch();
+};
+
+const executeSearch = async () => {
   try {
     const res = await GetMenuStkInfo(
       selectGroupCd.value,
@@ -522,6 +473,9 @@ const allCheck = (e) => {
     showSave.value = false;
   }
 };
+
+// Modal Alert는 전역 함수로 사용 (App.vue에 등록됨)
+
 onMounted(() => {});
 </script>
 

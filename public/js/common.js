@@ -257,6 +257,12 @@ $(function(){
     $(document).on("click", "button.btn-sidemenu-toggle", function (e) {
         e.stopPropagation(); 
         $(".sidemenu").toggleClass("collapse");
+        // 사이드메뉴 collapse 상태에 따라 body에 클래스 추가/제거
+        if ($(".sidemenu").hasClass("collapse")) {
+            $("body").addClass("sidemenu-expanded");
+        } else {
+            $("body").removeClass("sidemenu-expanded");
+        }
     });
 
 
@@ -277,7 +283,47 @@ $(function(){
     $(document).on("click", ".gnb-dropdown a", function () {
         $(".gnb-dropdown").removeClass("active"); // GNB 닫기
         $(".sidemenu").addClass("collapse");      // 좌측 메뉴 열기
+        $("body").addClass("sidemenu-expanded");  // body에 클래스 추가
     });
+
+
+    /* ===============================
+        사이드메뉴 초기 상태 확인 및 상태 동기화
+    =============================== */
+    function updateSidemenuState() {
+        if (window.innerWidth <= 1024) {
+            if ($(".sidemenu").hasClass("collapse")) {
+                $("body").addClass("sidemenu-expanded");
+            } else {
+                $("body").removeClass("sidemenu-expanded");
+            }
+        } else {
+            $("body").removeClass("sidemenu-expanded");
+        }
+    }
+
+    // 초기 상태 확인
+    $(document).ready(function() {
+        updateSidemenuState();
+    });
+
+    // 사이드메뉴 요소가 동적으로 추가될 경우를 대비한 MutationObserver
+    if (typeof MutationObserver !== 'undefined') {
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    updateSidemenuState();
+                }
+            });
+        });
+
+        $(document).ready(function() {
+            const sidemenu = document.querySelector('.sidemenu');
+            if (sidemenu) {
+                observer.observe(sidemenu, { attributes: true, attributeFilter: ['class'] });
+            }
+        });
+    }
 
 
     /* ===============================

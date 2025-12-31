@@ -45,10 +45,14 @@ body.full-mode .po-content .w-right {width: 100%; padding-left: 20px !important;
     Side Menu 
 ================================ */
 .po-layout .sidemenu {display: flex; flex-direction: column; flex: 1; min-height: 0;}
-.po-layout .user-info {padding-top: 6px; padding-bottom: 14px; display: flex; gap: 10px;}
-.po-layout .user-info .inner {gap: 10px; padding: 5px 10px; width: 100%;}
+.po-layout .user-info {padding-top: 6px; padding-bottom: 14px; display: flex; gap: 10px; position: relative;}
+.po-layout .user-info .inner {gap: 10px; padding: 5px 10px; flex: 1; min-width: 0;}
 .po-layout .user-info .btn-sidemenu-toggle {position: relative; z-index: 999; border: none; cursor: pointer; width: 38px; height: 38px; border-radius: 5px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border: 1px solid var(--white-50); display: none;}
 .po-layout .user-info .btn-sidemenu-toggle span {display: inline-block; width: 14px; height: 14px; background: url('../images/ic_sidemenu_toggle.svg') no-repeat center / cover;}
+.po-layout .user-info .btn-sidemenu-close {display: none; position: relative; z-index: 1001; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 5px; cursor: pointer; width: 28px; height: 28px; flex-shrink: 0; justify-content: center; align-items: center;}
+.po-layout .user-info .btn-sidemenu-close .ico {display: block; width: 16px; height: 16px; background-size: cover; background-repeat: no-repeat; opacity: 0.9; transition: opacity 0.2s;}
+.po-layout .user-info .btn-sidemenu-close:hover {background: rgba(0, 0, 0, 0.5);}
+.po-layout .user-info .btn-sidemenu-close:hover .ico {opacity: 1;}
 .po-layout .user-icon {width: 28px; height: 28px; flex-shrink: 0;}
 .po-layout .user-icon img {width: 12px;}
 .po-layout .user-id {white-space: nowrap;}
@@ -437,16 +441,15 @@ body.no-scroll {overflow:hidden;}
     .po-layout .w-right {width: calc(100% - 50px); min-width: 700px; padding-left: 10px;}
     .po-layout .h-right {justify-content: flex-end; gap: 15px; min-width: auto;}
     .po-layout .h-left {max-width: 180px; }
+    /* 기본: GNB 숨김, gnb-btn 표시 */
     .po-layout .h-gnb { display: none; }  
     .po-layout .gnb-btn {display: flex;}
     .po-layout .h-controller {display: flex;}
     .po-layout .btn-logout {padding: 0; border: none;}
     .po-layout .btn-logout img {width: 20px;}
     .po-layout .btn-logout span {display: none;}
-    .po-layout .user-info {padding: 6px; padding-top: 0; padding-bottom: 10px;}
-    .po-layout .sidemenu.collapse .user-info .inner {display: flex; flex-flow: column; align-items: flex-start; border-radius: 6px; gap: 4px; padding: 4px 12px; width: calc(100% - 48px);}
-    .po-layout .user-info .btn-sidemenu-toggle {display: flex;}
-    .po-layout .sidemenu.collapse .user-info .btn-sidemenu-toggle {transform: rotate(180deg);}
+    .po-layout .user-info {padding: 6px; padding-top: 0; padding-bottom: 10px; overflow: visible !important;}
+    .po-layout .user-info .btn-sidemenu-toggle {display: flex !important;}
     .po-layout .user-id {width: 100%; border-bottom: 1px solid rgb(255, 255, 255, 0.2); padding-bottom: 4px;}
     .po-layout .user-store::before {display: none;}
     .sidemenu .menu-header {padding: 16px 16px 4px;}
@@ -462,21 +465,38 @@ body.no-scroll {overflow:hidden;}
     .po-layout .sidemenu:not(.collapse) .menu-top,
     .po-layout .sidemenu:not(.collapse) .menu-toggle,
     .po-layout .sidemenu:not(.collapse) .menu-group {
-        opacity: 0;
-        pointer-events: none;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        visibility: hidden;
     }
-    .po-layout .sidemenu:not(.collapse) .user-info .inner {display: none;}
+    .po-layout .sidemenu:not(.collapse) .user-info .inner {display: none !important;}
+    .po-layout .sidemenu:not(.collapse) .user-info .btn-sidemenu-toggle {transform: rotate(0deg);}
     /* 펼친 상태 */
     .po-layout .sidemenu.collapse {width: 240px;}
-    .po-layout .sidemenu.collapse .user-info .inner,
+    .po-layout .sidemenu.collapse .user-info .inner {display: flex !important; flex-flow: column; align-items: flex-start; border-radius: 6px; gap: 4px; padding: 4px 12px; flex: 1; min-width: 0; opacity: 1 !important; pointer-events: auto !important; visibility: visible;}
     .po-layout .sidemenu.collapse .search-box,
     .po-layout .sidemenu.collapse .menu-header,
     .po-layout .sidemenu.collapse .menu-top,
     .po-layout .sidemenu.collapse .menu-toggle,
     .po-layout .sidemenu.collapse .menu-group {
-        opacity: 1;
-        pointer-events: auto;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        visibility: visible;
         transition: opacity .2s;
+    }
+    .po-layout .sidemenu.collapse .user-info .btn-sidemenu-toggle {transform: rotate(180deg);}
+    /* 사이드메뉴가 펼쳐진 상태일 때 GNB 표시 (햄버거 버튼은 계속 표시) */
+    body.sidemenu-expanded .po-layout .h-gnb {display: flex !important;}
+    /* 사이드메뉴 닫기 버튼 표시 (1024px 이하에서만, 사이드메뉴가 펼쳐진 상태일 때) */
+    .po-layout .sidemenu.collapse .user-info .btn-sidemenu-close {
+        display: flex !important;
+        position: relative !important;
+        z-index: 1001 !important;
+        justify-content: center !important;
+        align-items: center !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
     }
     .po-page .sub-header {padding-top: 12px; padding-bottom: 12px;}
     .move-layout {gap: 62px;}

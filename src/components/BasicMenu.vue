@@ -15,6 +15,9 @@
       <button class="btn-sidemenu-toggle" type="button">
         <span></span>
       </button>
+      <button class="btn-sidemenu-close" type="button" @click="closeSidemenu" title="사이드메뉴 닫기">
+        <i class="ico ico-close"></i>
+      </button>
     </div>
 
     <!-- 검색 -->
@@ -304,6 +307,20 @@ const isMobile = ref(false);
 const detectMobile = () => {
   const userAgent = window.navigator.userAgent;
   isMobile.value = /iPhone|iPad|iPod|Android/i.test(userAgent);
+};
+
+const closeSidemenu = () => {
+  // 사이드메뉴 닫기: collapse 클래스 제거, body에서 sidemenu-expanded 클래스 제거
+  if (typeof window !== 'undefined' && window.$) {
+    window.$(".sidemenu").removeClass("collapse");
+    window.$("body").removeClass("sidemenu-expanded");
+  } else {
+    const sidemenu = document.querySelector(".sidemenu");
+    if (sidemenu) {
+      sidemenu.classList.remove("collapse");
+    }
+    document.body.classList.remove("sidemenu-expanded");
+  }
 };
 
 onMounted(() => {

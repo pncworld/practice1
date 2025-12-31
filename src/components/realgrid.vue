@@ -1188,6 +1188,8 @@ const addrow4activated = ref(false);
 const deleted2activated = ref(false);
 const updatedrowData = ref([]);
 const selectedindex = ref(-1);
+const isGridInitialized = ref(false);
+const previousRowDataLength = ref(0);
 const emit = defineEmits([
   "selcetedrowData",
   "updatedRowData",
@@ -1220,6 +1222,7 @@ const funcshowGrid = async () => {
     gridView.destroy();
     gridView = null;
     dataProvider = null;
+    isGridInitialized.value = false;
 
     // 기존 그리드 인스턴스 제거
   }
@@ -3373,6 +3376,9 @@ const funcshowGrid = async () => {
       emit("dblclickedRowData", selectedRowData.value);
     }
   };
+  
+  // 그리드 초기화 완료 플래그 설정
+  isGridInitialized.value = true;
 };
 
 // 7구간
@@ -4519,56 +4525,155 @@ const setupGrid = async () => {
 
 watch(
   () => props.rowData,
-  () => {
+  (newRowData) => {
     if (props.initSelect == true) {
       selectedindex.value = -1;
     }
     addrow4activated.value = true;
-    funcshowGrid().then(() => {
-      if (gridView) {
-        var rows = gridView.getCheckedRows();
-        selectedRowData.value = [];
-        for (var i in rows) {
-          var data = dataProvider.getJsonRow(rows[i]);
-          selectedRowData.value.push(data);
+    
+    // 초기 로드 판단: 이전 rowData가 빈 배열이었고 현재 데이터가 있는 경우
+    const isInitialLoad = previousRowDataLength.value === 0 && newRowData && newRowData.length > 0;
+    previousRowDataLength.value = newRowData ? newRowData.length : 0;
+    
+    // 초기 로드이거나 그리드가 초기화되지 않은 경우 funcshowGrid 호출
+    // 그 외의 경우 (그리드가 이미 초기화되어 있고 데이터만 업데이트)에는 setRows만 호출
+    if (!isInitialLoad && isGridInitialized.value && gridView !== undefined && gridView !== null && dataProvider !== undefined && dataProvider !== null) {
+      // 그리드 재초기화 없이 데이터만 업데이트
+      try {
+        if (props.setTreeView == false) {
+          dataProvider.setRows(props.rowData);
+        } else {
+          dataProvider.setRows(props.rowData, "TreeNum", false, null, "iconField");
         }
-        emit("checkedRowData", selectedRowData.value);
-      }
-
-      setTimeout(function () {
-        if (selectedindex.value == -1) {
-          if (dataProvider) {
-            dataProvider.clearRowStates();
-            emit("selectedIndex", selectedindex.value);
-            return;
+        
+        // 체크된 행 정보 유지
+        if (gridView) {
+          var rows = gridView.getCheckedRows();
+          selectedRowData.value = [];
+          for (var i in rows) {
+            var data = dataProvider.getJsonRow(rows[i]);
+            selectedRowData.value.push(data);
           }
+          emit("checkedRowData", selectedRowData.value);
         }
 
-        if (selectedindex.value !== "" && selectedindex.value != undefined) {
+        setTimeout(function () {
+          if (selectedindex.value == -1) {
+            if (dataProvider) {
+              dataProvider.clearRowStates();
+              emit("selectedIndex", selectedindex.value);
+              return;
+            }
+          }
+
+          if (selectedindex.value !== "" && selectedindex.value != undefined) {
+            if (gridView) {
+              gridView.setCurrent({ dataRow: selectedindex.value });
+            }
+          }
+
+          addrow4activated.value = false;
+
+          if (gridView !== null && gridView != undefined) {
+            if (deleted2activated.value == true) {
+              gridView.clearCurrent();
+              deleted2activated.value = false;
+            } else {
+              gridView.clearCurrent();
+            }
+          }
+        }, 80);
+      } catch (error) {
+        // setRows 실패 시 그리드 재초기화
+        console.warn("Failed to update rows, reinitializing grid:", error);
+        isGridInitialized.value = false;
+        funcshowGrid().then(() => {
           if (gridView) {
-            gridView.setCurrent({ dataRow: selectedindex.value });
+            var rows = gridView.getCheckedRows();
+            selectedRowData.value = [];
+            for (var i in rows) {
+              var data = dataProvider.getJsonRow(rows[i]);
+              selectedRowData.value.push(data);
+            }
+            emit("checkedRowData", selectedRowData.value);
           }
+
+          setTimeout(function () {
+            if (selectedindex.value == -1) {
+              if (dataProvider) {
+                dataProvider.clearRowStates();
+                emit("selectedIndex", selectedindex.value);
+                return;
+              }
+            }
+
+            if (selectedindex.value !== "" && selectedindex.value != undefined) {
+              if (gridView) {
+                gridView.setCurrent({ dataRow: selectedindex.value });
+              }
+            }
+
+            addrow4activated.value = false;
+
+            if (gridView !== null && gridView != undefined) {
+              if (deleted2activated.value == true) {
+                gridView.clearCurrent();
+                deleted2activated.value = false;
+              } else {
+                gridView.clearCurrent();
+              }
+            }
+          }, 80);
+        });
+      }
+    } else {
+      // 그리드가 초기화되지 않았거나 플래그가 false이면 funcshowGrid 호출
+      funcshowGrid().then(() => {
+        if (gridView) {
+          var rows = gridView.getCheckedRows();
+          selectedRowData.value = [];
+          for (var i in rows) {
+            var data = dataProvider.getJsonRow(rows[i]);
+            selectedRowData.value.push(data);
+          }
+          emit("checkedRowData", selectedRowData.value);
         }
 
-        // const newIndices = props.rowData.reduce((indices, item, index) => {
-        //   if (item.new === true) {
-        //     indices.push(index);
-        //   }
-        //   return indices;
-        // }, []);
-        // dataProvider.setRowStates(newIndices, "created", true);
-        addrow4activated.value = false;
-
-        if (gridView !== null && gridView != undefined) {
-          if (deleted2activated.value == true) {
-            gridView.clearCurrent();
-            deleted2activated.value = false;
-          } else {
-            gridView.clearCurrent();
+        setTimeout(function () {
+          if (selectedindex.value == -1) {
+            if (dataProvider) {
+              dataProvider.clearRowStates();
+              emit("selectedIndex", selectedindex.value);
+              return;
+            }
           }
-        }
-      }, 80); // 시간으로인한 미적용 이슈있음
-    });
+
+          if (selectedindex.value !== "" && selectedindex.value != undefined) {
+            if (gridView) {
+              gridView.setCurrent({ dataRow: selectedindex.value });
+            }
+          }
+
+          // const newIndices = props.rowData.reduce((indices, item, index) => {
+          //   if (item.new === true) {
+          //     indices.push(index);
+          //   }
+          //   return indices;
+          // }, []);
+          // dataProvider.setRowStates(newIndices, "created", true);
+          addrow4activated.value = false;
+
+          if (gridView !== null && gridView != undefined) {
+            if (deleted2activated.value == true) {
+              gridView.clearCurrent();
+              deleted2activated.value = false;
+            } else {
+              gridView.clearCurrent();
+            }
+          }
+        }, 80); // 시간으로인한 미적용 이슈있음
+      });
+    }
   }
 );
 

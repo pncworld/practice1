@@ -1001,8 +1001,9 @@ const saveButton = async () => {
     }
   } else {
     if (
-      JSON.stringify(confirmitem2.value) ===
-      JSON.stringify(updatedRowData5.value)
+      allstaterows2.value.deleted.length == 0 &&
+      allstaterows2.value.created.length == 0 &&
+      allstaterows2.value.updated.length == 0
     ) {
       Swal.fire({
         title: "경고",
@@ -1076,81 +1077,43 @@ const saveButton = async () => {
         //comsole.log(rowData3.value);
 
         if (currentMenu.value == false) {
-          const lngCodes = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngCode);
-          const strNames = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.strName);
-          const blnMustSels = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.blnMustSel);
-          const intMultiples = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.intMultiple);
-          const lngChainMenu1 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu1);
-          const lngChainMenu2 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu2);
-          const lngChainMenu3 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu3);
-          const lngChainMenu4 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu4);
-          const lngChainMenu5 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu5);
-          const lngChainMenu6 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu6);
-          const lngChainMenu7 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu7);
-          const lngChainMenu8 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu8);
-          const lngChainMenu9 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu9);
-          const lngChainMenu10 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu10);
-          const lngChainMenu11 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu11);
-          const lngChainMenu12 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu12);
-          const lngChainMenu13 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu13);
-          const lngChainMenu14 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu14);
-          const lngChainMenu15 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu15);
-          const lngChainMenu16 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu16);
-          const lngChainMenu17 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu17);
-          const lngChainMenu18 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu18);
-          const lngChainMenu19 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu19);
-          const lngChainMenu20 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu20);
-          const lngChainMenu21 = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index))
-            .map((item) => item.lngChainMenu21);
+          // 1. 먼저 삭제되지 않은 데이터를 필터링
+          const filteredData = updatedRowData4.value
+            .filter((_, index) => !allstaterows.value.deleted.includes(index));
+          
+          // 2. lngCode 기준으로 정렬 (이 부분이 추가됨!)
+          const sortedData = filteredData.sort((a, b) => {
+            const codeA = parseInt(a.lngCode) || 0;
+            const codeB = parseInt(b.lngCode) || 0;
+            return codeA - codeB;
+          });
+          
+          // 3. 정렬된 데이터에서 각 필드 추출
+          const lngCodes = sortedData.map((item) => item.lngCode);
+          const strNames = sortedData.map((item) => item.strName);
+          const blnMustSels = sortedData.map((item) => item.blnMustSel);
+          const intMultiples = sortedData.map((item) => item.intMultiple);
+          const lngChainMenu1 = sortedData.map((item) => item.lngChainMenu1);
+          const lngChainMenu2 = sortedData.map((item) => item.lngChainMenu2);
+          const lngChainMenu3 = sortedData.map((item) => item.lngChainMenu3);
+          const lngChainMenu4 = sortedData.map((item) => item.lngChainMenu4);
+          const lngChainMenu5 = sortedData.map((item) => item.lngChainMenu5);
+          const lngChainMenu6 = sortedData.map((item) => item.lngChainMenu6);
+          const lngChainMenu7 = sortedData.map((item) => item.lngChainMenu7);
+          const lngChainMenu8 = sortedData.map((item) => item.lngChainMenu8);
+          const lngChainMenu9 = sortedData.map((item) => item.lngChainMenu9);
+          const lngChainMenu10 = sortedData.map((item) => item.lngChainMenu10);
+          const lngChainMenu11 = sortedData.map((item) => item.lngChainMenu11);
+          const lngChainMenu12 = sortedData.map((item) => item.lngChainMenu12);
+          const lngChainMenu13 = sortedData.map((item) => item.lngChainMenu13);
+          const lngChainMenu14 = sortedData.map((item) => item.lngChainMenu14);
+          const lngChainMenu15 = sortedData.map((item) => item.lngChainMenu15);
+          const lngChainMenu16 = sortedData.map((item) => item.lngChainMenu16);
+          const lngChainMenu17 = sortedData.map((item) => item.lngChainMenu17);
+          const lngChainMenu18 = sortedData.map((item) => item.lngChainMenu18);
+          const lngChainMenu19 = sortedData.map((item) => item.lngChainMenu19);
+          const lngChainMenu20 = sortedData.map((item) => item.lngChainMenu20);
+          const lngChainMenu21 = sortedData.map((item) => item.lngChainMenu21);
 
           const res = await saveOptions(
             groupCd.value,
@@ -1181,73 +1144,44 @@ const saveButton = async () => {
             lngChainMenu20.join(","),
             lngChainMenu21.join(",")
           );
+
+          // console.log(res);
+
         } else {
-          const lngCodes2 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngCode);
-          const strNames2 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.strName);
-          const lngChainGroup1 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup1);
-          const lngChainGroup2 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup2);
-          const lngChainGroup3 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup3);
-          const lngChainGroup4 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup4);
-          const lngChainGroup5 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup5);
-          const lngChainGroup6 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup6);
-          const lngChainGroup7 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup7);
-          const lngChainGroup8 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup8);
-          const lngChainGroup9 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup9);
-          const lngChainGroup10 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup10);
-          const lngChainGroup11 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup11);
-          const lngChainGroup12 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup12);
-          const lngChainGroup13 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup13);
-          const lngChainGroup14 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup14);
-          const lngChainGroup15 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup15);
-          const lngChainGroup16 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup16);
-          const lngChainGroup17 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup17);
-          const lngChainGroup18 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup18);
-          const lngChainGroup19 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup19);
-          const lngChainGroup20 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index))
-            .map((item) => item.lngChainGroup20);
+          // 1. 삭제되지 않은 데이터 필터링
+          const filteredData2 = updatedRowData5.value
+            .filter((_, index) => !allstaterows2.value.deleted.includes(index));
+
+          // 2. lngCode 기준으로 정렬 추가!
+          const sortedData2 = filteredData2.sort((a, b) => {
+            const codeA = parseInt(a.lngCode) || 0;
+            const codeB = parseInt(b.lngCode) || 0;
+            return codeA - codeB;
+          });
+
+          // 3. 정렬된 데이터에서 각 필드 추출
+          const lngCodes2 = sortedData2.map((item) => item.lngCode);
+          const strNames2 = sortedData2.map((item) => item.strName);
+          const lngChainGroup1 = sortedData2.map((item) => item.lngChainGroup1);
+          const lngChainGroup2 = sortedData2.map((item) => item.lngChainGroup2);
+          const lngChainGroup3 = sortedData2.map((item) => item.lngChainGroup3);
+          const lngChainGroup4 = sortedData2.map((item) => item.lngChainGroup4);
+          const lngChainGroup5 = sortedData2.map((item) => item.lngChainGroup5);
+          const lngChainGroup6 = sortedData2.map((item) => item.lngChainGroup6);
+          const lngChainGroup7 = sortedData2.map((item) => item.lngChainGroup7);
+          const lngChainGroup8 = sortedData2.map((item) => item.lngChainGroup8);
+          const lngChainGroup9 = sortedData2.map((item) => item.lngChainGroup9);
+          const lngChainGroup10 = sortedData2.map((item) => item.lngChainGroup10);
+          const lngChainGroup11 = sortedData2.map((item) => item.lngChainGroup11);
+          const lngChainGroup12 = sortedData2.map((item) => item.lngChainGroup12);
+          const lngChainGroup13 = sortedData2.map((item) => item.lngChainGroup13);
+          const lngChainGroup14 = sortedData2.map((item) => item.lngChainGroup14);
+          const lngChainGroup15 = sortedData2.map((item) => item.lngChainGroup15);
+          const lngChainGroup16 = sortedData2.map((item) => item.lngChainGroup16);
+          const lngChainGroup17 = sortedData2.map((item) => item.lngChainGroup17);
+          const lngChainGroup18 = sortedData2.map((item) => item.lngChainGroup18);
+          const lngChainGroup19 = sortedData2.map((item) => item.lngChainGroup19);
+          const lngChainGroup20 = sortedData2.map((item) => item.lngChainGroup20);
 
           const res = await saveOptions2(
             groupCd.value,
