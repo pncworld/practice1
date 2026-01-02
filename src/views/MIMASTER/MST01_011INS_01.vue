@@ -798,7 +798,7 @@ const clickedRowData = (newValue) => {
   } else {
   }
   clickrowData1.value = true;
-  console.log(newValue);
+  // console.log(newValue);
   if (newValue == undefined) {
     return;
   }
@@ -1081,18 +1081,30 @@ const saveButton = async () => {
           const filteredData = updatedRowData4.value
             .filter((_, index) => !allstaterows.value.deleted.includes(index));
           
-          // 2. lngCode 기준으로 정렬 (이 부분이 추가됨!)
-          const sortedData = filteredData.sort((a, b) => {
+          // 디버깅: 필터링 전 원본 데이터 확인
+          // console.log("필터링 전 updatedRowData4:", updatedRowData4.value.map(item => ({ lngCode: item.lngCode, strName: item.strName })));
+          // console.log("필터링 후 filteredData:", filteredData.map(item => ({ lngCode: item.lngCode, strName: item.strName })));
+          
+          // 2. lngCode 기준으로 정렬 (복사본 생성 후 정렬하여 원본 보호)
+          const sortedData = [...filteredData].sort((a, b) => {
             const codeA = parseInt(a.lngCode) || 0;
             const codeB = parseInt(b.lngCode) || 0;
             return codeA - codeB;
           });
           
-          // 3. 정렬된 데이터에서 각 필드 추출
+          // 디버깅: 정렬 후 데이터 확인
+          // console.log("정렬 후 sortedData:", sortedData.map(item => ({ lngCode: item.lngCode, strName: item.strName })));
+
+          // 3. 정렬된 데이터에서 각 필드 추출 (같은 객체에서 추출하여 매핑 보장)
           const lngCodes = sortedData.map((item) => item.lngCode);
-          const strNames = sortedData.map((item) => item.strName);
+          const strNames = sortedData.map((item) => item.strName.replace(/,/g, '/')); // 쉼표를 | 로 변경
           const blnMustSels = sortedData.map((item) => item.blnMustSel);
           const intMultiples = sortedData.map((item) => item.intMultiple);
+          
+          // 디버깅: 추출된 데이터 확인
+          // console.log("추출된 lngCodes:", lngCodes);
+          // console.log("추출된 strNames:", strNames);
+          // console.log("매핑 확인:", lngCodes.map((code, idx) => ({ lngCode: code, strName: strNames[idx] })));
           const lngChainMenu1 = sortedData.map((item) => item.lngChainMenu1);
           const lngChainMenu2 = sortedData.map((item) => item.lngChainMenu2);
           const lngChainMenu3 = sortedData.map((item) => item.lngChainMenu3);
@@ -1114,6 +1126,17 @@ const saveButton = async () => {
           const lngChainMenu19 = sortedData.map((item) => item.lngChainMenu19);
           const lngChainMenu20 = sortedData.map((item) => item.lngChainMenu20);
           const lngChainMenu21 = sortedData.map((item) => item.lngChainMenu21);
+
+          // 백엔드로 전송되는 데이터 확인
+          // console.log("=== 백엔드 전송 데이터 ===");
+          // console.log("sortedData 전체:", sortedData); // 이거 추가!
+          // console.log("lngCodes (join):", lngCodes.join(","));
+          // console.log("strNames (join):", strNames.join(","));
+          // console.log("전송 전 최종 매핑 확인:", lngCodes.map((code, idx) => ({ 
+          //   index: idx, 
+          //   lngCode: code, 
+          //   strName: strNames[idx] 
+          // })));
 
           const res = await saveOptions(
             groupCd.value,
@@ -1152,8 +1175,8 @@ const saveButton = async () => {
           const filteredData2 = updatedRowData5.value
             .filter((_, index) => !allstaterows2.value.deleted.includes(index));
 
-          // 2. lngCode 기준으로 정렬 추가!
-          const sortedData2 = filteredData2.sort((a, b) => {
+          // 2. lngCode 기준으로 정렬 (복사본 생성 후 정렬하여 원본 보호)
+          const sortedData2 = [...filteredData2].sort((a, b) => {
             const codeA = parseInt(a.lngCode) || 0;
             const codeB = parseInt(b.lngCode) || 0;
             return codeA - codeB;
@@ -1161,7 +1184,7 @@ const saveButton = async () => {
 
           // 3. 정렬된 데이터에서 각 필드 추출
           const lngCodes2 = sortedData2.map((item) => item.lngCode);
-          const strNames2 = sortedData2.map((item) => item.strName);
+          const strNames2 = sortedData2.map((item) => item.strName.replace(/,/g, '/'));
           const lngChainGroup1 = sortedData2.map((item) => item.lngChainGroup1);
           const lngChainGroup2 = sortedData2.map((item) => item.lngChainGroup2);
           const lngChainGroup3 = sortedData2.map((item) => item.lngChainGroup3);
@@ -1211,7 +1234,7 @@ const saveButton = async () => {
           );
         }
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       } finally {
         store.state.loading = false;
         Swal.fire({
@@ -1232,7 +1255,7 @@ const saveButton = async () => {
  */
 
 const updatedRowData3 = (e) => {
-  console.log(e);
+  // console.log(e);
   updatedRowData4.value = e;
 };
 
@@ -2115,13 +2138,13 @@ const sendRowState2 = (e) => {
 
 const allstaterows = ref([]);
 const allStateRows = (e) => {
-  console.log(e);
+  // console.log(e);
   allstaterows.value = e;
 };
 
 const allstaterows2 = ref([]);
 const allStateRows2 = (e) => {
-  console.log(e);
+  // console.log(e);
   allstaterows2.value = e;
 };
 </script>

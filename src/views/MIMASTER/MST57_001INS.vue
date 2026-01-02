@@ -28,20 +28,37 @@
     <PickStore @update:storeAreaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" :showAreaCd="true"></PickStore>
   </div>
   <!-- 데이터 영역 -->
-  <div class="inline-block md:flex w-full">
-    <span class="md:hidden font-bold flex justify-center w-auto">
+  <div class="mst57-data-area">
+    <div class="inline-block md:flex w-full">
+    <!-- <span class="md:hidden font-bold flex justify-center w-auto">
       클릭하시면 아래 페이지에서 다국어 정보가 나옵니다.
-    </span>
-    <div class="border border-black md:w-64 w-full h-96 md:ml-5 ml-0 mt-10 overflow-auto">
-      <div v-for="i in Category" :key="i.MajorCode" class="ml-5 w-auto flex justify-start items-start flex-col">
-        <button @click="bringCategory(i.MajorCode)" class="font-bold" style="font-size: 15px">
-          {{ i.MajorName }}
-        </button>
-        <div v-for="x in i.SubCategory" :key="x.SubCode" class="flex items-start w-auto ml-5" :class="{ 'bg-lightblue': selectedButton === x.SubCode }">
-          <button class="font-thin" @click="bringCategory(i.MajorCode)" style="font-size: 15px">
-            {{ x.SubName }}
+    </span> -->
+    <div class="mst57-category-list-wrapper">
+      <div class="mst57-category-list">
+        <div v-for="i in Category" :key="i.MajorCode" class="mst57-category-item">
+          <button 
+            @click="bringCategory(i.MajorCode)" 
+            class="mst57-category-main-btn"
+            :class="{ 'mst57-category-active': selectedButton === i.MajorCode }">
+            {{ i.MajorName }}
           </button>
+          <div v-for="x in i.SubCategory" :key="x.SubCode" class="mst57-subcategory-item">
+            <button 
+              class="mst57-category-sub-btn" 
+              @click="bringCategory(i.MajorCode)"
+              :class="{ 'mst57-category-active': selectedButton === x.SubCode }">
+              {{ x.SubName }}
+            </button>
+          </div>
         </div>
+      </div>
+      <div class="mst57-action-buttons-left" v-show="afterSearch && afterCategory">
+        <button class="whitebutton mst57-add-category-btn" @click="addMainCategory">
+          메인카테고리 추가
+        </button>
+        <button class="whitebutton mst57-order-btn" @click="testOrderManage">
+          노출 순서 관리
+        </button>
       </div>
     </div>
     <div v-show="testOrderManage2" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
@@ -87,55 +104,53 @@
     </div>
   </div>
 </div>
-    <div class="h-60 md:ml-8 ml-1 mt-10 border-t border-b border-black md:w-[71%] w-full" style="height: 200px;" v-if="afterCategory">
-      <div class="text-white h-9 w-24 rounded-md flex items-center -mt-9 float-end md:-mr-10 mr-32 space-x-5">
-        <button class="whitebutton" style="font-size: 14px" @click="deleteMainCategory">
-          삭제
+    <div class="mst57-main-category-form" v-if="afterCategory">
+      <div class="mst57-form-header">
+        <button class="whitebutton mst57-delete-main-btn" @click="deleteMainCategory">
+          대카테고리 삭제
         </button>
       </div>
-      <div class="grid grid-cols-[1fr_3fr] grid-rows-4 mt-0 h-full divide-x divide-y divide-gray-300 -ml-2">
-        <div
-          class="bg-gray-200 flex justify-start items-center pl-4 font-bold"
-          style="color: #5782ff">
+      <div class="mst57-form-grid">
+        <div class="mst57-form-label mst57-label-required">
           *메인카테고리명(한국어)
         </div>
-        <div class="bg-white md:w-96 w-full">
+        <div class="mst57-form-field">
           <input
             type="text"
-            class="border border-gray-300 h-6 mt-2 w-8/12 md:w-96 flex justify-start ml-4 pl-2"
+            class="mst57-input"
             v-model="languageName0"
             @input="changeMajorName"
             @keyup="afterModifed" />
         </div>
-        <div class="bg-gray-200 flex justify-start items-center pl-4">
+        <div class="mst57-form-label">
           메인카테고리명(영어)
         </div>
-        <div class="bg-white md:w-96 w-full">
+        <div class="mst57-form-field">
           <input
             type="text"
-            class="border border-gray-300 h-6 mt-2 w-8/12 md:w-96 flex justify-start ml-4 pl-2"
+            class="mst57-input"
             v-model="languageName1"
             @input="changeMajorName1"
             @keyup="afterModifed" />
         </div>
-        <div class="bg-gray-200 flex justify-start items-center pl-4">
+        <div class="mst57-form-label">
           메인카테고리명(중국어)
         </div>
-        <div class="bg-white md:w-96 w-full">
+        <div class="mst57-form-field">
           <input
             type="text"
-            class="border border-gray-300 h-6 mt-2 w-8/12 md:w-96 flex justify-start ml-4 pl-2"
+            class="mst57-input"
             v-model="languageName2"
             @input="changeMajorName2"
             @keyup="afterModifed" />
         </div>
-        <div class="bg-gray-200 flex justify-start items-center pl-4">
+        <div class="mst57-form-label">
           메인카테고리명(일본어)
         </div>
-        <div class="bg-white md:w-96 w-full">
+        <div class="mst57-form-field">
           <input
             type="text"
-            class="border border-gray-300 h-6 mt-2 w-8/12 md:w-96 flex justify-start ml-4 pl-2"
+            class="mst57-input"
             v-model="languageName3"
             @input="changeMajorName3"
             @keyup="afterModifed" />
@@ -152,57 +167,28 @@
             @keyup="afterModifed" />
         </div> -->
       </div>
-    </div>
-  </div>
-  <div class="justify-start md:ml-5 ml-14 mt-5 space-x-2 hidden md:flex" v-show="afterSearch">
-    <button class="whitebutton" style="font-size: 14px" @click="addMainCategory">
-      메인카테고리추가
-    </button>
-    <button class="whitebutton" style="font-size: 14px" @click="testOrderManage">
-      노출 순서 관리
-    </button>
-  </div>
-  <div class="flex justify-between -mt-36 ml-2" v-if="afterCategory">
-    <div class="rounded-md h-10 w-auto ml-72 flex items-center">
-      <button
-        class="whitebutton"
-        @click="addsubCategory"
-        style="font-size: 14px">
-        서브카테고리 추가
-      </button>
-    </div>
-    <!-- <div class="rounded-md h-10 w-auto flex items-center justify-center mr-44">
-      <button
-        class="whitebutton"
-        style="font-size: 14px"
-        @click="deleteAllsubCategory">
-        전체 삭제
-      </button>
-    </div> -->
-  </div>
-  <div class="border border-neutral-600 -z-20"
-    style="margin-left: 293px; width: 72%;"
-    v-if="afterCategory">
-  </div>
-  <div class="h-60 mt-10 border-t border-b border-t-white border-b-gray-300"
-    style="margin-left: 293px; width: 72%; height: 302px;"
-    v-for="i in subMultiLang"
-    v-if="afterCategory">
-    <div class="-mt-10" style="margin-left: 1135px">
-      <button class="whitebutton" @click="deleteSubCategory(i[0].categoryCode)">
-        삭제
-      </button>
-    </div>
-    <div class="grid grid-cols-[1fr_3fr] grid-rows-[repeat(9,35px)] mt-0 h-full divide-x divide-y divide-gray-300">
-      <div
-        class="bg-gray-200 flex justify-start items-center pl-4 font-bold"
-        style="color: #5782ff">
+      <div class="mst57-subcategory-add-btn-wrapper" v-if="afterCategory">
+        <button class="whitebutton mst57-add-subcategory-btn" @click="addsubCategory">
+          서브카테고리 추가
+        </button>
+      </div>
+      <div class="mst57-sub-category-form"
+        v-for="i in subMultiLang"
+        v-if="afterCategory"
+        :key="i[0]?.categoryCode">
+        <div class="mst57-sub-form-header">
+          <button class="whitebutton mst57-delete-sub-btn" @click="deleteSubCategory(i[0].categoryCode)">
+            삭제
+          </button>
+        </div>
+    <div class="mst57-form-grid mst57-sub-form-grid">
+      <div class="mst57-form-label mst57-label-required">
         *서브카테고리명(한국어)
       </div>
-      <div class="bg-white">
+      <div class="mst57-form-field">
         <input
           type="text"
-          class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"
+          class="mst57-input"
           :value="i[0] ? i[0].LanguageName : ''"
           @input="
             (event) => {
@@ -212,55 +198,55 @@
           "
           @keyup="afterModifed" />
       </div>
-      <div class="bg-gray-200 flex justify-start items-center pl-4">
+      <div class="mst57-form-label">
         비고
       </div>
-      <div class="bg-white">
+      <div class="mst57-form-field">
         <input
           type="text"
-          class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"
+          class="mst57-input"
           :value="i[0] ? i[0].EXTRA_NM : ''"
           @input="(event) => changeExtraNm(i[0].categoryCode, event)"
           @keyup="afterModifed" />
       </div>
-      <div class="bg-gray-200 flex justify-start items-center pl-4">
+      <div class="mst57-form-label">
         서브카테고리명(영어)
       </div>
-      <div class="bg-white">
+      <div class="mst57-form-field">
         <input
           type="text"
-          class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"
+          class="mst57-input"
           :value="i[1] ? i[1].LanguageName : ''"
           @input="(event) => changeSubName1(i[0].categoryCode, event)"
           @keyup="afterModifed" />
       </div>
-      <div class="bg-gray-200 flex justify-start items-center pl-4">
+      <div class="mst57-form-label">
         서브카테고리명(중국어)
       </div>
-      <div class="bg-white">
+      <div class="mst57-form-field">
         <input
           type="text"
-          class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"
+          class="mst57-input"
           :value="i[2] ? i[2].LanguageName : ''"
           @input="(event) => changeSubName2(i[0].categoryCode, event)"
           @keyup="afterModifed" />
       </div>
-      <div class="bg-gray-200 flex justify-start items-center pl-4">
+      <div class="mst57-form-label">
         서브카테고리명(일본어)
       </div>
-      <div class="bg-white">
+      <div class="mst57-form-field">
         <input
           type="text"
-          class="border border-gray-300 h-6 mt-2 w-96 flex justify-start ml-4 pl-2"
+          class="mst57-input"
           :value="i[3] ? i[3].LanguageName : ''"
           @input="(event) => changeSubName3(i[0].categoryCode, event)"
           @keyup="afterModifed" />
       </div>
-      <div class="bg-gray-200 flex justify-start items-center pl-4">
+      <div class="mst57-form-label">
           사용여부
       </div>
          <!-- USE_YN 라디오 버튼 -->
-        <div class="flex items-center space-x-6 pl-4">
+        <div class="mst57-form-field mst57-radio-group">
           <label class="flex items-center space-x-1">
             <input
               type="radio"
@@ -282,10 +268,10 @@
             <span>미사용</span>
           </label>
         </div>
-        <div class="bg-gray-200 flex justify-start items-center pl-4">
+        <div class="mst57-form-label">
             사용기간
         </div>
-        <div class="border-l border-t border-r border-black flex flex-col justify-center pl-2 items-start  space-y-2 ">
+        <div class="mst57-form-field mst57-date-time-field">
           <!-- 전체기간 + 시작일/종료일 한 줄로 배치 (수평 정렬) -->
           <div class="flex items-center space-x-4">
             <!-- 체크박스 + 라벨 -->
@@ -323,10 +309,10 @@
             </div>
           </div>
         </div>
-        <div class="bg-gray-200 flex justify-start items-center pl-4">
+        <div class="mst57-form-label">
             사용시간
         </div>
-        <div class="border-l border-t border-r border-black flex flex-col justify-center pl-2 items-start  space-y-2 ">
+        <div class="mst57-form-field mst57-date-time-field">
         <!-- 전체기간 + 시작일/종료일 한 줄로 배치 (수평 정렬) -->
           <div class="flex items-center space-x-4">
             <!-- 체크박스 + 라벨 -->
@@ -345,7 +331,7 @@
             <div class="flex items-center">
               <span>시작시간 : </span>
               <select name="" id="" class="ml-1 text-lg disabled:bg-gray-400  disabled:opacity-100"
-                    :value="parseInt(i[0]?.FROM_TIME.substring(0, 2))" 
+                    :value="i[0]?.FROM_TIME ? parseInt(i[0].FROM_TIME.substring(0, 2)) : 0" 
                     @change="(event) => changeFromTime(i[0].categoryCode, 'hour', event.target.value)"
                     :disabled="(i[0]?.ALL_TIME === '1')" >
                 <option :value="i.lngCode" v-for="i in optionList">
@@ -354,7 +340,7 @@
               </select>
               <span>시</span>
               <select name="" id="" class="text-lg  disabled:bg-gray-400  disabled:opacity-100"
-                    :value="parseInt(i[0]?.FROM_TIME.substring(2))"
+                    :value="i[0]?.FROM_TIME ? parseInt(i[0].FROM_TIME.substring(2)) : 0"
                     @change="(event) => changeFromTime(i[0].categoryCode, 'minute', event.target.value)"
                     :disabled="(i[0]?.ALL_TIME === '1')" >
                 <option :value="i.lngCode" v-for="i in optionList2">
@@ -367,7 +353,7 @@
             <div class="flex items-center">
                 <span>종료시간 : </span>
                 <select name="" id="" class=" text-lg ml-1 disabled:bg-gray-400 disabled:opacity-100"
-                       :value="parseInt(i[0]?.TO_TIME.substring(0, 2))"
+                       :value="i[0]?.TO_TIME ? parseInt(i[0].TO_TIME.substring(0, 2)) : 0"
                        @change="(event) => changeToTime(i[0].categoryCode, 'hour', event.target.value)"
                        :disabled="(i[0]?.ALL_TIME === '1')">
                   <option :value="i.lngCode" v-for="i in optionList">
@@ -376,7 +362,7 @@
                 </select>
                 <span>시</span>
                 <select name="" id="" class=" text-lg disabled:bg-gray-400  disabled:opacity-100"
-                      :value="parseInt(i[0]?.TO_TIME.substring(2))"
+                      :value="i[0]?.TO_TIME ? parseInt(i[0].TO_TIME.substring(2)) : 0"
                       @change="(event) => changeToTime(i[0].categoryCode, 'minute', event.target.value)"
                       :disabled="(i[0]?.ALL_TIME === '1')">
                   <option :value="i.lngCode" v-for="i in optionList2">
@@ -387,61 +373,66 @@
             </div>
           </div>
         </div>
-      <div class="bg-gray-200 flex justify-start items-center pl-4">
+      <div class="mst57-form-label">
           사용요일
       </div>
-      <div class="border-l border-t border-r border-black flex flex-col justify-center pl-2 items-start space-y-2 ">
-        <div class="flex items-center space-x-4">
+      <div class="mst57-form-field mst57-date-time-field">
+        <div class="flex items-center space-x-4 flex-wrap">
             <label class="inline-flex items-center space-x-2">
               <input type="checkbox" id="allcheck" class="h-4 w-4" 
                   :checked="i[0]?.SEL_DAY === '11111111'" 
                   @change="(event) => toggleAllDays(i[0].categoryCode, event.target.checked)">
                 <span class="text-sm">전체체크</span>
-              </input>
             </label>
-            <div class="flex flex-col">
-              <div class="space-x-3">
-              <label for="mon">
+            <div class="flex items-center space-x-3">
+              <label for="mon" class="inline-flex items-center space-x-1">
                 <input type="checkbox" id="mon" 
-                    :checked="i[0]?.SEL_DAY.substring(0, 1) === '1'"
-                    @change="(event) => changeDay(i[0].categoryCode, 0, event.target.checked)" />월
+                    :checked="i[0]?.SEL_DAY ? i[0].SEL_DAY.substring(0, 1) === '1' : false"
+                    @change="(event) => changeDay(i[0].categoryCode, 0, event.target.checked)" />
+                <span>월</span>
               </label>
-              <label for="tue"> 
+              <label for="tue" class="inline-flex items-center space-x-1"> 
                 <input type="checkbox" id="tue" 
-                    :checked="i[0]?.SEL_DAY.substring(1, 2) === '1'"
-                    @change="(event) => changeDay(i[0].categoryCode, 1, event.target.checked)" />화
+                    :checked="i[0]?.SEL_DAY ? i[0].SEL_DAY.substring(1, 2) === '1' : false"
+                    @change="(event) => changeDay(i[0].categoryCode, 1, event.target.checked)" />
+                <span>화</span>
               </label>
-              <label for="wed">    
+              <label for="wed" class="inline-flex items-center space-x-1">    
                 <input type="checkbox" id="wed" 
-                    :checked="i[0]?.SEL_DAY.substring(2, 3) === '1'"
-                    @change="(event) => changeDay(i[0].categoryCode, 2, event.target.checked)" />수
+                    :checked="i[0]?.SEL_DAY ? i[0].SEL_DAY.substring(2, 3) === '1' : false"
+                    @change="(event) => changeDay(i[0].categoryCode, 2, event.target.checked)" />
+                <span>수</span>
               </label>
-              <label for="thu">
+              <label for="thu" class="inline-flex items-center space-x-1">
                 <input type="checkbox" id="thu" 
-                    :checked="i[0]?.SEL_DAY.substring(3, 4) === '1'"
-                    @change="(event) => changeDay(i[0].categoryCode, 3, event.target.checked)" />목
+                    :checked="i[0]?.SEL_DAY ? i[0].SEL_DAY.substring(3, 4) === '1' : false"
+                    @change="(event) => changeDay(i[0].categoryCode, 3, event.target.checked)" />
+                <span>목</span>
               </label>
-              <label for="fri">
+              <label for="fri" class="inline-flex items-center space-x-1">
                 <input type="checkbox" id="fri" 
-                    :checked="i[0]?.SEL_DAY.substring(4, 5) === '1'"
-                    @change="(event) => changeDay(i[0].categoryCode, 4, event.target.checked)" />금
+                    :checked="i[0]?.SEL_DAY ? i[0].SEL_DAY.substring(4, 5) === '1' : false"
+                    @change="(event) => changeDay(i[0].categoryCode, 4, event.target.checked)" />
+                <span>금</span>
               </label>
-              <label for="sat">
+              <label for="sat" class="inline-flex items-center space-x-1">
                 <input type="checkbox" id="sat" 
-                    :checked="i[0]?.SEL_DAY.substring(5, 6) === '1'"
-                    @change="(event) => changeDay(i[0].categoryCode, 5, event.target.checked)" />토
+                    :checked="i[0]?.SEL_DAY ? i[0].SEL_DAY.substring(5, 6) === '1' : false"
+                    @change="(event) => changeDay(i[0].categoryCode, 5, event.target.checked)" />
+                <span>토</span>
               </label>
-              <label for="sun">
+              <label for="sun" class="inline-flex items-center space-x-1">
                 <input type="checkbox" id="sun" 
-                    :checked="i[0]?.SEL_DAY.substring(6, 7) === '1'"
-                    @change="(event) => changeDay(i[0].categoryCode, 6, event.target.checked)" />일
+                    :checked="i[0]?.SEL_DAY ? i[0].SEL_DAY.substring(6, 7) === '1' : false"
+                    @change="(event) => changeDay(i[0].categoryCode, 6, event.target.checked)" />
+                <span>일</span>
               </label>
-              <label for="holiday">
+              <label for="holiday" class="inline-flex items-center space-x-1">
                 <input type="checkbox" id="holiday" 
-                    :checked="i[0]?.SEL_DAY.substring(7, 8) === '1'"
-                    @change="(event) => changeDay(i[0].categoryCode, 7, event.target.checked)" />공휴일
+                    :checked="i[0]?.SEL_DAY ? i[0].SEL_DAY.substring(7, 8) === '1' : false"
+                    @change="(event) => changeDay(i[0].categoryCode, 7, event.target.checked)" />
+                <span>공휴일</span>
               </label>
-             </div>
             </div>
         </div>
       </div>
@@ -456,27 +447,14 @@
           @input="(event) => changeSubName4(i[0].categoryCode, event)"
           @keyup="afterModifed" />
       </div> -->
-    </div>
-    <div class="float-right -mr-32 space-y-5"></div>
-  </div>
-  <div class="flex justify-end mr-40 mt-10" v-show="afterCategory">
-    <div class="flex flex-col items-end">
-      <div
-        class="text-white rounded-md h-8 w-44 flex items-center justify-center">
-        <button class="whitebutton" @click="addsubCategory">
-          서브카테고리 추가
-        </button>
+        </div>
       </div>
-      <div
-        class="text-white rounded-md h-8 w-28 flex items-center justify-center mt-5 mr-1">
-        <button class="button save" @click="saveButton">저장</button>
+      <div class="mst57-save-button-wrapper" v-show="afterCategory">
+        <button class="button save mst57-save-btn" @click="saveButton">저장</button>
       </div>
     </div>
+    </div>
   </div>
-  <!-- 데이터 영역 -->
-  <br />
-  <br />
-  <br />
 </template>
 
 <script setup>
@@ -1369,7 +1347,10 @@ const bringCategory = (value) => {
 
   const subCodes = Category.value
     .filter((item2) => item2.MajorCode == value)
-    .flatMap((item2) => item2.SubCategory.map((item3) => item3.SubCode));
+    .flatMap((item2) => {
+      const subCategory = Array.isArray(item2.SubCategory) ? item2.SubCategory : [];
+      return subCategory.map((item3) => item3.SubCode);
+    });
  
   // subMultiLang.value = subCodes.map((code) => {
   //   // 각 code에 대해 필터링하여 해당 categoryCode와 일치하는 subMultilang 항목을 모음
@@ -1423,7 +1404,19 @@ const addsubCategory = () => {
   (() => {
     Category.value.filter((item) => {
       if (item.MajorCode === currentMajorCode.value) {
-        item.SubCategory.push({ SubCode: maxSubCode, SubName: "" });
+        item.SubCategory.push({ 
+          SubCode: maxSubCode, 
+          SubName: "",
+          USE_YN: "Y",
+          ALL_DATE: "1",
+          FROM_DATE: new Date().toISOString().split('T')[0],
+          TO_DATE: new Date().toISOString().split('T')[0],
+          ALL_TIME: "1",
+          FROM_TIME: "0000",
+          TO_TIME: "2350",
+          SEL_DAY: "11111111",
+          EXTRA_NM: ""
+        });
       }
     });
   })();
@@ -1875,3 +1868,382 @@ const saveButtonPopup = async () => {
 };
 
 </script>
+
+<style scoped>
+/* MST57_001INS 페이지 전용 스타일 - 전역 CSS와 충돌 방지 */
+
+/* 데이터 영역 - 스크롤 가능 */
+.mst57-data-area {
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 20px;
+}
+
+/* 메인 레이아웃 */
+.inline-block.md\:flex {
+  display: flex;
+  gap: 20px;
+  margin-top: 0;
+}
+
+/* 왼쪽 카테고리 목록 래퍼 */
+.mst57-category-list-wrapper {
+  width: 250px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 왼쪽 카테고리 목록 */
+.mst57-category-list {
+  width: 100%;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  border-radius: 4px;
+  padding: 10px 0;
+  max-height: calc(100vh - 350px);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.mst57-category-item {
+  margin-bottom: 4px;
+}
+
+.mst57-category-main-btn,
+.mst57-category-sub-btn {
+  width: 100%;
+  text-align: left;
+  padding: 12px 20px;
+  font-size: 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #333;
+}
+
+.mst57-category-main-btn {
+  font-weight: 600;
+}
+
+.mst57-category-sub-btn {
+  font-weight: 400;
+  padding-left: 40px;
+  font-size: 13px;
+}
+
+.mst57-category-main-btn:hover,
+.mst57-category-sub-btn:hover {
+  background: #f5f5f5;
+}
+
+.mst57-category-active {
+  background: #C10000 !important;
+  color: #fff !important;
+}
+
+.mst57-category-active:hover {
+  background: #a00000 !important;
+}
+
+.mst57-subcategory-item {
+  margin-top: 2px;
+}
+
+/* 대카테고리 폼 */
+.mst57-main-category-form {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  padding: 20px;
+  margin-top: 0;
+  position: relative;
+}
+
+.mst57-form-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0;
+}
+
+.mst57-delete-main-btn {
+  background: #666;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mst57-delete-main-btn:hover {
+  background: #555;
+}
+
+/* 폼 그리드 */
+.mst57-form-grid {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 0;
+  border: 1px solid #e5e5e5;
+}
+
+.mst57-form-label {
+  background: #f5f5f5;
+  padding: 12px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid #e5e5e5;
+  border-right: 1px solid #e5e5e5;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.mst57-form-label:last-child {
+  border-bottom: none;
+}
+
+.mst57-label-required {
+  color: #5782ff;
+  font-weight: 700;
+}
+
+.mst57-form-field {
+  background: #fff;
+  padding: 8px 16px;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  align-items: center;
+}
+
+.mst57-form-field:last-child {
+  border-bottom: none;
+}
+
+.mst57-input {
+  width: 100%;
+  max-width: 400px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.mst57-input:focus {
+  outline: none;
+  border-color: #5782ff;
+}
+
+/* 왼쪽 액션 버튼들 */
+.mst57-action-buttons-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.mst57-action-buttons-left .mst57-add-category-btn,
+.mst57-action-buttons-left .mst57-order-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* 오른쪽 액션 버튼들 (사용 안 함) */
+.mst57-action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  margin-left: 0;
+}
+
+.mst57-add-category-btn {
+  background: #C10000;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mst57-add-category-btn:hover {
+  background: #a00000;
+}
+
+.mst57-order-btn {
+  background: #666;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mst57-order-btn:hover {
+  background: #555;
+}
+
+/* 중카테고리 추가 버튼 */
+.mst57-subcategory-add-btn-wrapper {
+  margin-top: 10px;
+  margin-left: 0;
+}
+
+.mst57-add-subcategory-btn {
+  background: #C10000;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mst57-add-subcategory-btn:hover {
+  background: #a00000;
+}
+
+/* 중카테고리 폼 */
+.mst57-sub-category-form {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin-top: 20px;
+  position: relative;
+  width: 100%;
+}
+
+.mst57-sub-form-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+.mst57-delete-sub-btn {
+  background: #666;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mst57-delete-sub-btn:hover {
+  background: #555;
+}
+
+.mst57-sub-form-grid {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 0;
+  border: 1px solid #e5e5e5;
+}
+
+/* 라디오 버튼 그룹 */
+.mst57-radio-group {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 16px;
+}
+
+.mst57-radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mst57-radio-group input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* 날짜/시간 필드 */
+.mst57-date-time-field {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 12px 16px;
+  gap: 8px;
+}
+
+.mst57-date-time-field > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mst57-date-time-field label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.mst57-date-time-field input[type="date"],
+.mst57-date-time-field input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.mst57-date-time-field select {
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+/* 저장 버튼 */
+.mst57-save-button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  margin-right: 0;
+}
+
+.mst57-save-btn {
+  padding: 10px 30px;
+  font-size: 14px;
+}
+
+/* 반응형 조정 */
+@media (max-width: 1440px) {
+  .mst57-category-list {
+    width: 200px;
+  }
+  
+  .mst57-action-buttons,
+  .mst57-subcategory-add-btn-wrapper {
+    margin-left: 220px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .inline-block.md\:flex {
+    flex-direction: column;
+  }
+  
+  .mst57-category-list {
+    width: 100%;
+    max-height: 300px;
+  }
+  
+  .mst57-action-buttons,
+  .mst57-subcategory-add-btn-wrapper {
+    margin-left: 0;
+  }
+}
+</style>
