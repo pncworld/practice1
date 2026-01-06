@@ -20,8 +20,8 @@ body.full-mode .po-content .w-right {width: 100%; padding-left: 20px !important;
     Header
 ================================ */
 .po-layout .po-header {height:80px; background:transparent; z-index: 9;}
-.po-layout .h-logo {height:68px; margin-left: 6px; border-radius: 10px; overflow: hidden; display: flex; align-items: center;}
-.po-layout .h-logo img {object-fit: contain; height: 100%; max-height: 68px; width: auto;}
+.po-layout .h-logo {height:68px; margin-left: 6px; border-radius: 10px; display: flex; align-items: center; background: #fff; padding: 8px 12px;}
+.po-layout .h-logo img {object-fit: contain; height: 100%; max-height: 52px; width: auto;}
 .po-layout .h-left {}
 .po-layout .h-right {gap:18px; justify-content: space-between; align-items: center; flex-direction: row;}
 .po-layout .h-gnb {flex:1; gap:2vw; width: calc(100% - 140px); padding-left: 10px;}
