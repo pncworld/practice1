@@ -426,7 +426,7 @@ import {
   getMenuList,
   getScreenList,
   getTLUList,
-  saveAllMenuKey,
+  saveKioskAllMenuKey,
   saveScreenKeys,
 } from "@/api/master";
 /**
@@ -999,7 +999,7 @@ const saveButton = async () => {
         //comsole.log(screenNumarr.join(","));
         //comsole.log(lngScrarr.join(","));
         //comsole.log(menuKeyNmarr.join(","));
-        const res2 = await saveAllMenuKey(
+        const res2 = await saveKioskAllMenuKey(
           groupCd.value,
           nowStoreCd.value,
           nowStoreAreaCd.value,
@@ -1013,8 +1013,9 @@ const saveButton = async () => {
           strIconarr.join("\u200B")
         );
 
-        console.log(res);
+        // console.log(res);
         console.log(res2);
+
       } catch (error) {
       } finally {
         store.state.loading = false;

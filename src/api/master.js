@@ -766,6 +766,35 @@ export const saveAllMenuKey = (
     STRICON_ARR: strIcon_arr,
   });
 };
+
+export const saveKioskAllMenuKey = (
+  groupCd,
+  storeCd,
+  areaCd,
+  posNo,
+  intKeySeq_arr,
+  intScreenNo_arr,
+  lngScrNo_arr,
+  strKeyName_arr,
+  intKeyNos,
+  lngKeyColor_arr,
+  strIcon_arr
+) => {
+  return api2.post("/MIMASTER/MST44_052INS.asmx/saveKioskAllMenuKey", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    AREA_CD: areaCd,
+    POSNO: posNo,
+    INTKEYSEQ_ARR: intKeySeq_arr,
+    INTSCREENNO_ARR: intScreenNo_arr,
+    LNGKEYSCRNO_ARR: lngScrNo_arr,
+    STRKEYNAME_ARR: strKeyName_arr,
+    INTKEYNOS: intKeyNos,
+    LNGKEYCOLOR_ARR: lngKeyColor_arr,
+    STRICON_ARR: strIcon_arr,
+  });
+};
+
 export const saveAllMenuKey2 = (
   groupCd,
   storeCd,
