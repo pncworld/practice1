@@ -17,7 +17,6 @@
           <!-- <img src="@/assets/images/logo.jpg" class="w100"> -->
           <img
             :src="strLogoUrl"
-            class="w100"
             @error="handleError2"
           />
         </div>
