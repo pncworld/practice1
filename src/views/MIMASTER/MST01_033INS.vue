@@ -1,5 +1,5 @@
 /*--############################################################################
-# Filename : MST01_033INS.vue                                                  
+# Filename : MST01_003INS.vue                                                  
 # Description : 마스터관리 > 메뉴 마스터 > 메뉴코드등록                        
 # Date :2025-05-14                                                             
 # Author : 권맑음                     
@@ -13,6 +13,7 @@
         조회
       </button>
       <button @click="saveButton" class="button save w-auto">저장</button>
+      <button @click="excelButton" class="button excel w-auto">엑셀</button>
     </div>
   </div>
   <br />
@@ -205,7 +206,10 @@
           :searchValue="searchValue"
           :searchWord3="searchWord"
           :suffixColumnwon="'lngPrice'"
-          :initFocus="initFocus"></Realgrid>
+          :initFocus="initFocus"
+          :exporttoExcel="exporttoExcel"
+          :exportExcelShowColumns="['strBarCode', 'strBigo']"
+          :documentTitle="'MST01_003INS'"></Realgrid>
         <!-- :searchWord="searchWord" :searchColId2="'blnInactive,payDistinct'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" -->
       </div>
     </div>
@@ -223,7 +227,7 @@
           class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border disabled:bg-gray-50 disabled:text-gray-200"
           @click="selectMenu(2)"
           :class="{ 'text-blue-400 bg-blue-100': selectedMenu == 2 }"
-          :disabled="discountDisabled">
+          :disabled="discountDisabled || disableWithMenuDisc">
           할인선택
         </button>
         <button
@@ -307,7 +311,7 @@
                 class="justify-center rounded-lg items-center h-full w-full border flex">
                 <input
                   type="date"
-                  :disabled="afterClick"
+                  :disabled="afterClick" 
                   name="dtmFromDate"
                   class="disabled:bg-gray-100 w-full h-full rounded-lg"
                   v-model="gridvalue4"
@@ -391,7 +395,7 @@
             </div>
             <div>
               <input
-                type="number"
+                type="text"
                 name="lngPrice"
                 class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-100"
                 :disabled="afterClick"
@@ -497,14 +501,16 @@
             class="grid grid-cols-[1fr,3fr,1fr,3fr] grid-rows-13 h-[120%] mt-3 w-[90%]">
             <div
               class="justify-center items-center bg-gray-100 border flex rounded-tl-lg">
-              할인여부
+              {{ disableWithMenuDisc ? "할인허용" : "할인여부" }}
             </div>
-            <div class="space-x-5 flex items-center border justify-left pl-2">
+            <div
+              class="space-x-5 flex items-center border justify-left pl-2"
+              v-if="!disableWithMenuDisc">
               <label for="discount1"
                 ><input
                   type="radio"
                   id="discount1"
-                  name="lngDiscount"
+                  name="discountYN"
                   v-model="gridvalue14"
                   value="1"
                   @input="changeInfo"
@@ -514,13 +520,26 @@
                 ><input
                   type="radio"
                   id="discount2"
-                  name="lngDiscount"
+                  name="discountYN"
                   v-model="gridvalue14"
                   value="0"
                   @input="changeInfo"
                   :disabled="afterClick"
                   class="disabled:bg-gray-200" />아니오</label
               >
+            </div>
+
+            <div
+              class="space-x-5 flex items-center border justify-left"
+              v-if="disableWithMenuDisc">
+              <input
+                type="text"
+                id="discount1"
+                name="lngDiscount"
+                v-model="gridvalue40"
+                @input="changeInfo"
+                :disabled="afterClick"
+                class="disabled:bg-gray-200 w-full" />
             </div>
             <div class="justify-center items-center bg-gray-100 border flex">
               메뉴당객수
@@ -834,8 +853,19 @@
                   class="disabled:bg-gray-200" />아니오</label
               >
             </div>
-            <div class="w-0"></div>
-            <div class="w-0"></div>
+            <div class="justify-center items-center bg-gray-100 border flex">
+              주방출력명
+            </div>
+            <div
+              class="space-x-5 flex justify-left items-center border w-[100%]">
+              <input
+                type="text"
+                v-model="gridvalue39"
+                :disabled="afterClick"
+                name="strNameK"
+                class="w-full rounded-lg border pl-1 h-full"
+                @input="changeInfo" />
+            </div>
             <div
               class="justify-center items-center bg-gray-100 border flex rounded-bl-lg">
               배달메뉴
@@ -973,6 +1003,20 @@
                   :disabled="afterClick" />휴일</label
               >
             </div>
+
+            <div
+              class="flex justify-center items-center bg-gray-100 border-l border-b">
+              비고
+            </div>
+            <div class="flex justify-start items-center border-b col-span-3">
+              <input
+                type="text"
+                class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200"
+                v-model="gridvalue41"
+                name="strBigo"
+                @change="changeInfo"
+                :disabled="afterClick" />
+            </div>
           </div>
         </div>
         <div v-show="selectedMenu == 2" class="h-[80%] w-[90%]">
@@ -1083,8 +1127,10 @@ import {
   copyMenuListByCode,
   getAmountListByMenuCode,
   getMenuCodeEnroll,
+  getMenuDiscCount,
   getMenuList,
   saveMenuCode,
+  saveDiscountCode,
   uploadFile,
 } from "@/api/master";
 /**
@@ -1162,6 +1208,14 @@ onMounted(async () => {
     hidesub.value = true;
     hideAttr.value = true;
   }
+
+  const res = await getMenuDiscCount(store.state.userData.lngStoreGroup);
+
+  if (res.data.List[0].count == "0") {
+    disableWithMenuDisc.value = true;
+  } else {
+    disableWithMenuDisc.value = false;
+  }
 });
 const searchWord2 = ref("");
 const nowStoreCd = ref(0);
@@ -1203,7 +1257,7 @@ const setAuto = () => {
 };
 const allStateRows = (e) => {
   updateDeleteInsertrowIndex.value = e;
-  console.log(e);
+  //console.log(e);
 };
 const sendRowState = (e) => {
   if (e == "created") {
@@ -1282,6 +1336,10 @@ const initCheckAct = ref(false);
 const uncheckValue = ref();
 const initSelect = ref(false);
 const discountDisabled = ref(true);
+const disableWithMenuDisc = ref(true);
+// 할인선택 변경 감지용
+const originalDiscountData = ref({}); // { menuCode: "strAmtCodeList" } 형태로 저장
+const discountChanged = ref(false); // 할인선택 변경 여부 플래그
 const labelsData = ref([
   ["할인", "지불", "할증"],
   ["사용", "미사용"],
@@ -1329,6 +1387,9 @@ const gridvalue35 = ref(false);
 const gridvalue36 = ref(false);
 const gridvalue37 = ref(false);
 const gridvalue38 = ref("");
+const gridvalue39 = ref("");
+const gridvalue40 = ref("");
+const gridvalue41 = ref("");
 const gridvalue100 = ref("");
 const clickedrowdata = ref([]);
 const clickrowData4 = ref([]);
@@ -1361,16 +1422,16 @@ const selectedIndex2 = (e) => {
  */
 
 function convertTo24Hour(timeStr) {
-  console.log(timeStr);
+  //console.log(timeStr);
   if (!timeStr) return "";
 
   // "오전 12:00:00" → ["오전", "12:00:00"]
 
   const [no, ampm, time] = timeStr.split(" ");
   let [hour, minute, second] = time.split(":").map(Number);
-  console.log(hour);
-  console.log(minute);
-  console.log(second);
+  //console.log(hour);
+  //console.log(minute);
+  //console.log(second);
   if (ampm === "오전") {
     // 오전 12시는 0시로 변환
     if (hour === 12) hour = 0;
@@ -1388,7 +1449,7 @@ function convertTo24Hour(timeStr) {
 }
 
 const clickedRowData = async (newvalue) => {
-  console.log(newvalue);
+  //console.log(newvalue);
   afterClick.value = false;
   if (newvalue[9] == 0 || newvalue[12] == 0) {
     // 판매가 할인여부
@@ -1412,9 +1473,7 @@ const clickedRowData = async (newvalue) => {
   //rowIndex.value = newvalue.index;
   clickrowData4.value = [];
   filteredrowData5.value = [];
-  //console.log(newvalue);
-  // forsearchMain.value = 0
-  // forsearchSub.value = 0
+
   searchWord2.value = "";
   searchWord3.value = "";
   clickedrowdata.value = newvalue[27];
@@ -1427,11 +1486,11 @@ const clickedRowData = async (newvalue) => {
   gridvalue7.value = newvalue[6];
   gridvalue8.value = newvalue[7];
   gridvalue9.value = newvalue[8];
-  gridvalue10.value = newvalue[9];
+  gridvalue10.value = String(newvalue[9]).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   gridvalue11.value = newvalue[10];
   gridvalue12.value = newvalue[11];
   gridvalue13.value = newvalue[2];
-  gridvalue14.value = newvalue[12];
+  gridvalue14.value = newvalue[39];
   gridvalue15.value = newvalue[13];
   gridvalue16.value = newvalue[14];
   gridvalue17.value = newvalue[15];
@@ -1452,6 +1511,8 @@ const clickedRowData = async (newvalue) => {
 
   gridvalue32.value = newvalue[35];
   gridvalue33.value = newvalue[36];
+  gridvalue40.value = newvalue[12];
+  gridvalue41.value = newvalue[40];
 
   gridvalue34.value =
     newvalue[34] != "" ? (Number(newvalue[34]) & 1) !== 0 : false;
@@ -1463,6 +1524,7 @@ const clickedRowData = async (newvalue) => {
     newvalue[34] != "" ? (Number(newvalue[34]) & 8) !== 0 : false;
 
   gridvalue38.value = newvalue[37];
+  gridvalue39.value = newvalue[38];
 
   if (gridvalue16.value == 1) {
     gridvalue100.value = 1;
@@ -1478,7 +1540,7 @@ const clickedRowData = async (newvalue) => {
     showKPG.value = true;
   }
   discountDisabled.value =
-    (newvalue[9] == 0 || newvalue[12] == 0) &&
+    (newvalue[9] == 0 || newvalue[39] == 0) &&
     afterSearch.value == true &&
     afterClick.value == false;
   fileName.value = newvalue[33];
@@ -1494,6 +1556,13 @@ const clickedRowData = async (newvalue) => {
 
   const firstarr = newvalue[32] != undefined ? newvalue[32].split(";") : [];
   duplilfirstarr.value = firstarr;
+  
+  // 할인선택 원본 데이터 저장 (변경 감지용)
+  const currentMenuCode = newvalue[0]?.toString();
+  if (currentMenuCode) {
+    originalDiscountData.value[currentMenuCode] = newvalue[32] || "";
+    discountChanged.value = false; // 행 클릭 시 변경 플래그 초기화
+  }
   if (rowData2.value.length > 0) {
     let dupliarr = JSON.parse(JSON.stringify(rowData2.value));
     dupliarr.sort((a, b) => {
@@ -1536,7 +1605,7 @@ const clickedRowData = async (newvalue) => {
       `https://www.pncapi.kr/MenuImage/Image/${fileName.value}?v=${Date.now()}`
     );
     await nextTick();
-    console.log(response);
+    //console.log(response);
     uploadImage.value.name = newvalue[31];
     fileSize.value = response.headers["content-length"];
 
@@ -1548,6 +1617,12 @@ const clickedRowData = async (newvalue) => {
     fileSize.value = "";
   } finally {
     afterClick.value = false;
+    
+    // 파일 input 리셋
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput) {
+      fileInput.value = "";
+    }
   }
 };
 /**
@@ -1662,7 +1737,7 @@ const searchButton = async () => {
     filteredrowData3.value = [...filteredrowData3.value];
 
     const res = await getMenuCodeEnroll(groupCd.value, nowStoreCd.value);
-    console.log(res);
+
     rowData.value = res.data.MENULIST;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
     MENUDEPEND.value = res.data.MENUDEPEND;
@@ -1719,8 +1794,20 @@ const searchC2 = ref(-1);
 
 const changeInfo = (e) => {
   const tagName = e.target.name;
-  const value2 = e.target.value;
-  //comsole.log(value2);
+  let value2 = e.target.value;
+  if (tagName.includes("lngPrice")) {
+    let val = value2.replace(/[^0-9]/g, "");
+    value2 = val;
+
+    gridvalue10.value = value2.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  if (tagName.includes("lngDiscount")) {
+    let val = value2.replace(/[^0-9]/g, "");
+    value2 = val;
+
+    gridvalue14.value = val;
+  }
 
   if (tagName.includes("lngType")) {
     changeColid.value = "lngType";
@@ -1807,10 +1894,27 @@ const checkedRowData2 = (e) => {
   changeColid.value = "strAmtCodeList";
   //comsole.log(updateRow.value);
   //comsole.log(e);
-  changeValue2.value = e
+  const newDiscountValue = e
     .filter((item) => item.lngMenu !== "0")
     .map((item2) => Number(item2.lngCode))
     .join(";");
+  
+  changeValue2.value = newDiscountValue;
+
+  // 할인선택 변경 감지: 원본 데이터와 비교
+  const currentMenuCode = gridvalue3.value?.toString();
+  if (currentMenuCode && originalDiscountData.value[currentMenuCode] !== undefined) {
+    const originalValue = originalDiscountData.value[currentMenuCode] || "";
+    if (originalValue !== newDiscountValue) {
+      discountChanged.value = true;
+    } else {
+      // 원본과 동일하면 변경 없음으로 표시
+      discountChanged.value = false;
+    }
+  } else {
+    // 원본 데이터가 없으면 변경된 것으로 간주
+    discountChanged.value = true;
+  }
 
   //changeValue2.value = e.changeRow.value = rowIndex.value;
   changeNow.value = !changeNow.value;
@@ -1949,7 +2053,7 @@ const saveButton = () => {
     return;
   }
 
-  console.log(updateRow.value);
+  //console.log(updateRow.value);
   const validateRow = updateRow.value.filter(
     (item) =>
       (item.lngCode === "" && isNewAutoMenuCode.value == false) ||
@@ -2058,16 +2162,18 @@ const saveButton = () => {
           filterAndMap("strNutrInfo"),
           filterAndMap("strCntryOrg"),
           filterAndMap("strMenuComment"),
-          filterAndMap("strAmtCodeList"),
           filterAndMap("strUserFileName"),
           filterAndMap("lngType"),
           filterAndMap("dtmStart"),
           filterAndMap("dtmEnd"),
           filterAndMap("lngKDS"),
+          filterAndMap("strNameK"),
+          filterAndMap("discountYN"),
+          filterAndMap("strBigo"),
           isNewAutoMenuCode.value == true ? 1 : 0,
           deleteCd.join(",")
         );
-        console.log(res);
+        //console.log(res);
         //console.log(res);
 
         //comsole.log(updatedAndInsertRow);
@@ -2094,7 +2200,7 @@ const saveButton = () => {
             String(existedName).padStart(10, 0) +
             ".jpg";
 
-          console.log(newFileName);
+          //console.log(newFileName);
           const newFile = new File([file], newFileName, { type: file.type });
           formData.append(`file${index}`, newFile);
         });
@@ -2108,6 +2214,35 @@ const saveButton = () => {
             store.state.loading = false;
           } finally {
             store.state.loading = false;
+          }
+        }
+
+        // 할인선택 변경이 있을 때만 저장
+        if (discountChanged.value) {
+          try {
+            const res3 = await saveDiscountCode(
+              groupCd.value,
+              nowStoreCd.value,
+              filterAndMap("lngCode"),
+              filterAndMap("strAmtCodeList"),
+              filterAndMap("lngPrice"),
+              filterAndMap("discountYN"),
+              isNewAutoMenuCode.value == true ? 1 : 0
+            );
+            
+            // console.log(res3);
+            
+            // 저장 후 원본 데이터 업데이트 및 플래그 초기화
+            updatedAndInsertRow.forEach((item) => {
+              const menuCode = item.lngCode?.toString();
+              if (menuCode) {
+                originalDiscountData.value[menuCode] = item.strAmtCodeList || "";
+              }
+            });
+            discountChanged.value = false;
+          } catch (error) {
+            console.error("할인선택 저장 실패:", error);
+            // 에러 발생 시에도 계속 진행
           }
         }
 
@@ -2126,6 +2261,12 @@ const saveButton = () => {
       } finally {
         store.state.loading = false;
 
+        // 파일 input 리셋
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) {
+          fileInput.value = "";
+        }
+
         searchButton();
       }
     }
@@ -2137,7 +2278,7 @@ const saveButton = () => {
  */
 
 const updatedRowData = (newvalue) => {
-  console.log(newvalue);
+  //console.log(newvalue);
   updateRow.value = newvalue;
 };
 const updatedList2 = ref([]);
@@ -2339,7 +2480,10 @@ const initAll = () => {
   gridvalue37.value = false;
 
   gridvalue38.value = "";
+  gridvalue39.value = "";
   gridvalue100.value = "";
+  gridvalue40.value = "";
+  gridvalue41.value = "";
   //initFocus.value = !initFocus.value
   fileName.value = "";
   fileSize.value = "";
@@ -2350,6 +2494,9 @@ const initAll = () => {
   disableMenuAuto.value = true;
   uploadImages.value = [];
   uploadImagesCd.value = [];
+  // 할인선택 관련 초기화
+  originalDiscountData.value = {};
+  discountChanged.value = false;
 };
 
 const searchPayCd = (e) => {
@@ -2380,7 +2527,7 @@ const handleFileUpload = async (e) => {
     return;
   }
   fileName2.value = e.target.files[0].name;
-  console.log(fileName2.value);
+  //console.log(fileName2.value);
   changeColid.value = "strUserFileName";
   changeValue2.value = fileName2.value;
   //comsole.log(changeValue2.value);
@@ -2388,8 +2535,20 @@ const handleFileUpload = async (e) => {
 
   const file = e.target.files[0];
   uploadImage.value = new File([file], changeValue2.value, { type: file.type });
+  
+  // 같은 메뉴코드에 대한 기존 파일 제거
+  const existingIndex = uploadImagesCd.value.findIndex(cd => cd === gridvalue3.value);
+  if (existingIndex !== -1) {
+    uploadImages.value.splice(existingIndex, 1);
+    uploadImagesCd.value.splice(existingIndex, 1);
+  }
+  
+  // 새 파일 추가
   uploadImages.value.push(uploadImage.value);
   uploadImagesCd.value.push(gridvalue3.value);
+  
+  // 파일 input 리셋 (같은 파일을 다시 선택할 수 있도록)
+  e.target.value = "";
   //comsole.log(uploadImages.value);
 };
 
@@ -2561,6 +2720,13 @@ const movePage = () => {
   //   lngProgramID: 73762,
   //   strTitle: "메뉴 코드 등록.",
   // };
+};
+
+const exporttoExcel = ref(false);
+const documentTitle = ref("");
+const excelButton = () => {
+  documentTitle.value = "메뉴코드";
+  exporttoExcel.value = !exporttoExcel.value;
 };
 </script>
 
