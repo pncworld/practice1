@@ -1451,7 +1451,8 @@ function convertTo24Hour(timeStr) {
 const clickedRowData = async (newvalue) => {
   //console.log(newvalue);
   afterClick.value = false;
-  if (newvalue[9] == 0 || newvalue[12] == 0) {
+  // if (newvalue[9] == 0 || newvalue[12] == 0) {
+  if (newvalue[9] == 0) {
     // 판매가 할인여부
     rowData2.value = [];
     clickrowData2.value = [];
