@@ -18,6 +18,7 @@
           <img
             :src="strLogoUrl"
             @error="handleError2"
+            class="w100"
           />
         </div>
       </div>

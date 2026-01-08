@@ -964,6 +964,8 @@ const searchButton = async () => {
       nowStoreAreaCd.value
     );
 
+    console.log(res);
+
     Category.value = res.data.MainCategory;
   
     afterSearch.value = true;

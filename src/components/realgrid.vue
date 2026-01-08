@@ -1456,12 +1456,15 @@ const funcshowGrid = async () => {
       text: props.setGroupSumCustomText[
         props.setGroupSumCustomColumnId.indexOf(item.strColID)
       ],
-      styleName:
-        item.strAlign == "center"
+      styleName: (() => {
+        // 기존 정렬 설정
+        const align = item.strAlign == "center"
           ? "setTextAlignCenter"
           : item.strAlign == "left"
           ? "setTextAlignLeft"
-          : "setTextAlignRight",
+          : "setTextAlignRight";
+        return align;
+      })(),
       expression:
         props.setGroupFooterExpressions[
           props.setGroupFooterColID.indexOf(item.strColID)
@@ -1519,29 +1522,57 @@ const funcshowGrid = async () => {
       styleCallback: function (grid, item2) {
         let ret = {};
 
+        // count 표현식이 사용되는 컬럼은 가운데 정렬 유지
+        const colIndex = props.setGroupFooterColID.indexOf(item.strColID);
+        const isCount = colIndex !== -1 && props.setGroupFooterExpressions[colIndex] === "count";
+        
         let defaultGroupNum = 2;
         if (props.setGroupColumnId != []) {
           defaultGroupNum = props.setGroupColumnId.split(",").length;
         }
 
         if (item.strAlign !== "right") {
-          if (defaultGroupNum == 1) {
-            if (item2.level == 2) {
-              ret.styleName = "skyblue setTextAlignLeft";
+          // count 컬럼은 가운데 정렬 유지
+          if (isCount) {
+            if (defaultGroupNum == 1) {
+              if (item2.level == 2) {
+                ret.styleName = "skyblue setTextAlignCenter";
+              }
+            } else if (defaultGroupNum == 2) {
+              if (item2.level == 2) {
+                ret.styleName = "blue setTextAlignCenter";
+              } else if (item2.level == 3) {
+                ret.styleName = "skyblue setTextAlignCenter";
+              }
+            } else if (defaultGroupNum == 3) {
+              if (item2.level == 2) {
+                ret.styleName = "green setTextAlignCenter";
+              } else if (item2.level == 3) {
+                ret.styleName = "blue setTextAlignCenter";
+              } else if (item2.level == 4) {
+                ret.styleName = "skyblue setTextAlignCenter";
+              }
             }
-          } else if (defaultGroupNum == 2) {
-            if (item2.level == 2) {
-              ret.styleName = "blue setTextAlignLeft";
-            } else if (item2.level == 3) {
-              ret.styleName = "skyblue setTextAlignLeft";
-            }
-          } else if (defaultGroupNum == 3) {
-            if (item2.level == 2) {
-              ret.styleName = "green setTextAlignLeft";
-            } else if (item2.level == 3) {
-              ret.styleName = "blue setTextAlignLeft";
-            } else if (item2.level == 4) {
-              ret.styleName = "skyblue setTextAlignLeft";
+          } else {
+            // 기존 로직 (왼쪽 정렬)
+            if (defaultGroupNum == 1) {
+              if (item2.level == 2) {
+                ret.styleName = "skyblue setTextAlignLeft";
+              }
+            } else if (defaultGroupNum == 2) {
+              if (item2.level == 2) {
+                ret.styleName = "blue setTextAlignLeft";
+              } else if (item2.level == 3) {
+                ret.styleName = "skyblue setTextAlignLeft";
+              }
+            } else if (defaultGroupNum == 3) {
+              if (item2.level == 2) {
+                ret.styleName = "green setTextAlignLeft";
+              } else if (item2.level == 3) {
+                ret.styleName = "blue setTextAlignLeft";
+              } else if (item2.level == 4) {
+                ret.styleName = "skyblue setTextAlignLeft";
+              }
             }
           }
           return ret;
@@ -1596,6 +1627,18 @@ const funcshowGrid = async () => {
           : "#,##0",
       suffix: props.suffixColumnPercent.includes(item.strColID) ? "%" : "",
       valueCallback: function (grid, column, footerIndex, columnFooter, value) {
+        // count 표현식 처리 - 그룹푸터 제외한 실제 데이터 행만 카운트
+        if (
+          props.setFooterColID.indexOf(item.strColID) !== -1 &&
+          props.setFooterExpressions[
+            props.setFooterColID.indexOf(item.strColID)
+          ] === "count"
+        ) {
+          // dataProvider.getRowCount()는 그룹푸터를 제외한 실제 데이터 행 수만 반환
+          const dataRowCount = dataProvider.getRowCount();
+          return dataRowCount;
+        }
+        
         // "시:분" 문자열 평균 계산
         if (
           props.setFooterExpressions[

@@ -323,6 +323,36 @@ export const getCardSalesDetailReport = (
   });
 };
 
+export const getEventCouponDetailReport = (
+  groupCd,
+  joinType,
+  superVisorTeam,
+  superVisor,
+  storeCds,
+  startDate,
+  endDate,
+  couponCode,
+  couponNo,
+) => {
+  return api2.post("/MISALES/SLS16_002RPT.asmx/getEventCouponDetailReport", {
+    GROUP_CD: groupCd,
+    STORE_ATTR: joinType,
+    SUPERVISOR_TEAM: superVisorTeam,
+    SUPERVISOR: superVisor,
+    STORE_CDS: storeCds,
+    START_DATE: startDate,
+    END_DATE: endDate,
+    COUPON_CD: couponCode,
+    COUPON_NO: couponNo,
+  });
+};
+
+export const getEventCouponList = (groupCd) => {
+  return api2.post("/MISALES/SLS16_002RPT.asmx/getEventCouponList", {
+    GROUP_CD: groupCd,
+  });
+};
+
 export const getCardCorp = (groupCd, storeCds, orderBy) => {
   return api2.post("/MISALES/SLS05_002RPT.asmx/getCardCorp", {
     GROUP_CD: groupCd,
@@ -354,6 +384,30 @@ export const getCardSalesSumReport = (
     REPORT_TYPE: reporttype,
     DATE_TYPE: dateType,
     BUY_CODE: strBuyCode,
+  });
+};
+
+export const getEventCouponSumReport = (
+  groupCd,
+  storeattr,
+  storeteam,
+  storesupervisor,
+  storeCds,
+  startDate,
+  endDate,
+  DateChk,
+  StoreChk
+) => {
+  return api2.post("/MISALES/SLS16_001RPT.asmx/getEventCouponSumReport", {
+    GROUP_CD: groupCd,
+    STORE_ATTR: storeattr,
+    STORE_TEAM: storeteam,
+    STORE_SUPERVISOR: storesupervisor,
+    STORE_CDS: storeCds,
+    START_DATE: startDate,
+    END_DATE: endDate,
+    DATE_CHK: DateChk,
+    STORE_CHK: StoreChk
   });
 };
 
