@@ -903,7 +903,7 @@ const selcetedrowData2 = (e) => {
   addMenuKey2();
 };
 const selcetedrowData4 = (e) => {
-  if (clickedRealIndex.value == null) {
+  if (clickedMenuKeyIndex.value == null) {
     return;
   }
   //comsole.log(e);
@@ -1834,7 +1834,11 @@ const addMenuKey2 = () => {
 const addScreenKeyf = () => {
   //comsole.log(MenuKeyList.value);
   //comsole.log(clickedRealIndex.value);
-  const targetKeySeq = (nowscreenNo.value - 1) * 45 + clickedRealIndex.value + 1;
+  if (clickedMenuKeyIndex.value == null) {
+    return;
+  }
+  // clickedMenuKeyIndex.value는 이미 올바른 intKeySeq 값을 가지고 있음
+  const targetKeySeq = clickedMenuKeyIndex.value;
   const currentScreenStartSeq3 = (nowscreenNo.value - 1) * 45 + 1;
   const currentScreenEndSeq3 = nowscreenNo.value * 45;
   
