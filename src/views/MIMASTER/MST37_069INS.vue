@@ -156,7 +156,8 @@
             name=""
             id=""
             class="border w-32 h-10 rounded-lg"
-            v-model="selectedType">
+            v-model="selectedType"
+            :disabled="disableStoreSection">
             <option value="0">매장별 메뉴</option>
             <option value="1">공통 메뉴</option>
           </select>
@@ -164,19 +165,20 @@
         <div class="flex space-x-3 ml-2">
           <input
             type="text"
-            disabled
+            :disabled="disableStoreSection"
             class="border disabled:bg-white w-28 rounded-lg h-10"
             v-model="cond6" />
           <input
             type="text"
             class="border disabled:bg-white w-28 rounded-lg h-10"
             v-model="cond7"
-            disabled />
+            :disabled="disableStoreSection" />
         </div>
         <div class="w-10 h-8 z-50">
           <button
             class="border bg-slate-300 w-full h-full rounded-lg shadow-lg"
-            @click="openStore">
+            @click="openStore"
+            :disabled="disableStoreSection">
             ...
           </button>
         </div>
@@ -466,7 +468,7 @@ onMounted(async () => {
     checkbox: false,
   }));
 
-  const res3 = await getMenuList2(userGroup, 0);
+  const res3 = await getMenuList2(userGroup, selectedStores.value);
   ////console.log(res3);
   rowData3.value = res3.data.List;
 
@@ -827,8 +829,23 @@ watch(cond3, () => {
 
 const openPopUp = ref(false);
 const openPopUp2 = ref(false);
+const disableStoreSection = ref(false);
 const addButton = () => {
   initPopUp();
+  
+  // store.state.userData.lngPositionType이 '0'일 때 처리
+  if (store.state.userData.lngPositionType === '0') {
+    selectedType.value = "0";
+    // 실제 매장코드와 매장명 사용
+    const storeCode = store.state.userData.lngPosition;
+    const storeName = store.state.userData.strStoreName;
+    cond6.value = storeCode;
+    cond7.value = storeName + " 등 1건";
+    disableStoreSection.value = true;
+  } else {
+    disableStoreSection.value = false;
+  }
+  
   openPopUp.value = !openPopUp.value;
 };
 
@@ -843,6 +860,7 @@ const initPopUp = () => {
   cond14.value = "0";
   cond5.value = "0";
   cond16.value = "2";
+  disableStoreSection.value = false;
 };
 const closePopUp2 = () => {
   openPopUp.value = false;

@@ -52,11 +52,11 @@
           </div>
         </div>
       </div>
-      <div class="mst57-action-buttons-left" v-show="afterSearch && afterCategory">
+      <div class="mst57-action-buttons-left" v-show="afterSearch">
         <button class="whitebutton mst57-add-category-btn" @click="addMainCategory">
           메인카테고리 추가
         </button>
-        <button class="whitebutton mst57-order-btn" @click="testOrderManage">
+        <button class="whitebutton mst57-order-btn" @click="testOrderManage" v-show="Category && Category.length > 0">
           노출 순서 관리
         </button>
       </div>
@@ -964,7 +964,7 @@ const searchButton = async () => {
       nowStoreAreaCd.value
     );
 
-    console.log(res);
+    // console.log(res);
 
     Category.value = res.data.MainCategory;
   
@@ -1113,11 +1113,11 @@ const saveButton = async () => {
       const extraNm2    = updateList.map(i => i.EXTRA_NM);
 
       const majorNmBase = [
-        languageName0.value,
-        languageName1.value,
-        languageName2.value,
-        languageName3.value,
-        languageName4.value,
+        languageName0.value || "",
+        languageName1.value || "",
+        languageName2.value || "",
+        languageName3.value || "",
+        languageName4.value || "",
       ];
       const makeMajorNmStr = (list) => {
         const uniqueSubCount = [...new Set(list.map(i => i.categoryCode))].length || 0;
@@ -1341,7 +1341,7 @@ const bringCategory = (value) => {
   languageName4.value = Category.value
     .map((item) => {
       const result = item.mainMultilang.find(
-        (item2) => item2.LanguageID === "3" && item2.categoryCode === value
+        (item2) => item2.LanguageID === "4" && item2.categoryCode === value
       );
       return result ? result.LanguageName : "";
     })

@@ -506,7 +506,7 @@ export const getMenuList3 = (groupCd, storeCd) => {
 export const getMenuList2 = (groupCd, storeCd) => {
   return api2.post("/MIMASTER/MST37_069INS.asmx/getMenuList2", {
     GROUP_CD: groupCd,
-    STORE_CD: 0,
+    STORE_CD: storeCd,
   });
 };
 export const getKitchenGroupList = (groupCd) => {
