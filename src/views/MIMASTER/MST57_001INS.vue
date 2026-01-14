@@ -39,14 +39,14 @@
           <button 
             @click="bringCategory(i.MajorCode)" 
             class="mst57-category-main-btn"
-            :class="{ 'mst57-category-active': selectedButton === i.MajorCode }">
+            :class="{ 'mst57-category-active': selectedButton === i.MajorCode && !selectedSubButton }">
             {{ i.MajorName }}
           </button>
           <div v-for="x in i.SubCategory" :key="x.SubCode" class="mst57-subcategory-item">
             <button 
               class="mst57-category-sub-btn" 
-              @click="bringCategory(i.MajorCode)"
-              :class="{ 'mst57-category-active': selectedButton === x.SubCode }">
+              @click="bringSubCategory(i.MajorCode, x.SubCode)"
+              :class="{ 'mst57-category-active': selectedSubButton === x.SubCode && selectedButton === i.MajorCode }">
               {{ x.SubName }}
             </button>
           </div>
@@ -516,6 +516,7 @@ onMounted(async () => {
 
 const searchStoreName = ref();
 const selectedButton = ref();
+const selectedSubButton = ref(null);
 const Category = ref([]);
 // const SubCategory = ref([]);
 const getMultiLang = ref([]);
@@ -607,6 +608,8 @@ watch(nowStoreCd, (newvalue, oldvalue) => {
     languageName3.value = "";
     languageName4.value = "";
     convertedsubMultiLang.value = [];
+    selectedButton.value = undefined;
+    selectedSubButton.value = null;
   }
 });
 const nowStoreAreaCd = ref();
@@ -934,6 +937,8 @@ const searchButton = async () => {
   languageName3.value = "";
   languageName4.value = "";
   convertedsubMultiLang.value = [];
+  selectedButton.value = undefined;
+  selectedSubButton.value = null;
   if (nowStoreCd.value == "0" || nowStoreCd.value == undefined) {
     Swal.fire({
       title: "경고",
@@ -1301,6 +1306,7 @@ const bringCategory = (value) => {
   });
 
   selectedButton.value = value;
+  selectedSubButton.value = null; // 메인 카테고리 선택 시 서브 카테고리 선택 해제
 
   languageName0.value = Category.value
     .map((item) => {
@@ -1386,8 +1392,13 @@ const bringCategory = (value) => {
     }).flat();
   });
 
+};
 
-
+const bringSubCategory = (majorCode, subCode) => {
+  // 먼저 메인 카테고리 정보를 로드
+  bringCategory(majorCode);
+  // 그 다음 서브 카테고리 선택
+  selectedSubButton.value = subCode;
 };
 
 const addsubCategory = () => {

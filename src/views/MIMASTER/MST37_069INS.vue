@@ -209,22 +209,23 @@
         <div class="text-base font-semibold text-nowrap">특별단가 :</div>
         <div class="flex flex-col ml-5 space-y-3">
           <div class="flex items-center">
-            <label for="cond5"
-              ><input
+            <label for="cond5">
+              <input
                 type="radio"
                 id="cond5"
                 v-model="cond5"
-                value="0" /></label
-            ><input
-              type="number"
-              class="border h-8"
-              :disabled="cond5 == '1'"
-              v-model="cond13" />
+                value="0" />
+            </label>
+              <input
+                type="number"
+                class="border h-8 ml-2"
+                :disabled="cond5 == '1'"
+                v-model="cond13" />
           </div>
           <div class="flex items-center">
-            <label for="cond6"
-              ><input type="radio" id="cond6" v-model="cond5" value="1"
-            /></label>
+            <label for="cond6">
+              <input type="radio" id="cond6" v-model="cond5" value="1"/>
+            </label>
             <div class="flex justify-center items-center">
               <div>기준단가 :</div>
               <input
@@ -652,7 +653,7 @@ const addNewSpecial = async (e) => {
     });
     return;
   }
-  if (cond5.value == "0" && cond13.value == "") {
+  if (cond5.value == "0" && (cond13.value === "" || cond13.value == null || cond13.value === undefined)) {
     Swal.fire({
       title: "경고",
       text: "특별단가를 입력해주세요.",
@@ -973,7 +974,6 @@ const saveButton = async (e) => {
     );
 
     console.log(res);
-    // ////console.log(res);
 
     Swal.fire({
       title: "성공",
@@ -1010,34 +1010,76 @@ const saveButton2 = async () => {
   }
   try {
     store.state.loading = true;
-    const stores = updateRowData2.value
-      .filter((item) => item.checkbox1 == true)
-      .map((item) => item.lngStoreCode)
-      .join(",");
-
-    const menuCodes = updateRowData2.value
-      .filter((item) => item.checkbox1 == true)
-      .map((item) => item.MenuCode);
+    
+    // 신규 입력한 매장/메뉴/가격 조합을 생성 (addNewSpecial과 동일한 로직)
+    let stores = "";
+    let menuCodes = [];
     let specialPrice = [];
+    
+    // 매장코드와 메뉴코드 조합 생성
+    if (checkedDatas2.value.length == 1) {
+      for (let i = 0; i < checkedDatas3.value.length; i++) {
+        stores += checkedDatas2.value[0].lngStoreCode + ",";
+        menuCodes.push(checkedDatas3.value[i].lngCode);
+      }
+      stores = stores.slice(0, stores.length - 1);
+    } else {
+      for (let i = 0; i < checkedDatas2.value.length; i++) {
+        for (let j = 0; j < checkedDatas3.value.length; j++) {
+          stores += checkedDatas2.value[i].lngStoreCode + ",";
+          menuCodes.push(checkedDatas3.value[j].lngCode);
+        }
+      }
+      stores = stores.slice(0, stores.length - 1);
+    }
+    
+    // 특별단가 계산 (addNewSpecial과 동일한 로직)
     if (cond5.value == 0) {
-      for (let i = 0; i < menuCodes.length; i++) {
-        specialPrice.push(cond13.value);
+      for (let i = 0; i < checkedDatas2.value.length; i++) {
+        for (let j = 0; j < checkedDatas3.value.length; j++) {
+          specialPrice.push(cond13.value);
+        }
       }
     } else if (cond5.value == 1) {
-      for (let i = 0; i < menuCodes.length; i++) {
-        let initPrice = rowData3.value.filter(
-          (item) => item.lngCode == menuCodes[i]
-        )[0].lngPrice;
-        initPrice =
-          cond16.value == "1"
-            ? Math.round(initPrice * (cond14.value / 100), cond15.value)
-            : cond16.value == "0"
-            ? Math.floor(initPrice * (cond14.value / 100), cond15.value)
-            : Math.ceil(initPrice * (cond14.value / 100), cond15.value);
-        specialPrice.push(initPrice);
+      for (let j = 0; j < checkedDatas2.value.length; j++) {
+        for (let i = 0; i < checkedDatas3.value.length; i++) {
+          let initPrice = rowData3.value.filter(
+            (item) => item.lngCode == checkedDatas3.value[i]
+          )[0].lngPrice;
+          initPrice =
+            cond16.value == "1"
+              ? Math.round(initPrice * (cond14.value / 100), cond15.value)
+              : cond16.value == "0"
+              ? Math.floor(initPrice * (cond14.value / 100), cond15.value)
+              : Math.ceil(initPrice * (cond14.value / 100), cond15.value);
+          specialPrice.push(initPrice);
+        }
       }
     }
 
+    // 매장코드 배열 생성 (필터링을 위해)
+    let storeArray = [];
+    if (checkedDatas2.value.length == 1) {
+      for (let i = 0; i < checkedDatas3.value.length; i++) {
+        storeArray.push(checkedDatas2.value[0].lngStoreCode);
+      }
+    } else {
+      for (let i = 0; i < checkedDatas2.value.length; i++) {
+        for (let j = 0; j < checkedDatas3.value.length; j++) {
+          storeArray.push(checkedDatas2.value[i].lngStoreCode);
+        }
+      }
+    }
+
+    // IGNORE(checkbox2)에 포함된 항목 추출 (기존 로직 유지)
+    const ignoreApply = updateRowData2.value
+      .filter((item) => item.checkbox2 == true)
+      .map((item) => item.lngStoreCode);
+    const ignoreApply2 = updateRowData2.value
+      .filter((item) => item.checkbox2 == true)
+      .map((item) => item.MenuCode);
+
+    // APPLY(checkbox1)에 포함된 항목 추출
     const editApply = updateRowData2.value
       .filter((item) => item.checkbox1 == true)
       .map((item) => item.lngStoreCode);
@@ -1045,12 +1087,42 @@ const saveButton2 = async () => {
       .filter((item) => item.checkbox1 == true)
       .map((item) => item.MenuCode);
 
-    const ignoreApply = updateRowData2.value
-      .filter((item) => item.checkbox2 == true)
-      .map((item) => item.lngStoreCode);
-    const ignoreApply2 = updateRowData2.value
-      .filter((item) => item.checkbox2 == true)
-      .map((item) => item.MenuCode);
+    // IGNORE에 포함된 매장코드/메뉴코드 조합을 Set으로 생성 (기존 로직 유지)
+    const ignoreSet = new Set();
+    for (let i = 0; i < ignoreApply.length; i++) {
+      ignoreSet.add(String(ignoreApply[i]) + "," + String(ignoreApply2[i]));
+    }
+
+    // APPLY에 포함된 매장코드/메뉴코드 조합을 Set으로 생성
+    const applySet = new Set();
+    for (let i = 0; i < editApply.length; i++) {
+      applySet.add(String(editApply[i]) + "," + String(editApply2[i]));
+    }
+
+    // 신규 입력 데이터에서 IGNORE 또는 APPLY에 포함된 항목 제외
+    const filteredStores = [];
+    const filteredMenuCodes = [];
+    const filteredSpecialPrice = [];
+    
+    // 필터링: IGNORE 또는 APPLY에 포함되지 않은 항목만 유지
+    for (let i = 0; i < menuCodes.length; i++) {
+      const key = String(storeArray[i]) + "," + String(menuCodes[i]);
+      // IGNORE 또는 APPLY에 포함되지 않은 항목만 포함
+      if (!ignoreSet.has(key) && !applySet.has(key)) {
+        filteredStores.push(storeArray[i]);
+        filteredMenuCodes.push(menuCodes[i]);
+        filteredSpecialPrice.push(specialPrice[i]);
+      }
+    }
+
+    // 필터링된 데이터를 문자열로 변환
+    const finalStores = filteredStores.join(",");
+    const finalMenuCodes = filteredMenuCodes.join(",");
+    const finalSpecialPrice = filteredSpecialPrice.join(",");
+
+    console.log("filtered stores:", finalStores);
+    console.log("filtered menuCodes:", finalMenuCodes);
+    console.log("filtered specialPrice:", finalSpecialPrice);
 
     let cond1 = [];
     let Cond2 = [];
@@ -1064,14 +1136,16 @@ const saveButton2 = async () => {
 
     const res = await saveExceptionSpecialPrice(
       selectedGroup.value,
-      stores,
-      menuCodes.join(","),
-      specialPrice.join(","),
+      finalStores,
+      finalMenuCodes,
+      finalSpecialPrice,
       startdate2.value,
       enddate2.value,
       cond1.join(","),
       Cond2.join(",")
     );
+
+    console.log(res);
 
     Swal.fire({
       title: "성공",
