@@ -3868,9 +3868,10 @@ export const pncInterFaceAPI = (path, paraNm, paraCd) => {
   });
 };
 
-export const getMenuDiscCount = (groupCd) => {
+export const getMenuDiscCount = (groupCd, storeCd) => {
   return api2.post("/MIMASTER/MST01_033INS.asmx/getMenuDiscCount", {
     GROUP_CD: groupCd,
+    STORE_CD: storeCd,
   });
 };
 

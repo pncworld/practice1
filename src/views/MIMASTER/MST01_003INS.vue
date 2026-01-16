@@ -1209,7 +1209,7 @@ onMounted(async () => {
     hideAttr.value = true;
   }
 
-  const res = await getMenuDiscCount(store.state.userData.lngStoreGroup);
+  const res = await getMenuDiscCount(store.state.userData.lngStoreGroup, nowStoreCd.value);
 
   if (res.data.List[0].count == "0") {
     disableWithMenuDisc.value = true;
