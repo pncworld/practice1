@@ -3875,6 +3875,12 @@ export const getMenuDiscCount = (groupCd, storeCd) => {
   });
 };
 
+export const getMenuDiscCount2 = (groupCd) => {
+  return api2.post("/MIMASTER/MST01_033INS.asmx/getMenuDiscCount2", {
+    GROUP_CD: groupCd,
+  });
+};
+
 export const getMultiLingual2 = (groupCd, storeCd, menuCd) => {
   return api2.post("/MIMASTER/MST44_066INS.asmx/getMultiLingual2", {
     GROUP_CD: groupCd,
