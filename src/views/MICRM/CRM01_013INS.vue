@@ -1192,44 +1192,96 @@ const saveButton2 = async () => {
 };
 
 const saveButton3 = async () => {
+  if (updateRowData.value.length === 0) {
+    Swal.fire({
+      title: "경고",
+      text: "업로드할 데이터가 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  // 필수 필드 검증
+  const custidsl = updateRowData.value
+    .map((item) => item.strSaleCustID)
+    .filter(
+      (item2) => item2 == "" || item2 == undefined || item2 == null
+    ).length;
+
+  const cardnos = updateRowData.value
+    .map((item) => item.strSaleCardNo)
+    .filter(
+      (item2) => item2 == "" || item2 == undefined || item2 == null
+    ).length;
+
+  const custnms = updateRowData.value
+    .map((item) => item.strSaleCustName)
+    .filter(
+      (item2) => item2 == "" || item2 == undefined || item2 == null
+    ).length;
+
+  if (custidsl + cardnos + custnms > 0) {
+    Swal.fire({
+      title: "경고",
+      text: `미입력된 필수값이 존재합니다. 확인해주세요.`,
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  const result = await Swal.fire({
+    title: "확인",
+    text: "업로드 하시겠습니까?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "확인",
+    cancelButtonText: "취소",
+  });
+
+  if (!result.isConfirmed) {
+    return;
+  }
+
   try {
     store.state.loading = true;
 
     const custids = updateRowData.value
-      .map((item) => item.strSaleCustID)
+      .map((item) => item.strSaleCustID || "")
       .join("\u200b");
     const limitAmt = updateRowData.value
-      .map((item) => item.dblLimitAmt)
+      .map((item) => item.dblLimitAmt || 0)
       .join("\u200b");
     const custStatus = updateRowData.value
-      .map((item) => item.strSaleCustStatus)
+      .map((item) => item.strSaleCustStatus || 0)
       .join("\u200b");
     const cardStatus = updateRowData.value
-      .map((item) => item.strSaleCardStatus)
+      .map((item) => item.strSaleCardStatus || 0)
       .join("\u200b");
     const cardNos = updateRowData.value
-      .map((item) => item.strSaleCardNo)
+      .map((item) => item.strSaleCardNo || "")
       .join("\u200b");
     const custNms = updateRowData.value
-      .map((item) => item.strSaleCustName)
+      .map((item) => item.strSaleCustName || "")
       .join("\u200b");
     const deptCds = updateRowData.value
-      .map((item) => item.strCustDeptCode)
+      .map((item) => item.strCustDeptCode || "")
       .join("\u200b");
     const deptNms = updateRowData.value
-      .map((item) => item.strCustDeptName)
+      .map((item) => item.strCustDeptName || "")
       .join("\u200b");
     const telNos = updateRowData.value
-      .map((item) => item.strTelNo)
+      .map((item) => item.strTelNo || "")
       .join("\u200b");
     const compCds = updateRowData.value
-      .map((item) => item.strCustCompCode)
+      .map((item) => item.strCustCompCode || "")
       .join("\u200b");
     const compNms = updateRowData.value
-      .map((item) => item.strCustCompName)
+      .map((item) => item.strCustCompName || "")
       .join("\u200b");
     const address = updateRowData.value
-      .map((item) => item.strAddress)
+      .map((item) => item.strAddress || "")
       .join("\u200b");
     const res = await saveCustomorsInfo(
       CompanyCode.value,
@@ -1247,20 +1299,35 @@ const saveButton3 = async () => {
       address,
       store.state.userData.lngSequence
     );
-    ////console.log(res);
+    console.log("API 응답:", res.data);
     if (res.data.RESULT_CD == "00") {
       Swal.fire({
         title: "성공",
-        text: `저장이 완료되었습니다.`,
+        text: `처리되었습니다.`,
         icon: "success",
         confirmButtonText: "확인",
       });
-      return;
+      searchButton();
+    } else {
+      Swal.fire({
+        title: "실패",
+        text: res.data.RESULT_MSG || `업로드에 실패했습니다. (코드: ${res.data.RESULT_CD})`,
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+      searchButton();
     }
   } catch (error) {
+    console.error("업로드 오류:", error);
+    Swal.fire({
+      title: "오류",
+      text: error.response?.data?.message || `업로드 중 오류가 발생했습니다.`,
+      icon: "error",
+      confirmButtonText: "확인",
+    });
+    searchButton();
   } finally {
     store.state.loading = false;
-    searchButton();
   }
 };
 
@@ -1504,6 +1571,11 @@ async function readFileWithArrayBuffer(file) {
     ...item,
     strSaleCustStatus: 0,
     strSaleCustStatusTxt: "정상",
+    strSaleCardStatus: 0,
+    strSaleCardStatusTxt: "정상",
+    strAddress: item.strAddress || "",
+    dblSaleAmt: item.dblSaleAmt || 0,
+    dblRemAmt: item.dblRemAmt || 0,
   }));
   updateRowData.value = JSON.parse(JSON.stringify(rowData.value));
   ////console.log(updateRowData.value);
