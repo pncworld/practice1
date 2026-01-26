@@ -2009,14 +2009,42 @@ const addRow = () => {
     clickaddrowSeq.value = "new" + addrowSeq.value;
   }
 };
-/**
- * 그리드 행 삭제 버튼 함수
- */
+
 /**
  * 그리드 행 삭제 버튼 함수
  */
 
 const deleteRow = () => {
+  // 현재 선택된 행이 신규행인지 확인
+  if (rowIndex.value === undefined || rowIndex.value === null) {
+    Swal.fire({
+      title: "경고",
+      text: "삭제할 행을 선택하세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  // 신규행 확인 방법 1: created 배열에 포함되어 있는지 확인
+  const isNewRowInCreated = updateDeleteInsertrowIndex.value.created?.includes(rowIndex.value) || false;
+  
+  // 신규행 확인 방법 2: rowData의 new 속성 또는 sequence 확인
+  const currentRow = rowData.value[rowIndex.value];
+  const isNewRowByProperty = currentRow?.new === true || currentRow?.sequence?.toString().startsWith('new') || false;
+
+  // 신규행이 아닌 경우 경고 메시지 표시
+  if (!isNewRowInCreated && !isNewRowByProperty) {
+    Swal.fire({
+      title: "경고",
+      text: "신규로 추가된 행만 삭제할 수 있습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  // 신규행인 경우에만 삭제 실행
   deleteRow3.value = !deleteRow3.value;
 };
 
