@@ -702,27 +702,28 @@
               주문서출력제외
             </div>
             <div class="space-x-5 flex justify-left pl-2 items-center border">
-              <label for="discountfor1"
-                ><input
+              <label for="discountfor1">
+                <input
                   type="radio"
                   id="discountfor1"
-                  name="blnRedPrint"
+                  name="blnFloat"
                   v-model="gridvalue22"
                   value="1"
                   @input="changeInfo"
                   :disabled="afterClick"
-                  class="disabled:bg-gray-200" />전체 선택</label
-              ><label for="discountfor2"
-                ><input
+                  class="disabled:bg-gray-200" />예
+              </label>
+              <label for="discountfor2">
+                <input
                   type="radio"
                   id="discountfor2"
-                  name="blnRedPrint"
+                  name="blnFloat"
                   v-model="gridvalue22"
                   value="0"
                   @input="changeInfo"
                   :disabled="afterClick"
-                  class="disabled:bg-gray-200" />부분 선택</label
-              >
+                  class="disabled:bg-gray-200" />아니오
+              </label>
             </div>
             <div class="justify-center items-center bg-gray-100 border flex">
               메뉴옵션코드
@@ -1948,7 +1949,7 @@ const addRow = () => {
     const today = new Date();
     const formattedDate = today.toLocaleDateString("en-CA");
     addrowProp.value =
-      "lngMainGroup,lngSubGroup,dtmFromDate,dtmToDate,strName,lngPrice,lngTax,blnInactive,strAmtCodeList,lngDCPrice,lngChain,blnDCPriceYN,lngDiscount,intCustCount,lngOrder,blnReceipt,lngMenuOption,blnRedPrint,strIcon,blnKitSingle,lngSubTitle,blnServing,blnOpen,blnDeliveryYN";
+      "lngMainGroup,lngSubGroup,dtmFromDate,dtmToDate,strName,lngPrice,lngTax,blnInactive,strAmtCodeList,lngDCPrice,lngChain,blnDCPriceYN,lngDiscount,intCustCount,lngOrder,blnReceipt,lngMenuOption,blnFloat,strIcon,blnKitSingle,lngSubTitle,blnServing,blnOpen,blnDeliveryYN";
     addrowDefault.value =
       "0,0," +
       formattedDate +
@@ -2188,7 +2189,7 @@ const saveButton = () => {
           filterAndMap("strBarCode"),
           filterAndMap("blnReceipt"),
           filterAndMap("lngMenuOption"),
-          filterAndMap("blnRedPrint"),
+          filterAndMap("blnFloat"),
           filterAndMap("strIcon"),
           filterAndMap("blnKitSingle"),
           filterAndMap("lngSubTitle"),
