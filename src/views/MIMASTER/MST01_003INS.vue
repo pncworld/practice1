@@ -1949,7 +1949,7 @@ const addRow = () => {
     const today = new Date();
     const formattedDate = today.toLocaleDateString("en-CA");
     addrowProp.value =
-      "lngMainGroup,lngSubGroup,dtmFromDate,dtmToDate,strName,lngPrice,lngTax,blnInactive,strAmtCodeList,lngDCPrice,lngChain,blnDCPriceYN,lngDiscount,intCustCount,lngOrder,blnReceipt,lngMenuOption,blnFloat,strIcon,blnKitSingle,lngSubTitle,blnServing,blnOpen,blnDeliveryYN";
+      "lngMainGroup,lngSubGroup,dtmFromDate,dtmToDate,strName,lngPrice,lngTax,blnInactive,strAmtCodeList,lngDCPrice,lngChain,blnDCPriceYN,lngDiscount,intCustCount,lngOrder,lngKPG,blnReceipt,lngMenuOption,blnFloat,strIcon,blnKitSingle,lngSubTitle,blnServing,blnOpen,blnDeliveryYN";
     addrowDefault.value =
       "0,0," +
       formattedDate +
@@ -1977,6 +1977,8 @@ const addRow = () => {
       "0" +
       "," +
       "0" +
+      "," +
+      "1" + // lngKPG (주방출력제외 - 아니오)
       "," +
       "0" +
       "," +
@@ -2008,6 +2010,10 @@ const addRow = () => {
       blnInactive: undefined,
     });
     clickaddrowSeq.value = "new" + addrowSeq.value;
+    // 주방출력제외 초기값을 "아니오"(1)로 설정 (UI 반영)
+    gridvalue18.value = "1";
+    disabledKPG.value = false;
+    showKPG.value = true;
   }
 };
 
