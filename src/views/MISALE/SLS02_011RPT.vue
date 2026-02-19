@@ -370,14 +370,12 @@ const labelsData = ref([["매출취소", "메뉴정정", "주문취소"]]);
 
 const clickedRowData = async (e) => {
   //comsole.log(e);
-  const seqId = e[17];
+  const seqId = e[18];
 
   const res = await getCustInfo(groupCd.value, storeCd.value, seqId);
-
   rowData2.value = res.data.CUSTOMER;
 
   const res2 = await getOrderInfo(groupCd.value, storeCd.value, seqId);
-
   rowData3.value = res2.data.ORDER;
 
   const res3 = await getPayInfo(
