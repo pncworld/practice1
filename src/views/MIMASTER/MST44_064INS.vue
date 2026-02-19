@@ -60,7 +60,7 @@
   <div class="flex h-4/6 w-full mt-5">
     <div class="flex flex-col w-6/12 h-4/6">
       <div
-        class="flex justify-between mt-0 ml-10 border-b border-b-gray-300"
+        class="flex justify-between mt-0 ml-14 border-b border-b-gray-300"
         :class="currentMenu == 1 ? 'w-full' : 'w-full'">
         <div
           class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold"
@@ -240,7 +240,7 @@
             <Realgrid class="w-[100%] h-[130%] " :progname="'MST44_062INS_VUE'" :progid="3" :reload="reload" :rowStateeditable="false"
               :rowData="rowData4" @clickedRowData="clickedRowData4" @realgridname="realgridname4" @selectedIndex2="selectedIndex5"
               @updatedRowData="updatedRowData4" :changeColid="changeColid" :changeRow="changeRow" :changeNow="changeNow4"
-              :changeValue2="changeValue" :initSelect="false" ></Realgrid>
+              :changeValue2="changeValue" :initSelect="initSelect" ></Realgrid>
           </div>
                 <!-- 그리드 영역 -->
         </div>
@@ -258,7 +258,7 @@
               </div>
               <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
                 v-model="receiptU" @input="handleInput" @click="caculateByte3" :disabled="!afterSearch4"
-               >
+                @change="changeData">
               </input>
             </div>
             <div class="bg-gray-100 flex justify-center items-center rounded-bl-lg border border-gray-600">
@@ -1520,6 +1520,7 @@ const searchButton = async () => {
     tempDisabled2.value = true;
     forsearchSub.value = -1;
     forsearchMain.value = -1;
+    initSelect.value = !initSelect.value
   }
 };
 const filteredSubMenuGroup = ref([]);
@@ -2036,6 +2037,7 @@ const initGrid3 = () => {
 
 
 const changeNow4 = ref(false)
+const initSelect = ref(false)
 const receiptU = ref('')
 const receiptD1 = ref('')
 const receiptD2 = ref('')
@@ -2043,17 +2045,15 @@ const receiptD3 = ref('')
 const receiptD4 = ref('')
 const receiptD5 = ref('')
 function getByteLength2(str) {
+
+  if (str == ''){
+    str = ' '
+  }
   let byteLen = 0;
- 
-  if(str !=undefined){
-     for (let i = 0; i < str.length; i++) {
+  for (let i = 0; i < str.length; i++) {
     byteLen += str.charCodeAt(i) > 127 ? 2 : 1;
   }
   return byteLen;
-  } else {
-    return 0
-  }
- 
 }
 function splitStringByByteLength(str, maxByteLength) {
 
@@ -2083,15 +2083,16 @@ function splitStringByByteLength(str, maxByteLength) {
 }
 
 const clickedRowData4 = (newValue) => {
-  
+  //console.log(newValue)
   receiptU.value = newValue[2]
-   const result = splitStringByByteLength(newValue[3], 42)
+  const result = splitStringByByteLength(newValue[3], 42)
 
-  receiptD1.value = result[0]
-  receiptD2.value = result[1]
-  receiptD3.value = result[2]
-  receiptD4.value = result[3]
-  receiptD5.value = result[4]
+  receiptD1.value = result[0] == undefined ? '' : result[0]
+  receiptD2.value = result[1]  == undefined ? '' : result[1]
+  receiptD3.value = result[2]  == undefined ? '' : result[2]
+  receiptD4.value = result[3]  == undefined ? '' : result[3]
+  receiptD5.value = result[4]  == undefined ? '' : result[4]
+
 }
 
 const updatedList4 = ref([])
@@ -2220,6 +2221,21 @@ const addSpace42Text = (value) => {
   return prechangeValue
 }
 
+const changeValues2 = async (e) => {
+
+  let newText1 = addSpace42Text(receiptD1.value == undefined ? '' : receiptD1.value)
+  let newText2 = addSpace42Text(receiptD2.value == undefined ? '' : receiptD2.value)
+  let newText3 = addSpace42Text(receiptD3.value == undefined ? '' : receiptD3.value)
+  let newText4 = addSpace42Text(receiptD4.value == undefined ? '' : receiptD4.value)
+  let newText5 = addSpace42Text(receiptD5.value == undefined ? '' : receiptD5.value)
+
+  changeColid.value = 'strReceiptD'
+  changeValue.value = newText1 + newText2 + newText3 + newText4 + newText5
+
+
+
+}
+
 const handleBlur = (e) => {
   if(isSwalOpen == true){
     return
@@ -2313,6 +2329,40 @@ const dupliAllData = async() => {
    changeNow4.value = !changeNow4.value
 
 }
+
+watch(receiptU, (newvalue) => {
+  setTimeout(() => {
+    changeColid.value = 'strReceiptU'
+    changeValue.value = newvalue
+  }, 10)
+})
+watch(receiptD1, () => {
+  setTimeout(() => {
+    changeValues2();
+  }, 5);
+})
+watch(receiptD2, () => {
+  setTimeout(() => {
+    changeValues2();
+  }, 5);
+
+})
+watch(receiptD3, () => {
+  setTimeout(() => {
+    changeValues2();
+  }, 5);
+
+})
+watch(receiptD4, () => {
+  setTimeout(() => {
+    changeValues2();
+  }, 5);
+})
+watch(receiptD5, () => {
+  setTimeout(() => {
+    changeValues2();
+  }, 5);
+})
 </script>
 
 <style scoped></style>

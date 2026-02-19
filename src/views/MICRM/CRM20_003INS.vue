@@ -1220,6 +1220,8 @@ const saveButton = async (e) => {
       item.strSaleAccStatus === undefined
   );
 
+  // console.log(filterMust);
+
   if (filterMust.length > 0) {
     Swal.fire({
       title: "경고",

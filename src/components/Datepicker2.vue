@@ -308,8 +308,7 @@ const updateDateRange = (e) => {
     selectedEndDate.value = formatDateToYYYYMMDD(currentWeekEnd);
   } else if (e.target.value == "lastMonth") {
     const lastMonth = new Date(TODAY);
-    // lastMonth.setMonth(TODAY.getMonth() - 1);
-    lastMonth.setMonth(TODAY.getMonth());
+    lastMonth.setMonth(TODAY.getMonth() - 1);
     const lastMonthStart = new Date(
       lastMonth.getFullYear(),
       lastMonth.getMonth(),

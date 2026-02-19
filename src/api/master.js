@@ -3938,3 +3938,38 @@ export const getMultiLingual3 = (groupCd, storeCd, screenNo) => {
     SCREEN_NO: screenNo,
   });
 };
+
+export const getDiscountGroup = (groupCd, storeCd) => {
+  return api2.post("/MIMASTER/MST36_006INS.asmx/getDiscountGroup", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+
+export const saveDiscountGroup = (groupCd, storeCd, lngCode, strName, lngValue, deleteNo) => {
+  return api2.post("/MIMASTER/MST36_006INS.asmx/saveDiscountGroup", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LNG_CODE: lngCode,
+    STR_NAME: strName,
+    LNG_VALUE: lngValue,
+    DELETE_NO: deleteNo,
+  });
+};
+
+export const getDiscountMenuList = (groupCd, storeCd, common) => {
+  return api2.post("/MIMASTER/MST36_006INS.asmx/getDiscountMenuList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    COMMON: common,
+  });
+};
+
+export const saveDiscountMenuSetting = (groupCd, storeCd, menuCd, discountVal) => {
+  return api2.post("/MIMASTER/MST36_006INS.asmx/saveDiscountMenuSetting", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    MENU_CD : menuCd,
+    DISCOUNT_VLU: discountVal,
+  });
+};

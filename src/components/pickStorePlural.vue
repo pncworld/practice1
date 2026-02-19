@@ -598,8 +598,18 @@ const updatedRowData = (e) => {
   }
   emit("lngStoreGroups", sendStoreGroups.value);
   if (sendStoreCodes.value.length == 0) {
-    let senditem = checkedRowData.map((item) => item.lngStoreCode).join(",");
-    emit("lngStoreCodes", senditem);
+    // 체크된 것이 없을 때는 초기값과 동일하게 전체 매장 코드를 emit
+    if (
+      store.state.userData.blnBrandAdmin == "True" ||
+      store.state.userData.lngPositionType == "1"
+    ) {
+      emit(
+        "lngStoreCodes",
+        store.state.storeCd.map((item) => item.lngStoreCode).join(",")
+      );
+    } else {
+      emit("lngStoreCodes", store.state.userData.lngPosition);
+    }
   } else {
     emit("lngStoreCodes", sendStoreCodes.value.join(","));
   }
@@ -629,7 +639,18 @@ const resetChecked = () => {
   rowData.value = [...rowData.value];
   searchWord.value = "";
   emit("lngStoreGroup", store.state.storeGroup[0].lngStoreGroup);
-  emit("lngStoreCodes", 0);
+  // 초기값과 동일하게 전체 매장 코드를 emit
+  if (
+    store.state.userData.blnBrandAdmin == "True" ||
+    store.state.userData.lngPositionType == "1"
+  ) {
+    emit(
+      "lngStoreCodes",
+      store.state.storeCd.map((item) => item.lngStoreCode).join(",")
+    );
+  } else {
+    emit("lngStoreCodes", store.state.userData.lngPosition);
+  }
   emit("lngStoreAttrs", 0);
   emit("lngSupervisor", 0);
   emit("lngStoreTeam", 0);

@@ -13,26 +13,20 @@
         조회
       </button>
       <button @click="saveButton" class="button save w-auto">저장</button>
-      <!-- <button @click="copyButton" class="button copy w-auto" v-if="currentMenu == true">복사</button> -->
     </div>
   </div>
   <br />
   <div
     class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
     <PickStore
-      @areaCd="handleStoreAreaCd"
+      @update:storeAreaCd="handleStoreAreaCd"
       @update:storeCd="handleStoreCd"
-      @posNo="handlePosNo"
       @storeNm="handlestoreNm"
-      @update:ischanged="handleinitAll"></PickStore>
+      @GroupNm="handleGroupNm"
+      @update:ischanged="handleinitAll"
+      :hidesub="hidesub"
+      :hideAttr="hidesub"></PickStore>
   </div>
-  <!-- 조회 조건 -->
-  <!-- <div class="z-50">
-    <DupliPopUp5 :isVisible="showPopup2" @close="showPopup2 = false" :storeCd="nowStoreCd" :storeNm="clickedStoreNm"
-      :areaCd="nowStoreAreaCd" :posNo="posNo" :progname="'MST44_061INS_VUE'" :dupliapiname="'DUPLIALLKDS'" :progid="3"
-      :poskiosk="'getStoreList'" naming2="KDS">
-    </DupliPopUp5>
-  </div> -->
   <div class="mt-5 flex justify-start ml-10">
     <button
       class="contents_tab-button"
@@ -47,72 +41,69 @@
       할인그룹 메뉴설정
     </button>
   </div>
-  <div class="flex h-[60vh] w-full mt-5">
+  <div class="flex h-[55vh] w-full mt-5">
     <div class="flex flex-col w-3/5 h-4/6">
       <div
         class="flex justify-between mt-0 ml-10 border-b border-b-gray-300"
-        :class="
-          currentMenu == 1
-            ? 'w-full'
-            : currentMenu == 3
-            ? 'w-[45vw]'
-            : 'w-[54%]'
-        ">
+        :class="currentMenu == 1 ? 'w-full' : 'w-[54%]'">
         <div
           class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold"
           v-if="currentMenu == 1">
-          할인그룹 설정
+          할인그룹 정보
         </div>
         <div
           class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold"
           v-if="currentMenu == 2">
-          할인그룹 메뉴설정
+          메뉴 목록
         </div>
-        <!-- <div class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold " v-if="currentMenu == 3">POS 목록</div>
-        <div class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold space-x-1 " v-if="currentMenu == 3"><button
-            class="whitebutton" @click="initAllSection">초기화</button><button class="whitebutton"
-            @click="dupliData">복사</button><button class="whitebutton" @click="dupliAllData">붙여넣기</button></div> -->
+        <div class="mt-3">
+          <button
+            class="whitebutton"
+            :disabled="!(afterSearch == true)"
+            @click="addRow"
+            v-if="currentMenu == 1">
+            추가
+          </button>
+          <button
+            class="whitebutton"
+            @click="deleteRow"
+            :disabled="!(afterClick == true && afterSearch == true)"
+            v-if="currentMenu == 1">
+            삭제
+          </button>
+        </div>
       </div>
-      <!-- 그리드 영역 -->
-      <div class="flex flex-col space-y-20 ml-10">
-        <div class="" v-show="currentMenu == 1">
+      <div class="h-4/6" v-show="currentMenu == 1">
+        <div class="ml-10 mt-5 w-full h-full">
           <Realgrid
-            class="w-full h-[20vh]"
-            :progname="'MST44_062INS_VUE'"
+            class="w-full h-[230%]"
+            :progname="'MST36_006INS_VUE'"
             :progid="1"
             :rowData="rowData"
-            :rowStateeditable="false"
-            :showCheckBar="false"
-            @selcetedrowData="selcetedrowData"
-            :changeRow="changeRow"
-            :changeNow="changeNow"
-            :changeColid="changeColid"
-            :changeValue2="changeValue"
-            @updatedRowData="updatedRowData"
-            @selectedIndex="selectedIndex"
-            @clickedRowData="clickedRowData"
-            @realgridname="realgridname"></Realgrid>
-        </div>
-        <div class="h-full flex" v-show="currentMenu == 1">
-          <!-- <div
-          class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold ml-10"
-          v-if="currentMenu == false">
-          POS별 출력코너명 목록
-        </div> -->
-
-          <Realgrid
-            class="w-full h-[25vh]"
-            :progname="'MST44_062INS_VUE'"
-            :progid="2"
-            :rowData="rowData2"
-            :rowStateeditable="false"
             :showGrid="showGrid"
             :showCheckBar="false"
-            @realgridname="realgridname2"></Realgrid>
-
-          <!-- 그리드 영역 -->
+            @selcetedrowData="selcetedrowData"
+            :searchWord="searchword1"
+            :searchColId="'lngCode,strName'"
+            :addRow4="addRows"
+            @selectedIndex2="selectedIndex2"
+            :addrowProp="'strName,lngStoreGroup'"
+            :addrowDefault="addrowDefault"
+            @updatedRowData="updatedRowData"
+            @clickedRowData="clickedRowData"
+            @sendRowState="sendRowState"
+            @allStateRows="allStateRows"
+            :deleteRow6="deleteRows"
+            :changeColid="changeColid"
+            :changeRow="changeRow"
+            :changeValue2="changeValue"
+            :changeNow="changeNow"
+            @realgridname="realgridname2"
+            :rowStateeditable="rowStateeditable"></Realgrid>
         </div>
       </div>
+      <!-- 탭1 영역\-->
+      <!-- 탭2 영역\-->
 
       <div class="h-4/6 w-[80vw]" v-show="currentMenu == 2">
         <div
@@ -156,15 +147,15 @@
               v-model="searchword1" />
           </div>
         </div>
-        <!-- 그리드 영역 -->
         <div class="ml-10 mt-5 w-full h-full">
           <Realgrid
-            class="w-[103%] h-[200%]"
-            :progname="'MST44_062INS_VUE'"
-            :progid="4"
+            class="w-full h-[200%]"
+            :progname="'MST36_006INS_VUE'"
+            :progid="2"
             :reload="reload"
             :checkRenderEditable="true"
             :rowData="rowData3"
+            :extraColumns="discountGroupColumns"
             :showGrid="showGrid"
             :showCheckBar="false"
             @selcetedrowData="selcetedrowData"
@@ -172,6 +163,7 @@
             :activeSearchSpecial="true"
             :searchSpecialColId="searchSpecialColId"
             :searchSpecialCond="searchSpecialCond"
+            :searchSpecialCond2="searchSpecialCond2"
             :searchWord3="searchword1"
             :searchColId="'lngCode,strName'"
             :searchColId3="['mainCode', 'subCode']"
@@ -188,226 +180,53 @@
         </div>
         <!-- 그리드 영역 -->
       </div>
-
-      <!-- <div class="h-[50vh]" v-show="currentMenu == 3">
-        <div class="h-[15vh] w-[45vw] ml-10 mt-5" v-show="currentMenu == 3">
-          <div class="w-full h-full">
-            <!-- 그리드 영역
-            <Realgrid
-              class="w-[100%] h-[130%]"
-              :progname="'MST44_062INS_VUE'"
-              :progid="3"
-              :reload="reload"
-              :rowStateeditable="false"
-              :rowData="rowData4"
-              @clickedRowData="clickedRowData2"
-              @realgridname="realgridname4"
-              @selectedIndex2="selectedIndex2"
-              @updatedRowData="updatedRowData3"
-              :changeColid="changeColid"
-              :changeRow="changeRow"
-              :changeNow="changeNow2"
-              :changeValue2="changeValue"
-              :initSelect="initSelect"></Realgrid>
-          </div>
-         그리드 영역 
     </div>
-
-   <div v-show="currentMenu == 3" class="mt-12 flex flex-col justify-start ml-10 h-[35vh] w-[45vw] rounded-lg ">
-          <h1 class="text-xl font-bold flex justify-start">영수증 문구</h1>
-          <div class="grid grid-rows-[1fr,4fr] grid-cols-[2fr,9fr] h-[70%]">
-            <div class="bg-gray-100 flex justify-center items-center rounded-tl-lg border border-gray-600">
-              영수증 상단 문구
-            </div>
-            <div
-              class="justify-center items-center rounded-tr-lg border border-gray-600 grid grid-rows-2 grid-cols-1 w-full px-2 py-2 gap-1">
-              <div class=" w-full h-full px-2 py-2 rounded-lg  text-red-500">
-                ({{ receiptUByte }}byte)
-              </div>
-              <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                v-model="receiptU" @input="handleInput" @click="caculateByte3" :disabled="!afterSearch3"
-                @change="changeData">
-              </input>
-            </div>
-            <div class="bg-gray-100 flex justify-center items-center rounded-bl-lg border border-gray-600">
-              영수증 하단 문구
-            </div>
-            <div
-              class="justify-center items-center rounded-br-lg border border-gray-600 grid grid-rows-6 grid-cols-1 w-full px-2 py-2 gap-1">
-              <div class=" w-full h-full px-2 py-2 rounded-lg  flex justify-center text-red-500">({{ receiptDByte }}byte)
-              </div>
-              <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                :value="receiptD1" name="receiptD1"  @input="handleInput2" @blur="handleBlur" @click="selecedReceiptSection(1)"
-                :disabled="!afterSearch3"></input>
-              <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                 :value="receiptD2"  name="receiptD2" @input="handleInput2" @blur="handleBlur" @click="selecedReceiptSection(2)"
-                :disabled="!afterSearch3"></input>
-              <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                 :value="receiptD3"  name="receiptD3" @input="handleInput2" @blur="handleBlur" @click="selecedReceiptSection(3)"
-                :disabled="!afterSearch3"></input>
-              <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                 :value="receiptD4"  name="receiptD4" @input="handleInput2"  @blur="handleBlur" @click="selecedReceiptSection(4)"
-                :disabled="!afterSearch3"></input>
-              <input class="border w-full h-full px-2 py-2 rounded-lg border-gray-600 flex justify-start "
-                 :value="receiptD5" name="receiptD5"  @input="handleInput2" @blur="handleBlur" @click="selecedReceiptSection(5)"
-                :disabled="!afterSearch3"></input>
-            </div>
-          </div>
-        </div>
-      </div>  -->
-    </div>
-    <!-- TAB1 공간 -->
     <div
-      class="w-[52%] h-[50%] grid grid-rows-[1fr,5fr] grid-cols-1 ml-28 -mt-2"
+      class="w-[52%] h-[20%] grid grid-rows-2 grid-cols-1 ml-28 -mt-2"
       v-if="currentMenu == 1">
-      <div class="font-bold text-xl flex justify-start items-start h-auto">
+      <div class="font-bold text-xl flex justify-start items-center">
         상세정보
       </div>
-      <div class="w-full h-[50%] flex justify-start items-start">
-        <div class="grid grid-rows-3 grid-cols-[1fr,3fr] w-[93%] h-full">
+      <div class="w-full h-full flex justify-start items-center">
+        <div class="grid grid-rows-3 grid-cols-[3fr,7fr] w-[93%] h-full">
           <div
-            class="rounded-tl-lg border border-gray-600 flex justify-center items-center bg-gray-100 text-blue-500">
+            class="rounded-tl-lg border flex justify-center items-center bg-gray-100">
             할인그룹코드
           </div>
-          <div
-            class="rounded-tr-lg border border-gray-600 h-full py-1 px-1 flex items-center">
+          <div class="rounded-tr-lg border h-full py-1 px-1 flex items-center">
             <input
               type="text"
-              class="w-full border border-gray-600 rounded-lg disabled:bg-gray-300"
-              v-model="clickedNo"
-              disabled />
+              name="lngGroupCd"
+              class="w-full border rounded-lg disabled:bg-gray-100 pl-1"
+              v-model="discountGrpCd"
+              @input="changeValues"
+              :disabled="tempDisabled || currentRowState != 'created'" />
           </div>
           <div
-            class="border border-gray-600 flex justify-center items-center bg-gray-100 text-blue-500">
+            class="border flex justify-center items-center bg-gray-100">
             할인그룹명
           </div>
-          <div
-            class="rounded-br-lg border border-gray-600 h-full py-1 px-1 flex items-center">
+          <div class="border h-full py-1 px-1 flex items-center">
             <input
               type="text"
-              class="w-full border border-gray-600 rounded-lg pl-1"
-              :disabled="disabled"
-              v-model="clickedNm"
+              name="lngGroupNm"
+              class="w-full border rounded-lg pl-1 disabled:bg-gray-100"
+              v-model="discountGrpNm"
+              :disabled="tempDisabled2"
               @input="changeValues" />
           </div>
-
           <div
-            class="rounded-bl-lg border border-gray-600 flex justify-center items-center bg-gray-100 text-blue-500">
+            class="rounded-bl-lg border flex justify-center items-center bg-gray-100">
             할인값
           </div>
-          <div
-            class="rounded-br-lg border border-gray-600 h-full py-1 px-1 flex items-center">
+          <div class="rounded-br-lg border h-full py-1 px-1 flex items-center">
             <input
               type="text"
-              class="w-full border border-gray-600 rounded-lg pl-1"
-              :disabled="disabled"
-              v-model="clickedNm"
+              name="discountValue"
+              class="w-full border rounded-lg pl-1 disabled:bg-gray-100"
+              v-model="discountValue"
+              :disabled="currentRowState != 'created'"
               @input="changeValues" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="w-[52%] h-[20%] ml-10 mt-44 flex flex-col justify-center"
-      v-if="currentMenu == 3">
-      <div class="font-bold text-xl flex justify-start items-center">
-        영수증 예시
-      </div>
-      <div
-        class="flex justify-center items-center h-[45vh] w-[20vw] bg-gray-100 ml-28 mt-10">
-        <div class="w-full h-[130%] bg-white p-5 border shadow-lg rounded-lg">
-          <!-- 상단 수정 가능 영역 -->
-          <div class="text-center space-y-2">
-            <input
-              type="text"
-              v-model="receiptU"
-              class="flex justify-start w-full disabled:bg-white"
-              disabled />
-            <div>선불 데모매장 0212345678</div>
-            <div>주소상세주소</div>
-            <div>111-11-11111</div>
-          </div>
-          <hr class="my-3 border-gray-300" />
-
-          <!-- 영수증 본문 -->
-          <div class="text-sm">
-            <div class="flex justify-between">
-              <span>YYYY-MM-DD 00:00:00</span>
-              <span>01-0001</span>
-            </div>
-            <div class="mt-1 flex justify-end">
-              <span>T:01 Guest Type: 0 Count: 0</span>
-            </div>
-            <hr class="my-3 border-gray-300" />
-
-            <!-- 메뉴 리스트 -->
-            <div class="space-y-2">
-              <div class="flex justify-between">
-                <span>메뉴1</span>
-                <span>1</span>
-                <span>0</span>
-              </div>
-              <div class="flex justify-between">
-                <span>메뉴2</span>
-                <span>2</span>
-                <span>0</span>
-              </div>
-            </div>
-            <hr class="my-3 border-gray-300" />
-
-            <!-- 합계 -->
-            <div class="flex justify-between font-semibold">
-              <span>합 계</span>
-              <span>0</span>
-            </div>
-            <div class="flex justify-between">
-              <span>부가세 과세 물품 가액</span>
-              <span>0</span>
-            </div>
-            <div class="flex justify-between">
-              <span>부가세</span>
-              <span>0</span>
-            </div>
-            <hr class="my-3 border-gray-300" />
-
-            <!-- 하단 수정 가능 영역 -->
-            <div class="flex justify-between font-semibold">
-              <span>현 금</span>
-              <div>0</div>
-            </div>
-            <div class="text-sm mt-1 flex justify-between">
-              <span>IN-00:00:00</span>
-              <span class="float-right">CASHIER: 점장</span>
-            </div>
-
-            <div class="flex flex-col mt-2">
-              <input
-                type="text"
-                v-model="receiptD1"
-                disabled
-                class="disabled:bg-white" />
-              <input
-                type="text"
-                v-model="receiptD2"
-                disabled
-                class="disabled:bg-white" />
-              <input
-                type="text"
-                v-model="receiptD3"
-                disabled
-                class="disabled:bg-white" />
-              <input
-                type="text"
-                v-model="receiptD4"
-                disabled
-                class="disabled:bg-white" />
-              <input
-                type="text"
-                v-model="receiptD5"
-                disabled
-                class="disabled:bg-white" />
-            </div>
           </div>
         </div>
       </div>
@@ -422,31 +241,23 @@
 
 <script setup>
 import {
-  getKitchenSettingList,
-  getPrintList,
-  getStorePosList,
-  saveKitchenSettingAll,
-  savePrintNm,
-  saveReceiptData,
+  getDiscountMenuList,
+  getDiscountGroup,
+  saveDiscountMenuSetting,
+  saveDiscountGroup,
 } from "@/api/master";
 
 /*
  * 공통 표준  Function
  */
 
-import { nextTick, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, nextTick } from "vue";
 
 /**
  * 	Vuex 상태관리 및 로그인 세션 호출
  */
 
 import { useStore } from "vuex";
-
-/**
- * 	복사 팝업 컴포넌트
- */
-
-import DupliPopUp5 from "@/components/dupliPopUp5.vue";
 
 /**
  * 	매장 조건 정보 컴포넌트 호출
@@ -482,88 +293,63 @@ import PageName from "@/components/pageName.vue";
  * 	화면 Load시 실행 스크립트
  */
 
+const store = useStore();
+
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 });
-// 더미 데이터
+
 const disabled = ref(true);
-const items = ref([]);
-const ScreenKeyOrigin = ref([]);
-const ScreenKeys = ref();
+const tempDisabled = ref(true);
+const tempDisabled2 = ref(true);
+const afterClick = ref(true);
 const updatedList = ref();
 const updatedList2 = ref();
 const forsearchMain = ref("-1");
 const forsearchSub = ref("-1");
 const ischecked = ref(false);
-const rowData4 = ref([]);
-const changeMode = ref(false);
-const fixedColumn = ref(true);
-const PrintList = ref([]);
-const clickedNm = ref("");
-const clickedNo = ref();
-const clickedStoreNm = ref();
-/**
- * 페이지 매장명 세팅
- */
-
-const handlestoreNm = (newData) => {
-  clickedStoreNm.value = newData;
-};
-const showPopup2 = ref(false);
+const discountGrpCd = ref();
+const discountGrpNm = ref("");
+const discountValue = ref();
+const clickedGroupNm = ref();
 const confirmitem = ref([]);
-const reloadit = ref(true);
-const receiptU = ref("");
-const receiptD1 = ref("");
-const receiptD2 = ref("");
-const receiptD3 = ref("");
-const receiptD4 = ref("");
-const receiptD5 = ref("");
-/**
- * 선택한 포스 번호 호출 함수
- */
-
-const posNo = ref();
-const addrowDefault = ref();
-const currmenuKeyPage = ref(1);
-const AllscreenKeyPage = ref(1);
 const rowData = ref([]);
-const rowData2 = ref([]);
 const rowData3 = ref([]);
+const addRows = ref(false);
+const deleteRows = ref(false);
+const rowStateeditable = ref(false);
+const showGrid = ref(true);
+const addrowDefault = ref();
 const showMenus = (value) => {
   if (value == 1) {
     currentMenu.value = 1;
     hidesub.value = false;
   } else if (value == 2) {
     currentMenu.value = 2;
-    hidesub.value = true;
-  } else {
-    currentMenu.value = 3;
+    hidesub.value = false;
   }
 };
 
 const currentMenu = ref("1");
 
-const searchSpecialColId = ref([]);
-const searchSpecialCond = ref(false);
+const searchSpecialColId = ref(["lngDiscount"]);
+const searchSpecialCond = ref(true); // 초기값: 필터 비활성화 (모든 메뉴 표시)
+const searchSpecialCond2 = ref("(value = 0)");
 watch(ischecked, () => {
-  searchSpecialColId.value = [];
-  ////console.log(printNameList.value.length)
-  for (let i = 1; i <= printNameList.value.length; i++) {
-    searchSpecialColId.value.push("checkbox" + i);
-  }
   if (ischecked.value == true) {
-    // ////console.log(searchSpecialColId.value);
-
-    searchSpecialCond.value = false;
+    // 미설정메뉴보기 체크 시: lngDiscount === 0인 메뉴만 표시
+    searchSpecialColId.value = ["lngDiscount"];
+    searchSpecialCond.value = false; // 필터 활성화
   } else {
-    searchSpecialCond.value = true;
+    // 미설정메뉴보기 해제 시: 모든 메뉴 표시 (필터 제거)
+    searchSpecialColId.value = ["lngDiscount"]; // 컬럼은 유지하되
+    searchSpecialCond.value = true; // 필터 비활성화하여 필터 제거
   }
 });
 
 const realgrid2Name = ref("");
 const realgrid3Name = ref("");
 const realgrid4Name = ref("");
-const realgrid5Name = ref("");
 const realgridname = (e) => {
   realgrid2Name.value = e;
 };
@@ -573,49 +359,84 @@ const realgridname2 = (e) => {
 const realgridname3 = (e) => {
   realgrid4Name.value = e;
 };
-const realgridname4 = (e) => {
-  //comsole.log(e)
-  realgrid5Name.value = e;
-};
 
 watch(currentMenu, () => {
   if (currentMenu.value == 1) {
-    const reagrid2 = document.getElementById(realgrid2Name.value);
     setTimeout(() => {
-      RealGrid.getGridInstance(reagrid2).resetSize();
-      RealGrid.getGridInstance(reagrid2).refresh(true);
+      const reagrid2 = realgrid2Name.value
+        ? document.getElementById(realgrid2Name.value)
+        : null;
+      if (reagrid2) {
+        const grid2 = RealGrid.getGridInstance(reagrid2);
+        if (grid2) {
+          grid2.resetSize();
+          grid2.refresh(true);
+        }
+      }
     }, 100);
-    const reagrid3 = document.getElementById(realgrid3Name.value);
     setTimeout(() => {
-      RealGrid.getGridInstance(reagrid3).resetSize();
-      RealGrid.getGridInstance(reagrid3).refresh(true);
+      const reagrid3 = realgrid3Name.value
+        ? document.getElementById(realgrid3Name.value)
+        : null;
+      if (reagrid3) {
+        const grid3 = RealGrid.getGridInstance(reagrid3);
+        if (grid3) {
+          grid3.resetSize();
+          grid3.refresh(true);
+        }
+      }
     }, 100);
   } else if (currentMenu.value == 2) {
-    const reagrid4 = document.getElementById(realgrid4Name.value);
-    setTimeout(() => {
-      RealGrid.getGridInstance(reagrid4).resetSize();
-      RealGrid.getGridInstance(reagrid4).refresh(true);
-    }, 100);
-  } else if (currentMenu.value == 3) {
-    const reagrid5 = document.getElementById(realgrid5Name.value);
-    setTimeout(() => {
-      RealGrid.getGridInstance(reagrid5).resetSize();
-      RealGrid.getGridInstance(reagrid5).refresh(true);
-    }, 100);
+    if (realgrid4Name.value) {
+      const reagrid4 = document.getElementById(realgrid4Name.value);
+      if (reagrid4) {
+        setTimeout(() => {
+          const gridInstance = RealGrid.getGridInstance(reagrid4);
+          if (gridInstance) {
+            gridInstance.resetSize();
+            gridInstance.refresh(true);
+          }
+        }, 100);
+      }
+    }
   }
 });
 
 const hidesub = ref(false);
 
-const nowStoreAreaCd = ref();
+/**
+ * 페이지 매장명 세팅
+ */
+
+const handlestoreNm = (newData) => {
+  //comsole.log(newData)
+};
+
+/**
+ * 페이지 그룹명 세팅
+ */
+
+const handleGroupNm = (newData) => {
+  clickedGroupNm.value = newData;
+};
+
 /**
  *  pickStore - 지역코드 세팅
  */
 
 const handleStoreAreaCd = (newValue) => {
-  nowStoreAreaCd.value = newValue;
-  //comsole.log(nowStoreAreaCd.value)
+  //comsole.log(newValue)
 };
+
+/**
+ * 페이지 매장 코드 세팅
+ */
+
+const handleStoreCd = async (newValue) => {
+  nowStoreCd.value = newValue;
+  //comsole.log(nowStoreCd.value)
+};
+
 /**
  * 입력창 수정 데이터 갱신
  */
@@ -635,262 +456,50 @@ const updatedRowData2 = (newValue) => {
   //comsole.log(newValue)
 };
 
-const updatedList3 = ref([]);
-/**
- * 입력창 수정 데이터 갱신
- */
-
-const updatedRowData3 = (newValue) => {
-  updatedList3.value = newValue;
-  //comsole.log(updatedList3.value)
-};
 const nowStoreCd = ref();
-const afterCategory = ref(false);
 /**
  * 페이지 매장 코드 세팅
  */
-
-const handleStoreCd = async (newValue) => {
-  afterSearch.value = false;
-  rowData.value = [];
-  rowData2.value = [];
-
-  SettingList.value = [];
-  checked.value = [];
-  printNameList.value = [];
-  MenuGroup.value = [];
-  SubMenuGroup.value = [];
-  ischecked.value = false;
-
-  nowStoreCd.value = newValue;
-  searchButton();
-  //comsole.log(nowStoreCd.value)
-  reload.value = !reload.value;
-};
-const handleInput = (e) => {
-  changeColid.value = "strReceiptU";
-  changeValue.value = e.target.value;
-
-  changeNow2.value = !changeNow2.value;
-};
-
-const handleBlur = (e) => {
-  if (isSwalOpen == true) {
-    return;
-  }
-
-  receiptD1.value = receiptD1.value == undefined ? "" : receiptD1.value;
-  receiptD2.value = receiptD2.value == undefined ? "" : receiptD2.value;
-  receiptD3.value = receiptD3.value == undefined ? "" : receiptD3.value;
-  receiptD4.value = receiptD4.value == undefined ? "" : receiptD4.value;
-  receiptD5.value = receiptD5.value == undefined ? "" : receiptD5.value;
-  if (e.target.name == "receiptD1") {
-    changeValue.value =
-      addSpace42Text(e.target.value) +
-      addSpace42Text(receiptD2.value) +
-      addSpace42Text(receiptD3.value) +
-      addSpace42Text(receiptD4.value) +
-      addSpace42Text(receiptD5.value);
-  } else if (e.target.name == "receiptD2") {
-    changeValue.value =
-      addSpace42Text(receiptD1.value) +
-      addSpace42Text(e.target.value) +
-      addSpace42Text(receiptD3.value) +
-      addSpace42Text(receiptD4.value) +
-      addSpace42Text(receiptD5.value);
-  } else if (e.target.name == "receiptD3") {
-    changeValue.value =
-      addSpace42Text(receiptD1.value) +
-      addSpace42Text(receiptD2.value) +
-      addSpace42Text(e.target.value) +
-      addSpace42Text(receiptD4.value) +
-      addSpace42Text(receiptD5.value);
-  } else if (e.target.name == "receiptD4") {
-    changeValue.value =
-      addSpace42Text(receiptD1.value) +
-      addSpace42Text(receiptD2.value) +
-      addSpace42Text(receiptD3.value) +
-      addSpace42Text(e.target.value) +
-      addSpace42Text(receiptD5.value);
-  } else if (e.target.name == "receiptD5") {
-    changeValue.value =
-      addSpace42Text(receiptD1.value) +
-      addSpace42Text(receiptD2.value) +
-      addSpace42Text(receiptD3.value) +
-      addSpace42Text(receiptD4.value) +
-      addSpace42Text(e.target.value);
-  }
-
-  changeNow2.value = !changeNow2.value;
-};
-let isSwalOpen = false;
-const handleInput2 = (e) => {
-  const isValid = calculateByte2(e);
-  changeColid.value = "strReceiptD";
-
-  if (!isValid) return;
-
-  const name = e.target.name;
-  const value = e.target.value;
-  if (value == undefined) value = "";
-  if (name === "receiptD1") receiptD1.value = value;
-  else if (name === "receiptD2") receiptD2.value = value;
-  else if (name === "receiptD3") receiptD3.value = value;
-  else if (name === "receiptD4") receiptD4.value = value;
-  else if (name === "receiptD5") receiptD5.value = value;
-};
-
-const calculateByte2 = async (e) => {
-  const encoder = new TextEncoder();
-  let inputValue = e.target.value;
-  //comsole.log(inputValue)
-  receiptDByte.value = encoder.encode(inputValue).length;
-  if (receiptDByte.value >= 43) {
-    //comsole.log(inputValue)
-    isSwalOpen = true;
-    const result = await Swal.fire({
-      title: "경고",
-      text: "43바이트 이상 입력할 수 없습니다.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        isSwalOpen = false;
-        while (receiptDByte.value >= 43) {
-          inputValue = inputValue.slice(0, inputValue.length - 1);
-
-          //comsole.log(receiptU.value)
-          //comsole.log(inputValue)
-          receiptDByte.value = encoder.encode(inputValue).length;
-        }
-        if (e.target.name == "receiptD1") {
-          receiptD1.value = inputValue;
-        } else if (e.target.name == "receiptD2") {
-          receiptD2.value = inputValue;
-        } else if (e.target.name == "receiptD3") {
-          receiptD3.value = inputValue;
-        } else if (e.target.name == "receiptD4") {
-          receiptD4.value = inputValue;
-        } else if (e.target.name == "receiptD5") {
-          receiptD5.value = inputValue;
-        }
-      }
-    });
-
-    return false;
-  } else {
-    return true;
-  }
-};
-
 const reload = ref(false);
 const SettingList = ref();
-const Category = ref([]);
 const changeValue = ref("");
 const MenuGroup = ref([]);
 const SubMenuGroup = ref([]);
+// 탭2(할인그룹 메뉴설정)에서 할인그룹명 기반으로 동적 체크박스 컬럼 생성
+const discountGroupColumns = ref([]);
 const changeNow = ref(false);
-const changeNow2 = ref(false);
 const changeValues = (e) => {
-  changeValue.value = e.target.value;
-  changeNow.value = !changeNow.value;
+  if (e.target.name == "lngGroupCd") {
+    changeColid.value = "lngCode";
+    if (/[^\d-]/.test(e.target.value)) {
+      discountGrpCd.value = e.target.value.replace(/[^\d-]/g, "");
+      return;
+    }
+    changeValue.value = e.target.value;
+    changeNow.value = !changeNow.value;
+  } else if (e.target.name == "lngGroupNm") {
+    changeColid.value = "strName";
+    changeValue.value = e.target.value;
+    changeNow.value = !changeNow.value;
+  } else if (e.target.name == "discountValue") {
+    changeColid.value = "lngValue";
+    changeValue.value = e.target.value;
+    changeNow.value = !changeNow.value;
+  }
 };
 
-const store = useStore();
 /**
  *  그리드 검색어 세팅
  */
 
 const searchword1 = ref();
-/**
- *  그리드 검색어 세팅
- */
-
-const searchword3 = ref();
 const userData = store.state.userData;
 
 const groupCd = ref(userData.lngStoreGroup);
-const modified = ref(false);
 const afterSearch = ref(false);
 const afterSearch2 = ref(false);
-const afterSearch3 = ref(false);
-const MenuList = ref([]);
-const MenuKeyList = ref([]);
-const clickedScreenOrMenu = ref(false);
-const TLUList = ref([]);
 const checked = ref();
-/**
- * 추가 버튼 함수
- */
-
-const addRows = ref(false);
-/**
- * 그리드 행 삭제 버튼 함수
- */
-
-const deleteRows = ref(false);
-/**
- * 추가 버튼 함수
- */
-
-const addRow = () => {
-  if (afterSearch.value == false) {
-    Swal.fire({
-      title: "경고.",
-      text: "조회를 먼저 해주세요",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  addRows.value = !addRows.value;
-  addrowDefault.value = userData.strStoreGroupName;
-  //comsole.log(updatedList.value)
-  if (updatedList.value == undefined || updatedList.value[0] == undefined) {
-    addrowDefault.value += "," + 1;
-  } else {
-    const maxKdsCornerNum = Math.max(
-      ...updatedList.value.map((item) => item.kdsCornerNum)
-    );
-    //comsole.log(maxKdsCornerNum)
-    addrowDefault.value += "," + (maxKdsCornerNum + 1);
-    //comsole.log(addrowDefault.value)
-  }
-};
-
 const printNameList = ref([]);
-/**
- * 그리드 행 삭제 버튼 함수
- */
-
-const deleteRow = () => {
-  if (afterSearch.value == false) {
-    Swal.fire({
-      title: "경고.",
-      text: "조회를 먼저 해주세요",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  deleteRows.value = !deleteRows.value;
-};
-/**
- * 복사 팝업 - 복사 함수
- */
-
-const copyButton = () => {
-  if (afterSearch.value == false) {
-    Swal.fire({
-      title: "경고.",
-      text: "조회를 먼저 해주세요",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  showPopup2.value = true;
-};
 
 /**
  * 선택한 행의 상세정보 셋팅
@@ -900,23 +509,13 @@ const selcetedrowData = (newValue) => {
   //comsole.log(newValue)
 };
 const originRowData3 = ref([]);
-const initSelect = ref(false);
+
 /**
  *  조회 함수
  */
-
 const searchButton = async () => {
-  changeMode.value = false;
-  Category.value = [];
-  items.value = [];
-  receiptU.value = "";
-  receiptD1.value = "";
-  receiptD2.value = "";
-  receiptD3.value = "";
-  receiptD4.value = "";
-  receiptD5.value = "";
 
-  if (nowStoreCd.value == "0" || nowStoreCd.value == undefined) {
+  if (groupCd.value == "0" || groupCd.value == undefined) {
     Swal.fire({
       title: "경고",
       text: "매장을 선택하세요.",
@@ -932,58 +531,78 @@ const searchButton = async () => {
   try {
     let res;
     if (currentMenu.value == 1) {
-      res = await getPrintList(groupCd.value, nowStoreCd.value);
-      //comsole.log(res)
-      rowData.value = res.data.Print;
-      rowData2.value = res.data.Print2;
+      res = await getDiscountGroup(groupCd.value, 0);
+      rowData.value = res.data.discountGroup;
 
-      //comsole.log(rowData2.value)
       afterSearch.value = true;
     } else if (currentMenu.value == 2) {
-      console.log(store.state.userData);
-      res = await getKitchenSettingList(
-        groupCd.value,
-        nowStoreCd.value,
+      
+      res = await getDiscountMenuList(
+        groupCd.value, 
+        0, 
         store.state.userData.lngCommonMenu
       );
-      console.log(res);
 
-      SettingList.value = [...res.data.KITCHENMENU];
+      // console.log(res);
+
+      SettingList.value = [...res.data.discountSetting];
       MenuGroup.value = res.data.MAINGROUP;
       SubMenuGroup.value = res.data.SUBGROUP;
-      checked.value = res.data.SAVED;
-      PrintList.value = res.data.PRINTLIST;
-      printNameList.value = res.data.KITCHENPRINT;
-      //comsole.log(checked.value)
-      //comsole.log(printNameList.value)
-      //comsole.log(SettingList.value)
-      for (var i = 0; i < checked.value.length; i++) {
-        const tlngCode = checked.value[i].lngCode;
-        const portid = checked.value[i].portId;
-        const index = SettingList.value.findIndex(
-          (item) => item.lngCode == tlngCode
-        );
-        if (index != -1) {
-          SettingList.value[index][portid] = true;
+
+      // (요청대로) getDiscountMenuList 응답의 discountGroup 기준으로 컬럼 생성
+      printNameList.value = res.data.discountGroup;
+      const dgList = printNameList.value ?? [];
+
+      // 할인그룹명 기반 checkbox 컬럼 정의 생성 (checkbox1..N)
+      discountGroupColumns.value = dgList.map((g, idx) => {
+        const headerText = g?.strName ?? g?.lngCode ?? `할인그룹${idx + 1}`;
+        return {
+          strColID: `checkbox${idx + 1}`,
+          strHdText: String(headerText),
+          intHdWidth: 90,
+          strColType: "text",
+          strDisplay: "checkbox",
+          strAlign: "center",
+          strMask: "",
+          strSubSumtext: "",
+        };
+      });
+
+      // lngDiscount(비트마스크) 기준으로 체크박스 값 세팅
+      // - lngDiscount: 메뉴별 할인그룹 설정 비트마스크
+      // - discountGroup[].lngValue: 각 할인그룹의 비트값(2^n 형태)
+      if (Array.isArray(SettingList.value) && Array.isArray(dgList) && dgList.length > 0) {
+        for (let r = 0; r < SettingList.value.length; r++) {
+          const mask = Number(SettingList.value[r]?.lngDiscount ?? 0);
+          for (let i = 0; i < dgList.length; i++) {
+            const bit = Number(dgList[i]?.lngValue ?? 0);
+            const key = `checkbox${i + 1}`;
+            // bit 값이 0/NaN이면 체크 불가로 false 처리
+            SettingList.value[r][key] = bit > 0 ? (mask & bit) !== 0 : false;
+          }
+        }
+      } else if (Array.isArray(SettingList.value) && discountGroupColumns.value.length > 0) {
+        // fallback: 필드만 존재하도록 false 초기화
+        for (let r = 0; r < SettingList.value.length; r++) {
+          for (let c = 0; c < discountGroupColumns.value.length; c++) {
+            const key = discountGroupColumns.value[c].strColID;
+            if (SettingList.value[r][key] === undefined || SettingList.value[r][key] === null) {
+              SettingList.value[r][key] = false;
+            }
+          }
         }
       }
+      
       originRowData3.value = [...SettingList.value];
       rowData3.value = [...SettingList.value];
       updatedList2.value = [...SettingList.value];
-
       confirmitem.value = JSON.parse(JSON.stringify(SettingList.value));
       afterSearch2.value = true;
-    } else if (currentMenu.value == 3) {
-      res = await getStorePosList(groupCd.value, nowStoreCd.value);
-      //comsole.log(res)
-      rowData4.value = res.data.RECEIPTLIST;
-      afterSearch3.value = true;
     }
   } catch (error) {
     //comsole.log(error)
     afterSearch.value = false;
     afterSearch2.value = false;
-    afterSearch3.value = false;
   } finally {
     ischecked.value = false;
 
@@ -992,16 +611,15 @@ const searchButton = async () => {
     forsearchSub.value = "-1";
 
     store.state.loading = false; // 로딩 상태 종료
-    modified.value = false;
-    afterCategory.value = false;
-    clickedNo.value = "";
-    clickedNm.value = "";
-    initSelect.value = !initSelect.value;
+    discountGrpCd.value = "";
+    discountGrpNm.value = "";
+    discountValue.value = "";
+    tempDisabled.value = true;
+    tempDisabled2.value = true;
+    afterClick.value = false;
   }
 };
 const filteredSubMenuGroup = ref([]);
-const alreadyCheckedList = ref([]);
-const forSaveMenu2 = ref([]);
 
 const setSubCd = () => {
   forsearchSub.value = "-1";
@@ -1083,111 +701,77 @@ const saveButton = async () => {
         let res;
 
         if (currentMenu.value == 1) {
-          const printNo = updatedList.value.map((item) => item.lngPosition);
-          const printNm = updatedList.value.map((item) => item.cornerNm);
-          res = await savePrintNm(
-            groupCd.value,
-            nowStoreCd.value,
-            printNo.join(","),
-            printNm.join(",")
+          const lngCode = updatedList.value
+            .filter((item, index) => !allStateRowArr.value.deleted.includes(index))
+            .map((item) => item.lngCode);
+          const strName = updatedList.value
+            .filter((item, index) => !allStateRowArr.value.deleted.includes(index))
+            .map((item) => item.strName);
+          const lngValue = updatedList.value
+            .filter((item, index) => !allStateRowArr.value.deleted.includes(index))
+            .map((item) => item.lngValue);
+          const deleteNo = updatedList.value
+            .filter((item, index) => allStateRowArr.value.deleted.includes(index))
+            .map((item) => item.lngCode);
+
+          res = await saveDiscountGroup(
+            groupCd.value, 
+            0,
+            lngCode.join(","),
+            strName.join(","),
+            lngValue.join(","),
+            deleteNo.join(",")
           );
-          //comsole.log(res)
+          // console.log(res);
+          
         } else if (currentMenu.value == 2) {
-          const calculateArr = ref([]);
-          const count = Object.keys(updatedList2.value[0]).filter((key) =>
-            key.startsWith("checkbox")
-          ).length;
-          //comsole.log(count)
-
-          forSaveMenu.value = [];
-          for (let i = 1; i <= count; i++) {
-            let tempArr = [];
-            for (let j = 0; j < updatedList2.value.length; j++) {
-              if (updatedList2.value[j]["checkbox" + i] == true) {
-                tempArr.push(updatedList2.value[j].lngCode);
-              }
-            }
-            forSaveMenu.value.push(tempArr);
-          }
-
-          let uniqueArray = new Set();
+          // 할인그룹 목록 가져오기 (각 그룹의 lngValue가 비트값)
+          const discountGroupList = printNameList.value ?? [];
+          
+          // 모든 메뉴 행에 대해 체크박스 상태를 비트 연산으로 변환하여 lngDiscount 계산
+          const menuDiscountList = [];
+          
           for (let j = 0; j < updatedList2.value.length; j++) {
-            let tempint = 0;
-            for (let i = 1; i <= count; i++) {
-              if (updatedList2.value[j]["checkbox" + i] == true) {
-                tempint += 2 ** (i - 1);
-              }
-            }
-            if (tempint != 0) {
-              uniqueArray.add(tempint);
-            }
-          }
-          uniqueArray = [...uniqueArray];
-          // calculateArr.value = [[1],[2,6],[6]]
-          calculateArr.value = [];
-
-          for (let i = 0; i < count; i++) {
-            for (let j = 0; j < updatedList2.value.length; j++) {
-              let tempint = 0;
-              for (let k = 1; k <= count; k++) {
-                if (
-                  updatedList2.value[j]["checkbox" + k] == true &&
-                  updatedList2.value[j]["checkbox" + (i + 1)] == true
-                ) {
-                  tempint += 2 ** (k - 1);
+            const menuRow = updatedList2.value[j];
+            let lngDiscount = 0;
+            
+            // 체크된 체크박스에 해당하는 할인그룹의 lngValue를 합산
+            for (let i = 0; i < discountGroupList.length; i++) {
+              const checkboxKey = `checkbox${i + 1}`;
+              if (menuRow[checkboxKey] === true) {
+                const bitValue = Number(discountGroupList[i]?.lngValue ?? 0);
+                if (bitValue > 0) {
+                  lngDiscount += bitValue;
                 }
               }
-
-              if (!calculateArr.value[i]) {
-                // 해당 인덱스 없으면 초기화
-                calculateArr.value[i] = new Set();
-              }
-              if (tempint != 0) {
-                calculateArr.value[i].add(tempint);
-              }
             }
-            calculateArr.value[i] = Array.from(calculateArr.value[i]);
+            
+            // 메뉴 코드와 계산된 lngDiscount 값 저장
+            menuDiscountList.push({
+              lngCode: menuRow.lngCode,
+              lngDiscount: lngDiscount
+            });
           }
-
-          //comsole.log(forSaveMenu.value)
-          //comsole.log(uniqueArray)
-          //comsole.log(calculateArr.value)
-          res = await saveKitchenSettingAll(
+          
+          // 저장할 데이터 준비 (메뉴 코드와 lngDiscount 매핑)
+          const menuCodes = menuDiscountList.map(item => item.lngCode);
+          const discountValues = menuDiscountList.map(item => item.lngDiscount);
+          
+          // console.log("저장할 메뉴 할인그룹 설정:", menuDiscountList);
+          
+          //닷넷 API 호출
+          res = await saveDiscountMenuSetting(
             groupCd.value,
-            nowStoreCd.value,
-            JSON.stringify(forSaveMenu.value),
-            uniqueArray.sort().join(","),
-            JSON.stringify(calculateArr.value),
-            userData.loginID
-          );
-          //comsole.log(res)
-        } else if (currentMenu.value == 3) {
-          //comsole.log(updatedList3.value)
-          /**
-           * 선택한 포스 번호 호출 함수
-           */
-
-          const posNos = updatedList3.value.map((item) => item.intPosNo);
-          const areaCodes = updatedList3.value.map((item) => item.lngAreaCode);
-          const strreceipts = updatedList3.value.map(
-            (item) => item.strReceiptU
-          );
-          const strreceipts2 = updatedList3.value.map(
-            (item) => item.strReceiptD
+            0,
+            menuCodes.join(","),
+            discountValues.join(",")
           );
 
-          res = await saveReceiptData(
-            groupCd.value,
-            nowStoreCd.value,
-            posNos.join(","),
-            areaCodes.join(","),
-            strreceipts.join(","),
-            strreceipts2.join(",")
-          );
+          // console.log(res)
+
         }
-
-        //comsole.log(res)
       } catch (error) {
+
       } finally {
         store.state.loading = false;
         changeValue.value = null;
@@ -1203,31 +787,6 @@ const saveButton = async () => {
   });
 };
 
-// watch(ischecked , () => {
-//   //comsole.log(originRowData3.value)
-//   //comsole.log(ischecked.value)
-
-//    if(ischecked.value == true){
-//     const count = Object.keys(originRowData3.value[0]).filter(key => key.startsWith("checkbox")).length;
-//     let tempArr = []
-//     let tempbln = false
-//     for(let j=0 ; j < originRowData3.value.length ; j++){
-//       for(let i=1 ; i <= count ; i++){
-//       if( originRowData3.value[j]?.['checkbox'+i] ==true){
-//         tempbln = true
-//       }
-//       }
-//       if(tempbln == false){
-//         tempArr.push(originRowData3.value[j])
-//       }
-//       tempbln =  false
-//     }
-//     rowData3.value = tempArr ;
-//    } else {
-//     rowData3.value = originRowData3.value ;
-//    }
-//    //comsole.log(rowData3.value)
-// })
 /**
  * 수정용 데이터 행 설정
  */
@@ -1236,218 +795,64 @@ const selectedIndex = (e) => {
   changeRow.value = e;
 };
 const changeRow = ref();
+const currentRowState = ref("none");
 /**
  * 데이터셋 상세정보 셋팅
  */
 
 const clickedRowData = (newValue) => {
-  disabled.value = false;
-  clickedNo.value = newValue[2];
-  clickedNm.value = newValue[3];
-
-  //changeRow.value = newValue.index
-  changeColid.value = "cornerNm";
+  if (newValue == undefined) {
+    return;
+  }
+  afterClick.value = true;
+  //comsole.log(newValue);
+  discountGrpCd.value = newValue[0];
+  discountGrpNm.value = newValue[1];
+  discountValue.value = newValue[2];
+  if (newValue.index !== undefined) {
+    changeRow.value = newValue.index;
+  }
+  //comsole.log(changeRow.value);
+  tempDisabled2.value = false; // 할인그룹명만 수정 가능
 };
-const receiptUByte = ref("0");
-const receiptDByte = ref("0");
 const changeColid = ref("");
 
-const caculateByte3 = (e) => {
-  changeColid.value = "strReceiptU";
-  const encoder = new TextEncoder();
-  let inputValue = e.target.value;
-  receiptUByte.value = encoder.encode(inputValue).length;
-  changeValue.value = e.target.value;
+/**
+ * 추가 버튼 함수
+ */
 
-  changeNow2.value = !changeNow2.value;
+const addRow = () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고.",
+      text: "조회를 먼저 해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  addrowDefault.value = "," + groupCd.value;
+  addRows.value = !addRows.value;
 };
 
 /**
- * 페이지 초기화
+ * 그리드 행 삭제 버튼 함수
  */
 
-const initAllSection = async () => {
-  receiptU.value = "";
-  receiptD1.value = "";
-  receiptD2.value = "";
-  receiptD3.value = "";
-  receiptD4.value = "";
-  receiptD5.value = "";
-  changeColid.value = "strReceiptU";
-  changeValue.value = "";
-  changeNow2.value = !changeNow2.value;
-
-  await nextTick(); // DOM 업데이트 기다림
-
-  changeColid.value = "strReceiptD";
-  changeValue.value = "";
-  changeNow2.value = !changeNow2.value;
-};
-
-let changedupliindex = "";
-let savedreceiptU = "";
-let savedreceiptD1 = "";
-let savedreceiptD2 = "";
-let savedreceiptD3 = "";
-let savedreceiptD4 = "";
-let savedreceiptD5 = "";
-
-const dupliData = () => {
-  changedupliindex = changeRow.value;
-  savedreceiptU = receiptU.value;
-  savedreceiptD1 = receiptD1.value;
-  savedreceiptD2 = receiptD2.value;
-  savedreceiptD3 = receiptD3.value;
-  savedreceiptD4 = receiptD4.value;
-  savedreceiptD5 = receiptD5.value;
-
-  Swal.fire({
-    title: "완료",
-    text: "복사 완료",
-    icon: "success",
-    confirmButtonText: "확인",
-  });
-  return;
-};
-
-const selecedSection = ref();
-const selecedReceiptSection = (value) => {
-  changeColid.value = "strReceiptD";
-  selecedSection.value = value;
-  const encoder = new TextEncoder();
-  if (value == 1) {
-    receiptDByte.value = encoder.encode(receiptD1.value).length;
-  } else if (value == 2) {
-    receiptDByte.value = encoder.encode(receiptD2.value).length;
-  } else if (value == 3) {
-    receiptDByte.value = encoder.encode(receiptD3.value).length;
-  } else if (value == 4) {
-    receiptDByte.value = encoder.encode(receiptD4.value).length;
-  } else if (value == 5) {
-    receiptDByte.value = encoder.encode(receiptD5.value).length;
+const deleteRow = () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "경고.",
+      text: "조회를 먼저 해주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
   }
+  deleteRows.value = !deleteRows.value;
 };
 
-const addSpace42Text = (value) => {
-  let prechangeValue = value;
-  const encoder = new TextEncoder();
-  let byteLength = encoder.encode(prechangeValue).length;
-
-  while (byteLength < 42) {
-    prechangeValue += " "; // 공백을 추가
-    byteLength = encoder.encode(prechangeValue).length; // 바이트 길이를 다시 계산
-  }
-  return prechangeValue;
-};
-const changeValues2 = async (e) => {
-  let newText1 = addSpace42Text(
-    receiptD1.value == undefined ? "" : receiptD1.value
-  );
-  let newText2 = addSpace42Text(
-    receiptD2.value == undefined ? "" : receiptD2.value
-  );
-  let newText3 = addSpace42Text(
-    receiptD3.value == undefined ? "" : receiptD3.value
-  );
-  let newText4 = addSpace42Text(
-    receiptD4.value == undefined ? "" : receiptD4.value
-  );
-  let newText5 = addSpace42Text(
-    receiptD5.value == undefined ? "" : receiptD5.value
-  );
-
-  changeColid.value = "strReceiptD";
-  changeValue.value = newText1 + newText2 + newText3 + newText4 + newText5;
-};
-
-const dupliAllData = async () => {
-  receiptU.value = savedreceiptU;
-  //comsole.log(savedreceiptU)
-  //comsole.log(changeNow2.value)
-  changeColid.value = "strReceiptU";
-  changeValue.value = savedreceiptU;
-  changeNow2.value = !changeNow2.value;
-
-  await nextTick();
-
-  receiptD1.value = savedreceiptD1;
-  receiptD2.value = savedreceiptD2;
-  receiptD3.value = savedreceiptD3;
-  receiptD4.value = savedreceiptD4;
-  receiptD5.value = savedreceiptD5;
-  changeColid.value = "strReceiptD";
-  changeValue.value =
-    savedreceiptD1 +
-    savedreceiptD2 +
-    savedreceiptD3 +
-    savedreceiptD4 +
-    savedreceiptD5;
-
-  //comsole.log(changeValue.value)
-  //comsole.log(changeNow2.value)
-  changeNow2.value = !changeNow2.value;
-};
-
-watch(receiptU, (newvalue) => {
-  setTimeout(() => {
-    changeColid.value = "strReceiptU";
-    changeValue.value = newvalue;
-  }, 10);
-});
-watch(receiptD1, () => {
-  setTimeout(() => {
-    changeValues2();
-  }, 5);
-});
-watch(receiptD2, () => {
-  setTimeout(() => {
-    changeValues2();
-  }, 5);
-});
-watch(receiptD3, () => {
-  setTimeout(() => {
-    changeValues2();
-  }, 5);
-});
-watch(receiptD4, () => {
-  setTimeout(() => {
-    changeValues2();
-  }, 5);
-});
-watch(receiptD5, () => {
-  setTimeout(() => {
-    changeValues2();
-  }, 5);
-});
-
-function splitStringByByteLength(str, maxByteLength) {
-  const encoder = new TextEncoder(); // UTF-8로 인코딩
-  const bytes = encoder.encode(str); // 문자열을 바이트 배열로 변환
-  let chunks = [];
-  let currentByteLength = 0;
-  let currentChunk = "";
-
-  for (let i = 0; i < str.length; i++) {
-    const charBytes = encoder.encode(str[i]); // 현재 문자의 바이트 배열
-    const charByteLength = charBytes.length; // 현재 문자의 바이트 길이
-
-    if (currentByteLength + charByteLength > maxByteLength) {
-      chunks.push(currentChunk); // 현재 청크를 추가
-      currentChunk = ""; // 청크 초기화
-      currentByteLength = 0; // 바이트 길이 초기화
-    }
-
-    currentChunk += str[i];
-    currentByteLength += charByteLength;
-  }
-
-  // 마지막 청크 추가
-  if (currentChunk) {
-    chunks.push(currentChunk);
-  }
-
-  return chunks;
-}
 /**
  * 수정용 데이터 행 설정
  */
@@ -1455,32 +860,32 @@ function splitStringByByteLength(str, maxByteLength) {
 const selectedIndex2 = (e) => {
   changeRow.value = e;
 };
-/**
- * 데이터셋 상세정보 셋팅
- */
-
-const clickedRowData2 = (newValue) => {
-  //comsole.log(newValue)
-  receiptU.value = newValue[2];
-  const result = splitStringByByteLength(newValue[3], 42);
-  receiptD1.value = result[0];
-  receiptD2.value = result[1];
-  receiptD3.value = result[2];
-  receiptD4.value = result[3];
-  receiptD5.value = result[4];
-};
 
 /**
- * pickStore - 포스번호 세팅
+ * 상태 변화된 행 세팅
  */
 
-const handlePosNo = (newValue) => {
-  posNo.value = newValue;
-  //comsole.log(posNo.value)
-  if (nowStoreAreaCd.value != undefined || posNo.value != undefined) {
-    searchButton();
+const sendRowState = (e) => {
+  //comsole.log(e);
+  currentRowState.value = e;
+
+  if (e == "created") {
+    tempDisabled.value = false;
+  } else {
+    tempDisabled.value = true;
   }
 };
+
+/**
+ * 전체 상태 변화된 행 세팅
+ */
+
+const allStateRowArr = ref({ updated: [], deleted: [], created: [] });
+const allStateRows = (newValue) => {
+  allStateRowArr.value = newValue;
+  //comsole.log(newValue)
+};
+
 
 /**
  * 조회 초기화
@@ -1489,18 +894,11 @@ const handlePosNo = (newValue) => {
 const handleinitAll = (newvalue) => {
   MenuGroup.value = [];
   SubMenuGroup.value = [];
-  MenuKeyList.value = [];
-  ScreenKeyOrigin.value = [];
-  TLUList.value = [];
-  AllscreenKeyPage.value = "1";
-  MenuList.value = [];
-  ScreenKeys.value = [];
-  items.value = [];
-  forsearchMain.value = "0";
-  forsearchSub.value = "0";
   filteredSubMenuGroup.value = [];
+  discountGroupColumns.value = [];
+  forsearchMain.value = "-1";
+  forsearchSub.value = "-1";
   searchword1.value = "";
-  searchword3.value = "";
   afterSearch.value = false;
 };
 </script>

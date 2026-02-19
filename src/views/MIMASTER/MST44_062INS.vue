@@ -519,7 +519,7 @@ const handleStoreCd = async (newValue) => {
   }
  
   nowStoreCd.value = newValue;
-  searchButton()
+  // searchButton()
   //comsole.log(nowStoreCd.value)
   reload.value = !reload.value
 }
@@ -552,7 +552,7 @@ const handleBlur = (e) => {
   } else if(e.target.name == 'receiptD5'){
     changeValue.value = addSpace42Text(receiptD1.value) + addSpace42Text(receiptD2.value) + addSpace42Text(receiptD3.value)+ addSpace42Text(receiptD4.value) + addSpace42Text(e.target.value)
   }
-  
+
 
   changeNow2.value = !changeNow2.value
 }
@@ -811,9 +811,10 @@ const searchButton= async () => {
         } 
 
       }
-      originRowData3.value = [...SettingList.value]
-      rowData3.value = [...SettingList.value]
-      updatedList2.value = [...SettingList.value]
+      // 깊은 복사를 통해 참조 문제 해결
+      originRowData3.value = JSON.parse(JSON.stringify(SettingList.value))
+      rowData3.value = JSON.parse(JSON.stringify(SettingList.value))
+      updatedList2.value = JSON.parse(JSON.stringify(SettingList.value))
 
       confirmitem.value = JSON.parse(JSON.stringify(SettingList.value));
       afterSearch2.value = true
@@ -946,6 +947,17 @@ const saveButton  = async () => {
           res = await savePrintNm(groupCd.value, nowStoreCd.value, printNo.join(','), printNm.join(','))
           //comsole.log(res)
         } else if (currentMenu.value == 2) {
+          // updatedList2가 비어있거나 유효하지 않은 경우 처리
+          if (!updatedList2.value || updatedList2.value.length === 0 || !updatedList2.value[0]) {
+            Swal.fire({
+              title: '경고',
+              text: '저장할 데이터가 없습니다.',
+              icon: 'warning',
+              confirmButtonText: '확인'
+            })
+            store.state.loading = false;
+            return;
+          }
         
           const calculateArr = ref([])
           const count = Object.keys(updatedList2.value[0]).filter(key => key.startsWith("checkbox")).length;
@@ -975,50 +987,46 @@ const saveButton  = async () => {
             }
           
           }
-          uniqueArray = [...uniqueArray]
-         // calculateArr.value = [[1],[2,6],[6]]
+          // 숫자 정렬로 변경
+          uniqueArray = [...uniqueArray].sort((a, b) => a - b)
+          
+          // calculateArr.value = [[1],[2,6],[6]]
           calculateArr.value = []
-
-
-     
-             for(let i=0 ; i< count ; i++){
-       
-              for(let j=0 ; j< updatedList2.value.length ; j++){
-                    let tempint = 0;
+          for(let i=0 ; i< count ; i++){
+            calculateArr.value[i] = new Set();
+            
+            for(let j=0 ; j< updatedList2.value.length ; j++){
+              // checkbox(i+1)이 체크된 행만 처리
+              if(updatedList2.value[j]["checkbox"+(i+1)] == true){
+                let tempint = 0;
+                // 해당 행의 모든 체크박스 조합을 비트마스크로 계산
                 for(let k=1 ; k<= count ; k++){
-                  if(updatedList2.value[j]["checkbox"+k] == true && updatedList2.value[j]["checkbox"+(i+1)] == true  ){
-                    tempint+= 2**(k-1)
+                  if(updatedList2.value[j]["checkbox"+k] == true){
+                    tempint += 2**(k-1)
                   }
                 }
-
-                if (!calculateArr.value[i]) {
-            // 해당 인덱스 없으면 초기화
-                calculateArr.value[i] = new Set();
+                if(tempint != 0){
+                  calculateArr.value[i].add(tempint)
+                }
               }
-              if(tempint !=0){
-                calculateArr.value[i].add(tempint)
-              }
-      
-              }
-              calculateArr.value[i] = Array.from(calculateArr.value[i]);
-             } 
-
-         
-
-        
-          //comsole.log(forSaveMenu.value)
-          //comsole.log(uniqueArray)
-          //comsole.log(calculateArr.value)
-          res = await saveKitchenSettingAll(groupCd.value, nowStoreCd.value, JSON.stringify(forSaveMenu.value), uniqueArray.sort().join(','), JSON.stringify(calculateArr.value), userData.loginID)
-          //comsole.log(res)
+            }
+            calculateArr.value[i] = Array.from(calculateArr.value[i]).sort((a, b) => a - b);
+          } 
+          
+          console.log('forSaveMenu:', forSaveMenu.value)
+          console.log('uniqueArray:', uniqueArray)
+          console.log('calculateArr:', calculateArr.value)
+          
+          res = await saveKitchenSettingAll(groupCd.value, nowStoreCd.value, JSON.stringify(forSaveMenu.value), uniqueArray.join(','), JSON.stringify(calculateArr.value), userData.loginID)
+          console.log(res)
 
         } else if (currentMenu.value == 3) {
-          //comsole.log(updatedList3.value)
+          
           /**
- * 선택한 포스 번호 호출 함수
- */
+           * 선택한 포스 번호 호출 함수
+           */
 
-const posNos = updatedList3.value.map(item => item.intPosNo)
+          const posNos = updatedList3.value.map(item => item.intPosNo)
           const areaCodes = updatedList3.value.map(item => item.lngAreaCode)
           const strreceipts = updatedList3.value.map(item => item.strReceiptU)
           const strreceipts2 = updatedList3.value.map(item => item.strReceiptD)
@@ -1026,8 +1034,6 @@ const posNos = updatedList3.value.map(item => item.intPosNo)
           res = await saveReceiptData(groupCd.value, nowStoreCd.value, posNos.join(','), areaCodes.join(','), strreceipts.join(','), strreceipts2.join(','))
 
         }
-
-        //comsole.log(res)
 
       } catch (error) {
 
@@ -1039,7 +1045,14 @@ const posNos = updatedList3.value.map(item => item.intPosNo)
           confirmButtonText: '확인',
         })
 
-        searchButton()
+        await searchButton()
+        // 저장 후 재조회 시 updatedList2를 명시적으로 동기화
+        if (currentMenu.value == 2) {
+          await nextTick()
+          // 그리드가 완전히 업데이트된 후 updatedList2를 새 데이터로 동기화
+          updatedList2.value = JSON.parse(JSON.stringify(rowData3.value))
+          confirmitem.value = JSON.parse(JSON.stringify(rowData3.value))
+        }
         reload.value = !reload.value
       }
     }
@@ -1342,7 +1355,7 @@ const handlePosNo = (newValue) => {
   posNo.value = newValue
   //comsole.log(posNo.value)
   if (nowStoreAreaCd.value != undefined || posNo.value != undefined) {
-    searchButton()
+    // searchButton()
   }
 
 }
@@ -1385,4 +1398,5 @@ const receiptP3 = ref('')
 </script>
 
 
+<style scoped></style>
 <style scoped></style>
