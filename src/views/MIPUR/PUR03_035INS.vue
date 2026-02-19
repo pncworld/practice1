@@ -19,11 +19,11 @@
   <div
     class="grid grid-rows-1 grid-cols-4 bg-gray-200 rounded-lg h-14 items-start justify-start">
     <div class="flex justify-start">
-      <Datepicker2
+      <Datepicker_Order
         @endDate="endDate"
         @startDate="startDate"
-        :initToday="1"
-        :initToday2="-7"></Datepicker2>
+        :initToday="0"        
+        :initToday2="-7"></Datepicker_Order>
     </div>
     <div class="flex items-center justify-start space-x-5 ml-20">
       <PickStore
@@ -334,7 +334,7 @@ import {
 } from "@/api/mipur";
 import { getLossMasterPartList, getStockOrderList } from "@/api/mistock";
 import BusinessClient from "@/components/businessClient.vue";
-import Datepicker2 from "@/components/Datepicker2.vue";
+import Datepicker_Order from "@/components/Datepicker_Order.vue";
 /**
  *  페이지명 자동 입력 컴포넌트
  *  */
@@ -505,7 +505,7 @@ const excelButton = () => {
     "매장명 :" +
     clickedStoreNm.value +
     "\n" +
-    "매출일자 : " +
+    "발주일자 : " +
     sdate.value +
     "~" +
     edate.value +

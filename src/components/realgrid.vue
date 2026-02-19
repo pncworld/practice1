@@ -1059,6 +1059,11 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  CalculateTaxColId3: {
+    // 자동 세금 계산 할 컬럼 방법2
+    type: String,
+    default: "",
+  },
   CalculateTimeColId: {
     // 자동 시간 계산 컬럼
     type: String,
@@ -1343,6 +1348,13 @@ const funcshowGrid = async () => {
           } else {
             return 0;
           }
+        }
+      : props.CalculateTaxColId3.includes(item.strColID)
+      ? function (prod, dataRow, fieldName, fieldNames, values) {
+          let curSupply = values[fieldNames.indexOf("curSupply")];
+          let curTax = values[fieldNames.indexOf("curTax")];
+
+          return Math.floor(curSupply + curTax);
         }
       : props.CalculateTimeColId.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
@@ -3177,6 +3189,11 @@ const funcshowGrid = async () => {
     if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
       return;
     }
+    // 그룹 소계/푸터/헤더 등 "데이터 행"이 아닌 영역 클릭 시 버튼컬럼 이벤트 emit 금지
+    // (예: 그룹 소계 행에서 전표번호 클릭해도 팝업이 뜨지 않도록)
+    if (clickData.dataRow == undefined || clickData.dataRow < 0) {
+      return;
+    }
 
     var current = gridView.getCurrent();
     selectedindex.value = current.dataRow;
@@ -3231,6 +3248,9 @@ const funcshowGrid = async () => {
     if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
       return;
     }
+
+    // 그룹 소계/푸터/총계 등 dataRow가 없는 영역에서는 버튼컬럼 클릭 이벤트를 emit하지 않음
+    const isDataRow = !(clickData.dataRow == undefined || clickData.dataRow < 0);
 
     var current = gridView.getCurrent();
     ////console.log(current);
@@ -3308,7 +3328,9 @@ const funcshowGrid = async () => {
         emit("clickedRowData", selectedRowData.value);
       }
     }
-    emit("clickedButtonCol", clickData.fieldName);
+    if (isDataRow) {
+      emit("clickedButtonCol", clickData.fieldName);
+    }
     emit("allStateRows", dataProvider.getAllStateRows());
   };
 

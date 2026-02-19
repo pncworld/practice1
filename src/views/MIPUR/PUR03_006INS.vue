@@ -220,6 +220,9 @@
         :checkRowAuto2="true"
         :checkRenderEditable="true"
         :selectionStyle="'block'"
+        :CalculateTaxColId="'curTax'"
+        :CalculateTaxColId2="'curSupply'"
+        :CalculateTaxColId3="'curTotal'"
         :inputOnlyNumberColumn="'dblOrderQty'">
       </Realgrid>
     </div>
@@ -265,6 +268,9 @@
         :notsoftDelete="true"
         :checkRowAuto="false"
         :checkRowAuto2="true"
+        :CalculateTaxColId="'curTax'"
+        :CalculateTaxColId2="'curSupply'"
+        :CalculateTaxColId3="'curTotal'"
         :deleteRow7="deleteRow7"
         :addRow4="addRow4"
         :addrowProp="'lngStockID,strStockName,strStandardName,strUnitName,curUnitPrice,dblOrderQty,curSupply,curTax,curTotal,strOrderComments,strGenericName,strSupplierName,dtmExpectedDate,lngStoreGroup,lngStoreCode,strOrderNo,lngOrderSeq,lngSupplierID,dblCheckQty,strStatus,strDemandNo,strCheckComments,lngGenericID,lngOrderAble,lngTaxType,dtmOrderDate'"

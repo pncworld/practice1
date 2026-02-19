@@ -30,7 +30,8 @@
       <div class="flex space-x-5 items-center">
         <Datepicker2
           :mainName="'청구일자'"
-          :initToday="1"
+          :initToday="0"
+          :initToday2="0"
           @endDate="endDate"
           @startDate="startDate"></Datepicker2>
       </div>

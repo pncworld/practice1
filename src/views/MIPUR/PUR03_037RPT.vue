@@ -71,8 +71,18 @@
           :rowData="rowData"
           :reload="reload"
           :setStateBar="false"
+          :setFooter="true"
+          :setFooterColID="setFooterColID"
+          :setFooterExpressions="setFooterExpressions"
+          :setFooterCustomColumnId="setFooterCustomColumnId"
+          :setFooterCustomText="setFooterCustomText"
           :setGroupFooter="true"
           :setGroupColumnId="'strStoreName'"
+          :setGroupFooterColID="setGroupFooterColID"
+          :setGroupFooterExpressions="setGroupFooterExpressions"
+          :setGroupSumCustomColumnId="setGroupSumCustomColumnId"
+          :setGroupSumCustomText="setGroupSumCustomText"
+          :setGroupSumCustomColumnId2="setGroupSumCustomColumnId2"
           :setMergeMode="false"
           :documentTitle="'PUR03_037RPT'"
           :selectionStyle="'block'"
@@ -107,9 +117,9 @@
           <div>
             <input
               type="text"
-              class="border border-black h-7 w-48 disabled:bg-gray-200"
+              class="border border-black h-7 w-67 disabled:bg-gray-200"
               disabled
-              v-model="selectedExcelStore" />
+              v-model="forPopupOrderStoreNM" /> 
           </div>
         </div>
 
@@ -118,7 +128,7 @@
           <div>
             <input
               type="text"
-              class="border border-black h-7 w-48 disabled:bg-gray-200"
+              class="border border-black h-7 w-30 disabled:bg-gray-200"
               v-model="forPopupOrderNo"
               disabled />
           </div>
@@ -129,7 +139,7 @@
           <select
             name=""
             id=""
-            class="border border-black w-32 h-8 disabled:bg-gray-200"
+            class="border border-black w-35 h-8 disabled:bg-gray-200"
             disabled
             v-model="scond">
             <option :value="i.lngPartCode" v-for="i in optionList">
@@ -144,6 +154,11 @@
           :progid="1"
           :documentTitle="'PUR03_037RPT'"
           :rowStateeditable="false"
+          :setFooter="true"
+          :setFooterColID="setFooterColID2"
+          :setFooterExpressions="setFooterExpressions2"
+          :setFooterCustomColumnId="setFooterCustomColumnId2"
+          :setFooterCustomText="setFooterCustomText2"
           :exporttoExcel="exportExcel2"
           :documentSubTitle="documentSubTitle2"
           :rowData="rowData2"></Realgrid>
@@ -211,6 +226,50 @@ onMounted(async () => {
 const reload = ref(false);
 const rowData = ref([]);
 const afterSearch = ref(false);
+
+// 그룹 푸터 합계를 표시할 컬럼 설정
+// 필요한 컬럼 ID를 배열에 추가하고, 각 컬럼에 대한 표현식(sum, avg, count 등)을 지정하세요
+const setGroupFooterColID = ref([
+  "lngOrderQty",
+  "curSupply",
+  "curTax",
+  "curTotalCost" 
+]);
+const setGroupFooterExpressions = ref([
+  "sum",
+  "sum",
+  "sum",
+  "sum", 
+]);
+
+// 전체 푸터(총계) 합계 설정
+const setFooterColID = ref([
+  "lngOrderQty",
+  "curSupply",
+  "curTax",
+  "curTotalCost",
+]);
+const setFooterExpressions = ref(["sum", "sum", "sum", "sum"]);
+const setFooterCustomColumnId = ref(["strStoreName"]);
+const setFooterCustomText = ref(["총계"]);
+
+// 팝업 그리드(발주서 조회) 전체 푸터(총계) 합계 설정
+const setFooterColID2 = ref([
+  "dblOrderQty",
+  "curSupply",
+  "curTax",
+  "curTotal",
+]);
+const setFooterExpressions2 = ref(["sum", "sum", "sum", "sum"]);
+const setFooterCustomColumnId2 = ref(["strStoreName"]);
+const setFooterCustomText2 = ref(["총계"]);
+
+// 그룹 푸터에 표시할 커스텀 텍스트 설정
+const setGroupSumCustomColumnId = ref(["strStoreName"]);
+const setGroupSumCustomText = ref(["소계"]);
+
+// 그룹 푸터에 "소계" 텍스트를 표시할 컬럼 설정 (setGroupSumCustomColumnId2 사용)
+const setGroupSumCustomColumnId2 = ref(["strStoreName"]);
 
 const cond = ref("0");
 
@@ -285,6 +344,10 @@ const searchButton = async () => {
 
     rowData.value = res.data.List;
     //console.log(res);
+    // 디버깅: 실제 데이터 구조 확인
+    if (res.data.List && res.data.List.length > 0) {
+      console.log("그리드 컬럼 확인:", Object.keys(res.data.List[0]));
+    }
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -326,7 +389,7 @@ const exportExcel2 = ref(false);
 const excelButton2 = () => {
   documentSubTitle2.value =
     "매장명 :" +
-    selectedExcelStore.value +
+    forPopupOrderStoreNM.value +
     "\n" +
     "발주번호 :" +
     forPopupOrderNo.value +
@@ -369,18 +432,35 @@ const clickedButtonCol = async (e) => {
     );
 
     console.log(res);
-    rowData2.value = res.data.List;
+    // 팝업 그리드 합계 마스킹(콤마 등) 적용을 위해 합계 대상 필드를 숫자로 보정
+    rowData2.value = (res.data.List ?? []).map((row) => {
+      const toNum = (v) => {
+        if (v === null || v === undefined || v === "") return 0;
+        if (typeof v === "number") return v;
+        const n = Number(String(v).replaceAll(",", ""));
+        return isNaN(n) ? 0 : n;
+      };
+      return {
+        ...row,
+        dblOrderQty: toNum(row.dblOrderQty),
+        curSupply: toNum(row.curSupply),
+        curTax: toNum(row.curTax),
+        curTotal: toNum(row.curTotal),
+      };
+    });
     openPopUp.value = true;
   }
 };
 const rowData2 = ref([]);
 const forPopupOrderStoreCd = ref("");
+const forPopupOrderStoreNM = ref("");
 const forPopupOrderNo = ref("");
 
 const scond = ref("");
 const clickedRowData = (e) => {
   scond.value = e[3];
   forPopupOrderStoreCd.value = e[1];
+  forPopupOrderStoreNM.value = e[2];
   forPopupOrderNo.value = e[7];
 };
 
