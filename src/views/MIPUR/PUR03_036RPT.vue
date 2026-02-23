@@ -32,6 +32,7 @@
       </div>
       <div class="flex justify-start items-center ml-[10%]">
         <PickStore
+          :mainName="'매장'"
           @update:storeGroup="lngStoreGroup"
           :defaultStoreNm="'전체'"
           :hideGroup="false"
@@ -59,7 +60,7 @@
           :defaultNm="'전체'"></BusinessClient>
       </div>
 
-      <div class="flex space-x-5 ml-[25%] mt-3 items-center">
+      <div class="flex justify-start items-center ml-[10%] mt-3 space-x-5">
         <div class="font-semibold text-base">단위</div>
         <div>
           <select name="" id="" class="w-[100%] h-7" v-model="cond2">

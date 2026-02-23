@@ -123,19 +123,19 @@
           </div>
         </div>
 
-        <div class="flex space-x-5 ml-5 items-center">
+        <div class="flex space-x-5 ml-10 items-center">
           <div class="text-base font-semibold">발주번호</div>
           <div>
             <input
               type="text"
-              class="border border-black h-7 w-30 disabled:bg-gray-200"
+              class="border border-black h-7 w-23 disabled:bg-gray-200"
               v-model="forPopupOrderNo"
               disabled />
           </div>
         </div>
 
-        <div class="flex space-x-5 ml-5 items-center">
-          <div class="text-base font-semibold">파트번호</div>
+        <div class="flex space-x-5 ml-10 items-center">
+          <div class="text-base font-semibold">파트명</div>
           <select
             name=""
             id=""
@@ -394,9 +394,9 @@ const excelButton2 = () => {
     "발주번호 :" +
     forPopupOrderNo.value +
     "\n" +
-    "파트번호 : " +
-    optionList.value.filter((item) => item.lngPartCode == cond.value)[0]
-      .strPartName;
+    "파트명 : " +
+    // optionList.value.filter((item) => item.lngPartCode == cond.value)[0].strPartName;
+    forPopupPartNM.value
   exportExcel2.value = !exportExcel2.value;
 };
 
@@ -455,13 +455,15 @@ const rowData2 = ref([]);
 const forPopupOrderStoreCd = ref("");
 const forPopupOrderStoreNM = ref("");
 const forPopupOrderNo = ref("");
+const forPopupPartNM = ref("");
 
 const scond = ref("");
 const clickedRowData = (e) => {
   scond.value = e[3];
   forPopupOrderStoreCd.value = e[1];
+  forPopupPartNM.value = e[4];
   forPopupOrderStoreNM.value = e[2];
-  forPopupOrderNo.value = e[7];
+  forPopupOrderNo.value = e[7];  
 };
 
 const checkedrowdata = ref([]);
