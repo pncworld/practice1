@@ -151,27 +151,45 @@ export const getTablePosList = async (groupCd, storeCd) => {
   });
   return res;
 };
-export const getStoreAndPosList = async (groupCd, storeCd, posNo) => {
+export const getStoreAndPosList = async (
+  groupCd,
+  storeCd,
+  posNo,
+  blnBrandAdmin
+) => {
   const res = await api2.post("/SYSTEM/sysCom.asmx/getStoreAndPosList", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     POSNO: posNo,
+    BLN_BRAND_ADMIN: blnBrandAdmin,
   });
   return res;
 };
-export const getStoreAndPosList2 = async (groupCd, storeCd, posNo) => {
+export const getStoreAndPosList2 = async (
+  groupCd,
+  storeCd,
+  posNo,
+  blnBrandAdmin
+) => {
   const res = await api2.post("/SYSTEM/sysCom.asmx/getStoreAndPosList2", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     POSNO: posNo,
+    BLN_BRAND_ADMIN: blnBrandAdmin,
   });
   return res;
 };
-export const getStoreAndPosList4 = async (groupCd, storeCd, posNo) => {
+export const getStoreAndPosList4 = async (
+  groupCd,
+  storeCd,
+  posNo,
+  blnBrandAdmin
+) => {
   const res = await api2.post("/SYSTEM/sysCom.asmx/getStoreAndPosList4", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     POSNO: posNo,
+    BLN_BRAND_ADMIN: blnBrandAdmin,
   });
   return res;
 };
@@ -182,12 +200,19 @@ export const getStoreDistinctList = async (groupCd, storeCd, areaCd, posNo) => {
   return res;
 };
 
-export const getStoreAndPosList3 = async (groupCd, storeCd, areaCd, posNo) => {
+export const getStoreAndPosList3 = async (
+  groupCd,
+  storeCd,
+  areaCd,
+  posNo,
+  blnBrandAdmin
+) => {
   const res = await api2.post("/SYSTEM/sysCom.asmx/getStoreAndPosList3", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     AREA_CD: areaCd,
     POSNO: posNo,
+    BLN_BRAND_ADMIN: blnBrandAdmin,
   });
   return res;
 };

@@ -105,6 +105,7 @@ const {
   naming,
   naming2,
   summary,
+  blnBrandAdmin,
 } = defineProps({
   isVisible: { type: Boolean, default: false }, // 팝업 가시성 관리
   storeCd: { type: String, default: "" },
@@ -122,6 +123,7 @@ const {
     default:
       "선택하신 POS의 메뉴배치정보 및 화면정보가 모두 삭제 후 복사됩니다. 계속 진행하시겠습니까?",
   },
+  blnBrandAdmin: { type: Boolean, default: false }, // 브랜드 관리자 여부 (조회 파라미터)
 });
 const store = useStore(); // vuex store
 const userData = store.state.userData;
@@ -139,12 +141,26 @@ const rowData = ref([]);
 const showGrid = ref(false);
 const showStoreList = async () => {
   let res;
-  //comsole.log(progname);
-  //comsole.log(progid);
-  //comsole.log(storeCd);
-  //comsole.log(posNo);
+  
+  const blnBrandAdminValue = blnBrandAdmin ? 1 : 0;
+
   try {
-    res = await api[poskiosk](groupCd.value, storeCd, posNo);
+    if (poskiosk === "getStoreAndPosList3") {
+      res = await api[poskiosk](
+        groupCd.value,
+        storeCd,
+        areaCd,
+        posNo,
+        blnBrandAdminValue
+      );
+    } else {
+      res = await api[poskiosk](
+        groupCd.value,
+        storeCd,
+        posNo,
+        blnBrandAdminValue
+      );
+    }
 
     // console.log(res);
 

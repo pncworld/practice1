@@ -23,11 +23,24 @@
     </div>
     <div
       class="flex justify-start bg-gray-200 rounded-lg h-14 items-center z-10 pb-3">
+      <!-- 메뉴코드 탭: MST01_010INS 스타일 PickStore -->
       <PickStore
+        v-if="selected === 1"
+        @update:storeGroup="handleGroupCd"
+        @update:storeCd="handleStoreCd"
+        :hidesub="hidesub"
+        :hideAttr="hideAttr"
+        @storeNm="handlestoreNm"
+        @GroupNm="handleGroupNm">
+      </PickStore>
+      <!-- 화면키 탭: 기존 PickStore -->
+      <PickStore
+        v-else
         @update:storeCd="lngStoreCode"
         :showPosNo="showPosNo"
         @posNo="posNo"
-        @update:storeAreaCd="lngAreaCode"></PickStore>
+        @update:storeAreaCd="lngAreaCode">
+      </PickStore>
     </div>
 
     <div class="flex ml-10 mt-5">
@@ -278,6 +291,19 @@ const cond4 = ref(0);
 
 const store = useStore();
 
+/** PickStore (메뉴코드 탭용 - MST01_010INS 스타일) */
+const hidesub = ref(true);
+const hideAttr = ref(true);
+const clickedStoreNm = ref("");
+const handleGroupCd = () => {};
+const handleGroupNm = () => {};
+const handlestoreNm = (newData) => {
+  clickedStoreNm.value = newData;
+};
+const handleStoreCd = async (newValue) => {
+  await lngStoreCode(newValue);
+};
+
 /**
  * 	화면 Load시 실행 스크립트
  */
@@ -291,6 +317,14 @@ const filteredOptionList2 = ref([]);
 const optionList7 = ref([]);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+
+  if (store.state.userData.lngCommonMenu == "1") {
+    hidesub.value = false;
+    hideAttr.value = false;
+  } else {
+    hidesub.value = true;
+    hideAttr.value = true;
+  }
 
   const res = await getMenuList5(store.state.userData.lngStoreGroup, 0);
   console.log(res);

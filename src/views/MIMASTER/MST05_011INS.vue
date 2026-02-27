@@ -40,7 +40,8 @@
       :dupliapiname="'DUPLIALLPOSDATA'"
       :progid="1"
       :poskiosk="'getStoreAndPosList'"
-      :naming="'POS번호'">
+      :naming="'POS번호'"
+      :blnBrandAdmin="isBrandAdmin">
     </DupliPopUp>
   </div>
   <!-- 조회조건 -->
@@ -455,7 +456,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 /*
  * 드래그 라이브러리 호출
  */
@@ -710,6 +711,12 @@ const MenuGroup = ref([]);
 const SubMenuGroup = ref([]);
 
 const store = useStore();
+/**
+ * 브랜드 관리자 여부 (True일 때와 아닐 때 조회 파라미터 구분용)
+ */
+const isBrandAdmin = computed(
+  () => store.state.userData?.blnBrandAdmin == "True"
+);
 /**
  *  그리드 검색어 세팅
  */
