@@ -78,24 +78,7 @@
         <input
           type="text"
           class="w-64 h-8 rounded-lg"
-          v-model="cond2Text"
-          v-if="selectedCond2 !== 3 && selectedCond2 !== 4" />
-        <select
-          name=""
-          id=""
-          class="w-64 h-8 rounded-lg"
-          v-model="selectedCond4"
-          v-if="selectedCond2 == 3 || selectedCond2 == 4">
-          <option :value="i.strBelongNM" v-for="i in condition4List">
-            {{ i.strBelongNM }}
-          </option>
-        </select>
-        <button
-          @click="searchCondition"
-          class="button primary"
-          v-if="selectedCond2 == 3 || selectedCond2 == 4">
-          새로고침
-        </button>
+          v-model="cond2Text" />
       </div>
       <div class="flex justify-center items-center space-x-5 !-ml-12">
         <div class="text-base font-semibold text-nowrap">조회옵션</div>
@@ -134,7 +117,7 @@
 
 <script setup>
 import { getCommonList, getPosList2 } from "@/api/common";
-import { getCondition4List, getSalesbyDateAndMonth } from "@/api/misales";
+import { getSalesbyDateAndMonth } from "@/api/misales";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -168,7 +151,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -209,8 +192,6 @@ const selectedCond = ref(0);
 const selectedCond2 = ref(2);
 const cond2Text = ref("");
 const selectedCond3 = ref(1);
-const selectedCond4 = ref("전체");
-const condition4List = ref([]);
 
 const exceptRetire = (e) => {
   if (e.target.checked) {
@@ -287,15 +268,9 @@ const searchButton = async () => {
     } else if (selectedCond2.value == 2) {
       empName = cond2Text.value;
     } else if (selectedCond2.value == 3) {
-      custDeptName = selectedCond4.value;
-      if (selectedCond4.value == "전체") {
-        custDeptName = "";
-      }
+      custDeptName = cond2Text.value;
     } else if (selectedCond2.value == 4) {
-      custCompName = selectedCond4.value;
-      if (selectedCond4.value == "전체") {
-        custCompName = "";
-      }
+      custCompName = cond2Text.value;
     }
 
     const res = await getSalesbyDateAndMonth(
@@ -448,42 +423,5 @@ const selectedExcelStore = ref("");
 const excelStore = (e) => {
   selectedExcelStore.value = e;
   //comsole.log(e);
-};
-watch(selectedCond2, async () => {
-  if (selectedCond2.value == 3) {
-    const res2 = await getCondition4List(
-      selectedGroup.value,
-      selectedStores.value,
-      4
-    );
-    condition4List.value = res2.data.List;
-  } else if (selectedCond2.value == 4) {
-    const res2 = await getCondition4List(
-      selectedGroup.value,
-      selectedStores.value,
-      5
-    );
-    condition4List.value = res2.data.List;
-  }
-  selectedCond4.value = "전체";
-});
-
-const searchCondition = async (e) => {
-  if (selectedCond2.value == 3) {
-    const res2 = await getCondition4List(
-      selectedGroup.value,
-      selectedStores.value,
-      4
-    );
-    condition4List.value = res2.data.List;
-  } else if (selectedCond2.value == 4) {
-    const res2 = await getCondition4List(
-      selectedGroup.value,
-      selectedStores.value,
-      5
-    );
-    condition4List.value = res2.data.List;
-  }
-  selectedCond4.value = "전체";
 };
 </script>

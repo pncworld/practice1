@@ -88,35 +88,7 @@
         <input
           type="text"
           class="w-64 h-8 rounded-lg"
-          v-model="cond2Text"
-          v-if="selectedCond2 !== 3 && selectedCond2 !== 4" />
-        <select
-          name=""
-          id=""
-          class="w-64 h-8 rounded-lg"
-          v-model="selectedCond4"
-          v-if="
-            exception == false && (selectedCond2 == 3 || selectedCond2 == 4)
-          ">
-          <option :value="i.strBelongNM" v-for="i in condition4List">
-            {{ i.strBelongNM }}
-          </option>
-        </select>
-        <input
-          type="text"
-          class="w-64 h-8 rounded-lg"
-          v-model="selectedCond4"
-          v-if="
-            exception == true && (selectedCond2 == 3 || selectedCond2 == 4)
-          " />
-        <button
-          @click="searchCondition"
-          class="button primary"
-          v-if="
-            exception == false && (selectedCond2 == 3 || selectedCond2 == 4)
-          ">
-          새로고침
-        </button>
+          v-model="cond2Text" />
       </div>
 
       <div class="flex justify-start items-center h-8 space-x-5 -ml-4">
@@ -164,7 +136,7 @@
 
 <script setup>
 import { getCommonList, getPosList2 } from "@/api/common";
-import { getCondition4List, getSalesbyPostPay } from "@/api/misales";
+import { getSalesbyPostPay } from "@/api/misales";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -249,8 +221,6 @@ const selectedCond = ref(0);
 const selectedCond2 = ref(2);
 const cond2Text = ref("");
 const selectedCond3 = ref(1);
-const selectedCond4 = ref("전체");
-const condition4List = ref([]);
 
 const exceptRetire = (e) => {
   if (e.target.checked) {
@@ -324,15 +294,9 @@ const searchButton = async () => {
     } else if (selectedCond2.value == 2) {
       empName = cond2Text.value;
     } else if (selectedCond2.value == 3) {
-      custDeptName = selectedCond4.value;
-      if (selectedCond4.value == "전체") {
-        custDeptName = "";
-      }
+      custDeptName = cond2Text.value;
     } else if (selectedCond2.value == 4) {
-      custCompName = selectedCond4.value;
-      if (selectedCond4.value == "전체") {
-        custCompName = "";
-      }
+      custCompName = cond2Text.value;
     }
 
     const res = await getSalesbyPostPay(
@@ -509,46 +473,5 @@ const setUnite = (e) => {
     setRowGroupSpan2.value = "";
   }
   reload.value = !reload.value;
-};
-watch(selectedCond2, async () => {
-  if (selectedCond2.value == 3 && exception.value == false) {
-    const res2 = await getCondition4List(
-      selectedGroup.value,
-      selectedStores.value,
-      4
-    );
-
-    condition4List.value = res2.data.List;
-  } else if (selectedCond2.value == 4 && exception.value == false) {
-    const res2 = await getCondition4List(
-      selectedGroup.value,
-      selectedStores.value,
-      5
-    );
-    condition4List.value = res2.data.List;
-  } else if (exception.value == true) {
-    selectedCond4.value = "";
-    return;
-  }
-  selectedCond4.value = "전체";
-});
-
-const searchCondition = async (e) => {
-  if (selectedCond2.value == 3) {
-    const res2 = await getCondition4List(
-      selectedGroup.value,
-      selectedStores.value,
-      4
-    );
-    condition4List.value = res2.data.List;
-  } else if (selectedCond2.value == 4) {
-    const res2 = await getCondition4List(
-      selectedGroup.value,
-      selectedStores.value,
-      5
-    );
-    condition4List.value = res2.data.List;
-  }
-  selectedCond4.value = "전체";
 };
 </script>
