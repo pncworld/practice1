@@ -29,7 +29,8 @@
         @lngStoreGroup="lngStoreGroup"
         @lngStoreAttrs="lngStoreAttrs"
         @excelStore="excelStore"
-        :placeholderName="'선택'"></PickStoreRenew>
+        :placeholderName="'선택'">
+      </PickStoreRenew>
     </div>
     <div class="ml-12">
       <div class="flex space-x-5">
@@ -246,10 +247,116 @@ const searchButton = async () => {
           "\n";
       }
     }
-    preview.value += "\n" + "입력사항" + "\n" + res.data.List2[0].strIssueNote;
-    inputview.value = res.data.List2[0].strIssueNote;
+    const issueNote = res.data.List2?.[0]?.strIssueNote ?? "";
+
+    // 금일평당매출
+    const lngCurYearAmount = res.data.List[0].lngCurYearAmount ?? 0;
+    const lngFloorSpace = res.data.List4?.[0]?.lngFloorSpace ?? 0;
+    const salePerSquareMeter = lngFloorSpace > 0 ? Math.round(lngCurYearAmount / lngFloorSpace) : 0;
+
+    // 금일회전율보고
+    const lngTable = res.data.List4?.[0]?.lngTable ?? 0;
+    const lunchCustCnt = res.data.List5?.[0]?.lunchCustCnt ?? 0;
+    const dinnerCustCnt = res.data.List5?.[0]?.dinnerCustCnt ?? 0;
+    const lunchRotationRate =
+      lngTable > 0 ? Math.round((lunchCustCnt / lngTable) * 10) / 10 : 0;
+    const dinnerRotationRate =
+      lngTable > 0 ? Math.round((dinnerCustCnt / lngTable) * 10) / 10 : 0;
+    const totalRotationRate = Math.round((lunchRotationRate + dinnerRotationRate) * 10) / 10;
+
+    const deliveryCnt = res.data.List6?.[0]?.deliveryCnt ?? 0;
+    const deliveryCustCnt = res.data.List6?.[0]?.deliveryCustCnt ?? 0;
+    const deliverySaleAmt = res.data.List6?.[0]?.deliverySaleAmt ?? 0;
+    const takeoutCnt = res.data.List6?.[0]?.takeoutCnt ?? 0;
+    const takeoutCustCnt = res.data.List6?.[0]?.takeoutCustCnt ?? 0;
+    const takeoutSaleAmt = res.data.List6?.[0]?.takeoutSaleAmt ?? 0;
+
+    const totalDeliveryTakeoutSale = Number(deliverySaleAmt) + Number(takeoutSaleAmt);
+    const totalDeliveryTakeoutCnt = Number(deliveryCnt) + Number(takeoutCnt);
+    const totalDeliveryTakeoutCust = Number(deliveryCustCnt) + Number(takeoutCustCnt);
+    const deliveryTakeoutSalePercent =
+      lngCurYearAmount > 0
+        ? Math.round((totalDeliveryTakeoutSale / lngCurYearAmount) * 100)
+        : 0;
+    const deliverySalePercent =
+      totalDeliveryTakeoutSale > 0
+        ? Math.round((Number(deliverySaleAmt) / totalDeliveryTakeoutSale) * 100)
+        : 0;
+    const takeoutSalePercent =
+      totalDeliveryTakeoutSale > 0
+        ? Math.round((Number(takeoutSaleAmt) / totalDeliveryTakeoutSale) * 100)
+        : 0;
+    const deliveryCntPercent =
+      totalDeliveryTakeoutCnt > 0
+        ? Math.round((Number(deliveryCnt) / totalDeliveryTakeoutCnt) * 100)
+        : 0;
+    const takeoutCntPercent =
+      totalDeliveryTakeoutCnt > 0
+        ? Math.round((Number(takeoutCnt) / totalDeliveryTakeoutCnt) * 100)
+        : 0;
+    const deliveryCustPercent =
+      totalDeliveryTakeoutCust > 0
+        ? Math.round((Number(deliveryCustCnt) / totalDeliveryTakeoutCust) * 100)
+        : 0;
+    const takeoutCustPercent =
+      totalDeliveryTakeoutCust > 0
+        ? Math.round((Number(takeoutCustCnt) / totalDeliveryTakeoutCust) * 100)
+        : 0;
+
+    const inputTemplate =
+      // "<일일 매출 요약>" +
+      // "\n" +
+      "- 일 총근무시간 : 시간" +
+      "\n" +
+      "- 금일인시매출 : 원" +
+      "\n" +
+      "- 금일평당매출 : " + formatNumberWithCommas(salePerSquareMeter) + "원" +
+      "\n" +
+      "- 금일회전율보고" +
+      "\n" +
+      "  점심 (11:30~17:00) : " + Number(lunchRotationRate).toFixed(1) + "회전" +
+      "\n" +
+      "  저녁 (17:00~22:00) : " + Number(dinnerRotationRate).toFixed(1) + "회전" +
+      "\n" +
+      "  회전율합계 : " + Number(totalRotationRate).toFixed(1) + "회전" +
+      "\n" +
+      "\n" +
+      "<배달 및 포장매출현황>" +
+      "\n" +
+      "*포장/배달 총매출 : " + formatNumberWithCommas(totalDeliveryTakeoutSale) + "원(" + deliveryTakeoutSalePercent + "%)" +
+      "\n" +
+      "-배달매출 : " + formatNumberWithCommas(deliverySaleAmt) + "원(" + deliverySalePercent + "%)" +
+      "\n" +
+      "-포장매출 : " + formatNumberWithCommas(takeoutSaleAmt) + "원(" + takeoutSalePercent + "%)" +
+      "\n" +
+      "\n" +
+      "*포장/배달 총건수 : " + formatNumberWithCommas(totalDeliveryTakeoutCnt) + "건" +
+      "\n" +
+      "- 배달앱 : " + formatNumberWithCommas(deliveryCnt) + "건(" + deliveryCntPercent + "%)" +
+      "\n" +
+      "- 전화 : " + formatNumberWithCommas(takeoutCnt) + "건(" + takeoutCntPercent + "%)" +
+      "\n" +
+      "\n" +
+      "*포장/배달 총객수 : " + formatNumberWithCommas(totalDeliveryTakeoutCust) + "명" +
+      "\n" +
+      "- 배달앱 : " + formatNumberWithCommas(deliveryCustCnt) + "명(" + deliveryCustPercent + "%)" +
+      "\n" +
+      "- 전화 : " + formatNumberWithCommas(takeoutCustCnt) + "명(" + takeoutCustPercent + "%)" +
+      "\n" +
+      "\n" +
+      "<상품권 내역>" +
+      "\n" +
+      "\n" +
+      "\n" +
+      "\n" +
+      "\n" +
+      "\n" +
+      "- 금일 하루도 수고 하셨습니다.";
+
+    preview.value += "\n" + "입력사항" + "\n" + (issueNote || inputTemplate);
+    inputview.value = issueNote || inputTemplate;
     oriinputview.value = JSON.parse(
-      JSON.stringify(res.data.List2[0].strIssueNote)
+      JSON.stringify(issueNote || inputTemplate)
     );
     phoneNums.value = res.data.List3.map((item) => item.strPhoneNum).join(
       "\u200B"
