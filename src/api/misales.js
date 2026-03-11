@@ -1586,3 +1586,17 @@ export const getMonthlyMenuUseStatus = (groupCd, storeCd, startDate, endDate, ln
     POS_NO : intRegNo,
   });
 };
+
+export const getDailySalesAnalysis = (
+  groupCd,
+  storeCds,
+  startDate,
+  endDate,
+) => {
+  return api2.post("/MISALES/SLS06_013RPT.asmx/getDailySalesAnalysis", {
+    GROUP_CD: groupCd,
+    STORE_CDS: storeCds,  
+    START_DATE: startDate,
+    END_DATE: endDate,
+  });
+};

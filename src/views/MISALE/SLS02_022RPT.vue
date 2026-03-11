@@ -1,8 +1,8 @@
 <!-- /*--############################################################################
-# Filename : SLS02_022RPT.vue                                                  
-# Description : 매출관리 > 사원카드 매출현황 > 후불결제별 매출현황.            
-# Date :2025-05-14                                                             
-# Author : 권맑음                     
+# Filename : SLS02_022RPT.vue                                                  
+# Description : 매출관리 > 사원카드 매출현황 > 후불결제별 매출현황.            
+# Date :2025-05-14                                                             
+# Author : 권맑음                     
 ################################################################################*/ -->
 <template>
   <!-- 조회 조건 -->
@@ -85,10 +85,40 @@
           <option :value="3">부서명</option>
           <option :value="4">소속사명</option>
         </select>
+
+        <!-- 카드번호/사원번호/사원명: 항상 input -->
         <input
           type="text"
           class="w-64 h-8 rounded-lg"
-          v-model="cond2Text" />
+          v-model="cond2Text"
+          v-if="selectedCond2 !== 3 && selectedCond2 !== 4" />
+
+        <!-- 부서명/소속사명 + 3071 법인: select box (기존 방식) -->
+        <select
+          name=""
+          id=""
+          class="w-64 h-8 rounded-lg"
+          v-model="selectedCond4"
+          v-if="isLegacyGroup && (selectedCond2 == 3 || selectedCond2 == 4)">
+          <option :value="i.strBelongNM" v-for="i in condition4List">
+            {{ i.strBelongNM }}
+          </option>
+        </select>
+
+        <!-- 부서명/소속사명 + 3071 외 법인: input text (새로운 방식) -->
+        <input
+          type="text"
+          class="w-64 h-8 rounded-lg"
+          v-model="cond2Text"
+          v-if="!isLegacyGroup && (selectedCond2 == 3 || selectedCond2 == 4)" />
+
+        <!-- 새로고침 버튼: 3071 법인만 -->
+        <button
+          @click="searchCondition"
+          class="button primary"
+          v-if="isLegacyGroup && (selectedCond2 == 3 || selectedCond2 == 4)">
+          새로고침
+        </button>
       </div>
 
       <div class="flex justify-start items-center h-8 space-x-5 -ml-4">
@@ -136,7 +166,7 @@
 
 <script setup>
 import { getCommonList, getPosList2 } from "@/api/common";
-import { getSalesbyPostPay } from "@/api/misales";
+import { getCondition4List, getSalesbyPostPay } from "@/api/misales";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -170,7 +200,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -179,6 +209,14 @@ import { useStore } from "vuex";
 /**
  * 	화면 Load시 실행 스크립트
  */
+
+const store = useStore();
+const loginedstrLang = store.state.userData.lngLanguage;
+
+// 3071 법인 여부 (기존 select box 방식)
+const isLegacyGroup = computed(
+  () => store.state.userData.lngPosition == "3071537"
+);
 
 const exception = ref(false);
 const optionList = ref([]);
@@ -221,6 +259,8 @@ const selectedCond = ref(0);
 const selectedCond2 = ref(2);
 const cond2Text = ref("");
 const selectedCond3 = ref(1);
+const selectedCond4 = ref("전체");
+const condition4List = ref([]);
 
 const exceptRetire = (e) => {
   if (e.target.checked) {
@@ -247,9 +287,6 @@ const endDate = (e) => {
   selectedendDate.value = e;
 };
 
-const store = useStore();
-const loginedstrLang = store.state.userData.lngLanguage;
-
 const datepicker = ref(null);
 const closePopUp = ref(false);
 /**
@@ -269,15 +306,6 @@ const handleParentClick = (e) => {
  */
 
 const searchButton = async () => {
-  // if (selectedStores.value == 0) {
-  //   Swal.fire({
-  //     title: "경고",
-  //     text: "매장을 선택하세요.",
-  //     icon: "warning",
-  //     confirmButtonText: "확인",
-  //   });
-  //   return;
-  // }
   try {
     store.state.loading = true;
     initGrid();
@@ -294,9 +322,19 @@ const searchButton = async () => {
     } else if (selectedCond2.value == 2) {
       empName = cond2Text.value;
     } else if (selectedCond2.value == 3) {
-      custDeptName = cond2Text.value;
+      if (isLegacyGroup.value) {
+        // 3071 법인: select box 값 사용
+        custDeptName = selectedCond4.value === "전체" ? "" : selectedCond4.value;
+      } else {
+        custDeptName = cond2Text.value;
+      }
     } else if (selectedCond2.value == 4) {
-      custCompName = cond2Text.value;
+      if (isLegacyGroup.value) {
+        // 3071 법인: select box 값 사용
+        custCompName = selectedCond4.value === "전체" ? "" : selectedCond4.value;
+      } else {
+        custCompName = cond2Text.value;
+      }
     }
 
     const res = await getSalesbyPostPay(
@@ -402,9 +440,9 @@ const excelButton = () => {
   } else if (selectedCond2.value == 2) {
     cond3 += "사원명 , " + cond2Text.value;
   } else if (selectedCond2.value == 3) {
-    cond3 += "부서명 , " + cond2Text.value;
+    cond3 += "부서명 , " + (isLegacyGroup.value ? selectedCond4.value : cond2Text.value);
   } else if (selectedCond2.value == 4) {
-    cond3 += "소속사명 , " + cond2Text.value;
+    cond3 += "소속사명 , " + (isLegacyGroup.value ? selectedCond4.value : cond2Text.value);
   }
 
   let cond4 = "조회옵션 :";
@@ -473,5 +511,51 @@ const setUnite = (e) => {
     setRowGroupSpan2.value = "";
   }
   reload.value = !reload.value;
+};
+
+/**
+ * selectedCond2 변경 시 3071 법인이면 condition4List 로드 (기존 방식)
+ */
+watch(selectedCond2, async () => {
+  if (!isLegacyGroup.value) return;
+
+  if (selectedCond2.value == 3) {
+    const res2 = await getCondition4List(
+      selectedGroup.value,
+      selectedStores.value,
+      4
+    );
+    condition4List.value = res2.data.List;
+  } else if (selectedCond2.value == 4) {
+    const res2 = await getCondition4List(
+      selectedGroup.value,
+      selectedStores.value,
+      5
+    );
+    condition4List.value = res2.data.List;
+  }
+  selectedCond4.value = "전체";
+});
+
+/**
+ * 새로고침 버튼 함수 (3071 법인 전용)
+ */
+const searchCondition = async () => {
+  if (selectedCond2.value == 3) {
+    const res2 = await getCondition4List(
+      selectedGroup.value,
+      selectedStores.value,
+      4
+    );
+    condition4List.value = res2.data.List;
+  } else if (selectedCond2.value == 4) {
+    const res2 = await getCondition4List(
+      selectedGroup.value,
+      selectedStores.value,
+      5
+    );
+    condition4List.value = res2.data.List;
+  }
+  selectedCond4.value = "전체";
 };
 </script>
