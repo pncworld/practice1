@@ -39,27 +39,66 @@
     </div>
     <!-- 조회조건 -->
     <!-- 탭 -->
-    <div class="flex gap-0 w-full border-b border-gray-300">
-      <button
-        v-for="tab in tabList"
-        :key="tab"
-        type="button"
-        class="px-4 py-2.5 text-sm font-medium rounded-t transition-colors"
-        :class="activeTab === tab ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-        @click="activeTab = tab">
-        {{ tab }}
-      </button>
+    <div class="flex flex-col w-full border-b border-gray-300">
+      <div class="flex gap-0">
+        <button
+          v-for="tab in tabList"
+          :key="tab"
+          type="button"
+          class="px-4 py-2.5 text-sm font-medium rounded-t transition-colors"
+          :class="
+            activeTab === tab
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          "
+          @click="activeTab = tab">
+          {{ tab }}
+        </button>
+      </div>
+
+      <!-- 그룹 소계 체크박스 (매장별 탭 전용) -->
+      <div
+        v-if="activeTab === '매장별'"
+        class="flex items-center gap-4 px-4 py-2 bg-gray-50 border-t border-gray-200 text-sm text-gray-800">
+        <span class="font-semibold">그룹 소계</span>
+        <label class="flex items-center gap-1">
+          <input type="checkbox" v-model="groupByDate" @click.stop />
+          <span>매출 일자별</span>
+        </label>
+        <label class="flex items-center gap-1">
+          <input type="checkbox" v-model="groupByStore" @click.stop />
+          <span>매장별</span>
+        </label>
+      </div>
     </div>
     <!-- 그리드 영역 -->
     <div class="w-full h-[85%]">
       <Realgrid
+        :key="activeTab"
         :progname="'SLS06_013RPT_VUE'"
-        :progid="'1'"
+        :progid="
+          activeTab === '종합'
+            ? 1
+            : activeTab === '매장별'
+            ? 2
+            : activeTab === '결제수단별'
+            ? 3
+            : activeTab === '할인별'
+            ? 4
+            : activeTab === '시간대별'
+            ? 5
+            : 6
+        "
         :rowData="rowData"
         :reload="reload"
         :setFooter="true"
         :setFooterExpressions="setFooterExpressions"
         :setFooterColID="setFooterColID"
+        :setGroupFooterExpressions="setFooterExpressions"
+        :setGroupFooterColID="setFooterColID"
+        :setGroupFooter="activeTab === '매장별' && groupColumnId !== ''"
+        :setGroupColumnId="activeTab === '매장별' ? groupColumnId : ''"
+        :setGroupOrderByColumnId="activeTab === '매장별' ? groupColumnId : ''"
         :documentTitle="'SLS06_013RPT'"
         :rowStateeditable="false"
         :documentSubTitle="documentSubTitle"
@@ -71,7 +110,7 @@
 </template>
 
 <script setup>
-import { getDailySalesAnalysis } from "@/api/misales";
+import { getDailySalesAnalysis, dailySalesAnalysisStore } from "@/api/misales";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -103,7 +142,7 @@ import { insertPageLog } from "@/customFunc/customFunc";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -169,10 +208,42 @@ const setFooterExpressions = ref([
 const tabList = ["종합", "매장별", "결제수단별", "할인별", "시간대별", "주문유형별"];
 const activeTab = ref("종합");
 const reload = ref(false);
-const rowData = ref([]);
+
+// 탭별 데이터
+const rowDataTotal = ref([]); // 종합 탭
+const rowDataStore = ref([]); // 매장별 탭
+
+// 현재 탭에 보여줄 데이터
+const rowData = computed(() => {
+  if (activeTab.value === "종합") {
+    return rowDataTotal.value;
+  }
+  if (activeTab.value === "매장별") {
+    return rowDataStore.value;
+  }
+  // 다른 탭은 아직 별도 프로시저 미사용 → 빈 데이터
+  return [];
+});
 const afterSearch = ref(false);
 const selectedstartDate = ref();
 const selectedendDate = ref();
+
+// 그룹 소계 옵션 (매출 일자별 / 매장별)
+const groupByDate = ref(false);
+const groupByStore = ref(false);
+
+// 그룹핑 기준 컬럼 (체크박스 조합에 따라 dtmDate, strStoreName, 또는 둘 다)
+const groupColumnId = computed(() => {
+  const cols = [];
+  if (groupByDate.value) {
+    cols.push("dtmDate");
+  }
+  if (groupByStore.value) {
+    cols.push("strName");
+  }
+  // 아무 것도 선택 안 했을 때는 기본값(빈 문자열)로 그룹 미적용
+  return cols.join(",");
+});
 
 /**
  * 선택한 매출 시작일자
@@ -190,6 +261,14 @@ const startDate = (e) => {
 const endDate = (e) => {
   selectedendDate.value = e;
 };
+
+// 그룹 옵션 변경 시 그리드 리로드
+watch(
+  () => [groupByDate.value, groupByStore.value],
+  () => {
+    reload.value = !reload.value;
+  }
+);
 
 const store = useStore();
 const loginedstrLang = store.state.userData.lngLanguage;
@@ -217,27 +296,36 @@ const searchButton = async () => {
   store.state.loading = true;
   try {
     initGrid();
-    
-    //그리드 갱신
+
+    // 그리드 갱신
     reload.value = !reload.value;
 
-    //매장 선택
-    let selectedStorearr;
-    
-    selectedStorearr = selectedStores.value;
-    
-    // 일자별 조회
-    const res = await getDailySalesAnalysis(
+    // 매장 선택
+    const selectedStorearr = selectedStores.value;
+
+    // 종합 / 매장별 탭 데이터를 동시에 조회
+    const [resTotal, resStore] = await Promise.all([
+      getDailySalesAnalysis(
         selectedGroup.value,
         selectedStorearr,
         selectedstartDate.value,
-        selectedendDate.value,
-    );
+        selectedendDate.value
+      ),
+      dailySalesAnalysisStore(
+        selectedGroup.value,
+        selectedStorearr,
+        selectedstartDate.value,
+        selectedendDate.value
+      ),
+    ]);
 
-    // console.log(res);
-    
-    rowData.value = res.data.dailySalesAnalysis;
-    
+    rowDataTotal.value = resTotal.data.dailySalesAnalysis || [];
+    // 매장별 프로시저 결과 키는 dailySalesAnalysisStore 또는 dailySalesAnalysis 중 하나일 수 있음
+    rowDataStore.value =
+      resStore.data.dailySalesAnalysisStore ||
+      resStore.data.dailySalesAnalysis ||
+      [];
+
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -280,8 +368,11 @@ const lngStoreAttrs = (e) => {
  */
 
 const initGrid = () => {
-  if (rowData.value.length > 0) {
-    rowData.value = [];
+  if (rowDataTotal.value.length > 0) {
+    rowDataTotal.value = [];
+  }
+  if (rowDataStore.value.length > 0) {
+    rowDataStore.value = [];
   }
 };
 

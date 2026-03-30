@@ -275,20 +275,67 @@ const searchButton = async () => {
   try {
     store.state.loading = true;
     initGrid();
-    let strcond = cond4.value ? "1," : "";
-    strcond += cond5.value ? "2," : "";
-    strcond += cond6.value ? "3," : "";
-    strcond += cond7.value ? "4," : "";
-    strcond += cond8.value ? "5," : "";
-    strcond += cond9.value ? "6," : "";
-    strcond += cond10.value ? "7," : "";
-    strcond += cond11.value ? "8," : "";
-    strcond += cond12.value ? "9," : "";
-    strcond += cond13.value ? "10," : "";
-    strcond += cond14.value ? "11," : "";
-    strcond += cond15.value ? "12," : "";
-    strcond += cond16.value ? "13," : "";
-    strcond = strcond.slice(0, strcond.length - 1);
+    // @strApprovalType: DB 승인구분 순서(1~13) 고정 슬롯 — 체크 시 해당 코드, 미체크 시 0
+    // 1생성 2판매 3충전 4사용 5회수 6교환폐기 7교환판매 8교환충전 9취소 10출고 11차감 12분실 13증정 (전체 cond4는 슬롯 없음)
+    const strcond = [
+      [cond5, 1],
+      [cond7, 2],
+      [cond8, 3],
+      [cond9, 4],
+      [cond10, 5],
+      [cond11, 6],
+      [cond12, 7],
+      [cond13, 8],
+      [cond14, 9],
+      [cond6, 10],
+      [null, 11],
+      [cond15, 12],
+      [cond16, 13],
+    ]
+      .map(([r, code]) => (r && r.value ? String(code) : "0"))
+      .join(",");
+
+    // DEBUG: 조회 시 콘솔 확인용 (불필요 시 제거)
+    const debugPayload = {
+      GROUP_CD: groupCd.value,
+      STORE_CDS: storeCds.value,
+      COND: cond.value,
+      COND2: cond3.value,
+      START_DATE: sd.value,
+      END_DATE: ed.value,
+      COND3: strcond,
+      LANG: store.state.userData.strLanguage,
+    };
+    console.group("[CRM65_002RPT] getGftLedgerTradeList");
+    console.log(
+      "권종(cond)→API COND2:",
+      cond3.value,
+      "| 조회조건 슬롯(1~13순)→API COND3:",
+      JSON.stringify(strcond)
+    );
+    console.log(
+      "체크 cond4~16 (전체,생성,출고,판매,…):",
+      [
+        cond4.value,
+        cond5.value,
+        cond6.value,
+        cond7.value,
+        cond8.value,
+        cond9.value,
+        cond10.value,
+        cond11.value,
+        cond12.value,
+        cond13.value,
+        cond14.value,
+        cond15.value,
+        cond16.value,
+      ]
+        .map((v) => (v ? "1" : "0"))
+        .join("")
+    );
+    console.log("요청 본문 스냅샷(JSON):", JSON.stringify(debugPayload));
+    console.groupEnd();
+
     const res = await getGftLedgerTradeList(
       groupCd.value,
       storeCds.value,

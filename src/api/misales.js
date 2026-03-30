@@ -1595,7 +1595,21 @@ export const getDailySalesAnalysis = (
 ) => {
   return api2.post("/MISALES/SLS06_013RPT.asmx/getDailySalesAnalysis", {
     GROUP_CD: groupCd,
-    STORE_CDS: storeCds,  
+    STORE_CDS: storeCds,
+    START_DATE: startDate,
+    END_DATE: endDate,
+  });
+};
+
+export const dailySalesAnalysisStore = (
+  groupCd,
+  storeCds,
+  startDate,
+  endDate,
+) => {
+  return api2.post("/MISALES/SLS06_013RPT.asmx/getDailySalesAnalysisStore", {
+    GROUP_CD: groupCd,
+    STORE_CDS: storeCds,
     START_DATE: startDate,
     END_DATE: endDate,
   });
