@@ -671,7 +671,7 @@ const emitStoreType = (value) => {
 };
 
 const emitStoreCode = (value) => {
-  console.log(value);
+  // console.log(value);
   if (value != "0") {
     const selectedNm = storeCd.value.filter(
       (item) => item.lngStoreCode == value
@@ -852,7 +852,7 @@ watch(
 watch(
   () => props.setDefaultStoreCd,
   () => {
-    console.log(props.setDefaultStoreCd);
+    // console.log(props.setDefaultStoreCd);
     if (props.setDefaultStoreCd != "") {
       selectedStoreCode.value = props.setDefaultStoreCd;
       const selectedNm = storeCd.value.filter(
@@ -866,7 +866,7 @@ watch(
 watch(
   () => props.defaultStore,
   () => {
-    console.log(props.defaultStore);
+    // console.log(props.defaultStore);
     if (props.defaultStore == true) {
       selectedStoreCode.value = "0";
       emit("update:storeCd", "0");

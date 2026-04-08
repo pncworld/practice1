@@ -103,6 +103,7 @@ const {
   poskiosk,
   naming,
   naming2,
+  blnBrandAdmin,
 } = defineProps({
   isVisible: { type: Boolean, default: false }, // 팝업 가시성 관리
   storeCd: { type: String, default: "" },
@@ -115,6 +116,7 @@ const {
   poskiosk: { type: String },
   naming: { type: String },
   naming2: { type: String, default: "메뉴키" },
+  blnBrandAdmin: { type: Boolean, default: false },
 });
 const store = useStore(); // vuex store
 const userData = store.state.userData;
@@ -133,27 +135,33 @@ const rowData = ref([]);
 const showGrid = ref(false);
 const showStoreList = async () => {
   let res;
-  //comsole.log(progname);
-  //comsole.log(progid);
-  //comsole.log(storeCd);
-  //comsole.log(posNo);
+  const blnBrandAdminValue = blnBrandAdmin ? 1 : 0;
   try {
-    res = await api[poskiosk](groupCd.value, storeCd, areaCd, posNo);
+    if (poskiosk === "getStoreAndPosList3") {
+      res = await api[poskiosk](
+        groupCd.value,
+        storeCd,
+        areaCd,
+        posNo,
+        blnBrandAdminValue
+      );
+    } else {
+      res = await api[poskiosk](groupCd.value, storeCd, areaCd, posNo);
+    }
   } catch (error) {
-    //comsole.log(error);
   } finally {
     showGrid.value = true;
+    const rawList =
+      res?.data?.storepos ?? res?.data?.store ?? [];
     if (searchWord.value == "") {
-      rowData.value = res.data.store;
+      rowData.value = rawList;
     } else {
-      rowData.value = res.data.store.filter(
+      rowData.value = rawList.filter(
         (item) =>
           item.strName.includes(searchWord.value) ||
           item.lngStoreCode.toString().includes(searchWord.value)
       );
     }
-
-    //comsole.log(rowData.value);
   }
 };
 const selectedRows = ref([]);
@@ -216,7 +224,7 @@ const dupliStore = async () => {
               areaCd2.join(","),
               posNo2.join(",")
             );
-            console.log(res3);
+            //console.log(res3);
           } catch (error) {
             ////console.log(error);
           } finally {
