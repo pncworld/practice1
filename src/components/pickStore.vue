@@ -1,17 +1,32 @@
 <template>
   <div
-    class="flex justify-center md:justify-end text-base mt-2 ml-12"
-    :class="dynamicStoreClass2">
-    <div class="items-center font-bold hidden md:flex text-nowrap">
+    :class="[
+      'flex text-base',
+      compactSearchBar
+        ? 'mt-0 ml-0 min-w-0 w-full items-center justify-start gap-4'
+        : 'justify-center md:justify-end mt-2 ml-12',
+      dynamicStoreClass2,
+    ]">
+    <div
+      :class="
+        compactSearchBar
+          ? 'flex items-center text-base font-semibold text-nowrap shrink-0'
+          : 'items-center font-bold hidden md:flex text-nowrap'
+      ">
       {{ MainName }}
     </div>
     <div v-show="hideit2">
       <select
-        :disabled="isDisabled"
-        :class="dynamicStoreClass3"
-        v-model="selectedGroupCd"
         id="storeGroup"
-        class="hidden md:inline-block border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-32"
+        v-model="selectedGroupCd"
+        :disabled="isDisabled"
+        :class="[
+          'hidden md:inline-block shrink-0 rounded-md border border-gray-800 text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500',
+          compactSearchBar
+            ? 'ml-0 h-8 min-h-8 w-[5.75rem] px-2 py-0 text-sm'
+            : 'ml-5 w-32 p-2',
+          dynamicStoreClass3,
+        ]"
         @change="emitStoreGroup($event.target.value)">
         <option
           :value="item.lngStoreGroup"
@@ -23,14 +38,19 @@
     </div>
     <div v-show="hideit3">
       <select
+        v-model="selectedStoreType"
         :disabled="isDisabled"
-        :class="dynamicStoreClass3"
-        class="hidden md:inline-block border border-gray-800 rounded-md p-2 ml-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-20"
+        :class="[
+          'hidden md:inline-block shrink-0 rounded-md border border-gray-800 text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500',
+          compactSearchBar
+            ? 'ml-0 h-8 w-[4.5rem] px-1.5 py-0 text-sm'
+            : 'ml-2 w-20 p-2',
+          dynamicStoreClass3,
+        ]"
         @change="
           setStore($event.target.value);
           emitStoreType($event.target.value);
-        "
-        v-model="selectedStoreType">
+        ">
         <option value="0">전체</option>
         <option
           :value="item.lngStoreAttr"
@@ -40,7 +60,13 @@
         </option>
       </select>
     </div>
-    <div class="w-64 relative ml-5" v-show="hideit">
+    <div
+      :class="
+        compactSearchBar
+          ? 'relative max-w-[12rem] min-w-0 flex-1 basis-auto'
+          : 'w-64 relative ml-5'
+      "
+      v-show="hideit">
       <!-- <select
         :disabled="isDisabled"
         :class="dynamicStoreClass"
@@ -84,12 +110,16 @@
         class="w-60 h-[40%] mx-3"
         label="매장을 선택하세요" /> -->
       <div
-        class="h-[40px] w-[85%] bg-white border border-black rounded-lg text-xs text-nowrap"
-        :disabled="isDisabled"
-        :class="dynamicStoreClass">
+        :class="[
+          compactSearchBar
+            ? 'h-8 min-h-8 w-full max-w-[12rem] min-w-0 text-nowrap rounded-md border border-black bg-white text-sm'
+            : 'h-[40px] w-[85%] bg-white border border-black rounded-lg text-xs text-nowrap',
+          dynamicStoreClass,
+        ]"
+        :disabled="isDisabled">
         <v-select
           :reduce="(option) => option.lngStoreCode"
-          class="style-chooser h-full text-sm !disabled:text-black"
+          class="style-chooser h-full !disabled:text-black text-sm"
           v-model="selectedStoreCode"
           :disabled="isDisabled"
           :clearable="!isDisabled"
@@ -436,14 +466,82 @@ const props = defineProps({
     default: "",
   },
   setDefaultStoreCd: {
-    type: String,
+    type: [String, Number],
     default: "",
+  },
+  /** Vuex 목록에 없을 때 v-select 표시용(상세 행 등) */
+  extraStoreOption: {
+    type: Object,
+    default: null,
   },
   dynamicStoreClass3: {
     type: String,
     default: "",
   },
+  /** true: 상단 조회 바 — 높이·여백을 옆 컨트롤과 맞춤 */
+  compactSearchBar: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+const optionMatchesCode = (item, code) => {
+  if (item == null || code === "" || code === null || code === undefined)
+    return false;
+  return item.lngStoreCode == code;
+};
+
+/** extraStoreOption을 storeCd2/storeCd에 합쳐 vue-select가 라벨을 찾게 함 */
+const mergeExtraStoreIntoOptions = () => {
+  const ex = props.extraStoreOption;
+  if (!ex || ex.lngStoreCode == null || ex.lngStoreCode === "") return;
+  const code = ex.lngStoreCode;
+  const base2 = storeCd2.value;
+  if (!Array.isArray(base2)) return;
+  if (base2.some((item) => optionMatchesCode(item, code))) return;
+  const row = {
+    lngStoreCode: code,
+    strName: ex.strName || String(code),
+    lngStoreAttr: ex.lngStoreAttr ?? 0,
+  };
+  storeCd2.value = [...base2, row];
+  if (selectedStoreType.value == 0 || selectedStoreType.value === "0") {
+    storeCd.value = [...storeCd2.value];
+  } else {
+    const filtered = storeCd2.value.filter(
+      (item) => item.lngStoreAttr == selectedStoreType.value
+    );
+    storeCd.value = filtered.some((item) => optionMatchesCode(item, code))
+      ? filtered
+      : [...filtered, row];
+  }
+};
+
+const resolveDefaultStoreCode = (raw) => {
+  if (raw === "" || raw === null || raw === undefined) return raw;
+  mergeExtraStoreIntoOptions();
+  const list = storeCd.value;
+  const found = list.find((item) => optionMatchesCode(item, raw));
+  return found ? found.lngStoreCode : raw;
+};
+
+const emitStoreNameForCode = (code) => {
+  const c = code == null ? "0" : code;
+  if (c === "0" || c === 0) {
+    emit("storeNm", "전체");
+    return;
+  }
+  mergeExtraStoreIntoOptions();
+  const found = storeCd.value.find((item) => optionMatchesCode(item, c));
+  if (found) {
+    emit("storeNm", found.strName);
+    return;
+  }
+  const ex = props.extraStoreOption;
+  if (ex && optionMatchesCode(ex, c)) {
+    emit("storeNm", ex.strName || String(c));
+  }
+};
 
 const MainName = ref("");
 const hideit = ref(props.hidesub);
@@ -547,6 +645,7 @@ watch(
     storeType.value = store.state.storeType;
     storeCd.value = store.state.storeCd;
     storeCd2.value = store.state.storeCd;
+    mergeExtraStoreIntoOptions();
     storeAreaCd2.value = store.state.storeAreaCd;
     selectedStoreAreaCd.value = 0;
 
@@ -578,6 +677,7 @@ onMounted(async () => {
 
   storeCd.value = store.state.storeCd;
   storeCd2.value = store.state.storeCd;
+  mergeExtraStoreIntoOptions();
   storeAreaCd2.value = store.state.storeAreaCd;
   selectedStoreAreaCd.value = 0;
   MainName.value = props.mainName;
@@ -601,18 +701,10 @@ onMounted(async () => {
 
   emit("update:storeGroup", store.state.userData.lngStoreGroup);
   emit("update:storeType", selectedStoreType.value);
-  if (props.setDefaultStoreCd != "") {
-    selectedStoreCode.value = props.setDefaultStoreCd;
-
-    if (selectedStoreCode.value != null) {
-      const selectedNm = storeCd.value.filter(
-        (item) => item.lngStoreCode == props.setDefaultStoreCd
-      )[0].strName;
-
-      emit("storeNm", selectedNm);
-    } else {
-      emit("storeNm", "전체");
-    }
+  if (props.setDefaultStoreCd !== "" && props.setDefaultStoreCd != null) {
+    const resolved = resolveDefaultStoreCode(props.setDefaultStoreCd);
+    selectedStoreCode.value = resolved;
+    emitStoreNameForCode(resolved);
   } else {
     if (props.defaultStoreNm == "") {
       emit("storeNm", storenm);
@@ -671,13 +763,11 @@ const emitStoreType = (value) => {
 };
 
 const emitStoreCode = (value) => {
-  // console.log(value);
-  if (value != "0") {
-    const selectedNm = storeCd.value.filter(
-      (item) => item.lngStoreCode == value
-    )[0].strName;
-
-    emit("storeNm", selectedNm);
+  if (value != "0" && value != 0) {
+    mergeExtraStoreIntoOptions();
+    const hit = storeCd.value.find((item) => item.lngStoreCode == value);
+    if (hit) emit("storeNm", hit.strName);
+    else emitStoreNameForCode(value);
     emit("update:storeCd", value);
   } else {
     emit("storeNm", "전체");
@@ -851,22 +941,30 @@ watch(
 
 watch(
   () => props.setDefaultStoreCd,
-  () => {
-    // console.log(props.setDefaultStoreCd);
-    if (props.setDefaultStoreCd != "") {
-      selectedStoreCode.value = props.setDefaultStoreCd;
-      const selectedNm = storeCd.value.filter(
-        (item) => item.lngStoreCode == props.setDefaultStoreCd
-      )[0].strName;
-
-      emit("storeNm", selectedNm);
+  (cd) => {
+    if (cd !== "" && cd != null) {
+      const resolved = resolveDefaultStoreCode(cd);
+      selectedStoreCode.value = resolved;
+      emitStoreNameForCode(resolved);
     }
   }
+);
+
+watch(
+  () => props.extraStoreOption,
+  () => {
+    mergeExtraStoreIntoOptions();
+    if (props.setDefaultStoreCd !== "" && props.setDefaultStoreCd != null) {
+      const resolved = resolveDefaultStoreCode(props.setDefaultStoreCd);
+      selectedStoreCode.value = resolved;
+      emitStoreNameForCode(resolved);
+    }
+  },
+  { deep: true }
 );
 watch(
   () => props.defaultStore,
   () => {
-    // console.log(props.defaultStore);
     if (props.defaultStore == true) {
       selectedStoreCode.value = "0";
       emit("update:storeCd", "0");
@@ -875,10 +973,10 @@ watch(
       selectedStoreCode.value = store.state.userData.lngPosition;
       emit("update:storeCd", selectedStoreCode.value);
 
-      const selectedNm = storeCd.value.filter(
+      const hit = storeCd.value.find(
         (item) => item.lngStoreCode == selectedStoreCode.value
-      )[0].strName;
-      emit("storeNm", selectedNm);
+      );
+      emit("storeNm", hit?.strName ?? "");
     }
   }
 );
@@ -934,11 +1032,20 @@ watch(
   text-overflow: ellipsis;
 }
 
+/* disabled 시 vue-select 기본 변수(--vs-state-disabled-color = 반투명 회색) 무력화 */
+.style-chooser.vs--disabled {
+  --vs-state-disabled-color: #000000;
+  --vs-disabled-color: #000000;
+  --vs-selected-color: #000000;
+  --vs-search-input-color: #000000;
+  --vs-colors--light: #000000;
+}
 .style-chooser.vs--disabled .vs__selected {
   font-size: 14px !important;
   font-weight: 500;
   background: rgb(230, 230, 230);
-  color: black !important; /* Tailwind text-gray-700 */
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
   display: flex;
   justify-content: left !important;
   align-items: center;
@@ -946,5 +1053,12 @@ watch(
   min-width: 110% !important;
   z-index: 45;
   overflow: hidden !important;
+  opacity: 1 !important;
+}
+.style-chooser.vs--disabled .vs__dropdown-toggle,
+.style-chooser.vs--disabled .vs__selected-options {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  opacity: 1 !important;
 }
 </style>

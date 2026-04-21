@@ -312,6 +312,25 @@ export const getOrderInfoDetail = (groupCd, storeCd, orderNo) => {
     ORDER_NO: orderNo,
   });
 };
+
+
+export const getStkOrderDetail = (
+  groupCd,
+  storeCd,
+  orderNo,
+  supplierId,
+  orderDateYyyyMmDd,
+  strLanguage = "01",
+) => {
+  return api2.post("/MIPUR/PUR03_035INS.asmx/GetstkOrderDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    ORDER_NO: orderNo,
+    SUPPLIER_ID: supplierId,
+    ORDER_DATE: orderDateYyyyMmDd,
+    LANGUAGE_TY: strLanguage,
+  });
+};
 export const getPurChaseEnrollList = (
   groupCd,
   storeCd,
@@ -891,14 +910,48 @@ export const getCloseDtmDate2 = (groupCd, storeCd, date, generic) => {
   });
 };
 
-export const saveOrderMasterDetailByPart = (
+export const getOrderTimeCheck = (groupCd, storeCd) => {
+  return api2.post("/MIPUR/PUR03_035INS.asmx/getOrderTimeCheck", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+
+export const updateOrderStockDetail = (
+  groupCd,
+  storeCd,
+  orderNo,
+  orderSeq,
+  supplierId,
+  stockId,
+  qty,
+  supply,
+  tax,
+  comment2,
+  comment,
+  sequence
+) => {
+  return api2.post("/MIPUR/PUR03_035INS.asmx/updateOrderStockDetail", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    ORDER_NO: orderNo,
+    ORDER_SEQ: orderSeq,
+    SUPPLIERID: supplierId,
+    STOCKIDS: stockId,
+    QTY: qty,
+    SUPPLY: supply,
+    TAX: tax,
+    COMMENT2: comment2,
+    COMMENT: comment,
+    SEQUENCE: sequence,
+  });
+};
+
+export const setStockOrderTemp = (
   groupCd,
   storeCd,
   sdate,
   edate,
-  comment,
-  sequence,
-  interfacediv,
   supplierid,
   stockids,
   qty,
@@ -908,14 +961,11 @@ export const saveOrderMasterDetailByPart = (
   comment2,
   partcd
 ) => {
-  return api2.post("/MIPUR/PUR03_035INS.asmx/saveOrderMasterDetailByPart", {
+  return api2.post("/MIPUR/PUR03_035INS.asmx/setStockOrderTemp", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     SDATE: sdate,
     EDATE: edate,
-    COMMENT: comment,
-    SEQUENCE: sequence,
-    INTERFACE: interfacediv,
     SUPPLIERID: supplierid,
     STOCKIDS: stockids,
     QTY: qty,
@@ -924,6 +974,26 @@ export const saveOrderMasterDetailByPart = (
     TAX: tax,
     COMMENT2: comment2,
     PART: partcd,
+  });
+};
+
+export const saveOrderMasterDetailByPart = (
+  groupCd,
+  storeCd,
+  sdate,
+  edate,
+  comment,
+  sequence,
+  interfacediv
+) => {
+  return api2.post("/MIPUR/PUR03_035INS.asmx/saveOrderMasterDetailByPart", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    COMMENT: comment,
+    SEQUENCE: sequence,
+    INTERFACE: interfacediv,
   });
 };
 

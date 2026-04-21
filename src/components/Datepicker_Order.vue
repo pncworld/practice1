@@ -1,35 +1,56 @@
 <template>
-  <div class="flex justify-start items-center space-x-5 w-[500px] mt-2">
+  <div
+    :class="
+      compactRow
+        ? 'flex w-full min-w-0 items-center gap-4 mt-0'
+        : 'flex justify-start items-center space-x-5 w-[500px] mt-2'
+    ">
     <div
-      class="w-auto font-semibold flex items-center text-nowrap text-base ml-12">
+      :class="
+        compactRow
+          ? 'flex items-center text-base font-semibold text-nowrap shrink-0'
+          : 'w-auto font-semibold flex items-center text-nowrap text-base ml-12'
+      ">
       {{ mainName }}
     </div>
     <div
-      class="grid grid-cols-[2fr,1fr,2fr,1fr,1fr] grid-rows-1 justify-start h-11 pr-14 space-x-1">
+      :class="
+        compactRow
+          ? 'flex min-w-0 flex-1 flex-nowrap items-center justify-start gap-2'
+          : 'grid grid-cols-[2fr,1fr,2fr,1fr,1fr] grid-rows-1 justify-start h-11 pr-14 space-x-1'
+      ">
       <input
         type="date"
         :disabled="disable"
-        class="border rounded-lg h-10 w-36 text-base mr-2 pl-5 disabled:bg-gray-500"
+        :class="
+          compactRow
+            ? 'h-8 min-h-8 w-[8.75rem] max-w-[8.75rem] shrink-0 rounded-md border border-black px-2 text-sm disabled:bg-gray-500'
+            : 'border rounded-lg h-10 w-36 text-base mr-2 pl-5 disabled:bg-gray-500'
+        "
         v-model="selectedStartDate"
         @change="changeStartDate"
         :max="maxEndDate" />
-      <span class="items-center flex">~</span>
+      <span class="flex shrink-0 items-center text-sm text-gray-600">~</span>
       <input
         type="date"
         :disabled="disable"
-        class="border rounded-lg h-10 w-36 text-base pl-5 ml-2 disabled:bg-gray-500"
+        :class="
+          compactRow
+            ? 'h-8 min-h-8 w-[8.75rem] max-w-[8.75rem] shrink-0 rounded-md border border-black px-2 text-sm disabled:bg-gray-500'
+            : 'border rounded-lg h-10 w-36 text-base pl-5 ml-2 disabled:bg-gray-500'
+        "
         v-model="selectedEndDate"
         @change="changeEndDate"
         :max="maxEndDate" />
       <button
-        class="w-[30px] ml-2"
+        :class="compactRow ? 'ml-0.5 flex h-8 w-8 shrink-0 items-center justify-center' : 'w-[30px] ml-2'"
         @click="toggleRadio"
         :disabled="disable"
         v-if="disable2">
-        <img src="../assets/choiceCalendar.png" class="w-full" alt="" />
+        <img src="../assets/choiceCalendar.png" class="max-h-7 w-auto" alt="" />
       </button>
     </div>
-    <div class="flex justify-start">
+    <div class="flex shrink-0 justify-start">
       <div
         v-show="showRadio"
         class="-mt-2 p-1 -ml-10 w-40 h-40 bg-gray-100 rounded-lg shadow-md z-[70] absolute">
@@ -191,6 +212,11 @@ const props = defineProps({
     default: true,
   },
   setLimitYear: {
+    type: Boolean,
+    default: false,
+  },
+  /** true: 조회 툴바 한 줄 — 높이·여백을 콤보와 맞춤 */
+  compactRow: {
     type: Boolean,
     default: false,
   },

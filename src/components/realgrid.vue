@@ -1181,6 +1181,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  suppressEdit: {
+    // true면 셀 수정·체크바 체크 불가 (잠금 등)
+    type: Boolean,
+    default: false,
+  },
 });
 
 // 2구간
@@ -1199,16 +1204,20 @@ const emit = defineEmits([
   "selcetedrowData",
   "updatedRowData",
   "updatedRowData2",
+  "updatedrowData",
   "clickedRowData",
   "clickedRowData2",
   "dblclickedRowData",
   "selectedIndex",
+  "selectedIndex2",
+  "selectedindex",
   "checkedRowData",
   "checkedRowIndex",
   "getJsonData",
   "sendRowState",
   "deleteRows",
   "realgridName",
+  "realgridname",
   "allStateRows",
   "buttonClicked",
   "clickedButtonCol",
@@ -1272,6 +1281,8 @@ const funcshowGrid = async () => {
           item.strColType === "float" ||
           item.strColType === "double"
         ? "number"
+        : String(item.strMask || "").trim() === "@@@@-@@-@@"
+        ? "text" // YYYYMMDD 저장, displayCallback으로 표시
         : item.strColType == "date"
         ? "datetime"
         : "text",
@@ -1870,6 +1881,21 @@ const funcshowGrid = async () => {
     },
 
     datetimeFormat: item.strMask == "" ? "yyyy-MM-dd" : item.strMask, // sql 에서 mstgridinfo 에서 date  일때 기본값이 있고 정의할 수 있음
+    // YYYYMMDD 형식 값을 yyyy-MM-dd로 표시 (실제 데이터는 변경하지 않음)
+    // mstGridInfo strMask='@@@@-@@-@@' 컬럼만 적용
+    ...(String(item.strMask || "").trim() === "@@@@-@@-@@" && {
+      displayCallback: function (grid, index, value) {
+        if (
+          value != null &&
+          String(value).length === 8 &&
+          /^\d{8}$/.test(String(value))
+        ) {
+          const s = String(value);
+          return s.substr(0, 4) + "-" + s.substr(4, 2) + "-" + s.substr(6, 2);
+        }
+        return value;
+      },
+    }),
     width: item.intHdWidth,
     numberFormat:
       props.suffixColumnwon == "lngPrice" && item.strColID == "lngPrice"
@@ -2911,8 +2937,14 @@ const funcshowGrid = async () => {
   //gridView.displayOptions.fitStyle = "even";
   gridView.sortingOptions.enabled = true;
   gridView.sortingOptions.commitBeforeSorting = true;
-  gridView.editOptions.editable =
-    props.checkRenderEditable == true ? true : false;
+  const suppressLocked = props.suppressEdit === true;
+  gridView.editOptions.editable = suppressLocked
+    ? false
+    : props.checkRenderEditable == true
+      ? true
+      : false;
+  gridView.editOptions.readOnly = suppressLocked;
+  gridView.editOptions.checkable = !suppressLocked;
   gridView.editOptions.updatable = true;
 
   gridView.editOptions.deletable = true;
@@ -3430,11 +3462,7 @@ const funcshowGrid = async () => {
 
     const current = clickData.dataRow;
 
-    if (props.setTreeView == false) {
-      selectedRowData.value = dataProvider.getRows()[current];
-    } else {
-      selectedRowData.value = dataProvider.getJsonRow(current);
-    }
+    selectedRowData.value = dataProvider.getJsonRow(current);
 
     if (selectedRowData.value) {
       selectedRowData.value.index = clickData.itemIndex;
@@ -3446,7 +3474,23 @@ const funcshowGrid = async () => {
   isGridInitialized.value = true;
 };
 
+const refreshSuppressEditState = () => {
+  if (!gridView || !isGridInitialized.value) return;
+  const locked = props.suppressEdit === true;
+  gridView.editOptions.editable = locked
+    ? false
+    : props.checkRenderEditable == true;
+  gridView.editOptions.readOnly = locked;
+  gridView.editOptions.checkable = !locked;
+  gridView.refresh(true);
+};
+
 // 7구간
+watch(
+  () => [props.suppressEdit, props.checkRenderEditable],
+  () => refreshSuppressEditState()
+);
+
 watch(
   () => props.changeValue,
   () => {

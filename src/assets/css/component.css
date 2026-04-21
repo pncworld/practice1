@@ -45,7 +45,7 @@ html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address
     /* 고객사 로고 컬러에 맞춰 색상 변경 필요할 때는 아래 두 변수만 수정 */
     /* BRAND GRADIENT (HEADER / TAB BG) */
     --gradient-primary: linear-gradient(90deg, #318cec 0%, #41b6e7 100%);
-    /* --gradient-primary: linear-gradient(90deg, #dc2626 0%, #fca5a5 100%); */
+    /* gradient-primary: linear-gradient(90deg, #CF130C 0%, #DF5E54 100%); */
     /* BRAND BACKGROUND */
     --brand-bg: #f5f8fc;
 
