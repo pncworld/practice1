@@ -336,7 +336,7 @@
                   "
                   class="h-20 w-28 flex justify-center"
                   ><img
-                    :src="`https://www.pncapi.kr/MenuImage/t_pos/${item.strUserFileName}?v=${Date.now()}`"
+                    :src="getMenuKeyImageSrc(item)"
                     alt=""
                     class="h-full w-full" /></span
                 ><span
@@ -562,22 +562,15 @@ const handleStoreCd = async (newValue) => {
   }
   nowStoreCd.value = newValue;
 
-  // const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
-  // MenuList.value = res2.data.menuList;
-  // MenuGroup.value = res2.data.menuGroup;
-  // SubMenuGroup.value = res2.data.submenuGroup;
-  
   if (store.state.userData.lngCommonMenu == "1") {
     const res2 = await getMenuList(groupCd.value, 0);
 
-    //comsole.log(res2);
     MenuList.value = res2.data.menuList;
     MenuGroup.value = res2.data.menuGroup;
     SubMenuGroup.value = res2.data.submenuGroup;
   } else {
     const res2 = await getMenuList(groupCd.value, nowStoreCd.value);
 
-    //comsole.log(res2);
     MenuList.value = res2.data.menuList;
     MenuGroup.value = res2.data.menuGroup;
     SubMenuGroup.value = res2.data.submenuGroup;
@@ -616,6 +609,47 @@ const isBrandAdmin = computed(
 
 const userData = store.state.userData;
 const groupCd = ref(userData.lngStoreGroup);
+
+/**
+ * strUserFileName이 있을 때만(템플릿 v-if와 동일) 이미지 URL만 분기.
+ * MST01_003INS.vue: lngCommonMenu=="1" 이면 Image/ 매장·메뉴코드 패딩 우선, 아니면 t_pos/
+ */
+const isCommonMenuGroup = computed(
+  () => store.state.userData.lngCommonMenu == "1"
+);
+
+const buildStoreMenuImageFileName = (storeCd, menuCd) => {
+  const s = storeCd != null ? String(storeCd) : "";
+  const m = menuCd != null ? String(menuCd) : "";
+  if (!s || s === "0" || !m || m === "0") {
+    return "";
+  }
+  return `${s.padStart(10, "0")}_${m.padStart(10, "0")}.jpg`;
+};
+
+const getMenuKeyImageSrc = (item) => {
+  if (!item || item.strUserFileName === "" || item.strUserFileName == null) {
+    return "";
+  }
+  const v = Date.now();
+  if (!isCommonMenuGroup.value) {
+    return `https://www.pncapi.kr/MenuImage/t_pos/${item.strUserFileName}?v=${v}`;
+  }
+  const storeCd =
+    nowStoreCd.value != null && nowStoreCd.value !== ""
+      ? String(nowStoreCd.value)
+      : "";
+  const menuCd =
+    item.lngKeyscrNo != null && item.lngKeyscrNo !== ""
+      ? String(item.lngKeyscrNo)
+      : "";
+  const paddedName = buildStoreMenuImageFileName(storeCd, menuCd);
+  if (paddedName) {
+    return `https://www.pncapi.kr/MenuImage/Image/${paddedName}?v=${v}`;
+  }
+  return `https://www.pncapi.kr/MenuImage/Image/${item.strUserFileName}?v=${v}`;
+};
+
 const modified = ref(false);
 const afterSearch = ref(false);
 const MenuList = ref([]);

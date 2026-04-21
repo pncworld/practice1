@@ -235,7 +235,7 @@
           @click="selectMenu(3)"
           :class="{ 'text-blue-400 bg-blue-100': selectedMenu == 3 }"
           :disabled="selectedMultiple">
-          키오스크 이미지 설정
+          이미지 설정
         </button>
       </div>
       <div>
@@ -1060,14 +1060,37 @@
         </div>
         <div v-show="selectedMenu == 3" class="h-[90%] w-full">
           <div
-            class="grid grid-rows-1 grid-cols-[2fr,3fr] w-[80%] h-[40%] ml-10 mt-10 border pl-5">
-            <div class="flex justify-center items-center">
-              <img
-                :src="`https://www.pncapi.kr/MenuImage/Image/${fileName}?v=${Date.now()}`"
-                @error="`../../assets/noimage2.png`"
-                class="w-[80%] h-[80%]" />
+            v-if="isStoreImageFeatureEnabled"
+            class="grid grid-cols-[1fr,1fr,1fr,2fr] gap-2 items-center w-[80%] mt-3">
+            <div class="customtableIndex border border-gray-400 rounded-l-lg h-full">
+              공통 여부
             </div>
-            <div class="grid grid-rows-[1fr,5fr] grid-cols-[1fr,5fr] border">
+            <select v-model="imageScope" class="border rounded-lg h-9 px-2">
+              <option value="COMMON">공통(그룹)</option>
+              <option value="STORE">매장별</option>
+            </select>
+            <div class="customtableIndex border border-gray-400 rounded-l-lg h-full">
+              저장 매장
+            </div>
+            <v-select
+              v-model="imageStoreCd"
+              :options="imageStoreOptions"
+              label="strName"
+              placeholder="선택"
+              class="custom-select2"
+              :clearable="false"
+              :disabled="imageScope !== 'STORE'"
+              :reduce="(item) => String(item.lngStoreCode)" />
+          </div>
+          <div
+            class="grid grid-rows-1 grid-cols-[2fr,3fr] w-[80%] h-[40%] mt-10 border pl-5 items-start">
+            <div class="flex justify-center items-start w-full">
+              <img
+                :src="`https://www.pncapi.kr/MenuImage/Image/${currentImageFileName}?v=${Date.now()}`"
+                @error="`../../assets/noimage2.png`"
+                class="w-[80%] max-h-[min(40vh,320px)] object-contain" />
+            </div>
+            <div class="grid grid-rows-[1fr,5fr] grid-cols-[1fr,5fr] border w-full">
               <div
                 class="customtableIndex border border-gray-400 rounded-l-lg h-full">
                 파일명
@@ -1077,9 +1100,20 @@
                   type="text"
                   v-model="fileName2"
                   class="border rounded-lg bg-gray-100 w-full"
-                  disabled /><button class="whitebutton" @click="downloadFile">
+                  disabled />
+                <!--
+                <button class="whitebutton" @click="downloadFile">
                   다운로드
                 </button>
+                -->
+                  <label for="fileInput" class="whitebutton">
+                    파일선택</label>
+                  <input
+                    id="fileInput"
+                    type="file"
+                    @change="handleFileUpload"
+                    style="display: none"
+                    accept=".jpg,.png,.jpeg" />
               </div>
               <div
                 class="customtableIndex border border-gray-400 rounded-l-lg h-full w-full">
@@ -1091,16 +1125,13 @@
                     type="text"
                     v-model="fileSize"
                     class="border rounded-lg bg-gray-100 w-full h-[80%]"
-                    disabled /><label for="fileInput" class="whitebutton"
-                    >파일선택</label
-                  >
-
-                  <input
-                    id="fileInput"
-                    type="file"
-                    @change="handleFileUpload"
-                    style="display: none"
-                    accept=".jpg,.png,.jpeg" />
+                    disabled />
+                  <button
+                    type="button"
+                    class="whitebutton"
+                    @click="handleFileDelete">
+                    파일삭제
+                  </button>
                 </div>
                 <div class="flex flex-col justify-start ml-2">
                   <span class="flex justify-start"
@@ -1126,6 +1157,7 @@
 <script setup>
 import {
   copyMenuListByCode,
+  deleteFile,
   getAmountListByMenuCode,
   getMenuCodeEnroll,
   getMenuDiscCount,
@@ -1184,7 +1216,7 @@ import { v4 as uuidv4 } from "uuid";
  * 공통 표준  Function
  */
 
-import { nextTick, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -1203,7 +1235,7 @@ onMounted(async () => {
 
   const pageLog = await insertPageLog(store.state.activeTab2);
   ////console.log(store.state.userData.lngCommonMenu);
-  if (store.state.userData.lngCommonMenu == "1") {
+  if (isStoreImageFeatureEnabled.value) {
     hidesub.value = false;
     hideAttr.value = false;
   } else {
@@ -1325,6 +1357,52 @@ const clickedStoreNm = ref();
 const store = useStore();
 const userData = store.state.userData;
 const groupCd = ref(userData.lngStoreGroup);
+const imageScope = ref("COMMON");
+const imageStoreCd = ref("");
+const pickedStoreCd = ref("");
+const isStoreImageFeatureEnabled = computed(() => {
+  const commonMenuFlag =
+    store.state.userData.intCommonMenu ?? store.state.userData.lngCommonMenu;
+  return String(commonMenuFlag) === "1";
+});
+const imageStoreOptions = computed(() =>
+  (store.state.storeCd || []).filter((item) => item?.lngStoreCode != null)
+);
+const normalizeImageStoreCd = (value) => {
+  const strValue = value != null ? String(value) : "";
+  if (!strValue || strValue === "-1" || strValue === "0") {
+    return "";
+  }
+  return strValue;
+};
+const getEffectiveImageStoreCode = () => {
+  if (!isStoreImageFeatureEnabled.value || imageScope.value !== "STORE") {
+    return "";
+  }
+  const selected = normalizeImageStoreCd(imageStoreCd.value || pickedStoreCd.value);
+  return selected && selected !== "-1" && selected !== "0" ? selected : "";
+};
+watch(imageScope, (newValue) => {
+  if (newValue !== "STORE") {
+    // 공통(그룹) 전환 시 저장 매장을 "선택" 상태로 초기화
+    imageStoreCd.value = "";
+  }
+});
+const buildImageFileName = (menuCd, fallbackFileName = "") => {
+  if (!isStoreImageFeatureEnabled.value || imageScope.value !== "STORE") {
+    return fallbackFileName || "";
+  }
+  const effectiveStoreCd = getEffectiveImageStoreCode();
+  if (!effectiveStoreCd || !menuCd) {
+    return fallbackFileName || "";
+  }
+  return (
+    String(effectiveStoreCd).padStart(10, "0") +
+    "_" +
+    String(menuCd).padStart(10, "0") +
+    ".jpg"
+  );
+};
 const rowData2 = ref([]);
 const clickrowData2 = ref([]);
 const rowData3 = ref([]);
@@ -1404,6 +1482,9 @@ const clickrowData4 = ref([]);
 const filteredrowData5 = ref([]);
 const afterClick = ref(true);
 const fileName = ref();
+const currentImageFileName = computed(() =>
+  buildImageFileName(gridvalue3.value, fileName.value)
+);
 const rowIndex = ref();
 const duplilfirstarr = ref();
 const tempRowData2 = ref();
@@ -1553,7 +1634,8 @@ const clickedRowData = async (newvalue) => {
     afterSearch.value == true &&
     afterClick.value == false;
   fileName.value = newvalue[33];
-  fileName2.value = newvalue[31];
+  // 최초 메뉴 선택 시에도 표시 파일명을 현재 이미지 규칙과 동일하게 노출
+  fileName2.value = currentImageFileName.value || "";
   //comsole.log(newvalue);
   if (newvalue[34] == true) {
     //isNew.value = true;
@@ -1611,7 +1693,7 @@ const clickedRowData = async (newvalue) => {
   }
   try {
     const response = await axios.get(
-      `https://www.pncapi.kr/MenuImage/Image/${fileName.value}?v=${Date.now()}`
+      `https://www.pncapi.kr/MenuImage/Image/${currentImageFileName.value}?v=${Date.now()}`
     );
     await nextTick();
     //console.log(response);
@@ -1654,6 +1736,10 @@ const lngStoreGroup = (e) => {
 
 const handleStoreCd = async (newValue) => {
   ////console.log(newValue);
+  pickedStoreCd.value = String(newValue);
+  if (!imageStoreCd.value || imageStoreCd.value == "-1") {
+    imageStoreCd.value = normalizeImageStoreCd(newValue);
+  }
   if (newValue == "-1") {
     afterSearch.value = false;
     afterClick.value = true;
@@ -1667,7 +1753,7 @@ const handleStoreCd = async (newValue) => {
     gridvalue3.value = "";
     initAll();
   }
-  if (store.state.userData.lngCommonMenu == "1") {
+  if (isStoreImageFeatureEnabled.value) {
     nowStoreCd.value = 0;
   } else {
     nowStoreCd.value = newValue;
@@ -1996,6 +2082,8 @@ const addRow = () => {
       "," +
       "0" +
       "," +
+      "0" +
+      "," +
       "0";
 
     //comsole.log(addrowProp.value);
@@ -2081,12 +2169,13 @@ const saveButton = () => {
     });
     return;
   }
-  if (
+  const changedRowCount =
     updateDeleteInsertrowIndex.value.deleted.length +
-      updateDeleteInsertrowIndex.value.created.length +
-      updateDeleteInsertrowIndex.value.updated.length ==
-    0
-  ) {
+    updateDeleteInsertrowIndex.value.created.length +
+    updateDeleteInsertrowIndex.value.updated.length;
+  const hasFileUploadChange = uploadImages.value.length > 0;
+
+  if (changedRowCount === 0 && !hasFileUploadChange) {
     Swal.fire({
       title: "경고",
       text: "변경된 사항이 없습니다.",
@@ -2148,6 +2237,20 @@ const saveButton = () => {
     cancelButtonText: "취소",
   }).then(async (result) => {
     if (result.isConfirmed) {
+      if (
+        isStoreImageFeatureEnabled.value &&
+        imageScope.value === "STORE" &&
+        uploadImages.value.length > 0 &&
+        !getEffectiveImageStoreCode()
+      ) {
+        Swal.fire({
+          title: "경고",
+          text: "매장별 이미지 저장 시 저장 매장을 선택하세요.",
+          icon: "warning",
+          confirmButtonText: "확인",
+        });
+        return;
+      }
       store.state.loading = true;
       try {
         const deletedRow = updateRow.value.filter((_, index) =>
@@ -2227,13 +2330,18 @@ const saveButton = () => {
         const formData = new FormData();
 
         let storecode = nowStoreCd.value;
-        if (store.state.userData.lngCommonMenu == "1") {
+        if (isStoreImageFeatureEnabled.value && imageScope.value === "STORE") {
+          storecode = getEffectiveImageStoreCode();
+        } else if (isStoreImageFeatureEnabled.value) {
           storecode = groupCd.value;
         }
 
         if (groupCd.value == "1989" || groupCd.value == "1750") {
           storecode = groupCd.value;
         }
+
+        formData.append("groupCd", groupCd.value);
+
         uploadImages.value.forEach((file, index) => {
           const existedName = uploadImagesCd.value[index];
 
@@ -2250,9 +2358,8 @@ const saveButton = () => {
 
         if (uploadImages.value.length >= 1) {
           try {
-            // //console.log(formData);
             const res2 = await uploadFile(formData);
-            //comsole.log(res2);
+            // console.log(res2);
           } catch (error) {
             store.state.loading = false;
           } finally {
@@ -2531,6 +2638,8 @@ const initAll = () => {
   fileName.value = "";
   fileSize.value = "";
   fileName2.value = "";
+  imageScope.value = "COMMON";
+  imageStoreCd.value = normalizeImageStoreCd(pickedStoreCd.value);
 
   isNewAutoMenuCode.value = false;
   isNew.value = false;
@@ -2595,11 +2704,128 @@ const handleFileUpload = async (e) => {
   //comsole.log(uploadImages.value);
 };
 
+const handleFileDelete = async () => {
+  if (!isStoreImageFeatureEnabled.value || imageScope.value !== "STORE") {
+    Swal.fire({
+      title: "경고",
+      text: "공통 여부가 '매장별'일 때만 파일 삭제가 가능합니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (!getEffectiveImageStoreCode()) {
+    Swal.fire({
+      title: "경고",
+      text: "저장 매장을 선택하세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  if (!gridvalue3.value) {
+    Swal.fire({
+      title: "경고",
+      text: "메뉴를 선택하세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  const result = await Swal.fire({
+    title: "확인",
+    text: "정말 삭제하시겠습니까?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "삭제",
+    cancelButtonText: "취소",
+  });
+  if (!result.isConfirmed) {
+    return;
+  }
+
+
+  if (currentImageFileName.value) {
+    try {
+      const deleteFormData = new FormData();
+      deleteFormData.append("groupCd", groupCd.value);
+      deleteFormData.append("fileName", currentImageFileName.value);
+      await deleteFile(deleteFormData);
+      Swal.fire({
+        title: "이미지 파일을 삭제 하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "오류",
+        text: "파일 삭제에 실패했습니다.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+      store.state.loading = false;
+      return;
+    } finally {
+      store.state.loading = false;
+    }
+  }
+
+  changeColid.value = "strUserFileName";
+  changeValue2.value = "";
+  changeNow.value = !changeNow.value;
+
+  fileName.value = "";
+  fileName2.value = "";
+  fileSize.value = "";
+  uploadImage.value = { name: "" };
+
+  const existingIndex = uploadImagesCd.value.findIndex(
+    (cd) => cd === gridvalue3.value
+  );
+  if (existingIndex !== -1) {
+    uploadImages.value.splice(existingIndex, 1);
+    uploadImagesCd.value.splice(existingIndex, 1);
+  }
+
+  const fileInput = document.getElementById("fileInput");
+  if (fileInput) {
+    fileInput.value = "";
+  }
+};
+
+const refreshImageMeta = async () => {
+  if (!gridvalue3.value || !currentImageFileName.value) {
+    fileSize.value = "";
+    return;
+  }
+  try {
+    const response = await axios.get(
+      `https://www.pncapi.kr/MenuImage/Image/${currentImageFileName.value}?v=${Date.now()}`
+    );
+    fileSize.value = response.headers["content-length"];
+  } catch (error) {
+    fileSize.value = "";
+  }
+};
+
+watch([imageScope, imageStoreCd], async () => {
+  if (!isStoreImageFeatureEnabled.value) {
+    return;
+  }
+  if (selectedMenu.value !== 3) {
+    return;
+  }
+  // 이미지 대상/저장 매장 변경 시 파일명 표시도 현재 규칙에 맞춰 동기화
+  fileName2.value = currentImageFileName.value || "";
+  await refreshImageMeta();
+});
+
 const downloadFile = async () => {
   ////console.log(store.state.StoreToken);
   try {
     const response = await axios.get(
-      `https://www.pncapi.kr/MenuImage/Image/${fileName.value}`,
+      `https://www.pncapi.kr/MenuImage/Image/${currentImageFileName.value}`,
       {
         responseType: "blob", // 응답을 Blob 형태로 받음
       }
@@ -2610,7 +2836,7 @@ const downloadFile = async () => {
 
     const downloadLink = document.createElement("a");
     downloadLink.href = url;
-    downloadLink.download = `${fileName.value}`; // 다운로드 파일명 설정
+    downloadLink.download = `${currentImageFileName.value}`; // 다운로드 파일명 설정
     downloadLink.click();
 
     // 다운로드 후 Blob URL 해제
