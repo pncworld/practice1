@@ -188,7 +188,9 @@ onMounted(async () => {
 
 const store = useStore();
 const userData = computed(() => store.state.userData);
-const strLogoUrl = computed(() => userData.value.strLogoUrl);
+const strLogoUrl = computed(
+  () => userData.value.strNLogoUrl || userData.value.strLogoUrl
+);
 const groupCd = ref(userData.value.lngStoreGroup);
 const activeMain = ref([]);
 const activeSub = ref([]);

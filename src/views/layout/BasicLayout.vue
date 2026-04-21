@@ -179,6 +179,9 @@ import { useRoute } from "vue-router";
 
 import { useStore } from "vuex";
 
+/** 로고 로드 실패 시·세션 없음 시 사용 (존재하는 에셋, Vite 빌드 URL) */
+import defaultLogoSrc from "@/assets/logo.svg";
+
 const scrollContainer = ref(null);
 const moveright = () => {
   if (!scrollContainer.value) return;
@@ -196,21 +199,65 @@ const moveleft = () => {
  * 	화면 Load시 실행 스크립트
  */
 
-onMounted(() => {
-  // router.push("/homepage");
-});
-// 화면 크기 감지 및 업데이트
-
 const closeOtherTab = () => {
   showmenus.value = false;
 };
 const route = useRoute();
 const store = useStore();
 const userData = computed(() => store.state.userData);
-const strLogoUrl = computed(
-  () =>
-    userData.value.strLogoUrl?.split(".net")[1] || "../../assets/noimage2.png"
-); // .split(".net")[1]
+
+/** getLoginSession: strNLogoUrl 우선, 없으면 strLogoUrl — 절대 URL(http/https)은 전체 문자열 그대로 사용 */
+const resolveLogoUrlForHeader = (u) => {
+  if (!u || typeof u !== "object" || Array.isArray(u)) {
+    return defaultLogoSrc;
+  }
+  const raw = u.strNLogoUrl || u.strLogoUrl;
+  if (!raw || typeof raw !== "string") {
+    return defaultLogoSrc;
+  }
+  const trimmed = raw.trim();
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+  return trimmed;
+};
+
+const strLogoUrl = computed(() => resolveLogoUrlForHeader(userData.value));
+
+/** getLoginSession: strTopFColor → 시작, strTopTColor → 종료 (없으면 component.css 기본값) */
+const applySessionTopGradient = () => {
+  const u = store.state.userData;
+  const root = document.documentElement;
+  if (!u || typeof u !== "object" || Array.isArray(u)) {
+    root.style.removeProperty("--gradient-primary");
+    return;
+  }
+  const from = String(u.strTopFColor ?? u.strBackColor ?? "").trim();
+  const to = String(u.strTopTColor ?? "").trim();
+  if (from && to) {
+    root.style.setProperty(
+      "--gradient-primary",
+      `linear-gradient(90deg, ${from} 0%, ${to} 100%)`
+    );
+  } else {
+    root.style.removeProperty("--gradient-primary");
+  }
+};
+
+watch(() => store.state.userData, applySessionTopGradient, { deep: true });
+
+onMounted(() => {
+  applySessionTopGradient();
+});
+
+const handleError2 = (e) => {
+  const img = e?.target;
+  if (!img) return;
+  /** 상대경로 noimage는 dev 서버에서 /assets/noimage2.png 로 잘못 요청되어 404 — 한 번만 폴백 */
+  if (img.dataset.logoFallback === "1") return;
+  img.dataset.logoFallback = "1";
+  img.src = defaultLogoSrc;
+};
 const mobileShowMenu = ref(false);
 const showMenu = ref(route.path != "/"); // Initialize based on current route
 const componentKey = ref(null);
