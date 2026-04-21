@@ -206,7 +206,21 @@ const route = useRoute();
 const store = useStore();
 const userData = computed(() => store.state.userData);
 
-/** getLoginSession: strNLogoUrl 우선, 없으면 strLogoUrl — 절대 URL(http/https)은 전체 문자열 그대로 사용 */
+/**
+ * HTTPS 페이지에서 http:// 이미지는 브라우저가 차단(혼합 콘텐츠) → 동일 호스트는 https 로 승격
+ */
+const normalizeLogoUrlForPage = (url) => {
+  if (!url || typeof url !== "string") return url;
+  const u = url.trim();
+  if (typeof window === "undefined" || window.location.protocol !== "https:")
+    return u;
+  if (/^http:\/\/(www\.)?pncoffice\.net\b/i.test(u)) {
+    return u.replace(/^http:\/\//i, "https://");
+  }
+  return u;
+};
+
+/** getLoginSession: strNLogoUrl 우선, 없으면 strLogoUrl — 절대 URL은 전체 사용, 운영 https 시 pncoffice.net 은 https 로 보정 */
 const resolveLogoUrlForHeader = (u) => {
   if (!u || typeof u !== "object" || Array.isArray(u)) {
     return defaultLogoSrc;
@@ -217,9 +231,9 @@ const resolveLogoUrlForHeader = (u) => {
   }
   const trimmed = raw.trim();
   if (/^https?:\/\//i.test(trimmed)) {
-    return trimmed;
+    return normalizeLogoUrlForPage(trimmed);
   }
-  return trimmed;
+  return normalizeLogoUrlForPage(trimmed);
 };
 
 const strLogoUrl = computed(() => resolveLogoUrlForHeader(userData.value));
