@@ -337,6 +337,8 @@
                   class="h-20 w-28 flex justify-center"
                   ><img
                     :src="getMenuKeyImageSrc(item)"
+                    @load="handleMenuImageLoad"
+                    @error="handleMenuImageError($event, item)"
                     alt=""
                     class="h-full w-full" /></span
                 ><span
@@ -648,6 +650,41 @@ const getMenuKeyImageSrc = (item) => {
     return `https://www.pncapi.kr/MenuImage/Image/${paddedName}?v=${v}`;
   }
   return `https://www.pncapi.kr/MenuImage/Image/${item.strUserFileName}?v=${v}`;
+};
+
+const getLegacyMenuKeyImageSrc = (item) => {
+  if (!item || item.strUserFileName === "" || item.strUserFileName == null) {
+    return "";
+  }
+  const v = Date.now();
+  if (!isCommonMenuGroup.value) {
+    return `https://www.pncapi.kr/MenuImage/t_pos/${item.strUserFileName}?v=${v}`;
+  }
+  return `https://www.pncapi.kr/MenuImage/Image/${item.strUserFileName}?v=${v}`;
+};
+
+const handleMenuImageError = (event, item) => {
+  const target = event?.target;
+  if (!target) {
+    return;
+  }
+  const failedSrc = target.currentSrc || target.src || "";
+  if (target.dataset.lastFailedSrc === failedSrc) {
+    return;
+  }
+  target.dataset.lastFailedSrc = failedSrc;
+  const fallbackSrc = getLegacyMenuKeyImageSrc(item);
+  if (fallbackSrc && target.src !== fallbackSrc) {
+    target.src = fallbackSrc;
+  }
+};
+
+const handleMenuImageLoad = (event) => {
+  const target = event?.target;
+  if (!target) {
+    return;
+  }
+  delete target.dataset.lastFailedSrc;
 };
 
 const modified = ref(false);

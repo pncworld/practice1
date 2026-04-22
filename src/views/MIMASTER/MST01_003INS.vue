@@ -1060,7 +1060,7 @@
         </div>
         <div v-show="selectedMenu == 3" class="h-[90%] w-full">
           <div
-            v-if="isStoreImageFeatureEnabled"
+            v-if="showImageGroupScopeControls"
             class="grid grid-cols-[1fr,1fr,1fr,2fr] gap-2 items-center w-[80%] mt-3">
             <div class="customtableIndex border border-gray-400 rounded-l-lg h-full">
               공통 여부
@@ -1235,13 +1235,6 @@ onMounted(async () => {
 
   const pageLog = await insertPageLog(store.state.activeTab2);
   ////console.log(store.state.userData.lngCommonMenu);
-  if (isStoreImageFeatureEnabled.value) {
-    hidesub.value = false;
-    hideAttr.value = false;
-  } else {
-    hidesub.value = true;
-    hideAttr.value = true;
-  }
 
   let res = null;
 
@@ -1360,10 +1353,34 @@ const groupCd = ref(userData.lngStoreGroup);
 const imageScope = ref("COMMON");
 const imageStoreCd = ref("");
 const pickedStoreCd = ref("");
+/** 공통메뉴 플래그 — PickStore·저장 시 storecode 등 기존 동작 유지 */
 const isStoreImageFeatureEnabled = computed(() => {
   const commonMenuFlag =
     store.state.userData.intCommonMenu ?? store.state.userData.lngCommonMenu;
   return String(commonMenuFlag) === "1";
+});
+/** 이미지 설정 탭 — 공통(그룹)/저장 매장 행만 허용할 매장 그룹 */
+const MENU_IMAGE_SCOPE_STORE_GROUPS = [3051, 9999];
+const isImageScopeStoreGroup = computed(() =>
+  MENU_IMAGE_SCOPE_STORE_GROUPS.includes(Number(groupCd.value))
+);
+/** 공통 여부·저장 매장 UI 및 매장별 파일명 규칙 (위 두 조건 동시 만족) */
+const showImageGroupScopeControls = computed(
+  () => isStoreImageFeatureEnabled.value && isImageScopeStoreGroup.value
+);
+watch(
+  isStoreImageFeatureEnabled,
+  (enabled) => {
+    hidesub.value = !enabled;
+    hideAttr.value = !enabled;
+  },
+  { immediate: true }
+);
+watch(showImageGroupScopeControls, (ok) => {
+  if (!ok && imageScope.value === "STORE") {
+    imageScope.value = "COMMON";
+    imageStoreCd.value = "";
+  }
 });
 const imageStoreOptions = computed(() =>
   (store.state.storeCd || []).filter((item) => item?.lngStoreCode != null)
@@ -1376,7 +1393,7 @@ const normalizeImageStoreCd = (value) => {
   return strValue;
 };
 const getEffectiveImageStoreCode = () => {
-  if (!isStoreImageFeatureEnabled.value || imageScope.value !== "STORE") {
+  if (!showImageGroupScopeControls.value || imageScope.value !== "STORE") {
     return "";
   }
   const selected = normalizeImageStoreCd(imageStoreCd.value || pickedStoreCd.value);
@@ -1389,7 +1406,7 @@ watch(imageScope, (newValue) => {
   }
 });
 const buildImageFileName = (menuCd, fallbackFileName = "") => {
-  if (!isStoreImageFeatureEnabled.value || imageScope.value !== "STORE") {
+  if (!showImageGroupScopeControls.value || imageScope.value !== "STORE") {
     return fallbackFileName || "";
   }
   const effectiveStoreCd = getEffectiveImageStoreCode();
@@ -2238,7 +2255,7 @@ const saveButton = () => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       if (
-        isStoreImageFeatureEnabled.value &&
+        showImageGroupScopeControls.value &&
         imageScope.value === "STORE" &&
         uploadImages.value.length > 0 &&
         !getEffectiveImageStoreCode()
@@ -2330,7 +2347,10 @@ const saveButton = () => {
         const formData = new FormData();
 
         let storecode = nowStoreCd.value;
-        if (isStoreImageFeatureEnabled.value && imageScope.value === "STORE") {
+        if (
+          showImageGroupScopeControls.value &&
+          imageScope.value === "STORE"
+        ) {
           storecode = getEffectiveImageStoreCode();
         } else if (isStoreImageFeatureEnabled.value) {
           storecode = groupCd.value;
@@ -2705,7 +2725,7 @@ const handleFileUpload = async (e) => {
 };
 
 const handleFileDelete = async () => {
-  if (!isStoreImageFeatureEnabled.value || imageScope.value !== "STORE") {
+  if (!showImageGroupScopeControls.value || imageScope.value !== "STORE") {
     Swal.fire({
       title: "경고",
       text: "공통 여부가 '매장별'일 때만 파일 삭제가 가능합니다.",
@@ -2810,7 +2830,7 @@ const refreshImageMeta = async () => {
 };
 
 watch([imageScope, imageStoreCd], async () => {
-  if (!isStoreImageFeatureEnabled.value) {
+  if (!showImageGroupScopeControls.value) {
     return;
   }
   if (selectedMenu.value !== 3) {

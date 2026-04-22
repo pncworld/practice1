@@ -21,8 +21,8 @@
         </button> -->
       </div>
     </div>
-    <div
-      class="flex justify-start bg-gray-200 rounded-lg h-14 items-center z-10 pb-3">
+    <div class="bg-gray-200 rounded-lg px-2 py-2">
+      <div class="flex justify-start items-center">
       <!-- 메뉴코드 탭: MST01_010INS 스타일 PickStore -->
       <PickStore
         v-if="selected === 1"
@@ -41,6 +41,28 @@
         @posNo="posNo"
         @update:storeAreaCd="lngAreaCode">
       </PickStore>
+      </div>
+      <div
+        v-if="selected === 1 && isStoreScopeFeatureEnabled"
+        class="flex justify-start items-center text-base font-semibold text-black mt-2 ml-12 space-x-3">
+        <div>공통 여부</div>
+        <select
+          v-model="dataScope"
+          class="border rounded-lg h-9 px-2 bg-white w-44 text-sm">
+          <option value="COMMON">공통(그룹)</option>
+          <option value="STORE">매장별</option>
+        </select>
+        <div>저장 매장</div>
+        <v-select
+          v-model="scopeStoreCd"
+          :options="scopeStoreOptions"
+          label="strName"
+          placeholder="선택"
+          class="scope-store-select w-72 bg-white text-sm"
+          :clearable="false"
+          :disabled="dataScope !== 'STORE'"
+          :reduce="(item) => String(item.lngStoreCode)" />
+      </div>
     </div>
 
     <div class="flex ml-10 mt-5">
@@ -268,7 +290,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -295,12 +317,69 @@ const store = useStore();
 const hidesub = ref(true);
 const hideAttr = ref(true);
 const clickedStoreNm = ref("");
+const pickedStoreCd = ref("");
+const dataScope = ref("COMMON");
+const scopeStoreCd = ref("");
+const isStoreScopeFeatureEnabled = computed(() => {
+  const commonMenuFlag =
+    store.state.userData.intCommonMenu ?? store.state.userData.lngCommonMenu;
+  return String(commonMenuFlag) === "1";
+});
+const scopeStoreOptions = computed(() =>
+  (store.state.storeCd || []).filter((item) => item?.lngStoreCode != null)
+);
+const normalizeScopeStoreCd = (value) => {
+  const strValue = value != null ? String(value) : "";
+  if (!strValue || strValue === "-1" || strValue === "0") {
+    return "";
+  }
+  return strValue;
+};
+const getEffectiveStoreCd = () => {
+  if (
+    selected.value !== 1 ||
+    !isStoreScopeFeatureEnabled.value ||
+    dataScope.value !== "STORE"
+  ) {
+    return selectedStore.value;
+  }
+  const selectedScopeStoreCd = normalizeScopeStoreCd(
+    scopeStoreCd.value || pickedStoreCd.value
+  );
+  return selectedScopeStoreCd || selectedStore.value;
+};
+const getMenuSaveStoreCd = () => {
+  if (selected.value !== 1 || !isStoreScopeFeatureEnabled.value) {
+    return selectedStore.value;
+  }
+  if (dataScope.value === "STORE") {
+    return getEffectiveStoreCd();
+  }
+  return 0;
+};
+const applyMenuScopeToRows = (rows = []) => {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return [];
+  }
+  if (selected.value !== 1 || !isStoreScopeFeatureEnabled.value) {
+    return rows;
+  }
+  const scopedStoreCd = getMenuSaveStoreCd();
+  return rows.map((item) => ({
+    ...item,
+    lngStoreCode: scopedStoreCd,
+  }));
+};
 const handleGroupCd = () => {};
 const handleGroupNm = () => {};
 const handlestoreNm = (newData) => {
   clickedStoreNm.value = newData;
 };
 const handleStoreCd = async (newValue) => {
+  pickedStoreCd.value = String(newValue);
+  if (!scopeStoreCd.value || scopeStoreCd.value == "-1") {
+    scopeStoreCd.value = normalizeScopeStoreCd(newValue);
+  }
   await lngStoreCode(newValue);
 };
 
@@ -318,7 +397,9 @@ const optionList7 = ref([]);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
-  if (store.state.userData.lngCommonMenu == "1") {
+  const commonMenuFlag =
+    store.state.userData.intCommonMenu ?? store.state.userData.lngCommonMenu;
+  if (String(commonMenuFlag) === "1") {
     hidesub.value = false;
     hideAttr.value = false;
   } else {
@@ -343,12 +424,27 @@ onMounted(async () => {
 const filteredrowData = ref([]);
 const searchButton = async () => {
   if (selected.value == 1) {
+    const effectiveStoreCd = getEffectiveStoreCd();
+    const menuListStoreCd = isStoreScopeFeatureEnabled.value ? 0 : selectedStore.value;
+    if (
+      isStoreScopeFeatureEnabled.value &&
+      dataScope.value === "STORE" &&
+      (!effectiveStoreCd || effectiveStoreCd === "0")
+    ) {
+      Swal.fire({
+        title: "경고",
+        text: "매장별 조회 시 저장 매장을 선택하세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
     try {
       initGrid();
       store.state.loading = true;
       const res = await getMenuList5(
         store.state.userData.lngStoreGroup,
-        selectedStore.value
+        menuListStoreCd
       );
       //console.log(res);
       rowData.value = res.data.List;
@@ -404,6 +500,20 @@ const searchButton = async () => {
 
 const saveButton = async () => {
   if (selected.value == "1") {
+    const effectiveStoreCd = getEffectiveStoreCd();
+    if (
+      isStoreScopeFeatureEnabled.value &&
+      dataScope.value === "STORE" &&
+      (!effectiveStoreCd || effectiveStoreCd === "0")
+    ) {
+      Swal.fire({
+        title: "경고",
+        text: "매장별 저장 시 저장 매장을 선택하세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
     const langids = updatedrowdata.value
       .filter((item) => item.lngLanguageID)
       .map((item) => item.lngLanguageID);
@@ -435,14 +545,16 @@ const saveButton = async () => {
     }
     try {
       store.state.loading = true;
-      const concats = updatedrowdata.value.concat(updatedrowdata2.value);
-      const concats2 = updatedrowdata.value
+      const mergedRows = updatedrowdata.value.concat(updatedrowdata2.value);
+      const deletedRows = updatedrowdata.value
         .filter((_, index) => allstaterows.value.includes(index))
         .concat(
           updatedrowdata2.value.filter((_, index) =>
             allstaterows2.value.includes(index)
           )
         );
+      const concats = applyMenuScopeToRows(mergedRows);
+      const concats2 = applyMenuScopeToRows(deletedRows);
       //console.log(concats);
       const lngStoreGroup = concats
         .map((item) => item.lngStoreGroup)
@@ -513,7 +625,7 @@ const saveButton = async () => {
     } finally {
       const res = await getMultiLingual2(
         store.state.userData.lngStoreGroup,
-        selectedStore.value,
+        effectiveStoreCd,
         tempMenuCode.value
       );
 
@@ -626,6 +738,17 @@ const afterSearch2 = ref(false);
 const selectedGroup = ref(store.state.userData.lngStoreGroup);
 const selectedStore = ref(0);
 
+const resetMenuDetailGrids = () => {
+  rowData2.value = [];
+  rowData3.value = [];
+  updatedrowdata.value = [];
+  updatedrowdata2.value = [];
+  allstaterows.value = [];
+  allstaterows2.value = [];
+  tempMenuCode.value = "";
+  afterClicked.value = false;
+};
+
 const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
@@ -645,10 +768,12 @@ const initGrid = () => {
 };
 
 const lngStoreCode = async (e) => {
-  const res = await getMenuList5(store.state.userData.lngStoreGroup, e);
+  const baseStoreCd =
+    selected.value === 1 && isStoreScopeFeatureEnabled.value ? 0 : e;
+  const res = await getMenuList5(store.state.userData.lngStoreGroup, baseStoreCd);
   rowData.value = res.data.List;
   //console.log(res);
-  const res2 = await getMenuList(store.state.userData.lngStoreGroup, e);
+  const res2 = await getMenuList(store.state.userData.lngStoreGroup, baseStoreCd);
   //rowData2.value = res2.data.menuList
   SubMenuGroup.value = res2.data.submenuGroup;
   MenuGroup.value = res2.data.menuGroup;
@@ -673,11 +798,12 @@ const clickedRowData = async (e) => {
   //console.log(e);
 
   tempMenuCode.value = e[0];
+  const effectiveStoreCd = getEffectiveStoreCd();
   try {
     store.state.loading = true;
     const res = await getMultiLingual2(
       store.state.userData.lngStoreGroup,
-      selectedStore.value,
+      effectiveStoreCd,
       e[0]
     );
 
@@ -706,7 +832,7 @@ const addButton = () => {
   addrowDefault.value =
     store.state.userData.lngStoreGroup +
     "," +
-    selectedStore.value +
+    getEffectiveStoreCd() +
     ",1," +
     tempMenuCode.value +
     ", ";
@@ -726,7 +852,7 @@ const addButton2 = () => {
   addrowDefault2.value =
     store.state.userData.lngStoreGroup +
     "," +
-    selectedStore.value +
+    getEffectiveStoreCd() +
     ",6," +
     tempMenuCode.value +
     ", ";
@@ -865,6 +991,23 @@ const clickedRowData2 = async (e) => {
 };
 
 const showPosNo = ref(false);
+watch(dataScope, (newValue) => {
+  if (newValue !== "STORE") {
+    scopeStoreCd.value = "";
+  }
+  if (selected.value === 1 && isStoreScopeFeatureEnabled.value) {
+    resetMenuDetailGrids();
+  }
+});
+watch(scopeStoreCd, (newValue, oldValue) => {
+  if (
+    selected.value === 1 &&
+    isStoreScopeFeatureEnabled.value &&
+    newValue !== oldValue
+  ) {
+    resetMenuDetailGrids();
+  }
+});
 watch(selected, () => {
   if (selected.value == 1) {
     showPosNo.value = false;
@@ -874,4 +1017,26 @@ watch(selected, () => {
 });
 </script>
 
-<style></style>
+<style scoped>
+:deep(.scope-store-select .vs__dropdown-toggle) {
+  min-height: 36px;
+  height: 36px;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(209 213 219);
+  background-color: white;
+}
+
+:deep(.scope-store-select .vs__selected-options) {
+  padding: 0 6px;
+}
+
+:deep(.scope-store-select .vs__search),
+:deep(.scope-store-select .vs__selected) {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+:deep(.scope-store-select .vs__actions) {
+  padding-right: 6px;
+}
+</style>
