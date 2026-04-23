@@ -656,6 +656,55 @@ const handlestoreNm = (newData) => {
 
 const confirmitem = ref([]);
 const confirmitem2 = ref([]);
+
+/** 옵션 구성/옵션그룹 구성 그리드는 별도 RealGrid라 allStateRows에 잡히지 않음 — 체인 컬럼만 조회 스냅샷과 비교 */
+const LNG_CHAIN_MENU_KEYS = Array.from(
+  { length: 21 },
+  (_, i) => `lngChainMenu${i + 1}`
+);
+const LNG_CHAIN_GROUP_KEYS = Array.from(
+  { length: 20 },
+  (_, i) => `lngChainGroup${i + 1}`
+);
+const optionMenuChainDirty = ref(false);
+const optionGroupChainDirty = ref(false);
+
+const chainFieldNumEq = (a, b) =>
+  Number(a == null || a === "" ? 0 : a) ===
+  Number(b == null || b === "" ? 0 : b);
+
+const refreshOptionMenuChainDirty = () => {
+  const snap = confirmitem.value;
+  const rows = updatedRowData4.value;
+  if (!snap?.length || !rows?.length) {
+    optionMenuChainDirty.value = false;
+    return;
+  }
+  optionMenuChainDirty.value = rows
+    .filter((row) => !row.deleted)
+    .some((row) => {
+      const o = snap.find((x) => String(x.lngCode) === String(row.lngCode));
+      if (!o) return false;
+      return LNG_CHAIN_MENU_KEYS.some((k) => !chainFieldNumEq(row[k], o[k]));
+    });
+};
+
+const refreshOptionGroupChainDirty = () => {
+  const snap = confirmitem2.value;
+  const rows = updatedRowData5.value;
+  if (!snap?.length || !rows?.length) {
+    optionGroupChainDirty.value = false;
+    return;
+  }
+  optionGroupChainDirty.value = rows
+    .filter((row) => !row.deleted)
+    .some((row) => {
+      const o = snap.find((x) => String(x.lngCode) === String(row.lngCode));
+      if (!o) return false;
+      return LNG_CHAIN_GROUP_KEYS.some((k) => !chainFieldNumEq(row[k], o[k]));
+    });
+};
+
 const realgridName = ref();
 const realgridname = (e) => {
   realgridName.value = e;
@@ -951,6 +1000,8 @@ const searchButton = async () => {
     updatedRowData4.value = JSON.parse(JSON.stringify(rowData1.value));
     confirmitem2.value = JSON.parse(JSON.stringify(rowData3.value));
     updatedRowData5.value = JSON.parse(JSON.stringify(rowData3.value));
+    refreshOptionMenuChainDirty();
+    refreshOptionGroupChainDirty();
   } catch (error) {
     afterSearch.value = false;
   } finally {
@@ -989,7 +1040,8 @@ const saveButton = async () => {
     if (
       allstaterows.value.deleted.length == 0 &&
       allstaterows.value.created.length == 0 &&
-      allstaterows.value.updated.length == 0
+      allstaterows.value.updated.length == 0 &&
+      !optionMenuChainDirty.value
     ) {
       Swal.fire({
         title: "경고",
@@ -1003,7 +1055,8 @@ const saveButton = async () => {
     if (
       allstaterows2.value.deleted.length == 0 &&
       allstaterows2.value.created.length == 0 &&
-      allstaterows2.value.updated.length == 0
+      allstaterows2.value.updated.length == 0 &&
+      !optionGroupChainDirty.value
     ) {
       Swal.fire({
         title: "경고",
@@ -1257,6 +1310,7 @@ const saveButton = async () => {
 const updatedRowData3 = (e) => {
   // console.log(e);
   updatedRowData4.value = e;
+  refreshOptionMenuChainDirty();
 };
 
 /**
@@ -1271,6 +1325,7 @@ const updatedRowData5 = ref([]);
 
 const updatedRowData6 = (e) => {
   updatedRowData5.value = e;
+  refreshOptionGroupChainDirty();
 };
 /**
  * 입력창 수정 데이터 갱신
@@ -1318,6 +1373,7 @@ const updatedRowData = (newValue) => {
       newValue[20] == undefined ? 0 : newValue[20].lngCode;
     //comsole.log(change);
   }
+  refreshOptionMenuChainDirty();
   // rowData1.value = [...rowData1.value];
   //comsole.log(newValue);
 };
@@ -1365,6 +1421,7 @@ const updatedRowData2 = (newValue) => {
       newValue[19] == undefined ? 0 : newValue[19].lngCode;
     //comsole.log(change);
   }
+  refreshOptionGroupChainDirty();
   // rowData3.value = [...rowData3.value];
   ////console.log(updatedRowData5.value);
 };
@@ -1970,27 +2027,76 @@ const clickaddMenu2 = (newValue) => {
  */
 
 const changeNow3 = ref(false);
+
+/** 메뉴 조회 팝업: 클릭은 getRows(배열), 더블클릭은 getJsonRow(객체)로 올 수 있음 */
+const menuLngCodeFromPopupRow = (row) => {
+  if (row == null) return undefined;
+  if (Array.isArray(row) && row.length > 2) return row[2];
+  if (typeof row === "object" && row.lngCode != null && row.lngCode !== "")
+    return row.lngCode;
+  return undefined;
+};
+
+const isEmptyLngChainMenuSlot = (v) => {
+  if (v === undefined || v === null || v === "") return true;
+  if (v === "0" || v === 0) return true;
+  const n = Number(v);
+  return !Number.isNaN(n) && n === 0;
+};
+
 const dblclickedRowData = (newValue) => {
-  // console.log(newValue);
-  // console.log(updatedRowData4.value);
+  const menuLngCode = menuLngCodeFromPopupRow(newValue);
+  const menuLngNum = Number(menuLngCode);
+  if (
+    menuLngCode === undefined ||
+    menuLngCode === null ||
+    menuLngCode === "" ||
+    Number.isNaN(menuLngNum)
+  ) {
+    Swal.fire({
+      title: "메뉴코드를 확인할 수 없습니다. 행을 다시 선택해 주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
   const a = updatedRowData4.value.find(
     (item) => item.lngCode == optionCd.value
   );
+  if (!a) {
+    Swal.fire({
+      title: "옵션행을 찾을 수 없습니다. 옵션을 다시 선택해 주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  let placed = false;
   for (let i = 1; i <= 21; i++) {
     const key = `lngChainMenu${i}`;
-    if (a[key] == newValue[2]) {
-      Swal.fire({
-        title: "이미 등록된 메뉴코드입니다.",
-        confirmButtonText: "확인",
-      });
-      return;
+    if (!isEmptyLngChainMenuSlot(a[key])) {
+      if (Number(a[key]) === menuLngNum) {
+        Swal.fire({
+          title: "이미 등록된 메뉴코드입니다.",
+          confirmButtonText: "확인",
+        });
+        return;
+      }
+      continue;
     }
-    if (a[key] === "0" || a[key] === undefined || a[key] === "") {
-      changeColid.value = key;
-      changeValue.value = newValue[2];
-      changeNow3.value = !changeNow3.value;
-      break; // 첫 번째로 조건 맞는 값만 처리할 경우
-    }
+    changeColid.value = key;
+    changeValue.value = menuLngCode;
+    changeNow3.value = !changeNow3.value;
+    placed = true;
+    break;
+  }
+
+  if (!placed) {
+    Swal.fire({
+      title: "메뉴 연결 슬롯이 가득 찼습니다.",
+      confirmButtonText: "확인",
+    });
+    return;
   }
 
   // const rollbackdata = [...filteredrowData2.value];
@@ -2042,27 +2148,74 @@ const dblclickedRowData = (newValue) => {
  * 행 더블 클릭시 작동 함수
  */
 
+/** 옵션 조회 팝업: 더블클릭 시 JSON 행의 옵션코드 */
+const optionLngCodeFromPopupRow = (row) => {
+  if (row == null) return undefined;
+  if (Array.isArray(row) && row.length > 0) return row[0];
+  if (typeof row === "object" && row.lngCode != null && row.lngCode !== "")
+    return row.lngCode;
+  return undefined;
+};
+
 const dblclickedRowData2 = (newValue) => {
-  //console.log(newValue);
-  //comsole.log(updatedRowData5.value);
+  const optLngCode = optionLngCodeFromPopupRow(newValue);
+  const optLngNum = Number(optLngCode);
+  if (
+    optLngCode === undefined ||
+    optLngCode === null ||
+    optLngCode === "" ||
+    Number.isNaN(optLngNum)
+  ) {
+    Swal.fire({
+      title: "옵션코드를 확인할 수 없습니다. 행을 다시 선택해 주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
   const a = updatedRowData5.value.find(
     (item) => item.lngCode == optionGroupCd.value
   );
+  if (!a) {
+    Swal.fire({
+      title: "옵션그룹 행을 찾을 수 없습니다. 그룹을 다시 선택해 주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  let placed = false;
   for (let i = 1; i <= 20; i++) {
     const key = `lngChainGroup${i}`;
-    if (a[key] == newValue[0]) {
-      Swal.fire({
-        title: "이미 등록된 옵션코드입니다.",
-        confirmButtonText: "확인",
-      });
-      return;
+    const slotEmpty =
+      a[key] == 0 ||
+      a[key] === undefined ||
+      a[key] == "0" ||
+      a[key] === "" ||
+      a[key] === null;
+    if (!slotEmpty) {
+      if (Number(a[key]) === optLngNum) {
+        Swal.fire({
+          title: "이미 등록된 옵션코드입니다.",
+          confirmButtonText: "확인",
+        });
+        return;
+      }
+      continue;
     }
-    if (a[key] == 0 || a[key] === undefined || a[key] == "0" || a[key] === "") {
-      changeColid.value = key;
-      changeValue2.value = newValue[0];
-      changeNow4.value = !changeNow4.value;
-      break; // 첫 번째로 조건 맞는 값만 처리할 경우
-    }
+    changeColid.value = key;
+    changeValue2.value = optLngCode;
+    changeNow4.value = !changeNow4.value;
+    placed = true;
+    break;
+  }
+
+  if (!placed) {
+    Swal.fire({
+      title: "옵션 연결 슬롯이 가득 찼습니다.",
+      confirmButtonText: "확인",
+    });
+    return;
   }
 
   closeMenus2();

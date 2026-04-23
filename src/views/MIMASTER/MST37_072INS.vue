@@ -2131,71 +2131,77 @@ const clickaddMenu2 = (newValue) => {
  */
 
 const changeNow3 = ref(false);
+
+/** 메뉴 조회 팝업: 클릭은 getRows(배열), 더블클릭은 getJsonRow(객체)로 올 수 있음 */
+const menuLngCodeFromPopupRow = (row) => {
+  if (row == null) return undefined;
+  if (Array.isArray(row) && row.length > 2) return row[2];
+  if (typeof row === "object" && row.lngCode != null && row.lngCode !== "")
+    return row.lngCode;
+  return undefined;
+};
+
+const isEmptyLngChainMenuSlot = (v) => {
+  if (v === undefined || v === null || v === "") return true;
+  if (v === "0" || v === 0) return true;
+  const n = Number(v);
+  return !Number.isNaN(n) && n === 0;
+};
+
 const dblclickedRowData = (newValue) => {
-  // console.log(newValue);
-  // console.log(updatedRowData4.value);
+  const menuLngCode = menuLngCodeFromPopupRow(newValue);
+  const menuLngNum = Number(menuLngCode);
+  if (
+    menuLngCode === undefined ||
+    menuLngCode === null ||
+    menuLngCode === "" ||
+    Number.isNaN(menuLngNum)
+  ) {
+    Swal.fire({
+      title: "메뉴코드를 확인할 수 없습니다. 행을 다시 선택해 주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
   const a = updatedRowData4.value.find(
     (item) => item.lngCode == optionCd.value
   );
-  for (let i = 1; i <= 21; i++) {
-    const key = `lngChainMenu${i}`;
-    if (a[key] == newValue[2]) {
-      Swal.fire({
-        title: "이미 등록된 메뉴코드입니다.",
-        confirmButtonText: "확인",
-      });
-      return;
-    }
-    if (a[key] === "0" || a[key] === undefined || a[key] === "") {
-      changeColid.value = key;
-      changeValue.value = newValue[2];
-      changeNow3.value = !changeNow3.value;
-      break; // 첫 번째로 조건 맞는 값만 처리할 경우
-    }
+  if (!a) {
+    Swal.fire({
+      title: "옵션행을 찾을 수 없습니다. 옵션을 다시 선택해 주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
   }
 
-  // const rollbackdata = [...filteredrowData2.value];
-  // filteredrowData2.value = [];
-  // //comsole.log(a);
+  let placed = false;
+  for (let i = 1; i <= 21; i++) {
+    const key = `lngChainMenu${i}`;
+    if (!isEmptyLngChainMenuSlot(a[key])) {
+      if (Number(a[key]) === menuLngNum) {
+        Swal.fire({
+          title: "이미 등록된 메뉴코드입니다.",
+          confirmButtonText: "확인",
+        });
+        return;
+      }
+      continue;
+    }
+    changeColid.value = key;
+    changeValue.value = menuLngCode;
+    changeNow3.value = !changeNow3.value;
+    placed = true;
+    break;
+  }
 
-  // const keys = Object.keys(a);
-  // for (const key of keys) {
-  //   if (key.startsWith("lngChainMenu")) {
-  //     if (a[key] == Number(newValue[2])) {
-  //       Swal.fire({
-  //         title: "이미 등록된 메뉴코드입니다.",
-  //         confirmButtonText: "확인",
-  //       });
-  //       filteredrowData2.value = rollbackdata;
-  //       return;
-  //     }
-
-  //     if (a[key] == "0" || a[key] == undefined || a[key] == NaN) {
-  //       a[key] = Number(newValue[2]);
-  //       const seleced = rowData2.value.find(
-  //         (item) => item.lngCode == Number(newValue[2])
-  //       );
-  //       if (seleced != undefined) {
-  //         filteredrowData2.value.push({
-  //           lngCode: seleced.lngCode,
-  //           strName: seleced.strName,
-  //           lngPrice: seleced.lngPrice,
-  //         });
-  //         break;
-  //       }
-  //     } else {
-  //       const seleced = rowData2.value.find((item) => item.lngCode == a[key]);
-  //       if (seleced != undefined) {
-  //         filteredrowData2.value.push({
-  //           lngCode: seleced.lngCode,
-  //           strName: seleced.strName,
-  //           lngPrice: seleced.lngPrice,
-  //         });
-  //       }
-  //     }
-  //   }
-  // }
-  // rowData1.value = [...rowData1.value];
+  if (!placed) {
+    Swal.fire({
+      title: "메뉴 연결 슬롯이 가득 찼습니다.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
 
   closeMenus();
 };
@@ -2203,27 +2209,74 @@ const dblclickedRowData = (newValue) => {
  * 행 더블 클릭시 작동 함수
  */
 
+/** 옵션 조회 팝업: 더블클릭 시 JSON 행의 옵션코드 */
+const optionLngCodeFromPopupRow = (row) => {
+  if (row == null) return undefined;
+  if (Array.isArray(row) && row.length > 0) return row[0];
+  if (typeof row === "object" && row.lngCode != null && row.lngCode !== "")
+    return row.lngCode;
+  return undefined;
+};
+
 const dblclickedRowData2 = (newValue) => {
-  //console.log(newValue);
-  //comsole.log(updatedRowData5.value);
+  const optLngCode = optionLngCodeFromPopupRow(newValue);
+  const optLngNum = Number(optLngCode);
+  if (
+    optLngCode === undefined ||
+    optLngCode === null ||
+    optLngCode === "" ||
+    Number.isNaN(optLngNum)
+  ) {
+    Swal.fire({
+      title: "옵션코드를 확인할 수 없습니다. 행을 다시 선택해 주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
   const a = updatedRowData5.value.find(
     (item) => item.lngCode == optionGroupCd.value
   );
+  if (!a) {
+    Swal.fire({
+      title: "옵션그룹 행을 찾을 수 없습니다. 그룹을 다시 선택해 주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  let placed = false;
   for (let i = 1; i <= 20; i++) {
     const key = `lngChainGroup${i}`;
-    if (a[key] == newValue[0]) {
-      Swal.fire({
-        title: "이미 등록된 옵션코드입니다.",
-        confirmButtonText: "확인",
-      });
-      return;
+    const slotEmpty =
+      a[key] == 0 ||
+      a[key] === undefined ||
+      a[key] == "0" ||
+      a[key] === "" ||
+      a[key] === null;
+    if (!slotEmpty) {
+      if (Number(a[key]) === optLngNum) {
+        Swal.fire({
+          title: "이미 등록된 옵션코드입니다.",
+          confirmButtonText: "확인",
+        });
+        return;
+      }
+      continue;
     }
-    if (a[key] == 0 || a[key] === undefined || a[key] == "0" || a[key] === "") {
-      changeColid.value = key;
-      changeValue2.value = newValue[0];
-      changeNow4.value = !changeNow4.value;
-      break; // 첫 번째로 조건 맞는 값만 처리할 경우
-    }
+    changeColid.value = key;
+    changeValue2.value = optLngCode;
+    changeNow4.value = !changeNow4.value;
+    placed = true;
+    break;
+  }
+
+  if (!placed) {
+    Swal.fire({
+      title: "옵션 연결 슬롯이 가득 찼습니다.",
+      confirmButtonText: "확인",
+    });
+    return;
   }
 
   closeMenus2();
