@@ -221,9 +221,13 @@ const props = defineProps({
     default: false,
   },
 });
+/** 로컬 날짜 (toISOString 은 UTC라 KST 등에서 종료일이 하루 밀릴 수 있음) */
 const formatDate = (date) => {
-  //comsole.log(date);
-  return date.toISOString().split("T")[0];
+  if (!date || !(date instanceof Date) || isNaN(date.getTime())) return "";
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 };
 const today = new Date();
 
@@ -496,7 +500,7 @@ const changeStartDate = (e) => {
     //  tempEndDateStack.push(selectedEndDate.value);
   } else if (1000 < date1.getFullYear() && date1.getFullYear() < 2000) {
     if (props.setLimitYear == false) {
-      selectedStartDate.value = new Date().toISOString().split("T")[0];
+      selectedStartDate.value = formatDate(new Date());
     }
   } else if (
     props.setLimitYear == true &&

@@ -85,7 +85,8 @@
     class="fixed bottom-2 right-2 w-[87%] h-[85%] flex items-center justify-center bg-black/100 z-40">
     <!-- 팝업 컨텐츠 박스 -->
     <div
-      class="bg-white p-4 rounded-lg shadow-lg w-full h-full border border-black">
+      class="bg-white p-4 rounded-lg shadow-lg w-full h-full border border-black"
+      @mousedown.capture="onPopupMouseDownSyncBottomGrid">
       <div class="flex justify-between items-center mb-2">
         <h2 class="text-lg font-bold">발주 품목등록(파트별)</h2>
         <button
@@ -147,7 +148,9 @@
             :disabled="isOrderDetailView"
             v-model="scond3" />
         </div>
-        <div class="flex items-center justify-end gap-3 px-2 py-1 border-b border-r border-black col-span-2">
+        <div
+          ref="popupOrderHeaderActionsWrap"
+          class="flex items-center justify-end gap-3 px-2 py-1 border-b border-r border-black col-span-2">
           <button
             type="button"
             class="whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none"
@@ -197,10 +200,12 @@
             v-model="scond5" />
         </div>
       </div>
-      <div class="h-[35%] w-full mt-2">
+      <div ref="popupTopOrderGridWrap" class="h-[35%] w-full mt-2">
         <Realgrid
           :progid="2"
           :progname="'PUR03_035INS_VUE'"
+          checkBarFieldName="chkTopRemove"
+          :syncRowDataPulse="topGridSyncPulse"
           @updatedRowData="updatedRowData2"
           :editableColId="'dblOrderQty,strOrderComments'"
           :checkRowAuto="false"
@@ -211,7 +216,9 @@
           :rowStateeditable="false"
           :rowData="rowData2"></Realgrid>
       </div>
-      <div class="flex justify-between items-center mt-2 border border-black bg-[#e8e4f0]">
+      <div
+        ref="popupMaterialToolbarWrap"
+        class="flex justify-between items-center mt-2 border border-black bg-[#e8e4f0]">
         <!-- 같은 묶음(라벨+컨트롤): gap-2로 붙임 / 다른 묶음 사이: 고정 w-16 스페이서로만 간격(항상 동일) -->
         <div class="flex flex-wrap items-center py-2 pl-4 pr-2 gap-y-2">
           <div class="flex items-center gap-2 shrink-0">
@@ -257,7 +264,7 @@
           </button>
         </div>
       </div>
-      <div class="h-[35%] mt-2">
+      <div ref="popupBottomMaterialGridWrap" class="h-[35%] mt-2">
         <Realgrid
           :progid="3"
           :progname="'PUR03_035INS_VUE'"
@@ -269,6 +276,7 @@
           :inputOnlyNumberColumn="'dblOrderQty'"
           :CalculateTaxColId2="'curSupply'"
           :editableColId="'dblOrderQty,strOrderComments'"
+          :syncRowDataPulse="bottomGridSyncPulse"
           @updatedRowData="updatedRowData3"
           :checkRowAuto="false"
           :checkRowAuto2="true"
@@ -283,57 +291,85 @@
 
   <div
     v-if="openpopup2"
-    class="fixed bottom-2 right-2 w-[52%] h-[85%] flex items-center justify-center bg-black/100 z-50">
+    class="fixed bottom-2 right-2 w-[52%] h-[85%] flex items-stretch justify-center bg-black/100 z-50 p-2 box-border">
     <div
-      class="bg-white p-6 rounded-xl shadow-lg w-full h-full border border-black">
-      <div class="flex justify-end space-x-2">
-        <button class="whitebutton" @click="addButton2">추가</button>
-        <button class="whitebutton" @click="openpopup2 = false">닫기</button>
+      class="bg-white p-6 rounded-xl shadow-lg w-full h-full max-h-full border border-black flex flex-col min-h-0 min-w-0 box-border">
+      <div class="flex shrink-0 justify-end gap-3">
+        <button
+          type="button"
+          class="whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+          @click="addButton2">
+          추가
+        </button>
+        <button
+          type="button"
+          class="whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+          @click="closeStockPickerPopup">
+          닫기
+        </button>
       </div>
-      <div class="grid grid-rows-2 grid-cols-[1fr,2fr,1fr,2fr]">
+      <div
+        class="mt-3 border border-black overflow-hidden shrink-0">
+        <!-- 열: 라벨 | 자재특성콤보 | 간격 | 거래처라벨 | 거래처콤보 — 자재코드 입력은 자재특성 콤보 열 너비에만 맞춤 -->
         <div
-          class="bg-gray-100 text-base font-semibold flex justify-center items-center border-l border-t border-black">
-          자재특성
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-center items-center">
-          <select
-            name=""
-            id=""
-            class="w-[80%] h-[80%] border border-black"
-            @change="setSearchValue"
-            v-model="sscond">
-            <option value="-1">전체</option>
-            <option :value="i.lngGenericID" v-for="i in optionList2">
-              {{ i.strGenericName }}
-            </option>
-          </select>
-        </div>
-        <div
-          class="bg-gray-100 text-base font-semibold flex justify-center items-center border-l border-t border-b border-black">
-          거래처
-        </div>
-        <div class="border-l border-t border-r border-black">
-          <BusinessClient
-            :defaultName="''"
-            :defaultNm="'전체'"
-            @SupplierId="SupplierId3"
-            :setDynamicClass="'!-mt-1 -ml-2 h-[80%] w-[80%]'"></BusinessClient>
-        </div>
-        <div
-          class="bg-gray-100 text-base font-semibold flex justify-center items-center border-l border-t border-b border-black">
-          자재코드/이름
-        </div>
-        <div
-          class="flex border border-black col-span-3 space-x-3 items-center justify-start pl-6">
-          <input
-            type="text"
-            class="w-[30%] h-[80%] border border-black"
-            @input="searchWord"
-            v-model="sscond2" />
+          class="grid grid-cols-[6.75rem_minmax(0,1fr)_1.5rem_6.75rem_minmax(0,1fr)]">
+          <div
+            class="bg-gray-100 text-sm font-semibold flex items-center justify-center px-2 py-2 border-b border-r border-black">
+            자재특성
+          </div>
+          <div
+            class="flex items-center pl-2 pr-2 py-1.5 border-b border-r border-black bg-white min-w-0 min-h-9">
+            <select
+              name=""
+              id=""
+              class="w-full h-7 border border-gray-600 px-2 text-sm min-w-0"
+              @change="setSearchValue"
+              v-model="sscond">
+              <option value="-1">전체</option>
+              <option :value="i.lngGenericID" v-for="i in optionList2">
+                {{ i.strGenericName }}
+              </option>
+            </select>
+          </div>
+          <div
+            class="border-b border-r border-black bg-white shrink-0 min-h-9"
+            aria-hidden="true"></div>
+          <div
+            class="bg-gray-100 text-sm font-semibold flex items-center justify-center px-2 py-2 border-b border-r border-black">
+            거래처
+          </div>
+          <div
+            class="flex items-center pl-2 pr-2 py-1.5 border-b border-black bg-white min-w-0 min-h-9">
+            <BusinessClient
+              :defaultName="''"
+              :defaultNm="'전체'"
+              :toolbarStretch="true"
+              :setDynamicClass="'!w-full !min-w-0 !max-w-none !h-7 shrink border border-gray-600 px-2 text-sm'"
+              :setDynamicClass2="'!mt-0 !items-center !gap-0 min-w-0 w-full [&>div:first-child]:hidden'"
+              @SupplierId="SupplierId3"></BusinessClient>
+          </div>
+          <div
+            class="bg-gray-100 text-sm font-semibold flex items-center justify-center px-2 py-2 border-b border-r border-black">
+            자재코드/이름
+          </div>
+          <div
+            class="flex items-center pl-2 pr-2 py-1.5 border-b border-r border-black bg-white min-w-0 min-h-9">
+            <input
+              type="text"
+              class="w-full h-7 border border-gray-600 px-2 text-sm min-w-0"
+              @input="searchWord"
+              v-model="sscond2" />
+          </div>
+          <div
+            class="border-b border-r border-black bg-white min-h-9 shrink-0"
+            aria-hidden="true"></div>
+          <div
+            class="col-span-2 border-b border-black bg-white min-h-9"></div>
         </div>
       </div>
-      <div class="w-full h-[90%] mt-1">
+      <div
+        class="mt-1 flex min-h-0 flex-1 flex-col overflow-hidden pb-1">
+        <div class="h-full min-h-0 w-full min-w-0">
         <Realgrid
           :progname="'PUR03_035INS_VUE'"
           :progid="4"
@@ -347,10 +383,12 @@
           @clickedRowData="clickedRowData"
           @checkedRowData2="checkedRowData2"
           :checkedRowData2Col="'lngFavorites'"
+          :emitCheckedRowData2AsJson="true"
           :searchColId="'lngStockID,strStockName'"
           :searchColId3="['lngGenericID', 'lngSupplierID']"
           :searchValue="searchValue"
           :rowData="rowData4"></Realgrid>
+        </div>
       </div>
     </div>
   </div>
@@ -360,7 +398,8 @@
 <script setup>
 import { getStockGeneric } from "@/api/master";
 import {
-  deleteStockOrderItem,
+  deleteOrderChit,
+  deleteOrderStockItem,
   getCloseDtmDate2,
   getOrderTimeCheck,
   getStkOrderDetail,
@@ -431,18 +470,26 @@ const orderTimeInfo = ref("");
 
 /**
  * 발주가능 시간 체크
+ * 팝업 오픈 시에는 popupSessionStoreCd(행 매장), 아니면 storeCd 사용.
  * @param {number} lngEventType 1:페이지로드 2:신규버튼 3:저장버튼 4:전표삭제버튼 5:자재제거버튼
  * @returns {boolean|undefined} type 2~5: true=허용, false=차단 / type 1: undefined
  */
 const GetOrderTimeCheck = async (lngEventType) => {
-  if (!storeCd.value || storeCd.value == 0) {
+  let sc = storeCd.value;
+  if (openpopup.value) {
+    const p = popupSessionStoreCd.value;
+    if (p != null && p !== "" && p !== 0 && p !== "0") {
+      sc = p;
+    }
+  }
+  if (!sc || sc == 0) {
     orderTimeInfo.value = "";
     return lngEventType === 1 ? undefined : true;
   }
   try {
     const res = await getOrderTimeCheck(
       store.state.userData.lngStoreGroup,
-      storeCd.value
+      sc
     );
     const data = res?.data?.List?.[0];
     if (!data) return lngEventType === 1 ? undefined : true;
@@ -617,10 +664,97 @@ const searchButton = async () => {
 
 const updatedrowdata = ref([]);
 const updatedrowdata2 = ref([]);
-/** 신규 발주: lngStockID 기준 주문 품목 (하단 그리드 emit이 검색·필터로 일부 행만 올 때 상단 주문 유실 방지) */
+/**
+ * [신규 발주 팝업] 상단·하단 발주수량 동기 구조 (단일 진실 원본: lngStockID → orderBookByStock)
+ *
+ * • 하단(자재목록) 그리드에 수량 입력 → updatedRowData3 가 행을 orderBook 에 merge → 같은 품목 요약 rows 가
+ *   상단(발주내역) 그리드 rowData2 에 반영됨.
+ *
+ * • 상단 그리드에서 수량 변경 → updatedRowData2 가 rowData2 로 book 재구축 후 patchRowData3QtyFromOrderBook 로
+ *   같은 lngStockID 품목 하단 줄의 발주수량·금액 컬럼만 맞춤.
+ *
+ * • 하단에서 다시 수정 → 역시 updatedRowData3 으로 book·상단 갱신 (emit 데이터가 이미 최신이므로 여기선 patch 불필요).
+ *
+ * • 팝업 @mousedown.capture 는 편집 커밋 순서만 보조할 뿐, 위 데이터 흐름을 대체하지 않음.
+ *
+ * • 체크박스: 상단 chkTopRemove 와 하단 checkbox/lngCheck 는 서로 다른 기능이므로 orderBook 병합 시 동기화하지 않음.
+ */
 const orderBookByStock = ref({});
+/** 신규: 품목별 공급사 ID 스냅샷 — 하단 emit 시 공급사가 빈 문자열로 덮일 때 저장 보강 */
+const newOrderSupplierByStockId = ref({});
 /** 상단 자재제거 후 하단 emit 한 번: 의도적으로 0으로 만든 품목만 버킷에서 삭제 허용 (오동작으로 전 행이 0으로 오는 경우 방지) */
 const allowZeroFromBottomThisRound = ref(null);
+/** 하단 그리드 편집 커밋 후 상단 반영 — 팝업 내 클릭 시 syncRowDataPulse 증가 (상단·헤더버튼·자재툴바 제외) */
+const bottomGridSyncPulse = ref(0);
+/** 상단 발주그리드 먼저 커밋 — 하단 클릭 전 미커밋 편집이 orderBook 을 덮지 않도록 */
+const topGridSyncPulse = ref(0);
+const popupTopOrderGridWrap = ref(null);
+const popupOrderHeaderActionsWrap = ref(null);
+const popupMaterialToolbarWrap = ref(null);
+/** 하단 자재목록 그리드 영역 */
+const popupBottomMaterialGridWrap = ref(null);
+
+/** capture 단계 mousedown 시점에 포커스가 상단 발주그리드 안에 있는지 (편집 중인 채 하단으로 옮길 때만 상단 commit 필요) */
+const isFocusInsideTopOrderGrid = () => {
+  const wrap = popupTopOrderGridWrap.value;
+  const ae = document.activeElement;
+  return wrap != null && ae != null && ae instanceof Node && wrap.contains(ae);
+};
+
+/** 포커스가 하단 자재목록 그리드 안(발주수량 입력 등)인지 — 상단 클릭 전 하단 commit 용 */
+const isFocusInsideBottomMaterialGrid = () => {
+  const wrap = popupBottomMaterialGridWrap.value;
+  const ae = document.activeElement;
+  return wrap != null && ae != null && ae instanceof Node && wrap.contains(ae);
+};
+
+const onPopupMouseDownSyncBottomGrid = (ev) => {
+  const t = ev?.target;
+  if (!t || !(t instanceof Node)) return;
+
+  const inTopGrid = popupTopOrderGridWrap.value?.contains(t) === true;
+
+  /**
+   * 예전에는 상단 클릭 시 여기서 바로 return 해 하단 편집이 커밋되지 않았음.
+   * 하단 수정 직후 상단 클릭: 같은 틱에서 rowData(setRows)와 편집기가 경합하지 않도록 커밋은 다음 틱.
+   */
+  if (inTopGrid) {
+    if (isFocusInsideBottomMaterialGrid()) {
+      nextTick(() => {
+        bottomGridSyncPulse.value++;
+      });
+    }
+    return;
+  }
+
+  if (popupOrderHeaderActionsWrap.value?.contains(t)) return;
+  if (popupMaterialToolbarWrap.value?.contains(t)) return;
+
+  const inBottomGrid = popupBottomMaterialGridWrap.value?.contains(t) === true;
+
+  /**
+   * 하단을 클릭할 때마다 topGridSyncPulse → 상단 commit·emit → updatedRowData2 → patchRowData3 로
+   * rowData3 가 매번 갱신되어 두 번째 칸부터 발주수량 입력이 막힘.
+   * 포커스가 실제로 상단 그리드(편집 중)에 있을 때만 상단 commit — 하단 연속 입력은 건드리지 않음.
+   * 상단 편집 후 하단으로 올 때는 capture 시점에 보통 아직 포커스가 상단에 있음.
+   */
+  if (inBottomGrid) {
+    if (isFocusInsideTopOrderGrid()) {
+      topGridSyncPulse.value++;
+    }
+    return;
+  }
+
+  if (isFocusInsideTopOrderGrid()) {
+    topGridSyncPulse.value++;
+  }
+  nextTick(() => {
+    patchRowData3QtyFromOrderBook();
+    nextTick(() => {
+      bottomGridSyncPulse.value++;
+    });
+  });
+};
 
 const getStockId = (row) => {
   if (!row || typeof row !== "object") return "";
@@ -639,15 +773,29 @@ const getStockId = (row) => {
   return "";
 };
 
-/** 상단 그리드: 내장 체크바는 checkbox 필드, 파트 설정에 따라 lngCheck 도 사용 */
+/** 상단 자재제거 체크 — RealGrid 체크바 필드 chkTopRemove(하단 checkbox 와 분리) */
 const isTopRowCheckedForRemove = (item) => {
   if (item == null || typeof item !== "object") return false;
-  const cb = item.checkbox;
-  if (cb === true || cb === 1 || cb === "1" || String(cb).trim() === "1")
-    return true;
+  if (Object.prototype.hasOwnProperty.call(item, "chkTopRemove")) {
+    const cb = item.chkTopRemove;
+    return (
+      cb === true ||
+      cb === 1 ||
+      cb === "1" ||
+      String(cb).trim() === "1"
+    );
+  }
+  if (Object.prototype.hasOwnProperty.call(item, "checkbox")) {
+    const cb = item.checkbox;
+    return (
+      cb === true ||
+      cb === 1 ||
+      cb === "1" ||
+      String(cb).trim() === "1"
+    );
+  }
   const lc = item.lngCheck;
-  if (lc === true || lc === 1 || lc === "1") return true;
-  return false;
+  return lc === true || lc === 1 || lc === "1";
 };
 
 /** 하단 발주수량이 0이 아닌지 */
@@ -661,9 +809,39 @@ const hasOrderQty = (item) => {
 const assignDefined = (base, patch) => {
   const out = { ...(base || {}) };
   if (!patch || typeof patch !== "object") return out;
+  /** 하단 그리드가 공급사 컬럼을 안 줄 때 '' 로 오면 기존 @lngSupplierID 가 지워지는 것 방지 */
+  const supplierKeys = new Set([
+    "lngSupplierId",
+    "lngSupplierID",
+    "LngSupplierID",
+    "LngSupplierId",
+    "SUPPLIERID",
+    "SupplierID",
+  ]);
   for (const [k, v] of Object.entries(patch)) {
-    if (v !== undefined) out[k] = v;
+    if (v === undefined) continue;
+    if (v === "" && supplierKeys.has(k) && getSupplierIdFromRow(out))
+      continue;
+    out[k] = v;
   }
+  return out;
+};
+
+/** 하단 emit → orderBook 병합 시 체크 필드 제외(상단 chkTopRemove 와 무관한 별도 기능) */
+const stripBottomGridCheckFieldsForBookMerge = (patch) => {
+  if (!patch || typeof patch !== "object") return patch;
+  const out = { ...patch };
+  delete out.checkbox;
+  delete out.lngCheck;
+  return out;
+};
+
+/** 상단 발주내역 그리드에 줄 행 — book 에 남은 하단 체크 필드 제거 */
+const sanitizeBookRowForTopGrid = (row) => {
+  if (!row || typeof row !== "object") return row;
+  const out = { ...row };
+  delete out.checkbox;
+  delete out.lngCheck;
   return out;
 };
 const rebuildOrderBookFromRows = (rows) => {
@@ -674,9 +852,10 @@ const rebuildOrderBookFromRows = (rows) => {
     next[sid] = { ...row };
   }
   orderBookByStock.value = next;
+  patchNewOrderSupplierSnap(next);
 };
 
-/** 상단 orderBook 기준으로 하단 목록 발주수량·금액 재맞춤 (자재제거 후 그리드 참조 공유로 0만 보이는 현상 완화) */
+/** 상단 변경 → 하단: orderBook 기준으로 하단 목록 중 같은 자재 행의 발주수량·금액·공급사만 덮어씀 */
 const patchRowData3QtyFromOrderBook = () => {
   const book = orderBookByStock.value || {};
   rowData3.value = (rowData3.value || []).map((row) => {
@@ -685,12 +864,14 @@ const patchRowData3QtyFromOrderBook = () => {
     if (!sid) return base;
     const br = book[sid];
     if (br != null && hasOrderQty(br)) {
+      const sup = getSupplierIdFromRow(br);
       return {
         ...base,
         dblOrderQty: br.dblOrderQty,
         curSupply: br.curSupply,
         curTax: br.curTax,
         curTotal: br.curTotal,
+        ...(sup ? { lngSupplierID: sup } : {}),
       };
     }
     return base;
@@ -706,11 +887,13 @@ const updatedRowData = (newValue) => {
   //console.log(newValue);
   updatedrowdata.value = newValue;
 };
+/** 상단 발주내역 그리드 emit — 상→하 동기화 */
 const updatedRowData2 = (newValue) => {
   const arr = Array.isArray(newValue) ? newValue : [];
   updatedrowdata2.value = arr;
   rowData2.value = arr.map((r) => ({ ...r }));
   rebuildOrderBookFromRows(rowData2.value);
+  patchRowData3QtyFromOrderBook();
 };
 
 /**
@@ -829,8 +1012,14 @@ const popupSessionStoreCd = ref(0);
 /** 상세 팝업에서 수정 시 사용할 발주번호/발주순번 */
 const popupSessionOrderNo = ref("");
 const popupSessionOrderSeq = ref("");
+/** 상세 조회 시 목록 행 헤더 공급사 — DeleteOrderChit 등 동일 조건식 */
+const popupSessionSupplierId = ref("");
 /** 동일 전표(GetstkOrderDetail) 품목별 검수수량 스냅샷 — 자재제거 가능 여부 판단용 */
 const orderDetailCheckQtyByStockId = ref({});
+/** 상세 조회 직후 품목별 공급사 ID — 그리드 emit 후 유실 시 updateOrderStockDetail 보강 */
+const orderDetailSupplierByStockId = ref({});
+/** 상세 조회 직후 품목별 발주순번 — 그리드 emit 후 유실 시 보강 */
+const orderDetailOrderSeqByStockId = ref({});
 const addButton = async () => {
   if (storeCd.value == "0") {
     Swal.fire({
@@ -845,6 +1034,7 @@ const addButton = async () => {
   const canOrder = await GetOrderTimeCheck(2);
   if (!canOrder) return;
   popupSessionStoreCd.value = storeCd.value;
+  popupSessionSupplierId.value = "";
   scond2.value = formatLocalDate(new Date());
   scond3.value = formatLocalDate(new Date().setDate(new Date().getDate() + 1));
   const closeDtmOk = await refreshOrderCloseDtmFromExpectedDate();
@@ -854,7 +1044,10 @@ const addButton = async () => {
   orderDetailLngStatus.value = "";
   popupExtraStoreOption.value = null;
   orderDetailCheckQtyByStockId.value = {};
+  orderDetailSupplierByStockId.value = {};
+  orderDetailOrderSeqByStockId.value = {};
   orderBookByStock.value = {};
+  newOrderSupplierByStockId.value = {};
   allowZeroFromBottomThisRound.value = null;
   rowData2.value = [];
   updatedrowdata2.value = [];
@@ -945,15 +1138,28 @@ const searchWord = (e) => {
   sscond2.value = e.target.value;
 };
 
-const checkedRowData2 = async (e) => {
-  const res = await saveFavoriteStockItemBypart(
-    store.state.userData.lngStoreGroup,
-    popupSessionStoreCd.value,
-    e[3],
-    e[1] == true ? 0 : 1,
-    scond4.value
-  );
-  console.log(res);
+/** 자재추가 팝업: 즐겨찾기(lngFavorites) 토글 시마다 API 호출 */
+const checkedRowData2 = async (row) => {
+  if (!row || typeof row !== "object") return;
+  const stockId = getStockId(row);
+  if (!stockId) return;
+  const favRaw = getRowVal(row, "lngFavorites", "LngFavorites");
+  const isFavoriteOn =
+    favRaw === true ||
+    favRaw === 1 ||
+    favRaw === "1" ||
+    String(favRaw).trim() === "1";
+  /** 기존 로직 유지: 체크됨(true) → VALUE 0, 해제 → 1 */
+  const value = isFavoriteOn ? 0 : 1;
+  try {
+    await saveFavoriteStockItemBypart(
+      store.state.userData.lngStoreGroup,
+      popupSessionStoreCd.value,
+      stockId,
+      value,
+      scond4.value
+    );
+  } catch (_) {}
 };
 
 const selectedRowForPopup = ref(null);
@@ -976,6 +1182,59 @@ const getRowVal = (r, ...keys) => {
     }
   }
   return undefined;
+};
+
+/** 상세/그리드 행 공급사 ID — API·직렬화 필드명 혼용 */
+const getSupplierIdFromRow = (row) => {
+  if (!row || typeof row !== "object") return "";
+  const v = getRowVal(
+    row,
+    "lngSupplierId",
+    "lngSupplierID",
+    "LngSupplierID",
+    "LngSupplierId",
+    "SUPPLIERID",
+    "SupplierID"
+  );
+  if (v === undefined || v === null || v === "") return "";
+  return String(v).trim();
+};
+
+/** API 전달용 공급사 ID — 공백·문자열 "0"·숫자 0(예: "00") 제외. 비숫자 코드는 그대로 허용 */
+const isValidSupplierIdForApi = (v) => {
+  const t = String(v ?? "").trim();
+  if (!t) return false;
+  const n = Number(String(t).replaceAll(",", ""));
+  if (!Number.isNaN(n) && n === 0) return false;
+  return true;
+};
+
+/** 신규: orderBook 갱신 시 품목별 공급사 스냅샷 유지(빈 값으로 덮어쓰지 않음) */
+function patchNewOrderSupplierSnap(book) {
+  if (isOrderDetailView.value) return;
+  const b = book || {};
+  const prev = newOrderSupplierByStockId.value || {};
+  const snap = {};
+  for (const [sid, row] of Object.entries(b)) {
+    const sup = getSupplierIdFromRow(row);
+    snap[sid] = sup || prev[sid] || "";
+  }
+  newOrderSupplierByStockId.value = snap;
+}
+
+/** 품목별 발주순번 — API·직렬화 필드명 혼용 (행마다 상이) */
+const getOrderSeqFromRow = (row) => {
+  if (!row || typeof row !== "object") return "";
+  const v = getRowVal(
+    row,
+    "lngOrderSeq",
+    "LngOrderSeq",
+    "LNG_ORDER_SEQ",
+    "OrderSeq",
+    "intOrderSeq"
+  );
+  if (v === undefined || v === null || v === "") return "";
+  return String(v).trim();
 };
 
 /** 상세 API 주문일자 파라미터용 yyyyMMdd */
@@ -1056,8 +1315,10 @@ const openOrderDetailPopup = async (row) => {
     const list = resDetail.data.List ?? [];
     {
       const m = {};
+      const supMap = {};
+      const seqMap = {};
       for (const item of list) {
-        const sid = String(item.lngStockID ?? item.LngStockID ?? "").trim();
+        const sid = getStockId(item);
         if (!sid) continue;
         const q = item.dblCheckQty ?? item.DblCheckQty;
         const n =
@@ -1065,8 +1326,14 @@ const openOrderDetailPopup = async (row) => {
             ? q
             : Number(String(q ?? "").replaceAll(",", ""));
         m[sid] = Number.isNaN(n) ? 0 : n;
+        const sup = getSupplierIdFromRow(item);
+        if (sup) supMap[sid] = sup;
+        const oseq = getOrderSeqFromRow(item);
+        if (oseq) seqMap[sid] = oseq;
       }
       orderDetailCheckQtyByStockId.value = m;
+      orderDetailSupplierByStockId.value = supMap;
+      orderDetailOrderSeqByStockId.value = seqMap;
     }
     console.log("[상세 list] 첫번째 항목 fields:", list[0] ? Object.keys(list[0]) : "없음", list[0]);
     let partList = resPart.data.List ?? [];
@@ -1086,6 +1353,7 @@ const openOrderDetailPopup = async (row) => {
     popupSessionStoreCd.value = storeCdVal;
     popupSessionOrderNo.value = orderNoVal ?? "";
     popupSessionOrderSeq.value = String(list[0]?.lngOrderSeq ?? "");
+    popupSessionSupplierId.value = supplierIdVal;
     popupExtraStoreOption.value =
       storeCdVal != null && storeCdVal !== ""
         ? {
@@ -1133,6 +1401,8 @@ const openOrderDetailPopup = async (row) => {
         curSupply: toNum(item.curSupply),
         curTax: toNum(item.curTax),
         curTotal: toNum(item.curTotal),
+        /** 자재제거 체크만 사용 — 상세 API lngCheck 가 1 이면 미선택인데도 선택으로 오인됨 */
+        checkbox: false,
       };
     });
     rebuildOrderBookFromRows(rowData2.value);
@@ -1181,7 +1451,10 @@ const updatedRowData4 = (e) => {
 const rowData3 = ref([]);
 const updatedrowdata3 = ref([]);
 
-/** 하단 자재목록(최근등록·즐겨찾기) — 잠금 시 미호출 */
+/**
+ * 하단 자재목록(최근등록·즐겨찾기).
+ * getStockItemListWithFavorite 응답 List 행마다 lngSupplierID(품목별) 포함 — 잠금 시 미호출
+ */
 const loadPopupStockListForMaterialPane = async (favoriteType) => {
   if (isPopupToolbarLocked.value) return;
   if (isOrderDetailView.value) return;
@@ -1203,7 +1476,89 @@ const loadPopupStockListForMaterialPane = async (favoriteType) => {
   } catch (error) {}
 };
 
-const addButton2 = () => {
+/** 자재추가 팝업에서 [추가]로 넣은 행 표시 — 즐겨찾기 재조회 시 선택 추가분만 목록 밖 행으로 유지 */
+const isStockPickerPopupAddedRow = (row) =>
+  row?.lngFromStockPickerAdd === 1 ||
+  row?.lngFromStockPickerAdd === true ||
+  row?.lngFromStockPickerAdd === "1";
+
+/** 즐겨찾기만 서버 목록으로 새로 깔고, 입력수량 등은 같은 자재코드(prev)와 병합 */
+function mergeFavoriteReloadWithExistingBottomRows(freshList, prevRows) {
+  const prevBySid = {};
+  for (const r of prevRows || []) {
+    const sid = getStockId(r);
+    if (sid) prevBySid[sid] = r;
+  }
+  const freshSids = new Set(
+    (freshList || []).map((r) => getStockId(r)).filter(Boolean)
+  );
+
+  const out = (freshList || []).map((row) => {
+    const sid = getStockId(row);
+    const prev = sid ? prevBySid[sid] : null;
+    if (!sid || !prev) return { ...row };
+    const merged = {
+      ...row,
+      dblOrderQty: prev.dblOrderQty,
+      curSupply: prev.curSupply,
+      curTax: prev.curTax,
+      curTotal: prev.curTotal,
+      strOrderComments: prev.strOrderComments ?? row.strOrderComments,
+      lngCheck: prev.lngCheck,
+      ...(Object.prototype.hasOwnProperty.call(prev, "checkbox")
+        ? { checkbox: prev.checkbox }
+        : {}),
+    };
+    if (isStockPickerPopupAddedRow(prev)) merged.lngFromStockPickerAdd = 1;
+    return merged;
+  });
+
+  /** 즐겨찾기 API에 없어진 줄은 버리되, 팝업 [추가]로만 넣은 품목은 계속 표시 */
+  for (const r of prevRows || []) {
+    const sid = getStockId(r);
+    if (!sid || freshSids.has(sid)) continue;
+    if (!isStockPickerPopupAddedRow(r)) continue;
+    out.push({ ...r });
+  }
+  return out;
+}
+
+/** 하단 자재목록이 즐겨찾기일 때 자재추가 팝업 닫기 후 목록만 최신화 */
+const reloadFavoriteListPreservingBottomRows = async () => {
+  store.state.loading = true;
+  try {
+    const prevRows = rowData3.value || [];
+    const res = await getStockItemListWithFavorite(
+      store.state.userData.lngStoreGroup,
+      popupSessionStoreCd.value,
+      scond4.value,
+      "2",
+      ""
+    );
+    const freshList = res?.data?.List ?? [];
+    const merged = mergeFavoriteReloadWithExistingBottomRows(freshList, prevRows);
+    rowData3.value = merged;
+    updatedrowdata3.value = merged.map((r) => ({ ...r }));
+    await nextTick();
+    updatedRowData3(merged);
+  } catch (_) {
+    /* noop */
+  } finally {
+    store.state.loading = false;
+  }
+};
+
+const closeStockPickerPopup = async () => {
+  openpopup2.value = false;
+  if (isPopupToolbarLocked.value) return;
+  if (isOrderDetailView.value) return;
+  if (scond4.value === "0" || scond4.value === 0) return;
+  if (String(scond7.value) !== "2") return;
+  await reloadFavoriteListPreservingBottomRows();
+};
+
+/** 자재추가: 기존 하단 목록 유지 + 선택 품목만 추가(동일 자재는 건너뜀) */
+const addButton2 = async () => {
   if (updatedrowdata4.value.length == 0) {
     Swal.fire({
       title: "경고",
@@ -1215,13 +1570,38 @@ const addButton2 = () => {
     return;
   }
 
-  rowData3.value = updatedrowdata4.value.map((item) => ({
-    ...item,
-    dblOrderQty: 0,
-    curSupply: 0,
-    lngCheck: "0",
-  }));
-  openpopup2.value = false;
+  const existing = [...(rowData3.value || [])];
+  const existingSids = new Set(
+    existing.map((r) => getStockId(r)).filter(Boolean)
+  );
+  const additions = [];
+  for (const item of updatedrowdata4.value) {
+    const sid = getStockId(item);
+    if (!sid || existingSids.has(sid)) continue;
+    existingSids.add(sid);
+    additions.push({
+      ...item,
+      dblOrderQty: 0,
+      curSupply: 0,
+      lngCheck: "0",
+      lngFromStockPickerAdd: 1,
+    });
+  }
+
+  if (additions.length === 0) {
+    await Swal.fire({
+      title: "안내",
+      text: "선택한 품목은 이미 자재목록에 있습니다.",
+      icon: "info",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  rowData3.value = [...existing, ...additions];
+  updatedrowdata3.value = rowData3.value.map((r) => ({ ...r }));
+  await nextTick();
+  updatedRowData3(rowData3.value);
 };
 
 const searchButton3 = async (e) => {
@@ -1257,9 +1637,9 @@ const setScond6 = (e) => {
 };
 
 /**
- * 하단 그리드 emit(e): orderBook 기준으로만 갱신 → 이번 emit에 없는 품목은 유지.
- * patch 에 undefined 가 오면 assignDefined 로 기존 수량 유지.
- * 버킷에 주문이 있는데 들어온 값만 0인 경우: 자재제거 직후(set된 allowZeroFromBottomThisRound)에만 버킷 삭제 허용.
+ * 하단 자재목록 그리드 emit — 하→상 동기화.
+ * orderBook 에 merge 후 상단 rowData2 만 갱신 (하단은 emit 값 e 가 그대로 유지되어 patch 불필요).
+ * 이번 emit 에 없는 품목은 기존 book 유지. assignDefined 로 부분 패치 병합.
  */
 const updatedRowData3 = (e) => {
   console.log(e);
@@ -1273,10 +1653,14 @@ const updatedRowData3 = (e) => {
     const sid = getStockId(row);
     if (!sid) continue;
 
-    const merged = assignDefined(book[sid], row);
+    const prevBook = book[sid];
+    const merged = assignDefined(
+      prevBook,
+      stripBottomGridCheckFieldsForBookMerge(row)
+    );
 
     if (!hasOrderQty(merged)) {
-      const hadBookOrder = book[sid] != null && hasOrderQty(book[sid]);
+      const hadBookOrder = prevBook != null && hasOrderQty(prevBook);
       if (
         hadBookOrder &&
         allowZeroSet != null &&
@@ -1296,7 +1680,10 @@ const updatedRowData3 = (e) => {
   }
 
   orderBookByStock.value = book;
-  const mergedRows = Object.values(book).filter(hasOrderQty);
+  patchNewOrderSupplierSnap(book);
+  const mergedRows = Object.values(book)
+    .filter(hasOrderQty)
+    .map(sanitizeBookRowForTopGrid);
   updatedrowdata2.value = mergedRows;
   rowData2.value = mergedRows.map((r) => ({ ...r }));
 };
@@ -1311,9 +1698,132 @@ const deleteStock = () => {
 const deleteOrder = async () => {
   if (isPopupToolbarLocked.value) return;
   if (!isOrderDetailView.value) return;
+
+  const snap = orderDetailCheckQtyByStockId.value || {};
+  const anyCheckQtyNonZero = Object.values(snap).some((n) => {
+    const x = Number(n);
+    return !Number.isNaN(x) && x !== 0;
+  });
+  if (anyCheckQtyNonZero) {
+    await Swal.fire({
+      title: "안내",
+      text: "발주상태가 변경되어 삭제가 불가능합니다",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
   const canDelete = await GetOrderTimeCheck(4);
   if (!canDelete) return;
-  // TODO: 전표삭제 로직 구현
+
+  const confirm = await Swal.fire({
+    title: "확인",
+    text: "전표를 삭제하시겠습니까?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "확인",
+    cancelButtonText: "취소",
+  });
+  if (!confirm.isConfirmed) return;
+
+  const orderNoVal = String(popupSessionOrderNo.value ?? "").trim();
+  if (!orderNoVal) {
+    await Swal.fire({
+      title: "안내",
+      text: "주문번호를 찾을 수 없어 삭제할 수 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  const storeCdVal = popupSessionStoreCd.value;
+  if (
+    storeCdVal == null ||
+    storeCdVal === "" ||
+    storeCdVal === 0 ||
+    storeCdVal === "0"
+  ) {
+    await Swal.fire({
+      title: "안내",
+      text: "매장정보를 찾을 수 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  /** 헤더가 "0"이면 truthy라서 `||` 폴백이 안 됨 → 유효 ID만 채택, 행·스냅샷 순 탐색 */
+  const resolveSupplierIdForChit = () => {
+    if (isValidSupplierIdForApi(popupSessionSupplierId.value)) {
+      return String(popupSessionSupplierId.value).trim();
+    }
+    for (const row of rowData2.value || []) {
+      const s = getSupplierIdFromRow(row);
+      if (isValidSupplierIdForApi(s)) return s;
+    }
+    const snap = orderDetailSupplierByStockId.value || {};
+    for (const sid of Object.keys(snap)) {
+      const s = snap[sid];
+      if (isValidSupplierIdForApi(s)) return String(s).trim();
+    }
+    return "";
+  };
+
+  const supplierIdForChit = resolveSupplierIdForChit();
+  if (!isValidSupplierIdForApi(supplierIdForChit)) {
+    await Swal.fire({
+      title: "안내",
+      text: "공급사 정보를 찾을 수 없어 삭제할 수 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  store.state.loading = true;
+  try {
+    const res = await deleteOrderChit(
+      store.state.userData.lngStoreGroup,
+      storeCdVal,
+      orderNoVal,
+      supplierIdForChit,
+      store.state.userData.lngSequence
+    );
+    store.state.loading = false;
+
+    if (res?.data?.RESULT_CD !== "00") {
+      await Swal.fire({
+        title: "실패",
+        text: res?.data?.RESULT_NM ?? "전표 삭제에 실패하였습니다.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+
+    await Swal.fire({
+      title: "성공",
+      text: "전표삭제가 완료되었습니다.",
+      icon: "success",
+      confirmButtonText: "확인",
+    });
+    closeOpenpopup();
+    await searchButton();
+  } catch (err) {
+    store.state.loading = false;
+    const errText =
+      err?.response?.data?.RESULT_NM ??
+      err?.message ??
+      "전표 삭제 중 오류가 발생하였습니다.";
+    await Swal.fire({
+      title: "오류",
+      text: errText,
+      icon: "error",
+      confirmButtonText: "확인",
+    });
+  }
 };
 
 /** 상단 자재제거: UI만 갱신(신규) / API 성공 후에도 동일 경로 */
@@ -1356,7 +1866,9 @@ const deleteStock2 = async () => {
   if (removedIds.size === 0) {
     await Swal.fire({
       title: "안내",
-      text: "제거할 자재를 선택해 주세요.",
+      text: isOrderDetailView.value
+        ? "제거할 주문품목을 선택해 주십시오"
+        : "제거할 자재를 선택해 주세요.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -1367,7 +1879,12 @@ const deleteStock2 = async () => {
     const snap = orderDetailCheckQtyByStockId.value || {};
     const anyCheckQtyOnSlip = Object.values(snap).some((n) => Number(n) > 0);
     if (anyCheckQtyOnSlip) {
-      alert("발주상태가 변경되어 삭제가 불가능합니다");
+      await Swal.fire({
+        title: "안내",
+        text: "발주상태가 변경되어 삭제가 불가능합니다",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
       return;
     }
   }
@@ -1399,27 +1916,34 @@ const deleteStock2 = async () => {
     const groupCd = Array(n).fill(store.state.userData.lngStoreGroup).join(zw);
     const storeCdJoined = Array(n).fill(popupSessionStoreCd.value).join(zw);
     const orderNoJoined = Array(n).fill(orderNoVal).join(zw);
+    const seqSnapDel = orderDetailOrderSeqByStockId.value || {};
     const orderSeqJoined = checkedRows
-      .map((item) =>
-        String(
-          item.lngOrderSeq != null && item.lngOrderSeq !== ""
-            ? item.lngOrderSeq
-            : popupSessionOrderSeq.value ?? ""
-        )
-      )
+      .map((item) => {
+        const sid = getStockId(item);
+        const seq =
+          getOrderSeqFromRow(item) ||
+          (sid ? seqSnapDel[sid] : "") ||
+          popupSessionOrderSeq.value ||
+          "";
+        return String(seq);
+      })
       .join(zw);
-    const stockIds = checkedRows
-      .map((item) => String(item.lngStockID ?? item.lngStockId ?? ""))
-      .join(zw);
+    const stockIds = checkedRows.map((item) => getStockId(item)).join(zw);
+    const supSnapDel = orderDetailSupplierByStockId.value || {};
     const supplierIds = checkedRows
-      .map((item) =>
-        String(item.lngSupplierId ?? item.lngSupplierID ?? "")
-      )
+      .map((item) => {
+        const sid = getStockId(item);
+        const sup =
+          getSupplierIdFromRow(item) ||
+          (sid ? supSnapDel[sid] : "") ||
+          "";
+        return String(sup);
+      })
       .join(zw);
 
     store.state.loading = true;
     try {
-      const res = await deleteStockOrderItem(
+      const res = await deleteOrderStockItem(
         groupCd,
         storeCdJoined,
         orderNoJoined,
@@ -1439,16 +1963,36 @@ const deleteStock2 = async () => {
         });
         return;
       }
-      const snapNext = { ...orderDetailCheckQtyByStockId.value };
-      for (const id of removedIds) {
-        delete snapNext[String(id)];
+      await Swal.fire({
+        title: "성공",
+        text: "자재제거가 완료되었습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      /** 상세 스냅샷에서 제거된 자재 제거 — 팝업 유지 후 추가 수정 가능 */
+      const qc = { ...orderDetailCheckQtyByStockId.value };
+      const qs = { ...orderDetailSupplierByStockId.value };
+      const qo = { ...orderDetailOrderSeqByStockId.value };
+      for (const sid of removedIds) {
+        delete qc[sid];
+        delete qs[sid];
+        delete qo[sid];
       }
-      orderDetailCheckQtyByStockId.value = snapNext;
-    } catch (_) {
+      orderDetailCheckQtyByStockId.value = qc;
+      orderDetailSupplierByStockId.value = qs;
+      orderDetailOrderSeqByStockId.value = qo;
+      await applyLocalDeleteStock2(rows, removedIds);
+      await searchButton();
+      return;
+    } catch (err) {
       store.state.loading = false;
+      const errText =
+        err?.response?.data?.RESULT_NM ??
+        err?.message ??
+        "품목 삭제 중 오류가 발생하였습니다.";
       await Swal.fire({
         title: "오류",
-        text: "품목 삭제 중 오류가 발생하였습니다.",
+        text: errText,
         icon: "error",
         confirmButtonText: "확인",
       });
@@ -1463,34 +2007,47 @@ const UpdateOrderStockDetail = async () => {
   const orderNo = popupSessionOrderNo.value;
   const orderSeq = popupSessionOrderSeq.value;
 
-  // lngSupplierId는 그리드 emit에서 누락되므로 원본 rowData2에서 lngStockID 기준으로 매핑
-  const origMap = Object.fromEntries(
-    (rowData2.value || []).map((r) => [String(r.lngStockID ?? ""), r])
-  );
+  /** emit·API 필드명 차이로 lngStockID 만으로는 매칭 실패할 수 있어 getStockId 로 통일 */
+  const origMap = {};
+  for (const r of rowData2.value || []) {
+    const k = getStockId(r);
+    if (k) origMap[k] = r;
+  }
 
   const sourceRows = (updatedrowdata2.value?.length > 0)
     ? updatedrowdata2.value
     : rowData2.value;
-  // lngStockID 기준 중복 제거
   const seen = new Set();
   const targetRows = sourceRows.filter((item) => {
-    const key = String(item.lngStockID ?? "");
-    if (seen.has(key)) return false;
+    const key = getStockId(item);
+    if (!key || seen.has(key)) return false;
     seen.add(key);
     return true;
   });
+  const supSnap = orderDetailSupplierByStockId.value || {};
+  const seqSnap = orderDetailOrderSeqByStockId.value || {};
   let lastRes = null;
   for (const item of targetRows) {
-    const orig = origMap[String(item.lngStockID ?? "")];
-    const supplierId = orig?.lngSupplierId ?? item.lngSupplierId ?? "";
-    const itemOrderSeq = String(orig?.lngOrderSeq ?? item.lngOrderSeq ?? orderSeq);
+    const sid = getStockId(item);
+    const orig = sid ? origMap[sid] : undefined;
+    const supplierId =
+      getSupplierIdFromRow(orig) ||
+      getSupplierIdFromRow(item) ||
+      (sid ? supSnap[sid] : "") ||
+      "";
+    const itemOrderSeq = String(
+      getOrderSeqFromRow(orig) ||
+        getOrderSeqFromRow(item) ||
+        (sid ? seqSnap[sid] : "") ||
+        orderSeq
+    );
     lastRes = await updateOrderStockDetail(
       store.state.userData.lngStoreGroup,
       popupSessionStoreCd.value,
       orderNo,
       itemOrderSeq,
       supplierId,
-      String(item.lngStockID ?? ""),
+      sid,
       String(item.dblOrderQty ?? ""),
       String(item.curSupply ?? ""),
       String(item.curTax ?? ""),
@@ -1548,7 +2105,14 @@ const saveButton2 = async () => {
       res = await UpdateOrderStockDetail();
     } else {
       const supplierid = updatedrowdata2.value
-        .map((item) => item.lngSupplierId ?? item.lngSupplierID ?? "")
+        .map((item) => {
+          const sid = getStockId(item);
+          return (
+            getSupplierIdFromRow(item) ||
+            (sid ? newOrderSupplierByStockId.value[sid] : "") ||
+            ""
+          );
+        })
         .join("\u200b");
       const stockids = updatedrowdata2.value
         .map((item) => item.lngStockID)
@@ -1697,8 +2261,15 @@ const refreshOrderCloseDtmFromExpectedDate = async (showAlert = true) => {
   }
 };
 
-watch(scond3, () => {
-  void refreshOrderCloseDtmFromExpectedDate(false);
+/** 납기예정일 변경 시: 발주마감시각 갱신 + 발주가능 시간(저장과 동일, type 3) */
+watch(scond3, async () => {
+  /** 납기 바뀔 때마다 마감 안내 Swal 재표시 가능하게 */
+  orderClosePastWarningShown.value = false;
+  await refreshOrderCloseDtmFromExpectedDate(false);
+  if (!openpopup.value) return;
+  const exp = (scond3.value || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(exp)) return;
+  await GetOrderTimeCheck(3);
 });
 
 const searchButton4 = async (e) => {
@@ -1727,7 +2298,10 @@ const initGrid2 = () => {
   popupSessionStoreCd.value = 0;
   popupSessionOrderNo.value = "";
   popupSessionOrderSeq.value = "";
+  popupSessionSupplierId.value = "";
   orderDetailCheckQtyByStockId.value = {};
+  orderDetailSupplierByStockId.value = {};
+  orderDetailOrderSeqByStockId.value = {};
   orderDetailLngStatus.value = "";
   isOrderDetailView.value = false;
   scond.value = "";
@@ -1741,6 +2315,7 @@ const initGrid2 = () => {
 
   rowData2.value = [];
   orderBookByStock.value = {};
+  newOrderSupplierByStockId.value = {};
   allowZeroFromBottomThisRound.value = null;
 
   rowData3.value = [];

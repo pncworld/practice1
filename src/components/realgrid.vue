@@ -291,6 +291,16 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /** 값이 바뀔 때마다 commit 후 updatedRowData emit (부모에서 클릭 시 동기화용) */
+  syncRowDataPulse: {
+    type: Number,
+    default: 0,
+  },
+  /** 체크바가 바인딩할 행 필드명 (기본 checkbox). 상·하단 그리드 분리 시 각각 다른 값 사용 */
+  checkBarFieldName: {
+    type: String,
+    default: "checkbox",
+  },
   inputOnlyNumberColumn: {
     // 데이터 입력 숫자로 제한
     type: String,
@@ -1135,6 +1145,11 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  /** true면 checkedRowData2 페이로드를 getJsonRow(row) 객체로 전달 (인덱스 배열 의존 제거) */
+  emitCheckedRowData2AsJson: {
+    type: Boolean,
+    default: false,
+  },
   checkAbleExpressionCol: {
     // 체크가능한 컬럼
     type: String,
@@ -1394,6 +1409,14 @@ const funcshowGrid = async () => {
     if (props.addField == "new") {
       fields.push({ fieldName: "new", dataType: "boolean" });
     }
+  }
+
+  if (
+    props.checkBarFieldName &&
+    props.checkBarFieldName !== "checkbox" &&
+    !fields.some((f) => f.fieldName === props.checkBarFieldName)
+  ) {
+    fields.push({ fieldName: props.checkBarFieldName, dataType: "boolean" });
   }
 
   if (props.autoPlusColumn) {
@@ -2988,7 +3011,7 @@ const funcshowGrid = async () => {
 
   gridView.displayOptions.watchDisplayChange = false;
   gridView.filterMode = "explicit";
-  gridView.checkBar.fieldName = "checkbox";
+  gridView.checkBar.fieldName = props.checkBarFieldName || "checkbox";
   gridView.rowIndicator.draggableSelectedRows = true;
   gridView.displayOptions.syncGridHeight =
     props.syncGridHeight == true ? "always" : "none";
@@ -3115,8 +3138,8 @@ const funcshowGrid = async () => {
 
   gridView.onCellEdited = function (grid, itemIndex, row, field) {
     gridView.commit();
-    const isCheckCell =
-      gridView.columnByField(field).renderer?.type === "check";
+    const colEdited = gridView.columnByField(field);
+    const isCheckCell = colEdited?.renderer?.type === "check";
 
     if (props.checkRowAuto2 == true && isCheckCell) {
       const val = grid.getDataSource().getValue(row, props.checkRowAuto2Col); // 셀 클릭시 checkautoRow  = false 하고 셀 클릭과 내장 체크바가 연동안되게하면서 이 방식으로 체크박스가 체크되었을때만체크되게 설정
@@ -3149,13 +3172,17 @@ const funcshowGrid = async () => {
     emit("updatedRowData", updatedrowData.value);
     emit("allStateRows", dataProvider.getAllStateRows());
 
+    const orgFieldName = dataProvider.getOrgFieldName(field);
+    const colForChecked2 =
+      orgFieldName != null ? gridView.columnByField(orgFieldName) : null;
     if (
       props.checkedRowData2Col != "" &&
-      gridView.columnByField(dataProvider.getOrgFieldName(field)).name ==
-        props.checkedRowData2Col
+      colForChecked2?.name == props.checkedRowData2Col
     ) {
-      const checkedRowData2 = dataProvider.getRows()[row];
-      emit("checkedRowData2", checkedRowData2);
+      const checkedPayload = props.emitCheckedRowData2AsJson
+        ? dataProvider.getJsonRow(row)
+        : dataProvider.getRows()[row];
+      emit("checkedRowData2", checkedPayload);
     }
   };
 
@@ -3183,6 +3210,8 @@ const funcshowGrid = async () => {
 
     emit("checkedRowIndex", rows);
     updatedrowData.value = [...dataProvider.getJsonRows()];
+    emit("updatedRowData", updatedrowData.value);
+    emit("allStateRows", dataProvider.getAllStateRows());
     // dataProvider.endUpdate();
     //selectedRowData.value.index = itemIndex;
   };
@@ -3201,8 +3230,9 @@ const funcshowGrid = async () => {
     }
     emit("checkedRowData", selectedRowData.value);
 
-    // updatedrowData.value = [...dataProvider.getJsonRows()];
-    // emit("updatedRowData", updatedrowData.value);
+    updatedrowData.value = [...dataProvider.getJsonRows()];
+    emit("updatedRowData", updatedrowData.value);
+    emit("allStateRows", dataProvider.getAllStateRows());
   };
 
   dataProvider.onDataChanged = function (provider) {
@@ -3457,6 +3487,10 @@ const funcshowGrid = async () => {
 
   gridView.onCellDblClicked = function (grid, clickData) {
     if (clickData.itemIndex == undefined) {
+      return;
+    }
+    /** 푸터/소계/헤더 영역 또는 동기화 직후 무효 행 → getJsonRow(-1) 예외 방지 */
+    if (clickData.dataRow == undefined || clickData.dataRow < 0) {
       return;
     }
 
@@ -4135,6 +4169,21 @@ watch(
   }
 );
 watch(
+  () => props.syncRowDataPulse,
+  () => {
+    if (
+      gridView == null ||
+      dataProvider == null ||
+      dataProvider.getRowCount() <= 0
+    ) {
+      return;
+    }
+    gridView.commit();
+    updatedrowData.value = [...dataProvider.getJsonRows()];
+    emit("updatedRowData", updatedrowData.value);
+  }
+);
+watch(
   () => props.setAllCheck,
   (newval) => {
     if (gridView != null) {
@@ -4649,6 +4698,12 @@ watch(
     if (!isInitialLoad && isGridInitialized.value && gridView !== undefined && gridView !== null && dataProvider !== undefined && dataProvider !== null) {
       // 그리드 재초기화 없이 데이터만 업데이트
       try {
+        /** 편집 중인 채 setRows 하면 "Client is editing (call grid.commit first)" — 먼저 커밋 */
+        if (gridView != null) {
+          try {
+            gridView.commit();
+          } catch (_) {}
+        }
         if (props.setTreeView == false) {
           dataProvider.setRows(props.rowData);
         } else {

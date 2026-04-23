@@ -1,0 +1,92 @@
+        /// <summary>
+        /// 전표 단위 삭제. usp_VUE_DeleteOrderChit(@lngStoreGroup, @lngStoreCode, @strOrderNo, @lngSupplierID, @lngSequence)
+        /// JSON { RESULT_CD, RESULT_NM } — DeleteOrderStockItem 과 동일. (납기는 SP에서 키로 쓰지 않음)
+        /// </summary>
+        [WebMethod]
+        public object DeleteOrderChit(
+            string GROUP_CD,
+            string STORE_CD,
+            string ORDER_NO,
+            string SUPPLIERID,
+            string SEQUENCE)
+        {
+            SqlParameter[] param;
+            string strResultCode = "99";
+            string strResultName = "UNKNOWN ERROR";
+
+            try
+            {
+                string ono = (ORDER_NO ?? "").Trim();
+                int groupId;
+                int storeId;
+                int supId;
+                int seqId;
+
+                if (!int.TryParse((GROUP_CD ?? "").Trim(), out groupId))
+                {
+                    strResultName = "그룹코드가 올바르지 않습니다.";
+                }
+                else if (!int.TryParse((STORE_CD ?? "").Trim(), out storeId) || storeId == 0)
+                {
+                    strResultName = "매장코드가 올바르지 않습니다.";
+                }
+                else if (string.IsNullOrEmpty(ono))
+                {
+                    strResultName = "주문번호가 없습니다.";
+                }
+                else if (!int.TryParse((SUPPLIERID ?? "").Trim(), out supId) || supId == 0)
+                {
+                    strResultName = "공급사 정보가 올바르지 않습니다.";
+                }
+                else if (!int.TryParse((SEQUENCE ?? "").Trim(), out seqId))
+                {
+                    strResultName = "시퀀스(사용자)가 올바르지 않습니다.";
+                }
+                else
+                {
+                    param = new[]
+                    {
+                        new SqlParameter("@lngStoreGroup", SqlDbType.Int) { Value = groupId },
+                        new SqlParameter("@lngStoreCode", SqlDbType.Int) { Value = storeId },
+                        new SqlParameter("@strOrderNo", SqlDbType.VarChar, 20) { Value = ono },
+                        new SqlParameter("@lngSupplierID", SqlDbType.Int) { Value = supId },
+                        new SqlParameter("@lngSequence", SqlDbType.Int) { Value = seqId },
+                    };
+
+                    bool ok = Proc_Execute("usp_VUE_DeleteOrderChit", param);
+
+                    if (ok == false)
+                    {
+                        strResultName = "전표 삭제 처리에 실패하였습니다.";
+                    }
+                    else
+                    {
+                        strResultCode = "00";
+                        strResultName = "SUCCESS";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                /* .NET 3.5 이하: IsNullOrWhiteSpace 미지원 → Trim 길이로 판별 */
+                strResultName =
+                    ex.Message == null || ex.Message.Trim().Length == 0
+                        ? "전표 삭제 중 오류가 발생하였습니다."
+                        : ex.Message;
+            }
+
+            var jsonObj = new
+            {
+                RESULT_CD = strResultCode,
+                RESULT_NM = strResultName,
+            };
+
+            var js = new System.Web.Script.Serialization.JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+            HttpContext.Current.Response.Clear();
+            HttpContext.Current.Response.ContentType = "application/json; charset=utf-8";
+            HttpContext.Current.Response.Write(js.Serialize(jsonObj));
+            HttpContext.Current.Response.Flush();
+            HttpContext.Current.Response.End();
+
+            return null;
+        }

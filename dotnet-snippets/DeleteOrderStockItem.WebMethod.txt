@@ -1,0 +1,86 @@
+        [WebMethod]
+        public object DeleteOrderStockItem(
+            string GROUP_CD,
+            string STORE_CD,
+            string ORDER_NO,
+            string ORDER_SEQ,
+            string STOCKIDS,
+            string SUPPLIERID,
+            string SEQUENCE)
+        {
+            SqlParameter[] param;
+            string strResultCode = "99";
+            string strResultName = "UNKNOWN ERROR";
+
+            try
+            {
+                char zw = '\u200b';
+
+                string[] groupCds = GROUP_CD.Split(zw);
+                string[] storeCds = STORE_CD.Split(zw);
+                string[] orderNos = ORDER_NO.Split(zw);
+                string[] orderSeqs = ORDER_SEQ.Split(zw);
+                string[] stockids = STOCKIDS.Split(zw);
+                string[] supplierids = SUPPLIERID.Split(zw);
+
+                int n = stockids.Length;
+                if (n == 0)
+                {
+                    strResultName = "NO STOCKIDS";
+                }
+                else if (
+                    groupCds.Length != n ||
+                    storeCds.Length != n ||
+                    orderNos.Length != n ||
+                    orderSeqs.Length != n ||
+                    supplierids.Length != n)
+                {
+                    strResultName = "PARAMETER COUNT MISMATCH";
+                }
+                else
+                {
+                    for (var i = 0; i < n; i++)
+                    {
+                        param = new[]
+                        {
+                            new SqlParameter("@lngStoreGroup", SqlDbType.VarChar) { Value = groupCds[i] },
+                            new SqlParameter("@lngStoreCode", SqlDbType.VarChar) { Value = storeCds[i] },
+                            new SqlParameter("@strOrderNo", SqlDbType.VarChar) { Value = orderNos[i] },
+                            new SqlParameter("@lngOrderSeq", SqlDbType.VarChar) { Value = orderSeqs[i] },
+                            new SqlParameter("@lngStockID", SqlDbType.VarChar) { Value = stockids[i] },
+                            new SqlParameter("@lngSupplierID", SqlDbType.VarChar) { Value = supplierids[i] },
+                            new SqlParameter("@lngSequence", SqlDbType.VarChar) { Value = SEQUENCE ?? "" },
+                        };
+
+                        bool insertupdate2 = Proc_Execute("usp_VUE_DeleteOrderStockItem", param);
+
+                        if (insertupdate2 == false)
+                        {
+                            throw new Exception("Failed to usp_VUE_DeleteOrderStockItem");
+                        }
+                    }
+
+                    strResultCode = "00";
+                    strResultName = "SUCCESS";
+                }
+            }
+            catch (Exception ex)
+            {
+                strResultName = ex.Message;
+            }
+
+            var jsonObj = new
+            {
+                RESULT_CD = strResultCode,
+                RESULT_NM = strResultName,
+            };
+
+            var js = new System.Web.Script.Serialization.JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+            HttpContext.Current.Response.Clear();
+            HttpContext.Current.Response.ContentType = "application/json; charset=utf-8";
+            HttpContext.Current.Response.Write(js.Serialize(jsonObj));
+            HttpContext.Current.Response.Flush();
+            HttpContext.Current.Response.End();
+
+            return null;
+        }

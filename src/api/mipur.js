@@ -118,6 +118,44 @@ export const deleteStockOrderItem = (
   });
 };
 
+/** PUR03_035INS — 전표(주문 단위) 삭제 → usp_VUE_DeleteOrderChit (납기 미전달, 그룹/매장/주문번호/공급사/시퀀스) */
+export const deleteOrderChit = (
+  groupCd,
+  storeCd,
+  orderNo,
+  supplierId,
+  sequence
+) => {
+  return api2.post("/MIPUR/PUR03_035INS.asmx/DeleteOrderChit", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    ORDER_NO: orderNo,
+    SUPPLIERID: supplierId,
+    SEQUENCE: sequence,
+  });
+};
+
+/** PUR03_035INS — 기존 주문 품목 삭제 (006INS deleteStockOrderItem 대체) */
+export const deleteOrderStockItem = (
+  groupCd,
+  storeCd,
+  orderNo,
+  orderSeq,
+  stockIds,
+  supplierIds,
+  sequence
+) => {
+  return api2.post("/MIPUR/PUR03_035INS.asmx/DeleteOrderStockItem", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    ORDER_NO: orderNo,
+    ORDER_SEQ: orderSeq,
+    STOCKIDS: stockIds,
+    SUPPLIERID: supplierIds,
+    SEQUENCE: sequence,
+  });
+};
+
 export const getSubSequence = (sequence, groupCd, storeCd, cond2) => {
   return api2.post("/MIPUR/PUR03_006INS.asmx/getSubSequence", {
     SUBSEQUENCE: sequence,

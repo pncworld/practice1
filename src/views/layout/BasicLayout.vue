@@ -207,14 +207,16 @@ const store = useStore();
 const userData = computed(() => store.state.userData);
 
 /**
- * HTTPS 페이지에서 http:// 이미지는 브라우저가 차단(혼합 콘텐츠) → 동일 호스트는 https 로 승격
+ * HTTPS 페이지에서 http:// 절대 URL 이미지는 브라우저가 차단(혼합 콘텐츠).
+ * API가 pncoffice.net / co.kr / com 등 어떤 호스트로 주든 동일하게 https 로 시도한다.
+ * (해당 호스트에 https 가 없으면 로드 실패 → @error 폴백과 동일)
  */
 const normalizeLogoUrlForPage = (url) => {
   if (!url || typeof url !== "string") return url;
   const u = url.trim();
   if (typeof window === "undefined" || window.location.protocol !== "https:")
     return u;
-  if (/^http:\/\/(www\.)?pncoffice\.net\b/i.test(u)) {
+  if (/^http:\/\//i.test(u)) {
     return u.replace(/^http:\/\//i, "https://");
   }
   return u;
