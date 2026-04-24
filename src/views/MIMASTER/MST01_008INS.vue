@@ -357,7 +357,7 @@ const updatedRowData = (newValue) => {
   // for (var i = 0; i < newValue.length; i++) {
   //   rowData2.value.push(newValue[i]);
   // }
-  console.log(newValue);
+  // console.log(newValue);
   updatedrowdata2.value = newValue;
   //comsole.log(rowData2.value);
   //comsole.log(newValue.length);
@@ -413,6 +413,60 @@ const deleteRow = () => {
  *  저장 버튼 함수
  */
 
+const toPlainForLog = (v) => {
+  try {
+    return JSON.parse(JSON.stringify(v));
+  } catch (e) {
+    return { _toPlainError: String(e) };
+  }
+};
+
+const fieldDebugStr = (val) => ({
+  typeof: typeof val,
+  raw: val,
+  asString: val === undefined || val === null ? val : String(val),
+  length: typeof val === "string" ? val.length : undefined,
+  isEmptyString: val === "",
+  isUndefined: val === undefined,
+  isNull: val === null,
+  trimIsEmpty: typeof val === "string" && val.trim() === "",
+});
+
+const fieldDebugCode = (val) => ({
+  ...fieldDebugStr(val),
+  numberParsed: Number(val),
+  numberIsNaN: isNaN(Number(val)),
+});
+
+const saveValidationLogPayload = ({
+  commitResult,
+  invalidMainDiagnostics,
+  invalidSubDiagnostics,
+}) => ({
+  at: new Date().toISOString(),
+  screen: "MST01_008INS",
+  commitAllsResult: toPlainForLog(commitResult),
+  context: {
+    afterSearch: afterSearch.value,
+    nowStoreCd: nowStoreCd.value,
+    groupCd: groupCd.value,
+    selectedlngCode: selectedlngCode.value,
+    mainRowCount: forsaveRowData.value?.length ?? null,
+    subRowCountAll: rowData2.value?.length ?? null,
+    subRowCountFiltered: Array.isArray(filteredRowData2.value)
+      ? filteredRowData2.value.length
+      : null,
+    updatedrowdata2Count: updatedrowdata2.value?.length ?? null,
+    subValidationScope:
+      "updatedrowdata2 + 삭제행 제외 (saveMenuManage 서브 인자와 동일)",
+    subRowsValidatedCount: (updatedrowdata2.value || []).filter(
+      (_, index) => !(allstaterows2.value?.deleted ?? []).includes(index)
+    ).length,
+  },
+  invalidMainRows: invalidMainDiagnostics,
+  invalidSubRows: invalidSubDiagnostics,
+});
+
 const saveButton = () => {
   commitAlls().then((newvalue) => {
     if (afterSearch.value == false) {
@@ -425,19 +479,76 @@ const saveButton = () => {
       return;
     }
     //comsole.log(rowData2.value);
-    const length =
-      (forsaveRowData.value?.filter(
+    const invalidMainRows =
+      forsaveRowData.value?.filter(
         (item) =>
           item.strName == "" ||
           item.strName == undefined ||
           item.lngCode == undefined ||
           item.lngCode == "" ||
           isNaN(Number(item.lngCode))
-      ).length || 0) +
-      (rowData2.value?.filter(
-        (item) => item.strName == "" || item.strName == undefined
-      ).length || 0);
+      ) || [];
+    const deletedSubIndices = allstaterows2.value?.deleted ?? [];
+    const invalidSubRows =
+      (updatedrowdata2.value || []).filter(
+        (item, index) =>
+          !deletedSubIndices.includes(index) &&
+          (item.strName == "" || item.strName == undefined)
+      ) || [];
+    const invalidMainDiagnostics =
+      forsaveRowData.value
+        ?.map((item, index) => {
+          const reasons = [];
+          if (item.strName == "" || item.strName == undefined) {
+            reasons.push("strName 누락");
+          }
+          if (item.lngCode == undefined || item.lngCode == "") {
+            reasons.push("lngCode 누락");
+          } else if (isNaN(Number(item.lngCode))) {
+            reasons.push("lngCode 숫자 아님");
+          }
+          if (reasons.length === 0) return null;
+          return {
+            grid: "main(메인)",
+            index,
+            reasons,
+            strName: fieldDebugStr(item.strName),
+            lngCode: fieldDebugCode(item.lngCode),
+            rowPlain: toPlainForLog(item),
+          };
+        })
+        .filter(Boolean) || [];
+    const invalidSubDiagnostics =
+      (updatedrowdata2.value || [])
+        .map((item, gridIndex) => {
+          if (deletedSubIndices.includes(gridIndex)) return null;
+          if (item.strName == "" || item.strName == undefined) {
+            return {
+              grid: "sub(우측 updatedrowdata2, 저장 API와 동일·삭제 제외)",
+              gridIndex,
+              selectedlngCode: selectedlngCode.value,
+              reason: "strName 누락 (빈 문자열 또는 undefined)",
+              strName: fieldDebugStr(item.strName),
+              lngCode: fieldDebugCode(item.lngCode),
+              lngMajor: item.lngMajor,
+              rowPlain: toPlainForLog(item),
+            };
+          }
+          return null;
+        })
+        .filter(Boolean) || [];
+    const length = invalidMainRows.length + invalidSubRows.length;
     if (length > 0) {
+      const payload = saveValidationLogPayload({
+        commitResult: newvalue,
+        invalidMainDiagnostics,
+        invalidSubDiagnostics,
+      });
+      console.warn("[MST01_008INS] 저장 유효성 실패 (객체)", payload);
+      console.warn(
+        "[MST01_008INS] 저장 유효성 실패 (복사용 JSON)\n" +
+          JSON.stringify(payload, null, 2)
+      );
       Swal.fire({
         title: "경고",
         text: "입력되지 않은 칸이나 잘못된 값이 포함되어 있습니다.",
@@ -508,7 +619,7 @@ const saveButton = () => {
             );
           }
 
-          console.log(updatedrowdata2.value);
+          // console.log(updatedrowdata2.value);
           const subMenulngCode = updatedrowdata2.value
             .filter(
               (item, index) => !allstaterows2.value.deleted.includes(index)
@@ -534,7 +645,7 @@ const saveButton = () => {
             subMenuMajorCode.join(","),
             tempMainCode.value
           );
-          console.log(res);
+          // console.log(res);
           //comsole.log(res);
         } catch (error) {
           //comsole.log(error);
