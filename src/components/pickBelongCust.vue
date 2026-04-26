@@ -129,10 +129,31 @@ const closePopUp = async () => {
   showing.value = false;
 };
 
+const getRowValue = (row, keys, fallbackIndex) => {
+  if (!row) return "";
+  if (Array.isArray(row)) {
+    return row[fallbackIndex] ?? "";
+  }
+  for (const key of keys) {
+    if (row[key] !== undefined && row[key] !== null) {
+      return row[key];
+    }
+  }
+  return "";
+};
+
 const dblclickedRowData = (e) => {
   ////console.log(e);
-  strName.value = e[1];
-  lngCode.value = e[0];
+  lngCode.value = getRowValue(
+    e,
+    ["strSaleCustID", "lngSaleCustID", "strCustID", "lngCode"],
+    0
+  );
+  strName.value = getRowValue(
+    e,
+    ["strSaleCustName", "strCustName", "strName"],
+    1
+  );
   emit("strSaleCustID", lngCode.value);
   emit("strSaleCustName", strName.value);
   emit("excelList", mainName.value + ": " + strName.value);
