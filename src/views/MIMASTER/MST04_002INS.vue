@@ -5,24 +5,27 @@
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <!-- 조회 조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <PageName></PageName>
+  <div
+    class="flex h-full max-w-full min-h-0 flex-col gap-3 overflow-hidden pb-1 box-border">
+    <!-- 상단: 페이지명 -->
+    <div class="flex shrink-0 flex-wrap items-center justify-between gap-3">
+      <PageName />
     </div>
-    <div
-      class="grid grid-cols-1 grid-rows-2 justify-between bg-gray-200 rounded-lg h-20 items-start z-10">
-      <div class="flex ml-[77px] mt-2 items-center space-x-5">
-        <div class="font-semibold text-base">파일선택</div>
-        <div>
+
+    <!-- 엑셀 업로드: 라벨+입력 동일 줄 (MST04_001 조회조건과 동일 w-[8rem] 라벨) -->
+    <div class="shrink-0 rounded-lg bg-gray-200 px-4 py-3">
+      <div class="flex flex-col gap-y-3">
+        <div class="flex min-w-0 flex-wrap items-center gap-2">
+          <span
+            class="w-[8rem] shrink-0 text-center text-base font-semibold text-gray-900"
+            >파일선택</span
+          >
           <input
             type="text"
-            class="h-7 disabled:bg-white"
+            class="h-8 min-w-[22rem] max-w-[40rem] shrink-0 border border-black bg-white px-2 text-sm disabled:bg-white"
             v-model="fileName"
             disabled />
-        </div>
-        <div>
-          <button class="whitebutton !bg-white" @click="FileChoice">
+          <button type="button" :class="popupToolbarBtnClass" @click="FileChoice">
             파일선택
           </button>
           <input
@@ -31,170 +34,193 @@
             ref="fileInput"
             @change="onFileChange"
             accept=".xlsx,.xls" />
-        </div>
-        <div>
-          <button class="whitebutton !bg-white" @click="downloadFile">
+          <button type="button" :class="popupToolbarBtnClass" @click="downloadFile">
             샘플 다운로드
           </button>
         </div>
-      </div>
-      <div class="flex ml-12 mt-2 items-center space-x-5">
-        <div class="font-semibold text-base">SHEET 선택</div>
-        <div>
+        <div class="flex min-w-0 flex-wrap items-center gap-2">
+          <span
+            class="w-[8rem] shrink-0 text-center text-base font-semibold text-gray-900"
+            >SHEET 선택</span
+          >
           <select
-            name=""
-            id=""
-            class="w-52 h-7"
+            class="h-8 w-52 shrink-0 border border-black bg-white px-2 text-sm"
             @change="changeSheet"
             v-model="excelcond">
-            <option :value="i.lngCode" v-for="i in SheetList">
+            <option :value="i.lngCode" v-for="i in SheetList" :key="i.lngCode">
               {{ i.strName }}
             </option>
           </select>
-        </div>
-        <div class="flex space-x-5 items-center">
-          <button class="whitebutton !bg-white" @click="saveButton">
+          <button type="button" class="button save shrink-0 md:w-auto" @click="saveButton">
             저장
           </button>
-          <div>★전매장 사용 가능 자재로 등록됩니다.</div>
+        </div>
+      </div>
+      <p class="mt-3 text-left text-sm leading-snug text-gray-700">
+        ★전매장 사용 가능 자재로 등록됩니다.
+      </p>
+    </div>
+
+    <!-- 미리보기 그리드 + 등록내역 조회 + 내역 그리드 (남은 높이 분할) -->
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col gap-3 overflow-hidden">
+      <div
+        class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-gray-300 bg-white shadow-sm">
+        <div class="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-auto">
+          <Realgrid
+            :progname="'MST04_002INS_VUE'"
+            :progid="2"
+            :rowData="rowData"
+            :reload="reload"
+            :setStateBar="false"
+            :setGroupCustomLevel="2"
+            :mergeColumns2="true"
+            @clickedRowData="clickedRowData6"
+            @dblclickedRowData="dblclickedRowData"
+            :mergeColumnGroupName2="[
+              ['발주/매입'],
+              ['청구'],
+              ['반품/이동'],
+              ['실사/재고'],
+              ['사용/손실'],
+              ['단가'],
+            ]"
+            :mergeColumnGroupSubList2="[
+              ['strOrderNCheckUOM', 'strOrderNCheckUOMFigure'],
+              ['strDemandUOM', 'strDemandUOMFigure'],
+              ['strReturnNMoveUOM', 'strReturnNMoveUOMFigure'],
+              ['strRealNReportUOM', 'strRealNReportUOMFigure'],
+              ['strUseNLossUOM', 'strUseNLossUOMFigure'],
+              ['curUnitPrice', 'curSalesUnitPrice'],
+            ]"
+            :rowStateeditable="false">
+          </Realgrid>
+        </div>
+      </div>
+
+      <!-- 자재 마스터 등록 내역 조회 -->
+      <div class="shrink-0 rounded-lg bg-gray-200 px-4 py-3">
+        <div class="flex min-w-0 flex-wrap items-center justify-between gap-3">
+          <span class="min-w-0 text-base font-semibold text-gray-900">
+            자재 마스터 등록 내역 조회
+          </span>
+          <div class="flex shrink-0 flex-wrap items-center justify-end gap-2">
+            <button type="button" class="button search shrink-0 md:w-auto w-14" @click="searchButton">
+              조회
+            </button>
+            <button type="button" class="button save w-auto excel shrink-0" @click="excelButton">
+              엑셀
+            </button>
+          </div>
+        </div>
+        <div
+          class="mt-3 grid grid-cols-1 gap-x-6 gap-y-2 lg:grid-cols-12 lg:items-center">
+          <div class="flex min-w-0 items-center gap-2 lg:col-span-4">
+            <span
+              class="flex w-[8rem] shrink-0 items-center justify-center text-base font-semibold text-gray-900"
+              >조회조건</span
+            >
+            <select
+              class="h-8 min-w-0 flex-1 max-w-full border border-black bg-white px-2 text-sm"
+              @change="changeCond"
+              v-model="searchCond">
+              <option value="1">최근업로드</option>
+              <option value="2">자재코드</option>
+              <option value="3">일자선택</option>
+            </select>
+          </div>
+          <div
+            v-show="searchCond == 2"
+            class="flex min-w-0 flex-wrap items-center gap-2 lg:col-span-4">
+            <input
+              type="text"
+              class="h-8 min-w-0 w-full max-w-[9rem] border border-black px-2 text-sm sm:max-w-[10rem]"
+              @input="onlyNumber"
+              v-model="cond" />
+            <input
+              type="text"
+              class="h-8 min-w-0 w-full max-w-[9rem] border border-black px-2 text-sm sm:max-w-[10rem]"
+              @input="onlyNumber"
+              v-model="cond2" />
+          </div>
+          <div
+            v-show="searchCond == 3"
+            class="flex min-w-0 items-center gap-2 lg:col-span-4 lg:justify-start">
+            <input type="date" class="h-8 border border-black px-2 text-sm" v-model="cond3" />
+          </div>
+        </div>
+        <p class="mt-3 text-left text-sm leading-snug text-gray-700">
+          ★엑셀 업로드 완료시 신규 업로드 내역이 자동 조회됩니다.
+        </p>
+      </div>
+
+      <div
+        class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-gray-300 bg-white shadow-sm">
+        <div class="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-auto">
+          <Realgrid
+            :progname="'MST04_002INS_VUE'"
+            :progid="3"
+            :rowData="rowData2"
+            :reload="reload"
+            :setStateBar="false"
+            :setGroupCustomLevel="2"
+            :mergeColumns2="true"
+            :mergeColumnGroupName2="[['단위'], ['단가']]"
+            :mergeColumnGroupSubList2="[
+              [
+                'strOrderNCheck',
+                'strDemandUOM',
+                'strReturnNMoveUOM',
+                'strRealNreportUOM',
+                'strUseNLossUOM',
+              ],
+              ['curUnitPrice', 'curSalesUnitPrice'],
+            ]"
+            :documentTitle="'MST04_002INS'"
+            :documentSubTitle="documentSubTitle"
+            :exporttoExcel="exportExcel"
+            :rowStateeditable="false">
+          </Realgrid>
         </div>
       </div>
     </div>
-    <!-- 조회 조건 -->
-    <!--그리드 영역 -->
+  </div>
 
-    <div class="w-[100%] h-[30vh] grid-rows-2 grid-cols-1">
-      <Realgrid
-        :progname="'MST04_002INS_VUE'"
-        :progid="2"
-        :rowData="rowData"
-        :reload="reload"
-        :setStateBar="false"
-        :setGroupCustomLevel="2"
-        :mergeColumns2="true"
-        @clickedRowData="clickedRowData6"
-        @dblclickedRowData="dblclickedRowData"
-        :mergeColumnGroupName2="[
-          ['발주/매입'],
-          ['청구'],
-          ['반품/이동'],
-          ['실사/재고'],
-          ['사용/손실'],
-          ['단가'],
-        ]"
-        :mergeColumnGroupSubList2="[
-          ['strOrderNCheckUOM', 'strOrderNCheckUOMFigure'],
-          ['strDemandUOM', 'strDemandUOMFigure'],
-          ['strReturnNMoveUOM', 'strReturnNMoveUOMFigure'],
-          ['strRealNReportUOM', 'strRealNReportUOMFigure'],
-          ['strUseNLossUOM', 'strUseNLossUOMFigure'],
-          ['curUnitPrice', 'curSalesUnitPrice'],
-        ]"
-        :rowStateeditable="false">
-      </Realgrid>
-    </div>
-
+  <Teleport to="body">
     <div
-      class="grid grid-cols-1 grid-rows-3 justify-between bg-gray-200 rounded-lg h-24 items-start z-10 mt-2">
-      <div class="text-2xl font-bold ml-12 flex space-x-5 items-center">
-        <div>자재 마스터 등록 내역 조회.</div>
-        <div>
-          <button class="whitebutton bg-white" @click="searchButton">
-            조회
-          </button>
+      v-if="openPop"
+      class="fixed inset-0 z-[11000] flex items-center justify-center bg-black/40 px-3 py-4">
+      <div
+        role="dialog"
+        aria-modal="true"
+        class="flex h-[min(28rem,90vh)] w-full max-w-[34rem] flex-col rounded-lg border-2 border-gray-700 bg-white shadow-2xl">
+        <div
+          class="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-4 py-3">
+          <h2 class="min-w-0 flex-1 pr-2 text-lg font-bold leading-tight text-gray-900">
+            기 등록 동일 코드 품목 조회
+          </h2>
+          <div class="flex shrink-0 flex-wrap items-center justify-end gap-2">
+            <button type="button" class="button save w-auto excel shrink-0" @click="excelButton2">
+              엑셀
+            </button>
+            <button type="button" class="whitebutton shrink-0" @click="openPop = false">
+              닫기
+            </button>
+          </div>
         </div>
-        <div>
-          <button class="whitebutton bg-white" @click="excelButton">
-            엑셀
-          </button>
+        <div class="min-h-0 flex-1 overflow-hidden p-3">
+          <div class="h-full min-h-[12rem] w-full min-w-0">
+            <Realgrid
+              :progname="'MST04_002INS_VUE'"
+              :progid="4"
+              :rowStateeditable="false"
+              :exporttoExcel="exportExcel2"
+              :documentTitle="'MST04_002INS'"
+              :rowData="ErrorRowData"></Realgrid>
+          </div>
         </div>
-      </div>
-      <div class="ml-12 flex space-x-5 items-center">
-        <div class="text-base font-semibold">조회조건</div>
-        <div class="flex items-center">
-          <select
-            name=""
-            id=""
-            class="h-7"
-            @change="changeCond"
-            v-model="searchCond">
-            <option value="1">최근업로드</option>
-            <option value="2">자재코드</option>
-            <option value="3">일자선택</option>
-          </select>
-        </div>
-        <div v-show="searchCond == 2">
-          <input type="text" @input="onlyNumber" v-model="cond" />
-        </div>
-        <div v-show="searchCond == 2">
-          <input type="text" @input="onlyNumber" v-model="cond2" />
-        </div>
-        <div v-show="searchCond == 3">
-          <input type="date" v-model="cond3" />
-        </div>
-      </div>
-      <div class="flex justify-center">
-        ★엑셀 업로드 완료시 신규 업로드 내역이 자동 조회됩니다.
       </div>
     </div>
-
-    <div class="w-[100%] h-[30vh] grid-rows-2 grid-cols-1">
-      <Realgrid
-        :progname="'MST04_002INS_VUE'"
-        :progid="3"
-        :rowData="rowData2"
-        :reload="reload"
-        :setStateBar="false"
-        :setGroupCustomLevel="2"
-        :mergeColumns2="true"
-        :mergeColumnGroupName2="[['단위'], ['단가']]"
-        :mergeColumnGroupSubList2="[
-          [
-            'strOrderNCheck',
-            'strDemandUOM',
-            'strReturnNMoveUOM',
-            'strRealNreportUOM',
-            'strUseNLossUOM',
-          ],
-
-          ['curUnitPrice', 'curSalesUnitPrice'],
-        ]"
-        :documentTitle="'MST04_002INS'"
-        :documentSubTitle="documentSubTitle"
-        :exporttoExcel="exportExcel"
-        :rowStateeditable="false">
-      </Realgrid>
-    </div>
-  </div>
-
-  <div v-if="openPop" class="fixed inset-0 flex items-center justify-center">
-    <div class="bg-white p-6 rounded shadow-lg w-[500px] h-96">
-      <div class="flex items-center justify-between">
-        <h2 class="text-lg font-bold mb-4">기 등록 동일 코드 품목 조회</h2>
-        <div class="space-x-2">
-          <button
-            @click="excelButton2"
-            class="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-            엑셀
-          </button>
-          <button
-            @click="openPop = false"
-            class="mt-4 px-4 py-2 bg-gray-300 text-white rounded">
-            닫기
-          </button>
-        </div>
-      </div>
-      <div class="w-full h-[70%]">
-        <Realgrid
-          :progname="'MST04_002INS_VUE'"
-          :progid="4"
-          :rowStateeditable="false"
-          :exporttoExcel="exportExcel2"
-          :documentTitle="'MST04_002INS'"
-          :rowData="ErrorRowData"></Realgrid>
-      </div>
-    </div>
-  </div>
+  </Teleport>
   <!--그리드 영역 -->
 </template>
 
@@ -234,6 +260,10 @@ import { onMounted, ref } from "vue";
  */
 
 import { useStore } from "vuex";
+
+/** 발주등록 PUR03_035INS 팝업 · MST04_001INS 신규팝업과 동일한 흰 버튼 형식 */
+const popupToolbarBtnClass =
+  "whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none";
 import { read, utils } from "xlsx-js-style";
 
 const reload = ref(false);

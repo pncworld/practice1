@@ -1366,8 +1366,18 @@ const funcshowGrid = async () => {
         }
       : props.CalculateTaxColId.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
-          let taxType = values[fieldNames.indexOf("lngTaxType")];
-          let supply = values[fieldNames.indexOf("curSupply")];
+          /** 그리드 메타에 lngTaxType 컬럼이 없으면 indexOf 가 -1 — 상단 발주그리드(PUR 등)에서 부가세가 0만 나오는 현상 방지 */
+          const ti = fieldNames.indexOf("lngTaxType");
+          const si = fieldNames.indexOf("curSupply");
+          let taxType = ti >= 0 ? values[ti] : undefined;
+          const supply = si >= 0 ? Number(values[si] || 0) : 0;
+          if (
+            taxType === undefined ||
+            taxType === null ||
+            taxType === ""
+          ) {
+            taxType = "01";
+          }
 
           if (taxType == "01") {
             return Math.floor(supply * 0.1);
@@ -4549,6 +4559,8 @@ onMounted(async () => {
         .header-style-${realgridname.value}${index} {
           background-color: ${item.strHdBkColor} !important;
           color: ${item.strHdColor} !important;
+          text-align: center !important;
+          vertical-align: middle !important;
         }
       `;
     });
@@ -4665,6 +4677,8 @@ const setupGrid = async () => {
         .header-style-${realgridname.value}${index} {
           background-color: ${item.strHdBkColor} !important;
           color: ${item.strHdColor} !important;
+          text-align: center !important;
+          vertical-align: middle !important;
         }
       `;
     });
@@ -5005,14 +5019,20 @@ watch(
 .header-style-0 {
   background-color: #545876;
   color: white;
+  text-align: center !important;
+  vertical-align: middle !important;
 }
 .header-style-red {
   background-color: #800020;
   color: white;
+  text-align: center !important;
+  vertical-align: middle !important;
 }
 .header-style-green {
   background-color: #006400;
   color: white;
+  text-align: center !important;
+  vertical-align: middle !important;
 }
 
 img.rg-tree-icon {

@@ -5,31 +5,33 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="searchButton" class="button search md:w-auto w-14">
+  <!-- MST45 / CRM10_007 계열: 상단 버튼 · 회색 조회바 · 좌 그리드 / 우 상세 -->
+  <div class="flex h-full max-w-full min-h-0 flex-col gap-3 overflow-hidden pb-1 box-border">
+    <div class="flex shrink-0 flex-wrap items-center justify-between gap-3 overflow-y-hidden">
+      <PageName />
+      <div class="flex flex-wrap items-center justify-end gap-2 pr-2">
+        <button type="button" @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="addButton" class="button new md:w-auto w-14">
+        <button type="button" @click="addButton" class="button new md:w-auto w-14">
           신규
         </button>
-        <button @click="saveButton" class="button save md:w-auto w-14">
+        <button type="button" @click="saveButton" class="button save md:w-auto w-14">
           저장
         </button>
-        <button @click="deleteButton" class="button delete md:w-auto w-14">
+        <button type="button" @click="deleteButton" class="button delete md:w-auto w-14">
           삭제
         </button>
-        <button @click="excelButton" class="button save w-auto excel">
+        <button type="button" @click="excelButton" class="button save w-auto excel">
           엑셀
         </button>
       </div>
     </div>
 
-    <div class="flex bg-gray-200 rounded-lg h-16 items-start z-10">
+    <div class="flex shrink-0 justify-start rounded-lg bg-gray-200 px-4 py-3">
       <PickStore
+        :compactSearchBar="true"
+        :compact-store-combo-max-rem="14.4"
         :hideGroup="false"
         :hideAttr="false"
         @update:storeCd="lngStoreCode"
@@ -37,169 +39,194 @@
         @storeNm="excelStore">
       </PickStore>
     </div>
-    <!-- 조회조건 -->
-    <!-- 그리드 영역 -->
-    <div class="w-full h-[80%] grid grid-rows-1 grid-cols-[7fr,5fr]">
-      <Realgrid
-        :progname="'CRM10_019INS_VUE'"
-        :progid="1"
-        :rowData="rowData"
-        :reload="reload"
-        :setStateBar="false"
-        @clickedRowData="clickedRowData"
-        :documentTitle="'CRM10_019INS'"
-        :dynamicRowHeight="true"
-        :documentSubTitle="documentSubTitle"
-        :rowStateeditable="false"
-        :exporttoExcel="exportExcel">
-      </Realgrid>
-      <div class="w-[70%] h-[20vh] mt-10 ml-10">
+
+    <div
+      class="grid min-h-0 min-w-0 flex-1 grid-cols-1 gap-6 px-2 pb-4 lg:grid-cols-[minmax(0,7fr)_minmax(17rem,4fr)] lg:items-stretch lg:gap-8 lg:px-6">
+      <!-- 좌: 목록 그리드 -->
+      <div class="flex min-h-0 min-w-0 flex-col">
+        <div class="mb-2 flex min-h-[2.75rem] flex-none items-center">
+          <h2 class="text-lg font-bold leading-none tracking-tight text-gray-900">
+            예약가능인원
+          </h2>
+        </div>
         <div
-          class="grid grid-rows-4 grid-cols-[1fr,3fr] border w-full h-full border-black">
-          <div class="border border-black flex justify-center items-center">
-            휴일구분
+          class="flex h-[65vh] min-h-[280px] w-full min-w-0 flex-col overflow-hidden rounded-sm border border-gray-400 bg-white">
+          <div class="relative min-h-0 w-full flex-1">
+            <Realgrid
+              :progname="'CRM10_019INS_VUE'"
+              :progid="1"
+              :rowData="rowData"
+              :reload="reload"
+              :setStateBar="false"
+              @clickedRowData="clickedRowData"
+              :documentTitle="'CRM10_019INS'"
+              :dynamicRowHeight="true"
+              :documentSubTitle="documentSubTitle"
+              :rowStateeditable="false"
+              :exporttoExcel="exportExcel">
+            </Realgrid>
           </div>
-          <div class="border border-black flex justify-center items-center">
-            <select
-              name=""
-              id=""
-              :disabled="disablegrid"
-              class="border h-[70%] w-[70%] border-black"
-              v-model="gridvalue1">
-              <option value="0">평일</option>
-              <option value="1">휴일</option>
-            </select>
+        </div>
+      </div>
+
+      <!-- 우: 상세 입력 -->
+      <div class="flex min-w-0 flex-col">
+        <div class="mb-2 flex min-h-[2.75rem] flex-none items-center">
+          <h2 class="text-lg font-bold leading-none tracking-tight text-gray-900">상세정보</h2>
+        </div>
+        <div class="w-full overflow-visible rounded-none border border-gray-600 bg-white">
+          <div class="grid grid-cols-[minmax(7rem,9.5rem)_1fr] border-b border-gray-600">
+            <div
+              class="flex min-h-[2.5rem] items-center justify-center border-r border-gray-600 bg-[#dfe3f5] px-2 py-2 text-center text-sm font-semibold text-gray-900">
+              휴일구분
+            </div>
+            <div class="flex min-h-[2.5rem] items-center bg-white px-3 py-2">
+              <select
+                class="h-8 w-full max-w-full border border-black bg-white px-2 text-sm disabled:bg-gray-100"
+                :disabled="disableCoreDetailFields"
+                v-model="gridvalue1">
+                <option value="0">평일</option>
+                <option value="1">휴일</option>
+              </select>
+            </div>
           </div>
-          <div class="border border-black flex justify-center items-center">
-            식사구분
+          <div class="grid grid-cols-[minmax(7rem,9.5rem)_1fr] border-b border-gray-600">
+            <div
+              class="flex min-h-[2.5rem] items-center justify-center border-r border-gray-600 bg-[#dfe3f5] px-2 py-2 text-center text-sm font-semibold text-gray-900">
+              식사구분
+            </div>
+            <div class="flex min-h-[2.5rem] items-center bg-white px-3 py-2">
+              <select
+                class="h-8 w-full max-w-full border border-black bg-white px-2 text-sm disabled:bg-gray-100"
+                :disabled="disableCoreDetailFields"
+                v-model="gridvalue2">
+                <option value="0">선택</option>
+                <option :value="i.strDCode" v-for="i in optionList" :key="'ml-' + i.strDCode">
+                  {{ i.strDName }}
+                </option>
+              </select>
+            </div>
           </div>
-          <div class="border border-black flex justify-center items-center">
-            <select
-              name=""
-              id=""
-              :disabled="disablegrid"
-              class="border h-[70%] w-[70%] border-black"
-              v-model="gridvalue2">
-              <option value="0">선택</option>
-              <option :value="i.strDCode" v-for="i in optionList">
-                {{ i.strDName }}
-              </option>
-            </select>
+          <div class="grid grid-cols-[minmax(7rem,9.5rem)_1fr] border-b border-gray-600">
+            <div
+              class="flex min-h-[2.5rem] items-center justify-center border-r border-gray-600 bg-[#dfe3f5] px-2 py-2 text-center text-sm font-semibold text-gray-900">
+              회차
+            </div>
+            <div class="flex min-h-[2.5rem] items-center bg-white px-3 py-2">
+              <select
+                class="h-8 w-full max-w-full border border-black bg-white px-2 text-sm disabled:bg-gray-100"
+                :disabled="disableCoreDetailFields"
+                v-model="gridvalue3">
+                <option value="0">선택</option>
+                <option :value="i.strDCode" v-for="i in optionList2" :key="'rn-' + i.strDCode">
+                  {{ i.strDName }}
+                </option>
+              </select>
+            </div>
           </div>
-          <div class="border border-black flex justify-center items-center">
-            회차
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            <select
-              name=""
-              id=""
-              :disabled="disablegrid"
-              class="border h-[70%] w-[70%] border-black"
-              v-model="gridvalue3">
-              <option value="0">선택</option>
-              <option :value="i.strDCode" v-for="i in optionList2">
-                {{ i.strDName }}
-              </option>
-            </select>
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            MAX
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            <input
-              type="number"
-              v-model="gridvalue4"
-              class="border w-[70%] h-[80%] pl-1" />
+          <div class="grid grid-cols-[minmax(7rem,9.5rem)_1fr]">
+            <div
+              class="flex min-h-[2.5rem] items-center justify-center border-r border-gray-600 bg-[#dfe3f5] px-2 py-2 text-center text-sm font-semibold text-gray-900">
+              MAX
+            </div>
+            <div class="flex min-h-[2.5rem] items-center bg-white px-3 py-2">
+              <input
+                type="number"
+                :disabled="disableMaxField"
+                v-model.number="gridvalue4"
+                min="0"
+                class="h-8 w-full rounded-none border border-black bg-white px-2 text-sm outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100" />
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
 import { getCommonList } from "@/api/common";
 import { getReservedNum, saveReserveNum } from "@/api/micrm";
-import "vue3-timepicker/dist/VueTimepicker.css";
-/**
- *  매출 일자 세팅 컴포넌트
- *  */
-
-/**
- *  페이지명 자동 입력 컴포넌트
- *  */
 
 import PageName from "@/components/pageName.vue";
 import PickStore from "@/components/pickStore.vue";
-/**
- * 	매장 단일 선택 컴포넌트
- */
-/**
- * 	그리드 생성
- */
 
 import Realgrid from "@/components/realgrid.vue";
-/**
- *  페이지로그 자동 입력
- *  */
 
 import { insertPageLog } from "@/customFunc/customFunc";
-/**
- *  경고창 호출 라이브러리
- *  */
 
 import Swal from "sweetalert2";
-/*
- * 공통 표준  Function
- */
 
-import { onMounted, ref } from "vue";
-/**
- *  Vuex 상태관리 및 로그인세션 관련 라이브러리
- */
+import { computed, onMounted, ref } from "vue";
 
 import { useStore } from "vuex";
-/**
- * 	화면 Load시 실행 스크립트
- */
 
 const optionList = ref([]);
 const optionList2 = ref([]);
-const optionList3 = ref([]);
 
 const gridvalue1 = ref(0);
 const gridvalue2 = ref(0);
 const gridvalue3 = ref(0);
 const gridvalue4 = ref(0);
-const gridvalue5 = ref("00:00");
-const setGridValue5 = ref(1);
-const gridvalue6 = ref(1);
+
+const reload = ref(false);
+
+const store = useStore();
+
+const selectedGroup = ref();
+const selectedStores = ref();
+
+function warnIfNoStoreSelected() {
+  const code = selectedStores.value;
+  if (
+    code === null ||
+    code === undefined ||
+    code === "" ||
+    code === "0" ||
+    code === 0
+  ) {
+    Swal.fire({
+      title: "경고",
+      text: "매장을 선택해 주십시오.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return true;
+  }
+  return false;
+}
+
+/** 상세 미선택 시 전부 비활성 · 그리드 행 선택 시 핵심칸만 잠금(MAX만 수정 가능) */
+const detailInactive = ref(true);
+/** 그리드 행 선택 후 삭제 검증용 */
+const editingExistingRow = ref(false);
+
+const disableCoreDetailFields = computed(
+  () => detailInactive.value || editingExistingRow.value
+);
+const disableMaxField = computed(() => detailInactive.value);
+
 onMounted(async () => {
-  const pageLog = await insertPageLog(store.state.activeTab2);
+  await insertPageLog(store.state.activeTab2);
   const res = await getCommonList(231);
   const res2 = await getCommonList(232);
-  const res3 = await getCommonList(45);
 
   optionList.value = res.data.List;
   optionList2.value = res2.data.List;
-  optionList3.value = res3.data.List;
 
   reload.value = !reload.value;
 });
 
-const reload = ref(false);
 const rowData = ref([]);
 const afterSearch = ref(false);
 
 const cond = ref("");
 const cond2 = ref("");
-const store = useStore();
 
 const clickedRowData = (e) => {
-  disablegrid.value = true;
+  detailInactive.value = false;
+  editingExistingRow.value = true;
   insertupdatedelete.value = 2;
-  ////console.log(e);
   gridvalue1.value = e[4];
   gridvalue2.value = e[5];
   gridvalue3.value = e[6];
@@ -211,27 +238,27 @@ const clickedRowData = (e) => {
  */
 
 const searchButton = async () => {
+  if (warnIfNoStoreSelected()) return;
   try {
     store.state.loading = true;
     initGrid();
     reload.value = !reload.value;
     const res = await getReservedNum(selectedGroup.value, selectedStores.value);
-    ////console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    //comsole.log(error);
   } finally {
     store.state.loading = false;
   }
 };
-const disablegrid = ref(true);
 const insertupdatedelete = ref(1);
 const addButton = () => {
+  if (warnIfNoStoreSelected()) return;
   insertupdatedelete.value = 1;
-  disablegrid.value = false;
+  detailInactive.value = false;
+  editingExistingRow.value = false;
   gridvalue1.value = 0;
   gridvalue2.value = 0;
   gridvalue3.value = 0;
@@ -239,10 +266,20 @@ const addButton = () => {
 };
 
 const saveButton = async () => {
+  if (warnIfNoStoreSelected()) return;
   if (afterSearch.value == false) {
     Swal.fire({
       title: "경고",
       text: "조회를 먼저 해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (insertupdatedelete.value === 3 && !editingExistingRow.value) {
+    Swal.fire({
+      title: "경고",
+      text: "삭제할 항목을 선택해 주십시오.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -269,7 +306,7 @@ const saveButton = async () => {
 
   try {
     store.state.loading = true;
-    const res = await saveReserveNum(
+    await saveReserveNum(
       selectedGroup.value,
       selectedStores.value,
       gridvalue1.value,
@@ -290,7 +327,6 @@ const saveButton = async () => {
       icon: "success",
       confirmButtonText: "확인",
     });
-    ////console.log(res);
   } catch (error) {
   } finally {
     store.state.loading = false;
@@ -298,14 +334,23 @@ const saveButton = async () => {
   }
 };
 
-const deleteButton = () => {
+const deleteButton = async () => {
+  if (warnIfNoStoreSelected()) return;
+
+  const confirm = await Swal.fire({
+    title: "삭제 확인",
+    text: "선택한 항목을 삭제하시겠습니까?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "삭제",
+    cancelButtonText: "취소",
+  });
+
+  if (!confirm.isConfirmed) return;
+
   insertupdatedelete.value = 3;
-  saveButton();
+  await saveButton();
 };
-/* 매장 컴포넌트 관련 함수 */
-const selectedGroup = ref();
-const selectedStores = ref();
-const selectedStoreAttrs = ref();
 
 /**
  * 페이지 매장 코드 세팅
@@ -316,7 +361,6 @@ const lngStoreCode = async (e) => {
   selectedStores.value = e;
 };
 const lngStoreGroup = async (e) => {
-  //initGrid();
   selectedGroup.value = e;
 };
 
@@ -329,13 +373,12 @@ const initGrid = () => {
     rowData.value = [];
   }
   afterSearch.value = false;
+  detailInactive.value = true;
+  editingExistingRow.value = false;
   gridvalue1.value = 0;
   gridvalue2.value = 0;
   gridvalue3.value = 0;
-  gridvalue4.value = "";
-  gridvalue5.value = "00:00";
-  setGridValue5.value = setGridValue5.value + 1;
-  gridvalue6.value = 0;
+  gridvalue4.value = 0;
 };
 
 //엑셀 버튼 처리 함수
@@ -345,9 +388,9 @@ const exportExcel = ref(false);
  */
 
 const excelButton = () => {
+  if (warnIfNoStoreSelected()) return;
   documentSubTitle.value = selectedExcelStore.value + "\n";
 
-  //documentSubTitle.value += "\n";
   exportExcel.value = !exportExcel.value;
 };
 
@@ -363,10 +406,8 @@ const selectedExcelStore = ref("");
 
 const excelStore = (e) => {
   selectedExcelStore.value = "매장명 : " + e;
-  //comsole.log(e);
 };
 const excelDate = (e) => {
   selectedExcelDate.value = e;
-  //comsole.log(e);
 };
 </script>

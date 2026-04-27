@@ -18,85 +18,103 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-4 grid-rows-1 bg-gray-200 rounded-lg h-16 items-start z-10">
-      <div class="justify-start flex ml-12">
-        <Datepicker1
-          :mainName="'입고예정일자'"
-          ref="datepicker"
-          :initToday="1"
-          :closePopUp="closePopUp"
-          @excelDate="excelDate"
-          @dateValue="dateValue">
-        </Datepicker1>
-      </div>
-      <div class="flex justify-start items-center">
-        <PickStore
-          @update:storeGroup="lngStoreGroup"
-          :defaultStoreNm="'전체'"
-          @storeNm="excelStore"
-          :hideGroup="false"
-          :hideAttr="false"
-          :defaultStoreType2="true"
-          :defaultStore="true"
-          @update:storeCd="lngStoreCode"></PickStore>
-      </div>
-      <div class="flex justify-start pl-3 items-center mt-1">
-        <BusinessClient
-          @SupplierId="SupplierId"
-          :defaultNm="'전체'"></BusinessClient>
-      </div>
-      <div class="flex justify-start pl-3 items-center space-x-5 mt-2">
-        <div class="text-base font-semibold">파트</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="border border-black w-32 h-8"
-            v-model="cond">
-            <option :value="i.lngPartCode" v-for="i in optionList">
-              {{ i.strPartName }}
-            </option>
-          </select>
+      class="z-10 mt-3 w-full min-w-0 overflow-x-auto rounded-lg bg-gray-200 px-24 py-4">
+      <div
+        class="pur037-search-grid min-w-0"
+        :style="{
+          '--pur037-control-border': pur037ControlBorder,
+          '--pur037-item-gap': pur037ItemGap,
+        }">
+        <div class="pur037-cell">
+          <div class="pur037-sg-label">입고예정일자</div>
+          <div class="pur037-cell-field pur037-date-slot min-w-0">
+            <Datepicker1
+              ref="datepicker"
+              :mainName="'입고예정일자'"
+              :initToday="1"
+              :closePopUp="closePopUp"
+              @excelDate="excelDate"
+              @dateValue="dateValue" />
+          </div>
+        </div>
+        <div class="pur037-cell">
+          <div class="pur037-sg-label">매장명</div>
+          <div class="pur037-cell-field pur037-pick-slot min-w-0">
+            <PickStore
+              compact-search-bar
+              :compact-store-combo-max-rem="pur037PickStoreComboMaxRem"
+              main-name=""
+              @update:storeGroup="lngStoreGroup"
+              :defaultStoreNm="'전체'"
+              @storeNm="excelStore"
+              :hideGroup="false"
+              :hideAttr="false"
+              :defaultStoreType2="true"
+              :defaultStore="true"
+              @update:storeCd="lngStoreCode" />
+          </div>
+        </div>
+        <div class="pur037-cell">
+          <div class="pur037-sg-label">거래처</div>
+          <div class="pur037-cell-field pur037-bc-slot min-w-0">
+            <BusinessClient
+              compact-search-bar
+              @SupplierId="SupplierId" />
+          </div>
+        </div>
+        <div class="pur037-cell">
+          <div class="pur037-sg-label">파트</div>
+          <div class="pur037-cell-field min-w-0">
+            <select
+              id="pur03-037-cond-part"
+              v-model="cond"
+              class="pur037-part-select h-8 w-full min-w-[8rem] rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option
+                v-for="i in optionList"
+                :key="i.lngPartCode"
+                :value="i.lngPartCode">
+                {{ i.strPartName }}
+              </option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- 조회조건 -->
-    <!-- 그리드 영역 -->
-    <div class="w-full h-[75vh]">
-      <div class="w-full h-[80%]">
-        <Realgrid
-          :progname="'PUR03_037RPT_VUE'"
-          :progid="1"
-          :rowData="rowData"
-          :reload="reload"
-          :setStateBar="false"
-          :setFooter="true"
-          :setFooterColID="setFooterColID"
-          :setFooterExpressions="setFooterExpressions"
-          :setFooterCustomColumnId="setFooterCustomColumnId"
-          :setFooterCustomText="setFooterCustomText"
-          :setGroupFooter="true"
-          :setGroupColumnId="'strStoreName'"
-          :setGroupFooterColID="setGroupFooterColID"
-          :setGroupFooterExpressions="setGroupFooterExpressions"
-          :setGroupSumCustomColumnId="setGroupSumCustomColumnId"
-          :setGroupSumCustomText="setGroupSumCustomText"
-          :setGroupSumCustomColumnId2="setGroupSumCustomColumnId2"
-          :setMergeMode="false"
-          :documentTitle="'PUR03_037RPT'"
-          :selectionStyle="'block'"
-          @clickedRowData="clickedRowData"
-          :documentSubTitle="documentSubTitle"
-          :rowStateeditable="false"
-          @clickedButtonCol="clickedButtonCol"
-          @checkedRowData="checkedRowData"
-          :checkRowAuto="false"
-          :checkRowAuto2="true"
-          :checkRenderEditable="true"
-          :exporttoExcel="exportExcel">
-        </Realgrid>
-      </div>
+    <!-- 그리드 영역 — 발주등록(80%) 대비 조금 넓게 -->
+    <div class="w-full h-[85%]">
+      <Realgrid
+        :progname="'PUR03_037RPT_VUE'"
+        :progid="1"
+        :rowData="rowData"
+        :reload="reload"
+        :setStateBar="false"
+        :setFooter="true"
+        :setFooterColID="setFooterColID"
+        :setFooterExpressions="setFooterExpressions"
+        :setFooterCustomColumnId="setFooterCustomColumnId"
+        :setFooterCustomText="setFooterCustomText"
+        :setGroupFooter="true"
+        :setGroupColumnId="'strStoreName'"
+        :setGroupFooterColID="setGroupFooterColID"
+        :setGroupFooterExpressions="setGroupFooterExpressions"
+        :setGroupSumCustomColumnId="setGroupSumCustomColumnId"
+        :setGroupSumCustomText="setGroupSumCustomText"
+        :setGroupSumCustomColumnId2="setGroupSumCustomColumnId2"
+        :setMergeMode="false"
+        :documentTitle="'PUR03_037RPT'"
+        :selectionStyle="'block'"
+        @clickedRowData="clickedRowData"
+        :documentSubTitle="documentSubTitle"
+        :rowStateeditable="false"
+        @clickedButtonCol="clickedButtonCol"
+        @checkedRowData="checkedRowData"
+        :checkRowAuto="false"
+        :checkRowAuto2="true"
+        :checkRenderEditable="true"
+        :exporttoExcel="exportExcel">
+      </Realgrid>
     </div>
   </div>
 
@@ -175,7 +193,7 @@ import {
   getPurchaseOrderListByPart,
 } from "@/api/mipur";
 import { getLossMasterPartList } from "@/api/mistock";
-import BusinessClient from "@/components/businessClient.vue";
+import BusinessClient from "@/components/businessClient2.vue";
 import Datepicker1 from "@/components/Datepicker1.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -275,6 +293,14 @@ const cond = ref("0");
 
 const store = useStore();
 
+/** 조회줄 컨트롤 공통 테두리(search-area-layout) */
+const pur037ControlBorder = "#cbd5e1";
+/** compact 매장 v-select가 칸 폭을 채우도록 기본 12rem 상한 해제(조회줄 4등분 시각 균등) */
+const pur037PickStoreComboMaxRem = 96;
+
+/** 라벨↔필드, 항목(4블록) 사이 간격 — 한 값으로 통일 */
+const pur037ItemGap = "0.75rem";
+
 const datepicker = ref(null);
 const closePopUp = ref(false);
 const optionList = ref([]);
@@ -338,7 +364,7 @@ const searchButton = async () => {
       groupCd.value,
       storeCode.value,
       cond.value,
-      sDate.value.replaceAll("-", ""),
+      String(sDate.value ?? "").replaceAll("-", ""),
       supplierid.value
     );
 
@@ -494,7 +520,7 @@ const printButton = () => {
       groupCd.value
     }&@P_lngStoreCode=${
       storeCode.value
-    }&@P_dtmOrderDate=${sDate.value.replaceAll(
+    }&@P_dtmOrderDate=${String(sDate.value ?? "").replaceAll(
       "-",
       ""
     )}&@P_flag=1&@P_lngStoreCodeList=${storecds}&@P_orderNo=${ordercds}`,
@@ -503,3 +529,124 @@ const printButton = () => {
   );
 };
 </script>
+
+<style scoped>
+/* 4열 동일 minmax(0,1fr) + column-gap만으로 열 간격 통일 (search-area-layout) */
+.pur037-search-grid {
+  --pur037-label-col: 6.5rem;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: var(--pur037-item-gap);
+}
+
+.pur037-cell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--pur037-item-gap);
+}
+
+.pur037-sg-label {
+  flex: 0 0 var(--pur037-label-col);
+  width: var(--pur037-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+}
+
+.pur037-cell-field {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* 라벨 제외 나머지 칸을 컨트롤이 가득 채움 → 칸마다 L/R 빈 여백 균형 */
+.pur037-cell-field > * {
+  min-width: 0;
+  width: 100%;
+}
+
+.pur037-search-grid select.pur037-part-select {
+  border: 1px solid var(--pur037-control-border) !important;
+}
+
+.pur037-search-grid select.pur037-part-select:focus {
+  border-color: #3b82f6 !important;
+}
+
+.pur037-search-grid .pur037-pick-slot :deep(select) {
+  border: 1px solid var(--pur037-control-border) !important;
+}
+
+.pur037-search-grid .pur037-pick-slot :deep(select:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.pur037-search-grid .pur037-pick-slot :deep(.pickstore-vs-shell),
+.pur037-search-grid .pur037-bc-slot :deep(.pickstore-vs-shell) {
+  border: 1px solid var(--pur037-control-border) !important;
+}
+
+/* Datepicker2 filterBarAlign 날짜 입력과 동일 높이·타이포 (h-8, text-sm, pl-3, rounded-md) */
+.pur037-search-grid .pur037-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: 2rem;
+  min-height: 2rem;
+  padding-left: 0.75rem;
+  padding-right: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--pur037-control-border) !important;
+}
+
+.pur037-search-grid .pur037-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6 !important;
+}
+
+/* 그리드 바깥 라벨로 쓰므로 Datepicker1 안쪽 제목 숨김 */
+.pur037-date-slot :deep(div.space-x-5 > span) {
+  display: none;
+}
+
+.pur037-date-slot :deep(div.space-x-5) {
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.pur037-bc-slot :deep(> div.flex.text-base) {
+  width: 100%;
+  min-width: 0;
+}
+
+.pur037-pick-slot :deep(> div.flex.text-base) {
+  width: 100%;
+  min-width: 0;
+  /* PickStore compact 기본 gap-4(1rem) → 조회줄 간격과 불일치 */
+  gap: var(--pur037-item-gap) !important;
+}
+
+.pur037-pick-slot :deep(> div.flex > div:first-child) {
+  display: none;
+}
+
+.pur037-bc-slot :deep(> div.flex.items-center) {
+  margin-top: 0;
+}
+</style>

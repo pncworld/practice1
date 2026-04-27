@@ -1,12 +1,14 @@
 <template>
-  <div class="flex justify-end text-sm">
-    <div class="flex items-center font-bold text-sm ml-12">매장그룹</div>
-    <div>
+  <div class="flex items-center justify-end text-sm">
+    <div class="flex shrink-0 items-center font-semibold text-base ml-12 text-gray-900">
+      매장그룹
+    </div>
+    <div class="min-w-0">
       <select
         :disabled="isDisabled1"
         id="storeGroup"
         v-model="selectedGroup"
-        class="border border-gray-800 rounded-md p-2 ml-5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="ml-5 h-8 min-h-8 w-64 min-w-[14rem] shrink-0 rounded-md border border-black bg-white px-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
         @change="emitStoreGroup($event.target.value)">
         <option value="0">선택</option>
         <option

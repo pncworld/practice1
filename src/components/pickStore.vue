@@ -63,8 +63,13 @@
     <div
       :class="
         compactSearchBar
-          ? 'relative max-w-[12rem] min-w-0 flex-1 basis-auto'
+          ? 'relative min-w-0 flex-1 basis-auto'
           : 'w-64 relative ml-5'
+      "
+      :style="
+        compactSearchBar
+          ? { maxWidth: `${compactStoreComboMaxRem}rem` }
+          : undefined
       "
       v-show="hideit">
       <!-- <select
@@ -112,7 +117,7 @@
       <div
         :class="[
           compactSearchBar
-            ? 'h-8 min-h-8 w-full max-w-[12rem] min-w-0 text-nowrap rounded-md border border-black bg-white text-sm'
+            ? 'pickstore-vs-shell h-8 min-h-8 w-full max-w-full min-w-0 text-nowrap rounded-md border border-gray-800 bg-white text-sm'
             : 'h-[40px] w-[85%] bg-white border border-black rounded-lg text-xs text-nowrap',
           dynamicStoreClass,
         ]"
@@ -482,6 +487,11 @@ const props = defineProps({
   compactSearchBar: {
     type: Boolean,
     default: false,
+  },
+  /** compactSearchBar일 때 매장(v-select) 최대 너비(rem). 기본 12 */
+  compactStoreComboMaxRem: {
+    type: Number,
+    default: 12,
   },
 });
 
@@ -1004,6 +1014,13 @@ watch(
   overflow: hidden !important;
   position: relative;
   z-index: 40 !important;
+}
+
+/* 조회바(compact): 바깥 셸에만 테두리 — vue-select 토글 기본 테두리와 이중선 방지 */
+.pickstore-vs-shell .style-chooser .vs__dropdown-toggle {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 .style-chooser .vs__dropdown-menu {
   background: white;

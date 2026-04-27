@@ -5,734 +5,881 @@
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <!-- 조회 조건 -->
-  <div class="h-full">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="searchButton" class="button search md:w-auto w-14">
+  <div
+    class="flex h-full max-w-full min-h-0 flex-col gap-3 overflow-hidden pb-1 box-border">
+    <!-- 상단: 페이지명 + 액션 -->
+    <div class="flex shrink-0 flex-wrap items-center justify-between gap-3">
+      <PageName />
+      <div class="flex flex-wrap items-center justify-end gap-2">
+        <button type="button" @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-
-        <button @click="excelButton" class="button save w-auto excel">
+        <button type="button" @click="excelButton" class="button save w-auto excel">
           엑셀
+        </button>
+        <button type="button" @click="addButton" class="button new md:w-auto w-auto">
+          신규
+        </button>
+        <button type="button" @click="deleteButton" class="button delete md:w-auto w-auto">
+          삭제
         </button>
       </div>
     </div>
-    <div
-      class="grid grid-cols-3 grid-rows-3 justify-between bg-gray-200 rounded-lg h-32 items-start z-10">
-      <div class="flex ml-12 mt-2 items-center">
-        <div class="font-semibold text-base">자재코드</div>
-        <input
-          type="text"
-          class="ml-5 h-7 border border-black"
-          v-model="cond" />
-      </div>
-      <div class="flex ml-24 mt-2 items-center">
-        <div class="font-semibold text-base">자재명</div>
-        <input
-          type="text"
-          class="ml-5 h-7 border border-black"
-          v-model="cond2" />
-      </div>
-      <div></div>
-      <div
-        class="flex justify-start items-center text-base text-nowrap font-semibold ml-12 space-x-5">
-        자재그룹
-        <div class="flex space-x-5 ml-5">
-          <select name="" id="" class="w-48 h-8" v-model="cond3">
+
+    <!-- 조회 조건: 라벨 너비 통일 · 넓은 화면에서 3열×3행 -->
+    <div class="shrink-0 rounded-lg bg-gray-200 px-4 py-3">
+      <div class="grid grid-cols-1 gap-x-6 gap-y-3 lg:grid-cols-12 lg:items-center">
+        <div class="flex min-w-0 items-center gap-2 lg:col-span-4">
+          <span class="w-[8rem] shrink-0 text-center text-base font-semibold text-gray-900"
+            >자재코드</span
+          >
+          <input
+            type="text"
+            class="h-8 min-w-0 flex-1 border border-black px-2 text-sm"
+            v-model="cond" />
+        </div>
+        <div class="flex min-w-0 items-center gap-2 lg:col-span-4">
+          <span class="w-[8rem] shrink-0 text-center text-base font-semibold text-gray-900"
+            >자재명</span
+          >
+          <input
+            type="text"
+            class="h-8 min-w-0 flex-1 border border-black px-2 text-sm"
+            v-model="cond2" />
+        </div>
+        <div class="hidden lg:block lg:col-span-4" aria-hidden="true"></div>
+
+        <div class="flex min-w-0 items-center gap-2 lg:col-span-4">
+          <span class="w-[8rem] shrink-0 text-center text-base font-semibold text-gray-900"
+            >자재그룹</span
+          >
+          <select
+            class="h-8 min-w-0 flex-1 max-w-full border border-black bg-white px-2 text-sm"
+            v-model="cond3">
             <option value="0">선택</option>
             <option :value="i.lngStockGroupID" v-for="i in optionList">
               {{ i.strStockGroupName }}
             </option>
           </select>
         </div>
-      </div>
-      <div class="flex items-center justify-start text-base font-bold ml-20">
-        <div>자재분류</div>
-        <select name="" id="" class="w-48 h-8 ml-5" v-model="cond4">
-          <option value="0">선택</option>
-          <option :value="i.lngCategoryID" v-for="i in optionList2">
-            {{ i.strCategoryName }}
-          </option>
-        </select>
-      </div>
-      <div class="flex items-center justify-start text-base font-bold ml-24">
-        <div>자재특성</div>
-        <select name="" id="" class="w-48 h-8 ml-5" v-model="cond5">
-          <option value="0">선택</option>
-          <option :value="i.lngGenericID" v-for="i in optionList3">
-            {{ i.strGenericName }}
-          </option>
-        </select>
-      </div>
-
-      <div class="flex items-center justify-start text-base font-bold ml-16">
-        <div>거래처</div>
-        <select name="" id="" class="w-48 h-8 ml-5" v-model="cond6">
-          <option value="0">선택</option>
-          <option :value="i.lngSupplierID" v-for="i in optionList4">
-            {{ i.strSupplierName }}
-          </option>
-        </select>
-      </div>
-
-      <div class="flex items-center justify-start text-base font-bold ml-16">
-        <div>구분(주/부)</div>
-        <select name="" id="" class="w-48 h-8 ml-5" v-model="cond7">
-          <option value="0">선택</option>
-          <option :value="i.strDCode" v-for="i in optionList5">
-            {{ i.strDName }}
-          </option>
-        </select>
-      </div>
-
-      <div class="flex items-center justify-start text-base font-bold ml-16">
-        <div>과세면세구분</div>
-        <select name="" id="" class="w-48 h-8 ml-5" v-model="cond8">
-          <option :value="''">선택</option>
-          <option :value="i.strDCode" v-for="i in optionList6">
-            {{ i.strDName }}
-          </option>
-        </select>
-      </div>
-    </div>
-    <!-- 조회 조건 -->
-    <!--그리드 영역 -->
-    <div class="flex justify-end space-x-2">
-      <div><button @click="addButton" class="whitebutton">신규</button></div>
-      <div><button @click="deleteButton" class="whitebutton">삭제</button></div>
-    </div>
-    <div class="w-[100%] h-[70vh] grid-rows-2 grid-cols-1">
-      <Realgrid
-        :progname="'MST04_001INS_VUE'"
-        :progid="1"
-        :rowData="rowData"
-        :reload="reload"
-        :setStateBar="false"
-        :setGroupCustomLevel="2"
-        :mergeColumns2="true"
-        @clickedRowData="clickedRowData6"
-        @dblclickedRowData="dblclickedRowData"
-        :mergeColumnGroupName2="[['단위'], ['단가']]"
-        :mergeColumnGroupSubList2="[
-          [
-            'strOrderNCheck',
-            'strDemandUOM',
-            'strReturnNMoveUOM',
-            'strRealNreportUOM',
-            'strUseNLossUOM',
-          ],
-          ['curUnitPrice', 'curSalesUnitPrice'],
-        ]"
-        :documentTitle="'MST04_001INS'"
-        :documentSubTitle="documentSubTitle"
-        :exporttoExcel="exportExcel"
-        :rowStateeditable="false">
-      </Realgrid>
-    </div>
-  </div>
-
-  <div v-if="addRow" class="fixed top-64 right-96 w-[600px] h-[500px]">
-    <div class="bg-white border border-black w-full h-full">
-      <div class="flex justify-end space-x-2">
-        <div>
-          <button class="whitebutton" @click="cleanButton">신규</button>
-        </div>
-        <div><button class="whitebutton" @click="saveButton">저장</button></div>
-        <div>
-          <button class="whitebutton" @click="closePopUp2">닫기</button>
-        </div>
-      </div>
-      <div class="grid grid-rows-4 grid-cols-[1fr,2fr,1fr,2fr]">
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          자재코드
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start items-center pl-1">
-          <input
-            type="text"
-            class="h-[80%] w-[80%] border-black border"
-            name="scond"
-            @input="onlyNumber"
-            v-model="scond" />
-        </div>
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          자재명
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start items-center pl-1">
-          <input
-            type="text"
-            class="h-[80%] w-[80%] border-black border"
-            v-model="scond2" />
-        </div>
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          자재그룹
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start pl-1 items-center">
+        <div class="flex min-w-0 items-center gap-2 lg:col-span-4">
+          <span class="w-[8rem] shrink-0 text-center text-base font-semibold text-gray-900"
+            >자재분류</span
+          >
           <select
-            name=""
-            id=""
-            class="w-[70%] h-[80%] border border-black"
-            v-model="scond3">
-            <option value="0">선택</option>
-            <option :value="i.lngStockGroupID" v-for="i in optionList">
-              {{ i.strStockGroupName }}
-            </option>
-          </select>
-          <button class="whitebutton !h-[80%]" @click="showAddPopUp(1)">
-            +
-          </button>
-        </div>
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          자재분류
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start pl-1 items-center">
-          <select
-            name=""
-            id=""
-            class="w-[70%] h-[80%] border border-black"
-            v-model="scond4">
+            class="h-8 min-w-0 flex-1 max-w-full border border-black bg-white px-2 text-sm"
+            v-model="cond4">
             <option value="0">선택</option>
             <option :value="i.lngCategoryID" v-for="i in optionList2">
               {{ i.strCategoryName }}
             </option>
           </select>
-          <button class="whitebutton !h-[80%]" @click="showAddPopUp(2)">
-            +
-          </button>
         </div>
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          자재특성
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start pl-1 items-center">
+        <div class="flex min-w-0 items-center gap-2 lg:col-span-4">
+          <span class="w-[8rem] shrink-0 text-center text-base font-semibold text-gray-900"
+            >자재특성</span
+          >
           <select
-            name=""
-            id=""
-            class="w-[70%] h-[80%] border border-black"
-            v-model="scond5">
+            class="h-8 min-w-0 flex-1 max-w-full border border-black bg-white px-2 text-sm"
+            v-model="cond5">
             <option value="0">선택</option>
             <option :value="i.lngGenericID" v-for="i in optionList3">
               {{ i.strGenericName }}
             </option>
           </select>
-          <button class="whitebutton !h-[80%]" @click="showAddPopUp(3)">
-            +
-          </button>
         </div>
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          실사주기
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start pl-1 items-center">
-          <select
-            name=""
-            id=""
-            class="w-[70%] h-[80%] border border-black"
-            v-model="scond6">
-            <option value="0">선택</option>
-            <option :value="i.strDCode" v-for="i in optionList7">
-              {{ i.strDName }}
-            </option>
-          </select>
-        </div>
-        <div
-          class="border-l border-t border-b border-black bg-gray-100 justify-center items-center text-center">
-          과세면세구분
-        </div>
-        <div
-          class="border-l border-t border-b border-black flex justify-start pl-1 items-center">
-          <select
-            name=""
-            id=""
-            class="w-[70%] h-[80%] border border-black"
-            v-model="scond7">
-            <option value="0">선택</option>
-            <option :value="i.strDCode" v-for="i in optionList6">
-              {{ i.strDName }}
-            </option>
-          </select>
-        </div>
-        <div
-          class="border-l border-t border-b border-black bg-gray-100 justify-center items-center text-center">
-          의제매입
-        </div>
-        <div
-          class="border-l border-t border-b border-black flex justify-start pl-1 items-center">
-          <select
-            name=""
-            id=""
-            class="w-[70%] h-[80%] border border-black"
-            v-model="scond8">
-            <option value="0">선택</option>
-            <option :value="i.strDCode" v-for="i in optionList8">
-              {{ i.strDName }}
-            </option>
-          </select>
-        </div>
-      </div>
-      <div class="flex text-red-500">
-        ex : 1ea 에 100g 자재를 1box 매입하여 1ea 단위로 출고. 1box에 12ea가
-        들어있음. <br />
-        발주매입:1box , 청구:12ea , 반품/이동:12ea , 실사/재고:1200g , 사용/손실
-        : 1200g
-      </div>
 
-      <div class="grid grid-rows-6 grid-cols-[1fr,2fr]">
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          규격
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start pl-1 items-center">
+        <div class="flex min-w-0 items-center gap-2 lg:col-span-4">
+          <span class="w-[8rem] shrink-0 text-center text-base font-semibold text-gray-900"
+            >거래처</span
+          >
           <select
-            name=""
-            id=""
-            class="w-[70%] h-[80%] border border-black"
-            v-model="scond9">
-            <option value="0">선택</option>
-            <option :value="i.lngStandardID" v-for="i in optionList9">
-              {{ i.strStandardName }}
-            </option>
-          </select>
-          <button class="whitebutton !h-[80%]" @click="showAddPopUp(4)">
-            +
-          </button>
-        </div>
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          발주매입단위
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start pl-1 items-center">
-          <select
-            name=""
-            id=""
-            class="w-[40%] h-[80%] border border-black disabled:bg-gray-300"
-            :disabled="saveNew == false"
-            v-model="scond10">
-            <option value="0">선택</option>
-            <option :value="i.lngUnitID" v-for="i in optionList10">
-              {{ i.strUnitName }}
-            </option>
-          </select>
-          <input
-            type="text"
-            @input="onlyNumber"
-            :disabled="saveNew == false"
-            name="scond11"
-            class="h-[80%] w-[29%] border border-black ml-1 disabled:bg-gray-300"
-            v-model="scond11" />
-        </div>
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          청구단위
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start pl-1 items-center">
-          <select
-            name=""
-            id=""
-            :disabled="saveNew == false"
-            class="w-[40%] h-[80%] border border-black disabled:bg-gray-300"
-            v-model="scond12">
-            <option value="0">선택</option>
-            <option :value="i.lngUnitID" v-for="i in optionList10">
-              {{ i.strUnitName }}
-            </option>
-          </select>
-          <input
-            type="text"
-            :disabled="saveNew == false"
-            @input="onlyNumber"
-            name="scond13"
-            class="h-[80%] w-[29%] border border-black ml-1 disabled:bg-gray-300"
-            v-model="scond13" />
-        </div>
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          반품/이동단위
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start pl-1 items-center">
-          <select
-            name=""
-            id=""
-            :disabled="saveNew == false"
-            class="w-[40%] h-[80%] border border-black disabled:bg-gray-300"
-            v-model="scond14">
-            <option value="0">선택</option>
-            <option :value="i.lngUnitID" v-for="i in optionList10">
-              {{ i.strUnitName }}
-            </option>
-          </select>
-          <input
-            type="text"
-            @input="onlyNumber"
-            :disabled="saveNew == false"
-            name="scond15"
-            class="h-[80%] w-[29%] border border-black ml-1 disabled:bg-gray-300"
-            v-model="scond15" />
-        </div>
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          실사/재고단위
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start pl-1 items-center">
-          <select
-            name=""
-            id=""
-            :disabled="saveNew == false"
-            class="w-[40%] h-[80%] border border-black disabled:bg-gray-300"
-            @change="scond18 = scond16"
-            v-model="scond16">
-            <option value="0">선택</option>
-            <option :value="i.lngUnitID" v-for="i in optionList10">
-              {{ i.strUnitName }}
-            </option>
-          </select>
-          <input
-            type="text"
-            :disabled="saveNew == false"
-            @input="handleInput"
-            class="h-[80%] w-[29%] border border-black ml-1 disabled:bg-gray-300"
-            v-model="scond17" />
-        </div>
-        <div
-          class="border-l border-t border-b border-black bg-gray-100 justify-center items-center text-center">
-          사용/손실단위
-        </div>
-        <div
-          class="border-l border-t border-b border-black flex justify-start pl-1 items-center">
-          <select
-            name=""
-            id=""
-            class="w-[40%] h-[80%] border border-black disabled:bg-gray-300"
-            disabled
-            v-model="scond18">
-            <option value="0">선택</option>
-            <option :value="i.lngUnitID" v-for="i in optionList10">
-              {{ i.strUnitName }}
-            </option>
-          </select>
-          <input
-            type="text"
-            disabled
-            class="h-[80%] w-[29%] border border-b border-black ml-1 disabled:bg-gray-300"
-            v-model="scond19" />
-        </div>
-      </div>
-      <div class="flex text-red-500">
-        ※매입단가 : 발주/매입 단위 금액, 판매단가 : 반품/이동 단위 금액.
-      </div>
-
-      <div class="grid grid-rows-5 grid-cols-[3fr,4fr,3fr,4fr]">
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          주거래처
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start pl-1 items-center col-span-3">
-          <select
-            name=""
-            id=""
-            class="w-[70%] h-[80%] border border-black"
-            v-model="scond20">
+            class="h-8 min-w-0 flex-1 max-w-full border border-black bg-white px-2 text-sm"
+            v-model="cond6">
             <option value="0">선택</option>
             <option :value="i.lngSupplierID" v-for="i in optionList4">
               {{ i.strSupplierName }}
             </option>
           </select>
         </div>
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          부가세 구분
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start pl-1 items-center col-span-3">
-          <label for="ssscond2"
-            ><input
-              type="checkbox"
-              id="ssscond2"
-              v-model="scond21" />포함</label
+        <div class="flex min-w-0 items-center gap-2 lg:col-span-4">
+          <span class="w-[8rem] shrink-0 text-center text-base font-semibold text-gray-900"
+            >구분(주/부)</span
           >
-        </div>
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          매입단가
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start pl-1 items-center">
-          <input
-            type="text"
-            :disabled="disabled2"
-            @input="onlyNumber"
-            name="scond22"
-            class="h-[80%] w-[70%] border border-black disabled:bg-gray-300"
-            v-model="scond22" />
-        </div>
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          판매단가
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start pl-1 items-center">
-          <input
-            type="text"
-            :disabled="disabled2"
-            @input="onlyNumber"
-            name="scond23"
-            class="h-[80%] w-[70%] border border-black disabled:bg-gray-300"
-            v-model="scond23" />
-        </div>
-        <div
-          class="border-l border-t border-black bg-gray-100 justify-center items-center text-center">
-          매입단가(VAT포함)
-        </div>
-        <div
-          class="border-l border-t border-black flex justify-start pl-1 items-center">
-          <input
-            type="text"
-            :disabled="!disabled2"
-            @input="onlyNumber"
-            name="scond24"
-            class="h-[80%] w-[70%] border border-black disabled:bg-gray-300"
-            v-model="scond24" />
-        </div>
-        <div
-          class="border-l border-t border-b border-black bg-gray-100 justify-center items-center text-center">
-          판매단가(VAT포함)
-        </div>
-        <div
-          class="border-l border-t border-b border-black flex justify-start pl-1 items-center">
-          <input
-            type="text"
-            @input="onlyNumber"
-            name="scond25"
-            :disabled="!disabled2"
-            class="h-[80%] w-[70%] border border-black disabled:bg-gray-300"
-            v-model="scond25" />
-        </div>
-
-        <div
-          class="border-l border-t border-b border-black bg-gray-100 justify-center items-center text-center">
-          바코드
-        </div>
-        <div
-          class="border-l border-t border-b border-black flex justify-start pl-1 items-center">
-          <input
-            type="text"
-            class="h-[80%] w-[70%] border border-black disabled:bg-gray-300"
-            v-model="scond26" />
-        </div>
-        <div
-          class="border-l border-t border-b border-black bg-gray-100 justify-center items-center text-center">
-          사용여부
-        </div>
-        <div
-          class="border-l border-t border-b border-black flex justify-start pl-1 items-center">
           <select
-            name=""
-            id=""
-            class="w-[70%] h-[80%] border border-black"
-            v-model="scond27">
-            <option value="Y">Y</option>
-            <option value="N">N</option>
+            class="h-8 min-w-0 flex-1 max-w-full border border-black bg-white px-2 text-sm"
+            v-model="cond7">
+            <option value="0">선택</option>
+            <option :value="i.strDCode" v-for="i in optionList5">
+              {{ i.strDName }}
+            </option>
+          </select>
+        </div>
+        <div class="flex min-w-0 items-center gap-2 lg:col-span-4">
+          <span class="w-[8rem] shrink-0 text-center text-base font-semibold text-gray-900"
+            >과세면세구분</span
+          >
+          <select
+            class="h-8 min-w-0 flex-1 max-w-full border border-black bg-white px-2 text-sm"
+            v-model="cond8">
+            <option :value="''">선택</option>
+            <option :value="i.strDCode" v-for="i in optionList6">
+              {{ i.strDName }}
+            </option>
           </select>
         </div>
       </div>
     </div>
-  </div>
 
-  <div v-if="addRow2" class="fixed top-64 right-8 w-[350px] h-[500px]">
-    <div class="bg-white border border-black w-full h-full">
-      <div class="flex justify-end space-x-2">
-        <div>
-          <button class="whitebutton" @click="cleanButton2">신규</button>
-        </div>
-        <div>
-          <button class="whitebutton" @click="saveButton2">저장</button>
-        </div>
-        <div>
-          <button class="whitebutton" @click="deleteButton2">삭제</button>
-        </div>
-        <div><button class="whitebutton" @click="closePopUp">닫기</button></div>
-      </div>
-      <div class="grid grid-rows-2 grid-cols-[1fr,2fr] w-full">
-        <div class="border-l border-t border-black">자재그룹코드</div>
-        <div class="border-l border-t border-black pl-1 flex items-center">
-          <input
-            type="number"
-            class="border border-black h-[80%]"
-            v-model="sscond" />
-        </div>
-        <div class="border-l border-t border-b border-black">자재그룹명</div>
+    <!-- 그리드: 남은 높이 사용 + 가로 스크롤은 영역 안에서만 -->
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <div
+        class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-gray-300 bg-white shadow-sm">
         <div
-          class="border-l border-t border-b border-black pl-1 flex items-center">
-          <input
-            type="text"
-            class="border border-black h-[80%]"
-            v-model="sscond2" />
+          class="h-[calc(100vh-15rem)] min-h-[18rem] w-full min-w-0 overflow-auto">
+          <Realgrid
+            :progname="'MST04_001INS_VUE'"
+            :progid="1"
+            :rowData="rowData"
+            :reload="reload"
+            :setStateBar="false"
+            :setGroupCustomLevel="2"
+            :mergeColumns2="true"
+            @clickedRowData="clickedRowData6"
+            @dblclickedRowData="dblclickedRowData"
+            :mergeColumnGroupName2="[['단위'], ['단가']]"
+            :mergeColumnGroupSubList2="[
+              [
+                'strOrderNCheck',
+                'strDemandUOM',
+                'strReturnNMoveUOM',
+                'strRealNreportUOM',
+                'strUseNLossUOM',
+              ],
+              ['curUnitPrice', 'curSalesUnitPrice'],
+            ]"
+            :documentTitle="'MST04_001INS'"
+            :documentSubTitle="documentSubTitle"
+            :exporttoExcel="exportExcel"
+            :rowStateeditable="false">
+          </Realgrid>
         </div>
-      </div>
-
-      <div class="w-[95%] h-[80%] flex justify-center items-center ml-1 mt-1">
-        <Realgrid
-          :progname="'MST04_001INS_VUE'"
-          :progid="2"
-          :setStateBar="false"
-          :rowStateeditable="false"
-          @clickedRowData="clickedRowData"
-          :rowData="rowData2"></Realgrid>
       </div>
     </div>
   </div>
 
-  <div v-if="addRow3" class="fixed top-64 right-12 w-[16vw] h-[50vh]">
-    <div class="bg-white border border-black w-full h-full">
-      <div class="flex justify-end space-x-2">
-        <div>
-          <button class="whitebutton" @click="cleanButton3">신규</button>
-        </div>
-        <div>
-          <button class="whitebutton" @click="saveButton3">저장</button>
-        </div>
-        <div>
-          <button class="whitebutton" @click="deleteButton3">삭제</button>
-        </div>
-        <div><button class="whitebutton" @click="closePopUp">닫기</button></div>
+  <!-- body로 올려 .po-header(z-9)보다 위에 그리지 않으면 상단 GNB가 클릭을 가로챔 -->
+  <Teleport to="body">
+    <div
+      v-if="addRow"
+      class="fixed inset-0 z-[11000] flex justify-center overflow-y-auto bg-black/40 px-3 py-2">
+    <div
+      role="dialog"
+      aria-modal="true"
+      class="border-2 border-gray-700 bg-white shadow-2xl flex h-fit max-h-[calc(100vh-4.5rem)] w-full max-w-5xl flex-col rounded-lg">
+      <div
+        class="flex shrink-0 flex-wrap items-center justify-end gap-3 border-b border-gray-400 bg-gray-50 px-3 py-1.5 rounded-t-lg">
+        <button type="button" :class="popupToolbarBtnClass" @click="cleanButton">
+          신규
+        </button>
+        <button type="button" :class="popupToolbarBtnClass" @click="saveButton">
+          저장
+        </button>
+        <button type="button" :class="popupToolbarBtnClass" @click="closePopUp2">
+          닫기
+        </button>
       </div>
-      <div class="grid grid-rows-2 grid-cols-[1fr,2fr] w-full">
-        <div class="border-l border-t border-black">자재분류코드</div>
-        <div class="border-l border-t border-black pl-1 flex items-center">
-          <input
-            type="number"
-            class="border border-black h-[80%]"
-            v-model="sscond3" />
+
+      <div class="min-h-0 flex-1 overflow-y-auto px-2 py-1.5 space-y-1">
+        <!-- 공통: 라벨 열 2 / 값 열 4 × 2 = 12 -->
+        <div class="rounded-md border border-gray-500 overflow-hidden">
+          <div
+            class="grid grid-cols-12 border-b border-gray-500 bg-white last:border-b-0">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              자재코드
+            </div>
+            <div
+              class="col-span-12 flex min-h-[34px] items-center border-r border-gray-400 px-2 py-1 sm:col-span-4">
+              <input
+                type="text"
+                class="h-7 w-full rounded-sm border border-gray-700 px-2 text-sm"
+                name="scond"
+                @input="onlyNumber"
+                v-model="scond" />
+            </div>
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              자재명
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center px-2 py-1 sm:col-span-4">
+              <input
+                type="text"
+                class="h-7 w-full rounded-sm border border-gray-700 px-2 text-sm"
+                v-model="scond2" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              자재그룹
+            </div>
+            <div
+              class="col-span-12 flex min-h-[34px] items-center gap-1.5 border-r border-gray-400 px-2 py-1 sm:col-span-4">
+              <select
+                class="h-7 min-w-0 flex-1 rounded-sm border border-gray-700 bg-white px-2 text-sm"
+                v-model="scond3">
+                <option value="0">선택</option>
+                <option :value="i.lngStockGroupID" v-for="i in optionList">
+                  {{ i.strStockGroupName }}
+                </option>
+              </select>
+              <button type="button" class="whitebutton !h-7 shrink-0 px-2" @click="showAddPopUp(1)">
+                +
+              </button>
+            </div>
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              자재분류
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center gap-2 px-2 py-1 sm:col-span-4">
+              <select
+                class="h-7 min-w-0 flex-1 rounded-sm border border-gray-700 bg-white px-2 text-sm"
+                v-model="scond4">
+                <option value="0">선택</option>
+                <option :value="i.lngCategoryID" v-for="i in optionList2">
+                  {{ i.strCategoryName }}
+                </option>
+              </select>
+              <button type="button" class="whitebutton !h-7 shrink-0 px-2" @click="showAddPopUp(2)">
+                +
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              자재특성
+            </div>
+            <div
+              class="col-span-12 flex min-h-[34px] items-center gap-1.5 border-r border-gray-400 px-2 py-1 sm:col-span-4">
+              <select
+                class="h-7 min-w-0 flex-1 rounded-sm border border-gray-700 bg-white px-2 text-sm"
+                v-model="scond5">
+                <option value="0">선택</option>
+                <option :value="i.lngGenericID" v-for="i in optionList3">
+                  {{ i.strGenericName }}
+                </option>
+              </select>
+              <button type="button" class="whitebutton !h-7 shrink-0 px-2" @click="showAddPopUp(3)">
+                +
+              </button>
+            </div>
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              실사주기
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center px-2 py-1 sm:col-span-4">
+              <select
+                class="h-7 w-full rounded-sm border border-gray-700 bg-white px-2 text-sm"
+                v-model="scond6">
+                <option value="0">선택</option>
+                <option :value="i.strDCode" v-for="i in optionList7">
+                  {{ i.strDName }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 bg-white">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              과세면세구분
+            </div>
+            <div
+              class="col-span-12 flex min-h-[34px] items-center border-r border-gray-400 px-2 py-1 sm:col-span-4">
+              <select
+                class="h-7 w-full rounded-sm border border-gray-700 bg-white px-2 text-sm"
+                v-model="scond7">
+                <option value="0">선택</option>
+                <option :value="i.strDCode" v-for="i in optionList6">
+                  {{ i.strDName }}
+                </option>
+              </select>
+            </div>
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              의제매입
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center px-2 py-1 sm:col-span-4">
+              <select
+                class="h-7 w-full rounded-sm border border-gray-700 bg-white px-2 text-sm"
+                v-model="scond8">
+                <option value="0">선택</option>
+                <option :value="i.strDCode" v-for="i in optionList8">
+                  {{ i.strDName }}
+                </option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div class="border-l border-t border-b border-black">자재분류명</div>
         <div
-          class="border-l border-t border-b border-black pl-1 flex items-center">
-          <input
-            type="text"
-            class="border border-black h-[80%]"
-            v-model="sscond4" />
+          class="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm leading-snug text-red-600">
+          ex : 1ea 에 100g 자재를 1box 매입하여 1ea 단위로 출고. 1box에 12ea가 들어있음.
+          <br />
+          발주매입:1box , 청구:12ea , 반품/이동:12ea , 실사/재고:1200g , 사용/손실 : 1200g
         </div>
-      </div>
 
-      <div class="w-[95%] h-[80%] flex justify-center items-center ml-1 mt-1">
-        <Realgrid
-          :progname="'MST04_001INS_VUE'"
-          :progid="3"
-          :setStateBar="false"
-          :rowStateeditable="false"
-          @clickedRowData="clickedRowData2"
-          :rowData="rowData3"></Realgrid>
+        <div class="rounded-md border border-gray-500 overflow-hidden">
+          <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              규격
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center gap-1.5 px-2 py-1 sm:col-span-10">
+              <select
+                class="h-7 min-w-0 flex-1 rounded-sm border border-gray-700 bg-white px-2 text-sm"
+                v-model="scond9">
+                <option value="0">선택</option>
+                <option :value="i.lngStandardID" v-for="i in optionList9">
+                  {{ i.strStandardName }}
+                </option>
+              </select>
+              <button type="button" class="whitebutton !h-7 shrink-0 px-2" @click="showAddPopUp(4)">
+                +
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              발주매입단위
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center gap-1.5 px-2 py-1 sm:col-span-10">
+              <select
+                class="h-7 min-w-0 flex-1 rounded-sm border border-gray-700 bg-white px-2 text-sm disabled:bg-gray-200"
+                :disabled="saveNew == false"
+                v-model="scond10">
+                <option value="0">선택</option>
+                <option :value="i.lngUnitID" v-for="i in optionList10">
+                  {{ i.strUnitName }}
+                </option>
+              </select>
+              <input
+                type="text"
+                @input="onlyNumber"
+                :disabled="saveNew == false"
+                name="scond11"
+                class="h-7 w-24 shrink-0 rounded-sm border border-gray-700 px-2 text-sm disabled:bg-gray-200"
+                v-model="scond11" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              청구단위
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center gap-1.5 px-2 py-1 sm:col-span-10">
+              <select
+                class="h-7 min-w-0 flex-1 rounded-sm border border-gray-700 bg-white px-2 text-sm disabled:bg-gray-200"
+                :disabled="saveNew == false"
+                v-model="scond12">
+                <option value="0">선택</option>
+                <option :value="i.lngUnitID" v-for="i in optionList10">
+                  {{ i.strUnitName }}
+                </option>
+              </select>
+              <input
+                type="text"
+                :disabled="saveNew == false"
+                @input="onlyNumber"
+                name="scond13"
+                class="h-7 w-24 shrink-0 rounded-sm border border-gray-700 px-2 text-sm disabled:bg-gray-200"
+                v-model="scond13" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              반품/이동단위
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center gap-1.5 px-2 py-1 sm:col-span-10">
+              <select
+                class="h-7 min-w-0 flex-1 rounded-sm border border-gray-700 bg-white px-2 text-sm disabled:bg-gray-200"
+                :disabled="saveNew == false"
+                v-model="scond14">
+                <option value="0">선택</option>
+                <option :value="i.lngUnitID" v-for="i in optionList10">
+                  {{ i.strUnitName }}
+                </option>
+              </select>
+              <input
+                type="text"
+                @input="onlyNumber"
+                :disabled="saveNew == false"
+                name="scond15"
+                class="h-7 w-24 shrink-0 rounded-sm border border-gray-700 px-2 text-sm disabled:bg-gray-200"
+                v-model="scond15" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              실사/재고단위
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center gap-1.5 px-2 py-1 sm:col-span-10">
+              <select
+                class="h-7 min-w-0 flex-1 rounded-sm border border-gray-700 bg-white px-2 text-sm disabled:bg-gray-200"
+                :disabled="saveNew == false"
+                @change="scond18 = scond16"
+                v-model="scond16">
+                <option value="0">선택</option>
+                <option :value="i.lngUnitID" v-for="i in optionList10">
+                  {{ i.strUnitName }}
+                </option>
+              </select>
+              <input
+                type="text"
+                :disabled="saveNew == false"
+                @input="handleInput"
+                class="h-7 w-24 shrink-0 rounded-sm border border-gray-700 px-2 text-sm disabled:bg-gray-200"
+                v-model="scond17" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 bg-white">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              사용/손실단위
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center gap-1.5 px-2 py-1 sm:col-span-10">
+              <select
+                class="h-7 min-w-0 flex-1 rounded-sm border border-gray-700 bg-white px-2 text-sm disabled:bg-gray-200"
+                disabled
+                v-model="scond18">
+                <option value="0">선택</option>
+                <option :value="i.lngUnitID" v-for="i in optionList10">
+                  {{ i.strUnitName }}
+                </option>
+              </select>
+              <input
+                type="text"
+                disabled
+                class="h-7 w-24 shrink-0 rounded-sm border border-gray-700 px-2 text-sm disabled:bg-gray-200"
+                v-model="scond19" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm leading-snug text-amber-900">
+          ※매입단가 : 발주/매입 단위 금액, 판매단가 : 반품/이동 단위 금액.
+        </div>
+
+        <div class="rounded-md border border-gray-500 overflow-hidden">
+          <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              주거래처
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center px-2 py-1 sm:col-span-10">
+              <select
+                class="h-7 w-full max-w-xl rounded-sm border border-gray-700 bg-white px-2 text-sm"
+                v-model="scond20">
+                <option value="0">선택</option>
+                <option :value="i.lngSupplierID" v-for="i in optionList4">
+                  {{ i.strSupplierName }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              부가세 구분
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center px-2 py-1 sm:col-span-10">
+              <label for="ssscond2" class="flex cursor-pointer items-center gap-2 text-base">
+                <input type="checkbox" id="ssscond2" v-model="scond21" />
+                포함
+              </label>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              매입단가
+            </div>
+            <div
+              class="col-span-12 flex min-h-[34px] items-center border-r border-gray-400 px-2 py-1 sm:col-span-4">
+              <input
+                type="text"
+                :disabled="disabled2"
+                @input="onlyNumber"
+                name="scond22"
+                class="h-7 w-full max-w-xs rounded-sm border border-gray-700 px-2 text-sm disabled:bg-gray-200"
+                v-model="scond22" />
+            </div>
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              판매단가
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center px-2 py-1 sm:col-span-4">
+              <input
+                type="text"
+                :disabled="disabled2"
+                @input="onlyNumber"
+                name="scond23"
+                class="h-7 w-full max-w-xs rounded-sm border border-gray-700 px-2 text-sm disabled:bg-gray-200"
+                v-model="scond23" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              매입단가(VAT포함)
+            </div>
+            <div
+              class="col-span-12 flex min-h-[34px] items-center border-r border-gray-400 px-2 py-1 sm:col-span-4">
+              <input
+                type="text"
+                :disabled="!disabled2"
+                @input="onlyNumber"
+                name="scond24"
+                class="h-7 w-full max-w-xs rounded-sm border border-gray-700 px-2 text-sm disabled:bg-gray-200"
+                v-model="scond24" />
+            </div>
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              판매단가(VAT포함)
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center px-2 py-1 sm:col-span-4">
+              <input
+                type="text"
+                @input="onlyNumber"
+                name="scond25"
+                :disabled="!disabled2"
+                class="h-7 w-full max-w-xs rounded-sm border border-gray-700 px-2 text-sm disabled:bg-gray-200"
+                v-model="scond25" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 bg-white">
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              바코드
+            </div>
+            <div
+              class="col-span-12 flex min-h-[34px] items-center border-r border-gray-400 px-2 py-1 sm:col-span-4">
+              <input
+                type="text"
+                class="h-7 w-full max-w-xs rounded-sm border border-gray-700 px-2 text-sm disabled:bg-gray-200"
+                v-model="scond26" />
+            </div>
+            <div
+              class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+              사용여부
+            </div>
+            <div class="col-span-12 flex min-h-[34px] items-center px-2 py-1 sm:col-span-4">
+              <select
+                class="h-7 w-full max-w-xs rounded-sm border border-gray-700 bg-white px-2 text-sm"
+                v-model="scond27">
+                <option value="Y">Y</option>
+                <option value="N">N</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+    </div>
+  </Teleport>
 
-  <div v-if="addRow4" class="fixed top-64 right-12 w-[16vw] h-[50vh]">
-    <div class="bg-white border border-black w-full h-full">
-      <div class="flex justify-end space-x-2">
-        <div>
-          <button class="whitebutton" @click="cleanButton4">신규</button>
-        </div>
-        <div>
-          <button class="whitebutton" @click="saveButton4">저장</button>
-        </div>
-        <div>
-          <button class="whitebutton" @click="deleteButton4">삭제</button>
-        </div>
-        <div><button class="whitebutton" @click="closePopUp">닫기</button></div>
-      </div>
-      <div class="grid grid-rows-2 grid-cols-[1fr,2fr] w-full">
-        <div class="border-l border-t border-black">자재특성코드</div>
-        <div class="border-l border-t border-black pl-1 flex items-center">
-          <input
-            type="number"
-            class="border border-black h-[80%]"
-            v-model="sscond5" />
-        </div>
-
-        <div class="border-l border-t border-b border-black">자재특성명</div>
+  <Teleport to="body">
+    <div
+      v-if="addRow2"
+      class="fixed inset-0 z-[12000] flex justify-center overflow-y-auto bg-black/40 px-3 py-2">
+      <div
+        role="dialog"
+        aria-modal="true"
+        class="border-2 border-gray-700 bg-white shadow-2xl my-auto flex h-fit max-h-[calc(100vh-4.5rem)] w-full max-w-4xl flex-col rounded-lg">
         <div
-          class="border-l border-t border-b border-black pl-1 flex items-center">
-          <input
-            type="text"
-            class="border border-black h-[80%]"
-            v-model="sscond6" />
+          class="flex shrink-0 flex-wrap items-center justify-end gap-3 border-b border-gray-400 bg-gray-50 px-3 py-1.5 rounded-t-lg">
+          <button type="button" :class="popupToolbarBtnClass" @click="cleanButton2">
+            신규
+          </button>
+          <button type="button" :class="popupToolbarBtnClass" @click="saveButton2">
+            저장
+          </button>
+          <button type="button" :class="popupToolbarBtnClass" @click="deleteButton2">
+            삭제
+          </button>
+          <button type="button" :class="popupToolbarBtnClass" @click="closePopUp">
+            닫기
+          </button>
         </div>
-      </div>
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col gap-2 overflow-hidden px-2 py-2">
+          <div class="shrink-0 rounded-md border border-gray-500 overflow-hidden">
+            <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+              <div
+                class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+                자재그룹코드
+              </div>
+              <div
+                class="col-span-12 flex min-h-[34px] items-center border-r border-gray-400 px-2 py-1 sm:col-span-10">
+                <input
+                  type="number"
+                  class="h-7 w-full max-w-md rounded-sm border border-gray-700 px-2 text-sm"
+                  v-model="sscond" />
+              </div>
+            </div>
+            <div class="grid grid-cols-12 bg-white">
+              <div
+                class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+                자재그룹명
+              </div>
+              <div class="col-span-12 flex min-h-[34px] items-center px-2 py-1 sm:col-span-10">
+                <input
+                  type="text"
+                  class="h-7 w-full max-w-md rounded-sm border border-gray-700 px-2 text-sm"
+                  v-model="sscond2" />
+              </div>
+            </div>
+          </div>
 
-      <div class="w-[95%] h-[80%] flex justify-center items-center ml-1 mt-1">
-        <Realgrid
-          :progname="'MST04_001INS_VUE'"
-          :progid="4"
-          :setStateBar="false"
-          :rowStateeditable="false"
-          @clickedRowData="clickedRowData3"
-          :rowData="rowData4"></Realgrid>
+          <div
+            class="flex h-[50vh] min-h-[260px] w-full min-w-0 flex-col overflow-hidden rounded-md border border-gray-500 bg-white">
+            <div class="box-border h-full min-h-0 w-full flex-1 overflow-hidden p-1">
+              <Realgrid
+                :progname="'MST04_001INS_VUE'"
+                :progid="2"
+                :setStateBar="false"
+                :rowStateeditable="false"
+                @clickedRowData="clickedRowData"
+                :rowData="rowData2"></Realgrid>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 
-  <div v-if="addRow5" class="fixed top-64 right-12 w-[16vw] h-[50vh]">
-    <div class="bg-white border border-black w-full h-full">
-      <div class="flex justify-end space-x-2">
-        <div>
-          <button class="whitebutton" @click="cleanButton5">신규</button>
-        </div>
-        <div>
-          <button class="whitebutton" @click="saveButton5">저장</button>
-        </div>
-        <div>
-          <button class="whitebutton" @click="deleteButton5">삭제</button>
-        </div>
-        <div><button class="whitebutton" @click="closePopUp">닫기</button></div>
-      </div>
-      <div class="grid grid-rows-2 grid-cols-[1fr,2fr] w-full">
-        <div class="border-l border-t border-black">자재규격코드</div>
-        <div class="border-l border-t border-black pl-1 flex items-center">
-          <input
-            type="number"
-            class="border border-black h-[80%]"
-            v-model="sscond7" />
-        </div>
-
-        <div class="border-l border-t border-b border-black">자재규격명</div>
+  <Teleport to="body">
+    <div
+      v-if="addRow3"
+      class="fixed inset-0 z-[12000] flex justify-center overflow-y-auto bg-black/40 px-3 py-2">
+      <div
+        role="dialog"
+        aria-modal="true"
+        class="border-2 border-gray-700 bg-white shadow-2xl my-auto flex h-fit max-h-[calc(100vh-4.5rem)] w-full max-w-4xl flex-col rounded-lg">
         <div
-          class="border-l border-t border-b border-black pl-1 flex items-center">
-          <input
-            type="text"
-            class="border border-black h-[80%]"
-            v-model="sscond8" />
+          class="flex shrink-0 flex-wrap items-center justify-end gap-3 border-b border-gray-400 bg-gray-50 px-3 py-1.5 rounded-t-lg">
+          <button type="button" :class="popupToolbarBtnClass" @click="cleanButton3">
+            신규
+          </button>
+          <button type="button" :class="popupToolbarBtnClass" @click="saveButton3">
+            저장
+          </button>
+          <button type="button" :class="popupToolbarBtnClass" @click="deleteButton3">
+            삭제
+          </button>
+          <button type="button" :class="popupToolbarBtnClass" @click="closePopUp">
+            닫기
+          </button>
         </div>
-      </div>
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col gap-2 overflow-hidden px-2 py-2">
+          <div class="shrink-0 rounded-md border border-gray-500 overflow-hidden">
+            <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+              <div
+                class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+                자재분류코드
+              </div>
+              <div
+                class="col-span-12 flex min-h-[34px] items-center border-r border-gray-400 px-2 py-1 sm:col-span-10">
+                <input
+                  type="number"
+                  class="h-7 w-full max-w-md rounded-sm border border-gray-700 px-2 text-sm"
+                  v-model="sscond3" />
+              </div>
+            </div>
+            <div class="grid grid-cols-12 bg-white">
+              <div
+                class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+                자재분류명
+              </div>
+              <div class="col-span-12 flex min-h-[34px] items-center px-2 py-1 sm:col-span-10">
+                <input
+                  type="text"
+                  class="h-7 w-full max-w-md rounded-sm border border-gray-700 px-2 text-sm"
+                  v-model="sscond4" />
+              </div>
+            </div>
+          </div>
 
-      <div class="w-[95%] h-[80%] flex justify-center items-center ml-1 mt-1">
-        <Realgrid
-          :progname="'MST04_001INS_VUE'"
-          :progid="5"
-          :setStateBar="false"
-          :rowStateeditable="false"
-          @clickedRowData="clickedRowData4"
-          :rowData="rowData5"></Realgrid>
+          <div
+            class="flex h-[50vh] min-h-[260px] w-full min-w-0 flex-col overflow-hidden rounded-md border border-gray-500 bg-white">
+            <div class="box-border h-full min-h-0 w-full flex-1 overflow-hidden p-1">
+              <Realgrid
+                :progname="'MST04_001INS_VUE'"
+                :progid="3"
+                :setStateBar="false"
+                :rowStateeditable="false"
+                @clickedRowData="clickedRowData2"
+                :rowData="rowData3"></Realgrid>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </Teleport>
+
+  <Teleport to="body">
+    <div
+      v-if="addRow4"
+      class="fixed inset-0 z-[12000] flex justify-center overflow-y-auto bg-black/40 px-3 py-2">
+      <div
+        role="dialog"
+        aria-modal="true"
+        class="border-2 border-gray-700 bg-white shadow-2xl my-auto flex h-fit max-h-[calc(100vh-4.5rem)] w-full max-w-4xl flex-col rounded-lg">
+        <div
+          class="flex shrink-0 flex-wrap items-center justify-end gap-3 border-b border-gray-400 bg-gray-50 px-3 py-1.5 rounded-t-lg">
+          <button type="button" :class="popupToolbarBtnClass" @click="cleanButton4">
+            신규
+          </button>
+          <button type="button" :class="popupToolbarBtnClass" @click="saveButton4">
+            저장
+          </button>
+          <button type="button" :class="popupToolbarBtnClass" @click="deleteButton4">
+            삭제
+          </button>
+          <button type="button" :class="popupToolbarBtnClass" @click="closePopUp">
+            닫기
+          </button>
+        </div>
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col gap-2 overflow-hidden px-2 py-2">
+          <div class="shrink-0 rounded-md border border-gray-500 overflow-hidden">
+            <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+              <div
+                class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+                자재특성코드
+              </div>
+              <div
+                class="col-span-12 flex min-h-[34px] items-center border-r border-gray-400 px-2 py-1 sm:col-span-10">
+                <input
+                  type="number"
+                  class="h-7 w-full max-w-md rounded-sm border border-gray-700 px-2 text-sm"
+                  v-model="sscond5" />
+              </div>
+            </div>
+            <div class="grid grid-cols-12 bg-white">
+              <div
+                class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+                자재특성명
+              </div>
+              <div class="col-span-12 flex min-h-[34px] items-center px-2 py-1 sm:col-span-10">
+                <input
+                  type="text"
+                  class="h-7 w-full max-w-md rounded-sm border border-gray-700 px-2 text-sm"
+                  v-model="sscond6" />
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="flex h-[50vh] min-h-[260px] w-full min-w-0 flex-col overflow-hidden rounded-md border border-gray-500 bg-white">
+            <div class="box-border h-full min-h-0 w-full flex-1 overflow-hidden p-1">
+              <Realgrid
+                :progname="'MST04_001INS_VUE'"
+                :progid="4"
+                :setStateBar="false"
+                :rowStateeditable="false"
+                @clickedRowData="clickedRowData3"
+                :rowData="rowData4"></Realgrid>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Teleport>
+
+  <Teleport to="body">
+    <div
+      v-if="addRow5"
+      class="fixed inset-0 z-[12000] flex justify-center overflow-y-auto bg-black/40 px-3 py-2">
+      <div
+        role="dialog"
+        aria-modal="true"
+        class="border-2 border-gray-700 bg-white shadow-2xl my-auto flex h-fit max-h-[calc(100vh-4.5rem)] w-full max-w-4xl flex-col rounded-lg">
+        <div
+          class="flex shrink-0 flex-wrap items-center justify-end gap-3 border-b border-gray-400 bg-gray-50 px-3 py-1.5 rounded-t-lg">
+          <button type="button" :class="popupToolbarBtnClass" @click="cleanButton5">
+            신규
+          </button>
+          <button type="button" :class="popupToolbarBtnClass" @click="saveButton5">
+            저장
+          </button>
+          <button type="button" :class="popupToolbarBtnClass" @click="deleteButton5">
+            삭제
+          </button>
+          <button type="button" :class="popupToolbarBtnClass" @click="closePopUp">
+            닫기
+          </button>
+        </div>
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col gap-2 overflow-hidden px-2 py-2">
+          <div class="shrink-0 rounded-md border border-gray-500 overflow-hidden">
+            <div class="grid grid-cols-12 border-b border-gray-500 bg-white">
+              <div
+                class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+                자재규격코드
+              </div>
+              <div
+                class="col-span-12 flex min-h-[34px] items-center border-r border-gray-400 px-2 py-1 sm:col-span-10">
+                <input
+                  type="number"
+                  class="h-7 w-full max-w-md rounded-sm border border-gray-700 px-2 text-sm"
+                  v-model="sscond7" />
+              </div>
+            </div>
+            <div class="grid grid-cols-12 bg-white">
+              <div
+                class="col-span-12 flex min-h-[34px] items-center justify-center border-r border-gray-400 bg-[#ebe8f2] px-2 py-1 text-center text-base font-semibold leading-tight text-gray-900 sm:col-span-2">
+                자재규격명
+              </div>
+              <div class="col-span-12 flex min-h-[34px] items-center px-2 py-1 sm:col-span-10">
+                <input
+                  type="text"
+                  class="h-7 w-full max-w-md rounded-sm border border-gray-700 px-2 text-sm"
+                  v-model="sscond8" />
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="flex h-[50vh] min-h-[260px] w-full min-w-0 flex-col overflow-hidden rounded-md border border-gray-500 bg-white">
+            <div class="box-border h-full min-h-0 w-full flex-1 overflow-hidden p-1">
+              <Realgrid
+                :progname="'MST04_001INS_VUE'"
+                :progid="5"
+                :setStateBar="false"
+                :rowStateeditable="false"
+                @clickedRowData="clickedRowData4"
+                :rowData="rowData5"></Realgrid>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Teleport>
   <!--그리드 영역 -->
 </template>
 
@@ -786,6 +933,10 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
+
+/** PUR03_035INS 팝업 툴바와 동일 — 신규/저장/닫기 통일 */
+const popupToolbarBtnClass =
+  "whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none";
 
 const reload = ref(false);
 const rowData = ref([]);
@@ -967,21 +1118,34 @@ watch(scond21, () => {
   }
 });
 
+/** 환산율 등 — 숫자와 소수점 하나만 허용 (기존 정수만 허용 시 1.5 → 15 로 깨지던 문제 수정) */
+const sanitizeDecimalInput = (raw) => {
+  const v = String(raw ?? "").replace(/[^0-9.]/g, "");
+  if (!v) return "";
+  const parts = v.split(".");
+  if (parts.length === 1) return parts[0];
+  const intPart = parts[0] ?? "";
+  const frac = parts.slice(1).join("");
+  if (!frac.length) return intPart.length ? `${intPart}.` : "";
+  if (!intPart.length) return `0.${frac}`;
+  return `${intPart}.${frac}`;
+};
+
 const handleInput = (e) => {
-  //onlyNumber(e);
-  scond17.value = e.target.value.replace(/[^0-9]/g, "");
-  scond19.value = scond17.value;
+  const next = sanitizeDecimalInput(e.target.value);
+  scond17.value = next;
+  scond19.value = next;
 };
 
 const onlyNumber = (e) => {
   if (e.target.name == "scond") {
     scond.value = e.target.value.replace(/[^0-9]/g, "");
   } else if (e.target.name == "scond11") {
-    scond11.value = e.target.value.replace(/[^0-9]/g, "");
+    scond11.value = sanitizeDecimalInput(e.target.value);
   } else if (e.target.name == "scond13") {
-    scond13.value = e.target.value.replace(/[^0-9]/g, "");
+    scond13.value = sanitizeDecimalInput(e.target.value);
   } else if (e.target.name == "scond15") {
-    scond15.value = e.target.value.replace(/[^0-9]/g, "");
+    scond15.value = sanitizeDecimalInput(e.target.value);
   } else if (e.target.name == "scond22") {
     scond22.value = e.target.value.replace(/[^0-9]/g, "");
   } else if (e.target.name == "scond23") {
@@ -1056,6 +1220,40 @@ onMounted(async () => {
  */
 
 const filteredrowData = ref([]);
+
+/** 조회 API가 lng·dbl 접두만 줄 때도 그리드 컬럼(str…Figure)에 맞춰 채움 — 환산율 노출·getJsonRow 매핑용 */
+const enrichStockGridRow = (r) => {
+  if (!r || typeof r !== "object") return r;
+  return {
+    ...r,
+    strOrderNCheckUOMFigure:
+      r.strOrderNCheckUOMFigure ??
+      r.lngOrderNCheckUOMFigure ??
+      r.dblOrderNCheckUOMFigure ??
+      "",
+    strDemandUOMFigure:
+      r.strDemandUOMFigure ??
+      r.lngDemandUOMFigure ??
+      r.dblDemandUOMFigure ??
+      "",
+    strReturnNMoveUOMFigure:
+      r.strReturnNMoveUOMFigure ??
+      r.lngReturnNMoveUOMFigure ??
+      r.dblReturnNMoveUOMFigure ??
+      "",
+    strRealNReportUOMFigure:
+      r.strRealNReportUOMFigure ??
+      r.lngRealNReportUOMFigure ??
+      r.dblRealNReportUOMFigure ??
+      "",
+    strUseNLossUOMFigure:
+      r.strUseNLossUOMFigure ??
+      r.lngUseNLossUOMFigure ??
+      r.dblUseNLossUOMFigure ??
+      "",
+  };
+};
+
 const searchButton = async () => {
   store.state.loading = true;
   try {
@@ -1077,7 +1275,7 @@ const searchButton = async () => {
     );
     console.log(res);
 
-    rowData.value = res.data.List;
+    rowData.value = (res.data.List || []).map(enrichStockGridRow);
 
     afterSearch.value = true;
   } catch (error) {
@@ -1366,24 +1564,45 @@ const saveButton = async () => {
     return;
   }
 
-  if (scond22.value == "" || scond22.value == undefined) {
-    Swal.fire({
-      title: "경고",
-      text: "매입단가를 입력해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-
-  if (scond23.value == "" || scond23.value == undefined) {
-    Swal.fire({
-      title: "경고",
-      text: "판매단가를 입력해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
+  /* 부가세 포함 미체크: 공급가 매입·판매단가 필수 / 포함 체크: VAT포함 금액 필수 */
+  if (scond21.value == false) {
+    if (scond22.value === "" || scond22.value == undefined) {
+      Swal.fire({
+        title: "경고",
+        text: "매입단가를 입력해주세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+    if (scond23.value === "" || scond23.value == undefined) {
+      Swal.fire({
+        title: "경고",
+        text: "판매단가를 입력해주세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } else {
+    if (scond24.value === "" || scond24.value == undefined) {
+      Swal.fire({
+        title: "경고",
+        text: "매입단가(VAT포함)를 입력해주세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+    if (scond25.value === "" || scond25.value == undefined) {
+      Swal.fire({
+        title: "경고",
+        text: "판매단가(VAT포함)를 입력해주세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
   }
 
   try {
@@ -1398,6 +1617,10 @@ const saveButton = async () => {
       tcond2 = scond25.value;
     }
     store.state.loading = true;
+    /**
+     * COND10·11 … COND18·19 짝: 서버 기준 Figure=환산율, UOM=단위(콤보) 코드.
+     * 화면 순서는 [단위 콤보, 환산율] 이므로 전달은 [Figure, UOM] = [scond11, scond10] 형태.
+     */
     const res = await saveMaterialCode(
       store.state.userData.lngStoreGroup,
       scond.value,
@@ -1409,16 +1632,16 @@ const saveButton = async () => {
       scond7.value,
       scond8.value,
       scond9.value,
-      scond10.value,
       scond11.value,
-      scond12.value,
+      scond10.value,
       scond13.value,
-      scond14.value,
+      scond12.value,
       scond15.value,
-      scond16.value,
+      scond14.value,
       scond17.value,
-      scond18.value,
+      scond16.value,
       scond19.value,
+      scond18.value,
       scond20.value,
       tcond,
       tcond2,
@@ -1840,51 +2063,235 @@ const deleteButton5 = async () => {
 };
 
 const deleteLngCode2 = ref("");
-const clickedRowData6 = (e) => {
-  scond11.value = e[18];
-  scond13.value = e[17];
-  scond15.value = e[20];
-  scond17.value = e[19];
-  scond19.value = e[21];
-  deleteLngCode2.value = e[0];
+
+/** 조회 그리드 행 컬럼명이 DB·버전별로 다를 때 대비 */
+const rowPickStr = (row, keys, fallback = "") => {
+  for (const k of keys) {
+    const v = row[k];
+    if (v !== undefined && v !== null && v !== "") return String(v);
+  }
+  return fallback;
 };
 
-const dblclickedRowData = async (e) => {
-  //console.log(e);
+/** `<option :value="i.lngStockGroupID">` 처럼 숫자 value 와 select v-model 일치 */
+const numId = (v, fallback = 0) => {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+};
+
+/** 공통코드 option 은 strDCode 문자열 */
+const strDVal = (v, fallback = "0") => {
+  if (v === undefined || v === null || v === "") return fallback;
+  return String(v);
+};
+
+const figureFromDetail = (d, keys) => {
+  for (const k of keys) {
+    const v = d[k];
+    if (v !== undefined && v !== null && v !== "") return String(v);
+  }
+  return "";
+};
+
+/** 상세 응답에 환산율 없으면 조회 그리드 행(동일 자재)에서 보완 */
+const figureDetailOrGrid = (d, gridRow, detailKeys, gridKeys) => {
+  const fromDet = figureFromDetail(d, detailKeys);
+  if (fromDet !== "") return fromDet;
+  return rowPickStr(gridRow || {}, gridKeys);
+};
+
+const clickedRowData6 = (e) => {
+  if (!Array.isArray(e)) return;
+  deleteLngCode2.value = String(e[0] ?? "");
+  const gridRow = rowData.value?.find(
+    (r) => String(r.lngStockID) === String(e[0])
+  );
+  if (!gridRow) return;
+  scond11.value = rowPickStr(gridRow, [
+    "strOrderNCheckUOMFigure",
+    "lngOrderNCheckUOMFigure",
+    "dblOrderNCheckUOMFigure",
+  ]);
+  scond13.value = rowPickStr(gridRow, [
+    "strDemandUOMFigure",
+    "lngDemandUOMFigure",
+    "dblDemandUOMFigure",
+  ]);
+  scond15.value = rowPickStr(gridRow, [
+    "strReturnNMoveUOMFigure",
+    "lngReturnNMoveUOMFigure",
+    "dblReturnNMoveUOMFigure",
+  ]);
+  scond17.value = rowPickStr(gridRow, [
+    "strRealNReportUOMFigure",
+    "lngRealNReportUOMFigure",
+    "dblRealNReportUOMFigure",
+  ]);
+  scond19.value = rowPickStr(gridRow, [
+    "strUseNLossUOMFigure",
+    "lngUseNLossUOMFigure",
+    "dblUseNLossUOMFigure",
+  ]);
+};
+
+/**
+ * 조회 그리드 더블클릭 — 그리드 getJsonRow 는 병합/표시 컬럼만 있어 ID·환산율이 빠진 경우가 많음.
+ * 자재코드로 getMaterialDetail 로 완전 바인딩 + 콤보는 option :value(숫자)와 타입 일치(numId).
+ */
+const dblclickedRowData = async (row) => {
+  if (!row || typeof row !== "object") return;
+
+  const stockId = rowPickStr(row, [
+    "lngStockID",
+    "LNG_STOCK_ID",
+    "lngstockid",
+  ]);
+  if (!stockId) return;
+
+  deleteLngCode2.value = stockId;
+  const gridRow =
+    rowData.value?.find((r) => String(r.lngStockID) === String(stockId)) ??
+    row;
 
   try {
+    store.state.loading = true;
     const res = await getMaterialDetail(
       store.state.userData.lngStoreGroup,
-      e[0],
+      stockId,
       store.state.userData.strLanguage,
       0
     );
+    const d = res.data.List?.[0];
+    if (!d) return;
 
-    console.log(res);
+    scond.value = String(d.lngStockID ?? "");
+    scond2.value = String(d.strStockName ?? "");
 
-    scond.value = res.data.List[0].lngStockID;
-    scond2.value = res.data.List[0].strStockName;
-    scond3.value = res.data.List[0].lngGroupID;
-    scond4.value = res.data.List[0].lngCategoryID;
-    scond5.value = res.data.List[0].lngGenericID;
-    scond6.value = res.data.List[0].lngTakeCycle;
-    scond7.value = res.data.List[0].lngTaxType;
-    scond8.value = res.data.List[0].blnImiReceive;
-    scond9.value = res.data.List[0].lngStandardID;
-    scond10.value = res.data.List[0].lngDemandUOM;
-    scond12.value = res.data.List[0].lngOrderNCheckUOM;
-    scond14.value = res.data.List[0].lngReturnNMoveUOM;
-    scond16.value = res.data.List[0].lngRealNReportUOM;
-    scond18.value = res.data.List[0].lngUseNLossUOM;
-    scond20.value = res.data.List[0].lngSupplierID;
-    scond22.value = parseInt(res.data.List[0].curUnitPrice);
-    scond23.value = parseInt(res.data.List[0].curSalesPrice);
-    scond26.value = res.data.List[0].strBarCode;
-    scond27.value = res.data.List[0].lngActive;
+    scond3.value = numId(d.lngGroupID, 0);
+    scond4.value = numId(d.lngCategoryID, 0);
+    scond5.value = numId(d.lngGenericID, 0);
+    scond6.value = strDVal(d.lngTakeCycle);
+    scond7.value = strDVal(d.lngTaxType);
+    scond8.value = strDVal(d.blnImiReceive);
+    scond9.value = numId(d.lngStandardID, 0);
+
+    scond10.value = numId(d.lngOrderNCheckUOM, 0);
+    scond11.value = figureDetailOrGrid(
+      d,
+      gridRow,
+      [
+        "lngOrderNCheckUOMFigure",
+        "dblOrderNCheckUOMFigure",
+        "strOrderNCheckUOMFigure",
+      ],
+      [
+        "strOrderNCheckUOMFigure",
+        "lngOrderNCheckUOMFigure",
+        "dblOrderNCheckUOMFigure",
+      ]
+    );
+    scond12.value = numId(d.lngDemandUOM, 0);
+    scond13.value = figureDetailOrGrid(
+      d,
+      gridRow,
+      ["lngDemandUOMFigure", "dblDemandUOMFigure", "strDemandUOMFigure"],
+      ["strDemandUOMFigure", "lngDemandUOMFigure", "dblDemandUOMFigure"]
+    );
+    scond14.value = numId(d.lngReturnNMoveUOM, 0);
+    scond15.value = figureDetailOrGrid(
+      d,
+      gridRow,
+      [
+        "lngReturnNMoveUOMFigure",
+        "dblReturnNMoveUOMFigure",
+        "strReturnNMoveUOMFigure",
+      ],
+      [
+        "strReturnNMoveUOMFigure",
+        "lngReturnNMoveUOMFigure",
+        "dblReturnNMoveUOMFigure",
+      ]
+    );
+    scond16.value = numId(d.lngRealNReportUOM, 0);
+    scond17.value = figureDetailOrGrid(
+      d,
+      gridRow,
+      [
+        "lngRealNReportUOMFigure",
+        "dblRealNReportUOMFigure",
+        "strRealNReportUOMFigure",
+      ],
+      [
+        "strRealNReportUOMFigure",
+        "lngRealNReportUOMFigure",
+        "dblRealNReportUOMFigure",
+      ]
+    );
+    scond18.value = numId(d.lngUseNLossUOM, 0);
+    scond19.value = figureDetailOrGrid(
+      d,
+      gridRow,
+      ["lngUseNLossUOMFigure", "dblUseNLossUOMFigure", "strUseNLossUOMFigure"],
+      ["strUseNLossUOMFigure", "lngUseNLossUOMFigure", "dblUseNLossUOMFigure"]
+    );
+
+    scond20.value = numId(d.lngSupplierID, 0);
+
+    const cup = d.curUnitPrice;
+    const csp = d.curSalesUnitPrice ?? d.curSalesPrice;
+    const nCup = parseInt(String(cup ?? "").replace(/[^0-9.-]/g, ""), 10);
+    const nCsp = parseInt(String(csp ?? "").replace(/[^0-9.-]/g, ""), 10);
+    scond22.value =
+      cup !== undefined && cup !== null && cup !== "" && !Number.isNaN(nCup)
+        ? String(nCup)
+        : "";
+    scond23.value =
+      csp !== undefined && csp !== null && csp !== "" && !Number.isNaN(nCsp)
+        ? String(nCsp)
+        : "";
+
+    if (typeof d.blnPriceIncludeVAT === "boolean") {
+      scond21.value = d.blnPriceIncludeVAT;
+    } else if (typeof d.blnVatIncluded === "boolean") {
+      scond21.value = d.blnVatIncluded;
+    } else if (d.lngPriceIncludeVAT != null) {
+      scond21.value = Number(d.lngPriceIncludeVAT) !== 0;
+    } else {
+      scond21.value = false;
+    }
+
+    const vatIn = d.curUnitPriceVat ?? d.curUnitPriceVAT;
+    const vatOut = d.curSalesUnitPriceVat ?? d.curSalesUnitPriceVAT;
+    const nVi = parseInt(String(vatIn ?? "").replace(/[^0-9.-]/g, ""), 10);
+    const nVo = parseInt(String(vatOut ?? "").replace(/[^0-9.-]/g, ""), 10);
+    scond24.value =
+      vatIn !== undefined &&
+      vatIn !== null &&
+      vatIn !== "" &&
+      !Number.isNaN(nVi)
+        ? String(nVi)
+        : "";
+    scond25.value =
+      vatOut !== undefined &&
+      vatOut !== null &&
+      vatOut !== "" &&
+      !Number.isNaN(nVo)
+        ? String(nVo)
+        : "";
+
+    scond26.value = String(d.strBarCode ?? "");
+    scond27.value =
+      d.lngActive !== undefined && d.lngActive !== null && d.lngActive !== ""
+        ? String(d.lngActive)
+        : "Y";
 
     addRow.value = true;
     saveNew.value = false;
-  } catch (error) {}
+  } catch (error) {
+    /* ignore */
+  } finally {
+    store.state.loading = false;
+  }
 };
 
 const deleteButton = async () => {

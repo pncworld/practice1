@@ -20,79 +20,92 @@
       <PickGroup @update:storeGroup="handleGroupCd" @GroupNm="GroupNm">
       </PickGroup>
     </div>
-    <span class="grid grid-rows-1 grid-cols-2 mt-5">
-      <div class="ml-10 flex justify-start font-bold text-xl">
-        자재 규격 정보
-      </div>
-      <div class="flex justify-between ml-44">
-        <div class="flex justify-start font-bold text-xl">상세정보</div>
-        <div class="mr-20">
-          <button class="whitebutton" @click="addButton">추가</button
-          ><button class="whitebutton" @click="deleteButton">삭제</button>
-        </div>
-      </div>
-    </span>
-    <!-- 조회 조건 -->
-    <!-- 그리드 영역 -->
+    <!-- 마스터-디테일: MST45_033INS와 동일 테마 -->
     <div
-      class="grid grid-rows-1 grid-cols-2 h-[65vh] w-full justify-center mt-2">
-      <div class="w-[110%] ml-10 h-[65vh]">
-        <Realgrid
-          :progname="'MST45_051INS_VUE'"
-          :progid="1"
-          :rowData="rowData"
-          @clickedRowData="clickedRowData"
-          :changeNow="changeNow"
-          :changeValue2="changeValue2"
-          :changeColid="changeColid"
-          :changeRow="changeRow"
-          @selectedIndex="selectedIndex"
-          @selcetedrowData="selcetedrowData"
-          @updatedRowData="updatedRowData"
-          :selectionStyle="'singleRow'"
-          :addRow4="addRow"
-          @allStateRows="allStateRows"
-          :deleteRow6="deleteRow"
-          :addrowDefault="addrowDefault"
-          @sendRowState="sendRowState"
-          :addrowProp="addrowProp"
-          :rowStateeditable="false"
-          :addField="'new'"
-          :documentTitle="'MST45_051INS'"
-          :documentSubTitle="documentSubTitle"
-          :exporttoExcel="exporttoExcel"
-          :ExcelNm="'자재 규격 등록'"></Realgrid>
+      class="mt-5 grid min-h-0 w-full grid-cols-1 gap-6 px-4 pb-6 lg:grid-cols-[minmax(0,7fr)_minmax(17rem,4fr)] lg:items-stretch lg:gap-8 lg:px-10">
+      <div class="flex min-h-0 min-w-0 flex-col">
+        <div class="mb-2 flex min-h-[2.75rem] flex-none items-center">
+          <h2 class="text-lg font-bold leading-none tracking-tight text-gray-900">
+            자재 규격 정보
+          </h2>
+        </div>
+        <div
+          class="flex h-[65vh] min-h-[280px] w-full min-w-0 flex-col overflow-hidden rounded-sm border border-gray-400 bg-white">
+          <div class="relative min-h-0 w-full flex-1">
+            <Realgrid
+              :progname="'MST45_051INS_VUE'"
+              :progid="1"
+              :rowData="rowData"
+              @clickedRowData="clickedRowData"
+              :changeNow="changeNow"
+              :changeValue2="changeValue2"
+              :changeColid="changeColid"
+              :changeRow="changeRow"
+              @selectedIndex="selectedIndex"
+              @selcetedrowData="selcetedrowData"
+              @updatedRowData="updatedRowData"
+              :selectionStyle="'singleRow'"
+              :addRow4="addRow"
+              @allStateRows="allStateRows"
+              :deleteRow6="deleteRow"
+              :addrowDefault="addrowDefault"
+              @sendRowState="sendRowState"
+              :addrowProp="addrowProp"
+              :rowStateeditable="false"
+              :addField="'new'"
+              :documentTitle="'MST45_051INS'"
+              :documentSubTitle="documentSubTitle"
+              :exporttoExcel="exporttoExcel"
+              :ExcelNm="'자재 규격 등록'"></Realgrid>
+          </div>
+        </div>
       </div>
-      <!-- 그리드 영역 -->
-      <!-- 연동 데이터 영역 -->
-      <div class="grid grid-cols-[2fr,6fr] grid-rows-3 w-[70%] ml-44 h-[15%]">
+
+      <div class="flex min-w-0 flex-col">
         <div
-          class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500 rounded-tl-lg">
-          *자재규격코드
+          class="mb-2 flex min-h-[2.75rem] flex-none flex-wrap items-center justify-between gap-x-3 gap-y-2 lg:flex-nowrap">
+          <h2 class="text-lg font-bold leading-none tracking-tight text-gray-900">상세정보</h2>
+          <div class="flex shrink-0 items-center gap-2">
+            <button type="button" :class="popupToolbarBtnClass" @click="addButton">
+              추가
+            </button>
+            <button type="button" :class="popupToolbarBtnClass" @click="deleteButton">
+              삭제
+            </button>
+          </div>
         </div>
-        <div
-          class="border flex h-full items-center text-sm font-semibold justify-center rounded-tr-lg">
-          <input
-            type="number"
-            class="gridvalue1 border text-sm rounded-md w-full pl-2 h-full disabled:bg-gray-200"
-            v-model="gridvalue1"
-            name="gridvalue1"
-            @input="changeInfo"
-            :disabled="isNewColumn" />
-        </div>
-        <div
-          class="border flex h-full items-center text-sm font-semibold justify-center bg-gray-100">
-          자재규격명
-        </div>
-        <div
-          class="border flex h-full items-center text-sm font-semibold justify-center">
-          <input
-            type="text"
-            class="gridvalue2 border text-sm rounded-md w-full pl-2 h-full disabled:bg-gray-200"
-            v-model="gridvalue2"
-            name="gridvalue2"
-            @input="changeInfo"
-            :disabled="!clickrowData1" />
+        <div class="w-full flex-1 overflow-hidden rounded-none border border-gray-600 bg-white">
+          <div class="grid grid-cols-[minmax(7rem,9.5rem)_1fr] border-b border-gray-600">
+            <div
+              class="flex min-h-[2.5rem] items-center justify-center border-r border-gray-600 bg-[#dfe3f5] px-2 py-2 text-center text-sm font-semibold text-gray-900">
+              <span class="text-red-600">*</span>
+              자재규격코드
+            </div>
+            <div class="flex min-h-[2.5rem] items-center bg-white px-3 py-2">
+              <input
+                type="number"
+                name="gridvalue1"
+                class="gridvalue1 h-8 w-full rounded-none border border-black bg-white px-2 text-sm text-gray-900 outline-none focus:z-10 focus:border-blue-600 focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+                v-model="gridvalue1"
+                @input="changeInfo"
+                :disabled="isNewColumn" />
+            </div>
+          </div>
+          <div class="grid grid-cols-[minmax(7rem,9.5rem)_1fr]">
+            <div
+              class="flex min-h-[2.5rem] items-center justify-center border-r border-gray-600 bg-[#dfe3f5] px-2 py-2 text-center text-sm font-semibold text-gray-900">
+              자재규격명
+            </div>
+            <div class="flex min-h-[2.5rem] items-center bg-white px-3 py-2">
+              <input
+                type="text"
+                name="gridvalue2"
+                class="gridvalue2 h-8 w-full rounded-none border border-black bg-white px-2 text-sm text-gray-900 outline-none focus:z-10 focus:border-blue-600 focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+                v-model="gridvalue2"
+                @input="changeInfo"
+                :disabled="!clickrowData1" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -139,6 +152,10 @@ import { onMounted, ref } from "vue";
  */
 
 import { useStore } from "vuex";
+
+/** PUR03_035INS 발주등록 팝업 · MST45_033INS와 동일 흰 버튼 */
+const popupToolbarBtnClass =
+  "whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none";
 
 /**
  * 	화면 Load시 실행 스크립트

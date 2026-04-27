@@ -113,6 +113,7 @@ import {
   login,
 } from "../api/common";
 import { insertLoginLog } from "@/customFunc/customFunc";
+import { mergeThemeLogoFromPersistedSession } from "@/utils/mergeSessionUserData";
 
 const store = useStore(); // Vuex 스토어 가져오기
 const router = useRouter(); // Vue Router 가져오기
@@ -233,13 +234,18 @@ const login2 = async () => {
 
 onMounted(async () => {
   store.state.loading = true;
+  const persistedUser = store.state.userData;
   try {
     const token = store.state.StoreToken;
     const res = await alreadyLogined(token);
     //comsole.log(token);
     //comsole.log(res);
     if (res.data.RESULT == true) {
-      store.dispatch("updateUserData", res.data.List[0]);
+      const sessionUser = mergeThemeLogoFromPersistedSession(
+        res.data.List[0],
+        persistedUser
+      );
+      store.dispatch("updateUserData", sessionUser);
       store.dispatch("setToken", res.data.List[0].SessionToken);
 
       const response = await get_sys_list(

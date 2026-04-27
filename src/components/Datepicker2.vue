@@ -1,38 +1,67 @@
 <template>
-  <div class="flex justify-start items-center space-x-5 w-[500px] mt-2">
+  <div
+    class="flex justify-start items-center"
+    :class="
+      filterBarAlign
+        ? 'mt-0 w-auto max-w-full shrink-0 gap-x-2'
+        : 'mt-2 w-[500px] space-x-5'
+    ">
     <div
-      class="w-auto font-semibold flex items-center text-nowrap text-base ml-12">
+      v-if="!omitMainLabel"
+      class="w-auto flex shrink-0 items-center text-nowrap text-base font-semibold leading-none"
+      :class="filterBarAlign ? '' : 'ml-12'">
       {{ mainName }}
     </div>
+    <!-- filterBarAlign: fr 그리드는 칸 사이가 과하게 벌어짐 → inline-flex로 From ~ To 밀착 -->
     <div
-      class="grid grid-cols-[2fr,1fr,2fr,1fr,1fr] grid-rows-1 justify-start h-11 pr-14 space-x-1">
+      class="justify-start"
+      :class="
+        filterBarAlign
+          ? 'inline-flex h-8 shrink-0 items-center gap-x-1 pr-0'
+          : 'grid h-11 grid-cols-[2fr,1fr,2fr,1fr,1fr] grid-rows-1 space-x-1 pr-14'
+      ">
       <input
         type="date"
         :disabled="disable"
-        class="border rounded-lg h-10 w-36 text-base mr-2 pl-5 disabled:bg-gray-500"
+        class="w-36 shrink-0 disabled:bg-gray-500"
+        :class="
+          filterBarAlign
+            ? 'h-8 border border-gray-800 rounded-md pl-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500'
+            : 'mr-2 h-10 border rounded-lg pl-5 text-base'
+        "
         v-model="selectedStartDate"
         @change="changeStartDate"
         :max="maxEndDate" />
-      <span class="items-center flex">~</span>
+      <span class="flex shrink-0 items-center px-0.5">~</span>
       <input
         type="date"
         :disabled="disable"
-        class="border rounded-lg h-10 w-36 text-base pl-5 ml-2 disabled:bg-gray-500"
+        class="w-36 shrink-0 disabled:bg-gray-500"
+        :class="
+          filterBarAlign
+            ? 'h-8 border border-gray-800 rounded-md pl-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500'
+            : 'ml-2 h-10 border rounded-lg pl-5 text-base'
+        "
         v-model="selectedEndDate"
         @change="changeEndDate"
         :max="maxEndDate" />
       <button
-        class="w-[30px] ml-2"
+        class="shrink-0"
+        :class="
+          filterBarAlign
+            ? 'ml-0.5 flex h-8 w-8 items-center justify-center'
+            : 'ml-2 w-[30px]'
+        "
         @click="toggleRadio"
         :disabled="disable"
         v-if="disable2">
         <img src="../assets/choiceCalendar.png" class="w-full" alt="" />
       </button>
     </div>
-    <div class="flex justify-start">
+    <div class="relative flex justify-start">
       <div
         v-show="showRadio"
-        class="-mt-2 p-1 -ml-10 w-40 h-40 bg-gray-100 rounded-lg shadow-md z-[70] absolute">
+        class="absolute -left-2 top-full z-[70] mt-1 w-40 rounded-lg bg-gray-100 p-1 shadow-md">
         <div class="flex justify-end mr-3">
           <button @click="toggleRadio">닫기</button>
         </div>
@@ -191,6 +220,16 @@ const props = defineProps({
     default: true,
   },
   setLimitYear: {
+    type: Boolean,
+    default: false,
+  },
+  /** 조회바: 좌측 라벨 정렬(h-8 행과 맞춤), 타 화면은 기존 레이아웃 유지 */
+  filterBarAlign: {
+    type: Boolean,
+    default: false,
+  },
+  /** 부모 그리드에서 라벨을 따로 둘 때 메인 라벨 숨김 */
+  omitMainLabel: {
     type: Boolean,
     default: false,
   },

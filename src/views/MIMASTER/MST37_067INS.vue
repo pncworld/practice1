@@ -17,13 +17,15 @@
         <button @click="excelButton" class="button excel">엑셀</button>
       </div>
     </div>
-    <div
-      class="flex justify-start space-x-5 bg-gray-200 rounded-lg h-16 items-center mt-3">
-      <div class="flex">
-        <div class="ml-12 text-base font-semibold">멀티단가명</div>
-        <div class="ml-5">
-          <input type="text" class="pl-1 border border-black" v-model="cond" />
-        </div>
+    <div class="flex h-16 items-center bg-gray-200 rounded-lg mt-3 px-4">
+      <div class="flex w-full flex-wrap items-center gap-x-5 gap-y-2 pl-8 md:pl-12">
+        <span class="shrink-0 text-base font-semibold leading-none text-gray-900">
+          멀티단가명
+        </span>
+        <input
+          type="text"
+          class="h-8 min-h-8 w-64 max-w-full shrink-0 rounded-md border border-black bg-white px-2 text-sm leading-none outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-500"
+          v-model="cond" />
       </div>
     </div>
 
@@ -88,7 +90,7 @@
             class="font-semibold border-l border-t border-b border-black border-r flex justify-center items-center">
             <input
               type="text"
-              class="border border-black w-[80%] h-[80%]"
+              class="h-8 w-[90%] max-w-full rounded-none border border-black bg-white px-2 text-sm outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-500"
               @input="onlyNumber"
               v-model="scond2" />
           </div>

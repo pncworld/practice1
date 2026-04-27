@@ -1,6 +1,19 @@
 <template>
-  <div class="flex justify-start text-sm items-center w-[500px] mt-2">
-    <div class="items-center font-bold text-base flex">{{ mainName }}</div>
+  <div
+    class="flex justify-start text-sm items-center"
+    :class="
+      compact
+        ? comboFill
+          ? 'mt-0 w-full min-w-0 max-w-full'
+          : 'mt-0 w-auto max-w-full shrink-0'
+        : 'mt-2 w-[500px]'
+    ">
+    <div
+      v-if="!omitMainLabel"
+      class="flex items-center text-base leading-none"
+      :class="compact ? 'shrink-0 font-semibold' : 'font-bold'">
+      {{ mainName }}
+    </div>
     <div v-if="hideit">
       <select
         :disabled="true"
@@ -38,15 +51,16 @@
         :disabled="disabled1"
         label="strName"
         :placeholder="defaultPlaceHolder"
-        class="!w-72 !h-7 -mt-3 custom-select ml-5"
+        :class="vSelectClass"
         :clearable="!disabled1"
+        :append-to-body="compact"
         @click="resetSelectedStore" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { defineProps, onMounted, ref, watch } from "vue";
+import { computed, defineProps, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
@@ -64,6 +78,16 @@ const selectedStore = ref(null);
 const userData = store.state.userData;
 
 const props = defineProps({
+  /** 조회바 h-8 등 다른 입력과 높이 맞춤 */
+  compact: {
+    type: Boolean,
+    default: false,
+  },
+  /** 부모 그리드에서 라벨을 따로 둘 때 매장 라벨 숨김 */
+  omitMainLabel: {
+    type: Boolean,
+    default: false,
+  },
   groupCdDisabled: Boolean,
   hidesub: {
     type: Boolean,
@@ -90,6 +114,11 @@ const props = defineProps({
     default: "매장명",
   },
   resetFlag: Boolean,
+  /** compact일 때 부모 열(동일 폭 그리드 등) 안에서 가로를 꽉 채움 */
+  comboFill: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const hideit = ref(props.hideit);
@@ -106,6 +135,17 @@ const selectedStoreType = ref(0);
 //   }
 // );
 const { groupCdDisabled } = props;
+
+const vSelectClass = computed(() =>
+  props.compact
+    ? [
+        props.omitMainLabel ? "!ml-0" : "ml-2",
+        "custom-select",
+        "custom-select--compact",
+        props.comboFill ? "!w-full min-w-0 max-w-full" : "!w-72",
+      ]
+    : ["ml-5", "custom-select", "!w-72", "!h-7", "-mt-3"]
+);
 isDisabled1.value = groupCdDisabled;
 const changed = ref(false);
 const ischanged = () => {
@@ -356,5 +396,25 @@ const resetSelectedStore = (e) => {
   background-color: #d1d5db !important;
   color: white !important; /* 텍스트 색상도 변경 */
   border-color: #d1d5db !important;
+}
+
+/* compact: 조회 영역 일반 입력(h-8)과 동일한 토글 높이 */
+.custom-select.custom-select--compact .vs__dropdown-toggle {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 10px !important;
+}
+
+.custom-select.custom-select--compact .vs__selected {
+  padding-top: 0 !important;
+  min-width: 0 !important;
+}
+
+.custom-select.custom-select--compact.vs--disabled .vs__selected {
+  margin-top: 0 !important;
+}
+
+.custom-select.custom-select--compact .vs__dropdown-menu {
+  margin-top: 4px !important;
 }
 </style>

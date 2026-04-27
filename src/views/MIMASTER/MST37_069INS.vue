@@ -33,64 +33,89 @@
       </div>
     </div>
 
+    <!-- 조회 영역: 6열×2행 — 좌·우 여백 동일(기존 px-12 의 약 2배: px-24) -->
     <div
-      class="grid grid-cols-1 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div
-        class="flex justify-start mr-40 items-center text-base font-semibold space-x-10">
-        <Datepicker2
-          :mainName="'적용일'"
-          :initToday="1"
-          @startDate="startDate"
-          :disableAll="disableAll"
-          @endDate="endDate"
-          @excelDate="excelDate"></Datepicker2>
-        <div>
-          <label for="cond" class="text-nowrap"
-            ><input type="checkbox" id="cond" v-model="cond20" />적용일
-            제외하기</label
-          >
-        </div>
-
-        <div class="flex justify-center items-center">
-          <div>메뉴서브그룹</div>
-          <div>
-            <select
-              name=""
-              id=""
-              class="w-40 h-8 ml-5"
-              v-model="selectedSubGroup">
-              <option value="0">전체</option>
-              <option :value="i.lngCode" v-for="i in MultiSubList">
-                {{ i.strName }}
-              </option>
-            </select>
+      class="z-10 mt-3 w-full overflow-x-auto rounded-lg bg-gray-200 px-24 py-4">
+      <div class="w-full min-w-0">
+        <div
+          class="grid w-full min-w-0 grid-cols-1 gap-x-5 gap-y-3 md:min-w-[52rem] md:grid-cols-[3.5rem_minmax(0,max-content)_auto_minmax(1.5rem,1fr)_minmax(6.25rem,auto)_minmax(10rem,1fr)] md:items-center">
+          <!-- 1행 1열: 적용일 -->
+          <span
+            class="flex w-full items-center justify-center text-base font-semibold leading-none text-gray-900 md:w-[3.5rem] md:shrink-0">
+            적용일
+          </span>
+          <!-- 1행 2열: 시작~종료 -->
+          <div class="min-w-0 overflow-x-auto [scrollbar-width:thin] md:max-w-full">
+            <Datepicker2
+              omit-main-label
+              filter-bar-align
+              :mainName="'적용일'"
+              :initToday="1"
+              @startDate="startDate"
+              :disableAll="disableAll"
+              @endDate="endDate"
+              @excelDate="excelDate"></Datepicker2>
           </div>
-        </div>
-        <div class="flex justify-center items-center">
-          <div>메뉴명</div>
-          <div><input type="text" class="w-40 h-8 ml-5" v-model="cond2" /></div>
-        </div>
-      </div>
+          <!-- 1행 3열: 체크(날짜 옆) -->
+          <label
+            for="cond"
+            class="flex shrink-0 cursor-pointer items-center gap-x-1 whitespace-nowrap text-base font-semibold leading-none text-gray-900">
+            <input type="checkbox" id="cond" v-model="cond20" />
+            적용일 제외 하기
+          </label>
+          <!-- 1행 4열: 가변 여백(전체 폭에서만 커짐) -->
+          <div class="hidden min-h-0 md:block" aria-hidden="true"></div>
+          <!-- 1행 5열: 메뉴서브그룹 -->
+          <span
+            class="flex w-full items-center justify-center text-base font-semibold leading-none text-gray-900 md:min-w-[6.25rem]">
+            메뉴서브그룹
+          </span>
+          <!-- 1행 6열: 콤보 -->
+          <select id="mst37-subgroup" class="h-8 min-w-0 w-full" v-model="selectedSubGroup">
+            <option value="0">전체</option>
+            <option :value="i.lngCode" v-for="i in MultiSubList" :key="i.lngCode">
+              {{ i.strName }}
+            </option>
+          </select>
 
-      <div class="flex justify-start items-center ml-12">
-        <PickStoreRenew
-          :hideit="false"
-          :hideit2="false"
-          :disableStore="disableStore"
-          @lngStoreGroup="lngStoreGroup"
-          @lngStoreCode="lngStoreCode"></PickStoreRenew>
-        <div class="flex flex-col justify-start items-start -pl-10">
-          <label for="cond3"
-            ><input
-              type="radio"
-              id="cond3"
-              v-model="cond3"
-              value="0" />전체</label
-          >
-          <label for="cond4"
-            ><input type="radio" id="cond4" v-model="cond3" value="1" />전
-            매장이 적용된 특별단가</label
-          >
+          <!-- 2행 1열: 매장 -->
+          <span
+            class="flex w-full items-center justify-center text-base font-semibold leading-none text-gray-900 md:w-[3.5rem] md:shrink-0">
+            매장
+          </span>
+          <!-- 2행 2열: 매장 콤보 -->
+          <div class="shrink-0 min-w-[18rem] max-w-full">
+            <PickStoreRenew
+              compact
+              omit-main-label
+              main-name="매장"
+              :hideit="false"
+              :hideit2="false"
+              :disableStore="disableStore"
+              @lngStoreGroup="lngStoreGroup"
+              @lngStoreCode="lngStoreCode"></PickStoreRenew>
+          </div>
+          <!-- 2행 3열: 라디오(콤보 옆) -->
+          <div
+            class="flex min-w-0 flex-col gap-1 text-left text-base font-semibold leading-none text-gray-900">
+            <label for="cond3" class="flex cursor-pointer items-center gap-x-2">
+              <input type="radio" id="cond3" v-model="cond3" value="0" />
+              전체
+            </label>
+            <label for="cond4" class="flex cursor-pointer items-center gap-x-2 leading-snug">
+              <input type="radio" id="cond4" v-model="cond3" value="1" />
+              전 매장이 적용된 특별단가
+            </label>
+          </div>
+          <!-- 2행 4열: 가변 여백 -->
+          <div class="hidden min-h-0 md:block" aria-hidden="true"></div>
+          <!-- 2행 5열: 메뉴명 -->
+          <span
+            class="flex w-full items-center justify-center text-base font-semibold leading-none text-gray-900 md:min-w-[6.25rem]">
+            메뉴명
+          </span>
+          <!-- 2행 6열: 입력 -->
+          <input type="text" class="h-8 min-w-0 w-full" v-model="cond2" />
         </div>
       </div>
     </div>
