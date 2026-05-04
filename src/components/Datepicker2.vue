@@ -1,11 +1,14 @@
 <template>
+  <!-- @click.stop: 조회 영역 부모(handleParentClick→closePopUp)가 버블로 받아 기간 패널이 바로 닫히는 것 방지 -->
   <div
     class="flex justify-start items-center"
     :class="
       filterBarAlign
-        ? 'mt-0 w-auto max-w-full shrink-0 gap-x-2'
+        ? /* 조회 그리드 셀 안: shrink-0·w-auto면 내용 최소폭으로 옆 열(라벨)과 겹침 → min-w-0·줄어듦 허용 */
+          'mt-0 w-full min-w-0 max-w-full shrink gap-x-2'
         : 'mt-2 w-[500px] space-x-5'
-    ">
+    "
+    @click.stop>
     <div
       v-if="!omitMainLabel"
       class="w-auto flex shrink-0 items-center text-nowrap text-base font-semibold leading-none"
@@ -46,6 +49,8 @@
         @change="changeEndDate"
         :max="maxEndDate" />
       <button
+        ref="periodAnchorBtn"
+        type="button"
         class="shrink-0"
         :class="
           filterBarAlign
@@ -58,12 +63,14 @@
         <img src="../assets/choiceCalendar.png" class="w-full" alt="" />
       </button>
     </div>
-    <div class="relative flex justify-start">
+    <Teleport to="body">
       <div
         v-show="showRadio"
-        class="absolute -left-2 top-full z-[70] mt-1 w-40 rounded-lg bg-gray-100 p-1 shadow-md">
+        class="datepicker2-period-panel fixed z-[5000] w-40 rounded-lg bg-gray-100 p-1 shadow-md"
+        :style="periodFloaterStyle"
+        @click.stop>
         <div class="flex justify-end mr-3">
-          <button @click="toggleRadio">닫기</button>
+          <button type="button" @click="toggleRadio">닫기</button>
         </div>
         <h2 class="text-sm font-semibold -mt-3">기간 선택</h2>
 
@@ -152,14 +159,21 @@
           </label>
         </div>
       </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
 import { getSalesCloseMaxDate } from "@/api/misales";
 import Swal from "sweetalert2";
-import { onMounted, ref, watch } from "vue";
+import {
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
+import { useRoute } from "vue-router";
 
 const emit = defineEmits(["startDate", "endDate", "acceptDate", "excelDate"]);
 const props = defineProps({
@@ -167,9 +181,10 @@ const props = defineProps({
     type: Boolean,
     default: false, // 기본값: 빈 함수
   },
+  /** 0: 종료일=오늘. 1 이상: Datepicker1과 동일 — 오늘+(initToday-1) (1이면 오늘, 2이면 내일) */
   initToday: {
     type: Number,
-    default: 0, // 기본값: 현재 날짜
+    default: 0,
   },
   initToday2: {
     type: Number,
@@ -255,7 +270,7 @@ onMounted(() => {
   if (props.initToday == 0) {
     today.setDate(today.getDate());
   } else {
-    today.setDate(today.getDate() + props.initToday);
+    today.setDate(today.getDate() + props.initToday - 1);
   }
   tempStartDateStack.push(selectedStartDate.value);
   tempEndDateStack.push(selectedEndDate.value);
@@ -324,9 +339,74 @@ watch(
 const emitDate2 = (e) => {};
 
 const showRadio = ref(false);
-const toggleRadio = (e) => {
+/** 기간설정 버튼 — Teleport 패널 위치 기준 */
+const periodAnchorBtn = ref(null);
+const PERIOD_PANEL_W_PX = 160;
+
+const periodFloaterStyle = ref({
+  top: "0px",
+  left: "0px",
+});
+
+function positionPeriodPanel() {
+  const el = periodAnchorBtn.value;
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  let left = r.left;
+  const vw = window.innerWidth;
+  if (left + PERIOD_PANEL_W_PX > vw - 8) {
+    left = Math.max(8, vw - PERIOD_PANEL_W_PX - 8);
+  }
+  if (left < 8) left = 8;
+  periodFloaterStyle.value = {
+    top: `${Math.round(r.bottom + 4)}px`,
+    left: `${Math.round(left)}px`,
+  };
+}
+
+let periodPanelPositionBound = false;
+
+function bindPeriodPanelReposition() {
+  if (periodPanelPositionBound) return;
+  periodPanelPositionBound = true;
+  window.addEventListener("scroll", positionPeriodPanel, true);
+  window.addEventListener("resize", positionPeriodPanel);
+}
+
+function unbindPeriodPanelReposition() {
+  if (!periodPanelPositionBound) return;
+  periodPanelPositionBound = false;
+  window.removeEventListener("scroll", positionPeriodPanel, true);
+  window.removeEventListener("resize", positionPeriodPanel);
+}
+
+const toggleRadio = () => {
   showRadio.value = !showRadio.value;
 };
+
+watch(showRadio, (open) => {
+  if (open) {
+    nextTick(() => {
+      positionPeriodPanel();
+      bindPeriodPanelReposition();
+    });
+  } else {
+    unbindPeriodPanelReposition();
+  }
+});
+
+const route = useRoute();
+watch(
+  () => route.fullPath,
+  () => {
+    showRadio.value = false;
+    unbindPeriodPanelReposition();
+  }
+);
+
+onBeforeUnmount(() => {
+  unbindPeriodPanelReposition();
+});
 const updateDateRange = (e) => {
   const TODAY = new Date();
   // TODAY.setDate(TODAY.getDate() - 1);

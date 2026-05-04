@@ -152,6 +152,7 @@
 import { getSalesCloseMaxDate } from "@/api/misales";
 import Swal from "sweetalert2";
 import { onMounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 
 const emit = defineEmits(["startDate", "endDate", "acceptDate", "excelDate"]);
 const props = defineProps({
@@ -246,7 +247,8 @@ onMounted(() => {
   if (props.initToday == 0) {
     today.setDate(today.getDate());
   } else {
-    today.setDate(today.getDate() + props.initToday);
+    /* Datepicker1·Datepicker2와 동일: 1이면 종료일=오늘 (기존 +1만 하면 하루 밀림) */
+    today.setDate(today.getDate() + props.initToday - 1);
   }
   tempStartDateStack.push(selectedStartDate.value);
   tempEndDateStack.push(selectedEndDate.value);
@@ -315,6 +317,14 @@ watch(
 const emitDate2 = (e) => {};
 
 const showRadio = ref(false);
+const route = useRoute();
+watch(
+  () => route.fullPath,
+  () => {
+    showRadio.value = false;
+  }
+);
+
 const toggleRadio = (e) => {
   showRadio.value = !showRadio.value;
 };
@@ -338,8 +348,7 @@ const updateDateRange = (e) => {
     selectedEndDate.value = formatDateToYYYYMMDD(currentWeekEnd);
   } else if (e.target.value == "lastMonth") {
     const lastMonth = new Date(TODAY);
-    // lastMonth.setMonth(TODAY.getMonth() - 1);
-    lastMonth.setMonth(TODAY.getMonth());
+    lastMonth.setMonth(TODAY.getMonth() - 1);
     const lastMonthStart = new Date(
       lastMonth.getFullYear(),
       lastMonth.getMonth(),
@@ -349,7 +358,7 @@ const updateDateRange = (e) => {
       lastMonth.getFullYear(),
       lastMonth.getMonth() + 1,
       0
-    ); // 전월 종료 날짜
+    ); // 전월 말일
     selectedStartDate.value = formatDateToYYYYMMDD(lastMonthStart);
     selectedEndDate.value = formatDateToYYYYMMDD(lastMonthEnd);
   } else if (e.target.value == "currentMonth") {

@@ -10,7 +10,9 @@
     <div class="flex justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="confirmButton" class="button primary w-32">
+        <button
+          @click="confirmButton"
+          class="button primary w-32 justify-center text-center">
           선택 전표 확정
         </button>
         <button @click="searchButton" class="button search md:w-auto w-14">
@@ -20,69 +22,93 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-3 grid-rows-2 bg-gray-200 rounded-lg h-24 items-start z-10">
-      <div class="justify-start flex">
-        <Datepicker2
-          :mainName="'발주일자'"
-          ref="datepicker"
-          :initToday2="-7"
-          :initToday="1"
-          :closePopUp="closePopUp"
-          @excelDate="excelDate"
-          @endDate="endDate"
-          @startDate="startDate"
-          @dateValue="dateValue">
-        </Datepicker2>
-      </div>
-      <div class="flex justify-start items-center">
-        <PickStore
-          @update:storeGroup="lngStoreGroup"
-          :defaultStoreNm="'전체'"
-          @storeNm="excelStore"
-          :hideGroup="false"
-          :hideAttr="false"
-          :defaultStoreType2="true"
-          :defaultStore="true"
-          @update:storeCd="lngStoreCode"></PickStore>
-      </div>
-      <div class="flex ml-20 space-x-5 mt-2 items-center">
-        <div class="text-base font-semibold">파트</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="border border-black w-32 h-8"
-            v-model="cond2">
-            <option :value="i.lngPartCode" v-for="i in optionList2">
-              {{ i.strPartName }}
-            </option>
-          </select>
+      class="pur017-search-panel z-10 mt-3 w-full min-w-0 overflow-x-auto rounded-lg bg-gray-200 px-24 py-4">
+      <div
+        class="pur017-search-grid min-w-0"
+        :style="{
+          '--pur017-control-border': pur017ControlBorder,
+          '--pur017-item-gap': pur017ItemGap,
+        }">
+        <div class="pur017-cell">
+          <div class="pur017-sg-label">발주일자</div>
+          <div class="pur017-cell-field pur017-date-slot min-w-0">
+            <Datepicker2
+              ref="datepicker"
+              omit-main-label
+              filter-bar-align
+              :mainName="'발주일자'"
+              :initToday2="-7"
+              :initToday="0"
+              :closePopUp="closePopUp"
+              @excelDate="excelDate"
+              @endDate="endDate"
+              @startDate="startDate"
+              @dateValue="dateValue" />
+          </div>
         </div>
-      </div>
-      <div class="flex ml-20 space-x-5 mt-2 items-center">
-        <div class="text-base font-semibold">상태</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="w-48 border border-black h-7"
-            v-model="cond">
-            <option :value="i.strDCode" v-for="i in optionList">
-              {{ i.strDName }}
-            </option>
-          </select>
+        <div class="pur017-cell">
+          <div class="pur017-sg-label">매장</div>
+          <div class="pur017-cell-field pur017-pick-slot min-w-0">
+            <PickStore
+              compact-search-bar
+              :compact-store-combo-max-rem="pur017PickStoreComboMaxRem"
+              main-name=""
+              @update:storeGroup="lngStoreGroup"
+              :defaultStoreNm="'전체'"
+              @storeNm="excelStore"
+              :hide-group="false"
+              :hide-attr="false"
+              :default-store-type2="true"
+              :default-store="true"
+              @update:storeCd="lngStoreCode" />
+          </div>
         </div>
-      </div>
-      <div class="flex justify-start pl-12 items-center mt-1">
-        <BusinessClient
-          @SupplierId="SupplierId"
-          :defaultNm="'전체'"></BusinessClient>
+        <div class="pur017-cell">
+          <div class="pur017-sg-label">파트</div>
+          <div class="pur017-cell-field min-w-0">
+            <select
+              id="pur02-017-part"
+              v-model="cond2"
+              class="pur017-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option
+                v-for="i in optionList2"
+                :key="i.lngPartCode"
+                :value="i.lngPartCode">
+                {{ i.strPartName }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="pur017-cell">
+          <div class="pur017-sg-label">상태</div>
+          <div class="pur017-cell-field min-w-0">
+            <select
+              id="pur02-017-status"
+              v-model="cond"
+              class="pur017-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option
+                v-for="i in optionList"
+                :key="i.strDCode"
+                :value="i.strDCode">
+                {{ i.strDName }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="pur017-cell">
+          <div class="pur017-sg-label">거래처</div>
+          <div class="pur017-cell-field pur017-bc-slot min-w-0">
+            <BusinessClient compact-search-bar @SupplierId="SupplierId" />
+          </div>
+        </div>
+        <!-- 3열×2행 정렬: 2행 3칸 균등 간격 유지 -->
+        <div class="pur017-cell pur017-grid-filler" aria-hidden="true" />
       </div>
     </div>
 
     <!-- 조회조건 -->
-    <!-- 그리드 영역 -->
-    <div class="w-full h-[65vh]">
+    <!-- 그리드 영역 (조회 AREA와 안내 문구 사이 살짝 여백) -->
+    <div class="mt-2 w-full h-[65vh]">
       <div class="font-semibold ml-2">
         [미입고]: 입고수량이 발주수량보다 적게 입고되었거나 입고가 안된 경우.
         [입고완료] : 입고수량이 발주수량과 같거나 많이 입고된 경우
@@ -113,140 +139,150 @@
 
   <div
     v-if="openPopUp"
-    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white p-6 rounded-2xl shadow-xl w-[75vw] h-[80vh]">
+    class="fixed inset-0 z-40 flex items-center justify-center bg-black/60">
+    <div class="relative z-50 rounded-2xl bg-white p-6 shadow-xl w-[75vw] h-[80vh]">
       <div class="flex justify-between">
-        <h2 class="text-xl font-bold mb-4">매입 상세</h2>
-        <div class="flex space-x-5">
+        <h2 class="text-xl font-bold mb-4">매입확정 상세</h2>
+        <div class="flex flex-wrap items-center justify-end gap-2">
           <button
-            class="whitebutton disabled:opacity-30"
+            class="button primary md:w-auto w-14 justify-center text-center disabled:opacity-30"
+            type="button"
             @click="saveButton"
-            :disabled="disabled1">
-            저장
+            :disabled="disabled1 || popupConfirmLocked">
+            확정
           </button>
           <button
-            class="whitebutton disabled:opacity-30"
+            class="button primary md:w-auto min-w-[5.5rem] justify-center px-3 text-center disabled:opacity-30"
+            type="button"
             @click="cancelButton"
-            :disabled="!disabled1">
+            :disabled="!disabled1 || popupConfirmLocked">
             확정취소
           </button>
-          <button class="whitebutton" @click="excelButton2">엑셀</button>
-          <button class="whitebutton" @click="openPopUp = false">닫기</button>
+          <button
+            class="button primary md:w-auto w-14 justify-center text-center"
+            type="button"
+            @click="excelButton2">
+            엑셀
+          </button>
+          <button
+            class="button primary md:w-auto w-14 justify-center text-center"
+            type="button"
+            @click="openPopUp = false">
+            닫기
+          </button>
         </div>
       </div>
-      <div class="grid grid-rows-5 grid-cols-[1fr,4fr,1fr,4fr] h-[20vh]">
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-center">
-          매장
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-start pl-2">
-          <input
-            type="text"
-            class="border border-black w-[80%] disabled:bg-gray-300"
-            v-model="scond"
-            disabled />
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-center">
-          전표번호
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-start pl-2 border-r">
-          <input
-            type="text"
-            v-model="scond2"
-            class="border border-black w-[80%] disabled:bg-gray-300"
-            disabled />
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-center">
-          배송(입고)일
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-start pl-2">
-          <input
-            type="text"
-            v-model="scond3"
-            class="border border-black w-[80%] disabled:bg-gray-300"
-            disabled />
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-center">
-          거래처
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-start pl-2 border-r">
-          <input
-            type="text"
-            v-model="scond4"
-            class="border border-black w-[80%] disabled:bg-gray-300"
-            disabled />
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-center">
-          코멘트(발주)
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-start pl-2">
-          <input
-            type="text"
-            class="border border-black w-[80%] disabled:bg-gray-300"
-            v-model="scond5"
-            disabled />
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-center">
-          코멘트(출고)
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-start pl-2 border-r">
-          <input
-            type="text"
-            class="border border-black w-[80%] disabled:bg-gray-300"
-            v-model="scond6"
-            disabled />
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-center">
-          입고확정일
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-start pl-2">
-          <input
-            type="date"
-            :disabled="disabled1"
-            class="border border-black w-[80%]"
-            v-model="scond7" />
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-center">
-          검수자
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-black justify-start pl-2 border-r">
-          <input
-            type="text"
-            class="border border-black w-[80%]"
-            :disabled="disabled1"
-            v-model="scond8" />
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-b border-black justify-center">
-          코멘트입고
-        </div>
-        <div
-          class="flex space-x-5 items-center border-l border-t border-b border-r border-black justify-start pl-2 col-span-3">
-          <input
-            type="text"
-            class="border border-black w-[80%]"
-            :disabled="disabled1"
-            v-model="scond9" />
+      <!-- 발주 확인/출고(팝업) PUR01_019INS와 동일 패턴 -->
+      <div
+        class="pur017-popup-fields mb-3 min-w-0 rounded-lg bg-gray-100 px-6 py-4"
+        :style="{
+          '--pur017-popup-border': pur017PopupBorder,
+          '--pur017-popup-label': pur017PopupLabelCol,
+          '--pur017-popup-gap': pur017PopupFieldGap,
+        }">
+        <div class="pur017-popup-grid">
+          <div class="pur017-popup-label">
+            <div class="pur017-popup-label-inner">매장 / 파트</div>
+          </div>
+          <div class="pur017-popup-cell">
+            <input
+              type="text"
+              class="pur017-popup-input"
+              v-model="scond"
+              disabled />
+          </div>
+          <div class="pur017-popup-label">
+            <div class="pur017-popup-label-inner">전표번호</div>
+          </div>
+          <div class="pur017-popup-cell">
+            <input
+              type="text"
+              class="pur017-popup-input"
+              v-model="scond2"
+              disabled />
+          </div>
+
+          <div class="pur017-popup-label">
+            <div class="pur017-popup-label-inner">배송(입고)일</div>
+          </div>
+          <div class="pur017-popup-cell">
+            <input
+              type="text"
+              class="pur017-popup-input"
+              v-model="scond3"
+              disabled />
+          </div>
+          <div class="pur017-popup-label">
+            <div class="pur017-popup-label-inner">거래처</div>
+          </div>
+          <div class="pur017-popup-cell">
+            <input
+              type="text"
+              class="pur017-popup-input"
+              v-model="scond4"
+              disabled />
+          </div>
+
+          <div class="pur017-popup-label">
+            <div class="pur017-popup-label-inner">코멘트(발주)</div>
+          </div>
+          <div class="pur017-popup-cell">
+            <input
+              type="text"
+              class="pur017-popup-input"
+              v-model="scond5"
+              disabled />
+          </div>
+          <div class="pur017-popup-label">
+            <div class="pur017-popup-label-inner">코멘트(출고)</div>
+          </div>
+          <div class="pur017-popup-cell">
+            <input
+              type="text"
+              class="pur017-popup-input"
+              v-model="scond6"
+              disabled />
+          </div>
+
+          <div class="pur017-popup-label">
+            <div class="pur017-popup-label-inner">입고확정일</div>
+          </div>
+          <div class="pur017-popup-cell">
+            <input
+              type="date"
+              class="pur017-popup-input"
+              :class="{ 'pur017-popup-input--editable': !disabled1 }"
+              :disabled="disabled1"
+              v-model="scond7" />
+          </div>
+          <div class="pur017-popup-label">
+            <div class="pur017-popup-label-inner">검수자</div>
+          </div>
+          <div class="pur017-popup-cell">
+            <input
+              type="text"
+              class="pur017-popup-input"
+              :class="{ 'pur017-popup-input--editable': !disabled1 }"
+              :disabled="disabled1"
+              v-model="scond8" />
+          </div>
+
+          <div class="pur017-popup-label">
+            <div class="pur017-popup-label-inner">코멘트입고</div>
+          </div>
+          <div class="pur017-popup-cell pur017-popup-cell--span">
+            <input
+              type="text"
+              class="pur017-popup-input"
+              :class="{ 'pur017-popup-input--editable': !disabled1 }"
+              :disabled="disabled1"
+              v-model="scond9" />
+          </div>
         </div>
       </div>
       <div class="h-[60%] w-full flex justify-center items-center mt-2">
         <Realgrid
-          :progname="'PUR02_015INS_VUE'"
+          :progname="'PUR02_017INS_VUE'"
           :progid="2"
           :documentTitle="'PUR02_017INS'"
           :exporttoExcel="exportExcel2"
@@ -280,7 +316,7 @@ import {
   saveStockCheckMasterDetailByPart,
 } from "@/api/mipur";
 import { getLossMasterPartList } from "@/api/mistock";
-import BusinessClient from "@/components/businessClient.vue";
+import BusinessClient from "@/components/businessClient2.vue";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -342,6 +378,17 @@ const cond3 = ref(0);
 const cond4 = ref("");
 const cond5 = ref(0);
 const store = useStore();
+
+/** 조회 AREA — PUR03_037RPT·search-area-layout.mdc 패턴(3열×2행) */
+const pur017ControlBorder = "#cbd5e1";
+const pur017ItemGap = "0.75rem";
+/** 매장 v-select가 열을 가로로 채우도록 기본 12rem 상한 해제(규칙 예: 96) */
+const pur017PickStoreComboMaxRem = 96;
+
+/** 매입 상세(팝업) 상단 필드 — PUR01_019INS 발주 확인/출고(팝업)과 동일 */
+const pur017PopupBorder = "#cbd5e1";
+const pur017PopupLabelCol = "7rem";
+const pur017PopupFieldGap = "0.5rem";
 
 const datepicker = ref(null);
 const closePopUp = ref(false);
@@ -428,6 +475,9 @@ const searchButton = async () => {
  */
 
 const disabled1 = ref(false);
+/** API blnChk === 1 이면 팝업에서 확정·확정취소 비활성 */
+const popupConfirmLocked = ref(false);
+
 const progid = ref(1);
 const initGrid = () => {
   if (rowData.value.length > 0) {
@@ -494,8 +544,33 @@ const scond5 = ref("");
 const scond6 = ref("");
 const scond8 = ref("");
 const scond9 = ref("");
+
+/** 그리드/서버 YYYYMMDD(또는 8자리 숫자문자) → 화면 표시 YYYY-MM-DD */
+function formatYmdDigitsToIsoDate(v) {
+  if (v == null || v === "") return "";
+  const raw = String(v).trim().replace(/-/g, "");
+  if (raw.length === 8 && /^\d{8}$/.test(raw)) {
+    return `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
+  }
+  return String(v);
+}
+
+function isBlnChkLockedApiValue(v) {
+  if (v === true) return true;
+  if (v === 1 || v === "1") return true;
+  const n = Number(v);
+  return !Number.isNaN(n) && n === 1;
+}
+
+function rowHasBlnChkLocked(row) {
+  if (row == null || typeof row !== "object") return false;
+  return isBlnChkLockedApiValue(row.blnChk);
+}
+
 const dblclickedRowData = async (e) => {
   console.log(e);
+
+  popupConfirmLocked.value = false;
 
   if (e[22] == "01") {
     disabled1.value = false;
@@ -506,9 +581,9 @@ const dblclickedRowData = async (e) => {
     scond7.value =
       e[6].slice(0, 4) + "-" + e[6].slice(4, 6) + "-" + e[6].slice(6, 8);
   }
-  scond.value = e[1] + "/" + e[2];
+  scond.value = `${e[1]} / ${e[2]}`;
   scond2.value = e[4];
-  scond3.value = e[7];
+  scond3.value = formatYmdDigitsToIsoDate(e[7]);
   scond4.value = e[3];
   scond5.value = e[18];
   openPopUp.value = true;
@@ -521,6 +596,11 @@ const dblclickedRowData = async (e) => {
   scond8.value = e[21];
   scond9.value = e[20];
   scond6.value = e[19];
+
+  let lockedFromMain = false;
+  if (typeof e?.index === "number" && rowData.value?.[e.index]) {
+    lockedFromMain = rowHasBlnChkLocked(rowData.value[e.index]);
+  }
 
   //console.log(scond7.value);
   try {
@@ -535,7 +615,13 @@ const dblclickedRowData = async (e) => {
     console.log(res);
     rowData2.value = res.data.List;
     updatedrowdata2.value = res.data.List;
-  } catch (error) {}
+    const lockedFromDetail =
+      Array.isArray(res.data.List) &&
+      res.data.List.some((row) => rowHasBlnChkLocked(row));
+    popupConfirmLocked.value = lockedFromMain || lockedFromDetail;
+  } catch (error) {
+    popupConfirmLocked.value = lockedFromMain;
+  }
 };
 
 const checkedrowdata = ref([]);
@@ -629,7 +715,7 @@ const saveButton = async () => {
     if (res.data.RESULT_CD == "00") {
       await Swal.fire({
         title: "성공",
-        text: "저장되었습니다.",
+        text: "확정이 완료되었습니다.",
         icon: "success",
         confirmButtonText: "확인",
       });
@@ -716,13 +802,18 @@ const cancelButton = async () => {
 };
 
 const confirmButton = async () => {
-  if (checkedrowdata.value.length == 0) {
-    Swal.fire({
-      title: "경고",
-      text: "선택된 전표가 없습니다.",
+  const hasGridData = Array.isArray(rowData.value) && rowData.value.length > 0;
+  const hasChecked =
+    Array.isArray(checkedrowdata.value) && checkedrowdata.value.length > 0;
+
+  if (!hasGridData || !hasChecked) {
+    await Swal.fire({
+      title: "알림",
+      text: "확정할 전표가 없습니다.",
       icon: "warning",
       confirmButtonText: "확인",
     });
+    return;
   }
 
   try {
@@ -788,3 +879,226 @@ const confirmButton = async () => {
   //try
 };
 </script>
+
+<style scoped>
+/*
+ * PUR03_037RPT·search-area-layout.mdc — 3열×2행
+ * repeat(3, minmax(0, 1fr)) + column-gap/row-gap 동일 변수로 열 간격 통일.
+ * 라벨 통일·가운데 정렬, 값 칸 width:100%로 칸마다 L/R 여백 균형.
+ */
+.pur017-search-grid {
+  --pur017-label-col: 6.5rem;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--pur017-item-gap);
+  row-gap: var(--pur017-item-gap);
+}
+
+.pur017-cell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--pur017-item-gap);
+}
+
+.pur017-grid-filler {
+  visibility: hidden;
+  pointer-events: none;
+  min-height: 2rem;
+}
+
+.pur017-sg-label {
+  flex: 0 0 var(--pur017-label-col);
+  width: var(--pur017-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+}
+
+.pur017-cell-field {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.pur017-cell-field > * {
+  min-width: 0;
+  width: 100%;
+}
+
+.pur017-search-panel .pur017-search-grid select.pur017-sg-select {
+  box-sizing: border-box;
+  border: 1px solid var(--pur017-control-border) !important;
+}
+
+.pur017-search-panel .pur017-search-grid select.pur017-sg-select:focus {
+  border-color: #3b82f6 !important;
+}
+
+.pur017-search-panel .pur017-pick-slot :deep(select) {
+  border: 1px solid var(--pur017-control-border) !important;
+}
+
+.pur017-search-panel .pur017-pick-slot :deep(select:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.pur017-search-panel .pur017-pick-slot :deep(.pickstore-vs-shell),
+.pur017-search-panel .pur017-bc-slot :deep(.pickstore-vs-shell) {
+  border: 1px solid var(--pur017-control-border) !important;
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.pur017-bc-slot :deep(> div.flex.text-base) {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Datepicker2 루트: 값 칸 가로 채움 */
+.pur017-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin-left: 0;
+  padding-left: 0;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+/* From~To: flex 행으로 두 date가 동일 비율 확장(한쪽만 비대 방지) */
+.pur017-date-slot :deep(> div.flex > div.inline-flex) {
+  display: flex !important;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.pur017-search-panel .pur017-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+  max-width: none;
+  height: 2rem;
+  min-height: 2rem;
+  padding-left: 0.75rem;
+  padding-right: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--pur017-control-border) !important;
+}
+
+.pur017-search-panel .pur017-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.pur017-date-slot :deep(> div.flex > div.inline-flex > span),
+.pur017-date-slot :deep(> div.flex > div.inline-flex > button) {
+  flex-shrink: 0;
+}
+
+.pur017-pick-slot {
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.pur017-pick-slot :deep(> div.flex.text-base) {
+  width: 100%;
+  min-width: 0;
+  gap: var(--pur017-item-gap) !important;
+}
+
+.pur017-pick-slot :deep(> div.flex > div:first-child) {
+  display: none;
+}
+
+.pur017-bc-slot :deep(> div.flex.items-center) {
+  margin-top: 0;
+}
+
+/* 매입 상세(팝업) 상단 항목 — PUR01_019INS 발주 확인/출고(팝업)과 동일 구조 */
+.pur017-popup-fields {
+  box-sizing: border-box;
+}
+
+.pur017-popup-grid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns:
+    minmax(0, var(--pur017-popup-label)) minmax(0, 1fr)
+    minmax(0, var(--pur017-popup-label)) minmax(0, 1fr);
+  column-gap: 0.75rem;
+  row-gap: var(--pur017-popup-gap);
+  align-items: center;
+}
+
+.pur017-popup-label {
+  min-width: 0;
+  max-width: var(--pur017-popup-label);
+}
+
+.pur017-popup-label-inner {
+  display: flex;
+  width: 100%;
+  min-height: 2rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.125rem 0.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  color: rgb(17 24 39);
+}
+
+.pur017-popup-cell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+
+.pur017-popup-cell--span {
+  grid-column: 2 / -1;
+}
+
+.pur017-popup-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 2rem;
+  min-height: 2rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--pur017-popup-border) !important;
+  background-color: #fff;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: rgb(55 65 81);
+}
+
+.pur017-popup-input:disabled {
+  background-color: rgb(229 231 235);
+  color: rgb(75 85 99);
+}
+
+.pur017-popup-input--editable:focus {
+  border-color: #3b82f6 !important;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.35);
+}
+</style>

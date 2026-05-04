@@ -22,7 +22,7 @@
         v-model="selectedSupplier"
         :options="optionList"
         label="strSupplierName"
-        placeholder="전체"
+        :placeholder="defaultNm"
         :reduce="(store) => (store != null ? store.lngSupplierID : null)"
         :clearable="!disable"
         append-to-body
@@ -49,10 +49,6 @@ const selectedSupplier = ref("");
 const selectedSupplierNm = ref("");
 const emit = defineEmits(["SupplierId", "SupplierNm"]);
 const props = defineProps({
-  selectSupplierNm: {
-    type: String,
-    default: "전체",
-  },
   disable: {
     type: Boolean,
     default: false,
@@ -60,6 +56,11 @@ const props = defineProps({
   selectSupplierId: {
     type: [String, Number],
     default: "",
+  },
+  /** businessClient.vue `defaultNm` 과 동일 — 미선택 시 표시·emit 문구 (조회에서 `전체`가 필요하면 `:default-nm="'전체'"`) */
+  defaultNm: {
+    type: String,
+    default: "선택",
   },
   defaultName: {
     type: String,
@@ -86,12 +87,6 @@ watch(
     applyPresetSupplier(props.selectSupplierId);
   }
 );
-watch(
-  () => props.selectSupplierNm,
-  () => {
-    selectedSupplierNm.value = props.selectSupplierNm;
-  }
-);
 
 function hasPresetId(id) {
   return (
@@ -111,7 +106,7 @@ function applyPresetSupplier(presetId) {
     selectedSupplierNm.value = found ? found.strSupplierName : "";
   } else {
     selectedSupplier.value = "";
-    selectedSupplierNm.value = "전체";
+    selectedSupplierNm.value = props.defaultNm;
   }
 }
 
@@ -135,7 +130,7 @@ onMounted(async () => {
     selectedSupplierNm.value = found ? found.strSupplierName : "";
   } else {
     selectedSupplier.value = "";
-    selectedSupplierNm.value = "전체";
+    selectedSupplierNm.value = props.defaultNm;
   }
 
   emit("SupplierId", selectedSupplier.value);
@@ -144,9 +139,9 @@ onMounted(async () => {
 
 watch(selectedSupplier, (newVal) => {
   if (newVal === null || newVal === undefined || newVal === "") {
-    selectedSupplierNm.value = "전체";
+    selectedSupplierNm.value = props.defaultNm;
     emit("SupplierId", "");
-    emit("SupplierNm", "전체");
+    emit("SupplierNm", props.defaultNm);
     return;
   }
   const found = optionList.value.find(

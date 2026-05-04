@@ -5,9 +5,9 @@
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <!-- 조회조건 + 좌우 그리드: 시작선 맞춤, 하단은 flex-1로 동일 높이 -->
+  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
@@ -21,165 +21,211 @@
         </button>
       </div>
     </div>
-    <div
-      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-24 items-start z-10">
-      <div class="justify-start flex ml-4">
-        <PickStore
-          @update:storeGroup="lngStoreGroup"
-          :defaultStoreNm="'공통'"
-          @storeNm="excelStore"
-          :hideGroup="false"
-          :hideAttr="false"
-          :defaultStore="true"
-          @update:storeCd="lngStoreCode"></PickStore>
-      </div>
-      <div class="flex justify-start items-center">
-        <BusinessClient
-          @SupplierId="SupplierId"
-          :defaultNm="'전체'"></BusinessClient>
-      </div>
 
-      <div class="flex space-x-5 ml-12 mt-3 items-center">
-        <div class="font-semibold text-base">자재코드</div>
-        <div>
-          <input
-            type="text"
-            class="h-7 border border-black pl-1"
-            @input="onlyNumber"
-            v-model="cond" />
+    <div
+      class="pur235-search-panel pur401-search-wrap z-10 mt-3 w-full min-h-0 shrink-0 overflow-x-auto rounded-lg bg-gray-200 px-8 py-3 md:px-12">
+      <div
+        class="pur235-wire-grid pur235-wire-grid-401 min-w-0"
+        :style="{
+          '--pur235-control-border': pur235ControlBorder,
+          '--pur235-col-gutter': pur235ColGutter,
+          '--pur235-row-gap': pur235RowGap,
+          '--pur235-label-col': pur235LabelCol,
+        }">
+        <div class="pur235-wire-cell">
+          <div class="pur235-wire-label">매장선택</div>
+          <div
+            class="pur235-wire-field pur235-pick-slot pur235-pick-narrow min-w-0 w-full">
+            <!-- 본 화면은 매장 1콤보만(그룹·구분 숨김) — 유형 임의 변경 금지 -->
+            <PickStore
+              @update:storeGroup="lngStoreGroup"
+              :default-store-nm="'공통'"
+              @storeNm="excelStore"
+              :hide-group="false"
+              :hide-attr="false"
+              :default-store="true"
+              @update:storeCd="lngStoreCode" />
+          </div>
         </div>
-      </div>
-      <div class="flex space-x-5 ml-0 mt-3 items-center">
-        <div class="text-base font-semibold">자재명</div>
-        <div>
-          <input
-            type="text"
-            class="w-64 h-7 border border-black"
-            v-model="cond2" />
+        <div class="pur235-wire-cell">
+          <div class="pur235-wire-label">거래처</div>
+          <div class="pur235-wire-field pur235-bc-slot min-w-0 w-full">
+            <BusinessClient compact-search-bar @SupplierId="SupplierId" />
+          </div>
+        </div>
+        <div class="pur235-wire-cell min-w-0">
+          <div class="pur235-wire-label">자재코드</div>
+          <div class="pur235-wire-field min-w-0">
+            <input
+              id="pur04-001-cond"
+              v-model="cond"
+              type="text"
+              class="pur235-sg-input h-8 min-h-8 w-full min-w-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              @input="onlyNumber" />
+          </div>
+        </div>
+        <div class="pur235-wire-cell min-w-0">
+          <div class="pur235-wire-label">자재명</div>
+          <div class="pur235-wire-field min-w-0">
+            <input
+              id="pur04-001-cond2"
+              v-model="cond2"
+              type="text"
+              class="pur235-sg-input h-8 min-h-8 w-full min-w-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
         </div>
       </div>
     </div>
-    <!-- 조회조건 -->
-    <!-- 그리드 영역 -->
-    <div class="grid grid-rows-1 grid-cols-2 h-[75vh] mt-1 gap-2">
-      <div>
-        <Realgrid
-          :progname="'PUR04_001INS_VUE'"
-          :progid="1"
-          :rowData="rowData"
-          :reload="reload"
-          :setStateBar="false"
-          :documentTitle="'PUR01_009RPT'"
-          @updatedRowData="updatedRowData"
-          @dblclickedRowData="dblclickedRowData"
-          @clickedRowData="dblclickedRowData"
-          :checkRenderEditable="true"
-          :documentSubTitle="documentSubTitle"
-          :rowStateeditable="false"
-          :exporttoExcel="exportExcel">
-        </Realgrid>
+
+    <div class="mt-2 grid min-h-0 flex-1 grid-cols-2 gap-2">
+      <div class="flex min-h-0 min-w-0 flex-col">
+        <div class="relative min-h-0 flex-1">
+          <Realgrid
+            :progname="'PUR04_001INS_VUE'"
+            :progid="1"
+            :rowData="rowData"
+            :reload="reload"
+            :setStateBar="false"
+            :documentTitle="'PUR01_009RPT'"
+            @updatedRowData="updatedRowData"
+            @dblclickedRowData="dblclickedRowData"
+            @clickedRowData="dblclickedRowData"
+            :checkRenderEditable="true"
+            :documentSubTitle="documentSubTitle"
+            :rowStateeditable="false"
+            :exporttoExcel="exportExcel">
+          </Realgrid>
+        </div>
       </div>
-      <div class="w-full">
-        <div class="grid grid-rows-[1fr,3fr,22fr] grid-cols-1">
-          <div class="flex justify-between">
-            <div class="text-bold text-red-500">
+
+      <div class="flex min-h-0 min-w-0 flex-col">
+        <div class="shrink-0 flex flex-col gap-2 pb-2">
+          <div
+            class="pur235-search-panel flex flex-wrap items-center justify-between gap-2 rounded-lg px-4 py-2.5 md:px-6">
+            <p class="min-w-0 text-sm font-bold text-red-500">
               ※매입단가 : 발주/매입 금액 단위 금액
-            </div>
-            <div class="flex space-x-2">
-              <button class="whitebutton" @click="addButton">신규</button>
-              <button class="whitebutton" @click="saveButton">저장</button>
-              <button class="whitebutton" @click="deleteButton">삭제</button>
-            </div>
-          </div>
-          <div class="grid grid-rows-3 grid-cols-[1fr,3fr,1fr,3fr]">
-            <div
-              class="border-l border-t border-black font-semibold text-base bg-gray-100 text-center flex items-center justify-center">
-              거래처
-            </div>
-            <div class="border-l border-t border-black !flex !items-center">
-              <BusinessClient
-                @SupplierId="SupplierId2"
-                :selectSupplierId="supplierid2"
-                :defaultName="''"
-                class="!mt-0 !-ml-3"></BusinessClient>
-            </div>
-            <div
-              class="border-l border-t border-black font-semibold text-base bg-gray-100 text-center flex items-center justify-center">
-              부가세 구분
-            </div>
-            <div class="border-l border-t border-black !flex !items-center">
-              <label for="scond"
-                ><input
-                  type="checkbox"
-                  class="ml-2"
-                  id="scond"
-                  v-model="scond" />포함</label
-              >
-            </div>
-            <div
-              class="border-l border-t border-black font-semibold text-base bg-gray-100 text-center flex items-center justify-center">
-              단가
-            </div>
-            <div class="border-l border-t border-black !flex !items-center">
-              <input
-                type="text"
-                name="curUnitPrice"
-                class="ml-2 border border-black pl-1 disabled:bg-gray-300"
-                @input="onlyNumber2"
-                :disabled="disabled"
-                v-model="scond2" />
-            </div>
-            <div
-              class="border-l border-t border-black font-semibold text-base bg-gray-100 text-center flex items-center justify-center">
-              단가(VAT포함)
-            </div>
-            <div class="border-l border-t border-black !flex !items-center">
-              <input
-                type="text"
-                name="curUnitPrice2"
-                class="ml-2 border border-black pl-1 disabled:bg-gray-300"
-                @input="onlyNumber2"
-                :disabled="!disabled"
-                v-model="scond3" />
-            </div>
-            <div
-              class="border-l border-t border-b border-black font-semibold text-base bg-gray-100 text-center flex items-center justify-center">
-              적용일
-            </div>
-            <div
-              class="border-l border-t border-b border-black !flex !items-center">
-              <input
-                type="date"
-                v-model="scond4"
-                class="ml-2 border border-black pl-1 disabled:bg-gray-300 w-[65%]" />
-            </div>
-            <div
-              class="border-l border-t border-b border-black font-semibold text-base bg-gray-100 text-center flex items-center justify-center">
-              구분(주/부)
-            </div>
-            <div
-              class="border-l border-t border-b border-black !flex !items-center">
-              <select
-                name=""
-                id=""
-                class="border border-black w-[65%] ml-2"
-                v-model="scond5">
-                <option value="0">선택</option>
-                <option :value="i.strDCode" v-for="i in optionList">
-                  {{ i.strDName }}
-                </option>
-              </select>
+            </p>
+            <div class="flex shrink-0 flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                class="whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+                @click="addButton">
+                신규
+              </button>
+              <button
+                type="button"
+                class="whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+                @click="saveButton">
+                저장
+              </button>
+              <button
+                type="button"
+                class="whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+                @click="deleteButton">
+                삭제
+              </button>
             </div>
           </div>
 
-          <div class="h-full w-full">
-            <Realgrid
-              :progname="'PUR04_001INS_VUE'"
-              :progid="2"
-              :rowStateeditable="false"
-              @clickedRowData="clickedRowData2"
-              :rowData="rowData2"></Realgrid>
+          <div
+            class="pur235-search-panel pur401-grid2-form rounded-lg px-5 py-2.5 md:px-6"
+            :style="{
+              '--pur235-control-border': pur235ControlBorder,
+              '--pur235-col-gutter': '0.625rem',
+              '--pur235-row-gap': '0.5rem',
+              '--pur235-label-col': '7rem',
+              '--pur401-detail-field-max': '10.25rem',
+            }">
+            <div class="pur235-wire-grid pur235-wire-grid-401 min-w-0">
+              <div class="pur235-wire-cell min-w-0">
+                <div class="pur235-wire-label">거래처</div>
+                <div class="pur235-wire-field pur235-bc-slot pur401-detail-control min-w-0 w-full">
+                  <BusinessClient
+                    compact-search-bar
+                    :select-supplier-id="supplierid2"
+                    :default-name="''"
+                    @SupplierId="SupplierId2" />
+                </div>
+              </div>
+              <div class="pur235-wire-cell min-w-0">
+                <div class="pur235-wire-label">부가세 구분</div>
+                <div class="pur235-wire-field min-w-0">
+                  <label
+                    class="flex cursor-pointer items-center gap-2.5 text-sm text-gray-800"
+                    for="scond">
+                    <input
+                      id="scond"
+                      v-model="scond"
+                      type="checkbox"
+                      class="h-5 w-5 shrink-0 cursor-pointer rounded border-gray-400 text-blue-600 focus:ring-blue-500" />
+                    <span>포함</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="pur235-wire-cell min-w-0">
+                <div class="pur235-wire-label">단가</div>
+                <div class="pur235-wire-field pur401-detail-control min-w-0">
+                  <input
+                    v-model="scond2"
+                    type="text"
+                    name="curUnitPrice"
+                    class="pur235-sg-input h-8 min-h-8 w-full min-w-0 rounded-md border border-solid bg-white px-1.5 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200"
+                    @input="onlyNumber2"
+                    :disabled="disabled" />
+                </div>
+              </div>
+              <div class="pur235-wire-cell min-w-0">
+                <div class="pur235-wire-label">단가(VAT포함)</div>
+                <div class="pur235-wire-field pur401-detail-control min-w-0">
+                  <input
+                    v-model="scond3"
+                    type="text"
+                    name="curUnitPrice2"
+                    class="pur235-sg-input h-8 min-h-8 w-full min-w-0 rounded-md border border-solid bg-white px-1.5 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200"
+                    @input="onlyNumber2"
+                    :disabled="!disabled" />
+                </div>
+              </div>
+
+              <div class="pur235-wire-cell min-w-0">
+                <div class="pur235-wire-label">적용일</div>
+                <div class="pur235-wire-field pur401-detail-control min-w-0">
+                  <input
+                    v-model="scond4"
+                    type="date"
+                    class="pur235-sg-input h-8 min-h-8 w-full min-w-0 rounded-md border border-solid bg-white px-1.5 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200" />
+                </div>
+              </div>
+              <div class="pur235-wire-cell min-w-0">
+                <div class="pur235-wire-label">구분(주/부)</div>
+                <div class="pur235-wire-field pur401-detail-control min-w-0">
+                  <select
+                    id="pur04-001-scond5"
+                    v-model="scond5"
+                    class="pur235-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white px-1.5 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="0">선택</option>
+                    <option
+                      v-for="i in optionList"
+                      :key="i.strDCode"
+                      :value="i.strDCode">
+                      {{ i.strDName }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+
+        <div class="relative mt-1 min-h-0 flex-1">
+          <Realgrid
+            :progname="'PUR04_001INS_VUE'"
+            :progid="2"
+            :rowStateeditable="false"
+            @clickedRowData="clickedRowData2"
+            :rowData="rowData2">
+          </Realgrid>
         </div>
       </div>
     </div>
@@ -252,7 +298,7 @@ import {
   getUnitPriceDetailList,
   saveStockPriceHistory,
 } from "@/api/mipur";
-import BusinessClient from "@/components/businessClient.vue";
+import BusinessClient from "@/components/businessClient2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -326,6 +372,12 @@ const cond2 = ref("");
 const disabled2 = ref(false);
 const cond5 = ref(0);
 const store = useStore();
+
+/** 조회 AREA — PUR02_014/035과 동일 pur235 와이어 토큰 */
+const pur235ControlBorder = "#cbd5e1";
+const pur235ColGutter = "1.125rem";
+const pur235RowGap = "0.875rem";
+const pur235LabelCol = "6.25rem";
 
 const datepicker = ref(null);
 const closePopUp = ref(false);
@@ -507,12 +559,17 @@ const tempStockId = ref("");
 const dblclickedRowData = async (e) => {
   //console.log(e);
 
+  const clickedStockId = e[1];
+  if (String(clickedStockId ?? "") !== String(tempStockId.value ?? "")) {
+    supplierid2.value = 0;
+  }
+
   try {
     const res = await getUnitPriceDetailList(
       groupCd.value,
       storeCode.value,
       supplierid.value,
-      e[1],
+      clickedStockId,
       store.state.userData.strLanguage
     );
 
@@ -520,11 +577,21 @@ const dblclickedRowData = async (e) => {
 
     rowData2.value = res.data.List;
     afterDblClick.value = true;
-    tempStockId.value = e[1];
+    tempStockId.value = clickedStockId;
     tempFromDate.value = "";
     tempTodate.value = "";
     tempSupplierId.value = "";
   } catch (error) {}
+};
+
+/** 2번 그리드 상단 — 거래처·부가세·단가·적용일·구분 디폴트(신규와 동일) */
+const resetDetailFormDefaults = () => {
+  supplierid2.value = 0;
+  scond.value = false;
+  scond2.value = "";
+  scond3.value = "";
+  scond4.value = formatLocalDate(new Date());
+  scond5.value = 0;
 };
 
 const addButton = () => {
@@ -550,12 +617,7 @@ const addButton = () => {
     return;
   }
 
-  supplierid2.value = 0;
-  scond.value = false;
-  scond2.value = "";
-  scond3.value = "";
-  scond4.value = formatLocalDate(new Date());
-  scond5.value = 0;
+  resetDetailFormDefaults();
 };
 
 const disabled = ref(false);
@@ -666,6 +728,7 @@ const saveButton = async () => {
     //console.log(res);
 
     if (res.data.RESULT_CD == "00") {
+      resetDetailFormDefaults();
       Swal.fire({
         title: "성공",
         text: "저장을 완료하였습니다.",
@@ -881,3 +944,198 @@ const updatedRowData2 = (e) => {
   //console.log(e);
 };
 </script>
+
+<style scoped>
+/* PUR02_035RPT와 동일 와이어 — 401만 2열(매장|거래처 / 자재코드|자재명) */
+.pur235-wire-grid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--pur235-col-gutter);
+  row-gap: var(--pur235-row-gap);
+}
+
+.pur235-wire-grid-401 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pur235-wire-cell {
+  display: flex;
+  min-width: 0;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pur235-wire-label {
+  flex: 0 0 var(--pur235-label-col);
+  width: var(--pur235-label-col);
+  min-width: 0;
+  max-width: var(--pur235-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pur235-wire-field {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 auto;
+  align-items: center;
+}
+
+.pur235-wire-field:not(.pur235-mat-row) > * {
+  min-width: 0;
+  width: 100%;
+}
+
+.pur235-sg-select {
+  box-sizing: border-box;
+}
+
+.pur235-search-panel select.pur235-sg-select {
+  border: 1px solid var(--pur235-control-border) !important;
+}
+
+.pur235-search-panel select.pur235-sg-select:focus {
+  border-color: #3b82f6 !important;
+}
+
+/* 상단 조회 — 매장·거래처·자재 필드 가로 = 매장 콤보 기준(14rem) 통일 */
+.pur401-search-wrap .pur235-wire-cell > .pur235-wire-field {
+  max-width: 14rem;
+  width: 100%;
+  min-width: 0;
+  align-self: flex-start;
+  box-sizing: border-box;
+}
+
+/* 조회 AREA — 자재코드/명 입력 세로 = 매장·거래처 콤보(2rem)와 동일 */
+.pur401-search-wrap .pur235-sg-input {
+  height: 2rem !important;
+  min-height: 2rem !important;
+  max-height: 2rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  line-height: 1.25rem !important;
+}
+
+/* 2번 그리드 폼 — 거래처(11rem)와 단가(9.5rem) 중간(10.25rem), 부가세 행 제외 */
+.pur401-grid2-form .pur401-detail-control {
+  max-width: var(--pur401-detail-field-max, 10.25rem);
+  width: 100%;
+  min-width: 0;
+  align-self: flex-start;
+  box-sizing: border-box;
+}
+
+.pur401-grid2-form .pur401-detail-control .pur235-sg-input,
+.pur401-grid2-form .pur401-detail-control .pur235-sg-select {
+  max-width: 100%;
+}
+
+.pur235-search-panel .pur235-sg-input {
+  border: 1px solid var(--pur235-control-border) !important;
+  box-sizing: border-box;
+}
+
+.pur235-search-panel .pur235-sg-input:focus {
+  border-color: #3b82f6 !important;
+}
+
+.pur235-search-panel .pur235-pick-slot :deep(select) {
+  border: 1px solid var(--pur235-control-border) !important;
+}
+
+.pur235-search-panel .pur235-pick-slot :deep(select:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.pur235-search-panel .pur235-pick-slot :deep(.pickstore-vs-shell),
+.pur235-search-panel .pur235-bc-slot :deep(.pickstore-vs-shell) {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--pur235-control-border) !important;
+}
+
+.pur235-search-panel .pur235-pick-slot :deep(div.relative.min-w-0.flex-1) {
+  max-width: 100% !important;
+}
+
+.pur235-pick-slot :deep(> div.flex.text-base) {
+  width: 100%;
+  min-width: 0;
+}
+
+.pur235-pick-slot :deep(> div.flex > div:first-child) {
+  display: none;
+}
+
+/* 매장 1콤보 — 세로 h-8 정렬(:deep), 가로는 .pur401-search-wrap 이 wire-field에 14rem 적용 */
+.pur235-search-panel .pur235-pick-narrow {
+  width: 100%;
+  align-self: flex-start;
+}
+
+.pur235-pick-narrow :deep(> div.flex.text-base) {
+  margin-top: 0;
+  margin-left: 0;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.pur235-pick-narrow :deep(> div.flex.text-base > div:nth-child(4)) {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+}
+
+.pur235-pick-narrow :deep(> div.flex.text-base > div:nth-child(4) > div:first-child) {
+  width: 100% !important;
+  max-width: 100%;
+  height: 2rem !important;
+  min-height: 2rem !important;
+  max-height: 2rem !important;
+  border-radius: 0.375rem;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem;
+  box-sizing: border-box;
+}
+
+.pur235-pick-narrow
+  :deep(> div.flex.text-base > div:nth-child(4) > div:first-child .style-chooser) {
+  height: 100% !important;
+  min-height: 0;
+}
+
+.pur235-bc-slot :deep(> div.flex) {
+  justify-content: flex-start;
+  width: 100%;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+/* 2번 그리드 상단 폼 — 라벨 잘림 방지(폰트는 상단 조회와 동일 1rem) */
+.pur401-grid2-form .pur235-wire-label {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.2;
+  font-size: 1rem;
+  hyphens: none;
+  padding-left: 0.125rem;
+  padding-right: 0.125rem;
+}
+</style>

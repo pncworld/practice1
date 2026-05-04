@@ -1384,12 +1384,13 @@ export const getOrderListByTypeByPart = (
   sdate,
   edate,
   supplierid,
-  cond,
-  cond2,
-  cond3,
-  cond4,
-  cond5,
-  cond6
+  master,
+  detail,
+  name,
+  unitType,
+  sequence,
+  ip,
+  cond5
 ) => {
   return api2.post("/MIPUR/PUR02_035RPT.asmx/getOrderListByTypeByPart", {
     GROUP_CD: groupCd,
@@ -1398,13 +1399,13 @@ export const getOrderListByTypeByPart = (
     SDATE: sdate,
     EDATE: edate,
     SUPPLIERID: supplierid,
-    MASTER: cond,
-    DETAIL: cond2,
-    NAME: cond3,
-    UNITTYPE: cond4,
-    SEQUENCE: cond5,
-    IP: cond6,
-    COND5: cond7,
+    MASTER: master,
+    DETAIL: detail,
+    NAME: name,
+    UNITTYPE: unitType,
+    SEQUENCE: sequence,
+    IP: ip,
+    COND5: cond5,
   });
 };
 

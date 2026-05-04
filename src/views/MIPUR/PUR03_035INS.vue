@@ -5,80 +5,109 @@
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <!-- 조회조건 -->
-  <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <PageName></PageName>
-    <div class="flex justify-center mr-9 space-x-2 pr-5">
-      <button @click="addButton" class="button new md:w-auto w-14">신규</button>
+  <div class="h-full" @click="handleParentClick">
+    <!-- 조회조건 -->
+    <div class="flex justify-between items-center w-full overflow-y-hidden">
+      <PageName></PageName>
+      <div class="flex justify-center mr-9 space-x-2 pr-5">
+        <button @click="addButton" class="button new md:w-auto w-14">신규</button>
 
-      <button @click="searchButton" class="button search w-auto">조회</button>
-      <button @click="excelButton" class="button excel w-auto">엑셀</button>
+        <button @click="searchButton" class="button search w-auto">조회</button>
+        <button @click="excelButton" class="button excel w-auto">엑셀</button>
+      </div>
     </div>
-  </div>
-  <div v-if="orderTimeInfo" class="text-sm text-blue-700 font-semibold px-2 py-1">
-    {{ orderTimeInfo }}
-  </div>
-  <br />
-  <div
-    class="parent-search-bar grid min-h-14 w-full grid-cols-1 items-center gap-x-[clamp(1.35rem,3.5vw,2.5rem)] gap-y-3 bg-gray-200 rounded-lg px-7 md:grid-cols-2 md:gap-y-3 md:px-10 xl:h-14 xl:grid-cols-[minmax(0,1.28fr)_minmax(0,0.91fr)_minmax(0,0.91fr)_minmax(0,0.91fr)] xl:gap-y-0">
-    <div class="flex min-w-0 items-center">
-      <Datepicker_Order
-        compactRow
-        class="w-full min-w-0"
-        @endDate="endDate"
-        @startDate="startDate"
-        :initToday="0"        
-        :initToday2="-7"></Datepicker_Order>
+    <div
+      v-if="orderTimeInfo"
+      class="text-sm text-blue-700 font-semibold px-2 py-1">
+      {{ orderTimeInfo }}
     </div>
-    <div class="flex min-w-0 items-center">
-      <PickStore
-        compactSearchBar
-        :defaultStoreNm="'전체'"
-        @update:storeCd="handleStoreCd"
-        @storeNm="storeNm"
-        :hideGroup="false"
-        :hideAttr="false"></PickStore>
-    </div>
-    <div class="flex min-w-0 items-center gap-4">
-      <div class="text-base font-semibold whitespace-nowrap shrink-0">파트</div>
-      <select
-        name=""
-        id=""
-        class="h-8 min-h-8 min-w-0 max-w-[12rem] flex-1 rounded-md border border-black bg-white px-2 text-sm"
-        v-model="cond"
-        @change="getSelectedValue">
-        <option :value="i.lngPartCode" v-for="i in optionList">
-          {{ i.strPartName }}
-        </option>
-      </select>
-    </div>
-    <div class="flex min-w-0 items-center">
-      <BusinessClient
-        toolbarStretch
-        :setDynamicClass="'!h-8 !min-h-8 !w-[12rem] !max-w-[12rem] rounded-md border border-black px-2 text-sm'"
-        :setDynamicClass2="'!mt-0'"
-        @SupplierNm="SupplierNm"
-        @SupplierId="SupplierId"
-        :defaultNm="'전체'"></BusinessClient>
-    </div>
-  </div>
 
-  <!-- 조회조건 -->
-  <!-- 그리드 영역 -->
-  <div class="w-full h-[80%]">
-     <Realgrid
-      :progid="1"
-      :setFooter="true"
-      :rowStateeditable="false"
-      :progname="'PUR03_035INS_VUE'"
-      :exporttoExcel="exporttoExcel"
-      :documentSubTitle="documentSubTitle"
-      :documentTitle="'PUR03_035INS'"
-      @clickedRowData="clickedRowData"
-      @clickedButtonCol="clickedButtonCol"
-      @dblclickedRowData="dblclickedRowData"
-      :rowData="rowData">
-    </Realgrid>
+    <div
+      class="pur035-search-panel z-10 mt-3 w-full min-w-0 overflow-x-auto rounded-lg bg-gray-200 px-24 py-3">
+      <div
+        class="pur035-search-grid min-w-0"
+        :style="{
+          '--pur035-control-border': pur035ControlBorder,
+          '--pur035-item-gap': pur035ItemGap,
+          '--pur035-combo-max': pur035ComboMaxCss,
+        }">
+        <div class="pur035-cell">
+          <div class="pur035-sg-label">조회기간</div>
+          <div class="pur035-cell-field pur035-date-slot min-w-0">
+            <Datepicker_Order
+              ref="datepicker"
+              compactRow
+              class="w-full min-w-0"
+              mainName=""
+              :closePopUp="closePopUp"
+              @endDate="endDate"
+              @startDate="startDate"
+              :initToday="0"
+              :initToday2="-7" />
+          </div>
+        </div>
+        <div class="pur035-cell">
+          <div class="pur035-sg-label">매장</div>
+          <div class="pur035-cell-field pur035-pick-slot pur035-combo-cap min-w-0">
+            <PickStore
+              compact-search-bar
+              :compact-store-combo-max-rem="pur035ComboMaxRem"
+              main-name=""
+              :default-store-nm="'전체'"
+              :default-store="true"
+              :default-store-type2="true"
+              :hide-group="false"
+              :hide-attr="false"
+              @update:store-cd="handleStoreCd"
+              @store-nm="storeNm" />
+          </div>
+        </div>
+        <div class="pur035-cell">
+          <div class="pur035-sg-label">파트</div>
+          <div class="pur035-cell-field pur035-combo-cap min-w-0">
+            <select
+              id="pur03-035-part"
+              v-model="cond"
+              class="pur035-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              @change="getSelectedValue">
+              <option
+                v-for="i in optionList"
+                :key="i.lngPartCode"
+                :value="i.lngPartCode">
+                {{ i.strPartName }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="pur035-cell">
+          <div class="pur035-sg-label">거래처</div>
+          <div class="pur035-cell-field pur035-bc-slot pur035-combo-cap min-w-0">
+            <BusinessClient2
+              compact-search-bar
+              @SupplierNm="SupplierNm"
+              @SupplierId="SupplierId" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 조회조건 -->
+    <!-- 그리드 영역 -->
+    <div class="mt-2 w-full h-[80%]">
+      <Realgrid
+        :progid="1"
+        :setFooter="true"
+        :rowStateeditable="false"
+        :progname="'PUR03_035INS_VUE'"
+        :exporttoExcel="exporttoExcel"
+        :documentSubTitle="documentSubTitle"
+        :documentTitle="'PUR03_035INS'"
+        @clickedRowData="clickedRowData"
+        @clickedButtonCol="clickedButtonCol"
+        @dblclickedRowData="dblclickedRowData"
+        :rowData="rowData">
+      </Realgrid>
+    </div>
   </div>
 
   <div v-if="openpopup"
@@ -412,6 +441,7 @@ import {
 import { getStoreList2 } from "@/api/common";
 import { getLossMasterPartList, getStockOrderList } from "@/api/mistock";
 import BusinessClient from "@/components/businessClient.vue";
+import BusinessClient2 from "@/components/businessClient2.vue";
 import Datepicker_Order from "@/components/Datepicker_Order.vue";
 /**
  *  페이지명 자동 입력 컴포넌트
@@ -467,6 +497,23 @@ const cond13 = ref("");
 
 /** 발주가능 시간 안내 문구 (Static6.Text) */
 const orderTimeInfo = ref("");
+
+/** 조회 AREA(search-area-layout) — PUR03_037RPT·PUR02_018INS 패턴 */
+const pur035ControlBorder = "#cbd5e1";
+/** 매장·파트·거래처 콤보 동일 비율(가로 상한 rem — PickStore prop + CSS max-width) */
+const pur035ComboMaxRem = 20;
+const pur035ComboMaxCss = `${pur035ComboMaxRem}rem`;
+const pur035ItemGap = "0.5rem";
+
+const datepicker = ref(null);
+const closePopUp = ref(false);
+const handleParentClick = (e) => {
+  const datepickerEl = datepicker.value?.$el;
+  if (datepickerEl && datepickerEl.contains(e.target)) {
+    return;
+  }
+  closePopUp.value = !closePopUp.value;
+};
 
 /**
  * 발주가능 시간 체크
@@ -834,6 +881,34 @@ const stripBottomGridCheckFieldsForBookMerge = (patch) => {
   delete out.checkbox;
   delete out.lngCheck;
   return out;
+};
+
+/** 하단 행이 양의 발주수량(dblOrderQty)을 전달하는지 — 빈 값·0 은 false */
+const bottomRowAssertsPositiveOrderQty = (row) => {
+  const patch = stripBottomGridCheckFieldsForBookMerge(row);
+  const q = patch?.dblOrderQty;
+  if (q === undefined || q === null || q === "") return false;
+  const s = typeof q === "string" ? String(q).trim() : String(q);
+  if (s === "" || s === "0") return false;
+  const n = Number(s);
+  if (!Number.isNaN(n)) return n > 0;
+  return hasOrderQty({ dblOrderQty: q });
+};
+
+/**
+ * orderBook 에 이미 발주가 있는데 하단 emit 이 해당 품목을 0/빈 수량으로 보내는 경우
+ * (목록 재조회 직후 API 0, 다른 행만 편집 시 전체 행이 함께 옴) 기존 발주가 지워지지 않게 함.
+ */
+const mergeBottomRowIntoBookBase = (prevBook, row) => {
+  if (
+    prevBook != null &&
+    hasOrderQty(prevBook) &&
+    !bottomRowAssertsPositiveOrderQty(row)
+  ) {
+    return { ...prevBook };
+  }
+  const patch = { ...stripBottomGridCheckFieldsForBookMerge(row) };
+  return assignDefined(prevBook, patch);
 };
 
 /** 상단 발주내역 그리드에 줄 행 — book 에 남은 하단 체크 필드 제거 */
@@ -1471,8 +1546,13 @@ const loadPopupStockListForMaterialPane = async (favoriteType) => {
       mode,
       ""
     );
-    updatedrowdata3.value = res.data.List;
-    rowData3.value = res.data.List;
+    const prevRows = rowData3.value || [];
+    const freshList = res?.data?.List ?? [];
+    const merged = mergeFavoriteReloadWithExistingBottomRows(freshList, prevRows);
+    updatedrowdata3.value = merged;
+    rowData3.value = merged;
+    await nextTick();
+    updatedRowData3(merged);
   } catch (error) {}
 };
 
@@ -1654,10 +1734,7 @@ const updatedRowData3 = (e) => {
     if (!sid) continue;
 
     const prevBook = book[sid];
-    const merged = assignDefined(
-      prevBook,
-      stripBottomGridCheckFieldsForBookMerge(row)
-    );
+    const merged = mergeBottomRowIntoBookBase(prevBook, row);
 
     if (!hasOrderQty(merged)) {
       const hadBookOrder = prevBook != null && hasOrderQty(prevBook);
@@ -2333,6 +2410,151 @@ const closeOpenpopup = () => {
 </script>
 
 <style scoped>
+/* 2열×2행 — 조회기간·매장 / 파트·거래처 (search-area-layout) */
+.pur035-search-grid {
+  --pur035-label-col: 5.5rem;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--pur035-item-gap);
+  row-gap: var(--pur035-item-gap);
+}
+
+.pur035-cell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--pur035-item-gap);
+}
+
+.pur035-sg-label {
+  flex: 0 0 var(--pur035-label-col);
+  width: var(--pur035-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+}
+
+.pur035-cell-field {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* 조회기간만 넓게, 매장·파트·거래처는 동일 max */
+.pur035-cell-field.pur035-date-slot {
+  max-width: min(100%, 26rem);
+}
+
+.pur035-cell-field.pur035-combo-cap {
+  max-width: min(100%, var(--pur035-combo-max));
+}
+
+.pur035-cell-field > * {
+  min-width: 0;
+  width: 100%;
+}
+
+.pur035-search-panel .pur035-search-grid select.pur035-sg-select {
+  box-sizing: border-box;
+  border: 1px solid var(--pur035-control-border) !important;
+}
+
+.pur035-search-panel .pur035-search-grid select.pur035-sg-select:focus {
+  border-color: #3b82f6 !important;
+}
+
+.pur035-search-panel .pur035-pick-slot :deep(select) {
+  border: 1px solid var(--pur035-control-border) !important;
+}
+
+.pur035-search-panel .pur035-pick-slot :deep(select:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.pur035-search-panel .pur035-pick-slot :deep(.pickstore-vs-shell),
+.pur035-search-panel .pur035-bc-slot :deep(.pickstore-vs-shell) {
+  border: 1px solid var(--pur035-control-border) !important;
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Datepicker_Order(compactRow) — 조회줄 날짜 테두리·가로만 다소 축소 */
+.pur035-search-panel .pur035-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  flex: 1 1 7.5rem;
+  min-width: 7.25rem;
+  width: 100%;
+  max-width: 9.5rem;
+  height: 2rem;
+  min-height: 2rem;
+  padding-left: 0.75rem;
+  padding-right: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--pur035-control-border) !important;
+}
+
+.pur035-search-panel .pur035-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.pur035-date-slot :deep(> div.flex.w-full.min-w-0.items-center) {
+  width: 100%;
+  min-width: 0;
+  gap: var(--pur035-item-gap) !important;
+}
+
+.pur035-date-slot :deep(> div.flex.w-full.min-w-0.items-center > div:first-child) {
+  display: none;
+}
+
+.pur035-date-slot
+  :deep(
+    > div.flex.w-full.min-w-0.items-center > div.flex.min-w-0.flex-1.flex-nowrap
+  ) {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.pur035-bc-slot :deep(> div.flex.text-base) {
+  width: 100%;
+  min-width: 0;
+}
+
+.pur035-pick-slot {
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.pur035-pick-slot :deep(> div.flex.text-base) {
+  width: 100%;
+  min-width: 0;
+  gap: var(--pur035-item-gap) !important;
+}
+
+.pur035-pick-slot :deep(> div.flex > div:first-child) {
+  display: none;
+}
+
+.pur035-bc-slot :deep(> div.flex.items-center) {
+  margin-top: 0;
+}
+
 /* 매핑된 매장명: vue-select disabled 기본 회색 → 검정 (CSS 변수 + 자식 상속) */
 .store-name-cell :deep(.v-select.style-chooser.vs--disabled),
 .store-name-cell :deep(.style-chooser.vs--disabled) {

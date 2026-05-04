@@ -1,5 +1,9 @@
 <template>
-  <div :id="realgridname" class="h-[100%] w-[100%] realgrid"></div>
+  <div
+    :id="realgridname"
+    class="h-[100%] w-[100%] realgrid"
+    :tabindex="props.keyDeleteRemovesCurrentRow === true ? 0 : undefined"
+    @focusin="onGridContainerFocusIn"></div>
 </template>
 
 <script setup>
@@ -774,6 +778,16 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  /** Enter 키 시 현재 행을 더블클릭과 동일하게 `dblclickedRowData`로 전달 (자재 조회 팝업 등) */
+  enterKeyEmitsDblClicked: {
+    type: Boolean,
+    default: false,
+  },
+  /** Delete 키로 현재 행 삭제 후 `updatedRowData` emit (`enterKeyEmitsDblClicked`와 동시 사용 시 Enter 전용 그리드에만 각각 설정) */
+  keyDeleteRemovesCurrentRow: {
+    type: Boolean,
+    default: false,
+  },
   deleteCreated: {
     // 추가된 행 삭제 방법 여부
     type: Boolean,
@@ -1203,6 +1217,16 @@ const props = defineProps({
   },
 });
 
+/** 탭으로 그리드 루트에 들어올 때 RealGrid 캔버스로 포커스 (Delete 행삭제) */
+const onGridContainerFocusIn = () => {
+  if (props.keyDeleteRemovesCurrentRow !== true) return;
+  try {
+    gridView?.setFocus?.();
+  } catch {
+    void 0;
+  }
+};
+
 // 2구간
 const realgridname = ref(); // 동적 ID 설정
 const tabInitSetArray = ref([]);
@@ -1240,7 +1264,7 @@ const emit = defineEmits([
   "checkedRowData2",
 ]);
 // 3구간
-const funcshowGrid = async () => {
+const runFuncshowGrid = async () => {
   if (tabInitSetArray.value.length == 0) {
     return;
   }
@@ -1359,9 +1383,26 @@ const funcshowGrid = async () => {
         }
       : props.CalculateTaxColId2.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
-          let unitp = values[fieldNames.indexOf("curUnitPrice")];
-          let qty = values[fieldNames.indexOf("dblOrderQty")];
-
+          const unitp = Number(values[fieldNames.indexOf("curUnitPrice")] || 0);
+          const primaryRaw =
+            typeof props.inputOnlyNumberColumn === "string" &&
+            String(props.inputOnlyNumberColumn).trim() !== ""
+              ? String(props.inputOnlyNumberColumn).split(",")[0].trim()
+              : "";
+          let qty = 0;
+          const primaryIdx =
+            primaryRaw !== "" ? fieldNames.indexOf(primaryRaw) : -1;
+          if (primaryIdx >= 0) {
+            qty = Number(values[primaryIdx] || 0);
+          } else {
+            const iOrder = fieldNames.indexOf("dblOrderQty");
+            const iCheck = fieldNames.indexOf("dblCheckQty");
+            if (iOrder >= 0) {
+              qty = Number(values[iOrder] || 0);
+            } else if (iCheck >= 0) {
+              qty = Number(values[iCheck] || 0);
+            }
+          }
           return Math.floor(unitp * qty);
         }
       : props.CalculateTaxColId.includes(item.strColID)
@@ -2465,7 +2506,9 @@ const funcshowGrid = async () => {
             props.setRowStyleCallsDefaultCol2
           );
 
-          if (Value == "소계" || Value2 == "소계" || Value2 == "매장 계") {
+          if (Value == "일소계" || Value2 == "일소계") {
+            return "rowDailySubtotal";
+          } else if (Value == "소계" || Value2 == "소계" || Value2 == "매장 계") {
             return "blue";
           } else if (Value == "합계" || Value2 == "합계") {
             return "pink";
@@ -3506,16 +3549,123 @@ const funcshowGrid = async () => {
 
     const current = clickData.dataRow;
 
-    selectedRowData.value = dataProvider.getJsonRow(current);
+    // 단일 클릭(onCellClicked)과 동일: 일반 그리드는 getRows() 배열, 트리만 getJsonRow
+    if (props.setTreeView == false) {
+      selectedRowData.value = dataProvider.getRows()[current];
+    } else {
+      selectedRowData.value = dataProvider.getJsonRow(current);
+    }
 
     if (selectedRowData.value) {
       selectedRowData.value.index = clickData.itemIndex;
       emit("dblclickedRowData", selectedRowData.value);
     }
   };
-  
+
+  if (props.enterKeyEmitsDblClicked === true) {
+    gridView.onKeyDown = function (grid, event) {
+      if (event.key !== "Enter" && event.keyCode !== 13) {
+        return true;
+      }
+      if (!gridView || !dataProvider) {
+        return true;
+      }
+      const cur = gridView.getCurrent();
+      if (
+        !cur ||
+        cur.dataRow === undefined ||
+        cur.dataRow === null ||
+        cur.dataRow < 0
+      ) {
+        return true;
+      }
+      const dr = cur.dataRow;
+      let row;
+      if (props.setTreeView == false) {
+        row = dataProvider.getRows()[dr];
+      } else {
+        row = dataProvider.getJsonRow(dr);
+      }
+      if (row) {
+        row.index = cur.itemIndex;
+        emit("dblclickedRowData", row);
+      }
+      if (event.preventDefault) {
+        event.preventDefault();
+      }
+      return false;
+    };
+  }
+
+  if (
+    props.keyDeleteRemovesCurrentRow === true &&
+    props.enterKeyEmitsDblClicked !== true
+  ) {
+    gridView.onKeyDown = function (grid, event) {
+      if (event.key !== "Delete" && event.keyCode !== 46) {
+        return true;
+      }
+      if (!gridView || !dataProvider) {
+        return true;
+      }
+      const cur = gridView.getCurrent();
+      if (!cur) {
+        return true;
+      }
+      let dr = cur.dataRow;
+      if (
+        dr === undefined ||
+        dr === null ||
+        dr < 0 ||
+        (typeof dr === "number" && Number.isNaN(dr))
+      ) {
+        if (cur.itemIndex != null && cur.itemIndex >= 0) {
+          try {
+            dr = gridView.getDataRow(cur.itemIndex);
+          } catch (_) {
+            dr = -1;
+          }
+        } else {
+          dr = -1;
+        }
+      }
+      if (dr < 0) {
+        return true;
+      }
+      try {
+        gridView.commit(true);
+      } catch (_) {}
+      try {
+        dataProvider.removeRow(dr);
+      } catch (_) {
+        return true;
+      }
+      updatedrowData.value = [...dataProvider.getJsonRows()];
+      emit("updatedRowData", updatedrowData.value);
+      if (event.preventDefault) {
+        event.preventDefault();
+      }
+      return false;
+    };
+  }
+
   // 그리드 초기화 완료 플래그 설정
   isGridInitialized.value = true;
+};
+
+/**
+ * onMounted·rowData watch 등에서 funcshowGrid 가 동시에 호출되면
+ * 동일 ContainerDiv 에 GridView 가 중복 생성되어 런타임 오류가 난다.
+ * 호출을 직렬화해 한 번에 하나의 초기화만 수행한다.
+ */
+let _funcshowGridSerial = Promise.resolve();
+const funcshowGrid = () => {
+  _funcshowGridSerial = _funcshowGridSerial
+    .then(() => runFuncshowGrid())
+    .catch((err) => {
+      console.warn("[Realgrid] funcshowGrid", err);
+    });
+  return _funcshowGridSerial;
 };
 
 const refreshSuppressEditState = () => {
@@ -4429,14 +4579,30 @@ watch(
   () => {
     //comsole.log(props.moveFocusbyIndex);
     ////comsole.log(gridView.setCurrent({ dataRow: Number(props.moveFocusbyIndex) }))
-    if (props.moveFocusbyIndex != -1) {
-      gridView.setCurrent({ dataRow: props.moveFocusbyIndex });
+    if (
+      props.moveFocusbyIndex == null ||
+      props.moveFocusbyIndex === "" ||
+      props.moveFocusbyIndex == -1 ||
+      props.moveFocusbyIndex === "-1"
+    ) {
+      return;
+    }
+    if (!gridView || !dataProvider) {
+      return;
+    }
+    const idx = Number(props.moveFocusbyIndex);
+    if (Number.isNaN(idx) || idx < 0) {
+      return;
+    }
+    gridView.setCurrent({ dataRow: idx });
 
-      selectedRowData.value = dataProvider.getRows()[props.moveFocusbyIndex];
-      if (selectedRowData.value) {
-        emit("selectedIndex", props.moveFocusbyIndex);
-        // emit('clickedRowData', selectedRowData.value);
-      }
+    selectedRowData.value = dataProvider.getRows()[idx];
+    if (selectedRowData.value) {
+      emit("selectedIndex", idx);
+      try {
+        gridView.setFocus();
+      } catch (_) {}
+      // emit('clickedRowData', selectedRowData.value);
     }
   }
 );
@@ -4987,6 +5153,12 @@ watch(
 
 .green {
   background: greenyellow;
+  text-align: right;
+}
+
+/* 일소계 행 — 소계(청)·합계(분홍)과 다른 계열(연민트) */
+.rowDailySubtotal {
+  background: rgb(178, 229, 210);
   text-align: right;
 }
 

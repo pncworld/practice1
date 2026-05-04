@@ -5,9 +5,9 @@
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <!-- 조회조건 — PUR02_035RPT(매입현황) 와이어와 동일 패턴 -->
+  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
@@ -19,145 +19,173 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-3 grid-rows-3 bg-gray-200 rounded-lg h-32 items-start z-10">
-      <div class="justify-start flex">
-        <Datepicker2
-          :mainName="'선택일자'"
-          @endDate="endDate"
-          ref="datepicker"
-          :initToday="1"
-          :closePopUp="closePopUp"
-          @excelDate="excelDate"
-          @startDate="startDate">
-        </Datepicker2>
-      </div>
-      <div class="flex justify-start items-center">
-        <PickStore
-          @update:storeGroup="lngStoreGroup"
-          :defaultStoreNm="'전체'"
-          class=""
-          @storeNm="excelStore"
-          @update:storeCd="lngStoreCode"></PickStore>
-      </div>
-      <div class="flex justify-start pl-16 items-center">
-        <BusinessClient
-          @SupplierId="SupplierId"
-          :defaultNm="'전체'"></BusinessClient>
-      </div>
+      class="pur235-search-panel z-10 mt-3 w-full min-h-0 shrink-0 overflow-x-auto rounded-lg bg-gray-200 px-8 py-3 md:px-12">
+      <div
+        class="pur235-wire-grid pur235-wire-grid-014 min-w-0"
+        :style="{
+          '--pur235-control-border': pur235ControlBorder,
+          '--pur235-col-gutter': pur235ColGutter,
+          '--pur235-row-gap': pur235RowGap,
+          '--pur235-label-col': pur235LabelCol,
+        }">
+        <div class="pur235-wire-cell">
+          <div class="pur235-wire-label">선택일자</div>
+          <div class="pur235-wire-field pur235-date-slot min-w-0 overflow-hidden">
+            <Datepicker2
+              ref="datepicker"
+              omit-main-label
+              filter-bar-align
+              :mainName="'선택일자'"
+              :initToday="1"
+              :closePopUp="closePopUp"
+              @excelDate="excelDate"
+              @endDate="endDate"
+              @startDate="startDate" />
+          </div>
+        </div>
+        <div class="pur235-wire-cell">
+          <div class="pur235-wire-label">매장선택</div>
+          <div class="pur235-wire-field pur235-mat-row pur235-pick-slot-full min-w-0 w-full">
+            <!-- 그룹/구분/매장 — 자재명/코드와 동일 1:1:2 그리드 + 높이는 거래처(h-8)와 맞춤 -->
+            <PickStore
+              @update:storeGroup="lngStoreGroup"
+              :default-store-nm="'전체'"
+              @storeNm="excelStore"
+              @update:storeCd="lngStoreCode" />
+          </div>
+        </div>
+        <div class="pur235-wire-cell">
+          <div class="pur235-wire-label">거래처</div>
+          <div class="pur235-wire-field pur235-bc-slot min-w-0 w-full max-w-full">
+            <BusinessClient compact-search-bar @SupplierId="SupplierId" />
+          </div>
+        </div>
 
-      <div class="flex space-x-5 ml-20 mt-3 items-center">
-        <div class="font-semibold text-base">단위</div>
-        <div>
-          <select name="" id="" class="w-64 h-7" v-model="cond">
-            <option :value="i.strDCode" v-for="i in optionList">
-              {{ i.strDName }}
-            </option>
-          </select>
+        <div class="pur235-wire-cell">
+          <div class="pur235-wire-label">단위</div>
+          <div class="pur235-wire-field min-w-0">
+            <select
+              id="pur02-014-unit"
+              v-model="cond"
+              class="pur235-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option
+                v-for="i in optionList"
+                :key="i.strDCode"
+                :value="i.strDCode">
+                {{ i.strDName }}
+              </option>
+            </select>
+          </div>
         </div>
-      </div>
-      <div class="flex space-x-5 ml-12 mt-3 items-center">
-        <div class="text-base font-semibold">자재명</div>
-        <div>
-          <select name="" id="" class="w-32 h-7" v-model="cond2">
-            <option value="0">전체</option>
-            <option value="1">분류</option>
-            <option value="2">그룹</option>
-            <option value="3">특성</option>
-            <option value="4">재고조사주기</option>
-          </select>
+        <div class="pur235-wire-cell min-w-0">
+          <div class="pur235-wire-label">자재명/코드</div>
+          <div class="pur235-wire-field pur235-mat-row min-w-0">
+            <select
+              id="pur02-014-mat-kind"
+              v-model="cond2"
+              class="pur235-sg-select pur235-mat-kind h-8 w-full min-w-0 max-w-full rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="0">전체</option>
+              <option value="1">분류</option>
+              <option value="2">그룹</option>
+              <option value="3">특성</option>
+              <option value="4">재고조사주기</option>
+            </select>
+            <select
+              id="pur02-014-mat-code"
+              v-model="cond3"
+              class="pur235-sg-select pur235-mat-code h-8 w-full min-w-0 max-w-full rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="0">전체</option>
+              <option
+                v-for="i in optionList2"
+                :key="String(i.strDCode)"
+                :value="i.strDCode">
+                {{ i.strDName }}
+              </option>
+            </select>
+            <input
+              id="pur02-014-mat-keyword"
+              v-model="cond4"
+              type="text"
+              placeholder="검색어"
+              title="자재명·코드 키워드"
+              class="pur235-sg-input pur235-mat-keyword h-8 min-h-8 min-w-0 w-full max-w-full rounded-md border border-solid bg-white px-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
         </div>
-        <div>
-          <select name="" id="" class="w-32 h-7" v-model="cond3">
-            <option value="0">전체</option>
-            <option :value="i.strDCode" v-for="i in optionList2">
-              {{ i.strDName }}
-            </option>
-          </select>
+        <div class="pur235-wire-cell">
+          <div class="pur235-wire-label">단가</div>
+          <div class="pur235-wire-field min-w-0">
+            <select
+              id="pur02-014-price"
+              v-model="cond6"
+              :disabled="disabled"
+              class="pur235-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60">
+              <option
+                v-for="i in optionList3"
+                :key="i.strDCode"
+                :value="i.strDCode">
+                {{ i.strDName }}
+              </option>
+            </select>
+          </div>
         </div>
-        <div>
-          <input type="text" class="w-52 h-7" v-model="cond4" />
-        </div>
-      </div>
-      <div class="flex space-x-5 ml-20 mt-3 items-center">
-        <div class="text-base font-semibold">단가</div>
-        <div>
-          <select
-            name=""
-            id=""
-            :disabled="disabled"
-            class="border border-black w-64 h-7"
-            v-model="cond6">
-            <option :value="i.strDCode" v-for="i in optionList3">
-              {{ i.strDName }}
-            </option>
-          </select>
-        </div>
-      </div>
 
-      <div class="flex ml-12 items-center mt-3 space-x-5">
-        <div class="text-base font-semibold">조회유형</div>
-        <div class="flex space-x-4">
-          <label for="cond51"
-            ><input
-              type="radio"
-              v-model="cond5"
-              id="cond51"
-              value="0" />자재별</label
-          >
-          <label for="cond52"
-            ><input type="radio" v-model="cond5" id="cond52" value="1" />일자별
-            자재별</label
-          >
-          <label for="cond53"
-            ><input type="radio" v-model="cond5" id="cond53" value="2" />매장별
-            자재별</label
-          >
-
-          <label for="cond54"
-            ><input
-              type="radio"
-              v-model="cond5"
-              id="cond54"
-              value="3" />거래처별 일자별</label
-          >
+        <div class="pur235-wire-span">
+          <div class="pur235-wire-span-label">조회유형</div>
+          <div class="pur235-wire-span-radios">
+            <label class="flex shrink-0 cursor-pointer items-center gap-1.5 text-sm">
+              <input id="pur02-014-type-0" v-model="cond5" type="radio" value="0" />
+              자재별
+            </label>
+            <label class="flex shrink-0 cursor-pointer items-center gap-1.5 text-sm">
+              <input id="pur02-014-type-1" v-model="cond5" type="radio" value="1" />
+              일자별 자재별
+            </label>
+            <label class="flex shrink-0 cursor-pointer items-center gap-1.5 text-sm">
+              <input id="pur02-014-type-2" v-model="cond5" type="radio" value="2" />
+              매장별 자재별
+            </label>
+            <label class="flex shrink-0 cursor-pointer items-center gap-1.5 text-sm">
+              <input id="pur02-014-type-3" v-model="cond5" type="radio" value="3" />
+              거래처별 일자별
+            </label>
+          </div>
         </div>
       </div>
     </div>
-    <!-- 조회조건 -->
-    <!-- 그리드 영역 -->
-    <div class="w-full h-[75vh]">
-      <Realgrid
-        :progname="'PUR02_014RPT_VUE'"
-        :progid="progid"
-        :rowData="rowData"
-        :reload="reload"
-        :mergeColumns2="true"
-        :mergeColumnGroupSubList2="[
-          ['lngCheckQty', 'chk_curSupply', 'chk_curTax', 'chk_curTotalCost'],
-          ['lngReturnQty', 'rtn_curSupply', 'rtn_curTax', 'rtn_curTotalCost'],
-          ['tot_Qty', 'tot_Supply', 'tot_Tax', 'tot_Cost'],
-        ]"
-        :mergeColumnGroupName2="['매입', '반품', '합계']"
-        :documentTitle="'PUR02_014RPT'"
-        @clickedRowData="clickedRowData"
-        :documentSubTitle="documentSubTitle"
-        :rowStateeditable="false"
-        :hardCodeSetRowStyleCalls="true"
-        :setRowStyleCalls="true"
-        :setRowStyleCallsDefaultCol="setRowStyleCallsDefaultCol"
-        :setRowStyleCallsDefaultCol2="setRowStyleCallsDefaultCol2"
-        :exporttoExcel="exportExcel">
-      </Realgrid>
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <div class="relative h-full min-h-0 min-w-0 flex-1">
+        <Realgrid
+          :progname="'PUR02_014RPT_VUE'"
+          :progid="progid"
+          :rowData="rowData"
+          :reload="reload"
+          :mergeColumns2="true"
+          :mergeColumnGroupSubList2="[
+            ['lngCheckQty', 'chk_curSupply', 'chk_curTax', 'chk_curTotalCost'],
+            ['lngReturnQty', 'rtn_curSupply', 'rtn_curTax', 'rtn_curTotalCost'],
+            ['tot_Qty', 'tot_Supply', 'tot_Tax', 'tot_Cost'],
+          ]"
+          :mergeColumnGroupName2="['매입', '반품', '합계']"
+          :documentTitle="'PUR02_014RPT'"
+          @clickedRowData="clickedRowData"
+          :documentSubTitle="documentSubTitle"
+          :rowStateeditable="false"
+          :hardCodeSetRowStyleCalls="true"
+          :setRowStyleCalls="true"
+          :setRowStyleCallsDefaultCol="setRowStyleCallsDefaultCol"
+          :setRowStyleCallsDefaultCol2="setRowStyleCallsDefaultCol2"
+          :exporttoExcel="exportExcel">
+        </Realgrid>
+      </div>
     </div>
   </div>
-  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
 import { getCommonList } from "@/api/common";
 import { getStockCategory, getStockGeneric, getStockGroup } from "@/api/master";
-import { getCheckReturnReportList, getReturnListByType } from "@/api/mipur";
-import BusinessClient from "@/components/businessClient.vue";
+import { getCheckReturnReportList } from "@/api/mipur";
+import BusinessClient from "@/components/businessClient2.vue";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -200,6 +228,8 @@ import { useStore } from "vuex";
  * 	화면 Load시 실행 스크립트
  */
 
+const store = useStore();
+
 const optionList3 = ref([]);
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -222,7 +252,12 @@ const cond3 = ref(0);
 const cond4 = ref("");
 const cond5 = ref(0);
 const cond6 = ref("01");
-const store = useStore();
+
+/** 조회 AREA — 좌우 여백·라벨·열간격을 줄여 필드(특히 선택일자)를 넓게 */
+const pur235ControlBorder = "#cbd5e1";
+const pur235ColGutter = "1.125rem";
+const pur235RowGap = "0.875rem";
+const pur235LabelCol = "6.25rem";
 
 const datepicker = ref(null);
 const closePopUp = ref(false);
@@ -319,7 +354,8 @@ const lngStoreGroup = (e) => {
 
 const supplierid = ref("");
 const SupplierId = (e) => {
-  supplierid.value = e;
+  supplierid.value =
+    e === "" || e === null || e === undefined ? "0" : String(e);
 };
 /**
  *  조회 함수
@@ -333,8 +369,8 @@ const searchButton = async () => {
     const res = await getCheckReturnReportList(
       groupCd.value,
       storeCode.value,
-      sDate.value.replaceAll("-", ""),
-      eDate.value.replaceAll("-", ""),
+      String(sDate.value ?? "").replaceAll("-", ""),
+      String(eDate.value ?? "").replaceAll("-", ""),
       supplierid.value,
       cond2.value,
       cond3.value,
@@ -434,3 +470,270 @@ watch(cond5, () => {
   }
 });
 </script>
+
+<style scoped>
+/* PUR02_035RPT(매입현황)와 동일 와이어 */
+.pur235-wire-grid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--pur235-col-gutter);
+  row-gap: var(--pur235-row-gap);
+}
+
+/* 1행: 선택일자 열을 조금 더 넓게 */
+.pur235-wire-grid-014 {
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1.18fr) minmax(0, 0.95fr);
+}
+
+.pur235-wire-cell {
+  display: flex;
+  min-width: 0;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pur235-wire-label {
+  flex: 0 0 var(--pur235-label-col);
+  width: var(--pur235-label-col);
+  min-width: 0;
+  max-width: var(--pur235-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pur235-wire-field {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 auto;
+  align-items: center;
+}
+
+.pur235-wire-field:not(.pur235-mat-row) > * {
+  min-width: 0;
+  width: 100%;
+}
+
+.pur235-mat-row {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.pur235-wire-field.pur235-mat-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr);
+  column-gap: 0.5rem;
+  row-gap: 0.375rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.pur235-wire-field.pur235-mat-row > * {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.pur235-wire-span {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.pur235-wire-span-label {
+  flex: 0 0 var(--pur235-label-col);
+  width: var(--pur235-label-col);
+  min-width: 0;
+  max-width: var(--pur235-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pur235-wire-span-radios {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1.1rem;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.pur235-sg-select {
+  box-sizing: border-box;
+}
+
+.pur235-search-panel select.pur235-sg-select {
+  border: 1px solid var(--pur235-control-border) !important;
+}
+
+.pur235-search-panel select.pur235-sg-select:focus {
+  border-color: #3b82f6 !important;
+}
+
+.pur235-search-panel .pur235-sg-input {
+  border: 1px solid var(--pur235-control-border) !important;
+  box-sizing: border-box;
+}
+
+.pur235-search-panel .pur235-sg-input:focus {
+  border-color: #3b82f6 !important;
+}
+
+.pur235-search-panel .pur235-pick-slot-full :deep(select) {
+  border: 1px solid var(--pur235-control-border) !important;
+}
+
+.pur235-search-panel .pur235-pick-slot-full :deep(select:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.pur235-search-panel .pur235-pick-slot-full :deep(.pickstore-vs-shell),
+.pur235-search-panel .pur235-bc-slot :deep(.pickstore-vs-shell) {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--pur235-control-border) !important;
+}
+
+.pur235-search-panel .pur235-pick-slot-full :deep(div.relative.min-w-0.flex-1) {
+  max-width: 100% !important;
+}
+
+.pur235-search-panel .pur235-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.pur235-search-panel .pur235-date-slot :deep(> div.flex.justify-start.items-center) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+  gap: 0.25rem !important;
+}
+
+.pur235-search-panel .pur235-date-slot :deep(> div.flex > div.inline-flex.h-8) {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  gap: 0.125rem !important;
+}
+
+.pur235-search-panel .pur235-date-slot :deep(input[type="date"]) {
+  border: 1px solid var(--pur235-control-border) !important;
+  box-sizing: border-box;
+  width: auto !important;
+  flex: 1 1 0;
+  min-width: 6.5rem;
+  max-width: none;
+  padding-left: 0.45rem;
+  padding-right: 0.25rem;
+}
+
+.pur235-search-panel .pur235-date-slot :deep(div.inline-flex.h-8 > span) {
+  flex-shrink: 0;
+  padding-left: 0.05rem;
+  padding-right: 0.05rem;
+}
+
+.pur235-search-panel .pur235-date-slot :deep(div.inline-flex.h-8 > button) {
+  flex-shrink: 0;
+  width: 1.65rem !important;
+  height: 1.65rem !important;
+  min-width: 1.65rem;
+  margin-left: 0 !important;
+}
+
+.pur235-search-panel .pur235-date-slot :deep(div.inline-flex.h-8 > button img) {
+  max-width: 85%;
+  max-height: 85%;
+}
+
+/* 매장선택: 자재명/코드와 동일 3열(1fr 1fr 2fr) — PickStore 루트를 contents로 펼침 */
+.pur235-pick-slot-full :deep(> div.flex.text-base) {
+  display: contents;
+  margin: 0;
+}
+
+/* 와이어 '매장선택' 라벨이 있으므로 PickStore 내부 타이틀(매장명) 숨김 */
+.pur235-pick-slot-full :deep(> div.flex.text-base > div:first-child) {
+  display: none !important;
+}
+
+/* 그룹·구분 select — 자재/거래처 줄과 동일 h-8·text-sm */
+.pur235-pick-slot-full :deep(> div.flex.text-base > div:nth-child(2) select),
+.pur235-pick-slot-full :deep(> div.flex.text-base > div:nth-child(3) select) {
+  margin-left: 0 !important;
+  height: 2rem !important;
+  min-height: 2rem !important;
+  max-height: 2rem !important;
+  padding: 0 0.5rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem;
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: 100%;
+}
+
+/* 매장 v-select 래퍼 — 거래처 pickstore-vs-shell과 동일 높이·모서리 */
+.pur235-pick-slot-full :deep(> div.flex.text-base > div:nth-child(4)) {
+  margin-left: 0 !important;
+  width: 100% !important;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.pur235-pick-slot-full :deep(> div.flex.text-base > div:nth-child(4) > div:first-child) {
+  height: 2rem !important;
+  min-height: 2rem !important;
+  max-height: 2rem !important;
+  width: 100% !important;
+  max-width: 100%;
+  border-radius: 0.375rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem;
+  box-sizing: border-box;
+  border: 1px solid var(--pur235-control-border) !important;
+}
+
+.pur235-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.pur235-bc-slot :deep(> div.flex) {
+  justify-content: flex-start;
+  width: 100%;
+  margin-left: 0;
+  padding-left: 0;
+}
+</style>
