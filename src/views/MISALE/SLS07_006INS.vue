@@ -105,6 +105,7 @@ import PageName from "@/components/pageName.vue";
 import PickStoreRenew from "@/components/pickStoreRenew.vue";
 import Realgrid from "@/components/realgrid.vue";
 import {
+  formatLocalDate,
   formatLocalDate2,
   formatLocalDate3,
   formatNumberWithCommas,
@@ -127,19 +128,14 @@ const initcompday = ref(1);
 const reload = ref(false);
 const dateValue1 = (e) => {
   reportDay.value = e;
+  const cur = parseReportDay(e);
 
   initcompday2.value = -(
-    getDaysBetween(
-      getLastYearBeforeSameWeekday(new Date(reportDay.value)),
-      new Date(reportDay.value)
-    ) - 1
+    getDaysBetween(getPreDate(cur, 2), cur) - 1
   );
 
   initcompday.value = -(
-    getDaysBetween(
-      getLastYearSameWeekday(new Date(reportDay.value)),
-      new Date(reportDay.value)
-    ) - 1
+    getDaysBetween(getPreDate(cur, 1), cur) - 1
   );
   reloadDate.value = e;
   reload.value = !reload.value;
@@ -168,8 +164,10 @@ const searchButton = async () => {
     initGrid();
 
     const reportday_1 = reportDay.value.substring(0, 8) + "01";
-    const compday_1 = compday.value.substring(0, 8) + "02"; // 2
-    const compday2_1 = compday2.value.substring(0, 8) + "04"; // 4
+    // 레거지: fromDate_LastYear / fromDate_YearBefore = getPreDate(금년 월초, 1|2)
+    const fromDateCurYear = parseReportDay(reportday_1);
+    const compday_1 = formatLocalDate(getPreDate(fromDateCurYear, 1));
+    const compday2_1 = formatLocalDate(getPreDate(fromDateCurYear, 2));
 
     const res = await getDaySalesReport2(
       groupCd.value,
@@ -344,7 +342,7 @@ const searchButton = async () => {
       "- 전화 : " + formatNumberWithCommas(takeoutCustCnt) + "명(" + takeoutCustPercent + "%)" +
       "\n" +
       "\n" +
-      "<상품권 내역>" +
+      "<시식권 내역>" +
       "\n" +
       "\n" +
       "\n" +
@@ -543,29 +541,44 @@ function getDaysBetween(date1, date2) {
   return Math.round(diffTime / msPerDay); // 일 수 차이
 }
 
-function getLastYearSameWeekday(date = new Date()) {
-  const currentDayOfWeek = date.getDay(); // 0 (일) ~ 6 (토)
-  const lastYearDate = new Date(date);
-  lastYearDate.setFullYear(date.getFullYear() - 1);
-
-  const lastYearDayOfWeek = lastYearDate.getDay();
-  const diff = currentDayOfWeek - lastYearDayOfWeek;
-  lastYearDate.setDate(lastYearDate.getDate() + diff);
-
-  return lastYearDate;
+/** YYYY-MM-DD → 로컬 달력 기준 Date (레거시 addMonth/getDay와 정합) */
+function parseReportDay(ymd) {
+  if (!ymd || ymd.length < 10) return new Date(ymd);
+  const y = Number(ymd.slice(0, 4));
+  const m = Number(ymd.slice(5, 7)) - 1;
+  const d = Number(ymd.slice(8, 10));
+  return new Date(y, m, d);
 }
 
-function getLastYearBeforeSameWeekday(date = new Date()) {
-  const targetWeekday = date.getDay(); // 오늘 요일
-  const startDate = new Date(date);
-  startDate.setFullYear(date.getFullYear() - 2); // 정확히 2년 전 날짜
+function addMonths(date, deltaMonths) {
+  const d = new Date(date.getTime());
+  d.setMonth(d.getMonth() + deltaMonths);
+  return d;
+}
 
-  // 같은 요일을 만날 때까지 하루씩 앞으로 이동
-  while (startDate.getDay() !== targetWeekday) {
-    startDate.setDate(startDate.getDate() + 1); // 하루 전으로 이동
+function addDays(date, deltaDays) {
+  const d = new Date(date.getTime());
+  d.setDate(d.getDate() + deltaDays);
+  return d;
+}
+
+/**
+ * 레거시 getPreDate: addMonth(-preYear*12) 후 요일은 항상 앞으로만 맞춤.
+ * preYear 1 = 전년, 2 = 전전년
+ */
+function getPreDate(curDate, preYear) {
+  const monthNum = preYear * 12;
+  const curDayCode = curDate.getDay();
+  const preDate = addMonths(curDate, -monthNum);
+  const preDayCode = preDate.getDay();
+
+  if (curDayCode === preDayCode) {
+    return preDate;
   }
-
-  return startDate;
+  if (curDayCode > preDayCode) {
+    return addDays(preDate, curDayCode - preDayCode);
+  }
+  return addDays(preDate, 7 - preDayCode + curDayCode);
 }
 </script>
 
