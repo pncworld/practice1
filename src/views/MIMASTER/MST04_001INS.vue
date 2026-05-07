@@ -179,7 +179,11 @@
       class="border-2 border-gray-700 bg-white shadow-2xl flex h-fit max-h-[calc(100vh-4.5rem)] w-full max-w-5xl flex-col rounded-lg">
       <div
         class="flex shrink-0 flex-wrap items-center justify-end gap-3 border-b border-gray-400 bg-gray-50 px-3 py-1.5 rounded-t-lg">
-        <button type="button" :class="popupToolbarBtnClass" @click="cleanButton">
+        <button
+          v-if="saveNew"
+          type="button"
+          :class="popupToolbarBtnClass"
+          @click="cleanButton">
           신규
         </button>
         <button type="button" :class="popupToolbarBtnClass" @click="saveButton">
@@ -1564,21 +1568,12 @@ const saveButton = async () => {
     return;
   }
 
-  /* 부가세 포함 미체크: 공급가 매입·판매단가 필수 / 포함 체크: VAT포함 금액 필수 */
+  /* 부가세 포함 여부에 따라 매입은 필수, 판매단가는 공란이면 0으로 저장 */
   if (scond21.value == false) {
     if (scond22.value === "" || scond22.value == undefined) {
       Swal.fire({
         title: "경고",
         text: "매입단가를 입력해주세요.",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
-      return;
-    }
-    if (scond23.value === "" || scond23.value == undefined) {
-      Swal.fire({
-        title: "경고",
-        text: "판매단가를 입력해주세요.",
         icon: "warning",
         confirmButtonText: "확인",
       });
@@ -1594,15 +1589,6 @@ const saveButton = async () => {
       });
       return;
     }
-    if (scond25.value === "" || scond25.value == undefined) {
-      Swal.fire({
-        title: "경고",
-        text: "판매단가(VAT포함)를 입력해주세요.",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
-      return;
-    }
   }
 
   try {
@@ -1611,10 +1597,16 @@ const saveButton = async () => {
 
     if (scond21.value == false) {
       tcond = scond22.value;
-      tcond2 = scond23.value;
+      tcond2 =
+        scond23.value === "" || scond23.value == undefined
+          ? "0"
+          : String(scond23.value);
     } else {
       tcond = scond24.value;
-      tcond2 = scond25.value;
+      tcond2 =
+        scond25.value === "" || scond25.value == undefined
+          ? "0"
+          : String(scond25.value);
     }
     store.state.loading = true;
     /**
@@ -2138,15 +2130,38 @@ const clickedRowData6 = (e) => {
  * 조회 그리드 더블클릭 — 그리드 getJsonRow 는 병합/표시 컬럼만 있어 ID·환산율이 빠진 경우가 많음.
  * 자재코드로 getMaterialDetail 로 완전 바인딩 + 콤보는 option :value(숫자)와 타입 일치(numId).
  */
-const dblclickedRowData = async (row) => {
-  if (!row || typeof row !== "object") return;
+/** 더블클릭 행에서 자재 PK 추출 (그리드/DB 컬럼명 편차 대응) */
+const STOCK_ID_KEYS = [
+  "lngStockID",
+  "LNG_STOCK_ID",
+  "lngstockid",
+  "lngStockId",
+];
 
-  const stockId = rowPickStr(row, [
-    "lngStockID",
-    "LNG_STOCK_ID",
-    "lngstockid",
-  ]);
-  if (!stockId) return;
+const dblclickedRowData = async (row) => {
+  if (!row || typeof row !== "object" || Array.isArray(row)) return;
+
+  let stockId = rowPickStr(row, STOCK_ID_KEYS);
+  if (
+    !stockId &&
+    typeof row.dataRow === "number" &&
+    row.dataRow >= 0 &&
+    rowData.value?.[row.dataRow]
+  ) {
+    stockId = rowPickStr(rowData.value[row.dataRow], STOCK_ID_KEYS);
+  }
+  if (!stockId && typeof row.index === "number" && rowData.value?.[row.index]) {
+    stockId = rowPickStr(rowData.value[row.index], STOCK_ID_KEYS);
+  }
+  if (!stockId) {
+    Swal.fire({
+      title: "알림",
+      text: "자재 식별 정보를 찾을 수 없습니다. 조회 후 다시 더블클릭해 주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
 
   deleteLngCode2.value = stockId;
   const gridRow =
@@ -2162,7 +2177,15 @@ const dblclickedRowData = async (row) => {
       0
     );
     const d = res.data.List?.[0];
-    if (!d) return;
+    if (!d) {
+      Swal.fire({
+        title: "알림",
+        text: "자재 상세 정보를 불러오지 못했습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
 
     scond.value = String(d.lngStockID ?? "");
     scond2.value = String(d.strStockName ?? "");
@@ -2288,7 +2311,12 @@ const dblclickedRowData = async (row) => {
     addRow.value = true;
     saveNew.value = false;
   } catch (error) {
-    /* ignore */
+    Swal.fire({
+      title: "오류",
+      text: "자재 상세 조회 중 오류가 발생했습니다.",
+      icon: "error",
+      confirmButtonText: "확인",
+    });
   } finally {
     store.state.loading = false;
   }

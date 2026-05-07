@@ -3551,13 +3551,40 @@ const runFuncshowGrid = async () => {
 
     // 단일 클릭(onCellClicked)과 동일: 일반 그리드는 getRows() 배열, 트리만 getJsonRow
     if (props.setTreeView == false) {
-      selectedRowData.value = dataProvider.getRows()[current];
+      let fromProvider = dataProvider.getRows()[current];
+      const fromParent =
+        Array.isArray(props.rowData) &&
+        current >= 0 &&
+        current < props.rowData.length
+          ? props.rowData[current]
+          : null;
+      /** 병합 컬럼 등으로 provider 행에 PK·코드가 빠진 경우 부모 rowData로 보완 */
+      if (fromParent && typeof fromParent === "object") {
+        const merged = { ...(fromProvider || {}) };
+        for (const k of Object.keys(fromParent)) {
+          const pv = fromParent[k];
+          const mv = merged[k];
+          if (
+            (mv === undefined || mv === null || mv === "") &&
+            pv !== undefined &&
+            pv !== null &&
+            pv !== ""
+          ) {
+            merged[k] = pv;
+          }
+        }
+        selectedRowData.value =
+          Object.keys(merged).length > 0 ? merged : fromParent;
+      } else {
+        selectedRowData.value = fromProvider;
+      }
     } else {
       selectedRowData.value = dataProvider.getJsonRow(current);
     }
 
     if (selectedRowData.value) {
       selectedRowData.value.index = clickData.itemIndex;
+      selectedRowData.value.dataRow = current;
       emit("dblclickedRowData", selectedRowData.value);
     }
   };
@@ -3582,12 +3609,38 @@ const runFuncshowGrid = async () => {
       const dr = cur.dataRow;
       let row;
       if (props.setTreeView == false) {
-        row = dataProvider.getRows()[dr];
+        let fromProvider = dataProvider.getRows()[dr];
+        const fromParent =
+          Array.isArray(props.rowData) &&
+          dr >= 0 &&
+          dr < props.rowData.length
+            ? props.rowData[dr]
+            : null;
+        if (fromParent && typeof fromParent === "object") {
+          const merged = { ...(fromProvider || {}) };
+          for (const k of Object.keys(fromParent)) {
+            const pv = fromParent[k];
+            const mv = merged[k];
+            if (
+              (mv === undefined || mv === null || mv === "") &&
+              pv !== undefined &&
+              pv !== null &&
+              pv !== ""
+            ) {
+              merged[k] = pv;
+            }
+          }
+          row =
+            Object.keys(merged).length > 0 ? merged : fromParent;
+        } else {
+          row = fromProvider;
+        }
       } else {
         row = dataProvider.getJsonRow(dr);
       }
       if (row) {
         row.index = cur.itemIndex;
+        row.dataRow = dr;
         emit("dblclickedRowData", row);
       }
       if (event.preventDefault) {
