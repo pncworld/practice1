@@ -1228,8 +1228,36 @@ const filteredrowData = ref([]);
 /** 조회 API가 lng·dbl 접두만 줄 때도 그리드 컬럼(str…Figure)에 맞춰 채움 — 환산율 노출·getJsonRow 매핑용 */
 const enrichStockGridRow = (r) => {
   if (!r || typeof r !== "object") return r;
+  /** 목록 API·직렬화별 단가 컬럼명을 그리드 표준 필드로 통일 (더블클릭 시 팝업 바인딩용) */
+  const curUnitPriceNorm =
+    r.curUnitPrice ??
+    r.CurUnitPrice ??
+    r.curSupplyPrice ??
+    r.lngUnitPrice ??
+    r.dblUnitPrice ??
+    r.strUnitPrice;
+  const curSalesNorm =
+    r.curSalesUnitPrice ??
+    r.CurSalesUnitPrice ??
+    r.curSalesPrice ??
+    r.CurSalesPrice ??
+    r.lngSalesUnitPrice ??
+    r.dblSalesUnitPrice ??
+    r.strSalesUnitPrice ??
+    r.lngSalesPrice ??
+    r.dblSalesPrice;
   return {
     ...r,
+    ...(curUnitPriceNorm !== undefined &&
+    curUnitPriceNorm !== null &&
+    curUnitPriceNorm !== ""
+      ? { curUnitPrice: curUnitPriceNorm }
+      : {}),
+    ...(curSalesNorm !== undefined &&
+    curSalesNorm !== null &&
+    curSalesNorm !== ""
+      ? { curSalesUnitPrice: curSalesNorm }
+      : {}),
     strOrderNCheckUOMFigure:
       r.strOrderNCheckUOMFigure ??
       r.lngOrderNCheckUOMFigure ??
@@ -2092,11 +2120,101 @@ const figureDetailOrGrid = (d, gridRow, detailKeys, gridKeys) => {
   return rowPickStr(gridRow || {}, gridKeys);
 };
 
+/** 상세/그리드에서 단가 후보 필드 중 첫 값 (숫자 0·문자 '0' 포함) */
+const pickMaterialPrice = (detail, gridRow, keys) => {
+  for (const obj of [detail, gridRow]) {
+    if (!obj || typeof obj !== "object" || Array.isArray(obj)) continue;
+    for (const k of keys) {
+      const v = obj[k];
+      if (v !== undefined && v !== null && v !== "") return v;
+    }
+  }
+  return undefined;
+};
+
+const PRICE_KEYS_UNIT = [
+  "curUnitPrice",
+  "curSupplyPrice",
+  "lngUnitPrice",
+  "dblUnitPrice",
+];
+const PRICE_KEYS_SALES = [
+  "curSalesUnitPrice",
+  "curSalesPrice",
+  "lngSalesUnitPrice",
+  "dblSalesUnitPrice",
+  "strSalesUnitPrice",
+  "curSalePrice",
+  "CurSalesUnitPrice",
+  "CurSalesPrice",
+  "lngSalesPrice",
+  "dblSalesPrice",
+];
+const PRICE_KEYS_UNIT_VAT = [
+  "curUnitPriceVat",
+  "curUnitPriceVAT",
+  "lngUnitPriceVat",
+  "dblUnitPriceVat",
+];
+const PRICE_KEYS_SALES_VAT = [
+  "curSalesUnitPriceVat",
+  "curSalesUnitPriceVAT",
+  "curSalesPriceVat",
+  "lngSalesUnitPriceVat",
+  "dblSalesUnitPriceVat",
+  "CurSalesUnitPriceVat",
+  "CurSalesUnitPriceVAT",
+];
+
+/**
+ * API 컬럼명을 알 수 없을 때: 객체 키 중 판매·단가 계열만 훑어 값 확보 (VAT 별도 행은 제외)
+ */
+const pickSalesPriceLoose = (...objs) => {
+  for (const obj of objs) {
+    if (!obj || typeof obj !== "object" || Array.isArray(obj)) continue;
+    const keys = Object.keys(obj).sort();
+    for (const k of keys) {
+      const kl = k.toLowerCase();
+      if (/vat|포함|tax|include/i.test(k) || /vat|tax|include/.test(kl)) {
+        continue;
+      }
+      if (
+        !(
+          (/sale|sales|판매/i.test(k) || /sale|sales/.test(kl)) &&
+          (/price|amt|cost|money|won|unit|금액|단가/i.test(k) ||
+            /price|amt|cost|money|won|unit/.test(kl))
+        )
+      ) {
+        continue;
+      }
+      const v = obj[k];
+      if (v !== undefined && v !== null && v !== "") return v;
+    }
+  }
+  return undefined;
+};
+
+const pickSalesVatPriceLoose = (...objs) => {
+  for (const obj of objs) {
+    if (!obj || typeof obj !== "object" || Array.isArray(obj)) continue;
+    for (const k of Object.keys(obj)) {
+      const kl = k.toLowerCase();
+      if (!/(sale|sales|판매)/i.test(k) && !/sale|sales/.test(kl)) continue;
+      if (!/(vat|tax|포함)/i.test(k) && !/(vat|tax|include)/.test(kl)) continue;
+      if (!/(price|amt|금액|단가)/i.test(k) && !/(price|amt)/.test(kl))
+        continue;
+      const v = obj[k];
+      if (v !== undefined && v !== null && v !== "") return v;
+    }
+  }
+  return undefined;
+};
+
 const clickedRowData6 = (e) => {
   if (!Array.isArray(e)) return;
   deleteLngCode2.value = String(e[0] ?? "");
-  const gridRow = rowData.value?.find(
-    (r) => String(r.lngStockID) === String(e[0])
+  const gridRow = rowData.value?.find((r) =>
+    STOCK_ID_KEYS.some((k) => String(r?.[k] ?? "") === String(e[0]))
   );
   if (!gridRow) return;
   scond11.value = rowPickStr(gridRow, [
@@ -2164,8 +2282,17 @@ const dblclickedRowData = async (row) => {
   }
 
   deleteLngCode2.value = stockId;
+  const rowByIndex =
+    typeof row.dataRow === "number" &&
+    row.dataRow >= 0 &&
+    rowData.value?.[row.dataRow]
+      ? rowData.value[row.dataRow]
+      : null;
   const gridRow =
-    rowData.value?.find((r) => String(r.lngStockID) === String(stockId)) ??
+    rowData.value?.find((r) =>
+      STOCK_ID_KEYS.some((k) => String(r?.[k] ?? "") === String(stockId))
+    ) ??
+    rowByIndex ??
     row;
 
   try {
@@ -2260,8 +2387,19 @@ const dblclickedRowData = async (row) => {
 
     scond20.value = numId(d.lngSupplierID, 0);
 
-    const cup = d.curUnitPrice;
-    const csp = d.curSalesUnitPrice ?? d.curSalesPrice;
+    const cup = pickMaterialPrice(d, gridRow, PRICE_KEYS_UNIT);
+    /** 판매단가: 목록 그리드 해당 행 curSalesUnitPrice 우선 → 상세·추가 키 순 */
+    const gridSalesUnit =
+      rowPickStr(gridRow || {}, ["curSalesUnitPrice"]) ||
+      rowPickStr(rowByIndex || {}, ["curSalesUnitPrice"]) ||
+      rowPickStr(row || {}, ["curSalesUnitPrice"]);
+    let csp =
+      gridSalesUnit !== ""
+        ? gridSalesUnit
+        : pickMaterialPrice(d, gridRow, PRICE_KEYS_SALES);
+    if (csp === undefined || csp === null || csp === "") {
+      csp = pickSalesPriceLoose(d, gridRow, rowByIndex, row);
+    }
     const nCup = parseInt(String(cup ?? "").replace(/[^0-9.-]/g, ""), 10);
     const nCsp = parseInt(String(csp ?? "").replace(/[^0-9.-]/g, ""), 10);
     scond22.value =
@@ -2283,8 +2421,11 @@ const dblclickedRowData = async (row) => {
       scond21.value = false;
     }
 
-    const vatIn = d.curUnitPriceVat ?? d.curUnitPriceVAT;
-    const vatOut = d.curSalesUnitPriceVat ?? d.curSalesUnitPriceVAT;
+    const vatIn = pickMaterialPrice(d, gridRow, PRICE_KEYS_UNIT_VAT);
+    let vatOut = pickMaterialPrice(d, gridRow, PRICE_KEYS_SALES_VAT);
+    if (vatOut === undefined || vatOut === null || vatOut === "") {
+      vatOut = pickSalesVatPriceLoose(d, gridRow, rowByIndex, row);
+    }
     const nVi = parseInt(String(vatIn ?? "").replace(/[^0-9.-]/g, ""), 10);
     const nVo = parseInt(String(vatOut ?? "").replace(/[^0-9.-]/g, ""), 10);
     scond24.value =
