@@ -487,10 +487,8 @@ import {
   getStockCheckDetail,
   getStockCloseDate,
   getStockItemListWithFavorite,
-  getStockItemListWithFavorite2,
   getStockMasterListByPart,
   saveFavoriteStockItem,
-  saveFavoriteStockItem2,
   saveFavoriteStockItemBypart,
   saveOrderMasterDetailByPart,
   saveStockMasterDetailByPart,
@@ -818,11 +816,13 @@ const rowData4 = ref([]);
 const searchButton2 = async () => {
   try {
     store.state.loading = true;
-    const res = await getStockItemListWithFavorite2(
+    /** PUR03_035INS 자재추가 팝업과 동일: getStockItemListWithFavorite → PUR03_035INS.asmx */
+    const res = await getStockItemListWithFavorite(
       store.state.userData.lngStoreGroup,
       storeCd2.value,
+      scond4.value,
       3,
-      scond3.value.replaceAll("-", "")
+      ""
     );
 
     console.log(res);
@@ -849,11 +849,12 @@ const searchWord = (e) => {
 const checkedRowData2 = async (e) => {
   if (!Array.isArray(e) || e.length < 4) return;
   console.log(e);
-  const res = await saveFavoriteStockItem2(
+  const res = await saveFavoriteStockItemBypart(
     store.state.userData.lngStoreGroup,
-    storeCd.value,
+    storeCd2.value,
     e[3],
-    e[1] == true ? 0 : 1
+    e[1] == true ? 0 : 1,
+    scond4.value
   );
   console.log(res);
 };
@@ -912,7 +913,7 @@ const addButton2 = () => {
     }));
 
   rowData3.value = [...rowData3.value, ...temprow];
-  openpopup2.value = false;
+  /** PUR03_035INS와 동일: 추가 후 팝업 유지 — 연속 추가 후 사용자가 닫기로 닫음 */
   nextTick(() => {
     updatedRowData3(rowData3.value);
   });
@@ -1990,6 +1991,45 @@ const searchButton4 = async (e, opts = {}) => {
     }
   }
 };
+
+/** 자재추가 팝업 닫힌 뒤(즐겨찾기 모드) — 하단 자재목록만 재조회, 상단 기등록 수량은 preserveTopOrders로 유지.
+ *  API가 즐겨찾기만 돌려줘 자재추가로 붙인 행이 빠질 수 있으므로, 닫기 전 rowData3에만 있던 품목은 머지해 유지한다. */
+watch(openpopup2, async (isOpen, wasOpen) => {
+  if (isOpen) return;
+  if (wasOpen !== true) return;
+  if (String(scond7.value) !== "2") return;
+  if (!openpopup.value || !currentEdit.value) return;
+  if (isPopupPartAll()) return;
+
+  const prevRowData3 = Array.isArray(rowData3.value)
+    ? rowData3.value.map((r) => ({ ...r }))
+    : [];
+
+  try {
+    await searchButton4(undefined, { preserveTopOrders: true });
+  } catch (_) {
+    return;
+  }
+
+  const apiIds = new Set(
+    (rowData3.value || [])
+      .map((r) => getStockId(r))
+      .filter((id) => id !== "")
+  );
+
+  const extras = prevRowData3.filter((r) => {
+    const id = getStockId(r);
+    return id !== "" && !apiIds.has(id);
+  });
+
+  if (extras.length === 0) return;
+
+  rowData3.value = [...(rowData3.value || []), ...extras.map((r) => ({ ...r }))];
+  updatedrowdata3.value = rowData3.value.map((r) => ({ ...r }));
+
+  await nextTick();
+  updatedRowData3(rowData3.value);
+});
 
 const initGrid2 = () => {
   scond.value = "01";

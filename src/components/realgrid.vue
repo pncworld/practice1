@@ -1217,6 +1217,57 @@ const props = defineProps({
   },
 });
 
+/** 체크 조건값 — 콤마 구분이면 토큰 단위 일치, 아니면 전체 문자열과만 일치 (`'미확정'.includes('확정')` 오탐 방지) */
+const rgCheckAbleValMatches = (valSpec, cellValue) => {
+  const raw =
+    cellValue === undefined || cellValue === null
+      ? ""
+      : String(cellValue).trim();
+  const spec = String(valSpec ?? "").trim();
+  if (!spec) return false;
+  if (spec.includes(",")) {
+    const parts = spec.split(",").map((s) => s.trim()).filter(Boolean);
+    return parts.includes(raw);
+  }
+  return raw === spec;
+};
+
+/** checkAbleExpression — 체크 불가(readOnly) 셀 배경 (진한 회색) */
+const rgCheckReadonlyDisabledBg = { backgroundColor: "#9a9a9a" };
+const rgCheckReadonlyDisabledStyleName = "rg-check-readonly-disabled";
+
+/** 콤마 목록 — `cancled,Selected`.includes 로는 부분 문자열 오탐 가능 */
+const isCheckAbleExpressionColumn = (strColID) => {
+  const raw = String(props.checkAbleExpressionCol ?? "").trim();
+  if (!raw) return false;
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .includes(strColID);
+};
+
+const headerCheckBarHasCol = (strColID) => {
+  const raw = String(props.headerCheckBar ?? "").trim();
+  if (!raw) return false;
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .includes(strColID);
+};
+
+const matchesCheckedRowData2Col = (colName) => {
+  const raw = String(props.checkedRowData2Col ?? "").trim();
+  if (!raw || colName == null || colName === "") return false;
+  const norm = String(colName).trim().toLowerCase();
+  return raw
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+    .includes(norm);
+};
+
 /** 탭으로 그리드 루트에 들어올 때 RealGrid 캔버스로 포커스 (Delete 행삭제) */
 const onGridContainerFocusIn = () => {
   if (props.keyDeleteRemovesCurrentRow !== true) return;
@@ -1522,7 +1573,7 @@ const runFuncshowGrid = async () => {
       checkLocation:
         (item.strColID.includes("checkbox") ||
           item.strDisplay.includes("checkbox")) &&
-        !props.headerCheckBar.includes(item.strColID)
+        !headerCheckBarHasCol(item.strColID)
           ? "left"
           : "none",
     },
@@ -2107,13 +2158,17 @@ const runFuncshowGrid = async () => {
             var ret = {};
 
             if (item.strColID == "dblDemandQty") {
-              const val = grid
-                .getDataSource()
-                .getValue(dataCell.index.dataRow, "dtmEndDate");
+              const dr = dataCell?.index?.dataRow;
+              if (dr == null || (typeof dr === "number" && dr < 0)) {
+                return ret;
+              }
+              const ds = grid.getDataSource();
+              if (!ds) {
+                return ret;
+              }
+              const val = ds.getValue(dr, "dtmEndDate");
               const val2 = formatDateTime2(new Date());
-              const val3 = grid
-                .getDataSource()
-                .getValue(dataCell.index.dataRow, "strStatus");
+              const val3 = ds.getValue(dr, "strStatus");
 
               return {
                 editable:
@@ -2123,19 +2178,35 @@ const runFuncshowGrid = async () => {
               };
             }
           }
-        : props.checkAbleExpressionCol.includes(item.strColID)
+        : isCheckAbleExpressionColumn(item.strColID)
         ? function (grid, dataCell) {
-            if (item.strColID == "Selected") {
-              const blnChk = grid
-                .getDataSource()
-                .getValue(
-                  dataCell.index.dataRow,
-                  props.checkAbleExpressionCol2
-                );
+            const dr = dataCell?.index?.dataRow;
+            if (dr == null || (typeof dr === "number" && dr < 0)) {
+              return {};
+            }
+            const ds = grid.getDataSource();
+            if (!ds) {
+              return {};
+            }
 
-              if (props.checkAbleExpressionVal.includes(blnChk)) {
+            if (item.strColID == "Selected") {
+              const c2 = (props.checkAbleExpressionCol2 || "").trim();
+              if (!c2) {
+                return {
+                  editable: true,
+                  renderer: {
+                    type: "check",
+                    editable: true,
+                  },
+                };
+              }
+              const blnChk = ds.getValue(dr, c2);
+
+              if (rgCheckAbleValMatches(props.checkAbleExpressionVal, blnChk)) {
                 return {
                   editable: props.rowStateeditable,
+                  style: rgCheckReadonlyDisabledBg,
+                  styleName: rgCheckReadonlyDisabledStyleName,
                   renderer: {
                     type: "check",
                     editable: false,
@@ -2151,16 +2222,23 @@ const runFuncshowGrid = async () => {
                 },
               };
             } else if (item.strColID == "cancled") {
-              const blnChk = grid
-                .getDataSource()
-                .getValue(
-                  dataCell.index.dataRow,
-                  props.checkAbleExpressionCol3
-                );
+              const c3 = (props.checkAbleExpressionCol3 || "").trim();
+              if (!c3) {
+                return {
+                  editable: true,
+                  renderer: {
+                    type: "check",
+                    editable: true,
+                  },
+                };
+              }
+              const blnChk = ds.getValue(dr, c3);
 
-              if (props.checkAbleExpressionVal2.includes(blnChk)) {
+              if (rgCheckAbleValMatches(props.checkAbleExpressionVal2, blnChk)) {
                 return {
                   editable: props.rowStateeditable,
+                  style: rgCheckReadonlyDisabledBg,
+                  styleName: rgCheckReadonlyDisabledStyleName,
                   renderer: {
                     type: "check",
                     editable: false,
@@ -2176,16 +2254,23 @@ const runFuncshowGrid = async () => {
                 },
               };
             } else {
-              const blnChk = grid
-                .getDataSource()
-                .getValue(
-                  dataCell.index.dataRow,
-                  props.checkAbleExpressionCol2
-                );
+              const c2b = (props.checkAbleExpressionCol2 || "").trim();
+              if (!c2b) {
+                return {
+                  editable: props.rowStateeditable,
+                  renderer: {
+                    type: "check",
+                    editable: true,
+                  },
+                };
+              }
+              const blnChk = ds.getValue(dr, c2b);
 
               if (blnChk != props.checkAbleExpressionVal) {
                 return {
                   editable: props.rowStateeditable,
+                  style: rgCheckReadonlyDisabledBg,
+                  styleName: rgCheckReadonlyDisabledStyleName,
                   renderer: {
                     type: "check",
                     editable: false,
@@ -2992,6 +3077,31 @@ const runFuncshowGrid = async () => {
     ]
   */
 
+  /** 체크박스 편집 필드명 복구(getOrgFieldName 실패 대비) — onCellEdited에서 사용 */
+  const resolveEditedFieldName = (field) => {
+    let name = null;
+    try {
+      name = dataProvider.getOrgFieldName?.(field) ?? null;
+    } catch (_) {
+      name = null;
+    }
+    if (name != null && String(name).trim() !== "") return String(name).trim();
+    if (typeof field === "number") {
+      try {
+        const col = gridView.getColumn?.(field);
+        if (col?.name) return String(col.name).trim();
+      } catch (_) {}
+      try {
+        const names = dataProvider.getOrgFieldNames?.();
+        if (Array.isArray(names) && field >= 0 && field < names.length) {
+          return String(names[field]).trim();
+        }
+      } catch (_) {}
+    }
+    if (typeof field === "string") return String(field).trim();
+    return "";
+  };
+
   emit("allStateRows", dataProvider.getAllStateRows());
   // 데이터 추가
   // 5구간
@@ -3190,9 +3300,45 @@ const runFuncshowGrid = async () => {
   };
 
   gridView.onCellEdited = function (grid, itemIndex, row, field) {
+    const editedFieldName = resolveEditedFieldName(field);
+    let oldVal;
+    if (editedFieldName) {
+      try {
+        oldVal = dataProvider.getValue(row, editedFieldName);
+      } catch (_) {
+        oldVal = undefined;
+      }
+    }
+
     gridView.commit();
-    const colEdited = gridView.columnByField(field);
+
+    let newVal;
+    if (editedFieldName) {
+      try {
+        newVal = dataProvider.getValue(row, editedFieldName);
+      } catch (_) {
+        newVal = undefined;
+      }
+    }
+
+    const colEdited = editedFieldName
+      ? gridView.columnByField(editedFieldName)
+      : null;
     const isCheckCell = colEdited?.renderer?.type === "check";
+    const checkTruthy = (v) =>
+      v === true ||
+      v === 1 ||
+      v === "1" ||
+      String(v).toLowerCase() === "true";
+    if (
+      isCheckCell &&
+      editedFieldName &&
+      oldVal !== undefined &&
+      newVal !== undefined &&
+      oldVal === newVal
+    ) {
+      newVal = checkTruthy(oldVal) ? false : true;
+    }
 
     if (props.checkRowAuto2 == true && isCheckCell) {
       const val = grid.getDataSource().getValue(row, props.checkRowAuto2Col); // 셀 클릭시 checkautoRow  = false 하고 셀 클릭과 내장 체크바가 연동안되게하면서 이 방식으로 체크박스가 체크되었을때만체크되게 설정
@@ -3225,17 +3371,42 @@ const runFuncshowGrid = async () => {
     emit("updatedRowData", updatedrowData.value);
     emit("allStateRows", dataProvider.getAllStateRows());
 
-    const orgFieldName = dataProvider.getOrgFieldName(field);
-    const colForChecked2 =
-      orgFieldName != null ? gridView.columnByField(orgFieldName) : null;
+    const orgFieldName = editedFieldName;
     if (
-      props.checkedRowData2Col != "" &&
-      colForChecked2?.name == props.checkedRowData2Col
+      props.checkedRowData2Col &&
+      String(props.checkedRowData2Col).trim() !== "" &&
+      orgFieldName &&
+      matchesCheckedRowData2Col(orgFieldName)
     ) {
-      const checkedPayload = props.emitCheckedRowData2AsJson
-        ? dataProvider.getJsonRow(row)
-        : dataProvider.getRows()[row];
-      emit("checkedRowData2", checkedPayload);
+      let checkedPayload;
+      if (props.emitCheckedRowData2AsJson) {
+        const base = dataProvider.getJsonRow(row) || {};
+        const v =
+          orgFieldName != null && orgFieldName !== ""
+            ? dataProvider.getValue(row, orgFieldName)
+            : undefined;
+        let strC;
+        try {
+          strC = dataProvider.getValue(row, "strConfirm");
+        } catch (_) {
+          strC = undefined;
+        }
+        if (strC === undefined) {
+          try {
+            strC = dataProvider.getValue(row, "StrConfirm");
+          } catch (_) {
+            strC = undefined;
+          }
+        }
+        checkedPayload = {
+          ...base,
+          ...(v !== undefined ? { [orgFieldName]: v } : {}),
+          ...(strC !== undefined && strC !== null ? { strConfirm: strC } : {}),
+        };
+      } else {
+        checkedPayload = dataProvider.getRows()[row];
+      }
+      emit("checkedRowData2", checkedPayload, orgFieldName, row, oldVal, newVal);
     }
   };
 
@@ -3479,24 +3650,27 @@ const runFuncshowGrid = async () => {
             gridView.checkRow(index, chk);
           }
         }
-      } else {
+      } else if ((props.checkAbleExpressionCol2 || "").trim() !== "") {
         for (var i = 0; i < rowCount; i++) {
           const getblnCheck = dataProvider.getValue(
             i,
             props.checkAbleExpressionCol2
           );
-          console.log(getblnCheck);
           if (getblnCheck == props.checkAbleExpressionVal) {
             dataProvider.setValue(i, col.fieldName, chk);
             const index = dataProvider.getDataRowId(i);
             gridView.checkRow(index, chk);
           }
         }
+      } else {
+        for (var i = 0; i < rowCount; i++) {
+          dataProvider.setValue(i, col.fieldName, chk);
+        }
+        gridView.setAllCheck(chk);
       }
     }
     dataProvider.endUpdate();
     var rows = gridView.getCheckedRows();
-    console.log(rows);
     selectedRowData.value = [];
     for (var i in rows) {
       var data = dataProvider.getJsonRow(rows[i]);
@@ -4942,7 +5116,7 @@ watch(
         } else {
           dataProvider.setRows(props.rowData, "TreeNum", false, null, "iconField");
         }
-        
+
         // 체크된 행 정보 유지
         if (gridView) {
           var rows = gridView.getCheckedRows();
@@ -5160,6 +5334,10 @@ watch(
 </script>
 
 <style>
+.rg-check-readonly-disabled {
+  background-color: #9a9a9a !important;
+}
+
 .setTextAlignLeft {
   text-align: left !important;
   white-space: pre !important;

@@ -57,6 +57,11 @@ const props = defineProps({
     type: [String, Number],
     default: "",
   },
+  /** `selectSupplierId`가 목록에 없을 때(거래처 전용 계정 등) 표시할 거래처명 */
+  selectSupplierLabel: {
+    type: String,
+    default: "",
+  },
   /** businessClient.vue `defaultNm` 과 동일 — 미선택 시 표시·emit 문구 (조회에서 `전체`가 필요하면 `:default-nm="'전체'"`) */
   defaultNm: {
     type: String,
@@ -84,6 +89,15 @@ watch(
 watch(
   () => props.selectSupplierId,
   () => {
+    ensurePresetOptionInList(props.selectSupplierId);
+    applyPresetSupplier(props.selectSupplierId);
+  }
+);
+
+watch(
+  () => props.selectSupplierLabel,
+  () => {
+    ensurePresetOptionInList(props.selectSupplierId);
     applyPresetSupplier(props.selectSupplierId);
   }
 );
@@ -97,13 +111,50 @@ function hasPresetId(id) {
   );
 }
 
+/** 프리셋 ID가 getSuppliers 목록에 없으면 행을 넣어 v-select가 이름(label)로 표시하도록 함 */
+function ensurePresetOptionInList(presetId) {
+  if (!hasPresetId(presetId)) return;
+  const idStr = String(presetId);
+  const idx = optionList.value.findIndex(
+    (i) => String(i.lngSupplierID) === idStr
+  );
+  const labelFromProp =
+    props.selectSupplierLabel && String(props.selectSupplierLabel).trim();
+  const label = labelFromProp || `거래처 (${idStr})`;
+  const nid = Number(presetId);
+  const idVal = Number.isFinite(nid) ? nid : presetId;
+
+  if (idx >= 0) {
+    if (
+      labelFromProp &&
+      optionList.value[idx].strSupplierName !== labelFromProp
+    ) {
+      const copy = [...optionList.value];
+      copy[idx] = { ...copy[idx], strSupplierName: labelFromProp };
+      optionList.value = copy;
+    }
+    return;
+  }
+  optionList.value = [
+    { lngSupplierID: idVal, strSupplierName: label },
+    ...optionList.value,
+  ];
+}
+
 function applyPresetSupplier(presetId) {
   if (hasPresetId(presetId)) {
-    selectedSupplier.value = presetId;
     const found = optionList.value.find(
       (i) => String(i.lngSupplierID) === String(presetId)
     );
-    selectedSupplierNm.value = found ? found.strSupplierName : "";
+    if (found) {
+      selectedSupplier.value = found.lngSupplierID;
+      selectedSupplierNm.value = found.strSupplierName ?? "";
+    } else {
+      selectedSupplier.value = Number.isFinite(Number(presetId))
+        ? Number(presetId)
+        : presetId;
+      selectedSupplierNm.value = "";
+    }
   } else {
     selectedSupplier.value = "";
     selectedSupplierNm.value = props.defaultNm;
@@ -122,16 +173,8 @@ onMounted(async () => {
   Name.value = props.defaultName;
 
   const presetId = props.selectSupplierId;
-  if (hasPresetId(presetId)) {
-    selectedSupplier.value = presetId;
-    const found = optionList.value.find(
-      (i) => String(i.lngSupplierID) === String(presetId)
-    );
-    selectedSupplierNm.value = found ? found.strSupplierName : "";
-  } else {
-    selectedSupplier.value = "";
-    selectedSupplierNm.value = props.defaultNm;
-  }
+  ensurePresetOptionInList(presetId);
+  applyPresetSupplier(presetId);
 
   emit("SupplierId", selectedSupplier.value);
   emit("SupplierNm", selectedSupplierNm.value);

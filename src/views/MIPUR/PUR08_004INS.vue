@@ -5,9 +5,10 @@
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <!-- 조회 패널·그리드 레이아웃: PUR08_003INS 와 동일 pur235 와이어 + flex-1 그리드 -->
+  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+    <div
+      class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
@@ -25,121 +26,168 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-24 items-start z-10">
-      <div class="justify-start flex">
-        <PickStore
-          @update:storeGroup="lngStoreGroup"
-          :defaultStoreNm="'전체'"
-          :mainName="'보낸 매장'"
-          @storeNm="excelStore"
-          :hideAttr="false"
-          :hideGroup="false"
-          :setDynamicStoreClass="'!h-8 !p-0'"
-          :defaultStore="true"
-          @update:storeCd="lngStoreCode"></PickStore>
-      </div>
-      <div class="flex justify-start items-center">
-        <div class="text-base font-semibold">받는 매장/파트</div>
-        <div class="flex items-center space-x-2">
-          <PickStore
-            :defaultStoreNm="'전체'"
-            :mainName="''"
-            @storeNm="excelStore2"
-            :hideAttr="false"
-            :hideGroup="false"
-            :setDynamicStoreClass="'!h-8 !p-0'"
-            :setDynamicStoreClass2="'!ml-0'"
-            :defaultStore="true"
-            @update:storeCd="lngStoreCode2"></PickStore>
-          <select
-            name=""
-            id=""
-            class="w-32 h-8 border border-black mt-2"
-            v-model="cond">
-            <option :value="i.lngPartCode" v-for="i in optionList">
-              {{ i.strPartName }}
-            </option>
-          </select>
+      class="pur235-search-panel pur803-search-shrink z-10 mt-3 w-full min-h-0 shrink-0 overflow-x-auto rounded-lg bg-gray-200 px-8 py-3 md:px-12">
+      <div
+        class="pur235-wire-grid pur803-wire-grid min-w-0"
+        :style="{
+          '--pur235-control-border': pur235ControlBorder,
+          '--pur235-col-gutter': pur235ColGutter,
+          '--pur235-row-gap': pur235RowGap,
+          '--pur235-label-col': pur235LabelCol,
+        }">
+        <div class="pur235-wire-cell min-w-0">
+          <div class="pur235-wire-label">보낸 매장</div>
+          <div class="pur235-wire-field min-w-0">
+            <div class="pur803-store-part-pair">
+              <div class="pur235-pick-slot pur803-pick-in-pair min-h-0 min-w-0">
+                <PickStore
+                  compact-search-bar
+                  unlock-store-combo-only
+                  @update:store-group="lngStoreGroup"
+                  :default-store-nm="'전체'"
+                  :main-name="'보낸 매장'"
+                  :default-store="true"
+                  @store-nm="excelStore"
+                  :hide-attr="false"
+                  :hide-group="false"
+                  @update:store-cd="lngStoreCode" />
+              </div>
+              <span
+                class="pur803-store-slash pur804-from-store-pair-slash select-none"
+                aria-hidden="true"
+                >/</span>
+              <div
+                class="pur235-sg-select pur803-part-in-pair pur804-from-store-pair-spacer h-8 min-w-0 border border-transparent bg-transparent"
+                aria-hidden="true" />
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="flex justify-start items-center -mt-2 space-x-5">
-        <Datepicker2
-          :mainName="'이동기간'"
-          @startDate="startDate"
-          @excelDate="excelDate"
-          @endDate="endDate"></Datepicker2>
-      </div>
-      <div class="flex justify-start pl-10 mt-2 items-center space-x-5">
-        <div class="text-base font-semibold">확정기간</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="w-48 h-8 border border-black"
-            v-model="cond2">
-            <option value="9">전체</option>
-            <option :value="i.strDCode" v-for="i in optionList2">
-              {{ i.strDName }}
-            </option>
-          </select>
+        <div class="pur235-wire-cell min-w-0">
+          <div class="pur235-wire-label">받는 매장/파트</div>
+          <div class="pur235-wire-field min-w-0">
+            <div class="pur803-store-part-pair">
+              <div class="pur235-pick-slot pur803-pick-in-pair min-h-0 min-w-0">
+                <PickStore
+                  compact-search-bar
+                  :default-store-nm="'전체'"
+                  :default-store="true"
+                  :main-name="'받는 매장/파트'"
+                  @store-nm="excelStore2"
+                  :hide-attr="false"
+                  :hide-group="false"
+                  @update:store-cd="lngStoreCode2" />
+              </div>
+              <span class="pur803-store-slash" aria-hidden="true">/</span>
+              <select
+                id="pur08-004-to-part"
+                v-model="cond"
+                :disabled="partToDisabled"
+                class="pur235-sg-select pur803-part-in-pair h-8 min-w-0 rounded-md border border-solid bg-white px-1.5 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500">
+                <option
+                  v-for="i in optionList"
+                  :key="i.lngPartCode"
+                  :value="i.lngPartCode">
+                  {{ i.strPartName }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="pur235-wire-cell min-w-0">
+          <div class="pur235-wire-label">이동기간</div>
+          <div class="pur235-wire-field pur235-date-slot min-w-0 overflow-hidden">
+            <Datepicker2
+              ref="datepicker"
+              omit-main-label
+              filter-bar-align
+              :main-name="'이동기간'"
+              :close-pop-up="closePopUp"
+              @start-date="startDate"
+              @excel-date="excelDate"
+              @end-date="endDate" />
+          </div>
+        </div>
+        <div class="pur235-wire-cell min-w-0">
+          <div class="pur235-wire-label">확정기간</div>
+          <div class="pur235-wire-field min-w-0">
+            <div class="pur803-confirm-row">
+              <select
+                id="pur08-004-confirm-period"
+                v-model="cond2"
+                class="pur235-sg-select pur803-confirm-select h-8 w-full min-w-0 rounded-md border border-solid bg-white px-1.5 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="9">전체</option>
+                <option
+                  v-for="i in optionList2"
+                  :key="i.strDCode"
+                  :value="i.strDCode">
+                  {{ i.strDName }}
+                </option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <!-- 조회조건 -->
-    <!-- 그리드 영역 -->
-    <div class="w-full h-[75vh]">
-      <Realgrid
-        :progname="'PUR08_004INS_VUE'"
-        :progid="1"
-        :rowData="rowData"
-        :setStateBar="false"
-        :documentTitle="'PUR08_004INS'"
-        @updatedRowData="updatedRowData"
-        :checkedRowData2Col="'Selected'"
-        @selectedIndex="selectedIndex"
-        @checkedRowData2="checkedRowData2"
-        :documentSubTitle="documentSubTitle"
-        :checkAbleExpressionVal="'1'"
-        :checkAbleExpressionCol2="'lngConfirm'"
-        :headerCheckBar="'cancled,Selected'"
-        :checkAbleExpressionCol="'cancled,Selected'"
-        :checkRenderEditable="true"
-        :checkRowAuto="true"
-        :rowStateeditable="false"
-        :changeRow="changeRow"
-        :changeColid="changeColid"
-        :changeNow="changeNow"
-        :changeValue2="changeValue2"
-        :exporttoExcel="exportExcel">
-      </Realgrid>
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <div
+        class="relative h-full min-h-[min(40vh,18rem)] min-w-0 flex-1">
+        <Realgrid
+          :progname="'PUR08_004INS_VUE'"
+          :progid="1"
+          :rowData="rowData"
+          :setStateBar="false"
+          :documentTitle="'PUR08_004INS'"
+          @updatedRowData="updatedRowData"
+          :checkedRowData2Col="'Selected,cancled'"
+          @selectedIndex="selectedIndex"
+          @checkedRowData2="checkedRowData2"
+          :documentSubTitle="documentSubTitle"
+          :headerCheckBar="'cancled,Selected'"
+          :checkAbleExpressionCol="'cancled,Selected'"
+          :checkAbleExpressionCol2="'strConfirm'"
+          :checkAbleExpressionVal="'확정'"
+          :checkAbleExpressionCol3="'strConfirm'"
+          :checkAbleExpressionVal2="'미확정'"
+          :checkRenderEditable="true"
+          :checkRowAuto="true"
+          :rowStateeditable="false"
+          :changeRow="changeRow"
+          :changeColid="changeColid"
+          :changeNow="changeNow"
+          :changeValue2="changeValue2"
+          :emitCheckedRowData2AsJson="true"
+          :exporttoExcel="exportExcel">
+        </Realgrid>
+      </div>
     </div>
   </div>
 
   <div
-    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
     v-if="open">
     <div
-      class="flex flex-col bg-white border border-black w-[40vw] h-[15vh] p-2">
-      <div class="flex justify-end space-x-3">
-        <button class="whitebutton" @click="setValue">선택</button>
-        <button class="whitebutton" @click="setFalse">닫기</button>
+      class="flex min-h-[12rem] w-[min(92vw,24rem)] flex-col rounded-lg border border-slate-300 bg-white p-4 shadow-lg"
+      @click.stop>
+      <div class="flex shrink-0 justify-end gap-2 pb-3">
+        <button type="button" class="whitebutton" @click="setValue">선택</button>
+        <button type="button" class="whitebutton" @click="setFalse">닫기</button>
       </div>
-      <div class="grid grid-rows-1 grid-cols-[1fr,2fr] h-[50%]">
+      <div
+        class="grid min-h-0 flex-1 grid-cols-[6.75rem_1fr] gap-0 overflow-hidden rounded border border-slate-300 text-sm">
         <div
-          class="text-base font-semibold border border-black flex justify-center items-center bg-gray-50">
+          class="flex items-center justify-center border-b border-r border-slate-300 bg-slate-100 px-2 py-2 font-semibold text-gray-900">
           입고 확정일자
         </div>
         <div
-          class="text-base font-semibold border border-black flex justify-center items-center">
+          class="flex items-center justify-center border-b border-slate-300 bg-white px-2 py-2">
           <input
             type="date"
-            class="border border-black h-[80%] w-[80%]"
+            class="h-8 w-full max-w-full rounded-md border border-slate-300 px-2 text-sm"
             v-model="changeValue2" />
         </div>
       </div>
     </div>
   </div>
-  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
@@ -183,22 +231,25 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
 import { useStore } from "vuex";
+
+const store = useStore();
+
 /**
  * 	화면 Load시 실행 스크립트
  */
 
 onMounted(async () => {
-  const pageLog = await insertPageLog(store.state.activeTab2);
+  await insertPageLog(store.state.activeTab2);
 
   const res = await getCommonList(24);
 
-  optionList2.value = res.data.List;
+  optionList2.value = Array.isArray(res?.data?.List) ? res.data.List : [];
 });
 
 const reload = ref(false);
@@ -211,7 +262,12 @@ const cond3 = ref(0);
 const cond4 = ref("");
 const cond5 = ref(0);
 const cond6 = ref(0);
-const store = useStore();
+
+/** 조회 AREA — PUR08_003INS 와 동일 pur235 와이어 토큰 */
+const pur235ControlBorder = "#cbd5e1";
+const pur235ColGutter = "1.125rem";
+const pur235RowGap = "0.875rem";
+const pur235LabelCol = "8.75rem";
 
 const datepicker = ref(null);
 const closePopUp = ref(false);
@@ -246,6 +302,13 @@ const excelDate = (e) => {
   selectedDate.value = e;
 };
 
+/** PickStore `전체` → storeCd 0/`0` — 받는 파트 콤보 비활성 (PUR08_003INS 와 동일) */
+const isWholeStore = (storeCd) => {
+  if (storeCd === undefined || storeCd === null) return true;
+  const s = String(storeCd).trim();
+  return s === "" || s === "0";
+};
+
 const storeCode = ref();
 const lngStoreCode = async (e) => {
   initGrid();
@@ -271,7 +334,6 @@ const hideColumnsId = ref([]);
 const searchButton = async () => {
   try {
     store.state.loading = true;
-    initGrid();
 
     const res = await getStoreStockMoveListByPart(
       groupCd.value,
@@ -284,12 +346,12 @@ const searchButton = async () => {
       cond2.value
     );
 
-    rowData.value = res.data.List;
-    console.log(res);
+    /** List가 null/비배열이면 Realgrid setRows 오류·헤더 깨짐 방지 */
+    rowData.value = Array.isArray(res?.data?.List) ? res.data.List : [];
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    //comsole.log(error);
+    rowData.value = [];
   } finally {
     store.state.loading = false;
   }
@@ -353,16 +415,35 @@ const excelList = (e) => {
   selectedExcelList.value = e;
   //comsole.log(e);
 };
-const storeCode2 = ref("");
-const lngStoreCode2 = async (e) => {
-  storeCode2.value = e;
+const storeCode2 = ref();
+/** 받는 매장이 전체일 때 파트 콤보 비활성 */
+const partToDisabled = computed(() => isWholeStore(storeCode2.value));
 
+const lngStoreCode2 = async (e) => {
+  initGrid();
+  storeCode2.value = e;
+  if (isWholeStore(e)) {
+    try {
+      const res2 = await getLossMasterPartList(
+        store.state.userData.lngStoreGroup,
+        "0"
+      );
+      const list = res2?.data?.List;
+      if (Array.isArray(list) && list.length > 0) {
+        optionList.value = list;
+      }
+    } catch {
+      /* 기존 optionList 유지 */
+    }
+    cond.value = "0";
+    return;
+  }
   const res2 = await getLossMasterPartList(
     store.state.userData.lngStoreGroup,
     storeCode2.value
   );
 
-  optionList.value = res2.data.List;
+  optionList.value = Array.isArray(res2?.data?.List) ? res2.data.List : [];
 };
 
 const open = ref(false);
@@ -371,16 +452,153 @@ const changeValue2 = ref("");
 const changeColid = ref("strConfirmDate");
 const tempMoveDate = ref("");
 const tempCloseDate = ref("");
-const checkedRowData2 = async (e) => {
-  console.log(e);
+/** Realgrid `changeNow` 되돌리기로 인한 onValueChanged 재진입 방지 */
+const skipCheckedRowData2Sync = ref(false);
 
-  tempMoveDate.value = formatLocalDate(e[2]).replaceAll("-", "");
-  tempCloseDate.value = e[23];
-  if (e[0] == true) {
+const isConfirmedRow = (v) => {
+  const s = String(v ?? "")
+    .replace(/\s/g, "")
+    .trim();
+  return s === "확정" || s === "1" || s === "Y" || s === "y" || v === 1;
+};
+
+const normField = (f) => String(f ?? "").trim();
+
+const isTruthyCheck = (v) =>
+  v === true || v === 1 || v === "1" || String(v).toLowerCase() === "true";
+
+/** emitCheckedRowData2AsJson 행 — getRows 배열 인덱스와 Selected 위치가 다를 수 있음 */
+const readMonthCloseRaw = (row) => {
+  if (!row || typeof row !== "object") return "";
+  const keys = [
+    "strMonthCloseDate",
+    "StrMonthCloseDate",
+    "strStockCloseDate",
+    "StrStockCloseDate",
+    "strCloseDate",
+    "StrCloseDate",
+    "strCloseDt",
+    "StrCloseDt",
+    "lngMonthClose",
+    "LngMonthClose",
+  ];
+  for (const k of keys) {
+    const v = row[k];
+    if (v != null && v !== "") return v;
+  }
+  return "";
+};
+
+/** RealGrid onCellEdited 직후 Swal이 가려지거나 미표시되는 경우 방지 */
+const showSwalAfterGrid = (options) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      void Swal.fire(options).then(resolve);
+    }, 0);
+  });
+
+const revertGridCheckbox = (dataRow, colid, value) => {
+  if (typeof dataRow !== "number" || dataRow < 0) return;
+  skipCheckedRowData2Sync.value = true;
+  changeRow.value = dataRow;
+  changeColid.value = colid;
+  changeValue2.value = value;
+  changeNow.value = !changeNow.value;
+  void nextTick(() => {
+    void nextTick(() => {
+      skipCheckedRowData2Sync.value = false;
+    });
+  });
+};
+
+const checkedRowData2 = async (
+  payload,
+  editedField,
+  dataRow,
+  oldVal,
+  newVal
+) => {
+  if (skipCheckedRowData2Sync.value) return;
+  await nextTick();
+
+  const field = normField(editedField);
+  const isSelectedCol = field === "Selected" || field === "selected";
+  const isCancledCol =
+    field === "cancled" || field === "Cancled" || field === "canceled";
+
+  const base =
+    payload && typeof payload === "object" && !Array.isArray(payload)
+      ? payload
+      : {};
+  const live =
+    typeof dataRow === "number" &&
+    dataRow >= 0 &&
+    Array.isArray(updatedrowdata.value) &&
+    updatedrowdata.value[dataRow]
+      ? updatedrowdata.value[dataRow]
+      : null;
+  const row =
+    live && Object.keys(base).length
+      ? { ...base, ...live }
+      : live ?? (Object.keys(base).length ? base : null);
+
+  if (!row) return;
+
+  const strConfirm = String(
+    row.strConfirm ?? row.StrConfirm ?? ""
+  ).trim();
+  /** 편집 직후 payload/행과 그리드 값이 어긋날 수 있어 emit의 newVal·동기화된 행을 우선 */
+  const selectedOn = isSelectedCol
+    ? newVal !== undefined
+      ? isTruthyCheck(newVal)
+      : isTruthyCheck(row.Selected)
+    : isTruthyCheck(row.Selected);
+  const cancledOn = isCancledCol
+    ? newVal !== undefined
+      ? isTruthyCheck(newVal)
+      : isTruthyCheck(row.cancled)
+    : isTruthyCheck(row.cancled);
+
+  if (isSelectedCol && selectedOn && isConfirmedRow(strConfirm)) {
+    await showSwalAfterGrid({
+      title: "알림",
+      text: "이미 확정 되어 있습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    revertGridCheckbox(dataRow, "Selected", "0");
+    return;
+  }
+
+  if (isCancledCol && cancledOn && !isConfirmedRow(strConfirm)) {
+    await showSwalAfterGrid({
+      title: "알림",
+      text: "확정되지 않은 입고 건 입니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    revertGridCheckbox(dataRow, "cancled", false);
+    return;
+  }
+
+  if (!isSelectedCol) {
+    return;
+  }
+
+  const moveRaw = row.strMoveDate ?? row.StrMoveDate;
+  tempMoveDate.value = formatLocalDate(moveRaw).replaceAll("-", "");
+
+  const closeRaw = readMonthCloseRaw(row);
+  tempCloseDate.value =
+    closeRaw !== "" && closeRaw != null
+      ? String(closeRaw).replace(/\D/g, "") || closeRaw
+      : "";
+
+  if (selectedOn) {
     changeColid.value = "strConfirmDate";
     changeValue2.value = formatLocalDate(new Date());
     open.value = true;
-  } else if (e[0] == false) {
+  } else {
     changeColid.value = "strConfirmDate";
     changeValue2.value = "";
     changeNow.value = !changeNow.value;
@@ -438,36 +656,41 @@ const updatedRowData = (e) => {
 };
 
 const cancelButton = async () => {
+  const cancelRows = Array.isArray(updatedrowdata.value)
+    ? updatedrowdata.value.filter((item) => item.cancled == true)
+    : [];
+  if (cancelRows.length === 0) {
+    await Swal.fire({
+      title: "알림",
+      text: "확정취소할 항목을 선택해 주십시오.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   try {
-    const fstorecds = updatedrowdata.value
-      .filter((item) => item.cancled == true)
+    const fstorecds = cancelRows
       .map((item) => item.lngFromStoreCode)
       .join("\u200b");
-    const moveseqs = updatedrowdata.value
-      .filter((item) => item.cancled == true)
+    const moveseqs = cancelRows
       .map((item) => item.strMoveSeqID)
       .join("\u200b");
-    const tstorecds = updatedrowdata.value
-      .filter((item) => item.cancled == true)
+    const tstorecds = cancelRows
       .map((item) => item.lngToStoreCode)
       .join("\u200b");
-    const movedate = updatedrowdata.value
-      .filter((item) => item.cancled == true)
+    const movedate = cancelRows
       .map((item) => formatLocalDate(item.strMoveDate).replaceAll("-", ""))
       .join("\u200b");
 
-    const supplier = updatedrowdata.value
-      .filter((item) => item.cancled == true)
+    const supplier = cancelRows
       .map((item) => item.lngSupplierID)
       .join("\u200b");
 
-    const stockids = updatedrowdata.value
-      .filter((item) => item.cancled == true)
+    const stockids = cancelRows
       .map((item) => item.lngStockID)
       .join("\u200b");
 
-    const confirmdate = updatedrowdata.value
-      .filter((item) => item.cancled == true)
+    const confirmdate = cancelRows
       .map((item) => item.strConfirmDate)
       .join("\u200b");
     const res = await cancelStoreMoveConfirmList(
@@ -507,47 +730,41 @@ const cancelButton = async () => {
 };
 
 const confirmButton = async () => {
-  if (
-    updatedrowdata.value.filter((item) => item.Selected == true).length == 0
-  ) {
-    Swal.fire({
-      title: "경고",
-      text: "확정할 자재를 체크해주세요.",
-      icon: "success",
-
+  const selectedRows = Array.isArray(updatedrowdata.value)
+    ? updatedrowdata.value.filter((item) => item.Selected == true)
+    : [];
+  if (selectedRows.length === 0) {
+    await Swal.fire({
+      title: "알림",
+      text: "확정할 항목을 선택해주십시오.",
+      icon: "warning",
       confirmButtonText: "확인",
     });
+    return;
   }
   try {
-    const fstorecds = updatedrowdata.value
-      .filter((item) => item.Selected == true)
+    const fstorecds = selectedRows
       .map((item) => item.lngFromStoreCode)
       .join("\u200b");
-    const moveseqs = updatedrowdata.value
-      .filter((item) => item.Selected == true)
+    const moveseqs = selectedRows
       .map((item) => item.strMoveSeqID)
       .join("\u200b");
-    const tstorecds = updatedrowdata.value
-      .filter((item) => item.Selected == true)
+    const tstorecds = selectedRows
       .map((item) => item.lngToStoreCode)
       .join("\u200b");
-    const movedate = updatedrowdata.value
-      .filter((item) => item.Selected == true)
+    const movedate = selectedRows
       .map((item) => formatLocalDate(item.strMoveDate).replaceAll("-", ""))
       .join("\u200b");
 
-    const supplier = updatedrowdata.value
-      .filter((item) => item.Selected == true)
+    const supplier = selectedRows
       .map((item) => item.lngSupplierID)
       .join("\u200b");
 
-    const stockids = updatedrowdata.value
-      .filter((item) => item.Selected == true)
+    const stockids = selectedRows
       .map((item) => item.lngStockID)
       .join("\u200b");
 
-    const confirmdate = updatedrowdata.value
-      .filter((item) => item.Selected == true)
+    const confirmdate = selectedRows
       .map((item) => formatLocalDate(item.strConfirmDate).replaceAll("-", ""))
       .join("\u200b");
     const res = await confirmStoreMoveConfirmList(
@@ -587,3 +804,227 @@ const confirmButton = async () => {
   }
 };
 </script>
+
+<style scoped>
+/* 2열 와이어 — PUR08_003INS 와 동일 */
+.pur803-wire-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pur235-search-panel.pur803-search-shrink .pur235-wire-cell > .pur235-wire-field {
+  width: 63%;
+  max-width: 63%;
+  flex: 0 1 auto;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.pur803-store-part-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 0.125rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.pur803-store-slash {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1;
+  color: rgb(75 85 99);
+  padding: 0;
+  margin: 0;
+  user-select: none;
+}
+
+/* 보낸 매장: 받는 매장과 동일 1fr | / | 1fr 비율 — 매장 콤보만 첫 칸에 배치 */
+.pur804-from-store-pair-slash {
+  color: transparent;
+}
+
+.pur804-from-store-pair-spacer {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.pur803-pick-in-pair {
+  justify-self: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.pur803-store-part-pair .pur803-pick-in-pair :deep(div.relative.min-w-0.flex-1) {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.pur803-store-part-pair .pur803-pick-in-pair :deep(.pickstore-vs-shell) {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.pur803-part-in-pair {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  justify-self: stretch;
+}
+
+.pur803-confirm-row {
+  width: 100%;
+  max-width: calc(50% - 0.25rem);
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.pur803-confirm-select {
+  box-sizing: border-box;
+}
+
+.pur235-wire-grid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  column-gap: var(--pur235-col-gutter);
+  row-gap: var(--pur235-row-gap);
+}
+
+.pur235-wire-cell {
+  display: flex;
+  min-width: 0;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pur235-wire-label {
+  flex: 0 0 var(--pur235-label-col);
+  width: var(--pur235-label-col);
+  min-width: 0;
+  max-width: var(--pur235-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  text-align: center;
+  white-space: normal;
+  overflow: visible;
+  hyphens: none;
+  padding-left: 0.125rem;
+  padding-right: 0.125rem;
+}
+
+.pur235-wire-field {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 auto;
+  align-items: center;
+}
+
+.pur235-wire-field:not(.pur235-mat-row) > * {
+  min-width: 0;
+  width: 100%;
+}
+
+.pur235-sg-select {
+  box-sizing: border-box;
+}
+
+.pur235-search-panel select.pur235-sg-select {
+  border: 1px solid var(--pur235-control-border) !important;
+}
+
+.pur235-search-panel select.pur235-sg-select:focus {
+  border-color: #3b82f6 !important;
+}
+
+.pur235-search-panel .pur235-pick-slot :deep(select) {
+  border: 1px solid var(--pur235-control-border) !important;
+}
+
+.pur235-search-panel .pur235-pick-slot :deep(select:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.pur235-search-panel .pur235-pick-slot :deep(.pickstore-vs-shell),
+.pur235-search-panel .pur235-bc-slot :deep(.pickstore-vs-shell) {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--pur235-control-border) !important;
+}
+
+.pur235-search-panel .pur235-pick-slot :deep(div.relative.min-w-0.flex-1) {
+  max-width: 100% !important;
+}
+
+.pur235-pick-slot :deep(> div.flex.text-base) {
+  width: 100%;
+  min-width: 0;
+}
+
+.pur235-pick-slot :deep(> div.flex > div:first-child) {
+  display: none;
+}
+
+.pur235-search-panel .pur235-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.pur235-search-panel .pur235-date-slot :deep(> div.flex.justify-start.items-center) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+  gap: 0.25rem !important;
+}
+
+.pur235-search-panel .pur235-date-slot :deep(> div.flex > div.inline-flex.h-8) {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  gap: 0.125rem !important;
+}
+
+.pur235-search-panel .pur235-date-slot :deep(input[type="date"]) {
+  border: 1px solid var(--pur235-control-border) !important;
+  box-sizing: border-box;
+  width: auto !important;
+  flex: 1 1 0;
+  min-width: 5.25rem;
+  max-width: none;
+  padding-left: 0.45rem;
+  padding-right: 0.25rem;
+}
+
+.pur235-search-panel .pur235-date-slot :deep(div.inline-flex.h-8 > span) {
+  flex-shrink: 0;
+  padding-left: 0.05rem;
+  padding-right: 0.05rem;
+}
+
+.pur235-search-panel .pur235-date-slot :deep(div.inline-flex.h-8 > button) {
+  flex-shrink: 0;
+  width: 1.65rem !important;
+  height: 1.65rem !important;
+  min-width: 1.65rem;
+  margin-left: 0 !important;
+}
+
+.pur235-search-panel .pur235-date-slot :deep(div.inline-flex.h-8 > button img) {
+  max-width: 85%;
+  max-height: 85%;
+}
+
+.pur235-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin-left: 0;
+  padding-left: 0;
+}
+</style>

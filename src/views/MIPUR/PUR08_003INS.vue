@@ -71,6 +71,7 @@
               <div class="pur235-pick-slot pur803-pick-in-pair min-h-0 min-w-0">
                 <PickStore
                   compact-search-bar
+                  unlock-store-combo-only
                   :default-store-nm="'전체'"
                   :default-store="true"
                   :main-name="'받는 매장/파트'"
@@ -139,6 +140,12 @@
           :checkRowAuto="false"
           :checkRowAuto2="true"
           :checkRowAuto2Col="'Selected'"
+          :headerCheckBar="'Selected'"
+          :checkAbleExpressionCol="'Selected'"
+          :checkAbleExpressionCol2="'strConfirm'"
+          :checkAbleExpressionVal="'확정'"
+          :checkAbleExpressionCol3="'strConfirm'"
+          :checkAbleExpressionVal2="'미확정'"
           :documentSubTitle="documentSubTitle"
           :rowStateeditable="false"
           :exporttoExcel="exportExcel">
@@ -152,7 +159,8 @@
     v-if="open">
     <div
       :key="pur803NewPopupKey"
-      class="pur803-newpop-shell flex h-[min(88vh,56rem)] max-h-[92vh] min-h-0 w-[min(92vw,72rem)] flex-col rounded-lg bg-white p-5 shadow-lg">
+      class="pur803-newpop-shell flex h-[min(88vh,56rem)] max-h-[92vh] min-h-0 w-[min(92vw,72rem)] flex-col rounded-lg bg-white p-5 shadow-lg"
+      @click.stop>
       <div
         class="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-gray-200 pb-3">
         <h2 class="shrink-0 text-xl font-bold text-gray-900">매장간 출고 신규 등록</h2>
@@ -172,10 +180,8 @@
         </div>
       </div>
 
-      <!-- 상단 폼: 스크롤 영역으로 분리해 매장/파트 줄이 잘리지 않게 -->
-      <div
-        class="pur803-newpop-upper-scroll mt-3 min-h-0 max-h-[min(42vh,24rem)] shrink-0 overflow-y-auto overflow-x-hidden">
-        <div class="pur803-newpop-formwrap flex min-h-0 shrink-0 flex-col gap-0">
+      <!-- 매장/파트·일자·거래처: 스크롤 밖 고정 — 하단 Realgrid 페인트·히트 영역과 분리 -->
+      <div class="pur803-newpop-master-strip mt-3 shrink-0">
         <div class="pur803-newpop-master-wrap shrink-0 border border-slate-500 bg-white shadow-sm">
         <div
           class="pur803-newpop-master-grid grid grid-cols-[6.75rem_1fr_6.75rem_1fr] text-sm leading-tight text-gray-900">
@@ -219,6 +225,7 @@
               <PickStore
                 :compactSearchBar="true"
                 :compactStoreComboMaxRem="20"
+                :unlockStoreComboOnly="true"
                 :defaultStoreNm="'전체'"
                 :defaultStore="true"
                 :mainName="''"
@@ -267,7 +274,12 @@
           </div>
         </div>
         </div>
+      </div>
 
+      <!-- 자재 입력만 세로 스크롤 (매장 블록과 분리) -->
+      <div
+        class="pur803-newpop-upper-scroll mt-2 min-h-0 max-h-[min(36vh,20rem)] shrink-0 overflow-y-auto overflow-x-hidden">
+        <div class="pur803-newpop-formwrap flex min-h-0 shrink-0 flex-col gap-0">
         <div class="pur803-newpop-midrule shrink-0 bg-slate-50 px-0.5 py-2.5" aria-hidden="true">
           <div class="h-0 border-t-2 border-slate-500 shadow-sm"></div>
         </div>
@@ -418,9 +430,13 @@
             :rowData="rowData3"
             :setStateBar="false"
             :suppressEdit="true"
-            key-delete-removes-current-row
-            @updatedRowData="onDetailGridUpdatedRowData"></Realgrid>
+            @updatedRowData="onDetailGridUpdatedRowData"
+            @dblclickedRowData="pur803OnDetailGridDblClicked"></Realgrid>
         </div>
+        <p
+          class="shrink-0 px-1 pt-2 text-left text-sm font-bold leading-snug text-red-600">
+          ※삭제 할 자재품목을 더블클릭 하시면 삭제가 가능합니다.
+        </p>
       </div>
 
       <div
@@ -498,7 +514,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { computed, nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -749,6 +765,19 @@ const updatedRowData = (e) => {
 };
 
 const open = ref(false);
+/** append-to-body 매장 콤보: 전역 style에서 .vs__dropdown-menu z-index:40 → 모달 fixed z-50 뒤로 깔림. 팝업 열릴 때만 body 플래그로 올림 */
+const PUR803_NEWPOP_BODY_CLASS = "pur803-newpop-active";
+
+watch(open, (isOpen) => {
+  if (typeof document === "undefined") return;
+  document.body.classList.toggle(PUR803_NEWPOP_BODY_CLASS, !!isOpen);
+});
+
+onUnmounted(() => {
+  if (typeof document !== "undefined") {
+    document.body.classList.remove(PUR803_NEWPOP_BODY_CLASS);
+  }
+});
 /** 팝업 내부 PickStore 등 완전 초기화용 remount 키 */
 const pur803NewPopupKey = ref(0);
 const open2 = ref(false);
@@ -764,6 +793,7 @@ const closeStockListPopup = () => {
 /** 신규 등록 팝업: 하단 그리드·입력·매장/파트 선택 등 초기화 (닫기·재오픈·저장 후 공통) */
 const resetPur803NewPopup = async () => {
   closeStockListPopup();
+  pur803SaveLines.value = [];
   rowData3.value = [];
   updatedrowdata2.value = [];
   disabled.value = false;
@@ -865,6 +895,7 @@ const searchButton2 = async () => {
     });
     return;
   }
+
   try {
     store.state.loading = true;
     const res = await getStockListByPart(
@@ -1021,10 +1052,65 @@ const onlyNumber2 = (e) => {
   }
 };
 
+/** 자재조회 더블클릭 값 — 배열 인덱스 또는 Json 행 객체 모두 허용 */
+const pur803PickerRowToFields = (snap) => {
+  if (snap == null)
+    return {
+      lngStockID: "",
+      strStockName: "",
+      strSupplierName: "",
+      strUnitName: "",
+      lngTaxType: "01",
+    };
+  if (Array.isArray(snap)) {
+    return {
+      lngStockID: snap[0],
+      strStockName: snap[1],
+      strSupplierName: snap[2],
+      strUnitName: snap[3],
+      lngTaxType: snap[5],
+    };
+  }
+  const o = snap;
+  return {
+    lngStockID:
+      o.lngStockID ?? o.LngStockID ?? o.lngStockId ?? o.strStockCode ?? "",
+    strStockName: o.strStockName ?? o.StrStockName ?? "",
+    strSupplierName: o.strSupplierName ?? o.StrSupplierName ?? "",
+    strUnitName: o.strUnitName ?? o.strUnit ?? "",
+    lngTaxType: o.lngTaxType ?? o.LngTaxType ?? "01",
+  };
+};
+
+/** 출고 저장 전용 행 — 그리드에 넘긴 객체를 내부에서 수정해도 여기는 추가 시점 스냅샷만 유지 */
+const pur803SaveLines = ref([]);
 const rowData3 = ref([]);
 const disabled = ref(false);
+
+/** Swal 종료 후 포커스 — 기본 returnFocus(트리거 입력으로 복귀)가 다른 필드 포커스를 덮어쓰지 않게 함 */
+const pur803FocusInputAfterSwal = async (inputRef) => {
+  await nextTick();
+  await nextTick();
+  inputRef.value?.focus?.();
+};
+
 const addRowData3 = async (e) => {
-  if (scond5.value == "" || scond6.value == "") {
+  /** 그리드 추가 시에만 — 자재 검색(조회) 버튼 경로에서는 검사하지 않음 */
+  const pur803AddCode = String(scond4.value ?? "").trim();
+  const pur803AddName = String(scond5.value ?? "").trim();
+  if (
+    (!pur803AddCode && !pur803AddName) ||
+    scond5.value == "" ||
+    scond6.value == ""
+  ) {
+    await Swal.fire({
+      title: "알림",
+      text: "출고할 자재 품목을 선택해 주십시오!",
+      icon: "warning",
+      confirmButtonText: "확인",
+      returnFocus: false,
+    });
+    await pur803FocusInputAfterSwal(pur803InputScond4);
     return;
   }
   const qtySan = pur803SanitizeDecimal(scond8.value);
@@ -1035,18 +1121,31 @@ const addRowData3 = async (e) => {
       text: "이동수량을 입력해 주십시오.",
       icon: "warning",
       confirmButtonText: "확인",
+      returnFocus: false,
     });
-    window.setTimeout(() => {
-      pur803InputScond8.value?.focus?.();
-    }, 100);
+    await pur803FocusInputAfterSwal(pur803InputScond8);
+    return;
+  }
+  const snap = tempRowData2.value;
+  const pick = pur803PickerRowToFields(snap);
+  const sidNorm = String(pick.lngStockID ?? "").trim();
+  if (!sidNorm) {
+    await Swal.fire({
+      title: "알림",
+      text: "자재를 다시 조회·선택한 뒤 추가해 주십시오.",
+      icon: "warning",
+      confirmButtonText: "확인",
+      returnFocus: false,
+    });
+    await pur803FocusInputAfterSwal(pur803InputScond4);
     return;
   }
   const cRowData3 = {
-    lngStockID: tempRowData2.value[0],
-    strStockName: tempRowData2.value[1],
-    lngTaxType: tempRowData2.value[5],
-    strSupplierName: tempRowData2.value[2],
-    strUnitName: tempRowData2.value[3],
+    lngStockID: sidNorm,
+    strStockName: pick.strStockName,
+    lngTaxType: pick.lngTaxType,
+    strSupplierName: pick.strSupplierName,
+    strUnitName: pick.strUnitName,
     curUnitPrice: pur803ParseFloat(scond7.value),
     dblQty: pur803ParseFloat(scond8.value),
     curSupply: pur803ParseFloat(scond9.value),
@@ -1054,7 +1153,8 @@ const addRowData3 = async (e) => {
     curTotal: pur803ParseFloat(scond11.value),
   };
 
-  rowData3.value = rowData3.value.concat(cRowData3);
+  pur803SaveLines.value = [...pur803SaveLines.value, { ...cRowData3 }];
+  rowData3.value = pur803SaveLines.value.map((r) => ({ ...r }));
 
   updatedrowdata2.value = rowData3.value;
   scond4.value = "";
@@ -1095,73 +1195,169 @@ const pur803OnAmountEnter = (e) => {
   });
 };
 
+/** 저단 상세 그리드 행에서 자재키 추출(저장·병합 공통) */
+const pur803StockId = (item) => {
+  if (!item || typeof item !== "object") return "";
+  const v =
+    item.lngStockID ??
+    item.LngStockID ??
+    item.lngStockId ??
+    item.strStockCode ??
+    item.StrStockCode ??
+    "";
+  return String(v).trim();
+};
+
 const updatedrowdata2 = ref([]);
-/** 하단 출고 그리드(progid 2)만 동기화 — 자재조회 그리드와 핸들러를 분리 */
+/** 하단 출고 그리드 — 표시용 동기화만. 저장 원본(pur803SaveLines)은 추가·행삭제·초기화만 변경. */
 const onDetailGridUpdatedRowData = (e) => {
   const list = Array.isArray(e) ? [...e] : [];
   updatedrowdata2.value = list;
-  rowData3.value = list;
-  if (list.length === 0) {
+};
+
+/** 하단 그리드 더블클릭 — 출고 대기 행(pur803SaveLines)에서 동일 인덱스 제거 후 그리드 갱신 */
+const pur803OnDetailGridDblClicked = async (row) => {
+  if (!row || typeof row !== "object") return;
+  const lines = pur803SaveLines.value;
+  if (!Array.isArray(lines) || lines.length === 0) return;
+
+  let dr = row.dataRow;
+  if (dr === undefined || dr === null) return;
+  dr = Number(dr);
+  if (!Number.isFinite(dr) || dr < 0 || dr >= lines.length) return;
+
+  const line = lines[dr];
+  if (!line) return;
+  const idFromRow = pur803StockId(row);
+  const idFromLine = pur803StockId(line);
+  if (idFromRow && idFromLine && idFromRow !== idFromLine) {
+    return;
+  }
+
+  const name = String(
+    row.strStockName ?? row.StrStockName ?? line.strStockName ?? ""
+  ).trim();
+  const code = (idFromRow || idFromLine).trim() || "—";
+  const label = name ? `${name} (${code})` : `(${code})`;
+
+  const result = await Swal.fire({
+    title: "확인",
+    text: `${label} 를 삭제하시겠습니까?`,
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "확인",
+    cancelButtonText: "취소",
+    returnFocus: false,
+  });
+  if (!result.isConfirmed) return;
+
+  const next = lines.filter((_, i) => i !== dr);
+  pur803SaveLines.value = next;
+  rowData3.value = next.map((r) => ({ ...r }));
+  updatedrowdata2.value = rowData3.value;
+  if (next.length === 0) {
     disabled.value = false;
   }
+
+  await Swal.fire({
+    title: "알림",
+    text: "삭제가 완료되었습니다.",
+    icon: "success",
+    confirmButtonText: "확인",
+    returnFocus: false,
+  });
 };
+
+/** 출고 API 단건 필드 문자열화 */
+const pur803SaveFieldStr = (v) =>
+  v === undefined || v === null ? "" : String(v);
 
 const saveButton = async (e) => {
   try {
-    const rows = Array.isArray(rowData3.value) ? [...rowData3.value] : [];
-    const stockids = rows.map((item) => item.lngStockID).join("\u200b");
-    const unitprices = rows.map((item) => item.curUnitPrice).join("\u200b");
-    const qtys = rows.map((item) => item.dblQty).join("\u200b");
-    const supplys = rows.map((item) => item.curSupply).join("\u200b");
-    const taxs = rows.map((item) => item.curTax).join("\u200b");
-    const res = await saveMoveStorePartList(
-      groupCd.value,
-      storeCode3.value,
-      scond.value,
-      storeCode4.value,
-      scond2.value,
-      scond3.value.replaceAll("-", ""),
-      supplierid.value,
-      stockids,
-      unitprices,
-      qtys,
-      supplys,
-      taxs,
-      store.state.userData.lngSequence
-    );
-
-    console.log(res);
-
-    if (res.data.RESULT_CD == "00") {
+    const rows = Array.isArray(pur803SaveLines.value)
+      ? [...pur803SaveLines.value].filter(
+          (r) => r && String(pur803StockId(r)).trim() !== ""
+        )
+      : [];
+    if (rows.length === 0) {
       await Swal.fire({
-        title: "성공",
-        text: "출고를 완료하였습니다",
-        icon: "success",
-
+        title: "알림",
+        text: "출고할 자재가 없습니다. 추가로 등록한 뒤 출고해 주십시오.",
+        icon: "warning",
         confirmButtonText: "확인",
       });
-    } else {
-      await Swal.fire({
-        title: "실패",
-        text: `${res.data.RESULT_NM}`,
-        icon: "error",
-
-        confirmButtonText: "확인",
-      });
+      return;
     }
+
+    store.state.loading = true;
+
+    /** 행마다 단건 호출 — STOCKIDS 등 구분자 일괄 문자열이 서버에서 첫 건만 처리되는 경우 우회 */
+    for (let idx = 0; idx < rows.length; idx++) {
+      const row = rows[idx];
+      const res = await saveMoveStorePartList(
+        groupCd.value,
+        storeCode3.value,
+        scond.value,
+        storeCode4.value,
+        scond2.value,
+        scond3.value.replaceAll("-", ""),
+        supplierid.value,
+        pur803StockId(row),
+        pur803SaveFieldStr(row.curUnitPrice),
+        pur803SaveFieldStr(row.dblQty),
+        pur803SaveFieldStr(row.curSupply),
+        pur803SaveFieldStr(row.curTax),
+        store.state.userData.lngSequence
+      );
+
+      if (res.data.RESULT_CD != "00") {
+        const msg = res.data.RESULT_NM ?? "";
+        await Swal.fire({
+          title: "실패",
+          text:
+            rows.length > 1
+              ? `${idx + 1}번째 자재 처리 중 오류입니다.\n${msg}`
+              : `${msg}`,
+          icon: "error",
+          confirmButtonText: "확인",
+        });
+        return;
+      }
+    }
+
+    await Swal.fire({
+      title: "성공",
+      text: "출고를 완료하였습니다",
+      icon: "success",
+
+      confirmButtonText: "확인",
+    });
 
     await resetPur803NewPopup();
     open.value = false;
-    if (res.data.RESULT_CD == "00") {
-      await searchButton();
-    }
-  } catch (error) {}
+    await searchButton();
+  } catch (error) {
+  } finally {
+    store.state.loading = false;
+  }
 };
 
 const deleteButton = async () => {
-  console.log(updatedrowdata.value);
+  const list = Array.isArray(rowData.value) ? rowData.value : [];
+  const filtered = Array.isArray(updatedrowdata.value)
+    ? updatedrowdata.value.filter((item) => item.Selected == true)
+    : [];
 
-  const filtered = updatedrowdata.value.filter((item) => item.Selected == true);
+  if (list.length === 0 || filtered.length === 0) {
+    await Swal.fire({
+      title: "알림",
+      text: "삭제 할 출고내역이 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
   try {
     const fromstorecd = filtered
       .map((item) => item.lngFromStoreCode)
@@ -1432,6 +1628,38 @@ const deleteButton = async () => {
 .pur803-newpop-shell {
   box-sizing: border-box;
   overflow: visible;
+  isolation: isolate;
+}
+
+/* 매장/파트 블록: 스크롤 영역 밖에 두고 z-index로 그리드 히트 영역보다 위에 고정 */
+.pur803-newpop-master-strip {
+  position: relative;
+  z-index: 40;
+  isolation: isolate;
+  pointer-events: auto;
+  transform: translateZ(0);
+}
+
+/* 자재 입력 스크롤 영역 */
+.pur803-newpop-upper-scroll {
+  position: relative;
+  z-index: 20;
+  background-color: #fff;
+  isolation: isolate;
+}
+
+.pur803-newpop-grid-gap {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  isolation: isolate;
+}
+
+.pur803-newpop-grid-host {
+  position: relative;
+  z-index: 0;
+  box-sizing: border-box;
+  min-height: 12rem;
 }
 
 .pur803-newpop-formwrap {
@@ -1446,17 +1674,10 @@ const deleteButton = async () => {
 .pur803-newpop-master-wrap {
   overflow: visible;
   padding-bottom: 2px;
-  position: relative;
-  z-index: 1;
 }
 
 .pur803-newpop-midrule {
   box-sizing: border-box;
-}
-
-.pur803-newpop-grid-host {
-  box-sizing: border-box;
-  min-height: 12rem;
 }
 
 .pur803-newpop-lbl-master {
@@ -1496,10 +1717,6 @@ const deleteButton = async () => {
 .pur803-newpop-detail-wrap .pur803-newpop-input:focus,
 .pur803-newpop-detail-wrap .pur803-newpop-select:focus {
   background-color: #fce7f3;
-}
-
-.pur803-newpop-grid-gap {
-  box-sizing: border-box;
 }
 
 .pur803-newpop-store-part-row {
@@ -1557,5 +1774,15 @@ const deleteButton = async () => {
 .pur235-date-slot :deep(> div.flex.justify-start.items-center) {
   margin-left: 0;
   padding-left: 0;
+}
+</style>
+<!-- append-to-body 드롭다운은 scoped 미적용 — 모달·그리드보다 위 -->
+<style>
+body.pur803-newpop-active .style-chooser .vs__dropdown-menu {
+  z-index: 10060 !important;
+}
+body.pur803-newpop-active .style-chooser .vs__dropdown-toggle {
+  position: relative;
+  z-index: 10061 !important;
 }
 </style>
