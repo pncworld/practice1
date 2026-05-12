@@ -663,9 +663,18 @@ const getLegacyMenuKeyImageSrc = (item) => {
   return `https://www.pncapi.kr/MenuImage/Image/${item.strUserFileName}?v=${v}`;
 };
 
+const NO_IMAGE_SRC = new URL("../../assets/noimage2.png", import.meta.url).href;
+
 const handleMenuImageError = (event, item) => {
   const target = event?.target;
   if (!target) {
+    return;
+  }
+  // pncapi 원본 실패 후 fallback은 1회만 시도하고, 재실패 시 즉시 기본 이미지로 고정한다.
+  if (target.dataset.fallbackTried === "true") {
+    if (target.src !== NO_IMAGE_SRC) {
+      target.src = NO_IMAGE_SRC;
+    }
     return;
   }
   const failedSrc = target.currentSrc || target.src || "";
@@ -675,7 +684,12 @@ const handleMenuImageError = (event, item) => {
   target.dataset.lastFailedSrc = failedSrc;
   const fallbackSrc = getLegacyMenuKeyImageSrc(item);
   if (fallbackSrc && target.src !== fallbackSrc) {
+    target.dataset.fallbackTried = "true";
     target.src = fallbackSrc;
+    return;
+  }
+  if (target.src !== NO_IMAGE_SRC) {
+    target.src = NO_IMAGE_SRC;
   }
 };
 
@@ -685,6 +699,7 @@ const handleMenuImageLoad = (event) => {
     return;
   }
   delete target.dataset.lastFailedSrc;
+  delete target.dataset.fallbackTried;
 };
 
 const modified = ref(false);

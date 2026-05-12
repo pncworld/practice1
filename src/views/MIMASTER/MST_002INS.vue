@@ -386,7 +386,7 @@ import {
   getTableList,
   getTableScreenKeys,
   saveScreenKeys3,
-  saveTables,
+  saveTables_test,
 } from "@/api/master";
 import DupliPopUp6 from "@/components/dupliPopUp6.vue";
 /**
@@ -422,6 +422,173 @@ import { onActivated, onDeactivated, onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
+
+/** 조회 직후 tableList 스냅샷 — 저장 시 ADD/UPD/DEL diff 기준 */
+const tableListBaseline = ref([]);
+
+function isMst002TempTableRow(row) {
+  if (!row) return false;
+  const id = row.id != null ? String(row.id) : "";
+  if (id && /^new/i.test(id)) return true;
+  const k = row.lngKeyscrNo;
+  if (k == null) return false;
+  const ks = String(k);
+  return ks.toLowerCase().includes("new");
+}
+
+function mst002RowPersistKey(row) {
+  return `${String(row.intScreenNo)}_${String(row.lngKeyscrNo)}`;
+}
+
+function mst002PxDimToIntStr(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? String(Math.round(n)) : "0";
+}
+
+/** SP @x,@y,@w,@h 는 INT — 그리드 배율 곱의 소수 제거 */
+function mst002RowToSaveGeometry(item) {
+  const rawX =
+    item.x !== undefined && item.x !== null ? item.x * 125 : item.lngX;
+  const rawY =
+    item.y !== undefined && item.y !== null ? item.y * 125 : item.lngY;
+  const rawW =
+    item.w !== undefined && item.w !== null ? item.w * 120 : item.lngWidth;
+  const rawH =
+    item.h !== undefined && item.h !== null ? item.h * 120 : item.lngHeight;
+  return {
+    x: mst002PxDimToIntStr(rawX),
+    y: mst002PxDimToIntStr(rawY),
+    w: mst002PxDimToIntStr(rawW),
+    h: mst002PxDimToIntStr(rawH),
+  };
+}
+
+function mst002TableRowEqualsForSave(cur, base) {
+  const g1 = mst002RowToSaveGeometry(cur);
+  const g2 = mst002RowToSaveGeometry(base);
+  return (
+    String(cur.lngKeyColor) === String(base.lngKeyColor) &&
+    String(cur.lngShape) === String(base.lngShape) &&
+    String(cur.strName ?? "") === String(base.strName ?? "") &&
+    String(cur.lngCount ?? "") === String(base.lngCount ?? "") &&
+    g1.x === g2.x &&
+    g1.y === g2.y &&
+    g1.w === g2.w &&
+    g1.h === g2.h
+  );
+}
+
+/**
+ * saveTables(as-is ADD/UPD/DEL)용 delta — master.saveTables_test 두 번째 인자
+ */
+function buildMst002TableSaveDelta(currentList, baselineList) {
+  const base = Array.isArray(baselineList) ? baselineList : [];
+  const cur = Array.isArray(currentList) ? currentList : [];
+
+  const baselineMap = new Map();
+  for (const b of base) {
+    if (!isMst002TempTableRow(b)) {
+      baselineMap.set(mst002RowPersistKey(b), b);
+    }
+  }
+
+  const currentPersistedKeys = new Set();
+  for (const r of cur) {
+    if (!isMst002TempTableRow(r)) {
+      currentPersistedKeys.add(mst002RowPersistKey(r));
+    }
+  }
+
+  const delScreenNos = [];
+  const delKeyscrNos = [];
+  for (const b of base) {
+    if (isMst002TempTableRow(b)) continue;
+    const pk = mst002RowPersistKey(b);
+    if (!currentPersistedKeys.has(pk)) {
+      delScreenNos.push(String(b.intScreenNo));
+      delKeyscrNos.push(String(b.lngKeyscrNo));
+    }
+  }
+
+  const addClientIds = [];
+  const addScreenNos = [];
+  const addKeyColors = [];
+  const addKeyShapes = [];
+  const addKeyNames = [];
+  const addKeyLngCounts = [];
+  const addXs = [];
+  const addYs = [];
+  const addWs = [];
+  const addHs = [];
+
+  const updScreenNos = [];
+  const updKeyscrNos = [];
+  const updKeyColors = [];
+  const updKeyShapes = [];
+  const updKeyNames = [];
+  const updKeyLngCounts = [];
+  const updXs = [];
+  const updYs = [];
+  const updWs = [];
+  const updHs = [];
+
+  for (const r of cur) {
+    if (isMst002TempTableRow(r)) {
+      const geo = mst002RowToSaveGeometry(r);
+      addClientIds.push(String(r.id != null ? r.id : r.lngKeyscrNo));
+      addScreenNos.push(String(r.intScreenNo));
+      addKeyColors.push(String(r.lngKeyColor));
+      addKeyShapes.push(String(r.lngShape));
+      addKeyNames.push(String(r.strName ?? ""));
+      addKeyLngCounts.push(String(r.lngCount ?? ""));
+      addXs.push(geo.x);
+      addYs.push(geo.y);
+      addWs.push(geo.w);
+      addHs.push(geo.h);
+    } else {
+      const pk = mst002RowPersistKey(r);
+      const baseRow = baselineMap.get(pk);
+      if (!baseRow || !mst002TableRowEqualsForSave(r, baseRow)) {
+        const geo = mst002RowToSaveGeometry(r);
+        updScreenNos.push(String(r.intScreenNo));
+        updKeyscrNos.push(String(r.lngKeyscrNo));
+        updKeyColors.push(String(r.lngKeyColor));
+        updKeyShapes.push(String(r.lngShape));
+        updKeyNames.push(String(r.strName ?? ""));
+        updKeyLngCounts.push(String(r.lngCount ?? ""));
+        updXs.push(geo.x);
+        updYs.push(geo.y);
+        updWs.push(geo.w);
+        updHs.push(geo.h);
+      }
+    }
+  }
+
+  return {
+    addClientIds,
+    addScreenNos,
+    addKeyColors,
+    addKeyShapes,
+    addKeyNames,
+    addKeyLngCounts,
+    addXs,
+    addYs,
+    addWs,
+    addHs,
+    updScreenNos,
+    updKeyscrNos,
+    updKeyColors,
+    updKeyShapes,
+    updKeyNames,
+    updKeyLngCounts,
+    updXs,
+    updYs,
+    updWs,
+    updHs,
+    delScreenNos,
+    delKeyscrNos,
+  };
+}
 
 const ScreenKeyOrigin = ref([]);
 const changeMode = ref(false);
@@ -468,12 +635,22 @@ const shapeclick = (value) => {
     } else if (clickedShape.value == 3) {
       resizeHandle.classList.add("triangle");
     }
-    const findit = tableList.value.find(
+    const finditFiltered = filteredtableList.value.find(
       (item) => item.lngKeyscrNo == clickedtableCode.value
+    );
+    if (finditFiltered) {
+      finditFiltered.lngShape = clickedShape.value;
+    }
+    const findit = tableList.value.find(
+      (item) =>
+        item.lngKeyscrNo == clickedtableCode.value &&
+        item.intScreenNo == clickScreenButton.value
     );
     //comsole.log(findit);
     //comsole.log(clickedtableCode.value);
-    findit.lngShape = clickedShape.value;
+    if (findit) {
+      findit.lngShape = clickedShape.value;
+    }
   }
 };
 const clickedColor = ref(1);
@@ -625,7 +802,9 @@ const searchButton = async () => {
       posNo.value,
       nowStoreAreaCd.value
     );
-    ScreenKeyOrigin.value = res.data.SCREENKEYS;
+    ScreenKeyOrigin.value = Array.isArray(res.data.SCREENKEYS)
+      ? res.data.SCREENKEYS
+      : [];
 
     //comsole.log(ScreenKeyOrigin.value);
     let res2 = await getTableList(
@@ -636,7 +815,10 @@ const searchButton = async () => {
     );
 
     ////console.log(res2);
-    tableList.value = res2.data.TABLELISTS;
+    tableList.value = Array.isArray(res2.data.TABLELISTS)
+      ? res2.data.TABLELISTS
+      : [];
+    tableListBaseline.value = JSON.parse(JSON.stringify(tableList.value));
     //comsole.log(tableList.value);
     filteredtableList.value = tableList.value
       .filter((item) => item.intScreenNo == "1")
@@ -864,6 +1046,7 @@ onMounted(async () => {
 
 const sequence = ref(1);
 function addNewWidget() {
+  const n = sequence.value;
   // filteredtableList에서 아이템을 가져옴, 없으면 기본 값 설정
   const node = {
     w: 5, // 너비
@@ -871,12 +1054,12 @@ function addNewWidget() {
     intScreenNo: clickScreenButton.value,
     lngCount: 0,
     lngKeyColor: "16777215",
-    lngKeyscrNo: "new" + sequence.value,
+    lngKeyscrNo: "new" + n,
     lngShape: 0,
-    strName: "신규" + sequence.value,
+    strName: "신규" + n,
   };
-  // id는 count 값을 사용
-  node.id = String("new" + ++sequence.value);
+  // id는 count 값을 사용 (++sequence 하면 표시/키가 한 칸 밀림)
+  node.id = String("new" + n);
 
   // autoPosition을 true로 설정하여 겹치지 않게 자동으로 위치 배치
   const result = grid.addWidget(node); // true로 설정하면 GridStack이 자동으로 위치를 계산
@@ -901,12 +1084,13 @@ function addNewWidget() {
     });
     return;
   }
+  sequence.value = n + 1;
   filteredtableList.value.push({
     intScreenNo: Number(clickScreenButton.value),
-    strName: "신규" + sequence.value,
+    strName: "신규" + n,
     lngShape: 0,
     lngKeyColor: 16777215,
-    lngKeyscrNo: "new" + sequence.value,
+    lngKeyscrNo: "new" + n,
     lngCount: 0,
     w: 5,
     h: 5,
@@ -916,10 +1100,10 @@ function addNewWidget() {
   });
   tableList.value.push({
     intScreenNo: clickScreenButton.value,
-    strName: "신규" + sequence.value,
+    strName: "신규" + n,
     lngShape: 0,
     lngKeyColor: 16777215,
-    lngKeyscrNo: "new" + sequence.value,
+    lngKeyscrNo: "new" + n,
     lngCount: 0,
     w: 5,
     h: 5,
@@ -939,7 +1123,7 @@ function addNewWidget() {
   const textElement = widgetElement.querySelector(".grid-stack-item-content");
   if (textElement) {
     const newDiv = document.createElement("div");
-    newDiv.innerText = "신규" + sequence.value; // 텍스트 설정
+    newDiv.innerText = "신규" + n; // 텍스트 설정
     newDiv.style.position = "absolute";
     newDiv.style.left = "0";
     newDiv.style.zIndex = "81";
@@ -1310,9 +1494,10 @@ const confirmScreenKey = () => {
     });
     return;
   }
-  const nextKeyno = Math.max(
-    ...ScreenKeyOrigin.value.map((item) => item.intScreenNo)
-  );
+  const existingNos = ScreenKeyOrigin.value
+    .map((item) => Number(item.intScreenNo))
+    .filter((n) => Number.isFinite(n));
+  const nextKeyno = existingNos.length > 0 ? Math.max(...existingNos) : 0;
 
   //comsole.log(nextKeyno);
   ScreenKeyOrigin.value.push({
@@ -1412,17 +1597,13 @@ const saveButton = async () => {
     if (result.isConfirmed) {
       store.state.loading = true;
       try {
-        let res;
-        let res2;
-        let res3;
-
         const ScreenKeyNms = ScreenKeyOrigin.value.map(
           (item) => item.strScreenName
         );
         const ScreenKeyNos = ScreenKeyOrigin.value.map(
           (item) => item.intScreenNo
         );
-        res = await saveScreenKeys3(
+        const res = await saveScreenKeys3(
           groupCd.value,
           nowStoreCd.value,
           posNo.value,
@@ -1430,91 +1611,46 @@ const saveButton = async () => {
           ScreenKeyNms.join(","),
           ScreenKeyNos.join(",")
         );
-        ////console.log(res);
-        //comsole.log(tableList.value);
-        const intScreenNos = tableList.value.map((item) => item.intScreenNo);
-        const ids = tableList.value.map((item) =>
-          typeof item.lngKeyscrNo == "string" ? 0 : item.lngKeyscrNo
+        if (res.data?.RESULT_CD != null && res.data.RESULT_CD !== "00") {
+          throw new Error(res.data.RESULT_NM || "화면키 저장에 실패했습니다.");
+        }
+
+        updateTableListFromFiltered();
+        const delta = buildMst002TableSaveDelta(
+          tableList.value,
+          tableListBaseline.value
         );
-        const lngKeyColors = tableList.value.map((item) => item.lngKeyColor);
-        const lngShapes = tableList.value.map((item) => item.lngShape);
-        const strNames = tableList.value.map((item) => item.strName);
-        const lngCounts = tableList.value.map((item) => item.lngCount);
-        const xs = tableList.value.map((item) => {
-          return item.x !== undefined && item.x !== null
-            ? item.x * 125
-            : item.lngX; // x가 없으면 lngX를 사용
-        });
-        const ys = tableList.value.map((item) => {
-          return item.y !== undefined && item.y !== null
-            ? item.y * 125
-            : item.lngY; // x가 없으면 lngX를 사용
-        });
-        const ws = tableList.value.map((item) => {
-          return item.w !== undefined && item.w !== null
-            ? item.w * 120
-            : item.lngWidth; // x가 없으면 lngX를 사용
-        });
-
-        const hs = tableList.value.map((item) => {
-          return item.h !== undefined && item.h !== null
-            ? item.h * 120
-            : item.lngHeight; // x가 없으면 lngX를 사용
-        });
-
-        const newtableNm = tableList.value
-          .filter((item) => item.lngKeyscrNo.toString().includes("new"))
-          .map((item) => item.strName);
-        const newtableCount = tableList.value
-          .filter((item) => item.lngKeyscrNo.toString().includes("new"))
-          .map((item) => item.lngCount);
-
-        //comsole.log(intScreenNos);
-        //comsole.log(ids);
-        //comsole.log(lngKeyColors);
-        //comsole.log(lngShapes);
-        //comsole.log(strNames);
-        //comsole.log(lngCounts);
-        //comsole.log(xs);
-        //comsole.log(ys);
-        //comsole.log(ws);
-        //comsole.log(hs);
-        //comsole.log(newtableNm);
-        //comsole.log(newtableCount);
-
-        res2 = await saveTables(
+        const res2 = await saveTables_test(
           groupCd.value,
           nowStoreCd.value,
           posNo.value,
           nowStoreAreaCd.value,
-          intScreenNos.join(","),
-          ids.join(","),
-          lngKeyColors.join(","),
-          lngShapes.join(","),
-          strNames.join(","),
-          lngCounts.join(","),
-          xs.join(","),
-          ys.join(","),
-          ws.join(","),
-          hs.join(","),
-          newtableNm.join(","),
-          newtableCount.join(",")
+          delta
         );
+        if (res2.data?.RESULT_CD != null && res2.data.RESULT_CD !== "00") {
+          throw new Error(res2.data.RESULT_NM || "테이블 저장에 실패했습니다.");
+        }
 
-        ////console.log(res2);
-      } catch (error) {
-        //comsole.log(error);
-      } finally {
-        store.state.loading = false;
-        Swal.fire({
+        await Swal.fire({
           title: "저장 되었습니다.",
           confirmButtonText: "확인",
         });
-
-        searchButton().then(() => {
-          //comsole.log(clickScreenButton.value);
-          showOtherScreen(clickScreenButton.value);
+        await searchButton();
+        showOtherScreen(clickScreenButton.value);
+      } catch (error) {
+        const msg =
+          error?.response?.data?.RESULT_NM ||
+          error?.response?.data?.message ||
+          error?.message ||
+          "저장 중 오류가 발생했습니다.";
+        Swal.fire({
+          title: "저장 실패",
+          text: String(msg),
+          icon: "error",
+          confirmButtonText: "확인",
         });
+      } finally {
+        store.state.loading = false;
       }
     }
   });

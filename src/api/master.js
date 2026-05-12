@@ -1603,41 +1603,39 @@ export const saveStorePayCd = (groupCd, storeCd, lngcode) => {
     LNG_CODE: lngcode,
   });
 };
-export const saveTables = (
-  groupCd,
-  storeCd,
-  posnos,
-  areaCds,
-  screenNo,
-  lngKeyscrNo,
-  lngKeyColors,
-  lngShapes,
-  strNames,
-  lngCounts,
-  xs,
-  ys,
-  ws,
-  hs,
-  newNm,
-  newlngCount
-) => {
-  return api2.post("/MIMASTER/MST_002INS.asmx/saveTables", {
+/**
+ * MST_002INS 좌석(테이블) 저장 — ADD / UPD / DEL 분리 (asmx 시그니처와 동일 키)
+ * @param {object} delta — MST_002INS.vue의 buildMst002TableSaveDelta 결과
+ */
+export const saveTables_test = (groupCd, storeCd, posnos, areaCds, delta) => {
+  const j = (arr) => (Array.isArray(arr) && arr.length ? arr.join(",") : "");
+  return api2.post("/MIMASTER/MST_002INS.asmx/saveTables_test", {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
     POS_NO: posnos,
     AREA_CD: areaCds,
-    SCREEN_NO: screenNo,
-    KEYSCR_NO: lngKeyscrNo,
-    KEY_COLOR: lngKeyColors,
-    KEY_SHAPE: lngShapes,
-    KEY_NAME: strNames,
-    KEY_LNGCOUNT: lngCounts,
-    X: xs,
-    Y: ys,
-    W: ws,
-    H: hs,
-    NEW_NM: newNm,
-    NEW_COUNT: newlngCount,
+    ADD_CLIENT_ID: j(delta.addClientIds),
+    ADD_SCREEN_NO: j(delta.addScreenNos),
+    ADD_KEY_COLOR: j(delta.addKeyColors),
+    ADD_KEY_SHAPE: j(delta.addKeyShapes),
+    ADD_KEY_NAME: j(delta.addKeyNames),
+    ADD_KEY_LNGCOUNT: j(delta.addKeyLngCounts),
+    ADD_X: j(delta.addXs),
+    ADD_Y: j(delta.addYs),
+    ADD_W: j(delta.addWs),
+    ADD_H: j(delta.addHs),
+    UPD_SCREEN_NO: j(delta.updScreenNos),
+    UPD_KEYSCR_NO: j(delta.updKeyscrNos),
+    UPD_KEY_COLOR: j(delta.updKeyColors),
+    UPD_KEY_SHAPE: j(delta.updKeyShapes),
+    UPD_KEY_NAME: j(delta.updKeyNames),
+    UPD_KEY_LNGCOUNT: j(delta.updKeyLngCounts),
+    UPD_X: j(delta.updXs),
+    UPD_Y: j(delta.updYs),
+    UPD_W: j(delta.updWs),
+    UPD_H: j(delta.updHs),
+    DEL_SCREEN_NO: j(delta.delScreenNos),
+    DEL_KEYSCR_NO: j(delta.delKeyscrNos),
   });
 };
 export const saveTables2 = (
