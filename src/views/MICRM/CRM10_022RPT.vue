@@ -6,89 +6,138 @@
 ################################################################################*/ -->
 <template>
   <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+    <div
+      class="flex shrink-0 items-center justify-between gap-3 overflow-y-hidden pr-1">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="searchButton" class="button search md:w-auto w-14">
+      <div class="flex shrink-0 items-center justify-end space-x-2 pr-5">
+        <button type="button" class="button search md:w-auto w-14" @click="searchButton">
           조회
         </button>
-        <button @click="excelButton" class="button save w-auto excel">
+        <button type="button" class="button save w-auto excel" @click="excelButton">
           엑셀
         </button>
       </div>
     </div>
-    <div class="flex bg-gray-200 rounded-lg h-16 items-start z-10">
-      <div>
-        <PickStore
-          class="!-mr-4"
-          :hideGroup="false"
-          :hideAttr="false"
-          @update:storeCd="lngStoreCode"
-          @update:storeGroup="lngStoreGroup"
-          @storeNm="excelStore"
-          :defaultStoreNm="'전체'">
-        </PickStore>
-      </div>
-      <div class="ml-5">
-        <Datepicker2
-          @endDate="endDate"
-          @startDate="startDate"
-          @excelDate="excelDate"
-          :initToday="1"
-          :mainName="'접수일'"
-          class="!w-[350px] !pr-0 !ml-5"></Datepicker2>
-      </div>
-      <div class="flex mt-5 ml-32">
-        <div class="text-base font-semibold text-nowrap">상태</div>
-        <div>
-          <select name="" id="" class="w-32 ml-5" v-model="status">
-            <option value="99">전체</option>
-            <option value="0">예약</option>
-            <option value="1">방문</option>
-            <option value="2">대기</option>
-            <option value="3">입장</option>
-            <option value="4">취소</option>
-            <option value="5">NO SHOW</option>
-          </select>
+
+    <div
+      class="crm10-search-panel z-10 mt-3 w-full max-w-[min(100%,1680px)] min-w-0 shrink-0 self-center overflow-x-auto rounded-md border border-slate-500/70 bg-gradient-to-b from-violet-100 via-purple-50/95 to-slate-100 shadow-sm">
+      <div
+        class="crm10-search-body min-w-0 text-slate-800"
+        :style="{ '--crm10-control-border': crm10ControlBorder }">
+        <!-- 1행: 매장명 · 매장 · 접수일 -->
+        <div
+          class="crm10-search-row crm10-row-store flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-slate-500/45 px-4 py-2.5 sm:px-5">
+          <div class="crm10-label-slot shrink-0">
+            <span class="crm10-lbl">매장명</span>
+          </div>
+          <div class="crm10-pick-slot min-w-0 flex-1 basis-0 sm:max-w-[22rem]">
+            <PickStore
+              compact-search-bar
+              :compact-store-combo-max-rem="20"
+              main-name=""
+              :default-store-nm="'전체'"
+              :hide-group="false"
+              :hide-attr="false"
+              @update:store-cd="lngStoreCode"
+              @update:store-group="lngStoreGroup"
+              @store-nm="excelStore"></PickStore>
+          </div>
+          <div class="crm10-pair flex shrink-0 flex-nowrap items-center gap-x-2">
+            <div class="crm10-label-slot shrink-0">
+              <span class="crm10-lbl">접수일</span>
+            </div>
+            <div class="crm10-date-slot min-w-0">
+              <Datepicker2
+                ref="datepicker"
+                :main-name="'접수일'"
+                omit-main-label
+                filter-bar-align
+                :init-today="1"
+                :close-pop-up="closePopUp"
+                @end-date="endDate"
+                @excel-date="excelDate"
+                @start-date="startDate"></Datepicker2>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2행: 상태 · 고객명 · 전화번호 -->
+        <div
+          class="crm10-search-row crm10-row-rest flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5 sm:px-5">
+          <div class="crm10-pair flex shrink-0 flex-nowrap items-center gap-x-2">
+            <div class="crm10-label-slot shrink-0">
+              <span class="crm10-lbl">상태</span>
+            </div>
+            <select
+              id="crm10-022-status"
+              v-model="status"
+              class="crm10-select h-8 min-h-8 w-36 shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-slate-800">
+              <option value="99">전체</option>
+              <option value="0">예약</option>
+              <option value="1">방문</option>
+              <option value="2">대기</option>
+              <option value="3">입장</option>
+              <option value="4">취소</option>
+              <option value="5">NO SHOW</option>
+            </select>
+          </div>
+
+          <div class="crm10-pair flex shrink-0 flex-nowrap items-center gap-x-2">
+            <div class="crm10-label-slot shrink-0">
+              <span class="crm10-lbl">고객명</span>
+            </div>
+            <input
+              v-model="cond"
+              type="text"
+              autocomplete="off"
+              class="crm10-input h-8 min-h-8 w-[11rem] max-w-[min(100%,14rem)] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-slate-800" />
+          </div>
+
+          <div class="crm10-pair flex min-w-0 shrink-0 flex-nowrap items-center gap-x-2">
+            <div class="crm10-label-slot shrink-0">
+              <span class="crm10-lbl">전화번호</span>
+            </div>
+            <div class="crm10-phone-val flex min-w-0 flex-nowrap items-center gap-x-1.5">
+              <input
+                v-model="cond2"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                class="crm10-input h-8 min-h-8 w-[7.5rem] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-slate-800" />
+              <span class="crm10-hint shrink-0 text-xs font-medium text-slate-600">(뒷4자리)</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="flex ml-6 mt-5">
-        <div class="text-base font-semibold">고객명</div>
-        <div><input type="text" class="ml-5" v-model="cond" /></div>
-      </div>
-      <div class="flex mt-5 ml-5">
-        <div class="text-base font-semibold">전화번호</div>
-        <div><input type="text" class="ml-5" v-model="cond2" /></div>
-        <div>(뒷4자리)</div>
-      </div>
     </div>
-    <!-- 조회조건 -->
-    <!-- 그리드 영역 -->
-    <div class="w-full h-[75%]">
-      <Realgrid
-        :progname="'CRM10_022RPT_VUE'"
-        :progid="1"
-        :rowData="rowData"
-        :reload="reload"
-        :setStateBar="false"
-        :documentTitle="'CRM10_022RPT'"
-        :dynamicRowHeight="true"
-        :documentSubTitle="documentSubTitle"
-        :rowStateeditable="false"
-        :exporttoExcel="exportExcel">
-      </Realgrid>
+
+    <!-- 그리드 -->
+    <div
+      class="crm10-grid-shell mx-auto mt-2 flex min-h-0 min-w-0 w-full max-w-[min(100%,1680px)] flex-1 flex-col basis-0 overflow-hidden px-1 pb-1">
+      <div
+        class="crm10-main-grid-frame flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-sm border border-gray-400 bg-white">
+        <div class="relative min-h-0 w-full flex-1">
+          <Realgrid
+            :progname="'CRM10_022RPT_VUE'"
+            :progid="1"
+            :rowData="rowData"
+            :reload="reload"
+            :setStateBar="false"
+            :documentTitle="'CRM10_022RPT'"
+            :dynamicRowHeight="true"
+            :documentSubTitle="documentSubTitle"
+            :rowStateeditable="false"
+            :exporttoExcel="exportExcel">
+          </Realgrid>
+        </div>
+      </div>
     </div>
   </div>
-  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
-import {
-  getBelongCustList,
-  getReservedChangeHistory,
-  getReservedSearch,
-} from "@/api/micrm";
+import { getReservedSearch } from "@/api/micrm";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -128,13 +177,9 @@ import { onMounted, ref } from "vue";
  */
 
 import { useStore } from "vuex";
-/**
- * 	화면 Load시 실행 스크립트
- */
 
-onMounted(async () => {
-  const pageLog = await insertPageLog(store.state.activeTab2);
-});
+const store = useStore();
+const crm10ControlBorder = "#cbd5e1";
 
 const reload = ref(false);
 const rowData = ref([]);
@@ -142,7 +187,6 @@ const afterSearch = ref(false);
 
 const cond = ref("");
 const cond2 = ref("");
-const store = useStore();
 const status = ref(99);
 const datepicker = ref(null);
 const closePopUp = ref(false);
@@ -164,6 +208,10 @@ const enddate = ref("");
 const endDate = (e) => {
   enddate.value = e;
 };
+
+onMounted(async () => {
+  await insertPageLog(store.state.activeTab2);
+});
 /**
  * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
  */
@@ -280,3 +328,100 @@ const excelDate = (e) => {
   //comsole.log(e);
 };
 </script>
+
+<style scoped>
+.crm10-main-grid-frame {
+  min-height: min(65vh, 420px);
+}
+
+@media (max-height: 800px) {
+  .crm10-main-grid-frame {
+    min-height: min(52vh, 300px);
+  }
+}
+
+.crm10-lbl {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(30 41 59);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.crm10-label-slot {
+  display: grid;
+  min-width: 0;
+  min-height: 2rem;
+  align-items: center;
+  grid-template-columns: minmax(5.25rem, 6.75rem);
+}
+
+.crm10-pick-slot :deep(> div.flex.text-base > div.shrink-0:first-child) {
+  display: none;
+}
+
+.crm10-date-slot :deep(> div.flex.justify-start.items-center) {
+  min-height: 2rem;
+  align-items: center;
+}
+
+.crm10-search-panel .crm10-input,
+.crm10-search-panel .crm10-select {
+  border: 1px solid var(--crm10-control-border) !important;
+  box-sizing: border-box;
+}
+
+.crm10-search-panel .crm10-input:focus,
+.crm10-search-panel .crm10-select:focus {
+  border-color: #3b82f6 !important;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.35);
+}
+
+.crm10-search-panel .crm10-date-slot :deep(input[type="date"]) {
+  border: 1px solid var(--crm10-control-border) !important;
+  box-sizing: border-box;
+}
+
+.crm10-search-panel .crm10-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.crm10-pick-slot {
+  width: 100%;
+  min-width: 0;
+}
+
+.crm10-pick-slot :deep(select) {
+  border: 1px solid var(--crm10-control-border) !important;
+}
+
+.crm10-pick-slot :deep(select:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.crm10-pick-slot :deep(.pickstore-vs-shell) {
+  border: 1px solid var(--crm10-control-border) !important;
+}
+
+.crm10-pick-slot :deep(> div.flex.text-base) {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-height: 900px) {
+  .crm10-search-panel {
+    margin-top: 0.25rem !important;
+  }
+
+  .crm10-search-row {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+}
+</style>

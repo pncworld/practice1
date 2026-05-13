@@ -303,7 +303,6 @@
     @lngBonusPoint="lngBonusPoint"
     @lngUsedPoint="lngUsedPoint"
     @lngRemPoint="lngRemPoint"
-    @strRemark="strRemark"
     @lngStoreCode="lngStoreCode"
     @lngCustNo="lngCustNo"
     @closePopUp="showPopup = false"></CustomerSearch>
@@ -439,9 +438,11 @@ const searchButton = async () => {
     } else {
       res = await getCardChangeInfo(
         store.state.userData.lngStoreGroup,
-        cond2.value,
         null,
-        null
+        null,
+        null,
+        "1",
+        cond2.value
       );
     }
     ////console.log(res);
@@ -524,9 +525,6 @@ const lngRemPoint = (e) => {
   } else {
     pcond18.value = e;
   }
-};
-const strRemark = (e) => {
-  //pcond12.value = e;
 };
 const lngStoreCode = (e) => {
   if (isfirst.value == false) {
