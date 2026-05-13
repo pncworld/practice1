@@ -17,8 +17,18 @@ const isFavoriteOrNot = ref(false);
 
 let lngProgId;
 onMounted(async () => {
-  currentTabName.value = store.state.activeTab2.strTitle;
-  lngProgId = store.state.activeTab2.lngProgramID.split("_")[0];
+  const t = store.state.activeTab2;
+  if (!t || typeof t !== "object") {
+    currentTabName.value = "";
+    isFavoriteOrNot.value = false;
+    return;
+  }
+  currentTabName.value = t.strTitle ?? "";
+  if (!t.lngProgramID) {
+    isFavoriteOrNot.value = false;
+    return;
+  }
+  lngProgId = t.lngProgramID.split("_")[0];
 
   isFavoriteOrNot.value = store.state.favoriteList.includes(Number(lngProgId));
 });
@@ -26,8 +36,18 @@ onMounted(async () => {
 watch(
   () => [store.state.activeTab2, store.state.favoriteList],
   () => {
-    currentTabName.value = store.state.activeTab2.strTitle;
-    let lngProgId = store.state.activeTab2.lngProgramID.split("_")[0];
+    const t = store.state.activeTab2;
+    if (!t || typeof t !== "object") {
+      currentTabName.value = "";
+      isFavoriteOrNot.value = false;
+      return;
+    }
+    currentTabName.value = t.strTitle ?? "";
+    if (!t.lngProgramID) {
+      isFavoriteOrNot.value = false;
+      return;
+    }
+    let lngProgId = t.lngProgramID.split("_")[0];
 
     isFavoriteOrNot.value = store.state.favoriteList.includes(
       Number(lngProgId)

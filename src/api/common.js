@@ -1,10 +1,11 @@
+import { SALES_ANALYSIS_DASHBOARD_API } from "@/constants/salesAnalysisDashboardApi.js";
 import router from "@/router";
 import store from "@/store";
 import axios from "axios";
 import { ref } from "vue";
 
 export const commonUrl = "http://211.238.145.43:3000";
-export const commonUrl2 = "https://www.pncapi.kr"; //http://www.pncoffice.com:8085
+export const commonUrl2 = "https://pncapi.kr"; // Postman·운영 API 호스트와 통일 (www 서브도메인과 다를 수 있음)
 // Axios 인스턴스 생성 (기본 설정)
 const api = axios.create({
   baseURL: commonUrl, // API 기본 URL
@@ -42,9 +43,9 @@ api2.interceptors.response.use(
       //alert("로그인 시간이 1분 이상 지났습니다. 재로그인 해주세요.");
       store.commit("clearSession");
       router.push("/");
-      return new Promise(() => {});
     }
-    return new Promise(() => {});
+    /* 영원히 pending 인 Promise 를 반환하면 호출부(await / allSettled)가 끝나지 않아 로딩이 풀리지 않음 */
+    return Promise.reject(error);
   }
 );
 // API 요청 메서드들
@@ -321,4 +322,112 @@ export const MainDashBoard3 = (groupcd, storecd) => {
     GROUP_CD: groupcd,
     STORE_CD: storecd,
   });
+};
+
+/**
+ * `SLS00_001DASH.asmx` 5개 웹메서드 공통 요청 바디.
+ * @param {string|number} groupCd GROUP_CD
+ * @param {string|number} storeCd STORE_CD (본사 0 — 프론트 `SalesAnalysisDashboard` 의 본사 판별과 동일하게 전달)
+ * @param {string|number} sequence SEQUENCE
+ * @param {string} fromDt FROM_DT (`yyyy-mm-dd`, Asia/Seoul 당월 1일 등)
+ * @param {string} toDt TO_DT (`yyyy-mm-dd`)
+ * @returns {{ GROUP_CD: string|number; STORE_CD: string|number; SEQUENCE: string|number; FROM_DT: string; TO_DT: string }}
+ */
+export const buildSalesAnalysisDashBody = (
+  groupCd,
+  storeCd,
+  sequence,
+  fromDt,
+  toDt
+) => ({
+  GROUP_CD: groupCd,
+  STORE_CD: storeCd,
+  SEQUENCE: sequence,
+  FROM_DT: fromDt,
+  TO_DT: toDt,
+});
+
+/**
+ * 홈 매출 분석 — 주간 핵심 지표
+ * @see buildSalesAnalysisDashBody
+ */
+export const getWeeklyKeyIndicators = (
+  groupCd,
+  storeCd,
+  sequence,
+  fromDt,
+  toDt
+) => {
+  return api2.post(
+    SALES_ANALYSIS_DASHBOARD_API.weeklyKeyIndicators,
+    buildSalesAnalysisDashBody(groupCd, storeCd, sequence, fromDt, toDt)
+  );
+};
+
+/**
+ * 홈 매출 분석 — 객수/객단가 매장별
+ * @see buildSalesAnalysisDashBody
+ */
+export const getCustomerAndUnitPriceByStore = (
+  groupCd,
+  storeCd,
+  sequence,
+  fromDt,
+  toDt
+) => {
+  return api2.post(
+    SALES_ANALYSIS_DASHBOARD_API.customerAndUnitPriceByStore,
+    buildSalesAnalysisDashBody(groupCd, storeCd, sequence, fromDt, toDt)
+  );
+};
+
+/**
+ * 홈 매출 분석 — 매장 매출 매장별
+ * @see buildSalesAnalysisDashBody
+ */
+export const getStoreSalesByStore = (
+  groupCd,
+  storeCd,
+  sequence,
+  fromDt,
+  toDt
+) => {
+  return api2.post(
+    SALES_ANALYSIS_DASHBOARD_API.storeSalesByStore,
+    buildSalesAnalysisDashBody(groupCd, storeCd, sequence, fromDt, toDt)
+  );
+};
+
+/**
+ * 홈 매출 분석 — 재료비 매장별
+ * @see buildSalesAnalysisDashBody
+ */
+export const getMaterialCostByStore = (
+  groupCd,
+  storeCd,
+  sequence,
+  fromDt,
+  toDt
+) => {
+  return api2.post(
+    SALES_ANALYSIS_DASHBOARD_API.materialCostByStore,
+    buildSalesAnalysisDashBody(groupCd, storeCd, sequence, fromDt, toDt)
+  );
+};
+
+/**
+ * 홈 매출 분석 — 인건비 매장별
+ * @see buildSalesAnalysisDashBody
+ */
+export const getLaborCostByStore = (
+  groupCd,
+  storeCd,
+  sequence,
+  fromDt,
+  toDt
+) => {
+  return api2.post(
+    SALES_ANALYSIS_DASHBOARD_API.laborCostByStore,
+    buildSalesAnalysisDashBody(groupCd, storeCd, sequence, fromDt, toDt)
+  );
 };

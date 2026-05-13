@@ -3,8 +3,15 @@
     <div class="page-scroll">
       <div class="pd24 pt0 mt30 grid-area" data-fixed>
         <!-- grid-area: 남은 화면 높이 전체 채움 / grid-fixed: 콘텐츠 높이만큼만 출력 -->
-        
-        <div class="dashboard-content">
+
+        <SalesAnalysisDashboard
+          v-if="isHomeSalesAnalysisDashboard"
+          ref="salesAnalysisDashboardRef"
+          class="sa-dash-host"
+          @refresh="onSalesAnalysisDashboardRefresh"
+        />
+
+        <div v-else class="dashboard-content">
           <section class="dashboard-top">
             <!-- KPI 2x2 -->
             <div class="kpi-area" style="grid-column: 1 / 2; grid-row: 1 / 2;">
@@ -134,9 +141,12 @@
 
 <script setup>
 import { MainDashBoard, MainDashBoard2, MainDashBoard3 } from "@/api/common";
+import SalesAnalysisDashboard from "@/components/SalesAnalysisDashboard.vue";
+import { USER_ADMIN_ID_SUPPLIER_ACCOUNT } from "@/constants/sessionUser";
+import { matchesSalesAnalysisHomeTempBypass } from "@/constants/salesAnalysisDashboardApi.js";
 import Chart from "@/components/chart.vue";
 import Realgrid from "@/components/realgrid.vue";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -144,6 +154,23 @@ import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
+
+/** 홈 매출 분석 대시보드 노출은 `SALES_ANALYSIS_HOME_TEMP_BYPASS_RULES` (`salesAnalysisDashboardApi.js`)만 따름 */
+/** @param {Record<string, unknown>|unknown} u userData */
+function isSalesAnalysisDashboardHome(u) {
+  if (!u || typeof u !== "object" || Array.isArray(u)) return false;
+  return matchesSalesAnalysisHomeTempBypass(u);
+}
+
+const isHomeSalesAnalysisDashboard = computed(() =>
+  isSalesAnalysisDashboardHome(store.state.userData)
+);
+
+const salesAnalysisDashboardRef = ref(null);
+
+function onSalesAnalysisDashboardRefresh() {
+  /* SalesAnalysisDashboard 가 새로고침 시 API까지 처리한 뒤 emit 함 — 부모에서 추가 연동 시 여기 작성 */
+}
 
 /**
  * 	화면 Load시 실행 스크립트
@@ -178,6 +205,13 @@ onMounted(async () => {
 
   console.log(store.state.userData);
   const userdata = store.state.userData;
+  if (isSalesAnalysisDashboardHome(userdata)) {
+    return;
+  }
+  /* 구 대시보드 공통: 매장 그룹과 무관, 공급사(60)이면 MainDashBoard·2·3 미호출 */
+  if (Number(userdata.lngUserAdminID) === USER_ADMIN_ID_SUPPLIER_ACCOUNT) {
+    return;
+  }
   let lngStoreCode = "";
 
   if (userdata.lngSubLease == "0") {
@@ -317,4 +351,13 @@ const formatNumber = (num) => {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.sa-dash-host {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+</style>

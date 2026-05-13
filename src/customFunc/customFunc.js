@@ -135,6 +135,9 @@ export function excelSerialDateToJSDate(serial) {
 }
 
 export async function insertPageLog(progdata) {
+  if (!progdata?.strUrl || typeof progdata.strUrl !== "string") {
+    return "";
+  }
   //const store = useStore()
   const currenttime = new Date();
   const inserttime = formatDateTime2(currenttime);

@@ -13,12 +13,21 @@
     =============================== -->
     <div v-if="showMenu" class="po-header flex-between">
       <div class="w-left h-left">
-        <div class="h-logo hidden md:block">
+        <div
+          class="h-logo h-logo-nav-home hidden md:block"
+          role="button"
+          tabindex="0"
+          title="대시보드로 이동"
+          @click="goToDashboard"
+          @keydown.enter.prevent="goToDashboard"
+          @keydown.space.prevent="goToDashboard"
+        >
           <!-- <img src="@/assets/images/logo.jpg" class="w100"> -->
           <img
             :src="strLogoUrl"
             @error="handleError2"
             class="w100"
+            alt=""
           />
         </div>
       </div>
@@ -204,6 +213,12 @@ const closeOtherTab = () => {
 };
 const route = useRoute();
 const store = useStore();
+/** 홈 대시보드로 이동 시 Vuex·insertPageLog 등이 기대하는 최소 탭 형태 (strUrl 없으면 strUrl.split 오류) */
+const ROUTE_HOME_TAB = Object.freeze({
+  strUrl: "HOME::MainDashBoard_VUE.xml",
+  lngProgramID: "",
+  strTitle: "대시보드",
+});
 const userData = computed(() => store.state.userData);
 
 /**
@@ -274,6 +289,7 @@ const handleError2 = (e) => {
   img.dataset.logoFallback = "1";
   img.src = defaultLogoSrc;
 };
+
 const mobileShowMenu = ref(false);
 const showMenu = ref(route.path != "/"); // Initialize based on current route
 const componentKey = ref(null);
@@ -298,6 +314,9 @@ const deleteAllTabs = () => {
     if (result.isConfirmed) {
       //store.dispatch("closeAllTabs");
       tabs.value = [];
+      currentActiveTab.value = { ...ROUTE_HOME_TAB };
+      store.dispatch("saveActiveTab", { ...ROUTE_HOME_TAB });
+      componentKey.value = null;
       router.push("/homePage");
     } else {
     }
@@ -385,6 +404,8 @@ const removeTab = (tab) => {
       query: { index: insteadProgramID },
     });
   } else {
+    currentActiveTab.value = { ...ROUTE_HOME_TAB };
+    store.dispatch("saveActiveTab", { ...ROUTE_HOME_TAB });
     componentKey.value = null;
     router.push("/homePage");
   }
@@ -407,13 +428,25 @@ const reLoad = () => {
   const a = tabs.value.find(
     (item) => item.lngProgramID == currentActiveTab.value.lngProgramID
   );
+  if (!a) {
+    return;
+  }
 
   const c = b + "_" + uuid;
   a.lngProgramID = c;
   componentKey.value = c;
 };
 
-const currentActiveTab = ref({ lngProgramID: "", strTitle: "" });
+const currentActiveTab = ref({ ...ROUTE_HOME_TAB });
+
+/** 다른 탭이 열려 있어도 홈 대시보드(homePage2)로 이동 — KPI·매출분석 대시보드 동일 경로 */
+const goToDashboard = () => {
+  currentActiveTab.value = { ...ROUTE_HOME_TAB };
+  store.dispatch("saveActiveTab", { ...ROUTE_HOME_TAB });
+  componentKey.value = null;
+  router.push({ name: "homePage" }).catch(() => {});
+};
+
 const setActiveTab = (tab) => {
   // showmenus.value = false ;
   //store.dispatch("changeActiveTab", tab);
@@ -482,5 +515,12 @@ watch(
 .header-style-3 {
   background-color: #545876 !important;
   color: white !important;
+}
+.h-logo-nav-home {
+  cursor: pointer;
+}
+.h-logo-nav-home:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
 }
 </style>
