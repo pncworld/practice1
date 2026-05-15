@@ -179,7 +179,7 @@ export const COL_MATERIAL = [
   },
   {
     fieldName: "actual",
-    headerText: "실적",
+    headerText: "매입금액",
     width: 96,
     bodyAlign: "far",
     fieldDataType: "number",

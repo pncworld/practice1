@@ -80,7 +80,8 @@
               ref="gridMaterial"
               export-label="재료비"
               :columns="COL_MATERIAL"
-              :row-data="costMaterialRows" />
+              :row-data="costMaterialRows"
+              :total-row-highlight="STORE_SALES_TOTAL_ROW_HIGHLIGHT" />
           </div>
         </section>
       </div>
@@ -978,15 +979,15 @@ defineExpose({
   --sa-card-hd-body-gap: 7px;
   /* 카드 제목줄(헤더) 공통 높이 — 매장 매출 등 우측 버튼 있어도 다른 카드와 동일 */
   --sa-card-hd-height: 45px;
-  /* 주간: 행 28px — 데이터 행 3행(매출·객수·객단가) 기준 높이 */
+  /* 주간: 행 28px — 데이터 행 4행(매출·객수·객단가·재료비) 기준 높이 */
   --sa-weekly-rg-row: 28px;
   --sa-weekly-rg-hdr: 26px;
-  --sa-weekly-data-rows: 3;
+  --sa-weekly-data-rows: 4;
   --sa-weekly-body-pad-bottom: 6px;
   --sa-weekly-grid-inner: calc(
     var(--sa-weekly-rg-hdr) + var(--sa-weekly-data-rows) * var(--sa-weekly-rg-row)
   );
-  /* 참고: 주간 카드 높이(3행 기준). 레이아웃은 2:3 fr 로 분배 */
+  /* 참고: 주간 카드 높이(4행 기준). 레이아웃은 2:3 fr 로 분배 */
   --sa-weekly-band: calc(
     var(--sa-card-hd-height) + var(--sa-card-hd-body-gap) + var(--sa-weekly-grid-inner) +
       var(--sa-weekly-body-pad-bottom)
