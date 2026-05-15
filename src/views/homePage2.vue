@@ -201,135 +201,141 @@ const kpiData = ref({
   receiptsRateClass: 'up'
 });
 onMounted(async () => {
-  store.state.loading = false;
-
   console.log(store.state.userData);
   const userdata = store.state.userData;
   if (isSalesAnalysisDashboardHome(userdata)) {
+    /* 신규 매출 분석 대시보드: `SalesAnalysisDashboard` 가 API 구간에서 로딩 처리 */
     return;
   }
   /* 구 대시보드 공통: 매장 그룹과 무관, 공급사(60)이면 MainDashBoard·2·3 미호출 */
   if (Number(userdata.lngUserAdminID) === USER_ADMIN_ID_SUPPLIER_ACCOUNT) {
+    store.dispatch("convertLoading", false);
     return;
   }
-  let lngStoreCode = "";
 
-  if (userdata.lngSubLease == "0") {
-    lngStoreCode = 0;
-  } else {
-    lngStoreCode = userdata.lngPosition;
-  }
+  store.dispatch("convertLoading", true);
+  try {
+    let lngStoreCode = "";
 
-  let res = "";
-  if (
-    userdata.lngSupplierID <= 1 &&
-    userdata.lngUserAdminID !== userdata.lngStoreGroup
-  ) {
-    res = await MainDashBoard(
-      userdata.lngStoreGroup,
-      lngStoreCode,
-      userdata.lngSubLease,
-      userdata.lngSequence,
-      userdata.lngLanguage
-    );
-
-    rowData.value = res.data.List;
-
-    rowData2.value = res.data.List2;
-    
-    // 각 타이틀에 맞게 currentMonth와 strAchieveRate 데이터 추출
-    if (rowData2.value && rowData2.value.length > 0) {
-      // 매출 (인덱스 0)
-      const salesItem = rowData2.value[0];
-      const salesCurrentMonth = salesItem ? parseInt(parseFloat(salesItem.currentMonth || salesItem.currenMonth || 0)) : 0;
-      const salesAchieveRate = salesItem?.strAchieveRate || '0%';
-      
-      // 고객수 (인덱스 1)
-      const customersItem = rowData2.value[1];
-      const customersCurrentMonth = customersItem ? parseInt(parseFloat(customersItem.currentMonth || customersItem.currenMonth || 0)) : 0;
-      const customersAchieveRate = customersItem?.strAchieveRate || '0%';
-      
-      // 고객 AVG. (인덱스 2)
-      const customerAvgItem = rowData2.value[2];
-      const customerAvgCurrentMonth = customerAvgItem ? parseInt(parseFloat(customerAvgItem.currentMonth || customerAvgItem.currenMonth || 0)) : 0;
-      const customerAvgAchieveRate = customerAvgItem?.strAchieveRate || '0%';
-      
-      // 영수증수 (인덱스 3)
-      const receiptsItem = rowData2.value[3];
-      const receiptsCurrentMonth = receiptsItem ? parseInt(parseFloat(receiptsItem.currentMonth || receiptsItem.currenMonth || 0)) : 0;
-      const receiptsAchieveRate = receiptsItem?.strAchieveRate || '0%';
-      
-      // KPI 데이터 업데이트
-      kpiData.value.sales = salesCurrentMonth;
-      kpiData.value.salesRate = salesAchieveRate;
-      kpiData.value.salesRateClass = salesAchieveRate && salesAchieveRate.startsWith('-') ? 'down' : 'up';
-      
-      kpiData.value.customers = customersCurrentMonth;
-      kpiData.value.customersRate = customersAchieveRate;
-      kpiData.value.customersRateClass = customersAchieveRate && customersAchieveRate.startsWith('-') ? 'down' : 'up';
-      
-      kpiData.value.customerAvg = customerAvgCurrentMonth;
-      kpiData.value.customerAvgRate = customerAvgAchieveRate;
-      kpiData.value.customerAvgRateClass = customerAvgAchieveRate && customerAvgAchieveRate.startsWith('-') ? 'down' : 'up';
-      
-      kpiData.value.receipts = receiptsCurrentMonth;
-      kpiData.value.receiptsRate = receiptsAchieveRate;
-      kpiData.value.receiptsRateClass = receiptsAchieveRate && receiptsAchieveRate.startsWith('-') ? 'down' : 'up';
+    if (userdata.lngSubLease == "0") {
+      lngStoreCode = 0;
+    } else {
+      lngStoreCode = userdata.lngPosition;
     }
 
+    let res = "";
+    if (
+      userdata.lngSupplierID <= 1 &&
+      userdata.lngUserAdminID !== userdata.lngStoreGroup
+    ) {
+      res = await MainDashBoard(
+        userdata.lngStoreGroup,
+        lngStoreCode,
+        userdata.lngSubLease,
+        userdata.lngSequence,
+        userdata.lngLanguage
+      );
 
-  }
+      rowData.value = res.data.List;
 
-  if (
-    (userdata.lngSupplierID <= 0 || userdata.lngStoreGroup == "1260") &&
-    userdata.lngUserAdminID != userdata.lngStoreGroup
-  ) {
-    let res = await MainDashBoard2(
-      userdata.lngStoreGroup,
-      userdata.lngPosition,
-      userdata.lngSequence
-    );
-    // ////console.log(res);
-    rowData3.value = res.data.List;
-    rowData4.value = res.data.List2;
-  }
+      rowData2.value = res.data.List2;
 
-  if (userdata.lngSupplierID > 0) {
-    return;
-  }
-  if (userdata.lngStoreGroup == "3033" && userdata.lngPositionType == 0) {
-    return;
-  }
-  if (userdata.lngStoreGroup == "7650" && userdata.lngPositionType == 0) {
-    return;
-  }
-  if (userdata.lngStoreGroup == "7639" && userdata.lngPositionType == 0) {
-    return;
-  }
-  if (userdata.lngStoreGroup == "7838" && userdata.lngPositionType == 0) {
-    return;
-  }
-  if (userdata.lngStoreGroup == "7208" && userdata.lngPositionType == 0) {
-    return;
-  }
-  if (userdata.lngUserAdminID == userdata.lngStoreGroup) {
-    return;
-  }
+      // 각 타이틀에 맞게 currentMonth와 strAchieveRate 데이터 추출
+      if (rowData2.value && rowData2.value.length > 0) {
+        // 매출 (인덱스 0)
+        const salesItem = rowData2.value[0];
+        const salesCurrentMonth = salesItem ? parseInt(parseFloat(salesItem.currentMonth || salesItem.currenMonth || 0)) : 0;
+        const salesAchieveRate = salesItem?.strAchieveRate || '0%';
 
-  res = await MainDashBoard3(userdata.lngStoreGroup, lngStoreCode);
-  datas.value = [
-    res.data.List.map((item) => parseInt(item.lastTotAmt)),
-    res.data.List.map((item) => parseInt(item.nowTotAmt)),
-  ];
+        // 고객수 (인덱스 1)
+        const customersItem = rowData2.value[1];
+        const customersCurrentMonth = customersItem ? parseInt(parseFloat(customersItem.currentMonth || customersItem.currenMonth || 0)) : 0;
+        const customersAchieveRate = customersItem?.strAchieveRate || '0%';
 
-  ////console.log(datas.value);
-  labels.value = res.data.List.map((item) => item.dtmDay);
-  ////console.log(res);
-  const today = new Date();
-  label.value = [
-    today.getFullYear() - 1 + "-" + (today.getMonth() + 1),
-    today.getFullYear() + "-" + (today.getMonth() + 1),
-  ];
+        // 고객 AVG. (인덱스 2)
+        const customerAvgItem = rowData2.value[2];
+        const customerAvgCurrentMonth = customerAvgItem ? parseInt(parseFloat(customerAvgItem.currentMonth || customerAvgItem.currenMonth || 0)) : 0;
+        const customerAvgAchieveRate = customerAvgItem?.strAchieveRate || '0%';
+
+        // 영수증수 (인덱스 3)
+        const receiptsItem = rowData2.value[3];
+        const receiptsCurrentMonth = receiptsItem ? parseInt(parseFloat(receiptsItem.currentMonth || receiptsItem.currenMonth || 0)) : 0;
+        const receiptsAchieveRate = receiptsItem?.strAchieveRate || '0%';
+
+        // KPI 데이터 업데이트
+        kpiData.value.sales = salesCurrentMonth;
+        kpiData.value.salesRate = salesAchieveRate;
+        kpiData.value.salesRateClass = salesAchieveRate && salesAchieveRate.startsWith('-') ? 'down' : 'up';
+
+        kpiData.value.customers = customersCurrentMonth;
+        kpiData.value.customersRate = customersAchieveRate;
+        kpiData.value.customersRateClass = customersAchieveRate && customersAchieveRate.startsWith('-') ? 'down' : 'up';
+
+        kpiData.value.customerAvg = customerAvgCurrentMonth;
+        kpiData.value.customerAvgRate = customerAvgAchieveRate;
+        kpiData.value.customerAvgRateClass = customerAvgAchieveRate && customerAvgAchieveRate.startsWith('-') ? 'down' : 'up';
+
+        kpiData.value.receipts = receiptsCurrentMonth;
+        kpiData.value.receiptsRate = receiptsAchieveRate;
+        kpiData.value.receiptsRateClass = receiptsAchieveRate && receiptsAchieveRate.startsWith('-') ? 'down' : 'up';
+      }
+    }
+
+    if (
+      (userdata.lngSupplierID <= 0 || userdata.lngStoreGroup == "1260") &&
+      userdata.lngUserAdminID != userdata.lngStoreGroup
+    ) {
+      const res2 = await MainDashBoard2(
+        userdata.lngStoreGroup,
+        userdata.lngPosition,
+        userdata.lngSequence
+      );
+      // ////console.log(res2);
+      rowData3.value = res2.data.List;
+      rowData4.value = res2.data.List2;
+    }
+
+    if (userdata.lngSupplierID > 0) {
+      return;
+    }
+    if (userdata.lngStoreGroup == "3033" && userdata.lngPositionType == 0) {
+      return;
+    }
+    if (userdata.lngStoreGroup == "7650" && userdata.lngPositionType == 0) {
+      return;
+    }
+    if (userdata.lngStoreGroup == "7639" && userdata.lngPositionType == 0) {
+      return;
+    }
+    if (userdata.lngStoreGroup == "7838" && userdata.lngPositionType == 0) {
+      return;
+    }
+    if (userdata.lngStoreGroup == "7208" && userdata.lngPositionType == 0) {
+      return;
+    }
+    if (userdata.lngUserAdminID == userdata.lngStoreGroup) {
+      return;
+    }
+
+    res = await MainDashBoard3(userdata.lngStoreGroup, lngStoreCode);
+    datas.value = [
+      res.data.List.map((item) => parseInt(item.lastTotAmt)),
+      res.data.List.map((item) => parseInt(item.nowTotAmt)),
+    ];
+
+    ////console.log(datas.value);
+    labels.value = res.data.List.map((item) => item.dtmDay);
+    ////console.log(res);
+    const today = new Date();
+    label.value = [
+      today.getFullYear() - 1 + "-" + (today.getMonth() + 1),
+      today.getFullYear() + "-" + (today.getMonth() + 1),
+    ];
+  } catch (e) {
+    console.error("[homePage2] dashboard load", e);
+  } finally {
+    store.dispatch("convertLoading", false);
+  }
 });
 
 const dblclickedRowData = (e) => {

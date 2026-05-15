@@ -409,12 +409,16 @@ async function loadSalesAnalysisDashboardData() {
     queryDateTimeText.value = "";
     return;
   }
+
+  /* 전역 로딩: API 직전에 켜고, 한 프레임 그린 뒤 동시 요청 (로그인 직후 대기 체감 완화) */
+  store.dispatch("convertLoading", true);
+  await nextTick();
+
   const { FROM_DT, TO_DT } = getSeoulMonthFromToYmdHyphen();
   const groupCd = u.lngStoreGroup;
   const storeCd = resolveSalesDashStoreCd(u);
   const sequence = u.lngSequence;
   try {
-    store.state.loading = true;
     const [rw, rc, rs, rm, rl] = await Promise.allSettled([
       getWeeklyKeyIndicators(groupCd, storeCd, sequence, FROM_DT, TO_DT),
       getCustomerAndUnitPriceByStore(groupCd, storeCd, sequence, FROM_DT, TO_DT),
@@ -445,7 +449,7 @@ async function loadSalesAnalysisDashboardData() {
   } catch {
     clearSalesAnalysisDashboardRows();
   } finally {
-    store.state.loading = false;
+    store.dispatch("convertLoading", false);
     queryDateTimeText.value = formatSalesDashQueryAtSeoul(new Date());
   }
 }
