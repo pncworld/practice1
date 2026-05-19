@@ -393,6 +393,50 @@ const selectedExcelDate = ref("");
 const saveNew = ref(true);
 const ErrorRowData = ref([]);
 const openPop = ref(false);
+
+/** 엑셀 필수 항목 (판매단가·바코드 제외) */
+const EXCEL_REQUIRED_FIELDS = [
+  { key: "lngStockID", label: "자재코드" },
+  { key: "strStockName", label: "자재명" },
+  { key: "strStandardName", label: "규격" },
+  { key: "strStockGroupName", label: "자재그룹" },
+  { key: "strCategoryName", label: "자재분류" },
+  { key: "strGenericName", label: "자재특성" },
+  { key: "strTaxTypeName", label: "과세면세구분" },
+  { key: "strOrderNCheckUOM", label: "발주/매입 단위" },
+  { key: "strOrderNCheckUOMFigure", label: "발주/매입 환산율" },
+  { key: "strDemandUOM", label: "청구 단위" },
+  { key: "strDemandUOMFigure", label: "청구 환산율" },
+  { key: "strReturnNMoveUOM", label: "반품/이동 단위" },
+  { key: "strReturnNMoveUOMFigure", label: "반품/이동 환산율" },
+  { key: "strRealNReportUOM", label: "실사/재고 단위" },
+  { key: "strRealNReportUOMFigure", label: "실사/재고 환산율" },
+  { key: "strUseNLossUOM", label: "사용/손실 단위" },
+  { key: "strUseNLossUOMFigure", label: "사용/손실 환산율" },
+  { key: "curUnitPrice", label: "매입단가" },
+  { key: "strSupplierName", label: "주거래처" },
+];
+
+const isExcelFieldEmpty = (value) => {
+  if (value === null || value === undefined) return true;
+  if (typeof value === "number" && !Number.isNaN(value)) return false;
+  return String(value).trim() === "";
+};
+
+const getMissingRequiredExcelDetails = (rows) => {
+  const lines = [];
+  rows.forEach((row, index) => {
+    const missingLabels = EXCEL_REQUIRED_FIELDS.filter(({ key }) =>
+      isExcelFieldEmpty(row[key])
+    ).map(({ label }) => label);
+    if (missingLabels.length === 0) return;
+
+    const dataRowNo = index + 1;
+    lines.push(`- 데이터 ${dataRowNo}행 : ${missingLabels.join(", ")}`);
+  });
+  return lines;
+};
+
 const saveButton = async () => {
   if (currentFile.value == null || currentFile.value == undefined) {
     Swal.fire({
@@ -408,6 +452,27 @@ const saveButton = async () => {
     Swal.fire({
       title: "경고",
       text: "저장할 자재 데이터가 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  const missingDetails = getMissingRequiredExcelDetails(updateRowData.value);
+  if (missingDetails.length > 0) {
+    const maxShow = 8;
+    const shown = missingDetails.slice(0, maxShow);
+    const restCount = missingDetails.length - shown.length;
+    let detailText = shown.join("\n");
+    if (restCount > 0) {
+      detailText += `\n- … 외 ${restCount}행`;
+    }
+    Swal.fire({
+      title: "경고",
+      html: `<p style="margin:0;text-align:center;">미입력된 필수값이 존재합니다. 확인해 주세요.</p>
+        <div style="margin-top:0.75rem;text-align:left;font-size:0.9em;line-height:1.55;max-height:50vh;overflow-y:auto;">
+          ${detailText.replace(/\n/g, "<br>")}
+        </div>`,
       icon: "warning",
       confirmButtonText: "확인",
     });
