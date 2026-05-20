@@ -214,7 +214,7 @@ const login2 = async () => {
       }
 
       await store.dispatch("convertLoading", false);
-      await router.push("/homepage");
+      await router.push("/homePage");
 
       return;
     } else {
@@ -302,7 +302,7 @@ onMounted(async () => {
         "setFavoriteList",
         res4.data.List.map((item) => Number(item.lngProgramID))
       );
-      router.push("/homepage");
+      router.push("/homePage");
       return;
     }
   } catch (error) {

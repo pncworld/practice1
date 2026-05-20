@@ -6,119 +6,161 @@
 ################################################################################*/
 <template>
   <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+    <div
+      class="flex shrink-0 items-center justify-between gap-3 overflow-y-hidden pr-1">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="searchButton" class="button search md:w-auto w-14">
+      <div class="flex shrink-0 items-center justify-end space-x-2 pr-5">
+        <button type="button" class="button search md:w-auto w-14" @click="searchButton">
           조회
         </button>
-        <button @click="excelButton" class="button save w-auto excel">
+        <button type="button" class="button save w-auto excel" @click="excelButton">
           엑셀
         </button>
       </div>
     </div>
+
     <div
-      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div class="justify-start flex">
-        <Datepicker2
-          :mainName="'기간'"
-          @endDate="endDate"
-          ref="datepicker"
-          :initToday="1"
-          :closePopUp="closePopUp"
-          @excelDate="excelDate"
-          @startDate="startDate">
-        </Datepicker2>
-        <div class="items-center space-x-5 flex justify-start ml-20">
-          <label for="cond"
-            ><input
-              type="checkbox"
-              id="cond"
-              name="condtype"
-              @change="setCond"
-              v-model="cond" />전체기간</label
-          >
-          <label for="cond2"
-            ><input
-              type="checkbox"
-              id="cond2"
-              name="condtype"
-              @change="setCond2"
-              v-model="cond2" />집계내역</label
-          >
+      class="crm02-search-panel z-10 mt-3 w-full max-w-[min(100%,1680px)] min-w-0 shrink-0 self-center overflow-x-auto rounded-md border border-slate-500/70 bg-gradient-to-b from-violet-100 via-purple-50/95 to-slate-100 shadow-sm">
+      <div
+        class="crm02-search-body min-w-0 text-slate-800"
+        :style="{ '--crm02-control-border': crm02ControlBorder }">
+        <!-- 참고: 1행 — 기간 · 체크 · 고객명 · 조회 -->
+        <div
+          class="crm02-search-r1 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-slate-500/45 px-4 py-2.5 sm:px-5">
+          <!-- 1행 라벨 열 = 2행 .crm02-r2-cell 첫 열 -->
+          <div class="crm02-r1-left flex min-w-0 flex-1 items-center gap-x-2">
+            <div class="crm02-r1-label-slot shrink-0">
+              <span class="crm02-r2-label">기간</span>
+            </div>
+            <div
+              class="crm02-r1-cluster flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 sm:flex-nowrap sm:gap-x-4 sm:gap-y-0">
+              <div class="crm02-r1-period flex min-h-8 shrink-0 items-center">
+                <div class="crm02-date-field min-w-0 shrink-0">
+                  <Datepicker2
+                    :main-name="'기간'"
+                    :omit-main-label="true"
+                    :filter-bar-align="true"
+                    ref="datepicker"
+                    :initToday="1"
+                    :closePopUp="closePopUp"
+                    @excelDate="excelDate"
+                    @endDate="endDate"
+                    @startDate="startDate"></Datepicker2>
+                </div>
+              </div>
+              <div class="crm02-r1-checks flex min-h-8 shrink-0 items-center gap-x-4 sm:gap-x-5">
+                <label class="crm02-check-label shrink-0" for="crm02-cond-all">
+                  <input
+                    id="crm02-cond-all"
+                    v-model="cond"
+                    type="checkbox"
+                    name="condtype"
+                    class="crm02-check"
+                    @change="setCond" />
+                  전체기간
+                </label>
+                <label class="crm02-check-label shrink-0" for="crm02-cond-agg">
+                  <input
+                    id="crm02-cond-agg"
+                    v-model="cond2"
+                    type="checkbox"
+                    name="condtype"
+                    class="crm02-check"
+                    @change="setCond2" />
+                  집계내역
+                </label>
+              </div>
+            </div>
+          </div>
+          <div
+            class="crm02-r1-cust flex min-h-8 w-full min-w-0 shrink-0 items-center justify-end gap-2 sm:w-auto sm:max-w-[min(100%,42rem)]">
+            <span class="crm02-inline-lbl shrink-0">고객명</span>
+            <div class="crm02-pick-slot min-w-0 flex-1 sm:flex-1 sm:min-w-[12rem]">
+              <PickCustomers
+                :main-name="'고객명'"
+                @Name="Name"
+                @ID="ID"
+                @CustId="CustId"
+                @excelList="excelList"></PickCustomers>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="ml-5 justify-start flex">
-        <PickCustomers
-          @Name="Name"
-          @ID="ID"
-          @CustId="CustId"
-          @excelList="excelList"></PickCustomers>
-      </div>
-      <div class="flex justify-start font-semibold text-base ml-1">
-        <div>누적포인트</div>
-        <div>
-          <input
-            type="text"
-            class="pl-1 disabled:bg-white ml-5"
-            disabled
-            v-model="point1" />
-        </div>
-        <div class="ml-5">사용포인트</div>
-        <div>
-          <input
-            type="text"
-            class="pl-1 disabled:bg-white ml-5"
-            disabled
-            v-model="point2" />
-        </div>
-      </div>
-
-      <div class="flex justify-start items-center -ml-2">
-        <div class="text-base font-semibold">잔여포인트</div>
-        <div>
-          <input
-            type="text"
-            class="pl-1 ml-5 disabled:bg-white"
-            disabled
-            v-model="point3" />
-        </div>
-
-        <div class="ml-5 font-semibold text-base">보너스포인트</div>
-        <div>
-          <input
-            type="text"
-            class="pl-1 ml-5 disabled:bg-white"
-            disabled
-            v-model="point4" />
+        <!-- 참고: 2행 — 포인트 4종 균등 -->
+        <div
+          class="crm02-search-r2 grid grid-cols-1 gap-x-3 gap-y-2 px-4 py-2.5 sm:grid-cols-2 sm:px-5 lg:grid-cols-4 lg:gap-x-3">
+          <div class="crm02-r2-cell">
+            <span class="crm02-r2-label">누적포인트</span>
+            <input
+              id="crm02-pt-sale"
+              v-model="point1"
+              type="text"
+              disabled
+              autocomplete="off"
+              class="crm02-sg-input crm02-pt-readonly h-8 min-h-8 min-w-0 w-full rounded-md border border-solid bg-slate-100 px-2 text-sm text-slate-700" />
+          </div>
+          <div class="crm02-r2-cell">
+            <span class="crm02-r2-label">사용포인트</span>
+            <input
+              id="crm02-pt-used"
+              v-model="point2"
+              type="text"
+              disabled
+              autocomplete="off"
+              class="crm02-sg-input crm02-pt-readonly h-8 min-h-8 min-w-0 w-full rounded-md border border-solid bg-slate-100 px-2 text-sm text-slate-700" />
+          </div>
+          <div class="crm02-r2-cell">
+            <span class="crm02-r2-label">잔여포인트</span>
+            <input
+              id="crm02-pt-rem"
+              v-model="point3"
+              type="text"
+              disabled
+              autocomplete="off"
+              class="crm02-sg-input crm02-pt-readonly h-8 min-h-8 min-w-0 w-full rounded-md border border-solid bg-slate-100 px-2 text-sm text-slate-700" />
+          </div>
+          <div class="crm02-r2-cell">
+            <span class="crm02-r2-label">보너스포인트</span>
+            <input
+              id="crm02-pt-bonus"
+              v-model="point4"
+              type="text"
+              disabled
+              autocomplete="off"
+              class="crm02-sg-input crm02-pt-readonly h-8 min-h-8 min-w-0 w-full rounded-md border border-solid bg-slate-100 px-2 text-sm text-slate-700" />
+          </div>
         </div>
       </div>
     </div>
-    <!-- 조회조건 -->
-    <!-- 그리드 영역 -->
-    <div class="grid grid-rows-1 grid-cols-[3fr,1fr] w-full h-[75vh]">
-      <div class="w-full h-[80%]">
-        <Realgrid
-          :progname="'CRM02_002RPT_VUE'"
-          :progid="1"
-          :rowData="rowData"
-          :reload="reload"
-          :setFooterCustomColumnId="['strCCardID']"
-          :setFooterCustomText="['합계']"
-          :setFooter="true"
-          :hideColumnsId="hideColumnsId"
-          :documentTitle="'CRM02_002RPT'"
-          @clickedRowData="clickedRowData"
-          :documentSubTitle="documentSubTitle"
-          :rowStateeditable="false"
-          :exporttoExcel="exportExcel">
-        </Realgrid>
-      </div>
-      <div
-        class="grid grid-rows-[1fr,4fr,1fr,4fr,1fr,4fr] grid-cols-1 border border-black h-[80%]">
-        <div class="flex justify-start items-center">※고객정보</div>
-        <div class="h-full w-full">
+    <!-- 그리드: 노트북 뷰포트에 맞춤 — flex-1 + min-h-0 체인 (Realgrid h-full) -->
+    <div
+      class="crm02-grid-shell mx-auto mt-2 grid min-h-0 min-w-0 w-full max-w-[min(100%,1680px)] flex-1 basis-0 grid-cols-[minmax(0,2.7fr)_minmax(0,1.3fr)] grid-rows-1 gap-2 overflow-hidden px-1 pb-1">
+      <section class="crm02-grid-main flex min-h-0 min-w-0 flex-col">
+        <div
+          class="crm02-main-grid-frame flex w-full min-w-0 flex-1 flex-col overflow-hidden rounded-sm border border-gray-400 bg-white">
+          <div class="relative min-h-0 w-full flex-1">
+            <Realgrid
+              :progname="'CRM02_002RPT_VUE'"
+              :progid="1"
+              :rowData="rowData"
+              :reload="reload"
+              :setFooterCustomColumnId="['strCCardID']"
+              :setFooterCustomText="['합계']"
+              :setFooter="true"
+              :hideColumnsId="hideColumnsId"
+              :documentTitle="'CRM02_002RPT'"
+              @clickedRowData="clickedRowData"
+              :documentSubTitle="documentSubTitle"
+              :rowStateeditable="false"
+              :exporttoExcel="exportExcel">
+            </Realgrid>
+          </div>
+        </div>
+      </section>
+      <section
+        class="crm02-grid-side grid h-full min-h-0 min-w-0 grid-cols-1 grid-rows-[1fr,4fr,1fr,4fr,1fr,4fr] border border-black">
+        <div class="flex items-center justify-start">※고객정보</div>
+        <div class="h-full min-h-0 w-full overflow-hidden">
           <Realgrid
             :progname="'CRM02_002RPT_VUE_Popup'"
             :progid="1"
@@ -126,8 +168,8 @@
             :rowStateeditable="false"
             :setStateBar="false"></Realgrid>
         </div>
-        <div class="flex justify-start items-center">※주문내역</div>
-        <div class="h-full w-full">
+        <div class="flex items-center justify-start">※주문내역</div>
+        <div class="h-full min-h-0 w-full overflow-hidden">
           <Realgrid
             :progname="'CRM02_002RPT_VUE_Popup'"
             :progid="2"
@@ -135,8 +177,8 @@
             :rowStateeditable="false"
             :setStateBar="false"></Realgrid>
         </div>
-        <div class="flex justify-start items-center">※결재내역</div>
-        <div class="h-full w-full">
+        <div class="flex items-center justify-start">※결재내역</div>
+        <div class="h-full min-h-0 w-full overflow-hidden">
           <Realgrid
             :progname="'CRM02_002RPT_VUE_Popup'"
             :progid="3"
@@ -144,7 +186,7 @@
             :rowStateeditable="false"
             :setStateBar="false"></Realgrid>
         </div>
-      </div>
+      </section>
     </div>
   </div>
   <!-- 그리드 영역 -->
@@ -194,12 +236,17 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
+import Swal from "sweetalert2";
 /**
  * 	화면 Load시 실행 스크립트
  */
 
+const store = useStore();
+
+const crm02ControlBorder = "#cbd5e1";
+
 onMounted(async () => {
-  const pageLog = await insertPageLog(store.state.activeTab2);
+  await insertPageLog(store.state.activeTab2);
 });
 
 const reload = ref(false);
@@ -210,7 +257,6 @@ const rowData2 = ref([]);
 const rowData3 = ref([]);
 const rowData4 = ref([]);
 const condValue = ref(0);
-const store = useStore();
 const cond = ref(false);
 const cond2 = ref(false);
 const datepicker = ref(null);
@@ -285,19 +331,25 @@ const searchButton = async () => {
       cond2.value == true ? 1 : 0
     );
     if (custID.value != "" && custID.value != undefined) {
-      const res = await getCustPointInfo(
+      const resPt = await getCustPointInfo(
         store.state.userData.lngStoreGroup,
         custID.value
       );
 
-      point1.value = res.data.List[0].lngSalePoint;
-      point2.value = res.data.List[0].lngUsedPoint;
-      point3.value = res.data.List[0].lngRemPoint;
-      point4.value = res.data.List[0].lngBonusPoint;
+      point1.value = resPt.data.List[0].lngSalePoint;
+      point2.value = resPt.data.List[0].lngUsedPoint;
+      point3.value = resPt.data.List[0].lngRemPoint;
+      point4.value = resPt.data.List[0].lngBonusPoint;
     }
-    rowData.value = res.data.List;
+    const list = res.data.List ?? [];
+    rowData.value = list;
     ////console.log(res);
     afterSearch.value = true;
+    Swal.fire({
+      icon: "info",
+      text: `조회가 완료되었습니다.조회건수:${list.length}`,
+      confirmButtonText: "확인",
+    });
   } catch (error) {
     afterSearch.value = false;
     //comsole.log(error);
@@ -379,3 +431,193 @@ const setCond = (e) => {
   cond.value = !cond.value;
 };
 </script>
+
+<style scoped>
+/* 메인 그리드: 고정 vh 대신 뷰포트·노트북에 맞는 최소 높이 (MST/CRM10류) */
+.crm02-main-grid-frame {
+  min-height: min(65vh, 420px);
+}
+
+@media (max-height: 800px) {
+  .crm02-main-grid-frame {
+    min-height: min(52vh, 300px);
+  }
+}
+
+.crm02-inline-lbl {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(30 41 59);
+  white-space: nowrap;
+}
+
+/* 1행 '기간' 라벨: 2행 .crm02-r2-cell 첫 열과 동일 폭 → 누적포인트 칸 왼쪽선과 일치 */
+.crm02-r1-label-slot {
+  display: grid;
+  min-width: 0;
+  min-height: 2rem;
+  align-items: center;
+  grid-template-columns: minmax(5.25rem, 6.75rem);
+}
+
+/* 2행: 4열 균등 + 셀 안 라벨|입력 2열 그리드(간격 통일) */
+.crm02-search-r2 {
+  align-items: stretch;
+}
+
+.crm02-r2-cell {
+  display: grid;
+  min-width: 0;
+  min-height: 2rem;
+  align-items: center;
+  column-gap: 0.5rem;
+  grid-template-columns: minmax(5.25rem, 6.75rem) minmax(0, 1fr);
+}
+
+.crm02-r2-label {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(30 41 59);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.crm02-date-field :deep(> div.flex.justify-start.items-center) {
+  min-height: 2rem;
+  align-items: center;
+}
+
+.crm02-pick-slot > * {
+  min-width: 0;
+  width: 100%;
+}
+
+.crm02-pick-slot :deep(> div.flex.items-center) {
+  width: 100%;
+  min-width: 0;
+  min-height: 2rem;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 0.375rem;
+  column-gap: 0.75rem;
+}
+
+.crm02-pick-slot :deep(> div.flex.items-center.w-32) {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+.crm02-pick-slot :deep(> div.flex.items-center > div.text-base.text-nowrap.font-semibold:first-of-type) {
+  display: none;
+}
+
+.crm02-pick-slot :deep(> div.flex.items-center > div > input[type="text"]) {
+  box-sizing: border-box;
+  height: 2rem;
+  min-height: 2rem;
+  margin-left: 0 !important;
+  border: 1px solid var(--crm02-control-border) !important;
+  border-radius: 0.375rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  min-width: 5rem;
+  flex: 1 1 7rem;
+  max-width: 100%;
+}
+
+.crm02-pick-slot :deep(> div.flex.items-center > div > input[type="text"]:focus) {
+  border-color: #3b82f6 !important;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.35);
+}
+
+.crm02-pick-slot :deep(.whitebutton) {
+  box-sizing: border-box;
+  display: inline-flex;
+  height: 2rem;
+  min-height: 2rem;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0 !important;
+  border-radius: 0.375rem;
+  border: 1px solid rgb(203 213 225);
+  background-color: #fff;
+  padding: 0 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(55 65 81);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.crm02-pick-slot :deep(.whitebutton:hover) {
+  background-color: rgb(248 250 252);
+}
+
+.crm02-check-label {
+  display: inline-flex;
+  min-height: 2rem;
+  cursor: pointer;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgb(55 65 81);
+}
+
+.crm02-check {
+  height: 1rem;
+  width: 1rem;
+  flex-shrink: 0;
+  border-radius: 0.25rem;
+  border: 1px solid rgb(148 163 184);
+}
+
+.crm02-search-panel .crm02-sg-input {
+  border: 1px solid var(--crm02-control-border) !important;
+  box-sizing: border-box;
+}
+
+.crm02-search-panel .crm02-sg-input:focus {
+  border-color: #3b82f6 !important;
+}
+
+/* 조회 결과 전용 — 비활성 톤 유지(브라우저 기본 흐림 완화) */
+.crm02-search-panel .crm02-pt-readonly:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.crm02-search-panel .crm02-date-field :deep(input[type="date"]) {
+  border: 1px solid var(--crm02-control-border) !important;
+  box-sizing: border-box;
+}
+
+.crm02-search-panel .crm02-date-field :deep(input[type="date"]:focus) {
+  border-color: #3b82f6 !important;
+}
+
+@media (max-height: 900px) {
+  .crm02-search-panel {
+    margin-top: 0.25rem !important;
+  }
+
+  .crm02-search-r1,
+  .crm02-search-r2 {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+
+  .crm02-search-r2 {
+    gap: 0.5rem !important;
+  }
+}
+</style>

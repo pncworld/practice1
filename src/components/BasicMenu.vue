@@ -384,7 +384,7 @@ onMounted(() => {
     }
   });
 
-  router.push("/homepage");
+  router.push("/homePage");
 });
 
 watch(

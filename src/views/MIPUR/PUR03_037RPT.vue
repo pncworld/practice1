@@ -59,6 +59,9 @@
           <div class="pur037-cell-field pur037-bc-slot min-w-0">
             <BusinessClient
               compact-search-bar
+              :disable="supplierComboDisabled"
+              :select-supplier-id="supplierComboPresetId"
+              :select-supplier-label="supplierSessionDisplayName"
               @SupplierId="SupplierId" />
           </div>
         </div>
@@ -227,7 +230,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -236,10 +239,6 @@ import { useStore } from "vuex";
 /**
  * 	화면 Load시 실행 스크립트
  */
-
-onMounted(async () => {
-  const pageLog = await insertPageLog(store.state.activeTab2);
-});
 
 const reload = ref(false);
 const rowData = ref([]);
@@ -292,6 +291,29 @@ const setGroupSumCustomColumnId2 = ref(["strStoreName"]);
 const cond = ref("0");
 
 const store = useStore();
+
+/** 거래처 계정(lngUserAdminID === 60): 세션 `lngSupplierID` 고정 + 콤보 비활성 */
+const isSupplierPortal = computed(() => store.getters.isSupplierAccountUser);
+const supplierComboPresetId = computed(() => {
+  if (!isSupplierPortal.value) return "";
+  const id = store.getters.sessionLngSupplierID;
+  return id != null && id > 0 ? id : "";
+});
+const supplierComboDisabled = computed(() => isSupplierPortal.value);
+/** 로그인 세션에 오는 거래처 표시명 — 콤보 목록에 없을 때 라벨로 사용 */
+const supplierSessionDisplayName = computed(() => {
+  if (!isSupplierPortal.value) return "";
+  const u = store.state.userData;
+  if (!u || typeof u !== "object" || Array.isArray(u)) return "";
+  const nm =
+    u.strSupplierName ??
+    u.StrSupplierName ??
+    u.strChargerName ??
+    u.strStoreName ??
+    u.strUserID ??
+    "";
+  return String(nm).trim();
+});
 
 /** 조회줄 컨트롤 공통 테두리(search-area-layout) */
 const pur037ControlBorder = "#cbd5e1";
@@ -349,8 +371,25 @@ const lngStoreGroup = (e) => {
 
 const supplierid = ref("");
 const SupplierId = (e) => {
+  if (isSupplierPortal.value) {
+    const sid = store.getters.sessionLngSupplierID;
+    if (sid != null && sid > 0) {
+      supplierid.value = String(sid);
+      return;
+    }
+  }
   supplierid.value = e;
 };
+
+onMounted(async () => {
+  await insertPageLog(store.state.activeTab2);
+  if (isSupplierPortal.value) {
+    const sid = store.getters.sessionLngSupplierID;
+    if (sid != null && sid > 0) {
+      supplierid.value = String(sid);
+    }
+  }
+});
 /**
  *  조회 함수
  */

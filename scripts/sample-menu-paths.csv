@@ -1,0 +1,3 @@
+idx,code,name,detail,path,sort
+1,MICRM,예약조회,상세,views/MICRM/CRM10_022RPT.vue,100
+2,MICRM,없음,상세,views/MICRM/DOES_NOT_EXIST_99999.vue,200

@@ -1,124 +1,105 @@
 <template>
-  <div
-    class="grid grid-cols-[80px,80px,150px,150px,300px] grid-rows-2 h-16 w-[750px] mt-2">
+  <div class="pss-root flex w-full min-w-0 max-w-full flex-row gap-2">
     <div
-      class="font-semibold text-nowrap text-base row-span-2 flex justify-center items-center">
+      class="pss-brand flex shrink-0 items-center justify-center self-stretch font-semibold text-base text-nowrap"
+      style="width: 4.5rem; min-width: 3.5rem">
       매장명
     </div>
-    <div class="flex justify-start items-center">
-      <label for="searchType1" class="text-base font-normal"
+    <div class="pss-grid min-w-0 flex-1">
+      <label
+        class="pss-radio flex shrink-0 cursor-pointer items-center gap-1 self-center text-base font-normal"
+        for="searchType1"
         >직/가맹<input
-          type="radio"
           id="searchType1"
+          type="radio"
           value="1"
           v-model="settingDisable"
           @click="initSearchBox"
           :disabled="settingDisable2"
       /></label>
-    </div>
-    <div class="w-24">
       <select
-        name=""
-        id=""
         v-model="selectedStoreGroup"
-        :disabled="true"
-        class="mr-28 w-36 h-7 rounded-lg">
-        <option :value="i.lngStoreGroup" v-for="i in storeGroup">
+        disabled
+        class="pss-select pss-col-grp h-7 min-w-0 rounded-lg">
+        <option :value="i.lngStoreGroup" v-for="i in storeGroup" :key="i.lngStoreGroup">
           {{ i.strName }}
         </option>
       </select>
-    </div>
-    <div>
       <select
-        name=""
-        id=""
         v-model="selectedStoreType"
         :disabled="disabled1"
-        class="w-36 h-7 rounded-lg mr-20">
+        class="pss-select pss-col-mid h-7 min-w-0 w-full rounded-lg">
         <option :value="0">전체</option>
-        <option :value="i.lngStoreAttr" v-for="i in storeType">
+        <option :value="i.lngStoreAttr" v-for="i in storeType" :key="i.lngStoreAttr">
           {{ i.strName }}
         </option>
       </select>
-    </div>
-    <div class="w-44">
-      <div class="w-44 !h-7">
+      <div class="pss-col-store min-w-0">
         <v-select
           v-model="selectedStoreList"
+          append-to-body
           :options="rowData"
           label="strName"
           :placeholder="placeHolderNm"
-          class="custom-select2 w-80"
+          class="custom-select2 w-full min-w-0"
           clearable="true"
           @click="clickPosNo"
           :disabled="disabled1"
           :reduce="(store) => store.lngStoreCode" />
       </div>
-    </div>
-    <div class="flex justify-center items-center">
-      <label for="searchType2" class="text-base font-normal mr-3"
+
+      <label
+        class="pss-radio flex shrink-0 cursor-pointer items-center gap-1 self-center text-base font-normal"
+        for="searchType2"
         >팀/SC<input
-          type="radio"
           id="searchType2"
+          type="radio"
           value="2"
           v-model="settingDisable"
           @click="initSearchBox"
           :disabled="settingDisable2"
       /></label>
-    </div>
-    <div class="w-32">
       <select
-        name=""
-        id=""
         v-model="selectedStoreGroup2"
-        class="w-full mr-10 h-7 rounded-lg"
-        :disabled="true">
-        <option :value="i.lngStoreGroup" v-for="i in storeGroup">
+        disabled
+        class="pss-select pss-col-grp h-7 min-w-0 rounded-lg">
+        <option :value="i.lngStoreGroup" v-for="i in storeGroup" :key="'g2-' + i.lngStoreGroup">
           {{ i.strName }}
         </option>
       </select>
-    </div>
-    <div>
-      <div class="grid grid-rows-1 grid-cols-2">
-        <div class="-ml-3">
-          <select
-            name=""
-            id=""
-            v-model="selectedStoreTeam"
-            class="w-full h-7 rounded-lg"
-            :disabled="disabled2">
-            <option :value="0">전체</option>
-            <option :value="i.lngTeamCode" v-for="i in storeTeam">
-              {{ i.strTeamName }}
-            </option>
-          </select>
-        </div>
-        <div>
-          <select
-            name=""
-            id=""
-            v-model="selectedSuperVisor"
-            class="w-28 h-7 rounded-lg ml-2"
-            :disabled="disabled2">
-            <option :value="0">전체</option>
-            <option :value="i.lngSupervisor" v-for="i in storeSuperVisor">
-              {{ i.strName }}
-            </option>
-          </select>
-        </div>
+      <div class="pss-col-mid pss-mid-pair min-w-0">
+        <select
+          v-model="selectedStoreTeam"
+          class="pss-select h-7 min-w-0 w-full rounded-lg"
+          :disabled="disabled2">
+          <option :value="0">전체</option>
+          <option :value="i.lngTeamCode" v-for="i in storeTeam" :key="i.lngTeamCode">
+            {{ i.strTeamName }}
+          </option>
+        </select>
+        <select
+          v-model="selectedSuperVisor"
+          class="pss-select h-7 min-w-0 w-full rounded-lg"
+          :disabled="disabled2">
+          <option :value="0">전체</option>
+          <option :value="i.lngSupervisor" v-for="i in storeSuperVisor" :key="i.lngSupervisor">
+            {{ i.strName }}
+          </option>
+        </select>
       </div>
-    </div>
-    <div class="ml-10">
-      <v-select
-        v-model="selectedStoreList"
-        :options="rowData"
-        label="strName"
-        :placeholder="placeHolderNm"
-        class="custom-select4 pr-20"
-        clearable="true"
-        @click="clickPosNo"
-        :disabled="disabled2"
-        :reduce="(store) => store.lngStoreCode" />
+      <div class="pss-col-store min-w-0">
+        <v-select
+          v-model="selectedStoreList"
+          append-to-body
+          :options="rowData"
+          label="strName"
+          :placeholder="placeHolderNm"
+          class="custom-select2 w-full min-w-0"
+          clearable="true"
+          @click="clickPosNo"
+          :disabled="disabled2"
+          :reduce="(store) => store.lngStoreCode" />
+      </div>
     </div>
   </div>
 </template>
@@ -234,7 +215,7 @@ onMounted(() => {
         : store.state.userData.lngTeamCode;
     selectedSuperVisor.value =
       store.state.userData.lngSupervisor == undefined ||
-      store.state.userData.lngSupervisor == ""
+        store.state.userData.lngSupervisor == ""
         ? 0
         : store.state.userData.lngSupervisor;
     disabled1.value = true;
@@ -360,6 +341,58 @@ const initSearchBox = (e) => {
   }
 };
 </script>
+
+<style scoped>
+/* 두 줄 동일 열: 끝선 맞춤. 그룹 콤보(1열) 2배 폭 → 마지막 열(1fr)이 같은 만큼 줄어듦 */
+.pss-grid {
+  --pss-grp-col: 11rem; /* 기존 5.5rem의 2배 */
+  display: grid;
+  align-items: center;
+  column-gap: 0.5rem;
+  row-gap: 0.375rem;
+  grid-template-columns: auto var(--pss-grp-col) minmax(5.5rem, 12rem) minmax(0, 1fr);
+  grid-template-rows: auto auto;
+}
+
+.pss-col-grp {
+  width: var(--pss-grp-col);
+  min-width: var(--pss-grp-col);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.pss-mid-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+}
+
+.pss-col-store {
+  min-width: 0;
+  width: 100%;
+}
+
+.pss-select {
+  box-sizing: border-box;
+  border: 1px solid #cbd5e1;
+  background-color: #fff;
+}
+.pss-select:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.35);
+}
+.pss-root :deep(.vs__dropdown-toggle) {
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 0.5rem;
+  min-height: 1.75rem;
+}
+.pss-root :deep(.vs__selected-options) {
+  min-width: 0;
+}
+</style>
 
 <style>
 .vs--disabled .vs__dropdown-toggle {

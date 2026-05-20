@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "check-menu-vue": "node scripts/check-excel-vue-paths.cjs"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-vue": "^7.3.0",

@@ -1,6 +1,7 @@
 // src/store/index.js
 import { createStore } from "vuex";
 import createPersistedState from "vuex-persistedstate";
+import { USER_ADMIN_ID_SUPPLIER_ACCOUNT } from "@/constants/sessionUser";
 
 export default createStore({
   state() {
@@ -280,6 +281,19 @@ export default createStore({
   },
   getters: {
     userData: (state) => state.userData, // 상태를 가져오는 getter
+    /** 거래처(공급사) 계정 — `lngUserAdminID === 60` */
+    isSupplierAccountUser: (state) => {
+      const u = state.userData;
+      if (!u || typeof u !== "object" || Array.isArray(u)) return false;
+      return Number(u.lngUserAdminID) === USER_ADMIN_ID_SUPPLIER_ACCOUNT;
+    },
+    /** 세션 거래처 PK (`lngSupplierID`). 비거래처·미세팅이면 `null` */
+    sessionLngSupplierID: (state) => {
+      const u = state.userData;
+      if (!u || typeof u !== "object" || Array.isArray(u)) return null;
+      const n = Number(u.lngSupplierID);
+      return Number.isFinite(n) ? n : null;
+    },
   },
   plugins: [
     createPersistedState({

@@ -43,7 +43,7 @@ api2.interceptors.response.use(
       router.push("/");
       return new Promise(() => {});
     }
-    return new Promise(() => {});
+    return Promise.reject(error);
   }
 );
 
@@ -719,6 +719,50 @@ export const getCustomerInfo = (
   });
 };
 
+export const getCustomerInfoCount = (
+  cond, cond2, cond3, cond4, cond5, cond6, cond7, cond8, cond9, cond10,
+  cond11, cond12, cond13, cond14, cond15, cond16, cond17, cond18, cond19,
+  cond20, cond21, cond22, cond23, cond24, cond25, cond26, cond27, cond28,
+  cond29, cond30, cond31, cond32, cond33, cond34, cond35, cond36, cond37, cond38
+) => {
+  return api2.post("/MICRM/CRM01_001INS.asmx/getCustomerInfoCount", {
+    GROUP_CD: cond, JOINTYPE: cond2, TEAM: cond3, SUPER: cond4,
+    STORE_CD: cond5, CUST_NO: cond6, CARD_ID: cond7, CUSTNAME: cond8,
+    JOINSTS: cond9, RESINO: cond10, BIRTHMM: cond11, BIRTHDD: cond12,
+    MARRIED: cond13, SEX: cond14, JOBCLS: cond15, MOBILE: cond16,
+    HOMETEL: cond17, HOMEADDR: cond18, ETCADDR: cond19,
+    JOINFROM: cond20, JOINTO: cond21, FIRSTFROM: cond22, FIRSTTO: cond23,
+    LASTFROM: cond24, LASTTO: cond25, SPOINT: cond26, SALEPOINT: cond27,
+    RPOINT: cond28, REMPOINT: cond29, AAMT: cond30, ACTAMT: cond31,
+    VCNT: cond32, VISITCNT: cond33, LEVEL: cond34, SMS: cond35,
+    PRECD: cond36, SLEEPSTS: cond37, CUSTAGREE: cond38,
+  });
+};
+
+export const getCustomerInfoExcel = (
+  cond, cond2, cond3, cond4, cond5, cond6, cond7, cond8, cond9, cond10,
+  cond11, cond12, cond13, cond14, cond15, cond16, cond17, cond18, cond19,
+  cond20, cond21, cond22, cond23, cond24, cond25, cond26, cond27, cond28,
+  cond29, cond30, cond31, cond32, cond33, cond34, cond35, cond36, cond37, cond38
+) => {
+  return api2.post(
+    "/MICRM/CRM01_001INS.asmx/getCustomerInfoExcel",
+    {
+      GROUP_CD: cond, JOINTYPE: cond2, TEAM: cond3, SUPER: cond4,
+      STORE_CD: cond5, CUST_NO: cond6, CARD_ID: cond7, CUSTNAME: cond8,
+      JOINSTS: cond9, RESINO: cond10, BIRTHMM: cond11, BIRTHDD: cond12,
+      MARRIED: cond13, SEX: cond14, JOBCLS: cond15, MOBILE: cond16,
+      HOMETEL: cond17, HOMEADDR: cond18, ETCADDR: cond19,
+      JOINFROM: cond20, JOINTO: cond21, FIRSTFROM: cond22, FIRSTTO: cond23,
+      LASTFROM: cond24, LASTTO: cond25, SPOINT: cond26, SALEPOINT: cond27,
+      RPOINT: cond28, REMPOINT: cond29, AAMT: cond30, ACTAMT: cond31,
+      VCNT: cond32, VISITCNT: cond33, LEVEL: cond34, SMS: cond35,
+      PRECD: cond36, SLEEPSTS: cond37, CUSTAGREE: cond38,
+    },
+    { responseType: "blob" }
+  );
+};
+
 export const getCustInitData = (groupcd) => {
   return api2.post("/MICRM/CRM01_001INS.asmx/getCustInitData", {
     GROUP_CD: groupcd,
@@ -931,13 +975,28 @@ export const deleteCustomors = (cond, cond2, cond3, cond4, cond5) => {
     USERID: cond5,
   });
 };
-export const getCardChangeInfo = (cond, cond2, cond3, cond4, cond5) => {
+export const getCardChangeInfo = (
+  groupCd,
+  custNo,
+  cardId,
+  custNm,
+  joinSts,
+  mobile
+) => {
+  /** '' 는 프로시저에서 DEFAULT 와 다르게 동작할 수 있음 → 미사용 조건은 null */
+  const nilStr = (v) => {
+    if (v === undefined || v === null) return null;
+    const s = String(v).trim();
+    return s === "" ? null : s;
+  };
+  const group = String(groupCd ?? "").trim();
   return api2.post("/MICRM/CRM01_008INS.asmx/getCardChangeInfo", {
-    GROUP_CD: cond,
-    CUST_NO: cond2,
-    CARD_ID: cond3,
-    CUST_NM: cond4,
-    JOIN_STS: cond5,
+    GROUP_CD: group === "" ? null : group,
+    CUST_NO: nilStr(custNo),
+    CARD_ID: nilStr(cardId),
+    CUST_NM: nilStr(custNm),
+    JOIN_STS: nilStr(joinSts),
+    MOBILE: nilStr(mobile),
   });
 };
 export const changeCardNo = (

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { commonUrl, commonUrl2 } from "./common";
+import router from "@/router";
 import store from "@/store";
 
 const url = commonUrl;
@@ -41,9 +42,8 @@ api2.interceptors.response.use(
       //alert("로그인 시간이 1분 이상 지났습니다. 재로그인 해주세요.");
       store.commit("clearSession");
       router.push("/");
-      return new Promise(() => {});
     }
-    return new Promise(() => {});
+    return Promise.reject(error);
   }
 );
 

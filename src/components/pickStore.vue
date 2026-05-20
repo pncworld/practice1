@@ -121,18 +121,18 @@
             : 'h-[40px] w-[85%] bg-white border border-black rounded-lg text-xs text-nowrap',
           dynamicStoreClass,
         ]"
-        :disabled="isDisabled">
+        :disabled="isStoreComboDisabled">
         <v-select
           :reduce="(option) => option.lngStoreCode"
           class="style-chooser h-full !disabled:text-black text-sm"
           v-model="selectedStoreCode"
-          :disabled="isDisabled"
-          :clearable="!isDisabled"
+          :disabled="isStoreComboDisabled"
+          :clearable="!isStoreComboDisabled"
           label="strName"
           :placeholder="defaultStoreNm"
           @click="resetStoreCode"
           append-to-body
-          :options="storeCd">
+          :options="storeSelectOptions">
           <template #no-options>
             <div>검색된 항목이 없습니다.</div>
           </template>
@@ -310,21 +310,14 @@
 </template>
 
 <script setup>
-import { getKioskList, getPosList, getTablePosList } from "@/api/common";
+import { getKioskList, getPosList, getTablePosList, getStoreList2 } from "@/api/common";
 import { getScreenList2 } from "@/api/master";
-import { defineProps, nextTick, onMounted, ref, watch } from "vue";
+import { defineProps, nextTick, onMounted, ref, watch, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
 const store = useStore();
 const selectedStoreCode = ref(null);
-
-const resetStoreCode = () => {
-  if (isDisabled.value == true) {
-    return;
-  }
-  selectedStoreCode.value = null;
-};
 //////////////////////////////////////////////////////////////////////////////////
 watch(selectedStoreCode, () => {
   let converted =
@@ -462,6 +455,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /**
+   * 매장 계정(isDisabled)일 때도 매장(v-select)만 선택 가능하게 함.
+   * 그룹·속성(업종) 콤보는 기존처럼 isDisabled 유지 — 입고확정 등「보낸만 선택·받는은 고정」용.
+   */
+  unlockStoreComboOnly: {
+    type: Boolean,
+    default: false,
+  },
   setDynamicStoreClass: {
     type: String,
     default: "",
@@ -494,6 +495,56 @@ const props = defineProps({
     default: 12,
   },
 });
+
+/** defaultStore + v-select: 목록에 전체 행이 없으면 reduce(0)이 라벨을 못 찾아 "0"만 표시됨 */
+const storeSelectOptions = computed(() => {
+  const base = Array.isArray(storeCd.value) ? storeCd.value : [];
+  if (!props.defaultStore) return base;
+  const hasWhole = base.some(
+    (item) =>
+      item != null &&
+      (item.lngStoreCode === 0 || item.lngStoreCode === "0")
+  );
+  if (hasWhole) return base;
+  const nm = props.defaultStoreNm || "전체";
+  return [{ lngStoreCode: 0, strName: nm, lngStoreAttr: 0 }, ...base];
+});
+
+const isStoreComboDisabled = computed(
+  () => isDisabled.value && !props.unlockStoreComboOnly
+);
+
+const resetStoreCode = () => {
+  if (isStoreComboDisabled.value == true) {
+    return;
+  }
+  selectedStoreCode.value = null;
+};
+
+/** 매장 계정 + unlockStoreComboOnly: Vuex storeCd(1건) 대신 그룹 전체 매장 목록 로드 */
+const applyFullGroupStoreListForUnlock = async () => {
+  if (!props.unlockStoreComboOnly) return;
+  if (
+    store.state.userData.blnBrandAdmin == "True" ||
+    store.state.userData.lngPositionType == "1"
+  ) {
+    return;
+  }
+  const g = store.state.userData.lngStoreGroup;
+  if (g === undefined || g === null || String(g).trim() === "") return;
+  try {
+    const res = await getStoreList2(g);
+    const raw =
+      res?.data?.store ?? res?.data?.List ?? res?.data?.list ?? res?.data ?? [];
+    const arr = Array.isArray(raw) ? raw : [];
+    if (arr.length === 0) return;
+    storeCd2.value = arr;
+    storeCd.value = arr;
+    mergeExtraStoreIntoOptions();
+  } catch (_) {
+    /* Vuex 목록 유지 */
+  }
+};
 
 const optionMatchesCode = (item, code) => {
   if (item == null || code === "" || code === null || code === undefined)
@@ -650,12 +701,13 @@ watch(
 );
 watch(
   () => store.state.storeCd,
-  () => {
+  async () => {
     storeGroup.value = store.state.storeGroup;
     storeType.value = store.state.storeType;
     storeCd.value = store.state.storeCd;
     storeCd2.value = store.state.storeCd;
     mergeExtraStoreIntoOptions();
+    await applyFullGroupStoreListForUnlock();
     storeAreaCd2.value = store.state.storeAreaCd;
     selectedStoreAreaCd.value = 0;
 
@@ -703,8 +755,13 @@ onMounted(async () => {
     // hideit.value = false;
     // hideit3.value = false;
   } else {
-    selectedStoreCode.value = parseInt(store.state.userData.lngPosition);
-    selectedStoreType.value = store.state.userData.lngJoinType;
+    if (props.unlockStoreComboOnly && props.defaultStore) {
+      selectedStoreCode.value = 0;
+      selectedStoreType.value = 0;
+    } else {
+      selectedStoreCode.value = parseInt(store.state.userData.lngPosition);
+      selectedStoreType.value = store.state.userData.lngJoinType;
+    }
     // hideit.value = true;
     // hideit3.value = true;
   }
@@ -766,6 +823,7 @@ onMounted(async () => {
     isDisabled.value = false;
   }
   defaultStoreNm.value = props.defaultStoreNm;
+  await applyFullGroupStoreListForUnlock();
 });
 
 const emitStoreType = (value) => {
@@ -976,7 +1034,7 @@ watch(
   () => props.defaultStore,
   () => {
     if (props.defaultStore == true) {
-      selectedStoreCode.value = "0";
+      selectedStoreCode.value = 0;
       emit("update:storeCd", "0");
       emit("storeNm", "전체");
     } else {
