@@ -1382,6 +1382,16 @@ export const getOrderStatus = (groupCd, storeCd, sdate, edate, cond) => {
   });
 };
 
+export const getPosAndTablePosSale = (groupCd, storeCd, sdate, edate, cond) => {
+  return api2.post("/MISALES/SLS11_025RPT.asmx/getPosAndTablePosSale", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    EDATE: edate,
+    COND: cond,
+  });
+};
+
 export const getMenuDistinct = (groupCd, storeCd, cond) => {
   return api2.post("/MISALES/SLS04_023RPT.asmx/getMenuDistinct", {
     GROUP_CD: groupCd,
