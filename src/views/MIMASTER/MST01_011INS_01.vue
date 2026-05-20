@@ -529,6 +529,8 @@
 
 <script setup>
 import {
+  deleteOptionGroup,
+  deleteStoreConTable,
   getAllOptionManageData,
   getMostColumnMenuList,
   saveOptions,
@@ -1022,6 +1024,120 @@ watch(mainCategory, () => {
   subCategory.value = 0;
 });
 
+const getGridRowState = (state) => ({
+  deleted: state?.deleted ?? [],
+  created: state?.created ?? [],
+  updated: state?.updated ?? [],
+});
+
+const isActiveSaveRow = (item) =>
+  item.deleted != true &&
+  item.lngCode != null &&
+  item.lngCode !== "" &&
+  item.lngCode !== undefined;
+
+const sortRowsByLngCode = (rows) =>
+  [...rows].sort((a, b) => {
+    const codeA = parseInt(a.lngCode, 10) || 0;
+    const codeB = parseInt(b.lngCode, 10) || 0;
+    return codeA - codeB;
+  });
+
+const buildActiveOptionRows = () =>
+  sortRowsByLngCode(updatedRowData4.value.filter(isActiveSaveRow));
+
+const buildActiveOptionGroupRows = () =>
+  sortRowsByLngCode(updatedRowData5.value.filter(isActiveSaveRow));
+
+const countRemovedCodes = (snapshot, activeRows) => {
+  const activeCodes = new Set(
+    activeRows.map((row) => String(row.lngCode)).filter(Boolean)
+  );
+  return snapshot.filter(
+    (row) => row.lngCode != null && row.lngCode !== "" && !activeCodes.has(String(row.lngCode))
+  ).length;
+};
+
+const getRemovedCodes = (snapshot, activeRows) => {
+  const activeCodes = new Set(
+    activeRows.map((row) => String(row.lngCode)).filter(Boolean)
+  );
+  return snapshot
+    .filter(
+      (row) =>
+        row.lngCode != null &&
+        row.lngCode !== "" &&
+        !activeCodes.has(String(row.lngCode))
+    )
+    .map((row) => row.lngCode);
+};
+
+const applyOptionRowDelete = (deletedRow, deleteIndex) => {
+  if (!deletedRow) {
+    return;
+  }
+  if (deletedRow.lngCode != null && deletedRow.lngCode !== "") {
+    updatedRowData4.value = updatedRowData4.value.filter(
+      (row) => String(row.lngCode) !== String(deletedRow.lngCode)
+    );
+  } else {
+    updatedRowData4.value = updatedRowData4.value.filter(
+      (_, index) => index !== deleteIndex
+    );
+  }
+  rowData1.value = [...updatedRowData4.value];
+  refreshOptionMenuChainDirty();
+};
+
+const applyOptionGroupRowDelete = (deletedRow, deleteIndex) => {
+  if (!deletedRow) {
+    return;
+  }
+  if (deletedRow.lngCode != null && deletedRow.lngCode !== "") {
+    updatedRowData5.value = updatedRowData5.value.filter(
+      (row) => String(row.lngCode) !== String(deletedRow.lngCode)
+    );
+  } else {
+    updatedRowData5.value = updatedRowData5.value.filter(
+      (_, index) => index !== deleteIndex
+    );
+  }
+  rowData3.value = [...updatedRowData5.value];
+  refreshOptionGroupChainDirty();
+};
+
+const hasOptionGridChanges = () => {
+  const state = getGridRowState(allstaterows.value);
+  if (state.deleted.length || state.created.length || state.updated.length) {
+    return true;
+  }
+  if (optionMenuChainDirty.value) {
+    return true;
+  }
+  if (countRemovedCodes(confirmitem.value, buildActiveOptionRows()) > 0) {
+    return true;
+  }
+  return (
+    JSON.stringify(confirmitem.value) !== JSON.stringify(updatedRowData4.value)
+  );
+};
+
+const hasOptionGroupGridChanges = () => {
+  const state = getGridRowState(allstaterows2.value);
+  if (state.deleted.length || state.created.length || state.updated.length) {
+    return true;
+  }
+  if (optionGroupChainDirty.value) {
+    return true;
+  }
+  if (countRemovedCodes(confirmitem2.value, buildActiveOptionGroupRows()) > 0) {
+    return true;
+  }
+  return (
+    JSON.stringify(confirmitem2.value) !== JSON.stringify(updatedRowData5.value)
+  );
+};
+
 /**
  *  저장 버튼 함수
  */
@@ -1037,12 +1153,7 @@ const saveButton = async () => {
     return;
   }
   if (currentMenu.value == false) {
-    if (
-      allstaterows.value.deleted.length == 0 &&
-      allstaterows.value.created.length == 0 &&
-      allstaterows.value.updated.length == 0 &&
-      !optionMenuChainDirty.value
-    ) {
+    if (!hasOptionGridChanges()) {
       Swal.fire({
         title: "경고",
         text: "변경된 사항이 없습니다.",
@@ -1052,12 +1163,7 @@ const saveButton = async () => {
       return;
     }
   } else {
-    if (
-      allstaterows2.value.deleted.length == 0 &&
-      allstaterows2.value.created.length == 0 &&
-      allstaterows2.value.updated.length == 0 &&
-      !optionGroupChainDirty.value
-    ) {
+    if (!hasOptionGroupGridChanges()) {
       Swal.fire({
         title: "경고",
         text: "변경된 사항이 없습니다.",
@@ -1115,40 +1221,48 @@ const saveButton = async () => {
     }
   }
 
-  Swal.fire({
+  const activeRowsForSave = currentMenu.value
+    ? buildActiveOptionGroupRows()
+    : buildActiveOptionRows();
+  const snapshotForSave = currentMenu.value
+    ? confirmitem2.value
+    : confirmitem.value;
+
+  const saveConfirm = await Swal.fire({
     title: "저장",
     text: "저장 하시겠습니까?",
     icon: "question",
     showCancelButton: true,
     confirmButtonText: "저장",
     cancelButtonText: "취소",
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      store.state.loading = true;
-      try {
-        //comsole.log(updatedRowData4.value);
-        //comsole.log(rowData3.value);
+  });
+  if (!saveConfirm.isConfirmed) {
+    return;
+  }
+
+  store.state.loading = true;
+  let saveSucceeded = false;
+  try {
+        const removedCodes = getRemovedCodes(snapshotForSave, activeRowsForSave);
+        if (removedCodes.length > 0) {
+          if (currentMenu.value == false) {
+            await deleteStoreConTable(
+              groupCd.value,
+              nowStoreCd.value,
+              removedCodes.join(",")
+            );
+          } else {
+            await deleteOptionGroup(
+              groupCd.value,
+              nowStoreCd.value,
+              removedCodes.join("\u200b")
+            );
+          }
+        }
 
         if (currentMenu.value == false) {
-          // 1. 먼저 삭제되지 않은 데이터를 필터링
-          const filteredData = updatedRowData4.value
-            .filter((_, index) => !allstaterows.value.deleted.includes(index));
-          
-          // 디버깅: 필터링 전 원본 데이터 확인
-          // console.log("필터링 전 updatedRowData4:", updatedRowData4.value.map(item => ({ lngCode: item.lngCode, strName: item.strName })));
-          // console.log("필터링 후 filteredData:", filteredData.map(item => ({ lngCode: item.lngCode, strName: item.strName })));
-          
-          // 2. lngCode 기준으로 정렬 (복사본 생성 후 정렬하여 원본 보호)
-          const sortedData = [...filteredData].sort((a, b) => {
-            const codeA = parseInt(a.lngCode) || 0;
-            const codeB = parseInt(b.lngCode) || 0;
-            return codeA - codeB;
-          });
-          
-          // 디버깅: 정렬 후 데이터 확인
-          // console.log("정렬 후 sortedData:", sortedData.map(item => ({ lngCode: item.lngCode, strName: item.strName })));
+          const sortedData = buildActiveOptionRows();
 
-          // 3. 정렬된 데이터에서 각 필드 추출 (같은 객체에서 추출하여 매핑 보장)
           const lngCodes = sortedData.map((item) => item.lngCode);
           const strNames = sortedData.map((item) => item.strName.replace(/,/g, '/')); // 쉼표를 | 로 변경
           const blnMustSels = sortedData.map((item) => item.blnMustSel);
@@ -1191,7 +1305,7 @@ const saveButton = async () => {
           //   strName: strNames[idx] 
           // })));
 
-          const res = await saveOptions(
+          await saveOptions(
             groupCd.value,
             nowStoreCd.value,
             lngCodes.join(","),
@@ -1221,21 +1335,9 @@ const saveButton = async () => {
             lngChainMenu21.join(",")
           );
 
-          // console.log(res);
-
         } else {
-          // 1. 삭제되지 않은 데이터 필터링
-          const filteredData2 = updatedRowData5.value
-            .filter((_, index) => !allstaterows2.value.deleted.includes(index));
+          const sortedData2 = buildActiveOptionGroupRows();
 
-          // 2. lngCode 기준으로 정렬 (복사본 생성 후 정렬하여 원본 보호)
-          const sortedData2 = [...filteredData2].sort((a, b) => {
-            const codeA = parseInt(a.lngCode) || 0;
-            const codeB = parseInt(b.lngCode) || 0;
-            return codeA - codeB;
-          });
-
-          // 3. 정렬된 데이터에서 각 필드 추출
           const lngCodes2 = sortedData2.map((item) => item.lngCode);
           const strNames2 = sortedData2.map((item) => item.strName.replace(/,/g, '/'));
           const lngChainGroup1 = sortedData2.map((item) => item.lngChainGroup1);
@@ -1259,7 +1361,7 @@ const saveButton = async () => {
           const lngChainGroup19 = sortedData2.map((item) => item.lngChainGroup19);
           const lngChainGroup20 = sortedData2.map((item) => item.lngChainGroup20);
 
-          const res = await saveOptions2(
+          await saveOptions2(
             groupCd.value,
             nowStoreCd.value,
             lngCodes2.join(","),
@@ -1286,19 +1388,24 @@ const saveButton = async () => {
             lngChainGroup20.join(",")
           );
         }
-      } catch (error) {
-        // console.log(error);
-      } finally {
-        store.state.loading = false;
-        Swal.fire({
-          title: "저장 되었습니다.",
-          confirmButtonText: "확인",
-        });
-
-        searchButton();
-      }
+    saveSucceeded = true;
+  } catch (error) {
+    Swal.fire({
+      title: "저장 실패",
+      text: "저장 중 오류가 발생했습니다. 데이터를 다시 조회한 후 확인해 주세요.",
+      icon: "error",
+      confirmButtonText: "확인",
+    });
+  } finally {
+    store.state.loading = false;
+    if (saveSucceeded) {
+      await Swal.fire({
+        title: "저장 되었습니다.",
+        confirmButtonText: "확인",
+      });
+      searchButton();
     }
-  });
+  }
 
   // 빈공간 데이터를 넣으려고하는데 안 들어가고 조회가 안됨 // 빈 칸에 대한 것도 데이터를 불러와야 메뉴키위치를 정할 수 있음.
 };
@@ -1490,6 +1597,32 @@ const searchOption2 = (e) => {
 };
 const deleteAll1 = ref(false);
 const deleteAll = async () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "조회를 먼저 해주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (!clickrowData1.value) {
+    Swal.fire({
+      title: "초기화할 옵션을 선택해 주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  const resetConfirm = await Swal.fire({
+    title: "초기화",
+    text: "선택한 옵션의 구성(연결 메뉴)을 모두 초기화합니다. 계속하시겠습니까?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "초기화",
+    cancelButtonText: "취소",
+  });
+  if (!resetConfirm.isConfirmed) {
+    return;
+  }
+
   changeColid.value = "lngChainMenu1";
   changeValue.value = 0;
   changeNow3.value = !changeNow3.value;
@@ -1617,6 +1750,32 @@ const deleteAll = async () => {
 };
 const deleteAll2 = ref(false);
 const deleteAlls = async () => {
+  if (afterSearch.value == false) {
+    Swal.fire({
+      title: "조회를 먼저 해주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (!clickrowData2.value) {
+    Swal.fire({
+      title: "초기화할 옵션그룹을 선택해 주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  const resetConfirm = await Swal.fire({
+    title: "초기화",
+    text: "선택한 옵션그룹의 구성을 모두 초기화합니다. 계속하시겠습니까?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "초기화",
+    cancelButtonText: "취소",
+  });
+  if (!resetConfirm.isConfirmed) {
+    return;
+  }
+
   changeColid.value = "lngChainGroup1";
   changeValue.value = 0;
   changeNow4.value = !changeNow4.value;
@@ -1843,21 +2002,39 @@ const addRowData4 = () => {
  * 그리드 행 삭제 버튼 함수
  */
 
-const deleteRowData1 = () => {
+const deleteRowData1 = async () => {
   if (afterSearch.value == false) {
     Swal.fire({
       title: "조회를 먼저 해주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (changeRow.value == null || changeRow.value < 0) {
+    Swal.fire({
+      title: "삭제할 행을 선택해 주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  const deleteIndex = changeRow.value;
+  const deletedRow = updatedRowData4.value[deleteIndex];
+  if (!deletedRow) {
+    Swal.fire({
+      title: "삭제할 행을 선택해 주세요.",
       confirmButtonText: "확인",
     });
     return;
   }
   deleterow1.value = !deleterow1.value;
+  await nextTick();
+  applyOptionRowDelete(deletedRow, deleteIndex);
 };
 /**
  * 그리드 행 삭제 버튼 함수
  */
 
-const deleteRowData3 = () => {
+const deleteRowData3 = async () => {
   if (afterSearch.value == false) {
     Swal.fire({
       title: "조회를 먼저 해주세요.",
@@ -1865,7 +2042,25 @@ const deleteRowData3 = () => {
     });
     return;
   }
+  if (changeRow2.value == null || changeRow2.value < 0) {
+    Swal.fire({
+      title: "삭제할 행을 선택해 주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  const deleteIndex = changeRow2.value;
+  const deletedRow = updatedRowData5.value[deleteIndex];
+  if (!deletedRow) {
+    Swal.fire({
+      title: "삭제할 행을 선택해 주세요.",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   deleterow2.value = !deleterow2.value;
+  await nextTick();
+  applyOptionGroupRowDelete(deletedRow, deleteIndex);
 };
 /**
  * 그리드 행 삭제 버튼 함수
@@ -2289,13 +2484,13 @@ const sendRowState2 = (e) => {
   currState2.value = e;
 };
 
-const allstaterows = ref([]);
+const allstaterows = ref({ deleted: [], created: [], updated: [] });
 const allStateRows = (e) => {
   // console.log(e);
   allstaterows.value = e;
 };
 
-const allstaterows2 = ref([]);
+const allstaterows2 = ref({ deleted: [], created: [], updated: [] });
 const allStateRows2 = (e) => {
   // console.log(e);
   allstaterows2.value = e;
