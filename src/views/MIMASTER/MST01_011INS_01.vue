@@ -2223,12 +2223,17 @@ const clickaddMenu2 = (newValue) => {
 
 const changeNow3 = ref(false);
 
-/** 메뉴 조회 팝업: 클릭은 getRows(배열), 더블클릭은 getJsonRow(객체)로 올 수 있음 */
+/** 메뉴 조회 팝업: 클릭은 getRows(배열), 더블클릭은 병합 객체 — 필터 후 lngCode가 틀릴 수 있어 [2] 우선 */
 const menuLngCodeFromPopupRow = (row) => {
   if (row == null) return undefined;
   if (Array.isArray(row) && row.length > 2) return row[2];
-  if (typeof row === "object" && row.lngCode != null && row.lngCode !== "")
-    return row.lngCode;
+  if (typeof row === "object") {
+    const fromIdx = row[2];
+    if (fromIdx != null && fromIdx !== "" && fromIdx !== 0 && fromIdx !== "0") {
+      return fromIdx;
+    }
+    if (row.lngCode != null && row.lngCode !== "") return row.lngCode;
+  }
   return undefined;
 };
 
@@ -2343,12 +2348,17 @@ const dblclickedRowData = (newValue) => {
  * 행 더블 클릭시 작동 함수
  */
 
-/** 옵션 조회 팝업: 더블클릭 시 JSON 행의 옵션코드 */
+/** 옵션 조회 팝업: 더블클릭 병합 객체 — 필터 후 lngCode가 틀릴 수 있어 [0] 우선 */
 const optionLngCodeFromPopupRow = (row) => {
   if (row == null) return undefined;
   if (Array.isArray(row) && row.length > 0) return row[0];
-  if (typeof row === "object" && row.lngCode != null && row.lngCode !== "")
-    return row.lngCode;
+  if (typeof row === "object") {
+    const fromIdx = row[0];
+    if (fromIdx != null && fromIdx !== "" && fromIdx !== 0 && fromIdx !== "0") {
+      return fromIdx;
+    }
+    if (row.lngCode != null && row.lngCode !== "") return row.lngCode;
+  }
   return undefined;
 };
 
