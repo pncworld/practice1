@@ -769,9 +769,53 @@ export const getCustInitData = (groupcd) => {
   });
 };
 
+/** 가입경로 마스터 (crmJoinPathMst) — 체크박스 목록 */
+export const getJoinPathMst = (groupCd) => {
+  return api2.post("/MICRM/CRM01_001INS.asmx/getJoinPathMst", {
+    GROUP_CD: groupCd,
+  });
+};
+
+/** @deprecated getJoinPathMst 사용 */
+export const getJoinPathList = getJoinPathMst;
+
+/** 고객 가입경로 조회 — usp_CRM01_001INS_getCustJoinPath */
+export const getCustJoinPath = (groupCd, custNo) => {
+  return api2.post("/MICRM/CRM01_001INS.asmx/getCustJoinPath", {
+    GROUP_CD: groupCd,
+    CUST_NO: custNo,
+  });
+};
+
+/** 고객 가입경로 저장 — usp_CRM01_001INS_setCustJoinPath (INTSTOPRSN과 분리) */
+export const setCustJoinPath = (groupCd, custNo, userSeq, joinPathCds) => {
+  return api2.post("/MICRM/CRM01_001INS.asmx/setCustJoinPath", {
+    GROUP_CD: groupCd,
+    CUST_NO: custNo,
+    USER_SEQ: userSeq,
+    JOIN_PATH_CDS: joinPathCds ?? "",
+  });
+};
+
 export const getCrmPolicy = (groupcd) => {
   return api2.post("/MICRM/CRM01_001INS.asmx/getCrmPolicy", {
     GROUP_CD : groupcd,    
+  });
+};
+
+/** 마케팅 수신동의 안내 알림톡 템플릿 (mstAlimTalkInfo lngMsgType=5) */
+export const getMktConsentAlimTalkTemplate = (groupCd) => {
+  return api2.post("/MICRM/CRM01_001INS.asmx/getMktConsentAlimTalkTemplate", {
+    GROUP_CD: groupCd,
+  });
+};
+
+/** 마케팅 수신동의 안내 알림톡 발송 */
+export const sendMktConsentAlimTalk = (groupCd, custNo, consentDate) => {
+  return api2.post("/MICRM/CRM01_001INS.asmx/sendMktConsentAlimTalk", {
+    GROUP_CD: groupCd,
+    CUST_NO: custNo,
+    CONSENT_DATE: consentDate,
   });
 };
 

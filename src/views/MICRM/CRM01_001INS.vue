@@ -440,14 +440,15 @@
     </div>
   </div>
 
-  <!-- 고객정보 신규·수정 팝업: 조회 패널과 동일 wire 패턴 -->
-  <div
-    v-if="visible"
-    class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-2 sm:p-3">
+  <!-- 고객정보 신규·수정 팝업 (body teleport — TOP GNB·레이아웃 위) -->
+  <Teleport to="body">
     <div
-      class="crm01-modal-sheet flex max-h-[min(calc(100dvh-10px),900px)] w-full max-w-[min(100%,960px)] flex-col overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-slate-900/10 sm:max-w-4xl sm:rounded-2xl xl:max-w-5xl">
+      v-if="visible"
+      class="fixed inset-0 z-[11000] flex items-center justify-center bg-black/50 p-2 sm:p-3">
+    <div
+      class="crm01-modal-sheet flex max-h-[min(calc(100dvh-6px),920px)] w-full max-w-[min(100%,960px)] flex-col overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-slate-900/10 sm:max-w-4xl sm:rounded-2xl xl:max-w-5xl">
       <div
-        class="shrink-0 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100/80 px-4 py-2.5 sm:px-5 sm:py-3">
+        class="shrink-0 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100/80 px-4 py-2 sm:px-5 sm:py-2.5">
         <h2 class="text-lg font-bold leading-tight tracking-tight text-slate-900 sm:text-xl">
           {{ InsertNew ? "고객정보 신규 등록" : "고객정보 수정" }}
         </h2>
@@ -455,16 +456,20 @@
           <span class="crm01-req-mark" aria-hidden="true">*</span> 표시는 필수 항목입니다.
         </p>
       </div>
-      <div class="crm01-modal-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-3 py-2 sm:px-4 sm:py-3">
+      <div class="crm01-modal-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-hidden overscroll-contain px-3 py-1.5 sm:px-4 sm:py-2">
         <div
-          class="crm01-modal-panel rounded-xl bg-gray-200 px-3 py-3 sm:px-4 sm:py-4"
+          class="crm01-modal-panel crm01-modal-panel-split rounded-xl px-3 py-2 sm:px-4 sm:py-2.5"
           :style="{
             '--crm01-control-border': crm01ControlBorder,
             '--crm01-col-gutter': crm01ModalColGutter,
             '--crm01-row-gap': crm01ModalRowGap,
             '--crm01-label-col': crm01ModalLabelCol,
+            '--crm01-modal-row-border': crm01ModalRowBorder,
+            '--crm01-modal-row-pad': crm01ModalRowPad,
           }">
-          <div class="crm01-modal-wire-grid">
+          <section class="crm01-modal-area-required">
+            <h3 class="crm01-modal-area-heading">필수 항목</h3>
+            <div class="crm01-modal-wire-grid">
             <!-- 1행 -->
             <div class="crm01-wire-cell">
               <div class="crm01-wire-label">
@@ -565,38 +570,7 @@
               </div>
             </div>
 
-            <!-- 3행 -->
-            <div class="crm01-wire-cell">
-              <div class="crm01-wire-label">
-                <span class="crm01-req-mark" aria-hidden="true">*</span>휴대폰번호
-              </div>
-              <div class="crm01-wire-field min-w-0 crm01-modal-field-wrap">
-                <select
-                  id="crm01-pop-mobile-pre"
-                  v-model="pcond6"
-                  class="crm01-sg-select h-8 min-h-8 w-[4.75rem] shrink-0 rounded-md border border-solid bg-white px-1 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="010">010</option>
-                </select>
-                <input
-                  id="crm01-pop-mobile-mid"
-                  v-model="pcond7"
-                  type="text"
-                  class="crm01-sg-input h-8 min-h-8 w-[5.25rem] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  @input="limitFourDigitsPcond7"
-                />
-                <input
-                  id="crm01-pop-mobile-last"
-                  v-model="pcond8"
-                  type="text"
-                  class="crm01-sg-input h-8 min-h-8 w-[5.25rem] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  @input="limitFourDigitsPcond8"
-                />
-                <label class="crm01-modal-choice shrink-0" for="crm01-pop-sms-agree">
-                  <input id="crm01-pop-sms-agree" type="checkbox" v-model="pcond9" />
-                  SMS 수신 동의
-                </label>
-              </div>
-            </div>
+            <!-- 3행: 등급 | 빈칸(구분선) -->
             <div class="crm01-wire-cell">
               <div class="crm01-wire-label">
                 <span class="crm01-req-mark" aria-hidden="true">*</span>등급
@@ -605,7 +579,7 @@
                 <select
                   id="crm01-pop-level"
                   v-model="pcond10"
-                  class="crm01-sg-select h-8 min-h-8 w-full min-w-0 max-w-xs rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  class="crm01-sg-select h-8 min-h-8 w-full min-w-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="0">선택</option>
                   <option :value="i.intLevel" v-for="i in optionList" :key="i.intLevel">
                     {{ i.strLevelName }}
@@ -613,57 +587,109 @@
                 </select>
               </div>
             </div>
+            <div
+              class="crm01-wire-cell crm01-modal-cell-row-fill"
+              aria-hidden="true"></div>
 
-            <!-- 4행 -->
+            <!-- 4행: 휴대폰 + SMS + 동의일 (한 줄 전체) -->
+            <div class="crm01-wire-cell crm01-modal-span-full">
+              <div class="crm01-wire-label">
+                <span class="crm01-req-mark" aria-hidden="true">*</span>휴대폰번호
+              </div>
+              <div
+                class="crm01-wire-field min-w-0 crm01-modal-field-wrap crm01-modal-mobile-row flex-nowrap">
+                <select
+                  id="crm01-pop-mobile-pre"
+                  v-model="pcond6"
+                  class="crm01-sg-select h-8 min-h-8 w-[4.275rem] shrink-0 rounded-md border border-solid bg-white px-1 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="010">010</option>
+                </select>
+                <input
+                  id="crm01-pop-mobile-mid"
+                  v-model="pcond7"
+                  type="text"
+                  class="crm01-sg-input h-8 min-h-8 w-[4.725rem] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  @input="limitFourDigitsPcond7"
+                />
+                <input
+                  id="crm01-pop-mobile-last"
+                  v-model="pcond8"
+                  type="text"
+                  class="crm01-sg-input h-8 min-h-8 w-[4.725rem] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  @input="limitFourDigitsPcond8"
+                />
+                <label
+                  class="crm01-modal-choice crm01-modal-consent-choice shrink-0"
+                  for="crm01-pop-sms-agree">
+                  <input id="crm01-pop-sms-agree" type="checkbox" v-model="pcond9" />
+                  SMS 수신 동의
+                </label>
+                <div class="crm01-modal-consent-date-inline">
+                  <span class="crm01-modal-consent-date-label">{{ pcondSmsAgreeDateLabel }}</span>
+                  <input
+                    id="crm01-pop-sms-agree-date"
+                    v-model="pcondSmsAgreeDate"
+                    type="text"
+                    readonly
+                    disabled
+                    class="crm01-sg-input crm01-modal-date crm01-modal-consent-date h-8 min-h-8 w-[9.25rem] shrink-0 cursor-not-allowed rounded-md border border-solid bg-slate-100 px-2 text-sm text-slate-600"
+                  />
+                </div>
+              </div>
+            </div>
+            </div>
+          </section>
+
+          <section class="crm01-modal-area-optional">
+            <h3 class="crm01-modal-area-heading">추가 정보</h3>
+            <div class="crm01-modal-marketing-block">
+              <div class="crm01-modal-marketing-row">
+                <div class="crm01-modal-marketing-left">
+                  <label
+                    class="crm01-modal-choice crm01-modal-marketing-check crm01-modal-consent-choice"
+                    for="crm01-pop-mkt-agree">
+                    <span class="crm01-modal-marketing-title crm01-modal-consent-text">마케팅 정보 수신동의</span>
+                    <input id="crm01-pop-mkt-agree" type="checkbox" v-model="pcond32" />
+                  </label>
+                  <button
+                    v-if="mktSmsAvailable"
+                    type="button"
+                    class="crm01-modal-marketing-sms-btn shrink-0"
+                    :disabled="!savedMktAgree"
+                    @click="openMktSmsPopup">
+                    <font-awesome-icon
+                      icon="comment-sms"
+                      class="crm01-modal-marketing-sms-btn-icon"
+                      aria-hidden="true"
+                    />
+                    마케팅 수신동의 문자발송
+                  </button>
+                </div>
+                <div class="crm01-modal-marketing-date-cell">
+                  <span class="crm01-modal-consent-date-label">{{ pcondMktAgreeDateLabel }}</span>
+                  <input
+                    id="crm01-pop-mkt-agree-date"
+                    v-model="pcondMktAgreeDate"
+                    type="text"
+                    readonly
+                    disabled
+                    class="crm01-sg-input crm01-modal-date crm01-modal-consent-date h-8 min-h-8 w-[9.25rem] min-w-0 shrink-0 cursor-not-allowed rounded-md border border-solid bg-slate-100 px-2 text-sm text-slate-600"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="crm01-modal-wire-grid">
+            <!-- 전화번호 | 가입일 -->
             <div class="crm01-wire-cell">
               <div class="crm01-wire-label">전화번호</div>
-              <div class="crm01-wire-field min-w-0 crm01-stack-field">
+              <div class="crm01-wire-field min-w-0 crm01-modal-field-wrap crm01-modal-tel-row flex-nowrap">
                 <input
                   id="crm01-pop-tel"
                   v-model="pcond11"
                   type="text"
-                  class="crm01-sg-input h-8 min-h-8 w-full max-w-xs rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="crm01-sg-input crm01-modal-tel-input h-8 min-h-8 shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <span class="crm01-hint">※ 02-111-2222</span>
-              </div>
-            </div>
-            <div
-              class="crm01-wire-cell crm01-modal-hide-ssn"
-              aria-hidden="true">
-              <div class="crm01-wire-label">주민번호</div>
-              <div class="crm01-wire-field min-w-0 crm01-modal-field-wrap">
-                <input
-                  id="crm01-pop-ssn-front"
-                  v-model="pcond12"
-                  type="text"
-                  maxlength="6"
-                  class="crm01-sg-input h-8 min-h-8 w-[7rem] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <span class="select-none font-semibold text-slate-500">—</span>
-                <input
-                  id="crm01-pop-ssn-back"
-                  v-model="pcond13"
-                  type="text"
-                  maxlength="7"
-                  class="crm01-sg-input h-8 min-h-8 w-[7.5rem] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-
-            <!-- 5행 -->
-            <div class="crm01-wire-cell">
-              <div class="crm01-wire-label">E-mail</div>
-              <div class="crm01-wire-field min-w-0 crm01-modal-field-wrap flex-wrap items-center">
-                <input
-                  id="crm01-pop-email"
-                  v-model="pcond14"
-                  type="text"
-                  class="crm01-sg-input h-8 min-h-8 min-w-0 flex-1 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:min-w-[12rem]"
-                />
-                <label class="crm01-modal-choice shrink-0 whitespace-nowrap" for="crm01-pop-email-agree">
-                  <input id="crm01-pop-email-agree" type="checkbox" v-model="pcond15" />
-                  이메일 수신 동의
-                </label>
+                <span class="crm01-hint shrink-0">※ 02-111-2222</span>
               </div>
             </div>
             <div class="crm01-wire-cell">
@@ -672,45 +698,58 @@
                 <input
                   id="crm01-pop-join-date"
                   v-model="pcond16"
-                  type="text"
+                  type="date"
                   disabled
-                  class="crm01-sg-input h-8 min-h-8 w-full max-w-xs cursor-not-allowed rounded-md border border-solid bg-slate-100 px-2 text-sm text-slate-600"
+                  class="crm01-sg-input crm01-modal-date h-8 min-h-8 w-full min-w-0 cursor-not-allowed rounded-md border border-solid bg-slate-100 px-2 text-sm text-slate-600"
                 />
               </div>
             </div>
 
-            <!-- 가입매장 | 콤보 | 선호매장 | 콤보 (한 줄·다른 항목과 동일 라벨 스타일) -->
-            <div class="crm01-wire-cell crm01-modal-span-full crm01-modal-store-inline">
-              <div class="crm01-wire-label shrink-0">가입매장</div>
-              <div class="crm01-wire-field min-w-0 flex-1 basis-0">
-                <select
-                  id="crm01-pop-store-join"
-                  v-model="pcond17"
-                  class="crm01-sg-select h-8 min-h-8 w-full min-w-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option v-for="i in optionList2" :key="i.lngStoreCode" :value="i.lngStoreCode">
-                    {{ i.strName }}
-                  </option>
+            <!-- E-mail | 이메일 수신 동의 (입력 폭 = 가입매장 콤보) -->
+            <div class="crm01-wire-cell">
+              <div class="crm01-wire-label">E-mail</div>
+              <div class="crm01-wire-field min-w-0">
+                <input
+                  id="crm01-pop-email"
+                  v-model="pcond14"
+                  type="text"
+                  class="crm01-sg-input h-8 min-h-8 w-full min-w-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            <div class="crm01-wire-cell crm01-modal-email-agree-cell">
+              <div class="crm01-wire-field min-w-0 crm01-modal-email-agree-field">
+                <label class="crm01-modal-choice shrink-0 whitespace-nowrap" for="crm01-pop-email-agree">
+                  <input id="crm01-pop-email-agree" type="checkbox" v-model="pcond15" />
+                  이메일 수신 동의
+                </label>
+              </div>
+            </div>
+
+            <!-- 가입매장 | 선호매장 -->
+            <div class="crm01-wire-cell">
+              <div class="crm01-wire-label">가입매장</div>
+              <div class="crm01-wire-field min-w-0">
+                <select id="crm01-pop-store-join" v-model="pcond17" class="crm01-sg-select h-8 min-h-8 w-full min-w-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option v-for="i in optionList2" :key="i.lngStoreCode" :value="i.lngStoreCode">{{ i.strName }}</option>
                 </select>
               </div>
-              <div class="crm01-wire-label shrink-0">선호매장</div>
-              <div class="crm01-wire-field min-w-0 flex-1 basis-0">
-                <select
-                  id="crm01-pop-store-pref"
-                  v-model="pcond18"
-                  class="crm01-sg-select h-8 min-h-8 w-full min-w-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="crm01-wire-cell">
+              <div class="crm01-wire-label">선호매장</div>
+              <div class="crm01-wire-field min-w-0">
+                <select id="crm01-pop-store-pref" v-model="pcond18" class="crm01-sg-select h-8 min-h-8 w-full min-w-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="0">미선택</option>
-                  <option v-for="i in optionList2" :key="'p-' + i.lngStoreCode" :value="i.lngStoreCode">
-                    {{ i.strName }}
-                  </option>
+                  <option v-for="i in optionList2" :key="'p-' + i.lngStoreCode" :value="i.lngStoreCode">{{ i.strName }}</option>
                 </select>
               </div>
             </div>
 
             <!-- 집주소 -->
-            <div class="crm01-wire-cell crm01-modal-span-full">
+            <div class="crm01-wire-cell crm01-modal-span-full crm01-modal-row-tall">
               <div class="crm01-wire-label">집주소</div>
-              <div class="crm01-wire-field min-w-0 flex-col items-stretch gap-2">
-                <div class="crm01-modal-field-wrap w-full flex-wrap items-center">
+              <div class="crm01-wire-field min-w-0 flex-col items-stretch crm01-modal-home-value">
+                <div class="crm01-modal-home-zip-row crm01-modal-field-wrap flex-wrap items-center">
                   <input
                     id="crm01-pop-zip-home"
                     v-model="pcond19"
@@ -733,7 +772,9 @@
                     class="crm01-sg-input h-8 min-h-8 min-w-[10rem] flex-1 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <div class="crm01-modal-field-wrap gap-4">
+                <div
+                  class="crm01-modal-home-mail-block crm01-modal-field-wrap gap-4"
+                  aria-label="등록 우편물 수령지">
                   <span class="text-xs font-semibold text-slate-700">등록 우편물 수령지</span>
                   <label class="crm01-modal-choice" for="crm01-pop-mail-home">
                     <input
@@ -785,7 +826,42 @@
               </div>
             </div>
 
-            <!-- 생년월일 / 기념일 -->
+            <!-- 결혼여부 (전폭 값 영역) -->
+            <div class="crm01-wire-cell crm01-modal-span-full">
+              <div class="crm01-wire-label">결혼여부</div>
+              <div class="crm01-wire-field min-w-0 crm01-modal-field-wrap gap-4">
+                <label class="crm01-modal-choice" for="crm01-pop-marry-no">
+                  <input id="crm01-pop-marry-no" type="radio" name="pcond31" value="0" v-model="pcond31" />
+                  미혼
+                </label>
+                <label class="crm01-modal-choice" for="crm01-pop-marry-yes">
+                  <input id="crm01-pop-marry-yes" type="radio" name="pcond31" value="1" v-model="pcond31" />
+                  기혼
+                </label>
+              </div>
+            </div>
+
+            <div class="crm01-wire-cell crm01-modal-span-full crm01-modal-join-path-cell">
+              <div class="crm01-wire-label">가입경로</div>
+              <div
+                class="crm01-wire-field min-w-0 crm01-modal-join-path-row"
+                :style="crm01JoinPathGridStyle">
+                <label
+                  v-for="opt in joinPathOptions"
+                  :key="opt.code"
+                  class="crm01-modal-choice crm01-modal-join-path-choice"
+                  :for="'crm01-pop-join-path-' + opt.code">
+                  <input
+                    :id="'crm01-pop-join-path-' + opt.code"
+                    type="checkbox"
+                    :value="opt.code"
+                    v-model="pcond38" />
+                  {{ opt.label }}
+                </label>
+              </div>
+            </div>
+
+            <!-- 생년월일 | 결혼기념일 -->
             <div class="crm01-wire-cell">
               <div class="crm01-wire-label">생년월일</div>
               <div class="crm01-wire-field min-w-0 crm01-modal-field-wrap flex-wrap items-center gap-3">
@@ -796,21 +872,11 @@
                   class="crm01-sg-input crm01-modal-date h-8 min-h-8 min-w-0 shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <label class="crm01-modal-choice" for="crm01-pop-lunar">
-                  <input
-                    id="crm01-pop-lunar"
-                    type="radio"
-                    name="pcond28"
-                    value="0"
-                    v-model="pcond28" />
+                  <input id="crm01-pop-lunar" type="radio" name="pcond28" value="0" v-model="pcond28" />
                   음력
                 </label>
                 <label class="crm01-modal-choice" for="crm01-pop-solar">
-                  <input
-                    id="crm01-pop-solar"
-                    type="radio"
-                    name="pcond28"
-                    value="1"
-                    v-model="pcond28" />
+                  <input id="crm01-pop-solar" type="radio" name="pcond28" value="1" v-model="pcond28" />
                   양력
                 </label>
               </div>
@@ -825,68 +891,24 @@
                   class="crm01-sg-input crm01-modal-date h-8 min-h-8 min-w-0 shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <label class="crm01-modal-choice" for="crm01-pop-anni-birth">
-                  <input
-                    id="crm01-pop-anni-birth"
-                    type="radio"
-                    name="pcond30"
-                    value="1"
-                    v-model="pcond30" />
+                  <input id="crm01-pop-anni-birth" type="radio" name="pcond30" value="1" v-model="pcond30" />
                   생일
                 </label>
                 <label class="crm01-modal-choice" for="crm01-pop-anni-wed">
-                  <input
-                    id="crm01-pop-anni-wed"
-                    type="radio"
-                    name="pcond30"
-                    value="2"
-                    v-model="pcond30" />
+                  <input id="crm01-pop-anni-wed" type="radio" name="pcond30" value="2" v-model="pcond30" />
                   결혼기념일
                 </label>
               </div>
             </div>
 
-            <!-- 결혼여부 / 정보활용 -->
-            <div class="crm01-wire-cell">
-              <div class="crm01-wire-label">결혼여부</div>
-              <div class="crm01-wire-field min-w-0 crm01-modal-field-wrap gap-4">
-                <label class="crm01-modal-choice" for="crm01-pop-marry-no">
-                  <input
-                    id="crm01-pop-marry-no"
-                    type="radio"
-                    name="pcond31"
-                    value="0"
-                    v-model="pcond31" />
-                  미혼
-                </label>
-                <label class="crm01-modal-choice" for="crm01-pop-marry-yes">
-                  <input
-                    id="crm01-pop-marry-yes"
-                    type="radio"
-                    name="pcond31"
-                    value="1"
-                    v-model="pcond31" />
-                  기혼
-                </label>
-              </div>
-            </div>
-            <div class="crm01-wire-cell">
-              <div class="crm01-wire-label">정보활용동의</div>
-              <div class="crm01-wire-field min-w-0">
-                <label class="crm01-modal-choice" for="crm01-pop-use-agree">
-                  <input id="crm01-pop-use-agree" type="checkbox" v-model="pcond32" />
-                  활용 동의함
-                </label>
-              </div>
-            </div>
-
-            <!-- 직종 / 직장 -->
+            <!-- 직종 | 직장명 -->
             <div class="crm01-wire-cell">
               <div class="crm01-wire-label">직종</div>
               <div class="crm01-wire-field min-w-0">
                 <select
                   id="crm01-pop-job"
                   v-model="pcond33"
-                  class="crm01-sg-select h-8 min-h-8 w-full min-w-0 max-w-xs rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  class="crm01-sg-select h-8 min-h-8 w-full min-w-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="0">전체</option>
                   <option value="1">회사원</option>
                   <option value="2">공무원</option>
@@ -910,32 +932,8 @@
               </div>
             </div>
 
-            <!-- 부서 / 직급 -->
-            <div class="crm01-wire-cell">
-              <div class="crm01-wire-label">부서명</div>
-              <div class="crm01-wire-field min-w-0">
-                <input
-                  id="crm01-pop-dept"
-                  v-model="pcond35"
-                  type="text"
-                  class="crm01-sg-input h-8 min-h-8 w-full rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-            <div class="crm01-wire-cell">
-              <div class="crm01-wire-label">직급</div>
-              <div class="crm01-wire-field min-w-0">
-                <input
-                  id="crm01-pop-rank"
-                  v-model="pcond36"
-                  type="text"
-                  class="crm01-sg-input h-8 min-h-8 w-full rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-
             <!-- 비고 전폭 -->
-            <div class="crm01-wire-cell crm01-modal-span-full">
+            <div class="crm01-wire-cell crm01-modal-span-full crm01-modal-remark-row">
               <div class="crm01-wire-label">비고</div>
               <div class="crm01-wire-field min-w-0">
                 <input
@@ -947,15 +945,17 @@
               </div>
             </div>
           </div>
+          </section>
         </div>
       </div>
-      <div class="shrink-0 flex justify-end gap-2 border-t border-slate-200 bg-slate-50 px-5 py-3 sm:px-6">
+      <div class="shrink-0 flex justify-end gap-2 border-t border-slate-200 bg-slate-50 px-5 py-2.5 sm:px-6">
         <button
           type="button"
           class="rounded-lg border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50"
           @click="
             visible = false;
             InsertNew = false;
+            closeMktSmsPopup();
           ">
           닫기
         </button>
@@ -967,7 +967,57 @@
         </button>
       </div>
     </div>
-  </div>
+    </div>
+  </Teleport>
+
+  <!-- 마케팅 수신동의 문자발송 팝업 (body teleport — 고객 팝업·레이아웃 위 최상단) -->
+  <Teleport to="body">
+    <div
+      v-if="mktSmsPopupVisible"
+      class="fixed inset-0 z-[11100] flex items-center justify-center bg-black/50 p-3">
+      <div
+        class="crm01-mkt-sms-popup flex w-full max-w-lg max-h-[min(calc(100dvh-1.5rem),920px)] flex-col overflow-y-auto rounded-xl bg-white shadow-2xl ring-1 ring-slate-900/10">
+        <div class="shrink-0 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100/80 px-5 py-3">
+          <h2 class="text-base font-bold text-slate-900 sm:text-lg">마케팅 수신동의 문자발송</h2>
+        </div>
+        <div class="flex flex-col gap-3 px-5 py-4">
+          <div class="crm01-mkt-sms-date-row flex items-center gap-3">
+            <label class="crm01-mkt-sms-date-label shrink-0" for="crm01-mkt-sms-consent-date">마케팅 수신동의 일자</label>
+            <input
+              id="crm01-mkt-sms-consent-date"
+              v-model="mktSmsConsentDate"
+              type="date"
+              class="crm01-sg-input crm01-modal-date h-8 min-h-8 w-[9.25rem] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800"
+            />
+          </div>
+          <div
+            class="crm01-mkt-sms-template w-full rounded-md border border-solid border-slate-300 bg-slate-50 px-3 py-2 text-sm leading-relaxed text-slate-700"
+            role="textbox"
+            aria-readonly="true">
+            {{ mktSmsTemplateDisplay || "발송 템플릿을 불러오는 중입니다." }}
+          </div>
+          <p v-if="mktSmsAvailable" class="crm01-mkt-sms-template-notice">
+            ※ 위 내용은 발송 미리보기입니다. 실제 전송 시 줄바꿈 위치는 수신 환경에 따라 달라질 수 있습니다.
+          </p>
+        </div>
+        <div class="flex shrink-0 justify-end gap-2 border-t border-slate-200 bg-slate-50 px-5 py-3">
+          <button
+            type="button"
+            class="rounded-lg border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50"
+            @click="closeMktSmsPopup">
+            닫기
+          </button>
+          <button
+            type="button"
+            class="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+            @click="sendMktSms">
+            전송
+          </button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
+
   <GetZipCode
     v-if="show1"
     @closePopUp="show1 = false"
@@ -988,7 +1038,12 @@ import {
   getCustomerInfoExcel,
   getCrmPolicy,
   getInitDataCustPurchase,
+  getCustJoinPath,
+  getJoinPathMst,
+  getMktConsentAlimTalkTemplate,
   insertCustomerInfo,
+  sendMktConsentAlimTalk,
+  setCustJoinPath,
   updateCustomerInfo,
   validCardNo,
 } from "@/api/micrm";
@@ -1026,7 +1081,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -1073,6 +1128,82 @@ const crm01LabelCol = "8rem";
 const crm01ModalColGutter = "0.75rem";
 const crm01ModalRowGap = "0.4rem";
 const crm01ModalLabelCol = "6.875rem";
+const crm01ModalRowBorder = "#e2e8f0";
+const crm01ModalRowPad = "0.25rem 0.45rem";
+
+const CRM01_JOIN_PATH_OPTIONS_FALLBACK = [
+  { code: "1", label: "온라인 광고" },
+  { code: "2", label: "네이버 검색" },
+  { code: "3", label: "지인추천" },
+  { code: "4", label: "친구/가족추천" },
+  { code: "5", label: "매장 홍보물" },
+  { code: "6", label: "기타" },
+];
+
+const joinPathOptions = ref([...CRM01_JOIN_PATH_OPTIONS_FALLBACK]);
+
+const crm01JoinPathGridStyle = computed(() => {
+  const n = Math.max(joinPathOptions.value.length, 1);
+  return { gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` };
+});
+
+const mapJoinPathMstRow = (row) => ({
+  code: String(row.lngPathCD ?? row.LNGPATHCD ?? "").trim(),
+  label: String(row.strPathNM ?? row.STRPATHNM ?? "").trim(),
+});
+
+const loadJoinPathMst = async (group) => {
+  const g = group ?? ccustomorGroup.value ?? groupCd.value;
+  if (!g) {
+    joinPathOptions.value = [...CRM01_JOIN_PATH_OPTIONS_FALLBACK];
+    return;
+  }
+  try {
+    const res = await getJoinPathMst(g);
+    const list = Array.isArray(res.data?.List) ? res.data.List : [];
+    const opts = list.map(mapJoinPathMstRow).filter((o) => o.code && o.label);
+    joinPathOptions.value =
+      opts.length > 0 ? opts : [...CRM01_JOIN_PATH_OPTIONS_FALLBACK];
+  } catch {
+    joinPathOptions.value = [...CRM01_JOIN_PATH_OPTIONS_FALLBACK];
+  }
+  const valid = new Set(joinPathOptions.value.map((o) => o.code));
+  pcond38.value = (Array.isArray(pcond38.value) ? pcond38.value : [])
+    .map((c) => String(c).trim())
+    .filter((c) => valid.has(c));
+};
+
+const loadMktSmsTemplate = async (group) => {
+  const g = group ?? ccustomorGroup.value ?? groupCd.value;
+  mktSmsTemplateRaw.value = "";
+  mktSmsTempCode.value = "";
+  if (!g) return;
+  try {
+    const res = await getMktConsentAlimTalkTemplate(g);
+    const list = Array.isArray(res.data?.List) ? res.data.List : [];
+    const row = list[0];
+    if (!row) return;
+    const msg = String(
+      row.KT_TEMPMSG ?? row.ktTempMsg ?? row.kt_tempmsg ?? ""
+    ).trim();
+    const code = String(
+      row.KT_TEMPCODE ?? row.ktTempCode ?? row.kt_tempcode ?? ""
+    ).trim();
+    if (msg) {
+      mktSmsTemplateRaw.value = msg;
+      mktSmsTempCode.value = code;
+    }
+  } catch {
+    mktSmsTemplateRaw.value = "";
+    mktSmsTempCode.value = "";
+  }
+};
+
+const preparePopupJoinPath = async () => {
+  const group = ccustomorGroup.value ?? groupCd.value;
+  await Promise.all([loadJoinPathMst(group), loadMktSmsTemplate(group)]);
+  await loadCustJoinPath();
+};
 
 /** 조회 영역 UI(매장·기간)를 최초 마운트와 동일하게 다시 그릴 때 증가 */
 const crm01SearchAreaKey = ref(0);
@@ -1222,6 +1353,116 @@ const pcond34 = ref("");
 const pcond35 = ref("");
 const pcond36 = ref("");
 const pcond37 = ref("");
+const pcond38 = ref([]);
+
+const pcondSmsAgreeDate = ref("");
+const pcondMktAgreeDate = ref("");
+const pcondSmsAgreeDateLabel = ref("SMS 수신 미동의일");
+const pcondMktAgreeDateLabel = ref("마케팅 정보 미수신 동의일");
+
+/** DB 저장 기준 마케팅 동의 (체크박스 변경과 무관 — 조회/저장 후 갱신) */
+const savedMktAgree = ref(false);
+const savedMktAgreeDate = ref("");
+
+const mktSmsPopupVisible = ref(false);
+const mktSmsConsentDate = ref("");
+/** API 원본 템플릿 (KT_TEMPMSG, #{비고1} 포함) */
+const mktSmsTemplateRaw = ref("");
+const mktSmsTempCode = ref("");
+
+const resolveMktSmsConsentDate = () => {
+  const saved = savedMktAgreeDate.value;
+  if (saved != null && String(saved).trim() !== "") {
+    return formatConsentDateDisplay(saved);
+  }
+  return formatLocalDate(new Date());
+};
+
+const openMktSmsPopup = () => {
+  if (!savedMktAgree.value || !mktSmsAvailable.value) return;
+  mktSmsConsentDate.value = resolveMktSmsConsentDate();
+  mktSmsPopupVisible.value = true;
+};
+
+const closeMktSmsPopup = () => {
+  mktSmsPopupVisible.value = false;
+};
+
+const sendMktSms = async () => {
+  const dateDisplay = formatMktSmsTemplateDate(mktSmsConsentDate.value);
+  if (!mktSmsConsentDate.value || !dateDisplay) {
+    await Swal.fire({
+      title: "경고",
+      text: "마케팅 수신동의 일자를 선택해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  const confirmed = await Swal.fire({
+    title: "전송 확인",
+    html: `설정된 마케팅 수신동의 일자(<b>${dateDisplay}</b>)가 맞습니까?`,
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "예",
+    cancelButtonText: "아니오",
+  });
+  if (!confirmed.isConfirmed) return;
+
+  const group = ccustomorGroup.value ?? groupCd.value;
+  const custNo = String(ccustomorNum.value ?? "").trim();
+  if (!group || !custNo) {
+    await Swal.fire({
+      title: "경고",
+      text: "고객 정보를 확인할 수 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  const consentDate = formatConsentDateDisplay(mktSmsConsentDate.value);
+  if (!consentDate) {
+    await Swal.fire({
+      title: "경고",
+      text: "마케팅 수신동의 일자 형식이 올바르지 않습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  try {
+    store.state.loading = true;
+    const res = await sendMktConsentAlimTalk(group, custNo, consentDate);
+    if (res?.data?.RESULT_CD != null && res.data.RESULT_CD !== "00") {
+      await Swal.fire({
+        title: "실패",
+        text: res.data.RESULT_NM || "알림톡 발송에 실패했습니다.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+    await Swal.fire({
+      title: "완료",
+      text: "마케팅 수신동의 안내 알림톡 발송 요청이 완료되었습니다.",
+      icon: "success",
+      confirmButtonText: "확인",
+    });
+    closeMktSmsPopup();
+  } catch {
+    await Swal.fire({
+      title: "실패",
+      text: "알림톡 발송 중 오류가 발생했습니다.",
+      icon: "error",
+      confirmButtonText: "확인",
+    });
+  } finally {
+    store.state.loading = false;
+  }
+};
 
 const visible = ref(false);
 const team = ref();
@@ -1506,7 +1747,7 @@ const saveButton = async () => {
         pcond32.value == false ? 0 : 1,
         pcond10.value,
         pcond37.value,
-        null,
+        "",
         null,
         pcond18.value
       );
@@ -1564,21 +1805,65 @@ const saveButton = async () => {
         pcond32.value == false ? 0 : 1,
         pcond10.value,
         pcond37.value,
-        null,
+        "",
         null,
         pcond18.value,
         pcond.value
       );
     }
-    ////console.log(res);
-    store.state.loading = false;
+    const saveFailed =
+      res?.data?.RESULT_CD != null && res.data.RESULT_CD !== "00";
+    if (saveFailed) {
+      await Swal.fire({
+        title: "실패",
+        text: res.data.RESULT_NM
+          ? `저장을 실패하였습니다. ${res.data.RESULT_NM}`
+          : "저장을 실패하였습니다.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+
+    const isNew = InsertNew.value;
+    const savedCustNo = await resolveCustNoAfterSave(res, isNew);
+    if (savedCustNo) {
+      ccustomorNum.value = savedCustNo;
+    }
+    const joinPathOk = await saveCustomerJoinPath(
+      ccustomorGroup.value ?? groupCd.value,
+      savedCustNo
+    );
+    if (!joinPathOk) {
+      await Swal.fire({
+        title: "경고",
+        text: "고객 정보는 저장되었으나 가입경로 저장에 실패했습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+    }
+
+    if (isNew) {
+      visible.value = false;
+      InsertNew.value = false;
+      closeMktSmsPopup();
+      if (afterSearch.value) {
+        await searchButton();
+      }
+    } else {
+      await Swal.fire({
+        text: joinPathOk
+          ? "저장되었습니다."
+          : "저장되었습니다. (가입경로는 확인 필요)",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      await reloadPopupCustomerFromServer();
+    }
   } catch (error) {
     ////console.log(error);
-    store.state.loading = false;
   } finally {
     store.state.loading = false;
-    visible.value = false;
-    searchButton();
   }
 };
 
@@ -1594,14 +1879,297 @@ const saveButton = async () => {
 const ccustomorNum = ref();
 const ccustomorGroup = ref();
 const ccustomorStatus = ref();
-const dblclickedRowData = (e) => {
-  InsertNew.value = false;
-  ////console.log(e);
-  ccustomorNum.value = e[0];
-  ccustomorGroup.value = e[59];
-  ccustomorStatus.value = e[60];
-  visible.value = true;
-  pcond.value = e[4].replace("[", "").replace("]", "");
+const popupEditDataRow = ref(-1);
+
+const normalizeCardId = (v) => String(v ?? "").replace(/[\[\]]/g, "").trim();
+
+const formatCardIdForApi = (card) => {
+  const raw = normalizeCardId(card);
+  return raw ? `[${raw}]` : null;
+};
+
+const formatJoinPathForApi = (codes) => {
+  if (!Array.isArray(codes) || codes.length === 0) return "";
+  return codes.map((c) => String(c).trim()).filter(Boolean).join(",");
+};
+
+const parseJoinPathCodes = (raw) => {
+  if (raw == null || raw === "") return [];
+  const s = String(raw).trim();
+  if (!s) return [];
+  return s.split(/[,|]/).map((c) => c.trim()).filter(Boolean);
+};
+
+const resolveCustNoAfterSave = (res, isNew) => {
+  if (!isNew) {
+    return String(ccustomorNum.value ?? "").trim();
+  }
+  const fromRes =
+    res?.data?.List?.[0]?.lngCustNo ??
+    res?.data?.List?.[0]?.CUST_NO ??
+    res?.data?.CUST_NO ??
+    res?.data?.lngCustNo;
+  if (fromRes != null && String(fromRes).trim() !== "") {
+    return String(fromRes).trim();
+  }
+  return String(ccustomorNum.value ?? "").trim();
+};
+
+const loadCustJoinPath = async () => {
+  const group = ccustomorGroup.value ?? groupCd.value;
+  const custNo = String(ccustomorNum.value ?? "").trim();
+  if (!group || !custNo) {
+    pcond38.value = [];
+    return;
+  }
+  try {
+    const res = await getCustJoinPath(group, custNo);
+    const raw = res?.data?.JOIN_PATH_CDS ?? "";
+    pcond38.value = parseJoinPathCodes(raw);
+  } catch {
+    pcond38.value = [];
+  }
+};
+
+const saveCustomerJoinPath = async (group, custNo) => {
+  const cust = String(custNo ?? "").trim();
+  if (!group || !cust) return true;
+  try {
+    const pathRes = await setCustJoinPath(
+      group,
+      cust,
+      store.state.userData.lngSequence,
+      formatJoinPathForApi(pcond38.value)
+    );
+    if (pathRes?.data?.RESULT_CD != null && pathRes.data.RESULT_CD !== "00") {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const gridRowField = (row, fieldNames, indexFallback) => {
+  if (row == null) return undefined;
+  if (Array.isArray(row)) return row[indexFallback];
+  for (const name of fieldNames) {
+    if (Object.prototype.hasOwnProperty.call(row, name)) {
+      return row[name];
+    }
+  }
+  return row[indexFallback];
+};
+
+const gridRowAgreed = (row, fieldNames, indexFallback) => {
+  const v = gridRowField(row, fieldNames, indexFallback);
+  return v === true || v === "True" || v === 1 || v === "1";
+};
+
+const formatConsentDateDisplay = (raw) => {
+  if (raw == null || raw === "") return "";
+  const s = String(raw).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  if (/^\d{8}$/.test(s)) {
+    return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
+  }
+  const formatted = formatLocalDate(raw);
+  return formatted && formatted !== "--" ? formatted : "";
+};
+
+const mktSmsAvailable = computed(
+  () => String(mktSmsTemplateRaw.value ?? "").trim() !== ""
+);
+
+/** 템플릿 #{비고1} — 2026년 5월 28일 형식 */
+const formatMktSmsTemplateDate = (raw) => {
+  if (raw == null || raw === "") return "";
+  let s = String(raw).trim();
+  if (/^\d{8}$/.test(s)) {
+    s = `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
+  }
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (m) {
+    return `${m[1]}년 ${Number(m[2])}월 ${Number(m[3])}일`;
+  }
+  const formatted = formatLocalDate(raw);
+  const m2 = /^(\d{4})-(\d{2})-(\d{2})$/.exec(formatted);
+  if (m2) {
+    return `${m2[1]}년 ${Number(m2[2])}월 ${Number(m2[3])}일`;
+  }
+  return "";
+};
+
+/** #{비고1} → 동의일자 콤보 값 (날짜 변경 시 실시간 반영) */
+const mktSmsTemplateDisplay = computed(() => {
+  const raw = mktSmsTemplateRaw.value ?? "";
+  if (!raw) return "";
+  const date = formatMktSmsTemplateDate(mktSmsConsentDate.value);
+  return raw.replace(/#\{비고1\}/g, date);
+});
+
+/** crmCustConsentStat — 동의면 LastAgree, 미동의면 LastRefuse (getCustomerInfo SELECT alias) */
+const pickConsentDateFromRow = (row, agreed, agreeFieldNames, refuseFieldNames) => {
+  const names = agreed ? agreeFieldNames : refuseFieldNames;
+  for (const name of names) {
+    const raw = gridRowField(row, [name], undefined);
+    if (raw != null && String(raw).trim() !== "") {
+      return formatConsentDateDisplay(raw);
+    }
+  }
+  return "";
+};
+
+const setSmsConsentFromRow = (e) => {
+  const agreed = gridRowAgreed(e, ["blnSMS", "BLNSMS"], 7);
+  pcondSmsAgreeDateLabel.value = agreed ? "SMS 수신 동의일" : "SMS 수신 미동의일";
+  pcondSmsAgreeDate.value = pickConsentDateFromRow(e, agreed, ["dtmSmsLastAgree"], [
+    "dtmSmsLastRefuse",
+  ]);
+};
+
+const setMktConsentFromRow = (e) => {
+  const agreed = gridRowAgreed(e, ["blnCustAgree", "CUSTAGREE", "blnMktAgree"], 58);
+  savedMktAgree.value = agreed;
+  savedMktAgreeDate.value = agreed
+    ? pickConsentDateFromRow(e, true, ["dtmMktLastAgree"], [])
+    : "";
+  pcondMktAgreeDateLabel.value = agreed
+    ? "마케팅 정보 수신 동의일"
+    : "마케팅 정보 미수신 동의일";
+  pcondMktAgreeDate.value = pickConsentDateFromRow(e, agreed, ["dtmMktLastAgree"], [
+    "dtmMktLastRefuse",
+  ]);
+};
+
+const resetConsentDateFields = () => {
+  pcondSmsAgreeDate.value = "";
+  pcondMktAgreeDate.value = "";
+  pcondSmsAgreeDateLabel.value = "SMS 수신 미동의일";
+  pcondMktAgreeDateLabel.value = "마케팅 정보 미수신 동의일";
+  savedMktAgree.value = false;
+  savedMktAgreeDate.value = "";
+};
+
+const getRowCustNo = (row) =>
+  String(
+    gridRowField(row, ["A01_lngCustNo", "lngCustNo", "lngCustNO"], 0) ?? ""
+  ).trim();
+
+const getRowCardId = (row) =>
+  normalizeCardId(
+    gridRowField(row, ["A05_strCCardID", "strCCardID", "strCardId"], 4)
+  );
+
+const matchesCustomerRow = (row, custNo, cardId) => {
+  const targetNo = String(custNo ?? "").trim();
+  const targetCard = normalizeCardId(cardId);
+  const rowNo = getRowCustNo(row);
+  const rowCard = getRowCardId(row);
+  if (targetNo && rowNo && rowNo === targetNo) return true;
+  if (targetCard && rowCard && rowCard === targetCard) return true;
+  if (!row || typeof row !== "object") return false;
+  for (const [key, val] of Object.entries(row)) {
+    if (targetNo && /custno/i.test(key) && String(val ?? "").trim() === targetNo) {
+      return true;
+    }
+    if (targetCard && /card/i.test(key) && normalizeCardId(val) === targetCard) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const mergeGridRowAt = (dataRow) => {
+  if (dataRow == null || dataRow < 0) return null;
+  const fromParent =
+    Array.isArray(rowData.value) && dataRow < rowData.value.length
+      ? rowData.value[dataRow]
+      : null;
+  let fromProvider = null;
+  try {
+    const gv = window.gridView;
+    const dp = gv?.getDataSource?.();
+    if (dp?.getRows) fromProvider = dp.getRows()[dataRow];
+    if (!fromProvider && dp?.getJsonRow) fromProvider = dp.getJsonRow(dataRow);
+  } catch {
+    fromProvider = null;
+  }
+  if (!fromParent && !fromProvider) return null;
+  if (!fromParent) return fromProvider;
+  if (!fromProvider) return fromParent;
+  const merged = { ...(fromProvider || {}) };
+  for (const k of Object.keys(fromParent)) {
+    const pv = fromParent[k];
+    const mv = merged[k];
+    if (
+      (mv === undefined || mv === null || mv === "") &&
+      pv !== undefined &&
+      pv !== null &&
+      pv !== ""
+    ) {
+      merged[k] = pv;
+    }
+  }
+  return Object.keys(merged).length > 0 ? merged : fromParent;
+};
+
+const findCustomerDataRowIndex = (custNo, cardId) => {
+  const idx = rowData.value.findIndex((row) =>
+    matchesCustomerRow(row, custNo, cardId)
+  );
+  if (idx >= 0) return idx;
+  if (
+    popupEditDataRow.value >= 0 &&
+    popupEditDataRow.value < rowData.value.length
+  ) {
+    return popupEditDataRow.value;
+  }
+  const cur = window.gridView?.getCurrent?.();
+  if (cur?.dataRow >= 0) return cur.dataRow;
+  return -1;
+};
+
+const buildMinimalCustomerSearchParams = (custNo, cardId) => {
+  const params = buildSearchParams();
+  params[0] = groupCd.value;
+  params[1] = 0;
+  params[2] = null;
+  params[3] = null;
+  params[4] = null;
+  params[5] = custNo ?? null;
+  params[6] = cardId ? formatCardIdForApi(cardId) : null;
+  for (let i = 7; i < params.length; i++) {
+    params[i] = null;
+  }
+  return params;
+};
+
+const fetchCustomerRowForPopup = async () => {
+  const custNo = ccustomorNum.value;
+  const cardId = pcond.value;
+  let res = await getCustomerInfo(
+    ...buildMinimalCustomerSearchParams(custNo, null)
+  );
+  let list = Array.isArray(res.data?.List) ? res.data.List : [];
+  let row = list.find((r) => matchesCustomerRow(r, custNo, null));
+  if (row) return row;
+  if (cardId) {
+    res = await getCustomerInfo(
+      ...buildMinimalCustomerSearchParams(null, cardId)
+    );
+    list = Array.isArray(res.data?.List) ? res.data.List : [];
+    row = list.find((r) => matchesCustomerRow(r, custNo, cardId));
+    if (row) return row;
+  }
+  return null;
+};
+
+const applyGridRowToPopupForm = (e) => {
+  ccustomorNum.value = getRowCustNo(e);
+  ccustomorGroup.value = gridRowField(e, ["lngStoreGroup"], 59);
+  ccustomorStatus.value = gridRowField(e, ["intJoinSts"], 60);
+  pcond.value = String(getRowCardId(e)).replace("[", "").replace("]", "");
   pcond2.value = e[49];
   pcond3.value = e[1];
   pcond4.value = e[35];
@@ -1624,7 +2192,6 @@ const dblclickedRowData = (e) => {
   pcond20.value = e[12];
   pcond21.value = e[13];
   pcond22.value = e[50];
-
   pcond24.value = e[14];
   pcond25.value = e[15];
   pcond26.value = e[16];
@@ -1639,6 +2206,72 @@ const dblclickedRowData = (e) => {
   pcond35.value = e[45];
   pcond36.value = e[44];
   pcond37.value = e[46];
+  pcond38.value = [];
+  setSmsConsentFromRow(e);
+  setMktConsentFromRow(e);
+  preparePopupJoinPath();
+};
+
+const applyMergedRowToPopup = (dataRow) => {
+  const merged = mergeGridRowAt(dataRow);
+  if (!merged) return false;
+  applyGridRowToPopupForm(merged);
+  popupEditDataRow.value = dataRow;
+  return true;
+};
+
+const refreshCustomerGridSilently = async () => {
+  if (!afterSearch.value) return;
+  const res = await getCustomerInfo(...buildSearchParams());
+  rowData.value = Array.isArray(res.data?.List) ? res.data.List : [];
+  reload.value = !reload.value;
+  await nextTick();
+  const idx = findCustomerDataRowIndex(ccustomorNum.value, pcond.value);
+  if (idx >= 0) {
+    popupEditDataRow.value = idx;
+    window.gridView?.setCurrent({ itemIndex: idx });
+  }
+};
+
+const reloadPopupCustomerFromServer = async () => {
+  const custNo = ccustomorNum.value;
+  const cardId = pcond.value;
+  if (afterSearch.value) {
+    await refreshCustomerGridSilently();
+    await nextTick();
+    await nextTick();
+  }
+  const dataRow = findCustomerDataRowIndex(custNo, cardId);
+  if (dataRow >= 0 && applyMergedRowToPopup(dataRow)) {
+    return true;
+  }
+  const fetched = await fetchCustomerRowForPopup();
+  if (fetched) {
+    let idx = rowData.value.findIndex((row) => row === fetched);
+    if (idx < 0) {
+      idx = rowData.value.findIndex((row) =>
+        matchesCustomerRow(row, custNo, cardId)
+      );
+    }
+    if (idx >= 0 && applyMergedRowToPopup(idx)) {
+      return true;
+    }
+    applyGridRowToPopupForm(fetched);
+    return true;
+  }
+  return false;
+};
+
+const dblclickedRowData = (e) => {
+  InsertNew.value = false;
+  visible.value = true;
+  popupEditDataRow.value =
+    typeof e?.dataRow === "number"
+      ? e.dataRow
+      : typeof e?.index === "number"
+        ? e.index
+        : -1;
+  applyGridRowToPopupForm(e);
 };
 
 const initVar = () => {
@@ -1683,6 +2316,8 @@ function resetPconds() {
   pcond35.value = "";
   pcond36.value = "";
   pcond37.value = "";
+  pcond38.value = [];
+  resetConsentDateFields();
 }
 
 const InsertNew = ref(false);
@@ -1700,11 +2335,13 @@ const addButton = (e) => {
   */
   InsertNew.value = true;
   resetPconds();
+  popupEditDataRow.value = -1;
 
   ccustomorNum.value = "";
   ccustomorGroup.value = groupCd.value;
   ccustomorStatus.value = 1;
   visible.value = true;
+  preparePopupJoinPath();
 };
 
 const InputPcond = (e) => {
@@ -2050,7 +2687,7 @@ const excelList = (e) => {
   align-items: center;
 }
 
-.crm01-wire-field:not(.crm01-inline-ops):not(.crm01-birth-row):not(.crm01-stack-field):not(.crm01-date-slot):not(.crm01-modal-field-wrap)
+.crm01-wire-field:not(.crm01-inline-ops):not(.crm01-birth-row):not(.crm01-stack-field):not(.crm01-date-slot):not(.crm01-modal-field-wrap):not(.crm01-modal-join-path-row)
   > * {
   min-width: 0;
   width: 100%;
@@ -2193,47 +2830,365 @@ const excelList = (e) => {
   margin-left: 0 !important;
 }
 
-/* 고객정보 생성/수정 모달 — 조회 패널과 동일 라벨·테두리 톤 */
-.crm01-modal-wire-grid {
+/* 고객정보 생성/수정 모달 — split panel · 필수/추가 영역 */
+.crm01-modal-panel-split {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4375rem;
+  background: transparent;
+}
+
+.crm01-modal-area-heading {
+  margin: 0 0 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: rgb(51 65 85);
+}
+
+.crm01-modal-area-required {
+  padding: 0.4375rem 0.5625rem 0.5rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(180deg, #fff8f1 0%, #ffedd8 100%);
+  border: 1px solid rgb(254 215 170);
+}
+
+.crm01-modal-area-optional {
+  padding: 0.3125rem 0.5rem 0.375rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid rgb(226 232 240);
+}
+
+.crm01-modal-marketing-block {
+  margin-bottom: 0.25rem;
+  padding: 0.3125rem 0.4375rem;
+  border-radius: 0.375rem;
+  background: linear-gradient(180deg, #f7fee7 0%, #ecfccb 55%, #d9f99d 100%);
+  border: 1px solid rgba(101, 163, 13, 0.35);
+  box-shadow: 0 1px 2px rgba(101, 163, 13, 0.08);
+}
+
+/* 마케팅 행 — wire-grid와 동일 4열(라벨|값|라벨|값) */
+.crm01-modal-marketing-row {
   display: grid;
   width: 100%;
   min-width: 0;
-  align-items: start;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: var(--crm01-label-col) minmax(0, 1fr) var(--crm01-label-col) minmax(0, 1fr);
   column-gap: var(--crm01-col-gutter);
-  row-gap: var(--crm01-row-gap);
+  align-items: center;
 }
 
-.crm01-modal-wire-grid .crm01-wire-cell {
-  align-items: stretch;
+.crm01-modal-marketing-left {
+  display: flex;
+  grid-column: 1 / 3;
+  align-items: center;
+  min-width: 0;
+  gap: 0.5rem;
+}
+
+.crm01-modal-marketing-sms-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 0.375rem;
+  margin-left: 0.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid rgb(101 163 13 / 0.45);
+  background-color: #fff;
+  padding: 0.3125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: rgb(77 124 15);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
 }
 
-.crm01-modal-wire-grid .crm01-modal-span-full {
-  grid-column: 1 / -1;
+.crm01-modal-marketing-sms-btn:hover:not(:disabled) {
+  background-color: rgb(247 254 231);
 }
 
-.crm01-modal-store-inline.crm01-wire-cell {
-  flex-wrap: nowrap;
+.crm01-modal-marketing-sms-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  color: rgb(100 116 139);
+  border-color: rgb(203 213 225);
 }
 
-.crm01-modal-store-inline.crm01-wire-cell > .crm01-wire-field {
-  flex: 1 1 0%;
+.crm01-modal-marketing-sms-btn-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+}
+
+.crm01-mkt-sms-date-label {
+  width: auto;
+  min-width: 8.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: center;
+  color: rgb(55 65 81);
+}
+
+.crm01-mkt-sms-template {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: visible;
+}
+
+.crm01-mkt-sms-template-notice {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: rgb(185 28 28);
+}
+
+.crm01-mkt-sms-template:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.2);
+}
+
+.crm01-modal-marketing-title {
+  width: 100%;
+  max-width: var(--crm01-label-col);
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* 텍스트 + 체크박스만 클릭 (오른쪽 빈 영역 제외) */
+.crm01-modal-marketing-check {
+  display: inline-grid;
+  grid-template-columns: var(--crm01-label-col) auto;
+  column-gap: 0.5rem;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.crm01-modal-marketing-date-cell {
+  display: grid;
+  grid-column: 3 / 5;
+  grid-template-columns: auto minmax(9.25rem, 1fr);
+  column-gap: 0.75rem;
+  align-items: center;
   min-width: 0;
 }
 
-@media (max-width: 639px) {
-  .crm01-modal-store-inline.crm01-wire-cell {
-    flex-wrap: wrap;
-  }
+.crm01-modal-marketing-date-cell .crm01-modal-consent-date-label {
+  padding-right: 0.375rem;
+  white-space: nowrap;
+}
 
-  .crm01-modal-store-inline.crm01-wire-cell > .crm01-wire-label {
-    flex: 0 0 var(--crm01-label-col);
-  }
+/* 4열 마스터: [라벨1][값1][라벨2][값2] — 한 줄 두 항목 동일 폭 */
+/* 4열 마스터 + 1줄 행 공통 높이(h-8 + 패딩) */
+.crm01-modal-wire-grid {
+  --crm01-modal-row-min-h: calc(2rem + 0.5rem);
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: stretch;
+  grid-template-columns: var(--crm01-label-col) minmax(0, 1fr) var(--crm01-label-col) minmax(0, 1fr);
+  column-gap: var(--crm01-col-gutter);
+  row-gap: 0;
+}
 
-  .crm01-modal-store-inline.crm01-wire-cell > .crm01-wire-field {
-    flex: 1 1 calc(100% - var(--crm01-label-col) - 0.5rem);
-  }
+.crm01-modal-wire-grid > .crm01-wire-cell:not(.crm01-modal-span-full):not(.crm01-modal-cell-row-fill) {
+  display: contents;
+}
+
+.crm01-modal-wire-grid > .crm01-wire-cell > .crm01-wire-label,
+.crm01-modal-wire-grid > .crm01-wire-cell > .crm01-wire-field {
+  display: flex;
+  min-width: 0;
+  min-height: var(--crm01-modal-row-min-h);
+  align-items: center;
+  box-sizing: border-box;
+  padding: var(--crm01-modal-row-pad);
+  border-bottom: 1px solid var(--crm01-modal-row-border);
+}
+
+.crm01-modal-wire-grid > .crm01-wire-cell.crm01-modal-row-tall > .crm01-wire-field {
+  min-height: auto;
+  align-items: flex-start;
+}
+
+/* 집주소: 구분선은 우편물 수령지 블록 하단만, 라벨 세로 가운데 */
+.crm01-modal-wire-grid > .crm01-wire-cell.crm01-modal-span-full.crm01-modal-row-tall > .crm01-wire-label {
+  min-height: auto;
+  align-self: stretch;
+  align-items: center;
+}
+
+.crm01-modal-wire-grid
+  > .crm01-wire-cell.crm01-modal-span-full.crm01-modal-row-tall
+  > .crm01-wire-field.crm01-modal-home-value {
+  align-items: stretch;
+  align-self: stretch;
+  padding: 0;
+  border-bottom: none;
+  gap: 0.375rem;
+}
+
+/* 우편번호·우편물: 사무실주소 wire-field와 동일 패딩(inset), 구분선은 우편물 하단만 */
+.crm01-modal-home-zip-row {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--crm01-modal-row-min-h);
+  padding: var(--crm01-modal-row-pad);
+  padding-bottom: 0;
+}
+
+.crm01-modal-home-mail-block {
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--crm01-modal-row-pad);
+  padding-top: 0;
+  border-bottom: 1px solid var(--crm01-modal-row-border);
+}
+
+.crm01-modal-wire-grid > .crm01-wire-cell > .crm01-wire-label {
+  justify-content: center;
+}
+
+.crm01-modal-wire-grid > .crm01-wire-cell > .crm01-wire-field {
+  width: 100%;
+  max-width: 100%;
+  justify-content: flex-start;
+}
+
+.crm01-modal-wire-grid > .crm01-wire-cell > .crm01-wire-field.crm01-modal-field-wrap {
+  width: 100%;
+}
+
+.crm01-modal-wire-grid
+  > .crm01-wire-cell
+  > .crm01-wire-field:not(.crm01-modal-field-wrap):not(.flex-col)
+  > .crm01-sg-input,
+.crm01-modal-wire-grid
+  > .crm01-wire-cell
+  > .crm01-wire-field:not(.crm01-modal-field-wrap):not(.flex-col)
+  > .crm01-sg-select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* 전폭 행: 라벨=1열, 값=2~4열(사무실주소·가입경로·결혼여부와 동일 폭) */
+.crm01-modal-wire-grid > .crm01-wire-cell.crm01-modal-span-full {
+  display: contents;
+}
+
+.crm01-modal-wire-grid > .crm01-wire-cell.crm01-modal-span-full > .crm01-wire-label {
+  grid-column: 1;
+}
+
+.crm01-modal-wire-grid > .crm01-wire-cell.crm01-modal-span-full > .crm01-wire-field {
+  grid-column: 2 / 5;
+  align-self: stretch;
+}
+
+.crm01-modal-panel .crm01-modal-wire-grid > .crm01-wire-cell > .crm01-wire-label {
+  flex: none;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.crm01-modal-wire-grid
+  > .crm01-wire-cell.crm01-modal-span-full
+  > .crm01-wire-field.crm01-modal-field-wrap {
+  min-height: var(--crm01-modal-row-min-h);
+}
+
+.crm01-modal-wire-grid > .crm01-wire-cell.crm01-modal-cell-row-fill {
+  display: block;
+  grid-column: 3 / 5;
+  min-width: 0;
+  min-height: var(--crm01-modal-row-min-h);
+  padding: var(--crm01-modal-row-pad);
+  border-bottom: 1px solid var(--crm01-modal-row-border);
+  pointer-events: none;
+}
+
+.crm01-modal-consent-text {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.crm01-modal-consent-date-inline {
+  display: inline-flex;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-left: 0.375rem;
+  padding-left: 0.125rem;
+}
+
+.crm01-modal-consent-date-label {
+  flex: 0 0 auto;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: rgb(55 65 81);
+  white-space: nowrap;
+  padding-right: 0.375rem;
+}
+
+.crm01-modal-panel .crm01-modal-consent-date {
+  margin-left: 0.125rem;
+}
+
+.crm01-modal-mobile-row,
+.crm01-modal-tel-row {
+  flex-wrap: nowrap;
+}
+
+/* 이메일 수신동의: 오른쪽 반쪽(3~4열)만 사용 → 입력창 바로 옆 */
+.crm01-modal-email-agree-cell {
+  display: contents;
+}
+
+.crm01-modal-email-agree-field {
+  grid-column: 3 / 5;
+  justify-content: flex-start;
+  padding-left: 0.25rem;
+}
+
+.crm01-modal-tel-input {
+  width: 40% !important;
+  max-width: 12rem;
+}
+
+/* 가입경로: 항목 수만큼 균등 분할 — grid-template-columns는 :style 바인딩 */
+.crm01-modal-wire-grid > .crm01-wire-cell.crm01-modal-join-path-cell > .crm01-wire-field.crm01-modal-join-path-row {
+  display: grid;
+  width: 100%;
+  min-height: 2rem;
+  column-gap: 0.5rem;
+  align-items: center;
+  justify-items: start;
+}
+
+.crm01-modal-join-path-choice {
+  display: inline-flex;
+  justify-content: flex-start;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  cursor: pointer;
 }
 
 .crm01-modal-field-wrap {
@@ -2332,14 +3287,18 @@ const excelList = (e) => {
   font-weight: 600;
 }
 
-.crm01-modal-scroll {
-  scrollbar-gutter: stable;
+.crm01-modal-panel .crm01-modal-choice.crm01-modal-consent-choice,
+.crm01-modal-panel .crm01-modal-consent-text {
+  color: #dc2626;
+  font-weight: 700;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .crm01-modal-scroll {
-    scrollbar-width: thin;
-  }
+.crm01-modal-scroll {
+  scrollbar-width: none;
+}
+
+.crm01-modal-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 </style>
