@@ -100,6 +100,7 @@
                 type="checkbox"
                 id="gift"
                 class="ml-5"
+                checked
                 @change="checking" />증정구분</label
             >
           </div>
@@ -1214,7 +1215,7 @@ const searchCondition = ref([
   "셀병합",
 ]);
 const dayCondition = ref(["일", "월", "화", "수", "목", "금", "토"]);
-const ConditionSet = new Set([]);
+const ConditionSet = new Set([4]);
 /**
  * 엑셀 내보내기 함수
  */
@@ -1417,11 +1418,9 @@ const hideColumnsId = ref([
   "strMajor",
   "strSub",
   "dtmDate",
-  "lngNMenuCnt",
-  "lngGMenuCnt",
 ]);
 const checkedReportTypes = new Set([0]);
-const checkedGift = ref(0);
+const checkedGift = ref(1);
 const checkedlngPrice = ref(0);
 const checkedlngPrint = ref(0);
 const customOrder = ["strStore", "strMajor", "strSub", "dtmDate"];

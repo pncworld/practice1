@@ -675,7 +675,11 @@ export const getCustomerInfo = (
   cond35,
   cond36,
   cond37,
-  cond38
+  cond38,
+  cond39,
+  cond40,
+  cond41,
+  cond42
 ) => {
   return api2.post("/MICRM/CRM01_001INS.asmx/getCustomerInfo", {
     GROUP_CD: cond,
@@ -716,6 +720,10 @@ export const getCustomerInfo = (
     PRECD: cond36,
     SLEEPSTS: cond37,
     CUSTAGREE: cond38,
+    MKTAGREEFROM: cond39,
+    MKTAGREETO: cond40,
+    SMSAGREEFROM: cond41,
+    SMSAGREETO: cond42,
   });
 };
 
@@ -723,7 +731,8 @@ export const getCustomerInfoCount = (
   cond, cond2, cond3, cond4, cond5, cond6, cond7, cond8, cond9, cond10,
   cond11, cond12, cond13, cond14, cond15, cond16, cond17, cond18, cond19,
   cond20, cond21, cond22, cond23, cond24, cond25, cond26, cond27, cond28,
-  cond29, cond30, cond31, cond32, cond33, cond34, cond35, cond36, cond37, cond38
+  cond29, cond30, cond31, cond32, cond33, cond34, cond35, cond36, cond37, cond38,
+  cond39, cond40, cond41, cond42
 ) => {
   return api2.post("/MICRM/CRM01_001INS.asmx/getCustomerInfoCount", {
     GROUP_CD: cond, JOINTYPE: cond2, TEAM: cond3, SUPER: cond4,
@@ -736,6 +745,8 @@ export const getCustomerInfoCount = (
     RPOINT: cond28, REMPOINT: cond29, AAMT: cond30, ACTAMT: cond31,
     VCNT: cond32, VISITCNT: cond33, LEVEL: cond34, SMS: cond35,
     PRECD: cond36, SLEEPSTS: cond37, CUSTAGREE: cond38,
+    MKTAGREEFROM: cond39, MKTAGREETO: cond40,
+    SMSAGREEFROM: cond41, SMSAGREETO: cond42,
   });
 };
 
@@ -743,7 +754,8 @@ export const getCustomerInfoExcel = (
   cond, cond2, cond3, cond4, cond5, cond6, cond7, cond8, cond9, cond10,
   cond11, cond12, cond13, cond14, cond15, cond16, cond17, cond18, cond19,
   cond20, cond21, cond22, cond23, cond24, cond25, cond26, cond27, cond28,
-  cond29, cond30, cond31, cond32, cond33, cond34, cond35, cond36, cond37, cond38
+  cond29, cond30, cond31, cond32, cond33, cond34, cond35, cond36, cond37, cond38,
+  cond39, cond40, cond41, cond42
 ) => {
   return api2.post(
     "/MICRM/CRM01_001INS.asmx/getCustomerInfoExcel",
@@ -758,6 +770,8 @@ export const getCustomerInfoExcel = (
       RPOINT: cond28, REMPOINT: cond29, AAMT: cond30, ACTAMT: cond31,
       VCNT: cond32, VISITCNT: cond33, LEVEL: cond34, SMS: cond35,
       PRECD: cond36, SLEEPSTS: cond37, CUSTAGREE: cond38,
+      MKTAGREEFROM: cond39, MKTAGREETO: cond40,
+      SMSAGREEFROM: cond41, SMSAGREETO: cond42,
     },
     { responseType: "blob" }
   );
@@ -862,7 +876,9 @@ export const updateCustomerInfo = (
   cond40,
   cond41,
   cond42,
-  cond43
+  cond43,
+  cond44,
+  cond45
 ) => {
   return api2.post("/MICRM/CRM01_001INS.asmx/updateCustomerInfo", {
     GROUP_CD: cond,
@@ -908,6 +924,8 @@ export const updateCustomerInfo = (
     INTSTOPRSN: cond41,
     DTMMANIA: cond42,
     LNGPR_CD: cond43,
+    SMSAGREEDATE: cond44,
+    MKTAGREEDATE: cond45,
   });
 };
 export const insertCustomerInfo = (
@@ -954,7 +972,9 @@ export const insertCustomerInfo = (
   cond41,
   cond42,
   cond43,
-  cond44
+  cond44,
+  cond45,
+  cond46
 ) => {
   return api2.post("/MICRM/CRM01_001INS.asmx/insertCustomerInfo", {
     GROUP_CD: cond,
@@ -1001,6 +1021,8 @@ export const insertCustomerInfo = (
     DTMMANIA: cond42,
     LNGPR_CD: cond43,
     CARD_ID: cond44,
+    SMSAGREEDATE: cond45,
+    MKTAGREEDATE: cond46,
   });
 };
 

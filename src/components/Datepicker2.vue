@@ -26,11 +26,11 @@
       <input
         type="date"
         :disabled="disable"
-        class="w-36 shrink-0 disabled:bg-gray-500"
+        class="w-36 shrink-0"
         :class="
           filterBarAlign
-            ? 'h-8 border border-gray-800 rounded-md pl-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500'
-            : 'mr-2 h-10 border rounded-lg pl-5 text-base'
+            ? 'h-8 border border-gray-800 rounded-md pl-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-white disabled:text-slate-400'
+            : 'mr-2 h-10 border rounded-lg pl-5 text-base disabled:bg-gray-500'
         "
         v-model="selectedStartDate"
         @change="changeStartDate"
@@ -39,11 +39,11 @@
       <input
         type="date"
         :disabled="disable"
-        class="w-36 shrink-0 disabled:bg-gray-500"
+        class="w-36 shrink-0"
         :class="
           filterBarAlign
-            ? 'h-8 border border-gray-800 rounded-md pl-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500'
-            : 'ml-2 h-10 border rounded-lg pl-5 text-base'
+            ? 'h-8 border border-gray-800 rounded-md pl-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-white disabled:text-slate-400'
+            : 'ml-2 h-10 border rounded-lg pl-5 text-base disabled:bg-gray-500'
         "
         v-model="selectedEndDate"
         @change="changeEndDate"
@@ -317,8 +317,14 @@ onMounted(() => {
 
 watch(
   () => props.disableAll,
-  () => {
-    disable.value = props.disableAll;
+  (v) => {
+    disable.value = v;
+    if (v && props.removeDefault) {
+      selectedStartDate.value = "";
+      selectedEndDate.value = "";
+      emit("startDate", "");
+      emit("endDate", "");
+    }
   }
 );
 watch(

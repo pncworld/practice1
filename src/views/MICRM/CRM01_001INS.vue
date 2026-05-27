@@ -31,15 +31,14 @@
       </div>
     </div>
     <div
-      class="crm01-search-panel z-10 mt-2 w-full max-w-[min(100%,1680px)] min-w-0 shrink-0 overflow-x-auto self-center rounded-lg bg-gray-200 px-5 py-3 sm:px-8 md:px-12 lg:px-14 xl:px-16 xl:py-3.5 2xl:px-20">
-      <div
-        class="crm01-wire-grid min-w-0"
-        :style="{
-          '--crm01-control-border': crm01ControlBorder,
-          '--crm01-col-gutter': crm01ColGutter,
-          '--crm01-row-gap': crm01RowGap,
-          '--crm01-label-col': crm01LabelCol,
-        }">
+      class="crm01-search-panel z-10 mt-2 w-full max-w-[min(100%,1840px)] min-w-0 shrink-0 overflow-x-auto self-center rounded-lg bg-gray-200 px-4 py-2.5 sm:px-6 md:px-10 lg:px-12 xl:px-14 xl:py-3 2xl:px-16"
+      :style="{
+        '--crm01-control-border': crm01ControlBorder,
+        '--crm01-col-gutter': crm01ColGutter,
+        '--crm01-row-gap': crm01RowGap,
+        '--crm01-label-col': crm01LabelCol,
+      }">
+      <div class="crm01-wire-grid min-w-0">
         <div class="crm01-pick-span">
           <PickStoreSingle
             :key="'crm01-pss-' + crm01SearchAreaKey"
@@ -169,14 +168,14 @@
         </div>
 
         <div class="crm01-wire-cell">
-          <div class="crm01-wire-label">전화번호</div>
-          <div class="crm01-wire-field crm01-stack-field min-w-0">
+          <div class="crm01-wire-label">휴대폰 번호</div>
+          <div class="crm01-wire-field min-w-0">
             <input
               id="crm01-cond-phone"
               v-model="cond7"
               type="text"
+              placeholder="010-0000-0000"
               class="crm01-sg-input h-8 min-h-8 w-full min-w-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            <span class="crm01-hint">※ 010-0000-0000</span>
           </div>
         </div>
         <div class="crm01-wire-cell">
@@ -316,7 +315,10 @@
               @startDate="startDate3" />
           </div>
         </div>
+      </div>
 
+      <!-- 방문횟수~ : 4열 균등 배치 -->
+      <div class="crm01-wire-grid crm01-wire-grid-4 min-w-0">
         <div class="crm01-wire-cell">
           <div class="crm01-wire-label">방문횟수</div>
           <div class="crm01-wire-field crm01-inline-ops min-w-0">
@@ -336,15 +338,15 @@
           </div>
         </div>
         <div class="crm01-wire-cell">
-          <div class="crm01-wire-label">SMS수신동의</div>
+          <div class="crm01-wire-label">휴면회원여부</div>
           <div class="crm01-wire-field min-w-0">
             <select
-              id="crm01-cond-sms"
-              v-model="cond17"
+              id="crm01-cond-dormant"
+              v-model="cond21"
               class="crm01-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="2">전체</option>
-              <option value="1">동의</option>
-              <option value="0">비동의</option>
+              <option value="-1">전체</option>
+              <option value="0">일반</option>
+              <option value="1">휴면</option>
             </select>
           </div>
         </div>
@@ -371,6 +373,20 @@
               @input="onCond19ThousandsInput" />
           </div>
         </div>
+        <div class="crm01-wire-cell">
+          <div class="crm01-wire-label">선호매장</div>
+          <div class="crm01-wire-field min-w-0">
+            <select
+              id="crm01-cond-pstore"
+              v-model="pstore"
+              class="crm01-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="0">전체</option>
+              <option :value="i.lngStoreCode" v-for="i in optionList2" :key="i.lngStoreCode">
+                {{ i.strName }}
+              </option>
+            </select>
+          </div>
+        </div>
 
         <div class="crm01-wire-cell">
           <div class="crm01-wire-label">마케팅수신동의</div>
@@ -386,39 +402,57 @@
           </div>
         </div>
         <div class="crm01-wire-cell">
-          <div class="crm01-wire-label">휴면회원여부</div>
+          <div class="crm01-wire-label">마케팅동의일</div>
+          <div class="crm01-wire-field crm01-date-slot min-w-0 overflow-hidden">
+            <Datepicker2
+              :key="'crm01-dt-mkt-' + crm01SearchAreaKey + '-' + crm01MktAgreeDateKey"
+              :disableAll="isMktDisagreeSearch"
+              :disableBox="false"
+              omit-main-label
+              filter-bar-align
+              :removeDefault="true"
+              :mainName="'마케팅동의일'"
+              @endDate="endDateMktAgree"
+              @startDate="startDateMktAgree" />
+          </div>
+        </div>
+        <div class="crm01-wire-cell">
+          <div class="crm01-wire-label">SMS수신동의</div>
           <div class="crm01-wire-field min-w-0">
             <select
-              id="crm01-cond-dormant"
-              v-model="cond21"
+              id="crm01-cond-sms"
+              v-model="cond17"
               class="crm01-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="-1">전체</option>
-              <option value="0">일반</option>
-              <option value="1">휴면</option>
+              <option value="2">전체</option>
+              <option value="1">동의</option>
+              <option value="0">비동의</option>
             </select>
           </div>
         </div>
         <div class="crm01-wire-cell">
-          <div class="crm01-wire-label">선호매장</div>
-          <div class="crm01-wire-field min-w-0">
-            <select
-              id="crm01-cond-pstore"
-              v-model="pstore"
-              class="crm01-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="0">전체</option>
-              <option :value="i.lngStoreCode" v-for="i in optionList2" :key="i.lngStoreCode">
-                {{ i.strName }}
-              </option>
-            </select>
+          <div class="crm01-wire-label">SMS동의일</div>
+          <div class="crm01-wire-field crm01-date-slot min-w-0 overflow-hidden">
+            <Datepicker2
+              :key="'crm01-dt-sms-' + crm01SearchAreaKey + '-' + crm01SmsAgreeDateKey"
+              :disableAll="isSmsDisagreeSearch"
+              :disableBox="false"
+              omit-main-label
+              filter-bar-align
+              :removeDefault="true"
+              :mainName="'SMS동의일'"
+              @endDate="endDateSmsAgree"
+              @startDate="startDateSmsAgree" />
           </div>
         </div>
       </div>
     </div>
-    <div
-      class="w-full max-w-[min(100%,1680px)] shrink-0 self-center px-5 pt-0.5 text-xs leading-snug text-red-500 sm:px-8 sm:text-sm md:px-12 lg:px-14 xl:px-16 2xl:px-20">
-      ※ 고객명을 더블클릭하시면 수정하실 수 있습니다.
-    </div>
-    <div class="mx-auto mt-1 flex min-h-0 min-w-0 max-w-[min(100%,1680px)] flex-1 flex-col overflow-hidden px-1 pb-0 w-full">
+    <div class="mx-auto mt-1 flex min-h-0 min-w-0 max-w-[min(100%,1840px)] flex-1 flex-col overflow-hidden px-1 pb-0 w-full">
+      <div class="crm01-grid-hint shrink-0 pt-0.5 text-xs leading-snug text-red-500 sm:text-sm">
+        <span>※ 고객명을 더블클릭하시면 수정하실 수 있습니다.</span>
+        <span class="crm01-grid-hint-gap" aria-hidden="true"></span>
+        <span
+          >※ 마케팅 / SMS 동의일 설정 후 조회 시 마케팅 / SMS 동의를 한 고객만 조회 됩니다.</span>
+      </div>
       <div class="relative flex min-h-0 flex-1 basis-0 min-w-0">
         <Realgrid
           :progname="'CRM01_001INS_VUE'"
@@ -601,21 +635,23 @@
                 <select
                   id="crm01-pop-mobile-pre"
                   v-model="pcond6"
-                  class="crm01-sg-select h-8 min-h-8 w-[4.275rem] shrink-0 rounded-md border border-solid bg-white px-1 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  class="crm01-sg-select h-8 min-h-8 w-[4rem] shrink-0 rounded-md border border-solid bg-white px-1 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="010">010</option>
                 </select>
                 <input
                   id="crm01-pop-mobile-mid"
                   v-model="pcond7"
                   type="text"
-                  class="crm01-sg-input h-8 min-h-8 w-[4.725rem] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="0000"
+                  class="crm01-sg-input h-8 min-h-8 w-[4.25rem] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   @input="limitFourDigitsPcond7"
                 />
                 <input
                   id="crm01-pop-mobile-last"
                   v-model="pcond8"
                   type="text"
-                  class="crm01-sg-input h-8 min-h-8 w-[4.725rem] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="0000"
+                  class="crm01-sg-input h-8 min-h-8 w-[4.25rem] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   @input="limitFourDigitsPcond8"
                 />
                 <label
@@ -629,10 +665,14 @@
                   <input
                     id="crm01-pop-sms-agree-date"
                     v-model="pcondSmsAgreeDate"
-                    type="text"
-                    readonly
-                    disabled
-                    class="crm01-sg-input crm01-modal-date crm01-modal-consent-date h-8 min-h-8 w-[9.25rem] shrink-0 cursor-not-allowed rounded-md border border-solid bg-slate-100 px-2 text-sm text-slate-600"
+                    type="date"
+                    :disabled="!pcond9"
+                    class="crm01-sg-input crm01-modal-date crm01-modal-consent-date h-8 min-h-8 w-[8.75rem] shrink-0 rounded-md border border-solid px-2 text-sm"
+                    :class="
+                      pcond9
+                        ? 'bg-white text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        : 'cursor-not-allowed bg-slate-100 text-slate-600'
+                    "
                   />
                 </div>
               </div>
@@ -651,29 +691,43 @@
                     <span class="crm01-modal-marketing-title crm01-modal-consent-text">마케팅 정보 수신동의</span>
                     <input id="crm01-pop-mkt-agree" type="checkbox" v-model="pcond32" />
                   </label>
-                  <button
+                  <span
                     v-if="mktSmsAvailable"
-                    type="button"
-                    class="crm01-modal-marketing-sms-btn shrink-0"
-                    :disabled="!savedMktAgree"
-                    @click="openMktSmsPopup">
-                    <font-awesome-icon
-                      icon="comment-sms"
-                      class="crm01-modal-marketing-sms-btn-icon"
-                      aria-hidden="true"
-                    />
-                    마케팅 수신동의 문자발송
-                  </button>
+                    class="crm01-mkt-sms-btn-wrap relative inline-flex shrink-0">
+                    <button
+                      type="button"
+                      class="crm01-modal-marketing-sms-btn shrink-0"
+                      :class="{ 'crm01-modal-marketing-sms-btn--inactive': mktSmsSendDisabled }"
+                      :disabled="!InsertNew && !pcond32"
+                      @click="onMktSmsSendClick">
+                      <font-awesome-icon
+                        icon="comment-sms"
+                        class="crm01-modal-marketing-sms-btn-icon"
+                        aria-hidden="true"
+                      />
+                      마케팅 수신동의 문자발송
+                    </button>
+                    <span
+                      v-show="mktSmsNewSaveTooltipVisible"
+                      class="crm01-mkt-sms-save-tooltip"
+                      role="tooltip">
+                      신규 고객은 저장 후 문자 발송이 가능합니다.
+                    </span>
+                  </span>
                 </div>
                 <div class="crm01-modal-marketing-date-cell">
                   <span class="crm01-modal-consent-date-label">{{ pcondMktAgreeDateLabel }}</span>
                   <input
                     id="crm01-pop-mkt-agree-date"
                     v-model="pcondMktAgreeDate"
-                    type="text"
-                    readonly
-                    disabled
-                    class="crm01-sg-input crm01-modal-date crm01-modal-consent-date h-8 min-h-8 w-[9.25rem] min-w-0 shrink-0 cursor-not-allowed rounded-md border border-solid bg-slate-100 px-2 text-sm text-slate-600"
+                    type="date"
+                    :disabled="!pcond32"
+                    class="crm01-sg-input crm01-modal-date crm01-modal-consent-date h-8 min-h-8 w-[8.75rem] min-w-0 shrink-0 rounded-md border border-solid px-2 text-sm"
+                    :class="
+                      pcond32
+                        ? 'bg-white text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        : 'cursor-not-allowed bg-slate-100 text-slate-600'
+                    "
                   />
                 </div>
               </div>
@@ -687,9 +741,9 @@
                   id="crm01-pop-tel"
                   v-model="pcond11"
                   type="text"
-                  class="crm01-sg-input crm01-modal-tel-input h-8 min-h-8 shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="02-0000-0000"
+                  class="crm01-sg-input crm01-modal-tel-input h-8 min-h-8 min-w-0 shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <span class="crm01-hint shrink-0">※ 02-111-2222</span>
               </div>
             </div>
             <div class="crm01-wire-cell">
@@ -990,6 +1044,10 @@
               class="crm01-sg-input crm01-modal-date h-8 min-h-8 w-[9.25rem] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-800"
             />
           </div>
+          <div class="crm01-mkt-sms-date-row flex items-center gap-3">
+            <span class="crm01-mkt-sms-date-label shrink-0">문자 발송 번호</span>
+            <span class="text-sm font-medium text-slate-800">{{ mktSmsSendPhone || "-" }}</span>
+          </div>
           <div
             class="crm01-mkt-sms-template w-full rounded-md border border-solid border-slate-300 bg-slate-50 px-3 py-2 text-sm leading-relaxed text-slate-700"
             role="textbox"
@@ -1081,7 +1139,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { computed, nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -1121,9 +1179,9 @@ const store = useStore();
 
 /** 조회 AREA — PUR03_036RPT / search-area-layout 패턴 */
 const crm01ControlBorder = "#cbd5e1";
-const crm01ColGutter = "1.25rem";
-const crm01RowGap = "0.6875rem";
-const crm01LabelCol = "8rem";
+const crm01ColGutter = "1rem";
+const crm01RowGap = "0.5625rem";
+const crm01LabelCol = "7.25rem";
 /** 신규/수정 팝업 전용 간격 — 노트북 한 화면 맞춤 */
 const crm01ModalColGutter = "0.75rem";
 const crm01ModalRowGap = "0.4rem";
@@ -1207,6 +1265,8 @@ const preparePopupJoinPath = async () => {
 
 /** 조회 영역 UI(매장·기간)를 최초 마운트와 동일하게 다시 그릴 때 증가 */
 const crm01SearchAreaKey = ref(0);
+const crm01MktAgreeDateKey = ref(0);
+const crm01SmsAgreeDateKey = ref(0);
 
 const cond = ref("");
 const cond2 = ref("");
@@ -1364,31 +1424,141 @@ const pcondMktAgreeDateLabel = ref("마케팅 정보 미수신 동의일");
 const savedMktAgree = ref(false);
 const savedMktAgreeDate = ref("");
 
+/** 수정 팝업 — 조회 시점 DB 동의/미동의 일자 (토글 시 복원용) */
+const popupSmsAgreeDateLoaded = ref("");
+const popupSmsRefuseDateLoaded = ref("");
+const popupMktAgreeDateLoaded = ref("");
+const popupMktRefuseDateLoaded = ref("");
+/** 수정 팝업 — 조회/저장 시점 DB 휴대폰 (변경 여부 판단용) */
+const popupMobileLoaded = ref("");
+const suppressConsentDateWatch = ref(false);
+
 const mktSmsPopupVisible = ref(false);
 const mktSmsConsentDate = ref("");
+const mktSmsSendPhone = ref("");
 /** API 원본 템플릿 (KT_TEMPMSG, #{비고1} 포함) */
 const mktSmsTemplateRaw = ref("");
 const mktSmsTempCode = ref("");
 
+const todayPopupConsentDate = () => formatLocalDate(new Date());
+
+const syncConsentDateLabels = () => {
+  pcondSmsAgreeDateLabel.value = pcond9.value
+    ? "SMS 수신 동의일"
+    : "SMS 수신 미동의일";
+  pcondMktAgreeDateLabel.value = pcond32.value
+    ? "마케팅 정보 수신 동의일"
+    : "마케팅 정보 미수신 동의일";
+};
+
+const initNewPopupConsentDates = () => {
+  suppressConsentDateWatch.value = true;
+  popupSmsAgreeDateLoaded.value = "";
+  popupSmsRefuseDateLoaded.value = "";
+  popupMktAgreeDateLoaded.value = "";
+  popupMktRefuseDateLoaded.value = "";
+  const today = todayPopupConsentDate();
+  pcondSmsAgreeDate.value = today;
+  pcondMktAgreeDate.value = today;
+  syncConsentDateLabels();
+  suppressConsentDateWatch.value = false;
+};
+
 const resolveMktSmsConsentDate = () => {
+  const fromField = formatConsentDateDisplay(pcondMktAgreeDate.value);
+  if (fromField) return fromField;
   const saved = savedMktAgreeDate.value;
   if (saved != null && String(saved).trim() !== "") {
     return formatConsentDateDisplay(saved);
   }
-  return formatLocalDate(new Date());
+  return todayPopupConsentDate();
+};
+
+const formatPopupMobile = () => {
+  const p1 = String(pcond6.value ?? "").trim();
+  const p2 = String(pcond7.value ?? "").trim();
+  const p3 = String(pcond8.value ?? "").trim();
+  if (!p1 && !p2 && !p3) return "";
+  return `${p1}-${p2}-${p3}`;
+};
+
+const normalizeMobileKey = (mobile) => String(mobile ?? "").replace(/\D/g, "");
+
+const capturePopupMobileLoaded = () => {
+  popupMobileLoaded.value = formatPopupMobile();
+};
+
+const isPopupMobileChanged = () => {
+  const loaded = normalizeMobileKey(popupMobileLoaded.value);
+  const current = normalizeMobileKey(formatPopupMobile());
+  return loaded !== current;
+};
+
+const warnPopupMobileChangedBeforeMktSms = async () => {
+  if (!isPopupMobileChanged()) return false;
+  await Swal.fire({
+    title: "경고",
+    text: "휴대폰 번호가 변경되었습니다. 먼저 저장 후 마케팅 수신동의 문자를 발송해 주십시오.",
+    icon: "warning",
+    confirmButtonText: "확인",
+  });
+  return true;
+};
+
+const mktSmsNewSaveTooltipVisible = ref(false);
+let mktSmsNewSaveTooltipTimer = null;
+
+const mktSmsSendDisabled = computed(
+  () => !pcond32.value || InsertNew.value
+);
+
+const hideMktSmsNewSaveTooltip = () => {
+  if (mktSmsNewSaveTooltipTimer) {
+    clearTimeout(mktSmsNewSaveTooltipTimer);
+    mktSmsNewSaveTooltipTimer = null;
+  }
+  mktSmsNewSaveTooltipVisible.value = false;
+};
+
+const onMktSmsSendClick = async () => {
+  if (InsertNew.value) {
+    hideMktSmsNewSaveTooltip();
+    mktSmsNewSaveTooltipVisible.value = true;
+    mktSmsNewSaveTooltipTimer = setTimeout(() => {
+      hideMktSmsNewSaveTooltip();
+    }, 2800);
+    return;
+  }
+  if (await warnPopupMobileChangedBeforeMktSms()) return;
+  if (!pcond9.value) {
+    const confirmed = await Swal.fire({
+      title: "확인",
+      text: "SMS 수신 동의가 되어 있지 않은 고객입니다. 마케팅 수신동의 문자를 발송 하시겠습니까?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "예",
+      cancelButtonText: "아니오",
+    });
+    if (!confirmed.isConfirmed) return;
+  }
+  openMktSmsPopup();
 };
 
 const openMktSmsPopup = () => {
-  if (!savedMktAgree.value || !mktSmsAvailable.value) return;
+  if (InsertNew.value || !pcond32.value || !mktSmsAvailable.value) return;
   mktSmsConsentDate.value = resolveMktSmsConsentDate();
+  mktSmsSendPhone.value = formatPopupMobile();
   mktSmsPopupVisible.value = true;
 };
 
 const closeMktSmsPopup = () => {
   mktSmsPopupVisible.value = false;
+  hideMktSmsNewSaveTooltip();
 };
 
 const sendMktSms = async () => {
+  if (await warnPopupMobileChangedBeforeMktSms()) return;
+
   const dateDisplay = formatMktSmsTemplateDate(mktSmsConsentDate.value);
   if (!mktSmsConsentDate.value || !dateDisplay) {
     await Swal.fire({
@@ -1555,6 +1725,86 @@ const endDate3 = (e) => {
   eDate3.value = e;
 };
 
+const sDateMktAgree = ref();
+const eDateMktAgree = ref();
+const startDateMktAgree = (e) => {
+  sDateMktAgree.value = e;
+};
+const endDateMktAgree = (e) => {
+  eDateMktAgree.value = e;
+};
+
+const sDateSmsAgree = ref();
+const eDateSmsAgree = ref();
+const startDateSmsAgree = (e) => {
+  sDateSmsAgree.value = e;
+};
+const endDateSmsAgree = (e) => {
+  eDateSmsAgree.value = e;
+};
+
+/** 조회조건 — 비동의(0)이면 해당 동의일 입력 불가 */
+const isMktDisagreeSearch = computed(() => String(cond20.value) === "0");
+const isSmsDisagreeSearch = computed(() => String(cond17.value) === "0");
+
+const clearMktAgreeSearchDates = () => {
+  sDateMktAgree.value = undefined;
+  eDateMktAgree.value = undefined;
+};
+
+const clearSmsAgreeSearchDates = () => {
+  sDateSmsAgree.value = undefined;
+  eDateSmsAgree.value = undefined;
+};
+
+/** 비동의 조회 시 동의일 기간 필터 미적용 — 조회 직전 날짜 초기화 */
+const prepareConsentSearchDates = () => {
+  if (isMktDisagreeSearch.value) {
+    clearMktAgreeSearchDates();
+    crm01MktAgreeDateKey.value += 1;
+  }
+  if (isSmsDisagreeSearch.value) {
+    clearSmsAgreeSearchDates();
+    crm01SmsAgreeDateKey.value += 1;
+  }
+};
+
+watch(
+  () => cond20.value,
+  (v, oldV) => {
+    if (String(v) === "0") {
+      clearMktAgreeSearchDates();
+    }
+    if (String(v) === "0" || String(oldV) === "0") {
+      crm01MktAgreeDateKey.value += 1;
+    }
+  }
+);
+
+watch(
+  () => cond17.value,
+  (v, oldV) => {
+    if (String(v) === "0") {
+      clearSmsAgreeSearchDates();
+    }
+    if (String(v) === "0" || String(oldV) === "0") {
+      crm01SmsAgreeDateKey.value += 1;
+    }
+  }
+);
+
+watch(pcond9, (agreed) => {
+  if (suppressConsentDateWatch.value) return;
+  syncConsentDateLabels();
+  applySmsConsentDateForPopup(agreed);
+});
+
+watch(pcond32, (agreed) => {
+  if (suppressConsentDateWatch.value) return;
+  syncConsentDateLabels();
+  applyMktConsentDateForPopup(agreed);
+});
+
 const selectedDate = ref();
 const excelDate = (e) => {
   selectedDate.value = e;
@@ -1564,10 +1814,26 @@ const excelDate = (e) => {
  */
 const hideColumnsId = ref([]);
 /** 조회·건수확인·엑셀 공통 파라미터 배열 */
+const searchDateOrNull = (v) => (v == null || String(v).trim() === "" ? null : v);
+
+/** 동의일 From·To 모두 비었으면 [null,null] → SP 필터 미적용(동의일 없는 고객 포함). 하나라도 있으면 기간 필터 */
+const consentSearchDatePair = (from, to) => {
+  const fromVal = searchDateOrNull(from);
+  const toVal = searchDateOrNull(to);
+  if (fromVal == null && toVal == null) return [null, null];
+  return [fromVal, toVal];
+};
+
 const buildSearchParams = () => {
   const salePointAmt = parseAmountInputToNumber(cond12.value);
   const remPointAmt  = parseAmountInputToNumber(cond14.value);
   const actAmtVal    = parseAmountInputToNumber(cond19.value);
+  const [mktFrom, mktTo] = isMktDisagreeSearch.value
+    ? [null, null]
+    : consentSearchDatePair(sDateMktAgree.value, eDateMktAgree.value);
+  const [smsFrom, smsTo] = isSmsDisagreeSearch.value
+    ? [null, null]
+    : consentSearchDatePair(sDateSmsAgree.value, eDateSmsAgree.value);
   return [
     groupCd.value, 0, team.value, supervisor.value, storeCd.value, null,
     cond.value, cond2.value, cond8.value, null,
@@ -1580,11 +1846,16 @@ const buildSearchParams = () => {
     cond11.value, salePointAmt, cond13.value, remPointAmt,
     cond18.value, actAmtVal, cond15.value, cond16.value,
     cond10.value, cond17.value, pstore.value, cond21.value, cond20.value,
+    mktFrom,
+    mktTo,
+    smsFrom,
+    smsTo,
   ];
 };
 
 const searchButton = async () => {
   try {
+    prepareConsentSearchDates();
     const params = buildSearchParams();
 
     // 건수 먼저 확인
@@ -1627,7 +1898,7 @@ const searchButton = async () => {
     initGrid();
     const res = await getCustomerInfo(...params);
 
-    rowData.value = res.data.List;
+    rowData.value = mapCustomerListForGrid(res.data.List);
     afterSearch.value = true;
 
     const cnt = Array.isArray(res.data?.List) ? res.data.List.length : 0;
@@ -1749,7 +2020,9 @@ const saveButton = async () => {
         pcond37.value,
         "",
         null,
-        pcond18.value
+        pcond18.value,
+        consentDateForSave(pcondSmsAgreeDate.value),
+        consentDateForSave(pcondMktAgreeDate.value)
       );
     } else {
       res = await insertCustomerInfo(
@@ -1808,7 +2081,9 @@ const saveButton = async () => {
         "",
         null,
         pcond18.value,
-        pcond.value
+        pcond.value,
+        consentDateForSave(pcondSmsAgreeDate.value),
+        consentDateForSave(pcondMktAgreeDate.value)
       );
     }
     const saveFailed =
@@ -1830,20 +2105,30 @@ const saveButton = async () => {
     if (savedCustNo) {
       ccustomorNum.value = savedCustNo;
     }
-    const joinPathOk = await saveCustomerJoinPath(
+    const joinPathResult = await saveCustomerJoinPath(
       ccustomorGroup.value ?? groupCd.value,
       savedCustNo
     );
-    if (!joinPathOk) {
+    if (!joinPathResult.ok) {
       await Swal.fire({
         title: "경고",
-        text: "고객 정보는 저장되었으나 가입경로 저장에 실패했습니다.",
+        text: joinPathResult.message
+          ? `고객 정보는 저장되었으나 가입경로 저장에 실패했습니다. ${joinPathResult.message}`
+          : "고객 정보는 저장되었으나 가입경로 저장에 실패했습니다.",
         icon: "warning",
         confirmButtonText: "확인",
       });
     }
 
     if (isNew) {
+      if (joinPathResult.ok) {
+        await Swal.fire({
+          title: "완료",
+          text: "가입이 완료되었습니다.",
+          icon: "success",
+          confirmButtonText: "확인",
+        });
+      }
       visible.value = false;
       InsertNew.value = false;
       closeMktSmsPopup();
@@ -1852,7 +2137,7 @@ const saveButton = async () => {
       }
     } else {
       await Swal.fire({
-        text: joinPathOk
+        text: joinPathResult.ok
           ? "저장되었습니다."
           : "저장되었습니다. (가입경로는 확인 필요)",
         icon: "success",
@@ -1900,7 +2185,7 @@ const parseJoinPathCodes = (raw) => {
   return s.split(/[,|]/).map((c) => c.trim()).filter(Boolean);
 };
 
-const resolveCustNoAfterSave = (res, isNew) => {
+const resolveCustNoAfterSave = async (res, isNew) => {
   if (!isNew) {
     return String(ccustomorNum.value ?? "").trim();
   }
@@ -1911,6 +2196,19 @@ const resolveCustNoAfterSave = (res, isNew) => {
     res?.data?.lngCustNo;
   if (fromRes != null && String(fromRes).trim() !== "") {
     return String(fromRes).trim();
+  }
+  const group = String(ccustomorGroup.value ?? groupCd.value ?? "").trim();
+  const card = normalizeCardId(pcond.value);
+  if (group && card) {
+    try {
+      const cardRes = await validCardNo(group, card);
+      const no = cardRes?.data?.List?.[0]?.lngCustNo;
+      if (no != null && String(no).trim() !== "") {
+        return String(no).trim();
+      }
+    } catch {
+      // ignore — fallback only
+    }
   }
   return String(ccustomorNum.value ?? "").trim();
 };
@@ -1932,33 +2230,62 @@ const loadCustJoinPath = async () => {
 };
 
 const saveCustomerJoinPath = async (group, custNo) => {
+  const pathCds = formatJoinPathForApi(pcond38.value);
+  if (!pathCds) return { ok: true, message: "" };
   const cust = String(custNo ?? "").trim();
-  if (!group || !cust) return true;
+  const grp = String(group ?? "").trim();
+  if (!grp || !cust) {
+    return {
+      ok: false,
+      message:
+        "고객번호를 확인할 수 없습니다. API 배포 후 insertCustomerInfo 응답의 lngCustNo를 확인해 주세요.",
+    };
+  }
   try {
     const pathRes = await setCustJoinPath(
-      group,
+      grp,
       cust,
       store.state.userData.lngSequence,
-      formatJoinPathForApi(pcond38.value)
+      pathCds
     );
     if (pathRes?.data?.RESULT_CD != null && pathRes.data.RESULT_CD !== "00") {
-      return false;
+      const detail = pathRes.data.RESULT_NM
+        ? String(pathRes.data.RESULT_NM).trim()
+        : "";
+      return {
+        ok: false,
+        message: detail || "가입경로 저장 API 오류",
+      };
     }
-    return true;
-  } catch {
-    return false;
+    return { ok: true, message: "" };
+  } catch (err) {
+    const detail =
+      err?.response?.data?.RESULT_NM ??
+      err?.response?.data?.Message ??
+      err?.message ??
+      "";
+    return {
+      ok: false,
+      message: detail ? String(detail).trim() : "가입경로 저장 중 오류",
+    };
   }
 };
 
 const gridRowField = (row, fieldNames, indexFallback) => {
   if (row == null) return undefined;
-  if (Array.isArray(row)) return row[indexFallback];
+  if (Array.isArray(row)) {
+    return indexFallback !== undefined ? row[indexFallback] : undefined;
+  }
   for (const name of fieldNames) {
     if (Object.prototype.hasOwnProperty.call(row, name)) {
       return row[name];
     }
+    const alt = Object.keys(row).find(
+      (k) => k.toLowerCase() === String(name).toLowerCase()
+    );
+    if (alt) return row[alt];
   }
-  return row[indexFallback];
+  return indexFallback !== undefined ? row[indexFallback] : undefined;
 };
 
 const gridRowAgreed = (row, fieldNames, indexFallback) => {
@@ -1966,15 +2293,108 @@ const gridRowAgreed = (row, fieldNames, indexFallback) => {
   return v === true || v === "True" || v === 1 || v === "1";
 };
 
+const gridRowBool = (row, fieldNames, indexFallback) => {
+  const v = gridRowField(row, fieldNames, indexFallback);
+  return v === true || v === "True" || v === 1 || v === "1";
+};
+
+const gridRowBool01 = (row, fieldNames, indexFallback) =>
+  gridRowBool(row, fieldNames, indexFallback) ? 1 : 0;
+
+/** 그리드 SMS/이메일 수신 — 마케팅수신(A38)과 동일하게 동의 시에만 「동의」 표기 */
+const normalizeConsentRawValue = (raw) => (raw === "동의" ? 1 : raw);
+
+const formatGridConsentAgreeDisplay = (raw) => {
+  const v = normalizeConsentRawValue(raw);
+  return v === true || v === "True" || v === 1 || v === "1" ? "동의" : "";
+};
+
+const mapCustomerListForGrid = (list) => {
+  if (!Array.isArray(list)) return [];
+  return list.map((row) => {
+    if (row == null || typeof row !== "object" || Array.isArray(row)) return row;
+    const smsRaw = normalizeConsentRawValue(
+      row.A45_blnSMS ?? row.a45_blnSMS ?? row.blnSMS ?? row.BLNSMS ?? row.A08_blnSMS
+    );
+    const emailRaw = normalizeConsentRawValue(
+      row.blnEmail ?? row.BLNEMAIL ?? row.A10_blnEmail ?? row.a10_blnEmail
+    );
+    const smsAgreed =
+      smsRaw === true || smsRaw === "True" || smsRaw === 1 || smsRaw === "1";
+    const mktAgreed = gridRowAgreed(
+      row,
+      ["blnCustAgree", "CUSTAGREE", "A38_blnCustAgree", "A38_blnCustAgree2"],
+      undefined
+    );
+    /** 미동의 — 그리드 동의일 컬럼 빈칸 (동의일·미동의일 모두 미표시) */
+    const smsAgreeDate = smsAgreed
+      ? String(row.A57_strSmsAgreeDate ?? row.dtmSmsLastAgree ?? "").trim()
+      : "";
+    const mktAgreeDate = mktAgreed
+      ? String(row.A56_strMktAgreeDate ?? row.dtmMktLastAgree ?? "").trim()
+      : "";
+    return {
+      ...row,
+      blnEmail: emailRaw,
+      A08_blnSMS: formatGridConsentAgreeDisplay(smsRaw),
+      A10_blnEmail: formatGridConsentAgreeDisplay(emailRaw),
+      A57_strSmsAgreeDate: smsAgreeDate,
+      A56_strMktAgreeDate: mktAgreeDate,
+    };
+  });
+};
+
+const gridRowSmsAgreed = (row) =>
+  gridRowAgreed(row, ["A45_blnSMS", "blnSMS", "BLNSMS"], undefined);
+
+const gridRowEmailAgreed = (row) => {
+  const displayed = gridRowField(row, ["A10_blnEmail"], undefined);
+  if (displayed === "동의") return true;
+  return gridRowAgreed(row, ["blnEmail", "BLNEMAIL"], undefined);
+};
+
 const formatConsentDateDisplay = (raw) => {
   if (raw == null || raw === "") return "";
   const s = String(raw).trim();
-  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  if (!s || s === "--") return "";
+
+  // API datetime — "2024-01-15 00:00:00", "2024-01-15T00:00:00", "2024-01-15 오전 ..."
+  const isoPrefix = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (isoPrefix) {
+    return `${isoPrefix[1]}-${isoPrefix[2]}-${isoPrefix[3]}`;
+  }
+
   if (/^\d{8}$/.test(s)) {
     return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
   }
-  const formatted = formatLocalDate(raw);
-  return formatted && formatted !== "--" ? formatted : "";
+
+  const slash = s.match(/^(\d{4})[/.](\d{1,2})[/.](\d{1,2})/);
+  if (slash) {
+    return `${slash[1]}-${String(slash[2]).padStart(2, "0")}-${String(slash[3]).padStart(2, "0")}`;
+  }
+
+  const d = new Date(s);
+  if (!Number.isNaN(d.getTime())) {
+    const formatted = formatLocalDate(d);
+    return formatted && !formatted.includes("NaN") ? formatted : "";
+  }
+  return "";
+};
+
+/** date input / 팝업용 — yyyy-MM-dd 또는 빈칸 */
+const formatPopupDateInput = (raw) => formatConsentDateDisplay(raw);
+
+/** 저장 API용 yyyy-MM-dd (빈값 → null) */
+const consentDateForSave = (raw) => {
+  const formatted = formatConsentDateDisplay(raw);
+  return formatted || null;
+};
+
+const gridRowSelectNum = (row, fieldNames) => {
+  const v = gridRowField(row, fieldNames, undefined);
+  if (v === undefined || v === null || v === "") return 0;
+  const n = Number(v);
+  return Number.isNaN(n) ? 0 : n;
 };
 
 const mktSmsAvailable = computed(
@@ -2020,26 +2440,74 @@ const pickConsentDateFromRow = (row, agreed, agreeFieldNames, refuseFieldNames) 
   return "";
 };
 
-const setSmsConsentFromRow = (e) => {
-  const agreed = gridRowAgreed(e, ["blnSMS", "BLNSMS"], 7);
-  pcondSmsAgreeDateLabel.value = agreed ? "SMS 수신 동의일" : "SMS 수신 미동의일";
-  pcondSmsAgreeDate.value = pickConsentDateFromRow(e, agreed, ["dtmSmsLastAgree"], [
-    "dtmSmsLastRefuse",
-  ]);
+/** 신규: 미동의=오늘(고정) / 동의=선택 가능. 수정: DB 스냅샷 기준 복원 */
+const applySmsConsentDateForPopup = (agreed) => {
+  if (InsertNew.value) {
+    if (!agreed) {
+      pcondSmsAgreeDate.value = todayPopupConsentDate();
+    } else if (!pcondSmsAgreeDate.value) {
+      pcondSmsAgreeDate.value = todayPopupConsentDate();
+    }
+    return;
+  }
+  if (!agreed) {
+    pcondSmsAgreeDate.value =
+      popupSmsRefuseDateLoaded.value || todayPopupConsentDate();
+  } else {
+    pcondSmsAgreeDate.value =
+      popupSmsAgreeDateLoaded.value || todayPopupConsentDate();
+  }
 };
 
-const setMktConsentFromRow = (e) => {
-  const agreed = gridRowAgreed(e, ["blnCustAgree", "CUSTAGREE", "blnMktAgree"], 58);
-  savedMktAgree.value = agreed;
-  savedMktAgreeDate.value = agreed
-    ? pickConsentDateFromRow(e, true, ["dtmMktLastAgree"], [])
-    : "";
-  pcondMktAgreeDateLabel.value = agreed
-    ? "마케팅 정보 수신 동의일"
-    : "마케팅 정보 미수신 동의일";
-  pcondMktAgreeDate.value = pickConsentDateFromRow(e, agreed, ["dtmMktLastAgree"], [
-    "dtmMktLastRefuse",
-  ]);
+const applyMktConsentDateForPopup = (agreed) => {
+  if (InsertNew.value) {
+    if (!agreed) {
+      pcondMktAgreeDate.value = todayPopupConsentDate();
+    } else if (!pcondMktAgreeDate.value) {
+      pcondMktAgreeDate.value = todayPopupConsentDate();
+    }
+    savedMktAgreeDate.value = pcondMktAgreeDate.value;
+    return;
+  }
+  if (!agreed) {
+    pcondMktAgreeDate.value =
+      popupMktRefuseDateLoaded.value || todayPopupConsentDate();
+  } else {
+    pcondMktAgreeDate.value =
+      popupMktAgreeDateLoaded.value || todayPopupConsentDate();
+  }
+  savedMktAgreeDate.value = pcondMktAgreeDate.value;
+};
+
+const initPopupConsentFromRow = (row) => {
+  suppressConsentDateWatch.value = true;
+
+  popupSmsAgreeDateLoaded.value =
+    pickConsentDateFromRow(row, true, ["dtmSmsLastAgree", "A57_strSmsAgreeDate"], []) ||
+    "";
+  popupSmsRefuseDateLoaded.value =
+    pickConsentDateFromRow(row, false, [], ["dtmSmsLastRefuse"]) || "";
+  popupMktAgreeDateLoaded.value =
+    pickConsentDateFromRow(row, true, ["dtmMktLastAgree", "A56_strMktAgreeDate"], []) ||
+    "";
+  popupMktRefuseDateLoaded.value =
+    pickConsentDateFromRow(row, false, [], ["dtmMktLastRefuse"]) || "";
+
+  const smsAgreed = gridRowSmsAgreed(row);
+  const mktAgreed = gridRowAgreed(
+    row,
+    ["blnCustAgree", "CUSTAGREE", "blnMktAgree"],
+    undefined
+  );
+
+  pcond9.value = smsAgreed;
+  pcond32.value = mktAgreed;
+  applySmsConsentDateForPopup(smsAgreed);
+  applyMktConsentDateForPopup(mktAgreed);
+  syncConsentDateLabels();
+  savedMktAgree.value = mktAgreed;
+
+  suppressConsentDateWatch.value = false;
 };
 
 const resetConsentDateFields = () => {
@@ -2047,6 +2515,11 @@ const resetConsentDateFields = () => {
   pcondMktAgreeDate.value = "";
   pcondSmsAgreeDateLabel.value = "SMS 수신 미동의일";
   pcondMktAgreeDateLabel.value = "마케팅 정보 미수신 동의일";
+  popupSmsAgreeDateLoaded.value = "";
+  popupSmsRefuseDateLoaded.value = "";
+  popupMktAgreeDateLoaded.value = "";
+  popupMktRefuseDateLoaded.value = "";
+  popupMobileLoaded.value = "";
   savedMktAgree.value = false;
   savedMktAgreeDate.value = "";
 };
@@ -2098,6 +2571,25 @@ const mergeGridRowAt = (dataRow) => {
   if (!fromParent && !fromProvider) return null;
   if (!fromParent) return fromProvider;
   if (!fromProvider) return fromParent;
+  // API rowData(필드명·원본값) 우선 — 그리드 provider는 빈 칸만 보조
+  if (typeof fromParent === "object" && !Array.isArray(fromParent)) {
+    const merged = { ...fromParent };
+    if (typeof fromProvider === "object" && !Array.isArray(fromProvider)) {
+      for (const k of Object.keys(fromProvider)) {
+        const pv = fromProvider[k];
+        const mv = merged[k];
+        if (
+          (mv === undefined || mv === null || mv === "") &&
+          pv !== undefined &&
+          pv !== null &&
+          pv !== ""
+        ) {
+          merged[k] = pv;
+        }
+      }
+    }
+    return merged;
+  }
   const merged = { ...(fromProvider || {}) };
   for (const k of Object.keys(fromParent)) {
     const pv = fromParent[k];
@@ -2165,50 +2657,84 @@ const fetchCustomerRowForPopup = async () => {
   return null;
 };
 
-const applyGridRowToPopupForm = (e) => {
-  ccustomorNum.value = getRowCustNo(e);
-  ccustomorGroup.value = gridRowField(e, ["lngStoreGroup"], 59);
-  ccustomorStatus.value = gridRowField(e, ["intJoinSts"], 60);
-  pcond.value = String(getRowCardId(e)).replace("[", "").replace("]", "");
-  pcond2.value = e[49];
-  pcond3.value = e[1];
-  pcond4.value = e[35];
-  pcond5.value = e[37] == "True" ? 1 : 0;
-  const mobileParts = String(e[6] ?? "").split("-");
-  pcond6.value = "010";
+const applyGridRowToPopupForm = (row) => {
+  ccustomorNum.value = getRowCustNo(row);
+  ccustomorGroup.value = gridRowField(row, ["lngStoreGroup"], undefined);
+  ccustomorStatus.value = gridRowField(row, ["intJoinSts"], undefined);
+  pcond.value = String(getRowCardId(row)).replace("[", "").replace("]", "");
+
+  pcond2.value =
+    Number(gridRowField(row, ["A46_intCustCls", "intCustCls"], undefined)) || 1;
+  pcond3.value =
+    gridRowField(row, ["A02_strCustName", "strCustName"], undefined) ?? "";
+  pcond4.value =
+    gridRowField(row, ["A32_strCustEName", "strCustEName"], undefined) ?? "";
+  pcond5.value = gridRowBool01(row, ["A34_blnSex", "blnSex"], undefined);
+
+  const mobile = String(
+    gridRowField(row, ["A07_strMobile", "strMobile"], undefined) ?? ""
+  );
+  const mobileParts = mobile.split("-");
+  pcond6.value = mobileParts[0] || "010";
   pcond7.value = mobileParts[1] ?? "";
   pcond8.value = mobileParts[2] ?? "";
-  pcond9.value = e[7] == "True" ? true : false;
-  pcond10.value = e[36];
-  pcond11.value = e[10];
-  pcond12.value = e[55];
-  pcond13.value = e[56];
-  pcond14.value = e[8];
-  pcond15.value = e[9] == "True" ? true : false;
-  pcond16.value = formatLocalDate(e[20]);
-  pcond17.value = e[57];
-  pcond18.value = e[61];
-  pcond19.value = e[11];
-  pcond20.value = e[12];
-  pcond21.value = e[13];
-  pcond22.value = e[50];
-  pcond24.value = e[14];
-  pcond25.value = e[15];
-  pcond26.value = e[16];
-  pcond27.value = formatLocalDate(e[17]);
-  pcond28.value = e[47] == "True" ? 1 : 0;
-  pcond29.value = formatLocalDate(e[19]);
-  pcond30.value = e[39];
-  pcond31.value = e[40] == "True" ? 1 : 0;
-  pcond32.value = e[58] == "True" ? true : false;
-  pcond33.value = e[42];
-  pcond34.value = e[43];
-  pcond35.value = e[45];
-  pcond36.value = e[44];
-  pcond37.value = e[46];
+  capturePopupMobileLoaded();
+
+  pcond10.value =
+    gridRowField(row, ["A33_intLevel", "intLevel"], undefined) ?? 0;
+  pcond11.value =
+    gridRowField(row, ["A11_strHomeTel", "strHomeTel"], undefined) ?? "";
+  pcond12.value = gridRowField(row, ["strResiNo1"], undefined) ?? "";
+  pcond13.value =
+    gridRowField(row, ["strResiNo2", "A35_strResiNo2"], undefined) ?? "";
+  pcond14.value =
+    gridRowField(row, ["A09_strEmail", "strEmail"], undefined) ?? "";
+  pcond15.value = gridRowEmailAgreed(row);
+  pcond16.value = formatPopupDateInput(
+    gridRowField(row, ["A21_dtmJoin", "dtmJoin"], undefined)
+  );
+  pcond17.value = gridRowSelectNum(row, ["lngStoreCode"]);
+  pcond18.value = gridRowSelectNum(row, ["A53_lngPrfStrCD", "lngPrfStrCD"]);
+
+  pcond19.value =
+    gridRowField(row, ["A12_strHomeZip", "strHomeZip"], undefined) ?? "";
+  pcond20.value =
+    gridRowField(row, ["A13_strHomeAddr1", "strHomeAddr1"], undefined) ?? "";
+  pcond21.value =
+    gridRowField(row, ["A14_strHomeAddr2", "strHomeAddr2"], undefined) ?? "";
+  pcond22.value =
+    Number(gridRowField(row, ["A47_intDMRecv", "intDMRecv"], undefined)) || 0;
+
+  pcond24.value =
+    gridRowField(row, ["A15_strEtcZip", "strEtcZip"], undefined) ?? "";
+  pcond25.value =
+    gridRowField(row, ["A16_strEtcAddr1", "strEtcAddr1"], undefined) ?? "";
+  pcond26.value =
+    gridRowField(row, ["A17_strEtcAddr2", "strEtcAddr2"], undefined) ?? "";
+
+  pcond27.value = formatPopupDateInput(
+    gridRowField(row, ["A18_strBirth", "strBirth"], undefined)
+  );
+  pcond28.value = gridRowBool01(row, ["A44_blnSolar", "blnSolar"], undefined);
+  pcond29.value = formatPopupDateInput(
+    gridRowField(row, ["A20_strWedding", "strWedding"], undefined)
+  );
+  pcond30.value =
+    Number(gridRowField(row, ["A36_intSDayCls", "intSDayCls"], undefined)) || 1;
+  pcond31.value = gridRowBool01(row, ["A37_blnMarried", "blnMarried"], undefined);
+
+  pcond33.value =
+    Number(gridRowField(row, ["A39_intJobCls", "intJobCls"], undefined)) || 0;
+  pcond34.value =
+    gridRowField(row, ["A40_strCompany", "strCompany"], undefined) ?? "";
+  pcond35.value =
+    gridRowField(row, ["A41_strJobRank", "strJobRank"], undefined) ?? "";
+  pcond36.value =
+    gridRowField(row, ["A42_strDepart", "strDepart"], undefined) ?? "";
+  pcond37.value =
+    gridRowField(row, ["A43_strRemark", "strRemark"], undefined) ?? "";
   pcond38.value = [];
-  setSmsConsentFromRow(e);
-  setMktConsentFromRow(e);
+  initPopupConsentFromRow(row);
   preparePopupJoinPath();
 };
 
@@ -2223,7 +2749,9 @@ const applyMergedRowToPopup = (dataRow) => {
 const refreshCustomerGridSilently = async () => {
   if (!afterSearch.value) return;
   const res = await getCustomerInfo(...buildSearchParams());
-  rowData.value = Array.isArray(res.data?.List) ? res.data.List : [];
+  rowData.value = mapCustomerListForGrid(
+    Array.isArray(res.data?.List) ? res.data.List : []
+  );
   reload.value = !reload.value;
   await nextTick();
   const idx = findCustomerDataRowIndex(ccustomorNum.value, pcond.value);
@@ -2256,7 +2784,9 @@ const reloadPopupCustomerFromServer = async () => {
     if (idx >= 0 && applyMergedRowToPopup(idx)) {
       return true;
     }
-    applyGridRowToPopupForm(fetched);
+    applyGridRowToPopupForm(
+      mapCustomerListForGrid([fetched])[0] ?? fetched
+    );
     return true;
   }
   return false;
@@ -2264,14 +2794,25 @@ const reloadPopupCustomerFromServer = async () => {
 
 const dblclickedRowData = (e) => {
   InsertNew.value = false;
-  visible.value = true;
-  popupEditDataRow.value =
-    typeof e?.dataRow === "number"
+  const dataRow =
+    typeof e?.dataRow === "number" && e.dataRow >= 0
       ? e.dataRow
-      : typeof e?.index === "number"
+      : typeof e?.index === "number" && e.index >= 0
         ? e.index
-        : -1;
-  applyGridRowToPopupForm(e);
+        : findCustomerDataRowIndex(getRowCustNo(e), getRowCardId(e));
+  popupEditDataRow.value = dataRow;
+  if (dataRow >= 0 && applyMergedRowToPopup(dataRow)) {
+    visible.value = true;
+    return;
+  }
+  const fallback =
+    dataRow >= 0 &&
+    Array.isArray(rowData.value) &&
+    dataRow < rowData.value.length
+      ? rowData.value[dataRow]
+      : e;
+  applyGridRowToPopupForm(fallback);
+  visible.value = true;
 };
 
 const initVar = () => {
@@ -2335,6 +2876,7 @@ const addButton = (e) => {
   */
   InsertNew.value = true;
   resetPconds();
+  initNewPopupConsentDates();
   popupEditDataRow.value = -1;
 
   ccustomorNum.value = "";
@@ -2446,6 +2988,12 @@ const resetSearchArea = async () => {
   eDate2.value = undefined;
   sDate3.value = undefined;
   eDate3.value = undefined;
+  sDateMktAgree.value = undefined;
+  eDateMktAgree.value = undefined;
+  sDateSmsAgree.value = undefined;
+  eDateSmsAgree.value = undefined;
+  crm01MktAgreeDateKey.value += 1;
+  crm01SmsAgreeDateKey.value += 1;
 
   documentSubTitle.value = "";
   afterSearch.value = false;
@@ -2653,6 +3201,22 @@ const excelList = (e) => {
   row-gap: var(--crm01-row-gap);
 }
 
+.crm01-wire-grid-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: var(--crm01-row-gap);
+}
+
+.crm01-wire-grid-4 .crm01-wire-label {
+  flex: 0 0 6.875rem;
+  width: 6.875rem;
+  max-width: 6.875rem;
+  font-size: 0.875rem;
+}
+
+.crm01-wire-grid-4 .crm01-wire-cell {
+  gap: 0.5rem;
+}
+
 .crm01-wire-cell {
   display: flex;
   min-width: 0;
@@ -2765,8 +3329,23 @@ const excelList = (e) => {
   color: rgb(248 113 113);
 }
 
+.crm01-grid-hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.crm01-grid-hint-gap {
+  flex-shrink: 0;
+  width: 8ch;
+}
+
 .crm01-sg-select {
   box-sizing: border-box;
+}
+
+.crm01-search-panel .crm01-wire-label {
+  font-size: 0.9375rem;
 }
 
 .crm01-search-panel select.crm01-sg-select {
@@ -2893,7 +3472,6 @@ const excelList = (e) => {
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
-  margin-left: 0.5rem;
   border-radius: 0.375rem;
   border: 1px solid rgb(101 163 13 / 0.45);
   background-color: #fff;
@@ -2907,15 +3485,50 @@ const excelList = (e) => {
   white-space: nowrap;
 }
 
-.crm01-modal-marketing-sms-btn:hover:not(:disabled) {
-  background-color: rgb(247 254 231);
-}
-
-.crm01-modal-marketing-sms-btn:disabled {
+.crm01-modal-marketing-sms-btn:disabled,
+.crm01-modal-marketing-sms-btn--inactive {
   opacity: 0.55;
   cursor: not-allowed;
   color: rgb(100 116 139);
   border-color: rgb(203 213 225);
+}
+
+.crm01-modal-marketing-sms-btn:hover:not(:disabled):not(.crm01-modal-marketing-sms-btn--inactive) {
+  background-color: rgb(247 254 231);
+}
+
+.crm01-mkt-sms-btn-wrap {
+  margin-left: 0.5rem;
+}
+
+.crm01-mkt-sms-save-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.375rem);
+  z-index: 20;
+  width: max-content;
+  max-width: 14rem;
+  transform: translateX(-50%);
+  border-radius: 0.375rem;
+  background-color: rgb(30 41 59);
+  padding: 0.375rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.18);
+  pointer-events: none;
+}
+
+.crm01-mkt-sms-save-tooltip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgb(30 41 59);
 }
 
 .crm01-modal-marketing-sms-btn-icon {
@@ -2976,7 +3589,7 @@ const excelList = (e) => {
 .crm01-modal-marketing-date-cell {
   display: grid;
   grid-column: 3 / 5;
-  grid-template-columns: auto minmax(9.25rem, 1fr);
+  grid-template-columns: auto minmax(8.75rem, 1fr);
   column-gap: 0.75rem;
   align-items: center;
   min-width: 0;
@@ -3166,8 +3779,8 @@ const excelList = (e) => {
 }
 
 .crm01-modal-tel-input {
-  width: 40% !important;
-  max-width: 12rem;
+  width: 100%;
+  max-width: 9.5rem;
 }
 
 /* 가입경로: 항목 수만큼 균등 분할 — grid-template-columns는 :style 바인딩 */
