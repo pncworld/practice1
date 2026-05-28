@@ -480,10 +480,27 @@ function mst002TableRowEqualsForSave(cur, base) {
 
 /**
  * saveTables(as-is ADD/UPD/DEL)용 delta — master.saveTables_test 두 번째 인자
+ *
+ * 백엔드는 ADD_* / UPD_* / DEL_* 파라미터를 콤마로 split 한 뒤 각 인덱스끼리 1행으로 묶기 때문에
+ *  - 모든 parallel 배열의 길이가 같아야 한다
+ *  - 빈 문자열("")은 0개로 해석되므로, 행이 1개라도 어떤 칼럼이 비어 있으면 "parallel array length mismatch" 발생
+ * 따라서 push 시점에 숫자(좌석수 등)는 "0", 문자열(테이블명 등)은 공백("\u00A0")으로 정규화한다.
  */
 function buildMst002TableSaveDelta(currentList, baselineList) {
   const base = Array.isArray(baselineList) ? baselineList : [];
   const cur = Array.isArray(currentList) ? currentList : [];
+
+  /** 빈 값 → "0" (숫자 칼럼: 좌석수·색상·도형·좌표·크기) */
+  const toIntStr = (v) => {
+    if (v == null || v === "") return "0";
+    const n = Number(v);
+    return Number.isFinite(n) ? String(Math.trunc(n)) : "0";
+  };
+  /** 빈 값 → " " (문자열 칼럼: 테이블명) — 빈 문자열은 split에서 0개로 처리되므로 공백으로 대체 */
+  const toSafeStr = (v) => {
+    const s = v == null ? "" : String(v);
+    return s.length === 0 ? " " : s;
+  };
 
   const baselineMap = new Map();
   for (const b of base) {
@@ -505,8 +522,8 @@ function buildMst002TableSaveDelta(currentList, baselineList) {
     if (isMst002TempTableRow(b)) continue;
     const pk = mst002RowPersistKey(b);
     if (!currentPersistedKeys.has(pk)) {
-      delScreenNos.push(String(b.intScreenNo));
-      delKeyscrNos.push(String(b.lngKeyscrNo));
+      delScreenNos.push(toIntStr(b.intScreenNo));
+      delKeyscrNos.push(toIntStr(b.lngKeyscrNo));
     }
   }
 
@@ -535,31 +552,31 @@ function buildMst002TableSaveDelta(currentList, baselineList) {
   for (const r of cur) {
     if (isMst002TempTableRow(r)) {
       const geo = mst002RowToSaveGeometry(r);
-      addClientIds.push(String(r.id != null ? r.id : r.lngKeyscrNo));
-      addScreenNos.push(String(r.intScreenNo));
-      addKeyColors.push(String(r.lngKeyColor));
-      addKeyShapes.push(String(r.lngShape));
-      addKeyNames.push(String(r.strName ?? ""));
-      addKeyLngCounts.push(String(r.lngCount ?? ""));
-      addXs.push(geo.x);
-      addYs.push(geo.y);
-      addWs.push(geo.w);
-      addHs.push(geo.h);
+      addClientIds.push(toSafeStr(r.id != null ? r.id : r.lngKeyscrNo));
+      addScreenNos.push(toIntStr(r.intScreenNo));
+      addKeyColors.push(toIntStr(r.lngKeyColor));
+      addKeyShapes.push(toIntStr(r.lngShape));
+      addKeyNames.push(toSafeStr(r.strName));
+      addKeyLngCounts.push(toIntStr(r.lngCount));
+      addXs.push(toIntStr(geo.x));
+      addYs.push(toIntStr(geo.y));
+      addWs.push(toIntStr(geo.w));
+      addHs.push(toIntStr(geo.h));
     } else {
       const pk = mst002RowPersistKey(r);
       const baseRow = baselineMap.get(pk);
       if (!baseRow || !mst002TableRowEqualsForSave(r, baseRow)) {
         const geo = mst002RowToSaveGeometry(r);
-        updScreenNos.push(String(r.intScreenNo));
-        updKeyscrNos.push(String(r.lngKeyscrNo));
-        updKeyColors.push(String(r.lngKeyColor));
-        updKeyShapes.push(String(r.lngShape));
-        updKeyNames.push(String(r.strName ?? ""));
-        updKeyLngCounts.push(String(r.lngCount ?? ""));
-        updXs.push(geo.x);
-        updYs.push(geo.y);
-        updWs.push(geo.w);
-        updHs.push(geo.h);
+        updScreenNos.push(toIntStr(r.intScreenNo));
+        updKeyscrNos.push(toIntStr(r.lngKeyscrNo));
+        updKeyColors.push(toIntStr(r.lngKeyColor));
+        updKeyShapes.push(toIntStr(r.lngShape));
+        updKeyNames.push(toSafeStr(r.strName));
+        updKeyLngCounts.push(toIntStr(r.lngCount));
+        updXs.push(toIntStr(geo.x));
+        updYs.push(toIntStr(geo.y));
+        updWs.push(toIntStr(geo.w));
+        updHs.push(toIntStr(geo.h));
       }
     }
   }

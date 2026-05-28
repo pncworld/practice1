@@ -813,6 +813,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /** 부모에서 조회 후 넘기는 동적 컬럼(할인그룹 체크박스 등). getGridInfoList 결과 뒤에 병합 */
+  extraColumns: {
+    type: Array,
+    default: () => [],
+  },
   searchWord3: {
     // 검색어
     type: String,
@@ -1235,6 +1240,22 @@ const rgCheckAbleValMatches = (valSpec, cellValue) => {
 /** checkAbleExpression — 체크 불가(readOnly) 셀 배경 (진한 회색) */
 const rgCheckReadonlyDisabledBg = { backgroundColor: "#9a9a9a" };
 const rgCheckReadonlyDisabledStyleName = "rg-check-readonly-disabled";
+
+const isCheckboxGridColumn = (item) =>
+  item?.strColID?.includes("checkbox") ||
+  item?.strDisplay?.includes("checkbox");
+
+/** extraColumns 등 동적 컬럼 — 기본 그리드 컬럼과 동일한 헤더 색상 상속 */
+const withInheritedHeaderStyle = (baseColumns, extraCols) => {
+  if (!Array.isArray(extraCols) || extraCols.length === 0) return [];
+  const ref =
+    baseColumns?.find((c) => c?.strHdBkColor) ?? baseColumns?.[0] ?? {};
+  return extraCols.map((c) => ({
+    ...c,
+    strHdBkColor: c.strHdBkColor ?? ref.strHdBkColor ?? "#FFFFFF",
+    strHdColor: c.strHdColor ?? ref.strHdColor ?? "#000000",
+  }));
+};
 
 /** 콤마 목록 — `cancled,Selected`.includes 로는 부분 문자열 오탐 가능 */
 const isCheckAbleExpressionColumn = (strColID) => {
@@ -2468,6 +2489,11 @@ const runFuncshowGrid = async () => {
             } else if (
               props.rowStateeditable == true &&
               dataCell.item.itemState == "normal"
+            ) {
+              ret.editable = true;
+            } else if (
+              props.checkRenderEditable == true &&
+              isCheckboxGridColumn(item)
             ) {
               ret.editable = true;
             } else {
@@ -4897,6 +4923,24 @@ onMounted(async () => {
 
       tabInitSetArray.value.push(...res.data.List);
     }
+
+    if (props.setDynamicGrid3 == true) {
+      const res = await getDynamicGrid3(
+        store.state.userData.lngStoreGroup,
+        props.dynamicStoreCd,
+        result.length
+      );
+      if (res.data.List.length > 0) {
+        tabInitSetArray.value.push(...res.data.List);
+      }
+    }
+
+    if (Array.isArray(props.extraColumns) && props.extraColumns.length > 0) {
+      tabInitSetArray.value.push(
+        ...withInheritedHeaderStyle(result, props.extraColumns)
+      );
+    }
+
     if (props.setDynamicGrid4 == true) {
       const res = await getDynamicGrid4(
         store.state.userData.lngStoreGroup,
@@ -5013,6 +5057,12 @@ const setupGrid = async () => {
       if (res.data.List.length > 0) {
         tabInitSetArray.value.push(...res.data.List);
       }
+    }
+
+    if (Array.isArray(props.extraColumns) && props.extraColumns.length > 0) {
+      tabInitSetArray.value.push(
+        ...withInheritedHeaderStyle(result, props.extraColumns)
+      );
     }
 
     if (props.setDynamicGrid4 == true) {
