@@ -2173,6 +2173,48 @@ const formatCardIdForApi = (card) => {
   return raw ? `[${raw}]` : null;
 };
 
+/** ASMX 직접 JSON / { d: ... } / 문자열 응답 공통 처리 */
+const unwrapAsmxData = (res) => {
+  let d = res?.data;
+  if (d == null) return null;
+  if (typeof d === "string") {
+    try {
+      d = JSON.parse(d);
+    } catch {
+      return null;
+    }
+  }
+  if (d && typeof d === "object" && d.d != null && typeof d.d === "object") {
+    return d.d;
+  }
+  return d;
+};
+
+const lookupCustNoByCard = async (group, cardRaw) => {
+  const raw = normalizeCardId(cardRaw);
+  if (!group || !raw) return "";
+  const bracketed = formatCardIdForApi(raw);
+  const candidates = [raw, bracketed].filter(
+    (v, i, a) => v && a.indexOf(v) === i
+  );
+  for (const cardNo of candidates) {
+    try {
+      const cardRes = await validCardNo(group, cardNo);
+      const payload = unwrapAsmxData(cardRes);
+      const no =
+        payload?.List?.[0]?.lngCustNo ??
+        payload?.List?.[0]?.CUST_NO ??
+        payload?.lngCustNo;
+      if (no != null && String(no).trim() !== "") {
+        return String(no).trim();
+      }
+    } catch {
+      // try next format
+    }
+  }
+  return "";
+};
+
 const formatJoinPathForApi = (codes) => {
   if (!Array.isArray(codes) || codes.length === 0) return "";
   return codes.map((c) => String(c).trim()).filter(Boolean).join(",");
@@ -2189,27 +2231,18 @@ const resolveCustNoAfterSave = async (res, isNew) => {
   if (!isNew) {
     return String(ccustomorNum.value ?? "").trim();
   }
+  const data = unwrapAsmxData(res);
   const fromRes =
-    res?.data?.List?.[0]?.lngCustNo ??
-    res?.data?.List?.[0]?.CUST_NO ??
-    res?.data?.CUST_NO ??
-    res?.data?.lngCustNo;
+    data?.List?.[0]?.lngCustNo ??
+    data?.List?.[0]?.CUST_NO ??
+    data?.CUST_NO ??
+    data?.lngCustNo;
   if (fromRes != null && String(fromRes).trim() !== "") {
     return String(fromRes).trim();
   }
   const group = String(ccustomorGroup.value ?? groupCd.value ?? "").trim();
-  const card = normalizeCardId(pcond.value);
-  if (group && card) {
-    try {
-      const cardRes = await validCardNo(group, card);
-      const no = cardRes?.data?.List?.[0]?.lngCustNo;
-      if (no != null && String(no).trim() !== "") {
-        return String(no).trim();
-      }
-    } catch {
-      // ignore — fallback only
-    }
-  }
+  const fromCard = await lookupCustNoByCard(group, pcond.value);
+  if (fromCard) return fromCard;
   return String(ccustomorNum.value ?? "").trim();
 };
 
@@ -2238,7 +2271,7 @@ const saveCustomerJoinPath = async (group, custNo) => {
     return {
       ok: false,
       message:
-        "고객번호를 확인할 수 없습니다. API 배포 후 insertCustomerInfo 응답의 lngCustNo를 확인해 주세요.",
+        "고객번호를 확인할 수 없습니다. 운영 API(insertCustomerInfo)에 lngCustNo 반환 및 usp_crmCustNew @p_lngCustNoRtn 배포를 확인해 주세요.",
     };
   }
   try {
