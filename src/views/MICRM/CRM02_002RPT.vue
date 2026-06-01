@@ -76,13 +76,35 @@
           <div
             class="crm02-r1-cust flex min-h-8 w-full min-w-0 shrink-0 items-center justify-end gap-2 sm:w-auto sm:max-w-[min(100%,42rem)]">
             <span class="crm02-inline-lbl shrink-0">고객명</span>
-            <div class="crm02-pick-slot min-w-0 flex-1 sm:flex-1 sm:min-w-[12rem]">
-              <PickCustomers
-                :main-name="'고객명'"
-                @Name="Name"
-                @ID="ID"
-                @CustId="CustId"
-                @excelList="excelList"></PickCustomers>
+            <div class="crm02-cust-pick flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:min-w-[12rem]">
+              <input
+                id="crm02-pick-card"
+                v-model="pickedCardDisplay"
+                type="text"
+                disabled
+                autocomplete="off"
+                class="crm02-sg-input crm02-cust-pick-input h-8 min-h-8 min-w-0 flex-1 rounded-md border border-solid bg-slate-100 px-2 text-sm text-slate-700 sm:max-w-[7rem]"
+              />
+              <input
+                id="crm02-pick-name"
+                v-model="pickedCustName"
+                type="text"
+                disabled
+                autocomplete="off"
+                class="crm02-sg-input crm02-cust-pick-input h-8 min-h-8 min-w-0 flex-1 rounded-md border border-solid bg-white px-2 text-sm text-slate-800 sm:min-w-[6rem]"
+              />
+              <button
+                type="button"
+                class="crm02-cust-pick-btn shrink-0"
+                @click="openCustSearch">
+                조회
+              </button>
+              <button
+                type="button"
+                class="crm02-cust-pick-btn shrink-0"
+                @click="resetCustPick">
+                초기화
+              </button>
             </div>
           </div>
         </div>
@@ -189,6 +211,15 @@
       </section>
     </div>
   </div>
+
+  <CustomerSearch
+    v-if="showCustPopup"
+    join-sts="1"
+    @strCCardID="onPickCard"
+    @strCustName="onPickCustName"
+    @lngCustNo="onPickCustNo"
+    @closePopUp="showCustPopup = false"
+  />
   <!-- 그리드 영역 -->
 </template>
 
@@ -208,7 +239,7 @@ import Datepicker2 from "@/components/Datepicker2.vue";
  *  */
 
 import PageName from "@/components/pageName.vue";
-import PickCustomers from "@/components/pickCustomers.vue";
+import CustomerSearch from "@/components/customerSearch.vue";
 /**
  * 	매장 단일 선택 컴포넌트
  */
@@ -247,7 +278,53 @@ const crm02ControlBorder = "#cbd5e1";
 
 onMounted(async () => {
   await insertPageLog(store.state.activeTab2);
+  syncExcelListLabel();
 });
+
+const showCustPopup = ref(false);
+const pickedCardDisplay = ref("");
+const pickedCustName = ref("");
+const searchNum = ref("");
+const custID = ref();
+
+const syncExcelListLabel = () => {
+  selectedExcelList.value = pickedCustName.value
+    ? `고객명: ${pickedCustName.value}`
+    : "고객명:   ";
+};
+
+const openCustSearch = () => {
+  showCustPopup.value = true;
+};
+
+const normalizeCardDisplay = (v) =>
+  String(v ?? "")
+    .replace(/[\[\]]/g, "")
+    .trim();
+
+const onPickCard = (v) => {
+  searchNum.value = String(v ?? "").trim();
+  pickedCardDisplay.value = normalizeCardDisplay(v);
+  initGrid();
+};
+
+const onPickCustName = (v) => {
+  pickedCustName.value = String(v ?? "").trim();
+  syncExcelListLabel();
+};
+
+const onPickCustNo = (v) => {
+  custID.value = v;
+};
+
+const resetCustPick = () => {
+  searchNum.value = "";
+  custID.value = "";
+  pickedCardDisplay.value = "";
+  pickedCustName.value = "";
+  syncExcelListLabel();
+  initGrid();
+};
 
 const reload = ref(false);
 const rowData = ref([]);
@@ -287,19 +364,6 @@ const handleParentClick = (e) => {
   closePopUp.value = !closePopUp.value;
 };
 
-const Name = (e) => {
-  ////console.log(e);
-};
-const searchNum = ref("");
-const ID = (e) => {
-  initGrid();
-  searchNum.value = e;
-};
-
-const custID = ref();
-const CustId = (e) => {
-  custID.value = e;
-};
 const sDate = ref();
 const eDate = ref();
 const startDate = (e) => {
@@ -419,10 +483,6 @@ const excelStore = (e) => {
   selectedExcelStore.value = e;
   //comsole.log(e);
 };
-const excelList = (e) => {
-  selectedExcelList.value = e;
-  //comsole.log(e);
-};
 
 const setCond2 = (e) => {
   cond2.value = !cond2.value;
@@ -493,60 +553,22 @@ const setCond = (e) => {
   align-items: center;
 }
 
-.crm02-pick-slot > * {
+.crm02-cust-pick {
   min-width: 0;
-  width: 100%;
 }
 
-.crm02-pick-slot :deep(> div.flex.items-center) {
-  width: 100%;
-  min-width: 0;
-  min-height: 2rem;
-  align-items: center;
-  flex-wrap: wrap;
-  row-gap: 0.375rem;
-  column-gap: 0.75rem;
-}
-
-.crm02-pick-slot :deep(> div.flex.items-center.w-32) {
-  width: 100% !important;
-  max-width: 100%;
-}
-
-.crm02-pick-slot :deep(> div.flex.items-center > div.text-base.text-nowrap.font-semibold:first-of-type) {
-  display: none;
-}
-
-.crm02-pick-slot :deep(> div.flex.items-center > div > input[type="text"]) {
-  box-sizing: border-box;
-  height: 2rem;
-  min-height: 2rem;
-  margin-left: 0 !important;
+.crm02-cust-pick-input {
   border: 1px solid var(--crm02-control-border) !important;
-  border-radius: 0.375rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  min-width: 5rem;
-  flex: 1 1 7rem;
-  max-width: 100%;
+  box-sizing: border-box;
 }
 
-.crm02-pick-slot :deep(> div.flex.items-center > div > input[type="text"]:focus) {
-  border-color: #3b82f6 !important;
-  outline: none;
-  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.35);
-}
-
-.crm02-pick-slot :deep(.whitebutton) {
+.crm02-cust-pick-btn {
   box-sizing: border-box;
   display: inline-flex;
   height: 2rem;
   min-height: 2rem;
   align-items: center;
   justify-content: center;
-  margin-left: 0 !important;
   border-radius: 0.375rem;
   border: 1px solid rgb(203 213 225);
   background-color: #fff;
@@ -558,7 +580,7 @@ const setCond = (e) => {
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
-.crm02-pick-slot :deep(.whitebutton:hover) {
+.crm02-cust-pick-btn:hover {
   background-color: rgb(248 250 252);
 }
 
