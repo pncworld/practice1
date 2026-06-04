@@ -282,7 +282,7 @@
           :syncRowDataPulse="topGridSyncPulse"
           @updatedRowData="updatedRowData2"
           :editableColId="'dblCheckQty,strComments'"
-          :inputOnlyNumberColumn="'dblCheckQty'"
+          :inputSignedDecimalColumn="'dblCheckQty'"
           :CalculateTaxColId="'curTax'"
           :CalculateTaxColId2="'curSupply'"
           :CalculateTaxColId3="'curTotal'"
@@ -358,7 +358,7 @@
           :CalculateTaxColId3="'curTotal'"
           :searchColId3="['lngSupplierID']"
           :searchValue="searchValue2"
-          :inputOnlyNumberColumn="'dblCheckQty'"
+          :inputSignedDecimalColumn="'dblCheckQty'"
           :editableColId="'dblCheckQty,strComments,lngCheck,checkbox'"
           @updatedRowData="updatedRowData3"
           :checkRowAuto="false"
@@ -1237,7 +1237,7 @@ const stripBottomGridCheckFieldsForBookMerge = (patch) => {
 };
 
 /**
- * 하단 행이 "발주 확정 양수 수량"을 전달하는지 (빈 값·0·"0" 등은 false).
+ * 하단 행이 0이 아닌 매입수량을 전달하는지 (빈 값·0·"0" 등은 false, 음수·소수 허용).
  */
 const bottomRowAssertsPositiveOrderQty = (row) => {
   const patch = stripBottomGridCheckFieldsForBookMerge(row);
@@ -1246,7 +1246,7 @@ const bottomRowAssertsPositiveOrderQty = (row) => {
   const s = typeof q === "string" ? String(q).trim() : String(q);
   if (s === "" || s === "0") return false;
   const n = Number(s);
-  if (!Number.isNaN(n)) return n > 0;
+  if (!Number.isNaN(n)) return n !== 0;
   return hasCheckQty({ dblCheckQty: q });
 };
 

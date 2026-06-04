@@ -315,6 +315,11 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  /** 콤마 구분 컬럼 — 정수·소수·음수(-) 입력 허용, 문자 불가 */
+  inputSignedDecimalColumn: {
+    type: String,
+    default: "",
+  },
   dragOn: {
     // 고정 컬럼 여부
     type: Boolean,
@@ -1456,11 +1461,16 @@ const runFuncshowGrid = async () => {
       : props.CalculateTaxColId2.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {
           const unitp = Number(values[fieldNames.indexOf("curUnitPrice")] || 0);
+          const signedDecimalRaw =
+            typeof props.inputSignedDecimalColumn === "string" &&
+            String(props.inputSignedDecimalColumn).trim() !== ""
+              ? String(props.inputSignedDecimalColumn).split(",")[0].trim()
+              : "";
           const primaryRaw =
             typeof props.inputOnlyNumberColumn === "string" &&
             String(props.inputOnlyNumberColumn).trim() !== ""
               ? String(props.inputOnlyNumberColumn).split(",")[0].trim()
-              : "";
+              : signedDecimalRaw;
           let qty = 0;
           const primaryIdx =
             primaryRaw !== "" ? fieldNames.indexOf(primaryRaw) : -1;
@@ -1584,6 +1594,71 @@ const runFuncshowGrid = async () => {
 
   dataProvider.setFields(fields);
 
+  const signedDecimalColumnIds = String(props.inputSignedDecimalColumn || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const SIGNED_DECIMAL_MAX_PLACES = 2;
+  const signedDecimalNumberFormat = "#,##0.##";
+  const isSignedDecimalColumn = (colId) =>
+    signedDecimalColumnIds.includes(colId);
+  const countMeaningfulDecimalPlaces = (
+    v,
+    maxPlaces = SIGNED_DECIMAL_MAX_PLACES
+  ) => {
+    if (v === null || v === undefined || v === "") return 0;
+    const s = String(v).trim();
+    if (!s.includes(".")) return 0;
+    const frac = (s.split(".")[1] || "").replace(/0+$/, "");
+    return Math.min(frac.length, maxPlaces);
+  };
+  const roundSignedDecimal = (v, maxPlaces = SIGNED_DECIMAL_MAX_PLACES) => {
+    const n = Number(v);
+    if (Number.isNaN(n)) return v;
+    const factor = 10 ** maxPlaces;
+    return Math.round(n * factor) / factor;
+  };
+  const getMaxDecimalPlacesInGridColumn = (
+    grid,
+    colId,
+    maxPlaces = SIGNED_DECIMAL_MAX_PLACES
+  ) => {
+    let max = 0;
+    const cnt = grid.getItemCount();
+    for (let i = 0; i < cnt; i++) {
+      max = Math.max(
+        max,
+        countMeaningfulDecimalPlaces(grid.getValue(i, colId), maxPlaces)
+      );
+    }
+    return max;
+  };
+  const formatSignedDecimalSum = (num, decimalPlaces) => {
+    const n = Number(num);
+    if (Number.isNaN(n)) return num;
+    if (decimalPlaces <= 0) {
+      return Math.round(n).toLocaleString("ko-KR", {
+        maximumFractionDigits: 0,
+      });
+    }
+    const factor = 10 ** decimalPlaces;
+    const rounded = Math.round(n * factor) / factor;
+    const fixed = rounded.toFixed(decimalPlaces);
+    const trimmed = fixed.replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+    const negative = trimmed.startsWith("-");
+    const abs = negative ? trimmed.slice(1) : trimmed;
+    const [intPart, decPart] = abs.split(".");
+    const formattedInt = Number(intPart).toLocaleString("ko-KR");
+    let result = formattedInt + (decPart !== undefined ? "." + decPart : "");
+    return negative ? "-" + result : result;
+  };
+  const formatSignedDecimalFooterValue = (grid, colId, rawValue) => {
+    const numVal = Number(rawValue);
+    if (Number.isNaN(numVal)) return rawValue;
+    const maxDec = getMaxDecimalPlacesInGridColumn(grid, colId);
+    return formatSignedDecimalSum(numVal, maxDec);
+  };
+
   // 컬럼 정의
   const columns = tabInitSetArray.value.map((item, index) => ({
     name: item.strColID,
@@ -1642,16 +1717,17 @@ const runFuncshowGrid = async () => {
           : props.setGroupFooterExpressions[
               props.setGroupFooterColID.indexOf(item.strColID)
             ],
-      numberFormat:
-        item.strColType == "float"
-          ? "#,##0"
-          : item.strColType === "double" && item.strDisplay == "double2"
-          ? "#,##0.000"
-          : item.strColType === "double" && item.strDisplay == "double"
-          ? "#,##0.00"
-          : item.strColType === "double" && item.strDisplay != "double"
-          ? "#,##0.0"
-          : "#,##0",
+      numberFormat: isSignedDecimalColumn(item.strColID)
+        ? ""
+        : item.strColType == "float"
+        ? "#,##0"
+        : item.strColType === "double" && item.strDisplay == "double2"
+        ? "#,##0.000"
+        : item.strColType === "double" && item.strDisplay == "double"
+        ? "#,##0.00"
+        : item.strColType === "double" && item.strDisplay != "double"
+        ? "#,##0.0"
+        : "#,##0",
       valueCallback: function (grid, column, groupFooterIndex, group, value) {
         const regex =
           /(sum|avg|max|min|count)\(\s*([^)]+?)\s*\)|([+\-*/]|\b\d+\b)/gi;
@@ -1683,9 +1759,20 @@ const runFuncshowGrid = async () => {
             }
           }
 
-          return eval(returnText) == "Infinity" ? 0 : eval(returnText);
+          const evaluated = eval(returnText);
+          const safeVal = evaluated == "Infinity" ? 0 : evaluated;
+          if (isSignedDecimalColumn(item.strColID)) {
+            return formatSignedDecimalFooterValue(
+              grid,
+              item.strColID,
+              safeVal
+            );
+          }
+          return safeVal;
         } else {
-          return value;
+          return isSignedDecimalColumn(item.strColID)
+            ? formatSignedDecimalFooterValue(grid, item.strColID, value)
+            : value;
         }
       },
       styleCallback: function (grid, item2) {
@@ -1784,16 +1871,17 @@ const runFuncshowGrid = async () => {
         : "setTextAlignRight",
       expression:
         props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)],
-      numberFormat:
-        item.strTotalexpr != ""
-          ? item.strTotalexpr
-          : item.strColType === "double" && item.strDisplay == "double2"
-          ? "#,##0.000"
-          : item.strColType === "double" && item.strDisplay == "double"
-          ? "#,##0.00"
-          : item.strColType === "double" && item.strDisplay != "double"
-          ? "#,##0.0"
-          : "#,##0",
+      numberFormat: isSignedDecimalColumn(item.strColID)
+        ? ""
+        : item.strTotalexpr != ""
+        ? item.strTotalexpr
+        : item.strColType === "double" && item.strDisplay == "double2"
+        ? "#,##0.000"
+        : item.strColType === "double" && item.strDisplay == "double"
+        ? "#,##0.00"
+        : item.strColType === "double" && item.strDisplay != "double"
+        ? "#,##0.0"
+        : "#,##0",
       suffix: props.suffixColumnPercent.includes(item.strColID) ? "%" : "",
       valueCallback: function (grid, column, footerIndex, columnFooter, value) {
         // count 표현식 처리 - 그룹푸터 제외한 실제 데이터 행만 카운트
@@ -2019,9 +2107,20 @@ const runFuncshowGrid = async () => {
             );
           }
 
-          return eval(returnText) == "Infinity" ? 0 : eval(returnText);
+          const evaluated = eval(returnText);
+          const safeVal = evaluated == "Infinity" ? 0 : evaluated;
+          if (isSignedDecimalColumn(item.strColID)) {
+            return formatSignedDecimalFooterValue(
+              grid,
+              item.strColID,
+              safeVal
+            );
+          }
+          return safeVal;
         } else {
-          return value;
+          return isSignedDecimalColumn(item.strColID)
+            ? formatSignedDecimalFooterValue(grid, item.strColID, value)
+            : value;
         }
       },
     },
@@ -2043,16 +2142,17 @@ const runFuncshowGrid = async () => {
       },
     }),
     width: item.intHdWidth,
-    numberFormat:
-      props.suffixColumnwon == "lngPrice" && item.strColID == "lngPrice"
-        ? "#,##0"
-        : item.strColType == "float"
-        ? "#,##0"
-        : item.strColType == "double" && item.strDisplay == "double"
-        ? "#,##0.00"
-        : item.strColType == "double" && item.strDisplay == "double2"
-        ? "#,##0.000"
-        : "#,##0.0",
+    numberFormat: isSignedDecimalColumn(item.strColID)
+      ? signedDecimalNumberFormat
+      : props.suffixColumnwon == "lngPrice" && item.strColID == "lngPrice"
+      ? "#,##0"
+      : item.strColType == "float"
+      ? "#,##0"
+      : item.strColType == "double" && item.strDisplay == "double"
+      ? "#,##0.00"
+      : item.strColType == "double" && item.strDisplay == "double2"
+      ? "#,##0.000"
+      : "#,##0.0",
     styleName:
       props.dynamicRowHeight2 == true && item.strAlign == "left"
         ? "setTextAlignLeft"
@@ -2135,9 +2235,14 @@ const runFuncshowGrid = async () => {
             }
           : null,
       commitOnSelect: true,
-      inputCharacters: props.inputOnlyNumberColumn
-        .split(",")
-        .includes(item.strColID)
+      ...(isSignedDecimalColumn(item.strColID)
+        ? { editFormat: signedDecimalNumberFormat }
+        : {}),
+      inputCharacters: isSignedDecimalColumn(item.strColID)
+        ? "0123456789.-"
+        : props.inputOnlyNumberColumn
+            .split(",")
+            .includes(item.strColID)
         ? "0123456789"
         : item.strColID == props.inputOnlyNumberColumn2
         ? "0123456789."
@@ -3344,6 +3449,20 @@ const runFuncshowGrid = async () => {
         newVal = dataProvider.getValue(row, editedFieldName);
       } catch (_) {
         newVal = undefined;
+      }
+    }
+
+    if (
+      editedFieldName &&
+      isSignedDecimalColumn(editedFieldName) &&
+      newVal !== null &&
+      newVal !== undefined &&
+      newVal !== ""
+    ) {
+      const rounded = roundSignedDecimal(newVal);
+      if (!Number.isNaN(Number(newVal)) && Number(newVal) !== rounded) {
+        dataProvider.setValue(row, editedFieldName, rounded);
+        newVal = rounded;
       }
     }
 

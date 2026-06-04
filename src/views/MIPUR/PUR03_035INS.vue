@@ -237,6 +237,7 @@
           :syncRowDataPulse="topGridSyncPulse"
           @updatedRowData="updatedRowData2"
           :editableColId="'dblOrderQty,strOrderComments'"
+          :inputSignedDecimalColumn="'dblOrderQty'"
           :checkRowAuto="false"
           :setFooter="true"
           :checkRowAuto2="true"
@@ -302,7 +303,7 @@
           :CalculateTaxColId="'curTax'"
           :searchColId3="['lngSupplierID']"
           :searchValue="searchValue2"
-          :inputOnlyNumberColumn="'dblOrderQty'"
+          :inputSignedDecimalColumn="'dblOrderQty'"
           :CalculateTaxColId2="'curSupply'"
           :editableColId="'dblOrderQty,strOrderComments'"
           :syncRowDataPulse="bottomGridSyncPulse"
@@ -883,7 +884,7 @@ const stripBottomGridCheckFieldsForBookMerge = (patch) => {
   return out;
 };
 
-/** 하단 행이 양의 발주수량(dblOrderQty)을 전달하는지 — 빈 값·0 은 false */
+/** 하단 행이 0이 아닌 발주수량(dblOrderQty)을 전달하는지 — 빈 값·0 은 false, 음수·소수 허용 */
 const bottomRowAssertsPositiveOrderQty = (row) => {
   const patch = stripBottomGridCheckFieldsForBookMerge(row);
   const q = patch?.dblOrderQty;
@@ -891,7 +892,7 @@ const bottomRowAssertsPositiveOrderQty = (row) => {
   const s = typeof q === "string" ? String(q).trim() : String(q);
   if (s === "" || s === "0") return false;
   const n = Number(s);
-  if (!Number.isNaN(n)) return n > 0;
+  if (!Number.isNaN(n)) return n !== 0;
   return hasOrderQty({ dblOrderQty: q });
 };
 
