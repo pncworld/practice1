@@ -28,115 +28,166 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-3 grid-rows-3 justify-between bg-gray-200 rounded-lg h-32 items-start z-10">
-      <div class="flex ml-24">
-        <Datepicker1 :mainName="'일자'" @dateValue="dateValue"></Datepicker1>
-      </div>
-      <div class="mt-2">
-        <PickStoreRenew
-          @lngStoreCode="lngStoreCode"
-          @excelStore="excelStore"
-          :hideit2="false"
-          :hideit="false"></PickStoreRenew>
-      </div>
+      class="z-10 mt-3 w-full min-w-0 overflow-x-auto rounded-lg bg-gray-200 px-24 py-4">
+      <div
+        class="stkn016-search-grid min-w-0"
+        :style="{
+          '--stkn016-control-border': stkn016ControlBorder,
+          '--stkn016-item-gap': stkn016ItemGap,
+        }">
+        <div class="stkn016-cell">
+          <div class="stkn016-sg-label">일자</div>
+          <div class="stkn016-cell-field stkn016-date-slot min-w-0">
+            <Datepicker1
+              ref="datepicker"
+              :mainName="'일자'"
+              @dateValue="dateValue" />
+          </div>
+        </div>
+        <div class="stkn016-cell">
+          <div class="stkn016-sg-label">매장</div>
+          <div class="stkn016-cell-field stkn016-pick-slot min-w-0">
+            <PickStoreRenew
+              compact
+              combo-fill
+              omit-main-label
+              main-name="매장"
+              :hideit2="false"
+              :hideit="false"
+              @lngStoreCode="lngStoreCode"
+              @excelStore="excelStore" />
+          </div>
+        </div>
+        <div class="stkn016-cell">
+          <div class="stkn016-sg-label">파트</div>
+          <div class="stkn016-cell-field min-w-0">
+            <select
+              id="stkn07-016-cond-part"
+              v-model="cond"
+              class="stkn016-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              @change="setCond">
+              <option
+                v-for="i in optionList"
+                :key="i.lngPartCode"
+                :value="i.lngPartCode">
+                {{ i.strPartName }}
+              </option>
+            </select>
+          </div>
+        </div>
 
-      <div class="flex items-center space-x-5 mt-2 ml-5">
-        <div class="text-base font-semibold">파트</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="border border-black w-32 h-8"
-            @change="setCond"
-            v-model="cond">
-            <option :value="i.lngPartCode" v-for="i in optionList">
-              {{ i.strPartName }}
-            </option>
-          </select>
+        <div class="stkn016-cell">
+          <div class="stkn016-sg-label">자재코드/명</div>
+          <div
+            class="stkn016-cell-field stkn016-dual-input flex min-h-8 min-w-0 flex-nowrap items-center gap-2">
+            <input
+              id="stkn07-016-stock-id"
+              :value="cond2"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              autocomplete="off"
+              placeholder="자재코드"
+              class="stkn016-input stkn016-input--code h-8 min-h-8 min-w-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-700"
+              @input="onStockCodeFilterInput" />
+            <input
+              id="stkn07-016-stock-name"
+              :value="cond3"
+              type="text"
+              autocomplete="off"
+              placeholder="자재명"
+              class="stkn016-input stkn016-input--name h-8 min-h-8 min-w-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-700"
+              @input="onStockNameFilterInput"
+              @compositionend="onStockNameFilterInput" />
+          </div>
         </div>
-      </div>
-      <div class="flex ml-12 space-x-5 mt-2 items-center col-span-2">
-        <div class="text-base font-semibold">자재코드/명</div>
-        <div class="flex space-x-5">
-          <input
-            type="text"
-            class="w-32 h-8 border border-black"
-            v-model="cond2" />
-          <input
-            type="text"
-            class="w-48 h-8 border border-black"
-            v-model="cond3" />
+        <div class="stkn016-cell stkn016-cell--spacer" aria-hidden="true"></div>
+        <div class="stkn016-cell">
+          <div class="stkn016-sg-label">주거래처</div>
+          <div class="stkn016-cell-field min-w-0">
+            <select
+              id="stkn07-016-cond-supplier"
+              v-model="cond4"
+              class="stkn016-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="0">전체</option>
+              <option
+                v-for="i in optionList2"
+                :key="i.lngSupplierID"
+                :value="i.lngSupplierID">
+                {{ i.strSupplierName }}
+              </option>
+            </select>
+          </div>
         </div>
-      </div>
-      <div class="flex items-center justify-start text-base font-bold ml-1">
-        <div>거래처</div>
-        <select
-          name=""
-          id=""
-          class="w-48 h-8 ml-5 border border-black"
-          v-model="cond4">
-          <option value="0">전체</option>
-          <option :value="i.lngSupplierID" v-for="i in optionList2">
-            {{ i.strSupplierName }}
-          </option>
-        </select>
+
+        <div class="stkn016-cell">
+          <div class="stkn016-sg-label">자재그룹</div>
+          <div class="stkn016-cell-field min-w-0">
+            <select
+              id="stkn07-016-cond-stock-group"
+              v-model="cond5"
+              class="stkn016-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="0">전체</option>
+              <option
+                v-for="i in optionList3"
+                :key="i.lngStockGroupID"
+                :value="i.lngStockGroupID">
+                {{ i.strStockGroupName }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="stkn016-cell">
+          <div class="stkn016-sg-label">자재분류</div>
+          <div class="stkn016-cell-field min-w-0">
+            <select
+              id="stkn07-016-cond-category"
+              v-model="cond6"
+              class="stkn016-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="0">전체</option>
+              <option
+                v-for="i in optionList4"
+                :key="i.lngCategoryID"
+                :value="i.lngCategoryID">
+                {{ i.strCategoryName }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="stkn016-cell">
+          <div class="stkn016-sg-label">자재특성</div>
+          <div class="stkn016-cell-field min-w-0">
+            <select
+              id="stkn07-016-cond-generic"
+              v-model="cond7"
+              class="stkn016-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="0">전체</option>
+              <option
+                v-for="i in optionList5"
+                :key="i.lngGenericID"
+                :value="i.lngGenericID">
+                {{ i.strGenericName }}
+              </option>
+            </select>
+          </div>
+        </div>
       </div>
       <div
-        class="flex justify-start items-center text-base text-nowrap font-semibold ml-16 pl-1 space-x-5">
-        자재그룹
-        <div class="flex space-x-5 ml-5">
-          <select
-            name=""
-            id=""
-            class="w-48 h-8 border border-black"
-            v-model="cond5">
-            <option value="0">전체</option>
-            <option :value="i.lngStockGroupID" v-for="i in optionList3">
-              {{ i.strStockGroupName }}
-            </option>
-          </select>
-        </div>
-      </div>
-      <div class="flex items-center justify-start text-base font-bold ml-20">
-        <div>자재분류</div>
-        <select
-          name=""
-          id=""
-          class="w-48 h-8 ml-5 border border-black"
-          v-model="cond6">
-          <option value="0">전체</option>
-          <option :value="i.lngCategoryID" v-for="i in optionList4">
-            {{ i.strCategoryName }}
-          </option>
-        </select>
-      </div>
-      <div
-        class="flex items-center justify-start text-base font-bold space-x-5 -ml-3">
-        <div>자재특성</div>
-        <select
-          name=""
-          id=""
-          class="w-48 h-8 border border-black"
-          v-model="cond7">
-          <option value="0">전체</option>
-          <option :value="i.lngGenericID" v-for="i in optionList5">
-            {{ i.strGenericName }}
-          </option>
-        </select>
-
-        <div>
-          <label for="check"
-            ><input type="checkbox" id="check" v-model="cond8" />전체보기</label
-          >
-        </div>
+        class="stkn016-footer mt-2 flex min-w-0 flex-nowrap items-center justify-between gap-4">
+        <p class="min-w-0 text-sm font-semibold text-red-500">
+          ※월마감인 경우는 실사일자를 반드시 월의 마지막날로 선택해야 합니다.
+        </p>
+        <label
+          for="stkn07-016-cond-all"
+          class="flex shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap text-sm font-semibold text-gray-900">
+          <input id="stkn07-016-cond-all" v-model="cond8" type="checkbox" />
+          전체보기
+        </label>
       </div>
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
     <div class="w-full h-[70%]">
-      <div class="flex text-red-400 text-nowrap">
-        ※월마감인 경우는 실사일자를 반드시 월의 마지막날로 선택해야 합니다.
-      </div>
       <Realgrid
         :progname="'STKN07_016RPT_VUE'"
         :progid="1"
@@ -309,7 +360,7 @@ import { insertPageLog } from "@/customFunc/customFunc";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -325,6 +376,9 @@ import Datepicker1 from "@/components/Datepicker1.vue";
 import { useStore } from "vuex";
 import PickStore from "@/components/pickStore.vue";
 import { read, utils, writeXLSX } from "xlsx-js-style";
+
+const stkn016ControlBorder = "#cbd5e1";
+const stkn016ItemGap = "0.75rem";
 
 const optionList = ref([]);
 const optionList2 = ref([]);
@@ -344,6 +398,74 @@ const afterSearch = ref(false);
 const cond = ref(0);
 const cond2 = ref("");
 const cond3 = ref("");
+
+/** 조회 원본 — 자재코드/명 입력 시 LIKE 필터만 rowData에 반영 */
+const rawRowData = ref([]);
+
+const normalizeStockSearchText = (value) =>
+  String(value ?? "")
+    .trim()
+    .normalize("NFKC")
+    .toLowerCase();
+
+const getRowStockCode = (row) =>
+  normalizeStockSearchText(
+    row.lngStockID ??
+      row.strStockID ??
+      row.strStockCode ??
+      row.strStockId ??
+      ""
+  );
+
+const getRowStockName = (row) =>
+  normalizeStockSearchText(row.strStockName ?? row.strName ?? row.strStockNm ?? "");
+
+const applyStockLikeFilter = (list, codeRaw = cond2.value, nameRaw = cond3.value) => {
+  const codeQ = normalizeStockSearchText(codeRaw);
+  const nameQ = normalizeStockSearchText(nameRaw);
+  if (!codeQ && !nameQ) {
+    return [...list];
+  }
+  return list.filter((row) => {
+    const code = getRowStockCode(row);
+    const name = getRowStockName(row);
+    const codeOk = !codeQ || code.includes(codeQ);
+    const nameOk = !nameQ || name.includes(nameQ);
+    return codeOk && nameOk;
+  });
+};
+
+const syncRowDataFromStockFilter = async (codeRaw, nameRaw) => {
+  if (!afterSearch.value) {
+    return;
+  }
+  const filtered = applyStockLikeFilter(rawRowData.value, codeRaw, nameRaw);
+  rowData.value = [...filtered];
+  updatedrowdata.value = [...filtered];
+  await nextTick();
+};
+
+/** 자재코드 — 숫자만 허용(붙여넣기·IME 포함 비숫자 제거) */
+const sanitizeStockCodeInput = (value) =>
+  String(value ?? "")
+    .normalize("NFKC")
+    .replace(/\D/g, "");
+
+const onStockCodeFilterInput = (e) => {
+  const v = sanitizeStockCodeInput(e.target.value);
+  if (e.target.value !== v) {
+    e.target.value = v;
+  }
+  cond2.value = v;
+  syncRowDataFromStockFilter(v, cond3.value);
+};
+
+const onStockNameFilterInput = (e) => {
+  const v = e.target.value;
+  cond3.value = v;
+  syncRowDataFromStockFilter(cond2.value, v);
+};
+
 const cond4 = ref("0");
 const cond5 = ref("0");
 const cond6 = ref("0");
@@ -405,9 +527,9 @@ const searchButton = async () => {
       cond.value
     );
     console.log(res);
-    rowData.value = res.data.List;
-    updatedrowdata.value = res.data.List;
+    rawRowData.value = res.data.List ?? [];
     afterSearch.value = true;
+    syncRowDataFromStockFilter();
   } catch (error) {
     afterSearch.value = false;
     //comsole.log(error);
@@ -531,9 +653,11 @@ const saveButton = async () => {
  */
 
 const initGrid = () => {
+  rawRowData.value = [];
   if (rowData.value.length > 0) {
     rowData.value = [];
   }
+  updatedrowdata.value = [];
 };
 
 //엑셀 버튼 처리 함수
@@ -827,3 +951,169 @@ const saveButton2 = async () => {
   } catch (error) {}
 };
 </script>
+
+<style scoped>
+/* PUR03_037RPT / search-area-layout — 3열 repeat(1fr) + column-gap, 셀당 라벨+값 flex */
+.stkn016-search-grid {
+  --stkn016-label-col: 7rem;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--stkn016-item-gap);
+  row-gap: var(--stkn016-item-gap);
+}
+
+.stkn016-cell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--stkn016-item-gap);
+}
+
+.stkn016-cell--spacer {
+  min-height: 2rem;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.stkn016-sg-label {
+  flex: 0 0 var(--stkn016-label-col);
+  width: var(--stkn016-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+}
+
+.stkn016-cell-field {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.stkn016-cell-field:not(.stkn016-dual-input) > * {
+  min-width: 0;
+  width: 100%;
+}
+
+.stkn016-dual-input {
+  width: 100%;
+}
+
+.stkn016-search-grid select.stkn016-select,
+.stkn016-search-grid input.stkn016-input {
+  box-sizing: border-box;
+  border: 1px solid var(--stkn016-control-border) !important;
+}
+
+.stkn016-search-grid select.stkn016-select:focus,
+.stkn016-search-grid input.stkn016-input:focus {
+  border-color: #3b82f6 !important;
+}
+
+.stkn016-search-grid input.stkn016-input::placeholder {
+  color: rgb(156 163 175);
+  font-weight: 400;
+  opacity: 1;
+}
+
+.stkn016-input--code {
+  flex: 0 0 38%;
+  min-width: 0;
+}
+
+.stkn016-input--name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Datepicker1: 숨긴 span이 첫 자식이라 space-x-5가 input에 margin-left를 줌 → 좌측 라인 어긋남 */
+.stkn016-date-slot :deep(.space-x-5 > span) {
+  display: none !important;
+  width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.stkn016-date-slot :deep(.space-x-5) {
+  margin-top: 0 !important;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 2rem;
+  gap: 0 !important;
+}
+
+.stkn016-date-slot :deep(.space-x-5 > input[type="date"]) {
+  margin-left: 0 !important;
+  margin-inline-start: 0 !important;
+}
+
+.stkn016-search-grid .stkn016-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  flex: 1 1 auto;
+  height: 2rem;
+  min-height: 2rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--stkn016-control-border) !important;
+}
+
+.stkn016-search-grid .stkn016-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.stkn016-pick-slot :deep(> div.flex) {
+  width: 100%;
+  min-width: 0;
+  gap: var(--stkn016-item-gap) !important;
+}
+
+.stkn016-pick-slot :deep(> div.flex > div) {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.stkn016-pick-slot :deep(select) {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--stkn016-control-border) !important;
+}
+
+.stkn016-pick-slot :deep(select:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.stkn016-pick-slot :deep(.custom-select) {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+}
+
+.stkn016-pick-slot :deep(.custom-select .vs__dropdown-toggle) {
+  border: 1px solid var(--stkn016-control-border) !important;
+  border-radius: 0.375rem;
+}
+
+.stkn016-pick-slot :deep(.custom-select .vs__dropdown-toggle:focus-within) {
+  border-color: #3b82f6 !important;
+}
+</style>
