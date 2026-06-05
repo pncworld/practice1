@@ -795,10 +795,8 @@ const handleStoreCd = (newValue) => {
   storeCd.value = newValue;
 };
 
-const storeType = ref();
-const handleStoreType = (e) => {
-  storeType.value = e;
-};
+const storeType = ref(store.state.userData.lngStoreAttr);
+const handleStoreType = (_e) => {};
 const updateRow = ref([]);
 /**
  * 입력창 수정 데이터 갱신
@@ -926,6 +924,8 @@ const searchButton = async () => {
     let res;
     //comsole.log(groupCd.value);
     //comsole.log(storeCd.value);
+
+    console.log(storeType.value);
 
     let lngoption =
       (cond.value == true ? "1" : "") +

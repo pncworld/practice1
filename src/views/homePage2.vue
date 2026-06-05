@@ -1,5 +1,6 @@
 <template>
   <div class="br12 po-page">
+    <StoreGroupWelcomePopup v-if="showWelcomePopup" />
     <div class="page-scroll">
       <div class="pd24 pt0 mt30 grid-area" data-fixed>
         <!-- grid-area: 남은 화면 높이 전체 채움 / grid-fixed: 콘텐츠 높이만큼만 출력 -->
@@ -142,11 +143,14 @@
 <script setup>
 import { MainDashBoard, MainDashBoard2, MainDashBoard3 } from "@/api/common";
 import SalesAnalysisDashboard from "@/components/SalesAnalysisDashboard.vue";
+import StoreGroupWelcomePopup from "@/components/StoreGroupWelcomePopup.vue";
 import { USER_ADMIN_ID_SUPPLIER_ACCOUNT } from "@/constants/sessionUser";
 import { matchesSalesAnalysisHomeTempBypass } from "@/constants/salesAnalysisDashboardApi.js";
 import Chart from "@/components/chart.vue";
 import Realgrid from "@/components/realgrid.vue";
 import { computed, onMounted, ref } from "vue";
+
+const WELCOME_POPUP_GROUP = 3071;
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -154,6 +158,10 @@ import { computed, onMounted, ref } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
+
+const showWelcomePopup = computed(
+  () => Number(store.state.userData?.lngStoreGroup) === WELCOME_POPUP_GROUP
+);
 
 /** 홈 매출 분석 대시보드 노출은 `SALES_ANALYSIS_HOME_TEMP_BYPASS_RULES` (`salesAnalysisDashboardApi.js`)만 따름 */
 /** @param {Record<string, unknown>|unknown} u userData */

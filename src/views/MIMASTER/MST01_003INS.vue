@@ -1026,7 +1026,7 @@
             </div>
           </div>
         </div>
-        <div v-show="selectedMenu == 2" class="flex min-h-0 min-w-0 flex-col">
+        <div v-show="selectedMenu == 2" class="flex min-w-0 flex-col h-full overflow-hidden">
           <div class="flex w-full items-center justify-between">
             <div class="mst003-section-title mb-0">할인설정</div>
             <div>
@@ -1323,13 +1323,15 @@ const selectMenu = (newValue) => {
  */
 
 watch(selectedMenu, () => {
+  if (selectedMenu.value !== 2) return;
   const reagrid2 = document.getElementById(realgrid2Name.value);
+  if (!reagrid2) return;
   setTimeout(() => {
-    RealGrid.getGridInstance(reagrid2).resetSize();
-    RealGrid.getGridInstance(reagrid2).refresh(true);
+    const instance = RealGrid.getGridInstance(reagrid2);
+    if (!instance) return;
+    instance.resetSize();
+    instance.refresh(true);
   }, 100);
-
-  //comsole.log(RealGrid.getGridInstance(reagrid2));
 });
 /**
  * 추가 버튼 함수
