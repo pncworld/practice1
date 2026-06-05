@@ -320,6 +320,11 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  /** 콤마 구분 컬럼 — 정수·소수만(음수 불가), 소수 2자리 */
+  inputUnsignedDecimalColumn: {
+    type: String,
+    default: "",
+  },
   dragOn: {
     // 고정 컬럼 여부
     type: Boolean,
@@ -1382,6 +1387,83 @@ const runFuncshowGrid = async () => {
   }
   window.gridView = gridView;
 
+  const parseDecimalColumnIds = (propVal) =>
+    String(propVal || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  const signedDecimalColumnIds = parseDecimalColumnIds(
+    props.inputSignedDecimalColumn
+  );
+  const unsignedDecimalColumnIds = parseDecimalColumnIds(
+    props.inputUnsignedDecimalColumn
+  );
+  const colIdInDecimalList = (colId, list) => list.includes(colId);
+  const isSignedDecimalColumn = (colId) =>
+    colIdInDecimalList(colId, signedDecimalColumnIds);
+  const isUnsignedDecimalColumn = (colId) =>
+    colIdInDecimalList(colId, unsignedDecimalColumnIds);
+  const isDecimalInputColumn = (colId) =>
+    isSignedDecimalColumn(colId) || isUnsignedDecimalColumn(colId);
+  const SIGNED_DECIMAL_MAX_PLACES = 2;
+  const signedDecimalNumberFormat = "#,##0.##";
+  const countMeaningfulDecimalPlaces = (
+    v,
+    maxPlaces = SIGNED_DECIMAL_MAX_PLACES
+  ) => {
+    if (v === null || v === undefined || v === "") return 0;
+    const s = String(v).trim();
+    if (!s.includes(".")) return 0;
+    const frac = (s.split(".")[1] || "").replace(/0+$/, "");
+    return Math.min(frac.length, maxPlaces);
+  };
+  const roundSignedDecimal = (v, maxPlaces = SIGNED_DECIMAL_MAX_PLACES) => {
+    const n = Number(v);
+    if (Number.isNaN(n)) return v;
+    const factor = 10 ** maxPlaces;
+    return Math.round(n * factor) / factor;
+  };
+  const getMaxDecimalPlacesInGridColumn = (
+    grid,
+    colId,
+    maxPlaces = SIGNED_DECIMAL_MAX_PLACES
+  ) => {
+    let max = 0;
+    const cnt = grid.getItemCount();
+    for (let i = 0; i < cnt; i++) {
+      max = Math.max(
+        max,
+        countMeaningfulDecimalPlaces(grid.getValue(i, colId), maxPlaces)
+      );
+    }
+    return max;
+  };
+  const formatSignedDecimalSum = (num, decimalPlaces) => {
+    const n = Number(num);
+    if (Number.isNaN(n)) return num;
+    if (decimalPlaces <= 0) {
+      return Math.round(n).toLocaleString("ko-KR", {
+        maximumFractionDigits: 0,
+      });
+    }
+    const factor = 10 ** decimalPlaces;
+    const rounded = Math.round(n * factor) / factor;
+    const fixed = rounded.toFixed(decimalPlaces);
+    const trimmed = fixed.replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+    const negative = trimmed.startsWith("-");
+    const abs = negative ? trimmed.slice(1) : trimmed;
+    const [intPart, decPart] = abs.split(".");
+    const formattedInt = Number(intPart).toLocaleString("ko-KR");
+    let result = formattedInt + (decPart !== undefined ? "." + decPart : "");
+    return negative ? "-" + result : result;
+  };
+  const formatSignedDecimalFooterValue = (grid, colId, rawValue) => {
+    const numVal = Number(rawValue);
+    if (Number.isNaN(numVal)) return rawValue;
+    const maxDec = getMaxDecimalPlacesInGridColumn(grid, colId);
+    return formatSignedDecimalSum(numVal, maxDec);
+  };
+
   // 필드 정의
   const fields = tabInitSetArray.value.map((item) => ({
     fieldName: item.strColID,
@@ -1393,7 +1475,8 @@ const runFuncshowGrid = async () => {
           (item.strColID.includes("lngSupplierID") &&
             props.checkBarInactive == "lngSupplierID")
         ? "boolean"
-        : item.strColType == "number" ||
+        : isDecimalInputColumn(item.strColID) ||
+          item.strColType == "number" ||
           item.strColType === "float" ||
           item.strColType === "double"
         ? "number"
@@ -1594,71 +1677,6 @@ const runFuncshowGrid = async () => {
 
   dataProvider.setFields(fields);
 
-  const signedDecimalColumnIds = String(props.inputSignedDecimalColumn || "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  const SIGNED_DECIMAL_MAX_PLACES = 2;
-  const signedDecimalNumberFormat = "#,##0.##";
-  const isSignedDecimalColumn = (colId) =>
-    signedDecimalColumnIds.includes(colId);
-  const countMeaningfulDecimalPlaces = (
-    v,
-    maxPlaces = SIGNED_DECIMAL_MAX_PLACES
-  ) => {
-    if (v === null || v === undefined || v === "") return 0;
-    const s = String(v).trim();
-    if (!s.includes(".")) return 0;
-    const frac = (s.split(".")[1] || "").replace(/0+$/, "");
-    return Math.min(frac.length, maxPlaces);
-  };
-  const roundSignedDecimal = (v, maxPlaces = SIGNED_DECIMAL_MAX_PLACES) => {
-    const n = Number(v);
-    if (Number.isNaN(n)) return v;
-    const factor = 10 ** maxPlaces;
-    return Math.round(n * factor) / factor;
-  };
-  const getMaxDecimalPlacesInGridColumn = (
-    grid,
-    colId,
-    maxPlaces = SIGNED_DECIMAL_MAX_PLACES
-  ) => {
-    let max = 0;
-    const cnt = grid.getItemCount();
-    for (let i = 0; i < cnt; i++) {
-      max = Math.max(
-        max,
-        countMeaningfulDecimalPlaces(grid.getValue(i, colId), maxPlaces)
-      );
-    }
-    return max;
-  };
-  const formatSignedDecimalSum = (num, decimalPlaces) => {
-    const n = Number(num);
-    if (Number.isNaN(n)) return num;
-    if (decimalPlaces <= 0) {
-      return Math.round(n).toLocaleString("ko-KR", {
-        maximumFractionDigits: 0,
-      });
-    }
-    const factor = 10 ** decimalPlaces;
-    const rounded = Math.round(n * factor) / factor;
-    const fixed = rounded.toFixed(decimalPlaces);
-    const trimmed = fixed.replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
-    const negative = trimmed.startsWith("-");
-    const abs = negative ? trimmed.slice(1) : trimmed;
-    const [intPart, decPart] = abs.split(".");
-    const formattedInt = Number(intPart).toLocaleString("ko-KR");
-    let result = formattedInt + (decPart !== undefined ? "." + decPart : "");
-    return negative ? "-" + result : result;
-  };
-  const formatSignedDecimalFooterValue = (grid, colId, rawValue) => {
-    const numVal = Number(rawValue);
-    if (Number.isNaN(numVal)) return rawValue;
-    const maxDec = getMaxDecimalPlacesInGridColumn(grid, colId);
-    return formatSignedDecimalSum(numVal, maxDec);
-  };
-
   // 컬럼 정의
   const columns = tabInitSetArray.value.map((item, index) => ({
     name: item.strColID,
@@ -1717,7 +1735,7 @@ const runFuncshowGrid = async () => {
           : props.setGroupFooterExpressions[
               props.setGroupFooterColID.indexOf(item.strColID)
             ],
-      numberFormat: isSignedDecimalColumn(item.strColID)
+      numberFormat: isDecimalInputColumn(item.strColID)
         ? ""
         : item.strColType == "float"
         ? "#,##0"
@@ -1761,7 +1779,7 @@ const runFuncshowGrid = async () => {
 
           const evaluated = eval(returnText);
           const safeVal = evaluated == "Infinity" ? 0 : evaluated;
-          if (isSignedDecimalColumn(item.strColID)) {
+          if (isDecimalInputColumn(item.strColID)) {
             return formatSignedDecimalFooterValue(
               grid,
               item.strColID,
@@ -1770,7 +1788,7 @@ const runFuncshowGrid = async () => {
           }
           return safeVal;
         } else {
-          return isSignedDecimalColumn(item.strColID)
+          return isDecimalInputColumn(item.strColID)
             ? formatSignedDecimalFooterValue(grid, item.strColID, value)
             : value;
         }
@@ -1871,7 +1889,7 @@ const runFuncshowGrid = async () => {
         : "setTextAlignRight",
       expression:
         props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)],
-      numberFormat: isSignedDecimalColumn(item.strColID)
+      numberFormat: isDecimalInputColumn(item.strColID)
         ? ""
         : item.strTotalexpr != ""
         ? item.strTotalexpr
@@ -2109,7 +2127,7 @@ const runFuncshowGrid = async () => {
 
           const evaluated = eval(returnText);
           const safeVal = evaluated == "Infinity" ? 0 : evaluated;
-          if (isSignedDecimalColumn(item.strColID)) {
+          if (isDecimalInputColumn(item.strColID)) {
             return formatSignedDecimalFooterValue(
               grid,
               item.strColID,
@@ -2118,7 +2136,7 @@ const runFuncshowGrid = async () => {
           }
           return safeVal;
         } else {
-          return isSignedDecimalColumn(item.strColID)
+          return isDecimalInputColumn(item.strColID)
             ? formatSignedDecimalFooterValue(grid, item.strColID, value)
             : value;
         }
@@ -2142,7 +2160,7 @@ const runFuncshowGrid = async () => {
       },
     }),
     width: item.intHdWidth,
-    numberFormat: isSignedDecimalColumn(item.strColID)
+    numberFormat: isDecimalInputColumn(item.strColID)
       ? signedDecimalNumberFormat
       : props.suffixColumnwon == "lngPrice" && item.strColID == "lngPrice"
       ? "#,##0"
@@ -2205,6 +2223,8 @@ const runFuncshowGrid = async () => {
         ? "dropdown"
         : item.strDisplay.includes("date")
         ? "date"
+        : isDecimalInputColumn(item.strColID)
+        ? "number"
         : "line",
       domainOnly: true,
       textReadOnly: false,
@@ -2235,10 +2255,17 @@ const runFuncshowGrid = async () => {
             }
           : null,
       commitOnSelect: true,
-      ...(isSignedDecimalColumn(item.strColID)
-        ? { editFormat: signedDecimalNumberFormat }
+      ...(isDecimalInputColumn(item.strColID)
+        ? {
+            editFormat: signedDecimalNumberFormat,
+            ...(isUnsignedDecimalColumn(item.strColID)
+              ? { positiveOnly: true }
+              : {}),
+          }
         : {}),
-      inputCharacters: isSignedDecimalColumn(item.strColID)
+      inputCharacters: isUnsignedDecimalColumn(item.strColID)
+        ? "0123456789."
+        : isSignedDecimalColumn(item.strColID)
         ? "0123456789.-"
         : props.inputOnlyNumberColumn
             .split(",")
@@ -3454,13 +3481,20 @@ const runFuncshowGrid = async () => {
 
     if (
       editedFieldName &&
-      isSignedDecimalColumn(editedFieldName) &&
+      isDecimalInputColumn(editedFieldName) &&
       newVal !== null &&
       newVal !== undefined &&
       newVal !== ""
     ) {
-      const rounded = roundSignedDecimal(newVal);
-      if (!Number.isNaN(Number(newVal)) && Number(newVal) !== rounded) {
+      let rounded = roundSignedDecimal(newVal);
+      if (
+        isUnsignedDecimalColumn(editedFieldName) &&
+        !Number.isNaN(Number(newVal)) &&
+        Number(newVal) < 0
+      ) {
+        rounded = 0;
+      }
+      if (!Number.isNaN(Number(newVal))) {
         dataProvider.setValue(row, editedFieldName, rounded);
         newVal = rounded;
       }

@@ -200,7 +200,7 @@
         :checkRowAuto2="false"
         @updatedRowData="updatedRowData"
         @allStateRows="allStateRows"
-        :inputOnlyNumberColumn="'dblTakeQty'"
+        :inputUnsignedDecimalColumn="'dblTakeQty'"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :exporttoExcel="exportExcel">
@@ -652,12 +652,29 @@ const saveButton = async () => {
  * 그리드 초기화
  */
 
+/** 파트 목록에서 기본값(전체) 코드 — API 목록 첫 항목이 전체인 경우 대비 */
+const resolveDefaultPartCode = (list) => {
+  const items = Array.isArray(list) ? list : [];
+  if (!items.length) return 0;
+  const byName = items.find(
+    (p) => String(p.strPartName ?? "").trim() === "전체"
+  );
+  if (byName != null) return byName.lngPartCode;
+  const byZero = items.find(
+    (p) => p.lngPartCode === 0 || p.lngPartCode === "0"
+  );
+  if (byZero != null) return byZero.lngPartCode;
+  return items[0].lngPartCode;
+};
+
 const initGrid = () => {
   rawRowData.value = [];
   if (rowData.value.length > 0) {
     rowData.value = [];
   }
   updatedrowdata.value = [];
+  allstaterows.value = [];
+  afterSearch.value = false;
 };
 
 //엑셀 버튼 처리 함수
@@ -693,8 +710,9 @@ const lngStoreCode = async (e) => {
     selectedStore.value
   );
 
-  optionList.value = res2.data.List;
-  afterSearch.value = false;
+  optionList.value = res2.data.List ?? [];
+  cond.value = resolveDefaultPartCode(optionList.value);
+  initGrid();
 };
 const selectedExcelStore = ref("");
 /**
@@ -725,7 +743,7 @@ const allStateRows = (e) => {
 
 const setCond = (e) => {
   cond.value = e.target.value;
-  afterSearch.value = false;
+  initGrid();
 };
 
 const deleteButton = async () => {
