@@ -3,16 +3,29 @@
     <header class="sa-head">
       <div class="sa-head-leading">
         <h1 class="sa-title">매출 분석</h1>
-        <span class="sa-period">{{ periodLabel }}</span>
+        <div class="sa-date-range" aria-label="조회 기간">
+          <input
+            v-model="selectedFromDate"
+            type="date"
+            class="sa-date-input"
+            :max="maxSelectableDate"
+            aria-label="조회 시작일" />
+          <span class="sa-date-sep" aria-hidden="true">~</span>
+          <input
+            v-model="selectedToDate"
+            type="date"
+            class="sa-date-input"
+            :max="maxSelectableDate"
+            aria-label="조회 종료일" />
+          <button type="button" class="sa-hd-btn sa-hd-btn--ghost" @click="onSearch">
+            조회
+          </button>
+        </div>
       </div>
       <div class="sa-head-btns">
         <span v-if="queryDateTimeText" class="sa-query-at" aria-label="데이터 조회 일시">
           조회일시 : {{ queryDateTimeText }}
         </span>
-        <button type="button" class="sa-hd-btn sa-hd-btn--ghost" @click="onRefresh">
-          <img class="sa-hd-btn__ic sa-hd-btn__ic--refresh" :src="saIconRefresh" width="16" height="16" alt="" />
-          새로고침
-        </button>
         <button type="button" class="sa-hd-btn sa-hd-btn--primary" @click="onExcel">
           <img class="sa-hd-btn__ic" :src="saIconExcel" width="16" height="16" alt="" />
           엑셀변환
@@ -149,7 +162,7 @@ import {
 } from "@/constants/salesAnalysisDashboardColumns.js";
 import saIconDetail from "@/assets/images/ic_move.svg";
 import saIconExcel from "@/assets/excel_icon.svg";
-import saIconRefresh from "@/assets/ic_refresh.svg";
+import Swal from "sweetalert2";
 import { utils, writeFile } from "xlsx-js-style";
 import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -165,10 +178,16 @@ const STORE_SALES_TOTAL_ROW_HIGHLIGHT = Object.freeze({
   values: ["합계"],
 });
 
-/** 표시 기간 문자열을 다시 그릴 때마다 증가 (한국 당일 기준 재계산) */
-const periodRefreshKey = ref(0);
 /** API 조회 완료 시점(Asia/Seoul `yyyy-mm-dd HH:mm`) — 미조회·스킵 시 빈 문자열 */
 const queryDateTimeText = ref("");
+
+const { FROM_DT: defaultFromDt, TO_DT: defaultToDt } = getSeoulMonthFromToYmdHyphen();
+/** 조회 조건 — 날짜 입력값 */
+const selectedFromDate = ref(defaultFromDt);
+const selectedToDate = ref(defaultToDt);
+/** 마지막 조회에 사용된 기간(엑셀·표시용) */
+const queriedFromDate = ref(defaultFromDt);
+const queriedToDate = ref(defaultToDt);
 
 /** 상세페이지 이동 — 일시 비활성, 클릭 시 툴팁만 표시 */
 let detailPrepTooltipTimer = null;
@@ -209,6 +228,25 @@ function getSeoulMonthFromToYmdHyphen() {
     FROM_DT: `${y}-${mo}-01`,
     TO_DT: `${y}-${mo}-${da}`,
   };
+}
+
+/** Asia/Seoul 당일 `yyyy-mm-dd` — 날짜 입력 max */
+function getSeoulTodayYmdHyphen() {
+  return getSeoulMonthFromToYmdHyphen().TO_DT;
+}
+
+/** `yyyy-mm-dd` → `m/d` 표시 */
+function formatYmdToMdSlash(ymd) {
+  const m = String(ymd ?? "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return String(ymd ?? "");
+  return `${Number(m[2])}/${Number(m[3])}`;
+}
+
+function isInvalidSalesDashDateRange(fromDt, toDt) {
+  const from = String(fromDt ?? "").trim();
+  const to = String(toDt ?? "").trim();
+  if (!from || !to) return true;
+  return from > to;
 }
 
 /** Asia/Seoul 기준 조회 완료 일시 `yyyy-mm-dd HH:mm` */
@@ -414,7 +452,8 @@ async function loadSalesAnalysisDashboardData() {
   store.dispatch("convertLoading", true);
   await nextTick();
 
-  const { FROM_DT, TO_DT } = getSeoulMonthFromToYmdHyphen();
+  const FROM_DT = String(selectedFromDate.value ?? "").trim();
+  const TO_DT = String(selectedToDate.value ?? "").trim();
   const groupCd = u.lngStoreGroup;
   const storeCd = resolveSalesDashStoreCd(u);
   const sequence = u.lngSequence;
@@ -451,6 +490,8 @@ async function loadSalesAnalysisDashboardData() {
   } finally {
     store.dispatch("convertLoading", false);
     queryDateTimeText.value = formatSalesDashQueryAtSeoul(new Date());
+    queriedFromDate.value = FROM_DT;
+    queriedToDate.value = TO_DT;
   }
 }
 
@@ -488,8 +529,16 @@ function scheduleDashGridReflow() {
 const SA_DASH_COL_MQ = "(max-width: 1280px)";
 let saDashMq = null;
 
-function onRefresh() {
-  periodRefreshKey.value += 1;
+function onSearch() {
+  if (isInvalidSalesDashDateRange(selectedFromDate.value, selectedToDate.value)) {
+    void Swal.fire({
+      title: "경고",
+      text: "조회 기간을 확인해 주십시오!",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   void loadSalesAnalysisDashboardData().finally(() => {
     emit("refresh");
     resetAllGridLayouts();
@@ -808,7 +857,8 @@ function onExcel() {
       return x;
     };
 
-    const { FROM_DT, TO_DT } = getSeoulMonthFromToYmdHyphen();
+    const FROM_DT = String(queriedFromDate.value ?? "").trim();
+    const TO_DT = String(queriedToDate.value ?? "").trim();
     const leftCols = Math.max(1, Math.floor(maxCols / 2));
     const bannerRow = 1;
     const topBanner = padTop([]);
@@ -911,11 +961,11 @@ function onGoSalesGoalRegister() {
   void router.push({ path: "/MISALES/SLS01_001INS.xml" }).catch(() => {});
 }
 
-const periodLabel = computed(() => {
-  periodRefreshKey.value;
-  const { m, d } = getSeoulYmd();
-  return `${m}/1 ~ ${m}/${d}`;
-});
+const maxSelectableDate = computed(() => getSeoulTodayYmdHyphen());
+
+const periodLabel = computed(
+  () => `${formatYmdToMdSlash(queriedFromDate.value)} ~ ${formatYmdToMdSlash(queriedToDate.value)}`
+);
 
 onMounted(() => {
   void loadSalesAnalysisDashboardData();
@@ -965,7 +1015,11 @@ defineExpose({
   /** @deprecated 동일 동작 — `loadSalesAnalysisDashboardData` 사용 */
   loadCustomerAndUnitPriceByStore: loadSalesAnalysisDashboardData,
   refreshPeriodLabel() {
-    periodRefreshKey.value += 1;
+    const { FROM_DT, TO_DT } = getSeoulMonthFromToYmdHyphen();
+    selectedFromDate.value = FROM_DT;
+    selectedToDate.value = TO_DT;
+    queriedFromDate.value = FROM_DT;
+    queriedToDate.value = TO_DT;
   },
 });
 </script>
@@ -1132,13 +1186,39 @@ defineExpose({
   letter-spacing: -0.02em;
 }
 
-.sa-period {
+.sa-date-range {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  min-width: 0;
+}
+
+.sa-date-input {
+  width: 9.25rem;
+  max-width: 100%;
+  height: 2rem;
+  padding: 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-deep, #1a3c70);
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sa-date-input:focus {
+  outline: none;
+  border-color: #5782ff;
+  box-shadow: 0 0 0 2px rgba(87, 130, 255, 0.2);
+}
+
+.sa-date-sep {
+  font-size: 14px;
   font-weight: 700;
   color: var(--primary-dark, #0063c0);
-  padding: 6px 14px;
-  background: var(--tint-200, #e8eef5);
-  border-radius: 8px;
-  font-size: 14px;
+  flex-shrink: 0;
 }
 
 /* 조회 완료 시각(Asia/Seoul) — 기간 배지와 톤 맞춤 */

@@ -5,10 +5,13 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
+  <div
+    class="mst003-page box-border flex h-full max-w-full min-h-0 flex-col gap-3 overflow-hidden pb-1">
   <!-- 조회조건  START-->
-  <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <div
+    class="flex shrink-0 flex-wrap items-center justify-between gap-3 overflow-y-hidden">
     <PageName></PageName>
-    <div class="flex justify-center mr-9 space-x-2 pr-5">
+    <div class="flex flex-wrap items-center justify-end gap-2 pr-5 mr-9">
       <button @click="searchButton" class="button search md:w-auto w-14">
         조회
       </button>
@@ -16,7 +19,6 @@
       <button @click="excelButton" class="button excel w-auto">엑셀</button>
     </div>
   </div>
-  <br />
   <div
     class="absolute z-50 inset-0 bg-black bg-opacity-50 w-full h-full"
     v-if="showPopUp">
@@ -98,81 +100,104 @@
           </div>
         </div>
         <div class="flex justify-end mt-2">
-          <button @click="closePopUp" class="whitebutton">닫기</button>
+          <button type="button" @click="closePopUp" class="whitebutton mst003-sub-btn">
+            닫기
+          </button>
         </div>
       </div>
     </div>
   </div>
   <div
-    class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore
-      @update:storeGroup="lngStoreGroup"
-      @update:storeCd="handleStoreCd"
-      @storeNm="handlestoreNm"
-      :hidesub="hidesub"
-      :hideAttr="hideAttr"
-      @update:ischanged="handleinitAll"
-      @update:ischanged2="searchinit"></PickStore>
+    class="z-10 w-full min-w-0 shrink-0 overflow-x-auto rounded-lg bg-gray-200 px-12 py-4">
+    <div class="mst003-search-grid min-w-0">
+      <div class="mst003-cell">
+        <span class="mst003-sg-label">매장명</span>
+        <div class="mst003-cell-field mst003-pick-slot min-w-0">
+          <PickStore
+            compactSearchBar
+            main-name="매장명"
+            @update:storeGroup="lngStoreGroup"
+            @update:storeCd="handleStoreCd"
+            @storeNm="handlestoreNm"
+            :hidesub="hidesub"
+            :hideAttr="hideAttr"
+            @update:ischanged="handleinitAll"
+            @update:ischanged2="searchinit"></PickStore>
+        </div>
+      </div>
+    </div>
   </div>
   <!-- 조회조건  END-->
   <!-- 그리드영역 -->
-  <div class="grid grid-rows-1 grid-cols-[3fr,5fr] h-[65vh] w-full">
-    <div class="flex flex-col w-full h-[55vh]">
+  <div
+    class="grid min-h-0 min-w-0 flex-1 grid-cols-1 gap-4 px-4 pb-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-6 lg:px-6">
+    <div class="flex min-h-0 min-w-0 flex-col">
       <div
-        class="flex justify-between mt-5 ml-10 w-full border-b border-b-gray-300">
-        <div class="flex justify-start font-bold text-xl">메뉴코드 목록</div>
-        <div class="mt-3 space-x-2">
-          <button class="whitebutton" @click="addRow" :disabled="!afterSearch">
+        class="mb-2 flex min-h-[2.75rem] flex-none items-center justify-between border-b border-gray-300 pb-2">
+        <h2 class="text-lg font-bold leading-none tracking-tight text-gray-900">
+          메뉴코드 목록
+        </h2>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            class="whitebutton mst003-sub-btn"
+            @click="addRow"
+            :disabled="!afterSearch">
             추가
           </button>
-          <button class="whitebutton" @click="deleteRow" :disabled="afterClick">
+          <button
+            type="button"
+            class="whitebutton mst003-sub-btn"
+            @click="deleteRow"
+            :disabled="afterClick">
             삭제
           </button>
         </div>
       </div>
 
-      <div class="mt-3 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full ml-10">
-        <div class="customtableIndex border border-gray-400 rounded-tl-lg">
-          메뉴분류
+      <div class="mst003-filter-stack mb-2 w-full min-w-0">
+        <div class="mst003-cell">
+          <span class="mst003-sg-label">메뉴분류</span>
+          <div class="mst003-cell-field mst003-dual-control flex min-w-0 gap-2">
+            <select
+              name="lngMainGroup"
+              id="mst003-search-main-group"
+              class="mst003-control min-w-0 flex-1"
+              @change="setSubCd"
+              v-model="forsearchMain">
+              <option value="-1">전체</option>
+              <option :value="i.GroupCd" v-for="i in MenuGroup">
+                [{{ i.GroupCd }}]{{ i.majorGroupNm }}
+              </option>
+            </select>
+            <select
+              name="lngSubGroup"
+              id="mst003-search-sub-group"
+              class="mst003-control min-w-0 flex-1"
+              v-model="forsearchSub"
+              @change="setSubCd">
+              <option value="-1">전체</option>
+              <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup">
+                [{{ i.GroupCd }}]{{ i.subGroupNm }}
+              </option>
+            </select>
+          </div>
         </div>
-        <div class="border border-gray-300 rounded-tr-lg flex p-1">
-          <select
-            name="lngMainGroup"
-            id=""
-            class="flex-1 border rounded-lg w-[80%] h-full"
-            @change="setSubCd"
-            v-model="forsearchMain">
-            <option value="-1">전체</option>
-            <option :value="i.GroupCd" v-for="i in MenuGroup">
-              [{{ i.GroupCd }}]{{ i.majorGroupNm }}
-            </option>
-          </select>
-          <select
-            name="lngSubGroup"
-            id=""
-            class="flex-1 border rounded-lg w-full h-full"
-            v-model="forsearchSub"
-            @change="setSubCd">
-            <option value="-1">전체</option>
-            <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup">
-              [{{ i.GroupCd }}]{{ i.subGroupNm }}
-            </option>
-          </select>
-        </div>
-        <div class="customtableIndex border border-gray-400 rounded-bl-lg">
-          메뉴명/코드
-        </div>
-        <div class="px-1 py-1 border border-gray-300 rounded-br-lg">
-          <input
-            type="text"
-            class="border w-full h-full px-1 border-gray-400 rounded-lg"
-            @input="searchMenuList"
-            v-model="searchWord" />
+        <div class="mst003-cell">
+          <span class="mst003-sg-label">메뉴명/코드</span>
+          <div class="mst003-cell-field min-w-0">
+            <input
+              type="text"
+              id="mst003-search-menu"
+              class="mst003-control w-full"
+              @input="searchMenuList"
+              v-model="searchWord" />
+          </div>
         </div>
       </div>
-      <div class="ml-10 mt-1 w-full h-[55vh]">
+      <div class="relative min-h-0 min-w-0 flex-1">
         <Realgrid
-          class="w-full h-[60vh]"
+          class="h-full w-full"
           :progname="'MST01_033INS_VUE'"
           :progid="1"
           :rowData="rowData"
@@ -215,44 +240,43 @@
     </div>
     <!-- 그리드영역 -->
     <!-- 탭영역 -->
-    <div class="grid grid-cols-1 grid-rows-[1fr,9fr] ml-20">
-      <div class="flex space-x-1 mt-10">
+    <div class="flex min-h-0 min-w-0 flex-col">
+      <div class="flex flex-none gap-1 border-b border-gray-300">
         <button
-          class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border"
+          class="contents_tab-button"
           @click="selectMenu(1)"
-          :class="{ 'text-blue-400 bg-blue-100': selectedMenu == 1 }">
+          :class="{ 'text-blue-600': selectedMenu == 1 }">
           상세정보
         </button>
         <button
-          class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border disabled:bg-gray-50 disabled:text-gray-200"
+          class="contents_tab-button disabled:bg-gray-50 disabled:text-gray-300"
           @click="selectMenu(2)"
-          :class="{ 'text-blue-400 bg-blue-100': selectedMenu == 2 }"
+          :class="{ 'text-blue-600': selectedMenu == 2 }"
           :disabled="discountDisabled || disableWithMenuDisc">
           할인선택
         </button>
         <button
-          class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border"
+          class="contents_tab-button disabled:bg-gray-50 disabled:text-gray-300"
           @click="selectMenu(3)"
-          :class="{ 'text-blue-400 bg-blue-100': selectedMenu == 3 }"
+          :class="{ 'text-blue-600': selectedMenu == 3 }"
           :disabled="selectedMultiple">
           이미지 설정
         </button>
       </div>
-      <div>
-        <hr class="w-[90%] mt-0" />
-        <div v-show="selectedMenu == 1" class="mt-3 h-[46%]">
-          <div class="font-bold flex justify-start text-xl">기본정보</div>
-          <div
-            class="grid grid-rows-7 grid-cols-[1fr,3fr,1fr,3fr] h-[70%] mt-3 w-[90%] border rounded-lg">
+      <div
+        class="mst003-detail-panel min-h-0 flex-1 overflow-x-hidden overflow-y-auto pr-1 pt-3">
+        <div v-show="selectedMenu == 1" class="min-w-0">
+          <div class="mst003-section-title">기본정보</div>
+          <div class="mst003-form-grid mt-3 w-full">
             <div
-              class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">
+              class="mst003-form-label mst003-form-label--required">
               *메뉴분류
             </div>
-            <div class="flex w-[236%]">
+            <div class="mst003-field-span3 mst003-form-value flex min-w-0 gap-2">
               <select
                 name="lngMainGroup"
                 id=""
-                class="flex border rounded-lg w-[95%] h-full disabled:bg-gray-100"
+                class="mst003-control min-w-0 flex-1 disabled:bg-gray-100"
                 @change="
                   (e) => {
                     setSubCd4();
@@ -269,7 +293,7 @@
               <select
                 name="lngSubGroup"
                 id=""
-                class="flex border rounded-lg w-[130%] h-full disabled:bg-gray-100"
+                class="mst003-control min-w-0 flex-1 disabled:bg-gray-100"
                 v-model="gridvalue2"
                 @change="changeInfo"
                 :disabled="afterClick">
@@ -279,21 +303,19 @@
                 </option>
               </select>
             </div>
-            <div class="w-0"></div>
-            <div class="w-0"></div>
             <div
-              class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">
+              class="mst003-form-label mst003-form-label--required">
               *메뉴코드
             </div>
-            <div class="justify-start items-center border flex">
+            <div class="mst003-form-value mst003-form-value--inline gap-2">
               <input
                 type="number"
                 name="lngCode"
-                class="justify-start rounded-lg items-center h-full w-[80%] border flex disabled:bg-gray-100"
+                class="mst003-control mst003-control--menu-code disabled:bg-gray-100"
                 :disabled="!isNew || isNewAutoMenuCode"
                 v-model="gridvalue3"
                 @input="changeInfo" />
-              <label for="autoMenuCode"
+              <label class="mst003-auto-check shrink-0" for="autoMenuCode"
                 ><input
                   type="checkbox"
                   id="autoMenuCode"
@@ -303,81 +325,71 @@
               >
             </div>
             <div
-              class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">
+              class="mst003-form-label mst003-form-label--required">
               *유효기간
             </div>
-            <div class="grid grid-rows-1 grid-cols-2">
-              <div
-                class="justify-center rounded-lg items-center h-full w-full border flex">
-                <input
-                  type="date"
-                  :disabled="afterClick"
-                  name="dtmFromDate"
-                  class="disabled:bg-gray-100 w-full h-full rounded-lg"
-                  v-model="gridvalue4"
-                  @input="changeInfo" />
-              </div>
-              <div
-                class="justify-center rounded-lg items-center h-full w-full border flex">
-                <input
-                  type="date"
-                  :disabled="afterClick"
-                  class="disabled:bg-gray-100 w-full h-full rounded-lg"
-                  name="dtmToDate"
-                  v-model="gridvalue5"
-                  @input="changeInfo" />
-              </div>
+            <div class="mst003-form-value mst003-dual-control flex min-w-0 gap-2">
+              <input
+                type="date"
+                :disabled="afterClick"
+                name="dtmFromDate"
+                class="mst003-control min-w-0 flex-1 disabled:bg-gray-100"
+                v-model="gridvalue4"
+                @input="changeInfo" />
+              <input
+                type="date"
+                :disabled="afterClick"
+                class="mst003-control min-w-0 flex-1 disabled:bg-gray-100"
+                name="dtmToDate"
+                v-model="gridvalue5"
+                @input="changeInfo" />
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              메뉴명
+            <div
+              class="mst003-form-label mst003-form-label--required">
+              *메뉴명
             </div>
-            <div class="grid grid-rows-1 grid-cols-[2.9fr,4fr] w-[236%] z-5">
-              <div
-                class="justify-center rounded-lg items-center h-full w-full border flex">
-                <span class="text-blue-500 font-bold text-start">*국문:</span
-                ><input
-                  type="text"
-                  class="ml-0 justify-center rounded-lg items-center h-full w-[87%] border flex disabled:bg-gray-100"
-                  :disabled="afterClick"
-                  v-model="gridvalue6"
-                  name="strName"
-                  @input="changeInfo" />
-              </div>
-              <div
-                class="justify-center rounded-lg items-center h-full w-[100%] border flex mr-28">
-                영문:
-                <input
-                  type="text"
-                  class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-100"
-                  :disabled="afterClick"
-                  v-model="gridvalue7"
-                  name="strNameE"
-                  @input="changeInfo" />
-              </div>
+            <div class="mst003-form-value">
+              <input
+                type="text"
+                class="mst003-control w-full disabled:bg-gray-100"
+                :disabled="afterClick"
+                v-model="gridvalue6"
+                name="strName"
+                @input="changeInfo" />
             </div>
-            <div class="w-0"></div>
-            <div class="w-0"></div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
+              메뉴명(영문)
+            </div>
+            <div class="mst003-form-value">
+              <input
+                type="text"
+                class="mst003-control w-full disabled:bg-gray-100"
+                :disabled="afterClick"
+                v-model="gridvalue7"
+                name="strNameE"
+                @input="changeInfo" />
+            </div>
+            <div class="mst003-form-label">
               정상단가
             </div>
-            <div>
+            <div class="mst003-form-value">
               <input
                 type="number"
                 name="lngDCPrice"
-                class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-100"
+                class="mst003-control w-full disabled:bg-gray-100"
                 :disabled="afterClick"
                 v-model="gridvalue8"
                 @input="changeInfo" />
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               옵션그룹선택
             </div>
-            <div>
+            <div class="mst003-form-value mst003-form-value--inline gap-2">
               <select
                 name="lngChain"
                 id=""
                 :disabled="afterClick"
-                class="disabled:bg-gray-100 border rounded-lg w-[50%] h-full p-1"
+                class="mst003-control min-w-0 flex-1 disabled:bg-gray-100"
                 v-model="gridvalue9"
                 @change="changeInfo">
                 <option value="">선택</option>
@@ -385,27 +397,30 @@
                   [{{ i.lngCode }}]{{ i.strName }}
                 </option>
               </select>
-              <button class="whitebutton" @click="moveOptionGroupPage">
+              <button
+                type="button"
+                class="whitebutton mst003-sub-btn shrink-0"
+                @click="moveOptionGroupPage">
                 옵션그룹 추가
               </button>
             </div>
             <div
-              class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">
+              class="mst003-form-label mst003-form-label--required">
               *판매가
             </div>
-            <div>
+            <div class="mst003-form-value">
               <input
                 type="text"
                 name="lngPrice"
-                class="justify-center rounded-lg items-center h-full w-full border flex disabled:bg-gray-100"
+                class="mst003-control w-full disabled:bg-gray-100"
                 :disabled="afterClick"
                 v-model="gridvalue10"
                 @input="changeInfo" />
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               정상단가할인표기
             </div>
-            <div class="space-x-5 flex items-center border justify-left pl-2">
+            <div class="mst003-form-value mst003-form-value--inline">
               <label for="disY"
                 ><input
                   type="radio"
@@ -430,15 +445,15 @@
                 name=""
                 id=""
                 :disabled="true"
-                class="border rounded-lg disabled:bg-gray-200 ml-10 h-[80%] w-[50%]">
+                class="mst003-control ml-2 min-w-0 flex-1 disabled:bg-gray-200">
                 <option value="">선택</option>
               </select>
             </div>
             <div
-              class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">
+              class="mst003-form-label mst003-form-label--required">
               *과세구분
             </div>
-            <div class="space-x-5 flex items-center border justify-left pl-2">
+            <div class="mst003-form-value mst003-form-value--inline">
               <label for="chargeY"
                 ><input
                   type="radio"
@@ -461,10 +476,10 @@
               >
             </div>
             <div
-              class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">
+              class="mst003-form-label mst003-form-label--required">
               *사용여부
             </div>
-            <div class="space-x-5 flex items-center border justify-left pl-2">
+            <div class="mst003-form-value mst003-form-value--inline">
               <label for="useY"
                 ><input
                   type="radio"
@@ -487,24 +502,23 @@
               >
             </div>
 
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               주방출력설정
             </div>
-            <div class="space-x-5 flex items-center border justify-left pl-2">
-              <button class="whitebutton" @click="movePage">
+            <div class="mst003-form-value mst003-form-value--inline">
+              <button type="button" class="whitebutton mst003-sub-btn" @click="movePage">
                 주방출력설정
               </button>
             </div>
           </div>
-          <div class="font-bold text-xl flex justify-start mt-5">부가정보</div>
-          <div
-            class="grid grid-cols-[1fr,3fr,1fr,3fr] grid-rows-13 h-[120%] mt-3 w-[90%]">
+          <div class="mst003-section-title mt-5">부가정보</div>
+          <div class="mst003-form-grid mt-3 w-full">
             <div
-              class="justify-center items-center bg-gray-100 border flex rounded-tl-lg">
+              class="mst003-form-label">
               {{ disableWithMenuDisc ? "할인허용" : "할인여부" }}
             </div>
             <div
-              class="space-x-5 flex items-center border justify-left pl-2"
+              class="mst003-form-value mst003-form-value--inline"
               v-if="!disableWithMenuDisc">
               <label for="discount1"
                 ><input
@@ -530,7 +544,7 @@
             </div>
 
             <div
-              class="space-x-5 flex items-center border justify-left"
+              class="mst003-form-value"
               v-if="disableWithMenuDisc">
               <input
                 type="text"
@@ -539,26 +553,26 @@
                 v-model="gridvalue40"
                 @input="changeInfo"
                 :disabled="afterClick"
-                class="disabled:bg-gray-200 w-full" />
+                class="mst003-control w-full disabled:bg-gray-200" />
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               메뉴당객수
             </div>
-            <div class="flex justify-center items-center">
+            <div class="mst003-form-value">
               <input
                 type="number"
                 name="intCustCount"
                 id=""
-                class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-100"
+                class="mst003-control w-full disabled:bg-gray-100"
                 v-model="gridvalue15"
                 @input="changeInfo"
                 :disabled="afterClick" />
             </div>
             <div
-              class="justify-center items-center bg-gray-100 border flex text-blue-500 font-bold">
+              class="mst003-form-label mst003-form-label--required">
               *주메뉴종속
             </div>
-            <div class="space-x-5 flex items-center border justify-left pl-2">
+            <div class="mst003-form-value mst003-form-value--inline">
               <label for="autopay1"
                 ><input
                   type="radio"
@@ -585,7 +599,7 @@
               <select
                 name="lngKPG"
                 id=""
-                class="border h-[80%] w-[60%] rounded-lg pl-1 disabled:bg-gray-200 ml-3"
+                class="mst003-control ml-2 min-w-0 flex-1 disabled:bg-gray-200"
                 :disabled="afterClick || gridvalue100 == 0"
                 v-model="gridvalue18"
                 @change="
@@ -598,23 +612,23 @@
                 </option>
               </select>
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               주문정렬순위
             </div>
-            <div class="flex justify-center items-center">
+            <div class="mst003-form-value">
               <input
                 type="number"
                 name="lngOrder"
                 id=""
-                class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-100"
+                class="mst003-control w-full disabled:bg-gray-100"
                 v-model="gridvalue17"
                 @input="changeInfo"
                 :disabled="afterClick" />
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               주방출력제외
             </div>
-            <div class="space-x-5 flex justify-left pl-2 items-center border">
+            <div class="mst003-form-value mst003-form-value--inline">
               <label for="openmoney1"
                 ><input
                   type="radio"
@@ -643,23 +657,23 @@
                   disabled />아니오</label
               >
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               바코드
             </div>
-            <div class="flex justify-center items-center">
+            <div class="mst003-form-value">
               <input
                 type="text"
                 name="strBarCode"
                 id=""
-                class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-100"
+                class="mst003-control w-full disabled:bg-gray-100"
                 v-model="gridvalue19"
                 @input="changeInfo"
                 :disabled="afterClick" />
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               영수증출력제외
             </div>
-            <div class="space-x-5 flex justify-left pl-2 items-center border">
+            <div class="mst003-form-value mst003-form-value--inline">
               <label for="receipt1"
                 ><input
                   type="radio"
@@ -682,14 +696,14 @@
                   class="disabled:bg-gray-200" />아니오</label
               >
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               메뉴주문옵션
             </div>
-            <div class="flex justify-center items-center">
+            <div class="mst003-form-value">
               <select
                 name="lngMenuOption"
                 id=""
-                class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst003-control w-full disabled:bg-gray-200"
                 v-model="gridvalue21"
                 @change="changeInfo"
                 :disabled="afterClick">
@@ -698,10 +712,10 @@
                 </option>
               </select>
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               주문서출력제외
             </div>
-            <div class="space-x-5 flex justify-left pl-2 items-center border">
+            <div class="mst003-form-value mst003-form-value--inline">
               <label for="discountfor1">
                 <input
                   type="radio"
@@ -725,14 +739,14 @@
                   class="disabled:bg-gray-200" />아니오
               </label>
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               메뉴옵션코드
             </div>
-            <div class="flex justify-center items-center">
+            <div class="mst003-form-value">
               <select
                 name="strIcon"
                 id=""
-                class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst003-control w-full disabled:bg-gray-200"
                 v-model="gridvalue23"
                 @change="changeInfo"
                 :disabled="afterClick">
@@ -742,10 +756,10 @@
                 </option>
               </select>
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               주방단품출력
             </div>
-            <div class="space-x-5 flex justify-left pl-2 items-center border">
+            <div class="mst003-form-value mst003-form-value--inline">
               <label for="allow1"
                 ><input
                   type="radio"
@@ -768,14 +782,14 @@
                   class="disabled:bg-gray-200" />비허용</label
               >
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               서브타이틀
             </div>
-            <div class="flex justify-center items-center">
+            <div class="mst003-form-value">
               <select
                 name="lngSubTitle"
                 id=""
-                class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst003-control w-full disabled:bg-gray-200"
                 :disabled="afterClick"
                 v-model="gridvalue25"
                 @change="changeInfo">
@@ -786,11 +800,10 @@
               </select>
             </div>
 
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               메뉴제공완료여부
             </div>
-            <div
-              class="space-x-5 flex justify-left pl-2 items-center border w-[233%]">
+            <div class="mst003-form-value mst003-form-value--inline">
               <label for="allow3"
                 ><input
                   type="radio"
@@ -813,25 +826,24 @@
                   class="disabled:bg-gray-200" />아니오</label
               >
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               KDS출력
             </div>
             <div
-              class="space-x-5 flex justify-left items-center border w-[100%]">
+              class="mst003-form-value mst003-form-value--inline">
               <input
                 type="text"
                 v-model="gridvalue38"
                 :disabled="afterClick"
                 name="lngKDS"
-                class="w-full rounded-lg border pl-1 h-full"
+                class="mst003-control w-full"
                 @input="onlyNumber" />
             </div>
             <div
-              class="justify-center items-center bg-gray-100 border flex rounded-bl-lg">
+              class="mst003-form-label">
               시세가적용
             </div>
-            <div
-              class="space-x-5 flex justify-left pl-2 items-center border w-[233%]">
+            <div class="mst003-form-value mst003-form-value--inline">
               <label for="allow5"
                 ><input
                   type="radio"
@@ -854,25 +866,24 @@
                   class="disabled:bg-gray-200" />아니오</label
               >
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               주방출력명
             </div>
             <div
-              class="space-x-5 flex justify-left items-center border w-[100%]">
+              class="mst003-form-value mst003-form-value--inline">
               <input
                 type="text"
                 v-model="gridvalue39"
                 :disabled="afterClick"
                 name="strNameK"
-                class="w-full rounded-lg border pl-1 h-full"
+                class="mst003-control w-full"
                 @input="changeInfo" />
             </div>
             <div
-              class="justify-center items-center bg-gray-100 border flex rounded-bl-lg">
+              class="mst003-form-label">
               배달메뉴
             </div>
-            <div
-              class="space-x-5 flex justify-left pl-2 items-center border w-[233%]">
+            <div class="mst003-form-value mst003-form-value--inline">
               <label for="allow7"
                 ><input
                   type="radio"
@@ -895,78 +906,73 @@
                   class="disabled:bg-gray-200" />아니오</label
               >
             </div>
-            <div class="w-0"></div>
-            <div class="w-0"></div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-grid-void" aria-hidden="true"></div>
+            <div class="mst003-grid-void" aria-hidden="true"></div>
+            <div class="mst003-form-label">
               영양소 정보
             </div>
-            <div class="flex justify-center items-center w-[233%]">
+            <div class="mst003-field-span3 mst003-form-value">
               <input
                 type="text"
                 name="strNutrInfo"
                 id=""
-                class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst003-control w-full disabled:bg-gray-200"
                 v-model="gridvalue29"
                 @input="changeInfo"
                 :disabled="afterClick" />
             </div>
-            <div class="w-0"></div>
-            <div class="w-0"></div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               원산지 정보
             </div>
-            <div class="flex justify-center items-center w-[233%]">
+            <div class="mst003-field-span3 mst003-form-value">
               <input
                 type="text"
                 name="strCntryOrg"
                 id=""
-                class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst003-control w-full disabled:bg-gray-200"
                 v-model="gridvalue30"
                 @input="changeInfo"
                 :disabled="afterClick" />
             </div>
-            <div class="w-0"></div>
-            <div class="w-0"></div>
-            <div class="justify-center items-center bg-gray-100 border flex">
+            <div class="mst003-form-label">
               메뉴설명
             </div>
-            <div class="flex justify-center items-center w-[100%] col-span-3">
+            <div class="mst003-field-span3 mst003-form-value">
               <input
                 type="text"
                 name="strMenuComment"
                 id=""
-                class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst003-control w-full disabled:bg-gray-200"
                 v-model="gridvalue31"
                 @input="changeInfo"
                 :disabled="afterClick" />
             </div>
             <div
-              class="flex justify-center items-center bg-gray-100 border-l border-b">
+              class="mst003-form-label">
               판매 시간대
             </div>
-            <div class="flex justify-start pl-2 items-center border-b">
+            <div class="mst003-form-value mst003-dual-control flex min-w-0 items-center gap-2">
               <input
                 type="time"
-                class="border border-black w-[40%] h-[80%]"
+                class="mst003-control min-w-0 flex-1"
                 v-model="gridvalue32"
                 name="dtmStart"
                 @change="changeInfo"
                 :disabled="afterClick" />
-              ~
+              <span class="shrink-0 text-sm text-gray-600">~</span>
               <input
                 type="time"
-                class="border border-black w-[40%] h-[80%]"
+                class="mst003-control min-w-0 flex-1"
                 v-model="gridvalue33"
                 name="dtmEnd"
                 @change="changeInfo"
                 :disabled="afterClick" />
             </div>
             <div
-              class="flex justify-center items-center bg-gray-100 border-l border-b">
+              class="mst003-form-label">
               판매일 설정
             </div>
-            <div
-              class="flex justify-start pl-2 space-x-2 items-center border-b border-r">
+            <div class="mst003-form-value mst003-form-value--inline">
               <label for="lngType1"
                 ><input
                   type="checkbox"
@@ -1006,13 +1012,13 @@
             </div>
 
             <div
-              class="flex justify-center items-center bg-gray-100 border-l border-b">
+              class="mst003-form-label">
               비고
             </div>
-            <div class="flex justify-start items-center border-b col-span-3">
+            <div class="mst003-field-span3 mst003-form-value">
               <input
                 type="text"
-                class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst003-control w-full disabled:bg-gray-200"
                 v-model="gridvalue41"
                 name="strBigo"
                 @change="changeInfo"
@@ -1020,29 +1026,28 @@
             </div>
           </div>
         </div>
-        <div v-show="selectedMenu == 2" class="h-[80%] w-[90%]">
-          <div class="flex justify-between mt-3 w-full">
-            <div class="font-bold text-xl">할인설정</div>
+        <div v-show="selectedMenu == 2" class="flex min-h-0 min-w-0 flex-col">
+          <div class="flex w-full items-center justify-between">
+            <div class="mst003-section-title mb-0">할인설정</div>
             <div>
-              <button class="whitebutton" @click="copyButton2">
+              <button type="button" class="whitebutton mst003-sub-btn" @click="copyButton2">
                 할인설정복사
               </button>
             </div>
           </div>
-          <div class="grid grid-rows-1 grid-cols-[1fr,3fr] mt-3">
-            <div class="customtableIndex border border-gray-400 rounded-l-lg">
-              결제코드/명
-            </div>
-            <div class="px-1 py-1 border border-gray-300 rounded-r-lg">
+          <div class="mst003-cell mt-3 w-full min-w-0">
+            <span class="mst003-sg-label">결제코드/명</span>
+            <div class="mst003-cell-field min-w-0">
               <input
                 type="text"
-                class="border w-full h-full px-1 border-gray-400 rounded-lg"
+                class="mst003-control w-full"
                 @input="searchPayCd"
                 v-model="searchWord2" />
             </div>
           </div>
+          <div class="relative mt-3 min-h-[240px] flex-1">
           <Realgrid
-            class="w-full h-full mt-5"
+            class="h-full w-full"
             @realgridname="realgridname"
             :progname="'MST01_033INS_VUE'"
             :progid="2"
@@ -1056,34 +1061,37 @@
             :hideCheckBarList="true"
             :rowStateeditable="false"
             :showTooltip="true"></Realgrid>
+          </div>
           <!-- :searchColId2="'majorGroupCd,subGroupCd'" :searchColId="'menuCd,menuNm'" :searchColValue2="searchColValue3" :searchWord="searchWord2" -->
         </div>
-        <div v-show="selectedMenu == 3" class="h-[90%] w-full">
-          <div
-            v-if="showImageGroupScopeControls"
-            class="grid grid-cols-[1fr,1fr,1fr,2fr] gap-2 items-center w-[80%] mt-3">
-            <div class="customtableIndex border border-gray-400 rounded-l-lg h-full">
-              공통 여부
+        <div v-show="selectedMenu == 3" class="min-w-0">
+          <div v-if="showImageGroupScopeControls" class="mst003-filter-stack mt-3 w-full min-w-0">
+            <div class="mst003-cell">
+              <span class="mst003-sg-label">공통 여부</span>
+              <div class="mst003-cell-field min-w-0">
+                <select v-model="imageScope" class="mst003-control w-full">
+                  <option value="COMMON">공통(그룹)</option>
+                  <option value="STORE">매장별</option>
+                </select>
+              </div>
             </div>
-            <select v-model="imageScope" class="border rounded-lg h-9 px-2">
-              <option value="COMMON">공통(그룹)</option>
-              <option value="STORE">매장별</option>
-            </select>
-            <div class="customtableIndex border border-gray-400 rounded-l-lg h-full">
-              저장 매장
+            <div class="mst003-cell">
+              <span class="mst003-sg-label">저장 매장</span>
+              <div class="mst003-cell-field mst003-vselect-slot min-w-0">
+                <v-select
+                  v-model="imageStoreCd"
+                  :options="imageStoreOptions"
+                  label="strName"
+                  placeholder="선택"
+                  class="custom-select2"
+                  :clearable="false"
+                  :disabled="imageScope !== 'STORE'"
+                  :reduce="(item) => String(item.lngStoreCode)" />
+              </div>
             </div>
-            <v-select
-              v-model="imageStoreCd"
-              :options="imageStoreOptions"
-              label="strName"
-              placeholder="선택"
-              class="custom-select2"
-              :clearable="false"
-              :disabled="imageScope !== 'STORE'"
-              :reduce="(item) => String(item.lngStoreCode)" />
           </div>
           <div
-            class="grid grid-rows-1 grid-cols-[2fr,3fr] w-[80%] h-[40%] mt-10 border pl-5 items-start">
+            class="mt-6 grid w-full min-w-0 grid-cols-1 items-start gap-6 rounded-lg border border-gray-300 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
             <div class="flex justify-center items-start w-full">
               <img
                 :src="`https://www.pncapi.kr/MenuImage/Image/${currentImageFileName}?v=${Date.now()}`"
@@ -1102,11 +1110,11 @@
                   class="border rounded-lg bg-gray-100 w-full"
                   disabled />
                 <!--
-                <button class="whitebutton" @click="downloadFile">
+                <button type="button" class="whitebutton mst003-sub-btn" @click="downloadFile">
                   다운로드
                 </button>
                 -->
-                  <label for="fileInput" class="whitebutton">
+                  <label for="fileInput" class="whitebutton mst003-sub-btn">
                     파일선택</label>
                   <input
                     id="fileInput"
@@ -1128,7 +1136,7 @@
                     disabled />
                   <button
                     type="button"
-                    class="whitebutton"
+                    class="whitebutton mst003-sub-btn"
                     @click="handleFileDelete">
                     파일삭제
                   </button>
@@ -1150,6 +1158,7 @@
         </div>
       </div>
     </div>
+  </div>
   </div>
   <!-- 탭영역 -->
 </template>
@@ -3019,4 +3028,534 @@ const excelButton = () => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.mst003-page {
+  --mst003-label-col: 7rem;
+  --mst003-item-gap: 0.75rem;
+  --mst003-control-border: #cbd5e1;
+  --mst003-control-focus-border: #3b82f6;
+  --mst003-control-h: 1.75rem;
+  --mst003-control-radius: 0.375rem;
+  --mst003-cell-py: 0.125rem;
+}
+
+.mst003-search-grid {
+  width: 100%;
+  min-width: 0;
+  --mst003-control-h: 2rem;
+}
+
+.mst003-search-grid .mst003-cell {
+  max-width: 52rem;
+}
+
+.mst003-filter-stack {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mst003-item-gap);
+}
+
+/* 메뉴분류 select — 메뉴명/코드 input과 동일 높이·체감 */
+.mst003-filter-stack input.mst003-control {
+  height: var(--mst003-control-h) !important;
+  min-height: var(--mst003-control-h) !important;
+  max-height: var(--mst003-control-h) !important;
+  box-sizing: border-box;
+  padding: 0 0.5rem !important;
+  font-size: 0.875rem !important;
+  line-height: calc(var(--mst003-control-h) - 2px) !important;
+}
+
+.mst003-filter-stack select.mst003-control {
+  height: var(--mst003-control-h) !important;
+  min-height: var(--mst003-control-h) !important;
+  max-height: var(--mst003-control-h) !important;
+  box-sizing: border-box;
+  padding: 0 1.75rem 0 0.5rem !important;
+  font-size: 0.875rem !important;
+  line-height: calc(var(--mst003-control-h) - 2px) !important;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='M3 4.5 6 7.5 9 4.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 0.75rem;
+}
+
+.mst003-filter-stack .mst003-dual-control {
+  align-items: stretch;
+  min-height: var(--mst003-control-h);
+}
+
+.mst003-filter-stack .mst003-dual-control select.mst003-control {
+  align-self: stretch;
+}
+
+.mst003-cell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--mst003-item-gap);
+}
+
+.mst003-sg-label {
+  flex: 0 0 var(--mst003-label-col);
+  width: var(--mst003-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+}
+
+.mst003-cell-field {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.mst003-cell-field:not(.mst003-dual-control):not(.mst003-vselect-slot) > * {
+  min-width: 0;
+  width: 100%;
+}
+
+.mst003-control {
+  box-sizing: border-box;
+  height: var(--mst003-control-h);
+  min-height: var(--mst003-control-h);
+  max-height: var(--mst003-control-h);
+  width: 100%;
+  min-width: 0;
+  border-radius: var(--mst003-control-radius);
+  border: 1px solid var(--mst003-control-border);
+  background: #fff;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.mst003-page select.mst003-control,
+.mst003-page input.mst003-control {
+  border: 1px solid var(--mst003-control-border) !important;
+  border-radius: var(--mst003-control-radius) !important;
+}
+
+.mst003-control:focus,
+.mst003-control:focus-visible {
+  border-color: var(--mst003-control-focus-border) !important;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+
+.mst003-control:disabled {
+  background: #f3f4f6;
+}
+
+.mst003-pick-slot :deep(> .flex) {
+  width: 100%;
+  min-width: 0;
+  margin-left: 0 !important;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem !important;
+}
+
+.mst003-pick-slot :deep(> .flex > div.shrink-0.font-semibold) {
+  display: none !important;
+}
+
+/* 상단 매장명: 그룹·속성·매장 = 3:4:5 */
+.mst003-pick-slot :deep(> .flex > div:has(#storeGroup)) {
+  flex: 3 1 0 !important;
+  min-width: 0;
+  width: auto !important;
+}
+
+.mst003-pick-slot :deep(#storeGroup) {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.mst003-pick-slot :deep(> .flex > div:has(> select:not(#storeGroup))) {
+  flex: 4 1 0 !important;
+  min-width: 0;
+  width: auto !important;
+}
+
+.mst003-pick-slot :deep(> .flex > div:has(> select:not(#storeGroup)) > select) {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.mst003-pick-slot :deep(> .flex > div:has(.pickstore-vs-shell)) {
+  flex: 5 1 0 !important;
+  min-width: 0;
+  max-width: none !important;
+  width: auto !important;
+}
+
+.mst003-pick-slot :deep(select) {
+  box-sizing: border-box;
+  height: var(--mst003-control-h) !important;
+  min-height: var(--mst003-control-h) !important;
+  max-height: var(--mst003-control-h) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border: 1px solid var(--mst003-control-border) !important;
+  border-radius: var(--mst003-control-radius) !important;
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.mst003-pick-slot :deep(select:focus) {
+  border-color: var(--mst003-control-focus-border) !important;
+}
+
+.mst003-pick-slot :deep(.pickstore-vs-shell:focus-within) {
+  border-color: var(--mst003-control-focus-border) !important;
+}
+
+.mst003-pick-slot :deep(.custom-select),
+.mst003-pick-slot :deep(.pickstore-vs-shell) {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  height: var(--mst003-control-h) !important;
+  min-height: var(--mst003-control-h) !important;
+  max-height: var(--mst003-control-h) !important;
+  border-radius: var(--mst003-control-radius) !important;
+  overflow: hidden;
+  border: 1px solid var(--mst003-control-border) !important;
+  box-sizing: border-box;
+}
+
+.mst003-pick-slot :deep(.custom-select .vs__dropdown-toggle),
+.mst003-pick-slot :deep(.pickstore-vs-shell .vs__dropdown-toggle) {
+  height: var(--mst003-control-h) !important;
+  min-height: var(--mst003-control-h) !important;
+  max-height: var(--mst003-control-h) !important;
+  padding: 0 0.375rem !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.mst003-pick-slot :deep(.pickstore-vs-shell .vs__dropdown-toggle:focus-within) {
+  box-shadow: none !important;
+}
+
+.mst003-pick-slot :deep(.vs__selected-options) {
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+.mst003-pick-slot :deep(.vs__selected) {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+.mst003-pick-slot :deep(.vs__search) {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+.mst003-vselect-slot :deep(.custom-select2) {
+  width: 100% !important;
+  min-width: 0 !important;
+  border-radius: var(--mst003-control-radius) !important;
+  overflow: hidden;
+}
+
+.mst003-vselect-slot :deep(.vs__dropdown-toggle) {
+  height: var(--mst003-control-h) !important;
+  min-height: var(--mst003-control-h) !important;
+  max-height: var(--mst003-control-h) !important;
+  padding: 0 0.375rem !important;
+  border: 1px solid var(--mst003-control-border) !important;
+  border-radius: var(--mst003-control-radius) !important;
+}
+
+.mst003-vselect-slot :deep(.vs__dropdown-toggle:focus-within) {
+  border-color: var(--mst003-control-focus-border) !important;
+}
+
+.mst003-vselect-slot :deep(.vs__selected-options),
+.mst003-vselect-slot :deep(.vs__selected),
+.mst003-vselect-slot :deep(.vs__search) {
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+.mst003-section-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  color: #111827;
+}
+
+.mst003-detail-panel {
+  /* 상세 탭 전용 — 기본 대비 약 7% 축소 */
+  --mst003-detail-control-h: 1.625rem;
+  --mst003-detail-font: 0.8125rem;
+  --mst003-detail-row-h: 2.5rem;
+  --mst003-detail-cell-py: 0.4375rem;
+  --mst003-detail-scrollbar-thumb: #1e40af;
+  --mst003-detail-scrollbar-thumb-hover: #1e3a8a;
+  --mst003-detail-scrollbar-track: #e8eef7;
+  scrollbar-width: auto;
+  scrollbar-color: var(--mst003-detail-scrollbar-thumb) var(--mst003-detail-scrollbar-track);
+}
+
+.mst003-detail-panel::-webkit-scrollbar {
+  width: 0.75rem;
+}
+
+.mst003-detail-panel::-webkit-scrollbar-track {
+  background: var(--mst003-detail-scrollbar-track);
+  border-radius: 0.375rem;
+}
+
+.mst003-detail-panel::-webkit-scrollbar-thumb {
+  background: var(--mst003-detail-scrollbar-thumb);
+  border-radius: 0.375rem;
+  border: 2px solid var(--mst003-detail-scrollbar-track);
+}
+
+.mst003-detail-panel::-webkit-scrollbar-thumb:hover {
+  background: var(--mst003-detail-scrollbar-thumb-hover);
+}
+
+.mst003-form-grid {
+  display: grid;
+  grid-template-columns: var(--mst003-label-col) minmax(0, 1fr) var(--mst003-label-col) minmax(
+      0,
+      1fr
+    );
+  grid-auto-rows: var(--mst003-detail-row-h, 2.5rem);
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+.mst003-detail-panel .mst003-form-grid > * {
+  box-sizing: border-box;
+  min-height: var(--mst003-detail-row-h);
+  align-self: stretch;
+}
+
+.mst003-form-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--mst003-detail-row-h, 2rem);
+  padding: var(--mst003-detail-cell-py, 0.1875rem) 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #edf2f7;
+  color: #5c5c5c;
+  font-size: var(--mst003-detail-font, 0.8125rem);
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  overflow: visible;
+  word-break: keep-all;
+}
+
+.mst003-form-label--required {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.mst003-form-value {
+  display: flex;
+  align-items: center;
+  min-height: var(--mst003-detail-row-h, 2rem);
+  min-width: 0;
+  padding: var(--mst003-detail-cell-py, 0.1875rem) 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  overflow: visible;
+}
+
+.mst003-form-value--inline {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.5rem 0.875rem;
+}
+
+.mst003-detail-panel .mst003-form-value--inline label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: var(--mst003-detail-font);
+  line-height: 1.25;
+  white-space: nowrap;
+  color: #374151;
+  flex-shrink: 0;
+}
+
+.mst003-detail-panel .mst003-form-value--inline input[type="radio"],
+.mst003-detail-panel .mst003-form-value--inline input[type="checkbox"] {
+  width: 0.875rem;
+  height: 0.875rem;
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.mst003-detail-panel .mst003-form-value--inline label:has(input[type="checkbox"]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: var(--mst003-detail-font);
+  line-height: 1.25;
+  white-space: nowrap;
+  color: #374151;
+  flex-shrink: 0;
+}
+
+.mst003-grid-void {
+  min-height: var(--mst003-detail-row-h, 2.5rem) !important;
+  padding: 0 !important;
+  margin: 0;
+  border: none !important;
+  background: transparent;
+  visibility: hidden;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.mst003-field-span3 {
+  grid-column: 2 / -1;
+  min-width: 0;
+}
+
+.mst003-inline-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.mst003-inline-field__label {
+  flex: 0 0 auto;
+  font-size: var(--mst003-detail-font, 0.8125rem);
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.mst003-detail-panel .mst003-form-grid .mst003-control--menu-code {
+  width: 7.8rem;
+  max-width: 7.8rem;
+  flex: 0 0 7.8rem;
+  min-width: 0;
+}
+
+.mst003-detail-panel .mst003-form-grid .mst003-auto-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: var(--mst003-detail-font);
+  line-height: 1.25;
+  white-space: nowrap;
+  color: #374151;
+}
+
+.mst003-detail-panel .mst003-form-grid .mst003-auto-check input[type="checkbox"] {
+  width: 0.875rem;
+  height: 0.875rem;
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.mst003-detail-panel .mst003-form-grid select.mst003-control,
+.mst003-detail-panel .mst003-form-grid .mst003-control,
+.mst003-detail-panel .mst003-form-grid input[type="date"].mst003-control,
+.mst003-detail-panel .mst003-form-grid input[type="time"].mst003-control {
+  border: 1px solid var(--mst003-control-border) !important;
+  border-radius: var(--mst003-control-radius) !important;
+}
+
+.mst003-detail-panel .mst003-form-grid .mst003-control:focus,
+.mst003-detail-panel .mst003-form-grid .mst003-control:focus-visible,
+.mst003-detail-panel .mst003-form-grid select.mst003-control:focus {
+  border-color: var(--mst003-control-focus-border) !important;
+}
+
+.mst003-detail-panel .mst003-form-grid .mst003-control,
+.mst003-detail-panel .mst003-form-grid .mst003-form-value select:not(.mst003-control),
+.mst003-detail-panel
+  .mst003-form-grid
+  .mst003-form-value
+  input:not([type="radio"]):not([type="checkbox"]):not(.mst003-control),
+.mst003-detail-panel .mst003-form-grid .mst003-field-span3 .mst003-control,
+.mst003-detail-panel .mst003-form-grid .mst003-field-span3 select:not(.mst003-control) {
+  height: var(--mst003-detail-control-h);
+  min-height: var(--mst003-detail-control-h);
+  max-height: var(--mst003-detail-control-h);
+  font-size: var(--mst003-detail-font);
+  line-height: 1.2;
+}
+
+.mst003-detail-panel .mst003-form-grid input[type="date"],
+.mst003-detail-panel .mst003-form-grid input[type="time"] {
+  height: var(--mst003-detail-control-h);
+  min-height: var(--mst003-detail-control-h);
+  max-height: var(--mst003-detail-control-h);
+  font-size: var(--mst003-detail-font);
+  line-height: 1.2;
+}
+
+/* 보조버튼 스타일 — 상단 button search/save/excel(메인)과 구분되는 화면 내 보조 액션 */
+.mst003-sub-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  padding: 0 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: #374151;
+  border: 1px solid #6b7280;
+  border-radius: 0.375rem;
+  background: #fff;
+}
+
+.mst003-sub-btn:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: #60a5fa;
+  color: #1d4ed8;
+}
+
+.mst003-sub-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mst003-detail-panel .mst003-form-grid .mst003-sub-btn {
+  font-size: var(--mst003-detail-font);
+}
+</style>
