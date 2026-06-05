@@ -5,9 +5,9 @@
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+    <div
+      class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
@@ -19,141 +19,175 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-3 grid-rows-3 bg-gray-200 rounded-lg h-36 items-start z-10">
-      <div class="justify-start flex ml-24 space-x-5 mt-2 items-center">
-        <DatePicker4 @month="month" @year="year"></DatePicker4>
-      </div>
-      <div class="flex justify-start items-center !-ml-5">
-        <PickStore
-          @update:storeGroup="lngStoreGroup"
-          :defaultStoreNm="'전체'"
-          class=""
-          :hideGroup="false"
-          :hideAttr="false"
-          @storeNm="excelStore"
-          @update:storeCd="lngStoreCode"></PickStore>
-      </div>
-      <div class="flex justify-start items-center mt-2 ml-20 space-x-5">
-        <div class="text-base font-semibold">파트</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="border border-black w-32 h-8"
-            v-model="cond">
-            <option :value="i.lngPartCode" v-for="i in optionList6">
-              {{ i.strPartName }}
-            </option>
-          </select>
+      class="z-10 mt-3 w-full min-w-0 shrink-0 overflow-x-auto rounded-lg bg-gray-200 px-8 py-3 md:px-12">
+      <div
+        class="stk08019-search-grid min-w-0"
+        :style="{
+          '--stk08019-control-border': stk08019ControlBorder,
+          '--stk08019-item-gap': stk08019ItemGap,
+        }">
+        <div class="stk08019-cell">
+          <div class="stk08019-sg-label">마감월</div>
+          <div class="stk08019-cell-field stk08019-month-slot min-w-0">
+            <DatePicker4
+              main-name=""
+              @month="month"
+              @year="year" />
+          </div>
         </div>
-      </div>
-      <div class="flex justify-start pl-20 items-center mt-2 space-x-5">
-        <div class="text-base font-semibold">자재분류</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="w-64 h-8 border border-black"
-            v-model="cond2">
-            <option value="0">전체</option>
-            <option :value="i.lngDetail" v-for="i in optionList">
-              {{ i.strDetail }}
-            </option>
-          </select>
+        <div class="stk08019-cell">
+          <div class="stk08019-sg-label">매장</div>
+          <div class="stk08019-cell-field stk08019-pick-slot min-w-0">
+            <PickStore
+              compact-search-bar
+              :main-name="''"
+              @update:storeGroup="lngStoreGroup"
+              :defaultStoreNm="'전체'"
+              :hideGroup="false"
+              :hideAttr="false"
+              @storeNm="excelStore"
+              @update:storeCd="lngStoreCode" />
+          </div>
         </div>
-      </div>
+        <div class="stk08019-cell">
+          <div class="stk08019-sg-label">파트</div>
+          <div class="stk08019-cell-field min-w-0">
+            <select
+              id="stk08-019-cond-part"
+              v-model="cond"
+              class="stk08019-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option
+                v-for="i in optionList6"
+                :key="i.lngPartCode"
+                :value="i.lngPartCode">
+                {{ i.strPartName }}
+              </option>
+            </select>
+          </div>
+        </div>
 
-      <div class="flex space-x-5 ml-4 mt-3 items-center">
-        <div class="font-semibold text-base">자재그룹</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="w-64 h-8 border border-black"
-            v-model="cond3">
-            <option value="0">전체</option>
-            <option :value="i.lngStockGroupID" v-for="i in optionList2">
-              {{ i.strStockGroupName }}
-            </option>
-          </select>
+        <div class="stk08019-cell">
+          <div class="stk08019-sg-label">자재분류</div>
+          <div class="stk08019-cell-field min-w-0">
+            <select
+              id="stk08-019-cond-category"
+              v-model="cond2"
+              class="stk08019-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="0">전체</option>
+              <option
+                v-for="i in optionList"
+                :key="i.lngDetail"
+                :value="i.lngDetail">
+                {{ i.strDetail }}
+              </option>
+            </select>
+          </div>
         </div>
-      </div>
-      <div class="flex space-x-5 ml-12 mt-3 items-center">
-        <div class="text-base font-semibold">자재특성</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="w-64 h-8 border border-black"
-            v-model="cond4">
-            <option value="0">전체</option>
-            <option :value="i.lngGenericID" v-for="i in optionList3">
-              {{ i.strGenericName }}
-            </option>
-          </select>
+        <div class="stk08019-cell">
+          <div class="stk08019-sg-label">자재그룹</div>
+          <div class="stk08019-cell-field min-w-0">
+            <select
+              id="stk08-019-cond-stock-group"
+              v-model="cond3"
+              class="stk08019-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="0">전체</option>
+              <option
+                v-for="i in optionList2"
+                :key="i.lngStockGroupID"
+                :value="i.lngStockGroupID">
+                {{ i.strStockGroupName }}
+              </option>
+            </select>
+          </div>
         </div>
-      </div>
-      <div class="flex space-x-5 ml-12 mt-3 items-center">
-        <div class="font-semibold text-base text-nowrap">자재코드/이름</div>
-        <div class="flex space-x-0">
-          <input
-            type="text"
-            class="h-8 w-[47%] border border-black"
-            v-model="cond5" />
+        <div class="stk08019-cell">
+          <div class="stk08019-sg-label">자재특성</div>
+          <div class="stk08019-cell-field min-w-0">
+            <select
+              id="stk08-019-cond-generic"
+              v-model="cond4"
+              class="stk08019-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="0">전체</option>
+              <option
+                v-for="i in optionList3"
+                :key="i.lngGenericID"
+                :value="i.lngGenericID">
+                {{ i.strGenericName }}
+              </option>
+            </select>
+          </div>
+        </div>
 
-          <input
-            type="text"
-            class="h-8 w-[47%] border border-black"
-            v-model="cond6" />
+        <div class="stk08019-cell">
+          <div class="stk08019-sg-label">자재코드/명</div>
+          <div
+            class="stk08019-cell-field stk08019-dual-input flex min-h-8 min-w-0 flex-nowrap items-center gap-2">
+            <input
+              id="stk08-019-stock-id"
+              v-model="cond5"
+              type="text"
+              autocomplete="off"
+              placeholder="자재코드"
+              class="stk08019-input stk08019-input--code h-8 min-h-8 min-w-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-700" />
+            <input
+              id="stk08-019-stock-name"
+              v-model="cond6"
+              type="text"
+              autocomplete="off"
+              placeholder="자재명"
+              class="stk08019-input stk08019-input--name h-8 min-h-8 min-w-0 rounded-md border border-solid bg-white px-2 text-sm text-gray-700" />
+          </div>
+        </div>
+        <div class="stk08019-cell">
+          <div class="stk08019-sg-label">단위</div>
+          <div class="stk08019-cell-field min-w-0">
+            <select
+              id="stk08-019-cond-unit"
+              v-model="cond7"
+              class="stk08019-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option
+                v-for="i in optionList4"
+                :key="i.strDCode"
+                :value="i.strDCode">
+                {{ i.strDName }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="stk08019-cell">
+          <div class="stk08019-sg-label">단가</div>
+          <div class="stk08019-cell-field min-w-0">
+            <select
+              id="stk08-019-cond-price"
+              v-model="cond8"
+              class="stk08019-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option
+                v-for="i in optionList5"
+                :key="i.strDCode"
+                :value="i.strDCode">
+                {{ i.strDName }}
+              </option>
+            </select>
+          </div>
         </div>
       </div>
-
-      <div class="flex ml-10 pl-1 items-center mt-3 space-x-5">
-        <div class="text-base font-semibold">단위</div>
-        <div class="flex space-x-4">
-          <select
-            name=""
-            id=""
-            class="border border-black w-64 h-8"
-            v-model="cond7">
-            <option :value="i.strDCode" v-for="i in optionList4">
-              {{ i.strDName }}
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <div class="flex ml-20 items-center mt-3 space-x-5">
-        <div class="text-base font-semibold">단가</div>
-        <div class="flex space-x-4">
-          <select
-            name=""
-            id=""
-            class="border border-black w-[130%] h-8"
-            v-model="cond8">
-            <option :value="i.strDCode" v-for="i in optionList5">
-              {{ i.strDName }}
-            </option>
-          </select>
-        </div>
-        <div>
-          <label for="cond9"
-            ><input
-              type="checkbox"
-              id="cond9"
-              @change="setCond9" />전체보기</label
-          >
-        </div>
+      <div
+        class="stk08019-footer mt-2 flex min-w-0 flex-nowrap items-center justify-between gap-4">
+        <p class="min-w-0 text-sm font-semibold text-red-500">
+          ※사용량 = 기초 + 입고(매입 + 매장간입고) - 출고(손실 + 매장간출고) -
+          실사
+        </p>
+        <label
+          for="stk08-019-cond-all"
+          class="flex shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap text-sm font-semibold text-gray-900">
+          <input id="stk08-019-cond-all" v-model="cond9" type="checkbox" />
+          전체보기
+        </label>
       </div>
     </div>
-    <!-- 조회조건 -->
-    <!-- 그리드 영역 -->
-    <div class="w-full h-[70vh]">
-      <div class="text-red-500">
-        ※사용량 = 기초 + 입고(매입 + 매장간입고) - 출고(손실 + 매장간출고) -
-        실사
-      </div>
-      <Realgrid
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <div class="relative h-full min-h-0 min-w-0 flex-1">
+        <Realgrid
         :progname="'STK08_019RPT_VUE'"
         :progid="1"
         :rowData="rowData"
@@ -162,6 +196,7 @@
         :mergeColumnGroupName2="[
           '기초재고',
           '매입',
+          '반품',
           '매장간입고',
           '입고계',
           '손실',
@@ -174,6 +209,7 @@
           ['dblInitQty', 'curInitCost'],
           ['dblCheckQty', 'curCheckCost'],
           ['dblReturnQty', 'curReturnCost'],
+          ['dblStoreMoveInQty', 'curStoreMoveInCost'],
           ['dblInTotQty', 'curInTotCost'],
           ['dblLossQty', 'curLossCost'],
           ['dblStoreMoveOutQty', 'curStoreMoveOutCost'],
@@ -181,7 +217,7 @@
           ['dblTakeQty', 'curTakeCost'],
           ['dblUsageQty', 'curUsageCost'],
         ]"
-        :headerColors="['', '', '', 'green', '', '', 'green', '', 'red']"
+        :headerColors="['', '', '', '', 'green', '', '', 'green', '', 'red']"
         :mergeColumns2="true"
         :documentTitle="'STK08_019RPT'"
         @clickedRowData="clickedRowData"
@@ -191,9 +227,9 @@
         :rowStateeditable="false"
         :exporttoExcel="exportExcel">
       </Realgrid>
+      </div>
     </div>
   </div>
-  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
@@ -298,6 +334,9 @@ const cond8 = ref("03");
 
 const store = useStore();
 
+const stk08019ControlBorder = "#cbd5e1";
+const stk08019ItemGap = "0.75rem";
+
 const datepicker = ref(null);
 const closePopUp = ref(false);
 const optionList = ref([]);
@@ -368,7 +407,31 @@ const SupplierId = (e) => {
 /**
  *  조회 함수
  */
-const hideColumnsId = ref([]);
+const toStk08019Num = (v) => {
+  if (v === undefined || v === null || v === "") return 0;
+  const n = Number(String(v).replace(/,/g, ""));
+  return Number.isFinite(n) ? n : 0;
+};
+
+/** 매장간입고·입고계(매입+매장간입고) 행 매핑 */
+const mapStk08019GridRow = (row) => {
+  if (!row || typeof row !== "object") return row;
+  const dblCheckQty = toStk08019Num(row.dblCheckQty);
+  const curCheckCost = toStk08019Num(row.curCheckCost);
+  const dblStoreMoveInQty = toStk08019Num(row.dblStoreMoveInQty);
+  const curStoreMoveInCost = toStk08019Num(row.curStoreMoveInCost);
+  return {
+    ...row,
+    dblStoreMoveInQty,
+    curStoreMoveInCost,
+    dblInTotQty: dblCheckQty + dblStoreMoveInQty,
+    curInTotCost: curCheckCost + curStoreMoveInCost,
+  };
+};
+
+const mapStk08019GridList = (list) =>
+  Array.isArray(list) ? list.map((row) => mapStk08019GridRow(row)) : [];
+
 const searchButton = async () => {
   try {
     store.state.loading = true;
@@ -391,7 +454,7 @@ const searchButton = async () => {
       "M"
     );
 
-    rowData.value = res.data.List;
+    rowData.value = mapStk08019GridList(res.data.List);
     console.log(res);
     afterSearch.value = true;
   } catch (error) {
@@ -456,9 +519,6 @@ const excelList = (e) => {
 };
 
 const cond9 = ref(false);
-const setCond9 = (e) => {
-  cond9.value = e.target.checked;
-};
 
 const selectedYear = ref("");
 const year = (e) => {
@@ -470,3 +530,258 @@ const month = (e) => {
   selectedMonth.value = e;
 };
 </script>
+
+<style scoped>
+.stk08019-search-grid {
+  --stk08019-label-col: 7rem;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--stk08019-item-gap);
+  row-gap: var(--stk08019-item-gap);
+}
+
+.stk08019-cell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--stk08019-item-gap);
+}
+
+.stk08019-sg-label {
+  flex: 0 0 var(--stk08019-label-col);
+  width: var(--stk08019-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+}
+
+.stk08019-cell-field {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.stk08019-cell-field:not(.stk08019-dual-input) > * {
+  min-width: 0;
+  width: 100%;
+}
+
+.stk08019-dual-input {
+  width: 100%;
+}
+
+.stk08019-search-grid select.stk08019-select,
+.stk08019-search-grid input.stk08019-input {
+  box-sizing: border-box;
+  border: 1px solid var(--stk08019-control-border) !important;
+}
+
+.stk08019-search-grid select.stk08019-select:focus,
+.stk08019-search-grid input.stk08019-input:focus {
+  border-color: #3b82f6 !important;
+  outline: none;
+}
+
+.stk08019-search-grid input.stk08019-input::placeholder {
+  color: rgb(156 163 175);
+}
+
+.stk08019-input--code {
+  flex: 0 1 38%;
+  max-width: 9rem;
+}
+
+.stk08019-input--name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.stk08019-cell-field.stk08019-month-slot {
+  justify-content: flex-start;
+}
+
+.stk08019-month-slot :deep(.flex.space-x-5) {
+  margin-top: 0 !important;
+  margin-left: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 2rem;
+  gap: 0.5rem !important;
+}
+
+/* DatePicker4 내부 라벨·space-x-5 여백 제거 → 아래 행 입력 왼쪽선 정렬 */
+.stk08019-month-slot :deep(.flex.space-x-5 > *) {
+  margin-left: 0 !important;
+  margin-inline-start: 0 !important;
+}
+
+.stk08019-month-slot :deep(.flex.space-x-5 > div:first-child) {
+  display: none !important;
+  width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+/* 셀 너비 기준 년 30% · 월 20% (합 50%) */
+.stk08019-month-slot :deep(.flex.space-x-5 > div:nth-child(2)) {
+  flex: 0 0 30%;
+  width: 30%;
+  max-width: 30%;
+  min-width: 0;
+}
+
+.stk08019-month-slot :deep(.flex.space-x-5 > div:nth-child(3)) {
+  flex: 0 0 20%;
+  width: 20%;
+  max-width: 20%;
+  min-width: 0;
+}
+
+.stk08019-month-slot :deep(select) {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  height: 2rem;
+  min-height: 2rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--stk08019-control-border) !important;
+  background: #fff;
+  font-size: 0.875rem;
+  color: rgb(55 65 81);
+}
+
+.stk08019-month-slot :deep(select:focus) {
+  border-color: #3b82f6 !important;
+  outline: none;
+}
+
+.stk08019-pick-slot :deep(> div.flex) {
+  width: 100%;
+  min-width: 0;
+  gap: var(--stk08019-item-gap) !important;
+}
+
+/* 외부 라벨(매장) 사용 — PickStore 기본 '매장명' 텍스트 숨김 */
+.stk08019-pick-slot :deep(> div.flex > div:first-child) {
+  display: none !important;
+  width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.stk08019-pick-slot :deep(> div.flex > div.relative) {
+  flex: 1 1 auto !important;
+  max-width: 100% !important;
+}
+
+.stk08019-pick-slot :deep(> div.flex > div) {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.stk08019-pick-slot :deep(select) {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 2rem;
+  min-height: 2rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--stk08019-control-border) !important;
+  background: #fff;
+  font-size: 0.875rem;
+  color: rgb(55 65 81);
+}
+
+.stk08019-pick-slot :deep(select:focus) {
+  border-color: #3b82f6 !important;
+  outline: none;
+}
+
+/* compact PickStore — 셸(border-gray-800)을 다른 콤보와 동일하게 */
+.stk08019-pick-slot :deep(.pickstore-vs-shell) {
+  box-sizing: border-box;
+  height: 2rem !important;
+  min-height: 2rem !important;
+  max-height: 2rem !important;
+  border: 1px solid var(--stk08019-control-border) !important;
+  border-radius: 0.375rem !important;
+  background: #fff;
+}
+
+.stk08019-pick-slot :deep(.pickstore-vs-shell:focus-within),
+.stk08019-pick-slot :deep(.pickstore-vs-shell:has(.vs--open)) {
+  border-color: #3b82f6 !important;
+}
+
+.stk08019-pick-slot :deep(.pickstore-vs-shell .style-chooser) {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.stk08019-pick-slot :deep(.pickstore-vs-shell .style-chooser .vs__dropdown-toggle) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.stk08019-pick-slot :deep(.pickstore-vs-shell .vs__selected-options) {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 0 0 0.5rem !important;
+}
+
+/* pickStore .vs__selected absolute+width100% 가 X(지우기) 버튼을 덮음 */
+.stk08019-pick-slot :deep(.pickstore-vs-shell .vs__selected) {
+  position: static !important;
+  width: auto !important;
+  max-width: 100% !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem;
+  color: rgb(55 65 81);
+}
+
+.stk08019-pick-slot :deep(.pickstore-vs-shell .vs__search) {
+  font-size: 0.875rem !important;
+  line-height: 1.25rem;
+  color: rgb(55 65 81);
+}
+
+.stk08019-pick-slot :deep(.pickstore-vs-shell .vs__actions) {
+  flex-shrink: 0;
+  display: flex !important;
+  align-items: center;
+  padding-right: 0.25rem;
+}
+
+.stk08019-pick-slot :deep(.pickstore-vs-shell .vs__clear),
+.stk08019-pick-slot :deep(.pickstore-vs-shell .vs__open-indicator) {
+  display: flex !important;
+}
+</style>

@@ -1232,6 +1232,23 @@ const props = defineProps({
   },
 });
 
+/** DataSource.getValue — 필드 미정의 시 fieldIndex -1 런타임 오류 방지 */
+const rgSafeDataSourceGetValue = (ds, dataRow, fieldName) => {
+  const fn = String(fieldName ?? "").trim();
+  if (!ds || !fn || dataRow == null || (typeof dataRow === "number" && dataRow < 0)) {
+    return undefined;
+  }
+  try {
+    if (typeof ds.getFieldIndex === "function") {
+      const idx = ds.getFieldIndex(fn);
+      if (typeof idx === "number" && idx < 0) return undefined;
+    }
+    return ds.getValue(dataRow, fn);
+  } catch {
+    return undefined;
+  }
+};
+
 /** 체크 조건값 — 콤마 구분이면 토큰 단위 일치, 아니면 전체 문자열과만 일치 (`'미확정'.includes('확정')` 오탐 방지) */
 const rgCheckAbleValMatches = (valSpec, cellValue) => {
   const raw =
@@ -1625,6 +1642,15 @@ const runFuncshowGrid = async () => {
     if (props.addField == "new") {
       fields.push({ fieldName: "new", dataType: "boolean" });
     }
+  }
+
+  for (const extraField of [
+    props.checkAbleExpressionCol2,
+    props.checkAbleExpressionCol3,
+  ]) {
+    const fn = String(extraField ?? "").trim();
+    if (!fn || fields.some((f) => f.fieldName === fn)) continue;
+    fields.push({ fieldName: fn, dataType: "text" });
   }
 
   if (
@@ -2075,8 +2101,17 @@ const runFuncshowGrid = async () => {
         let tokens = [];
         let match;
 
-        if (item.strTotalSumtext != "" && item.strTotalSumtext != "N") {
-          while ((match = regex.exec(item.strTotalSumtext)) !== null) {
+        const footerOverrideIdx = props.setFooterColID.indexOf(item.strColID);
+        let totalSumtext = item.strTotalSumtext;
+        if (
+          footerOverrideIdx !== -1 &&
+          props.setFooterExpressions[footerOverrideIdx] === "sum"
+        ) {
+          totalSumtext = `sum(${item.strColID})`;
+        }
+
+        if (totalSumtext != "" && totalSumtext != "N") {
+          while ((match = regex.exec(totalSumtext)) !== null) {
             if (match[1]) {
               // 함수 호출 패턴에 매칭된 경우
               tokens.push({
@@ -2353,7 +2388,16 @@ const runFuncshowGrid = async () => {
                   },
                 };
               }
-              const blnChk = ds.getValue(dr, c2);
+              const blnChk = rgSafeDataSourceGetValue(ds, dr, c2);
+              if (blnChk === undefined) {
+                return {
+                  editable: props.rowStateeditable,
+                  renderer: {
+                    type: "check",
+                    editable: true,
+                  },
+                };
+              }
 
               if (rgCheckAbleValMatches(props.checkAbleExpressionVal, blnChk)) {
                 return {
@@ -2385,7 +2429,16 @@ const runFuncshowGrid = async () => {
                   },
                 };
               }
-              const blnChk = ds.getValue(dr, c3);
+              const blnChk = rgSafeDataSourceGetValue(ds, dr, c3);
+              if (blnChk === undefined) {
+                return {
+                  editable: props.rowStateeditable,
+                  renderer: {
+                    type: "check",
+                    editable: true,
+                  },
+                };
+              }
 
               if (rgCheckAbleValMatches(props.checkAbleExpressionVal2, blnChk)) {
                 return {
@@ -2417,7 +2470,16 @@ const runFuncshowGrid = async () => {
                   },
                 };
               }
-              const blnChk = ds.getValue(dr, c2b);
+              const blnChk = rgSafeDataSourceGetValue(ds, dr, c2b);
+              if (blnChk === undefined) {
+                return {
+                  editable: props.rowStateeditable,
+                  renderer: {
+                    type: "check",
+                    editable: true,
+                  },
+                };
+              }
 
               if (blnChk != props.checkAbleExpressionVal) {
                 return {
@@ -2679,11 +2741,16 @@ const runFuncshowGrid = async () => {
   }
 
   if (props.setNumberformatColumn != "") {
-    let formatcolumn = columns.find(
-      (item) => item.fieldName == props.setNumberformatColumn
-    );
-    if (formatcolumn) {
-      formatcolumn.numberFormat = "#,##0.00";
+    const fmtIds = String(props.setNumberformatColumn)
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const qtyFmt = "#,##0.00";
+    for (const fmtId of fmtIds) {
+      const formatcolumn = columns.find((item) => item.fieldName == fmtId);
+      if (formatcolumn) {
+        formatcolumn.numberFormat = qtyFmt;
+      }
     }
   }
 
@@ -2724,6 +2791,21 @@ const runFuncshowGrid = async () => {
   }
 
   gridView.setColumns(columns);
+  if (props.setNumberformatColumn != "") {
+    const fmtIds = String(props.setNumberformatColumn)
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const qtyFmt = "#,##0.00";
+    for (const fmtId of fmtIds) {
+      try {
+        const gvCol = gridView.columnByField(fmtId);
+        if (gvCol) gvCol.numberFormat = qtyFmt;
+      } catch {
+        void 0;
+      }
+    }
+  }
   // 4구간
   if (props.setRowStyleCalls) {
     gridView.setRowStyleCallback((grid, item, fixed) => {
@@ -3818,10 +3900,12 @@ const runFuncshowGrid = async () => {
         gridView.setAllCheck(chk);
       } else if (props.checkAbleExpressionCol3 != "") {
         for (var i = 0; i < rowCount; i++) {
-          const getblnCheck = dataProvider.getValue(
+          const getblnCheck = rgSafeDataSourceGetValue(
+            dataProvider,
             i,
             props.checkAbleExpressionCol3
           );
+          if (getblnCheck === undefined) continue;
 
           if (getblnCheck == props.checkAbleExpressionVal2) {
             dataProvider.setValue(i, col.fieldName, chk);
@@ -3831,10 +3915,12 @@ const runFuncshowGrid = async () => {
         }
       } else if ((props.checkAbleExpressionCol2 || "").trim() !== "") {
         for (var i = 0; i < rowCount; i++) {
-          const getblnCheck = dataProvider.getValue(
+          const getblnCheck = rgSafeDataSourceGetValue(
+            dataProvider,
             i,
             props.checkAbleExpressionCol2
           );
+          if (getblnCheck === undefined) continue;
           if (getblnCheck == props.checkAbleExpressionVal) {
             dataProvider.setValue(i, col.fieldName, chk);
             const index = dataProvider.getDataRowId(i);

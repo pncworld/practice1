@@ -100,6 +100,7 @@
               ref="datepicker"
               omit-main-label
               filter-bar-align
+              :init-today2="-7"
               :main-name="'이동기간'"
               :close-pop-up="closePopUp"
               @start-date="startDate"
@@ -108,20 +109,17 @@
           </div>
         </div>
         <div class="pur235-wire-cell min-w-0">
-          <div class="pur235-wire-label">확정기간</div>
+          <div class="pur235-wire-label">확정여부</div>
           <div class="pur235-wire-field min-w-0">
             <div class="pur803-confirm-row">
               <select
                 id="pur08-004-confirm-period"
                 v-model="cond2"
                 class="pur235-sg-select pur803-confirm-select h-8 w-full min-w-0 rounded-md border border-solid bg-white px-1.5 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <!-- OPTION: 9 전체, 0 미확정, 1 확정 (공통코드 24 와 API 값 불일치 — PUR08_003INS 동일) -->
                 <option value="9">전체</option>
-                <option
-                  v-for="i in optionList2"
-                  :key="i.strDCode"
-                  :value="i.strDCode">
-                  {{ i.strDName }}
-                </option>
+                <option value="0">미확정</option>
+                <option value="1">확정</option>
               </select>
             </div>
           </div>
@@ -135,6 +133,7 @@
           :progname="'PUR08_004INS_VUE'"
           :progid="1"
           :rowData="rowData"
+          :setNumberformatColumn="'dblQty,dblMoveQty'"
           :setStateBar="false"
           :documentTitle="'PUR08_004INS'"
           @updatedRowData="updatedRowData"
@@ -144,10 +143,10 @@
           :documentSubTitle="documentSubTitle"
           :headerCheckBar="'cancled,Selected'"
           :checkAbleExpressionCol="'cancled,Selected'"
-          :checkAbleExpressionCol2="'strConfirm'"
-          :checkAbleExpressionVal="'확정'"
-          :checkAbleExpressionCol3="'strConfirm'"
-          :checkAbleExpressionVal2="'미확정'"
+          :checkAbleExpressionCol2="'SelectableChk'"
+          :checkAbleExpressionVal="'1,2'"
+          :checkAbleExpressionCol3="'SelectableChk'"
+          :checkAbleExpressionVal2="'0,2'"
           :checkRenderEditable="true"
           :checkRowAuto="true"
           :rowStateeditable="false"
@@ -191,7 +190,6 @@
 </template>
 
 <script setup>
-import { getCommonList } from "@/api/common";
 import {
   cancelStoreMoveConfirmList,
   confirmStoreMoveConfirmList,
@@ -246,10 +244,6 @@ const store = useStore();
 
 onMounted(async () => {
   await insertPageLog(store.state.activeTab2);
-
-  const res = await getCommonList(24);
-
-  optionList2.value = Array.isArray(res?.data?.List) ? res.data.List : [];
 });
 
 const reload = ref(false);
@@ -257,6 +251,7 @@ const rowData = ref([]);
 const afterSearch = ref(false);
 
 const cond = ref("0");
+/** 확정여부 → 조회 API OPTION: 9 전체, 0 미확정, 1 확정 */
 const cond2 = ref(9);
 const cond3 = ref(0);
 const cond4 = ref("");
@@ -272,7 +267,6 @@ const pur235LabelCol = "8.75rem";
 const datepicker = ref(null);
 const closePopUp = ref(false);
 const optionList = ref([]);
-const optionList2 = ref([]);
 const optionList3 = ref([]);
 /**
  * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
@@ -347,7 +341,7 @@ const searchButton = async () => {
     );
 
     /** List가 null/비배열이면 Realgrid setRows 오류·헤더 깨짐 방지 */
-    rowData.value = Array.isArray(res?.data?.List) ? res.data.List : [];
+    rowData.value = mapPur08RowsWithSelectableChk(res?.data?.List);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -489,6 +483,152 @@ const readMonthCloseRaw = (row) => {
   return "";
 };
 
+/** PUR08_002 구 프로그램 SelectableChk: 0 미확정, 1 확정, 2 마감(월마감 이전 이동) */
+const resolvePur08SelectableChk = (row) => {
+  if (!row || typeof row !== "object") return "0";
+  const existing = row.SelectableChk ?? row.selectableChk;
+  if (existing != null && String(existing).trim() !== "") {
+    return String(existing).trim();
+  }
+  const strConfirm = String(row.strConfirm ?? row.StrConfirm ?? "").trim();
+  const confirmed =
+    strConfirm === "확정" ||
+    strConfirm === "1" ||
+    strConfirm === "Y" ||
+    strConfirm === "y";
+  const closeRaw = readMonthCloseRaw(row);
+  const closeYmd =
+    closeRaw !== "" && closeRaw != null
+      ? String(closeRaw).replace(/\D/g, "")
+      : "";
+  const moveRaw = row.strMoveDate ?? row.StrMoveDate;
+  const moveYmd = toYmdDigits(moveRaw);
+  if (
+    closeYmd &&
+    moveYmd &&
+    parseInt(moveYmd, 10) <= parseInt(closeYmd, 10)
+  ) {
+    return "2";
+  }
+  return confirmed ? "1" : "0";
+};
+
+const pickPur08RowVal = (row, ...keys) => {
+  if (!row || typeof row !== "object") return "";
+  for (const k of keys) {
+    const v = row[k];
+    if (v !== undefined && v !== null && String(v).trim() !== "") return v;
+  }
+  return "";
+};
+
+const normalizePur08GridDate = (val) => {
+  if (val === undefined || val === null || String(val).trim() === "") return "";
+  const raw = String(val).trim();
+
+  const msMatch = raw.match(/\/Date\((-?\d+)\)\//);
+  if (msMatch) {
+    const d = new Date(parseInt(msMatch[1], 10));
+    if (!Number.isNaN(d.getTime())) return formatLocalDate(d);
+  }
+
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length === 8) {
+    return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
+  }
+  if (/^\d{13}$/.test(digits)) {
+    const d = new Date(parseInt(digits, 10));
+    if (!Number.isNaN(d.getTime())) return formatLocalDate(d);
+  }
+
+  const d = new Date(raw);
+  if (!Number.isNaN(d.getTime())) return formatLocalDate(d);
+  return raw;
+};
+
+/** 그리드 @@@@-@@-@@ 텍스트 컬럼 — YYYYMMDD 8자리 */
+const toRealGridMaskDateValue = (val) => {
+  if (val === undefined || val === null || String(val).trim() === "") return "";
+  const raw = String(val).trim();
+  if (/^\d{8}$/.test(raw)) return raw;
+  const ymd = normalizePur08GridDate(val);
+  if (!ymd || ymd.includes("NaN")) return "";
+  return ymd.replaceAll("-", "");
+};
+
+const toYmdDigits = (val) => toRealGridMaskDateValue(val);
+
+const normalizePur08GridQty = (val) => {
+  if (val === undefined || val === null || val === "") return val;
+  const n = Number(String(val).replace(/,/g, ""));
+  return Number.isFinite(n) ? n : val;
+};
+
+const mapPur08GridListRow = (row) => {
+  const strConfirmDateRaw = pickPur08RowVal(
+    row,
+    "strConfirmDate",
+    "StrConfirmDate",
+    "strCofirmDate",
+    "StrCofirmDate",
+    "dtmConfirmDate",
+    "DtmConfirmDate",
+    "strInConfirmDate",
+    "StrInConfirmDate",
+    "strInDate",
+    "StrInDate",
+    "dtmInDate",
+    "DtmInDate"
+  );
+  const strMoveDateRaw = pickPur08RowVal(
+    row,
+    "strMoveDate",
+    "StrMoveDate",
+    "dtmMoveDate",
+    "DtmMoveDate"
+  );
+  const dblQtyRaw = pickPur08RowVal(
+    row,
+    "dblQty",
+    "DblQty",
+    "dblMoveQty",
+    "DblMoveQty"
+  );
+  const strConfirmDate = toRealGridMaskDateValue(
+    strConfirmDateRaw !== ""
+      ? strConfirmDateRaw
+      : row.strConfirmDate ?? row.StrConfirmDate
+  );
+  const strMoveDate = toRealGridMaskDateValue(
+    strMoveDateRaw !== "" ? strMoveDateRaw : row.strMoveDate ?? row.StrMoveDate
+  );
+  const dblQty = normalizePur08GridQty(
+    dblQtyRaw !== "" ? dblQtyRaw : row.dblQty ?? row.DblQty
+  );
+  const enriched = {
+    ...row,
+    strConfirmDate,
+    StrConfirmDate: strConfirmDate,
+    strInConfirmDate: strConfirmDate,
+    StrInConfirmDate: strConfirmDate,
+    strInDate: strConfirmDate,
+    StrInDate: strConfirmDate,
+    strMoveDate,
+    StrMoveDate: strMoveDate,
+    dblQty,
+    DblQty: dblQty,
+    dblMoveQty: dblQty,
+    DblMoveQty: dblQty,
+  };
+  return {
+    ...enriched,
+    SelectableChk: resolvePur08SelectableChk(enriched),
+  };
+};
+
+const mapPur08RowsWithSelectableChk = (list) =>
+  Array.isArray(list) ? list.map((row) => mapPur08GridListRow(row)) : [];
+
 /** RealGrid onCellEdited 직후 Swal이 가려지거나 미표시되는 경우 방지 */
 const showSwalAfterGrid = (options) =>
   new Promise((resolve) => {
@@ -586,7 +726,7 @@ const checkedRowData2 = async (
   }
 
   const moveRaw = row.strMoveDate ?? row.StrMoveDate;
-  tempMoveDate.value = formatLocalDate(moveRaw).replaceAll("-", "");
+  tempMoveDate.value = toYmdDigits(moveRaw);
 
   const closeRaw = readMonthCloseRaw(row);
   tempCloseDate.value =
@@ -679,7 +819,7 @@ const cancelButton = async () => {
       .map((item) => item.lngToStoreCode)
       .join("\u200b");
     const movedate = cancelRows
-      .map((item) => formatLocalDate(item.strMoveDate).replaceAll("-", ""))
+      .map((item) => toYmdDigits(item.strMoveDate))
       .join("\u200b");
 
     const supplier = cancelRows
@@ -691,7 +831,7 @@ const cancelButton = async () => {
       .join("\u200b");
 
     const confirmdate = cancelRows
-      .map((item) => item.strConfirmDate)
+      .map((item) => toYmdDigits(item.strConfirmDate))
       .join("\u200b");
     const res = await cancelStoreMoveConfirmList(
       groupCd.value,
@@ -753,7 +893,7 @@ const confirmButton = async () => {
       .map((item) => item.lngToStoreCode)
       .join("\u200b");
     const movedate = selectedRows
-      .map((item) => formatLocalDate(item.strMoveDate).replaceAll("-", ""))
+      .map((item) => toYmdDigits(item.strMoveDate))
       .join("\u200b");
 
     const supplier = selectedRows
@@ -765,7 +905,7 @@ const confirmButton = async () => {
       .join("\u200b");
 
     const confirmdate = selectedRows
-      .map((item) => formatLocalDate(item.strConfirmDate).replaceAll("-", ""))
+      .map((item) => toYmdDigits(item.strConfirmDate))
       .join("\u200b");
     const res = await confirmStoreMoveConfirmList(
       groupCd.value,

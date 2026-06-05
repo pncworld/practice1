@@ -103,6 +103,7 @@
               ref="datepicker"
               omit-main-label
               filter-bar-align
+              :init-today2="-7"
               :main-name="'이동기간'"
               @end-date="endDate"
               :close-pop-up="closePopUp"
@@ -134,6 +135,7 @@
           :progname="'PUR08_003INS_VUE'"
           :progid="1"
           :rowData="rowData"
+          :setNumberformatColumn="'dblQty,dblMoveQty'"
           :documentTitle="'PUR08_003INS'"
           @updatedRowData="updatedRowData"
           :checkRenderEditable="true"
@@ -142,10 +144,8 @@
           :checkRowAuto2Col="'Selected'"
           :headerCheckBar="'Selected'"
           :checkAbleExpressionCol="'Selected'"
-          :checkAbleExpressionCol2="'strConfirm'"
-          :checkAbleExpressionVal="'확정'"
-          :checkAbleExpressionCol3="'strConfirm'"
-          :checkAbleExpressionVal2="'미확정'"
+          :checkAbleExpressionCol2="'SelectableChk'"
+          :checkAbleExpressionVal="'1,2'"
           :documentSubTitle="documentSubTitle"
           :rowStateeditable="false"
           :exporttoExcel="exportExcel">
@@ -428,6 +428,7 @@
             :progname="'PUR08_003INS_VUE'"
             :progid="2"
             :rowData="rowData3"
+            :setNumberformatColumn="'dblQty,dblMoveQty'"
             :setStateBar="false"
             :suppressEdit="true"
             @updatedRowData="onDetailGridUpdatedRowData"
@@ -683,6 +684,179 @@ const lngStoreGroup = (e) => {
   groupCd.value = e;
 };
 
+const readPur803MonthCloseRaw = (row) => {
+  if (!row || typeof row !== "object") return "";
+  const keys = [
+    "strMonthCloseDate",
+    "StrMonthCloseDate",
+    "strStockCloseDate",
+    "StrStockCloseDate",
+    "strCloseDate",
+    "StrCloseDate",
+    "strCloseDt",
+    "StrCloseDt",
+    "lngMonthClose",
+    "LngMonthClose",
+  ];
+  for (const k of keys) {
+    const v = row[k];
+    if (v != null && v !== "") return v;
+  }
+  return "";
+};
+
+/** PUR08_002 구 프로그램 SelectableChk: 0 미확정, 1 확정, 2 마감(월마감 이전 이동) */
+const resolvePur803SelectableChk = (row) => {
+  if (!row || typeof row !== "object") return "0";
+  const existing = row.SelectableChk ?? row.selectableChk;
+  if (existing != null && String(existing).trim() !== "") {
+    return String(existing).trim();
+  }
+  const strConfirm = String(row.strConfirm ?? row.StrConfirm ?? "").trim();
+  const confirmed =
+    strConfirm === "확정" ||
+    strConfirm === "1" ||
+    strConfirm === "Y" ||
+    strConfirm === "y";
+  const closeRaw = readPur803MonthCloseRaw(row);
+  const closeYmd =
+    closeRaw !== "" && closeRaw != null
+      ? String(closeRaw).replace(/\D/g, "")
+      : "";
+  const moveRaw = row.strMoveDate ?? row.StrMoveDate;
+  const moveYmd = moveRaw
+    ? formatLocalDate(moveRaw).replaceAll("-", "")
+    : "";
+  if (
+    closeYmd &&
+    moveYmd &&
+    parseInt(moveYmd, 10) <= parseInt(closeYmd, 10)
+  ) {
+    return "2";
+  }
+  return confirmed ? "1" : "0";
+};
+
+const pickPur08RowVal = (row, ...keys) => {
+  if (!row || typeof row !== "object") return "";
+  for (const k of keys) {
+    const v = row[k];
+    if (v !== undefined && v !== null && String(v).trim() !== "") return v;
+  }
+  return "";
+};
+
+/** 그리드 날짜 — YYYYMMDD·/Date(ms)/·ISO·하이픈 문자열 통일 */
+const normalizePur803GridDate = (val) => {
+  if (val === undefined || val === null || String(val).trim() === "") return "";
+  const raw = String(val).trim();
+
+  const msMatch = raw.match(/\/Date\((-?\d+)\)\//);
+  if (msMatch) {
+    const d = new Date(parseInt(msMatch[1], 10));
+    if (!Number.isNaN(d.getTime())) return formatLocalDate(d);
+  }
+
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length === 8) {
+    return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
+  }
+  if (/^\d{13}$/.test(digits)) {
+    const d = new Date(parseInt(digits, 10));
+    if (!Number.isNaN(d.getTime())) return formatLocalDate(d);
+  }
+
+  const d = new Date(raw);
+  if (!Number.isNaN(d.getTime())) return formatLocalDate(d);
+  return raw;
+};
+
+/** RealGrid datetime — YYYYMMDD(20260530)·하이픈·ISO → Date */
+const toRealGridDateValue = (val) => {
+  if (val === undefined || val === null || String(val).trim() === "") return null;
+  if (val instanceof Date && !Number.isNaN(val.getTime())) return val;
+  const ymd = normalizePur803GridDate(val);
+  if (!ymd || ymd.includes("NaN")) return null;
+  const m = ymd.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return null;
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 0, 0, 0, 0);
+  return Number.isNaN(d.getTime()) ? null : d;
+};
+
+const normalizePur803GridQty = (val) => {
+  if (val === undefined || val === null || val === "") return val;
+  const n = Number(String(val).replace(/,/g, ""));
+  return Number.isFinite(n) ? n : val;
+};
+
+const mapPur803GridListRow = (row) => {
+  const strConfirmDateRaw = pickPur08RowVal(
+    row,
+    "strConfirmDate",
+    "StrConfirmDate",
+    "strCofirmDate",
+    "StrCofirmDate",
+    "dtmConfirmDate",
+    "DtmConfirmDate",
+    "strInConfirmDate",
+    "StrInConfirmDate",
+    "strInDate",
+    "StrInDate",
+    "dtmInDate",
+    "DtmInDate"
+  );
+  const strMoveDateRaw = pickPur08RowVal(
+    row,
+    "strMoveDate",
+    "StrMoveDate",
+    "dtmMoveDate",
+    "DtmMoveDate"
+  );
+  const dblQtyRaw = pickPur08RowVal(
+    row,
+    "dblQty",
+    "DblQty",
+    "dblMoveQty",
+    "DblMoveQty"
+  );
+  const strConfirmDate = toRealGridDateValue(
+    strConfirmDateRaw !== ""
+      ? strConfirmDateRaw
+      : row.strConfirmDate ?? row.StrConfirmDate
+  );
+  const strMoveDate = toRealGridDateValue(
+    strMoveDateRaw !== "" ? strMoveDateRaw : row.strMoveDate ?? row.StrMoveDate
+  );
+  const dtmInsert = toRealGridDateValue(row.dtmInsert ?? row.DtmInsert);
+  const dblQty = normalizePur803GridQty(
+    dblQtyRaw !== "" ? dblQtyRaw : row.dblQty ?? row.DblQty
+  );
+  const enriched = {
+    ...row,
+    strConfirmDate,
+    StrConfirmDate: strConfirmDate,
+    strInConfirmDate: strConfirmDate,
+    StrInConfirmDate: strConfirmDate,
+    strInDate: strConfirmDate,
+    StrInDate: strConfirmDate,
+    strMoveDate,
+    StrMoveDate: strMoveDate,
+    dtmInsert,
+    DtmInsert: dtmInsert,
+    dblQty,
+    DblQty: dblQty,
+    dblMoveQty: dblQty,
+    DblMoveQty: dblQty,
+  };
+  return {
+    ...enriched,
+    SelectableChk: resolvePur803SelectableChk(enriched),
+  };
+};
+
+const mapPur803RowsWithSelectableChk = (list) =>
+  Array.isArray(list) ? list.map((row) => mapPur803GridListRow(row)) : [];
+
 /**
  *  조회 함수
  */
@@ -703,8 +877,7 @@ const searchButton = async () => {
       cond3.value
     );
 
-    rowData.value = res.data.List;
-    console.log(res);
+    rowData.value = mapPur803RowsWithSelectableChk(res?.data?.List);
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
