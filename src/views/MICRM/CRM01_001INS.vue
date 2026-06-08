@@ -698,7 +698,6 @@
                       type="button"
                       class="crm01-modal-marketing-sms-btn shrink-0"
                       :class="{ 'crm01-modal-marketing-sms-btn--inactive': mktSmsSendDisabled }"
-                      :disabled="!InsertNew && !pcond32"
                       @click="onMktSmsSendClick">
                       <font-awesome-icon
                         icon="comment-sms"
@@ -711,7 +710,7 @@
                       v-show="mktSmsNewSaveTooltipVisible"
                       class="crm01-mkt-sms-save-tooltip"
                       role="tooltip">
-                      신규 고객은 저장 후 문자 발송이 가능합니다.
+                      {{ mktSmsSaveFirstTooltipText }}
                     </span>
                   </span>
                 </div>
@@ -1508,9 +1507,20 @@ const warnPopupMobileChangedBeforeMktSms = async () => {
 const mktSmsNewSaveTooltipVisible = ref(false);
 let mktSmsNewSaveTooltipTimer = null;
 
+/** 발송 가능: DB 동의(saved) + 화면 체크(pcond32) 둘 다 충족 시에만 활성 */
 const mktSmsSendDisabled = computed(
-  () => !pcond32.value || InsertNew.value
+  () => InsertNew.value || !savedMktAgree.value || !pcond32.value
 );
+
+const mktSmsSaveFirstTooltipText = computed(() => {
+  if (InsertNew.value) {
+    return "신규 고객은 저장 후 문자 발송이 가능합니다.";
+  }
+  if (!pcond32.value) {
+    return "마케팅 수신동의가 체크되어 있지 않습니다.";
+  }
+  return "마케팅 수신동의 저장 후 문자 발송이 가능합니다.";
+});
 
 const hideMktSmsNewSaveTooltip = () => {
   if (mktSmsNewSaveTooltipTimer) {
@@ -1521,7 +1531,7 @@ const hideMktSmsNewSaveTooltip = () => {
 };
 
 const onMktSmsSendClick = async () => {
-  if (InsertNew.value) {
+  if (mktSmsSendDisabled.value) {
     hideMktSmsNewSaveTooltip();
     mktSmsNewSaveTooltipVisible.value = true;
     mktSmsNewSaveTooltipTimer = setTimeout(() => {
@@ -1545,7 +1555,14 @@ const onMktSmsSendClick = async () => {
 };
 
 const openMktSmsPopup = () => {
-  if (InsertNew.value || !pcond32.value || !mktSmsAvailable.value) return;
+  if (
+    InsertNew.value ||
+    !savedMktAgree.value ||
+    !pcond32.value ||
+    !mktSmsAvailable.value
+  ) {
+    return;
+  }
   mktSmsConsentDate.value = resolveMktSmsConsentDate();
   mktSmsSendPhone.value = formatPopupMobile();
   mktSmsPopupVisible.value = true;
@@ -1554,6 +1571,18 @@ const openMktSmsPopup = () => {
 const closeMktSmsPopup = () => {
   mktSmsPopupVisible.value = false;
   hideMktSmsNewSaveTooltip();
+};
+
+/** 알림톡 발송 성공 시 수정 팝업 마케팅 동의일을 발송 창 일자로 동기화 */
+const applyMktConsentDateAfterSmsSend = (consentDate) => {
+  const formatted = formatConsentDateDisplay(consentDate);
+  if (!formatted) return;
+  suppressConsentDateWatch.value = true;
+  pcondMktAgreeDate.value = formatted;
+  savedMktAgreeDate.value = formatted;
+  popupMktAgreeDateLoaded.value = formatted;
+  suppressConsentDateWatch.value = false;
+  syncConsentDateLabels();
 };
 
 const sendMktSms = async () => {
@@ -1615,6 +1644,8 @@ const sendMktSms = async () => {
       });
       return;
     }
+    applyMktConsentDateAfterSmsSend(consentDate);
+    await reloadPopupCustomerFromServer();
     await Swal.fire({
       title: "완료",
       text: "마케팅 수신동의 안내 알림톡 발송 요청이 완료되었습니다.",
@@ -1793,16 +1824,16 @@ watch(
   }
 );
 
-watch(pcond9, (agreed) => {
+watch(pcond9, (agreed, prevAgreed) => {
   if (suppressConsentDateWatch.value) return;
   syncConsentDateLabels();
-  applySmsConsentDateForPopup(agreed);
+  applySmsConsentDateForPopup(agreed, prevAgreed);
 });
 
-watch(pcond32, (agreed) => {
+watch(pcond32, (agreed, prevAgreed) => {
   if (suppressConsentDateWatch.value) return;
   syncConsentDateLabels();
-  applyMktConsentDateForPopup(agreed);
+  applyMktConsentDateForPopup(agreed, prevAgreed);
 });
 
 const selectedDate = ref();
@@ -2473,8 +2504,8 @@ const pickConsentDateFromRow = (row, agreed, agreeFieldNames, refuseFieldNames) 
   return "";
 };
 
-/** 신규: 미동의=오늘(고정) / 동의=선택 가능. 수정: DB 스냅샷 기준 복원 */
-const applySmsConsentDateForPopup = (agreed) => {
+/** 신규: 미동의=오늘(고정) / 동의=선택 가능. 수정: 조회=DB일자, 체크/해제 토글 시=오늘 */
+const applySmsConsentDateForPopup = (agreed, prevAgreed) => {
   if (InsertNew.value) {
     if (!agreed) {
       pcondSmsAgreeDate.value = todayPopupConsentDate();
@@ -2484,15 +2515,21 @@ const applySmsConsentDateForPopup = (agreed) => {
     return;
   }
   if (!agreed) {
-    pcondSmsAgreeDate.value =
-      popupSmsRefuseDateLoaded.value || todayPopupConsentDate();
+    if (prevAgreed === true) {
+      pcondSmsAgreeDate.value = todayPopupConsentDate();
+    } else {
+      pcondSmsAgreeDate.value =
+        popupSmsRefuseDateLoaded.value || todayPopupConsentDate();
+    }
+  } else if (prevAgreed === false) {
+    pcondSmsAgreeDate.value = todayPopupConsentDate();
   } else {
     pcondSmsAgreeDate.value =
       popupSmsAgreeDateLoaded.value || todayPopupConsentDate();
   }
 };
 
-const applyMktConsentDateForPopup = (agreed) => {
+const applyMktConsentDateForPopup = (agreed, prevAgreed) => {
   if (InsertNew.value) {
     if (!agreed) {
       pcondMktAgreeDate.value = todayPopupConsentDate();
@@ -2503,8 +2540,14 @@ const applyMktConsentDateForPopup = (agreed) => {
     return;
   }
   if (!agreed) {
-    pcondMktAgreeDate.value =
-      popupMktRefuseDateLoaded.value || todayPopupConsentDate();
+    if (prevAgreed === true) {
+      pcondMktAgreeDate.value = todayPopupConsentDate();
+    } else {
+      pcondMktAgreeDate.value =
+        popupMktRefuseDateLoaded.value || todayPopupConsentDate();
+    }
+  } else if (prevAgreed === false) {
+    pcondMktAgreeDate.value = todayPopupConsentDate();
   } else {
     pcondMktAgreeDate.value =
       popupMktAgreeDateLoaded.value || todayPopupConsentDate();
