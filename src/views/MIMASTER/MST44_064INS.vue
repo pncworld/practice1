@@ -18,16 +18,42 @@
     </div>
   </div>
   <br />
-  <div
-    class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore
-      @update:storeAreaCd="handleStoreAreaCd"
-      @update:storeCd="handleStoreCd"
-      @storeNm="handlestoreNm"
-      @GroupNm="handleGroupNm"
-      @update:ischanged="handleinitAll"
-      :hidesub="hidesub"
-      :hideAttr="hidesub"></PickStore>
+  <div class="bg-gray-200 rounded-lg px-2 py-2">
+    <div class="flex justify-start space-x-5 md:h-16 h-24 items-center">
+      <PickStore
+        @update:storeAreaCd="handleStoreAreaCd"
+        @update:storeCd="handleStoreCd"
+        @storeNm="handlestoreNm"
+        @GroupNm="handleGroupNm"
+        @update:ischanged="handleinitAll"
+        :hidesub="hidesub"
+        :hideAttr="hidesub"></PickStore>
+    </div>
+    <div
+      v-if="isStoreScopeFeatureEnabled && currentMenu == 2"
+      class="flex justify-start items-center text-base font-semibold text-black mt-2 ml-12 space-x-3">
+      <div>
+        공통 여부
+      </div>
+      <select
+        v-model="dataScope"
+        class="border rounded-lg h-9 px-2 bg-white w-44 text-sm">
+        <option value="COMMON">공통(그룹)</option>
+        <option value="STORE">매장별</option>
+      </select>
+      <div>
+        저장 매장
+      </div>
+      <v-select
+        v-model="scopeStoreCd"
+        :options="scopeStoreOptions"
+        label="strName"
+        placeholder="선택"
+        class="scope-store-select w-72 bg-white text-sm"
+        :clearable="false"
+        :disabled="dataScope !== 'STORE'"
+        :reduce="(item) => String(item.lngStoreCode)" />
+    </div>
   </div>
   <!-- 조회조건 -->
   <!-- 탭1 영역\-->
@@ -899,6 +925,7 @@ import {
   getKitchenGroupList2,
   getKitchenPortList,
   getMenuCodeEnroll,
+  getMenuCodeEnrollStoreKPG,
   getMenuList,
   getMstBasic,
   getStorePosList,
@@ -906,12 +933,13 @@ import {
   saveMenuKPG,
   savePortKitchenConfig,
   saveReceiptData,
+  saveStoreKPG,
 } from "@/api/master";
 /*
  * 공통 표준  Function
  */
 
-import { nextTick, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -1220,6 +1248,10 @@ const receiptP2 = ref('')
 const receiptP3 = ref('')
 const handleStoreCd = async (newValue) => {
   saveStoreCode.value = newValue;
+  pickedStoreCd.value = String(newValue);
+  if (!scopeStoreCd.value || scopeStoreCd.value == "-1") {
+    scopeStoreCd.value = normalizeScopeStoreCd(newValue);
+  }
 
     const res = await getMstBasic(store.state.userData.lngStoreGroup , saveStoreCode.value)
    
@@ -1297,6 +1329,76 @@ const changeValues = (e) => {
   changeNow.value = !changeNow.value;
 };
 const store = useStore();
+
+/**
+ * 주방출력 메뉴설정 탭 - 공통(slsMenu)/매장별(slsStoreKPG) 저장 구분
+ */
+
+const dataScope = ref("COMMON");
+const scopeStoreCd = ref("");
+const pickedStoreCd = ref("");
+// 매장별(slsStoreKPG) 저장 기능 허용 매장그룹
+const STORE_KPG_ENABLED_GROUPS = ["3264", "3287", "9999"];
+const isStoreScopeFeatureEnabled = computed(() => {
+  const commonMenuFlag =
+    store.state.userData.intCommonMenu ?? store.state.userData.lngCommonMenu;
+  return (
+    String(commonMenuFlag) === "1" &&
+    STORE_KPG_ENABLED_GROUPS.includes(String(groupCd.value))
+  );
+});
+const scopeStoreOptions = computed(() =>
+  (store.state.storeCd || []).filter((item) => item?.lngStoreCode != null)
+);
+const normalizeScopeStoreCd = (value) => {
+  const strValue = value != null ? String(value) : "";
+  if (!strValue || strValue === "-1" || strValue === "0") {
+    return "";
+  }
+  return strValue;
+};
+const getEffectiveStoreCd = () => {
+  if (!isStoreScopeFeatureEnabled.value || dataScope.value !== "STORE") {
+    return nowStoreCd.value;
+  }
+  const selected = normalizeScopeStoreCd(
+    scopeStoreCd.value || pickedStoreCd.value
+  );
+  return selected || "";
+};
+/**
+ * 공통 여부/저장 매장 변경 시 탭2 그리드·상세정보 초기화 (재조회 필요)
+ */
+
+const resetMenuKPGGridAndDetail = () => {
+  rowData2.value = [];
+  updatedList2.value = [];
+  confirmitem2.value = [];
+  forSaveMenu.value = [];
+  selectedmenuCode.value = "";
+  selectedmenuNm.value = "";
+  selectedKitchenGroup.value = 0;
+  afterClick.value = true;
+  afterSearch2.value = false;
+};
+watch(dataScope, (newValue) => {
+  if (newValue !== "STORE") {
+    // 공통(그룹) 전환 시 저장 매장을 "선택" 상태로 초기화
+    scopeStoreCd.value = "";
+  }
+  resetMenuKPGGridAndDetail();
+});
+watch(scopeStoreCd, (newValue, oldValue) => {
+  // 매장별 모드에서 저장 매장을 바꿀 때만 초기화
+  if (dataScope.value !== "STORE") {
+    return;
+  }
+  if (String(newValue ?? "") === String(oldValue ?? "")) {
+    return;
+  }
+  resetMenuKPGGridAndDetail();
+});
+
 /**
  *  그리드 검색어 세팅
  */
@@ -1424,6 +1526,25 @@ const searchButton = async () => {
     }
   }
 
+  if (
+    currentMenu.value == 2 &&
+    isStoreScopeFeatureEnabled.value &&
+    dataScope.value === "STORE"
+  ) {
+    const effectiveStoreCd = getEffectiveStoreCd();
+    if (!effectiveStoreCd || effectiveStoreCd === "0") {
+      Swal.fire({
+        title: "경고",
+        text: "매장별 조회 시 저장 매장을 선택하세요.",
+        icon: "warning",
+        showCancelButton: false,
+        confirmButtonColor: "#3085d6",
+        allowOutsideClick: false,
+      });
+      return;
+    }
+  }
+
   try {
     store.state.loading = true;
     let res;
@@ -1449,7 +1570,20 @@ const searchButton = async () => {
       } else {
         store2 = nowStoreCd.value
       }
-      const res2 = await getMenuCodeEnroll(groupCd.value, store2);
+      let res2;
+      if (
+        currentMenu.value == 2 &&
+        isStoreScopeFeatureEnabled.value &&
+        dataScope.value === "STORE"
+      ) {
+        // 매장별: slsStoreKPG 값이 있으면 해당 lngKPG로 조회
+        res2 = await getMenuCodeEnrollStoreKPG(
+          groupCd.value,
+          getEffectiveStoreCd()
+        );
+      } else {
+        res2 = await getMenuCodeEnroll(groupCd.value, store2);
+      }
       const res3 = await getMenuList(groupCd.value, store2);
        const res4 = await getKitchenGroupList2(groupCd.value, store2);
 
@@ -1511,10 +1645,11 @@ const searchButton = async () => {
     afterCategory.value = false;
     clickedNo.value = "";
     clickedNm.value = "";
-    selectedKitchenGroup.value = "";
+    selectedKitchenGroup.value = 0;
     selectedmenuNm.value = "";
     selectedmenuCode.value = "";
-    // afterClick.value = true;
+    // 조회 후 행 선택 전까지 주방출력그룹 콤보 비활성화
+    afterClick.value = true;
     // afterClick2.value = true;
     // afterClick3.value = true;
     tempDisabled2.value = true;
@@ -1553,6 +1688,23 @@ const searchMenuList = (e) => {
  */
 
 const saveButton = async () => {
+  if (
+    currentMenu.value == 2 &&
+    isStoreScopeFeatureEnabled.value &&
+    dataScope.value === "STORE"
+  ) {
+    const effectiveStoreCd = getEffectiveStoreCd();
+    if (!effectiveStoreCd || effectiveStoreCd === "0") {
+      Swal.fire({
+        title: "경고",
+        text: "매장별 저장 시 저장 매장을 선택하세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  }
+
   if (currentMenu.value == 1) {
     if (afterSearch.value == false) {
       Swal.fire({
@@ -1722,12 +1874,26 @@ const saveButton = async () => {
           const filteredSave = updatedList2.value.filter((_, index) =>
             forSaveMenu.value.includes(index)
           );
-          res = await saveMenuKPG(
-            groupCd.value,
-            nowStoreCd.value,
-            filteredSave.map((item) => item.lngCode).join("\u200B"),
-            filteredSave.map((item) => item.lngKPG).join("\u200B")
-          );
+          if (
+            isStoreScopeFeatureEnabled.value &&
+            dataScope.value === "STORE"
+          ) {
+            // 매장별: slsStoreKPG insert/update
+            res = await saveStoreKPG(
+              groupCd.value,
+              getEffectiveStoreCd(),
+              filteredSave.map((item) => item.lngCode).join("\u200B"),
+              filteredSave.map((item) => item.lngKPG).join("\u200B")
+            );
+          } else {
+            // 공통(그룹): slsMenu lngKPG 업데이트
+            res = await saveMenuKPG(
+              groupCd.value,
+              nowStoreCd.value,
+              filteredSave.map((item) => item.lngCode).join("\u200B"),
+              filteredSave.map((item) => item.lngKPG).join("\u200B")
+            );
+          }
           ////console.log(res);
         } else if (currentMenu.value == 3) {
           updatedList3.value;
@@ -1938,7 +2104,10 @@ const clickedRowData2 = (newValue) => {
   //comsole.log(newValue);
   selectedmenuCode.value = newValue[0];
   selectedmenuNm.value = newValue[1];
-  selectedKitchenGroup.value = newValue[16];
+  // lngKPG가 NULL/빈값이면 '선택'(0)으로 표시
+  const kpgValue = newValue[16];
+  selectedKitchenGroup.value =
+    kpgValue == null || kpgValue === "" ? 0 : kpgValue;
   //   clickedNo.value = newValue[1];
   //   clickedNm.value = newValue[2];
   //   //changeRow.value = newValue.index;
@@ -2001,6 +2170,10 @@ const handleinitAll = (newvalue) => {
   filteredSubMenuGroup.value = [];
   searchword1.value = "";
   searchword3.value = "";
+  if (isStoreScopeFeatureEnabled.value) {
+    dataScope.value = "COMMON";
+    scopeStoreCd.value = normalizeScopeStoreCd(pickedStoreCd.value);
+  }
 
 };
 
@@ -2365,4 +2538,26 @@ watch(receiptD5, () => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+:deep(.scope-store-select .vs__dropdown-toggle) {
+  min-height: 36px;
+  height: 36px;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(209 213 219);
+  background-color: white;
+}
+
+:deep(.scope-store-select .vs__selected-options) {
+  padding: 0 6px;
+}
+
+:deep(.scope-store-select .vs__search),
+:deep(.scope-store-select .vs__selected) {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+:deep(.scope-store-select .vs__actions) {
+  padding-right: 6px;
+}
+</style>

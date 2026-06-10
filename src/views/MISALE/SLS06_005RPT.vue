@@ -380,85 +380,16 @@ const ConditionSet = new Set([]);
  */
 
 const excelButton = () => {
-  //let menu ;
-  // if(selectedMenu.value == null ){
-  //     menu = '전체'
-  // } else {
-  //     menu = mainMenu.value.find(item => item.lngcode == selectedMenu.value.lngcode).strname
-  // }
-
-  // let submenu;
-
-  // if(selectedsubMenu.value == null || menuType.value.length == 0 ){
-  //     submenu = '전체'
-  // } else {
-  //     submenu = menuType.value.find(item => item.lngcode == selectedsubMenu.value.lngcode).strname
-  // }
-  const newCondarr = [...ConditionSet].sort();
-  let searchcond = "";
-  for (let i = 0; i < newCondarr.length; i++) {
-    searchcond += searchCondition.value[newCondarr[i]] + ",";
-  }
-
-  let thirdcond = "";
-  const newCondarr2 = [...checkedDays].sort();
-  for (let i = 0; i < newCondarr2.length; i++) {
-    thirdcond += dayCondition.value[newCondarr2[i] - 1] + ",";
-  }
-  let first;
-  let second;
-  let third;
-  if (selectedMenu.value == null) {
-    first = "전체";
-  } else {
-    //comsole.log(mainMenu.value.filter((item) => item.lngcode == selectedMenu.value));
-    first = mainMenu.value.filter(
-      (item) => item.lngcode == selectedMenu.value.lngcode
-    )[0].strname;
-  }
-
-  if (selectedsubMenu.value == null || menuType.value.length == 0) {
-    second = "전체";
-  } else {
-    second = menuType.value.filter(
-      (item) => item.lngcode == selectedsubMenu.value.lngcode
-    )[0].strname;
-  }
-
-  if (selectedSubSubMenu.value == null || Menus.value.length == 0) {
-    third = "전체";
-  } else {
-    third = Menus.value.filter(
-      (item) => item.lngcode == selectedSubSubMenu.value.lngcode
-    )[0].strname;
-  }
-  let guest;
-  if (selectedGuest.value == null || selectedGuest.value == undefined) {
-    guest = "전체";
-  } else {
-    guest = GuestType.value.filter(
-      (item) => item.lngCode == selectedGuest.value.lngCode
-    )[0].strName;
-  }
   documentSubTitle.value =
-    selectedExcelDate.value +
+    "비교년도/기준년도 : " +
+    selectedCompareYear.value +
+    " / " +
+    selectedRefYear.value +
     "\n" +
     selectedExcelStore.value +
     "\n" +
-    "조건 :" +
-    (checkedStore.value == 1 ? "매장별" : "") +
-    (checkedDate.value == 1 ? " 일자별" : "") +
-    "\n" +
-    "메뉴구분 :" +
-    first +
-    "," +
-    second +
-    "," +
-    third +
-    searchText.value +
-    "\n" +
-    "객층구분 :" +
-    guest;
+    "매출구분 : " +
+    (selectedSalesType.value == 1 ? "실매출" : "순매출");
   exportExcel.value = !exportExcel.value;
 };
 

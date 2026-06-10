@@ -553,6 +553,22 @@ export const saveMenuKPG = (groupCd, storeCd, lngCodes, lngkpg) => {
     LNG_KPG: lngkpg,
   });
 };
+// 매장별 주방출력그룹(slsStoreKPG) insert/update
+export const saveStoreKPG = (groupCd, storeCd, lngCodes, lngkpg) => {
+  return api2.post("/MIMASTER/MST44_064INS.asmx/saveStoreKPG", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    LNG_CODE: lngCodes,
+    LNG_KPG: lngkpg,
+  });
+};
+// 매장별 메뉴 목록 조회(slsStoreKPG 값이 있으면 해당 lngKPG 우선)
+export const getMenuCodeEnrollStoreKPG = (groupCd, storeCd) => {
+  return api2.post("/MIMASTER/MST44_064INS.asmx/getMenuCodeEnrollStoreKPG", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
 export const savePortKitchenConfig = (
   groupCd,
   storeCds,
