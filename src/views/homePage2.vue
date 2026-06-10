@@ -174,6 +174,19 @@ const isHomeSalesAnalysisDashboard = computed(() =>
   isSalesAnalysisDashboardHome(store.state.userData)
 );
 
+/** KPI·매출그리드·전년 월누계 차트 — 동일 미조회 조건 */
+function shouldSkipMainDashBoardSalesChart(userdata) {
+  if (!userdata) return true;
+  if (Number(userdata.lngSupplierID) > 0) return true;
+  if (userdata.lngStoreGroup == "3033" && userdata.lngPositionType == 0) return true;
+  if (userdata.lngStoreGroup == "7650" && userdata.lngPositionType == 0) return true;
+  if (userdata.lngStoreGroup == "7639" && userdata.lngPositionType == 0) return true;
+  if (userdata.lngStoreGroup == "7838" && userdata.lngPositionType == 0) return true;
+  if (userdata.lngStoreGroup == "7208" && userdata.lngPositionType == 0) return true;
+  if (userdata.lngUserAdminID == userdata.lngStoreGroup) return true;
+  return false;
+}
+
 const salesAnalysisDashboardRef = ref(null);
 
 function onSalesAnalysisDashboardRefresh() {
@@ -234,7 +247,8 @@ onMounted(async () => {
     let res = "";
     if (
       userdata.lngSupplierID <= 1 &&
-      userdata.lngUserAdminID !== userdata.lngStoreGroup
+      userdata.lngUserAdminID !== userdata.lngStoreGroup &&
+      !shouldSkipMainDashBoardSalesChart(userdata)
     ) {
       res = await MainDashBoard(
         userdata.lngStoreGroup,
@@ -303,42 +317,22 @@ onMounted(async () => {
       rowData4.value = res2.data.List2;
     }
 
-    if (userdata.lngSupplierID > 0) {
-      return;
-    }
-    if (userdata.lngStoreGroup == "3033" && userdata.lngPositionType == 0) {
-      return;
-    }
-    if (userdata.lngStoreGroup == "7650" && userdata.lngPositionType == 0) {
-      return;
-    }
-    if (userdata.lngStoreGroup == "7639" && userdata.lngPositionType == 0) {
-      return;
-    }
-    if (userdata.lngStoreGroup == "7838" && userdata.lngPositionType == 0) {
-      return;
-    }
-    if (userdata.lngStoreGroup == "7208" && userdata.lngPositionType == 0) {
-      return;
-    }
-    if (userdata.lngUserAdminID == userdata.lngStoreGroup) {
-      return;
-    }
+    if (!shouldSkipMainDashBoardSalesChart(userdata)) {
+      res = await MainDashBoard3(userdata.lngStoreGroup, lngStoreCode);
+      datas.value = [
+        res.data.List.map((item) => parseInt(item.lastTotAmt)),
+        res.data.List.map((item) => parseInt(item.nowTotAmt)),
+      ];
 
-    res = await MainDashBoard3(userdata.lngStoreGroup, lngStoreCode);
-    datas.value = [
-      res.data.List.map((item) => parseInt(item.lastTotAmt)),
-      res.data.List.map((item) => parseInt(item.nowTotAmt)),
-    ];
-
-    ////console.log(datas.value);
-    labels.value = res.data.List.map((item) => item.dtmDay);
-    ////console.log(res);
-    const today = new Date();
-    label.value = [
-      today.getFullYear() - 1 + "-" + (today.getMonth() + 1),
-      today.getFullYear() + "-" + (today.getMonth() + 1),
-    ];
+      ////console.log(datas.value);
+      labels.value = res.data.List.map((item) => item.dtmDay);
+      ////console.log(res);
+      const today = new Date();
+      label.value = [
+        today.getFullYear() - 1 + "-" + (today.getMonth() + 1),
+        today.getFullYear() + "-" + (today.getMonth() + 1),
+      ];
+    }
   } catch (e) {
     console.error("[homePage2] dashboard load", e);
   } finally {
