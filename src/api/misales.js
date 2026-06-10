@@ -856,6 +856,29 @@ export const getDiscountRecords = (
     DISCOUNT_CODE: discount,
   });
 };
+
+export const getDiscountRecordsByMenu = (
+  groupCd,
+  storeattr,
+  storeteam,
+  storesupervisor,
+  storeCd,
+  startdate,
+  enddate,
+  discount
+) => {
+  return api2.post("/MISALES/SLS11_017RPT.asmx/getDiscountRecordsByMenu", {
+    GROUP_CD: groupCd,
+    STORE_ATTR: storeattr,
+    STORE_TEAM: storeteam,
+    STORE_SUPERVISOR: storesupervisor,
+    STORE_CD: storeCd,
+    START_DATE: startdate,
+    END_DATE: enddate,
+    DISCOUNT_CODE: discount,
+  });
+};
+
 export const getCashReceiptDetail = (
   groupCd,
   storeattr,
