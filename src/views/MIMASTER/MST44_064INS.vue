@@ -37,7 +37,8 @@
       </div>
       <select
         v-model="dataScope"
-        class="border rounded-lg h-9 px-2 bg-white w-44 text-sm">
+        :disabled="isStoreAccount"
+        class="border rounded-lg h-9 px-2 bg-white w-44 text-sm disabled:bg-gray-100">
         <option value="COMMON">공통(그룹)</option>
         <option value="STORE">매장별</option>
       </select>
@@ -51,7 +52,7 @@
         placeholder="선택"
         class="scope-store-select w-72 bg-white text-sm"
         :clearable="false"
-        :disabled="dataScope !== 'STORE'"
+        :disabled="isStoreAccount || dataScope !== 'STORE'"
         :reduce="(item) => String(item.lngStoreCode)" />
     </div>
   </div>
@@ -1044,6 +1045,7 @@ onMounted(async () => {
       hidesub.value = true;
     }
 
+  applyStoreAccountScopeLock();
 });
 
 const currentMenu = ref(1);
@@ -1347,9 +1349,29 @@ const isStoreScopeFeatureEnabled = computed(() => {
     STORE_KPG_ENABLED_GROUPS.includes(String(groupCd.value))
   );
 });
+// 매장 아이디(매장 계정) 여부 - 본사/브랜드 관리자 계정이 아니면 매장 계정
+const isStoreAccount = computed(
+  () =>
+    !(
+      store.state.userData.blnBrandAdmin == "True" ||
+      store.state.userData.lngPositionType == "1"
+    )
+);
 const scopeStoreOptions = computed(() =>
   (store.state.storeCd || []).filter((item) => item?.lngStoreCode != null)
 );
+/**
+ * 매장 계정: 공통 여부=매장별, 저장 매장=로그인 매장으로 고정
+ */
+const applyStoreAccountScopeLock = () => {
+  if (!isStoreAccount.value) {
+    return;
+  }
+  dataScope.value = "STORE";
+  scopeStoreCd.value = normalizeScopeStoreCd(
+    store.state.userData.lngPosition
+  );
+};
 const normalizeScopeStoreCd = (value) => {
   const strValue = value != null ? String(value) : "";
   if (!strValue || strValue === "-1" || strValue === "0") {
@@ -1562,17 +1584,25 @@ const searchButton = async () => {
 
 
 
-    if (currentMenu.value == 1 || currentMenu.value == 2) {
+    let store2 = ''
+    if (store.state.userData.lngCommonMenu == "1") {
+      store2 = 0
+    } else {
+      store2 = nowStoreCd.value
+    }
+
+    if (currentMenu.value == 1) {
+      // 탭1: 주방출력그룹만 조회
       res = await getKitchenGroupList(groupCd.value);
-      let store2 = ''
-        if (store.state.userData.lngCommonMenu == "1") {
-        store2 = 0
-      } else {
-        store2 = nowStoreCd.value
-      }
+
+      rowData.value = res.data.List;
+      updatedList.value = rowData.value;
+      confirmitem.value = JSON.parse(JSON.stringify(rowData.value));
+      afterSearch.value = true;
+    } else if (currentMenu.value == 2) {
+      // 탭2: 주방출력 메뉴설정만 조회
       let res2;
       if (
-        currentMenu.value == 2 &&
         isStoreScopeFeatureEnabled.value &&
         dataScope.value === "STORE"
       ) {
@@ -1585,7 +1615,7 @@ const searchButton = async () => {
         res2 = await getMenuCodeEnroll(groupCd.value, store2);
       }
       const res3 = await getMenuList(groupCd.value, store2);
-       const res4 = await getKitchenGroupList2(groupCd.value, store2);
+      const res4 = await getKitchenGroupList2(groupCd.value, store2);
 
       KitchenGroup.value = res4.data.List;
       SubMenuGroup.value = res3.data.submenuGroup;
@@ -1594,26 +1624,24 @@ const searchButton = async () => {
       rowData2.value = res2.data.MENULIST;
       updatedList2.value = JSON.parse(JSON.stringify(rowData2.value));
       confirmitem2.value = JSON.parse(JSON.stringify(rowData2.value));
-
-      rowData.value = res.data.List;
-
-      updatedList.value = rowData.value;
-      confirmitem.value = JSON.parse(JSON.stringify(rowData.value));
-      afterSearch.value = true;
       afterSearch2.value = true;
-    }  else if (currentMenu.value == '4' || currentMenu.value == '3'){
-
-       const res2 = await getKitchenPortList(
+    } else if (currentMenu.value == 3) {
+      // 탭3: 주방출력구성만 조회
+      const res2 = await getKitchenPortList(
         groupCd.value,
         saveStoreCode.value,
         nowStoreAreaCd.value
       );
       rowData3.value = res2.data.List;
-      console.log(rowData3.value)
       updatedList3.value = JSON.parse(JSON.stringify(rowData3.value));
       confirmitem3.value = JSON.parse(JSON.stringify(rowData3.value));
-      afterSearch3.value = true;
 
+      // 탭3 상세정보 주방출력번호 콤보용 목록
+      const res4 = await getKitchenGroupList2(groupCd.value, store2);
+      KitchenGroup.value = res4.data.List;
+      afterSearch3.value = true;
+    } else if (currentMenu.value == 4) {
+      // 탭4: 영수증 문구출력만 조회
       receiptD1.value = ''
       receiptD2.value = ''
       receiptD3.value = ''
@@ -1621,41 +1649,41 @@ const searchButton = async () => {
       receiptD5.value = ''
       receiptU.value = ''
 
-    
       receiptDByte.value = ''
       receiptUByte.value = ''
       rowData4.value = []
       res = await getStorePosList(groupCd.value, saveStoreCode.value)
-      console.log(res)
       rowData4.value = res.data.RECEIPTLIST
       afterSearch4.value = true
-
-
-    } 
+    }
   } catch (error) {
     console.log(error);
     store.state.loading = false;
   } finally {
-    //comsole.log(KDSList.value);
-    // nowStoreCd.value = saveStoreCode.value;
     ischecked.value = false;
 
     store.state.loading = false; // 로딩 상태 종료
     modified.value = false;
     afterCategory.value = false;
-    clickedNo.value = "";
-    clickedNm.value = "";
-    selectedKitchenGroup.value = 0;
-    selectedmenuNm.value = "";
-    selectedmenuCode.value = "";
-    // 조회 후 행 선택 전까지 주방출력그룹 콤보 비활성화
-    afterClick.value = true;
-    // afterClick2.value = true;
-    // afterClick3.value = true;
-    tempDisabled2.value = true;
-    forsearchSub.value = -1;
-    forsearchMain.value = -1;
-    initSelect.value = !initSelect.value
+
+    if (currentMenu.value == 1) {
+      clickedNo.value = "";
+      clickedNm.value = "";
+      tempDisabled2.value = true;
+    } else if (currentMenu.value == 2) {
+      selectedKitchenGroup.value = 0;
+      selectedmenuNm.value = "";
+      selectedmenuCode.value = "";
+      // 조회 후 행 선택 전까지 주방출력그룹 콤보 비활성화
+      afterClick.value = true;
+      forsearchSub.value = -1;
+      forsearchMain.value = -1;
+    } else if (currentMenu.value == 3) {
+      afterClick3.value = true;
+      initGrid3();
+    } else if (currentMenu.value == 4) {
+      initSelect.value = !initSelect.value
+    }
   }
 };
 const filteredSubMenuGroup = ref([]);
@@ -2171,8 +2199,12 @@ const handleinitAll = (newvalue) => {
   searchword1.value = "";
   searchword3.value = "";
   if (isStoreScopeFeatureEnabled.value) {
-    dataScope.value = "COMMON";
-    scopeStoreCd.value = normalizeScopeStoreCd(pickedStoreCd.value);
+    if (isStoreAccount.value) {
+      applyStoreAccountScopeLock();
+    } else {
+      dataScope.value = "COMMON";
+      scopeStoreCd.value = normalizeScopeStoreCd(pickedStoreCd.value);
+    }
   }
 
 };
