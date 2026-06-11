@@ -38,11 +38,7 @@ const vuetify = createVuetify({
 });
 
 library.add(fas, far);
-window.addEventListener("storage", (event) => {
-  if (event.key === "vuex") {
-    store.replaceState(JSON.parse(event.newValue)); // 새로운 값으로 업데이트
-  }
-});
+/* vuex localStorage 동기화 제거: 다른 브라우저 창 조작 시 replaceState로 타이틀·탭이 뒤섞이던 원인 */
 const app = createApp(App)
   .use(router)
   .use(store)

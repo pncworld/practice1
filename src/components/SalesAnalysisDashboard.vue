@@ -943,21 +943,42 @@ function onGoDetail() {
   }, 2200);
 }
 
+/** 좌측 메뉴(minorCategory)에서 화면 XML로 프로그램 정보 조회 — 탭·strUrl·lngProgramID 일치 */
+function resolveMenuProgramByXmlFile(xmlFileName) {
+  const list = store.state.minorCategory;
+  if (!Array.isArray(list)) return null;
+  const needle = String(xmlFileName ?? "").trim().toLowerCase();
+  if (!needle) return null;
+  return (
+    list.find((item) => {
+      const url = String(item?.strUrl ?? "").toLowerCase();
+      return url.endsWith(needle) || url.includes(`::${needle}`);
+    }) ?? null
+  );
+}
+
 function onGoSalesGoalRegister() {
   const t = SALES_GOAL_REGISTRATION_TAB;
-  if (!t.strUrl) {
+  const menuProg = resolveMenuProgramByXmlFile("SLS01_001INS.xml");
+  const strUrl = menuProg?.strUrl ?? t.strUrl;
+  const strTitle = menuProg?.strTitle ?? t.strTitle;
+  const lngProgramID = menuProg?.lngProgramID ?? t.lngProgramID;
+
+  if (!strUrl) {
     window.alert("매출목표 등록 경로(strUrl)가 설정되지 않았습니다.");
     return;
   }
-  const programId = Number(t.lngProgramID);
+
+  const programId = Number(lngProgramID);
   if (Number.isFinite(programId) && programId > 0) {
     store.state.moveOtherTab = {
-      strUrl: t.strUrl,
+      strUrl,
       lngProgramID: programId,
-      strTitle: t.strTitle,
+      strTitle,
     };
     return;
   }
+
   void router.push({ path: "/MISALES/SLS01_001INS.xml" }).catch(() => {});
 }
 

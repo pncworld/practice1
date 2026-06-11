@@ -26,8 +26,8 @@ export const SALES_ANALYSIS_DASHBOARD_DETAIL_TAB = {
 
 /**
  * 홈 매출 분석 —「매출목표 등록」버튼 → `MISALES/SLS01_001INS.xml`
- * - `lngProgramID` > 0 이면 `moveOtherTab`(메뉴 탭)으로 열림.
- * - 0 이면 라우터로 동일 화면 직접 이동(홈 `/homePage` 등 탭 레이아웃 밖에서도 동작).
+ * - `minorCategory`에서 `SLS01_001INS.xml` 조회 후 `moveOtherTab`(좌측 메뉴와 동일 탭)으로 열림.
+ * - 메뉴에 없으면 `lngProgramID`·strUrl 폴백 사용, 0이면 라우터 직접 이동.
  * @type {{ strUrl: string; lngProgramID: number; strTitle: string }}
  */
 export const SALES_GOAL_REGISTRATION_TAB = {

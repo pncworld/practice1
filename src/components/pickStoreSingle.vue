@@ -340,6 +340,13 @@ const initSearchBox = (e) => {
     disabled1.value = true;
   }
 };
+
+const setStoreCode = (code) => {
+  selectedStoreList.value =
+    code == null || code === 0 ? null : Number(code);
+};
+
+defineExpose({ setStoreCode });
 </script>
 
 <style scoped>

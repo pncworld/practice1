@@ -9,14 +9,14 @@
 <script setup>
 import { addFavorite, deleteFavorite } from "@/api/common";
 import store from "@/store";
-import { ref, watch } from "vue";
-import { onMounted } from "vue";
+import { onActivated, onMounted, ref, watch } from "vue";
 
 const currentTabName = ref("");
 const isFavoriteOrNot = ref(false);
 
 let lngProgId;
-onMounted(async () => {
+
+const syncTabNameFromStore = () => {
   const t = store.state.activeTab2;
   if (!t || typeof t !== "object") {
     currentTabName.value = "";
@@ -29,29 +29,16 @@ onMounted(async () => {
     return;
   }
   lngProgId = t.lngProgramID.split("_")[0];
-
   isFavoriteOrNot.value = store.state.favoriteList.includes(Number(lngProgId));
-});
+};
+
+onMounted(syncTabNameFromStore);
+onActivated(syncTabNameFromStore);
 
 watch(
   () => [store.state.activeTab2, store.state.favoriteList],
   () => {
-    const t = store.state.activeTab2;
-    if (!t || typeof t !== "object") {
-      currentTabName.value = "";
-      isFavoriteOrNot.value = false;
-      return;
-    }
-    currentTabName.value = t.strTitle ?? "";
-    if (!t.lngProgramID) {
-      isFavoriteOrNot.value = false;
-      return;
-    }
-    let lngProgId = t.lngProgramID.split("_")[0];
-
-    isFavoriteOrNot.value = store.state.favoriteList.includes(
-      Number(lngProgId)
-    );
+    syncTabNameFromStore();
   }
 );
 

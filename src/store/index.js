@@ -297,7 +297,28 @@ export default createStore({
   },
   plugins: [
     createPersistedState({
-      storage: window.localStorage, // ✅ 기본값 (localStorage에 저장됨)
+      storage: window.localStorage,
+      /* 창(탭)마다 독립: activeTab2·currentTabs 등 네비 상태는 제외 (localStorage 공유 + storage 이벤트 동기화 방지) */
+      paths: [
+        "userData",
+        "StoreToken",
+        "favoriteList",
+        "storeGroup",
+        "storeType",
+        "storeCd",
+        "storeTeamCode",
+        "storeSupervisor",
+        "storeAreaCd",
+        "storeSubLease",
+        "mainCategory",
+        "subCategory",
+        "minorCategory",
+        "selectedCategoryId",
+        "mobileCategory",
+        "mobileFunction",
+        "isMobile",
+        "mUSER_NO",
+      ],
     }),
   ],
 });
