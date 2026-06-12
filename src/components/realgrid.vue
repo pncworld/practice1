@@ -1370,6 +1370,17 @@ const headerCheckBarHasCol = (strColID) => {
     .includes(strColID);
 };
 
+/** headerCheckBar 지정 시: 해당 컬럼만 헤더 체크. 미지정 시: checkbox 타입 컬럼 */
+const resolveHeaderCheckLocation = (item) => {
+  const isCheckboxCol =
+    item.strColID.includes("checkbox") || item.strDisplay.includes("checkbox");
+  const headerCheckSpec = String(props.headerCheckBar ?? "").trim();
+  if (headerCheckSpec) {
+    return headerCheckBarHasCol(item.strColID) ? "left" : "none";
+  }
+  return isCheckboxCol ? "left" : "none";
+};
+
 const matchesCheckedRowData2Col = (colName) => {
   const raw = String(props.checkedRowData2Col ?? "").trim();
   if (!raw || colName == null || colName === "") return false;
@@ -1775,12 +1786,7 @@ const runFuncshowGrid = async () => {
     header: {
       text: item.strHdText,
       styleName: `header-style-${realgridname.value}${index}`,
-      checkLocation:
-        (item.strColID.includes("checkbox") ||
-          item.strDisplay.includes("checkbox")) &&
-        !headerCheckBarHasCol(item.strColID)
-          ? "left"
-          : "none",
+      checkLocation: resolveHeaderCheckLocation(item),
     },
     // styleCallback: props.setCellStyleColId.includes(item.strColID)
     //   ? function (grid, dataCell) {
