@@ -1,4 +1,5 @@
 const { defineConfig } = require("@vue/cli-service");
+const { PNC_IMAGE_DEV_MIRROR_ORIGIN } = require("./config/pncHosts");
 
 module.exports = defineConfig({
   transpileDependencies: true,
@@ -14,6 +15,16 @@ module.exports = defineConfig({
       },
       "/SYSTEM": {
         target: "http://www.pncoffice.com:8085",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/image": {
+        target: PNC_IMAGE_DEV_MIRROR_ORIGIN,
+        changeOrigin: true,
+        secure: false,
+      },
+      "/Image": {
+        target: PNC_IMAGE_DEV_MIRROR_ORIGIN,
         changeOrigin: true,
         secure: false,
       },

@@ -1264,6 +1264,71 @@ const rgCheckAbleValMatches = (valSpec, cellValue) => {
   return raw === spec;
 };
 
+const rgIsCheckValueTruthy = (v) =>
+  v === true ||
+  v === 1 ||
+  v === "1" ||
+  String(v).toLowerCase() === "true";
+
+/** 헤더 전체선택 — checkAbleExpression styleCallback 과 동일하게 선택 가능한 행인지 */
+const rgIsCheckColumnHeaderSelectable = (dataProvider, dataRow, colFieldName) => {
+  if (!isCheckAbleExpressionColumn(colFieldName)) {
+    return true;
+  }
+
+  const fname = String(colFieldName ?? "");
+  const c2 = (props.checkAbleExpressionCol2 || "").trim();
+  const c3 = (props.checkAbleExpressionCol3 || "").trim();
+
+  if (c3) {
+    const v = rgSafeDataSourceGetValue(dataProvider, dataRow, c3);
+    if (v === undefined) return true;
+    return rgCheckAbleValMatches(props.checkAbleExpressionVal2, v);
+  }
+
+  if (!c2) return true;
+
+  const blnChk = rgSafeDataSourceGetValue(dataProvider, dataRow, c2);
+  if (blnChk === undefined) return true;
+
+  if (fname === "Selected") {
+    return !rgCheckAbleValMatches(props.checkAbleExpressionVal, blnChk);
+  }
+  if (fname === "cancled") {
+    return !rgCheckAbleValMatches(props.checkAbleExpressionVal2, blnChk);
+  }
+
+  if (rgCheckAbleValMatches(props.checkAbleExpressionVal, blnChk)) {
+    return true;
+  }
+  return blnChk == props.checkAbleExpressionVal;
+};
+
+const rgCollectCheckedRowData = () => {
+  const rows = [];
+  const rowCount = dataProvider?.getRowCount?.() ?? 0;
+  const checkCol =
+    props.checkRowAuto2 === true
+      ? String(props.checkRowAuto2Col ?? "").trim()
+      : "";
+
+  if (checkCol) {
+    for (let i = 0; i < rowCount; i++) {
+      const v = rgSafeDataSourceGetValue(dataProvider, i, checkCol);
+      if (rgIsCheckValueTruthy(v)) {
+        rows.push(dataProvider.getJsonRow(i));
+      }
+    }
+    return rows;
+  }
+
+  const checkedRows = gridView?.getCheckedRows?.() ?? [];
+  for (const ri in checkedRows) {
+    rows.push(dataProvider.getJsonRow(checkedRows[ri]));
+  }
+  return rows;
+};
+
 /** checkAbleExpression — 체크 불가(readOnly) 셀 배경 (진한 회색) */
 const rgCheckReadonlyDisabledBg = { backgroundColor: "#9a9a9a" };
 const rgCheckReadonlyDisabledStyleName = "rg-check-readonly-disabled";
@@ -3884,66 +3949,56 @@ const runFuncshowGrid = async () => {
   gridView.onColumnCheckedChanged = function (grid, col, chk) {
     //console.log("헤더 전체체크");
     var rowCount = dataProvider.getRowCount(); // 전체 행의 개수
+    const colFieldName = col?.fieldName ?? "";
+    const syncCheckRow =
+      props.checkRowAuto2 === true &&
+      colFieldName === String(props.checkRowAuto2Col ?? "").trim();
+
     dataProvider.beginUpdate();
     if (props.ExceptionCheck != "") {
       for (var i = 0; i < rowCount; i++) {
         if (grid.getValue(i, props.ExceptionCheck) !== "0") {
-          dataProvider.setValue(i, col.fieldName, chk);
+          dataProvider.setValue(i, colFieldName, chk);
+          if (syncCheckRow) {
+            gridView.checkRow(i, chk);
+          }
         }
       }
+    } else if (props.checkAbleExpressionCol == "") {
+      for (var i = 0; i < rowCount; i++) {
+        dataProvider.setValue(i, colFieldName, chk);
+      }
+      gridView.setAllCheck(chk);
     } else {
-      if (props.checkAbleExpressionCol == "") {
-        // console.log("여기오냐");
-        for (var i = 0; i < rowCount; i++) {
-          dataProvider.setValue(i, col.fieldName, chk);
+      for (var i = 0; i < rowCount; i++) {
+        if (!rgIsCheckColumnHeaderSelectable(dataProvider, i, colFieldName)) {
+          continue;
         }
-        gridView.setAllCheck(chk);
-      } else if (props.checkAbleExpressionCol3 != "") {
-        for (var i = 0; i < rowCount; i++) {
-          const getblnCheck = rgSafeDataSourceGetValue(
-            dataProvider,
-            i,
-            props.checkAbleExpressionCol3
-          );
-          if (getblnCheck === undefined) continue;
-
-          if (getblnCheck == props.checkAbleExpressionVal2) {
-            dataProvider.setValue(i, col.fieldName, chk);
-            const index = dataProvider.getDataRowId(i);
-            gridView.checkRow(index, chk);
-          }
+        dataProvider.setValue(i, colFieldName, chk);
+        if (syncCheckRow) {
+          gridView.checkRow(i, chk);
         }
-      } else if ((props.checkAbleExpressionCol2 || "").trim() !== "") {
-        for (var i = 0; i < rowCount; i++) {
-          const getblnCheck = rgSafeDataSourceGetValue(
-            dataProvider,
-            i,
-            props.checkAbleExpressionCol2
-          );
-          if (getblnCheck === undefined) continue;
-          if (getblnCheck == props.checkAbleExpressionVal) {
-            dataProvider.setValue(i, col.fieldName, chk);
-            const index = dataProvider.getDataRowId(i);
-            gridView.checkRow(index, chk);
-          }
-        }
-      } else {
-        for (var i = 0; i < rowCount; i++) {
-          dataProvider.setValue(i, col.fieldName, chk);
-        }
-        gridView.setAllCheck(chk);
       }
     }
     dataProvider.endUpdate();
-    var rows = gridView.getCheckedRows();
-    selectedRowData.value = [];
-    for (var i in rows) {
-      var data = dataProvider.getJsonRow(rows[i]);
-      selectedRowData.value.push(data);
+
+    selectedRowData.value = rgCollectCheckedRowData();
+    let checkedRowIndexes;
+    if (syncCheckRow) {
+      checkedRowIndexes = [];
+      const checkCol = String(props.checkRowAuto2Col ?? "").trim();
+      for (let ri = 0; ri < rowCount; ri++) {
+        const v = rgSafeDataSourceGetValue(dataProvider, ri, checkCol);
+        if (rgIsCheckValueTruthy(v)) {
+          checkedRowIndexes.push(ri);
+        }
+      }
+    } else {
+      checkedRowIndexes = gridView.getCheckedRows();
     }
 
     emit("checkedRowData", selectedRowData.value);
-    emit("checkedRowIndex", rows);
+    emit("checkedRowIndex", checkedRowIndexes);
     updatedrowData.value = [...dataProvider.getJsonRows()];
 
     emit("updatedRowData", updatedrowData.value);

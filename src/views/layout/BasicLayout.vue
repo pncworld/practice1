@@ -24,6 +24,7 @@
         >
           <!-- <img src="@/assets/images/logo.jpg" class="w100"> -->
           <img
+            :key="strLogoUrl"
             :src="strLogoUrl"
             @error="handleError2"
             class="w100"
@@ -188,8 +189,12 @@ import { useRoute } from "vue-router";
 
 import { useStore } from "vuex";
 
-/** 로고 로드 실패 시·세션 없음 시 사용 (존재하는 에셋, Vite 빌드 URL) */
-import defaultLogoSrc from "@/assets/logo.svg";
+/** 로고 로드 실패 시·세션 없음 시 사용 */
+import defaultLogoSrc from "@/assets/images/pncoffice_logo.png";
+import {
+  handleLogoImgError,
+  resolveSessionLogoUrl,
+} from "@/utils/resolveSessionLogoUrl";
 
 const scrollContainer = ref(null);
 const moveright = () => {
@@ -221,39 +226,9 @@ const ROUTE_HOME_TAB = Object.freeze({
 });
 const userData = computed(() => store.state.userData);
 
-/**
- * HTTPS 페이지에서 http:// 절대 URL 이미지는 브라우저가 차단(혼합 콘텐츠).
- * API가 pncoffice.net / co.kr / com 등 어떤 호스트로 주든 동일하게 https 로 시도한다.
- * (해당 호스트에 https 가 없으면 로드 실패 → @error 폴백과 동일)
- */
-const normalizeLogoUrlForPage = (url) => {
-  if (!url || typeof url !== "string") return url;
-  const u = url.trim();
-  if (typeof window === "undefined" || window.location.protocol !== "https:")
-    return u;
-  if (/^http:\/\//i.test(u)) {
-    return u.replace(/^http:\/\//i, "https://");
-  }
-  return u;
-};
-
-/** getLoginSession: strNLogoUrl 우선, 없으면 strLogoUrl — 절대 URL은 전체 사용, 운영 https 시 pncoffice.net 은 https 로 보정 */
-const resolveLogoUrlForHeader = (u) => {
-  if (!u || typeof u !== "object" || Array.isArray(u)) {
-    return defaultLogoSrc;
-  }
-  const raw = u.strNLogoUrl || u.strLogoUrl;
-  if (!raw || typeof raw !== "string") {
-    return defaultLogoSrc;
-  }
-  const trimmed = raw.trim();
-  if (/^https?:\/\//i.test(trimmed)) {
-    return normalizeLogoUrlForPage(trimmed);
-  }
-  return normalizeLogoUrlForPage(trimmed);
-};
-
-const strLogoUrl = computed(() => resolveLogoUrlForHeader(userData.value));
+const strLogoUrl = computed(() =>
+  resolveSessionLogoUrl(userData.value, defaultLogoSrc)
+);
 
 /** getLoginSession: strTopFColor → 시작, strTopTColor → 종료 (없으면 component.css 기본값) */
 const applySessionTopGradient = () => {
@@ -281,14 +256,7 @@ onMounted(() => {
   applySessionTopGradient();
 });
 
-const handleError2 = (e) => {
-  const img = e?.target;
-  if (!img) return;
-  /** 상대경로 noimage는 dev 서버에서 /assets/noimage2.png 로 잘못 요청되어 404 — 한 번만 폴백 */
-  if (img.dataset.logoFallback === "1") return;
-  img.dataset.logoFallback = "1";
-  img.src = defaultLogoSrc;
-};
+const handleError2 = (e) => handleLogoImgError(e, defaultLogoSrc);
 
 const mobileShowMenu = ref(false);
 const showMenu = ref(route.path != "/"); // Initialize based on current route

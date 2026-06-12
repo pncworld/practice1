@@ -125,6 +125,7 @@
         :checkRenderEditable="true"
         :checkRowAuto="false"
         :checkRowAuto2="true"
+        :headerCheckBar="'lngCheck'"
         :checkAbleExpressionCol="'lngCheck'"
         :checkAbleExpressionCol2="'blnChk'"
         :checkAbleExpressionVal="'0'"

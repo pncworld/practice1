@@ -5,7 +5,7 @@ import axios from "axios";
 import { ref } from "vue";
 
 export const commonUrl = "http://211.238.145.43:3000";
-export const commonUrl2 = "https://pncapi.kr"; // Postman·운영 API 호스트와 통일 (www 서브도메인과 다를 수 있음)
+export const commonUrl2 = "https://pncapi.kr"; // REST API — 로고·이미지는 별도 서버(pncapi.kr:88), @/constants/pncHosts
 // Axios 인스턴스 생성 (기본 설정)
 const api = axios.create({
   baseURL: commonUrl, // API 기본 URL

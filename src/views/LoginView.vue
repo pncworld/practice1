@@ -13,7 +13,11 @@
           <div class="login-inner">
             <!-- Logo -->
             <div class="login-logo">
-              <img src="@/assets/images/pncoffice_logo.png" alt="PNC Office">
+              <img
+                :key="loginLogoUrl"
+                :src="loginLogoUrl"
+                alt="PNC Office"
+                @error="onLoginLogoError" />
             </div>
 
             <!-- Form -->
@@ -98,8 +102,13 @@ import loading from "@/components/loading.vue";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import defaultLoginLogo from "@/assets/images/pncoffice_logo.png";
+import {
+  handleLogoImgError,
+  resolveSessionLogoUrl,
+} from "@/utils/resolveSessionLogoUrl";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -118,6 +127,12 @@ import { mergeThemeLogoFromPersistedSession } from "@/utils/mergeSessionUserData
 const store = useStore(); // Vuex 스토어 가져오기
 const router = useRouter(); // Vue Router 가져오기
 
+const loginLogoUrl = computed(() =>
+  resolveSessionLogoUrl(store.state.userData, defaultLoginLogo)
+);
+
+const onLoginLogoError = (e) => handleLogoImgError(e, defaultLoginLogo);
+
 const username = ref(""); // 사용자 ID
 const password = ref(""); // 사용자 비밀번호
 const message = ref(""); // 상태 메시지
@@ -132,7 +147,11 @@ const login2 = async () => {
     const loginStatus = response.data.loginSession[0].strUserID;
 
     if (loginStatus != undefined) {
-      store.dispatch("updateUserData", response.data.loginSession[0]);
+      const sessionUser = mergeThemeLogoFromPersistedSession(
+        response.data.loginSession[0],
+        store.state.userData
+      );
+      store.dispatch("updateUserData", sessionUser);
       store.dispatch("setToken", response.data.loginSession[0].SessionToken);
       //comsole.log(response.data.loginSession[0]);
       //console.trace();

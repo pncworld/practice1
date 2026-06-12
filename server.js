@@ -4,19 +4,19 @@ const https = require("https");
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
+const { PNC_IMAGE_SERVER_ORIGIN } = require("./config/pncHosts");
 
 const app = express();
 
 app.use(express.static(path.join(__dirname, "dist")));
-// 로고 폴더 서비스
-app.use(
-  "/image",
-  createProxyMiddleware({
-    target: "http://www.pncoffice.net/",
-    changeOrigin: true,
-    secure: false,
-  })
-);
+// 로고·정적 이미지 — 이미지 전용 서버(:88, API 와 별도). 브라우저는 동일 출처 /image 만 호출
+const imageProxy = createProxyMiddleware({
+  target: PNC_IMAGE_SERVER_ORIGIN,
+  changeOrigin: true,
+  secure: false,
+});
+app.use("/image", imageProxy);
+app.use("/Image", imageProxy);
 
 app.get(/^\/.*$/, (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
