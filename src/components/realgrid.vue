@@ -1329,6 +1329,37 @@ const rgCollectCheckedRowData = () => {
   return rows;
 };
 
+const rgSaveGridViewScrollState = () => ({
+  topItem:
+    typeof gridView?.getTopItem === "function" ? gridView.getTopItem() : null,
+  current: gridView?.getCurrent?.() ?? null,
+});
+
+const rgRestoreGridViewScrollState = (saved) => {
+  if (!saved || !gridView) return;
+  try {
+    if (saved.topItem != null && typeof gridView.setTopItem === "function") {
+      gridView.setTopItem(saved.topItem);
+    }
+    if (saved.current?.dataRow >= 0) {
+      gridView.setCurrent({
+        dataRow: saved.current.dataRow,
+        fieldName: saved.current.fieldName,
+        column: saved.current.column,
+      });
+    }
+  } catch (_) {
+    void 0;
+  }
+};
+
+/** 헤더 전체선택 — checkRowAuto2 셀 체크 컬럼은 setValue만 (checkRow 반복 시 느림·맨 아래로 스크롤) */
+const rgSyncHeaderCheckRow = (rowIndex, checked, bulkCellCheckOnly) => {
+  if (!bulkCellCheckOnly) {
+    gridView.checkRow(rowIndex, checked);
+  }
+};
+
 /** checkAbleExpression — 체크 불가(readOnly) 셀 배경 (진한 회색) */
 const rgCheckReadonlyDisabledBg = { backgroundColor: "#9a9a9a" };
 const rgCheckReadonlyDisabledStyleName = "rg-check-readonly-disabled";
@@ -3956,43 +3987,51 @@ const runFuncshowGrid = async () => {
     //console.log("헤더 전체체크");
     var rowCount = dataProvider.getRowCount(); // 전체 행의 개수
     const colFieldName = col?.fieldName ?? "";
+    const checkCol = String(props.checkRowAuto2Col ?? "").trim();
     const syncCheckRow =
-      props.checkRowAuto2 === true &&
-      colFieldName === String(props.checkRowAuto2Col ?? "").trim();
+      props.checkRowAuto2 === true && colFieldName === checkCol;
+    const bulkCellCheckOnly = syncCheckRow;
+    const scrollState = rgSaveGridViewScrollState();
 
     dataProvider.beginUpdate();
-    if (props.ExceptionCheck != "") {
-      for (var i = 0; i < rowCount; i++) {
-        if (grid.getValue(i, props.ExceptionCheck) !== "0") {
+    try {
+      if (props.ExceptionCheck != "") {
+        for (var i = 0; i < rowCount; i++) {
+          if (grid.getValue(i, props.ExceptionCheck) !== "0") {
+            dataProvider.setValue(i, colFieldName, chk);
+            if (syncCheckRow) {
+              rgSyncHeaderCheckRow(i, chk, bulkCellCheckOnly);
+            }
+          }
+        }
+      } else if (props.checkAbleExpressionCol == "") {
+        for (var i = 0; i < rowCount; i++) {
+          dataProvider.setValue(i, colFieldName, chk);
+        }
+        if (!bulkCellCheckOnly) {
+          gridView.setAllCheck(chk);
+        }
+      } else {
+        for (var i = 0; i < rowCount; i++) {
+          if (!rgIsCheckColumnHeaderSelectable(dataProvider, i, colFieldName)) {
+            continue;
+          }
           dataProvider.setValue(i, colFieldName, chk);
           if (syncCheckRow) {
-            gridView.checkRow(i, chk);
+            rgSyncHeaderCheckRow(i, chk, bulkCellCheckOnly);
           }
         }
       }
-    } else if (props.checkAbleExpressionCol == "") {
-      for (var i = 0; i < rowCount; i++) {
-        dataProvider.setValue(i, colFieldName, chk);
-      }
-      gridView.setAllCheck(chk);
-    } else {
-      for (var i = 0; i < rowCount; i++) {
-        if (!rgIsCheckColumnHeaderSelectable(dataProvider, i, colFieldName)) {
-          continue;
-        }
-        dataProvider.setValue(i, colFieldName, chk);
-        if (syncCheckRow) {
-          gridView.checkRow(i, chk);
-        }
-      }
+    } finally {
+      dataProvider.endUpdate();
     }
-    dataProvider.endUpdate();
+
+    rgRestoreGridViewScrollState(scrollState);
 
     selectedRowData.value = rgCollectCheckedRowData();
     let checkedRowIndexes;
     if (syncCheckRow) {
       checkedRowIndexes = [];
-      const checkCol = String(props.checkRowAuto2Col ?? "").trim();
       for (let ri = 0; ri < rowCount; ri++) {
         const v = rgSafeDataSourceGetValue(dataProvider, ri, checkCol);
         if (rgIsCheckValueTruthy(v)) {
