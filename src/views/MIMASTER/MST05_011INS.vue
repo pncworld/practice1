@@ -370,7 +370,7 @@
                   item.lngKeyscrNo ? item.lngKeyscrNo : ""
                 }}</span
                 ><span>{{
-                  item.strKeyName ? covertKeyName(item.strKeyName) : ""
+                  item.lngKeyscrNo ? getCurrentMenuNm(item) : ""
                 }}</span
                 ><span class="flex justify-end pr-3">{{
                   item.lngPrice !== null &&
@@ -963,6 +963,17 @@ function covertKeyName(e) {
     return e;
   }
 }
+
+const getCurrentMenuNm = (item) => {
+  if (!item.lngKeyscrNo) return "";
+  if (item.intKeyNo == 7) {
+    const found = TLUList.value.find((t) => t.lngCode == item.lngKeyscrNo);
+    return found ? found.strName : covertKeyName(item.strKeyName || "");
+  } else {
+    const found = MenuList.value.find((m) => m.menuCd == item.lngKeyscrNo);
+    return found ? found.menuNm : covertKeyName(item.strKeyName || "");
+  }
+};
 const onEnd2 = (evt) => {
   const originScreenNo = dupliScreenKeyOrigin[evt.oldIndex].intScreenNo;
   const targetScreenNo = dupliScreenKeyOrigin[targetItemIndex3].intScreenNo;
