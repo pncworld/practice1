@@ -224,18 +224,20 @@ const searchButton = async () => {
 
     const res = await getMenuEngineer(
       selectedGroup.value,
+      0,
       selectedstartDate.value,
       selectedendDate.value,
       cond.value == null ? 0 : cond.value.lngCode,
       cond2.value == null ? 0 : cond2.value.lngCode,
       cond3.value,
-      cond4.value
+      cond4.value,
     );
+    
     console.log(res);
 
     rowData.value = res.data.List;
-
     afterSearch.value = true;
+
   } catch (error) {
     afterSearch.value = false;
   } finally {

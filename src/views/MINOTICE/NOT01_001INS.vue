@@ -1,8 +1,11 @@
 <template>
-  <div class="flex justify-center items-center">
-    <div class="grid grid-rows-[1fr,13fr,2fr,2fr] grid-cols-1 w-[70vw]">
-      <div class="flex justify-start ml-10 text-2xl mt-2">◎공지사항</div>
-      <div>
+  <div class="notice-page">
+    <div class="notice-shell">
+      <div class="notice-title">
+        <span class="notice-title-mark"></span>
+        <span>공지사항</span>
+      </div>
+      <div class="notice-grid-wrap">
         <Realgrid
           :progname="'NOT01_001INS_VUE'"
           :progid="9"
@@ -11,46 +14,47 @@
           @clickedRowData="clickedRowData"
           :setStateBar="false"></Realgrid>
       </div>
-      <div class="flex justify-center mt-5 items-center">
-        <div
-          class="flex pl-[32vw] w-36 items-center justify-center text-nowrap space-x-5">
+      <div class="notice-toolbar">
+        <div class="notice-pagination">
           <div><button class="whitebutton" @click="movePrev"><</button></div>
-          <div>
+          <div class="notice-page-status">
             <input
               type="number"
-              class="border w-10 h-8"
+              class="border w-10 h-8 notice-page-input"
               v-model="cPage"
               @keydown.enter="moveNow" />
             / {{ maxPage }} 페이지
           </div>
           <div><button class="whitebutton" @click="moveNext">></button></div>
         </div>
-        <div class="ml-[25vw]">
-          <button class="button primary" @click="WritePopUp">글쓰기</button>
-        </div>
       </div>
-      <div class="flex justify-center items-center space-x-5">
-        <div>
-          <select
-            name=""
-            id=""
-            class="border w-20 shadow-lg h-10"
-            v-model="selectOption">
-            <option :value="i.strDCode" v-for="i in optionList">
-              {{ i.strDName }}
-            </option>
-          </select>
+      <div class="notice-searchbar">
+        <div class="notice-search-controls">
+          <div>
+            <select
+              name=""
+              id=""
+              class="border shadow-lg h-10 notice-search-select"
+              v-model="selectOption">
+              <option :value="i.strDCode" v-for="i in optionList">
+                {{ i.strDName }}
+              </option>
+            </select>
+          </div>
+          <div>
+            <input
+              type="text"
+              class="border shadow-lg h-10 pl-1 notice-search-input"
+              v-model="searchValue"
+              @keydown.enter.prevent="moveNow2" />
+          </div>
+          <div><button class="button search" @click="moveNow2">검색</button></div>
+          <div>
+            <button class="button primary" @click="reMount">검색 초기화</button>
+          </div>
         </div>
-        <div>
-          <input
-            type="text"
-            class="border shadow-lg h-10 pl-1"
-            v-model="searchValue"
-            @keydown.enter.prevent="moveNow2" />
-        </div>
-        <div><button class="button search" @click="moveNow2">검색</button></div>
-        <div>
-          <button class="button primary" @click="reMount">검색 초기화</button>
+        <div class="notice-search-action">
+          <button class="button primary" @click="WritePopUp">글쓰기</button>
         </div>
       </div>
     </div>
@@ -59,11 +63,13 @@
   <div
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     v-if="Writepopup">
-    <div
-      class="bg-white p-6 rounded-xl shadow-xl w-[85vw] h-[90vh] overflow-y-auto">
-      <div class="flex justify-between">
-        <div class="text-2xl font-bold">◎공지사항 {{ NoticeDefault }}</div>
-        <div class="flex justify-center items-center space-x-3">
+    <div class="notice-modal-shell notice-modal-shell--edit">
+      <div class="notice-modal-header">
+        <div class="notice-modal-title text-2xl font-bold">
+          <span class="notice-title-mark"></span>
+          <span>공지사항 {{ NoticeDefault }}</span>
+        </div>
+        <div class="notice-modal-actions">
           <button class="button primary" @click="openFileEdit">파일첨부</button>
           <input
             type="file"
@@ -75,7 +81,7 @@
           <button class="button primary" @click="closePopUp">닫기</button>
         </div>
       </div>
-      <div class="grid grid-rows-10 grid-cols-[1fr,8fr] w-[60vw]">
+      <div class="notice-edit-form">
         <div class="bg-gray-100 border-l border-t">작성자</div>
         <div class="border-l border-t flex justify-start pl-5">
           <input type="text" class="border pl-1" v-model="gridvalue1" />
@@ -220,13 +226,13 @@
           ><input type="text" class="border pl-1 w-96" v-model="gridvalue18" />
         </div>
       </div>
-      <div class="flex justify-start items-center w-[80vw]">
+      <div class="notice-editor-wrap">
         <CkEditor class="w-full" @editorData="editorData" :content="content">
         </CkEditor>
       </div>
-      <div class="grid grid-rows-[1fr,6fr] w-[59vw]">
+      <div class="notice-attach-wrap">
         <div class="text-xl font-bold flex justify-start">◎첨부파일</div>
-        <div>
+        <div class="notice-attach-grid">
           <Realgrid
             :progname="'NOT01_001INS_VUE'"
             :progid="8"
@@ -417,12 +423,14 @@
   <div
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]"
     v-if="showNoticeDetail">
-    <div
-      class="bg-white p-6 rounded-xl shadow-xl w-[85vw] h-[90vh] overflow-y-auto">
-      <div class="flex flex-col">
-        <div class="flex justify-between">
-          <div class="text-2xl font-semibold">◎공지사항 상세조회</div>
-          <div class="flex justify-center items-center space-x-5">
+    <div class="notice-modal-shell notice-modal-shell--detail">
+      <div class="notice-detail-body">
+        <div class="notice-modal-header">
+          <div class="notice-modal-title text-2xl font-semibold">
+            <span class="notice-title-mark"></span>
+            <span>공지사항 상세조회</span>
+          </div>
+          <div class="notice-modal-actions">
             <button class="button primary" @click="editPopUp">수정</button
             ><button class="button delete" @click="deleteNotice">삭제</button
             ><button class="button primary" @click="showNoticeDetail = false">
@@ -430,53 +438,44 @@
             </button>
           </div>
         </div>
-        <div class="grid grid-rows-2 grid-cols-[1fr,8fr] h-20 w-[60vw]">
-          <div
-            class="bg-gray-100 font-semibold text-lg flex justify-center items-center border-l border-t">
-            작성자
-          </div>
-          <div
-            class="border-l border-t grid grid-rows-1 grid-cols-[4fr,1fr,3fr]">
-            <div class="flex justify-center items-center">
+        <div class="notice-detail-meta">
+          <div class="notice-detail-label">작성자</div>
+          <div class="notice-detail-meta-top">
+            <div class="notice-detail-meta-field">
               <input
                 type="text"
-                class="border h-[85%] w-[60%]"
+                class="notice-detail-input"
                 v-model="gridvalue21"
                 disabled />
             </div>
-            <div
-              class="bg-gray-100 font-semibold text-lg flex justify-center items-center border-l border-t">
-              작성일자
-            </div>
-            <div class="flex justify-center items-center">
+            <div class="notice-detail-sub-label">작성일자</div>
+            <div class="notice-detail-meta-field notice-detail-meta-field--right">
               <input
                 type="text"
-                class="border h-[85%] w-[60%]"
+                class="notice-detail-input"
                 v-model="gridvalue22"
                 disabled />
             </div>
           </div>
+          <div class="notice-detail-label notice-detail-label--bottom">제목</div>
           <div
-            class="bg-gray-100 font-semibold text-lg flex justify-center items-center border-l border-t">
-            제목
-          </div>
-          <div class="flex justify-start border pl-20 items-center">
+            class="notice-detail-meta-field notice-detail-meta-field--title notice-detail-meta-field--bottom notice-detail-meta-field--right">
             <input
               type="text"
-              class="border h-[85%] w-[80%]"
+              class="notice-detail-input notice-detail-input--title"
               v-model="gridvalue23"
               disabled />
           </div>
         </div>
-        <div class="w-[80vw] h-[60vh] border">
+        <div class="notice-detail-content">
           <div
             v-html="content"
             disabled
-            class="border border-black w-full h-full overflow-auto content-wrapper"></div>
+            class="notice-detail-content-inner content-wrapper"></div>
         </div>
-        <div class="h-[10vh] w-[97%]">
+        <div class="notice-detail-attach">
           <div class="text-lg font-semibold flex justify-start">◎첨부파일</div>
-          <div class="w-full h-full">
+          <div class="notice-attach-grid">
             <Realgrid
               :progname="'NOT01_001INS_VUE'"
               :progid="8"
@@ -1371,4 +1370,294 @@ const clickedRowData2 = async (e) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.notice-page {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 3rem 1.25rem 1.25rem;
+  background-color: transparent;
+}
+
+.notice-shell {
+  width: min(90vw, 1320px);
+  min-height: 74vh;
+  display: grid;
+  grid-template-rows: auto minmax(22rem, 50vh) auto auto;
+  gap: 0.75rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.notice-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.notice-title-mark {
+  width: 0.35rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.notice-grid-wrap {
+  min-height: 0;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.notice-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.notice-pagination {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.notice-page-status {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.notice-page-input {
+  text-align: center;
+}
+
+.notice-searchbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding-top: 0.25rem;
+  width: 100%;
+}
+
+.notice-search-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  grid-column: 2;
+}
+
+.notice-search-action {
+  grid-column: 3;
+  justify-self: end;
+}
+
+.notice-modal-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.notice-search-select {
+  width: 6rem;
+}
+
+.notice-search-input {
+  width: 18rem;
+}
+
+.notice-modal-shell {
+  width: min(90vw, 1440px);
+  max-height: 90vh;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.18);
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+.notice-modal-shell--edit,
+.notice-modal-shell--detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notice-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.notice-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.notice-edit-form {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 1fr) minmax(0, 8fr);
+  border-top: 1px solid #d1d5db;
+  border-left: 1px solid #d1d5db;
+}
+
+.notice-edit-form > div {
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid #d1d5db;
+  border-bottom: 1px solid #d1d5db;
+  border-left: 0;
+  border-top: 0;
+}
+
+.notice-edit-form > div:nth-child(odd) {
+  justify-content: center;
+  text-align: center;
+  font-weight: 600;
+}
+
+.notice-editor-wrap,
+.notice-attach-wrap {
+  width: 100%;
+}
+
+.notice-attach-wrap {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.5rem;
+  min-height: 16rem;
+}
+
+.notice-attach-grid {
+  min-height: 12rem;
+}
+
+.notice-detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notice-detail-meta {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 1fr) minmax(0, 8fr);
+  grid-auto-rows: minmax(2.75rem, auto);
+}
+
+.notice-detail-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: #f3f4f6;
+  font-weight: 600;
+  border-left: 1px solid #d1d5db;
+  border-top: 1px solid #d1d5db;
+  padding: 0.25rem 0.5rem;
+}
+
+.notice-detail-label--bottom {
+  border-bottom: 1px solid #d1d5db;
+}
+
+.notice-detail-meta-top {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(7rem, 1.2fr) minmax(0, 3fr);
+  border-left: 1px solid #d1d5db;
+  border-top: 1px solid #d1d5db;
+}
+
+.notice-detail-sub-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: #f3f4f6;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-left: 1px solid #d1d5db;
+  border-right: 1px solid #d1d5db;
+}
+
+.notice-detail-meta-field {
+  display: flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  min-width: 0;
+  border-left: 1px solid #d1d5db;
+  border-top: 1px solid #d1d5db;
+}
+
+.notice-detail-meta-field--bottom {
+  border-bottom: 1px solid #d1d5db;
+}
+
+.notice-detail-meta-field--right {
+  border-right: 1px solid #d1d5db;
+}
+
+.notice-detail-meta-top .notice-detail-meta-field {
+  border-left: none;
+  border-top: none;
+}
+
+.notice-detail-meta-field--title {
+  padding: 0.375rem 0.75rem;
+}
+
+.notice-detail-input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  background-color: #ffffff;
+}
+
+.notice-detail-input--title {
+  width: 100%;
+}
+
+.notice-detail-content {
+  width: 100%;
+  min-height: 45vh;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.notice-detail-content-inner {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 0.75rem;
+}
+
+.notice-detail-attach {
+  width: 100%;
+  min-height: 10rem;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.5rem;
+}
+</style>

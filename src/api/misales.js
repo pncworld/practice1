@@ -1424,22 +1424,25 @@ export const getMenuDistinct = (groupCd, storeCd, cond) => {
 };
 export const getMenuEngineer = (
   groupCd,
+  storeCd,
   sdate,
   edate,
   cond,
   cond2,
   cond3,
-  cond4
+  cond4,
 ) => {
-  return api2.post("/MISALES/SLS04_023RPT.asmx/getMenuEngineer", {
-    GROUP_CD: groupCd,
-    SDATE: sdate,
-    EDATE: edate,
-    COND: cond,
-    COND2: cond2,
-    COND3: cond3,
-    COND4: cond4,
-  });
+  return api2.post("/MISALES/SLS04_023RPT.asmx/getMenuEngineer",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      SDATE: sdate,
+      EDATE: edate,
+      COND: cond,
+      COND2: cond2,
+      COND3: cond3,
+      COND4: cond4,
+    });
 };
 
 export const getDynamicGrid7 = (groupCd) => {
