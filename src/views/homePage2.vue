@@ -103,7 +103,9 @@
                   :progid="3"
                   :rowStateeditable="false"
                   :setStateBar="false"
-                  @dblclickedRowData="dblclickedRowData"
+                  @clickedRowData="openNoticeDetail"
+                  @clickedRowData2="openNoticeDetail"
+                  @dblclickedRowData="openNoticeDetail"
                   :rowData="rowData3"
                 ></Realgrid>
               </div>
@@ -136,12 +138,41 @@
       <!-- grid-area, grid-fixed -->
     </div>
     <!-- page-scroll -->
+
+    <div
+      v-if="showNoticeDetail"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70]">
+      <div class="hp-notice-modal">
+        <div class="hp-notice-modal-header">
+          <div class="title-section !mb-0">
+            <div class="icon"></div>
+            <div class="f20 text">공지사항 상세조회</div>
+          </div>
+          <button class="button primary" @click="closeNoticeDetail">목록보기</button>
+        </div>
+
+        <div class="hp-notice-meta">
+          <div class="hp-notice-meta-label">작성자</div>
+          <div class="hp-notice-meta-value">{{ noticeDetailWriter }}</div>
+          <div class="hp-notice-meta-label">작성일자</div>
+          <div class="hp-notice-meta-value">{{ noticeDetailDate }}</div>
+          <div class="hp-notice-meta-label">제목</div>
+          <div class="hp-notice-meta-value hp-notice-meta-value--subject">
+            {{ noticeDetailSubject }}
+          </div>
+        </div>
+
+        <div class="hp-notice-body content-wrapper" v-html="noticeDetailBody"></div>
+      </div>
+    </div>
   </div>
   <!-- po-page -->
 </template>
 
 <script setup>
 import { MainDashBoard, MainDashBoard2, MainDashBoard3 } from "@/api/common";
+import { getNoticeList2 } from "@/api/minotice";
+import { getNoticeDocDetail } from "@/api/minotice";
 import SalesAnalysisDashboard from "@/components/SalesAnalysisDashboard.vue";
 import StoreGroupWelcomePopup from "@/components/StoreGroupWelcomePopup.vue";
 import { USER_ADMIN_ID_SUPPLIER_ACCOUNT } from "@/constants/sessionUser";
@@ -205,6 +236,11 @@ const rowData4 = ref([]);
 const datas = ref([]);
 const labels = ref([]);
 const label = ref([]);
+const showNoticeDetail = ref(false);
+const noticeDetailSubject = ref("");
+const noticeDetailWriter = ref("");
+const noticeDetailDate = ref("");
+const noticeDetailBody = ref("");
 
 // KPI 데이터
 const kpiData = ref({
@@ -340,8 +376,141 @@ onMounted(async () => {
   }
 });
 
-const dblclickedRowData = (e) => {
-  ////console.log(e);
+const getNoticeSeq = (row) => {
+  if (!row || typeof row !== "object") return "";
+
+  if (Array.isArray(row)) {
+    const seqFromArray = [...row]
+      .reverse()
+      .find((item) => item !== null && item !== undefined && /^\d+$/.test(String(item)));
+    return seqFromArray ? String(seqFromArray) : "";
+  }
+
+  const key = Object.keys(row).find((k) => k.toLowerCase().includes("seq"));
+  if (key && row[key] !== undefined && row[key] !== null && row[key] !== "") {
+    return String(row[key]);
+  }
+
+  return (
+    row.lngSeqID ??
+    row.lngSeqId ??
+    row.lngSEQID ??
+    row.seqID ??
+    row.seqId ??
+    row.noticeSeq ??
+    row.noticeSEQ ??
+    row.lngNoticeSeq ??
+    row.SEQID ??
+    row.SEQNO ??
+    row.lngSeqNo ??
+    ""
+  );
+};
+
+const resolveNoticeRow = (payload) => {
+  if (typeof payload === "number") {
+    return rowData3.value[payload] ?? null;
+  }
+
+  if (payload && typeof payload === "object" && "dataRow" in payload) {
+    const idx = Number(payload.dataRow);
+    if (!Number.isNaN(idx) && idx >= 0) {
+      return rowData3.value[idx] ?? payload;
+    }
+  }
+
+  return payload;
+};
+
+const getRowValue = (row, keys) => {
+  if (!row || typeof row !== "object") return "";
+  for (const key of keys) {
+    if (row[key] !== undefined && row[key] !== null && row[key] !== "") {
+      return String(row[key]).trim();
+    }
+  }
+  return "";
+};
+
+const normalizeDateText = (value) => {
+  if (!value) return "";
+  return String(value).replace(/[.\s]/g, "").slice(0, 10);
+};
+
+const findNoticeSeqByList = async (row) => {
+  const userData = store.state.userData;
+  const subject = getRowValue(row, ["strSubject", "SUBJECT", "subject"]);
+  const writer = getRowValue(row, ["strWriter", "WRITER", "writer"]);
+  const writeDate = normalizeDateText(
+    getRowValue(row, ["dtmWriteDate", "WRITE_DATE", "writeDate", "strDate"])
+  );
+
+  const res = await getNoticeList2(
+    userData.lngStoreGroup,
+    userData.lngPosition,
+    userData.lngUserAdminID,
+    1,
+    "00",
+    "",
+    userData.lngLanguage
+  );
+
+  const list = Array.isArray(res?.data?.List) ? res.data.List : [];
+  const matched = list.find((item) => {
+    const itemSubject = String(item?.strSubject ?? "").trim();
+    const itemWriter = String(item?.strWriter ?? "").trim();
+    const itemDate = normalizeDateText(item?.dtmWriteDate ?? "");
+
+    if (!itemSubject || !subject) return false;
+    if (itemSubject !== subject) return false;
+    if (writer && itemWriter && writer !== itemWriter) return false;
+    if (writeDate && itemDate && writeDate !== itemDate) return false;
+    return true;
+  });
+
+  return matched?.lngSeqID ? String(matched.lngSeqID) : "";
+};
+
+const openNoticeDetail = async (payload) => {
+  const row = resolveNoticeRow(payload);
+  let seqNo = getNoticeSeq(row);
+  if (!seqNo) {
+    seqNo = await findNoticeSeqByList(row);
+  }
+  if (!seqNo) {
+    moveNoticePage();
+    return;
+  }
+
+  try {
+    store.dispatch("convertLoading", true);
+    const userData = store.state.userData;
+    const res = await getNoticeDocDetail(
+      userData.lngStoreGroup,
+      userData.lngPosition,
+      userData.lngUserAdminID,
+      seqNo
+    );
+
+    const detail = res?.data?.List?.[0];
+    if (!detail) {
+      return;
+    }
+
+    noticeDetailSubject.value = detail.strSubject ?? "";
+    noticeDetailWriter.value = detail.strWriter ?? "";
+    noticeDetailDate.value = detail.dtmWriteDate ?? "";
+    noticeDetailBody.value = detail.strBody ?? "";
+    showNoticeDetail.value = true;
+  } catch (error) {
+    console.error("[homePage2] notice detail load", error);
+  } finally {
+    store.dispatch("convertLoading", false);
+  }
+};
+
+const closeNoticeDetail = () => {
+  showNoticeDetail.value = false;
 };
 
 const moveNoticePage = (e) => {
@@ -367,5 +536,59 @@ const formatNumber = (num) => {
   width: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.hp-notice-modal {
+  width: min(90vw, 1080px);
+  max-height: 88vh;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.18);
+  padding: 1rem;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.hp-notice-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.hp-notice-meta {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr) 7rem minmax(0, 1fr);
+  border-top: 1px solid #d1d5db;
+  border-left: 1px solid #d1d5db;
+}
+
+.hp-notice-meta-label,
+.hp-notice-meta-value {
+  border-right: 1px solid #d1d5db;
+  border-bottom: 1px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.hp-notice-meta-label {
+  justify-content: center;
+  background: #f3f4f6;
+  font-weight: 600;
+}
+
+.hp-notice-meta-value--subject {
+  grid-column: span 3;
+}
+
+.hp-notice-body {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  overflow: auto;
+  min-height: 24rem;
 }
 </style>

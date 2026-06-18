@@ -512,10 +512,64 @@ import CkEditor from "@/components/ckEditor.vue";
 
 import Realgrid from "@/components/realgrid.vue";
 import store from "@/store";
-import axios from "axios";
 import Swal from "sweetalert2";
 import { v4 } from "uuid";
 import { nextTick, onMounted, ref, watch } from "vue";
+
+const normalizeFileUrl = (rawUrl) => {
+  if (!rawUrl) return "";
+
+  const original = rawUrl.toString().trim();
+  if (!original) return "";
+  const noticeHost = "http://www.pncoffice.net";
+
+  if (original.startsWith("/Storage/Notice/")) {
+    return noticeHost + encodeURI(original);
+  }
+
+  try {
+    const parsed = new URL(original);
+    if (
+      (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") &&
+      parsed.pathname.includes("/Storage/Notice/")
+    ) {
+      parsed.protocol = "http:";
+      parsed.hostname = "www.pncoffice.net";
+      parsed.port = "";
+    }
+    const encodedPath = parsed.pathname
+      .split("/")
+      .map((segment) => {
+        if (!segment) return "";
+        try {
+          return encodeURIComponent(decodeURIComponent(segment));
+        } catch {
+          return encodeURIComponent(segment);
+        }
+      })
+      .join("/");
+    parsed.pathname = encodedPath;
+    return parsed.toString();
+  } catch {
+    return encodeURI(original);
+  }
+};
+
+const extractDeleteFilePath = (filePath) => {
+  if (!filePath) return "";
+
+  const normalized = filePath.toString();
+
+  if (normalized.includes("/Storage/Notice/")) {
+    return normalized.split("/Storage/Notice/")[1];
+  }
+
+  if (normalized.includes("/Uploads/")) {
+    return normalized.split("/Uploads/")[1];
+  }
+
+  return normalized;
+};
 
 const maxPage = ref(1);
 const cPage = ref(1);
@@ -1033,34 +1087,42 @@ const saveButton = async () => {
     );
     ////console.log(res);
     const newSeq = res.data.List[0].lngSeqID;
-    const tempFileName = ref([]);
-    if (rowData10.value.length > 0) {
-      const formData = new FormData();
+    const uploadRows = rowData10.value.filter(
+      (item) => item.checkbox !== true && item.strFile instanceof File
+    );
 
-      rowData10.value.forEach((file, index) => {
-        if (file.checkbox !== true) {
-          const currv4 = v4();
-          // ////console.log(file.strFileName);
-          formData.append(
-            `file${index}`,
-            file.strFile,
-            currv4 + "_" + file.strFileName
-          );
-          tempFileName.value.push(
-            "http://211.238.145.30:8085/Uploads/" + currv4 + "_"
-          );
-        }
+    if (uploadRows.length > 0) {
+      const tempFileName = [];
+      const fileNos = [];
+      const fileNms = [];
+      const fileSizes = [];
+      const formData = new FormData();
+      formData.append("groupCd", String(store.state.userData.lngStoreGroup));
+      formData.append("uploadType", "NOTICE");
+
+      uploadRows.forEach((file, index) => {
+        const currv4 = v4();
+        const currentFileNo = file.lngFILENo ?? index + 1;
+        const currentFileName = file.strFileName ?? file.strFile.name;
+        const currentFileSize = file.lngFileSize ?? file.strFile.size;
+
+        formData.append(
+          `file${index}`,
+          file.strFile,
+          currv4 + "_" + currentFileName
+        );
+        tempFileName.push("http://211.238.145.30:8085/Uploads/" + currv4 + "_");
+        fileNos.push(currentFileNo);
+        fileNms.push(currentFileName);
+        fileSizes.push(currentFileSize);
       });
 
       try {
-        const fileNos = rowData10.value.map((item) => item.lngFILENo);
-        const fileNms = rowData10.value.map((item) => item.strFileName);
-        const fileSizes = rowData10.value.map((item) => item.lngFileSize);
         const res = await saveNoticeFileInsert(
           store.state.userData.lngStoreGroup,
           newSeq,
           fileNos.join("\u200b"),
-          tempFileName.value.join("\u200b"),
+          tempFileName.join("\u200b"),
           fileNms.join("\u200b"),
           fileSizes.join("\u200b")
         );
@@ -1075,6 +1137,12 @@ const saveButton = async () => {
           const res2 = await uploadFile(formData);
           // ////console.log(res2);
         } catch (error) {
+          Swal.fire({
+            title: "오류",
+            text: "첨부파일 업로드 중 오류가 발생했습니다.",
+            icon: "error",
+            confirmButtonText: "확인",
+          });
           store.state.loading = false;
         } finally {
           store.state.loading = false;
@@ -1255,8 +1323,8 @@ const filesEditForDelete = ref([]);
 const filesEditForDelete2 = ref([]);
 const checkedRowData6 = (e) => {
   filesEditForDelete.value = e.map((item) => item.lngSeqNo);
-  filesEditForDelete2.value = e.map(
-    (item) => item.strFilePath.split("/Uploads/")[1]
+  filesEditForDelete2.value = e.map((item) =>
+    extractDeleteFilePath(item.strFilePath)
   );
   ////console.log(e);
 };
@@ -1341,32 +1409,19 @@ const editPopUp = () => {
   Writepopup.value = true;
 };
 
-const clickedRowData2 = async (e) => {
-  try {
-    const response = await axios.get(`${e[4]}`, {
-      responseType: "blob", // 응답을 Blob 형태로 받음
-    });
-
-    const blob = response.data;
-    const url = window.URL.createObjectURL(blob);
-
-    const downloadLink = document.createElement("a");
-    downloadLink.href = url;
-    downloadLink.download = `${e[2]}`; // 다운로드 파일명 설정
-    downloadLink.click();
-
-    // 다운로드 후 Blob URL 해제
-    window.URL.revokeObjectURL(url);
-  } catch (error) {
-    // ////console.log(error);
+const clickedRowData2 = (e) => {
+  const url = normalizeFileUrl(e?.[4]);
+  if (!url) {
     Swal.fire({
       title: "오류",
-      text: "파일 다운로드 실패",
+      text: "파일 경로가 올바르지 않습니다.",
       icon: "error",
       confirmButtonText: "확인",
     });
     return;
   }
+
+  window.open(url, "_blank", "noopener,noreferrer");
 };
 </script>
 
