@@ -1078,6 +1078,21 @@ const props = defineProps({
     type: String,
     default: "lngCheck",
   },
+  /** true: rowData 없을 때 빈 그리드 생성 생략 — 첫 조회 시 한 번만 초기화 (대량 조회 화면용) */
+  deferGridUntilData: {
+    type: Boolean,
+    default: false,
+  },
+  /** 대량 조회(수천 행) — fitStyle·styleCallback·refresh·푸터 등 렌더 부담 최소화 */
+  bulkLoadMode: {
+    type: Boolean,
+    default: false,
+  },
+  /** true: mstGridInfo strEdit/strBackColorexp expr:decode 적용 (화면별 opt-in) */
+  useMetaEditExpr: {
+    type: Boolean,
+    default: false,
+  },
   AutoCalculateDataMainColId: {
     // 자동 계산할 메인 컬럼명들
     type: Array,
@@ -1270,10 +1285,126 @@ const rgIsCheckValueTruthy = (v) =>
   v === "1" ||
   String(v).toLowerCase() === "true";
 
+/** bulkLoadMode — setRows 전 1회 전처리용 잠금 플래그 */
+const RG_CHK_LOCKED_FIELD = "_rgChkLocked";
+
+/** mstGridInfo expr:decode(blnChk,0,"checkbox","none") 파싱 */
+const parseGridDecodeExpr = (expr) => {
+  const s = String(expr ?? "").trim();
+  if (!/^expr:decode/i.test(s)) return null;
+  const m = s.match(
+    /^expr:decode\s*\(\s*([^,]+)\s*,\s*([^,]+)\s*,\s*"([^"]*)"\s*,\s*"([^"]*)"\s*\)\s*$/i
+  );
+  if (!m) return null;
+  return {
+    field: m[1].trim(),
+    matchVal: m[2].trim().replace(/^['"]|['"]$/g, ""),
+    trueResult: m[3].trim(),
+    falseResult: m[4].trim(),
+  };
+};
+
+const rgDecodeExprMatches = (raw, matchVal) => {
+  if (raw === undefined || raw === null) return false;
+  return String(raw).trim() === String(matchVal).trim() || raw == matchVal;
+};
+
+const rgGetGridMetaItem = (colId) =>
+  tabInitSetArray.value.find((t) => t.strColID === colId);
+
+const rgGetMetaEditDecodeForCol = (colId) =>
+  parseGridDecodeExpr(rgGetGridMetaItem(colId)?.strEdit);
+
+const rgResolveMetaDecodeKind = (decode, raw) => {
+  if (!decode) return null;
+  if (raw === undefined || raw === null) {
+    return decode.falseResult;
+  }
+  return rgDecodeExprMatches(raw, decode.matchVal)
+    ? decode.trueResult
+    : decode.falseResult;
+};
+
+const rgIsRowLockedByMetaDecode = (source, dataRow, decode, fromRow = false) => {
+  if (!decode) return false;
+  const raw = fromRow
+    ? source[decode.field]
+    : source?.getValue?.(dataRow, decode.field);
+  const kind = rgResolveMetaDecodeKind(decode, raw);
+  return kind === "none" || kind === "";
+};
+
+const rgIsMetaEditCheckLocked = (ds, dataRow, colId) => {
+  if (props.useMetaEditExpr !== true) return false;
+  const decode = rgGetMetaEditDecodeForCol(colId);
+  return rgIsRowLockedByMetaDecode(ds, dataRow, decode);
+};
+
+const buildMetaEditStyleCallback = (metaItem, rowStateeditable) => {
+  const editDec = parseGridDecodeExpr(metaItem?.strEdit);
+  const bgDec = parseGridDecodeExpr(metaItem?.strBackColorexp);
+  if (!editDec && !bgDec) return null;
+
+  return function (grid, dataCell) {
+    const dr = dataCell?.index?.dataRow;
+    if (dr == null || (typeof dr === "number" && dr < 0)) {
+      return {};
+    }
+    const ds = grid.getDataSource();
+    if (!ds) {
+      return {};
+    }
+
+    const condField = editDec?.field ?? bgDec?.field;
+    const raw = condField ? ds.getValue(dr, condField) : undefined;
+    const ret = {};
+
+    if (editDec) {
+      const kind = rgResolveMetaDecodeKind(editDec, raw);
+      if (kind === "checkbox" || kind === "check") {
+        Object.assign(ret, rgCheckStyleEditable);
+      } else {
+        ret.renderer = { type: "text", editable: false };
+      }
+    }
+
+    if (bgDec) {
+      const color = rgResolveMetaDecodeKind(bgDec, raw);
+      if (color && color.toLowerCase() !== "white") {
+        ret.style = { backgroundColor: color };
+      }
+    }
+
+    if (ret.editable === undefined) {
+      ret.editable = rowStateeditable;
+    }
+    return ret;
+  };
+};
+
 /** 헤더 전체선택 — checkAbleExpression styleCallback 과 동일하게 선택 가능한 행인지 */
 const rgIsCheckColumnHeaderSelectable = (dataProvider, dataRow, colFieldName) => {
+  if (props.useMetaEditExpr === true) {
+    const metaDecode = rgGetMetaEditDecodeForCol(colFieldName);
+    if (metaDecode) {
+      if (
+        dataProvider?.getValue?.(dataRow, RG_CHK_LOCKED_FIELD) === 1
+      ) {
+        return false;
+      }
+      return !rgIsRowLockedByMetaDecode(dataProvider, dataRow, metaDecode);
+    }
+  }
+
   if (!isCheckAbleExpressionColumn(colFieldName)) {
     return true;
+  }
+
+  if (
+    (props.bulkLoadMode === true || props.useMetaEditExpr === true) &&
+    dataProvider?.getValue?.(dataRow, RG_CHK_LOCKED_FIELD) === 1
+  ) {
+    return false;
   }
 
   const fname = String(colFieldName ?? "");
@@ -1363,6 +1494,180 @@ const rgSyncHeaderCheckRow = (rowIndex, checked, bulkCellCheckOnly) => {
 /** checkAbleExpression — 체크 불가(readOnly) 셀 배경 (진한 회색) */
 const rgCheckReadonlyDisabledBg = { backgroundColor: "#9a9a9a" };
 const rgCheckReadonlyDisabledStyleName = "rg-check-readonly-disabled";
+
+const rgCheckStyleEditable = {
+  renderer: { type: "check", editable: true },
+};
+const rgCheckStyleDisabled = {
+  style: rgCheckReadonlyDisabledBg,
+  styleName: rgCheckReadonlyDisabledStyleName,
+  renderer: { type: "check", editable: false, readOnlySetDisabled: true },
+};
+
+/** bulkLoadMode / useMetaEditExpr — setRows 전 1회 잠금 플래그 in-place 설정 */
+const preprocessBulkCheckRows = (rows) => {
+  if (props.bulkLoadMode !== true && props.useMetaEditExpr !== true) {
+    return rows;
+  }
+  if (!Array.isArray(rows) || rows.length === 0) return rows;
+
+  if (props.useMetaEditExpr === true) {
+    let decode = null;
+    const checkCols = String(
+      props.headerCheckBar ?? props.checkRowAuto2Col ?? ""
+    )
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    for (const c of checkCols) {
+      const d = rgGetMetaEditDecodeForCol(c);
+      if (d) {
+        decode = d;
+        break;
+      }
+    }
+    if (!decode) {
+      for (const t of tabInitSetArray.value) {
+        const d = parseGridDecodeExpr(t.strEdit);
+        if (d) {
+          decode = d;
+          break;
+        }
+      }
+    }
+    if (decode) {
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        if (row == null || typeof row !== "object" || Array.isArray(row)) {
+          continue;
+        }
+        if (rgIsRowLockedByMetaDecode(row, null, decode, true)) {
+          row[RG_CHK_LOCKED_FIELD] = 1;
+        } else if (row[RG_CHK_LOCKED_FIELD] != null) {
+          delete row[RG_CHK_LOCKED_FIELD];
+        }
+      }
+      return rows;
+    }
+  }
+
+  if (props.bulkLoadMode !== true) return rows;
+
+  const c2 = String(props.checkAbleExpressionCol2 ?? "").trim();
+  const val = String(props.checkAbleExpressionVal ?? "").trim();
+  const col = String(props.checkAbleExpressionCol ?? "").trim();
+  if (!c2 || !col) return rows;
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    if (row == null || typeof row !== "object" || Array.isArray(row)) continue;
+    const blnChk = row[c2];
+    const locked =
+      blnChk !== undefined &&
+      blnChk !== null &&
+      String(blnChk).trim() !== val &&
+      blnChk != val;
+    if (locked) {
+      row[RG_CHK_LOCKED_FIELD] = 1;
+    } else if (row[RG_CHK_LOCKED_FIELD] != null) {
+      delete row[RG_CHK_LOCKED_FIELD];
+    }
+  }
+  return rows;
+};
+
+const isRgCheckRowLocked = (ds, dataRow) =>
+  (props.bulkLoadMode === true || props.useMetaEditExpr === true) &&
+  ds?.getValue?.(dataRow, RG_CHK_LOCKED_FIELD) === 1;
+
+/** bulkLoadMode — updatedRowData 미사용 화면에서 전체 getJsonRows 생략 */
+const rgEmitUpdatedRowData = () => {
+  if (props.bulkLoadMode === true) return;
+  updatedrowData.value = [...dataProvider.getJsonRows()];
+  emit("updatedRowData", updatedrowData.value);
+};
+
+/** 대량 setRows — beginUpdate·푸터 지연·불필요 refresh 생략 */
+const applyRowsToProvider = (rows, options = {}) => {
+  const { skipFooterDefer = false } = options;
+  if (!dataProvider) return;
+  const payload = preprocessBulkCheckRows(rows);
+  let deferFooter = false;
+  if (
+    props.bulkLoadMode === true &&
+    props.setFooter === true &&
+    !skipFooterDefer &&
+    gridView
+  ) {
+    deferFooter = true;
+    try {
+      gridView.setFooters({ visible: false });
+    } catch (_) {}
+  }
+  try {
+    dataProvider.beginUpdate();
+    if (props.setTreeView == false) {
+      dataProvider.setRows(payload);
+    } else {
+      dataProvider.setRows(payload, "TreeNum", false, null, "iconField");
+    }
+  } finally {
+    try {
+      dataProvider.endUpdate(true);
+    } catch (_) {}
+  }
+  if (deferFooter) {
+    requestAnimationFrame(() => {
+      try {
+        if (props.setFooter === true) {
+          gridView?.setOptions?.({ summaryMode: "aggregate" });
+        }
+        gridView?.setFooters?.({ visible: true });
+      } catch (_) {}
+    });
+  }
+};
+
+/** lngCheck 등 — blnChk(조건필드) 값으로 체크 가능 여부 (styleCallback 행마다 호출) */
+const rgResolveCheckAbleCellStyle = (ds, dataRow, colId, rowStateeditable) => {
+  const c2 = String(props.checkAbleExpressionCol2 ?? "").trim();
+  const c3 = String(props.checkAbleExpressionCol3 ?? "").trim();
+  const col = String(colId ?? "");
+
+  if (col === "Selected") {
+    if (!c2) return { ...rgCheckStyleEditable, editable: true };
+    const blnChk = ds.getValue(dataRow, c2);
+    if (blnChk === undefined || blnChk === null) {
+      return { ...rgCheckStyleEditable, editable: rowStateeditable };
+    }
+    if (rgCheckAbleValMatches(props.checkAbleExpressionVal, blnChk)) {
+      return { ...rgCheckStyleDisabled, editable: rowStateeditable };
+    }
+    return { ...rgCheckStyleEditable, editable: rowStateeditable };
+  }
+
+  if (col === "cancled") {
+    if (!c3) return { ...rgCheckStyleEditable, editable: true };
+    const blnChk = ds.getValue(dataRow, c3);
+    if (blnChk === undefined || blnChk === null) {
+      return { ...rgCheckStyleEditable, editable: rowStateeditable };
+    }
+    if (rgCheckAbleValMatches(props.checkAbleExpressionVal2, blnChk)) {
+      return { ...rgCheckStyleDisabled, editable: rowStateeditable };
+    }
+    return { ...rgCheckStyleEditable, editable: rowStateeditable };
+  }
+
+  if (!c2) return { ...rgCheckStyleEditable, editable: rowStateeditable };
+  const blnChk = ds.getValue(dataRow, c2);
+  if (blnChk === undefined || blnChk === null) {
+    return { ...rgCheckStyleEditable, editable: rowStateeditable };
+  }
+  if (blnChk != props.checkAbleExpressionVal) {
+    return { ...rgCheckStyleDisabled, editable: rowStateeditable };
+  }
+  return { ...rgCheckStyleEditable, editable: rowStateeditable };
+};
 
 const isCheckboxGridColumn = (item) =>
   item?.strColID?.includes("checkbox") ||
@@ -1766,6 +2071,13 @@ const runFuncshowGrid = async () => {
     !fields.some((f) => f.fieldName === props.checkBarFieldName)
   ) {
     fields.push({ fieldName: props.checkBarFieldName, dataType: "boolean" });
+  }
+
+  if (
+    (props.bulkLoadMode === true || props.useMetaEditExpr === true) &&
+    !fields.some((f) => f.fieldName === RG_CHK_LOCKED_FIELD)
+  ) {
+    fields.push({ fieldName: RG_CHK_LOCKED_FIELD, dataType: "number" });
   }
 
   if (props.autoPlusColumn) {
@@ -2468,7 +2780,8 @@ const runFuncshowGrid = async () => {
               };
             }
           }
-        : isCheckAbleExpressionColumn(item.strColID)
+        : isCheckAbleExpressionColumn(item.strColID) &&
+          props.bulkLoadMode !== true
         ? function (grid, dataCell) {
             const dr = dataCell?.index?.dataRow;
             if (dr == null || (typeof dr === "number" && dr < 0)) {
@@ -2478,131 +2791,12 @@ const runFuncshowGrid = async () => {
             if (!ds) {
               return {};
             }
-
-            if (item.strColID == "Selected") {
-              const c2 = (props.checkAbleExpressionCol2 || "").trim();
-              if (!c2) {
-                return {
-                  editable: true,
-                  renderer: {
-                    type: "check",
-                    editable: true,
-                  },
-                };
-              }
-              const blnChk = rgSafeDataSourceGetValue(ds, dr, c2);
-              if (blnChk === undefined) {
-                return {
-                  editable: props.rowStateeditable,
-                  renderer: {
-                    type: "check",
-                    editable: true,
-                  },
-                };
-              }
-
-              if (rgCheckAbleValMatches(props.checkAbleExpressionVal, blnChk)) {
-                return {
-                  editable: props.rowStateeditable,
-                  style: rgCheckReadonlyDisabledBg,
-                  styleName: rgCheckReadonlyDisabledStyleName,
-                  renderer: {
-                    type: "check",
-                    editable: false,
-                    readOnlySetDisabled: true,
-                  },
-                };
-              }
-              return {
-                editable: props.rowStateeditable,
-                renderer: {
-                  type: "check",
-                  editable: true,
-                },
-              };
-            } else if (item.strColID == "cancled") {
-              const c3 = (props.checkAbleExpressionCol3 || "").trim();
-              if (!c3) {
-                return {
-                  editable: true,
-                  renderer: {
-                    type: "check",
-                    editable: true,
-                  },
-                };
-              }
-              const blnChk = rgSafeDataSourceGetValue(ds, dr, c3);
-              if (blnChk === undefined) {
-                return {
-                  editable: props.rowStateeditable,
-                  renderer: {
-                    type: "check",
-                    editable: true,
-                  },
-                };
-              }
-
-              if (rgCheckAbleValMatches(props.checkAbleExpressionVal2, blnChk)) {
-                return {
-                  editable: props.rowStateeditable,
-                  style: rgCheckReadonlyDisabledBg,
-                  styleName: rgCheckReadonlyDisabledStyleName,
-                  renderer: {
-                    type: "check",
-                    editable: false,
-                    readOnlySetDisabled: true,
-                  },
-                };
-              }
-              return {
-                editable: props.rowStateeditable,
-                renderer: {
-                  type: "check",
-                  editable: true,
-                },
-              };
-            } else {
-              const c2b = (props.checkAbleExpressionCol2 || "").trim();
-              if (!c2b) {
-                return {
-                  editable: props.rowStateeditable,
-                  renderer: {
-                    type: "check",
-                    editable: true,
-                  },
-                };
-              }
-              const blnChk = rgSafeDataSourceGetValue(ds, dr, c2b);
-              if (blnChk === undefined) {
-                return {
-                  editable: props.rowStateeditable,
-                  renderer: {
-                    type: "check",
-                    editable: true,
-                  },
-                };
-              }
-
-              if (blnChk != props.checkAbleExpressionVal) {
-                return {
-                  editable: props.rowStateeditable,
-                  style: rgCheckReadonlyDisabledBg,
-                  styleName: rgCheckReadonlyDisabledStyleName,
-                  renderer: {
-                    type: "check",
-                    editable: false,
-                    readOnlySetDisabled: true,
-                  },
-                };
-              }
-              return {
-                editable: props.rowStateeditable,
-                renderer: {
-                  type: "check",
-                  editable: true,
-                },
-              };
-            }
+            return rgResolveCheckAbleCellStyle(
+              ds,
+              dr,
+              item.strColID,
+              props.rowStateeditable
+            );
           }
         : props.setCellStyleColId3 == true
         ? function (grid, dataCell) {
@@ -2819,6 +3013,48 @@ const runFuncshowGrid = async () => {
             return ret;
           },
   }));
+
+  if (props.bulkLoadMode === true || props.useMetaEditExpr === true) {
+    for (const col of columns) {
+      const metaItem = rgGetGridMetaItem(col.fieldName);
+      if (props.useMetaEditExpr === true && metaItem) {
+        const metaCb = buildMetaEditStyleCallback(
+          metaItem,
+          props.rowStateeditable
+        );
+        if (metaCb) {
+          col.styleCallback = metaCb;
+          continue;
+        }
+      }
+      if (props.bulkLoadMode === true) {
+        if (isCheckAbleExpressionColumn(col.fieldName)) {
+          col.styleCallback = function (grid, dataCell) {
+            const dr = dataCell?.index?.dataRow;
+            if (dr == null || (typeof dr === "number" && dr < 0)) {
+              return {};
+            }
+            const ds = grid.getDataSource();
+            if (!ds) {
+              return {};
+            }
+            if (isRgCheckRowLocked(ds, dr)) {
+              return {
+                ...rgCheckStyleDisabled,
+                editable: props.rowStateeditable,
+              };
+            }
+            return {
+              ...rgCheckStyleEditable,
+              editable: props.rowStateeditable,
+            };
+          };
+        } else {
+          delete col.styleCallback;
+        }
+      }
+    }
+  }
 
   if (props.labelingColumns != "") {
     const lcolumns = props.labelingColumns.split(",");
@@ -3447,11 +3683,7 @@ const runFuncshowGrid = async () => {
   emit("allStateRows", dataProvider.getAllStateRows());
   // 데이터 추가
   // 5구간
-  if (props.setTreeView == false) {
-    dataProvider.setRows(props.rowData);
-  } else {
-    dataProvider.setRows(props.rowData, "TreeNum", false, null, "iconField");
-  }
+  applyRowsToProvider(props.rowData, { skipFooterDefer: false });
 
   //
   // 기타 옵션
@@ -3477,14 +3709,19 @@ const runFuncshowGrid = async () => {
 
   gridView.editOptions.deletable = true;
   gridView.displayOptions.fitStyle =
-    props.fixedColumn == false ? "even" : "none";
+    props.fixedColumn === true || props.bulkLoadMode === true
+      ? "none"
+      : "even";
   gridView.editOptions.commitByCell = true;
 
   gridView.editOptions.commitWhenLeave = true;
   gridView.displayOptions.showInnerFocus = false;
-  gridView.displayOptions.useAlternateRowStyle = props.useAlternateRowStyle
-    ? true
-    : false;
+  gridView.displayOptions.useAlternateRowStyle =
+    props.bulkLoadMode === true
+      ? false
+      : props.useAlternateRowStyle
+        ? true
+        : false;
   dataProvider.softDeleting = props.notsoftDelete == false ? true : false;
   dataProvider.deleteCreated = props.deleteCreated;
   gridView.filteringOptions.handleVisibility = "hidden";
@@ -3497,7 +3734,10 @@ const runFuncshowGrid = async () => {
   gridView.displayOptions.selectionStyle =
     props.dragOn == true ? "block" : props.selectionStyle;
   // props.selectionStyle;deleteRow
-  gridView.displayOptions.showTooltip = true;
+  gridView.displayOptions.showTooltip = props.bulkLoadMode !== true;
+  if (props.bulkLoadMode === true) {
+    gridView.displayOptions.refreshMode = "visibleOnly";
+  }
   gridView.displayOptions.rowHeight =
     props.dynamicRowHeight == true && props.setTreeView == false
       ? -1
@@ -3605,7 +3845,7 @@ const runFuncshowGrid = async () => {
     }
   }
 
-  if (props.setFooter == true) {
+  if (props.setFooter == true && props.bulkLoadMode !== true) {
     gridView.setOptions({ summaryMode: "aggregate" });
   }
 
@@ -3616,11 +3856,12 @@ const runFuncshowGrid = async () => {
   }
   gridView.headerSummaries.visible = false; // 그룹핑 할때 상단 요약값 없애는 설정
 
-  for (let i = dataProvider.getRowCount() - 1; i >= 0; i--) {
-    // 역순으로 순회
-    const rowData = dataProvider.getJsonRow(i);
-    if (rowData != null && rowData.deleted && props.setTreeView == false) {
-      dataProvider.removeRow(i); // 해당 행 삭제
+  if (props.bulkLoadMode !== true) {
+    for (let i = dataProvider.getRowCount() - 1; i >= 0; i--) {
+      const rowData = dataProvider.getJsonRow(i);
+      if (rowData != null && rowData.deleted && props.setTreeView == false) {
+        dataProvider.removeRow(i);
+      }
     }
   }
 
@@ -3637,6 +3878,12 @@ const runFuncshowGrid = async () => {
   // 6구간
   // 이벤트 설정
   gridView.onDataLoadComplated = function (grid) {
+    if (props.bulkLoadMode === true) {
+      try {
+        grid.resetSize();
+      } catch (_) {}
+      return;
+    }
     grid.refresh(true);
     grid.resetSize();
   };
@@ -3688,6 +3935,17 @@ const runFuncshowGrid = async () => {
       ? gridView.columnByField(editedFieldName)
       : null;
     const isCheckCell = colEdited?.renderer?.type === "check";
+    if (
+      isCheckCell &&
+      editedFieldName &&
+      (isRgCheckRowLocked(dataProvider, row) ||
+        rgIsMetaEditCheckLocked(dataProvider, row, editedFieldName))
+    ) {
+      try {
+        dataProvider.setValue(row, editedFieldName, oldVal);
+      } catch (_) {}
+      return;
+    }
     const checkTruthy = (v) =>
       v === true ||
       v === 1 ||
@@ -3730,8 +3988,15 @@ const runFuncshowGrid = async () => {
       dataProvider.setValue(row, "Selected", false);
     }
 
-    updatedrowData.value = [...dataProvider.getJsonRows()];
-    emit("updatedRowData", updatedrowData.value);
+    if (props.bulkLoadMode === true) {
+      if (isCheckCell) {
+        selectedRowData.value = rgCollectCheckedRowData();
+        emit("checkedRowData", selectedRowData.value);
+      }
+    } else {
+      updatedrowData.value = [...dataProvider.getJsonRows()];
+      emit("updatedRowData", updatedrowData.value);
+    }
     emit("allStateRows", dataProvider.getAllStateRows());
 
     const orgFieldName = editedFieldName;
@@ -3774,6 +4039,9 @@ const runFuncshowGrid = async () => {
   };
 
   gridView.onItemChecked = function (grid, itemIndex, checked) {
+    if (props.bulkLoadMode === true && props.checkRowAuto2 === true) {
+      return;
+    }
     gridView.setCurrent({ dataRow: grid.getDataRow(itemIndex) });
 
     // dataProvider.beginUpdate();
@@ -3796,8 +4064,7 @@ const runFuncshowGrid = async () => {
     ////console.log(selectedRowData.value);
 
     emit("checkedRowIndex", rows);
-    updatedrowData.value = [...dataProvider.getJsonRows()];
-    emit("updatedRowData", updatedrowData.value);
+    rgEmitUpdatedRowData();
     emit("allStateRows", dataProvider.getAllStateRows());
     // dataProvider.endUpdate();
     //selectedRowData.value.index = itemIndex;
@@ -3817,14 +4084,15 @@ const runFuncshowGrid = async () => {
     }
     emit("checkedRowData", selectedRowData.value);
 
-    updatedrowData.value = [...dataProvider.getJsonRows()];
-    emit("updatedRowData", updatedrowData.value);
+    rgEmitUpdatedRowData();
     emit("allStateRows", dataProvider.getAllStateRows());
   };
 
   dataProvider.onDataChanged = function (provider) {
     gridView.commit();
-    updatedrowData.value = [...dataProvider.getJsonRows()];
+    if (props.bulkLoadMode !== true) {
+      updatedrowData.value = [...dataProvider.getJsonRows()];
+    }
 
     // emit("updatedRowData", updatedrowData.value);
     const a = updatedrowData.value.filter((item) => item.checkbox == true);
@@ -4044,9 +4312,7 @@ const runFuncshowGrid = async () => {
 
     emit("checkedRowData", selectedRowData.value);
     emit("checkedRowIndex", checkedRowIndexes);
-    updatedrowData.value = [...dataProvider.getJsonRows()];
-
-    emit("updatedRowData", updatedrowData.value);
+    rgEmitUpdatedRowData();
     emit("allStateRows", dataProvider.getAllStateRows());
     //comsole.log(col.fieldName + "was checked as: " + chk);
 
@@ -4078,15 +4344,28 @@ const runFuncshowGrid = async () => {
   };
 
   gridView.onCellDblClicked = function (grid, clickData) {
-    if (clickData.itemIndex == undefined) {
+    if (clickData.itemIndex == undefined || clickData.itemIndex < 0) {
       return;
     }
-    /** 푸터/소계/헤더 영역 또는 동기화 직후 무효 행 → getJsonRow(-1) 예외 방지 */
+    /** 푸터/소계/헤더·CheckBar·No. 영역 또는 동기화 직후 무효 행 */
     if (clickData.dataRow == undefined || clickData.dataRow < 0) {
+      return;
+    }
+    if (
+      clickData.cellType === "check" ||
+      clickData.cellType === "indicator" ||
+      clickData.cellType === "header"
+    ) {
       return;
     }
 
     const current = clickData.dataRow;
+    let fromJson = null;
+    try {
+      fromJson = dataProvider.getJsonRow(current);
+    } catch {
+      fromJson = null;
+    }
 
     // 단일 클릭(onCellClicked)과 동일: 일반 그리드는 getRows() 배열, 트리만 getJsonRow
     if (props.setTreeView == false) {
@@ -4099,7 +4378,7 @@ const runFuncshowGrid = async () => {
           : null;
       /** 병합 컬럼 등으로 provider 행에 PK·코드가 빠진 경우 부모 rowData로 보완 */
       if (fromParent && typeof fromParent === "object") {
-        const merged = { ...(fromProvider || {}) };
+        const merged = { ...(fromProvider || fromJson || {}) };
         for (const k of Object.keys(fromParent)) {
           const pv = fromParent[k];
           const mv = merged[k];
@@ -4115,17 +4394,19 @@ const runFuncshowGrid = async () => {
         selectedRowData.value =
           Object.keys(merged).length > 0 ? merged : fromParent;
       } else {
-        selectedRowData.value = fromProvider;
+        selectedRowData.value = fromProvider ?? fromJson;
       }
     } else {
-      selectedRowData.value = dataProvider.getJsonRow(current);
+      selectedRowData.value = fromJson ?? dataProvider.getJsonRow(current);
     }
 
-    if (selectedRowData.value) {
-      selectedRowData.value.index = clickData.itemIndex;
-      selectedRowData.value.dataRow = current;
-      emit("dblclickedRowData", selectedRowData.value);
-    }
+    const payload =
+      selectedRowData.value && typeof selectedRowData.value === "object"
+        ? { ...selectedRowData.value }
+        : {};
+    payload.index = clickData.itemIndex;
+    payload.dataRow = current;
+    emit("dblclickedRowData", payload);
   };
 
   if (props.enterKeyEmitsDblClicked === true) {
@@ -5346,7 +5627,12 @@ onMounted(async () => {
     );
     await nextTick();
     if (tabInitSetArray.value.length != 0) {
-      await funcshowGrid();
+      const deferEmpty =
+        props.deferGridUntilData === true &&
+        (!Array.isArray(props.rowData) || props.rowData.length === 0);
+      if (!deferEmpty) {
+        await funcshowGrid();
+      }
     }
   } catch (error) {
     //console.error("Failed to fetch data:", error);
@@ -5470,7 +5756,12 @@ const setupGrid = async () => {
     );
 
     if (tabInitSetArray.value.length != 0) {
-      await funcshowGrid();
+      const deferEmpty =
+        props.deferGridUntilData === true &&
+        (!Array.isArray(props.rowData) || props.rowData.length === 0);
+      if (!deferEmpty) {
+        await funcshowGrid();
+      }
     }
   } catch (error) {
     //console.error("Failed to fetch data:", error);
@@ -5485,8 +5776,9 @@ watch(
     }
     addrow4activated.value = true;
     
-    // 초기 로드 판단: 이전 rowData가 빈 배열이었고 현재 데이터가 있는 경우
-    const isInitialLoad = previousRowDataLength.value === 0 && newRowData && newRowData.length > 0;
+    // 미초기화 + 데이터 도착 → funcshowGrid 1회. 이후는 setRows만
+    const isInitialLoad =
+      !isGridInitialized.value && newRowData && newRowData.length > 0;
     previousRowDataLength.value = newRowData ? newRowData.length : 0;
     
     // 초기 로드이거나 그리드가 초기화되지 않은 경우 funcshowGrid 호출
@@ -5494,19 +5786,21 @@ watch(
     if (!isInitialLoad && isGridInitialized.value && gridView !== undefined && gridView !== null && dataProvider !== undefined && dataProvider !== null) {
       // 그리드 재초기화 없이 데이터만 업데이트
       try {
-        /** 편집 중인 채 setRows 하면 "Client is editing (call grid.commit first)" — 먼저 커밋 */
         if (gridView != null) {
           try {
             gridView.commit();
           } catch (_) {}
         }
-        if (props.setTreeView == false) {
-          dataProvider.setRows(props.rowData);
-        } else {
-          dataProvider.setRows(props.rowData, "TreeNum", false, null, "iconField");
+        applyRowsToProvider(props.rowData);
+
+        if (props.bulkLoadMode === true) {
+          addrow4activated.value = false;
+          return;
         }
 
-        // 체크된 행 정보 유지
+        try {
+          gridView?.refresh?.();
+        } catch (_) {}
         if (gridView) {
           var rows = gridView.getCheckedRows();
           selectedRowData.value = [];

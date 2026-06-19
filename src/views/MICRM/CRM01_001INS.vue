@@ -461,6 +461,7 @@
           :reload="reload"
           :documentTitle="'CRM01_001INS'"
           :showCheckBar="true"
+          :checkRowAuto="false"
           @clickedRowData="clickedRowData"
           @checkedRowIndex="checkedRowIndex"
           @dblclickedRowData="dblclickedRowData"
@@ -3282,15 +3283,24 @@ const excelList = (e) => {
   margin-top: var(--crm01-row-gap);
 }
 
-.crm01-wire-grid-4 .crm01-wire-label {
-  flex: 0 0 6.875rem;
-  width: 6.875rem;
-  max-width: 6.875rem;
-  font-size: 0.875rem;
+/* 조회 AREA — 라벨 열·입력 열 시작선 통일 (grid-4 포함) */
+.crm01-search-panel .crm01-wire-cell:not(.crm01-wire-cell-stacked) {
+  display: grid;
+  grid-template-columns: var(--crm01-label-col) minmax(0, 1fr);
+  column-gap: 0.5rem;
+  align-items: center;
 }
 
-.crm01-wire-grid-4 .crm01-wire-cell {
-  gap: 0.5rem;
+.crm01-search-panel .crm01-wire-cell:not(.crm01-wire-cell-stacked) .crm01-wire-label {
+  width: auto;
+  max-width: none;
+  flex: none;
+  justify-self: stretch;
+}
+
+.crm01-search-panel .crm01-wire-cell:not(.crm01-wire-cell-stacked) .crm01-wire-field {
+  min-width: 0;
+  width: 100%;
 }
 
 .crm01-wire-cell {
