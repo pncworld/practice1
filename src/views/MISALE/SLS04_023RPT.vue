@@ -224,7 +224,7 @@ const searchButton = async () => {
 
     const res = await getMenuEngineer(
       selectedGroup.value,
-      0,
+      selectedStores.value,
       selectedstartDate.value,
       selectedendDate.value,
       cond.value == null ? 0 : cond.value.lngCode,
