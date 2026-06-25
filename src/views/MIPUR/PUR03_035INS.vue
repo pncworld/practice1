@@ -103,6 +103,7 @@
         :documentSubTitle="documentSubTitle"
         :documentTitle="'PUR03_035INS'"
         @clickedRowData="clickedRowData"
+        @selectedIndex2="onMainGridSelectedIndex"
         @clickedButtonCol="clickedButtonCol"
         @dblclickedRowData="dblclickedRowData"
         :rowData="rowData">
@@ -1239,8 +1240,50 @@ const checkedRowData2 = async (row) => {
 };
 
 const selectedRowForPopup = ref(null);
+const selectedMainRowIndex = ref(-1);
+
+const onMainGridSelectedIndex = (idx) => {
+  selectedMainRowIndex.value =
+    typeof idx === "number" && idx >= 0 ? idx : -1;
+};
+
+const resolveMainGridRowObject = (row) => {
+  if (row && typeof row === "object" && !Array.isArray(row)) {
+    return row;
+  }
+  if (Array.isArray(row)) {
+    const orderNoFromArray = String(row[7] ?? "").trim();
+    const storeCdFromArray = String(row[1] ?? "").trim();
+    if (orderNoFromArray && Array.isArray(rowData.value)) {
+      const found = rowData.value.find((r) => {
+        const orderNo = String(
+          getRowVal(r, "strOrderNo", "StrOrderNo") ?? ""
+        ).trim();
+        if (orderNo !== orderNoFromArray) return false;
+        if (!storeCdFromArray) return true;
+        const storeCd = String(
+          getRowVal(r, "lngStoreCode", "LngStoreCode") ?? ""
+        ).trim();
+        return storeCd === storeCdFromArray;
+      });
+      if (found) {
+        return found;
+      }
+    }
+  }
+  const rowIdx = Number(row?.dataRow ?? row?.index);
+  const idx =
+    Number.isInteger(rowIdx) && rowIdx >= 0
+      ? rowIdx
+      : selectedMainRowIndex.value;
+  if (idx >= 0 && Array.isArray(rowData.value) && idx < rowData.value.length) {
+    return rowData.value[idx];
+  }
+  return null;
+};
+
 const clickedRowData = (row) => {
-  selectedRowForPopup.value = row && typeof row === "object" ? row : null;
+  selectedRowForPopup.value = resolveMainGridRowObject(row);
 };
 
 const getRowVal = (r, ...keys) => {
@@ -1321,7 +1364,7 @@ const toOrderDateYyyyMmDd = (val) => {
 };
 
 const openOrderDetailPopup = async (row) => {
-  const rowIdx = row?.index;
+  const rowIdx = row?.index ?? row?.dataRow ?? selectedMainRowIndex.value;
   const originalRow = rowIdx != null && rowData.value?.[rowIdx];
   const r = (originalRow && typeof originalRow === "object")
     ? originalRow
