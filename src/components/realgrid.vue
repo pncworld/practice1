@@ -4764,18 +4764,24 @@ const runFuncshowGrid = async () => {
     selectedindex.value = dataRow;
     const rowArray = dp.getRows()?.[dataRow];
     const clickPayload = rgBuildClickedRowPayload(dataRow);
-    let clickEmit = null;
-    if (
+    const parentRow =
       Array.isArray(props.rowData) &&
       dataRow >= 0 &&
-      dataRow < props.rowData.length &&
-      props.rowData[dataRow] != null
-    ) {
-      clickEmit = props.rowData[dataRow];
-    } else if (Array.isArray(rowArray)) {
+      dataRow < props.rowData.length
+        ? props.rowData[dataRow]
+        : null;
+    /**
+     * clickedRowData 호환성:
+     * - 레거시 화면(MST01/PUR03 등)은 e[0], e[1] 형태(배열)를 사용
+     * - 배열이 있으면 배열을 우선 emit 하고, 없으면 객체 payload를 emit
+     */
+    let clickEmit = null;
+    if (Array.isArray(rowArray)) {
       clickEmit = rowArray;
+    } else if (Array.isArray(parentRow)) {
+      clickEmit = parentRow;
     } else {
-      clickEmit = clickPayload ?? null;
+      clickEmit = clickPayload ?? rowArray ?? parentRow ?? null;
     }
     if (clickEmit != null) {
       emit("clickedRowData", clickEmit);
