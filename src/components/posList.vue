@@ -11,6 +11,7 @@
       :options="POSLIST"
       label="strName"
       placeholder="전체"
+      append-to-body
       class="!w-48 !h-7 -mt-3 custom-select"
       :reduce="(store) => (store != null ? store.lngCode : null)"
       clearable="true"

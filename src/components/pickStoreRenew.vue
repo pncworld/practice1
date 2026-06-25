@@ -54,7 +54,15 @@
         :class="vSelectClass"
         :clearable="!disabled1"
         :append-to-body="compact"
-        @click="resetSelectedStore" />
+        @click="resetSelectedStore">
+        <template #selected-option="option">
+          <span
+            class="pickstore-selected-text"
+            :title="option?.strName ?? ''">
+            {{ option?.strName }}
+          </span>
+        </template>
+      </v-select>
     </div>
   </div>
 </template>
@@ -408,6 +416,14 @@ const resetSelectedStore = (e) => {
 .custom-select.custom-select--compact .vs__selected {
   padding-top: 0 !important;
   min-width: 0 !important;
+}
+
+.custom-select.custom-select--compact .pickstore-selected-text {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .custom-select.custom-select--compact.vs--disabled .vs__selected {

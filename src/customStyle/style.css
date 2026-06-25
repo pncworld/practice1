@@ -552,3 +552,29 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
   align-items: center;
   justify-content: center;
 }
+
+/* Realgrid 버튼 렌더러 — 셀 꽉 채우기 + Tailwind Preflight 초기화 복원 */
+.rg-button-renderer-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  padding: 0 6px !important;
+  border: 1px solid #a8aeb7 !important;
+  background: linear-gradient(to bottom, #f5f7f9, #ffffff) !important;
+  color: #333333 !important;
+  font-size: inherit !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  border-radius: 2px !important;
+}
+
+.rg-button-renderer-button:hover {
+  color: #b65111 !important;
+  border-color: #b65111 !important;
+  background: linear-gradient(to bottom, #edeff1, #ffffff) !important;
+}

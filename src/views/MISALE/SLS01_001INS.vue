@@ -7,17 +7,17 @@
 <template>
   <div class="sls01-page flex min-h-0 flex-col" ref="sls01PageRef">
     <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
-      <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
+    <PageName></PageName>
+    <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="() => searchButton()" class="button search md:w-auto w-14">
-          조회
-        </button>
-        <button @click="saveButton" class="button save md:w-auto w-14">
-          저장
-        </button>
-        <button @click="excelButton" class="button w-auto excel">엑셀</button>
-      </div>
+        조회
+      </button>
+      <button @click="saveButton" class="button save md:w-auto w-14">
+        저장
+      </button>
+      <button @click="excelButton" class="button w-auto excel">엑셀</button>
     </div>
+  </div>
   <div
     class="sls01-search-panel relative z-10 mt-2 w-full min-w-0 shrink-0 overflow-x-auto overflow-y-hidden rounded-lg bg-gray-200 px-4 py-2.5 sm:px-6 md:px-10 lg:px-12 xl:py-3 2xl:px-16"
     :style="{
@@ -61,7 +61,7 @@
           @lngStoreCode="lngStoreCode"
           @excelStore="excelStore"
           :placeholderName="'선택'" />
-      </div>
+        </div>
 
       <!-- 2행 좌: 매출목표액 -->
       <div class="sls01-wire-cell">
@@ -101,24 +101,24 @@
           <input
             id="sls01-file-name"
             type="text"
-            disabled
+              disabled
             v-model="excelName"
             :title="excelName"
             class="sls01-sg-input sls01-file-input h-8 min-h-8 min-w-0 flex-1 rounded-md border border-solid bg-white px-2 text-sm text-gray-700" />
-          <label
-            for="hiddenFile"
+            <label
+              for="hiddenFile"
             class="sls01-sub-btn shrink-0 cursor-pointer">
-            파일선택
-          </label>
-          <input
+              파일선택
+            </label>
+            <input
             ref="hiddenFileRef"
-            type="file"
-            class="hidden"
-            id="hiddenFile"
-            @change="readExcel"
+              type="file"
+              class="hidden"
+              id="hiddenFile"
+              @change="readExcel"
             @click="onFileInputClick" />
+          </div>
         </div>
-      </div>
 
       <!-- 3행 우: sheet 선택 레이블 = PickStoreSingle 매장명 left 라인 -->
       <div class="sls01-excel-store-col sls01-pss-row min-w-0">
@@ -150,8 +150,8 @@
             <span class="sls01-sub-btn__excel-icon" aria-hidden="true"></span>
             download
           </button>
-        </div>
       </div>
+    </div>
 
       <div class="sls01-foot-span">
         <p class="sls01-hint m-0 text-sm text-gray-700">
@@ -172,13 +172,13 @@
         @click.stop>
         <div class="sls01-day-popup__header">
           <span class="sls01-day-popup__title">일별 매출계획</span>
-          <button
+              <button
             type="button"
             class="sls01-day-popup__close"
             aria-label="닫기"
-            @click="closePopup">
+                @click="closePopup">
             ×
-          </button>
+              </button>
         </div>
         <div class="sls01-day-popup__body">
           <div class="sls01-day-popup__date-wrap">
@@ -203,10 +203,10 @@
           </div>
           <div class="sls01-day-popup__row">
             <label class="sls01-day-popup__label" for="sls01-popup-amt">목표액</label>
-            <input
+              <input
               ref="sls01PopupAmtRef"
               id="sls01-popup-amt"
-              type="text"
+                type="text"
               inputmode="numeric"
               v-model="clickedProj"
               @keydown="onClickedProjKeydown"
@@ -216,25 +216,25 @@
           </div>
           <div class="sls01-day-popup__row">
             <label class="sls01-day-popup__label" for="sls01-popup-comment">비고</label>
-            <input
+              <input
               id="sls01-popup-comment"
-              type="text"
-              :value="clickedComment"
-              @input="changeComment($event)"
+                type="text"
+                :value="clickedComment"
+                @input="changeComment($event)"
               @keydown="onClickedCommentKeydown"
               class="sls01-day-popup__input" />
-          </div>
+    </div>
         </div>
         <div class="sls01-day-popup__footer">
-          <button
+        <button
             type="button"
             class="sls01-day-popup__btn"
             @click="closePopup">
             닫기
-          </button>
-        </div>
+        </button>
       </div>
     </div>
+      </div>
   </Teleport>
 
   <!--달력 영역-->
@@ -246,14 +246,14 @@
         aria-label="이전 달"
         @click="handleSls01CalendarPrev">
         ‹
-      </button>
+        </button>
       <div class="sls01-cal-toolbar__main">
         <p class="sls01-cal-toolbar__title">{{ sls01CalendarTitle }}</p>
         <div class="sls01-cal-toolbar__total">
           <span class="sls01-cal-toolbar__total-label">매출 목표액</span>
           <span class="sls01-cal-toolbar__total-value">{{ targetMonthSales || "0" }}</span>
-        </div>
       </div>
+    </div>
       <button
         type="button"
         class="sls01-cal-nav"
@@ -261,7 +261,7 @@
         @click="handleSls01CalendarNext">
         ›
       </button>
-    </div>
+  </div>
     <div
       class="sls01-cal-body"
       ref="sls01CalBodyRef"
@@ -1013,7 +1013,7 @@ const isSls01ApiSuccess = (res) => {
 /** 저장 성공 시에만 호출 — 엑셀 업로드 UI·데이터 초기화 */
 const resetSls01ExcelUpload = async () => {
   excelRawSheets.value = [];
-  excelData.value = [];
+    excelData.value = [];
   excelUploadFormats.value = [];
   sheetArr.value = [];
   selectSheet.value = SLS01_SHEET_NONE;
@@ -1383,10 +1383,10 @@ const readSls01ExcelWorkbook = (workbook) => {
   const rawSheets = [];
   const sheets = [];
 
-  for (let i = 0; i < workbook.SheetNames.length; i++) {
-    const sheetName = workbook.SheetNames[i];
-    const worksheet = workbook.Sheets[sheetName];
-    const jsonData = utils.sheet_to_json(worksheet, { header: 1 });
+    for (let i = 0; i < workbook.SheetNames.length; i++) {
+      const sheetName = workbook.SheetNames[i];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = utils.sheet_to_json(worksheet, { header: 1 });
     rawSheets.push({ sheetName, jsonData });
     sheets.push({ lngCode: i, strName: sheetName });
   }
@@ -1406,8 +1406,8 @@ const finishSls01ExcelUpload = async () => {
       icon: "warning",
       confirmButtonText: "확인",
     });
-    return;
-  }
+        return;
+      }
 
   if (count === 1) {
     const loaded = await loadSls01ExcelSheet(0, {
@@ -1582,11 +1582,11 @@ const saveUploadFile = async () => {
     await searchButton({ skipUnsavedCheck: true });
     await resetSls01ExcelUpload();
     await Swal.fire({
-      title: "성공",
-      text: "저장되었습니다.",
-      icon: "success",
-      confirmButtonText: "확인",
-    });
+        title: "성공",
+        text: "저장되었습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
   } catch (error) {
     await Swal.fire({
       title: "실패",
@@ -1672,18 +1672,18 @@ const saveButton = async () => {
           await searchButton({ skipUnsavedCheck: true });
           await resetSls01ExcelUpload();
           await Swal.fire({
-            title: "성공",
-            text: "저장되었습니다.",
-            icon: "success",
-            confirmButtonText: "확인",
-          });
+              title: "성공",
+              text: "저장되었습니다.",
+              icon: "success",
+              confirmButtonText: "확인",
+            });
         } catch (e) {
           await Swal.fire({
-            title: "실패",
+              title: "실패",
             text: "저장 중 오류가 발생했습니다.",
-            icon: "error",
-            confirmButtonText: "확인",
-          });
+              icon: "error",
+              confirmButtonText: "확인",
+            });
         }
       }
     });
@@ -2088,7 +2088,7 @@ const lngSupervisor = (e) => {
 
 const applyLngStoreCodeChange = async (e) => {
   if (sls01RevertingStore.value) {
-    lngstorecode.value = e;
+  lngstorecode.value = e;
     return;
   }
   if (sls01StoreChangeBusy.value) {
@@ -2117,7 +2117,7 @@ const applyLngStoreCodeChange = async (e) => {
     }
 
     lngstorecode.value = e;
-    initGrid();
+  initGrid();
     await tryAutoSearch();
   } finally {
     sls01StoreChangeBusy.value = false;
@@ -2173,12 +2173,12 @@ const searchButton = async (options = {}) => {
   }
   if (lngstorecode.value == 0) {
     if (!silentNoStore) {
-      Swal.fire({
-        title: "경고",
-        text: "매장을 선택하세요.",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
+    Swal.fire({
+      title: "경고",
+      text: "매장을 선택하세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
     }
     return false;
   }

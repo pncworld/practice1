@@ -30,9 +30,32 @@ import {
   TreeView,
 } from "realgrid";
 import { v4 as uuidv4 } from "uuid";
-import { nextTick, onMounted, ref, watch } from "vue";
+import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import {
+  rgDestroyRegistryInstance,
+  rgGetInstance,
+  rgInstanceRegistry,
+} from "./realgridInstanceRegistry.js";
 let gridView;
 let dataProvider;
+
+const rgDestroyInstance = (id, nameRef) => {
+  const key = id ?? nameRef?.value;
+  if (!key) return;
+  const inst = rgGetInstance(key);
+  rgDestroyRegistryInstance(key);
+  if (gridView === inst?.gridView) {
+    gridView = null;
+    dataProvider = null;
+  }
+};
+
+const rgBindActiveInstance = (nameRef) => {
+  const inst = rgGetInstance(nameRef?.value);
+  gridView = inst?.gridView ?? null;
+  dataProvider = inst?.dataProvider ?? null;
+  return inst;
+};
 
 /*
 
@@ -923,6 +946,26 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /** true: rowData 갱신 후 clearCurrent 생략 — 다중 그리드·행 클릭 화면용 */
+  skipClearCurrentAfterSetRows: {
+    type: Boolean,
+    default: false,
+  },
+  /** true: setRows·레이아웃 동기화 시 refresh 생략 — setColumnLayout 유지용 */
+  preserveColumnLayoutOnRefresh: {
+    type: Boolean,
+    default: false,
+  },
+  /** true: labelingColumns 콤보 — 편집 시 editor.values/labels 고정 (팝업 등 opt-in) */
+  fixLabelingDropdownOnShow: {
+    type: Boolean,
+    default: false,
+  },
+  /** setColumnLayout으로 초기·데이터 로드 후 컬럼 레이아웃 고정 (예: 코너명만 표시) */
+  forceColumnLayout: {
+    type: Array,
+    default: () => [],
+  },
   changeNow3: {
     // 데이터 변경시 트리거
     type: Boolean,
@@ -1128,6 +1171,11 @@ const props = defineProps({
     type: Array,
     default: [],
   },
+  /** 값별 글자색 — [{ field, values, color }] */
+  cellFontColorByValue: {
+    type: Array,
+    default: () => [],
+  },
   checkOnlyFalse: {
     // 체크박스 해제만 되는 설정
     type: Boolean,
@@ -1245,7 +1293,75 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /** 행 높이(px). 0이면 기존 동작 */
+  gridRowHeight: {
+    type: Number,
+    default: 0,
+  },
+  /** 헤더 높이(px). 0이면 기존 동작 */
+  gridHeaderHeight: {
+    type: Number,
+    default: 0,
+  },
+  /** 본문·헤더 폰트(px). 0이면 기존 동작 */
+  gridFontSize: {
+    type: Number,
+    default: 0,
+  },
+  /** 본문 세로 정렬(near/center/far). 빈 값이면 기존 동작 */
+  gridBodyLineAlignment: {
+    type: String,
+    default: "",
+  },
+  /** true: 행 포커스 변경(onCurrentChanged) 시 selectedIndex emit */
+  emitSelectedOnCurrentChange: {
+    type: Boolean,
+    default: false,
+  },
+  /** true: 셀 클릭·포커스 시 rowData 원본을 cellClicked 로 emit (행번호·사이즈와 무관) */
+  emitCellClickedRow: {
+    type: Boolean,
+    default: false,
+  },
+  /** true: 행 포커스 변경(onCurrentChanged) 시 clickedRowData emit — 콤보/편집 셀 포함 */
+  emitClickedRowOnRowChange: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+/** onCellClicked — dataRow 를 itemIndex·current 등에서 최대한 복원 */
+const rgResolveClickedDataRow = (grid, clickData, current) => {
+  if (clickData?.dataRow != null && clickData.dataRow >= 0) {
+    return clickData.dataRow;
+  }
+  if (current?.dataRow != null && current.dataRow >= 0) {
+    return current.dataRow;
+  }
+  const ii = clickData?.itemIndex;
+  if (ii != null && ii >= 0 && grid?.getDataRow) {
+    try {
+      const dr = grid.getDataRow(ii);
+      if (dr != null && dr >= 0) {
+        return dr;
+      }
+    } catch (_) {
+      void 0;
+    }
+  }
+  const cii = current?.itemIndex;
+  if (cii != null && cii >= 0 && grid?.getDataRow) {
+    try {
+      const dr2 = grid.getDataRow(cii);
+      if (dr2 != null && dr2 >= 0) {
+        return dr2;
+      }
+    } catch (_) {
+      void 0;
+    }
+  }
+  return -1;
+};
 
 /** DataSource.getValue — 필드 미정의 시 fieldIndex -1 런타임 오류 방지 */
 const rgSafeDataSourceGetValue = (ds, dataRow, fieldName) => {
@@ -1740,6 +1856,334 @@ const onGridContainerFocusIn = () => {
 
 // 2구간
 const realgridname = ref(); // 동적 ID 설정
+
+const rgBuildHeaderStyleBlock = (item, index) => {
+  const fontRule =
+    props.gridFontSize > 0
+      ? `font-size: ${props.gridFontSize}px !important;`
+      : "";
+  return `
+        .header-style-${realgridname.value}${index} {
+          background-color: ${item.strHdBkColor} !important;
+          color: ${item.strHdColor} !important;
+          text-align: center !important;
+          vertical-align: middle !important;
+          ${fontRule}
+        }
+      `;
+};
+
+const rgBuildGridFontSizeCss = () => {
+  if (props.gridFontSize <= 0 || !realgridname.value) return "";
+  const fs = props.gridFontSize;
+  const id = realgridname.value;
+  return `
+    #${id} .rg-data-cell,
+    #${id} .rg-body-cell,
+    #${id} .rg-header-cell,
+    #${id} .rg-header-group-cell,
+    #${id} .setTextAlignLeft,
+    #${id} .setTextAlignCenter,
+    #${id} .setTextAlignRight {
+      font-size: ${fs}px !important;
+    }
+  `;
+};
+
+/** mstgridInfo.intHdHeight — props 없을 때 헤더 높이 (프론트 미연동이었음) */
+const rgGridInfoHeaderHeight = ref(0);
+
+const rgParseGridInfoHeaderHeight = (items) => {
+  let max = 0;
+  for (const it of items || []) {
+    const h = Number(it?.intHdHeight) || 0;
+    if (h > max) {
+      max = h;
+    }
+  }
+  return max;
+};
+
+const rgEffectiveRowHeight = () =>
+  props.gridRowHeight > 0 ? props.gridRowHeight : 0;
+
+const rgEffectiveHeaderHeight = () =>
+  props.gridHeaderHeight > 0
+    ? props.gridHeaderHeight
+    : rgGridInfoHeaderHeight.value;
+
+const rgApplyForceColumnLayout = (gv) => {
+  const layout = props.forceColumnLayout;
+  if (!gv || !Array.isArray(layout) || layout.length === 0) {
+    return;
+  }
+  try {
+    gv.setColumnLayout(layout);
+  } catch (_) {
+    void 0;
+  }
+};
+
+/** labelingColumns 드롭다운 — domainOnly:false; fixLabelingDropdownOnShow 시 listCallback으로 목록 고정 */
+const rgBuildLabelingDropdownEditor = (valueList, labelList) => {
+  const values = valueList.map(String);
+  const labels = labelList.map(String);
+  if (props.fixLabelingDropdownOnShow) {
+    const list = values.map((value, idx) => ({
+      value,
+      label: labels[idx] ?? value,
+    }));
+    return {
+      type: "list",
+      domainOnly: false,
+      textReadOnly: true,
+      dropDownWhenClick: true,
+      commitOnSelect: true,
+      dropDownCount: values.length,
+      values: [...values],
+      labels: [...labels],
+      listCallback: function () {
+        return {
+          value: "value",
+          label: "label",
+          list,
+        };
+      },
+    };
+  }
+  return {
+    type: "dropdown",
+    domainOnly: false,
+    textReadOnly: true,
+    dropDownWhenClick: true,
+    commitOnSelect: true,
+    dropDownCount: Math.max(values.length, 3),
+    dropDownPosition: "editor",
+  };
+};
+
+const rgResolveLabelingFieldKey = (index, grid) => {
+  if (!index) {
+    return "";
+  }
+  if (index.fieldName) {
+    return index.fieldName;
+  }
+  const colRef = index.column;
+  if (typeof colRef === "string") {
+    return colRef;
+  }
+  const fromCol = colRef?.fieldName ?? colRef?.name ?? "";
+  if (fromCol) {
+    return fromCol;
+  }
+  if (grid && index.column != null) {
+    try {
+      const col = grid.getColumn?.(index.column);
+      return col?.fieldName ?? col?.name ?? "";
+    } catch (_) {
+      void 0;
+    }
+  }
+  return "";
+};
+
+const rgFindLabelingColumnIndex = (fieldKey) => {
+  const lcolumns = props.labelingColumns
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (!fieldKey) {
+    return -1;
+  }
+  let colIdx = lcolumns.indexOf(fieldKey);
+  if (colIdx >= 0) {
+    return colIdx;
+  }
+  const lower = String(fieldKey).toLowerCase();
+  colIdx = lcolumns.findIndex((col) => col.toLowerCase() === lower);
+  return colIdx;
+};
+
+const rgApplyLabelingDropdownEditorToGrid = (grid, fieldKey) => {
+  const colIdx = rgFindLabelingColumnIndex(fieldKey);
+  if (colIdx < 0) {
+    return;
+  }
+  const valueList = props.valuesData[colIdx];
+  const labelList = props.labelsData[colIdx];
+  if (!valueList?.length || !labelList?.length) {
+    return;
+  }
+  const editor = rgBuildLabelingDropdownEditor(valueList, labelList);
+  try {
+    grid.setColumnProperty?.(fieldKey, "lookupDisplay", true);
+    grid.setColumnProperty?.(fieldKey, "values", valueList);
+    grid.setColumnProperty?.(fieldKey, "labels", labelList);
+    grid.setColumnProperty?.(fieldKey, "editor", editor);
+    if (props.fixLabelingDropdownOnShow) {
+      grid.setColumnProperty?.(fieldKey, "editButtonVisibility", "always");
+    }
+  } catch (_) {
+    void 0;
+  }
+};
+
+const rgBindLabelingDropdownOnShowEditor = (gv) => {
+  if (
+    !gv ||
+    !props.labelingColumns ||
+    !props.fixLabelingDropdownOnShow ||
+    gv.__rgLabelingDropdownOnShowBound
+  ) {
+    return;
+  }
+  gv.__rgLabelingDropdownOnShowBound = true;
+  const prevOnShowEditor = gv.onShowEditor;
+  gv.onShowEditor = function (grid, index, editProps, attrs) {
+    let allow = true;
+    if (typeof prevOnShowEditor === "function") {
+      const ret = prevOnShowEditor(grid, index, editProps, attrs);
+      if (ret === false) {
+        return false;
+      }
+      if (typeof ret === "boolean") {
+        allow = ret;
+      }
+    }
+    const fieldKey = rgResolveLabelingFieldKey(index, grid);
+    const colIdx = rgFindLabelingColumnIndex(fieldKey);
+    if (colIdx >= 0) {
+      const valueList = props.valuesData[colIdx];
+      const labelList = props.labelsData[colIdx];
+      if (valueList?.length && labelList?.length) {
+        const editor = rgBuildLabelingDropdownEditor(valueList, labelList);
+        Object.assign(editProps, editor);
+        rgApplyLabelingDropdownEditorToGrid(grid, fieldKey);
+      }
+    }
+    return allow;
+  };
+};
+
+/** labelingColumns 드롭다운 — domainOnly:false, values/labels는 컬럼에만 */
+const rgReapplyLabelingDropdownEditors = (gv) => {
+  if (!gv || !props.labelingColumns) {
+    return;
+  }
+  const lcolumns = props.labelingColumns
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const labels = props.labelsData;
+  const values = props.valuesData;
+  for (let i = 0; i < lcolumns.length; i++) {
+    const field = lcolumns[i];
+    const valueList = values[i];
+    const labelList = labels[i];
+    if (!field || !valueList || !labelList) {
+      continue;
+    }
+    try {
+      const gvCol = gv.columnByField(field);
+      if (!gvCol) {
+        continue;
+      }
+      gvCol.lookupDisplay = true;
+      gvCol.values = valueList;
+      gvCol.labels = labelList;
+      if (props.fixLabelingDropdownOnShow) {
+        gvCol.editButtonVisibility = "always";
+      }
+      const editor = props.fixLabelingDropdownOnShow
+        ? rgBuildLabelingDropdownEditor(valueList, labelList)
+        : (() => {
+            const editorType =
+              gvCol.editor?.type === "list" ? "list" : "dropdown";
+            return {
+              type: editorType,
+              domainOnly: false,
+              textReadOnly: true,
+              dropDownWhenClick: true,
+              commitOnSelect: true,
+              dropDownCount: valueList.length,
+            };
+          })();
+      gvCol.editor = editor;
+      gv.setColumnProperty?.(field, "lookupDisplay", true);
+      gv.setColumnProperty?.(field, "values", valueList);
+      gv.setColumnProperty?.(field, "labels", labelList);
+      gv.setColumnProperty?.(field, "editor", editor);
+      if (props.fixLabelingDropdownOnShow) {
+        gv.setColumnProperty?.(field, "editButtonVisibility", "always");
+      }
+    } catch (_) {
+      void 0;
+    }
+  }
+};
+
+/** RealGrid2 — setStyles 미지원 시에도 초기화가 중단되지 않도록 폰트·정렬 적용 */
+const rgApplyGridTypographyStyles = (gv) => {
+  if (!gv || (props.gridFontSize <= 0 && !props.gridBodyLineAlignment)) {
+    return;
+  }
+  const bodyStyle = {};
+  if (props.gridFontSize > 0) {
+    bodyStyle.fontSize = String(props.gridFontSize);
+  }
+  if (props.gridBodyLineAlignment) {
+    bodyStyle.lineAlignment = props.gridBodyLineAlignment;
+  }
+  const styles = { body: bodyStyle };
+  if (props.gridFontSize > 0) {
+    styles.header = { fontSize: String(props.gridFontSize) };
+  }
+  if (typeof gv.setStyles === "function") {
+    try {
+      gv.setStyles(styles);
+      return;
+    } catch (_) {
+      void 0;
+    }
+  }
+  const el = document.getElementById(realgridname.value);
+  if (el && props.gridFontSize > 0) {
+    el.style.fontSize = `${props.gridFontSize}px`;
+  }
+};
+
+/** rowHeight·폰트 적용 후 refresh. rowHeight 변경 시 resetSize로 클릭 영역·No열 동기화 */
+const rgSyncGridLayout = () => {
+  rgBindActiveInstance(realgridname);
+  if (!gridView || !isGridInitialized.value) return;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      try {
+        const rowH = rgEffectiveRowHeight();
+        const hdrH = rgEffectiveHeaderHeight();
+        if (rowH > 0) {
+          gridView.displayOptions.rowHeight = rowH;
+        }
+        if (hdrH > 0) {
+          gridView.header.height = hdrH;
+        }
+        if (
+          Array.isArray(props.forceColumnLayout) &&
+          props.forceColumnLayout.length > 0
+        ) {
+          rgApplyForceColumnLayout(gridView);
+        } else if (!props.preserveColumnLayoutOnRefresh) {
+          gridView.refresh(true);
+        }
+        if (props.syncGridHeight === true || rowH > 0) {
+          gridView.resetSize();
+        }
+      } catch (_) {}
+    });
+  });
+};
+
 const tabInitSetArray = ref([]);
 const selectedRowData = ref([]);
 const result2 = ref([]);
@@ -1757,6 +2201,7 @@ const emit = defineEmits([
   "updatedrowData",
   "clickedRowData",
   "clickedRowData2",
+  "cellClicked",
   "dblclickedRowData",
   "selectedIndex",
   "selectedIndex2",
@@ -1773,23 +2218,18 @@ const emit = defineEmits([
   "clickedButtonCol",
   "checkAllorNot",
   "checkedRowData2",
+  "gridReady",
 ]);
 // 3구간
 const runFuncshowGrid = async () => {
   if (tabInitSetArray.value.length == 0) {
     return;
   }
-  if (gridView !== undefined && gridView !== null) {
-    dataProvider.clearRows();
-    dataProvider.destroy();
-
-    gridView.destroy();
-    gridView = null;
-    dataProvider = null;
-    isGridInitialized.value = false;
-
-    // 기존 그리드 인스턴스 제거
-  }
+  rgGridInfoHeaderHeight.value = rgParseGridInfoHeaderHeight(
+    tabInitSetArray.value
+  );
+  rgDestroyInstance(undefined, realgridname);
+  isGridInitialized.value = false;
 
   if (props.setTreeView == false) {
     dataProvider = new LocalDataProvider();
@@ -1814,7 +2254,12 @@ const runFuncshowGrid = async () => {
     gridView = new TreeView(container);
     gridView.setDataSource(dataProvider);
   }
+  rgInstanceRegistry.set(realgridname.value, { gridView, dataProvider });
   window.gridView = gridView;
+  /** 이 runFuncshowGrid 클로저 전용 — 다중 그리드 시 module dataProvider 덮어쓰기 방지 */
+  const rgSelfId = realgridname.value;
+  const rgLocalDp = () => rgInstanceRegistry.get(rgSelfId)?.dataProvider ?? null;
+  const rgLocalGv = () => rgInstanceRegistry.get(rgSelfId)?.gridView ?? null;
 
   const parseDecimalColumnIds = (propVal) =>
     String(propVal || "")
@@ -2967,6 +3412,40 @@ const runFuncshowGrid = async () => {
         : function (grid, dataCell) {
             var ret = {};
 
+            for (const rule of props.cellFontColorByValue ?? []) {
+              const field = rule?.field ?? rule?.fieldName;
+              if (!field || item.strColID !== field) {
+                continue;
+              }
+              if (rule.whenField) {
+                const whenVal = String(
+                  grid.getValue(dataCell.index.itemIndex, rule.whenField) ?? ""
+                );
+                const whenMatches = (
+                  rule.whenValues ??
+                  rule.whenMatch ??
+                  []
+                ).map(String);
+                if (whenMatches.includes(whenVal)) {
+                  ret.style = {
+                    ...(ret.style || {}),
+                    color: rule.color || "#FF0000",
+                  };
+                }
+                continue;
+              }
+              const val = String(
+                grid.getValue(dataCell.index.itemIndex, field) ?? ""
+              );
+              const matches = (rule.values ?? rule.match ?? []).map(String);
+              if (matches.includes(val)) {
+                ret.style = {
+                  ...(ret.style || {}),
+                  color: rule.color || "#FF0000",
+                };
+              }
+            }
+
             if (
               (dataCell.item.rowState == "created" ||
                 dataCell.item.itemState == "appending" ||
@@ -3073,6 +3552,28 @@ const runFuncshowGrid = async () => {
 
         labelingcolumn.values = values[i];
         labelingcolumn.labels = labels[i];
+        if (props.fixLabelingDropdownOnShow) {
+          labelingcolumn.editButtonVisibility = "always";
+          labelingcolumn.editor = rgBuildLabelingDropdownEditor(
+            values[i],
+            labels[i]
+          );
+        } else if (
+          labelingcolumn.editor &&
+          typeof labelingcolumn.editor === "object"
+        ) {
+          const editorType =
+            labelingcolumn.editor.type === "list" ? "list" : "dropdown";
+          labelingcolumn.editor.type = editorType;
+          labelingcolumn.editor.domainOnly = false;
+          labelingcolumn.editor.textReadOnly = true;
+          labelingcolumn.editor.dropDownWhenClick = true;
+          labelingcolumn.editor.commitOnSelect = true;
+          labelingcolumn.editor.dropDownCount = values[i]?.length ?? 0;
+          delete labelingcolumn.editor.values;
+          delete labelingcolumn.editor.labels;
+          delete labelingcolumn.editor.listCallback;
+        }
       }
       //comsole.log(labelingcolumn);
     }
@@ -3129,6 +3630,8 @@ const runFuncshowGrid = async () => {
   }
 
   gridView.setColumns(columns);
+  rgReapplyLabelingDropdownEditors(gridView);
+  rgBindLabelingDropdownOnShowEditor(gridView);
   if (props.setNumberformatColumn != "") {
     const fmtIds = String(props.setNumberformatColumn)
       .split(",")
@@ -3739,11 +4242,18 @@ const runFuncshowGrid = async () => {
     gridView.displayOptions.refreshMode = "visibleOnly";
   }
   gridView.displayOptions.rowHeight =
-    props.dynamicRowHeight == true && props.setTreeView == false
+    rgEffectiveRowHeight() > 0
+      ? rgEffectiveRowHeight()
+      : props.dynamicRowHeight == true && props.setTreeView == false
       ? -1
       : props.dynamicRowHeight2 == true && props.setTreeView == true
       ? -1
       : 1;
+  const hdrH = rgEffectiveHeaderHeight();
+  if (hdrH > 0) {
+    gridView.header.height = hdrH;
+  }
+  rgApplyGridTypographyStyles(gridView);
   gridView.displayOptions.useFocusClass = false;
   gridView.displayOptions.wheelScrollLines = 1;
   if (props.setTreeView == false) {
@@ -3799,10 +4309,19 @@ const runFuncshowGrid = async () => {
     }
   }
 
+  rgApplyForceColumnLayout(gridView);
+
   watch(
     () => props.hideColumnsId,
     () => {
       if (gridView != null) {
+        if (
+          Array.isArray(props.forceColumnLayout) &&
+          props.forceColumnLayout.length > 0
+        ) {
+          rgApplyForceColumnLayout(gridView);
+          return;
+        }
         for (let i = 0; i < gridView.getColumns().length; i++) {
           if (gridView.getColumns()[i].width != 0) {
             gridView.columnByField(
@@ -3884,7 +4403,29 @@ const runFuncshowGrid = async () => {
       } catch (_) {}
       return;
     }
+    if (
+      Array.isArray(props.forceColumnLayout) &&
+      props.forceColumnLayout.length > 0
+    ) {
+      rgApplyForceColumnLayout(grid);
+      rgReapplyLabelingDropdownEditors(grid);
+      rgBindLabelingDropdownOnShowEditor(grid);
+      try {
+        grid.resetSize();
+      } catch (_) {}
+      return;
+    }
+    if (props.preserveColumnLayoutOnRefresh) {
+      try {
+        grid.resetSize();
+      } catch (_) {}
+      rgReapplyLabelingDropdownEditors(grid);
+      rgBindLabelingDropdownOnShowEditor(grid);
+      return;
+    }
     grid.refresh(true);
+    rgReapplyLabelingDropdownEditors(grid);
+    rgBindLabelingDropdownOnShowEditor(grid);
     grid.resetSize();
   };
 
@@ -4103,44 +4644,259 @@ const runFuncshowGrid = async () => {
   };
 
   gridView.onCellItemClicked = function (grid, clickData) {
-    if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
+    // itemIndex == -1 이어도 dataRow 가 유효하면 계속 진행 (행 높이 불일치 시 발생)
+    const ciItemIndex = clickData.itemIndex;
+    const ciDataRow = clickData.dataRow;
+    if ((ciItemIndex == undefined || ciItemIndex == -1) && (ciDataRow == undefined || ciDataRow < 0)) {
       return;
     }
     // 그룹 소계/푸터/헤더 등 "데이터 행"이 아닌 영역 클릭 시 버튼컬럼 이벤트 emit 금지
-    // (예: 그룹 소계 행에서 전표번호 클릭해도 팝업이 뜨지 않도록)
-    if (clickData.dataRow == undefined || clickData.dataRow < 0) {
+    if (ciDataRow == undefined || ciDataRow < 0) {
       return;
     }
 
-    var current = gridView.getCurrent();
-    selectedindex.value = current.dataRow;
+    var current = grid.getCurrent();
+    // current.dataRow 가 유효하지 않으면 clickData.dataRow 사용
+    const effectiveDataRow =
+      current.dataRow != null && current.dataRow >= 0 ? current.dataRow : ciDataRow;
+    selectedindex.value = effectiveDataRow;
+    const dpClick = rgLocalDp();
+    if (!dpClick) {
+      return;
+    }
     if (props.setTreeView == false) {
-      selectedRowData.value = dataProvider.getRows()[current.dataRow];
+      selectedRowData.value = dpClick.getRows()[effectiveDataRow];
     } else {
-      selectedRowData.value = dataProvider.getJsonRow(current.dataRow);
+      selectedRowData.value = dpClick.getJsonRow(effectiveDataRow);
     }
     emit("buttonClicked", selectedRowData.value);
     emit("clickedButtonCol", clickData.fieldName);
     emit("selcetedrowData", selectedRowData.value);
-    emit("selectedIndex", clickData.dataRow);
-    emit("selectedIndex2", clickData.dataRow);
-    emit("allStateRows", dataProvider.getAllStateRows());
+    emit("selectedIndex", ciDataRow);
+    emit("selectedIndex2", ciDataRow);
+    emit("allStateRows", dpClick.getAllStateRows());
   };
 
   gridView.onSelectionChanged = function (grid) {
-    var current = gridView.getCurrent();
+    var current = grid.getCurrent();
+    const dr = current?.dataRow;
+    if (dr == null || dr < 0) {
+      return;
+    }
+
+    const dpSel = rgLocalDp();
+    if (!dpSel) {
+      return;
+    }
 
     if (props.setTreeView == false) {
-      selectedRowData.value = dataProvider.getRows()[current.dataRow];
+      selectedRowData.value = dpSel.getRows()[dr];
     } else {
-      selectedRowData.value = dataProvider.getJsonRow(current.dataRow);
+      selectedRowData.value = dpSel.getJsonRow(dr);
     }
     if (selectedRowData.value) {
-      selectedRowData.value.index = current.dataRow;
+      selectedRowData.value.index = dr;
+    }
 
-      emit("selectedIndex", current.dataRow);
+    emit("selectedIndex", dr);
+    emit("selectedIndex2", dr);
+  };
+
+  const rgBuildClickedRowPayload = (dataRow) => {
+    const dp = rgLocalDp();
+    if (!dp || dataRow == null || dataRow < 0) return null;
+    let fromJson = null;
+    try {
+      fromJson = dp.getJsonRow(dataRow);
+    } catch (_) {
+      fromJson = null;
+    }
+    if (props.setTreeView == false) {
+      const fromProvider = dp.getRows()[dataRow];
+      const fromParent =
+        Array.isArray(props.rowData) &&
+        dataRow >= 0 &&
+        dataRow < props.rowData.length
+          ? props.rowData[dataRow]
+          : null;
+      if (fromParent && typeof fromParent === "object") {
+        const merged = { ...(fromProvider || fromJson || {}) };
+        for (const k of Object.keys(fromParent)) {
+          const pv = fromParent[k];
+          const mv = merged[k];
+          if (
+            (mv === undefined || mv === null || mv === "") &&
+            pv !== undefined &&
+            pv !== null &&
+            pv !== ""
+          ) {
+            merged[k] = pv;
+          }
+        }
+        const payload =
+          Object.keys(merged).length > 0 ? merged : { ...fromParent };
+        payload.index = dataRow;
+        payload.dataRow = dataRow;
+        return payload;
+      }
+      const base = fromProvider ?? fromJson;
+      if (base && typeof base === "object") {
+        const payload = Array.isArray(base) ? [...base] : { ...base };
+        payload.index = dataRow;
+        payload.dataRow = dataRow;
+        return payload;
+      }
+      return base;
+    }
+    const jsonRow = fromJson ?? dp.getJsonRow(dataRow);
+    if (jsonRow && typeof jsonRow === "object") {
+      return { ...jsonRow, index: dataRow, dataRow };
+    }
+    return jsonRow;
+  };
+
+  /** clickedRowData emit — HEAD 배열 [0],[1] 우선 */
+  const rgEmitClickedRowData = (dataRow) => {
+    const dp = rgLocalDp();
+    if (!dp || dataRow == null || dataRow < 0) {
+      return;
+    }
+    selectedindex.value = dataRow;
+    const rowArray = dp.getRows()?.[dataRow];
+    const clickPayload = rgBuildClickedRowPayload(dataRow);
+    let clickEmit = null;
+    if (
+      Array.isArray(props.rowData) &&
+      dataRow >= 0 &&
+      dataRow < props.rowData.length &&
+      props.rowData[dataRow] != null
+    ) {
+      clickEmit = props.rowData[dataRow];
+    } else if (Array.isArray(rowArray)) {
+      clickEmit = rowArray;
+    } else {
+      clickEmit = clickPayload ?? null;
+    }
+    if (clickEmit != null) {
+      emit("clickedRowData", clickEmit);
+      emit("selectedIndex", dataRow);
+      emit("selectedIndex2", dataRow);
     }
   };
+
+  const rgEmitCellClickedRow = (dataRow, fieldName) => {
+    if (!props.emitCellClickedRow || dataRow == null || dataRow < 0) {
+      return;
+    }
+    let row = null;
+    if (
+      Array.isArray(props.rowData) &&
+      dataRow >= 0 &&
+      dataRow < props.rowData.length
+    ) {
+      row = props.rowData[dataRow];
+    }
+    if (row == null) {
+      row = rgBuildClickedRowPayload(dataRow);
+    }
+    const gv = rgLocalGv();
+    if (gv) {
+      try {
+        const itemIndex = gv.getItemIndex(dataRow);
+        if (itemIndex >= 0) {
+          const cd = gv.getValue(itemIndex, "lngCornerCD");
+          const nm = gv.getValue(itemIndex, "strCornerNM");
+          if (cd != null && cd !== "") {
+            if (row && typeof row === "object" && !Array.isArray(row)) {
+              row = {
+                ...row,
+                lngCornerCD: row.lngCornerCD ?? row.lngCornerCd ?? cd,
+                strCornerNM: row.strCornerNM ?? row.strCornerNm ?? nm,
+              };
+            } else {
+              row = { lngCornerCD: cd, strCornerNM: nm ?? "" };
+            }
+          }
+        }
+      } catch (_) {
+        void 0;
+      }
+    }
+    const rowArray =
+      rgLocalDp() && dataRow >= 0
+        ? rgLocalDp().getRows()?.[dataRow]
+        : null;
+    if (row != null || rowArray != null) {
+      emit("cellClicked", {
+        dataRow,
+        fieldName: fieldName ?? "",
+        row: row ?? rowArray,
+        rowArray,
+      });
+    }
+  };
+
+  if (
+    props.emitSelectedOnCurrentChange === true ||
+    props.emitCellClickedRow === true ||
+    props.emitClickedRowOnRowChange === true
+  ) {
+    gridView.onCurrentChanged = function (grid, newIndex) {
+      if (newIndex?.cellType === "header") {
+        return;
+      }
+      const dr = newIndex?.dataRow;
+      if (dr == null || dr < 0) {
+        return;
+      }
+
+      if (props.emitClickedRowOnRowChange === true) {
+        rgEmitClickedRowData(dr);
+      }
+
+      if (props.emitCellClickedRow === true) {
+        rgEmitCellClickedRow(dr, newIndex?.fieldName);
+      }
+
+      if (props.emitSelectedOnCurrentChange !== true) {
+        return;
+      }
+
+      selectedindex.value = dr;
+      emit("selectedIndex", dr);
+      emit("selectedIndex2", dr);
+
+      let rowPayload = null;
+      try {
+        rowPayload = dataProvider.getJsonRow(dr);
+      } catch (_) {
+        rowPayload = null;
+      }
+      const fromParent =
+        Array.isArray(props.rowData) &&
+        dr >= 0 &&
+        dr < props.rowData.length
+          ? props.rowData[dr]
+          : null;
+      if (fromParent && typeof fromParent === "object") {
+        const merged = { ...(rowPayload || {}) };
+        for (const k of Object.keys(fromParent)) {
+          if (
+            merged[k] == null ||
+            merged[k] === "" ||
+            merged[k] === undefined
+          ) {
+            merged[k] = fromParent[k];
+          }
+        }
+        rowPayload = Object.keys(merged).length > 0 ? merged : { ...fromParent };
+      }
+      if (rowPayload != null && typeof rowPayload === "object") {
+        rowPayload.index = dr;
+        rowPayload.dataRow = dr;
+      }
+    };
+  }
 
   gridView.onShowTooltip = function (grid, index, value) {
     var column = index.fieldName;
@@ -4160,35 +4916,93 @@ const runFuncshowGrid = async () => {
       return;
     }
     if (clickData.cellType === "header") {
-      gridView.setCurrent({ dataRow: selectedindex.value });
-    }
-    if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
+      grid.setCurrent({ dataRow: selectedindex.value });
       return;
     }
 
+    // 클릭한 셀에 current 고정 → dataRow 확보 (높이 변경·편집 셀 포함)
+    if (clickData.itemIndex != null && clickData.itemIndex >= 0) {
+      try {
+        grid.setCurrent({
+          itemIndex: clickData.itemIndex,
+          fieldName: clickData.fieldName,
+        });
+      } catch (_) {
+        void 0;
+      }
+    }
+
+    if (props.emitCellClickedRow) {
+      const curForCell = grid.getCurrent();
+      const drCell = rgResolveClickedDataRow(grid, clickData, curForCell);
+      if (drCell >= 0) {
+        rgEmitCellClickedRow(drCell, clickData.fieldName);
+      }
+    }
+
+    var current = grid.getCurrent();
+    const clickedDataRow = rgResolveClickedDataRow(grid, clickData, current);
+
+    if (clickedDataRow >= 0) {
+      rgEmitClickedRowData(clickedDataRow);
+    }
+
+    // rowHeight·폰트 CSS 불일치 시 itemIndex=-1 이어도 dataRow(getDataRow)로 처리
+    if (clickData.itemIndex == undefined || clickData.itemIndex == -1) {
+      if (clickedDataRow < 0) {
+        return;
+      }
+    }
+
     // 그룹 소계/푸터/총계 등 dataRow가 없는 영역에서는 버튼컬럼 클릭 이벤트를 emit하지 않음
-    const isDataRow = !(clickData.dataRow == undefined || clickData.dataRow < 0);
+    const isDataRow = clickedDataRow >= 0;
 
-    var current = gridView.getCurrent();
+    // onCellItemClicked 가 itemIndex=-1 로 안 터질 때 fallback — button renderer 컬럼 클릭 시 buttonClicked emit
+    if (isDataRow && clickData.fieldName) {
+      try {
+        const colDef = grid.columnByName?.(clickData.fieldName);
+        if (colDef?.renderer?.type === "button") {
+          const dpBtn = rgLocalDp();
+          if (dpBtn) {
+            const btnRow =
+              props.setTreeView == false
+                ? dpBtn.getRows()?.[clickedDataRow]
+                : dpBtn.getJsonRow(clickedDataRow);
+            if (btnRow != null) {
+              emit("buttonClicked", btnRow);
+              emit("clickedButtonCol", clickData.fieldName);
+            }
+          }
+        }
+      } catch (_) {
+        void 0;
+      }
+    }
+
     ////console.log(current);
-    if (current.itemIndex !== -1) {
-      emit("selectedIndex", current.dataRow);
-      emit("selectedIndex2", current.dataRow);
+    if (current.itemIndex !== -1 || clickedDataRow >= 0) {
+      if (isDataRow && clickData.fieldName) {
+        emit("clickedButtonCol", clickData.fieldName);
+      }
+      if (clickedDataRow != null && clickedDataRow >= 0) {
+        emit("selectedIndex", clickedDataRow);
+        emit("selectedIndex2", clickedDataRow);
+      }
 
+      const dpCell = rgLocalDp();
       if (props.setTreeView == false) {
-        selectedRowData.value = dataProvider.getRows()[current.dataRow];
+        selectedRowData.value = dpCell?.getRows()?.[clickedDataRow];
       } else {
-        selectedRowData.value = dataProvider.getJsonRow(current.dataRow);
+        selectedRowData.value = dpCell?.getJsonRow(clickedDataRow);
       }
       //dataProvider.checkRowStates(false);
       if (props.excludeCheck == true) {
-        gridView.checkAll(false); // checkrowstates
+        grid.checkAll(false);
       }
 
       //if(props.cellclickcheck)
       if (props.checkRowAuto == true) {
-        // 내장 체크바와 연동할건지 말건지를 결정하는 부분 false하면 셀 클릭시 내장 체크바는 선택안됨
-        if (gridView.isCheckedRow(clickData.itemIndex)) {
+        if (grid.isCheckedRow(clickData.itemIndex)) {
           if (props.hideCheckBarList == false) {
             grid.checkItem(clickData.itemIndex, false);
           } else {
@@ -4225,30 +5039,27 @@ const runFuncshowGrid = async () => {
       //   emit("checkedRowData", selectedRowData.value);
       // }
 
-      // dataProvider.checkRowStates(true);
       if (props.setTreeView == false) {
-        selectedRowData.value = dataProvider.getRows()[current.dataRow];
+        selectedRowData.value = dpCell?.getRows()?.[clickedDataRow];
       } else {
-        selectedRowData.value = dataProvider.getJsonRow(current.dataRow);
+        selectedRowData.value = dpCell?.getJsonRow(clickedDataRow);
       }
+      const rowState =
+        clickedDataRow >= 0 && dpCell
+          ? dpCell.getRowState(clickedDataRow)
+          : null;
       if (selectedRowData.value) {
-        const rowState = dataProvider.getRowState(clickData.dataRow);
-        if (selectedRowData.value) {
-          selectedRowData.value.index = current.dataRow;
-          selectedRowData.value.rowState = rowState;
-        }
-        selectedindex.value = current.dataRow;
-
-        //comsole.log(rowState);
-        emit("sendRowState", rowState);
-
-        emit("clickedRowData", selectedRowData.value);
+        selectedRowData.value.index = clickedDataRow;
+        selectedRowData.value.rowState = rowState;
       }
+      selectedindex.value = clickedDataRow;
+
+      emit("sendRowState", rowState);
     }
-    if (isDataRow) {
-      emit("clickedButtonCol", clickData.fieldName);
+    const dpAll = rgLocalDp();
+    if (dpAll) {
+      emit("allStateRows", dpAll.getAllStateRows());
     }
-    emit("allStateRows", dataProvider.getAllStateRows());
   };
 
   gridView.onColumnCheckedChanged = function (grid, col, chk) {
@@ -4524,6 +5335,15 @@ const runFuncshowGrid = async () => {
 
   // 그리드 초기화 완료 플래그 설정
   isGridInitialized.value = true;
+  if (
+    props.syncGridHeight === true ||
+    props.gridRowHeight > 0 ||
+    props.gridHeaderHeight > 0 ||
+    props.gridFontSize > 0
+  ) {
+    rgSyncGridLayout();
+  }
+  emit("gridReady", realgridname.value);
 };
 
 /**
@@ -4531,14 +5351,71 @@ const runFuncshowGrid = async () => {
  * 동일 ContainerDiv 에 GridView 가 중복 생성되어 런타임 오류가 난다.
  * 호출을 직렬화해 한 번에 하나의 초기화만 수행한다.
  */
-let _funcshowGridSerial = Promise.resolve();
+let _funcshowGridSerialById = new Map();
 const funcshowGrid = () => {
-  _funcshowGridSerial = _funcshowGridSerial
+  const key = realgridname.value;
+  if (!key) {
+    return Promise.resolve();
+  }
+  const prev = _funcshowGridSerialById.get(key) ?? Promise.resolve();
+  const next = prev
     .then(() => runFuncshowGrid())
     .catch((err) => {
-      console.warn("[Realgrid] funcshowGrid", err);
+      console.warn("[Realgrid] funcshowGrid", key, err?.message ?? err, err);
     });
-  return _funcshowGridSerial;
+  _funcshowGridSerialById.set(key, next);
+  return next;
+};
+
+/** setRows 후 처리 — selfId 고정 (다중 그리드에서 전역 gridView 참조 오류 방지) */
+const rgRunPostSetRowsFinalize = (selfId) => {
+  if (!selfId) {
+    return;
+  }
+  setTimeout(function () {
+    const inst = rgGetInstance(selfId);
+    const gv = inst?.gridView;
+    const dp = inst?.dataProvider;
+
+    if (selectedindex.value == -1) {
+      if (dp) {
+        dp.clearRowStates();
+        if (
+          gv &&
+          Array.isArray(props.forceColumnLayout) &&
+          props.forceColumnLayout.length > 0
+        ) {
+          rgApplyForceColumnLayout(gv);
+        }
+        emit("selectedIndex", selectedindex.value);
+        emit("gridReady", selfId);
+        return;
+      }
+    }
+
+    if (selectedindex.value !== "" && selectedindex.value != undefined) {
+      gv?.setCurrent?.({ dataRow: selectedindex.value });
+    }
+
+    addrow4activated.value = false;
+
+    if (gv != null && props.skipClearCurrentAfterSetRows !== true) {
+      if (deleted2activated.value == true) {
+        gv.clearCurrent();
+        deleted2activated.value = false;
+      } else {
+        gv.clearCurrent();
+      }
+    }
+    emit("gridReady", selfId);
+    if (
+      gv &&
+      Array.isArray(props.forceColumnLayout) &&
+      props.forceColumnLayout.length > 0
+    ) {
+      rgApplyForceColumnLayout(gv);
+    }
+  }, 80);
 };
 
 const refreshSuppressEditState = () => {
@@ -4734,13 +5611,18 @@ watch(
     }
 
     if (gridView != undefined) {
+      const menuSearchCol = criteria2[0]?.trim?.() ?? "";
       if (props.searchWord3 == "" && props.searchColId3 == []) {
-        gridView.setColumnFilters(criteria2[0], []);
+        if (menuSearchCol) {
+          gridView.setColumnFilters(menuSearchCol, []);
+        }
       } else {
-        if (props.searchWord3 !== "") {
-          gridView.setColumnFilters(criteria2[0], filter);
-        } else {
-          gridView.setColumnFilters(criteria2[0], []);
+        if (menuSearchCol) {
+          if (props.searchWord3 !== "") {
+            gridView.setColumnFilters(menuSearchCol, filter);
+          } else {
+            gridView.setColumnFilters(menuSearchCol, []);
+          }
         }
         for (let i = 0; i < filter2.length; i++) {
           //comsole.log(props.searchValue[i]);
@@ -5612,15 +6494,9 @@ onMounted(async () => {
     // 동적 스타일 생성
     let styleContent = "";
     tabInitSetArray.value.forEach((item, index) => {
-      styleContent += `
-        .header-style-${realgridname.value}${index} {
-          background-color: ${item.strHdBkColor} !important;
-          color: ${item.strHdColor} !important;
-          text-align: center !important;
-          vertical-align: middle !important;
-        }
-      `;
+      styleContent += rgBuildHeaderStyleBlock(item, index);
     });
+    styleContent += rgBuildGridFontSizeCss();
     document.head.insertAdjacentHTML(
       "beforeend",
       `<style>${styleContent}</style>`
@@ -5741,15 +6617,9 @@ const setupGrid = async () => {
     // Dynamic style generation
     let styleContent = "";
     tabInitSetArray.value.forEach((item, index) => {
-      styleContent += `
-        .header-style-${realgridname.value}${index} {
-          background-color: ${item.strHdBkColor} !important;
-          color: ${item.strHdColor} !important;
-          text-align: center !important;
-          vertical-align: middle !important;
-        }
-      `;
+      styleContent += rgBuildHeaderStyleBlock(item, index);
     });
+    styleContent += rgBuildGridFontSizeCss();
     document.head.insertAdjacentHTML(
       "beforeend",
       `<style>${styleContent}</style>`
@@ -5768,6 +6638,11 @@ const setupGrid = async () => {
   }
 };
 
+onUnmounted(() => {
+  rgDestroyInstance(undefined, realgridname);
+  isGridInitialized.value = false;
+});
+
 watch(
   () => props.rowData,
   (newRowData) => {
@@ -5783,12 +6658,23 @@ watch(
     
     // 초기 로드이거나 그리드가 초기화되지 않은 경우 funcshowGrid 호출
     // 그 외의 경우 (그리드가 이미 초기화되어 있고 데이터만 업데이트)에는 setRows만 호출
-    if (!isInitialLoad && isGridInitialized.value && gridView !== undefined && gridView !== null && dataProvider !== undefined && dataProvider !== null) {
+    if (!isInitialLoad && isGridInitialized.value) {
+      const selfId = realgridname.value;
+      rgBindActiveInstance(realgridname);
+      const instSet = rgGetInstance(selfId);
+      const gvSet = instSet?.gridView;
+      const dpSet = instSet?.dataProvider;
+      if (
+        gvSet !== undefined &&
+        gvSet !== null &&
+        dpSet !== undefined &&
+        dpSet !== null
+      ) {
       // 그리드 재초기화 없이 데이터만 업데이트
       try {
-        if (gridView != null) {
+        if (gvSet != null) {
           try {
-            gridView.commit();
+            gvSet.commit();
           } catch (_) {}
         }
         applyRowsToProvider(props.rowData);
@@ -5799,133 +6685,75 @@ watch(
         }
 
         try {
-          gridView?.refresh?.();
+          if (
+            Array.isArray(props.forceColumnLayout) &&
+            props.forceColumnLayout.length > 0
+          ) {
+            rgApplyForceColumnLayout(gvSet);
+          } else if (!props.preserveColumnLayoutOnRefresh) {
+            gvSet?.refresh?.();
+          }
+          rgReapplyLabelingDropdownEditors(gvSet);
+          rgBindLabelingDropdownOnShowEditor(gvSet);
+          if (
+            props.syncGridHeight === true ||
+            props.gridRowHeight > 0 ||
+            props.gridHeaderHeight > 0 ||
+            props.gridFontSize > 0
+          ) {
+            rgSyncGridLayout();
+          }
         } catch (_) {}
-        if (gridView) {
-          var rows = gridView.getCheckedRows();
+        if (gvSet) {
+          var rows = gvSet.getCheckedRows();
           selectedRowData.value = [];
           for (var i in rows) {
-            var data = dataProvider.getJsonRow(rows[i]);
+            var data = dpSet.getJsonRow(rows[i]);
             selectedRowData.value.push(data);
           }
           emit("checkedRowData", selectedRowData.value);
         }
 
-        setTimeout(function () {
-          if (selectedindex.value == -1) {
-            if (dataProvider) {
-              dataProvider.clearRowStates();
-              emit("selectedIndex", selectedindex.value);
-              return;
-            }
-          }
-
-          if (selectedindex.value !== "" && selectedindex.value != undefined) {
-            if (gridView) {
-              gridView.setCurrent({ dataRow: selectedindex.value });
-            }
-          }
-
-          addrow4activated.value = false;
-
-          if (gridView !== null && gridView != undefined) {
-            if (deleted2activated.value == true) {
-              gridView.clearCurrent();
-              deleted2activated.value = false;
-            } else {
-              gridView.clearCurrent();
-            }
-          }
-        }, 80);
+        rgRunPostSetRowsFinalize(selfId);
       } catch (error) {
         // setRows 실패 시 그리드 재초기화
         console.warn("Failed to update rows, reinitializing grid:", error);
         isGridInitialized.value = false;
         funcshowGrid().then(() => {
-          if (gridView) {
-            var rows = gridView.getCheckedRows();
+          const instRe = rgGetInstance(selfId);
+          const gvRe = instRe?.gridView;
+          const dpRe = instRe?.dataProvider;
+          if (gvRe) {
+            var rows = gvRe.getCheckedRows();
             selectedRowData.value = [];
             for (var i in rows) {
-              var data = dataProvider.getJsonRow(rows[i]);
+              var data = dpRe.getJsonRow(rows[i]);
               selectedRowData.value.push(data);
             }
             emit("checkedRowData", selectedRowData.value);
           }
 
-          setTimeout(function () {
-            if (selectedindex.value == -1) {
-              if (dataProvider) {
-                dataProvider.clearRowStates();
-                emit("selectedIndex", selectedindex.value);
-                return;
-              }
-            }
-
-            if (selectedindex.value !== "" && selectedindex.value != undefined) {
-              if (gridView) {
-                gridView.setCurrent({ dataRow: selectedindex.value });
-              }
-            }
-
-            addrow4activated.value = false;
-
-            if (gridView !== null && gridView != undefined) {
-              if (deleted2activated.value == true) {
-                gridView.clearCurrent();
-                deleted2activated.value = false;
-              } else {
-                gridView.clearCurrent();
-              }
-            }
-          }, 80);
+          rgRunPostSetRowsFinalize(selfId);
         });
       }
+      }
     } else {
-      // 그리드가 초기화되지 않았거나 플래그가 false이면 funcshowGrid 호출
+      const selfIdElse = realgridname.value;
       funcshowGrid().then(() => {
-        if (gridView) {
-          var rows = gridView.getCheckedRows();
+        const instElse = rgGetInstance(selfIdElse);
+        const gvElse = instElse?.gridView;
+        const dpElse = instElse?.dataProvider;
+        if (gvElse) {
+          var rows = gvElse.getCheckedRows();
           selectedRowData.value = [];
           for (var i in rows) {
-            var data = dataProvider.getJsonRow(rows[i]);
+            var data = dpElse.getJsonRow(rows[i]);
             selectedRowData.value.push(data);
           }
           emit("checkedRowData", selectedRowData.value);
         }
 
-        setTimeout(function () {
-          if (selectedindex.value == -1) {
-            if (dataProvider) {
-              dataProvider.clearRowStates();
-              emit("selectedIndex", selectedindex.value);
-              return;
-            }
-          }
-
-          if (selectedindex.value !== "" && selectedindex.value != undefined) {
-            if (gridView) {
-              gridView.setCurrent({ dataRow: selectedindex.value });
-            }
-          }
-
-          // const newIndices = props.rowData.reduce((indices, item, index) => {
-          //   if (item.new === true) {
-          //     indices.push(index);
-          //   }
-          //   return indices;
-          // }, []);
-          // dataProvider.setRowStates(newIndices, "created", true);
-          addrow4activated.value = false;
-
-          if (gridView !== null && gridView != undefined) {
-            if (deleted2activated.value == true) {
-              gridView.clearCurrent();
-              deleted2activated.value = false;
-            } else {
-              gridView.clearCurrent();
-            }
-          }
-        }, 80); // 시간으로인한 미적용 이슈있음
+        rgRunPostSetRowsFinalize(selfIdElse);
       });
     }
   }
