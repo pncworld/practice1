@@ -312,6 +312,7 @@
 <script setup>
 import { getKioskList, getPosList, getTablePosList, getStoreList2 } from "@/api/common";
 import { getScreenList2 } from "@/api/master";
+import Swal from "sweetalert2";
 import { defineProps, nextTick, onMounted, ref, watch, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
@@ -330,6 +331,11 @@ watch(selectedStoreCode, () => {
   setKioskNo(converted);
   setTablePosNo(converted);
   setScreenNo2(converted);
+
+  if (props.resetTimeOnStoreChange && props.showTime && selectedTime.value !== "0") {
+    selectedTime.value = "0";
+    emit("updateTime", "0");
+  }
 });
 
 const storeGroup = ref([]);
@@ -359,8 +365,25 @@ const changeFunc = (e) => {
   selectedFuncScreen.value = e.target.value;
   emit("updateFuncScreenType", selectedFuncScreen.value);
 };
-const changeTime = (e) => {
-  selectedTime.value = e.target.value;
+const isStoreSelected = () => {
+  const code = selectedStoreCode.value;
+  return code != null && code !== "" && String(code) !== "0";
+};
+
+const changeTime = async (e) => {
+  const next = e.target.value;
+  if (props.requireStoreBeforeTime && next !== "0" && !isStoreSelected()) {
+    selectedTime.value = "0";
+    await Swal.fire({
+      title: "경고",
+      text: "매장을 먼저 선택해 주세요",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    emit("updateTime", "0");
+    return;
+  }
+  selectedTime.value = next;
   emit("updateTime", selectedTime.value);
 };
 const userData = store.state.userData;
@@ -424,6 +447,16 @@ const props = defineProps({
     default: false,
   },
   showTime: {
+    type: Boolean,
+    default: false,
+  },
+  /** true: 매장 변경 시 시간대 콤보를 「선택」으로 초기화 */
+  resetTimeOnStoreChange: {
+    type: Boolean,
+    default: false,
+  },
+  /** true: 매장 미선택 시 시간대(런치/디너) 선택 차단 */
+  requireStoreBeforeTime: {
     type: Boolean,
     default: false,
   },

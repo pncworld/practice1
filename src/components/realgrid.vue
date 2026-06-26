@@ -22,6 +22,7 @@ import {
   formatDateTime2,
   formatLocalDate,
 } from "@/customFunc/customFunc";
+import { isKoreanPublicHoliday } from "@/customFunc/koreanHolidays";
 import store from "@/store";
 import {
   GridView,
@@ -686,6 +687,20 @@ const props = defineProps({
     // 그룹핑할 컬럼들
     type: Array,
     default: [[]],
+  },
+  /** mergeColumns2 — strColID별 너비 배율 (예: { strDate: 1.1 }) 화면별 opt-in */
+  mergeColumnWidthScale2: {
+    type: Object,
+    default: () => ({}),
+  },
+  /** 일자 열 기준 토·일·공휴일 셀 스타일 (SLS01 일별매출계획과 동일 톤) — 화면별 opt-in */
+  weekdayHolidayStyleColumns: {
+    type: Array,
+    default: () => [],
+  },
+  weekdayHolidayDateField: {
+    type: String,
+    default: "strDate",
   },
   getJson: {
     // 현재 데이터를 JSON 데이터로 전달할 변수
@@ -1379,6 +1394,40 @@ const rgSafeDataSourceGetValue = (ds, dataRow, fieldName) => {
     return undefined;
   }
 };
+
+const RG_WEEKDAY_HOLIDAY_SAT_STYLE = {
+  backgroundColor: "#eff6ff",
+  color: "#1d4ed8",
+  fontWeight: "700",
+};
+
+const RG_WEEKDAY_HOLIDAY_SUN_STYLE = {
+  backgroundColor: "#fff1f2",
+  color: "#b91c1c",
+  fontWeight: "700",
+};
+
+function rgParseGridRowDate(dateStr) {
+  const s = String(dateStr ?? "").trim();
+  if (!s || s === "합계") return null;
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return null;
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 12, 0, 0);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function rgResolveWeekdayHolidayCellStyle(grid, dataRow, dateField) {
+  const ds = grid?.getDataSource?.();
+  if (!ds) return null;
+  const raw = rgSafeDataSourceGetValue(ds, dataRow, dateField);
+  const d = rgParseGridRowDate(raw);
+  if (!d) return null;
+  if (isKoreanPublicHoliday(d)) return { ...RG_WEEKDAY_HOLIDAY_SUN_STYLE };
+  const dow = d.getDay();
+  if (dow === 0) return { ...RG_WEEKDAY_HOLIDAY_SUN_STYLE };
+  if (dow === 6) return { ...RG_WEEKDAY_HOLIDAY_SAT_STYLE };
+  return null;
+}
 
 /** 체크 조건값 — 콤마 구분이면 토큰 단위 일치, 아니면 전체 문자열과만 일치 (`'미확정'.includes('확정')` 오탐 방지) */
 const rgCheckAbleValMatches = (valSpec, cellValue) => {
@@ -2567,6 +2616,15 @@ const runFuncshowGrid = async () => {
 
   dataProvider.setFields(fields);
 
+  const rgColWidthScaleMap = props.mergeColumnWidthScale2 || {};
+  const rgScaledColumnWidth = (colId, baseWidth) => {
+    const scale = rgColWidthScaleMap[colId];
+    if (!scale || !baseWidth) {
+      return baseWidth;
+    }
+    return Math.max(1, Math.round(baseWidth * scale));
+  };
+
   // 컬럼 정의
   const columns = tabInitSetArray.value.map((item, index) => ({
     name: item.strColID,
@@ -3053,7 +3111,7 @@ const runFuncshowGrid = async () => {
         return value;
       },
     }),
-    width: item.intHdWidth,
+    width: rgScaledColumnWidth(item.strColID, item.intHdWidth),
     numberFormat: isDecimalInputColumn(item.strColID)
       ? signedDecimalNumberFormat
       : props.suffixColumnwon == "lngPrice" && item.strColID == "lngPrice"
@@ -3402,6 +3460,19 @@ const runFuncshowGrid = async () => {
               : (ret.style = { backgroundColor: "#FFFFFF", color: "#FFFFFF" });
 
             return ret;
+          }
+        : props.weekdayHolidayStyleColumns.includes(item.strColID)
+        ? function (grid, dataCell) {
+            const dr = dataCell?.index?.dataRow;
+            if (dr == null || (typeof dr === "number" && dr < 0)) {
+              return {};
+            }
+            const styled = rgResolveWeekdayHolidayCellStyle(
+              grid,
+              dr,
+              props.weekdayHolidayDateField
+            );
+            return styled ? { style: styled } : {};
           }
         : props.ColCellRedColorColId.includes(item.strColID)
         ? function (grid, dataCell) {
@@ -3868,6 +3939,21 @@ const runFuncshowGrid = async () => {
   if (props.mergeColumns2 == true) {
     const subList = props.mergeColumnGroupSubList2; // [['column1','column2'],['column3','column4']]
     const groupList = props.mergeColumnGroupName2; // ['그룹컬럼1','그룹컬럼2']
+    const widthScaleMap = props.mergeColumnWidthScale2 || {};
+    const scaledMergeWidth = (colId, baseWidth) => {
+      const scale = widthScaleMap[colId];
+      if (!scale || !baseWidth) {
+        return baseWidth;
+      }
+      return Math.max(1, Math.round(baseWidth * scale));
+    };
+    const mergeLayoutItem = (colId, tabItem) => {
+      const scaled = scaledMergeWidth(colId, tabItem.intHdWidth);
+      if (scaled !== tabItem.intHdWidth) {
+        return { column: colId, width: scaled };
+      }
+      return colId;
+    };
     let layout = [];
     tabInitSetArray.value.forEach((item) => {
       if (subList.flat().includes(item.strColID)) {
@@ -3879,14 +3965,14 @@ const runFuncshowGrid = async () => {
           const findit = layout.find((item) => item.name == groupList[index]);
 
           if (findit) {
-            findit.items.push(item.strColID);
+            findit.items.push(mergeLayoutItem(item.strColID, item));
           }
         } else {
           layout.push({
             name: groupList[index],
             direction: "horizontal",
             hideChildHeaders: props.hideChildHeader,
-            items: [item.strColID],
+            items: [mergeLayoutItem(item.strColID, item)],
             header: {
               text: groupList[index],
               styleName:
@@ -3906,7 +3992,7 @@ const runFuncshowGrid = async () => {
           hideChildHeaders: props.hideChildHeader,
           header: { visible: true, text: item.strHdText },
           visible: item.intHdWidth !== 0,
-          width: item.intHdWidth,
+          width: scaledMergeWidth(item.strColID, item.intHdWidth),
         });
       }
     });

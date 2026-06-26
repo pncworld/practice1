@@ -38,6 +38,8 @@
               :hide-group="false"
               :hide-attr="false"
               :show-time="true"
+              :reset-time-on-store-change="true"
+              :require-store-before-time="true"
               @update:store-cd="lngStoreCode"
               @update:store-group="lngStoreGroup"
               @update-time="updateTime"
@@ -105,16 +107,17 @@
             class="crm10-024-rpt__summary-rg">
             <div class="crm10-024-rpt__summary-rg-mount">
               <Realgrid
+                :key="`summary-lunch-${summaryLunchProgid}`"
                 :progname="'CRM10_024RPT_VUE'"
-                :progid="1"
+                :progid="summaryLunchProgid"
                 :rowData="rowData"
                 :reload="reload"
                 :setStateBar="false"
                 :documentTitle="'CRM10_024RPT'"
                 :documentSubTitle="documentSubTitle"
                 :mergeColumns2="true"
-                :mergeColumnGroupName2="mergeColumnGroupName2"
-                :mergeColumnGroupSubList2="mergeColumnGroupSubList2"
+                :mergeColumnGroupName2="summaryLunchMergeGroupName"
+                :mergeColumnGroupSubList2="summaryLunchMergeSubList"
                 :rowStateeditable="false"
                 :syncGridHeight="true"
                 :exporttoExcel="exportExcel" />
@@ -342,7 +345,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -518,6 +521,36 @@ const mergeColumnGroupSubList2 = ref([
     "lngTime206",
   ],
 ]);
+/** grid 9 — 해운대엘시티점 런치: 조식 + 1부 + 2부 */
+const mergeColumnGroupNameGrid9 = ref(["조식", "1부", "2부"]);
+const mergeColumnGroupSubListGrid9 = ref([
+  [
+    "lngTime001",
+    "lngTime002",
+    "lngTime003",
+    "lngTime004",
+    "lngTime005",
+    "lngTime006",
+  ],
+  [
+    "lngTime101",
+    "lngTime102",
+    "lngTime103",
+    "lngTime104",
+    "lngTime105",
+    "lngTime106",
+    "lngTime107",
+  ],
+  [
+    "lngTime201",
+    "lngTime202",
+    "lngTime2025",
+    "lngTime203",
+    "lngTime204",
+    "lngTime205",
+    "lngTime206",
+  ],
+]);
 const mergeColumnGroupSubList3 = ref([
   [
     "lngTime301",
@@ -547,13 +580,22 @@ watch(
 
 const selectedTime = ref(0);
 const updateTime = (e) => {
-  initGrid();
-  selectedTime.value = e;
-
-  if (e == 1) {
+  const timeVal = e == null || e === "" ? 0 : Number(e);
+  if (timeVal !== 0 && (!selectedStores.value || selectedStores.value == 0)) {
+    selectedTime.value = 0;
     changeTime.value = false;
-  } else if (e == 2) {
+    return;
+  }
+
+  initGrid();
+  selectedTime.value = timeVal;
+
+  if (timeVal === 1) {
+    changeTime.value = false;
+  } else if (timeVal === 2) {
     changeTime.value = true;
+  } else {
+    changeTime.value = false;
   }
 };
 /**
@@ -638,6 +680,22 @@ const selectedGroup = ref();
 const selectedStores = ref();
 const selectedStoreAttrs = ref();
 
+/** 마키노차야 해운대엘시티점 — 런치 시간대별 예약현황 전용 그리드 */
+const CRM10_024_LUNCH_GRID9_STORE_CD = "1871021";
+const summaryLunchProgid = computed(() =>
+  String(selectedStores.value) === CRM10_024_LUNCH_GRID9_STORE_CD ? 9 : 1
+);
+const summaryLunchMergeGroupName = computed(() =>
+  summaryLunchProgid.value === 9
+    ? mergeColumnGroupNameGrid9.value
+    : mergeColumnGroupName2.value
+);
+const summaryLunchMergeSubList = computed(() =>
+  summaryLunchProgid.value === 9
+    ? mergeColumnGroupSubListGrid9.value
+    : mergeColumnGroupSubList2.value
+);
+
 /**
  * 페이지 매장 코드 세팅
  */
@@ -645,6 +703,8 @@ const selectedStoreAttrs = ref();
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
+  selectedTime.value = 0;
+  changeTime.value = false;
   ////console.log(e);
 };
 const lngStoreGroup = async (e) => {
