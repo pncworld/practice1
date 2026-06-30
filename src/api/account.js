@@ -53,6 +53,20 @@ export const getEmployeesData = (groupCd, searchType, searchText) => {
     SEARCH_TEXT: searchText,
   });
 };
+export const getEmployeesData003 = (
+  groupCd,
+  searchType,
+  searchText,
+  affCompCd
+) => {
+  return api2.post("/MIACCOUNT/ACT09_003RPT.asmx/getEmployeesData", {
+    GROUP_CD: groupCd,
+    SEARCH_TYPE: searchType,
+    SEARCH_TEXT: searchText,
+    AFF_COMP_CD:
+      affCompCd == null || affCompCd === "" ? "0" : String(affCompCd),
+  });
+};
 export const getEmployeeSummary = (
   groupCd,
   storeAttr,
@@ -76,6 +90,32 @@ export const getEmployeeSummary = (
     OPTION_VALUE: optionValue,
   });
 };
+export const getEmployeeSummary003 = (
+  groupCd,
+  storeAttr,
+  storeCd,
+  startDate,
+  endDate,
+  trantype,
+  empid,
+  lngoption,
+  optionValue,
+  affCompCd
+) => {
+  return api2.post("/MIACCOUNT/ACT09_003RPT.asmx/getEmployeeSummary", {
+    GROUP_CD: groupCd,
+    STORE_ATTR: storeAttr,
+    STORE_CD: storeCd,
+    START_DATE: startDate,
+    END_DATE: endDate,
+    TRAN_TYPE: trantype,
+    EMP_ID: empid,
+    LNG_OPTION: lngoption,
+    OPTION_VALUE: optionValue,
+    AFF_COMP_CD:
+      affCompCd == null || affCompCd === "" ? "0" : String(affCompCd),
+  });
+};
 export const getEmployeeDetailSummary = (
   groupCd,
   storeAttr,
@@ -97,6 +137,32 @@ export const getEmployeeDetailSummary = (
     EMP_ID: empid,
     LNG_OPTION: lngoption,
     OPTION_VALUE: optionValue,
+  });
+};
+export const getEmployeeDetailSummary004 = (
+  groupCd,
+  storeAttr,
+  storeCd,
+  startDate,
+  endDate,
+  trantype,
+  empid,
+  lngoption,
+  optionValue,
+  affCompCd
+) => {
+  return api2.post("/MIACCOUNT/ACT09_004RPT.asmx/getEmployeeDetailSummary", {
+    GROUP_CD: groupCd,
+    STORE_ATTR: storeAttr,
+    STORE_CD: storeCd,
+    START_DATE: startDate,
+    END_DATE: endDate,
+    TRAN_TYPE: trantype,
+    EMP_ID: empid,
+    LNG_OPTION: lngoption,
+    OPTION_VALUE: optionValue,
+    AFF_COMP_CD:
+      affCompCd == null || affCompCd === "" ? "0" : String(affCompCd),
   });
 };
 

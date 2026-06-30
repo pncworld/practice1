@@ -30,3 +30,7 @@ proxy.config.local.js
 # menu vue path checker output (see scripts/check-excel-vue-paths.cjs)
 scripts/vue-path-check-report.json
 scripts/vue-path-check-report.csv
+
+# Local junction → sibling PncOffice-docs (optional, per-machine)
+/PncOffice-docs
+PncOffice.code-workspace

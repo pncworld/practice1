@@ -45,13 +45,15 @@
               @startDate="startDate" />
           </div>
         </div>
-        <div class="act09-wire-cell act09-wire-cell--store-span">
+        <div class="act09-wire-cell">
           <div class="act09-wire-label">매장선택</div>
-          <div class="act09-wire-field act09-pick-slot min-w-0 w-full">
+          <div class="act09-wire-field act09-pick-slot act09-pick-slot--store-grid min-w-0">
             <PickStoreRenew3
+              ref="pickStoreRef"
               compact
               omit-main-label
               combo-fill
+              init-store-from-store-cd
               @lngStoreCode="lngStoreCodes"
               @lngStoreGroup="lngStoreGroup"
               @excelStore="excelStore"
@@ -59,12 +61,11 @@
               @changeInit="changeInit" />
           </div>
         </div>
-
         <div class="act09-wire-cell">
           <div class="act09-wire-label">거래구분</div>
           <div class="act09-wire-field min-w-0">
             <select
-              id="act09-002-tran-type"
+              id="act09-004-tran-type"
               v-model="tranType"
               class="act09-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option :value="1">포인트</option>
@@ -72,38 +73,62 @@
             </select>
           </div>
         </div>
+
+        <div class="act09-wire-cell">
+          <div class="act09-wire-label">소속사</div>
+          <div class="act09-wire-field min-w-0">
+            <select
+              id="act09-004-aff-comp"
+              v-model="affiliateCompCode"
+              :disabled="
+                affiliateCompLocked ||
+                affiliateCompList.length === 0 ||
+                affiliateCompLoading
+              "
+              class="act09-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-100"
+              @change="onAffiliateCompChange">
+              <option v-if="affiliateCompList.length === 0" disabled value="">
+                {{ affiliateCompLoading ? "불러오는 중..." : "소속사 없음" }}
+              </option>
+              <option
+                v-for="item in affiliateCompList"
+                :key="item.value"
+                :value="item.value">
+                {{ item.label }}
+              </option>
+            </select>
+          </div>
+        </div>
         <div class="act09-wire-cell">
           <div class="act09-wire-label">조회옵션</div>
           <div class="act09-wire-field act09-pair-row min-w-0">
             <select
-              id="act09-002-option"
-              v-model="lngOption"
-              class="act09-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              @change="resetOptionValue">
-              <option :value="0">선택</option>
+              id="act09-004-option"
+              :value="1"
+              disabled
+              class="act09-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 disabled:cursor-not-allowed disabled:bg-gray-100">
               <option :value="1">부서</option>
-              <option :value="2">소속사</option>
             </select>
             <input
-              id="act09-002-option-value"
+              id="act09-004-option-value"
               v-model="optionValue"
               type="text"
-              :disabled="lngOption == 0"
-              class="act09-sg-input h-8 min-h-8 min-w-0 w-full rounded-md border border-solid bg-white px-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-100" />
+              class="act09-sg-input h-8 min-h-8 min-w-0 w-full rounded-md border border-solid bg-white px-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              @keydown.enter="searchButton" />
           </div>
         </div>
         <div class="act09-wire-cell">
           <div class="act09-wire-label">사원명</div>
           <div class="act09-wire-field act09-emp-row min-w-0">
             <input
-              id="act09-002-emp-id"
+              id="act09-004-emp-id"
               v-model="empId"
               type="text"
               readonly
               class="act09-sg-input h-8 min-h-8 min-w-0 w-full rounded-md border border-solid bg-white px-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               @keydown="resetInputBox" />
             <input
-              id="act09-002-emp-name"
+              id="act09-004-emp-name"
               v-model="empName"
               type="text"
               readonly
@@ -122,6 +147,11 @@
 
     <EmployeePopUp
       :open="open"
+      employees-program-id="ACT09_004RPT"
+      :affiliate-comp-list="affiliateCompList"
+      :affiliate-comp-code="affiliateCompCode"
+      :affiliate-comp-locked="affiliateCompLocked"
+      :affiliate-comp-loading="affiliateCompLoading"
       @custId="custId"
       @custName="custName"
       @updateOpen="updateOpen" />
@@ -129,7 +159,7 @@
     <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <div class="relative h-full min-h-0 min-w-0 flex-1">
         <Realgrid
-          :progname="'ACT09_002RPT_VUE'"
+          :progname="'ACT09_004RPT_VUE'"
           :progid="1"
           :rowData="rowData"
           :reload="reload"
@@ -146,7 +176,7 @@
           :setGroupFooter="true"
           :setMergeMode="false"
           :setGroupColumnId="'strSaleCustID'"
-          :documentTitle="'ACT09_002RPT'"
+          :documentTitle="'ACT09_004RPT'"
           :documentSubTitle="documentSubTitle"
           :exporttoExcel="exportExcel">
         </Realgrid>
@@ -156,7 +186,12 @@
 </template>
 
 <script setup>
-import { getEmployeeDetailSummary } from "@/api/account";
+import { getEmployeeDetailSummary004 } from "@/api/account";
+import {
+  buildAffCompCombos,
+  getAffComp,
+  getCustCompany050,
+} from "@/api/micrm";
 import { getCauseList } from "@/api/misales";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -287,17 +322,116 @@ const selectedCause = ref(null);
 const store = useStore();
 const causeList = ref([]);
 const tranType = ref(1);
-const lngOption = ref(0);
+const lngOption = ref(1);
 const optionValue = ref("");
+const strSaleCompCode = ref("");
+const strSaleCompName = ref("");
+const affiliateCompList = ref([]);
+const affiliateCompCode = ref("");
+const affiliateCompLocked = ref(false);
+const affiliateCompLoading = ref(true);
+const pickStoreRef = ref(null);
 
-/** 조회 AREA — ACT09_001RPT wire 패턴 */
+const getPickerStoreCode = () => {
+  const code = pickStoreRef.value?.getSelectedStoreCode?.();
+  if (code == null || code === "" || code === 0 || code === "0") {
+    return null;
+  }
+  return code;
+};
+
+const resetAffCompCombos = () => {
+  strSaleCompCode.value = "";
+  strSaleCompName.value = "";
+  affiliateCompList.value = [];
+  affiliateCompCode.value = "";
+  affiliateCompLocked.value = false;
+};
+
+const loadAffComp = async () => {
+  if (!strSaleCompCode.value || strSaleCompCode.value === "0") {
+    resetAffCompCombos();
+    return;
+  }
+  try {
+    const res = await getAffComp(
+      strSaleCompCode.value,
+      store.state.userData.lngStoreGroup,
+      store.state.userData.lngSequence
+    );
+    if (res.data?.RESULT_CD !== "00") {
+      resetAffCompCombos();
+      return;
+    }
+    const combo = buildAffCompCombos(res.data?.List ?? []);
+    affiliateCompLocked.value = combo.singleLocked;
+    affiliateCompList.value = combo.topOptions;
+    affiliateCompCode.value = combo.topValue;
+  } catch (error) {
+    resetAffCompCombos();
+  }
+};
+
+/** CRM01_050INS(PickCustCompany setAPI=2)와 동일 — 로그인 매장그룹·포지션으로 고객사 조회 후 소속사 로드 */
+const loadCustCompanyAndAffComp = async () => {
+  affiliateCompLoading.value = true;
+  resetAffCompCombos();
+  try {
+    const res = await getCustCompany050(
+      store.state.userData.lngStoreGroup,
+      store.state.userData.lngPosition
+    );
+    const list = res.data?.List ?? [];
+    if (list.length === 0) {
+      return;
+    }
+    const comp = list.length === 1 ? list[0] : list[0];
+    strSaleCompCode.value = comp.strSaleCompCode ?? "";
+    strSaleCompName.value = comp.strSaleCompName ?? "";
+    if (strSaleCompCode.value) {
+      await loadAffComp();
+    }
+  } catch (error) {
+    resetAffCompCombos();
+  } finally {
+    affiliateCompLoading.value = false;
+  }
+};
+
+const getAffCompCdParam = () => {
+  const code = affiliateCompCode.value;
+  if (!code || code === "0" || code === "") {
+    return "0";
+  }
+  return String(code);
+};
+
+const getSearchOptionParams = () => ({
+  searchLngOption: lngOption.value,
+  searchOptionValue: optionValue.value,
+});
+
+const getAffiliateExcelLabel = () => {
+  const affCode = affiliateCompCode.value;
+  if (!affCode || affCode === "0" || affiliateCompList.value.length === 0) {
+    return "전체";
+  }
+  const aff = affiliateCompList.value.find((i) => i.value === affCode);
+  return aff?.label ?? "전체";
+};
+
+const onAffiliateCompChange = () => {
+  initGrid();
+};
+
+/** 조회 AREA — ACT09 wire 패턴 */
 const act09ControlBorder = "#cbd5e1";
 const act09ColGutter = "1.5rem";
 const act09RowGap = "0.875rem";
 const act09LabelCol = "5.5rem";
 const act09ItemGap = "0.5rem";
-const act09StoreGroupWidth = "8.625rem";
-const act09StoreAttrWidth = "6.75rem";
+const act09StoreGroupWidth = "calc(8.625rem * 0.8)";
+const act09StoreAttrWidth = "calc(6.75rem * 0.9)";
 /**
  * 	화면 Load시 실행 스크립트
  */
@@ -310,7 +444,7 @@ onMounted(async () => {
 
   const res = await getCauseList(userGroup, 0);
   causeList.value = res.data.List;
-  //comsole.log(res);
+  await loadCustCompanyAndAffComp();
 });
 
 onUnmounted(() => {
@@ -335,16 +469,20 @@ const searchButton = async () => {
 
     reload.value = !reload.value;
 
-    const res = await getEmployeeDetailSummary(
+    const { searchLngOption, searchOptionValue } = getSearchOptionParams();
+    const storeCd = getPickerStoreCode() ?? selectedStores.value;
+
+    const res = await getEmployeeDetailSummary004(
       selectedGroup.value,
       selectedStoreAttrs.value,
-      selectedStores.value,
+      storeCd,
       selectedstartDate.value,
       selectedendDate.value,
       tranType.value,
       empId.value,
-      lngOption.value,
-      optionValue.value
+      searchLngOption,
+      searchOptionValue,
+      getAffCompCdParam()
     );
     //comsole.log(res);
     rowData.value = res.data.List;
@@ -365,7 +503,6 @@ const selectedStoreAttrs = ref();
  */
 
 const lngStoreGroup = (e) => {
-  //comsole.log(e);
   selectedGroup.value = e;
 };
 /**
@@ -374,7 +511,6 @@ const lngStoreGroup = (e) => {
 
 const lngStoreCodes = (e) => {
   selectedStores.value = e;
-  //comsole.log(e);
 };
 
 /**
@@ -413,15 +549,10 @@ const excelButton = () => {
     condition += "급여공제";
   }
 
-  let condition2 = "조회 옵션 :";
-  if (lngOption.value == 0) {
-    condition2 += "선택";
-  } else if (lngOption.value == 1) {
-    condition2 += "부서";
-  } else if (lngOption.value == 2) {
-    condition2 += "소속사";
-  }
+  let condition2 = "조회 옵션 :부서";
   condition2 += optionValue.value;
+
+  let conditionAff = "소속사 : " + getAffiliateExcelLabel();
 
   let condition3 = "사원명 : " + empId.value + "," + empName.value;
 
@@ -433,6 +564,8 @@ const excelButton = () => {
     condition +
     "\n" +
     condition2 +
+    "\n" +
+    conditionAff +
     "\n" +
     condition3;
   //comsole.log(documentSubTitle.value);
@@ -506,7 +639,7 @@ const showSum = (e) => {
  *  컴포넌트 변동시 감지 함수
  */
 
-const changeInit = (e) => {
+const changeInit = () => {
   initGrid();
 };
 const custName = (e) => {
@@ -523,11 +656,6 @@ const openPopUp = (e) => {
 };
 const updateOpen = (e) => {
   open.value = false;
-};
-const resetOptionValue = (e) => {
-  if (e.target.value == 0) {
-    optionValue.value = "";
-  }
 };
 
 const resetInputBox = (e) => {
@@ -555,19 +683,6 @@ const resetInputBox = (e) => {
   flex-direction: row;
   align-items: center;
   gap: var(--act09-item-gap);
-}
-
-.act09-wire-cell--store-span {
-  grid-column: span 2;
-}
-
-/* 3번째 매장 콤보 우측 — 2행 사원명 레이블 끝에 맞춤 */
-.act09-wire-cell--store-span > .act09-wire-field.act09-pick-slot {
-  flex: 0 1 auto;
-  max-width: calc(
-    (100% - var(--act09-col-gutter)) / 2 + var(--act09-col-gutter) -
-      var(--act09-item-gap)
-  );
 }
 
 .act09-wire-label {
@@ -813,18 +928,46 @@ const resetInputBox = (e) => {
   font-size: 0.875rem !important;
 }
 
+/* store-layout — 하단 공통 pick-slot 규칙 이후 재적용 */
+.act09-pick-slot--store-grid :deep(> div.flex) {
+  display: grid !important;
+  grid-template-columns:
+    var(--act09-store-group-w)
+    var(--act09-store-attr-w)
+    minmax(0, 1fr) !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  flex-wrap: unset !important;
+  align-items: stretch !important;
+}
+
+.act09-pick-slot--store-grid
+  :deep(> div.flex > div:nth-child(1) select),
+.act09-pick-slot--store-grid
+  :deep(> div.flex > div:nth-child(2) select) {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.act09-pick-slot--store-grid :deep(> div.flex > div:last-child) {
+  flex: unset !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.act09-pick-slot--store-grid
+  :deep(> div.flex > div:last-child .custom-select) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin-left: 0 !important;
+}
+
 @media (max-width: 960px) {
   .act09-wire-grid {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .act09-wire-cell--store-span {
-    grid-column: auto;
-  }
-
-  .act09-wire-cell--store-span > .act09-wire-field.act09-pick-slot {
-    flex: 1 1 auto;
-    max-width: 100%;
   }
 }
 </style>

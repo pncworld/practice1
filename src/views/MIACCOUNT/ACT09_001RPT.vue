@@ -5,8 +5,8 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
@@ -18,114 +18,139 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-center z-10">
-      <div class="grid grid-cols-1 grid-rows-2 mt-1">
-        <Datepicker2
-          @endDate="endDate"
-          @startDate="startDate"
-          :closePopUp="closePopUp"
-          ref="datepicker"
-          @excelDate="excelDate"
-          :mainName="'일자'"
-          :initToday="1"></Datepicker2>
-        <div
-          class="flex justify-start items-center text-nowrap ml-36 space-x-10 mt-1">
-          <div class="flex items-center mr-2">
-            <div class="font-semibold text-base">거래 구분 :</div>
-            <div>
-              <select
-                name=""
-                id=""
-                class="rounded-lg h-8 ml-2 w-24"
-                v-model="tranType">
-                <option :value="1">포인트</option>
-                <option :value="2">급여공제</option>
-              </select>
-            </div>
+      class="act09-search-panel z-10 mt-3 w-full min-h-0 shrink-0 overflow-x-auto rounded-lg bg-gray-200 px-8 py-3 md:px-12">
+      <div
+        class="act09-wire-grid min-w-0"
+        :style="{
+          '--act09-control-border': act09ControlBorder,
+          '--act09-col-gutter': act09ColGutter,
+          '--act09-row-gap': act09RowGap,
+          '--act09-label-col': act09LabelCol,
+          '--act09-item-gap': act09ItemGap,
+          '--act09-store-group-w': act09StoreGroupWidth,
+          '--act09-store-attr-w': act09StoreAttrWidth,
+        }">
+        <div class="act09-wire-cell">
+          <div class="act09-wire-label">일자</div>
+          <div class="act09-wire-field act09-date-slot min-w-0 overflow-hidden">
+            <Datepicker2
+              ref="datepicker"
+              omit-main-label
+              filter-bar-align
+              :mainName="'일자'"
+              :initToday="1"
+              :closePopUp="closePopUp"
+              @excelDate="excelDate"
+              @endDate="endDate"
+              @startDate="startDate" />
           </div>
-          <div class="flex items-center">
-            <div class="font-semibold text-base ml-3">조회 옵션:</div>
+        </div>
+        <div class="act09-wire-cell act09-wire-cell--store-span">
+          <div class="act09-wire-label">매장선택</div>
+          <div class="act09-wire-field act09-pick-slot min-w-0 w-full">
+            <PickStoreRenew3
+              compact
+              omit-main-label
+              combo-fill
+              @lngStoreCode="lngStoreCodes"
+              @lngStoreGroup="lngStoreGroup"
+              @excelStore="excelStore"
+              @lngStoreAttrs="lngStoreAttrs"
+              @changeInit="changeInit" />
+          </div>
+        </div>
+
+        <div class="act09-wire-cell">
+          <div class="act09-wire-label">거래구분</div>
+          <div class="act09-wire-field min-w-0">
             <select
-              name=""
-              id=""
-              class="rounded-lg h-8 ml-3 w-24"
+              id="act09-001-tran-type"
+              v-model="tranType"
+              class="act09-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option :value="1">포인트</option>
+              <option :value="2">급여공제</option>
+            </select>
+          </div>
+        </div>
+        <div class="act09-wire-cell">
+          <div class="act09-wire-label">조회옵션</div>
+          <div class="act09-wire-field act09-pair-row min-w-0">
+            <select
+              id="act09-001-option"
               v-model="lngOption"
+              class="act09-sg-select h-8 w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               @change="resetOptionValue">
               <option :value="0">선택</option>
               <option :value="1">부서</option>
               <option :value="2">소속사</option>
             </select>
             <input
-              type="text"
-              class="rounded-lg h-8 ml-2 pl-1 disabled:bg-gray-100 border"
+              id="act09-001-option-value"
               v-model="optionValue"
-              :disabled="lngOption == 0" />
-          </div>
-
-          <div class="flex items-center pl-[85px]">
-            <div class="font-semibold text-base">사원명 :</div>
-            <input
               type="text"
-              class="rounded-lg h-8 ml-3"
+              :disabled="lngOption == 0"
+              class="act09-sg-input h-8 min-h-8 min-w-0 w-full rounded-md border border-solid bg-white px-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-100" />
+          </div>
+        </div>
+        <div class="act09-wire-cell">
+          <div class="act09-wire-label">사원명</div>
+          <div class="act09-wire-field act09-emp-row min-w-0">
+            <input
+              id="act09-001-emp-id"
               v-model="empId"
+              type="text"
               readonly
+              class="act09-sg-input h-8 min-h-8 min-w-0 w-full rounded-md border border-solid bg-white px-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               @keydown="resetInputBox" />
             <input
-              type="text"
-              class="rounded-lg h-8 ml-3"
+              id="act09-001-emp-name"
               v-model="empName"
+              type="text"
               readonly
+              class="act09-sg-input h-8 min-h-8 min-w-0 w-full rounded-md border border-solid bg-white px-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               @keydown="resetInputBox" />
             <button
-              class="button primary !h-7 !w-16 ml-2"
-              @click="openPopUp"
-              ref="button">
+              type="button"
+              class="act09-sub-btn shrink-0"
+              @click="openPopUp">
               조회
             </button>
-            <EmployeePopUp
-              @custId="custId"
-              @custName="custName"
-              :open="open"
-              ref="employee"
-              @updateOpen="updateOpen"
-              class="absolute right-56 top-56 z-40"></EmployeePopUp>
           </div>
         </div>
       </div>
-      <div class="ml-20 -mt-10">
-        <PickStoreRenew3
-          @lngStoreCode="lngStoreCodes"
-          @lngStoreGroup="lngStoreGroup"
-          @excelStore="excelStore"
-          @lngStoreAttrs="lngStoreAttrs"
-          @changeInit="changeInit">
-        </PickStoreRenew3>
-      </div>
-      <div></div>
     </div>
 
-    <div class="w-full h-[80%]">
-      <Realgrid
-        :progname="'ACT09_001RPT_VUE'"
-        :progid="2"
-        :rowData="rowData"
-        :reload="reload"
-        :setFooter="true"
-        :setFooterExpressions="['sum', 'sum']"
-        :setFooterColID="['lngUseCnt', 'dblSaleAmt']"
-        :setFooterCustomColumnId="['strName']"
-        :setFooterCustomText="['합계']"
-        :setGroupFooterColID="['strName', 'lngUseCnt', 'dblSaleAmt']"
-        :setGroupFooterExpressions="['custom', 'sum', 'sum']"
-        :setGroupSumCustomColumnId="['strSaleCustID']"
-        :setGroupSumCustomText="['매장소계']"
-        :setGroupFooter="true"
-        :setMergeMode="false"
-        :setGroupColumnId="'strName'"
-        :documentTitle="'ACT09_001RPT'"
-        :documentSubTitle="documentSubTitle"
-        :exporttoExcel="exportExcel">
-      </Realgrid>
+    <EmployeePopUp
+      :open="open"
+      @custId="custId"
+      @custName="custName"
+      @updateOpen="updateOpen" />
+
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <div class="relative h-full min-h-0 min-w-0 flex-1">
+        <Realgrid
+          :progname="'ACT09_001RPT_VUE'"
+          :progid="2"
+          :rowData="rowData"
+          :reload="reload"
+          :rowStateeditable="false"
+          :setFooter="true"
+          :setFooterExpressions="['sum', 'sum']"
+          :setFooterColID="['lngUseCnt', 'dblSaleAmt']"
+          :setFooterCustomColumnId="['strName']"
+          :setFooterCustomText="['합계']"
+          :setGroupFooterColID="['strName', 'lngUseCnt', 'dblSaleAmt']"
+          :setGroupFooterExpressions="['custom', 'sum', 'sum']"
+          :setGroupSumCustomColumnId="['strSaleCustID']"
+          :setGroupSumCustomText="['매장소계']"
+          :setGroupFooter="true"
+          :setMergeMode="false"
+          :setGroupColumnId="'strName'"
+          :documentTitle="'ACT09_001RPT'"
+          :documentSubTitle="documentSubTitle"
+          :exporttoExcel="exportExcel">
+        </Realgrid>
+      </div>
     </div>
   </div>
 </template>
@@ -163,7 +188,7 @@ import { insertPageLog } from "@/customFunc/customFunc";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -264,11 +289,21 @@ const causeList = ref([]);
 const tranType = ref(1);
 const lngOption = ref(0);
 const optionValue = ref("");
+
+/** 조회 AREA — PUR02_035RPT / SLS02_011RPT wire 패턴 */
+const act09ControlBorder = "#cbd5e1";
+const act09ColGutter = "1.5rem";
+const act09RowGap = "0.875rem";
+const act09LabelCol = "5.5rem";
+const act09ItemGap = "0.5rem";
+const act09StoreGroupWidth = "8.625rem";
+const act09StoreAttrWidth = "6.75rem";
 /**
  * 	화면 Load시 실행 스크립트
  */
 
 onMounted(async () => {
+  document.body.classList.add("act09-page-active");
   const pageLog = await insertPageLog(store.state.activeTab2);
 
   const userGroup = store.state.storeGroup[0].lngStoreGroup;
@@ -276,6 +311,10 @@ onMounted(async () => {
   const res = await getCauseList(userGroup, 0);
   causeList.value = res.data.List;
   //comsole.log(res);
+});
+
+onUnmounted(() => {
+  document.body.classList.remove("act09-page-active");
 });
 
 const loginedstrLang = store.state.userData.lngLanguage;
@@ -404,8 +443,6 @@ const resetVselect2 = () => {
   endTime.value = 23;
 };
 const datepicker = ref(null);
-const employee = ref(null);
-const button = ref(null);
 const closePopUp = ref(false);
 /**
  * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
@@ -413,12 +450,8 @@ const closePopUp = ref(false);
 
 const handleParentClick = (e) => {
   const datepickerEl = datepicker.value?.$el;
-  const employeeEl = employee.value?.$el;
 
   if (datepickerEl && datepickerEl.contains(e.target)) {
-    return;
-  }
-  if (employeeEl && employeeEl.contains(e.target)) {
     return;
   }
   if (e.target.closest("button")) {
@@ -505,4 +538,299 @@ const resetInputBox = (e) => {
 };
 </script>
 
-<style></style>
+<style scoped>
+.act09-wire-grid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--act09-col-gutter);
+  row-gap: var(--act09-row-gap);
+}
+
+.act09-wire-cell {
+  display: flex;
+  min-width: 0;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--act09-item-gap);
+}
+
+.act09-wire-cell--store-span {
+  grid-column: span 2;
+}
+
+/* 3번째 매장 콤보 우측 — 2행 사원명 레이블 끝에 맞춤 */
+.act09-wire-cell--store-span > .act09-wire-field.act09-pick-slot {
+  flex: 0 1 auto;
+  max-width: calc(
+    (100% - var(--act09-col-gutter)) / 2 + var(--act09-col-gutter) -
+      var(--act09-item-gap)
+  );
+}
+
+.act09-wire-label {
+  flex: 0 0 var(--act09-label-col);
+  width: var(--act09-label-col);
+  min-width: 0;
+  max-width: var(--act09-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.act09-wire-field {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 auto;
+  align-items: center;
+}
+
+.act09-wire-field:not(.act09-pair-row):not(.act09-emp-row) > * {
+  min-width: 0;
+  width: 100%;
+}
+
+.act09-pair-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  column-gap: 0.5rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.act09-emp-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) auto;
+  column-gap: 0.5rem;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.act09-pair-row > *,
+.act09-emp-row > * {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* 보조버튼 — SLS01_001INS / CRM01 팝업 톤 */
+.act09-sub-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  height: 2rem;
+  min-height: 2rem;
+  min-width: 4.5rem;
+  padding: 0 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: rgb(30 64 175);
+  border: 1px solid rgb(147 197 253);
+  border-radius: 0.375rem;
+  background-color: rgb(239 246 255);
+  box-shadow: 0 1px 2px 0 rgb(59 130 246 / 0.08);
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+  cursor: pointer;
+}
+
+.act09-sub-btn:hover:not(:disabled) {
+  background-color: rgb(219 234 254);
+  border-color: rgb(96 165 250);
+}
+
+.act09-sg-select,
+.act09-sg-input {
+  box-sizing: border-box;
+}
+
+.act09-search-panel select.act09-sg-select {
+  border: 1px solid var(--act09-control-border) !important;
+}
+
+.act09-search-panel select.act09-sg-select:focus {
+  border-color: #3b82f6 !important;
+}
+
+.act09-search-panel .act09-sg-input {
+  border: 1px solid var(--act09-control-border) !important;
+}
+
+.act09-search-panel .act09-sg-input:focus {
+  border-color: #3b82f6 !important;
+}
+
+.act09-search-panel .act09-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.act09-search-panel .act09-date-slot :deep(> div.flex.justify-start.items-center) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+  gap: 0.25rem !important;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.act09-search-panel .act09-date-slot :deep(> div.flex > div.inline-flex.h-8) {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  gap: 0.125rem !important;
+}
+
+.act09-search-panel .act09-date-slot :deep(input[type="date"]) {
+  border: 1px solid var(--act09-control-border) !important;
+  box-sizing: border-box;
+  width: auto !important;
+  flex: 1 1 0;
+  min-width: 5.25rem;
+  max-width: none;
+  padding-left: 0.45rem;
+  padding-right: 0.25rem;
+}
+
+.act09-search-panel .act09-date-slot :deep(div.inline-flex.h-8 > span) {
+  flex-shrink: 0;
+  padding-left: 0.05rem;
+  padding-right: 0.05rem;
+}
+
+.act09-search-panel .act09-date-slot :deep(div.inline-flex.h-8 > button) {
+  flex-shrink: 0;
+  width: 1.65rem !important;
+  height: 1.65rem !important;
+  min-width: 1.65rem;
+  margin-left: 0 !important;
+}
+
+.act09-pick-slot :deep(> div.flex) {
+  margin-top: 0 !important;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--act09-item-gap) !important;
+}
+
+.act09-pick-slot :deep(> div.flex > div:has(select)) {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.act09-pick-slot :deep(> div.flex > div:nth-child(1) select) {
+  box-sizing: border-box;
+  width: var(--act09-store-group-w);
+  max-width: var(--act09-store-group-w);
+  height: 2rem;
+  min-height: 2rem;
+  margin-left: 0 !important;
+  padding: 0 0.375rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--act09-control-border) !important;
+}
+
+.act09-pick-slot :deep(> div.flex > div:nth-child(2) select) {
+  box-sizing: border-box;
+  width: var(--act09-store-attr-w);
+  max-width: var(--act09-store-attr-w);
+  height: 2rem;
+  min-height: 2rem;
+  margin-left: 0 !important;
+  padding: 0 0.25rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--act09-control-border) !important;
+}
+
+.act09-pick-slot :deep(> div.flex > div:last-child) {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.act09-pick-slot :deep(.custom-select) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin-left: 0 !important;
+}
+
+.act09-pick-slot :deep(.custom-select.custom-select--compact .vs__dropdown-toggle) {
+  box-sizing: border-box;
+  height: 2rem !important;
+  min-height: 2rem !important;
+  padding: 2px 8px !important;
+  border: 1px solid var(--act09-control-border) !important;
+  border-radius: 0.375rem !important;
+  overflow: hidden !important;
+  flex-wrap: nowrap !important;
+}
+
+.act09-pick-slot :deep(.custom-select.custom-select--compact .vs__selected-options) {
+  flex: 1 1 auto !important;
+  flex-wrap: nowrap !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.act09-pick-slot :deep(.custom-select.custom-select--compact .vs__selected) {
+  display: block !important;
+  font-size: 0.875rem !important;
+  line-height: 1.75rem !important;
+  height: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.act09-pick-slot :deep(.custom-select.custom-select--compact .vs__search) {
+  font-size: 0.875rem !important;
+}
+
+@media (max-width: 960px) {
+  .act09-wire-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .act09-wire-cell--store-span {
+    grid-column: auto;
+  }
+
+  .act09-wire-cell--store-span > .act09-wire-field.act09-pick-slot {
+    flex: 1 1 auto;
+    max-width: 100%;
+  }
+}
+</style>
+
+<style>
+body.act09-page-active .vs__dropdown-menu {
+  z-index: 200 !important;
+}
+</style>

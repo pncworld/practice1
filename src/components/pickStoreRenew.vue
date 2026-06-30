@@ -127,6 +127,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /** ACT09 등: 비관리자 초기 emit을 storeCd[0].lngStoreCode 기준 (기본은 lngPosition) */
+  initStoreFromStoreCd: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const hideit = ref(props.hideit);
@@ -212,15 +217,28 @@ onMounted(() => {
     emit("storeNm", "전체");
   } else {
     disabled1.value = true;
-    emit("lngStoreGroup", store.state.userData.lngStoreGroup);
-    emit("lngStoreCodes", store.state.userData.lngPosition);
-    emit("lngStoreCode", store.state.userData.lngPosition);
-    // emit("lngStoreAttrs", store.state.userData.lngJoinType); 임시조치
-    emit("lngStoreAttrs", 0);
-    emit("excelStore", "매장명 : " + store.state.userData.strStoreName);
-    emit("storeNm", store.state.userData.strStoreName);
-    selectedStoreType.value = store.state.userData.lngJoinType;
-    selectedStore.value = store.state.storeCd[0];
+    if (props.initStoreFromStoreCd) {
+      selectedStoreType.value = store.state.userData.lngJoinType;
+      selectedStore.value = store.state.storeCd[0];
+      const initStoreCode =
+        selectedStore.value?.lngStoreCode ?? store.state.userData.lngPosition;
+      emit("lngStoreGroup", store.state.userData.lngStoreGroup);
+      emit("lngStoreCodes", initStoreCode);
+      emit("lngStoreCode", initStoreCode);
+      emit("lngStoreAttrs", 0);
+      emit("excelStore", "매장명 : " + store.state.userData.strStoreName);
+      emit("storeNm", store.state.userData.strStoreName);
+    } else {
+      emit("lngStoreGroup", store.state.userData.lngStoreGroup);
+      emit("lngStoreCodes", store.state.userData.lngPosition);
+      emit("lngStoreCode", store.state.userData.lngPosition);
+      // emit("lngStoreAttrs", store.state.userData.lngJoinType); 임시조치
+      emit("lngStoreAttrs", 0);
+      emit("excelStore", "매장명 : " + store.state.userData.strStoreName);
+      emit("storeNm", store.state.userData.strStoreName);
+      selectedStoreType.value = store.state.userData.lngJoinType;
+      selectedStore.value = store.state.storeCd[0];
+    }
     //comsole.log(store.state.storeCd);
   }
 });
@@ -330,6 +348,17 @@ const resetSelectedStore = (e) => {
     selectedStore.value = null;
   }
 };
+
+const getSelectedStoreCode = () => {
+  if (selectedStore.value == null) {
+    return 0;
+  }
+  return selectedStore.value.lngStoreCode;
+};
+
+defineExpose({
+  getSelectedStoreCode,
+});
 </script>
 
 <style>
