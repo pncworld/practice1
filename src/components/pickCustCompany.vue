@@ -1,24 +1,35 @@
 <template>
-  <div class="flex justify-start text-sm items-center w-[500px] ml-12 !mt-2">
-    <div class="items-center font-bold text-base flex text-nowrap">
-      사업장명
+  <div
+    :class="
+      props.filterBarAlign
+        ? 'flex min-w-0 flex-1 items-center gap-2'
+        : 'flex justify-start text-sm items-center w-[500px] ml-12 !mt-2'
+    ">
+    <div
+      v-if="!props.omitLabel"
+      class="items-center font-bold text-base flex text-nowrap">
+      {{ props.fieldLabel }}
     </div>
-    <div>
+    <div :class="props.filterBarAlign ? 'min-w-0 flex-1' : ''">
       <v-select
         v-model="selectedStore"
         :options="storeCd"
-        :disabled="disabled1"
+        :disabled="disabled1 || singleStoreLocked"
         label="strSaleCompName"
         :placeholder="defaultPlaceHolder"
-        class="!w-72 !h-7 -mt-3 custom-select ml-5"
-        :clearable="!disabled1"
+        :class="
+          props.filterBarAlign
+            ? '!w-full !min-w-0 !h-7 custom-select'
+            : '!w-72 !h-7 -mt-3 custom-select ml-5'
+        "
+        :clearable="!disabled1 && !singleStoreLocked && storeCd.length !== 1"
         @click="resetSelectedStore" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { getCustCompany, getCustCompany2 } from "@/api/micrm";
+import { getCustCompany, getCustCompany2, getCustCompany050 } from "@/api/micrm";
 import { defineProps, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 
@@ -30,6 +41,7 @@ const storeCd2 = ref([]);
 const isDisabled1 = ref(false);
 const isDisabled2 = ref(false);
 const disabled1 = ref(false);
+const singleStoreLocked = ref(false);
 const selectedGroup = ref();
 const selectedStore = ref(null);
 
@@ -45,9 +57,23 @@ const props = defineProps({
     type: String,
     default: "선택",
   },
+  fieldLabel: {
+    type: String,
+    default: "사업장명",
+  },
   setAPI: {
     type: String,
     default: "0",
+  },
+  /** 조회 패널 라벨을 화면에서 직접 표시할 때 true (CRM01_050INS 등) */
+  omitLabel: {
+    type: Boolean,
+    default: false,
+  },
+  /** MST04/CRM 표준 조회바 — 가로만 맞춤, 높이·폰트는 기존 유지 */
+  filterBarAlign: {
+    type: Boolean,
+    default: false,
   },
 });
 const is9999 = ref(store.state.userData.lngStoreGroup[0] !== "9999");
@@ -84,6 +110,28 @@ const emit = defineEmits([
   "lngIFChk",
 ]);
 
+const emitEmptySelection = (withBp = false) => {
+  emit("excelStore", "사업장명 : 전체");
+  if (selectedStore.value == null) {
+    emit("lngStoreCode", 0);
+    if (withBp) {
+      emit("BP_ID", 0);
+      emit("lngIFChk", "");
+    }
+  }
+};
+
+/** 목록 1건이면 자동 선택 + 콤보 고정 */
+const applyLoadedStoreList = (list, withBp = false) => {
+  storeCd.value = list ?? [];
+  singleStoreLocked.value = storeCd.value.length === 1;
+  if (singleStoreLocked.value) {
+    selectedStore.value = storeCd.value[0];
+    return;
+  }
+  emitEmptySelection(withBp);
+};
+
 onMounted(async () => {
   ////console.log(store.state.userData);
 
@@ -96,11 +144,14 @@ onMounted(async () => {
 
     ////console.log(res);
 
-    storeCd.value = res.data.List;
-    emit("excelStore", "사업장명 : 전체");
-    if (selectedStore.value == null) {
-      emit("lngStoreCode", 0);
-    }
+    applyLoadedStoreList(res.data.List, false);
+  } else if (props.setAPI == "2") {
+    const res = await getCustCompany050(
+      store.state.userData.lngStoreGroup,
+      store.state.userData.lngPosition
+    );
+
+    applyLoadedStoreList(res.data.List, true);
   } else {
     const res = await getCustCompany2(
       store.state.userData.lngStoreGroup,
@@ -109,13 +160,7 @@ onMounted(async () => {
 
     ////console.log(res);
 
-    storeCd.value = res.data.List;
-    emit("excelStore", "사업장명 : 전체");
-    if (selectedStore.value == null) {
-      emit("lngStoreCode", 0);
-      emit("BP_ID", 0);
-      emit("lngIFChk", "");
-    }
+    applyLoadedStoreList(res.data.List, true);
   }
 });
 
@@ -144,7 +189,10 @@ storeType.value = store.state.storeType;
 storeCd.value = store.state.storeCd;
 storeCd2.value = store.state.storeCd;
 
-const resetSelectedStore = (e) => {
+const resetSelectedStore = () => {
+  if (singleStoreLocked.value || storeCd.value.length === 1) {
+    return;
+  }
   if (
     store.state.userData.blnBrandAdmin == "True" ||
     store.state.userData.lngPositionType == "1"

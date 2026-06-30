@@ -60,6 +60,58 @@ export const getCustCompany2 = (groupCd, storecd) => {
     STORE_CD: storecd,
   });
 };
+/** CRM01_050INS — 직원후불 고객정보관리(신규) */
+export const getCustCompany050 = (groupCd, storecd) => {
+  return api2.post("/MICRM/CRM01_050INS.asmx/getCustCompany2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+  });
+};
+/** 소속사 콤보 — 공통 (상단·하단 표기는 Vue에서 처리) */
+export const getAffComp = (companyCd, groupCd, userId) => {
+  return api2.post("/MICRM/CRM01_050INS.asmx/getAffComp", {
+    COMP_CD: companyCd,
+    GROUP_CD: groupCd,
+    USER_ID: userId,
+  });
+};
+
+/** getAffComp 응답 row → 콤보 옵션 (소속사: strAffCompCode/Name) */
+export const toAffCompOption = (item) => ({
+  value: String(item.strAffCompCode ?? ""),
+  label: String(item.strAffCompName ?? ""),
+});
+
+/** 소속사 목록 → 상단(전체)/하단(선택) 콤보 옵션 구성 */
+export const buildAffCompCombos = (list) => {
+  const seen = new Set();
+  const items = [];
+  for (const row of list ?? []) {
+    const opt = toAffCompOption(row);
+    if (!opt.value || seen.has(opt.value)) continue;
+    seen.add(opt.value);
+    items.push(opt);
+  }
+
+  const single = items.length === 1;
+  const multi = items.length > 1;
+
+  return {
+    singleLocked: single,
+    topOptions: single
+      ? items
+      : multi
+        ? [{ value: "0", label: "전체" }, ...items]
+        : [],
+    detailOptions: single
+      ? items
+      : multi
+        ? [{ value: "", label: "선택" }, ...items]
+        : [],
+    topValue: single ? items[0].value : "0",
+    detailValue: single ? items[0].value : "",
+  };
+};
 export const getAccCust = (
   companyCd,
   cond,
@@ -77,6 +129,27 @@ export const getAccCust = (
     DEPT_NM: cond4,
     COMP_NM: cond5,
     REPORT_TYPE: cond6,
+  });
+};
+export const getAccCust050 = (
+  companyCd,
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6,
+  affCompCd
+) => {
+  return api2.post("/MICRM/CRM01_050INS.asmx/getAccCust", {
+    COMPANY_CD: companyCd,
+    CARD_NO: cond,
+    CUST_ID: cond2,
+    CUST_NM: cond3,
+    DEPT_NM: cond4,
+    COMP_NM: cond5,
+    REPORT_TYPE: cond6,
+    AFF_COMP_CD: affCompCd == null || affCompCd === "" ? "0" : String(affCompCd),
   });
 };
 export const getBelongCust = (custcode, searchword, type) => {
@@ -1725,8 +1798,34 @@ export const saveEmployeeCustInfo = (
     USERID: cond6,
   });
 };
+export const saveEmployeeCustInfo050 = (
+  cond,
+  cond2,
+  cond3,
+  cond4,
+  cond5,
+  cond6
+) => {
+  return api2.post("/MICRM/CRM01_050INS.asmx/saveEmployeeCustInfo", {
+    COMP_CD: cond,
+    CUST_ID: cond2,
+    CARD_NO: cond3,
+    NCARD_NO: cond4,
+    CARD_S: cond5,
+    USERID: cond6,
+  });
+};
 export const deleteCustomors2 = (cond, cond2, cond3, cond4, cond5) => {
   return api2.post("/MICRM/CRM01_013INS.asmx/deleteCustomors2", {
+    COMP_CD: cond,
+    CUST_ID: cond2,
+    CARD_NO: cond3,
+    USERID: cond4,
+    USERIP: cond5,
+  });
+};
+export const deleteCustomors050 = (cond, cond2, cond3, cond4, cond5) => {
+  return api2.post("/MICRM/CRM01_050INS.asmx/deleteCustomors2", {
     COMP_CD: cond,
     CUST_ID: cond2,
     CARD_NO: cond3,
@@ -1766,6 +1865,38 @@ export const saveCustomorsInfo = (
     COMPNM: cond12,
     ADDRESS: cond13,
     USERID: cond14,
+  });
+};
+
+export const saveCustomorsInfo050 = (
+  companyCd,
+  custId,
+  limitAmt,
+  custSts,
+  cardSts,
+  cardNo,
+  custNm,
+  deptCd,
+  deptNm,
+  telNos,
+  compCd,
+  address,
+  userId
+) => {
+  return api2.post("/MICRM/CRM01_050INS.asmx/saveCustomorsInfo", {
+    COMP_CD: companyCd,
+    CUST_ID: custId,
+    LIMITAMT: limitAmt,
+    CUSTSTS: custSts,
+    CARDSTS: cardSts,
+    CARDNO: cardNo,
+    CUSTNM: custNm,
+    DEPTCD: deptCd,
+    DEPTNM: deptNm,
+    TELNOS: telNos,
+    COMPCD: compCd,
+    ADDRESS: address,
+    USERID: userId,
   });
 };
 
