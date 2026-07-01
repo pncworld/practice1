@@ -2631,6 +2631,31 @@ export const getMenuCodeEnroll = (groupCd, storeCd) => {
     STORE_CD: storeCd,
   });
 };
+export const getDeliveryMenuMap = (groupCd, storeCd, deliveryCd, menuCd) => {
+  const payload = {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    DELIVERY_CD: deliveryCd,
+    MENU_CD: menuCd,
+  };
+  console.log("[api/master][getDeliveryMenuMap] payload", payload);
+  return api2.post("/MIMASTER/MST01_033INS.asmx/getDeliveryMenuMap", payload);
+};
+export const getDeliveryMenuExcelColumn = (groupCd, storeCd) => {
+  const payload = {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  };
+  console.log("[api/master][getDeliveryMenuExcelColumn] payload", payload);
+  return api2.post(
+    "/MIMASTER/MST01_033INS.asmx/getDeliveryMenuExcelColumn",
+    payload
+  );
+};
+export const saveDeliveryMenuMap = (payload) => {
+  // console.log("[api/master][saveDeliveryMenuMap] payload", payload);
+  return api2.post("/MIMASTER/MST01_033INS.asmx/saveDeliveryMenuMap", payload);
+};
 export const uploadFile = (formData) => {
   return api2.post("/MIMASTER/FileUpload.ashx", formData, {
     headers: {
@@ -2734,6 +2759,9 @@ export const copyMenuListByCode = (groupCd, lngcode, menucdlist) => {
     MENUCODE: lngcode,
     COPYLIST: menucdlist,
   });
+};
+export const copyDeliveryMenuMap = (payload) => {
+  return api2.post("/MIMASTER/MST01_033INS.asmx/copyDeliveryMenuMap", payload);
 };
 export const getMenuGroupList = (groupCd, storecd, cond) => {
   return api2.post("/MIMASTER/MST01_014INS.asmx/getMenuGroupList", {

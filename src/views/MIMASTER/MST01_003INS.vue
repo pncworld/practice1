@@ -108,6 +108,69 @@
     </div>
   </div>
   <div
+    class="absolute z-50 inset-0 bg-black bg-opacity-50 w-full h-full"
+    v-if="showDeliveryCopyPopUp">
+    <div class="fixed top-[28%] left-[30%] w-[40vw] min-w-[32rem] bg-white rounded-lg">
+      <div class="grid grid-cols-1 text-base p-5 font-semibold gap-3">
+        <div class="flex items-center justify-between">
+          <div class="text-xl">배달메뉴 설정 복사</div>
+          <button class="button primary" @click="copyDeliveryMenuToStore">복사</button>
+        </div>
+        <div class="grid grid-cols-[1fr,4fr] items-center gap-2 text-sm">
+          <div class="bg-gray-100 flex justify-center items-center rounded-md border border-gray-300 h-8">
+            기준 메뉴코드
+          </div>
+          <input
+            type="text"
+            :value="selectedMenuCodeForDelivery || gridvalue3"
+            disabled
+            class="mst003-control w-full bg-gray-100" />
+        </div>
+        <div class="grid grid-cols-[1fr,4fr] items-center gap-2 text-sm">
+          <div class="bg-gray-100 flex justify-center items-center rounded-md border border-gray-300 h-8">
+            기준 메뉴명
+          </div>
+          <input
+            type="text"
+            :value="gridvalue6"
+            disabled
+            class="mst003-control w-full bg-gray-100" />
+        </div>
+        <div class="grid grid-cols-[1fr,4fr] items-center gap-2 text-sm">
+          <div class="bg-gray-100 flex justify-center items-center rounded-md border border-gray-300 h-8">
+            기준 매장
+          </div>
+          <input
+            type="text"
+            :value="deliveryCopyBaseStoreLabel"
+            disabled
+            class="mst003-control w-full bg-gray-100" />
+        </div>
+        <div class="grid grid-cols-[1fr,4fr] items-center gap-2 text-sm">
+          <div class="bg-gray-100 flex justify-center items-center rounded-md border border-gray-300 h-8">
+            대상 매장
+          </div>
+          <div class="mst003-vselect-slot min-w-0">
+            <v-select
+              v-model="deliveryCopyTargetStoreCd"
+              :options="imageStoreOptions"
+              label="strName"
+              placeholder="매장 선택"
+              class="custom-select2"
+              append-to-body
+              :clearable="true"
+              :reduce="(item) => String(item.lngStoreCode)" />
+          </div>
+        </div>
+        <div class="flex justify-end mt-1">
+          <button type="button" @click="closeDeliveryCopyPopUp" class="whitebutton mst003-sub-btn">
+            닫기
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
     class="z-10 w-full min-w-0 shrink-0 overflow-x-auto rounded-lg bg-gray-200 px-12 py-4">
     <div class="mst003-search-grid min-w-0">
       <div class="mst003-cell">
@@ -233,7 +296,9 @@
           :suffixColumnwon="'lngPrice'"
           :initFocus="initFocus"
           :exporttoExcel="exporttoExcel"
-          :exportExcelShowColumns="['strBarCode', 'strBigo']"
+          :exportExcelShowColumns="exportExcelShowColumnsMain"
+          :exportExcelColumnHeaders="exportExcelColumnHeadersMain"
+          @exportDone="onMainGridExportDone"
           :documentTitle="'MST01_003INS'"></Realgrid>
         <!-- :searchWord="searchWord" :searchColId2="'blnInactive,payDistinct'" :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" -->
       </div>
@@ -261,6 +326,14 @@
           :class="{ 'text-blue-600': selectedMenu == 3 }"
           :disabled="selectedMultiple">
           이미지 설정
+        </button>
+        <button
+          v-if="canUseDeliveryMenuTab"
+          class="contents_tab-button disabled:bg-gray-50 disabled:text-gray-300"
+          @click="selectMenu(4)"
+          :class="{ 'text-blue-600': selectedMenu == 4 }"
+          :disabled="selectedMultiple">
+          배달메뉴 설정
         </button>
       </div>
       <div
@@ -1065,29 +1138,27 @@
           <!-- :searchColId2="'majorGroupCd,subGroupCd'" :searchColId="'menuCd,menuNm'" :searchColValue2="searchColValue3" :searchWord="searchWord2" -->
         </div>
         <div v-show="selectedMenu == 3" class="min-w-0">
-          <div v-if="showImageGroupScopeControls" class="mst003-filter-stack mt-3 w-full min-w-0">
-            <div class="mst003-cell">
-              <span class="mst003-sg-label">공통 여부</span>
-              <div class="mst003-cell-field min-w-0">
-                <select v-model="imageScope" class="mst003-control w-full">
-                  <option value="COMMON">공통(그룹)</option>
-                  <option value="STORE">매장별</option>
-                </select>
-              </div>
+          <div v-if="showImageGroupScopeControls" class="mst003-form-grid mt-3 w-full">
+            <div class="mst003-form-label">공통 여부</div>
+            <div class="mst003-field-span3 mst003-form-value">
+              <select v-model="imageScope" class="mst003-control w-full">
+                <option value="COMMON">공통(그룹)</option>
+                <option value="STORE">매장별</option>
+              </select>
             </div>
-            <div class="mst003-cell">
-              <span class="mst003-sg-label">저장 매장</span>
-              <div class="mst003-cell-field mst003-vselect-slot min-w-0">
-                <v-select
-                  v-model="imageStoreCd"
-                  :options="imageStoreOptions"
-                  label="strName"
-                  placeholder="선택"
-                  class="custom-select2"
-                  :clearable="false"
-                  :disabled="imageScope !== 'STORE'"
-                  :reduce="(item) => String(item.lngStoreCode)" />
-              </div>
+
+            <div class="mst003-form-label">저장 매장</div>
+            <div class="mst003-field-span3 mst003-form-value mst003-vselect-slot">
+              <v-select
+                v-model="imageStoreCd"
+                :options="imageStoreOptions"
+                label="strName"
+                placeholder="선택"
+                class="custom-select2"
+                append-to-body
+                :clearable="true"
+                :disabled="imageScope !== 'STORE'"
+                :reduce="(item) => String(item.lngStoreCode)" />
             </div>
           </div>
           <div
@@ -1156,6 +1227,60 @@
             </div>
           </div>
         </div>
+        <div
+          v-if="canUseDeliveryMenuTab"
+          v-show="selectedMenu == 4"
+          class="min-w-0">
+          <div class="flex justify-end mb-2">
+            <button
+              type="button"
+              class="whitebutton mst003-sub-btn"
+              @click="openDeliveryCopyPopUp">
+              배달메뉴복사
+            </button>
+          </div>
+          <div class="mst003-form-grid mt-3 w-full">
+            <div class="mst003-form-label">
+              매장
+            </div>
+            <div class="mst003-field-span3 mst003-form-value mst003-vselect-slot">
+              <v-select
+                v-model="deliveryStoreCd"
+                :options="imageStoreOptions"
+                label="strName"
+                placeholder="선택"
+                class="custom-select2"
+                append-to-body
+                :clearable="true"
+                :reduce="(item) => String(item.lngStoreCode)" />
+            </div>
+
+            <div class="mst003-form-label">
+              배달사
+            </div>
+            <div class="mst003-form-value">
+              <select v-model="deliveryCompany" class="mst003-control w-full">
+                <option value="">선택</option>
+                <option
+                  v-for="deliveryOption in deliveryCompanyOptions"
+                  :key="deliveryOption.strDCode"
+                  :value="String(deliveryOption.strDCode)">
+                  {{ deliveryOption.strDName }}
+                </option>
+              </select>
+            </div>
+            <div class="mst003-form-label">
+              배달메뉴명
+            </div>
+            <div class="mst003-form-value">
+              <input
+                type="text"
+                v-model="deliveryMenuName"
+                class="mst003-control w-full"
+                placeholder="배달메뉴명 입력" />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1166,12 +1291,16 @@
 <script setup>
 import {
   copyMenuListByCode,
+  copyDeliveryMenuMap,
   deleteFile,
+  getDeliveryMenuExcelColumn,
   getAmountListByMenuCode,
+  getDeliveryMenuMap,
   getMenuCodeEnroll,
   getMenuDiscCount,
   getMenuDiscCount2,
   getMenuList,
+  saveDeliveryMenuMap,
   saveMenuCode,
   saveDiscountCode,
   uploadFile,
@@ -1206,6 +1335,7 @@ import RealGrid from "realgrid";
  *  */
 
 import { insertPageLog } from "@/customFunc/customFunc";
+import { getCommonList, getStoreList2 } from "@/api/common";
 /**
  *  이미지 별도 호출
  *  */
@@ -1234,6 +1364,9 @@ import { useStore } from "vuex";
 
 const hidesub = ref(true);
 const hideAttr = ref(true);
+const store = useStore();
+const userData = store.state.userData;
+const groupCd = ref(userData.lngStoreGroup);
 
 /**
  * 	화면 Load시 실행 스크립트
@@ -1258,6 +1391,10 @@ onMounted(async () => {
   } else {
     disableWithMenuDisc.value = false;
   }
+
+  const deliveryCompanyRes = await getCommonList(446);
+  deliveryCompanyOptions.value = deliveryCompanyRes?.data?.List ?? [];
+  await loadStoreOptions(groupCd.value);
 });
 const searchWord2 = ref("");
 const nowStoreCd = ref(0);
@@ -1314,8 +1451,145 @@ const sendRowState = (e) => {
 };
 
 const selectedMenu = ref(1);
+const deliveryMenuTabAllowedGroups = ["9999", "3048", "3071", "3287"];
+const canUseDeliveryMenuTab = computed(() =>
+  deliveryMenuTabAllowedGroups.includes(String(groupCd.value ?? ""))
+);
 const selectMenu = (newValue) => {
+  if (newValue === 4 && !canUseDeliveryMenuTab.value) {
+    selectedMenu.value = 1;
+    return;
+  }
   selectedMenu.value = newValue;
+};
+watch(canUseDeliveryMenuTab, (allowed) => {
+  if (!allowed && selectedMenu.value === 4) {
+    selectedMenu.value = 1;
+  }
+});
+const deliveryStoreCd = ref("");
+const deliveryCompany = ref("");
+const deliveryMenuName = ref("");
+const deliveryCompanyOptions = ref([]);
+const selectedMenuCodeForDelivery = ref("");
+const resolveMenuCdFromRow = (row) => {
+  if (Array.isArray(row)) {
+    return normalizeDeliveryParam(row[0]);
+  }
+  return normalizeDeliveryParam(
+    row?.lngCode ??
+      row?.menuCd ??
+      row?.lngMenu ??
+      row?.lngMenuCode ??
+      row?.LNG_CODE ??
+      row?.MENU_CD ??
+      row?.LNGCODE ??
+      row?.MENUCODE ??
+      row?.LNG_MENU ??
+      row?.LNG_MENUCODE ??
+      row?.lng_code ??
+      row?.menu_code ??
+      row?.lng_menu ??
+      row?.lng_menucode
+  );
+};
+const normalizeMenuCodeKey = (value) => {
+  const raw = normalizeDeliveryParam(value);
+  if (!raw) return "";
+  if (/^\d+$/.test(raw)) return String(Number(raw));
+  return raw.toUpperCase();
+};
+const normalizeDeliveryParam = (value) => {
+  const strValue = value == null ? "" : String(value).trim();
+  if (!strValue || strValue === "0" || strValue === "-1") return "";
+  return strValue;
+};
+const resolveDeliveryMenuName = (response) => {
+  const src = response?.data;
+  const resultCd = String(src?.RESULT_CD ?? src?.result_cd ?? "");
+  const list = Array.isArray(src?.List)
+    ? src.List
+    : Array.isArray(src?.list)
+      ? src.list
+      : [];
+
+  // C# getDeliveryMenuMap 응답 스펙: RESULT_CD == "00" && List[0].strInfo1
+  if (resultCd === "00" && list.length > 0) {
+    const first = list[0] || {};
+    return String(first?.strInfo1 ?? first?.STRINFO1 ?? first?.STR_INFO1 ?? "");
+  }
+
+  // 하위호환(기존/타 응답 포맷)
+  const row = (Array.isArray(src) && src[0]) || src?.Map || src || {};
+  return String(
+    row?.strDeliveryMenuName ??
+      row?.STR_DELIVERY_MENU_NAME ??
+      row?.deliveryMenuName ??
+      row?.strMenuName ??
+      row?.STR_MENU_NAME ??
+      row?.strInfo1 ??
+      ""
+  );
+};
+const extractResultCode = (response) =>
+  String(response?.data?.RESULT_CD ?? response?.data?.result_cd ?? "");
+const extractResultName = (response) =>
+  String(response?.data?.RESULT_NM ?? response?.data?.result_nm ?? "");
+const extractDuplicateMenuCd = (response) => {
+  const data = response?.data ?? {};
+  const directCd = normalizeDeliveryParam(
+    data?.DUPLICATE_MENU_CD ??
+      data?.duplicate_menu_cd ??
+      data?.DUPLICATE_MENUCODE ??
+      data?.duplicateMenuCd
+  );
+  if (directCd) return directCd;
+
+  const resultName = extractResultName(response);
+  const matched = resultName.match(/\b\d+\b/);
+  return matched ? normalizeDeliveryParam(matched[0]) : "";
+};
+const extractDeliveryMapList = (response) => {
+  const src = response?.data;
+  if (Array.isArray(src?.List)) return src.List;
+  if (Array.isArray(src?.list)) return src.list;
+  return [];
+};
+const loadDeliveryMenuName = async () => {
+  const storeCd = normalizeDeliveryParam(deliveryStoreCd.value);
+  const deliveryCd = normalizeDeliveryParam(deliveryCompany.value);
+  const menuCd = normalizeDeliveryParam(
+    selectedMenuCodeForDelivery.value || gridvalue3.value
+  );
+  // console.log("[MST01_003INS][DELIVERY_MAP] request params", {
+  //   GROUP_CD: groupCd.value,
+  //   STORE_CD: storeCd,
+  //   DELIVERY_CD: deliveryCd,
+  //   MENU_CD: menuCd,
+  //   selectedMenuCodeForDelivery: selectedMenuCodeForDelivery.value,
+  //   gridvalue3: gridvalue3.value,
+  // });
+  if (!storeCd || !deliveryCd || !menuCd) {
+    // console.log("[MST01_003INS][DELIVERY_MAP] skipped (missing params)", {
+    //   GROUP_CD: groupCd.value,
+    //   STORE_CD: storeCd,
+    //   DELIVERY_CD: deliveryCd,
+    //   MENU_CD: menuCd,
+    // });
+    deliveryMenuName.value = "";
+    return;
+  }
+  try {
+    const res = await getDeliveryMenuMap(groupCd.value, storeCd, deliveryCd, menuCd);
+    // console.log("[MST01_003INS][DELIVERY_MAP] response data", res?.data);
+    deliveryMenuName.value = resolveDeliveryMenuName(res);
+    // console.log("[MST01_003INS][DELIVERY_MAP] resolved deliveryMenuName", {
+    //   deliveryMenuName: deliveryMenuName.value,
+    // });
+  } catch (error) {
+    console.error("[MST01_003INS][DELIVERY_MAP] request failed", error);
+    deliveryMenuName.value = "";
+  }
 };
 
 /*
@@ -1358,9 +1632,7 @@ const forsearchMain = ref(-1);
 const forsearchSub = ref(-1);
 const afterSearch = ref(false);
 const clickedStoreNm = ref();
-const store = useStore();
-const userData = store.state.userData;
-const groupCd = ref(userData.lngStoreGroup);
+const storeOptions = ref([]);
 const imageScope = ref("COMMON");
 const imageStoreCd = ref("");
 const pickedStoreCd = ref("");
@@ -1393,9 +1665,42 @@ watch(showImageGroupScopeControls, (ok) => {
     imageStoreCd.value = "";
   }
 });
-const imageStoreOptions = computed(() =>
-  (store.state.storeCd || []).filter((item) => item?.lngStoreCode != null)
-);
+const normalizeStoreOption = (item) => {
+  const lngStoreCode =
+    item?.lngStoreCode ?? item?.LngStoreCode ?? item?.storeCd ?? item?.STORE_CD;
+  if (lngStoreCode == null || lngStoreCode === "") {
+    return null;
+  }
+  return {
+    ...item,
+    lngStoreCode,
+    strName:
+      item?.strName ??
+      item?.strStoreName ??
+      item?.StrStoreName ??
+      item?.STORE_NM ??
+      String(lngStoreCode),
+  };
+};
+const normalizeStoreList = (payload) => {
+  const rawList = payload?.data?.List ?? payload?.data?.store ?? payload?.data ?? [];
+  if (!Array.isArray(rawList)) return [];
+  return rawList.map(normalizeStoreOption).filter(Boolean);
+};
+const loadStoreOptions = async (targetGroupCd = groupCd.value) => {
+  try {
+    const storeRes = await getStoreList2(targetGroupCd);
+    storeOptions.value = normalizeStoreList(storeRes);
+  } catch (error) {
+    storeOptions.value = [];
+  }
+};
+const imageStoreOptions = computed(() => {
+  if (storeOptions.value.length > 0) {
+    return storeOptions.value;
+  }
+  return (store.state.storeCd || []).map(normalizeStoreOption).filter(Boolean);
+});
 const normalizeImageStoreCd = (value) => {
   const strValue = value != null ? String(value) : "";
   if (!strValue || strValue === "-1" || strValue === "0") {
@@ -1505,6 +1810,15 @@ const gridvalue39 = ref("");
 const gridvalue40 = ref("");
 const gridvalue41 = ref("");
 const gridvalue100 = ref("");
+watch([deliveryStoreCd, deliveryCompany, selectedMenuCodeForDelivery, gridvalue3], () => {
+  loadDeliveryMenuName();
+});
+watch(gridvalue3, (newMenuCd) => {
+  const normalized = normalizeDeliveryParam(newMenuCd);
+  if (normalized && normalized !== selectedMenuCodeForDelivery.value) {
+    selectedMenuCodeForDelivery.value = normalized;
+  }
+});
 const clickedrowdata = ref([]);
 const clickrowData4 = ref([]);
 const filteredrowData5 = ref([]);
@@ -1566,7 +1880,7 @@ function convertTo24Hour(timeStr) {
 }
 
 const clickedRowData = async (newvalue) => {
-  //console.log(newvalue);
+  const payloadMenuCd = resolveMenuCdFromRow(newvalue);
   afterClick.value = false;
   // if (newvalue[9] == 0 || newvalue[12] == 0) {
   if (newvalue[9] == 0) {
@@ -1598,6 +1912,8 @@ const clickedRowData = async (newvalue) => {
   gridvalue1.value = newvalue[30];
   gridvalue2.value = newvalue[3];
   gridvalue3.value = newvalue[0];
+  selectedMenuCodeForDelivery.value =
+    payloadMenuCd || normalizeDeliveryParam(gridvalue3.value);
   gridvalue4.value = newvalue[4];
   gridvalue5.value = newvalue[5];
   gridvalue6.value = newvalue[1];
@@ -1755,8 +2071,9 @@ const selectedIndex = (e) => {
  * 페이지 매장 그룹 세팅
  */
 
-const lngStoreGroup = (e) => {
+const lngStoreGroup = async (e) => {
   groupCd.value = e;
+  await loadStoreOptions(e);
 };
 /**
  * 페이지 매장 코드 세팅
@@ -2182,11 +2499,168 @@ watch(gridvalue9, () => {
   );
 });
 
+const saveDeliveryMenuTab = async () => {
+  const targetStoreCd = normalizeDeliveryParam(deliveryStoreCd.value);
+  const targetDeliveryCd = normalizeDeliveryParam(deliveryCompany.value);
+  const targetMenuCd = normalizeDeliveryParam(
+    selectedMenuCodeForDelivery.value || gridvalue3.value
+  );
+  const targetMenuName = String(gridvalue6.value ?? "").trim();
+  const targetDeliveryMenuName = String(deliveryMenuName.value ?? "").trim();
+
+  // console.log("[MST01_003INS][DELIVERY_SAVE] pre-validate params", {
+  //   GROUP_CD: groupCd.value,
+  //   STORE_CD: targetStoreCd,
+  //   MENU_CD: targetMenuCd,
+  //   DELIVERY_CD: targetDeliveryCd,
+  //   STR_NAME: targetMenuName,
+  //   STR_INFO1: targetDeliveryMenuName,
+  // });
+
+  if (!targetStoreCd || !targetDeliveryCd || !targetMenuCd) {
+    Swal.fire({
+      title: "경고",
+      text: "매장, 배달사, 메뉴코드를 확인해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (!targetDeliveryMenuName) {
+    Swal.fire({
+      title: "경고",
+      text: "배달메뉴명을 입력해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  Swal.fire({
+    title: "저장",
+    text: "배달메뉴 설정을 저장 하시겠습니까?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "저장",
+    cancelButtonText: "취소",
+  }).then(async (result) => {
+    if (!result.isConfirmed) return;
+
+    store.state.loading = true;
+    try {
+      const savePayloadBase = {
+        GROUP_CD: groupCd.value,
+        STORE_CD: targetStoreCd,
+        MENU_CD: targetMenuCd,
+        DELIVERY_CD: targetDeliveryCd,
+        STR_NAME: targetMenuName,
+        STR_INFO1: targetDeliveryMenuName,
+      };
+      let saveRes = await saveDeliveryMenuMap({
+        ...savePayloadBase,
+        OVERWRITE_YN: "N",
+      });
+
+      if (extractResultCode(saveRes) === "97") {
+        let duplicateMenuCdForMsg = extractDuplicateMenuCd(saveRes);
+        // console.log("[MST01_003INS][DUP_DEBUG] saveRes.data", saveRes?.data);
+        // console.log(
+        //   "[MST01_003INS][DUP_DEBUG] duplicateMenuCd from saveRes",
+        //   duplicateMenuCdForMsg
+        // );
+        try {
+          if (!duplicateMenuCdForMsg) {
+            const duplicateCheckRes = await getDeliveryMenuMap(
+              groupCd.value,
+              targetStoreCd,
+              targetDeliveryCd,
+              ""
+            );
+            // console.log(
+            //   "[MST01_003INS][DUP_DEBUG] duplicateCheckRes.data",
+            //   duplicateCheckRes?.data
+            // );
+            const targetInfo1 = targetDeliveryMenuName.trim().toLowerCase();
+            const duplicateRow = extractDeliveryMapList(duplicateCheckRes).find((item) => {
+              const rowInfo1 = String(
+                item?.strInfo1 ?? item?.STR_INFO1 ?? item?.STRINFO1 ?? ""
+              )
+                .trim()
+                .toLowerCase();
+              const rowMenuCd = normalizeDeliveryParam(
+                item?.lngCode ?? item?.MENU_CD ?? item?.lngcode ?? item?.menuCd
+              );
+              return rowInfo1 === targetInfo1 && rowMenuCd !== targetMenuCd;
+            });
+            duplicateMenuCdForMsg = normalizeDeliveryParam(
+              duplicateRow?.lngCode ??
+                duplicateRow?.MENU_CD ??
+                duplicateRow?.lngcode ??
+                duplicateRow?.menuCd
+            );
+            // console.log("[MST01_003INS][DUP_DEBUG] duplicateRow matched", duplicateRow);
+            // console.log(
+            //   "[MST01_003INS][DUP_DEBUG] duplicateMenuCd from duplicateCheckRes",
+            //   duplicateMenuCdForMsg
+            // );
+          }
+        } catch (_) {}
+
+        const duplicateConfirm = await Swal.fire({
+          title: "중복 배달메뉴명",
+          text: duplicateMenuCdForMsg
+            ? `${duplicateMenuCdForMsg} 메뉴코드가 이미 해당 배달메뉴명을 사용 중입니다. 그래도 저장하시겠습니까?`
+            : "다른 메뉴코드에 중복된 배달메뉴명이 있습니다. 그래도 저장하시겠습니까?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "예",
+          cancelButtonText: "아니오",
+        });
+
+        if (!duplicateConfirm.isConfirmed) {
+          return;
+        }
+
+        saveRes = await saveDeliveryMenuMap({
+          ...savePayloadBase,
+          OVERWRITE_YN: "Y",
+        });
+      }
+
+      if (extractResultCode(saveRes) !== "00") {
+        Swal.fire({
+          title: "저장이 실패되었습니다.",
+          text: extractResultName(saveRes) || "저장 중 오류가 발생했습니다.",
+          confirmButtonText: "확인",
+        });
+        return;
+      }
+
+      Swal.fire({
+        title: "저장 되었습니다.",
+        confirmButtonText: "확인",
+      });
+      await loadDeliveryMenuName();
+    } catch (error) {
+      Swal.fire({
+        title: "저장이 실패되었습니다.",
+        confirmButtonText: "확인",
+      });
+    } finally {
+      store.state.loading = false;
+    }
+  });
+};
+
 /**
  *  저장 버튼 함수
  */
 
 const saveButton = () => {
+  if (selectedMenu.value === 4) {
+    saveDeliveryMenuTab();
+    return;
+  }
   //comsole.log(updateRow.value);
   if (afterSearch.value == false) {
     Swal.fire({
@@ -2422,7 +2896,7 @@ const saveButton = () => {
             });
             discountChanged.value = false;
           } catch (error) {
-            console.error("할인선택 저장 실패:", error);
+            // console.error("할인선택 저장 실패:", error);
             // 에러 발생 시에도 계속 진행
           }
         }
@@ -2665,6 +3139,7 @@ const initAll = () => {
   gridvalue100.value = "";
   gridvalue40.value = "";
   gridvalue41.value = "";
+  selectedMenuCodeForDelivery.value = "";
   //initFocus.value = !initFocus.value
   fileName.value = "";
   fileSize.value = "";
@@ -2912,6 +3387,17 @@ const resetKPG = (e) => {
 };
 
 const showPopUp = ref(false);
+const showDeliveryCopyPopUp = ref(false);
+const deliveryCopyTargetStoreCd = ref("");
+const deliveryCopyBaseStoreLabel = computed(() => {
+  const baseStoreCd = normalizeDeliveryParam(deliveryStoreCd.value);
+  if (!baseStoreCd) return "미선택";
+  const hit = (imageStoreOptions.value || []).find(
+    (item) => String(item.lngStoreCode) === baseStoreCd
+  );
+  if (!hit) return `[${baseStoreCd}]`;
+  return `[${hit.lngStoreCode}] ${hit.strName}`;
+});
 const rowData4 = ref([]);
 const rowData5 = ref([]);
 /**
@@ -2970,6 +3456,125 @@ const copyButton = async () => {
 const closePopUp = () => {
   showPopUp.value = false;
 };
+const openDeliveryCopyPopUp = () => {
+  if (!normalizeDeliveryParam(deliveryStoreCd.value)) {
+    Swal.fire({
+      title: "경고",
+      text: "기준 매장을 선택해야 배달메뉴복사가 가능합니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (!normalizeDeliveryParam(selectedMenuCodeForDelivery.value || gridvalue3.value)) {
+    Swal.fire({
+      title: "경고",
+      text: "복사할 기준 메뉴를 먼저 선택해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  deliveryCopyTargetStoreCd.value = "";
+  showDeliveryCopyPopUp.value = true;
+};
+const closeDeliveryCopyPopUp = () => {
+  showDeliveryCopyPopUp.value = false;
+};
+const copyDeliveryMenuToStore = async () => {
+  const baseStoreCd = normalizeDeliveryParam(deliveryStoreCd.value);
+  const targetStoreCd = normalizeDeliveryParam(deliveryCopyTargetStoreCd.value);
+  const menuCd = normalizeDeliveryParam(selectedMenuCodeForDelivery.value || gridvalue3.value);
+  const menuNm = String(gridvalue6.value ?? "").trim();
+
+  if (!baseStoreCd) {
+    Swal.fire({
+      title: "경고",
+      text: "기준 매장을 선택해야 배달메뉴복사가 가능합니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (!targetStoreCd) {
+    Swal.fire({
+      title: "경고",
+      text: "복사할 대상 매장을 선택해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (!menuCd) {
+    Swal.fire({
+      title: "경고",
+      text: "기준 메뉴코드를 선택해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (baseStoreCd === targetStoreCd) {
+    Swal.fire({
+      title: "경고",
+      text: "기준 매장과 대상 매장이 같습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  const confirm = await Swal.fire({
+    title: "복사",
+    text: "기준 매장의 해당 메뉴에 대한 모든 배달사 설정을 대상 매장으로 복사하시겠습니까?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "복사",
+    cancelButtonText: "취소",
+  });
+  if (!confirm.isConfirmed) return;
+
+  try {
+    store.state.loading = true;
+    const res = await copyDeliveryMenuMap({
+      GROUP_CD: groupCd.value,
+      BASE_STORE_CD: baseStoreCd,
+      TARGET_STORE_CD: targetStoreCd,
+      MENU_CD: menuCd,
+      STR_NAME: menuNm,
+    });
+
+    if (res?.data?.RESULT_CD === "00") {
+      Swal.fire({
+        title: "성공",
+        text: "복사를 완료하였습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      showDeliveryCopyPopUp.value = false;
+      if (targetStoreCd === normalizeDeliveryParam(deliveryStoreCd.value)) {
+        await loadDeliveryMenuName();
+      }
+      return;
+    }
+
+    Swal.fire({
+      title: "실패",
+      text: `복사에 실패하였습니다. ${res?.data?.RESULT_NM ?? ""}`,
+      icon: "error",
+      confirmButtonText: "확인",
+    });
+  } catch (error) {
+    Swal.fire({
+      title: "실패",
+      text: "복사 처리 중 오류가 발생했습니다.",
+      icon: "error",
+      confirmButtonText: "확인",
+    });
+  } finally {
+    store.state.loading = false;
+  }
+};
 
 const searchWord5 = ref("");
 
@@ -3024,9 +3629,85 @@ const movePage = () => {
 
 const exporttoExcel = ref(false);
 const documentTitle = ref("");
-const excelButton = () => {
-  documentTitle.value = "메뉴코드";
-  exporttoExcel.value = !exporttoExcel.value;
+const defaultExportShowColumns = ["strBarCode", "strBigo"];
+const exportExcelShowColumnsMain = ref([...defaultExportShowColumns]);
+const exportExcelColumnHeadersMain = ref({});
+const exportRestoreBackupMap = ref(null);
+const exportRestoreTimer = ref(null);
+const restoreExcelExportRows = () => {
+  const backup = exportRestoreBackupMap.value;
+  if (!backup) return;
+  for (const [row, prevValues] of backup.entries()) {
+    if (!row || !prevValues) continue;
+    for (const [fieldName, oldValue] of Object.entries(prevValues)) {
+      if (oldValue === undefined) delete row[fieldName];
+      else row[fieldName] = oldValue;
+    }
+  }
+  rowData.value = [...rowData.value];
+  exportRestoreBackupMap.value = null;
+  exportExcelShowColumnsMain.value = [...defaultExportShowColumns];
+  exportExcelColumnHeadersMain.value = {};
+  if (exportRestoreTimer.value) {
+    clearTimeout(exportRestoreTimer.value);
+    exportRestoreTimer.value = null;
+  }
+};
+const onMainGridExportDone = () => {
+  restoreExcelExportRows();
+  store.state.loading = false;
+};
+const pulseGridExcelExport = async () => {
+  exporttoExcel.value = false;
+  await nextTick();
+  exporttoExcel.value = true;
+};
+const resolveDeliveryMenuNameFromMapRow = (row) =>
+  String(
+    row?.strInfo1 ??
+      row?.STRINFO1 ??
+      row?.STR_INFO1 ??
+      row?.strDeliveryMenuName ??
+      row?.STR_DELIVERY_MENU_NAME ??
+      ""
+  ).trim();
+const excelButton = async () => {
+  try {
+    // console.log("[MST01_003INS][EXCEL] click", {
+    //   selectedMenu: selectedMenu.value,
+    //   rowCount: Array.isArray(rowData.value) ? rowData.value.length : 0,
+    //   exporttoExcelBefore: exporttoExcel.value,
+    // });
+    if (exportRestoreTimer.value) {
+      clearTimeout(exportRestoreTimer.value);
+      exportRestoreTimer.value = null;
+    }
+
+    documentTitle.value = "메뉴코드";
+    exportExcelShowColumnsMain.value = [...defaultExportShowColumns];
+    exportExcelColumnHeadersMain.value = {};
+
+    // [임시 비활성화] 배달메뉴설정 탭(selectedMenu === 4) 엑셀 확장 로직
+    // 검수/배포 안정화를 위해 아래 로직 전체를 막고, 초기 공통 엑셀 추출만 수행합니다.
+    // if (selectedMenu.value === 4) {
+    //   const exportStoreCd = normalizeDeliveryParam(deliveryStoreCd.value || nowStoreCd.value);
+    //   ... 배달사별 동적 컬럼 생성/매핑/원복 로직 ...
+    // }
+    await pulseGridExcelExport();
+
+    // console.log("[MST01_003INS][EXCEL] trigger sent", {
+    //   exporttoExcelAfter: exporttoExcel.value,
+    //   documentTitle: documentTitle.value,
+    // });
+  } catch (e) {
+    // console.error("[MST01_003INS][EXCEL] failed", e);
+    Swal.fire({
+      title: "실패",
+      text: "엑셀 추출 처리 중 오류가 발생했습니다.",
+      icon: "error",
+      confirmButtonText: "확인",
+    });
+  }
 };
 </script>
 
