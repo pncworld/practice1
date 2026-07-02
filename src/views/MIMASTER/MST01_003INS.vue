@@ -1255,30 +1255,25 @@
                 :reduce="(item) => String(item.lngStoreCode)" />
             </div>
 
-            <div class="mst003-form-label">
-              배달사
-            </div>
-            <div class="mst003-form-value">
-              <select v-model="deliveryCompany" class="mst003-control w-full">
-                <option value="">선택</option>
-                <option
-                  v-for="deliveryOption in deliveryCompanyOptions"
-                  :key="deliveryOption.strDCode"
-                  :value="String(deliveryOption.strDCode)">
-                  {{ deliveryOption.strDName }}
-                </option>
-              </select>
-            </div>
-            <div class="mst003-form-label">
-              배달메뉴명
-            </div>
-            <div class="mst003-form-value">
-              <input
-                type="text"
-                v-model="deliveryMenuName"
-                class="mst003-control w-full"
-                placeholder="배달메뉴명 입력" />
-            </div>
+            <template v-for="deliveryRow in deliveryMenuRows" :key="deliveryRow.code">
+              <div class="mst003-form-label">
+                {{ deliveryRow.name }}
+              </div>
+              <div class="mst003-field-span3 mst003-form-value">
+                <input
+                  type="text"
+                  v-model="deliveryRow.menuName"
+                  class="mst003-control w-full"
+                  placeholder="배달메뉴명 입력"
+                  :disabled="!canEditDeliveryMenuRows" />
+              </div>
+            </template>
+            <template v-if="deliveryMenuRows.length === 0">
+              <div class="mst003-form-label">배달사</div>
+              <div class="mst003-field-span3 mst003-form-value text-gray-500">
+                배달사 정보가 없습니다.
+              </div>
+            </template>
           </div>
         </div>
       </div>
@@ -1451,7 +1446,7 @@ const sendRowState = (e) => {
 };
 
 const selectedMenu = ref(1);
-const deliveryMenuTabAllowedGroups = ["9999", "3048", "3071", "3287"];
+const deliveryMenuTabAllowedGroups = ["9999", "3048", "3287"];
 const canUseDeliveryMenuTab = computed(() =>
   deliveryMenuTabAllowedGroups.includes(String(groupCd.value ?? ""))
 );
@@ -1471,7 +1466,15 @@ const deliveryStoreCd = ref("");
 const deliveryCompany = ref("");
 const deliveryMenuName = ref("");
 const deliveryCompanyOptions = ref([]);
+const deliveryMenuRows = ref([]);
 const selectedMenuCodeForDelivery = ref("");
+const canEditDeliveryMenuRows = computed(() => {
+  const storeCd = normalizeDeliveryParam(deliveryStoreCd.value);
+  const menuCd = normalizeDeliveryParam(
+    selectedMenuCodeForDelivery.value || gridvalue3.value
+  );
+  return Boolean(storeCd && menuCd);
+});
 const resolveMenuCdFromRow = (row) => {
   if (Array.isArray(row)) {
     return normalizeDeliveryParam(row[0]);
@@ -1555,9 +1558,17 @@ const extractDeliveryMapList = (response) => {
   if (Array.isArray(src?.list)) return src.list;
   return [];
 };
+const buildDeliveryMenuRows = () =>
+  (deliveryCompanyOptions.value || [])
+    .filter((item) => normalizeDeliveryParam(item?.strDCode) !== "")
+    .map((item) => ({
+      code: normalizeDeliveryParam(item?.strDCode),
+      name: String(item?.strDName ?? item?.strDCode ?? ""),
+      menuName: "",
+      originalMenuName: "",
+    }));
 const loadDeliveryMenuName = async () => {
   const storeCd = normalizeDeliveryParam(deliveryStoreCd.value);
-  const deliveryCd = normalizeDeliveryParam(deliveryCompany.value);
   const menuCd = normalizeDeliveryParam(
     selectedMenuCodeForDelivery.value || gridvalue3.value
   );
@@ -1569,25 +1580,33 @@ const loadDeliveryMenuName = async () => {
   //   selectedMenuCodeForDelivery: selectedMenuCodeForDelivery.value,
   //   gridvalue3: gridvalue3.value,
   // });
-  if (!storeCd || !deliveryCd || !menuCd) {
-    // console.log("[MST01_003INS][DELIVERY_MAP] skipped (missing params)", {
-    //   GROUP_CD: groupCd.value,
-    //   STORE_CD: storeCd,
-    //   DELIVERY_CD: deliveryCd,
-    //   MENU_CD: menuCd,
-    // });
+  const baseRows = buildDeliveryMenuRows();
+  deliveryMenuRows.value = baseRows;
+
+  if (!storeCd || !menuCd || baseRows.length === 0) {
     deliveryMenuName.value = "";
     return;
   }
   try {
-    const res = await getDeliveryMenuMap(groupCd.value, storeCd, deliveryCd, menuCd);
-    // console.log("[MST01_003INS][DELIVERY_MAP] response data", res?.data);
-    deliveryMenuName.value = resolveDeliveryMenuName(res);
-    // console.log("[MST01_003INS][DELIVERY_MAP] resolved deliveryMenuName", {
-    //   deliveryMenuName: deliveryMenuName.value,
-    // });
+    const loadedRows = await Promise.all(
+      baseRows.map(async (row) => {
+        const res = await getDeliveryMenuMap(groupCd.value, storeCd, row.code, menuCd);
+        const loadedName = String(resolveDeliveryMenuName(res) ?? "").trim();
+        return {
+          ...row,
+          menuName: loadedName,
+          originalMenuName: loadedName,
+        };
+      })
+    );
+    deliveryMenuRows.value = loadedRows;
+
+    const selectedCd = normalizeDeliveryParam(deliveryCompany.value);
+    const selectedRow = loadedRows.find((row) => row.code === selectedCd);
+    deliveryMenuName.value = selectedRow?.menuName ?? "";
   } catch (error) {
     console.error("[MST01_003INS][DELIVERY_MAP] request failed", error);
+    deliveryMenuRows.value = baseRows;
     deliveryMenuName.value = "";
   }
 };
@@ -1810,7 +1829,7 @@ const gridvalue39 = ref("");
 const gridvalue40 = ref("");
 const gridvalue41 = ref("");
 const gridvalue100 = ref("");
-watch([deliveryStoreCd, deliveryCompany, selectedMenuCodeForDelivery, gridvalue3], () => {
+watch([deliveryStoreCd, selectedMenuCodeForDelivery, gridvalue3, deliveryCompanyOptions], () => {
   loadDeliveryMenuName();
 });
 watch(gridvalue3, (newMenuCd) => {
@@ -2501,41 +2520,38 @@ watch(gridvalue9, () => {
 
 const saveDeliveryMenuTab = async () => {
   const targetStoreCd = normalizeDeliveryParam(deliveryStoreCd.value);
-  const targetDeliveryCd = normalizeDeliveryParam(deliveryCompany.value);
   const targetMenuCd = normalizeDeliveryParam(
     selectedMenuCodeForDelivery.value || gridvalue3.value
   );
   const targetMenuName = String(gridvalue6.value ?? "").trim();
-  const targetDeliveryMenuName = String(deliveryMenuName.value ?? "").trim();
 
-  // console.log("[MST01_003INS][DELIVERY_SAVE] pre-validate params", {
-  //   GROUP_CD: groupCd.value,
-  //   STORE_CD: targetStoreCd,
-  //   MENU_CD: targetMenuCd,
-  //   DELIVERY_CD: targetDeliveryCd,
-  //   STR_NAME: targetMenuName,
-  //   STR_INFO1: targetDeliveryMenuName,
-  // });
+  const rowsToSave = (deliveryMenuRows.value || [])
+    .map((row) => ({
+      code: normalizeDeliveryParam(row?.code),
+      menuName: String(row?.menuName ?? "").trim(),
+      originalMenuName: String(row?.originalMenuName ?? "").trim(),
+    }))
+    .filter((row) => row.code && row.menuName !== row.originalMenuName);
 
-  if (!targetStoreCd || !targetDeliveryCd || !targetMenuCd) {
+  if (rowsToSave.length === 0) {
     Swal.fire({
       title: "경고",
-      text: "매장, 배달사, 메뉴코드를 확인해주세요.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  if (!targetDeliveryMenuName) {
-    Swal.fire({
-      title: "경고",
-      text: "배달메뉴명을 입력해주세요.",
+      text: "변경된 배달메뉴명이 없습니다.",
       icon: "warning",
       confirmButtonText: "확인",
     });
     return;
   }
 
+  if (!targetStoreCd || !targetMenuCd) {
+    Swal.fire({
+      title: "경고",
+      text: "매장, 메뉴코드를 확인해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   Swal.fire({
     title: "저장",
     text: "배달메뉴 설정을 저장 하시겠습니까?",
@@ -2548,92 +2564,82 @@ const saveDeliveryMenuTab = async () => {
 
     store.state.loading = true;
     try {
-      const savePayloadBase = {
-        GROUP_CD: groupCd.value,
-        STORE_CD: targetStoreCd,
-        MENU_CD: targetMenuCd,
-        DELIVERY_CD: targetDeliveryCd,
-        STR_NAME: targetMenuName,
-        STR_INFO1: targetDeliveryMenuName,
-      };
-      let saveRes = await saveDeliveryMenuMap({
-        ...savePayloadBase,
-        OVERWRITE_YN: "N",
-      });
-
-      if (extractResultCode(saveRes) === "97") {
-        let duplicateMenuCdForMsg = extractDuplicateMenuCd(saveRes);
-        // console.log("[MST01_003INS][DUP_DEBUG] saveRes.data", saveRes?.data);
-        // console.log(
-        //   "[MST01_003INS][DUP_DEBUG] duplicateMenuCd from saveRes",
-        //   duplicateMenuCdForMsg
-        // );
-        try {
-          if (!duplicateMenuCdForMsg) {
-            const duplicateCheckRes = await getDeliveryMenuMap(
-              groupCd.value,
-              targetStoreCd,
-              targetDeliveryCd,
-              ""
-            );
-            // console.log(
-            //   "[MST01_003INS][DUP_DEBUG] duplicateCheckRes.data",
-            //   duplicateCheckRes?.data
-            // );
-            const targetInfo1 = targetDeliveryMenuName.trim().toLowerCase();
-            const duplicateRow = extractDeliveryMapList(duplicateCheckRes).find((item) => {
-              const rowInfo1 = String(
-                item?.strInfo1 ?? item?.STR_INFO1 ?? item?.STRINFO1 ?? ""
-              )
-                .trim()
-                .toLowerCase();
-              const rowMenuCd = normalizeDeliveryParam(
-                item?.lngCode ?? item?.MENU_CD ?? item?.lngcode ?? item?.menuCd
-              );
-              return rowInfo1 === targetInfo1 && rowMenuCd !== targetMenuCd;
-            });
-            duplicateMenuCdForMsg = normalizeDeliveryParam(
-              duplicateRow?.lngCode ??
-                duplicateRow?.MENU_CD ??
-                duplicateRow?.lngcode ??
-                duplicateRow?.menuCd
-            );
-            // console.log("[MST01_003INS][DUP_DEBUG] duplicateRow matched", duplicateRow);
-            // console.log(
-            //   "[MST01_003INS][DUP_DEBUG] duplicateMenuCd from duplicateCheckRes",
-            //   duplicateMenuCdForMsg
-            // );
-          }
-        } catch (_) {}
-
-        const duplicateConfirm = await Swal.fire({
-          title: "중복 배달메뉴명",
-          text: duplicateMenuCdForMsg
-            ? `${duplicateMenuCdForMsg} 메뉴코드가 이미 해당 배달메뉴명을 사용 중입니다. 그래도 저장하시겠습니까?`
-            : "다른 메뉴코드에 중복된 배달메뉴명이 있습니다. 그래도 저장하시겠습니까?",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "예",
-          cancelButtonText: "아니오",
+      for (const row of rowsToSave) {
+        const targetDeliveryCd = row.code;
+        const targetDeliveryMenuName = row.menuName;
+        const savePayloadBase = {
+          GROUP_CD: groupCd.value,
+          STORE_CD: targetStoreCd,
+          MENU_CD: targetMenuCd,
+          DELIVERY_CD: targetDeliveryCd,
+          STR_NAME: targetMenuName,
+          STR_INFO1: targetDeliveryMenuName,
+        };
+        let saveRes = await saveDeliveryMenuMap({
+          ...savePayloadBase,
+          OVERWRITE_YN: "N",
         });
 
-        if (!duplicateConfirm.isConfirmed) {
-          return;
+        if (extractResultCode(saveRes) === "97") {
+          let duplicateMenuCdForMsg = extractDuplicateMenuCd(saveRes);
+          try {
+            if (!duplicateMenuCdForMsg) {
+              const duplicateCheckRes = await getDeliveryMenuMap(
+                groupCd.value,
+                targetStoreCd,
+                targetDeliveryCd,
+                ""
+              );
+              const targetInfo1 = targetDeliveryMenuName.trim().toLowerCase();
+              const duplicateRow = extractDeliveryMapList(duplicateCheckRes).find((item) => {
+                const rowInfo1 = String(
+                  item?.strInfo1 ?? item?.STR_INFO1 ?? item?.STRINFO1 ?? ""
+                )
+                  .trim()
+                  .toLowerCase();
+                const rowMenuCd = normalizeDeliveryParam(
+                  item?.lngCode ?? item?.MENU_CD ?? item?.lngcode ?? item?.menuCd
+                );
+                return rowInfo1 === targetInfo1 && rowMenuCd !== targetMenuCd;
+              });
+              duplicateMenuCdForMsg = normalizeDeliveryParam(
+                duplicateRow?.lngCode ??
+                  duplicateRow?.MENU_CD ??
+                  duplicateRow?.lngcode ??
+                  duplicateRow?.menuCd
+              );
+            }
+          } catch (_) {}
+
+          const duplicateConfirm = await Swal.fire({
+            title: "중복 배달메뉴명",
+            text: duplicateMenuCdForMsg
+              ? `${duplicateMenuCdForMsg} 메뉴코드가 이미 해당 배달메뉴명을 사용 중입니다. 그래도 저장하시겠습니까?`
+              : "다른 메뉴코드에 중복된 배달메뉴명이 있습니다. 그래도 저장하시겠습니까?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "예",
+            cancelButtonText: "아니오",
+          });
+
+          if (!duplicateConfirm.isConfirmed) {
+            return;
+          }
+
+          saveRes = await saveDeliveryMenuMap({
+            ...savePayloadBase,
+            OVERWRITE_YN: "Y",
+          });
         }
 
-        saveRes = await saveDeliveryMenuMap({
-          ...savePayloadBase,
-          OVERWRITE_YN: "Y",
-        });
-      }
-
-      if (extractResultCode(saveRes) !== "00") {
-        Swal.fire({
-          title: "저장이 실패되었습니다.",
-          text: extractResultName(saveRes) || "저장 중 오류가 발생했습니다.",
-          confirmButtonText: "확인",
-        });
-        return;
+        if (extractResultCode(saveRes) !== "00") {
+          Swal.fire({
+            title: "저장이 실패되었습니다.",
+            text: extractResultName(saveRes) || "저장 중 오류가 발생했습니다.",
+            confirmButtonText: "확인",
+          });
+          return;
+        }
       }
 
       Swal.fire({
