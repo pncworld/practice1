@@ -913,8 +913,29 @@
                 @input="onlyNumber" />
             </div>
             <div
-              class="mst003-form-label">
-              시세가적용
+              class="mst003-form-label mst003-form-label--with-info">
+              <span>시세가적용</span>
+              <span class="mst003-info-tooltip-host">
+                <button
+                  type="button"
+                  class="mst003-info-btn"
+                  @click.stop="toggleFieldInfoTooltip('marketPrice')"
+                  aria-label="시세가적용 안내"
+                  aria-describedby="marketPriceInfoTooltip">
+                  <img
+                    src="@/assets/images/ic-info.svg"
+                    alt=""
+                    class="mst003-info-btn__icon"
+                    aria-hidden="true" />
+                </button>
+                <span
+                  v-show="isFieldInfoTooltipVisible('marketPrice')"
+                  id="marketPriceInfoTooltip"
+                  class="mst003-info-tooltip"
+                  role="tooltip">
+                  포스 입력 판매가 사용
+                </span>
+              </span>
             </div>
             <div class="mst003-form-value mst003-form-value--inline">
               <label for="allow5"
@@ -979,8 +1000,54 @@
                   class="disabled:bg-gray-200" />아니오</label
               >
             </div>
-            <div class="mst003-grid-void" aria-hidden="true"></div>
-            <div class="mst003-grid-void" aria-hidden="true"></div>
+            <div
+              class="mst003-form-label mst003-form-label--with-info">
+              <span>메뉴재고 품절</span>
+              <span class="mst003-info-tooltip-host">
+                <button
+                  type="button"
+                  class="mst003-info-btn"
+                  @click.stop="toggleFieldInfoTooltip('soldOut')"
+                  aria-label="메뉴재고 품절 안내"
+                  aria-describedby="soldOutInfoTooltip">
+                  <img
+                    src="@/assets/images/ic-info.svg"
+                    alt=""
+                    class="mst003-info-btn__icon"
+                    aria-hidden="true" />
+                </button>
+                <span
+                  v-show="isFieldInfoTooltipVisible('soldOut')"
+                  id="soldOutInfoTooltip"
+                  class="mst003-info-tooltip"
+                  role="tooltip">
+                  메뉴재고 품절 사용시에만 해당
+                </span>
+              </span>
+            </div>
+            <div class="mst003-form-value mst003-form-value--inline">
+              <label for="soldOutY"
+                ><input
+                  type="radio"
+                  id="soldOutY"
+                  name="blnSoldOutYN"
+                  v-model="gridvalue42"
+                  value="1"
+                  @input="changeInfo"
+                  :disabled="afterClick"
+                  class="disabled:bg-gray-200" />적용</label
+              ><label for="soldOutN"
+                ><input
+                  type="radio"
+                  id="soldOutN"
+                  name="blnSoldOutYN"
+                  v-model="gridvalue42"
+                  value="0"
+                  @input="changeInfo"
+                  :disabled="afterClick"
+                  class="disabled:bg-gray-200" />미적용</label
+              >
+            </div>
             <div class="mst003-form-label">
               영양소 정보
             </div>
@@ -1042,8 +1109,29 @@
                 :disabled="afterClick" />
             </div>
             <div
-              class="mst003-form-label">
-              판매일 설정
+              class="mst003-form-label mst003-form-label--with-info">
+              <span>판매일 설정</span>
+              <span class="mst003-info-tooltip-host">
+                <button
+                  type="button"
+                  class="mst003-info-btn"
+                  @click.stop="toggleFieldInfoTooltip('saleDaySetting')"
+                  aria-label="판매일 설정 안내"
+                  aria-describedby="saleDaySettingInfoTooltip">
+                  <img
+                    src="@/assets/images/ic-info.svg"
+                    alt=""
+                    class="mst003-info-btn__icon"
+                    aria-hidden="true" />
+                </button>
+                <span
+                  v-show="isFieldInfoTooltipVisible('saleDaySetting')"
+                  id="saleDaySettingInfoTooltip"
+                  class="mst003-info-tooltip"
+                  role="tooltip">
+                  휴일과 중복될 경우 휴일 우선적용
+                </span>
+              </span>
             </div>
             <div class="mst003-form-value mst003-form-value--inline">
               <label for="lngType1"
@@ -1828,6 +1916,7 @@ const gridvalue38 = ref("");
 const gridvalue39 = ref("");
 const gridvalue40 = ref("");
 const gridvalue41 = ref("");
+const gridvalue42 = ref("");
 const gridvalue100 = ref("");
 watch([deliveryStoreCd, selectedMenuCodeForDelivery, gridvalue3, deliveryCompanyOptions], () => {
   loadDeliveryMenuName();
@@ -1958,6 +2047,7 @@ const clickedRowData = async (newvalue) => {
   gridvalue26.value = newvalue[23];
   gridvalue27.value = newvalue[25];
   gridvalue28.value = newvalue[26];
+  gridvalue42.value = newvalue?.blnSoldOutYN ?? newvalue[41] ?? "0";
   gridvalue29.value = newvalue[27];
   gridvalue30.value = newvalue[28];
   gridvalue31.value = newvalue[29];
@@ -2251,6 +2341,35 @@ const searchC2 = ref(-1);
  * INPUT , SELECT 수정 데이터 갱신
  */
 
+const FIELD_INFO_TOOLTIP_DURATION = 1500;
+const fieldInfoTooltipKey = ref(null);
+let fieldInfoTooltipTimer = null;
+
+const hideFieldInfoTooltip = () => {
+  if (fieldInfoTooltipTimer) {
+    clearTimeout(fieldInfoTooltipTimer);
+    fieldInfoTooltipTimer = null;
+  }
+  fieldInfoTooltipKey.value = null;
+};
+
+const toggleFieldInfoTooltip = (key) => {
+  if (fieldInfoTooltipKey.value === key) {
+    hideFieldInfoTooltip();
+    return;
+  }
+  if (fieldInfoTooltipTimer) {
+    clearTimeout(fieldInfoTooltipTimer);
+    fieldInfoTooltipTimer = null;
+  }
+  fieldInfoTooltipKey.value = key;
+  fieldInfoTooltipTimer = setTimeout(() => {
+    hideFieldInfoTooltip();
+  }, FIELD_INFO_TOOLTIP_DURATION);
+};
+
+const isFieldInfoTooltipVisible = (key) => fieldInfoTooltipKey.value === key;
+
 const changeInfo = (e) => {
   const tagName = e.target.name;
   let value2 = e.target.value;
@@ -2399,7 +2518,7 @@ const addRow = () => {
     const today = new Date();
     const formattedDate = today.toLocaleDateString("en-CA");
     addrowProp.value =
-      "lngMainGroup,lngSubGroup,dtmFromDate,dtmToDate,strName,lngPrice,lngTax,blnInactive,strAmtCodeList,lngDCPrice,lngChain,blnDCPriceYN,lngDiscount,intCustCount,lngOrder,lngKPG,blnReceipt,lngMenuOption,blnFloat,strIcon,blnKitSingle,lngSubTitle,blnServing,blnOpen,blnDeliveryYN";
+      "lngMainGroup,lngSubGroup,dtmFromDate,dtmToDate,strName,lngPrice,lngTax,blnInactive,strAmtCodeList,lngDCPrice,lngChain,blnDCPriceYN,lngDiscount,intCustCount,lngOrder,lngKPG,blnReceipt,lngMenuOption,blnFloat,strIcon,blnKitSingle,lngSubTitle,blnServing,blnOpen,blnDeliveryYN,blnSoldOutYN";
     addrowDefault.value =
       "0,0," +
       formattedDate +
@@ -2441,6 +2560,8 @@ const addRow = () => {
       "0" +
       "," +
       "" +
+      "," +
+      "0" +
       "," +
       "0" +
       "," +
@@ -2813,6 +2934,7 @@ const saveButton = () => {
           filterAndMap("blnServing"),
           filterAndMap("blnOpen"),
           filterAndMap("blnDeliveryYN"),
+          filterAndMap("blnSoldOutYN"),
           filterAndMap("strNutrInfo"),
           filterAndMap("strCntryOrg"),
           filterAndMap("strMenuComment"),
@@ -3145,6 +3267,7 @@ const initAll = () => {
   gridvalue100.value = "";
   gridvalue40.value = "";
   gridvalue41.value = "";
+  gridvalue42.value = "";
   selectedMenuCodeForDelivery.value = "";
   //initFocus.value = !initFocus.value
   fileName.value = "";
@@ -4069,6 +4192,70 @@ const excelButton = async () => {
 .mst003-form-label--required {
   color: #2563eb;
   font-weight: 700;
+}
+
+.mst003-form-label--with-info {
+  gap: 0.375rem;
+}
+
+.mst003-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.75rem;
+  height: 0.75rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.mst003-info-btn__icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mst003-info-btn:hover {
+  opacity: 0.8;
+}
+
+.mst003-info-tooltip-host {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.mst003-info-tooltip {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 0.375rem);
+  z-index: 30;
+  width: max-content;
+  max-width: 12rem;
+  transform: translateX(-50%);
+  border-radius: 0.375rem;
+  background-color: #1e293b;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.18);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.mst003-info-tooltip::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-bottom-color: #1e293b;
 }
 
 .mst003-form-value {

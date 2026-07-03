@@ -2330,6 +2330,29 @@ const runFuncshowGrid = async () => {
     isSignedDecimalColumn(colId) || isUnsignedDecimalColumn(colId);
   const SIGNED_DECIMAL_MAX_PLACES = 2;
   const signedDecimalNumberFormat = "#,##0.##";
+  const isGridNumberMask = (mask) => {
+    const m = String(mask ?? "").trim();
+    return m !== "" && m !== "@@@@-@@-@@" && /[#0,]/.test(m);
+  };
+  const resolveGridNumberFormat = (item) => {
+    if (isDecimalInputColumn(item.strColID)) return signedDecimalNumberFormat;
+    if (props.suffixColumnwon == "lngPrice" && item.strColID == "lngPrice") {
+      return "#,##0";
+    }
+    const mask = String(item.strMask ?? "").trim();
+    if (isGridNumberMask(mask)) return mask;
+    if (item.strColType == "float") return "#,##0";
+    if (item.strColType === "double" && item.strDisplay == "double2") {
+      return "#,##0.000";
+    }
+    if (item.strColType === "double" && item.strDisplay == "double") {
+      return "#,##0.00";
+    }
+    if (item.strColType === "double" && item.strDisplay != "double") {
+      return "#,##0.0";
+    }
+    return "#,##0.0";
+  };
   const countMeaningfulDecimalPlaces = (
     v,
     maxPlaces = SIGNED_DECIMAL_MAX_PLACES
@@ -2400,6 +2423,8 @@ const runFuncshowGrid = async () => {
         ? "boolean"
         : isDecimalInputColumn(item.strColID) ||
           item.strColType == "number" ||
+          item.strDisplay == "number" ||
+          isGridNumberMask(item.strMask) ||
           item.strColType === "float" ||
           item.strColType === "double"
         ? "number"
@@ -2680,15 +2705,7 @@ const runFuncshowGrid = async () => {
             ],
       numberFormat: isDecimalInputColumn(item.strColID)
         ? ""
-        : item.strColType == "float"
-        ? "#,##0"
-        : item.strColType === "double" && item.strDisplay == "double2"
-        ? "#,##0.000"
-        : item.strColType === "double" && item.strDisplay == "double"
-        ? "#,##0.00"
-        : item.strColType === "double" && item.strDisplay != "double"
-        ? "#,##0.0"
-        : "#,##0",
+        : resolveGridNumberFormat(item),
       valueCallback: function (grid, column, groupFooterIndex, group, value) {
         const regex =
           /(sum|avg|max|min|count)\(\s*([^)]+?)\s*\)|([+\-*/]|\b\d+\b)/gi;
@@ -2836,13 +2853,7 @@ const runFuncshowGrid = async () => {
         ? ""
         : item.strTotalexpr != ""
         ? item.strTotalexpr
-        : item.strColType === "double" && item.strDisplay == "double2"
-        ? "#,##0.000"
-        : item.strColType === "double" && item.strDisplay == "double"
-        ? "#,##0.00"
-        : item.strColType === "double" && item.strDisplay != "double"
-        ? "#,##0.0"
-        : "#,##0",
+        : resolveGridNumberFormat(item),
       suffix: props.suffixColumnPercent.includes(item.strColID) ? "%" : "",
       valueCallback: function (grid, column, footerIndex, columnFooter, value) {
         // count 표현식 처리 - 그룹푸터 제외한 실제 데이터 행만 카운트
@@ -3112,17 +3123,7 @@ const runFuncshowGrid = async () => {
       },
     }),
     width: rgScaledColumnWidth(item.strColID, item.intHdWidth),
-    numberFormat: isDecimalInputColumn(item.strColID)
-      ? signedDecimalNumberFormat
-      : props.suffixColumnwon == "lngPrice" && item.strColID == "lngPrice"
-      ? "#,##0"
-      : item.strColType == "float"
-      ? "#,##0"
-      : item.strColType == "double" && item.strDisplay == "double"
-      ? "#,##0.00"
-      : item.strColType == "double" && item.strDisplay == "double2"
-      ? "#,##0.000"
-      : "#,##0.0",
+    numberFormat: resolveGridNumberFormat(item),
     styleName:
       props.dynamicRowHeight2 == true && item.strAlign == "left"
         ? "setTextAlignLeft"
