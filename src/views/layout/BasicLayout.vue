@@ -486,6 +486,15 @@ watch(
 }
 .h-logo-nav-home {
   cursor: pointer;
+  transition: box-shadow 0.18s, opacity 0.18s;
+}
+.h-logo-nav-home:hover {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6), 0 4px 14px rgba(0, 0, 0, 0.18);
+  opacity: 0.92;
+}
+.h-logo-nav-home:active {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
+  opacity: 0.85;
 }
 .h-logo-nav-home:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.85);

@@ -30,7 +30,7 @@
           <img class="sa-hd-btn__ic" :src="saIconExcel" width="16" height="16" alt="" />
           엑셀변환
         </button>
-        <span class="sa-hd-btn-wrap sa-hd-btn-wrap--tooltip-host">
+        <span class="sa-hd-btn-wrap sa-hd-btn-wrap--tooltip-host" style="display:none;">
           <button type="button" class="sa-hd-btn sa-hd-btn--outline" @click="onGoDetail">
             <img
               class="sa-hd-btn__ic sa-hd-btn__ic--detail"
@@ -161,7 +161,7 @@ import {
   COL_WEEKLY,
 } from "@/constants/salesAnalysisDashboardColumns.js";
 import saIconDetail from "@/assets/images/ic_move.svg";
-import saIconExcel from "@/assets/excel_icon.svg";
+import saIconExcel from "@/assets/excel_icon_dashboard.svg";
 import Swal from "sweetalert2";
 import { utils, writeFile } from "xlsx-js-style";
 import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
@@ -1170,13 +1170,14 @@ defineExpose({
 }
 
 .sa-hd-btn--primary {
-  border: 1px solid #4a6fd8;
-  background: #5782ff;
-  color: #fff;
+  border: 1px solid #a8d5b5;
+  background: #d4edda;
+  color: #2d6a4f;
 }
 
 .sa-hd-btn--primary:hover {
-  filter: brightness(1.05);
+  background: #b7dfc4;
+  border-color: #8ec6a0;
 }
 
 .sa-hd-btn--ghost {

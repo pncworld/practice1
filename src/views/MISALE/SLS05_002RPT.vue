@@ -5,58 +5,102 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <!-- 조회조건 -->
-    <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
-       <PageName></PageName>
+  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+    <!-- 상단 버튼 영역 -->
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
+      <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">조회</button>
         <button @click="excelButton" class="button save w-auto excel">엑셀</button>
       </div>
     </div>
-    <div class="grid grid-cols-2 grid-rows-1 justify-between  bg-gray-200 rounded-lg h-32 items-start z-10">
-      <div class="grid grid-cols-1 grid-rows-3">
-        <Datepicker2    class="" @endDate="endDate" @startDate="startDate" :closePopUp="closePopUp" ref="datepicker" @excelDate="excelDate"></Datepicker2>
-        <div class="flex justify-start items-center text-base text-nowrap font-semibold ml-16 "> 매입사 
-          <div class="flex ml-5 space-x-3 ">
-            <v-select v-model="selectCardCorp" :options="cardCorp" placeholder="전체" label="strBuyName" class="w-48 !h-8 bg-white " clearable="true"/>
+    <!-- 조회조건 영역 -->
+    <div
+      class="sls05-search-panel relative z-10 mt-2 w-full min-w-0 shrink-0 overflow-visible rounded-lg bg-gray-200 py-2.5 xl:py-3"
+      :style="{
+        '--sls05-control-border': sls05ControlBorder,
+        '--sls05-item-gap': sls05ItemGap,
+        '--sls05-row-gap': sls05RowGap,
+        '--sls05-col-gap': sls05ColGap,
+        '--sls05-label-col': sls05LabelCol,
+        '--sls05-pick-gap-col': sls05PickGapCol,
+        '--sls05-pick-scale': sls05PickScale,
+      }">
+      <div class="sls05-search-grid min-w-0">
+        <!-- 좌: 일자·매입사·승인여부 (1열) -->
+        <div class="sls05-left-stack">
+          <div class="sls05-left-row">
+            <div class="sls05-sg-label">일자</div>
+            <div class="sls05-input-col sls05-date-slot min-w-0">
+              <Datepicker2
+                ref="datepicker"
+                omit-main-label
+                filter-bar-align
+                :closePopUp="closePopUp"
+                @endDate="endDate"
+                @startDate="startDate"
+                @excelDate="excelDate" />
+            </div>
+          </div>
+
+          <div class="sls05-left-row">
+            <div class="sls05-sg-label">매입사</div>
+            <div class="sls05-input-col min-w-0">
+              <v-select
+                v-model="selectCardCorp"
+                :options="cardCorp"
+                placeholder="전체"
+                label="strBuyName"
+                class="custom-select2 sls05-buy-vselect"
+                append-to-body
+                :clearable="true" />
+            </div>
+          </div>
+
+          <div class="sls05-left-row">
+            <div class="sls05-sg-label">승인여부</div>
+            <div class="sls05-input-col min-w-0">
+              <div class="flex items-center gap-4">
+                <label class="flex items-center gap-1.5 text-sm font-normal cursor-pointer">
+                  <input type="radio" value="0" v-model="selectedRadioBox" /> 승인
+                </label>
+                <label class="flex items-center gap-1.5 text-sm font-normal cursor-pointer">
+                  <input type="radio" value="1" v-model="selectedRadioBox" /> 취소
+                </label>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="flex justify-start items-start text-base text-nowrap font-semibold ml-12 ">조회조건
-          <div>
-            <label for="accept" class="font-normal">
-              <input type="radio" id="accept" value="0" v-model="selectedRadioBox" class="ml-5"> 승인
-            </label>
-          </div>
-          <div>
-            <label for="cancel" class="font-normal">
-              <input type="radio" id="cancel" value="1" v-model="selectedRadioBox" class="ml-5"> 취소
-            </label>
-          </div>
+
+        <!-- 3열: 매장명 (우측·확대) -->
+        <div class="sls05-col2-gap" aria-hidden="true"></div>
+        <div class="sls05-pick-span">
+          <pickStoreSingle
+            @lngStoreCode="lngStoreCodes"
+            @lngStoreGroup="lngStoreGroup"
+            @lngStoreAttrs="lngStoreAttrs"
+            @lngSupervisor="lngSupervisor"
+            @excelStore="excelStore" />
         </div>
       </div>
-      <div class="h-[75%] ">
-        <pickStoreSingle @lngStoreCode="lngStoreCodes" @lngStoreGroup="lngStoreGroup"  @lngStoreAttrs="lngStoreAttrs" @lngSupervisor="lngSupervisor" @excelStore="excelStore"></pickStoreSingle>
-      </div>
     </div>
-      <!-- 조회조건 -->
-      <!-- 그리드 영역 -->
-    <div class="w-full h-[82%]">
-      <!-- <Realgrid :progname="'SLS02_014RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload" 
-         :setFooter="true" :setGroupFooter="setGroupFooter" :setFooterExpressions="setFooterExpressions" :setFooterColID="setFooterColID"
-        :setGroupColumnId="'strStore'" :setGroupSumCustomText="['소계']" :setGroupSumCustomColumnId="setGroupSumCustomColumnId"
-        :setGroupSumCustomLevel="3" :setGroupSummaryCenterIds="setGroupSummaryCenterIds" :setGroupFooterExpressions="setGroupFooterExpressions" :setGroupFooterColID="setGroupFooterColID"
-        :documentTitle="'SLS02_014RPT'" :documentSubTitle="documentSubTitle" :exporttoExcel="exportExcel">
-      </Realgrid> -->
-      <Realgrid :progname="'SLS05_002RPT_VUE'" :progid="progid" :rowData="rowData" :reload="reload" :rowStateeditable="false"
-         :setFooter="true" 
-         :setGroupFooter="true" :setGroupColumnId="'strStore'"
-         :exporttoExcel="exportExcel" :documentTitle="'SLS05_002RPT'" :documentSubTitle="documentSubTitle" 
-      </Realgrid>
+    <!-- 그리드 영역 -->
+    <div class="w-full flex-1 min-h-0 mt-2">
+      <Realgrid
+        :progname="'SLS05_002RPT_VUE'"
+        :progid="progid"
+        :rowData="rowData"
+        :reload="reload"
+        :rowStateeditable="false"
+        :setFooter="true"
+        :setGroupFooter="true"
+        :setGroupColumnId="'strStore'"
+        :exporttoExcel="exportExcel"
+        :documentTitle="'SLS05_002RPT'"
+        :documentSubTitle="documentSubTitle" />
     </div>
-    </div>
-       <!-- 그리드 영역 -->
-  </template>
+  </div>
+</template>
   
   <script setup>
   import { getCardCorp, getCardSalesDetailReport } from '@/api/misales';
@@ -99,6 +143,14 @@ import { insertPageLog } from '@/customFunc/customFunc';
  *  */
 
 import PageName from '@/components/pageName.vue';
+
+const sls05ControlBorder = '#cbd5e1';
+const sls05ItemGap = '0.75rem';
+const sls05RowGap = '0.5625rem';
+const sls05ColGap = '1.25rem';
+const sls05LabelCol = '5.25rem';
+const sls05PickGapCol = '3.75rem';
+const sls05PickScale = 0.857375;
   
   const setFooterColID = ref(['lngAmount'])
   const setFooterExpressions = ref(['sum'])
@@ -207,7 +259,6 @@ const searchButton= async () => {
 
 const lngStoreGroup = (e) => {
     initGrid()
-    //comsole.log(e)
     selectedGroup.value = e
   }
   /**
@@ -218,7 +269,6 @@ const lngStoreCodes = (e) => {
     initGrid()
     selectCardCorp.value = null
     selectedStores.value = e
-    //comsole.log(e)
   }
 
 
@@ -246,27 +296,30 @@ const lngSupervisor = (e) => {
   const cardCorp = ref([])
   const selectedBuyCode = ref("")
 
+  const loadCardCorpList = async () => {
+    if (selectedGroup.value == null || selectedStores.value == null) {
+      cardCorp.value = []
+      return
+    }
+    try {
+      const res = await getCardCorp(selectedGroup.value, selectedStores.value, 1)
+      cardCorp.value = res.data.cardCorpList ?? []
+    } catch {
+      cardCorp.value = []
+    }
+  }
+
   /**
  * 	화면 Load시 실행 스크립트
  */
 
 onMounted(async () => {
+  await insertPageLog(store.state.activeTab2)
+})
 
-
-  const pageLog = await insertPageLog(store.state.activeTab2);
-
-    //comsole.log(selectedGroup.value, selectedStores.value)
-    const res = await getCardCorp(selectedGroup.value, selectedStores.value, 1)
-    cardCorp.value = res.data.cardCorpList
-    //comsole.log(cardCorp.value)
-  })
-
-  watch([selectedGroup, selectedStores], async () => {
-      //comsole.log(selectedGroup.value, selectedStores.value)
-      const res = await getCardCorp(selectedGroup.value, selectedStores.value, 1)
-      cardCorp.value = res.data.cardCorpList
-      //comsole.log(cardCorp.value)
-  })
+watch([selectedGroup, selectedStores], () => {
+  loadCardCorpList()
+})
   
   watch(selectCardCorp, (newValue) => {
     selectedBuyCode.value = newValue ? newValue.strBuyCode : ""
@@ -322,3 +375,218 @@ const excelStore = (e) =>{
     //comsole.log(e)
   }
   </script>
+
+<style scoped>
+/* 패널 좌·우 여백 — 앞(일자 앞)=뒤(매장명 뒤), 항상 동일 값 유지 */
+.sls05-search-panel {
+  --sls05-panel-pad-x: 2rem;
+  padding-inline: var(--sls05-panel-pad-x);
+}
+
+@media (min-width: 640px) {
+  .sls05-search-panel {
+    --sls05-panel-pad-x: 2.875rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .sls05-search-panel {
+    --sls05-panel-pad-x: 4.875rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .sls05-search-panel {
+    --sls05-panel-pad-x: 5.5rem;
+  }
+}
+
+/* 3열 AREA — 1열: 조건 / 2열: 간격 / 3열: 매장명(우측·확대) */
+.sls05-search-grid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  overflow: visible;
+  grid-template-columns: max-content var(--sls05-pick-gap-col) minmax(0, 1fr);
+  column-gap: var(--sls05-col-gap);
+  row-gap: var(--sls05-row-gap);
+}
+
+.sls05-left-stack {
+  grid-column: 1;
+  grid-row: 1 / 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--sls05-row-gap);
+  align-self: stretch;
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.sls05-left-row {
+  display: grid;
+  grid-template-columns: var(--sls05-label-col) auto;
+  column-gap: var(--sls05-item-gap);
+  align-items: center;
+  min-width: 0;
+}
+
+.sls05-input-col {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  width: 100%;
+}
+
+.sls05-pick-span {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  align-self: center;
+  justify-self: end;
+  min-width: 0;
+  width: calc(100% * var(--sls05-pick-scale));
+  max-width: calc(100% * var(--sls05-pick-scale));
+  overflow-x: hidden;
+}
+
+.sls05-col2-gap {
+  grid-column: 2;
+  grid-row: 1 / 4;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.sls05-pick-span :deep(.pss-root) {
+  width: 100%;
+  max-width: 100%;
+  gap: var(--sls05-row-gap);
+}
+
+.sls05-pick-span :deep(.pss-grid) {
+  --pss-grp-col: calc(11rem * var(--sls05-pick-scale));
+  width: 100%;
+  max-width: 100%;
+  row-gap: var(--sls05-row-gap);
+  column-gap: var(--sls05-item-gap);
+  grid-template-columns:
+    auto
+    var(--pss-grp-col)
+    minmax(calc(6.5rem * var(--sls05-pick-scale)), 1fr)
+    minmax(calc(6.5rem * var(--sls05-pick-scale)), 1fr);
+}
+
+.sls05-pick-span :deep(.pss-brand) {
+  width: calc(4.5rem * var(--sls05-pick-scale)) !important;
+  min-width: calc(3.5rem * var(--sls05-pick-scale)) !important;
+}
+
+.sls05-pick-span :deep(.pss-mid-pair) {
+  width: 100%;
+  min-width: 0;
+}
+
+.sls05-pick-span :deep(.pss-col-store) {
+  min-width: 0;
+  width: 100%;
+}
+
+.sls05-sg-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+}
+
+.sls05-buy-vselect {
+  width: 100% !important;
+  min-width: 0;
+}
+
+.sls05-input-col :deep(.custom-select2 .vs__dropdown-toggle) {
+  height: 2rem !important;
+  min-height: 2rem !important;
+  border: 1px solid var(--sls05-control-border) !important;
+  border-radius: 0.375rem !important;
+  padding: 0 0.5rem !important;
+}
+
+.sls05-input-col :deep(.custom-select2 .vs__selected-options) {
+  padding: 0 !important;
+  flex-wrap: nowrap;
+}
+
+.sls05-input-col :deep(.custom-select2 .vs__selected),
+.sls05-input-col :deep(.custom-select2 .vs__placeholder),
+.sls05-input-col :deep(.custom-select2 .vs__search) {
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+  color: rgb(55 65 81) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.sls05-input-col :deep(.custom-select2 .vs__actions) {
+  padding: 0 0 0 0.25rem !important;
+}
+
+.sls05-search-panel .sls05-date-slot :deep(> div.flex.justify-start.items-center) {
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0;
+  gap: 0.25rem !important;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.sls05-search-panel .sls05-date-slot :deep(> div.flex > div.inline-flex.h-8) {
+  flex: 0 0 auto;
+  width: auto !important;
+  max-width: none;
+  gap: 0.125rem !important;
+}
+
+.sls05-search-panel .sls05-date-slot :deep(input[type="date"]) {
+  border: 1px solid var(--sls05-control-border) !important;
+  box-sizing: border-box;
+  flex: 0 0 9rem;
+  width: 9rem !important;
+  min-width: 9rem;
+  max-width: 9rem;
+  height: 2rem !important;
+  min-height: 2rem !important;
+  padding-left: 0.45rem;
+  padding-right: 0.25rem;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+  border-radius: 0.375rem;
+}
+
+.sls05-search-panel .sls05-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.sls05-search-panel .sls05-date-slot :deep(div.inline-flex.h-8 > span) {
+  flex-shrink: 0;
+}
+
+.sls05-search-panel .sls05-date-slot :deep(div.inline-flex.h-8 > button) {
+  flex-shrink: 0;
+  width: 2rem !important;
+  height: 2rem !important;
+  min-width: 2rem;
+  margin-left: 0.125rem !important;
+}
+
+.sls05-pick-span :deep(.pss-select),
+.sls05-pick-span :deep(.vs__dropdown-toggle) {
+  border: 1px solid var(--sls05-control-border) !important;
+  box-sizing: border-box;
+}
+</style>

@@ -65,7 +65,7 @@
                 </div>
               </form>
               <br/>
-              <p v-if="message" class="message-text" style="text-align: center;">{{ message }}</p>
+              <p v-if="message" class="message-text" style="text-align:center;color:#ef4444;font-weight:500;">{{ message }}</p>
             </div>
           </div>
 
@@ -87,8 +87,9 @@
       <!-- Footer -->
       <div class="login-footer">
         <div class="f15 text">
-          본 시스템은 Chrome, Windows Edge 브라우저에 최적화 되어있습니다. <br />
-          Internet Explorer 8 이하 버전의 경우 정상 작동하지 않을 수 있습니다.
+          권장 브라우저 : Google Chrome · Microsoft Edge (최신 버전)<br />
+          Internet Explorer는 지원하지 않으며, 구형 브라우저에서는 일부 화면이 정상 표시되지 않을 수 있습니다.<br />
+          최신 브라우저 사용을 권장합니다.
         </div>
         <div class="f14 copyright">Copyright©1997 PnCworld ALL RIGHT RESERVED.</div>
       </div>
@@ -241,7 +242,7 @@ const login2 = async () => {
     }
   } catch (error) {
     console.log(error);
-    message.value = "오류 발생";
+    message.value = "아이디 / 패스워드를 확인 해 주십시오.";
   } finally {
     store.dispatch("convertLoading", false);
   }
