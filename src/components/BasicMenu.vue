@@ -7,9 +7,35 @@
         <span class="flex-center bg-black-50 br50p user-icon">
           <img src="../assets/images/ic_user.png">
         </span>
-        <span class="user-id">{{ loginName }}</span>
-        <span class="user-store">
-          {{ storeName }} ({{ lStoreCd }})
+        <span class="user-info-tooltip-host user-info-tooltip-host--id">
+          <span
+            ref="userIdRef"
+            class="user-id"
+            @mouseenter="onUserIdEnter"
+            @mouseleave="onUserIdLeave">
+            {{ loginName }}
+          </span>
+          <span
+            v-show="userIdTooltipVisible"
+            class="user-info-hover-tooltip"
+            role="tooltip">
+            {{ loginName }}
+          </span>
+        </span>
+        <span class="user-info-tooltip-host user-info-tooltip-host--store">
+          <span
+            ref="userStoreRef"
+            class="user-store"
+            @mouseenter="onUserStoreEnter"
+            @mouseleave="onUserStoreLeave">
+            {{ storeDisplayText }}
+          </span>
+          <span
+            v-show="userStoreTooltipVisible"
+            class="user-info-hover-tooltip"
+            role="tooltip">
+            {{ storeDisplayText }}
+          </span>
         </span>
       </div>
       <button class="btn-sidemenu-toggle" type="button">
@@ -134,6 +160,36 @@ const props = defineProps({
 const storeName = ref("");
 const loginName = ref("");
 const lStoreCd = ref("");
+const userIdRef = ref(null);
+const userStoreRef = ref(null);
+const userIdTooltipVisible = ref(false);
+const userStoreTooltipVisible = ref(false);
+const storeDisplayText = computed(
+  () => `${storeName.value} (${lStoreCd.value})`
+);
+
+const isTextTruncated = (el) => {
+  if (!el) return false;
+  return el.scrollWidth > el.clientWidth + 1;
+};
+
+const onUserIdEnter = () => {
+  userIdTooltipVisible.value = isTextTruncated(userIdRef.value);
+};
+
+const onUserIdLeave = () => {
+  userIdTooltipVisible.value = false;
+};
+
+const onUserStoreEnter = () => {
+  userStoreTooltipVisible.value = isTextTruncated(userStoreRef.value);
+};
+
+const onUserStoreLeave = () => {
+  userStoreTooltipVisible.value = false;
+};
+
+let userInfoResizeObserver = null;
 const store = useStore();
 const clickFavorite = ref(false);
 const favoriteProgList = ref([]);
@@ -384,7 +440,27 @@ onMounted(() => {
     }
   });
 
+  nextTick(() => {
+    const targets = [userIdRef.value, userStoreRef.value].filter(Boolean);
+    if (targets.length && typeof ResizeObserver !== "undefined") {
+      userInfoResizeObserver = new ResizeObserver(() => {
+        if (!isTextTruncated(userIdRef.value)) {
+          userIdTooltipVisible.value = false;
+        }
+        if (!isTextTruncated(userStoreRef.value)) {
+          userStoreTooltipVisible.value = false;
+        }
+      });
+      targets.forEach((el) => userInfoResizeObserver.observe(el));
+    }
+  });
+
   router.push("/homePage");
+});
+
+onUnmounted(() => {
+  userInfoResizeObserver?.disconnect();
+  userInfoResizeObserver = null;
 });
 
 watch(

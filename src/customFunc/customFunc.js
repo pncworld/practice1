@@ -328,3 +328,23 @@ export function formatNumberWithCommas(number) {
   // if (typeof number !== 'number') return number; // 숫자가 아닐 경우 그대로 반환
   return new Intl.NumberFormat().format(Number(number)); // 천 단위로 구분한 숫자 포맷
 }
+
+/** 메뉴재고 품절(blnSoldOutYN) — API True/False, 0/1 등을 라디오용 "0"|"1"로 통일 */
+export function normalizeSoldOutYn(value, defaultValue = "0") {
+  if (value === undefined || value === null || value === "") {
+    return defaultValue;
+  }
+  if (value === true || value === 1) return "1";
+  if (value === false || value === 0) return "0";
+  const normalized = String(value).trim().toLowerCase();
+  if (normalized === "1" || normalized === "true") return "1";
+  if (normalized === "0" || normalized === "false") return "0";
+  return defaultValue;
+}
+
+export function normalizeMenuListSoldOutYn(list) {
+  return (list ?? []).map((row) => ({
+    ...row,
+    blnSoldOutYN: normalizeSoldOutYn(row.blnSoldOutYN),
+  }));
+}

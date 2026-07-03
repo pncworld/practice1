@@ -1251,7 +1251,7 @@ import RealGrid from "realgrid";
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog } from "@/customFunc/customFunc";
+import { insertPageLog, normalizeMenuListSoldOutYn, normalizeSoldOutYn } from "@/customFunc/customFunc";
 /**
  *  이미지 별도 호출
  *  */
@@ -1538,6 +1538,25 @@ function convertTo24Hour(timeStr) {
   return `${hh}:${mm}`;
 }
 
+const resolveSoldOutYnFromRow = (newvalue) => {
+  const menuCd = Array.isArray(newvalue) ? newvalue[0] : newvalue?.lngCode;
+  if (menuCd != null && menuCd !== "") {
+    const rowObj = updateRow.value.find(
+      (row) => String(row.lngCode) === String(menuCd)
+    );
+    if (rowObj?.blnSoldOutYN !== undefined && rowObj?.blnSoldOutYN !== null) {
+      return normalizeSoldOutYn(rowObj.blnSoldOutYN);
+    }
+  }
+  if (!Array.isArray(newvalue) && newvalue?.blnSoldOutYN != null) {
+    return normalizeSoldOutYn(newvalue.blnSoldOutYN);
+  }
+  if (Array.isArray(newvalue)) {
+    return normalizeSoldOutYn(newvalue[41]);
+  }
+  return "0";
+};
+
 const clickedRowData = async (newvalue) => {
   //console.log(newvalue);
   afterClick.value = false;
@@ -1596,7 +1615,7 @@ const clickedRowData = async (newvalue) => {
   gridvalue26.value = newvalue[23];
   gridvalue27.value = newvalue[25];
   gridvalue28.value = newvalue[26];
-  gridvalue42.value = newvalue?.blnSoldOutYN ?? newvalue[41] ?? "0";
+  gridvalue42.value = resolveSoldOutYnFromRow(newvalue);
   gridvalue29.value = newvalue[27];
   gridvalue30.value = newvalue[28];
   gridvalue31.value = newvalue[29];
@@ -1830,7 +1849,7 @@ const searchButton = async () => {
 
     const res = await getMenuCodeEnroll(groupCd.value, nowStoreCd.value);
 
-    rowData.value = res.data.MENULIST;
+    rowData.value = normalizeMenuListSoldOutYn(res.data.MENULIST);
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
     MENUDEPEND.value = res.data.MENUDEPEND;
     subTitle.value = res.data.SUBTITLE;
@@ -2242,8 +2261,22 @@ const saveButton = () => {
         //console.log(updatedAndInsertRow);
         //comsole.log(updateDeleteInsertrowIndex.value);
         //comsole.log(updatedAndInsertRow);
-        const filterAndMap = (key) =>
-          updatedAndInsertRow.map((item) => item[key]).join("\u200B");
+        const filterAndMap = (key, defaultValue) =>
+          updatedAndInsertRow
+            .map((item) => {
+              const value = item[key];
+              if (key === "blnSoldOutYN") {
+                return normalizeSoldOutYn(value, defaultValue ?? "0");
+              }
+              if (
+                defaultValue !== undefined &&
+                (value === undefined || value === null || value === "")
+              ) {
+                return defaultValue;
+              }
+              return value;
+            })
+            .join("\u200B");
 
         const deleteCd = deletedRow.map((item) => item.lngCode);
 
@@ -2282,7 +2315,7 @@ const saveButton = () => {
           filterAndMap("blnServing"),
           filterAndMap("blnOpen"),
           filterAndMap("blnDeliveryYN"),
-          filterAndMap("blnSoldOutYN"),
+          filterAndMap("blnSoldOutYN", "0"),
           filterAndMap("strNutrInfo"),
           filterAndMap("strCntryOrg"),
           filterAndMap("strMenuComment"),
@@ -2297,7 +2330,9 @@ const saveButton = () => {
           isNewAutoMenuCode.value == true ? 1 : 0,
           deleteCd.join(",")
         );
-        //console.log(res);
+        if (res?.data?.RESULT_CD !== "00") {
+          throw new Error(res?.data?.RESULT_NM || "saveMenuCode failed");
+        }
         //console.log(res);
 
         //comsole.log(updatedAndInsertRow);
@@ -2380,6 +2415,7 @@ const saveButton = () => {
 
         Swal.fire({
           title: "저장이 실패되었습니다.",
+          text: error?.message || "",
           confirmButtonText: "확인",
         });
       } finally {
