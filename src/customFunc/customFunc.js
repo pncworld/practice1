@@ -348,3 +348,88 @@ export function normalizeMenuListSoldOutYn(list) {
     blnSoldOutYN: normalizeSoldOutYn(row.blnSoldOutYN),
   }));
 }
+
+export function getApiResultPayload(response) {
+  const data = response?.data;
+  if (data == null) return null;
+  if (typeof data === "string") {
+    try {
+      return JSON.parse(data);
+    } catch {
+      return null;
+    }
+  }
+  return data;
+}
+
+export function getApiResultCd(response) {
+  const payload = getApiResultPayload(response);
+  if (payload == null) return "";
+  return String(payload.RESULT_CD ?? "").trim();
+}
+
+export function assertApiSuccess(
+  response,
+  defaultMessage = "요청에 실패했습니다."
+) {
+  const resultCd = getApiResultCd(response);
+  if (resultCd && resultCd !== "00") {
+    const payload = getApiResultPayload(response);
+    throw new Error(payload?.RESULT_NM || defaultMessage);
+  }
+}
+
+/** 메뉴코드등록(MST01_003/033INS) 저장 시 첫 번째 미입력 필수 항목 라벨 반환 */
+export function findFirstMissingMenuCodeRequiredLabel(rows, isNewAutoMenuCode) {
+  const checks = [
+    {
+      label: "메뉴분류",
+      isMissing: (item) =>
+        item.lngMainGroup === undefined ||
+        item.lngMainGroup == 0 ||
+        item.lngSubGroup === undefined ||
+        item.lngSubGroup == 0,
+    },
+    {
+      label: "메뉴코드",
+      isMissing: (item) =>
+        (item.lngCode === "" && isNewAutoMenuCode === false) ||
+        item.lngCode === undefined,
+    },
+    {
+      label: "메뉴명",
+      isMissing: (item) =>
+        item.strName === "" || item.strName === undefined,
+    },
+    {
+      label: "유효기간",
+      isMissing: (item) =>
+        item.dtmToDate === undefined || item.dtmFromDate === undefined,
+    },
+    {
+      label: "판매가",
+      isMissing: (item) => item.lngPrice === undefined,
+    },
+    {
+      label: "사용여부",
+      isMissing: (item) => item.blnInactive === undefined,
+    },
+    {
+      label: "과세구분",
+      isMissing: (item) => item.lngTax === undefined,
+    },
+    {
+      label: "주메뉴종속",
+      isMissing: (item) => item.lngKPG === "",
+    },
+  ];
+
+  for (const item of rows ?? []) {
+    for (const check of checks) {
+      if (check.isMissing(item)) {
+        return check.label;
+      }
+    }
+  }
+  return null;
+}

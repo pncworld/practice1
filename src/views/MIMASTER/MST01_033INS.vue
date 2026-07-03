@@ -1251,7 +1251,7 @@ import RealGrid from "realgrid";
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog, normalizeMenuListSoldOutYn, normalizeSoldOutYn } from "@/customFunc/customFunc";
+import { insertPageLog, normalizeMenuListSoldOutYn, normalizeSoldOutYn, assertApiSuccess, findFirstMissingMenuCodeRequiredLabel } from "@/customFunc/customFunc";
 /**
  *  이미지 별도 호출
  *  */
@@ -2196,28 +2196,15 @@ const saveButton = () => {
   }
 
   //console.log(updateRow.value);
-  const validateRow = updateRow.value.filter(
-    (item) =>
-      (item.lngCode === "" && isNewAutoMenuCode.value == false) ||
-      item.lngCode === undefined ||
-      item.strName === "" ||
-      item.strName === undefined ||
-      item.lngMainGroup === undefined ||
-      item.lngMainGroup == 0 ||
-      item.lngSubGroup === undefined ||
-      item.lngSubGroup == 0 ||
-      item.dtmToDate === undefined ||
-      item.dtmFromDate === undefined ||
-      item.lngPrice === undefined ||
-      item.blnInactive === undefined ||
-      item.lngTax === undefined ||
-      item.lngKPG === ""
-  ).length;
+  const missingRequiredLabel = findFirstMissingMenuCodeRequiredLabel(
+    updateRow.value,
+    isNewAutoMenuCode.value
+  );
 
-  if (validateRow > 0) {
+  if (missingRequiredLabel) {
     Swal.fire({
       title: "경고",
-      text: "미입력된 필수값이 존재합니다. 확인해주세요.",
+      text: `${missingRequiredLabel} 항목이 미입력 되어 있습니다. 확인해 주세요.`,
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -2330,9 +2317,7 @@ const saveButton = () => {
           isNewAutoMenuCode.value == true ? 1 : 0,
           deleteCd.join(",")
         );
-        if (res?.data?.RESULT_CD !== "00") {
-          throw new Error(res?.data?.RESULT_NM || "saveMenuCode failed");
-        }
+        assertApiSuccess(res, "saveMenuCode failed");
         //console.log(res);
 
         //comsole.log(updatedAndInsertRow);
