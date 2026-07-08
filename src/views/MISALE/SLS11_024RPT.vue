@@ -324,6 +324,20 @@ const changeInit = (e) => {
   initGrid();
 };
 
+/**
+ * 그리드 컬럼 마스크(###,###,###,##0.00%)와 동일하게
+ * 소수점 2자리 고정 + 천단위 콤마로 TABLET ORDER 비율 값을 표시
+ */
+const formatTabOrderRate = (value) => {
+  const num = Number(value) || 0;
+  return (
+    new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(num) + "%"
+  );
+};
+
 const downloadExcel = () => {
   //console.log(rowData2.value);
 
@@ -332,8 +346,9 @@ const downloadExcel = () => {
     row.strStoreName,
     formatNumberWithCommas(row.lngTotCnt),
     formatNumberWithCommas(row.lngPosOrderCnt),
+    formatNumberWithCommas(row.lngDelOrderCnt),
     formatNumberWithCommas(row.lngTabOrderCnt),
-    Math.round(row.lngTabOrderRate, 2) + "%",
+    formatTabOrderRate(row.lngTabOrderRate),
   ]);
   const worksheet = utils.aoa_to_sheet(filtered, { origin: "A7" });
 
@@ -345,12 +360,16 @@ const downloadExcel = () => {
     (acc, item) => acc + parseInt(item.lngPosOrderCnt),
     0
   );
+  const sumDel = rowData2.value.reduce(
+    (acc, item) => acc + parseInt(item.lngDelOrderCnt),
+    0
+  );
   const sum3 = rowData2.value.reduce(
     (acc, item) => acc + parseInt(item.lngTabOrderCnt),
     0
   );
   const sum4 = rowData2.value.reduce(
-    (acc, item) => acc + parseInt(item.lngTabOrderRate),
+    (acc, item) => acc + parseFloat(item.lngTabOrderRate || 0),
     0
   );
 
@@ -365,8 +384,9 @@ const downloadExcel = () => {
   worksheet["B6"] = { t: "s", v: "매장명" };
   worksheet["C6"] = { t: "s", v: "총 건수" };
   worksheet["D6"] = { t: "s", v: "POS" };
-  worksheet["E6"] = { t: "s", v: "TABLET ORDER" };
-  worksheet["F6"] = { t: "s", v: "TABLET ORDER 비율" };
+  worksheet["E6"] = { t: "s", v: "배달" };
+  worksheet["F6"] = { t: "s", v: "TABLET ORDER" };
+  worksheet["G6"] = { t: "s", v: "TABLET ORDER 비율" };
 
   let secondRowLeng = rowData2.value.length + 7 + 3;
 
@@ -387,11 +407,15 @@ const downloadExcel = () => {
   };
   worksheet[`E${secondRowLeng - 2}`] = {
     t: "s",
-    v: formatNumberWithCommas(sum3),
+    v: formatNumberWithCommas(sumDel),
   };
   worksheet[`F${secondRowLeng - 2}`] = {
     t: "s",
-    v: formatNumberWithCommas(sum4) + "%",
+    v: formatNumberWithCommas(sum3),
+  };
+  worksheet[`G${secondRowLeng - 2}`] = {
+    t: "s",
+    v: formatTabOrderRate(sum4),
   };
 
   utils.sheet_add_aoa(
@@ -431,6 +455,7 @@ const downloadExcel = () => {
     { wch: 40 }, // 매장명
     { wch: 20 }, // 총 건수
     { wch: 20 }, // POS
+    { wch: 20 }, // 배달
     { wch: 20 }, // TABLET ORDER
     { wch: 20 }, // TABLET ORDER 비율
     { wch: 20 }, // TABLET ORDER 비율
