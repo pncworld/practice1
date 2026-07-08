@@ -53,6 +53,7 @@
             <option value="0">전체</option>
             <option value="1">POS</option>
             <option value="2">TABLET ORDER</option>
+            <option value="3">배달</option>
           </select>
         </div>
       </div>
