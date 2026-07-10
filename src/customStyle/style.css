@@ -222,10 +222,19 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
 
 .button.search:disabled {
   background-color: #dddddd;
+  cursor: not-allowed;
 }
 
 .button.save:disabled {
   background-color: #dddddd;
+  cursor: not-allowed;
+}
+
+.button.new:disabled,
+.button.delete:disabled,
+.button.excel:disabled {
+  background-color: #dddddd;
+  cursor: not-allowed;
 }
 
 .contents_form-top {

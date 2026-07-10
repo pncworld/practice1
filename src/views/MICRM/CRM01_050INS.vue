@@ -17,30 +17,36 @@
         v-if="disableButton">
         수동고객정보수신
       </button>
-        <button @click="searchButton" class="button search md:w-auto w-14">
+        <button
+          @click="searchButton"
+          class="button search md:w-auto w-14"
+          :disabled="affCompAccessDenied">
           조회
         </button>
         <button
           type="button"
           @click="addButton"
           class="button new md:w-auto w-14"
-          :disabled="disableButton">
+          :disabled="crm050EditActionDisabled">
           추가
         </button>
         <button
           @click="saveButton"
           class="button save md:w-auto w-14"
-          :disabled="disableButton">
+          :disabled="crm050ToolbarSaveDisabled">
         저장
       </button>
         <button
           type="button"
           @click="deleteButton"
           class="button delete md:w-auto w-14"
-          :disabled="disableButton">
+          :disabled="crm050EditActionDisabled">
           삭제
         </button>
-        <button @click="exportToExcel" class="button excel md:w-auto w-14">
+        <button
+          @click="exportToExcel"
+          class="button excel md:w-auto w-14"
+          :disabled="affCompAccessDenied">
           엑셀
         </button>
     </div>
@@ -173,7 +179,7 @@
                 type="button"
                 class="whitebutton crm050-sub-btn shrink-0"
           @click="cardChange"
-          :disabled="disableButton">
+          :disabled="crm050EditActionDisabled || !openCardChange">
           카드변경
         </button>
       </div>
@@ -404,7 +410,7 @@
                 { 'crm050-excel-btn--blocked': crm050ExcelUploadBlocked },
               ]"
               class="shrink-0"
-              :disabled="disableButton"
+              :disabled="crm050EditActionDisabled"
               @click="beforeFileSelect">
               찾아보기...
     </button>
@@ -420,13 +426,34 @@
           {{ i.strName }}
         </option>
       </select>
-      <button
+            <div class="crm050-excel-upload-wrap shrink-0">
+              <div
+                v-if="crm050ExcelUploadReady"
+                class="crm050-excel-upload-bubble"
+                role="status"
+                aria-live="polite">
+                <span class="crm050-excel-upload-bubble__icon" aria-hidden="true"
+                  >✨</span
+                >
+                업로드 버튼을 눌러주세요.
+              </div>
+              <button
+                type="button"
+                class="button save md:w-auto"
+                :class="{ 'crm050-excel-upload-btn--blink': crm050ExcelUploadReady }"
+                :disabled="crm050ExcelUploadBtnDisabled"
+                @click="saveButton3">
+                업로드
+              </button>
+            </div>
+            <button
               type="button"
-              class="button save shrink-0 md:w-auto"
-              :disabled="crm050ExcelUploadBtnDisabled"
-              @click="saveButton3">
-        업로드
-      </button>
+              :class="popupToolbarBtnClass"
+              class="shrink-0"
+              :disabled="crm050ExcelResetDisabled"
+              @click="resetExcelUploadPanel">
+              초기화
+            </button>
     </div>
           <button
             type="button"
@@ -449,7 +476,7 @@
   <div
     v-if="visible"
     class="crm050-card-modal"
-    @click.self="visible = false">
+    @click.self="closeCardChangeModal">
     <div
       class="crm050-card-modal__dialog"
       role="dialog"
@@ -490,11 +517,26 @@
             <span class="crm050-form-label__asterisk" aria-hidden="true">*</span>
             신규 카드번호
           </div>
-          <div class="crm050-form-value">
-            <input
-              type="text"
-              class="crm050-control crm050-control--field"
-              v-model="pcond4" />
+          <div class="crm050-form-value crm050-form-value--card-newno">
+            <div class="crm-card-newno-field-wrap">
+              <div
+                v-if="cardChangeNewCardWarn"
+                class="crm-card-newno-warn-bubble"
+                role="alert"
+                aria-live="polite">
+                <span class="crm-card-newno-warn-bubble__icon" aria-hidden="true"
+                  >⚠️</span
+                >
+                카드번호를 입력해 주시오.
+              </div>
+              <input
+                type="text"
+                class="crm050-control crm050-control--field"
+                v-model="pcond4"
+                @keydown="onCardChangeNewCardKeydown"
+                @input="onCardChangeNewCardInput"
+                @paste="onCardChangeNewCardPaste" />
+            </div>
           </div>
 
           <div class="crm050-form-label crm050-form-label--required">
@@ -531,7 +573,7 @@
           <button
             type="button"
             class="whitebutton crm050-sub-btn crm050-card-modal__btn"
-            @click="visible = false">
+            @click="closeCardChangeModal">
             닫기
           </button>
         </div>
@@ -663,6 +705,11 @@ import { read, utils, writeFile } from "xlsx-js-style";
  */
 
 const disableButton = ref(false);
+/** getAffComp 권한 없음 — 고객사 변경 시 재판정, 성공 시 해제 */
+const affCompAccessDenied = ref(true);
+const crm050EditActionDisabled = computed(
+  () => affCompAccessDenied.value || disableButton.value
+);
 const store = useStore();
 const groupCd = ref();
 
@@ -671,6 +718,7 @@ const popupToolbarBtnClass =
   "whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none";
 const excelFileName = ref("");
 const excelDataLoaded = ref(false);
+const excelUploading = ref(false);
 
 const disableStoreCode = ref(true);
 /**
@@ -782,7 +830,10 @@ const isTopAffiliateAll = () => {
 const crm050ExcelUploadBlocked = computed(() => isTopAffiliateAll());
 
 const crm050ExcelActionDisabled = computed(
-  () => disableButton.value || crm050ExcelUploadBlocked.value
+  () =>
+    affCompAccessDenied.value ||
+    disableButton.value ||
+    crm050ExcelUploadBlocked.value
 );
 
 /** 파일 경로 + Sheet 불러오기 완료 시에만 업로드 활성화 */
@@ -791,6 +842,27 @@ const crm050ExcelUploadBtnDisabled = computed(
     crm050ExcelActionDisabled.value ||
     !excelFileName.value?.trim() ||
     !excelDataLoaded.value
+);
+
+/** Sheet 데이터 로드 완료 + 업로드 가능 시 버튼 강조 */
+const crm050ExcelUploadReady = computed(
+  () => excelDataLoaded.value && !crm050ExcelUploadBtnDisabled.value
+);
+
+const crm050ExcelResetDisabled = computed(
+  () =>
+    crm050ExcelActionDisabled.value ||
+    (!excelFileName.value?.trim() &&
+      SheetList.value.length === 0 &&
+      !excelDataLoaded.value)
+);
+
+/** 엑셀 Sheet 로드 후 업로드 전·업로드 API 진행 중 저장 차단 */
+const crm050ToolbarSaveDisabled = computed(
+  () =>
+    crm050EditActionDisabled.value ||
+    excelDataLoaded.value ||
+    excelUploading.value
 );
 
 const getTopAffiliateOption = () => {
@@ -1085,6 +1157,7 @@ const setCompanyCode = (e) => {
   detailAffCompList.value = [];
   affiliateCompLocked.value = false;
   detailAffCompLocked.value = false;
+  affCompAccessDenied.value = true;
   if (e && e !== 0 && e !== "0") {
     loadAffComp();
   }
@@ -1100,17 +1173,24 @@ const resetAffCompCombos = () => {
 };
 
 const loadAffComp = async () => {
-  if (!CompanyCode.value || CompanyCode.value === 0) {
+  const compCode = CompanyCode.value;
+  if (!compCode || compCode === 0 || compCode === "0") {
+    affCompAccessDenied.value = true;
     return;
   }
+  affCompAccessDenied.value = true;
   try {
     const res = await getAffComp(
-      CompanyCode.value,
+      compCode,
       store.state.userData.lngStoreGroup,
       store.state.userData.lngSequence
     );
+    if (compCode !== CompanyCode.value) {
+      return;
+    }
     if (res.data?.RESULT_CD !== "00") {
       resetAffCompCombos();
+      affCompAccessDenied.value = true;
       Swal.fire({
         title: "경고",
         text:
@@ -1121,6 +1201,7 @@ const loadAffComp = async () => {
       });
       return;
     }
+    affCompAccessDenied.value = false;
     const combo = buildAffCompCombos(res.data?.List ?? []);
     affiliateCompLocked.value = combo.singleLocked;
     affiliateCompList.value = combo.topOptions;
@@ -1128,6 +1209,10 @@ const loadAffComp = async () => {
     affiliateCompCode.value = combo.topValue;
     applyDetailAffCompEditState();
   } catch (error) {
+    if (compCode !== CompanyCode.value) {
+      return;
+    }
+    affCompAccessDenied.value = true;
     resetAffCompCombos();
     console.error("소속사 목록 조회 오류:", error);
   }
@@ -1376,6 +1461,15 @@ const deleteButton = () => {
  */
 
 const saveButton = async () => {
+  if (excelDataLoaded.value || excelUploading.value) {
+    await Swal.fire({
+      title: "안내",
+      text: "엑셀 업로드 대기 중입니다. 하단 「업로드」 버튼을 눌러 주세요.",
+      icon: "info",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   if (CompanyCode.value == 0 || CompanyCode.value === "0") {
     Swal.fire({
       title: "경고",
@@ -1576,13 +1670,8 @@ const saveButton = async () => {
 };
 
 const saveButton2 = async () => {
-  if (crm050IsBlank(pcond4.value)) {
-    await Swal.fire({
-      title: "경고",
-      text: "신규 카드번호를 입력해 주십시오!",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
+  if (isCardChangeNewCardBlank(pcond4.value)) {
+    cardChangeNewCardWarn.value = true;
     return;
   }
 
@@ -1599,13 +1688,16 @@ const saveButton2 = async () => {
     ////console.log(res);
 
     if (res.data.List[0].strErr == "0000") {
+      const custId = pcond2.value;
       await Swal.fire({
         title: "성공",
         text: `${res.data.List[0].strErrMsg}`,
         icon: "success",
         confirmButtonText: "확인",
       });
+      applyCardChangeToGrid();
       await searchButton();
+      restoreSelectionAfterCardChange(custId);
       return;
     } else {
       Swal.fire({
@@ -1619,7 +1711,7 @@ const saveButton2 = async () => {
   } catch (error) {
   } finally {
     store.state.loading = false;
-    visible.value = false;
+    closeCardChangeModal();
   }
 };
 
@@ -1713,6 +1805,7 @@ const saveButton3 = async () => {
   }
 
   try {
+    excelUploading.value = true;
     store.state.loading = true;
 
     const custids = updateRowData.value
@@ -1792,6 +1885,7 @@ const saveButton3 = async () => {
     });
     searchButton();
   } finally {
+    excelUploading.value = false;
     store.state.loading = false;
   }
 };
@@ -1882,6 +1976,93 @@ const clickedRowData3 = (e) => {
  */
 const visible = ref(false);
 
+const closeCardChangeModal = () => {
+  visible.value = false;
+  pcond4.value = "";
+  pcond5.value = "1";
+  cardChangeNewCardWarn.value = false;
+};
+
+const getCardChangeStatus = () => {
+  if (String(pcond5.value) === "2") {
+    return { code: "2", text: "분실" };
+  }
+  return { code: "1", text: "교체" };
+};
+
+/** 카드변경 성공 — 그리드·상세에 신규 카드번호 반영 */
+const applyCardChangeToGrid = () => {
+  const newCardNo = String(pcond4.value ?? "").trim();
+  const custId = String(pcond2.value ?? "").trim();
+  if (!newCardNo || !custId) {
+    return;
+  }
+  const { code, text } = getCardChangeStatus();
+  const patchRow = (row) => ({
+    ...row,
+    strSaleCardNo: newCardNo,
+    strSaleCardStatus: code,
+    strSaleCardStatusTxt: text,
+  });
+
+  let idx = Number(changeRow.value);
+  if (Number.isNaN(idx) || idx < 0 || !updateRowData.value[idx]) {
+    idx = updateRowData.value.findIndex(
+      (r) => String(r.strSaleCustID) === custId
+    );
+  }
+  if (idx < 0 || !updateRowData.value[idx]) {
+    return;
+  }
+
+  updateRowData.value[idx] = patchRow(updateRowData.value[idx]);
+  rowData.value = JSON.parse(JSON.stringify(updateRowData.value));
+  changeRow.value = idx;
+  fillDetailFromRow(updateRowData.value[idx]);
+};
+
+const fillDetailFromRow = (row) => {
+  if (!row) {
+    return;
+  }
+  gridvalue1.value = row.strSaleCardNo ?? "";
+  gridvalue2.value = formatAmountDisplay(row.dblLimitAmt);
+  gridvalue3.value = row.strSaleCustID ?? "";
+  gridvalue4.value = formatAmountDisplay(row.dblSaleAmt);
+  gridvalue5.value = row.strSaleCustName ?? "";
+  gridvalue6.value = formatAmountDisplay(row.dblRemAmt);
+  gridvalue7.value = row.strTelNo ?? "";
+  gridvalue8.value = row.dtmInsDateTime
+    ? String(row.dtmInsDateTime).split("T")[0]
+    : "";
+  gridvalue9.value = row.strCustCompCode ?? "";
+  if (!isTopAffiliateAll()) {
+    const topAff = getTopAffiliateOption();
+    if (topAff) {
+      gridvalue9.value = topAff.value;
+      gridvalue11.value = topAff.label;
+    }
+  } else {
+    gridvalue11.value = row.strCustCompName ?? "";
+  }
+  gridvalue10.value = row.strSaleCustStatus ?? "0";
+  gridvalue12.value = String(row.strSaleCardStatus ?? "0");
+  gridvalue13.value = row.strCustDeptCode ?? "";
+  gridvalue14.value = row.strAddress ?? "";
+  gridvalue15.value = row.strCustDeptName ?? "";
+};
+
+const restoreSelectionAfterCardChange = (custId) => {
+  const idx = updateRowData.value.findIndex(
+    (r) => String(r.strSaleCustID) === String(custId)
+  );
+  if (idx < 0) {
+    return;
+  }
+  changeRow.value = idx;
+  fillDetailFromRow(updateRowData.value[idx]);
+};
+
 const crm050FillCardChangePopup = () => {
   const idx = Number(changeRow.value);
   if (Number.isNaN(idx) || idx < 0 || !updateRowData.value[idx]) {
@@ -1893,6 +2074,7 @@ const crm050FillCardChangePopup = () => {
   pcond3.value = row.strSaleCardNo ?? "";
   pcond4.value = "";
   pcond5.value = "1";
+  cardChangeNewCardWarn.value = false;
   return true;
 };
 
@@ -1917,6 +2099,50 @@ const pcond2 = ref("");
 const pcond3 = ref("");
 const pcond4 = ref("");
 const pcond5 = ref("");
+
+const isCardChangeNewCardBlank = (value) => String(value ?? "").trim() === "";
+
+const sanitizeCardChangeNewCardNo = (value) =>
+  String(value ?? "").replace(/\s/g, "");
+
+const cardChangeNewCardWarn = ref(false);
+
+const onCardChangeNewCardKeydown = (event) => {
+  if (event.key === " " || event.code === "Space") {
+    event.preventDefault();
+  }
+};
+
+const onCardChangeNewCardInput = () => {
+  const sanitized = sanitizeCardChangeNewCardNo(pcond4.value);
+  if (pcond4.value !== sanitized) {
+    pcond4.value = sanitized;
+  }
+  if (!isCardChangeNewCardBlank(sanitized)) {
+    cardChangeNewCardWarn.value = false;
+  }
+};
+
+const onCardChangeNewCardPaste = (event) => {
+  event.preventDefault();
+  const pasteText = sanitizeCardChangeNewCardNo(
+    (event.clipboardData || window.clipboardData)?.getData("text") ?? ""
+  );
+  const input = event.target;
+  const start = input.selectionStart ?? 0;
+  const end = input.selectionEnd ?? 0;
+  const current = sanitizeCardChangeNewCardNo(pcond4.value);
+  const next = current.slice(0, start) + pasteText + current.slice(end);
+  pcond4.value = next;
+  if (!isCardChangeNewCardBlank(next)) {
+    cardChangeNewCardWarn.value = false;
+  }
+  nextTick(() => {
+    const pos = start + pasteText.length;
+    input.setSelectionRange(pos, pos);
+  });
+};
+
 /**
  * 페이지 매장 분류 세팅
  */
@@ -2050,6 +2276,14 @@ const resetExcelUploadControls = () => {
     fileInput.value.value = "";
   }
 };
+
+const resetExcelUploadPanel = async () => {
+  resetExcelUploadControls();
+  if (afterSearch.value) {
+    await searchButton();
+  }
+};
+
 const beforeFileSelect = () => {
   // 여기서 점검: 권한, 사용자 상태 등
   if (CompanyCode.value == 0 || afterSearch.value == false) {
@@ -2604,6 +2838,83 @@ watch(p2cond2, () => {
   align-items: center;
   gap: 0.5rem 1rem;
   min-width: 0;
+  overflow: visible;
+}
+
+@keyframes crm050-excel-upload-blink {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgb(87 130 255 / 0.55);
+  }
+  50% {
+    opacity: 0.88;
+    box-shadow: 0 0 0 0.35rem rgb(87 130 255 / 0.4);
+  }
+}
+
+.crm050-excel-upload-btn--blink:not(:disabled) {
+  animation: crm050-excel-upload-blink 1.1s ease-in-out infinite;
+}
+
+.crm050-excel-upload-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.crm050-excel-upload-bubble {
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  left: 50%;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  width: max-content;
+  max-width: 11rem;
+  padding: 0.375rem 0.625rem;
+  border: 2px solid #93c5fd;
+  border-radius: 1rem;
+  background: linear-gradient(180deg, #eff6ff 0%, #fdf2f8 100%);
+  box-shadow: 0 4px 12px rgb(59 130 246 / 0.18);
+  color: #1e40af;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  animation: crm050-excel-bubble-bounce 1.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.crm050-excel-upload-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-top: 0.45rem solid #93c5fd;
+  border-right: 0.4rem solid transparent;
+  border-left: 0.4rem solid transparent;
+  transform: translateX(-50%);
+}
+
+.crm050-excel-upload-bubble__icon {
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+@keyframes crm050-excel-bubble-bounce {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-0.2rem);
+  }
 }
 
 .crm050-excel-group {
@@ -3072,7 +3383,7 @@ watch(p2cond2, () => {
   grid-auto-rows: minmax(2.125rem, auto);
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
-  overflow: hidden;
+  overflow: visible;
   background: #fff;
 }
 
@@ -3084,6 +3395,69 @@ watch(p2cond2, () => {
 .crm050-card-modal__grid .crm050-form-value .crm050-control--field {
   width: 100%;
   max-width: 100%;
+}
+
+.crm050-card-modal__grid > .crm050-form-value--card-newno {
+  overflow: visible;
+  position: relative;
+  z-index: 2;
+}
+
+.crm-card-newno-field-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.crm-card-newno-warn-bubble {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  width: max-content;
+  max-width: 12rem;
+  padding: 0.375rem 0.625rem;
+  border: 2px solid #fcd34d;
+  border-radius: 1rem;
+  background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
+  box-shadow: 0 4px 12px rgb(245 158 11 / 0.22);
+  color: #b45309;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: nowrap;
+  transform: translateY(calc(-100% - 0.35rem));
+  animation: crm-card-newno-warn-bounce 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.crm-card-newno-warn-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 0.85rem;
+  width: 0;
+  height: 0;
+  border-top: 0.45rem solid #fcd34d;
+  border-right: 0.4rem solid transparent;
+  border-left: 0.4rem solid transparent;
+}
+
+.crm-card-newno-warn-bubble__icon {
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+@keyframes crm-card-newno-warn-bounce {
+  0%,
+  100% {
+    transform: translateY(calc(-100% - 0.35rem));
+  }
+  50% {
+    transform: translateY(calc(-100% - 0.55rem));
+  }
 }
 
 .crm050-card-modal__grid .crm050-form-value--radio label {
