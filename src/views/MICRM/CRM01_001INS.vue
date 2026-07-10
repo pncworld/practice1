@@ -2409,6 +2409,55 @@ const mapCustomerListForGrid = (list) => {
   });
 };
 
+/** 팝업 바인딩 — 조회 그리드와 동일하게 동의일·표시 필드 정규화 */
+const normalizePopupCustomerRow = (row) => {
+  if (row == null || typeof row !== "object" || Array.isArray(row)) return row;
+  return mapCustomerListForGrid([row])[0] ?? row;
+};
+
+const MKT_AGREE_FIELD_NAMES = [
+  "blnCustAgree",
+  "CUSTAGREE",
+  "blnMktAgree",
+  "A38_blnCustAgree",
+  "A38_blnCustAgree2",
+];
+
+const resolvePopupConsentDatesFromRow = (row) => {
+  const normalized = normalizePopupCustomerRow(row);
+  const smsAgreed = gridRowSmsAgreed(normalized);
+  const mktAgreed = gridRowAgreed(normalized, MKT_AGREE_FIELD_NAMES, undefined);
+
+  const smsAgree = smsAgreed
+    ? formatConsentDateDisplay(
+        gridRowField(normalized, ["A57_strSmsAgreeDate", "dtmSmsLastAgree"], undefined)
+      )
+    : "";
+  const smsRefuse = !smsAgreed
+    ? formatConsentDateDisplay(
+        gridRowField(normalized, ["dtmSmsLastRefuse"], undefined)
+      )
+    : "";
+  const mktAgree =
+    formatConsentDateDisplay(
+      gridRowField(normalized, ["A56_strMktAgreeDate", "dtmMktLastAgree"], undefined)
+    ) || "";
+  const mktRefuse =
+    formatConsentDateDisplay(
+      gridRowField(normalized, ["dtmMktLastRefuse"], undefined)
+    ) || "";
+
+  return {
+    normalized,
+    smsAgreed,
+    mktAgreed,
+    smsAgree,
+    smsRefuse,
+    mktAgree,
+    mktRefuse,
+  };
+};
+
 const gridRowSmsAgreed = (row) =>
   gridRowAgreed(row, ["A45_blnSMS", "blnSMS", "BLNSMS"], undefined);
 
@@ -2505,14 +2554,34 @@ const pickConsentDateFromRow = (row, agreed, agreeFieldNames, refuseFieldNames) 
   return "";
 };
 
+/** 수정 팝업 — 마케팅 동의일 표시 규칙 (신규 팝업은 InsertNew 분기 유지) */
+const resolveMktPopupConsentDate = (agreed, agreeLoaded, refuseLoaded) => {
+  const agree = String(agreeLoaded ?? "").trim();
+  const refuse = String(refuseLoaded ?? "").trim();
+
+  if (agreed) {
+    return agree || todayPopupConsentDate();
+  }
+  if (refuse) return refuse;
+  if (agree) return agree;
+  return todayPopupConsentDate();
+};
+
 /** 신규: 미동의=오늘(고정) / 동의=선택 가능. 수정: 조회=DB일자, 체크/해제 토글 시=오늘 */
-const applySmsConsentDateForPopup = (agreed, prevAgreed) => {
+const applySmsConsentDateForPopup = (agreed, prevAgreed, options = {}) => {
+  const { initialLoad = false } = options;
   if (InsertNew.value) {
     if (!agreed) {
       pcondSmsAgreeDate.value = todayPopupConsentDate();
     } else if (!pcondSmsAgreeDate.value) {
       pcondSmsAgreeDate.value = todayPopupConsentDate();
     }
+    return;
+  }
+  if (initialLoad) {
+    pcondSmsAgreeDate.value = agreed
+      ? popupSmsAgreeDateLoaded.value
+      : popupSmsRefuseDateLoaded.value;
     return;
   }
   if (!agreed) {
@@ -2530,7 +2599,8 @@ const applySmsConsentDateForPopup = (agreed, prevAgreed) => {
   }
 };
 
-const applyMktConsentDateForPopup = (agreed, prevAgreed) => {
+const applyMktConsentDateForPopup = (agreed, prevAgreed, options = {}) => {
+  const { initialLoad = false } = options;
   if (InsertNew.value) {
     if (!agreed) {
       pcondMktAgreeDate.value = todayPopupConsentDate();
@@ -2540,18 +2610,33 @@ const applyMktConsentDateForPopup = (agreed, prevAgreed) => {
     savedMktAgreeDate.value = pcondMktAgreeDate.value;
     return;
   }
+  if (initialLoad) {
+    pcondMktAgreeDate.value = resolveMktPopupConsentDate(
+      agreed,
+      popupMktAgreeDateLoaded.value,
+      popupMktRefuseDateLoaded.value
+    );
+    savedMktAgreeDate.value = pcondMktAgreeDate.value;
+    return;
+  }
   if (!agreed) {
     if (prevAgreed === true) {
       pcondMktAgreeDate.value = todayPopupConsentDate();
     } else {
-      pcondMktAgreeDate.value =
-        popupMktRefuseDateLoaded.value || todayPopupConsentDate();
+      pcondMktAgreeDate.value = resolveMktPopupConsentDate(
+        false,
+        popupMktAgreeDateLoaded.value,
+        popupMktRefuseDateLoaded.value
+      );
     }
   } else if (prevAgreed === false) {
     pcondMktAgreeDate.value = todayPopupConsentDate();
   } else {
-    pcondMktAgreeDate.value =
-      popupMktAgreeDateLoaded.value || todayPopupConsentDate();
+    pcondMktAgreeDate.value = resolveMktPopupConsentDate(
+      true,
+      popupMktAgreeDateLoaded.value,
+      popupMktRefuseDateLoaded.value
+    );
   }
   savedMktAgreeDate.value = pcondMktAgreeDate.value;
 };
@@ -2559,32 +2644,31 @@ const applyMktConsentDateForPopup = (agreed, prevAgreed) => {
 const initPopupConsentFromRow = (row) => {
   suppressConsentDateWatch.value = true;
 
-  popupSmsAgreeDateLoaded.value =
-    pickConsentDateFromRow(row, true, ["dtmSmsLastAgree", "A57_strSmsAgreeDate"], []) ||
-    "";
-  popupSmsRefuseDateLoaded.value =
-    pickConsentDateFromRow(row, false, [], ["dtmSmsLastRefuse"]) || "";
-  popupMktAgreeDateLoaded.value =
-    pickConsentDateFromRow(row, true, ["dtmMktLastAgree", "A56_strMktAgreeDate"], []) ||
-    "";
-  popupMktRefuseDateLoaded.value =
-    pickConsentDateFromRow(row, false, [], ["dtmMktLastRefuse"]) || "";
+  const {
+    smsAgreed,
+    mktAgreed,
+    smsAgree,
+    smsRefuse,
+    mktAgree,
+    mktRefuse,
+  } = resolvePopupConsentDatesFromRow(row);
 
-  const smsAgreed = gridRowSmsAgreed(row);
-  const mktAgreed = gridRowAgreed(
-    row,
-    ["blnCustAgree", "CUSTAGREE", "blnMktAgree"],
-    undefined
-  );
+  popupSmsAgreeDateLoaded.value = smsAgree;
+  popupSmsRefuseDateLoaded.value = smsRefuse;
+  popupMktAgreeDateLoaded.value = mktAgree;
+  popupMktRefuseDateLoaded.value = mktRefuse;
 
   pcond9.value = smsAgreed;
   pcond32.value = mktAgreed;
-  applySmsConsentDateForPopup(smsAgreed);
-  applyMktConsentDateForPopup(mktAgreed);
+  applySmsConsentDateForPopup(smsAgreed, undefined, { initialLoad: true });
+  applyMktConsentDateForPopup(mktAgreed, undefined, { initialLoad: true });
   syncConsentDateLabels();
   savedMktAgree.value = mktAgreed;
 
-  suppressConsentDateWatch.value = false;
+  /* 체크박스 watch가 (동의=true, 이전=false)로 오늘 날짜를 덮어쓰지 않도록 다음 틱까지 억제 */
+  nextTick(() => {
+    suppressConsentDateWatch.value = false;
+  });
 };
 
 const resetConsentDateFields = () => {
@@ -2735,6 +2819,7 @@ const fetchCustomerRowForPopup = async () => {
 };
 
 const applyGridRowToPopupForm = (row) => {
+  row = normalizePopupCustomerRow(row);
   ccustomorNum.value = getRowCustNo(row);
   ccustomorGroup.value = gridRowField(row, ["lngStoreGroup"], undefined);
   ccustomorStatus.value = gridRowField(row, ["intJoinSts"], undefined);
