@@ -192,7 +192,7 @@
 
   <!-- 비밀번호 변경 모달 (body 최상위에 렌더링) -->
   <Teleport to="body">
-    <div v-if="showPasswordModal" class="pw-modal-overlay" @click.self="closePasswordModal">
+    <div v-if="showPasswordModal" class="pw-modal-overlay">
       <!-- 모달 카드 -->
       <div class="pw-modal-card" @click.stop>
         <!-- 헤더 -->
@@ -284,12 +284,18 @@
                 </svg>
               </button>
             </div>
-            <!-- 강도 바 -->
+            <!-- 강도 바 — 충족 개수만큼 왼쪽부터 채움 -->
             <div v-if="pwNew" class="pw-strength-bar">
               <div class="pw-strength-bar__tracks">
-                <div v-for="i in 4" :key="i" :class="['pw-strength-bar__track', i <= pwStrength ? pwStrengthBarColor : '']"></div>
+                <div
+                  v-for="i in pwStrengthTotal"
+                  :key="i"
+                  class="pw-strength-bar__track"
+                  :class="i <= pwStrengthMet ? pwStrengthBarClass : ''"></div>
               </div>
-              <span :class="['pw-strength-label', pwStrengthTextColor]">{{ pwStrengthLabel }}</span>
+              <span class="pw-strength-label" :class="pwStrengthTextClass"
+                >{{ pwStrengthLabel }} ({{ pwStrengthMet }}/{{ pwStrengthTotal }})</span
+              >
             </div>
           </div>
 
@@ -634,7 +640,7 @@ const pwRules = computed(() => {
   const pw = pwNew.value;
   const id = store.state.userData?.loginID ?? "";
   return [
-    { text: "8자리 이상 20자리 이하", met: pw.length >= 8 && pw.length <= 20 },
+    { text: "8자리 이상 20자리 이하 (기본)", met: pw.length >= 8 && pw.length <= 20, basic: true },
     { text: "영문자·숫자·특수문자 중 2종류 이상", met: [/[a-zA-Z]/.test(pw),/[0-9]/.test(pw),pwHasSpecial(pw)].filter(Boolean).length >= 2 },
     { text: "아이디와 동일한 비밀번호 불가", met: pw.length > 0 && id.length > 0 && !pw.toLowerCase().includes(id.toLowerCase()) },
     { text: "동일 문자 4회 이상 연속 불가 (예: aaaa)", met: pw.length > 0 && !pwHasRepeated(pw) },
@@ -643,28 +649,61 @@ const pwRules = computed(() => {
   ];
 });
 
-const pwStrength = computed(() => {
-  const pw = pwNew.value;
-  if (!pw) return 0;
-  if (pw.length < 8) return 1;
-  const met = pwRules.value.filter(r => r.met).length;
-  if (met <= 2) return 1;
-  if (met <= 3) return 2;
-  if (met <= 4) return 3;
-  return 4;
+const PW_MIN_RULES_TO_SAVE = 4;
+/** 기본 조건: 8자리 미만이면 취약 고정·변경 불가 */
+const pwMeetsBasicLength = computed(() => {
+  const len = pwNew.value?.length ?? 0;
+  return len >= 8 && len <= 20;
 });
-const pwStrengthBarColor   = computed(() => ["","bg-red-400","bg-yellow-400","bg-blue-400","bg-green-500"][pwStrength.value] ?? "bg-red-400");
-const pwStrengthTextColor  = computed(() => ["","text-red-500","text-yellow-500","text-blue-500","text-green-600"][pwStrength.value] ?? "text-red-500");
-const pwStrengthLabel      = computed(() => ["","취약","보통","양호","강함"][pwStrength.value] ?? "취약");
+
+const pwStrengthMet = computed(
+  () => pwRules.value.filter((r) => r.met).length
+);
+const pwStrengthTotal = computed(() => pwRules.value.length);
+
+const pwStrengthBarClass = computed(() => {
+  if (!pwMeetsBasicLength.value) return "is-weak";
+  const met = pwStrengthMet.value;
+  if (met <= 0) return "";
+  if (met <= 2) return "is-weak";
+  if (met <= 3) return "is-fair";
+  if (met < pwStrengthTotal.value) return "is-good";
+  return "is-strong";
+});
+const pwStrengthTextClass = computed(() => pwStrengthBarClass.value);
+const pwStrengthLabel = computed(() => {
+  if (!pwNew.value) return "취약";
+  if (!pwMeetsBasicLength.value) return "취약";
+  const met = pwStrengthMet.value;
+  if (met <= 2) return "취약";
+  if (met <= 3) return "보통";
+  if (met < pwStrengthTotal.value) return "양호";
+  return "강함";
+});
 
 const pwSaveButton = () => {
   if (pwNew.value !== pwConfirm.value) {
     Swal.fire({ icon:"error", title:"신규 비밀번호 오류", text:"신규 비밀번호와 확인 비밀번호가 일치하지 않습니다." });
     return;
   }
-  const failed = pwRules.value.filter(r => !r.met);
-  if (failed.length > 0) {
-    Swal.fire({ icon:"error", title:"비밀번호 규칙 미충족", html: failed.map(r=>`• ${r.text}`).join("<br>") });
+  if (!pwMeetsBasicLength.value) {
+    Swal.fire({
+      icon: "error",
+      title: "기본 조건 미충족",
+      text: "비밀번호는 8자리 이상 20자리 이하(기본 조건)여야 합니다.",
+    });
+    return;
+  }
+  if (pwStrengthMet.value < PW_MIN_RULES_TO_SAVE) {
+    const failed = pwRules.value.filter((r) => !r.met);
+    Swal.fire({
+      icon: "error",
+      title: "비밀번호 규칙 미충족",
+      html:
+        `비밀번호 규칙 ${PW_MIN_RULES_TO_SAVE}개 이상 만족해야 변경할 수 있습니다.<br>` +
+        `(현재 ${pwStrengthMet.value}/${pwStrengthTotal.value})<br><br>` +
+        failed.map((r) => `• ${r.text}`).join("<br>"),
+    });
     return;
   }
   Swal.fire({
@@ -1178,8 +1217,22 @@ watch(
 
 .pw-strength-bar { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
 .pw-strength-bar__tracks { display: flex; gap: 4px; flex: 1; }
-.pw-strength-bar__track { height: 5px; flex: 1; border-radius: 9999px; background: #e5e7eb; transition: background 0.2s; }
-.pw-strength-label { font-size: 0.75rem; }
+.pw-strength-bar__track {
+  height: 5px;
+  flex: 1;
+  border-radius: 9999px;
+  background: #e5e7eb;
+  transition: background 0.2s;
+}
+.pw-strength-bar__track.is-weak { background: #f87171; }
+.pw-strength-bar__track.is-fair { background: #facc15; }
+.pw-strength-bar__track.is-good { background: #60a5fa; }
+.pw-strength-bar__track.is-strong { background: #22c55e; }
+.pw-strength-label { font-size: 0.75rem; color: #6b7280; white-space: nowrap; }
+.pw-strength-label.is-weak { color: #ef4444; }
+.pw-strength-label.is-fair { color: #eab308; }
+.pw-strength-label.is-good { color: #3b82f6; }
+.pw-strength-label.is-strong { color: #16a34a; }
 
 .pw-mismatch-msg { display: flex; align-items: center; gap: 4px; font-size: 0.78rem; color: #ef4444; margin-top: 2px; }
 

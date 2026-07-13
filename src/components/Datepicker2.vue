@@ -51,111 +51,86 @@
       <button
         ref="periodAnchorBtn"
         type="button"
-        class="shrink-0"
-        :class="
-          filterBarAlign
-            ? 'ml-0.5 flex h-8 w-8 items-center justify-center'
-            : 'ml-2 w-[30px]'
-        "
+        class="datepicker2-period-btn shrink-0"
+        :class="filterBarAlign ? 'datepicker2-period-btn--compact' : 'datepicker2-period-btn--default'"
+        :aria-expanded="showRadio"
+        aria-haspopup="dialog"
+        title="기간 선택"
         @click="toggleRadio"
         :disabled="disable"
         v-if="disable2">
-        <img src="../assets/choiceCalendar.png" class="w-full" alt="" />
+        <svg
+          class="datepicker2-period-btn__icon"
+          viewBox="0 0 20 20"
+          fill="none"
+          aria-hidden="true">
+          <rect
+            x="3"
+            y="4"
+            width="14"
+            height="13"
+            rx="2"
+            stroke="currentColor"
+            stroke-width="1.5" />
+          <path
+            d="M3 8.5h14"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round" />
+          <path
+            d="M7 3v2.5M13 3v2.5"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round" />
+          <path
+            d="M6.5 12h3M6.5 14.5h7"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round" />
+        </svg>
       </button>
     </div>
     <Teleport to="body">
       <div
         v-show="showRadio"
-        class="datepicker2-period-panel fixed z-[5000] w-40 rounded-lg bg-gray-100 p-1 shadow-md"
+        class="datepicker2-period-panel"
+        role="dialog"
+        aria-label="기간 선택"
         :style="periodFloaterStyle"
         @click.stop>
-        <div class="flex justify-end mr-3">
-          <button type="button" @click="toggleRadio">닫기</button>
+        <div class="datepicker2-period-panel__header">
+          <h2 class="datepicker2-period-panel__title">기간 선택</h2>
+          <button
+            type="button"
+            class="datepicker2-period-panel__close"
+            title="닫기"
+            @click="toggleRadio">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="M5 5l10 10M15 5L5 15"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round" />
+            </svg>
+          </button>
         </div>
-        <h2 class="text-sm font-semibold -mt-3">기간 선택</h2>
 
-        <div class="flex flex-col space-y-0 items-center pr-8 -mt-1">
-          <label class="flex items-center cursor-pointer">
+        <div class="datepicker2-period-panel__list" role="radiogroup" aria-label="기간 프리셋">
+          <label
+            v-for="opt in periodPresetOptions"
+            :key="opt.value"
+            class="datepicker2-period-option"
+            :class="{ 'is-selected': selectedRange === opt.value }">
             <input
               type="radio"
               name="dateRange"
-              id="lastweek"
-              value="lastweek"
+              :id="opt.value"
+              :value="opt.value"
               v-model="selectedRange"
               @change="updateDateRange"
-              class="" />
-
-            전주
-          </label>
-
-          <label class="flex items-center cursor-pointer">
-            <input
-              type="radio"
-              name="dateRange"
-              id="currentWeek"
-              value="currentWeek"
-              v-model="selectedRange"
-              @change="updateDateRange"
-              class="" />
-            <!-- <span
-              class="flex items-center justify-center w-6 h-6 border-2 border-gray-300 rounded-full peer-checked:border-blue-500 peer-checked:bg-blue-500 mr-2"></span> -->
-            금주
-          </label>
-
-          <label class="flex items-center cursor-pointer">
-            <input
-              type="radio"
-              name="dateRange"
-              id="lastMonth"
-              value="lastMonth"
-              v-model="selectedRange"
-              @change="updateDateRange"
-              class="" />
-            <!-- <span
-              class="flex items-center justify-center w-6 h-6 border-2 border-gray-300 rounded-full peer-checked:border-blue-500 peer-checked:bg-blue-500 mr-2"></span> -->
-            전월
-          </label>
-
-          <label class="flex items-center cursor-pointer">
-            <input
-              type="radio"
-              name="dateRange"
-              id="currentMonth"
-              value="currentMonth"
-              v-model="selectedRange"
-              @change="updateDateRange"
-              class="" />
-            <!-- <span
-              class="flex items-center justify-center w-6 h-6 border-2 border-gray-300 rounded-full peer-checked:border-blue-500 peer-checked:bg-blue-500 mr-2"></span> -->
-            금월
-          </label>
-
-          <label class="flex items-center cursor-pointer pl-6">
-            <input
-              type="radio"
-              name="dateRange"
-              id="last3Month"
-              value="last3Month"
-              v-model="selectedRange"
-              @change="updateDateRange"
-              class="" />
-            <!-- <span
-              class="flex items-center justify-center w-6 h-6 border-2 border-gray-300 rounded-full peer-checked:border-blue-500 peer-checked:bg-blue-500 mr-2"></span> -->
-            전3개월
-          </label>
-
-          <label class="flex items-center cursor-pointer pl-6">
-            <input
-              type="radio"
-              name="dateRange"
-              id="current3Month"
-              value="current3Month"
-              v-model="selectedRange"
-              @change="updateDateRange"
-              class="" />
-            <!-- <span
-              class="flex items-center justify-center w-6 h-6 border-2 border-gray-300 rounded-full peer-checked:border-blue-500 peer-checked:bg-blue-500 mr-2"></span> -->
-            금3개월
+              class="datepicker2-period-option__input" />
+            <span class="datepicker2-period-option__radio" aria-hidden="true"></span>
+            <span class="datepicker2-period-option__text">{{ opt.label }}</span>
           </label>
         </div>
       </div>
@@ -347,7 +322,16 @@ const emitDate2 = (e) => {};
 const showRadio = ref(false);
 /** 기간설정 버튼 — Teleport 패널 위치 기준 */
 const periodAnchorBtn = ref(null);
-const PERIOD_PANEL_W_PX = 160;
+const PERIOD_PANEL_W_PX = 176;
+const selectedRange = ref("");
+const periodPresetOptions = [
+  { value: "lastweek", label: "전주" },
+  { value: "currentWeek", label: "금주" },
+  { value: "lastMonth", label: "전월" },
+  { value: "currentMonth", label: "금월" },
+  { value: "last3Month", label: "전3개월" },
+  { value: "current3Month", label: "금3개월" },
+];
 
 const periodFloaterStyle = ref({
   top: "0px",
@@ -652,4 +636,211 @@ const changeEndDate = (e) => {
 };
 </script>
 
-<style></style>
+<style>
+.datepicker2-period-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  background: #fff;
+  color: #334155;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.datepicker2-period-btn--compact {
+  margin-left: 0.125rem;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  min-height: 2rem;
+}
+
+.datepicker2-period-btn--default {
+  margin-left: 0.5rem;
+  width: 1.875rem;
+  height: 1.875rem;
+}
+
+.datepicker2-period-btn__icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.datepicker2-period-btn:hover:not(:disabled) {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.datepicker2-period-btn:focus-visible {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.2);
+}
+
+.datepicker2-period-btn[aria-expanded="true"] {
+  border-color: #f87171;
+  background: #fee2e2;
+  color: #dc2626;
+  animation: datepicker2-period-btn-blink 1.1s ease-in-out infinite;
+}
+
+.datepicker2-period-btn[aria-expanded="true"]:hover:not(:disabled) {
+  border-color: #ef4444;
+  background: #fecaca;
+  color: #b91c1c;
+}
+
+@keyframes datepicker2-period-btn-blink {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgb(248 113 113 / 0.55);
+  }
+  50% {
+    opacity: 0.82;
+    box-shadow: 0 0 0 0.3rem rgb(248 113 113 / 0.35);
+  }
+}
+
+.datepicker2-period-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.datepicker2-period-panel {
+  position: fixed;
+  z-index: 5000;
+  width: 11rem;
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.625rem;
+  background: #fff;
+  box-shadow:
+    0 10px 15px -3px rgb(15 23 42 / 0.12),
+    0 4px 6px -4px rgb(15 23 42 / 0.08);
+}
+
+.datepicker2-period-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.125rem 0.25rem 0.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 0.375rem;
+}
+
+.datepicker2-period-panel__title {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.datepicker2-period-panel__close {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.datepicker2-period-panel__close svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.datepicker2-period-panel__close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.datepicker2-period-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.datepicker2-period-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 1.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  color: #334155;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease;
+}
+
+.datepicker2-period-option:hover:not(.is-selected) {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.datepicker2-period-option:hover:not(.is-selected) .datepicker2-period-option__radio {
+  border-color: #fca5a5;
+}
+
+.datepicker2-period-option.is-selected {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.datepicker2-period-option.is-selected:hover {
+  background: #bfdbfe;
+  color: #1e3a8a;
+}
+
+.datepicker2-period-option__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.datepicker2-period-option__radio {
+  box-sizing: border-box;
+  width: 0.875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 9999px;
+  background: #fff;
+  transition:
+    border-color 0.12s ease,
+    background-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.datepicker2-period-option.is-selected .datepicker2-period-option__radio {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+  box-shadow: inset 0 0 0 2.5px #fff;
+}
+
+.datepicker2-period-option__text {
+  line-height: 1.2;
+  white-space: nowrap;
+}
+</style>

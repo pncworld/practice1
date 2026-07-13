@@ -6,8 +6,8 @@
 ################################################################################*/ -->
 <template>
   <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
@@ -18,49 +18,79 @@
         </button>
       </div>
     </div>
-    <div
-      class="grid grid-cols-[2fr,2fr,1fr] grid-rows-1 bg-gray-200 rounded-lg h-20 items-center z-10 space-x-5">
-      <div class="justify-start flex items-center -space-x-10">
-        <div class="pl-7 z-50">
-          <input type="checkbox" v-model="cond" @input="cond = !cond" />
-        </div>
-        <Datepicker2
-          :mainName="'기간'"
-          :initToday="1"
-          ref="datepicker"
-          :closePopUp="closePopUp"
-          @endDate="endDate"
-          @excelDate="excelDate"
-          @startDate="startDate">
-        </Datepicker2>
-      </div>
 
-      <div class="h-[75%] justify-start items-center flex space-x-2">
-        <div class="pl-2 z-50">
-          <input type="checkbox" v-model="cond2" @input="cond2 = !cond2" />
+    <div
+      class="crm010-search-panel z-10 mt-3 w-full min-h-0 shrink-0 overflow-x-auto rounded-lg bg-gray-200"
+      :style="{
+        '--crm010-panel-pad-x': '2rem',
+        '--crm010-control-border': crm010ControlBorder,
+      }">
+      <div class="crm010-search-layout min-w-0">
+        <!-- 좌측 2단: 기간 / 등급 -->
+        <div class="crm010-left-stack min-w-0">
+          <div class="crm010-row">
+            <input
+              id="crm010-cond-period"
+              v-model="cond"
+              type="checkbox"
+              class="crm010-check shrink-0" />
+            <label class="crm010-lbl shrink-0" for="crm010-cond-period">기간</label>
+            <div class="crm010-date-slot min-w-0 flex-1">
+              <Datepicker2
+                ref="datepicker"
+                omit-main-label
+                filter-bar-align
+                :mainName="'기간'"
+                :initToday="1"
+                :closePopUp="closePopUp"
+                @endDate="endDate"
+                @excelDate="excelDate"
+                @startDate="startDate" />
+            </div>
+          </div>
+          <div class="crm010-row">
+            <span class="crm010-check-spacer shrink-0" aria-hidden="true"></span>
+            <span class="crm010-lbl shrink-0">등급</span>
+            <div class="crm010-field min-w-0">
+              <select
+                id="crm010-grade"
+                v-model="cond3"
+                class="crm010-sg-select h-8 min-h-8 rounded-md border border-solid bg-white px-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="0">전체</option>
+                <option
+                  v-for="i in optionList"
+                  :key="i.intLevel"
+                  :value="i.intLevel">
+                  {{ i.strLevelName }}
+                </option>
+              </select>
+            </div>
+          </div>
         </div>
-        <PickStoreSingle
-          @lngStoreGroup="lngStoreGroup"
-          @lngStoreCode="lngStoreCode"
-          @lngStoreAttrs="lngStoreAttrs"
-          @lngStoreTeam="lngStoreTeam"
-          @excelStore="excelStore"
-          @lngSupervisor="lngSupervisor"></PickStoreSingle>
-      </div>
-      <div class="flex justify-start items-center !ml-12">
-        <span class="text-base font-semibold">등급 </span>
-        <select name="" id="" class="border w-32 h-7 ml-2" v-model="cond3">
-          <option value="0">전체</option>
-          <option :value="i.intLevel" v-for="i in optionList">
-            {{ i.strLevelName }}
-          </option>
-        </select>
+
+        <!-- 우측: 매장명(2단 컴포넌트) — 좌측 2단에 맞춤 -->
+        <div class="crm010-right-store min-w-0">
+          <input
+            id="crm010-cond-store"
+            v-model="cond2"
+            type="checkbox"
+            class="crm010-check shrink-0" />
+          <div class="crm010-pick-slot min-w-0 flex-1">
+            <PickStoreSingle
+              @lngStoreGroup="lngStoreGroup"
+              @lngStoreCode="lngStoreCode"
+              @lngStoreAttrs="lngStoreAttrs"
+              @lngStoreTeam="lngStoreTeam"
+              @excelStore="excelStore"
+              @lngSupervisor="lngSupervisor" />
+          </div>
+        </div>
       </div>
     </div>
-    <!-- 조회조건 -->
+
     <!-- 그리드 영역 -->
-    <div class="w-full h-[75vh]">
-      <div class="w-full h-[80%]">
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col">
+      <div class="relative min-h-0 w-full flex-1">
         <Realgrid
           :progname="'CRM01_010RPT_VUE'"
           :progid="1"
@@ -326,4 +356,134 @@ const excelStore = (e) => {
   selectedExcelStore.value = e;
   //comsole.log(e);
 };
+
+const crm010ControlBorder = "#cbd5e1";
 </script>
+
+<style scoped>
+.crm010-search-panel {
+  box-sizing: border-box;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: var(--crm010-panel-pad-x, 2rem);
+  padding-right: var(--crm010-panel-pad-x, 2rem);
+}
+
+@media (min-width: 768px) {
+  .crm010-search-panel {
+    --crm010-panel-pad-x: 3rem;
+  }
+}
+
+.crm010-search-layout {
+  display: grid;
+  grid-template-columns: minmax(18rem, 1.05fr) minmax(22rem, 1.25fr);
+  column-gap: 1.75rem;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.crm010-left-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.625rem;
+  min-width: 0;
+  /* 패널 좌측 inset과 별도로 한 번 더 들여 → 왼쪽 공간 약 2배, 매장명 위치는 유지 */
+  padding-inline-start: var(--crm010-panel-pad-x, 2rem);
+}
+
+.crm010-row {
+  display: grid;
+  grid-template-columns: 1rem 3.5rem minmax(0, 1fr);
+  column-gap: 0.875rem;
+  align-items: center;
+  min-width: 0;
+  min-height: 2rem;
+}
+
+.crm010-right-store {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.crm010-check {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #2563eb;
+  justify-self: center;
+}
+
+.crm010-check-spacer {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  justify-self: center;
+}
+
+.crm010-lbl {
+  width: auto;
+  margin: 0;
+  padding-inline-end: 0.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+  text-align: left;
+}
+
+.crm010-field {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding-inline-start: 0.125rem;
+  /* Datepicker2 filterBarAlign: w-36 + gap-x-1 + ~ + gap-x-1 + w-36 (캘린더 버튼 제외) */
+  width: calc(9rem + 0.25rem + 1rem + 0.25rem + 9rem);
+  max-width: 100%;
+}
+
+.crm010-date-slot {
+  min-width: 0;
+  padding-inline-start: 0.125rem;
+}
+
+.crm010-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin: 0 !important;
+  width: auto !important;
+  max-width: 100%;
+}
+
+.crm010-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  height: 2rem;
+  min-height: 2rem;
+  border: 1px solid var(--crm010-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+  background: #fff;
+}
+
+.crm010-pick-slot {
+  min-width: 0;
+}
+
+.crm010-pick-slot :deep(.pss-root) {
+  width: 100%;
+}
+
+.crm010-sg-select {
+  box-sizing: border-box;
+  width: 100%;
+  border-color: var(--crm010-control-border, #cbd5e1);
+}
+
+@media (max-width: 900px) {
+  .crm010-search-layout {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.75rem;
+  }
+}
+</style>

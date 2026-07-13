@@ -6,8 +6,8 @@
 ################################################################################*/ -->
 <template>
   <!-- 조회 조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
@@ -18,182 +18,188 @@
         </button>
       </div>
     </div>
+
     <div
-      class="grid grid-cols-[10fr,10fr] grid-rows-1 justify-between bg-gray-200 rounded-lg h-32 z-10">
-      <div class="grid grid-cols-1 grid-rows-3 justify-start">
-        <div class="flex justify-start items-start">
-          <Datepicker2
-            class="pr-0"
-            @endDate="endDate"
-            @startDate="startDate"
-            :closePopUp="closePopUp"
-            ref="datepicker"
-            @excelDate="excelDate"></Datepicker2>
+      class="sls04-search-panel z-10 mt-3 w-full min-h-0 shrink-0 overflow-visible rounded-lg bg-gray-200"
+      :style="{
+        '--sls04-panel-pad-x': '2rem',
+        '--sls04-control-border': sls04ControlBorder,
+        '--sls04-col-gutter': sls04ColGutter,
+        '--sls04-row-gap': sls04RowGap,
+        '--sls04-label-col': sls04LabelCol,
+        '--psp-label-w': sls04LabelCol,
+        '--psp-radio-w': '4.75rem',
+        '--psp-col-gap': '0.5rem',
+      }">
+      <div class="sls04-search-layout min-w-0">
+        <!-- 좌측: 기간 / 조건 / 메뉴·객층 -->
+        <div class="sls04-left-stack min-w-0">
+          <div class="sls04-row">
+            <span class="sls04-lbl shrink-0">기간</span>
+            <div class="sls04-date-slot min-w-0 flex-1">
+              <Datepicker2
+                ref="datepicker"
+                omit-main-label
+                filter-bar-align
+                :mainName="'기간'"
+                :closePopUp="closePopUp"
+                @endDate="endDate"
+                @startDate="startDate"
+                @excelDate="excelDate" />
+            </div>
+          </div>
+
+          <div class="sls04-row">
+            <span class="sls04-lbl shrink-0">조건</span>
+            <div class="sls04-checks flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
+              <label class="sls04-check-label" for="store">
+                <input id="store" type="checkbox" class="sls04-check" @click="setCond" />
+                매장별
+              </label>
+              <label class="sls04-check-label" for="date">
+                <input id="date" type="checkbox" class="sls04-check" @click="setCond" />
+                일자별
+              </label>
+              <label class="sls04-check-label" for="unite">
+                <input id="unite" type="checkbox" class="sls04-check" @click="setCellUnite" />
+                셀병합
+              </label>
+              <label class="sls04-check-label" for="group">
+                <input id="group" type="checkbox" class="sls04-check" @click="changeGridMenus" />
+                메뉴그룹표시
+              </label>
+            </div>
+          </div>
+
+          <div class="sls04-row sls04-row--menu">
+            <span class="sls04-lbl shrink-0">메뉴구분</span>
+            <div class="sls04-menu-fields min-w-0">
+              <v-select
+                v-model="selectedMenu"
+                :options="mainMenu"
+                placeholder="전체"
+                label="strname"
+                class="custom-select2 sls04-vselect sls04-menu-item"
+                clearable="true" />
+              <v-select
+                v-model="selectedsubMenu"
+                :options="menuType"
+                placeholder="전체"
+                label="strname"
+                class="custom-select2 sls04-vselect sls04-menu-item"
+                clearable="true" />
+              <v-select
+                v-model="selectedSubSubMenu"
+                :options="Menus"
+                placeholder="전체"
+                label="strname"
+                class="custom-select2 sls04-vselect sls04-menu-item sls04-menu-item--wide"
+                clearable="true" />
+              <input
+                type="text"
+                v-model="searchText"
+                placeholder="메뉴명"
+                @click.stop
+                @mousedown.stop
+                class="sls04-sg-input sls04-menu-item relative z-10 h-8 min-h-8 rounded-md border border-solid bg-white px-2 text-sm text-gray-700" />
+            </div>
+          </div>
         </div>
-        <div
-          class="justify-start flex items-center space-x-5 w-[600px] ml-[78px]">
-          <div class="text-base font-semibold">조건</div>
-          <div class="flex">
-            <label for="store"
-              ><input
-                type="checkbox"
-                id="store"
-                @click="setCond" />매장별</label
-            >
-          </div>
-          <div>
-            <label for="date"
-              ><input type="checkbox" id="date" @click="setCond" />일자별</label
-            >
-          </div>
-          <div>
-            <label for="unite"
-              ><input
-                type="checkbox"
-                id="unite"
-                @click="setCellUnite" />셀병합</label
-            >
-          </div>
-          <div>
-            <label for="group"
-              ><input
-                type="checkbox"
-                id="group"
-                @click="changeGridMenus" />메뉴그룹표시</label
-            >
-          </div>
-        </div>
-        <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-12">
-          메뉴구분
-          <div class="flex space-x-5 ml-5 -mt-1">
-            <v-select
-              v-model="selectedMenu"
-              :options="mainMenu"
-              placeholder="전체"
-              label="strname"
-              class="w-44 !h-8 bg-white"
-              clearable="true" />
 
-            <v-select
-              v-model="selectedsubMenu"
-              :options="menuType"
-              placeholder="전체"
-              label="strname"
-              class="w-44 !h-8 bg-white"
-              clearable="true" />
-
-            <v-select
-              v-model="selectedSubSubMenu"
-              :options="Menus"
-              placeholder="전체"
-              label="strname"
-              class="w-44 !h-8 bg-white"
-              clearable="true" />
-
-            <input
-              type="text"
-              v-model="searchText"
-              class="pl-2 w-44 !h-8 bg-white" />
-          </div>
-
-          <div class="flex justify-end space-x-2 items-center ml-5">
-            객층구분
+        <!-- 우측: 매장명 + 객층구분(우측 정렬) -->
+        <div class="sls04-right-store min-w-0 overflow-visible">
+          <PickStorePlural
+            fluid-width
+            @lngStoreCodes="lngStoreCodes"
+            @lngStoreGroup="lngStoreGroup"
+            @lngSupervisor="lngSupervisor"
+            @lngStoreTeam="lngStoreTeam"
+            @lngStoreAttr="lngStoreAttr"
+            @excelStore="excelStore"
+            :setFooterColID="setFooterColID"
+            :setFooterExpressions="setFooterExpressions" />
+          <div class="sls04-guest-row">
+            <span class="sls04-lbl shrink-0">객층구분</span>
             <v-select
               v-model="selectedGuest"
               :options="GuestType"
               placeholder="전체"
               label="strName"
-              class="w-44 !h-8 bg-white ml-5"
+              class="custom-select2 sls04-vselect sls04-guest-select"
               clearable="true" />
           </div>
         </div>
-        <!-- <div class="pt-1 space-x-2 ml-10">
-        
-        </div> -->
-      </div>
-      <div class="flex justify-start items-start">
-        <PickStorePlural
-          @lngStoreCodes="lngStoreCodes"
-          @lngStoreGroup="lngStoreGroup"
-          @lngSupervisor="lngSupervisor"
-          @lngStoreTeam="lngStoreTeam"
-          @lngStoreAttr="lngStoreAttr"
-          @excelStore="excelStore"
-          :setFooterColID="setFooterColID"
-          :setFooterExpressions="setFooterExpressions">
-        </PickStorePlural>
-        <div></div>
-        <div></div>
       </div>
     </div>
-    <!-- 조회 조건 -->
+
     <!-- 그리드 영역 -->
-    <div class="w-full h-[77%] mt-1">
-      <Realgrid
-        :progname="'SLS04_004RPT_VUE'"
-        :progid="1"
-        :rowData="rowData"
-        :reload="reload"
-        :exporttoExcel="exportExcel"
-        :documentSubTitle="documentSubTitle"
-        :documentTitle="'SLS04_004RPT'"
-        :setRowGroupSpan2="setRowGroupSpan2"
-        :mergeColumns2="true"
-        :rowStateeditable="false"
-        :mergeColumnGroupSubList2="[
-          ['R1', 'S1', 'C1'],
-          ['R2', 'S2', 'C2'],
-          ['R3', 'S3', 'C3'],
-          ['R4', 'S4', 'C4'],
-          ['R5', 'S5', 'C5'],
-          ['R6', 'S6', 'C6'],
-          ['R7', 'S7', 'C7'],
-          ['R8', 'S8', 'C8'],
-          ['R9', 'S9', 'C9'],
-          ['R10', 'S10', 'C10'],
-          ['R11', 'S11', 'C11'],
-          ['R12', 'S12', 'C12'],
-          ['R13', 'S13', 'C13'],
-          ['R14', 'S14', 'C14'],
-          ['R15', 'S15', 'C15'],
-          ['R16', 'S16', 'C16'],
-          ['R17', 'S17', 'C17'],
-          ['R18', 'S18', 'C18'],
-          ['R19', 'S19', 'C19'],
-          ['R20', 'S20', 'C20'],
-          ['R21', 'S21', 'C21'],
-          ['R22', 'S22', 'C22'],
-          ['R23', 'S23', 'C23'],
-          ['R24', 'S24', 'C24'],
-        ]"
-        :mergeColumnGroupName2="[
-          '00:00-01:00',
-          '01:00-02:00',
-          '02:00-03:00',
-          '03:00-04:00',
-          '04:00-05:00',
-          '05:00-06:00',
-          '06:00-07:00',
-          '07:00-08:00',
-          '08:00-09:00',
-          '09:00-10:00',
-          '10:00-11:00',
-          '11:00-12:00',
-          '12:00-13:00',
-          '13:00-14:00',
-          '14:00-15:00',
-          '15:00-16:00',
-          '16:00-17:00',
-          '17:00-18:00',
-          '18:00-19:00',
-          '19:00-20:00',
-          '20:00-21:00',
-          '21:00-22:00',
-          '22:00-23:00',
-          '23:00-24:00',
-        ]"
-        :hideColumnsId="hideColumnsId"></Realgrid>
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col">
+      <div class="relative min-h-0 w-full flex-1">
+        <Realgrid
+          :progname="'SLS04_004RPT_VUE'"
+          :progid="1"
+          :rowData="rowData"
+          :reload="reload"
+          :exporttoExcel="exportExcel"
+          :documentSubTitle="documentSubTitle"
+          :documentTitle="'SLS04_004RPT'"
+          :setRowGroupSpan2="setRowGroupSpan2"
+          :mergeColumns2="true"
+          :rowStateeditable="false"
+          :mergeColumnGroupSubList2="[
+            ['R1', 'S1', 'C1'],
+            ['R2', 'S2', 'C2'],
+            ['R3', 'S3', 'C3'],
+            ['R4', 'S4', 'C4'],
+            ['R5', 'S5', 'C5'],
+            ['R6', 'S6', 'C6'],
+            ['R7', 'S7', 'C7'],
+            ['R8', 'S8', 'C8'],
+            ['R9', 'S9', 'C9'],
+            ['R10', 'S10', 'C10'],
+            ['R11', 'S11', 'C11'],
+            ['R12', 'S12', 'C12'],
+            ['R13', 'S13', 'C13'],
+            ['R14', 'S14', 'C14'],
+            ['R15', 'S15', 'C15'],
+            ['R16', 'S16', 'C16'],
+            ['R17', 'S17', 'C17'],
+            ['R18', 'S18', 'C18'],
+            ['R19', 'S19', 'C19'],
+            ['R20', 'S20', 'C20'],
+            ['R21', 'S21', 'C21'],
+            ['R22', 'S22', 'C22'],
+            ['R23', 'S23', 'C23'],
+            ['R24', 'S24', 'C24'],
+          ]"
+          :mergeColumnGroupName2="[
+            '00:00-01:00',
+            '01:00-02:00',
+            '02:00-03:00',
+            '03:00-04:00',
+            '04:00-05:00',
+            '05:00-06:00',
+            '06:00-07:00',
+            '07:00-08:00',
+            '08:00-09:00',
+            '09:00-10:00',
+            '10:00-11:00',
+            '11:00-12:00',
+            '12:00-13:00',
+            '13:00-14:00',
+            '14:00-15:00',
+            '15:00-16:00',
+            '16:00-17:00',
+            '17:00-18:00',
+            '18:00-19:00',
+            '19:00-20:00',
+            '20:00-21:00',
+            '21:00-22:00',
+            '22:00-23:00',
+            '23:00-24:00',
+          ]"
+          :hideColumnsId="hideColumnsId"></Realgrid>
+      </div>
     </div>
   </div>
   <!-- 그리드 영역 -->
@@ -698,6 +704,312 @@ const setCellUnite = (e) => {
   }
   reload.value = !reload.value;
 };
+
+const sls04ControlBorder = "#cbd5e1";
+const sls04ColGutter = "0.5rem";
+const sls04RowGap = "0.875rem";
+const sls04LabelCol = "5.5rem";
 </script>
 
-<style></style>
+<style scoped>
+.sls04-search-panel {
+  box-sizing: border-box;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: var(--sls04-panel-pad-x, 2rem);
+  padding-right: var(--sls04-panel-pad-x, 2rem);
+}
+
+@media (min-width: 768px) {
+  .sls04-search-panel {
+    --sls04-panel-pad-x: 3rem;
+  }
+}
+
+.sls04-search-layout {
+  /* 메뉴구분 1.5배 폭 반영 — 좌측 비중 확대 */
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  column-gap: var(--sls04-col-gutter, 0.5rem);
+  align-items: start;
+  min-width: 0;
+}
+
+.sls04-left-stack {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sls04-row-gap, 0.875rem);
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.sls04-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: 2rem;
+}
+
+.sls04-lbl {
+  box-sizing: border-box;
+  flex: 0 0 var(--sls04-label-col, 5.5rem);
+  width: var(--sls04-label-col, 5.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sls04-checks {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1rem;
+}
+
+.sls04-check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9375rem;
+  line-height: 1.25;
+  color: #1f2937;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sls04-check {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.sls04-date-slot {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sls04-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin: 0 !important;
+  width: auto !important;
+  max-width: 100%;
+}
+
+.sls04-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  height: 2rem;
+  min-height: 2rem;
+  border: 1px solid var(--sls04-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+  background: #fff;
+}
+
+.sls04-menu-fields {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1 1 auto;
+  position: relative;
+  z-index: 5;
+}
+
+.sls04-menu-item {
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-width: 9rem;
+  max-width: 13.5rem;
+  height: 2rem;
+  min-height: 2rem;
+}
+
+/* 3번째(메뉴명) — 긴 텍스트용으로 더 넓게 */
+.sls04-menu-item--wide {
+  flex: 2 1 0;
+  min-width: 16rem;
+  max-width: 22rem;
+}
+
+/* 메뉴명 입력창 — 기존 대비 약 1.5배 */
+.sls04-menu-fields .sls04-sg-input {
+  flex: 0 0 auto;
+  width: 16.5rem;
+  min-width: 16.5rem;
+  max-width: 16.5rem;
+  pointer-events: auto;
+  cursor: text;
+}
+
+.sls04-sg-input {
+  box-sizing: border-box;
+  height: 2rem;
+  min-height: 2rem;
+  border-color: var(--sls04-control-border, #cbd5e1);
+}
+
+.sls04-sg-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+
+/* custom-select2 + 조회 AREA h-8 / 말줄임 */
+.sls04-search-panel :deep(.sls04-vselect) {
+  height: 2rem;
+  min-height: 2rem;
+}
+
+.sls04-search-panel :deep(.sls04-vselect .vs__dropdown-toggle) {
+  box-sizing: border-box;
+  height: 2rem !important;
+  min-height: 2rem !important;
+  padding: 0 0.5rem !important;
+  border: 1px solid var(--sls04-control-border, #cbd5e1) !important;
+  border-radius: 0.375rem !important;
+  background: #fff !important;
+  overflow: hidden;
+}
+
+.sls04-search-panel :deep(.sls04-vselect .vs__selected-options) {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.sls04-search-panel :deep(.sls04-vselect .vs__selected),
+.sls04-search-panel :deep(.sls04-vselect .vs__placeholder) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none;
+  background: none;
+  display: block;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+  color: rgb(55 65 81);
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.sls04-search-panel :deep(.sls04-vselect .vs__search) {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 1.25rem;
+  line-height: 1.25rem;
+  font-size: 0.875rem;
+  min-width: 4px !important;
+  opacity: 1 !important;
+  cursor: text;
+}
+
+.sls04-search-panel :deep(.sls04-vselect .vs__actions) {
+  padding: 0 0 0 0.25rem !important;
+}
+
+.sls04-right-store {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--sls04-row-gap, 0.875rem);
+  min-width: 0;
+  overflow: visible;
+}
+
+/* 매장 팝업/말풍선 열리면 좌측 메뉴입력창보다 위 */
+.sls04-right-store:has(.psp-popup),
+.sls04-right-store:has(.psp-store-hover-list) {
+  z-index: 50;
+}
+
+.sls04-right-store :deep(.psp-popup) {
+  z-index: 60;
+}
+
+.sls04-right-store :deep(.psp-root) {
+  /* 라벨 | 직/가맹·팀/SC | 그룹 | 속성·팀/SC쌍 | 매장선택(최대) */
+  grid-template-columns:
+    var(--psp-label-w, 5.5rem)
+    minmax(var(--psp-radio-w, 4.75rem), auto)
+    minmax(8rem, 1.1fr)
+    minmax(12.5rem, 1.45fr)
+    minmax(13rem, 1.85fr);
+  column-gap: var(--psp-col-gap, 0.5rem);
+  row-gap: 0.5rem;
+}
+
+.sls04-right-store :deep(.psp-label) {
+  width: var(--psp-label-w, 5.5rem);
+  justify-content: center;
+  padding-inline-start: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* 매장 콤보/트리거도 h-8로 통일 (공통 컴포넌트 기본 1.75rem 덮어씀) */
+.sls04-right-store :deep(.psp-select),
+.sls04-right-store :deep(.psp-store-trigger),
+.sls04-right-store :deep(.psp-collapse-btn) {
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+.sls04-right-store :deep(.psp-collapse-btn) {
+  width: 2rem !important;
+}
+
+/* 객층구분: 매장 AREA 우측 정렬 */
+.sls04-guest-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: 2rem;
+}
+
+.sls04-guest-row .sls04-lbl {
+  flex: 0 0 auto;
+  width: auto;
+  justify-content: flex-end;
+}
+
+.sls04-guest-select {
+  width: 13rem;
+  max-width: 100%;
+  height: 2rem;
+  min-height: 2rem;
+}
+
+@media (max-width: 1100px) {
+  .sls04-search-layout {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--sls04-row-gap, 0.875rem);
+  }
+
+  .sls04-menu-fields {
+    flex-wrap: wrap;
+  }
+}
+</style>

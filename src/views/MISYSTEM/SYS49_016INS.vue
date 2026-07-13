@@ -107,14 +107,18 @@
                 </svg>
               </button>
             </div>
-            <!-- 강도 바 -->
+            <!-- 강도 바 — 충족 개수만큼 왼쪽부터 채움 -->
             <div v-if="newPassWord" class="mt-2 flex items-center gap-2">
               <div class="flex gap-1 flex-1">
-                <div v-for="i in 4" :key="i"
+                <div
+                  v-for="i in passwordStrengthTotal"
+                  :key="i"
                   class="h-1.5 flex-1 rounded-full transition-colors"
-                  :class="i <= passwordStrength ? strengthBarColor : 'bg-gray-200'"></div>
+                  :class="i <= passwordStrengthMet ? strengthBarColor : 'bg-gray-200'"></div>
               </div>
-              <span class="text-sm" :class="strengthTextColor">{{ strengthLabel }}</span>
+              <span class="text-sm whitespace-nowrap" :class="strengthTextColor"
+                >{{ strengthLabel }} ({{ passwordStrengthMet }}/{{ passwordStrengthTotal }})</span
+              >
             </div>
           </div>
 
@@ -236,8 +240,9 @@ const passwordRules = computed(() => {
   const loginId = store.state.userData?.loginID ?? "";
   return [
     {
-      text: "8자리 이상 20자리 이하",
+      text: "8자리 이상 20자리 이하 (기본)",
       met: pw.length >= 8 && pw.length <= 20,
+      basic: true,
     },
     {
       text: "영문자·숫자·특수문자 중 2종류 이상 조합",
@@ -263,36 +268,44 @@ const passwordRules = computed(() => {
   ];
 });
 
-// 비밀번호 강도 (0~4): 8자 미만이면 무조건 취약(1)
-const passwordStrength = computed(() => {
-  const pw = newPassWord.value;
-  if (!pw) return 0;
-  if (pw.length < 8) return 1;
-  const met = passwordRules.value.filter((r) => r.met).length;
-  if (met <= 2) return 1;
-  if (met <= 3) return 2;
-  if (met <= 4) return 3;
-  return 4;
+const PW_MIN_RULES_TO_SAVE = 4;
+/** 기본 조건: 8자리 미만이면 취약 고정·변경 불가 */
+const passwordMeetsBasicLength = computed(() => {
+  const len = newPassWord.value?.length ?? 0;
+  return len >= 8 && len <= 20;
 });
 
+// 비밀번호 강도 — 규칙별 충족 칸 + 충족 수
+const passwordStrengthMet = computed(
+  () => passwordRules.value.filter((r) => r.met).length
+);
+const passwordStrengthTotal = computed(() => passwordRules.value.length);
+
 const strengthBarColor = computed(() => {
-  if (passwordStrength.value <= 1) return "bg-red-400";
-  if (passwordStrength.value <= 2) return "bg-yellow-400";
-  if (passwordStrength.value <= 3) return "bg-blue-400";
+  if (!passwordMeetsBasicLength.value) return "bg-red-400";
+  const met = passwordStrengthMet.value;
+  if (met <= 0) return "bg-gray-200";
+  if (met <= 2) return "bg-red-400";
+  if (met <= 3) return "bg-yellow-400";
+  if (met < passwordStrengthTotal.value) return "bg-blue-400";
   return "bg-green-500";
 });
 
 const strengthTextColor = computed(() => {
-  if (passwordStrength.value <= 1) return "text-red-500";
-  if (passwordStrength.value <= 2) return "text-yellow-500";
-  if (passwordStrength.value <= 3) return "text-blue-500";
+  if (!newPassWord.value || !passwordMeetsBasicLength.value) return "text-red-500";
+  const met = passwordStrengthMet.value;
+  if (met <= 2) return "text-red-500";
+  if (met <= 3) return "text-yellow-500";
+  if (met < passwordStrengthTotal.value) return "text-blue-500";
   return "text-green-600";
 });
 
 const strengthLabel = computed(() => {
-  if (passwordStrength.value <= 1) return "취약";
-  if (passwordStrength.value <= 2) return "보통";
-  if (passwordStrength.value <= 3) return "양호";
+  if (!newPassWord.value || !passwordMeetsBasicLength.value) return "취약";
+  const met = passwordStrengthMet.value;
+  if (met <= 2) return "취약";
+  if (met <= 3) return "보통";
+  if (met < passwordStrengthTotal.value) return "양호";
   return "강함";
 });
 
@@ -305,12 +318,23 @@ const saveButton = () => {
     });
     return;
   }
-  const failedRules = passwordRules.value.filter((r) => !r.met);
-  if (failedRules.length > 0) {
+  if (!passwordMeetsBasicLength.value) {
+    Swal.fire({
+      icon: "error",
+      title: "기본 조건 미충족",
+      text: "비밀번호는 8자리 이상 20자리 이하(기본 조건)여야 합니다.",
+    });
+    return;
+  }
+  if (passwordStrengthMet.value < PW_MIN_RULES_TO_SAVE) {
+    const failedRules = passwordRules.value.filter((r) => !r.met);
     Swal.fire({
       icon: "error",
       title: "비밀번호 규칙 미충족",
-      html: failedRules.map((r) => `• ${r.text}`).join("<br>"),
+      html:
+        `비밀번호 규칙 ${PW_MIN_RULES_TO_SAVE}개 이상 만족해야 변경할 수 있습니다.<br>` +
+        `(현재 ${passwordStrengthMet.value}/${passwordStrengthTotal.value})<br><br>` +
+        failedRules.map((r) => `• ${r.text}`).join("<br>"),
     });
     return;
   }

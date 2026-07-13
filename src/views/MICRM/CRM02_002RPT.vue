@@ -21,7 +21,7 @@
     </div>
 
     <div
-      class="crm02-search-panel z-10 mt-3 w-full max-w-[min(100%,1680px)] min-w-0 shrink-0 self-center overflow-x-auto rounded-md border border-slate-500/70 bg-gradient-to-b from-violet-100 via-purple-50/95 to-slate-100 shadow-sm">
+      class="crm02-search-panel z-10 mt-3 w-full max-w-[min(100%,1680px)] min-w-0 shrink-0 self-center overflow-x-auto rounded-md border border-slate-500/70 bg-gray-200 shadow-sm">
       <div
         class="crm02-search-body min-w-0 text-slate-800"
         :style="{ '--crm02-control-border': crm02ControlBorder }">
