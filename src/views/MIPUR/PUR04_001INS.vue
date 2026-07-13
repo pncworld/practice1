@@ -528,21 +528,67 @@ const onlyNumber = (e) => {
   e.target.value = e.target.value.replace(/[^0-9]/g, "");
 };
 
+/** 숫자·소수점 1개만 허용, 소수 최대 2자리 */
+const sanitizeUnitPriceDecimal = (raw) => {
+  const s = String(raw ?? "").replace(/,/g, "").replace(/[^0-9.]/g, "");
+  let out = "";
+  let hasDot = false;
+  let fracLen = 0;
+  for (const ch of s) {
+    if (ch >= "0" && ch <= "9") {
+      if (hasDot) {
+        if (fracLen >= 2) continue;
+        fracLen += 1;
+      }
+      out += ch;
+    } else if (ch === "." && !hasDot) {
+      out += ".";
+      hasDot = true;
+    }
+  }
+  return out;
+};
+
+/** 정수부에 천단위 콤마 (입력 중 끝 `.` 유지) */
+const maskUnitPriceWithCommas = (san) => {
+  if (san === "" || san === undefined || san === null) return "";
+  if (san === ".") return ".";
+  const hasTrailingDot = san.endsWith(".");
+  const core = hasTrailingDot ? san.slice(0, -1) : san;
+  const [intPart, fracPart] = core.split(".");
+  const intMasked = String(intPart ?? "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  if (fracPart !== undefined) {
+    return `${intMasked}.${fracPart}`;
+  }
+  return hasTrailingDot ? `${intMasked}.` : intMasked;
+};
+
+const formatUnitPriceDecimal2 = (n) => {
+  if (Number.isNaN(n)) return "";
+  const rounded = Math.round(n * 100) / 100;
+  return maskUnitPriceWithCommas(String(rounded));
+};
+
 const onlyNumber2 = (e) => {
-  e.target.value = e.target.value.replace(/[^0-9]/g, "");
+  const sanitized = sanitizeUnitPriceDecimal(e.target.value);
+  const masked = maskUnitPriceWithCommas(sanitized);
+  e.target.value = masked;
 
   if (e.target.name == "curUnitPrice") {
-    if (isNaN(scond2.value)) {
+    scond2.value = masked;
+    if (sanitized === "" || sanitized === "." || Number.isNaN(Number(sanitized))) {
       scond3.value = "";
     } else {
-      scond3.value =
-        parseInt(scond2.value) + Math.floor(parseInt(scond2.value) * 0.1);
+      const price = Number(sanitized);
+      scond3.value = formatUnitPriceDecimal2(price * 1.1);
     }
   } else if (e.target.name == "curUnitPrice2") {
-    if (isNaN(scond3.value)) {
+    scond3.value = masked;
+    if (sanitized === "" || sanitized === "." || Number.isNaN(Number(sanitized))) {
       scond2.value = "";
     } else {
-      scond2.value = Math.round((parseInt(scond3.value) * 10) / 11);
+      const priceVat = Number(sanitized);
+      scond2.value = formatUnitPriceDecimal2((priceVat * 10) / 11);
     }
   }
 };
@@ -719,7 +765,7 @@ const saveButton = async () => {
       storeCode.value,
       supplierid2.value,
       tempStockId.value,
-      scond2.value,
+      sanitizeUnitPriceDecimal(scond2.value),
       scond4.value.replaceAll("-", ""),
       scond5.value,
       store.state.userData.lngSequence
