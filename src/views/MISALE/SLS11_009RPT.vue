@@ -35,15 +35,14 @@
             ref="datepicker"
             @excelDate="excelDate"
             :mainName="'일자'"></Datepicker2>
-
           <input
             type="checkbox"
-            class="!ml-72 mt-5"
+            class="!ml-60 mt-2"
             @click="checkReportType"
             :value="2" />
         </div>
-        <div class="flex justify-start mt-2 ml-12 -space-x-7">
-          <div class="text-base font-semibold">객층구분</div>
+        <div class="flex justify-start mt-2 ml-14 -space-x-7">
+          <div class="text-base font-semibold">{{ custType === 3 ? '연령구분' : '객층구분' }}</div>
           <v-select
             v-model="selectedCust"
             :options="customerList"
@@ -243,6 +242,7 @@ const causeList = ref([]);
 const mergeMask = ref();
 const selectedCust = ref(null);
 const customerList = ref([]);
+const custType = ref(2);
 /**
  * 	화면 Load시 실행 스크립트
  */
@@ -314,6 +314,7 @@ const lngStoreCodes = async (e) => {
 
   const res = await getCustomerList(selectedGroup.value, selectedStores.value);
   customerList.value = res.data.List;
+  custType.value = res.data.CUST_TYPE ?? 2;
 };
 
 /**
@@ -360,7 +361,7 @@ const exportExcel = ref(false);
  */
 
 const excelButton = () => {
-  let condition = "객층구분 :";
+  let condition = (custType.value === 3 ? "연령구분" : "객층구분") + " :";
   if (selectedCust.value == null) {
     condition += "전체";
   } else {

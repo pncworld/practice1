@@ -281,6 +281,36 @@ export const getSalesReportByMenu = (
   });
 };
 
+export const getDailyByStoreMenuSales = (
+  groupCd,
+  storeCd,
+  startDate,
+  endDate,
+  searchType,
+  searchValue,
+  reporttype,
+  checklngprice,
+  checkedlngprint,
+  checkdays,
+  checkholiday,
+  menuName
+) => {
+  return api2.post("/MISALES/SLS04_031RPT.asmx/getDailyByStoreMenuSales", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    START_DATE: startDate,
+    END_DATE: endDate,
+    SEARCH_TYPE: searchType,
+    SEARCH_VALUE: searchValue,
+    REPORT_TYPE: reporttype,
+    CHECKED_LNGPRICE: checklngprice,
+    CHECKED_LNGPRINT: checkedlngprint,
+    CHECKED_DAYS: checkdays,
+    CHECKED_HOLIDAY: checkholiday,
+    MENU_NAME: menuName,
+  });
+};
+
 export const getAreaIndustrySalesReport = (
   groupCd,
   storeCds,
