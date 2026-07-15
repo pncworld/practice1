@@ -316,7 +316,7 @@ const pcond8 = ref();
 const pcond9 = ref();
 const pcond10 = ref();
 const pcond11 = ref();
-const pcond12 = ref();
+const pcond12 = ref("");
 
 const showPopup = ref(false);
 
@@ -495,27 +495,62 @@ const saveButton = async () => {
 
   try {
     store.state.loading = true;
-    const res = await changeCardNo(
+
+    const changeCardNoParams = {
+      GROUP_CD: store.state.userData.lngStoreGroup,
+      STORE_CD: selectedStoreCd.value,
+      USER_SEQ: store.state.userData.lngSequence,
+      CUST_NO: selectedCustNo.value,
+      CARD_OLD: pcond.value,
+      CARD_NEW: pcond2.value,
+      CARD_RSN: pcond4.value,
+      REASON: pcond12.value,
+    };
+    console.log("[CRM01_008INS] changeCardNo 요청 파라미터:", changeCardNoParams);
+
+    const changeRes = await changeCardNo(
       store.state.userData.lngStoreGroup,
       selectedStoreCd.value,
       store.state.userData.lngSequence,
       selectedCustNo.value,
-      pcond.value,
-      pcond2.value,
-      pcond4.value,
-      pcond12.value
+      pcond.value ?? "",
+      pcond2.value ?? "",
+      pcond4.value ?? 0,
+      pcond12.value ?? ""
     );
-    ////console.log(res);
-    Swal.fire({
+    console.log("[CRM01_008INS] changeCardNo 응답:", changeRes);
+
+    const listRes = await getCardChangeList(
+      store.state.userData.lngStoreGroup,
+      selectedCustNo.value
+    );
+    console.log("[CRM01_008INS] getCardChangeList 응답:", listRes);
+    rowData.value = listRes.data.List;
+
+    store.state.loading = false;
+
+    await Swal.fire({
       title: "성공",
       text: "카드 번호 변경 완료하였습니다.",
       icon: "success",
       confirmButtonText: "확인",
     });
-  } catch (error) {
-  } finally {
-    store.state.loading = false;
+
     initGrid();
+  } catch (error) {
+    store.state.loading = false;
+    console.error("[CRM01_008INS] 저장 중 오류 발생:", error);
+    console.error("[CRM01_008INS] 오류 상세:", {
+      message: error?.message,
+      response: error?.response?.data,
+      status: error?.response?.status,
+    });
+    Swal.fire({
+      title: "오류",
+      text: "카드 번호 변경 중 오류가 발생했습니다.",
+      icon: "error",
+      confirmButtonText: "확인",
+    });
   }
 };
 /**
@@ -527,9 +562,7 @@ const saveButton = async () => {
  */
 
 const initGrid = () => {
-  if (rowData.value.length > 0) {
-    rowData.value = [];
-  }
+  rowData.value = [];
   pcond.value = "";
   pcond2.value = "";
   pcond3.value = "";
@@ -542,6 +575,9 @@ const initGrid = () => {
   pcond10.value = "";
   pcond11.value = "";
   pcond12.value = "";
+  selectedCustNo.value = null;
+  selectedStoreCd.value = null;
+  checkCard.value = false;
 };
 
 //엑셀 버튼 처리 함수
