@@ -1,5 +1,5 @@
 /*--############################################################################
-# Filename : SLS12_019RPT.vue
+# Filename : SLS12_020RPT.vue
 # Description : 매출관리 > 상세 매출 현황 > 결제 세부 내역
 # Date :2025-05-14
 # Author : 권맑음
@@ -9,10 +9,16 @@
     <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="searchButton" class="button search md:w-auto w-14">
+        <button
+          @click="searchButton"
+          class="button search md:w-auto w-14"
+          :disabled="searchActionsDisabled">
           조회
         </button>
-        <button @click="excelButton" class="button save w-auto excel">
+        <button
+          @click="excelButton"
+          class="button save w-auto excel"
+          :disabled="searchActionsDisabled">
           엑셀
         </button>
       </div>
@@ -26,6 +32,7 @@
         '--sls12-col-gutter': sls12ColGutter,
         '--sls12-row-gap': sls12RowGap,
         '--sls12-label-col': sls12LabelCol,
+        '--sls12-ctrl-w': sls12CtrlW,
       }">
       <div class="sls12-search-layout min-w-0">
         <div class="sls12-left-stack min-w-0">
@@ -44,9 +51,9 @@
             </div>
           </div>
 
-          <div class="sls12-row">
+          <div class="sls12-row sls12-row--pay-aff">
             <span class="sls12-lbl shrink-0">결제코드</span>
-            <div class="sls12-pay-slot min-w-0 flex-1">
+            <div class="sls12-ctrl-slot">
               <v-select
                 v-model="selectedCode"
                 :options="codeList"
@@ -54,8 +61,35 @@
                 label="strName"
                 class="custom-select2 sls12-vselect"
                 clearable="true"
-                @click="resetVselect2" />
+                @click="resetVselect2"
+                @update:modelValue="onPayCodeChange" />
             </div>
+            <template v-if="isAffPayCode">
+              <div class="sls12-row-spacer" aria-hidden="true"></div>
+              <span class="sls12-lbl shrink-0">소속사</span>
+              <div class="sls12-ctrl-slot">
+                <select
+                  id="sls12-020-aff-comp"
+                  v-model="affiliateCompCode"
+                  :disabled="
+                    affiliateCompLocked ||
+                    affiliateCompList.length === 0 ||
+                    affiliateCompLoading
+                  "
+                  class="sls12-sg-select"
+                  @change="onAffiliateCompChange">
+                  <option v-if="affiliateCompList.length === 0" disabled value="">
+                    {{ affiliateCompLoading ? "불러오는 중..." : "소속사 없음" }}
+                  </option>
+                  <option
+                    v-for="item in affiliateCompList"
+                    :key="item.value"
+                    :value="item.value">
+                    {{ item.label }}
+                  </option>
+                </select>
+              </div>
+            </template>
           </div>
         </div>
 
@@ -80,7 +114,7 @@
     <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <div class="relative h-full min-h-0 min-w-0 flex-1">
         <Realgrid
-          :progname="'SLS12_019RPT_VUE'"
+          :progname="'SLS12_020RPT_VUE'"
           :progid="progid"
           :rowData="rowData"
           :reload="reload"
@@ -94,7 +128,7 @@
           :setGroupSumCustomNameField="'strStoreName'"
           :setFooterCustomColumnId="['strStoreName']"
           :setFooterCustomText="['총합계']"
-          :documentTitle="'SLS12_019RPT'"
+          :documentTitle="'SLS12_020RPT'"
           :rowStateeditable="false"
           :documentSubTitle="documentSubTitle"
           :exporttoExcel="exportExcel">
@@ -105,7 +139,12 @@
 </template>
 
 <script setup>
-import { getpayCodeList2, getSalesDetail } from "@/api/misales";
+import { getpayCodeList_020, getSalesDetail_020 } from "@/api/misales";
+import {
+  buildAffCompCombos,
+  getAffComp,
+  getCustCompany050,
+} from "@/api/micrm";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -135,12 +174,16 @@ import { insertPageLog } from "@/customFunc/customFunc";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
+import Swal from "sweetalert2";
 import { useStore } from "vuex";
+
+/** 소속사 콤보 표시 대상 결제코드 */
+const AFF_PAY_CODE = 2304;
 
 const orderPay = ref(1);
 const setFooterColID = ref(["lngCount", "lngPreAmt", "lngAmt", "lngChange"]);
@@ -182,18 +225,168 @@ const store = useStore();
 const causeList = ref([]);
 const mergeMask = ref();
 
+const strSaleCompCode = ref("");
+const strSaleCompName = ref("");
+const affiliateCompList = ref([]);
+const affiliateCompCode = ref("");
+const affiliateCompLocked = ref(false);
+const affiliateCompLoading = ref(true);
+/** getAffComp 실패 시 — 결제코드 2304일 때만 조회·엑셀 제한 */
+const affCompAccessDenied = ref(true);
+/** 로드 성공 시 기본 선택값 (콤보 초기화 후 복원용) */
+const affiliateCompDefaultCode = ref("");
+
+const isAffPayCode = computed(
+  () => Number(selectedCode.value?.lngCode) === AFF_PAY_CODE
+);
+const searchActionsDisabled = computed(
+  () => isAffPayCode.value && affCompAccessDenied.value
+);
+
 const sls12ControlBorder = "#cbd5e1";
 const sls12ColGutter = "1.5rem";
 const sls12RowGap = "0.875rem";
 const sls12LabelCol = "5.5rem";
+/** 기간 첫 일자 콤보(w-36)와 동일 */
+const sls12CtrlW = "9rem";
+
+const resetAffCompCombos = () => {
+  strSaleCompCode.value = "";
+  strSaleCompName.value = "";
+  affiliateCompList.value = [];
+  affiliateCompCode.value = "";
+  affiliateCompLocked.value = false;
+  affiliateCompDefaultCode.value = "";
+};
+
+/** 결제코드가 2304가 아니면 소속사를 「전체」(0)로 초기화 */
+const clearAffiliateSelection = () => {
+  affiliateCompCode.value = "0";
+};
+
+const restoreAffiliateSelection = () => {
+  if (affiliateCompList.value.length === 0) {
+    affiliateCompCode.value = "0";
+    return;
+  }
+  affiliateCompCode.value =
+    affiliateCompDefaultCode.value || affiliateCompList.value[0].value;
+};
+
+const onPayCodeChange = (code) => {
+  if (Number(code?.lngCode) === AFF_PAY_CODE) {
+    restoreAffiliateSelection();
+  } else {
+    clearAffiliateSelection();
+  }
+  initGrid();
+};
+
+const loadAffComp = async () => {
+  if (!strSaleCompCode.value || strSaleCompCode.value === "0") {
+    affCompAccessDenied.value = true;
+    resetAffCompCombos();
+    return;
+  }
+  affCompAccessDenied.value = true;
+  try {
+    const res = await getAffComp(
+      strSaleCompCode.value,
+      store.state.userData.lngStoreGroup,
+      store.state.userData.lngSequence
+    );
+    if (res.data?.RESULT_CD !== "00") {
+      resetAffCompCombos();
+      affCompAccessDenied.value = true;
+      Swal.fire({
+        title: "경고",
+        text:
+          res.data?.RESULT_MSG ||
+          "소속사 목록 조회에 실패했습니다. 피앤시월드에 문의하세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+    affCompAccessDenied.value = false;
+    const combo = buildAffCompCombos(res.data?.List ?? []);
+    affiliateCompLocked.value = combo.singleLocked;
+    affiliateCompList.value = combo.topOptions;
+    affiliateCompDefaultCode.value = combo.topValue;
+    // 결제코드 2304일 때만 기본값 유지, 아니면 「전체」(0)
+    affiliateCompCode.value = isAffPayCode.value ? combo.topValue : "0";
+  } catch (error) {
+    affCompAccessDenied.value = true;
+    resetAffCompCombos();
+  }
+};
+
+/** ACT09_003RPT와 동일 — 로그인 매장그룹·포지션으로 고객사 조회 후 소속사 로드 */
+const loadCustCompanyAndAffComp = async () => {
+  affiliateCompLoading.value = true;
+  affCompAccessDenied.value = true;
+  resetAffCompCombos();
+  try {
+    const res = await getCustCompany050(
+      store.state.userData.lngStoreGroup,
+      store.state.userData.lngPosition
+    );
+    const list = res.data?.List ?? [];
+    if (list.length === 0) {
+      return;
+    }
+    const comp = list[0];
+    strSaleCompCode.value = comp.strSaleCompCode ?? "";
+    strSaleCompName.value = comp.strSaleCompName ?? "";
+    if (strSaleCompCode.value) {
+      await loadAffComp();
+    }
+  } catch (error) {
+    affCompAccessDenied.value = true;
+    resetAffCompCombos();
+  } finally {
+    affiliateCompLoading.value = false;
+  }
+};
+
+const getAffCompCdParam = () => {
+  // 결제코드 2304가 아니면 소속사 전체(0)
+  if (!isAffPayCode.value) {
+    return "0";
+  }
+  const code = affiliateCompCode.value;
+  if (!code || code === "0" || code === "") {
+    return "0";
+  }
+  return String(code);
+};
+
+const getAffiliateExcelLabel = () => {
+  const affCode = affiliateCompCode.value;
+  if (!affCode || affCode === "0" || affiliateCompList.value.length === 0) {
+    return "전체";
+  }
+  const aff = affiliateCompList.value.find((i) => i.value === affCode);
+  return aff?.label ?? "전체";
+};
+
+const onAffiliateCompChange = () => {
+  initGrid();
+};
 
 /**
  * 결제코드 콤보 로드 (매장코드 기준)
+ * SLS12_020RPT.asmx 미배포 시에도 화면이 멈추지 않도록 실패를 삼킨다.
  */
 const loadPayCodeList = async (storeCd) => {
-  const userGroup = store.state.storeGroup[0].lngStoreGroup;
-  const res = await getpayCodeList2(userGroup, storeCd ?? 0);
-  codeList.value = res.data.List ?? [];
+  try {
+    const userGroup = store.state.storeGroup[0].lngStoreGroup;
+    const res = await getpayCodeList_020(userGroup, storeCd ?? 0);
+    codeList.value = res.data.List ?? [];
+  } catch (error) {
+    codeList.value = [];
+    console.error("SLS12_020RPT getpayCodeList 오류:", error);
+  }
   selectedCode.value = null;
 };
 
@@ -204,8 +397,11 @@ const loadPayCodeList = async (storeCd) => {
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
-  // 로그인 계정 lngPosition 기준으로 결제코드 로드
-  await loadPayCodeList(store.state.userData.lngPosition);
+  // 결제코드(SLS12_020 asmx)와 소속사(CRM01_050)는 독립 — 020 미배포 시에도 소속사 로드
+  await Promise.all([
+    loadPayCodeList(store.state.userData.lngPosition),
+    loadCustCompanyAndAffComp(),
+  ]);
 });
 
 const loginedstrLang = store.state.userData.lngLanguage;
@@ -214,6 +410,15 @@ const loginedstrLang = store.state.userData.lngLanguage;
  */
 
 const searchButton = async () => {
+  if (searchActionsDisabled.value) {
+    Swal.fire({
+      title: "경고",
+      text: "소속사 정보를 조회할 수 없어 조회가 제한됩니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   store.state.loading = true;
   try {
     initGrid();
@@ -226,7 +431,7 @@ const searchButton = async () => {
 
     reload.value = !reload.value;
 
-    const res = await getSalesDetail(
+    const res = await getSalesDetail_020(
       selectedGroup.value,
       selectedStoreAttrs.value,
       selectedStoreTeam.value,
@@ -234,7 +439,8 @@ const searchButton = async () => {
       selectedStores.value,
       selectedstartDate.value,
       selectedendDate.value,
-      code
+      code,
+      getAffCompCdParam()
     );
     //comsole.log(res);
     rowData.value = res.data.List;
@@ -312,6 +518,15 @@ const exportExcel = ref(false);
  */
 
 const excelButton = () => {
+  if (searchActionsDisabled.value) {
+    Swal.fire({
+      title: "경고",
+      text: "소속사 정보를 조회할 수 없어 엑셀 내려받기가 제한됩니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   let codestr = "결제코드 :";
   if (selectedCode.value == null || selectedCode.value == undefined) {
     codestr += "전체";
@@ -320,7 +535,12 @@ const excelButton = () => {
   }
 
   documentSubTitle.value =
-    selectedExcelDate.value + "\n" + selectedExcelStore.value + "\n" + codestr;
+    selectedExcelDate.value +
+    "\n" +
+    selectedExcelStore.value +
+    "\n" +
+    codestr +
+    (isAffPayCode.value ? "\n소속사 : " + getAffiliateExcelLabel() : "");
   //comsole.log(documentSubTitle.value);
   exportExcel.value = !exportExcel.value;
 };
@@ -492,12 +712,47 @@ const changeInit = (e) => {
   background: #fff;
 }
 
-/* 결제코드 — 이전 크기 */
-.sls12-pay-slot {
-  flex: 0 1 18rem;
-  width: 18rem;
-  max-width: 18rem;
+/* 기간 첫 일자 · 결제코드 · 소속사 동일 폭 */
+.sls12-ctrl-slot {
+  box-sizing: border-box;
+  flex: 0 0 var(--sls12-ctrl-w, 9rem);
+  width: var(--sls12-ctrl-w, 9rem);
   min-width: 0;
+  max-width: var(--sls12-ctrl-w, 9rem);
+}
+
+.sls12-row--pay-aff {
+  flex-wrap: nowrap;
+}
+
+.sls12-row-spacer {
+  flex: 1 1 auto;
+  min-width: 1.5rem;
+}
+
+.sls12-sg-select {
+  box-sizing: border-box;
+  width: 100%;
+  height: 2rem;
+  min-height: 2rem;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  color: rgb(55 65 81);
+  border: 1px solid var(--sls12-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+  background: #fff;
+}
+
+.sls12-sg-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+
+.sls12-sg-select:disabled {
+  cursor: not-allowed;
+  background: #f3f4f6;
+  color: #6b7280;
 }
 
 .sls12-search-panel :deep(.sls12-vselect) {
@@ -658,9 +913,15 @@ const changeInit = (e) => {
     width: 100%;
   }
 
-  .sls12-pay-slot {
-    width: 100%;
-    max-width: 18rem;
+  .sls12-row--pay-aff {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .sls12-row-spacer {
+    flex-basis: 100%;
+    min-width: 0;
+    height: 0;
   }
 
   .sls12-right-store {

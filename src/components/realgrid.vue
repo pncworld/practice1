@@ -607,6 +607,11 @@ const props = defineProps({
     type: Array,
     default: [],
   },
+  /** opt-in: 비어있지 않으면 그룹 첫 행의 해당 필드값 + setGroupSumCustomText(접미사)로 표시. 예) 홍길동 + 님 소계 */
+  setGroupSumCustomNameField: {
+    type: String,
+    default: "",
+  },
   setGroupCustomLevel: {
     //  그룹 푸터에서 임의로 설정할 텍스트 컬럼의 레벨 설정
     type: String,
@@ -2683,9 +2688,13 @@ const runFuncshowGrid = async () => {
     //       return ret;
     //     },
     groupFooter: {
-      text: props.setGroupSumCustomText[
-        props.setGroupSumCustomColumnId.indexOf(item.strColID)
-      ],
+      text: (() => {
+        const customIdx = props.setGroupSumCustomColumnId.indexOf(item.strColID);
+        if (customIdx < 0) return undefined;
+        // nameField opt-in 시 static text는 비우고 valueCallback으로 동적 표기
+        if (props.setGroupSumCustomNameField) return "";
+        return props.setGroupSumCustomText[customIdx];
+      })(),
       styleName: (() => {
         // 기존 정렬 설정
         const align = item.strAlign == "center"
@@ -2707,6 +2716,24 @@ const runFuncshowGrid = async () => {
         ? ""
         : resolveGridNumberFormat(item),
       valueCallback: function (grid, column, groupFooterIndex, group, value) {
+        // opt-in: 사원명 + 접미사 (예: 홍길동님 소계)
+        const customIdx = props.setGroupSumCustomColumnId.indexOf(item.strColID);
+        if (customIdx >= 0 && props.setGroupSumCustomNameField) {
+          const suffix = props.setGroupSumCustomText[customIdx] || "";
+          try {
+            const dataRow =
+              group && group.firstItem ? group.firstItem.dataRow : null;
+            if (dataRow == null || dataRow < 0) return suffix;
+            const name = dataProvider.getValue(
+              dataRow,
+              props.setGroupSumCustomNameField
+            );
+            return (name == null ? "" : String(name)) + suffix;
+          } catch (e) {
+            return suffix;
+          }
+        }
+
         const regex =
           /(sum|avg|max|min|count)\(\s*([^)]+?)\s*\)|([+\-*/]|\b\d+\b)/gi;
         let tokens = [];

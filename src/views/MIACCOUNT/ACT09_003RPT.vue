@@ -9,10 +9,16 @@
     <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="searchButton" class="button search md:w-auto w-14">
+        <button
+          @click="searchButton"
+          class="button search md:w-auto w-14"
+          :disabled="affCompAccessDenied">
           조회
         </button>
-        <button @click="excelButton" class="button save w-auto excel">
+        <button
+          @click="excelButton"
+          class="button save w-auto excel"
+          :disabled="affCompAccessDenied">
           엑셀
         </button>
       </div>
@@ -228,6 +234,7 @@ import { onMounted, onUnmounted, ref } from "vue";
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
+import Swal from "sweetalert2";
 import { useStore } from "vuex";
 
 const orderPay = ref(1);
@@ -330,6 +337,8 @@ const affiliateCompList = ref([]);
 const affiliateCompCode = ref("");
 const affiliateCompLocked = ref(false);
 const affiliateCompLoading = ref(true);
+/** getAffComp 실패 시 조회·엑셀 제한 (CRM01_050INS와 동일) */
+const affCompAccessDenied = ref(true);
 const pickStoreRef = ref(null);
 
 const getPickerStoreCode = () => {
@@ -350,9 +359,11 @@ const resetAffCompCombos = () => {
 
 const loadAffComp = async () => {
   if (!strSaleCompCode.value || strSaleCompCode.value === "0") {
+    affCompAccessDenied.value = true;
     resetAffCompCombos();
     return;
   }
+  affCompAccessDenied.value = true;
   try {
     const res = await getAffComp(
       strSaleCompCode.value,
@@ -361,13 +372,24 @@ const loadAffComp = async () => {
     );
     if (res.data?.RESULT_CD !== "00") {
       resetAffCompCombos();
+      affCompAccessDenied.value = true;
+      Swal.fire({
+        title: "경고",
+        text:
+          res.data?.RESULT_MSG ||
+          "소속사 목록 조회에 실패했습니다. 피앤시월드에 문의하세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
       return;
     }
+    affCompAccessDenied.value = false;
     const combo = buildAffCompCombos(res.data?.List ?? []);
     affiliateCompLocked.value = combo.singleLocked;
     affiliateCompList.value = combo.topOptions;
     affiliateCompCode.value = combo.topValue;
   } catch (error) {
+    affCompAccessDenied.value = true;
     resetAffCompCombos();
   }
 };
@@ -375,6 +397,7 @@ const loadAffComp = async () => {
 /** CRM01_050INS(PickCustCompany setAPI=2)와 동일 — 로그인 매장그룹·포지션으로 고객사 조회 후 소속사 로드 */
 const loadCustCompanyAndAffComp = async () => {
   affiliateCompLoading.value = true;
+  affCompAccessDenied.value = true;
   resetAffCompCombos();
   try {
     const res = await getCustCompany050(
@@ -392,6 +415,7 @@ const loadCustCompanyAndAffComp = async () => {
       await loadAffComp();
     }
   } catch (error) {
+    affCompAccessDenied.value = true;
     resetAffCompCombos();
   } finally {
     affiliateCompLoading.value = false;
@@ -457,6 +481,15 @@ const loginedstrLang = store.state.userData.lngLanguage;
  */
 
 const searchButton = async () => {
+  if (affCompAccessDenied.value) {
+    Swal.fire({
+      title: "경고",
+      text: "소속사 정보를 조회할 수 없어 조회가 제한됩니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   store.state.loading = true;
   try {
     initGrid();
@@ -541,6 +574,15 @@ const exportExcel = ref(false);
  */
 
 const excelButton = () => {
+  if (affCompAccessDenied.value) {
+    Swal.fire({
+      title: "경고",
+      text: "소속사 정보를 조회할 수 없어 엑셀 내려받기가 제한됩니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   let condition = "거래 구분 :";
 
   if (tranType.value == 1) {

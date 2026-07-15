@@ -117,6 +117,12 @@ export const getpayCodeList2 = (groupCd, storeCd) => {
     STORE_CD: storeCd,
   });
 };
+export const getpayCodeList_020 = (groupCd, storeCd) => {
+  return api2.post("/MISALES/SLS12_020RPT.asmx/getpayCodeList", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
 export const getCustInfo = (groupCd, storeCd, seqId) => {
   return api2.post("/MISALES/SLS02_011RPT.asmx/getCustInfo", {
     GROUP_CD: groupCd,
@@ -944,6 +950,30 @@ export const getSalesDetail = (
     START_DATE: startdate,
     END_DATE: enddate,
     CONDITION: cond2,
+  });
+};
+export const getSalesDetail_020 = (
+  groupCd,
+  storeattr,
+  storeteam,
+  storesupervisor,
+  storeCd,
+  startdate,
+  enddate,
+  cond2,
+  affCompCd
+) => {
+  return api2.post("/MISALES/SLS12_020RPT.asmx/getSalesDetail", {
+    GROUP_CD: groupCd,
+    STORE_ATTR: storeattr,
+    STORE_TEAM: storeteam,
+    STORE_SUPERVISOR: storesupervisor,
+    STORE_CD: storeCd,
+    START_DATE: startdate,
+    END_DATE: enddate,
+    CONDITION: cond2,
+    AFF_COMP_CD:
+      affCompCd == null || affCompCd === "" ? "0" : String(affCompCd),
   });
 };
 export const getVATInfo = (groupCd, storeCd, startdate, enddate) => {
