@@ -3256,7 +3256,15 @@ const runFuncshowGrid = async () => {
         : "",
     },
     visible: item.intHdWidth !== 0,
-    sortable: true,
+    sortable: !(
+      item.strColID.includes("checkbox") ||
+      String(item.strDisplay ?? "")
+        .toLowerCase()
+        .includes("checkbox") ||
+      String(item.strDisplay ?? "").toLowerCase() === "check" ||
+      (item.strColID.includes("lngSupplierID") &&
+        props.checkBarInactive == "lngSupplierID")
+    ),
     renderer: {
       type:
         item.strColID == "add" ||
@@ -3729,6 +3737,17 @@ const runFuncshowGrid = async () => {
   }
 
   gridView.setColumns(columns);
+  // 체크(렌더러) 컬럼은 정렬 비활성 — 헤더 클릭 시 재정렬 착시 방지
+  try {
+    const cols = gridView.getColumns?.() ?? [];
+    for (const col of cols) {
+      if (col?.renderer?.type === "check") {
+        col.sortable = false;
+      }
+    }
+  } catch (_) {
+    void 0;
+  }
   rgReapplyLabelingDropdownEditors(gridView);
   rgBindLabelingDropdownOnShowEditor(gridView);
   if (props.setNumberformatColumn != "") {

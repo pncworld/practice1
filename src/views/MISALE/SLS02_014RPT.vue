@@ -1,13 +1,12 @@
 /*--############################################################################
-# Filename : SLS02_014RPT.vue                                                  
-# Description : 매출관리 > 매장별 매출 현황 > 지역/업종별 매출 현황.           
-# Date :2025-05-14                                                             
-# Author : 권맑음                     
+# Filename : SLS02_014RPT.vue
+# Description : 매출관리 > 매장별 매출 현황 > 지역/업종별 매출 현황.
+# Date :2025-05-14
+# Author : 권맑음
 ################################################################################*/
 <template>
-  <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
@@ -18,87 +17,106 @@
         </button>
       </div>
     </div>
+
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
-      <div class="grid grid-cols-1 grid-rows-2">
-        <Datepicker2
-          @endDate="endDate"
-          @startDate="startDate"
-          :closePopUp="closePopUp"
-          class=""
-          ref="datepicker"
-          @excelDate="excelDate"></Datepicker2>
-        <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-12">
-          조회조건
-          <div>
-            <label for="daily" class="font-normal"
-              ><input
-                type="checkbox"
-                id="daily"
-                class="ml-5"
-                @change="seeDaily" />일자별</label
-            >
+      class="sls0214-search-panel z-10 mt-3 w-full min-h-0 shrink-0 overflow-visible rounded-lg bg-gray-200"
+      :style="{
+        '--sls0214-panel-pad-x': '2rem',
+        '--sls0214-control-border': sls0214ControlBorder,
+        '--sls0214-col-gutter': sls0214ColGutter,
+        '--sls0214-row-gap': sls0214RowGap,
+        '--sls0214-label-col': sls0214LabelCol,
+        '--psp-label-w': sls0214LabelCol,
+        '--psp-radio-w': '4.75rem',
+        '--psp-col-gap': '0.5rem',
+      }">
+      <div class="sls0214-search-layout min-w-0">
+        <!-- 좌측: 매출일자 / 조회조건 -->
+        <div class="sls0214-left-stack min-w-0">
+          <div class="sls0214-row">
+            <span class="sls0214-lbl shrink-0">매출일자</span>
+            <div class="sls0214-date-slot min-w-0 flex-1">
+              <Datepicker2
+                ref="datepicker"
+                omit-main-label
+                filter-bar-align
+                :mainName="'매출일자'"
+                :closePopUp="closePopUp"
+                @endDate="endDate"
+                @startDate="startDate"
+                @excelDate="excelDate" />
+            </div>
           </div>
-          <div>
-            <label for="store" class="font-normal"
-              ><input
-                type="checkbox"
-                id="store"
-                class="ml-5"
-                @change="seeStore" />매장별</label
-            >
-          </div>
-          <!-- <div>
-            <label for="unite" class="font-thin"><input type="checkbox" id="unite" class="ml-5 "
-                @change="seeUnite">셀병합</label>
-          </div> -->
-          <div>
-            <label for="sum" class="font-normal"
-              ><input
-                type="checkbox"
-                id="sum"
-                class="ml-5"
-                @change="seeSum" />합계</label
-            >
+
+          <div class="sls0214-row">
+            <span class="sls0214-lbl shrink-0">조회조건</span>
+            <div class="sls0214-checks flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
+              <label class="sls0214-check-label" for="daily">
+                <input
+                  id="daily"
+                  type="checkbox"
+                  class="sls0214-check"
+                  @change="seeDaily" />
+                일자별
+              </label>
+              <label class="sls0214-check-label" for="store">
+                <input
+                  id="store"
+                  type="checkbox"
+                  class="sls0214-check"
+                  @change="seeStore" />
+                매장별
+              </label>
+              <label class="sls0214-check-label" for="sum">
+                <input
+                  id="sum"
+                  type="checkbox"
+                  class="sls0214-check"
+                  @change="seeSum" />
+                합계
+              </label>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="">
-        <PickStorePlural
-          @lngStoreCodes="lngStoreCodes"
-          @lngStoreGroup="lngStoreGroup"
-          @lngStoreAttrs="lngStoreAttrs"
-          @excelStore="excelStore"></PickStorePlural>
+
+        <!-- 우측: 매장명 -->
+        <div class="sls0214-right-store min-w-0 overflow-visible">
+          <PickStorePlural
+            fluid-width
+            @lngStoreCodes="lngStoreCodes"
+            @lngStoreGroup="lngStoreGroup"
+            @lngStoreAttrs="lngStoreAttrs"
+            @excelStore="excelStore" />
+        </div>
       </div>
     </div>
-    <!-- 조회조건 -->
-    <!-- 그리드 영역 -->
-    <div class="w-full h-[85%]">
-      <Realgrid
-        :progname="'SLS02_014RPT_VUE'"
-        :progid="progid"
-        :rowData="rowData"
-        :reload="reload"
-        :setFooter="true"
-        :setGroupFooter="setGroupFooter"
-        :setFooterExpressions="setFooterExpressions"
-        :setFooterColID="setFooterColID"
-        :setGroupColumnId="'strStore'"
-        :setGroupSumCustomText="['소계']"
-        :setGroupSumCustomColumnId="setGroupSumCustomColumnId"
-        :setGroupSumCustomLevel="3"
-        :setGroupSummaryCenterIds="setGroupSummaryCenterIds"
-        :setGroupFooterExpressions="setGroupFooterExpressions"
-        :setGroupFooterColID="setGroupFooterColID"
-        :documentTitle="'SLS02_014RPT'"
-        :rowStateeditable="false"
-        :documentSubTitle="documentSubTitle"
-        :exporttoExcel="exportExcel">
-      </Realgrid>
+
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col">
+      <div class="relative min-h-0 w-full flex-1">
+        <Realgrid
+          :progname="'SLS02_014RPT_VUE'"
+          :progid="progid"
+          :rowData="rowData"
+          :reload="reload"
+          :setFooter="true"
+          :setGroupFooter="setGroupFooter"
+          :setFooterExpressions="setFooterExpressions"
+          :setFooterColID="setFooterColID"
+          :setGroupColumnId="'strStore'"
+          :setGroupSumCustomText="['소계']"
+          :setGroupSumCustomColumnId="setGroupSumCustomColumnId"
+          :setGroupSumCustomLevel="3"
+          :setGroupSummaryCenterIds="setGroupSummaryCenterIds"
+          :setGroupFooterExpressions="setGroupFooterExpressions"
+          :setGroupFooterColID="setGroupFooterColID"
+          :documentTitle="'SLS02_014RPT'"
+          :rowStateeditable="false"
+          :documentSubTitle="documentSubTitle"
+          :exporttoExcel="exportExcel">
+        </Realgrid>
+      </div>
     </div>
   </div>
-  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
@@ -140,6 +158,12 @@ import { onMounted, ref } from "vue";
  */
 
 import { useStore } from "vuex";
+
+/** 조회 AREA — SLS04 / SLS02_031 wire 패턴 */
+const sls0214ControlBorder = "#cbd5e1";
+const sls0214ColGutter = "1.25rem";
+const sls0214RowGap = "0.875rem";
+const sls0214LabelCol = "5.5rem";
 
 /**
  * 	화면 Load시 실행 스크립트
@@ -464,4 +488,183 @@ const excelStore = (e) => {
 };
 </script>
 
-<style></style>
+<style scoped>
+.sls0214-search-panel {
+  box-sizing: border-box;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: var(--sls0214-panel-pad-x, 2rem);
+  padding-right: var(--sls0214-panel-pad-x, 2rem);
+}
+
+@media (min-width: 768px) {
+  .sls0214-search-panel {
+    --sls0214-panel-pad-x: 3rem;
+  }
+}
+
+.sls0214-search-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  column-gap: var(--sls0214-col-gutter, 1.25rem);
+  align-items: start;
+  min-width: 0;
+}
+
+.sls0214-left-stack {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sls0214-row-gap, 0.875rem);
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.sls0214-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: 2rem;
+}
+
+.sls0214-lbl {
+  box-sizing: border-box;
+  flex: 0 0 var(--sls0214-label-col, 5.5rem);
+  width: var(--sls0214-label-col, 5.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sls0214-checks {
+  min-width: 0;
+}
+
+.sls0214-check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9375rem;
+  line-height: 1.25;
+  font-weight: 400;
+  color: #1f2937;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sls0214-check {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.sls0214-date-slot {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sls0214-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin: 0 !important;
+  width: auto !important;
+  max-width: 100%;
+}
+
+.sls0214-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  height: 2rem;
+  min-height: 2rem;
+  border: 1px solid var(--sls0214-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+  background: #fff;
+}
+
+.sls0214-date-slot :deep(div.inline-flex.h-8),
+.sls0214-date-slot :deep(button) {
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+.sls0214-right-store {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+.sls0214-right-store:has(.psp-popup),
+.sls0214-right-store:has(.psp-store-hover-list) {
+  z-index: 50;
+}
+
+.sls0214-right-store :deep(.psp-root) {
+  grid-template-columns:
+    var(--psp-label-w, 5.5rem)
+    minmax(var(--psp-radio-w, 4.75rem), auto)
+    minmax(7rem, 1.05fr)
+    minmax(9.5rem, 1.3fr)
+    minmax(9.5rem, 1.35fr);
+  column-gap: var(--psp-col-gap, 0.5rem);
+  row-gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.sls0214-right-store :deep(.psp-label) {
+  width: var(--psp-label-w, 5.5rem);
+  justify-content: center;
+  padding-inline-start: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* 매장 콤보/트리거 — 일자(h-8)와 동일 높이 */
+.sls0214-right-store :deep(.psp-select),
+.sls0214-right-store :deep(.psp-store-trigger),
+.sls0214-right-store :deep(.psp-collapse-btn) {
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+.sls0214-right-store :deep(.psp-collapse-btn) {
+  width: 2rem !important;
+}
+
+.sls0214-right-store :deep(.psp-popup) {
+  z-index: 60;
+  right: 0;
+  left: auto;
+  width: min(42rem, 92vw);
+  min-width: 28rem;
+  max-width: min(42rem, 92vw);
+}
+
+@media (max-width: 1280px) {
+  .sls0214-search-layout {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--sls0214-row-gap, 0.875rem);
+  }
+
+  .sls0214-right-store :deep(.psp-popup) {
+    left: 0;
+    right: auto;
+  }
+}
+</style>

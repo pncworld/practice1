@@ -49,9 +49,9 @@
             </div>
           </div>
 
-          <div class="sls04-row">
+          <div class="sls04-row sls04-row--cond">
             <span class="sls04-lbl shrink-0">조건</span>
-            <div class="sls04-checks flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
+            <div class="sls04-cond-inline min-w-0 flex-1">
               <label class="sls04-check-label" for="store">
                 <input id="store" type="checkbox" class="sls04-check" @click="setCond" />
                 매장별
@@ -60,14 +60,20 @@
                 <input id="date" type="checkbox" class="sls04-check" @click="setCond" />
                 일자별
               </label>
-              <label class="sls04-check-label" for="unite">
-                <input id="unite" type="checkbox" class="sls04-check" @click="setCellUnite" />
-                셀병합
-              </label>
               <label class="sls04-check-label" for="group">
                 <input id="group" type="checkbox" class="sls04-check" @click="changeGridMenus" />
                 메뉴그룹표시
               </label>
+              <div class="sls04-guest-inline">
+                <span class="sls04-guest-lbl shrink-0">객층구분</span>
+                <v-select
+                  v-model="selectedGuest"
+                  :options="GuestType"
+                  placeholder="전체"
+                  label="strName"
+                  class="custom-select2 sls04-vselect sls04-guest-select"
+                  clearable="true" />
+              </div>
             </div>
           </div>
 
@@ -101,12 +107,12 @@
                 placeholder="메뉴명"
                 @click.stop
                 @mousedown.stop
-                class="sls04-sg-input sls04-menu-item relative z-10 h-8 min-h-8 rounded-md border border-solid bg-white px-2 text-sm text-gray-700" />
+                class="sls04-sg-input sls04-menu-item relative z-[1] h-8 min-h-8 rounded-md border border-solid bg-white px-2 text-sm text-gray-700" />
             </div>
           </div>
         </div>
 
-        <!-- 우측: 매장명 + 객층구분(우측 정렬) -->
+        <!-- 우측: 매장명 -->
         <div class="sls04-right-store min-w-0 overflow-visible">
           <PickStorePlural
             fluid-width
@@ -118,16 +124,6 @@
             @excelStore="excelStore"
             :setFooterColID="setFooterColID"
             :setFooterExpressions="setFooterExpressions" />
-          <div class="sls04-guest-row">
-            <span class="sls04-lbl shrink-0">객층구분</span>
-            <v-select
-              v-model="selectedGuest"
-              :options="GuestType"
-              placeholder="전체"
-              label="strName"
-              class="custom-select2 sls04-vselect sls04-guest-select"
-              clearable="true" />
-          </div>
         </div>
       </div>
     </div>
@@ -143,7 +139,7 @@
           :exporttoExcel="exportExcel"
           :documentSubTitle="documentSubTitle"
           :documentTitle="'SLS04_004RPT'"
-          :setRowGroupSpan2="setRowGroupSpan2"
+          :setRowGroupSpan2="''"
           :mergeColumns2="true"
           :rowStateeditable="false"
           :mergeColumnGroupSubList2="[
@@ -246,7 +242,6 @@ import { onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 const setGroupFooter = ref(false);
-const mergeColumns2 = ref(false);
 
 const progid = ref(1);
 const reload = ref(false);
@@ -287,7 +282,6 @@ const startDate = (e) => {
 const endDate = (e) => {
   selectedendDate.value = e;
 };
-const setRowGroupSpan = ref("");
 const temphideColumns = ref(["strStore", "dtmDate"]);
 const checkedDate = ref(0);
 const checkedStore = ref(0);
@@ -298,9 +292,18 @@ const setCond = (e) => {
       temphideColumns.value = temphideColumns.value.filter(
         (item) => item != "strStore"
       );
+      // 일자별과 동일 — hideColumnsId도 즉시 반영 (조회 전에도 매장명 표시)
+      hideColumnsId.value = hideColumnsId.value.filter(
+        (item) => item != "strStore"
+      );
     } else {
       checkedStore.value = 0;
-      temphideColumns.value.push("strStore");
+      if (!temphideColumns.value.includes("strStore")) {
+        temphideColumns.value.push("strStore");
+      }
+      if (!hideColumnsId.value.includes("strStore")) {
+        hideColumnsId.value.push("strStore");
+      }
     }
   } else if (e.target.id == "date") {
     if (e.target.checked) {
@@ -313,9 +316,15 @@ const setCond = (e) => {
       );
     } else {
       checkedDate.value = 0;
-      temphideColumns.value.push("dtmDate");
-      hideColumnsId.value.push("dtmDate");
-      hideColumnsId.value.push("lngPrice");
+      if (!temphideColumns.value.includes("dtmDate")) {
+        temphideColumns.value.push("dtmDate");
+      }
+      if (!hideColumnsId.value.includes("dtmDate")) {
+        hideColumnsId.value.push("dtmDate");
+      }
+      if (!hideColumnsId.value.includes("lngPrice")) {
+        hideColumnsId.value.push("lngPrice");
+      }
     }
   }
 };
@@ -331,18 +340,26 @@ const searchButton = async () => {
   try {
     initGrid();
 
+    // 매장별·일자별 — 중복 push 없이 hideColumnsId 동기화
     if (temphideColumns.value.includes("strStore")) {
-      hideColumnsId.value.push("strStore");
-    } else if (!temphideColumns.value.includes("strStore")) {
+      if (!hideColumnsId.value.includes("strStore")) {
+        hideColumnsId.value.push("strStore");
+      }
+    } else {
       hideColumnsId.value = hideColumnsId.value.filter(
         (item) => item != "strStore"
       );
     }
     if (temphideColumns.value.includes("dtmDate")) {
-      hideColumnsId.value.push("dtmDate");
-    } else if (!temphideColumns.value.includes("dtmDate")) {
+      if (!hideColumnsId.value.includes("dtmDate")) {
+        hideColumnsId.value.push("dtmDate");
+      }
+      if (!hideColumnsId.value.includes("lngPrice")) {
+        hideColumnsId.value.push("lngPrice");
+      }
+    } else {
       hideColumnsId.value = hideColumnsId.value.filter(
-        (item) => item != "dtmDate"
+        (item) => item != "dtmDate" && item != "lngPrice"
       );
     }
 
@@ -474,7 +491,6 @@ const searchCondition = ref([
   "증정구분",
   "단가제외",
   "합계",
-  "셀병합",
 ]);
 const dayCondition = ref(["일", "월", "화", "수", "목", "금", "토"]);
 const ConditionSet = new Set([]);
@@ -661,47 +677,21 @@ const hideColumnsId = ref([
 const checkedDays = new Set([1, 2, 3, 4, 5, 6, 7]);
 
 const changeGridMenus = (e) => {
-  if (e.target.checked) {
-    if (
-      hideColumnsId.value.includes("strStore") &&
-      hideColumnsId.value.includes("dtmDate")
-    ) {
-      hideColumnsId.value = ["strStore", "dtmDate"];
-    } else if (hideColumnsId.value.includes("strStore")) {
-      hideColumnsId.value = ["strStore"];
-    } else if (hideColumnsId.value.includes("dtmDate")) {
-      hideColumnsId.value = ["dtmDate"];
-    } else {
-      hideColumnsId.value = [];
-    }
-  } else {
-    if (
-      hideColumnsId.value.includes("strStore") &&
-      hideColumnsId.value.includes("dtmDate")
-    ) {
-      hideColumnsId.value = ["strStore", "dtmDate", "strMajor", "strSub"];
-    } else if (hideColumnsId.value.includes("strStore")) {
-      hideColumnsId.value = ["strStore", "strMajor", "strSub"];
-    } else if (hideColumnsId.value.includes("dtmDate")) {
-      hideColumnsId.value = ["dtmDate", "strMajor", "strSub"];
-    } else {
-      hideColumnsId.value = ["strMajor", "strSub"];
-    }
-  }
-  reload.value = !reload.value;
-};
+  // 매장별/일자별은 checked* 기준 (hideColumnsId 잔존값에 의존하지 않음)
+  const hideStore = checkedStore.value != 1;
+  const hideDate = checkedDate.value != 1;
+  const next = [];
 
-const setRowGroupSpan2 = ref("");
-const setCellUnite = (e) => {
-  if (e.target.checked) {
-    if (checkedStore.value == 1) {
-      setRowGroupSpan2.value = "strStore,dtmDate";
-    } else {
-      setRowGroupSpan2.value = "dtmDate";
-    }
-  } else {
-    setRowGroupSpan2.value = "";
+  if (hideStore) next.push("strStore");
+  if (hideDate) {
+    next.push("dtmDate");
+    next.push("lngPrice");
   }
+  if (!e.target.checked) {
+    next.push("strMajor", "strSub");
+  }
+
+  hideColumnsId.value = next;
   reload.value = !reload.value;
 };
 
@@ -727,7 +717,6 @@ const sls04LabelCol = "5.5rem";
 }
 
 .sls04-search-layout {
-  /* 메뉴구분 1.5배 폭 반영 — 좌측 비중 확대 */
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
   column-gap: var(--sls04-col-gutter, 0.5rem);
@@ -737,13 +726,14 @@ const sls04LabelCol = "5.5rem";
 
 .sls04-left-stack {
   position: relative;
-  z-index: 2;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: var(--sls04-row-gap, 0.875rem);
   min-width: 0;
   width: 100%;
   max-width: 100%;
+  overflow: visible;
 }
 
 .sls04-row {
@@ -753,6 +743,20 @@ const sls04LabelCol = "5.5rem";
   gap: 0.5rem;
   min-width: 0;
   min-height: 2rem;
+}
+
+/* 객층구분 — 메뉴구분보다 위, 매장명 라벨은 가리지 않음 */
+.sls04-row--cond {
+  position: relative;
+  z-index: 3;
+  overflow: visible;
+}
+
+.sls04-row--menu {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  overflow: hidden; /* 우측 매장명 라벨을 덮지 않도록 */
 }
 
 .sls04-lbl {
@@ -825,7 +829,7 @@ const sls04LabelCol = "5.5rem";
   min-width: 0;
   flex: 1 1 auto;
   position: relative;
-  z-index: 5;
+  z-index: 1;
 }
 
 .sls04-menu-item {
@@ -928,11 +932,13 @@ const sls04LabelCol = "5.5rem";
 
 .sls04-right-store {
   position: relative;
-  z-index: 1;
+  z-index: 2; /* 매장명 라벨이 좌측 overflow에 가려지지 않도록 */
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--sls04-row-gap, 0.875rem);
+  justify-self: stretch;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   overflow: visible;
 }
@@ -947,6 +953,21 @@ const sls04LabelCol = "5.5rem";
   z-index: 60;
 }
 
+.sls04-right-store :deep(.psp-label) {
+  width: var(--psp-label-w, 5.5rem);
+  min-width: var(--psp-label-w, 5.5rem);
+  justify-content: center;
+  justify-self: start;
+  align-self: center;
+  padding-inline-start: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+  visibility: visible;
+  opacity: 1;
+}
+
 .sls04-right-store :deep(.psp-root) {
   /* 라벨 | 직/가맹·팀/SC | 그룹 | 속성·팀/SC쌍 | 매장선택(최대) */
   grid-template-columns:
@@ -957,14 +978,9 @@ const sls04LabelCol = "5.5rem";
     minmax(13rem, 1.85fr);
   column-gap: var(--psp-col-gap, 0.5rem);
   row-gap: 0.5rem;
-}
-
-.sls04-right-store :deep(.psp-label) {
-  width: var(--psp-label-w, 5.5rem);
-  justify-content: center;
-  padding-inline-start: 0;
-  font-size: 1rem;
-  font-weight: 600;
+  width: 100%;
+  max-width: 100%;
+  justify-items: stretch;
 }
 
 /* 매장 콤보/트리거도 h-8로 통일 (공통 컴포넌트 기본 1.75rem 덮어씀) */
@@ -979,27 +995,48 @@ const sls04LabelCol = "5.5rem";
   width: 2rem !important;
 }
 
-/* 객층구분: 매장 AREA 우측 정렬 */
-.sls04-guest-row {
+/* 조건 체크 + 객층구분 — 한 줄, 메뉴그룹표시 바로 뒤 */
+.sls04-cond-inline {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
-  justify-content: flex-end;
-  gap: 0.5rem;
+  gap: 0.35rem 1rem;
   min-width: 0;
-  min-height: 2rem;
+  overflow: visible;
 }
 
-.sls04-guest-row .sls04-lbl {
+.sls04-guest-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: 1.5rem; /* 객층구분 앞 여백 2배 */
   flex: 0 0 auto;
-  width: auto;
-  justify-content: flex-end;
+  position: relative;
+  z-index: 2;
+}
+
+.sls04-guest-lbl {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  white-space: nowrap;
 }
 
 .sls04-guest-select {
-  width: 13rem;
-  max-width: 100%;
+  box-sizing: border-box;
+  width: 10rem;
+  min-width: 10rem;
+  max-width: 10rem;
   height: 2rem;
   min-height: 2rem;
+  flex: 0 0 10rem;
+}
+
+.sls04-search-panel :deep(.sls04-guest-select) {
+  width: 10rem !important;
+  min-width: 10rem !important;
+  max-width: 10rem !important;
 }
 
 @media (max-width: 1100px) {

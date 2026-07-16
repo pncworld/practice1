@@ -6,8 +6,8 @@
 ################################################################################*/
 <template>
   <!-- 조회 조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
@@ -18,121 +18,147 @@
         </button>
       </div>
     </div>
+
     <div
-      class="grid grid-cols-[1fr,10fr,10fr] grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
-      <div class="w-10 ml-12 mt-2">
-        <select
-          name=""
-          id=""
-          class="border rounded-lg h-8 text-base relative z-50"
-          v-model="selectedSearchType"
-          @change="changeSearchType">
-          <option :value="1">집계</option>
-          <option :value="2">일자별</option>
-          <option :value="3">월별</option>
-        </select>
-      </div>
-      <div class="grid grid-cols-1 grid-rows-2 justify-start items-start">
-        <div class="flex justify-start">
-          <Datepicker2
-            @endDate="endDate"
-            @startDate="startDate"
-            :closePopUp="closePopUp"
-            ref="datepicker"
-            @excelDate="excelDate"></Datepicker2>
-          <div class="mt-2 items-center flex">
-            <label for="detail" class="flex items-center"
-              ><input
-                type="checkbox"
-                id="detail"
-                @change="detailView" />상세보기</label
-            >
+      class="sls0403-search-panel z-10 mt-3 w-full min-h-0 shrink-0 overflow-visible rounded-lg bg-gray-200"
+      :style="{
+        '--sls0403-panel-pad-x': '2rem',
+        '--sls0403-control-border': sls0403ControlBorder,
+        '--sls0403-col-gutter': sls0403ColGutter,
+        '--sls0403-row-gap': sls0403RowGap,
+        '--sls0403-label-col': sls0403LabelCol,
+        '--psp-label-w': sls0403LabelCol,
+        '--psp-radio-w': '4.75rem',
+        '--psp-col-gap': '0.5rem',
+      }">
+      <div class="sls0403-search-layout min-w-0">
+        <!-- 1행: 기간 | 매장명(2~3열, 1~2행 span) -->
+        <div class="sls0403-cell sls0403-cell--period">
+          <span class="sls0403-lbl shrink-0">기간</span>
+          <div class="sls0403-date-slot min-w-0 flex-1">
+            <Datepicker2
+              ref="datepicker"
+              omit-main-label
+              filter-bar-align
+              :mainName="'기간'"
+              :closePopUp="closePopUp"
+              @endDate="endDate"
+              @startDate="startDate"
+              @excelDate="excelDate" />
           </div>
         </div>
-        <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-12">
-          메뉴구분
-          <div class="flex ml-5 space-x-3 mt-1">
+
+        <div class="sls0403-cell sls0403-cell--store min-w-0 overflow-visible">
+          <PickStorePlural
+            fluid-width
+            @lngStoreCodes="lngStoreCodes"
+            @lngStoreGroup="lngStoreGroup"
+            @lngSupervisor="lngSupervisor"
+            @lngStoreTeam="lngStoreTeam"
+            @lngStoreAttr="lngStoreAttr"
+            @excelStore="excelStore"
+            :setFooterColID="setFooterColID"
+            :setFooterExpressions="setFooterExpressions" />
+        </div>
+
+        <!-- 2행: 조회구분 -->
+        <div class="sls0403-cell sls0403-cell--type">
+          <span class="sls0403-lbl shrink-0">조회구분</span>
+          <div class="sls0403-cond-fields min-w-0">
+            <select
+              id="sls0403-search-type"
+              class="sls0403-sg-select"
+              v-model="selectedSearchType"
+              @change="changeSearchType">
+              <option :value="1">집계</option>
+              <option :value="2">일자별</option>
+              <option :value="3">월별</option>
+            </select>
+            <label class="sls0403-check-label" for="detail">
+              <input
+                id="detail"
+                type="checkbox"
+                class="sls0403-check"
+                @change="detailView" />
+              상세보기
+            </label>
+            <label class="sls0403-check-label" for="StoreName">
+              <input
+                id="StoreName"
+                type="checkbox"
+                class="sls0403-check"
+                @change="showStore" />
+              매장명표시
+            </label>
+          </div>
+        </div>
+
+        <!-- 3행: 메뉴구분 — 3열 전체 -->
+        <div class="sls0403-cell sls0403-cell--menu">
+          <span class="sls0403-lbl shrink-0">메뉴구분</span>
+          <div class="sls0403-menu-fields min-w-0">
             <v-select
               v-model="selectedMenu"
               :options="mainMenu"
               placeholder="전체"
               label="strname"
-              class="w-44 !h-8 bg-white"
+              class="custom-select2 sls0403-vselect sls0403-menu-item"
               clearable="true" />
-
             <v-select
               v-model="selectedsubMenu"
               :options="menuType"
               placeholder="전체"
               label="strname"
-              class="w-44 !h-8 bg-white"
+              class="custom-select2 sls0403-vselect sls0403-menu-item"
               clearable="true" />
-
             <v-select
               v-model="selectedSubSubMenu"
               :options="Menus"
               placeholder="전체"
               label="strname"
-              class="w-44 !h-8 bg-white"
+              class="custom-select2 sls0403-vselect sls0403-menu-item sls0403-menu-item--wide"
               clearable="true" />
           </div>
         </div>
       </div>
-      <div class="ml-0 flex items-center">
-        <div class="mt-2">
-          <label for="StoreName"
-            ><input type="checkbox" id="StoreName" @change="showStore"
-          /></label>
-        </div>
-        <PickStorePlural
-          @lngStoreCodes="lngStoreCodes"
-          @lngStoreGroup="lngStoreGroup"
-          @lngSupervisor="lngSupervisor"
-          @lngStoreTeam="lngStoreTeam"
-          @lngStoreAttr="lngStoreAttr"
-          @excelStore="excelStore"
-          :setFooterColID="setFooterColID"
-          :setFooterExpressions="setFooterExpressions">
-        </PickStorePlural>
-      </div>
-    </div>
-    <!-- 조회 조건 -->
-    <!--그리드 영역 -->
-    <div class="w-full h-[85%] mt-1" v-if="selectedDetail == false">
-      <Realgrid
-        :progname="'SLS04_003RPT_VUE'"
-        :progid="1"
-        :rowData="rowData"
-        :reload="reload"
-        :exporttoExcel="exportExcel"
-        :documentSubTitle="documentSubTitle"
-        :documentTitle="'SLS04_003RPT'"
-        :setDynamicGrid7="true"
-        :setFooter="true"
-        :hideColumnsId="hideColumnsId"
-        :rowStateeditable="false"></Realgrid>
     </div>
 
-    <div class="w-full h-[85%] mt-1" v-if="selectedDetail == true">
-      <Realgrid
-        :progname="'SLS04_003RPT_VUE'"
-        :progid="1"
-        :rowData="rowData2"
-        :reload="reload"
-        :exporttoExcel="exportExcel2"
-        :documentSubTitle="documentSubTitle"
-        :documentTitle="'SLS04_003RPT'"
-        :setFooter="true"
-        :setDynamicGrid8="true"
-        :mergeColumns2="true"
-        :mergeColumnGroupName2="mergeColumnGroupName2"
-        :mergeColumnGroupSubList2="mergeColumnGroupSubList2"
-        :hideColumnsId="hideColumnsId"
-        :rowStateeditable="false"></Realgrid>
+    <!-- 그리드 영역 -->
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col">
+      <div class="relative min-h-0 w-full flex-1" v-if="selectedDetail == false">
+        <Realgrid
+          :progname="'SLS04_003RPT_VUE'"
+          :progid="1"
+          :rowData="rowData"
+          :reload="reload"
+          :exporttoExcel="exportExcel"
+          :documentSubTitle="documentSubTitle"
+          :documentTitle="'SLS04_003RPT'"
+          :setDynamicGrid7="true"
+          :setFooter="true"
+          :hideColumnsId="hideColumnsId"
+          :rowStateeditable="false" />
+      </div>
+
+      <div class="relative min-h-0 w-full flex-1" v-if="selectedDetail == true">
+        <Realgrid
+          :progname="'SLS04_003RPT_VUE'"
+          :progid="1"
+          :rowData="rowData2"
+          :reload="reload"
+          :exporttoExcel="exportExcel2"
+          :documentSubTitle="documentSubTitle"
+          :documentTitle="'SLS04_003RPT'"
+          :setFooter="true"
+          :setDynamicGrid8="true"
+          :mergeColumns2="true"
+          :mergeColumnGroupName2="mergeColumnGroupName2"
+          :mergeColumnGroupSubList2="mergeColumnGroupSubList2"
+          :hideColumnsId="hideColumnsId"
+          :rowStateeditable="false" />
+      </div>
     </div>
   </div>
-  <!--그리드 영역 -->
 </template>
 
 <script setup>
@@ -645,6 +671,7 @@ const detailView = (e) => {
     selectedDetail.value = false;
     temptmergeColumns2.value = false;
   }
+  syncHideColumnsByOptions();
 };
 const customOrder = ["strStore", "strMajor", "strSub", "dtmDate"];
 // const checking = (e) => {
@@ -826,6 +853,38 @@ const checkday = (e) => {
   }
 };
 const showornotstore = ref(false);
+
+/** 조회구분·매장명표시 기준 hideColumnsId 동기화 */
+const syncHideColumnsByOptions = () => {
+  const type = selectedSearchType.value;
+  const detail = selectedDetail.value == true;
+  const showStore = showornotstore.value == true;
+  const next = [];
+
+  if (!showStore) {
+    next.push("strStoreName");
+  }
+
+  if (type == 1) {
+    // 집계 — 일자/월 컬럼 숨김
+    next.push("dtmDate", "dtmDate2");
+  } else if (type == 2) {
+    // 일자별
+    next.push("dtmDate2");
+    if (!detail) {
+      next.push("dtmDate");
+    }
+  } else {
+    // 월별
+    next.push("dtmDate");
+    if (!detail) {
+      next.push("dtmDate2");
+    }
+  }
+
+  hideColumnsId.value = next;
+};
+
 const showStore = (e) => {
   if (e.target.checked) {
     showornotstore.value = true;
@@ -834,29 +893,346 @@ const showStore = (e) => {
     showornotstore.value = false;
     hideColumnNow.value = true;
   }
+  syncHideColumnsByOptions();
 };
 
-const changeSearchType = (e) => {
-  if (e.target.value == 1) {
-    if (selectedDetail.value == true) {
-      hideColumnsId.value = ["strStoreName", "dtmDate", "dtmDate2"];
-    } else {
-      hideColumnsId.value = ["strStoreName", "dtmDate", "dtmDate2"];
-    }
-  } else if (e.target.value == 2) {
-    if (selectedDetail.value == true) {
-      hideColumnsId.value = ["strStoreName", "dtmDate2"];
-    } else {
-      hideColumnsId.value = ["strStoreName", "dtmDate2", "dtmDate"];
-    }
-  } else {
-    if (selectedDetail.value == true) {
-      hideColumnsId.value = ["strStoreName", "dtmDate"];
-    } else {
-      hideColumnsId.value = ["strStoreName", "dtmDate2", "dtmDate"];
-    }
-  }
+const changeSearchType = () => {
+  syncHideColumnsByOptions();
 };
+
+/** 조회 AREA — SLS04_004 wire 패턴 */
+const sls0403ControlBorder = "#cbd5e1";
+const sls0403ColGutter = "0.5rem";
+const sls0403RowGap = "0.875rem";
+const sls0403LabelCol = "5.5rem";
 </script>
 
-<style></style>
+<style scoped>
+.sls0403-search-panel {
+  box-sizing: border-box;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: var(--sls0403-panel-pad-x, 2rem);
+  padding-right: var(--sls0403-panel-pad-x, 2rem);
+}
+
+@media (min-width: 768px) {
+  .sls0403-search-panel {
+    --sls0403-panel-pad-x: 3rem;
+  }
+}
+
+.sls0403-search-layout {
+  /* 3열 — 매장명(2~3열) 폭은 SLS04_004 우측(1fr / 전체 대비)과 동일 비중 */
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.5fr) minmax(0, 0.5fr);
+  grid-template-rows: auto auto auto;
+  column-gap: var(--sls0403-col-gutter, 1.25rem);
+  row-gap: var(--sls0403-row-gap, 0.75rem);
+  align-items: center;
+  min-width: 0;
+}
+
+.sls0403-cell {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: 2rem;
+}
+
+.sls0403-cell--period {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  z-index: 2;
+}
+
+.sls0403-cell--type {
+  grid-column: 1;
+  grid-row: 2;
+  position: relative;
+  z-index: 2;
+}
+
+.sls0403-cell--store {
+  grid-column: 2 / span 2;
+  grid-row: 1 / span 2;
+  position: relative;
+  z-index: 1;
+  align-self: stretch;
+  justify-content: center;
+  overflow: visible;
+}
+
+.sls0403-cell--menu {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  position: relative;
+  z-index: 2;
+}
+
+.sls0403-lbl {
+  box-sizing: border-box;
+  flex: 0 0 var(--sls0403-label-col, 5.5rem);
+  width: var(--sls0403-label-col, 5.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sls0403-cond-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sls0403-check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9375rem;
+  line-height: 1.25;
+  font-weight: 400;
+  color: #1f2937;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sls0403-check {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.sls0403-date-slot {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sls0403-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin: 0 !important;
+  width: auto !important;
+  max-width: 100%;
+}
+
+.sls0403-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  height: 2rem !important;
+  min-height: 2rem !important;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: rgb(55 65 81);
+  border: 1px solid var(--sls0403-control-border, #cbd5e1) !important;
+  border-radius: 0.375rem !important;
+  background: #fff !important;
+}
+
+.sls0403-date-slot :deep(div.inline-flex.h-8),
+.sls0403-date-slot :deep(button) {
+  box-sizing: border-box;
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+.sls0403-sg-select {
+  box-sizing: border-box;
+  height: 2rem !important;
+  min-height: 2rem !important;
+  width: 7rem;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: rgb(55 65 81);
+  border: 1px solid var(--sls0403-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+  background: #fff;
+  appearance: auto;
+}
+
+.sls0403-menu-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sls0403-menu-item {
+  box-sizing: border-box;
+  flex: 0 1 11rem;
+  width: 11rem;
+  max-width: 11rem;
+  min-width: 0;
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+.sls0403-menu-item--wide {
+  flex: 0 1 14.3rem;
+  width: 14.3rem;
+  max-width: 14.3rem;
+}
+
+.sls0403-search-panel :deep(.sls0403-vselect) {
+  width: 100%;
+  min-width: 0;
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+.sls0403-search-panel :deep(.sls0403-vselect .vs__dropdown-toggle) {
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 2rem !important;
+  min-height: 2rem !important;
+  max-height: 2rem !important;
+  padding: 0 0.5rem !important;
+  border: 1px solid var(--sls0403-control-border, #cbd5e1) !important;
+  border-radius: 0.375rem !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+
+.sls0403-search-panel :deep(.sls0403-vselect .vs__selected-options) {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0 !important;
+}
+
+.sls0403-search-panel :deep(.sls0403-vselect .vs__selected),
+.sls0403-search-panel :deep(.sls0403-vselect .vs__placeholder) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  display: block;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+  color: rgb(55 65 81) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.sls0403-search-panel :deep(.sls0403-vselect .vs__search),
+.sls0403-search-panel :deep(.sls0403-vselect .vs__search input) {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 1.25rem !important;
+  min-height: 0 !important;
+  line-height: 1.25rem !important;
+  font-size: 0.875rem !important;
+}
+
+.sls0403-search-panel :deep(.sls0403-vselect .vs__actions) {
+  padding: 0 0 0 0.25rem !important;
+  align-items: center !important;
+}
+
+.sls0403-cell--store:has(.psp-popup),
+.sls0403-cell--store:has(.psp-store-hover-list) {
+  z-index: 50;
+}
+
+.sls0403-cell--store :deep(.psp-root) {
+  /* SLS04_004 매장명 콤보 비율과 동일 */
+  grid-template-columns:
+    var(--psp-label-w, 5.5rem)
+    minmax(var(--psp-radio-w, 4.75rem), auto)
+    minmax(8rem, 1.1fr)
+    minmax(12.5rem, 1.45fr)
+    minmax(13rem, 1.85fr);
+  column-gap: var(--psp-col-gap, 0.5rem);
+  row-gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.sls0403-cell--store :deep(.psp-label) {
+  width: var(--psp-label-w, 5.5rem);
+  justify-content: center;
+  padding-inline-start: 0;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+}
+
+.sls0403-cell--store :deep(.psp-select),
+.sls0403-cell--store :deep(.psp-store-trigger),
+.sls0403-cell--store :deep(.psp-collapse-btn) {
+  box-sizing: border-box !important;
+  height: 2rem !important;
+  min-height: 2rem !important;
+  max-height: 2rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+  border-radius: 0.375rem !important;
+}
+
+.sls0403-cell--store :deep(.psp-select) {
+  color: rgb(55 65 81) !important;
+  border: 1px solid var(--sls0403-control-border, #cbd5e1) !important;
+  background: #fff !important;
+  padding: 0 0.5rem !important;
+}
+
+.sls0403-cell--store :deep(.psp-collapse-btn) {
+  width: 2rem !important;
+  padding: 0 !important;
+}
+
+.sls0403-cell--store :deep(.psp-popup) {
+  z-index: 60;
+  right: 0;
+  left: auto;
+  width: min(42rem, 92vw);
+  min-width: 28rem;
+  max-width: min(42rem, 92vw);
+}
+
+@media (max-width: 1280px) {
+  .sls0403-search-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    row-gap: var(--sls0403-row-gap, 0.75rem);
+  }
+
+  .sls0403-cell--period,
+  .sls0403-cell--type,
+  .sls0403-cell--store,
+  .sls0403-cell--menu {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .sls0403-cell--store :deep(.psp-popup) {
+    left: 0;
+    right: auto;
+  }
+}
+</style>

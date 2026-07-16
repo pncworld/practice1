@@ -6,8 +6,8 @@
 ################################################################################*/ -->
 <template>
   <!-- 조회 조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
       <div class="flex justify-center mr-9 space-x-2 pr-5">
         <button @click="chartButton" class="button chart md:w-auto w-14">
@@ -22,221 +22,159 @@
         <button @click="printButton" class="button print w-auto">인쇄</button>
       </div>
     </div>
+
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-40 items-start z-10">
-      <div class="grid grid-cols-1 grid-rows-4 h-full mt-1">
-        <Datepicker2
-          class=""
-          @endDate="endDate"
-          @startDate="startDate"
-          :closePopUp="closePopUp"
-          ref="datepicker"
-          @excelDate="excelDate"></Datepicker2>
-        <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-12">
-          메뉴구분
-          <div class="flex ml-5 space-x-5 mt-1">
+      class="sls0402-search-panel z-10 mt-3 w-full min-h-0 shrink-0 overflow-visible rounded-lg bg-gray-200"
+      :style="{
+        '--sls0402-panel-pad-x': '2rem',
+        '--sls0402-control-border': sls0402ControlBorder,
+        '--sls0402-col-gutter': sls0402ColGutter,
+        '--sls0402-row-gap': sls0402RowGap,
+        '--sls0402-label-col': sls0402LabelCol,
+        '--psp-label-w': sls0402LabelCol,
+        '--psp-radio-w': '4.75rem',
+        '--psp-col-gap': '0.5rem',
+      }">
+      <div class="sls0402-search-layout min-w-0">
+        <!-- 1행: 기간 | 매장명(1~2행 span) -->
+        <div class="sls0402-row">
+          <span class="sls0402-lbl shrink-0">기간</span>
+          <div class="sls0402-date-slot min-w-0 flex-1">
+            <Datepicker2
+              ref="datepicker"
+              omit-main-label
+              filter-bar-align
+              :mainName="'기간'"
+              :closePopUp="closePopUp"
+              @endDate="endDate"
+              @startDate="startDate"
+              @excelDate="excelDate" />
+          </div>
+        </div>
+
+        <div class="sls0402-right-store min-w-0 overflow-visible">
+          <PickStorePlural
+            fluid-width
+            @lngStoreCodes="lngStoreCodes"
+            @lngStoreGroup="lngStoreGroup"
+            @lngSupervisor="lngSupervisor"
+            @lngStoreTeam="lngStoreTeam"
+            @lngStoreAttr="lngStoreAttr"
+            @excelStore="excelStore"
+            :setFooterColID="setFooterColID"
+            :setFooterExpressions="setFooterExpressions" />
+        </div>
+
+        <!-- 2행: 메뉴구분 -->
+        <div class="sls0402-row">
+          <span class="sls0402-lbl shrink-0">메뉴구분</span>
+          <div class="sls0402-menu-fields min-w-0">
             <v-select
               v-model="selectedMenu"
               :options="mainMenu"
               placeholder="전체"
               label="strName"
-              class="w-44 !h-8 bg-white"
+              class="custom-select2 sls0402-vselect sls0402-menu-item"
               :reduce="(store) => (store != null ? store.lngCode : null)"
-              clearable="true" />
-
+              clearable />
             <v-select
               v-model="selectedsubMenu"
               :options="subList"
               placeholder="전체"
               label="strName"
-              class="w-44 !h-8 bg-white"
+              class="custom-select2 sls0402-vselect sls0402-menu-item sls0402-menu-item--wide"
               :reduce="(store) => (store != null ? store.lngCode : null)"
-              clearable="true" />
+              clearable />
           </div>
         </div>
-        <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-12 h-8 space-x-2">
-          조회조건
-          <div>
-            <label for="store" class="font-normal"
-              ><input
-                type="checkbox"
-                id="store"
-                class="ml-5"
-                @change="checking" />매장명표시</label
-            >
-          </div>
-          <div>
-            <label for="maingroup" class="font-normal"
-              ><input
-                type="checkbox"
-                id="maingroup"
-                class="ml-5"
-                @change="checking" />대그룹</label
-            >
-          </div>
-          <div>
-            <label for="subgroup" class="font-normal"
-              ><input
-                type="checkbox"
-                id="subgroup"
-                class="ml-5"
-                @change="checking" />서브그룹</label
-            >
-          </div>
-          <div>
-            <label for="day" class="font-normal"
-              ><input
-                type="checkbox"
-                id="day"
-                class="ml-5"
-                @change="checking" />일자별</label
-            >
-          </div>
-          <div>
-            <label for="gift" class="font-normal"
-              ><input
-                type="checkbox"
-                id="gift"
-                class="ml-5"
-                checked
-                @change="checking" />증정구분</label
-            >
-          </div>
-          <div>
-            <label for="exception" class="font-normal"
-              ><input
-                type="checkbox"
-                id="exception"
-                class="ml-5"
-                @change="checking" />단가제외</label
-            >
-          </div>
-          <div>
-            <label for="sum" class="font-normal"
-              ><input
-                type="checkbox"
-                id="sum"
-                class="ml-5"
-                @change="checking" />합계</label
-            >
-          </div>
-          <div>
-            <label for="unite" class="font-normal"
-              ><input
-                type="checkbox"
-                id="unite"
-                class="ml-5"
-                @change="checking" />셀병합</label
-            >
-          </div>
-        </div>
-        <div
-          class="flex justify-start items-center text-base text-nowrap font-semibold ml-12 h-8">
-          요일조건
-          <div>
-            <label for="mon" class="font-normal"
-              ><input
-                type="checkbox"
-                id="mon"
-                class="ml-5"
-                @change="checkday"
-                checked />월</label
-            >
-          </div>
-          <div>
-            <label for="tue" class="font-normal"
-              ><input
-                type="checkbox"
-                id="tue"
-                class="ml-5"
-                @change="checkday"
-                checked />화</label
-            >
-          </div>
-          <div>
-            <label for="wed" class="font-normal"
-              ><input
-                type="checkbox"
-                id="wed"
-                class="ml-5"
-                @change="checkday"
-                checked />수</label
-            >
-          </div>
-          <div>
-            <label for="thu" class="font-normal"
-              ><input
-                type="checkbox"
-                id="thu"
-                class="ml-5"
-                @change="checkday"
-                checked />목</label
-            >
-          </div>
-          <div>
-            <label for="fri" class="font-normal"
-              ><input
-                type="checkbox"
-                id="fri"
-                class="ml-5"
-                @change="checkday"
-                checked />금</label
-            >
-          </div>
-          <div>
-            <label for="sat" class="font-normal"
-              ><input
-                type="checkbox"
-                id="sat"
-                class="ml-5"
-                @change="checkday"
-                checked />토</label
-            >
-          </div>
-          <div>
-            <label for="sun" class="font-normal"
-              ><input
-                type="checkbox"
-                id="sun"
-                class="ml-5"
-                @change="checkday"
-                checked />일</label
-            >
+
+        <!-- 3~4행: 조회/요일 — 동일 폭, 공휴일 끝 = 조회조건(셀병합) 끝 -->
+        <div class="sls0402-cond-stack">
+          <div class="sls0402-row">
+            <span class="sls0402-lbl shrink-0">조회조건</span>
+            <div class="sls0402-checks sls0402-checks--single flex min-w-0 items-center">
+              <label class="sls0402-check-label" for="store">
+                <input id="store" type="checkbox" class="sls0402-check" @change="checking" />
+                매장명표시
+              </label>
+              <label class="sls0402-check-label" for="maingroup">
+                <input id="maingroup" type="checkbox" class="sls0402-check" @change="checking" />
+                대그룹
+              </label>
+              <label class="sls0402-check-label" for="subgroup">
+                <input id="subgroup" type="checkbox" class="sls0402-check" @change="checking" />
+                서브그룹
+              </label>
+              <label class="sls0402-check-label" for="day">
+                <input id="day" type="checkbox" class="sls0402-check" @change="checking" />
+                일자별
+              </label>
+              <label class="sls0402-check-label" for="gift">
+                <input id="gift" type="checkbox" class="sls0402-check" checked @change="checking" />
+                증정구분
+              </label>
+              <label class="sls0402-check-label" for="exception">
+                <input id="exception" type="checkbox" class="sls0402-check" @change="checking" />
+                단가제외
+              </label>
+              <label class="sls0402-check-label" for="sum">
+                <input id="sum" type="checkbox" class="sls0402-check" @change="checking" />
+                합계
+              </label>
+              <label class="sls0402-check-label" for="unite">
+                <input id="unite" type="checkbox" class="sls0402-check" @change="checking" />
+                셀병합
+              </label>
+            </div>
           </div>
 
-          <div class="ml-20">
-            공휴일
-            <select
-              name=""
-              id=""
-              class="border w-16 h-7 rounded-lg"
-              v-model="selectedHoliday">
-              <option :value="0">선택</option>
-              <option :value="1">포함</option>
-              <option :value="2">제외</option>
-            </select>
+          <div class="sls0402-row">
+            <span class="sls0402-lbl shrink-0">요일조건</span>
+            <div class="sls0402-checks sls0402-checks--days flex min-w-0 items-center">
+              <label class="sls0402-check-label" for="mon">
+                <input id="mon" type="checkbox" class="sls0402-check" checked @change="checkday" />
+                월
+              </label>
+              <label class="sls0402-check-label" for="tue">
+                <input id="tue" type="checkbox" class="sls0402-check" checked @change="checkday" />
+                화
+              </label>
+              <label class="sls0402-check-label" for="wed">
+                <input id="wed" type="checkbox" class="sls0402-check" checked @change="checkday" />
+                수
+              </label>
+              <label class="sls0402-check-label" for="thu">
+                <input id="thu" type="checkbox" class="sls0402-check" checked @change="checkday" />
+                목
+              </label>
+              <label class="sls0402-check-label" for="fri">
+                <input id="fri" type="checkbox" class="sls0402-check" checked @change="checkday" />
+                금
+              </label>
+              <label class="sls0402-check-label" for="sat">
+                <input id="sat" type="checkbox" class="sls0402-check" checked @change="checkday" />
+                토
+              </label>
+              <label class="sls0402-check-label" for="sun">
+                <input id="sun" type="checkbox" class="sls0402-check" checked @change="checkday" />
+                일
+              </label>
+              <div class="sls0402-holiday">
+                <span class="sls0402-holiday-lbl">공휴일</span>
+                <select v-model="selectedHoliday" class="sls0402-sg-select">
+                  <option :value="0">선택</option>
+                  <option :value="1">포함</option>
+                  <option :value="2">제외</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="flex items-start">
-        <PickStorePlural
-          @lngStoreCodes="lngStoreCodes"
-          @lngStoreGroup="lngStoreGroup"
-          @lngSupervisor="lngSupervisor"
-          @lngStoreTeam="lngStoreTeam"
-          @lngStoreAttr="lngStoreAttr"
-          @excelStore="excelStore"
-          :setFooterColID="setFooterColID"
-          :setFooterExpressions="setFooterExpressions">
-        </PickStorePlural>
-      </div>
-      <div></div>
     </div>
     <!-- 조회 조건 -->
     <!-- 그리드 영역 -->
-    <div class="w-full h-[80%] mt-1">
+    <div class="relative mt-2 flex min-h-0 min-w-0 flex-1 flex-col">
       <div
         v-show="byRadioButton"
         class="absolute top-80 left-64 z-[60] bg-gray-200 rounded-lg p-2">
@@ -428,6 +366,12 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
+
+/** 조회 AREA — SLS04_004 / SLS02_031 wire 패턴 */
+const sls0402ControlBorder = "#cbd5e1";
+const sls0402ColGutter = "1.25rem";
+const sls0402RowGap = "0.75rem";
+const sls0402LabelCol = "5.5rem";
 
 const colors = [
   "lightgreen",
@@ -1603,6 +1547,404 @@ const checkday = (e) => {
   }
 };
 </script>
+
+<style scoped>
+.sls0402-search-panel {
+  box-sizing: border-box;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: var(--sls0402-panel-pad-x, 2rem);
+  padding-right: var(--sls0402-panel-pad-x, 2rem);
+}
+
+@media (min-width: 768px) {
+  .sls0402-search-panel {
+    --sls0402-panel-pad-x: 3rem;
+  }
+}
+
+.sls0402-search-layout {
+  /* 상단 2행: 기간·메뉴 | 매장명(중심 기준 확대) / 하단 2행: 조회·요일(좌측 열) */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(32rem, 1.4fr);
+  grid-template-rows: auto auto auto auto;
+  column-gap: var(--sls0402-col-gutter, 1.25rem);
+  row-gap: var(--sls0402-row-gap, 0.75rem);
+  align-items: center;
+  min-width: 0;
+}
+
+.sls0402-search-layout > .sls0402-row {
+  grid-column: 1;
+  min-width: 0;
+}
+
+/* 조회·요일 묶음 — 2열 그리드로 콘텐츠 폭 공유, 공휴일 끝 = 셀병합 끝 */
+.sls0402-cond-stack {
+  grid-column: 1;
+  grid-row: 3 / span 2;
+  display: grid;
+  grid-template-columns: var(--sls0402-label-col, 5.5rem) max-content;
+  column-gap: 0.5rem;
+  row-gap: var(--sls0402-row-gap, 0.75rem);
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.sls0402-cond-stack > .sls0402-row {
+  display: contents;
+}
+
+.sls0402-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: 2rem;
+}
+
+.sls0402-lbl {
+  box-sizing: border-box;
+  flex: 0 0 var(--sls0402-label-col, 5.5rem);
+  width: var(--sls0402-label-col, 5.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sls0402-checks {
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 0.35rem 0.85rem;
+}
+
+/* 조회조건 — 그리드 2열 폭 기준 */
+.sls0402-checks--single {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.35rem 1rem;
+  overflow: visible;
+  min-width: 0;
+  min-height: 2rem;
+}
+
+/* 요일조건 — 조회조건과 동일 열 폭, 공휴일 콤보 우측 끝 정렬 */
+.sls0402-checks--days {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.35rem 1.25rem;
+  overflow: visible;
+  width: 100%;
+  min-width: 0;
+  min-height: 2rem;
+}
+
+.sls0402-check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.9375rem;
+  line-height: 1.25;
+  font-weight: 400 !important;
+  color: #1f2937;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.sls0402-checks--single .sls0402-check-label {
+  gap: 0.4rem;
+}
+
+.sls0402-check {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.sls0402-date-slot {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sls0402-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin: 0 !important;
+  width: auto !important;
+  max-width: 100%;
+}
+
+.sls0402-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  height: 2rem !important;
+  min-height: 2rem !important;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: rgb(55 65 81);
+  border: 1px solid var(--sls0402-control-border, #cbd5e1) !important;
+  border-radius: 0.375rem !important;
+  background: #fff !important;
+}
+
+.sls0402-date-slot :deep(div.inline-flex.h-8),
+.sls0402-date-slot :deep(button) {
+  box-sizing: border-box;
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+.sls0402-menu-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sls0402-menu-item {
+  box-sizing: border-box;
+  flex: 0 1 11rem;
+  width: 11rem;
+  max-width: 11rem;
+  min-width: 0;
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+/* 메뉴구분 2번째 콤보 — 1.3배 */
+.sls0402-menu-item--wide {
+  flex: 0 1 14.3rem;
+  width: 14.3rem;
+  max-width: 14.3rem;
+}
+
+.sls0402-holiday {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+  padding-left: 2.5rem;
+  min-height: 2rem;
+  flex-shrink: 0;
+}
+
+.sls0402-holiday-lbl {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+}
+
+.sls0402-sg-select {
+  box-sizing: border-box;
+  height: 2rem !important;
+  min-height: 2rem !important;
+  width: 6rem;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: rgb(55 65 81);
+  border: 1px solid var(--sls0402-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+  background: #fff;
+  appearance: auto;
+}
+
+/* v-select (메뉴구분) — h-8 통일 */
+.sls0402-search-panel :deep(.sls0402-vselect) {
+  width: 100%;
+  min-width: 0;
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+.sls0402-search-panel :deep(.sls0402-vselect .vs__dropdown-toggle) {
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 2rem !important;
+  min-height: 2rem !important;
+  max-height: 2rem !important;
+  padding: 0 0.5rem !important;
+  border: 1px solid var(--sls0402-control-border, #cbd5e1) !important;
+  border-radius: 0.375rem !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+
+.sls0402-search-panel :deep(.sls0402-vselect .vs__selected-options) {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0 !important;
+}
+
+.sls0402-search-panel :deep(.sls0402-vselect .vs__selected),
+.sls0402-search-panel :deep(.sls0402-vselect .vs__placeholder) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  display: block;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+  color: rgb(55 65 81) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.sls0402-search-panel :deep(.sls0402-vselect .vs__search),
+.sls0402-search-panel :deep(.sls0402-vselect .vs__search input) {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 1.25rem !important;
+  min-height: 0 !important;
+  line-height: 1.25rem !important;
+  font-size: 0.875rem !important;
+}
+
+.sls0402-search-panel :deep(.sls0402-vselect .vs__actions) {
+  padding: 0 0 0 0.25rem !important;
+  align-items: center !important;
+}
+
+.sls0402-right-store {
+  position: relative;
+  z-index: 1;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: stretch;
+  justify-self: end;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  width: 90.25%; /* 현재(95%)의 95% */
+  max-width: 90.25%;
+  min-width: 0;
+  overflow: visible;
+}
+
+.sls0402-right-store:has(.psp-popup),
+.sls0402-right-store:has(.psp-store-hover-list) {
+  z-index: 50;
+}
+
+.sls0402-right-store :deep(.psp-root) {
+  grid-template-columns:
+    var(--psp-label-w, 5.5rem)
+    minmax(var(--psp-radio-w, 4.75rem), auto)
+    minmax(7rem, 1.05fr)
+    minmax(9.5rem, 1.3fr)
+    minmax(9.5rem, 1.35fr);
+  column-gap: var(--psp-col-gap, 0.5rem);
+  row-gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.sls0402-right-store :deep(.psp-label) {
+  width: var(--psp-label-w, 5.5rem);
+  justify-content: center;
+  padding-inline-start: 0;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+}
+
+/* 매장 콤보/트리거 — 기간·메뉴·공휴일과 동일 h-8 */
+.sls0402-right-store :deep(.psp-select),
+.sls0402-right-store :deep(.psp-store-trigger),
+.sls0402-right-store :deep(.psp-collapse-btn) {
+  box-sizing: border-box !important;
+  height: 2rem !important;
+  min-height: 2rem !important;
+  max-height: 2rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+  border-radius: 0.375rem !important;
+}
+
+.sls0402-right-store :deep(.psp-select) {
+  color: rgb(55 65 81) !important;
+  border: 1px solid var(--sls0402-control-border, #cbd5e1) !important;
+  background: #fff !important;
+  padding: 0 0.5rem !important;
+}
+
+.sls0402-right-store :deep(.psp-collapse-btn) {
+  width: 2rem !important;
+  padding: 0 !important;
+}
+
+.sls0402-right-store :deep(.psp-popup) {
+  z-index: 60;
+  right: 0;
+  left: auto;
+  width: min(42rem, 92vw);
+  min-width: 28rem;
+  max-width: min(42rem, 92vw);
+}
+
+@media (max-width: 1280px) {
+  .sls0402-search-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    row-gap: var(--sls0402-row-gap, 0.75rem);
+  }
+
+  .sls0402-search-layout > .sls0402-row,
+  .sls0402-cond-stack {
+    grid-column: 1;
+    grid-row: auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .sls0402-checks--single {
+    width: auto;
+    max-width: 100%;
+  }
+
+  .sls0402-right-store {
+    grid-column: 1;
+    grid-row: auto;
+    width: 100%;
+    max-width: 100%;
+    justify-self: stretch;
+  }
+
+  .sls0402-right-store :deep(.psp-popup) {
+    left: 0;
+    right: auto;
+  }
+}
+</style>
 
 <style>
 @media print {
