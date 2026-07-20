@@ -3680,6 +3680,16 @@ const runFuncshowGrid = async () => {
           delete labelingcolumn.editor.values;
           delete labelingcolumn.editor.labels;
           delete labelingcolumn.editor.listCallback;
+        } else {
+          // 텍스트 컬럼 등 editor 없을 때 드롭다운 생성 (손실명 등)
+          labelingcolumn.editor = {
+            type: "dropdown",
+            domainOnly: false,
+            textReadOnly: true,
+            dropDownWhenClick: true,
+            commitOnSelect: true,
+            dropDownCount: values[i]?.length ?? 0,
+          };
         }
       }
       //comsole.log(labelingcolumn);
@@ -6466,6 +6476,21 @@ watch(
       gridView.columnByField(props.hideColumn).visible = !props.hideColumnNow;
     }
   }
+);
+
+/** labelingColumns 목록(labels/values)이 늦게 도착해도 드롭다운 재적용 */
+watch(
+  () => [props.labelsData, props.valuesData, props.labelingColumns],
+  () => {
+    if (!gridView || !props.labelingColumns) return;
+    try {
+      rgReapplyLabelingDropdownEditors(gridView);
+      rgBindLabelingDropdownOnShowEditor(gridView);
+    } catch (_) {
+      void 0;
+    }
+  },
+  { deep: true }
 );
 
 watch(

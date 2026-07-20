@@ -53,7 +53,7 @@
         :placeholder="defaultPlaceHolder"
         :class="vSelectClass"
         :clearable="!disabled1"
-        :append-to-body="compact"
+        :append-to-body="useAppendToBody"
         @click="resetSelectedStore">
         <template #selected-option="option">
           <span
@@ -132,6 +132,19 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /** 부모에서 넘긴 매장코드로 초기 선택 (빈값/미지정 시 기존 동작 유지) */
+  setDefaultStoreCd: {
+    type: [String, Number],
+    default: "",
+  },
+  /**
+   * v-select append-to-body.
+   * 미지정 시 compact와 동일. 모달 안에서는 false 권장(목록이 모달 뒤로 가리지 않음).
+   */
+  appendToBody: {
+    type: Boolean,
+    default: undefined,
+  },
 });
 
 const hideit = ref(props.hideit);
@@ -158,6 +171,11 @@ const vSelectClass = computed(() =>
         props.comboFill ? "!w-full min-w-0 max-w-full" : "!w-72",
       ]
     : ["ml-5", "custom-select", "!w-72", "!h-7", "-mt-3"]
+);
+
+/** compact 기본은 append-to-body. 모달 등은 :append-to-body="false"로 덮어씀 */
+const useAppendToBody = computed(() =>
+  props.appendToBody === undefined ? props.compact : props.appendToBody
 );
 isDisabled1.value = groupCdDisabled;
 const changed = ref(false);
@@ -199,6 +217,28 @@ watch(
     disabled1.value = props.disableStore;
   }
 );
+/** setDefaultStoreCd가 있으면 해당 매장 선택. 없으면 false (기존 초기화 유지) */
+const applySetDefaultStoreCd = () => {
+  const raw = props.setDefaultStoreCd;
+  if (raw === "" || raw === null || raw === undefined) return false;
+  if (raw === 0 || raw === "0") {
+    selectedStore.value = null;
+    return true;
+  }
+  const list = store.state.storeCd || [];
+  const found = list.find(
+    (item) => String(item?.lngStoreCode) === String(raw)
+  );
+  if (!found) return false;
+  // 속성 필터를 '전체'로 두고 목록에서 선택 (관리자 type watch가 선택을 지우지 않도록 type 변경 최소화)
+  if (selectedStoreType.value != 0) {
+    selectedStoreType.value = 0;
+  }
+  storeCd.value = store.state.storeCd;
+  selectedStore.value = found;
+  return true;
+};
+
 onMounted(() => {
   defaultPlaceHolder.value = props.placeholderName;
   selectedGroup.value = store.state.storeGroup[0].lngStoreGroup;
@@ -210,11 +250,13 @@ onMounted(() => {
     disabled1.value = false;
     emit("update:storeGroup", selectedGroup.value);
     emit("lngStoreGroup", selectedGroup.value);
-    emit("update:storeCd", 0);
     emit("lngStoreAttrs", 0);
-    emit("lngStoreCode", 0);
-    emit("excelStore", "매장명 : 전체");
-    emit("storeNm", "전체");
+    if (!applySetDefaultStoreCd()) {
+      emit("update:storeCd", 0);
+      emit("lngStoreCode", 0);
+      emit("excelStore", "매장명 : 전체");
+      emit("storeNm", "전체");
+    }
   } else {
     disabled1.value = true;
     if (props.initStoreFromStoreCd) {
@@ -239,9 +281,18 @@ onMounted(() => {
       selectedStoreType.value = store.state.userData.lngJoinType;
       selectedStore.value = store.state.storeCd[0];
     }
+    // 비관리자도 부모가 넘긴 코드가 있으면 우선 반영 (보통 본인 매장)
+    applySetDefaultStoreCd();
     //comsole.log(store.state.storeCd);
   }
 });
+
+watch(
+  () => props.setDefaultStoreCd,
+  () => {
+    applySetDefaultStoreCd();
+  }
+);
 // const emitStoreCode = (e) => {
 //   //comsole.log(e)
 //   const selectedCd = e.target.value

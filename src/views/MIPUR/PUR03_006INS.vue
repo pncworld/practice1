@@ -6,280 +6,281 @@
 ################################################################################*/ -->
 <template>
   <!-- 조회조건 -->
-  <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <PageName></PageName>
-    <div class="flex justify-center mr-9 space-x-2 pr-5">
-      <!-- <button @click="searchButton" class="button search md:w-auto w-14">
-        조회
-      </button>
-
-      <button @click="saveButton" class="button save w-auto">저장</button>
-      <button @click="excelButton" class="button excel w-auto">엑셀</button> -->
-    </div>
-  </div>
-  <br />
-  <div
-    class="grid grid-rows-5 grid-cols-3 bg-gray-200 rounded-lg h-56 items-start justify-start">
-    <div class="flex justify-start ml-11">
-      <PickStore
-        @update:storeGroup="handleStoreGroup"
-        @update:storeCd="handleStoreCd"
-        @storeNm="handlestoreNm"
-        :defaultStoreNm="'선택'"
-        :defaultStoreType2="true"
-        :defaultStore="true"></PickStore>
-    </div>
-    <div
-      class="flex items-center justify-start space-x-5 mt-2 col-span-2 ml-[35%]">
-      <div class="text-base font-semibold text-red-500">발주일자</div>
-      <div class="flex space-x-3">
-        <input type="date" class="h-7" v-model="cond" @change="searchButton" />
-        <button class="whitebutton bg-white" @click="searchButton">
-          발주조회
-        </button>
-      </div>
-    </div>
-    <div class="flex justify-start ml-12 mt-3 space-x-5 items-center">
-      <div class="text-base font-semibold">발주마감일시</div>
-      <div>
-        <input
-          type="text"
-          class="border border-black h-7 disabled:bg-white text-red-500"
-          v-model="cond2"
-          disabled />
-      </div>
-    </div>
-
-    <div
-      class="flex justify-start mt-3 space-x-5 items-center col-span-2 ml-[5%] pl-1">
-      <div class="text-base font-semibold">코멘트(발주)</div>
-      <div>
-        <input
-          type="text"
-          class="border border-black h-7 w-[300%]"
-          v-model="cond3" />
-      </div>
-    </div>
-
-    <div class="flex ml-20 pl-3 mt-2 space-x-5">
-      <div class="text-base font-semibold">공급가</div>
-      <div>
-        <input
-          type="text"
-          class="border border-black h-7 disabled:bg-white"
-          v-model="cond4"
-          disabled />
-      </div>
-    </div>
-
-    <div class="flex ml-[16%] pl-4 mt-2 space-x-5">
-      <div class="text-base font-semibold">부가세</div>
-      <div>
-        <input
-          type="text"
-          class="border border-black h-7 disabled:bg-white"
-          v-model="cond5"
-          disabled />
-      </div>
-    </div>
-
-    <div class="flex ml-20 pl-4 mt-2 space-x-5">
-      <div class="text-base font-semibold">합계</div>
-      <div>
-        <input
-          type="text"
-          class="border border-black h-7 disabled:bg-white"
-          v-model="cond6"
-          disabled />
-      </div>
-    </div>
-
-    <div class="flex ml-20 mt-2 items-center col-span-3 space-x-10">
-      <div class="flex space-x-5 items-center">
-        <div class="text-base font-semibold">자재목록</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="w-48 border border-black h-7"
-            v-model="cond7">
-            <option value="0">전체</option>
-            <option :value="i.strDCode" v-for="i in optionList">
-              {{ i.strDName }}
-            </option>
-          </select>
-        </div>
-      </div>
-      <div class="flex space-x-5 items-start -mt-1">
-        <BusinessClient
-          :defaultNm="'전체'"
-          class="w-64"
-          @SupplierId="SupplierId"></BusinessClient>
-      </div>
-
-      <div class="flex space-x-5 items-center">
-        <div class="text-base font-semibold">자재분류</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="w-48 border border-black h-7"
-            v-model="cond9">
-            <option value="0">전체</option>
-            <option :value="i.lngCategoryID" v-for="i in optionList3">
-              {{ i.strCategoryName }}
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <div class="flex space-x-5 items-center">
-        <div class="text-base font-semibold">자재그룹</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="w-48 border border-black h-7"
-            v-model="cond10">
-            <option value="0">전체</option>
-            <option :value="i.lngStockGroupID" v-for="i in optionList4">
-              {{ i.strStockGroupName }}
-            </option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex space-x-5 items-center ml-20">
-      <div class="text-base font-semibold">자재특성</div>
-      <div>
-        <select
-          name=""
-          id=""
-          class="w-48 border border-black h-7"
-          v-model="cond11">
-          <option value="0">전체</option>
-          <option :value="i.lngGenericID" v-for="i in optionList5">
-            {{ i.strGenericName }}
-          </option>
-        </select>
-      </div>
-    </div>
-
-    <div class="flex space-x-5 items-center col-span-2">
-      <div class="text-base font-semibold">자재코드/명</div>
-      <div class="flex space-x-5">
-        <input
-          type="text"
-          class="w-48 border border-black h-7"
-          v-model="cond12" />
-        <input
-          type="text"
-          class="w-96 border border-black h-7"
-          v-model="cond13" />
-
-        <button class="whitebutton bg-white" @click="searchButton2">
+  <div class="br12 po-page">
+    <div class="pd24 flex-between sub-header">
+      <PageName></PageName>
+      <div class="flex justify-center space-x-2 pr-5">
+        <!-- <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
+        <button @click="saveButton" class="button save w-auto">저장</button>
+        <button @click="excelButton" class="button excel w-auto">엑셀</button> -->
       </div>
     </div>
-  </div>
 
-  <!-- 조회조건 -->
-  <!-- 그리드 영역 -->
-  <div
-    class="grid grid-rows-1 grid-cols-[12fr,1fr,12fr] justify-center w-[98%] h-[50vh] ml-5">
-    <div class="mt-2">
-      <div class="flex justify-between bg-yellow-100">
-        <div class="text-base font-semibold">검색 자재</div>
-        <div class="space-x-5">
-          <button class="whitebutton bg-white" @click="addButton">추가</button>
-          <button class="whitebutton bg-white" @click="excelButton">
-            엑셀
-          </button>
-        </div>
-      </div>
-      <Realgrid
-        class="w-full h-full mt-2"
-        :progname="'PUR03_006INS_VUE'"
-        :progid="1"
-        :rowData="rowData"
-        @updatedRowData="updatedRowData"
-        @sendRowState="sendRowState"
-        @clickedRowData="clickedRowData"
-        @allStateRows="allStateRows"
-        @clickedButtonCol="clickedButtonCol"
-        @checkAllorNot="checkAllorNot"
-        :cellEditthenCheck="true"
-        :exporttoExcel="exporttoExcel"
-        :documentTitle="'PUR03_006INS'"
-        :documentSubTitle="documentSubTitle"
-        :editableColId="'dblOrderQty,strOrderComments'"
-        :rowStateeditable="false"
-        :checkRowAuto="false"
-        :checkRowAuto2="true"
-        :checkRenderEditable="true"
-        :selectionStyle="'block'"
-        :CalculateTaxColId="'curTax'"
-        :CalculateTaxColId2="'curSupply'"
-        :CalculateTaxColId3="'curTotal'"
-        :inputOnlyNumberColumn="'dblOrderQty'">
-      </Realgrid>
-    </div>
-    <div class="flex flex-col items-center justify-center space-y-5">
-      <div class="whitebutton !font-extrabold !text-black" @click="addButton">
-        >
-      </div>
+    <div class="page-scroll pd24 pt0 flex min-h-0 flex-1 flex-col">
       <div
-        class="whitebutton !font-extrabold !text-black"
-        @click="deleteButton">
-        <
-      </div>
-    </div>
-    <div class="mt-2">
-      <div class="flex justify-between bg-yellow-100">
-        <div class="text-base font-semibold">발주 자재</div>
-        <div class="space-x-5">
-          <button class="whitebutton bg-white" @click="deleteButton">
-            삭제
-          </button>
-          <button class="whitebutton bg-white" @click="saveButton">저장</button>
-          <button class="whitebutton bg-white" @click="excelButton2">
-            엑셀
-          </button>
+        class="pur306-search-panel shrink-0"
+        :style="{
+          '--pur306-control-border': pur306ControlBorder,
+          '--pur306-label-col': pur306LabelCol,
+          '--pur306-item-gap': pur306ItemGap,
+          '--pur306-col-gap': pur306ColGap,
+          '--pur306-row-gap': pur306RowGap,
+          '--pur306-pair-gap': pur306PairGap,
+        }">
+        <div class="pur306-search-grid min-w-0">
+          <div class="pur306-block pur306-block--order min-w-0">
+            <div class="pur306-row pur306-row--order1 min-w-0">
+              <div class="pur306-sg-label pur306-req">매장</div>
+              <div
+                class="pur306-cell-field pur306-pick-slot pur306-pick-slot--store-grid min-w-0">
+                <PickStore
+                  compact-search-bar
+                  :compact-store-combo-max-rem="pur306PickStoreComboMaxRem"
+                  main-name=""
+                  @update:storeGroup="handleStoreGroup"
+                  @update:storeCd="handleStoreCd"
+                  @storeNm="handlestoreNm"
+                  :defaultStoreNm="'선택'"
+                  :defaultStoreType2="true"
+                  :defaultStore="true" />
+              </div>
+              <div class="pur306-sg-label pur306-req pur306-sg-label--danger">
+                발주일자
+              </div>
+              <div class="pur306-cell-field pur306-inline-field pur306-date-field min-w-0">
+                <input
+                  type="date"
+                  class="pur306-sg-input pur306-sg-input--date"
+                  v-model="cond"
+                  @change="searchButton" />
+                <button type="button" class="pur306-sub-btn" @click="searchButton">
+                  발주조회
+                </button>
+              </div>
+            </div>
+
+            <div class="pur306-row pur306-row--order2 min-w-0">
+              <div class="pur306-sg-label pur306-sg-label--danger">발주마감일시</div>
+              <div class="pur306-cell-field pur306-deadline-field min-w-0">
+                <input
+                  type="text"
+                  class="pur306-sg-input pur306-sg-input--danger pur306-sg-input--deadline"
+                  v-model="cond2"
+                  disabled />
+              </div>
+              <div class="pur306-order2-tail min-w-0">
+                <div class="pur306-sg-label">코멘트(발주)</div>
+                <div class="pur306-cell-field min-w-0">
+                  <input type="text" class="pur306-sg-input" v-model="cond3" />
+                </div>
+              </div>
+            </div>
+
+            <div class="pur306-row pur306-row--order3 min-w-0">
+              <div class="pur306-sg-label">공급가</div>
+              <div class="pur306-cell-field min-w-0">
+                <input type="text" class="pur306-sg-input" v-model="cond4" disabled />
+              </div>
+              <div class="pur306-sg-label">부가세</div>
+              <div class="pur306-cell-field min-w-0">
+                <input type="text" class="pur306-sg-input" v-model="cond5" disabled />
+              </div>
+              <div class="pur306-sg-label">합계</div>
+              <div class="pur306-cell-field min-w-0">
+                <input type="text" class="pur306-sg-input" v-model="cond6" disabled />
+              </div>
+            </div>
+          </div>
+
+          <div class="pur306-block pur306-block--mat min-w-0">
+            <div class="pur306-row pur306-row--mat1 min-w-0">
+              <div class="pur306-sg-label pur306-req">자재목록</div>
+              <div class="pur306-cell-field min-w-0">
+                <select class="pur306-sg-select" v-model="cond7">
+                  <option value="0">전체</option>
+                  <option :value="i.strDCode" v-for="i in optionList" :key="i.strDCode">
+                    {{ i.strDName }}
+                  </option>
+                </select>
+              </div>
+              <div class="pur306-sg-label">거래처</div>
+              <div class="pur306-cell-field pur306-bc-slot min-w-0">
+                <BusinessClient2
+                  compact-search-bar
+                  :default-nm="'전체'"
+                  @SupplierId="SupplierId" />
+              </div>
+              <div class="pur306-sg-label">자재분류</div>
+              <div class="pur306-cell-field min-w-0">
+                <select class="pur306-sg-select" v-model="cond9">
+                  <option value="0">전체</option>
+                  <option
+                    :value="i.lngCategoryID"
+                    v-for="i in optionList3"
+                    :key="i.lngCategoryID">
+                    {{ i.strCategoryName }}
+                  </option>
+                </select>
+              </div>
+              <div class="pur306-sg-label">자재그룹</div>
+              <div class="pur306-cell-field min-w-0">
+                <select class="pur306-sg-select" v-model="cond10">
+                  <option value="0">전체</option>
+                  <option
+                    :value="i.lngStockGroupID"
+                    v-for="i in optionList4"
+                    :key="i.lngStockGroupID">
+                    {{ i.strStockGroupName }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="pur306-row pur306-row--mat2 min-w-0">
+              <div class="pur306-sg-label">자재특성</div>
+              <div class="pur306-cell-field min-w-0">
+                <select class="pur306-sg-select" v-model="cond11">
+                  <option value="0">전체</option>
+                  <option
+                    :value="i.lngGenericID"
+                    v-for="i in optionList5"
+                    :key="i.lngGenericID">
+                    {{ i.strGenericName }}
+                  </option>
+                </select>
+              </div>
+              <div class="pur306-mat2-code-pair min-w-0">
+                <div class="pur306-sg-label">자재코드/명</div>
+                <div class="pur306-cell-field pur306-inline-field pur306-mat-code-field min-w-0">
+                  <input
+                    type="text"
+                    class="pur306-sg-input pur306-sg-input--code"
+                    v-model="cond12" />
+                  <input
+                    type="text"
+                    class="pur306-sg-input pur306-sg-input--name"
+                    v-model="cond13" />
+                  <button type="button" class="pur306-sub-btn" @click="searchButton2">
+                    조회
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <Realgrid
-        class="w-full h-full mt-2"
-        :progname="'PUR03_006INS_VUE'"
-        :progid="2"
-        :rowData="rowData2"
-        @updatedRowData="updatedRowData2"
-        @clickedRowData="clickedRowData2"
-        @allStateRows="allStateRows2"
-        :exporttoExcel="exporttoExcel2"
-        :documentTitle="'PUR03_006INS'"
-        :documentSubTitle="documentSubTitle"
-        :editableColId="'dblOrderQty,strOrderComments'"
-        :rowStateeditable="false"
-        :checkRenderEditable="true"
-        :selectionStyle="'block'"
-        :setFooter="true"
-        :notsoftDelete="true"
-        :checkRowAuto="false"
-        :checkRowAuto2="true"
-        :CalculateTaxColId="'curTax'"
-        :CalculateTaxColId2="'curSupply'"
-        :CalculateTaxColId3="'curTotal'"
-        :deleteRow7="deleteRow7"
-        :addRow4="addRow4"
-        :addrowProp="'lngStockID,strStockName,strStandardName,strUnitName,curUnitPrice,dblOrderQty,curSupply,curTax,curTotal,strOrderComments,strGenericName,strSupplierName,dtmExpectedDate,lngStoreGroup,lngStoreCode,strOrderNo,lngOrderSeq,lngSupplierID,dblCheckQty,strStatus,strDemandNo,strCheckComments,lngGenericID,lngOrderAble,lngTaxType,dtmOrderDate'"
-        :addrowDefault="addrowDefault"
-        :inputOnlyNumberColumn="'dblOrderQty'">
-      </Realgrid>
+
+      <!-- 그리드 영역 -->
+      <div
+        class="pur306-grid-layout mt-1 grid min-h-0 min-w-0 flex-1 grid-cols-[12fr,1fr,12fr] grid-rows-1 justify-center">
+      <div class="mt-0 flex min-h-0 min-w-0 flex-col">
+        <div class="pur306-grid-bar flex shrink-0 justify-between bg-yellow-100">
+          <div class="text-base font-semibold">검색 자재</div>
+          <div class="pur306-grid-actions">
+            <button type="button" class="pur306-sub-btn pur306-sub-btn--grid" @click="addButton">추가</button>
+            <button type="button" class="pur306-sub-btn pur306-sub-btn--grid" @click="excelButton">
+              엑셀
+            </button>
+          </div>
+        </div>
+        <Realgrid
+          class="pur306-grid-body min-h-0 w-full flex-1"
+          :progname="'PUR03_006INS_VUE'"
+          :progid="1"
+          :rowData="rowData"
+          @updatedRowData="updatedRowData"
+          @sendRowState="sendRowState"
+          @clickedRowData="clickedRowData"
+          @allStateRows="allStateRows"
+          @clickedButtonCol="clickedButtonCol"
+          @checkAllorNot="checkAllorNot"
+          :cellEditthenCheck="true"
+          :exporttoExcel="exporttoExcel"
+          :documentTitle="'PUR03_006INS'"
+          :documentSubTitle="documentSubTitle"
+          :editableColId="'dblOrderQty,strOrderComments'"
+          :rowStateeditable="false"
+          :checkRowAuto="false"
+          :checkRowAuto2="true"
+          :checkRenderEditable="true"
+          :selectionStyle="'block'"
+          :CalculateTaxColId="'curTax'"
+          :CalculateTaxColId2="'curSupply'"
+          :CalculateTaxColId3="'curTotal'"
+          :inputOnlyNumberColumn="'dblOrderQty'" />
+      </div>
+      <div class="pur306-grid-transfer">
+        <button
+          type="button"
+          class="pur306-transfer-btn"
+          title="발주 자재로 추가"
+          aria-label="발주 자재로 추가"
+          @click="addButton">
+          <svg class="pur306-transfer-icon" viewBox="0 0 640 640" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M566.6 342.6C579.1 330.1 579.1 309.8 566.6 297.3L406.6 137.3C394.1 124.8 373.8 124.8 361.3 137.3C348.8 149.8 348.8 170.1 361.3 182.6L466.7 288L96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L466.7 352L361.3 457.4C348.8 469.9 348.8 490.2 361.3 502.7C373.8 515.2 394.1 515.2 406.6 502.7L566.6 342.7z" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="pur306-transfer-btn"
+          title="검색 자재로 되돌리기"
+          aria-label="검색 자재로 되돌리기"
+          @click="deleteButton">
+          <svg class="pur306-transfer-icon" viewBox="0 0 640 640" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M73.4 297.4C60.9 309.9 60.9 330.2 73.4 342.7L233.4 502.7C245.9 515.2 266.2 515.2 278.7 502.7C291.2 490.2 291.2 469.9 278.7 457.4L173.3 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L173.3 288L278.7 182.6C291.2 170.1 291.2 149.8 278.7 137.3C266.2 124.8 245.9 124.8 233.4 137.3L73.4 297.3z" />
+          </svg>
+        </button>
+      </div>
+      <div class="mt-0 flex min-h-0 min-w-0 flex-col">
+        <div class="pur306-grid-bar flex shrink-0 justify-between bg-yellow-100">
+          <div class="text-base font-semibold">발주 자재</div>
+          <div class="pur306-grid-actions">
+            <button type="button" class="pur306-sub-btn pur306-sub-btn--grid" @click="deleteButton">
+              삭제
+            </button>
+            <button type="button" class="pur306-sub-btn pur306-sub-btn--grid" @click="saveButton">저장</button>
+            <button type="button" class="pur306-sub-btn pur306-sub-btn--grid" @click="excelButton2">
+              엑셀
+            </button>
+          </div>
+        </div>
+        <Realgrid
+          class="pur306-grid-body min-h-0 w-full flex-1"
+          :progname="'PUR03_006INS_VUE'"
+          :progid="2"
+          :rowData="rowData2"
+          @updatedRowData="updatedRowData2"
+          @clickedRowData="clickedRowData2"
+          @allStateRows="allStateRows2"
+          :exporttoExcel="exporttoExcel2"
+          :documentTitle="'PUR03_006INS'"
+          :documentSubTitle="documentSubTitle"
+          :editableColId="'dblOrderQty,strOrderComments'"
+          :rowStateeditable="false"
+          :checkRenderEditable="true"
+          :selectionStyle="'block'"
+          :setFooter="true"
+          :notsoftDelete="true"
+          :checkRowAuto="false"
+          :checkRowAuto2="true"
+          :CalculateTaxColId="'curTax'"
+          :CalculateTaxColId2="'curSupply'"
+          :CalculateTaxColId3="'curTotal'"
+          :deleteRow7="deleteRow7"
+          :addRow4="addRow4"
+          :addrowProp="'lngStockID,strStockName,strStandardName,strUnitName,curUnitPrice,dblOrderQty,curSupply,curTax,curTotal,strOrderComments,strGenericName,strSupplierName,dtmExpectedDate,lngStoreGroup,lngStoreCode,strOrderNo,lngOrderSeq,lngSupplierID,dblCheckQty,strStatus,strDemandNo,strCheckComments,lngGenericID,lngOrderAble,lngTaxType,dtmOrderDate'"
+          :addrowDefault="addrowDefault"
+          :inputOnlyNumberColumn="'dblOrderQty'" />
+      </div>
+    </div>
     </div>
   </div>
-  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
@@ -301,7 +302,7 @@ import {
   saveNewOrderTmp2,
   updateOrderTmp,
 } from "@/api/mipur";
-import BusinessClient from "@/components/businessClient.vue";
+import BusinessClient2 from "@/components/businessClient2.vue";
 /**
  *  페이지명 자동 입력 컴포넌트
  *  */
@@ -341,6 +342,15 @@ import { nextTick, onMounted, ref } from "vue";
  */
 
 import { useStore } from "vuex";
+
+/** 조회 AREA — wire 그리드 (PUR02/STKN06 패턴) */
+const pur306ControlBorder = "#cbd5e1";
+const pur306LabelCol = "5.5rem";
+const pur306ItemGap = "0.375rem";
+const pur306ColGap = "1.25rem";
+const pur306RowGap = "0.375rem";
+const pur306PairGap = "0.25rem";
+const pur306PickStoreComboMaxRem = 14;
 
 /**
  * 	화면 Load시 실행 스크립트
@@ -1261,4 +1271,619 @@ const initAll = () => {
 };
 </script>
 
-<style></style>
+<style scoped>
+/* ── 조회 AREA wire (PUR02/STKN06 패턴) ── */
+.pur306-search-panel {
+  --pur306-panel-pad-x: 2rem;
+  --pur306-row-min-h: 2rem;
+  --pur306-control-h: 2rem;
+  /* 2번 콤보(11.5rem) 기준 — 1번을 2번과 동일 폭으로 */
+  --pur306-store-combo-2: 11.5rem;
+  --pur306-store-combo-w: var(--pur306-store-combo-2);
+  /* 매장 3번째 콤보 왼쪽선 (1행 pick-slot 기준) */
+  --pur306-store-combo3-left: calc(
+    var(--pur306-label-col) + var(--pur306-pair-gap) + var(--pur306-store-combo-w) +
+      var(--pur306-item-gap) + var(--pur306-store-combo-w) + var(--pur306-item-gap)
+  );
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  margin-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-block: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: rgb(229 231 235);
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .pur306-search-panel {
+    --pur306-panel-pad-x: 2.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .pur306-search-panel {
+    --pur306-panel-pad-x: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pur306-search-panel {
+    --pur306-panel-pad-x: 3.5rem;
+  }
+}
+
+.pur306-search-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pur306-row-gap);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding-left: var(--pur306-panel-pad-x);
+  padding-right: var(--pur306-panel-pad-x);
+}
+
+.pur306-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pur306-row-gap);
+  width: 100%;
+  min-width: 0;
+}
+
+.pur306-block--mat {
+  margin-top: 0;
+  padding-top: var(--pur306-row-gap);
+  border-top: 2px solid #94a3b8;
+}
+
+.pur306-row {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  column-gap: var(--pur306-pair-gap);
+  align-items: center;
+  min-height: var(--pur306-row-min-h);
+}
+
+/* 1행 — 매장 | 발주일자(우측 정렬) */
+.pur306-row--order1 {
+  grid-template-columns:
+    var(--pur306-label-col) minmax(0, 1fr)
+    var(--pur306-label-col) minmax(0, max-content);
+}
+
+.pur306-row--order1 > .pur306-pick-slot {
+  justify-self: start;
+}
+
+.pur306-row--order1 > .pur306-date-field {
+  justify-content: flex-end;
+  justify-self: end;
+  width: max-content;
+  max-width: 100%;
+}
+
+/* 2행 — 발주마감 | 코멘트(매장 3번 콤보 left 정렬) */
+.pur306-row--order2 {
+  grid-template-columns:
+    var(--pur306-label-col) max-content minmax(0, 1fr);
+}
+
+.pur306-order2-tail {
+  display: grid;
+  grid-template-columns: var(--pur306-label-col) minmax(0, 1fr);
+  column-gap: var(--pur306-pair-gap);
+  align-items: center;
+  min-width: 0;
+  min-height: var(--pur306-row-min-h);
+  padding-left: calc(
+    var(--pur306-store-combo3-left) -
+      (var(--pur306-label-col) + var(--pur306-pair-gap) + var(--pur306-store-combo-w) +
+        var(--pur306-pair-gap))
+  );
+}
+
+.pur306-order2-tail > .pur306-sg-label,
+.pur306-order2-tail > .pur306-cell-field {
+  min-height: var(--pur306-row-min-h);
+}
+
+.pur306-row--order2 > .pur306-deadline-field {
+  width: var(--pur306-store-combo-w);
+  max-width: var(--pur306-store-combo-w);
+  flex: 0 0 auto;
+}
+
+.pur306-deadline-field {
+  justify-self: start;
+}
+
+.pur306-sg-input--deadline {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  text-align: center;
+}
+
+.pur306-sg-input--deadline:disabled {
+  color: rgb(220 38 38) !important;
+  -webkit-text-fill-color: rgb(220 38 38);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* 3행 — 공급가 | 부가세 | 합계 (행 독립 레이아웃) */
+.pur306-row--order3 {
+  grid-template-columns:
+    var(--pur306-label-col) max-content
+    var(--pur306-label-col) max-content
+    var(--pur306-label-col) max-content;
+}
+
+.pur306-row--order3 > .pur306-cell-field {
+  width: var(--pur306-store-combo-w);
+  max-width: var(--pur306-store-combo-w);
+  flex: 0 0 auto;
+}
+
+.pur306-row--mat1 {
+  grid-template-columns:
+    var(--pur306-label-col) minmax(0, 1fr)
+    var(--pur306-label-col) minmax(0, 1fr)
+    var(--pur306-label-col) minmax(0, 1fr)
+    var(--pur306-label-col) minmax(0, 1fr);
+}
+
+.pur306-row--mat2 {
+  grid-template-columns:
+    var(--pur306-label-col) minmax(0, 1fr)
+    var(--pur306-label-col) minmax(0, 1fr)
+    var(--pur306-label-col) minmax(0, 1fr)
+    var(--pur306-label-col) minmax(0, 1fr);
+}
+
+/* 자재코드/명 — mat1 자재분류(3번째 쌍)와 left 정렬 */
+.pur306-row--mat2 > .pur306-sg-label:nth-child(1) {
+  grid-column: 1;
+}
+
+.pur306-row--mat2 > .pur306-cell-field:nth-child(2) {
+  grid-column: 2;
+}
+
+.pur306-mat2-code-pair {
+  grid-column: 5 / -1;
+  display: grid;
+  grid-template-columns: var(--pur306-label-col) minmax(0, 1fr);
+  column-gap: var(--pur306-item-gap);
+  align-items: center;
+  min-width: 0;
+  min-height: var(--pur306-row-min-h);
+}
+
+.pur306-mat2-code-pair > .pur306-sg-label {
+  margin-left: 0;
+}
+
+.pur306-mat2-code-pair > .pur306-mat-code-field {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 6fr) max-content;
+  column-gap: var(--pur306-pair-gap);
+  align-items: center;
+  min-width: 0;
+}
+
+.pur306-mat-code-field .pur306-sg-input--code,
+.pur306-mat-code-field .pur306-sg-input--name {
+  width: 100%;
+  max-width: 100%;
+  flex: none;
+  min-width: 0;
+}
+
+.pur306-row > .pur306-sg-label:not(:first-child) {
+  margin-left: calc(var(--pur306-col-gap) - var(--pur306-pair-gap));
+}
+
+.pur306-row > .pur306-sg-label,
+.pur306-row > .pur306-cell-field {
+  min-height: var(--pur306-row-min-h);
+}
+
+.pur306-sg-label {
+  box-sizing: border-box;
+  width: var(--pur306-label-col);
+  min-width: var(--pur306-label-col);
+  max-width: var(--pur306-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pur306-sg-label--danger {
+  color: rgb(220 38 38);
+}
+
+.pur306-req::before {
+  content: "*";
+  color: rgb(220 38 38);
+  margin-right: 0.15rem;
+  font-weight: 700;
+}
+
+.pur306-cell-field {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.pur306-inline-field {
+  flex-wrap: nowrap;
+  gap: 0.375rem;
+}
+
+.pur306-sg-input,
+.pur306-sg-select {
+  box-sizing: border-box;
+  height: var(--pur306-control-h);
+  min-height: var(--pur306-control-h);
+  max-height: var(--pur306-control-h);
+  width: 100%;
+  min-width: 0;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: rgb(55 65 81);
+  background: #fff;
+  border: 1px solid var(--pur306-control-border);
+  border-radius: 0.375rem;
+}
+
+.pur306-sg-input:focus,
+.pur306-sg-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.2);
+}
+
+.pur306-sg-input:disabled {
+  background: rgb(241 245 249);
+  color: rgb(71 85 105);
+}
+
+.pur306-sg-input--danger {
+  color: rgb(220 38 38);
+  font-weight: 600;
+}
+
+.pur306-sg-input--date {
+  flex: 0 1 9rem;
+  width: 9rem;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.pur306-sg-input--code {
+  flex: 0 0 5.5rem;
+  width: 5.5rem;
+  max-width: 5.5rem;
+}
+
+.pur306-sg-input--name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.pur306-sub-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: var(--pur306-control-h);
+  min-height: var(--pur306-control-h);
+  min-width: 4.5rem;
+  padding: 0 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: rgb(30 64 175);
+  border: 1px solid rgb(147 197 253);
+  border-radius: 0.375rem;
+  background-color: rgb(239 246 255);
+  box-shadow: 0 1px 2px 0 rgb(59 130 246 / 0.08);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.pur306-sub-btn:hover {
+  background-color: rgb(219 234 254);
+  border-color: rgb(96 165 250);
+}
+
+/* 그리드 헤더 — whitebutton(26px) 높이 + 서브버튼 톤 */
+.pur306-sub-btn--grid {
+  height: 1.625rem;
+  min-height: 1.625rem;
+  max-height: 1.625rem;
+  min-width: auto;
+  padding: 0 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* 그리드 헤더 — 서브버튼 + 컴팩트 바 */
+.pur306-grid-bar {
+  align-items: center;
+  min-height: 1.875rem;
+  padding: 0.125rem 0.5rem;
+}
+
+.pur306-grid-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.875rem;
+}
+
+.pur306-grid-body {
+  margin-top: 0.25rem;
+}
+
+.pur306-grid-layout {
+  min-height: 0;
+}
+
+.pur306-grid-transfer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0 0.125rem;
+}
+
+.pur306-transfer-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  color: rgb(37 99 235);
+  border: 1px solid rgb(147 197 253);
+  border-radius: 0.5rem;
+  background: linear-gradient(180deg, rgb(239 246 255) 0%, rgb(219 234 254) 100%);
+  box-shadow: 0 1px 3px 0 rgb(59 130 246 / 0.18);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.pur306-transfer-btn:hover {
+  color: rgb(29 78 216);
+  border-color: rgb(96 165 250);
+  background: rgb(219 234 254);
+  box-shadow: 0 2px 6px 0 rgb(59 130 246 / 0.22);
+  transform: translateY(-1px);
+}
+
+.pur306-transfer-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px 0 rgb(59 130 246 / 0.15);
+}
+
+.pur306-transfer-icon {
+  display: block;
+  width: 1.125rem;
+  height: 1.125rem;
+  pointer-events: none;
+}
+
+/* PickStore — STKN06_012 store-grid (3콤보 한 세트) */
+.pur306-pick-slot {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.pur306-pick-slot :deep(> div.flex.text-base) {
+  margin: 0 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+.pur306-pick-slot :deep(> div.flex > div:first-child) {
+  display: none;
+}
+
+/* 매장 3콤보 — 1행 전용 내부 그리드 */
+.pur306-pick-slot--store-grid :deep(> div.flex) {
+  display: grid !important;
+  grid-template-columns:
+    var(--pur306-store-combo-w)
+    var(--pur306-store-combo-w)
+    minmax(0, 1fr) !important;
+  width: max-content !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  flex-wrap: unset !important;
+  align-items: stretch !important;
+  gap: var(--pur306-item-gap) !important;
+}
+
+.pur306-pick-slot--store-grid :deep(> div.flex > div) {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.pur306-pick-slot--store-grid :deep(> div.flex > div:last-child) {
+  flex: unset !important;
+  width: 50% !important;
+  min-width: 0 !important;
+  max-width: 50% !important;
+  justify-self: start;
+}
+
+.pur306-pick-slot--store-grid :deep(> div.flex > div:last-child > div) {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.pur306-search-panel .pur306-pick-slot :deep(select) {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: var(--pur306-control-h) !important;
+  min-height: var(--pur306-control-h) !important;
+  max-height: var(--pur306-control-h) !important;
+  margin-left: 0 !important;
+  padding: 0 0.375rem !important;
+  font-size: 0.875rem !important;
+  border: 1px solid var(--pur306-control-border) !important;
+  border-radius: 0.375rem !important;
+}
+
+.pur306-search-panel .pur306-pick-slot :deep(select:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.pur306-search-panel .pur306-pick-slot :deep(.pickstore-vs-shell) {
+  box-sizing: border-box;
+  height: var(--pur306-control-h) !important;
+  min-height: var(--pur306-control-h) !important;
+  max-height: var(--pur306-control-h) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  border: 1px solid var(--pur306-control-border) !important;
+  border-radius: 0.375rem !important;
+  font-size: 0.875rem !important;
+  background: #fff !important;
+}
+
+.pur306-pick-slot :deep(.vs__dropdown-toggle) {
+  height: 100% !important;
+  min-height: 0 !important;
+  border: none !important;
+}
+
+/* BusinessClient2 — PUR02 패턴 */
+.pur306-bc-slot :deep(> div.flex.text-base) {
+  margin: 0 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  gap: 0 !important;
+}
+
+.pur306-search-panel .pur306-bc-slot :deep(.pickstore-vs-shell) {
+  box-sizing: border-box;
+  height: var(--pur306-control-h) !important;
+  min-height: var(--pur306-control-h) !important;
+  border: 1px solid var(--pur306-control-border) !important;
+  border-radius: 0.375rem !important;
+  font-size: 0.875rem !important;
+  background: #fff !important;
+  max-width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 1279px) {
+  .pur306-row--mat1 {
+    grid-template-columns:
+      var(--pur306-label-col) minmax(0, 1fr)
+      var(--pur306-label-col) minmax(0, 1fr);
+  }
+
+  .pur306-row--mat1 > .pur306-sg-label:nth-child(5),
+  .pur306-row--mat1 > .pur306-cell-field:nth-child(6),
+  .pur306-row--mat1 > .pur306-sg-label:nth-child(7),
+  .pur306-row--mat1 > .pur306-cell-field:nth-child(8) {
+    margin-top: var(--pur306-row-gap);
+  }
+
+  .pur306-row--mat1 > .pur306-sg-label:nth-child(5) {
+    margin-left: 0;
+  }
+
+  .pur306-row--mat2 {
+    grid-template-columns:
+      var(--pur306-label-col) minmax(0, 1fr)
+      var(--pur306-label-col) minmax(0, 1fr);
+  }
+
+  .pur306-row--mat2 > .pur306-mat2-code-pair {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 1023px) {
+  .pur306-row--order1,
+  .pur306-row--order2,
+  .pur306-row--order3,
+  .pur306-row--mat1,
+  .pur306-row--mat2 {
+    grid-template-columns: var(--pur306-label-col) minmax(0, 1fr);
+  }
+
+  .pur306-row--order1 > .pur306-date-field,
+  .pur306-row--order2 > .pur306-deadline-field,
+  .pur306-row--order3 > .pur306-cell-field {
+    justify-self: stretch;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .pur306-order2-tail {
+    padding-left: 0;
+    grid-template-columns: var(--pur306-label-col) minmax(0, 1fr);
+  }
+
+  .pur306-row--mat2 > .pur306-mat2-code-pair {
+    grid-column: auto;
+    grid-template-columns: var(--pur306-label-col) minmax(0, 1fr);
+  }
+
+  .pur306-mat-code-field {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pur306-row > .pur306-sg-label:not(:first-child) {
+    margin-left: 0;
+    margin-top: var(--pur306-row-gap);
+  }
+
+  .pur306-row > .pur306-cell-field:not(:first-of-type) {
+    margin-top: 0;
+  }
+}
+</style>
