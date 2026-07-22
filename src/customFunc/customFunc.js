@@ -392,9 +392,12 @@ export function findFirstMissingMenuCodeRequiredLabel(rows, isNewAutoMenuCode) {
     },
     {
       label: "메뉴코드",
-      isMissing: (item) =>
-        (item.lngCode === "" && isNewAutoMenuCode === false) ||
-        item.lngCode === undefined,
+      isMissing: (item) => {
+        if (isNewAutoMenuCode) {
+          return false;
+        }
+        return item.lngCode === "" || item.lngCode === undefined;
+      },
     },
     {
       label: "메뉴명",

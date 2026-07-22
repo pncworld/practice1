@@ -2195,9 +2195,14 @@ const saveButton = () => {
     return;
   }
 
-  //console.log(updateRow.value);
+  const rowsToSave = updateRow.value.filter(
+    (_, index) =>
+      updateDeleteInsertrowIndex.value.updated?.includes(index) ||
+      updateDeleteInsertrowIndex.value.created?.includes(index)
+  );
+
   const missingRequiredLabel = findFirstMissingMenuCodeRequiredLabel(
-    updateRow.value,
+    rowsToSave,
     isNewAutoMenuCode.value
   );
 
@@ -2211,9 +2216,10 @@ const saveButton = () => {
     return;
   }
 
-  const validateRow2 =
-    new Set(updateRow.value.map((item) => item.lngCode)).size ==
-    updateRow.value.map((item) => item.lngCode).length;
+  const saveMenuCodes = rowsToSave
+    .map((item) => item.lngCode)
+    .filter((code) => code !== "" && code !== undefined && code !== null);
+  const validateRow2 = new Set(saveMenuCodes).size === saveMenuCodes.length;
 
   if (validateRow2 == false) {
     Swal.fire({
