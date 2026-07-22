@@ -1417,7 +1417,7 @@ import RealGrid from "realgrid";
  *  페이지로그 자동 입력
  *  */
 
-import { insertPageLog, normalizeMenuListSoldOutYn, normalizeSoldOutYn, assertApiSuccess, findFirstMissingMenuCodeRequiredLabel } from "@/customFunc/customFunc";
+import { insertPageLog, normalizeMenuListSoldOutYn, normalizeSoldOutYn, assertApiSuccess, findFirstMissingMenuCodeRequiredLabel, getMenuCodeRowIndicesToSave, getUpdatedRowsMissingMenuNameSwalText } from "@/customFunc/customFunc";
 import { getCommonList, getStoreList2 } from "@/api/common";
 /**
  *  이미지 별도 호출
@@ -2817,13 +2817,20 @@ const saveButton = () => {
     });
     return;
   }
-  const changedRowCount =
-    updateDeleteInsertrowIndex.value.deleted.length +
-    updateDeleteInsertrowIndex.value.created.length +
-    updateDeleteInsertrowIndex.value.updated.length;
+  const saveIndices = getMenuCodeRowIndicesToSave(
+    updateRow.value,
+    updateDeleteInsertrowIndex.value,
+    confirmData.value
+  );
+  const deletedCount = updateDeleteInsertrowIndex.value.deleted?.length ?? 0;
   const hasFileUploadChange = uploadImages.value.length > 0;
 
-  if (changedRowCount === 0 && !hasFileUploadChange) {
+  if (
+    saveIndices.length === 0 &&
+    deletedCount === 0 &&
+    !hasFileUploadChange &&
+    !discountChanged.value
+  ) {
     Swal.fire({
       title: "경고",
       text: "변경된 사항이 없습니다.",
@@ -2833,11 +2840,23 @@ const saveButton = () => {
     return;
   }
 
-  const rowsToSave = updateRow.value.filter(
-    (_, index) =>
-      updateDeleteInsertrowIndex.value.updated?.includes(index) ||
-      updateDeleteInsertrowIndex.value.created?.includes(index)
+  const rowsToSave = saveIndices.map((index) => updateRow.value[index]);
+
+  const updatedMissingMenuNameText = getUpdatedRowsMissingMenuNameSwalText(
+    updateRow.value,
+    saveIndices,
+    updateDeleteInsertrowIndex.value
   );
+
+  if (updatedMissingMenuNameText) {
+    Swal.fire({
+      title: "경고",
+      text: updatedMissingMenuNameText,
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
 
   const missingRequiredLabel = findFirstMissingMenuCodeRequiredLabel(
     rowsToSave,
@@ -2897,10 +2916,8 @@ const saveButton = () => {
         const deletedRow = updateRow.value.filter((_, index) =>
           updateDeleteInsertrowIndex.value.deleted.includes(index)
         );
-        const updatedAndInsertRow = updateRow.value.filter(
-          (_, index) =>
-            updateDeleteInsertrowIndex.value.updated.includes(index) ||
-            updateDeleteInsertrowIndex.value.created.includes(index)
+        const updatedAndInsertRow = saveIndices.map(
+          (index) => updateRow.value[index]
         );
 
         //console.log(updatedAndInsertRow);

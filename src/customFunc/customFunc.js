@@ -380,6 +380,10 @@ export function assertApiSuccess(
 }
 
 /** 메뉴코드등록(MST01_003/033INS) 저장 시 첫 번째 미입력 필수 항목 라벨 반환 */
+function isMenuNameMissing(value) {
+  return value === "" || value === undefined || value === null || String(value).trim() === "";
+}
+
 export function findFirstMissingMenuCodeRequiredLabel(rows, isNewAutoMenuCode) {
   const checks = [
     {
@@ -401,8 +405,7 @@ export function findFirstMissingMenuCodeRequiredLabel(rows, isNewAutoMenuCode) {
     },
     {
       label: "메뉴명",
-      isMissing: (item) =>
-        item.strName === "" || item.strName === undefined,
+      isMissing: (item) => isMenuNameMissing(item.strName),
     },
     {
       label: "유효기간",
@@ -435,4 +438,136 @@ export function findFirstMissingMenuCodeRequiredLabel(rows, isNewAutoMenuCode) {
     }
   }
   return null;
+}
+
+/** saveMenuCode 전송 필드 — 실제 변경 여부 비교용 (003/033 공통 + 화면별 필드) */
+const MENU_CODE_ROW_COMPARE_KEYS = [
+  "lngMainGroup",
+  "lngSubGroup",
+  "lngCode",
+  "dtmFromDate",
+  "dtmToDate",
+  "strName",
+  "strNameE",
+  "lngDCPrice",
+  "lngChain",
+  "lngPrice",
+  "blnDCPriceYN",
+  "lngTax",
+  "blnInactive",
+  "lngDiscount",
+  "intCustCount",
+  "blnCondimentprice",
+  "lngOrder",
+  "lngKPG",
+  "strBarCode",
+  "blnReceipt",
+  "lngMenuOption",
+  "blnFloat",
+  "blnRedPrint",
+  "strIcon",
+  "blnKitSingle",
+  "lngSubTitle",
+  "blnServing",
+  "blnOpen",
+  "blnDeliveryYN",
+  "blnSoldOutYN",
+  "strNutrInfo",
+  "strCntryOrg",
+  "strMenuComment",
+  "strUserFileName",
+  "lngType",
+  "dtmStart",
+  "dtmEnd",
+  "lngKDS",
+  "strNameK",
+  "discountYN",
+  "strBigo",
+  "strAmtCodeList",
+];
+
+function normalizeMenuCodeRowCompareValue(key, value) {
+  if (value === undefined || value === null) {
+    return "";
+  }
+  if (key === "blnSoldOutYN") {
+    return normalizeSoldOutYn(value);
+  }
+  if (typeof value === "boolean") {
+    return value ? "1" : "0";
+  }
+  if (typeof value === "number") {
+    return String(value);
+  }
+  return String(value).trim();
+}
+
+/** 조회 시점(confirmData) 대비 실제 값이 바뀐 updated 행인지 */
+export function isMenuCodeRowActuallyChanged(current, original) {
+  if (!current) {
+    return false;
+  }
+  if (!original) {
+    return true;
+  }
+  for (const key of MENU_CODE_ROW_COMPARE_KEYS) {
+    if (
+      normalizeMenuCodeRowCompareValue(key, current[key]) !==
+      normalizeMenuCodeRowCompareValue(key, original[key])
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/** created 전부 + 실제 변경된 updated만 저장 대상 인덱스로 반환 */
+export function getMenuCodeRowIndicesToSave(allRows, stateIndexes, originalRows) {
+  const created = stateIndexes?.created ?? [];
+  const updated = stateIndexes?.updated ?? [];
+  const indices = [
+    ...created,
+    ...updated.filter((index) =>
+      isMenuCodeRowActuallyChanged(allRows?.[index], originalRows?.[index])
+    ),
+  ];
+  return [...new Set(indices)].sort((a, b) => a - b);
+}
+
+export function getMenuCodeRowsToSave(allRows, stateIndexes, originalRows) {
+  return getMenuCodeRowIndicesToSave(allRows, stateIndexes, originalRows).map(
+    (index) => allRows[index]
+  );
+}
+
+/** 저장 대상 중 updated 행의 메뉴명 미입력 — 기존 경고 Swal용 문구 */
+export function getUpdatedRowsMissingMenuNameSwalText(
+  allRows,
+  saveIndices,
+  stateIndexes
+) {
+  const updatedSet = new Set(stateIndexes?.updated ?? []);
+  const menuCodes = [];
+
+  for (const index of saveIndices ?? []) {
+    if (!updatedSet.has(index)) {
+      continue;
+    }
+    const row = allRows?.[index];
+    if (!row || !isMenuNameMissing(row.strName)) {
+      continue;
+    }
+    const code = row.lngCode;
+    menuCodes.push(
+      code !== "" && code !== undefined && code !== null
+        ? String(code)
+        : "미지정"
+    );
+  }
+
+  if (menuCodes.length === 0) {
+    return null;
+  }
+
+  return `메뉴명 항목이 미입력 되어 있습니다.\n (메뉴명 미등록 메뉴코드: ${menuCodes.join(", ")}) `;
 }
