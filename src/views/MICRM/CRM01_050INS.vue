@@ -123,8 +123,8 @@
       </div>
     </div>
 
-    <!-- 그리드: 고정 높이로 항상 표시 (013INS 동일) -->
-    <div class="h-[32vh] min-h-[11rem] w-full shrink-0 px-2">
+    <div class="crm050-content min-h-0 flex-1">
+    <div class="crm050-grid-wrap px-2">
     <Realgrid
         class="h-full w-full"
         :progname="'CRM01_050INS_VUE'"
@@ -158,11 +158,10 @@
   </div>
 
     <!-- 상세 + 엑셀: 남은 높이 — 상세 폼 확장, 엑셀은 하단 고정 -->
-    <div
-      class="crm050-lower-body flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto px-2 pb-1">
-      <div class="crm050-detail-section flex min-h-0 min-w-0 flex-1 flex-col">
-        <div class="crm050-detail-panel flex min-h-0 flex-1 flex-col pt-0">
-          <div class="crm050-form-grid min-h-0 w-full flex-1">
+    <div class="crm050-lower-body px-2">
+      <div class="crm050-detail-section shrink-0">
+        <div class="crm050-detail-panel shrink-0 flex flex-col gap-2 pt-0">
+          <div class="crm050-form-grid w-full shrink-0">
             <div class="crm050-form-label crm050-form-label--required">
               <span class="crm050-form-label__asterisk" aria-hidden="true">*</span>
               카드번호
@@ -471,6 +470,7 @@
             @change="handleFileChange" />
         </div>
       </div>
+    </div>
     </div>
 
   <div
@@ -2488,6 +2488,20 @@ watch(p2cond2, () => {
   --crm050-bar-control-h: 2rem;
 }
 
+.crm050-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(8rem, 1fr) auto;
+  overflow: hidden;
+}
+
+.crm050-grid-wrap {
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
 /* 상단 조회 — 전체 너비 4열 균등 + 조회조건 콤보 120% / 입력 110% */
 .crm050-search-bar {
   --crm050-search-control-h: var(--crm050-bar-control-h);
@@ -3059,13 +3073,41 @@ watch(p2cond2, () => {
 }
 
 .crm050-lower-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   min-height: 0;
-  overflow-y: hidden;
+  min-width: 0;
+  max-height: min(52vh, 32rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-bottom: 1rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+
+.crm050-lower-body::-webkit-scrollbar {
+  width: 0.625rem;
+}
+
+.crm050-lower-body::-webkit-scrollbar-track {
+  background: #eef2f7;
+  border-radius: 0.375rem;
+}
+
+.crm050-lower-body::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 0.375rem;
+  border: 2px solid #eef2f7;
+}
+
+.crm050-lower-body::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
 
 .crm050-detail-section {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
+  min-width: 0;
   overflow: visible;
   display: flex;
   flex-direction: column;
@@ -3073,21 +3115,22 @@ watch(p2cond2, () => {
 
 .crm050-detail-panel {
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   flex-direction: column;
-  min-height: 0;
+  min-width: 0;
+  gap: 0.5rem;
   --crm050-detail-row-min: 2.125rem;
   --crm050-detail-font: 0.875rem;
   --crm050-detail-cell-py: 0.25rem;
-  --crm050-detail-input-w-scale: 0.7;
+  --crm050-detail-control-h: 1.75rem;
   scrollbar-width: auto;
   scrollbar-color: #1e40af #e8eef7;
 }
 
 .crm050-excel-upload--pinned {
-  margin-top: auto;
-  padding-top: 1rem;
-  padding-bottom: 0.25rem;
+  margin-top: 0;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
 }
 
 .crm050-detail-panel::-webkit-scrollbar {
@@ -3111,7 +3154,10 @@ watch(p2cond2, () => {
       0,
       3fr
     );
-  grid-template-rows: repeat(7, minmax(var(--crm050-detail-row-min), 1fr));
+  grid-auto-rows: minmax(var(--crm050-detail-row-min), auto);
+  align-self: start;
+  flex: 0 0 auto;
+  width: 100%;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
   overflow: visible;
@@ -3130,7 +3176,6 @@ watch(p2cond2, () => {
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  height: 100%;
   min-height: var(--crm050-detail-row-min);
   padding: var(--crm050-detail-cell-py) 0.375rem;
   border: 1px solid #e5e7eb;
@@ -3176,7 +3221,6 @@ watch(p2cond2, () => {
   display: flex;
   align-items: center;
   box-sizing: border-box;
-  height: 100%;
   min-height: var(--crm050-detail-row-min);
   min-width: 0;
   padding: var(--crm050-detail-cell-py) 0.375rem;
@@ -3199,10 +3243,10 @@ watch(p2cond2, () => {
 }
 
 .crm050-form-value--card .crm050-control--field {
-  flex: 0 1 calc(100% * var(--crm050-detail-input-w-scale));
+  flex: 1 1 auto;
   min-width: 0;
-  max-width: calc(100% * var(--crm050-detail-input-w-scale));
-  width: auto;
+  width: 100%;
+  max-width: 100%;
 }
 
 .crm050-detail-panel .crm050-form-value:not(.crm050-form-value--card):not(
@@ -3212,8 +3256,8 @@ watch(p2cond2, () => {
 .crm050-detail-panel
   .crm050-form-value:not(.crm050-form-value--radio)
   select.crm050-control--field {
-  width: calc(100% * var(--crm050-detail-input-w-scale));
-  max-width: calc(100% * var(--crm050-detail-input-w-scale));
+  width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
@@ -3231,11 +3275,13 @@ watch(p2cond2, () => {
   align-items: flex-start;
   justify-content: flex-end;
   gap: 0.375rem;
-  flex-shrink: 0;
+  flex: 0 0 auto;
   width: 100%;
-  margin-top: auto;
-  margin-bottom: 0;
-  padding: 0.625rem 0.375rem 0.25rem 0;
+  margin: 0;
+  padding: 0.25rem 0.375rem 0 0;
+  position: relative;
+  z-index: 1;
+  clear: both;
   font-size: var(--crm050-detail-font);
   font-weight: 700;
   line-height: 1.5;
@@ -3290,24 +3336,21 @@ watch(p2cond2, () => {
 .crm050-detail-panel .crm050-form-grid .crm050-control,
 .crm050-detail-panel .crm050-form-grid .crm050-control--field {
   box-sizing: border-box;
-  flex-shrink: 0;
-  height: min(
-    2.25rem,
-    calc(100% - (var(--crm050-detail-cell-py) * 2) - 2px)
-  );
-  min-height: 1.625rem;
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 100%;
+  height: var(--crm050-detail-control-h);
+  min-height: var(--crm050-detail-control-h);
+  max-height: var(--crm050-detail-control-h);
   font-size: var(--crm050-detail-font);
   line-height: 1.2;
   border: 1px solid var(--crm050-control-border) !important;
   border-radius: var(--crm050-control-radius) !important;
 }
 
-.crm050-detail-panel .crm050-form-grid .crm050-control--field,
-.crm050-detail-panel
-  .crm050-form-grid
-  select.crm050-control--field {
-  width: calc(100% * var(--crm050-detail-input-w-scale));
-  max-width: calc(100% * var(--crm050-detail-input-w-scale));
+.crm050-detail-panel .crm050-form-grid select.crm050-control--field {
+  width: 100%;
+  max-width: 100%;
 }
 
 .crm050-control--amount {
@@ -3319,11 +3362,9 @@ watch(p2cond2, () => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  height: min(
-    2.25rem,
-    calc(100% - (var(--crm050-detail-cell-py) * 2) - 2px)
-  );
-  min-height: 1.625rem;
+  height: var(--crm050-detail-control-h);
+  min-height: var(--crm050-detail-control-h);
+  max-height: var(--crm050-detail-control-h);
   padding: 0 0.625rem;
   font-size: var(--crm050-detail-font);
   font-weight: 600;
@@ -3485,28 +3526,18 @@ watch(p2cond2, () => {
   min-height: 2.25rem;
 }
 
-/* 노트북 등 세로 공간 부족 — 폼 행 고정·안내 문구 하단 우측 배치 */
+/* 노트북 등 세로·가로 공간 부족 — 2열/1열 반응형 */
+@media (max-width: 1280px) {
+  .crm050-form-grid {
+    grid-template-columns: minmax(4.5rem, 1fr) minmax(0, 2.5fr);
+  }
+}
+
 @media (max-height: 920px) {
   .crm050-detail-panel {
     --crm050-detail-row-min: 1.75rem;
     --crm050-detail-cell-py: 0.1875rem;
-  }
-
-  .crm050-form-grid {
-    flex: 0 0 auto;
-    grid-template-rows: repeat(7, minmax(var(--crm050-detail-row-min), auto));
-  }
-
-  .crm050-detail-panel .crm050-form-grid .crm050-control,
-  .crm050-detail-panel .crm050-form-grid .crm050-control--field,
-  .crm050-sub-btn {
-    height: 1.625rem;
-    min-height: 1.5rem;
-  }
-
-  .crm050-detail-note {
-    padding-top: 0.75rem;
-    padding-bottom: 0.375rem;
+    --crm050-detail-control-h: 1.625rem;
   }
 
   .crm050-excel-upload--pinned {
