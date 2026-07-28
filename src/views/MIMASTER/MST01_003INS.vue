@@ -337,7 +337,8 @@
         </button>
       </div>
       <div
-        class="mst003-detail-panel min-h-0 flex-1 overflow-x-hidden overflow-y-auto pr-1 pt-3">
+        class="mst003-detail-panel min-h-0 flex-1 overflow-x-hidden overflow-y-auto pr-1"
+        :class="selectedMenu == 4 ? 'mst003-detail-panel--delivery' : 'pt-3'">
         <div v-show="selectedMenu == 1" class="min-w-0">
           <div class="mst003-section-title">기본정보</div>
           <div class="mst003-form-grid mt-3 w-full">
@@ -1319,7 +1320,7 @@
           v-if="canUseDeliveryMenuTab"
           v-show="selectedMenu == 4"
           class="min-w-0">
-          <div class="flex justify-end mb-2">
+          <div v-if="!isDeliveryMenuNoStoreMode" class="flex justify-end mb-2">
             <button
               type="button"
               class="whitebutton mst003-sub-btn"
@@ -1327,34 +1328,73 @@
               배달메뉴복사
             </button>
           </div>
-          <div class="mst003-form-grid mt-3 w-full">
-            <div class="mst003-form-label">
-              매장
-            </div>
-            <div class="mst003-field-span3 mst003-form-value mst003-vselect-slot">
-              <v-select
-                v-model="deliveryStoreCd"
-                :options="imageStoreOptions"
-                label="strName"
-                placeholder="선택"
-                class="custom-select2"
-                append-to-body
-                :clearable="true"
-                :reduce="(item) => String(item.lngStoreCode)" />
-            </div>
+          <div
+            class="mst003-form-grid w-full"
+            :class="
+              isDeliveryMenuNoStoreMode
+                ? 'mst003-form-grid--delivery-compact'
+                : 'mt-3'
+            ">
+            <template v-if="!isDeliveryMenuNoStoreMode">
+              <div class="mst003-form-label">
+                매장
+              </div>
+              <div class="mst003-field-span3 mst003-form-value mst003-vselect-slot">
+                <v-select
+                  v-model="deliveryStoreCd"
+                  :options="imageStoreOptions"
+                  label="strName"
+                  placeholder="선택"
+                  class="custom-select2"
+                  append-to-body
+                  :clearable="true"
+                  :reduce="(item) => String(item.lngStoreCode)" />
+              </div>
+            </template>
 
             <template v-for="deliveryRow in deliveryMenuRows" :key="deliveryRow.code">
-              <div class="mst003-form-label">
-                {{ deliveryRow.name }}
-              </div>
-              <div class="mst003-field-span3 mst003-form-value">
-                <input
-                  type="text"
-                  v-model="deliveryRow.menuName"
-                  class="mst003-control w-full"
-                  placeholder="배달메뉴명 입력"
-                  :disabled="!canEditDeliveryMenuRows" />
-              </div>
+              <template
+                v-if="
+                  isDeliveryMenuNoStoreMode && isMultiNameDeliveryRow(deliveryRow)
+                ">
+                <div class="mst003-form-label mst003-baemin-merged-label">
+                  {{ deliveryRow.name }}
+                </div>
+                <div
+                  v-for="pairIndex in multiDeliveryMenuNameCount / 2"
+                  :key="`${deliveryRow.code}-pair-${pairIndex}`"
+                  class="mst003-field-span3 mst003-form-value mst003-baemin-pair">
+                  <div class="mst003-baemin-pair-cell">
+                    <input
+                      type="text"
+                      v-model="deliveryRow.menuNames[(pairIndex - 1) * 2]"
+                      class="mst003-control w-full"
+                      placeholder="배달메뉴명 입력"
+                      :disabled="!canEditDeliveryMenuRows" />
+                  </div>
+                  <div class="mst003-baemin-pair-cell">
+                    <input
+                      type="text"
+                      v-model="deliveryRow.menuNames[(pairIndex - 1) * 2 + 1]"
+                      class="mst003-control w-full"
+                      placeholder="배달메뉴명 입력"
+                      :disabled="!canEditDeliveryMenuRows" />
+                  </div>
+                </div>
+              </template>
+              <template v-else>
+                <div class="mst003-form-label">
+                  {{ deliveryRow.name }}
+                </div>
+                <div class="mst003-field-span3 mst003-form-value">
+                  <input
+                    type="text"
+                    v-model="deliveryRow.menuName"
+                    class="mst003-control w-full"
+                    placeholder="배달메뉴명 입력"
+                    :disabled="!canEditDeliveryMenuRows" />
+                </div>
+              </template>
             </template>
             <template v-if="deliveryMenuRows.length === 0">
               <div class="mst003-form-label">배달사</div>
@@ -1376,6 +1416,7 @@ import {
   copyMenuListByCode,
   copyDeliveryMenuMap,
   deleteFile,
+  getCommonList_ver2,
   getDeliveryMenuExcelColumn,
   getAmountListByMenuCode,
   getDeliveryMenuMap,
@@ -1418,7 +1459,7 @@ import RealGrid from "realgrid";
  *  */
 
 import { insertPageLog, normalizeMenuListSoldOutYn, normalizeSoldOutYn, assertApiSuccess, findFirstMissingMenuCodeRequiredLabel, getMenuCodeRowIndicesToSave, getUpdatedRowsMissingMenuNameSwalText } from "@/customFunc/customFunc";
-import { getCommonList, getStoreList2 } from "@/api/common";
+import { getStoreList2 } from "@/api/common";
 /**
  *  이미지 별도 호출
  *  */
@@ -1475,8 +1516,36 @@ onMounted(async () => {
     disableWithMenuDisc.value = false;
   }
 
-  const deliveryCompanyRes = await getCommonList(446);
-  deliveryCompanyOptions.value = deliveryCompanyRes?.data?.List ?? [];
+  try {
+    // console.log("[MST01_003INS][DELIVERY_COMPANY] fetch start", {
+    //   CODE: 446,
+    //   groupCd: groupCd.value,
+    // });
+    const deliveryCompanyRes = await getCommonList_ver2(446);
+    const rawList = deliveryCompanyRes?.data?.List ?? [];
+    // console.log(
+    //   "[MST01_003INS][DELIVERY_COMPANY] raw response summary\n",
+    //   JSON.stringify(
+    //     {
+    //       RESULT_CD: deliveryCompanyRes?.data?.RESULT_CD,
+    //       RESULT_NM: deliveryCompanyRes?.data?.RESULT_NM,
+    //       listLength: rawList.length,
+    //       firstItem: rawList[0] ?? null,
+    //     },
+    //     null,
+    //     2
+    //   )
+    // );
+    // if (!rawList.length) {
+    //   console.warn(
+    //     "[MST01_003INS][DELIVERY_COMPANY] 배달사 List 비어있음 → UI에 '배달사 정보가 없습니다.' 표시"
+    //   );
+    // }
+    deliveryCompanyOptions.value = rawList;
+  } catch (error) {
+    // console.error("[MST01_003INS][DELIVERY_COMPANY] fetch error", error);
+    deliveryCompanyOptions.value = [];
+  }
   await loadStoreOptions(groupCd.value);
 });
 const searchWord2 = ref("");
@@ -1535,8 +1604,14 @@ const sendRowState = (e) => {
 
 const selectedMenu = ref(1);
 const deliveryMenuTabAllowedGroups = ["9999", "3048", "3287"];
+// 임시: 9999는 3048과 동일하게 매장별 조회/저장 테스트용 (롤백 시 ["9999","3287"]로 복구)
+const deliveryMenuNoStoreGroups = ["3287"];
+const multiDeliveryMenuNameCount = 10;
 const canUseDeliveryMenuTab = computed(() =>
   deliveryMenuTabAllowedGroups.includes(String(groupCd.value ?? ""))
+);
+const isDeliveryMenuNoStoreMode = computed(() =>
+  deliveryMenuNoStoreGroups.includes(String(groupCd.value ?? ""))
 );
 const selectMenu = (newValue) => {
   if (newValue === 4 && !canUseDeliveryMenuTab.value) {
@@ -1556,11 +1631,50 @@ const deliveryMenuName = ref("");
 const deliveryCompanyOptions = ref([]);
 const deliveryMenuRows = ref([]);
 const selectedMenuCodeForDelivery = ref("");
+const isMultiNameDeliveryRow = (row) =>
+  /배달의\s*민족|요기요|쿠팡\s*이츠|네이버/.test(String(row?.name ?? ""));
+const createEmptyMultiMenuNames = () =>
+  Array.from({ length: multiDeliveryMenuNameCount }, () => "");
+/** 3287: STORE_CD 고정 0 / 3048·9999(임시): 선택 매장 */
+const resolveDeliveryStoreCdForApi = () => {
+  if (isDeliveryMenuNoStoreMode.value) return "0";
+  return normalizeDeliveryParam(deliveryStoreCd.value);
+};
+const readDeliveryStrInfo = (row, index) => {
+  const n = index + 1;
+  return String(
+    row?.[`strInfo${n}`] ??
+      row?.[`STR_INFO${n}`] ??
+      row?.[`STRINFO${n}`] ??
+      row?.[`StrInfo${n}`] ??
+      ""
+  ).trim();
+};
+const resolveDeliveryMenuNamesList = (response) => {
+  const empty = createEmptyMultiMenuNames();
+  const src = response?.data;
+  const resultCd = String(src?.RESULT_CD ?? src?.result_cd ?? "");
+  const list = Array.isArray(src?.List)
+    ? src.List
+    : Array.isArray(src?.list)
+      ? src.list
+      : [];
+
+  const first =
+    resultCd === "00" && list.length > 0
+      ? list[0] || {}
+      : (Array.isArray(src) && src[0]) || src?.Map || src || {};
+
+  return empty.map((_, index) => readDeliveryStrInfo(first, index));
+};
 const canEditDeliveryMenuRows = computed(() => {
-  const storeCd = normalizeDeliveryParam(deliveryStoreCd.value);
   const menuCd = normalizeDeliveryParam(
     selectedMenuCodeForDelivery.value || gridvalue3.value
   );
+  if (isDeliveryMenuNoStoreMode.value) {
+    return Boolean(menuCd);
+  }
+  const storeCd = normalizeDeliveryParam(deliveryStoreCd.value);
   return Boolean(storeCd && menuCd);
 });
 const resolveMenuCdFromRow = (row) => {
@@ -1646,44 +1760,84 @@ const extractDeliveryMapList = (response) => {
   if (Array.isArray(src?.list)) return src.list;
   return [];
 };
-const buildDeliveryMenuRows = () =>
-  (deliveryCompanyOptions.value || [])
+const buildDeliveryMenuRows = () => {
+  const source = deliveryCompanyOptions.value || [];
+  const rows = source
     .filter((item) => normalizeDeliveryParam(item?.strDCode) !== "")
-    .map((item) => ({
-      code: normalizeDeliveryParam(item?.strDCode),
-      name: String(item?.strDName ?? item?.strDCode ?? ""),
-      menuName: "",
-      originalMenuName: "",
-    }));
+    .map((item) => {
+      const name = String(item?.strDName ?? item?.strDCode ?? "");
+      return {
+        code: normalizeDeliveryParam(item?.strDCode),
+        name,
+        menuName: "",
+        originalMenuName: "",
+        menuNames: createEmptyMultiMenuNames(),
+        originalMenuNames: createEmptyMultiMenuNames(),
+      };
+    });
+
+  // console.log("[MST01_003INS][DELIVERY_COMPANY] buildDeliveryMenuRows", {
+  //   sourceLength: source.length,
+  //   builtRowLength: rows.length,
+  //   filteredOut: source
+  //     .map((item, index) => ({
+  //       index,
+  //       strDCode: item?.strDCode,
+  //       strDName: item?.strDName,
+  //       normalized: normalizeDeliveryParam(item?.strDCode),
+  //       keys: Object.keys(item ?? {}),
+  //     }))
+  //     .filter((item) => item.normalized === ""),
+  //   rows,
+  // });
+
+  return rows;
+};
 const loadDeliveryMenuName = async () => {
-  const storeCd = normalizeDeliveryParam(deliveryStoreCd.value);
+  const storeCd = resolveDeliveryStoreCdForApi();
   const menuCd = normalizeDeliveryParam(
     selectedMenuCodeForDelivery.value || gridvalue3.value
   );
-  // console.log("[MST01_003INS][DELIVERY_MAP] request params", {
-  //   GROUP_CD: groupCd.value,
-  //   STORE_CD: storeCd,
-  //   DELIVERY_CD: deliveryCd,
-  //   MENU_CD: menuCd,
-  //   selectedMenuCodeForDelivery: selectedMenuCodeForDelivery.value,
-  //   gridvalue3: gridvalue3.value,
-  // });
   const baseRows = buildDeliveryMenuRows();
   deliveryMenuRows.value = baseRows;
 
-  if (!storeCd || !menuCd || baseRows.length === 0) {
+  // 3048·9999(임시): 매장 필수 / 3287: STORE_CD=0 고정이라 메뉴만 있으면 조회
+  if (
+    !menuCd ||
+    baseRows.length === 0 ||
+    (!isDeliveryMenuNoStoreMode.value && !storeCd)
+  ) {
     deliveryMenuName.value = "";
     return;
   }
   try {
     const loadedRows = await Promise.all(
       baseRows.map(async (row) => {
-        const res = await getDeliveryMenuMap(groupCd.value, storeCd, row.code, menuCd);
+        const res = await getDeliveryMenuMap(
+          groupCd.value,
+          storeCd,
+          row.code,
+          menuCd
+        );
+        const useMulti =
+          isDeliveryMenuNoStoreMode.value && isMultiNameDeliveryRow(row);
+        if (useMulti) {
+          const loadedNames = resolveDeliveryMenuNamesList(res);
+          return {
+            ...row,
+            menuName: loadedNames[0] ?? "",
+            originalMenuName: loadedNames[0] ?? "",
+            menuNames: loadedNames,
+            originalMenuNames: [...loadedNames],
+          };
+        }
         const loadedName = String(resolveDeliveryMenuName(res) ?? "").trim();
         return {
           ...row,
           menuName: loadedName,
           originalMenuName: loadedName,
+          menuNames: createEmptyMultiMenuNames(),
+          originalMenuNames: createEmptyMultiMenuNames(),
         };
       })
     );
@@ -1693,7 +1847,7 @@ const loadDeliveryMenuName = async () => {
     const selectedRow = loadedRows.find((row) => row.code === selectedCd);
     deliveryMenuName.value = selectedRow?.menuName ?? "";
   } catch (error) {
-    console.error("[MST01_003INS][DELIVERY_MAP] request failed", error);
+    // console.error("[MST01_003INS][DELIVERY_MAP] request failed", error);
     deliveryMenuRows.value = baseRows;
     deliveryMenuName.value = "";
   }
@@ -2659,19 +2813,41 @@ watch(gridvalue9, () => {
 });
 
 const saveDeliveryMenuTab = async () => {
-  const targetStoreCd = normalizeDeliveryParam(deliveryStoreCd.value);
+  const targetStoreCd = resolveDeliveryStoreCdForApi();
   const targetMenuCd = normalizeDeliveryParam(
     selectedMenuCodeForDelivery.value || gridvalue3.value
   );
   const targetMenuName = String(gridvalue6.value ?? "").trim();
 
   const rowsToSave = (deliveryMenuRows.value || [])
-    .map((row) => ({
-      code: normalizeDeliveryParam(row?.code),
-      menuName: String(row?.menuName ?? "").trim(),
-      originalMenuName: String(row?.originalMenuName ?? "").trim(),
-    }))
-    .filter((row) => row.code && row.menuName !== row.originalMenuName);
+    .map((row) => {
+      const code = normalizeDeliveryParam(row?.code);
+      const useMulti =
+        isDeliveryMenuNoStoreMode.value && isMultiNameDeliveryRow(row);
+      if (useMulti) {
+        const menuNames = Array.from(
+          { length: multiDeliveryMenuNameCount },
+          (_, index) => String(row?.menuNames?.[index] ?? "").trim()
+        );
+        const originalMenuNames = Array.from(
+          { length: multiDeliveryMenuNameCount },
+          (_, index) => String(row?.originalMenuNames?.[index] ?? "").trim()
+        );
+        const changed = menuNames.some(
+          (name, index) => name !== originalMenuNames[index]
+        );
+        return { code, useMulti: true, menuNames, changed };
+      }
+      const menuName = String(row?.menuName ?? "").trim();
+      const originalMenuName = String(row?.originalMenuName ?? "").trim();
+      return {
+        code,
+        useMulti: false,
+        menuName,
+        changed: menuName !== originalMenuName,
+      };
+    })
+    .filter((row) => row.code && row.changed);
 
   if (rowsToSave.length === 0) {
     Swal.fire({
@@ -2683,10 +2859,12 @@ const saveDeliveryMenuTab = async () => {
     return;
   }
 
-  if (!targetStoreCd || !targetMenuCd) {
+  if (!targetMenuCd || (!isDeliveryMenuNoStoreMode.value && !targetStoreCd)) {
     Swal.fire({
       title: "경고",
-      text: "매장, 메뉴코드를 확인해주세요.",
+      text: isDeliveryMenuNoStoreMode.value
+        ? "메뉴코드를 확인해주세요."
+        : "매장, 메뉴코드를 확인해주세요.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -2706,15 +2884,28 @@ const saveDeliveryMenuTab = async () => {
     try {
       for (const row of rowsToSave) {
         const targetDeliveryCd = row.code;
-        const targetDeliveryMenuName = row.menuName;
         const savePayloadBase = {
           GROUP_CD: groupCd.value,
           STORE_CD: targetStoreCd,
           MENU_CD: targetMenuCd,
           DELIVERY_CD: targetDeliveryCd,
           STR_NAME: targetMenuName,
-          STR_INFO1: targetDeliveryMenuName,
         };
+        if (row.useMulti) {
+          row.menuNames.forEach((name, index) => {
+            savePayloadBase[`STR_INFO${index + 1}`] = name;
+          });
+        } else {
+          // C# saveDeliveryMenuMap이 STR_INFO1~10을 모두 받으므로 단일 저장도 빈값 포함 전송
+          savePayloadBase.STR_INFO1 = row.menuName;
+          for (let i = 2; i <= multiDeliveryMenuNameCount; i++) {
+            savePayloadBase[`STR_INFO${i}`] = "";
+          }
+        }
+        const duplicateCompareName = row.useMulti
+          ? row.menuNames.find((name) => name) || ""
+          : row.menuName;
+
         let saveRes = await saveDeliveryMenuMap({
           ...savePayloadBase,
           OVERWRITE_YN: "N",
@@ -2730,18 +2921,20 @@ const saveDeliveryMenuTab = async () => {
                 targetDeliveryCd,
                 ""
               );
-              const targetInfo1 = targetDeliveryMenuName.trim().toLowerCase();
-              const duplicateRow = extractDeliveryMapList(duplicateCheckRes).find((item) => {
-                const rowInfo1 = String(
-                  item?.strInfo1 ?? item?.STR_INFO1 ?? item?.STRINFO1 ?? ""
-                )
-                  .trim()
-                  .toLowerCase();
-                const rowMenuCd = normalizeDeliveryParam(
-                  item?.lngCode ?? item?.MENU_CD ?? item?.lngcode ?? item?.menuCd
-                );
-                return rowInfo1 === targetInfo1 && rowMenuCd !== targetMenuCd;
-              });
+              const targetInfo1 = duplicateCompareName.trim().toLowerCase();
+              const duplicateRow = extractDeliveryMapList(duplicateCheckRes).find(
+                (item) => {
+                  const rowInfo1 = String(
+                    item?.strInfo1 ?? item?.STR_INFO1 ?? item?.STRINFO1 ?? ""
+                  )
+                    .trim()
+                    .toLowerCase();
+                  const rowMenuCd = normalizeDeliveryParam(
+                    item?.lngCode ?? item?.MENU_CD ?? item?.lngcode ?? item?.menuCd
+                  );
+                  return rowInfo1 === targetInfo1 && rowMenuCd !== targetMenuCd;
+                }
+              );
               duplicateMenuCdForMsg = normalizeDeliveryParam(
                 duplicateRow?.lngCode ??
                   duplicateRow?.MENU_CD ??
@@ -4366,6 +4559,62 @@ const excelButton = async () => {
 .mst003-field-span3 {
   grid-column: 2 / -1;
   min-width: 0;
+}
+
+.mst003-detail-panel--delivery {
+  /* 왼쪽 '메뉴분류' 필터 라인과 상단 정렬 (탭 36px 기준) */
+  padding-top: 1rem;
+}
+
+.mst003-form-grid--delivery-compact {
+  --mst003-detail-row-h: 1.875rem;
+  --mst003-detail-control-h: 1.375rem;
+  --mst003-detail-cell-py: 0.1875rem;
+  margin-top: 0;
+}
+
+.mst003-form-grid--delivery-compact .mst003-baemin-pair-cell {
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+}
+
+.mst003-form-grid--delivery-compact .mst003-baemin-pair-cell .mst003-control {
+  height: var(--mst003-detail-control-h);
+  min-height: var(--mst003-detail-control-h);
+  max-height: var(--mst003-detail-control-h);
+}
+
+.mst003-baemin-merged-label {
+  grid-column: 1;
+  grid-row: span 5;
+  height: auto;
+  min-height: 100%;
+  align-self: stretch;
+}
+
+.mst003-baemin-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0;
+  padding: 0 !important;
+  min-width: 0;
+}
+
+.mst003-baemin-pair-cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: var(--mst003-detail-cell-py, 0.1875rem) 0.375rem;
+  border-right: 1px solid #e5e7eb;
+}
+
+.mst003-baemin-pair-cell:last-child {
+  border-right: none;
+}
+
+.mst003-baemin-pair-cell .mst003-control {
+  width: 100%;
+  max-width: 100%;
 }
 
 .mst003-inline-field {
