@@ -1369,7 +1369,7 @@
                       type="text"
                       v-model="deliveryRow.menuNames[(pairIndex - 1) * 2]"
                       class="mst003-control w-full"
-                      placeholder="배달메뉴명 입력"
+                      :placeholder="`배달메뉴명 입력 ${(pairIndex - 1) * 2 + 1}`"
                       :disabled="!canEditDeliveryMenuRows" />
                   </div>
                   <div class="mst003-baemin-pair-cell">
@@ -1377,7 +1377,7 @@
                       type="text"
                       v-model="deliveryRow.menuNames[(pairIndex - 1) * 2 + 1]"
                       class="mst003-control w-full"
-                      placeholder="배달메뉴명 입력"
+                      :placeholder="`배달메뉴명 입력 ${(pairIndex - 1) * 2 + 2}`"
                       :disabled="!canEditDeliveryMenuRows" />
                   </div>
                 </div>
@@ -1753,6 +1753,69 @@ const extractDuplicateMenuCd = (response) => {
   const resultName = extractResultName(response);
   const matched = resultName.match(/\b\d+\b/);
   return matched ? normalizeDeliveryParam(matched[0]) : "";
+};
+const extractDuplicateName = (response) => {
+  const data = response?.data ?? {};
+  return String(
+    data?.DUPLICATE_NAME ??
+      data?.duplicate_name ??
+      data?.DUPLICATE_NM ??
+      data?.duplicateNm ??
+      ""
+  ).trim();
+};
+/** 메뉴명 + 배달메뉴명(1~10) 사이 중복 문구 생성 */
+const findDuplicateDeliveryNameMessage = (menuNm, rows) => {
+  const entries = [];
+  const pushEntry = (label, value, channel = "") => {
+    const raw = String(value ?? "").trim();
+    if (!raw) return;
+    entries.push({
+      label,
+      channel,
+      value: raw.toLowerCase(),
+    });
+  };
+
+  pushEntry("메뉴명", menuNm);
+  (rows || []).forEach((row) => {
+    const channel = String(row?.name ?? "").trim();
+    if (isDeliveryMenuNoStoreMode.value && isMultiNameDeliveryRow(row)) {
+      (row.menuNames || []).forEach((name, index) => {
+        pushEntry(`배달메뉴명 ${index + 1}`, name, channel);
+      });
+    } else {
+      pushEntry("배달메뉴명", row?.menuName, channel);
+    }
+  });
+
+  for (let i = 0; i < entries.length; i++) {
+    for (let j = i + 1; j < entries.length; j++) {
+      if (entries[i].value !== entries[j].value) continue;
+      const left = entries[i];
+      const right = entries[j];
+      let leftLabel = left.label;
+      let rightLabel = right.label;
+
+      if (left.label === "메뉴명") {
+        // 메뉴명 vs 배달메뉴명 → 뒤에 배달사 유지
+        if (right.channel) rightLabel = `${right.channel} ${right.label}`;
+      } else if (right.label === "메뉴명") {
+        if (left.channel) leftLabel = `${left.channel} ${left.label}`;
+      } else if (left.channel && right.channel && left.channel === right.channel) {
+        // 같은 배달사끼리 → 앞에만 배달사, 뒤에는 배달메뉴명 N만
+        leftLabel = `${left.channel} ${left.label}`;
+        rightLabel = right.label;
+      } else {
+        // 서로 다른 배달사 → 양쪽 모두 배달사 표시
+        if (left.channel) leftLabel = `${left.channel} ${left.label}`;
+        if (right.channel) rightLabel = `${right.channel} ${right.label}`;
+      }
+
+      return `${leftLabel}과 ${rightLabel}이 똑같습니다. 다시 입력해주세요.`;
+    }
+  }
+  return "";
 };
 const extractDeliveryMapList = (response) => {
   const src = response?.data;
@@ -2870,6 +2933,20 @@ const saveDeliveryMenuTab = async () => {
     });
     return;
   }
+
+  const duplicateNameMessage = isDeliveryMenuNoStoreMode.value
+    ? findDuplicateDeliveryNameMessage(targetMenuName, deliveryMenuRows.value)
+    : "";
+  if (duplicateNameMessage) {
+    Swal.fire({
+      title: "경고",
+      text: duplicateNameMessage,
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
   Swal.fire({
     title: "저장",
     text: "배달메뉴 설정을 저장 하시겠습니까?",
@@ -2902,9 +2979,6 @@ const saveDeliveryMenuTab = async () => {
             savePayloadBase[`STR_INFO${i}`] = "";
           }
         }
-        const duplicateCompareName = row.useMulti
-          ? row.menuNames.find((name) => name) || ""
-          : row.menuName;
 
         let saveRes = await saveDeliveryMenuMap({
           ...savePayloadBase,
@@ -2912,6 +2986,31 @@ const saveDeliveryMenuTab = async () => {
         });
 
         if (extractResultCode(saveRes) === "97") {
+          // 무매장(3287): 덮어쓰기 없이 경고만 / 매장단위(3048·9999): 기존 예/아니오
+          if (isDeliveryMenuNoStoreMode.value) {
+            const duplicateMenuCdForMsg = extractDuplicateMenuCd(saveRes);
+            const duplicateNameForMsg = extractDuplicateName(saveRes);
+            let warningText = "";
+            if (duplicateNameForMsg && duplicateMenuCdForMsg) {
+              warningText = `「${duplicateNameForMsg}」이(가) 메뉴코드 ${duplicateMenuCdForMsg}와 중복됩니다. 다시 입력해주세요.`;
+            } else if (duplicateNameForMsg) {
+              warningText = `「${duplicateNameForMsg}」이(가) 이미 사용 중입니다. 다시 입력해주세요.`;
+            } else if (duplicateMenuCdForMsg) {
+              warningText = `메뉴코드 ${duplicateMenuCdForMsg}와 배달메뉴명이 중복됩니다. 다시 입력해주세요.`;
+            } else {
+              warningText =
+                extractResultName(saveRes) ||
+                "중복된 메뉴명/배달메뉴명이 있습니다. 다시 입력해주세요.";
+            }
+            await Swal.fire({
+              title: "경고",
+              text: warningText,
+              icon: "warning",
+              confirmButtonText: "확인",
+            });
+            return;
+          }
+
           let duplicateMenuCdForMsg = extractDuplicateMenuCd(saveRes);
           try {
             if (!duplicateMenuCdForMsg) {
@@ -2921,7 +3020,9 @@ const saveDeliveryMenuTab = async () => {
                 targetDeliveryCd,
                 ""
               );
-              const targetInfo1 = duplicateCompareName.trim().toLowerCase();
+              const targetInfo1 = String(row.menuName ?? "")
+                .trim()
+                .toLowerCase();
               const duplicateRow = extractDeliveryMapList(duplicateCheckRes).find(
                 (item) => {
                   const rowInfo1 = String(
