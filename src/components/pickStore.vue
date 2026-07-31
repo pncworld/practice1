@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="pickStoreRootRef"
     :class="[
       'flex text-base',
       compactSearchBar
@@ -1088,6 +1089,39 @@ watch(
     showPosNo.value = props.showPosNo;
   }
 );
+
+const selectStoreByCode = (code) => {
+  if (code == null || code === "" || code === 0 || code === "0") {
+    selectedStoreCode.value = 0;
+    return;
+  }
+  selectedStoreCode.value = parseInt(code, 10);
+};
+
+const pickStoreRootRef = ref(null);
+
+const blurPickStore = () => {
+  const root = pickStoreRootRef.value;
+  if (!root) return;
+
+  root.querySelectorAll("input, select, button, .vs__dropdown-toggle").forEach((el) => {
+    if (el instanceof HTMLElement) {
+      el.blur();
+    }
+  });
+
+  if (
+    document.activeElement instanceof HTMLElement &&
+    root.contains(document.activeElement)
+  ) {
+    document.activeElement.blur();
+  }
+};
+
+defineExpose({
+  selectStoreByCode,
+  blurPickStore,
+});
 </script>
 <style>
 .style-chooser .vs__search::placeholder {

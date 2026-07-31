@@ -7,6 +7,12 @@
 <template>
   <!-- 조회조건 -->
   <div class="br12 po-page">
+    <button
+      ref="pur306FocusSinkRef"
+      type="button"
+      class="pur306-focus-sink"
+      tabindex="-1"
+      aria-hidden="true" />
     <div class="pd24 flex-between sub-header">
       <PageName></PageName>
       <div class="flex justify-center space-x-2 pr-5">
@@ -36,6 +42,7 @@
               <div
                 class="pur306-cell-field pur306-pick-slot pur306-pick-slot--store-grid min-w-0">
                 <PickStore
+                  ref="pickStoreRef"
                   compact-search-bar
                   :compact-store-combo-max-rem="pur306PickStoreComboMaxRem"
                   main-name=""
@@ -51,10 +58,12 @@
               </div>
               <div class="pur306-cell-field pur306-inline-field pur306-date-field min-w-0">
                 <input
+                  ref="pur306OrderDateRef"
                   type="date"
                   class="pur306-sg-input pur306-sg-input--date"
                   v-model="cond"
-                  @change="searchButton" />
+                  @change="onOrderDateChange"
+                  @keydown.enter.prevent="onOrderDateEnter" />
                 <button type="button" class="pur306-sub-btn" @click="searchButton">
                   발주조회
                 </button>
@@ -70,11 +79,10 @@
                   v-model="cond2"
                   disabled />
               </div>
-              <div class="pur306-order2-tail min-w-0">
-                <div class="pur306-sg-label">코멘트(발주)</div>
-                <div class="pur306-cell-field min-w-0">
-                  <input type="text" class="pur306-sg-input" v-model="cond3" />
-                </div>
+              <div class="pur306-order2-gap" aria-hidden="true"></div>
+              <div class="pur306-sg-label">코멘트(발주)</div>
+              <div class="pur306-cell-field pur306-order2-comment-field min-w-0">
+                <input type="text" class="pur306-sg-input" v-model="cond3" />
               </div>
             </div>
 
@@ -153,19 +161,27 @@
               </div>
               <div class="pur306-mat2-code-pair min-w-0">
                 <div class="pur306-sg-label">자재코드/명</div>
-                <div class="pur306-cell-field pur306-inline-field pur306-mat-code-field min-w-0">
+                <div class="pur306-cell-field pur306-mat-code-field min-w-0">
                   <input
                     type="text"
                     class="pur306-sg-input pur306-sg-input--code"
-                    v-model="cond12" />
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    v-model="cond12"
+                    @input="onMatCodeInput"
+                    @keydown.enter.prevent="onPur306MaterialSearchEnter" />
                   <input
                     type="text"
                     class="pur306-sg-input pur306-sg-input--name"
-                    v-model="cond13" />
-                  <button type="button" class="pur306-sub-btn" @click="searchButton2">
-                    조회
-                  </button>
+                    v-model="cond13"
+                    @keydown.enter.prevent="onPur306MaterialSearchEnter" />
                 </div>
+                <button
+                  type="button"
+                  class="pur306-sub-btn pur306-mat-code-search-btn"
+                  @click="searchButton2">
+                  조회
+                </button>
               </div>
             </div>
           </div>
@@ -196,7 +212,7 @@
           @allStateRows="allStateRows"
           @clickedButtonCol="clickedButtonCol"
           @checkAllorNot="checkAllorNot"
-          :cellEditthenCheck="true"
+          :cell-edit-qty-check-pair="pur306SearchQtyCheckPair"
           :exporttoExcel="exporttoExcel"
           :documentTitle="'PUR03_006INS'"
           :documentSubTitle="documentSubTitle"
@@ -209,7 +225,10 @@
           :CalculateTaxColId="'curTax'"
           :CalculateTaxColId2="'curSupply'"
           :CalculateTaxColId3="'curTotal'"
-          :inputOnlyNumberColumn="'dblOrderQty'" />
+          :inputUnsignedDecimalColumn="'dblOrderQty'"
+          hover-tooltip-fields="strStockName"
+          :hover-tooltip-max-length="40"
+          row-hover-pastel-tone="red" />
       </div>
       <div class="pur306-grid-transfer">
         <button
@@ -276,7 +295,10 @@
           :addRow4="addRow4"
           :addrowProp="'lngStockID,strStockName,strStandardName,strUnitName,curUnitPrice,dblOrderQty,curSupply,curTax,curTotal,strOrderComments,strGenericName,strSupplierName,dtmExpectedDate,lngStoreGroup,lngStoreCode,strOrderNo,lngOrderSeq,lngSupplierID,dblCheckQty,strStatus,strDemandNo,strCheckComments,lngGenericID,lngOrderAble,lngTaxType,dtmOrderDate'"
           :addrowDefault="addrowDefault"
-          :inputOnlyNumberColumn="'dblOrderQty'" />
+          :inputUnsignedDecimalColumn="'dblOrderQty'"
+          hover-tooltip-fields="strStockName"
+          :hover-tooltip-max-length="40"
+          row-hover-pastel-tone="red" />
       </div>
     </div>
     </div>
@@ -345,6 +367,12 @@ import { useStore } from "vuex";
 
 /** 조회 AREA — wire 그리드 (PUR02/STKN06 패턴) */
 const pur306ControlBorder = "#cbd5e1";
+const pur306SearchQtyCheckPair = {
+  qtyField: "dblOrderQty",
+  checkField: "lngCheck",
+  rowKeyField: "lngStockID",
+  uncheckOnZero: true,
+};
 const pur306LabelCol = "5.5rem";
 const pur306ItemGap = "0.375rem";
 const pur306ColGap = "1.25rem";
@@ -421,6 +449,7 @@ onMounted(async () => {
   const res5 = await getStockGeneric(store.state.userData.lngStoreGroup);
 
   optionList5.value = res5.data.List;
+  lastAppliedCond.value = cond.value;
 });
 
 const nowStoreAreaCd = ref();
@@ -455,12 +484,268 @@ const handleStoreGroup = (e) => {
   groupCd.value = e;
 };
 const first = ref(false);
-const handleStoreCd = async (newValue) => {
-  //   if (newValue == "0" && store.state.userData.lngCommonMenu == "0") {
-  //     afterSearch.value = false;
-  //   }
+const pickStoreRef = ref(null);
+const pur306OrderDateRef = ref(null);
+const pur306FocusSinkRef = ref(null);
+const pur306SkipStoreCdHandler = ref(false);
+const lastAppliedCond = ref("");
+
+const getRowStateCount = (state) => {
+  if (state == null) return 0;
+  if (typeof state === "number") return state;
+  if (Array.isArray(state)) return state.length;
+  return 0;
+};
+
+const pur306FieldChanged = (current, base) =>
+  String(current ?? "") !== String(base ?? "");
+
+const hasPur306SearchGridDataChanges = () => {
+  const baseRows = rowData.value ?? [];
+  const currentRows = updatedrowdata.value ?? [];
+
+  const baseMap = new Map(baseRows.map((row) => [row.lngStockID, row]));
+
+  for (const current of currentRows) {
+    const base = baseMap.get(current.lngStockID);
+    if (!base) continue;
+    if (pur306FieldChanged(current.dblOrderQty, base.dblOrderQty)) return true;
+    if (pur306FieldChanged(current.strOrderComments, base.strOrderComments)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+const hasPur306OrderGridDataChanges = () => {
+  const baseRows = rowData2.value ?? [];
+  const currentRows = updatedrowdata2.value ?? [];
+  const baseMap = new Map(baseRows.map((row) => [row.lngStockID, row]));
+
+  for (const current of currentRows) {
+    const base = baseMap.get(current.lngStockID);
+    if (!base) return true;
+    if (pur306FieldChanged(current.dblOrderQty, base.dblOrderQty)) return true;
+    if (pur306FieldChanged(current.strOrderComments, base.strOrderComments)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+const hasUnsavedSearchGridChanges = () => {
+  const search = allstaterows.value;
+
+  if (Array.isArray(search) && search.length > 0) return true;
+
+  if (
+    getRowStateCount(search?.created) > 0 ||
+    getRowStateCount(search?.updated) > 0 ||
+    getRowStateCount(search?.deleted) > 0
+  ) {
+    return true;
+  }
+
+  return hasPur306SearchGridDataChanges();
+};
+
+const hasUnsavedOrderGridChanges = () => {
+  const order = allstaterows2.value;
+
+  if (Array.isArray(order) && order.length > 0) return true;
+
+  if (
+    getRowStateCount(order?.created) > 0 ||
+    getRowStateCount(order?.updated) > 0 ||
+    getRowStateCount(order?.deleted) > 0
+  ) {
+    return true;
+  }
+
+  return hasPur306OrderGridDataChanges();
+};
+
+const hasUnsavedPur306Changes = () => {
+  return hasUnsavedSearchGridChanges() || hasUnsavedOrderGridChanges();
+};
+
+const resetPur306UnsavedGridState = () => {
+  allstaterows.value = { created: [], updated: [], deleted: [] };
+  allstaterows2.value = { created: [], updated: [], deleted: [] };
+};
+
+const getPur306OrderStockIds = () =>
+  new Set(
+    (updatedrowdata2.value ?? [])
+      .map((item) => item?.lngStockID)
+      .filter((id) => id != null && id !== "")
+  );
+
+const filterPur306SearchStockList = (list) => {
+  const orderIds = getPur306OrderStockIds();
+  return (list ?? []).filter((item) => !orderIds.has(item.lngStockID));
+};
+
+const formatPur306DuplicateStockLines = (items) =>
+  items
+    .map((item) => {
+      const code = item?.lngStockID ?? "";
+      const name = item?.strStockName ?? "";
+      return name ? `${code} · ${name}` : String(code);
+    })
+    .join("<br>");
+
+/** 검색→발주 이동 시 원본 행 보관 (발주→검색 복원용) */
+const pur306SearchStockCache = new Map();
+/** 마지막 검색자재 조회 결과 품목 ID (복원 대상 판단) */
+const pur306LastSearchStockIds = ref(null);
+
+const isPur306SearchRestorableStock = (stockId) => {
+  if (stockId == null || stockId === "") return false;
+  if (pur306LastSearchStockIds.value == null) return false;
+  return pur306LastSearchStockIds.value.has(stockId);
+};
+
+const cachePur306SearchStockRows = (items) => {
+  (items ?? []).forEach((item) => {
+    if (item?.lngStockID == null || item.lngStockID === "") return;
+    pur306SearchStockCache.set(item.lngStockID, { ...item });
+  });
+};
+
+/** 검색자재 — 그리드 편집값(updatedrowdata) 우선 스냅샷 */
+const getPur306SearchGridSnapshot = () => {
+  const source =
+    updatedrowdata.value?.length > 0
+      ? updatedrowdata.value
+      : (rowData.value ?? []);
+
+  return source.map((row) => ({ ...row }));
+};
+
+const applyPur306SearchGridRows = (rows) => {
+  const next = rows.map((row) => ({ ...row }));
+  rowData.value = next;
+  updatedrowdata.value = next;
+};
+
+const toPur306SearchStockRow = (orderItem) => {
+  const stockId = orderItem?.lngStockID;
+  const cached =
+    stockId != null && stockId !== ""
+      ? pur306SearchStockCache.get(stockId)
+      : undefined;
+
+  if (stockId != null && stockId !== "") {
+    pur306SearchStockCache.delete(stockId);
+  }
+
+  const base = cached ? { ...cached } : { ...orderItem };
+
+  return {
+    ...base,
+    lngCheck: false,
+    dblOrderQty: 0,
+    curSupply: 0,
+    curTax: 0,
+    curTotal: 0,
+  };
+};
+
+const restorePur306SearchStockFromOrder = (orderItems) => {
+  if (!orderItems?.length) return;
+
+  const currentRows = getPur306SearchGridSnapshot();
+  const existingIds = new Set(currentRows.map((item) => item.lngStockID));
+  const toRestore = orderItems
+    .filter((item) => item?.lngStockID != null && item.lngStockID !== "")
+    .filter((item) => isPur306SearchRestorableStock(item.lngStockID))
+    .filter((item) => !existingIds.has(item.lngStockID))
+    .map(toPur306SearchStockRow);
+
+  if (toRestore.length === 0) return;
+
+  applyPur306SearchGridRows([...currentRows, ...toRestore]);
+};
+
+const splitPur306CheckedOrderRows = () => {
+  const createdIndices = new Set(allstaterows2.value?.created ?? []);
+  const unsaved = [];
+  const saved = [];
+
+  updatedrowdata2.value.forEach((item, index) => {
+    if (item.lngCheck != true) return;
+
+    if (createdIndices.has(index)) {
+      unsaved.push(item);
+    } else {
+      saved.push(item);
+    }
+  });
+
+  return { unsaved, saved, all: [...unsaved, ...saved] };
+};
+
+const removePur306OrderRowsFromGrid = async () => {
+  deleteRow7.value = !deleteRow7.value;
+  await nextTick();
+};
+
+const recalcPur306OrderTotals = () => {
+  cond4.value = formatNumberWithCommas(
+    updatedrowdata2.value.reduce(
+      (sum, item) => sum + parseInt(item.curSupply || 0, 10),
+      0
+    )
+  );
+  cond5.value = formatNumberWithCommas(
+    updatedrowdata2.value.reduce(
+      (sum, item) => sum + parseInt(item.curTax || 0, 10),
+      0
+    )
+  );
+  cond6.value = formatNumberWithCommas(
+    updatedrowdata2.value.reduce(
+      (sum, item) => sum + parseInt(item.curTotal || 0, 10),
+      0
+    )
+  );
+};
+
+const confirmDiscardPur306Changes = async () => {
+  const result = await Swal.fire({
+    title: "확인",
+    html: "변경된 내용이 있습니다.<br>저장 없이 진행 하시겠습니까?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "예",
+    cancelButtonText: "아니오",
+    returnFocus: false,
+  });
+  return result.isConfirmed;
+};
+
+const focusPur306Neutral = async () => {
+  await nextTick();
+  await nextTick();
+  pickStoreRef.value?.blurPickStore?.();
+  pur306OrderDateRef.value?.blur();
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+  await new Promise((resolve) => requestAnimationFrame(resolve));
+  pur306FocusSinkRef.value?.focus({ preventScroll: true });
+};
+
+const applyStoreChange = async (newValue) => {
   initAll();
   nowStoreCd.value = newValue;
+
+  if (nowStoreCd.value == 0) {
+    return;
+  }
 
   const res = await getOrderDate(
     groupCd.value,
@@ -468,7 +753,6 @@ const handleStoreCd = async (newValue) => {
     cond.value.replaceAll("-", ""),
     1
   );
-  // console.log(res);
   cond2.value =
     res.data.List[0].dtmOrderCloseTime == ""
       ? cond.value + " 12:00"
@@ -481,7 +765,88 @@ const handleStoreCd = async (newValue) => {
         res.data.List[0].dtmOrderCloseTime.slice(8, 10) +
         ":" +
         res.data.List[0].dtmOrderCloseTime.slice(10, 12);
-  //searchButton();
+
+  first.value = true;
+  await searchButton({ forceLoad: true });
+};
+
+const handleStoreCd = async (newValue) => {
+  if (pur306SkipStoreCdHandler.value) {
+    pur306SkipStoreCdHandler.value = false;
+    return;
+  }
+
+  const prevStoreCd = nowStoreCd.value;
+  const normalizedNew =
+    newValue == null || newValue === "" ? 0 : Number(newValue);
+  const normalizedPrev = prevStoreCd == null ? 0 : Number(prevStoreCd);
+
+  if (normalizedNew === normalizedPrev) {
+    return;
+  }
+
+  if (hasUnsavedPur306Changes()) {
+    const confirmed = await confirmDiscardPur306Changes();
+    if (!confirmed) {
+      pur306SkipStoreCdHandler.value = true;
+      pickStoreRef.value?.selectStoreByCode(normalizedPrev);
+      await focusPur306Neutral();
+      return;
+    }
+  }
+
+  await applyStoreChange(normalizedNew);
+};
+
+const onOrderDateChange = async (event) => {
+  await commitPur306ActiveEditor();
+
+  const newDate = event.target.value;
+  const prevDate = lastAppliedCond.value;
+
+  if (newDate === prevDate) {
+    return;
+  }
+
+  if (hasUnsavedOrderGridChanges()) {
+    const confirmed = await confirmDiscardPur306Changes();
+    if (!confirmed) {
+      cond.value = prevDate;
+      if (event.target instanceof HTMLInputElement) {
+        event.target.value = prevDate;
+        event.target.blur();
+      }
+      await focusPur306Neutral();
+      return;
+    }
+  }
+
+  initAll();
+  lastAppliedCond.value = newDate;
+  cond.value = newDate;
+  first.value = true;
+  await searchButton({ forceLoad: true });
+};
+
+/** Enter — 편집 중인 그리드 셀 commit 후 조회 */
+const commitPur306ActiveEditor = async () => {
+  const active = document.activeElement;
+  if (active instanceof HTMLElement) {
+    active.blur();
+  }
+  await nextTick();
+  await nextTick();
+};
+
+const onOrderDateEnter = (event) => {
+  if (event.target instanceof HTMLInputElement) {
+    event.target.blur();
+  }
+};
+
+const onPur306MaterialSearchEnter = async () => {
+  await commitPur306ActiveEditor();
+  await searchButton2();
 };
 
 const checkAllorNot = async (e, e2) => {
@@ -526,8 +891,7 @@ const rowData = ref([]);
 const rowData2 = ref([]);
 
 const allStateRows = (e) => {
-  //console.log(e);
-  allstaterows.value = e.updated;
+  allstaterows.value = e;
 };
 const allStateRows2 = (e) => {
   //console.log(e);
@@ -537,7 +901,20 @@ const allStateRows2 = (e) => {
  *  조회 함수
  */
 
-const searchButton = async () => {
+const searchButton = async (options = {}) => {
+  const { forceLoad = false, skipUnsavedCheck = false } = options;
+
+  await commitPur306ActiveEditor();
+
+  if (!skipUnsavedCheck && hasUnsavedOrderGridChanges()) {
+    const confirmed = await confirmDiscardPur306Changes();
+    if (!confirmed) {
+      return;
+    }
+    allstaterows2.value = { created: [], updated: [], deleted: [] };
+    updatedrowdata2.value = [];
+  }
+
   const res2 = await getOrderDate(
     groupCd.value,
     nowStoreCd.value,
@@ -558,7 +935,7 @@ const searchButton = async () => {
         ":" +
         res2.data.List[0].dtmOrderCloseTime.slice(10, 12);
 
-  if (first.value == false) {
+  if (first.value == false && !forceLoad) {
     first.value = true;
     return;
   }
@@ -619,6 +996,12 @@ const searchButton = async () => {
   }
 };
 
+const onMatCodeInput = (e) => {
+  const digits = e.target.value.replace(/\D/g, "");
+  cond12.value = digits;
+  e.target.value = digits;
+};
+
 const searchButton2 = async () => {
   if (nowStoreCd.value == 0) {
     Swal.fire({
@@ -630,6 +1013,18 @@ const searchButton2 = async () => {
     });
     return;
   }
+
+  await commitPur306ActiveEditor();
+
+  if (hasUnsavedSearchGridChanges()) {
+    const confirmed = await confirmDiscardPur306Changes();
+    if (!confirmed) {
+      return;
+    }
+    allstaterows.value = { created: [], updated: [], deleted: [] };
+    updatedrowdata.value = [];
+  }
+
   // const res = await getOrderDate(
   //   groupCd.value,
   //   nowStoreCd.value,
@@ -664,8 +1059,10 @@ const searchButton2 = async () => {
       cond13.value
     );
     store.state.loading = false;
-    //console.log(res);
-    rowData.value = res.data.List;
+    pur306LastSearchStockIds.value = new Set(
+      (res.data.List ?? []).map((item) => item.lngStockID)
+    );
+    rowData.value = filterPur306SearchStockList(res.data.List);
   } catch (error) {
     //console.log(error);
   }
@@ -1039,7 +1436,21 @@ const saveButton = async () => {
         }
         store.state.loading = false;
 
-        searchButton();
+        const saveSucceeded =
+          (allstaterows2.value.updated.length > 0 &&
+            allstaterows2.value.created.length > 0 &&
+            result == 2) ||
+          (allstaterows2.value.updated.length > 0 &&
+            allstaterows2.value.created.length == 0 &&
+            result == 1) ||
+          (allstaterows2.value.updated.length == 0 &&
+            allstaterows2.value.created.length > 0 &&
+            result == 1);
+
+        if (saveSucceeded) {
+          resetPur306UnsavedGridState();
+          await searchButton({ skipUnsavedCheck: true });
+        }
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         // 취소 눌렀을 때 실행할 코드
         ////console.log("취소 버튼 클릭됨");
@@ -1073,91 +1484,88 @@ const excelButton2 = () => {
 const addrowDefault = ref("");
 const addRow4 = ref(false);
 const addButton = async () => {
-  const set1 = new Set(
-    updatedrowdata.value
-      .filter((item) => item.lngCheck == true)
-      .map((item) => item.lngStockID)
-  );
+  const orderIds = getPur306OrderStockIds();
+  const selected = updatedrowdata.value.filter((item) => item.lngCheck == true);
+  const duplicates = selected.filter((item) => orderIds.has(item.lngStockID));
+  const toAdd = selected.filter((item) => !orderIds.has(item.lngStockID));
 
-  const hasDupli = updatedrowdata2.value.some((item) =>
-    set1.has(item.lngStockID)
-  );
-
-  if (hasDupli == true) {
-    Swal.fire({
-      title: "경고",
-      text: "중복된 자재코드가 존재합니다. 확인해주세요.",
-      icon: "warning",
-
-      confirmButtonText: "확인",
-    });
+  if (toAdd.length === 0) {
+    if (duplicates.length > 0) {
+      Swal.fire({
+        title: "경고",
+        html: `이미 발주자재에 등록된 품목입니다.<br><br>${formatPur306DuplicateStockLines(duplicates)}`,
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+    }
     return;
   }
-  //console.log(updatedrowdata.value);
-  updatedrowdata.value = updatedrowdata.value
-    .filter((item) => item.lngCheck == true)
-    .map((item) => ({
-      ...item,
-      lngCheck: false,
-      dtmOrderDate: cond.value.replaceAll("-", ""),
-    }));
 
-  for (let i = 0; i < updatedrowdata.value.length; i++) {
+  const addedIds = new Set(toAdd.map((item) => item.lngStockID));
+  const searchSnapshot = getPur306SearchGridSnapshot();
+
+  const rowsForOrderAdd = toAdd.map((item) => ({
+    ...item,
+    lngCheck: false,
+    dtmOrderDate: cond.value.replaceAll("-", ""),
+  }));
+
+  for (let i = 0; i < rowsForOrderAdd.length; i++) {
     addrowDefault.value =
-      updatedrowdata.value[i].lngStockID +
+      rowsForOrderAdd[i].lngStockID +
       "," +
-      updatedrowdata.value[i].strStockName +
+      rowsForOrderAdd[i].strStockName +
       "," +
-      updatedrowdata.value[i].strStandardName +
+      rowsForOrderAdd[i].strStandardName +
       "," +
-      updatedrowdata.value[i].strUnitName +
+      rowsForOrderAdd[i].strUnitName +
       "," +
-      updatedrowdata.value[i].curUnitPrice +
+      rowsForOrderAdd[i].curUnitPrice +
       "," +
-      updatedrowdata.value[i].dblOrderQty +
+      rowsForOrderAdd[i].dblOrderQty +
       "," +
-      updatedrowdata.value[i].curSupply +
+      rowsForOrderAdd[i].curSupply +
       "," +
-      updatedrowdata.value[i].curTax +
+      rowsForOrderAdd[i].curTax +
       "," +
-      updatedrowdata.value[i].curTotal +
+      rowsForOrderAdd[i].curTotal +
       "," +
-      updatedrowdata.value[i].strOrderComments +
+      rowsForOrderAdd[i].strOrderComments +
       "," +
-      updatedrowdata.value[i].strGenericName +
+      rowsForOrderAdd[i].strGenericName +
       "," +
-      updatedrowdata.value[i].strSupplierName +
+      rowsForOrderAdd[i].strSupplierName +
       "," +
-      formatLocalDate(updatedrowdata.value[i].dtmExpectedDate).replaceAll(
+      formatLocalDate(rowsForOrderAdd[i].dtmExpectedDate).replaceAll(
         "-",
         ""
       ) +
       "," +
-      updatedrowdata.value[i].lngStoreGroup +
+      rowsForOrderAdd[i].lngStoreGroup +
       "," +
-      updatedrowdata.value[i].lngStoreCode +
+      rowsForOrderAdd[i].lngStoreCode +
       "," +
-      updatedrowdata.value[i].strOrderNo +
+      rowsForOrderAdd[i].strOrderNo +
       "," +
-      updatedrowdata.value[i].lngOrderSeq +
+      rowsForOrderAdd[i].lngOrderSeq +
       "," +
-      updatedrowdata.value[i].lngSupplierID +
+      rowsForOrderAdd[i].lngSupplierID +
       "," +
-      updatedrowdata.value[i].dblCheckQty +
+      rowsForOrderAdd[i].dblCheckQty +
       "," +
-      updatedrowdata.value[i].strStatus +
+      rowsForOrderAdd[i].strStatus +
       "," +
-      updatedrowdata.value[i].strDemandNo +
+      rowsForOrderAdd[i].strDemandNo +
       "," +
-      updatedrowdata.value[i].strCheckComments +
+      rowsForOrderAdd[i].strCheckComments +
       "," +
-      updatedrowdata.value[i].lngGenericID +
+      rowsForOrderAdd[i].lngGenericID +
       "," +
-      updatedrowdata.value[i].lngOrderAble +
+      rowsForOrderAdd[i].lngOrderAble +
       "," +
-      updatedrowdata.value[i].lngTaxType +
+      rowsForOrderAdd[i].lngTaxType +
       "," +
-      updatedrowdata.value[i].dtmOrderDate;
+      rowsForOrderAdd[i].dtmOrderDate;
 
     //console.log(addrowDefault.value);
     addRow4.value = !addRow4.value;
@@ -1168,21 +1576,30 @@ const addButton = async () => {
   // rowData2.value = rowData2.value.concat(updatedrowdata.value);
 
   // updatedrowdata2.value = JSON.parse(JSON.stringify(rowData2.value));
-  rowData.value = rowData.value.map((item) => ({
-    ...item,
-    lngCheck: false,
-  }));
+  cachePur306SearchStockRows(
+    searchSnapshot.filter((item) => addedIds.has(item.lngStockID))
+  );
+  applyPur306SearchGridRows(
+    searchSnapshot
+      .filter((item) => !addedIds.has(item.lngStockID))
+      .map((item) => ({
+        ...item,
+        lngCheck: false,
+      }))
+  );
 };
 
 const deleteRow7 = ref(false);
+const finalizePur306OrderDelete = async (rowsToRestore) => {
+  await removePur306OrderRowsFromGrid();
+  restorePur306SearchStockFromOrder(rowsToRestore);
+  recalcPur306OrderTotals();
+};
+
 const deleteButton = async () => {
-  //console.log(updatedrowdata2.value);
+  const { unsaved, saved, all: checkedRows } = splitPur306CheckedOrderRows();
 
-  const checkedRows = updatedrowdata2.value.filter(
-    (item) => item.lngCheck == true
-  );
-
-  if (checkedRows.length == 0) {
+  if (checkedRows.length === 0) {
     Swal.fire({
       title: "경고",
       text: "삭제할 품목이 없습니다.",
@@ -1192,82 +1609,81 @@ const deleteButton = async () => {
     return;
   }
 
-  Swal.fire({
+  const result = await Swal.fire({
     title: "경고",
     text: "정말 삭제하시겠습니까?",
     icon: "warning",
     confirmButtonText: "확인",
     cancelButtonText: "취소",
     showCancelButton: true,
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-        store.state.loading = true;
-
-        const groupcds = checkedRows
-          .map((item) => item.lngStoreGroup)
-          .join("\u200b");
-        const storecds = checkedRows
-          .map((item) => item.lngStoreCode)
-          .join("\u200b");
-        const ordernos = checkedRows
-          .map((item) => item.strOrderNo)
-          .join("\u200b");
-        const orderseqs = checkedRows
-          .map((item) => item.lngOrderSeq)
-          .join("\u200b");
-        const stockids = checkedRows
-          .map((item) => item.lngStockID)
-          .join("\u200b");
-        const supplierids = checkedRows
-          .map((item) => item.lngSupplierID)
-          .join("\u200b");
-
-        const res = await deleteStockOrderItem(
-          groupcds,
-          storecds,
-          ordernos,
-          orderseqs,
-          stockids,
-          supplierids,
-          store.state.userData.lngSequence
-        );
-
-        //console.log(res);
-        store.state.loading = false;
-
-        deleteRow7.value = !deleteRow7.value;
-
-        if (res.data.RESULT_CD == "00") {
-          Swal.fire({
-            title: "삭제 성공",
-            text: "선택 하신 사항이 삭제되었습니다.",
-            icon: "success",
-            confirmButtonText: "확인",
-          });
-        } else {
-          Swal.fire({
-            title: "삭제 실패",
-            text: "선택 사항 삭제가 실패되었습니다.",
-            icon: "error",
-            confirmButtonText: "확인",
-          });
-        }
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-    } else {
-      return;
-    }
   });
+
+  if (!result.isConfirmed) {
+    return;
+  }
+
+  if (saved.length === 0) {
+    await finalizePur306OrderDelete(checkedRows);
+    return;
+  }
+
+  try {
+    store.state.loading = true;
+
+    const groupcds = saved.map((item) => item.lngStoreGroup).join("\u200b");
+    const storecds = saved.map((item) => item.lngStoreCode).join("\u200b");
+    const ordernos = saved.map((item) => item.strOrderNo).join("\u200b");
+    const orderseqs = saved.map((item) => item.lngOrderSeq).join("\u200b");
+    const stockids = saved.map((item) => item.lngStockID).join("\u200b");
+    const supplierids = saved.map((item) => item.lngSupplierID).join("\u200b");
+
+    const res = await deleteStockOrderItem(
+      groupcds,
+      storecds,
+      ordernos,
+      orderseqs,
+      stockids,
+      supplierids,
+      store.state.userData.lngSequence
+    );
+
+    store.state.loading = false;
+
+    if (res.data.RESULT_CD == "00") {
+      await finalizePur306OrderDelete(checkedRows);
+      Swal.fire({
+        title: "삭제 성공",
+        text: "선택 하신 사항이 삭제되었습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+    } else {
+      Swal.fire({
+        title: "삭제 실패",
+        text: "선택 사항 삭제가 실패되었습니다.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (error) {
+    store.state.loading = false;
+    console.log(error);
+  }
 };
 
 const initAll = () => {
+  pur306SearchStockCache.clear();
+  pur306LastSearchStockIds.value = null;
   rowData.value = [];
   rowData2.value = [];
   updatedrowdata2.value = [];
   updatedrowdata.value = [];
+  allstaterows.value = { created: [], updated: [], deleted: [] };
+  allstaterows2.value = { created: [], updated: [], deleted: [] };
+  cond3.value = "";
+  cond4.value = "";
+  cond5.value = "";
+  cond6.value = "";
 };
 </script>
 
@@ -1280,11 +1696,6 @@ const initAll = () => {
   /* 2번 콤보(11.5rem) 기준 — 1번을 2번과 동일 폭으로 */
   --pur306-store-combo-2: 11.5rem;
   --pur306-store-combo-w: var(--pur306-store-combo-2);
-  /* 매장 3번째 콤보 왼쪽선 (1행 pick-slot 기준) */
-  --pur306-store-combo3-left: calc(
-    var(--pur306-label-col) + var(--pur306-pair-gap) + var(--pur306-store-combo-w) +
-      var(--pur306-item-gap) + var(--pur306-store-combo-w) + var(--pur306-item-gap)
-  );
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
@@ -1339,6 +1750,24 @@ const initAll = () => {
   margin-top: 0;
   padding-top: var(--pur306-row-gap);
   border-top: 2px solid #94a3b8;
+  --pur306-mat-control-scale: 0.7;
+  --pur306-mat-pair-gap: 1.75rem;
+  --pur306-mat-input-gap: 0.75rem;
+}
+
+/* mat — 콤보·거래처 70% + 항목 간 공백 */
+.pur306-block--mat .pur306-row > .pur306-cell-field:not(.pur306-mat-code-field) {
+  width: calc(100% * var(--pur306-mat-control-scale));
+  max-width: calc(100% * var(--pur306-mat-control-scale));
+  justify-self: start;
+}
+
+.pur306-block--mat .pur306-row > .pur306-cell-field:not(:last-child):not(.pur306-mat-code-field) {
+  margin-right: calc(var(--pur306-mat-pair-gap) - var(--pur306-pair-gap));
+}
+
+.pur306-block--mat .pur306-mat2-code-pair {
+  margin-right: 0;
 }
 
 .pur306-row {
@@ -1368,34 +1797,51 @@ const initAll = () => {
   max-width: 100%;
 }
 
-/* 2행 — 발주마감 | 코멘트(매장 3번 콤보 left 정렬) */
+/* 2행 — 1~5열 3행과 동일, 6열은 우측(발주조회)까지 확장 */
 .pur306-row--order2 {
   grid-template-columns:
-    var(--pur306-label-col) max-content minmax(0, 1fr);
+    var(--pur306-label-col) var(--pur306-store-combo-w)
+    var(--pur306-label-col) var(--pur306-store-combo-w)
+    var(--pur306-label-col) minmax(var(--pur306-store-combo-w), 1fr);
 }
 
-.pur306-order2-tail {
-  display: grid;
-  grid-template-columns: var(--pur306-label-col) minmax(0, 1fr);
-  column-gap: var(--pur306-pair-gap);
-  align-items: center;
+/* 3행 — 공급가 | 부가세 | 합계 (6열 고정) */
+.pur306-row--order3 {
+  grid-template-columns:
+    var(--pur306-label-col) var(--pur306-store-combo-w)
+    var(--pur306-label-col) var(--pur306-store-combo-w)
+    var(--pur306-label-col) var(--pur306-store-combo-w);
+}
+
+.pur306-row--order2 > .pur306-order2-gap {
+  grid-column: 3 / 5;
   min-width: 0;
-  min-height: var(--pur306-row-min-h);
-  padding-left: calc(
-    var(--pur306-store-combo3-left) -
-      (var(--pur306-label-col) + var(--pur306-pair-gap) + var(--pur306-store-combo-w) +
-        var(--pur306-pair-gap))
-  );
 }
 
-.pur306-order2-tail > .pur306-sg-label,
-.pur306-order2-tail > .pur306-cell-field {
-  min-height: var(--pur306-row-min-h);
+.pur306-row--order2 > .pur306-deadline-field,
+.pur306-row--order3 > .pur306-cell-field {
+  width: var(--pur306-store-combo-w);
+  max-width: var(--pur306-store-combo-w);
+  flex: 0 0 auto;
+}
+
+.pur306-row--order3 .pur306-sg-input {
+  text-align: right;
+}
+
+.pur306-row--order2 > .pur306-order2-comment-field {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  justify-self: stretch;
+}
+
+.pur306-row--order2 > .pur306-order2-comment-field .pur306-sg-input {
+  width: 100%;
+  max-width: 100%;
 }
 
 .pur306-row--order2 > .pur306-deadline-field {
-  width: var(--pur306-store-combo-w);
-  max-width: var(--pur306-store-combo-w);
   flex: 0 0 auto;
 }
 
@@ -1417,20 +1863,6 @@ const initAll = () => {
   text-align: center;
 }
 
-/* 3행 — 공급가 | 부가세 | 합계 (행 독립 레이아웃) */
-.pur306-row--order3 {
-  grid-template-columns:
-    var(--pur306-label-col) max-content
-    var(--pur306-label-col) max-content
-    var(--pur306-label-col) max-content;
-}
-
-.pur306-row--order3 > .pur306-cell-field {
-  width: var(--pur306-store-combo-w);
-  max-width: var(--pur306-store-combo-w);
-  flex: 0 0 auto;
-}
-
 .pur306-row--mat1 {
   grid-template-columns:
     var(--pur306-label-col) minmax(0, 1fr)
@@ -1447,7 +1879,7 @@ const initAll = () => {
     var(--pur306-label-col) minmax(0, 1fr);
 }
 
-/* 자재코드/명 — mat1 자재분류(3번째 쌍)와 left 정렬 */
+/* mat2 — 자재특성 | 자재코드/명(거래처~자재분류 label 정렬) */
 .pur306-row--mat2 > .pur306-sg-label:nth-child(1) {
   grid-column: 1;
 }
@@ -1456,43 +1888,65 @@ const initAll = () => {
   grid-column: 2;
 }
 
+/* 자재코드/명 — 거래처 label(3열) ~ 자재분류 label(5열) 정렬, 입력 1:1.5 */
 .pur306-mat2-code-pair {
-  grid-column: 5 / -1;
+  grid-column: 3 / 7;
   display: grid;
-  grid-template-columns: var(--pur306-label-col) minmax(0, 1fr);
-  column-gap: var(--pur306-item-gap);
+  grid-template-columns:
+    var(--pur306-label-col)
+    minmax(0, 1fr)
+    var(--pur306-label-col)
+    max-content;
+  column-gap: var(--pur306-pair-gap);
   align-items: center;
   min-width: 0;
   min-height: var(--pur306-row-min-h);
 }
 
 .pur306-mat2-code-pair > .pur306-sg-label {
+  grid-column: 1;
   margin-left: 0;
+  justify-content: center;
+  text-align: center;
 }
 
 .pur306-mat2-code-pair > .pur306-mat-code-field {
+  grid-column: 2 / 4;
   display: grid;
-  grid-template-columns: minmax(0, 4fr) minmax(0, 6fr) max-content;
-  column-gap: var(--pur306-pair-gap);
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  column-gap: var(--pur306-mat-input-gap);
   align-items: center;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
+}
+
+.pur306-mat2-code-pair > .pur306-mat-code-search-btn {
+  grid-column: 4;
+  justify-self: start;
 }
 
 .pur306-mat-code-field .pur306-sg-input--code,
 .pur306-mat-code-field .pur306-sg-input--name {
+  box-sizing: border-box;
   width: 100%;
   max-width: 100%;
-  flex: none;
   min-width: 0;
+  flex: none;
 }
 
-.pur306-row > .pur306-sg-label:not(:first-child) {
-  margin-left: calc(var(--pur306-col-gap) - var(--pur306-pair-gap));
+/* 항목 사이 간격 — 필드 쪽 margin (라벨 가운데 정렬 유지) */
+.pur306-row > .pur306-cell-field:not(:last-child) {
+  margin-right: calc(var(--pur306-col-gap) - var(--pur306-pair-gap));
 }
 
 .pur306-row > .pur306-sg-label,
 .pur306-row > .pur306-cell-field {
   min-height: var(--pur306-row-min-h);
+}
+
+.pur306-row > .pur306-sg-label {
+  justify-self: center;
 }
 
 .pur306-sg-label {
@@ -1843,6 +2297,16 @@ const initAll = () => {
 
   .pur306-row--mat2 > .pur306-mat2-code-pair {
     grid-column: auto;
+    grid-template-columns: var(--pur306-label-col) minmax(0, 1fr) max-content;
+  }
+
+  .pur306-mat2-code-pair > .pur306-mat-code-field {
+    grid-column: 2;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+
+  .pur306-mat2-code-pair > .pur306-mat-code-search-btn {
+    grid-column: 3;
   }
 }
 
@@ -1857,15 +2321,15 @@ const initAll = () => {
 
   .pur306-row--order1 > .pur306-date-field,
   .pur306-row--order2 > .pur306-deadline-field,
+  .pur306-row--order2 > .pur306-order2-comment-field,
   .pur306-row--order3 > .pur306-cell-field {
     justify-self: stretch;
     width: 100%;
     max-width: 100%;
   }
 
-  .pur306-order2-tail {
-    padding-left: 0;
-    grid-template-columns: var(--pur306-label-col) minmax(0, 1fr);
+  .pur306-order2-gap {
+    display: none;
   }
 
   .pur306-row--mat2 > .pur306-mat2-code-pair {
@@ -1873,8 +2337,25 @@ const initAll = () => {
     grid-template-columns: var(--pur306-label-col) minmax(0, 1fr);
   }
 
-  .pur306-mat-code-field {
+  .pur306-mat2-code-pair > .pur306-mat-code-field {
+    grid-column: 2;
     grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--pur306-row-gap);
+  }
+
+  .pur306-mat2-code-pair > .pur306-mat-code-search-btn {
+    grid-column: 1 / -1;
+    justify-self: end;
+    margin-top: var(--pur306-row-gap);
+  }
+
+  .pur306-block--mat .pur306-row > .pur306-cell-field:not(.pur306-mat-code-field) {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .pur306-block--mat .pur306-row > .pur306-cell-field:not(:last-child):not(.pur306-mat-code-field) {
+    margin-right: 0;
   }
 
   .pur306-row > .pur306-sg-label:not(:first-child) {
@@ -1882,8 +2363,24 @@ const initAll = () => {
     margin-top: var(--pur306-row-gap);
   }
 
+  .pur306-row > .pur306-cell-field:not(:last-child) {
+    margin-right: 0;
+  }
+
   .pur306-row > .pur306-cell-field:not(:first-of-type) {
     margin-top: 0;
   }
+}
+
+.pur306-focus-sink {
+  position: absolute;
+  width: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 </style>

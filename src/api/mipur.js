@@ -1694,6 +1694,11 @@ export const confirmOrderList = (
   });
 };
 
+/** 발주 승인 화면 — 서버 현재 일시 (마감 16시 판단용) */
+export const getOrderConfirmServerDateTime = () => {
+  return api2.post("/MIPUR/PUR01_034INS.asmx/getServerDateTime", {});
+};
+
 export const getStoreMoveList = (
   groupCd,
   storeCd,

@@ -2,6 +2,7 @@
   <div
     :id="realgridname"
     class="h-[100%] w-[100%] realgrid"
+    :class="rgUiToneClassNames"
     :tabindex="props.keyDeleteRemovesCurrentRow === true ? 0 : undefined"
     @focusin="onGridContainerFocusIn"></div>
 </template>
@@ -31,7 +32,7 @@ import {
   TreeView,
 } from "realgrid";
 import { v4 as uuidv4 } from "uuid";
-import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import {
   rgDestroyRegistryInstance,
   rgGetInstance,
@@ -550,6 +551,20 @@ const props = defineProps({
     // 툴팁 보이기
     type: Boolean,
     default: false,
+  },
+  /** 마우스 오버 시 툴팁 — fieldName 콤마 구분 (화면 opt-in) */
+  hoverTooltipFields: {
+    type: String,
+    default: "",
+  },
+  hoverTooltipMaxLength: {
+    type: Number,
+    default: 30,
+  },
+  /** 행 hover 배경 — 'red' | 'green' (화면 opt-in, 기본 RealGrid hover 유지) */
+  rowHoverPastelTone: {
+    type: String,
+    default: "",
   },
 
   searchPrimaryId: {
@@ -1307,6 +1322,11 @@ const props = defineProps({
     // 셀 변경시 체크
     type: Boolean,
     default: false,
+  },
+  /** opt-in — qtyField 입력 시 checkField 자동 체크, 0이면 수동 체크 행만 유지 */
+  cellEditQtyCheckPair: {
+    type: Object,
+    default: null,
   },
   suppressEdit: {
     // true면 셀 수정·체크바 체크 불가 (잠금 등)
@@ -2248,6 +2268,8 @@ const updatedrowData = ref([]);
 const selectedindex = ref(-1);
 const isGridInitialized = ref(false);
 const previousRowDataLength = ref(0);
+/** cellEditQtyCheckPair — 수동 이동체크(lngCheck) 행 키 보관 */
+const rgManualQtyCheckKeys = new Set();
 const emit = defineEmits([
   "selcetedrowData",
   "updatedRowData",
@@ -2274,6 +2296,34 @@ const emit = defineEmits([
   "checkedRowData2",
   "gridReady",
 ]);
+
+const rgUiToneClassNames = computed(() => {
+  const classes = [];
+  if (props.rowHoverPastelTone === "red") {
+    classes.push("rg-ui-row-hover-pastel-red");
+  } else if (props.rowHoverPastelTone === "green") {
+    classes.push("rg-ui-row-hover-pastel-green");
+  }
+  if (props.hoverTooltipFields) {
+    classes.push("rg-ui-gray-tooltip");
+  }
+  return classes;
+});
+
+const rgApplyGrayTooltipTone = () => {
+  nextTick(() => {
+    try {
+      const root = document.getElementById(realgridname.value);
+      const tip =
+        root?.querySelector(".rg-tooltip") ??
+        document.querySelector(".rg-tooltip");
+      tip?.classList.add("rg-ui-gray-tooltip-popup");
+    } catch {
+      void 0;
+    }
+  });
+};
+
 // 3구간
 const runFuncshowGrid = async () => {
   if (tabInitSetArray.value.length == 0) {
@@ -4381,6 +4431,9 @@ const runFuncshowGrid = async () => {
     props.dragOn == true ? "block" : props.selectionStyle;
   // props.selectionStyle;deleteRow
   gridView.displayOptions.showTooltip = props.bulkLoadMode !== true;
+  if (props.rowHoverPastelTone === "red" || props.rowHoverPastelTone === "green") {
+    gridView.displayOptions.rowHoverType = "row";
+  }
   if (props.bulkLoadMode === true) {
     gridView.displayOptions.refreshMode = "visibleOnly";
   }
@@ -4665,7 +4718,50 @@ const runFuncshowGrid = async () => {
       }
     }
     //console.log(field);
-    if (props.cellEditthenCheck == true && field == 4) {
+    if (props.cellEditQtyCheckPair) {
+      const pair = props.cellEditQtyCheckPair;
+      const qtyField = pair.qtyField ?? "dblOrderQty";
+      const checkField = pair.checkField ?? "lngCheck";
+      const rowKeyField = pair.rowKeyField ?? "lngStockID";
+      const uncheckOnZero = pair.uncheckOnZero !== false;
+
+      let rowKey;
+      try {
+        rowKey = dataProvider.getValue(row, rowKeyField);
+      } catch (_) {
+        rowKey = undefined;
+      }
+
+      const qtyPositive = (v) => {
+        if (v == null || v === "") return false;
+        const n = Number(v);
+        return !Number.isNaN(n) && n > 0;
+      };
+
+      if (editedFieldName === checkField && isCheckCell) {
+        if (rowKey != null && rowKey !== "") {
+          if (checkTruthy(newVal)) {
+            rgManualQtyCheckKeys.add(rowKey);
+          } else {
+            rgManualQtyCheckKeys.delete(rowKey);
+          }
+        }
+      } else if (editedFieldName === qtyField) {
+        if (qtyPositive(newVal)) {
+          if (rowKey != null && rowKey !== "") {
+            rgManualQtyCheckKeys.delete(rowKey);
+          }
+          dataProvider.setValue(row, checkField, true);
+        } else if (
+          uncheckOnZero &&
+          (rowKey == null ||
+            rowKey === "" ||
+            !rgManualQtyCheckKeys.has(rowKey))
+        ) {
+          dataProvider.setValue(row, checkField, false);
+        }
+      }
+    } else if (props.cellEditthenCheck == true && field == 4) {
       dataProvider.setValue(row, "lngCheck", true);
     }
     if (props.checkOnlyFalse == true) {
@@ -5050,6 +5146,26 @@ const runFuncshowGrid = async () => {
   gridView.onShowTooltip = function (grid, index, value) {
     var column = index.fieldName;
     var itemIndex = index.itemIndex;
+
+    const hoverFields = props.hoverTooltipFields
+      ? props.hoverTooltipFields
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+    if (hoverFields.includes(column)) {
+      const text = value != null ? String(value) : "";
+      if (!text) {
+        return "";
+      }
+      const maxLen =
+        props.hoverTooltipMaxLength > 0 ? props.hoverTooltipMaxLength : 30;
+      const tooltipText =
+        text.length > maxLen ? text.slice(0, maxLen) + "..." : text;
+      rgApplyGrayTooltipTone();
+      return tooltipText;
+    }
+
     if (props.showTooltip == true) {
       var tooltip = "";
       if (column == "checkbox" && grid.getValue(itemIndex, "lngMenu") == "0") {
@@ -6810,6 +6926,7 @@ onUnmounted(() => {
 watch(
   () => props.rowData,
   (newRowData) => {
+    rgManualQtyCheckKeys.clear();
     if (props.initSelect == true) {
       selectedindex.value = -1;
     }
@@ -6842,6 +6959,12 @@ watch(
           } catch (_) {}
         }
         applyRowsToProvider(props.rowData);
+        try {
+          dpSet.clearRowStates();
+          emit("allStateRows", dpSet.getAllStateRows());
+        } catch (_) {
+          void 0;
+        }
 
         if (props.bulkLoadMode === true) {
           addrow4activated.value = false;
@@ -7071,6 +7194,55 @@ watch(
 .skyblue {
   background: #d0e9f5;
   text-align: right;
+}
+
+.realgrid.rg-ui-row-hover-pastel-red .rg-rowhover {
+  background: transparent !important;
+}
+
+.realgrid.rg-ui-row-hover-pastel-red .rg-body .rg-table tr:has(td:hover) > td,
+.realgrid.rg-ui-row-hover-pastel-red .rg-fixed-body .rg-table tr:has(td:hover) > td,
+.realgrid.rg-ui-row-hover-pastel-red .rg-body .rg-table tr td:hover,
+.realgrid.rg-ui-row-hover-pastel-red .rg-fixed-body .rg-table tr td:hover {
+  background: #fecaca !important;
+  color: #000000 !important;
+}
+
+.realgrid.rg-ui-row-hover-pastel-red .rg-body .rg-table tr:has(td:hover) > td *,
+.realgrid.rg-ui-row-hover-pastel-red .rg-fixed-body .rg-table tr:has(td:hover) > td *,
+.realgrid.rg-ui-row-hover-pastel-red .rg-body .rg-table tr td:hover *,
+.realgrid.rg-ui-row-hover-pastel-red .rg-fixed-body .rg-table tr td:hover * {
+  color: #000000 !important;
+}
+
+.realgrid.rg-ui-row-hover-pastel-green .rg-rowhover {
+  background: transparent !important;
+}
+
+.realgrid.rg-ui-row-hover-pastel-green .rg-body .rg-table tr:has(td:hover) > td,
+.realgrid.rg-ui-row-hover-pastel-green .rg-fixed-body .rg-table tr:has(td:hover) > td,
+.realgrid.rg-ui-row-hover-pastel-green .rg-body .rg-table tr td:hover,
+.realgrid.rg-ui-row-hover-pastel-green .rg-fixed-body .rg-table tr td:hover {
+  background: #bbf7d0 !important;
+  color: #000000 !important;
+}
+
+.realgrid.rg-ui-row-hover-pastel-green .rg-body .rg-table tr:has(td:hover) > td *,
+.realgrid.rg-ui-row-hover-pastel-green .rg-fixed-body .rg-table tr:has(td:hover) > td *,
+.realgrid.rg-ui-row-hover-pastel-green .rg-body .rg-table tr td:hover *,
+.realgrid.rg-ui-row-hover-pastel-green .rg-fixed-body .rg-table tr td:hover * {
+  color: #000000 !important;
+}
+
+.realgrid.rg-ui-gray-tooltip .rg-tooltip,
+.rg-tooltip.rg-ui-gray-tooltip-popup {
+  background-color: #4b5563 !important;
+  color: #f9fafb !important;
+  border: 1px solid #6b7280 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18) !important;
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+  padding: 6px 10px !important;
 }
 
 .realgrid-pre-wrap {

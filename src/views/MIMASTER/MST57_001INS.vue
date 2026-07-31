@@ -1117,29 +1117,46 @@ const saveButton = async () => {
       const selDay2     = updateList.map(i => i.SEL_DAY);
       const extraNm2    = updateList.map(i => i.EXTRA_NM);
 
-      const majorNmBase = [
-        languageName0.value || "",
-        languageName1.value || "",
-        languageName2.value || "",
-        languageName3.value || "",
-        languageName4.value || "",
-      ];
+      // bringCategory가 배열을 넣을 수 있어 문자열로 정규화
+      const asLangName = (v) => {
+        if (Array.isArray(v)) return v.find((x) => x != null && x !== "") ?? "";
+        return v == null ? "" : String(v);
+      };
+      // API는 sub 행 개수만큼 루프하며 majorNmArray[i] ↔ languageIdArray[i] 짝
+      // → 언어 개수(4/5)와 무관하게 각 행 LanguageID에 맞는 메인명을 매핑
       const makeMajorNmStr = (list) => {
-        const uniqueSubCount = [...new Set(list.map(i => i.categoryCode))].length || 0;
-        if (uniqueSubCount === 0) return "";
-        return Array.from({ length: uniqueSubCount })
-          .flatMap(() => majorNmBase)
+        if (!list.length) return "";
+        const byLang = {
+          "0": asLangName(languageName0.value),
+          "1": asLangName(languageName1.value),
+          "2": asLangName(languageName2.value),
+          "3": asLangName(languageName3.value),
+          "4": asLangName(languageName4.value),
+        };
+        return list
+          .map((i) => byLang[String(i.LanguageID)] ?? "")
           .join(",");
       };
       const majorNmStr = makeMajorNmStr(insertList);
       const majorNmStr2 = makeMajorNmStr(updateList);
 
+      const isSaveOk = (res) => {
+        const d = res?.data?.d ?? res?.data;
+        return d === "0000" || d === 0 || d === "0";
+      };
+
+      let saveOk = true;
+      let saveErrorMsg = "";
+
       try {
+        if (insertList.length === 0 && updateList.length === 0) {
+          saveOk = false;
+          saveErrorMsg =
+            "저장할 서브카테고리 행이 없습니다. 서브카테고리를 추가한 뒤 다시 저장해주세요.";
+        }
 
-        // console.log(majorNmStr.length);
-
-        if (majorNmStr.length != 0){
-          if (mainCategoryInsert.value){
+        if (saveOk && majorNmStr.length != 0) {
+          if (mainCategoryInsert.value) {
             const res = await setMainCategoryINSERT(
               groupCd.value,
               nowStoreCd.value,
@@ -1149,19 +1166,20 @@ const saveButton = async () => {
               subCd.join(","),
               subNm.join(","),
               languageNm.join(","),
-              useYn.join(","),
-              allDate.join(","),
-              fromDate.join(","),
-              toDate.join(","),
-              allTime.join(","),
-              fromTime.join(","),
-              toTime.join(","),
-              selDay.join(","),
-              extraNm.join(","),
+              useYn.map((v) => v ?? "Y").join(","),
+              allDate.map((v) => v ?? "1").join(","),
+              fromDate.map((v) => v ?? "").join(","),
+              toDate.map((v) => v ?? "").join(","),
+              allTime.map((v) => v ?? "1").join(","),
+              fromTime.map((v) => v ?? "0000").join(","),
+              toTime.map((v) => v ?? "2350").join(","),
+              selDay.map((v) => v ?? "11111111").join(","),
+              extraNm.map((v) => v ?? "").join(",")
             );
-        
-            // console.log(res);
-
+            if (!isSaveOk(res)) {
+              saveOk = false;
+              saveErrorMsg = String(res?.data?.d ?? res?.data ?? "INSERT 실패");
+            }
           } else {
             const res = await setSubCategoryINSERT(
               groupCd.value,
@@ -1172,26 +1190,24 @@ const saveButton = async () => {
               subCd.join(","),
               subNm.join(","),
               languageNm.join(","),
-              useYn.join(","),
-              allDate.join(","),
-              fromDate.join(","),
-              toDate.join(","),
-              allTime.join(","),
-              fromTime.join(","),
-              toTime.join(","),
-              selDay.join(","),
-              extraNm.join(","),
+              useYn.map((v) => v ?? "Y").join(","),
+              allDate.map((v) => v ?? "1").join(","),
+              fromDate.map((v) => v ?? "").join(","),
+              toDate.map((v) => v ?? "").join(","),
+              allTime.map((v) => v ?? "1").join(","),
+              fromTime.map((v) => v ?? "0000").join(","),
+              toTime.map((v) => v ?? "2350").join(","),
+              selDay.map((v) => v ?? "11111111").join(","),
+              extraNm.map((v) => v ?? "").join(",")
             );
-        
-          //  console.log(res);
-
+            if (!isSaveOk(res)) {
+              saveOk = false;
+              saveErrorMsg = String(res?.data?.d ?? res?.data ?? "SUB INSERT 실패");
+            }
           }
-        } 
-        
-        // console.log(majorNmStr2.length);
+        }
 
-        if(majorNmStr2.length != 0){
-
+        if (saveOk && majorNmStr2.length != 0) {
           if (!newMainCategoryCode.value.includes(currentMajorCode.value)) {
             const res = await setMainCategoryUpdate(
               groupCd.value,
@@ -1202,19 +1218,20 @@ const saveButton = async () => {
               subCd2.join(","),
               subNm2.join(","),
               languageNm2.join(","),
-              useYn2.join(","),
-              allDate2.join(","),
-              fromDate2.join(","),
-              toDate2.join(","),
-              allTime2.join(","),
-              fromTime2.join(","),
-              toTime2.join(","),
-              selDay2.join(","),
-              extraNm2.join(","),
+              useYn2.map((v) => v ?? "Y").join(","),
+              allDate2.map((v) => v ?? "1").join(","),
+              fromDate2.map((v) => v ?? "").join(","),
+              toDate2.map((v) => v ?? "").join(","),
+              allTime2.map((v) => v ?? "1").join(","),
+              fromTime2.map((v) => v ?? "0000").join(","),
+              toTime2.map((v) => v ?? "2350").join(","),
+              selDay2.map((v) => v ?? "11111111").join(","),
+              extraNm2.map((v) => v ?? "").join(",")
             );
-        
-            // console.log(res);
-
+            if (!isSaveOk(res)) {
+              saveOk = false;
+              saveErrorMsg = String(res?.data?.d ?? res?.data ?? "UPDATE 실패");
+            }
           } else {
             const res = await setSubCategoryUPDATE(
               groupCd.value,
@@ -1225,49 +1242,53 @@ const saveButton = async () => {
               subCd2.join(","),
               subNm2.join(","),
               languageNm2.join(","),
-              useYn2.join(","),
-              allDate2.join(","),
-              fromDate2.join(","),
-              toDate2.join(","),
-              allTime2.join(","),
-              fromTime2.join(","),
-              toTime2.join(","),
-              selDay2.join(","),
-              extraNm2.join(","),
+              useYn2.map((v) => v ?? "Y").join(","),
+              allDate2.map((v) => v ?? "1").join(","),
+              fromDate2.map((v) => v ?? "").join(","),
+              toDate2.map((v) => v ?? "").join(","),
+              allTime2.map((v) => v ?? "1").join(","),
+              fromTime2.map((v) => v ?? "0000").join(","),
+              toTime2.map((v) => v ?? "2350").join(","),
+              selDay2.map((v) => v ?? "11111111").join(","),
+              extraNm2.map((v) => v ?? "").join(",")
             );
-        
-            // console.log(res);
-
+            if (!isSaveOk(res)) {
+              saveOk = false;
+              saveErrorMsg = String(res?.data?.d ?? res?.data ?? "SUB UPDATE 실패");
+            }
           }
-
         }
-
       } catch (error) {
-        // 오류 처리
+        saveOk = false;
+        saveErrorMsg = error?.message || "오류가 발생했습니다.";
+      }
+
+      const keepMajor = currentMajorCode.value;
+      await searchButton();
+      if (keepMajor != null && keepMajor !== "") {
+        bringCategory(keepMajor);
+      }
+
+      if (saveOk) {
+        Swal.fire({
+          title: "저장 성공",
+          text: "저장되었습니다.",
+          icon: "success",
+          showCancelButton: false,
+          confirmButtonColor: "#3085d6",
+          allowOutsideClick: false,
+        });
+        newMainCategoryCode.value = [];
+        modified.value = false;
+      } else {
         Swal.fire({
           title: "저장 실패",
-          text: "오류가 발생했습니다.",
+          text: saveErrorMsg || "오류가 발생했습니다.",
           icon: "error",
           showCancelButton: false,
           confirmButtonColor: "#3085d6",
           allowOutsideClick: false,
         });
-      } finally {
-        
-        await searchButton(); // searchMenu()도 await
-        bringCategory(currentMajorCode.value);
-
-        Swal.fire({
-            title: "저장 성공",
-            text: "저장되었습니다.",
-            icon: "success",
-            showCancelButton: false,
-            confirmButtonColor: "#3085d6",
-            allowOutsideClick: false,
-        });
-        newMainCategoryCode.value = [];
-        modified.value = false;
-
       }
     } else {
       return;
@@ -1308,50 +1329,24 @@ const bringCategory = (value) => {
   selectedButton.value = value;
   selectedSubButton.value = null; // 메인 카테고리 선택 시 서브 카테고리 선택 해제
 
-  languageName0.value = Category.value
-    .map((item) => {
-      const result = item.mainMultilang.find(
-        (item2) => item2.LanguageID === "0" && item2.categoryCode === value
+  const pickMainLangName = (langId) => {
+    for (const item of Category.value) {
+      const result = item.mainMultilang?.find(
+        (item2) =>
+          String(item2.LanguageID) === String(langId) &&
+          String(item2.categoryCode) === String(value)
       );
-      return result ? result.LanguageName : "";
-    })
-    .filter((name) => name !== ""); // 빈 값 제거
-
-  languageName1.value = Category.value
-    .map((item) => {
-      const result = item.mainMultilang.find(
-        (item2) => item2.LanguageID === "1" && item2.categoryCode === value
-      );
-      return result ? result.LanguageName : "";
-    })
-    .filter((name) => name !== ""); // 빈 값 제거
-
-  languageName2.value = Category.value
-    .map((item) => {
-      const result = item.mainMultilang.find(
-        (item2) => item2.LanguageID === "2" && item2.categoryCode === value
-      );
-      return result ? result.LanguageName : "";
-    })
-    .filter((name) => name !== "");
-
-  languageName3.value = Category.value
-    .map((item) => {
-      const result = item.mainMultilang.find(
-        (item2) => item2.LanguageID === "3" && item2.categoryCode === value
-      );
-      return result ? result.LanguageName : "";
-    })
-    .filter((name) => name !== "");
-
-  languageName4.value = Category.value
-    .map((item) => {
-      const result = item.mainMultilang.find(
-        (item2) => item2.LanguageID === "4" && item2.categoryCode === value
-      );
-      return result ? result.LanguageName : "";
-    })
-    .filter((name) => name !== "");
+      if (result?.LanguageName != null && result.LanguageName !== "") {
+        return result.LanguageName;
+      }
+    }
+    return "";
+  };
+  languageName0.value = pickMainLangName("0");
+  languageName1.value = pickMainLangName("1");
+  languageName2.value = pickMainLangName("2");
+  languageName3.value = pickMainLangName("3");
+  languageName4.value = pickMainLangName("4");
 
   const subCodes = Category.value
     .filter((item2) => item2.MajorCode == value)
