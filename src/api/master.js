@@ -2640,7 +2640,7 @@ export const getDeliveryMenuMap = (groupCd, storeCd, deliveryCd, menuCd) => {
     DELIVERY_CD: deliveryCd,
     MENU_CD: menuCd,
   };
-  console.log("[api/master][getDeliveryMenuMap] payload", payload);
+  // console.log("[api/master][getDeliveryMenuMap] payload", payload);
   return api2.post("/MIMASTER/MST01_033INS.asmx/getDeliveryMenuMap", payload);
 };
 export const getDeliveryMenuExcelColumn = (groupCd, storeCd) => {
@@ -2648,7 +2648,7 @@ export const getDeliveryMenuExcelColumn = (groupCd, storeCd) => {
     GROUP_CD: groupCd,
     STORE_CD: storeCd,
   };
-  console.log("[api/master][getDeliveryMenuExcelColumn] payload", payload);
+  // console.log("[api/master][getDeliveryMenuExcelColumn] payload", payload);
   return api2.post(
     "/MIMASTER/MST01_033INS.asmx/getDeliveryMenuExcelColumn",
     payload
@@ -4055,6 +4055,100 @@ export const getMenuDiscCount2 = (groupCd) => {
   return api2.post("/MIMASTER/MST01_033INS.asmx/getMenuDiscCount2", {
     GROUP_CD: groupCd,
   });
+};
+
+const parseAsmxJsonPayload = (data) => {
+  let payload = data;
+  if (typeof payload === "string") {
+    try {
+      payload = JSON.parse(payload);
+    } catch (_) {
+      return { raw: data, parsed: null };
+    }
+  }
+  // ASMX ScriptService 래핑({ d: ... }) 대응
+  if (payload && typeof payload === "object" && "d" in payload) {
+    let inner = payload.d;
+    if (typeof inner === "string") {
+      try {
+        inner = JSON.parse(inner);
+      } catch (_) {
+        return { raw: data, parsed: payload };
+      }
+    }
+    payload = inner;
+  }
+  return { raw: data, parsed: payload };
+};
+
+const extractCommonListPayload = (data) => {
+  const { raw, parsed } = parseAsmxJsonPayload(data);
+  const src = parsed && typeof parsed === "object" ? parsed : {};
+  const list = Array.isArray(src.List)
+    ? src.List
+    : Array.isArray(src.list)
+      ? src.list
+      : [];
+  return {
+    raw,
+    parsed: src,
+    RESULT_CD: String(src.RESULT_CD ?? src.result_cd ?? ""),
+    RESULT_NM: String(src.RESULT_NM ?? src.result_nm ?? ""),
+    List: list,
+  };
+};
+
+export const getCommonList_ver2 = async (code) => {
+  const payload = { CODE: String(code ?? "") };
+  const url = "/MIMASTER/MST01_033INS.asmx/getCommonCode";
+  // console.log("[api/master][getCommonList_ver2] request", { url, payload });
+  try {
+    const res = await api2.post(url, payload);
+    const extracted = extractCommonListPayload(res?.data);
+    // console.log(
+    //   "[api/master][getCommonList_ver2] response summary\n",
+    //   JSON.stringify(
+    //     {
+    //       httpStatus: res?.status,
+    //       dataType: typeof res?.data,
+    //       RESULT_CD: extracted.RESULT_CD,
+    //       RESULT_NM: extracted.RESULT_NM,
+    //       ListLength: extracted.List.length,
+    //       firstItem: extracted.List[0] ?? null,
+    //       parsedKeys: Object.keys(extracted.parsed ?? {}),
+    //     },
+    //     null,
+    //     2
+    //   )
+    // );
+    // if (extracted.RESULT_CD && extracted.RESULT_CD !== "00") {
+    //   console.warn(
+    //     "[api/master][getCommonList_ver2] RESULT not success:",
+    //     extracted.RESULT_CD,
+    //     extracted.RESULT_NM
+    //   );
+    // }
+    // if (extracted.List.length === 0) {
+    //   console.warn(
+    //     "[api/master][getCommonList_ver2] List empty. SP는 strSCode='Y'만 조회합니다. C# Proc 이름이 점(.) 포함이면 [VUE_COMMON_CODELIST_Ver.2] 처럼 대괄호가 필요할 수 있습니다."
+    //   );
+    // }
+    res.data = {
+      ...(extracted.parsed || {}),
+      RESULT_CD: extracted.RESULT_CD || extracted.parsed?.RESULT_CD,
+      RESULT_NM: extracted.RESULT_NM || extracted.parsed?.RESULT_NM,
+      List: extracted.List,
+    };
+    return res;
+  } catch (error) {
+    // console.error("[api/master][getCommonList_ver2] failed", {
+    //   message: error?.message,
+    //   status: error?.response?.status,
+    //   responseData: error?.response?.data,
+    //   error,
+    // });
+    throw error;
+  }
 };
 
 export const getMultiLingual2 = (groupCd, storeCd, menuCd) => {
