@@ -127,10 +127,8 @@ import Realgrid from "@/components/realgrid.vue";
  *  */
 
 import {
-  formatDateTime,
   formatDateTime3,
   formatLocalDate,
-  formatNumberWithCommas,
   insertPageLog,
 } from "@/customFunc/customFunc";
 /*
@@ -143,7 +141,8 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
-import { utils, write } from "xlsx-js-style";
+import Swal from "sweetalert2";
+import { utils, writeFile } from "xlsx-js-style";
 
 const reload = ref(false);
 const rowData = ref([]);
@@ -338,217 +337,287 @@ const formatTabOrderRate = (value) => {
   );
 };
 
-const downloadExcel = () => {
-  //console.log(rowData2.value);
+const toNumber = (value) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : 0;
+};
 
-  const filtered = rowData2.value.map((row, index) => [
-    index + 1,
-    row.strStoreName,
-    formatNumberWithCommas(row.lngTotCnt),
-    formatNumberWithCommas(row.lngPosOrderCnt),
-    formatNumberWithCommas(row.lngDelOrderCnt),
-    formatNumberWithCommas(row.lngTabOrderCnt),
-    formatTabOrderRate(row.lngTabOrderRate),
-  ]);
-  const worksheet = utils.aoa_to_sheet(filtered, { origin: "A7" });
+const EXCEL_BORDER = {
+  top: { style: "thin", color: { rgb: "000000" } },
+  bottom: { style: "thin", color: { rgb: "000000" } },
+  left: { style: "thin", color: { rgb: "000000" } },
+  right: { style: "thin", color: { rgb: "000000" } },
+};
 
-  const sum1 = rowData2.value.reduce(
-    (acc, item) => acc + parseInt(item.lngTotCnt),
-    0
-  );
-  const sum2 = rowData2.value.reduce(
-    (acc, item) => acc + parseInt(item.lngPosOrderCnt),
-    0
-  );
-  const sumDel = rowData2.value.reduce(
-    (acc, item) => acc + parseInt(item.lngDelOrderCnt),
-    0
-  );
-  const sum3 = rowData2.value.reduce(
-    (acc, item) => acc + parseInt(item.lngTabOrderCnt),
-    0
-  );
-  const sum4 = rowData2.value.reduce(
-    (acc, item) => acc + parseFloat(item.lngTabOrderRate || 0),
-    0
-  );
+const EXCEL_HEADER_STYLE = {
+  fill: { patternType: "solid", fgColor: { rgb: "87CEFA" } },
+  font: { name: "맑은 고딕", bold: true, sz: 11, color: { rgb: "000000" } },
+  alignment: { horizontal: "center", vertical: "center" },
+  border: EXCEL_BORDER,
+};
 
-  worksheet["B1"] = { t: "s", v: "주문구분 현황" };
-  worksheet["B3"] = { t: "s", v: selectedExcelStore.value };
-  worksheet["B4"] = {
-    t: "s",
-    v: "작성일시 :" + formatDateTime3(new Date()),
-  };
+const EXCEL_DATA_STYLE = {
+  font: { name: "맑은 고딕", sz: 11, color: { rgb: "000000" } },
+  alignment: { horizontal: "center", vertical: "center" },
+  border: EXCEL_BORDER,
+};
 
-  worksheet["A6"] = { t: "s", v: "No" };
-  worksheet["B6"] = { t: "s", v: "매장명" };
-  worksheet["C6"] = { t: "s", v: "총 건수" };
-  worksheet["D6"] = { t: "s", v: "POS" };
-  worksheet["E6"] = { t: "s", v: "배달" };
-  worksheet["F6"] = { t: "s", v: "TABLET ORDER" };
-  worksheet["G6"] = { t: "s", v: "TABLET ORDER 비율" };
+const EXCEL_TOTAL_STYLE = {
+  fill: { patternType: "solid", fgColor: { rgb: "FFF2CC" } },
+  font: { name: "맑은 고딕", bold: true, sz: 11, color: { rgb: "000000" } },
+  alignment: { horizontal: "center", vertical: "center" },
+  border: EXCEL_BORDER,
+};
 
-  let secondRowLeng = rowData2.value.length + 7 + 3;
+const applyExcelRangeStyle = (worksheet, startRow, endRow, colCount, style, options = {}) => {
+  const { leftAlignCols = [], rightAlignCols = [], numberCols = {} } = options;
 
-  // console.log(sum1);
-  // console.log(formatNumberWithCommas(sum1));
-  worksheet[`B${secondRowLeng - 2}`] = {
-    t: "s",
-    v: "합계",
-  };
+  for (let row = startRow; row <= endRow; row += 1) {
+    for (let col = 0; col < colCount; col += 1) {
+      const cellRef = utils.encode_cell({ r: row - 1, c: col });
+      if (!worksheet[cellRef]) {
+        worksheet[cellRef] = { t: "s", v: "" };
+      }
 
-  worksheet[`C${secondRowLeng - 2}`] = {
-    t: "s",
-    v: formatNumberWithCommas(sum1),
-  };
-  worksheet[`D${secondRowLeng - 2}`] = {
-    t: "s",
-    v: formatNumberWithCommas(sum2),
-  };
-  worksheet[`E${secondRowLeng - 2}`] = {
-    t: "s",
-    v: formatNumberWithCommas(sumDel),
-  };
-  worksheet[`F${secondRowLeng - 2}`] = {
-    t: "s",
-    v: formatNumberWithCommas(sum3),
-  };
-  worksheet[`G${secondRowLeng - 2}`] = {
-    t: "s",
-    v: formatTabOrderRate(sum4),
-  };
+      worksheet[cellRef].s = {
+        ...style,
+        alignment: {
+          ...style.alignment,
+          horizontal: leftAlignCols.includes(col)
+            ? "left"
+            : rightAlignCols.includes(col)
+            ? "right"
+            : style.alignment?.horizontal || "center",
+        },
+      };
 
-  utils.sheet_add_aoa(
-    worksheet,
-    [
-      [
-        "No",
-        "매장명",
-        "일자",
-        "영수번호",
-        "주문시간",
-        "주문구분",
-        "메뉴코드",
-        "메뉴명",
-        "판매가",
-        "수량",
-        "금액",
-      ],
-    ],
-    { origin: `A${secondRowLeng}` }
-  );
-
-  // //console.log(`A${secondRowLeng}`);
-  // worksheet[`A${secondRowLeng}`] = { t: "s", v: "매장명" };
-  // worksheet[`B${secondRowLeng}`] = { t: "s", v: "일자" };
-  // worksheet[`C${secondRowLeng}`] = { t: "s", v: "영수번호" };
-  // worksheet[`D${secondRowLeng}`] = { t: "s", v: "주문시간" };
-  // worksheet[`E${secondRowLeng}`] = { t: "s", v: "주문구분" };
-  // worksheet[`F${secondRowLeng}`] = { t: "s", v: "메뉴코드" };
-  // worksheet[`G${secondRowLeng}`] = { t: "s", v: "메뉴명" };
-  // worksheet[`H${secondRowLeng}`] = { t: "s", v: "판매가" };
-  // worksheet[`I${secondRowLeng}`] = { t: "s", v: "수량" };
-  // worksheet[`J${secondRowLeng}`] = { t: "s", v: "금액" };
-
-  worksheet["!cols"] = [
-    { wch: 10 }, // No
-    { wch: 40 }, // 매장명
-    { wch: 20 }, // 총 건수
-    { wch: 20 }, // POS
-    { wch: 20 }, // 배달
-    { wch: 20 }, // TABLET ORDER
-    { wch: 20 }, // TABLET ORDER 비율
-    { wch: 20 }, // TABLET ORDER 비율
-  ];
-
-  // 헤더에 스타일 적용 예시 (Pro 버전 사용 시)
-  const headerStyle = {
-    fill: { fgColor: { rgb: "FF87CEFA" } },
-    font: { bold: true, size: 16 },
-  };
-
-  const dataStyle = {
-    border: { top: "thin", left: "thin", bottom: "thin", right: "thin" },
-    font: { size: 16 },
-  };
-
-  // ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6", "I6"].forEach((cell) => {
-  //   if (worksheet[cell]) {
-  //     worksheet[cell].s = headerStyle;
-  //   }
-  // });
-
-  for (var i = 0; i < 11; i++) {
-    let cell = String.fromCharCode(65 + i) + "6";
-    let cell2 = String.fromCharCode(65 + i) + secondRowLeng;
-    if (worksheet[cell]) {
-      worksheet[cell].s = headerStyle;
-    }
-    if (worksheet[cell2]) {
-      worksheet[cell2].s = headerStyle;
-    }
-  }
-
-  // ["A7", "B7", "C7", "D7", "A8", "B8", "C8", "D8"].forEach((cell) => {
-  //   if (worksheet[cell]) {
-  //     worksheet[cell].s = dataStyle;
-  //   }
-  // });
-
-  for (var i = 0; i < 9; i++) {
-    let cell = String.fromCharCode(65 + i);
-    for (var j = 0; j < rowData2.value.length; j++) {
-      cell = cell + (j + 7);
-      if (worksheet[cell]) {
-        worksheet[cell].s = dataStyle;
+      if (numberCols[col] && worksheet[cellRef].t === "n") {
+        worksheet[cellRef].z = numberCols[col];
       }
     }
   }
+};
 
-  const filteredData = filteredrowData.value.map((row, index) => [
-    index + 1,
-    row.strStoreName,
-    formatLocalDate(row.dtmDate.split(" ")[0]),
-    row.lngReceipt,
-    row.dtmEndTime,
-    row.strOrderType,
-    row.lngSMenu,
-    row.strMenuName,
-    formatNumberWithCommas(row.lngPrice),
-    formatNumberWithCommas(row.intCount),
-    formatNumberWithCommas(row.lngAmount),
-  ]);
-  utils.sheet_add_aoa(worksheet, filteredData, {
-    origin: `A${secondRowLeng + 1}`,
-  });
-
-  const workbook = utils.book_new();
-  utils.book_append_sheet(workbook, worksheet, "Sheet1");
-
-  const workbookOut = write(workbook, { bookType: "xlsx", type: "binary" });
-
-  function s2ab(s) {
-    const buf = new ArrayBuffer(s.length);
-    const view = new Uint8Array(buf);
-    for (let i = 0; i < s.length; i++) {
-      view[i] = s.charCodeAt(i) & 0xff;
-    }
-    return buf;
+const downloadExcel = () => {
+  if (!afterSearch.value || rowData2.value.length === 0) {
+    Swal.fire({
+      title: "경고",
+      text: "조회를 먼저 진행해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
   }
 
-  const blob = new Blob([s2ab(workbookOut)], {
-    type: "application/octet-stream",
+  const summaryHeaders = [
+    "No",
+    "매장명",
+    "총 건수",
+    "POS",
+    "배달",
+    "TABLET ORDER",
+    "TABLET ORDER 비율",
+  ];
+  const detailHeaders = [
+    "No",
+    "매장명",
+    "일자",
+    "영수번호",
+    "주문시간",
+    "주문구분",
+    "메뉴코드",
+    "메뉴명",
+    "판매가",
+    "수량",
+    "금액",
+  ];
+
+  const summaryRows = rowData2.value.map((row, index) => [
+    index + 1,
+    row.strStoreName ?? "",
+    toNumber(row.lngTotCnt),
+    toNumber(row.lngPosOrderCnt),
+    toNumber(row.lngDelOrderCnt),
+    toNumber(row.lngTabOrderCnt),
+    formatTabOrderRate(row.lngTabOrderRate),
+  ]);
+
+  const sumTot = summaryRows.reduce((acc, row) => acc + row[2], 0);
+  const sumPos = summaryRows.reduce((acc, row) => acc + row[3], 0);
+  const sumDel = summaryRows.reduce((acc, row) => acc + row[4], 0);
+  const sumTab = summaryRows.reduce((acc, row) => acc + row[5], 0);
+  const avgTabRate = formatTabOrderRate(sumTot > 0 ? (sumTab / sumTot) * 100 : 0);
+
+  const detailSource =
+    filteredrowData.value.length > 0 ? filteredrowData.value : rowData.value;
+  const detailRows = detailSource.map((row, index) => [
+    index + 1,
+    row.strStoreName ?? "",
+    row.dtmDate ? formatLocalDate(String(row.dtmDate).split(" ")[0]) : "",
+    row.lngReceipt ?? "",
+    row.dtmEndTime ?? "",
+    row.strOrderType ?? "",
+    row.lngSMenu ?? "",
+    row.strMenuName ?? "",
+    toNumber(row.lngPrice),
+    toNumber(row.intCount),
+    toNumber(row.lngAmount),
+  ]);
+
+  const summaryHeaderRow = 6;
+  const summaryDataStart = 7;
+  const summaryDataEnd = summaryDataStart + summaryRows.length - 1;
+  const totalRow = summaryDataEnd + 1;
+  const detailSectionTitleRow = totalRow + 2;
+  const detailHeaderRow = detailSectionTitleRow + 1;
+  const detailDataStart = detailHeaderRow + 1;
+  const detailDataEnd = detailDataStart + Math.max(detailRows.length, 1) - 1;
+
+  const worksheet = utils.aoa_to_sheet([
+    ["주문구분 현황"],
+    [],
+    [selectedExcelDate.value || ""],
+    [selectedExcelStore.value || ""],
+    [`작성일시 : ${formatDateTime3(new Date())}`],
+    summaryHeaders,
+    ...summaryRows,
+    ["", "합계", sumTot, sumPos, sumDel, sumTab, avgTabRate],
+    [],
+    ["○ 주문 상세"],
+    detailHeaders,
+    ...(detailRows.length > 0 ? detailRows : [["", "상세 데이터가 없습니다."]]),
+  ]);
+
+  worksheet["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } },
+    { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } },
+    { s: { r: 3, c: 0 }, e: { r: 3, c: 6 } },
+    { s: { r: 4, c: 0 }, e: { r: 4, c: 6 } },
+    {
+      s: { r: detailSectionTitleRow - 1, c: 0 },
+      e: { r: detailSectionTitleRow - 1, c: 10 },
+    },
+  ];
+
+  worksheet["!cols"] = [
+    { wch: 8 },
+    { wch: 28 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 28 },
+    { wch: 20 },
+    { wch: 22 },
+    { wch: 44 },
+    { wch: 12 },
+    { wch: 10 },
+    { wch: 14 },
+  ];
+
+  worksheet["!rows"] = [{ hpt: 30 }];
+
+  // 타이틀
+  if (worksheet.A1) {
+    worksheet.A1.s = {
+      font: { name: "맑은 고딕", bold: true, sz: 18, color: { rgb: "000000" } },
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+  }
+
+  // 조회조건
+  ["A3", "A4", "A5"].forEach((cell) => {
+    if (worksheet[cell]) {
+      worksheet[cell].s = {
+        font: { name: "맑은 고딕", sz: 11 },
+        alignment: { horizontal: "left", vertical: "center" },
+      };
+    }
   });
 
-  // Blob을 가리키는 URL 생성
-  const url = window.URL.createObjectURL(blob);
+  // 요약 헤더/데이터/합계
+  applyExcelRangeStyle(
+    worksheet,
+    summaryHeaderRow,
+    summaryHeaderRow,
+    summaryHeaders.length,
+    EXCEL_HEADER_STYLE
+  );
+  if (summaryRows.length > 0) {
+    applyExcelRangeStyle(
+      worksheet,
+      summaryDataStart,
+      summaryDataEnd,
+      summaryHeaders.length,
+      EXCEL_DATA_STYLE,
+      {
+        leftAlignCols: [1],
+        rightAlignCols: [2, 3, 4, 5, 6],
+        numberCols: {
+          2: "#,##0",
+          3: "#,##0",
+          4: "#,##0",
+          5: "#,##0",
+        },
+      }
+    );
+  }
+  applyExcelRangeStyle(
+    worksheet,
+    totalRow,
+    totalRow,
+    summaryHeaders.length,
+    EXCEL_TOTAL_STYLE,
+    {
+      leftAlignCols: [1],
+      rightAlignCols: [2, 3, 4, 5, 6],
+      numberCols: {
+        2: "#,##0",
+        3: "#,##0",
+        4: "#,##0",
+        5: "#,##0",
+      },
+    }
+  );
 
-  // 임시 링크를 만들어 클릭 이벤트로 다운로드 실행
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "주문구분 현황.xlsx"; // 저장될 파일명
-  document.body.appendChild(a);
-  a.click();
+  // 상세 섹션 타이틀
+  const detailTitleCell = `A${detailSectionTitleRow}`;
+  if (worksheet[detailTitleCell]) {
+    worksheet[detailTitleCell].s = {
+      font: { name: "맑은 고딕", bold: true, sz: 12 },
+      alignment: { horizontal: "left", vertical: "center" },
+    };
+  }
+
+  // 상세 헤더/데이터
+  applyExcelRangeStyle(
+    worksheet,
+    detailHeaderRow,
+    detailHeaderRow,
+    detailHeaders.length,
+    EXCEL_HEADER_STYLE
+  );
+
+  if (detailRows.length > 0) {
+    applyExcelRangeStyle(
+      worksheet,
+      detailDataStart,
+      detailDataEnd,
+      detailHeaders.length,
+      EXCEL_DATA_STYLE,
+      {
+        leftAlignCols: [1, 7],
+        rightAlignCols: [8, 9, 10],
+        numberCols: {
+          8: "#,##0",
+          9: "#,##0",
+          10: "#,##0",
+        },
+      }
+    );
+  }
+
+  const workbook = utils.book_new();
+  utils.book_append_sheet(workbook, worksheet, "주문구분 현황");
+  writeFile(workbook, "주문구분 현황.xlsx");
 };
 </script>
 

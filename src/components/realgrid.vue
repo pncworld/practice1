@@ -2,7 +2,7 @@
   <div
     :id="realgridname"
     class="h-[100%] w-[100%] realgrid"
-    :class="rgUiToneClassNames"
+    :class="[rgUiToneClassNames, props.checkExclusiveColumns ? 'rg-exclusive-radio-grid' : '']"
     :tabindex="props.keyDeleteRemovesCurrentRow === true ? 0 : undefined"
     @focusin="onGridContainerFocusIn"></div>
 </template>
@@ -1021,6 +1021,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /** checkbox* 컬럼을 행 단위 라디오처럼 배타 선택 */
+  checkExclusiveColumns: {
+    type: Boolean,
+    default: false,
+  },
   checkAll: {
     // 전체 체크박스 선택할지 말지
     type: Boolean,
@@ -1898,11 +1903,14 @@ const headerCheckBarHasCol = (strColID) => {
 
 /** headerCheckBar 지정 시: 해당 컬럼만 헤더 체크. 미지정 시: checkbox 타입 컬럼 */
 const resolveHeaderCheckLocation = (item) => {
-  const isCheckboxCol =
-    item.strColID.includes("checkbox") || item.strDisplay.includes("checkbox");
+  const isCheckboxCol = isCheckboxGridColumn(item);
   const headerCheckSpec = String(props.headerCheckBar ?? "").trim();
   if (headerCheckSpec) {
     return headerCheckBarHasCol(item.strColID) ? "left" : "none";
+  }
+  // 배타 라디오 컬럼은 헤더 전체선택 비활성
+  if (props.checkExclusiveColumns && isCheckboxCol) {
+    return "none";
   }
   return isCheckboxCol ? "left" : "none";
 };
@@ -2709,6 +2717,10 @@ const runFuncshowGrid = async () => {
   const columns = tabInitSetArray.value.map((item, index) => ({
     name: item.strColID,
     fieldName: item.strColID,
+    // opt-in: checkExclusiveColumns 화면만 체크컬럼 텍스트 편집 차단
+    ...(props.checkExclusiveColumns && isCheckboxGridColumn(item)
+      ? { editable: false }
+      : {}),
     header: {
       text: item.strHdText,
       styleName: `header-style-${realgridname.value}${index}`,
@@ -3202,7 +3214,7 @@ const runFuncshowGrid = async () => {
     width: rgScaledColumnWidth(item.strColID, item.intHdWidth),
     numberFormat: resolveGridNumberFormat(item),
     styleName:
-      props.dynamicRowHeight2 == true && item.strAlign == "left"
+      (props.dynamicRowHeight2 == true && item.strAlign == "left"
         ? "setTextAlignLeft"
         : props.dynamicRowHeight == true
         ? "realgrid-pre-wrap"
@@ -3210,7 +3222,10 @@ const runFuncshowGrid = async () => {
         ? "setTextAlignLeft"
         : item.strAlign == "center"
         ? "setTextAlignCenter"
-        : "setTextAlignRight",
+        : "setTextAlignRight") +
+      (props.checkExclusiveColumns && isCheckboxGridColumn(item)
+        ? " rg-exclusive-radio"
+        : ""),
     // editor: {
     //   type: item.strColType.includes("dropdown")
     //     ? "dropdown"
@@ -3340,6 +3355,10 @@ const runFuncshowGrid = async () => {
             item.strColID == props.checkRenderEditable2Col
           ? false
           : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
+      // opt-in: 배타 선택 화면만 라디오 이미지
+      ...(props.checkExclusiveColumns && isCheckboxGridColumn(item)
+        ? { useImages: true }
+        : {}),
     },
     buttonVisibility: "always",
     styleCallback:
@@ -3803,10 +3822,35 @@ const runFuncshowGrid = async () => {
     for (const col of cols) {
       if (col?.renderer?.type === "check") {
         col.sortable = false;
+        // opt-in: 배타 선택 화면만 더블클릭 텍스트 편집 차단
+        if (props.checkExclusiveColumns == true) {
+          col.editable = false;
+        }
       }
     }
   } catch (_) {
     void 0;
+  }
+  // opt-in: 배타 선택 화면만 체크컬럼 편집기 진입 차단
+  if (props.checkExclusiveColumns == true) {
+    const prevShowEditorForCheck = gridView.onShowEditor;
+    gridView.onShowEditor = function (grid, index, editProps, attrs) {
+      try {
+        const col =
+          (index?.column && grid.columnByName?.(index.column)) ||
+          (index?.fieldName && grid.columnByField?.(index.fieldName)) ||
+          null;
+        if (col?.renderer?.type === "check") {
+          return false;
+        }
+      } catch (_) {
+        void 0;
+      }
+      if (typeof prevShowEditorForCheck === "function") {
+        return prevShowEditorForCheck(grid, index, editProps, attrs);
+      }
+      return true;
+    };
   }
   rgReapplyLabelingDropdownEditors(gridView);
   rgBindLabelingDropdownOnShowEditor(gridView);
@@ -4714,6 +4758,33 @@ const runFuncshowGrid = async () => {
         ////console.log(bool);
         if (bool == true) {
           dataProvider.setValue(row, "checkbox1", false);
+        }
+      }
+    }
+    // 동적 checkbox 컬럼(N개)을 행 단위 라디오처럼 동작
+    if (
+      props.checkExclusiveColumns == true &&
+      isCheckCell &&
+      editedFieldName &&
+      String(editedFieldName).includes("checkbox") &&
+      checkTruthy(newVal)
+    ) {
+      const fieldCnt = dataProvider.getFieldCount();
+      for (let f = 0; f < fieldCnt; f += 1) {
+        let fname = "";
+        try {
+          fname = dataProvider.getOrgFieldName(f);
+        } catch (_) {
+          fname = "";
+        }
+        if (
+          fname &&
+          fname.includes("checkbox") &&
+          fname !== editedFieldName
+        ) {
+          try {
+            dataProvider.setValue(row, fname, false);
+          } catch (_) {}
         }
       }
     }
@@ -7134,6 +7205,34 @@ watch(
 <style>
 .rg-check-readonly-disabled {
   background-color: #9a9a9a !important;
+}
+
+/* 배타 선택 컬럼: 체크박스 대신 라디오 이미지 */
+.rg-exclusive-radio-grid .rg-check-renderer-checked,
+.rg-exclusive-radio .rg-check-renderer-checked {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='white' stroke='%234b5563' stroke-width='1.5'/%3E%3Ccircle cx='8' cy='8' r='4' fill='%232563eb'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+}
+.rg-exclusive-radio-grid .rg-check-renderer-unchecked,
+.rg-exclusive-radio .rg-check-renderer-unchecked {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='white' stroke='%234b5563' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+}
+.rg-exclusive-radio-grid .rg-check-renderer-checked::before,
+.rg-exclusive-radio-grid .rg-check-renderer-unchecked::before,
+.rg-exclusive-radio .rg-check-renderer-checked::before,
+.rg-exclusive-radio .rg-check-renderer-unchecked::before {
+  content: none !important;
 }
 
 .setTextAlignLeft {
