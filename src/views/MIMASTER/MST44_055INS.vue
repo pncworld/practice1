@@ -806,16 +806,25 @@ const saveButton = async () => {
           .filter((item) => item.lngKeyScrNo !== undefined)
           .map((item) => item.intKeyNo);
 
-        const intKeySeqs2 = originGroupKeys.value.map((item) => item.intKeySeq);
-        const lngAmtcode2 = originGroupKeys.value.map(
-          (item) => item.lngAmtCode
-        );
-        const lngGroupCode2 = originGroupKeys.value.map(
-          (item) => item.lngGroupCode
-        );
-        const strKeyName2 = originGroupKeys.value.map(
-          (item) => item.strKeyName
-        );
+        // 동일 그룹+시퀀스 중복 제거 (마지막 값 유지) — DB에 intSubKeySeq 중복 저장 방지
+        const dedupedGroupKeys = [];
+        const groupSeqMap = new Map();
+        for (const item of originGroupKeys.value) {
+          if (item.lngAmtCode === undefined || item.lngAmtCode === null) continue;
+          const key = `${item.lngGroupCode}_${item.intKeySeq}`;
+          if (groupSeqMap.has(key)) {
+            dedupedGroupKeys[groupSeqMap.get(key)] = item;
+          } else {
+            groupSeqMap.set(key, dedupedGroupKeys.length);
+            dedupedGroupKeys.push(item);
+          }
+        }
+        originGroupKeys.value = dedupedGroupKeys;
+
+        const intKeySeqs2 = dedupedGroupKeys.map((item) => item.intKeySeq);
+        const lngAmtcode2 = dedupedGroupKeys.map((item) => item.lngAmtCode);
+        const lngGroupCode2 = dedupedGroupKeys.map((item) => item.lngGroupCode);
+        const strKeyName2 = dedupedGroupKeys.map((item) => item.strKeyName);
 
         const res2 = await savePayKey(
           groupCd.value,
@@ -1052,38 +1061,34 @@ const addKey = () => {
     //comsole.log(clickedRealIndex.value);
     //comsole.log(clickedGroupPage.value);
     //comsole.log(KeyList2.value);
+    const targetSeq =
+      (clickedGroupPage.value - 1) * 25 + clickedRealIndex.value;
+    const newItem = {
+      intKeySeq: targetSeq,
+      lngGroupCode: clickedGroupCd.value,
+      lngAmtCode: Number(clickedCode.value),
+      strKeyName: clickedstrName.value,
+    };
     const foraddIndex = KeyList2.value.findIndex(
-      (item) =>
-        item.intKeySeq ==
-        (clickedGroupPage.value - 1) * 25 + clickedRealIndex.value
+      (item) => item.intKeySeq == targetSeq
     );
     //comsole.log(foraddIndex);
     if (foraddIndex == -1) {
-      KeyList2.value.push({
-        intKeySeq: (clickedGroupPage.value - 1) * 25 + clickedRealIndex.value,
-        lngGroupCode: clickedGroupCd.value,
-        lngAmtCode: Number(clickedCode.value),
-        strKeyName: clickedstrName.value,
-      });
-      originGroupKeys.value.push({
-        intKeySeq: (clickedGroupPage.value - 1) * 25 + clickedRealIndex.value,
-        lngGroupCode: clickedGroupCd.value,
-        lngAmtCode: Number(clickedCode.value),
-        strKeyName: clickedstrName.value,
-      });
+      KeyList2.value.push(newItem);
     } else {
-      KeyList2.value[foraddIndex] = {
-        intKeySeq: (clickedGroupPage.value - 1) * 25 + clickedRealIndex.value,
-        lngGroupCode: clickedGroupCd.value,
-        lngAmtCode: Number(clickedCode.value),
-        strKeyName: clickedstrName.value,
-      };
-      originGroupKeys.value.push({
-        intKeySeq: (clickedGroupPage.value - 1) * 25 + clickedRealIndex.value,
-        lngGroupCode: clickedGroupCd.value,
-        lngAmtCode: Number(clickedCode.value),
-        strKeyName: clickedstrName.value,
-      });
+      KeyList2.value[foraddIndex] = newItem;
+    }
+
+    // 동일 그룹+시퀀스에는 결제코드 1개만 유지 (덮어쓰기)
+    const originIndex = originGroupKeys.value.findIndex(
+      (item) =>
+        item.intKeySeq == targetSeq &&
+        item.lngGroupCode == clickedGroupCd.value
+    );
+    if (originIndex === -1) {
+      originGroupKeys.value.push(newItem);
+    } else {
+      originGroupKeys.value[originIndex] = newItem;
     }
   }
   //comsole.log(originGroupKeys.value);
@@ -1118,11 +1123,15 @@ const deletekey = () => {
       return item;
     });
 
+    // 현재 그룹의 해당 시퀀스만 제거 (다른 그룹 데이터는 유지)
+    const deleteSeq =
+      (clickedGroupPage.value - 1) * 25 + clickedRealIndex.value;
     originGroupKeys.value = originGroupKeys.value.filter(
       (item) =>
-        item.intKeySeq !=
-          (clickedGroupPage.value - 1) * 25 + clickedRealIndex.value &&
-        item.lngGroupCode == clickedGroupCd.value
+        !(
+          item.intKeySeq == deleteSeq &&
+          item.lngGroupCode == clickedGroupCd.value
+        )
     );
     //comsole.log(KeyList2.value);
     //comsole.log(originGroupKeys.value);

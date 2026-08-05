@@ -6,35 +6,39 @@
 # 수정자 : 권지안                
 ################################################################################*/
 <template>
-  <!-- 조회 조건 -->
-  <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <div class="flex justify-start pt-0">
-      <PageName></PageName>
-      <div class="flex justify-end space-x-2 ml-[1168px]">
-        <div class="flex justify-center space-x-2 mt-2">
-          <button @click="searchButton" class="button search md:w-auto w-14">
-            조회
-          </button>
-          <button @click="saveButton" class="button save text-sm md:w-auto w-14">
-            저장
-          </button>
-        </div>
-      </div>
+  <div class="mst57-page">
+  <!-- 상단 타이틀 / 액션 -->
+  <div class="mst57-page-header">
+    <PageName></PageName>
+    <div class="mst57-page-actions">
+      <button @click="searchButton" class="button search md:w-auto w-14">
+        조회
+      </button>
+      <button @click="saveButton" class="button save text-sm md:w-auto w-14">
+        저장
+      </button>
     </div>
   </div>
-  <br/>
+
   <!-- 조회 조건 -->
-  <div class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
+  <div class="mst57-search-bar">
     <PickStore @update:storeAreaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" :showAreaCd="true"></PickStore>
   </div>
+
   <!-- 데이터 영역 -->
   <div class="mst57-data-area">
-    <div class="inline-block md:flex w-full">
-    <!-- <span class="md:hidden font-bold flex justify-center w-auto">
-      클릭하시면 아래 페이지에서 다국어 정보가 나옵니다.
-    </span> -->
+    <div class="mst57-content-row">
     <div class="mst57-category-list-wrapper">
+      <div class="mst57-panel-head">
+        <span class="mst57-panel-title">카테고리</span>
+      </div>
       <div class="mst57-category-list">
+        <div v-if="!afterSearch" class="mst57-empty-hint">
+          매장을 선택한 뒤 조회해 주세요.
+        </div>
+        <div v-else-if="!Category || Category.length === 0" class="mst57-empty-hint">
+          등록된 카테고리가 없습니다.
+        </div>
         <div v-for="i in Category" :key="i.MajorCode" class="mst57-category-item">
           <button 
             @click="bringCategory(i.MajorCode)" 
@@ -61,51 +65,64 @@
         </button>
       </div>
     </div>
-    <div v-show="testOrderManage2" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-      <div class="bg-white p-6 rounded shadow-lg w-4/5 h-4/5 overflow-auto">
-        <!-- 상단 타이틀 영역 -->
-        <div class="border-gray-500 text-2xl flex justify-between items-center mb-4">
-          <span>카테고리 노출 순서 관리</span>
-          <button @click="saveButtonPopup" class="button save text-sm md:w-auto w-14">
-            저장
-          </button>
+
+    <!-- 노출 순서 관리 모달 -->
+    <div v-show="testOrderManage2" class="mst57-modal-overlay">
+      <div class="mst57-modal">
+        <div class="mst57-modal-header">
+          <span class="mst57-modal-title">카테고리 노출 순서 관리</span>
+          <div class="mst57-modal-actions">
+            <button @click="saveButtonPopup" class="button save text-sm md:w-auto w-14">
+              저장
+            </button>
+            <button @click="testOrderManage" class="mst57-modal-close-btn">
+              닫기
+            </button>
+          </div>
         </div>
-    <!-- 본문 영역: 2컬럼 레이아웃 -->
-    <div class="grid grid-cols-2 gap-6 h-[calc(100%-6rem)]">
-      <!-- 대 카테고리 -->
-      <div class="border border-gray-300 rounded">
-        <div class="bg-gray-100 font-bold p-2 text-center">대 카테고리</div>
-        <VueDraggableNext v-model="Category" item-key="MajorCode" :group="'A'" class="space-y-2 p-2" @end="updateCategoryNumbers">
-          <div v-for="i in Category" :key="i.MajorCode" class="p-3 bg-gray-200 rounded-md shadow-sm cursor-pointer flex items-center" @click="selectCategory(i)">
-            <span class="mr-2">≡</span>
-            <p>{{ i.MajorName }}</p>
+        <div class="mst57-modal-body">
+          <div class="mst57-drag-panel">
+            <div class="mst57-drag-panel-head">대 카테고리</div>
+            <VueDraggableNext v-model="Category" item-key="MajorCode" :group="'A'" class="mst57-drag-list" @end="updateCategoryNumbers">
+              <div
+                v-for="i in Category"
+                :key="i.MajorCode"
+                class="mst57-drag-item"
+                :class="{ 'mst57-drag-item--selected': selectedCategory && selectedCategory.MajorCode === i.MajorCode }"
+                @click="selectCategory(i)">
+                <span class="mst57-drag-handle">≡</span>
+                <p>{{ i.MajorName }}</p>
+              </div>
+            </VueDraggableNext>
           </div>
-        </VueDraggableNext>
-      </div>
-      <!-- 중 카테고리 -->
-      <div class="border border-gray-300 rounded">
-        <div class="bg-gray-100 font-bold p-2 text-center">중 카테고리</div>
-        <VueDraggableNext v-if="selectedCategory" v-model="selectedCategory.SubCategory" item-key="SubCode" :group="'B'" class="space-y-2 p-2" @end="updateCategoryNumbers">
-          <div v-for="x in selectedCategory.SubCategory" :key="x.SubCode" class="p-3 bg-blue-200 rounded-md shadow-sm cursor-move flex items-center">
-            <span class="mr-2">≡</span>
-            <p>{{ x.SubName }}</p>
+          <div class="mst57-drag-panel">
+            <div class="mst57-drag-panel-head">중 카테고리</div>
+            <VueDraggableNext
+              v-if="selectedCategory"
+              v-model="selectedCategory.SubCategory"
+              item-key="SubCode"
+              :group="'B'"
+              class="mst57-drag-list"
+              @end="updateCategoryNumbers">
+              <div
+                v-for="x in selectedCategory.SubCategory"
+                :key="x.SubCode"
+                class="mst57-drag-item mst57-drag-item--sub">
+                <span class="mst57-drag-handle">≡</span>
+                <p>{{ x.SubName }}</p>
+              </div>
+            </VueDraggableNext>
+            <p v-else class="mst57-empty-hint mst57-empty-hint--modal">
+              중 카테고리 순서 변경을 원하시면<br>대 카테고리를 선택하세요.
+            </p>
           </div>
-        </VueDraggableNext>
-        <p v-else class="text-gray-500 text-center p-4">
-          중 카테고리 순서 변경을 원하시면<br>대 카테고리를 선택하세요.
-        </p>
+        </div>
       </div>
     </div>
-    <!-- 하단 닫기 버튼 -->
-    <div class="flex justify-center mt-6">
-      <button @click="testOrderManage" class="p-2 bg-blue-500 text-white rounded">
-        닫기
-      </button>
-    </div>
-  </div>
-</div>
+
     <div class="mst57-main-category-form" v-if="afterCategory">
       <div class="mst57-form-header">
+        <span class="mst57-section-title">대카테고리 정보</span>
         <button class="whitebutton mst57-delete-main-btn" @click="deleteMainCategory">
           대카테고리 삭제
         </button>
@@ -155,19 +172,9 @@
             @input="changeMajorName3"
             @keyup="afterModifed" />
         </div>
-        <!-- <div class="bg-gray-200 flex justify-start items-center pl-4">
-          메인카테고리명(스페인어)
-        </div>
-        <div class="bg-white md:w-96 w-full">
-          <input
-            type="text"
-            class="border border-gray-300 h-6 mt-2 w-8/12 md:w-96 flex justify-start ml-4 pl-2"
-            v-model="languageName4"
-            @input="changeMajorName4"
-            @keyup="afterModifed" />
-        </div> -->
       </div>
-      <div class="mst57-subcategory-add-btn-wrapper" v-if="afterCategory">
+      <div class="mst57-sub-section-bar" v-if="afterCategory">
+        <span class="mst57-section-title">서브카테고리</span>
         <button class="whitebutton mst57-add-subcategory-btn" @click="addsubCategory">
           서브카테고리 추가
         </button>
@@ -177,6 +184,7 @@
         v-if="afterCategory"
         :key="i[0]?.categoryCode">
         <div class="mst57-sub-form-header">
+          <span class="mst57-sub-form-title">{{ i[0]?.LanguageName || '새 서브카테고리' }}</span>
           <button class="whitebutton mst57-delete-sub-btn" @click="deleteSubCategory(i[0].categoryCode)">
             삭제
           </button>
@@ -290,7 +298,7 @@
               <span class="w-14 text-sm flex-shrink-0">시작일 : </span>
               <input
                 type="date"
-                class="h-8 text-sm ml-1 w-[6vw] disabled:bg-gray-400"
+                class="mst57-date-input disabled:bg-gray-100"
                 :value="i[0] ? i[0].FROM_DATE : ''"
                 @input="(event) => changeFromDate(i[0].categoryCode, event)"
                 :disabled="(i[0]?.ALL_DATE === '1')"
@@ -301,7 +309,7 @@
               <span class="w-14 text-sm flex-shrink-0">종료일 : </span>
               <input
                 type="date"
-                class="h-8 text-sm ml-1 w-[6vw] disabled:bg-gray-400"
+                class="mst57-date-input disabled:bg-gray-100"
                 :value="i[0] ? i[0].TO_DATE : ''"
                 @input="(event) => changeToDate(i[0].categoryCode, event)"
                 :disabled="(i[0]?.ALL_DATE === '1')"
@@ -330,7 +338,7 @@
              <!-- 시작일 -->
             <div class="flex items-center">
               <span>시작시간 : </span>
-              <select name="" id="" class="ml-1 text-lg disabled:bg-gray-400  disabled:opacity-100"
+              <select name="" id="" class="mst57-time-select disabled:bg-gray-100 disabled:opacity-100"
                     :value="i[0]?.FROM_TIME ? parseInt(i[0].FROM_TIME.substring(0, 2)) : 0" 
                     @change="(event) => changeFromTime(i[0].categoryCode, 'hour', event.target.value)"
                     :disabled="(i[0]?.ALL_TIME === '1')" >
@@ -338,8 +346,8 @@
                   {{ i.strName }}
                 </option>
               </select>
-              <span>시</span>
-              <select name="" id="" class="text-lg  disabled:bg-gray-400  disabled:opacity-100"
+              <span class="mst57-unit">시</span>
+              <select name="" id="" class="mst57-time-select disabled:bg-gray-100 disabled:opacity-100"
                     :value="i[0]?.FROM_TIME ? parseInt(i[0].FROM_TIME.substring(2)) : 0"
                     @change="(event) => changeFromTime(i[0].categoryCode, 'minute', event.target.value)"
                     :disabled="(i[0]?.ALL_TIME === '1')" >
@@ -347,12 +355,12 @@
                   {{ i.strName }}
                 </option>
               </select>
-              <span>분</span>
+              <span class="mst57-unit">분</span>
             </div>
             <!-- 종료일 -->
             <div class="flex items-center">
                 <span>종료시간 : </span>
-                <select name="" id="" class=" text-lg ml-1 disabled:bg-gray-400 disabled:opacity-100"
+                <select name="" id="" class="mst57-time-select disabled:bg-gray-100 disabled:opacity-100"
                        :value="i[0]?.TO_TIME ? parseInt(i[0].TO_TIME.substring(0, 2)) : 0"
                        @change="(event) => changeToTime(i[0].categoryCode, 'hour', event.target.value)"
                        :disabled="(i[0]?.ALL_TIME === '1')">
@@ -360,8 +368,8 @@
                     {{ i.strName }}
                   </option>
                 </select>
-                <span>시</span>
-                <select name="" id="" class=" text-lg disabled:bg-gray-400  disabled:opacity-100"
+                <span class="mst57-unit">시</span>
+                <select name="" id="" class="mst57-time-select disabled:bg-gray-100 disabled:opacity-100"
                       :value="i[0]?.TO_TIME ? parseInt(i[0].TO_TIME.substring(2)) : 0"
                       @change="(event) => changeToTime(i[0].categoryCode, 'minute', event.target.value)"
                       :disabled="(i[0]?.ALL_TIME === '1')">
@@ -369,7 +377,7 @@
                     {{ i.strName }}
                   </option>
                 </select>
-                <span>분</span>
+                <span class="mst57-unit">분</span>
             </div>
           </div>
         </div>
@@ -453,7 +461,11 @@
         <button class="button save mst57-save-btn" @click="saveButton">저장</button>
       </div>
     </div>
+    <div v-else-if="afterSearch" class="mst57-main-placeholder">
+      <p class="mst57-empty-hint">왼쪽에서 카테고리를 선택하거나<br>메인카테고리를 추가해 주세요.</p>
     </div>
+    </div>
+  </div>
   </div>
 </template>
 
@@ -1878,58 +1890,131 @@ const saveButtonPopup = async () => {
 </script>
 
 <style scoped>
-/* MST57_001INS 페이지 전용 스타일 - 전역 CSS와 충돌 방지 */
+/* MST57_001INS 페이지 전용 스타일 */
 
-/* 데이터 영역 - 스크롤 가능 */
+.mst57-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.mst57-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  flex-shrink: 0;
+  gap: 1rem;
+}
+
+.mst57-page-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.mst57-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  min-height: 3.5rem;
+  flex-shrink: 0;
+}
+
 .mst57-data-area {
-  height: calc(100vh - 200px);
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  margin-top: 20px;
+  margin-top: 0.75rem;
 }
 
-/* 메인 레이아웃 */
-.inline-block.md\:flex {
+.mst57-content-row {
   display: flex;
-  gap: 20px;
-  margin-top: 0;
+  gap: 1rem;
+  width: 100%;
+  align-items: flex-start;
+  /* 카테고리 목록을 왼쪽 끝 ↔ 입력폼 사이쯤으로 */
+  padding-left: clamp(24px, 4vw, 56px);
+  padding-right: 1rem;
+  box-sizing: border-box;
 }
 
-/* 왼쪽 카테고리 목록 래퍼 */
+/* 왼쪽 카테고리 패널 */
 .mst57-category-list-wrapper {
-  width: 250px;
+  width: 260px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 
-/* 왼쪽 카테고리 목록 */
+.mst57-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.mst57-panel-title,
+.mst57-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #545876;
+}
+
 .mst57-category-list {
   width: 100%;
-  border: 1px solid #e5e5e5;
   background: #fff;
-  border-radius: 4px;
-  padding: 10px 0;
-  max-height: calc(100vh - 350px);
+  padding: 0.5rem 0;
+  max-height: calc(100vh - 360px);
   overflow-y: auto;
   flex: 1;
+  min-height: 200px;
+}
+
+.mst57-empty-hint {
+  padding: 2rem 1.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #9ca3af;
+}
+
+.mst57-empty-hint--modal {
+  padding: 3rem 1rem;
 }
 
 .mst57-category-item {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .mst57-category-main-btn,
 .mst57-category-sub-btn {
   width: 100%;
   text-align: left;
-  padding: 12px 20px;
-  font-size: 14px;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
   background: transparent;
   border: none;
+  border-left: 3px solid transparent;
   cursor: pointer;
-  transition: all 0.2s;
-  color: #333;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  color: #374151;
 }
 
 .mst57-category-main-btn {
@@ -1938,91 +2023,164 @@ const saveButtonPopup = async () => {
 
 .mst57-category-sub-btn {
   font-weight: 400;
-  padding-left: 40px;
-  font-size: 13px;
+  padding-left: 2rem;
+  font-size: 0.8125rem;
+  color: #6b7280;
 }
 
 .mst57-category-main-btn:hover,
 .mst57-category-sub-btn:hover {
-  background: #f5f5f5;
+  background: #f9fafb;
 }
 
 .mst57-category-active {
-  background: #C10000 !important;
-  color: #fff !important;
+  background: #fef2f2 !important;
+  color: #C10000 !important;
+  border-left-color: #C10000 !important;
+  font-weight: 700;
 }
 
 .mst57-category-active:hover {
-  background: #a00000 !important;
+  background: #fee2e2 !important;
 }
 
 .mst57-subcategory-item {
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
-/* 대카테고리 폼 */
+.mst57-action-buttons-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+  background: #fafafa;
+}
+
+.mst57-action-buttons-left .mst57-add-category-btn,
+.mst57-action-buttons-left .mst57-order-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.mst57-add-category-btn {
+  background: #C10000;
+  color: #fff;
+  border: none;
+  padding: 0.625rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.mst57-add-category-btn:hover {
+  background: #a00000;
+}
+
+.mst57-order-btn {
+  background: #fff;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+  padding: 0.625rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.mst57-order-btn:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* 오른쪽 폼 영역 */
 .mst57-main-category-form {
   flex: 1;
+  min-width: 0;
   background: #fff;
-  border: 1px solid #e5e5e5;
-  border-radius: 4px;
-  padding: 20px;
-  margin-top: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
   position: relative;
+}
+
+.mst57-main-placeholder {
+  flex: 1;
+  min-width: 0;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px dashed #d1d5db;
+  border-radius: 0.5rem;
 }
 
 .mst57-form-header {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  gap: 0.75rem;
 }
 
-.mst57-delete-main-btn {
-  background: #666;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 14px;
+.mst57-delete-main-btn,
+.mst57-delete-sub-btn {
+  background: #fff;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+  padding: 0.375rem 0.875rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
-.mst57-delete-main-btn:hover {
-  background: #555;
+.mst57-delete-main-btn:hover,
+.mst57-delete-sub-btn:hover {
+  background: #fef2f2;
+  color: #C10000;
+  border-color: #fca5a5;
 }
 
-/* 폼 그리드 */
 .mst57-form-grid {
   display: grid;
-  grid-template-columns: 150px 1fr;
+  grid-template-columns: 160px 1fr;
   gap: 0;
-  border: 1px solid #e5e5e5;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  overflow: hidden;
 }
 
 .mst57-form-label {
-  background: #f5f5f5;
-  padding: 12px 16px;
-  font-size: 14px;
-  border-bottom: 1px solid #e5e5e5;
-  border-right: 1px solid #e5e5e5;
+  background: #f8f9fb;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   font-weight: 500;
+  color: #4b5563;
 }
 
-.mst57-form-label:last-child {
+.mst57-form-label:nth-last-child(2) {
   border-bottom: none;
 }
 
 .mst57-label-required {
-  color: #5782ff;
+  color: #C10000;
   font-weight: 700;
 }
 
 .mst57-form-field {
   background: #fff;
-  padding: 8px 16px;
-  border-bottom: 1px solid #e5e5e5;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
 }
@@ -2033,225 +2191,337 @@ const saveButtonPopup = async () => {
 
 .mst57-input {
   width: 100%;
-  max-width: 400px;
-  height: 32px;
-  padding: 0 12px;
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
-  font-size: 14px;
+  max-width: 420px;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .mst57-input:focus {
   outline: none;
-  border-color: #5782ff;
+  border-color: #C10000;
+  box-shadow: 0 0 0 2px rgba(193, 0, 0, 0.12);
 }
 
-/* 왼쪽 액션 버튼들 */
-.mst57-action-buttons-left {
+.mst57-sub-section-bar {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
-  width: 100%;
-}
-
-.mst57-action-buttons-left .mst57-add-category-btn,
-.mst57-action-buttons-left .mst57-order-btn {
-  width: 100%;
-  justify-content: center;
-}
-
-/* 오른쪽 액션 버튼들 (사용 안 함) */
-.mst57-action-buttons {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-  margin-left: 0;
-}
-
-.mst57-add-category-btn {
-  background: #C10000;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.mst57-add-category-btn:hover {
-  background: #a00000;
-}
-
-.mst57-order-btn {
-  background: #666;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.mst57-order-btn:hover {
-  background: #555;
-}
-
-/* 중카테고리 추가 버튼 */
-.mst57-subcategory-add-btn-wrapper {
-  margin-top: 10px;
-  margin-left: 0;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  gap: 0.75rem;
 }
 
 .mst57-add-subcategory-btn {
   background: #C10000;
   color: #fff;
   border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-size: 14px;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 0.15s ease;
 }
 
 .mst57-add-subcategory-btn:hover {
   background: #a00000;
 }
 
-/* 중카테고리 폼 */
 .mst57-sub-category-form {
-  flex: 1;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  padding: 0;
-  margin-top: 20px;
-  position: relative;
   width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.875rem;
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
 }
 
 .mst57-sub-form-header {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0;
-  margin-top: 0;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.625rem;
+  gap: 0.75rem;
 }
 
-.mst57-delete-sub-btn {
-  background: #666;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.mst57-delete-sub-btn:hover {
-  background: #555;
+.mst57-sub-form-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
 }
 
 .mst57-sub-form-grid {
   display: grid;
-  grid-template-columns: 150px 1fr;
+  grid-template-columns: 160px 1fr;
   gap: 0;
-  border: 1px solid #e5e5e5;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  background: #fff;
 }
 
-/* 라디오 버튼 그룹 */
 .mst57-radio-group {
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding: 12px 16px;
+  gap: 1.5rem;
+  padding: 0.75rem 1rem;
 }
 
 .mst57-radio-group label {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 14px;
+  gap: 0.375rem;
+  font-size: 0.875rem;
   cursor: pointer;
 }
 
 .mst57-radio-group input[type="radio"] {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
   cursor: pointer;
+  accent-color: #C10000;
 }
 
-/* 날짜/시간 필드 */
 .mst57-date-time-field {
   flex-direction: column;
   align-items: flex-start;
-  padding: 12px 16px;
-  gap: 8px;
+  padding: 0.75rem 1rem;
+  gap: 0.5rem;
 }
 
 .mst57-date-time-field > div {
   display: flex;
   align-items: center;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .mst57-date-time-field label {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
   cursor: pointer;
 }
 
-.mst57-date-time-field input[type="date"],
 .mst57-date-time-field input[type="checkbox"] {
   cursor: pointer;
+  accent-color: #C10000;
 }
 
-.mst57-date-time-field select {
-  height: 28px;
-  padding: 0 8px;
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
-  font-size: 13px;
+.mst57-date-input {
+  height: 2rem;
+  margin-left: 0.25rem;
+  padding: 0 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  min-width: 9rem;
 }
 
-/* 저장 버튼 */
+.mst57-date-input:focus {
+  outline: none;
+  border-color: #C10000;
+  box-shadow: 0 0 0 2px rgba(193, 0, 0, 0.12);
+}
+
+.mst57-time-select {
+  height: 2rem;
+  margin-left: 0.25rem;
+  padding: 0 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  background: #fff;
+}
+
+.mst57-time-select:focus {
+  outline: none;
+  border-color: #C10000;
+}
+
+.mst57-unit {
+  margin: 0 0.25rem;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
 .mst57-save-button-wrapper {
   display: flex;
   justify-content: flex-end;
-  margin-top: 20px;
-  margin-right: 0;
+  margin-top: 1.25rem;
 }
 
 .mst57-save-btn {
-  padding: 10px 30px;
-  font-size: 14px;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
 }
 
-/* 반응형 조정 */
-@media (max-width: 1440px) {
-  .mst57-category-list {
-    width: 200px;
-  }
-  
-  .mst57-action-buttons,
-  .mst57-subcategory-add-btn-wrapper {
-    margin-left: 220px;
-  }
+/* 모달 */
+.mst57-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 24, 39, 0.45);
+  backdrop-filter: blur(2px);
 }
 
+.mst57-modal {
+  width: 80%;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+
+.mst57-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.mst57-modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #545876;
+}
+
+.mst57-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mst57-modal-close-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.mst57-modal-close-btn:hover {
+  background: #f3f4f6;
+}
+
+.mst57-modal-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  flex: 1;
+  min-height: 0;
+  padding: 1.25rem 1.5rem;
+  overflow: hidden;
+}
+
+.mst57-drag-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+.mst57-drag-panel-head {
+  flex-shrink: 0;
+  padding: 0.625rem 1rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #545876;
+  background: #f8f9fb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.mst57-drag-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mst57-drag-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #f3f4f6;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  cursor: grab;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.mst57-drag-item:hover {
+  background: #e5e7eb;
+}
+
+.mst57-drag-item--selected {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  box-shadow: 0 0 0 1px rgba(193, 0, 0, 0.08);
+}
+
+.mst57-drag-item--sub {
+  background: #eff6ff;
+}
+
+.mst57-drag-item--sub:hover {
+  background: #dbeafe;
+}
+
+.mst57-drag-handle {
+  color: #9ca3af;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* 반응형 */
 @media (max-width: 1024px) {
-  .inline-block.md\:flex {
+  .mst57-content-row {
     flex-direction: column;
+    padding-left: 1rem;
   }
-  
-  .mst57-category-list {
+
+  .mst57-category-list-wrapper {
     width: 100%;
-    max-height: 300px;
   }
-  
-  .mst57-action-buttons,
-  .mst57-subcategory-add-btn-wrapper {
-    margin-left: 0;
+
+  .mst57-category-list {
+    max-height: 240px;
+  }
+
+  .mst57-modal {
+    width: 94%;
+    height: 90%;
+  }
+
+  .mst57-modal-body {
+    grid-template-columns: 1fr;
   }
 }
 </style>
