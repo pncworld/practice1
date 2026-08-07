@@ -718,8 +718,12 @@ const searchButton = async () => {
       nowStoreCd.value,
       nowStoreAreaCd.value
     );
-    MenuKeyList.value = res4.data.MenuKeyList;
-    ScreenKeyOrigin.value = res3.data.ScreenList;
+    MenuKeyList.value = Array.isArray(res4.data.MenuKeyList)
+      ? res4.data.MenuKeyList
+      : [];
+    ScreenKeyOrigin.value = Array.isArray(res3.data.ScreenList)
+      ? res3.data.ScreenList
+      : [];
     console.log(MenuKeyList.value);
 
     addfor8ScreenKey();
@@ -960,48 +964,61 @@ const saveButton = async () => {
         const intKeyNos = MenuKeyList.value
           .filter((item) => item.intPosNo == posNo.value)
           .map((item) => item.intKeyNo);
-        
-        // lngKeyColor와 strIcon 필드 추가
-        // DELETE-INSERT 구조이므로 기존 데이터(confirmitem)에서 값을 가져와야 함
+
+        const originMenuKeys = Array.isArray(confirmitem.value)
+          ? confirmitem.value
+          : [];
+
+        // lngKeyColor / strIcon: DELETE-INSERT 구조라 기존 값 유지 필요
+        // 빈 문자열만 1건이면 join 결과가 ""가 되어 백엔드가 배열 길이 0으로 처리 → 첫 메뉴키 저장 실패
+        // 값이 없을 때는 "0"을 넣어 Split 길이가 메뉴키 개수와 맞도록 함
         const lngKeyColorarr = MenuKeyList.value
           .filter((item) => item.intPosNo == posNo.value)
           .map((item) => {
-            // lngKeyColor가 있으면 사용, 없으면 기존 데이터에서 찾기
-            if (item.lngKeyColor !== undefined && item.lngKeyColor !== null && item.lngKeyColor !== "") {
+            if (
+              item.lngKeyColor !== undefined &&
+              item.lngKeyColor !== null &&
+              item.lngKeyColor !== ""
+            ) {
               return item.lngKeyColor;
             }
-            // 기존 데이터에서 같은 메뉴키 찾기
-            const originalItem = confirmitem.value.find(
+            const originalItem = originMenuKeys.find(
               (orig) =>
                 orig.intPosNo == item.intPosNo &&
                 orig.intScreenNo == item.intScreenNo &&
                 orig.intKeySeq == item.intKeySeq
             );
-            // 기존 데이터에 lngKeyColor가 있으면 사용, 없으면 빈 문자열
-            return originalItem && originalItem.lngKeyColor !== undefined && originalItem.lngKeyColor !== null && originalItem.lngKeyColor !== ""
+            return originalItem &&
+              originalItem.lngKeyColor !== undefined &&
+              originalItem.lngKeyColor !== null &&
+              originalItem.lngKeyColor !== ""
               ? originalItem.lngKeyColor
-              : "";
+              : "0";
           });
         const strIconarr = MenuKeyList.value
           .filter((item) => item.intPosNo == posNo.value)
           .map((item) => {
-            // strIcon이 있으면 사용, 없으면 기존 데이터에서 찾기
-            if (item.strIcon !== undefined && item.strIcon !== null && item.strIcon !== "") {
+            if (
+              item.strIcon !== undefined &&
+              item.strIcon !== null &&
+              item.strIcon !== ""
+            ) {
               return item.strIcon;
             }
-            // 기존 데이터에서 같은 메뉴키 찾기
-            const originalItem = confirmitem.value.find(
+            const originalItem = originMenuKeys.find(
               (orig) =>
                 orig.intPosNo == item.intPosNo &&
                 orig.intScreenNo == item.intScreenNo &&
                 orig.intKeySeq == item.intKeySeq
             );
-            // 기존 데이터에 strIcon이 있으면 사용, 없으면 빈 문자열
-            return originalItem && originalItem.strIcon !== undefined && originalItem.strIcon !== null && originalItem.strIcon !== ""
+            return originalItem &&
+              originalItem.strIcon !== undefined &&
+              originalItem.strIcon !== null &&
+              originalItem.strIcon !== ""
               ? originalItem.strIcon
-              : "";
+              : "0";
           });
-        
+
         //comsole.log(posNo.value);
         //comsole.log(intKeySeqs.join(","));
         //comsole.log(screenNumarr.join(","));
