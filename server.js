@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const express = require("express");
 const https = require("https");
@@ -6,7 +8,22 @@ const fs = require("fs");
 const path = require("path");
 const { PNC_IMAGE_SERVER_ORIGIN } = require("./config/pncHosts");
 
+// 네이버 스마트플레이스 연동 라우트
+const naverOnboardingRouter = require("./naverPlacePlus/routes/naverOnboarding");
+const naverLoginRouter = require("./naverPlacePlus/routes/naverLogin");
+const naverTermsRouter = require("./naverPlacePlus/routes/naverTerms");
+const naverPlacesRouter = require("./naverPlacePlus/routes/naverPlaces");
+
 const app = express();
+
+app.use(express.json());
+
+// ===== 네이버 스마트플레이스 연동 라우트 (catch-all보다 반드시 위) =====
+app.use("/naver/start", naverOnboardingRouter);
+app.use("/naver/login", naverLoginRouter);
+app.use("/naver/terms", naverTermsRouter);
+app.use("/naver/places", naverPlacesRouter);
+// =====================================================================
 
 app.use(express.static(path.join(__dirname, "dist")));
 // 로고·정적 이미지 — 이미지 전용 서버(:88, API 와 별도). 브라우저는 동일 출처 /image 만 호출

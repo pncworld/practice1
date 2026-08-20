@@ -6,7 +6,9 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "check-menu-vue": "node scripts/check-excel-vue-paths.cjs"
+    "check-menu-vue": "node scripts/check-excel-vue-paths.cjs",
+    "naver:dev": "node --watch naverPlacePlus/server.js",
+    "naver:start": "node naverPlacePlus/server.js"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-vue": "^7.3.0",
@@ -32,6 +34,7 @@
     "ckeditor5": "^45.1.0",
     "core-js": "^3.8.3",
     "date-fns": "^4.1.0",
+    "dotenv": "^16.6.1",
     "express": "^4.18.2",
     "grid-layout-plus": "^1.0.6",
     "gridstack": "^11.1.2",

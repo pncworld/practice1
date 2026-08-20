@@ -244,7 +244,7 @@
           <img src="../../assets/arrow_down_wo_border.svg" alt="" />
         </button>
       </div>
-      &nbsp;&nbsp;&nbsp;{{ clickedGroupPage }} / 5
+      &nbsp;&nbsp;&nbsp;{{ clickedGroupPage }} / 15
     </div>
   </div>
   <!-- 드래그 영역-->
@@ -399,7 +399,7 @@ const showPopupf = () => {
 };
 
 const showNext = () => {
-  if (clickedGroupPage.value == 5) {
+  if (clickedGroupPage.value == 15) {
     return;
   }
   KeyList2.value = [];
