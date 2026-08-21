@@ -11,7 +11,8 @@
  *   1. GET /naver/login/start   → 네이버 로그인 인가 페이지로 리다이렉트
  *   2. (사용자가 네이버 계정으로 로그인/동의)
  *   3. GET /naver/login/callback → code를 Access Token으로 교환 → 프로필 조회
- *      → naverUniqueId 확보 → 다음 단계(약관동의)로 이동
+ *      → naverUniqueId 확보 → 동의여부 조회
+ *      → 이미 필수 약관 동의면 /naver/places, 아니면 약관동의 페이지
  */
 
 const express = require("express");
@@ -22,6 +23,11 @@ const {
   exchangeCodeForToken,
   getProfile,
 } = require("../services/naverIdLogin");
+const { getAccessToken } = require("../services/naverAuth");
+const {
+  getAgreementSummary,
+  hasAllRequiredAgreements,
+} = require("../services/placeApi");
 const { getBaseUrl } = require("../services/baseUrl");
 
 function getRedirectUri() {
@@ -71,11 +77,33 @@ router.get("/callback", async (req, res) => {
   }
 
   try {
-    const accessToken = await exchangeCodeForToken({ code, state });
-    const profile = await getProfile(accessToken);
+    const loginAccessToken = await exchangeCodeForToken({ code, state });
+    const profile = await getProfile(loginAccessToken);
     const naverUniqueId = profile.id;
 
-    const nextUrl = new URL("/naver/terms/start", getBaseUrl(req));
+    // 이미 동의한 계정은 네이버 약관 페이지로 보내지 않는다.
+    // (약관 페이지는 이미 동의하면 to 콜백을 안 타고 메인으로 보내는 경우가 있음)
+    let nextPath = "/naver/terms/start";
+    try {
+      const placeAccessToken = await getAccessToken(
+        storeId,
+        process.env.DEMO_REFRESH_TOKEN
+      );
+      const summary = await getAgreementSummary({
+        accessToken: placeAccessToken,
+        naverUniqueId,
+      });
+      if (hasAllRequiredAgreements(summary)) {
+        nextPath = "/naver/places";
+      }
+    } catch (checkErr) {
+      console.error(
+        "[naver/login/callback] 동의여부 조회 실패, 약관 페이지로 진행:",
+        checkErr.response?.data || checkErr.message
+      );
+    }
+
+    const nextUrl = new URL(nextPath, getBaseUrl(req));
     nextUrl.searchParams.set("storeId", storeId);
     nextUrl.searchParams.set("naverUniqueId", naverUniqueId);
 
