@@ -1,5 +1,6 @@
 <template>
   <div class="br12 po-page">
+    <ServerMaintenanceNoticePopup @close="onMaintenanceNoticeClose" />
     <StoreGroupWelcomePopup v-if="showWelcomePopup" />
     <div class="page-scroll">
       <div class="pd24 pt0 mt30 grid-area" data-fixed>
@@ -174,6 +175,7 @@ import { MainDashBoard, MainDashBoard2, MainDashBoard3 } from "@/api/common";
 import { getNoticeList2 } from "@/api/minotice";
 import { getNoticeDocDetail } from "@/api/minotice";
 import SalesAnalysisDashboard from "@/components/SalesAnalysisDashboard.vue";
+import ServerMaintenanceNoticePopup from "@/components/ServerMaintenanceNoticePopup.vue";
 import StoreGroupWelcomePopup from "@/components/StoreGroupWelcomePopup.vue";
 import { USER_ADMIN_ID_SUPPLIER_ACCOUNT } from "@/constants/sessionUser";
 import { matchesSalesAnalysisHomeTempBypass } from "@/constants/salesAnalysisDashboardApi.js";
@@ -190,9 +192,17 @@ import { useStore } from "vuex";
 
 const store = useStore();
 
+const maintenanceNoticeClosed = ref(false);
+
 const showWelcomePopup = computed(
-  () => Number(store.state.userData?.lngStoreGroup) === WELCOME_POPUP_GROUP
+  () =>
+    maintenanceNoticeClosed.value &&
+    Number(store.state.userData?.lngStoreGroup) === WELCOME_POPUP_GROUP
 );
+
+function onMaintenanceNoticeClose() {
+  maintenanceNoticeClosed.value = true;
+}
 
 /** 홈 매출 분석 대시보드 노출은 `SALES_ANALYSIS_HOME_TEMP_BYPASS_RULES` (`salesAnalysisDashboardApi.js`)만 따름 */
 /** @param {Record<string, unknown>|unknown} u userData */
