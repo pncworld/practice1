@@ -8,12 +8,12 @@
  *
  *   2. 리다이렉트 URL 형식:
  *        https://new.smartplace.naver.com/embed/terms
- *          ?service=pos_xxxx,mybiz,booking
+ *          ?service=pnc,booking
  *          &to={redirectURL}
  *
  *      - service 파라미터 (콤마로 여러 개 지정 가능):
- *          pos_xxxx : "xxxx" 자리에 우리 회사 코드가 들어감 (필수)
- *                     → 사업자 등록 정보를 POS사에 제공하기 위한 동의
+ *          pnc      : 담당자가 발급한 POS 서비스 코드 그대로 (필수)
+ *                     → 가이드 예시 pos_xxxx 와 달리, 우리 값은 pnc 이다 (pos_pnc 아님)
  *          booking  : 예약/주문 등 솔루션 사용 시 필요한 약관 (필수로 쓰는 경우)
  *          mybiz    : 파이낸셜 통합 사업자 서비스 동의 (선택 — 필요할 때만 추가)
  *
@@ -61,7 +61,7 @@ router.get("/start", (req, res) => {
   // 실제 로그인한 사용자 기준으로 재검증할 수 있습니다.
   callbackUrl.searchParams.set("naverUniqueId", naverUniqueId);
 
-  const serviceCode = process.env.POS_SERVICE_CODE; // e.g. pos_xxxx
+  const serviceCode = process.env.POS_SERVICE_CODE; // 담당자 발급값 그대로 (pnc)
   const services = [serviceCode, "booking"].join(","); // mybiz는 필요할 때만 추가
 
   const termsUrl = new URL("/embed/terms", FRONT_HOST);

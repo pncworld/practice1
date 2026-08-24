@@ -1,5 +1,5 @@
 /**
- * "네이버 아이디로 로그인" (네아로) — 아임유 PDF 3페이지 ②번 화면에 해당
+ * "네이버 아이디로 로그인"
  *
  * 가이드 슬라이드 16 "네이버 아이디 로그인을 사용하는 이유"에 나온 대로,
  * 이건 스마트플레이스 약관동의 페이지(/embed/terms) 안에서 뜨는 로그인과는
@@ -81,8 +81,7 @@ router.get("/callback", async (req, res) => {
     const profile = await getProfile(loginAccessToken);
     const naverUniqueId = profile.id;
 
-    // 이미 동의한 계정은 네이버 약관 페이지로 보내지 않는다.
-    // (약관 페이지는 이미 동의하면 to 콜백을 안 타고 메인으로 보내는 경우가 있음)
+    // 필수 약관이 없으면 약관 페이지로, 이미 다 있으면 업체 목록으로 간다.
     let nextPath = "/naver/terms/start";
     try {
       const placeAccessToken = await getAccessToken(
@@ -93,20 +92,28 @@ router.get("/callback", async (req, res) => {
         accessToken: placeAccessToken,
         naverUniqueId,
       });
-      if (hasAllRequiredAgreements(summary)) {
+      const allAgreed = hasAllRequiredAgreements(summary);
+      console.log(
+        "[naver/login/callback] 동의여부:",
+        allAgreed,
+        summary.agreedPlacePrivacyAgreementTypes
+      );
+      if (allAgreed) {
         nextPath = "/naver/places";
       }
     } catch (checkErr) {
-      console.error(
-        "[naver/login/callback] 동의여부 조회 실패, 약관 페이지로 진행:",
-        checkErr.response?.data || checkErr.message
+      const detail = checkErr.response?.data || checkErr.message;
+      console.error("[naver/login/callback] 동의여부 조회 실패:", detail);
+      return res.status(502).send(
+        `로그인 후 플레이스 API 호출에 실패했습니다.<br/>` +
+          `${escapeText(typeof detail === "string" ? detail : JSON.stringify(detail))}<br/><br/>` +
+          `test-api.pbp.naver.com 을 못 찾으면 VPN을 확인하세요.`
       );
     }
 
     const nextUrl = new URL(nextPath, getBaseUrl(req));
     nextUrl.searchParams.set("storeId", storeId);
     nextUrl.searchParams.set("naverUniqueId", naverUniqueId);
-
     return res.redirect(nextUrl.toString());
   } catch (err) {
     console.error("[naver/login/callback] 로그인 처리 실패:", err.response?.data || err.message);
