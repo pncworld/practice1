@@ -6,7 +6,7 @@ const https = require("https");
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
-const { PNC_IMAGE_SERVER_ORIGIN } = require("./config/pncHosts");
+const { PNC_IMAGE_PROXY_TARGET } = require("./config/pncHosts");
 
 // 네이버 스마트플레이스 연동 라우트
 const naverOnboardingRouter = require("./naverPlacePlus/routes/naverOnboarding");
@@ -25,15 +25,27 @@ app.use("/naver/terms", naverTermsRouter);
 app.use("/naver/places", naverPlacesRouter);
 // =====================================================================
 
-app.use(express.static(path.join(__dirname, "dist")));
-// 로고·정적 이미지 — 이미지 전용 서버(:88, API 와 별도). 브라우저는 동일 출처 /image 만 호출
+// 로고·정적 이미지 — SPA static/catch-all 보다 먼저 연결해야 /image 가 index.html 로 안 떨어짐.
+// Express mount(/image)가 path 를 떼므로, 원본 서버의 /image/Logo/... 경로를 다시 붙인다.
+function restorePncImagePath(pathWithQuery) {
+  const q = pathWithQuery.indexOf("?");
+  const pathname = q === -1 ? pathWithQuery : pathWithQuery.slice(0, q);
+  const search = q === -1 ? "" : pathWithQuery.slice(q);
+  const rest = pathname.replace(/^\/image/i, "");
+  const normalizedRest = rest.startsWith("/") ? rest : `/${rest}`;
+  return `/image${normalizedRest}${search}`;
+}
+
 const imageProxy = createProxyMiddleware({
-  target: PNC_IMAGE_SERVER_ORIGIN,
+  target: PNC_IMAGE_PROXY_TARGET,
   changeOrigin: true,
   secure: false,
+  pathRewrite: restorePncImagePath,
 });
 app.use("/image", imageProxy);
 app.use("/Image", imageProxy);
+
+app.use(express.static(path.join(__dirname, "dist")));
 
 app.get(/^\/.*$/, (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
