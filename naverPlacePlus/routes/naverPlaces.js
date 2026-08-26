@@ -30,51 +30,18 @@ const {
 const { getDemoStoreContext } = require("../services/demoStore");
 const { getBaseUrl } = require("../services/baseUrl");
 const { FRONT_HOST } = require("../services/frontHost");
+const { escapeHtml, renderLayout } = require("../ui/layout");
 
 const PAGE_SIZE = 10; // 가이드 슬라이드 23: 디폴트 사이즈 10
 
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, (ch) => {
-    switch (ch) {
-      case "&":
-        return "&amp;";
-      case "<":
-        return "&lt;";
-      case ">":
-        return "&gt;";
-      case '"':
-        return "&quot;";
-      default:
-        return "&#39;";
-    }
+function layout({ title, heading, subtitle, body }) {
+  return renderLayout({
+    title,
+    heading: heading || title,
+    subtitle,
+    body,
+    wide: true,
   });
-}
-
-function layout({ title, body }) {
-  return `<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <title>${escapeHtml(title)}</title>
-  <style>
-    body { font-family: -apple-system, "Malgun Gothic", sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; color: #222; }
-    h1 { font-size: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-    th, td { border-bottom: 1px solid #eee; padding: 10px 8px; text-align: left; font-size: 14px; vertical-align: middle; }
-    th { color: #888; font-weight: 500; }
-    button, .btn { background: #03c75a; color: #fff; border: none; border-radius: 6px; padding: 8px 14px; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; }
-    button:hover, .btn:hover { background: #02b350; }
-    .muted { color: #888; font-size: 13px; }
-    .empty { text-align: center; padding: 48px 0; color: #666; }
-    .pager { display: flex; justify-content: space-between; margin-top: 20px; }
-    .pager a { color: #03c75a; text-decoration: none; font-size: 14px; }
-    .notice { background: #f5f5f5; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #555; margin-top: 12px; }
-  </style>
-</head>
-<body>
-  ${body}
-</body>
-</html>`;
 }
 
 function buildLookupUrl(callbackUrl) {
@@ -112,12 +79,12 @@ router.get("/", async (req, res) => {
       return res.send(
         layout({
           title: "연동할 업체 찾기",
+          heading: "연동할 업체를 찾을 수 없습니다",
+          subtitle: "이 네이버 계정이 주인권한을 가진 업체가 없습니다.",
           body: `
-            <h1>연동할 업체를 찾을 수 없어요</h1>
             <div class="empty">
-              <p>이 네이버 계정이 주인권한을 가진 업체가 없습니다.</p>
-              <p class="muted">아래 버튼으로 이동해 업체를 신규 등록하거나, 이미 등록된 업체라면 주인권한을 변경해주세요.</p>
-              <p style="margin-top: 20px;"><a class="btn" href="${escapeHtml(lookupUrl)}">업체 찾기 / 주인권한 변경하러 가기</a></p>
+              <p>아래 버튼으로 이동해 업체를 신규 등록하거나, 이미 등록된 업체라면 주인권한을 변경해주세요.</p>
+              <a class="btn btn-accent" href="${escapeHtml(lookupUrl)}">업체 찾기 / 주인권한 변경하러 가기</a>
             </div>
           `,
         })
@@ -139,16 +106,16 @@ router.get("/", async (req, res) => {
         const isConnected = connectedFlags[index];
         const actionForm = isConnected
           ? `<form method="post" action="/naver/places/${encodeURIComponent(biz.placeId)}/disconnect?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}&page=${page}" onsubmit="return confirm('연동을 해지할까요?');">
-              <button type="submit" style="background:#888;">연동 해지</button>
+              <button class="btn btn-muted" type="submit">연동 해지</button>
             </form>`
           : `<form method="post" action="/naver/places/${encodeURIComponent(biz.placeId)}/connect?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}&page=${page}">
-              <button type="submit">연동하기</button>
+              <button class="btn btn-accent" type="submit">연동하기</button>
             </form>`;
         return `
           <tr>
-            <td>${image ? `<img src="${escapeHtml(image)}" alt="" width="48" height="48" style="border-radius:6px;object-fit:cover;" />` : ""}</td>
+            <td>${image ? `<img class="biz-thumb" src="${escapeHtml(image)}" alt="" />` : ""}</td>
             <td>
-              <div><strong>${escapeHtml(biz.businessName)}</strong> ${isConnected ? '<span class="muted">(연동됨)</span>' : ""}</div>
+              <div class="biz-name">${escapeHtml(biz.businessName)} ${isConnected ? '<span class="badge">연동됨</span>' : ""}</div>
               <div class="muted">${escapeHtml(biz.address || "")}</div>
             </td>
             <td>${actionForm}</td>
@@ -161,12 +128,12 @@ router.get("/", async (req, res) => {
     const hasNext = (page + 1) * PAGE_SIZE < totalCount;
 
     return res.send(
-      layout({
-        title: "연동할 업체 선택",
-        body: `
-          <h1>연동할 업체를 선택하세요</h1>
-          <p class="muted">전체 ${totalCount}개 업체 중 ${page * PAGE_SIZE + 1}~${page * PAGE_SIZE + items.length}번째</p>
-          <table>
+        layout({
+          title: "연동할 업체 선택",
+          heading: "연동할 업체를 선택하세요",
+          subtitle: `전체 ${totalCount}개 업체 중 ${page * PAGE_SIZE + 1}~${page * PAGE_SIZE + items.length}번째`,
+          body: `
+          <table class="biz-table">
             <thead><tr><th></th><th>업체 정보</th><th></th></tr></thead>
             <tbody>${rows}</tbody>
           </table>
@@ -174,15 +141,22 @@ router.get("/", async (req, res) => {
             <a href="${hasPrev ? pageLink(page - 1) : "#"}" style="visibility:${hasPrev ? "visible" : "hidden"}">← 이전 페이지</a>
             <a href="${hasNext ? pageLink(page + 1) : "#"}" style="visibility:${hasNext ? "visible" : "hidden"}">다음 페이지 →</a>
           </div>
-          <div class="notice">찾는 업체가 없나요? <a href="${escapeHtml(buildLookupUrl(selfUrl.toString()))}">업체 찾기로 이동</a></div>
+          <div class="lookup-bar">찾는 업체가 없나요? <a href="${escapeHtml(buildLookupUrl(selfUrl.toString()))}">업체 찾기로 이동</a></div>
         `,
-      })
+        })
     );
   } catch (err) {
     console.error("[naver/places] 업체 목록 조회 실패:", err.message);
-    return res
-      .status(502)
-      .send("업체 목록을 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    return res.status(502).send(
+      layout({
+        title: "업체 목록 조회 실패",
+        heading: "업체 목록을 불러오지 못했습니다",
+        body: `
+          <p class="msg">잠시 후 다시 시도해주세요.</p>
+          <div class="actions-after"><a class="btn btn-primary" href="/naver/start">처음으로</a></div>
+        `,
+      })
+    );
   }
 });
 
@@ -200,15 +174,15 @@ router.post("/:placeId/connect", async (req, res) => {
     const result = await addAgencyMapping({ accessToken, naverUniqueId, placeId });
 
     return res.send(
-      layout({
-        title: "연동 완료",
-        body: `
-          <h1>연동이 완료됐어요 🎉</h1>
-          <p>플레이스 ID <strong>${escapeHtml(placeId)}</strong> 업체와의 연동이 등록되었습니다.</p>
+        layout({
+          title: "연동 완료",
+          heading: "연동이 완료되었습니다",
+          body: `
+          <p class="msg">플레이스 ID <strong>${escapeHtml(placeId)}</strong> 업체와의 연동이 등록되었습니다.</p>
           <p class="muted">연동 등록 시각: ${escapeHtml(result.regDateTime)}</p>
-          <p style="margin-top: 24px;"><a class="btn" href="/naver/start">처음으로</a></p>
+          <div class="actions-after"><a class="btn btn-primary" href="/naver/start">처음으로</a></div>
         `,
-      })
+        })
     );
   } catch (err) {
     const status = err.response?.status;
@@ -233,14 +207,14 @@ router.post("/:placeId/connect", async (req, res) => {
     }
 
     return res.status(responseStatus).send(
-      layout({
-        title: "연동 실패",
-        body: `
-          <h1>연동에 실패했어요</h1>
-          <p>${escapeHtml(message)}</p>
-          <p style="margin-top: 24px;"><a class="btn" href="/naver/places?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}">목록으로 돌아가기</a></p>
+        layout({
+          title: "연동 실패",
+          heading: "연동에 실패했습니다",
+          body: `
+          <p class="msg">${escapeHtml(message)}</p>
+          <div class="actions-after"><a class="btn btn-primary" href="/naver/places?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}">목록으로 돌아가기</a></div>
         `,
-      })
+        })
     );
   }
 });
@@ -282,14 +256,14 @@ router.post("/:placeId/disconnect", async (req, res) => {
     }
 
     return res.status(responseStatus).send(
-      layout({
-        title: "연동 해지 실패",
-        body: `
-          <h1>연동 해지에 실패했어요</h1>
-          <p>${escapeHtml(message)}</p>
-          <p style="margin-top: 24px;"><a class="btn" href="/naver/places?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}">목록으로 돌아가기</a></p>
+        layout({
+          title: "연동 해지 실패",
+          heading: "연동 해지에 실패했습니다",
+          body: `
+          <p class="msg">${escapeHtml(message)}</p>
+          <div class="actions-after"><a class="btn btn-primary" href="/naver/places?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}">목록으로 돌아가기</a></div>
         `,
-      })
+        })
     );
   }
 });

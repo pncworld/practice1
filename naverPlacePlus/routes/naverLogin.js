@@ -29,6 +29,7 @@ const {
   hasAllRequiredAgreements,
 } = require("../services/placeApi");
 const { getBaseUrl } = require("../services/baseUrl");
+const { renderLayout, escapeHtml } = require("../ui/layout");
 
 function getRedirectUri() {
   // 네이버 개발자센터에 등록한 Callback URL 과 글자 하나까지 같아야 합니다.
@@ -71,9 +72,16 @@ router.get("/callback", async (req, res) => {
 
   if (error) {
     console.error("[naver/login/callback] 로그인 거부/오류:", error, errorDescription);
-    return res
-      .status(400)
-      .send(`네이버 로그인이 취소되었거나 실패했습니다. (${escapeText(errorDescription || error)})`);
+    return res.status(400).send(
+      renderLayout({
+        title: "로그인 취소",
+        heading: "네이버 로그인이 취소되었습니다",
+        body: `
+          <p class="msg">${escapeHtml(errorDescription || error)}</p>
+          <div class="actions-after"><a class="btn btn-primary" href="/naver/start">처음으로</a></div>
+        `,
+      })
+    );
   }
 
   try {
@@ -103,12 +111,11 @@ router.get("/callback", async (req, res) => {
       }
     } catch (checkErr) {
       const detail = checkErr.response?.data || checkErr.message;
-      console.error("[naver/login/callback] 동의여부 조회 실패:", detail);
-      return res.status(502).send(
-        `로그인 후 플레이스 API 호출에 실패했습니다.<br/>` +
-          `${escapeText(typeof detail === "string" ? detail : JSON.stringify(detail))}<br/><br/>` +
-          `test-api.pbp.naver.com 을 못 찾으면 VPN을 확인하세요.`
+      console.error(
+        "[naver/login/callback] 동의여부 조회 실패, 약관 페이지로 진행:",
+        detail
       );
+      nextPath = "/naver/terms/start";
     }
 
     const nextUrl = new URL(nextPath, getBaseUrl(req));
@@ -117,14 +124,17 @@ router.get("/callback", async (req, res) => {
     return res.redirect(nextUrl.toString());
   } catch (err) {
     console.error("[naver/login/callback] 로그인 처리 실패:", err.response?.data || err.message);
-    return res
-      .status(502)
-      .send("네이버 로그인 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    return res.status(502).send(
+      renderLayout({
+        title: "로그인 실패",
+        heading: "네이버 로그인 처리 중 오류가 발생했습니다",
+        body: `
+          <p class="msg">잠시 후 다시 시도해주세요.</p>
+          <div class="actions-after"><a class="btn btn-primary" href="/naver/start">처음으로</a></div>
+        `,
+      })
+    );
   }
 });
-
-function escapeText(value) {
-  return String(value ?? "").replace(/[<>&]/g, "");
-}
 
 module.exports = router;

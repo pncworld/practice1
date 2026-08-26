@@ -40,6 +40,7 @@ const {
 const { getDemoStoreContext } = require("../services/demoStore");
 const { FRONT_HOST } = require("../services/frontHost");
 const { getBaseUrl } = require("../services/baseUrl");
+const { renderLayout, escapeHtml } = require("../ui/layout");
 
 /**
  * STEP 1. 약관 동의 시작
@@ -98,8 +99,19 @@ router.get("/callback", async (req, res) => {
       `/naver/terms/start?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}`
     );
   } catch (err) {
-    console.error("[naver/terms/callback] 동의여부 조회 실패:", err.message);
-    return res.status(502).send("동의 여부를 확인하는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    const detail = err.response?.data || err.message;
+    console.error("[naver/terms/callback] 동의여부 조회 실패:", detail);
+    return res.status(502).send(
+      renderLayout({
+        title: "동의 확인 실패",
+        heading: "약관 동의 후 돌아오는 데는 성공했습니다",
+        body: `
+          <p class="msg">운영 서버가 테스트 플레이스 API에 붙지 못해 동의 여부를 확인하지 못했습니다.</p>
+          <div class="msg-detail">${escapeHtml(typeof detail === "string" ? detail : JSON.stringify(detail))}</div>
+          <div class="actions-after"><a class="btn btn-primary" href="/naver/start">처음으로</a></div>
+        `,
+      })
+    );
   }
 });
 
