@@ -2,17 +2,22 @@
   <div class="br12 po-page">
     <StoreGroupWelcomePopup v-if="showWelcomePopup" />
     <div class="page-scroll">
-      <div class="pd24 pt0 mt30 grid-area" data-fixed>
+      <!--
+        ≤1440px layout.css [data-fixed]{flex:none} → 높이 소실 → 빈 흰 화면.
+        매출 분석은 data-fixed 없이 sa-dash-fill + 별도 host(스크롤)로 확정 높이 유지.
+      -->
+      <div v-if="isHomeSalesAnalysisDashboard" class="pd24 pt0 mt30 grid-area sa-dash-fill">
+        <div class="sa-dash-host">
+          <SalesAnalysisDashboard
+            ref="salesAnalysisDashboardRef"
+            @refresh="onSalesAnalysisDashboardRefresh"
+          />
+        </div>
+      </div>
+
+      <div v-else class="pd24 pt0 mt30 grid-area" data-fixed>
         <!-- grid-area: 남은 화면 높이 전체 채움 / grid-fixed: 콘텐츠 높이만큼만 출력 -->
-
-        <SalesAnalysisDashboard
-          v-if="isHomeSalesAnalysisDashboard"
-          ref="salesAnalysisDashboardRef"
-          class="sa-dash-host"
-          @refresh="onSalesAnalysisDashboardRefresh"
-        />
-
-        <div v-else class="dashboard-content">
+        <div class="dashboard-content">
           <section class="dashboard-top">
             <!-- KPI 2x2 -->
             <div class="kpi-area" style="grid-column: 1 / 2; grid-row: 1 / 2;">
@@ -529,13 +534,24 @@ const formatNumber = (num) => {
 </script>
 
 <style scoped>
+/* layout.css [data-fixed]{flex:none} 보다 우선 — 매출 분석 전용 확정 높이 */
+.sa-dash-fill {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* 스크롤포트는 여기만 — sa-root 와 분리 (같은 노드 병합 시 높이 0 접힘 방지) */
 .sa-dash-host {
   flex: 1 1 0;
   min-height: 0;
   min-width: 0;
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: auto;
 }
 
 .hp-notice-modal {

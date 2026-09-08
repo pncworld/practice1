@@ -299,14 +299,63 @@ onUnmounted(() => {
   destroyGrid();
 });
 
+function ensureDashExcelDocStyles() {
+  const id = "sa-dash-xls-doc-styles";
+  if (typeof document === "undefined") return;
+  let el = document.getElementById(id);
+  if (!el) {
+    el = document.createElement("style");
+    el.id = id;
+    document.head.appendChild(el);
+  }
+  el.textContent = `
+.sa_dash_xls_title{
+  font-family:'맑은 고딕','Malgun Gothic',sans-serif!important;
+  font-size:18pt!important;
+  font-weight:700!important;
+  color:#1a3c70!important;
+  text-align:left!important;
+  vertical-align:middle!important;
+  background-color:#edf1f7!important;
+}
+.sa_dash_xls_subtitle{
+  font-family:'맑은 고딕','Malgun Gothic',sans-serif!important;
+  font-size:10pt!important;
+  font-weight:500!important;
+  color:#2f4666!important;
+  text-align:left!important;
+  vertical-align:top!important;
+  white-space:pre-line!important;
+  background-color:#f7f9fc!important;
+}
+`.replace(/\s+/g, " ");
+}
+
 function exportToExcel(overrides = {}) {
   if (!gridView) return;
+  ensureDashExcelDocStyles();
   const base = overrides.fileBase ?? props.exportLabel ?? "grid";
   const safe = String(base).replace(/[\\/:*?"<>|]/g, "_");
-  const rawName = overrides.fileName ?? `${safe}.xlsx`;
-  const fileName = /\.xlsx$/i.test(rawName) ? rawName : `${rawName}.xlsx`;
   const now = new Date();
-  const subtitle = `조회시간: ${now.toLocaleString("ko-KR")}`;
+  const stamp =
+    overrides.fileStamp ??
+    `${now.getFullYear()}${pad2(now.getMonth() + 1)}${pad2(now.getDate())}_${pad2(
+      now.getHours()
+    )}${pad2(now.getMinutes())}${pad2(now.getSeconds())}`;
+  const rawName = overrides.fileName ?? `${safe}_${stamp}.xlsx`;
+  const fileName = /\.xlsx$/i.test(rawName) ? rawName : `${rawName}.xlsx`;
+  const bullet = "\u2022 ";
+  const subtitle =
+    overrides.subtitle ??
+    `${bullet}조회일시: ${now.toLocaleString("ko-KR")}`;
+  const titleStyleName =
+    typeof overrides.titleStyleName === "string" && overrides.titleStyleName
+      ? overrides.titleStyleName
+      : "sa_dash_xls_title";
+  const subtitleStyleName =
+    typeof overrides.subtitleStyleName === "string" && overrides.subtitleStyleName
+      ? overrides.subtitleStyleName
+      : "sa_dash_xls_subtitle";
   try {
     gridView.exportGrid({
       type: "excel",
@@ -326,19 +375,25 @@ function exportToExcel(overrides = {}) {
       documentTitle: {
         message: overrides.title ?? base,
         visible: true,
-        spaceTop: 1,
+        spaceTop: 0,
         spaceBottom: 0,
-        height: 28,
+        height: overrides.titleHeight ?? 44,
+        styleName: titleStyleName,
       },
       documentSubtitle: {
         message: subtitle,
         visible: true,
-        height: 44,
+        height: overrides.subtitleHeight ?? (String(subtitle).includes("\n") ? 72 : 40),
+        styleName: subtitleStyleName,
       },
     });
   } catch (e) {
     console.error("[SalesDashReportGrid] exportToExcel", e);
   }
+}
+
+function pad2(n) {
+  return String(n).padStart(2, "0");
 }
 
 function resetLayout() {

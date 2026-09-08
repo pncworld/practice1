@@ -25,9 +25,10 @@ export const SALES_ANALYSIS_DASHBOARD_DETAIL_TAB = {
 };
 
 /**
- * 홈 매출 분석 —「매출목표 등록」버튼 → `MISALES/SLS01_001INS.xml`
+ * 홈 매출 분석 —「매출목표 등록」·「목표원가율 등록」→ `MISALES/SLS01_001INS.xml`
  * - `minorCategory`에서 `SLS01_001INS.xml` 조회 후 `moveOtherTab`(좌측 메뉴와 동일 탭)으로 열림.
  * - 메뉴에 없으면 `lngProgramID`·strUrl 폴백 사용, 0이면 라우터 직접 이동.
+ * - 목표원가율도 동일 화면(달력 상단)에서 등록.
  * @type {{ strUrl: string; lngProgramID: number; strTitle: string }}
  */
 export const SALES_GOAL_REGISTRATION_TAB = {
@@ -91,6 +92,15 @@ export const SALES_ANALYSIS_DASHBOARD_API = {
   /** 4. 재료비 — 매장별 (동일 Body) */
   materialCostByStore: "/MISALES/SLS00_001DASH.asmx/getMaterialCostByStore",
 
-  /** 5. 인건비 — 매장별 (동일 Body) */
+  /**
+   * 5. 예약현황 — 매장별 (동일 Body; SP `usp_VUE_saGetReservationByStore`)
+   * 구 인건비 `getLaborCostByStore` 대체
+   */
+  reservationByStore: "/MISALES/SLS00_001DASH.asmx/getReservationByStore",
+
+  /** @deprecated getReservationByStore 사용 */
+  reservationStatusByStore: "/MISALES/SLS00_001DASH.asmx/getReservationByStore",
+
+  /** @deprecated 예약현황으로 교체 — reservationByStore 사용 */
   laborCostByStore: "/MISALES/SLS00_001DASH.asmx/getLaborCostByStore",
 };

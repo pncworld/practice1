@@ -170,15 +170,39 @@ export const COL_STORE_SALES = [
 export const COL_MATERIAL = [
   { fieldName: "store", headerText: "매장", width: 80, bodyAlign: "center", fieldDataType: "text" },
   {
-    fieldName: "target",
-    headerText: "목표",
+    fieldName: "targetRate",
+    headerText: "목표원가율",
+    width: 84,
+    bodyAlign: "far",
+    fieldDataType: "number",
+    numberFormat: "#,##0.00",
+  },
+  {
+    fieldName: "actualRate",
+    headerText: "실제원가율",
+    width: 84,
+    bodyAlign: "far",
+    fieldDataType: "number",
+    numberFormat: "#,##0.00",
+  },
+  {
+    fieldName: "rateDiff",
+    headerText: "원가율차이",
+    width: 84,
+    bodyAlign: "far",
+    fieldDataType: "number",
+    numberFormat: "#,##0.00",
+  },
+  {
+    fieldName: "targetAmt",
+    headerText: "목표금액",
     width: 96,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0",
   },
   {
-    fieldName: "actual",
+    fieldName: "purchaseAmt",
     headerText: "매입금액",
     width: 96,
     bodyAlign: "far",
@@ -186,71 +210,62 @@ export const COL_MATERIAL = [
     numberFormat: "#,##0",
   },
   {
-    fieldName: "rate",
-    headerText: "달성률",
-    width: 84,
+    fieldName: "amtDiff",
+    headerText: "금액비",
+    width: 96,
     bodyAlign: "far",
     fieldDataType: "number",
-    numberFormat: "#,##0.00",
-  },
-  {
-    fieldName: "wow",
-    headerText: "전주대비",
-    width: 84,
-    bodyAlign: "far",
-    fieldDataType: "number",
-    numberFormat: "#,##0.00",
-  },
-  {
-    fieldName: "yoy",
-    headerText: "전년대비",
-    width: 84,
-    bodyAlign: "far",
-    fieldDataType: "number",
-    numberFormat: "#,##0.00",
+    numberFormat: "#,##0",
   },
 ];
 
-export const COL_LABOR = [
+/**
+ * 예약현황 — `usp_VUE_saGetReservationByStore` / `getReservationByStore`
+ * 컬럼: store, rsv, mom, yoy, grp, grp_yoy
+ */
+export const COL_RESERVATION = [
   { fieldName: "store", headerText: "매장", width: 80, bodyAlign: "center", fieldDataType: "text" },
   {
-    fieldName: "target",
-    headerText: "목표",
-    width: 96,
+    fieldName: "rsv",
+    headerText: "예약인원",
+    width: 88,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0",
   },
   {
-    fieldName: "actual",
-    headerText: "실적",
-    width: 96,
+    fieldName: "mom",
+    headerText: "전월비",
+    width: 80,
     bodyAlign: "far",
     fieldDataType: "number",
-    numberFormat: "#,##0",
-  },
-  {
-    fieldName: "rate",
-    headerText: "달성률",
-    width: 84,
-    bodyAlign: "far",
-    fieldDataType: "number",
-    numberFormat: "#,##0.00",
-  },
-  {
-    fieldName: "wow",
-    headerText: "전주대비",
-    width: 84,
-    bodyAlign: "far",
-    fieldDataType: "number",
-    numberFormat: "#,##0.00",
+    numberFormat: "#,##0.0",
   },
   {
     fieldName: "yoy",
-    headerText: "전년대비",
+    headerText: "전년비",
+    width: 80,
+    bodyAlign: "far",
+    fieldDataType: "number",
+    numberFormat: "#,##0.0",
+  },
+  {
+    fieldName: "grp",
+    headerText: "단체건수",
     width: 84,
     bodyAlign: "far",
     fieldDataType: "number",
-    numberFormat: "#,##0.00",
+    numberFormat: "#,##0",
+  },
+  {
+    fieldName: "grp_yoy",
+    headerText: "단체전년비",
+    width: 92,
+    bodyAlign: "far",
+    fieldDataType: "number",
+    numberFormat: "#,##0.0",
   },
 ];
+
+/** @deprecated 예약현황으로 교체 — COL_RESERVATION 사용 */
+export const COL_LABOR = COL_RESERVATION;

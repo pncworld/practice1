@@ -51,7 +51,7 @@
           <button type="button" class="btn-action close" @click="deleteAllTabs">
             <i class="ico ico-close"></i>
           </button>
-          <button type="button" class="btn-action refresh" @click="reLoad">
+          <button type="button" class="btn-action refresh" @click="reLoadToolbar">
             <i class="ico ico-refresh"></i>
           </button>
           <button type="button" class="btn-action menu" @click.stop="showMenus">
@@ -132,7 +132,7 @@
             <button class="btn-action close" @click="deleteAllTabs">
               <i class="ico ico-close"></i>
             </button>
-            <button class="btn-action refresh" @click="reLoad">
+            <button class="btn-action refresh" @click="reLoadToolbar">
               <i class="ico ico-refresh"></i>
             </button>
             <div class="btn-menu-group">
@@ -403,6 +403,18 @@ const reLoad = () => {
   const c = b + "_" + uuid;
   a.lngProgramID = c;
   componentKey.value = c;
+};
+
+/** 상단 리프레시 아이콘 전용 — 홈(매출분석·KPI)만 추가 갱신. 메뉴 토글 등 기존 reLoad 경로는 유지 */
+const reLoadToolbar = () => {
+  if (
+    currentActiveTab.value &&
+    (tabs.value.length == 0 || currentActiveTab.value.lngProgramID == "")
+  ) {
+    componentKey.value = v4();
+    return;
+  }
+  reLoad();
 };
 
 const currentActiveTab = ref({ ...ROUTE_HOME_TAB });

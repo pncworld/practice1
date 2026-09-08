@@ -307,7 +307,7 @@
                   @input="updateGridValue"
                   id="cond2-leave"
                   value="2" />휴직</label
-              >
+        >
       </div>
 
             <div class="crm050-form-label">부서명</div>
@@ -435,16 +435,16 @@
                   >✨</span
                 >
                 업로드 버튼을 눌러주세요.
-              </div>
-              <button
+    </div>
+      <button
                 type="button"
                 class="button save md:w-auto"
                 :class="{ 'crm050-excel-upload-btn--blink': crm050ExcelUploadReady }"
                 :disabled="crm050ExcelUploadBtnDisabled"
                 @click="saveButton3">
-                업로드
-              </button>
-            </div>
+        업로드
+      </button>
+    </div>
             <button
               type="button"
               :class="popupToolbarBtnClass"
@@ -453,7 +453,7 @@
               @click="resetExcelUploadPanel">
               초기화
             </button>
-    </div>
+  </div>
           <button
             type="button"
             :class="popupToolbarBtnClass"
@@ -488,35 +488,35 @@
         <div class="crm050-card-modal__grid">
           <div class="crm050-form-label">사원명</div>
           <div class="crm050-form-value">
-            <input
-              type="text"
+          <input
+            type="text"
               class="crm050-control crm050-control--field"
-              v-model="pcond"
-              disabled />
-          </div>
+            v-model="pcond"
+            disabled />
+        </div>
 
           <div class="crm050-form-label">사원번호</div>
           <div class="crm050-form-value">
-            <input
-              type="text"
+          <input
+            type="text"
               class="crm050-control crm050-control--field"
-              v-model="pcond2"
-              disabled />
-          </div>
+            v-model="pcond2"
+            disabled />
+        </div>
 
           <div class="crm050-form-label">현재 카드번호</div>
           <div class="crm050-form-value">
-            <input
-              type="text"
+          <input
+            type="text"
               class="crm050-control crm050-control--field"
-              v-model="pcond3"
-              disabled />
-          </div>
+            v-model="pcond3"
+            disabled />
+        </div>
 
           <div class="crm050-form-label crm050-form-label--required">
             <span class="crm050-form-label__asterisk" aria-hidden="true">*</span>
-            신규 카드번호
-          </div>
+          신규 카드번호
+        </div>
           <div class="crm050-form-value crm050-form-value--card-newno">
             <div class="crm-card-newno-field-wrap">
               <div
@@ -529,53 +529,53 @@
                 >
                 카드번호를 입력해 주시오.
               </div>
-              <input
-                type="text"
+          <input
+            type="text"
                 class="crm050-control crm050-control--field"
                 v-model="pcond4"
                 @keydown="onCardChangeNewCardKeydown"
                 @input="onCardChangeNewCardInput"
                 @paste="onCardChangeNewCardPaste" />
-            </div>
+        </div>
           </div>
 
           <div class="crm050-form-label crm050-form-label--required">
             <span class="crm050-form-label__asterisk" aria-hidden="true">*</span>
-            변경 유형
-          </div>
+          변경 유형
+        </div>
           <div class="crm050-form-value crm050-form-value--radio">
             <label for="crm050-card-change-type-1">
               <input
-                type="radio"
+              type="radio"
                 id="crm050-card-change-type-1"
-                v-model="pcond5"
+              v-model="pcond5"
                 value="1" />
               교체
             </label>
             <label for="crm050-card-change-type-2">
               <input
-                type="radio"
+              type="radio"
                 id="crm050-card-change-type-2"
-                v-model="pcond5"
+              v-model="pcond5"
                 value="2" />
               분실
             </label>
-          </div>
         </div>
+      </div>
 
         <div class="crm050-card-modal__actions">
-          <button
+        <button
             type="button"
             class="whitebutton crm050-sub-btn crm050-card-modal__btn"
-            @click="saveButton2">
-            저장
-          </button>
-          <button
+          @click="saveButton2">
+          저장
+        </button>
+        <button
             type="button"
             class="whitebutton crm050-sub-btn crm050-card-modal__btn"
             @click="closeCardChangeModal">
-            닫기
-          </button>
+          닫기
+        </button>
         </div>
       </div>
     </div>
@@ -2357,14 +2357,14 @@ async function readFileWithArrayBuffer(file) {
 
   rowData.value = crm050ApplyTopAffiliateToRows(
     crm050MapExcelRows(jsonData).map((item) => ({
-      ...item,
-      strSaleCustStatus: 0,
-      strSaleCustStatusTxt: "정상",
-      strSaleCardStatus: 0,
-      strSaleCardStatusTxt: "정상",
-      strAddress: item.strAddress || "",
-      dblSaleAmt: item.dblSaleAmt || 0,
-      dblRemAmt: item.dblRemAmt || 0,
+    ...item,
+    strSaleCustStatus: 0,
+    strSaleCustStatusTxt: "정상",
+    strSaleCardStatus: 0,
+    strSaleCardStatusTxt: "정상",
+    strAddress: item.strAddress || "",
+    dblSaleAmt: item.dblSaleAmt || 0,
+    dblRemAmt: item.dblRemAmt || 0,
     }))
   );
   updateRowData.value = JSON.parse(JSON.stringify(rowData.value));

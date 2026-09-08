@@ -56,7 +56,16 @@
         <div class="sa-left-stack">
           <section class="sa-card sa-area-weekly">
             <div class="sa-card-hd">
-              <h2 class="sa-card-title">주간 핵심 지표</h2>
+              <button
+                type="button"
+                class="sa-card-title-btn"
+                data-sa-expand="weekly"
+                title="크게 보기"
+                aria-label="주간 핵심 지표 크게 보기"
+                @click="openPanelExpand('weekly', $event)">
+                <span class="sa-card-title">주간 핵심 지표</span>
+                <img class="sa-card-title__expand-ic" :src="saIconExtent" width="22" height="22" alt="" />
+              </button>
             </div>
             <div class="sa-card-body">
               <SalesDashReportGrid
@@ -70,7 +79,16 @@
 
           <section class="sa-card sa-area-customer">
             <div class="sa-card-hd">
-              <h2 class="sa-card-title">객수 / 객단가</h2>
+              <button
+                type="button"
+                class="sa-card-title-btn"
+                data-sa-expand="customer"
+                title="크게 보기"
+                aria-label="객수 / 객단가 크게 보기"
+                @click="openPanelExpand('customer', $event)">
+                <span class="sa-card-title">객수 / 객단가</span>
+                <img class="sa-card-title__expand-ic" :src="saIconExtent" width="22" height="22" alt="" />
+              </button>
             </div>
             <div class="sa-card-body">
               <SalesDashReportGrid
@@ -86,7 +104,28 @@
 
         <section class="sa-card sa-area-material">
           <div class="sa-card-hd">
-            <h2 class="sa-card-title">재료비</h2>
+            <button
+              type="button"
+              class="sa-card-title-btn"
+              data-sa-expand="material"
+              title="크게 보기"
+              aria-label="재료비 크게 보기"
+              @click="openPanelExpand('material', $event)">
+              <span class="sa-card-title">재료비</span>
+              <img class="sa-card-title__expand-ic" :src="saIconExtent" width="22" height="22" alt="" />
+            </button>
+            <button
+              type="button"
+              class="sa-hd-btn sa-hd-btn--outline"
+              @click.stop="onGoTargetCostRateRegister">
+              <img
+                class="sa-hd-btn__ic sa-hd-btn__ic--detail"
+                :src="saIconDetail"
+                width="16"
+                height="16"
+                alt="" />
+              목표원가율 등록
+            </button>
           </div>
           <div class="sa-card-body">
             <SalesDashReportGrid
@@ -101,8 +140,20 @@
 
       <section class="sa-card sa-area-store">
         <div class="sa-card-hd">
-          <h2 class="sa-card-title">매장 매출</h2>
-          <button type="button" class="sa-hd-btn sa-hd-btn--outline" @click="onGoSalesGoalRegister">
+          <button
+            type="button"
+            class="sa-card-title-btn"
+            data-sa-expand="store"
+            title="크게 보기"
+            aria-label="매장 매출 크게 보기"
+            @click="openPanelExpand('store', $event)">
+            <span class="sa-card-title">매장 매출</span>
+            <img class="sa-card-title__expand-ic" :src="saIconExtent" width="22" height="22" alt="" />
+          </button>
+          <button
+            type="button"
+            class="sa-hd-btn sa-hd-btn--outline"
+            @click.stop="onGoSalesGoalRegister">
             <img
               class="sa-hd-btn__ic sa-hd-btn__ic--detail"
               :src="saIconDetail"
@@ -124,17 +175,103 @@
 
       <section class="sa-card sa-area-labor">
         <div class="sa-card-hd">
-          <h2 class="sa-card-title">인건비</h2>
+          <button
+            type="button"
+            class="sa-card-title-btn"
+            data-sa-expand="labor"
+            title="크게 보기"
+            aria-label="예약현황 크게 보기"
+            @click="openPanelExpand('labor', $event)">
+            <span class="sa-card-title">예약현황</span>
+            <img class="sa-card-title__expand-ic" :src="saIconExtent" width="22" height="22" alt="" />
+          </button>
         </div>
         <div class="sa-card-body">
           <SalesDashReportGrid
             ref="gridLabor"
-            export-label="인건비"
-            :columns="COL_LABOR"
-            :row-data="laborRows" />
+            export-label="예약현황"
+            :columns="COL_RESERVATION"
+            :row-data="laborRows"
+            :total-row-highlight="STORE_SALES_TOTAL_ROW_HIGHLIGHT" />
         </div>
       </section>
     </div>
+
+    <Teleport to="body">
+      <div
+        v-if="expandUiOpen && expandPanelView"
+        ref="expandOverlayEl"
+        class="sa-expand-overlay"
+        :class="{ 'sa-expand-overlay--dim': expandOverlayDim }"
+        role="presentation">
+        <div
+          class="sa-expand-dialog"
+          role="dialog"
+          aria-modal="true"
+          :aria-label="`${expandPanelView.title} 크게 보기`"
+          tabindex="-1"
+          ref="expandDialogEl"
+          :style="expandDialogPosStyle">
+          <div
+            class="sa-expand-hd"
+            title="드래그하여 이동"
+            @mousedown="onExpandDialogDragStart">
+            <div class="sa-expand-hd-lead">
+              <h2 class="sa-expand-title">{{ expandPanelView.title }}</h2>
+              <span class="sa-expand-period" aria-label="조회 기간">
+                조회기간 {{ periodLabel }}
+              </span>
+            </div>
+            <div class="sa-expand-hd-actions">
+              <button
+                type="button"
+                class="sa-hd-btn sa-hd-btn--ghost"
+                title="새로고침"
+                @click="onExpandPanelRefresh">
+                <img
+                  class="sa-hd-btn__ic sa-hd-btn__ic--refresh"
+                  :src="saIconRefresh"
+                  width="16"
+                  height="16"
+                  alt="" />
+                새로고침
+              </button>
+              <button
+                type="button"
+                class="sa-hd-btn sa-hd-btn--primary"
+                @click="onExpandPanelExcel">
+                <img class="sa-hd-btn__ic" :src="saIconExcel" width="16" height="16" alt="" />
+                엑셀변환
+              </button>
+              <button type="button" class="sa-hd-btn sa-hd-btn--ghost" @click="closePanelExpand">
+                닫기
+              </button>
+            </div>
+          </div>
+          <div class="sa-expand-body">
+            <SalesDashReportGrid
+              ref="expandGridRef"
+              :key="`expand-${expandPanelView.id}`"
+              :export-label="expandPanelView.exportLabel"
+              :columns="expandPanelView.columns"
+              :column-layout="expandPanelView.columnLayout"
+              :row-data="expandPanelView.rowData"
+              :row-height="expandPanelView.rowHeight"
+              :fit-style="expandPanelView.fitStyle"
+              :total-row-highlight="expandPanelView.totalRowHighlight" />
+          </div>
+          <div
+            class="sa-expand-resize-grip"
+            aria-hidden="true"
+            title="크기 조절"
+            @mousedown.stop="onExpandDialogResizeStart">
+            <span class="sa-expand-resize-grip__plate">
+              <span class="sa-expand-resize-grip__dots"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -142,8 +279,8 @@
 import SalesDashReportGrid from "@/components/SalesDashReportGrid.vue";
 import {
   getCustomerAndUnitPriceByStore,
-  getLaborCostByStore,
   getMaterialCostByStore,
+  getReservationByStore,
   getStoreSalesByStore,
   getWeeklyKeyIndicators,
 } from "@/api/common";
@@ -155,13 +292,15 @@ import {
 import {
   COL_CUSTOMER,
   COL_CUSTOMER_LAYOUT,
-  COL_LABOR,
   COL_MATERIAL,
+  COL_RESERVATION,
   COL_STORE_SALES,
   COL_WEEKLY,
 } from "@/constants/salesAnalysisDashboardColumns.js";
 import saIconDetail from "@/assets/images/ic_move.svg";
 import saIconExcel from "@/assets/excel_icon_dashboard.svg";
+import saIconExtent from "@/assets/ic_extent.svg";
+import saIconRefresh from "@/assets/ic_refresh.svg";
 import Swal from "sweetalert2";
 import { utils, writeFile } from "xlsx-js-style";
 import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
@@ -178,6 +317,31 @@ const STORE_SALES_TOTAL_ROW_HIGHLIGHT = Object.freeze({
   values: ["합계"],
 });
 
+/** 패널 타이틀 크게 보기 (이 컴포넌트 전용) */
+const expandPanelId = ref(null);
+/** v-if — 닫힘 FLIP 끝날 때까지 true 유지 */
+const expandUiOpen = ref(false);
+const expandOverlayDim = ref(false);
+const expandDialogEl = ref(null);
+const expandOverlayEl = ref(null);
+const expandGridRef = ref(null);
+/** 팝업 위치(px) — 헤더 드래그로 이동 */
+const expandDialogPos = ref({ left: 0, top: 0 });
+const expandDialogPosStyle = computed(() => ({
+  left: `${expandDialogPos.value.left}px`,
+  top: `${expandDialogPos.value.top}px`,
+}));
+/** 팝업 열기 전 body overflow — 닫을 때 원복 */
+let expandPrevBodyOverflow = null;
+/** @type {{ startX: number; startY: number; origLeft: number; origTop: number } | null} */
+let expandDragState = null;
+/** @type {{ startX: number; startY: number; origW: number; origH: number } | null} */
+let expandResizeState = null;
+/** @type {{ left: number; top: number; width: number; height: number } | null} */
+let expandOriginRect = null;
+let expandLeaving = false;
+const EXPAND_FLIP_MS_IN = 820;
+const EXPAND_FLIP_MS_OUT = 640;
 /** API 조회 완료 시점(Asia/Seoul `yyyy-mm-dd HH:mm`) — 미조회·스킵 시 빈 문자열 */
 const queryDateTimeText = ref("");
 
@@ -198,6 +362,605 @@ const customerRows = ref([]);
 const storeSalesRows = ref([]);
 const costMaterialRows = ref([]);
 const laborRows = ref([]);
+
+const expandPanelView = computed(() => {
+  const id = expandPanelId.value;
+  if (!id) return null;
+  const commonTot = STORE_SALES_TOTAL_ROW_HIGHLIGHT;
+  /** @type {Record<string, object>} */
+  const map = {
+    weekly: {
+      id: "weekly",
+      title: "주간 핵심 지표",
+      exportLabel: "주간핵심지표",
+      columns: COL_WEEKLY,
+      columnLayout: null,
+      rowData: weeklyKpi.value,
+      rowHeight: 32,
+      fitStyle: "even",
+      totalRowHighlight: null,
+    },
+    customer: {
+      id: "customer",
+      title: "객수 / 객단가",
+      exportLabel: "객수_객단가",
+      columns: COL_CUSTOMER,
+      columnLayout: COL_CUSTOMER_LAYOUT,
+      rowData: customerRows.value,
+      rowHeight: 32,
+      fitStyle: "even",
+      totalRowHighlight: commonTot,
+    },
+    material: {
+      id: "material",
+      title: "재료비",
+      exportLabel: "재료비",
+      columns: COL_MATERIAL,
+      columnLayout: null,
+      rowData: costMaterialRows.value,
+      rowHeight: 32,
+      fitStyle: "even",
+      totalRowHighlight: commonTot,
+    },
+    store: {
+      id: "store",
+      title: "매장 매출",
+      exportLabel: "매장매출",
+      columns: COL_STORE_SALES,
+      columnLayout: null,
+      rowData: storeSalesRows.value,
+      rowHeight: 32,
+      fitStyle: "even",
+      totalRowHighlight: commonTot,
+    },
+    labor: {
+      id: "labor",
+      title: "예약현황",
+      exportLabel: "예약현황",
+      columns: COL_RESERVATION,
+      columnLayout: null,
+      rowData: laborRows.value,
+      rowHeight: 32,
+      fitStyle: "even",
+      totalRowHighlight: commonTot,
+    },
+  };
+  return map[id] ?? null;
+});
+
+function centerExpandDialog() {
+  const dialog = expandDialogEl.value;
+  const overlay = expandOverlayEl.value;
+  if (!dialog || !overlay) return;
+  const ow = overlay.clientWidth;
+  const oh = overlay.clientHeight;
+  const dw = dialog.offsetWidth;
+  const dh = dialog.offsetHeight;
+  expandDialogPos.value = {
+    left: Math.max(0, Math.round((ow - dw) / 2)),
+    top: Math.max(0, Math.round((oh - dh) / 2)),
+  };
+}
+
+/** 팝업 마운트 전 대략 중앙 — 첫 프레임이 좌상단에서 튀지 않게 (애니메이션 가시성) */
+function precenterExpandDialog() {
+  if (typeof window === "undefined") return;
+  const ow = window.innerWidth;
+  const oh = window.innerHeight;
+  const dw = Math.min(ow * 0.818, 1027);
+  const dh = Math.min(oh * 0.774, 686);
+  expandDialogPos.value = {
+    left: Math.max(0, Math.round((ow - dw) / 2)),
+    top: Math.max(0, Math.round((oh - dh) / 2)),
+  };
+}
+
+function clampExpandDialogPos(left, top) {
+  const dialog = expandDialogEl.value;
+  const overlay = expandOverlayEl.value;
+  if (!dialog || !overlay) return { left, top };
+  const maxL = Math.max(0, overlay.clientWidth - dialog.offsetWidth);
+  const maxT = Math.max(0, overlay.clientHeight - dialog.offsetHeight);
+  return {
+    left: Math.min(maxL, Math.max(0, left)),
+    top: Math.min(maxT, Math.max(0, top)),
+  };
+}
+
+function onExpandDialogDragMove(e) {
+  if (!expandDragState) return;
+  const next = clampExpandDialogPos(
+    expandDragState.origLeft + (e.clientX - expandDragState.startX),
+    expandDragState.origTop + (e.clientY - expandDragState.startY)
+  );
+  expandDialogPos.value = next;
+}
+
+function onExpandDialogDragEnd() {
+  expandDragState = null;
+  if (typeof window === "undefined") return;
+  window.removeEventListener("mousemove", onExpandDialogDragMove);
+  window.removeEventListener("mouseup", onExpandDialogDragEnd);
+}
+
+function onExpandDialogDragStart(e) {
+  if (e.button !== 0) return;
+  const t = e.target;
+  if (t && typeof t.closest === "function" && t.closest("button, a, input, select, textarea")) {
+    return;
+  }
+  const dialog = expandDialogEl.value;
+  if (!dialog) return;
+  e.preventDefault();
+  expandDragState = {
+    startX: e.clientX,
+    startY: e.clientY,
+    origLeft: expandDialogPos.value.left,
+    origTop: expandDialogPos.value.top,
+  };
+  if (typeof window === "undefined") return;
+  window.addEventListener("mousemove", onExpandDialogDragMove);
+  window.addEventListener("mouseup", onExpandDialogDragEnd);
+}
+
+function onExpandDialogResizeMove(e) {
+  if (!expandResizeState) return;
+  const dialog = expandDialogEl.value;
+  const overlay = expandOverlayEl.value;
+  if (!dialog || !overlay) return;
+  const minW = Math.min(420, overlay.clientWidth);
+  const minH = Math.min(360, overlay.clientHeight);
+  const maxW = Math.max(minW, overlay.clientWidth * 0.98);
+  const maxH = Math.max(minH, overlay.clientHeight * 0.96);
+  const nextW = Math.min(
+    maxW,
+    Math.max(minW, expandResizeState.origW + (e.clientX - expandResizeState.startX))
+  );
+  const nextH = Math.min(
+    maxH,
+    Math.max(minH, expandResizeState.origH + (e.clientY - expandResizeState.startY))
+  );
+  dialog.style.width = `${Math.round(nextW)}px`;
+  dialog.style.height = `${Math.round(nextH)}px`;
+  expandDialogPos.value = clampExpandDialogPos(
+    expandDialogPos.value.left,
+    expandDialogPos.value.top
+  );
+}
+
+function onExpandDialogResizeEnd() {
+  expandResizeState = null;
+  if (typeof window === "undefined") return;
+  window.removeEventListener("mousemove", onExpandDialogResizeMove);
+  window.removeEventListener("mouseup", onExpandDialogResizeEnd);
+  try {
+    expandGridRef.value?.resetLayout?.();
+  } catch (_) {
+    void 0;
+  }
+}
+
+function onExpandDialogResizeStart(e) {
+  if (e.button !== 0) return;
+  const dialog = expandDialogEl.value;
+  if (!dialog) return;
+  e.preventDefault();
+  expandResizeState = {
+    startX: e.clientX,
+    startY: e.clientY,
+    origW: dialog.offsetWidth,
+    origH: dialog.offsetHeight,
+  };
+  if (typeof window === "undefined") return;
+  window.addEventListener("mousemove", onExpandDialogResizeMove);
+  window.addEventListener("mouseup", onExpandDialogResizeEnd);
+}
+
+function prefersExpandReducedMotion() {
+  if (typeof window === "undefined" || !window.matchMedia) return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function readExpandOriginFromEvent(e) {
+  const t = e?.currentTarget;
+  if (!t || typeof t.getBoundingClientRect !== "function") return null;
+  const r = t.getBoundingClientRect();
+  if (!r.width || !r.height) return null;
+  return { left: r.left, top: r.top, width: r.width, height: r.height };
+}
+
+function readExpandOriginByPanelId(id) {
+  if (typeof document === "undefined" || !id) return expandOriginRect;
+  const btn = document.querySelector(`[data-sa-expand="${id}"]`);
+  if (!btn || typeof btn.getBoundingClientRect !== "function") return expandOriginRect;
+  const r = btn.getBoundingClientRect();
+  if (!r.width || !r.height) return expandOriginRect;
+  return { left: r.left, top: r.top, width: r.width, height: r.height };
+}
+
+function clearExpandDialogMotionStyles(dialog) {
+  if (!dialog) return;
+  dialog.style.transition = "";
+  dialog.style.transform = "";
+  dialog.style.transformOrigin = "";
+  dialog.style.opacity = "";
+}
+
+function waitExpandFlip(el, ms) {
+  return new Promise((resolve) => {
+    if (!el) {
+      resolve();
+      return;
+    }
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      el.removeEventListener("transitionend", onEnd);
+      resolve();
+    };
+    const onEnd = (ev) => {
+      if (ev.target !== el) return;
+      if (ev.propertyName === "transform" || ev.propertyName === "opacity") finish();
+    };
+    el.addEventListener("transitionend", onEnd);
+    setTimeout(finish, ms + 40);
+  });
+}
+
+function nextExpandFrames(n = 2) {
+  return new Promise((resolve) => {
+    if (typeof window === "undefined" || !window.requestAnimationFrame) {
+      resolve();
+      return;
+    }
+    let left = Math.max(1, n);
+    const step = () => {
+      left -= 1;
+      if (left <= 0) resolve();
+      else window.requestAnimationFrame(step);
+    };
+    window.requestAnimationFrame(step);
+  });
+}
+
+/**
+ * 클릭 타이틀 중심 기준 균등 scale
+ * @param {"in"|"out"} dir — 열림은 더 작게 시작해야 커짐이 잘 보임
+ * @returns {{ ox: number; oy: number; s: number } | null}
+ */
+function computeExpandFlipScale(dialog, origin, dir = "out") {
+  if (!dialog || !origin) return null;
+  const last = dialog.getBoundingClientRect();
+  if (!last.width || !last.height) return null;
+  const ox = origin.left + origin.width / 2 - last.left;
+  const oy = origin.top + origin.height / 2 - last.top;
+  const sW = origin.width / last.width;
+  const sH = origin.height / last.height;
+  const sFit = Math.max(0.05, Math.min(sW, sH));
+  const s =
+    dir === "in"
+      ? Math.min(0.03, Math.max(0.012, sFit * 0.2))
+      : Math.max(0.06, Math.sqrt(Math.max(0.0001, sW * sH)));
+  return { ox, oy, s };
+}
+
+/**
+ * FLIP: 클릭 타이틀 ↔ 팝업 (이 대시보드 전용)
+ * @param {"in"|"out"} dir
+ */
+async function runExpandFlip(dir) {
+  const dialog = expandDialogEl.value;
+  const overlay = expandOverlayEl.value;
+  if (!dialog || !overlay) return false;
+  if (prefersExpandReducedMotion()) return false;
+
+  const origin =
+    dir === "out"
+      ? readExpandOriginByPanelId(expandPanelId.value)
+      : expandOriginRect;
+  const flip = computeExpandFlipScale(dialog, origin, dir);
+  if (!flip) return false;
+
+  const ms = dir === "in" ? EXPAND_FLIP_MS_IN : EXPAND_FLIP_MS_OUT;
+  /** 열림/닫힘 대칭 — 닫힘과 같은 계열 곡선 */
+  const ease =
+    dir === "in"
+      ? "cubic-bezier(0.22, 1, 0.36, 1)"
+      : "cubic-bezier(0.4, 0, 0.2, 1)";
+  const from = `scale(${flip.s})`;
+  const to = "scale(1)";
+
+  dialog.style.transformOrigin = `${flip.ox}px ${flip.oy}px`;
+
+  if (dir === "in") {
+    /* 첫 페인트에 풀사이즈가 보이지 않게 숨긴 뒤 invert 적용 */
+    dialog.style.transition = "none";
+    dialog.style.opacity = "0";
+    dialog.style.transform = from;
+    expandOverlayDim.value = false;
+    void dialog.offsetWidth;
+    await nextExpandFrames(2);
+    dialog.style.opacity = "0.92";
+    dialog.style.transition = `transform ${ms}ms ${ease}, opacity ${Math.round(ms * 0.75)}ms ease-out`;
+    void dialog.offsetWidth;
+    dialog.style.transform = to;
+    dialog.style.opacity = "1";
+    expandOverlayDim.value = true;
+    await waitExpandFlip(dialog, ms);
+    clearExpandDialogMotionStyles(dialog);
+  } else {
+    dialog.style.transition = "none";
+    dialog.style.transform = to;
+    dialog.style.opacity = "1";
+    void dialog.offsetWidth;
+    await nextExpandFrames(1);
+    dialog.style.transition = `transform ${ms}ms ${ease}, opacity ${Math.round(ms * 0.85)}ms ease-in`;
+    dialog.style.transform = from;
+    dialog.style.opacity = "0.72";
+    expandOverlayDim.value = false;
+    await waitExpandFlip(dialog, ms);
+    clearExpandDialogMotionStyles(dialog);
+  }
+  return true;
+}
+
+function teardownExpandPanel() {
+  expandUiOpen.value = false;
+  expandPanelId.value = null;
+  expandOverlayDim.value = false;
+  expandOriginRect = null;
+  expandLeaving = false;
+  if (typeof document !== "undefined" && expandPrevBodyOverflow !== null) {
+    document.body.style.overflow = expandPrevBodyOverflow;
+    expandPrevBodyOverflow = null;
+  }
+}
+
+async function openPanelExpand(id, e) {
+  if (expandLeaving) return;
+  expandOriginRect = readExpandOriginFromEvent(e);
+  precenterExpandDialog();
+  expandPanelId.value = id;
+  expandUiOpen.value = true;
+  /* FLIP 준비 전엔 딤/풀사이즈 노출 방지 */
+  expandOverlayDim.value = !expandOriginRect || prefersExpandReducedMotion();
+  if (typeof document !== "undefined") {
+    if (expandPrevBodyOverflow === null) {
+      expandPrevBodyOverflow = document.body.style.overflow;
+    }
+    document.body.style.overflow = "hidden";
+  }
+  await nextTick();
+  const dialog = expandDialogEl.value;
+  if (dialog && expandOriginRect && !prefersExpandReducedMotion()) {
+    dialog.style.transition = "none";
+    dialog.style.opacity = "0";
+  }
+  centerExpandDialog();
+  await nextTick();
+  centerExpandDialog();
+  if (dialog) {
+    dialog.style.width = "";
+    dialog.style.height = "";
+  }
+  try {
+    const flipped = await runExpandFlip("in");
+    if (!flipped) expandOverlayDim.value = true;
+  } catch (_) {
+    expandOverlayDim.value = true;
+    clearExpandDialogMotionStyles(dialog);
+  }
+  try {
+    expandDialogEl.value?.focus?.();
+  } catch (_) {
+    void 0;
+  }
+  try {
+    expandGridRef.value?.resetLayout?.();
+  } catch (_) {
+    void 0;
+  }
+}
+
+async function closePanelExpand() {
+  if (expandLeaving || !expandUiOpen.value) return;
+  expandLeaving = true;
+  onExpandDialogDragEnd();
+  onExpandDialogResizeEnd();
+  try {
+    await runExpandFlip("out");
+  } catch (_) {
+    void 0;
+  }
+  teardownExpandPanel();
+}
+
+/** 크게 보기 팝업 — 대시보드와 동일 기간으로 재조회 (팝업 유지) */
+function onExpandPanelRefresh() {
+  if (isInvalidSalesDashDateRange(selectedFromDate.value, selectedToDate.value)) {
+    void Swal.fire({
+      title: "경고",
+      text: "조회 기간을 확인해 주십시오!",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  void loadSalesAnalysisDashboardData().finally(() => {
+    emit("refresh");
+    resetAllGridLayouts();
+    try {
+      expandGridRef.value?.resetLayout?.();
+    } catch (_) {
+      void 0;
+    }
+  });
+}
+
+/** 크게 보기 팝업 — 현재 패널만 엑셀 (xlsx-js-style, 맑은 고딕 고정) */
+function onExpandPanelExcel() {
+  const view = expandPanelView.value;
+  if (!view || !Array.isArray(view.columns) || view.columns.length === 0) {
+    window.alert("엑셀로 내보낼 데이터가 없습니다.");
+    return;
+  }
+  try {
+    const columns = view.columns;
+    const rows = Array.isArray(view.rowData) ? view.rowData : [];
+    const maxCols = Math.max(1, columns.length);
+    const FROM_DT = String(queriedFromDate.value ?? "").trim();
+    const TO_DT = String(queriedToDate.value ?? "").trim();
+    const queriedAt = formatSalesDashQueryAtSeoul(new Date());
+    const bullet = SA_EXCEL_META_BULLET;
+
+    const wb = utils.book_new();
+    const ws = utils.aoa_to_sheet([]);
+    const pad = (/** @type {unknown[]} */ arr) => {
+      const x = arr.slice();
+      while (x.length < maxCols) x.push("");
+      return x;
+    };
+
+    utils.sheet_add_aoa(ws, [pad([view.title])], { origin: "A1" });
+    utils.sheet_add_aoa(
+      ws,
+      [pad([`${bullet}조회기간: ${periodLabel.value} (${FROM_DT}~${TO_DT})`])],
+      { origin: "A2" }
+    );
+    utils.sheet_add_aoa(ws, [pad([`${bullet}조회일시: ${queriedAt}`])], { origin: "A3" });
+    utils.sheet_add_aoa(ws, [pad([""])], { origin: "A4" });
+
+    const headerRow1 = 5;
+    utils.sheet_add_aoa(ws, [pad(columns.map((c) => c.headerText))], {
+      origin: utils.encode_cell({ r: headerRow1 - 1, c: 0 }),
+    });
+
+    const fields = columns.map((c) => c.fieldName);
+    const aoa = rows.map((row) =>
+      pad(
+        fields.map((f) => {
+          const v = row?.[f];
+          if (v === null || v === undefined || v === "") return "";
+          if (typeof v === "number" && Number.isFinite(v)) return v;
+          return String(v);
+        })
+      )
+    );
+    const dataStart = 6;
+    let dataEnd = 0;
+    if (aoa.length) {
+      utils.sheet_add_aoa(ws, aoa, { origin: utils.encode_cell({ r: dataStart - 1, c: 0 }) });
+      dataEnd = dataStart + aoa.length - 1;
+    }
+
+    const merges = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: maxCols - 1 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: maxCols - 1 } },
+      { s: { r: 2, c: 0 }, e: { r: 2, c: maxCols - 1 } },
+    ];
+    ws["!merges"] = merges;
+
+    const titleStyle = {
+      font: { name: "맑은 고딕", sz: 18, bold: true, color: { rgb: "FF1A3C70" } },
+      fill: { patternType: "solid", fgColor: { rgb: "FFDCE6F5" } },
+      alignment: { horizontal: "left", vertical: "center", wrapText: true },
+      border: SA_EXCEL_BORDER,
+    };
+    const metaStyle = {
+      font: { name: "맑은 고딕", sz: 11, bold: false, color: { rgb: "FF2F4666" } },
+      fill: { patternType: "solid", fgColor: { rgb: "FFF3F6FB" } },
+      alignment: { horizontal: "left", vertical: "center", wrapText: true },
+      border: SA_EXCEL_BORDER,
+    };
+    const headerStyle = {
+      font: { name: "맑은 고딕", sz: 11, bold: true, color: { rgb: "FFFFFFFF" } },
+      fill: { patternType: "solid", fgColor: { rgb: "FF243D5C" } },
+      alignment: { horizontal: "center", vertical: "center", wrapText: true },
+      border: SA_EXCEL_BORDER,
+    };
+    const dataBase = {
+      font: { name: "맑은 고딕", sz: 11, color: { rgb: "FF222222" } },
+      fill: { patternType: "solid", fgColor: { rgb: "FFFFFFFF" } },
+      border: SA_EXCEL_BORDER,
+      alignment: { vertical: "center", wrapText: true },
+    };
+    const dataTotal = {
+      font: { name: "맑은 고딕", sz: 11, bold: true, color: { rgb: "FF5A1F24" } },
+      fill: { patternType: "solid", fgColor: { rgb: "FFFCE9EA" } },
+      border: SA_EXCEL_BORDER,
+      alignment: { vertical: "center", wrapText: true },
+    };
+
+    paintDashExcelRect(ws, 1, 1, 1, maxCols, titleStyle);
+    paintDashExcelRect(ws, 2, 1, 2, maxCols, metaStyle);
+    paintDashExcelRect(ws, 3, 1, 3, maxCols, metaStyle);
+    paintDashExcelRect(ws, headerRow1, 1, headerRow1, maxCols, headerStyle);
+
+    const tot = view.totalRowHighlight;
+    if (dataEnd >= dataStart) {
+      for (let r = dataStart; r <= dataEnd; r++) {
+        const rowObj = rows[r - dataStart];
+        const isTotal = dashExcelRowMatchesTotalHighlight(rowObj, tot);
+        for (let c = 1; c <= maxCols; c++) {
+          const addr = utils.encode_cell({ r: r - 1, c: c - 1 });
+          const cell = ws[addr];
+          if (!cell) continue;
+          const colDef = columns[c - 1];
+          const isNumberCol = colDef?.fieldDataType === "number";
+          const base = isTotal ? dataTotal : dataBase;
+          cell.s = {
+            ...base,
+            alignment: {
+              ...base.alignment,
+              horizontal: isNumberCol ? "right" : "left",
+            },
+          };
+          if (cell.t === "n" && isNumberCol) {
+            cell.z = colDef?.numberFormat?.includes(".") ? "#,##0.00" : "#,##0";
+          }
+        }
+      }
+    }
+
+    if (!ws["!rows"]) ws["!rows"] = [];
+    ws["!rows"][0] = { hpt: 32, customHeight: true };
+    ws["!rows"][1] = { hpt: 22, customHeight: true };
+    ws["!rows"][2] = { hpt: 22, customHeight: true };
+    ws["!rows"][headerRow1 - 1] = { hpt: 24, customHeight: true };
+    if (dataEnd >= dataStart) {
+      for (let rr = dataStart; rr <= dataEnd; rr++) {
+        ws["!rows"][rr - 1] = { hpt: 20, customHeight: true };
+      }
+    }
+
+    /** @type {import("xlsx-js-style").ColInfo[]} */
+    const cols = columns.map((c) => {
+      const px = typeof c.width === "number" ? c.width : 96;
+      const wch = Math.min(36, Math.max(10, Math.round(px / 5) + 1));
+      return { wch };
+    });
+    ws["!cols"] = cols;
+
+    const sheetName = String(view.exportLabel || view.title || "sheet")
+      .replace(/[\\/?*\[\]:]/g, "_")
+      .slice(0, 31);
+    utils.book_append_sheet(wb, ws, sheetName || "sheet");
+
+    const now = new Date();
+    const stamp = `${now.getFullYear()}${pad2(now.getMonth() + 1)}${pad2(now.getDate())}_${pad2(
+      now.getHours()
+    )}${pad2(now.getMinutes())}${pad2(now.getSeconds())}`;
+    const safeBase = String(view.exportLabel || view.title || "export").replace(
+      /[\\/:*?"<>|]/g,
+      "_"
+    );
+    writeFile(wb, `${safeBase}_${stamp}.xlsx`);
+  } catch (e) {
+    console.error("[SalesAnalysisDashboard] onExpandPanelExcel", e);
+    window.alert("엑셀 저장 중 오류가 발생했습니다.");
+  }
+}
 
 /**
  * Asia/Seoul 기준 연·월·일 (조회 시점 = 브라우저 시계가 아닌 한국 달력)
@@ -386,7 +1149,7 @@ function mapWeeklyDashRow(r) {
   };
 }
 
-/** 매장 매출 / 재료비 / 인건비 공통 행 */
+/** 매장 매출 공통 행 */
 function mapStoreMetricDashRow(r) {
   if (!r || typeof r !== "object") {
     return { store: "", target: 0, actual: 0, rate: 0, wow: null, yoy: null };
@@ -398,6 +1161,56 @@ function mapStoreMetricDashRow(r) {
     rate: parseDashRate(pickRow(r, ["rate", "RATE"])) ?? 0,
     wow: parseDashRate(pickRow(r, ["wow", "WOW", "WOW_RATE"])),
     yoy: parseDashRate(pickRow(r, ["yoy", "YOY", "YOY_RATE"])),
+  };
+}
+
+/** 재료비 — 목표/실제 원가율·금액 (SP 합계 행 store=`합계`, 매장매출과 동일 강조) */
+function mapMaterialDashRow(r) {
+  if (!r || typeof r !== "object") {
+    return {
+      store: "",
+      targetRate: 0,
+      actualRate: 0,
+      rateDiff: 0,
+      targetAmt: 0,
+      purchaseAmt: 0,
+      amtDiff: 0,
+    };
+  }
+  return {
+    store: String(pickRow(r, ["store", "STORE_NM", "STR_STORE_NM", "STORE"]) ?? ""),
+    targetRate:
+      parseDashRate(
+        pickRow(r, ["targetRate", "TARGET_RATE", "TARGETRATE", "목표원가율"])
+      ) ?? 0,
+    actualRate:
+      parseDashRate(
+        pickRow(r, ["actualRate", "ACTUAL_RATE", "ACTUALRATE", "실제원가율"])
+      ) ?? 0,
+    rateDiff:
+      parseDashRate(pickRow(r, ["rateDiff", "RATE_DIFF", "RATEDIFF", "원가율차이"])) ?? 0,
+    targetAmt: parseDashAmount(
+      pickRow(r, ["targetAmt", "TARGET_AMT", "TARGETAMT", "목표금액"])
+    ),
+    purchaseAmt: parseDashAmount(
+      pickRow(r, ["purchaseAmt", "PURCHASE_AMT", "PURCHASEAMT", "actual", "매입금액"])
+    ),
+    amtDiff: parseDashAmount(pickRow(r, ["amtDiff", "AMT_DIFF", "AMTDIFF", "금액비"])),
+  };
+}
+
+/** 예약현황 — store, rsv, mom, yoy, grp, grp_yoy */
+function mapReservationDashRow(r) {
+  if (!r || typeof r !== "object") {
+    return { store: "", rsv: 0, mom: null, yoy: null, grp: 0, grp_yoy: null };
+  }
+  return {
+    store: String(pickRow(r, ["store", "STORE_NM", "STR_STORE_NM", "STORE"]) ?? ""),
+    rsv: parseDashAmount(pickRow(r, ["rsv", "RSV", "RSV_CNT", "RESERVATION"])),
+    mom: parseDashRate(pickRow(r, ["mom", "MOM", "MOM_RATE"])),
+    yoy: parseDashRate(pickRow(r, ["yoy", "YOY", "YOY_RATE"])),
+    grp: parseDashAmount(pickRow(r, ["grp", "GRP", "GRP_CNT", "GROUP_CNT"])),
+    grp_yoy: parseDashRate(pickRow(r, ["grp_yoy", "GRP_YOY", "GROUP_YOY"])),
   };
 }
 
@@ -463,7 +1276,7 @@ async function loadSalesAnalysisDashboardData() {
       getCustomerAndUnitPriceByStore(groupCd, storeCd, sequence, FROM_DT, TO_DT),
       getStoreSalesByStore(groupCd, storeCd, sequence, FROM_DT, TO_DT),
       getMaterialCostByStore(groupCd, storeCd, sequence, FROM_DT, TO_DT),
-      getLaborCostByStore(groupCd, storeCd, sequence, FROM_DT, TO_DT),
+      getReservationByStore(groupCd, storeCd, sequence, FROM_DT, TO_DT),
     ]);
     weeklyKpi.value =
       rw.status === "fulfilled" && Array.isArray(readDashList(rw.value))
@@ -479,11 +1292,11 @@ async function loadSalesAnalysisDashboardData() {
         : [];
     costMaterialRows.value =
       rm.status === "fulfilled" && Array.isArray(readDashList(rm.value))
-        ? readDashList(rm.value).map((row) => mapStoreMetricDashRow(row))
+        ? readDashList(rm.value).map((row) => mapMaterialDashRow(row))
         : [];
     laborRows.value =
       rl.status === "fulfilled" && Array.isArray(readDashList(rl.value))
-        ? readDashList(rl.value).map((row) => mapStoreMetricDashRow(row))
+        ? readDashList(rl.value).map((row) => mapReservationDashRow(row))
         : [];
   } catch {
     clearSalesAnalysisDashboardRows();
@@ -511,7 +1324,7 @@ function resetAllGridLayouts() {
   });
 }
 
-/** 리사이즈·브레이크포인트 전환 후 레이아웃이 잡힌 뒤 RealGrid 크기 재계산 (겹침·가로스크롤 완화) */
+/** 창 리사이즈 후 RealGrid 크기 재계산 */
 let saDashResizeTimer = null;
 function scheduleDashGridReflow() {
   if (saDashResizeTimer) clearTimeout(saDashResizeTimer);
@@ -524,10 +1337,6 @@ function scheduleDashGridReflow() {
     });
   }, 120);
 }
-
-/** `@media (max-width: 1280px)` 과 동일 — `display: contents` 전환 시 그리드 깨짐 방지 */
-const SA_DASH_COL_MQ = "(max-width: 1280px)";
-let saDashMq = null;
 
 function onSearch() {
   if (isInvalidSalesDashDateRange(selectedFromDate.value, selectedToDate.value)) {
@@ -821,7 +1630,7 @@ function applySalesDashExcelStyles(ws, layout) {
  * @returns {import("xlsx-js-style").ColInfo[]}
  */
 function buildSalesDashExcelCols(maxCols) {
-  const defs = [COL_WEEKLY, COL_STORE_SALES, COL_CUSTOMER, COL_MATERIAL, COL_LABOR];
+  const defs = [COL_WEEKLY, COL_STORE_SALES, COL_CUSTOMER, COL_MATERIAL, COL_RESERVATION];
   /** @type {import("xlsx-js-style").ColInfo[]} */
   const cols = [];
   for (let i = 0; i < maxCols; i++) {
@@ -849,7 +1658,7 @@ function onExcel() {
       COL_CUSTOMER.length,
       COL_MATERIAL.length,
       COL_STORE_SALES.length,
-      COL_LABOR.length
+      COL_RESERVATION.length
     );
     const padTop = (/** @type {unknown[]} */ cells) => {
       const x = cells.slice();
@@ -914,7 +1723,7 @@ function onExcel() {
     pushSection("매장 매출", COL_STORE_SALES, storeSalesRows.value, STORE_SALES_TOTAL_ROW_HIGHLIGHT);
     pushSection("객수 / 객단가", COL_CUSTOMER, customerRows.value, STORE_SALES_TOTAL_ROW_HIGHLIGHT);
     pushSection("재료비", COL_MATERIAL, costMaterialRows.value, STORE_SALES_TOTAL_ROW_HIGHLIGHT);
-    pushSection("인건비", COL_LABOR, laborRows.value, STORE_SALES_TOTAL_ROW_HIGHLIGHT);
+    pushSection("예약현황", COL_RESERVATION, laborRows.value, STORE_SALES_TOTAL_ROW_HIGHLIGHT);
 
     ws["!merges"] = merges;
 
@@ -957,15 +1766,15 @@ function resolveMenuProgramByXmlFile(xmlFileName) {
   );
 }
 
-function onGoSalesGoalRegister() {
+function openSls01RegistrationTab(fallbackTitle) {
   const t = SALES_GOAL_REGISTRATION_TAB;
   const menuProg = resolveMenuProgramByXmlFile("SLS01_001INS.xml");
   const strUrl = menuProg?.strUrl ?? t.strUrl;
-  const strTitle = menuProg?.strTitle ?? t.strTitle;
+  const strTitle = menuProg?.strTitle ?? fallbackTitle ?? t.strTitle;
   const lngProgramID = menuProg?.lngProgramID ?? t.lngProgramID;
 
   if (!strUrl) {
-    window.alert("매출목표 등록 경로(strUrl)가 설정되지 않았습니다.");
+    window.alert("등록 화면 경로(strUrl)가 설정되지 않았습니다.");
     return;
   }
 
@@ -982,6 +1791,15 @@ function onGoSalesGoalRegister() {
   void router.push({ path: "/MISALES/SLS01_001INS.xml" }).catch(() => {});
 }
 
+function onGoSalesGoalRegister() {
+  openSls01RegistrationTab("매출목표 등록");
+}
+
+/** 재료비 — 목표원가율은 SLS01_001INS 동일 화면에서 등록 */
+function onGoTargetCostRateRegister() {
+  openSls01RegistrationTab("목표원가율 등록");
+}
+
 const maxSelectableDate = computed(() => getSeoulTodayYmdHyphen());
 
 const periodLabel = computed(
@@ -992,29 +1810,12 @@ onMounted(() => {
   void loadSalesAnalysisDashboardData();
   if (typeof window === "undefined") return;
   window.addEventListener("resize", scheduleDashGridReflow, { passive: true });
-  try {
-    saDashMq = window.matchMedia(SA_DASH_COL_MQ);
-    if (saDashMq.addEventListener) {
-      saDashMq.addEventListener("change", scheduleDashGridReflow);
-    } else if (saDashMq.addListener) {
-      saDashMq.addListener(scheduleDashGridReflow);
-    }
-  } catch {
-    void 0;
-  }
 });
 
 onUnmounted(() => {
+  closePanelExpand();
   if (typeof window === "undefined") return;
   window.removeEventListener("resize", scheduleDashGridReflow);
-  if (saDashMq) {
-    if (saDashMq.removeEventListener) {
-      saDashMq.removeEventListener("change", scheduleDashGridReflow);
-    } else if (saDashMq.removeListener) {
-      saDashMq.removeListener(scheduleDashGridReflow);
-    }
-    saDashMq = null;
-  }
   if (saDashResizeTimer) {
     clearTimeout(saDashResizeTimer);
     saDashResizeTimer = null;
@@ -1051,14 +1852,12 @@ defineExpose({
   --sa-layout-max-width: 1520px;
   --sa-gap: 14px;
   --sa-row-min: 152px;
+  /* 상단(주간+객수 / 매장매출) 최소 높이 — 0으로 접히면 하단만 보이고 RealGrid 가 겹쳐 그림 */
+  --sa-top-min: 300px;
   --sa-head-gap: 14px;
-  /* 제목「매출 분석」과 기간 배지 사이 */
   --sa-title-date-gap: 22px;
-  /* 카드 소제목 영역과 그리드 사이 */
   --sa-card-hd-body-gap: 7px;
-  /* 카드 제목줄(헤더) 공통 높이 — 매장 매출 등 우측 버튼 있어도 다른 카드와 동일 */
   --sa-card-hd-height: 45px;
-  /* 주간: 행 28px — 데이터 행 4행(매출·객수·객단가·재료비) 기준 높이 */
   --sa-weekly-rg-row: 28px;
   --sa-weekly-rg-hdr: 26px;
   --sa-weekly-data-rows: 4;
@@ -1066,20 +1865,22 @@ defineExpose({
   --sa-weekly-grid-inner: calc(
     var(--sa-weekly-rg-hdr) + var(--sa-weekly-data-rows) * var(--sa-weekly-rg-row)
   );
-  /* 참고: 주간 카드 높이(4행 기준). 레이아웃은 2:3 fr 로 분배 */
   --sa-weekly-band: calc(
     var(--sa-card-hd-height) + var(--sa-card-hd-body-gap) + var(--sa-weekly-grid-inner) +
       var(--sa-weekly-body-pad-bottom)
   );
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-head-gap);
+  /* 부모 .sa-dash-host 가 확정 높이·스크롤 담당 — 여기는 내용만 채움 */
   flex: 1 1 auto;
   align-self: center;
   width: min(100%, var(--sa-layout-max-width));
   min-width: 0;
   min-height: 0;
+  height: 100%;
   max-height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sa-head-gap);
 }
 
 .sa-head {
@@ -1268,11 +2069,11 @@ defineExpose({
   height: 100%;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  /* 하단 행(재료비·인건비) 높이는 기존 3행 그리드의 3행째와 동일 — 위쪽은 주간:객수 = 2:3 */
-  --sa-rows-sum: calc(100% - 2 * var(--sa-gap));
-  --sa-row-third: calc(var(--sa-rows-sum) / 3);
-  --sa-bottom-band: max(var(--sa-row-min), var(--sa-row-third));
-  grid-template-rows: minmax(0, 1fr) var(--sa-bottom-band);
+  /*
+   * % 기반 --sa-bottom-band 제거.
+   * 상단 minmax(0,1fr) 은 0 접힘 → RealGrid 겹침 유발. px 하한 유지.
+   */
+  grid-template-rows: minmax(var(--sa-top-min), 2fr) minmax(var(--sa-row-min), 1fr);
   gap: var(--sa-gap);
   align-items: stretch;
 }
@@ -1283,7 +2084,7 @@ defineExpose({
   min-width: 0;
   min-height: 0;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) var(--sa-bottom-band);
+  grid-template-rows: minmax(var(--sa-top-min), 2fr) minmax(var(--sa-row-min), 1fr);
   gap: var(--sa-gap);
   align-items: stretch;
 }
@@ -1348,9 +2149,8 @@ defineExpose({
   flex-direction: column;
   gap: var(--sa-card-hd-body-gap);
   min-height: 0;
+  height: 100%;
   isolation: isolate;
-  /* 리사이즈 시 RealGrid 캔버스가 인접 카드와 겹쳐 보이는 현상 완화 */
-  contain: layout;
 }
 
 /* 주간·객수 상단 스택 2:3 — `sa-card` 공통 min-height:0 은 아래에서 주간만 보정 */
@@ -1394,6 +2194,42 @@ defineExpose({
   min-height: 0;
 }
 
+.sa-card-title-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  padding: 4px 6px 4px 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  min-width: 0;
+  max-width: 100%;
+  border-radius: 6px;
+  color: inherit;
+  text-align: left;
+}
+
+.sa-card-title-btn:hover .sa-card-title,
+.sa-card-title-btn:focus-visible .sa-card-title {
+  color: #0b2a5c;
+  transform: scale(1.06);
+}
+
+.sa-card-title-btn:hover .sa-card-title__expand-ic,
+.sa-card-title-btn:focus-visible .sa-card-title__expand-ic {
+  opacity: 1;
+  transform: scale(1.32);
+  /* 브랜드 남색 계열 포인트 블루 (#1f6feb) */
+  filter: brightness(0) saturate(100%) invert(32%) sepia(98%) saturate(1800%)
+    hue-rotate(199deg) brightness(0.98) contrast(1.05);
+}
+
+.sa-card-title-btn:focus-visible {
+  outline: 2px solid rgba(26, 60, 112, 0.45);
+  outline-offset: 2px;
+}
+
 .sa-card-title {
   margin: 0;
   font-size: 16px;
@@ -1401,54 +2237,223 @@ defineExpose({
   line-height: 1.25;
   color: var(--primary-deep, #1a3c70);
   min-width: 0;
+  transform-origin: left center;
+  transition: color 0.15s ease, transform 0.15s ease;
 }
 
-@media (max-width: 1280px) {
-  .sa-col-left,
-  .sa-left-stack {
-    display: contents;
-  }
+.sa-card-title__expand-ic {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  opacity: 0.78;
+  transform-origin: center;
+  transition: opacity 0.15s ease, transform 0.15s ease, filter 0.15s ease;
+}
 
-  .sa-columns {
-    grid-template-columns: 1fr;
-    /* 1·2행: 주간:객수 = 2:3, 3~5행: 재료비·매장·인건비 (기존 1/5 기준) */
-    --sa-rows5-sum: calc(100% - 4 * var(--sa-gap));
-    --sa-rows5-one: calc(var(--sa-rows5-sum) / 5);
-    grid-template-rows:
-      minmax(90px, 2fr)
-      minmax(100px, 3fr)
-      max(120px, var(--sa-rows5-one))
-      max(120px, var(--sa-rows5-one))
-      max(120px, var(--sa-rows5-one));
-  }
+/* 패널 크게 보기 — 리사이즈·드래그 이동 (가로≈87%, 세로≈88%)
+   열림/닫힘 모션은 JS FLIP (클릭 타이틀 ↔ 팝업) — 이 컴포넌트만 */
+.sa-expand-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  box-sizing: border-box;
+  padding: 0;
+  background: rgba(15, 28, 48, 0.45);
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.65s ease;
+}
 
-  .sa-area-weekly {
-    grid-column: 1;
-    grid-row: 1;
-    min-height: 0;
-    max-height: none;
-    height: 100%;
-    align-self: stretch;
-  }
+.sa-expand-overlay--dim {
+  opacity: 1;
+}
 
-  .sa-area-customer {
-    grid-column: 1;
-    grid-row: 2;
-  }
+.sa-expand-dialog {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: min(81.8vw, 1027px);
+  height: min(77.4vh, 686px);
+  min-width: min(420px, 100%);
+  min-height: min(360px, 100%);
+  max-width: 98vw;
+  max-height: 96vh;
+  resize: both;
+  overflow: auto;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid rgba(26, 60, 112, 0.22);
+  box-shadow: 0 18px 48px rgba(15, 28, 48, 0.28);
+  will-change: transform, opacity;
+}
 
-  .sa-area-material {
-    grid-column: 1;
-    grid-row: 3;
+@media (prefers-reduced-motion: reduce) {
+  .sa-expand-overlay {
+    transition: none;
   }
+}
 
-  .sa-area-store {
-    grid-column: 1;
-    grid-row: 4;
-  }
+.sa-expand-resize-grip {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  z-index: 3;
+  width: 28px;
+  height: 28px;
+  pointer-events: auto;
+  cursor: nwse-resize;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
 
-  .sa-area-labor {
-    grid-column: 1;
-    grid-row: 5;
-  }
+.sa-expand-resize-grip__plate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px 0 10px 0;
+  background: linear-gradient(135deg, #e8eef7 0%, #c5d3e6 55%, #a8bcd4 100%);
+  border: 1px solid rgba(26, 60, 112, 0.45);
+  box-shadow:
+    0 1px 3px rgba(15, 28, 48, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.sa-expand-resize-grip__dots {
+  display: block;
+  width: 14px;
+  height: 14px;
+  opacity: 1;
+  background-image:
+    radial-gradient(circle, #1a3c70 1.55px, transparent 1.7px),
+    radial-gradient(circle, #1a3c70 1.55px, transparent 1.7px),
+    radial-gradient(circle, #1a3c70 1.55px, transparent 1.7px),
+    radial-gradient(circle, #1a3c70 1.55px, transparent 1.7px),
+    radial-gradient(circle, #1a3c70 1.55px, transparent 1.7px),
+    radial-gradient(circle, #1a3c70 1.55px, transparent 1.7px);
+  background-size: 4px 4px;
+  background-position:
+    9px 9px,
+    5px 9px,
+    9px 5px,
+    1px 9px,
+    5px 5px,
+    9px 1px;
+  background-repeat: no-repeat;
+  transition:
+    transform 0.12s ease,
+    background-image 0.12s ease;
+}
+
+.sa-expand-resize-grip:hover .sa-expand-resize-grip__plate,
+.sa-expand-resize-grip:active .sa-expand-resize-grip__plate {
+  background: linear-gradient(135deg, #ffd0d0 0%, #ff8a8a 50%, #e53935 100%);
+  border-color: rgba(183, 28, 28, 0.75);
+  box-shadow:
+    0 2px 6px rgba(183, 28, 28, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.sa-expand-resize-grip:hover .sa-expand-resize-grip__dots,
+.sa-expand-resize-grip:active .sa-expand-resize-grip__dots {
+  transform: scale(1.08);
+  background-image:
+    radial-gradient(circle, #7f0000 1.55px, transparent 1.7px),
+    radial-gradient(circle, #7f0000 1.55px, transparent 1.7px),
+    radial-gradient(circle, #7f0000 1.55px, transparent 1.7px),
+    radial-gradient(circle, #7f0000 1.55px, transparent 1.7px),
+    radial-gradient(circle, #7f0000 1.55px, transparent 1.7px),
+    radial-gradient(circle, #7f0000 1.55px, transparent 1.7px);
+}
+
+.sa-expand-hd {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  box-sizing: border-box;
+  min-height: 48px;
+  padding: 8px 14px 8px 18px;
+  background: linear-gradient(180deg, #dbe2ee 0%, #ccd8e6 100%);
+  border-bottom: 1px solid rgba(26, 60, 112, 0.18);
+  cursor: move;
+  user-select: none;
+}
+
+.sa-expand-hd-lead {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sa-expand-hd-actions {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  cursor: default;
+}
+
+.sa-expand-hd-actions .sa-hd-btn {
+  cursor: pointer;
+}
+
+.sa-expand-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--primary-deep, #1a3c70);
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.sa-expand-period {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(26, 60, 112, 0.16);
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #314864;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sa-expand-body {
+  flex: 1 1 auto;
+  min-height: 280px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 8px 10px 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.sa-expand-body :deep(.sa-rg-host) {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
 }
 </style>

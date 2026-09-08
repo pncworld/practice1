@@ -1295,6 +1295,25 @@ export const getProjByMonth = (groupCd, storecd, startdate) => {
   });
 };
 
+/** 월 목표원가율 조회 — slsProjectMonthly.curTargetCostRate */
+export const getCostRate = (groupCd, storecd, startdate) => {
+  return api2.post("/MISALES/SLS01_001INS.asmx/getCostRate", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DTM_DATE: startdate,
+  });
+};
+
+/** 월 목표원가율 저장 */
+export const saveCostRate = (groupCd, storecd, startdate, costRate) => {
+  return api2.post("/MISALES/SLS01_001INS.asmx/saveCostRate", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DTM_DATE: startdate,
+    COST_RATE: costRate,
+  });
+};
+
 export const saveExcelDataPlan = (groupCd, storecd, date, proj, comment) => {
   return api2.post("/MISALES/SLS01_001INS.asmx/saveExcelDataPlan", {
     GROUP_CD: groupCd,

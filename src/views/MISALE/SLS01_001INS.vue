@@ -252,7 +252,37 @@
         <div class="sls01-cal-toolbar__total">
           <span class="sls01-cal-toolbar__total-label">매출 목표액</span>
           <span class="sls01-cal-toolbar__total-value">{{ targetMonthSales || "0" }}</span>
-      </div>
+        </div>
+        <div
+          v-if="showTargetCostRate"
+          class="sls01-cal-toolbar__cost-rate"
+          :class="{ 'sls01-cal-toolbar__cost-rate--empty': isTargetCostRateUnset }">
+          <label class="sls01-cal-toolbar__total-label" for="sls01-target-cost-rate">
+            목표원가율
+          </label>
+          <input
+            id="sls01-target-cost-rate"
+            v-model="targetCostRate"
+            type="text"
+            inputmode="decimal"
+            class="sls01-cal-toolbar__cost-rate-input"
+            :class="{ 'sls01-cal-toolbar__cost-rate-input--empty': isTargetCostRateUnset }"
+            :disabled="!afterSearch"
+            placeholder="0.00"
+            maxlength="6"
+            aria-label="목표원가율"
+            :aria-describedby="isTargetCostRateUnset ? 'sls01-cost-rate-tip' : undefined"
+            @keydown="onTargetCostRateKeydown"
+            @blur="normalizeTargetCostRateInput" />
+          <span class="sls01-cal-toolbar__cost-rate-unit" aria-hidden="true">%</span>
+          <span
+            v-if="isTargetCostRateUnset"
+            id="sls01-cost-rate-tip"
+            class="sls01-cost-rate-tooltip"
+            role="tooltip">
+            목표원가율을 등록후 저장해 주세요.
+          </span>
+        </div>
     </div>
       <button
         type="button"
@@ -277,7 +307,7 @@
 </template>
 
 <script setup>
-import { getProjByMonth, saveExcelDataPlan } from "@/api/misales";
+import { getCostRate, getProjByMonth, saveCostRate, saveExcelDataPlan } from "@/api/misales";
 /**
  *  해당연월 컴포넌트
  *  */
@@ -378,6 +408,21 @@ const popupTop = ref("0px");
 const selectWeek = ref(0);
 const targetSales = ref("");
 const targetMonthSales = ref("0");
+/** 월 목표원가율 (%) — slsProjectMonthly.curTargetCostRate */
+const targetCostRate = ref("");
+const targetCostRateSaved = ref("");
+/** 마키노차야(1871) + 테스트(5001) 만 목표원가율 입력·저장 */
+const SLS01_TARGET_COST_RATE_GROUPS = new Set([1871, 5001]);
+const showTargetCostRate = computed(() =>
+  SLS01_TARGET_COST_RATE_GROUPS.has(Number(lngstoregroup.value))
+);
+/** 조회 후 DB 미등록(null/공란) — 입력·저장 유도 강조 */
+const isTargetCostRateUnset = computed(
+  () =>
+    showTargetCostRate.value &&
+    afterSearch.value &&
+    String(targetCostRateSaved.value ?? "").trim() === ""
+);
 
 const sls01CalendarTitle = computed(() => {
   if (currentYear.value == null || currentMonth.value == null) return "—";
@@ -546,6 +591,123 @@ const syncMonthTargetTotal = () => {
   );
   targetMonthSales.value = formatSls01Amount(String(sum));
 };
+
+const parseSls01CostRate = (val) => {
+  const s = String(val ?? "")
+    .replace(/,/g, "")
+    .trim();
+  if (s === "") return "";
+  const n = Number(s);
+  if (!Number.isFinite(n)) return null;
+  return n;
+};
+
+const formatSls01CostRate = (val) => {
+  const n = parseSls01CostRate(val);
+  if (n === "" || n == null) return "";
+  return String(Math.round(n * 100) / 100);
+};
+
+const onTargetCostRateKeydown = (e) => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key === "Enter") {
+    e.preventDefault();
+    e.target?.blur?.();
+    return;
+  }
+  if (
+    SLS01_AMOUNT_NAV_KEYS.has(e.key) ||
+    e.key === "." ||
+    e.key === "," ||
+    /^\d$/.test(e.key)
+  ) {
+    return;
+  }
+  e.preventDefault();
+};
+
+const normalizeTargetCostRateInput = () => {
+  const n = parseSls01CostRate(targetCostRate.value);
+  if (n === null) {
+    targetCostRate.value = targetCostRateSaved.value;
+    return;
+  }
+  targetCostRate.value = formatSls01CostRate(n === "" ? "" : n);
+};
+
+const isTargetCostRateDirty = () => {
+  if (!showTargetCostRate.value) return false;
+  const cur = formatSls01CostRate(targetCostRate.value);
+  const saved = formatSls01CostRate(targetCostRateSaved.value);
+  return cur !== saved;
+};
+
+/** @returns {{ ok: true, payload: string } | { ok: false, message: string }} */
+const validateTargetCostRateForSave = () => {
+  normalizeTargetCostRateInput();
+  const n = parseSls01CostRate(targetCostRate.value);
+  if (n === null) {
+    return { ok: false, message: "목표원가율을 숫자로 입력하세요." };
+  }
+  if (n !== "" && (n < 0 || n > 100)) {
+    return { ok: false, message: "목표원가율은 0~100 사이여야 합니다." };
+  }
+  return { ok: true, payload: n === "" ? "" : String(n) };
+};
+
+const pickCostRateFromResponse = (res) => {
+  const list = res?.data?.List ?? res?.data?.list ?? res?.List;
+  if (!Array.isArray(list) || list.length === 0) return "";
+  const row = list[0] ?? {};
+  const raw =
+    row.curTargetCostRate ??
+    row.CURTARGETCOSTRATE ??
+    row.CostRate ??
+    row.costRate;
+  if (raw == null || raw === "") return "";
+  return formatSls01CostRate(raw);
+};
+
+const loadTargetCostRate = async () => {
+  if (!showTargetCostRate.value) {
+    targetCostRate.value = "";
+    targetCostRateSaved.value = "";
+    return;
+  }
+  if (lngstorecode.value == 0 || !selectedstartDate.value) {
+    targetCostRate.value = "";
+    targetCostRateSaved.value = "";
+    return;
+  }
+  try {
+    const res = await getCostRate(
+      lngstoregroup.value,
+      lngstorecode.value,
+      selectedstartDate.value
+    );
+    const formatted = pickCostRateFromResponse(res);
+    targetCostRate.value = formatted;
+    targetCostRateSaved.value = formatted;
+  } catch {
+    targetCostRate.value = "";
+    targetCostRateSaved.value = "";
+  }
+};
+
+/** 상단 저장과 함께 호출 — 성공 시 true */
+const persistTargetCostRate = async (costRatePayload) => {
+  const res = await saveCostRate(
+    lngstoregroup.value,
+    lngstorecode.value,
+    selectedstartDate.value,
+    costRatePayload
+  );
+  if (!isSls01ApiSuccess(res)) return false;
+  targetCostRateSaved.value = formatSls01CostRate(costRatePayload);
+  targetCostRate.value = targetCostRateSaved.value;
+  return true;
+};
+
 const setMonthSales = () => {
   if (!afterSearch.value) {
     warnSearchFirst();
@@ -593,12 +755,13 @@ let sls01StoreCodePending = null;
 const normalizeSls01StoreCode = (code) =>
   code == null || code === "" || code === 0 ? 0 : Number(code);
 
-const hasUnsavedSls01Changes = () => afterSearch.value && !isSls01RowDataSynced();
+const hasUnsavedSls01Changes = () =>
+  afterSearch.value && (!isSls01RowDataSynced() || isTargetCostRateDirty());
 
 const confirmDiscardSls01Changes = async () => {
   const result = await Swal.fire({
     title: "확인",
-    html: `입력한 매출계획이 저장되지 않았습니다.<br><span style="color:#dc2626;font-weight:600">계속 진행 하시겠습니까?</span>`,
+    html: `입력한 내용이 저장되지 않았습니다.<br><span style="color:#dc2626;font-weight:600">계속 진행 하시겠습니까?</span>`,
     icon: "warning",
     showCancelButton: true,
     confirmButtonText: "예",
@@ -1621,10 +1784,26 @@ const saveButton = async () => {
     });
     return;
   }
-  if (isSls01RowDataSynced()) {
+
+  const planDirty = !isSls01RowDataSynced();
+  const rateDirty = showTargetCostRate.value && isTargetCostRateDirty();
+  if (!planDirty && !rateDirty) {
     Swal.fire({
       title: "경고",
       text: "변경된 사항이 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  const rateCheck = showTargetCostRate.value
+    ? validateTargetCostRateForSave()
+    : { ok: true, payload: "" };
+  if (!rateCheck.ok) {
+    await Swal.fire({
+      title: "경고",
+      text: rateCheck.message,
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -1641,49 +1820,72 @@ const saveButton = async () => {
       cancelButtonText: "취소",
     }).then(async (result) => {
       if (result.isConfirmed) {
+        store.state.loading = true;
         try {
-          const dates = rowData.value.map((i) => i.start).join(",");
-          const projs = rowData.value
-            .map((i) => parseSls01Amount(i.title))
-            .join(",");
-          const comments = rowData.value
-            .map((i) => i.strComment)
-            .join("\u2063");
+          if (planDirty) {
+            const dates = rowData.value.map((i) => i.start).join(",");
+            const projs = rowData.value
+              .map((i) => parseSls01Amount(i.title))
+              .join(",");
+            const comments = rowData.value
+              .map((i) => i.strComment)
+              .join("\u2063");
 
-          //comsole.log(dates, projs, comments);
-          const res = await saveExcelDataPlan(
-            lngstoregroup.value,
-            lngstorecode.value,
-            dates,
-            projs,
-            comments
-          );
+            const res = await saveExcelDataPlan(
+              lngstoregroup.value,
+              lngstorecode.value,
+              dates,
+              projs,
+              comments
+            );
 
-          if (!isSls01ApiSuccess(res)) {
-            await Swal.fire({
-              title: "실패",
-              text: "저장에 실패했습니다.",
-              icon: "error",
-              confirmButtonText: "확인",
-            });
-            return;
+            if (!isSls01ApiSuccess(res)) {
+              await Swal.fire({
+                title: "실패",
+                text: "매출목표 저장에 실패했습니다.",
+                icon: "error",
+                confirmButtonText: "확인",
+              });
+              return;
+            }
+          }
+
+          if (rateDirty) {
+            const rateOk = await persistTargetCostRate(rateCheck.payload);
+            if (!rateOk) {
+              await Swal.fire({
+                title: "실패",
+                text: planDirty
+                  ? "매출목표는 저장되었으나 목표원가율 저장에 실패했습니다."
+                  : "목표원가율 저장에 실패했습니다.",
+                icon: "error",
+                confirmButtonText: "확인",
+              });
+              if (planDirty) {
+                await searchButton({ skipUnsavedCheck: true });
+                await resetSls01ExcelUpload();
+              }
+              return;
+            }
           }
 
           await searchButton({ skipUnsavedCheck: true });
           await resetSls01ExcelUpload();
           await Swal.fire({
-              title: "성공",
-              text: "저장되었습니다.",
-              icon: "success",
-              confirmButtonText: "확인",
-            });
+            title: "성공",
+            text: "저장되었습니다.",
+            icon: "success",
+            confirmButtonText: "확인",
+          });
         } catch (e) {
           await Swal.fire({
-              title: "실패",
+            title: "실패",
             text: "저장 중 오류가 발생했습니다.",
-              icon: "error",
-              confirmButtonText: "확인",
-            });
+            icon: "error",
+            confirmButtonText: "확인",
+          });
+        } finally {
+          store.state.loading = false;
         }
       }
     });
@@ -2212,11 +2414,15 @@ const searchButton = async (options = {}) => {
       )
     );
 
+    await loadTargetCostRate();
+
     // if (rowData.value.length > 0) {
     //     maxSaleTarget.value = rowData.value.map(i => i.lngProject)[0].toLocaleString();
     // }
   } catch (error) {
     afterSearch.value = false;
+    targetCostRate.value = "";
+    targetCostRateSaved.value = "";
     return;
   } finally {
     store.state.loading = false;
@@ -2409,6 +2615,8 @@ const initGrid = () => {
   afterSearch.value = false;
   targetSales.value = "";
   targetMonthSales.value = formatSls01Amount("0");
+  targetCostRate.value = "";
+  targetCostRateSaved.value = "";
   selectWeek.value = 0;
 };
 </script>
@@ -2569,6 +2777,134 @@ const initGrid = () => {
   font-variant-numeric: tabular-nums;
   color: rgb(30 64 175);
   white-space: nowrap;
+}
+
+.sls01-cal-toolbar__cost-rate {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  max-width: 100%;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid rgb(252 165 165);
+  border-radius: 9999px;
+  background: rgb(254 242 242);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7);
+}
+
+.sls01-cal-toolbar__cost-rate--empty {
+  border-color: rgb(239 68 68);
+  background: rgb(254 226 226);
+  animation: sls01-cost-rate-pulse 1.6s ease-in-out infinite;
+}
+
+.sls01-cal-toolbar__cost-rate .sls01-cal-toolbar__total-label {
+  color: rgb(185 28 28);
+}
+
+.sls01-cal-toolbar__cost-rate-input {
+  box-sizing: border-box;
+  width: 4.25rem;
+  height: 1.75rem;
+  margin: 0;
+  padding: 0 0.375rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: rgb(153 27 27);
+  background: #fff;
+  border: 1.5px solid rgb(239 68 68);
+  border-radius: 0.375rem;
+  box-shadow: 0 0 0 1px rgb(254 202 202);
+}
+
+.sls01-cal-toolbar__cost-rate-input--empty {
+  border-color: rgb(220 38 38);
+  background: rgb(255 251 251);
+  box-shadow: 0 0 0 2px rgb(252 165 165 / 0.9);
+}
+
+.sls01-cal-toolbar__cost-rate-input::placeholder {
+  color: rgb(248 113 113);
+  opacity: 0.85;
+}
+
+.sls01-cal-toolbar__cost-rate-input:focus {
+  outline: none;
+  border-color: rgb(220 38 38);
+  box-shadow: 0 0 0 3px rgb(254 202 202 / 0.85);
+  animation: none;
+}
+
+.sls01-cal-toolbar__cost-rate-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  border-color: rgb(252 165 165);
+  box-shadow: none;
+}
+
+.sls01-cal-toolbar__cost-rate-unit {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: rgb(185 28 28);
+}
+
+/* MST01_033 / 공통 음영 툴팁 — null(미등록)일 때만, 영역 전체 hover */
+.sls01-cost-rate-tooltip {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 0.375rem);
+  z-index: 40;
+  width: max-content;
+  max-width: 14rem;
+  transform: translateX(-50%);
+  border-radius: 0.375rem;
+  background-color: #1e293b;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.18);
+  pointer-events: none;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.12s ease,
+    visibility 0.12s ease;
+}
+
+.sls01-cost-rate-tooltip::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-bottom-color: #1e293b;
+}
+
+.sls01-cal-toolbar__cost-rate--empty:hover .sls01-cost-rate-tooltip,
+.sls01-cal-toolbar__cost-rate--empty:focus-within .sls01-cost-rate-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+@keyframes sls01-cost-rate-pulse {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.7),
+      0 0 0 0 rgb(239 68 68 / 0.45);
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.7),
+      0 0 0 6px rgb(239 68 68 / 0);
+  }
 }
 
 .sls01-cal-body {

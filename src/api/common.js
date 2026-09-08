@@ -416,7 +416,27 @@ export const getMaterialCostByStore = (
 };
 
 /**
- * 홈 매출 분석 — 인건비 매장별
+ * 홈 매출 분석 — 예약현황 매장별 (`usp_VUE_saGetReservationByStore`)
+ * @see buildSalesAnalysisDashBody
+ */
+export const getReservationByStore = (
+  groupCd,
+  storeCd,
+  sequence,
+  fromDt,
+  toDt
+) => {
+  return api2.post(
+    SALES_ANALYSIS_DASHBOARD_API.reservationByStore,
+    buildSalesAnalysisDashBody(groupCd, storeCd, sequence, fromDt, toDt)
+  );
+};
+
+/** @deprecated getReservationByStore 사용 */
+export const getReservationStatusByStore = getReservationByStore;
+
+/**
+ * @deprecated 예약현황으로 교체 — getReservationByStore 사용
  * @see buildSalesAnalysisDashBody
  */
 export const getLaborCostByStore = (
