@@ -6708,10 +6708,11 @@ watch(
       },
       documentSubtitle: {
         //부제
-        message:
-          props.documentSubTitle + "\n" + "조회시간 : " + today + "\n" + ")",
+        message: [props.documentSubTitle, "조회시간 : " + today]
+          .filter(Boolean)
+          .join("\n"),
         visible: true,
-        height: 80,
+        height: 60,
         styleName: "documentSubtitleStyle",
       },
       fileName: props.documentTitle + ".xlsx",

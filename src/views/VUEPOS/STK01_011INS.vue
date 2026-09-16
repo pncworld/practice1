@@ -67,7 +67,7 @@
           :progid="1"
           :rowData="rowData"
           :reload="reload"
-          :documentTitle="'STK01_011INS'"
+          :documentTitle="'청구 등록'"
           @updatedRowData="updatedRowData"
           @clickedButtonCol="clickedButtonCol"
           @dblclickedRowData="dblclickedRowData"
@@ -83,7 +83,7 @@
           :documentSubTitle="documentSubTitle"
           :rowStateeditable="false"
           :highlightColId="'strStoreName,strDemandNo'"
-          :exporttoExcel="exportExcel">
+          :exporttoExcel2="exportExcel">
         </Realgrid>
       </div>
     </section>
@@ -152,7 +152,7 @@
           :progname="'STK01_011INS_VUE'"
           :progid="2"
           :rowData="rowData2"
-          :documentTitle="'STK01_011INS'"
+          :documentTitle="'청구 등록'"
           :rowStateeditable="false"
           :editableColId="editableColId"
           @updatedRowData="updatedRowData2"
@@ -163,7 +163,7 @@
           :highlightColId="'dblDemandQty'"
           :demandDetailColColors="true"
           :documentSubTitle="documentSubTitle2"
-          :exporttoExcel="exporttoExcel2"
+          :exporttoExcel2="exporttoExcel2"
           :setStateBar="false"></Realgrid>
       </div>
 
