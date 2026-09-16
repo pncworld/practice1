@@ -549,9 +549,9 @@ const scond3 = ref("");
 
 const exporttoExcel2 = ref(false);
 const excelButton2 = () => {
-  const storeNm = optionList.value.filter(
-    (item) => item.lngStoreCode == scond2.value
-  )[0].strName;
+  const storeNm =
+    optionList.value.filter((item) => item.lngStoreCode == scond2.value)[0]
+      ?.strName || "";
   documentSubTitle2.value =
     "청구일자 :" +
     scond.value +

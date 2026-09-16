@@ -6599,18 +6599,20 @@ watch(
 watch(
   () => props.exporttoExcel,
   (newVal) => {
-    const documentTitle = excelTitle(
-      store.state.minorCategory.find((item) =>
-        item.strUrl.includes(props.documentTitle)
-      )
+    const menu = (store.state.minorCategory || []).find((item) =>
+      String(item?.strUrl || "").includes(props.documentTitle)
     );
-    const excelNm = documentTitle.split("-")[2];
-    const user = store.state.userData.strChargerName;
-    const userID = store.state.userData.loginID;
+    const documentTitle = menu
+      ? excelTitle(menu)
+      : String(props.documentTitle || "export");
+    const excelNm = documentTitle.split("-")[2] || documentTitle;
+    const user = store.state.userData?.strChargerName || "";
+    const userID = store.state.userData?.loginID || "";
     const today = formatDateTime(new Date());
 
     for (let col of props.exportExcelShowColumns) {
-      gridView.columnByName(col).width = 100;
+      const gvCol = gridView.columnByName(col);
+      if (gvCol) gvCol.width = 100;
     }
 
     gridView.exportGrid({
@@ -6664,7 +6666,8 @@ watch(
       done: () => {
         // 다시 원복
         for (let col of props.exportExcelShowColumns) {
-          gridView.columnByName(col).width = 0;
+          const gvCol = gridView.columnByName(col);
+          if (gvCol) gvCol.width = 0;
         }
       },
     });
