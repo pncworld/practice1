@@ -3,12 +3,18 @@
  *
  * 약관동의(/embed/terms), 업체찾기(/bizes/lookup), 리뷰관리(/embed/bizes/...)처럼
  * 네이버가 제공하는 페이지로 리다이렉트할 때 씁니다.
- * PLACE_API_HOST / AUTH_API_HOST와 마찬가지로 PLACE_API_ENV 값에 따라
- * 테스트/운영 도메인을 구분합니다 (가이드 슬라이드 37 "API 및 FE 도메인" 참고).
+ *
+ * 테스트 FE(test-new.smartplace.naver.com)는 브라우저에서 열리지 않는다.
+ * API는 PLACE_API_ENV=test 를 유지하고, 사람이 보는 화면만 운영 FE를 쓴다.
  */
+const PROD_FRONT =
+  process.env.SMARTPLACE_FRONT_HOST_PROD || "https://new.smartplace.naver.com";
+const TEST_FRONT = process.env.SMARTPLACE_FRONT_HOST_TEST || "";
+const TEST_FRONT_UNUSABLE = TEST_FRONT.includes("test-new.smartplace.naver.com");
+
 const FRONT_HOST =
-  process.env.PLACE_API_ENV === "production"
-    ? process.env.SMARTPLACE_FRONT_HOST_PROD
-    : process.env.SMARTPLACE_FRONT_HOST_TEST;
+  process.env.PLACE_API_ENV === "production" || !TEST_FRONT || TEST_FRONT_UNUSABLE
+    ? PROD_FRONT
+    : TEST_FRONT;
 
 module.exports = { FRONT_HOST };

@@ -5,11 +5,13 @@
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <div
+    class="stk011-page box-border flex h-full max-w-full min-h-0 flex-col gap-3 overflow-hidden pb-1"
+    @click="handleParentClick">
+    <div
+      class="flex shrink-0 flex-wrap items-center justify-between gap-3 overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
+      <div class="flex flex-wrap items-center justify-end gap-2 pr-5 mr-9">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
@@ -25,34 +27,45 @@
         <button @click="excelButton" class="button excel">엑셀</button>
       </div>
     </div>
+
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-14 items-start z-10">
-      <div class="flex space-x-5 items-center">
-        <Datepicker2
-          :mainName="'청구일자'"
-          :initToday="0"
-          :initToday2="0"
-          @endDate="endDate"
-          @startDate="startDate"></Datepicker2>
-      </div>
-      <div class="flex space-x-5 mt-2 items-center">
-        <div class="text-base font-semibold">청구매장</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="border border-black w-48 h-7"
-            v-model="cond">
-            <option :value="i.lngStoreCode" v-for="i in optionList">
-              {{ i.strName }}
-            </option>
-          </select>
+      class="z-10 w-full min-w-0 shrink-0 overflow-x-auto rounded-lg bg-gray-200 px-12 py-4">
+      <div class="stk011-search-grid min-w-0">
+        <div class="stk011-cell">
+          <span class="stk011-sg-label">청구일자</span>
+          <div class="stk011-cell-field stk011-date-slot min-w-0">
+            <Datepicker2
+              ref="datepicker"
+              omit-main-label
+              filter-bar-align
+              :mainName="'청구일자'"
+              :initToday="0"
+              :initToday2="0"
+              :closePopUp="closePopUp"
+              @endDate="endDate"
+              @startDate="startDate" />
+          </div>
+        </div>
+        <div class="stk011-cell">
+          <span class="stk011-sg-label">청구매장</span>
+          <div class="stk011-cell-field min-w-0">
+            <select
+              id="stk01-011-store"
+              class="stk011-control"
+              v-model="cond">
+              <option
+                v-for="i in optionList"
+                :key="i.lngStoreCode"
+                :value="i.lngStoreCode">
+                {{ i.strName }}
+              </option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
-    <!-- 조회조건 -->
-    <!-- 그리드 영역 -->
-    <div class="w-full h-[82%]">
+
+    <div class="min-h-0 min-w-0 w-full flex-1 px-4 pb-2 lg:px-6">
       <Realgrid
         :progname="'STK01_011INS_VUE'"
         :progid="1"
@@ -79,80 +92,60 @@
   </div>
 
   <div
-    class="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
     v-if="open">
-    <!-- 팝업 내용 -->
-    <div class="bg-white p-6 rounded-2xl shadow-lg w-[900px] h-[700px]">
-      <div class="flex justify-between">
-        <h2 class="text-xl font-bold mb-4">청구 등록 팝업</h2>
-        <div class="flex space-x-3">
+    <div class="stk011-popup">
+      <div class="stk011-popup-head">
+        <h2 class="text-xl font-bold tracking-tight text-gray-900">청구 등록</h2>
+        <div class="flex flex-wrap items-center gap-2">
           <button
-            class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            type="button"
+            class="whitebutton"
             :disabled="limitStore == '2'"
             @click="saveButton">
             저장
           </button>
-          <button
-            class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            @click="excelButton2">
+          <button type="button" class="whitebutton" @click="excelButton2">
             엑셀
           </button>
-          <button
-            class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-blue-600"
-            @click="open = false">
+          <button type="button" class="whitebutton" @click="open = false">
             닫기
           </button>
         </div>
       </div>
-      <div class="grid grid-rows-1 grid-cols-3 border border-black mt-1">
-        <div class="flex">
-          <div
-            class="text-base font-semibold bg-gray-100 border-r border-black w-[40%] flex items-center justify-center">
-            청구일자
-          </div>
-          <div class="border-r border-black flex justify-center items-center">
-            <input
-              type="date"
-              class="border border-black"
-              v-model="scond"
-              @change="searchButton2"
-              :disabled="disabled" />
-          </div>
+
+      <div class="stk011-form-grid">
+        <div class="stk011-form-label">청구일자</div>
+        <div class="stk011-form-value">
+          <input
+            type="date"
+            class="stk011-control"
+            v-model="scond"
+            @change="searchButton2"
+            :disabled="disabled" />
         </div>
-        <div class="flex">
-          <div
-            class="text-base font-semibold bg-gray-100 border-r border-l border-black w-[40%] flex items-center justify-center">
-            청구매장
-          </div>
-          <div
-            class="border-r border-black flex justify-center items-center w-full">
-            <select
-              name=""
-              id=""
-              disabled
-              v-model="scond2"
-              class="w-[60%] h-[80%] border border-black disabled:bg-gray-200">
-              <option :value="i.lngStoreCode" v-for="i in optionList">
-                {{ i.strName }}
-              </option>
-            </select>
-          </div>
+        <div class="stk011-form-label">청구매장</div>
+        <div class="stk011-form-value">
+          <select id="stk01-011-popup-store" disabled v-model="scond2" class="stk011-control">
+            <option
+              v-for="i in optionList"
+              :key="'p-' + i.lngStoreCode"
+              :value="i.lngStoreCode">
+              {{ i.strName }}
+            </option>
+          </select>
         </div>
-        <div class="flex">
-          <div
-            class="text-base font-semibold bg-gray-100 border-r border-l border-black w-[40%] flex items-center justify-center">
-            청구번호
-          </div>
-          <div class="border-r border-black flex justify-center items-center">
-            <input
-              type="text"
-              class="border border-black"
-              v-model="scond3"
-              disabled />
-          </div>
+        <div class="stk011-form-label">청구번호</div>
+        <div class="stk011-form-value">
+          <input
+            type="text"
+            class="stk011-control"
+            v-model="scond3"
+            disabled />
         </div>
       </div>
-      <div class="h-[75%] w-full mt-2">
+
+      <div class="stk011-popup-grid">
         <Realgrid
           :progname="'STK01_011INS_VUE'"
           :progid="2"
@@ -169,20 +162,15 @@
           :setStateBar="false"></Realgrid>
       </div>
 
-      <div class="flex flex-col">
-        <div class="border border-black text-base font-semibold w-[10%]">
-          코멘트
-        </div>
+      <div class="stk011-comment">
+        <div class="stk011-form-label">코멘트</div>
         <textarea
-          name=""
-          id=""
           v-model="scond4"
           :disabled="disabled2"
-          class="border border-black w-full h-full"></textarea>
+          class="stk011-comment-field"></textarea>
       </div>
     </div>
   </div>
-  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
@@ -669,3 +657,236 @@ const deleteButton = async () => {
   }
 };
 </script>
+
+<style scoped>
+.stk011-page {
+  --stk011-label-col: 6.5rem;
+  --stk011-item-gap: 0.75rem;
+  --stk011-control-border: #cbd5e1;
+  --stk011-control-focus-border: #3b82f6;
+  --stk011-control-h: 2rem;
+  --stk011-control-radius: 0.375rem;
+}
+
+.stk011-search-grid {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem 1.75rem;
+}
+
+.stk011-cell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--stk011-item-gap);
+}
+
+.stk011-search-grid .stk011-cell:first-child {
+  flex: 0 1 auto;
+}
+
+.stk011-search-grid .stk011-cell:last-child {
+  flex: 0 1 20rem;
+  max-width: 22rem;
+}
+
+.stk011-sg-label {
+  flex: 0 0 var(--stk011-label-col);
+  width: var(--stk011-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+}
+
+.stk011-cell-field {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.stk011-control {
+  box-sizing: border-box;
+  height: var(--stk011-control-h);
+  min-height: var(--stk011-control-h);
+  max-height: var(--stk011-control-h);
+  width: 100%;
+  min-width: 0;
+  border-radius: var(--stk011-control-radius);
+  border: 1px solid var(--stk011-control-border);
+  background: #fff;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1;
+  color: rgb(55 65 81);
+}
+
+.stk011-page select.stk011-control,
+.stk011-popup select.stk011-control {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 1.75rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='M3 4.5 6 7.5 9 4.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 0.75rem;
+}
+
+.stk011-control:focus,
+.stk011-control:focus-visible {
+  border-color: var(--stk011-control-focus-border) !important;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+
+.stk011-control:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.stk011-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin: 0 !important;
+  width: auto !important;
+  max-width: 100%;
+}
+
+.stk011-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  height: 2rem;
+  min-height: 2rem;
+  border: 1px solid var(--stk011-control-border) !important;
+  border-radius: 0.375rem;
+  background: #fff;
+}
+
+.stk011-date-slot :deep(input[type="date"]:focus) {
+  border-color: var(--stk011-control-focus-border) !important;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+
+.stk011-popup {
+  --stk011-control-border: #cbd5e1;
+  --stk011-control-focus-border: #3b82f6;
+  --stk011-control-h: 2rem;
+  --stk011-control-radius: 0.375rem;
+  display: flex;
+  flex-direction: column;
+  width: min(56rem, 92vw);
+  height: min(44rem, 88vh);
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 40px rgb(15 23 42 / 0.18);
+}
+
+.stk011-popup-head {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #d1d5db;
+}
+
+.stk011-form-grid {
+  display: grid;
+  flex-shrink: 0;
+  grid-template-columns: 6.25rem minmax(0, 1fr) 6.25rem minmax(0, 1fr) 6.25rem minmax(0, 1fr);
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+.stk011-form-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.25rem 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #edf2f7;
+  color: #5c5c5c;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.stk011-form-value {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 2.5rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.stk011-form-value .stk011-control {
+  width: 100%;
+}
+
+.stk011-popup-grid {
+  min-height: 0;
+  flex: 1 1 auto;
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
+.stk011-comment {
+  display: grid;
+  flex-shrink: 0;
+  grid-template-columns: 6.25rem minmax(0, 1fr);
+  min-height: 5.5rem;
+  margin-top: 0.75rem;
+  overflow: hidden;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+}
+
+.stk011-comment .stk011-form-label {
+  align-self: stretch;
+  min-height: 100%;
+}
+
+.stk011-comment-field {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 5.5rem;
+  height: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  resize: none;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: rgb(55 65 81);
+  background: #fff;
+}
+
+.stk011-comment-field:focus {
+  outline: none;
+}
+
+.stk011-comment-field:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+</style>

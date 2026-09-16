@@ -34,13 +34,14 @@ const { escapeHtml, renderLayout } = require("../ui/layout");
 
 const PAGE_SIZE = 10; // 가이드 슬라이드 23: 디폴트 사이즈 10
 
-function layout({ title, heading, subtitle, body }) {
+function layout(req, { title, heading, subtitle, body }) {
   return renderLayout({
     title,
     heading: heading || title,
     subtitle,
     body,
     wide: true,
+    showLogout: true,
   });
 }
 
@@ -77,7 +78,7 @@ router.get("/", async (req, res) => {
     if (!items || items.length === 0) {
       const lookupUrl = buildLookupUrl(selfUrl.toString());
       return res.send(
-        layout({
+        layout(req, {
           title: "연동할 업체 찾기",
           heading: "연동할 업체를 찾을 수 없습니다",
           subtitle: "이 네이버 계정이 주인권한을 가진 업체가 없습니다.",
@@ -102,7 +103,8 @@ router.get("/", async (req, res) => {
 
     const rows = items
       .map((biz, index) => {
-        const image = biz.businessImage?.primary?.thumbnail;
+        const image = biz.businessImage?.primary?.url || biz.businessImage?.primary?.thumbnail;
+        const initial = escapeHtml(String(biz.businessName || "?").charAt(0));
         const isConnected = connectedFlags[index];
         const actionForm = isConnected
           ? `<form method="post" action="/naver/places/${encodeURIComponent(biz.placeId)}/disconnect?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}&page=${page}" onsubmit="return confirm('연동을 해지할까요?');">
@@ -113,7 +115,12 @@ router.get("/", async (req, res) => {
             </form>`;
         return `
           <tr>
-            <td>${image ? `<img class="biz-thumb" src="${escapeHtml(image)}" alt="" />` : ""}</td>
+            <td>
+              <div class="biz-thumb-wrap">
+                <div class="biz-thumb-fallback">${initial}</div>
+                ${image ? `<img class="biz-thumb" src="${escapeHtml(image)}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'" />` : ""}
+              </div>
+            </td>
             <td>
               <div class="biz-name">${escapeHtml(biz.businessName)} ${isConnected ? '<span class="badge">연동됨</span>' : ""}</div>
               <div class="muted">${escapeHtml(biz.address || "")}</div>
@@ -128,7 +135,7 @@ router.get("/", async (req, res) => {
     const hasNext = (page + 1) * PAGE_SIZE < totalCount;
 
     return res.send(
-        layout({
+        layout(req, {
           title: "연동할 업체 선택",
           heading: "연동할 업체를 선택하세요",
           subtitle: `전체 ${totalCount}개 업체 중 ${page * PAGE_SIZE + 1}~${page * PAGE_SIZE + items.length}번째`,
@@ -148,7 +155,7 @@ router.get("/", async (req, res) => {
   } catch (err) {
     console.error("[naver/places] 업체 목록 조회 실패:", err.message);
     return res.status(502).send(
-      layout({
+      layout(req, {
         title: "업체 목록 조회 실패",
         heading: "업체 목록을 불러오지 못했습니다",
         body: `
@@ -174,7 +181,7 @@ router.post("/:placeId/connect", async (req, res) => {
     const result = await addAgencyMapping({ accessToken, naverUniqueId, placeId });
 
     return res.send(
-        layout({
+        layout(req, {
           title: "연동 완료",
           heading: "연동이 완료되었습니다",
           body: `
@@ -207,7 +214,7 @@ router.post("/:placeId/connect", async (req, res) => {
     }
 
     return res.status(responseStatus).send(
-        layout({
+        layout(req, {
           title: "연동 실패",
           heading: "연동에 실패했습니다",
           body: `
@@ -256,7 +263,7 @@ router.post("/:placeId/disconnect", async (req, res) => {
     }
 
     return res.status(responseStatus).send(
-        layout({
+        layout(req, {
           title: "연동 해지 실패",
           heading: "연동 해지에 실패했습니다",
           body: `

@@ -11,8 +11,9 @@
  *   1. GET /naver/login/start   → 네이버 로그인 인가 페이지로 리다이렉트
  *   2. (사용자가 네이버 계정으로 로그인/동의)
  *   3. GET /naver/login/callback → code를 Access Token으로 교환 → 프로필 조회
- *      → naverUniqueId 확보 → 동의여부 조회
- *      → 이미 필수 약관 동의면 /naver/places, 아니면 약관동의 페이지
+ *      → naverUniqueId 확보 → /naver/places
+ *      (이미 동의한 계정을 embed/terms 로 보내면 네이버가 to 콜백을
+ *       호출하지 않아 목록까지 가지 못한다)
  */
 
 const express = require("express");
@@ -41,6 +42,13 @@ function getRedirectUri() {
     String(process.env.BASE_URL || "http://localhost").replace(/\/$/, "")
   ).toString();
 }
+
+function handleNaverLogout(req, res) {
+  res.set("Cache-Control", "no-store");
+  res.redirect("/naver/start");
+}
+
+router.get("/logout", handleNaverLogout);
 
 /**
  * STEP 1. 네이버 로그인 시작
@@ -89,7 +97,6 @@ router.get("/callback", async (req, res) => {
     const profile = await getProfile(loginAccessToken);
     const naverUniqueId = profile.id;
 
-    // 필수 약관이 없으면 약관 페이지로, 이미 다 있으면 업체 목록으로 간다.
     let nextPath = "/naver/terms/start";
     try {
       const placeAccessToken = await getAccessToken(
@@ -100,22 +107,14 @@ router.get("/callback", async (req, res) => {
         accessToken: placeAccessToken,
         naverUniqueId,
       });
-      const allAgreed = hasAllRequiredAgreements(summary);
-      console.log(
-        "[naver/login/callback] 동의여부:",
-        allAgreed,
-        summary.agreedPlacePrivacyAgreementTypes
-      );
-      if (allAgreed) {
+      if (hasAllRequiredAgreements(summary)) {
         nextPath = "/naver/places";
       }
     } catch (checkErr) {
-      const detail = checkErr.response?.data || checkErr.message;
       console.error(
         "[naver/login/callback] 동의여부 조회 실패, 약관 페이지로 진행:",
-        detail
+        checkErr.response?.data || checkErr.message
       );
-      nextPath = "/naver/terms/start";
     }
 
     const nextUrl = new URL(nextPath, getBaseUrl(req));
@@ -138,3 +137,4 @@ router.get("/callback", async (req, res) => {
 });
 
 module.exports = router;
+module.exports.handleNaverLogout = handleNaverLogout;

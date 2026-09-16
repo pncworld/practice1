@@ -1318,6 +1318,16 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /** 콤마 구분 컬럼 — 하늘색 음영 */
+  highlightColId: {
+    type: String,
+    default: "",
+  },
+  /** 청구 상세 — 윈폼 색(입고예정·수량·단가) + 입력 행 음영, 수량/단가열 제외 글자 파랑 */
+  demandDetailColColors: {
+    type: Boolean,
+    default: false,
+  },
   headerColors: {
     // 헤더 적용 스타일 이름
     type: Array,
@@ -2358,6 +2368,9 @@ const runFuncshowGrid = async () => {
     //console.error(`Invalid grid container element: ${realgridname.value}`);
     return;
   }
+  if (props.demandDetailColColors) {
+    container.classList.add("stk-demand-detail");
+  }
 
   if (props.setTreeView == false) {
     gridView = new GridView(container);
@@ -2711,6 +2724,82 @@ const runFuncshowGrid = async () => {
       return baseWidth;
     }
     return Math.max(1, Math.round(baseWidth * scale));
+  };
+  const rgDemandDetailTone = (col) => {
+    if (!props.demandDetailColColors) return "";
+    const id = String(col.strColID || "");
+    const hd = String(col.strHdText || "").replace(/\s+/g, "");
+    if (id === "dblDemandQty" || hd === "청구수량") return "qty";
+    if (
+      hd === "입고예정" ||
+      id === "dblPreQty" ||
+      id === "dblExpectedQty" ||
+      id === "dblPreExpectedQty"
+    ) {
+      return "expect";
+    }
+    if (
+      hd === "단가" ||
+      hd === "공급가" ||
+      hd === "부가세" ||
+      id === "curUnitPrice" ||
+      id === "curSupply" ||
+      id === "curTax"
+    ) {
+      return "price";
+    }
+    return "text";
+  };
+  const rgDemandDetailBg = {
+    qty: "#E4F4F8",
+    expect: "#E8F5E0",
+    price: "#FFFFCC",
+  };
+  const rgDemandDetailColClass = (col) => {
+    const tone = rgDemandDetailTone(col);
+    if (tone === "qty") return " stk-col-qty";
+    if (tone === "expect") return " stk-col-expect stk-col-blue-text";
+    if (tone === "price") return " stk-col-price";
+    if (tone === "text") return " stk-col-blue-text";
+    return "";
+  };
+  const rgDemandExpectField =
+    tabInitSetArray.value.find(
+      (col) => String(col.strHdText || "").replace(/\s+/g, "") === "입고예정"
+    )?.strColID || "";
+  const rgDemandHasEnteredQty = (value) => {
+    const n = Number(String(value ?? "").replace(/,/g, ""));
+    return Number.isFinite(n) && n > 0;
+  };
+  const rgDemandReadExpectQty = (grid, index) => {
+    let expectQty = rgDemandExpectField
+      ? grid.getValue(index, rgDemandExpectField)
+      : null;
+    if (expectQty == null || expectQty === "") {
+      for (const field of ["dblPreQty", "dblExpectedQty", "dblPreExpectedQty"]) {
+        try {
+          const v = grid.getValue(index, field);
+          if (v != null && v !== "") {
+            expectQty = v;
+            break;
+          }
+        } catch {
+          void 0;
+        }
+      }
+    }
+    return expectQty;
+  };
+  const rgDemandIsEnteredRow = (grid, index) => {
+    try {
+      if (index == null || index < 0) return false;
+      return (
+        rgDemandHasEnteredQty(grid.getValue(index, "dblDemandQty")) &&
+        rgDemandHasEnteredQty(rgDemandReadExpectQty(grid, index))
+      );
+    } catch {
+      return false;
+    }
   };
 
   // 컬럼 정의
@@ -3225,7 +3314,18 @@ const runFuncshowGrid = async () => {
         : "setTextAlignRight") +
       (props.checkExclusiveColumns && isCheckboxGridColumn(item)
         ? " rg-exclusive-radio"
-        : ""),
+        : "") +
+      (props.editableColByCondition == true && item.strColID == "dblDemandQty"
+        ? " demand-qty"
+        : "") +
+      (String(props.highlightColId || "")
+        .split(",")
+        .map((id) => id.trim())
+        .filter(Boolean)
+        .includes(item.strColID)
+        ? " demand-qty"
+        : "") +
+      rgDemandDetailColClass(item),
     // editor: {
     //   type: item.strColType.includes("dropdown")
     //     ? "dropdown"
@@ -3366,27 +3466,66 @@ const runFuncshowGrid = async () => {
         ? // 시간값에 따라서 배경 색상 지정
           function (grid, dataCell) {
             var ret = {};
+            const tone = rgDemandDetailTone(item);
+            if (tone === "qty" || tone === "expect" || tone === "price") {
+              ret.style = { backgroundColor: rgDemandDetailBg[tone] };
+            }
+            if (
+              (tone === "expect" || tone === "text") &&
+              rgDemandIsEnteredRow(
+                grid,
+                dataCell?.index?.itemIndex ?? dataCell?.index?.dataRow
+              )
+            ) {
+              ret.style = {
+                ...(ret.style || {}),
+                color: "#0000FF",
+              };
+            }
 
             if (item.strColID == "dblDemandQty") {
+              if (!ret.style) {
+                ret.style = {
+                  backgroundColor: props.demandDetailColColors
+                    ? rgDemandDetailBg.qty
+                    : "#8EE0FF",
+                };
+              }
+              if (
+                String(props.editableColId || "")
+                  .split(",")
+                  .map((id) => id.trim())
+                  .includes("dblDemandQty")
+              ) {
+                ret.editable = true;
+                return ret;
+              }
               const dr = dataCell?.index?.dataRow;
               if (dr == null || (typeof dr === "number" && dr < 0)) {
+                ret.editable = true;
                 return ret;
               }
               const ds = grid.getDataSource();
               if (!ds) {
+                ret.editable = true;
                 return ret;
               }
               const val = ds.getValue(dr, "dtmEndDate");
               const val2 = formatDateTime2(new Date());
               const val3 = ds.getValue(dr, "strStatus");
 
-              return {
-                editable:
-                  new Date(val.replace(" ", "T")) >
-                    new Date(val2.slice(0, 16).replace(" ", "T")) &&
-                  val3 !== "출고완료",
-              };
+              if (!val) {
+                ret.editable = true;
+                return ret;
+              }
+
+              ret.editable =
+                new Date(String(val).replace(" ", "T")) >
+                  new Date(val2.slice(0, 16).replace(" ", "T")) &&
+                val3 !== "출고완료";
+              return ret;
             }
+            return ret;
           }
         : isCheckAbleExpressionColumn(item.strColID) &&
           props.bulkLoadMode !== true
@@ -3870,7 +4009,14 @@ const runFuncshowGrid = async () => {
     }
   }
   // 4구간
-  if (props.setRowStyleCalls) {
+  if (props.demandDetailColColors) {
+    gridView.setRowStyleCallback((grid, item) => {
+      if (rgDemandIsEnteredRow(grid, item.index)) {
+        return "stk-row-registered";
+      }
+      return "";
+    });
+  } else if (props.setRowStyleCalls) {
     gridView.setRowStyleCallback((grid, item, fixed) => {
       if (props.setRowStyleLevel == 1) {
         let Value = grid.getValue(item.index, props.setRowStyleCallsDefaultCol);
@@ -7293,6 +7439,43 @@ watch(
 .skyblue {
   background: #d0e9f5;
   text-align: right;
+}
+
+.demand-qty {
+  background: #8ee0ff;
+  text-align: right;
+}
+
+.stk-col-expect {
+  background: #e8f5e0 !important;
+}
+
+.stk-col-qty {
+  background: #e4f4f8 !important;
+}
+
+.stk-col-price {
+  background: #ffffcc !important;
+}
+
+.stk-col-blue-text {
+  color: inherit;
+}
+
+.stk-row-registered {
+  background: #e8e8f0;
+}
+
+.stk-row-registered .stk-col-blue-text,
+.stk-row-registered .stk-col-expect,
+.stk-row-registered .rg-rowindicator,
+.stk-row-registered .rg-rowindicator-cell {
+  color: #0000ff !important;
+}
+
+.stk-row-registered .stk-col-qty,
+.stk-row-registered .stk-col-price {
+  color: #000 !important;
 }
 
 .realgrid.rg-ui-row-hover-pastel-red .rg-rowhover {

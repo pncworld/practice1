@@ -40,7 +40,6 @@ const {
 const { getDemoStoreContext } = require("../services/demoStore");
 const { FRONT_HOST } = require("../services/frontHost");
 const { getBaseUrl } = require("../services/baseUrl");
-const { renderLayout, escapeHtml } = require("../ui/layout");
 
 /**
  * STEP 1. 약관 동의 시작
@@ -50,8 +49,23 @@ const { renderLayout, escapeHtml } = require("../ui/layout");
  *
  * GET /naver/terms/start?storeId=xxx
  */
-router.get("/start", (req, res) => {
-  const { storeId, naverUniqueId } = getDemoStoreContext(req);
+router.get("/start", async (req, res) => {
+  const { storeId, refreshToken, naverUniqueId } = getDemoStoreContext(req);
+
+  try {
+    const accessToken = await getAccessToken(storeId, refreshToken);
+    const summary = await getAgreementSummary({ accessToken, naverUniqueId });
+    if (hasAllRequiredAgreements(summary)) {
+      return res.redirect(
+        `/naver/places?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}`
+      );
+    }
+  } catch (err) {
+    console.error(
+      "[naver/terms/start] 동의여부 조회 실패, 약관 페이지로 진행:",
+      err.response?.data || err.message
+    );
+  }
 
   const callbackUrl = new URL(
     "/naver/terms/callback",
@@ -80,39 +94,11 @@ router.get("/start", (req, res) => {
  *
  * GET /naver/terms/callback?storeId=xxx
  */
-router.get("/callback", async (req, res) => {
-  const { storeId, refreshToken, naverUniqueId } = getDemoStoreContext(req);
-
-  try {
-    const accessToken = await getAccessToken(storeId, refreshToken);
-    const summary = await getAgreementSummary({ accessToken, naverUniqueId });
-
-    if (hasAllRequiredAgreements(summary)) {
-      // 필수 약관 모두 동의됨 → 다음 단계(플레이스 목록 조회 화면)로 이동
-      return res.redirect(
-        `/naver/places?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}`
-      );
-    }
-
-    // 미동의 항목이 남아있음 → 다시 약관동의 페이지로 보낸다 (가이드 항목 4)
-    return res.redirect(
-      `/naver/terms/start?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}`
-    );
-  } catch (err) {
-    const detail = err.response?.data || err.message;
-    console.error("[naver/terms/callback] 동의여부 조회 실패:", detail);
-    return res.status(502).send(
-      renderLayout({
-        title: "동의 확인 실패",
-        heading: "약관 동의 후 돌아오는 데는 성공했습니다",
-        body: `
-          <p class="msg">운영 서버가 테스트 플레이스 API에 붙지 못해 동의 여부를 확인하지 못했습니다.</p>
-          <div class="msg-detail">${escapeHtml(typeof detail === "string" ? detail : JSON.stringify(detail))}</div>
-          <div class="actions-after"><a class="btn btn-primary" href="/naver/start">처음으로</a></div>
-        `,
-      })
-    );
-  }
+router.get("/callback", (req, res) => {
+  const { storeId, naverUniqueId } = getDemoStoreContext(req);
+  return res.redirect(
+    `/naver/places?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}`
+  );
 });
 
 module.exports = router;

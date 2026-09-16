@@ -67,14 +67,16 @@ async function getAgreementSummary({ accessToken, naverUniqueId }) {
 }
 
 /**
- * 필수 약관(통합약관 + 비즈니스약관 + 사업자정보제공동의)이
- * 모두 동의되어 있는지 판별하는 헬퍼.
+ * embed/terms(?service=pnc,booking)에서 받는 필수 약관이 모두 동의됐는지 판별.
+ *
+ * AGENCY_BUSINESS_DATA_PROVISION(사업자정보 제공)은 이 약관 화면에 안 나오고,
+ * 빠져 있어도 업체 목록 API는 된다. 그걸 필수로 두면 이미 동의한 계정이
+ * 약관 페이지로 다시 갔다가 to 콜백 없이 멈춘다.
  */
 function hasAllRequiredAgreements(summary) {
   const REQUIRED = [
-    "SMARTPLACE_INTEGRATED_TERMS", // 스마트플레이스 통합 이용약관
-    "SMARTPLACE_BUSINESS_TERMS", // 스마트플레이스 비즈니스 이용약관 (booking 파라미터로 노출됨)
-    "AGENCY_BUSINESS_DATA_PROVISION", // 사업자 등록 정보 제공 동의
+    "SMARTPLACE_INTEGRATED_TERMS",
+    "SMARTPLACE_BUSINESS_TERMS",
   ];
 
   const agreed = summary.agreedPlacePrivacyAgreementTypes || [];

@@ -13,16 +13,23 @@ const naverOnboardingRouter = require("./naverPlacePlus/routes/naverOnboarding")
 const naverLoginRouter = require("./naverPlacePlus/routes/naverLogin");
 const naverTermsRouter = require("./naverPlacePlus/routes/naverTerms");
 const naverPlacesRouter = require("./naverPlacePlus/routes/naverPlaces");
+const naverImageRouter = require("./naverPlacePlus/routes/naverImage");
 
 const app = express();
 
 app.use(express.json());
 
 // ===== 네이버 스마트플레이스 연동 라우트 (catch-all보다 반드시 위) =====
+app.use(
+  "/naver/assets",
+  express.static(path.join(__dirname, "naverPlacePlus", "ui", "assets"))
+);
 app.use("/naver/start", naverOnboardingRouter);
+app.get("/naver/logout", naverLoginRouter.handleNaverLogout);
 app.use("/naver/login", naverLoginRouter);
 app.use("/naver/terms", naverTermsRouter);
 app.use("/naver/places", naverPlacesRouter);
+app.use("/naver/image", naverImageRouter);
 // =====================================================================
 
 // 로고·정적 이미지 — SPA static/catch-all 보다 먼저 연결해야 /image 가 index.html 로 안 떨어짐.

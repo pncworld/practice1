@@ -26,24 +26,52 @@ router.get("/", (req, res) => {
       title: "네이버 스마트플레이스 연동",
       heading: "네이버 스마트플레이스 연동",
       subtitle: `${COMPANY_NAME}에서 연동하여 관리하세요.`,
+      wide: true,
       body: `
         <div class="notice-box">
           <div class="notice-title">개인(신용)정보 제3자 제공 동의 <span class="required">필수</span></div>
+          <p class="notice-lead">
+            「개인정보 보호법」 제17조 및 「신용정보의 이용 및 보호에 관한 법률」에 따라,
+            네이버 스마트플레이스 연동을 위해 아래와 같이 개인(신용)정보를 제3자에게 제공합니다.
+            아래 내용을 확인하신 후 동의 여부를 결정해 주시기 바랍니다.
+          </p>
           <dl>
-            <dt>제공받는 자</dt>
+            <dt>개인(신용)정보를 제공받는 자</dt>
             <dd>네이버 주식회사 (스마트플레이스)</dd>
-            <dt>제공 목적</dt>
-            <dd>네이버 스마트플레이스 연동 서비스 이용을 위한 매장 확인 및 POS 연동</dd>
-            <dt>제공 항목</dt>
-            <dd>사업자 등록 정보, 매장 정보 등 (세부 항목은 다음 화면에서 다시 확인합니다)</dd>
-            <dt>보유 및 이용 기간</dt>
-            <dd>연동 해지 시까지</dd>
+            <dt>제공받는 자의 이용 목적</dt>
+            <dd>
+              네이버 스마트플레이스 연동 서비스 제공, 매장(사업장) 확인 및 식별,
+              POS와 스마트플레이스 간 매장 연동·연동 유지 및 해지 처리
+            </dd>
+            <dt>제공하는 개인(신용)정보의 항목</dt>
+            <dd>
+              사업자등록번호, 상호, 대표자 성명, 사업장 주소, 업태·종목,
+              매장명, 매장 연락처, 영업시간 등 매장·사업자 정보,
+              네이버 아이디로 로그인 시 수집되는 식별정보(네이버 Unique ID)
+            </dd>
+            <dt>제공받는 자의 보유 및 이용 기간</dt>
+            <dd>
+              연동 목적 달성 시까지(연동 해지 시까지).
+              다만 관련 법령에 따라 보존이 필요한 경우 해당 법령에서 정한 기간까지 보유합니다.
+            </dd>
+            <dt>제공 방법</dt>
+            <dd>정보통신망을 통한 전송</dd>
+            <dt>동의 거부 권리 및 거부 시 불이익</dt>
+            <dd>
+              귀하는 위 제3자 제공에 대한 동의를 거부할 수 있습니다.
+              다만 본 동의는 네이버 스마트플레이스 연동에 필수이므로,
+              동의하지 않으실 경우 해당 연동 서비스를 이용하실 수 없습니다.
+            </dd>
           </dl>
+          <p class="notice-refuse">
+            동의한 이후에도 연동을 해지하면 제공 목적이 종료되며, 이후 네이버 스마트플레이스에서 요구하는
+            약관 및 정보 제공 동의는 다음 화면에서 별도로 진행됩니다.
+          </p>
         </div>
 
         <label class="agree">
           <input type="checkbox" id="agreeCheckbox" />
-          위 내용에 동의합니다.
+          위 개인(신용)정보 제3자 제공에 동의합니다. (필수)
         </label>
 
         <div class="btn-row">
@@ -53,6 +81,13 @@ router.get("/", (req, res) => {
       `,
       extraScript: `
         <script>
+          try {
+            if (sessionStorage.getItem("np_close_naver_logout")) {
+              sessionStorage.removeItem("np_close_naver_logout");
+              var npLogoutWin = window.open("", "np_naver_logout");
+              if (npLogoutWin && !npLogoutWin.closed) npLogoutWin.close();
+            }
+          } catch (e) {}
           const checkbox = document.getElementById("agreeCheckbox");
           const button = document.getElementById("agreeBtn");
           const startUrl = ${JSON.stringify(startUrl)};

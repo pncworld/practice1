@@ -376,6 +376,40 @@ export const InsertDemandMasterDetail2 = (
   });
 };
 
+export const UpdateDemandMasterDetail2 = (
+  groupCd,
+  storecd,
+  date,
+  demandno,
+  comments,
+  classtype,
+  ddate,
+  edate,
+  stockids,
+  qtys,
+  userid,
+  specialyn,
+  char,
+  comments2
+) => {
+  return api2.post("/VUEPOS/STK01_011INS.asmx/UpdateDemandMasterDetail2", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DATE: date,
+    DEMANDNO: demandno,
+    COMMENT: comments,
+    CLASSTYPE: classtype,
+    DDATE: ddate,
+    EDATE: edate,
+    STOCKIDS: stockids,
+    QTYS: qtys,
+    USERID: userid,
+    SPECIAL: specialyn,
+    CHAR: char,
+    COMMENTS: comments2,
+  });
+};
+
 export const getStockDemandList22 = (groupCd, storeCd, lang, sdate, edate) => {
   return api2.post("/VUEPOS/STK01_011INS.asmx/getStockDemandList22", {
     GROUP_CD: groupCd,
