@@ -126,7 +126,22 @@
             v-model="currentscreenKeyNm" />
         </div>
       </div>
-      <div class="flex justify-center space-x-3 w-full h-16 mt-28">
+      <div
+        v-if="currentpaymentCd == 3"
+        class="flex flex-col justify-start h-12 mt-3">
+        <div>
+          <p>화면키 유형</p>
+        </div>
+        <div class="h-full w-full rounded-lg">
+          <select
+            class="border border-gray-400 pl-1 h-full w-full rounded-lg"
+            v-model="currentProduct">
+            <option :value="0">기본</option>
+            <option :value="1">품목할인</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex justify-center space-x-3 w-full h-16 mt-8">
         <button
           @click="confirmaddScreenKey()"
           class="mt-4 p-2 bg-blue-500 text-white rounded">
@@ -541,7 +556,7 @@ const SubMenuGroup = ref([]);
 const rowData = ref([]);
 
 const store = useStore();
-const currentProduct = ref("0");
+const currentProduct = ref(0);
 const showEditProduct = ref(false);
 const userData = store.state.userData;
 const groupCd = ref(userData.lngStoreGroup);
@@ -553,6 +568,87 @@ const screenList = ref([]);
 const clickedScreenOrMenu = ref(false);
 const TLUList = ref([]);
 const clickedScreenNo = ref();
+
+const toNum = (value, fallback = 0) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : fallback;
+};
+
+const getScreenOption = (item) =>
+  toNum(item?.intScreenOption ?? item?.itemDiscYn, 0) === 1 ? 1 : 0;
+
+const isItemDiscountPayCode = (item) => {
+  if (!item) return false;
+  return toNum(item.lngDiscType) === 1;
+};
+
+const uniqueItemDiscountCodes = (screenNo) => {
+  const map = new Map();
+  const addCode = (code, name, extra) => {
+    if (code == null || code === "") return;
+    const key = String(code);
+    if (!map.has(key)) {
+      map.set(key, {
+        ...(extra || {}),
+        lngCode: code,
+        strName: name || extra?.strName || extra?.strKeyName || "",
+      });
+    }
+  };
+
+  (AmountList.value || []).forEach((item) => {
+    if (!isItemDiscountPayCode(item)) return;
+    addCode(item.lngCode, item.strName, item);
+  });
+
+  if (map.size === 0) {
+    (KeyList.value || []).forEach((item) => {
+      if (screenNo != null && item.intScreenNo != screenNo) return;
+      addCode(
+        item.lngKeyScrNo ?? item.lngCode,
+        item.strName || item.strKeyName,
+        item
+      );
+    });
+  }
+
+  return [...map.values()];
+};
+
+const applyPayCodeListByScreen = (isItemDiscScreen, screenNo) => {
+  const list = AmountList.value || [];
+  if (!isItemDiscScreen) {
+    rowData.value = list;
+    return;
+  }
+  rowData.value = uniqueItemDiscountCodes(screenNo);
+};
+
+const getScreenNoGroup = (type) => {
+  const t = toNum(type);
+  if (t === 3 || t === 4) return "3-4";
+  return String(t);
+};
+
+const isSameScreenNoGroup = (item, type = currentpaymentCd.value) => {
+  if (!item) return false;
+  if (item.intScreenType == null || item.intScreenType === "") return true;
+  return getScreenNoGroup(item.intScreenType) === getScreenNoGroup(type);
+};
+
+const nextScreenNoForType = () => {
+  const nos = [...(ScreenKeyOrigin.value || []), ...(screenList.value || [])]
+    .filter(
+      (item) =>
+        item &&
+        item.intScreenNo !== "" &&
+        item.intScreenNo != null &&
+        isSameScreenNoGroup(item)
+    )
+    .map((item) => toNum(item.intScreenNo, 0))
+    .filter((num) => num > 0);
+  return (nos.length ? Math.max(...nos) : 0) + 1;
+};
 
 /**
  * 조회 함수
@@ -594,12 +690,19 @@ const searchButton = async () => {
       Number(currentpaymentCd.value)
     );
     //comsole.log(res4);
-    AmountList.value = res4.data.AmountList;
-    ScreenKeyOrigin.value = res4.data.AmountScreenList;
+    AmountList.value = res4.data.AmountList || [];
+    ScreenKeyOrigin.value = (res4.data.AmountScreenList || []).map((item) => {
+      const option = getScreenOption(item);
+      return {
+        ...item,
+        intScreenOption: option,
+        itemDiscYn: option,
+      };
+    });
     //comsole.log(ScreenKeyOrigin.value);
     KeyList.value = res4.data.AmountKeyList;
     if (KeyList.value == null) {
-      KeyList.value = ["1"];
+      KeyList.value = [];
     }
     AmountList.value = AmountList.value.map((item) => {
       return {
@@ -607,7 +710,7 @@ const searchButton = async () => {
         add: "추가",
       };
     });
-    rowData.value = AmountList.value;
+    applyPayCodeListByScreen(false);
 
     const res2 = await getAllScreenList(
       groupCd.value,
@@ -667,30 +770,43 @@ const showKeys = (value) => {
   }
   //comsole.log(value);
   clickedintScreenNo.value = value;
-  const thisProduct = ScreenKeyOrigin.value.filter(
-    (item) => item.itemDiscYn == 1 && item.intScreenNo == value
-  ).length;
-  if (thisProduct > 0) {
+  const currentScreen = ScreenKeyOrigin.value.find(
+    (item) => item.intScreenNo == value
+  );
+  const thisProduct = getScreenOption(currentScreen) === 1;
+  applyPayCodeListByScreen(thisProduct, value);
+  if (thisProduct) {
     clickedRealIndex.value = "";
-    items.value = Array.from({ length: 30 }, (_, index) => ({
-      intKeySeq: index + 1, // 인덱스에 1을 더하여 값 설정
-      itemDiscYn: 1,
-    }));
+    const discCodes = uniqueItemDiscountCodes(value);
+    items.value = Array.from({ length: 30 }, (_, index) => {
+      const code = discCodes[index];
+      if (code) {
+        return {
+          intKeySeq: index + 1,
+          itemDiscYn: 1,
+          lngKeyScrNo: code.lngCode,
+          strName: code.strName,
+        };
+      }
+      return {
+        intKeySeq: index + 1,
+        itemDiscYn: 1,
+      };
+    });
   } else {
     items.value = Array.from({ length: 30 }, (_, index) => ({
-      intKeySeq: index + 1, // 인덱스에 1을 더하여 값 설정
+      intKeySeq: index + 1,
       itemDiscYn: 0,
     }));
+    KeyList.value
+      .filter((item) => item.intScreenNo == value)
+      .forEach((item) => {
+        const position = item.intKeySeq - (currmenuKeyPage.value - 1) * 30 - 1;
+        if (position >= 0 && position < 30) {
+          items.value[position] = item;
+        }
+      });
   }
-
-  KeyList.value
-    .filter((item) => item.intScreenNo == value)
-    .forEach((item) => {
-      const position = item.intKeySeq - (currmenuKeyPage.value - 1) * 30 - 1;
-      if (position >= 0 && position < 30) {
-        items.value[position] = item;
-      }
-    });
   afterSearch2.value = true;
 };
 watch(ScreenKeys, (newvalue) => {
@@ -836,8 +952,8 @@ const saveButton = async () => {
         const screenKeyNamearr = ScreenKeyOrigin.value.map(
           (item) => item.strScreenName
         );
-        const screenKeyDisc = ScreenKeyOrigin.value.map(
-          (item) => item.itemDiscYn
+        const screenKeyDisc = ScreenKeyOrigin.value.map((item) =>
+          getScreenOption(item) === 1 ? "1" : "0"
         );
 
         const res = await saveScreenKeys2(
@@ -851,11 +967,28 @@ const saveButton = async () => {
           currentpaymentCd.value
         );
 
-        const intKeySeqs = KeyList.value.map((item) => item.intKeySeq);
-        const screenNumarr = KeyList.value.map((item) => item.intScreenNo);
-        const lngScrarr = KeyList.value.map((item) => item.lngKeyScrNo);
-        const menuKeyNmarr = KeyList.value.map((item) => item.strName);
-        const itemDiscYnarr = KeyList.value.map((item) => item.itemDiscYn);
+        const saveKeys = [...(KeyList.value || [])];
+        ScreenKeyOrigin.value.forEach((screen) => {
+          if (getScreenOption(screen) !== 1) return;
+          if (saveKeys.some((item) => item.intScreenNo == screen.intScreenNo)) {
+            return;
+          }
+          saveKeys.push({
+            intKeySeq: 1,
+            intScreenNo: screen.intScreenNo,
+            lngKeyScrNo: 0,
+            strName: "",
+            itemDiscYn: 1,
+          });
+        });
+
+        const intKeySeqs = saveKeys.map((item) => item.intKeySeq);
+        const screenNumarr = saveKeys.map((item) => item.intScreenNo);
+        const lngScrarr = saveKeys.map((item) => item.lngKeyScrNo);
+        const menuKeyNmarr = saveKeys.map((item) => item.strName);
+        const itemDiscYnarr = saveKeys.map((item) =>
+          toNum(item.itemDiscYn) === 1 ? 1 : 0
+        );
         //comsole.log(posNo.value);
         //comsole.log(intKeySeqs.join(","));
         //comsole.log(screenNumarr.join(","));
@@ -916,6 +1049,12 @@ const clickedCode = ref();
  */
 
 const selcetedrowData = (newValue) => {
+  const currentScreen = ScreenKeyOrigin.value.find(
+    (item) => item.intScreenNo == clickedintScreenNo.value
+  );
+  if (getScreenOption(currentScreen) === 1) {
+    return;
+  }
   clickedstrName.value = newValue[1];
   clickedCode.value = newValue[0];
   addKey();
@@ -994,19 +1133,15 @@ watch(
 const editScreenKey = (value, value2, value3) => {
   currentscreenKeyNm.value = value2;
   //comsole.log(value3);
-  currentProduct.value = value3;
+  currentProduct.value = toNum(value3) === 1 ? 1 : 0;
   clickedScreenNo.value = value;
   changeScreenKey.value = true;
   const disclength = ScreenKeyOrigin.value.filter(
-    (item) => item.itemDiscYn == 1
+    (item) => getScreenOption(item) === 1
   ).length;
   //comsole.log(ScreenKeyOrigin.value);
   //comsole.log(disclength);
-  if (disclength == 1 && currentProduct.value == 0) {
-    showEditProduct.value = true;
-  } else if (disclength == 1 && currentProduct.value == 1) {
-    showEditProduct.value = false;
-  }
+  showEditProduct.value = disclength >= 1 && currentProduct.value !== 1;
 };
 
 const exitScreenKey = () => {
@@ -1017,9 +1152,21 @@ const confirmScreenKey = () => {
   const index = ScreenKeyOrigin.value.findIndex(
     (item) => item.intScreenNo == clickedScreenNo.value
   );
+  const nextOption =
+    currentpaymentCd.value == 3 && toNum(currentProduct.value) === 1 ? 1 : 0;
+  const applyScreenOption = () => {
+    ScreenKeyOrigin.value[index].strScreenName = currentscreenKeyNm.value;
+    ScreenKeyOrigin.value[index].itemDiscYn = nextOption;
+    ScreenKeyOrigin.value[index].intScreenOption = nextOption;
+    changeScreenKey.value = false;
+    addfor4ScreenKey();
+    currentscreenKeyNm.value = "";
+    showKeys(clickedScreenNo.value);
+    currentProduct.value = 0;
+  };
   if (
     currentpaymentCd.value == 3 &&
-    ScreenKeyOrigin.value[index].itemDiscYn != currentProduct.value
+    getScreenOption(ScreenKeyOrigin.value[index]) !== nextOption
   ) {
     Swal.fire({
       title: "변경",
@@ -1030,45 +1177,14 @@ const confirmScreenKey = () => {
       cancelButtonText: "취소",
     }).then((result) => {
       if (result.isConfirmed) {
-        //comsole.log(ScreenKeyOrigin.value[index].itemDiscYn);
-        //comsole.log(currentProduct.value);
-        if (ScreenKeyOrigin.value[index].itemDiscYn != currentProduct.value) {
-          ////console.log(clickedScreenNo.value);
-          KeyList.value = KeyList.value.filter(
-            (item) => item.intScreenNo != clickedScreenNo.value
-          );
-        }
-
-        ScreenKeyOrigin.value[index].strScreenName = currentscreenKeyNm.value;
-        ScreenKeyOrigin.value[index].itemDiscYn = currentProduct.value;
-
-        changeScreenKey.value = false;
-        ////console.log("여기오냐");
-        addfor4ScreenKey();
-        currentscreenKeyNm.value = "";
-        showKeys(clickedScreenNo.value);
-        currentProduct.value = "0";
+        KeyList.value = KeyList.value.filter(
+          (item) => item.intScreenNo != clickedScreenNo.value
+        );
+        applyScreenOption();
       }
     });
-  } else if (
-    currentpaymentCd.value == 3 &&
-    ScreenKeyOrigin.value[index].itemDiscYn == currentProduct.value
-  ) {
-    ScreenKeyOrigin.value[index].strScreenName = currentscreenKeyNm.value;
-    changeScreenKey.value = false;
-    //comsole.log(ScreenKeyOrigin.value);
-    addfor4ScreenKey();
-    currentscreenKeyNm.value = "";
-    showKeys(clickedScreenNo.value);
-    currentProduct.value = "0";
   } else {
-    ScreenKeyOrigin.value[index].strScreenName = currentscreenKeyNm.value;
-    changeScreenKey.value = false;
-    //comsole.log(ScreenKeyOrigin.value);
-    addfor4ScreenKey();
-    currentscreenKeyNm.value = "";
-    showKeys(clickedScreenNo.value);
-    currentProduct.value = "0";
+    applyScreenOption();
   }
 };
 
@@ -1102,6 +1218,7 @@ const addfor30MenuKeys = () => {
 
 const addScreenKey = (value) => {
   currentscreenKeyNm.value = "";
+  currentProduct.value = 0;
   addscreenKey.value = true;
   //comsole.log(value);
   clickedScreenNo.value = value + 1;
@@ -1117,25 +1234,36 @@ const confirmaddScreenKey = () => {
     });
     return;
   }
-  let newScreenNo;
-  if (ScreenKeyOrigin.value.length == 0) {
-    newScreenNo = 1;
-  } else {
-    newScreenNo =
-      ScreenKeyOrigin.value[ScreenKeyOrigin.value.length - 1].intScreenNo + 1;
-  }
+  const newScreenNo = nextScreenNoForType();
+  const newScreenType = toNum(currentpaymentCd.value);
+  const option =
+    newScreenType === 3 && toNum(currentProduct.value) === 1 ? 1 : 0;
 
   ScreenKeyOrigin.value.push({
     strScreenName: currentscreenKeyNm.value,
     intScreenNo: newScreenNo,
-    intScreenType: currentpaymentCd.value,
+    intScreenType: newScreenType,
+    itemDiscYn: option,
+    intScreenOption: option,
   });
+  screenList.value = [
+    ...(screenList.value || []),
+    {
+      strScreenName: currentscreenKeyNm.value,
+      intScreenNo: newScreenNo,
+      intScreenType: newScreenType,
+      itemDiscYn: option,
+      intScreenOption: option,
+    },
+  ];
   addscreenKey.value = false;
   addfor4ScreenKey();
   //comsole.log(ScreenKeyOrigin.value);
   currentscreenKeyNm.value = "";
+  currentProduct.value = 0;
+  clickedintScreenNo.value = newScreenNo;
   //comsole.log(clickedScreenNo.value);
-  showKeys(clickedScreenNo.value);
+  showKeys(newScreenNo);
 };
 
 const existMenuKey = ref(false);
@@ -1218,6 +1346,13 @@ const deletekey = () => {
   if (clickedScreenOrMenu.value == false) {
     ScreenKeyOrigin.value = ScreenKeyOrigin.value.filter(
       (item) => item.intScreenNo != clickedintScreenNo.value
+    );
+    screenList.value = (screenList.value || []).filter(
+      (item) =>
+        !(
+          item.intScreenNo == clickedintScreenNo.value &&
+          toNum(item.intScreenType) === toNum(currentpaymentCd.value)
+        )
     );
     addscreenKey.value = false;
     addfor4ScreenKey();
