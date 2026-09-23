@@ -5,118 +5,83 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div
-    class="w-[100vw] h-[9vh] absolute top-[6vh] bg-black grid grid-rows-1 grid-cols-[1fr,3fr,1fr]">
-    <div class="flex flex-col items-center justify-center ml-2">
-      <div class="text-sm text-white text-nowrap">{{ startDate }}</div>
-      <div class="text-sm text-white text-nowrap">~{{ endDate }}</div>
-    </div>
-    <div class="flex flex-col items-center justify-center">
-      <div
-        class="text-sm text-white whitespace-nowrap overflow-hidden w-[50vw]">
-        {{ selectedStoreName }}
+  <div class="mds-bar">
+    <button type="button" class="mds-summary" @click="showStoreAndDate">
+      <div class="mds-summary-body">
+        <div class="mds-summary-row">
+          <font-awesome-icon :icon="['far', 'calendar']" class="mds-ico" />
+          <span>{{ displayDate(startDate) }} ~ {{ displayDate(endDate) }}</span>
+        </div>
+        <div class="mds-summary-row mds-summary-store">
+          <font-awesome-icon :icon="['fas', 'location-dot']" class="mds-ico" />
+          <span class="truncate">{{ selectedStoreName }}</span>
+        </div>
       </div>
-    </div>
-    <div class="flex flex-col items-center justify-center bg-blue-500">
-      <button @click="showStoreAndDate">
-        <font-awesome-icon
-          :icon="['fas', 'sliders']"
-          class="text-white size-10" />
-      </button>
-    </div>
+      <span class="mds-filter-btn" :class="{ 'is-open': show }">
+        <font-awesome-icon :icon="['fas', 'sliders']" />
+      </span>
+    </button>
   </div>
-  <div
-    class="bg-white absolute top-0 text-black w-full h-[50vh] mt-[6vh]"
-    v-show="show">
-    <div class="flex flex-col">
-      <div
-        class="flex justify-start space-x-2 mt-[2vh] text-lg font-medium ml-[4vw]">
-        <div>조회기간</div>
-        <div class="w-[35vw]">
-          <input
-            type="date"
-            v-model="startDate"
-            class="border w-full text-xs"
-            @input="resetIcon" />
+
+  <div v-show="show" class="mds-layer">
+    <div class="mds-dim" @click="closePanel"></div>
+    <div class="mds-sheet">
+      <div class="mds-sheet-head">
+        <div>
+          <div class="mds-sheet-title">조회 조건</div>
+          <div class="mds-sheet-sub">기간과 지점을 선택한 뒤 조회하세요</div>
         </div>
-        <div class="w-[35vw]">
-          <input
-            type="date"
-            v-model="endDate"
-            class="border w-full text-xs"
-            @input="resetIcon" />
-        </div>
-      </div>
-      <div
-        class="flex w-full mt-[3vh] justify-center items-center space-x-2 p-2">
-        <button
-          @click="setYesterDay"
-          class="border border-blue-500 text-blue-500 rounded-lg w-1/4 h-8"
-          :class="setIcon == 1 ? 'bg-blue-500 text-white' : ''">
-          전일
-        </button>
-        <button
-          @click="setLastWeek"
-          class="border border-blue-500 text-blue-500 rounded-lg w-1/4 h-8"
-          :class="setIcon == 2 ? 'bg-blue-500 text-white' : ''">
-          1주일
-        </button>
-        <button
-          @click="setLastMonth"
-          class="border border-blue-500 text-blue-500 rounded-lg w-1/4 h-8"
-          :class="setIcon == 3 ? 'bg-blue-500 text-white' : ''">
-          1개월
-        </button>
-        <button
-          @click="setLast3Month"
-          class="border border-blue-500 text-blue-500 rounded-lg w-1/4 h-8"
-          :class="setIcon == 4 ? 'bg-blue-500 text-white' : ''">
-          3개월
+        <button type="button" class="mds-close" @click="closePanel">
+          <font-awesome-icon icon="xmark" />
         </button>
       </div>
 
-      <div class="flex flex-col mt-[5vh] space-x-5 space-y-2">
-        <div class="flex">
-          <div class="text-lg font-medium ml-[5vw]">매장검색</div>
-          <div class="border border-gray-600 w-[60vw]">
-            <input
-              type="text"
-              class="w-full h-full"
-              v-model="searchword"
-              @keydown.enter="filterStore" />
-          </div>
-          <button class="text-2xl" id="StoreSelect2" @click="filterStore">
-            🔍
-          </button>
-        </div>
-        <div class="flex">
-          <div class="text-lg font-medium ml-[4vw]">지점명</div>
-          <div class="border border-gray-600 w-[60vw]">
-            <select
-              name=""
-              id="StoreSelect"
-              ref="StoreSelect"
-              class="w-full h-full"
-              v-model="selectedStoreCd2">
-              <option
-                :value="{
-                  STORE_CD: i.STORE_CD,
-                  GROUP_CD: i.GROUP_CD,
-                }"
-                v-for="i in StoreList">
-                {{ i.STORE_NM }}
-              </option>
-            </select>
-          </div>
-        </div>
+      <div class="mds-label">조회기간</div>
+      <div class="mds-date-box">
+        <input type="date" v-model="startDate" class="mds-date" @input="resetIcon" />
+        <span class="mds-tilde">~</span>
+        <input type="date" v-model="endDate" class="mds-date" @input="resetIcon" />
       </div>
-      <div class="flex justify-center items-center">
-        <button
-          @click="sendSearch"
-          class="bg-blue-600 text-white text-xl rounded-lg w-[80vw] h-[5vh] mt-[5vh]">
-          조회하기
+
+      <div class="mds-chips">
+        <button type="button" class="mds-chip" :class="{ 'is-on': setIcon == 1 }" @click="setYesterDay">전일</button>
+        <button type="button" class="mds-chip" :class="{ 'is-on': setIcon == 2 }" @click="setLastWeek">1주일</button>
+        <button type="button" class="mds-chip" :class="{ 'is-on': setIcon == 3 }" @click="setLastMonth">1개월</button>
+        <button type="button" class="mds-chip" :class="{ 'is-on': setIcon == 4 }" @click="setLast3Month">3개월</button>
+      </div>
+
+      <div class="mds-label">매장검색</div>
+      <div class="mds-search-row">
+        <input
+          type="text"
+          class="mds-search-input"
+          v-model="searchword"
+          placeholder="매장명"
+          @keydown.enter="filterStore" />
+        <button type="button" class="mds-search-go" id="StoreSelect2" @click="filterStore">
+          <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
         </button>
       </div>
+
+      <div class="mds-label">지점명</div>
+      <div class="mds-select-wrap">
+        <font-awesome-icon :icon="['fas', 'store']" class="mds-select-ico" />
+        <select
+          class="mds-select"
+          id="StoreSelect"
+          ref="StoreSelect"
+          v-model="selectedStoreCd2">
+          <option
+            :value="{ STORE_CD: i.STORE_CD, GROUP_CD: i.GROUP_CD }"
+            v-for="i in StoreList"
+            :key="i.GROUP_CD + '-' + i.STORE_CD">
+            {{ i.STORE_NM }}
+          </option>
+        </select>
+        <font-awesome-icon :icon="['fas', 'chevron-down']" class="mds-select-chevron" />
+      </div>
+
+      <button type="button" class="mds-search" @click="sendSearch">조회</button>
     </div>
   </div>
 </template>
@@ -153,6 +118,10 @@ const props = defineProps({
 
 const resetIcon = () => {
   setIcon.value = 0;
+};
+const displayDate = (value) => String(value || "").replaceAll("-", ".");
+const closePanel = () => {
+  show.value = false;
 };
 const setIcon = ref(0);
 const setYesterDay = () => {
@@ -201,8 +170,11 @@ const emit = defineEmits([
   "SEARCHNOW",
 ]);
 const showStoreAndDate = () => {
+  if (show.value) {
+    closePanel();
+    return;
+  }
   show.value = true;
-
   selectedStoreCd2.value = selectedStoreCd.value;
 };
 /**
@@ -329,4 +301,245 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.mds-bar {
+  position: absolute;
+  top: 3.25rem;
+  left: 0;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 9vh;
+  padding: 0 0.75rem;
+}
+
+.mds-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  height: 7.2vh;
+  padding: 0 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+  text-align: left;
+}
+
+.mds-summary-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.mds-summary-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #1e293b;
+  white-space: nowrap;
+}
+
+.mds-summary-store {
+  margin-top: 0.1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.mds-ico {
+  width: 0.85rem;
+  color: #3b82f6;
+}
+
+.mds-summary-store .mds-ico {
+  color: #94a3b8;
+}
+
+.mds-filter-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.75rem;
+  background: #eff4ff;
+  color: #3b82f6;
+  flex-shrink: 0;
+}
+
+.mds-filter-btn.is-open {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.mds-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+
+.mds-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.mds-sheet {
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  top: 16vh;
+  max-height: 72vh;
+  overflow-y: auto;
+  padding: 1rem;
+  border-radius: 1.25rem;
+  background: #fff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+}
+
+.mds-sheet-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+}
+
+.mds-sheet-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.mds-sheet-sub {
+  margin-top: 0.15rem;
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.mds-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.mds-label {
+  margin-bottom: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.mds-date-box,
+.mds-search-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+  background: #f8fafc;
+}
+
+.mds-date,
+.mds-search-input {
+  flex: 1;
+  min-width: 0;
+  height: 2.1rem;
+  border: 0;
+  background: transparent;
+  font-size: 0.8125rem;
+  color: #1e293b;
+}
+
+.mds-search-go {
+  width: 2rem;
+  color: #3b82f6;
+}
+
+.mds-tilde {
+  flex-shrink: 0;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.mds-chips {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  padding: 0.25rem;
+  border-radius: 0.85rem;
+  background: #f1f5f9;
+}
+
+.mds-chip {
+  height: 2rem;
+  border-radius: 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.mds-chip.is-on {
+  background: #fff;
+  color: #3b82f6;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+}
+
+.mds-select-wrap {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.mds-select-ico {
+  position: absolute;
+  top: 50%;
+  left: 0.85rem;
+  width: 0.85rem;
+  color: #94a3b8;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.mds-select {
+  width: 100%;
+  height: 2.75rem;
+  padding: 0 2.2rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+  background: #fff;
+  font-size: 0.875rem;
+  color: #1e293b;
+  appearance: none;
+}
+
+.mds-select-chevron {
+  position: absolute;
+  top: 50%;
+  right: 0.85rem;
+  width: 0.7rem;
+  color: #94a3b8;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.mds-search {
+  width: 100%;
+  height: 2.75rem;
+  border-radius: 0.85rem;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+</style>

@@ -1,142 +1,96 @@
 <template>
-  <div
-    class="overflow-y-auto flex flex-col justify-center items-center space-y-4 h-full relative">
-    <div class="w-[95%] p-3 h-[10%] bg-white flex flex-col justify-center">
-      <div class="flex justify-start">안녕하세요!</div>
-      <div class="flex items-center">
-        <span class="text-blue-500 text-nowrap text-2xl">{{ StoreName }}</span>
-        &nbsp;&nbsp;&nbsp; 입니다.
+  <div class="home">
+    <div class="home-card home-hello">
+      <div class="home-kicker">안녕하세요</div>
+      <div class="home-name">
+        <span>{{ StoreName }}</span> 입니다.
       </div>
-      <div class="flex justify-end text-gray-500">
-        최신 업데이트 {{ today }}
+      <div class="home-updated">최신 업데이트 {{ today }}</div>
+    </div>
+
+    <div class="home-kpis">
+      <div class="home-card home-kpi">
+        <div class="home-kpi-tag">일매출</div>
+        <div class="home-kpi-sub">전일 {{ lastDaySale }}원</div>
+        <div class="home-kpi-now">{{ todaySale }}원</div>
+      </div>
+      <div class="home-card home-kpi">
+        <div class="home-kpi-tag">주간매출</div>
+        <div class="home-kpi-sub">전주 {{ lastWeekSale }}원</div>
+        <div class="home-kpi-now">{{ WeekSale }}원</div>
+      </div>
+      <div class="home-card home-kpi">
+        <div class="home-kpi-tag">월매출</div>
+        <div class="home-kpi-sub">전월 {{ lastMonthSale }}원</div>
+        <div class="home-kpi-now">{{ MonthSale }}원</div>
       </div>
     </div>
 
-    <div class="h-[12vh] w-[95%] bg-white overflow-visible">
-      <div class="grid grid-rows-2 grid-cols-3 h-full gap-1">
-        <div
-          class="bg-black text-white flex justify-center items-center h-[50%]">
-          일매출
+    <div class="home-diffs">
+      <div class="home-card home-diff">
+        <div>전일대비</div>
+        <div class="home-diff-val" :class="diffClass(difdaySale)">
+          <font-awesome-icon
+            :icon="['fas', 'circle-arrow-up']"
+            v-show="difdaySale > 0" />
+          <font-awesome-icon
+            :icon="['fas', 'circle-arrow-down']"
+            v-show="difdaySale < 0" />
+          {{ difdaySale2 }}
         </div>
-        <div
-          class="bg-black text-white flex justify-center items-center h-[50%]">
-          주간매출
+      </div>
+      <div class="home-card home-diff">
+        <div>전주대비</div>
+        <div class="home-diff-val" :class="diffClass(difweekSale)">
+          <font-awesome-icon
+            :icon="['fas', 'circle-arrow-up']"
+            v-show="difweekSale > 0" />
+          <font-awesome-icon
+            :icon="['fas', 'circle-arrow-down']"
+            v-show="difweekSale < 0" />
+          {{ difweekSale2 }}
         </div>
-        <div
-          class="bg-black text-white flex justify-center items-center h-[50%]">
-          월매출
-        </div>
-        <div class="text-gray-500 h-full -mt-[20%]">
-          전일 / <br />
-          {{ lastDaySale }}원 <br />
-          <div class="text-blue-400">{{ todaySale }}원</div>
-        </div>
-        <div class="text-gray-500 h-full -mt-[20%]">
-          전주 / <br />
-          {{ lastWeekSale }}원 <br />
-          <div class="text-blue-400">{{ WeekSale }}원</div>
-        </div>
-        <div class="text-gray-500 h-full -mt-[20%]">
-          전월 / <br />
-          {{ lastMonthSale }}원 <br />
-          <div class="text-blue-400">{{ MonthSale }}원</div>
+      </div>
+      <div class="home-card home-diff">
+        <div>전월대비</div>
+        <div class="home-diff-val" :class="diffClass(difmonthSale)">
+          <font-awesome-icon
+            :icon="['fas', 'circle-arrow-up']"
+            v-show="difmonthSale > 0" />
+          <font-awesome-icon
+            :icon="['fas', 'circle-arrow-down']"
+            v-show="difmonthSale < 0" />
+          {{ difmonthSale2 }}
         </div>
       </div>
     </div>
 
-    <div class="h-[6%] w-[95%] flex space-x-1">
-      <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white">
-        <div class="flex flex-col h-[10vh]">
-          <div class="flex justify-center text-gray-500 mr-[2vw]">전일대비</div>
-          <div class="pl-1">
-            <font-awesome-icon
-              :icon="['fas', 'circle-arrow-up']"
-              class="text-red-500 size-[3vw]"
-              v-show="difdaySale > 0" /><font-awesome-icon
-              :icon="['fas', 'circle-arrow-down']"
-              class="text-blue-500 size-[3vw]"
-              v-show="difdaySale < 0" />&nbsp;&nbsp;{{ difdaySale2 }}
+    <div class="home-card home-chart">
+      <div class="home-chart-unit">단위 (만원)</div>
+      <div class="home-bars">
+        <div class="home-bar-col">
+          <div class="home-bar-pair">
+            <div class="home-bar is-day is-dim" :style="{ height: prevsaleH }"></div>
+            <div class="home-bar is-day" :style="{ height: nextsaleH }"></div>
           </div>
+          <div class="home-bar-cap">전일 {{ lastDaySale2 }}</div>
+          <div class="home-bar-cap is-now">당일 {{ todaySale2 }}</div>
         </div>
-      </div>
-      <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white">
-        <div class="flex flex-col h-[10vh]">
-          <div class="flex justify-center text-gray-500 mr-[2vw]">전주대비</div>
-          <div class="pl-1">
-            <font-awesome-icon
-              :icon="['fas', 'circle-arrow-up']"
-              class="text-red-500 size-[3vw]"
-              v-show="difweekSale > 0" /><font-awesome-icon
-              :icon="['fas', 'circle-arrow-down']"
-              class="text-blue-500 size-[3vw]"
-              v-show="difweekSale < 0" />&nbsp;&nbsp;{{ difweekSale2 }}
+        <div class="home-bar-col">
+          <div class="home-bar-pair">
+            <div class="home-bar is-week is-dim" :style="{ height: prevWeeksaleH }"></div>
+            <div class="home-bar is-week" :style="{ height: nextWeeksaleH }"></div>
           </div>
+          <div class="home-bar-cap">전주 {{ lastWeekSale2 }}</div>
+          <div class="home-bar-cap is-now">금주 {{ WeekSale2 }}</div>
         </div>
-      </div>
-
-      <div class="grid grid-rows-1 grid-cols-1 w-[33%] bg-white relative">
-        <div class="flex flex-col h-[10vh]">
-          <div class="flex justify-center text-gray-500 mr-[2vw]">전월대비</div>
-          <div class="pl-1">
-            <font-awesome-icon
-              :icon="['fas', 'circle-arrow-up']"
-              class="text-red-500 size-[3vw]"
-              v-show="difmonthSale > 0" /><font-awesome-icon
-              :icon="['fas', 'circle-arrow-down']"
-              class="text-blue-500 size-[3vw]"
-              v-show="difmonthSale < 0" />&nbsp;&nbsp;{{ difmonthSale2 }}
+        <div class="home-bar-col">
+          <div class="home-bar-pair">
+            <div class="home-bar is-month is-dim" :style="{ height: prevMonthsaleH }"></div>
+            <div class="home-bar is-month" :style="{ height: nextMonthsaleH }"></div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="grid grid-rows-1 grid-cols-3 bg-white h-[50%] w-[95%] relative">
-      <div class="flex items-end justify-center space-x-4 h-[90%]">
-        <div
-          class="bg-red-500 opacity-60 w-[10vw] flex relative"
-          :style="{ height: prevsaleH }">
-          <span class="text-black absolute bottom-full mb-1 ml-1">{{
-            lastDaySale2
-          }}</span>
-        </div>
-        <div
-          class="bg-red-500 flex relative w-[10vw]"
-          :style="{ height: nextsaleH }">
-          <span class="text-black absolute bottom-full mb-1 ml-1">{{
-            todaySale2
-          }}</span>
-        </div>
-      </div>
-      <div class="size-[1vw] absolute text-nowrap">단위 (만원)</div>
-      <div class="flex items-end justify-center space-x-4 h-[90%]">
-        <div
-          class="bg-green-500 opacity-60 w-[10vw] flex relative"
-          :style="{ height: prevWeeksaleH }">
-          <span class="text-black absolute bottom-full mb-1 ml-1">{{
-            lastWeekSale2
-          }}</span>
-        </div>
-        <div
-          class="bg-green-500 flex relative w-[10vw]"
-          :style="{ height: nextWeeksaleH }">
-          <span class="text-black absolute bottom-full mb-1 ml-1">{{
-            WeekSale2
-          }}</span>
-        </div>
-      </div>
-      <div class="flex items-end justify-center space-x-4 h-[90%]">
-        <div
-          class="bg-blue-500 opacity-60 w-[10vw] flex relative"
-          :style="{ height: prevMonthsaleH }">
-          <span class="text-black absolute bottom-full mb-1 ml-1">{{
-            lastMonthSale2
-          }}</span>
-        </div>
-        <div
-          class="bg-blue-500 flex w-[10vw] relative"
-          :style="{ height: nextMonthsaleH }">
-          <span class="text-black absolute bottom-full mb-1 ml-1">{{
-            MonthSale2
-          }}</span>
+          <div class="home-bar-cap">전월 {{ lastMonthSale2 }}</div>
+          <div class="home-bar-cap is-now">당월 {{ MonthSale2 }}</div>
         </div>
       </div>
     </div>
@@ -195,6 +149,8 @@ const difweekSale = ref(0);
 const difweekSale2 = ref(0);
 const difmonthSale = ref(0);
 const difmonthSale2 = ref(0);
+const diffClass = (value) =>
+  Number(value) > 0 ? "is-up" : Number(value) < 0 ? "is-down" : "";
 const isMobile = store.state.isMobile;
 const StoreName = ref("");
 const today = ref(formatLocalDate2(new Date()));
@@ -299,4 +255,166 @@ onMounted(async () => {
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.home {
+  min-height: 100%;
+  padding: 4.2rem 0.75rem 5.5rem;
+  background: #f8fafc;
+}
+
+.home-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+}
+
+.home-hello {
+  padding: 1rem 1rem 0.85rem;
+}
+
+.home-kicker {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.home-name {
+  margin-top: 0.2rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.home-name span {
+  color: #3b82f6;
+}
+
+.home-updated {
+  margin-top: 0.45rem;
+  text-align: right;
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.home-kpis,
+.home-diffs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+}
+
+.home-kpi,
+.home-diff {
+  padding: 0.7rem 0.45rem 0.65rem;
+}
+
+.home-kpi-tag {
+  display: inline-flex;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.home-kpi-sub {
+  margin-top: 0.45rem;
+  font-size: 0.62rem;
+  line-height: 1.25;
+  color: #94a3b8;
+  word-break: keep-all;
+}
+
+.home-kpi-now {
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #3b82f6;
+  word-break: break-all;
+}
+
+.home-diff {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.home-diff-val {
+  margin-top: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #334155;
+  word-break: break-all;
+}
+
+.home-diff-val.is-up {
+  color: #ef4444;
+}
+
+.home-diff-val.is-down {
+  color: #3b82f6;
+}
+
+.home-chart {
+  margin-top: 0.65rem;
+  padding: 0.85rem 0.5rem 0.75rem;
+}
+
+.home-chart-unit {
+  margin-bottom: 0.35rem;
+  padding-left: 0.35rem;
+  font-size: 0.68rem;
+  color: #94a3b8;
+}
+
+.home-bars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.25rem;
+}
+
+.home-bar-pair {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.45rem;
+  height: 9.5rem;
+}
+
+.home-bar {
+  width: 1.35rem;
+  min-height: 4px;
+  border-radius: 0.45rem 0.45rem 0.2rem 0.2rem;
+}
+
+.home-bar.is-day {
+  background: #ef4444;
+}
+
+.home-bar.is-week {
+  background: #22c55e;
+}
+
+.home-bar.is-month {
+  background: #3b82f6;
+}
+
+.home-bar.is-dim {
+  opacity: 0.45;
+}
+
+.home-bar-cap {
+  margin-top: 0.35rem;
+  text-align: center;
+  font-size: 0.68rem;
+  color: #94a3b8;
+}
+
+.home-bar-cap.is-now {
+  margin-top: 0.1rem;
+  font-weight: 700;
+  color: #334155;
+}
+</style>

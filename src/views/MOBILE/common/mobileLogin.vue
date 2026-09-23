@@ -5,18 +5,19 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div class="flex items-center justify-center h-screen bg-slate-100">
+  <div class="flex items-center justify-center h-screen bg-slate-100 px-5">
     <loading></loading>
-    <!-- <div><img class="mr-20 size-4/5" src="../assets/login_visual.png" alt=""></div> -->
-    <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
-      <h1
-        class="text-2xl font-bold text-center mb-6 text-blue-600 flex justify-center">
-        PNC Office
-      </h1>
+    <div class="bg-white p-7 rounded-3xl shadow-lg max-w-sm w-full border border-slate-100">
+      <div class="mb-6 flex justify-center">
+        <img
+          :src="loginLogo"
+          alt="PNC Office"
+          class="w-full max-w-[152px]" />
+      </div>
 
       <form @submit.prevent="login2">
         <div class="mb-4">
-          <label for="username" class="block text-gray-700 font-medium mb-2"
+          <label for="username" class="block text-slate-600 text-sm font-medium mb-2"
             >아이디</label
           >
           <input
@@ -25,78 +26,81 @@
             v-model="username"
             placeholder="아이디를 입력하세요"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
             @keyup.enter="login2" />
         </div>
 
         <div class="mb-6">
-          <label for="password" class="block text-gray-700 font-medium mb-2"
+          <label for="password" class="block text-slate-600 text-sm font-medium mb-2"
             >비밀번호</label
           >
-          <input
-            :type="passwordVisible ? 'text' : 'password'"
-            id="password"
-            v-model="password"
-            placeholder="비밀번호를 입력하세요"
-            required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            @keyup.enter="login2" />
-          <button
-            type="button"
-            class="absolute right-14 mt-2"
-            @click="showPassword">
-            {{ passwordVisible ? "숨기기" : "보기" }}
-          </button>
+          <div class="relative">
+            <input
+              :type="passwordVisible ? 'text' : 'password'"
+              id="password"
+              v-model="password"
+              placeholder="비밀번호를 입력하세요"
+              required
+              class="w-full px-3 py-2.5 pr-16 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              @keyup.enter="login2" />
+            <button
+              type="button"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-blue-500"
+              @click="showPassword">
+              {{ passwordVisible ? "숨기기" : "보기" }}
+            </button>
+          </div>
         </div>
 
         <button
           type="submit"
-          class="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          class="w-full py-2.5 px-4 bg-blue-500 text-white font-semibold rounded-xl shadow-md">
           로그인
         </button>
       </form>
-      <div class="flex justify-start items-center space-x-2 mt-3">
-        <input
-          type="checkbox"
-          id="saveId"
-          v-model="saveID"
-          class="form-checkbox h-6 w-6 text-blue-500 rounded-full" />
-
-        <label for="saveId" class="cursor-pointer text-gray-700"
-          >아이디 저장</label
-        >
-        <div><button @click="showCustomorCenter">| 고객센터</button></div>
+      <div class="mt-4 flex items-center justify-between text-sm">
+        <label for="saveId" class="flex cursor-pointer items-center gap-2 text-slate-600">
+          <input
+            type="checkbox"
+            id="saveId"
+            v-model="saveID"
+            class="form-checkbox h-4 w-4 text-blue-500" />
+          아이디 저장
+        </label>
+        <button type="button" class="font-semibold text-blue-500" @click="showCustomorCenter">
+          고객센터
+        </button>
       </div>
-      <p class="mt-4 text-center text-gray-600">{{ message }}</p>
+      <p class="mt-4 text-center text-sm text-slate-500">{{ message }}</p>
     </div>
   </div>
 
   <div
-    class="absolute z-50 top-[30%] left-[5%] w-[90%] h-[70%]"
-    v-if="showPopUp">
-    <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
-      <h1
-        class="text-2xl font-bold text-center mb-6 text-blue-600 flex justify-center">
-        고객센터
-      </h1>
-      <div class="text-xl">
-        비밀번호 찾기 및 기타 문의사항은 <br />아래 고객센터로 문의해 주시기
-        바랍니다.
+    class="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 px-4 pb-8"
+    v-if="showPopUp"
+    @click.self="
+      showPopUp = false;
+      disableBg();
+    ">
+    <div class="w-full max-w-sm rounded-3xl bg-white p-6 shadow-xl">
+      <h1 class="mb-3 text-center text-lg font-bold text-slate-800">고객센터</h1>
+      <p class="text-sm leading-6 text-slate-600">
+        비밀번호 찾기 및 기타 문의사항은 아래 고객센터로 문의해 주시기 바랍니다.
+      </p>
+      <div class="mt-4 space-y-1 text-sm text-slate-700">
+        <div>대표 번호 02-1588-7443</div>
+        <div>대표 메일 customer@pncworld.com</div>
+        <div class="text-slate-400">연중 무휴 09:00 ~ 21:00</div>
       </div>
-
-      <div class="text-sm mt-3">
-        대표 번호 : 02-1588-7443 <br />대표 메일 : customer@pncworld.com
-      </div>
-      <div class="text-sm mt-3">연중 무휴 09:00 ~ 21:00</div>
-      <div class="flex justify-center items-center space-x-2 mt-3">
-        <button
-          @click="
-            showPopUp = false;
-            disableBg();
-          ">
-          닫기
-        </button>
-      </div>
+      <button
+        type="button"
+        class="mt-5 h-11 w-full rounded-xl bg-blue-500 font-semibold text-white"
+        @click="
+          showPopUp = false;
+          disableBg();
+        ">
+        닫기
+      </button>
     </div>
   </div>
 </template>
@@ -105,6 +109,7 @@
 import { alreadyMobileLogined } from "@/api/common";
 import { getMobileProgList, mobileLogin } from "@/api/mobile";
 import loading from "@/components/loading.vue";
+import loginLogo from "@/assets/images/pncoffice_logo.png";
 /*
  * 공통 표준  Function
  */

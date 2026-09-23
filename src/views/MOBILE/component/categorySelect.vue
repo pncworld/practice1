@@ -5,18 +5,14 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div
-    class="w-[100vw] h-[9vh] absolute top-[6vh] bg-black grid grid-rows-1 grid-cols-[4fr,1fr]">
-    <div class="flex flex-col items-center justify-center">
-      <div class="text-sm text-white text-nowrap">{{ selectedStoreName }}</div>
-    </div>
-    <div class="flex flex-col items-center justify-center bg-blue-500">
-      <button @click="showStoreAndDate">
-        <font-awesome-icon
-          :icon="['fas', 'sliders']"
-          class="text-white size-10" />
-      </button>
-    </div>
+  <div class="cat-bar">
+    <button type="button" class="cat-summary" @click="showStoreAndDate">
+      <font-awesome-icon :icon="['fas', 'store']" class="cat-ico" />
+      <span class="truncate">{{ selectedStoreName }}</span>
+      <span class="cat-filter">
+        <font-awesome-icon :icon="['fas', 'sliders']" />
+      </span>
+    </button>
   </div>
   <div
     class="bg-white absolute top-0 text-black w-full h-[50vh] mt-[6vh]"
@@ -323,4 +319,54 @@ watch(
 );
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.cat-bar {
+  position: absolute;
+  top: 3.25rem;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 9vh;
+  padding: 0 0.75rem;
+}
+
+.cat-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  height: 7.2vh;
+  padding: 0 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+  color: #1e293b;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.cat-summary span.truncate {
+  min-width: 0;
+  flex: 1;
+}
+
+.cat-ico {
+  color: #3b82f6;
+}
+
+.cat-filter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.75rem;
+  background: #eff4ff;
+  color: #3b82f6;
+  flex-shrink: 0;
+}
+</style>

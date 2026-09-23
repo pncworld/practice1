@@ -29,7 +29,10 @@ onMounted(() => {
 });
 
 watch(route, () => {
-  if (route.fullPath.includes("VUEPOS")) {
+  if (
+    route.fullPath.includes("VUEPOS") &&
+    !route.fullPath.startsWith("/m")
+  ) {
     exception.value = true;
   } else {
     exception.value = false;

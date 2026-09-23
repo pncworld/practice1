@@ -1,81 +1,66 @@
 <template>
-  <div
-    class="flex fixed top-0 w-full bg-white z-10 space-x-0 border border-gray-100 justify-between"
-    v-show="showMenu2">
-    <div class="flex">
-      <button @click="showTotalMenu" v-if="clickIcon != 4">
-        <font-awesome-icon :icon="['fas', 'bars']" class="size-8 mt-2 ml-5" />
+  <div class="m-top" v-show="showMenu2">
+    <div class="m-top-left">
+      <button type="button" class="m-icon-btn" @click="showTotalMenu" v-if="clickIcon != 4">
+        <font-awesome-icon :icon="['fas', 'bars']" />
       </button>
-
-      <button @click="moveBack" v-if="clickIcon == 4">
-        <font-awesome-icon
-          :icon="['fas', 'angle-left']"
-          class="size-8 mt-2 ml-5" />
+      <button type="button" class="m-icon-btn" @click="moveBack" v-if="clickIcon == 4">
+        <font-awesome-icon :icon="['fas', 'angle-left']" />
       </button>
-      <div
-        v-if="clickIcon == 2 && showInputBox == false"
-        class="flex justify-center items-center ml-[2vw] text-xl font-semibold">
-        공지사항
-      </div>
-      <div
-        v-if="clickIcon == 3"
-        class="flex justify-center items-center ml-[2vw] text-xl font-semibold">
-        매출조회
-      </div>
-      <div
-        v-if="clickIcon == 0"
-        class="flex justify-center items-center ml-[2vw] text-xl font-semibold">
-        {{ selectedProgName }}
-      </div>
-      <div
-        v-if="clickIcon == 4"
-        class="flex justify-center items-center ml-[2vw] text-xl font-semibold"></div>
-      <div
-        v-if="showInputBox"
-        class="flex justify-center items-center ml-[2vw] text-xl font-semibold">
+      <div v-if="clickIcon == 2 && showInputBox == false" class="m-title">공지사항</div>
+      <div v-if="clickIcon == 3" class="m-title">매출조회</div>
+      <div v-if="clickIcon == 5" class="m-title">발주관리</div>
+      <div v-if="clickIcon == 0" class="m-title">{{ selectedProgName }}</div>
+      <div v-if="showInputBox" class="m-title">
         <input
           type="text"
           @keydown.enter="searchNotice2"
           v-model="searchWord"
-          class="border border-gray-500 rounded-lg h-6 pl-1" />
+          class="m-search"
+          placeholder="검색" />
       </div>
     </div>
     <div>
-      <button @click="reload" v-if="clickIcon == 1 || clickIcon == 0">
-        <font-awesome-icon
-          :icon="['fas', 'rotate-right']"
-          class="size-8 mt-2 mr-5" />
+      <button type="button" class="m-icon-btn" @click="reload" v-if="clickIcon == 1 || clickIcon == 0">
+        <font-awesome-icon :icon="['fas', 'rotate-right']" />
       </button>
-      <button @click="searchNotice" v-if="clickIcon == 2">
-        <font-awesome-icon
-          :icon="['fas', 'magnifying-glass']"
-          class="size-8 mt-2 mr-5" />
+      <button type="button" class="m-icon-btn" @click="searchNotice" v-if="clickIcon == 2">
+        <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
       </button>
     </div>
   </div>
-  <div
-    class="flex justify-center fixed bottom-0 w-full bg-white z-10 space-x-0 border border-gray-100"
-    v-show="showMenu">
+  <div class="m-tab" v-show="showMenu">
     <button
+      type="button"
       @click="showHomePage"
-      class="w-1/3 bg-white"
-      :class="{ '!bg-blue-500 text-white': clickIcon == 1 }">
-      <font-awesome-icon icon="house" class="size-8" />
-      <div class="text-xs">홈</div>
+      class="m-tab-btn"
+      :class="{ 'is-on': clickIcon == 1 }">
+      <font-awesome-icon icon="house" />
+      <div>홈</div>
     </button>
     <button
+      type="button"
       @click="showMobileNotice"
-      class="w-1/3 bg-white"
-      :class="{ '!bg-blue-500 text-white': clickIcon == 2 }">
-      <font-awesome-icon :icon="['far', 'bell']" class="size-8" />
-      <div class="text-xs">공지사항</div>
+      class="m-tab-btn"
+      :class="{ 'is-on': clickIcon == 2 }">
+      <font-awesome-icon :icon="['far', 'bell']" />
+      <div>공지사항</div>
     </button>
     <button
+      type="button"
       @click="showMobilePersonal"
-      class="w-1/3 bg-white"
-      :class="{ '!bg-blue-500 text-white': clickIcon == 3 }">
-      <font-awesome-icon :icon="['far', 'calendar-days']" class="size-8" />
-      <div class="text-xs">매출조회</div>
+      class="m-tab-btn"
+      :class="{ 'is-on': clickIcon == 3 }">
+      <font-awesome-icon :icon="['far', 'calendar-days']" />
+      <div>매출조회</div>
+    </button>
+    <button
+      type="button"
+      @click="showMobileOrder"
+      class="m-tab-btn"
+      :class="{ 'is-on': clickIcon == 5 }">
+      <font-awesome-icon :icon="['fas', 'cart-shopping']" />
+      <div>발주관리</div>
     </button>
   </div>
 </template>
@@ -124,6 +109,7 @@ const mobileMenu = ref(false);
 const showMenu = ref(false);
 const showMenu2 = ref(false);
 const personal = ref(false);
+const orderMenu = ref(false);
 
 const route = useRoute();
 watch(route, () => {
@@ -152,6 +138,7 @@ onMounted(() => {
 const emit = defineEmits([
   "showNotice",
   "showpersonal",
+  "showorder",
   "showHomepage",
   "showMenu3",
   "changeIconValue",
@@ -202,9 +189,9 @@ watch(
   () => props.changeSalesIconState,
   () => {
     personal.value = false;
+    orderMenu.value = false;
   }
 );
-
 const showMobileNotice = () => {
   if (mobileMenu.value) {
     clickIcon.value = 0;
@@ -215,7 +202,9 @@ const showMobileNotice = () => {
 
   emit("showNotice", mobileMenu.value);
   personal.value = false;
+  orderMenu.value = false;
   emit("showpersonal", personal.value);
+  emit("showorder", orderMenu.value);
   emit("showHomepage", false);
 };
 const showMobilePersonal = () => {
@@ -228,8 +217,26 @@ const showMobilePersonal = () => {
   mobileMenu.value = false;
   emit("showNotice", mobileMenu.value);
   personal.value = !personal.value;
+  orderMenu.value = false;
   showInputBox.value = false;
   emit("showpersonal", personal.value);
+  emit("showorder", orderMenu.value);
+  emit("showHomepage", false);
+};
+const showMobileOrder = () => {
+  if (orderMenu.value) {
+    clickIcon.value = 0;
+  } else {
+    clickIcon.value = 5;
+  }
+
+  mobileMenu.value = false;
+  emit("showNotice", mobileMenu.value);
+  personal.value = false;
+  orderMenu.value = !orderMenu.value;
+  showInputBox.value = false;
+  emit("showpersonal", personal.value);
+  emit("showorder", orderMenu.value);
   emit("showHomepage", false);
 };
 const showHomePage = () => {
@@ -238,7 +245,9 @@ const showHomePage = () => {
   showInputBox.value = false;
   emit("showNotice", mobileMenu.value);
   personal.value = false;
+  orderMenu.value = false;
   emit("showpersonal", personal.value);
+  emit("showorder", orderMenu.value);
   router.push("/m/homePage");
 };
 
@@ -291,4 +300,90 @@ watch(
 );
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.m-top {
+  position: fixed;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 3.25rem;
+  padding: 0 0.75rem;
+  background: #fff;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.m-top-left {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 0.35rem;
+}
+
+.m-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.75rem;
+  color: #334155;
+  font-size: 1.15rem;
+}
+
+.m-title {
+  max-width: 62vw;
+  overflow: hidden;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.m-search {
+  width: 52vw;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: #f8fafc;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.m-tab {
+  position: fixed;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  width: 100%;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #fff;
+  border-top: 1px solid #eef2f6;
+  box-shadow: 0 -6px 16px rgba(15, 23, 42, 0.04);
+}
+
+.m-tab-btn {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  height: 3.6rem;
+  color: #94a3b8;
+  font-size: 1.15rem;
+}
+
+.m-tab-btn div {
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.m-tab-btn.is-on {
+  color: #3b82f6;
+}
+</style>

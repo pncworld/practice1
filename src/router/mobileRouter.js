@@ -13,6 +13,7 @@ import TableReport from "@/views/MOBILE/sales/tableReport.vue";
 import TaxReport from "@/views/MOBILE/sales/taxReport.vue";
 import CategoryManage from "@/views/MOBILE/tablepos/categoryManage.vue";
 import MenuSoldOut from "@/views/MOBILE/tablepos/menuSoldOut.vue";
+import STK01_011INS_01 from "@/views/MOBILE/stock/STK01_011INS_01.vue";
 import mobileMaster from "./mobileMaster";
 import mobileSales from "./mobileSales";
 import SalesbyCornerMenu from "@/views/MOBILE/sales/SalesbyCornerMenu.vue";
@@ -123,6 +124,14 @@ export default function mobileRouter() {
       path: "50002",
       //component : BasicLayout ,
       component: MenuSoldOut,
+    },
+    {
+      path: "30011",
+      component: STK01_011INS_01,
+    },
+    {
+      path: "STK01_011INS_01.xml",
+      component: STK01_011INS_01,
     },
   ];
 }

@@ -13,9 +13,9 @@
     <Loading2></Loading2>
     <Inactive></Inactive>
     <main
-      class="h-screen overflow-y-auto bg-gray-100"
+      class="h-screen overflow-y-auto bg-slate-50"
       ref="scrollContainer"
-      v-show="!(notice || personal)">
+      v-show="!(notice || personal || order)">
       <router-view v-slot="{ Component, route }" class="mt-1">
         <component
           :is="Component"
@@ -23,89 +23,73 @@
           id="content"></component>
       </router-view>
     </main>
-    <div
-      class="flex flex-col gap-0 w-full items-center justify-center mr-0 h-auto mt-10"
-      v-show="notice">
-      <!-- <div class="flex justify-end w-full mr-4">
-            <button class="text-3xl" @click="showNotice(false)">
-              <font-awesome-icon icon="xmark" />
-            </button>
-          </div> -->
+    <div class="m-panel" v-show="notice">
       <div
         v-show="!showDetailNotice"
         @scroll="handleScroll2"
         ref="scrollArea"
         class="overflow-y-auto">
-        <div
-          class="absolute top-[20vh] left-[35vw] flex justify-center items-center w-auto"
-          v-if="blnNoticeList">
-          공지사항이 없습니다.
-        </div>
+        <div class="m-empty" v-if="blnNoticeList">공지사항이 없습니다.</div>
 
-        <div class="p-2 space-y-2" v-if="!blnNoticeList">
+        <div class="m-list" v-if="!blnNoticeList">
           <div
             v-for="I in notices"
+            :key="I.NOTICE_ID"
             @click="showNoticeDetail(I.NOTICE_ID)"
-            :class="I.READ_YN == 1 ? 'opacity-50' : ''"
-            class="bg-white shadow-md rounded-2xl p-2 border border-gray-100">
-            <h5
-              class="text-lg text-gray-800 mb-2 text-left flex justify-between"></h5>
-            <h2
-              class="text-lg font-semibold text-gray-800 mb-2 flex justify-center">
-              <div class="bg-red-600 text-white rounded-lg">
-                {{ I.IMPORTANT_YN == "1" ? "중요" : "" }}
-              </div>
-              <div>{{ I.TITLE_NM }}</div>
-            </h2>
-            <p class="text-sm text-gray-600 line-clamp-2 text-right">
-              작성자 : {{ I.WRITER_NM }}
-            </p>
-            <div class="text-xs text-gray-400 mt-2 text-right">
-              {{ I.WRITE_DT }} / 조회수 : {{ I.READ_CNT }}
+            :class="I.READ_YN == 1 ? 'is-read' : ''"
+            class="m-notice">
+            <div class="m-notice-title">
+              <span v-if="I.IMPORTANT_YN == '1'" class="m-badge">중요</span>
+              <span>{{ I.TITLE_NM }}</span>
+            </div>
+            <div class="m-notice-meta">{{ I.WRITER_NM }}</div>
+            <div class="m-notice-sub">
+              {{ I.WRITE_DT }} · 조회 {{ I.READ_CNT }}
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div v-if="personal" class="h-[120%] w-full items-center relative">
-      <div
-        class="flex flex-col h-full w-full space-y-3 justify-center items-center mt-[10%]">
-        <div
+    <div v-if="personal" class="m-panel">
+      <div class="m-list">
+        <button
           v-for="(i, index) in salesMenus"
-          @click="movePage(i.code, i.name)"
-          class="text-xl text-nowrap w-[95vw] h-[10%] flex justify-center items-center border"
-          :class="index % 2 == 1 ? 'bg-white' : 'bg-gray-200'">
-          <button>{{ i.name }}</button>
-        </div>
+          :key="i.code || index"
+          type="button"
+          class="m-menu"
+          @click="movePage(i.code, i.name)">
+          <span>{{ i.name }}</span>
+          <font-awesome-icon :icon="['fas', 'chevron-right']" />
+        </button>
       </div>
     </div>
-    <div v-if="showDetailNotice" class="h-full">
-      <div class="min-h-screen bg-gray-50">
-        <!-- 제목 -->
-        <h1 class="text-2xl font-bold text-gray-900 mb-4 text-left pl-5 pt-5">
-          {{ DetailNotice.TITLE_NM }}
-        </h1>
-
-        <!-- 작성 정보 -->
-        <div
-          class="text-sm text-gray-500 mb-6 flex flex-col space-y-1 text-left pl-5">
-          <div><strong>작성자:</strong> {{ DetailNotice.WRITER_NM }}</div>
-          <div class="flex w-full items-center">
-            <strong>작성일:</strong> {{ DetailNotice.WRITE_DT }}
-            <span class="mx-2">|</span>
-            <strong>조회수:</strong> {{ DetailNotice.READ_CNT }}
-            <button class="text-blue-500 ml-auto mr-5" @click="downloadFile">
-              첨부파일({{ downloadFileLeng }})
-            </button>
-          </div>
+    <div v-if="order" class="m-panel">
+      <div class="m-list">
+        <button
+          v-for="(i, index) in orderMenus"
+          :key="i.code || index"
+          type="button"
+          class="m-menu"
+          @click="movePage(i.code, i.name)">
+          <span>{{ i.name }}</span>
+          <font-awesome-icon :icon="['fas', 'chevron-right']" />
+        </button>
+      </div>
+    </div>
+    <div v-if="showDetailNotice" class="m-detail">
+      <h1>{{ DetailNotice.TITLE_NM }}</h1>
+      <div class="m-detail-meta">
+        <div>작성자 {{ DetailNotice.WRITER_NM }}</div>
+        <div class="m-detail-row">
+          <span>{{ DetailNotice.WRITE_DT }} · 조회 {{ DetailNotice.READ_CNT }}</span>
+          <button type="button" @click="downloadFile">
+            첨부 {{ downloadFileLeng }}
+          </button>
         </div>
-
-        <!-- 본문 -->
-        <div
-          class="bg-white rounded-xl shadow-sm text-gray-800 whitespace-pre-line h-full w-full min-h-[500px]">
-          <div v-html="DetailNotice.NOTICE_CT" class="h-full text-left"></div>
-        </div>
+      </div>
+      <div class="m-detail-body">
+        <div v-html="DetailNotice.NOTICE_CT"></div>
       </div>
     </div>
   </div>
@@ -113,13 +97,15 @@
     v-show="showTotalMenu"
     @MenuState="MenuState"
     @showNotice="showNotice2"
-    @SalesMenus="SalesMenus"></MobileTotalMenu>
+    @SalesMenus="SalesMenus"
+    @OrderMenus="OrderMenus"></MobileTotalMenu>
   <MobileMenu
     ref="stickyElement"
     id="stickyElement"
     v-if="showMobileMenu"
     @showNotice="showNotice"
     @showpersonal="showpersonal"
+    @showorder="showorder"
     @showMenu3="showMenu3"
     @changeIconValue="changeIconValue"
     @searchword="searchword"
@@ -154,14 +140,19 @@ const store = useStore();
 const notice = ref(false);
 const isMenu2 = ref(false);
 const personal = ref(false);
+const order = ref(false);
 const showMobileMenu = ref(true);
 const clickthismenu = ref([]);
 const route = useRoute();
 const blnNoticeList = ref(true);
 const salesMenus = ref([]);
+const orderMenus = ref([]);
 const SalesMenus = (e) => {
   //comsole.log(e);
   salesMenus.value = e;
+};
+const OrderMenus = (e) => {
+  orderMenus.value = e;
 };
 
 const changeMenuState = ref(false);
@@ -169,6 +160,7 @@ const MenuState = (e) => {
   showTotalMenu.value = e;
   notice.value = e;
   personal.value = e;
+  order.value = e;
 };
 const showNotice = async (value) => {
   notice.value = value;
@@ -200,6 +192,9 @@ const showNotice2 = (e) => {
 };
 const showpersonal = (value) => {
   personal.value = value;
+};
+const showorder = (value) => {
+  order.value = value;
 };
 
 const showTotalMenu = ref(false);
@@ -527,10 +522,138 @@ const movePage = async (e, e2) => {
   store.dispatch("saveMobileProgName", e2);
   changeIcon.value = 0;
   personal.value = false;
+  order.value = false;
   changeSalesIconState.value = !changeSalesIconState.value;
   notice.value = false;
   router.push(`/m/${e}`);
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.m-panel {
+  min-height: 100%;
+  padding: 4.2rem 0.75rem 5.5rem;
+  background: #f8fafc;
+}
+
+.m-empty {
+  padding: 4rem 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.m-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.m-notice,
+.m-menu {
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.m-notice {
+  padding: 0.9rem 1rem;
+  text-align: left;
+}
+
+.m-notice.is-read {
+  opacity: 0.55;
+}
+
+.m-notice-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.m-badge {
+  flex-shrink: 0;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.65rem;
+}
+
+.m-notice-meta {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.m-notice-sub {
+  margin-top: 0.15rem;
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.m-menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.95rem 1rem;
+  color: #1e293b;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.m-menu svg {
+  color: #cbd5e1;
+  font-size: 0.75rem;
+}
+
+.m-detail {
+  min-height: 100%;
+  padding: 4.2rem 0 5.5rem;
+  background: #f8fafc;
+}
+
+.m-detail h1 {
+  padding: 0.25rem 1.1rem 0.6rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  text-align: left;
+}
+
+.m-detail-meta {
+  padding: 0 1.1rem 0.9rem;
+  font-size: 0.8rem;
+  color: #64748b;
+  text-align: left;
+}
+
+.m-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+}
+
+.m-detail-row button {
+  color: #3b82f6;
+  font-weight: 700;
+}
+
+.m-detail-body {
+  min-height: 24rem;
+  margin: 0 0.75rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #fff;
+  color: #334155;
+  text-align: left;
+  white-space: pre-line;
+}
+</style>

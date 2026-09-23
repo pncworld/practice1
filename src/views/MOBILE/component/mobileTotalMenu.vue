@@ -5,81 +5,61 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div
-    class="h-screen top-0 fixed w-64 z-[60] bg-white overflow-y-auto overflow-x-hidden">
-    <div class="flex justify-center items-center mr-5 mt-[5%]">
-      <img src="../../../assets/pnc_mobile_logo.png" alt="" />
+  <div class="side">
+    <div class="side-logo">
+      <img src="../../../assets/pnc_mobile_logo.png" alt="PNC Office" />
     </div>
-    <div class="grid grid-rows-3 h-60 border w-full mt-[5%]">
-      <div
-        class="bg-blue-500 text-white text-2xl flex justify-center items-center h-auto">
-        {{ StoreName }}
-      </div>
-      <div class="h-full w-full border border-gray-200">
-        <button
-          class="h-full w-full flex justify-start items-center ml-[10%]"
-          @click="showHome">
-          <font-awesome-icon icon="house" class="size-8" />
-          <div class="text-xl mt-1 ml-4">홈</div>
-        </button>
-      </div>
-      <div class="h-full w-full border border-gray-200">
-        <button
-          class="h-full w-full flex justify-start items-center ml-[10%]"
-          @click="showNotice">
-          <font-awesome-icon :icon="['far', 'bell']" class="size-8" />
-          <div class="text-xl mt-1 ml-4">공지사항</div>
-        </button>
-      </div>
-    </div>
-    <div
-      class="w-64 bg-white rounded-lg overflow-y-auto mb-14"
-      style="max-height: 80vh">
-      <ul
-        v-for="(i, index) in menuItems"
-        :key="index"
-        class="border-b-2 border-l-2 border-r-2 border-gray-200">
-        <li>
-          <button
-            class="w-full flex justify-start pl-6 items-center py-4 px-3 h-20"
-            @click="toggleSubMenu(index)">
-            <font-awesome-icon
-              :icon="['far', 'calendar-days']"
-              class="size-8"
-              v-if="i.mainCode == 20" />
-            <img
-              v-if="i.mainCode == 50"
-              src="../../../assets/tablet-screen-button-solid.svg"
-              alt=""
-              class="size-8" />
-            <div class="text-xl ml-4">{{ i.title }}</div>
-          </button>
+    <div class="side-store">{{ StoreName }}</div>
+    <button type="button" class="side-link" @click="showHome">
+      <font-awesome-icon icon="house" />
+      <span>홈</span>
+    </button>
+    <button type="button" class="side-link" @click="showNotice">
+      <font-awesome-icon :icon="['far', 'bell']" />
+      <span>공지사항</span>
+    </button>
 
-          <ul
-            v-if="i.isOpen"
-            class="ml-8 mb-2 bg-white p-2 rounded-md transition-all duration-300">
-            <li v-for="(subItem, subIndex) in i.children" :key="subIndex">
-              <button
-                class="w-full text-lg px-4 py-2 bg-white rounded-md hover:bg-gray-100 flex justify-start text-nowrap"
-                @click="moveProgram(subItem.code, subItem.name)">
-                {{ subItem.name }}
-              </button>
-            </li>
-          </ul>
-        </li>
-      </ul>
+    <div class="side-scroll">
+      <div v-for="(i, index) in menuItems" :key="index" class="side-group">
+        <button type="button" class="side-link" @click="toggleSubMenu(index)">
+          <font-awesome-icon
+            :icon="['far', 'calendar-days']"
+            v-if="i.mainCode == 20" />
+          <font-awesome-icon
+            :icon="['fas', 'cart-shopping']"
+            v-if="i.mainCode == 30" />
+          <img
+            v-if="i.mainCode == 50"
+            src="../../../assets/tablet-screen-button-solid.svg"
+            alt=""
+            class="side-img" />
+          <span>{{ i.title }}</span>
+          <font-awesome-icon
+            class="side-chevron"
+            :icon="['fas', i.isOpen ? 'chevron-up' : 'chevron-down']" />
+        </button>
+        <div v-if="i.isOpen" class="side-sub">
+          <button
+            v-for="(subItem, subIndex) in i.children"
+            :key="subIndex"
+            type="button"
+            class="side-sub-btn"
+            @click="moveProgram(subItem.code, subItem.name)">
+            {{ subItem.name }}
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="fixed bottom-0 w-64 justify-between flex">
-      <div
-        class="w-1/2 bg-gray-200 text-gray-600 h-14 flex justify-center items-center">
-        <font-awesome-icon :icon="['fas', 'gear']" />설정
+
+    <div class="side-foot">
+      <div class="side-foot-btn">
+        <font-awesome-icon :icon="['fas', 'gear']" />
+        설정
       </div>
-      <div
-        class="w-1/2 bg-gray-200 text-gray-600 h-14 flex justify-center items-center"
-        @click="logout">
-        <font-awesome-icon
-          :icon="['fas', 'arrow-right-from-bracket']" />로그아웃
-      </div>
+      <button type="button" class="side-foot-btn side-foot-out" @click="logout">
+        <font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']" />
+        로그아웃
+      </button>
     </div>
   </div>
 </template>
@@ -140,6 +120,7 @@ const menuItems = ref([
       { code: 30004, name: "매입확정" },
       { code: 30005, name: "반품조회" },
       { code: 30006, name: "반품등록" },
+      { code: 30011, name: "청구 등록" },
       { code: 30500, name: "주문수정" },
       { code: 30501, name: "반품삭제" },
     ],
@@ -194,6 +175,7 @@ const menuItems2 = ref([
       { code: 30004, name: "매입확정" },
       { code: 30005, name: "반품조회" },
       { code: 30006, name: "반품등록" },
+      { code: 30011, name: "청구 등록" },
       { code: 30500, name: "주문수정" },
       { code: 30501, name: "반품삭제" },
     ],
@@ -215,7 +197,7 @@ const toggleSubMenu = (e) => {
 
 const groupMenu = ref([]);
 
-const emit = defineEmits(["MenuState", "SalesMenus", "showNotice"]);
+const emit = defineEmits(["MenuState", "SalesMenus", "OrderMenus", "showNotice"]);
 watch(
   () => store.state.mobileCategory,
   () => {
@@ -238,8 +220,15 @@ watch(
     }));
 
     //comsole.log(menuItems.value);
-    if (menuItems.value[0]) {
+    const salesItem = menuItems.value.find((item) => item.mainCode == 20);
+    const orderItem = menuItems.value.find((item) => item.mainCode == 30);
+    if (salesItem) {
+      emit("SalesMenus", salesItem.children);
+    } else if (menuItems.value[0]) {
       emit("SalesMenus", menuItems.value[0].children);
+    }
+    if (orderItem) {
+      emit("OrderMenus", orderItem.children);
     }
   },
   { immediate: true } // 새로고침할때 반응해주게 하는 설정
@@ -297,4 +286,117 @@ const logout = () => {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.side {
+  position: fixed;
+  top: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  width: 17rem;
+  height: 100%;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 8px 0 24px rgba(15, 23, 42, 0.12);
+}
+
+.side-logo {
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 1rem 0.75rem;
+}
+
+.side-logo img {
+  max-width: 9rem;
+}
+
+.side-store {
+  margin: 0 0.85rem 0.5rem;
+  padding: 0.85rem 0.5rem;
+  border-radius: 1rem;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.side-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 4.5rem;
+}
+
+.side-group {
+  border-top: 1px solid #f1f5f9;
+}
+
+.side-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.95rem 1.1rem;
+  color: #1e293b;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.side-link svg,
+.side-img {
+  width: 1.15rem;
+  color: #3b82f6;
+}
+
+.side-chevron {
+  margin-left: auto;
+  width: 0.7rem !important;
+  color: #94a3b8 !important;
+}
+
+.side-sub {
+  padding: 0 0.75rem 0.6rem 2.4rem;
+}
+
+.side-sub-btn {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.7rem;
+  color: #475569;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.side-sub-btn:active {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.side-foot {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  width: 100%;
+  border-top: 1px solid #eef2f6;
+  background: #fff;
+}
+
+.side-foot-btn {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  height: 3.25rem;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.side-foot-out {
+  color: #ef4444;
+}
+</style>
