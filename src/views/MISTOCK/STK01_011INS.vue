@@ -18,7 +18,7 @@
         <button
           @click="addButton"
           class="button new md:w-auto w-14 disabled:bg-opacity-50"
-          :disabled="limitStore == '2'">
+          :disabled="!canAddDemand">
           신규
         </button>
         <button @click="deleteButton" class="button delete md:w-auto w-14">
@@ -57,7 +57,7 @@
                 v-for="i in optionList"
                 :key="i.lngStoreCode"
                 :value="i.lngStoreCode">
-                {{ i.strName }}
+                {{ storeOptionLabel(i) }}
               </option>
             </select>
           </div>
@@ -65,6 +65,9 @@
       </div>
     </div>
 
+    <p class="stk011-dblclick-hint">
+      매장명 또는 청구번호를 더블클릭하면 상세가 열립니다.
+    </p>
     <div class="min-h-0 min-w-0 w-full flex-1 px-4 pb-2 lg:px-6">
       <Realgrid
         :progname="'STK01_011INS_VUE'"
@@ -86,7 +89,9 @@
         :checkAbleExpressionVal2="'01'"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
-        :exporttoExcel="exportExcel">
+        :exporttoExcel="exportExcel"
+        dblclickShadeColumns="strStoreName,strDemandNo"
+        timeDateColumns="addedDate,updatedDate">
       </Realgrid>
     </div>
   </div>
@@ -101,7 +106,7 @@
           <button
             type="button"
             class="whitebutton"
-            :disabled="limitStore == '2'"
+            :disabled="!canEditDemand"
             @click="saveButton">
             저장
           </button>
@@ -131,7 +136,7 @@
               v-for="i in optionList"
               :key="'p-' + i.lngStoreCode"
               :value="i.lngStoreCode">
-              {{ i.strName }}
+              {{ storeOptionLabel(i) }}
             </option>
           </select>
         </div>
@@ -155,8 +160,11 @@
           :editableColId="editableColId"
           @updatedRowData="updatedRowData2"
           :editableColByCondition="true"
-          :CalculateTaxColId4="'curTax'"
-          :CalculateSumColId2="'curSupply'"
+          :inputOnlyNumberColumn="'dblDemandQty'"
+          :CalculateTaxColId2="'curSupply'"
+          :CalculateTaxColId="'curTax'"
+          :highlightColId="'dblDemandQty'"
+          :demandDetailColColors="true"
           :documentSubTitle="documentSubTitle2"
           :exporttoExcel="exporttoExcel2"
           :setStateBar="false"></Realgrid>
@@ -166,7 +174,7 @@
         <div class="stk011-form-label">코멘트</div>
         <textarea
           v-model="scond4"
-          :disabled="disabled2"
+          :disabled="!canEditDemand"
           class="stk011-comment-field"></textarea>
       </div>
     </div>
@@ -182,16 +190,12 @@ import {
   getStockDemandList2,
   getStockDetail2,
   InsertDemandMasterDetail,
-  updateDemandMaster,
 } from "@/api/mistock";
+import { UpdateDemandMasterDetail2 } from "@/api/vuepos";
 import PageName from "@/components/pageName.vue";
 import Realgrid from "@/components/realgrid.vue";
-import {
-  formatLocalDate,
-  insertPageLog,
-  formatDateTime2,
-} from "@/customFunc/customFunc";
-import { onMounted, ref } from "vue";
+import { formatLocalDate, insertPageLog } from "@/customFunc/customFunc";
+import { computed, onMounted, ref } from "vue";
 
 import Datepicker2 from "@/components/Datepicker2.vue";
 import Swal from "sweetalert2";
@@ -250,15 +254,57 @@ const selectedStore = ref(0);
  */
 
 const limitStore = ref("0");
+
+const isAllStoreRow = (item) => {
+  const name = String(item?.strName ?? "").replace(/\s/g, "");
+  const code = Number(item?.lngStoreCode);
+  return name === "전체" || name === "선택" || code === 0;
+};
+
+const storeOptionLabel = (item) => (isAllStoreRow(item) ? "선택" : item.strName);
+
+const isStoreUnselected = () => {
+  const current = optionList.value.find(
+    (item) => String(item.lngStoreCode) === String(cond.value)
+  );
+  if (!current) return true;
+  return isAllStoreRow(current);
+};
+
+const canAddDemand = computed(
+  () => limitStore.value != "2" && !isStoreUnselected()
+);
+
+const canEditDemand = ref(false);
+
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
   const res = await getDemandStoreList(store.state.userData.lngStoreGroup, 0);
+  const list = res.data.List || [];
+  const concrete = list.filter((item) => !isAllStoreRow(item));
+  const mine = concrete.find(
+    (item) =>
+      String(item.lngStoreCode) === String(store.state.userData.lngStoreCode)
+  );
+  const lockedToOneStore = concrete.length === 1 && Boolean(mine);
+  let allRow = list.find((item) => isAllStoreRow(item));
 
-  optionList.value = res.data.List;
+  if (!lockedToOneStore && !allRow) {
+    allRow = { lngStoreCode: 0, strName: "선택" };
+    optionList.value = [allRow, ...list];
+  } else {
+    optionList.value = list;
+  }
 
-  if (res.data.List.length > 0) {
-    cond.value = res.data.List[0].lngStoreCode;
+  if (lockedToOneStore) {
+    cond.value = mine.lngStoreCode;
+  } else if (allRow) {
+    cond.value = allRow.lngStoreCode;
+  } else if (concrete.length === 1) {
+    cond.value = concrete[0].lngStoreCode;
+  } else {
+    cond.value = 0;
   }
 
   const res2 = await getCheckAbility(
@@ -281,7 +327,6 @@ onMounted(async () => {
 /**
  * 그리드 초기화
  */
-const disabled2 = ref(false);
 const initGrid = () => {
   if (rowData.value.length > 0) {
     rowData.value = [];
@@ -351,103 +396,197 @@ const updatedrowdata = ref([]);
 const updatedRowData = (e) => {
   updatedrowdata.value = e;
 };
+
+const toInt = (value) => {
+  const num = Number(String(value ?? "").replace(/,/g, ""));
+  return Number.isFinite(num) ? Math.trunc(num) : 0;
+};
+
+const toDateInput = (raw) => {
+  if (raw == null || raw === "") return "";
+  if (raw instanceof Date && !Number.isNaN(raw.getTime())) {
+    return formatLocalDate(raw);
+  }
+  const text = String(raw).trim();
+  const msMatch = text.match(/\/Date\((-?\d+)(?:[+-]\d+)?\)\//);
+  if (msMatch) return formatLocalDate(new Date(Number(msMatch[1])));
+  if (/^\d{4}-\d{2}-\d{2}/.test(text)) return text.slice(0, 10);
+  const digits = text.replace(/\D/g, "");
+  if (digits.length >= 8 && digits.length <= 14) {
+    return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
+  }
+  const parsed = new Date(text);
+  if (!Number.isNaN(parsed.getTime())) return formatLocalDate(parsed);
+  return "";
+};
+
+const pad2 = (value) => String(value).padStart(2, "0");
+
+const displayDateTime = (raw) => {
+  if (raw == null || raw === "") return "";
+  if (raw instanceof Date && !Number.isNaN(raw.getTime())) {
+    return `${raw.getFullYear()}-${pad2(raw.getMonth() + 1)}-${pad2(
+      raw.getDate()
+    )} ${pad2(raw.getHours())}:${pad2(raw.getMinutes())}`;
+  }
+  const text = String(raw).trim();
+  const msMatch = text.match(/\/Date\((-?\d+)(?:[+-]\d+)?\)\//);
+  if (msMatch) {
+    const d = new Date(Number(msMatch[1]));
+    if (!Number.isNaN(d.getTime())) return displayDateTime(d);
+  }
+  const datePart = toDateInput(text);
+  if (!datePart) return "";
+  const timePart = text.match(/(\d{1,2}):(\d{2})/);
+  if (!timePart) return datePart;
+  let hour = Number(timePart[1]);
+  const minute = Number(timePart[2]);
+  if (/오후|PM/i.test(text) && hour < 12) hour += 12;
+  if (/오전|AM/i.test(text) && hour === 12) hour = 0;
+  return `${datePart} ${pad2(hour)}:${pad2(minute)}`;
+};
+
+const formatGridDateTime = (raw) => {
+  const shown = displayDateTime(raw);
+  if (!shown) return "";
+  const [date, time] = shown.split(" ");
+  if (!time) return `${date.replaceAll("-", "/")} 00:00`;
+  return `${date.replaceAll("-", "/")} ${time}`;
+};
+
+const originQtyByStock = ref({});
+
+const applyDetailList = (list) => {
+  const map = {};
+  rowData2.value = (list || []).map((item) => {
+    const qty = toInt(item.dblDemandQty);
+    map[String(item.lngStockID)] = qty;
+    return { ...item, dblDemandQty: qty };
+  });
+  originQtyByStock.value = map;
+};
+
+const isUnissuedDemand = (row) => {
+  if (row == null) return false;
+  const lng = String(row.lngStatus ?? row[10] ?? "").trim();
+  const str = String(row.strStatus ?? row[7] ?? "").trim();
+  return (
+    lng === "01" ||
+    lng === "1" ||
+    lng.includes("미발주") ||
+    str.includes("미발주")
+  );
+};
+
+const rowText = (row, name, index) => {
+  const named = row?.[name];
+  if (named != null && String(named).trim() !== "") return named;
+  const indexed = row?.[index];
+  return indexed == null ? "" : indexed;
+};
+
 const saveButton = async () => {
-  if (disabled.value == true) {
-    try {
-      store.state.loading = true;
-
-      const res = await updateDemandMaster(
-        store.state.userData.lngStoreGroup,
-        scond2.value,
-        scond.value.replaceAll("-", ""),
-        scond3.value,
-        scond4.value,
-        tempdtmEndDate.value + ":00"
-      );
-
-      store.state.loading = false;
-      if (res.data.RESULT_CD == "00") {
-        await Swal.fire({
-          title: "성공",
-          text: "청구등록이 저장 되었습니다.",
-          icon: "success",
-          confirmButtonText: "확인",
-        });
-        openPopUp.value = false;
-      } else {
-        await Swal.fire({
-          title: "경고",
-          text: `${res.data.RESULT_NM}`,
-          icon: "warning",
-          confirmButtonText: "확인",
-        });
-      }
-    } catch (error) {
-    } finally {
-      open.value = false;
-      searchButton();
-    }
-  } else {
-    try {
-      const ddate = updatedrowdata2.value
-        .map((item) => item.dtmEndDate.split(" ")[0].replaceAll("-", ""))
-        .join("\u200b");
-      const edate = updatedrowdata2.value
-        .map((item) =>
-          formatLocalDate(item.dtmPreExpectedDate).replaceAll("-", "")
+  if (!canEditDemand.value) return;
+  const isExistingDemand = String(scond3.value || "").trim() !== "";
+  try {
+    store.state.loading = true;
+    const source =
+      updatedrowdata2.value && updatedrowdata2.value.length
+        ? updatedrowdata2.value
+        : rowData2.value || [];
+    const saveRows = isExistingDemand
+      ? source.filter(
+          (item) =>
+            toInt(item.dblDemandQty) > 0 ||
+            toInt(originQtyByStock.value[String(item.lngStockID)]) > 0
         )
-        .join("\u200b");
-      const lngstocks = updatedrowdata2.value
-        .map((item) => item.lngStockID)
-        .join("\u200b");
-      const qtys = updatedrowdata2.value
-        .map((item) => item.dblDemandQty)
-        .join("\u200b");
-      store.state.loading = true;
-
-      const res = await InsertDemandMasterDetail(
-        store.state.userData.lngStoreGroup,
-        scond2.value,
-        scond.value.replaceAll("-", ""),
-        scond4.value,
-        1,
-        ddate,
-        edate,
-        lngstocks,
-        qtys,
-        store.state.userData.lngSequence,
-        0,
-        "",
-        ""
-      );
-      console.log(res);
-      store.state.loading = false;
-      if (res.data.RESULT_CD == "00") {
-        await Swal.fire({
-          title: "성공",
-          text: "신규 청구등록이 저장 되었습니다.",
-          icon: "success",
-          confirmButtonText: "확인",
-        });
-        openPopUp.value = false;
-      } else {
-        await Swal.fire({
-          title: "경고",
-          text: "신규  청구등록 저장을 실패하였습니다.",
-          icon: "warning",
-          confirmButtonText: "확인",
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      open.value = false;
-      searchButton();
+      : source;
+    const ddate = saveRows
+      .map((item) =>
+        String(item.dtmEndDate || "").split(" ")[0].replaceAll("-", "")
+      )
+      .join("\u200b");
+    const edate = saveRows
+      .map((item) =>
+        String(toDateInput(item.dtmPreExpectedDate) || "").replaceAll("-", "")
+      )
+      .join("\u200b");
+    const lngstocks = saveRows.map((item) => item.lngStockID).join("\u200b");
+    const qtys = saveRows.map((item) => toInt(item.dblDemandQty)).join("\u200b");
+    const demandDate = String(scond.value || "").replaceAll("-", "");
+    const res = isExistingDemand
+      ? await UpdateDemandMasterDetail2(
+          store.state.userData.lngStoreGroup,
+          scond2.value,
+          demandDate,
+          scond3.value,
+          scond4.value,
+          1,
+          ddate,
+          edate,
+          lngstocks,
+          qtys,
+          store.state.userData.lngSequence,
+          0,
+          "",
+          ""
+        )
+      : await InsertDemandMasterDetail(
+          store.state.userData.lngStoreGroup,
+          scond2.value,
+          demandDate,
+          scond4.value,
+          1,
+          ddate,
+          edate,
+          lngstocks,
+          qtys,
+          store.state.userData.lngSequence,
+          0,
+          "",
+          ""
+        );
+    if (res.data.RESULT_CD == "00") {
+      await Swal.fire({
+        title: "성공",
+        text: isExistingDemand
+          ? "청구등록이 수정 되었습니다."
+          : "신규 청구등록이 저장 되었습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+    } else {
+      await Swal.fire({
+        title: "경고",
+        text: res.data.RESULT_NM || "청구등록 저장을 실패하였습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
     }
+  } catch (error) {
+    await Swal.fire({
+      title: "경고",
+      text: "청구등록 저장을 실패하였습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+  } finally {
+    store.state.loading = false;
+    open.value = false;
+    searchButton();
   }
 };
 
 const searchButton = async () => {
+  if (isStoreUnselected()) {
+    await Swal.fire({
+      title: "알림",
+      text: "매장을 선택해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   try {
     store.state.loading = true;
     const res = await getStockDemandList2(
@@ -457,13 +596,21 @@ const searchButton = async () => {
       sdate.value.replaceAll("-", ""),
       edate.value.replaceAll("-", "")
     );
-
-    console.log(res);
-
-    store.state.loading = false;
-    rowData.value = res.data.List;
+    rowData.value = (res.data.List || []).map((item) => ({
+      ...item,
+      Selected: false,
+      addedDate: formatGridDateTime(
+        item.addedDate ?? item.AddedDate ?? item.dtmAddedDate
+      ),
+      updatedDate: formatGridDateTime(
+        item.updatedDate ?? item.UpdatedDate ?? item.dtmUpdatedDate
+      ),
+    }));
     afterSearch.value = true;
-  } catch (error) {}
+  } catch (error) {
+  } finally {
+    store.state.loading = false;
+  }
 };
 
 const sdate = ref("");
@@ -491,40 +638,37 @@ const scond4 = ref("");
 const editableColId = ref("");
 const tempdtmEndDate = ref("");
 const dblclickedRowData = async (e) => {
-  console.log(e);
-  //   console.log(tempColID.value);
-
   editableColId.value = "";
   if (tempColID.value == "strStoreName" || tempColID.value == "strDemandNo") {
+    const demandDate = rowText(e, "dtmDemandDate", 3);
+    const storeCode = rowText(e, "lngStoreCode", 11);
+    const demandNo = rowText(e, "strDemandNo", 2);
+    const unissued = isUnissuedDemand(e) && limitStore.value != "2";
     disabled.value = true;
-    scond.value =
-      e[3].slice(0, 4) + "-" + e[3].slice(4, 6) + "-" + e[3].slice(6, 8);
-    scond2.value = e[11];
-    scond3.value = e[2];
+    canEditDemand.value = unissued;
+    editableColId.value = unissued ? "dblDemandQty" : "";
+    scond.value = toDateInput(demandDate);
+    scond2.value = storeCode;
+    scond3.value = demandNo;
+    updatedrowdata2.value = [];
 
     try {
       store.state.loading = true;
       const res = await getStockDetail2(
         store.state.userData.lngStoreGroup,
-        e[11],
+        storeCode,
         store.state.userData.strLanguage,
-        e[2],
-        e[3]
+        demandNo,
+        toDateInput(demandDate).replaceAll("-", "")
       );
-
-      console.log(res);
-
+      applyDetailList(res.data.List || []);
+      scond4.value = res.data.List2?.[0]?.strComments || "";
+      tempdtmEndDate.value = rowData2.value[0]?.dtmEndDate || "";
+      open.value = true;
+    } catch (error) {
+    } finally {
       store.state.loading = false;
-      rowData2.value = res.data.List;
-      scond4.value = res.data.List2[0].strComments;
-
-      disabled2.value =
-        new Date(formatDateTime2(new Date()).slice(0, 16)) >
-        new Date(rowData2.value[0].dtmEndDate);
-
-      tempdtmEndDate.value = rowData2.value[0].dtmEndDate;
-    } catch (error) {}
-    open.value = true;
+    }
   }
 };
 
@@ -551,13 +695,16 @@ const excelButton2 = () => {
 };
 
 const addButton = async () => {
+  if (!canAddDemand.value) return;
   disabled.value = false;
-
+  canEditDemand.value = true;
   scond.value = formatLocalDate(new Date());
   scond2.value = cond.value;
   scond3.value = "";
+  scond4.value = "";
   editableColId.value = "dblDemandQty";
   rowData2.value = [];
+  updatedrowdata2.value = [];
 
   try {
     store.state.loading = true;
@@ -568,15 +715,12 @@ const addButton = async () => {
       "",
       formatLocalDate(new Date()).replaceAll("-", "")
     );
-
-    //console.log(res);
-
+    applyDetailList(res.data.List || []);
+    open.value = true;
+  } catch (error) {
+  } finally {
     store.state.loading = false;
-    rowData2.value = res.data.List;
-
-    scond4.value = "";
-  } catch (error) {}
-  open.value = true;
+  }
 };
 
 const updatedrowdata2 = ref([]);
@@ -587,27 +731,28 @@ const updatedRowData2 = (e) => {
 
 const searchButton2 = async (e) => {
   rowData2.value = [];
-
+  updatedrowdata2.value = [];
   try {
     store.state.loading = true;
     const res = await getStockDetail2(
       store.state.userData.lngStoreGroup,
-      cond.value,
+      scond2.value || cond.value,
       store.state.userData.strLanguage,
       "",
       String(e.target.value).replaceAll("-", "")
     );
-
-    console.log(res);
-
+    applyDetailList(res.data.List || []);
+    scond4.value = res.data.List2?.[0]?.strComments || "";
+  } catch (error) {
+  } finally {
     store.state.loading = false;
-    rowData2.value = res.data.List;
-    scond4.value = res.data.List2[0].strComments;
-  } catch (error) {}
+  }
 };
 
 const deleteButton = async () => {
-  const filtered = updatedrowdata.value.filter((item) => item.Selected == true);
+  const filtered = updatedrowdata.value.filter(
+    (item) => item.Selected == true || item.Selected === "true"
+  );
 
   if (filtered.length == 0) {
     Swal.fire({
@@ -616,6 +761,7 @@ const deleteButton = async () => {
       icon: "warning",
       confirmButtonText: "확인",
     });
+    return;
   }
 
   try {
@@ -659,6 +805,15 @@ const deleteButton = async () => {
 </script>
 
 <style scoped>
+.stk011-dblclick-hint {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #3b5bdb;
+}
+
 .stk011-page {
   --stk011-label-col: 6.5rem;
   --stk011-item-gap: 0.75rem;
@@ -783,8 +938,8 @@ const deleteButton = async () => {
   --stk011-control-radius: 0.375rem;
   display: flex;
   flex-direction: column;
-  width: min(56rem, 92vw);
-  height: min(44rem, 88vh);
+  width: min(96rem, 98vw);
+  height: min(48rem, 90vh);
   padding: 1.5rem;
   background: #fff;
   border-radius: 0.75rem;

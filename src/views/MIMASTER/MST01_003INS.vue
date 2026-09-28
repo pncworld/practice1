@@ -2326,12 +2326,9 @@ const clickedRowData = async (newvalue) => {
   // 최초 메뉴 선택 시에도 표시 파일명을 현재 이미지 규칙과 동일하게 노출
   fileName2.value = currentImageFileName.value || "";
   //comsole.log(newvalue);
-  if (newvalue[34] == true) {
-    //isNew.value = true;
-    clickaddrowSeq.value = rowData.value[newvalue.index].sequence;
-    //comsole.log(clickaddrowSeq.value);
-  } else {
-    //isNew.value = false;
+  if (newvalue[34] === true) {
+    const addedRow = rowData.value?.[newvalue.index];
+    if (addedRow) clickaddrowSeq.value = addedRow.sequence;
   }
 
   const firstarr = newvalue[32] != undefined ? newvalue[32].split(";") : [];

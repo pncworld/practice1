@@ -164,7 +164,7 @@ onMounted(() => {
   endyear.value = currentYear;
   startmonth.value = lastMonth.getMonth() + (props.initMonth2 == true ? 2 : 1);
   endmonth.value = currentMonth;
-  for (let i = currentYear - 8; i <= currentYear + 5; i++) {
+  for (let i = currentYear - 20; i <= currentYear + 5; i++) {
     settingYears.value.push(i);
   }
 

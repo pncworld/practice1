@@ -235,6 +235,11 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  timeDateColumns: {
+    // 시분이 있는 날짜 컬럼. 값은 yyyy/MM/dd HH:mm
+    type: String,
+    default: "",
+  },
   changeColid: {
     // 그리드 안에 데이터를 수정할 컬럼 ID
     type: String,
@@ -1323,6 +1328,11 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  /** 더블클릭으로 상세가 열리는 컬럼. 이 화면만 연한 음영 */
+  dblclickShadeColumns: {
+    type: String,
+    default: "",
+  },
   /** 청구 상세 — 윈폼 색(입고예정·수량·단가) + 입력 행 음영, 수량/단가열 제외 글자 파랑 */
   demandDetailColColors: {
     type: Boolean,
@@ -2404,6 +2414,11 @@ const runFuncshowGrid = async () => {
     colIdInDecimalList(colId, unsignedDecimalColumnIds);
   const isDecimalInputColumn = (colId) =>
     isSignedDecimalColumn(colId) || isUnsignedDecimalColumn(colId);
+  const timeDateColumnIds = String(props.timeDateColumns || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const isTimeDateColumn = (colId) => timeDateColumnIds.includes(colId);
   const SIGNED_DECIMAL_MAX_PLACES = 2;
   const signedDecimalNumberFormat = "#,##0.##";
   const isGridNumberMask = (mask) => {
@@ -2509,7 +2524,9 @@ const runFuncshowGrid = async () => {
         : item.strColType == "date"
         ? "datetime"
         : "text",
-    datetimeFormat: "yyyy-MM-dd",
+    datetimeFormat: isTimeDateColumn(item.strColID)
+      ? "yyyy/MM/dd HH:mm"
+      : "yyyy-MM-dd",
     valueExpression:
       props.AutoCalculateDataSubColId[
         props.AutoCalculateDataMainColId.indexOf(item.strColID)
@@ -3284,7 +3301,11 @@ const runFuncshowGrid = async () => {
       },
     },
 
-    datetimeFormat: item.strMask == "" ? "yyyy-MM-dd" : item.strMask, // sql 에서 mstgridinfo 에서 date  일때 기본값이 있고 정의할 수 있음
+    datetimeFormat: isTimeDateColumn(item.strColID)
+      ? "yyyy/MM/dd HH:mm"
+      : item.strMask == ""
+      ? "yyyy-MM-dd"
+      : item.strMask, // sql 에서 mstgridinfo 에서 date  일때 기본값이 있고 정의할 수 있음
     // YYYYMMDD 형식 값을 yyyy-MM-dd로 표시 (실제 데이터는 변경하지 않음)
     // mstGridInfo strMask='@@@@-@@-@@' 컬럼만 적용
     ...(String(item.strMask || "").trim() === "@@@@-@@-@@" && {
@@ -3782,6 +3803,19 @@ const runFuncshowGrid = async () => {
               ret.editable = true;
             } else {
               ret.editable = false;
+            }
+
+            if (
+              String(props.dblclickShadeColumns || "")
+                .split(",")
+                .map((id) => id.trim())
+                .filter(Boolean)
+                .includes(item.strColID)
+            ) {
+              ret.style = {
+                ...(ret.style || {}),
+                backgroundColor: "#E4EEFF",
+              };
             }
 
             if (props.checkBarInactive != "") {
