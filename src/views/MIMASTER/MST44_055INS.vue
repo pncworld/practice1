@@ -486,6 +486,49 @@ const afterSearch = ref(false);
 const AmountList = ref([]);
 const KeyList = ref([]);
 const KeyList2 = ref([]);
+const PAY_KEY_ROWS = 5;
+const PAY_KEY_COLS = 3;
+const PAY_KEY_COUNT = PAY_KEY_ROWS * PAY_KEY_COLS;
+
+/** 화면은 가로로 채우고, intKeySeq 는 열을 따라 위에서 아래로 1~15 */
+const visualIndexToKeySeq = (index) => {
+  const row = Math.floor(index / PAY_KEY_COLS);
+  const col = index % PAY_KEY_COLS;
+  return col * PAY_KEY_ROWS + row + 1;
+};
+
+const layoutPayKeys = (list) => {
+  const slots = Array.from({ length: PAY_KEY_COUNT }, (_, index) => ({
+    intKeySeq: visualIndexToKeySeq(index),
+  }));
+  for (const item of list || []) {
+    const seq = Number(item?.intKeySeq);
+    if (!seq || seq < 1 || seq > PAY_KEY_COUNT) continue;
+    const row = (seq - 1) % PAY_KEY_ROWS;
+    const col = Math.floor((seq - 1) / PAY_KEY_ROWS);
+    const visual = row * PAY_KEY_COLS + col;
+    if (visual < 0 || visual >= PAY_KEY_COUNT) continue;
+    const hasData =
+      item.lngKeyScrNo !== undefined &&
+      item.lngKeyScrNo !== null &&
+      item.lngKeyScrNo !== "";
+    const slotHasData =
+      slots[visual].lngKeyScrNo !== undefined &&
+      slots[visual].lngKeyScrNo !== null &&
+      slots[visual].lngKeyScrNo !== "";
+    if (!slotHasData || hasData) {
+      slots[visual] = { ...item, intKeySeq: seq };
+    }
+  }
+  return slots;
+};
+
+/** 결제코드 intKeyNo=1, 결제그룹코드 intKeyNo=2 */
+const resolvePayKeyNo = (item) => {
+  if (item?.gp == 1) return 2;
+  if (item?.gp == 0) return 1;
+  return Number(item?.intKeyNo) === 2 ? 2 : 1;
+};
 const screenList = ref([]);
 const confirmitem3 = ref([]);
 const clickedScreenOrMenu = ref(false);
@@ -535,7 +578,7 @@ const searchButton = async () => {
     );
     //comsole.log(res4);
     AmountList.value = res4.data.AmountList;
-    KeyList.value = res4.data.AmountKeyList;
+    KeyList.value = layoutPayKeys(res4.data.AmountKeyList);
     originGroupKeys.value = res4.data.GroupList;
     //comsole.log(AmountList.value);
     //comsole.log(KeyList.value);
@@ -664,7 +707,7 @@ const onEnd = (evt) => {
 
       KeyList.value = swappedItems.map((item, index) => ({
         ...item, // 기존 객체의 다른 속성 유지
-        intKeySeq: index + 1, // 배열 순서대로 intKeySeq 재정렬
+        intKeySeq: visualIndexToKeySeq(index),
       }));
     } else if (changeGrid.value == true) {
       const oldIndex = evt.oldIndex; // 드래그된 아이템의 기존 인덱스
@@ -700,7 +743,7 @@ const onEnd = (evt) => {
       updateMenuKey.value = true;
       KeyList.value = KeyList.value.map((item, index) => ({
         ...item, // 기존 객체의 다른 속성 유지
-        intKeySeq: index + 1, // 배열 순서대로 intKeySeq 재정렬
+        intKeySeq: visualIndexToKeySeq(index),
       }));
     } else if (changeGrid.value == true) {
       KeyList2.value = KeyList2.value.map((item, index) => ({
@@ -804,7 +847,7 @@ const saveButton = async () => {
           .map((item) => item.gp);
         const intKeyNos = KeyList.value
           .filter((item) => item.lngKeyScrNo !== undefined)
-          .map((item) => item.intKeyNo);
+          .map((item) => resolvePayKeyNo(item));
 
         // 동일 그룹+시퀀스 중복 제거 (마지막 값 유지) — DB에 intSubKeySeq 중복 저장 방지
         const dedupedGroupKeys = [];
@@ -965,11 +1008,14 @@ const handlePosNo = (newValue) => {
 // );
 
 watch(KeyList, (newvalue) => {
-  for (var i = 0; i < 15; i++) {
-    if (KeyList.value.findIndex((item) => item.intKeySeq == i + 1) == -1) {
-      KeyList.value.splice(i, 0, { intKeySeq: i + 1 });
-    }
-    //comsole.log(KeyList.value);
+  if (
+    !Array.isArray(newvalue) ||
+    newvalue.length !== PAY_KEY_COUNT ||
+    newvalue.some(
+      (item, index) => Number(item?.intKeySeq) !== visualIndexToKeySeq(index)
+    )
+  ) {
+    KeyList.value = layoutPayKeys(newvalue);
   }
 });
 
@@ -1025,7 +1071,7 @@ const saveMenuKeyposition = (index, item) => {
     //comsole.log(KeyList2.value);
     clickedRealIndex.value = (clickedGroupPage.value - 1) * 25 + index + 1;
   } else {
-    clickedRealIndex.value = index + 1;
+    clickedRealIndex.value = visualIndexToKeySeq(index);
   }
 };
 
@@ -1039,7 +1085,7 @@ const addKey = () => {
     if (foraddIndex == -1) {
       KeyList.value.push({
         gp: clickedsort.value,
-        intKeyNo: 1,
+        intKeyNo: clickedsort.value == 1 ? 2 : 1,
         intKeySeq: clickedRealIndex.value,
         lngKeyColor: 0,
         lngKeyScrNo: Number(clickedCode.value),
@@ -1048,7 +1094,7 @@ const addKey = () => {
     } else {
       KeyList.value[foraddIndex] = {
         gp: clickedsort.value,
-        intKeyNo: 1,
+        intKeyNo: clickedsort.value == 1 ? 2 : 1,
         intKeySeq: clickedRealIndex.value,
         lngKeyColor: 0,
         lngKeyScrNo: Number(clickedCode.value),
