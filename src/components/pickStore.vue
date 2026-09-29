@@ -132,6 +132,7 @@
           label="strName"
           :placeholder="defaultStoreNm"
           @click="resetStoreCode"
+          @open="onStoreDropdownOpen"
           append-to-body
           :options="storeSelectOptions">
           <template #no-options>
@@ -528,7 +529,41 @@ const props = defineProps({
     type: Number,
     default: 12,
   },
+  /**
+   * append-to-body 드롭다운 최소 너비(rem). 0이면 미적용(기존 동작).
+   * 긴 매장명이 잘릴 때 화면에서만 opt-in.
+   */
+  storeDropdownMinWidthRem: {
+    type: Number,
+    default: 0,
+  },
 });
+
+/** append-to-body 메뉴는 컴포넌트 밖이라 화면 CSS가 안 먹음 → open 시 폭만 보정 */
+const applyStoreDropdownMinWidth = () => {
+  const minRem = Number(props.storeDropdownMinWidthRem) || 0;
+  if (minRem <= 0) return;
+  const menus = document.querySelectorAll(".vs__dropdown-menu");
+  const menu = menus.length > 0 ? menus[menus.length - 1] : null;
+  if (!menu) return;
+  menu.style.minWidth = `${minRem}rem`;
+  menu.style.width = "max-content";
+  menu.style.maxWidth = "min(36rem, 92vw)";
+  menu.querySelectorAll(".vs__dropdown-option").forEach((el) => {
+    el.style.whiteSpace = "normal";
+    el.style.overflow = "visible";
+    el.style.textOverflow = "unset";
+  });
+};
+
+const onStoreDropdownOpen = () => {
+  if (!(Number(props.storeDropdownMinWidthRem) > 0)) return;
+  nextTick(() => {
+    applyStoreDropdownMinWidth();
+    // vue-select가 body에 메뉴를 붙인 직후 한 프레임 더 대기
+    requestAnimationFrame(applyStoreDropdownMinWidth);
+  });
+};
 
 /** defaultStore + v-select: 목록에 전체 행이 없으면 reduce(0)이 라벨을 못 찾아 "0"만 표시됨 */
 const storeSelectOptions = computed(() => {

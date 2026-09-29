@@ -351,6 +351,25 @@ export const getOrderInfoDetail = (groupCd, storeCd, orderNo) => {
   });
 };
 
+/** Crystal 발주서와 동일 SP(usp_PUR03_016RPT_RPT_GET_ORDER) — 수신처/발주처 포함 */
+export const getPurchaseOrderPrint = (
+  groupCd,
+  storeCd,
+  sdate,
+  storeCdList,
+  orderNoList,
+  flag = "1",
+) => {
+  return api2.post("/MIPUR/PUR03_016RPT.asmx/getPurchaseOrderPrint", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SDATE: sdate,
+    STORE_CD_LIST: storeCdList,
+    ORDER_NO_LIST: orderNoList,
+    FLAG: flag,
+  });
+};
+
 
 export const getStkOrderDetail = (
   groupCd,

@@ -15,16 +15,21 @@
         </button>
         <button @click="excelButton" class="button w-auto excel">엑셀</button>
         <button @click="printButton" class="button print w-auto">인쇄</button>
+        <!-- 임시: Vue 인쇄와 Crystal 비교용 — 확정 후 제거 -->
+        <button @click="printCrystalButton" class="button print w-auto">
+          인쇄(구버전)
+        </button>
       </div>
     </div>
     <div
-      class="z-10 mt-3 w-full min-w-0 overflow-x-auto rounded-lg bg-gray-200 px-24 py-4">
-      <div
-        class="pur037-search-grid min-w-0"
-        :style="{
-          '--pur037-control-border': pur037ControlBorder,
-          '--pur037-item-gap': pur037ItemGap,
-        }">
+      class="pur037-search-panel z-10 mt-3 w-full min-w-0 shrink-0 rounded-lg bg-gray-200"
+      :style="{
+        '--pur037-control-border': pur037ControlBorder,
+        '--pur037-item-gap': pur037ItemGap,
+        '--pur037-col-gap': pur037ColGap,
+        '--pur037-panel-pad-x': pur037PanelPadX,
+      }">
+      <div class="pur037-search-grid min-w-0">
         <div class="pur037-cell">
           <div class="pur037-sg-label">입고예정일자</div>
           <div class="pur037-cell-field pur037-date-slot min-w-0">
@@ -43,6 +48,7 @@
             <PickStore
               compact-search-bar
               :compact-store-combo-max-rem="pur037PickStoreComboMaxRem"
+              :store-dropdown-min-width-rem="pur037StoreDropdownMinRem"
               main-name=""
               @update:storeGroup="lngStoreGroup"
               :defaultStoreNm="'전체'"
@@ -71,7 +77,7 @@
             <select
               id="pur03-037-cond-part"
               v-model="cond"
-              class="pur037-part-select h-8 w-full min-w-[8rem] rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              class="pur037-part-select w-full min-w-0 rounded-md border border-solid bg-white text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option
                 v-for="i in optionList"
                 :key="i.lngPartCode"
@@ -187,6 +193,16 @@
     </div>
   </div>
   <!-- 그리드 영역 -->
+
+  <ReportPrintShell
+    v-model:open="printPreviewOpen"
+    title="발주서 인쇄 미리보기"
+    :pages="printPages"
+    :loading="printLoading">
+    <template #page="{ page }">
+      <PurchaseOrderPrintSheet :page="page" />
+    </template>
+  </ReportPrintShell>
 </template>
 
 <script setup>
@@ -197,6 +213,9 @@ import {
 } from "@/api/mipur";
 import { getLossMasterPartList } from "@/api/mistock";
 import BusinessClient from "@/components/businessClient2.vue";
+import ReportPrintShell from "@/components/reportPrint/ReportPrintShell.vue";
+import { loadPurchaseOrderPrintPages } from "@/components/reportPrint/loadPurchaseOrderPrintPages";
+import PurchaseOrderPrintSheet from "@/components/reportPrint/sheets/PurchaseOrderPrintSheet.vue";
 import Datepicker1 from "@/components/Datepicker1.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -317,11 +336,16 @@ const supplierSessionDisplayName = computed(() => {
 
 /** 조회줄 컨트롤 공통 테두리(search-area-layout) */
 const pur037ControlBorder = "#cbd5e1";
-/** compact 매장 v-select가 칸 폭을 채우도록 기본 12rem 상한 해제(조회줄 4등분 시각 균등) */
+/** compact 매장 v-select가 칸 폭을 채우도록 기본 12rem 상한 해제 */
 const pur037PickStoreComboMaxRem = 96;
-
-/** 라벨↔필드, 항목(4블록) 사이 간격 — 한 값으로 통일 */
-const pur037ItemGap = "0.75rem";
+/** 매장 드롭다운 목록 최소 너비(rem) — 긴 매장명 잘림 방지 */
+const pur037StoreDropdownMinRem = 22;
+/** 라벨↔필드 간격 */
+const pur037ItemGap = "1rem";
+/** 항목(4블록) 사이 간격 — 앞뒤 여유 */
+const pur037ColGap = "1.75rem";
+/** 회색 AREA 좌·우 inset 동일 (내용·매장명 폭 확보) */
+const pur037PanelPadX = "2.5rem";
 
 const datepicker = ref(null);
 const closePopUp = ref(false);
@@ -537,7 +561,12 @@ const checkedRowData = (e) => {
 
   //console.log(e);
 };
-const printButton = () => {
+
+const printPreviewOpen = ref(false);
+const printLoading = ref(false);
+const printPages = ref([]);
+
+const printButton = async () => {
   if (checkedrowdata.value.length == 0) {
     Swal.fire({
       title: "경고",
@@ -548,21 +577,67 @@ const printButton = () => {
     });
     return;
   }
+
+  printPreviewOpen.value = true;
+  printLoading.value = true;
+  printPages.value = [];
+  try {
+    printPages.value = await loadPurchaseOrderPrintPages(
+      groupCd.value,
+      checkedrowdata.value,
+      {
+        storeCd: storeCode.value,
+        orderDate: String(sDate.value ?? "").replaceAll("-", ""),
+        flag: "1",
+      }
+    );
+    if (!printPages.value.length) {
+      printPreviewOpen.value = false;
+      await Swal.fire({
+        title: "경고",
+        text: "출력할 발주서 상세를 불러오지 못했습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (e) {
+    console.error("[PUR03_037RPT] printButton", e);
+    printPreviewOpen.value = false;
+    await Swal.fire({
+      title: "오류",
+      text: "발주서 인쇄 데이터를 불러오는 중 오류가 발생했습니다.",
+      icon: "error",
+      confirmButtonText: "확인",
+    });
+  } finally {
+    printLoading.value = false;
+  }
+};
+
+/** 임시 비교용 — 기존 Crystal CRPrint (확정 후 제거) */
+const printCrystalButton = () => {
+  if (checkedrowdata.value.length == 0) {
+    Swal.fire({
+      title: "경고",
+      text: "선택한 전표가 존재하지 않습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   const storecds = checkedrowdata.value
     .map((item) => item.lngStoreCode)
     .join(",");
   const ordercds = checkedrowdata.value
     .map((item) => item.strOrderNo)
     .join(",");
+  const orderDate = String(sDate.value ?? "").replaceAll("-", "");
   window.open(
     `http://222.231.31.99/Report/CRPrint.aspx?pCount=10&Report=PUR03_016RPT_PART&@P_lngStoreGroup=${
       groupCd.value
     }&@P_lngStoreCode=${
       storeCode.value
-    }&@P_dtmOrderDate=${String(sDate.value ?? "").replaceAll(
-      "-",
-      ""
-    )}&@P_flag=1&@P_lngStoreCodeList=${storecds}&@P_orderNo=${ordercds}`,
+    }&@P_dtmOrderDate=${orderDate}&@P_flag=1&@P_lngStoreCodeList=${storecds}&@P_orderNo=${ordercds}`,
     "_blank",
     "width=1600,height=1200"
   );
@@ -570,20 +645,44 @@ const printButton = () => {
 </script>
 
 <style scoped>
-/* 4열 동일 minmax(0,1fr) + column-gap만으로 열 간격 통일 (search-area-layout) */
+/*
+ * 조회 AREA — layout-equal-spacing / search-area-symmetric-inset / search-area-alignment
+ * 시작=끝 inset, 4열 반응형(매장 비중↑), 행·컨트롤 높이 2rem
+ */
+.pur037-search-panel {
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+  padding-block: 0.75rem;
+  /* 기본은 반응형 축소 — overflow는 최후 수단 */
+  overflow-x: auto;
+}
+
 .pur037-search-grid {
   --pur037-label-col: 6.5rem;
+  --pur037-row-min-h: 2rem;
+  --pur037-control-h: 2rem;
   display: grid;
+  box-sizing: border-box;
   width: 100%;
   min-width: 0;
+  max-width: 100%;
   align-items: center;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  column-gap: var(--pur037-item-gap);
+  /* 일자: 라벨6.5+간격+YYYY-MM-DD / 파트도 최소폭 확보 */
+  grid-template-columns:
+    minmax(18rem, 1.2fr)
+    minmax(16rem, 1.4fr)
+    minmax(14rem, 1.25fr)
+    minmax(15rem, 1.1fr);
+  column-gap: var(--pur037-col-gap);
+  padding-left: var(--pur037-panel-pad-x);
+  padding-right: var(--pur037-panel-pad-x);
 }
 
 .pur037-cell {
   display: flex;
   min-width: 0;
+  min-height: var(--pur037-row-min-h);
   align-items: center;
   gap: var(--pur037-item-gap);
 }
@@ -591,6 +690,7 @@ const printButton = () => {
 .pur037-sg-label {
   flex: 0 0 var(--pur037-label-col);
   width: var(--pur037-label-col);
+  min-height: var(--pur037-row-min-h);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -603,6 +703,7 @@ const printButton = () => {
 
 .pur037-cell-field {
   min-width: 0;
+  min-height: var(--pur037-row-min-h);
   flex: 1 1 auto;
   display: flex;
   align-items: center;
@@ -616,6 +717,11 @@ const printButton = () => {
 }
 
 .pur037-search-grid select.pur037-part-select {
+  box-sizing: border-box;
+  height: var(--pur037-control-h);
+  min-height: var(--pur037-control-h);
+  max-height: var(--pur037-control-h);
+  min-width: 7.5rem;
   border: 1px solid var(--pur037-control-border) !important;
 }
 
@@ -624,6 +730,10 @@ const printButton = () => {
 }
 
 .pur037-search-grid .pur037-pick-slot :deep(select) {
+  box-sizing: border-box;
+  height: var(--pur037-control-h) !important;
+  min-height: var(--pur037-control-h) !important;
+  max-height: var(--pur037-control-h) !important;
   border: 1px solid var(--pur037-control-border) !important;
 }
 
@@ -633,17 +743,97 @@ const printButton = () => {
 
 .pur037-search-grid .pur037-pick-slot :deep(.pickstore-vs-shell),
 .pur037-search-grid .pur037-bc-slot :deep(.pickstore-vs-shell) {
+  box-sizing: border-box;
+  height: var(--pur037-control-h) !important;
+  min-height: var(--pur037-control-h) !important;
+  max-height: var(--pur037-control-h) !important;
   border: 1px solid var(--pur037-control-border) !important;
+  overflow: hidden !important;
+  position: relative !important;
 }
 
-/* Datepicker2 filterBarAlign 날짜 입력과 동일 높이·타이포 (h-8, text-sm, pl-3, rounded-md) */
+.pur037-search-grid .pur037-pick-slot :deep(.style-chooser),
+.pur037-search-grid .pur037-bc-slot :deep(.style-chooser) {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.pur037-search-grid .pur037-pick-slot :deep(.vs__dropdown-toggle),
+.pur037-search-grid .pur037-bc-slot :deep(.vs__dropdown-toggle) {
+  box-sizing: border-box;
+  min-height: var(--pur037-control-h) !important;
+  height: var(--pur037-control-h) !important;
+  max-height: var(--pur037-control-h) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0.5rem !important;
+  padding-right: 0.25rem !important;
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+}
+
+/* 전역 position:absolute 유지 + 세로만 가운데 (static으로 바꾸면 텍스트/화살표 레이아웃 붕괴) */
+.pur037-search-grid .pur037-pick-slot :deep(.vs__selected-options),
+.pur037-search-grid .pur037-bc-slot :deep(.vs__selected-options) {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  position: relative !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.pur037-search-grid .pur037-pick-slot :deep(.vs__selected),
+.pur037-search-grid .pur037-bc-slot :deep(.vs__selected) {
+  position: absolute !important;
+  left: 0 !important;
+  right: 1.5rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  width: auto !important;
+  max-width: 100% !important;
+  line-height: 1.25 !important;
+  font-size: 0.875rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: block !important;
+  background: transparent !important;
+}
+
+.pur037-search-grid .pur037-pick-slot :deep(.vs__search),
+.pur037-search-grid .pur037-bc-slot :deep(.vs__search) {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: calc(var(--pur037-control-h) - 2px) !important;
+  line-height: calc(var(--pur037-control-h) - 2px) !important;
+  font-size: 0.875rem !important;
+}
+
+.pur037-search-grid .pur037-pick-slot :deep(.vs__actions),
+.pur037-search-grid .pur037-bc-slot :deep(.vs__actions) {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 2px 0 0 !important;
+  flex-shrink: 0 !important;
+  margin-left: auto !important;
+}
+
+/* Datepicker2 filterBarAlign 과 동일 높이 2rem — YYYY-MM-DD 잘리지 않게 최소폭 */
 .pur037-search-grid .pur037-date-slot :deep(input[type="date"]) {
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
-  min-width: 0;
-  height: 2rem;
-  min-height: 2rem;
+  min-width: 10.5rem;
+  height: var(--pur037-control-h);
+  min-height: var(--pur037-control-h);
+  max-height: var(--pur037-control-h);
   padding-left: 0.75rem;
   padding-right: 0.5rem;
   font-size: 0.875rem;
@@ -667,22 +857,38 @@ const printButton = () => {
   align-items: center;
   width: 100%;
   min-width: 0;
+  min-height: var(--pur037-row-min-h);
 }
 
 .pur037-bc-slot :deep(> div.flex.text-base) {
   width: 100%;
   min-width: 0;
+  min-height: var(--pur037-row-min-h);
+  align-items: center;
 }
 
 .pur037-pick-slot :deep(> div.flex.text-base) {
   width: 100%;
   min-width: 0;
-  /* PickStore compact 기본 gap-4(1rem) → 조회줄 간격과 불일치 */
+  min-height: var(--pur037-row-min-h);
+  align-items: center;
   gap: var(--pur037-item-gap) !important;
 }
 
 .pur037-pick-slot :deep(> div.flex > div:first-child) {
   display: none;
+}
+
+/* 매장그룹·속성 고정폭, 매장명 콤보가 나머지 가로 확보 */
+.pur037-pick-slot :deep(.relative.min-w-0.flex-1) {
+  flex: 1 1 auto !important;
+  min-width: 11rem !important;
+  max-width: none !important;
+}
+.pur037-pick-slot :deep(.pickstore-vs-shell) {
+  min-width: 0;
+  width: 100% !important;
+  max-width: none !important;
 }
 
 .pur037-bc-slot :deep(> div.flex.items-center) {
