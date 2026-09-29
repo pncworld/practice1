@@ -398,52 +398,42 @@ const showPopupf = () => {
   showPopup2.value = true;
 };
 
+const GROUP_KEY_PAGE_SIZE = 25;
+
+const groupPageSeq = (page, index) =>
+  (Number(page) - 1) * GROUP_KEY_PAGE_SIZE + Number(index) + 1;
+
+const fillGroupKeyPage = () => {
+  const page = clickedGroupPage.value;
+  const slots = [];
+  for (let index = 0; index < GROUP_KEY_PAGE_SIZE; index++) {
+    const seq = groupPageSeq(page, index);
+    const found = originGroupKeys.value.find(
+      (item) =>
+        Number(item.intKeySeq) == seq &&
+        item.lngGroupCode == clickedGroupCd.value &&
+        item.lngAmtCode !== undefined &&
+        item.lngAmtCode !== null &&
+        item.lngAmtCode !== ""
+    );
+    slots.push(found ? { ...found, intKeySeq: seq } : { intKeySeq: seq });
+  }
+  KeyList2.value = slots;
+};
+
 const showNext = () => {
   if (clickedGroupPage.value == 15) {
     return;
   }
-  KeyList2.value = [];
-  //comsole.log(clickedGroupPage.value);
   clickedGroupPage.value++;
-  //comsole.log(clickedGroupPage.value);
-  for (
-    var i = 25 * (clickedGroupPage.value - 1);
-    i < 25 * clickedGroupPage.value;
-    i++
-  ) {
-    const findindex = originGroupKeys.value.findIndex(
-      (item) =>
-        item.intKeySeq == i + 1 && item.lngGroupCode == clickedGroupCd.value
-    );
-    if (findindex == -1) {
-      KeyList2.value.splice(i, 0, { intKeySeq: i + 1 });
-    } else {
-      KeyList2.value.splice(i, 0, originGroupKeys.value[findindex]);
-    }
-  }
-  //comsole.log(KeyList2.value);
+  fillGroupKeyPage();
 };
 const showPrev = () => {
   if (clickedGroupPage.value == 1) {
     return;
   }
-  KeyList2.value = [];
   clickedGroupPage.value--;
-  //comsole.log(clickedGroupPage.value);
-  for (var i = 0; i < 25; i++) {
-    const findindex = originGroupKeys.value.findIndex(
-      (item) =>
-        item.intKeySeq == 25 * (clickedGroupPage.value - 1) + i + 1 &&
-        item.lngGroupCode == clickedGroupCd.value
-    );
-    if (findindex == -1) {
-      KeyList2.value.splice(i, 0, {
-        intKeySeq: 25 * (clickedGroupPage.value - 1) + i + 1,
-      });
-    } else {
-      KeyList2.value.splice(i, 0, originGroupKeys.value[findindex]);
-    }
-  }
+  fillGroupKeyPage();
 };
 const updateMenuKey = ref(false);
 
@@ -748,7 +738,7 @@ const onEnd = (evt) => {
     } else if (changeGrid.value == true) {
       KeyList2.value = KeyList2.value.map((item, index) => ({
         ...item, // 기존 객체의 다른 속성 유지
-        intKeySeq: index + 1, // 배열 순서대로 intKeySeq 재정렬
+        intKeySeq: groupPageSeq(clickedGroupPage.value, index),
       }));
 
       for (let i = 0; i < KeyList2.value.length; i++) {
@@ -853,7 +843,13 @@ const saveButton = async () => {
         const dedupedGroupKeys = [];
         const groupSeqMap = new Map();
         for (const item of originGroupKeys.value) {
-          if (item.lngAmtCode === undefined || item.lngAmtCode === null) continue;
+          if (
+            item.lngAmtCode === undefined ||
+            item.lngAmtCode === null ||
+            item.lngAmtCode === ""
+          ) {
+            continue;
+          }
           const key = `${item.lngGroupCode}_${item.intKeySeq}`;
           if (groupSeqMap.has(key)) {
             dedupedGroupKeys[groupSeqMap.get(key)] = item;
@@ -1041,35 +1037,17 @@ const clickedRealIndex = ref();
 const clickedGroupCd = ref();
 const saveMenuKeyposition = (index, item) => {
   if (item.gp == 1) {
-    KeyList2.value = [];
     clickedGroupCd.value = item.lngKeyScrNo;
     changeGrid.value = true;
     rowData.value = AmountList.value.filter(
       (item) => item.sort != "결제그룹코드"
     );
-    //comsole.log(originGroupKeys.value);
-    //comsole.log(KeyList2.value);
-    for (
-      var i = (clickedGroupPage.value - 1) * 25;
-      i < clickedGroupPage.value * 25;
-      i++
-    ) {
-      const findindex = originGroupKeys.value.findIndex(
-        (item) =>
-          item.intKeySeq == (clickedGroupPage.value - 1) * 25 + i + 1 &&
-          item.lngGroupCode == clickedGroupCd.value
-      );
-      if (findindex == -1) {
-        KeyList2.value.splice(i, 0, {
-          intKeySeq: (clickedGroupPage.value - 1) * 25 + i + 1,
-        });
-      } else {
-        KeyList2.value.splice(i, 0, originGroupKeys.value[findindex]);
-      }
-    }
+    fillGroupKeyPage();
 
     //comsole.log(KeyList2.value);
     clickedRealIndex.value = (clickedGroupPage.value - 1) * 25 + index + 1;
+  } else if (changeGrid.value == true) {
+    clickedRealIndex.value = index + 1;
   } else {
     clickedRealIndex.value = visualIndexToKeySeq(index);
   }
@@ -1157,30 +1135,19 @@ const deletekey = () => {
     });
     //comsole.log(KeyList.value);
   } else if (changeGrid.value == true) {
-    KeyList2.value = KeyList2.value.map((item) => {
-      if (
-        item.intKeySeq ==
-        clickedRealIndex.value + (clickedGroupPage.value - 1) * 25
-      ) {
-        return {
-          intKeySeq: clickedRealIndex.value + (clickedGroupPage.value - 1) * 25,
-        };
-      }
-      return item;
+    const index = Number(clickedMenuKey.value);
+    const cell = KeyList2.value[index];
+    if (!cell || cell.lngAmtCode == null || cell.lngAmtCode === "") {
+      return;
+    }
+    const slotSeq = groupPageSeq(clickedGroupPage.value, index);
+    originGroupKeys.value = originGroupKeys.value.filter((item) => {
+      if (item.lngGroupCode != clickedGroupCd.value) return true;
+      if (item.lngAmtCode != cell.lngAmtCode) return true;
+      const itemSeq = Number(item.intKeySeq);
+      return itemSeq != Number(cell.intKeySeq) && itemSeq != slotSeq;
     });
-
-    // 현재 그룹의 해당 시퀀스만 제거 (다른 그룹 데이터는 유지)
-    const deleteSeq =
-      (clickedGroupPage.value - 1) * 25 + clickedRealIndex.value;
-    originGroupKeys.value = originGroupKeys.value.filter(
-      (item) =>
-        !(
-          item.intKeySeq == deleteSeq &&
-          item.lngGroupCode == clickedGroupCd.value
-        )
-    );
-    //comsole.log(KeyList2.value);
-    //comsole.log(originGroupKeys.value);
+    KeyList2.value.splice(index, 1, { intKeySeq: slotSeq });
   }
 };
 
