@@ -763,6 +763,11 @@ const props = defineProps({
     type: Array,
     default: [],
   },
+  /** opt-in: true면 합계 글자를 현재 보이는 첫 열에만 둔다 */
+  footerLabelOnFirstVisible: {
+    type: Boolean,
+    default: false,
+  },
   setGroupOrderByColumnId: {
     // 그리드에서 그룹핑을 할때 순서 설정할 컬럼
     type: String,
@@ -967,7 +972,7 @@ const props = defineProps({
     default: false,
   },
   checkRenderEditable2Col: {
-    // 체크바 수정 관련 변수
+    // 지정 컬럼만 체크 렌더러 클릭 불가 (타이핑 차단용이 아님 — 체크 컬럼은 editable:false 로 타이핑 차단)
     type: String,
     default: "",
   },
@@ -1612,6 +1617,15 @@ const rgIsCheckColumnHeaderSelectable = (dataProvider, dataRow, colFieldName) =>
   }
 
   if (!isCheckAbleExpressionColumn(colFieldName)) {
+    // 삭제여부 체크된 행은 삭제(선택) 체크 불가
+    if (
+      props.checkRenderEditable === true &&
+      rgGetReadonlyCheckFlagCols().length > 0 &&
+      (colFieldName === "checkbox" ||
+        colFieldName === String(props.headerCheckBar ?? "").trim())
+    ) {
+      return !rgRowHasDeleteFlag(dataProvider, dataRow);
+    }
     return true;
   }
 
@@ -1887,6 +1901,33 @@ const rgResolveCheckAbleCellStyle = (ds, dataRow, colId, rowStateeditable) => {
 const isCheckboxGridColumn = (item) =>
   item?.strColID?.includes("checkbox") ||
   item?.strDisplay?.includes("checkbox");
+
+/** 삭제여부(checkbox2) 등 조회용 플래그 컬럼 목록 */
+const rgGetReadonlyCheckFlagCols = () =>
+  String(props.checkRenderEditable2Col ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+/** 삭제여부 true/1/Y 판별 (대소문자 무시) */
+const rgIsDeletedFlagValue = (v) => {
+  if (v === true || v === 1) return true;
+  const s = String(v ?? "").trim().toLowerCase();
+  return s === "1" || s === "true" || s === "y" || s === "t" || s === "yes";
+};
+
+/** 행이 삭제여부 체크 상태인지 */
+const rgRowHasDeleteFlag = (ds, dataRow) => {
+  if (!ds || dataRow == null || dataRow < 0) return false;
+  for (const flagCol of rgGetReadonlyCheckFlagCols()) {
+    try {
+      if (rgIsDeletedFlagValue(ds.getValue(dataRow, flagCol))) return true;
+    } catch (_) {
+      void 0;
+    }
+  }
+  return false;
+};
 
 /** extraColumns 등 동적 컬럼 — 기본 그리드 컬럼과 동일한 헤더 색상 상속 */
 const withInheritedHeaderStyle = (baseColumns, extraCols) => {
@@ -2823,8 +2864,13 @@ const runFuncshowGrid = async () => {
   const columns = tabInitSetArray.value.map((item, index) => ({
     name: item.strColID,
     fieldName: item.strColID,
-    // opt-in: checkExclusiveColumns 화면만 체크컬럼 텍스트 편집 차단
+    // 체크 컬럼: 셀 타이핑(라인편집) 차단. 체크 토글은 renderer.editable 로 처리
     ...(props.checkExclusiveColumns && isCheckboxGridColumn(item)
+      ? { editable: false }
+      : {}),
+    ...(props.checkRenderEditable === true &&
+    isCheckboxGridColumn(item) &&
+    !props.checkExclusiveColumns
       ? { editable: false }
       : {}),
     header: {
@@ -3472,10 +3518,7 @@ const runFuncshowGrid = async () => {
         (item.strColID.includes("checkbox") ||
           item.strDisplay.includes("checkbox"))
           ? true
-          : props.checkRenderEditable == true &&
-            item.strColID == props.checkRenderEditable2Col
-          ? false
-          : false, // 체크박스의 렌더러의 기능만 false 되는걸로 말씀주셨고 추후에 문제시 한 번 더 체크해볼것
+          : false, // checkRenderEditable2Col(삭제여부)은 클릭 불가 — 흐림은 CSS 보정
       // opt-in: 배타 선택 화면만 라디오 이미지
       ...(props.checkExclusiveColumns && isCheckboxGridColumn(item)
         ? { useImages: true }
@@ -3992,20 +4035,76 @@ const runFuncshowGrid = async () => {
   // 체크(렌더러) 컬럼은 정렬 비활성 — 헤더 클릭 시 재정렬 착시 방지
   try {
     const cols = gridView.getColumns?.() ?? [];
+    const readonlyCheckCols = String(props.checkRenderEditable2Col ?? "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
     for (const col of cols) {
       if (col?.renderer?.type === "check") {
         col.sortable = false;
-        // opt-in: 배타 선택 화면만 더블클릭 텍스트 편집 차단
-        if (props.checkExclusiveColumns == true) {
+        // 체크 컬럼 텍스트(라인) 편집 차단
+        // checkRenderEditable2Col: 해당 컬럼은 체크 클릭도 불가(조회 전용)
+        if (
+          props.checkExclusiveColumns == true ||
+          props.checkRenderEditable == true
+        ) {
+          const colId = String(col.fieldName ?? col.name ?? "");
+          const isReadonlyCheck = readonlyCheckCols.includes(colId);
           col.editable = false;
+          col.editor = null;
+          if (isReadonlyCheck) {
+            const prevStyle = String(col.styleName ?? "").trim();
+            col.styleName = [prevStyle, "rg-check-display-only"]
+              .filter(Boolean)
+              .join(" ");
+          }
+          const prevCb = col.styleCallback;
+          // 조회 전용 컬럼: 항상 클릭 불가
+          // 삭제(checkbox): 삭제여부 체크된 행만 클릭 불가
+          const isSelectCheckCol =
+            colId === "checkbox" ||
+            colId === String(props.headerCheckBar ?? "").trim();
+          col.styleCallback = function (grid, dataCell) {
+            const base =
+              typeof prevCb === "function"
+                ? prevCb.call(this, grid, dataCell) || {}
+                : {};
+            const dataRow = dataCell?.index?.dataRow;
+            const ds = grid?.getDataSource?.();
+            const rowDeleted = rgRowHasDeleteFlag(ds, dataRow);
+            const checkClickable =
+              props.checkExclusiveColumns !== true &&
+              props.checkRenderEditable === true &&
+              !isReadonlyCheck &&
+              !(isSelectCheckCol && rowDeleted);
+            return {
+              ...base,
+              editable: false,
+              styleName: isReadonlyCheck
+                ? [base.styleName, "rg-check-display-only"]
+                    .filter(Boolean)
+                    .join(" ")
+                : base.styleName,
+              renderer: {
+                ...(base.renderer && typeof base.renderer === "object"
+                  ? base.renderer
+                  : {}),
+                type: "check",
+                editable: checkClickable,
+              },
+            };
+          };
         }
       }
     }
   } catch (_) {
     void 0;
   }
-  // opt-in: 배타 선택 화면만 체크컬럼 편집기 진입 차단
-  if (props.checkExclusiveColumns == true) {
+  // 체크 컬럼: 라인 편집기 진입 차단 (타이핑 방지)
+  if (
+    props.checkExclusiveColumns == true ||
+    props.checkRenderEditable == true
+  ) {
     const prevShowEditorForCheck = gridView.onShowEditor;
     gridView.onShowEditor = function (grid, index, editProps, attrs) {
       try {
@@ -4729,7 +4828,40 @@ const runFuncshowGrid = async () => {
     }
   }
 
+  const rgApplyFooterLabelOnFirstVisible = () => {
+    if (props.footerLabelOnFirstVisible !== true || gridView == null) {
+      return;
+    }
+    const label = Array.isArray(props.setFooterCustomText)
+      ? String(props.setFooterCustomText[0] ?? "")
+      : "";
+    const sumCols = new Set(
+      (props.setFooterColID ?? []).map((id) => String(id))
+    );
+    const cols = gridView.getColumns?.() ?? [];
+    let placed = false;
+    for (const col of cols) {
+      const name = String(col?.name ?? col?.fieldName ?? "");
+      if (!name || sumCols.has(name)) {
+        continue;
+      }
+      const live = gridView.columnByField(name) || gridView.columnByName?.(name);
+      if (!live?.footer) {
+        continue;
+      }
+      const visible = live.visible !== false && Number(col?.width ?? live.width ?? 1) !== 0;
+      if (!placed && visible) {
+        live.footer.text = label;
+        live.footer.styleName = "setTextAlignCenter";
+        placed = true;
+      } else {
+        live.footer.text = "";
+      }
+    }
+  };
+
   rgApplyForceColumnLayout(gridView);
+  rgApplyFooterLabelOnFirstVisible();
 
   watch(
     () => props.hideColumnsId,
@@ -4754,6 +4886,7 @@ const runFuncshowGrid = async () => {
             gridView.columnByField(props.hideColumnsId[i]).visible = false;
           }
         }
+        rgApplyFooterLabelOnFirstVisible();
       }
     }
   );
@@ -5142,6 +5275,57 @@ const runFuncshowGrid = async () => {
     }
     // 그룹 소계/푸터/헤더 등 "데이터 행"이 아닌 영역 클릭 시 버튼컬럼 이벤트 emit 금지
     if (ciDataRow == undefined || ciDataRow < 0) {
+      return;
+    }
+
+    // 조회 전용 체크 컬럼(checkbox2 등): 클릭으로 값이 바뀌면 즉시 원복
+    const readonlyCheckCols = rgGetReadonlyCheckFlagCols();
+    const clickField = String(clickData.fieldName ?? "").trim();
+    const dpLock = rgLocalDp();
+    if (clickField && readonlyCheckCols.includes(clickField)) {
+      if (dpLock) {
+        let prevVal;
+        try {
+          prevVal = dpLock.getValue(ciDataRow, clickField);
+        } catch (_) {
+          prevVal = undefined;
+        }
+        const restore = () => {
+          try {
+            if (dpLock.getValue(ciDataRow, clickField) !== prevVal) {
+              dpLock.setValue(ciDataRow, clickField, prevVal);
+            }
+          } catch (_) {
+            void 0;
+          }
+        };
+        restore();
+        setTimeout(restore, 0);
+        setTimeout(restore, 50);
+      }
+      return;
+    }
+
+    // 삭제여부 체크된 행: 삭제(선택) 체크도 불가 — 값이 바뀌면 false 로 원복
+    if (
+      clickField &&
+      (clickField === "checkbox" ||
+        clickField === String(props.headerCheckBar ?? "").trim()) &&
+      dpLock &&
+      rgRowHasDeleteFlag(dpLock, ciDataRow)
+    ) {
+      const restoreFalse = () => {
+        try {
+          if (dpLock.getValue(ciDataRow, clickField) !== false) {
+            dpLock.setValue(ciDataRow, clickField, false);
+          }
+        } catch (_) {
+          void 0;
+        }
+      };
+      restoreFalse();
+      setTimeout(restoreFalse, 0);
+      setTimeout(restoreFalse, 50);
       return;
     }
 
@@ -5581,7 +5765,7 @@ const runFuncshowGrid = async () => {
   gridView.onColumnCheckedChanged = function (grid, col, chk) {
     //console.log("헤더 전체체크");
     var rowCount = dataProvider.getRowCount(); // 전체 행의 개수
-    const colFieldName = col?.fieldName ?? "";
+    const colFieldName = String(col?.fieldName || col?.name || "").trim();
     const checkCol = String(props.checkRowAuto2Col ?? "").trim();
     const syncCheckRow =
       props.checkRowAuto2 === true && colFieldName === checkCol;
@@ -5600,11 +5784,43 @@ const runFuncshowGrid = async () => {
           }
         }
       } else if (props.checkAbleExpressionCol == "") {
+        // checkRenderEditable + checkRenderEditable2Col 이면
+        // 삭제여부 체크된 행은 헤더 전체선택에서 제외 (그 외 화면은 전원 선택 — 기존과 동일)
+        const skipDeletedRows =
+          props.checkRenderEditable === true &&
+          rgGetReadonlyCheckFlagCols().length > 0 &&
+          (colFieldName === "checkbox" ||
+            colFieldName === String(props.headerCheckBar ?? "").trim());
+        const clearDeletedSelect = () => {
+          if (!skipDeletedRows || !colFieldName) return;
+          const n = dataProvider.getRowCount();
+          for (let ri = 0; ri < n; ri++) {
+            if (!rgRowHasDeleteFlag(dataProvider, ri)) continue;
+            try {
+              if (dataProvider.getValue(ri, colFieldName) !== false) {
+                dataProvider.setValue(ri, colFieldName, false);
+              }
+            } catch (_) {
+              void 0;
+            }
+          }
+        };
         for (var i = 0; i < rowCount; i++) {
+          if (skipDeletedRows && rgRowHasDeleteFlag(dataProvider, i)) {
+            dataProvider.setValue(i, colFieldName, false);
+            continue;
+          }
           dataProvider.setValue(i, colFieldName, chk);
         }
-        if (!bulkCellCheckOnly) {
+        // 그리드 헤더 체크가 콜백 이후에 셀을 다시 채우는 경우 대비
+        if (skipDeletedRows) {
+          clearDeletedSelect();
+        } else if (!bulkCellCheckOnly) {
           gridView.setAllCheck(chk);
+        }
+        if (skipDeletedRows) {
+          setTimeout(clearDeletedSelect, 0);
+          setTimeout(clearDeletedSelect, 50);
         }
       } else {
         for (var i = 0; i < rowCount; i++) {
@@ -5979,12 +6195,24 @@ watch(
       dataProvider.endUpdate();
       updatedrowData.value = [...dataProvider.getJsonRows()];
 
-      const dataRow = gridView.getCurrent().dataRow;
-      selectedRowData.value = dataProvider.getRows()[dataRow];
-      emit("clickedRowData", selectedRowData.value);
+      // 상세 폼 입력 중 getCurrent().dataRow 가 -1 일 수 있음 → changeRow 로 보정
+      const currentDataRow = gridView.getCurrent()?.dataRow;
+      const dataRow =
+        currentDataRow != null && currentDataRow >= 0
+          ? currentDataRow
+          : props.changeRow;
+      selectedRowData.value =
+        dataRow != null && dataRow >= 0
+          ? dataProvider.getRows()[dataRow]
+          : null;
+
+      // clickedRowData 가 부모에서 예외 나도 변경상태/저장용 emit 은 먼저 전달
       emit("updatedRowData", updatedrowData.value);
       emit("updatedRowData2", updatedrowData.value);
       emit("allStateRows", dataProvider.getAllStateRows());
+      if (selectedRowData.value != null) {
+        emit("clickedRowData", selectedRowData.value);
+      }
     }
   }
 );
@@ -7389,6 +7617,23 @@ watch(
 <style>
 .rg-check-readonly-disabled {
   background-color: #9a9a9a !important;
+}
+
+/* 삭제여부 등 조회 전용 체크 — disabled/흐림 없이 구분 가능하게 */
+.rg-check-display-only,
+.rg-check-display-only * {
+  opacity: 1 !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+.rg-check-display-only {
+  pointer-events: none !important;
+}
+.rg-check-display-only input[type="checkbox"] {
+  opacity: 1 !important;
+  filter: none !important;
+  cursor: default !important;
+  accent-color: #2563eb;
 }
 
 /* 배타 선택 컬럼: 체크박스 대신 라디오 이미지 */

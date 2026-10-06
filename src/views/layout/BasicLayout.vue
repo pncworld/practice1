@@ -347,6 +347,9 @@ const activeTab = (e) => {
   //store.state.activeTab2 = e;
   store.dispatch("saveActiveTab", e);
   currentActiveTab.value = e;
+  if (e?.lngProgramID) {
+    componentKey.value = e.lngProgramID;
+  }
 };
 
 const removedtabId = ref();
@@ -385,31 +388,50 @@ const reLoad = () => {
   // window.location.reload(); // 페이지 새로 고침
   //comsole.log(currentActiveTab.value);
   //comsole.log(tabs.value);
-  if (
-    currentActiveTab.value &&
-    (tabs.value.length == 0 || currentActiveTab.value.lngProgramID == "")
-  ) {
+  if (!currentActiveTab.value || tabs.value.length == 0) {
     return;
   }
-  const uuid = v4();
-  const b = currentActiveTab.value.lngProgramID.split("_")[0];
-  const a = tabs.value.find(
-    (item) => item.lngProgramID == currentActiveTab.value.lngProgramID
-  );
+  const prevId = currentActiveTab.value.lngProgramID;
+  if (prevId === "" || prevId == null) {
+    return;
+  }
+
+  const baseId = String(prevId).split("_")[0];
+  // 탭 객체 참조가 어긋난 경우(기존화면 이동 등)에도 같은 프로그램 탭을 찾는다
+  let a = tabs.value.find((item) => item.lngProgramID == prevId);
+  if (!a) {
+    a = tabs.value.find(
+      (item) =>
+        String(item.lngProgramID).split("_")[0] === baseId &&
+        item.strUrl === currentActiveTab.value.strUrl
+    );
+  }
   if (!a) {
     return;
   }
 
-  const c = b + "_" + uuid;
+  const c = `${baseId}_${v4()}`;
   a.lngProgramID = c;
+  // currentActiveTab 이 tabs 항목과 다른 객체여도 ID를 맞춘다
+  currentActiveTab.value = { ...a };
+  store.dispatch("saveActiveTab", currentActiveTab.value);
   componentKey.value = c;
+  // query.index 와 componentKey 불일치 시 keep-alive 키가 되돌아가 리프레시가 무효화되는 문제 방지
+  router
+    .replace({
+      path:
+        "/" + a.strUrl.split("::")[0] + "/" + a.strUrl.split("::")[1],
+      query: { index: c },
+    })
+    .catch(() => {});
 };
 
 /** 상단 리프레시 아이콘 전용 — 홈(매출분석·KPI)만 추가 갱신. 메뉴 토글 등 기존 reLoad 경로는 유지 */
 const reLoadToolbar = () => {
   if (
-    currentActiveTab.value &&
-    (tabs.value.length == 0 || currentActiveTab.value.lngProgramID == "")
+    !currentActiveTab.value ||
+    tabs.value.length == 0 ||
+    currentActiveTab.value.lngProgramID == ""
   ) {
     componentKey.value = v4();
     return;

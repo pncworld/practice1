@@ -5,108 +5,93 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <!-- 조회 조건 -->
-  <div class="h-[80%]">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <PageName></PageName>
-      <div class="flex justify-center mr-10 space-x-2 pr-5">
-        <button @click="searchButton" class="button search">조회</button>
-        <button @click="addButton" class="button new">신규</button>
-        <button @click="saveButton" class="button save">저장</button>
-        <button @click="excelButton" class="button excel">엑셀</button>
+  <div class="att01-page box-border flex h-full max-w-full min-h-0 flex-col gap-2 overflow-hidden pb-1">
+    <div class="att01-toolbar flex shrink-0 flex-wrap items-center justify-between gap-2">
+      <PageName />
+      <div class="flex flex-wrap items-center justify-end gap-2">
+        <button type="button" @click="searchButton" class="button search md:w-auto w-14">조회</button>
+        <button type="button" @click="addButton" class="button new md:w-auto w-auto">신규</button>
+        <button type="button" @click="saveButton" class="button save md:w-auto w-auto">저장</button>
+        <button type="button" @click="excelButton" class="button excel md:w-auto w-auto">엑셀</button>
       </div>
     </div>
-    <div
-      class="flex flex-col justify-start space-x-5 bg-gray-200 rounded-lg h-24 items-start pt-3 pl-36">
-      <div class="flex">
-        <div>
-          <PickStore
-            @update:storeGroup="handleGroupCd"
-            @update:storeCd="handleStoreCd"
-            @update:storeType="handleStoreType"
-            :defaultStoreNm="'전체'"
-            @storeNm="storeNm"
-            @update:ischanged="handleinitAll">
-          </PickStore>
-        </div>
-        <div class="flex justify-center items-center space-x-3 ml-60">
-          <div class="text-base font-semibold">검색 :</div>
-          <select
-            name=""
-            id=""
-            class="w-20 h-10 rounded-lg"
-            v-model="searchoption">
-            <option value="0">전체</option>
-            <option value="1">사원명</option>
-            <option value="2">사원코드</option>
-          </select>
-          <input
-            type="text"
-            v-model="searchword"
-            class="w-72 h-10 pl-1 rounded-lg" />
-        </div>
-      </div>
-      <div class="flex mt-3 space-x-10 items-center">
-        <div class="text-base font-semibold">조회옵션</div>
-        <div>
-          <label for="cond" class="text-sm"
-            ><input type="checkbox" id="cond" v-model="cond" />재직</label
-          >
-        </div>
-        <div>
-          <label for="cond2"
-            ><input type="checkbox" id="cond2" v-model="cond2" />퇴사</label
-          >
-        </div>
-        <div>
-          <label for="cond3"
-            ><input type="checkbox" id="cond3" v-model="cond3" />휴직</label
-          >
-        </div>
 
-        <div class="flex">
-          <div class="text-base font-semibold">직책:</div>
-          <div>
-            <select name="" id="" v-model="cond4" class="w-60 ml-1">
+    <div class="att01-search-panel z-10 w-full min-w-0 shrink-0 rounded-lg bg-gray-200">
+      <div class="att01-search-grid min-w-0">
+        <div class="att01-cell">
+          <div class="att01-sg-label">매장명</div>
+          <div class="att01-cell-field att01-pick-slot min-w-0">
+            <PickStore
+              compact-search-bar
+              store-dropdown-fit-height
+              main-name=""
+              :compact-store-combo-max-rem="15.6"
+              @update:storeGroup="handleGroupCd"
+              @update:storeType="handleStoreType"
+              @update:storeCd="handleStoreCd"
+              :defaultStoreNm="'전체'"
+              @storeNm="storeNm"
+              @update:ischanged="handleinitAll" />
+          </div>
+        </div>
+        <div class="att01-cell">
+          <div class="att01-sg-label">검색</div>
+          <div class="att01-cell-field att01-search-pair">
+            <select class="att01-control att01-control--kind" v-model="searchoption">
               <option value="0">전체</option>
-              <option :value="i.lngClassCode" v-for="i in dataList2">
-                {{ i.strClass }}
-              </option>
+              <option value="1">사원명</option>
+              <option value="2">사원코드</option>
+            </select>
+            <input
+              type="text"
+              v-model="searchword"
+              class="att01-control att01-control--word"
+              @keydown.enter.prevent="searchButton" />
+          </div>
+        </div>
+        <div class="att01-cell">
+          <div class="att01-sg-label">조회옵션</div>
+          <div class="att01-cell-field att01-checks">
+            <label class="att01-check" for="cond"><input type="checkbox" id="cond" v-model="cond" />재직</label>
+            <label class="att01-check" for="cond2"><input type="checkbox" id="cond2" v-model="cond2" />퇴사</label>
+            <label class="att01-check" for="cond3"><input type="checkbox" id="cond3" v-model="cond3" />휴직</label>
+          </div>
+        </div>
+        <div class="att01-cell">
+          <div class="att01-sg-label">직책</div>
+          <div class="att01-cell-field">
+            <select class="att01-control" v-model="cond4">
+              <option value="0">전체</option>
+              <option :value="i.lngClassCode" v-for="i in dataList2" :key="i.lngClassCode">{{ i.strClass }}</option>
             </select>
           </div>
         </div>
-
-        <div class="flex">
-          <div class="text-base font-semibold">직위 :</div>
-          <div>
-            <select name="" id="" v-model="cond5" class="w-60 ml-1">
+        <div class="att01-cell">
+          <div class="att01-sg-label">직위</div>
+          <div class="att01-cell-field">
+            <select class="att01-control" v-model="cond5">
               <option value="0">전체</option>
-              <option :value="i.lngRankCode" v-for="i in dataList3">
-                {{ i.strRank }}
-              </option>
+              <option :value="i.lngRankCode" v-for="i in dataList3" :key="i.lngRankCode">{{ i.strRank }}</option>
             </select>
           </div>
         </div>
-
-        <div class="flex">
-          <div class="text-base font-semibold">근무장소:</div>
-          <div>
-            <select name="" id="" v-model="cond6" class="w-60 ml-1">
+        <div class="att01-cell">
+          <div class="att01-sg-label">근무장소</div>
+          <div class="att01-cell-field">
+            <select class="att01-control" v-model="cond6">
               <option value="0">전체</option>
-              <option :value="i.lngAreaCode" v-for="i in dataList">
-                {{ i.strArea }}
-              </option>
+              <option :value="i.lngAreaCode" v-for="i in dataList" :key="i.lngAreaCode">{{ i.strArea }}</option>
             </select>
           </div>
         </div>
       </div>
     </div>
-    <!-- 조회 조건 -->
-    <!-- 그리드 영역-->
-    <div
-      class="grid grid-rows-2 grid-cols-1 h-[70vh] w-full justify-center mt-1">
-      <div class="w-full h-[30vh]">
+
+    <div class="att01-body min-h-0 min-w-0 flex-1">
+      <div class="att01-section-title shrink-0">사원 목록</div>
+      <div class="att01-grid-wrap mt-2 min-h-0 min-w-0">
         <Realgrid
+          class="h-full w-full"
           :progname="'ATT01_002INS_VUE2'"
           :progid="1"
           :rowData="rowData"
@@ -128,424 +113,148 @@
           :rowStateeditable="false"
           @sendRowState="sendRowState"
           @allStateRows="allStateRows"
-          :addField="'new'"></Realgrid>
+          :addField="'new'" />
       </div>
-      <div class="w-full h-[40vh] -mt-10">
-        <div
-          class="grid grid-rows-9 grid-cols-[1fr,2fr,1fr,2fr,1fr,2fr] h-[30vh]">
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            <span
-              class="flex justify-center items-center text-red-400 text-justify"
-              >*</span
-            >매장코드
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select
-              name="lngPosition"
-              id=""
-              :disabled="disableGrid"
-              v-model="gridvalue1"
-              @change="changeInfo"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
-              <option :value="i.lngStoreCode" v-for="i in dataList4">
-                {{ i.strName }}
-              </option>
+
+      <div class="att01-section-title att01-section-title--form shrink-0">사원 정보</div>
+      <div class="att01-form-scroll mt-2 min-h-0">
+        <div class="att01-form-grid">
+          <div class="att01-form-label att01-form-label--required">*매장코드</div>
+          <div class="att01-form-value">
+            <select name="lngPosition" :disabled="disableGrid || lockStoreCode" v-model="gridvalue1" @change="changeInfo" class="att01-control">
+              <option :value="i.lngStoreCode" v-for="i in dataList4" :key="i.lngStoreCode">{{ i.strName }}</option>
             </select>
           </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            <span
-              class="flex justify-center items-center text-red-400 text-justify"
-              >*</span
-            >사원이름
+          <div class="att01-form-label att01-form-label--required">*사원이름</div>
+          <div class="att01-form-value">
+            <input type="text" name="strChargerName" @input="changeInfo" :disabled="disableGrid" class="att01-control" v-model="gridvalue2" />
           </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strChargerName"
-              @input="changeInfo"
-              :disabled="disableGrid"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300"
-              v-model="gridvalue2" />
+          <div class="att01-form-label att01-form-label--required">*사원 코드</div>
+          <div class="att01-form-value">
+            <input type="text" name="lngChargerCode" @input="changeInfo" :disabled="disableGrid" class="att01-control" v-model="gridvalue3" />
           </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            <span
-              class="flex justify-center items-center text-red-400 text-justify"
-              >*</span
-            >사원 코드
+
+          <div class="att01-form-label">주민번호</div>
+          <div class="att01-form-value">
+            <input type="text" name="strIdNo" @input="changeInfo" :disabled="disableGrid" class="att01-control" v-model="gridvalue4" />
           </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="lngChargerCode"
-              @input="changeInfo"
-              :disabled="disableGrid"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300"
-              v-model="gridvalue3" />
+          <div class="att01-form-label">비밀번호</div>
+          <div class="att01-form-value">
+            <input type="text" name="strPassword" autocomplete="off" spellcheck="false" autocapitalize="off" @input="changeInfo" :disabled="disableGrid" class="att01-control att01-secret" v-model="gridvalue5" />
           </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            주민번호
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strIdNo"
-              @input="changeInfo"
-              :disabled="disableGrid"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300"
-              v-model="gridvalue4" />
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            비밀번호
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strPassword"
-              @input="changeInfo"
-              :disabled="disableGrid"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300"
-              v-model="gridvalue5" />
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            생년월일
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="date"
-              name="dtmBirthDate"
-              @input="changeInfo"
-              :disabled="disableGrid"
-              v-model="gridvalue6"
-              class="border border-black w-[60%] h-[80%] disabled:bg-gray-300" />
-            <select
-              name="blnLuner"
-              id=""
-              @input="changeInfo"
-              v-model="gridvalue7"
-              :disabled="disableGrid"
-              class="border border-black w-[20%] h-[80%] disabled:bg-gray-300">
+          <div class="att01-form-label">생년월일</div>
+          <div class="att01-form-value att01-form-value--split">
+            <input type="date" name="dtmBirthDate" @input="changeInfo" :disabled="disableGrid" v-model="gridvalue6" class="att01-control" />
+            <select name="blnLuner" @input="changeInfo" v-model="gridvalue7" :disabled="disableGrid" class="att01-control att01-control--calendar">
               <option :value="true">양력</option>
               <option :value="false">음력</option>
             </select>
           </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            <span
-              class="flex justify-center items-center text-red-400 text-justify"
-              >*</span
-            >직책
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select
-              name="lngClassCode"
-              id=""
-              @input="changeInfo"
-              v-model="gridvalue8"
-              :disabled="disableGrid"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
+
+          <div class="att01-form-label att01-form-label--required">*직책</div>
+          <div class="att01-form-value">
+            <select name="lngClassCode" @input="changeInfo" v-model="gridvalue8" :disabled="disableGrid" class="att01-control">
               <option value="0">선택</option>
-              <option :value="i.lngClassCode" v-for="i in dataList2">
-                {{ i.strClass }}
-              </option>
+              <option :value="i.lngClassCode" v-for="i in dataList2" :key="'c-' + i.lngClassCode">{{ i.strClass }}</option>
             </select>
           </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            <span
-              class="flex justify-center items-center text-red-400 text-justify"
-              >*</span
-            >직위
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select
-              name="lngRankCode"
-              id=""
-              @input="changeInfo"
-              v-model="gridvalue9"
-              :disabled="disableGrid"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
+          <div class="att01-form-label att01-form-label--required">*직위</div>
+          <div class="att01-form-value">
+            <select name="lngRankCode" @input="changeInfo" v-model="gridvalue9" :disabled="disableGrid" class="att01-control">
               <option value="0">선택</option>
-              <option :value="i.lngRankCode" v-for="i in dataList3">
-                {{ i.strRank }}
-              </option>
+              <option :value="i.lngRankCode" v-for="i in dataList3" :key="'r-' + i.lngRankCode">{{ i.strRank }}</option>
             </select>
           </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            <span
-              class="flex justify-center items-center text-red-400 text-justify"
-              >*</span
-            >근무장소
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select
-              name="lngAreaCode"
-              id=""
-              @input="changeInfo"
-              :disabled="disableGrid"
-              v-model="gridvalue10"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
-              <option value="null">선택</option>
-              <option :value="i.lngAreaCode" v-for="i in dataList">
-                {{ i.strArea }}
-              </option>
+          <div class="att01-form-label att01-form-label--required">*근무장소</div>
+          <div class="att01-form-value">
+            <select name="lngAreaCode" @input="changeInfo" :disabled="disableGrid" v-model="gridvalue10" class="att01-control">
+              <option value="0">선택</option>
+              <option :value="i.lngAreaCode" v-for="i in dataList" :key="'a-' + i.lngAreaCode">{{ i.strArea }}</option>
             </select>
           </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            입사일자
+
+          <div class="att01-form-label">입사일자</div>
+          <div class="att01-form-value">
+            <input type="date" name="dtmJoinDate" :disabled="disableGrid" @input="changeInfo" v-model="gridvalue11" class="att01-control" />
           </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="date"
-              name="dtmJoinDate"
-              :disabled="disableGrid"
-              @input="changeInfo"
-              v-model="gridvalue11"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
+          <div class="att01-form-label">카드번호</div>
+          <div class="att01-form-value">
+            <input type="text" name="strCardNumber" @input="changeInfo" :disabled="disableGrid" v-model="gridvalue12" class="att01-control" />
           </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            카드번호
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strCardNumber"
-              @input="changeInfo"
-              :disabled="disableGrid"
-              v-model="gridvalue12"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            <span
-              class="flex justify-center items-center text-red-400 text-justify"
-              >*</span
-            >재직구분
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select
-              name="blnExpireClass"
-              @input="changeInfo"
-              v-model="gridvalue13"
-              :disabled="disableGrid"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
+          <div class="att01-form-label att01-form-label--required">*재직구분</div>
+          <div class="att01-form-value">
+            <select name="blnExpireClass" @input="changeInfo" v-model="gridvalue13" :disabled="disableGrid" class="att01-control">
               <option value="0">재직</option>
               <option value="1">퇴직</option>
               <option value="2">휴직</option>
             </select>
           </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            우편번호
+
+          <div class="att01-form-label">우편번호</div>
+          <div class="att01-form-value att01-form-value--split">
+            <input type="text" name="strZipCode" @input="changeInfo" v-model="gridvalue14" :disabled="disableGrid" class="att01-control" />
+            <button type="button" class="whitebutton att01-zip-btn" @click="showZipCode" :disabled="disableGrid">우편번호 찾기</button>
           </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strZipCode"
-              @input="changeInfo"
-              v-model="gridvalue14"
-              :disabled="disableGrid"
-              class="border border-black w-[50%] h-[80%] disabled:bg-gray-300" />
-            <button
-              class="whitebutton"
-              @click="showZipCode"
-              :disabled="disableGrid">
-              우편번호 찾기
-            </button>
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            주소
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center col-span-3">
-            <input
-              type="text"
-              name="strAddress"
-              @input="changeInfo"
-              :disabled="disableGrid"
-              v-model="gridvalue15"
-              class="border border-black w-[80%] h-[80%] mr-28 disabled:bg-gray-300" />
+          <div class="att01-form-label">주소</div>
+          <div class="att01-form-value att01-span-3">
+            <input type="text" name="strAddress" @input="changeInfo" :disabled="disableGrid" v-model="gridvalue15" class="att01-control" />
           </div>
 
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            전화번호
+          <div class="att01-form-label">전화번호</div>
+          <div class="att01-form-value">
+            <input type="text" name="strTelNumber" :disabled="disableGrid" @input="changeInfo" v-model="gridvalue16" class="att01-control" />
           </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strTelNumber"
-              :disabled="disableGrid"
-              @input="changeInfo"
-              v-model="gridvalue16"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
+          <div class="att01-form-label">휴대폰번호</div>
+          <div class="att01-form-value">
+            <input type="text" name="strCPhone" :disabled="disableGrid" @input="changeInfo" v-model="gridvalue17" class="att01-control" />
           </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            휴대폰번호
+          <div class="att01-form-label">퇴직일자</div>
+          <div class="att01-form-value">
+            <input type="date" name="dtmRetireDate" :disabled="disableGrid" @input="changeInfo" v-model="gridvalue18" class="att01-control" />
           </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              name="strCPhone"
-              :disabled="disableGrid"
-              @input="changeInfo"
-              v-model="gridvalue17"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
+
+          <div class="att01-form-label">이메일</div>
+          <div class="att01-form-value">
+            <input type="text" :disabled="disableGrid" name="strEmail" @input="changeInfo" v-model="gridvalue19" class="att01-control" />
           </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            퇴직일자
+          <div class="att01-form-label">계약 만기일</div>
+          <div class="att01-form-value">
+            <input type="date" :disabled="disableGrid" name="dtmExpireDate" @input="changeInfo" v-model="gridvalue20" class="att01-control" />
           </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="date"
-              name="dtmRetireDate"
-              :disabled="disableGrid"
-              @input="changeInfo"
-              v-model="gridvalue18"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
+          <div class="att01-form-label">보건증만기일</div>
+          <div class="att01-form-value">
+            <input type="date" :disabled="disableGrid" name="dtmHealthExpireDate" @input="changeInfo" v-model="gridvalue21" class="att01-control" />
           </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            이메일
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              :disabled="disableGrid"
-              name="strEmail"
-              @input="changeInfo"
-              v-model="gridvalue19"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
-          </div>
-          <div
-            class="border-t border-gray-600 flex justify-center items-center"></div>
-          <div
-            class="border-t border-gray-600 flex justify-center items-center"></div>
-          <div
-            class="border-t border-gray-600 flex justify-center items-center"></div>
-          <div
-            class="border-t border-gray-600 flex justify-center items-center"></div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            계약 만기일
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="date"
-              :disabled="disableGrid"
-              name="dtmExpireDate"
-              @input="changeInfo"
-              v-model="gridvalue20"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            보건증만기일
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="date"
-              :disabled="disableGrid"
-              name="dtmHealthExpireDate"
-              @input="changeInfo"
-              v-model="gridvalue21"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
-          </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            정규직/PT
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select
-              name="lngWorkClass"
-              id=""
-              :disabled="disableGrid"
-              @change="changeInfo"
-              v-model="gridvalue22"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
+
+          <div class="att01-form-label">정규직/PT</div>
+          <div class="att01-form-value">
+            <select name="lngWorkClass" :disabled="disableGrid" @change="changeInfo" v-model="gridvalue22" class="att01-control">
               <option value="0">해당 사항 없음</option>
               <option value="1">정직원</option>
               <option value="2">PT</option>
             </select>
           </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            거래은행
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <select
-              name="lngBankCode"
-              id=""
-              :disabled="disableGrid"
-              @change="changeInfo"
-              v-model="gridvalue23"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300">
+          <div class="att01-form-label">거래은행</div>
+          <div class="att01-form-value">
+            <select name="lngBankCode" :disabled="disableGrid" @change="changeInfo" v-model="gridvalue23" class="att01-control">
               <option value="0">선택</option>
-              <option :value="i.lngBankCode" v-for="i in dataList5">
-                {{ i.strBankName }}
-              </option>
+              <option :value="i.lngBankCode" v-for="i in dataList5" :key="i.lngBankCode">{{ i.strBankName }}</option>
             </select>
           </div>
-          <div
-            class="bg-gray-100 border-l border-t border-gray-600 flex justify-center items-center">
-            계좌번호
-          </div>
-          <div
-            class="border-l border-t border-gray-600 flex justify-center items-center">
-            <input
-              type="text"
-              :disabled="disableGrid"
-              name="strBankNumber"
-              id=""
-              @input="changeInfo"
-              v-model="gridvalue24"
-              class="border border-black w-[80%] h-[80%] disabled:bg-gray-300" />
+          <div class="att01-form-label">계좌번호</div>
+          <div class="att01-form-value">
+            <input type="text" :disabled="disableGrid" name="strBankNumber" @input="changeInfo" v-model="gridvalue24" class="att01-control" />
           </div>
         </div>
       </div>
-      <!-- 그리드 영역-->
-      <!-- 연동 데이터 영역-->
     </div>
 
     <GetZipCode
       v-if="zipCode"
       @closePopUp="closeZipCode"
       @address="address"
-      @zipCode="zipCode2"></GetZipCode>
+      @zipCode="zipCode2" />
   </div>
-  <!-- 연동 데이터 영역-->
 </template>
 
 <script setup>
@@ -683,6 +392,7 @@ onMounted(async () => {
 const rowData = ref([]);
 const groupCd = ref();
 const storeCd = ref();
+const storeType = ref(0);
 const afterSearch = ref(false);
 const exporttoExcel = ref(false);
 const documentSubTitle = ref("");
@@ -697,11 +407,14 @@ const changeValue2 = ref();
 const changeColid = ref();
 const changeRow = ref();
 
+const lockStoreCode = ref(true);
 const sendRowState = (e) => {
   if (e == "created") {
     isNewRow.value = false;
+    lockStoreCode.value = false;
   } else {
     isNewRow.value = true;
+    lockStoreCode.value = true;
   }
 };
 
@@ -728,6 +441,16 @@ const addButton = () => {
     });
     return;
   }
+  const unsavedCreated = allRowStates.value?.created ?? [];
+  if (unsavedCreated.length > 0) {
+    Swal.fire({
+      title: "경고",
+      text: "사원 신규 등록을 완료 후 추가 등록해 주십시오.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   // isNewRow.value = false;
   const newCode =
     Math.max(0, ...updateRow.value.map((item) => item.lngChargerCode)) + 1;
@@ -741,7 +464,7 @@ const addButton = () => {
     storeNm +
     "," +
     newCode +
-    ", ,,,,,,,,재직,,,, , , , , ,,0,0,0, ,0,0,0,0,,,,,,0,0,0";
+    ",,,,,,,,,재직,,,, , , , , ,,0,0,0, ,0,0,0,0,,,,,,0,0,0";
   addRow.value = !addRow.value;
 };
 /**
@@ -764,7 +487,10 @@ const clickedRowData = (newValue) => {
   gridvalue7.value = newValue[28] == "True" ? true : false;
   gridvalue8.value = newValue[23];
   gridvalue9.value = newValue[24];
-  gridvalue10.value = isNaN(newValue[25]) ? null : newValue[25];
+  gridvalue10.value =
+    newValue[25] == null || newValue[25] === "" || isNaN(newValue[25])
+      ? "0"
+      : newValue[25];
   gridvalue11.value = newValue[16].split(" ")[0];
   gridvalue12.value = newValue[15];
   gridvalue13.value = newValue[29];
@@ -795,8 +521,9 @@ const handleStoreCd = (newValue) => {
   storeCd.value = newValue;
 };
 
-const storeType = ref(store.state.userData.lngStoreAttr);
-const handleStoreType = (_e) => {};
+const handleStoreType = (newValue) => {
+  storeType.value = newValue;
+};
 const updateRow = ref([]);
 /**
  * 입력창 수정 데이터 갱신
@@ -851,7 +578,7 @@ const changeInfo = (e) => {
   if (rowName == "lngAreaCode") {
     setTimeout(() => {
       // console.log(rowValue);
-      if (rowValue == null || rowValue == "null") {
+      if (rowValue == null || rowValue == "null" || rowValue == "0") {
         changeValue2.value = "선택";
         changeColid.value = "strAreaName";
 
@@ -925,8 +652,6 @@ const searchButton = async () => {
     //comsole.log(groupCd.value);
     //comsole.log(storeCd.value);
 
-    console.log(storeType.value);
-
     let lngoption =
       (cond.value == true ? "1" : "") +
       (cond2.value == true ? "2" : "") +
@@ -947,7 +672,7 @@ const searchButton = async () => {
 
     rowData.value = res.data.List;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
-    
+    allRowStates.value = { created: [] };
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -980,13 +705,31 @@ const saveButton = async () => {
     return;
   }
 
+  const validateRow1 = updateRow.value.filter(
+    (item) =>
+      item.lngPosition == null ||
+      item.lngPosition === "" ||
+      item.lngPosition == "0" ||
+      item.lngPosition == 0
+  ).length;
+  if (validateRow1 > 0) {
+    Swal.fire({
+      title: "경고",
+      text: "매장코드를 선택해 주십시오.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
   const validateRow2 = updateRow.value.filter(
-    (item) => item.strChargerName == "" || item.strChargerName == undefined
+    (item) =>
+      item.strChargerName == null || String(item.strChargerName).trim() === ""
   ).length;
   if (validateRow2 > 0) {
     Swal.fire({
       title: "경고",
-      text: "사원이름이 미입력되었습니다. 확인해주세요.",
+      text: "사원이름을 입력해 주십시오.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -994,12 +737,13 @@ const saveButton = async () => {
   }
 
   const validateRow3 = updateRow.value.filter(
-    (item) => item.lngChargerCode == "" || item.lngChargerCode == undefined
+    (item) =>
+      item.lngChargerCode == null || String(item.lngChargerCode).trim() === ""
   ).length;
   if (validateRow3 > 0) {
     Swal.fire({
       title: "경고",
-      text: "사원번호가 미입력되었습니다. 확인해주세요.",
+      text: "사원 코드를 입력해 주십시오.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -1007,12 +751,16 @@ const saveButton = async () => {
   }
 
   const validateRow4 = updateRow.value.filter(
-    (item) => item.lngClassCode == "0" || item.lngClassCode == undefined
+    (item) =>
+      item.lngClassCode == null ||
+      item.lngClassCode === "" ||
+      item.lngClassCode == "0" ||
+      item.lngClassCode == 0
   ).length;
   if (validateRow4 > 0) {
     Swal.fire({
       title: "경고",
-      text: "직책이 미입력되었습니다. 확인해주세요.",
+      text: "직책을 선택해 주십시오.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -1020,12 +768,16 @@ const saveButton = async () => {
   }
 
   const validateRow5 = updateRow.value.filter(
-    (item) => item.lngRankCode == "0" || item.lngRankCode == undefined
+    (item) =>
+      item.lngRankCode == null ||
+      item.lngRankCode === "" ||
+      item.lngRankCode == "0" ||
+      item.lngRankCode == 0
   ).length;
   if (validateRow5 > 0) {
     Swal.fire({
       title: "경고",
-      text: "직위가 미입력되었습니다. 확인해주세요.",
+      text: "직위를 선택해 주십시오.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -1035,13 +787,15 @@ const saveButton = async () => {
   const validateRow6 = updateRow.value.filter(
     (item) =>
       item.lngAreaCode == null ||
-      item.lngAreaCode == undefined ||
+      item.lngAreaCode === "" ||
+      item.lngAreaCode == "0" ||
+      item.lngAreaCode == 0 ||
       isNaN(item.lngAreaCode)
   ).length;
   if (validateRow6 > 0) {
     Swal.fire({
       title: "경고",
-      text: "근무장소가 미입력되었습니다. 확인해주세요.",
+      text: "근무장소를 선택해 주십시오.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -1049,12 +803,15 @@ const saveButton = async () => {
   }
 
   const validateRow7 = updateRow.value.filter(
-    (item) => item.blnExpireClass == undefined
+    (item) =>
+      item.blnExpireClass == null ||
+      item.blnExpireClass === "" ||
+      item.blnExpireClass == undefined
   ).length;
   if (validateRow7 > 0) {
     Swal.fire({
       title: "경고",
-      text: "재직구분이 미입력되었습니다. 확인해주세요.",
+      text: "재직구분을 선택해 주십시오.",
       icon: "warning",
       confirmButtonText: "확인",
     });
@@ -1204,4 +961,306 @@ const excelButton = () => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.att01-page {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+  padding-left: 1.25rem;
+  padding-right: 0.75rem;
+  box-sizing: border-box;
+}
+.att01-toolbar {
+  min-height: 2.5rem;
+}
+.att01-search-panel {
+  --att01-pad-x: 2rem;
+  --att01-control-h: 2rem;
+  --att01-row-min-h: 2rem;
+  --att01-col-gap: 1.5rem;
+  --att01-item-gap: 0.75rem;
+  --att01-label-col: 6.5rem;
+  --att01-control-border: #cbd5e1;
+  --att01-control-radius: 0.375rem;
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+  padding-block: 0.75rem;
+}
+.att01-search-grid {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--att01-col-gap);
+  row-gap: 0.5rem;
+  padding-left: var(--att01-pad-x);
+  padding-right: var(--att01-pad-x);
+}
+.att01-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--att01-item-gap);
+  min-height: var(--att01-row-min-h);
+  min-width: 0;
+}
+.att01-sg-label {
+  flex: 0 0 var(--att01-label-col);
+  width: var(--att01-label-col);
+  min-height: var(--att01-row-min-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  color: rgb(17 24 39);
+}
+.att01-cell-field {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0.5rem;
+}
+.att01-search-panel .att01-control {
+  box-sizing: border-box;
+  height: var(--att01-control-h);
+  min-height: var(--att01-control-h);
+  max-height: var(--att01-control-h);
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--att01-control-border);
+  border-radius: var(--att01-control-radius);
+  background: #fff;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  color: #111827;
+}
+.att01-search-panel .att01-control--kind {
+  flex: 0 0 7.5rem;
+  width: 7.5rem;
+}
+.att01-search-panel .att01-control--word {
+  flex: 1 1 auto;
+  width: auto;
+}
+.att01-checks {
+  gap: 1rem;
+}
+.att01-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: var(--att01-row-min-h);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+}
+.att01-pick-slot :deep(> .flex) {
+  width: 100%;
+  min-width: 0;
+  margin-left: 0 !important;
+  gap: 0.5rem !important;
+  align-items: center;
+}
+.att01-pick-slot :deep(> .flex > div.shrink-0.font-semibold) {
+  display: none !important;
+}
+.att01-pick-slot :deep(> .flex > div:has(#storeGroup)),
+.att01-pick-slot :deep(> .flex > div:has(> select:not(#storeGroup))) {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+.att01-pick-slot :deep(#storeGroup),
+.att01-pick-slot :deep(> .flex > div > select:not(#storeGroup)) {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+.att01-pick-slot :deep(> .flex > div:has(.pickstore-vs-shell)),
+.att01-pick-slot :deep(> .flex > div.relative.min-w-0.flex-1) {
+  flex: 1.35 1 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+.att01-pick-slot :deep(select),
+.att01-pick-slot :deep(.pickstore-vs-shell) {
+  box-sizing: border-box;
+  height: var(--att01-control-h) !important;
+  min-height: var(--att01-control-h) !important;
+  max-height: var(--att01-control-h) !important;
+  border: 1px solid var(--att01-control-border) !important;
+  border-radius: var(--att01-control-radius) !important;
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  box-shadow: none !important;
+}
+.att01-pick-slot :deep(.pickstore-vs-shell) {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+.att01-pick-slot :deep(.style-chooser .vs__dropdown-toggle) {
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  color: #111827 !important;
+}
+.att01-pick-slot :deep(.style-chooser .vs__selected),
+.att01-pick-slot :deep(.style-chooser .vs__search),
+.att01-pick-slot :deep(.style-chooser .vs__search::placeholder) {
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  color: #111827 !important;
+}
+.att01-pick-slot :deep(.style-chooser .vs__open-indicator) {
+  fill: #6b7280 !important;
+  transform: scale(0.72) !important;
+}
+.att01-pick-slot :deep(.style-chooser.vs--open .vs__open-indicator) {
+  fill: #6b7280 !important;
+  transform: scale(0.72) rotate(180deg) !important;
+}
+.att01-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: #fff;
+  border-radius: 0.75rem 0.75rem 0 0;
+  box-shadow: 0 2px 8px rgb(15 23 42 / 8%);
+  padding: 0.5rem 1rem 0.5rem;
+  overflow: hidden;
+}
+.att01-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  color: #111827;
+}
+.att01-section-title--form {
+  margin-top: 0.35rem;
+}
+.att01-section-title::before {
+  content: "";
+  flex: 0 0 0.25rem;
+  width: 0.25rem;
+  height: 1.05em;
+  border-radius: 999px;
+  background: #2563eb;
+}
+.att01-grid-wrap {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 7rem;
+  overflow: hidden;
+  width: 100%;
+}
+.att01-form-scroll {
+  flex: 0 0 auto;
+  overflow: visible;
+  min-width: 0;
+}
+.att01-form-grid {
+  --att01-label-col: 6.25rem;
+  --att01-control-h: 1.375rem;
+  --att01-row-h: 1.625rem;
+  --att01-font: 0.8125rem;
+  display: grid;
+  grid-template-columns: repeat(3, var(--att01-label-col) minmax(0, 1fr));
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
+}
+.att01-form-label {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--att01-row-h);
+  padding: 0.25rem 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #edf2f7;
+  color: #5c5c5c;
+  font-size: var(--att01-font);
+  font-weight: 600;
+  text-align: center;
+  word-break: keep-all;
+}
+.att01-form-label--required {
+  color: #2563eb;
+  font-weight: 700;
+}
+.att01-form-value {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  min-height: var(--att01-row-h);
+  min-width: 0;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  gap: 0.35rem;
+}
+.att01-form-value--split .att01-control {
+  flex: 1 1 auto;
+}
+.att01-control--calendar {
+  flex: 0 0 4.5rem;
+  width: 4.5rem;
+}
+.att01-span-3 {
+  grid-column: span 3;
+}
+.att01-control {
+  box-sizing: border-box;
+  height: var(--att01-control-h);
+  min-height: var(--att01-control-h);
+  max-height: var(--att01-control-h);
+  width: 100%;
+  min-width: 0;
+  border-radius: 0.375rem;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  padding: 0 0.5rem;
+  font-size: var(--att01-font);
+}
+.att01-control:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+.att01-secret {
+  -webkit-text-security: disc;
+}
+.att01-control:disabled {
+  background: #f3f4f6;
+  color: #374151;
+}
+.att01-zip-btn {
+  flex: 0 0 auto;
+  height: var(--att01-control-h);
+  white-space: nowrap;
+}
+@media (max-width: 1100px) {
+  .att01-form-grid {
+    grid-template-columns: var(--att01-label-col) minmax(0, 1fr);
+  }
+  .att01-span-3 {
+    grid-column: span 1;
+  }
+}
+</style>

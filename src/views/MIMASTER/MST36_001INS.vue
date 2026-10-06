@@ -5,31 +5,35 @@
   # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <!-- 조회 조건 -->
-  <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <PageName> </PageName>
-    <div class="flex justify-center mr-9 space-x-2 pr-5">
-      <button @click="searchButton" class="button search md:w-auto w-14">
-        조회
-      </button>
-      <button @click="saveButton" class="button save w-auto">저장</button>
+  <div class="mst36-page box-border flex h-full max-w-full min-h-0 flex-col gap-2 overflow-hidden pb-1">
+    <!-- 상단: 페이지명 + 액션 (매장정보등록과 동일) -->
+    <div class="flex shrink-0 flex-wrap items-center justify-between gap-2">
+      <PageName />
+      <div class="flex flex-wrap items-center justify-end gap-2">
+        <button type="button" @click="searchButton" class="button search md:w-auto w-14">
+          조회
+        </button>
+        <button type="button" @click="saveButton" class="button save md:w-auto w-auto">
+          저장
+        </button>
+      </div>
     </div>
-  </div>
-  <br />
+
+    <!-- 할인대상메뉴 복사 팝업 -->
   <div
-    class="absolute z-50 inset-0 bg-black bg-opacity-50 w-full h-full"
+    class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50"
     v-if="discountMenuShow">
-    <div class="fixed top-[30%] left-[30%] h-[50%] w-[50%] bg-white rounded-lg">
+    <div class="h-[50%] w-[50%] max-w-5xl rounded-lg bg-white shadow-lg">
       <div
-        class="grid grid-rows-[1fr,11fr,1fr] grid-cols-1 text-xl p-5 font-semibold">
+        class="grid grid-rows-[1fr,11fr,1fr] grid-cols-1 text-xl p-5 font-semibold h-full">
         <div class="flex justify-between">
           <div>할인대상메뉴 복사</div>
           <div>
             <button class="button primary" @click="copyButton">복사</button>
           </div>
         </div>
-        <div class="grid grid-rows-1 grid-cols-2 space-x-3">
-          <div class="grid grid-rows-[1fr,3fr,7fr]">
+        <div class="grid grid-rows-1 grid-cols-2 space-x-3 min-h-0">
+          <div class="grid grid-rows-[1fr,3fr,7fr] min-h-0">
             <div class="flex justify-start text-base">기준 결제코드</div>
             <div class="grid grid-rows-2 grid-cols-[1fr,3fr] text-sm h-20">
               <div
@@ -57,7 +61,7 @@
                   class="h-full w-full p-1" />
               </div>
             </div>
-            <div>
+            <div class="min-h-0">
               <Realgrid
                 :progname="'MST36_001INS_VUE'"
                 :progid="4"
@@ -67,7 +71,7 @@
               </Realgrid>
             </div>
           </div>
-          <div class="grid grid-rows-[1fr,1fr,7fr]">
+          <div class="grid grid-rows-[1fr,1fr,7fr] min-h-0">
             <div class="text-base flex justify-start">대상 결제코드 선택</div>
             <div class="grid grid-rows-1 grid-cols-[2fr,3fr] text-sm h-8">
               <div class="text-sm flex justify-center items-center">
@@ -80,7 +84,7 @@
                   class="h-full w-full pl-1" />
               </div>
             </div>
-            <div>
+            <div class="min-h-0">
               <Realgrid
                 :progname="'MST36_001INS_VUE'"
                 :progid="5"
@@ -96,89 +100,95 @@
           </div>
         </div>
         <div class="flex justify-end mt-2">
-          <button @click="closePopUp" class="whitebutton">닫기</button>
+          <button type="button" @click="closePopUp" class="whitebutton">닫기</button>
         </div>
       </div>
     </div>
   </div>
-  <div
-    class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore
-      @update:storeGroup="lngStoreGroup"
-      @update:storeCd="handleStoreCd"
-      @storeNm="handlestoreNm"
-      :hidesub="hidesub"
-      :hideAttr="hideAttr"
-      @update:ischanged="handleinitAll"
-      @update:ischanged2="searchinit"></PickStore>
-  </div>
-  <!-- 조회 조건 -->
-  <!-- 그리드 데이터 부분 -->
-  <div class="grid grid-rows-1 grid-cols-[4fr,5fr] h-[86%] w-full">
-    <div class="flex flex-col w-full h-full">
-      <div
-        class="flex justify-between mt-5 ml-10 w-full border-b border-b-gray-300">
-        <div class="flex justify-start font-bold text-xl">결제코드 목록</div>
-        <div class="mt-3 space-x-2">
-          <button class="whitebutton" @click="addRow" :disabled="!afterSearch">
+
+    <!-- 조회 AREA (매장정보등록과 동일 패턴) -->
+    <div class="mst36-search-panel z-10 w-full min-w-0 shrink-0 rounded-lg bg-gray-200">
+      <div class="mst36-search-grid min-w-0">
+        <div class="mst36-cell">
+          <div class="mst36-sg-label">매장명</div>
+          <div class="mst36-cell-field mst36-pick-slot min-w-0">
+            <PickStore
+              compact-search-bar
+              main-name=""
+              :compact-store-combo-max-rem="15.6"
+              @update:storeGroup="lngStoreGroup"
+              @update:storeCd="handleStoreCd"
+              @storeNm="handlestoreNm"
+              :hidesub="hidesub"
+              :hideAttr="hideAttr"
+              @update:ischanged="handleinitAll"
+              @update:ischanged2="searchinit" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <!-- 본문: 좌 목록 / 우 상세 -->
+  <div class="mst36-workspace grid min-h-0 min-w-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,4fr)_minmax(0,5fr)]">
+    <div class="mst36-left flex min-h-0 min-w-0 flex-col">
+      <div class="mst36-section-head shrink-0">
+        <div class="mst36-section-title">결제코드 목록</div>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            class="mst36-action-btn mst36-action-btn--add"
+            @click="addRow"
+            :disabled="!afterSearch">
+            <font-awesome-icon :icon="['fas', 'plus']" />
             추가
           </button>
           <button
-            class="whitebutton"
+            type="button"
+            class="mst36-action-btn mst36-action-btn--del"
             @click="deleteRow"
             :disabled="!afterSearch">
+            <font-awesome-icon :icon="['fas', 'trash']" />
             삭제
           </button>
         </div>
       </div>
 
-      <div class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
-        <div class="customtableIndex border border-gray-400 rounded-tl-lg">
-          사용여부
+      <div class="mst36-list-filter shrink-0">
+        <div class="mst36-filter-row">
+          <div class="mst36-filter-label">사용여부</div>
+          <select
+            name="blnInactive"
+            class="mst36-filter-control mst36-filter-control--sm"
+            @change="searchColumn"
+            v-model="searchC1">
+            <option value="-1">전체</option>
+            <option value="0">사용</option>
+            <option value="1">미사용</option>
+          </select>
+          <div class="mst36-filter-label">결제구분</div>
+          <select
+            name="payDistinct"
+            class="mst36-filter-control mst36-filter-control--sm"
+            @change="searchColumn"
+            v-model="searchC2">
+            <option value="-1">전체</option>
+            <option value="1">할인</option>
+            <option value="2">지불</option>
+            <option value="3">할증</option>
+          </select>
         </div>
-        <div class="grid grid-rows-1 grid-cols-3 justify-center items-center">
-          <div class="border border-gray-400 h-full">
-            <select
-              name="blnInactive"
-              id=""
-              class="flex-1 border rounded-lg w-full h-full pl-1"
-              @change="searchColumn"
-              v-model="searchC1">
-              <option value="-1">전체</option>
-              <option value="0">사용</option>
-              <option value="1">미사용</option>
-            </select>
-          </div>
-          <div class="customtableIndex border border-gray-400">결제구분</div>
-          <div class="border border-gray-400 h-full rounded-tr-lg">
-            <select
-              name="payDistinct"
-              id=""
-              class="flex-1 border rounded-lg w-full h-full pl-1"
-              @change="searchColumn"
-              v-model="searchC2">
-              <option value="-1">전체</option>
-              <option value="1">할인</option>
-              <option value="2">지불</option>
-              <option value="3">할증</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="customtableIndex border border-gray-400 rounded-bl-lg">
-          결제코드/명
-        </div>
-        <div class="px-1 py-1 border border-gray-300 rounded-br-lg">
+        <div class="mst36-filter-row">
+          <div class="mst36-filter-label">결제코드/명</div>
           <input
             type="text"
-            class="border w-full h-full px-1 border-gray-400 rounded-lg"
+            class="mst36-filter-control mst36-filter-control--grow"
             @input="searchword"
             v-model="searchWord" />
         </div>
       </div>
-      <div class="ml-10 mt-1 w-full h-full">
+      <div class="mst36-grid-wrap min-h-0 min-w-0 flex-1">
         <Realgrid
-          class="w-full h-[58vh]"
+          class="h-full w-full"
           :progname="'MST36_001INS_VUE'"
           :progid="1"
           :rowData="rowData"
@@ -214,43 +224,40 @@
     </div>
     <!-- 그리드 데이터 부분 -->
     <!-- 연동 데이터 부분 -->
-    <div class="grid grid-cols-1 grid-rows-[1fr,9fr] ml-24 w-[40vw]">
-      <div class="flex space-x-1 mt-10">
+    <div class="mst36-right flex min-h-0 min-w-0 flex-col">
+      <div class="mst36-detail-tabs flex shrink-0 flex-wrap gap-1">
         <button
-          class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border"
+          type="button"
+          class="mst36-tab"
           @click="selectMenu(1)"
-          :class="{ 'text-blue-400 bg-blue-100': selectedMenu == 1 }">
+          :class="{ 'mst36-tab--on': selectedMenu == 1 }">
           기본설정
         </button>
         <button
-          class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border disabled:bg-gray-50 disabled:text-gray-200"
+          type="button"
+          class="mst36-tab"
           @click="selectMenu(2)"
-          :class="{ 'text-blue-400 bg-blue-100': selectedMenu == 2 }"
+          :class="{ 'mst36-tab--on': selectedMenu == 2 }"
           :disabled="selectedPayDistinct || disableWithMenuDisc">
           할인대상메뉴
         </button>
         <button
-          class="bg-gray-100 h-12 rounded-t-lg font-bold p-2 border disabled:bg-gray-50 disabled:text-gray-200"
+          type="button"
+          class="mst36-tab"
           @click="selectMenu(3)"
-          :class="{ 'text-blue-400 bg-blue-100': selectedMenu == 3 }"
+          :class="{ 'mst36-tab--on': selectedMenu == 3 }"
           :disabled="selectedMultiple">
           복합결제허용
         </button>
       </div>
-      <div>
-        <hr class="w-[90%] mt-0" />
-        <div v-show="selectedMenu == 1" class="mt-3 h-[46%]">
-          <div class="font-bold flex justify-start text-xl">기본정보</div>
-          <div
-            class="grid grid-cols-[1fr,3fr,1fr,3fr] grid-rows-[1fr,2fr,1fr] mt-5 border rounded-lg w-[90%] h-[55%]">
-            <div class="flex justify-center items-center bg-gray-100 border">
-              결제구분
-            </div>
-            <div class="flex justify-center items-center border">
+      <div class="mst36-detail-body min-h-0 min-w-0 flex-1">
+        <div v-show="selectedMenu == 1" class="mst36-detail-pane mst36-detail-pane--form">
+          <div class="mst36-section-title">기본정보</div>
+          <div class="mst36-form-grid mt-2 w-full">
+            <div class="mst36-form-label">결제구분</div>
+            <div class="mst36-form-value">
               <select
-                name=""
-                id=""
-                class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst36-control mst36-control--wide"
                 v-model="gridvalue1"
                 disabled>
                 <option value="0">선택</option>
@@ -259,114 +266,83 @@
                 <option value="3">할증</option>
               </select>
             </div>
-            <div class="flex justify-center items-center bg-gray-100 border">
-              결제유형
-            </div>
-            <div class="flex justify-center items-center border">
-              <select
-                name=""
-                id=""
-                class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200"
-                disabled></select>
+            <div class="mst36-form-label">결제유형</div>
+            <div class="mst36-form-value">
+              <select class="mst36-control mst36-control--wide" disabled></select>
             </div>
 
-            <div class="justify-center items-center bg-gray-100 border grid">
-              <div>결제코드명</div>
-            </div>
-            <div class="grid grid-cols-1 grid-rows-2 h-full border">
-              <div class="flex items-center mt-1 text-blue-400 font-semibold">
-                *국문<input
+            <div class="mst36-form-label mst36-form-label--tall">결제코드명</div>
+            <div class="mst36-form-value mst36-form-value--stack">
+              <label class="mst36-inline-field mst36-inline-field--req">
+                <span>*국문</span>
+                <input
                   type="text"
                   name="strName"
-                  id=""
-                  class="h-full w-[80%] border rounded-lg pl-2 ml-2 font-semibold text-gray-700 disabled:bg-gray-200"
+                  class="mst36-control mst36-control--wide"
                   v-model="gridvalue3"
                   @input="changeInfo"
                   :disabled="afterClickrow" />
-              </div>
-              <div class="flex items-center mt-1 ml-1">
-                영문<input
+              </label>
+              <label class="mst36-inline-field">
+                <span>영문</span>
+                <input
                   type="text"
                   name="strNameE"
-                  id=""
-                  class="h-full w-[80%] border rounded-lg pl-2 ml-3 disabled:bg-gray-200"
+                  class="mst36-control mst36-control--wide"
                   v-model="gridvalue4"
                   @input="changeInfo"
                   :disabled="afterClickrow" />
-              </div>
+              </label>
             </div>
-            <div
-              class="justify-center items-center bg-gray-100 border flex flex-col">
-              <div
-                class="border h-full w-full flex items-center justify-center text-blue-400 font-semibold">
-                *결제코드
-              </div>
-              <div
-                class="border h-full w-full flex items-center justify-center text-blue-400 font-semibold">
-                *사용여부
-              </div>
+            <div class="mst36-form-label mst36-form-label--tall mst36-form-label--required">
+              *결제코드<br />*사용여부
             </div>
-            <div class="grid grid-cols-1 grid-rows-2">
-              <div>
-                <input
-                  type="text"
-                  name="lngCode"
-                  id=""
-                  class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200"
-                  v-model="gridvalue5"
-                  @input="changeInfo"
-                  :disabled="!(isNew == true && afterClickrow == false)" />
-              </div>
-              <div
-                class="space-x-5 border flex justify-left pl-2 items-center disabled:bg-gray-200"
-                :disabled="afterClickrow">
-                <label for="using1"
-                  ><input
+            <div class="mst36-form-value mst36-form-value--stack">
+              <input
+                type="text"
+                name="lngCode"
+                class="mst36-control mst36-control--wide"
+                v-model="gridvalue5"
+                @input="changeInfo"
+                :disabled="!(isNew == true && afterClickrow == false)" />
+              <div class="mst36-radio-row">
+                <label for="using1">
+                  <input
                     type="radio"
                     name="blnInactive"
                     id="using1"
                     v-model="gridvalue6"
                     value="0"
                     @change="changeInfo"
-                    :disabled="afterClickrow" />예</label
-                ><label for="using2"
-                  ><input
+                    :disabled="afterClickrow" />예
+                </label>
+                <label for="using2">
+                  <input
                     type="radio"
                     name="blnInactive"
                     id="using2"
                     v-model="gridvalue6"
                     value="1"
                     @change="changeInfo"
-                    :disabled="afterClickrow" />아니오</label
-                >
+                    :disabled="afterClickrow" />아니오
+                </label>
               </div>
             </div>
-            <div class="flex justify-center items-center bg-gray-100 border">
-              할인그룹
-            </div>
-            <div class="flex justify-center items-center border">
+
+            <div class="mst36-form-label">할인그룹</div>
+            <div class="mst36-form-value">
               <select
-                name=""
-                id=""
-                class="border h-full w-full rounded-lg pl-2 bg-gray-200"
+                class="mst36-control mst36-control--wide"
                 v-model="gridvalue2"
                 disabled>
                 <option value="">선택</option>
-                <option :value="i.lngValue" v-for="i in disCountGroup">
+                <option :value="i.lngValue" v-for="i in disCountGroup" :key="i.lngValue">
                   [{{ i.lngCode }}]{{ i.strName }}
                 </option>
               </select>
             </div>
-            <!-- <div class="flex justify-center items-center bg-gray-100 border">결제그룹</div>
-          <div class="flex justify-center items-center"><select name="" id="" class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200" disabled>
-      <option value="">선택</option>
-  
-    </select></div> -->
-
-            <div class="justify-center items-center bg-gray-100 border grid">
-              유효기간
-            </div>
-            <div class="flex justify-center items-center border">
+            <div class="mst36-form-label">유효기간</div>
+            <div class="mst36-form-value mst36-form-value--inline">
               <input
                 type="date"
                 max="9999-12-31"
@@ -374,8 +350,8 @@
                 name="dtmFromDate"
                 @input="changeInfo"
                 :disabled="afterClickrow"
-                class="disabled:bg-gray-200" />
-              ~
+                class="mst36-control mst36-control--date" />
+              <span>~</span>
               <input
                 type="date"
                 max="9999-12-31"
@@ -383,388 +359,340 @@
                 name="dtmToDate"
                 @input="changeInfo"
                 :disabled="afterClickrow"
-                class="disabled:bg-gray-200" />
+                class="mst36-control mst36-control--date" />
             </div>
-
-            <!-- <div class="justify-center items-center bg-gray-100 border flex text-blue-400 font-semibold">*승인구분</div>
-          <div><select name="" id="" v-model="gridvalue9" class="h-full w-full rounded-lg pl-2" @change="setSub">
-            <option value="">선택</option>
-            <option :value="i.strDCode1" v-for="i in approveType">[{{ i.strDCode1 }}]{{i.strDName1}}</option>
-          </select></div> -->
-            <!-- <div class="justify-center items-center bg-gray-100 border flex text-blue-400 font-semibold">*승인유형</div>
-          <div><select name="" id="" v-model="gridvalue10" class="h-full w-full rounded-lg pl-2">
-            <option value="">선택</option>
-            <option :value="i.strDCode2" v-for="i in filteredapproveType">[{{ i.strDCode2 }}]{{i.strDName2}}</option>
-          </select></div> -->
           </div>
-          <div class="font-bold text-xl flex justify-start mt-5">부가정보</div>
-          <div
-            class="grid grid-cols-[1fr,3fr,1fr,3fr] grid-rows-8 h-full mt-3 w-[90%]">
-            <div
-              class="justify-center items-center bg-gray-100 border flex rounded-tl-lg">
-              할인방법
+
+          <div class="mst36-section-title mt-4">부가정보</div>
+          <div class="mst36-form-grid mt-2 w-full">
+            <div class="mst36-form-label">할인방법</div>
+            <div class="mst36-form-value">
+              <div class="mst36-radio-row">
+                <label for="discount1">
+                  <input
+                    type="radio"
+                    id="discount1"
+                    name="lngRate"
+                    v-model="gridvalue11"
+                    value="0"
+                    @input="changeInfo"
+                    :disabled="afterClickrow" />금액
+                </label>
+                <label for="discount2">
+                  <input
+                    type="radio"
+                    id="discount2"
+                    name="lngRate"
+                    v-model="gridvalue11"
+                    value="1"
+                    @input="changeInfo"
+                    :disabled="afterClickrow" />비율
+                </label>
+              </div>
             </div>
-            <div class="space-x-5 flex items-center border justify-left pl-2">
-              <label for="discount1"
-                ><input
-                  type="radio"
-                  id="discount1"
-                  name="lngRate"
-                  v-model="gridvalue11"
-                  value="0"
-                  @input="changeInfo"
-                  :disabled="afterClickrow"
-                  class="disabled:bg-gray-200" />금액</label
-              ><label for="discount2"
-                ><input
-                  type="radio"
-                  id="discount2"
-                  name="lngRate"
-                  v-model="gridvalue11"
-                  value="1"
-                  @input="changeInfo"
-                  :disabled="afterClickrow"
-                  class="disabled:bg-gray-200" />비율</label
-              >
-            </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              할인금액(비율)
-            </div>
-            <div class="flex justify-center items-center">
+            <div class="mst36-form-label">할인금액(비율)</div>
+            <div class="mst36-form-value">
               <input
                 type="number"
                 name="lngAmt"
-                id=""
-                class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst36-control mst36-control--wide"
                 v-model="gridvalue12"
                 @input="changeInfo"
                 :disabled="afterClickrow" />
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              자동계산
+
+            <div class="mst36-form-label">자동계산</div>
+            <div class="mst36-form-value">
+              <div class="mst36-radio-row">
+                <label for="autopay1">
+                  <input
+                    type="radio"
+                    id="autopay1"
+                    name="blnAuto"
+                    v-model="gridvalue13"
+                    value="1"
+                    @input="changeInfo"
+                    :disabled="afterClickrow" />예
+                </label>
+                <label for="autopay2">
+                  <input
+                    type="radio"
+                    id="autopay2"
+                    name="blnAuto"
+                    v-model="gridvalue13"
+                    value="0"
+                    @input="changeInfo"
+                    :disabled="afterClickrow" />아니오
+                </label>
+              </div>
             </div>
-            <div class="space-x-5 flex items-center border justify-left pl-2">
-              <label for="autopay1"
-                ><input
-                  type="radio"
-                  id="autopay1"
-                  name="blnAuto"
-                  v-model="gridvalue13"
-                  value="1"
-                  @input="changeInfo"
-                  :disabled="afterClickrow"
-                  class="disabled:bg-gray-200" />예</label
-              ><label for="autopay2"
-                ><input
-                  type="radio"
-                  id="autopay2"
-                  name="blnAuto"
-                  v-model="gridvalue13"
-                  value="0"
-                  @input="changeInfo"
-                  :disabled="afterClickrow"
-                  class="disabled:bg-gray-200" />아니오</label
-              >
-            </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              할인한도금액
-            </div>
-            <div class="flex justify-center items-center">
+            <div class="mst36-form-label">할인한도금액</div>
+            <div class="mst36-form-value">
               <input
                 type="number"
                 name="lngDiscAmtLimit"
-                id=""
-                class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst36-control mst36-control--wide"
                 v-model="gridvalue14"
                 @input="changeInfo"
                 :disabled="afterClickrow" />
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              돈통오픈
+
+            <div class="mst36-form-label">돈통오픈</div>
+            <div class="mst36-form-value">
+              <div class="mst36-radio-row">
+                <label for="openmoney1">
+                  <input
+                    type="radio"
+                    id="openmoney1"
+                    name="blnDrawer"
+                    v-model="gridvalue15"
+                    value="0"
+                    @input="changeInfo"
+                    :disabled="afterClickrow" />예
+                </label>
+                <label for="openmoney2">
+                  <input
+                    type="radio"
+                    id="openmoney2"
+                    name="blnDrawer"
+                    v-model="gridvalue15"
+                    value="1"
+                    @input="changeInfo"
+                    :disabled="afterClickrow" />아니오
+                </label>
+              </div>
             </div>
-            <div class="space-x-5 flex justify-left pl-2 items-center border">
-              <label for="openmoney1"
-                ><input
-                  type="radio"
-                  id="openmoney1"
-                  name="blnDrawer"
-                  v-model="gridvalue15"
-                  value="0"
-                  @input="changeInfo"
-                  :disabled="afterClickrow"
-                  class="disabled:bg-gray-200" />예</label
-              ><label for="openmoney2"
-                ><input
-                  type="radio"
-                  id="openmoney2"
-                  name="blnDrawer"
-                  v-model="gridvalue15"
-                  value="1"
-                  @input="changeInfo"
-                  :disabled="afterClickrow"
-                  class="disabled:bg-gray-200" />아니오</label
-              >
-            </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              계산우선순위
-            </div>
-            <div class="flex justify-center items-center">
+            <div class="mst36-form-label">계산우선순위</div>
+            <div class="mst36-form-value">
               <input
                 type="number"
                 name="lngPrior"
-                id=""
-                class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst36-control mst36-control--wide"
                 v-model="gridvalue16"
                 @input="changeInfo"
                 :disabled="afterClickrow" />
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              영수증출력
-            </div>
-            <div class="space-x-5 flex justify-left pl-2 items-center border">
-              <label for="receipt1"
-                ><input
-                  type="radio"
-                  id="receipt1"
-                  name="blnReceipt"
-                  v-model="gridvalue17"
-                  value="0"
-                  @input="changeInfo"
-                  :disabled="afterClickrow"
-                  class="disabled:bg-gray-200" />예</label
-              ><label for="receipt2"
-                ><input
-                  type="radio"
-                  id="receipt2"
-                  name="blnReceipt"
-                  v-model="gridvalue17"
-                  value="1"
-                  @input="changeInfo"
-                  :disabled="afterClickrow"
-                  class="disabled:bg-gray-200" />아니오</label
-              >
-            </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              잔금반환비율
-              <div class="relative group inline-block">
-                <button class="size-3 flex justify-center items-center">
-                  <img src="../../assets/circle-question-regular.svg" alt="" />
-                </button>
-                <div
-                  class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-sm px-2 py-1 rounded whitespace-nowrap z-10">
-                  잔금반환비율에 대한 설명입니다.
-                </div>
+
+            <div class="mst36-form-label">영수증출력</div>
+            <div class="mst36-form-value">
+              <div class="mst36-radio-row">
+                <label for="receipt1">
+                  <input
+                    type="radio"
+                    id="receipt1"
+                    name="blnReceipt"
+                    v-model="gridvalue17"
+                    value="0"
+                    @input="changeInfo"
+                    :disabled="afterClickrow" />예
+                </label>
+                <label for="receipt2">
+                  <input
+                    type="radio"
+                    id="receipt2"
+                    name="blnReceipt"
+                    v-model="gridvalue17"
+                    value="1"
+                    @input="changeInfo"
+                    :disabled="afterClickrow" />아니오
+                </label>
               </div>
             </div>
-            <div class="flex justify-center items-center">
+            <div class="mst36-form-label">
+              잔금반환비율
+              <span class="relative group inline-flex ml-1">
+                <button type="button" class="size-3 flex justify-center items-center">
+                  <img src="../../assets/circle-question-regular.svg" alt="" />
+                </button>
+                <span
+                  class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-sm px-2 py-1 rounded whitespace-nowrap z-10">
+                  잔금반환비율에 대한 설명입니다.
+                </span>
+              </span>
+            </div>
+            <div class="mst36-form-value">
               <input
                 type="text"
                 name="lngChangeRateLimit"
-                id=""
-                class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst36-control mst36-control--wide"
                 v-model="gridvalue18"
                 @input="changeInfo"
                 :disabled="afterClickrow" />
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              할인대상메뉴
+
+            <div class="mst36-form-label">할인대상메뉴</div>
+            <div class="mst36-form-value">
+              <div class="mst36-radio-row">
+                <label for="discountfor1">
+                  <input
+                    type="radio"
+                    id="discountfor1"
+                    name="lngMenu"
+                    v-model="gridvalue19"
+                    value="0"
+                    @input="changeInfo"
+                    :disabled="afterClickrow" />전체 선택
+                </label>
+                <label for="discountfor2">
+                  <input
+                    type="radio"
+                    id="discountfor2"
+                    name="lngMenu"
+                    v-model="gridvalue19"
+                    value="1"
+                    @input="changeInfo"
+                    :disabled="afterClickrow" />부분 선택
+                </label>
+              </div>
             </div>
-            <div class="space-x-5 flex justify-left pl-2 items-center border">
-              <label for="discountfor1"
-                ><input
-                  type="radio"
-                  id="discountfor1"
-                  name="lngMenu"
-                  v-model="gridvalue19"
-                  value="0"
-                  @input="changeInfo"
-                  :disabled="afterClickrow"
-                  class="disabled:bg-gray-200" />전체 선택</label
-              ><label for="discountfor2"
-                ><input
-                  type="radio"
-                  id="discountfor2"
-                  name="lngMenu"
-                  v-model="gridvalue19"
-                  value="1"
-                  @input="changeInfo"
-                  :disabled="afterClickrow"
-                  class="disabled:bg-gray-200" />부분 선택</label
-              >
-            </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              품목할인설정
-            </div>
-            <div class="flex justify-center items-center">
+            <div class="mst36-form-label">품목할인설정</div>
+            <div class="mst36-form-value">
               <select
                 name="lngDiscType"
-                id=""
-                class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst36-control mst36-control--wide"
                 v-model="gridvalue20"
                 @change="changeInfo"
                 :disabled="afterClickrow">
                 <option value="">선택</option>
-                <option :value="i.strDCode" v-for="i in itemDiscount">
+                <option :value="i.strDCode" v-for="i in itemDiscount" :key="i.strDCode">
                   [{{ i.strDCode }}]{{ i.strDName }}
                 </option>
               </select>
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              중복결제
+
+            <div class="mst36-form-label">중복결제</div>
+            <div class="mst36-form-value">
+              <div class="mst36-radio-row">
+                <label for="allow1">
+                  <input
+                    type="radio"
+                    id="allow1"
+                    name="blnDuplicate"
+                    v-model="gridvalue21"
+                    value="1"
+                    @input="changeInfo"
+                    :disabled="afterClickrow" />허용
+                </label>
+                <label for="allow2">
+                  <input
+                    type="radio"
+                    id="allow2"
+                    name="blnDuplicate"
+                    v-model="gridvalue21"
+                    value="0"
+                    @input="changeInfo"
+                    :disabled="afterClickrow" />비허용
+                </label>
+              </div>
             </div>
-            <div class="space-x-5 flex justify-left pl-2 items-center border">
-              <label for="allow1"
-                ><input
-                  type="radio"
-                  id="allow1"
-                  name="blnDuplicate"
-                  v-model="gridvalue21"
-                  value="1"
-                  @input="changeInfo"
-                  :disabled="afterClickrow"
-                  class="disabled:bg-gray-200" />허용</label
-              ><label for="allow2"
-                ><input
-                  type="radio"
-                  id="allow2"
-                  name="blnDuplicate"
-                  v-model="gridvalue21"
-                  value="0"
-                  @input="changeInfo"
-                  :disabled="afterClickrow"
-                  class="disabled:bg-gray-200" />비허용</label
-              >
-            </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              크롤링결제코드
-            </div>
-            <div class="flex justify-center items-center">
-              <select
-                name=""
-                id=""
-                class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200"
-                disabled>
+            <div class="mst36-form-label">크롤링결제코드</div>
+            <div class="mst36-form-value">
+              <select class="mst36-control mst36-control--wide" disabled>
                 <option value="">선택</option>
               </select>
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              단수처리방법
-            </div>
-            <div class="flex justify-center items-center">
+
+            <div class="mst36-form-label">단수처리방법</div>
+            <div class="mst36-form-value">
               <select
                 name="lngRoundType"
-                id=""
-                class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst36-control mst36-control--wide"
                 v-model="gridvalue22"
                 @change="changeInfo"
                 :disabled="afterClickrow">
                 <option value="">선택</option>
-                <option :value="i.strDCode" v-for="i in rounding">
+                <option :value="i.strDCode" v-for="i in rounding" :key="i.strDCode">
                   [{{ i.strDCode }}]{{ i.strDName }}
                 </option>
               </select>
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              단수처리자릿수
-            </div>
-            <div>
+            <div class="mst36-form-label">단수처리자릿수</div>
+            <div class="mst36-form-value">
               <input
                 type="number"
                 name="lngRound"
-                id=""
-                class="h-full w-full border rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst36-control mst36-control--wide"
                 v-model="gridvalue23"
                 @input="changeInfo"
                 :disabled="afterClickrow" />
             </div>
-            <div
-              class="justify-center items-center bg-gray-100 border flex rounded-bl-lg">
-              세금계산방법
-            </div>
-            <div class="flex justify-center items-center">
+
+            <div class="mst36-form-label">세금계산방법</div>
+            <div class="mst36-form-value">
               <select
                 name="lngTax"
-                id=""
-                class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst36-control mst36-control--wide"
                 v-model="gridvalue24"
                 @change="changeInfo"
                 :disabled="afterClickrow">
                 <option value="">선택</option>
-                <option :value="i.strDCode" v-for="i in taxs">
+                <option :value="i.strDCode" v-for="i in taxs" :key="i.strDCode">
                   [{{ i.strDCode }}]{{ i.strDName }}
                 </option>
               </select>
             </div>
-            <div class="justify-center items-center bg-gray-100 border flex">
-              결제옵션
-            </div>
-            <div class="flex justify-center items-center">
+            <div class="mst36-form-label">결제옵션</div>
+            <div class="mst36-form-value">
               <select
                 name="strIcon"
-                id=""
-                class="border h-full w-full rounded-lg pl-2 disabled:bg-gray-200"
+                class="mst36-control mst36-control--wide"
                 v-model="gridvalue25"
                 @change="changeInfo"
                 :disabled="afterClickrow">
                 <option value="">선택</option>
-                <option :value="i.strDCode" v-for="i in payOptions">
+                <option :value="i.strDCode" v-for="i in payOptions" :key="i.strDCode">
                   [{{ i.strDCode }}] {{ i.strDName }}
                 </option>
               </select>
             </div>
           </div>
         </div>
-        <div class="h-[50vh] w-[40vw]" v-show="selectedMenu == 2">
-          <div class="flex justify-between mt-3 w-full">
-            <div class="font-bold text-xl">메뉴 목록</div>
+        <div class="mst36-detail-pane mst36-detail-pane--grid" v-show="selectedMenu == 2">
+          <div class="mst36-section-head shrink-0">
+            <div class="mst36-section-title">메뉴 목록</div>
             <div>
-              <button class="whitebutton" @click="showPopUp">
+              <button type="button" class="mst36-action-btn" @click="showPopUp">
                 할인대상메뉴복사
               </button>
             </div>
           </div>
-          <div class="mt-3 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
-            <div class="customtableIndex border border-gray-400 rounded-tl-lg">
-              메뉴분류
-            </div>
-            <div class="border border-gray-300 rounded-tr-lg flex p-1">
+          <div class="mst36-list-filter shrink-0">
+            <div class="mst36-filter-row">
+              <div class="mst36-filter-label">메뉴분류</div>
               <select
                 name="majorGroupCd"
-                id=""
-                class="flex-1 border rounded-lg w-full h-full"
+                class="mst36-filter-control mst36-filter-control--md"
                 @change="setSubCd"
                 v-model="forsearchMain">
                 <option value="-1">전체</option>
-                <option :value="i.GroupCd" v-for="i in MenuGroup">
+                <option :value="i.GroupCd" v-for="i in MenuGroup" :key="'m' + i.GroupCd">
                   [{{ i.GroupCd }}]{{ i.majorGroupNm }}
                 </option>
               </select>
               <select
                 name="subGroupCd"
-                id=""
-                class="flex-1 border rounded-lg w-full h-full"
+                class="mst36-filter-control mst36-filter-control--md"
                 v-model="forsearchSub"
                 @change="setSubCd">
                 <option value="-1">전체</option>
-                <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup">
+                <option :value="i.GroupCd" v-for="i in filteredSubMenuGroup" :key="'s' + i.GroupCd">
                   [{{ i.GroupCd }}]{{ i.subGroupNm }}
                 </option>
               </select>
             </div>
-            <div class="customtableIndex border border-gray-400 rounded-bl-lg">
-              메뉴명/코드
-            </div>
-            <div class="px-1 py-1 border border-gray-300 rounded-br-lg">
+            <div class="mst36-filter-row">
+              <div class="mst36-filter-label">메뉴명/코드</div>
               <input
                 type="text"
-                class="border w-full h-full px-1 border-gray-400 rounded-lg"
+                class="mst36-filter-control mst36-filter-control--grow"
                 @input="searchMenuList"
                 v-model="searchWord2" />
             </div>
           </div>
 
+          <div class="mst36-grid-wrap mt-2 min-h-0 min-w-0 flex-1">
           <Realgrid
-            class="w-full h-[50vh] mt-5"
+            class="w-full h-full"
             :progname="'MST36_001INS_VUE'"
             :progid="2"
             @realgridname="realgridname"
@@ -789,23 +717,23 @@
             :hideColumnsId="['checkbox']"
             @updatedRowData="updatedRowData2"
             @selectedIndex="selectedIndex2"></Realgrid>
+          </div>
           <!-- :searchColId2="'majorGroupCd,subGroupCd'" :searchColId="'menuCd,menuNm'" :searchColValue2="searchColValue3" :searchWord="searchWord2" -->
         </div>
-        <div v-show="selectedMenu == 3" class="h-[90%] w-[90%]">
-          <div class="grid grid-rows-1 grid-cols-[1fr,4fr] mt-3">
-            <div class="customtableIndex border border-gray-400 rounded-lg">
-              결제코드/명
-            </div>
-            <div class="px-1 py-1 border border-gray-300 rounded-br-lg">
+        <div v-show="selectedMenu == 3" class="mst36-detail-pane mst36-detail-pane--grid">
+          <div class="mst36-list-filter shrink-0">
+            <div class="mst36-filter-row">
+              <div class="mst36-filter-label">결제코드/명</div>
               <input
                 type="text"
-                class="border w-full h-full px-1 border-gray-400 rounded-lg"
+                class="mst36-filter-control mst36-filter-control--grow"
                 @input="searchMenuList2"
                 v-model="searchWord3" />
             </div>
           </div>
+          <div class="mst36-grid-wrap mt-2 min-h-0 min-w-0 flex-1">
           <Realgrid
-            class="w-full h-[55vh] mt-5"
+            class="w-full h-full"
             :progname="'MST36_001INS_VUE'"
             :progid="3"
             :rowData="filteredrowData5"
@@ -822,12 +750,13 @@
             :hideColumnsId="['checkbox']"
             :rowStateeditable="false"
             @updatedRowData="updatedRowData3"></Realgrid>
+          </div>
           <!-- :searchColId="'lngCode,strName'" :searchColValue2="searchColValue2" :searchWord="searchWord3"  -->
         </div>
       </div>
     </div>
   </div>
-  <!-- 연동 데이터 부분 -->
+  </div>
 </template>
 
 <script setup>
@@ -2100,4 +2029,452 @@ const initAll = () => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.mst36-page {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+}
+
+/* 조회 AREA — MST01_002INS(매장정보등록)와 동일 */
+.mst36-search-panel {
+  --mst36-panel-pad-x: 2rem;
+  --mst36-col-gap: 1.5rem;
+  --mst36-item-gap: 0.75rem;
+  --mst36-label-col: 6.5rem;
+  --mst36-row-min-h: 2rem;
+  --mst36-control-h: 2rem;
+  --mst36-control-border: #cbd5e1;
+  --mst36-control-focus-border: #3b82f6;
+  --mst36-control-radius: 0.375rem;
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+  padding-block: 0.75rem;
+}
+
+.mst36-search-grid {
+  display: grid;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 58rem;
+  column-gap: var(--mst36-col-gap);
+  padding-left: var(--mst36-panel-pad-x);
+  padding-right: var(--mst36-panel-pad-x);
+}
+
+.mst36-cell {
+  display: flex;
+  min-width: 0;
+  min-height: var(--mst36-row-min-h);
+  align-items: center;
+  gap: var(--mst36-item-gap);
+}
+
+.mst36-sg-label {
+  flex: 0 0 var(--mst36-label-col);
+  width: var(--mst36-label-col);
+  min-height: var(--mst36-row-min-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgb(17 24 39);
+}
+
+.mst36-cell-field {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.mst36-pick-slot :deep(> .flex) {
+  width: 100%;
+  min-width: 0;
+  margin-left: 0 !important;
+  gap: 0.5rem !important;
+}
+
+.mst36-pick-slot :deep(> .flex > div.shrink-0.font-semibold) {
+  display: none !important;
+}
+
+.mst36-pick-slot :deep(#storeGroup) {
+  width: 11.5rem !important;
+  min-width: 11.5rem !important;
+  max-width: 11.5rem !important;
+}
+
+.mst36-pick-slot :deep(> .flex > div:has(> select:not(#storeGroup)) > select),
+.mst36-pick-slot :deep(> .flex > div > select:not(#storeGroup)) {
+  width: 11.5rem !important;
+  min-width: 11.5rem !important;
+  max-width: 11.5rem !important;
+}
+
+.mst36-pick-slot :deep(> .flex > div:has(.pickstore-vs-shell)),
+.mst36-pick-slot :deep(> .flex > div.relative.min-w-0.flex-1) {
+  flex: 0 0 15.6rem !important;
+  width: 15.6rem !important;
+  max-width: 15.6rem !important;
+}
+
+.mst36-pick-slot :deep(select),
+.mst36-pick-slot :deep(.pickstore-vs-shell) {
+  box-sizing: border-box;
+  height: var(--mst36-control-h) !important;
+  min-height: var(--mst36-control-h) !important;
+  max-height: var(--mst36-control-h) !important;
+  border: 1px solid var(--mst36-control-border) !important;
+  border-radius: var(--mst36-control-radius) !important;
+}
+
+.mst36-pick-slot :deep(.pickstore-vs-shell) {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.mst36-workspace {
+  min-height: 0;
+}
+
+.mst36-left,
+.mst36-right {
+  min-height: 0;
+}
+
+.mst36-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.375rem;
+  min-height: 1.75rem;
+}
+
+.mst36-section-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.4rem;
+  color: #111827;
+}
+
+.mst36-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  height: 2rem;
+  min-width: 4.25rem;
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+  border: 1px solid #6b7280;
+  border-radius: 0.375rem;
+  color: #374151;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 10%);
+}
+
+.mst36-action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.mst36-action-btn--add:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: #60a5fa;
+  color: #1d4ed8;
+}
+
+.mst36-action-btn--del:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+.mst36-list-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  box-sizing: border-box;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #f3f4f6;
+}
+
+.mst36-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  min-height: 2rem;
+}
+
+.mst36-filter-label {
+  flex: 0 0 auto;
+  min-width: 5.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+}
+
+.mst36-filter-control {
+  box-sizing: border-box;
+  height: 2rem;
+  min-height: 2rem;
+  max-height: 2rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  background: #fff;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+}
+
+.mst36-filter-control--sm {
+  width: 7.5rem;
+  min-width: 0;
+}
+
+.mst36-filter-control--md {
+  width: 11rem;
+  min-width: 0;
+  flex: 1 1 10rem;
+  max-width: 14rem;
+}
+
+.mst36-filter-control--grow {
+  flex: 1 1 12rem;
+  min-width: 0;
+  width: auto;
+}
+
+.mst36-grid-wrap {
+  flex: 1 1 0;
+  min-height: 9rem;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.mst36-detail-tabs {
+  border-bottom: 1px solid #d1d5db;
+  margin-bottom: 0.5rem;
+}
+
+.mst36-tab {
+  height: 2.5rem;
+  padding: 0 0.875rem;
+  border: 1px solid #d1d5db;
+  border-bottom: none;
+  border-radius: 0.5rem 0.5rem 0 0;
+  background: #f3f4f6;
+  font-weight: 700;
+  color: #374151;
+  cursor: pointer;
+}
+
+.mst36-tab--on {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+
+.mst36-tab:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  color: #9ca3af;
+  background: #f9fafb;
+}
+
+.mst36-detail-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.mst36-detail-pane {
+  width: 100%;
+  min-width: 0;
+  --mst36-label-col: 7rem;
+  --mst36-control-h: 1.75rem;
+  --mst36-detail-row-h: 2.25rem;
+  --mst36-detail-cell-py: 0.25rem;
+  --mst36-detail-font: 0.8125rem;
+}
+
+/* 기본설정: 폼이 길면 내부 스크롤 */
+.mst36-detail-pane--form {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-bottom: 0.75rem;
+  padding-right: 0.25rem;
+}
+
+/* 할인대상메뉴 / 복합결제허용: 왼쪽 목록 그리드 하단과 맞춤 */
+.mst36-detail-pane--grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mst36-form-grid {
+  display: grid;
+  grid-template-columns:
+    var(--mst36-label-col) minmax(0, 1fr)
+    var(--mst36-label-col) minmax(0, 1fr);
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+.mst36-form-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--mst36-detail-row-h);
+  padding: var(--mst36-detail-cell-py) 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #edf2f7;
+  color: #5c5c5c;
+  font-size: var(--mst36-detail-font);
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.mst36-form-label--required {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.mst36-form-label--tall {
+  min-height: 4.5rem;
+}
+
+.mst36-form-value {
+  display: flex;
+  align-items: center;
+  min-height: var(--mst36-detail-row-h);
+  min-width: 0;
+  padding: var(--mst36-detail-cell-py) 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.mst36-form-value--inline {
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+.mst36-form-value--stack {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 4.5rem;
+  padding-block: 0.375rem;
+}
+
+.mst36-inline-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  font-size: var(--mst36-detail-font);
+  color: #374151;
+}
+
+.mst36-inline-field > span {
+  flex: 0 0 2.5rem;
+  text-align: right;
+}
+
+.mst36-inline-field--req > span {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.mst36-radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  font-size: var(--mst36-detail-font);
+  color: #374151;
+}
+
+.mst36-radio-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.mst36-control {
+  box-sizing: border-box;
+  height: var(--mst36-control-h);
+  min-height: var(--mst36-control-h);
+  max-height: var(--mst36-control-h);
+  width: 70%;
+  max-width: 70%;
+  min-width: 0;
+  border-radius: 0.375rem;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  padding: 0 0.5rem;
+  font-size: var(--mst36-detail-font);
+  line-height: 1;
+}
+
+.mst36-control--wide {
+  width: 100%;
+  max-width: 100%;
+}
+
+.mst36-control--date {
+  width: auto;
+  max-width: none;
+  flex: 1 1 0;
+}
+
+.mst36-control:disabled,
+.mst36-control:disabled:hover {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+@media (min-width: 1280px) {
+  .mst36-search-panel {
+    --mst36-panel-pad-x: 2.5rem;
+  }
+}
+
+@media (min-width: 1536px) {
+  .mst36-search-panel {
+    --mst36-panel-pad-x: 3rem;
+  }
+}
+</style>

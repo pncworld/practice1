@@ -34,6 +34,7 @@
       <div class="flex justify-start items-center">
         <PickStore
           @update:storeGroup="lngStoreGroup"
+          @update:storeType="lngStoreAttrs"
           :defaultStoreNm="'전체'"
           @storeNm="excelStore"
           :defaultStore="true"
@@ -284,7 +285,7 @@ const lngStoreCode = (e) => {
   storeCode.value = e;
 };
 
-const storeAttr = ref();
+const storeAttr = ref(0);
 const lngStoreAttrs = (e) => {
   storeAttr.value = e;
 };
@@ -321,7 +322,7 @@ const searchButton = async () => {
       cond3.value,
       cond4.value,
       cond.value,
-      0,
+      storeAttr.value,
       store.state.userData.lngSequence,
       ip.ip,
       cond5.value

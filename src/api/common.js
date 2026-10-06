@@ -82,6 +82,20 @@ export const get_store_list = (
     LNG_SUPERVISOR: lngSupervisor,
   });
 };
+/** pickStore.vue 가운데 콤보. mstStoreAttr. getComStoreList 의 storeAttr(직영/가맹)과 분리. */
+export const getComStoreAttrList = (
+  lngStoreGroup,
+  lngpositiontype,
+  blnbrandadmin,
+  lngposition
+) => {
+  return api2.post("/SYSTEM/sysCom.asmx/getComStoreAttrList", {
+    lngStoreGroup: lngStoreGroup,
+    LNG_POSITION_TYPE: lngpositiontype,
+    BLN_BRAND_ADMIN: blnbrandadmin,
+    lngStoreCode: lngposition,
+  });
+};
 export const getStoreList = (lngStoreGroup, lngStoreCode) => {
   return api2.post("/SYSTEM/sysCom.asmx/getStoreList2", {
     GROUP_CD: lngStoreGroup,

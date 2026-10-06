@@ -5,31 +5,45 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <!-- 조회 태그 -->
-  <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <PageName></PageName>
-    <div class="flex justify-center mr-10 space-x-2 pr-5">
-      <button @click="searchButton" class="button search md:w-auto w-14">
-        조회
-      </button>
-      <button @click="saveButton" class="button save w-auto">저장</button>
-      <button @click="copyButton" class="button copy w-auto">복사</button>
+  <div class="mst002s-page box-border flex h-full max-w-full min-h-0 flex-col gap-1 overflow-hidden bg-white pb-1">
+    <!-- 상단: 페이지명 + 액션 -->
+    <div class="flex shrink-0 flex-wrap items-center justify-between gap-2 px-1">
+      <PageName />
+      <div class="flex flex-wrap items-center justify-end gap-2">
+        <button type="button" @click="searchButton" class="button search md:w-auto w-14">
+          조회
+        </button>
+        <button type="button" @click="saveButton" class="button save md:w-auto w-auto">
+          저장
+        </button>
+        <button type="button" @click="copyButton" class="button copy md:w-auto w-auto">
+          복사
+        </button>
+      </div>
     </div>
-  </div>
-  <br />
-  <div
-    class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore
-      @areaCd="handleStoreAreaCd"
-      @update:storeCd="handleStoreCd"
-      @posNo="handlePosNo"
-      :showPosNo="true"
-      @storeNm="handlestoreNm"
-      @update:ischanged="handleinitAll"></PickStore>
-  </div>
-  <!-- 조회 태그 -->
-  <!-- 팝업 및 gridStack 태그 -->
-  <div class="z-[90]">
+
+    <!-- 조회 AREA -->
+    <div class="mst002s-search-panel w-full min-w-0 shrink-0 rounded-lg bg-gray-200">
+      <div class="mst002s-search-grid min-w-0">
+        <div class="mst002s-cell">
+          <div class="mst002s-sg-label">매장명</div>
+          <div class="mst002s-cell-field mst002s-pick-slot min-w-0">
+            <PickStore
+              compact-search-bar
+              main-name=""
+              :compact-store-combo-max-rem="15.6"
+              :showPosNo="true"
+              @areaCd="handleStoreAreaCd"
+              @update:storeCd="handleStoreCd"
+              @posNo="handlePosNo"
+              @storeNm="handlestoreNm"
+              @update:ischanged="handleinitAll" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 조회 AREA -->
+    <!-- 팝업 및 gridStack 태그 -->
     <DupliPopUp6
       :isVisible="showPopup2"
       @close="showPopup2 = false"
@@ -41,9 +55,7 @@
       :dupliapiname="'DUPLITABLEKEY'"
       :progid="2"
       :poskiosk="'getStoreAndPosList3'"
-      naming2="테이블">
-    </DupliPopUp6>
-  </div>
+      naming2="테이블" />
   <div
     v-if="showSetScreenKey"
     class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-[89]">
@@ -107,13 +119,13 @@
       </div>
     </div>
   </div>
-  <div class="flex ml-10 -mt-4 w-[60%] flex-row justify-between z-[88]">
-    <div class="flex flex-row w-[79%] items-center">
-      <button class="w-10 flex-shrink-0 flex items-center" @click="scrollLeft">
+  <div class="ml-10 flex max-w-full shrink-0 flex-row items-center">
+    <div class="mst002s-screen-bar flex w-[1000px] max-w-full min-w-0 flex-row items-center">
+      <button type="button" class="flex w-10 flex-shrink-0 items-center" @click="scrollLeft">
         <img src="../../assets/ic_before.svg" alt="" />
       </button>
       <div
-        class="flex gap-2 w-[1000px] z-[88] h-32 items-center relative overflow-hidden"
+        class="mst002s-screen-scroll relative z-[1] flex h-12 min-w-0 flex-1 items-center gap-2 overflow-hidden"
         ref="scrollContainer">
         <div
           v-for="(i, index) in ScreenKeyOrigin"
@@ -124,10 +136,11 @@
               ? 'text-blue-800 border-blue-500 border-2'
               : 'black'
           ">
-          <button @click="showOtherScreen(i.intScreenNo)" class="w-[80%]">
+          <button type="button" @click="showOtherScreen(i.intScreenNo)" class="w-[80%]">
             {{ i.strScreenName }}
           </button>
           <button
+            type="button"
             @click="showModifyButton(index, i.intScreenNo)"
             class="w-[15%]">
             <img src="../../assets/ic_kebap.svg" alt="" />
@@ -139,246 +152,266 @@
             class="flex flex-col absolute bg-white z-[88] ml-36 mt-8 rounded-lg gap-2 w-12 border border-gray-600"
             ref="scrollContainer">
             <button
+              type="button"
               class="text-black"
               @click="modifyScreenKey(i.strScreenName, i.intScreenNo)">
               수정
             </button>
-            <button class="text-black" @click="deleteScreenKey(i.intScreenNo)">
+            <button
+              type="button"
+              class="text-black"
+              @click="deleteScreenKey(i.intScreenNo)">
               삭제
             </button>
           </div>
         </div>
       </div>
 
-      <button class="w-10 flex-shrink-0 flex items-center" @click="scrollRight">
+      <button type="button" class="flex w-10 flex-shrink-0 items-center" @click="scrollRight">
         <img src="../../assets/ic_after.svg" alt="" />
       </button>
       <button
-        class="w-10 flex-shrink-0 flex items-center"
+        type="button"
+        class="flex w-10 flex-shrink-0 items-center"
         @click="addScreenKey">
         <img src="../../assets/Btn_46_add.svg" alt="" />
       </button>
       <button
-        class="w-10 flex-shrink-0 flex items-center"
+        type="button"
+        class="flex w-10 flex-shrink-0 items-center"
         @click="initAllTable">
         <img src="../../assets/Btn_46_refresh.svg" alt="" />
       </button>
     </div>
-    <div class="ml-[57%] h-14 w-[200px] mt-7 flex items-center">
-      <button
-        :disabled="afterSearch == false"
-        class="button primary w-[130px] h-[40px] flex justify-center"
-        @click="addNewWidget()">
-        테이블 추가
-      </button>
+    <!-- 액션 버튼: 속성 패널(표) 가로폭에 맞춰 3등분 -->
+    <div class="mst002s-prop-col ml-4 flex h-12 w-[28%] min-w-[20rem] max-w-[30rem] shrink-0 items-center">
+      <div class="mst002s-action-row">
+        <button
+          type="button"
+          :disabled="afterSearch == false"
+          class="mst002s-action-btn mst002s-action-btn--add"
+          @click="addNewWidget()">
+          <font-awesome-icon :icon="['fas', 'plus']" />
+          테이블 추가
+        </button>
+        <button
+          type="button"
+          class="mst002s-action-btn mst002s-action-btn--copy"
+          :disabled="clickTable == false"
+          @click="duplicateTable">
+          <font-awesome-icon :icon="['fas', 'copy']" />
+          테이블 복사
+        </button>
+        <button
+          type="button"
+          class="mst002s-action-btn mst002s-action-btn--del"
+          :disabled="clickTable == false"
+          @click="deleteTable">
+          <font-awesome-icon :icon="['fas', 'trash']" />
+          테이블 삭제
+        </button>
+      </div>
     </div>
   </div>
   <!-- 팝업 및 gridStack 태그 -->
-  <!-- input 태그 데이터 세팅  -->
-  <div class="flex z-81 -mt-7">
+  <!-- input 태그 데이터 세팅  — 캔버스 위치·크기는 기존 유지 -->
+  <div class="mst002s-workspace ml-10 flex shrink-0 items-start z-[1]">
+    <!-- 모눈: 기존 좌표/사이즈 기준 고정(1000×630). 크기 변경 금지 -->
     <div
-      class="grid-stack table_style overflow-hidden !w-[1000px] !h-[630px]"></div>
-    <div
-      class="grid grid-rows-[1fr,3fr,1fr,1fr,1fr,1fr,1fr,1fr,4fr,1fr] grid-cols-1 border border-gray-200 w-[25%] ml-20 rounded-lg">
-      <div class="bg-gray-100 font-semibold flex items-center justify-center">
-        테이블 속성
+      class="grid-stack table_style mst002s-canvas shrink-0 overflow-hidden !w-[1000px] !h-[630px]"></div>
+
+    <aside class="mst002s-prop-panel mst002s-prop-col ml-4 min-w-[20rem] max-w-[30rem] w-[28%] shrink-0">
+      <div class="mst002s-section-head">
+        <div class="mst002s-section-title">테이블 속성</div>
       </div>
-      <div class="flex justify-center items-center gap-3">
-        <button
-          :disabled="clickTable == false"
-          @click="shapeclick(0)"
-          :class="clickedShape == 0 ? 'bg-blue-200' : 'bg-white'"
-          class="h-full w-[25%] flex justify-center items-center">
-          <img src="../../assets/palette1.svg" alt="" />
-        </button>
-        <button
-          :disabled="clickTable == false"
-          @click="shapeclick(1)"
-          :class="clickedShape == 1 ? 'bg-blue-200' : 'bg-white'"
-          class="h-full w-[25%] flex justify-center items-center">
-          <img src="../../assets/palette2.svg" alt="" />
-        </button>
-        <button
-          :disabled="clickTable == false"
-          @click="shapeclick(2)"
-          :class="clickedShape == 2 ? 'bg-blue-200' : 'bg-white'"
-          class="h-full w-[25%] flex justify-center items-center">
-          <img src="../../assets/palette3.svg" alt="" />
-        </button>
-        <button
-          :disabled="clickTable == false"
-          @click="shapeclick(3)"
-          class="h-full w-[25%] flex justify-center items-center"
-          :class="clickedShape == 3 ? 'bg-blue-200' : 'bg-white'">
-          <img src="../../assets/palette4.svg" alt="" />
-        </button>
-      </div>
-      <div class="grid grid-cols-2">
-        <div class="bg-gray-100 font-semibold flex justify-center items-center">
-          테이블 코드
+
+      <fieldset
+        class="mst002s-form-grid mt-2 w-full"
+        :class="{ 'mst002s-form-grid--locked': clickTable == false }"
+        :disabled="clickTable == false">
+        <div class="mst002s-form-label mst002s-form-label--tall">형태</div>
+        <div class="mst002s-form-value mst002s-field-span3 mst002s-form-value--shape">
+          <div class="mst002s-shape-row">
+            <button
+              type="button"
+              :disabled="clickTable == false"
+              @click="shapeclick(0)"
+              class="mst002s-shape-btn"
+              :class="{ 'mst002s-shape-btn--on': clickedShape == 0 }">
+              <img src="../../assets/palette1.svg" alt="사각형" />
+            </button>
+            <button
+              type="button"
+              :disabled="clickTable == false"
+              @click="shapeclick(1)"
+              class="mst002s-shape-btn"
+              :class="{ 'mst002s-shape-btn--on': clickedShape == 1 }">
+              <img src="../../assets/palette2.svg" alt="원" />
+            </button>
+            <button
+              type="button"
+              :disabled="clickTable == false"
+              @click="shapeclick(2)"
+              class="mst002s-shape-btn"
+              :class="{ 'mst002s-shape-btn--on': clickedShape == 2 }">
+              <img src="../../assets/palette3.svg" alt="타원" />
+            </button>
+            <button
+              type="button"
+              :disabled="clickTable == false"
+              @click="shapeclick(3)"
+              class="mst002s-shape-btn"
+              :class="{ 'mst002s-shape-btn--on': clickedShape == 3 }">
+              <img src="../../assets/palette4.svg" alt="기타" />
+            </button>
+          </div>
         </div>
-        <div class="flex justify-center items-center">
+
+        <div class="mst002s-form-label">테이블 코드</div>
+        <div class="mst002s-form-value mst002s-field-span3">
           <input
-            v-if="!clickedtableCode.toString().includes('new')"
             type="text"
-            class="border rounded-lg border-gray-200 px-2"
-            v-model="clickedtableCode"
-            disabled /><input
-            v-if="clickedtableCode.toString().includes('new')"
-            type="text"
-            class="border rounded-lg border-gray-200 px-2"
-            value=""
+            class="mst002s-control mst002s-control--wide"
+            :value="
+              String(clickedtableCode ?? '').includes('new')
+                ? ''
+                : clickedtableCode
+            "
             disabled />
         </div>
-      </div>
-      <div class="grid grid-cols-2">
-        <div class="bg-gray-100 font-semibold flex justify-center items-center">
-          테이블 명
-        </div>
-        <div class="flex justify-center items-center">
+
+        <div class="mst002s-form-label">테이블 명</div>
+        <div class="mst002s-form-value mst002s-field-span3">
           <input
             type="text"
-            class="border rounded-lg border-gray-200 px-2"
+            class="mst002s-control mst002s-control--wide"
             v-model="clickedtableNm"
             @input="changetableProperty" />
         </div>
-      </div>
-      <div class="grid grid-cols-2">
-        <div class="bg-gray-100 font-semibold flex justify-center items-center">
-          좌석 수
-        </div>
-        <div class="flex justify-center items-center">
+
+        <div class="mst002s-form-label">좌석 수</div>
+        <div class="mst002s-form-value mst002s-field-span3">
           <input
             type="text"
-            class="border rounded-lg border-gray-200 px-2"
+            class="mst002s-control mst002s-control--wide"
             v-model="clickedtableSeats"
             @input="changetableProperty" />
         </div>
-      </div>
-      <div class="grid grid-cols-4">
-        <div class="bg-gray-100 font-semibold flex justify-center items-center">
-          가로 위치(x)
-        </div>
-        <div class="flex justify-center items-center">
+
+        <div class="mst002s-form-label">가로 위치(X)</div>
+        <div class="mst002s-form-value">
           <input
             type="text"
-            class="border rounded-lg border-gray-200 px-2 w-full"
+            class="mst002s-control"
             v-model="clickedtableX"
             disabled />
         </div>
-        <div class="bg-gray-100 font-semibold flex justify-center items-center">
-          세로 위치(Y)
-        </div>
-        <div class="flex justify-center items-center">
+        <div class="mst002s-form-label">세로 위치(Y)</div>
+        <div class="mst002s-form-value">
           <input
             type="text"
-            class="border rounded-lg border-gray-200 px-2 w-full"
+            class="mst002s-control"
             v-model="clickedtableY"
             disabled />
         </div>
-      </div>
-      <div class="grid grid-cols-4">
-        <div class="bg-gray-100 font-semibold flex justify-center items-center">
-          너비
-        </div>
-        <div class="flex justify-center items-center">
+
+        <div class="mst002s-form-label">너비</div>
+        <div class="mst002s-form-value">
           <input
             type="text"
-            class="border rounded-lg border-gray-200 px-2 w-full"
+            class="mst002s-control"
             v-model="clickedtableW"
             disabled />
         </div>
-        <div class="bg-gray-100 font-semibold flex justify-center items-center">
-          높이
-        </div>
-        <div class="flex justify-center items-center">
+        <div class="mst002s-form-label">높이</div>
+        <div class="mst002s-form-value">
           <input
             type="text"
-            class="border rounded-lg border-gray-200 px-2 w-full"
+            class="mst002s-control"
             v-model="clickedtableH"
             disabled />
         </div>
-      </div>
-      <div class="bg-gray-100 font-semibold flex items-center justify-center">
-        테이블 색상
-      </div>
-      <div>
-        <div class="grid grid-rows-2 grid-cols-7 gap-1 mt-5 ml-5">
-          <button
-            class="bg-white w-10 h-10 border border-gray-300 rounded-lg"
-            :class="clickedtableColor == '#FFFFFF' ? '!border-black' : ''"
-            @click="setColor(1)"></button>
-          <button
-            class="bg-[#BACCFF] w-10 h-10 border border-gray-300 rounded-lg"
-            :class="clickedtableColor == '#BACCFF' ? '!border-black' : ''"
-            @click="setColor(2)"></button>
-          <button
-            class="bg-[#B3EAFF] w-10 h-10 border border-gray-300 rounded-lg"
-            :class="clickedtableColor == '#B3EAFF' ? '!border-black' : ''"
-            @click="setColor(3)"></button>
-          <button
-            class="bg-[#CFFFAB] w-10 h-10 border border-gray-300 rounded-lg"
-            :class="clickedtableColor == '#CFFFAB' ? '!border-black' : ''"
-            @click="setColor(4)"></button>
-          <button
-            class="bg-[#FFDDBA] w-10 h-10 border border-gray-300 rounded-lg"
-            :class="clickedtableColor == '#FFDDBA' ? '!border-black' : ''"
-            @click="setColor(5)"></button>
-          <button
-            class="bg-[#FFC5C5] w-10 h-10 border border-gray-300 rounded-lg"
-            :class="clickedtableColor == '#FFC5C5' ? '!border-black' : ''"
-            @click="setColor(6)"></button>
-          <button
-            class="bg-[#D5C5FF] w-10 h-10 border border-gray-300 rounded-lg"
-            :class="clickedtableColor == '#D5C5FF' ? '!border-black' : ''"
-            @click="setColor(7)"></button>
-          <button
-            class="bg-[#C3C3C3] w-10 h-10 border border-gray-300 rounded-lg"
-            :class="clickedtableColor == '#C3C3C3' ? '!border-black' : ''"
-            @click="setColor(8)"></button>
-          <button
-            class="bg-[#7699FF] w-10 h-10 border border-gray-300 rounded-lg"
-            :class="clickedtableColor == '#7699FF' ? '!border-black' : ''"
-            @click="setColor(9)"></button>
-          <button
-            class="bg-[#5DD2FF] w-10 h-10 border border-gray-300 rounded-lg"
-            :class="clickedtableColor == '#5DD2FF' ? '!border-black' : ''"
-            @click="setColor(10)"></button>
-          <button
-            class="bg-[#9CFA55] w-10 h-10 border border-gray-300 rounded-lg"
-            :class="clickedtableColor == '#9CFA55' ? '!border-black' : ''"
-            @click="setColor(11)"></button>
-          <button
-            class="bg-[#FFB162] w-10 h-10 border border-gray-300 rounded-lg"
-            :class="clickedtableColor == '#FFB162' ? '!border-black' : ''"
-            @click="setColor(12)"></button>
-          <button
-            class="bg-[#FF9191] w-10 h-10 border border-gray-300 rounded-lg"
-            :class="clickedtableColor == '#FF9191' ? '!border-black' : ''"
-            @click="setColor(13)"></button>
-          <button
-            class="bg-[#AB8CFF] w-10 h-10 border border-gray-300 rounded-lg"
-            :class="clickedtableColor == '#AB8CFF' ? '!border-black' : ''"
-            @click="setColor(14)"></button>
+
+        <div class="mst002s-form-label mst002s-form-label--tall">테이블 색상</div>
+        <div class="mst002s-form-value mst002s-field-span3 mst002s-form-value--palette">
+          <div class="mst002s-color-grid">
+            <button
+              type="button"
+              class="mst002s-color-btn bg-white"
+              :class="{ 'mst002s-color-btn--on': clickedtableColor == '#FFFFFF' }"
+              @click="setColor(1)"></button>
+            <button
+              type="button"
+              class="mst002s-color-btn bg-[#BACCFF]"
+              :class="{ 'mst002s-color-btn--on': clickedtableColor == '#BACCFF' }"
+              @click="setColor(2)"></button>
+            <button
+              type="button"
+              class="mst002s-color-btn bg-[#B3EAFF]"
+              :class="{ 'mst002s-color-btn--on': clickedtableColor == '#B3EAFF' }"
+              @click="setColor(3)"></button>
+            <button
+              type="button"
+              class="mst002s-color-btn bg-[#CFFFAB]"
+              :class="{ 'mst002s-color-btn--on': clickedtableColor == '#CFFFAB' }"
+              @click="setColor(4)"></button>
+            <button
+              type="button"
+              class="mst002s-color-btn bg-[#FFDDBA]"
+              :class="{ 'mst002s-color-btn--on': clickedtableColor == '#FFDDBA' }"
+              @click="setColor(5)"></button>
+            <button
+              type="button"
+              class="mst002s-color-btn bg-[#FFC5C5]"
+              :class="{ 'mst002s-color-btn--on': clickedtableColor == '#FFC5C5' }"
+              @click="setColor(6)"></button>
+            <button
+              type="button"
+              class="mst002s-color-btn bg-[#D5C5FF]"
+              :class="{ 'mst002s-color-btn--on': clickedtableColor == '#D5C5FF' }"
+              @click="setColor(7)"></button>
+            <button
+              type="button"
+              class="mst002s-color-btn bg-[#C3C3C3]"
+              :class="{ 'mst002s-color-btn--on': clickedtableColor == '#C3C3C3' }"
+              @click="setColor(8)"></button>
+            <button
+              type="button"
+              class="mst002s-color-btn bg-[#7699FF]"
+              :class="{ 'mst002s-color-btn--on': clickedtableColor == '#7699FF' }"
+              @click="setColor(9)"></button>
+            <button
+              type="button"
+              class="mst002s-color-btn bg-[#5DD2FF]"
+              :class="{ 'mst002s-color-btn--on': clickedtableColor == '#5DD2FF' }"
+              @click="setColor(10)"></button>
+            <button
+              type="button"
+              class="mst002s-color-btn bg-[#9CFA55]"
+              :class="{ 'mst002s-color-btn--on': clickedtableColor == '#9CFA55' }"
+              @click="setColor(11)"></button>
+            <button
+              type="button"
+              class="mst002s-color-btn bg-[#FFB162]"
+              :class="{ 'mst002s-color-btn--on': clickedtableColor == '#FFB162' }"
+              @click="setColor(12)"></button>
+            <button
+              type="button"
+              class="mst002s-color-btn bg-[#FF9191]"
+              :class="{ 'mst002s-color-btn--on': clickedtableColor == '#FF9191' }"
+              @click="setColor(13)"></button>
+            <button
+              type="button"
+              class="mst002s-color-btn bg-[#AB8CFF]"
+              :class="{ 'mst002s-color-btn--on': clickedtableColor == '#AB8CFF' }"
+              @click="setColor(14)"></button>
+          </div>
         </div>
-      </div>
-      <div class="grid grid-cols-2 border border-y-black">
-        <div
-          @click="duplicateTable"
-          class="border border-x-black flex justify-center items-center"
-          :disabled="clickTable == false">
-          <button class="w-full h-full">복사</button>
-        </div>
-        <div
-          @click="deleteTable"
-          class="flex justify-center items-center border border-x-black"
-          :disabled="clickTable == false">
-          <button class="w-full h-full">삭제</button>
-        </div>
-      </div>
-    </div>
+      </fieldset>
+    </aside>
   </div>
   <!-- input 태그 데이터 세팅  -->
+  </div>
 </template>
 
 <script setup>
@@ -443,6 +476,34 @@ function mst002RowPersistKey(row) {
 function mst002PxDimToIntStr(v) {
   const n = Number(v);
   return Number.isFinite(n) ? String(Math.round(n)) : "0";
+}
+
+/** 모눈 위젯 표기용 테이블 코드 — 신규(new*)는 속성 패널과 같이 비움 */
+function mst002DisplayTableCode(code) {
+  if (code == null || code === "") return "";
+  const s = String(code);
+  return s.toLowerCase().includes("new") ? "" : s;
+}
+
+/** 테이블명(상단) + 테이블코드(왼쪽 하단) 라벨 */
+function mst002AppendTableLabels(widgetElement, { name, code }) {
+  if (!widgetElement) return;
+  const content = widgetElement.querySelector(".grid-stack-item-content");
+  if (!content) return;
+
+  widgetElement
+    .querySelectorAll(".mst002s-table-name, .mst002s-table-code")
+    .forEach((el) => el.remove());
+
+  const nameDiv = document.createElement("div");
+  nameDiv.className = "mst002s-table-name";
+  nameDiv.innerText = name != null ? String(name) : "";
+  content.insertAdjacentElement("afterend", nameDiv);
+
+  const codeDiv = document.createElement("div");
+  codeDiv.className = "mst002s-table-code";
+  codeDiv.innerText = mst002DisplayTableCode(code);
+  content.insertAdjacentElement("afterend", codeDiv);
 }
 
 /** SP @x,@y,@w,@h 는 INT — 그리드 배율 곱의 소수 제거 */
@@ -901,14 +962,22 @@ let info = ref("");
 let items = ref([]);
 
 function initializeGrid() {
-  const grid = GridStack.init({
-    float: true,
-    cellHeight: "auto",
-    column: 90,
-    resizable: { handles: "e,se" },
-    minRow: 56,
-    maxRow: 56,
-  });
+  const el =
+    document.querySelector(".mst002s-workspace .grid-stack") ||
+    document.querySelector(".grid-stack");
+  const grid = GridStack.init(
+    {
+      float: true,
+      cellHeight: "auto",
+      column: 90,
+      margin: 0,
+      alwaysShowResizeHandle: false,
+      resizable: { handles: "e,se", autoHide: true },
+      minRow: 56,
+      maxRow: 56,
+    },
+    el
+  );
 
   if (grid) {
     grid.on("dragstop", (event, element) => handleDragStop(grid, element));
@@ -918,66 +987,75 @@ function initializeGrid() {
 }
 
 function handleDragStop(grid, element) {
-  const node = element.gridstackNode;
-  let changed = false;
+  const node = element?.gridstackNode;
+  if (!node || !grid) return;
 
-  if (node.w <= 3) {
-    node.w = 3;
-    changed = true;
-  }
+  const apply = () => {
+    if (!element?.isConnected || !element.gridstackNode) return;
 
-  if (node.h <= 3) {
-    node.h = 3;
-    changed = true;
-  }
-  if (changed) {
-    grid.update(element, {
-      w: node.w,
-      h: node.h,
-      minW: node.w,
-      minH: node.h,
-    });
-  }
+    let changed = false;
+    if (node.w <= 3) {
+      node.w = 3;
+      changed = true;
+    }
+    if (node.h <= 3) {
+      node.h = 3;
+      changed = true;
+    }
+    if (changed) {
+      grid.update(element, {
+        w: node.w,
+        h: node.h,
+        minW: 3,
+        minH: 3,
+      });
+    }
 
-  updateNodePosition(grid, node);
-  syncFilteredTableList();
-  updateTableListFromFiltered();
-  //comsole.log(tableList.value);
+    updateNodePosition(grid, node);
+    syncFilteredTableList();
+    updateTableListFromFiltered();
 
-  const widgetElement = document.querySelector(`[gs-id="${node.id}"]`);
-  if (widgetElement) {
-    widgetElement.click(); // Trigger a click event
-  }
+    const widgetElement = document.querySelector(`[gs-id="${node.id}"]`);
+    if (widgetElement) {
+      widgetElement.click();
+    }
+  };
+
+  // DDResizable/Draggable stop 콜백 안에서 DOM을 바꾸면 el.classList 오류 발생 → 다음 프레임에 반영
+  requestAnimationFrame(apply);
 }
 
 function handleResizeStop(grid, element) {
-  const node = element.gridstackNode;
-  ////console.log(`You just resized node #${node.id} to width: ${node.w}, height: ${node.h} – good job!`);
+  const node = element?.gridstackNode;
+  if (!node || !grid) return;
 
-  let changed = false;
+  const apply = () => {
+    if (!element?.isConnected || !element.gridstackNode) return;
 
-  if (node.w <= 3) {
-    node.w = 3;
-    changed = true;
-  }
+    let changed = false;
+    if (node.w <= 3) {
+      node.w = 3;
+      changed = true;
+    }
+    if (node.h <= 3) {
+      node.h = 3;
+      changed = true;
+    }
+    if (changed) {
+      grid.update(element, {
+        w: node.w,
+        h: node.h,
+        minW: 3,
+        minH: 3,
+      });
+    }
 
-  if (node.h <= 3) {
-    node.h = 3;
-    changed = true;
-  }
-  if (changed) {
-    grid.update(element, {
-      w: node.w,
-      h: node.h,
-      minW: node.w,
-      minH: node.h,
-    });
-  }
+    updateNodeSize(node);
+    syncFilteredTableList();
+    updateTableListFromFiltered();
+  };
 
-  updateNodeSize(node);
-  syncFilteredTableList();
-  updateTableListFromFiltered();
-  //comsole.log(tableList.value);
+  requestAnimationFrame(apply);
 }
 
 function updateNodePosition(grid, node) {
@@ -1139,12 +1217,10 @@ function addNewWidget() {
   }
   const textElement = widgetElement.querySelector(".grid-stack-item-content");
   if (textElement) {
-    const newDiv = document.createElement("div");
-    newDiv.innerText = "신규" + n; // 텍스트 설정
-    newDiv.style.position = "absolute";
-    newDiv.style.left = "0";
-    newDiv.style.zIndex = "81";
-    textElement.insertAdjacentElement("afterend", newDiv);
+    mst002AppendTableLabels(widgetElement, {
+      name: "신규" + n,
+      code: node.id,
+    });
   }
   widgetElement.addEventListener("click", function () {
     const finditem = filteredtableList.value.find(
@@ -1194,6 +1270,13 @@ watch(
         if (grid == null) {
           return;
         }
+        // 이미 그리드에 있으면 재추가하지 않음 (리사이즈 중 DOM 파괴 방지)
+        if (
+          grid.engine?.nodes?.some((n) => String(n.id) === String(item.id)) ||
+          document.querySelector(`[gs-id="${item.id}"]`)
+        ) {
+          continue;
+        }
         grid.addWidget(node); // Add widget to the grid
 
         const widgetElement = document.querySelector(`[gs-id="${item.id}"]`);
@@ -1213,16 +1296,14 @@ watch(
             resizeHandle.classList.add("triangle");
           }
         }
-        const textElement = widgetElement.querySelector(
+        const textElement = widgetElement?.querySelector(
           ".grid-stack-item-content"
         );
         if (textElement) {
-          const newDiv = document.createElement("div");
-          newDiv.innerText = item.strName; // 텍스트 설정
-          newDiv.style.position = "absolute";
-          newDiv.style.left = "0";
-          newDiv.style.zIndex = "81";
-          textElement.insertAdjacentElement("afterend", newDiv);
+          mst002AppendTableLabels(widgetElement, {
+            name: item.strName,
+            code: item.lngKeyscrNo ?? item.id,
+          });
         }
         if (widgetElement) {
           widgetElement.addEventListener("click", function () {
@@ -1442,12 +1523,10 @@ const duplicateTable = () => {
 
     const textElement = widgetElement.querySelector(".grid-stack-item-content");
     if (textElement) {
-      const newDiv = document.createElement("div");
-      newDiv.innerText = "신규" + sequence.value; // 텍스트 설정
-      newDiv.style.position = "absolute";
-      newDiv.style.left = "0";
-      newDiv.style.zIndex = "81";
-      textElement.insertAdjacentElement("afterend", newDiv);
+      mst002AppendTableLabels(widgetElement, {
+        name: "신규" + sequence.value,
+        code: node.id,
+      });
     }
     widgetElement.addEventListener("click", function () {
       const finditem = filteredtableList.value.find(
@@ -1702,10 +1781,14 @@ const changetableProperty = (e) => {
       //comsole.log(item.gridstackNode.id);
       const gridItem = item.gridstackNode.el;
       //comsole.log(gridItem);
-      const label = gridItem.querySelector(
-        ".grid-stack-item-content"
-      ).nextElementSibling;
-      label.innerText = clickedtableNm.value;
+      const nameLabel = gridItem.querySelector(".mst002s-table-name");
+      if (nameLabel) {
+        nameLabel.innerText = clickedtableNm.value;
+      }
+      const codeLabel = gridItem.querySelector(".mst002s-table-code");
+      if (codeLabel) {
+        codeLabel.innerText = mst002DisplayTableCode(clickedtableCode.value);
+      }
     }
   });
 };
@@ -1754,119 +1837,25 @@ let savedGrid = null;
 
 onActivated(() => {
   if (savedGrid != null) {
-    grid = GridStack.init({
-      // DO NOT use grid.value = GridStack.init(), see above
-      float: true,
-      cellHeight: "auto",
-      column: 90,
-      resizable: { handles: "e,se" },
-      minRow: 56,
-      maxRow: 56,
-    });
+    const el =
+      document.querySelector(".mst002s-workspace .grid-stack") ||
+      document.querySelector(".grid-stack");
+    grid = GridStack.init(
+      {
+        float: true,
+        cellHeight: "auto",
+        column: 90,
+        margin: 0,
+        alwaysShowResizeHandle: false,
+        resizable: { handles: "e,se", autoHide: true },
+        minRow: 56,
+        maxRow: 56,
+      },
+      el
+    );
     grid.load(savedGrid);
-    grid.on("dragstop", function (event, element) {
-      const node = element.gridstackNode;
-      info.value = `you just dragged node #${node.id} to ${node.x},${node.y} – good job!`;
-      const findtableindex = filteredtableList.value.findIndex(
-        (item) => item.id == node.id
-      );
-      filteredtableList.value[findtableindex].x = node.x;
-      filteredtableList.value[findtableindex].y = node.y;
-
-      grid.getGridItems().forEach((item) => {
-        // 현재 그리드에 있는 모든 아이템들 순회
-        if (item.gridstackNode.id !== node.id) {
-          // 드래그된 요소를 제외한 나머지
-          const itemIndex = filteredtableList.value.findIndex(
-            (e) => e.id == item.gridstackNode.id
-          );
-          if (itemIndex !== -1) {
-            // 밀린 요소의 새로운 위치 업데이트
-            filteredtableList.value[itemIndex].x = item.gridstackNode.x;
-            filteredtableList.value[itemIndex].y = item.gridstackNode.y;
-          }
-        }
-      });
-      filteredtableList.value.forEach((item) => {
-        const tableItem = tableList.value.find(
-          (item2) =>
-            item2.intScreenNo == item.intScreenNo &&
-            item2.lngKeyscrNo == item.lngKeyscrNo
-        );
-        if (tableItem) {
-          Object.keys(item).forEach((key) => {
-            if (key == "w") {
-              tableItem["w"] = item["w"];
-            } else if (key == "h") {
-              tableItem["h"] = item["h"];
-            } else if (key == "x") {
-              tableItem["x"] = item["x"];
-            } else if (key == "y") {
-              tableItem["y"] = item["y"];
-            } else {
-              tableItem[key] = item[key];
-            }
-          });
-        }
-      });
-      //comsole.log(tableList.value);
-      const widgetElement = document.querySelector(`[gs-id="${node.id}"]`);
-      if (widgetElement) {
-        widgetElement.click(); // 클릭 이벤트 발생
-      }
-    });
-    grid.on("resizestop", function (event, element) {
-      const node = element.gridstackNode;
-      info.value = `you just resized node #${node.id} to width: ${node.w}, height: ${node.h} – good job!`;
-      // 리사이즈된 아이템의 정보 업데이트
-      const findtableindex = filteredtableList.value.findIndex(
-        (item) => item.id == node.id
-      );
-      if (findtableindex !== -1) {
-        filteredtableList.value[findtableindex].w = node.w;
-        filteredtableList.value[findtableindex].h = node.h;
-      }
-
-      grid.getGridItems().forEach((item) => {
-        // 현재 그리드에 있는 모든 아이템들 순회
-        if (item.gridstackNode.id !== node.id) {
-          // 드래그된 요소를 제외한 나머지
-          const itemIndex = filteredtableList.value.findIndex(
-            (e) => e.id == item.gridstackNode.id
-          );
-          if (itemIndex !== -1) {
-            // 밀린 요소의 새로운 위치 업데이트
-            filteredtableList.value[itemIndex].x = item.gridstackNode.x;
-            filteredtableList.value[itemIndex].y = item.gridstackNode.y;
-          }
-        }
-      });
-      filteredtableList.value.forEach((item) => {
-        const tableItem = tableList.value.find(
-          (item2) =>
-            item2.intScreenNo == item.intScreenNo &&
-            item2.lngKeyscrNo == item.lngKeyscrNo
-        );
-        if (tableItem) {
-          Object.keys(item).forEach((key) => {
-            if (key == "w") {
-              tableItem["w"] = item["w"];
-            } else if (key == "h") {
-              tableItem["h"] = item["h"];
-            } else if (key == "x") {
-              tableItem["x"] = item["x"];
-            } else if (key == "y") {
-              tableItem["y"] = item["y"];
-            } else {
-              tableItem[key] = item[key];
-            }
-
-            //comsole.log(tableList.value);
-          });
-        }
-        showOtherScreen(clickScreenButton.value);
-      });
-    });
+    grid.on("dragstop", (event, element) => handleDragStop(grid, element));
+    grid.on("resizestop", (event, element) => handleResizeStop(grid, element));
   }
 });
 /**
@@ -1891,7 +1880,10 @@ onDeactivated(() => {
   /* 아이템 배경색 */
   width: 100%;
   height: 100%;
-  overflow: hidden !important;
+  /* 리사이즈 핸들이 모서리에서 잘리지 않도록 */
+  overflow: visible !important;
+  /* 이동 가능 영역 — 커서 오버 시 십자(이동) 화살표 */
+  cursor: move;
 }
 
 .grid-stack-item-content {
@@ -1902,9 +1894,95 @@ onDeactivated(() => {
   /* 상단에서 0px 위치로 설정 */
   left: 0 !important;
   /* 좌측에서 0px 위치로 설정 */
+  right: 0 !important;
+  bottom: 0 !important;
   z-index: 50 !important;
   overflow: hidden !important;
   text-align: left;
+  cursor: move;
+}
+
+/* 테이블 명 — 좌상단, 크게·눈에 띄게 */
+.mst002s-table-name {
+  position: absolute;
+  left: 3px;
+  top: 2px;
+  z-index: 81;
+  max-width: calc(100% - 6px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.25;
+  pointer-events: none;
+  color: #0f172a;
+  text-shadow: 0 0 2px #fff, 0 1px 2px rgb(255 255 255 / 90%);
+}
+
+/* 테이블 코드(lngKeyscrNo) — 중앙, 사각 배지(은은한 음영) */
+.mst002s-table-code {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 81;
+  box-sizing: border-box;
+  min-width: 1.5rem;
+  min-height: 1.25rem;
+  max-width: 85%;
+  padding: 0.15rem 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+  color: #1e3a8a;
+  background: rgb(255 255 255 / 82%);
+  border: 1px solid rgb(30 58 138 / 22%);
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 12%);
+}
+.mst002s-table-code:empty {
+  display: none;
+}
+
+/*
+ * 리사이즈 화살표:
+ * - 평소 숨김
+ * - 테이블(아이템) 마우스 오버 시에만 표시
+ * - 이동 영역 커서는 move, 핸들 위에서는 se/e-resize
+ */
+.grid-stack-item > .ui-resizable-handle {
+  z-index: 200 !important;
+  display: none;
+}
+.grid-stack-item:hover > .ui-resizable-handle,
+.grid-stack-item.ui-resizable-autohide:hover > .ui-resizable-handle {
+  display: block !important;
+}
+.grid-stack-item.ui-draggable-dragging > .ui-resizable-handle,
+.grid-stack-item.ui-resizable-resizing > .ui-resizable-handle {
+  display: none !important;
+}
+.grid-stack-item > .ui-resizable-se {
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 20px !important;
+  height: 20px !important;
+  cursor: se-resize !important;
+}
+.grid-stack-item > .ui-resizable-e {
+  right: 0 !important;
+  width: 10px !important;
+  top: 15px !important;
+  bottom: 15px !important;
+  cursor: e-resize !important;
 }
 
 .table_style {
@@ -2670,5 +2748,458 @@ onDeactivated(() => {
 
 .gs-90 > .grid-stack-item[gs-w="90"] {
   width: 100%;
+}
+</style>
+
+<style scoped>
+/* 페이지 — 세로 스크롤 없음(잘림 허용). 모눈 크기 자체는 변경하지 않음 */
+.mst002s-page {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 조회 AREA — 확정본 유지 (노트북 수정 시 건드리지 않음) */
+.mst002s-search-panel {
+  --mst002s-panel-pad-x: 2rem;
+  --mst002s-col-gap: 1.5rem;
+  --mst002s-item-gap: 0.75rem;
+  --mst002s-label-col: 6.5rem;
+  --mst002s-row-min-h: 2rem;
+  --mst002s-control-h: 2rem;
+  --mst002s-control-border: #cbd5e1;
+  --mst002s-control-focus-border: #3b82f6;
+  --mst002s-control-radius: 0.375rem;
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+  padding-block: 0.75rem;
+}
+
+.mst002s-search-grid {
+  display: grid;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 72rem;
+  column-gap: var(--mst002s-col-gap);
+  padding-left: var(--mst002s-panel-pad-x);
+  padding-right: var(--mst002s-panel-pad-x);
+}
+
+.mst002s-cell {
+  display: flex;
+  min-width: 0;
+  min-height: var(--mst002s-row-min-h);
+  align-items: center;
+  gap: var(--mst002s-item-gap);
+}
+
+.mst002s-sg-label {
+  flex: 0 0 var(--mst002s-label-col);
+  width: var(--mst002s-label-col);
+  min-height: var(--mst002s-row-min-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgb(17 24 39);
+}
+
+.mst002s-cell-field {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.mst002s-pick-slot :deep(> .flex) {
+  width: 100%;
+  min-width: 0;
+  margin-left: 0 !important;
+  gap: 0.5rem !important;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.mst002s-pick-slot :deep(> .flex > div.shrink-0.font-semibold) {
+  display: none !important;
+}
+
+/* 그룹 · 매장구분 */
+.mst002s-pick-slot :deep(#storeGroup) {
+  width: 11.5rem !important;
+  min-width: 0 !important;
+  max-width: 11.5rem !important;
+}
+
+.mst002s-pick-slot :deep(> .flex > div:has(> select:not(#storeGroup)):not(.ml-5) > select) {
+  width: 11.5rem !important;
+  min-width: 0 !important;
+  max-width: 11.5rem !important;
+}
+
+/* 매장 v-select */
+.mst002s-pick-slot :deep(> .flex > div:has(.pickstore-vs-shell)),
+.mst002s-pick-slot :deep(> .flex > div.relative.min-w-0.flex-1) {
+  flex: 0 1 15.6rem !important;
+  width: 15.6rem !important;
+  max-width: 15.6rem !important;
+  min-width: 0 !important;
+}
+
+/* 포스번호 — 매장명과 간격 + 동일 라벨 폰트 */
+.mst002s-pick-slot :deep(> .flex > .ml-5) {
+  margin-left: 2.5rem !important;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: var(--mst002s-row-min-h);
+  min-width: 0;
+}
+
+.mst002s-pick-slot :deep(> .flex > .ml-5 > span) {
+  flex: 0 0 auto;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.25rem !important;
+  color: rgb(17 24 39) !important;
+  white-space: nowrap;
+}
+
+.mst002s-pick-slot :deep(> .flex > .ml-5 > select) {
+  width: 8rem !important;
+  min-width: 0 !important;
+  max-width: 8rem !important;
+  margin-left: 0 !important;
+  padding: 0 0.5rem !important;
+}
+
+.mst002s-pick-slot :deep(select),
+.mst002s-pick-slot :deep(.pickstore-vs-shell) {
+  box-sizing: border-box;
+  height: var(--mst002s-control-h) !important;
+  min-height: var(--mst002s-control-h) !important;
+  max-height: var(--mst002s-control-h) !important;
+  border: 1px solid var(--mst002s-control-border) !important;
+  border-radius: var(--mst002s-control-radius) !important;
+  background-color: #fff;
+}
+
+.mst002s-pick-slot :deep(.pickstore-vs-shell) {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.mst002s-pick-slot :deep(.pickstore-vs-shell .vs__dropdown-toggle) {
+  box-sizing: border-box;
+  height: 100% !important;
+  min-height: 100% !important;
+  padding: 0 0.5rem !important;
+  border: none !important;
+}
+
+.mst002s-pick-slot :deep(.pickstore-vs-shell .vs__selected),
+.mst002s-pick-slot :deep(.pickstore-vs-shell .vs__search) {
+  margin: 0 !important;
+  line-height: 1.25rem;
+  font-size: 0.875rem;
+}
+
+.mst002s-pick-slot :deep(select:focus),
+.mst002s-pick-slot :deep(.pickstore-vs-shell:focus-within) {
+  border-color: var(--mst002s-control-focus-border) !important;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+
+@media (min-width: 1280px) {
+  .mst002s-search-panel {
+    --mst002s-panel-pad-x: 2.5rem;
+  }
+}
+
+@media (min-width: 1536px) {
+  .mst002s-search-panel {
+    --mst002s-panel-pad-x: 3rem;
+  }
+}
+
+/* 우측 테이블 속성 — 캔버스 옆. 페이지 스크롤 대신 영역 안에서 맞춤 */
+.mst002s-workspace {
+  align-items: flex-start;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+/* 모눈(좌석 배치) — 기존 1000×630 고정. 좌표/사이즈 기준이므로 크기 변경 금지 */
+.mst002s-workspace .mst002s-canvas.table_style,
+.mst002s-workspace .mst002s-canvas.grid-stack {
+  box-sizing: border-box;
+  width: 1000px !important;
+  height: 630px !important;
+  min-width: 1000px !important;
+  min-height: 630px !important;
+  max-width: 1000px !important;
+  max-height: 630px !important;
+  margin-right: 0 !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+}
+
+.mst002s-prop-col {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+}
+
+/* 속성 패널만 모눈 높이에 맞춤 — 페이지 스크롤 유발 방지 */
+.mst002s-workspace .mst002s-prop-panel {
+  max-height: 630px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.mst002s-action-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.625rem;
+  width: 100%;
+  align-items: center;
+}
+
+.mst002s-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  box-sizing: border-box;
+  width: 100%;
+  height: 2.25rem;
+  min-height: 2.25rem;
+  max-height: 2.25rem;
+  min-width: 0;
+  padding: 0 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  border: 1px solid #6b7280;
+  border-radius: 0.375rem;
+  color: #374151;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 10%);
+}
+
+.mst002s-action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.mst002s-action-btn--add:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: #60a5fa;
+  color: #1d4ed8;
+}
+
+.mst002s-action-btn--copy:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: #60a5fa;
+  color: #1d4ed8;
+}
+
+.mst002s-action-btn--del:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+.mst002s-prop-panel {
+  --mst002s-label-col: 6.75rem;
+  --mst002s-control-border: #cbd5e1;
+  --mst002s-control-focus-border: #3b82f6;
+  --mst002s-control-h: 2rem;
+  --mst002s-control-radius: 0.375rem;
+  --mst002s-detail-font: 0.9375rem;
+  --mst002s-detail-row-h: 2.25rem;
+  --mst002s-detail-cell-py: 0.3rem;
+}
+
+.mst002s-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  min-height: 1.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.mst002s-section-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.4rem;
+  color: #111827;
+}
+
+.mst002s-form-grid {
+  display: grid;
+  margin: 0;
+  min-inline-size: 0;
+  padding: 0;
+  grid-template-columns:
+    var(--mst002s-label-col) minmax(0, 1fr)
+    var(--mst002s-label-col) minmax(0, 1fr);
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+.mst002s-form-grid--locked {
+  pointer-events: none;
+  opacity: 0.72;
+}
+
+.mst002s-form-grid--locked .mst002s-control,
+.mst002s-form-grid:disabled .mst002s-control {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.mst002s-form-grid > * {
+  box-sizing: border-box;
+  min-height: var(--mst002s-detail-row-h);
+  align-self: stretch;
+}
+
+.mst002s-form-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--mst002s-detail-cell-py) 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #edf2f7;
+  color: #5c5c5c;
+  font-size: var(--mst002s-detail-font);
+  font-weight: 600;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.mst002s-form-value {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: var(--mst002s-detail-cell-py) 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.mst002s-form-label--tall {
+  min-height: 5.5rem;
+}
+
+.mst002s-form-value--shape {
+  min-height: 5.5rem;
+  padding: 0.625rem 0.75rem;
+}
+
+.mst002s-form-value--palette {
+  min-height: 9rem;
+  align-items: center;
+  padding: 0.875rem 0.875rem;
+}
+
+.mst002s-field-span3 {
+  grid-column: span 3;
+  min-width: 0;
+}
+
+.mst002s-control {
+  box-sizing: border-box;
+  height: var(--mst002s-control-h);
+  min-height: var(--mst002s-control-h);
+  max-height: var(--mst002s-control-h);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  border-radius: var(--mst002s-control-radius);
+  border: 1px solid var(--mst002s-control-border);
+  background: #fff;
+  padding: 0 0.5rem;
+  font-size: var(--mst002s-detail-font);
+  line-height: 1;
+}
+
+.mst002s-control--wide {
+  width: 100%;
+  max-width: 100%;
+}
+
+.mst002s-control:focus {
+  border-color: var(--mst002s-control-focus-border);
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.2);
+}
+
+.mst002s-shape-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.mst002s-shape-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: 4.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.mst002s-shape-btn img {
+  max-height: 3.25rem;
+  width: auto;
+}
+
+.mst002s-shape-btn--on {
+  background: #dbeafe;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.mst002s-color-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.625rem;
+  width: 100%;
+}
+
+.mst002s-color-btn {
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 1;
+  min-height: 3.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.mst002s-color-btn--on {
+  border: 2px solid #111827;
+  box-shadow: 0 0 0 1px #fff inset;
 }
 </style>

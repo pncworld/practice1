@@ -22,7 +22,7 @@
         v-model="selectedGroupCd"
         :disabled="isDisabled"
         :class="[
-          'hidden md:inline-block shrink-0 rounded-md border border-gray-800 text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500',
+          'pickstore-native hidden md:inline-block shrink-0 rounded-md border border-gray-800 text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500',
           compactSearchBar
             ? 'ml-0 h-8 min-h-8 w-[5.75rem] px-2 py-0 text-sm'
             : 'ml-5 w-32 p-2',
@@ -42,7 +42,7 @@
         v-model="selectedStoreType"
         :disabled="isDisabled"
         :class="[
-          'hidden md:inline-block shrink-0 rounded-md border border-gray-800 text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500',
+          'pickstore-native hidden md:inline-block shrink-0 rounded-md border border-gray-800 text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500',
           compactSearchBar
             ? 'ml-0 h-8 w-[4.5rem] px-1.5 py-0 text-sm'
             : 'ml-2 w-20 p-2',
@@ -125,7 +125,7 @@
         :disabled="isStoreComboDisabled">
         <v-select
           :reduce="(option) => option.lngStoreCode"
-          class="style-chooser h-full !disabled:text-black text-sm"
+          class="style-chooser pickstore-chooser h-full !disabled:text-black text-sm"
           v-model="selectedStoreCode"
           :disabled="isStoreComboDisabled"
           :clearable="!isStoreComboDisabled"
@@ -312,7 +312,13 @@
 </template>
 
 <script setup>
-import { getKioskList, getPosList, getTablePosList, getStoreList2 } from "@/api/common";
+import {
+  getComStoreAttrList,
+  getKioskList,
+  getPosList,
+  getTablePosList,
+  getStoreList2,
+} from "@/api/common";
 import { getScreenList2 } from "@/api/master";
 import Swal from "sweetalert2";
 import { defineProps, nextTick, onMounted, ref, watch, computed } from "vue";
@@ -537,7 +543,45 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  /**
+   * true: 펼친 목록 가로만 매장명 길이에 맞춘다. 세로는 기본 높이.
+   */
+  storeDropdownFitHeight: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+/** append-to-body 메뉴는 컴포넌트 밖이라 화면 CSS가 안 먹음 → open 시 가로만 보정 */
+const applyStoreDropdownFitHeight = () => {
+  if (props.storeDropdownFitHeight !== true) return;
+  const menus = document.querySelectorAll(".vs__dropdown-menu");
+  const menu = menus.length > 0 ? menus[menus.length - 1] : null;
+  if (!menu) return;
+
+  const toggle = pickStoreRootRef.value?.querySelector?.(".vs__dropdown-toggle");
+  const toggleW = toggle ? Math.ceil(toggle.getBoundingClientRect().width) : 0;
+  menu.style.boxSizing = "border-box";
+  menu.style.width = "max-content";
+  menu.style.maxWidth = "min(40rem, calc(100vw - 16px))";
+  if (toggleW > 0) menu.style.minWidth = `${toggleW}px`;
+  menu.querySelectorAll(".vs__dropdown-option").forEach((el) => {
+    el.style.display = "block";
+    el.style.width = "max-content";
+    el.style.whiteSpace = "nowrap";
+    el.style.overflow = "visible";
+    el.style.textOverflow = "clip";
+  });
+  menu.style.maxHeight = "";
+  menu.style.overflowY = "auto";
+  menu.classList.add("pickstore-dd-wide");
+  const rect = menu.getBoundingClientRect();
+  const overflowRight = rect.right - (window.innerWidth - 8);
+  const currentLeft = parseFloat(menu.style.left);
+  if (overflowRight > 0 && !Number.isNaN(currentLeft)) {
+    menu.style.left = `${Math.max(8, currentLeft - overflowRight)}px`;
+  }
+};
 
 /** append-to-body 메뉴는 컴포넌트 밖이라 화면 CSS가 안 먹음 → open 시 폭만 보정 */
 const applyStoreDropdownMinWidth = () => {
@@ -557,11 +601,18 @@ const applyStoreDropdownMinWidth = () => {
 };
 
 const onStoreDropdownOpen = () => {
-  if (!(Number(props.storeDropdownMinWidthRem) > 0)) return;
+  const wantWidth = Number(props.storeDropdownMinWidthRem) > 0;
+  const wantHeight = props.storeDropdownFitHeight === true;
+  if (!wantWidth && !wantHeight) return;
+  const run = () => {
+    if (wantWidth) applyStoreDropdownMinWidth();
+    if (wantHeight) applyStoreDropdownFitHeight();
+  };
   nextTick(() => {
-    applyStoreDropdownMinWidth();
+    run();
     // vue-select가 body에 메뉴를 붙인 직후 한 프레임 더 대기
-    requestAnimationFrame(applyStoreDropdownMinWidth);
+    requestAnimationFrame(run);
+    setTimeout(run, 50);
   });
 };
 
@@ -644,6 +695,125 @@ const mergeExtraStoreIntoOptions = () => {
     storeCd.value = filtered.some((item) => optionMatchesCode(item, code))
       ? filtered
       : [...filtered, row];
+  }
+};
+
+/** getComStoreAttrList 결과. Vuex storeType(직영/가맹)은 다른 콤보가 쓰므로 여기서만 덮는다. */
+const storeAttrRows = ref(null);
+const storeAttrByCode = ref(null);
+const storeGroupRows = ref(null);
+
+const keepsMiddleComboAll = () => {
+  const user = store.state.userData || {};
+  return (
+    user.blnBrandAdmin == "True" ||
+    user.lngPositionType == "1" ||
+    (props.unlockStoreComboOnly && props.defaultStore)
+  );
+};
+
+const patchStoreRowsWithAttr = (list) => {
+  const source = Array.isArray(list) ? list : [];
+  const codes = storeAttrByCode.value;
+  if (!Array.isArray(codes) || codes.length === 0) {
+    return source.map((item) => ({ ...item }));
+  }
+  const map = new Map(
+    codes.map((row) => [String(row.lngStoreCode), row.lngStoreAttr])
+  );
+  return source.map((item) => {
+    if (item == null) return item;
+    const attr = map.get(String(item.lngStoreCode));
+    if (attr == null || attr === "") return { ...item };
+    return { ...item, lngStoreAttr: attr };
+  });
+};
+
+const applyStoreAttrToCombo = () => {
+  if (!Array.isArray(storeAttrRows.value) || storeAttrRows.value.length === 0) {
+    return;
+  }
+  storeType.value = storeAttrRows.value;
+  const source =
+    Array.isArray(storeCd2.value) && storeCd2.value.length > 0
+      ? storeCd2.value
+      : store.state.storeCd;
+  const patched = patchStoreRowsWithAttr(source);
+  storeCd2.value = patched;
+  if (selectedStoreType.value == 0 || selectedStoreType.value === "0") {
+    storeCd.value = patched;
+  } else {
+    storeCd.value = patched.filter(
+      (item) => item.lngStoreAttr == selectedStoreType.value
+    );
+  }
+  mergeExtraStoreIntoOptions();
+};
+
+/** 이 콤보가 마지막으로 불러온 그룹. 그룹이 바뀌면 가운데·매장을 그 그룹으로 다시 부른다. */
+const attrLoadedGroup = ref(null);
+
+const loadStoreAttrCombo = async (groupCd) => {
+  const user = store.state.userData || {};
+  const group =
+    groupCd == null || groupCd === "" ? user.lngStoreGroup : groupCd;
+  if (group == null || group === "") return;
+  const groupChanged =
+    attrLoadedGroup.value != null && String(attrLoadedGroup.value) !== String(group);
+  try {
+    const res = await getComStoreAttrList(
+      group,
+      user.lngPositionType,
+      user.blnBrandAdmin == "False" ? 0 : 1,
+      user.lngPosition
+    );
+    const attrs = res?.data?.storeAttr;
+    const codes = res?.data?.storeAttrCode;
+    const groups = res?.data?.storeGroup;
+    if (!Array.isArray(attrs) || attrs.length === 0) return;
+    if (Array.isArray(groups) && groups.length > 0) {
+      storeGroupRows.value = groups;
+      storeGroup.value = groups;
+    }
+    storeAttrRows.value = attrs;
+    storeAttrByCode.value = Array.isArray(codes) ? codes : [];
+    const apiStores =
+      groupChanged &&
+      Array.isArray(codes) &&
+      codes.some((row) => row && row.strName != null && row.strName !== "");
+    if (apiStores) {
+      storeCd2.value = codes.map((row) => ({
+        lngStoreGroup: row.lngStoreGroup,
+        lngStoreCode: row.lngStoreCode,
+        lngStoreAttr: row.lngStoreAttr,
+        strName: row.strName,
+      }));
+    }
+    if (groupChanged) {
+      selectedStoreType.value = 0;
+      selectedStoreCode.value = props.defaultStore ? 0 : null;
+    } else if (keepsMiddleComboAll()) {
+      const still = attrs.some(
+        (row) => row.lngStoreAttr == selectedStoreType.value
+      );
+      if (!still) selectedStoreType.value = 0;
+    } else {
+      const mine = attrs.find((row) => row.lngStoreAttr == user.lngStoreAttr);
+      if (mine) selectedStoreType.value = mine.lngStoreAttr;
+    }
+    attrLoadedGroup.value = group;
+    applyStoreAttrToCombo();
+    if (groupChanged || !keepsMiddleComboAll()) {
+      emit("update:storeType", selectedStoreType.value);
+    }
+    if (groupChanged) {
+      emit(
+        "update:storeCd",
+        selectedStoreCode.value == null ? "0" : selectedStoreCode.value
+      );
+    }
+  } catch (_) {
+    /* 웹메소드 배포 전에는 기존 getComStoreList 목록을 유지한다. */
   }
 };
 
@@ -793,6 +963,10 @@ watch(
     setTablePosNo(store.state.userData.lngPosition);
 
     defaultStoreNm.value = props.defaultStoreNm;
+    if (Array.isArray(storeGroupRows.value) && storeGroupRows.value.length > 0) {
+      storeGroup.value = storeGroupRows.value;
+    }
+    applyStoreAttrToCombo();
   }
 );
 
@@ -893,6 +1067,7 @@ onMounted(async () => {
   }
   defaultStoreNm.value = props.defaultStoreNm;
   await applyFullGroupStoreListForUnlock();
+  await loadStoreAttrCombo();
 });
 
 const emitStoreType = (value) => {
@@ -915,11 +1090,12 @@ const emitStoreCode = (value) => {
 const setStore = (value) => {
   if (value == 0) {
     storeCd.value = storeCd2.value;
-    return storeCd.value;
+  } else {
+    storeCd.value = storeCd2.value.filter((item) => {
+      return item.lngStoreAttr == value;
+    });
   }
-  storeCd.value = storeCd2.value.filter((item) => {
-    return item.lngStoreAttr == value;
-  });
+  selectedStoreCode.value = props.defaultStore ? 0 : null;
 };
 
 const route = useRoute();
@@ -1057,12 +1233,23 @@ watch(paymentType, (newvalue) => {
 });
 
 watch(selectedGroupCd, (newValue) => {
+  const list =
+    Array.isArray(storeGroup.value) && storeGroup.value.length > 0
+      ? storeGroup.value
+      : store.state.storeGroup;
   const GroupNm =
-    store.state.storeGroup.filter(
-      (item) => item.lngStoreGroup == selectedGroupCd.value
-    )[0]?.strName || "선택";
+    list.filter((item) => item.lngStoreGroup == selectedGroupCd.value)[0]
+      ?.strName || "선택";
   emit("update:storeGroup", selectedGroupCd.value);
   emit("GroupNm", GroupNm);
+  if (
+    attrLoadedGroup.value != null &&
+    String(newValue) !== String(attrLoadedGroup.value)
+  ) {
+    selectedStoreType.value = 0;
+    selectedStoreCode.value = props.defaultStore ? 0 : null;
+    loadStoreAttrCombo(newValue);
+  }
 });
 
 watch(
@@ -1193,10 +1380,50 @@ defineExpose({
   z-index: 40 !important;
 }
 
+/* 이 화면 opt-in: 펼친 목록 스크롤 막대를 잡기 쉽게 */
+.vs__dropdown-menu.pickstore-dd-wide {
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1.25rem;
+}
+.vs__dropdown-menu.pickstore-dd-wide .vs__dropdown-option {
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1.25rem;
+}
 .style-chooser .vs__clear,
 .style-chooser .vs__open-indicator {
   fill: #394066;
 }
+
+/* 사원등록과 동일: 닫힌 매장 콤보 글자·화살표 */
+select.pickstore-native {
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  line-height: 1.25rem !important;
+}
+.pickstore-chooser .vs__selected,
+.pickstore-chooser .vs__search,
+.pickstore-chooser .vs__search::placeholder {
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  color: #111827 !important;
+}
+.pickstore-chooser .vs__open-indicator {
+  fill: #6b7280 !important;
+  transform: scale(0.72) !important;
+}
+.pickstore-chooser.vs--open .vs__open-indicator {
+  fill: #6b7280 !important;
+  transform: scale(0.72) rotate(180deg) !important;
+}
+
 .style-chooser .vs__selected {
   background-color: white !important;
   justify-content: left;

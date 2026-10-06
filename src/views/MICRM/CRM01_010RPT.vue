@@ -29,12 +29,22 @@
         <!-- 좌측 2단: 기간 / 등급 -->
         <div class="crm010-left-stack min-w-0">
           <div class="crm010-row">
-            <input
-              id="crm010-cond-period"
-              v-model="cond"
-              type="checkbox"
-              class="crm010-check shrink-0" />
-            <label class="crm010-lbl shrink-0" for="crm010-cond-period">기간</label>
+            <button
+              type="button"
+              class="crm010-check-hit"
+              :aria-pressed="cond"
+              aria-label="기간"
+              :disabled="periodCheckLocked"
+              @click.stop="togglePeriodCond">
+              <span class="crm010-box" :class="{ 'is-on': cond }"></span>
+            </button>
+            <button
+              type="button"
+              class="crm010-lbl crm010-lbl-btn"
+              :disabled="periodCheckLocked"
+              @click.stop="togglePeriodCond">
+              기간
+            </button>
             <div class="crm010-date-slot min-w-0 flex-1">
               <Datepicker2
                 ref="datepicker"
@@ -70,11 +80,14 @@
 
         <!-- 우측: 매장명(2단 컴포넌트) — 좌측 2단에 맞춤 -->
         <div class="crm010-right-store min-w-0">
-          <input
-            id="crm010-cond-store"
-            v-model="cond2"
-            type="checkbox"
-            class="crm010-check shrink-0" />
+            <button
+              type="button"
+              class="crm010-check-hit"
+              :aria-pressed="cond2"
+              aria-label="매장명"
+              @click.stop="toggleStoreCond">
+              <span class="crm010-box" :class="{ 'is-on': cond2 }"></span>
+            </button>
           <div class="crm010-pick-slot min-w-0 flex-1">
             <PickStoreSingle
               @lngStoreGroup="lngStoreGroup"
@@ -96,12 +109,14 @@
           :progid="1"
           :rowData="rowData"
           :reload="reload"
-          :setFooterCustomColumnId="['strStoreName']"
           :hideColumnsId="hideColumnsId"
+          footer-label-on-first-visible
           :setFooterCustomText="['합계']"
+          :setFooterColID="['cnt', 'cnt1', 'cnt2', 'cnt3']"
+          :setFooterExpressions="['sum', 'sum', 'sum', 'sum']"
           :setGroupSumCustomColumnId="['strStoreName']"
           :setGroupSumCustomText="['일자별']"
-          :setFooter="setFooter"
+          :setFooter="true"
           :setGroupFooter="setGroupFooter"
           :setMergeMode="false"
           :setGroupColumnId="'dtmDate'"
@@ -163,7 +178,7 @@ import { insertPageLog } from "@/customFunc/customFunc";
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -190,12 +205,32 @@ const rowData4 = ref([]);
 const condValue = ref(0);
 const store = useStore();
 const cond = ref(false);
-const cond2 = ref(false);
+const cond2 = ref(true);
+
+/** 기간만 켜져 있으면 기간 체크는 비활성 */
+const periodCheckLocked = computed(
+  () => cond.value == true && cond2.value == false
+);
+
+/** 기간만 켜져 있으면 기간 체크는 끄지 않는다 */
+const togglePeriodCond = () => {
+  if (cond.value == true && cond2.value == false) {
+    return;
+  }
+  cond.value = !cond.value;
+};
+
+/** 기간이 꺼진 상태에서 매장 체크를 끄면 기간을 켠다. 둘 다 체크는 허용 */
+const toggleStoreCond = () => {
+  cond2.value = !cond2.value;
+  if (cond.value == false && cond2.value == false) {
+    cond.value = true;
+  }
+};
 const cond3 = ref(0);
 const optionList = ref([]);
 const datepicker = ref(null);
 const closePopUp = ref(false);
-const setFooter = ref(false);
 const groupCd = ref(0);
 const storeCd = ref(0);
 const joinType = ref(0);
@@ -254,31 +289,27 @@ const searchButton = async () => {
     store.state.loading = true;
     initGrid();
 
-    if (cond.value == true) {
+    const storeColumns = [
+      "lngStoreGroup",
+      "strSubLeaseName",
+      "strTeamName",
+      "strSupervisorName",
+      "lngStoreCode",
+      "strStoreName",
+    ];
+    let reportType = 0;
+    if (cond.value == true && cond2.value == true) {
       hideColumnsId.value = [];
+      setGroupFooter.value = true;
+      reportType = 1;
+    } else if (cond.value == true) {
+      hideColumnsId.value = storeColumns;
+      setGroupFooter.value = false;
+      reportType = 2;
     } else {
       hideColumnsId.value = ["dtmDate"];
-    }
-    if (cond2.value == true && cond.value == true) {
-      hideColumnsId.value = [];
-      setFooter.value = true;
-    } else if (cond2.value == false && cond.value == false) {
-      hideColumnsId.value = [
-        "lngStoreGroup",
-        "strSubLeaseName",
-        "strTeamName",
-        "strSupervisorName",
-        "lngStoreCode",
-        "strStoreName",
-      ];
-      cond.value = true;
-      setFooter.value = false;
-    }
-
-    if (cond.value == true && cond2.value == true) {
-      setGroupFooter.value = true;
-    } else {
       setGroupFooter.value = false;
+      reportType = 0;
     }
     const res = await getRegisterCustomer(
       groupCd.value,
@@ -289,7 +320,7 @@ const searchButton = async () => {
       sDate.value,
       eDate.value,
       cond3.value,
-      cond.value == true ? 1 : 0
+      reportType
     );
 
     rowData.value = res.data.List;
@@ -389,13 +420,15 @@ const crm010ControlBorder = "#cbd5e1";
   justify-content: space-between;
   gap: 0.625rem;
   min-width: 0;
+  position: relative;
+  z-index: 1;
   /* 패널 좌측 inset과 별도로 한 번 더 들여 → 왼쪽 공간 약 2배, 매장명 위치는 유지 */
   padding-inline-start: var(--crm010-panel-pad-x, 2rem);
 }
 
 .crm010-row {
   display: grid;
-  grid-template-columns: 1rem 3.5rem minmax(0, 1fr);
+  grid-template-columns: 1.25rem 3.5rem minmax(0, 1fr);
   column-gap: 0.875rem;
   align-items: center;
   min-width: 0;
@@ -407,25 +440,73 @@ const crm010ControlBorder = "#cbd5e1";
   align-items: center;
   gap: 0.75rem;
   min-width: 0;
+  position: relative;
+  z-index: 1;
 }
 
-.crm010-check {
+.crm010-check-hit {
+  position: relative;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  justify-self: center;
+  flex-shrink: 0;
+}
+
+.crm010-check-hit:disabled {
+  cursor: not-allowed;
+}
+
+.crm010-check-hit:disabled .crm010-box.is-on {
+  border-color: #94a3b8;
+  background: #94a3b8;
+}
+
+.crm010-box {
+  box-sizing: border-box;
   width: 1rem;
   height: 1rem;
-  margin: 0;
-  cursor: pointer;
-  accent-color: #2563eb;
-  justify-self: center;
+  border: 1px solid #64748b;
+  border-radius: 0.2rem;
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crm010-box.is-on {
+  border-color: #2563eb;
+  background: #2563eb;
+}
+
+.crm010-box.is-on::after {
+  content: "";
+  width: 0.28rem;
+  height: 0.5rem;
+  margin-top: -0.12rem;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .crm010-check-spacer {
   display: inline-block;
-  width: 1rem;
-  height: 1rem;
+  width: 1.25rem;
+  height: 1.25rem;
   justify-self: center;
 }
 
 .crm010-lbl {
+  position: relative;
+  z-index: 30;
   width: auto;
   margin: 0;
   padding-inline-end: 0.25rem;
@@ -434,6 +515,19 @@ const crm010ControlBorder = "#cbd5e1";
   color: rgb(17 24 39);
   white-space: nowrap;
   text-align: left;
+}
+
+.crm010-lbl-btn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.crm010-lbl-btn:disabled {
+  cursor: not-allowed;
+  color: #94a3b8;
 }
 
 .crm010-field {
@@ -447,6 +541,8 @@ const crm010ControlBorder = "#cbd5e1";
 }
 
 .crm010-date-slot {
+  position: relative;
+  z-index: 0;
   min-width: 0;
   padding-inline-start: 0.125rem;
 }
@@ -467,6 +563,8 @@ const crm010ControlBorder = "#cbd5e1";
 }
 
 .crm010-pick-slot {
+  position: relative;
+  z-index: 0;
   min-width: 0;
 }
 

@@ -49,6 +49,7 @@
             <!-- 그룹/구분/매장 — 자재명/코드와 동일 1:1:2 그리드 + 높이는 거래처(h-8)와 맞춤 -->
             <PickStore
               @update:storeGroup="lngStoreGroup"
+              @update:storeType="lngStoreAttrs"
               :default-store-nm="'전체'"
               @storeNm="excelStore"
               @update:storeCd="lngStoreCode" />
@@ -342,7 +343,7 @@ const lngStoreCode = (e) => {
   storeCode.value = e;
 };
 
-const storeAttr = ref();
+const storeAttr = ref(0);
 const lngStoreAttrs = (e) => {
   storeAttr.value = e;
 };
@@ -376,7 +377,7 @@ const searchButton = async () => {
       cond3.value,
       cond4.value,
       cond.value,
-      0,
+      storeAttr.value,
       cond5.value,
       cond6.value
     );

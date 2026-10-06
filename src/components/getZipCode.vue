@@ -1,8 +1,16 @@
 <template>
   <Teleport to="body">
     <div
-      class="fixed inset-0 z-[11100] flex items-center justify-center bg-black bg-opacity-50">
-      <div class="bg-white p-6 rounded-xl shadow-2xl w-[30vw]" id="address">
+      class="fixed inset-0 z-[11100] flex items-center justify-center bg-black/50"
+      @mousedown.self.prevent
+      @click.self.prevent>
+      <div
+        class="bg-white p-6 rounded-xl shadow-2xl w-[30vw]"
+        id="address"
+        role="dialog"
+        aria-modal="true"
+        @click.stop
+        @mousedown.stop>
         <div class="flex justify-end">
           <button class="button primary" @click="closePopUp">닫기</button>
         </div>

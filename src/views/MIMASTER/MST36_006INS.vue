@@ -5,151 +5,201 @@
     # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <!-- 조회 조건 -->
-  <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <PageName></PageName>
-    <div class="flex justify-center mr-10 space-x-2 pr-5">
-      <button @click="searchButton" class="button search md:w-auto w-14">
-        조회
-      </button>
-      <button @click="saveButton" class="button save w-auto">저장</button>
+  <div class="mst3606-page box-border flex h-full max-w-full min-h-0 flex-col gap-2 overflow-hidden pb-1">
+    <!-- 상단: 페이지명 + 액션 -->
+    <div class="flex shrink-0 flex-wrap items-center justify-between gap-2">
+      <PageName />
+      <div class="flex flex-wrap items-center justify-end gap-2">
+        <button type="button" @click="searchButton" class="button search md:w-auto w-14">
+          조회
+        </button>
+        <button type="button" @click="saveButton" class="button save md:w-auto w-auto">
+          저장
+        </button>
+      </div>
     </div>
-  </div>
-  <br />
-  <div
-    class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore
-      @update:storeAreaCd="handleStoreAreaCd"
-      @update:storeCd="handleStoreCd"
-      @storeNm="handlestoreNm"
-      @GroupNm="handleGroupNm"
-      @update:ischanged="handleinitAll"
-      :hidesub="hidesub"
-      :hideAttr="hidesub"></PickStore>
-  </div>
-  <div class="mt-5 flex justify-start ml-10">
-    <button
-      class="contents_tab-button"
-      :class="{ 'text-blue-600': currentMenu == 1 }"
-      @click="showMenus(1)">
-      할인그룹 설정
-    </button>
-    <button
-      class="contents_tab-button"
-      :class="{ 'text-blue-600': currentMenu == 2 }"
-      @click="showMenus(2)">
-      할인그룹 메뉴설정
-    </button>
-  </div>
-  <div class="flex h-[55vh] w-full mt-5">
-    <div class="flex flex-col w-3/5 h-4/6">
+
+    <!-- 조회 AREA -->
+    <div class="mst3606-search-panel z-10 w-full min-w-0 shrink-0 rounded-lg bg-gray-200">
+      <div class="mst3606-search-grid min-w-0">
+        <div class="mst3606-cell">
+          <div class="mst3606-sg-label">매장명</div>
+          <div class="mst3606-cell-field mst3606-pick-slot min-w-0">
+            <PickStore
+              compact-search-bar
+              main-name=""
+              :compact-store-combo-max-rem="15.6"
+              @update:storeAreaCd="handleStoreAreaCd"
+              @update:storeGroup="handleStoreGroup"
+              @update:storeCd="handleStoreCd"
+              @storeNm="handlestoreNm"
+              @GroupNm="handleGroupNm"
+              @update:ischanged="handleinitAll"
+              :hidesub="hidesub"
+              :hideAttr="hidesub" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 탭 -->
+    <div class="mst3606-content-tabs flex shrink-0 flex-wrap gap-1">
+      <button
+        type="button"
+        class="mst3606-tab"
+        :class="{ 'mst3606-tab--on': currentMenu == 1 }"
+        @click="showMenus(1)">
+        할인그룹 설정
+      </button>
+      <button
+        type="button"
+        class="mst3606-tab"
+        :class="{ 'mst3606-tab--on': currentMenu == 2 }"
+        @click="showMenus(2)">
+        할인그룹 메뉴설정
+      </button>
+    </div>
+
+    <!-- 본문 -->
+    <div class="mst3606-workspace min-h-0 min-w-0 flex-1">
+      <!-- 탭1: 할인그룹 설정 -->
       <div
-        class="flex justify-between mt-0 ml-10 border-b border-b-gray-300"
-        :class="currentMenu == 1 ? 'w-full' : 'w-[54%]'">
-        <div
-          class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold"
-          v-if="currentMenu == 1">
-          할인그룹 정보
+        v-show="currentMenu == 1"
+        class="mst3606-pane mst3606-pane--split">
+        <div class="mst3606-left flex min-h-0 min-w-0 flex-col">
+          <div class="mst3606-section-head shrink-0">
+            <div class="mst3606-section-title">할인그룹 정보</div>
+            <div class="flex gap-2">
+              <button
+                type="button"
+                class="mst3606-action-btn mst3606-action-btn--add"
+                :disabled="!(afterSearch == true)"
+                @click="addRow">
+                <font-awesome-icon :icon="['fas', 'plus']" />
+                추가
+              </button>
+              <button
+                type="button"
+                class="mst3606-action-btn mst3606-action-btn--del"
+                @click="deleteRow"
+                :disabled="!(afterClick == true && afterSearch == true)">
+                <font-awesome-icon :icon="['fas', 'trash']" />
+                삭제
+              </button>
+            </div>
+          </div>
+          <div class="mst3606-grid-wrap min-h-0 min-w-0 flex-1">
+            <Realgrid
+              class="h-full w-full"
+              :progname="'MST36_006INS_VUE'"
+              :progid="1"
+              :rowData="rowData"
+              :showGrid="showGrid"
+              :showCheckBar="false"
+              @selcetedrowData="selcetedrowData"
+              :searchWord="searchword1"
+              :searchColId="'lngCode,strName'"
+              :addRow4="addRows"
+              @selectedIndex2="selectedIndex2"
+              :addrowProp="'strName,lngStoreGroup'"
+              :addrowDefault="addrowDefault"
+              @updatedRowData="updatedRowData"
+              @clickedRowData="clickedRowData"
+              @sendRowState="sendRowState"
+              @allStateRows="allStateRows"
+              :deleteRow6="deleteRows"
+              :changeColid="changeColid"
+              :changeRow="changeRow"
+              :changeValue2="changeValue"
+              :changeNow="changeNow"
+              @realgridname="realgridname2"
+              :rowStateeditable="rowStateeditable" />
+          </div>
         </div>
-        <div
-          class="flex justify-start rounded-tl-lg text-xl -mt-1 font-bold"
-          v-if="currentMenu == 2">
-          메뉴 목록
-        </div>
-        <div class="mt-3">
-          <button
-            class="whitebutton"
-            :disabled="!(afterSearch == true)"
-            @click="addRow"
-            v-if="currentMenu == 1">
-            추가
-          </button>
-          <button
-            class="whitebutton"
-            @click="deleteRow"
-            :disabled="!(afterClick == true && afterSearch == true)"
-            v-if="currentMenu == 1">
-            삭제
-          </button>
+
+        <div class="mst3606-right flex min-h-0 min-w-0 flex-col">
+          <div class="mst3606-section-title shrink-0">상세정보</div>
+          <div class="mst3606-form-grid mt-2 w-full">
+            <div class="mst3606-form-label">할인그룹코드</div>
+            <div class="mst3606-form-value">
+              <input
+                type="text"
+                name="lngGroupCd"
+                class="mst3606-control mst3606-control--wide"
+                v-model="discountGrpCd"
+                @input="changeValues"
+                :disabled="tempDisabled || currentRowState != 'created'" />
+            </div>
+            <div class="mst3606-form-label">할인그룹명</div>
+            <div class="mst3606-form-value">
+              <input
+                type="text"
+                name="lngGroupNm"
+                class="mst3606-control mst3606-control--wide"
+                v-model="discountGrpNm"
+                :disabled="tempDisabled2"
+                @input="changeValues" />
+            </div>
+            <div class="mst3606-form-label">할인값</div>
+            <div class="mst3606-form-value">
+              <input
+                type="text"
+                name="discountValue"
+                class="mst3606-control mst3606-control--wide"
+                v-model="discountValue"
+                :disabled="currentRowState != 'created'"
+                @input="changeValues" />
+            </div>
+          </div>
         </div>
       </div>
-      <div class="h-4/6" v-show="currentMenu == 1">
-        <div class="ml-10 mt-5 w-full h-full">
-          <Realgrid
-            class="w-full h-[230%]"
-            :progname="'MST36_006INS_VUE'"
-            :progid="1"
-            :rowData="rowData"
-            :showGrid="showGrid"
-            :showCheckBar="false"
-            @selcetedrowData="selcetedrowData"
-            :searchWord="searchword1"
-            :searchColId="'lngCode,strName'"
-            :addRow4="addRows"
-            @selectedIndex2="selectedIndex2"
-            :addrowProp="'strName,lngStoreGroup'"
-            :addrowDefault="addrowDefault"
-            @updatedRowData="updatedRowData"
-            @clickedRowData="clickedRowData"
-            @sendRowState="sendRowState"
-            @allStateRows="allStateRows"
-            :deleteRow6="deleteRows"
-            :changeColid="changeColid"
-            :changeRow="changeRow"
-            :changeValue2="changeValue"
-            :changeNow="changeNow"
-            @realgridname="realgridname2"
-            :rowStateeditable="rowStateeditable"></Realgrid>
-        </div>
-      </div>
-      <!-- 탭1 영역\-->
-      <!-- 탭2 영역\-->
 
-      <div class="h-4/6 w-[80vw]" v-show="currentMenu == 2">
-        <div
-          class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-[35%]">
-          <div class="customtableIndex border border-gray-400 rounded-tl-lg">
-            메뉴분류
-          </div>
-          <div
-            class="px-2 py-1 border border-gray-400 rounded-tr-lg flex space-x-2">
-            <select
-              name=""
-              id=""
-              class="flex-1 border border-gray-400 rounded-lg"
-              @change="setSubCd"
-              v-model="forsearchMain">
-              <option value="-1">전체</option>
-              <option :value="i.mainCode" v-for="i in MenuGroup">
-                {{ i.mainName }}
-              </option>
-            </select>
-            <select
-              name=""
-              id=""
-              class="flex-1 border border-gray-400 rounded-lg"
-              v-model="forsearchSub">
-              <option value="-1">전체</option>
-              <option :value="i.subCode" v-for="i in filteredSubMenuGroup">
-                {{ i.subName }}
-              </option>
-            </select>
-          </div>
-
-          <div class="customtableIndex border border-gray-400 rounded-bl-lg">
-            메뉴명/코드
-          </div>
-          <div class="px-2 py-1 border border-gray-400 rounded-br-lg">
-            <input
-              type="text"
-              class="border w-full h-full px-1 border-gray-400 rounded-lg"
-              @input="searchMenuList"
-              v-model="searchword1" />
-          </div>
+      <!-- 탭2: 할인그룹 메뉴설정 -->
+      <div
+        v-show="currentMenu == 2"
+        class="mst3606-pane mst3606-pane--grid">
+        <div class="mst3606-section-head shrink-0">
+          <div class="mst3606-section-title">메뉴 목록</div>
         </div>
-        <div class="ml-10 mt-5 w-full h-full">
+        <div class="mst3606-filter-bar shrink-0">
+          <div class="mst3606-list-filter">
+            <div class="mst3606-filter-row">
+              <div class="mst3606-filter-label">메뉴분류</div>
+              <select
+                class="mst3606-filter-control mst3606-filter-control--md"
+                @change="setSubCd"
+                v-model="forsearchMain">
+                <option value="-1">전체</option>
+                <option :value="i.mainCode" v-for="i in MenuGroup" :key="'m' + i.mainCode">
+                  {{ i.mainName }}
+                </option>
+              </select>
+              <select
+                class="mst3606-filter-control mst3606-filter-control--md"
+                v-model="forsearchSub">
+                <option value="-1">전체</option>
+                <option :value="i.subCode" v-for="i in filteredSubMenuGroup" :key="'s' + i.subCode">
+                  {{ i.subName }}
+                </option>
+              </select>
+            </div>
+            <div class="mst3606-filter-row">
+              <div class="mst3606-filter-label">메뉴명/코드</div>
+              <input
+                type="text"
+                class="mst3606-filter-control mst3606-filter-control--grow"
+                @input="searchMenuList"
+                v-model="searchword1" />
+            </div>
+          </div>
+          <label class="mst3606-check-label mst3606-check-label--grid-end">
+            <input type="checkbox" v-model="ischecked" />
+            미설정 메뉴보기
+          </label>
+        </div>
+        <div class="mst3606-grid-wrap mst3606-grid-wrap--tab2 min-h-0 min-w-0 flex-1">
           <Realgrid
-            class="w-full h-[200%]"
+            class="h-full w-full"
             :progname="'MST36_006INS_VUE'"
             :progid="2"
             :reload="reload"
@@ -167,73 +217,17 @@
             :searchWord3="searchword1"
             :searchColId="'lngCode,strName'"
             :searchColId3="['mainCode', 'subCode']"
-            :searchValue="[forsearchMain, forsearchSub]"
+            :searchValue="menuSearchValue"
             @updatedRowData="updatedRowData2"
             :mergeColumns2="true"
             :mergeColumnGroupName2="['메뉴정보']"
             :mergeColumnGroupSubList2="[
               ['mainName', 'subName', 'lngCode', 'strName', 'lngPrice'],
             ]"
-            @realgridname="realgridname3"></Realgrid>
-        </div>
-        <!-- 그리드 영역 -->
-      </div>
-    </div>
-    <div
-      class="w-[52%] h-[20%] grid grid-rows-2 grid-cols-1 ml-28 -mt-2"
-      v-if="currentMenu == 1">
-      <div class="font-bold text-xl flex justify-start items-center">
-        상세정보
-      </div>
-      <div class="w-full h-full flex justify-start items-center">
-        <div class="grid grid-rows-3 grid-cols-[3fr,7fr] w-[93%] h-full">
-          <div
-            class="rounded-tl-lg border flex justify-center items-center bg-gray-100">
-            할인그룹코드
-          </div>
-          <div class="rounded-tr-lg border h-full py-1 px-1 flex items-center">
-            <input
-              type="text"
-              name="lngGroupCd"
-              class="w-full border rounded-lg disabled:bg-gray-100 pl-1"
-              v-model="discountGrpCd"
-              @input="changeValues"
-              :disabled="tempDisabled || currentRowState != 'created'" />
-          </div>
-          <div
-            class="border flex justify-center items-center bg-gray-100">
-            할인그룹명
-          </div>
-          <div class="border h-full py-1 px-1 flex items-center">
-            <input
-              type="text"
-              name="lngGroupNm"
-              class="w-full border rounded-lg pl-1 disabled:bg-gray-100"
-              v-model="discountGrpNm"
-              :disabled="tempDisabled2"
-              @input="changeValues" />
-          </div>
-          <div
-            class="rounded-bl-lg border flex justify-center items-center bg-gray-100">
-            할인값
-          </div>
-          <div class="rounded-br-lg border h-full py-1 px-1 flex items-center">
-            <input
-              type="text"
-              name="discountValue"
-              class="w-full border rounded-lg pl-1 disabled:bg-gray-100"
-              v-model="discountValue"
-              :disabled="currentRowState != 'created'"
-              @input="changeValues" />
-          </div>
+            @realgridname="realgridname3" />
         </div>
       </div>
     </div>
-    <!-- TAB2 공간 -->
-    <label v-if="currentMenu == 2" class="mt-20 relative right-96 top-1 h-2">
-      <input type="checkbox" v-model="ischecked" />
-      미설정메뉴보기
-    </label>
   </div>
 </template>
 
@@ -249,7 +243,7 @@ import {
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch, nextTick } from "vue";
+import { onMounted, ref, watch, nextTick, computed } from "vue";
 
 /**
  * 	Vuex 상태관리 및 로그인 세션 호출
@@ -311,6 +305,7 @@ const discountGrpNm = ref("");
 const discountValue = ref();
 const clickedGroupNm = ref();
 const confirmitem = ref([]);
+const confirmitem2 = ref([]);
 const rowData = ref([]);
 const rowData3 = ref([]);
 const addRows = ref(false);
@@ -328,11 +323,12 @@ const showMenus = (value) => {
   }
 };
 
-const currentMenu = ref("1");
+const currentMenu = ref(1);
 
 const searchSpecialColId = ref(["lngDiscount"]);
 const searchSpecialCond = ref(true); // 초기값: 필터 비활성화 (모든 메뉴 표시)
 const searchSpecialCond2 = ref("(value = 0)");
+const menuSearchValue = computed(() => [forsearchMain.value, forsearchSub.value]);
 watch(ischecked, () => {
   if (ischecked.value == true) {
     // 미설정메뉴보기 체크 시: lngDiscount === 0인 메뉴만 표시
@@ -358,46 +354,32 @@ const realgridname3 = (e) => {
   realgrid4Name.value = e;
 };
 
-watch(currentMenu, () => {
-  if (currentMenu.value == 1) {
-    setTimeout(() => {
-      const reagrid2 = realgrid2Name.value
-        ? document.getElementById(realgrid2Name.value)
-        : null;
-      if (reagrid2) {
-        const grid2 = RealGrid.getGridInstance(reagrid2);
-        if (grid2) {
-          grid2.resetSize();
-          grid2.refresh(true);
-        }
-      }
-    }, 100);
-    setTimeout(() => {
-      const reagrid3 = realgrid3Name.value
-        ? document.getElementById(realgrid3Name.value)
-        : null;
-      if (reagrid3) {
-        const grid3 = RealGrid.getGridInstance(reagrid3);
-        if (grid3) {
-          grid3.resetSize();
-          grid3.refresh(true);
-        }
-      }
-    }, 100);
-  } else if (currentMenu.value == 2) {
-    if (realgrid4Name.value) {
-      const reagrid4 = document.getElementById(realgrid4Name.value);
-      if (reagrid4) {
-        setTimeout(() => {
-          const gridInstance = RealGrid.getGridInstance(reagrid4);
-          if (gridInstance) {
-            gridInstance.resetSize();
-            gridInstance.refresh(true);
-          }
-        }, 100);
-      }
+const resizeGridById = (gridId) => {
+  if (!gridId) return;
+  const el = document.getElementById(gridId);
+  if (!el) return;
+  const grid = RealGrid.getGridInstance(el);
+  if (!grid) return;
+  grid.resetSize();
+  grid.refresh(true);
+};
+
+watch(currentMenu, async () => {
+  await nextTick();
+  setTimeout(() => {
+    if (currentMenu.value == 1) {
+      resizeGridById(realgrid3Name.value);
+    } else if (currentMenu.value == 2) {
+      resizeGridById(realgrid4Name.value);
     }
-  }
+  }, 50);
+  setTimeout(() => {
+    if (currentMenu.value == 1) {
+      resizeGridById(realgrid3Name.value);
+    } else if (currentMenu.value == 2) {
+      resizeGridById(realgrid4Name.value);
+    }
+  }, 200);
 });
 
 const hidesub = ref(false);
@@ -424,6 +406,15 @@ const handleGroupNm = (newData) => {
 
 const handleStoreAreaCd = (newValue) => {
   //comsole.log(newValue)
+};
+
+/**
+ * pickStore - 매장그룹 세팅
+ */
+const handleStoreGroup = (newValue) => {
+  if (newValue !== undefined && newValue !== null && newValue !== "") {
+    groupCd.value = newValue;
+  }
 };
 
 /**
@@ -509,10 +500,63 @@ const selcetedrowData = (newValue) => {
 const originRowData3 = ref([]);
 
 /**
- *  조회 함수
+ * 탭2(할인그룹 메뉴설정) 응답 → 동적 체크박스 컬럼 + 행 데이터
+ */
+const applyDiscountMenuList = (resData) => {
+  SettingList.value = [...(resData?.discountSetting ?? [])];
+  MenuGroup.value = Array.isArray(resData?.MAINGROUP) ? resData.MAINGROUP : [];
+  SubMenuGroup.value = Array.isArray(resData?.SUBGROUP) ? resData.SUBGROUP : [];
+  filteredSubMenuGroup.value = [];
+
+  printNameList.value = resData?.discountGroup ?? [];
+  const dgList = printNameList.value ?? [];
+
+  discountGroupColumns.value = dgList.map((g, idx) => {
+    const headerText = g?.strName ?? g?.lngCode ?? `할인그룹${idx + 1}`;
+    return {
+      strColID: `checkbox${idx + 1}`,
+      strHdText: String(headerText),
+      intHdWidth: 90,
+      strColType: "text",
+      strDisplay: "checkbox",
+      strAlign: "center",
+      strMask: "",
+      strSubSumtext: "",
+    };
+  });
+
+  // lngDiscount(비트마스크) 기준으로 체크박스 값 세팅
+  if (Array.isArray(SettingList.value) && Array.isArray(dgList) && dgList.length > 0) {
+    for (let r = 0; r < SettingList.value.length; r++) {
+      const mask = Number(SettingList.value[r]?.lngDiscount ?? 0);
+      for (let i = 0; i < dgList.length; i++) {
+        const bit = Number(dgList[i]?.lngValue ?? 0);
+        const key = `checkbox${i + 1}`;
+        SettingList.value[r][key] = bit > 0 ? (mask & bit) !== 0 : false;
+      }
+    }
+  } else if (Array.isArray(SettingList.value) && discountGroupColumns.value.length > 0) {
+    for (let r = 0; r < SettingList.value.length; r++) {
+      for (let c = 0; c < discountGroupColumns.value.length; c++) {
+        const key = discountGroupColumns.value[c].strColID;
+        if (SettingList.value[r][key] === undefined || SettingList.value[r][key] === null) {
+          SettingList.value[r][key] = false;
+        }
+      }
+    }
+  }
+
+  originRowData3.value = [...SettingList.value];
+  rowData3.value = [...SettingList.value];
+  updatedList2.value = [...SettingList.value];
+  confirmitem2.value = JSON.parse(JSON.stringify(SettingList.value));
+  afterSearch2.value = true;
+};
+
+/**
+ *  조회 함수 — 탭과 무관하게 할인그룹(탭1) + 메뉴설정(탭2) 동시 조회
  */
 const searchButton = async () => {
-
   if (groupCd.value == "0" || groupCd.value == undefined) {
     Swal.fire({
       title: "경고",
@@ -527,105 +571,37 @@ const searchButton = async () => {
 
   store.state.loading = true;
   try {
-    let res;
-    if (currentMenu.value == 1) {
-      res = await getDiscountGroup(groupCd.value, 0);
-      rowData.value = res.data.discountGroup;
+    const [resGroup, resMenu] = await Promise.all([
+      getDiscountGroup(groupCd.value, 0),
+      getDiscountMenuList(groupCd.value, 0, store.state.userData.lngCommonMenu),
+    ]);
 
-      afterSearch.value = true;
-    } else if (currentMenu.value == 2) {
-      
-      res = await getDiscountMenuList(
-        groupCd.value, 
-        0, 
-        store.state.userData.lngCommonMenu
-      );
+    rowData.value = resGroup.data?.discountGroup ?? [];
+    updatedList.value = [...rowData.value];
+    confirmitem.value = JSON.parse(JSON.stringify(rowData.value));
+    afterSearch.value = true;
 
-      // console.log("[MST36_006INS] getDiscountMenuList 응답", {
-      //   discountGroup: res.data?.discountGroup,
-      //   discountSettingCount: res.data?.discountSetting?.length,
-      //   sampleSetting: res.data?.discountSetting?.[0],
-      // });
+    applyDiscountMenuList(resMenu.data);
 
-      SettingList.value = [...res.data.discountSetting];
-      MenuGroup.value = res.data.MAINGROUP;
-      SubMenuGroup.value = res.data.SUBGROUP;
-
-      // (요청대로) getDiscountMenuList 응답의 discountGroup 기준으로 컬럼 생성
-      printNameList.value = res.data.discountGroup;
-      const dgList = printNameList.value ?? [];
-
-      // console.log("[MST36_006INS] 할인그룹 목록(dgList)", dgList);
-
-      // 할인그룹명 기반 checkbox 컬럼 정의 생성 (checkbox1..N)
-      discountGroupColumns.value = dgList.map((g, idx) => {
-        const headerText = g?.strName ?? g?.lngCode ?? `할인그룹${idx + 1}`;
-        return {
-          strColID: `checkbox${idx + 1}`,
-          strHdText: String(headerText),
-          intHdWidth: 90,
-          strColType: "text",
-          strDisplay: "checkbox",
-          strAlign: "center",
-          strMask: "",
-          strSubSumtext: "",
-        };
-      });
-
-      // console.log("[MST36_006INS] discountGroupColumns", discountGroupColumns.value);
-
-      // lngDiscount(비트마스크) 기준으로 체크박스 값 세팅
-      // - lngDiscount: 메뉴별 할인그룹 설정 비트마스크
-      // - discountGroup[].lngValue: 각 할인그룹의 비트값(2^n 형태)
-      if (Array.isArray(SettingList.value) && Array.isArray(dgList) && dgList.length > 0) {
-        for (let r = 0; r < SettingList.value.length; r++) {
-          const mask = Number(SettingList.value[r]?.lngDiscount ?? 0);
-          for (let i = 0; i < dgList.length; i++) {
-            const bit = Number(dgList[i]?.lngValue ?? 0);
-            const key = `checkbox${i + 1}`;
-            // bit 값이 0/NaN이면 체크 불가로 false 처리
-            SettingList.value[r][key] = bit > 0 ? (mask & bit) !== 0 : false;
-          }
-        }
-      } else if (Array.isArray(SettingList.value) && discountGroupColumns.value.length > 0) {
-        // fallback: 필드만 존재하도록 false 초기화
-        for (let r = 0; r < SettingList.value.length; r++) {
-          for (let c = 0; c < discountGroupColumns.value.length; c++) {
-            const key = discountGroupColumns.value[c].strColID;
-            if (SettingList.value[r][key] === undefined || SettingList.value[r][key] === null) {
-              SettingList.value[r][key] = false;
-            }
-          }
-        }
-      }
-      
-      originRowData3.value = [...SettingList.value];
-      rowData3.value = [...SettingList.value];
-      updatedList2.value = [...SettingList.value];
-      confirmitem.value = JSON.parse(JSON.stringify(SettingList.value));
-      afterSearch2.value = true;
-
-      // console.log("[MST36_006INS] rowData3 샘플(체크박스 필드)", {
-      //   row0: rowData3.value?.[0],
-      //   checkboxKeys: discountGroupColumns.value.map((c) => c.strColID),
-      // });
-
-      await nextTick();
-      reload.value = !reload.value;
-      // console.log("[MST36_006INS] 그리드 reload 토글", reload.value);
-    }
+    await nextTick();
+    reload.value = !reload.value;
+    setTimeout(() => {
+      resizeGridById(realgrid3Name.value);
+      resizeGridById(realgrid4Name.value);
+    }, 50);
+    setTimeout(() => {
+      resizeGridById(realgrid3Name.value);
+      resizeGridById(realgrid4Name.value);
+    }, 200);
   } catch (error) {
     //comsole.log(error)
     afterSearch.value = false;
     afterSearch2.value = false;
   } finally {
     ischecked.value = false;
-
     forsearchMain.value = "-1";
-
     forsearchSub.value = "-1";
-
-    store.state.loading = false; // 로딩 상태 종료
+    store.state.loading = false;
     discountGrpCd.value = "";
     discountGrpNm.value = "";
     discountValue.value = "";
@@ -690,7 +666,7 @@ const saveButton = async () => {
     }
   } else if (currentMenu.value == 2) {
     if (
-      JSON.stringify(confirmitem.value) === JSON.stringify(updatedList2.value)
+      JSON.stringify(confirmitem2.value) === JSON.stringify(updatedList2.value)
     ) {
       Swal.fire({
         title: "경고",
@@ -939,11 +915,428 @@ const handleinitAll = (newvalue) => {
   SubMenuGroup.value = [];
   filteredSubMenuGroup.value = [];
   discountGroupColumns.value = [];
+  rowData.value = [];
+  rowData3.value = [];
+  SettingList.value = [];
+  updatedList.value = [];
+  updatedList2.value = [];
+  confirmitem.value = [];
+  confirmitem2.value = [];
+  printNameList.value = [];
   forsearchMain.value = "-1";
   forsearchSub.value = "-1";
   searchword1.value = "";
   afterSearch.value = false;
+  afterSearch2.value = false;
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.mst3606-page {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+}
+
+.mst3606-search-panel {
+  --mst3606-panel-pad-x: 2rem;
+  --mst3606-item-gap: 0.75rem;
+  --mst3606-label-col: 6.5rem;
+  --mst3606-row-min-h: 2rem;
+  --mst3606-control-h: 2rem;
+  --mst3606-control-border: #cbd5e1;
+  --mst3606-control-radius: 0.375rem;
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+  padding-block: 0.75rem;
+}
+
+.mst3606-search-grid {
+  display: grid;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 58rem;
+  padding-left: var(--mst3606-panel-pad-x);
+  padding-right: var(--mst3606-panel-pad-x);
+}
+
+.mst3606-cell {
+  display: flex;
+  min-width: 0;
+  min-height: var(--mst3606-row-min-h);
+  align-items: center;
+  gap: var(--mst3606-item-gap);
+}
+
+.mst3606-sg-label {
+  flex: 0 0 var(--mst3606-label-col);
+  width: var(--mst3606-label-col);
+  min-height: var(--mst3606-row-min-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgb(17 24 39);
+}
+
+.mst3606-cell-field {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.mst3606-pick-slot :deep(> .flex) {
+  width: 100%;
+  min-width: 0;
+  margin-left: 0 !important;
+  gap: 0.5rem !important;
+}
+
+.mst3606-pick-slot :deep(> .flex > div.shrink-0.font-semibold) {
+  display: none !important;
+}
+
+.mst3606-pick-slot :deep(#storeGroup) {
+  width: 11.5rem !important;
+  min-width: 11.5rem !important;
+  max-width: 11.5rem !important;
+}
+
+.mst3606-pick-slot :deep(> .flex > div:has(> select:not(#storeGroup)) > select),
+.mst3606-pick-slot :deep(> .flex > div > select:not(#storeGroup)) {
+  width: 11.5rem !important;
+  min-width: 11.5rem !important;
+  max-width: 11.5rem !important;
+}
+
+.mst3606-pick-slot :deep(> .flex > div:has(.pickstore-vs-shell)),
+.mst3606-pick-slot :deep(> .flex > div.relative.min-w-0.flex-1) {
+  flex: 0 0 15.6rem !important;
+  width: 15.6rem !important;
+  max-width: 15.6rem !important;
+}
+
+.mst3606-pick-slot :deep(select),
+.mst3606-pick-slot :deep(.pickstore-vs-shell) {
+  box-sizing: border-box;
+  height: var(--mst3606-control-h) !important;
+  min-height: var(--mst3606-control-h) !important;
+  max-height: var(--mst3606-control-h) !important;
+  border: 1px solid var(--mst3606-control-border) !important;
+  border-radius: var(--mst3606-control-radius) !important;
+}
+
+.mst3606-pick-slot :deep(.pickstore-vs-shell) {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.mst3606-content-tabs {
+  border-bottom: 1px solid #d1d5db;
+}
+
+.mst3606-tab {
+  height: 2.5rem;
+  padding: 0 0.875rem;
+  border: 1px solid #d1d5db;
+  border-bottom: none;
+  border-radius: 0.5rem 0.5rem 0 0;
+  background: #f3f4f6;
+  font-weight: 700;
+  color: #374151;
+  cursor: pointer;
+}
+
+.mst3606-tab--on {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+
+.mst3606-workspace {
+  position: relative;
+  min-height: 0;
+  flex: 1 1 0%;
+  overflow: hidden;
+}
+
+.mst3606-pane {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.mst3606-pane--split {
+  display: grid;
+  height: 100%;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .mst3606-pane--split {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  }
+}
+
+.mst3606-pane--grid {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.mst3606-left,
+.mst3606-right {
+  min-height: 0;
+  height: 100%;
+}
+
+.mst3606-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.375rem;
+  min-height: 1.75rem;
+}
+
+.mst3606-section-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.4rem;
+  color: #111827;
+}
+
+.mst3606-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  height: 2rem;
+  min-width: 4.25rem;
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+  border: 1px solid #6b7280;
+  border-radius: 0.375rem;
+  color: #374151;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 10%);
+}
+
+.mst3606-action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.mst3606-action-btn--add:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: #60a5fa;
+  color: #1d4ed8;
+}
+
+.mst3606-action-btn--del:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+.mst3606-check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #374151;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mst3606-check-label input[type="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  min-width: 1.25rem;
+  min-height: 1.25rem;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #2563eb;
+}
+
+.mst3606-filter-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  width: 100%;
+  margin-bottom: 0.375rem;
+}
+
+.mst3606-check-label--grid-end {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding-bottom: 0.125rem;
+}
+
+.mst3606-list-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  width: 100%;
+  max-width: 42rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  box-sizing: border-box;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #f3f4f6;
+}
+
+.mst3606-grid-wrap--tab2 {
+  margin-top: 0;
+}
+
+.mst3606-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  min-height: 2rem;
+}
+
+.mst3606-filter-label {
+  flex: 0 0 auto;
+  min-width: 5.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+}
+
+.mst3606-filter-control {
+  box-sizing: border-box;
+  height: 2rem;
+  min-height: 2rem;
+  max-height: 2rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  background: #fff;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+}
+
+.mst3606-filter-control--md {
+  width: 11rem;
+  min-width: 0;
+  flex: 1 1 10rem;
+  max-width: 14rem;
+}
+
+.mst3606-filter-control--grow {
+  flex: 1 1 12rem;
+  min-width: 0;
+  width: auto;
+}
+
+.mst3606-grid-wrap {
+  flex: 1 1 0;
+  min-height: 9rem;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.mst3606-form-grid {
+  --mst3606-label-col: 7.5rem;
+  --mst3606-control-h: 1.75rem;
+  --mst3606-detail-row-h: 2.25rem;
+  --mst3606-detail-cell-py: 0.25rem;
+  --mst3606-detail-font: 0.8125rem;
+  display: grid;
+  grid-template-columns: var(--mst3606-label-col) minmax(0, 1fr);
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
+  max-width: 36.4rem;
+}
+
+.mst3606-form-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--mst3606-detail-row-h);
+  padding: var(--mst3606-detail-cell-py) 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #edf2f7;
+  color: #5c5c5c;
+  font-size: var(--mst3606-detail-font);
+  font-weight: 600;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.mst3606-form-value {
+  display: flex;
+  align-items: center;
+  min-height: var(--mst3606-detail-row-h);
+  min-width: 0;
+  padding: var(--mst3606-detail-cell-py) 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.mst3606-control {
+  box-sizing: border-box;
+  height: var(--mst3606-control-h);
+  min-height: var(--mst3606-control-h);
+  max-height: var(--mst3606-control-h);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  border-radius: 0.375rem;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  padding: 0 0.5rem;
+  font-size: var(--mst3606-detail-font);
+  line-height: 1;
+}
+
+.mst3606-control--wide {
+  width: 100%;
+  max-width: 100%;
+}
+
+.mst3606-control:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+@media (min-width: 1280px) {
+  .mst3606-search-panel {
+    --mst3606-panel-pad-x: 2.5rem;
+  }
+}
+
+@media (min-width: 1536px) {
+  .mst3606-search-panel {
+    --mst3606-panel-pad-x: 3rem;
+  }
+}
+</style>

@@ -5,535 +5,417 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <!-- 조회 부분 -->
-  <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <PageName></PageName>
-    <div class="flex justify-center mr-10 space-x-2 pr-5">
-      <button @click="searchButton" class="button search">조회</button>
-      <button @click="saveButton" class="button save">저장</button>
-      <button @click="exportToExcel" class="button excel">엑셀</button>
-    </div>
-  </div>
-  <div
-    class="flex justify-start space-x-5 bg-gray-200 rounded-lg h-16 items-center mt-3">
-    <PickStore
-      :defaultStoreNm="'전체'"
-      @update:storeGroup="handleGroupCd"
-      @update:storeCd="handleStoreCd">
-    </PickStore>
-    <!-- <input
-      type="text"
-      v-model="searchStoreName"
-      class="rounded-lg h-9 items-center border border-black"
-      :disabled="allstrore"
-      @keydown.enter="searchButton" /> -->
-  </div>
-  <!-- 조회 부분 -->
-  <!-- 그리드 부분 -->
-  <div class="h-[42vh] w-full">
-    <div class="flex justify-end gap-1 mt-1">
-      <button @click="addButton" class="whitebutton">추가</button>
-      <button @click="deleteButton" class="whitebutton">삭제</button>
-    </div>
-    <Realgrid
-      class="w-full h-full mt-2"
-      :progname="'MST01_002INS_VUE'"
-      :progid="1"
-      :rowData="rowData"
-      @clickedRowData="clickedRowData3"
-      @selcetedrowData="selcetedrowData"
-      :selectionStyle="'singleRow'"
-      :initFocus="initFocus"
-      :labelingColumns="'lngSupervisor,lngSaleType,lngMultiPriceGroupCode,lngJoinType,lngSubLease,lngStoreAttr,lngStoreArea'"
-      @updatedRowData2="updatedRowData"
-      :valuesData="valuesData"
-      :labelsData="labelsData"
-      :deleteRow="deleted"
-      :changeColid="changeColid"
-      :changeRow="changeRow"
-      :changeValue2="changeValue"
-      :changeNow2="changeNow"
-      @selectedIndex="selectedIndex2"
-      @sendRowState="sendRowState"
-      @allStateRows="allStateRows"
-      :useCheckboxfordelete="true"
-      :addRow4="addRow4"
-      :addrowDefault="addrowDefault"
-      :addrowProp="addrowProp"
-      :addField="'new'"
-      :rowStateeditable="false"
-      :exporttoExcel="exExcel"
-      :ExcelNm="exExcelNm"></Realgrid>
-  </div>
-  <!-- 그리드 부분 -->
-  <!-- 데이터 부분 -->
-  <div class="relative left-0 top-4 mt-5">
-    <div class="absolute grid grid-cols-6 grid-rows-10 gap-0 w-full">
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg rounded-ss-xl bg-gray-100 text-blue-500">
-        *매장코드
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="text"
-          id="storeCode"
-          class="text-sm border rounded-md w-full pl-2 h-7 disabled:bg-gray-300"
-          v-model="lngStoreCode"
-          :disabled="rowstate != 'created'"
-          name="lngStoreCode"
-          @input="updateGridValue" />
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500">
-        *매장명
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="text"
-          id="storeCode"
-          class="text-sm border rounded-md w-full pl-2 h-7"
-          v-model="strName"
-          name="strName"
-          @input="updateGridValue" />
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        사업자번호
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center rounded-se-xl">
-        <input
-          type="text"
-          id="storeCode"
-          class="text-sm border rounded-md w-full pl-2 h-7"
-          v-model="strRegistNo"
-          name="strRegistNo"
-          @input="updateGridValue" />
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500">
-        *가맹유형
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <select
-          class="border rounded-md w-full h-7 pl-1"
-          v-model="lngJoinType"
-          name="lngJoinType"
-          @change="updateGridValue">
-          <option value="-1" class="text-sm">선택</option>
-          <option
-            v-for="item in lngJoinTypes"
-            :key="item.lngCode"
-            :value="item.lngCode"
-            class="text-sm">
-            {{ item.strName }}
-          </option>
-        </select>
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500">
-        *멀티단가 그룹
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <select
-          class="text-sm border rounded-md w-full h-7 pl-1"
-          v-model="lngMultiPriceGroupCode"
-          name="lngMultiPriceGroupCode"
-          @change="updateGridValue">
-          <option value="-1" class="text-sm">선택</option>
-          <option
-            v-for="item in lngMultiPriceGroupCodes"
-            :key="item.lngMultiPriceGroupCode"
-            :value="item.lngMultiPriceGroupCode"
-            class="text-sm">
-            {{ item.strMultiPriceGroupName }}
-          </option>
-        </select>
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center"></div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="hidden"
-          id="storeCode"
-          class="text-sm border rounded-md w-full h-7 pl-1" />
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500">
-        *매장구분
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <select
-          id="storeCode"
-          class="border rounded-md w-full h-7 pl-1"
-          v-model="lngStoreAttr"
-          name="lngStoreAttr"
-          @change="updateGridValue">
-          <option value="-1" class="text-sm">선택</option>
-          <option
-            v-for="item in lngStoreAttrs"
-            :key="item.lngStoreAttr"
-            :value="item.lngStoreAttr"
-            class="text-sm">
-            {{ item.strName }}
-          </option>
-        </select>
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500">
-        *매장유형
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <select
-          id="storeCode"
-          class="text-sm border rounded-md w-full h-7 pl-1"
-          v-model="lngSubLease"
-          name="lngSubLease"
-          @change="updateGridValue">
-          <option value="-1" class="text-sm">선택</option>
-          <option
-            v-for="item in lngSubLeases"
-            :key="item.lngCode"
-            :value="item.lngCode"
-            class="text-sm">
-            {{ item.strName }}
-          </option>
-        </select>
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 text-blue-500">
-        *지역
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <select
-          type="text"
-          id="storeCode"
-          class="text-sm border rounded-md w-full h-7 pl-1"
-          v-model="lngStoreArea"
-          name="lngStoreArea"
-          @change="updateGridValue">
-          <option value="-1" class="text-sm">선택</option>
-          <option
-            v-for="item in lngStoreAreas"
-            :key="item.lngStoreArea"
-            :value="item.lngStoreArea"
-            class="text-sm">
-            {{ item.strName }}
-          </option>
-        </select>
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        대표자명
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="text"
-          id="storeCode"
-          class="text-sm border rounded-md w-full pl-2 h-7"
-          v-model="strDirector"
-          name="strDirector"
-          @input="updateGridValue" />
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        업종
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="text"
-          id="storeCode"
-          class="text-sm border rounded-md w-full pl-2 h-7"
-          v-model="strDealType"
-          name="strDealType"
-          @input="updateGridValue" />
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        업태
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="text"
-          id="storeCode"
-          class="border rounded-md w-full h-7 pl-2"
-          v-model="strDealKind"
-          name="strDealKind"
-          @input="updateGridValue" />
-      </div>
-
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        오픈일자
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="date"
-          v-model="dtmOpenDate"
-          max="9999-12-31"
-          name="dtmOpenDate"
-          @input="updateGridValue"
-          class="border p-2 rounded h-full w-full" />
-      </div>
-
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        폐점일자
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="date"
-          v-model="dtmStop"
-          name="dtmStop"
-          @input="updateGridValue"
-          max="9999-12-31"
-          class="border p-2 rounded h-full w-full" />
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        변환코드
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="text"
-          id="storeCode"
-          class="border text-sm rounded-md w-full p-2 h-7 pl-2"
-          v-model="strConvCode"
-          name="strConvCode"
-          @input="updateGridValue" />
-      </div>
-
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        우편번호
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="text"
-          id="storeCode"
-          class="border text-sm rounded-md w-full p-2 h-7 pl-2"
-          v-model="strZipCode"
-          name="strZipCode"
-          @input="updateGridValue" />
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        주소
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center w-[200%]">
-        <input
-          type="text"
-          id="storeCode"
-          class="border text-sm rounded-md w-full h-7 p-2 pl-2"
-          v-model="strAddress"
-          name="strAddress"
-          @input="updateGridValue" />
-      </div>
-      <div class="h-0 w-0"></div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="text"
-          id="storeCode"
-          class="border text-sm rounded-md w-full pl-2 h-7"
-          v-model="strAddressEtc"
-          name="strAddressEtc"
-          @input="updateGridValue" />
-      </div>
-
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        전화번호
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="text"
-          id="storeCode"
-          class="border text-sm rounded-md w-full pl-2 h-7"
-          v-model="strTel"
-          name="strTel"
-          @input="updateGridValue" />
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        휴대폰번호
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="text"
-          id="storeCode"
-          class="border text-sm rounded-md w-full pl-2 h-7"
-          v-model="strPhone"
-          name="strPhone"
-          @input="updateGridValue" />
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        팩스번호
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="text"
-          id="storeCode"
-          class="border text-sm rounded-md w-full pl-2 h-7"
-          v-model="strFax"
-          name="strFax"
-          @input="updateGridValue" />
-      </div>
-
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        평수
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="number"
-          id="storeCode"
-          class="border text-sm rounded-md w-full pl-2 h-7"
-          v-model="lngFloorSpace"
-          name="lngFloorSpace"
-          @input="updateGridValue" />
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        임차조건
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="number"
-          id="storeCode"
-          class="border text-sm rounded-md w-full pl-2 h-7"
-          v-model="lngLease"
-          name="lngLease"
-          @input="updateGridValue" />
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        BEP
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="number"
-          id="storeCode"
-          class="border text-sm rounded-md w-full pl-2 h-7"
-          v-model="lngBEP"
-          name="lngBEP"
-          @input="updateGridValue" />
-      </div>
-
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        상권
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <select
-          id="storeCode"
-          class="text-sm border rounded-md w-full pl-1 h-7"
-          v-model="lngSaleType"
-          name="lngSaleType"
-          @change="updateGridValue">
-          <option value="-1" class="text-sm">선택</option>
-          <option value="0" class="text-sm">없음</option>
-          <option
-            v-for="item in lngSaleTypes"
-            :key="item.lngSaleType"
-            :value="item.lngSaleType"
-            class="text-sm">
-            {{ item.strSaleType }}
-          </option>
-        </select>
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        담당 S/C
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <select
-          id="storeCode"
-          class="text-sm border rounded-md w-full pl-1 h-7"
-          v-model="lngSupervisor"
-          name="lngSupervisor"
-          @change="updateGridValue">
-          <option value="-1" class="text-sm">선택</option>
-          <option
-            v-for="item in lngSupervisors"
-            :key="item.lngSupervisor"
-            :value="item.lngSupervisor"
-            class="text-sm">
-            {{ item.strName }}
-          </option>
-        </select>
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        배송기사명
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="text"
-          id="storeCode"
-          class="border text-sm rounded-md w-full pl-2 h-7"
-          v-model="strDev1"
-          name="strDev1"
-          @input="updateGridValue" />
-      </div>
-
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100 rounded-es-xl">
-        좌석수
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center">
-        <input
-          type="number"
-          id="storeCode"
-          class="border text-sm rounded-md w-full pl-2 h-7"
-          v-model="lngTable"
-          name="lngTable"
-          @input="updateGridValue" />
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center bg-gray-100">
-        매장이력
-      </div>
-      <div
-        class="border flex h-7 items-center text-sm font-semibold justify-center rounded-ee-xl w-[300%]">
-        <input
-          type="text"
-          id="storeCode"
-          class="border text-sm rounded-md w-full pl-2 h-7"
-          v-model="strStoreHistory"
-          name="strStoreHistory"
-          @input="updateGridValue" />
+  <div class="mst002-page box-border flex h-full max-w-full min-h-0 flex-col gap-2 overflow-hidden pb-1">
+    <!-- 상단: 페이지명 + 액션 -->
+    <div class="flex shrink-0 flex-wrap items-center justify-between gap-2">
+      <PageName />
+      <div class="flex flex-wrap items-center justify-end gap-2">
+        <button type="button" @click="searchButton" class="button search md:w-auto w-14">
+          조회
+        </button>
+        <button type="button" @click="saveButton" class="button save md:w-auto w-auto">
+          저장
+        </button>
+        <button type="button" @click="exportToExcel" class="button excel md:w-auto w-auto">
+          엑셀
+        </button>
       </div>
     </div>
+
+    <!-- 조회 AREA -->
+    <div class="mst002-search-panel z-10 w-full min-w-0 shrink-0 rounded-lg bg-gray-200">
+      <div class="mst002-search-grid min-w-0">
+        <div class="mst002-cell">
+          <div class="mst002-sg-label">매장명</div>
+          <div class="mst002-cell-field mst002-pick-slot min-w-0">
+            <PickStore
+              compact-search-bar
+              main-name=""
+              :compact-store-combo-max-rem="15.6"
+              :defaultStoreNm="'전체'"
+              @update:storeGroup="handleGroupCd"
+              @update:storeType="handleStoreType"
+              @update:storeCd="handleStoreCd" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 그리드 -->
+    <div class="mst002-grid-section min-h-0 min-w-0 w-full">
+      <div class="mst002-section-head">
+        <div class="mst002-section-title">매장 목록</div>
+        <div class="flex gap-2">
+          <button type="button" class="mst002-action-btn mst002-action-btn--add" @click="addButton">
+            <font-awesome-icon :icon="['fas', 'plus']" />
+            추가
+          </button>
+          <button type="button" class="mst002-action-btn mst002-action-btn--del" @click="deleteButton">
+            <font-awesome-icon :icon="['fas', 'trash']" />
+            삭제
+          </button>
+        </div>
+      </div>
+      <div class="mst002-grid-wrap">
+        <Realgrid
+          class="h-full w-full"
+          :progname="'MST01_002INS_VUE'"
+          :progid="1"
+          :rowData="rowData"
+          @clickedRowData="clickedRowData3"
+          @selcetedrowData="selcetedrowData"
+          :selectionStyle="'singleRow'"
+          :initFocus="initFocus"
+          :labelingColumns="'lngSupervisor,lngSaleType,lngMultiPriceGroupCode,lngJoinType,lngSubLease,lngStoreAttr,lngStoreArea'"
+          @updatedRowData2="updatedRowData"
+          :valuesData="valuesData"
+          :labelsData="labelsData"
+          :deleteRow="deleted"
+          :changeColid="changeColid"
+          :changeRow="changeRow"
+          :changeValue2="changeValue"
+          :changeNow2="changeNow"
+          @selectedIndex="selectedIndex2"
+          @sendRowState="sendRowState"
+          @allStateRows="allStateRows"
+          :useCheckboxfordelete="true"
+          :addRow4="addRow4"
+          :addrowDefault="addrowDefault"
+          :addrowProp="addrowProp"
+          :addField="'new'"
+          :rowStateeditable="false"
+          :exporttoExcel="exExcel"
+          :ExcelNm="exExcelNm" />
+      </div>
+    </div>
+
+    <!-- 상세 입력 -->
+    <div class="mst002-detail-panel min-h-0 min-w-0 w-full overflow-x-hidden overflow-y-auto px-1">
+      <div class="mst002-section-title">매장 정보</div>
+      <fieldset
+        class="mst002-form-grid mt-2 w-full"
+        :class="{ 'mst002-form-grid--locked': !detailReady }"
+        :disabled="!detailReady">
+        <div class="mst002-form-label mst002-form-label--required">*매장코드</div>
+        <div class="mst002-form-value">
+          <input
+            type="text"
+            id="storeCode"
+            class="mst002-control"
+            v-model="lngStoreCode"
+            :disabled="!detailReady || rowstate != 'created'"
+            name="lngStoreCode"
+            @input="updateGridValue" />
+        </div>
+        <div class="mst002-form-label mst002-form-label--required">*매장명</div>
+        <div class="mst002-form-value">
+          <input
+            type="text"
+            class="mst002-control"
+            v-model="strName"
+            name="strName"
+            @input="updateGridValue" />
+        </div>
+        <div class="mst002-form-label">사업자번호</div>
+        <div class="mst002-form-value">
+          <input
+            type="text"
+            class="mst002-control"
+            v-model="strRegistNo"
+            name="strRegistNo"
+            @input="updateGridValue" />
+        </div>
+
+        <div class="mst002-form-label mst002-form-label--required">*가맹유형</div>
+        <div class="mst002-form-value">
+          <select
+            class="mst002-control"
+            v-model="lngJoinType"
+            name="lngJoinType"
+            @change="updateGridValue">
+            <option value="-1">선택</option>
+            <option
+              v-for="item in lngJoinTypes"
+              :key="item.lngCode"
+              :value="item.lngCode">
+              {{ item.strName }}
+            </option>
+          </select>
+        </div>
+        <div class="mst002-form-label mst002-form-label--required">*멀티단가 그룹</div>
+        <div class="mst002-form-value">
+          <select
+            class="mst002-control"
+            v-model="lngMultiPriceGroupCode"
+            name="lngMultiPriceGroupCode"
+            @change="updateGridValue">
+            <option value="-1">선택</option>
+            <option
+              v-for="item in lngMultiPriceGroupCodes"
+              :key="item.lngMultiPriceGroupCode"
+              :value="item.lngMultiPriceGroupCode">
+              {{ item.strMultiPriceGroupName }}
+            </option>
+          </select>
+        </div>
+        <div class="mst002-form-label mst002-grid-void" aria-hidden="true"></div>
+        <div class="mst002-form-value mst002-grid-void" aria-hidden="true"></div>
+
+        <div class="mst002-form-label mst002-form-label--required">*매장구분</div>
+        <div class="mst002-form-value">
+          <select
+            class="mst002-control"
+            v-model="lngStoreAttr"
+            name="lngStoreAttr"
+            @change="updateGridValue">
+            <option value="-1">선택</option>
+            <option
+              v-for="item in lngStoreAttrs"
+              :key="item.lngStoreAttr"
+              :value="item.lngStoreAttr">
+              {{ item.strName }}
+            </option>
+          </select>
+        </div>
+        <div class="mst002-form-label mst002-form-label--required">*매장유형</div>
+        <div class="mst002-form-value">
+          <select
+            class="mst002-control"
+            v-model="lngSubLease"
+            name="lngSubLease"
+            @change="updateGridValue">
+            <option value="-1">선택</option>
+            <option
+              v-for="item in lngSubLeases"
+              :key="item.lngCode"
+              :value="item.lngCode">
+              {{ item.strName }}
+            </option>
+          </select>
+        </div>
+        <div class="mst002-form-label mst002-form-label--required">*지역</div>
+        <div class="mst002-form-value">
+          <select
+            class="mst002-control"
+            v-model="lngStoreArea"
+            name="lngStoreArea"
+            @change="updateGridValue">
+            <option value="-1">선택</option>
+            <option
+              v-for="item in lngStoreAreas"
+              :key="item.lngStoreArea"
+              :value="item.lngStoreArea">
+              {{ item.strName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mst002-form-label">대표자명</div>
+        <div class="mst002-form-value">
+          <input
+            type="text"
+            class="mst002-control"
+            v-model="strDirector"
+            name="strDirector"
+            @input="updateGridValue" />
+        </div>
+        <div class="mst002-form-label">업종</div>
+        <div class="mst002-form-value">
+          <input
+            type="text"
+            class="mst002-control"
+            v-model="strDealType"
+            name="strDealType"
+            @input="updateGridValue" />
+        </div>
+        <div class="mst002-form-label">업태</div>
+        <div class="mst002-form-value">
+          <input
+            type="text"
+            class="mst002-control"
+            v-model="strDealKind"
+            name="strDealKind"
+            @input="updateGridValue" />
+        </div>
+
+        <div class="mst002-form-label">오픈일자</div>
+        <div class="mst002-form-value">
+          <input
+            type="date"
+            v-model="dtmOpenDate"
+            max="9999-12-31"
+            name="dtmOpenDate"
+            @input="updateGridValue"
+            class="mst002-control" />
+        </div>
+        <div class="mst002-form-label">폐점일자</div>
+        <div class="mst002-form-value">
+          <input
+            type="date"
+            v-model="dtmStop"
+            name="dtmStop"
+            @input="updateGridValue"
+            max="9999-12-31"
+            class="mst002-control" />
+        </div>
+        <div class="mst002-form-label">변환코드</div>
+        <div class="mst002-form-value">
+          <input
+            type="text"
+            class="mst002-control"
+            v-model="strConvCode"
+            name="strConvCode"
+            @input="updateGridValue" />
+        </div>
+
+        <div class="mst002-form-label">우편번호</div>
+        <div class="mst002-form-value">
+          <input
+            type="text"
+            class="mst002-control"
+            v-model="strZipCode"
+            name="strZipCode"
+            @input="updateGridValue" />
+        </div>
+        <div class="mst002-form-label">주소</div>
+        <div class="mst002-form-value">
+          <input
+            type="text"
+            class="mst002-control"
+            v-model="strAddress"
+            name="strAddress"
+            @input="updateGridValue" />
+        </div>
+        <div class="mst002-form-label">상세주소</div>
+        <div class="mst002-form-value">
+          <input
+            type="text"
+            class="mst002-control"
+            v-model="strAddressEtc"
+            name="strAddressEtc"
+            @input="updateGridValue" />
+        </div>
+
+        <div class="mst002-form-label">전화번호</div>
+        <div class="mst002-form-value">
+          <input
+            type="text"
+            class="mst002-control"
+            v-model="strTel"
+            name="strTel"
+            @input="updateGridValue" />
+        </div>
+        <div class="mst002-form-label">휴대폰번호</div>
+        <div class="mst002-form-value">
+          <input
+            type="text"
+            class="mst002-control"
+            v-model="strPhone"
+            name="strPhone"
+            @input="updateGridValue" />
+        </div>
+        <div class="mst002-form-label">팩스번호</div>
+        <div class="mst002-form-value">
+          <input
+            type="text"
+            class="mst002-control"
+            v-model="strFax"
+            name="strFax"
+            @input="updateGridValue" />
+        </div>
+
+        <div class="mst002-form-label">평수</div>
+        <div class="mst002-form-value">
+          <input
+            type="number"
+            class="mst002-control"
+            v-model="lngFloorSpace"
+            name="lngFloorSpace"
+            @input="updateGridValue" />
+        </div>
+        <div class="mst002-form-label">임차조건</div>
+        <div class="mst002-form-value">
+          <input
+            type="number"
+            class="mst002-control"
+            v-model="lngLease"
+            name="lngLease"
+            @input="updateGridValue" />
+        </div>
+        <div class="mst002-form-label">BEP</div>
+        <div class="mst002-form-value">
+          <input
+            type="number"
+            class="mst002-control"
+            v-model="lngBEP"
+            name="lngBEP"
+            @input="updateGridValue" />
+        </div>
+
+        <div class="mst002-form-label">상권</div>
+        <div class="mst002-form-value">
+          <select
+            class="mst002-control"
+            v-model="lngSaleType"
+            name="lngSaleType"
+            @change="updateGridValue">
+            <option value="-1">선택</option>
+            <option value="0">없음</option>
+            <option
+              v-for="item in lngSaleTypes"
+              :key="item.lngSaleType"
+              :value="item.lngSaleType">
+              {{ item.strSaleType }}
+            </option>
+          </select>
+        </div>
+        <div class="mst002-form-label">담당 S/C</div>
+        <div class="mst002-form-value">
+          <select
+            class="mst002-control"
+            v-model="lngSupervisor"
+            name="lngSupervisor"
+            @change="updateGridValue">
+            <option value="-1">선택</option>
+            <option
+              v-for="item in lngSupervisors"
+              :key="item.lngSupervisor"
+              :value="item.lngSupervisor">
+              {{ item.strName }}
+            </option>
+          </select>
+        </div>
+        <div class="mst002-form-label">배송기사명</div>
+        <div class="mst002-form-value">
+          <input
+            type="text"
+            class="mst002-control"
+            v-model="strDev1"
+            name="strDev1"
+            @input="updateGridValue" />
+        </div>
+
+        <div class="mst002-form-label">좌석수</div>
+        <div class="mst002-form-value">
+          <input
+            type="number"
+            class="mst002-control"
+            v-model="lngTable"
+            name="lngTable"
+            @input="updateGridValue" />
+        </div>
+        <div class="mst002-form-label">매장이력</div>
+        <div class="mst002-form-value mst002-field-span3">
+          <input
+            type="text"
+            class="mst002-control mst002-control--wide"
+            v-model="strStoreHistory"
+            name="strStoreHistory"
+            @input="updateGridValue" />
+        </div>
+      </fieldset>
+    </div>
   </div>
-  <!-- 데이터 부분 -->
 </template>
 
 <script setup>
@@ -618,6 +500,9 @@ const inputValue = ref("");
  * 페이지 매장 그룹 세팅
  */
 
+const handleStoreType = (newValue) => {
+  storeType.value = newValue;
+};
 const handleGroupCd = (newValue) => {
   //comsole.log(newValue);
   groupCd.value = newValue;
@@ -678,17 +563,10 @@ const initlngMultiPriceGroupCode = ref(-1);
  *  조회 함수
  */
 
-const searchButton = async () => {
-  lngMultiPriceGroupCodes.value = [];
-  lngStoreAttrs.value = [];
-  lngJoinTypes.value = [];
-  lngSubLeases.value = [];
-  lngStoreAreas.value = [];
-  lngSaleTypes.value = [];
-  lngSupervisors.value = [];
-  valuesData.value = [];
-  labelsData.value = [];
+/** 상세 폼 편집 가능 여부 — 행 선택 또는 신규 추가 후에만 true */
+const detailReady = ref(false);
 
+const clearDetailForm = () => {
   lngStoreCode.value = "";
   strName.value = "";
   strRegistNo.value = "";
@@ -699,7 +577,7 @@ const searchButton = async () => {
   lngSubLease.value = "-1";
   lngStoreAttr.value = "-1";
   lngStoreArea.value = "-1";
-  dtmOpenDate.value = new Date().toISOString().split("T")[0];
+  dtmOpenDate.value = "";
   strTel.value = "";
   strFax.value = "";
   strZipCode.value = "";
@@ -712,24 +590,44 @@ const searchButton = async () => {
   lngLease.value = "";
   lngSupervisor.value = "-1";
   lngSaleType.value = "-1";
-  dtmStop.value = "9999-12-31";
+  dtmStop.value = "";
   strDev1.value = "";
   lngTable.value = "";
   lngMultiPriceGroupCode.value = "-1";
   strStoreHistory.value = "";
+};
 
-  store.dispatch("convertLoading", true);
+const lockDetailForm = () => {
+  detailReady.value = false;
+  rowstate.value = "none";
+  changeRow.value = null;
+  changeColid.value = "";
+  changeValue.value = "";
+  clearDetailForm();
+};
 
-  //comsole.log(groupCd.value);
-  //comsole.log(storeType.value);
-  //comsole.log(storeCd.value);
-  //comsole.log(searchStoreName.value);
-  const res = await getstoreInfo(
-    groupCd.value,
-    storeType.value,
-    storeCd.value,
-    searchStoreName.value
-  );
+const searchButton = async () => {
+  lockDetailForm();
+
+  lngMultiPriceGroupCodes.value = [];
+  lngStoreAttrs.value = [];
+  lngJoinTypes.value = [];
+  lngSubLeases.value = [];
+  lngStoreAreas.value = [];
+  lngSaleTypes.value = [];
+  lngSupervisors.value = [];
+  valuesData.value = [];
+  labelsData.value = [];
+
+  try {
+    store.dispatch("convertLoading", true);
+
+    const res = await getstoreInfo(
+      groupCd.value,
+      storeType.value || "0",
+      storeCd.value ?? "0",
+      searchStoreName.value || ""
+    );
 
   //comsole.log(res);
   lngJoinTypes.value = res.data.JOINTYPE;
@@ -741,27 +639,21 @@ const searchButton = async () => {
   lngSupervisors.value = res.data.SUPERVISOR;
 
   if (lngJoinTypes.value.length > 0) {
-    lngJoinType.value = lngJoinTypes.value[0].lngCode;
     initlngJoinType.value = lngJoinTypes.value[0].lngCode;
   }
   if (lngMultiPriceGroupCodes.value.length > 0) {
-    lngMultiPriceGroupCode.value =
-      lngMultiPriceGroupCodes.value[0].lngMultiPriceGroupCode;
     initlngMultiPriceGroupCode.value =
       lngMultiPriceGroupCodes.value[0].lngMultiPriceGroupCode;
   }
   if (lngStoreAttrs.value.length > 0) {
-    lngStoreAttr.value = lngStoreAttrs.value[0].lngStoreAttr;
     initlngStoreAttr.value = lngStoreAttrs.value[0].lngStoreAttr;
   }
 
   if (lngSubLeases.value.length > 0) {
-    lngSubLease.value = lngSubLeases.value[0].lngCode;
     initlngSubLease.value = lngSubLeases.value[0].lngCode;
   }
 
   if (lngStoreAreas.value.length > 0) {
-    lngStoreArea.value = lngStoreAreas.value[0].lngStoreArea;
     initlngStoreArea.value = lngStoreAreas.value[0].lngStoreArea;
   }
 
@@ -868,9 +760,20 @@ const searchButton = async () => {
   //comsole.log(valuesData.value);
   rowData.value = res.data.store;
   updateRowData.value = JSON.parse(JSON.stringify(rowData.value));
-  store.dispatch("convertLoading", false);
   afterSearch.value = true;
   //comsole.log(lngStoreArea.value);
+  } catch (error) {
+    afterSearch.value = false;
+    Swal.fire({
+      title: "조회 실패",
+      text: "매장 정보 조회 중 오류가 발생했습니다.",
+      icon: "error",
+      confirmButtonText: "확인",
+    });
+  } finally {
+    lockDetailForm();
+    store.dispatch("convertLoading", false);
+  }
 };
 
 const deleted = ref(false);
@@ -1299,6 +1202,7 @@ const selectedIndex2 = (e) => {
 const clickedRowData3 = (newValue) => {
   //comsole.log(newValue);
   //comsole.log(rowData.value);
+  detailReady.value = true;
   lngStoreCode.value = newValue[0]; // 1 -> 0
   strName.value = newValue[1]; // 2 -> 1
   strRegistNo.value = newValue[2]; // 3 -> 2
@@ -1352,7 +1256,7 @@ const lngSubLease = ref(" ");
 
 const lngStoreAttr = ref();
 const lngStoreArea = ref();
-const dtmOpenDate = ref(new Date().toISOString().split("T")[0]);
+const dtmOpenDate = ref("");
 const strTel = ref();
 const strFax = ref();
 const strZipCode = ref();
@@ -1369,7 +1273,7 @@ const lngSaleType = ref();
  */
 
 const lngSupervisor = ref();
-const dtmStop = ref(new Date("9999-12-31").toISOString().split("T")[0]);
+const dtmStop = ref("");
 const strDev1 = ref();
 const strStoreHistory = ref();
 const lngTable = ref();
@@ -1380,6 +1284,12 @@ const changeRow = ref();
 const changeColid = ref();
 const changeNow = ref(false);
 const updateGridValue = (e) => {
+  if (!detailReady.value) {
+    return;
+  }
+  if (changeRow.value === null || changeRow.value === undefined || changeRow.value === "") {
+    return;
+  }
   const name = e.target.name;
   const value = e.target.value;
 
@@ -1408,6 +1318,9 @@ watch(dtmStop, () => {
 const rowstate = ref("none");
 const sendRowState = (e) => {
   rowstate.value = e;
+  if (e === "created") {
+    detailReady.value = true;
+  }
 };
 
 const allstaterows = ref([]);
@@ -1417,21 +1330,362 @@ const allStateRows = (e) => {
 };
 </script>
 
-<style>
-.ag-theme-alpine {
-  height: 100%;
+<style scoped>
+/* 조회 AREA */
+.mst002-search-panel {
+  --mst002-panel-pad-x: 2rem;
+  --mst002-col-gap: 1.5rem;
+  --mst002-item-gap: 0.75rem;
+  --mst002-label-col: 6.5rem;
+  --mst002-row-min-h: 2rem;
+  --mst002-control-h: 2rem;
+  --mst002-control-border: #cbd5e1;
+  --mst002-control-focus-border: #3b82f6;
+  --mst002-control-radius: 0.375rem;
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+  padding-block: 0.75rem;
+}
+
+.mst002-search-grid {
+  display: grid;
+  box-sizing: border-box;
   width: 100%;
-  --ag-row-height: 20px !important;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 58rem;
+  column-gap: var(--mst002-col-gap);
+  padding-left: var(--mst002-panel-pad-x);
+  padding-right: var(--mst002-panel-pad-x);
 }
 
-.ag-header-cell-label {
-  justify-content: left !important;
-  margin-right: -5px !important;
+.mst002-cell {
+  display: flex;
+  min-width: 0;
+  min-height: var(--mst002-row-min-h);
+  align-items: center;
+  gap: var(--mst002-item-gap);
 }
 
-.custom-grid {
-  --ag-header-background-color: #545876 !important;
-  --ag-header-foreground-color: white !important;
-  --ag-font-size: 11px !important;
+.mst002-sg-label {
+  flex: 0 0 var(--mst002-label-col);
+  width: var(--mst002-label-col);
+  min-height: var(--mst002-row-min-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgb(17 24 39);
+}
+
+.mst002-cell-field {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.mst002-pick-slot :deep(> .flex) {
+  width: 100%;
+  min-width: 0;
+  margin-left: 0 !important;
+  gap: 0.5rem !important;
+}
+
+.mst002-pick-slot :deep(> .flex > div.shrink-0.font-semibold) {
+  display: none !important;
+}
+
+/* 1번째(그룹) 현재 5.75rem → 2배, 2번째(속성) 동일 */
+.mst002-pick-slot :deep(#storeGroup) {
+  width: 11.5rem !important;
+  min-width: 11.5rem !important;
+  max-width: 11.5rem !important;
+}
+
+.mst002-pick-slot :deep(> .flex > div:has(> select:not(#storeGroup)) > select),
+.mst002-pick-slot :deep(> .flex > div > select:not(#storeGroup)) {
+  width: 11.5rem !important;
+  min-width: 11.5rem !important;
+  max-width: 11.5rem !important;
+}
+
+/* 3번째(매장) 현재 12rem → 1.3배 */
+.mst002-pick-slot :deep(> .flex > div:has(.pickstore-vs-shell)),
+.mst002-pick-slot :deep(> .flex > div.relative.min-w-0.flex-1) {
+  flex: 0 0 15.6rem !important;
+  width: 15.6rem !important;
+  max-width: 15.6rem !important;
+}
+
+.mst002-pick-slot :deep(select),
+.mst002-pick-slot :deep(.pickstore-vs-shell) {
+  box-sizing: border-box;
+  height: var(--mst002-control-h) !important;
+  min-height: var(--mst002-control-h) !important;
+  max-height: var(--mst002-control-h) !important;
+  border: 1px solid var(--mst002-control-border) !important;
+  border-radius: var(--mst002-control-radius) !important;
+}
+
+.mst002-pick-slot :deep(.pickstore-vs-shell) {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.mst002-grid-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 10rem;
+  min-width: 0;
+}
+
+.mst002-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.375rem;
+  min-height: 1.75rem;
+}
+
+.mst002-section-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.4rem;
+  color: #111827;
+}
+
+.mst002-grid-wrap {
+  flex: 1 1 0;
+  min-height: 9rem;
+  overflow: hidden;
+}
+
+.mst002-sub-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.875rem;
+  padding: 0 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #374151;
+  border: 1px solid #6b7280;
+  border-radius: 0.375rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.mst002-sub-btn:hover {
+  background: #eff6ff;
+  border-color: #60a5fa;
+  color: #1d4ed8;
+}
+
+.mst002-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  height: 2rem;
+  min-width: 4.25rem;
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+  border: 1px solid #6b7280;
+  border-radius: 0.375rem;
+  color: #374151;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 10%);
+}
+
+.mst002-action-btn--add:hover {
+  background: #eff6ff;
+  border-color: #60a5fa;
+  color: #1d4ed8;
+}
+
+.mst002-action-btn--del:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+/* 상세 폼 — MST01_003 / MST42 톤, 3쌍(6열) */
+.mst002-detail-panel {
+  flex: 0 0 auto;
+  margin-top: 0.75rem;
+  --mst002-label-col: 6.75rem;
+  --mst002-control-border: #cbd5e1;
+  --mst002-control-focus-border: #3b82f6;
+  --mst002-control-h: 1.5rem;
+  --mst002-control-radius: 0.375rem;
+  --mst002-detail-font: 0.8125rem;
+  --mst002-detail-row-h: 2rem;
+  --mst002-detail-cell-py: 0.25rem;
+}
+
+.mst002-form-grid {
+  display: grid;
+  margin: 0;
+  min-inline-size: 0;
+  padding: 0;
+  grid-template-columns:
+    var(--mst002-label-col) minmax(0, 1fr)
+    var(--mst002-label-col) minmax(0, 1fr)
+    var(--mst002-label-col) minmax(0, 1fr);
+  grid-auto-rows: var(--mst002-detail-row-h);
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+.mst002-form-grid--locked {
+  pointer-events: none;
+  opacity: 0.72;
+}
+
+.mst002-form-grid--locked .mst002-control,
+.mst002-form-grid:disabled .mst002-control {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.mst002-form-grid > * {
+  box-sizing: border-box;
+  min-height: var(--mst002-detail-row-h);
+  align-self: stretch;
+}
+
+.mst002-form-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--mst002-detail-cell-py) 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #edf2f7;
+  color: #5c5c5c;
+  font-size: var(--mst002-detail-font);
+  font-weight: 600;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.mst002-form-label--required {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.mst002-form-value {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: var(--mst002-detail-cell-py) 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.mst002-field-span3 {
+  grid-column: span 3;
+  min-width: 0;
+}
+
+.mst002-grid-void {
+  border: none !important;
+  background: transparent !important;
+  visibility: hidden;
+  pointer-events: none;
+  padding: 0 !important;
+}
+
+.mst002-control {
+  box-sizing: border-box;
+  height: var(--mst002-control-h);
+  min-height: var(--mst002-control-h);
+  max-height: var(--mst002-control-h);
+  width: 60%;
+  max-width: 60%;
+  min-width: 0;
+  border-radius: var(--mst002-control-radius);
+  border: 1px solid var(--mst002-control-border);
+  background: #fff;
+  padding: 0 0.5rem;
+  font-size: var(--mst002-detail-font);
+  line-height: 1;
+}
+
+.mst002-control--wide {
+  width: 100%;
+  max-width: 100%;
+}
+
+.mst002-control:focus,
+.mst002-control:focus-visible {
+  border-color: var(--mst002-control-focus-border);
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+
+.mst002-control:disabled {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+@media (max-width: 1100px) {
+  .mst002-form-grid {
+    grid-template-columns:
+      var(--mst002-label-col) minmax(0, 1fr)
+      var(--mst002-label-col) minmax(0, 1fr);
+  }
+
+  .mst002-field-span3 {
+    grid-column: span 1;
+  }
+
+  .mst002-grid-void {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .mst002-form-grid {
+    grid-template-columns: var(--mst002-label-col) minmax(0, 1fr);
+  }
+}
+
+@media (max-height: 900px) {
+  .mst002-detail-panel {
+    --mst002-detail-row-h: 1.875rem;
+    --mst002-control-h: 1.375rem;
+    margin-top: 0.625rem;
+    max-height: 42vh;
+  }
+
+  .mst002-section-title {
+    font-size: 1.0625rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .mst002-search-panel {
+    --mst002-panel-pad-x: 2.5rem;
+  }
+}
+
+@media (min-width: 1536px) {
+  .mst002-search-panel {
+    --mst002-panel-pad-x: 3rem;
+  }
 }
 </style>

@@ -5,176 +5,171 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
-      <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="searchButton" class="button search md:w-auto w-14">
+  <div class="att07-page box-border flex h-full max-w-full min-h-0 flex-col gap-2 overflow-hidden pb-1" @click="handleParentClick">
+    <div class="att07-toolbar flex shrink-0 flex-wrap items-center justify-between gap-2">
+      <PageName />
+      <div class="flex flex-wrap items-center justify-end gap-2">
+        <button type="button" @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="addButton" class="button new md:w-auto w-14">
+        <button type="button" @click="addButton" class="button new md:w-auto w-auto">
           신규
         </button>
-        <button @click="saveButton" class="button save md:w-auto w-14">
+        <button type="button" @click="saveButton" class="button save md:w-auto w-auto">
           저장
         </button>
-        <button @click="deleteButton" class="button delete md:w-auto w-14">
+        <button type="button" @click="deleteButton" class="button delete md:w-auto w-auto">
           삭제
         </button>
-        <button @click="excelButton" class="button save w-auto excel">
+        <button type="button" @click="excelButton" class="button excel md:w-auto w-auto">
           엑셀
         </button>
       </div>
     </div>
 
-    <!-- 조회조건 -->
-    <!-- 그리드 영역 -->
-    <div class="w-full h-[80%] grid grid-rows-1 grid-cols-[7fr,5fr] mt-5">
-      <Realgrid
-        :progname="'ATT07_002INS_M_VUE'"
-        :progid="1"
-        :rowData="rowData"
-        :reload="reload"
-        :setStateBar="false"
-        :checkRowAuto="false"
-        :headerCheckBar="'checkbox2'"
-        @clickedRowData="clickedRowData"
-        @allStateRows="allStateRows"
-        @sendRowState="sendRowState"
-        @selectedIndex="selectedIndex"
-        @updatedRowData="updatedRowData"
-        :addRow4="addRow4"
-        :addrowProp="'checkbox,lngClassCode,strClass,lngHRColYN,checkbox2,lngSalary,lngEmpInsert,dtmInsert,strInsertIP,lngEmpEdit,dtmEdit,strEditIP'"
-        :addrowDefault="'false, , , ,false,, , , , , , ,'"
-        :documentTitle="'ATT07_002INS'"
-        :changeValue2="changeValue2"
-        :changeColid="changeColid"
-        :changeRow="changeRow"
-        :changeNow="changeNow"
-        :dynamicRowHeight="true"
-        :documentSubTitle="documentSubTitle"
-        :rowStateeditable="false"
-        :checkRenderEditable="true"
-        :checkRenderEditable2Col="'checkbox2'"
-        :exporttoExcel="exportExcel">
-      </Realgrid>
-      <div class="w-[70%] h-[40vh] mt-0 ml-10">
-        <div
-          class="grid grid-rows-8 grid-cols-[1fr,3fr] border w-full h-full border-black">
-          <div
-            class="border border-black flex justify-center items-center bg-orange-100">
-            직책코드
-            <span class="text-red-400 flex justify-center items-center">*</span>
+    <div class="att07-body min-h-0 min-w-0 flex-1">
+      <div class="att07-workspace min-h-0 min-w-0 h-full">
+        <div class="att07-left flex min-h-0 min-w-0 flex-col">
+          <div class="att07-section-title shrink-0">직책 목록</div>
+          <div class="att07-grid-wrap mt-2 min-h-0 min-w-0 flex-1">
+            <Realgrid
+              class="h-full w-full"
+              :progname="'ATT07_002INS_M_VUE'"
+              :progid="1"
+              :rowData="rowData"
+              :reload="reload"
+              :setStateBar="false"
+              :checkRowAuto="false"
+              :headerCheckBar="'checkbox'"
+              @clickedRowData="clickedRowData"
+              @allStateRows="allStateRows"
+              @sendRowState="sendRowState"
+              @selectedIndex="selectedIndex"
+              @updatedRowData="updatedRowData"
+              :addRow4="addRow4"
+              :addrowProp="'checkbox,lngClassCode,strClass,lngHRColYN,checkbox2,lngSalary,lngEmpInsert,dtmInsert,strInsertIP,lngEmpEdit,dtmEdit,strEditIP'"
+              :addrowDefault="addrowDefault"
+              :documentTitle="'ATT07_002INS'"
+              :changeValue2="changeValue2"
+              :changeColid="changeColid"
+              :changeRow="changeRow"
+              :changeNow="changeNow"
+              :dynamicRowHeight="true"
+              :documentSubTitle="documentSubTitle"
+              :rowStateeditable="false"
+              :checkRenderEditable="true"
+              :checkRenderEditable2Col="'checkbox2'"
+              :exporttoExcel="exportExcel" />
           </div>
-          <div class="border border-black flex justify-center items-center">
-            <input
-              type="number"
-              :disabled="disablegrid"
-              name="lngClassCode"
-              v-model="gridvalue1"
-              @input="changeValue"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300" />
-          </div>
-          <div
-            class="border border-black flex justify-center items-center bg-orange-100">
-            직책명
-            <span class="text-red-400 flex justify-center items-center">*</span>
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            <input
-              type="text"
-              name="strClass"
-              @input="changeValue"
-              :disabled="disablegrid2"
-              v-model="gridvalue2"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300" />
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            구 분
-          </div>
-          <div
-            class="border border-black flex justify-center items-center space-x-5">
-            <label for="cond"
-              ><input
-                type="radio"
-                id="cond"
-                name="intGrade"
+        </div>
+
+        <div class="att07-right flex min-h-0 min-w-0 flex-col">
+          <div class="att07-section-title shrink-0">직책 정보</div>
+          <div class="att07-form-grid mt-2 w-full">
+            <div class="att07-form-label att07-form-label--required">*직책코드</div>
+            <div class="att07-form-value">
+              <input
+                ref="codeInput"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                lang="en"
+                autocomplete="off"
+                name="lngClassCode"
+                class="att07-control"
+                :disabled="disablegrid"
+                v-model="gridvalue1"
+                @keydown="codeDigits.onKeydown"
+                @beforeinput="codeDigits.onBeforeInput"
+                @paste="codeDigits.onPaste"
+                @compositionstart="codeDigits.onCompositionStart"
+                @compositionupdate="codeDigits.onCompositionUpdate"
+                @compositionend="codeDigits.onCompositionEnd"
+                @input="codeDigits.onInput" />
+            </div>
+
+            <div class="att07-form-label att07-form-label--required">*직책명</div>
+            <div class="att07-form-value">
+              <input
+                type="text"
+                name="strClass"
+                class="att07-control"
                 :disabled="disablegrid2"
-                class="disabled:bg-gray-300"
-                @change="changeValue"
-                :value="1"
-                v-model="gridvalue3" />정직원</label
-            >
-            <label for="cond2"
-              ><input
-                type="radio"
-                id="cond2"
+                v-model="gridvalue2"
+                @input="changeValue" />
+            </div>
+
+            <div class="att07-form-label">구 분</div>
+            <div class="att07-form-value att07-form-value--radio">
+              <label class="att07-radio-label" for="cond">
+                <input
+                  type="radio"
+                  id="cond"
+                  name="intGrade"
+                  :disabled="disablegrid2"
+                  :value="1"
+                  v-model="gridvalue3"
+                  @change="changeValue" />
+                정직원
+              </label>
+              <label class="att07-radio-label" for="cond2">
+                <input
+                  type="radio"
+                  id="cond2"
+                  name="intGrade"
+                  :disabled="disablegrid2"
+                  :value="2"
+                  v-model="gridvalue3"
+                  @change="changeValue" />
+                PT
+              </label>
+            </div>
+
+            <div class="att07-form-label">POS 보안등급</div>
+            <div class="att07-form-value">
+              <input
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                lang="en"
+                autocomplete="off"
+                name="lngPOSSecurityRating"
+                class="att07-control"
                 :disabled="disablegrid2"
-                class="disabled:bg-gray-300"
-                :value="2"
-                @change="changeValue"
-                name="intGrade"
-                v-model="gridvalue3" />PT</label
-            >
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            POS 보안등급
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            <input
-              type="number"
-              name="lngPOSSecurityRating"
-              :disabled="disablegrid2"
-              @input="changeValue"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300"
-              v-model="gridvalue4" />
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            등록자
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            <input
-              type="text"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300"
-              v-model="gridvalue5"
-              disabled />
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            등록일자
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            <input
-              type="text"
-              v-model="gridvalue6"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300"
-              disabled />
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            수정자
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            <input
-              type="text"
-              v-model="gridvalue7"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300"
-              disabled />
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            수정일자
-          </div>
-          <div class="border border-black flex justify-center items-center">
-            <input
-              type="text"
-              v-model="gridvalue8"
-              class="w-[70%] h-[70%] border border-black pl-1 disabled:bg-gray-300"
-              disabled />
+                v-model="gridvalue4"
+                @keydown="posDigits.onKeydown"
+                @beforeinput="posDigits.onBeforeInput"
+                @paste="posDigits.onPaste"
+                @compositionstart="posDigits.onCompositionStart"
+                @compositionupdate="posDigits.onCompositionUpdate"
+                @compositionend="posDigits.onCompositionEnd"
+                @input="posDigits.onInput" />
+            </div>
+
+            <div class="att07-form-label">등록자</div>
+            <div class="att07-form-value">
+              <input type="text" class="att07-control" v-model="gridvalue5" disabled />
+            </div>
+
+            <div class="att07-form-label">등록일자</div>
+            <div class="att07-form-value">
+              <input type="text" class="att07-control" v-model="gridvalue6" disabled />
+            </div>
+
+            <div class="att07-form-label">수정자</div>
+            <div class="att07-form-value">
+              <input type="text" class="att07-control" v-model="gridvalue7" disabled />
+            </div>
+
+            <div class="att07-form-label">수정일자</div>
+            <div class="att07-form-value">
+              <input type="text" class="att07-control" v-model="gridvalue8" disabled />
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
@@ -216,6 +211,7 @@ import { onMounted, ref } from "vue";
  */
 
 import { deleteRole, getRoleList, saveRole } from "@/api/miattend";
+import { makeDigitsOnlyHandlers } from "@/utils/inputRestrict";
 import { useStore } from "vuex";
 /**
  * 	화면 Load시 실행 스크립트
@@ -223,6 +219,7 @@ import { useStore } from "vuex";
 
 const optionList3 = ref([]);
 
+const codeInput = ref(null);
 const gridvalue1 = ref();
 const gridvalue2 = ref();
 const gridvalue3 = ref(1);
@@ -232,6 +229,104 @@ const gridvalue6 = ref("");
 const gridvalue7 = ref("");
 const gridvalue8 = ref("");
 const cond = ref(1);
+
+/** 코드 잠금 / 상세(직책명·구분·POS보안등급) 잠금 — 핸들러보다 먼저 선언 */
+const disablegrid = ref(true);
+const disablegrid2 = ref(true);
+const insertupdatedelete = ref(1);
+/** 현재 선택 행이 삭제(비활성) 상태인지 */
+const isDeletedRow = ref(false);
+
+const isBlankCode = (v) =>
+  v === null || v === undefined || String(v).trim() === "";
+
+/** 0, 00 처럼 숫자 0만 있는 코드 */
+const isZeroCode = (v) => /^0+$/.test(String(v ?? "").trim());
+
+const ADDROW_BASE = "false, , , ,false,, , , , , , ,";
+const addrowDefault = ref(ADDROW_BASE);
+let lastValidCode = "";
+
+/** 조회·그리드에 있는 코드 중 가장 큰 정수 + 1. 없으면 1 */
+const nextMasterCode = (field) => {
+  let max = 0;
+  for (const list of [rowData.value, updateRow.value]) {
+    if (!Array.isArray(list)) continue;
+    for (const row of list) {
+      if (row == null || Array.isArray(row)) continue;
+      const n = Number(String(row[field] ?? "").trim());
+      if (Number.isInteger(n) && n > max) max = n;
+    }
+  }
+  return String(max + 1);
+};
+
+/** checkbox2(삭제체크) → lngDelete. 체크일 때만 1 */
+const toLngDelete = (checkbox2) =>
+  checkbox2 === true ||
+  checkbox2 === 1 ||
+  checkbox2 === "1" ||
+  checkbox2 === "true" ||
+  checkbox2 === "Y"
+    ? 1
+    : 0;
+
+/** addrowProp 기준 checkbox2 인덱스 (getRows 배열용, 보조) */
+const CHECKBOX2_IDX = 4;
+
+const isRowDeleted = (row) => {
+  if (row == null) return false;
+  if (!Array.isArray(row)) {
+    return toLngDelete(row.checkbox2 ?? row.lngDelete) === 1;
+  }
+  if (row.checkbox2 !== undefined) return toLngDelete(row.checkbox2) === 1;
+  if (row.lngDelete !== undefined) return toLngDelete(row.lngDelete) === 1;
+
+  // getRows() 배열은 필드 순서가 화면마다 다를 수 있음 → rowData(JSON)로 재확인
+  const code = row[1];
+  const fromList = Array.isArray(rowData.value)
+    ? rowData.value.find(
+        (r) =>
+          r != null &&
+          !Array.isArray(r) &&
+          String(r.lngClassCode ?? "") === String(code ?? "")
+      )
+    : null;
+  if (fromList) {
+    return toLngDelete(fromList.checkbox2 ?? fromList.lngDelete) === 1;
+  }
+  const fromUpdate =
+    Array.isArray(updateRow.value) &&
+    changeRow.value !== "" &&
+    changeRow.value != null &&
+    changeRow.value >= 0
+      ? updateRow.value[changeRow.value]
+      : null;
+  if (fromUpdate && !Array.isArray(fromUpdate)) {
+    return toLngDelete(fromUpdate.checkbox2 ?? fromUpdate.lngDelete) === 1;
+  }
+  return toLngDelete(row[CHECKBOX2_IDX]) === 1;
+};
+
+/**
+ * 신규: 코드+상세 개방
+ * 기존 활성: 코드 잠금, 상세 개방
+ * 기존 삭제: 코드·상세 모두 잠금
+ */
+const applyFormEditLock = (isNewRow, isDeleted = false) => {
+  if (isNewRow) {
+    isDeletedRow.value = false;
+    disablegrid.value = false;
+    disablegrid2.value = false;
+    return;
+  }
+  isDeletedRow.value = !!isDeleted;
+  disablegrid.value = true;
+  disablegrid2.value = !!isDeleted;
+};
+
+const handleParentClick = () => {};
+
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
@@ -246,9 +341,16 @@ const afterSearch = ref(false);
 const store = useStore();
 
 const clickedRowData = (e) => {
-  disablegrid2.value = false;
-  //insertupdatedelete.value = 2;
-  ////console.log(e);
+  if (e == null) return;
+
+  // 원본과 동일: 코드(disablegrid)는 여기서 건드리지 않음 — 신규 시 입력 가능 유지
+  const deleted = isRowDeleted(e);
+  isDeletedRow.value = deleted;
+  disablegrid2.value = deleted;
+  if (e?.rowState !== "created") {
+    insertupdatedelete.value = 2;
+  }
+
   gridvalue1.value = e[1];
   gridvalue2.value = e[2];
   gridvalue3.value = e[12];
@@ -265,13 +367,13 @@ const allStateRows = (e) => {
   updateStateRow.value = e;
 };
 const sendRowState = (e) => {
-  ////console.log(e);
   if (e == "created") {
-    disablegrid.value = false;
-    disablegrid2.value = false;
+    insertupdatedelete.value = 1;
+    applyFormEditLock(true);
   } else {
+    insertupdatedelete.value = 2;
     disablegrid.value = true;
-    disablegrid2.value = true;
+    disablegrid2.value = isDeletedRow.value;
   }
 };
 
@@ -283,16 +385,66 @@ const changeNow = ref(false);
 const changeColid = ref("");
 const changeValue2 = ref("");
 
+/** 직책코드 — 정수만 (잔상 없이 차단) */
+const codeDigits = makeDigitsOnlyHandlers({
+  setValue: (v) => {
+    if (disablegrid.value || isDeletedRow.value) return;
+    if (isZeroCode(v)) {
+      gridvalue1.value = lastValidCode;
+      return;
+    }
+    gridvalue1.value = v;
+  },
+  onCommit: (v) => {
+    if (disablegrid.value || isDeletedRow.value) return;
+    if (isZeroCode(v)) {
+      gridvalue1.value = lastValidCode;
+      return;
+    }
+    lastValidCode = v;
+    changeColid.value = "lngClassCode";
+    changeValue2.value = v;
+    changeNow.value = !changeNow.value;
+  },
+});
+
+/** POS 보안등급 — 정수만 (잔상 없이 차단) */
+const posDigits = makeDigitsOnlyHandlers({
+  setValue: (v) => {
+    if (isDeletedRow.value) return;
+    gridvalue4.value = v;
+  },
+  onCommit: (v) => {
+    if (isDeletedRow.value) return;
+    changeColid.value = "lngPOSSecurityRating";
+    changeValue2.value = v;
+    changeNow.value = !changeNow.value;
+  },
+});
+
 const changeValue = (e) => {
+  if (isDeletedRow.value) return;
   changeColid.value = e.target.name;
   changeValue2.value = e.target.value;
-
   changeNow.value = !changeNow.value;
 };
 
 const updateRow = ref([]);
 const updatedRowData = (e) => {
   updateRow.value = e;
+  if (
+    !Array.isArray(e) ||
+    changeRow.value === "" ||
+    changeRow.value == null ||
+    changeRow.value < 0
+  ) {
+    return;
+  }
+  const row = e[changeRow.value];
+  if (row == null || disablegrid.value !== true) return;
+  const deleted = isRowDeleted(row);
+  isDeletedRow.value = deleted;
+  disablegrid2.value = deleted;
 };
 /**
  *  조회 함수
@@ -315,9 +467,6 @@ const searchButton = async () => {
     store.state.loading = false;
   }
 };
-const disablegrid = ref(true);
-const disablegrid2 = ref(true);
-const insertupdatedelete = ref(1);
 const addRow4 = ref(false);
 const addButton = () => {
   if (afterSearch.value == false) {
@@ -330,6 +479,32 @@ const addButton = () => {
     return;
   }
 
+  const unsavedCreated = updateStateRow.value?.created ?? [];
+  if (unsavedCreated.length > 0) {
+    Swal.fire({
+      title: "경고",
+      text: "신규 행을 저장한 뒤 다시 등록해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  insertupdatedelete.value = 1;
+  applyFormEditLock(true);
+  const nextCode = nextMasterCode("lngClassCode");
+  const parts = ADDROW_BASE.split(",");
+  parts[1] = nextCode;
+  addrowDefault.value = parts.join(",");
+  lastValidCode = nextCode;
+  gridvalue1.value = nextCode;
+  gridvalue2.value = "";
+  gridvalue3.value = "1";
+  gridvalue4.value = "";
+  gridvalue5.value = "";
+  gridvalue6.value = "";
+  gridvalue7.value = "";
+  gridvalue8.value = "";
   addRow4.value = !addRow4.value;
 };
 
@@ -356,15 +531,78 @@ const saveButton = async () => {
     });
     return;
   }
-  const hashstate = new Set(updateRow.value.map((item) => item.lngClassCode));
-  const size = updateRow.value.length;
-  const setsize = hashstate.size;
-  if (size != setsize) {
+
+  const createdIndexes = updateStateRow.value.created ?? [];
+  const createdRows = updateRow.value.filter((item, index) =>
+    createdIndexes.includes(index)
+  );
+  if (createdRows.some((item) => isBlankCode(item?.lngClassCode))) {
     Swal.fire({
       title: "경고",
-      text: "중복된 직책코드가 존재합니다.",
+      text: "직책코드를 입력해주세요.",
       icon: "warning",
       confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (createdRows.some((item) => isZeroCode(item?.lngClassCode))) {
+    Swal.fire({
+      title: "경고",
+      text: "직책코드는 0으로 등록할 수 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (createdRows.some((item) => isBlankCode(item?.strClass))) {
+    Swal.fire({
+      title: "경고",
+      text: "직책명을 입력해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  const classCodes = updateRow.value.map((item) =>
+    String(item?.lngClassCode ?? "").trim()
+  );
+  const filledCodes = classCodes.filter((c) => c !== "");
+  const dupClassCodes = [
+    ...new Set(filledCodes.filter((c, i) => filledCodes.indexOf(c) !== i)),
+  ];
+  if (dupClassCodes.length > 0) {
+    const dupText = dupClassCodes.join(", ");
+    const targetIndex = updateRow.value.findIndex((item, index) => {
+      const code = String(item?.lngClassCode ?? "").trim();
+      return createdIndexes.includes(index) && dupClassCodes.includes(code);
+    });
+    if (targetIndex >= 0) {
+      const row = updateRow.value[targetIndex];
+      changeRow.value = targetIndex;
+      insertupdatedelete.value = 1;
+      applyFormEditLock(true);
+      gridvalue1.value = row?.lngClassCode ?? "";
+      gridvalue2.value = row?.strClass ?? "";
+      gridvalue3.value = row?.intGrade ?? gridvalue3.value;
+      gridvalue4.value = row?.lngPOSSecurityRating ?? "";
+    }
+    await Swal.fire({
+      title: "경고",
+      text: `이미 등록 된 직책 코드 [${dupText}] 번이 존재합니다. 직책 코드를 수정해 주십시오.`,
+      icon: "warning",
+      confirmButtonText: "확인",
+      returnFocus: false,
+      didClose: () => {
+        const focusCode = () => {
+          const el = codeInput.value;
+          if (!el || el.disabled) return;
+          el.focus();
+          el.select?.();
+        };
+        focusCode();
+        setTimeout(focusCode, 150);
+      },
     });
     return;
   }
@@ -374,6 +612,7 @@ const saveButton = async () => {
     const result = await fetch("https://api64.ipify.org", { timeout: 3000 });
     const data = await result.text();
     let userIp = data;
+    let res;
 
     if (updateStateRow.value.created.length > 0) {
       const rankcode = updateRow.value
@@ -387,7 +626,7 @@ const saveButton = async () => {
         .map((item) => item.lngPOSSecurityRating);
       const checkbox2 = updateRow.value
         .filter((item, index) => updateStateRow.value.created.includes(index))
-        .map((item) => (item.checkbox2 == false ? 0 : 1));
+        .map((item) => toLngDelete(item.checkbox2));
       const userID = store.state.userData.lngSequence;
       const userIP = userIp;
 
@@ -395,7 +634,7 @@ const saveButton = async () => {
         .filter((item, index) => updateStateRow.value.created.includes(index))
         .map((item) => item.intGrade);
 
-      const res = await saveRole(
+      res = await saveRole(
         store.state.userData.lngStoreGroup,
         rankcode.join("\u200b"),
         strclass.join("\u200b"),
@@ -411,26 +650,43 @@ const saveButton = async () => {
     }
 
     if (updateStateRow.value.updated.length > 0) {
+      const updatedRows = updateStateRow.value.updated;
+      const activeUpdatedIndexes = updatedRows.filter((index) => {
+        const item = updateRow.value[index];
+        return item != null && toLngDelete(item.checkbox2) === 0;
+      });
+
+      if (activeUpdatedIndexes.length === 0) {
+        store.state.loading = false;
+        Swal.fire({
+          title: "경고",
+          text: "삭제된 항목은 수정할 수 없습니다. 활성화된 항목만 저장 가능합니다.",
+          icon: "warning",
+          confirmButtonText: "확인",
+        });
+        return;
+      }
+
       const rankcode = updateRow.value
-        .filter((item, index) => updateStateRow.value.updated.includes(index))
+        .filter((item, index) => activeUpdatedIndexes.includes(index))
         .map((item) => item.lngClassCode);
       const strclass = updateRow.value
-        .filter((item, index) => updateStateRow.value.updated.includes(index))
+        .filter((item, index) => activeUpdatedIndexes.includes(index))
         .map((item) => item.strClass);
       const lngPOSSecurityRating = updateRow.value
-        .filter((item, index) => updateStateRow.value.updated.includes(index))
+        .filter((item, index) => activeUpdatedIndexes.includes(index))
         .map((item) => item.lngPOSSecurityRating);
       const checkbox2 = updateRow.value
-        .filter((item, index) => updateStateRow.value.updated.includes(index))
-        .map((item) => (item.checkbox2 == false ? 0 : 1));
+        .filter((item, index) => activeUpdatedIndexes.includes(index))
+        .map((item) => toLngDelete(item.checkbox2));
       const userID = store.state.userData.lngSequence;
       const userIP = userIp;
 
       const intGrade = updateRow.value
-        .filter((item, index) => updateStateRow.value.updated.includes(index))
+        .filter((item, index) => activeUpdatedIndexes.includes(index))
         .map((item) => item.intGrade);
 
-      const res = await saveRole(
+      res = await saveRole(
         store.state.userData.lngStoreGroup,
         rankcode.join("\u200b"),
         strclass.join("\u200b"),
@@ -551,6 +807,7 @@ const initGrid = () => {
     rowData.value = [];
   }
   afterSearch.value = false;
+  isDeletedRow.value = false;
   disablegrid.value = true;
   disablegrid2.value = true;
   gridvalue1.value = "";
@@ -595,3 +852,205 @@ const excelDate = (e) => {
   //comsole.log(e);
 };
 </script>
+
+<style scoped>
+.att07-page {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+  /* 좌측 메뉴와 간격 */
+  padding-left: 1.25rem;
+  padding-right: 0.75rem;
+  box-sizing: border-box;
+}
+
+.att07-toolbar {
+  min-height: 2.5rem;
+}
+
+/* 본문만 흰 배경 — 항목명이 상단 파란 배경에 들어가지 않도록 */
+.att07-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: #fff;
+  border-radius: 0.75rem 0.75rem 0 0;
+  box-shadow: 0 2px 8px rgb(15 23 42 / 8%);
+  padding: 1rem 1.25rem 1rem;
+  overflow: hidden;
+}
+
+.att07-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .att07-workspace {
+    grid-template-columns: minmax(0, 1.55fr) minmax(22rem, 0.85fr);
+  }
+}
+
+.att07-left,
+.att07-right {
+  min-height: 0;
+  min-width: 0;
+}
+
+.att07-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.4rem;
+  color: #111827;
+}
+
+.att07-section-title::before {
+  content: "";
+  flex: 0 0 0.25rem;
+  width: 0.25rem;
+  height: 1.05em;
+  border-radius: 999px;
+  background: #2563eb;
+}
+
+.att07-grid-wrap {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 12rem;
+  overflow: hidden;
+  width: 100%;
+}
+
+.att07-form-grid {
+  --att07-label-col: 7.5rem;
+  --att07-control-border: #cbd5e1;
+  --att07-control-focus-border: #3b82f6;
+  --att07-control-h: 1.5rem;
+  --att07-control-radius: 0.375rem;
+  --att07-detail-font: 0.8125rem;
+  --att07-detail-row-h: 2rem;
+  --att07-detail-cell-py: 0.25rem;
+  display: grid;
+  grid-template-columns: var(--att07-label-col) minmax(0, 1fr);
+  grid-auto-rows: var(--att07-detail-row-h);
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
+  width: 100%;
+  max-width: 100%;
+}
+
+.att07-form-grid > * {
+  box-sizing: border-box;
+  min-height: var(--att07-detail-row-h);
+  align-self: stretch;
+}
+
+.att07-form-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--att07-detail-row-h);
+  padding: var(--att07-detail-cell-py) 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #edf2f7;
+  color: #5c5c5c;
+  font-size: var(--att07-detail-font);
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.att07-form-label--required {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.att07-form-value {
+  display: flex;
+  align-items: center;
+  min-height: var(--att07-detail-row-h);
+  min-width: 0;
+  padding: var(--att07-detail-cell-py) 0.5rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.att07-form-value--radio {
+  gap: 1.25rem;
+}
+
+.att07-radio-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--att07-detail-font);
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.att07-radio-label input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.att07-radio-label:has(input:disabled) {
+  cursor: not-allowed;
+  color: #9ca3af;
+}
+
+.att07-control {
+  box-sizing: border-box;
+  height: var(--att07-control-h);
+  min-height: var(--att07-control-h);
+  max-height: var(--att07-control-h);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  border-radius: var(--att07-control-radius);
+  border: 1px solid var(--att07-control-border);
+  background: #fff;
+  padding: 0 0.5rem;
+  font-size: var(--att07-detail-font);
+  line-height: 1;
+}
+
+.att07-control:focus,
+.att07-control:focus-visible {
+  border-color: var(--att07-control-focus-border);
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+
+.att07-control:disabled {
+  background: #f3f4f6;
+  color: #374151;
+  cursor: default;
+}
+
+@media (max-height: 900px) {
+  .att07-body {
+    padding: 0.75rem 1rem;
+  }
+
+  .att07-form-grid {
+    --att07-detail-row-h: 1.875rem;
+    --att07-control-h: 1.375rem;
+    --att07-detail-cell-py: 0.1875rem;
+  }
+
+  .att07-section-title {
+    font-size: 1.0625rem;
+  }
+}
+</style>

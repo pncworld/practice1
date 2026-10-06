@@ -1,87 +1,79 @@
 <template>
-  <div
-    v-if="isVisible"
-    class="fixed flex top-0 left-0 w-full h-full bg-black bg-opacity-50 z-[90] justify-center items-center">
-    <div class="bg-white w-[30%] h-[80%] shadow-lg rounded-lg flex flex-col">
-      <header class="popup-header flex justify-between pl-12 pt-5">
-        <h1 class="font-bold text-2xl">{{ naming2 }} 복사</h1>
-        <button
-          class="border border-gray-300 button primary rounded-md mr-12"
-          @click="dupliStore">
-          복사
-        </button>
-      </header>
-      <main class="popup-body flex-grow">
-        <div class="flex justify-start font-bold text-xl ml-12">기준매장</div>
-        <div
-          class="grid grid-rows-2 grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[25vw] ml-12 h-[8vh] rounded-lg">
-          <div
-            class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">
-            기준매장
-          </div>
-          <div
-            class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center">
-            <input
-              type="text"
-              class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md bg-gray-200"
-              :value="'[' + storeCd + ']' + storeNm"
-              disabled />
-          </div>
-          <div
-            class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">
-            포스번호
-          </div>
-          <div
-            class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center">
-            <input
-              type="text"
-              class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md bg-gray-200"
-              :value="posNo"
-              disabled />
-          </div>
-        </div>
-        <div class="flex justify-center mt-3">
-          <img src="../assets/masterCopy-ArrowDown.png" alt="" />
-        </div>
-        <div class="flex justify-between font-bold text-xl ml-12">
-          <div>대상 매장 선택</div>
-          <div>
-            <button class="whitebutton mr-12" @click="showStoreList">
+  <Teleport to="body">
+    <div
+      v-if="isVisible"
+      class="dupli6-overlay"
+      @click.self="close">
+      <div class="dupli6-dialog" role="dialog" aria-modal="true">
+        <header class="dupli6-header">
+          <h1 class="dupli6-title">{{ naming2 }} 복사</h1>
+          <div class="dupli6-header-actions">
+            <button type="button" class="dupli6-btn dupli6-btn--primary" @click="showStoreList">
               조회
             </button>
+            <button type="button" class="dupli6-btn dupli6-btn--copy" @click="dupliStore">
+              복사
+            </button>
+            <button type="button" class="dupli6-btn" @click="close">
+              닫기
+            </button>
           </div>
-        </div>
-        <div
-          class="grid grid-cols-[1fr,4fr] border-[1px] border-gray-400 w-[25vw] ml-12 h-10 mt-5 rounded-lg">
-          <div
-            class="border-[1px] border-gray-400 rounded-tl-md flex justify-center items-center">
-            매장코드/명
+        </header>
+
+        <main class="dupli6-body">
+          <div class="dupli6-section-title">기준매장</div>
+          <div class="dupli6-form-grid">
+            <div class="dupli6-form-label">기준매장</div>
+            <div class="dupli6-form-value">
+              <input
+                type="text"
+                class="dupli6-control"
+                :value="'[' + storeCd + ']' + storeNm"
+                disabled />
+            </div>
+            <div class="dupli6-form-label">포스번호</div>
+            <div class="dupli6-form-value">
+              <input
+                type="text"
+                class="dupli6-control"
+                :value="posNo"
+                disabled />
+            </div>
           </div>
-          <div
-            class="w-full border border-gray-400 rounded-tr-md flex justify-center items-center">
-            <input
-              type="text"
-              class="w-[90%] h-[90%] border-[1px] border-gray-400 rounded-md"
-              @input="handleKeyup" />
+
+          <div class="dupli6-arrow" aria-hidden="true">
+            <img src="../assets/masterCopy-ArrowDown.png" alt="" />
           </div>
-        </div>
-        <div class="w-[25vw] h-[35vh] ml-12 flex justify-center">
-          <realgrid
-            :progname="progname"
-            :progid="progid"
-            :rowData="rowData"
-            :showGrid="showGrid"
-            :showCheckBar="true"
-            @checkedRowData="selcetedrowData"></realgrid>
-        </div>
-      </main>
-      <footer class="flex justify-end p-5 mt-auto">
-        <div class="border border-gray-300 rounded-md w-[5vw] h-[4vh] mr-7">
-          <button @click="close" class="w-full h-full">닫기</button>
-        </div>
-      </footer>
+
+          <div class="dupli6-section-head">
+            <div class="dupli6-section-title">대상 매장 선택</div>
+          </div>
+          <div class="dupli6-form-grid dupli6-form-grid--search">
+            <div class="dupli6-form-label">매장코드/명</div>
+            <div class="dupli6-form-value">
+              <input
+                type="text"
+                class="dupli6-control"
+                placeholder="검색어 입력"
+                @input="handleKeyup"
+                @keydown.enter.prevent="showStoreList" />
+            </div>
+          </div>
+
+          <div class="dupli6-grid-wrap">
+            <realgrid
+              class="h-full w-full"
+              :progname="progname"
+              :progid="progid"
+              :rowData="rowData"
+              :showGrid="showGrid"
+              :showCheckBar="true"
+              @checkedRowData="selcetedrowData" />
+          </div>
+        </main>
+      </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup>
@@ -260,33 +252,220 @@ const dupliStore = async () => {
 </script>
 
 <style scoped>
-.popup-overlay {
+.dupli6-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 50%);
+  padding: 1rem;
+}
+
+.dupli6-dialog {
+  --dupli6-label-col: 7rem;
+  --dupli6-control-h: 2rem;
+  --dupli6-font: 0.875rem;
+  --dupli6-border: #cbd5e1;
+  --dupli6-pad-x: 1.5rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: min(42rem, 96vw);
+  height: min(80vh, 46rem);
+  min-height: 0;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 28px rgb(15 23 42 / 18%);
+  overflow: hidden;
+}
+
+.dupli6-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  padding: 1rem var(--dupli6-pad-x);
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+.dupli6-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.3;
+}
+
+.dupli6-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dupli6-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 2rem;
+  min-width: 4.5rem;
+  padding: 0 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #374151;
+  background: #fff;
+  border: 1px solid #6b7280;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 10%);
+}
+
+.dupli6-btn--primary {
+  color: #fff;
+  background: #3b82f6;
+  border-color: #2563eb;
+}
+
+.dupli6-btn--primary:hover {
+  background: #2563eb;
+}
+
+.dupli6-btn--copy {
+  color: #fff;
+  background: #2563eb;
+  border-color: #1d4ed8;
+}
+
+.dupli6-btn--copy:hover {
+  background: #1d4ed8;
+}
+
+.dupli6-btn:hover {
+  background: #f3f4f6;
+}
+
+.dupli6-btn--primary:hover,
+.dupli6-btn--copy:hover {
+  color: #fff;
+}
+
+.dupli6-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 1rem var(--dupli6-pad-x) 1.25rem;
+  gap: 0.625rem;
+  overflow: hidden;
+}
+
+.dupli6-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.dupli6-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.4;
+}
+
+.dupli6-form-grid {
+  display: grid;
+  grid-template-columns: var(--dupli6-label-col) minmax(0, 1fr);
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+.dupli6-form-grid--search {
+  grid-template-columns: var(--dupli6-label-col) minmax(0, 1fr);
+}
+
+.dupli6-form-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #edf2f7;
+  color: #5c5c5c;
+  font-size: var(--dupli6-font);
+  font-weight: 600;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.dupli6-form-value {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.dupli6-control {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--dupli6-control-h);
+  min-height: var(--dupli6-control-h);
+  max-height: var(--dupli6-control-h);
+  padding: 0 0.5rem;
+  border: 1px solid var(--dupli6-border);
+  border-radius: 0.375rem;
+  background: #fff;
+  font-size: var(--dupli6-font);
+  line-height: 1;
+  color: #111827;
+}
+
+.dupli6-control:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.dupli6-control:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.2);
+}
+
+.dupli6-arrow {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 0.25rem 0;
 }
-.popup-content {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  width: 300px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+.dupli6-arrow img {
+  max-height: 1.75rem;
+  width: auto;
 }
-.popup-header {
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-}
-.popup-body {
-  margin-bottom: 1rem;
-}
-.popup-footer {
-  text-align: right;
+
+.dupli6-grid-wrap {
+  flex: 1 1 0;
+  min-height: 12rem;
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fff;
 }
 </style>

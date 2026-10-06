@@ -52,6 +52,7 @@
               :compact-store-combo-max-rem="18"
               main-name=""
               @update:storeGroup="lngStoreGroup"
+              @update:storeType="lngStoreAttrs"
               :defaultStoreNm="'전체'"
               :hideAttr="false"
               :hideGroup="false"
@@ -266,6 +267,10 @@ const groupCd = ref();
 const lngStoreGroup = (e) => {
   groupCd.value = e;
 };
+const storeAttr = ref(0);
+const lngStoreAttrs = (e) => {
+  storeAttr.value = e;
+};
 
 const supplierid = ref("");
 const SupplierId = (e) => {
@@ -281,7 +286,7 @@ const searchButton = async () => {
     const ip = await getIp.json();
     const res = await getOrderListByType(
       groupCd.value,
-      0,
+      storeAttr.value,
       storeCode.value,
       sDate.value.replaceAll("-", ""),
       eDate.value.replaceAll("-", ""),

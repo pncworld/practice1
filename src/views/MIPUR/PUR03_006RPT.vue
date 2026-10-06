@@ -34,6 +34,7 @@
       <div class="flex justify-start items-center">
         <PickStore
           @update:storeGroup="lngStoreGroup"
+          @update:storeType="lngStoreAttrs"
           :defaultStoreNm="'전체'"
           :hideGroup="false"
           class="space-x-3"
@@ -271,7 +272,7 @@ const lngStoreCode = (e) => {
   storeCode.value = e;
 };
 
-const storeAttr = ref();
+const storeAttr = ref(0);
 const lngStoreAttrs = (e) => {
   storeAttr.value = e;
 };
@@ -304,7 +305,7 @@ const searchButton = async () => {
       cond3.value,
       cond4.value,
       cond.value,
-      0,
+      storeAttr.value,
       cond5.value
     );
 
