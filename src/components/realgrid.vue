@@ -5458,6 +5458,9 @@ const runFuncshowGrid = async () => {
       clickEmit = clickPayload ?? rowArray ?? parentRow ?? null;
     }
     if (clickEmit != null) {
+      if (typeof clickEmit === "object") {
+        clickEmit.index = dataRow;
+      }
       emit("clickedRowData", clickEmit);
       emit("selectedIndex", dataRow);
       emit("selectedIndex2", dataRow);
@@ -6195,24 +6198,9 @@ watch(
       dataProvider.endUpdate();
       updatedrowData.value = [...dataProvider.getJsonRows()];
 
-      // 상세 폼 입력 중 getCurrent().dataRow 가 -1 일 수 있음 → changeRow 로 보정
-      const currentDataRow = gridView.getCurrent()?.dataRow;
-      const dataRow =
-        currentDataRow != null && currentDataRow >= 0
-          ? currentDataRow
-          : props.changeRow;
-      selectedRowData.value =
-        dataRow != null && dataRow >= 0
-          ? dataProvider.getRows()[dataRow]
-          : null;
-
-      // clickedRowData 가 부모에서 예외 나도 변경상태/저장용 emit 은 먼저 전달
       emit("updatedRowData", updatedrowData.value);
       emit("updatedRowData2", updatedrowData.value);
       emit("allStateRows", dataProvider.getAllStateRows());
-      if (selectedRowData.value != null) {
-        emit("clickedRowData", selectedRowData.value);
-      }
     }
   }
 );
@@ -6479,22 +6467,17 @@ watch(
     emit("sendRowState", "created");
     var dataRow = dataProvider.addRow(values);
     gridView.setCurrent({ dataRow: dataRow });
-    const current = gridView.getCurrent();
     emit("allStateRows", dataProvider.getAllStateRows());
-    // props.rowData.push(values);
-    const selectedRowIndex = current ? current.dataRow : null;
-    if (selectedRowIndex !== null) {
-      //comsole.log("현재 선택된 인덱스:", selectedRowIndex); // 선택된 행의 인덱스 출력
-      selectedindex.value = selectedRowIndex;
-    }
+    // 추가된 행 번호는 addRow 반환값을 쓴다. getCurrent()는 이전 행(맨 위)에 남을 수 있다.
+    selectedindex.value = dataRow;
 
-    emit("selectedIndex", selectedRowIndex);
-    emit("selectedIndex2", current.dataRow);
+    emit("selectedIndex", dataRow);
+    emit("selectedIndex2", dataRow);
     //comsole.log(props.rowData);
     addrow4activated.value = true;
 
-    selectedRowData.value = dataProvider.getRows()[selectedindex.value];
-    selectedRowData.value.index = selectedindex.value;
+    selectedRowData.value = dataProvider.getRows()[dataRow];
+    selectedRowData.value.index = dataRow;
     // const rowState = dataProvider.getRowState(selectedindex.value)
 
     emit("clickedRowData", selectedRowData.value);

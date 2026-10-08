@@ -1,6 +1,6 @@
 /*--############################################################################
 # Filename : ATT01_002INS.vue                                                  
-# Description : 마스터관리 > 사원 마스터 > 사원 등록.                          
+# Description : 인사관리 > 사원 마스터 > 사원등록.                          
 # Date :2025-05-14                                                             
 # Author : 권맑음                     
 ################################################################################*/
@@ -145,7 +145,7 @@
           <div class="att01-form-label">생년월일</div>
           <div class="att01-form-value att01-form-value--split">
             <input type="date" name="dtmBirthDate" @input="changeInfo" :disabled="disableGrid" v-model="gridvalue6" class="att01-control" />
-            <select name="blnLuner" @input="changeInfo" v-model="gridvalue7" :disabled="disableGrid" class="att01-control att01-control--calendar">
+            <select name="blnLuner" @change="changeInfo" v-model="gridvalue7" :disabled="disableGrid" class="att01-control att01-control--calendar">
               <option :value="true">양력</option>
               <option :value="false">음력</option>
             </select>
@@ -153,21 +153,21 @@
 
           <div class="att01-form-label att01-form-label--required">*직책</div>
           <div class="att01-form-value">
-            <select name="lngClassCode" @input="changeInfo" v-model="gridvalue8" :disabled="disableGrid" class="att01-control">
+            <select name="lngClassCode" @change="changeInfo" v-model="gridvalue8" :disabled="disableGrid" class="att01-control">
               <option value="0">선택</option>
               <option :value="i.lngClassCode" v-for="i in dataList2" :key="'c-' + i.lngClassCode">{{ i.strClass }}</option>
             </select>
           </div>
           <div class="att01-form-label att01-form-label--required">*직위</div>
           <div class="att01-form-value">
-            <select name="lngRankCode" @input="changeInfo" v-model="gridvalue9" :disabled="disableGrid" class="att01-control">
+            <select name="lngRankCode" @change="changeInfo" v-model="gridvalue9" :disabled="disableGrid" class="att01-control">
               <option value="0">선택</option>
               <option :value="i.lngRankCode" v-for="i in dataList3" :key="'r-' + i.lngRankCode">{{ i.strRank }}</option>
             </select>
           </div>
           <div class="att01-form-label att01-form-label--required">*근무장소</div>
           <div class="att01-form-value">
-            <select name="lngAreaCode" @input="changeInfo" :disabled="disableGrid" v-model="gridvalue10" class="att01-control">
+            <select name="lngAreaCode" @change="changeInfo" :disabled="disableGrid" v-model="gridvalue10" class="att01-control">
               <option value="0">선택</option>
               <option :value="i.lngAreaCode" v-for="i in dataList" :key="'a-' + i.lngAreaCode">{{ i.strArea }}</option>
             </select>
@@ -183,7 +183,7 @@
           </div>
           <div class="att01-form-label att01-form-label--required">*재직구분</div>
           <div class="att01-form-value">
-            <select name="blnExpireClass" @input="changeInfo" v-model="gridvalue13" :disabled="disableGrid" class="att01-control">
+            <select name="blnExpireClass" @change="changeInfo" v-model="gridvalue13" :disabled="disableGrid" class="att01-control">
               <option value="0">재직</option>
               <option value="1">퇴직</option>
               <option value="2">휴직</option>
@@ -339,6 +339,40 @@ const gridvalue23 = ref();
 const gridvalue24 = ref();
 
 const disableGrid = ref(true);
+
+const resetDetailForm = () => {
+  disableGrid.value = true;
+  lockStoreCode.value = true;
+  isNewRow.value = true;
+  detailRowIndex.value = -1;
+  changeRow.value = undefined;
+  editedRowIndexes.value = [];
+  allRowStates.value = { created: [] };
+  gridvalue1.value = store.state.userData.lngPosition;
+  gridvalue2.value = "";
+  gridvalue3.value = "";
+  gridvalue4.value = "";
+  gridvalue5.value = "";
+  gridvalue6.value = "";
+  gridvalue7.value = true;
+  gridvalue8.value = "0";
+  gridvalue9.value = "0";
+  gridvalue10.value = "0";
+  gridvalue11.value = "";
+  gridvalue12.value = "";
+  gridvalue13.value = "0";
+  gridvalue14.value = "";
+  gridvalue15.value = "";
+  gridvalue16.value = "";
+  gridvalue17.value = "";
+  gridvalue18.value = "";
+  gridvalue19.value = "";
+  gridvalue20.value = "";
+  gridvalue21.value = "";
+  gridvalue22.value = "0";
+  gridvalue23.value = "0";
+  gridvalue24.value = "";
+};
 const zipCode = ref(false);
 const showZipCode = () => {
   zipCode.value = true;
@@ -351,6 +385,7 @@ const address = async (e) => {
   gridvalue15.value = e;
 
   setTimeout(() => {
+    markEditedRow();
     changeColid.value = "strAddress";
     changeValue2.value = e;
     changeNow.value = !changeNow.value;
@@ -360,6 +395,7 @@ const address = async (e) => {
 const zipCode2 = async (e) => {
   gridvalue14.value = e;
   setTimeout(() => {
+    markEditedRow();
     changeColid.value = "strZipCode";
     changeValue2.value = e;
     changeNow.value = !changeNow.value;
@@ -406,6 +442,8 @@ const changeNow = ref(false);
 const changeValue2 = ref();
 const changeColid = ref();
 const changeRow = ref();
+const detailRowIndex = ref(-1);
+const editedRowIndexes = ref([]);
 
 const lockStoreCode = ref(true);
 const sendRowState = (e) => {
@@ -427,7 +465,35 @@ const allStateRows = (e) => {
  */
 
 const selectedIndex = (newValue) => {
+  const created = allRowStates.value?.created ?? [];
+  if (created.length === 1 && Number(newValue) !== Number(created[0])) {
+    changeRow.value = created[0];
+    return;
+  }
   changeRow.value = newValue;
+};
+
+const markEditedRow = () => {
+  const created = allRowStates.value?.created ?? [];
+  if (created.length === 1) {
+    changeRow.value = created[0];
+    detailRowIndex.value = created[0];
+  } else if (detailRowIndex.value >= 0) {
+    changeRow.value = detailRowIndex.value;
+  }
+  const idx = Number(changeRow.value);
+  if (Number.isNaN(idx) || idx < 0) {
+    return;
+  }
+  if (editedRowIndexes.value.includes(idx)) {
+    return;
+  }
+  const next = [...editedRowIndexes.value, idx];
+  setTimeout(() => {
+    if (!editedRowIndexes.value.includes(idx)) {
+      editedRowIndexes.value = next;
+    }
+  }, 0);
 };
 /**
  *  추가 버튼
@@ -477,6 +543,17 @@ const addButton = () => {
 
 const clickedRowData = (newValue) => {
   // console.log(newValue);
+  if (
+    newValue != null &&
+    typeof newValue.index === "number" &&
+    newValue.index >= 0
+  ) {
+    const created = allRowStates.value?.created ?? [];
+    if (created.length !== 1 || Number(newValue.index) === Number(created[0])) {
+      detailRowIndex.value = newValue.index;
+      changeRow.value = newValue.index;
+    }
+  }
   disableGrid.value = false;
   gridvalue1.value = newValue[1];
   gridvalue2.value = newValue[4];
@@ -539,6 +616,7 @@ const updatedRowData = (newValue) => {
  */
 
 const changeInfo = (e) => {
+  markEditedRow();
   const rowName = e.target.name;
   const rowValue = e.target.value;
 
@@ -554,10 +632,17 @@ const changeInfo = (e) => {
   }
 
   if (rowName == "lngClassCode") {
+    const classItem = dataList2.value.find(
+      (item) => String(item.lngClassCode) === String(rowValue)
+    );
+    if (classItem) {
+      gridvalue8.value = classItem.lngClassCode;
+    }
     setTimeout(() => {
-      changeValue2.value = dataList2.value.filter(
-        (item) => item.lngClassCode == rowValue
-      )[0].strClass;
+      if (!classItem) {
+        return;
+      }
+      changeValue2.value = classItem.strClass;
       changeColid.value = "strClass";
 
       changeNow.value = !changeNow.value;
@@ -565,10 +650,17 @@ const changeInfo = (e) => {
   }
 
   if (rowName == "lngRankCode") {
+    const rankItem = dataList3.value.find(
+      (item) => String(item.lngRankCode) === String(rowValue)
+    );
+    if (rankItem) {
+      gridvalue9.value = rankItem.lngRankCode;
+    }
     setTimeout(() => {
-      changeValue2.value = dataList3.value.filter(
-        (item) => item.lngRankCode == rowValue
-      )[0].strRank;
+      if (!rankItem) {
+        return;
+      }
+      changeValue2.value = rankItem.strRank;
       changeColid.value = "strRank";
 
       changeNow.value = !changeNow.value;
@@ -576,6 +668,12 @@ const changeInfo = (e) => {
   }
 
   if (rowName == "lngAreaCode") {
+    const areaItem = dataList.value.find(
+      (item) => String(item.lngAreaCode) === String(rowValue)
+    );
+    if (areaItem) {
+      gridvalue10.value = areaItem.lngAreaCode;
+    }
     setTimeout(() => {
       // console.log(rowValue);
       if (rowValue == null || rowValue == "null" || rowValue == "0") {
@@ -583,10 +681,8 @@ const changeInfo = (e) => {
         changeColid.value = "strAreaName";
 
         changeNow.value = !changeNow.value;
-      } else {
-        changeValue2.value = dataList.value.filter(
-          (item) => item.lngAreaCode == rowValue
-        )[0].strArea;
+      } else if (areaItem) {
+        changeValue2.value = areaItem.strArea;
         changeColid.value = "strAreaName";
 
         changeNow.value = !changeNow.value;
@@ -673,6 +769,8 @@ const searchButton = async () => {
     rowData.value = res.data.List;
     updateRow.value = JSON.parse(JSON.stringify(rowData.value));
     allRowStates.value = { created: [] };
+    editedRowIndexes.value = [];
+    detailRowIndex.value = -1;
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
@@ -705,7 +803,31 @@ const saveButton = async () => {
     return;
   }
 
-  const validateRow1 = updateRow.value.filter(
+  const states = allRowStates.value || {};
+  const dirtyIndex = [
+    ...new Set([
+      ...(states.created || []),
+      ...(states.updated || []),
+      ...editedRowIndexes.value,
+    ]),
+  ];
+  let rowsToSave = dirtyIndex
+    .map((index) => updateRow.value[index])
+    .filter((row) => row != null);
+  if (rowsToSave.length === 0 && updateRow.value.length > rowData.value.length) {
+    rowsToSave = updateRow.value.slice(rowData.value.length);
+  }
+  if (rowsToSave.length === 0) {
+    Swal.fire({
+      title: "경고",
+      text: "변경된 사항이 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  const validateRow1 = rowsToSave.filter(
     (item) =>
       item.lngPosition == null ||
       item.lngPosition === "" ||
@@ -722,7 +844,7 @@ const saveButton = async () => {
     return;
   }
 
-  const validateRow2 = updateRow.value.filter(
+  const validateRow2 = rowsToSave.filter(
     (item) =>
       item.strChargerName == null || String(item.strChargerName).trim() === ""
   ).length;
@@ -736,7 +858,7 @@ const saveButton = async () => {
     return;
   }
 
-  const validateRow3 = updateRow.value.filter(
+  const validateRow3 = rowsToSave.filter(
     (item) =>
       item.lngChargerCode == null || String(item.lngChargerCode).trim() === ""
   ).length;
@@ -750,7 +872,7 @@ const saveButton = async () => {
     return;
   }
 
-  const validateRow4 = updateRow.value.filter(
+  const validateRow4 = rowsToSave.filter(
     (item) =>
       item.lngClassCode == null ||
       item.lngClassCode === "" ||
@@ -767,7 +889,7 @@ const saveButton = async () => {
     return;
   }
 
-  const validateRow5 = updateRow.value.filter(
+  const validateRow5 = rowsToSave.filter(
     (item) =>
       item.lngRankCode == null ||
       item.lngRankCode === "" ||
@@ -784,7 +906,7 @@ const saveButton = async () => {
     return;
   }
 
-  const validateRow6 = updateRow.value.filter(
+  const validateRow6 = rowsToSave.filter(
     (item) =>
       item.lngAreaCode == null ||
       item.lngAreaCode === "" ||
@@ -802,7 +924,7 @@ const saveButton = async () => {
     return;
   }
 
-  const validateRow7 = updateRow.value.filter(
+  const validateRow7 = rowsToSave.filter(
     (item) =>
       item.blnExpireClass == null ||
       item.blnExpireClass === "" ||
@@ -829,61 +951,57 @@ const saveButton = async () => {
     if (result.isConfirmed) {
       store.state.loading = true;
       try {
-        //comsole.log(updateRow.value);
+        //comsole.log(rowsToSave);
 
-        const chargerCode = updateRow.value.map((item) => item.lngChargerCode);
-        const chargerName = updateRow.value.map((item) => item.strChargerName);
+        const chargerCode = rowsToSave.map((item) => item.lngChargerCode);
+        const chargerName = rowsToSave.map((item) => item.strChargerName);
 
-        const strIdNo = updateRow.value.map((item) => item.strIdNo);
-        const lngClassCode = updateRow.value.map((item) => item.lngClassCode);
-        const lngRankCode = updateRow.value.map((item) => item.lngRankCode);
-        const lngAreaCode = updateRow.value.map((item) => item.lngAreaCode);
-        const dtmJoinDate = updateRow.value.map(
-          (item) => item.dtmJoinDate.split(" ")[0]
+        const dateHead = (value) =>
+          value == null || value === "" ? "" : String(value).split(" ")[0];
+        const strIdNo = rowsToSave.map((item) => item.strIdNo);
+        const lngClassCode = rowsToSave.map((item) => item.lngClassCode);
+        const lngRankCode = rowsToSave.map((item) => item.lngRankCode);
+        const lngAreaCode = rowsToSave.map((item) => item.lngAreaCode);
+        const dtmJoinDate = rowsToSave.map((item) => dateHead(item.dtmJoinDate));
+        const dtmExpireDate = rowsToSave.map((item) =>
+          dateHead(item.dtmExpireDate)
         );
-        const dtmExpireDate = updateRow.value.map(
-          (item) => item.dtmExpireDate.split(" ")[0]
+        const dtmHealthExpireDate = rowsToSave.map((item) =>
+          dateHead(item.dtmHealthExpireDate)
         );
-        const dtmHealthExpireDate = updateRow.value.map(
-          (item) => item.dtmHealthExpireDate.split(" ")[0]
+        const dtmBirthDate = rowsToSave.map((item) =>
+          dateHead(item.dtmBirthDate)
         );
-        const dtmBirthDate = updateRow.value.map(
-          (item) => item.dtmBirthDate.split(" ")[0]
-        );
-        const strTelNumber = updateRow.value.map((item) => item.strTelNumber);
-        const strZipCode = updateRow.value.map((item) => item.strZipCode);
-        const strAddress = updateRow.value.map((item) => item.strAddress);
-        const strPassword = updateRow.value.map((item) => item.strPassword);
-        const lngBankCode = updateRow.value.map((item) => item.lngBankCode);
-        const strBankNumber = updateRow.value.map((item) => item.strBankNumber);
-        const blnExpireClass = updateRow.value.map(
-          (item) => item.blnExpireClass
-        );
-        const strCardNumber = updateRow.value.map((item) => item.strCardNumber);
-        const strEmail = updateRow.value.map((item) => item.strEmail);
-        const strCPhone = updateRow.value.map((item) => item.strCPhone);
-        const blnLuner = updateRow.value.map((item) =>
+        const strTelNumber = rowsToSave.map((item) => item.strTelNumber);
+        const strZipCode = rowsToSave.map((item) => item.strZipCode);
+        const strAddress = rowsToSave.map((item) => item.strAddress);
+        const strPassword = rowsToSave.map((item) => item.strPassword);
+        const lngBankCode = rowsToSave.map((item) => item.lngBankCode);
+        const strBankNumber = rowsToSave.map((item) => item.strBankNumber);
+        const blnExpireClass = rowsToSave.map((item) => item.blnExpireClass);
+        const strCardNumber = rowsToSave.map((item) => item.strCardNumber);
+        const strEmail = rowsToSave.map((item) => item.strEmail);
+        const strCPhone = rowsToSave.map((item) => item.strCPhone);
+        const blnLuner = rowsToSave.map((item) =>
           item.blnLuner == "True" ? 1 : item.blnLuner == true ? 1 : 0
         );
 
-        const lngPayCode = updateRow.value.map((item) => item.lngPayCode);
-        const dtmChangeDate = updateRow.value.map(
-          (item) => item.dtmChangeDate.split(" ")[0]
+        const lngPayCode = rowsToSave.map((item) => item.lngPayCode);
+        const dtmChangeDate = rowsToSave.map((item) =>
+          dateHead(item.dtmChangeDate)
         );
-        const lngUserAdminID = updateRow.value.map(
-          (item) => item.lngUserAdminID
+        const lngUserAdminID = rowsToSave.map((item) => item.lngUserAdminID);
+        const dtmRetireDate = rowsToSave.map((item) =>
+          dateHead(item.dtmRetireDate)
         );
-        const dtmRetireDate = updateRow.value.map(
-          (item) => item.dtmRetireDate.split(" ")[0]
-        );
-        const lngChangePayCode = updateRow.value.map(
+        const lngChangePayCode = rowsToSave.map(
           (item) => item.lngChangePayCode
         );
-        const lngStoreGroup = updateRow.value.map((item) => item.lngStoreGroup);
-        const lngSequence = updateRow.value.map((item) => item.lngSequence);
-        const lngPosition = updateRow.value.map((item) => item.lngPosition);
+        const lngStoreGroup = rowsToSave.map((item) => item.lngStoreGroup);
+        const lngSequence = rowsToSave.map((item) => item.lngSequence);
+        const lngPosition = rowsToSave.map((item) => item.lngPosition);
 
-        const lngWorkClass = updateRow.value.map((item) => item.lngWorkClass);
+        const lngWorkClass = rowsToSave.map((item) => item.lngWorkClass);
 
         const res = await saveEMP2(
           chargerCode.join("\u200b"),
@@ -922,6 +1040,8 @@ const saveButton = async () => {
           title: "저장 되었습니다.",
           confirmButtonText: "확인",
         });
+        await searchButton();
+        resetDetailForm();
       } catch (error) {
         Swal.fire({
           title: "저장이 실패되었습니다.",
@@ -929,7 +1049,6 @@ const saveButton = async () => {
         });
       } finally {
         store.state.loading = false;
-        searchButton();
       }
     }
   });
