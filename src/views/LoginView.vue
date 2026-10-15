@@ -124,6 +124,7 @@ import {
 } from "../api/common";
 import { insertLoginLog } from "@/customFunc/customFunc";
 import { mergeThemeLogoFromPersistedSession } from "@/utils/mergeSessionUserData";
+import { IDLE_LOGOUT_MESSAGE, isIdleLogoutLanding } from "@/utils/idleLogout";
 
 const store = useStore(); // Vuex 스토어 가져오기
 const router = useRouter(); // Vue Router 가져오기
@@ -342,6 +343,9 @@ onMounted(async () => {
     checkid.value = true;
   }
   store.state.loading2 = false;
+  if (isIdleLogoutLanding()) {
+    message.value = IDLE_LOGOUT_MESSAGE;
+  }
 });
 
 const passwordVisible = ref(false);

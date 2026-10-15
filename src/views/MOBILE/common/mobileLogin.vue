@@ -121,6 +121,7 @@ import { useRouter } from "vue-router";
  */
 
 import { useStore } from "vuex";
+import { IDLE_LOGOUT_MESSAGE, isIdleLogoutLanding } from "@/utils/idleLogout";
 
 const store = useStore(); // Vuex 스토어 가져오기
 const router = useRouter(); // Vue Router 가져오기
@@ -282,6 +283,9 @@ onMounted(async () => {
     username.value = localStorage.getItem("username");
   }
   store.state.loading2 = false;
+  if (isIdleLogoutLanding()) {
+    message.value = IDLE_LOGOUT_MESSAGE;
+  }
 });
 const showPopUp = ref(false);
 const showCustomorCenter = () => {

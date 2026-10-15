@@ -21,6 +21,7 @@ import Swal from "sweetalert2";
 import { customSwal } from "./config/swalConfig";
 import VueQuill from "vue3-quill"; // plugin (전역 등록용)
 import "quill/dist/quill.snow.css"; // CSS 스타일
+import { startIdleLogout } from "./utils/idleLogout";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
@@ -83,6 +84,7 @@ app.config.errorHandler = (err, vm, info) => {
 };
 
 app.mount("#app");
+startIdleLogout(store);
 
 //   // Vue 경고 핸들러 추가 (개발 중 경고를 잡기 위해)
 //   app.config.warnHandler = (msg, vm, trace) => {

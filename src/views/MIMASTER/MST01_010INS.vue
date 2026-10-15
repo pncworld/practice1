@@ -972,22 +972,18 @@ const selcetedrowData = (newValue) => {
 
   changeValue.value = newValue[0];
   changeColid.value = "lngMenu" + (currIndexKey.value + 1);
-  //comsole.log(changeColid.value);
   changeNow2.value = !changeNow2.value;
-  // const finditem = TLUList.value.find(
-  //   (item, index) => item.lngCode == Number(clickedTLUCd.value)
-  // );
-  // finditem[`lngMenu${currIndexKey.value + 1}`] = Number(newValue[0]);
-  // //comsole.log(finditem);
-  // //comsole.log(TLUList.value);
-  // TLUList.value = [...TLUList.value];
-  // const finditem2 = items.value.find(
-  //   (item, index) => index == currIndexKey.value
-  // );
-  // //comsole.log(finditem2);
-  // finditem2.lngCode = newValue[0];
-  // finditem2.strName = newValue[1];
-  // finditem2.lngPrice = newValue[2];
+
+  const cell = items.value[currIndexKey.value];
+  if (cell == null || cell.inactivate === true) return;
+  const code = Array.isArray(newValue) ? newValue[0] : newValue?.lngCode;
+  const menu = MenuList.value.find(
+    (item) => Number(item.lngCode) == Number(code)
+  );
+  if (menu == null) return;
+  cell.lngCode = menu.lngCode;
+  cell.strName = menu.strName;
+  cell.lngPrice = menu.lngPrice;
 };
 
 /**
