@@ -39,7 +39,7 @@ export const SALES_GOAL_REGISTRATION_TAB = {
 
 /**
  * 홈에서 매출 분석 대시보드 카드를 띄울 규칙.
- * - 마키노차야(1871): `lngUserAdminID` 가 10, 30, 또는 90 초과
+ * - 마키노차야(1871): `lngUserAdminID` 가 10, 30, 또는 90 이상
  *   (`lngUserAdminID === lngStoreGroup` 그룹관리자는 홈·API에서 이미 스킵, 1871=1871 포함)
  * - 테스트(5001): 기존과 동일, 92만
  * - 그 외 그룹: 이 대시보드 미사용
@@ -49,7 +49,7 @@ export const SALES_GOAL_REGISTRATION_TAB = {
 export const SALES_ANALYSIS_HOME_GROUP_1871 = "1871";
 export const SALES_ANALYSIS_HOME_GROUP_TEST = "5001";
 
-/** 테스트(5001) 기존 지정 계정. 마키노차야는 `matchesSalesAnalysisHomeTempBypass` 의 10 / 90초과 규칙. */
+/** 테스트(5001) 기존 지정 계정. 마키노차야는 `matchesSalesAnalysisHomeTempBypass` 의 10 / 30 / 90 이상 규칙. */
 export const SALES_ANALYSIS_HOME_TEMP_BYPASS_RULES = Object.freeze([
   Object.freeze({
     lngStoreGroup: SALES_ANALYSIS_HOME_GROUP_TEST,
@@ -68,7 +68,7 @@ export function matchesSalesAnalysisHomeTempBypass(u) {
   if (!Number.isFinite(aid)) return false;
   if (String(aid) === grp) return false;
   if (grp === SALES_ANALYSIS_HOME_GROUP_1871) {
-    return aid === 10 || aid === 30 || aid > 90;
+    return aid === 10 || aid === 30 || aid >= 90;
   }
   return SALES_ANALYSIS_HOME_TEMP_BYPASS_RULES.some(
     (r) => r.lngStoreGroup === grp && r.lngUserAdminIDs.includes(aid)
