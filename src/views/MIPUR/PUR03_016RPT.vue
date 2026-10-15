@@ -5,18 +5,16 @@
 # Author : 권맑음
 ################################################################################*/ -->
 <template>
-  <div class="h-full" @click="handleParentClick">
+  <!-- pl-5: 셸 w-right가 pl0이라 그리드가 좌측 메뉴에 붙음 → 우측 pd20과 맞춤 -->
+  <div class="h-full pl-5" @click="handleParentClick">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
+      <div class="flex justify-center space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
         <button @click="excelButton" class="button w-auto excel">엑셀</button>
         <button @click="printButton" class="button print w-auto">인쇄</button>
-        <button @click="printCrystalButton" class="button print w-auto">
-          인쇄(구버전)
-        </button>
       </div>
     </div>
     <div
@@ -351,33 +349,6 @@ const printButton = async () => {
   }
 };
 
-const printCrystalButton = () => {
-  if (checkedrowdata.value.length == 0) {
-    Swal.fire({
-      title: "경고",
-      text: "선택한 전표가 존재하지 않습니다.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  const storecds = checkedrowdata.value
-    .map((item) => item.lngStoreCode)
-    .join(",");
-  const ordercds = checkedrowdata.value
-    .map((item) => item.strOrderNo)
-    .join(",");
-  const orderDate = String(sDate.value ?? "").replaceAll("-", "");
-  window.open(
-    `http://222.231.31.99/Report/CRPrint.aspx?pCount=10&Report=PUR03_016RPT_RPT&@P_lngStoreGroup=${
-      groupCd.value
-    }&@P_lngStoreCode=${
-      storeCode.value
-    }&@P_dtmOrderDate=${orderDate}&@P_flag=1&@P_lngStoreCodeList=${storecds}&@P_orderNo=${ordercds}`,
-    "_blank",
-    "width=1600,height=1200"
-  );
-};
 </script>
 
 <style scoped>

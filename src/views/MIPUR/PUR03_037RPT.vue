@@ -6,19 +6,16 @@
 ################################################################################*/ -->
 <template>
   <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
+  <!-- pl-5: 셸 w-right가 pl0이라 그리드가 좌측 메뉴에 붙음 → 우측 pd20과 맞춤 -->
+  <div class="h-full pl-5" @click="handleParentClick">
     <div class="flex justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
+      <div class="flex justify-center space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
         <button @click="excelButton" class="button w-auto excel">엑셀</button>
         <button @click="printButton" class="button print w-auto">인쇄</button>
-        <!-- 임시: Vue 인쇄와 Crystal 비교용 — 확정 후 제거 -->
-        <button @click="printCrystalButton" class="button print w-auto">
-          인쇄(구버전)
-        </button>
       </div>
     </div>
     <div
@@ -113,7 +110,7 @@
         :setGroupSumCustomColumnId2="setGroupSumCustomColumnId2"
         :setMergeMode="false"
         :documentTitle="'PUR03_037RPT'"
-        :selectionStyle="'block'"
+        :selectionStyle="'singleRow'"
         @clickedRowData="clickedRowData"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
@@ -127,71 +124,101 @@
     </div>
   </div>
 
-  <div
-    v-if="openPopUp"
-    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white p-6 rounded-2xl shadow-xl w-[50vw] h-[50vh]">
-      <div class="flex justify-between">
-        <h2 class="text-xl font-bold mb-4">발주서 조회</h2>
-        <div class="flex space-x-5">
-          <button class="whitebutton" @click="excelButton2">엑셀</button
-          ><button class="whitebutton" @click="openPopUp = false">닫기</button>
-        </div>
-      </div>
-      <div class="flex">
-        <div class="flex space-x-5 items-center">
-          <div class="text-base font-semibold">매장명</div>
-          <div>
-            <input
-              type="text"
-              class="border border-black h-7 w-67 disabled:bg-gray-200"
-              disabled
-              v-model="forPopupOrderStoreNM" /> 
+  <Teleport to="body">
+    <div
+      v-if="openPopUp"
+      class="pur037-popup-backdrop"
+      @click.self.prevent>
+      <div
+        class="pur037-popup-dialog"
+        :style="detailDialogStyle"
+        role="dialog"
+        aria-modal="true"
+        @click.stop>
+        <div
+          class="pur037-popup-head pur037-popup-head--drag"
+          @pointerdown="onDetailDragStart">
+          <h2 class="pur037-popup-title">발주서 조회</h2>
+          <div class="pur037-popup-actions">
+            <button
+              type="button"
+              class="pur037-sub-btn pur037-sub-btn--icon pur037-sub-btn--excel"
+              @click.stop="excelButton2">
+              엑셀
+            </button>
+            <button
+              type="button"
+              class="pur037-sub-btn pur037-sub-btn--icon pur037-sub-btn--close"
+              @click.stop="openPopUp = false">
+              닫기
+            </button>
           </div>
         </div>
-
-        <div class="flex space-x-5 ml-10 items-center">
-          <div class="text-base font-semibold">발주번호</div>
-          <div>
-            <input
-              type="text"
-              class="border border-black h-7 w-23 disabled:bg-gray-200"
-              v-model="forPopupOrderNo"
-              disabled />
+        <div
+          class="pur037-popup-fields"
+          :style="{ '--pur037-popup-border': pur037ControlBorder }">
+          <div class="pur037-popup-field-grid">
+            <div class="pur037-popup-label">
+              <div class="pur037-popup-label-inner">매장명</div>
+            </div>
+            <div class="pur037-popup-cell">
+              <input
+                type="text"
+                class="pur037-popup-input"
+                disabled
+                v-model="forPopupOrderStoreNM" />
+            </div>
+            <div class="pur037-popup-label">
+              <div class="pur037-popup-label-inner">발주번호</div>
+            </div>
+            <div class="pur037-popup-cell">
+              <input
+                type="text"
+                class="pur037-popup-input"
+                disabled
+                v-model="forPopupOrderNo" />
+            </div>
+            <div class="pur037-popup-label">
+              <div class="pur037-popup-label-inner">파트명</div>
+            </div>
+            <div class="pur037-popup-cell pur037-popup-cell--part">
+              <select class="pur037-popup-input" disabled v-model="scond">
+                <option
+                  v-for="i in optionList"
+                  :key="i.lngPartCode"
+                  :value="i.lngPartCode">
+                  {{ i.strPartName }}
+                </option>
+              </select>
+            </div>
           </div>
         </div>
-
-        <div class="flex space-x-5 ml-10 items-center">
-          <div class="text-base font-semibold">파트명</div>
-          <select
-            name=""
-            id=""
-            class="border border-black w-35 h-8 disabled:bg-gray-200"
-            disabled
-            v-model="scond">
-            <option :value="i.lngPartCode" v-for="i in optionList">
-              {{ i.strPartName }}
-            </option>
-          </select>
+        <div ref="popupGridWrapRef" class="pur037-popup-grid-wrap">
+          <Realgrid
+            class="h-full min-h-0 w-full"
+            :progname="'PUR03_016RPT_01POP_VUE'"
+            :progid="1"
+            :documentTitle="'PUR03_037RPT'"
+            :rowStateeditable="false"
+            :selectionStyle="'singleRow'"
+            :fit-all-columns="true"
+            @realgridname="onPopupGridName"
+            :setFooter="true"
+            :setFooterColID="setFooterColID2"
+            :setFooterExpressions="setFooterExpressions2"
+            :setFooterCustomColumnId="setFooterCustomColumnId2"
+            :setFooterCustomText="setFooterCustomText2"
+            :exporttoExcel="exportExcel2"
+            :documentSubTitle="documentSubTitle2"
+            :rowData="rowData2"></Realgrid>
         </div>
-      </div>
-      <div class="h-[80%] w-full flex justify-center items-center mt-2">
-        <Realgrid
-          :progname="'PUR03_016RPT_01POP_VUE'"
-          :progid="1"
-          :documentTitle="'PUR03_037RPT'"
-          :rowStateeditable="false"
-          :setFooter="true"
-          :setFooterColID="setFooterColID2"
-          :setFooterExpressions="setFooterExpressions2"
-          :setFooterCustomColumnId="setFooterCustomColumnId2"
-          :setFooterCustomText="setFooterCustomText2"
-          :exporttoExcel="exportExcel2"
-          :documentSubTitle="documentSubTitle2"
-          :rowData="rowData2"></Realgrid>
+        <div
+          class="pur037-popup-resize"
+          aria-hidden="true"
+          @pointerdown.stop="onDetailResizeStart"></div>
       </div>
     </div>
-  </div>
+  </Teleport>
   <!-- 그리드 영역 -->
 
   <ReportPrintShell
@@ -235,6 +262,7 @@ import PickStore from "@/components/pickStore.vue";
  */
 
 import Realgrid from "@/components/realgrid.vue";
+import { rgGetInstance } from "@/components/realgridInstanceRegistry.js";
 /**
  *  페이지로그 자동 입력
  *  */
@@ -249,7 +277,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { computed, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -509,6 +537,145 @@ const excelList = (e) => {
 
 const openPopUp = ref(false);
 
+const DETAIL_W0 = () => Math.max(720, Math.min(window.innerWidth * 0.96, window.innerWidth - 24));
+const DETAIL_H0 = () => Math.max(420, Math.min(window.innerHeight * 0.82, window.innerHeight - 24));
+const DETAIL_MIN_W = 560;
+const DETAIL_MIN_H = 360;
+const detailBox = ref({ left: 12, top: 12, w: 720, h: 420 });
+const detailDialogStyle = computed(() => ({
+  left: `${detailBox.value.left}px`,
+  top: `${detailBox.value.top}px`,
+  width: `${detailBox.value.w}px`,
+  height: `${detailBox.value.h}px`,
+}));
+
+const resetDetailBox = () => {
+  const w = DETAIL_W0();
+  const h = DETAIL_H0();
+  detailBox.value = {
+    left: 12,
+    top: 12,
+    w,
+    h,
+  };
+};
+
+const popupGridName = ref("");
+const popupGridWrapRef = ref(null);
+let popupGridResizeObs = null;
+
+const resetPopupGridSize = () => {
+  const name = popupGridName.value;
+  if (!name) return;
+  const el = document.getElementById(name);
+  if (!el || el.clientWidth < 16 || el.clientHeight < 16) return;
+  const gv = rgGetInstance(name)?.gridView;
+  if (!gv) return;
+  try {
+    gv.resetSize();
+  } catch (_) {}
+};
+
+const onPopupGridName = (name) => {
+  if (typeof name === "string" && name) popupGridName.value = name;
+};
+
+const unbindPopupGridResize = () => {
+  if (!popupGridResizeObs) return;
+  popupGridResizeObs.disconnect();
+  popupGridResizeObs = null;
+};
+
+const bindPopupGridResize = () => {
+  unbindPopupGridResize();
+  const el = popupGridWrapRef.value;
+  if (!el || typeof ResizeObserver === "undefined") return;
+  popupGridResizeObs = new ResizeObserver(() => {
+    requestAnimationFrame(() => resetPopupGridSize());
+  });
+  popupGridResizeObs.observe(el);
+};
+
+watch(openPopUp, async (v) => {
+  if (!v) {
+    unbindPopupGridResize();
+    return;
+  }
+  resetDetailBox();
+  await nextTick();
+  bindPopupGridResize();
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => resetPopupGridSize());
+  });
+});
+
+let detailDrag = null;
+const onDetailDragStart = (e) => {
+  if (e.button !== 0) return;
+  if (e.target.closest("button")) return;
+  e.preventDefault();
+  detailDrag = {
+    kind: "move",
+    x: e.clientX,
+    y: e.clientY,
+    left: detailBox.value.left,
+    top: detailBox.value.top,
+  };
+  window.addEventListener("pointermove", onDetailPointerMove);
+  window.addEventListener("pointerup", onDetailPointerUp);
+};
+
+const onDetailResizeStart = (e) => {
+  if (e.button !== 0) return;
+  e.preventDefault();
+  detailDrag = {
+    kind: "resize",
+    x: e.clientX,
+    y: e.clientY,
+    w: detailBox.value.w,
+    h: detailBox.value.h,
+  };
+  window.addEventListener("pointermove", onDetailPointerMove);
+  window.addEventListener("pointerup", onDetailPointerUp);
+};
+
+const onDetailPointerMove = (e) => {
+  if (!detailDrag) return;
+  const dx = e.clientX - detailDrag.x;
+  const dy = e.clientY - detailDrag.y;
+  if (detailDrag.kind === "move") {
+    detailBox.value = {
+      ...detailBox.value,
+      left: Math.min(window.innerWidth - 80, Math.max(0, detailDrag.left + dx)),
+      top: Math.min(window.innerHeight - 48, Math.max(0, detailDrag.top + dy)),
+    };
+    return;
+  }
+  detailBox.value = {
+    ...detailBox.value,
+    w: Math.min(
+      window.innerWidth - detailBox.value.left,
+      Math.max(DETAIL_MIN_W, detailDrag.w + dx)
+    ),
+    h: Math.min(
+      window.innerHeight - detailBox.value.top,
+      Math.max(DETAIL_MIN_H, detailDrag.h + dy)
+    ),
+  };
+};
+
+const onDetailPointerUp = () => {
+  detailDrag = null;
+  window.removeEventListener("pointermove", onDetailPointerMove);
+  window.removeEventListener("pointerup", onDetailPointerUp);
+  requestAnimationFrame(() => resetPopupGridSize());
+};
+
+onUnmounted(() => {
+  unbindPopupGridResize();
+  onDetailPointerUp();
+});
+
 const clickedButtonCol = async (e) => {
   //   //console.log(e);
   //   //console.log(forPopupOrderNo.value);
@@ -614,34 +781,6 @@ const printButton = async () => {
   }
 };
 
-/** 임시 비교용 — 기존 Crystal CRPrint (확정 후 제거) */
-const printCrystalButton = () => {
-  if (checkedrowdata.value.length == 0) {
-    Swal.fire({
-      title: "경고",
-      text: "선택한 전표가 존재하지 않습니다.",
-      icon: "warning",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  const storecds = checkedrowdata.value
-    .map((item) => item.lngStoreCode)
-    .join(",");
-  const ordercds = checkedrowdata.value
-    .map((item) => item.strOrderNo)
-    .join(",");
-  const orderDate = String(sDate.value ?? "").replaceAll("-", "");
-  window.open(
-    `http://222.231.31.99/Report/CRPrint.aspx?pCount=10&Report=PUR03_016RPT_PART&@P_lngStoreGroup=${
-      groupCd.value
-    }&@P_lngStoreCode=${
-      storeCode.value
-    }&@P_dtmOrderDate=${orderDate}&@P_flag=1&@P_lngStoreCodeList=${storecds}&@P_orderNo=${ordercds}`,
-    "_blank",
-    "width=1600,height=1200"
-  );
-};
 </script>
 
 <style scoped>
@@ -893,5 +1032,252 @@ const printCrystalButton = () => {
 
 .pur037-bc-slot :deep(> div.flex.items-center) {
   margin-top: 0;
+}
+
+.pur037-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 11000;
+  background: rgb(0 0 0 / 0.5);
+}
+
+.pur037-popup-dialog {
+  position: fixed;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 22.5rem;
+  margin: 0;
+  padding: 1.25rem 1.5rem 1.5rem;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 20px 40px rgb(0 0 0 / 0.2);
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+.pur037-popup-head {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.pur037-popup-head--drag {
+  cursor: move;
+  user-select: none;
+}
+
+.pur037-popup-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: rgb(17 24 39);
+}
+
+.pur037-popup-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pur037-sub-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 2rem;
+  min-height: 2rem;
+  max-height: 2rem;
+  min-width: 5.75rem;
+  padding: 0 0.9rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: rgb(30 64 175);
+  border: 1px solid rgb(147 197 253);
+  border-radius: 0.375rem;
+  background-color: rgb(239 246 255);
+  box-shadow: 0 1px 2px 0 rgb(59 130 246 / 0.08);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.pur037-sub-btn:hover {
+  background-color: rgb(219 234 254);
+  border-color: rgb(96 165 250);
+}
+
+.pur037-sub-btn--icon {
+  gap: 0.25rem;
+}
+
+.pur037-sub-btn--icon::before {
+  content: "";
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.pur037-sub-btn--excel {
+  color: rgb(21 128 61);
+  border-color: rgb(134 239 172);
+  background-color: rgb(240 253 244);
+  box-shadow: 0 1px 2px 0 rgb(22 163 74 / 0.08);
+}
+
+.pur037-sub-btn--excel:hover {
+  background-color: rgb(220 252 231);
+  border-color: rgb(74 222 128);
+}
+
+.pur037-sub-btn--excel::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 14H7v-2h2.5v2zm0-3H7v-2h2.5v2zm0-3H7V9h2.5v2zm0-3H7V6h2.5v2zM17 17h-6v-2h6v2zm0-3h-6v-2h6v2zm0-3h-6V9h6v2zm0-3h-6V6h6v2z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 14H7v-2h2.5v2zm0-3H7v-2h2.5v2zm0-3H7V9h2.5v2zm0-3H7V6h2.5v2zM17 17h-6v-2h6v2zm0-3h-6v-2h6v2zm0-3h-6V9h6v2zm0-3h-6V6h6v2z'/%3E%3C/svg%3E");
+}
+
+.pur037-sub-btn--close {
+  color: rgb(55 65 81);
+  border-color: rgb(209 213 219);
+  background-color: rgb(249 250 251);
+  box-shadow: 0 1px 2px 0 rgb(107 114 128 / 0.08);
+}
+
+.pur037-sub-btn--close:hover {
+  background-color: rgb(243 244 246);
+  border-color: rgb(156 163 175);
+}
+
+.pur037-sub-btn--close::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E");
+}
+
+.pur037-popup-fields {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  margin-bottom: 0.75rem;
+  min-width: 0;
+  padding: 0.875rem 1.25rem;
+  border-radius: 0.5rem;
+  background: #fff;
+  overflow-x: hidden;
+}
+
+.pur037-popup-field-grid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  column-gap: 0.75rem;
+  overflow-x: hidden;
+  grid-template-columns:
+    minmax(0, 5.75rem) minmax(0, 1.2fr)
+    minmax(0, 5.75rem) minmax(0, 0.8fr)
+    minmax(0, 5.75rem) minmax(0, 1.8fr);
+}
+
+.pur037-popup-label {
+  min-width: 0;
+}
+
+.pur037-popup-label-inner {
+  display: flex;
+  width: 100%;
+  min-height: 2rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.125rem 0.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  color: rgb(17 24 39);
+}
+
+.pur037-popup-cell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+
+.pur037-popup-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 2rem;
+  min-height: 2rem;
+  max-height: 2rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--pur037-popup-border) !important;
+  background-color: #fff;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: rgb(17 24 39);
+  -webkit-text-fill-color: rgb(17 24 39);
+  opacity: 1;
+}
+
+.pur037-popup-input:disabled {
+  background-color: #fff;
+  color: rgb(17 24 39);
+  -webkit-text-fill-color: rgb(17 24 39);
+  opacity: 1;
+}
+
+select.pur037-popup-input {
+  width: 45%;
+  max-width: 45%;
+  min-width: 0;
+}
+
+.pur037-popup-grid-wrap {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+}
+
+.pur037-popup-grid-wrap :deep(.realgrid) {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pur037-popup-resize {
+  position: absolute;
+  right: 0.25rem;
+  bottom: 0.25rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  cursor: nwse-resize;
+  background:
+    linear-gradient(135deg, transparent 50%, #94a3b8 50%, #94a3b8 62%, transparent 62%),
+    linear-gradient(135deg, transparent 70%, #94a3b8 70%, #94a3b8 82%, transparent 82%);
 }
 </style>

@@ -127,10 +127,16 @@
     </div>
   </div>
 
+  <Teleport to="body">
   <div
     v-if="openPopUp"
-    class="fixed inset-0 z-40 flex items-center justify-center bg-black/60">
-    <div class="relative z-50 rounded-2xl bg-white p-6 shadow-xl w-[75vw] h-[80vh]">
+    class="fixed inset-0 z-[11000] flex items-center justify-center bg-black/60"
+    @click.self.prevent>
+    <div
+      class="relative rounded-2xl bg-white p-6 shadow-xl w-[75vw] h-[80vh]"
+      role="dialog"
+      aria-modal="true"
+      @click.stop>
       <div class="flex justify-between">
         <h2 class="text-xl font-bold mb-4">매입확정 상세</h2>
         <div class="flex flex-wrap items-center justify-end gap-2">
@@ -278,22 +284,21 @@
           :exporttoExcel="exportExcel2"
           @updatedRowData="updatedRowData2"
           :rowStateeditable="false"
-          :inputSignedDecimalColumn="'dblCheckQty'"
-          :setNumberformatColumn="'dblBefCheckQty'"
+          :inputSignedDecimalColumn="'dblCheckQty,dblOrderQty,dblBefCheckQty'"
+          :setNumberformatColumn="'dblCheckQty,dblOrderQty,dblBefCheckQty'"
           :CalculateTaxColId="'curTax'"
+          :CalculateTaxColId2="'curSupply'"
+          :CalculateTaxColId3="'curTotal'"
+          :persistCalculateTax="true"
           :editableColId="'dblCheckQty'"
           :suppressEdit="isPopupDetailReadOnly"
-          :AutoCalculateDataMainColId="['curSupply', 'curTotal']"
-          :AutoCalculateDataSubColId="[
-            `values['dblCheckQty'] * values['curUnitPrice']`,
-            `values['curSupply'] + values['curTax']`,
-          ]"
           :setFooter="true"
           :documentSubTitle="documentSubTitle2"
           :rowData="rowData2"></Realgrid>
       </div>
     </div>
   </div>
+  </Teleport>
   <!-- 그리드 영역 -->
 </template>
 
@@ -626,6 +631,61 @@ function rowHasBlnChkLocked(row) {
   return isBlnChkLockedApiValue(row.blnChk);
 }
 
+/** 팝업 행 키 — 세구분(lngTaxType)이 그리드 emit에서 빠질 수 있어 조회 시 보관 */
+const popupLineTaxType = ref(new Map());
+
+function popupDetailLineKey(item) {
+  if (item == null || typeof item !== "object") return "";
+  return `${item.strOrderNo ?? ""}|${item.lngOrderSeq ?? ""}|${item.lngStockID ?? ""}`;
+}
+
+/** 그리드 CalculateTax와 동일: 공급가=floor(단가×입고수량), 과세(01)만 부가세 10% */
+function resolvePopupTaxType(item) {
+  const fromRow = item?.lngTaxType;
+  if (fromRow != null && String(fromRow).trim() !== "") {
+    return String(fromRow);
+  }
+  const fromMap = popupLineTaxType.value.get(popupDetailLineKey(item));
+  if (fromMap != null && String(fromMap).trim() !== "") {
+    return String(fromMap);
+  }
+  return "01";
+}
+
+function applyPopupCheckQtyAmounts(item) {
+  const unit = Number(item?.curUnitPrice || 0);
+  const qty = Number(item?.dblCheckQty || 0);
+  const supply = Math.floor(unit * qty);
+  const taxType = resolvePopupTaxType(item);
+  const tax = taxType === "01" ? Math.floor(supply * 0.1) : 0;
+  return {
+    ...item,
+    curSupply: supply,
+    curTax: tax,
+    curTotal: Math.floor(supply + tax),
+  };
+}
+
+function rememberPopupLineTaxTypes(list) {
+  const map = new Map();
+  if (!Array.isArray(list)) {
+    popupLineTaxType.value = map;
+    return;
+  }
+  for (const item of list) {
+    const key = popupDetailLineKey(item);
+    if (!key || key === "||") continue;
+    let taxType = item?.lngTaxType;
+    if (taxType == null || String(taxType).trim() === "") {
+      const oldSupply = Number(item?.curSupply || 0);
+      const oldTax = Number(item?.curTax || 0);
+      taxType = oldSupply !== 0 && oldTax === 0 ? "00" : "01";
+    }
+    map.set(key, String(taxType));
+  }
+  popupLineTaxType.value = map;
+}
+
 const dblclickedRowData = async (row) => {
   if (!row || typeof row !== "object") return;
 
@@ -671,6 +731,7 @@ const dblclickedRowData = async (row) => {
       store.state.userData.strLanguage
     );
     rowData2.value = res.data.List;
+    rememberPopupLineTaxTypes(res.data.List);
     updatedrowdata2.value = res.data.List;
     const lockedFromDetail =
       Array.isArray(res.data.List) &&
@@ -720,28 +781,30 @@ const saveButton = async () => {
   }
 
   try {
-    const lngstockids = updatedrowdata2.value
+    const saveRows = (updatedrowdata2.value || []).map(applyPopupCheckQtyAmounts);
+    updatedrowdata2.value = saveRows;
+    const lngstockids = saveRows
       .map((item) => item.lngStockID)
       .join("\u200b");
-    const qtys = updatedrowdata2.value
+    const qtys = saveRows
       .map((item) => item.dblCheckQty)
       .join("\u200b");
-    const unitprices = updatedrowdata2.value
+    const unitprices = saveRows
       .map((item) => item.curUnitPrice)
       .join("\u200b");
-    const supply = updatedrowdata2.value
+    const supply = saveRows
       .map((item) => item.curSupply)
       .join("\u200b");
-    const taxs = updatedrowdata2.value
+    const taxs = saveRows
       .map((item) => item.curTax)
       .join("\u200b");
-    const ordernos = updatedrowdata2.value
+    const ordernos = saveRows
       .map((item) => item.strOrderNo)
       .join("\u200b");
-    const orderseqs = updatedrowdata2.value
+    const orderseqs = saveRows
       .map((item) => item.lngOrderSeq)
       .join("\u200b");
-    const comments = updatedrowdata2.value
+    const comments = saveRows
       .map((item) => item.strCheckComments)
       .join("\u200b");
 
@@ -794,7 +857,8 @@ const saveButton = async () => {
 
 const updatedrowdata2 = ref([]);
 const updatedRowData2 = (e) => {
-  updatedrowdata2.value = e;
+  const arr = Array.isArray(e) ? e : [];
+  updatedrowdata2.value = arr.map(applyPopupCheckQtyAmounts);
 };
 
 const cancelButton = async () => {

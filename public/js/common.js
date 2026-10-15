@@ -119,6 +119,9 @@ $(function(){
         $('.menu-list').show();
         $('.menu-list li').show();
 
+        // 즐겨찾기 복귀 시 섹션은 접히는데 스위치만 ON 남는 문제 방지
+        $('#toggleAll').prop('checked', false);
+
         $('.menu-section').removeClass('open');
         $('.menu-section .menu-list').hide();
 
@@ -140,7 +143,8 @@ $(function(){
         $('.menu-favorite').addClass('active');
         $('.menu-tab').removeClass('active');
 
-        $('.menu-toggle').hide(); 
+        $('.menu-toggle').hide();
+        $('#toggleAll').prop('checked', false);
         $('.menu-section').hide();
         $('.menu-section-head').hide();
         $('.menu-list').hide();
@@ -217,16 +221,13 @@ $(function(){
             return;
         }
 
-        const $toggleText = $('.toggle-text');
-
+        // 라벨은 「전체 열기」 고정. ON/OFF 는 스위치(.toggle-ui) CSS 로 표시.
         if (this.checked) {
             $('.menu-section').addClass('open');
             $('.menu-list').slideDown(200);
-            $toggleText.text('전체 접기');
         } else {
             $('.menu-section').removeClass('open');
             $('.menu-list').slideUp(200);
-            $toggleText.text('전체 열기');
         }
     });
 

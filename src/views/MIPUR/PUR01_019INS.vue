@@ -6,58 +6,54 @@
 # Editor : 권맑음
 ################################################################################*/ -->
 <template>
-  <div class="h-full">
-    <!-- 기본버튼 -->
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <!-- pl-5: 셸 w-right가 pl0이라 그리드가 좌측 메뉴에 붙음 → 우측 pd20과 맞춤 -->
+  <div class="flex h-full min-h-0 flex-col pl-5">
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="searchButton" class="button search md:w-auto w-14">
+      <div class="flex justify-center space-x-2 pr-5">
+        <button type="button" @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="excelButton" class="button excel w-auto">엑셀</button>
+        <button type="button" @click="excelButton" class="button excel w-auto">엑셀</button>
       </div>
     </div>
-    <!-- 조회조건 (search-area-layout: px-24, 그리드, 라벨·테두리 통일) -->
+
     <div
-      class="pur019-search-panel z-10 mt-3 w-full min-w-0 overflow-x-auto rounded-lg bg-gray-200 px-24 py-4">
-      <div
-        class="pur019-search-grid min-w-0"
-        :style="{
-          '--pur019-control-border': pur019ControlBorder,
-          '--pur019-item-gap': pur019ItemGap,
-          '--pur019-col-gap': pur019ColGap,
-          '--pur019-label-col': pur019LabelCol,
-          '--pur019-combo-max': pur019ComboMaxW,
-        }">
-        <div class="pur019-cell">
-          <div class="pur019-sg-label">{{ mainName }}</div>
-          <div class="pur019-cell-field pur019-date-slot min-w-0">
+      class="pur019-search-panel z-10 mt-3 w-full min-h-0 shrink-0 rounded-lg bg-gray-200"
+      :style="{
+        '--pur019-control-border': pur019ControlBorder,
+        '--pur019-col-gutter': pur019ColGutter,
+        '--pur019-row-gap': pur019RowGap,
+        '--pur019-label-col': pur019LabelCol,
+        '--pur019-row-min-h': pur019RowMinH,
+        '--pur019-control-h': pur019ControlH,
+      }">
+      <div class="pur019-wire-grid min-w-0">
+        <div class="pur019-wire-cell">
+          <div class="pur019-wire-label">{{ mainName }}</div>
+          <div class="pur019-wire-field pur019-date-slot min-w-0 overflow-hidden">
             <Datepicker1
               ref="datepicker"
               :mainName="mainName"
               :initToday="1"
-              @excelDate="excelDate"
               @dateValue="dateValue" />
           </div>
         </div>
-        <div class="pur019-cell">
-          <div class="pur019-sg-label">매장명</div>
-          <div class="pur019-cell-field pur019-renew-slot min-w-0">
+        <div class="pur019-wire-cell">
+          <div class="pur019-wire-label">매장명</div>
+          <div class="pur019-wire-field pur019-mat-row pur019-pick-slot-full min-w-0 w-full">
             <PickStoreRenew3
               compact
               omit-main-label
               combo-fill
               placeholder-name="전체"
               @excelStore="excelStoreGrid1"
-              @update:storeCd="handleStoreCd"
-              @storeNm="storeNm"
-              :hideit="false"
-              :hideit2="false" />
+              @update:storeCd="handleStoreCd" />
           </div>
         </div>
-        <div class="pur019-cell">
-          <div class="pur019-sg-label">거래처</div>
-          <div class="pur019-cell-field pur019-bc-slot min-w-0">
+        <div class="pur019-wire-cell">
+          <div class="pur019-wire-label">거래처</div>
+          <div class="pur019-wire-field pur019-bc-slot min-w-0 w-full max-w-full">
             <BusinessClient
               compact-search-bar
               @SupplierId="SupplierId"
@@ -66,10 +62,10 @@
         </div>
       </div>
     </div>
-    <!-- 그리드 영역 -->
-    <div class="flex justify-center w-[97%] h-[68vh] min-h-[20rem] gap-5 ml-5">
+
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <Realgrid
-        class="w-full h-full mt-2"
+        class="pur019-grid-body min-h-0 w-full flex-1"
         :progname="'PUR01_019INS_VUE'"
         :progid="1"
         :rowData="rowData"
@@ -254,16 +250,13 @@ import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 import BusinessClient from "@/components/businessClient2.vue";
 
-/** 조회 AREA 테두리·열 간격·라벨 칸 (search-area-layout) */
 const pur019ControlBorder = "#cbd5e1";
-/** 라벨↔입력 칸 내부 간격 */
-const pur019ItemGap = "0.625rem";
-/** 항목(열) 사이 간격 */
-const pur019ColGap = "1.25rem";
-const pur019LabelCol = "7.25rem";
-/** 매장명·거래처 콤보 동일 폭 상한(열이 넓을 때도 통일) */
-const pur019ComboMaxW = "23rem";
-/** 팝업 상단 항목 AREA — 라벨 칸·행 간격 (search-area-layout) */
+const pur019ColGutter = "1.25rem";
+const pur019RowGap = "0.75rem";
+const pur019LabelCol = "5.75rem";
+const pur019RowMinH = "2rem";
+const pur019ControlH = "2rem";
+/** 팝업 상단 항목 AREA — 라벨 칸·행 간격 */
 const pur019PopupLabelCol = "7rem";
 const pur019PopupFieldGap = "0.5rem";
 
@@ -666,141 +659,219 @@ const excelButtonGrid2 = () => {
 </script>
 
 <style scoped>
-/* 3열: 매장·거래처 트랙 동일(1fr), 콤보는 동일 max로 통일 */
-.pur019-search-grid {
-  display: grid;
+.pur019-search-panel {
+  --pur019-panel-pad-x: 2rem;
+  box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  align-items: center;
-  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.11fr) minmax(0, 1.11fr);
-  column-gap: var(--pur019-col-gap);
+  padding-left: 0;
+  padding-right: 0;
+  padding-block: 0.75rem;
+  overflow-x: auto;
 }
 
-.pur019-cell {
+@media (min-width: 640px) {
+  .pur019-search-panel {
+    --pur019-panel-pad-x: 2.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .pur019-search-panel {
+    --pur019-panel-pad-x: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pur019-search-panel {
+    --pur019-panel-pad-x: 3.5rem;
+  }
+}
+
+.pur019-wire-grid {
+  display: grid;
+  width: max(100%, max-content);
+  min-width: 100%;
+  box-sizing: border-box;
+  padding-left: var(--pur019-panel-pad-x);
+  padding-right: var(--pur019-panel-pad-x);
+  align-items: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--pur019-col-gutter);
+  row-gap: var(--pur019-row-gap);
+}
+
+.pur019-wire-cell {
   display: flex;
   min-width: 0;
+  min-height: var(--pur019-row-min-h);
+  flex-direction: row;
   align-items: center;
-  gap: var(--pur019-item-gap);
+  gap: 0.5rem;
 }
 
-.pur019-sg-label {
+.pur019-wire-label {
   flex: 0 0 var(--pur019-label-col);
   width: var(--pur019-label-col);
+  min-width: 0;
+  max-width: var(--pur019-label-col);
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  font-size: 1rem;
+  min-height: var(--pur019-row-min-h);
+  font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.25;
   color: rgb(17 24 39);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.pur019-cell-field {
-  min-width: 0;
-  flex: 1 1 auto;
+.pur019-wire-field {
   display: flex;
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 auto;
   align-items: center;
-  width: 100%;
+  min-height: var(--pur019-row-min-h);
 }
 
-.pur019-cell-field > * {
+.pur019-wire-field:not(.pur019-mat-row) > * {
   min-width: 0;
   width: 100%;
 }
 
-/* 그리드 바깥 라벨 사용 → Datepicker1 내부 제목 숨김 */
+.pur019-mat-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr);
+  column-gap: 0.5rem;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.pur019-mat-row > * {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Datepicker1 내부 제목 숨김 */
 .pur019-search-panel .pur019-date-slot :deep(div.space-x-5 > span) {
   display: none;
 }
 
 .pur019-search-panel .pur019-date-slot :deep(div.space-x-5) {
-  margin-top: 0;
+  margin-top: 0 !important;
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 10.75rem;
+  max-width: 100%;
   min-width: 0;
+  gap: 0.25rem;
 }
 
 .pur019-search-panel .pur019-date-slot :deep(input[type="date"]) {
   box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  height: 2rem;
-  min-height: 2rem;
-  padding-left: 0.75rem;
-  padding-right: 0.5rem;
+  height: var(--pur019-control-h) !important;
+  min-height: var(--pur019-control-h) !important;
+  max-height: var(--pur019-control-h) !important;
+  width: auto !important;
+  flex: 1 1 0;
+  min-width: 5.25rem;
+  max-width: none;
+  padding-left: 0.45rem;
+  padding-right: 0.25rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
   border-radius: 0.375rem;
   border: 1px solid var(--pur019-control-border) !important;
+  background: #fff;
 }
 
 .pur019-search-panel .pur019-date-slot :deep(input[type="date"]:focus) {
   border-color: #3b82f6 !important;
 }
 
-/* PickStoreRenew: 그룹/속성 select + v-select 한 줄 — 거래처와 동일 max 폭 */
-.pur019-search-panel .pur019-renew-slot :deep(> div.flex) {
-  width: 100%;
-  max-width: min(100%, var(--pur019-combo-max));
-  min-width: 0;
-  flex-wrap: nowrap;
-  gap: var(--pur019-item-gap) !important;
-  overflow-x: auto;
-  scrollbar-width: thin;
+/* 매장명: 그룹·구분·매장 3콤보 (1fr 1fr 2fr) */
+.pur019-pick-slot-full :deep(> div.flex) {
+  display: contents;
+  margin: 0;
 }
 
-/* 그룹/속성 select는 조금 줄이고 매장 v-select가 남는 폭을 우선 사용 */
-.pur019-search-panel .pur019-renew-slot :deep(> div.flex > div:has(select)) {
-  flex: 0 1 auto;
-  max-width: 7.5rem;
-  min-width: 0;
-}
-
-.pur019-search-panel .pur019-renew-slot :deep(> div.flex > div:last-child) {
-  flex: 1 1 auto;
-  min-width: 0;
-  width: 100%;
-  max-width: 100%;
-}
-
-.pur019-search-panel .pur019-renew-slot :deep(> div.flex > div:last-child .custom-select) {
+.pur019-pick-slot-full :deep(> div.flex > div:nth-child(1) select),
+.pur019-pick-slot-full :deep(> div.flex > div:nth-child(2) select) {
+  display: block !important;
+  margin-left: 0 !important;
+  height: var(--pur019-control-h) !important;
+  min-height: var(--pur019-control-h) !important;
+  max-height: var(--pur019-control-h) !important;
+  padding: 0 0.375rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem;
+  box-sizing: border-box;
   width: 100% !important;
   max-width: 100%;
+  border: 1px solid var(--pur019-control-border) !important;
+  border-radius: 0.375rem !important;
+  background: #fff !important;
+}
+
+.pur019-pick-slot-full :deep(> div.flex > div:nth-child(3)) {
+  margin-left: 0 !important;
+  width: 100% !important;
   min-width: 0;
+  max-width: 100%;
 }
 
-.pur019-search-panel .pur019-renew-slot :deep(select) {
+.pur019-pick-slot-full :deep(.custom-select) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin-left: 0 !important;
+}
+
+.pur019-pick-slot-full :deep(.vs__dropdown-toggle) {
+  height: var(--pur019-control-h) !important;
+  min-height: var(--pur019-control-h) !important;
+  max-height: var(--pur019-control-h) !important;
   border: 1px solid var(--pur019-control-border) !important;
+  border-radius: 0.375rem !important;
   box-sizing: border-box;
-}
-
-.pur019-search-panel .pur019-renew-slot :deep(select:focus) {
-  border-color: #3b82f6 !important;
-}
-
-.pur019-search-panel .pur019-renew-slot :deep(.vs__dropdown-toggle) {
-  border: 1px solid var(--pur019-control-border) !important;
-}
-
-.pur019-search-panel .pur019-renew-slot :deep(.vs__dropdown-toggle:focus-within) {
-  border-color: #3b82f6 !important;
+  background: #fff !important;
 }
 
 .pur019-search-panel .pur019-bc-slot :deep(.pickstore-vs-shell) {
+  box-sizing: border-box !important;
+  height: var(--pur019-control-h) !important;
+  min-height: var(--pur019-control-h) !important;
+  max-height: var(--pur019-control-h) !important;
   border: 1px solid var(--pur019-control-border) !important;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: min(100%, var(--pur019-combo-max));
+  border-radius: 0.375rem !important;
+  font-size: 0.875rem !important;
+  background: #fff !important;
+  max-width: 100%;
   min-width: 0;
+  width: 100%;
 }
 
-.pur019-search-panel .pur019-bc-slot :deep(> div.flex.text-base) {
+.pur019-bc-slot :deep(> div.flex.text-base) {
+  margin: 0 !important;
   width: 100%;
   min-width: 0;
+  gap: 0 !important;
+}
+
+.pur019-bc-slot :deep(.vs__dropdown-toggle) {
+  height: 100% !important;
+  min-height: 0 !important;
+  border: none !important;
+}
+
+.pur019-grid-body {
+  min-height: 12rem;
 }
 
 /* 발주 확인/출고(팝업) 상단 항목 AREA */

@@ -518,6 +518,92 @@ export const getCloseDtmDate = (groupCd, storeCd) => {
     STORE_CD: storeCd,
   });
 };
+
+export const deleteCheckDetails = (
+  groupCd,
+  storeCd,
+  storeCd2,
+  checknos,
+  checkseqs,
+  ordernos,
+  orderseqs,
+  checkqtys,
+  type,
+  userid
+) => {
+  return api2.post("/MIPUR/PUR02_031INS.asmx/deleteCheckDetails", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    STORE_CD2: storeCd2,
+    CHECKNOS: checknos,
+    CHECKSEQS: checkseqs,
+    ORDERNOS: ordernos,
+    ORDERSEQS: orderseqs,
+    CHECKQTYS: checkqtys,
+    TYPE: type,
+    USERID: userid,
+  });
+};
+
+export const insertCheckDetailNew = (
+  groupCd,
+  storeCd,
+  storeCd2,
+  checkNo,
+  date,
+  supplierids,
+  stockids,
+  checkqtys,
+  unitprices,
+  supplys,
+  taxs,
+  ordernos,
+  orderseqs,
+  type,
+  userid
+) => {
+  return api2.post("/MIPUR/PUR02_031INS.asmx/insertCheckDetailNew", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    STORE_CD2: storeCd2,
+    CHECKNO: checkNo,
+    DATE: date,
+    SUPPLIERIDS: supplierids,
+    STOCKIDS: stockids,
+    CHECKQTYS: checkqtys,
+    UNITPRICES: unitprices,
+    SUPPLYS: supplys,
+    TAXS: taxs,
+    ORDERNOS: ordernos,
+    ORDERSEQS: orderseqs,
+    TYPE: type,
+    USERID: userid,
+  });
+};
+
+export const insertStockPriceHistory = (
+  groupCd,
+  storeCd,
+  supplierids,
+  stockids,
+  fromdates,
+  todates,
+  unitprices,
+  mainsuppliers,
+  userid
+) => {
+  return api2.post("/MIPUR/PUR02_031INS.asmx/insertStockPriceHistory", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SUPPLIERIDS: supplierids,
+    STOCKIDS: stockids,
+    FROMDATES: fromdates,
+    TODATES: todates,
+    UNITPRICES: unitprices,
+    MAINSUPPLIERS: mainsuppliers,
+    USERID: userid,
+  });
+};
 export const deleteCheckDetailMasters = (
   groupCd,
   storeCd,
@@ -1324,7 +1410,8 @@ export const saveStockMasterDetailByPart = (
   supply,
   tax,
   comments2,
-  lngsequence
+  lngsequence,
+  edate
 ) => {
   return api2.post("/MIPUR/PUR02_018INS.asmx/saveStockMasterDetailByPart", {
     GROUP_CD: groupCd,
@@ -1339,6 +1426,7 @@ export const saveStockMasterDetailByPart = (
     TAX: tax,
     COMMENT2: comments2,
     LNGSEQUENCE: lngsequence,
+    EDATE: edate,
   });
 };
 

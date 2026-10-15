@@ -199,7 +199,7 @@ const showWelcomePopup = computed(
   () => Number(store.state.userData?.lngStoreGroup) === WELCOME_POPUP_GROUP
 );
 
-/** 홈 매출 분석 대시보드 노출은 `SALES_ANALYSIS_HOME_TEMP_BYPASS_RULES` (`salesAnalysisDashboardApi.js`)만 따름 */
+/** 홈 매출 분석 대시보드 노출은 `matchesSalesAnalysisHomeTempBypass` (`salesAnalysisDashboardApi.js`)만 따름 */
 /** @param {Record<string, unknown>|unknown} u userData */
 function isSalesAnalysisDashboardHome(u) {
   if (!u || typeof u !== "object" || Array.isArray(u)) return false;

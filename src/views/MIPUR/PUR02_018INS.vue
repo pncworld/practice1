@@ -286,6 +286,7 @@
           :CalculateTaxColId="'curTax'"
           :CalculateTaxColId2="'curSupply'"
           :CalculateTaxColId3="'curTotal'"
+          :persistCalculateTax="true"
           :checkRowAuto="false"
           :setFooter="true"
           :checkRowAuto2="true"
@@ -294,6 +295,10 @@
           :documentTitle="'PUR02_018INS'"
           :checkRenderEditable="true"
           :rowStateeditable="false"
+          :setFooterColID="['dblCheckQty', 'curSupply', 'curTax', 'curTotal']"
+          :setFooterExpressions="['sum', 'sum', 'sum', 'sum']"
+          @realgridname="onPopupTopGridName"
+          @gridReady="onPopupTopGridName"
           :rowData="filteredrowData2"></Realgrid>
       </div>
       <div
@@ -356,6 +361,7 @@
           :CalculateTaxColId="'curTax'"
           :CalculateTaxColId2="'curSupply'"
           :CalculateTaxColId3="'curTotal'"
+          :persistCalculateTax="true"
           :searchColId3="['lngSupplierID']"
           :searchValue="searchValue2"
           :inputSignedDecimalColumn="'dblCheckQty'"
@@ -366,6 +372,10 @@
           :checkRenderEditable="true"
           :searchColId="'lngStockID,strStockName'"
           :searchWord3="scond9"
+          :setFooterColID="['dblCheckQty', 'curSupply', 'curTax', 'curTotal']"
+          :setFooterExpressions="['sum', 'sum', 'sum', 'sum']"
+          @realgridname="onPopupBottomGridName"
+          @gridReady="onPopupBottomGridName"
           :rowData="rowData3"></Realgrid>
       </div>
     </div>
@@ -376,7 +386,11 @@
     class="fixed bottom-2 right-2 w-[52%] h-[85%] flex items-stretch justify-center bg-black/100 z-50 p-2 box-border">
     <div
       class="bg-white p-6 rounded-xl shadow-lg w-full h-full max-h-full border border-black flex flex-col min-h-0 min-w-0 box-border">
-      <div class="flex shrink-0 justify-end gap-3">
+      <div class="flex shrink-0 items-center justify-between gap-3">
+        <h2 class="text-base font-semibold">
+          {{ String(scond7) === "2" ? "즐겨찾기 자재 추가" : "최근등록 자재 추가" }}
+        </h2>
+        <div class="flex gap-3">
         <button
           type="button"
           class="whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none"
@@ -389,6 +403,7 @@
           @click="openpopup2 = false">
           닫기
         </button>
+        </div>
       </div>
       <div
         class="mt-3 border border-black overflow-hidden shrink-0">
@@ -401,17 +416,16 @@
           </div>
           <div
             class="flex items-center pl-2 pr-2 py-1.5 border-b border-r border-black bg-white min-w-0 min-h-9">
-            <select
-              name=""
-              id=""
-              class="w-full h-7 border border-gray-600 px-2 text-sm min-w-0"
-              @change="setSearchValue"
-              v-model="sscond">
-              <option value="-1">전체</option>
-              <option :value="i.lngGenericID" v-for="i in optionList2">
-                {{ i.strGenericName }}
-              </option>
-            </select>
+            <div class="pur-picker-vs min-w-0 w-full">
+              <v-select
+                v-model="sscond"
+                :options="pickerGenericOptions"
+                label="strGenericName"
+                :reduce="(opt) => String(opt?.lngGenericID ?? '-1')"
+                :clearable="false"
+                append-to-body
+                class="style-chooser h-7 w-full text-sm" />
+            </div>
           </div>
           <div
             class="border-b border-r border-black bg-white shrink-0 min-h-9"
@@ -422,13 +436,13 @@
           </div>
           <div
             class="flex items-center pl-2 pr-2 py-1.5 border-b border-black bg-white min-w-0 min-h-9">
-            <BusinessClient
-              :defaultName="''"
-              :defaultNm="'전체'"
-              :toolbarStretch="true"
-              :setDynamicClass="'!w-full !min-w-0 !max-w-none !h-7 shrink border border-gray-600 px-2 text-sm'"
-              :setDynamicClass2="'!mt-0 !items-center !gap-0 min-w-0 w-full [&>div:first-child]:hidden'"
-              @SupplierId="SupplierId"></BusinessClient>
+            <div class="pur-picker-vs min-w-0 w-full">
+              <BusinessClient2
+                compact-search-bar
+                :defaultName="''"
+                :defaultNm="'전체'"
+                @SupplierId="SupplierId3" />
+            </div>
           </div>
           <div
             class="bg-gray-100 text-sm font-semibold flex items-center justify-center px-2 py-2 border-b border-r border-black">
@@ -451,13 +465,18 @@
       </div>
       <div
         class="mt-1 flex min-h-0 flex-1 flex-col overflow-hidden pb-1">
-        <div class="h-full min-h-0 w-full min-w-0">
+        <div
+          class="h-full min-h-0 w-full min-w-0"
+          @mousedown="onStockPickerMouseDown">
         <Realgrid
           :key="stockPickerRealgridKey"
           :progname="'PUR03_035INS_VUE'"
           :progid="4"
           :searchWord3="sscond2"
           :headerCheckBar="'lngCheck,lngFavorites'"
+          :checkAbleExpressionCol="'lngCheck'"
+          :checkAbleExpressionCol2="'lngPickerAddable'"
+          :checkAbleExpressionVal="'1'"
           @updatedRowData="updatedRowData4"
           :rowStateeditable="false"
           :checkRenderEditable="true"
@@ -465,10 +484,14 @@
           :checkRowAuto2="true"
           @clickedRowData="clickedRowData"
           @checkedRowData2="checkedRowData2"
+          @checkAllorNot="onStockPickerCheckAll"
           :checkedRowData2Col="'lngFavorites'"
+          :emitCheckedRowData2AsJson="true"
           :searchColId="'lngStockID,strStockName'"
           :searchColId3="['lngGenericID', 'lngSupplierID']"
           :searchValue="searchValue"
+          @realgridname="onStockPickerGridName"
+          @gridReady="onStockPickerGridName"
           :rowData="rowData4"></Realgrid>
         </div>
       </div>
@@ -513,6 +536,7 @@ import PickStore from "@/components/pickStore.vue";
  */
 
 import Realgrid from "@/components/realgrid.vue";
+import { rgGetInstance } from "@/components/realgridInstanceRegistry.js";
 /**
  *  페이지로그 자동 입력
  *  */
@@ -527,7 +551,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { nextTick, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -609,6 +633,10 @@ const cond6 = ref("");
 const storeCd = ref(0);
 const optionList = ref([]);
 const optionList2 = ref([]);
+const pickerGenericOptions = computed(() => [
+  { lngGenericID: "-1", strGenericName: "전체" },
+  ...(optionList2.value || []),
+]);
 const optionList3 = ref([]);
 const handleStoreCd = async (e) => {
   storeCd.value = e;
@@ -634,7 +662,11 @@ const supplierid = ref("0");
 const suppliernm = ref("");
 const SupplierId = (e) => {
   supplierid.value = e;
-  searchValue.value = [searchValue.value[0], e == "0" ? "-1" : e];
+};
+const SupplierId3 = (e) => {
+  const v = e == null || e === "" || e == "0" ? "-1" : e;
+  searchValue.value = [searchValue.value[0], v];
+  if (openpopup2.value) clearStockPickerChecks(true);
 };
 const SupplierNm = (e) => {
   suppliernm.value = e;
@@ -659,6 +691,26 @@ const searchButton = async () => {
 
 const updatedrowdata = ref([]);
 const updatedrowdata2 = ref([]);
+
+/** 화면 계산과 저장값을 맞춤: 공급가=floor(단가×매입수량), 과세(01)만 부가세 10% */
+function applyPartCheckQtyAmounts(item) {
+  const unit = Number(item?.curUnitPrice || 0);
+  const qty = Number(item?.dblCheckQty || 0);
+  const supply = Math.floor(unit * qty);
+  let taxType = item?.lngTaxType;
+  if (taxType == null || String(taxType).trim() === "") {
+    const oldSupply = Number(item?.curSupply || 0);
+    const oldTax = Number(item?.curTax || 0);
+    taxType = oldSupply !== 0 && oldTax === 0 ? "00" : "01";
+  }
+  const tax = String(taxType) === "01" ? Math.floor(supply * 0.1) : 0;
+  return {
+    ...item,
+    curSupply: supply,
+    curTax: tax,
+    curTotal: Math.floor(supply + tax),
+  };
+}
 /**
 
 /**
@@ -809,6 +861,10 @@ const showStockList = async () => {
 };
 
 const sscond = ref("-1");
+watch(sscond, (v) => {
+  searchValue.value = [String(v ?? "-1"), searchValue.value[1]];
+  if (openpopup2.value) clearStockPickerChecks(true);
+});
 const sscond2 = ref("");
 
 const rowData4 = ref([]);
@@ -822,15 +878,17 @@ const searchButton2 = async () => {
       storeCd2.value,
       scond4.value,
       3,
-      ""
+      getFavoriteListUdate()
     );
-
+    const fav = await loadFavoriteStockList();
+    stockPickerFavoriteIds.value = fav.ids;
     console.log(res);
-    store.state.loading = false;
-    updatedrowdata4.value = [];
-    rowData4.value = res.data.List;
+    applyStockPickerRows(res?.data?.List ?? []);
   } catch (error) {
-    store.state.loading = false;
+    stockPickerFavoriteIds.value = new Set();
+    stockPickerAllRows.value = [];
+    rowData4.value = [];
+    updatedrowdata4.value = [];
   } finally {
     store.state.loading = false;
   }
@@ -840,23 +898,307 @@ const searchValue = ref(["-1", "-1"]);
 
 const setSearchValue = (e) => {
   searchValue.value = [e.target.value, searchValue.value[1]];
+  if (openpopup2.value) clearStockPickerChecks(true);
 };
 
 const searchWord = (e) => {
   sscond2.value = e.target.value;
+  if (openpopup2.value) clearStockPickerChecks(true);
 };
 
-const checkedRowData2 = async (e) => {
-  if (!Array.isArray(e) || e.length < 4) return;
-  console.log(e);
-  const res = await saveFavoriteStockItemBypart(
+const isFavoriteCheckOn = (checked) => {
+  if (checked === true || checked === 1 || checked === "1") return true;
+  const s = String(checked ?? "")
+    .trim()
+    .toLowerCase();
+  return s === "1" || s === "true" || s === "y" || s === "on";
+};
+
+const favoriteValueFromChecked = (checked) =>
+  isFavoriteCheckOn(checked) ? 0 : 1;
+
+const saveFavoriteForStock = async (stockId, value) => {
+  if (!stockId) return;
+  await saveFavoriteStockItemBypart(
     store.state.userData.lngStoreGroup,
     storeCd2.value,
-    e[3],
-    e[1] == true ? 0 : 1,
+    stockId,
+    value,
     scond4.value
   );
-  console.log(res);
+};
+
+/** DIV=2 즐겨찾기 목록 — 팝업에 행·체크 표시 */
+const loadFavoriteStockList = async () => {
+  try {
+    const res = await getStockItemListWithFavorite(
+      store.state.userData.lngStoreGroup,
+      storeCd2.value,
+      scond4.value,
+      2,
+      getFavoriteListUdate()
+    );
+    const rows = Array.isArray(res?.data?.List) ? res.data.List : [];
+    const ids = new Set();
+    for (const row of rows) {
+      const id = getStockId(row);
+      if (id) ids.add(id);
+    }
+    return { ids, rows };
+  } catch (_) {
+    return { ids: new Set(), rows: [] };
+  }
+};
+
+/** 팝업에서 즐겨찾기 제외한 자재. API가 아직 옛 목록을 줘도 하단에 다시 넣지 않음 */
+const unfavoritedStockIds = ref(new Set());
+
+const isStockPickerPopupAddedRow = (row) =>
+  row?.lngFromStockPickerAdd === 1 ||
+  row?.lngFromStockPickerAdd === true ||
+  row?.lngFromStockPickerAdd === "1";
+
+const isUnfavoritedStockId = (id) => {
+  const s = String(id ?? "").trim();
+  if (!s) return false;
+  return [...unfavoritedStockIds.value].some((d) => String(d) === s);
+};
+
+const markStocksUnfavorited = (stockIds) => {
+  const next = new Set(unfavoritedStockIds.value);
+  for (const id of stockIds || []) {
+    const s = String(id ?? "").trim();
+    if (s) next.add(s);
+  }
+  unfavoritedStockIds.value = next;
+};
+
+const isBottomStockSelectedToKeep = (row, sid) => {
+  if (isStockPickerPopupAddedRow(row)) return true;
+  const book = sid ? orderBookByStock.value?.[sid] : null;
+  if (book && hasCheckQty(book)) return true;
+  return false;
+};
+
+const rememberPickerFavorite = (stockId, checked) => {
+  if (!stockId) return;
+  const next = new Set(stockPickerFavoriteIds.value);
+  if (isFavoriteCheckOn(checked)) {
+    next.add(stockId);
+    unfavoritedStockIds.value = new Set(
+      [...unfavoritedStockIds.value].filter((id) => String(id) !== String(stockId))
+    );
+  } else next.delete(stockId);
+  stockPickerFavoriteIds.value = next;
+};
+
+/** 자재목록이 즐겨찾기일 때 하단에서 즉시 제외. 팝업 그리드는 다시 깔지 않음 */
+const dropUnfavoritedFromBottomNow = (stockIds) => {
+  if (String(scond7.value) !== "2") return;
+  markStocksUnfavorited(stockIds);
+  const next = (rowData3.value || []).filter((r) => {
+    const sid = getStockId(r);
+    if (!sid || !isUnfavoritedStockId(sid)) return true;
+    return isBottomStockSelectedToKeep(r, sid);
+  });
+  suppressOrderBookMergeFromBottomGrid.value = true;
+  rowData3.value = next.map((r) => ({ ...r }));
+  updatedrowdata3.value = next.map((r) => ({ ...r }));
+  nextTick(() => {
+    suppressOrderBookMergeFromBottomGrid.value = false;
+  });
+};
+
+const mapBottomFromFavoriteApi = (list, prevRows) => {
+  const prevBySid = {};
+  for (const r of prevRows || []) {
+    const sid = getStockId(r);
+    if (sid) prevBySid[sid] = r;
+  }
+  return (Array.isArray(list) ? list : [])
+    .filter((item) => {
+      const sid = getStockId(item);
+      if (!sid || !isUnfavoritedStockId(sid)) return true;
+      return isBottomStockSelectedToKeep(prevBySid[sid] || item, sid);
+    })
+    .map((item) => {
+      const prev = prevBySid[getStockId(item)];
+      return {
+        ...item,
+        dblCheckQty: prev?.dblCheckQty ?? item.dblOrderQty,
+        lngCheck: prev?.lngCheck ?? item.lngCheck ?? item.LngCheck ?? "0",
+        checkbox: prev?.checkbox ?? item.checkbox ?? false,
+        ...(prev && isStockPickerPopupAddedRow(prev)
+          ? { lngFromStockPickerAdd: 1 }
+          : {}),
+      };
+    });
+};
+
+const resolvePickerStockId = (payload, dataRow) => {
+  if (payload && typeof payload === "object") {
+    const fromObj = getStockId(payload);
+    if (fromObj) return fromObj;
+    if (Array.isArray(payload) && payload.length >= 4) {
+      const fromArr = String(payload[3] ?? "").trim();
+      if (fromArr) return fromArr;
+    }
+  }
+  if (dataRow == null || dataRow < 0) return "";
+  try {
+    const row = rgGetInstance(stockPickerGridName.value)?.dataProvider?.getJsonRow?.(
+      dataRow
+    );
+    return getStockId(row);
+  } catch (_) {
+    return "";
+  }
+};
+
+let syncingPickerFavoriteCells = false;
+
+const pickerIdIsFavorite = (id) => {
+  const s = String(id ?? "").trim();
+  if (!s) return false;
+  for (const x of stockPickerFavoriteIds.value) {
+    const t = String(x ?? "").trim();
+    if (!t) continue;
+    if (t === s) return true;
+    const na = Number(s);
+    const nb = Number(t);
+    if (Number.isFinite(na) && Number.isFinite(nb) && na === nb) return true;
+  }
+  return false;
+};
+
+/** 즐겨찾기 셀을 저장된 즐겨찾기만 켜 둔다. onlyOutsideFilter면 지금 조건 밖 행만 */
+const applyPickerFavoriteCells = (onlyOutsideFilter) => {
+  syncingPickerFavoriteCells = true;
+  try {
+    const inst = rgGetInstance(stockPickerGridName.value);
+    const dp = inst?.dataProvider;
+    const mapRow = (row) => {
+      if (!row) return row;
+      if (onlyOutsideFilter && rowMatchesPickerFilter(row)) return row;
+      const id = getStockId(row);
+      if (!id) return row;
+      return { ...row, lngFavorites: pickerIdIsFavorite(id) };
+    };
+    if (dp && typeof dp.getRowCount === "function") {
+      const n = dp.getRowCount();
+      try {
+        dp.beginUpdate?.();
+        for (let i = 0; i < n; i++) {
+          let row = null;
+          try {
+            row = dp.getJsonRow(i);
+          } catch (_) {
+            continue;
+          }
+          if (!row) continue;
+          if (onlyOutsideFilter && rowMatchesPickerFilter(row)) continue;
+          const id = getStockId(row);
+          if (!id) continue;
+          const on = pickerIdIsFavorite(id);
+          try {
+            if (isFavoriteCheckOn(dp.getValue(i, "lngFavorites")) !== on) {
+              dp.setValue(i, "lngFavorites", on);
+            }
+          } catch (_) {}
+        }
+      } finally {
+        try {
+          dp.endUpdate?.();
+        } catch (_) {}
+      }
+    }
+    stockPickerAllRows.value = (stockPickerAllRows.value || []).map(mapRow);
+    if (
+      Array.isArray(stockPickerLiveRows.value) &&
+      stockPickerLiveRows.value.length
+    ) {
+      stockPickerLiveRows.value = stockPickerLiveRows.value.map(mapRow);
+    }
+  } finally {
+    syncingPickerFavoriteCells = false;
+  }
+};
+
+const checkedRowData2 = async (payload, fieldName, dataRow, oldVal, newVal) => {
+  const col = String(fieldName || "").trim();
+  if (col && col !== "lngFavorites" && col !== "LngFavorites") return;
+  if (syncingPickerFavoriteCells) return;
+  const rowObj =
+    payload && typeof payload === "object" && !Array.isArray(payload)
+      ? payload
+      : null;
+  if (rowObj && !rowMatchesPickerFilter(rowObj)) return;
+  if (!rowObj && dataRow != null && dataRow >= 0) {
+    try {
+      const r = rgGetInstance(
+        stockPickerGridName.value
+      )?.dataProvider?.getJsonRow?.(dataRow);
+      if (r && !rowMatchesPickerFilter(r)) return;
+    } catch (_) {}
+  }
+  const stockId = resolvePickerStockId(payload, dataRow);
+  if (!stockId) return;
+  const favRaw =
+    newVal !== undefined && newVal !== null
+      ? newVal
+      : payload && typeof payload === "object" && !Array.isArray(payload)
+        ? payload.lngFavorites ?? payload.LngFavorites
+        : Array.isArray(payload)
+          ? payload[1]
+          : undefined;
+  rememberPickerFavorite(stockId, favRaw);
+  if (!isFavoriteCheckOn(favRaw)) {
+    dropUnfavoritedFromBottomNow([stockId]);
+  }
+  saveFavoriteForStock(stockId, favoriteValueFromChecked(favRaw)).catch(() => {});
+};
+
+/** 즐겨찾기 헤더 전체선택 — 화면에 보이는 행만 API 저장(행 단위 토글만 되면 전체가 빠지던 것) */
+const onStockPickerCheckAll = async (chk, fieldName) => {
+  const col = String(fieldName || "").trim();
+  if (col !== "lngFavorites" && col !== "LngFavorites") return;
+  const fallback =
+    stockPickerLiveRows.value.length > 0
+      ? stockPickerLiveRows.value
+      : rowData4.value;
+  const visible = getPickerVisibleRows(fallback);
+  const visibleIds = new Set(visible.map(getStockId).filter(Boolean));
+  if (visibleIds.size === 0) return;
+  const isOn = chk === true || chk === 1 || chk === "1";
+  const value = favoriteValueFromChecked(chk);
+  const next = new Set(stockPickerFavoriteIds.value);
+  for (const id of visibleIds) {
+    if (isOn) next.add(id);
+    else next.delete(id);
+  }
+  stockPickerFavoriteIds.value = next;
+  if (!isOn) {
+    markStocksUnfavorited([...visibleIds]);
+    dropUnfavoritedFromBottomNow([...visibleIds]);
+  } else {
+    unfavoritedStockIds.value = new Set(
+      [...unfavoritedStockIds.value].filter((id) => !visibleIds.has(String(id)))
+    );
+  }
+  applyPickerFavoriteCells(true);
+  store.state.loading = true;
+  try {
+    await Promise.allSettled(
+      visible.map((row) => {
+        const stockId = getStockId(row);
+        return stockId
+          ? saveFavoriteForStock(stockId, value)
+          : Promise.resolve();
+      })
+    );
+  } finally {
+    store.state.loading = false;
+  }
 };
 const tempColId = ref("");
 const clickedButtonCol = (e) => {
@@ -869,27 +1211,236 @@ const clickedRowData = (row) => {
   void row;
 };
 
-/** 자재추가 팝업에서 발주에 넣을 행 — lngCheck·checkbox 등 체크 상태 반영 */
-const isMaterialPickerRowSelected = (item) => {
-  if (item == null || typeof item !== "object" || Array.isArray(item))
-    return false;
-  const lc = item.lngCheck ?? item.LngCheck;
-  if (lc === true || lc === 1 || lc === "1") return true;
-  const cb = item.checkbox;
-  if (cb === true || cb === 1 || cb === "1") return true;
-  return false;
+const stockPickerAllRows = ref([]);
+const stockPickerFavoriteIds = ref(new Set());
+const stockPickerLiveRows = ref([]);
+const stockPickerCheckedIds = ref(new Set());
+const stockPickerGridName = ref("");
+const updatedrowdata4 = ref([]);
+let stockPickerAcceptChecks = false;
+
+const isLngCheckOn = (row) => {
+  if (!row || typeof row !== "object") return false;
+  const v = row.lngCheck;
+  return v === true || v === 1 || v === "1";
 };
 
-const updatedrowdata4 = ref([]);
+const onStockPickerMouseDown = () => {
+  stockPickerAcceptChecks = true;
+};
+
+const onStockPickerGridName = (name) => {
+  if (name) stockPickerGridName.value = name;
+};
+
+const rowMatchesPickerFilter = (row) => {
+  if (!row || typeof row !== "object") return false;
+  const generic = String(searchValue.value?.[0] ?? "-1");
+  const supplier = String(searchValue.value?.[1] ?? "-1");
+  if (generic !== "-1") {
+    const g = String(getRowVal(row, "lngGenericID", "LngGenericID") ?? "");
+    if (g !== generic) return false;
+  }
+  if (supplier !== "-1") {
+    const s = String(getRowVal(row, "lngSupplierID", "LngSupplierID") ?? "");
+    if (s !== supplier) return false;
+  }
+  const word = String(sscond2.value ?? "").trim();
+  if (word) {
+    const id = getStockId(row);
+    const name = String(getRowVal(row, "strStockName", "StrStockName") ?? "");
+    const w = word.toLowerCase();
+    if (!id.toLowerCase().includes(w) && !name.toLowerCase().includes(w)) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const getPickerVisibleRows = (fallbackRows) => {
+  const filtered = (Array.isArray(fallbackRows) ? fallbackRows : []).filter(
+    rowMatchesPickerFilter
+  );
+  const inst = rgGetInstance(stockPickerGridName.value);
+  const gv = inst?.gridView;
+  const dp = inst?.dataProvider;
+  if (gv && dp && typeof gv.getItemCount === "function") {
+    const out = [];
+    const n = gv.getItemCount();
+    for (let i = 0; i < n; i++) {
+      let dataRow = -1;
+      try {
+        dataRow = gv.getDataRow(i);
+      } catch (_) {
+        continue;
+      }
+      if (dataRow == null || dataRow < 0) continue;
+      let row = null;
+      try {
+        row = dp.getJsonRow(dataRow);
+      } catch (_) {
+        continue;
+      }
+      if (row && rowMatchesPickerFilter(row)) out.push(row);
+    }
+    if (out.length > 0) return out;
+  }
+  return filtered;
+};
+
+const collectPickerChecked = (rows) => {
+  const visible = getPickerVisibleRows(rows);
+  const next = new Set();
+  const checkedRows = [];
+  for (const row of visible) {
+    if (String(row?.lngPickerAddable ?? "1") === "0") continue;
+    if (!isLngCheckOn(row)) continue;
+    const id = getStockId(row);
+    if (!id) continue;
+    next.add(id);
+    checkedRows.push(row);
+  }
+  stockPickerCheckedIds.value = next;
+  updatedrowdata4.value = checkedRows;
+};
+
+const subGridStockIds = () => {
+  const ids = new Set();
+  for (const row of rowData3.value || []) {
+    const id = getStockId(row);
+    if (id) ids.add(id);
+  }
+  return ids;
+};
+
+/** 팝업 행 순서는 DIV=3(전체) 그대로. 즐겨찾기·이미 있는 품목을 맨 아래로 보내지 않는다. */
+const unionPickerSourceRows = (allList) =>
+  Array.isArray(allList) ? allList : [];
+
+const filterStockPickerList = (list) =>
+  (Array.isArray(list) ? list : []).filter((item) => getStockId(item) !== "");
+
+const normalizePickerRow = (item, inSubIds) => {
+  const ids = inSubIds || subGridStockIds();
+  const id = getStockId(item);
+  const fromRow = item?.lngFavorites ?? item?.LngFavorites;
+  const marked =
+    !isUnfavoritedStockId(id) &&
+    ((id !== "" && stockPickerFavoriteIds.value.has(id)) ||
+      isFavoriteCheckOn(fromRow));
+  const inSub = id !== "" && ids.has(id);
+  return {
+    ...item,
+    lngCheck: false,
+    checkbox: false,
+    lngFavorites: marked,
+    lngPickerAddable: inSub ? "0" : "1",
+  };
+};
+
+const applyStockPickerRows = (list) => {
+  stockPickerAcceptChecks = false;
+  stockPickerCheckedIds.value = new Set();
+  updatedrowdata4.value = [];
+  stockPickerLiveRows.value = [];
+  const inSubIds = subGridStockIds();
+  stockPickerAllRows.value = unionPickerSourceRows(list).map((item) =>
+    normalizePickerRow(item, inSubIds)
+  );
+  rowData4.value = filterStockPickerList(stockPickerAllRows.value);
+};
+
+/** 자재목록(최근등록/즐겨찾기)이 바뀌면, 열린 자재추가 팝업의 이미-있는-품목 잠금만 다시 맞춘다. */
+const refreshPickerAddableFromBottomGrid = () => {
+  if (!openpopup2.value) return;
+  const source =
+    stockPickerAllRows.value?.length > 0
+      ? stockPickerAllRows.value
+      : rowData4.value;
+  if (!Array.isArray(source) || source.length === 0) return;
+  const inSubIds = subGridStockIds();
+  stockPickerAllRows.value = source.map((r) => normalizePickerRow(r, inSubIds));
+  rowData4.value = filterStockPickerList(stockPickerAllRows.value);
+};
+
+const clearStockPickerChecks = (releaseFavoriteHeader = false) => {
+  stockPickerAcceptChecks = false;
+  stockPickerCheckedIds.value = new Set();
+  updatedrowdata4.value = [];
+  const inst = rgGetInstance(stockPickerGridName.value);
+  const gv = inst?.gridView;
+  const dp = inst?.dataProvider;
+  if (dp && typeof dp.getRowCount === "function") {
+    const n = dp.getRowCount();
+    try {
+      dp.beginUpdate?.();
+      for (let i = 0; i < n; i++) {
+        try {
+          const v = dp.getValue(i, "lngCheck");
+          if (v === true || v === 1 || v === "1") {
+            dp.setValue(i, "lngCheck", false);
+          }
+        } catch (_) {}
+      }
+    } finally {
+      try {
+        dp.endUpdate?.();
+      } catch (_) {}
+    }
+  }
+  if (gv) {
+    const headerFields = releaseFavoriteHeader
+      ? ["lngCheck", "lngFavorites"]
+      : ["lngCheck"];
+    for (const field of headerFields) {
+      try {
+        const col =
+          gv.columnByName?.(field) || gv.columnByField?.(field);
+        if (col) col.checked = false;
+      } catch (_) {}
+      try {
+        gv.setColumnProperty?.(field, "checked", false);
+      } catch (_) {}
+    }
+  }
+  if (releaseFavoriteHeader) applyPickerFavoriteCells(false);
+  stockPickerAllRows.value = (stockPickerAllRows.value || []).map((r) => ({
+    ...r,
+    lngCheck: false,
+  }));
+  if (Array.isArray(stockPickerLiveRows.value) && stockPickerLiveRows.value.length) {
+    stockPickerLiveRows.value = stockPickerLiveRows.value.map((r) => ({
+      ...r,
+      lngCheck: false,
+    }));
+  }
+};
+
 const updatedRowData4 = (e) => {
-  const incoming = Array.isArray(e) ? e : [];
-  updatedrowdata4.value = incoming.filter(isMaterialPickerRowSelected);
-  console.log(updatedrowdata4.value);
+  const rows = Array.isArray(e) ? e : [];
+  stockPickerLiveRows.value = rows;
+  if (!stockPickerAcceptChecks) {
+    updatedrowdata4.value = [];
+    stockPickerCheckedIds.value = new Set();
+    return;
+  }
+  collectPickerChecked(rows);
 };
 
 const rowData3 = ref([]);
-const addButton2 = () => {
-  if (updatedrowdata4.value.length == 0) {
+/** 하단 자재목록: 2=즐겨찾기 → 팝업 추가 시 즐겨찾기로 저장 */
+const isPopupFavoriteMode = () => String(scond7.value) === "2";
+const addButton2 = async () => {
+  const source = getPickerVisibleRows(
+    stockPickerLiveRows.value.length > 0
+      ? stockPickerLiveRows.value
+      : rowData4.value
+  );
+  const selected = source.filter((row) => {
+    const id = getStockId(row);
+    return id && (stockPickerCheckedIds.value.has(id) || isLngCheckOn(row));
+  });
+  if (selected.length === 0) {
     Swal.fire({
       title: "경고",
       text: "추가하실 자재를 선택해주세요.",
@@ -900,9 +1451,23 @@ const addButton2 = () => {
     return;
   }
 
-  const temprow = updatedrowdata4.value
-    .filter((item) => item && typeof item === "object" && !Array.isArray(item))
-    .map((item) => ({
+  const existing = [...(rowData3.value || [])];
+  const existingSids = subGridStockIds();
+  const additions = [];
+  let skippedExist = 0;
+  let skippedNoId = 0;
+  for (const item of selected) {
+    const sid = getStockId(item);
+    if (!sid) {
+      skippedNoId += 1;
+      continue;
+    }
+    if (existingSids.has(sid)) {
+      skippedExist += 1;
+      continue;
+    }
+    existingSids.add(sid);
+    additions.push({
       ...item,
       dblCheckQty: 0,
       curSupply: 0,
@@ -910,13 +1475,45 @@ const addButton2 = () => {
       curTotal: 0,
       lngCheck: "0",
       checkbox: false,
-    }));
+      lngFromStockPickerAdd: 1,
+      ...(isPopupFavoriteMode() ? { lngFavorites: true } : {}),
+    });
+  }
 
-  rowData3.value = [...rowData3.value, ...temprow];
+  if (additions.length === 0) {
+    await Swal.fire({
+      title: "안내",
+      text:
+        skippedNoId > 0 && skippedExist === 0
+          ? "선택한 품목의 자재코드를 확인할 수 없습니다."
+          : "선택한 품목은 이미 자재목록에 있습니다.",
+      icon: "info",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  rowData3.value = [...existing, ...additions];
+  if (isPopupFavoriteMode()) {
+    await Promise.allSettled(
+      additions.map((row) => {
+        const id = getStockId(row);
+        if (!id) return Promise.resolve();
+        rememberPickerFavorite(id, true);
+        return saveFavoriteForStock(id, favoriteValueFromChecked(true));
+      })
+    );
+  }
   /** PUR03_035INS와 동일: 추가 후 팝업 유지 — 연속 추가 후 사용자가 닫기로 닫음 */
-  nextTick(() => {
-    updatedRowData3(rowData3.value);
-  });
+  await nextTick();
+  updatedRowData3(rowData3.value);
+  const inSubIds = subGridStockIds();
+  stockPickerAllRows.value = (stockPickerAllRows.value || []).map((r) =>
+    normalizePickerRow(r, inSubIds)
+  );
+  rowData4.value = filterStockPickerList(stockPickerAllRows.value);
+  await nextTick();
+  clearStockPickerChecks();
 };
 
 const searchButton3 = async (e) => {
@@ -933,25 +1530,15 @@ const searchButton3 = async (e) => {
       e.target.value,
       getFavoriteListUdate()
     );
-    const list = res.data?.List ?? [];
-    if (list.length > 0) {
-      updatedrowdata3.value = list.map((item) => ({
-        ...item,
-        dblCheckQty: item.dblOrderQty,
-        lngCheck: item.lngCheck ?? item.LngCheck ?? "0",
-        checkbox: item.checkbox ?? false,
-      }));
-      rowData3.value = list.map((item) => ({
-        ...item,
-        dblCheckQty: item.dblOrderQty,
-        lngCheck: item.lngCheck ?? item.LngCheck ?? "0",
-        checkbox: item.checkbox ?? false,
-      }));
-    } else {
-      updatedrowdata3.value = list;
-      rowData3.value = list;
-    }
+    const list = mapBottomFromFavoriteApi(
+      res.data?.List ?? [],
+      rowData3.value || []
+    );
+    updatedrowdata3.value = list.map((item) => ({ ...item }));
+    rowData3.value = list;
   } catch (error) {}
+  await nextTick();
+  refreshPickerAddableFromBottomGrid();
 };
 
 const onPopupToolbarScond7Change = async (e) => {
@@ -1005,6 +1592,146 @@ const popupTopOrderGridWrap = ref(null);
 const popupOrderHeaderActionsWrap = ref(null);
 const popupMaterialToolbarWrap = ref(null);
 const popupBottomMaterialGridWrap = ref(null);
+const popupTopGridName = ref("");
+const popupBottomGridName = ref("");
+const ORDER_QTY_FIELD = "dblCheckQty";
+let suppressBottomPatchFromTop = false;
+/** 하단 매입수량 엔터·화살표 이동 중 rowData3 재할당 금지(setRows면 편집·이동이 끊김) */
+let suppressBottomSelfReload = false;
+
+const qtyEditorText = (grid, event) => {
+  try {
+    const v = grid.getEditValue?.();
+    if (v !== undefined && v !== null) return String(v);
+  } catch (_) {}
+  const el =
+    event?.target && typeof event.target.value === "string"
+      ? event.target
+      : document.activeElement;
+  return el && typeof el.value === "string" ? el.value : "";
+};
+
+const isQtyDecimalKeyAllowed = (grid, event) => {
+  const key = event?.key ?? "";
+  if (!key || key.length !== 1) return true;
+  if (event?.ctrlKey || event?.metaKey || event?.altKey) return true;
+  const text = qtyEditorText(grid, event);
+  const el =
+    event?.target?.selectionStart != null
+      ? event.target
+      : document.activeElement;
+  const start =
+    typeof el?.selectionStart === "number" ? el.selectionStart : text.length;
+  const end =
+    typeof el?.selectionEnd === "number" ? el.selectionEnd : text.length;
+  const next = text.slice(0, start) + key + text.slice(end);
+  if (key === ".") return next.split(".").length <= 2;
+  if (key >= "0" && key <= "9") {
+    const dot = next.indexOf(".");
+    if (dot >= 0 && next.slice(dot + 1).length > 2) return false;
+    return true;
+  }
+  return false;
+};
+
+const openOrderQtyEditor = (grid, dataRow) => {
+  const open = () => {
+    try {
+      grid.setCurrent({ dataRow, fieldName: ORDER_QTY_FIELD });
+    } catch (_) {}
+    requestAnimationFrame(() => {
+      try {
+        grid.showEditor?.();
+      } catch (_) {}
+    });
+  };
+  nextTick(open);
+};
+
+const bindOrderQtyNav = (gridName) => {
+  const gv = rgGetInstance(gridName)?.gridView;
+  if (!gv) return;
+  try {
+    if (gv.editOptions) {
+      gv.editOptions.enterToNextRow = false;
+      gv.editOptions.crossWhenExitLast = false;
+    }
+  } catch (_) {}
+  gv.onKeyDown = function (grid, event) {
+    const key = event?.key ?? event?.keyCode ?? event;
+    const cur = grid.getCurrent?.() || {};
+    const field = cur.fieldName || cur.column || "";
+    if (field === ORDER_QTY_FIELD && !isQtyDecimalKeyAllowed(grid, event)) {
+      if (event?.preventDefault) event.preventDefault();
+      return false;
+    }
+    const isEnter = key === "Enter" || key === 13;
+    const isUp = key === "ArrowUp" || key === 38;
+    const isDown = key === "ArrowDown" || key === 40;
+    if (!isEnter && !isUp && !isDown) return true;
+    if (field !== ORDER_QTY_FIELD) return true;
+
+    let itemIndex = cur.itemIndex;
+    if (itemIndex == null || itemIndex < 0) {
+      try {
+        itemIndex = grid.getItemIndex?.(cur.dataRow);
+      } catch (_) {
+        itemIndex = cur.dataRow;
+      }
+    }
+    const itemCount = grid.getItemCount?.() ?? 0;
+    let nextItem = itemIndex;
+    if (isEnter || isDown) nextItem = itemIndex + 1;
+    else nextItem = itemIndex - 1;
+
+    let curDataRow = cur.dataRow;
+    if (curDataRow == null || curDataRow < 0) {
+      try {
+        curDataRow = grid.getDataRow?.(itemIndex);
+      } catch (_) {
+        curDataRow = itemIndex;
+      }
+    }
+    const isTopGrid = gridName === popupTopGridName.value;
+    if (isTopGrid) suppressBottomPatchFromTop = true;
+    else suppressBottomSelfReload = true;
+    try {
+      grid.commit?.();
+    } catch (_) {}
+    if (isTopGrid) {
+      nextTick(() => {
+        suppressBottomPatchFromTop = false;
+      });
+    } else {
+      nextTick(() => {
+        suppressBottomSelfReload = false;
+      });
+    }
+    if (nextItem < 0 || nextItem >= itemCount) {
+      openOrderQtyEditor(grid, curDataRow);
+      if (event?.preventDefault) event.preventDefault();
+      return false;
+    }
+    let nextDataRow = nextItem;
+    try {
+      nextDataRow = grid.getDataRow?.(nextItem);
+    } catch (_) {}
+    if (nextDataRow == null || nextDataRow < 0) nextDataRow = nextItem;
+    openOrderQtyEditor(grid, nextDataRow);
+    if (event?.preventDefault) event.preventDefault();
+    return false;
+  };
+};
+
+const onPopupTopGridName = (name) => {
+  if (name) popupTopGridName.value = name;
+  bindOrderQtyNav(popupTopGridName.value);
+};
+
+const onPopupBottomGridName = (name) => {
+  if (name) popupBottomGridName.value = name;
+  bindOrderQtyNav(popupBottomGridName.value);
+};
 /** 수정(더블클릭) 시 getStockCheckDetail 원본 행 — 하단·상단이 orderBook 축약으로 비지 않게 유지 */
 const editModeDetailSnapshot2 = ref([]);
 
@@ -1025,8 +1752,15 @@ const getRowVal = (r, ...keys) => {
   return undefined;
 };
 
+const STOCK_ID_KEYS = ["lngstockid", "stock_id", "stockid"];
+
 const getStockId = (row) => {
-  if (!row || typeof row !== "object") return "";
+  if (row == null) return "";
+  if (Array.isArray(row)) {
+    const v = row.lngStockID ?? row.LngStockID ?? row[0];
+    if (v !== undefined && v !== null && v !== "") return String(v).trim();
+  }
+  if (typeof row !== "object") return "";
   const candidates = [
     row.lngStockID,
     row.lngStockId,
@@ -1038,6 +1772,10 @@ const getStockId = (row) => {
   ];
   for (const v of candidates) {
     if (v !== undefined && v !== null && v !== "") return String(v).trim();
+  }
+  for (const [k, v] of Object.entries(row)) {
+    if (v === undefined || v === null || v === "") continue;
+    if (STOCK_ID_KEYS.includes(String(k).toLowerCase())) return String(v).trim();
   }
   return "";
 };
@@ -1412,9 +2150,18 @@ const updatedRowData3 = (e) => {
     return;
   }
   updatedrowdata3.value = incoming;
-  /** 신규: :rowData="rowData3" 가 stale 이면 체크 직후 patchRowData3 가 이전 행으로 덮어 체크가 풀림 → incoming 과 동기화 */
-  if (currentEdit.value === true) {
-    rowData3.value = incoming.map((r) => ({ ...r }));
+  /**
+   * 신규: :rowData="rowData3" 가 stale 이면 체크 직후 patchRowData3 가 이전 행으로 덮어 체크가 풀림 → incoming 과 동기화.
+   * 매입수량 엔터·화살표 이동 중에는 건너뛴다. setRows가 편집기와 다음 행 이동을 끊는다.
+   */
+  if (currentEdit.value === true && !suppressBottomSelfReload) {
+    rowData3.value = incoming
+      .filter((r) => {
+        const sid = getStockId(r);
+        if (!sid || !isUnfavoritedStockId(sid)) return true;
+        return isBottomStockSelectedToKeep(r, sid);
+      })
+      .map((r) => ({ ...r }));
   }
 
   const book = { ...orderBookByStock.value };
@@ -1463,9 +2210,11 @@ const updatedRowData3 = (e) => {
       rowData2.value = mergedRows.map((r) => ({ ...r }));
       applyScondPriceToDisplayOnly();
       rebuildOrderBookFromRows(filteredrowData2.value);
-      rowData3.value = [];
-      updatedrowdata3.value = [];
-      patchRowData3QtyFromOrderBook();
+      if (!suppressBottomSelfReload) {
+        rowData3.value = [];
+        updatedrowdata3.value = [];
+        patchRowData3QtyFromOrderBook();
+      }
       return;
     }
     const row2BySid = {};
@@ -1502,10 +2251,12 @@ const updatedRowData3 = (e) => {
     updatedrowdata2.value = mergedTop.map((r) => ({ ...r }));
     applyScondPriceToDisplayOnly();
     rebuildOrderBookFromRows(filteredrowData2.value);
-    /** 수정: 035 발주상세와 같이 하단 자재목록(rowData3)은 비움 */
-    rowData3.value = [];
-    updatedrowdata3.value = [];
-    patchRowData3QtyFromOrderBook();
+    /** 수정: 035 발주상세와 같이 하단 자재목록(rowData3)은 비움. 수량 이동 중에는 하단 setRows 금지 */
+    if (!suppressBottomSelfReload) {
+      rowData3.value = [];
+      updatedrowdata3.value = [];
+      patchRowData3QtyFromOrderBook();
+    }
     return;
   }
 
@@ -1515,18 +2266,20 @@ const updatedRowData3 = (e) => {
   rowData2.value = mergedRows.map((r) => ({ ...r }));
   applyScondPriceToDisplayOnly();
   rebuildOrderBookFromRows(filteredrowData2.value);
-  patchRowData3QtyFromOrderBook();
+  if (!suppressBottomSelfReload) {
+    patchRowData3QtyFromOrderBook();
+  }
 };
 
-/** 상단 emit — 상→하 */
+/** 상단 emit — 상→하.
+ * filteredrowData2/rowData2 재할당 금지(setRows 되면 매입수량 엔터 이동이 끊김).
+ * 엔터·화살표 이동 중에는 하단 patch 생략(하단이 포커스를 가져감). */
 const updatedRowData2 = (newValue) => {
   const arr = Array.isArray(newValue) ? newValue : [];
   updatedrowdata2.value = arr;
-  rowData2.value = arr.map((r) => ({ ...r }));
-  rebuildOrderBookFromRows(rowData2.value);
+  rebuildOrderBookFromRows(arr);
+  if (suppressBottomPatchFromTop) return;
   patchRowData3QtyFromOrderBook();
-  applyScondPriceToDisplayOnly();
-  rebuildOrderBookFromRows(filteredrowData2.value);
 };
 
 const isBottomMaterialRemoveChecked = (item) => {
@@ -1726,22 +2479,24 @@ const saveButton2 = async () => {
 
   if (currentEdit.value == false) {
     try {
-      const checkseqs = updatedrowdata2.value
+      const saveRows = (updatedrowdata2.value || []).map(applyPartCheckQtyAmounts);
+      updatedrowdata2.value = saveRows;
+      const checkseqs = saveRows
         .map((item) => item.lngCheckSeq)
         .join("\u200b");
-      const dblcheckqtys = updatedrowdata2.value
+      const dblcheckqtys = saveRows
         .map((item) => item.dblCheckQty)
         .join("\u200b");
-      const unitprice = updatedrowdata2.value
+      const unitprice = saveRows
         .map((item) => item.curUnitPrice)
         .join("\u200b");
-      const supplys = updatedrowdata2.value
+      const supplys = saveRows
         .map((item) => item.curSupply)
         .join("\u200b");
-      const taxs = updatedrowdata2.value
+      const taxs = saveRows
         .map((item) => item.curTax)
         .join("\u200b");
-      const comments = updatedrowdata2.value
+      const comments = saveRows
         .map((item) => item.strComments)
         .join("\u200b");
       const res = await saveStockMasterDetailByPart(
@@ -1756,7 +2511,8 @@ const saveButton2 = async () => {
         supplys,
         taxs,
         comments,
-        store.state.userData.lngSequence
+        store.state.userData.lngSequence,
+        (scond3.value || "").replaceAll("-", "")
       );
 
       console.log(res);
@@ -1785,25 +2541,27 @@ const saveButton2 = async () => {
     } catch (error) {}
   } else {
     try {
-      const supplierids = updatedrowdata2.value
+      const saveRows = (updatedrowdata2.value || []).map(applyPartCheckQtyAmounts);
+      updatedrowdata2.value = saveRows;
+      const supplierids = saveRows
         .map((item) => item.lngSupplierID)
         .join("\u200b");
-      const stockids = updatedrowdata2.value
+      const stockids = saveRows
         .map((item) => item.lngStockID)
         .join("\u200b");
-      const orderqtys = updatedrowdata2.value
+      const orderqtys = saveRows
         .map((item) => item.dblCheckQty)
         .join("\u200b");
-      const unitprices = updatedrowdata2.value
+      const unitprices = saveRows
         .map((item) => item.curUnitPrice)
         .join("\u200b");
-      const supplys = updatedrowdata2.value
+      const supplys = saveRows
         .map((item) => item.curSupply)
         .join("\u200b");
-      const taxes = updatedrowdata2.value
+      const taxes = saveRows
         .map((item) => item.curTax)
         .join("\u200b");
-      const orderComments = updatedrowdata2.value
+      const orderComments = saveRows
         .map((item) => item.strComments)
         .join("\u200b");
       const res = await saveStockMasterDetailByPart2(
@@ -1953,33 +2711,12 @@ const searchButton4 = async (e, opts = {}) => {
       scond7.value,
       getFavoriteListUdate()
     );
-    //console.log(res);
-    if (res.data.List.length > 0) {
-      updatedrowdata3.value = res.data.List.map((item) => ({
-        ...item,
-        dblCheckQty: item.dblOrderQty,
-        lngCheck: item.lngCheck ?? item.LngCheck ?? "0",
-        checkbox: item.checkbox ?? false,
-      }));
-
-      rowData3.value = res.data.List.map((item) => ({
-        ...item,
-        dblCheckQty: item.dblOrderQty,
-        lngCheck: item.lngCheck ?? item.LngCheck ?? "0",
-        checkbox: item.checkbox ?? false,
-      }));
-    } else {
-      updatedrowdata3.value = (res.data.List || []).map((item) => ({
-        ...item,
-        lngCheck: item.lngCheck ?? item.LngCheck ?? "0",
-        checkbox: item.checkbox ?? false,
-      }));
-      rowData3.value = (res.data.List || []).map((item) => ({
-        ...item,
-        lngCheck: item.lngCheck ?? item.LngCheck ?? "0",
-        checkbox: item.checkbox ?? false,
-      }));
-    }
+    const list = mapBottomFromFavoriteApi(
+      res.data?.List ?? [],
+      rowData3.value || []
+    );
+    updatedrowdata3.value = list.map((item) => ({ ...item }));
+    rowData3.value = list;
   } catch (error) {
   } finally {
     if (preserveTopOrders) {
@@ -2019,7 +2756,11 @@ watch(openpopup2, async (isOpen, wasOpen) => {
 
   const extras = prevRowData3.filter((r) => {
     const id = getStockId(r);
-    return id !== "" && !apiIds.has(id);
+    if (!id || apiIds.has(id)) return false;
+    if (isUnfavoritedStockId(id) && !isBottomStockSelectedToKeep(r, id)) {
+      return false;
+    }
+    return isBottomStockSelectedToKeep(r, id);
   });
 
   if (extras.length === 0) return;
@@ -2035,6 +2776,7 @@ const initGrid2 = () => {
   scond.value = "01";
   scond2.value = "";
   scond3.value = "";
+  unfavoritedStockIds.value = new Set();
   scond4.value = "0";
   scond5.value = "";
 
@@ -2169,56 +2911,58 @@ const setRowData2 = (e) => {
 
 const deleteButton = async () => {
   try {
-    const groupcds = updatedrowdata.value
-      .filter((item) => item.lngCheck == true)
-      .map((item) => item.lngStoreGroup)
-      .join("\u200b");
-    const storeCds = updatedrowdata.value
-      .filter((item) => item.lngCheck == true)
-      .map((item) => item.lngStoreCode)
-      .join("\u200b");
-    const checknos = updatedrowdata.value
-      .filter((item) => item.lngCheck == true)
-      .map((item) => item.strCheckNo)
-      .join("\u200b");
-    const ordernos = updatedrowdata.value
-      .filter((item) => item.lngCheck == true)
-      .map((item) => item.strOrderNo)
-      .join("\u200b");
-
-    const res = await deleteStockListBypart(
-      groupcds,
-      storeCds,
-      checknos,
-      "",
-      ordernos,
-      "",
-      "",
-      1,
-      1
+    const checked = (updatedrowdata.value || []).filter(
+      (item) => item.lngCheck == true
     );
+    /** deleteStockListBypart는 전표 1건만 받는다. 여러 건을 \u200b로 붙이면 프로시저가 전표를 찾지 못한다. */
+    const targets =
+      checked.length > 0
+        ? checked
+        : [
+            {
+              lngStoreGroup: "",
+              lngStoreCode: "",
+              strCheckNo: "",
+              strOrderNo: "",
+            },
+          ];
 
-    console.log(res);
-    if (res.data.RESULT_CD == "00") {
-      await Swal.fire({
-        title: "성공",
-        text: "삭제에 성공하였습니다.",
-        icon: "success",
+    for (const item of targets) {
+      const res = await deleteStockListBypart(
+        item.lngStoreGroup ?? "",
+        item.lngStoreCode ?? "",
+        item.strCheckNo ?? "",
+        "",
+        item.strOrderNo ?? "",
+        "",
+        "",
+        1,
+        1
+      );
 
-        confirmButtonText: "확인",
-      });
-      openpopup.value = false;
-      openpopup2.value = false;
-      searchButton();
-    } else {
-      await Swal.fire({
-        title: "실패",
-        text: "삭제에 실패하였습니다.",
-        icon: "error",
+      if (res.data.RESULT_CD != "00") {
+        await Swal.fire({
+          title: "실패",
+          text: "삭제에 실패하였습니다.",
+          icon: "error",
 
-        confirmButtonText: "확인",
-      });
+          confirmButtonText: "확인",
+        });
+        if (checked.length > 1) searchButton();
+        return;
+      }
     }
+
+    await Swal.fire({
+      title: "성공",
+      text: "삭제에 성공하였습니다.",
+      icon: "success",
+
+      confirmButtonText: "확인",
+    });
+    openpopup.value = false;
+    openpopup2.value = false;
+    searchButton();
   } catch (error) {}
 };
 </script>
@@ -2377,6 +3121,64 @@ const deleteButton = async () => {
 
 .pur018-bc-slot :deep(> div.flex.items-center) {
   margin-top: 0;
+}
+
+/* 자재추가 팝업 콤보 — 칸 안 전체 폭·테두리(원래 select와 동일), 펼침 스크롤은 공통 vs 스타일 */
+.pur-picker-vs {
+  width: 100%;
+  min-width: 0;
+}
+.pur-picker-vs :deep(.flex.text-base) {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0;
+  gap: 0 !important;
+}
+.pur-picker-vs :deep(.pickstore-vs-shell) {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: 1.75rem;
+  min-height: 1.75rem;
+  max-height: 1.75rem;
+  overflow: hidden;
+  border: 1px solid #4b5563;
+  border-radius: 0;
+  background: #fff;
+}
+.pur-picker-vs :deep(.v-select),
+.pur-picker-vs :deep(.style-chooser) {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+.pur-picker-vs :deep(.vs__dropdown-toggle) {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 1.75rem;
+  min-height: 1.75rem;
+  max-height: 1.75rem;
+  padding: 0 0.25rem;
+  border: 1px solid #4b5563 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+.pur-picker-vs :deep(.pickstore-vs-shell .vs__dropdown-toggle) {
+  border: 0 !important;
+}
+.pur-picker-vs :deep(.vs__selected),
+.pur-picker-vs :deep(.vs__search),
+.pur-picker-vs :deep(.vs__search::placeholder) {
+  margin: 0;
+  padding: 0 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 
 /* 팝업 매장명 — PUR03_035INS .store-name-cell (disabled v-select 검정·좌측 정렬) */

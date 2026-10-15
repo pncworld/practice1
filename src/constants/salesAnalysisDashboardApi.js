@@ -38,31 +38,27 @@ export const SALES_GOAL_REGISTRATION_TAB = {
 };
 
 /**
- * 홈에서 매출 분석 대시보드 카드를 띄울 (그룹, `lngUserAdminID`) 규칙.
- * - 5001: 92만
- * - 1871: 30, 120 (60은 기존 홈 대시보드 유지)
- * - 3015: 110
+ * 홈에서 매출 분석 대시보드 카드를 띄울 규칙.
+ * - 마키노차야(1871): `lngUserAdminID` 가 10, 30, 또는 90 초과
+ *   (`lngUserAdminID === lngStoreGroup` 그룹관리자는 홈·API에서 이미 스킵, 1871=1871 포함)
+ * - 테스트(5001): 기존과 동일, 92만
+ * - 그 외 그룹: 이 대시보드 미사용
  * 신규 대시보드 5개 API 호출 여부는 `SalesAnalysisDashboard`의 `shouldSkipSalesAnalysisDashApis`만 따르며, 홈에 카드를 띄울지와는 별개(컴포넌트가 마운트될 때만 해당 API 실행).
  * (제거 시 `homePage2`·`SalesAnalysisDashboard` 분기 함께 정리)
- * @type {readonly { lngStoreGroup: string; lngUserAdminIDs: readonly number[] }[]}
  */
+export const SALES_ANALYSIS_HOME_GROUP_1871 = "1871";
+export const SALES_ANALYSIS_HOME_GROUP_TEST = "5001";
+
+/** 테스트(5001) 기존 지정 계정. 마키노차야는 `matchesSalesAnalysisHomeTempBypass` 의 10 / 90초과 규칙. */
 export const SALES_ANALYSIS_HOME_TEMP_BYPASS_RULES = Object.freeze([
   Object.freeze({
-    lngStoreGroup: "5001",
+    lngStoreGroup: SALES_ANALYSIS_HOME_GROUP_TEST,
     lngUserAdminIDs: Object.freeze([92]),
-  }),
-  Object.freeze({
-    lngStoreGroup: "1871",
-    lngUserAdminIDs: Object.freeze([30, 120]),
-  }),
-  Object.freeze({
-    lngStoreGroup: "3015",
-    lngUserAdminIDs: Object.freeze([110]),
   }),
 ]);
 
 /**
- * 세션이 위 임시 규칙 중 하나와 일치하는지
+ * 세션이 홈 매출 분석 대시보드 노출 조건과 일치하는지
  * @param {Record<string, unknown>|unknown} u userData
  */
 export function matchesSalesAnalysisHomeTempBypass(u) {
@@ -70,6 +66,10 @@ export function matchesSalesAnalysisHomeTempBypass(u) {
   const grp = String(/** @type {{ lngStoreGroup?: unknown }} */ (u).lngStoreGroup ?? "");
   const aid = Number(/** @type {{ lngUserAdminID?: unknown }} */ (u).lngUserAdminID);
   if (!Number.isFinite(aid)) return false;
+  if (String(aid) === grp) return false;
+  if (grp === SALES_ANALYSIS_HOME_GROUP_1871) {
+    return aid === 10 || aid === 30 || aid > 90;
+  }
   return SALES_ANALYSIS_HOME_TEMP_BYPASS_RULES.some(
     (r) => r.lngStoreGroup === grp && r.lngUserAdminIDs.includes(aid)
   );

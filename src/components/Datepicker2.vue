@@ -173,6 +173,11 @@ const props = defineProps({
     type: Boolean,
     default: false, // 기본값: 현재 날짜
   },
+  /** opt-in: 종료일을 어제로. 기본(false)은 기존과 동일 */
+  initEndYesterday: {
+    type: Boolean,
+    default: false,
+  },
   selectedRadioBox: {
     type: String,
     default: "01",
@@ -246,6 +251,9 @@ onMounted(() => {
     today.setDate(today.getDate());
   } else {
     today.setDate(today.getDate() + props.initToday - 1);
+  }
+  if (props.initEndYesterday === true) {
+    today.setDate(today.getDate() - 1);
   }
   tempStartDateStack.push(selectedStartDate.value);
   tempEndDateStack.push(selectedEndDate.value);

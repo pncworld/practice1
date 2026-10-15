@@ -5,10 +5,11 @@
 # Author : 권맑음
 ################################################################################*/ -->
 <template>
-  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+  <!-- pl-5: 셸 w-right가 pl0이라 그리드가 좌측 메뉴에 붙음 → 우측 pd20과 맞춤 -->
+  <div class="flex h-full min-h-0 flex-col pl-5" @click="handleParentClick">
     <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
+      <div class="flex justify-center space-x-2 pr-5">
         <button type="button" @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>

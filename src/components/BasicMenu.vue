@@ -134,11 +134,11 @@
       </div>
     </div>
 
-    <!-- 전체 열기 (동작은 jQuery, 데이터 필터는 Vue) -->
+    <!-- 전체 열기: 라벨 고정, 스위치 OFF/ON (동작은 jQuery) -->
     <div class="pd20 flex menu-toggle">
       <span class="f14 fw500 label toggle-text">전체 열기</span>
-      <label class="toggle-wrap">
-        <input type="checkbox" id="toggleAll">
+      <label class="toggle-wrap" title="전체 열기 ON/OFF">
+        <input type="checkbox" id="toggleAll" aria-label="전체 열기">
         <span class="toggle-ui"></span>
       </label>
     </div>
@@ -840,7 +840,10 @@ onMounted(() => {
     }
   });
 
-  router.push("/homePage");
+  // 다른 화면 새로고침은 메인으로 보낸다. 이미 메인이면 같은 주소로 다시 이동하지 않는다.
+  if (router.currentRoute.value.path !== "/homePage") {
+    router.push("/homePage");
+  }
 });
 
 onUnmounted(() => {
@@ -960,6 +963,20 @@ var cMenu = ref("매출관리");
 //const selectedCategoryId = computed(() => store.state.selectedCategoryId);
 const selectedCategoryId = ref("1");
 
+/** 대메뉴 전환 시 #toggleAll OFF + 섹션 접기 (라벨「전체 열기」는 고정) */
+const resetExpandAllToggle = () => {
+  countShow.value = false;
+  openCategoryId.value = [];
+  const el = document.getElementById("toggleAll");
+  if (el) {
+    el.checked = false;
+  }
+  if (typeof window !== "undefined" && window.$) {
+    window.$(".sidemenu .menu-section").removeClass("open");
+    window.$(".sidemenu .menu-list").hide();
+  }
+};
+
 watch(
   () => [props.selectCategoryId, props.triggerNow],
   (newCategory) => {
@@ -973,7 +990,13 @@ watch(
 
     // 초기화 함수 사용
     categories.value = initializeCategories();
-    //comsole.log(categories.value);
+    // 매출→구매 등 전환 시 토글 UI만 「전체 접기」로 남는 버그 방지
+    nextTick(() => {
+      resetExpandAllToggle();
+      if (typeof window.initActiveMenu === "function") {
+        window.initActiveMenu();
+      }
+    });
   }
 );
 

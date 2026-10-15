@@ -40,6 +40,8 @@ import {
 } from "./realgridInstanceRegistry.js";
 let gridView;
 let dataProvider;
+/** persistCalculateTax setValue 재진입 방지 */
+let rgPersistTaxWriting = false;
 
 const rgDestroyInstance = (id, nameRef) => {
   const key = id ?? nameRef?.value;
@@ -275,6 +277,11 @@ const props = defineProps({
     type: String,
     default: true,
   },
+  addrowValues: {
+    // 쉼표가 들어 있는 값은 addrowDefault 대신 이 객체로 넣는다. 없으면 기존 쉼표 분리.
+    type: Object,
+    default: null,
+  },
   reload: {
     // 그리드 갱신
     type: Boolean,
@@ -282,6 +289,11 @@ const props = defineProps({
   },
   fixedColumn: {
     // 그리드 컬럼의 가로 길이에 대한 고정 여부
+    type: Boolean,
+    default: false,
+  },
+  /** true: 그리드 너비에 맞춰 열이 늘고 줄어듦(evenFill). 기본 false=even */
+  fitAllColumns: {
     type: Boolean,
     default: false,
   },
@@ -398,6 +410,11 @@ const props = defineProps({
     // 숫자로만 오게
     type: Boolean,
     default: false,
+  },
+  /** 0 이상이면 addRow4로 넣은 행을 그 위치로 옮긴다. 기본 -1은 맨 뒤 추가 */
+  addRow4InsertIndex: {
+    type: Number,
+    default: -1,
   },
   addRow5: {
     // 행 추가
@@ -1151,6 +1168,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  deleteCheckedField: {
+    // 지정한 칸이 체크된 행도 deleteRow7에서 삭제. 비우면 체크바만 사용.
+    type: String,
+    default: "",
+  },
   removeInitProp: {
     // 그리드에 추가 컬럼 넣을지 말지
     type: Boolean,
@@ -1210,6 +1232,11 @@ const props = defineProps({
     // 자동 세금 계산 할 컬럼 방법2
     type: String,
     default: "",
+  },
+  /** true: 수량·단가 편집 시 공급가·부가세·합계를 데이터에도 기록. 기본 false(화면만 계산) */
+  persistCalculateTax: {
+    type: Boolean,
+    default: false,
   },
   CalculateTimeColId: {
     // 자동 시간 계산 컬럼
@@ -1340,6 +1367,11 @@ const props = defineProps({
   },
   /** 청구 상세 — 윈폼 색(입고예정·수량·단가) + 입력 행 음영, 수량/단가열 제외 글자 파랑 */
   demandDetailColColors: {
+    type: Boolean,
+    default: false,
+  },
+  /** true: addRow4 가 넣는 new 행만 배경 구분. 기본은 끄고, 켠 화면만 적용 */
+  highlightNewRows: {
     type: Boolean,
     default: false,
   },
@@ -2567,7 +2599,11 @@ const runFuncshowGrid = async () => {
         : "text",
     datetimeFormat: isTimeDateColumn(item.strColID)
       ? "yyyy/MM/dd HH:mm"
-      : "yyyy-MM-dd",
+      : String(item.strMask || "").trim() !== "" &&
+          String(item.strMask || "").trim() !== "@@@@-@@-@@" &&
+          item.strColType == "date"
+        ? String(item.strMask).trim()
+        : "yyyy-MM-dd",
     valueExpression:
       props.AutoCalculateDataSubColId[
         props.AutoCalculateDataMainColId.indexOf(item.strColID)
@@ -2724,6 +2760,13 @@ const runFuncshowGrid = async () => {
     !fields.some((f) => f.fieldName === props.checkBarFieldName)
   ) {
     fields.push({ fieldName: props.checkBarFieldName, dataType: "boolean" });
+  }
+
+  if (
+    props.highlightNewRows === true &&
+    !fields.some((f) => f.fieldName === "new")
+  ) {
+    fields.push({ fieldName: "new", dataType: "boolean" });
   }
 
   if (
@@ -4072,11 +4115,25 @@ const runFuncshowGrid = async () => {
             const dataRow = dataCell?.index?.dataRow;
             const ds = grid?.getDataSource?.();
             const rowDeleted = rgRowHasDeleteFlag(ds, dataRow);
+            let checkAbleOk = true;
+            if (
+              isCheckAbleExpressionColumn(colId) &&
+              ds &&
+              dataRow != null &&
+              dataRow >= 0
+            ) {
+              checkAbleOk = rgIsCheckColumnHeaderSelectable(
+                ds,
+                dataRow,
+                colId
+              );
+            }
             const checkClickable =
               props.checkExclusiveColumns !== true &&
               props.checkRenderEditable === true &&
               !isReadonlyCheck &&
-              !(isSelectCheckCol && rowDeleted);
+              !(isSelectCheckCol && rowDeleted) &&
+              checkAbleOk;
             return {
               ...base,
               editable: false,
@@ -4189,6 +4246,19 @@ const runFuncshowGrid = async () => {
           return "blue";
         }
       }
+    });
+  } else if (props.highlightNewRows === true) {
+    gridView.setRowStyleCallback((grid, item) => {
+      let flagged = false;
+      try {
+        flagged = grid.getValue(item.index, "new");
+      } catch (_) {
+        flagged = false;
+      }
+      if (flagged === true || flagged === "true" || flagged === 1) {
+        return "rg-row-unsaved";
+      }
+      return "";
     });
   }
 
@@ -4727,10 +4797,18 @@ const runFuncshowGrid = async () => {
   gridView.editOptions.updatable = true;
 
   gridView.editOptions.deletable = true;
-  gridView.displayOptions.fitStyle =
-    props.fixedColumn === true || props.bulkLoadMode === true
-      ? "none"
-      : "even";
+  try {
+    gridView.displayOptions.fitStyle =
+      props.fixedColumn === true || props.bulkLoadMode === true
+        ? "none"
+        : props.fitAllColumns === true
+          ? "evenFill"
+          : "even";
+  } catch (_) {
+    try {
+      gridView.displayOptions.fitStyle = "even";
+    } catch (_) {}
+  }
   gridView.editOptions.commitByCell = true;
 
   gridView.editOptions.commitWhenLeave = true;
@@ -4982,7 +5060,97 @@ const runFuncshowGrid = async () => {
     grid.resetSize();
   };
 
+  const rgFirstCommaField = (raw) => {
+    if (typeof raw !== "string") return "";
+    const t = String(raw).trim();
+    if (t === "") return "";
+    return t.split(",")[0].trim();
+  };
+
+  const rgProviderHasField = (fieldName) => {
+    if (!fieldName || !dataProvider) return false;
+    try {
+      if (typeof dataProvider.getFieldIndex === "function") {
+        return dataProvider.getFieldIndex(fieldName) >= 0;
+      }
+    } catch (_) {}
+    return false;
+  };
+
+  const persistCalculatedTaxOnQtyEdit = (dataRow, editedFieldName) => {
+    if (props.persistCalculateTax !== true) return;
+    if (rgPersistTaxWriting) return;
+    const supplyField = String(props.CalculateTaxColId2 || "").trim();
+    const taxField = String(props.CalculateTaxColId || "").trim();
+    const totalField = String(props.CalculateTaxColId3 || "").trim();
+    if (!supplyField && !taxField && !totalField) return;
+
+    let qtyCol =
+      rgFirstCommaField(props.inputOnlyNumberColumn) ||
+      rgFirstCommaField(props.inputSignedDecimalColumn) ||
+      rgFirstCommaField(props.inputUnsignedDecimalColumn);
+    if (!qtyCol || !rgProviderHasField(qtyCol)) {
+      if (rgProviderHasField("dblOrderQty")) qtyCol = "dblOrderQty";
+      else if (rgProviderHasField("dblCheckQty")) qtyCol = "dblCheckQty";
+      else qtyCol = "";
+    }
+    if (
+      !editedFieldName ||
+      (editedFieldName !== qtyCol && editedFieldName !== "curUnitPrice")
+    ) {
+      return;
+    }
+
+    let unit = 0;
+    let qty = 0;
+    let taxType;
+    let oldSupply = 0;
+    let oldTax = 0;
+    try {
+      unit = Number(dataProvider.getValue(dataRow, "curUnitPrice") || 0);
+    } catch (_) {
+      unit = 0;
+    }
+    try {
+      qty = Number(dataProvider.getValue(dataRow, qtyCol) || 0);
+    } catch (_) {
+      qty = 0;
+    }
+    try {
+      taxType = dataProvider.getValue(dataRow, "lngTaxType");
+    } catch (_) {
+      taxType = undefined;
+    }
+    try {
+      oldSupply = Number(dataProvider.getValue(dataRow, supplyField || "curSupply") || 0);
+    } catch (_) {
+      oldSupply = 0;
+    }
+    try {
+      oldTax = Number(dataProvider.getValue(dataRow, taxField || "curTax") || 0);
+    } catch (_) {
+      oldTax = 0;
+    }
+    if (taxType === undefined || taxType === null || taxType === "") {
+      taxType = oldSupply !== 0 && oldTax === 0 ? "00" : "01";
+    }
+    const supply = Math.floor(unit * qty);
+    const tax = String(taxType) === "01" ? Math.floor(supply * 0.1) : 0;
+    const total = Math.floor(supply + tax);
+
+    rgPersistTaxWriting = true;
+    try {
+      if (supplyField) dataProvider.setValue(dataRow, supplyField, supply);
+      if (taxField) dataProvider.setValue(dataRow, taxField, tax);
+      if (totalField) dataProvider.setValue(dataRow, totalField, total);
+    } catch (_) {
+    } finally {
+      rgPersistTaxWriting = false;
+    }
+  };
+
   gridView.onCellEdited = function (grid, itemIndex, row, field) {
+    if (rgPersistTaxWriting) return;
     const editedFieldName = resolveEditedFieldName(field);
     let oldVal;
     if (editedFieldName) {
@@ -5025,6 +5193,8 @@ const runFuncshowGrid = async () => {
       }
     }
 
+    persistCalculatedTaxOnQtyEdit(row, editedFieldName);
+
     const colEdited = editedFieldName
       ? gridView.columnByField(editedFieldName)
       : null;
@@ -5033,7 +5203,13 @@ const runFuncshowGrid = async () => {
       isCheckCell &&
       editedFieldName &&
       (isRgCheckRowLocked(dataProvider, row) ||
-        rgIsMetaEditCheckLocked(dataProvider, row, editedFieldName))
+        rgIsMetaEditCheckLocked(dataProvider, row, editedFieldName) ||
+        (isCheckAbleExpressionColumn(editedFieldName) &&
+          !rgIsCheckColumnHeaderSelectable(
+            dataProvider,
+            row,
+            editedFieldName
+          )))
     ) {
       try {
         dataProvider.setValue(row, editedFieldName, oldVal);
@@ -5796,16 +5972,21 @@ const runFuncshowGrid = async () => {
             colFieldName === String(props.headerCheckBar ?? "").trim());
         const clearDeletedSelect = () => {
           if (!skipDeletedRows || !colFieldName) return;
-          const n = dataProvider.getRowCount();
-          for (let ri = 0; ri < n; ri++) {
-            if (!rgRowHasDeleteFlag(dataProvider, ri)) continue;
-            try {
-              if (dataProvider.getValue(ri, colFieldName) !== false) {
-                dataProvider.setValue(ri, colFieldName, false);
+          try {
+            if (dataProvider == null) return;
+            const n = dataProvider.getRowCount();
+            for (let ri = 0; ri < n; ri++) {
+              if (!rgRowHasDeleteFlag(dataProvider, ri)) continue;
+              try {
+                if (dataProvider.getValue(ri, colFieldName) !== false) {
+                  dataProvider.setValue(ri, colFieldName, false);
+                }
+              } catch (_) {
+                void 0;
               }
-            } catch (_) {
-              void 0;
             }
+          } catch (_) {
+            void 0;
           }
         };
         for (var i = 0; i < rowCount; i++) {
@@ -5826,8 +6007,30 @@ const runFuncshowGrid = async () => {
           setTimeout(clearDeletedSelect, 50);
         }
       } else {
+        const clearLockedSelect = () => {
+          if (!colFieldName) return;
+          try {
+            if (dataProvider == null) return;
+            const n = dataProvider.getRowCount();
+            for (let ri = 0; ri < n; ri++) {
+              if (rgIsCheckColumnHeaderSelectable(dataProvider, ri, colFieldName)) {
+                continue;
+              }
+              try {
+                if (dataProvider.getValue(ri, colFieldName) !== false) {
+                  dataProvider.setValue(ri, colFieldName, false);
+                }
+              } catch (_) {
+                void 0;
+              }
+            }
+          } catch (_) {
+            void 0;
+          }
+        };
         for (var i = 0; i < rowCount; i++) {
           if (!rgIsCheckColumnHeaderSelectable(dataProvider, i, colFieldName)) {
+            dataProvider.setValue(i, colFieldName, false);
             continue;
           }
           dataProvider.setValue(i, colFieldName, chk);
@@ -5835,6 +6038,9 @@ const runFuncshowGrid = async () => {
             rgSyncHeaderCheckRow(i, chk, bulkCellCheckOnly);
           }
         }
+        clearLockedSelect();
+        setTimeout(clearLockedSelect, 0);
+        setTimeout(clearLockedSelect, 50);
       }
     } finally {
       dataProvider.endUpdate();
@@ -5862,7 +6068,7 @@ const runFuncshowGrid = async () => {
     emit("allStateRows", dataProvider.getAllStateRows());
     //comsole.log(col.fieldName + "was checked as: " + chk);
 
-    emit("checkAllorNot", chk, col.fieldName);
+    emit("checkAllorNot", chk, colFieldName);
   };
 
   gridView.dataDropOptions.callback = function (
@@ -5952,6 +6158,8 @@ const runFuncshowGrid = async () => {
         : {};
     payload.index = clickData.itemIndex;
     payload.dataRow = current;
+    /** 어느 컬럼을 더블클릭했는지. 기존 행 필드와 겹치지 않는 이름 */
+    payload.dblclickField = clickData.fieldName || clickData.column || "";
     emit("dblclickedRowData", payload);
   };
 
@@ -6007,6 +6215,7 @@ const runFuncshowGrid = async () => {
       if (row) {
         row.index = cur.itemIndex;
         row.dataRow = dr;
+        row.dblclickField = cur.fieldName || cur.column || "";
         emit("dblclickedRowData", row);
       }
       if (event.preventDefault) {
@@ -6079,6 +6288,19 @@ const runFuncshowGrid = async () => {
     rgSyncGridLayout();
   }
   emit("gridReady", realgridname.value);
+  if (props.fitAllColumns === true) {
+    nextTick(() => {
+      requestAnimationFrame(() => {
+        try {
+          const inst = rgGetInstance(realgridname.value);
+          const gv = inst?.gridView;
+          if (!gv) return;
+          gv.displayOptions.fitStyle = "evenFill";
+          gv.resetSize();
+        } catch (_) {}
+      });
+    });
+  }
 };
 
 /**
@@ -6458,14 +6680,27 @@ watch(
     gridView.commit();
     var values = { add: true };
     let propertys = props.addrowProp.split(",");
-    const value = props.addrowDefault.split(",");
-    for (var i = 0; i < propertys.length; i++) {
-      values[propertys[i]] = value[i];
+    const rowObject = props.addrowValues;
+    if (rowObject != null && typeof rowObject === "object" && !Array.isArray(rowObject)) {
+      for (var i = 0; i < propertys.length; i++) {
+        const cell = rowObject[propertys[i]];
+        values[propertys[i]] = cell == null ? "" : cell;
+      }
+    } else {
+      const value = props.addrowDefault.split(",");
+      for (var j = 0; j < propertys.length; j++) {
+        values[propertys[j]] = value[j];
+      }
     }
     values.new = true;
 
     emit("sendRowState", "created");
     var dataRow = dataProvider.addRow(values);
+    const insertAt = props.addRow4InsertIndex;
+    if (Number.isInteger(insertAt) && insertAt >= 0 && insertAt < dataRow) {
+      dataProvider.moveRow(dataRow, insertAt);
+      dataRow = insertAt;
+    }
     gridView.setCurrent({ dataRow: dataRow });
     emit("allStateRows", dataProvider.getAllStateRows());
     // 추가된 행 번호는 addRow 반환값을 쓴다. getCurrent()는 이전 행(맨 위)에 남을 수 있다.
@@ -6712,6 +6947,39 @@ watch(
   () => props.deleteRow7,
   (newVal) => {
     //console.log(gridView.getCheckedItems());
+
+    const deleteField = String(props.deleteCheckedField ?? "").trim();
+    if (deleteField && dataProvider) {
+      try {
+        gridView.commit(true);
+      } catch (_) {
+        try {
+          gridView.commit();
+        } catch (e) {
+          void e;
+        }
+      }
+      const checkedSet = new Set(gridView.getCheckedRows?.() ?? []);
+      dataProvider.getJsonRows().forEach((item, index) => {
+        const value = item?.[deleteField];
+        if (
+          value === true ||
+          value === 1 ||
+          value === "1" ||
+          String(value).toLowerCase() === "true"
+        ) {
+          checkedSet.add(index);
+        }
+      });
+      const checkedIndexes = [...checkedSet];
+      if (checkedIndexes.length > 0) {
+        dataProvider.removeRows(checkedIndexes);
+      }
+      updatedrowData.value = [...dataProvider.getJsonRows()];
+      emit("allStateRows", dataProvider.getAllStateRows());
+      emit("updatedRowData", updatedrowData.value);
+      return;
+    }
 
     const checkedArr = gridView.getCheckedRows();
     console.log(checkedArr);
@@ -7726,6 +7994,10 @@ watch(
 
 .stk-col-blue-text {
   color: inherit;
+}
+
+.rg-row-unsaved {
+  background: #fff3d6;
 }
 
 .stk-row-registered {

@@ -173,12 +173,17 @@
                   <input
                     type="text"
                     class="pur306-sg-input pur306-sg-input--name"
-                    v-model="cond13"
+                    :value="pur306NameComposing ? pur306NameKeyword : cond13"
+                    @compositionstart="onMatNameCompositionStart"
+                    @compositionupdate="onMatNameLiveInput"
+                    @compositionend="onMatNameCompositionEnd"
+                    @input="onMatNameLiveInput"
                     @keydown.enter.prevent="onPur306MaterialSearchEnter" />
                 </div>
                 <button
                   type="button"
                   class="pur306-sub-btn pur306-mat-code-search-btn"
+                  :class="{ 'pur306-mat-code-search-btn--pending': pur306MaterialSearchPending }"
                   @click="searchButton2">
                   조회
                 </button>
@@ -193,7 +198,10 @@
         class="pur306-grid-layout mt-1 grid min-h-0 min-w-0 flex-1 grid-cols-[12fr,1fr,12fr] grid-rows-1 justify-center">
       <div class="mt-0 flex min-h-0 min-w-0 flex-col">
         <div class="pur306-grid-bar flex shrink-0 justify-between bg-yellow-100">
-          <div class="text-base font-semibold">검색 자재</div>
+          <div class="pur306-grid-title-row">
+            <div class="pur306-grid-title shrink-0">검색 자재</div>
+            <span class="pur306-dblclick-hint">자재코드나 자재명을 더블클릭하면 상세 정보를 확인할 수 있습니다.</span>
+          </div>
           <div class="pur306-grid-actions">
             <button type="button" class="pur306-sub-btn pur306-sub-btn--grid" @click="addButton">추가</button>
             <button type="button" class="pur306-sub-btn pur306-sub-btn--grid" @click="excelButton">
@@ -209,6 +217,7 @@
           @updatedRowData="updatedRowData"
           @sendRowState="sendRowState"
           @clickedRowData="clickedRowData"
+          @dblclickedRowData="onSearchStockDblClick"
           @allStateRows="allStateRows"
           @clickedButtonCol="clickedButtonCol"
           @checkAllorNot="checkAllorNot"
@@ -226,6 +235,12 @@
           :CalculateTaxColId2="'curSupply'"
           :CalculateTaxColId3="'curTotal'"
           :inputUnsignedDecimalColumn="'dblOrderQty'"
+          :changeNow="searchChangeNow"
+          :changeRow="searchChangeRow"
+          :changeColid="searchChangeColid"
+          :changeValue2="searchChangeValue2"
+          :searchWord3="pur306NameKeyword"
+          searchColId="strStockName"
           hover-tooltip-fields="strStockName"
           :hover-tooltip-max-length="40"
           row-hover-pastel-tone="red" />
@@ -258,7 +273,28 @@
       </div>
       <div class="mt-0 flex min-h-0 min-w-0 flex-col">
         <div class="pur306-grid-bar flex shrink-0 justify-between bg-yellow-100">
-          <div class="text-base font-semibold">발주 자재</div>
+          <div class="pur306-grid-title-row pur306-grid-title-row--center">
+            <div class="pur306-grid-title shrink-0">발주 자재</div>
+            <button
+              type="button"
+              class="pur306-expand-btn"
+              data-pur306-order-expand
+              :disabled="!pur306OrderExpandEnabled"
+              :aria-label="pur306OrderExpandEnabled ? '발주 자재 크게 보기' : '발주 자재 없음'"
+              :title="pur306OrderExpandEnabled ? undefined : '조회된 발주 자재가 없습니다'"
+              @click="openOrderGridPopup($event)">
+              <svg class="pur306-expand-icon" viewBox="0 0 40 40" aria-hidden="true">
+                <g fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="10" y="10" width="20" height="20" />
+                  <path d="M19.13 26.01h-5.26v-5.09" />
+                  <path d="M13.87 26.01l5.26-5.26" />
+                  <path d="M20.87 13.99h5.26v5.09" />
+                  <path d="M26.13 13.99l-5.26 5.26" />
+                </g>
+              </svg>
+              <span v-if="pur306OrderExpandEnabled" class="pur306-expand-tip" role="tooltip">크게 보기</span>
+            </button>
+          </div>
           <div class="pur306-grid-actions">
             <button type="button" class="pur306-sub-btn pur306-sub-btn--grid" @click="deleteButton">
               삭제
@@ -285,6 +321,8 @@
           :checkRenderEditable="true"
           :selectionStyle="'block'"
           :setFooter="true"
+          highlight-new-rows
+          :merge-column-width-scale2="pur306OrderColWidthScale"
           :notsoftDelete="true"
           :checkRowAuto="false"
           :checkRowAuto2="true"
@@ -292,16 +330,220 @@
           :CalculateTaxColId2="'curSupply'"
           :CalculateTaxColId3="'curTotal'"
           :deleteRow7="deleteRow7"
+          delete-checked-field="lngCheck"
           :addRow4="addRow4"
+          :add-row4-insert-index="addRow4InsertIndex"
           :addrowProp="'lngStockID,strStockName,strStandardName,strUnitName,curUnitPrice,dblOrderQty,curSupply,curTax,curTotal,strOrderComments,strGenericName,strSupplierName,dtmExpectedDate,lngStoreGroup,lngStoreCode,strOrderNo,lngOrderSeq,lngSupplierID,dblCheckQty,strStatus,strDemandNo,strCheckComments,lngGenericID,lngOrderAble,lngTaxType,dtmOrderDate'"
+          :addrowValues="addrowValues"
           :addrowDefault="addrowDefault"
           :inputUnsignedDecimalColumn="'dblOrderQty'"
+          :changeNow="orderChangeNow"
+          :changeRow="orderChangeRow"
+          :changeColid="orderChangeColid"
+          :changeValue2="orderChangeValue2"
           hover-tooltip-fields="strStockName"
           :hover-tooltip-max-length="40"
           row-hover-pastel-tone="red" />
       </div>
     </div>
     </div>
+    <Teleport to="body">
+      <div
+        v-if="stockDetailOpen"
+        class="pur306-detail-backdrop">
+        <div
+          class="pur306-detail-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="pur306-detail-title"
+          :style="stockDetailDialogStyle()"
+          @keydown.esc="closeStockDetail">
+          <div
+            class="pur306-detail-head"
+            @pointerdown="onStockDetailDragStart"
+            @pointermove="onStockDetailDragMove"
+            @pointerup="onStockDetailDragEnd"
+            @pointercancel="onStockDetailDragEnd">
+            <h2 id="pur306-detail-title" class="pur306-detail-title">자재 상세</h2>
+          </div>
+          <div class="pur306-detail-body">
+            <section class="pur306-detail-basis" aria-label="발주일자, 발주마감일시, 매장명">
+              <dl class="pur306-detail-basis-grid">
+                <div>
+                  <dt>발주일자</dt>
+                  <dd>{{ cond }}</dd>
+                </div>
+                <div>
+                  <dt>발주마감일시</dt>
+                  <dd>{{ cond2 }}</dd>
+                </div>
+                <div>
+                  <dt>매장명</dt>
+                  <dd>{{ clickedStoreNm }}</dd>
+                </div>
+              </dl>
+            </section>
+            <dl class="pur306-detail-grid">
+              <div>
+                <dt>자재코드</dt>
+                <dd>{{ stockDetail.lngStockID }}</dd>
+              </div>
+              <div>
+                <dt>자재명</dt>
+                <dd>{{ stockDetail.strStockName }}</dd>
+              </div>
+              <div>
+                <dt>규격</dt>
+                <dd>{{ stockDetail.strStandardName }}</dd>
+              </div>
+              <div>
+                <dt>단위</dt>
+                <dd>{{ stockDetail.strUnitName }}</dd>
+              </div>
+              <div>
+                <dt>단가</dt>
+                <dd>{{ formatPur306DetailPrice(stockDetail.curUnitPrice) }}</dd>
+              </div>
+              <div>
+                <dt>거래처</dt>
+                <dd>{{ stockDetail.strSupplierName }}</dd>
+              </div>
+              <div>
+                <dt>자재분류</dt>
+                <dd>{{ stockDetail.strGenericName }}</dd>
+              </div>
+              <div>
+                <dt>납기예정일</dt>
+                <dd>{{ formatPur306DetailDate(stockDetail.dtmExpectedDate) }}</dd>
+              </div>
+            </dl>
+            <label class="pur306-detail-field">
+              <span class="pur306-detail-field-title">발주수량</span>
+              <input
+                ref="stockDetailQtyRef"
+                :value="stockDetailQty"
+                type="text"
+                inputmode="decimal"
+                lang="en"
+                autocomplete="off"
+                class="pur306-detail-input"
+                @keydown="onStockDetailQtyKeydown"
+                @beforeinput="onStockDetailQtyBeforeInput"
+                @paste="onStockDetailQtyPaste"
+                @compositionstart="onStockDetailQtyCompositionStart"
+                @compositionupdate="onStockDetailQtyCompositionUpdate"
+                @compositionend="onStockDetailQtyCompositionEnd"
+                @input="onStockDetailQtyInput" />
+            </label>
+            <label class="pur306-detail-field">
+              <span class="pur306-detail-field-title">메모</span>
+              <input
+                v-model="stockDetailMemo"
+                type="text"
+                class="pur306-detail-input"
+                maxlength="200"
+                autocomplete="off" />
+            </label>
+            <p class="pur306-detail-note">확인하면 검색 자재의 발주수량과 메모에 반영됩니다. 수량이 있으면 해당 행이 체크됩니다.</p>
+          </div>
+          <div class="pur306-detail-actions">
+            <button type="button" class="pur306-detail-btn" @click="closeStockDetail">취소</button>
+            <button type="button" class="pur306-detail-btn pur306-detail-btn--ok" @click="applyStockDetail">확인</button>
+          </div>
+          <div
+            class="pur306-detail-resize"
+            title="크기 조절"
+            @pointerdown.stop="onStockDetailResizeStart"
+            @pointermove="onStockDetailResizeMove"
+            @pointerup="onStockDetailResizeEnd"
+            @pointercancel="onStockDetailResizeEnd"></div>
+        </div>
+      </div>
+    </Teleport>
+    <Teleport to="body">
+      <div
+        v-if="orderGridOpen"
+        class="pur306-detail-backdrop pur306-order-pop-backdrop"
+        :class="{ 'pur306-order-pop-backdrop--in': orderPopDim }">
+        <div
+          ref="orderGridDialogEl"
+          class="pur306-detail-dialog pur306-order-pop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="pur306-order-pop-title"
+          :style="orderGridDialogStyle()"
+          @keydown.esc="closeOrderGridPopup">
+          <div
+            class="pur306-detail-head"
+            @pointerdown="onOrderGridDragStart"
+            @pointermove="onOrderGridDragMove"
+            @pointerup="onOrderGridDragEnd"
+            @pointercancel="onOrderGridDragEnd">
+            <h2 id="pur306-order-pop-title" class="pur306-detail-title">발주 자재</h2>
+          </div>
+          <div class="pur306-order-pop-body">
+            <section class="pur306-detail-basis" aria-label="발주일자, 발주마감일시, 매장명">
+              <dl class="pur306-detail-basis-grid">
+                <div>
+                  <dt>발주일자</dt>
+                  <dd>{{ cond }}</dd>
+                </div>
+                <div>
+                  <dt>발주마감일시</dt>
+                  <dd>{{ cond2 }}</dd>
+                </div>
+                <div>
+                  <dt>매장명</dt>
+                  <dd>{{ clickedStoreNm }}</dd>
+                </div>
+              </dl>
+            </section>
+            <div class="pur306-order-pop-legend">
+              <span class="pur306-order-pop-legend-item">
+                <i class="pur306-order-pop-swatch pur306-order-pop-swatch--new"></i>
+                신규 발주품목
+              </span>
+              <span class="pur306-order-pop-legend-item">
+                <i class="pur306-order-pop-swatch"></i>
+                기 발주품목
+              </span>
+            </div>
+            <p class="pur306-order-pop-note">발주수량과 메모만 수정할 수 있습니다. 적용하면 발주 화면에 반영되고, 삭제와 저장은 발주 화면에서 합니다.</p>
+            <div
+              class="pur306-order-pop-grid"
+              :class="{ 'pur306-order-pop-grid--pending': !orderPopGridVisible }">
+            <Realgrid
+              v-if="orderPopGridReady"
+              class="h-full w-full"
+              :progname="'PUR03_006INS_VUE'"
+              :progid="2"
+              :rowData="orderGridRows"
+              :editableColId="'dblOrderQty,strOrderComments'"
+              :inputUnsignedDecimalColumn="'dblOrderQty'"
+              :CalculateTaxColId="'curTax'"
+              :CalculateTaxColId2="'curSupply'"
+              :CalculateTaxColId3="'curTotal'"
+              :rowStateeditable="false"
+              :checkRenderEditable="false"
+              :hideColumnsId="pur306OrderPopupHideColumns"
+              :fixedColumn="true"
+              :selectionStyle="'singleRow'"
+              :setFooter="true"
+              highlight-new-rows
+              :merge-column-width-scale2="pur306OrderColWidthScale"
+              hover-tooltip-fields="strStockName"
+              :hover-tooltip-max-length="40"
+              @gridReady="onOrderPopGridReady"
+              @updatedRowData="onOrderPopupRowsEdited" />
+            </div>
+          </div>
+          <div class="pur306-detail-actions">
+            <button type="button" class="pur306-detail-btn" @click="closeOrderGridPopup">취소</button>
+            <button type="button" class="pur306-detail-btn pur306-detail-btn--ok" @click="applyOrderGridPopup">적용</button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -358,12 +600,13 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
 import { useStore } from "vuex";
+import { rgGetInstance } from "@/components/realgridInstanceRegistry";
 
 /** 조회 AREA — wire 그리드 (PUR02/STKN06 패턴) */
 const pur306ControlBorder = "#cbd5e1";
@@ -396,60 +639,99 @@ const cond10 = ref("0");
 const cond11 = ref("0");
 const cond12 = ref("");
 const cond13 = ref("");
+const pur306NameKeyword = ref("");
+const pur306NameComposing = ref(false);
+
+const setPur306NameKeyword = (value) => {
+  pur306NameKeyword.value = String(value ?? "").replace(/'/g, "");
+};
+
+const onMatNameCompositionStart = () => {
+  pur306NameComposing.value = true;
+};
+
+const onMatNameLiveInput = (event) => {
+  const value = event.target?.value ?? "";
+  setPur306NameKeyword(value);
+  if (!event.isComposing && !pur306NameComposing.value) {
+    cond13.value = value;
+  }
+};
+
+const onMatNameCompositionEnd = (event) => {
+  pur306NameComposing.value = false;
+  const value = event.target?.value ?? "";
+  cond13.value = value;
+  setPur306NameKeyword(value);
+};
 const optionList2 = ref([]);
 const optionList3 = ref([]);
 const optionList4 = ref([]);
 const optionList5 = ref([]);
-onMounted(async () => {
-  const pageLog = await insertPageLog(store.state.activeTab2);
-  const today = new Date();
-  today.setDate(today.getDate() + 1);
-  cond.value = formatLocalDate(today);
-  const res = await getOrderDate(
-    groupCd.value,
-    store.state.userData.lngPosition,
-    cond.value.replaceAll("-", ""),
-    0
-  );
-
-  ////console.log(res);
-
-  cond.value =
-    res.data.List[0].dtmOrderDate.slice(0, 4) +
-    "-" +
-    res.data.List[0].dtmOrderDate.slice(4, 6) +
-    "-" +
-    res.data.List[0].dtmOrderDate.slice(6, 8);
-
+const applyOrderDateRow = (row) => {
+  if (!row?.dtmOrderDate) return false;
+  const ymd = String(row.dtmOrderDate);
+  if (ymd.length < 8) return false;
+  cond.value = `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
+  const closeTime = String(row.dtmOrderCloseTime ?? "");
   cond2.value =
-    res.data.List[0].dtmOrderCloseTime == ""
+    closeTime === ""
       ? cond.value + " 12:00"
-      : res.data.List[0].dtmOrderCloseTime.slice(0, 4) +
+      : closeTime.slice(0, 4) +
         "-" +
-        res.data.List[0].dtmOrderCloseTime.slice(4, 6) +
+        closeTime.slice(4, 6) +
         "-" +
-        res.data.List[0].dtmOrderCloseTime.slice(6, 8) +
+        closeTime.slice(6, 8) +
         " " +
-        res.data.List[0].dtmOrderCloseTime.slice(8, 10) +
+        closeTime.slice(8, 10) +
         ":" +
-        res.data.List[0].dtmOrderCloseTime.slice(10, 12);
-
-  const res2 = await getCommonList(242);
-
-  optionList.value = res2.data.List;
-
-  const res3 = await getStockCategory(store.state.userData.lngStoreGroup);
-
-  optionList3.value = res3.data.List;
-
-  const res4 = await getStockGroup(store.state.userData.lngStoreGroup);
-
-  optionList4.value = res4.data.List;
-
-  const res5 = await getStockGeneric(store.state.userData.lngStoreGroup);
-
-  optionList5.value = res5.data.List;
+        closeTime.slice(10, 12);
   lastAppliedCond.value = cond.value;
+  return true;
+};
+
+/**
+ * 발주일자 초기값.
+ * getOrderDate 4번째 값 0 = usp_VUE_GetOrderDateCheck 의 발주일자 결정.
+ * 기준일은 오늘이다. 내일을 넣으면 마감 전에도 다음 날로 넘어간다.
+ * 화면 일자는 프로시저가 돌려준 dtmOrderDate 만 쓴다.
+ */
+const loadInitialOrderDate = async () => {
+  if (groupCd.value == null || groupCd.value === "") return;
+  const storeCd = isPur306StoreSelected()
+    ? nowStoreCd.value
+    : store.state.userData?.lngPosition;
+  const today = formatLocalDate(new Date()).replaceAll("-", "");
+  const res = await getOrderDate(groupCd.value, storeCd, today, 0);
+  const applied = applyOrderDateRow(res?.data?.List?.[0]);
+  if (!applied) return;
+  orderDateReady = true;
+  if (isPur306StoreSelected()) {
+    await searchButton({ forceLoad: true, skipUnsavedCheck: true });
+  }
+};
+
+onMounted(async () => {
+  try {
+    await insertPageLog(store.state.activeTab2);
+
+    const res2 = await getCommonList(242);
+    optionList.value = res2?.data?.List ?? [];
+
+    const storeGroup = store.state.userData?.lngStoreGroup;
+    if (storeGroup != null && storeGroup !== "") {
+      const res3 = await getStockCategory(storeGroup);
+      optionList3.value = res3?.data?.List ?? [];
+
+      const res4 = await getStockGroup(storeGroup);
+      optionList4.value = res4?.data?.List ?? [];
+
+      const res5 = await getStockGeneric(storeGroup);
+      optionList5.value = res5?.data?.List ?? [];
+    }
+  } catch (error) {
+    console.error("[PUR03_006INS] 화면 초기 조회", error);
+  }
 });
 
 const nowStoreAreaCd = ref();
@@ -480,8 +762,86 @@ const SupplierId = (e) => {
   selectedSupplier.value = e;
   // ///console.log(e);
 };
+let orderDateLoadStarted = false;
+let orderDateReady = false;
+
+const isPur306StoreSelected = () => {
+  const code = Number(nowStoreCd.value);
+  return Number.isFinite(code) && code !== 0;
+};
+
+const pur306MaterialSearchedKey = ref("");
+const pur306MaterialSearchDirty = ref(false);
+/** 자재목록·거래처·분류·그룹·특성·코드/명·매장·발주일자 */
+const pur306MaterialSearchKey = computed(() =>
+  [
+    groupCd.value,
+    nowStoreCd.value,
+    cond.value,
+    cond7.value,
+    selectedSupplier.value,
+    cond9.value,
+    cond10.value,
+    cond11.value,
+    cond12.value,
+    cond13.value,
+  ]
+    .map((value) => String(value ?? ""))
+    .join("\u0001")
+);
+/** 매장이 선택되고 발주일자가 있어야 검색자재 조회가 가능 */
+const pur306MaterialSearchReady = computed(() => {
+  if (groupCd.value == null || groupCd.value === "") return false;
+  if (!isPur306StoreSelected()) return false;
+  return String(cond.value ?? "").length >= 8;
+});
+watch(pur306MaterialSearchKey, (next) => {
+  if (!pur306MaterialSearchReady.value) {
+    pur306MaterialSearchDirty.value = false;
+    return;
+  }
+  pur306MaterialSearchDirty.value = next !== pur306MaterialSearchedKey.value;
+});
+/** 조회 가능 상태에서 조건을 바꿨는데 그 조건으로 아직 조회하지 않음 */
+const pur306MaterialSearchPending = computed(
+  () => pur306MaterialSearchReady.value && pur306MaterialSearchDirty.value
+);
+
+const alertSelectStore = () =>
+  Swal.fire({
+    title: "경고",
+    text: "매장을 선택해주세요.",
+    icon: "warning",
+    confirmButtonText: "확인",
+  });
+
+const applyOrderCloseTime = (row) => {
+  if (!row) return;
+  const closeTime = String(row.dtmOrderCloseTime ?? "");
+  cond2.value =
+    closeTime === ""
+      ? cond.value + " 12:00"
+      : closeTime.slice(0, 4) +
+        "-" +
+        closeTime.slice(4, 6) +
+        "-" +
+        closeTime.slice(6, 8) +
+        " " +
+        closeTime.slice(8, 10) +
+        ":" +
+        closeTime.slice(10, 12);
+};
+
 const handleStoreGroup = (e) => {
   groupCd.value = e;
+  if (orderDateLoadStarted || lastAppliedCond.value) return;
+  if (e == null || e === "") return;
+  orderDateLoadStarted = true;
+  loadInitialOrderDate()
+    .catch((error) => {
+      orderDateLoadStarted = false;
+      console.error("[PUR03_006INS] 발주일자 조회", error);
+    });
 };
 const first = ref(false);
 const pickStoreRef = ref(null);
@@ -631,6 +991,712 @@ const applyPur306SearchGridRows = (rows) => {
   updatedrowdata.value = next;
 };
 
+const PUR306_DETAIL_FIELDS = new Set(["lngStockID", "strStockName"]);
+const stockDetailOpen = ref(false);
+const stockDetailRowIndex = ref(-1);
+const stockDetail = ref({});
+const stockDetailQty = ref("");
+const stockDetailMemo = ref("");
+const stockDetailQtyRef = ref(null);
+const stockDetailFrame = ref({ left: 0, top: 0, width: 576, height: 520 });
+let stockDetailDrag = null;
+let stockDetailResize = null;
+
+const stockDetailDialogStyle = () => ({
+  left: `${stockDetailFrame.value.left}px`,
+  top: `${stockDetailFrame.value.top}px`,
+  width: `${stockDetailFrame.value.width}px`,
+  height: `${stockDetailFrame.value.height}px`,
+});
+
+const formatPur306DetailDate = (value) => {
+  const raw = String(value ?? "").replace(/\D/g, "");
+  if (raw.length >= 8) {
+    return `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
+  }
+  return String(value ?? "").trim();
+};
+
+const formatPur306DetailPrice = (value) => {
+  if (value == null || value === "") return "";
+  const n = Number(String(value).replace(/,/g, ""));
+  if (Number.isNaN(n)) return String(value);
+  return formatNumberWithCommas(n);
+};
+
+const onSearchStockDblClick = async (row) => {
+  const field = String(row?.dblclickField ?? "");
+  if (!PUR306_DETAIL_FIELDS.has(field)) return;
+  const dataRow = Number(row?.dataRow);
+  if (!Number.isFinite(dataRow) || dataRow < 0) return;
+
+  const live = updatedrowdata.value?.[dataRow];
+  const source =
+    live && typeof live === "object" && !Array.isArray(live) ? live : row;
+
+  stockDetailRowIndex.value = dataRow;
+  stockDetail.value = source && typeof source === "object" ? { ...source } : {};
+  const qty = source?.dblOrderQty;
+  const qtyNum = Number(qty);
+  stockDetailQty.value =
+    qty == null || qty === "" || Number.isNaN(qtyNum) || qtyNum === 0
+      ? ""
+      : formatPur306QtyMask(qty);
+  stockDetailMemo.value =
+    source?.strOrderComments == null ? "" : String(source.strOrderComments);
+  placeStockDetailDialog();
+  stockDetailOpen.value = true;
+  await nextTick();
+  stockDetailQtyRef.value?.focus();
+};
+
+const placeStockDetailDialog = () => {
+  const width = Math.min(576, Math.max(320, window.innerWidth - 32));
+  const height = Math.min(520, Math.max(280, window.innerHeight - 32));
+  stockDetailFrame.value = {
+    width,
+    height,
+    left: Math.max(8, Math.round((window.innerWidth - width) / 2)),
+    top: Math.max(8, Math.round((window.innerHeight - height) / 2)),
+  };
+};
+
+const clampStockDetailFrame = (frame) => {
+  const left = Math.min(Math.max(8, frame.left), Math.max(8, window.innerWidth - 120));
+  const top = Math.min(Math.max(8, frame.top), Math.max(8, window.innerHeight - 48));
+  const width = Math.min(
+    Math.max(320, frame.width),
+    Math.max(320, window.innerWidth - left - 8)
+  );
+  const height = Math.min(
+    Math.max(280, frame.height),
+    Math.max(280, window.innerHeight - top - 8)
+  );
+  return { left, top, width, height };
+};
+
+const onStockDetailDragStart = (event) => {
+  if (event.button !== 0) return;
+  if (event.target?.closest?.("button")) return;
+  stockDetailDrag = {
+    pointerId: event.pointerId,
+    startX: event.clientX,
+    startY: event.clientY,
+    left: stockDetailFrame.value.left,
+    top: stockDetailFrame.value.top,
+  };
+  event.currentTarget.setPointerCapture?.(event.pointerId);
+  event.preventDefault();
+};
+
+const onStockDetailDragMove = (event) => {
+  if (!stockDetailDrag || event.pointerId !== stockDetailDrag.pointerId) return;
+  stockDetailFrame.value = clampStockDetailFrame({
+    ...stockDetailFrame.value,
+    left: stockDetailDrag.left + (event.clientX - stockDetailDrag.startX),
+    top: stockDetailDrag.top + (event.clientY - stockDetailDrag.startY),
+  });
+};
+
+const onStockDetailDragEnd = (event) => {
+  if (!stockDetailDrag || event.pointerId !== stockDetailDrag.pointerId) return;
+  stockDetailDrag = null;
+};
+
+const onStockDetailResizeStart = (event) => {
+  if (event.button !== 0) return;
+  stockDetailResize = {
+    pointerId: event.pointerId,
+    startX: event.clientX,
+    startY: event.clientY,
+    width: stockDetailFrame.value.width,
+    height: stockDetailFrame.value.height,
+  };
+  event.currentTarget.setPointerCapture?.(event.pointerId);
+  event.preventDefault();
+};
+
+const onStockDetailResizeMove = (event) => {
+  if (!stockDetailResize || event.pointerId !== stockDetailResize.pointerId) return;
+  stockDetailFrame.value = clampStockDetailFrame({
+    ...stockDetailFrame.value,
+    width: stockDetailResize.width + (event.clientX - stockDetailResize.startX),
+    height: stockDetailResize.height + (event.clientY - stockDetailResize.startY),
+  });
+};
+
+const onStockDetailResizeEnd = (event) => {
+  if (!stockDetailResize || event.pointerId !== stockDetailResize.pointerId) return;
+  stockDetailResize = null;
+};
+
+const closeStockDetail = () => {
+  stockDetailOpen.value = false;
+};
+
+const pur306OrderPopupHideColumns = ["lngCheck"];
+
+const pur306OrderColWidthScale = {
+  strStockName: 1.5,
+  strOrderNo: 1.25,
+};
+
+const orderGridOpen = ref(false);
+const orderGridRows = ref([]);
+const orderPopupDraft = ref([]);
+const orderGridFrame = ref({ left: 0, top: 0, width: 960, height: 640 });
+const orderGridDialogEl = ref(null);
+const orderPopDim = ref(false);
+const orderPopGridReady = ref(false);
+const orderPopGridVisible = ref(false);
+const orderPopGridId = ref("");
+let orderGridDrag = null;
+let orderPopOrigin = null;
+let orderPopLeaving = false;
+const ORDER_POP_MS_IN = 820;
+const ORDER_POP_MS_OUT = 640;
+
+const clampOrderGridFrame = (frame) => {
+  const maxW = Math.max(320, window.innerWidth - 16);
+  const maxH = Math.max(280, window.innerHeight - 36);
+  const minW = Math.min(640, maxW);
+  const minH = Math.min(294, maxH);
+  const width = Math.min(Math.max(frame.width, minW), maxW);
+  const height = Math.min(Math.max(frame.height, minH), maxH);
+  const left = Math.min(Math.max(8, frame.left), Math.max(8, window.innerWidth - width - 8));
+  const topLimit = Math.max(12, window.innerHeight - height - 16);
+  const top = Math.min(Math.max(12, frame.top), topLimit);
+  return { left, top, width, height };
+};
+
+const placeOrderGridDialog = () => {
+  const top = 12;
+  const width = Math.min(Math.round(window.innerWidth * 0.86), window.innerWidth - 24);
+  const maxFit = Math.max(280, window.innerHeight - top - 16);
+  const height = Math.min(Math.round(window.innerHeight * 0.82), maxFit);
+  orderGridFrame.value = clampOrderGridFrame({
+    left: Math.round((window.innerWidth - width) / 2),
+    top,
+    width,
+    height,
+  });
+};
+
+const orderGridDialogStyle = () => ({
+  left: `${orderGridFrame.value.left}px`,
+  top: `${orderGridFrame.value.top}px`,
+  width: `${orderGridFrame.value.width}px`,
+  height: `${orderGridFrame.value.height}px`,
+});
+
+const prefersOrderPopReducedMotion = () => {
+  if (typeof window === "undefined" || !window.matchMedia) return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+};
+
+const readOrderPopRect = (el) => {
+  if (!el || typeof el.getBoundingClientRect !== "function") return null;
+  const rect = el.getBoundingClientRect();
+  if (!rect.width || !rect.height) return null;
+  return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+};
+
+const readOrderPopOrigin = (event) => readOrderPopRect(event?.currentTarget);
+
+const readOrderPopOriginButton = () => {
+  if (typeof document === "undefined") return orderPopOrigin;
+  return readOrderPopRect(document.querySelector("[data-pur306-order-expand]")) || orderPopOrigin;
+};
+
+const clearOrderPopMotion = (dialog) => {
+  if (!dialog) return;
+  dialog.style.transition = "";
+  dialog.style.transform = "";
+  dialog.style.transformOrigin = "";
+  dialog.style.opacity = "";
+  dialog.style.willChange = "";
+};
+
+const refreshOrderPopGridSize = async (gridId = orderPopGridId.value) => {
+  await nextTick();
+  await nextOrderPopFrames(2);
+  try {
+    const gridView = rgGetInstance(gridId)?.gridView;
+    gridView?.resetSize?.();
+  } catch (_) {
+    void 0;
+  }
+};
+
+const onOrderPopGridReady = async (gridId) => {
+  orderPopGridId.value = gridId || "";
+  await refreshOrderPopGridSize(gridId);
+  if (orderGridOpen.value && !orderPopLeaving) {
+    orderPopGridVisible.value = true;
+  }
+};
+
+const waitOrderPopFlip = (el, ms) =>
+  new Promise((resolve) => {
+    if (!el) {
+      resolve();
+      return;
+    }
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      el.removeEventListener("transitionend", onEnd);
+      resolve();
+    };
+    const onEnd = (ev) => {
+      if (ev.target !== el) return;
+      if (ev.propertyName === "transform" || ev.propertyName === "opacity") finish();
+    };
+    el.addEventListener("transitionend", onEnd);
+    setTimeout(finish, ms + 40);
+  });
+
+const nextOrderPopFrames = (count = 2) =>
+  new Promise((resolve) => {
+    if (typeof window === "undefined" || !window.requestAnimationFrame) {
+      resolve();
+      return;
+    }
+    let left = Math.max(1, count);
+    const step = () => {
+      left -= 1;
+      if (left <= 0) resolve();
+      else window.requestAnimationFrame(step);
+    };
+    window.requestAnimationFrame(step);
+  });
+
+const computeOrderPopFlip = (dialog, origin, dir) => {
+  if (!dialog || !origin) return null;
+  const last = dialog.getBoundingClientRect();
+  if (!last.width || !last.height) return null;
+  const ox = origin.left + origin.width / 2 - last.left;
+  const oy = origin.top + origin.height / 2 - last.top;
+  const sW = origin.width / last.width;
+  const sH = origin.height / last.height;
+  const sFit = Math.max(0.05, Math.min(sW, sH));
+  const s =
+    dir === "in"
+      ? Math.min(0.03, Math.max(0.012, sFit * 0.2))
+      : Math.max(0.06, Math.sqrt(Math.max(0.0001, sW * sH)));
+  return { ox, oy, s };
+};
+
+const runOrderPopFlip = async (dir) => {
+  const dialog = orderGridDialogEl.value;
+  if (!dialog) return false;
+  if (prefersOrderPopReducedMotion()) return false;
+  const origin = dir === "out" ? readOrderPopOriginButton() : orderPopOrigin;
+  const flip = computeOrderPopFlip(dialog, origin, dir);
+  if (!flip) return false;
+
+  const ms = dir === "in" ? ORDER_POP_MS_IN : ORDER_POP_MS_OUT;
+  const ease =
+    dir === "in" ? "cubic-bezier(0.22, 1, 0.36, 1)" : "cubic-bezier(0.4, 0, 0.2, 1)";
+  dialog.style.transformOrigin = `${flip.ox}px ${flip.oy}px`;
+
+  dialog.style.willChange = "transform, opacity";
+  if (dir === "in") {
+    dialog.style.transition = "none";
+    dialog.style.opacity = "0";
+    dialog.style.transform = `scale(${flip.s})`;
+    orderPopDim.value = false;
+    void dialog.offsetWidth;
+    await nextOrderPopFrames(2);
+    dialog.style.opacity = "0.92";
+    dialog.style.transition = `transform ${ms}ms ${ease}, opacity ${Math.round(ms * 0.75)}ms ease-out`;
+    void dialog.offsetWidth;
+    dialog.style.transform = "scale(1)";
+    dialog.style.opacity = "1";
+    orderPopDim.value = true;
+    await waitOrderPopFlip(dialog, ms);
+    clearOrderPopMotion(dialog);
+  } else {
+    dialog.style.transition = "none";
+    dialog.style.transform = "scale(1)";
+    dialog.style.opacity = "1";
+    void dialog.offsetWidth;
+    await nextOrderPopFrames(1);
+    dialog.style.transition = `transform ${ms}ms ${ease}, opacity ${Math.round(ms * 0.85)}ms ease-in`;
+    dialog.style.transform = `scale(${flip.s})`;
+    dialog.style.opacity = "0.72";
+    orderPopDim.value = false;
+    await waitOrderPopFlip(dialog, ms);
+    clearOrderPopMotion(dialog);
+  }
+  return true;
+};
+
+const getPur306OrderRows = () =>
+  updatedrowdata2.value?.length > 0 ? updatedrowdata2.value : (rowData2.value ?? []);
+
+const pur306OrderExpandEnabled = computed(() => getPur306OrderRows().length > 0);
+
+const openOrderGridPopup = async (event) => {
+  if (orderPopLeaving || !pur306OrderExpandEnabled.value) return;
+  orderPopOrigin = readOrderPopOrigin(event);
+  const snapshot = getPur306OrderRows().map((row) => ({ ...row }));
+  orderGridRows.value = snapshot;
+  orderPopupDraft.value = snapshot.map((row) => ({ ...row }));
+  placeOrderGridDialog();
+  orderPopGridVisible.value = false;
+  orderPopGridId.value = "";
+  // 애니메이션과 동시에 그리드를 준비해, 끝난 뒤 바로 보이게 한다.
+  orderPopGridReady.value = true;
+  orderPopDim.value = !orderPopOrigin || prefersOrderPopReducedMotion();
+  orderGridOpen.value = true;
+  await nextTick();
+  const dialog = orderGridDialogEl.value;
+  if (dialog && orderPopOrigin && !prefersOrderPopReducedMotion()) {
+    dialog.style.transition = "none";
+    dialog.style.opacity = "0";
+  }
+  try {
+    const flipped = await runOrderPopFlip("in");
+    if (!flipped) orderPopDim.value = true;
+  } catch (_) {
+    orderPopDim.value = true;
+    clearOrderPopMotion(dialog);
+  }
+  await refreshOrderPopGridSize();
+  orderPopGridVisible.value = true;
+};
+
+const closeOrderGridPopup = async () => {
+  if (!orderGridOpen.value || orderPopLeaving) return;
+  orderPopLeaving = true;
+  orderGridDrag = null;
+  orderPopGridVisible.value = false;
+  orderPopGridReady.value = false;
+  orderPopGridId.value = "";
+  try {
+    await runOrderPopFlip("out");
+  } catch (_) {
+    clearOrderPopMotion(orderGridDialogEl.value);
+  }
+  orderGridOpen.value = false;
+  orderPopupDraft.value = [];
+  orderPopDim.value = false;
+  orderPopOrigin = null;
+  orderPopLeaving = false;
+};
+
+const onOrderGridDragStart = (event) => {
+  if (event.button !== 0) return;
+  if (event.target?.closest?.("button")) return;
+  orderGridDrag = {
+    pointerId: event.pointerId,
+    startX: event.clientX,
+    startY: event.clientY,
+    left: orderGridFrame.value.left,
+    top: orderGridFrame.value.top,
+  };
+  event.currentTarget.setPointerCapture?.(event.pointerId);
+  event.preventDefault();
+};
+
+const onOrderGridDragMove = (event) => {
+  if (!orderGridDrag || event.pointerId !== orderGridDrag.pointerId) return;
+  orderGridFrame.value = clampOrderGridFrame({
+    ...orderGridFrame.value,
+    left: orderGridDrag.left + (event.clientX - orderGridDrag.startX),
+    top: orderGridDrag.top + (event.clientY - orderGridDrag.startY),
+  });
+};
+
+const onOrderGridDragEnd = (event) => {
+  if (!orderGridDrag || event.pointerId !== orderGridDrag.pointerId) return;
+  orderGridDrag = null;
+};
+
+const normalizePur306QtyInput = (value) => {
+  let text = String(value ?? "")
+    .replace(/,/g, "")
+    .replace(/[^\d.]/g, "");
+  const dot = text.indexOf(".");
+  if (dot >= 0) {
+    text = text.slice(0, dot + 1) + text.slice(dot + 1).replace(/\./g, "");
+  }
+  const hasDot = text.includes(".");
+  const [intRaw = "", fracRaw = ""] = text.split(".");
+  let intPart = intRaw.replace(/^0+(?=\d)/, "");
+  const frac = fracRaw.slice(0, 2);
+  if (!intPart && !hasDot) return "";
+  if (!intPart) intPart = "0";
+  return hasDot ? `${intPart}.${frac}` : intPart;
+};
+
+const formatPur306QtyMask = (value) => {
+  const normalized = normalizePur306QtyInput(value);
+  if (!normalized) return "";
+  const dot = normalized.indexOf(".");
+  if (dot < 0) return formatNumberWithCommas(normalized);
+  const intPart = normalized.slice(0, dot) || "0";
+  return `${formatNumberWithCommas(intPart)}.${normalized.slice(dot + 1)}`;
+};
+
+const countPur306QtyTokensBefore = (text, index) =>
+  String(text ?? "")
+    .slice(0, index)
+    .replace(/[^\d.]/g, "").length;
+
+const placeStockDetailQtyCaret = (masked, tokenPos) => {
+  nextTick(() => {
+    const input = stockDetailQtyRef.value;
+    if (!input) return;
+    if (tokenPos <= 0) {
+      input.setSelectionRange(0, 0);
+      return;
+    }
+    let seen = 0;
+    let pos = masked.length;
+    for (let i = 0; i < masked.length; i += 1) {
+      if (/\d/.test(masked[i]) || masked[i] === ".") seen += 1;
+      if (seen >= tokenPos) {
+        pos = i + 1;
+        break;
+      }
+    }
+    input.setSelectionRange(pos, pos);
+  });
+};
+
+const applyStockDetailQtyMask = (raw, tokenPos) => {
+  const masked = formatPur306QtyMask(raw);
+  stockDetailQty.value = masked;
+  const input = stockDetailQtyRef.value;
+  if (input && input.value !== masked) input.value = masked;
+  placeStockDetailQtyCaret(masked, tokenPos);
+};
+
+const stockDetailQtyNavKeys = new Set([
+  "Backspace",
+  "Delete",
+  "Tab",
+  "Escape",
+  "Enter",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowUp",
+  "ArrowDown",
+  "Home",
+  "End",
+]);
+
+const isPur306QtyDraft = (text) =>
+  /^\d*(\.\d{0,2})?$/.test(String(text ?? "").replace(/,/g, ""));
+
+const onStockDetailQtyKeydown = (event) => {
+  if (event.isComposing || event.key === "Process" || event.keyCode === 229) {
+    event.preventDefault();
+    return;
+  }
+  const el = event.target;
+  if (
+    el &&
+    !event.ctrlKey &&
+    !event.metaKey &&
+    !event.altKey &&
+    (event.key === "Backspace" || event.key === "Delete") &&
+    el.selectionStart === el.selectionEnd
+  ) {
+    const value = String(el.value ?? "");
+    const start = el.selectionStart ?? 0;
+    const markIndex = event.key === "Backspace" ? start - 1 : start;
+    if (value[markIndex] === ",") {
+      event.preventDefault();
+      const logical = value.replace(/,/g, "");
+      const tokensBefore = countPur306QtyTokensBefore(value, markIndex);
+      const removeAt = event.key === "Backspace" ? tokensBefore - 1 : tokensBefore;
+      if (removeAt < 0 || removeAt >= logical.length) return;
+      const next = logical.slice(0, removeAt) + logical.slice(removeAt + 1);
+      applyStockDetailQtyMask(next, removeAt);
+      return;
+    }
+  }
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
+  if (stockDetailQtyNavKeys.has(event.key)) return;
+  if (/^\d$/.test(event.key) || event.key === ".") return;
+  event.preventDefault();
+};
+
+const onStockDetailQtyBeforeInput = (event) => {
+  const type = event.inputType || "";
+  if (type === "insertCompositionText" || type === "deleteCompositionText") {
+    event.preventDefault();
+    return;
+  }
+  if (type.startsWith("delete")) return;
+  if (type !== "insertText" || event.data == null) return;
+  const el = event.target;
+  const start = el.selectionStart ?? 0;
+  const end = el.selectionEnd ?? 0;
+  const next =
+    String(el.value ?? "").slice(0, start) + event.data + String(el.value ?? "").slice(end);
+  if (!isPur306QtyDraft(next)) event.preventDefault();
+};
+
+const onStockDetailQtyPaste = (event) => {
+  event.preventDefault();
+  const el = event.target;
+  const pasted = String(event.clipboardData?.getData("text") ?? "").replace(/[^\d.]/g, "");
+  if (!pasted) return;
+  const value = String(el?.value ?? "");
+  const start = el?.selectionStart ?? value.length;
+  const end = el?.selectionEnd ?? value.length;
+  const logical = value.replace(/,/g, "");
+  const tokenStart = countPur306QtyTokensBefore(value, start);
+  const tokenEnd = countPur306QtyTokensBefore(value, end);
+  const next = logical.slice(0, tokenStart) + pasted + logical.slice(tokenEnd);
+  applyStockDetailQtyMask(next, tokenStart + normalizePur306QtyInput(pasted).length);
+};
+
+const snapStockDetailQty = (el) => {
+  if (!el) return;
+  const tokenPos = countPur306QtyTokensBefore(el.value, el.selectionStart ?? 0);
+  applyStockDetailQtyMask(el.value, tokenPos);
+};
+
+const onStockDetailQtyCompositionStart = (event) => {
+  event.preventDefault();
+  const el = event.target;
+  snapStockDetailQty(el);
+  el.blur();
+  requestAnimationFrame(() => {
+    el.focus();
+  });
+};
+
+const onStockDetailQtyCompositionUpdate = (event) => {
+  event.preventDefault();
+  snapStockDetailQty(event.target);
+};
+
+const onStockDetailQtyCompositionEnd = (event) => {
+  snapStockDetailQty(event.target);
+};
+
+const onStockDetailQtyInput = (event) => {
+  if (event.isComposing) {
+    snapStockDetailQty(event.target);
+    return;
+  }
+  const el = event.target;
+  const tokenPos = countPur306QtyTokensBefore(el.value, el.selectionStart ?? 0);
+  applyStockDetailQtyMask(el.value, tokenPos);
+};
+
+const searchChangeNow = ref(false);
+const searchChangeRow = ref(-1);
+const searchChangeColid = ref("");
+const searchChangeValue2 = ref("");
+const orderChangeNow = ref(false);
+const orderChangeRow = ref(-1);
+const orderChangeColid = ref("");
+const orderChangeValue2 = ref("");
+
+const setSearchGridCell = async (row, col, value) => {
+  searchChangeRow.value = row;
+  searchChangeColid.value = col;
+  searchChangeValue2.value = value;
+  searchChangeNow.value = !searchChangeNow.value;
+  await nextTick();
+};
+
+const setOrderGridCell = async (row, col, value) => {
+  orderChangeRow.value = row;
+  orderChangeColid.value = col;
+  orderChangeValue2.value = value;
+  orderChangeNow.value = !orderChangeNow.value;
+  await nextTick();
+};
+
+const pur306QtyNumber = (value) => {
+  if (value == null || value === "") return 0;
+  const num = Number(value);
+  return Number.isNaN(num) ? 0 : num;
+};
+
+const pur306MemoText = (value) => (value == null ? "" : String(value));
+
+const applyOrderPopupRows = async (rows) => {
+  if (!orderGridOpen.value || !Array.isArray(rows)) return;
+
+  const base =
+    updatedrowdata2.value?.length > 0 ? updatedrowdata2.value : (rowData2.value ?? []);
+
+  for (let i = 0; i < rows.length; i += 1) {
+    const next = rows[i];
+    const prev = base[i];
+    if (!next || !prev) continue;
+
+    const qtyChanged = pur306QtyNumber(prev.dblOrderQty) !== pur306QtyNumber(next.dblOrderQty);
+    const memoChanged = pur306MemoText(prev.strOrderComments) !== pur306MemoText(next.strOrderComments);
+    if (!qtyChanged && !memoChanged) continue;
+
+    if (qtyChanged) {
+      const qtyNum = pur306QtyNumber(next.dblOrderQty);
+      const unit = Number(next.curUnitPrice ?? prev.curUnitPrice ?? 0) || 0;
+      const supply = Math.floor(unit * qtyNum);
+      let taxType = next.lngTaxType ?? prev.lngTaxType;
+      if (taxType == null || taxType === "") taxType = "01";
+      const tax = taxType == "01" ? Math.floor(supply * 0.1) : 0;
+      await setOrderGridCell(i, "dblOrderQty", qtyNum);
+      await setOrderGridCell(i, "curSupply", supply);
+      await setOrderGridCell(i, "curTax", tax);
+      await setOrderGridCell(i, "curTotal", Math.floor(supply + tax));
+    }
+    if (memoChanged) {
+      await setOrderGridCell(i, "strOrderComments", pur306MemoText(next.strOrderComments));
+    }
+  }
+};
+
+const onOrderPopupRowsEdited = (rows) => {
+  if (!orderGridOpen.value || !Array.isArray(rows)) return;
+  orderPopupDraft.value = rows.map((row) => ({ ...row }));
+};
+
+const applyOrderGridPopup = async () => {
+  await commitPur306ActiveEditor();
+  const rows = orderPopupDraft.value.length > 0 ? orderPopupDraft.value : orderGridRows.value;
+  await applyOrderPopupRows(rows);
+  closeOrderGridPopup();
+};
+
+const applyStockDetail = async () => {
+  const index = stockDetailRowIndex.value;
+  const rows = getPur306SearchGridSnapshot();
+  if (index < 0 || index >= rows.length) {
+    closeStockDetail();
+    return;
+  }
+
+  const qtyText = normalizePur306QtyInput(stockDetailQty.value);
+  const parsedQty = qtyText === "" ? 0 : Number(qtyText);
+  const qtyNum = Number.isNaN(parsedQty) ? 0 : parsedQty;
+
+  const memo = stockDetailMemo.value ?? "";
+  const checked = qtyNum > 0;
+  await setSearchGridCell(index, "dblOrderQty", qtyNum);
+  await setSearchGridCell(index, "strOrderComments", memo);
+  await setSearchGridCell(index, "lngCheck", checked);
+
+  const source = Array.isArray(rowData.value) ? rowData.value[index] : null;
+  if (source && typeof source === "object") {
+    source.dblOrderQty = qtyNum;
+    source.strOrderComments = memo;
+    source.lngCheck = checked;
+  }
+  closeStockDetail();
+};
+
 const toPur306SearchStockRow = (orderItem) => {
   const stockId = orderItem?.lngStockID;
   const cached =
@@ -743,31 +1809,13 @@ const applyStoreChange = async (newValue) => {
   initAll();
   nowStoreCd.value = newValue;
 
-  if (nowStoreCd.value == 0) {
+  if (!isPur306StoreSelected()) {
     return;
   }
-
-  const res = await getOrderDate(
-    groupCd.value,
-    nowStoreCd.value,
-    cond.value.replaceAll("-", ""),
-    1
-  );
-  cond2.value =
-    res.data.List[0].dtmOrderCloseTime == ""
-      ? cond.value + " 12:00"
-      : res.data.List[0].dtmOrderCloseTime.slice(0, 4) +
-        "-" +
-        res.data.List[0].dtmOrderCloseTime.slice(4, 6) +
-        "-" +
-        res.data.List[0].dtmOrderCloseTime.slice(6, 8) +
-        " " +
-        res.data.List[0].dtmOrderCloseTime.slice(8, 10) +
-        ":" +
-        res.data.List[0].dtmOrderCloseTime.slice(10, 12);
-
-  first.value = true;
-  await searchButton({ forceLoad: true });
+  if (!orderDateReady) {
+    return;
+  }
+  await searchButton({ forceLoad: true, skipUnsavedCheck: true });
 };
 
 const handleStoreCd = async (newValue) => {
@@ -808,6 +1856,13 @@ const onOrderDateChange = async (event) => {
     return;
   }
 
+  if (!isPur306StoreSelected()) {
+    lastAppliedCond.value = newDate;
+    cond.value = newDate;
+    await alertSelectStore();
+    return;
+  }
+
   if (hasUnsavedOrderGridChanges()) {
     const confirmed = await confirmDiscardPur306Changes();
     if (!confirmed) {
@@ -825,7 +1880,7 @@ const onOrderDateChange = async (event) => {
   lastAppliedCond.value = newDate;
   cond.value = newDate;
   first.value = true;
-  await searchButton({ forceLoad: true });
+  await searchButton({ forceLoad: true, skipUnsavedCheck: true });
 };
 
 /** Enter — 편집 중인 그리드 셀 commit 후 조회 */
@@ -902,9 +1957,14 @@ const allStateRows2 = (e) => {
  */
 
 const searchButton = async (options = {}) => {
-  const { forceLoad = false, skipUnsavedCheck = false } = options;
+  const { skipUnsavedCheck = false } = options;
 
   await commitPur306ActiveEditor();
+
+  if (!isPur306StoreSelected()) {
+    await alertSelectStore();
+    return;
+  }
 
   if (!skipUnsavedCheck && hasUnsavedOrderGridChanges()) {
     const confirmed = await confirmDiscardPur306Changes();
@@ -915,84 +1975,49 @@ const searchButton = async (options = {}) => {
     updatedrowdata2.value = [];
   }
 
-  const res2 = await getOrderDate(
-    groupCd.value,
-    nowStoreCd.value,
-    cond.value.replaceAll("-", ""),
-    1
-  );
-
-  cond2.value =
-    res2.data.List[0].dtmOrderCloseTime == ""
-      ? cond.value + " 12:00"
-      : res2.data.List[0].dtmOrderCloseTime.slice(0, 4) +
-        "-" +
-        res2.data.List[0].dtmOrderCloseTime.slice(4, 6) +
-        "-" +
-        res2.data.List[0].dtmOrderCloseTime.slice(6, 8) +
-        " " +
-        res2.data.List[0].dtmOrderCloseTime.slice(8, 10) +
-        ":" +
-        res2.data.List[0].dtmOrderCloseTime.slice(10, 12);
-
-  if (first.value == false && !forceLoad) {
-    first.value = true;
-    return;
-  }
-  if (nowStoreCd.value == 0) {
-    Swal.fire({
-      title: "경고",
-      text: "매장을 선택해주세요.",
-      icon: "warning",
-
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-  const res = await getOrderDate(
-    groupCd.value,
-    nowStoreCd.value,
-    cond.value.replaceAll("-", ""),
-    1
-  );
-
-  if (res.data.List[0].strMsg == 9) {
-    Swal.fire({
-      title: "경고",
-      text: "본사에 발주마감 시간 설정을 확인 해 주십시오.",
-      icon: "warning",
-
-      confirmButtonText: "확인",
-    });
-    return;
-  }
-
   try {
+    const closeRes = await getOrderDate(
+      groupCd.value,
+      nowStoreCd.value,
+      cond.value.replaceAll("-", ""),
+      1
+    );
+    const orderDateRow = closeRes?.data?.List?.[0];
+    applyOrderCloseTime(orderDateRow);
+
+    if (String(orderDateRow?.strMsg ?? "") === "9") {
+      Swal.fire({
+        title: "경고",
+        text: "본사에 발주마감 시간 설정을 확인 해 주십시오.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+
     const res = await getOrderDataByDate(
       groupCd.value,
       nowStoreCd.value,
       cond.value.replaceAll("-", "")
     );
-    //console.log(res);
-    rowData2.value = res.data.List;
-    updatedrowdata2.value = res.data.List;
-    cond3.value = res.data.List2[0].strMComments;
+    const orderRows = sortPur306OrderRowsByName(
+      Array.isArray(res?.data?.List) ? res.data.List : []
+    );
+    rowData2.value = orderRows;
+    updatedrowdata2.value = orderRows;
+    cond3.value = res?.data?.List2?.[0]?.strMComments ?? "";
 
-    cond4.value = rowData2.value.reduce((sum, item) => {
-      return sum + parseInt(item.curSupply || 0, 10);
-    }, 0);
-    cond4.value = formatNumberWithCommas(cond4.value);
-    cond5.value = rowData2.value.reduce((sum, item) => {
-      return sum + parseInt(item.curTax || 0, 10);
-    }, 0);
-    cond5.value = formatNumberWithCommas(cond5.value);
-    cond6.value = rowData2.value.reduce((sum, item) => {
-      return sum + parseInt(item.curTotal || 0, 10);
-    }, 0);
-
-    cond6.value = formatNumberWithCommas(cond6.value);
+    cond4.value = formatNumberWithCommas(
+      orderRows.reduce((sum, item) => sum + parseInt(item.curSupply || 0, 10), 0)
+    );
+    cond5.value = formatNumberWithCommas(
+      orderRows.reduce((sum, item) => sum + parseInt(item.curTax || 0, 10), 0)
+    );
+    cond6.value = formatNumberWithCommas(
+      orderRows.reduce((sum, item) => sum + parseInt(item.curTotal || 0, 10), 0)
+    );
   } catch (error) {
-    console.log(error);
+    console.error("[PUR03_006INS] 발주조회", error);
   }
 };
 
@@ -1063,6 +2088,8 @@ const searchButton2 = async () => {
       (res.data.List ?? []).map((item) => item.lngStockID)
     );
     rowData.value = filterPur306SearchStockList(res.data.List);
+    pur306MaterialSearchedKey.value = pur306MaterialSearchKey.value;
+    pur306MaterialSearchDirty.value = false;
   } catch (error) {
     //console.log(error);
   }
@@ -1166,7 +2193,10 @@ const saveButton = async () => {
     return;
   }
 
-  if (allstaterows2.value.created == 0 && allstaterows2.value.updated == 0) {
+  if (
+    getRowStateCount(allstaterows2.value?.created) === 0 &&
+    getRowStateCount(allstaterows2.value?.updated) === 0
+  ) {
     Swal.fire({
       title: "경고",
       text: "변경된 사항이 존재하지 않습니다. 확인해주세요.",
@@ -1482,10 +2512,48 @@ const excelButton2 = () => {
 };
 
 const addrowDefault = ref("");
+const addrowValues = ref(null);
 const addRow4 = ref(false);
+const addRow4InsertIndex = ref(-1);
+
+const pur306IsNewOrderRow = (row) =>
+  row?.new === true || row?.new === "true" || row?.new === 1;
+
+const pur306CompareStockName = (left, right) =>
+  String(left ?? "").localeCompare(String(right ?? ""), "ko");
+
+const sortPur306OrderRowsByName = (rows) =>
+  [...rows].sort((a, b) => {
+    const byName = pur306CompareStockName(a?.strStockName, b?.strStockName);
+    if (byName !== 0) return byName;
+    return String(a?.lngStockID ?? "").localeCompare(String(b?.lngStockID ?? ""), "ko", {
+      numeric: true,
+    });
+  });
+
+const pur306NewRowInsertIndex = (name, stockId) => {
+  const rows = updatedrowdata2.value ?? [];
+  for (let i = 0; i < rows.length; i += 1) {
+    if (!pur306IsNewOrderRow(rows[i])) return i;
+    const byName = pur306CompareStockName(name, rows[i]?.strStockName);
+    if (byName < 0) return i;
+    if (
+      byName === 0 &&
+      String(stockId ?? "").localeCompare(String(rows[i]?.lngStockID ?? ""), "ko", {
+        numeric: true,
+      }) < 0
+    ) {
+      return i;
+    }
+  }
+  return rows.length;
+};
 const addButton = async () => {
   const orderIds = getPur306OrderStockIds();
   const selected = updatedrowdata.value.filter((item) => item.lngCheck == true);
+  if (selected.length > 0 && !(await isPur306OrderDateOpen())) {
+    return;
+  }
   const duplicates = selected.filter((item) => orderIds.has(item.lngStockID));
   const toAdd = selected.filter((item) => !orderIds.has(item.lngStockID));
 
@@ -1510,64 +2578,18 @@ const addButton = async () => {
     dtmOrderDate: cond.value.replaceAll("-", ""),
   }));
 
-  for (let i = 0; i < rowsForOrderAdd.length; i++) {
-    addrowDefault.value =
-      rowsForOrderAdd[i].lngStockID +
-      "," +
-      rowsForOrderAdd[i].strStockName +
-      "," +
-      rowsForOrderAdd[i].strStandardName +
-      "," +
-      rowsForOrderAdd[i].strUnitName +
-      "," +
-      rowsForOrderAdd[i].curUnitPrice +
-      "," +
-      rowsForOrderAdd[i].dblOrderQty +
-      "," +
-      rowsForOrderAdd[i].curSupply +
-      "," +
-      rowsForOrderAdd[i].curTax +
-      "," +
-      rowsForOrderAdd[i].curTotal +
-      "," +
-      rowsForOrderAdd[i].strOrderComments +
-      "," +
-      rowsForOrderAdd[i].strGenericName +
-      "," +
-      rowsForOrderAdd[i].strSupplierName +
-      "," +
-      formatLocalDate(rowsForOrderAdd[i].dtmExpectedDate).replaceAll(
-        "-",
-        ""
-      ) +
-      "," +
-      rowsForOrderAdd[i].lngStoreGroup +
-      "," +
-      rowsForOrderAdd[i].lngStoreCode +
-      "," +
-      rowsForOrderAdd[i].strOrderNo +
-      "," +
-      rowsForOrderAdd[i].lngOrderSeq +
-      "," +
-      rowsForOrderAdd[i].lngSupplierID +
-      "," +
-      rowsForOrderAdd[i].dblCheckQty +
-      "," +
-      rowsForOrderAdd[i].strStatus +
-      "," +
-      rowsForOrderAdd[i].strDemandNo +
-      "," +
-      rowsForOrderAdd[i].strCheckComments +
-      "," +
-      rowsForOrderAdd[i].lngGenericID +
-      "," +
-      rowsForOrderAdd[i].lngOrderAble +
-      "," +
-      rowsForOrderAdd[i].lngTaxType +
-      "," +
-      rowsForOrderAdd[i].dtmOrderDate;
-
-    //console.log(addrowDefault.value);
+  const rowsToInsert = sortPur306OrderRowsByName(rowsForOrderAdd);
+  for (let i = 0; i < rowsToInsert.length; i++) {
+    const source = rowsToInsert[i];
+    addRow4InsertIndex.value = pur306NewRowInsertIndex(
+      source.strStockName,
+      source.lngStockID
+    );
+    addrowValues.value = {
+      ...source,
+      dtmExpectedDate: formatLocalDate(source.dtmExpectedDate).replaceAll("-", ""),
+      dtmOrderDate: source.dtmOrderDate,
+    };
     addRow4.value = !addRow4.value;
 
     await nextTick();
@@ -1596,6 +2618,45 @@ const finalizePur306OrderDelete = async (rowsToRestore) => {
   recalcPur306OrderTotals();
 };
 
+const isPur306OrderDateOpen = async () => {
+  try {
+    const res = await getOrderDate(
+      groupCd.value,
+      nowStoreCd.value,
+      cond.value.replaceAll("-", ""),
+      2
+    );
+    const msg = res?.data?.List?.[0]?.strMsg;
+    if (msg == "1") {
+      Swal.fire({
+        title: "실패",
+        text: "해당 발주일자는 마감 되었습니다. 다른 발주일자로 변경해 주십시오.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+      return false;
+    }
+    if (msg !== "0") {
+      Swal.fire({
+        title: "실패",
+        text: "발주등록 오류. 피앤시월드에 문의해 주십시오.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+      return false;
+    }
+    return true;
+  } catch (error) {
+    Swal.fire({
+      title: "실패",
+      text: "발주등록 오류. 피앤시월드에 문의해 주십시오.",
+      icon: "error",
+      confirmButtonText: "확인",
+    });
+    return false;
+  }
+};
+
 const deleteButton = async () => {
   const { unsaved, saved, all: checkedRows } = splitPur306CheckedOrderRows();
 
@@ -1606,6 +2667,10 @@ const deleteButton = async () => {
       icon: "warning",
       confirmButtonText: "확인",
     });
+    return;
+  }
+
+  if (saved.length > 0 && !(await isPur306OrderDateOpen())) {
     return;
   }
 
@@ -2074,6 +3139,39 @@ const initAll = () => {
   border-color: rgb(96 165 250);
 }
 
+.pur306-sub-btn.pur306-mat-code-search-btn--pending {
+  color: #9f1239;
+  background-color: #fde8ea;
+  border-color: #e7a3a8;
+  font-weight: 700;
+  animation: pur306-search-pending 2.4s ease-in-out infinite;
+}
+
+.pur306-sub-btn.pur306-mat-code-search-btn--pending:hover {
+  animation: none;
+  color: #9f1239;
+  background-color: #f8d0d4;
+  border-color: #d4787e;
+  box-shadow: 0 0 0 2px rgb(190 18 60 / 0.12);
+}
+
+@keyframes pur306-search-pending {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(190 18 60 / 0);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgb(190 18 60 / 0.16);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pur306-sub-btn.pur306-mat-code-search-btn--pending {
+    animation: none;
+    box-shadow: 0 0 0 2px rgb(190 18 60 / 0.14);
+  }
+}
+
 /* 그리드 헤더 — whitebutton(26px) 높이 + 서브버튼 톤 */
 .pur306-sub-btn--grid {
   height: 1.625rem;
@@ -2088,9 +3186,170 @@ const initAll = () => {
 
 /* 그리드 헤더 — 서브버튼 + 컴팩트 바 */
 .pur306-grid-bar {
+  position: relative;
+  z-index: 5;
   align-items: center;
   min-height: 1.875rem;
   padding: 0.125rem 0.5rem;
+}
+
+.pur306-grid-title-row {
+  display: flex;
+  align-items: flex-end;
+  min-width: 0;
+  gap: 1.25rem;
+}
+
+.pur306-grid-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  color: #111827;
+}
+
+.pur306-grid-title::before {
+  content: "";
+  flex: 0 0 0.25rem;
+  width: 0.25rem;
+  height: 1.05em;
+  border-radius: 999px;
+  background: #2563eb;
+}
+
+.pur306-dblclick-hint {
+  min-width: 0;
+  padding-bottom: 0.05rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #b85a5a;
+}
+
+.pur306-grid-title-row--center {
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.pur306-expand-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: #1d4ed8;
+  cursor: pointer;
+}
+
+.pur306-expand-icon {
+  width: 1.875rem;
+  height: 1.875rem;
+}
+
+.pur306-expand-btn:hover:not(:disabled),
+.pur306-expand-btn:focus-visible:not(:disabled) {
+  background: rgb(37 99 235 / 0.12);
+}
+
+.pur306-expand-btn:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.pur306-expand-tip {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  z-index: 30;
+  padding: 6px 10px;
+  border: 1px solid #6b7280;
+  background-color: #4b5563;
+  color: #f9fafb;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.45;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  transform: translateX(-50%);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.pur306-expand-btn:hover .pur306-expand-tip,
+.pur306-expand-btn:focus-visible .pur306-expand-tip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.pur306-order-pop-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+  padding: 0.75rem 1rem 1rem;
+  overflow: hidden;
+}
+
+.pur306-order-pop-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.pur306-order-pop-grid--pending {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pur306-order-pop-legend {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 1.25rem;
+}
+
+.pur306-order-pop-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.pur306-order-pop-swatch {
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 1px solid #9ca3af;
+  border-radius: 0.125rem;
+  background: #d1d5db;
+}
+
+.pur306-order-pop-swatch--new {
+  border-color: #e4c8c2;
+  background: #f8e2de;
+}
+
+.pur306-order-pop-grid :deep(.rg-row-unsaved) {
+  background: #f8e2de;
+}
+
+.pur306-order-pop-note {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #64748b;
 }
 
 .pur306-grid-actions {
@@ -2382,5 +3641,224 @@ const initAll = () => {
   opacity: 0;
   pointer-events: none;
   overflow: hidden;
+}
+
+.pur306-detail-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 11000;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.pur306-order-pop-backdrop {
+  opacity: 0;
+  transition: opacity 0.65s ease;
+}
+
+.pur306-order-pop-backdrop--in {
+  opacity: 1;
+}
+
+.pur306-order-pop {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pur306-order-pop-backdrop {
+    transition: none;
+  }
+}
+
+.pur306-detail-dialog {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-width: 20rem;
+  min-height: 17.5rem;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2);
+}
+
+.pur306-detail-head {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #fef9c3;
+  border-bottom: 1px solid #e5e7eb;
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+}
+
+.pur306-detail-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.pur306-detail-btn {
+  cursor: pointer;
+  height: 2rem;
+  padding: 0 0.875rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  background: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.pur306-detail-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+  padding: 1rem;
+  overflow: auto;
+}
+
+.pur306-detail-basis {
+  padding: 0.625rem 0.75rem;
+  background: #e8eef4;
+  border: 1px solid #d5dee8;
+  border-radius: 0.375rem;
+}
+
+.pur306-detail-basis-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem 0.75rem;
+  margin: 0;
+}
+
+.pur306-detail-basis-grid > div {
+  min-width: 0;
+}
+
+.pur306-detail-basis-grid dt {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.pur306-detail-basis-grid dd {
+  margin: 0.125rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  word-break: break-all;
+}
+
+.pur306-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem 1rem;
+  margin: 0;
+}
+
+.pur306-detail-grid > div {
+  min-width: 0;
+}
+
+.pur306-detail-grid dt {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.pur306-detail-grid dd {
+  margin: 0.125rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+  word-break: break-all;
+}
+
+.pur306-detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.pur306-detail-field-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #2563eb;
+}
+
+.pur306-detail-field-title::before {
+  content: "";
+  flex: 0 0 0.25rem;
+  width: 0.25rem;
+  height: 1.05em;
+  border-radius: 999px;
+  background: #2563eb;
+}
+
+.pur306-detail-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 2rem;
+  padding: 0 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+.pur306-detail-note {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1d4ed8;
+}
+
+.pur306-detail-actions {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0 1rem 1rem;
+}
+
+.pur306-detail-resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 1rem;
+  height: 1rem;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
+.pur306-detail-resize::before {
+  content: "";
+  position: absolute;
+  right: 0.2rem;
+  bottom: 0.2rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 2px solid #64748b;
+  border-bottom: 2px solid #64748b;
+}
+
+.pur306-detail-btn--ok {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #fff;
 }
 </style>

@@ -84,15 +84,18 @@ body.full-mode .po-content .w-right {width: 100%; padding-left: 20px !important;
 .sidemenu .menu-tab.active .label, .menu-tab.active .ico-menu {color:var(--gray-000); opacity:1;}
 .sidemenu .menu-favorite.active .label, .menu-favorite.active .ico-star-off {color:var(--gray-000); opacity:1;}
 
-/** 전체 열기,접기 토글 **/
+/** 전체 열기 토글 — 라벨 고정, 스위치에 OFF/ON 표시 **/
 .sidemenu .menu-toggle {justify-content: end; gap: 10px; padding-top: 12px; padding-bottom: 0;}
 .sidemenu .menu-toggle .label {color:var(--black-90);}
-.sidemenu .toggle-wrap {position: relative; display: inline-block; width: 36px; height: 22px; cursor: pointer;}
+.sidemenu .toggle-wrap {position: relative; display: inline-block; width: 48px; height: 24px; cursor: pointer; flex-shrink: 0;}
 .sidemenu .toggle-wrap input {display: none;}
-.sidemenu .toggle-ui {position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--black-10); border-radius: 20px;}
-.sidemenu .toggle-ui::before {content: ""; position: absolute; width: 14px;  height: 14px; background:  var(--black-40); border-radius: 50%; top: 50%; left: 4px;  transform: translateY(-50%); transition: left 0.2s;}
-/* ON 상태 */
-.sidemenu .toggle-wrap input:checked + .toggle-ui::before {left: 18px;  background: var(--black);}
+.sidemenu .toggle-ui {position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--black-10); border-radius: 20px; transition: background 0.2s;}
+.sidemenu .toggle-ui::before {content: ""; position: absolute; width: 18px; height: 18px; background: #fff; border-radius: 50%; top: 50%; left: 3px; transform: translateY(-50%); transition: left 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,.2);}
+.sidemenu .toggle-ui::after {content: "OFF"; position: absolute; right: 5px; top: 50%; transform: translateY(-50%); font-size: 9px; font-weight: 700; line-height: 1; color: var(--black-40); letter-spacing: -0.02em; pointer-events: none;}
+/* ON 상태 — soft rose/coral (모바일·웹에서 흔한 톤) */
+.sidemenu .toggle-wrap input:checked + .toggle-ui {background: #f43f5e;}
+.sidemenu .toggle-wrap input:checked + .toggle-ui::before {left: 27px; background: #fff;}
+.sidemenu .toggle-wrap input:checked + .toggle-ui::after {content: "ON"; left: 6px; right: auto; color: #fff;}
 
 /** LNB **/
 .sidemenu .menu-group {display: flex; flex-direction: column; flex: 1; overflow-y: auto; min-height: 0; margin-top: 10px;}

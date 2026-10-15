@@ -238,13 +238,21 @@
           :syncRowDataPulse="topGridSyncPulse"
           @updatedRowData="updatedRowData2"
           :editableColId="'dblOrderQty,strOrderComments'"
-          :inputOnlyNumberColumn="'dblOrderQty'"
+          :input-unsigned-decimal-column="'dblOrderQty'"
+          :CalculateTaxColId="'curTax'"
+          :CalculateTaxColId2="'curSupply'"
+          :CalculateTaxColId3="'curTotal'"
+          :persistCalculateTax="true"
+          :setFooterColID="['dblOrderQty', 'curSupply', 'curTax', 'curTotal']"
+          :setFooterExpressions="['sum', 'sum', 'sum', 'sum']"
           :checkRowAuto="false"
           :setFooter="true"
           :checkRowAuto2="true"
           :checkRenderEditable="true"
           :suppressEdit="isPopupToolbarLocked"
           :rowStateeditable="false"
+          @realgridname="onPopupTopGridName"
+          @gridReady="onPopupTopGridName"
           :rowData="rowData2"></Realgrid>
       </div>
       <div
@@ -301,11 +309,15 @@
           :progname="'PUR03_035INS_VUE'"
           :rowStateeditable="false"
           :setFooter="true"
+          :setFooterColID="['dblOrderQty', 'curSupply', 'curTax', 'curTotal']"
+          :setFooterExpressions="['sum', 'sum', 'sum', 'sum']"
           :CalculateTaxColId="'curTax'"
           :searchColId3="['lngSupplierID']"
           :searchValue="searchValue2"
-          :inputOnlyNumberColumn="'dblOrderQty'"
+          :input-unsigned-decimal-column="'dblOrderQty'"
           :CalculateTaxColId2="'curSupply'"
+          :CalculateTaxColId3="'curTotal'"
+          :persistCalculateTax="true"
           :editableColId="'dblOrderQty,strOrderComments'"
           :syncRowDataPulse="bottomGridSyncPulse"
           @updatedRowData="updatedRowData3"
@@ -315,6 +327,8 @@
           :suppressEdit="isPopupToolbarLocked"
           :searchColId="'lngStockID,strStockName'"
           :searchWord3="scond6"
+          @realgridname="onPopupBottomGridName"
+          @gridReady="onPopupBottomGridName"
           :rowData="rowData3"></Realgrid>
       </div>
     </div>
@@ -325,7 +339,11 @@
     class="fixed bottom-2 right-2 w-[52%] h-[85%] flex items-stretch justify-center bg-black/100 z-50 p-2 box-border">
     <div
       class="bg-white p-6 rounded-xl shadow-lg w-full h-full max-h-full border border-black flex flex-col min-h-0 min-w-0 box-border">
-      <div class="flex shrink-0 justify-end gap-3">
+      <div class="flex shrink-0 items-center justify-between gap-3">
+        <h2 class="text-base font-semibold">
+          {{ String(scond7) === "2" ? "즐겨찾기 자재 추가" : "최근등록 자재 추가" }}
+        </h2>
+        <div class="flex gap-3">
         <button
           type="button"
           class="whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none"
@@ -338,6 +356,7 @@
           @click="closeStockPickerPopup">
           닫기
         </button>
+        </div>
       </div>
       <div
         class="mt-3 border border-black overflow-hidden shrink-0">
@@ -350,17 +369,16 @@
           </div>
           <div
             class="flex items-center pl-2 pr-2 py-1.5 border-b border-r border-black bg-white min-w-0 min-h-9">
-            <select
-              name=""
-              id=""
-              class="w-full h-7 border border-gray-600 px-2 text-sm min-w-0"
-              @change="setSearchValue"
-              v-model="sscond">
-              <option value="-1">전체</option>
-              <option :value="i.lngGenericID" v-for="i in optionList2">
-                {{ i.strGenericName }}
-              </option>
-            </select>
+            <div class="pur-picker-vs min-w-0 w-full">
+              <v-select
+                v-model="sscond"
+                :options="pickerGenericOptions"
+                label="strGenericName"
+                :reduce="(opt) => String(opt?.lngGenericID ?? '-1')"
+                :clearable="false"
+                append-to-body
+                class="style-chooser h-7 w-full text-sm" />
+            </div>
           </div>
           <div
             class="border-b border-r border-black bg-white shrink-0 min-h-9"
@@ -371,13 +389,13 @@
           </div>
           <div
             class="flex items-center pl-2 pr-2 py-1.5 border-b border-black bg-white min-w-0 min-h-9">
-            <BusinessClient
-              :defaultName="''"
-              :defaultNm="'전체'"
-              :toolbarStretch="true"
-              :setDynamicClass="'!w-full !min-w-0 !max-w-none !h-7 shrink border border-gray-600 px-2 text-sm'"
-              :setDynamicClass2="'!mt-0 !items-center !gap-0 min-w-0 w-full [&>div:first-child]:hidden'"
-              @SupplierId="SupplierId3"></BusinessClient>
+            <div class="pur-picker-vs min-w-0 w-full">
+              <BusinessClient2
+                compact-search-bar
+                :defaultName="''"
+                :defaultNm="'전체'"
+                @SupplierId="SupplierId3" />
+            </div>
           </div>
           <div
             class="bg-gray-100 text-sm font-semibold flex items-center justify-center px-2 py-2 border-b border-r border-black">
@@ -400,12 +418,17 @@
       </div>
       <div
         class="mt-1 flex min-h-0 flex-1 flex-col overflow-hidden pb-1">
-        <div class="h-full min-h-0 w-full min-w-0">
+        <div
+          class="h-full min-h-0 w-full min-w-0"
+          @mousedown="onStockPickerMouseDown">
         <Realgrid
           :progname="'PUR03_035INS_VUE'"
           :progid="4"
           :searchWord3="sscond2"
           :headerCheckBar="'lngCheck,lngFavorites'"
+          :checkAbleExpressionCol="'lngCheck'"
+          :checkAbleExpressionCol2="'lngPickerAddable'"
+          :checkAbleExpressionVal="'1'"
           @updatedRowData="updatedRowData4"
           :rowStateeditable="false"
           :checkRenderEditable="true"
@@ -413,11 +436,14 @@
           :checkRowAuto2="true"
           @clickedRowData="clickedRowData"
           @checkedRowData2="checkedRowData2"
+          @checkAllorNot="onStockPickerCheckAll"
           :checkedRowData2Col="'lngFavorites'"
           :emitCheckedRowData2AsJson="true"
           :searchColId="'lngStockID,strStockName'"
           :searchColId3="['lngGenericID', 'lngSupplierID']"
           :searchValue="searchValue"
+          @realgridname="onStockPickerGridName"
+          @gridReady="onStockPickerGridName"
           :rowData="rowData4"></Realgrid>
         </div>
       </div>
@@ -460,6 +486,7 @@ import PickStore from "@/components/pickStore.vue";
  */
 
 import Realgrid from "@/components/realgrid.vue";
+import { rgGetInstance } from "@/components/realgridInstanceRegistry.js";
 /**
  *  페이지로그 자동 입력
  *  */
@@ -652,6 +679,10 @@ const cond6 = ref("");
 const storeCd = ref(0);
 const optionList = ref([]);
 const optionList2 = ref([]);
+const pickerGenericOptions = computed(() => [
+  { lngGenericID: "-1", strGenericName: "전체" },
+  ...(optionList2.value || []),
+]);
 const handleStoreCd = async (e) => {
   storeCd.value = e;
   cond.value = "0";
@@ -689,7 +720,9 @@ const SupplierId = (e) => {
 };
 /** 팝업 하단 자재목록 거래처 필터 전용 — 부모창 supplierid는 건드리지 않음 */
 const SupplierId3 = (e) => {
-  searchValue.value = [searchValue.value[0], e == "0" ? "-1" : e];
+  const v = e == null || e === "" || e == "0" ? "-1" : e;
+  searchValue.value = [searchValue.value[0], v];
+  if (openpopup2.value) clearStockPickerChecks(true);
 };
 const SupplierNm = (e) => {
   suppliernm.value = e;
@@ -742,6 +775,150 @@ const popupOrderHeaderActionsWrap = ref(null);
 const popupMaterialToolbarWrap = ref(null);
 /** 하단 자재목록 그리드 영역 */
 const popupBottomMaterialGridWrap = ref(null);
+const popupTopGridName = ref("");
+const popupBottomGridName = ref("");
+const ORDER_QTY_FIELD = "dblOrderQty";
+/** 상단 발주수량 엔터·화살표 이동 중에는 하단 setRows 를 미룸(포커스 탈취 방지) */
+let suppressBottomPatchFromTop = false;
+
+const qtyEditorText = (grid, event) => {
+  try {
+    const v = grid.getEditValue?.();
+    if (v !== undefined && v !== null) {
+      return String(v);
+    }
+  } catch (_) {}
+  const el =
+    event?.target && typeof event.target.value === "string"
+      ? event.target
+      : document.activeElement;
+  return el && typeof el.value === "string" ? el.value : "";
+};
+
+const isQtyDecimalKeyAllowed = (grid, event) => {
+  const key = event?.key ?? "";
+  if (!key || key.length !== 1) {
+    return true;
+  }
+  if (event?.ctrlKey || event?.metaKey || event?.altKey) {
+    return true;
+  }
+  const text = qtyEditorText(grid, event);
+  const el =
+    event?.target?.selectionStart != null
+      ? event.target
+      : document.activeElement;
+  const start =
+    typeof el?.selectionStart === "number" ? el.selectionStart : text.length;
+  const end = typeof el?.selectionEnd === "number" ? el.selectionEnd : text.length;
+  const next = text.slice(0, start) + key + text.slice(end);
+  if (key === ".") {
+    return next.split(".").length <= 2;
+  }
+  if (key >= "0" && key <= "9") {
+    const dot = next.indexOf(".");
+    if (dot >= 0 && next.slice(dot + 1).length > 2) {
+      return false;
+    }
+    return true;
+  }
+  return false;
+};
+
+const openOrderQtyEditor = (grid, dataRow) => {
+  const open = () => {
+    try {
+      grid.setCurrent({ dataRow, fieldName: ORDER_QTY_FIELD });
+    } catch (_) {}
+    requestAnimationFrame(() => {
+      try {
+        grid.showEditor?.();
+      } catch (_) {}
+    });
+  };
+  nextTick(open);
+};
+
+const bindOrderQtyNav = (gridName) => {
+  const gv = rgGetInstance(gridName)?.gridView;
+  if (!gv) return;
+  try {
+    if (gv.editOptions) {
+      gv.editOptions.enterToNextRow = false;
+      gv.editOptions.crossWhenExitLast = false;
+    }
+  } catch (_) {}
+  gv.onKeyDown = function (grid, event) {
+    const key = event?.key ?? event?.keyCode ?? event;
+    const cur = grid.getCurrent?.() || {};
+    const field = cur.fieldName || cur.column || "";
+    if (field === ORDER_QTY_FIELD && !isQtyDecimalKeyAllowed(grid, event)) {
+      if (event?.preventDefault) event.preventDefault();
+      return false;
+    }
+    const isEnter = key === "Enter" || key === 13;
+    const isUp = key === "ArrowUp" || key === 38;
+    const isDown = key === "ArrowDown" || key === 40;
+    if (!isEnter && !isUp && !isDown) return true;
+    if (field !== ORDER_QTY_FIELD) return true;
+
+    let itemIndex = cur.itemIndex;
+    if (itemIndex == null || itemIndex < 0) {
+      try {
+        itemIndex = grid.getItemIndex?.(cur.dataRow);
+      } catch (_) {
+        itemIndex = cur.dataRow;
+      }
+    }
+    const itemCount = grid.getItemCount?.() ?? 0;
+    let nextItem = itemIndex;
+    if (isEnter || isDown) nextItem = itemIndex + 1;
+    else nextItem = itemIndex - 1;
+
+    let curDataRow = cur.dataRow;
+    if (curDataRow == null || curDataRow < 0) {
+      try {
+        curDataRow = grid.getDataRow?.(itemIndex);
+      } catch (_) {
+        curDataRow = itemIndex;
+      }
+    }
+    const isTopGrid = gridName === popupTopGridName.value;
+    if (isTopGrid) suppressBottomPatchFromTop = true;
+    try {
+      grid.commit?.();
+    } catch (_) {}
+    if (isTopGrid) {
+      nextTick(() => {
+        suppressBottomPatchFromTop = false;
+      });
+    }
+
+    if (nextItem < 0 || nextItem >= itemCount) {
+      openOrderQtyEditor(grid, curDataRow);
+      if (event?.preventDefault) event.preventDefault();
+      return false;
+    }
+    let nextDataRow = nextItem;
+    try {
+      nextDataRow = grid.getDataRow?.(nextItem);
+    } catch (_) {}
+    if (nextDataRow == null || nextDataRow < 0) nextDataRow = nextItem;
+    openOrderQtyEditor(grid, nextDataRow);
+    if (event?.preventDefault) event.preventDefault();
+    return false;
+  };
+};
+
+const onPopupTopGridName = (name) => {
+  if (name) popupTopGridName.value = name;
+  bindOrderQtyNav(popupTopGridName.value);
+};
+
+const onPopupBottomGridName = (name) => {
+  if (name) popupBottomGridName.value = name;
+  bindOrderQtyNav(popupBottomGridName.value);
+};
 
 /** capture 단계 mousedown 시점에 포커스가 상단 발주그리드 안에 있는지 (편집 중인 채 하단으로 옮길 때만 상단 commit 필요) */
 const isFocusInsideTopOrderGrid = () => {
@@ -805,9 +982,16 @@ const onPopupMouseDownSyncBottomGrid = (ev) => {
   });
 };
 
+const STOCK_ID_KEYS = ["lngstockid", "stock_id", "stockid"];
+
 const getStockId = (row) => {
-  if (!row || typeof row !== "object") return "";
-  const candidates = [
+  if (row == null) return "";
+  if (Array.isArray(row)) {
+    const v = row.lngStockID ?? row.LngStockID ?? row[0];
+    if (v !== undefined && v !== null && v !== "") return String(v).trim();
+  }
+  if (typeof row !== "object") return "";
+  const direct = [
     row.lngStockID,
     row.lngStockId,
     row.LngStockID,
@@ -816,8 +1000,12 @@ const getStockId = (row) => {
     row.stockId,
     row.StockID,
   ];
-  for (const v of candidates) {
+  for (const v of direct) {
     if (v !== undefined && v !== null && v !== "") return String(v).trim();
+  }
+  for (const [k, v] of Object.entries(row)) {
+    if (v === undefined || v === null || v === "") continue;
+    if (STOCK_ID_KEYS.includes(String(k).toLowerCase())) return String(v).trim();
   }
   return "";
 };
@@ -964,12 +1152,14 @@ const updatedRowData = (newValue) => {
   //console.log(newValue);
   updatedrowdata.value = newValue;
 };
-/** 상단 발주내역 그리드 emit — 상→하 동기화 */
+/** 상단 발주내역 그리드 emit — 상→하 동기화.
+ * rowData2 에 다시 넣지 않음(setRows 되면 발주수량 편집·엔터 이동이 끊김).
+ * 엔터·화살표 이동 중에는 하단 patch 도 건너뜀(하단 그리드가 포커스를 가져감). */
 const updatedRowData2 = (newValue) => {
   const arr = Array.isArray(newValue) ? newValue : [];
   updatedrowdata2.value = arr;
-  rowData2.value = arr.map((r) => ({ ...r }));
-  rebuildOrderBookFromRows(rowData2.value);
+  rebuildOrderBookFromRows(arr);
+  if (suppressBottomPatchFromTop) return;
   patchRowData3QtyFromOrderBook();
 };
 
@@ -1160,6 +1350,10 @@ const popupPartSelectRef = ref(null);
 const scond5 = ref("");
 /** 자재목록: 1=최근등록, 2=즐겨찾기 */
 const scond7 = ref("1");
+const isPopupFavoriteMode = () => String(scond7.value) === "2";
+/** getStockItemListWithFavorite UDATE — 발주등록II(018)과 동일, 입고예정일(scond3) YYYYMMDD */
+const getFavoriteListUdate = () =>
+  (scond3.value || "").trim().replaceAll("-", "");
 const openpopup2 = ref(false);
 const showStockList = () => {
   if (isPopupToolbarLocked.value) return;
@@ -1179,6 +1373,10 @@ const showStockList = () => {
 };
 
 const sscond = ref("-1");
+watch(sscond, (v) => {
+  searchValue.value = [String(v ?? "-1"), searchValue.value[1]];
+  if (openpopup2.value) clearStockPickerChecks(true);
+});
 const sscond2 = ref("");
 
 const rowData4 = ref([]);
@@ -1191,15 +1389,17 @@ const searchButton2 = async () => {
       popupSessionStoreCd.value,
       scond4.value,
       3,
-      ""
+      getFavoriteListUdate()
     );
-
+    const fav = await loadFavoriteStockList();
+    stockPickerFavoriteIds.value = fav.ids;
     console.log(res);
-    store.state.loading = false;
-    updatedrowdata4.value = [];
-    rowData4.value = res.data.List;
+    applyStockPickerRows(res?.data?.List ?? []);
   } catch (error) {
-    store.state.loading = false;
+    stockPickerFavoriteIds.value = new Set();
+    stockPickerAllRows.value = [];
+    rowData4.value = [];
+    updatedrowdata4.value = [];
   } finally {
     store.state.loading = false;
   }
@@ -1209,34 +1409,344 @@ const searchValue = ref(["-1", "-1"]);
 
 const setSearchValue = (e) => {
   searchValue.value = [e.target.value, searchValue.value[1]];
+  if (openpopup2.value) clearStockPickerChecks(true);
 };
 
 const searchWord = (e) => {
   sscond2.value = e.target.value;
+  if (openpopup2.value) clearStockPickerChecks(true);
+};
+
+const isFavoriteCheckOn = (checked) => {
+  if (checked === true || checked === 1 || checked === "1") return true;
+  const s = String(checked ?? "")
+    .trim()
+    .toLowerCase();
+  return s === "1" || s === "true" || s === "y" || s === "on";
+};
+
+const favoriteValueFromChecked = (checked) =>
+  isFavoriteCheckOn(checked) ? 0 : 1;
+
+const saveFavoriteForStock = async (stockId, value) => {
+  if (!stockId) return;
+  await saveFavoriteStockItemBypart(
+    store.state.userData.lngStoreGroup,
+    popupSessionStoreCd.value,
+    stockId,
+    value,
+    scond4.value
+  );
+};
+
+/** DIV=2 즐겨찾기 목록 — 팝업에 행·체크 표시 */
+const loadFavoriteStockList = async () => {
+  try {
+    const res = await getStockItemListWithFavorite(
+      store.state.userData.lngStoreGroup,
+      popupSessionStoreCd.value,
+      scond4.value,
+      2,
+      getFavoriteListUdate()
+    );
+    const rows = Array.isArray(res?.data?.List) ? res.data.List : [];
+    const ids = new Set();
+    for (const row of rows) {
+      const id = getStockId(row);
+      if (id) ids.add(id);
+    }
+    return { ids, rows };
+  } catch (_) {
+    return { ids: new Set(), rows: [] };
+  }
+};
+
+const rememberPickerFavorite = (stockId, checked) => {
+  if (!stockId) return;
+  const next = new Set(stockPickerFavoriteIds.value);
+  if (isFavoriteCheckOn(checked)) {
+    next.add(stockId);
+    unfavoritedStockIds.value = new Set(
+      [...unfavoritedStockIds.value].filter((id) => !stockIdsEqual(id, stockId))
+    );
+  } else next.delete(stockId);
+  stockPickerFavoriteIds.value = next;
+};
+
+/** 하단 자재목록을 마지막으로 불러온 유형(1 최근등록 / 2 즐겨찾기) */
+const bottomListMode = ref("1");
+/** 팝업에서 즐겨찾기 제외한 자재. API가 아직 옛 목록을 줘도 하단에 다시 넣지 않음 */
+const unfavoritedStockIds = ref(new Set());
+
+/** 즐겨찾기 제외 후에도 남길 품목: [추가] 한 것, 또는 상단에 발주수량이 있는 것 */
+const isBottomStockSelectedToKeep = (row, sid) => {
+  if (isStockPickerPopupAddedRow(row)) return true;
+  const book = sid ? orderBookByStock.value?.[sid] : null;
+  if (book && hasOrderQty(book)) return true;
+  return false;
+};
+
+const stockIdsEqual = (a, b) => {
+  const sa = String(a ?? "").trim();
+  const sb = String(b ?? "").trim();
+  if (!sa || !sb) return false;
+  if (sa === sb) return true;
+  const na = Number(sa);
+  const nb = Number(sb);
+  return Number.isFinite(na) && Number.isFinite(nb) && na === nb;
+};
+
+const collectRowStockIds = (row) => {
+  const out = [];
+  const add = (v) => {
+    const s = String(v ?? "").trim();
+    if (s && !out.some((x) => stockIdsEqual(x, s))) out.push(s);
+  };
+  add(getStockId(row));
+  if (row && typeof row === "object" && !Array.isArray(row)) {
+    add(row.lngStockID);
+    add(row.lngStockId);
+    add(row.LngStockID);
+    add(row.STOCK_ID);
+    add(row.stockId);
+  }
+  return out;
+};
+
+const isUnfavoritedStockId = (id) =>
+  [...unfavoritedStockIds.value].some((d) => stockIdsEqual(d, id));
+
+const markStocksUnfavorited = (stockIds) => {
+  const next = new Set(unfavoritedStockIds.value);
+  for (const id of stockIds || []) {
+    const s = String(id ?? "").trim();
+    if (s) next.add(s);
+  }
+  unfavoritedStockIds.value = next;
+};
+
+/** 018 searchButton3/4와 같이 하단 rowData3 만 갈아끼움. DataProvider 직접 setRows 하지 않음 */
+const applyBottomListRows = (rows) => {
+  const next = (Array.isArray(rows) ? rows : []).map((r) => ({ ...r }));
+  rowData3.value = next;
+  updatedrowdata3.value = next.map((r) => ({ ...r }));
+};
+
+const isBottomFavoriteList = () =>
+  String(scond7.value) === "2" || String(bottomListMode.value) === "2";
+
+/** 즐겨찾기 목록일 때만 하단에서 즉시 제외. API 재조회는 하지 않음(옛 목록이 다시 붙음) */
+const dropUnfavoritedFromBottomNow = (stockIds) => {
+  if (!isBottomFavoriteList()) return;
+  markStocksUnfavorited(stockIds);
+  const next = (rowData3.value || []).filter((r) => {
+    const ids = collectRowStockIds(r);
+    const dropped = ids.some((id) => isUnfavoritedStockId(id));
+    if (!dropped) return true;
+    return isBottomStockSelectedToKeep(r, getStockId(r) || ids[0]);
+  });
+  applyBottomListRows(next);
+  unlockPickerRowsForAdd(stockIds);
+};
+
+/** 하단에서 빠진 품목만 팝업 추가 잠금을 푼다. 선택 체크는 그대로 둔다. */
+const unlockPickerRowsForAdd = (stockIds) => {
+  const idSet = new Set(
+    (stockIds || []).map((id) => String(id ?? "").trim()).filter(Boolean)
+  );
+  if (idSet.size === 0) return;
+  stockPickerAllRows.value = (stockPickerAllRows.value || []).map((r) => {
+    const id = getStockId(r);
+    if (!id || !idSet.has(id)) return r;
+    return { ...r, lngPickerAddable: "1" };
+  });
+  const dp = rgGetInstance(stockPickerGridName.value)?.dataProvider;
+  if (!dp || typeof dp.getRowCount !== "function") return;
+  const n = dp.getRowCount();
+  for (let i = 0; i < n; i++) {
+    try {
+      const id = getStockId(dp.getJsonRow(i));
+      if (!id || !idSet.has(id)) continue;
+      dp.setValue(i, "lngPickerAddable", "1");
+    } catch (_) {}
+  }
+};
+
+const resolvePickerStockId = (payload, dataRow) => {
+  if (payload && typeof payload === "object") {
+    const fromObj = getStockId(payload);
+    if (fromObj) return fromObj;
+    if (Array.isArray(payload) && payload.length >= 4) {
+      const fromArr = String(payload[3] ?? "").trim();
+      if (fromArr) return fromArr;
+    }
+  }
+  if (dataRow == null || dataRow < 0) return "";
+  try {
+    const row = rgGetInstance(stockPickerGridName.value)?.dataProvider?.getJsonRow?.(
+      dataRow
+    );
+    return getStockId(row);
+  } catch (_) {
+    return "";
+  }
+};
+
+let syncingPickerFavoriteCells = false;
+
+const pickerIdIsFavorite = (id) => {
+  const s = String(id ?? "").trim();
+  if (!s) return false;
+  for (const x of stockPickerFavoriteIds.value) {
+    if (stockIdsEqual(x, s)) return true;
+  }
+  return false;
+};
+
+/** 즐겨찾기 셀을 저장된 즐겨찾기만 켜 둔다. onlyOutsideFilter면 지금 조건 밖 행만 */
+const applyPickerFavoriteCells = (onlyOutsideFilter) => {
+  syncingPickerFavoriteCells = true;
+  try {
+    const inst = rgGetInstance(stockPickerGridName.value);
+    const dp = inst?.dataProvider;
+    const mapRow = (row) => {
+      if (!row) return row;
+      if (onlyOutsideFilter && rowMatchesPickerFilter(row)) return row;
+      const id = getStockId(row);
+      if (!id) return row;
+      return { ...row, lngFavorites: pickerIdIsFavorite(id) };
+    };
+    if (dp && typeof dp.getRowCount === "function") {
+      const n = dp.getRowCount();
+      try {
+        dp.beginUpdate?.();
+        for (let i = 0; i < n; i++) {
+          let row = null;
+          try {
+            row = dp.getJsonRow(i);
+          } catch (_) {
+            continue;
+          }
+          if (!row) continue;
+          if (onlyOutsideFilter && rowMatchesPickerFilter(row)) continue;
+          const id = getStockId(row);
+          if (!id) continue;
+          const on = pickerIdIsFavorite(id);
+          try {
+            if (isFavoriteCheckOn(dp.getValue(i, "lngFavorites")) !== on) {
+              dp.setValue(i, "lngFavorites", on);
+            }
+          } catch (_) {}
+        }
+      } finally {
+        try {
+          dp.endUpdate?.();
+        } catch (_) {}
+      }
+    }
+    stockPickerAllRows.value = (stockPickerAllRows.value || []).map(mapRow);
+    if (
+      Array.isArray(stockPickerLiveRows.value) &&
+      stockPickerLiveRows.value.length
+    ) {
+      stockPickerLiveRows.value = stockPickerLiveRows.value.map(mapRow);
+    }
+  } finally {
+    syncingPickerFavoriteCells = false;
+  }
 };
 
 /** 자재추가 팝업: 즐겨찾기(lngFavorites) 토글 시마다 API 호출 */
-const checkedRowData2 = async (row) => {
-  if (!row || typeof row !== "object") return;
-  const stockId = getStockId(row);
+const checkedRowData2 = async (payload, fieldName, dataRow, oldVal, newVal) => {
+  const col = String(fieldName || "").trim();
+  if (col && col !== "lngFavorites" && col !== "LngFavorites") return;
+  if (syncingPickerFavoriteCells) return;
+  const rowObj =
+    payload && typeof payload === "object" && !Array.isArray(payload)
+      ? payload
+      : null;
+  const stockId = resolvePickerStockId(payload, dataRow);
+  let matchesFilter = true;
+  if (rowObj) matchesFilter = rowMatchesPickerFilter(rowObj);
+  else if (dataRow != null && dataRow >= 0) {
+    try {
+      const r = rgGetInstance(
+        stockPickerGridName.value
+      )?.dataProvider?.getJsonRow?.(dataRow);
+      if (r) matchesFilter = rowMatchesPickerFilter(r);
+    } catch (_) {}
+  }
+  if (!matchesFilter) return;
   if (!stockId) return;
-  const favRaw = getRowVal(row, "lngFavorites", "LngFavorites");
-  const isFavoriteOn =
-    favRaw === true ||
-    favRaw === 1 ||
-    favRaw === "1" ||
-    String(favRaw).trim() === "1";
-  /** 기존 로직 유지: 체크됨(true) → VALUE 0, 해제 → 1 */
-  const value = isFavoriteOn ? 0 : 1;
+  const favRaw =
+    newVal !== undefined && newVal !== null
+      ? newVal
+      : payload && typeof payload === "object" && !Array.isArray(payload)
+        ? getRowVal(payload, "lngFavorites", "LngFavorites")
+        : Array.isArray(payload)
+          ? payload[1]
+          : undefined;
   try {
-    await saveFavoriteStockItemBypart(
-      store.state.userData.lngStoreGroup,
-      popupSessionStoreCd.value,
-      stockId,
-      value,
-      scond4.value
-    );
+    await saveFavoriteForStock(stockId, favoriteValueFromChecked(favRaw));
+    rememberPickerFavorite(stockId, favRaw);
+    if (!isFavoriteCheckOn(favRaw)) {
+      dropUnfavoritedFromBottomNow([stockId]);
+    }
   } catch (_) {}
+};
+
+/** 헤더 전체선택 — 선택(lngCheck)은 추가용, 즐겨찾기(lngFavorites)는 저장용 */
+const onStockPickerCheckAll = async (chk, fieldName) => {
+  const col = String(fieldName || "").trim();
+  const isOn = chk === true || chk === 1 || chk === "1";
+  stockPickerAcceptChecks = true;
+
+  if (col === "lngCheck" || col === "LngCheck") {
+    const checked = collectCheckedPickerRowsFromProvider();
+    stockPickerCheckedIds.value = new Set(
+      checked.map(getStockId).filter(Boolean)
+    );
+    updatedrowdata4.value = checked;
+    return;
+  }
+
+  if (col !== "lngFavorites" && col !== "LngFavorites") return;
+  const fallback =
+    stockPickerLiveRows.value.length > 0
+      ? stockPickerLiveRows.value
+      : rowData4.value;
+  const visible = getPickerVisibleRows(fallback);
+  const visibleIds = new Set(visible.map(getStockId).filter(Boolean));
+  if (visibleIds.size === 0) return;
+  const value = favoriteValueFromChecked(chk);
+  if (isOn) {
+    unfavoritedStockIds.value = new Set(
+      [...unfavoritedStockIds.value].filter((id) => !visibleIds.has(String(id)))
+    );
+  }
+  store.state.loading = true;
+  try {
+    await Promise.allSettled(
+      visible.map((row) => {
+        const stockId = getStockId(row);
+        return stockId
+          ? saveFavoriteForStock(stockId, value)
+          : Promise.resolve();
+      })
+    );
+    const next = new Set(stockPickerFavoriteIds.value);
+    for (const id of visibleIds) {
+      if (isOn) next.add(id);
+      else next.delete(id);
+    }
+    stockPickerFavoriteIds.value = next;
+    if (!isOn) {
+      dropUnfavoritedFromBottomNow([...visibleIds]);
+    }
+    applyPickerFavoriteCells(true);
+  } finally {
+    store.state.loading = false;
+  }
 };
 
 const selectedRowForPopup = ref(null);
@@ -1561,10 +2071,252 @@ const dblclickedRowData = async (row) => {
   await openOrderDetailPopup(r);
 };
 
+const stockPickerAllRows = ref([]);
+const stockPickerFavoriteIds = ref(new Set());
+const stockPickerLiveRows = ref([]);
+const stockPickerCheckedIds = ref(new Set());
 const updatedrowdata4 = ref([]);
+/** 조회 emit 의 API lngCheck=1 은 선택이 아님. 팝업에서 마우스로 체크한 뒤만 인정 */
+let stockPickerAcceptChecks = false;
+
+const isLngCheckOn = (row) => {
+  if (!row || typeof row !== "object") return false;
+  const v = row.lngCheck;
+  return v === true || v === 1 || v === "1";
+};
+
+const onStockPickerMouseDown = () => {
+  stockPickerAcceptChecks = true;
+};
+
+/** 추가 후·필터 변경 시 선택 체크와 헤더 전체체크만 해제. 즐겨찾기 셀은 유지 */
+const clearStockPickerChecks = (releaseFavoriteHeader = false) => {
+  stockPickerAcceptChecks = false;
+  stockPickerCheckedIds.value = new Set();
+  updatedrowdata4.value = [];
+  const inst = rgGetInstance(stockPickerGridName.value);
+  const gv = inst?.gridView;
+  const dp = inst?.dataProvider;
+  if (dp && typeof dp.getRowCount === "function") {
+    const n = dp.getRowCount();
+    try {
+      dp.beginUpdate?.();
+      for (let i = 0; i < n; i++) {
+        try {
+          const v = dp.getValue(i, "lngCheck");
+          if (v === true || v === 1 || v === "1") {
+            dp.setValue(i, "lngCheck", false);
+          }
+        } catch (_) {}
+      }
+    } finally {
+      try {
+        dp.endUpdate?.();
+      } catch (_) {}
+    }
+  }
+  if (gv) {
+    const headerFields = releaseFavoriteHeader
+      ? ["lngCheck", "lngFavorites"]
+      : ["lngCheck"];
+    for (const field of headerFields) {
+      try {
+        const col =
+          gv.columnByName?.(field) || gv.columnByField?.(field);
+        if (col) col.checked = false;
+      } catch (_) {}
+      try {
+        gv.setColumnProperty?.(field, "checked", false);
+      } catch (_) {}
+    }
+  }
+  if (releaseFavoriteHeader) applyPickerFavoriteCells(false);
+  stockPickerAllRows.value = (stockPickerAllRows.value || []).map((r) => ({
+    ...r,
+    lngCheck: false,
+  }));
+  if (Array.isArray(stockPickerLiveRows.value) && stockPickerLiveRows.value.length) {
+    stockPickerLiveRows.value = stockPickerLiveRows.value.map((r) => ({
+      ...r,
+      lngCheck: false,
+    }));
+  }
+};
+
+const stockPickerGridName = ref("");
+const onStockPickerGridName = (name) => {
+  if (name) stockPickerGridName.value = name;
+};
+
+/** 팝업 조회조건(자재특성·거래처·이름)에 맞는 행만 — 그리드 필터와 동일 */
+const rowMatchesPickerFilter = (row) => {
+  if (!row || typeof row !== "object") return false;
+  const generic = String(searchValue.value?.[0] ?? "-1");
+  const supplier = String(searchValue.value?.[1] ?? "-1");
+  if (generic !== "-1") {
+    const g = String(getRowVal(row, "lngGenericID", "LngGenericID") ?? "");
+    if (g !== generic) return false;
+  }
+  if (supplier !== "-1") {
+    const s = String(getRowVal(row, "lngSupplierID", "LngSupplierID") ?? "");
+    if (s !== supplier) return false;
+  }
+  const word = String(sscond2.value ?? "").trim();
+  if (word) {
+    const id = getStockId(row);
+    const name = String(getRowVal(row, "strStockName", "StrStockName") ?? "");
+    const w = word.toLowerCase();
+    if (!id.toLowerCase().includes(w) && !name.toLowerCase().includes(w)) {
+      return false;
+    }
+  }
+  return true;
+};
+
+/** 화면에 보이는 행만. 그리드 행도 거래처·자재특성 조회조건으로 한 번 더 건다. */
+const getPickerVisibleRows = (fallbackRows) => {
+  const filtered = (Array.isArray(fallbackRows) ? fallbackRows : []).filter(
+    rowMatchesPickerFilter
+  );
+  const inst = rgGetInstance(stockPickerGridName.value);
+  const gv = inst?.gridView;
+  const dp = inst?.dataProvider;
+  if (gv && dp && typeof gv.getItemCount === "function") {
+    const out = [];
+    const n = gv.getItemCount();
+    for (let i = 0; i < n; i++) {
+      let dataRow = -1;
+      try {
+        dataRow = gv.getDataRow(i);
+      } catch (_) {
+        continue;
+      }
+      if (dataRow == null || dataRow < 0) continue;
+      let row = null;
+      try {
+        row = dp.getJsonRow(dataRow);
+      } catch (_) {
+        continue;
+      }
+      if (row && rowMatchesPickerFilter(row)) out.push(row);
+    }
+    if (out.length > 0) return out;
+  }
+  return filtered;
+};
+
+const collectCheckedPickerRowsFromProvider = () => {
+  const inst = rgGetInstance(stockPickerGridName.value);
+  const dp = inst?.dataProvider;
+  const inSub = subGridStockIds();
+  const out = [];
+  if (!dp || typeof dp.getRowCount !== "function") return out;
+  const n = dp.getRowCount();
+  for (let i = 0; i < n; i++) {
+    let row = null;
+    try {
+      row = dp.getJsonRow(i);
+    } catch (_) {
+      continue;
+    }
+    if (!row || !rowMatchesPickerFilter(row)) continue;
+    const id = getStockId(row);
+    if (!id || inSub.has(id)) continue;
+    if (!isLngCheckOn(row)) continue;
+    out.push(row);
+  }
+  return out;
+};
+
+const collectPickerChecked = (rows) => {
+  const fromGrid = collectCheckedPickerRowsFromProvider();
+  const visible = fromGrid.length > 0 ? fromGrid : getPickerVisibleRows(rows);
+  const inSub = subGridStockIds();
+  const next = new Set();
+  const checkedRows = [];
+  for (const row of visible) {
+    const id = getStockId(row);
+    if (!id || inSub.has(id)) continue;
+    if (!isLngCheckOn(row) && fromGrid.length === 0) continue;
+    if (fromGrid.length === 0 && String(row?.lngPickerAddable ?? "1") === "0") {
+      continue;
+    }
+    if (!isLngCheckOn(row)) continue;
+    next.add(id);
+    checkedRows.push(row);
+  }
+  stockPickerCheckedIds.value = next;
+  updatedrowdata4.value = checkedRows;
+};
+
+const subGridStockIds = () => {
+  const ids = new Set();
+  for (const row of rowData3.value || []) {
+    const id = getStockId(row);
+    if (id) ids.add(id);
+  }
+  return ids;
+};
+
+/** 팝업 행 순서는 DIV=3(전체) 그대로. 즐겨찾기·이미 있는 품목을 맨 아래로 보내지 않는다. */
+const unionPickerSourceRows = (allList) =>
+  Array.isArray(allList) ? allList : [];
+
+const filterStockPickerList = (list) =>
+  (Array.isArray(list) ? list : []).filter((item) => getStockId(item) !== "");
+
+const normalizePickerRow = (item, inSubIds) => {
+  const ids = inSubIds || subGridStockIds();
+  const id = getStockId(item);
+  const fromRow = item?.lngFavorites ?? item?.LngFavorites;
+  const marked =
+    !isUnfavoritedStockId(id) &&
+    ((id !== "" && stockPickerFavoriteIds.value.has(id)) ||
+      isFavoriteCheckOn(fromRow));
+  const inSub = id !== "" && ids.has(id);
+  return {
+    ...item,
+    lngCheck: false,
+    checkbox: false,
+    lngFavorites: marked,
+    lngPickerAddable: inSub ? "0" : "1",
+  };
+};
+
+const applyStockPickerRows = (list) => {
+  stockPickerAcceptChecks = false;
+  stockPickerCheckedIds.value = new Set();
+  updatedrowdata4.value = [];
+  stockPickerLiveRows.value = [];
+  const inSubIds = subGridStockIds();
+  stockPickerAllRows.value = unionPickerSourceRows(list).map((item) =>
+    normalizePickerRow(item, inSubIds)
+  );
+  rowData4.value = filterStockPickerList(stockPickerAllRows.value);
+};
+
+/** 자재목록(최근등록/즐겨찾기)이 바뀌면, 열린 자재추가 팝업의 이미-있는-품목 잠금만 다시 맞춘다. */
+const refreshPickerAddableFromBottomGrid = () => {
+  if (!openpopup2.value) return;
+  const source =
+    stockPickerAllRows.value?.length > 0
+      ? stockPickerAllRows.value
+      : rowData4.value;
+  if (!Array.isArray(source) || source.length === 0) return;
+  const inSubIds = subGridStockIds();
+  stockPickerAllRows.value = source.map((r) => normalizePickerRow(r, inSubIds));
+  rowData4.value = filterStockPickerList(stockPickerAllRows.value);
+};
+
 const updatedRowData4 = (e) => {
-  updatedrowdata4.value = e.filter((item) => item.lngCheck == true);
-  console.log(updatedrowdata4.value);
+  const rows = Array.isArray(e) ? e : [];
+  stockPickerLiveRows.value = rows;
+  if (!stockPickerAcceptChecks) {
+    updatedrowdata4.value = [];
+    stockPickerCheckedIds.value = new Set();
+    return;
+  }
+  collectPickerChecked(rows);
 };
 
 const rowData3 = ref([]);
@@ -1582,21 +2334,71 @@ const loadPopupStockListForMaterialPane = async (favoriteType) => {
     favoriteType != null && favoriteType !== ""
       ? favoriteType
       : scond7.value;
+  bottomListMode.value = String(mode);
   try {
+    const prevRows = (rowData3.value || []).map((r) => ({ ...r }));
+    const prevBySid = {};
+    for (const r of prevRows) {
+      const sid = getStockId(r);
+      if (sid) prevBySid[sid] = r;
+    }
+
     const res = await getStockItemListWithFavorite(
       store.state.userData.lngStoreGroup,
       popupSessionStoreCd.value,
       scond4.value,
       mode,
-      ""
+      getFavoriteListUdate()
     );
-    const prevRows = rowData3.value || [];
-    const freshList = res?.data?.List ?? [];
-    const merged = mergeFavoriteReloadWithExistingBottomRows(freshList, prevRows);
-    updatedrowdata3.value = merged;
-    rowData3.value = merged;
+    const list = res?.data?.List ?? [];
+
+    /** 018 searchButton3/4 — API 목록으로 하단을 통째로 갈아끼움. 예전 행을 다시 붙이지 않음 */
+    const next = list
+      .filter((item) => {
+        const sid = getStockId(item);
+        if (!sid || !isUnfavoritedStockId(sid)) return true;
+        return isBottomStockSelectedToKeep(prevBySid[sid] || item, sid);
+      })
+      .map((item) => {
+        const sid = getStockId(item);
+        const prev = sid ? prevBySid[sid] : null;
+        const row = {
+          ...item,
+          lngCheck: prev?.lngCheck ?? item.lngCheck ?? item.LngCheck ?? "0",
+          checkbox: prev?.checkbox ?? item.checkbox ?? false,
+        };
+        if (prev) {
+          if (prev.dblOrderQty != null && prev.dblOrderQty !== "") {
+            row.dblOrderQty = prev.dblOrderQty;
+            row.curSupply = prev.curSupply;
+            row.curTax = prev.curTax;
+            row.curTotal = prev.curTotal;
+          }
+          if (prev.strOrderComments != null) {
+            row.strOrderComments = prev.strOrderComments;
+          }
+          if (isStockPickerPopupAddedRow(prev)) {
+            row.lngFromStockPickerAdd = 1;
+          }
+        }
+        return row;
+      });
+
+    /** 018 닫기 extras: API에 없는 이전 행. 매입은 [추가]·수량 있는 것만 유지 */
+    if (String(mode) === "2") {
+      const apiIds = new Set(next.map((r) => getStockId(r)).filter(Boolean));
+      for (const r of prevRows) {
+        const id = getStockId(r);
+        if (!id || apiIds.has(id)) continue;
+        if (!isBottomStockSelectedToKeep(r, id)) continue;
+        next.push({ ...r });
+        apiIds.add(id);
+      }
+    }
+
+    applyBottomListRows(next);
     await nextTick();
-    updatedRowData3(merged);
+    refreshPickerAddableFromBottomGrid();
   } catch (error) {}
 };
 
@@ -1606,84 +2408,47 @@ const isStockPickerPopupAddedRow = (row) =>
   row?.lngFromStockPickerAdd === true ||
   row?.lngFromStockPickerAdd === "1";
 
-/** 즐겨찾기만 서버 목록으로 새로 깔고, 입력수량 등은 같은 자재코드(prev)와 병합 */
-function mergeFavoriteReloadWithExistingBottomRows(freshList, prevRows) {
-  const prevBySid = {};
-  for (const r of prevRows || []) {
-    const sid = getStockId(r);
-    if (sid) prevBySid[sid] = r;
-  }
-  const freshSids = new Set(
-    (freshList || []).map((r) => getStockId(r)).filter(Boolean)
-  );
+const closeStockPickerPopup = async () => {
+  openpopup2.value = false;
+};
 
-  const out = (freshList || []).map((row) => {
-    const sid = getStockId(row);
-    const prev = sid ? prevBySid[sid] : null;
-    if (!sid || !prev) return { ...row };
-    const merged = {
-      ...row,
-      dblOrderQty: prev.dblOrderQty,
-      curSupply: prev.curSupply,
-      curTax: prev.curTax,
-      curTotal: prev.curTotal,
-      strOrderComments: prev.strOrderComments ?? row.strOrderComments,
-      lngCheck: prev.lngCheck,
-      ...(Object.prototype.hasOwnProperty.call(prev, "checkbox")
-        ? { checkbox: prev.checkbox }
-        : {}),
-    };
-    if (isStockPickerPopupAddedRow(prev)) merged.lngFromStockPickerAdd = 1;
-    return merged;
-  });
-
-  /** 즐겨찾기 API에 없어진 줄은 버리되, 팝업 [추가]로만 넣은 품목은 계속 표시 */
-  for (const r of prevRows || []) {
-    const sid = getStockId(r);
-    if (!sid || freshSids.has(sid)) continue;
-    if (!isStockPickerPopupAddedRow(r)) continue;
-    out.push({ ...r });
-  }
-  return out;
-}
-
-/** 하단 자재목록이 즐겨찾기일 때 자재추가 팝업 닫기 후 목록만 최신화 */
-const reloadFavoriteListPreservingBottomRows = async () => {
+/** 018과 동일: 자재추가 팝업을 닫으면 즐겨찾기 목록으로 하단을 다시 조회 */
+watch(openpopup2, async (isOpen, wasOpen) => {
+  if (isOpen) return;
+  if (wasOpen !== true) return;
+  if (String(scond7.value) !== "2") return;
+  if (!openpopup.value) return;
+  if (scond4.value === "0" || scond4.value === 0) return;
+  if (isPopupToolbarLocked.value) return;
   store.state.loading = true;
   try {
-    const prevRows = rowData3.value || [];
-    const res = await getStockItemListWithFavorite(
-      store.state.userData.lngStoreGroup,
-      popupSessionStoreCd.value,
-      scond4.value,
-      "2",
-      ""
-    );
-    const freshList = res?.data?.List ?? [];
-    const merged = mergeFavoriteReloadWithExistingBottomRows(freshList, prevRows);
-    rowData3.value = merged;
-    updatedrowdata3.value = merged.map((r) => ({ ...r }));
-    await nextTick();
-    updatedRowData3(merged);
+    await loadPopupStockListForMaterialPane("2");
   } catch (_) {
     /* noop */
   } finally {
     store.state.loading = false;
   }
-};
-
-const closeStockPickerPopup = async () => {
-  openpopup2.value = false;
-  if (isPopupToolbarLocked.value) return;
-  if (isOrderDetailView.value) return;
-  if (scond4.value === "0" || scond4.value === 0) return;
-  if (String(scond7.value) !== "2") return;
-  await reloadFavoriteListPreservingBottomRows();
-};
+});
 
 /** 자재추가: 기존 하단 목록 유지 + 선택 품목만 추가(동일 자재는 건너뜀) */
 const addButton2 = async () => {
-  if (updatedrowdata4.value.length == 0) {
+  const fromGrid = collectCheckedPickerRowsFromProvider();
+  const source =
+    fromGrid.length > 0
+      ? fromGrid
+      : getPickerVisibleRows(
+          stockPickerLiveRows.value.length > 0
+            ? stockPickerLiveRows.value
+            : rowData4.value
+        );
+  const selected = source.filter((row) => {
+    const id = getStockId(row);
+    return (
+      id &&
+      (stockPickerCheckedIds.value.has(id) || isLngCheckOn(row))
+    );
+  });
+  if (selected.length === 0) {
     Swal.fire({
       title: "경고",
       text: "추가하실 자재를 선택해주세요.",
@@ -1695,27 +2460,39 @@ const addButton2 = async () => {
   }
 
   const existing = [...(rowData3.value || [])];
-  const existingSids = new Set(
-    existing.map((r) => getStockId(r)).filter(Boolean)
-  );
+  const existingSids = subGridStockIds();
   const additions = [];
-  for (const item of updatedrowdata4.value) {
+  let skippedExist = 0;
+  let skippedNoId = 0;
+  for (const item of selected) {
     const sid = getStockId(item);
-    if (!sid || existingSids.has(sid)) continue;
+    if (!sid) {
+      skippedNoId += 1;
+      continue;
+    }
+    if (existingSids.has(sid)) {
+      skippedExist += 1;
+      continue;
+    }
     existingSids.add(sid);
     additions.push({
       ...item,
       dblOrderQty: 0,
       curSupply: 0,
       lngCheck: "0",
+      checkbox: false,
       lngFromStockPickerAdd: 1,
+      ...(isPopupFavoriteMode() ? { lngFavorites: true } : {}),
     });
   }
 
   if (additions.length === 0) {
     await Swal.fire({
       title: "안내",
-      text: "선택한 품목은 이미 자재목록에 있습니다.",
+      text:
+        skippedNoId > 0 && skippedExist === 0
+          ? "선택한 품목의 자재코드를 확인할 수 없습니다."
+          : "선택한 품목은 이미 자재목록에 있습니다.",
       icon: "info",
       confirmButtonText: "확인",
     });
@@ -1724,8 +2501,29 @@ const addButton2 = async () => {
 
   rowData3.value = [...existing, ...additions];
   updatedrowdata3.value = rowData3.value.map((r) => ({ ...r }));
+  if (isPopupFavoriteMode()) {
+    await Promise.allSettled(
+      additions.map((row) => {
+        const id = getStockId(row);
+        if (!id) return Promise.resolve();
+        rememberPickerFavorite(id, true);
+        return saveFavoriteForStock(id, favoriteValueFromChecked(true));
+      })
+    );
+  }
   await nextTick();
   updatedRowData3(rowData3.value);
+  stockPickerAcceptChecks = false;
+  stockPickerCheckedIds.value = new Set();
+  updatedrowdata4.value = [];
+  stockPickerLiveRows.value = [];
+  const inSubIds = subGridStockIds();
+  stockPickerAllRows.value = (stockPickerAllRows.value || []).map((r) =>
+    normalizePickerRow(r, inSubIds)
+  );
+  rowData4.value = filterStockPickerList(stockPickerAllRows.value);
+  await nextTick();
+  clearStockPickerChecks();
 };
 
 const searchButton3 = async (e) => {
@@ -2124,6 +2922,26 @@ const deleteStock2 = async () => {
   await applyLocalDeleteStock2(rows, removedIds);
 };
 
+/** 화면 계산과 저장값을 맞춤: 공급가=floor(단가×발주수량), 과세(01)만 부가세 10% */
+function applyOrderQtyAmounts(item) {
+  const unit = Number(item?.curUnitPrice || 0);
+  const qty = Number(item?.dblOrderQty || 0);
+  const supply = Math.floor(unit * qty);
+  let taxType = item?.lngTaxType;
+  if (taxType == null || String(taxType).trim() === "") {
+    const oldSupply = Number(item?.curSupply || 0);
+    const oldTax = Number(item?.curTax || 0);
+    taxType = oldSupply !== 0 && oldTax === 0 ? "00" : "01";
+  }
+  const tax = String(taxType) === "01" ? Math.floor(supply * 0.1) : 0;
+  return {
+    ...item,
+    curSupply: supply,
+    curTax: tax,
+    curTotal: Math.floor(supply + tax),
+  };
+}
+
 const UpdateOrderStockDetail = async () => {
   const orderNo = popupSessionOrderNo.value;
   const orderSeq = popupSessionOrderSeq.value;
@@ -2148,7 +2966,8 @@ const UpdateOrderStockDetail = async () => {
   const supSnap = orderDetailSupplierByStockId.value || {};
   const seqSnap = orderDetailOrderSeqByStockId.value || {};
   let lastRes = null;
-  for (const item of targetRows) {
+  for (const raw of targetRows) {
+    const item = applyOrderQtyAmounts(raw);
     const sid = getStockId(item);
     const orig = sid ? origMap[sid] : undefined;
     const supplierId =
@@ -2225,7 +3044,9 @@ const saveButton2 = async () => {
     if (isOrderDetailView.value) {
       res = await UpdateOrderStockDetail();
     } else {
-      const supplierid = updatedrowdata2.value
+      const saveRows = (updatedrowdata2.value || []).map(applyOrderQtyAmounts);
+      updatedrowdata2.value = saveRows;
+      const supplierid = saveRows
         .map((item) => {
           const sid = getStockId(item);
           return (
@@ -2235,22 +3056,22 @@ const saveButton2 = async () => {
           );
         })
         .join("\u200b");
-      const stockids = updatedrowdata2.value
+      const stockids = saveRows
         .map((item) => item.lngStockID)
         .join("\u200b");
-      const qty = updatedrowdata2.value
+      const qty = saveRows
         .map((item) => item.dblOrderQty)
         .join("\u200b");
-      const unitprice = updatedrowdata2.value
+      const unitprice = saveRows
         .map((item) => item.curUnitPrice)
         .join("\u200b");
-      const supplys = updatedrowdata2.value
+      const supplys = saveRows
         .map((item) => item.curSupply)
         .join("\u200b");
-      const taxs = updatedrowdata2.value
+      const taxs = saveRows
         .map((item) => item.curTax)
         .join("\u200b");
-      const comments = updatedrowdata2.value
+      const comments = saveRows
         .map((item) => item.strOrderComments)
         .join("\u200b");
 
@@ -2432,6 +3253,8 @@ const initGrid2 = () => {
   scond5.value = "";
 
   scond7.value = "1";
+  bottomListMode.value = "1";
+  unfavoritedStockIds.value = new Set();
   scond6.value = "";
 
   rowData2.value = [];
@@ -2597,6 +3420,64 @@ const closeOpenpopup = () => {
 
 .pur035-bc-slot :deep(> div.flex.items-center) {
   margin-top: 0;
+}
+
+/* 자재추가 팝업 콤보 — 칸 안 전체 폭·테두리(원래 select와 동일), 펼침 스크롤은 공통 vs 스타일 */
+.pur-picker-vs {
+  width: 100%;
+  min-width: 0;
+}
+.pur-picker-vs :deep(.flex.text-base) {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0;
+  gap: 0 !important;
+}
+.pur-picker-vs :deep(.pickstore-vs-shell) {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: 1.75rem;
+  min-height: 1.75rem;
+  max-height: 1.75rem;
+  overflow: hidden;
+  border: 1px solid #4b5563;
+  border-radius: 0;
+  background: #fff;
+}
+.pur-picker-vs :deep(.v-select),
+.pur-picker-vs :deep(.style-chooser) {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+.pur-picker-vs :deep(.vs__dropdown-toggle) {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 1.75rem;
+  min-height: 1.75rem;
+  max-height: 1.75rem;
+  padding: 0 0.25rem;
+  border: 1px solid #4b5563 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+.pur-picker-vs :deep(.pickstore-vs-shell .vs__dropdown-toggle) {
+  border: 0 !important;
+}
+.pur-picker-vs :deep(.vs__selected),
+.pur-picker-vs :deep(.vs__search),
+.pur-picker-vs :deep(.vs__search::placeholder) {
+  margin: 0;
+  padding: 0 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 
 /* 매핑된 매장명: vue-select disabled 기본 회색 → 검정 (CSS 변수 + 자식 상속) */
