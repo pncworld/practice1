@@ -27,7 +27,7 @@
         :clearable="!disable"
         append-to-body
         :disabled="disable"
-        class="style-chooser h-full !disabled:text-black text-sm">
+        class="style-chooser pickstore-chooser h-full !disabled:text-black text-sm">
         <template #no-options>
           <div>검색된 항목이 없습니다.</div>
         </template>

@@ -508,7 +508,30 @@
                 기 발주품목
               </span>
             </div>
-            <p class="pur306-order-pop-note">발주수량과 메모만 수정할 수 있습니다. 적용하면 발주 화면에 반영되고, 삭제와 저장은 발주 화면에서 합니다.</p>
+            <p class="pur306-order-pop-note">
+              <svg
+                class="pur306-order-pop-note__icon"
+                viewBox="0 0 20 20"
+                aria-hidden="true"
+                focusable="false">
+                <circle
+                  cx="10"
+                  cy="10"
+                  r="8.25"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5" />
+                <circle cx="10" cy="6.2" r="1.15" fill="currentColor" />
+                <path
+                  d="M10.75 14.2V9.55c0-.28-.24-.48-.52-.43l-1.2.28c-.27.05-.46.28-.46.55h.66c.17 0 .3.14.3.3v3.5c0 .19-.15.34-.34.34h-.25c-.22 0-.39.17-.39.39v.1h2.9v-.1c0-.22-.17-.39-.39-.39h0c-.19 0-.34-.15-.34-.34z"
+                  fill="currentColor" />
+              </svg>
+              <span>
+                <em class="pur306-order-pop-note__em">발주수량</em>과
+                <em class="pur306-order-pop-note__em">메모</em> 수정이 가능합니다.
+                적용하면 발주 화면에 반영되고, 삭제와 저장은 발주 화면에서 합니다.
+              </span>
+            </p>
             <div
               class="pur306-order-pop-grid"
               :class="{ 'pur306-order-pop-grid--pending': !orderPopGridVisible }">
@@ -538,8 +561,35 @@
             </div>
           </div>
           <div class="pur306-detail-actions">
-            <button type="button" class="pur306-detail-btn" @click="closeOrderGridPopup">취소</button>
-            <button type="button" class="pur306-detail-btn pur306-detail-btn--ok" @click="applyOrderGridPopup">적용</button>
+            <button
+              type="button"
+              class="pnc-sub-btn pnc-sub-btn--gray"
+              @click="closeOrderGridPopup">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M4.2 4.2l7.6 7.6M11.8 4.2l-7.6 7.6"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round" />
+              </svg>
+              취소
+            </button>
+            <button
+              type="button"
+              class="pnc-sub-btn"
+              @click="applyOrderGridPopup">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M3.2 8.2 6.4 11.2 12.8 4.4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+              적용
+            </button>
           </div>
         </div>
       </div>
@@ -857,75 +907,47 @@ const getRowStateCount = (state) => {
   return 0;
 };
 
-const pur306FieldChanged = (current, base) =>
-  String(current ?? "") !== String(base ?? "");
+const pur306StockKey = (row) => String(row?.lngStockID ?? "");
 
-const hasPur306SearchGridDataChanges = () => {
-  const baseRows = rowData.value ?? [];
-  const currentRows = updatedrowdata.value ?? [];
-
-  const baseMap = new Map(baseRows.map((row) => [row.lngStockID, row]));
-
-  for (const current of currentRows) {
-    const base = baseMap.get(current.lngStockID);
-    if (!base) continue;
-    if (pur306FieldChanged(current.dblOrderQty, base.dblOrderQty)) return true;
-    if (pur306FieldChanged(current.strOrderComments, base.strOrderComments)) {
-      return true;
-    }
-  }
-
-  return false;
+const pur306RowSig = (row) => {
+  const qty = Number(row?.dblOrderQty);
+  return [
+    pur306StockKey(row),
+    String(row?.lngOrderSeq ?? ""),
+    Number.isFinite(qty) ? String(qty) : "",
+    String(row?.strOrderComments ?? ""),
+  ].join("\u0001");
 };
 
-const hasPur306OrderGridDataChanges = () => {
-  const baseRows = rowData2.value ?? [];
-  const currentRows = updatedrowdata2.value ?? [];
-  const baseMap = new Map(baseRows.map((row) => [row.lngStockID, row]));
+const pur306RowsSig = (rows) => (rows ?? []).map(pur306RowSig).join("\u0002");
 
-  for (const current of currentRows) {
-    const base = baseMap.get(current.lngStockID);
-    if (!base) return true;
-    if (pur306FieldChanged(current.dblOrderQty, base.dblOrderQty)) return true;
-    if (pur306FieldChanged(current.strOrderComments, base.strOrderComments)) {
-      return true;
-    }
-  }
+let pur306OrderBaselineSig = "";
+let pur306SearchBaselineSig = "";
+let pur306AcceptEcho = false;
 
-  return false;
+const capturePur306Clean = () => {
+  pur306OrderBaselineSig = pur306RowsSig(updatedrowdata2.value);
+  pur306SearchBaselineSig = pur306RowsSig(updatedrowdata.value);
 };
 
-const hasUnsavedSearchGridChanges = () => {
-  const search = allstaterows.value;
-
-  if (Array.isArray(search) && search.length > 0) return true;
-
-  if (
-    getRowStateCount(search?.created) > 0 ||
-    getRowStateCount(search?.updated) > 0 ||
-    getRowStateCount(search?.deleted) > 0
-  ) {
-    return true;
-  }
-
-  return hasPur306SearchGridDataChanges();
+/** 조회 직후 그리드가 같은 행을 다시 넘겨도 변경으로 보지 않음 */
+const settlePur306Clean = async () => {
+  pur306AcceptEcho = true;
+  capturePur306Clean();
+  await nextTick();
+  await nextTick();
+  capturePur306Clean();
+  setTimeout(() => {
+    capturePur306Clean();
+    pur306AcceptEcho = false;
+  }, 400);
 };
 
-const hasUnsavedOrderGridChanges = () => {
-  const order = allstaterows2.value;
+const hasUnsavedSearchGridChanges = () =>
+  pur306RowsSig(updatedrowdata.value) !== pur306SearchBaselineSig;
 
-  if (Array.isArray(order) && order.length > 0) return true;
-
-  if (
-    getRowStateCount(order?.created) > 0 ||
-    getRowStateCount(order?.updated) > 0 ||
-    getRowStateCount(order?.deleted) > 0
-  ) {
-    return true;
-  }
-
-  return hasPur306OrderGridDataChanges();
-};
+const hasUnsavedOrderGridChanges = () =>
+  pur306RowsSig(updatedrowdata2.value) !== pur306OrderBaselineSig;
 
 const hasUnsavedPur306Changes = () => {
   return hasUnsavedSearchGridChanges() || hasUnsavedOrderGridChanges();
@@ -2016,6 +2038,7 @@ const searchButton = async (options = {}) => {
     cond6.value = formatNumberWithCommas(
       orderRows.reduce((sum, item) => sum + parseInt(item.curTotal || 0, 10), 0)
     );
+    await settlePur306Clean();
   } catch (error) {
     console.error("[PUR03_006INS] 발주조회", error);
   }
@@ -2149,14 +2172,19 @@ const updatedrowdata2 = ref([]);
 const rowstate = ref("");
 const updatedRowData = (newValue) => {
   updatedrowdata.value = newValue;
+  if (pur306AcceptEcho) {
+    pur306SearchBaselineSig = pur306RowsSig(newValue);
+  }
 };
 
 const sendRowState = (e) => {
   rowstate.value = e;
 };
 const updatedRowData2 = (newValue) => {
-  //console.log(newValue);
   updatedrowdata2.value = newValue;
+  if (pur306AcceptEcho) {
+    pur306OrderBaselineSig = pur306RowsSig(newValue);
+  }
 };
 const deleterow = ref(false);
 const deleterow2 = ref(false);
@@ -2745,6 +2773,8 @@ const initAll = () => {
   updatedrowdata.value = [];
   allstaterows.value = { created: [], updated: [], deleted: [] };
   allstaterows2.value = { created: [], updated: [], deleted: [] };
+  pur306OrderBaselineSig = "";
+  pur306SearchBaselineSig = "";
   cond3.value = "";
   cond4.value = "";
   cond5.value = "";
@@ -3345,11 +3375,32 @@ const initAll = () => {
 }
 
 .pur306-order-pop-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
   margin: 0;
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1.3;
-  color: #64748b;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #9a3412;
+  background: #ffedd5;
+  border: 1px solid #fdba74;
+  border-radius: 0.375rem;
+}
+
+.pur306-order-pop-note__icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: 0.1rem;
+  flex-shrink: 0;
+  color: #2563eb;
+}
+
+.pur306-order-pop-note__em {
+  font-style: normal;
+  font-weight: 800;
+  color: #1e3a8a;
 }
 
 .pur306-grid-actions {

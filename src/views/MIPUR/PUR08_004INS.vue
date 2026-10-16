@@ -161,9 +161,11 @@
     </div>
   </div>
 
+  <Teleport to="body">
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-    v-if="open">
+    v-if="open"
+    class="pur804-modal-overlay"
+    @mousedown.self.prevent>
     <div
       class="flex min-h-[12rem] w-[min(92vw,24rem)] flex-col rounded-lg border border-slate-300 bg-white p-4 shadow-lg"
       @click.stop>
@@ -187,6 +189,7 @@
       </div>
     </div>
   </div>
+  </Teleport>
 </template>
 
 <script setup>
@@ -946,6 +949,17 @@ const confirmButton = async () => {
 </script>
 
 <style scoped>
+.pur804-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 0.5);
+  pointer-events: auto;
+}
+
 /* 2열 와이어 — PUR08_003INS 와 동일 */
 .pur803-wire-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -579,6 +579,7 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  /** 0 이하면 전체 표시. 양수면 그 길이에서 … 자름 */
   hoverTooltipMaxLength: {
     type: Number,
     default: 30,
@@ -1350,6 +1351,31 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /** 이 화면만 트리 아이콘을 바꿀 때. 비우면 기존 favicon 유지 */
+  treeIconImages: {
+    type: Array,
+    default: () => [],
+  },
+  /** 이 화면만 트리 펼침을 +/− 사각형으로 */
+  treeSquareExpander: {
+    type: Boolean,
+    default: false,
+  },
+  /** 트리에서 합계는 최상위 행만. 자식까지 더하면 부모 금액과 두 번 합산된다 */
+  footerSumRootOnly: {
+    type: Boolean,
+    default: false,
+  },
+  /** 푸터 금액도 셀과 같은 천단위 형식으로 표시 */
+  footerUseCellNumberFormat: {
+    type: Boolean,
+    default: false,
+  },
+  /** 합계 줄: 배경 #7386b0, 글자색은 그 열 헤더와 같음. 끄려면 false */
+  footerMatchHeader: {
+    type: Boolean,
+    default: true,
+  },
   editableColByCondition: {
     // 조건에 따른 수정 가능 컬럼
     type: Boolean,
@@ -1672,6 +1698,22 @@ const rgIsCheckColumnHeaderSelectable = (dataProvider, dataRow, colFieldName) =>
   const c2 = (props.checkAbleExpressionCol2 || "").trim();
   const c3 = (props.checkAbleExpressionCol3 || "").trim();
 
+  // Selected / cancled — rgResolveCheckAbleCellStyle(회색)과 동일 규칙
+  // (Col3 있을 때 Val2만으로 전 컬럼을 판정하면 확정행 cancled·미확정행 클릭이 어긋남)
+  if (fname === "Selected") {
+    if (!c2) return true;
+    const blnChk = rgSafeDataSourceGetValue(dataProvider, dataRow, c2);
+    if (blnChk === undefined) return true;
+    return !rgCheckAbleValMatches(props.checkAbleExpressionVal, blnChk);
+  }
+  if (fname === "cancled") {
+    const col = c3 || c2;
+    if (!col) return true;
+    const blnChk = rgSafeDataSourceGetValue(dataProvider, dataRow, col);
+    if (blnChk === undefined) return true;
+    return !rgCheckAbleValMatches(props.checkAbleExpressionVal2, blnChk);
+  }
+
   if (c3) {
     const v = rgSafeDataSourceGetValue(dataProvider, dataRow, c3);
     if (v === undefined) return true;
@@ -1682,13 +1724,6 @@ const rgIsCheckColumnHeaderSelectable = (dataProvider, dataRow, colFieldName) =>
 
   const blnChk = rgSafeDataSourceGetValue(dataProvider, dataRow, c2);
   if (blnChk === undefined) return true;
-
-  if (fname === "Selected") {
-    return !rgCheckAbleValMatches(props.checkAbleExpressionVal, blnChk);
-  }
-  if (fname === "cancled") {
-    return !rgCheckAbleValMatches(props.checkAbleExpressionVal2, blnChk);
-  }
 
   if (rgCheckAbleValMatches(props.checkAbleExpressionVal, blnChk)) {
     return true;
@@ -1847,6 +1882,31 @@ const rgEmitUpdatedRowData = () => {
   updatedrowData.value = [...dataProvider.getJsonRows()];
   emit("updatedRowData", updatedrowData.value);
 };
+
+function rgSumTreeRoot(grid, field, func) {
+  if (!grid || func !== "sum") {
+    return grid?.getSummary?.(field, func);
+  }
+  const ds = grid.getDataSource?.();
+  if (!ds?.getParent || !ds?.getRowCount) {
+    return grid.getSummary?.(field, func);
+  }
+  let sum = 0;
+  const n = ds.getRowCount();
+  for (let r = 0; r < n; r++) {
+    let parent = -1;
+    try {
+      parent = ds.getParent(r);
+    } catch (_) {
+      parent = -1;
+    }
+    if (parent != null && Number(parent) >= 0) continue;
+    const raw = ds.getValue(r, field);
+    const num = Number(String(raw ?? "").replace(/,/g, ""));
+    if (Number.isFinite(num)) sum += num;
+  }
+  return sum;
+}
 
 /** 대량 setRows — beginUpdate·푸터 지연·불필요 refresh 생략 */
 const applyRowsToProvider = (rows, options = {}) => {
@@ -2037,6 +2097,18 @@ const rgBuildHeaderStyleBlock = (item, index) => {
     props.gridFontSize > 0
       ? `font-size: ${props.gridFontSize}px !important;`
       : "";
+  const footerRule =
+    props.footerMatchHeader === true
+      ? `
+        .footer-hdr-${realgridname.value}${index} {
+          background-color: #7386b0 !important;
+          color: ${item.strHdColor} !important;
+          font-weight: 400 !important;
+          vertical-align: middle !important;
+          ${fontRule}
+        }
+      `
+      : "";
   return `
         .header-style-${realgridname.value}${index} {
           background-color: ${item.strHdBkColor} !important;
@@ -2045,6 +2117,7 @@ const rgBuildHeaderStyleBlock = (item, index) => {
           vertical-align: middle !important;
           ${fontRule}
         }
+        ${footerRule}
       `;
 };
 
@@ -2517,6 +2590,24 @@ const runFuncshowGrid = async () => {
     }
     return "#,##0.0";
   };
+  const formatFooterByCellMask = (value, mask) => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return value ?? "";
+    const m = String(mask || "#,##0");
+    const dot = m.indexOf(".");
+    let min = 0;
+    let max = 0;
+    if (dot >= 0) {
+      const frac = m.slice(dot + 1);
+      max = frac.length;
+      min = (frac.match(/0/g) || []).length;
+    }
+    return n.toLocaleString("ko-KR", {
+      useGrouping: m.includes(","),
+      minimumFractionDigits: min,
+      maximumFractionDigits: max,
+    });
+  };
   const countMeaningfulDecimalPlaces = (
     v,
     maxPlaces = SIGNED_DECIMAL_MAX_PLACES
@@ -2667,11 +2758,17 @@ const runFuncshowGrid = async () => {
             String(props.inputSignedDecimalColumn).trim() !== ""
               ? String(props.inputSignedDecimalColumn).split(",")[0].trim()
               : "";
+          const unsignedDecimalRaw =
+            typeof props.inputUnsignedDecimalColumn === "string" &&
+            String(props.inputUnsignedDecimalColumn).trim() !== ""
+              ? String(props.inputUnsignedDecimalColumn).split(",")[0].trim()
+              : "";
+          /** persistCalculateTax 와 동일: OnlyNumber → Signed → Unsigned → dblOrderQty/dblCheckQty/dblQty */
           const primaryRaw =
             typeof props.inputOnlyNumberColumn === "string" &&
             String(props.inputOnlyNumberColumn).trim() !== ""
               ? String(props.inputOnlyNumberColumn).split(",")[0].trim()
-              : signedDecimalRaw;
+              : signedDecimalRaw || unsignedDecimalRaw;
           let qty = 0;
           const primaryIdx =
             primaryRaw !== "" ? fieldNames.indexOf(primaryRaw) : -1;
@@ -2680,10 +2777,13 @@ const runFuncshowGrid = async () => {
           } else {
             const iOrder = fieldNames.indexOf("dblOrderQty");
             const iCheck = fieldNames.indexOf("dblCheckQty");
+            const iMove = fieldNames.indexOf("dblQty");
             if (iOrder >= 0) {
               qty = Number(values[iOrder] || 0);
             } else if (iCheck >= 0) {
               qty = Number(values[iCheck] || 0);
+            } else if (iMove >= 0) {
+              qty = Number(values[iMove] || 0);
             }
           }
           return Math.floor(unitp * qty);
@@ -3122,15 +3222,22 @@ const runFuncshowGrid = async () => {
       text: props.setFooterCustomText[
         props.setFooterCustomColumnId.indexOf(item.strColID)
       ],
-      styleName: props.setFooterCustomText[
-        props.setFooterCustomColumnId.indexOf(item.strColID)
+      styleName: [
+        props.setFooterCustomText[
+          props.setFooterCustomColumnId.indexOf(item.strColID)
+        ]
+          ? "setTextAlignCenter"
+          : item.strAlign == "center"
+          ? "setTextAlignCenter"
+          : item.strAlign == "left"
+          ? "setTextAlignLeft"
+          : "setTextAlignRight",
+        props.footerMatchHeader === true
+          ? `footer-hdr-${realgridname.value}${index}`
+          : "",
       ]
-        ? "setTextAlignCenter"
-        : item.strAlign == "center"
-        ? "setTextAlignCenter"
-        : item.strAlign == "left"
-        ? "setTextAlignLeft"
-        : "setTextAlignRight",
+        .filter(Boolean)
+        .join(" "),
       expression:
         props.setFooterExpressions[props.setFooterColID.indexOf(item.strColID)],
       numberFormat: isDecimalInputColumn(item.strColID)
@@ -3342,7 +3449,10 @@ const runFuncshowGrid = async () => {
           let returnText = "";
           for (let i = 0; i < tokens.length; i++) {
             if (tokens[i].type == "function") {
-              returnText += `gridView.getSummary("${tokens[i].field}", "${tokens[i].func}")`;
+              returnText +=
+                props.footerSumRootOnly === true
+                  ? `gridView.rgSumTreeRoot(gridView, "${tokens[i].field}", "${tokens[i].func}")`
+                  : `gridView.getSummary("${tokens[i].field}", "${tokens[i].func}")`;
             } else {
               returnText += tokens[i].operator;
             }
@@ -3372,6 +3482,9 @@ const runFuncshowGrid = async () => {
             );
           }
 
+          if (props.footerSumRootOnly === true && gridView) {
+            gridView.rgSumTreeRoot = rgSumTreeRoot;
+          }
           const evaluated = eval(returnText);
           const safeVal = evaluated == "Infinity" ? 0 : evaluated;
           if (isDecimalInputColumn(item.strColID)) {
@@ -3379,6 +3492,12 @@ const runFuncshowGrid = async () => {
               grid,
               item.strColID,
               safeVal
+            );
+          }
+          if (props.footerUseCellNumberFormat === true) {
+            return formatFooterByCellMask(
+              safeVal,
+              resolveGridNumberFormat(item)
             );
           }
           return safeVal;
@@ -3434,6 +3553,12 @@ const runFuncshowGrid = async () => {
         .filter(Boolean)
         .includes(item.strColID)
         ? " demand-qty"
+        : "") +
+      (String(props.hoverTooltipFields ?? "")
+        .split(",")
+        .map((s) => s.trim())
+        .includes(String(item.strColID ?? "").trim())
+        ? " rg-hover-tip-col"
         : "") +
       rgDemandDetailColClass(item),
     // editor: {
@@ -3565,6 +3690,15 @@ const runFuncshowGrid = async () => {
       // opt-in: 배타 선택 화면만 라디오 이미지
       ...(props.checkExclusiveColumns && isCheckboxGridColumn(item)
         ? { useImages: true }
+        : {}),
+      // hoverTooltipFields — 해당 컬럼만 데이터 툴팁
+      ...(String(props.hoverTooltipFields ?? "")
+        .split(",")
+        .map((s) => s.trim())
+        .includes(String(item.strColID ?? "").trim())
+        ? { showTooltip: true }
+        : String(props.hoverTooltipFields ?? "").trim()
+        ? { showTooltip: false }
         : {}),
     },
     buttonVisibility: "always",
@@ -4831,7 +4965,24 @@ const runFuncshowGrid = async () => {
   gridView.displayOptions.selectionStyle =
     props.dragOn == true ? "block" : props.selectionStyle;
   // props.selectionStyle;deleteRow
-  gridView.displayOptions.showTooltip = props.bulkLoadMode !== true;
+  const hoverTooltipFieldList = String(props.hoverTooltipFields ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (hoverTooltipFieldList.length > 0) {
+    // 지정 컬럼 + ellipsis(잘림) 셀만 툴팁 — 짧은 값·옆 칸 오인 방지
+    gridView.displayOptions.showTooltip = true;
+    gridView.displayOptions.tooltipEllipsisOnly = true;
+    // 오버 중인 셀 표시 (행 전체가 아닌 셀 단위)
+    if (
+      props.rowHoverPastelTone !== "red" &&
+      props.rowHoverPastelTone !== "green"
+    ) {
+      gridView.displayOptions.rowHoverType = "cell";
+    }
+  } else {
+    gridView.displayOptions.showTooltip = props.bulkLoadMode !== true;
+  }
   if (props.rowHoverPastelTone === "red" || props.rowHoverPastelTone === "green") {
     gridView.displayOptions.rowHoverType = "row";
   }
@@ -4857,8 +5008,20 @@ const runFuncshowGrid = async () => {
     gridView.groupPanel.visible = false;
   } else {
     gridView.treeOptions.iconImagesRoot = "/icon/";
-    gridView.treeOptions.iconImages = ["favicon.png", "favicon.png"];
+    gridView.treeOptions.iconImages =
+      Array.isArray(props.treeIconImages) && props.treeIconImages.length
+        ? props.treeIconImages
+        : ["favicon.png", "favicon.png"];
     gridView.treeOptions.defaultIcon = 1;
+    if (props.treeSquareExpander === true) {
+      try {
+        gridView.treeOptions.expanderIconStyle = "square";
+        gridView.treeOptions.collapsedIcon = 0;
+        gridView.treeOptions.expandedIcon = 1;
+      } catch (_) {
+        void 0;
+      }
+    }
   }
 
   gridView.displayOptions.watchDisplayChange = false;
@@ -4930,7 +5093,10 @@ const runFuncshowGrid = async () => {
       const visible = live.visible !== false && Number(col?.width ?? live.width ?? 1) !== 0;
       if (!placed && visible) {
         live.footer.text = label;
-        live.footer.styleName = "setTextAlignCenter";
+        const kept = String(live.footer.styleName || "")
+          .split(/\s+/)
+          .filter((name) => name.startsWith("footer-hdr-"));
+        live.footer.styleName = ["setTextAlignCenter", ...kept].join(" ");
         placed = true;
       } else {
         live.footer.text = "";
@@ -5092,6 +5258,7 @@ const runFuncshowGrid = async () => {
     if (!qtyCol || !rgProviderHasField(qtyCol)) {
       if (rgProviderHasField("dblOrderQty")) qtyCol = "dblOrderQty";
       else if (rgProviderHasField("dblCheckQty")) qtyCol = "dblCheckQty";
+      else if (rgProviderHasField("dblQty")) qtyCol = "dblQty";
       else qtyCol = "";
     }
     if (
@@ -5612,7 +5779,8 @@ const runFuncshowGrid = async () => {
       return;
     }
     selectedindex.value = dataRow;
-    const rowArray = dp.getRows()?.[dataRow];
+    const rowArray =
+      typeof dp.getRows === "function" ? dp.getRows()?.[dataRow] : undefined;
     const clickPayload = rgBuildClickedRowPayload(dataRow);
     const parentRow =
       Array.isArray(props.rowData) &&
@@ -5758,7 +5926,7 @@ const runFuncshowGrid = async () => {
   }
 
   gridView.onShowTooltip = function (grid, index, value) {
-    var column = index.fieldName;
+    var column = index.fieldName || index.column;
     var itemIndex = index.itemIndex;
 
     const hoverFields = props.hoverTooltipFields
@@ -5767,15 +5935,30 @@ const runFuncshowGrid = async () => {
           .map((s) => s.trim())
           .filter(Boolean)
       : [];
-    if (hoverFields.includes(column)) {
-      const text = value != null ? String(value) : "";
-      if (!text) {
-        return "";
+    if (hoverFields.length > 0) {
+      if (!hoverFields.includes(String(column ?? "").trim())) {
+        return null;
       }
-      const maxLen =
-        props.hoverTooltipMaxLength > 0 ? props.hoverTooltipMaxLength : 30;
+      let text = value != null ? String(value) : "";
+      try {
+        if (itemIndex != null && itemIndex >= 0 && column) {
+          const cellVal = grid.getValue(itemIndex, column);
+          if (cellVal != null && String(cellVal) !== "") {
+            text = String(cellVal);
+          }
+        }
+      } catch (_) {
+        void 0;
+      }
+      if (!text) {
+        return null;
+      }
+      // hoverTooltipMaxLength <= 0 → 전체 표시 (화면 opt-in)
+      const maxLen = props.hoverTooltipMaxLength;
       const tooltipText =
-        text.length > maxLen ? text.slice(0, maxLen) + "..." : text;
+        maxLen > 0 && text.length > maxLen
+          ? text.slice(0, maxLen) + "..."
+          : text;
       rgApplyGrayTooltipTone();
       return tooltipText;
     }
@@ -6028,12 +6211,14 @@ const runFuncshowGrid = async () => {
             void 0;
           }
         };
+        let anySelectableApplied = false;
         for (var i = 0; i < rowCount; i++) {
           if (!rgIsCheckColumnHeaderSelectable(dataProvider, i, colFieldName)) {
             dataProvider.setValue(i, colFieldName, false);
             continue;
           }
           dataProvider.setValue(i, colFieldName, chk);
+          anySelectableApplied = true;
           if (syncCheckRow) {
             rgSyncHeaderCheckRow(i, chk, bulkCellCheckOnly);
           }
@@ -6041,6 +6226,14 @@ const runFuncshowGrid = async () => {
         clearLockedSelect();
         setTimeout(clearLockedSelect, 0);
         setTimeout(clearLockedSelect, 50);
+        // 선택 가능한 행이 없으면 헤더 체크 잔상 제거 (미확정에서 취소 헤더 등)
+        if (chk && !anySelectableApplied) {
+          try {
+            if (col) col.checked = false;
+          } catch (_) {
+            void 0;
+          }
+        }
       }
     } finally {
       dataProvider.endUpdate();
@@ -7095,9 +7288,48 @@ watch(
 );
 watch(
   () => props.setAllCheck,
-  (newval) => {
-    if (gridView != null) {
+  () => {
+    if (gridView == null) return;
+    try {
       gridView.setAllCheck(false);
+    } catch (_) {
+      void 0;
+    }
+    /** 컬럼 헤더 체크(headerCheckBar) + 셀 값 함께 해제 — 삭제·확정/취소 후 잔상 방지 */
+    const hb = String(props.headerCheckBar ?? "").trim();
+    if (!hb) return;
+    const dp = dataProvider;
+    hb.split(",").forEach((raw) => {
+      const colId = String(raw || "").trim();
+      if (!colId) return;
+      try {
+        const col =
+          gridView.columnByField?.(colId) ||
+          gridView.columnByName?.(colId);
+        if (col) col.checked = false;
+      } catch (_) {
+        void 0;
+      }
+      if (!dp) return;
+      try {
+        const n = dp.getRowCount?.() ?? 0;
+        for (let i = 0; i < n; i++) {
+          try {
+            if (dp.getValue(i, colId) !== false) {
+              dp.setValue(i, colId, false);
+            }
+          } catch (_) {
+            void 0;
+          }
+        }
+      } catch (_) {
+        void 0;
+      }
+    });
+    try {
+      rgEmitUpdatedRowData();
+    } catch (_) {
+      void 0;
     }
   }
 );
@@ -7863,6 +8095,17 @@ watch(
     }
   }
 );
+
+defineExpose({
+  expandAllTree() {
+    const gv = rgGetInstance(realgridname.value)?.gridView;
+    gv?.expandAll?.();
+  },
+  collapseAllTree() {
+    const gv = rgGetInstance(realgridname.value)?.gridView;
+    gv?.collapseAll?.();
+  },
+});
 </script>
 
 <style>
@@ -8059,10 +8302,19 @@ watch(
   background-color: #4b5563 !important;
   color: #f9fafb !important;
   border: 1px solid #6b7280 !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18) !important;
-  font-size: 14px !important;
-  line-height: 1.45 !important;
-  padding: 6px 10px !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15) !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  padding: 2px 6px !important;
+}
+
+/* hoverTooltipFields 컬럼 — 마우스 오버 셀 표시 (연두 계통, 클릭 주황과 구분) */
+.realgrid .rg-hover-tip-col.rg-data-cell:hover,
+.realgrid td.rg-hover-tip-col:hover,
+.realgrid .rg-body .rg-table td.rg-hover-tip-col:hover,
+.realgrid .rg-fixed-body .rg-table td.rg-hover-tip-col:hover {
+  background-color: #dcfce7 !important;
+  box-shadow: inset 0 0 0 1px #4ade80;
 }
 
 .realgrid-pre-wrap {

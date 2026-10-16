@@ -46,6 +46,11 @@ const props = defineProps({
     type: String,
     default: "마감월",
   },
+  /** 0이면 이번 달. 1이면 한 달 전처럼, 이 화면만 시작월을 당긴다 */
+  initMonthsAgo: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const currentNm = ref("");
@@ -63,9 +68,13 @@ onMounted(() => {
     });
   }
 
-  // console.log(formatLocalDate(new Date()).split("-")[1]);
-  cond.value = formatLocalDate(new Date()).split("-")[0];
-  cond2.value = formatLocalDate(new Date()).split("-")[1];
+  const base = new Date();
+  const monthsAgo = Number(props.initMonthsAgo) || 0;
+  if (monthsAgo) {
+    base.setMonth(base.getMonth() - monthsAgo);
+  }
+  cond.value = formatLocalDate(base).split("-")[0];
+  cond2.value = formatLocalDate(base).split("-")[1];
   emit("year", cond.value);
   emit("month", cond2.value);
 });

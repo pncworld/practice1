@@ -154,9 +154,11 @@
     </div>
   </div>
   <!-- 오버레이 -->
+  <Teleport to="body">
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-    v-if="open">
+    v-if="open"
+    class="pur803-modal-overlay"
+    @mousedown.self.prevent>
     <div
       :key="pur803NewPopupKey"
       class="pur803-newpop-shell flex h-[min(88vh,56rem)] max-h-[92vh] min-h-0 w-[min(92vw,72rem)] flex-col rounded-lg bg-white p-5 shadow-lg"
@@ -441,8 +443,9 @@
       </div>
 
       <div
-        class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50"
-        v-if="open2">
+        v-if="open2"
+        class="pur803-modal-overlay pur803-modal-overlay--front"
+        @mousedown.self.prevent>
         <div
           class="flex h-[min(88vh,36rem)] w-[min(92vw,40rem)] flex-col border border-slate-300 bg-white p-2 shadow-lg">
           <p
@@ -469,6 +472,7 @@
       </div>
     </div>
   </div>
+  </Teleport>
 
   <!-- 그리드 영역 -->
 </template>
@@ -1587,6 +1591,21 @@ const deleteButton = async () => {
 </script>
 
 <style scoped>
+.pur803-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 0.5);
+  pointer-events: auto;
+}
+
+.pur803-modal-overlay--front {
+  z-index: 10060;
+}
+
 /* 2열 와이어 — 보낸/받는 | 이동기간/확정여부 */
 .pur803-wire-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));

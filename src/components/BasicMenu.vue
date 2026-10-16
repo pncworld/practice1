@@ -105,6 +105,7 @@
       <input
         type="text"
         class="search-input"
+        :class="{ 'has-clear': !!searchword }"
         placeholder="검색어를 입력해주세요"
         autocomplete="off"
         readonly
@@ -112,7 +113,23 @@
         @focus="(e) => e.target.removeAttribute('readonly')"
         @input="setProgramList"
       >
-      <button class="search-btn"></button>
+      <button
+        v-show="!!searchword"
+        type="button"
+        class="search-clear-btn"
+        title="검색어 지우기"
+        aria-label="검색어 지우기"
+        @click="clearMenuSearch">
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path
+            d="M4.2 4.2l7.6 7.6M11.8 4.2l-7.6 7.6"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round" />
+        </svg>
+      </button>
+      <button type="button" class="search-btn" tabindex="-1" aria-hidden="true"></button>
     </div>
 
     <!-- 상단 페이지 타이틀 -->
@@ -134,12 +151,14 @@
       </div>
     </div>
 
-    <!-- 전체 열기: 라벨 고정, 스위치 OFF/ON (동작은 jQuery) -->
+    <!-- 전체 열기: 라벨+스위치 왼쪽 한 세트 (원본은 label/wrap 분리 + menu-toggle justify end) -->
     <div class="pd20 flex menu-toggle">
-      <span class="f14 fw500 label toggle-text">전체 열기</span>
-      <label class="toggle-wrap" title="전체 열기 ON/OFF">
-        <input type="checkbox" id="toggleAll" aria-label="전체 열기">
-        <span class="toggle-ui"></span>
+      <label class="menu-toggle-control" title="전체 열기 ON/OFF">
+        <span class="f14 fw500 label toggle-text">전체 열기</span>
+        <span class="toggle-wrap">
+          <input type="checkbox" id="toggleAll" aria-label="전체 열기">
+          <span class="toggle-ui"></span>
+        </span>
       </label>
     </div>
 
@@ -457,6 +476,17 @@ const initializeCategories = () => {
   return category;
 };
 
+/** 검색어 비우기 → 현재 대메뉴(카테고리) 메뉴 목록·접힘 상태 원복 */
+const clearMenuSearch = () => {
+  searchword.value = "";
+  countShow.value = false;
+  openCategoryId.value = [];
+  categories.value = initializeCategories();
+  nextTick(() => {
+    resetExpandAllToggle();
+  });
+};
+
 const setProgramList = (e) => {
   //comsole.log(e.target.value);
 
@@ -466,10 +496,7 @@ const setProgramList = (e) => {
 
   if (e.target.value == "") {
     // 검색어가 비어있을 때 초기 데이터로 복원
-    searchword.value = "";
-    countShow.value = false;
-    openCategoryId.value = [];
-    categories.value = initializeCategories();
+    clearMenuSearch();
     return;
   } else {
     // 검색어가 있을 때 필터링 (원본 데이터 보호를 위해 깊은 복사본 사용)

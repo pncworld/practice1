@@ -144,14 +144,14 @@
             class="button primary md:w-auto w-14 justify-center text-center disabled:opacity-30"
             type="button"
             @click="saveButton"
-            :disabled="disabled1 || popupConfirmLocked">
+            :disabled="disabled1">
             확정
           </button>
           <button
             class="button primary md:w-auto min-w-[5.5rem] justify-center px-3 text-center disabled:opacity-30"
             type="button"
             @click="cancelButton"
-            :disabled="!disabled1 || popupConfirmLocked">
+            :disabled="!disabled1">
             확정취소
           </button>
           <button
@@ -249,7 +249,8 @@
               class="pur017-popup-input"
               :class="{ 'pur017-popup-input--editable': !disabled1 }"
               :disabled="disabled1"
-              v-model="scond7" />
+              v-model="scond7"
+              @change="onPopupCheckDateChange" />
           </div>
           <div class="pur017-popup-label">
             <div class="pur017-popup-label-inner">검수자</div>
@@ -291,7 +292,7 @@
           :CalculateTaxColId3="'curTotal'"
           :persistCalculateTax="true"
           :editableColId="'dblCheckQty'"
-          :suppressEdit="isPopupDetailReadOnly"
+          :suppressEdit="disabled1"
           :setFooter="true"
           :documentSubTitle="documentSubTitle2"
           :rowData="rowData2"></Realgrid>
@@ -352,7 +353,6 @@ import Swal from "sweetalert2";
  */
 
 import {
-  computed,
   defineAsyncComponent,
   markRaw,
   nextTick,
@@ -438,6 +438,24 @@ function formatYmdForGrid(v) {
 function toYmdDigits(v) {
   if (v == null || v === "") return "";
   return String(v).trim().replace(/-/g, "");
+}
+
+/** 팝업(z-11000) 위에 Swal이 보이도록 */
+function alertAbovePopup(options) {
+  return Swal.fire({
+    ...options,
+    didOpen: (el) => {
+      const container = el?.closest?.(".swal2-container") || document.querySelector(".swal2-container");
+      if (container) container.style.zIndex = "12050";
+      if (typeof options.didOpen === "function") options.didOpen(el);
+    },
+  });
+}
+
+/** ON20260929-014 → 20260929 */
+function orderYmdFromOrderNo(orderNo) {
+  const m = String(orderNo || "").match(/(\d{8})/);
+  return m ? m[1] : "";
 }
 
 function isPur017RowCheckable(blnChk) {
@@ -537,13 +555,8 @@ const searchButton = async () => {
  * 그리드 초기화
  */
 
+/** 미입고(strStatus==='01')면 false — 확정 가능. 그리드 blnChk(월마감)와 무관(레거시 동일) */
 const disabled1 = ref(false);
-/** API blnChk === 1 이면 팝업에서 확정·확정취소 비활성 */
-const popupConfirmLocked = ref(false);
-/** 확정 전표(strStatus !== '01') 또는 blnChk 잠금 시 상세 그리드 입고수량 수정 불가 */
-const isPopupDetailReadOnly = computed(
-  () => disabled1.value || popupConfirmLocked.value
-);
 
 const progid = ref(1);
 const initGrid = () => {
@@ -603,6 +616,9 @@ const tempStore = ref("");
 const tempBClient = ref("");
 const tempCheckNo = ref("");
 const tempCheckDate = ref("");
+/** 팝업 발주일 — 입고확정일 비교용 (레거시 Div0.dtmOrderDate) */
+const popupOrderDate = ref("");
+const popupCheckDatePrev = ref("");
 const tempPart = ref("");
 const scond5 = ref("");
 const scond6 = ref("");
@@ -617,18 +633,6 @@ function formatYmdDigitsToIsoDate(v) {
     return `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
   }
   return String(v);
-}
-
-function isBlnChkLockedApiValue(v) {
-  if (v === true) return true;
-  if (v === 1 || v === "1") return true;
-  const n = Number(v);
-  return !Number.isNaN(n) && n === 1;
-}
-
-function rowHasBlnChkLocked(row) {
-  if (row == null || typeof row !== "object") return false;
-  return isBlnChkLockedApiValue(row.blnChk);
 }
 
 /** 팝업 행 키 — 세구분(lngTaxType)이 그리드 emit에서 빠질 수 있어 조회 시 보관 */
@@ -689,8 +693,7 @@ function rememberPopupLineTaxTypes(list) {
 const dblclickedRowData = async (row) => {
   if (!row || typeof row !== "object") return;
 
-  popupConfirmLocked.value = false;
-
+  // 레거시: 팝업 버튼은 strStatus만 본다 (blnChk/월마감은 그리드 체크용)
   if (row.strStatus === "01") {
     disabled1.value = false;
     scond7.value = toYmdDigits(row.dtmCheckDate)
@@ -713,12 +716,13 @@ const dblclickedRowData = async (row) => {
   tempCheckNo.value = row.strCheckNo;
   tempBClient.value = row.lngSupplierID;
   tempCheckDate.value = toYmdDigits(row.dtmCheckDate);
+  popupOrderDate.value =
+    toYmdDigits(row.dtmOrderDate) || orderYmdFromOrderNo(row.strOrderNo);
+  popupCheckDatePrev.value = toYmdDigits(scond7.value);
   tempPart.value = row.lngPartCode;
   scond8.value = row.strCheckEmpName ?? "";
   scond9.value = row.strStoreCheckComments ?? "";
   scond6.value = row.strCheckComments ?? "";
-
-  const lockedFromMain = rowHasBlnChkLocked(row);
 
   rowData2.value = [];
   try {
@@ -733,12 +737,8 @@ const dblclickedRowData = async (row) => {
     rowData2.value = res.data.List;
     rememberPopupLineTaxTypes(res.data.List);
     updatedrowdata2.value = res.data.List;
-    const lockedFromDetail =
-      Array.isArray(res.data.List) &&
-      res.data.List.some((r) => rowHasBlnChkLocked(r));
-    popupConfirmLocked.value = lockedFromMain || lockedFromDetail;
   } catch (error) {
-    popupConfirmLocked.value = lockedFromMain;
+    console.log(error);
   }
 };
 
@@ -766,18 +766,70 @@ const excelButton2 = () => {
   exportExcel2.value = !exportExcel2.value;
 };
 
-const saveButton = async () => {
+/** 레거시 Div0_dtmCheckDate_OnChanged — 발주일보다 빠른 입고확정일 불가 */
+const onPopupCheckDateChange = async () => {
+  const orderYmd =
+    toYmdDigits(popupOrderDate.value) || orderYmdFromOrderNo(scond2.value);
+  const checkYmd = toYmdDigits(scond7.value);
   if (
-    parseInt(toYmdDigits(tempCheckDate.value), 10) >
-    parseInt(toYmdDigits(scond7.value), 10)
+    orderYmd &&
+    checkYmd &&
+    parseInt(orderYmd, 10) > parseInt(checkYmd, 10)
   ) {
-    await Swal.fire({
+    await alertAbovePopup({
       title: "경고",
-      text: "발주일보다 빠른 날짜로 매입확정을 하실 수 없습니다.",
+      text: "발주일보다 빠른 날짜로 매입확정하실 수 없습니다",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    scond7.value = popupCheckDatePrev.value
+      ? formatYmdDigitsToIsoDate(popupCheckDatePrev.value)
+      : formatYmdDigitsToIsoDate(orderYmd);
+    return;
+  }
+  popupCheckDatePrev.value = checkYmd;
+};
+
+const saveButton = async () => {
+  const orderYmd =
+    toYmdDigits(popupOrderDate.value) || orderYmdFromOrderNo(scond2.value);
+  const checkYmd = toYmdDigits(scond7.value);
+  if (
+    orderYmd &&
+    checkYmd &&
+    parseInt(orderYmd, 10) > parseInt(checkYmd, 10)
+  ) {
+    await alertAbovePopup({
+      title: "경고",
+      text: "발주일보다 빠른 날짜로 매입확정하실 수 없습니다",
       icon: "warning",
       confirmButtonText: "확인",
     });
     return;
+  }
+
+  // 레거시 Div0_btnSave: GetStoreStockClosed — 자재마감월만 차단 (blnChk와 별개)
+  try {
+    const closeRes = await checkStockCloseDate(
+      tempGroup.value,
+      tempStore.value,
+      toYmdDigits(scond7.value)
+    );
+    const yyyymm = toYmdDigits(scond7.value).slice(0, 6);
+    const closedRow = (closeRes.data?.List || []).find((item) =>
+      String(item.dtmMonth || "").includes(yyyymm)
+    );
+    if (closedRow?.strClosed == "Y") {
+      await alertAbovePopup({
+        title: "경고",
+        text: "자재마감이 완료되어있는 월에는 입고확정이 불가능합니다",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  } catch (error) {
+    console.log(error);
   }
 
   try {
