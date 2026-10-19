@@ -1,15 +1,15 @@
 /*--############################################################################
-# Filename : CRM20_006RPT.vue                                                  
-# Description : 매출관리 > 외상 거래 현황 > 거래처별외상잔액.                  
-# Date :2025-05-19                                                             
-# Author : 권맑음                     
+# Filename : CRM20_006RPT.vue
+# Description : 매출관리 > 외상 거래 현황 > 거래처별외상잔액.
+# Date :2025-05-19
+# Author : 권맑음
 ################################################################################*/
 <template>
-  <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <div class="flex h-full min-h-0 flex-col pl-5" @click="handleParentClick">
+    <div
+      class="flex w-full shrink-0 items-center justify-between overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
+      <div class="mr-9 flex justify-center space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
@@ -18,123 +18,120 @@
         </button>
       </div>
     </div>
+
     <div
-      class="grid grid-cols-2 grid-rows-2 bg-gray-200 rounded-lg h-24 items-start z-10">
-      <div class="mt-1 justify-start flex flex-col">
-        <PickCustCompany
-          class=""
-          @excelStore="excelStore"
-          @lngStoreCode="lngStoreCode"></PickCustCompany>
-      </div>
-      <div class="ml-5 mt-1 justify-start flex">
-        <PickBelongCust
-          :lngStoreCode="selectedStores"
-          @excelList="excelList"
-          @strSaleCustName="strSaleCustName"
-          @strSaleCustID="strSaleCustID"></PickBelongCust>
-      </div>
-      <div class="-mt-1">
-        <Datepicker2
-          :mainName="'조회기간'"
-          class=""
-          :closePopUp="closePopUp"
-          ref="datepicker"
-          :initToday="1"
-          @excelDate="excelDate"
-          @endDate="endDate"
-          @startDate="startDate"></Datepicker2>
-      </div>
-      <div class="mt-4 space-x-2 flex justify-start ml-[82px]">
-        <label for="cond"
-          ><input
-            type="radio"
-            id="cond"
-            name="condtype"
-            value="0"
-            v-model="condValue" />전체</label
-        >
-        <label for="cond2"
-          ><input
-            type="radio"
-            id="cond2"
-            name="condtype"
-            value="1"
-            v-model="condValue" />개인</label
-        >
-        <label for="cond3"
-          ><input
-            type="radio"
-            id="cond3"
-            name="condtype"
-            value="2"
-            v-model="condValue" />단체</label
-        >
+      class="crm2006-search-panel z-10 mt-3 w-full min-h-0 shrink-0 overflow-visible rounded-lg bg-gray-200"
+      :style="{
+        '--crm2006-control-border': crm2006ControlBorder,
+        '--crm2006-col-gap': crm2006ColGutter,
+        '--crm2006-item-gap': crm2006ItemGap,
+        '--crm2006-row-gap': crm2006RowGap,
+        '--crm2006-label-col': crm2006LabelCol,
+        '--crm2006-left-field-w': crm2006LeftFieldW,
+      }">
+      <div class="crm2006-search-grid min-w-0">
+        <div class="crm2006-left-stack min-w-0">
+          <div class="crm2006-lbl">사업장</div>
+          <div class="crm2006-field crm2006-company min-w-0">
+            <PickCustCompany
+              omit-label
+              filter-bar-align
+              @excelStore="excelStore"
+              @lngStoreCode="lngStoreCode" />
+          </div>
+          <div class="crm2006-lbl">조회기간</div>
+          <div class="crm2006-field crm2006-date-slot min-w-0">
+            <Datepicker2
+              ref="datepicker"
+              omit-main-label
+              filter-bar-align
+              :mainName="'조회기간'"
+              :closePopUp="closePopUp"
+              :initToday="1"
+              @excelDate="excelDate"
+              @endDate="endDate"
+              @startDate="startDate" />
+          </div>
+        </div>
+        <div class="crm2006-right-stack min-w-0 overflow-visible">
+          <div class="crm2006-lbl">거래처</div>
+          <div class="crm2006-field crm2006-belong min-w-0 overflow-visible">
+            <PickBelongCust
+              omit-label
+              filter-bar-align
+              :lngStoreCode="selectedStores"
+              @excelList="excelList"
+              @strSaleCustName="strSaleCustName"
+              @strSaleCustID="strSaleCustID" />
+          </div>
+          <div class="crm2006-lbl">구분</div>
+          <div class="crm2006-field crm2006-radio-row min-w-0">
+            <label class="crm2006-radio" for="crm2006-cond0">
+              <input
+                type="radio"
+                id="crm2006-cond0"
+                name="crm2006-condtype"
+                value="0"
+                v-model="condValue" />전체
+            </label>
+            <label class="crm2006-radio" for="crm2006-cond1">
+              <input
+                type="radio"
+                id="crm2006-cond1"
+                name="crm2006-condtype"
+                value="1"
+                v-model="condValue" />개인
+            </label>
+            <label class="crm2006-radio" for="crm2006-cond2">
+              <input
+                type="radio"
+                id="crm2006-cond2"
+                name="crm2006-condtype"
+                value="2"
+                v-model="condValue" />단체
+            </label>
+          </div>
+        </div>
       </div>
     </div>
-    <!-- 조회조건 -->
-    <!-- 그리드 영역 -->
-    <div class="w-full h-[75%]">
-      <Realgrid
-        :progname="'CRM20_006RPT_VUE'"
-        :progid="1"
-        :rowData="rowData"
-        :reload="reload"
-        :documentTitle="'CRM20_006RPT'"
-        :documentSubTitle="documentSubTitle"
-        :rowStateeditable="false"
-        :setFooter="true"
-        :exporttoExcel="exportExcel">
-      </Realgrid>
+
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col">
+      <div class="relative min-h-0 w-full flex-1">
+        <Realgrid
+          class="h-full min-h-0 w-full"
+          :progname="'CRM20_006RPT_VUE'"
+          :progid="1"
+          :rowData="rowData"
+          :reload="reload"
+          :documentTitle="'CRM20_006RPT'"
+          :documentSubTitle="documentSubTitle"
+          :rowStateeditable="false"
+          :setFooter="true"
+          :exporttoExcel="exportExcel" />
+      </div>
     </div>
   </div>
-  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
 import { getBalancebyCust, getBelongCustList } from "@/api/micrm";
 import Datepicker2 from "@/components/Datepicker2.vue";
-/**
- *  매출 일자 세팅 컴포넌트
- *  */
-
-/**
- *  페이지명 자동 입력 컴포넌트
- *  */
-
 import PageName from "@/components/pageName.vue";
 import PickBelongCust from "@/components/pickBelongCust.vue";
 import PickCustCompany from "@/components/pickCustCompany.vue";
-/**
- * 	매장 단일 선택 컴포넌트
- */
-/**
- * 	그리드 생성
- */
-
 import Realgrid from "@/components/realgrid.vue";
-/**
- *  페이지로그 자동 입력
- *  */
-
 import { insertPageLog } from "@/customFunc/customFunc";
-/**
- *  경고창 호출 라이브러리
- *  */
-
 import Swal from "sweetalert2";
-/*
- * 공통 표준  Function
- */
-
 import { onMounted, ref } from "vue";
-/**
- *  Vuex 상태관리 및 로그인세션 관련 라이브러리
- */
-
 import { useStore } from "vuex";
-/**
- * 	화면 Load시 실행 스크립트
- */
+
+const crm2006ControlBorder = "#cbd5e1";
+const crm2006ColGutter = "1.5rem";
+const crm2006ItemGap = "0.75rem";
+const crm2006RowGap = "0.875rem";
+const crm2006LabelCol = "5rem";
+/** 조회기간 폭 = 사업장 필드 끝선 */
+const crm2006LeftFieldW = "22rem";
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
@@ -158,9 +155,6 @@ const custNm = ref("");
 const strSaleCustName = (e) => {
   custNm.value = e;
 };
-/**
- * 매출 일자 안 라디오박스 닫기 위한 외부 클릭 감지 함수
- */
 
 const handleParentClick = (e) => {
   const datepickerEl = datepicker.value?.$el;
@@ -169,10 +163,6 @@ const handleParentClick = (e) => {
   }
   closePopUp.value = !closePopUp.value;
 };
-
-/**
- *  조회 함수
- */
 
 const searchButton = async () => {
   if (selectedStores.value == 0) {
@@ -201,30 +191,19 @@ const searchButton = async () => {
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    //comsole.log(error);
   } finally {
     store.state.loading = false;
   }
 };
 
-/* 매장 컴포넌트 관련 함수 */
 const selectedGroup = ref();
 const selectedStores = ref();
 const selectedStoreAttrs = ref();
 
-/**
- * 페이지 매장 코드 세팅
- */
-
 const lngStoreCode = async (e) => {
   initGrid();
   selectedStores.value = e;
-  ////console.log(e);
 };
-
-/**
- * 그리드 초기화
- */
 
 const initGrid = () => {
   if (rowData.value.length > 0) {
@@ -232,12 +211,8 @@ const initGrid = () => {
   }
 };
 
-//엑셀 버튼 처리 함수
 const exportExcel = ref(false);
 const selectedExcelDate = ref("");
-/**
- * 엑셀 내보내기 함수
- */
 
 const excelButton = () => {
   documentSubTitle.value =
@@ -253,22 +228,16 @@ const excelDate = (e) => {
   selectedExcelDate.value = e;
 };
 
-// 엑셀 추출
 const documentSubTitle = ref("");
 const selectedExcelList = ref("");
 
 const selectedExcelStore = ref("");
-/**
- * 엑셀용 매장 세팅 함수
- */
 
 const excelStore = (e) => {
   selectedExcelStore.value = e;
-  //comsole.log(e);
 };
 const excelList = (e) => {
   selectedExcelList.value = e;
-  //comsole.log(e);
 };
 
 const enddate = ref("");
@@ -280,3 +249,251 @@ const startDate = (e) => {
   startdate.value = e;
 };
 </script>
+
+<style scoped>
+.crm2006-search-panel {
+  --crm2006-panel-pad-x: 5rem;
+  --crm2006-row-min-h: 2rem;
+  --crm2006-control-h: 2rem;
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+  padding-block: 0.75rem;
+  overflow: visible;
+}
+
+@media (max-width: 1280px) {
+  .crm2006-search-panel {
+    --crm2006-panel-pad-x: 2.5rem;
+  }
+}
+
+.crm2006-search-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--crm2006-col-gap, 1.5rem);
+  row-gap: var(--crm2006-row-gap, 0.875rem);
+  align-items: start;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding-left: var(--crm2006-panel-pad-x);
+  padding-right: var(--crm2006-panel-pad-x);
+}
+
+.crm2006-left-stack {
+  display: grid;
+  grid-template-columns:
+    var(--crm2006-label-col, 5rem)
+    minmax(0, var(--crm2006-left-field-w, 22rem));
+  column-gap: var(--crm2006-item-gap, 0.75rem);
+  row-gap: var(--crm2006-row-gap, 0.875rem);
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.crm2006-right-stack {
+  display: grid;
+  grid-template-columns: var(--crm2006-label-col, 5rem) minmax(0, 1fr);
+  column-gap: var(--crm2006-item-gap, 0.75rem);
+  row-gap: var(--crm2006-row-gap, 0.875rem);
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.crm2006-lbl {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  min-height: var(--crm2006-row-min-h);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+}
+
+.crm2006-field {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--crm2006-row-min-h);
+  display: flex;
+  align-items: center;
+}
+
+/* 사업장 끝선 = 조회기간 끝선 (left-field-w 채움) */
+.crm2006-company {
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.crm2006-company :deep(> .flex) {
+  display: flex !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.crm2006-company :deep(> .flex > div) {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  flex: 1 1 auto !important;
+}
+
+.crm2006-company :deep(.custom-select),
+.crm2006-company :deep(.v-select) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: var(--crm2006-control-h) !important;
+  min-height: var(--crm2006-control-h) !important;
+  max-height: var(--crm2006-control-h) !important;
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  line-height: 1.25rem !important;
+  color: rgb(55 65 81) !important;
+}
+
+.crm2006-company :deep(.vs__dropdown-toggle) {
+  box-sizing: border-box;
+  height: var(--crm2006-control-h) !important;
+  min-height: var(--crm2006-control-h) !important;
+  max-height: var(--crm2006-control-h) !important;
+  padding: 0 0.375rem !important;
+  border: 1px solid var(--crm2006-control-border, #cbd5e1) !important;
+  border-radius: 0.375rem !important;
+  background-color: #fff !important;
+  overflow: hidden !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+}
+
+.crm2006-company :deep(.vs__selected-options) {
+  flex: 1 1 auto !important;
+  flex-wrap: nowrap !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  align-items: center !important;
+}
+
+.crm2006-company :deep(.vs__selected),
+.crm2006-company :deep(.vs__search) {
+  display: block !important;
+  box-sizing: border-box !important;
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  line-height: calc(var(--crm2006-control-h) - 2px) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: rgb(55 65 81) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.crm2006-company :deep(.vs__actions) {
+  padding: 0 2px 0 0 !important;
+}
+
+.crm2006-company :deep(.vs__clear) {
+  display: none !important;
+}
+
+.crm2006-company :deep(.vs__open-indicator) {
+  fill: rgb(107 114 128) !important;
+  transform: scale(0.55) !important;
+  transition: transform 0.15s ease;
+}
+
+.crm2006-company :deep(.vs--open .vs__open-indicator) {
+  transform: scale(0.55) rotate(180deg) !important;
+}
+
+.crm2006-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: 100%;
+}
+
+.crm2006-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  height: var(--crm2006-control-h);
+  min-height: var(--crm2006-control-h);
+  max-height: var(--crm2006-control-h);
+  border: 1px solid var(--crm2006-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+  background: #fff;
+}
+
+.crm2006-date-slot :deep(div.inline-flex.h-8),
+.crm2006-date-slot :deep(button) {
+  height: var(--crm2006-control-h) !important;
+  min-height: var(--crm2006-control-h) !important;
+}
+
+.crm2006-belong {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+.crm2006-belong :deep(.pbc-bar__code) {
+  width: calc(5.5rem * 1.3);
+  min-width: calc(4.5rem * 1.3);
+}
+
+.crm2006-belong :deep(.pbc-bar__name) {
+  width: calc(9rem * 1.3);
+  min-width: calc(6rem * 1.3);
+  max-width: calc(11rem * 1.3);
+  flex: 0 1 calc(9rem * 1.3);
+}
+
+.crm2006-radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.crm2006-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.875rem;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.crm2006-radio input {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .crm2006-search-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .crm2006-left-stack {
+    grid-template-columns: var(--crm2006-label-col, 5rem) minmax(0, 1fr);
+  }
+}
+</style>

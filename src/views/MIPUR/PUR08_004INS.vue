@@ -17,7 +17,30 @@
         <button @click="confirmButton" class="button save w-auto xcel">
           확정
         </button>
-        <button @click="cancelButton" class="button primary w-auto">
+        <button
+          type="button"
+          @click="cancelButton"
+          class="button primary confirm-cancel w-auto">
+          <svg
+            class="pur804-confirm-cancel-icon"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            focusable="false">
+            <!-- ⨂ 원 + X -->
+            <circle
+              cx="12"
+              cy="12"
+              r="8.25"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2" />
+            <path
+              d="M9.2 9.2l5.6 5.6M14.8 9.2l-5.6 5.6"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round" />
+          </svg>
           확정취소
         </button>
         <button @click="excelButton" class="button save w-auto excel">
@@ -141,12 +164,13 @@
           @selectedIndex="selectedIndex"
           @checkedRowData2="checkedRowData2"
           :documentSubTitle="documentSubTitle"
-          :headerCheckBar="'cancled,Selected'"
+          :headerCheckBar="'cancled'"
           :checkAbleExpressionCol="'cancled,Selected'"
           :checkAbleExpressionCol2="'SelectableChk'"
           :checkAbleExpressionVal="'1,2'"
           :checkAbleExpressionCol3="'SelectableChk'"
           :checkAbleExpressionVal2="'0,2'"
+          :setAllCheck="setAllCheck"
           :checkRenderEditable="true"
           :checkRowAuto="true"
           :rowStateeditable="false"
@@ -162,33 +186,44 @@
   </div>
 
   <Teleport to="body">
-  <div
-    v-if="open"
-    class="pur804-modal-overlay"
-    @mousedown.self.prevent>
     <div
-      class="flex min-h-[12rem] w-[min(92vw,24rem)] flex-col rounded-lg border border-slate-300 bg-white p-4 shadow-lg"
-      @click.stop>
-      <div class="flex shrink-0 justify-end gap-2 pb-3">
-        <button type="button" class="whitebutton" @click="setValue">선택</button>
-        <button type="button" class="whitebutton" @click="setFalse">닫기</button>
-      </div>
-      <div
-        class="grid min-h-0 flex-1 grid-cols-[6.75rem_1fr] gap-0 overflow-hidden rounded border border-slate-300 text-sm">
-        <div
-          class="flex items-center justify-center border-b border-r border-slate-300 bg-slate-100 px-2 py-2 font-semibold text-gray-900">
-          입고 확정일자
+      v-if="open"
+      class="pur804-overlay"
+      @mousedown.self.prevent>
+      <div class="pur804-pop" :style="confirmPop.style" @mousedown.stop>
+        <div class="pur804-pop-bar" @mousedown="confirmPop.startDrag">
+          <h2 class="text-base font-bold text-gray-900">입고 확정일자</h2>
+          <div class="flex shrink-0 gap-2" @mousedown.stop>
+            <button type="button" class="pnc-sub-btn" @click="setValue">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3.2 8.2 6.4 11.2 12.8 4.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              선택
+            </button>
+            <button type="button" class="pnc-sub-btn" @click="setFalse">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M4 4l8 8M12 4 4 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+              닫기
+            </button>
+          </div>
         </div>
-        <div
-          class="flex items-center justify-center border-b border-slate-300 bg-white px-2 py-2">
-          <input
-            type="date"
-            class="h-8 w-full max-w-full rounded-md border border-slate-300 px-2 text-sm"
-            v-model="changeValue2" />
+        <div class="min-h-0 flex-1 p-4">
+          <div class="grid grid-cols-[6.75rem_minmax(0,1fr)] overflow-hidden rounded border border-slate-300 text-sm">
+            <div class="flex min-h-[2.5rem] items-center justify-center border-r border-slate-300 bg-slate-100 px-2 font-semibold text-gray-900">
+              입고 확정일자
+            </div>
+            <div class="flex min-h-[2.5rem] items-center bg-white px-2">
+              <input
+                type="date"
+                class="h-8 w-full rounded-md border border-slate-300 px-2 text-sm"
+                v-model="changeValue2" />
+            </div>
+          </div>
         </div>
+        <div class="pur804-pop-resize" title="크기 조절" @mousedown.stop="confirmPop.startResize"></div>
       </div>
     </div>
-  </div>
   </Teleport>
 </template>
 
@@ -232,12 +267,13 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { computed, nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
 import { useStore } from "vuex";
+import { useFloatPopup } from "@/utils/floatPopup";
 
 const store = useStore();
 
@@ -444,6 +480,15 @@ const lngStoreCode2 = async (e) => {
 };
 
 const open = ref(false);
+const confirmPop = useFloatPopup({
+  width: 420,
+  height: 210,
+  minWidth: 320,
+  minHeight: 180,
+});
+watch(open, (shown) => {
+  if (shown) confirmPop.place();
+});
 const changeNow = ref(false);
 const changeValue2 = ref("");
 const changeColid = ref("strConfirmDate");
@@ -798,6 +843,12 @@ const updatedRowData = (e) => {
   updatedrowdata.value = e;
 };
 
+/** 헤더·행 체크 원복 (Realgrid setAllCheck watch) — PUR08_002INS 동일 */
+const setAllCheck = ref(false);
+const clearGridChecks = () => {
+  setAllCheck.value = !setAllCheck.value;
+};
+
 const cancelButton = async () => {
   const cancelRows = Array.isArray(updatedrowdata.value)
     ? updatedrowdata.value.filter((item) => item.cancled == true)
@@ -809,6 +860,7 @@ const cancelButton = async () => {
       icon: "warning",
       confirmButtonText: "확인",
     });
+    clearGridChecks();
     return;
   }
   try {
@@ -868,7 +920,8 @@ const cancelButton = async () => {
   } catch (error) {
     console.log(error);
   } finally {
-    searchButton();
+    clearGridChecks();
+    await searchButton();
   }
 };
 
@@ -943,21 +996,64 @@ const confirmButton = async () => {
   } catch (error) {
     console.log(error);
   } finally {
-    searchButton();
+    clearGridChecks();
+    await searchButton();
   }
 };
 </script>
 
 <style scoped>
-.pur804-modal-overlay {
+.pur804-confirm-cancel-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.3rem;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.pur804-overlay {
   position: fixed;
   inset: 0;
   z-index: 10050;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: rgb(0 0 0 / 0.5);
   pointer-events: auto;
+}
+
+.pur804-pop {
+  position: fixed;
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  box-shadow: 0 12px 32px rgb(15 23 42 / 28%);
+}
+
+.pur804-pop-bar {
+  display: flex;
+  shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  cursor: move;
+  user-select: none;
+}
+
+.pur804-pop-resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  background:
+    linear-gradient(135deg, transparent 50%, #94a3b8 50%, #94a3b8 62%, transparent 62%, transparent 74%, #94a3b8 74%);
 }
 
 /* 2열 와이어 — PUR08_003INS 와 동일 */

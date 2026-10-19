@@ -244,15 +244,15 @@
               <div class="col-span-2 min-h-[2.25rem] border-b border-l border-slate-400 bg-white"></div>
               <div class="pur801-lbl-detail flex items-center justify-center border-r border-slate-400 px-1.5 py-2 font-semibold">공급가</div>
               <div class="pur801-fld flex min-w-0 items-center border-r border-slate-400 bg-white px-2 py-1.5">
-                <input type="text" name="scond9" class="pur801-amt-left h-7 w-full border border-slate-300 px-1.5 text-sm" @input="onlyNumber2" v-model="scond9" />
+                <input type="text" name="scond9" class="pur801-amt-left h-7 w-full border border-slate-300 bg-[#e8e8e8] px-1.5 text-sm" v-model="scond9" disabled readonly tabindex="-1" />
               </div>
               <div class="pur801-lbl-detail flex items-center justify-center border-r border-slate-400 px-1.5 py-2 font-semibold">부가세</div>
               <div class="pur801-fld flex min-w-0 items-center border-r border-slate-400 bg-white px-2 py-1.5">
-                <input type="text" name="scond10" class="h-7 w-full min-w-0 border border-slate-300 px-1.5 text-sm" @input="onlyNumber2" v-model="scond10" />
+                <input type="text" name="scond10" class="h-7 w-full min-w-0 border border-slate-300 bg-[#e8e8e8] px-1.5 text-sm" v-model="scond10" disabled readonly tabindex="-1" />
               </div>
               <div class="pur801-lbl-detail flex items-center justify-center border-r border-slate-400 px-1.5 py-2 font-semibold">합계금액</div>
               <div class="pur801-fld flex min-w-0 items-center gap-2 px-2 py-1.5">
-                <input type="text" name="scond11" class="h-7 min-w-0 flex-1 border border-slate-300 px-1.5 text-sm" @input="onlyNumber2" v-model="scond11" />
+                <input type="text" name="scond11" class="h-7 min-w-0 flex-1 border border-slate-300 bg-[#e8e8e8] px-1.5 text-sm" v-model="scond11" disabled readonly tabindex="-1" />
                 <button type="button" class="pnc-sub-btn pnc-sub-btn--rose" @click="addRowData3">
                   <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
                     <path d="M8 3.2v9.6M3.2 8h9.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
@@ -270,12 +270,11 @@
               :progname="'PUR08_003INS_VUE'"
               :progid="2"
               :rowData="rowData3"
-              :setNumberformatColumn="'dblQty,dblMoveQty'"
               :setStateBar="false"
               :checkRenderEditable="true"
               :rowStateeditable="false"
-              :editableColId="'dblQty'"
-              :inputUnsignedDecimalColumn="'dblQty'"
+              :editableColId="'dblQty,curUnitPrice'"
+              :inputOnlyNumberColumn="'dblQty,curUnitPrice'"
               :CalculateTaxColId="'curTax'"
               :CalculateTaxColId2="'curSupply'"
               :CalculateTaxColId3="'curTotal'"
@@ -801,32 +800,26 @@ const clickedRowData = (e) => {
   open2.value = false;
 };
 
+/** 매입단가·이동수량 → 공급가/부가세/합계 (세구분 01=과세 10%, 정수) */
+const pur801RecalcAmounts = () => {
+  const qty = parseInt(String(scond8.value || "0").replace(/,/g, ""), 10) || 0;
+  const price =
+    parseInt(String(scond7.value || "0").replace(/,/g, ""), 10) || 0;
+  scond9.value = qty * price;
+  scond10.value =
+    tempTaxType.value == "01" ? Math.round(Number(scond9.value) * 0.1) : 0;
+  scond11.value = Number(scond9.value) + Number(scond10.value);
+};
+
 const onlyNumber = (e) => {
   scond8.value = e.target.value.replace(/[^0-9]/g, "");
-
-  const qty = parseInt(scond8.value || "0", 10) || 0;
-  const price = parseInt(String(scond7.value || "0").replace(/,/g, ""), 10) || 0;
-  scond9.value = qty * price;
-
-  if (tempTaxType.value == "01") {
-    scond10.value = Math.round(scond9.value * 0.1);
-  } else {
-    scond10.value = 0;
-  }
-
-  scond11.value = scond9.value + scond10.value;
+  pur801RecalcAmounts();
 };
 
 const onlyNumber2 = (e) => {
-  if (e.target.name == "scond9") {
-    scond9.value = e.target.value.replace(/[^0-9]/g, "");
-  } else if (e.target.name == "scond11") {
-    scond11.value = e.target.value.replace(/[^0-9]/g, "");
-  } else if (e.target.name == "scond7") {
-    scond7.value = e.target.value.replace(/[^0-9]/g, "");
-  } else if (e.target.name == "scond10") {
-    scond10.value = e.target.value.replace(/[^0-9]/g, "");
-  }
+  if (e.target.name !== "scond7") return;
+  scond7.value = e.target.value.replace(/[^0-9]/g, "");
+  pur801RecalcAmounts();
 };
 
 const rowData3 = ref([]);
@@ -1070,7 +1063,8 @@ const saveButton = async () => {
       title: "알림",
       html:
         `이동수량이 0인 품목이 있습니다.<br>` +
-        `해당 품목을 더블클릭으로 삭제 후 수량을 입력하여 다시 추가한 뒤 출고해 주십시오.<br><br>` +
+        `해당 품목을 더블클릭으로 삭제하시거나<br>` +
+        `이동 수량을 입력하여 출고해 주십시오.<br><br>` +
         `<div style="text-align:left;max-height:16rem;overflow:auto;line-height:1.5;">${listHtml}</div>`,
       icon: "warning",
       confirmButtonText: "확인",

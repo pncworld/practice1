@@ -1,15 +1,15 @@
- /*--############################################################################
-# Filename : SLS02_023RPT.vue                                                  
-# Description : 매출관리 > 분류별 매출 현황 > 결제 형태별 매출현황II            
-# Date :2025-05-14                                                             
-# Author : 권맑음                     
+/*--############################################################################
+# Filename : SLS02_023RPT.vue
+# Description : 매출관리 > 분류별 매출 현황 > 결제 형태별 매출현황II
+# Date :2025-05-14
+# Author : 권맑음
 ################################################################################*/
 <template>
-  <!-- 조회 조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <div class="flex h-full min-h-0 flex-col pl-5" @click="handleParentClick">
+    <div
+      class="flex w-full shrink-0 items-center justify-between overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
+      <div class="mr-9 flex justify-center space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
@@ -18,123 +18,132 @@
         </button>
       </div>
     </div>
+
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-32 items-start z-10">
-      <div class="grid grid-cols-1 grid-rows-3">
-        <Datepicker2
-          @startDate="startDate"
-          @endDate="endDate"
-          :closePopUp="closePopUp"
-          ref="datepicker"
-          class="ml-8"
-          @excelDate="excelDate"
-          :mainName="'기간'" />
-        <div class="flex justify-start items-center ml-20">
-          <div class="text-base font-semibold">구분</div>
-          <div class="flex justify-center space-x-5 ml-5">
-            <select
-              name=""
-              id=""
-              class="h-8 rounded-lg w-32"
-              @change="getSub"
-              v-model="selectedMainCode">
-              <option :value="'01'">직가맹</option>
-              <option :value="'02'">지역</option>
-              <option :value="'03'">매장유형</option>
-            </select>
+      class="sls0223-search-panel z-10 mt-3 w-full min-h-0 shrink-0 overflow-visible rounded-lg bg-gray-200"
+      :style="{
+        '--sls0223-panel-pad-x': '2rem',
+        '--sls0223-control-border': sls0223ControlBorder,
+        '--sls0223-col-gutter': sls0223ColGutter,
+        '--sls0223-row-gap': sls0223RowGap,
+        '--sls0223-label-col': sls0223LabelCol,
+        '--psp-label-w': sls0223LabelCol,
+        '--psp-radio-w': '4.75rem',
+        '--psp-col-gap': '0.5rem',
+      }">
+      <div class="sls0223-search-layout min-w-0">
+        <!-- 좌: 기간 / 구분 / 조회조건 -->
+        <div class="sls0223-left-stack min-w-0">
+          <div class="sls0223-row">
+            <span class="sls0223-lbl shrink-0">기간</span>
+            <div class="sls0223-date-slot min-w-0 flex-1">
+              <Datepicker2
+                ref="datepicker"
+                omit-main-label
+                filter-bar-align
+                :mainName="'기간'"
+                :closePopUp="closePopUp"
+                @startDate="startDate"
+                @endDate="endDate"
+                @excelDate="excelDate" />
+            </div>
+          </div>
 
-            <select
-              name=""
-              id=""
-              class="h-8 rounded-lg w-32"
-              v-model="selectedCode">
-              <option :value="-1">전체</option>
-              <option :value="i.lngCode" v-for="i in sublist">
-                {{ i.strName }}
-              </option>
-            </select>
+          <div class="sls0223-row">
+            <span class="sls0223-lbl shrink-0">구분</span>
+            <div class="sls0223-pair-row min-w-0">
+              <select
+                class="sls0223-select"
+                v-model="selectedMainCode"
+                @change="getSub">
+                <option :value="'01'">직가맹</option>
+                <option :value="'02'">지역</option>
+                <option :value="'03'">매장유형</option>
+              </select>
+              <select class="sls0223-select" v-model="selectedCode">
+                <option :value="-1">전체</option>
+                <option
+                  :value="i.lngCode"
+                  v-for="i in sublist"
+                  :key="i.lngCode">
+                  {{ i.strName }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="sls0223-row">
+            <span class="sls0223-lbl shrink-0">조회조건</span>
+            <div class="sls0223-check-row min-w-0 flex-1">
+              <label class="sls0223-check" for="daily">
+                <input type="checkbox" id="daily" @change="seeDaily" />
+                일자별
+              </label>
+              <label
+                v-if="isDynamicGrid2 == 'Y'"
+                class="sls0223-check"
+                for="count">
+                <input type="checkbox" id="count" @change="seeSum" />
+                건수
+              </label>
+              <label
+                v-if="isDynamicGrid2 == 'N'"
+                class="sls0223-check"
+                for="unite">
+                <input type="checkbox" id="unite" @change="seeUnite" />
+                셀병합
+              </label>
+              <label
+                v-if="isDynamicGrid2 == 'N'"
+                class="sls0223-check"
+                for="sum">
+                <input type="checkbox" id="sum" @change="seeGroup" />
+                합계
+              </label>
+            </div>
           </div>
         </div>
-        <div
-          class="flex justify-start items-start text-base text-nowrap font-semibold ml-12">
-          조회조건
-          <div>
-            <label for="daily" class="font-normal">
-              <input
-                type="checkbox"
-                id="daily"
-                class="ml-5"
-                @change="seeDaily" />일자별
-            </label>
-          </div>
-          <div v-if="isDynamicGrid2 == 'Y'">
-            <label for="count" class="font-normal">
-              <input
-                type="checkbox"
-                id="count"
-                class="ml-5"
-                @change="seeSum" />건수
-            </label>
-          </div>
 
-          <div v-if="isDynamicGrid2 == 'N'">
-            <label for="unite" class="font-normal">
-              <input
-                type="checkbox"
-                id="unite"
-                class="ml-5"
-                @change="seeUnite" />셀병합
-            </label>
-          </div>
-
-          <div v-if="isDynamicGrid2 == 'N'">
-            <label for="sum" class="font-normal">
-              <input
-                type="checkbox"
-                id="sum"
-                class="ml-5"
-                @change="seeGroup" />합계
-            </label>
-          </div>
+        <!-- 우: 매장 -->
+        <div class="sls0223-right-store min-w-0 overflow-visible">
+          <PickStorePlural
+            fluid-width
+            @lngStoreCodes="lngStoreCodes"
+            @lngStoreGroup="lngStoreGroup"
+            @lngStoreAttrs="lngStoreAttrs"
+            @excelStore="excelStore"
+            @changeInit="changeInit" />
         </div>
-      </div>
-      <div class="h-[75%] ml-5">
-        <PickStorePlural
-          @lngStoreCodes="lngStoreCodes"
-          @lngStoreGroup="lngStoreGroup"
-          @lngStoreAttrs="lngStoreAttrs"
-          @excelStore="excelStore"
-          @changeInit="changeInit"></PickStorePlural>
       </div>
     </div>
-    <!-- 조회 조건 -->
-    <!-- 그리드 영역 -->
-    <div class="w-full h-[82%]">
-      <Realgrid
-        :progname="'SLS02_023RPT_VUE'"
-        :progid="progId"
-        :setDynamicGrid="true"
-        :rowData="rowData"
-        :reload="reload"
-        :setFooter="true"
-        :setFooterCustomColumnId="['strStore']"
-        :setFooterCustomText="['합계']"
-        :setGroupSumCustomText="['매장소계']"
-        :setGroupSumCustomColumnId="['strStore']"
-        :hideColumnsId="hideColumnsId"
-        :mergeMask="''"
-        :setGroupFooter="setGroupFooter"
-        :setGroupColumnId="'strStore'"
-        :setMergeMode="false"
-        :setRowGroupSpan2="setRowGroupSpan"
-        :documentTitle="'SLS02_023RPT'"
-        :documentSubTitle="documentSubTitle"
-        :rowStateeditable="false"
-        :exporttoExcel="exportExcel">
-      </Realgrid>
+
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col">
+      <div class="relative min-h-0 w-full flex-1">
+        <Realgrid
+          class="h-full min-h-0 w-full"
+          :progname="'SLS02_023RPT_VUE'"
+          :progid="progId"
+          :setDynamicGrid="true"
+          :rowData="rowData"
+          :reload="reload"
+          :setFooter="true"
+          :setFooterCustomColumnId="['strStore']"
+          :setFooterCustomText="['합계']"
+          :setGroupSumCustomText="['매장소계']"
+          :setGroupSumCustomColumnId="['strStore']"
+          :hideColumnsId="hideColumnsId"
+          :mergeMask="''"
+          :setGroupFooter="setGroupFooter"
+          :setGroupColumnId="'strStore'"
+          :setMergeMode="false"
+          :setRowGroupSpan2="setRowGroupSpan"
+          :documentTitle="'SLS02_023RPT'"
+          :documentSubTitle="documentSubTitle"
+          :rowStateeditable="false"
+          :exporttoExcel="exportExcel" />
+      </div>
     </div>
   </div>
-  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
@@ -181,6 +190,12 @@ import { onMounted, ref } from "vue";
 
 import { useStore } from "vuex";
 
+/** 조회 AREA — SLS02_031RPT / STKN06 패턴 */
+const sls0223ControlBorder = "#cbd5e1";
+const sls0223ColGutter = "1.25rem";
+const sls0223RowGap = "0.875rem";
+const sls0223LabelCol = "5.5rem";
+
 const setGroupColumnId = ref("strStore");
 const hideColumnsId = ref(["dtmDate"]);
 const reload = ref(false);
@@ -205,8 +220,6 @@ onMounted(async () => {
   sublist.value = res.data.List;
 
   const res2 = await isDynamicGrid(store.state.userData.lngStoreGroup);
-  //comsole.log(res2);
-  //isDynamicGrid2.value = res2.data.List[0].strDynamicGrid;
   if (res2.data.List[0].strDynamicGrid == "Y") {
     isDynamicGrid2.value = "Y";
     progId.value = 1;
@@ -224,7 +237,6 @@ const getSub = async (e) => {
   } else if (e.target.value == "02") {
     const res = await getStoreArea(store.state.userData.lngStoreGroup, 0);
     sublist.value = res.data.List;
-    //comsole.log(sublist.value);
   } else if (e.target.value == "03") {
     const res = await getSubLease(store.state.userData.lngStoreGroup);
     sublist.value = res.data.List;
@@ -236,7 +248,6 @@ const getSub = async (e) => {
  */
 
 const startDate = (e) => {
-  //comsole.log(e);
   selectedstartDate.value = e;
 };
 
@@ -245,7 +256,6 @@ const startDate = (e) => {
  */
 
 const endDate = (e) => {
-  //comsole.log(e);
   selectedendDate.value = e;
 };
 
@@ -294,20 +304,8 @@ const searchButton = async () => {
   try {
     initGrid();
 
-    //그리드 갱신
     reload.value = !reload.value;
 
-    //comsole.log(
-    // groupCd.value,
-    //     storeCd.value,
-    //     selectedstartDate.value,
-    //     selectedendDate.value,
-    //     tempSeeDaily.value ? 1 : 0,
-    //     isDynamicGrid2.value,
-    //     selectedMainCode.value,
-    //     selectedCode.value,
-    //     setCnt.value
-    //   );
     const res = await getSalesByPaymentType2Report(
       groupCd.value,
       storeCd.value,
@@ -319,13 +317,11 @@ const searchButton = async () => {
       selectedCode.value,
       setCnt.value
     );
-    //console.log(res);
     rowData.value = res.data.List;
 
     afterSearch.value = true;
   } catch (error) {
     afterSearch.value = false;
-    //comsole.log(error);
   } finally {
     store.state.loading = false;
   }
@@ -341,7 +337,6 @@ const selectedStoreAttr = ref();
 
 const lngStoreCodes = (e) => {
   initGrid();
-  //comsole.log(e);
   storeCd.value = e;
 };
 /**
@@ -349,7 +344,6 @@ const lngStoreCodes = (e) => {
  */
 
 const lngStoreGroup = (e) => {
-  //comsole.log(e);
   groupCd.value = e;
 };
 
@@ -360,7 +354,6 @@ const lngStoreGroup = (e) => {
 const lngStoreAttrs = (e) => {
   initGrid();
   selectedStoreAttr.value = e;
-  //comsole.log(e);
 };
 
 /**
@@ -414,8 +407,6 @@ const excelButton = () => {
     cond +
     "\n" +
     cond2;
-  //comsole.log(documentSubTitle.value);
-  // 엑셀 기능 실행
   exportExcel.value = !exportExcel.value;
 };
 
@@ -428,7 +419,6 @@ const selectedExcelDate = ref("");
 
 const excelDate = (e) => {
   selectedExcelDate.value = e;
-  //comsole.log(e);
 };
 const selectedExcelStore = ref("");
 /**
@@ -437,7 +427,6 @@ const selectedExcelStore = ref("");
 
 const excelStore = (e) => {
   selectedExcelStore.value = e;
-  //comsole.log(e);
 };
 
 const setCnt = ref(0);
@@ -466,3 +455,210 @@ const changeInit = (e) => {
   initGrid();
 };
 </script>
+
+<style scoped>
+.sls0223-search-panel {
+  box-sizing: border-box;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: var(--sls0223-panel-pad-x, 2rem);
+  padding-right: var(--sls0223-panel-pad-x, 2rem);
+}
+
+@media (min-width: 768px) {
+  .sls0223-search-panel {
+    --sls0223-panel-pad-x: 3rem;
+  }
+}
+
+.sls0223-search-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  column-gap: var(--sls0223-col-gutter, 1.25rem);
+  align-items: start;
+  min-width: 0;
+}
+
+.sls0223-left-stack {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sls0223-row-gap, 0.875rem);
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.sls0223-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: 2rem;
+}
+
+.sls0223-lbl {
+  box-sizing: border-box;
+  flex: 0 0 var(--sls0223-label-col, 5.5rem);
+  width: var(--sls0223-label-col, 5.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sls0223-date-slot {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sls0223-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin: 0 !important;
+  width: auto !important;
+  max-width: 100%;
+}
+
+.sls0223-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  height: 2rem;
+  min-height: 2rem;
+  max-height: 2rem;
+  border: 1px solid var(--sls0223-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+  background: #fff;
+}
+
+.sls0223-date-slot :deep(div.inline-flex.h-8),
+.sls0223-date-slot :deep(button) {
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+.sls0223-pair-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 0.5rem;
+  align-items: center;
+  /* 라벨 제외 필드 칸 기준 현재 대비 70% */
+  flex: 0 1 70%;
+  width: 70%;
+  max-width: 70%;
+  min-width: 0;
+}
+
+.sls0223-select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 2rem;
+  min-height: 2rem;
+  max-height: 2rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--sls0223-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+  background: #fff;
+  font-size: 0.875rem;
+  color: rgb(55 65 81);
+}
+
+.sls0223-check-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  min-height: 2rem;
+}
+
+.sls0223-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sls0223-check input {
+  margin: 0;
+}
+
+.sls0223-right-store {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+.sls0223-right-store:has(.psp-popup),
+.sls0223-right-store:has(.psp-store-hover-list) {
+  z-index: 50;
+}
+
+.sls0223-right-store :deep(.psp-root) {
+  grid-template-columns:
+    var(--psp-label-w, 5.5rem)
+    minmax(var(--psp-radio-w, 4.75rem), auto)
+    minmax(7rem, 1.05fr)
+    minmax(9.5rem, 1.3fr)
+    minmax(9.5rem, 1.35fr);
+  column-gap: var(--psp-col-gap, 0.5rem);
+  row-gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.sls0223-right-store :deep(.psp-label) {
+  width: var(--psp-label-w, 5.5rem);
+  justify-content: center;
+  padding-inline-start: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.sls0223-right-store :deep(.psp-select),
+.sls0223-right-store :deep(.psp-store-trigger),
+.sls0223-right-store :deep(.psp-collapse-btn) {
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+.sls0223-right-store :deep(.psp-collapse-btn) {
+  width: 2rem !important;
+}
+
+.sls0223-right-store :deep(.psp-popup) {
+  z-index: 60;
+  right: 0;
+  left: auto;
+  width: min(42rem, 92vw);
+  min-width: 28rem;
+  max-width: min(42rem, 92vw);
+}
+
+@media (max-width: 1280px) {
+  .sls0223-search-layout {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--sls0223-row-gap, 0.875rem);
+  }
+
+  .sls0223-right-store :deep(.psp-popup) {
+    left: 0;
+    right: auto;
+  }
+}
+</style>

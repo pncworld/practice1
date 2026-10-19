@@ -20,7 +20,7 @@
       <select
         v-model="selectedStoreGroup"
         disabled
-        class="pss-select pss-col-grp h-7 min-w-0 rounded-lg">
+        class="pss-select pss-col-grp min-w-0">
         <option :value="i.lngStoreGroup" v-for="i in storeGroup" :key="i.lngStoreGroup">
           {{ i.strName }}
         </option>
@@ -28,7 +28,7 @@
       <select
         v-model="selectedStoreType"
         :disabled="disabled1"
-        class="pss-select pss-col-mid h-7 min-w-0 w-full rounded-lg">
+        class="pss-select pss-col-mid min-w-0 w-full">
         <option :value="0">전체</option>
         <option :value="i.lngStoreAttr" v-for="i in storeType" :key="i.lngStoreAttr">
           {{ i.strName }}
@@ -41,7 +41,7 @@
           :options="rowData"
           label="strName"
           :placeholder="placeHolderNm"
-          class="custom-select2 w-full min-w-0"
+          class="custom-select2 pss-vselect w-full min-w-0"
           clearable="true"
           @click="clickPosNo"
           :disabled="disabled1"
@@ -62,7 +62,7 @@
       <select
         v-model="selectedStoreGroup2"
         disabled
-        class="pss-select pss-col-grp h-7 min-w-0 rounded-lg">
+        class="pss-select pss-col-grp min-w-0">
         <option :value="i.lngStoreGroup" v-for="i in storeGroup" :key="'g2-' + i.lngStoreGroup">
           {{ i.strName }}
         </option>
@@ -70,7 +70,7 @@
       <div class="pss-col-mid pss-mid-pair min-w-0">
         <select
           v-model="selectedStoreTeam"
-          class="pss-select h-7 min-w-0 w-full rounded-lg"
+          class="pss-select min-w-0 w-full"
           :disabled="disabled2">
           <option :value="0">전체</option>
           <option :value="i.lngTeamCode" v-for="i in storeTeam" :key="i.lngTeamCode">
@@ -79,7 +79,7 @@
         </select>
         <select
           v-model="selectedSuperVisor"
-          class="pss-select h-7 min-w-0 w-full rounded-lg"
+          class="pss-select min-w-0 w-full"
           :disabled="disabled2">
           <option :value="0">전체</option>
           <option :value="i.lngSupervisor" v-for="i in storeSuperVisor" :key="i.lngSupervisor">
@@ -94,7 +94,7 @@
           :options="rowData"
           label="strName"
           :placeholder="placeHolderNm"
-          class="custom-select2 w-full min-w-0"
+          class="custom-select2 pss-vselect w-full min-w-0"
           clearable="true"
           @click="clickPosNo"
           :disabled="disabled2"
@@ -350,6 +350,11 @@ defineExpose({ setStoreCode });
 </script>
 
 <style scoped>
+.pss-root {
+  --pss-control-h: 1.75rem;
+  --pss-control-radius: 0.375rem;
+}
+
 /* 두 줄 동일 열: 끝선 맞춤. 그룹 콤보(1열) 2배 폭 → 마지막 열(1fr)이 같은 만큼 줄어듦 */
 .pss-grid {
   --pss-grp-col: 11rem; /* 기존 5.5rem의 2배 */
@@ -383,21 +388,87 @@ defineExpose({ setStoreCode });
 
 .pss-select {
   box-sizing: border-box;
+  height: var(--pss-control-h);
+  min-height: var(--pss-control-h);
+  max-height: var(--pss-control-h);
+  padding: 0 0.35rem;
   border: 1px solid #cbd5e1;
+  border-radius: var(--pss-control-radius);
   background-color: #fff;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  color: rgb(55 65 81);
 }
 .pss-select:focus {
   border-color: #3b82f6;
   outline: none;
   box-shadow: 0 0 0 2px rgb(59 130 246 / 0.35);
 }
-.pss-root :deep(.vs__dropdown-toggle) {
-  border: 1px solid #cbd5e1 !important;
-  border-radius: 0.5rem;
-  min-height: 1.75rem;
-}
-.pss-root :deep(.vs__selected-options) {
+
+/* 마지막 매장(v-select) — native .pss-select 와 동일 높이·라운드·테두리 */
+.pss-root :deep(.pss-vselect) {
+  width: 100%;
   min-width: 0;
+  height: var(--pss-control-h);
+  min-height: var(--pss-control-h);
+  max-height: var(--pss-control-h);
+  font-size: 0.875rem;
+}
+.pss-root :deep(.pss-vselect .vs__dropdown-toggle) {
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  height: var(--pss-control-h) !important;
+  min-height: var(--pss-control-h) !important;
+  max-height: var(--pss-control-h) !important;
+  padding: 0 0.35rem !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: var(--pss-control-radius) !important;
+  background-color: #fff !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+.pss-root :deep(.pss-vselect .vs__selected-options) {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  min-width: 0;
+  overflow: hidden;
+}
+.pss-root :deep(.pss-vselect .vs__selected),
+.pss-root :deep(.pss-vselect .vs__placeholder),
+.pss-root :deep(.pss-vselect .vs__search) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  line-height: 1.25rem !important;
+  color: rgb(55 65 81) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pss-root :deep(.pss-vselect .vs__actions) {
+  padding: 0 0 0 0.15rem !important;
+}
+.pss-root :deep(.pss-vselect .vs__open-indicator) {
+  fill: #94a3b8 !important;
+  transform: scale(0.55) !important;
+}
+.pss-root :deep(.pss-vselect.vs--open .vs__open-indicator) {
+  fill: #94a3b8 !important;
+  transform: scale(0.55) rotate(180deg) !important;
+}
+.pss-root :deep(.pss-vselect .vs__clear) {
+  fill: #94a3b8 !important;
+  transform: scale(0.7);
+  margin-top: 0;
 }
 </style>
 

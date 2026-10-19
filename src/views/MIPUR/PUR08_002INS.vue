@@ -130,6 +130,7 @@
         :progname="'PUR08_002INS_VUE'"
         :progid="1"
         :rowData="rowData"
+        :setNumberformatColumn="'dblQty,dblMoveQty'"
         :setStateBar="false"
         :documentTitle="'PUR08_002INS'"
         @updatedRowData="updatedRowData"

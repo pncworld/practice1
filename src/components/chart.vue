@@ -52,8 +52,48 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  /** 원형 그래프 조각에 labels(시간대 등) 표기 — 기본 false(기존 동작) */
+  pieSliceLabel: {
+    type: Boolean,
+    default: false,
+  },
+  /** 원형 라벨 최소 비중(0~1). 이보다 좁은 조각은 원 안 표기 생략 */
+  pieSliceLabelMinRatio: {
+    type: Number,
+    default: 0.04,
+  },
 });
 Chart.register(zoomPlugin);
+
+/** 폭이 좁은 조각(비중 미만·0)은 원 안 라벨 숨김 */
+const shouldShowPieSliceLabel = (value, context) => {
+  const num = Number(value);
+  if (!Number.isFinite(num) || num <= 0) return false;
+  const data = context?.dataset?.data || [];
+  const total = data.reduce((sum, v) => sum + (Number(v) || 0), 0);
+  if (total <= 0) return false;
+  const minRatio = Number(props.pieSliceLabelMinRatio);
+  const ratio = Number.isFinite(minRatio) && minRatio > 0 ? minRatio : 0.04;
+  return num / total >= ratio;
+};
+
+const formatPieDataLabel = (value, context) => {
+  const num = Number(value);
+  const numStr = Number.isFinite(num) ? num.toLocaleString() : String(value ?? "");
+  if (!props.pieSliceLabel) return numStr;
+  if (!shouldShowPieSliceLabel(value, context)) return null;
+  const lbl = context?.chart?.data?.labels?.[context.dataIndex];
+  if (lbl == null || lbl === "") return numStr;
+  return `${lbl}\n${numStr}`;
+};
+
+const pieDataLabelsDisplay = (context) => {
+  if (!props.pieSliceLabel) return true;
+  return shouldShowPieSliceLabel(
+    context?.dataset?.data?.[context.dataIndex],
+    context
+  );
+};
 
 onMounted(() => {
   if (chartRef.value) {
@@ -278,19 +318,20 @@ watch(
               },
             },
             datalabels: {
-              display: true, // 항상 표시
-              color: "black", // 텍스트 색상
-              anchor: "end", // 데이터 포인트의 끝에 라벨을 붙임
-              align: "top", // 위쪽 정렬
-              offset: 20,
+              display: pieDataLabelsDisplay,
+              color: "black",
+              anchor: props.pieSliceLabel ? "center" : "end",
+              align: props.pieSliceLabel ? "center" : "top",
+              offset: props.pieSliceLabel ? 0 : 20,
               clip: false,
-              formatter: (value) => value.toLocaleString(), // 표시할 값 포맷 (여기서는 그대로 표시)
+              textAlign: "center",
+              formatter: formatPieDataLabel,
             },
           },
 
           layout: {
             padding: {
-              right: 40, // 오른쪽 여백을 더 추가
+              right: 40,
               left: 20,
               top: 20,
               bottom: 20,
@@ -301,7 +342,7 @@ watch(
               ? {}
               : {
                   y: {
-                    min: 0, // y축의 최소값을 0으로 설정
+                    min: 0,
                   },
                 },
         },

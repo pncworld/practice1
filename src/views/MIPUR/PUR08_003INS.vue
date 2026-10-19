@@ -146,6 +146,7 @@
           :checkAbleExpressionCol="'Selected'"
           :checkAbleExpressionCol2="'SelectableChk'"
           :checkAbleExpressionVal="'1,2'"
+          :setAllCheck="setAllCheck"
           :documentSubTitle="documentSubTitle"
           :rowStateeditable="false"
           :exporttoExcel="exportExcel">
@@ -165,7 +166,7 @@
       @click.stop>
       <div
         class="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-gray-200 pb-3">
-        <h2 class="shrink-0 text-xl font-bold text-gray-900">매장간 출고 신규 등록</h2>
+        <h2 class="shrink-0 text-xl font-bold text-gray-900">매장/파트간 출고 신규 등록</h2>
         <div class="flex shrink-0 flex-wrap gap-2">
           <button
             type="button"
@@ -192,61 +193,66 @@
             보내는 매장/파트
           </div>
           <div
-            class="pur803-newpop-fld pur803-newpop-store-part-row flex min-w-0 gap-1.5 border-b border-r border-slate-400 bg-white px-2 py-1.5">
-            <div class="pur803-newpop-pick pur803-newpop-store-slot min-w-0">
-              <PickStore
-                :compactSearchBar="true"
-                :compactStoreComboMaxRem="20"
-                :defaultStoreNm="'전체'"
-                :defaultStore="true"
-                :mainName="''"
-                :hideAttr="false"
-                :hideGroup="false"
-                :disabledAll="disabled"
-                :setDynamicStoreClass="'!h-7 !min-h-[1.75rem] !w-full !min-w-0 !p-0 !rounded-md !border !border-slate-300 !text-sm !shadow-none'"
-                :setDynamicStoreClass2="'!ml-0 !mt-0 !gap-0'"
-                @update:storeCd="lngStoreCode3"></PickStore>
+            class="pur803-newpop-fld flex min-w-0 items-center border-b border-r border-slate-400 bg-white px-2 py-1.5">
+            <!-- 조회 AREA와 동일 구조(pur803-store-part-pair) — newpop 전용 pick CSS로 vue-select만 사라지던 문제 회피 -->
+            <div class="pur803-store-part-pair pur803-newpop-store-part w-full min-w-0">
+              <div class="pur235-pick-slot pur803-pick-in-pair min-h-0 min-w-0">
+                <PickStore
+                  compact-search-bar
+                  :compact-store-combo-max-rem="28"
+                  :default-store-nm="'전체'"
+                  :default-store="true"
+                  :main-name="''"
+                  :hide-attr="false"
+                  :hide-group="false"
+                  :disabled-all="disabled"
+                  :set-dynamic-store-class="'!h-8 !min-h-[2rem] !w-full !min-w-0 !p-0 !rounded-md !border !border-slate-300 !text-sm !shadow-none'"
+                  :set-dynamic-store-class2="'!ml-0 !mt-0 !w-full !gap-0'"
+                  @update:store-cd="lngStoreCode3" />
+              </div>
+              <span class="pur803-store-slash" aria-hidden="true">/</span>
+              <select
+                class="pur803-newpop-select pur803-part-in-pair h-8 min-w-0 rounded-md border border-slate-300 bg-white px-1.5 text-sm"
+                :disabled="disabled"
+                v-model="scond">
+                <option :value="i.lngPartCode" v-for="i in optionList4" :key="i.lngPartCode">
+                  {{ i.strPartName }}
+                </option>
+              </select>
             </div>
-            <span class="shrink-0 px-0.5 text-base font-semibold text-gray-600">/</span>
-            <select
-              class="pur803-newpop-select pur803-newpop-part-slot h-7 shrink-0 rounded-md border border-slate-300 px-1.5 text-sm disabled:bg-[#e8e8e8]"
-              :disabled="disabled"
-              v-model="scond">
-              <option :value="i.lngPartCode" v-for="i in optionList4" :key="i.lngPartCode">
-                {{ i.strPartName }}
-              </option>
-            </select>
           </div>
           <div
             class="pur803-newpop-lbl-master flex items-center justify-center border-b border-r border-slate-400 px-1.5 py-2 font-semibold">
             받는 매장/파트
           </div>
           <div
-            class="pur803-newpop-fld pur803-newpop-store-part-row flex min-w-0 gap-1.5 border-b border-slate-400 bg-white px-2 py-1.5">
-            <div class="pur803-newpop-pick pur803-newpop-store-slot min-w-0">
-              <PickStore
-                :compactSearchBar="true"
-                :compactStoreComboMaxRem="20"
-                :unlockStoreComboOnly="true"
-                :defaultStoreNm="'전체'"
-                :defaultStore="true"
-                :mainName="''"
-                :hideAttr="false"
-                :hideGroup="false"
-                :disabledAll="disabled"
-                :setDynamicStoreClass="'!h-7 !min-h-[1.75rem] !w-full !min-w-0 !p-0 !rounded-md !border !border-slate-300 !text-sm !shadow-none'"
-                :setDynamicStoreClass2="'!ml-0 !mt-0 !gap-0'"
-                @update:storeCd="lngStoreCode4"></PickStore>
+            class="pur803-newpop-fld flex min-w-0 items-center border-b border-slate-400 bg-white px-2 py-1.5">
+            <div class="pur803-store-part-pair pur803-newpop-store-part w-full min-w-0">
+              <div class="pur235-pick-slot pur803-pick-in-pair min-h-0 min-w-0">
+                <PickStore
+                  compact-search-bar
+                  unlock-store-combo-only
+                  :compact-store-combo-max-rem="28"
+                  :default-store-nm="'전체'"
+                  :default-store="true"
+                  :main-name="''"
+                  :hide-attr="false"
+                  :hide-group="false"
+                  :disabled-all="disabled"
+                  :set-dynamic-store-class="'!h-8 !min-h-[2rem] !w-full !min-w-0 !p-0 !rounded-md !border !border-slate-300 !text-sm !shadow-none'"
+                  :set-dynamic-store-class2="'!ml-0 !mt-0 !w-full !gap-0'"
+                  @update:store-cd="lngStoreCode4" />
+              </div>
+              <span class="pur803-store-slash" aria-hidden="true">/</span>
+              <select
+                class="pur803-newpop-select pur803-part-in-pair h-8 min-w-0 rounded-md border border-slate-300 bg-white px-1.5 text-sm"
+                :disabled="disabled"
+                v-model="scond2">
+                <option :value="i.lngPartCode" v-for="i in optionList5" :key="i.lngPartCode">
+                  {{ i.strPartName }}
+                </option>
+              </select>
             </div>
-            <span class="shrink-0 px-0.5 text-base font-semibold text-gray-600">/</span>
-            <select
-              class="pur803-newpop-select pur803-newpop-part-slot h-7 shrink-0 rounded-md border border-slate-300 px-1.5 text-sm disabled:bg-[#e8e8e8]"
-              :disabled="disabled"
-              v-model="scond2">
-              <option :value="i.lngPartCode" v-for="i in optionList5" :key="i.lngPartCode">
-                {{ i.strPartName }}
-              </option>
-            </select>
           </div>
           <div
             class="pur803-newpop-lbl-master flex items-center justify-center border-b border-r border-slate-400 px-1.5 py-2 font-semibold">
@@ -266,13 +272,14 @@
           </div>
           <div
             class="pur803-newpop-fld flex min-w-0 items-center border-b border-slate-400 bg-white px-2 py-1.5">
-            <BusinessClient
-              :defaultName="''"
-              :defaultNm="'전체'"
-              :toolbarStretch="true"
-              :setDynamicClass="'!h-7 !min-w-0 !w-full !max-w-none shrink border border-slate-300 px-2 text-sm'"
-              :setDynamicClass2="'!mt-0 !items-center !gap-0 min-w-0 w-full [&>div:first-child]:hidden'"
-              @SupplierId="SupplierId"></BusinessClient>
+            <div class="pur803-newpop-client min-w-0 w-full">
+              <BusinessClient
+                compact-search-bar
+                :default-name="''"
+                :default-nm="'전체'"
+                :disable="disabled"
+                @SupplierId="SupplierId" />
+            </div>
           </div>
         </div>
         </div>
@@ -356,8 +363,10 @@
               ref="pur803InputScond8"
               type="text"
               name="scond8"
+              inputmode="decimal"
               class="pur803-newpop-input h-7 w-full min-w-0 border border-slate-300 px-1.5 text-sm"
               @input="onlyNumber"
+              @blur="pur803OnQtyBlur"
               @keydown.enter.prevent="pur803OnAmountEnter"
               v-model="scond8" />
           </div>
@@ -375,10 +384,11 @@
               ref="pur803InputScond9"
               type="text"
               name="scond9"
-              class="pur803-newpop-input h-7 w-full max-w-[11rem] border border-slate-300 px-1.5 text-sm"
-              @input="onlyNumber2"
-              @keydown.enter.prevent="pur803OnAmountEnter"
-              v-model="scond9" />
+              class="pur803-newpop-input pur803-newpop-input-readonly h-7 w-full max-w-[11rem] border border-slate-300 px-1.5 text-sm"
+              v-model="scond9"
+              disabled
+              readonly
+              tabindex="-1" />
           </div>
           <div
             class="pur803-newpop-lbl-detail flex items-center justify-center border-r border-b border-slate-400 px-1.5 py-2 font-semibold">
@@ -390,10 +400,11 @@
               ref="pur803InputScond10"
               type="text"
               name="scond10"
-              class="pur803-newpop-input h-7 w-full min-w-0 border border-slate-300 px-1.5 text-sm"
-              @input="onlyNumber2"
-              @keydown.enter.prevent="pur803OnAmountEnter"
-              v-model="scond10" />
+              class="pur803-newpop-input pur803-newpop-input-readonly h-7 w-full min-w-0 border border-slate-300 px-1.5 text-sm"
+              v-model="scond10"
+              disabled
+              readonly
+              tabindex="-1" />
           </div>
           <div
             class="pur803-newpop-lbl-detail flex items-center justify-center border-r border-b border-slate-400 px-1.5 py-2 font-semibold">
@@ -405,10 +416,11 @@
               ref="pur803InputScond11"
               type="text"
               name="scond11"
-              class="pur803-newpop-input h-7 min-w-0 flex-1 border border-slate-300 px-1.5 text-sm"
-              @input="onlyNumber2"
-              @keydown.enter.prevent="pur803OnAmountEnter"
-              v-model="scond11" />
+              class="pur803-newpop-input pur803-newpop-input-readonly h-7 min-w-0 flex-1 border border-slate-300 px-1.5 text-sm"
+              v-model="scond11"
+              disabled
+              readonly
+              tabindex="-1" />
             <button
               ref="pur803BtnAddRow"
               type="button"
@@ -430,9 +442,16 @@
             :progname="'PUR08_003INS_VUE'"
             :progid="2"
             :rowData="rowData3"
-            :setNumberformatColumn="'dblQty,dblMoveQty'"
+            :setNumberformatColumn="'dblQty,dblMoveQty,curUnitPrice'"
             :setStateBar="false"
-            :suppressEdit="true"
+            :checkRenderEditable="true"
+            :rowStateeditable="false"
+            :editableColId="'dblQty,curUnitPrice'"
+            :inputUnsignedDecimalColumn="'dblQty,curUnitPrice'"
+            :CalculateTaxColId="'curTax'"
+            :CalculateTaxColId2="'curSupply'"
+            :CalculateTaxColId3="'curTotal'"
+            :persistCalculateTax="true"
             @updatedRowData="onDetailGridUpdatedRowData"
             @dblclickedRowData="pur803OnDetailGridDblClicked"></Realgrid>
         </div>
@@ -485,7 +504,7 @@ import {
   saveMoveStorePartList,
 } from "@/api/mipur";
 import { getLossMasterPartList } from "@/api/mistock";
-import BusinessClient from "@/components/businessClient.vue";
+import BusinessClient from "@/components/businessClient2.vue";
 import Datepicker2 from "@/components/Datepicker2.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -936,6 +955,11 @@ const excelList = (e) => {
 };
 
 const updatedrowdata = ref([]);
+/** 헤더·행 체크 원복 (Realgrid setAllCheck watch) — PUR08_001/002 동일 */
+const setAllCheck = ref(false);
+const clearGridChecks = () => {
+  setAllCheck.value = !setAllCheck.value;
+};
 const updatedRowData = (e) => {
   console.log(e);
   updatedrowdata.value = e;
@@ -1125,7 +1149,8 @@ const scond9 = ref("");
 const scond10 = ref("");
 const scond11 = ref("");
 const SupplierId = (e) => {
-  supplierid.value = e;
+  supplierid.value =
+    e === "" || e === null || e === undefined ? "0" : String(e);
 };
 
 const pur803InputScond4 = ref(null);
@@ -1136,14 +1161,23 @@ const pur803InputScond10 = ref(null);
 const pur803InputScond11 = ref(null);
 const pur803BtnAddRow = ref(null);
 
-/** 숫자·소수점(.)만 허용, 콤마 제거 */
-const pur803SanitizeDecimal = (raw) => {
+/**
+ * 숫자·소수점(.)만 허용, 콤마 제거.
+ * maxFrac: 소수 자릿수 상한 (이동수량=2). 미지정 시 제한 없음.
+ */
+const pur803SanitizeDecimal = (raw, maxFrac) => {
   const s = String(raw ?? "").replace(/,/g, "").replace(/[^0-9.]/g, "");
   let out = "";
   let dot = false;
+  let frac = 0;
   for (const ch of s) {
-    if (ch >= "0" && ch <= "9") out += ch;
-    else if (ch === "." && !dot) {
+    if (ch >= "0" && ch <= "9") {
+      if (dot) {
+        if (typeof maxFrac === "number" && frac >= maxFrac) continue;
+        frac += 1;
+      }
+      out += ch;
+    } else if (ch === "." && !dot) {
       out += ".";
       dot = true;
     }
@@ -1151,10 +1185,11 @@ const pur803SanitizeDecimal = (raw) => {
   return out;
 };
 
-const pur803FmtDecimal = (san) => {
+/** 표시용 — 소수 최대 자릿수(기본 10). fixed2 시 항상 소수 2자리 */
+const pur803FmtDecimal = (san, fixed2 = false) => {
   if (san === "" || san === undefined || san === null) return "";
-  if (san === ".") return ".";
-  if (san.endsWith(".")) {
+  if (san === ".") return fixed2 ? "0.00" : ".";
+  if (!fixed2 && san.endsWith(".")) {
     const base = san.slice(0, -1);
     if (base === "") return ".";
     const n = Number(base);
@@ -1164,8 +1199,14 @@ const pur803FmtDecimal = (san) => {
       "."
     );
   }
-  const n = Number(san);
+  const n = Number(String(san).replace(/,/g, ""));
   if (Number.isNaN(n)) return "";
+  if (fixed2) {
+    return new Intl.NumberFormat("ko-KR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(n);
+  }
   return new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 10 }).format(n);
 };
 
@@ -1185,7 +1226,7 @@ const clickedRowData = (e) => {
   scond5.value = e[1];
   scond6.value = e[3];
   scond7.value = pur803FmtDecimal(pur803SanitizeDecimal(String(e[4] ?? "")));
-  scond8.value = pur803FmtDecimal("0");
+  scond8.value = pur803FmtDecimal("0", true);
   scond9.value = pur803FmtDecimal("0");
   scond10.value = pur803FmtDecimal("0");
   scond11.value = pur803FmtDecimal("0");
@@ -1198,35 +1239,40 @@ const clickedRowData = (e) => {
   });
 };
 
-const onlyNumber = (e) => {
-  const san = pur803SanitizeDecimal(e.target.value);
-  scond8.value = pur803FmtDecimal(san);
+/** 매입단가·이동수량 → 공급가/부가세/합계 (세구분 01=과세 10%) */
+const pur803RecalcAmounts = () => {
   const n7 = pur803ParseFloat(scond7.value);
-  const n8 = san === "" ? 0 : pur803ParseFloat(san);
+  const n8 = pur803ParseFloat(scond8.value);
   const n9 = n8 * n7;
   scond9.value = pur803FmtDecimal(String(n9));
-  let n10 = 0;
-  if (tempTaxType.value == "01") {
-    n10 = n9 * 0.1;
-  }
+  const n10 = tempTaxType.value == "01" ? n9 * 0.1 : 0;
   scond10.value = pur803FmtDecimal(String(n10));
-  const n11 = n9 + n10;
-  scond11.value = pur803FmtDecimal(String(n11));
+  scond11.value = pur803FmtDecimal(String(n9 + n10));
+};
+
+const onlyNumber = (e) => {
+  /** 입력 중에는 소수 2자리까지만 허용, trailing `.` 유지(타이핑용). blur 때 0.00 고정 */
+  scond8.value = pur803SanitizeDecimal(e.target.value, 2);
+  pur803RecalcAmounts();
+};
+
+const pur803OnQtyBlur = () => {
+  const san = pur803SanitizeDecimal(scond8.value, 2);
+  if (san === "" || san === ".") {
+    scond8.value = "";
+    pur803RecalcAmounts();
+    return;
+  }
+  scond8.value = pur803FmtDecimal(san, true);
+  pur803RecalcAmounts();
 };
 
 const onlyNumber2 = (e) => {
   const name = e.target.name;
+  if (name !== "scond7") return;
   const san = pur803SanitizeDecimal(e.target.value);
-  const v = pur803FmtDecimal(san);
-  if (name == "scond9") {
-    scond9.value = v;
-  } else if (name == "scond11") {
-    scond11.value = v;
-  } else if (name == "scond7") {
-    scond7.value = v;
-  } else if (name == "scond10") {
-    scond10.value = v;
-  }
+  scond7.value = pur803FmtDecimal(san);
+  pur803RecalcAmounts();
 };
 
 /** 자재조회 더블클릭 값 — 배열 인덱스 또는 Json 행 객체 모두 허용 */
@@ -1353,23 +1399,17 @@ const addRowData3 = async (e) => {
 
 const pur803OnAmountEnter = (e) => {
   const key = e.target?.name;
-  if (key === "scond11") {
-    e.preventDefault();
-    void addRowData3();
+  e.preventDefault();
+  if (key === "scond7") {
+    nextTick(() => {
+      pur803InputScond8.value?.focus?.();
+    });
     return;
   }
-  const map = {
-    scond7: pur803InputScond8,
-    scond8: pur803InputScond9,
-    scond9: pur803InputScond10,
-    scond10: pur803InputScond11,
-  };
-  const next = map[key];
-  if (!next) return;
-  e.preventDefault();
-  nextTick(() => {
-    next.value?.focus?.();
-  });
+  if (key === "scond8") {
+    pur803OnQtyBlur();
+    void addRowData3();
+  }
 };
 
 /** 저단 상세 그리드 행에서 자재키 추출(저장·병합 공통) */
@@ -1386,10 +1426,35 @@ const pur803StockId = (item) => {
 };
 
 const updatedrowdata2 = ref([]);
-/** 하단 출고 그리드 — 표시용 동기화만. 저장 원본(pur803SaveLines)은 추가·행삭제·초기화만 변경. */
+/**
+ * 그리드 매입단가·수량 편집 → persistCalculateTax 로 공급가·부가세·합계 기록 후 emit.
+ * pur803SaveLines 만 갱신 (rowData3 재할당 시 setRows 로 편집이 되돌아가는 문제 방지).
+ */
 const onDetailGridUpdatedRowData = (e) => {
-  const list = Array.isArray(e) ? [...e] : [];
-  updatedrowdata2.value = list;
+  const list = Array.isArray(e) ? e : [];
+  const prev = pur803SaveLines.value;
+  if (list.length === 0 && prev.length === 0) return;
+  pur803SaveLines.value = list.map((row, i) => {
+    const p = prev[i] || {};
+    return {
+      ...p,
+      ...row,
+      lngStockID: row.lngStockID ?? row.LngStockID ?? p.lngStockID,
+      strStockName: row.strStockName ?? row.StrStockName ?? p.strStockName,
+      lngTaxType: row.lngTaxType ?? row.LngTaxType ?? p.lngTaxType,
+      strSupplierName:
+        row.strSupplierName ?? row.StrSupplierName ?? p.strSupplierName,
+      strUnitName: row.strUnitName ?? row.StrUnitName ?? p.strUnitName,
+      lngSupplierID:
+        row.lngSupplierID ?? row.LngSupplierID ?? p.lngSupplierID,
+      curUnitPrice: row.curUnitPrice ?? row.CurUnitPrice ?? p.curUnitPrice,
+      dblQty: row.dblQty ?? row.DblQty ?? row.dblMoveQty ?? p.dblQty,
+      curSupply: row.curSupply ?? row.CurSupply ?? p.curSupply,
+      curTax: row.curTax ?? row.CurTax ?? p.curTax,
+      curTotal: row.curTotal ?? row.CurTotal ?? p.curTotal,
+    };
+  });
+  updatedrowdata2.value = pur803SaveLines.value.map((r) => ({ ...r }));
 };
 
 /** 하단 그리드 더블클릭 — 출고 대기 행(pur803SaveLines)에서 동일 인덱스 제거 후 그리드 갱신 */
@@ -1449,6 +1514,15 @@ const pur803OnDetailGridDblClicked = async (row) => {
 const pur803SaveFieldStr = (v) =>
   v === undefined || v === null ? "" : String(v);
 
+/** 출고 대기 행 이동수량 (그리드 편집·소수 반영) */
+const pur803LineMoveQty = (r) => {
+  if (!r || typeof r !== "object") return 0;
+  const raw = r.dblQty ?? r.DblQty ?? r.dblMoveQty ?? r.DblMoveQty ?? "";
+  if (raw === null || raw === undefined || String(raw).trim() === "") return 0;
+  const q = parseFloat(String(raw).replace(/,/g, "").trim());
+  return Number.isFinite(q) ? q : 0;
+};
+
 const saveButton = async (e) => {
   try {
     const rows = Array.isArray(pur803SaveLines.value)
@@ -1460,6 +1534,35 @@ const saveButton = async (e) => {
       await Swal.fire({
         title: "알림",
         text: "출고할 자재가 없습니다. 추가로 등록한 뒤 출고해 주십시오.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+
+    const zeroQtyLines = rows.filter((r) => pur803LineMoveQty(r) <= 0);
+    if (zeroQtyLines.length > 0) {
+      const esc = (s) =>
+        String(s ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      const listHtml = zeroQtyLines
+        .map((r, i) => {
+          const code = esc(String(pur803StockId(r)).trim() || "—");
+          const name = esc(
+            String(r.strStockName ?? r.StrStockName ?? "").trim() || "—"
+          );
+          return `${i + 1}. [${code}] ${name}`;
+        })
+        .join("<br>");
+      await Swal.fire({
+        title: "알림",
+        html:
+          `이동수량이 0인 품목이 있습니다.<br>` +
+          `해당 품목을 더블클릭으로 삭제하시거나<br>` +
+          `이동 수량을 입력하여 출고해 주십시오.<br><br>` +
+          `<div style="text-align:left;max-height:16rem;overflow:auto;line-height:1.5;">${listHtml}</div>`,
         icon: "warning",
         confirmButtonText: "확인",
       });
@@ -1532,6 +1635,7 @@ const deleteButton = async () => {
       icon: "warning",
       confirmButtonText: "확인",
     });
+    clearGridChecks();
     return;
   }
 
@@ -1574,6 +1678,7 @@ const deleteButton = async () => {
 
         confirmButtonText: "확인",
       });
+      updatedrowdata.value = [];
     } else {
       await Swal.fire({
         title: "실패",
@@ -1585,7 +1690,9 @@ const deleteButton = async () => {
     }
   } catch (error) {
   } finally {
-    searchButton();
+    /** 조회 후 1회만 토글 — 연속 호출 시 true→false로 상쇄되어 watch가 안 도는 문제 방지 */
+    await searchButton();
+    clearGridChecks();
   }
 };
 </script>
@@ -1819,32 +1926,32 @@ const deleteButton = async () => {
 
 .pur803-newpop-shell {
   box-sizing: border-box;
+  /* 매장 vue-select는 셸에서 클립하지 않음 — 그리드만 host에서 클립 */
   overflow: visible;
   isolation: isolate;
 }
 
-/* 매장/파트 블록: 스크롤 영역 밖에 두고 z-index로 그리드 히트 영역보다 위에 고정 */
+/* 매장/파트 블록: 그리드보다 위 */
 .pur803-newpop-master-strip {
   position: relative;
-  z-index: 40;
-  isolation: isolate;
+  z-index: 50;
+  flex-shrink: 0;
   pointer-events: auto;
-  transform: translateZ(0);
+  background: #fff;
 }
 
 /* 자재 입력 스크롤 영역 */
 .pur803-newpop-upper-scroll {
   position: relative;
-  z-index: 20;
+  z-index: 10;
   background-color: #fff;
-  isolation: isolate;
 }
 
 .pur803-newpop-grid-gap {
   position: relative;
   z-index: 1;
   box-sizing: border-box;
-  isolation: isolate;
+  min-height: 0;
 }
 
 .pur803-newpop-grid-host {
@@ -1852,6 +1959,8 @@ const deleteButton = async () => {
   z-index: 0;
   box-sizing: border-box;
   min-height: 12rem;
+  overflow: hidden;
+  contain: layout paint;
 }
 
 .pur803-newpop-formwrap {
@@ -1911,56 +2020,78 @@ const deleteButton = async () => {
   background-color: #fce7f3;
 }
 
-.pur803-newpop-store-part-row {
-  display: flex;
-  align-items: stretch;
-  overflow: visible;
-  min-height: 2.5rem;
-}
-.pur803-newpop-store-part-row > .pur803-newpop-pick {
-  overflow: visible;
-  display: flex;
-  align-items: center;
-  min-height: 1.75rem;
-}
-.pur803-newpop-store-part-row :deep(.pickstore-vs-shell) {
-  overflow: visible;
-  box-sizing: border-box;
+/* 신규팝업 매장/파트 — 조회 AREA 동일 pair. 매장 열만 조금 넓게 */
+.pur803-newpop-store-part {
+  grid-template-columns: minmax(10rem, 1.35fr) auto minmax(5.5rem, 0.75fr);
+  column-gap: 0.35rem;
+  min-height: 2rem;
 }
 
-/* 매장 60% : 파트 40% (슬래시·gap 제외한 가로 기준 flex 비율) */
-.pur803-newpop-store-part-row > .pur803-newpop-store-slot {
-  flex: 6 1 0%;
+.pur803-newpop-store-part .pur803-part-in-pair:disabled {
+  background: #e8e8e8;
+  color: #6b7280;
+}
+
+.pur803-newpop-store-part .pur235-pick-slot :deep(.pickstore-vs-shell) {
+  height: 2rem !important;
+  min-height: 2rem !important;
+  max-height: 2rem !important;
+  border: 1px solid #cbd5e1 !important;
+  background: #fff !important;
+}
+
+.pur803-newpop-store-part .pur235-pick-slot :deep(.vs__selected),
+.pur803-newpop-store-part .pur235-pick-slot :deep(.vs__search),
+.pur803-newpop-store-part .pur235-pick-slot :deep(.vs__search::placeholder) {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
+/* 거래처 — 매장 콤보(pickstore-chooser)와 동일 셸·화살표 (PUR08_001 master-client) */
+.pur803-newpop-client :deep(> div) {
+  margin: 0 !important;
+  width: 100% !important;
   min-width: 0;
 }
 
-.pur803-newpop-store-part-row > .pur803-newpop-part-slot {
-  flex: 4 1 0%;
-  min-width: 0;
-}
-
-.pur803-newpop-pick :deep(div.relative.min-w-0.flex-1) {
+.pur803-newpop-client :deep(.pickstore-vs-shell) {
+  width: 100% !important;
   max-width: 100% !important;
-}
-
-.pur803-newpop-pick :deep(.pickstore-vs-shell) {
-  width: 100%;
-  max-width: 100%;
   min-width: 0;
-  height: 1.75rem !important;
-  min-height: 1.75rem !important;
-  /* 파트 select 와 동일: border-slate-300 (#cbd5e1) */
+  height: 2rem !important;
+  min-height: 2rem !important;
+  max-height: 2rem !important;
+  box-sizing: border-box;
   border: 1px solid #cbd5e1 !important;
   border-radius: 0.375rem;
-  box-sizing: border-box;
+  background: #fff !important;
   box-shadow: none !important;
-  background-color: #fff !important;
 }
 
-.pur803-newpop-pick :deep(.pickstore-vs-shell .vs__dropdown-toggle) {
-  min-height: 1.75rem !important;
+.pur803-newpop-client :deep(.pickstore-vs-shell .vs__dropdown-toggle) {
+  height: 100% !important;
+  min-height: 0 !important;
   border: none !important;
   background: transparent !important;
+}
+
+.pur803-newpop-client :deep(.pickstore-chooser .vs__selected),
+.pur803-newpop-client :deep(.pickstore-chooser .vs__search),
+.pur803-newpop-client :deep(.pickstore-chooser .vs__search::placeholder) {
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
+.pur803-newpop-client :deep(.pickstore-chooser .vs__open-indicator) {
+  fill: #6b7280 !important;
+  transform: scale(0.72) !important;
+}
+
+.pur803-newpop-client :deep(.pickstore-chooser.vs--open .vs__open-indicator) {
+  fill: #6b7280 !important;
+  transform: scale(0.72) rotate(180deg) !important;
 }
 
 .pur235-date-slot :deep(> div.flex.justify-start.items-center) {
@@ -1970,11 +2101,7 @@ const deleteButton = async () => {
 </style>
 <!-- append-to-body 드롭다운은 scoped 미적용 — 모달·그리드보다 위 -->
 <style>
-body.pur803-newpop-active .style-chooser .vs__dropdown-menu {
+body.pur803-newpop-active .vs__dropdown-menu {
   z-index: 10060 !important;
-}
-body.pur803-newpop-active .style-chooser .vs__dropdown-toggle {
-  position: relative;
-  z-index: 10061 !important;
 }
 </style>

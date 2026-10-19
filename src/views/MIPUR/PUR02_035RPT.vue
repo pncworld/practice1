@@ -168,6 +168,7 @@
         :progid="progid"
         :rowData="rowData"
         :reload="reload"
+        :setNumberformatColumn="'lngCheckQty,dblCheckQty,dblOrderQty'"
         :setRowStyleCalls="true"
         :setRowStyleCallsDefaultCol="setRowStyleCallsDefaultCol"
         :setRowStyleCallsDefaultCol2="setRowStyleCallsDefaultCol2"

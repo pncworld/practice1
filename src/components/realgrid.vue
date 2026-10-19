@@ -771,6 +771,16 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  /** opt-in: 그룹 접힘 시 표시. 기본 "none"(기존). "footer"면 접어도 소계 행 값 유지 */
+  rowGroupCollapsedAdornments: {
+    type: String,
+    default: "none",
+  },
+  /** opt-in: true면 그룹 펼치기/접기 화살표 숨김(항상 펼침·소계만 표시) */
+  rowGroupHideExpander: {
+    type: Boolean,
+    default: false,
+  },
   setFooterCustomText: {
     // 푸터에서 임의로 넣을 텍스트 값들
     type: Array,
@@ -4168,6 +4178,16 @@ const runFuncshowGrid = async () => {
       const formatcolumn = columns.find((item) => item.fieldName == fmtId);
       if (formatcolumn) {
         formatcolumn.numberFormat = qtyFmt;
+        // 푸터·그룹푸터 합계도 동일 소수 자릿수
+        if (formatcolumn.footer && typeof formatcolumn.footer === "object") {
+          formatcolumn.footer.numberFormat = qtyFmt;
+        }
+        if (
+          formatcolumn.groupFooter &&
+          typeof formatcolumn.groupFooter === "object"
+        ) {
+          formatcolumn.groupFooter.numberFormat = qtyFmt;
+        }
       }
     }
   }
@@ -4326,7 +4346,19 @@ const runFuncshowGrid = async () => {
     for (const fmtId of fmtIds) {
       try {
         const gvCol = gridView.columnByField(fmtId);
-        if (gvCol) gvCol.numberFormat = qtyFmt;
+        if (gvCol) {
+          gvCol.numberFormat = qtyFmt;
+          try {
+            if (gvCol.footer) gvCol.footer.numberFormat = qtyFmt;
+          } catch {
+            void 0;
+          }
+          try {
+            if (gvCol.groupFooter) gvCol.groupFooter.numberFormat = qtyFmt;
+          } catch {
+            void 0;
+          }
+        }
       } catch {
         void 0;
       }
@@ -5136,19 +5168,35 @@ const runFuncshowGrid = async () => {
   );
 
   if (props.setGroupFooter == true) {
-    gridView.setRowGroup({
+    /* ExpanderVisibility 는 "none"|"default"|"always" 만 유효. boolean false 는 무시됨 */
+    const hideExpander = props.rowGroupHideExpander === true;
+    const rowGroupOpts = {
       expandedAdornments: "footer",
       sorting: false,
-      collapsedAdornments: "none",
+      collapsedAdornments: props.rowGroupCollapsedAdornments || "none",
       headerStatement: "",
-      expanderVisibility: false,
+      expanderVisibility: hideExpander ? "none" : false,
       mergeMode: props.setMergeMode,
       createFooterCallback: function (grid, group) {
         return true;
       },
-    });
+    };
+    if (hideExpander) {
+      rowGroupOpts.mergeExpander = false;
+      rowGroupOpts.mergeExpanderVisibility = "none";
+      rowGroupOpts.indentVisible = false;
+      rowGroupOpts.expanderVisibleCallback = function () {
+        return false;
+      };
+    }
+    gridView.setRowGroup(rowGroupOpts);
 
     gridView.groupBy(props.setGroupColumnId.split(","));
+
+    /* groupBy 후 재적용 — 일부 버전에서 그룹 직후 expander 옵션이 되돌아감 */
+    if (hideExpander) {
+      gridView.setRowGroup(rowGroupOpts);
+    }
 
     if (props.setGroupOrderByColumnId != "") {
       //comsole.log(props.setGroupColumnId);
