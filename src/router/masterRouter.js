@@ -20,6 +20,7 @@ import MST05_004INS from "@/views/MIMASTER/MST05_004INS.vue";
 import MST05_011INS from "@/views/MIMASTER/MST05_011INS.vue";
 import MST36_001INS from "@/views/MIMASTER/MST36_001INS.vue";
 import MST36_003INS from "@/views/MIMASTER/MST36_003INS.vue";
+import MST36_005RPT from "@/views/MIMASTER/MST36_005RPT.vue";
 import MST36_006INS from "@/views/MIMASTER/MST36_006INS.vue";
 import MST36_008INS from "@/views/MIMASTER/MST36_008INS.vue";
 import MST36_055INS from "@/views/MIMASTER/MST36_055INS.vue";
@@ -34,6 +35,10 @@ import MST42_001INS from "@/views/MIMASTER/MST42_001INS.vue";
 import MST43_001INS from "@/views/MIMASTER/MST43_001INS.vue";
 import MST44_002INS from "@/views/MIMASTER/MST44_002INS.vue";
 import MST44_043INS from "@/views/MIMASTER/MST44_043INS.vue";
+import MST44_047INS from "@/views/MIMASTER/MST44_047INS.vue";
+import MST44_048INS from "@/views/MIMASTER/MST44_048INS.vue";
+import MST44_049RPT from "@/views/MIMASTER/MST44_049RPT.vue";
+import MST44_050RPT from "@/views/MIMASTER/MST44_050RPT.vue";
 import MST44_052INS from "@/views/MIMASTER/MST44_052INS.vue";
 import MST44_054INS from "@/views/MIMASTER/MST44_054INS.vue";
 import MST44_055INS from "@/views/MIMASTER/MST44_055INS.vue";
@@ -53,6 +58,7 @@ import MST49_008INS from "@/views/MIMASTER/MST49_008INS.vue";
 import MST56_001INS from "@/views/MIMASTER/MST56_001INS.vue";
 import MST56_002INS from "@/views/MIMASTER/MST56_002INS.vue";
 import MST56_003INS from "@/views/MIMASTER/MST56_003INS.vue";
+import MST90_003INS from "@/views/MIMASTER/MST90_003INS.vue";
 import MST57_001INS from "@/views/MIMASTER/MST57_001INS.vue";
 import MST57_002INS from "@/views/MIMASTER/MST57_002INS.vue";
 import MST_001INS from "@/views/MIMASTER/MST_001INS.vue";
@@ -110,6 +116,22 @@ export default function masterRouter() {
     {
       path: "MST44_043INS.xml",
       component: MST44_043INS,
+    },
+    {
+      path: "MST44_047INS.xml",
+      component: MST44_047INS,
+    },
+    {
+      path: "MST44_048INS.xml",
+      component: MST44_048INS,
+    },
+    {
+      path: "MST44_049RPT.xml",
+      component: MST44_049RPT,
+    },
+    {
+      path: "MST44_050RPT.xml",
+      component: MST44_050RPT,
     },
     {
       path: "MST44_059INS.xml",
@@ -233,6 +255,10 @@ export default function masterRouter() {
       component: MST37_001INS,
     },
     {
+      path: "MST36_005RPT.xml",
+      component: MST36_005RPT,
+    },
+    {
       path: "MST36_006INS.xml",
       component: MST36_006INS,
     },
@@ -243,6 +269,10 @@ export default function masterRouter() {
     {
       path: "MST56_001INS.xml",
       component: MST56_001INS,
+    },
+    {
+      path: "MST90_003INS.xml",
+      component: MST90_003INS,
     },
     {
       path: "MST01_005INS.xml",

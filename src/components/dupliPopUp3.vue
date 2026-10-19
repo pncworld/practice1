@@ -4,7 +4,7 @@
     class="fixed flex top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 justify-center items-center">
     <div class="bg-white w-[30%] h-[80%] shadow-lg rounded-lg flex flex-col">
       <header class="popup-header flex justify-between pl-12 pt-5">
-        <h1 class="font-bold text-2xl">메뉴키화면키 복사</h1>
+        <h1 class="font-bold text-2xl">결제키 복사</h1>
         <button
           class="border border-gray-300 button primary rounded-md mr-12"
           @click="dupliStore">
@@ -114,20 +114,7 @@ import * as api from "@/api/common";
 import * as api2 from "@/api/master";
 import { useStore } from "vuex";
 import Swal from "sweetalert2";
-const {
-  isVisible,
-  storeCd,
-  storeNm,
-  posNo,
-  areaCd,
-  progname,
-  progid,
-  dupliapiname,
-  poskiosk,
-  nowscreenNo,
-  screenList,
-  screenType,
-} = defineProps({
+const props = defineProps({
   isVisible: { type: Boolean, default: false }, // 팝업 가시성 관리
   storeCd: { type: String, default: "" },
   storeNm: { type: String, default: "" },
@@ -147,7 +134,7 @@ const groupCd = ref(userData.lngStoreGroup);
 const searchWord = ref("");
 const targetScreenNo = ref("0");
 const checked = ref(false);
-const selectedScreen = ref();
+const selectedScreen = ref("0");
 const emit = defineEmits(["close"]);
 
 function close() {
@@ -164,7 +151,7 @@ const showStoreList = async () => {
   //comsole.log(progid);
   try {
     //comsole.log(poskiosk);
-    res = await api[poskiosk](groupCd.value);
+    res = await api[props.poskiosk](groupCd.value);
     //comsole.log(res);
   } catch (error) {
     //comsole.log(error);
@@ -224,35 +211,48 @@ const dupliStore = async () => {
         confirmButtonText: "복사",
         cancelButtonText: "취소",
       }).then(async (result) => {
-        if (result.isConfirmed) {
-          store.state.loading = true;
-          const res3 = await api2[dupliapiname](
+        if (!result.isConfirmed) {
+          return;
+        }
+        store.state.loading = true;
+        try {
+          const res3 = await api2[props.dupliapiname](
             groupCd.value,
-            storeCd,
-            areaCd,
-            posNo,
-            selectedScreen.value,
-            screenType,
+            props.storeCd,
+            props.areaCd,
+            props.posNo,
+            selectedScreen.value || "0",
+            props.screenType,
             storeCd2.join(",")
           );
-          //comsole.log(res3);
           if (res3.data.RESULT_CD == "00") {
-            store.state.loading = false;
             Swal.fire({
               title: "복사 성공",
               text: "복사가 완료되었습니다.",
               icon: "success",
               confirmButtonText: "확인",
-            }).then((result) => {
-              if (result.isConfirmed) {
+            }).then((done) => {
+              if (done.isConfirmed) {
                 close();
               }
             });
           } else {
-            store.state.loading = false;
+            Swal.fire({
+              title: "복사 실패",
+              text: res3.data.RESULT_NM || "복사에 실패했습니다.",
+              icon: "error",
+              confirmButtonText: "확인",
+            });
           }
-        } else {
-          return;
+        } catch (error) {
+          Swal.fire({
+            title: "복사 실패",
+            text: "복사 요청이 서버에서 거절되었습니다.",
+            icon: "error",
+            confirmButtonText: "확인",
+          });
+        } finally {
+          store.state.loading = false;
         }
       });
     }

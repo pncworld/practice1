@@ -227,3 +227,18 @@ export const saveProgPriv = (
     LNG_ADMINTYPE: checkbox,
   });
 };
+
+export const searchSysUserList = (strStoreGroup, strStoreCode, lngUserAdmin, strUser) => {
+  return api2.post("/MISYSTEM/SYS90_001RPT.asmx/searchUser", {
+    strStoreGroup: strStoreGroup ?? "",
+    strStoreCode: strStoreCode ?? "",
+    lngUserAdmin: lngUserAdmin ?? "",
+    strUser: strUser ?? "",
+  });
+};
+
+export const resetAppNo = (lngSequence) => {
+  return api2.post("/MISYSTEM/SYS90_001RPT.asmx/resetAppNo", {
+    lngSequence: lngSequence ?? "",
+  });
+};

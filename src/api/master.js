@@ -43,7 +43,7 @@ api2.interceptors.response.use(
       router.push("/");
       return new Promise(() => {});
     }
-    return new Promise(() => {});
+    return Promise.reject(error);
   }
 );
 
@@ -1220,15 +1220,21 @@ export const DUPLIPAYKEY = (
   screenType,
   store_arr
 ) => {
-  return api2.post("/MIMASTER/MST44_054INS.asmx/DUPLIPAYKEY", {
-    GROUP_CD: groupCd,
-    STORE_CD: storeCd,
-    AREA_CD: areaCd,
-    POSNO: posNo,
-    SCREEN_NO: screenNo,
-    SCREEN_TYPE: screenType,
-    STORECD_ARR: store_arr,
-  });
+  return api2.post(
+    "/MIMASTER/MST44_054INS.asmx/DUPLIPAYKEY",
+    {
+      GROUP_CD: groupCd ?? "",
+      STORE_CD: storeCd ?? "",
+      AREA_CD: areaCd ?? "",
+      POSNO: posNo ?? "",
+      SCREEN_NO: screenNo ?? "0",
+      SCREEN_TYPE: screenType ?? "",
+      STORECD_ARR: store_arr ?? "",
+    },
+    {
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+    }
+  );
 };
 export const savePayKey = (
   groupCd,
@@ -4240,5 +4246,348 @@ export const saveDiscountMenuSetting = (groupCd, storeCd, menuCd, discountVal) =
     STORE_CD: storeCd,
     MENU_CD : menuCd,
     DISCOUNT_VLU: discountVal,
+  });
+};
+
+export const getFileMstList = (lngFileType, strFileName) => {
+  return api2.post("/MIMASTER/MST44_047INS.asmx/getFileMstList", {
+    lngFileType,
+    strFileName,
+  });
+};
+
+export const getFileDtlList = (
+  lngPatchFileMstCode,
+  lngPrgSection,
+  strSvrFilePath,
+  strSvrFileName,
+  lngViewSim
+) => {
+  return api2.post("/MIMASTER/MST44_047INS.asmx/getFileDtlList", {
+    lngPatchFileMstCode,
+    lngPrgSection,
+    strSvrFilePath,
+    strSvrFileName,
+    lngViewSim,
+  });
+};
+
+export const setFileMst = (
+  lngPatchFileMstCode,
+  lngFileType,
+  strFilePath,
+  strFileName,
+  lngUse
+) => {
+  return api2.post("/MIMASTER/MST44_047INS.asmx/setFileMst", {
+    lngPatchFileMstCode,
+    lngFileType,
+    strFilePath,
+    strFileName,
+    lngUse,
+  });
+};
+
+export const delFileMst = (lngPatchFileMstCode) => {
+  return api2.post("/MIMASTER/MST44_047INS.asmx/delFileMst", {
+    lngPatchFileMstCode,
+  });
+};
+
+export const setFileDtl = (
+  lngPatchFileDtlCode,
+  lngPatchFileMstCode,
+  lngPrgSection,
+  lngVersionType,
+  strVersionValue,
+  strSvrFilePath,
+  strSvrFileName
+) => {
+  return api2.post("/MIMASTER/MST44_047INS.asmx/setFileDtl", {
+    lngPatchFileDtlCode,
+    lngPatchFileMstCode,
+    lngPrgSection,
+    lngVersionType,
+    strVersionValue,
+    strSvrFilePath,
+    strSvrFileName,
+  });
+};
+
+export const delFileDtl = (lngPatchFileMstCode, lngPatchFileDtlCode) => {
+  return api2.post("/MIMASTER/MST44_047INS.asmx/delFileDtl", {
+    lngPatchFileMstCode,
+    lngPatchFileDtlCode,
+  });
+};
+
+export const uploadPatchFile = (formData) => {
+  return api2.post("/MIMASTER/PatchFileUpload.ashx", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+    timeout: 600000,
+  });
+};
+
+export const getPatchMstList = (lngPatchType, lngPrgSection) => {
+  return api2.post("/MIMASTER/MST44_048INS.asmx/getPatchMstList", {
+    lngPatchType,
+    lngPrgSection,
+  });
+};
+
+export const setPatchMst = (
+  lngPatchMstCode,
+  lngPatchType,
+  strPatchMstName,
+  strPatchMstReason,
+  lngUse,
+  lngUser,
+  lngPrgSection
+) => {
+  return api2.post("/MIMASTER/MST44_048INS.asmx/setPatchMst", {
+    lngPatchMstCode,
+    lngPatchType,
+    strPatchMstName,
+    strPatchMstReason,
+    lngUse,
+    lngUser,
+    lngPrgSection,
+  });
+};
+
+export const delPatchMst = (lngPatchMstCode) => {
+  return api2.post("/MIMASTER/MST44_048INS.asmx/delPatchMst", {
+    lngPatchMstCode,
+  });
+};
+
+export const getPatchDtlList = (lngPatchMstCode) => {
+  return api2.post("/MIMASTER/MST44_048INS.asmx/getPatchDtlList", {
+    lngPatchMstCode,
+  });
+};
+
+export const setPatchDtl = (
+  lngPatchDtlSeq,
+  lngPatchMstCode,
+  lngPatchFileMstCode,
+  lngPatchFileDtlCode,
+  lngUser
+) => {
+  return api2.post("/MIMASTER/MST44_048INS.asmx/setPatchDtl", {
+    lngPatchDtlSeq,
+    lngPatchMstCode,
+    lngPatchFileMstCode,
+    lngPatchFileDtlCode,
+    lngUser,
+  });
+};
+
+export const delPatchDtl = (lngPatchDtlSeq, lngPatchMstCode) => {
+  return api2.post("/MIMASTER/MST44_048INS.asmx/delPatchDtl", {
+    lngPatchDtlSeq,
+    lngPatchMstCode,
+  });
+};
+
+export const getPatchStoreList = (lngPatchMstCode) => {
+  return api2.post("/MIMASTER/MST44_048INS.asmx/getPatchStoreList", {
+    lngPatchMstCode,
+  });
+};
+
+/**
+ * 배포대상 여러 건은 이름에 쉼표가 들어갈 수 있어 U+200B로 나란히 보낸다.
+ * lngObjectCode, strObjectCode, lngStoreGroup 의 개수는 lngTargetCount 와 같다.
+ */
+export const setPatchStore = (
+  lngPatchStoreCode,
+  lngPatchMstCode,
+  dtmPatch,
+  lngPatchType,
+  lngTargetCount,
+  lngObjectCode,
+  strObjectCode,
+  lngStoreGroup
+) => {
+  return api2.post("/MIMASTER/MST44_048INS.asmx/setPatchStore", {
+    lngPatchStoreCode,
+    lngPatchMstCode,
+    dtmPatch,
+    lngPatchType,
+    lngTargetCount,
+    lngObjectCode,
+    strObjectCode,
+    lngStoreGroup,
+  });
+};
+
+export const delPatchStore = (
+  lngPatchStoreCode,
+  lngPatchMstCode,
+  lngPatchType
+) => {
+  return api2.post("/MIMASTER/MST44_048INS.asmx/delPatchStore", {
+    lngPatchStoreCode,
+    lngPatchMstCode,
+    lngPatchType,
+  });
+};
+
+export const getPatchFileMstList = (lngFileType, strFileName) => {
+  return api2.post("/MIMASTER/MST44_048INS.asmx/getPatchFileMstList", {
+    lngFileType,
+    strFileName,
+  });
+};
+
+export const getPatchFileDtlList = (
+  lngPatchFileMstCode,
+  lngPrgSection,
+  strSvrFilePath,
+  strSvrFileName,
+  lngViewSim
+) => {
+  return api2.post("/MIMASTER/MST44_048INS.asmx/getPatchFileDtlList", {
+    lngPatchFileMstCode,
+    lngPrgSection,
+    strSvrFilePath,
+    strSvrFileName,
+    lngViewSim,
+  });
+};
+
+export const getPatchTargetGroupList = (strStoreName) => {
+  return api2.post("/MIMASTER/MST44_048INS.asmx/getPatchTargetGroupList", {
+    strStoreName,
+  });
+};
+
+export const getPatchTargetStoreList = (lngStoreGroup, strStoreName) => {
+  return api2.post("/MIMASTER/MST44_048INS.asmx/getPatchTargetStoreList", {
+    lngStoreGroup,
+    strStoreName,
+  });
+};
+
+export const getPatchLog = (
+  strStoreGroup,
+  strStoreName,
+  lngPosNo,
+  dtmFromDate,
+  dtmToDate,
+  strPatchMst
+) => {
+  return api2.post("/MIMASTER/MST44_049RPT.asmx/getPatchLog", {
+    strStoreGroup,
+    strStoreName,
+    lngPosNo,
+    dtmFromDate,
+    dtmToDate,
+    strPatchMst,
+  });
+};
+
+export const getPosLastVersion = (
+  strStoreGroup,
+  strStoreName,
+  lngAreaCode,
+  lngPosNo,
+  dtmFromDate,
+  dtmToDate,
+  lngDateIgnore
+) => {
+  const query = new URLSearchParams({
+    strStoreGroup: strStoreGroup ?? "",
+    strStoreName: strStoreName ?? "",
+    lngAreaCode: lngAreaCode ?? "",
+    lngPosNo: lngPosNo ?? "",
+    dtmFromDate: dtmFromDate ?? "",
+    dtmToDate: dtmToDate ?? "",
+    lngDateIgnore: lngDateIgnore ?? "",
+  });
+  return api2.post(
+    `/MIMASTER/MST44_050RPT.asmx/getPosLastVersion?${query.toString()}`,
+    {
+      strStoreGroup: strStoreGroup ?? "",
+      strStoreName: strStoreName ?? "",
+      lngAreaCode: lngAreaCode ?? "",
+      lngPosNo: lngPosNo ?? "",
+      dtmFromDate: dtmFromDate ?? "",
+      dtmToDate: dtmToDate ?? "",
+      lngDateIgnore: lngDateIgnore ?? "",
+    }
+  );
+};
+
+export const searchStoreList = (strStoreGroupName, strStoreName, intOnlyUpload) => {
+  return api2.post("/MIMASTER/MST36_005RPT.asmx/searchStore", {
+    strStoreGroupName,
+    strStoreName,
+    intOnlyUpload,
+  });
+};
+
+export const menuCheckStore = (lngStoreGroup) => {
+  return api2.post("/MIMASTER/MST36_005RPT.asmx/menuCheck", {
+    lngStoreGroup,
+  });
+};
+
+export const storeCheckStore = (lngStoreGroup, lngStoreCode) => {
+  return api2.post("/MIMASTER/MST36_005RPT.asmx/storeCheck", {
+    lngStoreGroup,
+    lngStoreCode,
+  });
+};
+
+export const uploadSetStore = (lngStoreGroup, lngStoreCode) => {
+  return api2.post("/MIMASTER/MST36_005RPT.asmx/uploadSet", {
+    lngStoreGroup,
+    lngStoreCode,
+  });
+};
+
+export const selectBizAdmin = (lngAdminCode, lngStoreGroup, strType) => {
+  return api2.post("/SYSTEM/sysCom.asmx/selectAdmin", {
+    lngAdminCode: lngAdminCode ?? "0",
+    lngStoreGroup: lngStoreGroup ?? "0",
+    strType: strType ?? "admin",
+  });
+};
+
+export const selectMasterRate = (
+  lngStoreGroup,
+  lngStoreCode,
+  lngAdminCode,
+  dtmFromDate,
+  dtmToDate,
+  lngRate
+) => {
+  return api2.post("/MIMASTER/MST90_003INS.asmx/selectMaster", {
+    lngStoreGroup: lngStoreGroup ?? "",
+    lngStoreCode: lngStoreCode ?? "",
+    lngAdminCode: lngAdminCode ?? "",
+    dtmFromDate: dtmFromDate ?? "",
+    dtmToDate: dtmToDate ?? "",
+    lngRate: lngRate ?? "",
+  });
+};
+
+export const selectStoreInfo = (lngAdminCode, lngStoreGroup, lngStoreCode) => {
+  return api2.post("/MIMASTER/MST90_003INS.asmx/selectStoreInfo", {
+    lngAdminCode: lngAdminCode ?? "",
+    lngStoreGroup: lngStoreGroup ?? "",
+    lngStoreCode: lngStoreCode ?? "",
+  });
+};
+
+export const saveMst90StoreInfo = (lngStoreGroup, userId, rows) => {
+  return api2.post("/MIMASTER/MST90_003INS.asmx/saveStoreInfo", {
+    lngStoreGroup: lngStoreGroup ?? "",
+    USERID: userId ?? "",
+    rows: rows ?? [],
   });
 };
