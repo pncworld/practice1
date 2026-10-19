@@ -77,7 +77,7 @@
               <li>· 영업시간 : 연중 무휴 09:00~21:00</li>
             </ul>
             <button class="f15 btn-kakao" @click="goToKakao">
-              <img src="@/assets/images/kakao_channel_talk.svg" alt="카카오 채널톡">
+              <img :src="kakaoChannelTalkIcon" alt="카카오 채널톡">
               카카오 채널톡 상담
             </button>
           </div>
@@ -106,6 +106,7 @@ import loading from "@/components/loading.vue";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import defaultLoginLogo from "@/assets/images/pncoffice_logo.png";
+import kakaoChannelTalkIcon from "@/assets/images/kakao_channel_talk.svg";
 import {
   handleLogoImgError,
   resolveSessionLogoUrl,

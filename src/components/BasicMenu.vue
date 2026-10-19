@@ -60,7 +60,7 @@
           rel="noopener noreferrer"
           class="user-account-dropdown__item user-account-dropdown__item--kakao"
           @click="closeUserMenu">
-          <img src="@/assets/images/kakao_channel_talk.svg" alt="카카오" style="width:15px;height:15px;flex-shrink:0;" />
+          <img :src="kakaoChannelTalkIcon" alt="카카오" style="width:15px;height:15px;flex-shrink:0;" />
           채널톡 상담
         </a>
         <a
@@ -363,6 +363,7 @@
 <script setup>
 import { addFavorite, deleteFavorite } from "@/api/common";
 import { savePassWord, validatePassWord } from "@/api/system";
+import kakaoChannelTalkIcon from "@/assets/images/kakao_channel_talk.svg";
 import router from "@/router";
 import Swal from "sweetalert2";
 import { v4 } from "uuid";
