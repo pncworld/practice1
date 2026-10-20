@@ -56,6 +56,9 @@
           <div class="pur019-wire-field pur019-bc-slot min-w-0 w-full max-w-full">
             <BusinessClient
               compact-search-bar
+              :disable="supplierComboDisabled"
+              :select-supplier-id="supplierComboPresetId"
+              :select-supplier-label="supplierSessionDisplayName"
               @SupplierId="SupplierId"
               @SupplierNm="SupplierNm" />
           </div>
@@ -242,13 +245,38 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
 import { useStore } from "vuex";
 import BusinessClient from "@/components/businessClient2.vue";
+
+const store = useStore();
+
+/** 거래처 계정(lngUserAdminID === 60): 세션 `lngSupplierID` 고정 + 콤보 비활성 — PUR03_036RPT 와 동일 */
+const isSupplierPortal = computed(() => store.getters.isSupplierAccountUser);
+const supplierComboPresetId = computed(() => {
+  if (!isSupplierPortal.value) return "";
+  const id = store.getters.sessionLngSupplierID;
+  return id != null && id > 0 ? id : "";
+});
+const supplierComboDisabled = computed(() => isSupplierPortal.value);
+/** 로그인 세션에 오는 거래처 표시명 — 콤보 목록에 없을 때 라벨로 사용 */
+const supplierSessionDisplayName = computed(() => {
+  if (!isSupplierPortal.value) return "";
+  const u = store.state.userData;
+  if (!u || typeof u !== "object" || Array.isArray(u)) return "";
+  const nm =
+    u.strSupplierName ??
+    u.StrSupplierName ??
+    u.strChargerName ??
+    u.strStoreName ??
+    u.strUserID ??
+    "";
+  return String(nm).trim();
+});
 
 const pur019ControlBorder = "#cbd5e1";
 const pur019ColGutter = "1.25rem";
@@ -307,8 +335,14 @@ const handleStoreCd = (e) => {
 const supplierid = ref("");
 const SupplierId = (e) => {
   initGrid();
+  if (isSupplierPortal.value) {
+    const sid = store.getters.sessionLngSupplierID;
+    if (sid != null && sid > 0) {
+      supplierid.value = String(sid);
+      return;
+    }
+  }
   supplierid.value = e;
-  // console.log(supplierid.value);
 };
 
 const Suppliernm = ref("");
@@ -338,6 +372,13 @@ onMounted(async () => {
     store.state.userData.lngStoreGroup == "3264"
   ) {
     mainName.value = "발주일자";
+  }
+
+  if (isSupplierPortal.value) {
+    const sid = store.getters.sessionLngSupplierID;
+    if (sid != null && sid > 0) {
+      supplierid.value = String(sid);
+    }
   }
 
   console.log(mainName.value);
@@ -444,11 +485,6 @@ const allStateRows = (e) => {
   allstaterows.value = e.updated;
   // console.log(allstaterows.value);
 };
-
-/**
- *  그리드 검색어 세팅
- */
-const store = useStore();
 
 /**
  *  조회 함수

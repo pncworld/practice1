@@ -69,6 +69,9 @@
             <BusinessClient2
               compact-search-bar
               :default-nm="'전체'"
+              :disable="supplierComboDisabled"
+              :select-supplier-id="supplierComboPresetId"
+              :select-supplier-label="supplierSessionDisplayName"
               @SupplierId="SupplierId" />
           </div>
         </div>
@@ -173,7 +176,7 @@ import PageName from "@/components/pageName.vue";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
 import { insertPageLog } from "@/customFunc/customFunc";
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 const pur010ControlBorder = "#cbd5e1";
@@ -184,6 +187,29 @@ const pur010RowMinH = "2rem";
 const pur010ControlH = "2rem";
 
 const store = useStore();
+
+/** 거래처 계정(lngUserAdminID === 60): 세션 `lngSupplierID` 고정 + 콤보 비활성 — PUR03_036RPT 와 동일 */
+const isSupplierPortal = computed(() => store.getters.isSupplierAccountUser);
+const supplierComboPresetId = computed(() => {
+  if (!isSupplierPortal.value) return "";
+  const id = store.getters.sessionLngSupplierID;
+  return id != null && id > 0 ? id : "";
+});
+const supplierComboDisabled = computed(() => isSupplierPortal.value);
+/** 로그인 세션에 오는 거래처 표시명 — 콤보 목록에 없을 때 라벨로 사용 */
+const supplierSessionDisplayName = computed(() => {
+  if (!isSupplierPortal.value) return "";
+  const u = store.state.userData;
+  if (!u || typeof u !== "object" || Array.isArray(u)) return "";
+  const nm =
+    u.strSupplierName ??
+    u.StrSupplierName ??
+    u.strChargerName ??
+    u.strStoreName ??
+    u.strUserID ??
+    "";
+  return String(nm).trim();
+});
 const reload = ref(false);
 const rowData = ref([]);
 const afterSearch = ref(false);
@@ -204,6 +230,13 @@ onMounted(async () => {
 
   const res = await getCommonList(27);
   optionList.value = res.data.List.filter((item) => item.strDCode !== "01");
+
+  if (isSupplierPortal.value) {
+    const sid = store.getters.sessionLngSupplierID;
+    if (sid != null && sid > 0) {
+      supplierid.value = String(sid);
+    }
+  }
 });
 
 const handleParentClick = (e) => {
@@ -275,6 +308,13 @@ const lngStoreAttrs = (e) => {
 
 const supplierid = ref("");
 const SupplierId = (e) => {
+  if (isSupplierPortal.value) {
+    const sid = store.getters.sessionLngSupplierID;
+    if (sid != null && sid > 0) {
+      supplierid.value = String(sid);
+      return;
+    }
+  }
   supplierid.value = e;
 };
 
