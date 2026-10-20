@@ -1,71 +1,87 @@
 /*--############################################################################
-# Filename : ACT04_002RPT.vue                                                  
-# Description : 입출금관리 > 입출금 관리 >입출금 상세 현황                     
-# Date :2025-05-20                                                             
-# Author : 권맑음                     
+# Filename : ACT04_002RPT.vue
+# Description : 입출금관리 > 입출금 관리 >입출금 상세 현황
+# Date :2025-05-20
+# Author : 권맑음
 ################################################################################*/
 <template>
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <!-- pl-5: 셸 w-right가 pl0이라 그리드가 좌측 메뉴에 붙음 → 우측 pd20과 맞춤 -->
+  <div class="flex h-full min-h-0 flex-col pl-5" @click="handleParentClick">
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="searchButton" class="button search md:w-auto w-14">
+      <div class="flex justify-center space-x-2 pr-5">
+        <button type="button" @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="excelButton" class="button save w-auto excel">
+        <button type="button" @click="excelButton" class="button save w-auto excel">
           엑셀
         </button>
       </div>
     </div>
+
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
-      <div class="grid grid-cols-1 grid-rows-2">
-        <div>
-          <Datepicker2
-            @endDate="endDate"
-            @startDate="startDate"
-            :closePopUp="closePopUp"
-            class="ml-7"
-            ref="datepicker"
-            @excelDate="excelDate"
-            :mainName="'기간'"
-            :initToday="1"></Datepicker2>
+      class="act0402-search-panel z-10 mt-3 w-full min-w-0 shrink-0 rounded-lg bg-gray-200"
+      :style="{
+        '--act0402-control-border': act0402ControlBorder,
+        '--act0402-col-gap': act0402ColGap,
+        '--act0402-row-gap': act0402RowGap,
+        '--act0402-label-col': act0402LabelCol,
+        '--act0402-item-gap': act0402ItemGap,
+        '--act0402-row-min-h': act0402RowMinH,
+        '--act0402-control-h': act0402ControlH,
+      }">
+      <div class="act0402-search-layout min-w-0">
+        <!-- 좌: 기간 / 계정과목·셀병합 -->
+        <div class="act0402-left-stack min-w-0">
+          <div class="act0402-row">
+            <div class="act0402-label">기간</div>
+            <div class="act0402-field act0402-date-slot min-w-0">
+              <Datepicker2
+                ref="datepicker"
+                omit-main-label
+                filter-bar-align
+                :mainName="'기간'"
+                :initToday="1"
+                :closePopUp="closePopUp"
+                @endDate="endDate"
+                @startDate="startDate"
+                @excelDate="excelDate" />
+            </div>
+          </div>
+          <div class="act0402-row">
+            <div class="act0402-label">계정과목</div>
+            <div class="act0402-field act0402-acc-field min-w-0">
+              <select
+                id="act04-002-acc"
+                v-model="selectedCond"
+                class="act0402-sg-select act0402-acc-select">
+                <option value="0">전체</option>
+                <option
+                  v-for="i in CondList"
+                  :key="i.lngAccCode"
+                  :value="i.lngAccCode">
+                  {{ i.strAccName }}
+                </option>
+              </select>
+            </div>
+          </div>
         </div>
-        <div class="flex space-x-5 text-base font-semibold ml-12 mt-3">
-          <div class="">계정과목</div>
-          <div>
-            <select name="" id="" v-model="selectedCond" class="w-40">
-              <option value="0">전체</option>
-              <option :value="i.lngAccCode" v-for="i in CondList">
-                {{ i.strAccName }}
-              </option>
-            </select>
-          </div>
-          <div>
-            <label for="cellUnite"
-              ><input
-                type="checkbox"
-                id="cellUnite"
-                v-model="cond2"
-                @click="checkCond2" />셀병합</label
-            >
-          </div>
+
+        <!-- 우: 매장 (PickStoreSingle — 기존 컴포넌트·이벤트 유지) -->
+        <div class="act0402-pick-slot min-w-0">
+          <PickStoreSingle
+            @lngStoreCode="lngStoreCodes"
+            @lngStoreGroup="lngStoreGroup"
+            @excelStore="excelStore"
+            @lngStoreAttrs="lngStoreAttrs"
+            @changeInit="changeInit" />
         </div>
       </div>
-      <div class="">
-        <PickStoreSingle
-          @lngStoreCode="lngStoreCodes"
-          @lngStoreGroup="lngStoreGroup"
-          @excelStore="excelStore"
-          @lngStoreAttrs="lngStoreAttrs"
-          @changeInit="changeInit">
-        </PickStoreSingle>
-      </div>
-      <div></div>
     </div>
 
-    <div class="w-full h-[80%]">
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <Realgrid
+        class="act0402-grid-body min-h-0 w-full flex-1"
         :progname="'ACT04_002RPT_VUE'"
         :progid="1"
         :rowData="rowData"
@@ -74,8 +90,7 @@
         :mergeMask="mergeMask"
         :documentTitle="'ACT04_002RPT'"
         :documentSubTitle="documentSubTitle"
-        :exporttoExcel="exportExcel">
-      </Realgrid>
+        :exporttoExcel="exportExcel" />
     </div>
   </div>
 </template>
@@ -118,6 +133,14 @@ import { onMounted, ref } from "vue";
 
 import { useStore } from "vuex";
 
+const act0402ControlBorder = "#cbd5e1";
+const act0402ColGap = "1.75rem";
+const act0402RowGap = "0.75rem";
+const act0402LabelCol = "5.75rem";
+const act0402ItemGap = "0.75rem";
+const act0402RowMinH = "2rem";
+const act0402ControlH = "2rem";
+
 const setRowGroupSpan = ref("");
 const reload = ref(false);
 const rowData = ref([]);
@@ -128,21 +151,9 @@ const hideColumnNow = ref(true);
 const setGroupColumnId = ref("strName");
 const CondList = ref([]);
 const selectedCond = ref(0);
+/** 셀병합 — 조회 AREA 체크박스 없이 기본 병합 유지 */
 const setRowGroupSpan2 = ref("lngStoreCode,strName,dtmDate,lngCode,InOutName");
 const mergeMask = ref("lngStoreCode,strName,dtmDate");
-const cond2 = ref(true);
-
-const checkCond2 = (e) => {
-  if (e.target.checked) {
-    cond2.value = true;
-    setRowGroupSpan2.value = "lngStoreCode,strName,dtmDate,lngCode,InOutName";
-    reload.value = !reload.value;
-  } else {
-    setRowGroupSpan2.value = "";
-    reload.value = !reload.value;
-    cond2.value = false;
-  }
-};
 /**
  * 선택한 매출 시작일자
  */
@@ -382,4 +393,189 @@ const resetInputBox = (e) => {
 };
 </script>
 
-<style></style>
+<style scoped>
+.act0402-search-panel {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  --act0402-panel-pad-x: 2rem;
+  padding-left: var(--act0402-panel-pad-x);
+  padding-right: var(--act0402-panel-pad-x);
+  padding-block: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .act0402-search-panel {
+    --act0402-panel-pad-x: 2.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .act0402-search-panel {
+    --act0402-panel-pad-x: 3.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .act0402-search-panel {
+    --act0402-panel-pad-x: 4rem;
+  }
+}
+
+.act0402-search-layout {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr);
+  column-gap: var(--act0402-col-gap);
+}
+
+.act0402-left-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--act0402-row-gap);
+  min-width: 0;
+}
+
+.act0402-row {
+  display: flex;
+  min-width: 0;
+  min-height: var(--act0402-row-min-h);
+  flex-direction: row;
+  align-items: center;
+  gap: var(--act0402-item-gap);
+}
+
+.act0402-label {
+  flex: 0 0 var(--act0402-label-col);
+  width: var(--act0402-label-col);
+  min-width: 0;
+  max-width: var(--act0402-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--act0402-row-min-h);
+  /* 매장명(.pss-brand text-base)과 동일 */
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.act0402-field {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  min-height: var(--act0402-row-min-h);
+  /* ~ + 캘린더 버튼·간격 제외한 절반 = 기간 시작일 폭 → 계정과목과 공유 */
+  --act0402-period-first-w: calc((100% - 2.65rem) / 2);
+}
+
+.act0402-sg-select {
+  box-sizing: border-box;
+  height: var(--act0402-control-h);
+  min-height: var(--act0402-control-h);
+  max-height: var(--act0402-control-h);
+  min-width: 0;
+  padding: 0 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: rgb(55 65 81);
+  background: #fff;
+  border: 1px solid var(--act0402-control-border);
+  border-radius: 0.375rem;
+}
+
+/* 계정과목 콤보 = 기간 시작일(첫번째 date) 폭 */
+.act0402-acc-select {
+  width: var(--act0402-period-first-w);
+  max-width: var(--act0402-period-first-w);
+  flex: 0 0 var(--act0402-period-first-w);
+}
+
+.act0402-sg-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.2);
+}
+
+.act0402-search-panel .act0402-date-slot :deep(> div.flex.justify-start.items-center) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+  margin: 0 !important;
+  gap: 0.25rem !important;
+}
+
+.act0402-search-panel .act0402-date-slot :deep(> div.flex > div.inline-flex.h-8) {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  gap: 0.125rem !important;
+}
+
+.act0402-search-panel .act0402-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  height: var(--act0402-control-h) !important;
+  min-height: var(--act0402-control-h) !important;
+  max-height: var(--act0402-control-h) !important;
+  border: 1px solid var(--act0402-control-border) !important;
+  width: var(--act0402-period-first-w) !important;
+  flex: 0 0 var(--act0402-period-first-w) !important;
+  min-width: 0;
+  max-width: var(--act0402-period-first-w);
+  padding-left: 0.45rem;
+  padding-right: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.act0402-search-panel .act0402-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.act0402-search-panel .act0402-date-slot :deep(div.inline-flex.h-8 > span) {
+  flex-shrink: 0;
+}
+
+.act0402-search-panel .act0402-date-slot :deep(div.inline-flex.h-8 > button) {
+  flex-shrink: 0;
+  width: 1.65rem !important;
+  height: 1.65rem !important;
+  min-width: 1.65rem;
+  margin-left: 0 !important;
+}
+
+.act0402-pick-slot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  min-height: 100%;
+}
+
+/* 매장 콤보 ~85% — 줄어든 15%는 가운데(좌측 스택과의 사이)에 둠 */
+.act0402-pick-slot :deep(.pss-root) {
+  width: 85%;
+  max-width: 85%;
+  min-width: 0;
+}
+
+/* 매장명 라벨 — 기간·계정과목과 동일 폰트 */
+.act0402-pick-slot :deep(.pss-brand) {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  color: rgb(17 24 39) !important;
+}
+
+.act0402-grid-body {
+  min-height: 12rem;
+}
+</style>

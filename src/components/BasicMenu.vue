@@ -792,7 +792,10 @@ const closeSidemenu = () => {
 onMounted(() => {
   document.addEventListener("click", onDocClick);
   ////console.log(store.state.userData);
-  loginName.value = store.state.userData.loginID;
+  // 인사말: 로그인 ID가 아니라 세션 담당자명(고객명). 없으면 ID
+  const u = store.state.userData || {};
+  const chargerNm = String(u.strChargerName ?? "").trim();
+  loginName.value = chargerNm || u.loginID || "";
   storeName.value = store.state.userData.strStoreName;
   lStoreCd.value = store.state.userData.lngPosition;
   currentFavorite.value = [];

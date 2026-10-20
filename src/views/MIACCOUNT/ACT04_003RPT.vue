@@ -1,81 +1,110 @@
 /*--############################################################################
-# Filename : ACT04_003RPT.vue                                                  
-# Description : 입출금관리 > 입출금 관리 >입출금 집계 현황                     
-# Date :2025-05-21                                                             
-# Author : 권맑음                     
+# Filename : ACT04_003RPT.vue
+# Description : 입출금관리 > 입출금 관리 >입출금 집계 현황
+# Date :2025-05-21
+# Author : 권맑음
 ################################################################################*/
 <template>
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <!-- pl-5: 셸 w-right가 pl0이라 그리드가 좌측 메뉴에 붙음 → 우측 pd20과 맞춤 -->
+  <div class="flex h-full min-h-0 flex-col pl-5" @click="handleParentClick">
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="searchButton" class="button search md:w-auto w-14">
+      <div class="flex justify-center space-x-2 pr-5">
+        <button type="button" @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="excelButton" class="button save w-auto excel">
+        <button type="button" @click="excelButton" class="button save w-auto excel">
           엑셀
         </button>
       </div>
     </div>
+
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
-      <div class="grid grid-cols-1 grid-rows-2">
-        <Datepicker2
-          @endDate="endDate"
-          @startDate="startDate"
-          :closePopUp="closePopUp"
-          ref="datepicker"
-          @excelDate="excelDate"
-          :mainName="'기간'"
-          :initToday="1"></Datepicker2>
-        <div class="flex space-x-3 text-base font-semibold ml-12 mt-3">
-          <div class="space-x-3">
-            <label for="sum"
-              ><input
-                type="checkbox"
-                id="sum"
-                v-model="cond"
-                @click="checkCond" />소계</label
-            >
-            <label for="cellUnite"
-              ><input
-                type="checkbox"
-                id="cellUnite"
-                v-model="cond2"
-                @click="checkCond2" />셀병합</label
-            >
+      class="act0403-search-panel z-10 mt-3 w-full min-w-0 shrink-0 rounded-lg bg-gray-200"
+      :style="{
+        '--act0403-control-border': act0403ControlBorder,
+        '--act0403-col-gap': act0403ColGap,
+        '--act0403-row-gap': act0403RowGap,
+        '--act0403-label-col': act0403LabelCol,
+        '--act0403-item-gap': act0403ItemGap,
+        '--act0403-row-min-h': act0403RowMinH,
+        '--act0403-control-h': act0403ControlH,
+      }">
+      <div class="act0403-search-layout min-w-0">
+        <div class="act0403-left-stack min-w-0">
+          <div class="act0403-row">
+            <div class="act0403-label">기간</div>
+            <div class="act0403-field act0403-date-slot min-w-0">
+              <Datepicker2
+                ref="datepicker"
+                omit-main-label
+                filter-bar-align
+                :mainName="'기간'"
+                :initToday="1"
+                :closePopUp="closePopUp"
+                @endDate="endDate"
+                @startDate="startDate"
+                @excelDate="excelDate" />
+            </div>
+          </div>
+          <div class="act0403-row">
+            <div class="act0403-label" aria-hidden="true"></div>
+            <div class="act0403-field act0403-checks min-w-0">
+              <label class="act0403-check" for="act04-003-sum">
+                <input
+                  id="act04-003-sum"
+                  type="checkbox"
+                  v-model="cond"
+                  @click="checkCond" />
+                소계
+              </label>
+              <label class="act0403-check" for="act04-003-cellUnite">
+                <input
+                  id="act04-003-cellUnite"
+                  type="checkbox"
+                  v-model="cond2"
+                  @click="checkCond2" />
+                셀병합
+              </label>
+            </div>
           </div>
         </div>
+
+        <div class="act0403-pick-slot min-w-0">
+          <PickStoreSingle
+            @lngStoreCode="lngStoreCodes"
+            @lngStoreGroup="lngStoreGroup"
+            @excelStore="excelStore"
+            @lngStoreAttrs="lngStoreAttrs"
+            @changeInit="changeInit" />
+        </div>
       </div>
-      <div class="">
-        <PickStoreSingle
-          @lngStoreCode="lngStoreCodes"
-          @lngStoreGroup="lngStoreGroup"
-          @excelStore="excelStore"
-          @lngStoreAttrs="lngStoreAttrs"
-          @changeInit="changeInit">
-        </PickStoreSingle>
-      </div>
-      <div></div>
     </div>
 
-    <div class="w-full h-[80%]">
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <Realgrid
+        class="act0403-grid-body min-h-0 w-full flex-1"
         :progname="'ACT04_003RPT_VUE'"
         :progid="1"
         :rowData="rowData"
         :reload="reload"
         :setRowGroupSpan2="setRowGroupSpan2"
+        :set-merge-mode="cond2"
         :documentTitle="'ACT04_003RPT'"
         :setFooter="true"
         :rowStateeditable="false"
         :setGroupFooter="cond"
         :setGroupColumnId="'strName,dtmDate'"
+        :setGroupFooterColID="['Cnt', 'SumMoney']"
+        :setGroupFooterExpressions="['sum', 'sum']"
+        :setGroupSumCustomColumnId2="['InOutCodeName']"
+        :setFooterColID="['Cnt', 'SumMoney']"
+        :setFooterExpressions="['sum', 'sum']"
         :setFooterCustomColumnId="['strName']"
         :setFooterCustomText="['총합계']"
+        row-group-hide-expander
         :documentSubTitle="documentSubTitle"
-        :exporttoExcel="exportExcel">
-      </Realgrid>
+        :exporttoExcel="exportExcel" />
     </div>
   </div>
 </template>
@@ -123,6 +152,14 @@ import { onMounted, ref } from "vue";
 
 import { useStore } from "vuex";
 
+const act0403ControlBorder = "#cbd5e1";
+const act0403ColGap = "1.75rem";
+const act0403RowGap = "0.75rem";
+const act0403LabelCol = "5.75rem";
+const act0403ItemGap = "0.75rem";
+const act0403RowMinH = "2rem";
+const act0403ControlH = "2rem";
+
 const setRowGroupSpan = ref("");
 const reload = ref(false);
 const rowData = ref([]);
@@ -133,10 +170,12 @@ const hideColumnNow = ref(true);
 const setGroupColumnId = ref("strName");
 const CondList = ref([]);
 const selectedCond = ref(0);
-const setRowGroupSpan2 = ref("strName");
+/** 셀병합 기본 OFF */
+const setRowGroupSpan2 = ref("");
 const mergeMask = ref("lngStoreCode");
-const cond2 = ref(true);
-const cond = ref(true);
+const cond2 = ref(false);
+/** 소계 기본 OFF */
+const cond = ref(false);
 
 const checkCond = (e) => {
   if (e.target.checked) {
@@ -397,4 +436,188 @@ const resetInputBox = (e) => {
 };
 </script>
 
-<style></style>
+<style scoped>
+.act0403-search-panel {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  --act0403-panel-pad-x: 2rem;
+  padding-left: var(--act0403-panel-pad-x);
+  padding-right: var(--act0403-panel-pad-x);
+  padding-block: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .act0403-search-panel {
+    --act0403-panel-pad-x: 2.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .act0403-search-panel {
+    --act0403-panel-pad-x: 3.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .act0403-search-panel {
+    --act0403-panel-pad-x: 4rem;
+  }
+}
+
+.act0403-search-layout {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr);
+  column-gap: var(--act0403-col-gap);
+}
+
+.act0403-left-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--act0403-row-gap);
+  min-width: 0;
+}
+
+.act0403-row {
+  display: flex;
+  min-width: 0;
+  min-height: var(--act0403-row-min-h);
+  flex-direction: row;
+  align-items: center;
+  gap: var(--act0403-item-gap);
+}
+
+.act0403-label {
+  flex: 0 0 var(--act0403-label-col);
+  width: var(--act0403-label-col);
+  min-width: 0;
+  max-width: var(--act0403-label-col);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--act0403-row-min-h);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.act0403-field {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  min-height: var(--act0403-row-min-h);
+  --act0403-period-first-w: calc((100% - 2.65rem) / 2);
+}
+
+.act0403-checks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  min-width: 0;
+}
+
+.act0403-check {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--act0403-row-min-h);
+  gap: 0.45rem;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.act0403-check input[type="checkbox"] {
+  box-sizing: border-box;
+  margin: 0;
+  flex-shrink: 0;
+  width: 1.05rem;
+  height: 1.05rem;
+  min-width: 1.05rem;
+  min-height: 1.05rem;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.act0403-search-panel .act0403-date-slot :deep(> div.flex.justify-start.items-center) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+  margin: 0 !important;
+  gap: 0.25rem !important;
+}
+
+.act0403-search-panel .act0403-date-slot :deep(> div.flex > div.inline-flex.h-8) {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  gap: 0.125rem !important;
+}
+
+.act0403-search-panel .act0403-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  height: var(--act0403-control-h) !important;
+  min-height: var(--act0403-control-h) !important;
+  max-height: var(--act0403-control-h) !important;
+  border: 1px solid var(--act0403-control-border) !important;
+  width: var(--act0403-period-first-w) !important;
+  flex: 0 0 var(--act0403-period-first-w) !important;
+  min-width: 0;
+  max-width: var(--act0403-period-first-w);
+  padding-left: 0.45rem;
+  padding-right: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.act0403-search-panel .act0403-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.act0403-search-panel .act0403-date-slot :deep(div.inline-flex.h-8 > span) {
+  flex-shrink: 0;
+}
+
+.act0403-search-panel .act0403-date-slot :deep(div.inline-flex.h-8 > button) {
+  flex-shrink: 0;
+  width: 1.65rem !important;
+  height: 1.65rem !important;
+  min-width: 1.65rem;
+  margin-left: 0 !important;
+}
+
+.act0403-pick-slot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  min-height: 100%;
+}
+
+.act0403-pick-slot :deep(.pss-root) {
+  width: 85%;
+  max-width: 85%;
+  min-width: 0;
+}
+
+.act0403-pick-slot :deep(.pss-brand) {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  color: rgb(17 24 39) !important;
+}
+
+.act0403-grid-body {
+  min-height: 12rem;
+}
+</style>
