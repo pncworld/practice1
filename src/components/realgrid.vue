@@ -292,6 +292,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  freezeUntilHeader: {
+    // 이 헤더 문구 컬럼까지 가로 스크롤 시 왼쪽에 고정. 빈 값이면 동작하지 않음
+    type: String,
+    default: "",
+  },
   /** true: 그리드 너비에 맞춰 열이 늘고 줄어듦(evenFill). 기본 false=even */
   fitAllColumns: {
     type: Boolean,
@@ -4229,6 +4234,35 @@ const runFuncshowGrid = async () => {
   }
 
   gridView.setColumns(columns);
+  const freezeHeader = String(props.freezeUntilHeader || "").replace(/\s/g, "");
+  if (freezeHeader) {
+    let fixedCount = 0;
+    let foundFreezeColumn = false;
+    for (const col of columns) {
+      if (col.visible === false) {
+        continue;
+      }
+      fixedCount += 1;
+      const headerText = String(col?.header?.text ?? "").replace(/\s/g, "");
+      if (headerText === freezeHeader) {
+        foundFreezeColumn = true;
+        break;
+      }
+    }
+    if (foundFreezeColumn) {
+      gridView.setFixedOptions({ colCount: fixedCount, resizable: true });
+      for (const col of columns) {
+        if (col.visible === false) {
+          continue;
+        }
+        const width = Number(col.width);
+        if (!Number.isFinite(width) || width <= 0) {
+          continue;
+        }
+        gridView.setColumnProperty(col.name, "width", width);
+      }
+    }
+  }
   // 체크(렌더러) 컬럼은 정렬 비활성 — 헤더 클릭 시 재정렬 착시 방지
   try {
     const cols = gridView.getColumns?.() ?? [];
