@@ -1,16 +1,15 @@
 /*--############################################################################
-# Filename : CRM10_021RPT.vue                                                  
-# Description : 고객관리 > 고객 예약 관리 > 예약변경내역.                      
-# Date :2025-05-21                                                             
-# Author : 권맑음                     
+# Filename : CRM10_021RPT.vue
+# Description : 고객관리 > 고객 예약 관리 > 예약변경내역.
+# Date :2025-05-21
+# Author : 권맑음
 ################################################################################*/
 <template>
-  <!-- 조회조건 -->
-  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+  <div class="flex h-full min-h-0 flex-col pl-5" @click="handleParentClick">
     <div
-      class="flex shrink-0 items-center justify-between gap-3 overflow-y-hidden pr-1">
+      class="flex w-full shrink-0 items-center justify-between overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex shrink-0 items-center justify-end space-x-2 pr-5">
+      <div class="mr-9 flex justify-center space-x-2 pr-5">
         <button type="button" class="button search md:w-auto w-14" @click="searchButton">
           조회
         </button>
@@ -21,20 +20,24 @@
     </div>
 
     <div
-      class="crm10-search-panel z-10 mt-3 w-full max-w-[min(100%,1680px)] min-w-0 shrink-0 self-center overflow-x-auto rounded-md border border-slate-500/70 bg-gradient-to-b from-violet-100 via-purple-50/95 to-slate-100 shadow-sm">
-      <div
-        class="crm10-search-body min-w-0 text-slate-800"
-        :style="{ '--crm10-control-border': crm10ControlBorder }">
-        <!-- 1행: 매장명 + 매장(콤보 폭 상한 — 별도 라벨 열과 PUR01 패턴) -->
-        <div
-          class="crm10-search-row crm10-row-store flex flex-wrap items-center gap-x-2 border-b border-slate-500/45 px-4 py-2.5 sm:px-5">
-          <div class="crm10-label-slot shrink-0">
-            <span class="crm10-lbl">매장명</span>
-          </div>
-          <div class="crm10-pick-slot min-w-0 flex-1 basis-0 sm:max-w-[22rem]">
+      class="crm10021-search-panel z-10 mt-3 w-full min-h-0 shrink-0 overflow-visible rounded-lg bg-gray-200"
+      :style="{
+        '--crm10021-control-border': crm10021ControlBorder,
+        '--crm10021-col-gap': crm10021ColGutter,
+        '--crm10021-item-gap': crm10021ItemGap,
+        '--crm10021-row-gap': crm10021RowGap,
+        '--crm10021-label-col': crm10021LabelCol,
+      }">
+      <!--
+        앞뒤 pad 동일 · 2행: [항목][1fr][항목][1fr][항목] 로 A↔B=B↔C
+        매장 필드 폭 = 접수일 필드 폭
+      -->
+      <div class="crm10021-search-body min-w-0">
+        <div class="crm10021-row crm10021-row-store min-w-0">
+          <div class="crm10021-lbl">매장명</div>
+          <div class="crm10021-field crm10021-pick-slot min-w-0 overflow-visible">
             <PickStore
               compact-search-bar
-              :compact-store-combo-max-rem="20"
               main-name=""
               :hide-group="false"
               :hide-attr="false"
@@ -44,14 +47,10 @@
           </div>
         </div>
 
-        <!-- 2행: 접수일 · 고객명 · 전화번호 — 항목별 라벨+값 붙어서 줄바꿈 -->
-        <div
-          class="crm10-search-row crm10-row-rest flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5 sm:px-5">
-          <div class="crm10-pair flex shrink-0 flex-nowrap items-center gap-x-2">
-            <div class="crm10-label-slot shrink-0">
-              <span class="crm10-lbl">접수일</span>
-            </div>
-            <div class="crm10-date-slot min-w-0">
+        <div class="crm10021-row crm10021-row-filters min-w-0">
+          <div class="crm10021-cell crm10021-cell--date">
+            <div class="crm10021-lbl">접수일</div>
+            <div class="crm10021-field crm10021-date-slot min-w-0">
               <Datepicker2
                 ref="datepicker"
                 :main-name="'접수일'"
@@ -64,55 +63,52 @@
                 @start-date="startDate"></Datepicker2>
             </div>
           </div>
-
-          <div class="crm10-pair flex shrink-0 flex-nowrap items-center gap-x-2">
-            <div class="crm10-label-slot shrink-0">
-              <span class="crm10-lbl">고객명</span>
+          <div class="crm10021-gutter" aria-hidden="true"></div>
+          <div class="crm10021-cell crm10021-cell--name">
+            <div class="crm10021-lbl">고객명</div>
+            <div class="crm10021-field crm10021-field--name min-w-0">
+              <input
+                v-model="cond"
+                type="text"
+                autocomplete="off"
+                class="crm10021-input crm10021-input--name" />
             </div>
-            <input
-              v-model="cond"
-              type="text"
-              autocomplete="off"
-              class="crm10-input h-8 min-h-8 w-[11rem] max-w-[min(100%,14rem)] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-slate-800" />
           </div>
-
-          <div class="crm10-pair flex min-w-0 shrink-0 flex-nowrap items-center gap-x-2">
-            <div class="crm10-label-slot shrink-0">
-              <span class="crm10-lbl">전화번호</span>
-            </div>
-            <div class="crm10-phone-val flex min-w-0 flex-nowrap items-center gap-x-1.5">
+          <div class="crm10021-gutter" aria-hidden="true"></div>
+          <div class="crm10021-cell crm10021-cell--phone">
+            <div class="crm10021-lbl">전화번호</div>
+            <div class="crm10021-field crm10021-phone-field min-w-0">
               <input
                 v-model="cond2"
                 type="text"
                 inputmode="numeric"
                 autocomplete="off"
-                class="crm10-input h-8 min-h-8 w-[7.5rem] shrink-0 rounded-md border border-solid bg-white px-2 text-sm text-slate-800" />
-              <span class="crm10-hint shrink-0 text-xs font-medium text-slate-600">(뒷4자리)</span>
+                class="crm10021-input crm10021-input--phone" />
+              <span class="crm10021-hint">(뒷4자리)</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 그리드 -->
-    <div
-      class="crm10-grid-shell mx-auto mt-2 flex min-h-0 min-w-0 w-full max-w-[min(100%,1680px)] flex-1 flex-col basis-0 overflow-hidden px-1 pb-1">
-      <div
-        class="crm10-main-grid-frame flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-sm border border-gray-400 bg-white">
-        <div class="relative min-h-0 w-full flex-1">
-          <Realgrid
-            :progname="'CRM10_021RPT_VUE'"
-            :progid="1"
-            :rowData="rowData"
-            :reload="reload"
-            :setStateBar="false"
-            :documentTitle="'CRM10_021RPT'"
-            :dynamicRowHeight="true"
-            :documentSubTitle="documentSubTitle"
-            :rowStateeditable="false"
-            :exporttoExcel="exportExcel">
-          </Realgrid>
-        </div>
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col">
+      <div class="relative min-h-0 w-full flex-1">
+        <Realgrid
+          class="h-full min-h-0 w-full"
+          :progname="'CRM10_021RPT_VUE'"
+          :progid="1"
+          :rowData="rowData"
+          :reload="reload"
+          :setStateBar="false"
+          :documentTitle="'CRM10_021RPT'"
+          :dynamicRowHeight="true"
+          :dynamicRowHeightPadding="20"
+          :documentSubTitle="documentSubTitle"
+          :rowStateeditable="false"
+          :exporttoExcel="exportExcel"
+          @gridReady="onCrm10021GridReady"
+          @realgridname="onCrm10021RealgridName">
+        </Realgrid>
       </div>
     </div>
   </div>
@@ -139,6 +135,7 @@ import PickStore from "@/components/pickStore.vue";
  */
 
 import Realgrid from "@/components/realgrid.vue";
+import { rgGetInstance } from "@/components/realgridInstanceRegistry";
 /**
  *  페이지로그 자동 입력
  *  */
@@ -153,7 +150,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -161,11 +158,68 @@ import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
-const crm10ControlBorder = "#cbd5e1";
+const crm10021ControlBorder = "#cbd5e1";
+const crm10021ColGutter = "1.5rem";
+const crm10021ItemGap = "0.75rem";
+const crm10021RowGap = "0.875rem";
+const crm10021LabelCol = "5rem";
 
 const reload = ref(false);
 const rowData = ref([]);
 const afterSearch = ref(false);
+const crm10021GridId = ref("");
+
+/** 비고 열 최소 폭 — 너무 좁으면 wrap 과다로 동적 행높이가 짧게 잘림 */
+const CRM10021_BIGO_MIN_WIDTH = 280;
+
+const onCrm10021RealgridName = (id) => {
+  crm10021GridId.value = id;
+};
+
+const widenCrm10021BigoColumn = (gv) => {
+  if (!gv) return;
+  let cols = [];
+  try {
+    cols = gv.getColumns?.() ?? [];
+  } catch (_) {
+    cols = [];
+  }
+  for (const col of cols) {
+    const headerText = String(
+      col?.header?.text ?? col?.headerText ?? col?.header ?? ""
+    ).replace(/\s+/g, "");
+    if (!headerText.includes("비고")) continue;
+    const name = col.name || col.fieldName;
+    if (!name) continue;
+    const cur = Number(col.width || col.displayWidth || 0);
+    const next = Math.max(cur, CRM10021_BIGO_MIN_WIDTH);
+    try {
+      gv.setColumnProperty?.(name, "width", next);
+    } catch (_) {}
+    break;
+  }
+};
+
+const remasureCrm10021RowHeights = (gv) => {
+  if (!gv) return;
+  try {
+    gv.clearRowHeights?.(true);
+    gv.refresh?.(true);
+    gv.resetSize?.();
+  } catch (_) {}
+};
+
+const onCrm10021GridReady = (id) => {
+  const gridId = id || crm10021GridId.value;
+  const gv = rgGetInstance(gridId)?.gridView;
+  if (!gv) return;
+  widenCrm10021BigoColumn(gv);
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      remasureCrm10021RowHeights(gv);
+    });
+  });
+};
 
 const cond = ref("");
 const cond2 = ref("");
@@ -237,6 +291,12 @@ const searchButton = async () => {
     rowData.value = res.data.List;
 
     afterSearch.value = true;
+    await nextTick();
+    requestAnimationFrame(() => {
+      const gv = rgGetInstance(crm10021GridId.value)?.gridView;
+      widenCrm10021BigoColumn(gv);
+      remasureCrm10021RowHeights(gv);
+    });
   } catch (error) {
     afterSearch.value = false;
     //comsole.log(error);
@@ -312,97 +372,265 @@ const excelDate = (e) => {
 </script>
 
 <style scoped>
-.crm10-main-grid-frame {
-  min-height: min(65vh, 420px);
+/*
+  앞뒤 pad 동일 (--panel-pad-x)
+  2행: max-content | 1fr | max-content | 1fr | max-content → A↔B = B↔C
+  매장·접수일 필드 끝선: --left-field-w
+*/
+.crm10021-search-panel {
+  --crm10021-panel-pad-x: 2rem;
+  --crm10021-row-min-h: 2rem;
+  --crm10021-control-h: 2rem;
+  /* Datepicker2 filter-bar: w-36×2 + ~ + 기간버튼(2rem) + gap — STKN06 동일 */
+  --crm10021-left-field-w: calc(
+    9rem + 9rem + 2rem + 0.125rem * 3 + 0.125rem + 0.9rem
+  );
+  --crm10021-short-field-w: calc(var(--crm10021-left-field-w) * 0.6);
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+  padding-block: 0.75rem;
+  overflow: visible;
 }
 
-@media (max-height: 800px) {
-  .crm10-main-grid-frame {
-    min-height: min(52vh, 300px);
-  }
-}
-
-.crm10-lbl {
-  display: flex;
+.crm10021-search-body {
+  box-sizing: border-box;
+  width: 100%;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--crm10021-row-gap, 0.875rem);
+  padding-left: var(--crm10021-panel-pad-x);
+  padding-right: var(--crm10021-panel-pad-x);
+}
+
+.crm10021-row-store {
+  display: grid;
+  grid-template-columns:
+    var(--crm10021-label-col, 5rem)
+    minmax(0, var(--crm10021-left-field-w));
+  column-gap: var(--crm10021-item-gap, 0.75rem);
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+  min-height: var(--crm10021-row-min-h);
+}
+
+/* [접수일][여열][고객명][여열][전화번호] — 여열 동일 → 항목 사이 균등, 앞뒤는 pad-x */
+.crm10021-row-filters {
+  display: grid;
+  grid-template-columns:
+    max-content
+    minmax(var(--crm10021-col-gap, 1.5rem), 1fr)
+    max-content
+    minmax(var(--crm10021-col-gap, 1.5rem), 1fr)
+    max-content;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.crm10021-gutter {
+  min-width: 0;
+  pointer-events: none;
+}
+
+.crm10021-cell {
+  display: grid;
+  grid-template-columns: var(--crm10021-label-col, 5rem) max-content;
+  column-gap: var(--crm10021-item-gap, 0.75rem);
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+  min-height: var(--crm10021-row-min-h);
+}
+
+.crm10021-cell--date {
+  grid-template-columns:
+    var(--crm10021-label-col, 5rem)
+    minmax(0, var(--crm10021-left-field-w));
+}
+
+.crm10021-cell--date .crm10021-date-slot,
+.crm10021-row-store .crm10021-pick-slot {
+  width: 100%;
+  max-width: var(--crm10021-left-field-w);
+}
+
+.crm10021-lbl {
+  box-sizing: border-box;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  width: 100%;
+  min-height: var(--crm10021-row-min-h);
+  font-size: 0.9375rem;
   font-weight: 600;
   line-height: 1.25;
-  color: rgb(30 41 59);
+  color: rgb(17 24 39);
   text-align: center;
   white-space: nowrap;
 }
 
-.crm10-label-slot {
-  display: grid;
-  min-width: 0;
-  min-height: 2rem;
-  align-items: center;
-  grid-template-columns: minmax(5.25rem, 6.75rem);
-}
-
-/* 외부 '매장명' 라벨 사용 — PickStore 안쪽 빈 제목 칸 제거 */
-.crm10-pick-slot :deep(> div.flex.text-base > div.shrink-0:first-child) {
-  display: none;
-}
-
-.crm10-date-slot :deep(> div.flex.justify-start.items-center) {
-  min-height: 2rem;
-  align-items: center;
-}
-
-.crm10-search-panel .crm10-input {
-  border: 1px solid var(--crm10-control-border) !important;
+.crm10021-field {
   box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--crm10021-row-min-h);
+  display: flex;
+  align-items: center;
 }
 
-.crm10-search-panel .crm10-input:focus {
-  border-color: #3b82f6 !important;
+.crm10021-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: var(--crm10021-control-h);
+  min-height: var(--crm10021-control-h);
+  max-height: var(--crm10021-control-h);
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: rgb(30 41 59);
+  background: #fff;
+  border: 1px solid var(--crm10021-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+}
+
+/* 고객명·전화번호 — 접수일 필드 폭의 60% */
+.crm10021-field--name {
+  width: var(--crm10021-short-field-w);
+  max-width: var(--crm10021-short-field-w);
+  justify-content: flex-start;
+}
+
+.crm10021-input--name,
+.crm10021-input--phone {
+  flex: 0 0 auto;
+  width: var(--crm10021-short-field-w);
+  max-width: var(--crm10021-short-field-w);
+  min-width: 0;
+}
+
+.crm10021-input:focus {
+  border-color: #3b82f6;
   outline: none;
   box-shadow: 0 0 0 2px rgb(59 130 246 / 0.35);
 }
 
-.crm10-search-panel .crm10-date-slot :deep(input[type="date"]) {
-  border: 1px solid var(--crm10-control-border) !important;
+.crm10021-phone-field {
+  flex-wrap: nowrap;
+  width: max-content;
+  max-width: 100%;
+  gap: 0.375rem;
+}
+
+.crm10021-hint {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgb(71 85 105);
+  white-space: nowrap;
+}
+
+.crm10021-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: 100%;
+  min-height: var(--crm10021-row-min-h);
+  align-items: center;
+}
+
+.crm10021-date-slot :deep(input[type="date"]) {
   box-sizing: border-box;
+  height: var(--crm10021-control-h);
+  min-height: var(--crm10021-control-h);
+  max-height: var(--crm10021-control-h);
+  border: 1px solid var(--crm10021-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+  background: #fff;
 }
 
-.crm10-search-panel .crm10-date-slot :deep(input[type="date"]:focus) {
-  border-color: #3b82f6 !important;
+.crm10021-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6;
 }
 
-.crm10-pick-slot {
+.crm10021-date-slot :deep(div.inline-flex.h-8),
+.crm10021-date-slot :deep(button) {
+  height: var(--crm10021-control-h) !important;
+  min-height: var(--crm10021-control-h) !important;
+}
+
+/* 외부 라벨 — PickStore 안쪽 빈 제목 칸 제거 */
+.crm10021-pick-slot :deep(> div.flex.text-base > div.shrink-0:first-child) {
+  display: none;
+}
+
+.crm10021-pick-slot {
+  display: flex;
+  align-items: center;
   width: 100%;
   min-width: 0;
+  max-width: 100%;
 }
 
-.crm10-pick-slot :deep(select) {
-  border: 1px solid var(--crm10-control-border) !important;
+.crm10021-pick-slot > :deep(*) {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
 }
 
-.crm10-pick-slot :deep(select:focus) {
-  border-color: #3b82f6 !important;
+.crm10021-pick-slot :deep(> div.flex.text-base) {
+  margin: 0 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0 !important;
+  justify-content: flex-start !important;
 }
 
-.crm10-pick-slot :deep(.pickstore-vs-shell) {
-  border: 1px solid var(--crm10-control-border) !important;
+.crm10021-pick-slot :deep(> div.flex.text-base > div.relative),
+.crm10021-pick-slot :deep(.relative.min-w-0.flex-1) {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
 }
 
-.crm10-pick-slot :deep(> div.flex.text-base) {
-  width: 100%;
-  min-width: 0;
+.crm10021-pick-slot :deep(.pickstore-vs-shell) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
+  height: var(--crm10021-control-h) !important;
+  min-height: var(--crm10021-control-h) !important;
+  max-height: var(--crm10021-control-h) !important;
+  border: 1px solid var(--crm10021-control-border, #cbd5e1) !important;
 }
 
-@media (max-height: 900px) {
-  .crm10-search-panel {
-    margin-top: 0.25rem !important;
+.crm10021-pick-slot :deep(.style-chooser),
+.crm10021-pick-slot :deep(.vs__dropdown-toggle) {
+  width: 100% !important;
+  box-sizing: border-box;
+  height: var(--crm10021-control-h) !important;
+  min-height: var(--crm10021-control-h) !important;
+  max-height: var(--crm10021-control-h) !important;
+}
+
+@media (max-width: 900px) {
+  .crm10021-row-filters {
+    grid-template-columns: max-content;
+    justify-content: start;
+    row-gap: var(--crm10021-row-gap, 0.875rem);
   }
 
-  .crm10-search-row {
-    padding-top: 0.5rem !important;
-    padding-bottom: 0.5rem !important;
+  .crm10021-gutter {
+    display: none;
   }
 }
 </style>

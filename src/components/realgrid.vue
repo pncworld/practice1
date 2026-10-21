@@ -32,7 +32,15 @@ import {
   TreeView,
 } from "realgrid";
 import { v4 as uuidv4 } from "uuid";
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import {
+  computed,
+  nextTick,
+  onActivated,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+} from "vue";
 import {
   rgDestroyRegistryInstance,
   rgGetInstance,
@@ -1018,6 +1026,16 @@ const props = defineProps({
     // 동적 행 높이 2 트리뷰
     type: Boolean,
     default: false,
+  },
+  /** 동적 행높이(rowHeight=-1) 계산값에 더할 px — 마지막 줄 잘림 보정. 0이면 동적일 때 기본 12 */
+  dynamicRowHeightPadding: {
+    type: Number,
+    default: 0,
+  },
+  /** 동적 행 최대 높이(px). 0이면 RealGrid 기본(무제한). 화면별 opt-in */
+  dynamicMaxRowHeight: {
+    type: Number,
+    default: 0,
   },
   syncGridHeight: {
     // 행 높이 동기화
@@ -5055,14 +5073,28 @@ const runFuncshowGrid = async () => {
   if (props.bulkLoadMode === true) {
     gridView.displayOptions.refreshMode = "visibleOnly";
   }
+  const rgUseDynamicRowHeight =
+    (props.dynamicRowHeight == true && props.setTreeView == false) ||
+    (props.dynamicRowHeight2 == true && props.setTreeView == true);
   gridView.displayOptions.rowHeight =
     rgEffectiveRowHeight() > 0
       ? rgEffectiveRowHeight()
-      : props.dynamicRowHeight == true && props.setTreeView == false
-      ? -1
-      : props.dynamicRowHeight2 == true && props.setTreeView == true
+      : rgUseDynamicRowHeight
       ? -1
       : 1;
+  if (rgUseDynamicRowHeight) {
+    // fitStyle even 후 폭이 줄면 높이 재계산이 필요 — 표시 시 재측정
+    try {
+      gridView.displayOptions.refCalcHeights = false;
+    } catch (_) {}
+    const padRaw = Number(props.dynamicRowHeightPadding);
+    gridView.displayOptions.rowHeightPadding =
+      Number.isFinite(padRaw) && padRaw > 0 ? padRaw : 12;
+    const maxH = Number(props.dynamicMaxRowHeight);
+    if (Number.isFinite(maxH) && maxH > 0) {
+      gridView.displayOptions.maxRowHeight = maxH;
+    }
+  }
   const hdrH = rgEffectiveHeaderHeight();
   if (hdrH > 0) {
     gridView.header.height = hdrH;
@@ -5275,6 +5307,22 @@ const runFuncshowGrid = async () => {
   }
   // 6구간
   // 이벤트 설정
+  /** even fit 등으로 열 폭이 확정된 뒤 동적 행높이를 다시 잰다 (비고 등 긴 텍스트 잘림 방지) */
+  const rgRemeasureDynamicRowHeights = (grid) => {
+    const useDyn =
+      (props.dynamicRowHeight == true && props.setTreeView == false) ||
+      (props.dynamicRowHeight2 == true && props.setTreeView == true);
+    if (!grid || !useDyn) return;
+    try {
+      grid.clearRowHeights?.(true);
+    } catch (_) {}
+    try {
+      grid.refresh?.(true);
+    } catch (_) {}
+    try {
+      grid.resetSize?.();
+    } catch (_) {}
+  };
   gridView.onDataLoadComplated = function (grid) {
     if (props.bulkLoadMode === true) {
       try {
@@ -5292,6 +5340,7 @@ const runFuncshowGrid = async () => {
       try {
         grid.resetSize();
       } catch (_) {}
+      rgRemeasureDynamicRowHeights(grid);
       return;
     }
     if (props.preserveColumnLayoutOnRefresh) {
@@ -5300,12 +5349,14 @@ const runFuncshowGrid = async () => {
       } catch (_) {}
       rgReapplyLabelingDropdownEditors(grid);
       rgBindLabelingDropdownOnShowEditor(grid);
+      rgRemeasureDynamicRowHeights(grid);
       return;
     }
     grid.refresh(true);
     rgReapplyLabelingDropdownEditors(grid);
     rgBindLabelingDropdownOnShowEditor(grid);
     grid.resetSize();
+    rgRemeasureDynamicRowHeights(grid);
   };
 
   const rgFirstCommaField = (raw) => {
@@ -7723,6 +7774,23 @@ watch(
   }
 );
 
+/**
+ * BasicLayout keep-alive 탭 복귀 시 — 확대/원복 중 숨은 상태에서 resetSize(0) 된
+ * 그리드를 다시 맞춤. keep-alive 밖에서는 onActivated 가 호출되지 않음.
+ */
+onActivated(() => {
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      try {
+        const inst = rgGetInstance(realgridname.value);
+        inst?.gridView?.resetSize?.();
+      } catch (_) {
+        /* ignore */
+      }
+    });
+  });
+});
+
 onMounted(async () => {
   await nextTick();
   realgridname.value = `realgrid-${props.progname}-${props.progid}-${uuidv4()}`;
@@ -8037,6 +8105,21 @@ watch(
             props.gridFontSize > 0
           ) {
             rgSyncGridLayout();
+          }
+          // 조회 후 setRows — 열 폭 확정 뒤 동적 행높이 재측정
+          if (
+            (props.dynamicRowHeight == true && props.setTreeView == false) ||
+            (props.dynamicRowHeight2 == true && props.setTreeView == true)
+          ) {
+            nextTick(() => {
+              requestAnimationFrame(() => {
+                try {
+                  gvSet.clearRowHeights?.(true);
+                  gvSet.refresh?.(true);
+                  gvSet.resetSize?.();
+                } catch (_) {}
+              });
+            });
           }
         } catch (_) {}
         if (gvSet) {
@@ -8401,7 +8484,13 @@ defineExpose({
 
 .realgrid-pre-wrap {
   white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
   text-align: center;
+  padding-top: 2px;
+  padding-bottom: 4px;
+  box-sizing: border-box;
 }
 
 .blue-column {

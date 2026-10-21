@@ -5,7 +5,10 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div class="crm10-024-rpt flex h-full min-h-0 flex-col" @click="handleParentClick">
+  <div
+    class="crm10-024-rpt flex h-full min-h-0 flex-col pl-5"
+    :class="{ 'crm10-024-rpt--full': isFullMode }"
+    @click="handleParentClick">
     <!-- 상단: 제목 + 버튼 -->
     <header class="crm10-024-rpt__head flex shrink-0 items-center justify-between px-2">
       <PageName></PageName>
@@ -18,7 +21,7 @@
 
     <!-- 조회 AREA (CRM10_022 / PUR017 패턴) -->
     <div
-      class="crm10-024-rpt__search-panel z-10 mx-auto mt-2 w-full max-w-[min(100%,1680px)] shrink-0 overflow-hidden rounded-lg bg-gray-200 px-12 py-4 sm:px-16"
+      class="crm10-024-rpt__search-panel z-10 mt-2 w-full shrink-0 overflow-hidden rounded-lg bg-gray-200 px-12 py-4 sm:px-16"
       :style="{
         '--crm10-024-label-col': crm10LabelCol,
         '--crm10-024-col-gap': crm10ColGap,
@@ -331,6 +334,7 @@ import PickStore from "@/components/pickStore.vue";
  */
 
 import Realgrid from "@/components/realgrid.vue";
+import { rgInstanceRegistry } from "@/components/realgridInstanceRegistry";
 /**
  *  페이지로그 자동 입력
  *  */
@@ -352,6 +356,50 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
 import { useStore } from "vuex";
 import { utils, writeFile } from "xlsx-js-style";
+
+/** 이 화면만 — 접힘(1680·even) / 확대(full-mode·전체폭·evenFill) */
+const isFullMode = ref(false);
+let crm10024FullModeObserver = null;
+
+const syncCrm10024FullModeFlag = () => {
+  if (typeof document === "undefined") return;
+  isFullMode.value = document.body.classList.contains("full-mode");
+};
+
+const applyCrm10024GridsFitForFullMode = () => {
+  syncCrm10024FullModeFlag();
+  const fit = isFullMode.value ? "evenFill" : "even";
+  for (const [id, inst] of rgInstanceRegistry.entries()) {
+    if (!String(id).includes("CRM10_024RPT")) continue;
+    try {
+      if (inst?.gridView) {
+        inst.gridView.displayOptions.fitStyle = fit;
+      }
+    } catch (_) {
+      /* ignore */
+    }
+  }
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        try {
+          window.dispatchEvent(new Event("resize"));
+        } catch (_) {
+          /* ignore */
+        }
+        for (const [id, inst] of rgInstanceRegistry.entries()) {
+          if (!String(id).includes("CRM10_024RPT")) continue;
+          try {
+            inst?.gridView?.resetSize?.();
+          } catch (_) {
+            /* ignore */
+          }
+        }
+      });
+    });
+  });
+};
+
 /**
  * 	화면 Load시 실행 스크립트
  */
@@ -443,6 +491,8 @@ function scheduleScrollSpy() {
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
   scheduleScrollSpy();
+  syncCrm10024FullModeFlag();
+  applyCrm10024GridsFitForFullMode();
 
   if (typeof ResizeObserver !== "undefined" && scrollContainerRef.value) {
     scrollSpyResizeObserver = new ResizeObserver(scheduleScrollSpy);
@@ -450,11 +500,23 @@ onMounted(async () => {
     const stack = scrollContainerRef.value.querySelector(".crm10-024-rpt__grid-stack");
     if (stack) scrollSpyResizeObserver.observe(stack);
   }
+
+  if (typeof MutationObserver !== "undefined" && document?.body) {
+    crm10024FullModeObserver = new MutationObserver(() => {
+      applyCrm10024GridsFitForFullMode();
+    });
+    crm10024FullModeObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  }
 });
 
 onUnmounted(() => {
   scrollSpyResizeObserver?.disconnect();
   scrollSpyResizeObserver = null;
+  crm10024FullModeObserver?.disconnect?.();
+  crm10024FullModeObserver = null;
 });
 
 /** 조회 AREA — PUR017 / CRM10_022 패턴 */
@@ -575,7 +637,10 @@ watch(
     rowData5.value.length,
     changeTime.value,
   ],
-  () => scheduleScrollSpy()
+  () => {
+    scheduleScrollSpy();
+    applyCrm10024GridsFitForFullMode();
+  }
 );
 
 const selectedTime = ref(0);
@@ -667,6 +732,7 @@ const searchButton = async () => {
 
     afterSearch.value = true;
     scheduleScrollSpy();
+    applyCrm10024GridsFitForFullMode();
   } catch (error) {
     afterSearch.value = false;
     //comsole.log(error);
@@ -1372,14 +1438,29 @@ function closeRsvDetailPopup() {
   background: #be123c;
 }
 
+/* 접힘: 1680 가운데 / 확대(.crm10-024-rpt--full): 전체 폭 */
+.crm10-024-rpt__search-panel,
+.crm10-024-rpt__grid-stack {
+  max-width: min(100%, 1680px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .crm10-024-rpt__grid-stack {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   width: 100%;
-  max-width: min(100%, 1680px);
-  margin: 0 auto 1.5rem;
+  margin-bottom: 1.5rem;
   padding: 0 0.25rem;
+}
+
+.crm10-024-rpt--full .crm10-024-rpt__search-panel,
+.crm10-024-rpt--full .crm10-024-rpt__grid-stack {
+  max-width: none !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
 .crm10-024-rpt__block {

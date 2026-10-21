@@ -73,11 +73,25 @@ function ensurePoSheetStyles() {
   el.textContent = PO_SHEET_CSS;
 }
 
+function ensureExtraSheetStyles(css, styleId) {
+  if (typeof document === "undefined" || !css || !styleId) return;
+  let el = document.getElementById(styleId);
+  if (!el) {
+    el = document.createElement("style");
+    el.id = styleId;
+    document.head.appendChild(el);
+  }
+  el.textContent = css;
+}
+
 const props = defineProps({
   open: { type: Boolean, default: false },
   title: { type: String, default: "인쇄 미리보기" },
   pages: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
+  /** iframe·미리보기용 추가 시트 CSS (발주서 외 리포트) */
+  extraPrintCss: { type: String, default: "" },
+  extraPrintCssId: { type: String, default: "rp-extra-sheet-styles" },
 });
 
 const emit = defineEmits(["update:open", "close"]);
@@ -122,7 +136,7 @@ async function onPrint() {
   if (typeof window === "undefined") return;
   printedAt.value = new Date();
   await nextTick();
-  printReportContent(bodyEl.value);
+  printReportContent(bodyEl.value, { extraCss: props.extraPrintCss || "" });
 }
 
 watch(
@@ -130,6 +144,9 @@ watch(
   (v) => {
     if (v) {
       ensurePoSheetStyles();
+      if (props.extraPrintCss) {
+        ensureExtraSheetStyles(props.extraPrintCss, props.extraPrintCssId);
+      }
       printedAt.value = new Date();
     }
   }

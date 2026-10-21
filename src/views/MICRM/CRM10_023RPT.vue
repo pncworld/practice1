@@ -5,7 +5,10 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div class="flex h-full min-h-0 flex-col" @click="handleParentClick">
+  <div
+    class="crm10-023-page flex h-full min-h-0 flex-col pl-5"
+    :class="{ 'crm10-023-page--full': isFullMode }"
+    @click="handleParentClick">
     <div
       class="flex shrink-0 items-center justify-between gap-3 overflow-y-hidden pr-1">
       <PageName />
@@ -20,7 +23,7 @@
     </div>
 
     <div
-      class="crm10-search-panel z-10 mt-3 w-full max-w-[min(100%,1680px)] min-w-0 shrink-0 self-center overflow-x-auto rounded-lg bg-gray-200 px-5 py-3 sm:px-8 md:px-12 lg:px-14 xl:py-3.5 2xl:px-16">
+      class="crm10-search-panel z-10 mt-3 w-full min-w-0 shrink-0 overflow-x-auto rounded-lg bg-gray-200 px-5 py-3 sm:px-8 md:px-12 lg:px-14 xl:py-3.5 2xl:px-16">
       <div
         class="crm10-search-body min-w-0 text-slate-800"
         :style="{ '--crm10-control-border': crm10ControlBorder }">
@@ -62,12 +65,14 @@
       </div>
     </div>
 
+    <!-- 접힘: 1680 가운데 / 확대: 전체 폭 + evenFill -->
     <div
-      class="crm10-grid-shell mx-auto mt-2 flex min-h-0 min-w-0 w-full max-w-[min(100%,1680px)] flex-1 flex-col basis-0 overflow-hidden px-1 pb-1">
+      class="crm10-grid-shell mt-2 flex min-h-0 min-w-0 w-full flex-1 flex-col basis-0 overflow-hidden pb-1">
       <div
         class="crm10-main-grid-frame flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-sm border border-gray-400 bg-white">
         <div class="relative min-h-0 w-full flex-1">
           <Realgrid
+            class="h-full min-h-0 w-full"
             :key="`crm10-023-grid-${gridProgid}-${gridHeaderKey}`"
             :progname="'CRM10_023RPT_VUE'"
             :progid="gridProgid"
@@ -86,7 +91,9 @@
             :setFooterCustomColumnId="['strDate']"
             :setFooterCustomText="['합계']"
             :setFooter="true"
-            :exporttoExcel="exportExcel" />
+            :exporttoExcel="exportExcel"
+            @realgridname="onCrm10023RealgridName"
+            @gridReady="onCrm10023GridReady" />
         </div>
       </div>
     </div>
@@ -114,6 +121,7 @@ import PickStore from "@/components/pickStore.vue";
  */
 
 import Realgrid from "@/components/realgrid.vue";
+import { rgGetInstance } from "@/components/realgridInstanceRegistry";
 /**
  *  페이지로그 자동 입력
  *  */
@@ -128,18 +136,77 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { computed, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
 import { useStore } from "vuex";
+
+/** 이 화면만 — 접힘(even·1680) / 확대(full-mode·evenFill·전체폭) */
+const crm10023GridId = ref("");
+const isFullMode = ref(false);
+let crm10023FullModeObserver = null;
+
+const syncCrm10023FullModeFlag = () => {
+  if (typeof document === "undefined") return;
+  isFullMode.value = document.body.classList.contains("full-mode");
+};
+
+const onCrm10023RealgridName = (id) => {
+  crm10023GridId.value = id || "";
+};
+
+const applyCrm10023GridFitForFullMode = () => {
+  syncCrm10023FullModeFlag();
+  const gv = rgGetInstance(crm10023GridId.value)?.gridView;
+  if (!gv) return;
+  try {
+    gv.displayOptions.fitStyle = isFullMode.value ? "evenFill" : "even";
+  } catch (_) {
+    /* ignore */
+  }
+  // 폭 CSS 반영 후 리사이즈 (한 프레임만으로는 컨테이너가 안 늘어난 경우가 있음)
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        try {
+          window.dispatchEvent(new Event("resize"));
+          gv.resetSize?.();
+        } catch (_) {
+          /* ignore */
+        }
+      });
+    });
+  });
+};
+
+const onCrm10023GridReady = () => {
+  applyCrm10023GridFitForFullMode();
+};
+
 /**
  * 	화면 Load시 실행 스크립트
  */
 
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
+  syncCrm10023FullModeFlag();
+  applyCrm10023GridFitForFullMode();
+  if (typeof MutationObserver !== "undefined" && document?.body) {
+    crm10023FullModeObserver = new MutationObserver(() => {
+      applyCrm10023GridFitForFullMode();
+    });
+    crm10023FullModeObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  }
+});
+
+onUnmounted(() => {
+  crm10023FullModeObserver?.disconnect?.();
+  crm10023FullModeObserver = null;
 });
 
 const reload = ref(false);
@@ -416,6 +483,22 @@ const excelDate = (e) => {
 </script>
 
 <style scoped>
+/* 접힘: 1680 가운데 / 확대(.crm10-023-page--full): 전체 폭 */
+.crm10-search-panel,
+.crm10-grid-shell {
+  max-width: min(100%, 1680px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.crm10-023-page--full .crm10-search-panel,
+.crm10-023-page--full .crm10-grid-shell {
+  max-width: none !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
 .crm10-main-grid-frame {
   min-height: min(65vh, 420px);
 }

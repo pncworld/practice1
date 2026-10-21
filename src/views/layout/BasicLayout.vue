@@ -157,15 +157,18 @@
           </div>
         </div>
 
-        <!-- Router View -->
-        <router-view v-slot="{ Component, route }">
-          <keep-alive>
-            <component
-              :is="Component"
-              :key="`${route.path}-${componentKey}`"
-            />
-          </keep-alive>
-        </router-view>
+        <!-- Router View — flex-1 로 h-full 페이지·그리드 높이 확보 (확대 full-mode 포함) -->
+        <div class="po-router-view min-h-0 min-w-0 flex-1 overflow-hidden">
+          <router-view v-slot="{ Component, route }" class="h-full min-h-0">
+            <keep-alive>
+              <component
+                :is="Component"
+                :key="`${route.path}-${componentKey}`"
+                class="h-full min-h-0"
+              />
+            </keep-alive>
+          </router-view>
+        </div>
       </div>
     </div>
   </div>
@@ -191,6 +194,7 @@ import { useStore } from "vuex";
 
 /** 로고 로드 실패 시·세션 없음 시 사용 */
 import defaultLogoSrc from "@/assets/images/pncoffice_logo.png";
+import { rgInstanceRegistry } from "@/components/realgridInstanceRegistry";
 import {
   handleLogoImgError,
   resolveSessionLogoUrl,
@@ -303,6 +307,7 @@ const selectCategory = (category) => {
   //store.dispatch("selectCategory", category);\
   selectCategoryId.value = category;
   isMenu.value = true;
+  syncBodyFullMode(true);
   mobileShowMenu.value = true;
   triggerNow.value = !triggerNow.value;
 };
@@ -330,10 +335,65 @@ watch(mainCategoryList, (newCategories) => {
   }
 });
 
+/**
+ * 우측 상단 확대 — 좌측 메뉴 접기/펼치기.
+ * body.full-mode + isMenu 를 같이 맞춤 (layout.css: 메뉴 display:none, w-right 100%).
+ * public/js/common.js 의 jQuery full-mode toggle 은 제거함 (이중 토글 방지).
+ * reLoad() 는 그리드 데이터가 사라져서 호출하지 않음.
+ *
+ * keep-alive 로 숨겨진 그리드까지 resetSize 하면 컨테이너 0px → 이후 탭 이동 시
+ * 헤더·그리드가 안 보임. 보이는 그리드만 리사이즈하고, 탭 복귀는 realgrid onActivated.
+ */
+const syncBodyFullMode = (menuVisible) => {
+  if (typeof document === "undefined") return;
+  document.body.classList.toggle("full-mode", !menuVisible);
+};
+
+const isGridContainerVisible = (el) => {
+  if (!el || !el.isConnected) return false;
+  const rect = el.getBoundingClientRect();
+  return rect.width > 0 && rect.height > 0;
+};
+
+const resetVisibleRealgridsSize = () => {
+  try {
+    for (const [id, inst] of rgInstanceRegistry.entries()) {
+      const el = document.getElementById(id);
+      if (!isGridContainerVisible(el)) continue;
+      inst?.gridView?.resetSize?.();
+    }
+  } catch (_) {
+    /* ignore */
+  }
+};
+
+const scheduleVisibleGridsResize = () => {
+  nextTick(() => {
+    window.dispatchEvent(new Event("resize"));
+    requestAnimationFrame(() => {
+      resetVisibleRealgridsSize();
+      // 신규 화면 그리드 비동기 생성 직후에도 한 번 더
+      setTimeout(() => resetVisibleRealgridsSize(), 120);
+    });
+  });
+};
+
 const hideMenu = () => {
   isMenu.value = !isMenu.value;
-  reLoad();
+  syncBodyFullMode(isMenu.value);
+  scheduleVisibleGridsResize();
 };
+
+onMounted(() => {
+  syncBodyFullMode(isMenu.value);
+});
+
+watch(
+  () => [route.path, route.query?.index],
+  () => {
+    scheduleVisibleGridsResize();
+  }
+);
 
 const tabs = ref([]);
 const emittab = async (e) => {

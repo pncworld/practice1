@@ -7,13 +7,16 @@ body {overflow: hidden;}
 .po-layout .po-content {z-index: 1; display: flex; height: calc(100vh - 80px); /* 헤더(80px) */ overflow: hidden; min-width: 0;}
 .po-layout .w-left {width: 100%; max-width: 300px; flex-shrink: 0;}
 .po-layout .w-right {width: calc(100% - 300px); display: flex; flex-direction: column; min-height: 0;}
+.po-layout .w-right > .po-tabs {flex-shrink: 0;}
+.po-layout .w-right > .po-router-view {display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; min-width: 0;}
+.po-layout .w-right > .po-router-view > * {flex: 1 1 auto; min-height: 0; min-width: 0; height: 100%;}
 
 
 /* ================================
-    Global Full Mode Layout
+    Global Full Mode Layout (상단 확대 버튼)
 ================================ */
-body.full-mode .po-content .sidemenu {display: none;}
-body.full-mode .po-content .w-right {width: 100%; padding-left: 20px !important;}
+body.full-mode .po-content .sidemenu {display: none !important;}
+body.full-mode .po-content .w-right {width: 100% !important; max-width: 100%; padding-left: 20px !important;}
 
 
 /* ================================
@@ -536,6 +539,8 @@ body.no-scroll {overflow:hidden;}
     .po-layout .po-gradient {height: 174px;}
     .po-layout .w-left {max-width: 250px;}
     .po-layout .w-right {width: calc(100% - 250px);}
+    .po-layout .po-content > .w-left {width: 250px; max-width: 250px; flex-basis: 250px;}
+    .po-layout .po-content > .w-right {width: auto;}
     .po-layout .po-header {height: 70px;}
     .po-layout .h-gnb {gap:1vw;}
     .po-layout .h-gnb a {font-size: 14px;}
@@ -581,6 +586,7 @@ body.no-scroll {overflow:hidden;}
 @media (max-width: 1024px) {
     .po-layout .po-gradient {height: 175px;}
     .po-layout .w-right {width: calc(100% - 50px); min-width: 700px; padding-left: 10px;}
+    .po-layout .po-content > .w-right {width: auto; min-width: 0; padding-left: 10px;}
     .po-layout .h-right {justify-content: flex-end; gap: 15px; min-width: auto;}
     .po-layout .h-left {max-width: 180px; }
     /* 기본: GNB 숨김, gnb-btn 표시 */

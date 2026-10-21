@@ -111,7 +111,9 @@
   flex-direction: column;
 }
 
-.rp-page > .po-sheet {
+.rp-page > .po-sheet,
+.rp-page > .sls0217-sheet,
+.rp-page > .sa-dash-sheet {
   flex: 1 1 auto;
   min-height: 0;
 }

@@ -827,6 +827,7 @@ const showOnlyChecked = () => {
   min-width: 0;
 }
 
+/* 앞쪽 .psp-select 와 동일 테두리·배경 — 호버 시 파란 강조 없음 */
 .psp-store-trigger {
   box-sizing: border-box;
   display: inline-flex;
@@ -837,21 +838,16 @@ const showOnlyChecked = () => {
   min-width: 0;
   height: 1.75rem;
   padding: 0 0.5rem 0 0.625rem;
-  border: 1px solid #94a3b8;
+  border: 1px solid #cbd5e1;
   border-radius: 0.375rem;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  color: #0f172a;
+  background: #fff;
+  color: #111827;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.2;
   text-align: left;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
-  transition:
-    border-color 0.15s ease,
-    background-color 0.15s ease,
-    box-shadow 0.15s ease,
-    color 0.15s ease;
+  box-shadow: none;
 }
 
 .psp-store-trigger--wide {
@@ -871,28 +867,28 @@ const showOnlyChecked = () => {
   height: 0.875rem;
   flex-shrink: 0;
   color: #64748b;
-  transition: transform 0.15s ease, color 0.15s ease;
+  transition: transform 0.15s ease;
 }
 
 .psp-store-trigger:hover:not(:disabled) {
-  border-color: #60a5fa;
-  background: #eff6ff;
-  color: #1d4ed8;
+  border-color: #cbd5e1;
+  background: #fff;
+  color: #111827;
 }
 
 .psp-store-trigger:hover:not(:disabled) .psp-store-trigger__chev {
-  color: #2563eb;
+  color: #64748b;
 }
 
 .psp-store-trigger.is-open {
-  border-color: #3b82f6;
-  background: #dbeafe;
-  color: #1e40af;
-  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.15);
+  border-color: #cbd5e1;
+  background: #fff;
+  color: #111827;
+  box-shadow: none;
 }
 
 .psp-store-trigger.is-open .psp-store-trigger__chev {
-  color: #1d4ed8;
+  color: #64748b;
   transform: rotate(180deg);
 }
 

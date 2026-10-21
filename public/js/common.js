@@ -508,12 +508,8 @@ $(function(){
     });
 
 
-    /* ================================
-    Global Full Mode Toggle
-    ================================ */
-    $(document).on('click', '.btn-action.expand', function(){
-        $('body').toggleClass('full-mode');
-    });
+    /* Global Full Mode Toggle — Vue BasicLayout.hideMenu 가 body.full-mode 를 관리.
+       여기서 또 toggle 하면 확대/원복이 어긋나므로 바인딩하지 않음. */
 
     
 

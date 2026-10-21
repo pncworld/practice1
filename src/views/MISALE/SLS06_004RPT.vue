@@ -5,197 +5,220 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <!-- 조회 조건 -->
-  <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <PageName></PageName>
-    <div class="flex justify-center mr-9 space-x-2 pr-5">
-      <button @click="chartButton" class="button chart md:w-auto w-14">
-        차트
-      </button>
-      <button @click="searchButton" class="button search md:w-auto w-14">
-        조회
-      </button>
-      <button @click="excelButton" class="button save w-auto excel">
-        엑셀
-      </button>
-    </div>
-  </div>
-  <div
-    class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-24 items-start z-10">
-    <div class="grid grid-cols-1 grid-rows-2">
-      <Datepicker2
-        @endDate="endDate"
-        @startDate="startDate"
-        class=""
-        @excelDate="excelDate"></Datepicker2>
-      <div
-        class="flex justify-start items-center text-base text-nowrap font-semibold ml-12">
-        조회조건
-        <div>
-          <label for="detail" class="font-normal"
-            ><input
-              type="checkbox"
-              id="detail"
-              class="ml-5"
-              checked
-              @change="seeDetail" />상세보기</label
-          >
-        </div>
-        <div>
-          <label for="unite" class="font-normal"
-            ><input
-              type="checkbox"
-              id="unite"
-              class="ml-5"
-              @change="seeUnite" />셀병합</label
-          >
-        </div>
-      </div>
-    </div>
-    <div class="">
-      <PickStorePlural
-        @lngStoreCodes="lngStoreCodes"
-        @lngStoreGroup="lngStoreGroup"
-        @lngStoreAttrs="lngStoreAttrs"
-        @excelStore="excelStore">
-      </PickStorePlural>
-    </div>
-    <div></div>
-  </div>
-  <!-- 조회 조건 -->
-  <!--그리드 영역 -->
-  <div class="w-full h-[85%]">
+  <!-- pl-5: 셸 w-right가 pl0이라 그리드가 좌측 메뉴에 붙음 → 우측 pd20과 맞춤 -->
+  <div class="flex h-full min-h-0 flex-col pl-5" @click="handleParentClick">
     <div
-      v-show="byRadioButton"
-      class="absolute top-80 left-64 z-[60] bg-gray-200 rounded-lg p-2">
-      <div class="flex justify-start items-center space-x-1">
-        데이터 선택
-        <div class="flex justify-start ml-5 space-x-1">
-          <label for="first"
-            ><input
-              type="radio"
-              id="first"
-              name="option"
-              v-model="selectOption"
-              :value="1" />객수</label
-          ><label for="second"
-            ><input
-              type="radio"
-              id="second"
-              name="option"
-              v-model="selectOption"
-              :value="2" />객단가</label
-          ><label for="third"
-            ><input
-              type="radio"
-              id="third"
-              name="option"
-              v-model="selectOption"
-              :value="3" />조수</label
-          ><label for="fourth"
-            ><input
-              type="radio"
-              id="fourth"
-              name="option"
-              v-model="selectOption"
-              :value="4" />조단가</label
-          ><label for="fifth"
-            ><input
-              type="radio"
-              id="fifth"
-              name="option"
-              v-model="selectOption"
-              :value="5" />총매출액</label
-          ><label for="sixth"
-            ><input
-              type="radio"
-              id="sixth"
-              name="option"
-              v-model="selectOption"
-              :value="6" />실매출액</label
-          ><label for="seventh"
-            ><input
-              type="radio"
-              id="seventh"
-              name="option"
-              v-model="selectOption"
-              :value="7" />순매출액</label
-          >
-          <label for="eieghth"
-            ><input
-              type="radio"
-              id="eieghth"
-              name="option"
-              v-model="selectOption"
-              :value="8" />할인액</label
-          >
-        </div>
-        <div class="flex !pl-80 space-x-1">
-          <button class="button search !h-6" @click="searchButton2">조회</button
-          ><button class="button primary !h-6" @click="closeButton2">
-            닫기
-          </button>
-        </div>
+      class="flex w-full shrink-0 items-center justify-between overflow-y-hidden">
+      <PageName></PageName>
+      <div class="flex justify-center space-x-2 pr-5">
+        <button type="button" @click="chartButton" class="button chart md:w-auto w-14">
+          차트
+        </button>
+        <button type="button" @click="searchButton" class="button search md:w-auto w-14">
+          조회
+        </button>
+        <button type="button" @click="excelButton" class="button save w-auto excel">
+          엑셀
+        </button>
       </div>
-      <div class="flex justify-start items-center space-x-1 bg-gray-200 mt-1">
-        차트 유형 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <div class="space-x-1">
-          <label for="graph1"
-            ><input
-              type="radio"
-              id="graph1"
-              name="option2"
-              v-model="selectOption2"
-              :value="1" />꺽은선 그래프</label
-          ><label for="graph2"
-            ><input
-              type="radio"
-              id="graph2"
-              name="option2"
-              v-model="selectOption2"
-              :value="2" />막대 그래프</label
-          ><label for="graph3"
-            ><input
-              type="radio"
-              id="graph3"
-              name="option2"
-              v-model="selectOption2"
-              :value="3" />원형 그래프</label
-          >
-        </div>
-      </div>
-      <Chart
-        class="h-auto z-[60] !w-[1000px] bg-white"
-        :type="type"
-        :labels="labels"
-        :label="label"
-        :showLegend="false"
-        :changePieData="true"
-        :datas="datas"
-        :chartName="'일자별 매출현황'"
-        :colors="colors"></Chart>
     </div>
 
-    <Realgrid
-      :progname="'SLS06_004RPT_VUE'"
-      :progid="progid"
-      :rowData="rowData"
-      :reload="reload"
-      :setFooter="true"
-      :setGroupFooter="setGroupFooter"
-      :setFooterExpressions="setFooterExpressions"
-      :setFooterColID="setFooterColID"
-      :documentTitle="'SLS06_004RPT'"
-      :documentSubTitle="documentSubTitle"
-      :exporttoExcel="exportExcel"
-      :setGroupColumnId="'dtmDate'"
-      :setGroupSumCustomText="['소계']"
-      :setGroupSumCustomColumnId="['strWeekName']"
-      :setGroupCustomLevel="3"
-      :rowStateeditable="false"
-      :setGroupSummaryCenterIds="setGroupSummaryCenterIds"></Realgrid>
+    <div
+      class="sls0604-search-panel z-10 mt-3 w-full min-h-0 shrink-0 overflow-visible rounded-lg bg-gray-200"
+      :style="{
+        '--sls0604-panel-pad-x': '2rem',
+        '--sls0604-control-border': sls0604ControlBorder,
+        '--sls0604-col-gutter': sls0604ColGutter,
+        '--sls0604-row-gap': sls0604RowGap,
+        '--sls0604-label-col': sls0604LabelCol,
+        '--psp-label-w': sls0604LabelCol,
+        '--psp-radio-w': '4.75rem',
+        '--psp-col-gap': '0.5rem',
+      }">
+      <div class="sls0604-search-layout min-w-0">
+        <div class="sls0604-left-stack min-w-0">
+          <div class="sls0604-row">
+            <span class="sls0604-lbl shrink-0">기간</span>
+            <div class="sls0604-date-slot min-w-0 flex-1">
+              <Datepicker2
+                ref="datepicker"
+                omit-main-label
+                filter-bar-align
+                :mainName="'기간'"
+                :closePopUp="closePopUp"
+                @endDate="endDate"
+                @startDate="startDate"
+                @excelDate="excelDate" />
+            </div>
+          </div>
+          <div class="sls0604-row">
+            <span class="sls0604-lbl shrink-0">조회조건</span>
+            <div class="sls0604-check-row min-w-0 flex-1">
+              <label class="sls0604-check" for="sls0604-detail">
+                <input
+                  id="sls0604-detail"
+                  type="checkbox"
+                  checked
+                  @change="seeDetail" />
+                상세보기
+              </label>
+              <label class="sls0604-check" for="sls0604-unite">
+                <input
+                  id="sls0604-unite"
+                  type="checkbox"
+                  @change="seeUnite" />
+                셀병합
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="sls0604-right-store min-w-0 overflow-visible">
+          <PickStorePlural
+            fluid-width
+            @lngStoreCodes="lngStoreCodes"
+            @lngStoreGroup="lngStoreGroup"
+            @lngStoreAttrs="lngStoreAttrs"
+            @excelStore="excelStore" />
+        </div>
+      </div>
+    </div>
+
+    <div class="relative mt-2 flex min-h-0 min-w-0 flex-1 flex-col">
+      <div
+        v-show="byRadioButton"
+        class="absolute left-64 top-20 z-[60] rounded-lg bg-gray-200 p-2">
+        <div class="flex items-center justify-start space-x-1">
+          데이터 선택
+          <div class="ml-5 flex justify-start space-x-1">
+            <label for="first"
+              ><input
+                id="first"
+                v-model="selectOption"
+                type="radio"
+                name="option"
+                :value="1" />객수</label
+            ><label for="second"
+              ><input
+                id="second"
+                v-model="selectOption"
+                type="radio"
+                name="option"
+                :value="2" />객단가</label
+            ><label for="third"
+              ><input
+                id="third"
+                v-model="selectOption"
+                type="radio"
+                name="option"
+                :value="3" />조수</label
+            ><label for="fourth"
+              ><input
+                id="fourth"
+                v-model="selectOption"
+                type="radio"
+                name="option"
+                :value="4" />조단가</label
+            ><label for="fifth"
+              ><input
+                id="fifth"
+                v-model="selectOption"
+                type="radio"
+                name="option"
+                :value="5" />총매출액</label
+            ><label for="sixth"
+              ><input
+                id="sixth"
+                v-model="selectOption"
+                type="radio"
+                name="option"
+                :value="6" />실매출액</label
+            ><label for="seventh"
+              ><input
+                id="seventh"
+                v-model="selectOption"
+                type="radio"
+                name="option"
+                :value="7" />순매출액</label
+            >
+            <label for="eieghth"
+              ><input
+                id="eieghth"
+                v-model="selectOption"
+                type="radio"
+                name="option"
+                :value="8" />할인액</label
+            >
+          </div>
+          <div class="flex space-x-1 !pl-80">
+            <button type="button" class="button search !h-6" @click="searchButton2">
+              조회
+            </button>
+            <button type="button" class="button primary !h-6" @click="closeButton2">
+              닫기
+            </button>
+          </div>
+        </div>
+        <div class="mt-1 flex items-center justify-start space-x-1 bg-gray-200">
+          차트 유형 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <div class="space-x-1">
+            <label for="graph1"
+              ><input
+                id="graph1"
+                v-model="selectOption2"
+                type="radio"
+                name="option2"
+                :value="1" />꺽은선 그래프</label
+            ><label for="graph2"
+              ><input
+                id="graph2"
+                v-model="selectOption2"
+                type="radio"
+                name="option2"
+                :value="2" />막대 그래프</label
+            ><label for="graph3"
+              ><input
+                id="graph3"
+                v-model="selectOption2"
+                type="radio"
+                name="option2"
+                :value="3" />원형 그래프</label
+            >
+          </div>
+        </div>
+        <Chart
+          class="z-[60] h-auto !w-[1000px] bg-white"
+          :type="type"
+          :labels="labels"
+          :label="label"
+          :showLegend="false"
+          :changePieData="true"
+          :datas="datas"
+          :chartName="'일자별 매출현황'"
+          :colors="colors" />
+      </div>
+
+      <Realgrid
+        class="h-full min-h-0 w-full flex-1"
+        :progname="'SLS06_004RPT_VUE'"
+        :progid="progid"
+        :rowData="rowData"
+        :reload="reload"
+        :setFooter="true"
+        :setGroupFooter="setGroupFooter"
+        :setFooterExpressions="setFooterExpressions"
+        :setFooterColID="setFooterColID"
+        :documentTitle="'SLS06_004RPT'"
+        :documentSubTitle="documentSubTitle"
+        :exporttoExcel="exportExcel"
+        :setGroupColumnId="'dtmDate'"
+        :setGroupSumCustomText="['소계']"
+        :setGroupSumCustomColumnId="['strWeekName']"
+        :setGroupCustomLevel="3"
+        :rowStateeditable="false"
+        :setGroupSummaryCenterIds="setGroupSummaryCenterIds" />
+    </div>
   </div>
-  <!--그리드 영역 -->
 </template>
 
 <script setup>
@@ -236,6 +259,24 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
+
+/** 조회 AREA — SLS06_001 / SLS04_002 반응형 패턴 */
+const sls0604ControlBorder = "#cbd5e1";
+const sls0604ColGutter = "1.25rem";
+const sls0604RowGap = "0.875rem";
+const sls0604LabelCol = "5.5rem";
+
+const store = useStore();
+const datepicker = ref(null);
+const closePopUp = ref(false);
+
+const handleParentClick = (e) => {
+  const datepickerEl = datepicker.value?.$el;
+  if (datepickerEl && datepickerEl.contains(e.target)) {
+    return;
+  }
+  closePopUp.value = !closePopUp.value;
+};
 
 /**
  * 	화면 Load시 실행 스크립트
@@ -312,7 +353,6 @@ const seeDetail = (e) => {
     tempSeeDetail.value = 1;
   }
 };
-const store = useStore();
 const loginedstrLang = store.state.userData.lngLanguage;
 /**
  *  조회 함수
@@ -781,4 +821,160 @@ const colors = [
 ];
 </script>
 
-<style></style>
+<style scoped>
+.sls0604-search-panel {
+  box-sizing: border-box;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: var(--sls0604-panel-pad-x, 2rem);
+  padding-right: var(--sls0604-panel-pad-x, 2rem);
+}
+
+@media (min-width: 768px) {
+  .sls0604-search-panel {
+    --sls0604-panel-pad-x: 3rem;
+  }
+}
+
+.sls0604-search-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  column-gap: var(--sls0604-col-gutter, 1.25rem);
+  align-items: start;
+  min-width: 0;
+}
+
+.sls0604-left-stack {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sls0604-row-gap, 0.875rem);
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100%;
+}
+
+.sls0604-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: 2rem;
+}
+
+.sls0604-lbl {
+  box-sizing: border-box;
+  flex: 0 0 var(--sls0604-label-col, 5.5rem);
+  width: var(--sls0604-label-col, 5.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sls0604-date-slot {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sls0604-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin: 0 !important;
+  width: auto !important;
+  max-width: 100%;
+}
+
+.sls0604-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  height: 2rem;
+  min-height: 2rem;
+  max-height: 2rem;
+  border: 1px solid var(--sls0604-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+  background: #fff;
+}
+
+.sls0604-date-slot :deep(div.inline-flex.h-8),
+.sls0604-date-slot :deep(button) {
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+.sls0604-check-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  min-height: 2rem;
+}
+
+.sls0604-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sls0604-check input[type="checkbox"] {
+  box-sizing: border-box;
+  margin: 0;
+  flex-shrink: 0;
+  width: 1.05rem;
+  height: 1.05rem;
+  min-width: 1.05rem;
+  min-height: 1.05rem;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.sls0604-right-store {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+.sls0604-right-store :deep(.psp-root) {
+  width: 100%;
+  min-width: 0;
+}
+
+.sls0604-right-store :deep(.psp-label) {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  color: rgb(17 24 39) !important;
+}
+
+.sls0604-right-store :deep(select),
+.sls0604-right-store :deep(.psp-select),
+.sls0604-right-store :deep(.psp-store-trigger) {
+  box-sizing: border-box;
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+@media (max-width: 1280px) {
+  .sls0604-search-layout {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--sls0604-row-gap, 0.875rem);
+  }
+}
+</style>

@@ -175,121 +175,6 @@
     <!-- 조회 조건 -->
     <!-- 그리드 영역 -->
     <div class="relative mt-2 flex min-h-0 min-w-0 flex-1 flex-col">
-      <div
-        v-show="byRadioButton"
-        class="absolute top-80 left-64 z-[60] bg-gray-200 rounded-lg p-2">
-        <div class="flex justify-start items-center space-x-1">
-          데이터 선택
-          <div class="flex justify-start ml-5 space-x-1">
-            <label for="first"
-              ><input
-                type="radio"
-                id="first"
-                name="option"
-                v-model="selectOption"
-                :value="1" />총건수</label
-            ><label for="second"
-              ><input
-                type="radio"
-                id="second"
-                name="option"
-                v-model="selectOption"
-                :value="2" />정상건수</label
-            ><label for="third"
-              ><input
-                type="radio"
-                id="third"
-                name="option"
-                v-model="selectOption"
-                :value="3" />증정건수</label
-            ><label for="fourth"
-              ><input
-                type="radio"
-                id="fourth"
-                name="option"
-                v-model="selectOption"
-                :value="4" />할인건수</label
-            ><label for="fifth"
-              ><input
-                type="radio"
-                id="fifth"
-                name="option"
-                v-model="selectOption"
-                :value="5" />총매출액</label
-            ><label for="sixth"
-              ><input
-                type="radio"
-                id="sixth"
-                name="option"
-                v-model="selectOption"
-                :value="6" />실매출액</label
-            ><label for="seventh"
-              ><input
-                type="radio"
-                id="seventh"
-                name="option"
-                v-model="selectOption"
-                :value="7" />순매출액</label
-            ><label for="eighth"
-              ><input
-                type="radio"
-                id="eighth"
-                name="option"
-                v-model="selectOption"
-                :value="8" />할인액</label
-            ><label for="ninth"
-              ><input
-                type="radio"
-                id="ninth"
-                name="option"
-                v-model="selectOption"
-                :value="9" />증정금액</label
-            >
-          </div>
-          <div class="flex pl-28 space-x-1">
-            <button class="button search !h-6" @click="searchButton2">
-              조회</button
-            ><button class="button primary !h-6" @click="closeButton2">
-              닫기
-            </button>
-          </div>
-        </div>
-        <div class="flex justify-start items-center space-x-1 bg-gray-200 mt-1">
-          차트 유형 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <div class="space-x-1">
-            <label for="graph1"
-              ><input
-                type="radio"
-                id="graph1"
-                name="option2"
-                v-model="selectOption2"
-                :value="1" />꺽은선 그래프</label
-            ><label for="graph2"
-              ><input
-                type="radio"
-                id="graph2"
-                name="option2"
-                v-model="selectOption2"
-                :value="2" />막대 그래프</label
-            ><label for="graph3"
-              ><input
-                type="radio"
-                id="graph3"
-                name="option2"
-                v-model="selectOption2"
-                :value="3" />원형 그래프</label
-            >
-          </div>
-        </div>
-        <Chart
-          class="h-auto z-[60] !w-[1000px] bg-white"
-          :type="type"
-          :labels="labels"
-          :label="label"
-          :datas="datas"
-          :chartName="'메뉴군별 매출 현황2'"
-          :colors="colors"></Chart>
-      </div>
       <span id="print-area2"></span>
       <div id="print-area" class="h-full w-full">
         <Realgrid
@@ -317,6 +202,110 @@
           :setGroupSumCustomLevel2="setGroupSumCustomLevel2"></Realgrid>
       </div>
     </div>
+
+    <Teleport to="body">
+      <div
+        v-show="byRadioButton"
+        class="sls0402-chart-overlay"
+        @mousedown.self="closeButton2">
+        <div
+          class="sls0402-chart-dialog"
+          :style="chartPop.style"
+          role="dialog"
+          aria-modal="true"
+          @mousedown.stop>
+          <div class="sls0402-chart-head" @mousedown="onChartHeadDown">
+            <h2 class="sls0402-chart-title">메뉴군별 매출 현황2</h2>
+            <div class="sls0402-chart-actions" @mousedown.stop>
+              <button type="button" class="pnc-sub-btn" @click="searchButton2">
+                <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                  <circle cx="7" cy="7" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6" />
+                  <path d="M10.2 10.2 13.2 13.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+                조회
+              </button>
+              <button
+                type="button"
+                class="pnc-sub-btn pnc-sub-btn--gray"
+                @click="closeButton2">
+                <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                  <path
+                    d="M4 4l8 8M12 4 4 12"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round" />
+                </svg>
+                닫기
+              </button>
+            </div>
+          </div>
+
+          <div class="sls0402-chart-toolbar">
+            <div class="sls0402-chart-row">
+              <span class="sls0402-chart-lbl">데이터 선택</span>
+              <div class="sls0402-chart-radios">
+                <label class="sls0402-chart-radio" for="sls0402-first">
+                  <input type="radio" id="sls0402-first" name="sls0402-option" v-model="selectOption" :value="1" />총건수
+                </label>
+                <label class="sls0402-chart-radio" for="sls0402-second">
+                  <input type="radio" id="sls0402-second" name="sls0402-option" v-model="selectOption" :value="2" />정상건수
+                </label>
+                <label class="sls0402-chart-radio" for="sls0402-third">
+                  <input type="radio" id="sls0402-third" name="sls0402-option" v-model="selectOption" :value="3" />증정건수
+                </label>
+                <label class="sls0402-chart-radio" for="sls0402-fourth">
+                  <input type="radio" id="sls0402-fourth" name="sls0402-option" v-model="selectOption" :value="4" />할인건수
+                </label>
+                <label class="sls0402-chart-radio" for="sls0402-fifth">
+                  <input type="radio" id="sls0402-fifth" name="sls0402-option" v-model="selectOption" :value="5" />총매출액
+                </label>
+                <label class="sls0402-chart-radio" for="sls0402-sixth">
+                  <input type="radio" id="sls0402-sixth" name="sls0402-option" v-model="selectOption" :value="6" />실매출액
+                </label>
+                <label class="sls0402-chart-radio" for="sls0402-seventh">
+                  <input type="radio" id="sls0402-seventh" name="sls0402-option" v-model="selectOption" :value="7" />순매출액
+                </label>
+                <label class="sls0402-chart-radio" for="sls0402-eighth">
+                  <input type="radio" id="sls0402-eighth" name="sls0402-option" v-model="selectOption" :value="8" />할인액
+                </label>
+                <label class="sls0402-chart-radio" for="sls0402-ninth">
+                  <input type="radio" id="sls0402-ninth" name="sls0402-option" v-model="selectOption" :value="9" />증정금액
+                </label>
+              </div>
+            </div>
+            <div class="sls0402-chart-row">
+              <span class="sls0402-chart-lbl">차트 유형</span>
+              <div class="sls0402-chart-radios">
+                <label class="sls0402-chart-radio" for="sls0402-graph1">
+                  <input type="radio" id="sls0402-graph1" name="sls0402-option2" v-model="selectOption2" :value="1" />꺽은선 그래프
+                </label>
+                <label class="sls0402-chart-radio" for="sls0402-graph2">
+                  <input type="radio" id="sls0402-graph2" name="sls0402-option2" v-model="selectOption2" :value="2" />막대 그래프
+                </label>
+                <label class="sls0402-chart-radio" for="sls0402-graph3">
+                  <input type="radio" id="sls0402-graph3" name="sls0402-option2" v-model="selectOption2" :value="3" />원형 그래프
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="sls0402-chart-body">
+            <Chart
+              class="sls0402-chart-canvas"
+              :type="type"
+              :labels="labels"
+              :label="label"
+              :showLegend="type === 'pie'"
+              :pie-slice-label="type === 'pie'"
+              :changePieData="true"
+              :datas="datas"
+              :chartName="'메뉴군별 매출 현황2'"
+              :colors="colors" />
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
   <!-- 그리드 영역 -->
 </template>
@@ -349,6 +338,7 @@ import Realgrid from "@/components/realgrid.vue";
  */
 
 import { formatTime, insertPageLog } from "@/customFunc/customFunc";
+import { useFloatPopup } from "@/utils/floatPopup";
 
 /*
  * 프린트 세팅 라이브러리
@@ -538,6 +528,16 @@ const type = ref("line");
 const label = ref([]);
 const labels = ref([]);
 
+/** 총건수 + 꺽은선 기본값, 이전 차트 데이터 제거 */
+const resetChartPopup = () => {
+  selectOption.value = 1;
+  selectOption2.value = 1;
+  type.value = "line";
+  datas.value = [];
+  labels.value = [];
+  label.value = [];
+};
+
 const getJsonData = (e) => {
   datas.value = [];
   let data1 = [];
@@ -575,12 +575,34 @@ const endDate = (e) => {
   selectedendDate.value = e;
 };
 
-/**
- * 차트 버튼
- */
+/** 차트 팝업 — 제목 줄 드래그로 이동 (SLS06_002 / PUR08과 동일 유틸) */
+const chartPop = useFloatPopup({
+  width: 1088,
+  height: 832,
+  minWidth: 720,
+  minHeight: 480,
+  maxWidthRatio: 0.96,
+  maxHeightRatio: 0.92,
+});
 
-const chartButton = () => {
-  byRadioButton.value = !byRadioButton.value;
+const onChartHeadDown = (event) => {
+  if (event.button !== 0) return;
+  if (event.target.closest("button")) return;
+  chartPop.startDrag(event);
+};
+
+/**
+ * 차트 버튼 — 열 때 총건수·꺽은선으로 초기화 후 바로 조회
+ */
+const chartButton = async () => {
+  if (byRadioButton.value) {
+    closeButton2();
+    return;
+  }
+  resetChartPopup();
+  byRadioButton.value = true;
+  chartPop.place();
+  await searchButton2();
 };
 const setRowGroupSpan = ref("");
 const tempSeeDay = ref(0);
@@ -642,6 +664,7 @@ const searchButton = async () => {
 
 const closeButton2 = () => {
   byRadioButton.value = false;
+  resetChartPopup();
 };
 /**
  *  조회 함수
@@ -1978,5 +2001,127 @@ const checkday = (e) => {
     transform-origin: 0 0; /* 왼쪽 상단에서 크기 축소 */
     zoom: 0.55;
   }
+}
+
+/* 차트 팝업 — 제목 줄로 이동 (위치·크기는 chartPop.style) */
+.sls0402-chart-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  background: rgb(0 0 0 / 0.45);
+  box-sizing: border-box;
+}
+
+.sls0402-chart-dialog {
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgb(203 213 225);
+  border-radius: 0.5rem;
+  background: #fff;
+  box-shadow: 0 20px 40px rgb(15 23 42 / 0.18);
+}
+
+.sls0402-chart-head {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgb(226 232 240);
+  background: rgb(248 250 252);
+  cursor: move;
+  user-select: none;
+}
+
+.sls0402-chart-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+}
+
+.sls0402-chart-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sls0402-chart-toolbar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgb(226 232 240);
+  background: rgb(243 244 246);
+}
+
+.sls0402-chart-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  min-height: 2rem;
+}
+
+.sls0402-chart-lbl {
+  flex: 0 0 5.5rem;
+  width: 5.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+}
+
+.sls0402-chart-radios {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.85rem;
+  min-width: 0;
+}
+
+.sls0402-chart-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  font-size: 0.875rem;
+  color: rgb(31 41 55);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sls0402-chart-radio input {
+  margin: 0;
+}
+
+.sls0402-chart-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0.75rem 1rem 1rem;
+  background: #fff;
+}
+
+/* Chart.js maintainAspectRatio:false → 부모 높이 필수. height:auto 금지 */
+.sls0402-chart-canvas {
+  flex: 1 1 auto;
+  display: block;
+  width: 100% !important;
+  max-width: 100%;
+  min-height: 28rem;
+  height: 100% !important;
+  background: #fff;
 }
 </style>

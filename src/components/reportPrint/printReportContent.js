@@ -5,8 +5,9 @@ import { PO_PRINT_FRAME_CSS, PO_SHEET_CSS } from "./poSheetStyles";
 
 /**
  * @param {HTMLElement} contentEl  .rp-shell__body
+ * @param {{ extraCss?: string }} [opts]  발주서 외 시트 CSS (예: 일일 정산)
  */
-export function printReportContent(contentEl) {
+export function printReportContent(contentEl, opts = {}) {
   if (typeof window === "undefined" || typeof document === "undefined") return;
   if (!contentEl) {
     console.error("[printReportContent] contentEl 없음");
@@ -40,7 +41,8 @@ export function printReportContent(contentEl) {
     return;
   }
 
-  const css = `${PO_PRINT_FRAME_CSS}\n${PO_SHEET_CSS}`;
+  const extra = typeof opts.extraCss === "string" ? opts.extraCss : "";
+  const css = `${PO_PRINT_FRAME_CSS}\n${PO_SHEET_CSS}\n${extra}`;
 
   doc.open();
   doc.write(

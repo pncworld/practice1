@@ -1,190 +1,207 @@
 /*--############################################################################
-# Filename : SLS06_005RPT.vue                                                  
-# Description : 매출관리 > 기간별 매출 현황 > 전년대비실적.                     
-# Date :2025-05-14                                                             
-# Author : 권맑음                     
+# Filename : SLS06_005RPT.vue
+# Description : 매출관리 > 기간별 매출 현황 > 전년대비실적.
+# Date :2025-05-14
+# Author : 권맑음
 ################################################################################*/
 <template>
-  <!-- 조회 조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <!-- pl-5: 셸 w-right가 pl0이라 그리드가 좌측 메뉴에 붙음 → 우측 pd20과 맞춤 -->
+  <div class="flex h-full min-h-0 flex-col pl-5" @click="handleParentClick">
+    <div
+      class="flex w-full shrink-0 items-center justify-between overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="searchButton" class="button search md:w-auto w-14">
+      <div class="flex justify-center space-x-2 pr-5">
+        <button type="button" @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
-        <button @click="excelButton" class="button save w-auto excel">
+        <button type="button" @click="excelButton" class="button save w-auto excel">
           엑셀
         </button>
       </div>
     </div>
+
     <div
-      class="grid grid-cols-[10fr,10fr] grid-rows-1 justify-between bg-gray-200 rounded-lg h-20 z-10">
-      <div class="grid grid-cols-1 grid-rows-2 justify-center ml-12">
-        <div class="flex justify-start items-center space-x-4 mt-2">
-          <div class="text-base font-semibold text-nowrap">
-            비교년도/기준년도
+      class="sls0605-search-panel z-10 mt-3 w-full min-h-0 shrink-0 overflow-visible rounded-lg bg-gray-200"
+      :style="{
+        '--sls0605-panel-pad-x': '2rem',
+        '--sls0605-control-border': sls0605ControlBorder,
+        '--sls0605-col-gutter': sls0605ColGutter,
+        '--sls0605-row-gap': sls0605RowGap,
+        '--sls0605-label-col': sls0605LabelCol,
+      }">
+      <div class="sls0605-search-layout min-w-0">
+        <div class="sls0605-left-stack min-w-0">
+          <div class="sls0605-row">
+            <span class="sls0605-lbl shrink-0">비교/기준년도</span>
+            <div class="sls0605-year-row min-w-0 flex-1">
+              <select
+                id="sls0605-compare-year"
+                v-model="selectedCompareYear"
+                class="sls0605-sg-select"
+                title="비교년도">
+                <option v-for="i in yearsArray" :key="'c-' + i" :value="i">
+                  {{ i }}
+                </option>
+              </select>
+              <span class="sls0605-year-slash" aria-hidden="true">/</span>
+              <select
+                id="sls0605-ref-year"
+                v-model="selectedRefYear"
+                class="sls0605-sg-select"
+                title="기준년도">
+                <option v-for="i in yearsArray" :key="'r-' + i" :value="i">
+                  {{ i }}
+                </option>
+              </select>
+            </div>
           </div>
-          <div>
-            <select
-              name=""
-              id=""
-              class="border rounded-lg w-32 h-8"
-              v-model="selectedCompareYear">
-              <option :value="i" v-for="i in yearsArray">{{ i }}</option>
-            </select>
-          </div>
-          <div class="text-xl">/</div>
-          <div>
-            <select
-              name=""
-              id=""
-              class="border rounded-lg w-32 h-8"
-              v-model="selectedRefYear">
-              <option :value="i" v-for="i in yearsArray">{{ i }}</option>
-            </select>
+          <div class="sls0605-row">
+            <span class="sls0605-lbl shrink-0">매출 구분</span>
+            <div class="sls0605-radio-row min-w-0 flex-1">
+              <label class="sls0605-radio" for="sls0605-sales-1">
+                <input
+                  id="sls0605-sales-1"
+                  v-model="selectedSalesType"
+                  type="radio"
+                  name="sls0605-salesType"
+                  :value="1" />
+                실매출
+              </label>
+              <label class="sls0605-radio" for="sls0605-sales-2">
+                <input
+                  id="sls0605-sales-2"
+                  v-model="selectedSalesType"
+                  type="radio"
+                  name="sls0605-salesType"
+                  :value="2" />
+                순매출
+              </label>
+            </div>
           </div>
         </div>
-        <div
-          class="justify-start flex items-center space-x-5 w-[500px] pl-[60px]">
-          <div class="text-base font-semibold">매출 구분</div>
-          <div>
-            <label for="searchType"
-              ><input
-                type="radio"
-                id="searchType"
-                name="salesType"
-                v-model="selectedSalesType"
-                :value="1" />실매출</label
-            >
-          </div>
-          <div>
-            <label for="searchType2"
-              ><input
-                type="radio"
-                id="searchType2"
-                name="salesType"
-                v-model="selectedSalesType"
-                :value="2" />순매출</label
-            >
-          </div>
+
+        <div class="sls0605-right-store min-w-0 overflow-visible">
+          <PickStoreSingle2
+            @lngStoreCode="lngStoreCode"
+            @lngStoreGroup="lngStoreGroup"
+            @lngStoreAttrs="lngStoreAttrs"
+            @lngStoreTeam="lngStoreTeam"
+            @lngSupervisor="lngSupervisor"
+            @excelStore="excelStore" />
         </div>
       </div>
-      <div class="ml-90">
-        <PickStoreSingle2
-          @lngStoreCode="lngStoreCode"
-          @lngStoreGroup="lngStoreGroup"
-          @lngStoreAttrs="lngStoreAttrs"
-          @lngStoreTeam="lngStoreTeam"
-          @lngSupervisor="lngSupervisor"
-          @excelStore="excelStore">
-        </PickStoreSingle2>
+    </div>
+
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <div class="sls0605-grid-wrap min-h-0 w-full shrink-0">
+        <Realgrid
+          class="h-full min-h-0 w-full"
+          :progname="'SLS06_005RPT_VUE'"
+          :progid="1"
+          :rowData="rowData"
+          :reload="reload"
+          :exporttoExcel="exportExcel"
+          :documentSubTitle="documentSubTitle"
+          :documentTitle="'SLS06_005RPT'"
+          :rowStateeditable="false"
+          :setFooterColID="[
+            'lastTotAmt',
+            'lastCustCnt',
+            'lastCustResult',
+            'nowTotAmt',
+            'nowCustCnt',
+            'nowCustResult',
+            'differAmt',
+            'differCust',
+            'differCustResult',
+          ]"
+          :setFooterExpressions="[
+            'sum',
+            'sum',
+            'avg',
+            'sum',
+            'sum',
+            'avg',
+            'sum',
+            'sum',
+            'avg',
+          ]"
+          :setFooter="true"
+          :mergeColumns2="true"
+          :mergeColumnGroupSubList2="[
+            ['lastTotAmt', 'lastCustCnt', 'lastCustResult'],
+            ['nowTotAmt', 'nowCustCnt', 'nowCustResult'],
+            ['differAmt', 'differCust', 'differCustResult', 'AmtRate'],
+          ]"
+          :mergeColumnGroupName2="[
+            '비교년도' + '(' + selectedCompareYear + ')',
+            '기준년도' + '(' + selectedRefYear + ')',
+            '전년대비',
+          ]"
+          @getJsonData="getJsonData"
+          :getJson="getJson" />
       </div>
-    </div>
-    <!-- 조회 조건 -->
-    <!-- 그리드 영역 -->
-    <div class="h-[26%] w-[100%] mt-1">
-      <Realgrid
-        :progname="'SLS06_005RPT_VUE'"
-        :progid="1"
-        :rowData="rowData"
-        :reload="reload"
-        :exporttoExcel="exportExcel"
-        :documentSubTitle="documentSubTitle"
-        :documentTitle="'SLS06_005RPT'"
-        :rowStateeditable="false"
-        :setFooterColID="[
-          'lastTotAmt',
-          'lastCustCnt',
-          'lastCustResult',
-          'nowTotAmt',
-          'nowCustCnt',
-          'nowCustResult',
-          'differAmt',
-          'differCust',
-          'differCustResult',
-        ]"
-        :setFooterExpressions="[
-          'sum',
-          'sum',
-          'avg',
-          'sum',
-          'sum',
-          'avg',
-          'sum',
-          'sum',
-          'avg',
-        ]"
-        :setFooter="true"
-        :mergeColumns2="true"
-        :mergeColumnGroupSubList2="[
-          ['lastTotAmt', 'lastCustCnt', 'lastCustResult'],
-          ['nowTotAmt', 'nowCustCnt', 'nowCustResult'],
-          ['differAmt', 'differCust', 'differCustResult', 'AmtRate'],
-        ]"
-        :mergeColumnGroupName2="[
-          '비교년도' + '(' + selectedCompareYear + ')',
-          '기준년도' + '(' + selectedRefYear + ')',
-          '전년대비',
-        ]"
-        @getJsonData="getJsonData"
-        :getJson="getJson">
-      </Realgrid>
-    </div>
-    <div class="h-[57%] w-[100%]">
-      <Chart
-        class="h-[110%] -mt-5"
-        v-show="byRadioButton"
-        :type="type"
-        :labels="[
-          '1',
-          '2',
-          '3',
-          '4',
-          '5',
-          '6',
-          '7',
-          '8',
-          '9',
-          '10',
-          '11',
-          '12',
-        ]"
-        :label="[selectedCompareYear, selectedRefYear]"
-        :datas="datas"
-        :chartName="'전년대비실적'"
-        :colors="['lightgreen', '#333399']"
-        :print="print"></Chart>
-    </div>
-    <div class="flex justify-end space-x-2 absolute bottom-5 right-5">
-      <label for="line"
-        ><input
-          type="radio"
-          id="line"
-          name="Chart"
-          :value="0"
-          v-model="setchart" />선 그래프</label
-      >
-      <label for="bar"
-        ><input
-          type="radio"
-          id="bar"
-          name="Chart"
-          :value="1"
-          v-model="setchart" />막대그래프</label
-      >
-      <label for="hide"
-        ><input
-          type="radio"
-          id="hide"
-          name="Chart"
-          :value="2"
-          v-model="setchart" />차트숨기기</label
-      >
-      <button class="button print" @click="printChart">인쇄</button>
+
+      <!-- chart.vue 기본 height:600px가 라디오를 덮지 않도록 wrap에서 클리핑 -->
+      <div class="sls0605-chart-wrap relative mt-1 min-h-0 flex-1 overflow-hidden">
+        <Chart
+          v-show="byRadioButton"
+          class="sls0605-chart h-full min-h-0 w-full"
+          :type="type"
+          :labels="[
+            '1',
+            '2',
+            '3',
+            '4',
+            '5',
+            '6',
+            '7',
+            '8',
+            '9',
+            '10',
+            '11',
+            '12',
+          ]"
+          :label="[selectedCompareYear, selectedRefYear]"
+          :datas="datas"
+          :chartName="'전년대비실적'"
+          :colors="['lightgreen', '#333399']"
+          :print="print" />
+      </div>
+
+      <div
+        class="sls0605-chart-bar relative z-20 mt-2 flex shrink-0 flex-wrap items-center justify-end gap-x-4 gap-y-2">
+        <label class="sls0605-radio" for="sls0605-chart-line">
+          <input
+            id="sls0605-chart-line"
+            v-model="setchart"
+            type="radio"
+            name="sls0605-Chart"
+            :value="0" />
+          선 그래프
+        </label>
+        <label class="sls0605-radio" for="sls0605-chart-bar">
+          <input
+            id="sls0605-chart-bar"
+            v-model="setchart"
+            type="radio"
+            name="sls0605-Chart"
+            :value="1" />
+          막대그래프
+        </label>
+        <label class="sls0605-radio" for="sls0605-chart-hide">
+          <input
+            id="sls0605-chart-hide"
+            v-model="setchart"
+            type="radio"
+            name="sls0605-Chart"
+            :value="2" />
+          차트숨기기
+        </label>
+        <button type="button" class="button print" @click="printChart">인쇄</button>
+      </div>
     </div>
   </div>
-  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
@@ -220,6 +237,12 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
+
+/** 조회 AREA — SLS06_001 / SLS06_004 반응형 패턴 */
+const sls0605ControlBorder = "#cbd5e1";
+const sls0605ColGutter = "1.25rem";
+const sls0605RowGap = "0.875rem";
+const sls0605LabelCol = "7rem";
 
 const selectedCompareYear = ref(new Date().getFullYear() - 1);
 const selectedRefYear = ref(new Date().getFullYear());
@@ -476,4 +499,187 @@ const printChart = () => {
 };
 </script>
 
-<style></style>
+<style scoped>
+.sls0605-search-panel {
+  box-sizing: border-box;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: var(--sls0605-panel-pad-x, 2rem);
+  padding-right: var(--sls0605-panel-pad-x, 2rem);
+}
+
+@media (min-width: 768px) {
+  .sls0605-search-panel {
+    --sls0605-panel-pad-x: 3rem;
+  }
+}
+
+.sls0605-search-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  column-gap: var(--sls0605-col-gutter, 1.25rem);
+  align-items: start;
+  min-width: 0;
+}
+
+.sls0605-left-stack {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sls0605-row-gap, 0.875rem);
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100%;
+}
+
+.sls0605-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: 2rem;
+}
+
+.sls0605-lbl {
+  box-sizing: border-box;
+  flex: 0 0 var(--sls0605-label-col, 7rem);
+  width: var(--sls0605-label-col, 7rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sls0605-year-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.65rem;
+  min-width: 0;
+}
+
+.sls0605-year-slash {
+  flex: 0 0 auto;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1;
+  color: rgb(55 65 81);
+}
+
+.sls0605-sg-select {
+  box-sizing: border-box;
+  height: 2rem;
+  min-height: 2rem;
+  max-height: 2rem;
+  width: 8rem;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: rgb(55 65 81);
+  background: #fff;
+  border: 1px solid var(--sls0605-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+}
+
+.sls0605-sg-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.2);
+}
+
+.sls0605-radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  min-height: 2rem;
+}
+
+.sls0605-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sls0605-radio input {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.sls0605-right-store {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+.sls0605-right-store :deep(.pss-brand) {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  color: rgb(17 24 39) !important;
+}
+
+.sls0605-right-store :deep(select),
+.sls0605-right-store :deep(.h-8),
+.sls0605-right-store :deep(.pss-select),
+.sls0605-right-store :deep(.pss-vselect) {
+  box-sizing: border-box;
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+.sls0605-grid-wrap {
+  height: min(26vh, 14rem);
+  min-height: 10rem;
+}
+
+.sls0605-chart-wrap {
+  min-height: 12rem;
+  overflow: hidden;
+}
+
+/* 공통 Chart 기본 600px 고정 높이를 이 화면 영역 안으로만 맞춤 */
+.sls0605-chart-wrap :deep(.chart-container) {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100% !important;
+  max-height: 100%;
+  min-height: 0;
+}
+
+.sls0605-chart-bar {
+  position: relative;
+  z-index: 20;
+  min-height: 2rem;
+  pointer-events: auto;
+}
+
+@media (max-width: 1280px) {
+  .sls0605-search-layout {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--sls0605-row-gap, 0.875rem);
+  }
+}
+</style>

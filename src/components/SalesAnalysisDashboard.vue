@@ -18,7 +18,12 @@
             :max="maxSelectableDate"
             aria-label="조회 종료일" />
           <button type="button" class="sa-hd-btn sa-hd-btn--ghost" @click="onSearch">
+            <img class="sa-hd-btn__ic" :src="saIconSearch" width="16" height="16" alt="" />
             조회
+          </button>
+          <button type="button" class="sa-hd-btn sa-hd-btn--ghost" @click="onPrint">
+            <img class="sa-hd-btn__ic" :src="saIconPrint" width="16" height="16" alt="" />
+            출력
           </button>
         </div>
       </div>
@@ -272,11 +277,27 @@
         </div>
       </div>
     </Teleport>
+
+    <ReportPrintShell
+      v-model:open="printPreviewOpen"
+      title="매출 분석 인쇄 미리보기"
+      :pages="printPages"
+      :loading="printLoading"
+      :extra-print-css="saDashPrintCss"
+      extra-print-css-id="sa-dash-sheet-styles">
+      <template #page="{ page }">
+        <SalesAnalysisPrintSheet :page="page" />
+      </template>
+    </ReportPrintShell>
   </div>
 </template>
 
 <script setup>
 import SalesDashReportGrid from "@/components/SalesDashReportGrid.vue";
+import ReportPrintShell from "@/components/reportPrint/ReportPrintShell.vue";
+import { loadSalesAnalysisPrintPages } from "@/components/reportPrint/loadSalesAnalysisPrintPages";
+import { SA_DASH_SHEET_CSS } from "@/components/reportPrint/saDashSheetStyles";
+import SalesAnalysisPrintSheet from "@/components/reportPrint/sheets/SalesAnalysisPrintSheet.vue";
 import {
   getCustomerAndUnitPriceByStore,
   getMaterialCostByStore,
@@ -300,7 +321,9 @@ import {
 import saIconDetail from "@/assets/images/ic_move.svg";
 import saIconExcel from "@/assets/excel_icon_dashboard.svg";
 import saIconExtent from "@/assets/ic_extent.svg";
+import saIconPrint from "@/assets/print-solid.svg";
 import saIconRefresh from "@/assets/ic_refresh.svg";
+import saIconSearch from "@/assets/ic_search.svg";
 import Swal from "sweetalert2";
 import { utils, writeFile } from "xlsx-js-style";
 import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
@@ -1805,6 +1828,108 @@ const maxSelectableDate = computed(() => getSeoulTodayYmdHyphen());
 const periodLabel = computed(
   () => `${formatYmdToMdSlash(queriedFromDate.value)} ~ ${formatYmdToMdSlash(queriedToDate.value)}`
 );
+
+/** 인쇄 — 일일 정산 레포트와 동일 A4 측정 분할 */
+const printPreviewOpen = ref(false);
+const printLoading = ref(false);
+const printPages = ref([]);
+const saDashPrintCss = SA_DASH_SHEET_CSS;
+const WEEKLY_TOTAL_ROW_HIGHLIGHT = Object.freeze({ field: "label", values: ["합계"] });
+
+async function onPrint() {
+  if (!String(queryDateTimeText.value || "").trim()) {
+    await Swal.fire({
+      title: "경고",
+      text: "조회를 먼저 진행해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  const hasAnyRows =
+    weeklyKpi.value.length ||
+    storeSalesRows.value.length ||
+    customerRows.value.length ||
+    costMaterialRows.value.length ||
+    laborRows.value.length;
+  if (!hasAnyRows) {
+    await Swal.fire({
+      title: "경고",
+      text: "출력할 데이터가 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  printPreviewOpen.value = true;
+  printLoading.value = true;
+  printPages.value = [];
+  try {
+    printPages.value = loadSalesAnalysisPrintPages({
+      periodText: periodLabel.value,
+      searchAtText: String(queryDateTimeText.value || "").trim() || "—",
+      sections: [
+        {
+          id: "weekly",
+          title: "주간 핵심 지표",
+          columns: COL_WEEKLY,
+          rows: weeklyKpi.value,
+          totalHighlight: WEEKLY_TOTAL_ROW_HIGHLIGHT,
+        },
+        {
+          id: "storeSales",
+          title: "매장 매출",
+          columns: COL_STORE_SALES,
+          rows: storeSalesRows.value,
+          totalHighlight: STORE_SALES_TOTAL_ROW_HIGHLIGHT,
+        },
+        {
+          id: "customer",
+          title: "객수 / 객단가",
+          columns: COL_CUSTOMER,
+          rows: customerRows.value,
+          totalHighlight: STORE_SALES_TOTAL_ROW_HIGHLIGHT,
+        },
+        {
+          id: "material",
+          title: "재료비",
+          columns: COL_MATERIAL,
+          rows: costMaterialRows.value,
+          totalHighlight: STORE_SALES_TOTAL_ROW_HIGHLIGHT,
+        },
+        {
+          id: "reservation",
+          title: "예약현황",
+          columns: COL_RESERVATION,
+          rows: laborRows.value,
+          totalHighlight: STORE_SALES_TOTAL_ROW_HIGHLIGHT,
+        },
+      ],
+    });
+    if (!printPages.value.length) {
+      printPreviewOpen.value = false;
+      await Swal.fire({
+        title: "경고",
+        text: "출력할 데이터가 없습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+    }
+  } catch (e) {
+    console.error("[SalesAnalysisDashboard] onPrint", e);
+    printPreviewOpen.value = false;
+    await Swal.fire({
+      title: "오류",
+      text: "인쇄 미리보기를 준비하는 중 오류가 발생했습니다.",
+      icon: "error",
+      confirmButtonText: "확인",
+    });
+  } finally {
+    printLoading.value = false;
+  }
+}
 
 onMounted(() => {
   void loadSalesAnalysisDashboardData();

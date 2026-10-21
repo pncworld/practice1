@@ -6,6 +6,8 @@ export const REPORT_IDS = Object.freeze({
   PUR_ORDER_PART: "PUR_ORDER_PART",
   PUR_ORDER: "PUR_ORDER",
   STK05_013: "STK05_013",
+  SLS_DAY_SETTLEMENT: "SLS_DAY_SETTLEMENT",
+  SALES_ANALYSIS_DASH: "SALES_ANALYSIS_DASH",
 });
 
 /** @type {Record<string, import('vue').Component>} */

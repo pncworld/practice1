@@ -91,6 +91,8 @@
           :documentTitle="'PUR02_031INS'"
           @clickedRowData="clickedRowData"
           @checkedRowData="checkedRowData"
+          @realgridname="onMasterGridName"
+          @gridReady="onMasterGridReady"
           :checkRowAuto="false"
           :checkRowAuto2="true"
           :checkRowAuto2Col="'Selected'"
@@ -164,7 +166,7 @@
           </span>
           <span class="pur031-legend-item">
             <i class="pur031-swatch pur031-swatch--edited" aria-hidden="true"></i>
-            수량 수정
+            수량/금액 수정
           </span>
         </div>
         <Realgrid
@@ -172,14 +174,9 @@
           :progname="'PUR02_031INS_VUE'"
           :progid="2"
           :rowStateeditable="false"
-          :editableColId="'dblCheckQty'"
-          :AutoCalculateDataMainColId="['curSupply']"
-          :AutoCalculateDataSubColId="[
-            `values['curUnitPrice'] * values['dblCheckQty']`,
-          ]"
-          :inputOnlyNumberColumn="'curSupply'"
+          :editableColId="'dblCheckQty,curSupply,curTax'"
+          :inputOnlyNumberColumn="'curSupply,curTax'"
           :input-unsigned-decimal-column="'dblCheckQty'"
-          :CalculateTaxColId="'curTax'"
           :setFooter="true"
           @realgridname="onDetailGridName"
           @gridReady="onDetailGridName"
@@ -298,8 +295,8 @@
         </div>
         <div class="pur031-popup-hint">
           <span class="text-red-500"
-            >신규매입상품에 대해서 {매입단가},{매입수량} 을 조정할 수
-            있습니다.</span>
+            >신규매입상품에 대해서 {매입단가},{매입수량},{공급가액},{부가세액}
+            을 조정할 수 있습니다.</span>
           <div>{공급가액} = {매입단가} * {매입수량}</div>
           <div>{합계금액} = {공급가액} + {부가세액}</div>
         </div>
@@ -363,15 +360,11 @@
             :progid="2"
             :rowStateeditable="false"
             @realgridname="onNewPopupGridName"
+            @gridReady="onNewPopupGridName"
             @updatedRowData="updatedRowData3"
-            :editableColId="'dblCheckQty'"
-            :AutoCalculateDataMainColId="['curSupply']"
-            :AutoCalculateDataSubColId="[
-              `values['curUnitPrice'] * values['dblCheckQty']`,
-            ]"
-            :inputOnlyNumberColumn="'curSupply'"
+            :editableColId="'dblCheckQty,curSupply,curTax'"
+            :inputOnlyNumberColumn="'curSupply,curTax'"
             :input-unsigned-decimal-column="'dblCheckQty'"
-            :CalculateTaxColId="'curTax'"
             :rowData="rowData4" />
         </div>
         <div class="pur031-popup-memo">
@@ -481,8 +474,11 @@ const listPopupStockAll = ref([]);
 const listPopupNameKeyword = ref("");
 const listPopupNameComposing = ref(false);
 const listPopupGridName = ref("");
+const masterGridName = ref("");
 const detailGridName = ref("");
 const afterSearch = ref(false);
+/** 공급가·부가세 setValue 중 onCellEdited 재진입 방지 */
+let pur031AmtWriting = false;
 
 const disabledBusiness = ref(false);
 const masterRowSelected = ref(false);
@@ -801,14 +797,208 @@ const hideDetailUnitPriceFooterSum = () => {
     gv.refresh?.();
   } catch (_) {}
 };
+const resolvePur031FieldName = (dp, field) => {
+  if (typeof field === "string" && field) {
+    return field;
+  }
+  try {
+    if (typeof dp?.getOrgFieldName === "function") {
+      const n = dp.getOrgFieldName(field);
+      if (n) return n;
+    }
+  } catch (_) {}
+  try {
+    if (typeof dp?.getFieldName === "function") {
+      const n = dp.getFieldName(field);
+      if (n) return n;
+    }
+  } catch (_) {}
+  return "";
+};
+const applyPur031AmountEdit = (dp, dataRow, field, onSynced) => {
+  if (pur031AmtWriting || !dp || dataRow == null || dataRow < 0) {
+    return;
+  }
+  const fieldName = resolvePur031FieldName(dp, field);
+  if (
+    fieldName !== "dblCheckQty" &&
+    fieldName !== "curUnitPrice" &&
+    fieldName !== "curSupply" &&
+    fieldName !== "curTax"
+  ) {
+    return;
+  }
+  pur031AmtWriting = true;
+  try {
+    if (fieldName === "dblCheckQty" || fieldName === "curUnitPrice") {
+      const unit = Number(dp.getValue(dataRow, "curUnitPrice") || 0);
+      const qty = Number(dp.getValue(dataRow, "dblCheckQty") || 0);
+      const supply = Math.floor(unit * qty);
+      let taxType;
+      try {
+        taxType = dp.getValue(dataRow, "lngTaxType");
+      } catch (_) {
+        taxType = undefined;
+      }
+      if (taxType === undefined || taxType === null || taxType === "") {
+        const oldSupply = Number(dp.getValue(dataRow, "curSupply") || 0);
+        const oldTax = Number(dp.getValue(dataRow, "curTax") || 0);
+        taxType = oldSupply !== 0 && oldTax === 0 ? "00" : "01";
+      }
+      const tax = String(taxType) === "01" ? Math.floor(supply * 0.1) : 0;
+      dp.setValue(dataRow, "curSupply", supply);
+      dp.setValue(dataRow, "curTax", tax);
+      try {
+        dp.setValue(dataRow, "curTotal", Math.floor(supply + tax));
+      } catch (_) {}
+    } else {
+      const supply = Math.floor(Number(dp.getValue(dataRow, "curSupply") || 0));
+      const tax = Math.floor(Number(dp.getValue(dataRow, "curTax") || 0));
+      if (fieldName === "curSupply") {
+        dp.setValue(dataRow, "curSupply", supply);
+      }
+      if (fieldName === "curTax") {
+        dp.setValue(dataRow, "curTax", tax);
+      }
+      try {
+        dp.setValue(dataRow, "curTotal", Math.floor(supply + tax));
+      } catch (_) {}
+    }
+    if (typeof onSynced === "function") {
+      try {
+        onSynced(dp.getJsonRow?.(dataRow) || {});
+      } catch (_) {}
+    }
+  } finally {
+    pur031AmtWriting = false;
+  }
+};
+const applyPur031EditColStyles = (gv) => {
+  if (!gv?.setColumnProperty) {
+    return;
+  }
+  const paint = (field, cls) => {
+    try {
+      const prev = String(gv.getColumnProperty(field, "styleName") || "");
+      const base = prev
+        .split(/\s+/)
+        .filter((c) => c && !c.startsWith("pur031-col-"))
+        .join(" ");
+      gv.setColumnProperty(field, "styleName", `${base} ${cls}`.trim());
+    } catch (_) {}
+  };
+  paint("dblCheckQty", "pur031-col-qty");
+  paint("curSupply", "pur031-col-sky");
+  paint("curTax", "pur031-col-sky");
+};
+const bindPur031AmountEdit = (gridName, onSynced) => {
+  const inst = rgGetInstance(gridName);
+  const gv = inst?.gridView;
+  const dp = inst?.dataProvider;
+  if (!gv || !dp) {
+    return;
+  }
+  if (gv.__pur031AmtBound) {
+    applyPur031EditColStyles(gv);
+    return;
+  }
+  gv.__pur031AmtBound = true;
+  const prev = gv.onCellEdited;
+  gv.onCellEdited = function (grid, itemIndex, row, field) {
+    if (typeof prev === "function") {
+      prev.call(this, grid, itemIndex, row, field);
+    }
+    applyPur031AmountEdit(dp, row, field, onSynced);
+  };
+  applyPur031EditColStyles(gv);
+};
+const applyMasterCheckCenter = () => {
+  const gv = rgGetInstance(masterGridName.value)?.gridView;
+  if (!gv?.setColumnProperty) {
+    return;
+  }
+  try {
+    const prev = String(gv.getColumnProperty("Selected", "styleName") || "");
+    const next = prev.includes("setTextAlignCenter")
+      ? prev
+      : [prev, "setTextAlignCenter"].filter(Boolean).join(" ").trim();
+    gv.setColumnProperty("Selected", "styleName", next);
+  } catch (_) {}
+};
+const onMasterGridName = (name) => {
+  if (name) {
+    masterGridName.value = name;
+  }
+  nextTick(() => {
+    applyMasterCheckCenter();
+  });
+};
+const onMasterGridReady = (name) => {
+  if (name) {
+    masterGridName.value = name;
+  }
+  nextTick(() => {
+    applyMasterCheckCenter();
+    applyPur031GridsFitForFullMode();
+  });
+};
+
+/** 확대(full-mode) 시 상·하 그리드 폭·합계(푸터) 다시 맞춤 */
+let pur031FullModeObserver = null;
+const applyPur031GridsFitForFullMode = () => {
+  if (typeof document === "undefined") return;
+  const full = document.body.classList.contains("full-mode");
+  const names = [masterGridName.value, detailGridName.value].filter(Boolean);
+  for (const name of names) {
+    const gv = rgGetInstance(name)?.gridView;
+    if (!gv) continue;
+    try {
+      gv.displayOptions.fitStyle = full ? "evenFill" : "even";
+    } catch (_) {}
+  }
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        try {
+          window.dispatchEvent(new Event("resize"));
+        } catch (_) {}
+        for (const name of names) {
+          const gv = rgGetInstance(name)?.gridView;
+          try {
+            gv?.resetSize?.();
+            gv?.refresh?.();
+          } catch (_) {}
+        }
+      });
+    });
+  });
+};
+onMounted(() => {
+  if (typeof document === "undefined" || typeof MutationObserver === "undefined") {
+    return;
+  }
+  applyPur031GridsFitForFullMode();
+  pur031FullModeObserver = new MutationObserver(() => {
+    applyPur031GridsFitForFullMode();
+  });
+  pur031FullModeObserver.observe(document.body, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+});
 const onDetailGridName = (name) => {
   if (name) {
     detailGridName.value = name;
   }
   bindDetailRowHighlight();
   bindDetailQtyNav();
+  bindPur031AmountEdit(detailGridName.value, () => {
+    refreshDetailRowStyle();
+  });
   nextTick(() => {
     hideDetailUnitPriceFooterSum();
+    applyPur031EditColStyles(rgGetInstance(detailGridName.value)?.gridView);
+    applyPur031GridsFitForFullMode();
   });
 };
 const refreshDetailRowStyle = () => {
@@ -840,6 +1030,12 @@ const bindDetailRowHighlight = () => {
       const nowQty = detailQtyOf(row);
       const wasQty = detailQtyOf(origin);
       if (nowQty != null && wasQty != null && nowQty !== wasQty) {
+        return "pur031-row-edited";
+      }
+      if (
+        Number(row.curSupply || 0) !== Number(origin.curSupply || 0) ||
+        Number(row.curTax || 0) !== Number(origin.curTax || 0)
+      ) {
         return "pur031-row-edited";
       }
     } catch (_) {}
@@ -1145,6 +1341,10 @@ onUnmounted(() => {
   document.body.classList.remove("pur031-new-popup-open");
   listPopup.onPointerUp();
   newPopup.onPointerUp();
+  try {
+    pur031FullModeObserver?.disconnect?.();
+  } catch (_) {}
+  pur031FullModeObserver = null;
 });
 
 const stockIdOf = (item) => {
@@ -1738,6 +1938,21 @@ const applyNewPopupNameFilter = () => {
 };
 const onNewPopupGridName = (name) => {
   newPopupGridName.value = name || "";
+  bindPur031AmountEdit(newPopupGridName.value, (json) => {
+    mergeNewPopupQty([json]);
+    const id = stockIdOf(json);
+    if (!id || !Array.isArray(updatedrowdata3.value)) {
+      return;
+    }
+    updatedrowdata3.value = updatedrowdata3.value.map((row) =>
+      stockIdOf(row) === id ? { ...row, ...json } : row
+    );
+  });
+  nextTick(() => {
+    applyPur031EditColStyles(
+      rgGetInstance(newPopupGridName.value)?.gridView
+    );
+  });
 };
 const onNewPopupNameCompositionStart = () => {
   newPopupNameComposing.value = true;
@@ -2062,6 +2277,15 @@ const saveButton = async () => {
     strCheckNo: item.strCheckNo || checkNo,
     lngSupplierID: item.lngSupplierID || selectedMasterSupplier.value || "",
   }));
+  if (rows.length > 0 && !rows.some(isMainQtyEntered)) {
+    Swal.fire({
+      title: "경고",
+      text: "매입수량을 입력해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   const split = splitDetailSaveRows(rows);
   const addedRows = split.addedRows;
   const updateRows = split.updateRows;
@@ -2757,13 +2981,13 @@ const deleteButton = async () => {
 .pur031-pane-master {
   position: relative;
   z-index: 0;
-  flex: 2.5 1 0;
+  flex: 1 1 0;
   min-height: 8rem;
 }
 
 .pur031-pane-detail {
-  flex: 3.5 1 0;
-  min-height: 10rem;
+  flex: 1 1 0;
+  min-height: 8rem;
 }
 
 .pur031-detail-legend {
@@ -2809,11 +3033,26 @@ const deleteButton = async () => {
   min-width: 0;
 }
 
+/* 일일정산레포트(SLS02_017) · 발주등록II 와 동일 — 왼쪽 | 바 */
 .pur031-memo-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   margin-bottom: 0.25rem;
   font-size: 0.875rem;
   font-weight: 600;
+  line-height: 1.25;
   color: rgb(17 24 39);
+}
+
+.pur031-memo-label::before {
+  content: "";
+  display: inline-block;
+  flex-shrink: 0;
+  width: 0.25rem;
+  height: 0.9em;
+  border-radius: 999px;
+  background: #2563eb;
 }
 
 .pur031-memo-text,
@@ -2829,7 +3068,7 @@ const deleteButton = async () => {
 }
 
 .pur031-memo-text {
-  height: 6.5rem;
+  height: 3.25rem;
 }
 
 .pur031-popup-memo {
@@ -3104,5 +3343,26 @@ body.pur031-new-popup-open .vs__dropdown-menu {
 
 .pur031-row-edited {
   background: #fef3c7 !important;
+}
+
+/* 상단 Selected 체크 — 셀·렌더러 가운데 */
+.pur031-pane-master .rg-body .rg-data-cell.setTextAlignCenter,
+.pur031-pane-master .rg-fixed-body .rg-data-cell.setTextAlignCenter {
+  text-align: center !important;
+}
+.pur031-pane-master .rg-body .rg-data-cell.setTextAlignCenter .rg-renderer,
+.pur031-pane-master .rg-fixed-body .rg-data-cell.setTextAlignCenter .rg-renderer,
+.pur031-pane-master .rg-check-renderer-checked,
+.pur031-pane-master .rg-check-renderer-unchecked {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 하단·신규 팝업 — 바디만 파스텔 (헤더 styleName 유지) */
+.pur031-col-qty {
+  background: #fef9c3 !important;
+}
+.pur031-col-sky {
+  background: #e0f2fe !important;
 }
 </style>
