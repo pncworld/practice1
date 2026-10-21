@@ -5,93 +5,165 @@
   # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <!-- 조회조건 -->
-  <div class="flex justify-between items-center w-full overflow-y-hidden">
-    <PageName></PageName>
-    <div class="flex justify-center mr-9 space-x-2 pr-5">
-      <button @click="searchButton" class="button search md:w-auto w-14">
-        조회
-      </button>
-
-      <button @click="saveButton" class="button save w-auto">저장</button>
-      <!-- <button @click="excelButton" class="button excel w-auto">엑셀</button> -->
-    </div>
-  </div>
-  <br />
   <div
-    class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
-    <PickStore
-      @update:storeCd="handleStoreCd"
-      @storeNm="handlestoreNm"
-      :hidesub="hidesub"
-      :hideAttr="hideAttr"
-      @update:ischanged="handleinitAll"
-      @update:ischanged2="searchinit"></PickStore>
-  </div>
-  <div class="z-50"></div>
-  <!-- 조회조건 -->
-  <!-- 그리드 영역 -->
-  <div class="flex justify-center w-[80%] h-[60vh] gap-5 ml-10 mt-5">
-    <div class="w-full h-full">
-      <div class="flex justify-end gap-2">
-        <button class="whitebutton" @click="addRow">추가</button
-        ><button class="whitebutton" @click="deleteRow">삭제</button>
+    class="mst0108-page box-border flex h-full max-h-full min-h-0 flex-col overflow-hidden pl-5"
+    :style="{
+      '--mst0108-panel-pad-x': '7rem',
+      '--mst0108-item-gap': '0.75rem',
+      '--mst0108-label-col': '5.5rem',
+      '--mst0108-row-min-h': '2rem',
+      '--mst0108-control-h': '2rem',
+      '--mst0108-control-border': '#cbd5e1',
+    }">
+    <!-- 상단: 페이지명 + 메인 액션 -->
+    <div class="flex w-full shrink-0 items-center justify-between overflow-y-hidden">
+      <PageName></PageName>
+      <div class="mr-9 flex justify-center space-x-2 pr-5">
+        <button type="button" @click="searchButton" class="button search md:w-auto w-14">
+          조회
+        </button>
+        <button type="button" @click="saveButton" class="button save w-auto">
+          저장
+        </button>
       </div>
-      <Realgrid
-        class="w-full h-full mt-2"
-        :progname="'MST01_008INS_VUE'"
-        :progid="1"
-        :rowData="rowData"
-        :showGrid="showGrid"
-        :showCheckBar="false"
-        :addRow="addbutton"
-        @selcetedrowData="selcetedrowData"
-        @allStateRows="allStateRows"
-        :changeRow="changeRow"
-        :deleteRow="deleterow"
-        :changeColid="'lngCode'"
-        :changeValue="changeValue"
-        @updatedRowData="updatedRowData1"
-        @clickedRowData="clickedRowData"
-        :exporttoExcel="exporttoExcel"
-        :ExcelNm="'메뉴 분류 관리'"
-        :editableColId="'strName'"
-        :commitAll="commitAll"
-        :inputOnlyNumberColumn="'lngCode'">
-      </Realgrid>
     </div>
-    <div class="w-full h-full">
-      <div class="flex justify-end gap-2">
-        <button class="whitebutton" @click="addRow2">추가</button
-        ><button class="whitebutton" @click="deleteRow2">삭제</button>
+
+    <!-- 조회 AREA -->
+    <div class="mst0108-search-panel z-10 mt-3 w-full min-w-0 shrink-0 rounded-lg bg-gray-200">
+      <div class="mst0108-search-grid min-w-0">
+        <div class="mst0108-cell">
+          <div class="mst0108-sg-label">매장명</div>
+          <div class="mst0108-cell-field mst0108-pick-slot min-w-0">
+            <PickStore
+              compact-search-bar
+              omit-main-label
+              main-name=""
+              @update:storeCd="handleStoreCd"
+              @storeNm="handlestoreNm"
+              :hidesub="hidesub"
+              :hideAttr="hideAttr"
+              @update:ischanged="handleinitAll"
+              @update:ischanged2="searchinit"></PickStore>
+          </div>
+        </div>
       </div>
-      <Realgrid
-        class="w-full h-full mt-2"
-        :progname="'MST01_008INS_VUE'"
-        :progid="2"
-        :rowData="filteredRowData2"
-        :showGrid="showGrid"
-        :showCheckBar="false"
-        :addRow2="addbutton2"
-        @allStateRows="allStateRows2"
-        :addrowProp="'lngCode,lngMajor'"
-        :deleteRow="deleterow2"
-        :addrowDefault="addrowDefault"
-        @selcetedrowData="selcetedrowData"
-        :changeRow="changeRow"
-        :changeColid="'strName'"
-        :changeValue="changeValue2"
-        :inputOnlyNumberColumn="'lngCode'"
-        @updatedRowData="updatedRowData"
-        @clickedRowData="clickedRowData2"
-        :editableColId="'strName'"
-        :exporttoExcel="exporttoExcel"
-        :ExcelNm="'메뉴 분류 관리'"
-        :deleteAll="deleteAll"
-        :commitAll="commitAll"></Realgrid>
+    </div>
+
+    <!-- 그리드 영역 (좌: 메인 / 우: 서브) -->
+    <div class="mst0108-grids mt-3 flex min-h-0 w-full flex-1 gap-4 pr-5">
+      <div class="mst0108-grid-pane flex min-h-0 min-w-0 flex-1 flex-col">
+        <div class="mst0108-section-head shrink-0">
+          <h3 class="mst0108-section-title">메인 분류</h3>
+          <div class="flex gap-2">
+            <button type="button" class="pnc-sub-btn pnc-sub-btn--rose" @click="addRow">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M8 3v10M3 8h10"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round" />
+              </svg>
+              추가
+            </button>
+            <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="deleteRow">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M3.5 4.5h9M6 4.5V3.5h4v1M5.5 4.5l.5 8h4l.5-8"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+              삭제
+            </button>
+          </div>
+        </div>
+        <div class="mst0108-grid-host mt-2">
+          <Realgrid
+            class="mst0108-grid"
+            :progname="'MST01_008INS_VUE'"
+            :progid="1"
+            :rowData="rowData"
+            :showGrid="showGrid"
+            :showCheckBar="false"
+            :addRow="addbutton"
+            @selcetedrowData="selcetedrowData"
+            @allStateRows="allStateRows"
+            :changeRow="changeRow"
+            :deleteRow="deleterow"
+            :changeColid="'lngCode'"
+            :changeValue="changeValue"
+            @updatedRowData="updatedRowData1"
+            @clickedRowData="clickedRowData"
+            :exporttoExcel="exporttoExcel"
+            :ExcelNm="'메뉴 분류 관리'"
+            :editableColId="'strName'"
+            :commitAll="commitAll"
+            :inputOnlyNumberColumn="'lngCode'">
+          </Realgrid>
+        </div>
+      </div>
+
+      <div class="mst0108-grid-pane flex min-h-0 min-w-0 flex-1 flex-col">
+        <div class="mst0108-section-head shrink-0">
+          <h3 class="mst0108-section-title">서브 분류</h3>
+          <div class="flex gap-2">
+            <button type="button" class="pnc-sub-btn pnc-sub-btn--rose" @click="addRow2">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M8 3v10M3 8h10"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round" />
+              </svg>
+              추가
+            </button>
+            <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="deleteRow2">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M3.5 4.5h9M6 4.5V3.5h4v1M5.5 4.5l.5 8h4l.5-8"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+              삭제
+            </button>
+          </div>
+        </div>
+        <div class="mst0108-grid-host mt-2">
+          <Realgrid
+            class="mst0108-grid"
+            :progname="'MST01_008INS_VUE'"
+            :progid="2"
+            :rowData="filteredRowData2"
+            :showGrid="showGrid"
+            :showCheckBar="false"
+            :addRow2="addbutton2"
+            @allStateRows="allStateRows2"
+            :addrowProp="'lngCode,lngMajor'"
+            :deleteRow="deleterow2"
+            :addrowDefault="addrowDefault"
+            @selcetedrowData="selcetedrowData"
+            :changeRow="changeRow"
+            :changeColid="'strName'"
+            :changeValue="changeValue2"
+            :inputOnlyNumberColumn="'lngCode'"
+            @updatedRowData="updatedRowData"
+            @clickedRowData="clickedRowData2"
+            :editableColId="'strName'"
+            :exporttoExcel="exporttoExcel"
+            :ExcelNm="'메뉴 분류 관리'"
+            :deleteAll="deleteAll"
+            :commitAll="commitAll"></Realgrid>
+        </div>
+      </div>
     </div>
   </div>
-  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
@@ -687,4 +759,119 @@ const commitAlls = () => {
 };
 </script>
 
-<style></style>
+<style scoped>
+.mst0108-search-panel {
+  box-sizing: border-box;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.mst0108-search-grid {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding-left: var(--mst0108-panel-pad-x);
+  padding-right: var(--mst0108-panel-pad-x);
+}
+
+.mst0108-cell {
+  display: flex;
+  min-width: 0;
+  min-height: var(--mst0108-row-min-h);
+  align-items: center;
+  gap: var(--mst0108-item-gap);
+}
+
+.mst0108-sg-label {
+  flex: 0 0 var(--mst0108-label-col);
+  width: var(--mst0108-label-col);
+  min-height: var(--mst0108-row-min-h);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: right;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+}
+
+.mst0108-cell-field {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.mst0108-pick-slot :deep(> .flex) {
+  width: 100%;
+  min-width: 0;
+  margin-left: 0 !important;
+  margin-top: 0 !important;
+  gap: 0.5rem !important;
+  justify-content: flex-start !important;
+}
+
+.mst0108-pick-slot :deep(select),
+.mst0108-pick-slot :deep(.pickstore-vs-shell) {
+  box-sizing: border-box;
+  height: var(--mst0108-control-h) !important;
+  min-height: var(--mst0108-control-h) !important;
+  max-height: var(--mst0108-control-h) !important;
+  border: 1px solid var(--mst0108-control-border) !important;
+  border-radius: 0.375rem !important;
+}
+
+.mst0108-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2rem;
+}
+
+.mst0108-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #1a3c70;
+  white-space: nowrap;
+}
+
+.mst0108-section-title::before {
+  content: "";
+  display: inline-block;
+  flex-shrink: 0;
+  width: 0.25rem;
+  height: 0.9em;
+  border-radius: 999px;
+  background: #2563eb;
+}
+
+.mst0108-grids {
+  overflow: hidden;
+}
+
+.mst0108-grid-host {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+}
+
+.mst0108-grid-host :deep(.realgrid),
+.mst0108-grid-host :deep(.mst0108-grid) {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}
+</style>

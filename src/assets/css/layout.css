@@ -8,8 +8,9 @@ body {overflow: hidden;}
 .po-layout .w-left {width: 100%; max-width: 300px; flex-shrink: 0;}
 .po-layout .w-right {width: calc(100% - 300px); display: flex; flex-direction: column; min-height: 0;}
 .po-layout .w-right > .po-tabs {flex-shrink: 0;}
-.po-layout .w-right > .po-router-view {display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; min-width: 0;}
-.po-layout .w-right > .po-router-view > * {flex: 1 1 auto; min-height: 0; min-width: 0; height: 100%;}
+.po-layout .w-right > .po-router-view {display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; min-width: 0; overflow: auto;}
+/* 루트가 하나인 페이지만 높이 채움. 다중 루트(레거시)에 height:100% 주면 조회바·그리드가 각각 늘어나 레이아웃 깨짐 */
+.po-layout .w-right > .po-router-view > *:only-child {flex: 1 1 auto; min-height: 0; min-width: 0; height: 100%;}
 
 
 /* ================================
