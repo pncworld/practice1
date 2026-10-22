@@ -52,10 +52,33 @@ const imageProxy = createProxyMiddleware({
 app.use("/image", imageProxy);
 app.use("/Image", imageProxy);
 
-app.use(express.static(path.join(__dirname, "dist")));
+// index.html 만 no-cache — 배포 직후 새 탭/F5/재진입 시 최신 번들 참조.
+// 해시 붙은 js/css 등 나머지 정적 파일은 express.static 기본 캐시 유지.
+const distDir = path.join(__dirname, "dist");
+const indexHtmlPath = path.join(distDir, "index.html");
+
+function setIndexHtmlNoCache(res) {
+  res.set({
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    Pragma: "no-cache",
+    Expires: "0",
+  });
+}
+
+app.use(
+  express.static(distDir, {
+    index: false,
+    setHeaders(res, filePath) {
+      if (path.basename(filePath).toLowerCase() === "index.html") {
+        setIndexHtmlNoCache(res);
+      }
+    },
+  })
+);
 
 app.get(/^\/.*$/, (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
+  setIndexHtmlNoCache(res);
+  res.sendFile(indexHtmlPath);
 });
 
 const options = {
