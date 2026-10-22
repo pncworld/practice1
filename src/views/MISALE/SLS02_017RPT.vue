@@ -380,7 +380,7 @@
                 <em>매장</em>{{ expandStoreText }}
               </span>
               <span class="sls0217-expand-meta-item">
-                <em>기간</em>{{ expandPeriodText }}
+                <em>매출기간</em>{{ expandPeriodText }}
               </span>
               <span class="sls0217-expand-meta-item">
                 <em>조회시간</em>{{ expandSearchAtText }}
@@ -1144,7 +1144,9 @@ const expandPop = useFloatPopup({
 const expandView = computed(() => EXPAND_META[expandKey.value] || null);
 
 const expandStoreText = computed(() => {
-  const s = String(excelstore.value || "").trim();
+  const s = String(excelstore.value || "")
+    .trim()
+    .replace(/^매장명\s*:\s*/u, "");
   return s || "—";
 });
 

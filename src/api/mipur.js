@@ -680,7 +680,9 @@ export const saveStockCheckMasterDetail = (
   tax,
   ordernos,
   orderseqs,
-  userid
+  userid,
+  /** 행 메모(입고) — \u200b 구분. 없으면 빈 문자열 (헤더 COMMENTS와 별개) */
+  comments2 = ""
 ) => {
   return api2.post("/MIPUR/PUR02_015INS.asmx/saveStockCheckMasterDetail", {
     GROUP_CD: groupCd,
@@ -700,7 +702,7 @@ export const saveStockCheckMasterDetail = (
     ORDERNOS: ordernos,
     ORDERSEQS: orderseqs,
     USERID: userid,
-    COMMENTS2: comments,
+    COMMENTS2: comments2,
   });
 };
 

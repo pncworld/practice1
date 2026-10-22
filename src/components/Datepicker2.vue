@@ -202,6 +202,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /**
+   * opt-in: 시작일 = 종료일 − N일 (예: 7 → 오늘−7 ~ 오늘).
+   * 0이면 미적용. 켜면 makeSevenTerm보다 우선.
+   */
+  initRangeDays: {
+    type: Number,
+    default: 0,
+  },
   disableAll: {
     type: Boolean,
     default: false,
@@ -260,7 +268,11 @@ onMounted(() => {
 
   selectedEndDate.value = formatDate(today);
 
-  if (props.makeSevenTerm == true) {
+  if (props.initRangeDays > 0) {
+    const start = new Date(today);
+    start.setDate(start.getDate() - props.initRangeDays);
+    selectedStartDate.value = formatDate(start);
+  } else if (props.makeSevenTerm == true) {
     today.setDate(today.getDate() - 6);
     selectedStartDate.value = formatDate(today);
   } else {

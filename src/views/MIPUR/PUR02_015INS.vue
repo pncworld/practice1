@@ -38,6 +38,7 @@
             filter-bar-align
             :mainName="'발주일자'"
             :initToday="1"
+            :init-range-days="7"
             :closePopUp="closePopUp"
             @excelDate="excelDate"
             @endDate="endDate"
@@ -59,14 +60,6 @@
             @update:storeCd="lngStoreCode" />
         </div>
 
-        <div class="pur015-sg-label">거래처</div>
-        <div class="pur015-cell-field pur015-bc-slot min-w-0">
-          <BusinessClient
-            compact-search-bar
-            :default-nm="'전체'"
-            @SupplierId="SupplierId" />
-        </div>
-        <div class="pur015-spacer" aria-hidden="true"></div>
         <div class="pur015-sg-label">상태</div>
         <div class="pur015-cell-field pur015-status-slot min-w-0">
           <select
@@ -80,6 +73,14 @@
               {{ i.strDName }}
             </option>
           </select>
+        </div>
+        <div class="pur015-spacer" aria-hidden="true"></div>
+        <div class="pur015-sg-label">거래처</div>
+        <div class="pur015-cell-field pur015-bc-slot min-w-0">
+          <BusinessClient
+            compact-search-bar
+            :default-nm="'전체'"
+            @SupplierId="SupplierId" />
         </div>
       </div>
     </div>
@@ -110,16 +111,18 @@
     <div
       v-if="openPopUp"
       class="pur015-popup-backdrop"
-      @click.self.prevent>
+      @mousedown.self.prevent>
       <div
         class="pur015-popup-dialog"
         role="dialog"
         aria-modal="true"
-        @click.stop
+        aria-label="매입 상세"
+        :style="detailPop.style"
+        @mousedown.stop
         @keydown.esc="openPopUp = false">
-        <div class="pur015-popup-head">
+        <div class="pur015-popup-head" @mousedown="onDetailHeadDown">
           <h2 class="pur015-popup-title">매입 상세</h2>
-          <div class="pur015-popup-actions">
+          <div class="pur015-popup-actions" @mousedown.stop>
             <button
               type="button"
               class="whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none"
@@ -149,110 +152,120 @@
           </div>
         </div>
 
-        <div
-          class="pur015-popup-fields"
-          :style="{
-            '--pur015-popup-border': pur015ControlBorder,
-            '--pur015-popup-label': pur015PopupLabelCol,
-            '--pur015-popup-gap': pur015PopupFieldGap,
-          }">
-          <div class="pur015-popup-grid">
-            <div class="pur015-popup-label">
-              <div class="pur015-popup-label-inner">매장</div>
-            </div>
-            <div class="pur015-popup-cell">
-              <input type="text" class="pur015-popup-input" disabled v-model="scond" />
-            </div>
-            <div class="pur015-popup-label">
-              <div class="pur015-popup-label-inner">전표번호</div>
-            </div>
-            <div class="pur015-popup-cell">
-              <input type="text" class="pur015-popup-input" disabled v-model="scond2" />
-            </div>
+        <div class="pur015-popup-body">
+          <div
+            class="pur015-popup-fields"
+            :style="{
+              '--pur015-popup-border': pur015ControlBorder,
+              '--pur015-popup-label': pur015PopupLabelCol,
+              '--pur015-popup-gap': pur015PopupFieldGap,
+            }">
+            <div class="pur015-popup-grid">
+              <div class="pur015-popup-label">
+                <div class="pur015-popup-label-inner">매장</div>
+              </div>
+              <div class="pur015-popup-cell">
+                <input type="text" class="pur015-popup-input" disabled v-model="scond" />
+              </div>
+              <div class="pur015-popup-label">
+                <div class="pur015-popup-label-inner">전표번호</div>
+              </div>
+              <div class="pur015-popup-cell">
+                <input type="text" class="pur015-popup-input" disabled v-model="scond2" />
+              </div>
 
-            <div class="pur015-popup-label">
-              <div class="pur015-popup-label-inner">배송(입고)일</div>
-            </div>
-            <div class="pur015-popup-cell">
-              <input type="text" class="pur015-popup-input" disabled v-model="scond3" />
-            </div>
-            <div class="pur015-popup-label">
-              <div class="pur015-popup-label-inner">거래처</div>
-            </div>
-            <div class="pur015-popup-cell">
-              <input type="text" class="pur015-popup-input" disabled v-model="scond4" />
-            </div>
+              <div class="pur015-popup-label">
+                <div class="pur015-popup-label-inner">배송(입고)일</div>
+              </div>
+              <div class="pur015-popup-cell">
+                <input type="text" class="pur015-popup-input" disabled v-model="scond3" />
+              </div>
+              <div class="pur015-popup-label">
+                <div class="pur015-popup-label-inner">거래처</div>
+              </div>
+              <div class="pur015-popup-cell">
+                <input type="text" class="pur015-popup-input" disabled v-model="scond4" />
+              </div>
 
-            <div class="pur015-popup-label">
-              <div class="pur015-popup-label-inner">코멘트(발주)</div>
-            </div>
-            <div class="pur015-popup-cell">
-              <input type="text" class="pur015-popup-input" disabled v-model="scond5" />
-            </div>
-            <div class="pur015-popup-label">
-              <div class="pur015-popup-label-inner">코멘트(출고)</div>
-            </div>
-            <div class="pur015-popup-cell">
-              <input type="text" class="pur015-popup-input" disabled v-model="scond6" />
-            </div>
+              <div class="pur015-popup-label">
+                <div class="pur015-popup-label-inner">코멘트(발주)</div>
+              </div>
+              <div class="pur015-popup-cell">
+                <input type="text" class="pur015-popup-input" disabled v-model="scond5" />
+              </div>
+              <div class="pur015-popup-label">
+                <div class="pur015-popup-label-inner">코멘트(출고)</div>
+              </div>
+              <div class="pur015-popup-cell">
+                <input type="text" class="pur015-popup-input" disabled v-model="scond6" />
+              </div>
 
-            <div class="pur015-popup-label">
-              <div class="pur015-popup-label-inner">입고확정일</div>
-            </div>
-            <div class="pur015-popup-cell">
-              <input
-                type="date"
-                class="pur015-popup-input"
-                :class="{ 'pur015-popup-input--editable': !disabled1 }"
-                :disabled="disabled1"
-                v-model="scond7" />
-            </div>
-            <div class="pur015-popup-label">
-              <div class="pur015-popup-label-inner">검수자</div>
-            </div>
-            <div class="pur015-popup-cell">
-              <input
-                type="text"
-                class="pur015-popup-input"
-                :class="{ 'pur015-popup-input--editable': !disabled1 }"
-                :disabled="disabled1"
-                v-model="scond8" />
-            </div>
+              <div class="pur015-popup-label">
+                <div class="pur015-popup-label-inner">입고확정일</div>
+              </div>
+              <div class="pur015-popup-cell">
+                <input
+                  type="date"
+                  class="pur015-popup-input"
+                  :class="{ 'pur015-popup-input--editable': !disabled1 }"
+                  :disabled="disabled1"
+                  v-model="scond7" />
+              </div>
+              <div class="pur015-popup-label">
+                <div class="pur015-popup-label-inner">검수자</div>
+              </div>
+              <div class="pur015-popup-cell">
+                <input
+                  type="text"
+                  class="pur015-popup-input"
+                  :class="{ 'pur015-popup-input--editable': !disabled1 }"
+                  :disabled="disabled1"
+                  v-model="scond8" />
+              </div>
 
-            <div class="pur015-popup-label">
-              <div class="pur015-popup-label-inner">코멘트입고</div>
+              <div class="pur015-popup-label">
+                <div class="pur015-popup-label-inner">코멘트입고</div>
+              </div>
+              <div class="pur015-popup-cell pur015-popup-cell--span">
+                <input
+                  type="text"
+                  class="pur015-popup-input"
+                  :class="{ 'pur015-popup-input--editable': !disabled1 }"
+                  :disabled="disabled1"
+                  v-model="scond9" />
+              </div>
             </div>
-            <div class="pur015-popup-cell pur015-popup-cell--span">
-              <input
-                type="text"
-                class="pur015-popup-input"
-                :class="{ 'pur015-popup-input--editable': !disabled1 }"
-                :disabled="disabled1"
-                v-model="scond9" />
-            </div>
+          </div>
+
+          <div class="pur015-popup-grid-wrap">
+            <Realgrid
+              class="pur015-popup-grid-body min-h-0 h-full w-full"
+              :progname="'PUR02_015INS_VUE'"
+              :progid="2"
+              :documentTitle="'PUR02_015INS'"
+              :exporttoExcel="exportExcel2"
+              @realgridname="onPopupGridName"
+              @gridReady="onPopupGridName"
+              @updatedRowData="updatedRowData2"
+              :rowStateeditable="false"
+              :suppressEdit="disabled1"
+              :inputOnlyNumberColumn="'dblCheckQty'"
+              :CalculateTaxColId="'curTax'"
+              :editableColId="disabled1 ? '' : 'dblCheckQty,strCheckComments'"
+              :AutoCalculateDataMainColId="['curSupply', 'curTotal']"
+              :AutoCalculateDataSubColId="[
+                `values['dblCheckQty'] * values['curUnitPrice']`,
+                `values['curSupply'] + values['curTax']`,
+              ]"
+              :documentSubTitle="documentSubTitle2"
+              :rowData="rowData2" />
           </div>
         </div>
 
-        <div class="pur015-popup-grid-wrap">
-          <Realgrid
-            class="pur015-popup-grid-body min-h-0 h-full w-full"
-            :progname="'PUR02_015INS_VUE'"
-            :progid="2"
-            :documentTitle="'PUR02_015INS'"
-            :exporttoExcel="exportExcel2"
-            @updatedRowData="updatedRowData2"
-            :rowStateeditable="false"
-            :inputOnlyNumberColumn="'dblCheckQty'"
-            :CalculateTaxColId="'curTax'"
-            :editableColId="'dblCheckQty'"
-            :AutoCalculateDataMainColId="['curSupply', 'curTotal']"
-            :AutoCalculateDataSubColId="[
-              `values['dblCheckQty'] * values['curUnitPrice']`,
-              `values['curSupply'] + values['curTax']`,
-            ]"
-            :documentSubTitle="documentSubTitle2"
-            :rowData="rowData2" />
-        </div>
+        <div
+          class="pur015-popup-resize"
+          title="크기 조절"
+          @mousedown.stop="onDetailResizeDown"></div>
       </div>
     </div>
   </Teleport>
@@ -272,16 +285,49 @@ import Datepicker2 from "@/components/Datepicker2.vue";
 import PageName from "@/components/pageName.vue";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
+import { rgGetInstance } from "@/components/realgridInstanceRegistry.js";
 import { insertPageLog } from "@/customFunc/customFunc";
+import { useFloatPopup } from "@/utils/floatPopup";
 import Swal from "sweetalert2";
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
+
+const detailPop = useFloatPopup({
+  width: 1580,
+  height: 720,
+  minWidth: 720,
+  minHeight: 420,
+  maxWidthRatio: 0.98,
+  maxHeightRatio: 0.9,
+});
+
+const onDetailHeadDown = (event) => {
+  detailPop.startDrag(event);
+};
+
+const refreshPopupGridSize = () => {
+  try {
+    rgGetInstance(popupGridName.value)?.gridView?.resetSize?.();
+  } catch (_) {}
+  try {
+    window.dispatchEvent(new Event("resize"));
+  } catch (_) {}
+};
+
+const onDetailResizeDown = (event) => {
+  detailPop.startResize(event);
+  const onUp = () => {
+    window.removeEventListener("mouseup", onUp);
+    nextTick(() => refreshPopupGridSize());
+  };
+  window.addEventListener("mouseup", onUp);
+};
 
 const pur015ControlBorder = "#cbd5e1";
 const pur015ItemGap = "2rem";
 const pur015ColGap = "1.75rem";
 const pur015RowGap = "0.75rem";
-const pur015PanelPadX = "7rem";
+const pur015PanelPadX = "10.5rem"; /* 7rem × 1.5 — 조회 AREA 앞·뒤만 이 화면 */
 const pur015DateFieldW = "21.6rem";
 const pur015RowMinH = "2rem";
 const pur015ControlH = "2rem";
@@ -437,6 +483,16 @@ const excelList = (e) => {
 
 const openPopUp = ref(false);
 
+watch(openPopUp, (open) => {
+  if (open) {
+    detailPop.place();
+    nextTick(() => {
+      applyPopupQtyColStyle();
+      refreshPopupGridSize();
+    });
+  }
+});
+
 const rowData2 = ref([]);
 const forPopupOrderStoreCd = ref("");
 const forPopupOrderNo = ref("");
@@ -449,22 +505,86 @@ const scond5 = ref("");
 const scond6 = ref("");
 const scond8 = ref("");
 const scond9 = ref("");
+
+/** YYYYMMDD(또는 하이픈 포함) → 숫자 8자리 */
+const toYmdDigits = (v) => {
+  if (v == null || v === "") return "";
+  return String(v).trim().replace(/-/g, "");
+};
+
+/** 화면 date input용 YYYY-MM-DD */
+const formatYmdDigitsToIsoDate = (v) => {
+  const raw = toYmdDigits(v);
+  if (raw.length === 8 && /^\d{8}$/.test(raw)) {
+    return `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
+  }
+  return v == null ? "" : String(v);
+};
+
+/** 더블클릭 payload(배열형 getRows) + 조회 rowData 병합 */
+const resolvePopupMasterRow = (e) => {
+  if (!e || typeof e !== "object") return e;
+  const orderNo = e.strOrderNo ?? e[2];
+  const storeCd = e.lngStoreCode ?? e[14];
+  const groupCd = e.lngStoreGroup ?? e[13];
+  const hit = (rowData.value || []).find((r) => {
+    if (!r || typeof r !== "object") return false;
+    if (String(r.strOrderNo ?? "") !== String(orderNo ?? "")) return false;
+    if (
+      storeCd != null &&
+      r.lngStoreCode != null &&
+      String(r.lngStoreCode) !== String(storeCd)
+    ) {
+      return false;
+    }
+    if (
+      groupCd != null &&
+      r.lngStoreGroup != null &&
+      String(r.lngStoreGroup) !== String(groupCd)
+    ) {
+      return false;
+    }
+    return true;
+  });
+  return hit ? { ...e, ...hit } : e;
+};
+
+/**
+ * 미입고면 확정·입고확정일·수량 편집 가능 (부분입고 포함).
+ * strStatus가 '01'뿐 아니라 '미입고' 표시명인 경우·조회조건 미입고도 허용.
+ */
+const isMiipgoEditable = (statusRaw) => {
+  const s = String(statusRaw ?? "").trim();
+  if (s === "01" || s === "1" || s.includes("미입고")) return true;
+  if (s === "02" || s === "2" || s.includes("입고완료")) return false;
+  // 행에 상태 코드가 없으면 상단 조회 콤보 기준
+  return String(cond.value) === "01";
+};
+
 const dblclickedRowData = async (e) => {
   //console.log(e);
+  const row = resolvePopupMasterRow(e);
+  const status = row?.strStatus != null ? String(row.strStatus) : "";
+  const checkDateRaw =
+    row?.dtmCheckDate != null && String(row.dtmCheckDate).trim() !== ""
+      ? row.dtmCheckDate
+      : e?.[6];
+  const orderDateRaw =
+    row?.dtmOrderDate != null && String(row.dtmOrderDate).trim() !== ""
+      ? row.dtmOrderDate
+      : row?.dtmExpectedDate != null && String(row.dtmExpectedDate).trim() !== ""
+        ? row.dtmExpectedDate
+        : e?.[5];
 
-  if (e[6] == "" || e[6] == undefined) {
-    disabled1.value = false;
-    scond7.value =
-      e[5].slice(0, 4) + "-" + e[5].slice(4, 6) + "-" + e[5].slice(6, 8);
-  } else {
-    disabled1.value = true;
-    scond7.value =
-      e[6].slice(0, 4) + "-" + e[6].slice(4, 6) + "-" + e[6].slice(6, 8);
-  }
+  const canEdit = isMiipgoEditable(status);
+  disabled1.value = !canEdit;
+  scond7.value = toYmdDigits(checkDateRaw)
+    ? formatYmdDigitsToIsoDate(checkDateRaw)
+    : formatYmdDigitsToIsoDate(orderDateRaw);
+
   scond.value = e[0];
   scond2.value = e[2];
-  scond3.value =
-    e[5].slice(0, 4) + "-" + e[5].slice(4, 6) + "-" + e[5].slice(6, 8);
+  scond3.value = formatYmdDigitsToIsoDate(orderDateRaw);
   scond4.value = e[1];
   scond5.value = e[15];
   openPopUp.value = true;
@@ -490,8 +610,42 @@ const dblclickedRowData = async (e) => {
     //console.log(res);
     rowData2.value = res.data.List;
     updatedrowdata2.value = res.data.List;
-  } catch (error) {}
+  } catch (error) {
+  } finally {
+    await nextTick();
+    applyPopupQtyColStyle();
+  }
 };
+
+const popupGridName = ref("");
+
+/** 미입고일 때만 입고수량 바디 파스텔 / 입고완료면 제거 */
+const applyPopupQtyColStyle = () => {
+  const gv = rgGetInstance(popupGridName.value)?.gridView;
+  if (!gv?.setColumnProperty) {
+    return;
+  }
+  try {
+    const prev = String(gv.getColumnProperty("dblCheckQty", "styleName") || "");
+    const base = prev
+      .split(/\s+/)
+      .filter((c) => c && !c.startsWith("pur015-col-"))
+      .join(" ");
+    const next = disabled1.value
+      ? base
+      : `${base} pur015-col-qty`.trim();
+    gv.setColumnProperty("dblCheckQty", "styleName", next);
+  } catch (_) {}
+};
+
+const onPopupGridName = (name) => {
+  popupGridName.value = name || "";
+  nextTick(() => applyPopupQtyColStyle());
+};
+
+watch(disabled1, () => {
+  nextTick(() => applyPopupQtyColStyle());
+});
 
 const checkedrowdata = ref([]);
 
@@ -552,26 +706,29 @@ const saveButton = async () => {
   } catch (error) {}
 
   try {
-    const stockids = updatedrowdata2.value
-      .map((item) => item.lngStockID)
-      .join("\u200b");
-    const checkqtys = updatedrowdata2.value
-      .map((item) => item.dblCheckQty)
-      .join("\u200b");
-    const unitprices = updatedrowdata2.value
-      .map((item) => item.curUnitPrice)
-      .join("\u200b");
-    const supplys = updatedrowdata2.value
-      .map((item) => item.curSupply)
-      .join("\u200b");
-    const taxs = updatedrowdata2.value
-      .map((item) => item.curTax)
-      .join("\u200b");
-    const ordernos = updatedrowdata2.value
-      .map((item) => item.strOrderNo)
-      .join("\u200b");
-    const orderseqs = updatedrowdata2.value
-      .map((item) => item.lngOrderSeq)
+    try {
+      rgGetInstance(popupGridName.value)?.gridView?.commit?.();
+    } catch (_) {}
+    try {
+      const rows = rgGetInstance(popupGridName.value)?.dataProvider?.getJsonRows?.();
+      if (Array.isArray(rows)) {
+        updatedrowdata2.value = rows;
+      }
+    } catch (_) {}
+
+    const saveRows = Array.isArray(updatedrowdata2.value)
+      ? updatedrowdata2.value
+      : [];
+    const stockids = saveRows.map((item) => item.lngStockID).join("\u200b");
+    const checkqtys = saveRows.map((item) => item.dblCheckQty).join("\u200b");
+    const unitprices = saveRows.map((item) => item.curUnitPrice).join("\u200b");
+    const supplys = saveRows.map((item) => item.curSupply).join("\u200b");
+    const taxs = saveRows.map((item) => item.curTax).join("\u200b");
+    const ordernos = saveRows.map((item) => item.strOrderNo).join("\u200b");
+    const orderseqs = saveRows.map((item) => item.lngOrderSeq).join("\u200b");
+    // 행 메모(입고) — PUR02_017 COMMENTS2와 동일 (\u200b 구분)
+    const lineComments = saveRows
+      .map((item) => item.strCheckComments ?? "")
       .join("\u200b");
     const res = await saveStockCheckMasterDetail(
       tempGroup.value,
@@ -591,7 +748,8 @@ const saveButton = async () => {
       taxs,
       ordernos,
       orderseqs,
-      store.state.userData.lngSequence
+      store.state.userData.lngSequence,
+      lineComments
     );
 
     if (res.data.RESULT_CD == "00") {
@@ -753,12 +911,26 @@ const cancelButton = async () => {
   justify-self: start;
 }
 
-.pur015-pick-slot,
+.pur015-pick-slot {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  justify-self: stretch;
+}
+
+/* 발주일자 첫 날짜칸(시작일)과 동일 폭: 기간칸 − 달력버튼 − ~·gap 후 반분 */
 .pur015-status-slot {
   width: 100%;
   max-width: 100%;
   min-width: 0;
   justify-self: stretch;
+}
+
+.pur015-status-slot .pur015-sg-select {
+  /* 1.65rem=기간버튼, 0.75rem≈~ 및 내부 gap */
+  width: calc((var(--pur015-date-field-w) - 1.65rem - 0.75rem) / 2);
+  max-width: 100%;
+  flex: 0 0 auto;
 }
 
 .pur015-sg-select {
@@ -960,28 +1132,21 @@ const cancelButton = async () => {
   min-height: 12rem;
 }
 
-/* 팝업: body Teleport + Swal(13050) 아래, 조회 AREA(z-10) 위 — 배경 클릭 차단 */
+/* 팝업: body Teleport + Swal(13050) 아래 — 이동·리사이즈(floatPopup) */
 .pur015-popup-backdrop {
   position: fixed;
   inset: 0;
   z-index: 11000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: rgb(0 0 0 / 0.5);
   pointer-events: auto;
 }
 
 .pur015-popup-dialog {
-  position: relative;
   z-index: 1;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  width: min(75vw, 72rem);
-  height: min(80vh, 52rem);
-  max-height: 90vh;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.25rem 1.25rem;
   border-radius: 1rem;
   background: #fff;
   box-shadow: 0 20px 40px rgb(0 0 0 / 0.2);
@@ -996,6 +1161,17 @@ const cancelButton = async () => {
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 0.75rem;
+  cursor: move;
+  user-select: none;
+}
+
+.pur015-popup-body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  flex-direction: column;
+  overflow: auto;
 }
 
 .pur015-popup-title {
@@ -1011,6 +1187,7 @@ const cancelButton = async () => {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
+  cursor: default;
 }
 
 .pur015-popup-fields {
@@ -1093,14 +1270,45 @@ const cancelButton = async () => {
 
 .pur015-popup-grid-wrap {
   display: flex;
-  min-height: 0;
-  min-width: 0;
   flex: 1 1 auto;
+  min-height: 12rem;
+  min-width: 0;
   flex-direction: column;
   overflow: hidden;
 }
 
 .pur015-popup-grid-body {
   min-height: 12rem;
+}
+
+.pur015-popup-grid-wrap :deep(.rg-root),
+.pur015-popup-grid-wrap :deep(.rg-container),
+.pur015-popup-grid-wrap :deep(.realgrid) {
+  height: 100% !important;
+}
+
+.pur015-popup-resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  background: linear-gradient(
+    135deg,
+    transparent 50%,
+    #94a3b8 50%,
+    #94a3b8 62%,
+    transparent 62%,
+    transparent 74%,
+    #94a3b8 74%
+  );
+}
+</style>
+
+<style>
+/* 매입확정 팝업 — 미입고일 때 입고수량 바디만 파스텔 (헤더 유지) */
+.pur015-col-qty {
+  background: #fef9c3 !important;
 }
 </style>
