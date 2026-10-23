@@ -577,6 +577,14 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  /**
+   * 체크바(좌측) 행별 체크 가능 조건 — RealGrid checkableExpression.
+   * 예: values['lngVoid'] = '0'  (빈 문자열=미적용, 기존 화면 영향 없음)
+   */
+  checkBarCheckableExpression: {
+    type: String,
+    default: "",
+  },
   ExceptionCheck: {
     // 인위적으로 체크되는 것에서 제외할 인덱스 값들
     type: String,
@@ -1286,6 +1294,14 @@ const props = defineProps({
   cellFontColorByValue: {
     type: Array,
     default: () => [],
+  },
+  /**
+   * mstGridInfo strMask `####-##-##` 를 숫자 마스크로 보지 않고 문자로 표시.
+   * 기본 false — 기존 화면은 그대로. 켠 화면만 yyyy-MM-dd 로 보인다.
+   */
+  hyphenDateMaskAsText: {
+    type: Boolean,
+    default: false,
   },
   checkOnlyFalse: {
     // 체크박스 해제만 되는 설정
@@ -2586,7 +2602,13 @@ const runFuncshowGrid = async () => {
   const unsignedDecimalColumnIds = parseDecimalColumnIds(
     props.inputUnsignedDecimalColumn
   );
-  const colIdInDecimalList = (colId, list) => list.includes(colId);
+  const colIdInDecimalList = (colId, list) => {
+    const key = String(colId ?? "")
+      .trim()
+      .toLowerCase();
+    if (!key) return false;
+    return list.some((id) => String(id).trim().toLowerCase() === key);
+  };
   const isSignedDecimalColumn = (colId) =>
     colIdInDecimalList(colId, signedDecimalColumnIds);
   const isUnsignedDecimalColumn = (colId) =>
@@ -2599,13 +2621,131 @@ const runFuncshowGrid = async () => {
     .filter(Boolean);
   const isTimeDateColumn = (colId) => timeDateColumnIds.includes(colId);
   const SIGNED_DECIMAL_MAX_PLACES = 2;
-  const signedDecimalNumberFormat = "#,##0.##";
+  /**
+   * NumberCellEditor는 일부 환경에서 '-' keypress를 막음 → line + text 필드.
+   * inputCharacters 미사용: RealGrid [^…] 문자클래스에서 '-' 범위 오인 방지. 커밋 시 sanitize.
+   */
+  const signedDecimalNumberFormat = "#,##0.##;-#,##0.##";
+  const unsignedDecimalNumberFormat = "#,##0.##";
+  const sanitizeSignedDecimalText = (raw) => {
+    let s = String(raw ?? "").replace(/,/g, "").trim();
+    if (s === "" || s === "-") return s;
+    const neg = s.startsWith("-");
+    s = (neg ? s.slice(1) : s).replace(/[^\d.]/g, "");
+    const dot = s.indexOf(".");
+    if (dot >= 0) {
+      s =
+        s.slice(0, dot + 1) +
+        s
+          .slice(dot + 1)
+          .replace(/\./g, "")
+          .slice(0, SIGNED_DECIMAL_MAX_PLACES);
+    }
+    if (s === "" || s === ".") return neg ? "-" : "";
+    return neg ? `-${s}` : s;
+  };
+  const signedDecimalEditorSpec = () => ({
+    type: "line",
+    domainOnly: false,
+    textReadOnly: false,
+  });
+  const rgFindSignedDecimalColumn = (colId) => {
+    const key = String(colId ?? "")
+      .trim()
+      .toLowerCase();
+    if (!key || !gridView) return null;
+    try {
+      const byField = gridView.columnByField?.(colId);
+      if (byField) return byField;
+    } catch (_) {
+      /* ignore */
+    }
+    try {
+      const cols = gridView.getColumns?.() ?? [];
+      return (
+        cols.find((c) => {
+          const n = String(c?.fieldName ?? c?.name ?? "")
+            .trim()
+            .toLowerCase();
+          return n === key;
+        }) || null
+      );
+    } catch (_) {
+      return null;
+    }
+  };
+  const rgApplySignedDecimalEditors = () => {
+    for (const colId of signedDecimalColumnIds) {
+      try {
+        const col = rgFindSignedDecimalColumn(colId);
+        const name = col?.name || col?.fieldName || colId;
+        gridView.setColumnProperty(name, "editor", signedDecimalEditorSpec());
+        gridView.setColumnProperty(name, "numberFormat", undefined);
+      } catch (_) {
+        /* ignore */
+      }
+    }
+  };
+  const rgBindSignedDecimalOnShowEditor = () => {
+    if (signedDecimalColumnIds.length === 0) return;
+    const prev = gridView.onShowEditor;
+    gridView.onShowEditor = function (grid, index, editProps, attrs) {
+      let ret = true;
+      if (typeof prev === "function") {
+        ret = prev(grid, index, editProps, attrs);
+      }
+      const field = index?.fieldName || index?.column;
+      /* 다른 onShowEditor 이후에도 line 강제 — number 에디터 재적용 방지 */
+      if (field && isSignedDecimalColumn(field) && editProps) {
+        Object.keys(editProps).forEach((k) => {
+          if (
+            k === "type" ||
+            k === "inputCharacters" ||
+            k === "ignoreCharacters" ||
+            k === "positiveOnly" ||
+            k === "editFormat" ||
+            k === "domainOnly" ||
+            k === "textReadOnly"
+          ) {
+            delete editProps[k];
+          }
+        });
+        Object.assign(editProps, signedDecimalEditorSpec());
+        try {
+          delete editProps.inputCharacters;
+          delete editProps.positiveOnly;
+          delete editProps.editFormat;
+        } catch (_) {
+          /* ignore */
+        }
+      }
+      return ret !== false;
+    };
+  };
+  /** `####-##-##` 처럼 # 사이에만 '-' 가 있는 날짜 마스크 */
+  const isHyphenDateMask = (mask) =>
+    /^[#0]+(?:-[#0]+)+$/.test(String(mask ?? "").trim());
+  const formatHyphenDateMaskValue = (value) => {
+    if (value == null || value === "") return "";
+    const s = String(value).trim();
+    if (/^\d{8}$/.test(s)) {
+      return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
+    }
+    if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+    return s;
+  };
   const isGridNumberMask = (mask) => {
     const m = String(mask ?? "").trim();
+    if (props.hyphenDateMaskAsText === true && isHyphenDateMask(m)) return false;
     return m !== "" && m !== "@@@@-@@-@@" && /[#0,]/.test(m);
   };
   const resolveGridNumberFormat = (item) => {
-    if (isDecimalInputColumn(item.strColID)) return signedDecimalNumberFormat;
+    if (isUnsignedDecimalColumn(item.strColID)) {
+      return unsignedDecimalNumberFormat;
+    }
+    if (isSignedDecimalColumn(item.strColID)) {
+      return signedDecimalNumberFormat;
+    }
     if (props.suffixColumnwon == "lngPrice" && item.strColID == "lngPrice") {
       return "#,##0";
     }
@@ -2709,7 +2849,10 @@ const runFuncshowGrid = async () => {
           (item.strColID.includes("lngSupplierID") &&
             props.checkBarInactive == "lngSupplierID")
         ? "boolean"
-        : isDecimalInputColumn(item.strColID) ||
+        : /* 음수 허용: text — number 필드는 입력 중 '-' 단독을 거절하는 경우 있음 */
+        isSignedDecimalColumn(item.strColID)
+        ? "text"
+        : isUnsignedDecimalColumn(item.strColID) ||
           item.strColType == "number" ||
           item.strDisplay == "number" ||
           isGridNumberMask(item.strMask) ||
@@ -3291,7 +3434,29 @@ const runFuncshowGrid = async () => {
           const dataRowCount = dataProvider.getRowCount();
           return dataRowCount;
         }
-        
+
+        // 음수 허용(text) 컬럼 — provider sum 불가 → 직접 합산
+        if (isSignedDecimalColumn(item.strColID)) {
+          const fi = props.setFooterColID.indexOf(item.strColID);
+          const expr = fi >= 0 ? props.setFooterExpressions[fi] : "";
+          if (expr === "sum") {
+            let sum = 0;
+            const rc = dataProvider.getRowCount();
+            for (let r = 0; r < rc; r++) {
+              try {
+                const st = dataProvider.getRowState(r);
+                if (st === "deleted" || st === "createAndDeleted") continue;
+              } catch (_) {
+                /* ignore */
+              }
+              const raw = dataProvider.getValue(r, item.strColID);
+              const n = Number(String(raw ?? "").replace(/,/g, ""));
+              if (!Number.isNaN(n)) sum += n;
+            }
+            return formatSignedDecimalFooterValue(grid, item.strColID, sum);
+          }
+        }
+
         // "시:분" 문자열 평균 계산
         if (
           props.setFooterExpressions[
@@ -3549,21 +3714,47 @@ const runFuncshowGrid = async () => {
       : item.strMask, // sql 에서 mstgridinfo 에서 date  일때 기본값이 있고 정의할 수 있음
     // YYYYMMDD 형식 값을 yyyy-MM-dd로 표시 (실제 데이터는 변경하지 않음)
     // mstGridInfo strMask='@@@@-@@-@@' 컬럼만 적용
-    ...(String(item.strMask || "").trim() === "@@@@-@@-@@" && {
-      displayCallback: function (grid, index, value) {
-        if (
-          value != null &&
-          String(value).length === 8 &&
-          /^\d{8}$/.test(String(value))
-        ) {
-          const s = String(value);
-          return s.substr(0, 4) + "-" + s.substr(4, 2) + "-" + s.substr(6, 2);
+    ...(String(item.strMask || "").trim() === "@@@@-@@-@@"
+      ? {
+          displayCallback: function (grid, index, value) {
+            if (
+              value != null &&
+              String(value).length === 8 &&
+              /^\d{8}$/.test(String(value))
+            ) {
+              const s = String(value);
+              return (
+                s.substr(0, 4) + "-" + s.substr(4, 2) + "-" + s.substr(6, 2)
+              );
+            }
+            return value;
+          },
         }
-        return value;
-      },
-    }),
+      : props.hyphenDateMaskAsText === true && isHyphenDateMask(item.strMask)
+      ? {
+          displayCallback: function (grid, index, value) {
+            return formatHyphenDateMaskValue(value);
+          },
+        }
+      : isSignedDecimalColumn(item.strColID)
+      ? {
+          displayCallback: function (grid, index, value) {
+            if (value === null || value === undefined || value === "") {
+              return "";
+            }
+            const n = Number(String(value).replace(/,/g, ""));
+            if (Number.isNaN(n)) return value;
+            return formatSignedDecimalSum(
+              n,
+              countMeaningfulDecimalPlaces(n, SIGNED_DECIMAL_MAX_PLACES)
+            );
+          },
+        }
+      : {}),
     width: rgScaledColumnWidth(item.strColID, item.intHdWidth),
-    numberFormat: resolveGridNumberFormat(item),
+    numberFormat: isSignedDecimalColumn(item.strColID)
+      ? undefined
+      : resolveGridNumberFormat(item),
     styleName:
       (props.dynamicRowHeight2 == true && item.strAlign == "left"
         ? "setTextAlignLeft"
@@ -3636,10 +3827,15 @@ const runFuncshowGrid = async () => {
         ? "dropdown"
         : item.strDisplay.includes("date")
         ? "date"
-        : isDecimalInputColumn(item.strColID)
+        : isUnsignedDecimalColumn(item.strColID)
         ? "number"
+        : isSignedDecimalColumn(item.strColID)
+        ? "line"
         : "line",
-      domainOnly: true,
+      domainOnly: !(
+        isSignedDecimalColumn(item.strColID) ||
+        isUnsignedDecimalColumn(item.strColID)
+      ),
       textReadOnly: false,
       dropDownWhenClick: true,
       datetimeFormat: "yyyy-MM-dd",
@@ -3668,25 +3864,23 @@ const runFuncshowGrid = async () => {
             }
           : null,
       commitOnSelect: true,
-      ...(isDecimalInputColumn(item.strColID)
+      ...(isUnsignedDecimalColumn(item.strColID)
         ? {
-            editFormat: signedDecimalNumberFormat,
-            ...(isUnsignedDecimalColumn(item.strColID)
-              ? { positiveOnly: true }
-              : {}),
+            editFormat: unsignedDecimalNumberFormat,
+            positiveOnly: true,
+            inputCharacters: "0123456789.",
           }
-        : {}),
-      inputCharacters: isUnsignedDecimalColumn(item.strColID)
-        ? "0123456789."
         : isSignedDecimalColumn(item.strColID)
-        ? "0123456789.-"
-        : props.inputOnlyNumberColumn
-            .split(",")
-            .includes(item.strColID)
-        ? "0123456789"
-        : item.strColID == props.inputOnlyNumberColumn2
-        ? "0123456789."
-        : "",
+        ? {}
+        : {
+            inputCharacters: props.inputOnlyNumberColumn
+              .split(",")
+              .includes(item.strColID)
+              ? "0123456789"
+              : item.strColID == props.inputOnlyNumberColumn2
+              ? "0123456789."
+              : "",
+          }),
     },
     visible: item.intHdWidth !== 0,
     sortable: !(
@@ -4252,6 +4446,8 @@ const runFuncshowGrid = async () => {
   }
 
   gridView.setColumns(columns);
+
+  rgApplySignedDecimalEditors();
   const freezeHeader = String(props.freezeUntilHeader || "").replace(/\s/g, "");
   if (freezeHeader) {
     let fixedCount = 0;
@@ -4389,6 +4585,7 @@ const runFuncshowGrid = async () => {
   }
   rgReapplyLabelingDropdownEditors(gridView);
   rgBindLabelingDropdownOnShowEditor(gridView);
+  rgBindSignedDecimalOnShowEditor();
   if (props.setNumberformatColumn != "") {
     const fmtIds = String(props.setNumberformatColumn)
       .split(",")
@@ -4638,6 +4835,7 @@ const runFuncshowGrid = async () => {
     }
 
     gridView.setColumnLayout(layout1);
+    rgApplySignedDecimalEditors();
   }
 
   function getInnerMostIndex(colID, subList3) {
@@ -4716,6 +4914,7 @@ const runFuncshowGrid = async () => {
     });
 
     gridView.setColumnLayout(layout);
+    rgApplySignedDecimalEditors();
   }
 
   if (props.mergeColumns3 == true) {
@@ -4850,7 +5049,9 @@ const runFuncshowGrid = async () => {
 
     console.log(layout);
     gridView.setColumnLayout(layout);
+    rgApplySignedDecimalEditors();
   }
+  rgApplySignedDecimalEditors();
   /* 3단 예시
   [
       {
@@ -5001,6 +5202,15 @@ const runFuncshowGrid = async () => {
     visible: props.showCheckBar,
     exclusive: props.excludeCheck,
   });
+  // opt-in: 조건 불만족 행은 체크바 선택 불가 (기본 "" = 기존과 동일)
+  try {
+    const chkExpr = String(props.checkBarCheckableExpression ?? "").trim();
+    if (chkExpr) {
+      gridView.setCheckableExpression(chkExpr, true);
+    }
+  } catch (_) {
+    void 0;
+  }
   //gridView.displayOptions.fitStyle = "even";
   gridView.sortingOptions.enabled = true;
   gridView.sortingOptions.commitBeforeSorting = true;
@@ -5479,17 +5689,34 @@ const runFuncshowGrid = async () => {
       newVal !== undefined &&
       newVal !== ""
     ) {
-      let rounded = roundSignedDecimal(newVal);
-      if (
-        isUnsignedDecimalColumn(editedFieldName) &&
-        !Number.isNaN(Number(newVal)) &&
-        Number(newVal) < 0
-      ) {
-        rounded = 0;
-      }
-      if (!Number.isNaN(Number(newVal))) {
-        dataProvider.setValue(row, editedFieldName, rounded);
-        newVal = rounded;
+      if (isSignedDecimalColumn(editedFieldName)) {
+        const cleaned = sanitizeSignedDecimalText(newVal);
+        if (cleaned === "" || cleaned === "-") {
+          dataProvider.setValue(row, editedFieldName, "0");
+          newVal = "0";
+        } else {
+          const parsed = Number(cleaned);
+          if (!Number.isNaN(parsed)) {
+            const rounded = roundSignedDecimal(parsed);
+            const storeVal = String(rounded);
+            dataProvider.setValue(row, editedFieldName, storeVal);
+            newVal = storeVal;
+          }
+        }
+      } else {
+        const parsed = Number(String(newVal).replace(/,/g, "").trim());
+        let rounded = roundSignedDecimal(parsed);
+        if (
+          isUnsignedDecimalColumn(editedFieldName) &&
+          !Number.isNaN(parsed) &&
+          parsed < 0
+        ) {
+          rounded = 0;
+        }
+        if (!Number.isNaN(parsed)) {
+          dataProvider.setValue(row, editedFieldName, rounded);
+          newVal = rounded;
+        }
       }
     }
 

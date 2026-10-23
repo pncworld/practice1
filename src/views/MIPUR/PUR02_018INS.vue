@@ -312,7 +312,7 @@
               :value="String(scond7)"
               :disabled="!currentEdit"
               @change="onPopupToolbarScond7Change">
-              <option value="1">최근등록</option>
+              <option value="4">최근등록</option>
               <option value="2">즐겨찾기</option>
             </select>
           </div>
@@ -1023,9 +1023,13 @@ const mapBottomFromFavoriteApi = (list, prevRows) => {
     })
     .map((item) => {
       const prev = prevBySid[getStockId(item)];
+      const prevQty = prev?.dblCheckQty;
+      const hasPrevQty =
+        prevQty !== undefined && prevQty !== null && prevQty !== "";
       return {
         ...item,
-        dblCheckQty: prev?.dblCheckQty ?? item.dblOrderQty,
+        /** 하단 매입수량 디폴트 0 (이전 입력값만 유지, API dblOrderQty 미사용) */
+        dblCheckQty: hasPrevQty ? prevQty : 0,
         lngCheck: prev?.lngCheck ?? item.lngCheck ?? item.LngCheck ?? "0",
         checkbox: prev?.checkbox ?? item.checkbox ?? false,
         ...(prev && isStockPickerPopupAddedRow(prev)
@@ -1527,7 +1531,7 @@ const searchButton3 = async (e) => {
       store.state.userData.lngStoreGroup,
       storeCd2.value,
       scond4.value,
-      e.target.value,
+      toBottomListApiDiv(e.target.value),
       getFavoriteListUdate()
     );
     const list = mapBottomFromFavoriteApi(
@@ -1611,10 +1615,15 @@ const qtyEditorText = (grid, event) => {
   return el && typeof el.value === "string" ? el.value : "";
 };
 
-const isQtyDecimalKeyAllowed = (grid, event) => {
+/**
+ * 음수 허용 매입수량(dblCheckQty / inputSignedDecimalColumn) 전용.
+ * 음수 불가 화면(PUR03_035·PUR02_031 등)의 isQtyDecimalKeyAllowed 는 건드리지 않음.
+ */
+const isSignedQtyDecimalKeyAllowed = (grid, event) => {
   const key = event?.key ?? "";
   if (!key || key.length !== 1) return true;
   if (event?.ctrlKey || event?.metaKey || event?.altKey) return true;
+  if (key !== "-" && key !== "." && !(key >= "0" && key <= "9")) return false;
   const text = qtyEditorText(grid, event);
   const el =
     event?.target?.selectionStart != null
@@ -1625,13 +1634,8 @@ const isQtyDecimalKeyAllowed = (grid, event) => {
   const end =
     typeof el?.selectionEnd === "number" ? el.selectionEnd : text.length;
   const next = text.slice(0, start) + key + text.slice(end);
-  if (key === ".") return next.split(".").length <= 2;
-  if (key >= "0" && key <= "9") {
-    const dot = next.indexOf(".");
-    if (dot >= 0 && next.slice(dot + 1).length > 2) return false;
-    return true;
-  }
-  return false;
+  /** 입력 중간값: "", "-", "-.", "1.", "-12.3" 등 */
+  return /^-?\d*(?:\.\d{0,2})?$/.test(next);
 };
 
 const openOrderQtyEditor = (grid, dataRow) => {
@@ -1661,7 +1665,10 @@ const bindOrderQtyNav = (gridName) => {
     const key = event?.key ?? event?.keyCode ?? event;
     const cur = grid.getCurrent?.() || {};
     const field = cur.fieldName || cur.column || "";
-    if (field === ORDER_QTY_FIELD && !isQtyDecimalKeyAllowed(grid, event)) {
+    if (
+      field === ORDER_QTY_FIELD &&
+      !isSignedQtyDecimalKeyAllowed(grid, event)
+    ) {
       if (event?.preventDefault) event.preventDefault();
       return false;
     }
@@ -2688,7 +2695,13 @@ watch(scond3, () => {
 const getFavoriteListUdate = () =>
   (scond3.value || "").trim().replaceAll("-", "");
 
-const scond7 = ref("1");
+/** 하단 자재목록 DIV — 4=최근매입, 2=즐겨찾기 (1=최근발주·3=전체는 발주/자재추가용) */
+const scond7 = ref("4");
+const toBottomListApiDiv = (uiDiv) => {
+  const v = String(uiDiv ?? scond7.value);
+  if (v === "2") return "2";
+  return "4";
+};
 const searchButton4 = async (e, opts = {}) => {
   if (isPopupPartAll()) {
     await swalPopupPartFirst();
@@ -2708,7 +2721,7 @@ const searchButton4 = async (e, opts = {}) => {
       store.state.userData.lngStoreGroup,
       storeCd2.value,
       scond4.value,
-      scond7.value,
+      toBottomListApiDiv(scond7.value),
       getFavoriteListUdate()
     );
     const list = mapBottomFromFavoriteApi(
@@ -2780,7 +2793,7 @@ const initGrid2 = () => {
   scond4.value = "0";
   scond5.value = "";
 
-  scond7.value = "1";
+  scond7.value = "4";
   scond6.value = "";
 
   orderBookByStock.value = {};

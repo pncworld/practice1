@@ -1348,7 +1348,7 @@ const scond3 = ref("");
 const scond4 = ref("0");
 const popupPartSelectRef = ref(null);
 const scond5 = ref("");
-/** 자재목록: 1=최근등록, 2=즐겨찾기 */
+/** 자재목록: 1=최근발주, 2=즐겨찾기 (3=전체 자재추가, 4=최근매입은 매입 화면용) */
 const scond7 = ref("1");
 const isPopupFavoriteMode = () => String(scond7.value) === "2";
 /** getStockItemListWithFavorite UDATE — 발주등록II(018)과 동일, 입고예정일(scond3) YYYYMMDD */
@@ -1473,7 +1473,7 @@ const rememberPickerFavorite = (stockId, checked) => {
   stockPickerFavoriteIds.value = next;
 };
 
-/** 하단 자재목록을 마지막으로 불러온 유형(1 최근등록 / 2 즐겨찾기) */
+/** 하단 자재목록을 마지막으로 불러온 유형(1 최근발주 / 2 즐겨찾기) */
 const bottomListMode = ref("1");
 /** 팝업에서 즐겨찾기 제외한 자재. API가 아직 옛 목록을 줘도 하단에 다시 넣지 않음 */
 const unfavoritedStockIds = ref(new Set());

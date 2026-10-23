@@ -1,116 +1,172 @@
 <!-- /*--############################################################################
-# Filename : CRM65_002RPT.vue                                                  
-# Description : 고객관리 > 전자상품권 현황 > 전자상품권 거래 내역      
-# Date :2025-06-19                                                            
-# Author : 권맑음                     
+# Filename : CRM65_002RPT.vue
+# Description : 고객관리 > 전자상품권 현황 > 전자상품권 거래 내역
+# Date :2025-06-19
+# Author : 권맑음
 ################################################################################*/ -->
 <template>
-  <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <div class="flex h-full min-h-0 flex-col pl-5" @click="handleParentClick">
+    <div
+      class="flex w-full shrink-0 items-center justify-between overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
-        <button @click="searchButton" class="button search md:w-auto w-14">
+      <div class="mr-9 flex justify-center space-x-2 pr-5">
+        <button type="button" class="button search md:w-auto w-14" @click="searchButton">
           조회
         </button>
-        <button @click="excelButton" class="button save w-auto excel">
+        <button type="button" class="button save w-auto excel" @click="excelButton">
           엑셀
         </button>
       </div>
     </div>
+
     <div
-      class="grid grid-cols-[1fr,1fr] grid-rows-3 bg-gray-200 rounded-lg h-36 items-start z-10 justify-start">
-      <div class="justify-start">
-        <Datepicker2
-          :mainName="'일자'"
-          @startDate="startDate"
-          @excelDate="excelDate"
-          @endDate="endDate"></Datepicker2>
-      </div>
-      <div class="-ml-16">
-        <PickStorePlural
-          @lngStoreGroup="lngStoreGroup"
-          @lngStoreCodes="lngStoreCodes"></PickStorePlural>
-      </div>
-      <div class="justify-start flex items-center ml-12 mt-2">
-        <span class="text-base font-semibold">구분</span>
-        <select name="" id="" class="ml-5 w-40 h-8" v-model="cond">
-          <option value="0">전체</option>
-          <option :value="i.lngGftCategory" v-for="i in optionList">
-            {{ i.strGftCategory }}
-          </option>
-        </select>
+      class="crm6502-search-panel z-10 mt-3 w-full min-h-0 shrink-0 overflow-visible rounded-lg bg-gray-200"
+      :style="{
+        '--crm6502-control-border': crm6502ControlBorder,
+        '--crm6502-col-gap': crm6502ColGutter,
+        '--crm6502-item-gap': crm6502ItemGap,
+        '--crm6502-row-gap': crm6502RowGap,
+        '--crm6502-label-col': crm6502LabelCol,
+        '--crm6502-panel-pad-x': crm6502PanelPadX,
+        '--crm6502-select-w': crm6502SelectW,
+        '--crm6502-control-h': crm6502ControlH,
+        '--crm6502-row-min-h': crm6502RowMinH,
+      }">
+      <!--
+        row1: 일자 | PickStorePlural
+        row2: 구분 | 권종
+        row3: 조회조건 checkboxes
+        pad-x 2rem
+      -->
+      <div class="crm6502-search-rows min-w-0">
+        <div class="crm6502-search-grid crm6502-search-grid--2 min-w-0">
+          <div class="crm6502-edge" aria-hidden="true"></div>
+          <div class="crm6502-cell crm6502-cell--date">
+            <div class="crm6502-lbl">일자</div>
+            <div class="crm6502-field crm6502-date-slot min-w-0">
+              <Datepicker2
+                ref="datepicker"
+                :main-name="'일자'"
+                omit-main-label
+                filter-bar-align
+                :close-pop-up="closePopUp"
+                @excel-date="excelDate"
+                @start-date="startDate"
+                @end-date="endDate"></Datepicker2>
+            </div>
+          </div>
+          <div class="crm6502-gutter" aria-hidden="true"></div>
+          <div class="crm6502-cell crm6502-cell--store">
+            <div class="crm6502-field crm6502-pick-slot min-w-0">
+              <PickStorePlural
+                @lngStoreGroup="lngStoreGroup"
+                @lngStoreCodes="lngStoreCodes"></PickStorePlural>
+            </div>
+          </div>
+          <div class="crm6502-edge" aria-hidden="true"></div>
+        </div>
 
-        <span class="text-base font-semibold ml-10"> 권종 </span>
-        <select name="" id="" class="w-40 ml-5 h-8" v-model="cond3">
-          <option value="0">전체</option>
-          <option :value="i.lngGftType" v-for="i in optionList2">
-            {{ i.strGftType }}
-          </option>
-        </select>
-      </div>
-      <div></div>
+        <div class="crm6502-search-grid crm6502-search-grid--2 min-w-0">
+          <div class="crm6502-edge" aria-hidden="true"></div>
+          <div class="crm6502-cell">
+            <div class="crm6502-lbl">구분</div>
+            <div class="crm6502-field min-w-0">
+              <select v-model="cond" class="crm6502-select">
+                <option value="0">전체</option>
+                <option
+                  v-for="i in optionList"
+                  :key="i.lngGftCategory"
+                  :value="i.lngGftCategory">
+                  {{ i.strGftCategory }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="crm6502-gutter" aria-hidden="true"></div>
+          <div class="crm6502-cell">
+            <div class="crm6502-lbl">권종</div>
+            <div class="crm6502-field min-w-0">
+              <select v-model="cond3" class="crm6502-select">
+                <option value="0">전체</option>
+                <option
+                  v-for="i in optionList2"
+                  :key="i.lngGftType"
+                  :value="i.lngGftType">
+                  {{ i.strGftType }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="crm6502-edge" aria-hidden="true"></div>
+        </div>
 
-      <div
-        class="text-base flex justify-start font-semibold pl-12 w-[150%] space-x-5 mt-2">
-        <span class="text-base font-semibold"> 조회조건 </span>
-        <label for="cond4"
-          ><input type="checkbox" id="cond4" v-model="cond4" />전체</label
-        >
-        <label for="cond5"
-          ><input type="checkbox" id="cond5" v-model="cond5" />생성</label
-        >
-        <label for="cond6"
-          ><input type="checkbox" id="cond6" v-model="cond6" />출고</label
-        >
-        <label for="cond7"
-          ><input type="checkbox" id="cond7" v-model="cond7" />판매</label
-        >
-        <label for="cond8"
-          ><input type="checkbox" id="cond8" v-model="cond8" />충전</label
-        >
-        <label for="cond9"
-          ><input type="checkbox" id="cond9" v-model="cond9" />사용</label
-        >
-        <label for="cond10"
-          ><input type="checkbox" id="cond10" v-model="cond10" />회수</label
-        >
-        <label for="cond11"
-          ><input type="checkbox" id="cond11" v-model="cond11" />교환폐기</label
-        >
-        <label for="cond12"
-          ><input type="checkbox" id="cond12" v-model="cond12" />교환판매</label
-        >
-        <label for="cond13"
-          ><input type="checkbox" id="cond13" v-model="cond13" />교환충전</label
-        >
-        <label for="cond14"
-          ><input type="checkbox" id="cond14" v-model="cond14" />취소</label
-        >
-        <label for="cond15"
-          ><input type="checkbox" id="cond15" v-model="cond15" />분실</label
-        >
-        <label for="cond16"
-          ><input type="checkbox" id="cond16" v-model="cond16" />증정</label
-        >
+        <div class="crm6502-check-row min-w-0">
+          <div class="crm6502-edge" aria-hidden="true"></div>
+          <div class="crm6502-cell crm6502-cell--checks">
+            <div class="crm6502-lbl">조회조건</div>
+            <div class="crm6502-checks min-w-0">
+              <label class="crm6502-check-item" for="cond4">
+                <input id="cond4" v-model="cond4" type="checkbox" />전체
+              </label>
+              <label class="crm6502-check-item" for="cond5">
+                <input id="cond5" v-model="cond5" type="checkbox" />생성
+              </label>
+              <label class="crm6502-check-item" for="cond6">
+                <input id="cond6" v-model="cond6" type="checkbox" />출고
+              </label>
+              <label class="crm6502-check-item" for="cond7">
+                <input id="cond7" v-model="cond7" type="checkbox" />판매
+              </label>
+              <label class="crm6502-check-item" for="cond8">
+                <input id="cond8" v-model="cond8" type="checkbox" />충전
+              </label>
+              <label class="crm6502-check-item" for="cond9">
+                <input id="cond9" v-model="cond9" type="checkbox" />사용
+              </label>
+              <label class="crm6502-check-item" for="cond10">
+                <input id="cond10" v-model="cond10" type="checkbox" />회수
+              </label>
+              <label class="crm6502-check-item" for="cond11">
+                <input id="cond11" v-model="cond11" type="checkbox" />교환폐기
+              </label>
+              <label class="crm6502-check-item" for="cond12">
+                <input id="cond12" v-model="cond12" type="checkbox" />교환판매
+              </label>
+              <label class="crm6502-check-item" for="cond13">
+                <input id="cond13" v-model="cond13" type="checkbox" />교환충전
+              </label>
+              <label class="crm6502-check-item" for="cond14">
+                <input id="cond14" v-model="cond14" type="checkbox" />취소
+              </label>
+              <label class="crm6502-check-item" for="cond15">
+                <input id="cond15" v-model="cond15" type="checkbox" />분실
+              </label>
+              <label class="crm6502-check-item" for="cond16">
+                <input id="cond16" v-model="cond16" type="checkbox" />증정
+              </label>
+            </div>
+          </div>
+          <div class="crm6502-edge" aria-hidden="true"></div>
+        </div>
       </div>
     </div>
-    <!-- 조회조건 -->
-    <!-- 그리드 영역 -->
-    <div class="w-full h-[75%]">
-      <Realgrid
-        :progname="'CRM65_002RPT_VUE'"
-        :progid="1"
-        :rowData="rowData"
-        :reload="reload"
-        :documentTitle="'CRM65_002RPT'"
-        :documentSubTitle="documentSubTitle"
-        :rowStateeditable="false"
-        :exporttoExcel="exportExcel">
-      </Realgrid>
+
+    <div class="mt-2 flex min-h-0 min-w-0 flex-1 flex-col">
+      <div class="relative min-h-0 w-full flex-1">
+        <Realgrid
+          class="h-full min-h-0 w-full"
+          :progname="'CRM65_002RPT_VUE'"
+          :progid="1"
+          :rowData="rowData"
+          :reload="reload"
+          :documentTitle="'CRM65_002RPT'"
+          :documentSubTitle="documentSubTitle"
+          :rowStateeditable="false"
+          :exporttoExcel="exportExcel">
+        </Realgrid>
+      </div>
     </div>
   </div>
-  <!-- 그리드 영역 -->
 </template>
 
 <script setup>
@@ -155,6 +211,18 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
+
+const store = useStore();
+const crm6502ControlBorder = "#cbd5e1";
+const crm6502ColGutter = "1.5rem";
+const crm6502ItemGap = "0.75rem";
+const crm6502RowGap = "0.75rem";
+const crm6502LabelCol = "5rem";
+const crm6502PanelPadX = "2rem";
+const crm6502SelectW = "13.2rem";
+const crm6502ControlH = "2rem";
+const crm6502RowMinH = "2rem";
+
 /**
  * 	화면 Load시 실행 스크립트
  */
@@ -192,7 +260,6 @@ const cond13 = ref(true);
 const cond14 = ref(true);
 const cond15 = ref(true);
 const cond16 = ref(true);
-const store = useStore();
 const optionList = ref([]);
 const optionList2 = ref([]);
 const optionList3 = ref([]);
@@ -413,3 +480,222 @@ const excelList = (e) => {
   //comsole.log(e);
 };
 </script>
+
+<style scoped>
+.crm6502-search-panel {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding-block: 0.75rem;
+  padding-inline: 0;
+  overflow-x: visible;
+}
+
+.crm6502-search-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--crm6502-row-gap);
+  min-width: 0;
+}
+
+.crm6502-search-grid--2 {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  column-gap: 0;
+  grid-template-columns:
+    var(--crm6502-panel-pad-x)
+    max-content
+    minmax(var(--crm6502-col-gap), 1fr)
+    max-content
+    var(--crm6502-panel-pad-x);
+}
+
+.crm6502-check-row {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns:
+    var(--crm6502-panel-pad-x)
+    minmax(0, 1fr)
+    var(--crm6502-panel-pad-x);
+}
+
+.crm6502-edge,
+.crm6502-gutter {
+  min-width: 0;
+  pointer-events: none;
+}
+
+.crm6502-cell {
+  box-sizing: border-box;
+  display: grid;
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+  min-height: var(--crm6502-row-min-h);
+  grid-template-columns: max-content max-content;
+  column-gap: var(--crm6502-item-gap);
+  align-items: center;
+}
+
+.crm6502-cell--store {
+  grid-template-columns: max-content minmax(0, max-content);
+}
+
+.crm6502-cell--checks {
+  width: 100%;
+  max-width: 100%;
+  grid-template-columns: max-content minmax(0, 1fr);
+}
+
+.crm6502-lbl {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: max-content;
+  min-height: var(--crm6502-row-min-h);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+}
+
+.crm6502-field {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+  min-height: var(--crm6502-row-min-h);
+}
+
+.crm6502-select {
+  box-sizing: border-box;
+  width: var(--crm6502-select-w);
+  min-width: 0;
+  height: var(--crm6502-control-h);
+  min-height: var(--crm6502-control-h);
+  max-height: var(--crm6502-control-h);
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: rgb(30 41 59);
+  background: #fff;
+  border: 1px solid var(--crm6502-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+}
+
+.crm6502-select:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.35);
+}
+
+.crm6502-checks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.875rem;
+  min-height: var(--crm6502-row-min-h);
+}
+
+.crm6502-check-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(30 41 59);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.crm6502-check-item input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #2563eb;
+}
+
+.crm6502-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin: 0 !important;
+  width: max-content !important;
+  max-width: 100%;
+  min-height: var(--crm6502-row-min-h);
+  align-items: center;
+}
+
+.crm6502-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  height: var(--crm6502-control-h);
+  min-height: var(--crm6502-control-h);
+  max-height: var(--crm6502-control-h);
+  border: 1px solid var(--crm6502-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+  background: #fff;
+}
+
+.crm6502-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6;
+}
+
+.crm6502-date-slot :deep(div.inline-flex.h-8),
+.crm6502-date-slot :deep(button) {
+  height: var(--crm6502-control-h) !important;
+  min-height: var(--crm6502-control-h) !important;
+}
+
+.crm6502-pick-slot :deep(select),
+.crm6502-pick-slot :deep(.pickstore-vs-shell),
+.crm6502-pick-slot :deep(.vs__dropdown-toggle) {
+  box-sizing: border-box;
+  height: var(--crm6502-control-h) !important;
+  min-height: var(--crm6502-control-h) !important;
+  max-height: var(--crm6502-control-h) !important;
+}
+
+.crm6502-pick-slot :deep(.pickstore-vs-shell) {
+  border: 1px solid var(--crm6502-control-border, #cbd5e1) !important;
+  border-radius: 0.375rem;
+  background: #fff;
+}
+
+@media (max-width: 1100px) {
+  .crm6502-search-grid--2,
+  .crm6502-check-row {
+    grid-template-columns: minmax(0, 1fr);
+    justify-content: stretch;
+    row-gap: 0.75rem;
+    padding-left: var(--crm6502-panel-pad-x);
+    padding-right: var(--crm6502-panel-pad-x);
+  }
+
+  .crm6502-edge,
+  .crm6502-gutter {
+    display: none;
+  }
+
+  .crm6502-cell {
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: max-content minmax(0, 1fr);
+  }
+
+  .crm6502-field,
+  .crm6502-select {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .crm6502-date-slot :deep(> div.flex.justify-start.items-center) {
+    width: 100% !important;
+  }
+}
+</style>
