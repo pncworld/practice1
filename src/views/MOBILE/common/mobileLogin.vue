@@ -8,7 +8,7 @@
   <div class="flex items-center justify-center h-screen bg-slate-100 px-5">
     <loading></loading>
     <div class="bg-white p-7 rounded-3xl shadow-lg max-w-sm w-full border border-slate-100">
-      <div class="mb-6 flex justify-center">
+      <div class="mb-6">
         <img
           :src="loginLogo"
           alt="PNC Office"
@@ -30,7 +30,7 @@
             @keyup.enter="login2" />
         </div>
 
-        <div class="mb-6">
+        <div class="mb-4">
           <label for="password" class="block text-slate-600 text-sm font-medium mb-2"
             >비밀번호</label
           >
@@ -52,14 +52,7 @@
           </div>
         </div>
 
-        <button
-          type="submit"
-          class="w-full py-2.5 px-4 bg-blue-500 text-white font-semibold rounded-xl shadow-md">
-          로그인
-        </button>
-      </form>
-      <div class="mt-4 flex items-center justify-between text-sm">
-        <label for="saveId" class="flex cursor-pointer items-center gap-2 text-slate-600">
+        <label for="saveId" class="mb-6 flex cursor-pointer items-center gap-2 text-sm text-slate-600">
           <input
             type="checkbox"
             id="saveId"
@@ -67,6 +60,21 @@
             class="form-checkbox h-4 w-4 text-blue-500" />
           아이디 저장
         </label>
+
+        <button
+          type="submit"
+          class="w-full py-2.5 px-4 bg-blue-500 text-white font-semibold rounded-xl shadow-md">
+          로그인
+        </button>
+        <button
+          type="button"
+          class="mt-2 w-full py-2.5 px-4 font-semibold rounded-xl"
+          style="border: 1px solid #222; background: #fff; color: #222;"
+          @click="goToOrder">
+          소모품 발주
+        </button>
+      </form>
+      <div class="mt-4 flex justify-end text-sm">
         <button type="button" class="font-semibold text-blue-500" @click="showCustomorCenter">
           고객센터
         </button>
@@ -94,7 +102,14 @@
       </div>
       <button
         type="button"
-        class="mt-5 h-11 w-full rounded-xl bg-blue-500 font-semibold text-white"
+        class="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#ffde00] font-semibold text-[#231916]"
+        @click="goToKakao">
+        <img :src="kakaoChannelTalkIcon" alt="카카오 채널톡" class="h-5 w-5" />
+        카카오 채널톡 상담
+      </button>
+      <button
+        type="button"
+        class="mt-2 h-11 w-full rounded-xl bg-blue-500 font-semibold text-white"
         @click="
           showPopUp = false;
           disableBg();
@@ -110,6 +125,7 @@ import { alreadyMobileLogined } from "@/api/common";
 import { getMobileProgList, mobileLogin } from "@/api/mobile";
 import loading from "@/components/loading.vue";
 import loginLogo from "@/assets/images/pncoffice_logo.png";
+import kakaoChannelTalkIcon from "@/assets/images/kakao_channel_talk.svg";
 /*
  * 공통 표준  Function
  */
@@ -295,6 +311,14 @@ const showCustomorCenter = () => {
 
 const disableBg = () => {
   store.state.inActiveBackGround = false;
+};
+
+const goToOrder = () => {
+  window.open("https://sopumzip.shop/main/index", "_blank");
+};
+
+const goToKakao = () => {
+  window.open("https://pf.kakao.com/_Ztrxks", "_blank");
 };
 </script>
 
