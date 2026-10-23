@@ -14,6 +14,7 @@ function attachNaverRoutes(app) {
     express.static(path.join(__dirname, "ui", "assets"))
   );
   app.use("/naver/start", naverOnboardingRouter);
+  app.get("/naver/logout/closed", naverLoginRouter.handleNaverLogoutClosed);
   app.get("/naver/logout", naverLoginRouter.handleNaverLogout);
   app.use("/naver/login", naverLoginRouter);
   app.use("/naver/terms", naverTermsRouter);

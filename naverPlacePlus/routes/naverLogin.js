@@ -2,7 +2,7 @@
  * "네이버 아이디로 로그인"
  *
  * 가이드 슬라이드 16 "네이버 아이디 로그인을 사용하는 이유"에 나온 대로,
- * 이건 스마트플레이스 약관동의 페이지(/embed/terms) 안에서 뜨는 로그인과는
+ * 이건 플레이스+ 약관동의 페이지(/embed/terms) 안에서 뜨는 로그인과는
  * 별개로, 우리 서버가 "이 사용자가 누구인지(naverUniqueId)"를 알아내기 위해
  * 직접 붙이는 OAuth 로그인입니다. 이후 모든 플레이스 API 호출의
  * X-Naver-Unique-Id 헤더 값이 여기서 나옵니다.
@@ -28,8 +28,10 @@ const { getAccessToken } = require("../services/naverAuth");
 const {
   getAgreementSummary,
   hasAllRequiredAgreements,
+  listConnectedBusinesses,
 } = require("../services/placeApi");
 const { getBaseUrl } = require("../services/baseUrl");
+const { rememberNaverUser, clearNaverUser, hasConsent } = require("../services/npSession");
 const { renderLayout, escapeHtml } = require("../ui/layout");
 
 function getRedirectUri() {
@@ -44,8 +46,18 @@ function getRedirectUri() {
 }
 
 function handleNaverLogout(req, res) {
+  clearNaverUser(res);
   res.set("Cache-Control", "no-store");
   res.redirect("/naver/start");
+}
+
+function handleNaverLogoutClosed(req, res) {
+  res.set("Cache-Control", "no-store");
+  res.type("html").send(`<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="utf-8"><title>로그아웃</title></head>
+<body><script>window.close();</script></body>
+</html>`);
 }
 
 router.get("/logout", handleNaverLogout);
@@ -86,7 +98,7 @@ router.get("/callback", async (req, res) => {
         heading: "네이버 로그인이 취소되었습니다",
         body: `
           <p class="msg">${escapeHtml(errorDescription || error)}</p>
-          <div class="actions-after"><a class="btn btn-primary" href="/naver/start">처음으로</a></div>
+          <div class="actions-after"><a class="btn btn-primary" href="/naver/start?consent=1">처음으로</a></div>
         `,
       })
     );
@@ -96,19 +108,32 @@ router.get("/callback", async (req, res) => {
     const loginAccessToken = await exchangeCodeForToken({ code, state });
     const profile = await getProfile(loginAccessToken);
     const naverUniqueId = profile.id;
+    rememberNaverUser(res, storeId, naverUniqueId);
 
     let nextPath = "/naver/terms/start";
+    let showConsent = false;
     try {
       const placeAccessToken = await getAccessToken(
         storeId,
         process.env.DEMO_REFRESH_TOKEN
       );
-      const summary = await getAgreementSummary({
+      const connected = await listConnectedBusinesses({
         accessToken: placeAccessToken,
         naverUniqueId,
       });
-      if (hasAllRequiredAgreements(summary)) {
+      if (connected.length) {
         nextPath = "/naver/places";
+      } else if (!hasConsent(req)) {
+        nextPath = "/naver/start";
+        showConsent = true;
+      } else {
+        const summary = await getAgreementSummary({
+          accessToken: placeAccessToken,
+          naverUniqueId,
+        });
+        if (hasAllRequiredAgreements(summary)) {
+          nextPath = "/naver/places";
+        }
       }
     } catch (checkErr) {
       console.error(
@@ -118,6 +143,7 @@ router.get("/callback", async (req, res) => {
     }
 
     const nextUrl = new URL(nextPath, getBaseUrl(req));
+    if (showConsent) nextUrl.searchParams.set("consent", "1");
     nextUrl.searchParams.set("storeId", storeId);
     nextUrl.searchParams.set("naverUniqueId", naverUniqueId);
     return res.redirect(nextUrl.toString());
@@ -129,7 +155,7 @@ router.get("/callback", async (req, res) => {
         heading: "네이버 로그인 처리 중 오류가 발생했습니다",
         body: `
           <p class="msg">잠시 후 다시 시도해주세요.</p>
-          <div class="actions-after"><a class="btn btn-primary" href="/naver/start">처음으로</a></div>
+          <div class="actions-after"><a class="btn btn-primary" href="/naver/start?consent=1">처음으로</a></div>
         `,
       })
     );
@@ -138,3 +164,4 @@ router.get("/callback", async (req, res) => {
 
 module.exports = router;
 module.exports.handleNaverLogout = handleNaverLogout;
+module.exports.handleNaverLogoutClosed = handleNaverLogoutClosed;

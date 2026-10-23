@@ -216,6 +216,36 @@ html, body {
   border-radius: 8px; font-size: 12px; color: #888; word-break: break-all;
 }
 .actions-after { margin-top: 16px; }
+.status-block { margin-bottom: 14px; }
+.status-block + .status-block {
+  margin-top: 4px; padding-top: 14px; border-top: 1px solid #eee;
+}
+.status-summary { display: flex; gap: 14px; align-items: flex-start; }
+.status-photo { position: relative; width: 88px; height: 88px; flex-shrink: 0; }
+.status-photo-fallback {
+  width: 88px; height: 88px; border-radius: 10px;
+  background: var(--tint-400); color: var(--primary-dark);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 700;
+}
+.status-photo img {
+  position: absolute; top: 0; left: 0;
+  width: 88px; height: 88px; border-radius: 10px; object-fit: cover; display: block;
+}
+.status-fields { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.status-field span {
+  display: block; margin-bottom: 4px; font-size: 12px; color: var(--gray-666);
+}
+.status-field strong {
+  display: block; padding: 10px 12px; border-radius: 8px;
+  background: var(--tint-100); font-size: 15px; font-weight: 700; color: var(--gray-222);
+  word-break: break-word;
+}
+.status-block form { margin-top: 10px; }
+.status-actions { margin-top: 16px; }
+.status-actions form { flex: 1 1 0; display: flex; margin: 0; }
+.status-actions form .btn { flex: 1; width: 100%; }
+.status-actions.btn-row .btn-ghost { flex: 1 1 0; }
 @media (max-width: 640px) {
   .np-header { padding: 0 12px; }
   .np-card { padding: 12px 12px 14px; }
@@ -245,18 +275,19 @@ function renderLayout({
       </div>`
     : "";
   const logoutHtml = showLogout
-    ? `<a class="np-logout" href="/naver/start">로그아웃</a>`
+    ? `<a class="np-logout" href="/naver/logout" data-np-logout>로그아웃</a>`
     : "";
   const logoutScript = showLogout
     ? `<script>
 (function () {
-  var a = document.querySelector(".np-logout");
-  if (!a) return;
-  a.addEventListener("click", function (e) {
-    e.preventDefault();
-    try { sessionStorage.setItem("np_close_naver_logout", "1"); } catch (err) {}
-    window.open("https://nid.naver.com/nidlogin.logout", "np_naver_logout");
-    location.replace("/naver/start");
+  document.querySelectorAll("[data-np-logout]").forEach(function (el) {
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      var back = location.origin + "/naver/logout/closed";
+      var logoutUrl = "https://nid.naver.com/nidlogin.logout?returl=" + encodeURIComponent(back);
+      window.open(logoutUrl, "np_naver_logout");
+      location.replace("/naver/logout");
+    });
   });
 })();
 </script>`
@@ -276,7 +307,7 @@ function renderLayout({
     <div class="np-gradient"></div>
     <header class="np-header">
       <div class="np-logo"><img src="/naver/assets/pncoffice_logo.png" alt="PNC Office" /></div>
-      <div class="np-header-title">네이버 스마트플레이스 연동</div>
+      <div class="np-header-title">네이버 플레이스+ 연동</div>
       ${logoutHtml}
     </header>
     <main class="np-main${wide ? " is-wide" : ""}">

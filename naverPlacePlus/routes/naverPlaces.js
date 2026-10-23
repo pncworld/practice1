@@ -12,7 +12,7 @@
  *      integration API가 아니라 "파트너사 <-> 업체" 매핑만 추가하는 것이므로,
  *      로그인 계정이 해당 업체의 주인권한을 갖고 있어야 성공한다.
  *
- *   3. 목록 조회 결과가 비어있으면(주인권한 있는 업체가 없으면), 스마트플레이스
+ *   3. 목록 조회 결과가 비어있으면(주인권한 있는 업체가 없으면), 플레이스+
  *      "업체 찾기" 페이지로 보내 신규등록/주인권한 변경을 하도록 유도한다.
  *      (https://new.smartplace.naver.com/bizes/lookup?to=redirectURL)
  */
@@ -23,11 +23,13 @@ const router = express.Router();
 const { getAccessToken } = require("../services/naverAuth");
 const {
   getPlaceBusinesses,
+  listConnectedBusinesses,
   addAgencyMapping,
   getAgencyMapping,
   deleteAgencyMapping,
 } = require("../services/placeApi");
 const { getDemoStoreContext } = require("../services/demoStore");
+const { rememberNaverUser } = require("../services/npSession");
 const { getBaseUrl } = require("../services/baseUrl");
 const { FRONT_HOST } = require("../services/frontHost");
 const { escapeHtml, renderLayout } = require("../ui/layout");
@@ -51,6 +53,85 @@ function buildLookupUrl(callbackUrl) {
   return url.toString();
 }
 
+function disconnectForm(biz, storeId, naverUniqueId) {
+  const action = `/naver/places/${encodeURIComponent(biz.placeId)}/disconnect?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}&page=0`;
+  return `<form method="post" action="${action}" onsubmit="return confirm('연동을 해지할까요?');">
+    <button class="btn btn-muted" type="submit">연동 해지</button>
+  </form>`;
+}
+
+function placeImageSrc(url) {
+  if (!url) return "";
+  try {
+    const host = new URL(url).hostname;
+    if (/(^|\.)phinf\.net$/i.test(host)) {
+      return `/naver/image?u=${encodeURIComponent(url)}`;
+    }
+  } catch {
+    return "";
+  }
+  return url;
+}
+
+function placePhoto(biz, name) {
+  const image = biz.businessImage?.primary?.url || biz.businessImage?.primary?.thumbnail || "";
+  const src = placeImageSrc(image);
+  const initial = escapeHtml(String(name || "?").charAt(0));
+  return `<div class="status-photo">
+    <div class="status-photo-fallback">${initial}</div>
+    ${src ? `<img src="${escapeHtml(src)}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'" />` : ""}
+  </div>`;
+}
+
+function placeFields(biz) {
+  const name = biz.businessName || biz.name || "-";
+  const address = biz.address || "-";
+  const phone = String(biz.phone || biz.phoneNumber || biz.telephone || "").trim() || "-";
+  return `<div class="status-summary">
+    ${placePhoto(biz, name)}
+    <div class="status-fields">
+      <div class="status-field"><span>가맹점명</span><strong>${escapeHtml(name)}</strong></div>
+      <div class="status-field"><span>플레이스 ID</span><strong>${escapeHtml(biz.placeId)}</strong></div>
+      <div class="status-field"><span>주소</span><strong>${escapeHtml(address)}</strong></div>
+      <div class="status-field"><span>전화번호</span><strong>${escapeHtml(phone)}</strong></div>
+    </div>
+  </div>`;
+}
+
+/**
+ * 이미 연동된 업체가 있을 때 보여주는 확인 화면.
+ */
+function renderConnectedPage({ storeId, naverUniqueId, connected }) {
+  const logoutButton = `<button class="btn btn-ghost" type="button" data-np-logout>로그아웃</button>`;
+  let body;
+
+  if (connected.length === 1) {
+    body = `
+      ${placeFields(connected[0])}
+      <div class="btn-row status-actions">
+        ${disconnectForm(connected[0], storeId, naverUniqueId)}
+        ${logoutButton}
+      </div>`;
+  } else {
+    body = `
+      ${connected
+        .map(
+          (biz) => `<section class="status-block">
+            ${placeFields(biz)}
+            ${disconnectForm(biz, storeId, naverUniqueId)}
+          </section>`
+        )
+        .join("")}
+      <div class="btn-row status-actions">${logoutButton}</div>`;
+  }
+
+  return layout(null, {
+    title: "네이버 플레이스+ 연동",
+    heading: "현재 '네이버 플레이스+'가 정상적으로 연동되어 있습니다.",
+    body,
+  });
+}
+
 /**
  * STEP 3. 업체 목록 조회
  *
@@ -62,6 +143,14 @@ router.get("/", async (req, res) => {
 
   try {
     const accessToken = await getAccessToken(storeId, refreshToken);
+    rememberNaverUser(res, storeId, naverUniqueId);
+
+    const connected = await listConnectedBusinesses({ accessToken, naverUniqueId });
+    if (connected.length) {
+      res.set("Cache-Control", "no-store");
+      return res.send(renderConnectedPage({ storeId, naverUniqueId, connected }));
+    }
+
     const { items, totalCount } = await getPlaceBusinesses({
       accessToken,
       naverUniqueId,
@@ -124,6 +213,7 @@ router.get("/", async (req, res) => {
             <td>
               <div class="biz-name">${escapeHtml(biz.businessName)} ${isConnected ? '<span class="badge">연동됨</span>' : ""}</div>
               <div class="muted">${escapeHtml(biz.address || "")}</div>
+              ${biz.phone ? `<div class="muted">${escapeHtml(biz.phone)}</div>` : ""}
             </td>
             <td>${actionForm}</td>
           </tr>
@@ -206,7 +296,7 @@ router.post("/:placeId/connect", async (req, res) => {
     let message = "연동 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
     let responseStatus = 502;
     if (status === 401) {
-      message = "이 업체에 대한 주인권한이 없어 연동할 수 없습니다. 스마트플레이스에서 주인권한을 확인해주세요.";
+      message = "이 업체에 대한 주인권한이 없어 연동할 수 없습니다. 플레이스+에서 주인권한을 확인해주세요.";
       responseStatus = 401;
     } else if (status === 404) {
       message = "해당 업체를 찾을 수 없습니다. 목록을 새로고침한 뒤 다시 시도해주세요.";
@@ -276,3 +366,4 @@ router.post("/:placeId/disconnect", async (req, res) => {
 });
 
 module.exports = router;
+module.exports.renderConnectedPage = renderConnectedPage;

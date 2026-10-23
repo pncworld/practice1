@@ -105,6 +105,42 @@ async function getPlaceBusinesses({ accessToken, naverUniqueId, page = 0 }) {
 }
 
 /**
+ * 이 네이버 계정이 우리 대행사와 이미 연동한 업체를 모두 찾습니다.
+ * 목록은 10개씩이므로 페이지를 넘겨 확인합니다.
+ */
+async function listConnectedBusinesses({ accessToken, naverUniqueId }) {
+  const connected = [];
+  const pageSize = 10;
+
+  for (let page = 0; page < 30; page += 1) {
+    const { items, totalCount } = await getPlaceBusinesses({
+      accessToken,
+      naverUniqueId,
+      page,
+    });
+    const list = Array.isArray(items) ? items : [];
+    if (!list.length) break;
+
+    const checks = await Promise.allSettled(
+      list.map((biz) =>
+        getAgencyMapping({
+          accessToken,
+          naverUniqueId,
+          placeId: biz.placeId,
+        })
+      )
+    );
+    list.forEach((biz, index) => {
+      if (checks[index].status === "fulfilled") connected.push(biz);
+    });
+
+    if (!totalCount || (page + 1) * pageSize >= totalCount) break;
+  }
+
+  return connected;
+}
+
+/**
  * 선택한 업체(placeId)에 연동을 추가합니다.
  * (가이드 슬라이드 24: POST /v1/custom/pos/place-businesses/place-id/{placeId}/agency-mappings)
  */
@@ -151,7 +187,7 @@ async function deleteAgencyMapping({ accessToken, naverUniqueId, placeId }) {
 }
 
 /**
- * 스마트플레이스 업종을 조회합니다. 업체 등록/수정 시 categoryId가 필요합니다.
+ * 플레이스+ 업종을 조회합니다. 업체 등록/수정 시 categoryId가 필요합니다.
  */
 async function getCategories({
   accessToken,
@@ -231,6 +267,7 @@ module.exports = {
   getAgreementSummary,
   hasAllRequiredAgreements,
   getPlaceBusinesses,
+  listConnectedBusinesses,
   addAgencyMapping,
   getAgencyMapping,
   deleteAgencyMapping,

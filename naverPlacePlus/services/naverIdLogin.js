@@ -2,7 +2,7 @@
  * 네이버 아이디 로그인(네아로) 클라이언트
  *
  * 가이드 슬라이드 16, 18 기준:
- * - 이건 스마트플레이스 API용 Access Token(services/naverAuth.js, agency_refresh_token)과
+ * - 이건 플레이스+ API용 Access Token(services/naverAuth.js, agency_refresh_token)과
  *   완전히 다른 시스템입니다. 여기서 발급받는 access_token은 "네이버 로그인 프로필 조회"용이고,
  *   우리가 최종적으로 필요한 건 그 프로필 응답의 `response.id` 값 (= naverUniqueId,
  *   네아로 유니크 아이디)입니다.
