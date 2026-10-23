@@ -8,7 +8,7 @@ const fs = require("fs");
 const path = require("path");
 const { PNC_IMAGE_PROXY_TARGET } = require("./config/pncHosts");
 
-// 네이버 스마트플레이스 연동 라우트
+// 네이버 플레이스+ 연동 라우트
 const naverOnboardingRouter = require("./naverPlacePlus/routes/naverOnboarding");
 const naverLoginRouter = require("./naverPlacePlus/routes/naverLogin");
 const naverTermsRouter = require("./naverPlacePlus/routes/naverTerms");
@@ -19,12 +19,13 @@ const app = express();
 
 app.use(express.json());
 
-// ===== 네이버 스마트플레이스 연동 라우트 (catch-all보다 반드시 위) =====
+// ===== 네이버 플레이스+ 연동 라우트 (catch-all보다 반드시 위) =====
 app.use(
   "/naver/assets",
   express.static(path.join(__dirname, "naverPlacePlus", "ui", "assets"))
 );
 app.use("/naver/start", naverOnboardingRouter);
+app.get("/naver/logout/closed", naverLoginRouter.handleNaverLogoutClosed);
 app.get("/naver/logout", naverLoginRouter.handleNaverLogout);
 app.use("/naver/login", naverLoginRouter);
 app.use("/naver/terms", naverTermsRouter);
