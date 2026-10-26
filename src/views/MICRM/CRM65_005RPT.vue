@@ -49,11 +49,12 @@
         </div>
         <div class="crm6505-gutter" aria-hidden="true"></div>
         <div class="crm6505-cell">
-          <div class="crm6505-lbl">상품권선택</div>
+          <div class="crm6505-lbl">조회 상품권 선택</div>
           <div class="crm6505-field min-w-0">
             <button
               type="button"
               class="pnc-sub-btn"
+              :class="{ 'crm6505-gft-btn--blink': giftSelectBlink }"
               @click="visible = true">
               <svg
                 class="pnc-sub-btn__icon"
@@ -125,7 +126,7 @@
                   stroke-linecap="round"
                   stroke-linejoin="round" />
               </svg>
-              저장
+              선택
             </button>
             <button
               type="button"
@@ -263,6 +264,7 @@ const checkedRowIndex = (e) => {
 
 const initCheckRows = ref([]);
 const setDynamicGrid4Cond = ref(0);
+const giftSelectBlink = ref(false);
 const setSearchCond = () => {
   initGrid();
   cond.value = checkedRows.value;
@@ -290,6 +292,9 @@ const setSearchCond = () => {
   mergeColumnGroupName3.value.push(["합계"]);
 
   setDynamicGrid4Cond.value = cond.value.length;
+  if (cond.value.length > 0) {
+    giftSelectBlink.value = false;
+  }
   reload.value = !reload.value;
   visible.value = false;
 };
@@ -369,6 +374,16 @@ const searchButton = async () => {
       title: "경고",
       text: "일자을 선택하세요.",
       icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  if (!Array.isArray(cond.value) || cond.value.length === 0) {
+    giftSelectBlink.value = true;
+    Swal.fire({
+      title: "안내",
+      text: "먼저 상품권을 선택해 주세요.",
+      icon: "info",
       confirmButtonText: "확인",
     });
     return;
@@ -637,5 +652,24 @@ const excelList = (e) => {
   .crm6505-date-slot :deep(> div.flex.justify-start.items-center) {
     width: 100% !important;
   }
+}
+
+@keyframes crm6505-gft-btn-blink {
+  0%,
+  100% {
+    opacity: 1;
+    border-color: #fca5a5;
+    box-shadow: 0 0 0 0 rgb(248 113 113 / 0.55);
+  }
+  50% {
+    opacity: 0.88;
+    border-color: #dc2626;
+    box-shadow: 0 0 0 0.35rem rgb(248 113 113 / 0.35);
+  }
+}
+
+.crm6505-gft-btn--blink {
+  border-color: #f87171;
+  animation: crm6505-gft-btn-blink 1.1s ease-in-out infinite;
 }
 </style>

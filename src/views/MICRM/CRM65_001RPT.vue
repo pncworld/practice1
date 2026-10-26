@@ -70,11 +70,29 @@
         <div class="crm6501-cell crm6501-cell--recover">
           <div class="crm6501-lbl">회수일자</div>
           <div class="crm6501-field crm6501-recover-field min-w-0">
-            <input
-              v-model="cond2"
-              type="checkbox"
+            <button
+              type="button"
               class="crm6501-check"
-              aria-label="회수일자 사용" />
+              :class="{ 'is-on': cond2 }"
+              :aria-pressed="cond2 ? 'true' : 'false'"
+              title="회수일자 사용"
+              aria-label="회수일자 사용"
+              @click.stop="cond2 = !cond2">
+              <svg
+                v-show="cond2"
+                class="crm6501-check-mark"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false">
+                <path
+                  d="M5 13l4 4L19 7"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </button>
             <div class="crm6501-date-slot min-w-0 flex-1">
               <Datepicker2
                 :main-name="'회수일자'"
@@ -134,6 +152,7 @@
           :progid="1"
           :rowData="rowData"
           :reload="reload"
+          hyphen-date-mask-as-text
           :documentTitle="'CRM65_001RPT'"
           :documentSubTitle="documentSubTitle"
           :rowStateeditable="false"
@@ -450,11 +469,40 @@ const excelList = (e) => {
   min-width: 0;
 }
 
+.crm6501-recover-field .crm6501-date-slot {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
 .crm6501-check {
-  width: 1rem;
-  height: 1rem;
-  flex-shrink: 0;
-  accent-color: #2563eb;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 5;
+  display: inline-flex;
+  flex: 0 0 1.15rem;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  color: #fff;
+  background: #fff;
+  border: 1.5px solid #64748b;
+  border-radius: 0.2rem;
+}
+
+.crm6501-check.is-on {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.crm6501-check-mark {
+  display: block;
+  width: 0.85rem;
+  height: 0.85rem;
 }
 
 .crm6501-select,
@@ -481,19 +529,36 @@ const excelList = (e) => {
   box-shadow: 0 0 0 2px rgb(59 130 246 / 0.35);
 }
 
+.crm6501-date-slot {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
 .crm6501-date-slot :deep(> div.flex.justify-start.items-center) {
   margin: 0 !important;
   width: 100% !important;
   max-width: 100%;
+  min-width: 0;
   min-height: var(--crm6501-row-min-h, 2rem);
   align-items: center;
+}
+
+.crm6501-date-slot :deep(> div.flex.justify-start.items-center > div) {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .crm6501-date-slot :deep(input[type="date"]) {
   box-sizing: border-box;
   flex: 1 1 0;
+  width: 0 !important;
   min-width: 0;
-  width: auto;
+  max-width: 100%;
   height: var(--crm6501-control-h, 2rem);
   min-height: var(--crm6501-control-h, 2rem);
   max-height: var(--crm6501-control-h, 2rem);
@@ -506,11 +571,10 @@ const excelList = (e) => {
   border-color: #3b82f6;
 }
 
-.crm6501-date-slot :deep(div.inline-flex.h-8),
 .crm6501-date-slot :deep(button) {
+  flex: 0 0 auto;
   height: var(--crm6501-control-h, 2rem) !important;
   min-height: var(--crm6501-control-h, 2rem) !important;
-  flex-shrink: 0;
 }
 
 @media (max-width: 1100px) {

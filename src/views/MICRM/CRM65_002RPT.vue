@@ -31,19 +31,21 @@
         '--crm6502-select-w': crm6502SelectW,
         '--crm6502-control-h': crm6502ControlH,
         '--crm6502-row-min-h': crm6502RowMinH,
+        '--psp-label-w': crm6502LabelCol,
+        '--psp-radio-w': '4.75rem',
+        '--psp-col-gap': '0.5rem',
       }">
       <!--
-        row1: 일자 | PickStorePlural
-        row2: 구분 | 권종
-        row3: 조회조건 checkboxes
-        pad-x 2rem
+        004와 같은 2행:
+        좌 — row1 일자 / row2 구분·권종
+        우 — PickStorePlural(직/가맹 · 팀/SC)
+        조회조건 체크는 이 화면 전용이라 그 아래 줄에 유지
       -->
-      <div class="crm6502-search-rows min-w-0">
-        <div class="crm6502-search-grid crm6502-search-grid--2 min-w-0">
-          <div class="crm6502-edge" aria-hidden="true"></div>
-          <div class="crm6502-cell crm6502-cell--date">
-            <div class="crm6502-lbl">일자</div>
-            <div class="crm6502-field crm6502-date-slot min-w-0">
+      <div class="crm6502-search-layout min-w-0">
+        <div class="crm6502-left-stack min-w-0">
+          <div class="crm6502-row">
+            <span class="crm6502-lbl shrink-0">일자</span>
+            <div class="crm6502-date-slot min-w-0 flex-1">
               <Datepicker2
                 ref="datepicker"
                 :main-name="'일자'"
@@ -55,22 +57,10 @@
                 @end-date="endDate"></Datepicker2>
             </div>
           </div>
-          <div class="crm6502-gutter" aria-hidden="true"></div>
-          <div class="crm6502-cell crm6502-cell--store">
-            <div class="crm6502-field crm6502-pick-slot min-w-0">
-              <PickStorePlural
-                @lngStoreGroup="lngStoreGroup"
-                @lngStoreCodes="lngStoreCodes"></PickStorePlural>
-            </div>
-          </div>
-          <div class="crm6502-edge" aria-hidden="true"></div>
-        </div>
 
-        <div class="crm6502-search-grid crm6502-search-grid--2 min-w-0">
-          <div class="crm6502-edge" aria-hidden="true"></div>
-          <div class="crm6502-cell">
-            <div class="crm6502-lbl">구분</div>
-            <div class="crm6502-field min-w-0">
+          <div class="crm6502-row crm6502-row--pair">
+            <div class="crm6502-pair-item min-w-0">
+              <span class="crm6502-lbl shrink-0">구분</span>
               <select v-model="cond" class="crm6502-select">
                 <option value="0">전체</option>
                 <option
@@ -81,11 +71,8 @@
                 </option>
               </select>
             </div>
-          </div>
-          <div class="crm6502-gutter" aria-hidden="true"></div>
-          <div class="crm6502-cell">
-            <div class="crm6502-lbl">권종</div>
-            <div class="crm6502-field min-w-0">
+            <div class="crm6502-pair-item min-w-0">
+              <span class="crm6502-lbl shrink-0">권종</span>
               <select v-model="cond3" class="crm6502-select">
                 <option value="0">전체</option>
                 <option
@@ -97,56 +84,60 @@
               </select>
             </div>
           </div>
-          <div class="crm6502-edge" aria-hidden="true"></div>
         </div>
 
-        <div class="crm6502-check-row min-w-0">
-          <div class="crm6502-edge" aria-hidden="true"></div>
-          <div class="crm6502-cell crm6502-cell--checks">
-            <div class="crm6502-lbl">조회조건</div>
-            <div class="crm6502-checks min-w-0">
-              <label class="crm6502-check-item" for="cond4">
-                <input id="cond4" v-model="cond4" type="checkbox" />전체
-              </label>
-              <label class="crm6502-check-item" for="cond5">
-                <input id="cond5" v-model="cond5" type="checkbox" />생성
-              </label>
-              <label class="crm6502-check-item" for="cond6">
-                <input id="cond6" v-model="cond6" type="checkbox" />출고
-              </label>
-              <label class="crm6502-check-item" for="cond7">
-                <input id="cond7" v-model="cond7" type="checkbox" />판매
-              </label>
-              <label class="crm6502-check-item" for="cond8">
-                <input id="cond8" v-model="cond8" type="checkbox" />충전
-              </label>
-              <label class="crm6502-check-item" for="cond9">
-                <input id="cond9" v-model="cond9" type="checkbox" />사용
-              </label>
-              <label class="crm6502-check-item" for="cond10">
-                <input id="cond10" v-model="cond10" type="checkbox" />회수
-              </label>
-              <label class="crm6502-check-item" for="cond11">
-                <input id="cond11" v-model="cond11" type="checkbox" />교환폐기
-              </label>
-              <label class="crm6502-check-item" for="cond12">
-                <input id="cond12" v-model="cond12" type="checkbox" />교환판매
-              </label>
-              <label class="crm6502-check-item" for="cond13">
-                <input id="cond13" v-model="cond13" type="checkbox" />교환충전
-              </label>
-              <label class="crm6502-check-item" for="cond14">
-                <input id="cond14" v-model="cond14" type="checkbox" />취소
-              </label>
-              <label class="crm6502-check-item" for="cond15">
-                <input id="cond15" v-model="cond15" type="checkbox" />분실
-              </label>
-              <label class="crm6502-check-item" for="cond16">
-                <input id="cond16" v-model="cond16" type="checkbox" />증정
-              </label>
-            </div>
+        <div class="crm6502-right-store min-w-0 overflow-visible">
+          <div class="crm6502-pick-wrap min-w-0 flex-1">
+            <PickStorePlural
+              fluid-width
+              @lngStoreGroup="lngStoreGroup"
+              @lngStoreCodes="lngStoreCodes"></PickStorePlural>
           </div>
-          <div class="crm6502-edge" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="crm6502-check-row min-w-0">
+        <span class="crm6502-lbl shrink-0">조회조건</span>
+        <div class="crm6502-checks min-w-0">
+          <label class="crm6502-check-item" for="cond4">
+            <input id="cond4" v-model="cond4" type="checkbox" />전체
+          </label>
+          <label class="crm6502-check-item" for="cond5">
+            <input id="cond5" v-model="cond5" type="checkbox" />생성
+          </label>
+          <label class="crm6502-check-item" for="cond6">
+            <input id="cond6" v-model="cond6" type="checkbox" />출고
+          </label>
+          <label class="crm6502-check-item" for="cond7">
+            <input id="cond7" v-model="cond7" type="checkbox" />판매
+          </label>
+          <label class="crm6502-check-item" for="cond8">
+            <input id="cond8" v-model="cond8" type="checkbox" />충전
+          </label>
+          <label class="crm6502-check-item" for="cond9">
+            <input id="cond9" v-model="cond9" type="checkbox" />사용
+          </label>
+          <label class="crm6502-check-item" for="cond10">
+            <input id="cond10" v-model="cond10" type="checkbox" />회수
+          </label>
+          <label class="crm6502-check-item" for="cond11">
+            <input id="cond11" v-model="cond11" type="checkbox" />교환폐기
+          </label>
+          <label class="crm6502-check-item" for="cond12">
+            <input id="cond12" v-model="cond12" type="checkbox" />교환판매
+          </label>
+          <label class="crm6502-check-item" for="cond13">
+            <input id="cond13" v-model="cond13" type="checkbox" />교환충전
+          </label>
+          <label class="crm6502-check-item" for="cond14">
+            <input id="cond14" v-model="cond14" type="checkbox" />취소
+          </label>
+          <label class="crm6502-check-item" for="cond15">
+            <input id="cond15" v-model="cond15" type="checkbox" />분실
+          </label>
+          <label class="crm6502-check-item" for="cond16">
+            <input id="cond16" v-model="cond16" type="checkbox" />증정
+          </label>
         </div>
       </div>
     </div>
@@ -214,12 +205,13 @@ import { useStore } from "vuex";
 
 const store = useStore();
 const crm6502ControlBorder = "#cbd5e1";
-const crm6502ColGutter = "1.5rem";
+const crm6502ColGutter = "1.25rem";
 const crm6502ItemGap = "0.75rem";
 const crm6502RowGap = "0.75rem";
 const crm6502LabelCol = "5rem";
 const crm6502PanelPadX = "2rem";
-const crm6502SelectW = "13.2rem";
+/** 구분·권종 — 004와 같이 일자 한 칸에 맞춤 */
+const crm6502SelectW = "9.5rem";
 const crm6502ControlH = "2rem";
 const crm6502RowMinH = "2rem";
 
@@ -487,79 +479,66 @@ const excelList = (e) => {
   width: 100%;
   min-width: 0;
   padding-block: 0.75rem;
-  padding-inline: 0;
+  padding-left: var(--crm6502-panel-pad-x, 2rem);
+  padding-right: var(--crm6502-panel-pad-x, 2rem);
   overflow-x: visible;
 }
 
-.crm6502-search-rows {
+.crm6502-search-layout {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: var(--crm6502-col-gap, 1.25rem);
+  align-items: center;
+  min-width: 0;
+}
+
+.crm6502-left-stack {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--crm6502-row-gap);
-  min-width: 0;
-}
-
-.crm6502-search-grid--2 {
-  box-sizing: border-box;
-  display: grid;
-  width: 100%;
-  min-width: 0;
-  align-items: center;
-  column-gap: 0;
-  grid-template-columns:
-    var(--crm6502-panel-pad-x)
-    max-content
-    minmax(var(--crm6502-col-gap), 1fr)
-    max-content
-    var(--crm6502-panel-pad-x);
-}
-
-.crm6502-check-row {
-  box-sizing: border-box;
-  display: grid;
-  width: 100%;
-  min-width: 0;
-  align-items: center;
-  grid-template-columns:
-    var(--crm6502-panel-pad-x)
-    minmax(0, 1fr)
-    var(--crm6502-panel-pad-x);
-}
-
-.crm6502-edge,
-.crm6502-gutter {
-  min-width: 0;
-  pointer-events: none;
-}
-
-.crm6502-cell {
-  box-sizing: border-box;
-  display: grid;
+  align-items: stretch;
+  justify-content: center;
+  gap: var(--crm6502-row-gap, 0.75rem);
   width: max-content;
   max-width: 100%;
-  min-width: 0;
-  min-height: var(--crm6502-row-min-h);
-  grid-template-columns: max-content max-content;
-  column-gap: var(--crm6502-item-gap);
+  min-width: max-content;
+}
+
+.crm6502-row {
+  display: flex;
+  flex-direction: row;
   align-items: center;
-}
-
-.crm6502-cell--store {
-  grid-template-columns: max-content minmax(0, max-content);
-}
-
-.crm6502-cell--checks {
+  gap: var(--crm6502-item-gap, 0.75rem);
   width: 100%;
-  max-width: 100%;
-  grid-template-columns: max-content minmax(0, 1fr);
+  min-width: 0;
+  min-height: var(--crm6502-row-min-h, 2rem);
+}
+
+.crm6502-row--pair {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: var(--crm6502-item-gap, 0.75rem);
+  width: max-content;
+  min-width: max-content;
+}
+
+.crm6502-pair-item {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--crm6502-item-gap, 0.75rem);
 }
 
 .crm6502-lbl {
   box-sizing: border-box;
+  flex: 0 0 var(--crm6502-label-col, 5rem);
+  width: var(--crm6502-label-col, 5rem);
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  width: max-content;
-  min-height: var(--crm6502-row-min-h);
+  justify-content: flex-end;
+  min-height: var(--crm6502-row-min-h, 2rem);
   font-size: 0.9375rem;
   font-weight: 600;
   line-height: 1.25;
@@ -567,23 +546,14 @@ const excelList = (e) => {
   white-space: nowrap;
 }
 
-.crm6502-field {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  width: max-content;
-  max-width: 100%;
-  min-width: 0;
-  min-height: var(--crm6502-row-min-h);
-}
-
 .crm6502-select {
   box-sizing: border-box;
-  width: var(--crm6502-select-w);
+  width: var(--crm6502-select-w, 9.5rem);
+  max-width: 100%;
   min-width: 0;
-  height: var(--crm6502-control-h);
-  min-height: var(--crm6502-control-h);
-  max-height: var(--crm6502-control-h);
+  height: var(--crm6502-control-h, 2rem);
+  min-height: var(--crm6502-control-h, 2rem);
+  max-height: var(--crm6502-control-h, 2rem);
   padding: 0 0.5rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -599,18 +569,145 @@ const excelList = (e) => {
   box-shadow: 0 0 0 2px rgb(59 130 246 / 0.35);
 }
 
+.crm6502-date-slot {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.crm6502-date-slot :deep(> div.flex.justify-start.items-center) {
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: 100%;
+  min-height: var(--crm6502-row-min-h, 2rem);
+  align-items: center;
+}
+
+.crm6502-date-slot :deep(> div.flex.justify-start.items-center > div) {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.crm6502-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  flex: 1 1 0;
+  width: auto !important;
+  min-width: 0;
+  max-width: none;
+  height: var(--crm6502-control-h, 2rem);
+  min-height: var(--crm6502-control-h, 2rem);
+  max-height: var(--crm6502-control-h, 2rem);
+  border: 1px solid var(--crm6502-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+  background: #fff;
+}
+
+.crm6502-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6;
+}
+
+.crm6502-date-slot :deep(div.inline-flex.h-8),
+.crm6502-date-slot :deep(button) {
+  height: var(--crm6502-control-h, 2rem) !important;
+  min-height: var(--crm6502-control-h, 2rem) !important;
+}
+
+.crm6502-right-store {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-self: end;
+  gap: 0.4rem;
+  width: 100%;
+  max-width: 54.6rem;
+  min-width: 0;
+  overflow: visible;
+}
+
+.crm6502-pick-wrap {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.crm6502-right-store:has(.psp-popup),
+.crm6502-right-store:has(.psp-store-hover-list) {
+  z-index: 50;
+}
+
+.crm6502-right-store :deep(.psp-root) {
+  grid-template-columns:
+    var(--psp-label-w, 5rem)
+    minmax(var(--psp-radio-w, 4.75rem), auto)
+    minmax(0, 1.05fr)
+    minmax(0, 1.3fr)
+    minmax(0, 1.35fr);
+  column-gap: var(--psp-col-gap, 0.5rem);
+  row-gap: var(--crm6502-row-gap, 0.75rem);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.crm6502-right-store :deep(.psp-label) {
+  width: var(--psp-label-w, 5rem);
+  justify-content: flex-start;
+  padding-inline-start: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.crm6502-right-store :deep(.psp-select),
+.crm6502-right-store :deep(.psp-store-trigger),
+.crm6502-right-store :deep(.psp-collapse-btn) {
+  height: var(--crm6502-control-h, 2rem) !important;
+  min-height: var(--crm6502-control-h, 2rem) !important;
+}
+
+.crm6502-right-store :deep(.psp-collapse-btn) {
+  width: var(--crm6502-control-h, 2rem) !important;
+}
+
+.crm6502-right-store :deep(.psp-popup) {
+  z-index: 60;
+  right: 0;
+  left: auto;
+  width: min(42rem, 92vw);
+  min-width: 28rem;
+  max-width: min(42rem, 92vw);
+}
+
+.crm6502-check-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--crm6502-item-gap, 0.75rem);
+  min-width: 0;
+  min-height: var(--crm6502-row-min-h, 2rem);
+  margin-top: var(--crm6502-row-gap, 0.75rem);
+}
+
 .crm6502-checks {
   display: flex;
+  flex: 1 1 auto;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem 0.875rem;
-  min-height: var(--crm6502-row-min-h);
+  min-width: 0;
+  min-height: var(--crm6502-row-min-h, 2rem);
 }
 
 .crm6502-check-item {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
+  min-height: var(--crm6502-row-min-h, 2rem);
   font-size: 0.875rem;
   font-weight: 500;
   color: rgb(30 41 59);
@@ -624,78 +721,32 @@ const excelList = (e) => {
   accent-color: #2563eb;
 }
 
-.crm6502-date-slot :deep(> div.flex.justify-start.items-center) {
-  margin: 0 !important;
-  width: max-content !important;
-  max-width: 100%;
-  min-height: var(--crm6502-row-min-h);
-  align-items: center;
-}
-
-.crm6502-date-slot :deep(input[type="date"]) {
-  box-sizing: border-box;
-  height: var(--crm6502-control-h);
-  min-height: var(--crm6502-control-h);
-  max-height: var(--crm6502-control-h);
-  border: 1px solid var(--crm6502-control-border, #cbd5e1);
-  border-radius: 0.375rem;
-  background: #fff;
-}
-
-.crm6502-date-slot :deep(input[type="date"]:focus) {
-  border-color: #3b82f6;
-}
-
-.crm6502-date-slot :deep(div.inline-flex.h-8),
-.crm6502-date-slot :deep(button) {
-  height: var(--crm6502-control-h) !important;
-  min-height: var(--crm6502-control-h) !important;
-}
-
-.crm6502-pick-slot :deep(select),
-.crm6502-pick-slot :deep(.pickstore-vs-shell),
-.crm6502-pick-slot :deep(.vs__dropdown-toggle) {
-  box-sizing: border-box;
-  height: var(--crm6502-control-h) !important;
-  min-height: var(--crm6502-control-h) !important;
-  max-height: var(--crm6502-control-h) !important;
-}
-
-.crm6502-pick-slot :deep(.pickstore-vs-shell) {
-  border: 1px solid var(--crm6502-control-border, #cbd5e1) !important;
-  border-radius: 0.375rem;
-  background: #fff;
-}
-
-@media (max-width: 1100px) {
-  .crm6502-search-grid--2,
-  .crm6502-check-row {
+@media (max-width: 1280px) {
+  .crm6502-search-layout {
     grid-template-columns: minmax(0, 1fr);
-    justify-content: stretch;
-    row-gap: 0.75rem;
-    padding-left: var(--crm6502-panel-pad-x);
-    padding-right: var(--crm6502-panel-pad-x);
+    row-gap: var(--crm6502-row-gap, 0.75rem);
+    align-items: start;
   }
 
-  .crm6502-edge,
-  .crm6502-gutter {
-    display: none;
-  }
-
-  .crm6502-cell {
+  .crm6502-left-stack {
     width: 100%;
-    max-width: 100%;
-    grid-template-columns: max-content minmax(0, 1fr);
   }
 
-  .crm6502-field,
+  .crm6502-row--pair {
+    flex-wrap: wrap;
+  }
+
   .crm6502-select {
-    width: 100%;
-    max-width: 100%;
+    width: min(var(--crm6502-select-w, 9.5rem), 100%);
   }
 
   .crm6502-date-slot :deep(> div.flex.justify-start.items-center) {
     width: 100% !important;
+  }
+
+  .crm6502-right-store :deep(.psp-popup) {
+    left: 0;
+    right: auto;
   }
 }
 </style>

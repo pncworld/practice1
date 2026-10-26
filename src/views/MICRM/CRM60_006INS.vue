@@ -13,7 +13,7 @@
         <button type="button" class="button search md:w-auto w-14" @click="searchButton">
           조회
         </button>
-        <!-- 5001: 판매·증정 둘 다 테스트 / 그 외: 기존처럼 신규(판매) 1개 -->
+        <!-- 5001: 판매·증정 둘 다 테스트 / 1871: 신규=증정등록 / 그 외: 신규=판매 -->
         <template v-if="isTestDualPopup">
           <button
             type="button"
@@ -28,6 +28,13 @@
             증정등록
           </button>
         </template>
+        <button
+          v-else-if="isLfGiftGroup"
+          type="button"
+          class="button new md:w-auto w-14"
+          @click="addPrsntButton">
+          신규
+        </button>
         <button
           v-else
           type="button"
@@ -128,7 +135,7 @@
         <Realgrid
           class="h-full min-h-0 w-full"
           :progname="'CRM60_006INS_VUE'"
-          :progid="1"
+          :progid="gridProgid"
           :rowData="rowData"
           :reload="reload"
           :showCheckBar="true"
@@ -340,7 +347,10 @@
             <span class="crm6006-req" aria-hidden="true">*</span>고객
           </div>
           <div class="crm6006-form-value">
-            <select v-model="prsntCustCd" class="crm6006-control">
+            <select
+              v-model="prsntCustCd"
+              class="crm6006-control"
+              :disabled="!prsntGroupSelected">
               <option value="0">선택</option>
               <option
                 v-for="i in prsntCustList"
@@ -381,7 +391,8 @@
 import {
   cancelGftCardSale,
   getCreditCompanyList,
-  getGftCustGroup,
+  getGFTMaster,
+  getGFTMaster2,
   getGftLedgerSaleList,
   getGftPrsntCheck,
   getGftStkSaleCheck,
@@ -406,6 +417,24 @@ const isTestDualPopup = computed(() => {
   return [u.lngStoreGroup, u.lngCompanyCode, u.lngCompany].some(
     (v) => String(v ?? "") === "5001"
   );
+});
+/** LF(1871) 신규 버튼은 증정등록 팝업 */
+const isLfGiftGroup = computed(() => {
+  const u = store.state.userData || {};
+  return [u.lngStoreGroup, u.lngCompanyCode, u.lngCompany].some(
+    (v) => String(v ?? "") === "1871"
+  );
+});
+/** 1871/5001(증정등록) → mstGridInfo lngGridID=2, 그 외 → 1 */
+const gridProgid = computed(() => {
+  const u = store.state.userData || {};
+  const isGiftGrid = [u.lngStoreGroup, u.lngCompanyCode, u.lngCompany].some(
+    (v) => {
+      const s = String(v ?? "");
+      return s === "1871" || s === "5001";
+    }
+  );
+  return isGiftGrid ? 2 : 1;
 });
 const crm6006ControlBorder = "#cbd5e1";
 const crm6006ColGutter = "1.5rem";
@@ -729,6 +758,10 @@ const prsntCustCd = ref("0");
 const prsntDate = ref(todayYmd());
 const prsntCardFrom = ref("");
 const prsntCardTo = ref("");
+const prsntGroupSelected = computed(() => {
+  const v = prsntGroupCd.value;
+  return !(v == null || v === "" || v === 0 || v === "0");
+});
 
 const resetPrsntForm = () => {
   prsntGroupCd.value = "0";
@@ -741,11 +774,8 @@ const resetPrsntForm = () => {
 
 const loadPrsntGroups = async () => {
   try {
-    const res = await getGftCustGroup(
-      store.state.userData.lngStoreGroup,
-      "0",
-      "1"
-    );
+    // CRM60_009INS 등록 데이터와 동일 소스(usp_VUE_GetGFTCustMaster)
+    const res = await getGFTMaster(store.state.userData.lngStoreGroup);
     prsntGroupList.value = Array.isArray(res?.data?.List) ? res.data.List : [];
     prsntCustList.value = [];
     prsntCustCd.value = "0";
@@ -766,10 +796,10 @@ const onPrsntGroupChange = async () => {
     return;
   }
   try {
-    const res = await getGftCustGroup(
+    // CRM60_009INS 고객 목록과 동일 소스
+    const res = await getGFTMaster2(
       store.state.userData.lngStoreGroup,
-      prsntGroupCd.value,
-      "2"
+      prsntGroupCd.value
     );
     prsntCustList.value = Array.isArray(res?.data?.List) ? res.data.List : [];
   } catch (e) {
@@ -1466,6 +1496,12 @@ const excelList = (e) => {
   border-color: #3b82f6;
   outline: none;
   box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+
+.crm6006-control:disabled {
+  color: #94a3b8;
+  background: #f1f5f9;
+  cursor: not-allowed;
 }
 
 @media (max-width: 1100px) {

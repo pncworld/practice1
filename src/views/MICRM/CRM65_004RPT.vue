@@ -71,7 +71,7 @@
               </select>
             </div>
             <div class="crm6504-pair-item min-w-0">
-              <span class="crm6504-lbl crm6504-lbl--short shrink-0">권종</span>
+              <span class="crm6504-lbl shrink-0">권종</span>
               <select v-model="cond3" class="crm6504-select">
                 <option value="0">전체</option>
                 <option
@@ -86,13 +86,29 @@
         </div>
 
         <div class="crm6504-right-store min-w-0 overflow-visible">
-          <label class="crm6504-store-check" title="매장별 조회">
-            <input
-              v-model="cond"
-              type="checkbox"
-              class="crm6504-check"
-              aria-label="매장별 조회" />
-          </label>
+          <button
+            type="button"
+            class="crm6504-store-check"
+            :class="{ 'is-on': cond }"
+            :aria-pressed="cond ? 'true' : 'false'"
+            title="매장별 조회"
+            aria-label="매장별 조회"
+            @click.stop="cond = !cond">
+            <svg
+              v-show="cond"
+              class="crm6504-check-mark"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false">
+              <path
+                d="M5 13l4 4L19 7"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
           <div class="crm6504-pick-wrap min-w-0 flex-1">
             <PickStorePlural
               fluid-width
@@ -413,11 +429,13 @@ const excelList = (e) => {
   z-index: 1;
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   justify-content: center;
   gap: var(--crm6504-row-gap, 0.75rem);
   width: max-content;
   max-width: 100%;
   min-width: 0;
+  overflow: hidden;
 }
 
 .crm6504-row {
@@ -425,20 +443,23 @@ const excelList = (e) => {
   flex-direction: row;
   align-items: center;
   gap: var(--crm6504-item-gap, 0.75rem);
+  width: 100%;
   min-width: 0;
   min-height: var(--crm6504-row-min-h, 2rem);
 }
 
 .crm6504-row--pair {
-  gap: 1rem;
+  gap: var(--crm6504-item-gap, 0.75rem);
+  width: max-content;
+  max-width: 100%;
 }
 
 .crm6504-pair-item {
   display: flex;
+  flex: 0 0 auto;
   flex-direction: row;
   align-items: center;
   gap: var(--crm6504-item-gap, 0.75rem);
-  min-width: 0;
 }
 
 .crm6504-lbl {
@@ -447,7 +468,7 @@ const excelList = (e) => {
   width: var(--crm6504-label-col, 5rem);
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: flex-end;
   min-height: var(--crm6504-row-min-h, 2rem);
   font-size: 0.9375rem;
   font-weight: 600;
@@ -456,34 +477,35 @@ const excelList = (e) => {
   white-space: nowrap;
 }
 
-.crm6504-lbl--short {
-  flex-basis: 3rem;
-  width: 3rem;
-}
-
 .crm6504-store-check {
   box-sizing: border-box;
   display: inline-flex;
-  flex-shrink: 0;
+  flex: 0 0 1.15rem;
   align-items: center;
   justify-content: center;
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.15rem;
+  height: 1.15rem;
   margin: 0;
+  padding: 0;
   cursor: pointer;
   position: relative;
-  z-index: 5;
+  z-index: 30;
   pointer-events: auto;
+  color: #fff;
+  background: #fff;
+  border: 1.5px solid #64748b;
+  border-radius: 0.2rem;
 }
 
-.crm6504-check {
-  width: 1rem;
-  height: 1rem;
-  margin: 0;
-  flex-shrink: 0;
-  cursor: pointer;
-  pointer-events: auto;
-  accent-color: #2563eb;
+.crm6504-store-check.is-on {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.crm6504-check-mark {
+  display: block;
+  width: 0.85rem;
+  height: 0.85rem;
 }
 
 .crm6504-select {
@@ -509,16 +531,34 @@ const excelList = (e) => {
   box-shadow: 0 0 0 2px rgb(59 130 246 / 0.35);
 }
 
+.crm6504-date-slot {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .crm6504-date-slot :deep(> div.flex.justify-start.items-center) {
   margin: 0 !important;
-  width: max-content !important;
+  width: 100% !important;
   max-width: 100%;
   min-height: var(--crm6504-row-min-h, 2rem);
   align-items: center;
 }
 
+.crm6504-date-slot :deep(> div.flex.justify-start.items-center > div) {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
 .crm6504-date-slot :deep(input[type="date"]) {
   box-sizing: border-box;
+  flex: 1 1 0;
+  width: auto !important;
+  min-width: 0;
+  max-width: none;
   height: var(--crm6504-control-h, 2rem);
   min-height: var(--crm6504-control-h, 2rem);
   max-height: var(--crm6504-control-h, 2rem);
@@ -543,9 +583,10 @@ const excelList = (e) => {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-self: end;
   gap: 0.4rem;
   width: 100%;
-  max-width: 100%;
+  max-width: 54.6rem;
   min-width: 0;
   overflow: visible;
 }
