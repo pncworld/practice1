@@ -461,6 +461,18 @@ const searchButton = async () => {
       supplierid.value
     );
 
+    if (res?.data?.RESULT_CD !== "00") {
+      rowData.value = [];
+      afterSearch.value = false;
+      await Swal.fire({
+        title: "실패",
+        text: res?.data?.RESULT_NM ?? "조회 중 오류가 발생하였습니다.",
+        icon: "error",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+
     rowData.value = res.data.List;
     //console.log(res);
     // 디버깅: 실제 데이터 구조 확인
@@ -471,6 +483,12 @@ const searchButton = async () => {
   } catch (error) {
     afterSearch.value = false;
     //comsole.log(error);
+    await Swal.fire({
+      title: "오류",
+      text: "조회 중 오류가 발생하였습니다.",
+      icon: "error",
+      confirmButtonText: "확인",
+    });
   } finally {
     store.state.loading = false;
   }
