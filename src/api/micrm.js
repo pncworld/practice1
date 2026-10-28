@@ -1367,6 +1367,55 @@ export const getCreditCompanyList = (groupCd, cond) => {
     STORE_CD: cond,
   });
 };
+
+/** 판매등록 저장 전 검증 (Popup1) */
+export const getGftStkSaleCheck = (groupCd, storeCd, cardFrom, cardTo) => {
+  return api2.post("/MICRM/CRM60_006INS.asmx/getGftStkSaleCheck", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    CARD_FROM: cardFrom,
+    CARD_TO: cardTo,
+  });
+};
+
+/** 증정등록 저장 전 검증 (Popup2) */
+export const getGftPrsntCheck = (groupCd, cardFrom, cardTo) => {
+  return api2.post("/MICRM/CRM60_006INS.asmx/getGftPrsntCheck", {
+    GROUP_CD: groupCd,
+    CARD_FROM: cardFrom,
+    CARD_TO: cardTo,
+  });
+};
+
+/** 증정등록 저장 (Popup2) */
+export const setGftPrsnt = (
+  groupCd,
+  groupCust,
+  custCd,
+  saleDate,
+  cardFrom,
+  cardTo,
+  empSale
+) => {
+  return api2.post("/MICRM/CRM60_006INS.asmx/setGftPrsnt", {
+    GROUP_CD: groupCd,
+    GROUP_CUST: groupCust,
+    CUST_CD: custCd,
+    DATE: saleDate,
+    CARD_FROM: cardFrom,
+    CARD_TO: cardTo,
+    EMPSALE: empSale,
+  });
+};
+
+/** 거래처그룹(strDiv=1) / 고객(strDiv=2) */
+export const getGftCustGroup = (groupCd, lngGroup, strDiv) => {
+  return api2.post("/MICRM/CRM60_006INS.asmx/getCustGroup", {
+    GROUP_CD: groupCd,
+    LNG_GROUP: lngGroup,
+    STR_DIV: strDiv,
+  });
+};
 export const saveNewGftCard = (
   groupCd,
   cond,
@@ -1384,6 +1433,38 @@ export const saveNewGftCard = (
     CNT: cond4,
     DATE: cond5,
     EMP_CNT: cond6,
+  });
+};
+
+/** LF 푸드(1871) 연번생성 — 기등록 상품권번호 조회 */
+export const getGftValidChk = (groupCd, cardNoFrom, cardNoTo) => {
+  return api2.post("/MICRM/CRM60_004INS.asmx/getGftValidChk", {
+    GROUP_CD: groupCd,
+    CARD_FROM: cardNoFrom,
+    CARD_TO: cardNoTo,
+  });
+};
+
+/** LF 푸드(1871) 연번생성 — from~to 저장 */
+export const setGftCreate = (
+  groupCd,
+  category,
+  gftType,
+  cardNoFrom,
+  cardNoTo,
+  validateDate,
+  createCnt,
+  empCreate
+) => {
+  return api2.post("/MICRM/CRM60_004INS.asmx/setGftCreate", {
+    GROUP_CD: groupCd,
+    COND: category,
+    COND2: gftType,
+    CARD_FROM: cardNoFrom,
+    CARD_TO: cardNoTo,
+    DATE: validateDate,
+    CNT: createCnt,
+    EMP_CNT: empCreate,
   });
 };
 
@@ -1429,6 +1510,38 @@ export const getGftLedgerReleaseList = (groupCd, cond, cond2, cond3, cond4) => {
     SDATE: cond2,
     EDATE: cond3,
     STATUS: cond4,
+  });
+};
+
+/** 출고등록 전 유효성 — 레거시 GetGftValidChk */
+export const getGftReleaseValidChk = (
+  groupCd,
+  storeCd,
+  status,
+  cardNoFrom,
+  cardNoTo
+) => {
+  return api2.post("/MICRM/CRM60_008INS.asmx/getGftReleaseValidChk", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    STATUS: status,
+    CARD_NO: cardNoFrom,
+    CARD_NO_E: cardNoTo,
+  });
+};
+
+/** 출고취소 전 유효성 — 레거시 GetGftCancleChk */
+export const getGftReleaseCancelChk = (
+  groupCd,
+  status,
+  cardNoFrom,
+  cardNoTo
+) => {
+  return api2.post("/MICRM/CRM60_008INS.asmx/getGftReleaseCancelChk", {
+    GROUP_CD: groupCd,
+    STATUS: status,
+    CARD_NO: cardNoFrom,
+    CARD_NO_E: cardNoTo,
   });
 };
 
