@@ -33,10 +33,11 @@ const { rememberNaverUser } = require("../services/npSession");
 const { getBaseUrl } = require("../services/baseUrl");
 const { FRONT_HOST } = require("../services/frontHost");
 const { escapeHtml, renderLayout } = require("../ui/layout");
+const { handleNaverLogout } = require("./naverLogin");
 
 const PAGE_SIZE = 10; // 가이드 슬라이드 23: 디폴트 사이즈 10
 
-function layout(req, { title, heading, subtitle, body }) {
+function layout(req, { title, heading, subtitle, body, logoutHref = "/naver/places/logout" }) {
   return renderLayout({
     title,
     heading: heading || title,
@@ -44,6 +45,7 @@ function layout(req, { title, heading, subtitle, body }) {
     body,
     wide: true,
     showLogout: true,
+    logoutHref,
   });
 }
 
@@ -55,7 +57,7 @@ function buildLookupUrl(callbackUrl) {
 
 function disconnectForm(biz, storeId, naverUniqueId) {
   const action = `/naver/places/${encodeURIComponent(biz.placeId)}/disconnect?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}&page=0`;
-  return `<form method="post" action="${action}" onsubmit="return confirm('연동을 해지할까요?');">
+  return `<form method="post" action="${action}" data-np-confirm>
     <button class="btn btn-muted" type="submit">연동 해지</button>
   </form>`;
 }
@@ -102,7 +104,8 @@ function placeFields(biz) {
  * 이미 연동된 업체가 있을 때 보여주는 확인 화면.
  */
 function renderConnectedPage({ storeId, naverUniqueId, connected }) {
-  const logoutButton = `<button class="btn btn-ghost" type="button" data-np-logout>로그아웃</button>`;
+  const logoutHref = `/naver/places/logout?storeId=${encodeURIComponent(storeId)}`;
+  const logoutButton = `<a class="btn btn-ghost" data-np-logout href="${logoutHref}">로그아웃</a>`;
   let body;
 
   if (connected.length === 1) {
@@ -129,6 +132,7 @@ function renderConnectedPage({ storeId, naverUniqueId, connected }) {
     title: "네이버 플레이스+ 연동",
     heading: "현재 '네이버 플레이스+'가 정상적으로 연동되어 있습니다.",
     body,
+    logoutHref,
   });
 }
 
@@ -137,6 +141,8 @@ function renderConnectedPage({ storeId, naverUniqueId, connected }) {
  *
  * GET /naver/places?storeId=xxx&page=0
  */
+router.get("/logout", handleNaverLogout);
+
 router.get("/", async (req, res) => {
   const { storeId, refreshToken, naverUniqueId } = getDemoStoreContext(req);
   const page = Number.parseInt(req.query.page, 10) || 0;
@@ -196,7 +202,7 @@ router.get("/", async (req, res) => {
         const initial = escapeHtml(String(biz.businessName || "?").charAt(0));
         const isConnected = connectedFlags[index];
         const actionForm = isConnected
-          ? `<form method="post" action="/naver/places/${encodeURIComponent(biz.placeId)}/disconnect?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}&page=${page}" onsubmit="return confirm('연동을 해지할까요?');">
+          ? `<form method="post" action="/naver/places/${encodeURIComponent(biz.placeId)}/disconnect?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}&page=${page}" data-np-confirm>
               <button class="btn btn-muted" type="submit">연동 해지</button>
             </form>`
           : `<form method="post" action="/naver/places/${encodeURIComponent(biz.placeId)}/connect?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}&page=${page}">

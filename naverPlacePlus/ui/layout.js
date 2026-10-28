@@ -242,6 +242,21 @@ html, body {
   word-break: break-word;
 }
 .status-block form { margin-top: 10px; }
+.np-modal[hidden] { display: none !important; }
+.np-modal {
+  position: fixed; inset: 0; z-index: 30;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: rgba(26, 60, 112, 0.28);
+}
+.np-modal-card {
+  width: 100%; max-width: 420px;
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+  padding: 22px 22px 18px;
+}
+.np-modal-card .np-page-head { margin-bottom: 18px; }
+.np-modal-actions .btn { flex: 1; height: 44px; }
 .status-actions { margin-top: 16px; }
 .status-actions form { flex: 1 1 0; display: flex; margin: 0; }
 .status-actions form .btn { flex: 1; width: 100%; }
@@ -262,7 +277,7 @@ function renderLayout({
   wide = false,
   extraScript = "",
   showLogout = false,
-  logoutHref = "/naver/start",
+  logoutHref = "/naver/places/logout",
 }) {
   const subHtml = subtitle ? `<p class="np-sub">${escapeHtml(subtitle)}</p>` : "";
   const headHtml = heading
@@ -275,22 +290,7 @@ function renderLayout({
       </div>`
     : "";
   const logoutHtml = showLogout
-    ? `<a class="np-logout" href="/naver/logout" data-np-logout>로그아웃</a>`
-    : "";
-  const logoutScript = showLogout
-    ? `<script>
-(function () {
-  document.querySelectorAll("[data-np-logout]").forEach(function (el) {
-    el.addEventListener("click", function (e) {
-      e.preventDefault();
-      var back = location.origin + "/naver/logout/closed";
-      var logoutUrl = "https://nid.naver.com/nidlogin.logout?returl=" + encodeURIComponent(back);
-      window.open(logoutUrl, "np_naver_logout");
-      location.replace("/naver/logout");
-    });
-  });
-})();
-</script>`
+    ? `<a class="np-logout" data-np-logout href="${escapeHtml(logoutHref)}">로그아웃</a>`
     : "";
 
   return `<!DOCTYPE html>
@@ -318,8 +318,84 @@ function renderLayout({
     </main>
     <footer class="np-footer">Copyright©1997 PnCworld ALL RIGHT RESERVED.</footer>
   </div>
+  <div class="np-modal" id="np-confirm" hidden>
+    <div class="np-modal-card" role="dialog" aria-modal="true" aria-labelledby="np-confirm-title">
+      <div class="np-page-head">
+        <div class="np-title-icon"></div>
+        <div>
+          <h1 id="np-confirm-title">연동을 해지할까요?</h1>
+          <p class="np-sub" id="np-confirm-sub">해지하면 이 매장과 플레이스+ 연결이 끊어집니다.</p>
+        </div>
+      </div>
+      <div class="btn-row np-modal-actions">
+        <button type="button" class="btn btn-muted" id="np-confirm-ok">확인</button>
+        <button type="button" class="btn btn-ghost" id="np-confirm-cancel">취소</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var modal = document.getElementById("np-confirm");
+      var titleEl = document.getElementById("np-confirm-title");
+      var subEl = document.getElementById("np-confirm-sub");
+      var cancelBtn = document.getElementById("np-confirm-cancel");
+      var okBtn = document.getElementById("np-confirm-ok");
+      if (!modal || !titleEl || !subEl || !cancelBtn || !okBtn) return;
+      var pending = null;
+      function closeModal() {
+        modal.hidden = true;
+        pending = null;
+      }
+      function openModal(kind, target) {
+        pending = { kind: kind, target: target };
+        if (kind === "logout") {
+          titleEl.textContent = "로그아웃할까요?";
+          subEl.textContent = "로그아웃하면 네이버 로그인 화면으로 이동합니다.";
+        } else {
+          titleEl.textContent = "연동을 해지할까요?";
+          subEl.textContent = "해지하면 이 매장과 플레이스+ 연결이 끊어집니다.";
+        }
+        modal.hidden = false;
+        cancelBtn.focus();
+      }
+      document.addEventListener("submit", function (event) {
+        var form = event.target;
+        if (!form || !form.hasAttribute || !form.hasAttribute("data-np-confirm")) return;
+        if (form.getAttribute("data-np-confirmed") === "1") return;
+        event.preventDefault();
+        openModal("disconnect", form);
+      });
+      document.addEventListener("click", function (event) {
+        var link = event.target && event.target.closest
+          ? event.target.closest("a[data-np-logout]")
+          : null;
+        if (!link) return;
+        if (link.getAttribute("data-np-confirmed") === "1") return;
+        event.preventDefault();
+        openModal("logout", link);
+      });
+      cancelBtn.addEventListener("click", closeModal);
+      okBtn.addEventListener("click", function () {
+        if (!pending) return;
+        var target = pending.target;
+        var kind = pending.kind;
+        target.setAttribute("data-np-confirmed", "1");
+        closeModal();
+        if (kind === "logout") {
+          window.location.href = target.getAttribute("href");
+          return;
+        }
+        target.submit();
+      });
+      modal.addEventListener("click", function (event) {
+        if (event.target === modal) closeModal();
+      });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !modal.hidden) closeModal();
+      });
+    })();
+  </script>
   ${extraScript}
-  ${logoutScript}
 </body>
 </html>`;
 }
