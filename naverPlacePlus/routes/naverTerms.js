@@ -39,7 +39,7 @@ const {
 } = require("../services/placeApi");
 const { getDemoStoreContext } = require("../services/demoStore");
 const { FRONT_HOST } = require("../services/frontHost");
-const { getBaseUrl } = require("../services/baseUrl");
+const { getBaseUrl, getNaverStartUrl } = require("../services/baseUrl");
 
 /**
  * STEP 1. 약관 동의 시작
@@ -67,21 +67,20 @@ router.get("/start", async (req, res) => {
     );
   }
 
-  const callbackUrl = new URL(
-    "/naver/terms/callback",
-    getBaseUrl(req)
-  );
-  callbackUrl.searchParams.set("storeId", storeId);
-  // naverUniqueId도 함께 실어 보내야, 콜백에서 "동의여부 조회 API"를
-  // 실제 로그인한 사용자 기준으로 재검증할 수 있습니다.
-  callbackUrl.searchParams.set("naverUniqueId", naverUniqueId);
+  const returnUrl = new URL(getNaverStartUrl(req));
+  returnUrl.searchParams.set("consent", "1");
+  returnUrl.searchParams.set("fromTerms", "1");
+  returnUrl.searchParams.set("storeId", storeId);
+  if (naverUniqueId && naverUniqueId !== "DEMO_NAVER_UNIQUE_ID") {
+    returnUrl.searchParams.set("naverUniqueId", naverUniqueId);
+  }
 
   const serviceCode = process.env.POS_SERVICE_CODE; // 담당자 발급값 그대로 (pnc)
   const services = [serviceCode, "booking"].join(","); // mybiz는 필요할 때만 추가
 
   const termsUrl = new URL("/embed/terms", FRONT_HOST);
   termsUrl.searchParams.set("service", services);
-  termsUrl.searchParams.set("to", callbackUrl.toString());
+  termsUrl.searchParams.set("to", returnUrl.toString());
 
   res.redirect(termsUrl.toString());
 });
@@ -96,9 +95,14 @@ router.get("/start", async (req, res) => {
  */
 router.get("/callback", (req, res) => {
   const { storeId, naverUniqueId } = getDemoStoreContext(req);
-  return res.redirect(
-    `/naver/places?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}`
-  );
+  const returnUrl = new URL("/naver/start", getBaseUrl(req));
+  returnUrl.searchParams.set("consent", "1");
+  returnUrl.searchParams.set("fromTerms", "1");
+  returnUrl.searchParams.set("storeId", storeId);
+  if (naverUniqueId && naverUniqueId !== "DEMO_NAVER_UNIQUE_ID") {
+    returnUrl.searchParams.set("naverUniqueId", naverUniqueId);
+  }
+  return res.redirect(returnUrl.pathname + returnUrl.search);
 });
 
 module.exports = router;

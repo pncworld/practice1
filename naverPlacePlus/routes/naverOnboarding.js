@@ -14,7 +14,14 @@
 const express = require("express");
 const router = express.Router();
 const { renderLayout } = require("../ui/layout");
-const { readNaverSession, rememberNaverUser, markConsent, hasConsent } = require("../services/npSession");
+const {
+  readNaverSession,
+  rememberNaverUser,
+  rememberStoreId,
+  clearNaverUser,
+  markConsent,
+  hasConsent,
+} = require("../services/npSession");
 const { getAccessToken } = require("../services/naverAuth");
 const {
   getAgreementSummary,
@@ -44,10 +51,20 @@ router.get("/agree", (req, res) => {
 router.get("/", async (req, res) => {
   const session = readNaverSession(req);
   const storeId = req.query.storeId || session.storeId || "demo-store-1";
-  const naverUniqueId = req.query.naverUniqueId || session.naverUniqueId || "";
+  const naverUniqueIdFromQuery = req.query.naverUniqueId || "";
   res.set("Cache-Control", "no-store");
 
-  if (naverUniqueId) {
+  const fromTerms = req.query.fromTerms === "1";
+
+  if (!fromTerms && !naverUniqueIdFromQuery && session.naverUniqueId) {
+    clearNaverUser(res);
+    rememberStoreId(res, storeId);
+    return res.redirect(`/naver/login/start?storeId=${encodeURIComponent(storeId)}`);
+  }
+
+  const naverUniqueId = naverUniqueIdFromQuery || (fromTerms ? session.naverUniqueId || "" : "");
+
+  if (!fromTerms && naverUniqueId) {
     try {
       const accessToken = await getAccessToken(storeId, process.env.DEMO_REFRESH_TOKEN);
       const connected = await listConnectedBusinesses({ accessToken, naverUniqueId });
@@ -66,7 +83,7 @@ router.get("/", async (req, res) => {
         err.response?.data || err.message
       );
     }
-  } else if (req.query.consent !== "1") {
+  } else if (!fromTerms && req.query.consent !== "1") {
     return res.redirect(`/naver/login/start?storeId=${encodeURIComponent(storeId)}`);
   }
 
