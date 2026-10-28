@@ -31,7 +31,13 @@ const {
   listConnectedBusinesses,
 } = require("../services/placeApi");
 const { getBaseUrl } = require("../services/baseUrl");
-const { rememberNaverUser, clearNaverUser, hasConsent } = require("../services/npSession");
+const {
+  rememberNaverUser,
+  rememberStoreId,
+  clearNaverUser,
+  readNaverSession,
+  hasConsent,
+} = require("../services/npSession");
 const { renderLayout, escapeHtml } = require("../ui/layout");
 
 function getRedirectUri() {
@@ -46,9 +52,19 @@ function getRedirectUri() {
 }
 
 function handleNaverLogout(req, res) {
+  const session = readNaverSession(req);
+  const storeId = req.query.storeId || session.storeId || "demo-store-1";
   clearNaverUser(res);
+  rememberStoreId(res, storeId);
   res.set("Cache-Control", "no-store");
-  res.redirect("/naver/start");
+
+  const authorizeUrl = buildAuthorizeUrl({
+    redirectUri: getRedirectUri(),
+    state: storeId,
+  });
+  const logoutUrl = new URL("https://nid.naver.com/nidlogin.logout");
+  logoutUrl.searchParams.set("returl", authorizeUrl);
+  res.redirect(logoutUrl.toString());
 }
 
 function handleNaverLogoutClosed(req, res) {
@@ -88,7 +104,13 @@ router.get("/start", (req, res) => {
  */
 router.get("/callback", async (req, res) => {
   const { code, state, error, error_description: errorDescription } = req.query;
-  const storeId = state || "demo-store-1";
+  const storeId = state || readNaverSession(req).storeId || "demo-store-1";
+
+  if (!code && !error) {
+    const startUrl = new URL("/naver/start", new URL(getRedirectUri()).origin);
+    startUrl.searchParams.set("storeId", storeId);
+    return res.redirect(startUrl.toString());
+  }
 
   if (error) {
     console.error("[naver/login/callback] 로그인 거부/오류:", error, errorDescription);

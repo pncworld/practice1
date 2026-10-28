@@ -35,6 +35,11 @@ function cookieHeader(name, value, maxAge = MONTH_SECONDS) {
   ].join("; ");
 }
 
+function rememberStoreId(res, storeId) {
+  if (!res || !storeId) return;
+  res.append("Set-Cookie", cookieHeader(STORE_COOKIE, String(storeId)));
+}
+
 function rememberNaverUser(res, storeId, naverUniqueId) {
   if (!res || !storeId || !naverUniqueId || naverUniqueId === "DEMO_NAVER_UNIQUE_ID") {
     return;
@@ -66,6 +71,7 @@ function readNaverSession(req) {
 
 module.exports = {
   rememberNaverUser,
+  rememberStoreId,
   clearNaverUser,
   readNaverSession,
   markConsent,

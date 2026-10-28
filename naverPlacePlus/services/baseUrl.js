@@ -19,13 +19,9 @@ function getNaverStartUrl(req) {
   return `${origin}/naver/start`;
 }
 
-/** 네이버 세션을 끊고 start 로 돌아오는 로그아웃 URL */
+/** 로그아웃 후 열리는 연동 첫 화면 */
 function buildNaverLogoutUrl(req) {
-  const startUrl = getNaverStartUrl(req);
-  const url = new URL("https://nid.naver.com/nidlogin.logout");
-  url.searchParams.set("returl", startUrl);
-  url.searchParams.set("url", startUrl);
-  return url.toString();
+  return getNaverStartUrl(req);
 }
 
 module.exports = { getBaseUrl, getNaverStartUrl, buildNaverLogoutUrl };
