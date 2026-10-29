@@ -2639,6 +2639,151 @@ export const getMenuCodeEnroll = (groupCd, storeCd) => {
     STORE_CD: storeCd,
   });
 };
+// 메뉴코드등록 AI로 간편메뉴 추가: 메뉴코드 제안·중복 확인 (같은 매장 전체 메뉴 기준, 조회만)
+export const getMenuCodeSuggestion = (groupCd, storeCd, mainGroup, subGroup, lngCode) => {
+  const aiApiBase = process.env.VUE_APP_AI_API_BASE;
+  return api2.post(
+    "/MIMASTER/MST01_003INS_AI.asmx/getMenuCodeSuggestion",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      MAIN_GROUP: mainGroup,
+      SUB_GROUP: subGroup,
+      LNG_CODE: lngCode || "",
+    },
+    aiApiBase ? { baseURL: aiApiBase } : undefined
+  );
+};
+// 메뉴코드등록 AI로 간편메뉴 추가: 주방출력·할인적용 설정 참고 메뉴 (설정 묶음별 최근 등록 대표 메뉴, 조회만)
+export const getSettingReference = (groupCd, storeCd) => {
+  const aiApiBase = process.env.VUE_APP_AI_API_BASE;
+  return api2.post(
+    "/MIMASTER/MST01_003INS_AI.asmx/getSettingReference",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+    },
+    aiApiBase ? { baseURL: aiApiBase } : undefined
+  );
+};
+// 메뉴코드등록 AI로 간편메뉴 추가: 메뉴키 추가 (매장별 고른 화면의 마지막 위치, 매장의 포스 전체, 지우기 없음)
+// targets: [{ STORE_CD, SCREEN_NO }]
+export const appendMenuKeys = (groupCd, menuCode, keyName, targets) => {
+  const aiApiBase = process.env.VUE_APP_AI_API_BASE;
+  return api2.post(
+    "/MIMASTER/MST01_003INS_AI.asmx/appendMenuKeys",
+    {
+      GROUP_CD: groupCd,
+      MENU_CODE: menuCode,
+      KEY_NAME: keyName,
+      TARGETS: JSON.stringify(targets),
+    },
+    aiApiBase ? { baseURL: aiApiBase } : undefined
+  );
+};
+// 메뉴코드등록 AI로 간편메뉴 추가: 메뉴명 다국어(영어·일본어·중국어) 제안 (저장 없음, 저장은 saveMultiLang)
+export const translateMenuName = (groupCd, storeCd, name) => {
+  const aiApiBase = process.env.VUE_APP_AI_API_BASE;
+  return api2.post(
+    "/MIMASTER/MST01_003INS_AI.asmx/translateMenuName",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      NAME: name,
+    },
+    aiApiBase ? { baseURL: aiApiBase } : undefined
+  );
+};
+// 메뉴코드등록 AI로 추가(대화): 대화 기록·현재 후보 → 답변(REPLY) + 후보 목록 (DB 저장 없음)
+// 로컬 테스트: .env.development.local 에 VUE_APP_AI_API_BASE 가 있으면 이 호출만 그 주소(로컬 ASMX)로 보낸다
+export const chatMenu = (groupCd, storeCd, messages, currentItems, groupList) => {
+  const aiApiBase = process.env.VUE_APP_AI_API_BASE;
+  return api2.post(
+    "/MIMASTER/MST01_003INS_AI.asmx/chatMenu",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      MESSAGES: messages,
+      CURRENT_ITEMS: currentItems,
+      GROUP_LIST: groupList,
+    },
+    aiApiBase ? { baseURL: aiApiBase } : undefined
+  );
+};
+// 메뉴코드등록 AI 도우미(시작·조회·수정·매출·질문): 입력 문장 → 작업 종류(INTENT) + 조건·답변 (DB 저장 없음)
+// menuStats: 화면에 조회된 메뉴 목록 통계(JSON) — '전부 과세야?' 같은 질문에 답하는 데 쓴다
+export const chatAssist = (groupCd, storeCd, messages, groupList, menuStats) => {
+  const aiApiBase = process.env.VUE_APP_AI_API_BASE;
+  return api2.post(
+    "/MIMASTER/MST01_003INS_AI.asmx/chatAssist",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      MESSAGES: messages,
+      GROUP_LIST: groupList,
+      MENU_STATS: menuStats,
+    },
+    aiApiBase ? { baseURL: aiApiBase } : undefined
+  );
+};
+// 메뉴코드등록 AI 메뉴 관리: 메뉴 1건 현재 값(slsMenu 행 전체 JSON). 수정 저장 직전 '수정 전' 값으로 받아 둔다 (조회만)
+export const getMenuSnapshot = (groupCd, storeCd, menuCode) => {
+  const aiApiBase = process.env.VUE_APP_AI_API_BASE;
+  return api2.post(
+    "/MIMASTER/MST01_003INS_AI.asmx/getMenuSnapshot",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      MENU_CODE: menuCode,
+    },
+    aiApiBase ? { baseURL: aiApiBase } : undefined
+  );
+};
+// 메뉴코드등록 AI 메뉴 관리: 신규·수정 로그(sysAiChangeLog). 저장 뒤 호출, 신규·수정 후 값은 서버가 다시 읽고 사용자는 토큰에서 꺼낸다
+export const writeMenuChangeLog = (groupCd, storeCd, action, menuCode, beforeData, remark) => {
+  const aiApiBase = process.env.VUE_APP_AI_API_BASE;
+  return api2.post(
+    "/MIMASTER/MST01_003INS_AI.asmx/writeMenuChangeLog",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      ACTION: action,
+      MENU_CODE: menuCode,
+      BEFORE_DATA: beforeData,
+      REMARK: remark,
+    },
+    aiApiBase ? { baseURL: aiApiBase } : undefined
+  );
+};
+// 메뉴코드등록 AI 도우미: 등록일(INSERT)·수정일(UPDATE) 기간에 해당하는 메뉴코드와 일시 (조회만)
+export const getMenuDates = (groupCd, storeCd, dateType, fromDate, toDate) => {
+  const aiApiBase = process.env.VUE_APP_AI_API_BASE;
+  return api2.post(
+    "/MIMASTER/MST01_003INS_AI.asmx/getMenuDates",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      DATE_TYPE: dateType,
+      FROM_DATE: fromDate,
+      TO_DATE: toDate,
+    },
+    aiApiBase ? { baseURL: aiApiBase } : undefined
+  );
+};
+// 메뉴코드등록 AI 도우미: 기간(최대 31일) 메뉴별 판매수량·매출 합계 (판매된 메뉴만, 매장코드 0 이면 그룹 전체)
+export const getMenuSales = (groupCd, storeCd, fromDate, toDate) => {
+  const aiApiBase = process.env.VUE_APP_AI_API_BASE;
+  return api2.post(
+    "/MIMASTER/MST01_003INS_AI.asmx/getMenuSales",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      FROM_DATE: fromDate,
+      TO_DATE: toDate,
+    },
+    aiApiBase ? { baseURL: aiApiBase } : undefined
+  );
+};
 export const getDeliveryMenuMap = (groupCd, storeCd, deliveryCd, menuCd) => {
   const payload = {
     GROUP_CD: groupCd,
