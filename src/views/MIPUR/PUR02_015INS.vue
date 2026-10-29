@@ -103,6 +103,7 @@
         @dblclickedRowData="dblclickedRowData"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
+        :inputUnsignedDecimalColumn="'dblCheckQty,dblOrderQty'"
         :exporttoExcel="exportExcel" />
     </div>
   </div>
@@ -249,7 +250,7 @@
               @updatedRowData="updatedRowData2"
               :rowStateeditable="false"
               :suppressEdit="disabled1"
-              :inputOnlyNumberColumn="'dblCheckQty'"
+              :inputUnsignedDecimalColumn="'dblCheckQty,dblBefCheckQty,dblOrderQty'"
               :CalculateTaxColId="'curTax'"
               :editableColId="disabled1 ? '' : 'dblCheckQty,strCheckComments'"
               :AutoCalculateDataMainColId="['curSupply', 'curTotal']"

@@ -121,6 +121,7 @@
         :rowData="rowData"
         :reload="reload"
         :setStateBar="false"
+        :rowStateeditable="false"
         :setFooter="true"
         :footer-label-on-first-visible="true"
         :footer-use-cell-number-format="true"
