@@ -5463,6 +5463,8 @@ const runAiSales = async (cond) => {
   const period = `${fromText} ~ ${toText}`;
   // '이 메뉴들 중'처럼 앞 결과를 이어받으면 그 메뉴들 안에서만 본다
   const prevScope = aiPreviousScope(cond);
+  // 순위 기준: 서버가 sortBy=qty 를 보내면 판매수량, 아니면(값이 없는 이전 API 포함) 실매출
+  const byQty = cond.sortBy === "qty";
   const keywordText = (prevScope ? ` 앞 결과 ${prevScope.size}개 중` : "") + (keyword ? ` '${cond.keyword}'` : "");
 
   let rows;
@@ -5493,7 +5495,12 @@ const runAiSales = async (cond) => {
     rows = base
       .map(([code, s]) => ({ code, cnt: s.cnt, amt: s.amt, menu: menuByCode.get(code) }))
       .filter((r) => terms.length === 0 || (r.menu && aiMenuNameHit(r.menu, terms)))
-      .sort((a, b) => (mode === "bottom" ? a.amt - b.amt : b.amt - a.amt))
+      // 순위 기준: 판매수량(sortBy=qty) 또는 실매출(기본). 같으면 다른 기준으로 한 번 더
+      .sort((a, b) => {
+        const [x, y] = byQty ? [a.cnt - b.cnt, a.amt - b.amt] : [a.amt - b.amt, a.cnt - b.cnt];
+        const diff = x !== 0 ? x : y;
+        return mode === "bottom" ? diff : -diff;
+      })
       .map((r, idx) => ({
         rank: idx + 1,
         code: r.code,
@@ -5508,7 +5515,7 @@ const runAiSales = async (cond) => {
       rows.length === 0
         ? `${period} ${scope}에서${keywordText} 판매 내역이 없습니다.`
         : `${period} ${scope}${keywordText} 메뉴 매출입니다. 메뉴 ${rows.length}개, 수량 ${formatAiPrice(sumCnt)}개, 실매출 ${formatAiAmount(sumAmt)}원` +
-          (mode === "bottom" ? " (적게 팔린 순)" : " (많이 팔린 순)");
+          ` (${byQty ? "판매수량" : "실매출"} 기준 ${mode === "bottom" ? "적게" : "많이"} 팔린 순)`;
   }
   const total = rows.length;
   const shown = rows.slice(0, limit > 0 ? limit : AI_SEARCH_MAX_ROWS);
