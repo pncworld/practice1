@@ -1426,19 +1426,26 @@ const clickedRowData2 = (e) => {
 </script>
 
 <style scoped>
+/* 화면 크기(사이드메뉴 접기·창 확대)에 맞춰 카드·목록이 같이 커지도록 — 고정 폭/높이 제거 */
 .notice-page {
+  box-sizing: border-box;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   width: 100%;
+  height: 100%;
+  min-height: 0;
   padding: 3rem 1.25rem 1.25rem;
   background-color: transparent;
 }
 
 .notice-shell {
-  width: min(90vw, 1320px);
-  min-height: 74vh;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 30rem;
   display: grid;
-  grid-template-rows: auto minmax(22rem, 50vh) auto auto;
+  grid-template-rows: auto minmax(22rem, 1fr) auto auto;
   gap: 0.75rem;
   background-color: #ffffff;
   border: 1px solid #e2e8f0;

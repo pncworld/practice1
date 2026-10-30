@@ -6,10 +6,11 @@
 ################################################################################*/ -->
 <template>
   <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <!-- pl-5: 셸 w-right가 pl0이라 그리드가 좌측 메뉴에 붙음 → 우측 pd20과 맞춤 -->
+  <div class="stkn713-page flex h-full min-h-0 flex-col pl-5" @click="handleParentClick">
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
+      <div class="flex justify-center space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
@@ -25,127 +26,127 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-3 grid-rows-4 bg-gray-200 rounded-lg h-48 items-start z-10">
-      <div class="justify-start flex ml-28 space-x-5 mt items-center">
-        <Datepicker1 @dateValue="dateValue" :mainName="'일자'" :initToday="1">
-        </Datepicker1>
-      </div>
-      <div class="flex justify-start items-center !-ml-1">
-        <PickStore
-          @update:storeGroup="lngStoreGroup"
-          :defaultStoreNm="'전체'"
-          class=""
-          @storeNm="excelStore"
-          @update:storeCd="lngStoreCode"></PickStore>
-      </div>
-      <div class="flex justify-start pl-20 items-center mt-2 space-x-5"></div>
-      <div class="flex space-x-5 ml-16 mt-3 items-center">
-        <div class="font-semibold text-base">자재코드/명</div>
-        <div class="flex space-x-3">
-          <div>
-            <input
-              type="text"
-              class="h-8 w-64 border border-black"
-              v-model="cond1" />
+      class="stkn713-search-panel z-10 mt-3 w-full min-w-0 shrink-0 rounded-lg bg-gray-200">
+      <div class="stkn713-search-grid min-w-0">
+        <!-- 1행: 일자 | 매장 | 거래처 -->
+        <div class="stkn713-cell">
+          <div class="stkn713-sg-label">일자</div>
+          <div class="stkn713-cell-field stkn713-date-slot">
+            <Datepicker1 @dateValue="dateValue" :mainName="'일자'" :initToday="1">
+            </Datepicker1>
           </div>
-          <!-- <div>
+        </div>
+        <div class="stkn713-cell">
+          <div class="stkn713-sg-label">매장</div>
+          <div class="stkn713-cell-field stkn713-pick-slot">
+            <PickStore
+              compact-search-bar
+              :compact-store-combo-max-rem="96"
+              main-name=""
+              @update:storeGroup="lngStoreGroup"
+              :defaultStoreNm="'전체'"
+              @storeNm="excelStore"
+              @update:storeCd="lngStoreCode"></PickStore>
+          </div>
+        </div>
+        <div class="stkn713-cell">
+          <div class="stkn713-sg-label">거래처</div>
+          <div class="stkn713-cell-field stkn713-bc-slot">
+            <BusinessClient2 compact-search-bar @SupplierId="SupplierId" />
+          </div>
+        </div>
+
+        <!-- 2행: 자재그룹 | 자재분류 | 자재특성 -->
+        <div class="stkn713-cell">
+          <label class="stkn713-sg-label" for="stkn07-013-group">자재그룹</label>
+          <div class="stkn713-cell-field">
+            <select id="stkn07-013-group" class="stkn713-control" v-model="cond4">
+              <option value="0">전체</option>
+              <option :value="i.lngStockGroupID" v-for="i in optionList2" :key="i.lngStockGroupID">
+                {{ i.strStockGroupName }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="stkn713-cell">
+          <label class="stkn713-sg-label" for="stkn07-013-class">자재분류</label>
+          <div class="stkn713-cell-field">
+            <select id="stkn07-013-class" class="stkn713-control" v-model="cond5">
+              <option value="0">전체</option>
+              <option :value="i.lngDetail" v-for="i in optionList" :key="i.lngDetail">
+                {{ i.strDetail }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="stkn713-cell">
+          <label class="stkn713-sg-label" for="stkn07-013-generic">자재특성</label>
+          <div class="stkn713-cell-field">
+            <select id="stkn07-013-generic" class="stkn713-control" v-model="cond6">
+              <option value="0">전체</option>
+              <option :value="i.lngGenericID" v-for="i in optionList3" :key="i.lngGenericID">
+                {{ i.strGenericName }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 3행: 자재코드/명(+전체보기) | 재고조사주기 | 파일 -->
+        <div class="stkn713-cell">
+          <label class="stkn713-sg-label" for="stkn07-013-stock">자재코드/명</label>
+          <div class="stkn713-cell-field stkn713-inline">
             <input
+              id="stkn07-013-stock"
               type="text"
-              class="h-8 w-40 border border-black"
-              v-model="cond2" />
-          </div> -->
+              class="stkn713-control"
+              v-model="cond1" />
+            <!-- <div>
+              <input
+                type="text"
+                class="h-8 w-40 border border-black"
+                v-model="cond2" />
+            </div> -->
+            <label for="cond7" class="stkn713-check">
+              <input type="checkbox" id="cond7" @change="setCond7" /> 전체보기
+            </label>
+          </div>
+        </div>
+        <div class="stkn713-cell">
+          <label class="stkn713-sg-label" for="stkn07-013-cycle">재고조사주기</label>
+          <div class="stkn713-cell-field">
+            <select id="stkn07-013-cycle" class="stkn713-control" v-model="cond3">
+              <option value="0">선택</option>
+              <option :value="i.strDCode" v-for="i in optionList4" :key="i.strDCode">
+                {{ i.strDName }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="stkn713-cell">
+          <label class="stkn713-sg-label" for="stkn07-013-file">파일</label>
+          <div class="stkn713-cell-field stkn713-inline">
+            <input
+              id="stkn07-013-file"
+              type="text"
+              class="stkn713-control"
+              disabled
+              v-model="excelName" />
+            <button type="button" class="pnc-sub-btn" @click="beforeFileSelect">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 10.5V3M5 6l3-3 3 3M3 12.8h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              파일선택
+            </button>
+          </div>
         </div>
       </div>
-      <div class="flex space-x-5 mt-3 items-center">
-        <div class="text-base font-semibold">재고조사주기</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="w-64 h-8 border border-black"
-            v-model="cond3">
-            <option value="0">선택</option>
-            <option :value="i.strDCode" v-for="i in optionList4">
-              {{ i.strDName }}
-            </option>
-          </select>
-        </div>
-      </div>
-      <div class="flex space-x-5 ml-14 mt-3 items-center">
-        <BusinessClient2 @SupplierId="SupplierId" />
-      </div>
-      <div class="flex ml-10 pl-11 items-center mt-3 space-x-5">
-        <div class="font-semibold text-base">자재그룹</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="w-64 h-8 border border-black"
-            v-model="cond4">
-            <option value="0">전체</option>
-            <option :value="i.lngStockGroupID" v-for="i in optionList2">
-              {{ i.strStockGroupName }}
-            </option>
-          </select>
-        </div>
-      </div>
-      <div class="flex ml-7 items-center mt-3 space-x-5">
-        <div class="text-base font-semibold">자재분류</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="w-64 h-8 border border-black"
-            v-model="cond5">
-            <option value="0">전체</option>
-            <option :value="i.lngDetail" v-for="i in optionList">
-              {{ i.strDetail }}
-            </option>
-          </select>
-        </div>
-      </div>
-      <div class="flex ml-10 items-center mt-3 space-x-5">
-        <div class="text-base font-semibold">자재특성</div>
-        <div>
-          <select
-            name=""
-            id=""
-            class="w-64 h-8 border border-black"
-            v-model="cond6">
-            <option value="0">전체</option>
-            <option :value="i.lngGenericID" v-for="i in optionList3">
-              {{ i.strGenericName }}
-            </option>
-          </select>
-        </div>
-      </div>
-      <div class="justify-start flex ml-28 space-x-5 mt items-center">
-        <div class="text-base font-semibold">파일</div>
-        <input
-          type="text"
-          class="h-8 w-64 bg-white border border-black"
-          disabled
-          v-model="excelName" />
-        <label
-          for="hiddenFile"
-          class="button primary h-7 flex items-center ml-2 mt-1 cursor-pointer"
-          @click="beforeFileSelect">
-          파일선택
-        </label>
-      </div>
-      <div class="flex space-x-5 mt-3 ml-28 items-center">
-        <label for="cond7">
-          <input type="checkbox" id="cond7" @change="setCond7" /> 전체보기
-        </label>
-      </div>
-      <div class="flex justify-start pl-20 items-center mt-2 space-x-5"></div>
     </div>
     <!-- 조회조건 -->
-    <div class="font-bold text-blue-600">
+    <div class="stkn713-hint">
       * 월마감인 경우는 실사일자를 반드시 월의 마지막날로 선택해야 합니다.
     </div>
     <!-- 그리드 영역 -->
-    <div class="w-full h-[65vh]">
+    <div class="min-h-0 w-full flex-1">
       <Realgrid
         :progname="'STKN07_013RPT_VUE'"
         :progid="1"
@@ -153,7 +154,9 @@
         :searchColId="'lngStockID,strStockName'"
         :searchWord3="cond1"
         :CalculateShortQty="'dblShortQty'"
-        :inputOnlyNumberColumn="'dblTakeQty'"
+        :calculateShortQtyGuardCol="'strCheck'"
+        :inputUnsignedDecimalColumn="'dblTakeQty'"
+        :highlightColId="'dblTakeQty'"
         @updatedRowData="updatedRowData"
         @allStateRows="allStateRows"
         :documentTitle="'STKN07_013RPT'"
@@ -349,9 +352,56 @@ const allStateRows = (e) => {
 };
 
 /**
- *  조회 함수
+ * 저장하지 않은 실사재고 변경 확인
+ * — 조회할 때 받은 실사재고를 자재별로 기억해 두고, 지금 값과 다르면 「수정한 내용」으로 본다
+ */
+const baseTakeByStock = ref(new Map());
+const takeKey = (v) =>
+  v === null || v === undefined || String(v).trim() === "" ? "" : String(Number(v));
+
+/** 마지막 조회 결과 원본 — 엑셀 업로드 시 자재코드로 매핑할 기준 */
+const searchedRows = ref([]);
+
+const rememberBaseTake = (rows) => {
+  baseTakeByStock.value = new Map(
+    (rows || []).map((row) => [String(row.lngStockID), takeKey(row.dblTakeQty)])
+  );
+  searchedRows.value = JSON.parse(JSON.stringify(rows || []));
+};
+
+const hasUnsavedTakeChanges = () =>
+  (updateRowData.value || []).some(
+    (row) =>
+      takeKey(row.dblTakeQty) !==
+      (baseTakeByStock.value.get(String(row.lngStockID)) ?? "")
+  );
+
+/** 수정한 내용이 있으면 확인 창 — 계속 진행하면 true */
+const confirmDiscardChanges = async (actionName) => {
+  if (!hasUnsavedTakeChanges()) return true;
+  const result = await Swal.fire({
+    title: "확인",
+    html:
+      `수정한 내용이 있습니다. 저장없이 ${actionName} 하시겠습니까?<br>` +
+      `(저장없이 ${actionName} 시 입력 된 데이터는 이전 데이터로 초기화 됩니다.)`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "확인",
+    cancelButtonText: "취소",
+  });
+  return result.isConfirmed;
+};
+
+/**
+ *  조회 함수 — 조회 버튼: 수정한 내용 확인 후 조회
  */
 const searchButton = async () => {
+  if (!(await confirmDiscardChanges("다시 조회"))) return;
+  await runSearch();
+};
+
+/** 실제 조회 (저장·삭제 후 다시 조회할 때는 확인 없이 바로) */
+const runSearch = async () => {
   if (storeCode.value == "0") {
     Swal.fire({
       title: "경고",
@@ -370,6 +420,9 @@ const searchButton = async () => {
     });
     return;
   }
+  // 다시 조회하면 엑셀로 불러온 값은 DB 값으로 바뀌므로 업로드 상태·파일명 초기화
+  excelLoaded.value = false;
+  excelName.value = "";
   try {
     store.state.loading = true;
     initGrid();
@@ -395,6 +448,7 @@ const searchButton = async () => {
 
       rowData.value = res.data.List;
       updateRowData.value = res.data.List;
+      rememberBaseTake(res.data.List);
 
       afterSearch.value = true;
     } else {
@@ -411,6 +465,7 @@ const searchButton = async () => {
 
       rowData.value = res.data.List;
       updateRowData.value = res.data.List;
+      rememberBaseTake(res.data.List);
 
       afterSearch.value = true;
     }
@@ -426,6 +481,7 @@ const searchButton = async () => {
  *  삭제 처리 함수
  */
 const deleteButton = async () => {
+  if (!(await confirmDiscardChanges("삭제"))) return;
   if (allstaterows.value.length == 0) {
     Swal.fire({
       title: "경고",
@@ -487,7 +543,7 @@ const deleteButton = async () => {
     });
   } catch (error) {
   } finally {
-    searchButton();
+    runSearch();
   }
 };
 
@@ -505,7 +561,8 @@ const saveButton = async () => {
     return;
   }
   console.log(allstaterows.value.length);
-  if (allstaterows.value.length == 0) {
+  // 엑셀로 불러온 경우는 그리드 수정 행 목록이 비어 있어도 변경으로 봄
+  if (allstaterows.value.length == 0 && !excelLoaded.value) {
     Swal.fire({
       title: "경고",
       text: "변경된 사항이 없습니다.",
@@ -530,15 +587,22 @@ const saveButton = async () => {
 
         convCond3.value = parseInt(cond3.value, 10); // "01" → 1
 
-        const lngStockIDs = updateRowData.value
-          .filter((_, index) => allstaterows.value.includes(index))
+        // 기존 프로그램과 동일: 저장하면 그리드의 모든 자재를 저장(미입력은 실사재고 0). 엑셀 업로드 후에는 매핑된 품목만 그리드에 있으므로 그 품목만 저장
+        const selectedRows = updateRowData.value || [];
+        const takeOf = (item) => Number(item.dblTakeQty) || 0;
+        // 과부족은 그리드 자동계산과 같은 식으로 다시 계산 (미입력 행은 화면에 0 으로 보이지만 저장값은 실사재고 0 기준)
+        const shortOf = (item) => {
+          const take = takeOf(item);
+          const result = Number(item.dblResultQty) || 0;
+          const shortQty = result > 0 ? take - result : take + result;
+          return Math.round(shortQty * 10000) / 10000;
+        };
+
+        const lngStockIDs = selectedRows
           .map((item) => item.lngStockID)
           .join("\u200b");
 
-        const selectedRows = updateRowData.value.filter((_, index) =>
-          allstaterows.value.includes(index)
-        );
-        const hasNegative = selectedRows.some((item) => item.dblTakeQty < 0);
+        const hasNegative = selectedRows.some((item) => takeOf(item) < 0);
 
         if (hasNegative) {
           Swal.fire({
@@ -551,12 +615,11 @@ const saveButton = async () => {
         }
 
         const dblTakeQtys = selectedRows
-          .map((item) => item.dblTakeQty)
+          .map((item) => takeOf(item))
           .join("\u200b");
 
-        const dblShortQtys = updateRowData.value
-          .filter((_, index) => allstaterows.value.includes(index))
-          .map((item) => item.dblShortQty)
+        const dblShortQtys = selectedRows
+          .map((item) => shortOf(item))
           .join("\u200b");
 
         // console.log(selectedDate.value.replaceAll("-", ""), convCond3.value, lngStockIDs, dblTakeQtys, dblShortQtys);
@@ -596,7 +659,7 @@ const saveButton = async () => {
     });
   } catch (error) {
   } finally {
-    searchButton();
+    runSearch();
   }
 };
 
@@ -616,18 +679,22 @@ const fileInput = ref(null);
 const SheetList = ref([]);
 const currentFile = ref();
 const excelcond = ref(1);
+/** 조회 영역 「파일」 칸에 표시할 업로드 파일명 */
+const excelName = ref("");
+/** 엑셀로 실사재고를 불러옴 — 그리드 수정 행 목록이 비어 있어도 저장 가능 */
+const excelLoaded = ref(false);
 
 const beforeFileSelect = () => {
-  // 여기서 점검: 권한, 사용자 상태 등
-  // if (CompanyCode.value == 0 || afterSearch.value == false) {
-  //   Swal.fire({
-  //     title: "경고",
-  //     text: `조회를 먼저 해주세요.`,
-  //     icon: "warning",
-  //     confirmButtonText: "확인",
-  //   });
-  //   return;
-  // }
+  // 엑셀 품목을 조회 목록에 자재코드로 매핑하므로 조회가 먼저 필요
+  if (afterSearch.value == false || searchedRows.value.length === 0) {
+    Swal.fire({
+      title: "경고",
+      text: `조회를 먼저 해주세요.`,
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
   fileInput.value.click();
 };
 
@@ -650,6 +717,8 @@ const handleFileChange = async (e) => {
 
     const result = await readFileWithArrayBuffer(file);
     // console.log(result);
+    excelName.value = file.name;
+    excelLoaded.value = rowData.value.length > 0; // 매핑된 품목이 있을 때만 저장 가능
   }
   e.target.value = "";
 };
@@ -680,17 +749,53 @@ async function readFileWithArrayBuffer(file) {
 
   const rows = jsonData.slice(4); // 실제 데이터 행들
 
-  rowData.value = rows.map((row) => {
-    const obj = {};
-    header.forEach((key, i) => {
-      obj[key] = row[i + 2];
-    });
-    return obj;
+  const excelRows = rows
+    .map((row) => {
+      const obj = {};
+      header.forEach((key, i) => {
+        obj[key] = row[i + 2];
+      });
+      return obj;
+    })
+    .filter((obj) => String(obj.lngStockID ?? "").trim() !== "");
+
+  // 엑셀 실사재고: 자재코드별 (콤마 제거 후 숫자)
+  const excelTakeByStock = new Map();
+  excelRows.forEach((obj) => {
+    const text = String(obj.dblTakeQty ?? "").replace(/,/g, "").trim();
+    excelTakeByStock.set(String(obj.lngStockID).trim(), text === "" ? 0 : Number(text) || 0);
   });
-  rowData.value = rowData.value.map((item) => ({
-    ...item,
-  }));
-  updateRowData.value = JSON.parse(JSON.stringify(rowData.value));
+
+  // 조회 목록에 자재코드로 매핑 → 엑셀에 있는 품목만 그리드에 표시(이 품목들만 저장됨)
+  const mappedRows = searchedRows.value
+    .filter((row) => excelTakeByStock.has(String(row.lngStockID).trim()))
+    .map((row) => ({
+      ...row,
+      dblTakeQty: excelTakeByStock.get(String(row.lngStockID).trim()),
+      strCheck: "Y", // 업로드한 품목은 입력된 것으로 보고 과부족 계산
+    }));
+
+  const mappedIds = new Set(mappedRows.map((row) => String(row.lngStockID).trim()));
+  const unmatchedCount = [...excelTakeByStock.keys()].filter((id) => !mappedIds.has(id)).length;
+
+  rowData.value = mappedRows;
+  updateRowData.value = JSON.parse(JSON.stringify(mappedRows));
+
+  if (mappedRows.length === 0) {
+    Swal.fire({
+      title: "알림",
+      text: "엑셀 품목 중 조회 목록과 자재코드가 일치하는 품목이 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+  } else if (unmatchedCount > 0) {
+    Swal.fire({
+      title: "알림",
+      html: `엑셀 품목 ${mappedRows.length}건을 불러왔습니다.<br>조회 목록에 없는 ${unmatchedCount}건은 제외했습니다.`,
+      icon: "info",
+      confirmButtonText: "확인",
+    });
+  }
   // console.log(updateRowData.value);
   return jsonData;
 }
@@ -730,3 +835,214 @@ const excelList = (e) => {
   //comsole.log(e);
 };
 </script>
+
+<style scoped>
+/*
+ * 조회 AREA — STK32_001INS·STK05_013RPT 와 같은 기준
+ *  · 콤보·날짜·입력칸 크기 숫자 고정·통일(--stkn713-ctl-w)
+ *  · 항목명 칸 폭 통일(가장 긴 「자재코드/명」「재고조사주기」 기준) + 가운데 정렬 → 열마다 시작선 일치
+ *  · 3열 max-content + space-between → 열 사이 간격 균등, 앞·뒤 공백 = --stkn713-panel-pad-x
+ */
+.stkn713-page {
+  --stkn713-label-col: 5.75rem;
+  --stkn713-item-gap: 1.25rem; /* 항목명 ↔ 콤보 */
+  --stkn713-col-gap: 2.5rem;
+  --stkn713-row-gap: 0.625rem;
+  --stkn713-panel-pad-x: 2rem; /* 콤보를 키운 만큼 앞·뒤 공백 축소 (앞 = 뒤 유지) */
+  --stkn713-row-min-h: 2rem;
+  --stkn713-control-border: #cbd5e1;
+  --stkn713-control-h: 2rem;
+  --stkn713-ctl-w: 12rem; /* 일자·콤보·입력칸·매장 콤보·거래처 콤보 같은 폭 (10rem → 12rem) */
+  --stkn713-pick-sub-w: 5.25rem; /* 매장 그룹·속성 콤보 */
+  --stkn713-inline-gap: 0.5rem;
+}
+
+.stkn713-search-panel {
+  box-sizing: border-box;
+  padding-block: 0.75rem;
+  padding-inline: var(--stkn713-panel-pad-x);
+}
+
+.stkn713-search-grid {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  justify-content: space-between;
+  column-gap: var(--stkn713-col-gap);
+  row-gap: var(--stkn713-row-gap);
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.stkn713-cell {
+  display: flex;
+  min-width: 0;
+  min-height: var(--stkn713-row-min-h);
+  align-items: center;
+  gap: var(--stkn713-item-gap);
+}
+
+.stkn713-sg-label {
+  flex: 0 0 var(--stkn713-label-col);
+  width: var(--stkn713-label-col);
+  min-height: var(--stkn713-row-min-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+}
+
+.stkn713-cell-field {
+  flex: 0 0 auto;
+  min-width: 0;
+  min-height: var(--stkn713-row-min-h);
+  display: flex;
+  align-items: center;
+}
+
+.stkn713-inline {
+  gap: var(--stkn713-inline-gap);
+}
+
+.stkn713-control {
+  box-sizing: border-box;
+  flex: 0 0 var(--stkn713-ctl-w);
+  width: var(--stkn713-ctl-w);
+  height: var(--stkn713-control-h);
+  min-height: var(--stkn713-control-h);
+  max-height: var(--stkn713-control-h);
+  min-width: 0;
+  border: 1px solid var(--stkn713-control-border);
+  border-radius: 0.375rem;
+  background: #fff;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  color: rgb(55 65 81);
+}
+
+.stkn713-control:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+
+.stkn713-control:disabled {
+  background: #fff;
+  color: rgb(55 65 81);
+}
+
+.stkn713-check {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.stkn713-hint {
+  flex-shrink: 0;
+  margin: 0.5rem 0 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+/* 일자 Datepicker1 — 바깥 항목명 사용: 안쪽 제목·숨은 여백 제거, 입력칸 = --stkn713-ctl-w */
+.stkn713-date-slot :deep(div.space-x-5 > span) {
+  display: none;
+}
+
+.stkn713-date-slot :deep(div.space-x-5) {
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+}
+
+.stkn713-date-slot :deep(div.space-x-5 > *) {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.stkn713-date-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  width: var(--stkn713-ctl-w) !important;
+  max-width: none !important;
+  min-width: 0;
+  height: var(--stkn713-control-h) !important;
+  padding-left: 0.75rem;
+  padding-right: 0.5rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--stkn713-control-border) !important;
+  border-radius: 0.375rem;
+}
+
+.stkn713-date-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6 !important;
+}
+
+/* 매장 PickStore (compact) — 안쪽 제목 숨김, 그룹·속성은 작게, 매장 콤보 = --stkn713-ctl-w */
+.stkn713-pick-slot :deep(> div.flex.text-base) {
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0;
+  margin: 0 !important;
+  align-items: center;
+  gap: var(--stkn713-inline-gap) !important;
+}
+
+.stkn713-pick-slot :deep(> div.flex > div:first-child) {
+  display: none;
+}
+
+.stkn713-pick-slot :deep(select) {
+  box-sizing: border-box;
+  width: var(--stkn713-pick-sub-w) !important;
+  height: var(--stkn713-control-h) !important;
+  border: 1px solid var(--stkn713-control-border) !important;
+}
+
+.stkn713-pick-slot :deep(.relative.min-w-0.flex-1) {
+  flex: 0 0 var(--stkn713-ctl-w) !important;
+  width: var(--stkn713-ctl-w) !important;
+  min-width: 0 !important;
+  max-width: var(--stkn713-ctl-w) !important;
+}
+
+/* 거래처 BusinessClient2 (compact) — 콤보 = --stkn713-ctl-w */
+.stkn713-bc-slot :deep(> div.flex.text-base) {
+  width: var(--stkn713-ctl-w) !important;
+  max-width: none !important;
+  min-width: 0;
+  margin: 0 !important;
+}
+
+.stkn713-pick-slot :deep(.pickstore-vs-shell),
+.stkn713-bc-slot :deep(.pickstore-vs-shell) {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: none !important;
+  height: var(--stkn713-control-h) !important;
+  border: 1px solid var(--stkn713-control-border) !important;
+}
+
+/* 창이 좁으면 2열로 (열 시작선 정렬은 유지) */
+@media (max-width: 1600px) {
+  .stkn713-search-grid {
+    grid-template-columns: repeat(2, max-content);
+  }
+}
+</style>
+
+<style>
+/* 실사재고(입력 칸) — 공통 강조색(#8ee0ff, 청구 등록과 공유) 대신 이 화면만 연한 파스텔 하늘색 */
+.stkn713-page .demand-qty {
+  background: #e3f2fd !important;
+}
+</style>

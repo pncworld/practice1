@@ -54,6 +54,13 @@
             <span><strong>{{ loginName }}</strong>님 반갑습니다.</span>
           </div>
           <div class="user-account-dropdown__divider"></div>
+        <button type="button" class="user-account-dropdown__item" @click="openNoticeList">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+          </svg>
+          공지사항
+        </button>
         <a
           href="https://pf.kakao.com/_Ztrxks"
           target="_blank"
@@ -600,6 +607,16 @@ const isOpen = (id) => openCategoryId.value.includes(id);
 const userMenuOpen = ref(false);
 const toggleUserMenu = () => { userMenuOpen.value = !userMenuOpen.value; };
 const closeUserMenu = () => { userMenuOpen.value = false; };
+
+/** 사용자 메뉴 > 공지사항 — 대시보드 「더보기」(homePage2 moveNoticePage)와 같은 탭 열기 */
+const openNoticeList = () => {
+  userMenuOpen.value = false;
+  store.state.moveOtherTab = {
+    strUrl: "MINOTICE::NOT01_001INS.xml",
+    lngProgramID: 800101,
+    strTitle: "공지사항 목록",
+  };
+};
 
 /** hover 자동 열림/닫힘 — 타원↔드롭다운 이동 시 깜빡임 방지용 딜레이 타이머 */
 let _userMenuCloseTimer = null;

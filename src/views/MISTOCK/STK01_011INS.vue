@@ -5,13 +5,14 @@
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
+  <!-- pl-5: 셸 w-right가 pl0이라 그리드가 좌측 메뉴에 붙음 → 우측 pd20과 맞춤 -->
   <div
-    class="stk011-page box-border flex h-full max-w-full min-h-0 flex-col gap-3 overflow-hidden pb-1"
+    class="stk011-page box-border flex h-full max-w-full min-h-0 flex-col overflow-hidden pb-1 pl-5"
     @click="handleParentClick">
     <div
       class="flex shrink-0 flex-wrap items-center justify-between gap-3 overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex flex-wrap items-center justify-end gap-2 pr-5 mr-9">
+      <div class="flex flex-wrap items-center justify-end gap-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
@@ -29,38 +30,36 @@
     </div>
 
     <div
-      class="z-10 w-full min-w-0 shrink-0 overflow-x-auto rounded-lg bg-gray-200 px-12 py-4">
+      class="stk011-search-panel z-10 mt-3 w-full min-w-0 shrink-0 rounded-lg bg-gray-200">
       <div class="stk011-search-grid min-w-0">
-        <div class="stk011-cell">
-          <span class="stk011-sg-label">청구일자</span>
-          <div class="stk011-cell-field stk011-date-slot min-w-0">
-            <Datepicker2
-              ref="datepicker"
-              omit-main-label
-              filter-bar-align
-              :mainName="'청구일자'"
-              :initToday="0"
-              :initToday2="0"
-              :closePopUp="closePopUp"
-              @endDate="endDate"
-              @startDate="startDate" />
-          </div>
+        <div class="stk011-sg-label">청구일자</div>
+        <div class="stk011-cell-field stk011-date-slot min-w-0">
+          <Datepicker2
+            ref="datepicker"
+            omit-main-label
+            filter-bar-align
+            :mainName="'청구일자'"
+            :initToday="0"
+            :initToday2="0"
+            :closePopUp="closePopUp"
+            @endDate="endDate"
+            @startDate="startDate" />
         </div>
-        <div class="stk011-cell">
-          <span class="stk011-sg-label">청구매장</span>
-          <div class="stk011-cell-field min-w-0">
-            <select
-              id="stk01-011-store"
-              class="stk011-control"
-              v-model="cond">
-              <option
-                v-for="i in optionList"
-                :key="i.lngStoreCode"
-                :value="i.lngStoreCode">
-                {{ storeOptionLabel(i) }}
-              </option>
-            </select>
-          </div>
+        <div class="stk011-spacer" aria-hidden="true"></div>
+        <label class="stk011-sg-label" for="stk01-011-store">청구매장</label>
+        <div class="stk011-cell-field stk011-store-slot min-w-0">
+          <select
+            id="stk01-011-store"
+            class="stk011-control"
+            v-model="cond"
+            :disabled="storeLocked">
+            <option
+              v-for="i in optionList"
+              :key="i.lngStoreCode"
+              :value="i.lngStoreCode">
+              {{ storeOptionLabel(i) }}
+            </option>
+          </select>
         </div>
       </div>
     </div>
@@ -68,7 +67,7 @@
     <p class="stk011-dblclick-hint">
       매장명 또는 청구번호를 더블클릭하면 상세가 열립니다.
     </p>
-    <div class="min-h-0 min-w-0 w-full flex-1 px-4 pb-2 lg:px-6">
+    <div class="min-h-0 min-w-0 w-full flex-1 pb-2">
       <Realgrid
         :progname="'STK01_011INS_VUE'"
         :progid="1"
@@ -96,24 +95,42 @@
     </div>
   </div>
 
+  <Teleport to="body">
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-    v-if="open">
-    <div class="stk011-popup">
-      <div class="stk011-popup-head">
+    v-if="open"
+    class="stk011-popup-backdrop"
+    @mousedown.self.prevent>
+    <div
+      class="stk011-popup"
+      role="dialog"
+      aria-modal="true"
+      aria-label="청구 등록"
+      :style="demandPop.style"
+      @mousedown.stop
+      @keydown.esc="open = false">
+      <div class="stk011-popup-head" @mousedown="onDemandHeadDown">
         <h2 class="text-xl font-bold tracking-tight text-gray-900">청구 등록</h2>
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="stk011-popup-actions flex flex-wrap items-center gap-2" @mousedown.stop>
           <button
             type="button"
-            class="whitebutton"
-            :disabled="!canEditDemand"
+            class="pnc-sub-btn"
+            :disabled="!canEditDemand || saving"
             @click="saveButton">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M3.2 8.4 6.4 11.4 12.8 4.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
             저장
           </button>
-          <button type="button" class="whitebutton" @click="excelButton2">
+          <button type="button" class="pnc-sub-btn" @click="excelButton2">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M8 2.8v7.4M5 7.4 8 10.4 11 7.4M3 12.8h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
             엑셀
           </button>
-          <button type="button" class="whitebutton" @click="open = false">
+          <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="open = false">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M4 4l8 8M12 4 4 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
             닫기
           </button>
         </div>
@@ -167,6 +184,7 @@
           :demandDetailColColors="true"
           :documentSubTitle="documentSubTitle2"
           :exporttoExcel="exporttoExcel2"
+          @realgridname="onPopupGridName"
           :setStateBar="false"></Realgrid>
       </div>
 
@@ -177,8 +195,19 @@
           :disabled="!canEditDemand"
           class="stk011-comment-field"></textarea>
       </div>
+
+      <div
+        class="stk011-popup-resize"
+        title="크기 조절"
+        @mousedown.stop="onDemandResizeDown"></div>
+
+      <!-- 공통 로딩(BasicLayout, z-index 100)은 body 로 옮긴 팝업 뒤에 가려지므로 팝업 안에 표시 -->
+      <div v-if="store.state.loading" class="stk011-popup-loading" role="status" aria-label="처리 중">
+        <img :src="loadingGif" alt="" />
+      </div>
     </div>
   </div>
+  </Teleport>
 </template>
 
 <script setup>
@@ -194,12 +223,56 @@ import {
 import { UpdateDemandMasterDetail2 } from "@/api/vuepos";
 import PageName from "@/components/pageName.vue";
 import Realgrid from "@/components/realgrid.vue";
+import { rgGetInstance } from "@/components/realgridInstanceRegistry.js";
 import { formatLocalDate, insertPageLog } from "@/customFunc/customFunc";
-import { computed, onMounted, ref } from "vue";
+import { useFloatPopup } from "@/utils/floatPopup";
+import loadingGif from "@/assets/images/loading.gif";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 import Datepicker2 from "@/components/Datepicker2.vue";
 import Swal from "sweetalert2";
 import { useStore } from "vuex";
+
+/** 청구 등록 팝업 — 이동·크기 조절 (PUR02_015INS 매입 상세 팝업과 같은 방식) */
+const demandPop = useFloatPopup({
+  width: 1536,
+  height: 768,
+  minWidth: 720,
+  minHeight: 420,
+  maxWidthRatio: 0.98,
+  maxHeightRatio: 0.9,
+});
+
+const popupGridName = ref("");
+const onPopupGridName = (name) => {
+  popupGridName.value = name;
+};
+
+const onDemandHeadDown = (event) => {
+  demandPop.startDrag(event);
+};
+
+const refreshPopupGridSize = () => {
+  try {
+    rgGetInstance(popupGridName.value)?.gridView?.resetSize?.();
+  } catch (_) {
+    /* ignore */
+  }
+  try {
+    window.dispatchEvent(new Event("resize"));
+  } catch (_) {
+    /* ignore */
+  }
+};
+
+const onDemandResizeDown = (event) => {
+  demandPop.startResize(event);
+  const onUp = () => {
+    window.removeEventListener("mouseup", onUp);
+    nextTick(() => refreshPopupGridSize());
+  };
+  window.addEventListener("mouseup", onUp);
+};
 
 const optionList = ref([]);
 const reload = ref(false);
@@ -277,27 +350,51 @@ const canAddDemand = computed(
 
 const canEditDemand = ref(false);
 
+/** 매장 계정(브랜드 관리자·본사 아님)이면 청구매장을 자기 매장으로 고정 — pickStore.vue 와 같은 기준 */
+const isStoreAccount = () =>
+  String(store.state.userData.blnBrandAdmin) !== "True" &&
+  String(store.state.userData.lngPositionType) !== "1";
+const storeLocked = ref(false);
+
 onMounted(async () => {
   const pageLog = await insertPageLog(store.state.activeTab2);
 
   const res = await getDemandStoreList(store.state.userData.lngStoreGroup, 0);
   const list = res.data.List || [];
   const concrete = list.filter((item) => !isAllStoreRow(item));
+  // 세션 매장코드는 lngPosition (userData.lngStoreCode 는 세션에 없음)
+  const myStoreCode = String(store.state.userData.lngPosition ?? "");
   const mine = concrete.find(
-    (item) =>
-      String(item.lngStoreCode) === String(store.state.userData.lngStoreCode)
+    (item) => String(item.lngStoreCode) === myStoreCode
   );
-  const lockedToOneStore = concrete.length === 1 && Boolean(mine);
+
+  if (isStoreAccount()) {
+    storeLocked.value = true;
+    optionList.value = [
+      mine || {
+        lngStoreCode: myStoreCode,
+        strName: store.state.userData.strStoreName || myStoreCode,
+      },
+    ];
+    cond.value = optionList.value[0].lngStoreCode;
+  }
+
+  const lockedToOneStore =
+    storeLocked.value || (concrete.length === 1 && Boolean(mine));
   let allRow = list.find((item) => isAllStoreRow(item));
 
-  if (!lockedToOneStore && !allRow) {
+  if (storeLocked.value) {
+    // 위에서 자기 매장 하나로 고정함
+  } else if (!lockedToOneStore && !allRow) {
     allRow = { lngStoreCode: 0, strName: "선택" };
     optionList.value = [allRow, ...list];
   } else {
     optionList.value = list;
   }
 
-  if (lockedToOneStore) {
+  if (storeLocked.value) {
+    // cond 는 위에서 자기 매장으로 설정함
+  } else if (lockedToOneStore) {
     cond.value = mine.lngStoreCode;
   } else if (allRow) {
     cond.value = allRow.lngStoreCode;
@@ -485,9 +582,29 @@ const rowText = (row, name, index) => {
   return indexed == null ? "" : indexed;
 };
 
+/** 저장 요청 중 — 버튼 중복 클릭으로 같은 청구가 두 번 저장되는 것 방지 */
+const saving = ref(false);
+
 const saveButton = async () => {
-  if (!canEditDemand.value) return;
+  if (!canEditDemand.value || saving.value) return;
   const isExistingDemand = String(scond3.value || "").trim() !== "";
+  // 신규: 청구수량을 하나도 입력하지 않았으면 저장하지 않음
+  if (!isExistingDemand) {
+    const newRows =
+      updatedrowdata2.value && updatedrowdata2.value.length
+        ? updatedrowdata2.value
+        : rowData2.value || [];
+    if (!newRows.some((item) => toInt(item.dblDemandQty) > 0)) {
+      await Swal.fire({
+        title: "알림",
+        html: "청구수량을 입력한 자재가 없습니다.<br>청구수량을 입력한 뒤 저장해주세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+  }
+  saving.value = true;
   try {
     store.state.loading = true;
     const source =
@@ -572,6 +689,7 @@ const saveButton = async () => {
     });
   } finally {
     store.state.loading = false;
+    saving.value = false;
     open.value = false;
     searchButton();
   }
@@ -630,6 +748,12 @@ const clickedButtonCol = (e) => {
 const clickedrowdata = ref("");
 
 const open = ref(false);
+watch(open, (isOpen) => {
+  if (isOpen) {
+    demandPop.place();
+    nextTick(() => refreshPopupGridSize());
+  }
+});
 const disabled = ref(false);
 
 const rowData2 = ref([]);
@@ -788,7 +912,6 @@ const deleteButton = async () => {
         icon: "success",
         confirmButtonText: "확인",
       });
-      openPopUp.value = false;
     } else {
       await Swal.fire({
         title: "경고",
@@ -807,8 +930,7 @@ const deleteButton = async () => {
 <style scoped>
 .stk011-dblclick-hint {
   flex-shrink: 0;
-  margin: 0;
-  padding: 0 1.5rem;
+  margin: 0.5rem 0 0.25rem 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
   color: #3b5bdb;
@@ -816,57 +938,75 @@ const deleteButton = async () => {
 
 .stk011-page {
   --stk011-label-col: 6.5rem;
-  --stk011-item-gap: 0.75rem;
+  --stk011-item-gap: 2rem;
+  --stk011-col-gap: 1.75rem;
+  --stk011-panel-pad-x: 7rem; /* 조회 항목 2개 — 앞·뒤 동일 (search-area-pad-flexible) */
+  --stk011-date-field-w: 21.6rem;
+  --stk011-store-field-w: 18rem;
+  --stk011-row-min-h: 2rem;
   --stk011-control-border: #cbd5e1;
   --stk011-control-focus-border: #3b82f6;
   --stk011-control-h: 2rem;
   --stk011-control-radius: 0.375rem;
 }
 
-.stk011-search-grid {
-  display: flex;
+/* 조회 AREA — PUR02_015INS 패턴: 앞·뒤 pad 동일, 남는 가로는 가운데 spacer 만 흡수 */
+.stk011-search-panel {
+  box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1.25rem 1.75rem;
+  padding-block: 0.75rem;
+  padding-inline: var(--stk011-panel-pad-x);
 }
 
-.stk011-cell {
-  display: flex;
+.stk011-search-grid {
+  display: grid;
+  grid-template-columns:
+    max-content
+    minmax(0, var(--stk011-date-field-w))
+    minmax(var(--stk011-col-gap), 1fr)
+    max-content
+    minmax(0, var(--stk011-store-field-w));
+  align-items: center;
+  width: 100%;
   min-width: 0;
-  align-items: center;
-  gap: var(--stk011-item-gap);
+  box-sizing: border-box;
+  column-gap: 0;
 }
 
-.stk011-search-grid .stk011-cell:first-child {
-  flex: 0 1 auto;
-}
-
-.stk011-search-grid .stk011-cell:last-child {
-  flex: 0 1 20rem;
-  max-width: 22rem;
+.stk011-spacer {
+  min-width: var(--stk011-col-gap);
+  align-self: stretch;
 }
 
 .stk011-sg-label {
-  flex: 0 0 var(--stk011-label-col);
-  width: var(--stk011-label-col);
+  justify-self: stretch;
+  box-sizing: content-box;
+  min-width: var(--stk011-label-col);
+  padding-right: var(--stk011-item-gap);
+  min-height: var(--stk011-row-min-h);
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.25;
   color: rgb(17 24 39);
+  white-space: nowrap;
 }
 
 .stk011-cell-field {
   min-width: 0;
-  flex: 1 1 auto;
+  min-height: var(--stk011-row-min-h);
   display: flex;
   align-items: center;
   width: 100%;
+}
+
+.stk011-date-slot,
+.stk011-store-slot {
+  justify-self: stretch;
 }
 
 .stk011-control {
@@ -911,18 +1051,54 @@ const deleteButton = async () => {
 }
 
 .stk011-date-slot :deep(> div.flex.justify-start.items-center) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
   margin: 0 !important;
-  width: auto !important;
+  gap: 0.25rem !important;
+}
+
+.stk011-date-slot :deep(> div.flex > div.inline-flex.h-8) {
+  flex: 1 1 auto;
+  min-width: 0;
   max-width: 100%;
+  width: 100%;
+  gap: 0.125rem !important;
 }
 
 .stk011-date-slot :deep(input[type="date"]) {
   box-sizing: border-box;
-  height: 2rem;
-  min-height: 2rem;
+  height: var(--stk011-control-h) !important;
+  min-height: var(--stk011-control-h) !important;
+  max-height: var(--stk011-control-h) !important;
   border: 1px solid var(--stk011-control-border) !important;
   border-radius: 0.375rem;
   background: #fff;
+  width: auto !important;
+  flex: 1 1 0;
+  min-width: 5.25rem;
+  max-width: none;
+  padding-left: 0.45rem;
+  padding-right: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.stk011-date-slot :deep(div.inline-flex.h-8 > span) {
+  flex-shrink: 0;
+}
+
+.stk011-date-slot :deep(div.inline-flex.h-8 > button) {
+  flex-shrink: 0;
+  width: 1.65rem !important;
+  height: 1.65rem !important;
+  min-width: 1.65rem;
+  margin-left: 0 !important;
+}
+
+@media (max-width: 1100px) {
+  .stk011-page {
+    --stk011-panel-pad-x: 2rem;
+  }
 }
 
 .stk011-date-slot :deep(input[type="date"]:focus) {
@@ -931,30 +1107,82 @@ const deleteButton = async () => {
   box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
 }
 
+/* 팝업: body Teleport + Swal(13050) 아래 — 이동·크기 조절(floatPopup) */
+.stk011-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 11000;
+  background: rgb(0 0 0 / 0.5);
+  pointer-events: auto;
+}
+
 .stk011-popup {
   --stk011-control-border: #cbd5e1;
   --stk011-control-focus-border: #3b82f6;
   --stk011-control-h: 2rem;
   --stk011-control-radius: 0.375rem;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  width: min(96rem, 98vw);
-  height: min(48rem, 90vh);
   padding: 1.5rem;
   background: #fff;
   border-radius: 0.75rem;
   box-shadow: 0 20px 40px rgb(15 23 42 / 0.18);
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.stk011-popup-resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  background: linear-gradient(
+    135deg,
+    transparent 50%,
+    #94a3b8 50%,
+    #94a3b8 62%,
+    transparent 62%,
+    transparent 74%,
+    #94a3b8 74%
+  );
+}
+
+.stk011-popup-actions {
+  cursor: default;
+}
+
+/* 팝업 안 로딩 표시 — 처리 중에는 팝업 전체를 덮어 추가 클릭도 막음 */
+.stk011-popup-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(255 255 255 / 0.55);
+  cursor: progress;
+}
+
+.stk011-popup-loading img {
+  max-width: 80px;
+  max-height: 80px;
 }
 
 .stk011-popup-head {
+  cursor: move;
+  user-select: none;
   display: flex;
   flex-shrink: 0;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.75rem;
+  /* 팝업 padding(1.5rem) 위·좌우 여백까지 끌기 영역으로 — 맨 위를 잡아도 이동 */
+  margin: -1.5rem -1.5rem 0.75rem;
+  padding: 1.5rem 1.5rem 0.75rem;
   border-bottom: 1px solid #d1d5db;
 }
 

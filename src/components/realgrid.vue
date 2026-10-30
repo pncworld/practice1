@@ -1333,6 +1333,14 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  /**
+   * opt-in: CalculateShortQty 와 함께 사용. 이 컬럼 값이 'N'(미등록)이고 실사재고가 0(미입력)이면
+   * 과부족을 0 으로 둔다 (미입력 0 을 입력값으로 보고 과부족이 생긴 것처럼 보이는 것 방지). 기본 "" = 기존 동작
+   */
+  calculateShortQtyGuardCol: {
+    type: String,
+    default: "",
+  },
   CalculateSupplyPrice: {
     // 자동 가격 계산
     type: String,
@@ -2890,11 +2898,22 @@ const runFuncshowGrid = async () => {
           let dblResultQty = values[fieldNames.indexOf("dblResultQty")];
           let dblTakeQty = values[fieldNames.indexOf("dblTakeQty")];
 
-          if (dblResultQty > 0) {
-            return parseInt(dblTakeQty) - parseInt(dblResultQty);
-          } else {
-            return parseInt(dblTakeQty) + parseInt(dblResultQty);
+          // opt-in: 미등록('N')이고 실사재고가 0(미입력)인 행은 과부족 0 유지.
+          // (행 상태로 판단하면 값 계산 시점에 아직 'updated' 가 아니어서 입력해도 0 으로 남음 → 값으로 판단)
+          const guardCol = String(props.calculateShortQtyGuardCol || "").trim();
+          if (guardCol) {
+            const guardIdx = fieldNames.indexOf(guardCol);
+            const guardVal = guardIdx >= 0 ? String(values[guardIdx] ?? "") : "";
+            if (guardVal === "N" && (Number(dblTakeQty) || 0) === 0) {
+              return 0;
+            }
           }
+
+          // 소수점까지 계산(기존 parseInt 는 소수점 버림) — 넷째 자리 반올림으로 계산 오차 제거, 정수 결과는 기존과 동일
+          const take = Number(dblTakeQty) || 0;
+          const result = Number(dblResultQty) || 0;
+          const shortQty = result > 0 ? take - result : take + result;
+          return Math.round(shortQty * 10000) / 10000;
         }
       : props.CalculateSupplyPrice.includes(item.strColID)
       ? function (prod, dataRow, fieldName, fieldNames, values) {

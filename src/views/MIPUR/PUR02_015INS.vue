@@ -126,28 +126,42 @@
           <div class="pur015-popup-actions" @mousedown.stop>
             <button
               type="button"
-              class="whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+              class="pnc-sub-btn"
               @click="saveButton"
-              :disabled="disabled1">
+              :disabled="disabled1 || popupBusy">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3.2 8.4 6.4 11.4 12.8 4.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
               확정
             </button>
             <button
               type="button"
-              class="whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+              class="pnc-sub-btn"
               @click="cancelButton"
-              :disabled="!disabled1">
+              :disabled="!disabled1 || popupBusy">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <!-- ⨂ 원 + X -->
+                <circle cx="12" cy="12" r="8.25" fill="none" stroke="currentColor" stroke-width="2"/>
+                <path d="M9.2 9.2l5.6 5.6M14.8 9.2l-5.6 5.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
               확정취소
             </button>
             <button
               type="button"
-              class="whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+              class="pnc-sub-btn"
               @click="excelButton2">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 2.8v7.4M5 7.4 8 10.4 11 7.4M3 12.8h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
               엑셀
             </button>
             <button
               type="button"
-              class="whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+              class="pnc-sub-btn pnc-sub-btn--gray"
               @click="openPopUp = false">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M4 4l8 8M12 4 4 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
               닫기
             </button>
           </div>
@@ -267,6 +281,15 @@
           class="pur015-popup-resize"
           title="크기 조절"
           @mousedown.stop="onDetailResizeDown"></div>
+
+        <!-- 공통 로딩(BasicLayout, z-index 100)은 body 로 옮긴 팝업 뒤에 가려지므로 팝업 안에 표시 -->
+        <div
+          v-if="popupBusy || store.state.loading"
+          class="pur015-popup-loading"
+          role="status"
+          aria-label="처리 중">
+          <img :src="loadingGif" alt="" />
+        </div>
       </div>
     </div>
   </Teleport>
@@ -289,6 +312,7 @@ import Realgrid from "@/components/realgrid.vue";
 import { rgGetInstance } from "@/components/realgridInstanceRegistry.js";
 import { insertPageLog } from "@/customFunc/customFunc";
 import { useFloatPopup } from "@/utils/floatPopup";
+import loadingGif from "@/assets/images/loading.gif";
 import Swal from "sweetalert2";
 import { nextTick, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
@@ -669,7 +693,22 @@ const excelButton2 = () => {
   exportExcel2.value = !exportExcel2.value;
 };
 
-const saveButton = async () => {
+/** 매입 상세 팝업 확정·확정취소 처리 중 — 중복 클릭 방지 + 팝업 안 로딩 표시 */
+const popupBusy = ref(false);
+const runPopupAction = async (action) => {
+  if (popupBusy.value) return;
+  popupBusy.value = true;
+  try {
+    await action();
+  } finally {
+    popupBusy.value = false;
+  }
+};
+
+const saveButton = () => runPopupAction(saveConfirm);
+const cancelButton = () => runPopupAction(cancelConfirm);
+
+const saveConfirm = async () => {
   if (
     parseInt(tempCheckDate.value) > parseInt(scond7.value.replaceAll("-", ""))
   ) {
@@ -781,7 +820,7 @@ const updatedRowData2 = (e) => {
   updatedrowdata2.value = e;
 };
 
-const cancelButton = async () => {
+const cancelConfirm = async () => {
   try {
     const res = await checkStockCloseDate(
       tempGroup.value,
@@ -1189,6 +1228,23 @@ const cancelButton = async () => {
   align-items: center;
   gap: 0.5rem;
   cursor: default;
+}
+
+/* 팝업 안 로딩 표시 — 처리 중에는 팝업 전체를 덮어 추가 클릭도 막음 */
+.pur015-popup-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(255 255 255 / 0.55);
+  cursor: progress;
+}
+
+.pur015-popup-loading img {
+  max-width: 80px;
+  max-height: 80px;
 }
 
 .pur015-popup-fields {

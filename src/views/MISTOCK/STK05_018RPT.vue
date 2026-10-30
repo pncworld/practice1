@@ -6,10 +6,11 @@
 ################################################################################*/ -->
 <template>
   <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <!-- pl-5: 셸 w-right가 pl0이라 그리드가 좌측 메뉴에 붙음 → 우측 pd20과 맞춤 -->
+  <div class="stk518-page flex h-full min-h-0 flex-col pl-5" @click="handleParentClick">
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
+      <div class="flex justify-center space-x-2 pr-5">
         <button @click="searchButton" class="button search md:w-auto w-14">
           조회
         </button>
@@ -26,105 +27,120 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-[1fr,1fr,1fr] grid-rows-5 justify-start bg-gray-200 rounded-lg h-48 items-start z-10 w-full gap-3">
-      <div class="flex ml-7">
-        <Datepicker2
-          @endDate="endDate"
-          @startDate="startDate"
-          :mainName="'일자'"
-          :initToday="1"
-          @excelDate="excelDate"></Datepicker2>
+      class="stk518-search-panel z-10 mt-3 w-full min-w-0 shrink-0 rounded-lg bg-gray-200">
+      <div class="stk518-search-grid min-w-0">
+      <!-- 1행: 일자 | 자재분류 -->
+      <div class="stk518-cell">
+        <div class="stk518-sg-label">일자</div>
+        <div class="stk518-cell-field stk518-range-slot min-w-0">
+          <Datepicker2
+            omit-main-label
+            filter-bar-align
+            @endDate="endDate"
+            @startDate="startDate"
+            :mainName="'일자'"
+            :initToday="1"
+            @excelDate="excelDate"></Datepicker2>
+        </div>
       </div>
 
-      <div class="flex col-span-2">
-        <!-- <PickStoreRenew
-          @lngStoreCode="lngStoreCode"
-          @excelStore="excelStore"
-          :mainName="'이동매장'"
-          :disableStore="true"
-          :hideit2="false"
-          :hideit="false"></PickStoreRenew> -->
-
-        <PickStore
-          :hideGroup="false"
-          :hideAttr="false"
-          :mainName="'이동매장'"
-          @update:storeCd="lngStoreCode"></PickStore>
-
-        <PickStoreRenew
-          @lngStoreCode="lngStoreCode2"
-          @excelStore="excelStore"
-          :mainName="''"></PickStoreRenew>
+      <div class="stk518-cell stk518-cell--span2">
+        <div class="stk518-sg-label">자재분류</div>
+        <div class="stk518-cell-field stk518-inline min-w-0">
+          <select
+            class="stk518-control stk518-select"
+            aria-label="자재분류 대분류"
+            @change="changeOption"
+            v-model="cond">
+            <option value="0">전체</option>
+            <option :value="i.strDCode" v-for="i in optionList" :key="i.strDCode">
+              {{ i.strDName }}
+            </option>
+          </select>
+          <select
+            class="stk518-control stk518-select"
+            aria-label="자재분류 소분류"
+            v-model="cond2">
+            <option value="0">전체</option>
+            <option :value="i.lngDetail" v-for="i in optionList2" :key="i.lngDetail">
+              {{ i.strDetail }}
+            </option>
+          </select>
+          <input
+            type="text"
+            class="stk518-control stk518-text"
+            aria-label="자재코드/명"
+            v-model="cond3" />
+        </div>
       </div>
 
-      <div
-        class="flex justify-start items-center text-base text-nowrap font-semibold ml-12 mt-7 col-span-3">
-        자재분류
-        <div class="flex ml-5 space-x-3 -mt-1">
-          <div>
-            <select
-              name=""
-              id=""
-              class="border border-black w-32 h-7"
-              @change="changeOption"
-              v-model="cond">
-              <option value="0">전체</option>
-              <option :value="i.strDCode" v-for="i in optionList">
-                {{ i.strDName }}
-              </option>
-            </select>
+      <!-- 2행: 이동매장 (매장 콤보 2세트) -->
+      <div class="stk518-cell stk518-cell--full">
+        <div class="stk518-sg-label">이동매장</div>
+        <div class="stk518-cell-field stk518-move-slot min-w-0">
+          <!-- <PickStoreRenew
+            @lngStoreCode="lngStoreCode"
+            @excelStore="excelStore"
+            :mainName="'이동매장'"
+            :disableStore="true"
+            :hideit2="false"
+            :hideit="false"></PickStoreRenew> -->
+
+          <div class="stk518-pick-slot">
+            <PickStore
+              compact-search-bar
+              :compact-store-combo-max-rem="96"
+              main-name=""
+              :hideGroup="false"
+              :hideAttr="false"
+              :mainName="'이동매장'"
+              @update:storeCd="lngStoreCode"></PickStore>
           </div>
-          <div>
-            <select
-              name=""
-              id=""
-              class="border border-black w-32 h-7"
-              v-model="cond2">
-              <option value="0">전체</option>
-              <option :value="i.lngDetail" v-for="i in optionList2">
-                {{ i.strDetail }}
-              </option>
-            </select>
-          </div>
-          <div>
-            <input
-              type="text"
-              class="border border-black w-56 h-7"
-              v-model="cond3" />
+
+          <div class="stk518-renew-slot">
+            <PickStoreRenew
+              compact
+              combo-fill
+              omit-main-label
+              @lngStoreCode="lngStoreCode2"
+              @excelStore="excelStore"
+              :mainName="''"></PickStoreRenew>
           </div>
         </div>
       </div>
 
-      <div class="flex mt-6 ml-20 items-center">
-        <div class="text-base font-semibold">단위</div>
-        <div class="items-center ml-5">
+      <!-- 3행: 단위 | 단가 -->
+      <div class="stk518-cell">
+        <label class="stk518-sg-label" for="stk05-018-unit">단위</label>
+        <div class="stk518-cell-field min-w-0">
           <select
-            name=""
-            id=""
-            class="w-32 h-7 border border-black"
+            id="stk05-018-unit"
+            class="stk518-control"
             v-model="cond4">
-            <option :value="i.strDCode" v-for="i in optionList4">
+            <option :value="i.strDCode" v-for="i in optionList4" :key="i.strDCode">
               {{ i.strDName }}
             </option>
           </select>
         </div>
       </div>
-      <div class="flex mt-6 ml-20 items-center col-span-2">
-        <div class="text-base font-semibold">단가</div>
-        <div class="items-center ml-5">
+      <div class="stk518-cell stk518-cell--span2">
+        <label class="stk518-sg-label" for="stk05-018-price">단가</label>
+        <div class="stk518-cell-field stk518-half min-w-0">
           <select
-            name=""
-            id=""
-            class="w-32 h-7 border border-black"
+            id="stk05-018-price"
+            class="stk518-control"
             v-model="cond5">
-            <option :value="i.strDCode" v-for="i in optionList5">
+            <option :value="i.strDCode" v-for="i in optionList5" :key="i.strDCode">
               {{ i.strDName }}
             </option>
           </select>
         </div>
       </div>
-      <div class="flex mt-5 ml-4 items-center space-x-5 pl-1 col-span-3">
-        <div class="text-base font-semibold">주문/반품유형</div>
+
+      <!-- 4행: 주문/반품유형 | 조회유형 -->
+      <div class="stk518-cell">
+        <div class="stk518-sg-label">주문/반품유형</div>
+        <div class="stk518-cell-field stk518-radios min-w-0">
 
         <div>
           <label for="cond6"
@@ -156,9 +172,11 @@
               v-model="cond6" />반품현황</label
           >
         </div>
+        </div>
       </div>
-      <div class="flex mt-2 ml-12 items-center space-x-5 pl-1 w-[150%]">
-        <div class="text-base font-semibold">조회유형</div>
+      <div class="stk518-cell stk518-cell--span2">
+        <div class="stk518-sg-label">조회유형</div>
+        <div class="stk518-cell-field stk518-radios min-w-0">
 
         <div class="flex items-center text-center">
           <label for="cond9"
@@ -230,11 +248,13 @@
               v-model="cond7" />하겐다즈용</label
           >
         </div>
+        </div>
+      </div>
       </div>
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
-    <div class="w-full h-[70%]">
+    <div class="mt-3 min-h-0 w-full flex-1">
       <Realgrid
         :progname="'STK05_018RPT_M_VUE'"
         :progid="progid"
@@ -609,3 +629,249 @@ watch([cond7, cond6], () => {
   }
 });
 </script>
+
+<style scoped>
+.stk518-page {
+  --stk518-label-col: 7rem; /* 가장 긴 항목명: 주문/반품유형 */
+  --stk518-item-gap: 1rem;
+  --stk518-col-gap: 1.75rem;
+  --stk518-row-gap: 0.625rem;
+  --stk518-panel-pad-x: 2rem; /* 조회 항목 많음 — 앞·뒤 동일 */
+  --stk518-row-min-h: 2rem;
+  --stk518-control-border: #cbd5e1;
+  --stk518-control-h: 2rem;
+}
+
+/* 조회 AREA — 반응형 3열, 앞·뒤 pad 동일, 항목 사이 column-gap 하나 */
+.stk518-search-panel {
+  box-sizing: border-box;
+  padding-block: 0.75rem;
+  padding-inline: var(--stk518-panel-pad-x);
+}
+
+.stk518-search-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--stk518-col-gap);
+  row-gap: var(--stk518-row-gap);
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.stk518-cell {
+  display: flex;
+  min-width: 0;
+  min-height: var(--stk518-row-min-h);
+  align-items: center;
+  gap: var(--stk518-item-gap);
+}
+
+.stk518-cell--span2 {
+  grid-column: span 2;
+}
+
+.stk518-cell--full {
+  grid-column: 1 / -1;
+}
+
+.stk518-sg-label {
+  flex: 0 0 var(--stk518-label-col);
+  width: var(--stk518-label-col);
+  min-height: var(--stk518-row-min-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+}
+
+.stk518-cell-field {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: var(--stk518-row-min-h);
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.stk518-control {
+  box-sizing: border-box;
+  height: var(--stk518-control-h);
+  min-height: var(--stk518-control-h);
+  max-height: var(--stk518-control-h);
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--stk518-control-border);
+  border-radius: 0.375rem;
+  background: #fff;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  color: rgb(55 65 81);
+}
+
+.stk518-control:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+
+/* 자재분류: 대분류·소분류·자재코드/명 한 줄 */
+.stk518-inline {
+  gap: 0.5rem;
+}
+
+.stk518-select {
+  flex: 1 1 0;
+  max-width: 12rem;
+}
+
+.stk518-text {
+  flex: 2 1 0;
+  max-width: 20rem;
+}
+
+/* 단가: 3행 둘째 칸이 2칸을 차지하므로 컨트롤은 단위와 같은 폭 정도로 */
+.stk518-half > .stk518-control {
+  max-width: calc(50% - var(--stk518-col-gap) / 2);
+}
+
+/* 라디오 묶음 */
+.stk518-radios {
+  flex-wrap: wrap;
+  gap: 0.375rem 1.25rem;
+  font-size: 0.875rem;
+  color: rgb(17 24 39);
+}
+
+.stk518-radios label {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* 일자 Datepicker2 (filterBarAlign) — 칸 폭 채움·높이 2rem·테두리 통일 */
+.stk518-range-slot > * {
+  width: 100%;
+  min-width: 0;
+}
+
+.stk518-range-slot :deep(> div.flex.justify-start.items-center) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+  margin: 0 !important;
+  gap: 0.25rem !important;
+}
+
+.stk518-range-slot :deep(> div.flex > div.inline-flex.h-8) {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  gap: 0.125rem !important;
+}
+
+.stk518-range-slot :deep(input[type="date"]) {
+  box-sizing: border-box;
+  height: var(--stk518-control-h) !important;
+  border: 1px solid var(--stk518-control-border) !important;
+  width: auto !important;
+  flex: 1 1 0;
+  min-width: 5.25rem;
+  padding-left: 0.45rem;
+  padding-right: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.stk518-range-slot :deep(input[type="date"]:focus) {
+  border-color: #3b82f6 !important;
+}
+
+.stk518-range-slot :deep(div.inline-flex.h-8 > span),
+.stk518-range-slot :deep(div.inline-flex.h-8 > button) {
+  flex-shrink: 0;
+}
+
+/* 이동매장: PickStore(3콤보) + PickStoreRenew 한 줄 */
+.stk518-move-slot {
+  gap: var(--stk518-col-gap);
+}
+
+.stk518-pick-slot {
+  flex: 3 1 0;
+  min-width: 0;
+}
+
+.stk518-renew-slot {
+  flex: 2 1 0;
+  min-width: 0;
+}
+
+.stk518-pick-slot :deep(> div.flex.text-base) {
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: var(--stk518-item-gap) !important;
+}
+
+.stk518-pick-slot :deep(> div.flex > div:first-child) {
+  display: none;
+}
+
+.stk518-pick-slot :deep(.relative.min-w-0.flex-1) {
+  flex: 1 1 auto !important;
+  min-width: 11rem !important;
+  max-width: none !important;
+}
+
+.stk518-pick-slot :deep(select),
+.stk518-renew-slot :deep(select) {
+  box-sizing: border-box;
+  height: var(--stk518-control-h) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border: 1px solid var(--stk518-control-border) !important;
+}
+
+.stk518-renew-slot :deep(select) {
+  margin-left: 0 !important;
+}
+
+.stk518-renew-slot :deep(> div.flex) {
+  gap: 0.5rem;
+}
+
+.stk518-pick-slot :deep(.pickstore-vs-shell),
+.stk518-renew-slot :deep(.pickstore-vs-shell) {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: none !important;
+  height: var(--stk518-control-h) !important;
+  border: 1px solid var(--stk518-control-border) !important;
+}
+
+@media (max-width: 1280px) {
+  .stk518-search-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stk518-move-slot {
+    flex-wrap: wrap;
+  }
+
+  .stk518-pick-slot,
+  .stk518-renew-slot {
+    flex-basis: 100%;
+  }
+
+  .stk518-half > .stk518-control {
+    max-width: none;
+  }
+}
+</style>

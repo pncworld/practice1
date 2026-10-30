@@ -6,10 +6,11 @@
 ################################################################################*/ -->
 <template>
   <!-- 조회조건 -->
-  <div class="h-full" @click="handleParentClick">
-    <div class="flex justify-between items-center w-full overflow-y-hidden">
+  <!-- pl-5: 셸 w-right가 pl0이라 그리드가 좌측 메뉴에 붙음 → 우측 pd20과 맞춤 -->
+  <div class="stk002-page flex h-full min-h-0 flex-col pl-5" @click="handleParentClick">
+    <div class="flex shrink-0 justify-between items-center w-full overflow-y-hidden">
       <PageName></PageName>
-      <div class="flex justify-center mr-9 space-x-2 pr-5">
+      <div class="flex justify-center space-x-2 pr-5">
         <button @click="saveButton" class="button save md:w-auto w-14">
           저장
         </button>
@@ -17,51 +18,53 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-2 grid-rows-1 justify-between bg-gray-200 rounded-lg h-14 items-start z-10">
-      <div class="flex ml-12 space-x-5 mt-2 items-center">
-        <div class="font-semibold text-base">지역</div>
-        <select
-          name=""
-          id=""
-          class="w-48 h-7"
-          v-model="cond"
-          @change="setStoreArea">
-          <option :value="i.lngCode" v-for="i in optionList">
-            {{ i.strName }}
-          </option>
-        </select>
-      </div>
-      <div class="flex space-x-5 mt-2">
-        <div class="font-semibold text-base">납기예정일</div>
-        <div>
-          <input
-            type="text"
-            class="w-20"
-            name="cond2"
-            v-model="cond2"
-            @input="onlyNumber" />일전
+      class="stk002-search-panel z-10 mt-3 w-full min-w-0 shrink-0 rounded-lg bg-gray-200">
+      <div class="stk002-search-grid min-w-0">
+        <label class="stk002-sg-label" for="stk01-002-area">지역</label>
+        <div class="stk002-cell-field stk002-area-slot min-w-0">
+          <select
+            id="stk01-002-area"
+            class="stk002-control"
+            v-model="cond"
+            @change="setStoreArea">
+            <option :value="i.lngCode" v-for="i in optionList" :key="i.lngCode">
+              {{ i.strName }}
+            </option>
+          </select>
         </div>
-        <div>
-          <input
-            type="text"
-            class="w-20"
-            name="cond3"
-            v-model="cond3"
-            @input="onlyNumber" />시
-        </div>
-        <div>
-          <input
-            type="text"
-            class="w-20"
-            name="cond4"
-            v-model="cond4"
-            @input="onlyNumber" />분
+        <div class="stk002-spacer" aria-hidden="true"></div>
+        <div class="stk002-sg-label">납기예정일</div>
+        <div class="stk002-cell-field stk002-time-slot">
+          <label class="stk002-unit">
+            <input
+              type="text"
+              class="stk002-control stk002-num"
+              name="cond2"
+              v-model="cond2"
+              @input="onlyNumber" />일전
+          </label>
+          <label class="stk002-unit">
+            <input
+              type="text"
+              class="stk002-control stk002-num"
+              name="cond3"
+              v-model="cond3"
+              @input="onlyNumber" />시
+          </label>
+          <label class="stk002-unit">
+            <input
+              type="text"
+              class="stk002-control stk002-num"
+              name="cond4"
+              v-model="cond4"
+              @input="onlyNumber" />분
+          </label>
         </div>
       </div>
     </div>
     <!-- 조회조건 -->
     <!-- 그리드 영역 -->
-    <div class="w-full h-[82%]">
+    <div class="mt-3 min-h-0 w-full flex-1">
       <Realgrid
         :progname="'STK01_002INS_VUE'"
         :progid="1"
@@ -221,10 +224,11 @@ const setStoreArea = async (e) => {
     e.target.value
   );
 
+  // 화면 처음 열 때(onMounted)와 같은 순서: cond2=일전, cond3=시, cond4=분
   if (res2.data.List.length > 0) {
-    cond2.value = res2.data.List[0].dtmClosehour;
-    cond3.value = res2.data.List[0].dtmCloseMin;
-    cond4.value = res2.data.List[0].pre_date;
+    cond2.value = res2.data.List[0].pre_date;
+    cond3.value = res2.data.List[0].dtmClosehour;
+    cond4.value = res2.data.List[0].dtmCloseMin;
   }
 };
 
@@ -267,7 +271,6 @@ const saveButton = async () => {
         icon: "success",
         confirmButtonText: "확인",
       });
-      openPopUp.value = false;
     } else {
       await Swal.fire({
         title: "경고",
@@ -284,3 +287,114 @@ const saveButton = async () => {
   }
 };
 </script>
+
+<style scoped>
+.stk002-page {
+  --stk002-label-col: 6.5rem;
+  --stk002-item-gap: 2rem;
+  --stk002-col-gap: 1.75rem;
+  --stk002-panel-pad-x: 7rem; /* 조회 항목 2개 — 앞·뒤 동일 (search-area-pad-flexible) */
+  --stk002-area-field-w: 16rem;
+  --stk002-row-min-h: 2rem;
+  --stk002-control-border: #cbd5e1;
+  --stk002-control-h: 2rem;
+}
+
+/* 조회 AREA — 앞·뒤 pad 동일, 남는 가로는 가운데 spacer 만 흡수 */
+.stk002-search-panel {
+  box-sizing: border-box;
+  padding-block: 0.75rem;
+  padding-inline: var(--stk002-panel-pad-x);
+}
+
+.stk002-search-grid {
+  display: grid;
+  grid-template-columns:
+    max-content
+    minmax(0, var(--stk002-area-field-w))
+    minmax(var(--stk002-col-gap), 1fr)
+    max-content
+    max-content;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.stk002-spacer {
+  min-width: var(--stk002-col-gap);
+  align-self: stretch;
+}
+
+.stk002-sg-label {
+  box-sizing: content-box;
+  min-width: var(--stk002-label-col);
+  padding-right: var(--stk002-item-gap);
+  min-height: var(--stk002-row-min-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+}
+
+.stk002-cell-field {
+  min-width: 0;
+  min-height: var(--stk002-row-min-h);
+  display: flex;
+  align-items: center;
+}
+
+.stk002-area-slot {
+  width: 100%;
+}
+
+.stk002-control {
+  box-sizing: border-box;
+  height: var(--stk002-control-h);
+  min-height: var(--stk002-control-h);
+  max-height: var(--stk002-control-h);
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--stk002-control-border);
+  border-radius: 0.375rem;
+  background: #fff;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  color: rgb(55 65 81);
+}
+
+.stk002-control:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+
+.stk002-time-slot {
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+}
+
+.stk002-unit {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  color: rgb(17 24 39);
+  white-space: nowrap;
+}
+
+.stk002-num {
+  width: 4.5rem;
+  text-align: right;
+}
+
+@media (max-width: 1100px) {
+  .stk002-page {
+    --stk002-panel-pad-x: 2rem;
+  }
+}
+</style>
