@@ -461,6 +461,33 @@
                   </table>
                 </div>
               </template>
+              <!-- 매출 나눠 보기: 요일별·시간별·시간대(런치·디너 등)별 합계, 가장 많이 팔린 구분은 굵게 -->
+              <template v-else-if="msg.breakdownRows">
+                <div>{{ msg.content }}</div>
+                <div v-if="msg.breakdownRows.length > 0" class="mst003-chat-result-wrap">
+                  <table class="mst003-chat-lang mst003-chat-result">
+                    <thead>
+                      <tr>
+                        <th>{{ msg.breakdownLabel }}</th>
+                        <th class="text-right">수량</th>
+                        <th class="text-right">실매출</th>
+                        <th class="text-right">구성비</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="r in msg.breakdownRows"
+                        :key="r.key"
+                        :class="{ 'font-semibold text-blue-700': r.peak }">
+                        <td>{{ r.name }}</td>
+                        <td class="text-right">{{ r.cnt }}</td>
+                        <td class="text-right">{{ r.amt }}</td>
+                        <td class="text-right">{{ r.rate }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </template>
               <!-- 분류 목록: 대분류별 소분류와 메뉴 수 -->
               <template v-else-if="msg.groupRows">
                 <div>{{ msg.content }}</div>
@@ -1088,6 +1115,150 @@
       </div>
     </div>
   </Teleport>
+  <!-- 초간단 메뉴등록 팝업: '메뉴명 판매가' 한 줄 → 분류·메뉴코드 자동, 바로 저장 → 메뉴키 자동 배치 여부 -->
+  <Teleport to="body">
+    <div v-if="quickOpen" class="mst003-chat-mask">
+      <div class="mst003-chat-popup mst003-quick-popup" role="dialog" aria-modal="true">
+        <div class="mst003-chat-head mst003-quick-head">
+          <h2 class="mst003-chat-title">
+            초간단 메뉴등록
+            <span v-if="!isStoreImageFeatureEnabled && clickedStoreNm" class="mst003-chat-store"
+              >· {{ clickedStoreNm }}</span
+            >
+          </h2>
+          <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="closeQuickMenu">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M6 6l12 12M18 6L6 18"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round" />
+            </svg>
+            닫기
+          </button>
+        </div>
+        <div v-if="quickTestMode" class="mst003-ai-test">
+          테스트 모드: AI를 호출하지 않았습니다. 분류는 가장 작은 소분류 코드로 들어갑니다.
+        </div>
+        <div ref="quickLogRef" class="mst003-chat-log">
+          <div
+            v-for="(msg, idx) in quickDisplayMessages"
+            :key="idx"
+            class="mst003-chat-row"
+            :class="msg.role === 'user' ? 'mst003-chat-row--user' : 'mst003-chat-row--ai'">
+            <span
+              v-if="msg.role !== 'user'"
+              class="mst003-chat-avatar mst003-quick-avatar"
+              :class="{ 'mst003-chat-avatar--typing': msg.typing }">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  d="M13 2.5L5 13.5h6l-1 8 8-11h-6l1-8z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linejoin="round" />
+              </svg>
+            </span>
+            <div class="mst003-chat-bubble">
+              <!-- 처음 안내: 어떻게 등록되는지 -->
+              <template v-if="msg.guide">
+                <div>{{ msg.content }}</div>
+                <ul class="mst003-chat-examples mst003-quick-guide">
+                  <li v-for="line in QUICK_GUIDE_LINES" :key="line.label">
+                    <span class="mst003-chat-examples-label">{{ line.label }}</span>
+                    <span class="mst003-quick-guide-text">{{ line.text }}</span>
+                  </li>
+                </ul>
+              </template>
+              <!-- 메뉴키 자동 배치 여부 -->
+              <template v-else-if="msg.keyAsk">
+                <div>{{ msg.content }}</div>
+                <div class="mst003-chat-confirm-btns">
+                  <button
+                    type="button"
+                    class="pnc-sub-btn"
+                    :disabled="quickStep !== 'keyAsk' || quickLoading || msg.seq !== quickSeq"
+                    @click="answerQuickMenuKey(true)">
+                    예
+                  </button>
+                  <button
+                    type="button"
+                    class="pnc-sub-btn pnc-sub-btn--gray"
+                    :disabled="quickStep !== 'keyAsk' || quickLoading || msg.seq !== quickSeq"
+                    @click="answerQuickMenuKey(false)">
+                    아니오
+                  </button>
+                </div>
+              </template>
+              <!-- 공통 메뉴 브랜드: 메뉴키를 배치할 매장 선택 -->
+              <template v-else-if="msg.keyStores">
+                <div>{{ msg.content }}</div>
+                <div class="mst003-chat-check-list">
+                  <label v-for="s in quickKeyStores" :key="s.code" class="mst003-chat-choice">
+                    <input
+                      type="checkbox"
+                      :value="s.code"
+                      v-model="quickKeyChecked"
+                      :disabled="quickStep !== 'keyStores' || quickLoading || msg.seq !== quickSeq" />
+                    <span>{{ s.name }}</span>
+                  </label>
+                </div>
+                <div class="mst003-chat-confirm-btns">
+                  <button
+                    type="button"
+                    class="pnc-sub-btn"
+                    :disabled="quickStep !== 'keyStores' || quickLoading || msg.seq !== quickSeq || quickKeyChecked.length === 0"
+                    @click="confirmQuickKeyStores">
+                    배치
+                  </button>
+                  <button
+                    type="button"
+                    class="pnc-sub-btn pnc-sub-btn--gray"
+                    :disabled="quickStep !== 'keyStores' || quickLoading || msg.seq !== quickSeq"
+                    @click="answerQuickMenuKey(false)">
+                    취소
+                  </button>
+                </div>
+              </template>
+              <template v-else>{{ msg.content }}</template>
+            </div>
+          </div>
+        </div>
+        <div class="mst003-chat-input">
+          <textarea
+            ref="quickInputRef"
+            v-model="quickText"
+            class="mst003-chat-textarea"
+            rows="1"
+            maxlength="200"
+            placeholder="메뉴명과 판매가를 입력해 주세요. 예: 레몬에이드 4500 (Enter 등록)"
+            :disabled="quickLoading"
+            @keydown.enter="onQuickEnter"></textarea>
+          <button
+            type="button"
+            class="pnc-sub-btn mst003-chat-send shrink-0"
+            :disabled="quickLoading"
+            @click="sendQuickMenu">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M5 13l4 4L19 7"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            등록
+          </button>
+        </div>
+        <div class="mst003-chat-notice">
+          입력하시면 바로 저장됩니다. 등록 후 메뉴 정보를 꼭 확인해 주세요.<br />
+          AI는 정보 제공 시 실수를 할 수 있습니다. 개인 정보나 민감한 정보는 입력하지 마십시오.
+        </div>
+      </div>
+    </div>
+  </Teleport>
   <!-- AI 대화 이미지 미리보기 확대 (클릭하면 닫힘) -->
   <Teleport to="body">
     <div
@@ -1148,6 +1319,23 @@
                 stroke-linecap="round" />
             </svg>
             AI 메뉴 관리
+          </button>
+          <!-- 초간단 메뉴등록: 메뉴명·판매가 한 줄로 바로 등록 (AI 메뉴 관리와 같은 사용 조건) -->
+          <button
+            type="button"
+            class="whitebutton mst003-sub-btn mst003-quick-btn"
+            title="메뉴명과 판매가만 입력하시면 분류와 메뉴코드를 자동으로 정해 바로 등록해 드립니다."
+            @click="openQuickMenu"
+            :disabled="aiDisabledGroup || (!afterSearch && !aiNeedsStorePick)">
+            <svg class="mst003-ai-add-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M13 2.5L5 13.5h6l-1 8 8-11h-6l1-8z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linejoin="round" />
+            </svg>
+            초간단 메뉴등록
           </button>
           <button
             type="button"
@@ -2377,6 +2565,9 @@ import {
   chatMenu,
   chatAssist,
   getMenuSales,
+  getMenuSalesTime,
+  quickMenu,
+  getMenuKeyTarget,
   getMenuDates,
   getMenuSnapshot,
   writeMenuChangeLog,
@@ -2441,7 +2632,7 @@ import { v4 as uuidv4 } from "uuid";
  * 공통 표준  Function
  */
 
-import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -3990,6 +4181,7 @@ const AI_CHAT_SPECIAL_BUBBLE_KEYS = [
   "startMenu",
   "searchRows",
   "salesRows",
+  "breakdownRows",
   "groupRows",
   "editPick",
   "editRows",
@@ -5428,16 +5620,84 @@ const runAiSales = async (cond) => {
   const fromText = formatAiDate(from);
   const toText = formatAiDate(to);
   const days = Math.round((to - from) / 86400000) + 1;
-  if (days < 1 || days > AI_SALES_MAX_DAYS) {
+
+  // 요일(월=1 … 일=7)·시간대 조건과 나눠 보기 기준 (menu 메뉴별 순위 / weekday 요일별 / hour 시간별 / band 시간대 구간별)
+  const weekdays = [...new Set((cond.weekdays || []).map(Number).filter((d) => d >= 1 && d <= 7))].sort(
+    (a, b) => a - b
+  );
+  const ranges = (cond.timeRanges || []).filter(
+    (r) => aiTimeToMinute(r.from) >= 0 && aiTimeToMinute(r.to) >= 0
+  );
+  // 이름을 붙인 시간대(런치·디너 등)는 이 대화에서 기억해 두고, 다음에 같은 이름을 말하면 다시 묻지 않는다
+  ranges.forEach((r) => {
+    const name = String(r.name || "").trim();
+    if (name) aiTimeBands.value[name] = { from: r.from, to: r.to };
+  });
+  let groupBy = ["weekday", "hour", "band"].includes(cond.groupBy) ? cond.groupBy : "menu";
+  if (groupBy === "band" && ranges.length === 0) groupBy = "menu";
+  if (groupBy === "weekday" && ranges.length > 0) {
+    const text =
+      "시간대 조건과 요일별 나눠 보기는 함께 조회할 수 없습니다. 시간대 없이 요일별로 보시거나, 요일을 정해서 시간대별로 물어봐 주세요.";
+    pushAiChatLocal("assistant", text, true);
+    return `[매출] 조회 불가: ${text}`;
+  }
+  // 시간대 조건·시간별 나눠 보기는 거래 상세를 읽어 무거우므로 기간을 더 짧게 제한한다
+  const useTime = ranges.length > 0 || groupBy === "hour";
+  const maxDays = useTime ? AI_SALES_TIME_MAX_DAYS : AI_SALES_MAX_DAYS;
+  if (days < 1 || days > maxDays) {
     const text =
       days < 1
         ? "조회 시작일이 종료일보다 늦습니다. 기간을 다시 말씀해 주세요."
-        : `메뉴 매출은 최대 1달(${AI_SALES_MAX_DAYS}일)까지만 조회할 수 있습니다. 요청하신 기간(${fromText} ~ ${toText}, ${days}일)을 줄여 주세요.`;
+        : useTime
+          ? `시간대 매출은 최대 ${AI_SALES_TIME_MAX_DAYS}일까지만 조회할 수 있습니다. 요청하신 기간(${fromText} ~ ${toText}, ${days}일)을 줄여 주세요.`
+          : `메뉴 매출은 최대 1달(${AI_SALES_MAX_DAYS}일)까지만 조회할 수 있습니다. 요청하신 기간(${fromText} ~ ${toText}, ${days}일)을 줄여 주세요.`;
     pushAiChatLocal("assistant", text, true);
     return `[매출] 조회 불가: ${text}`;
   }
 
-  const res = await getMenuSales(groupCd.value, nowStoreCd.value, fromText, toText);
+  const menus = aiMenuRows();
+  const menuByCode = new Map(menus.map((r) => [String(r.lngCode), r]));
+  const keyword = normAiText(cond.keyword);
+  const terms = keyword
+    ? [keyword, ...(cond.aliases || []).map(normAiText).filter((a) => a && a !== keyword)]
+    : [];
+  // '이 메뉴들 중'처럼 앞 결과를 이어받으면 그 메뉴들 안에서만 본다
+  const prevScope = aiPreviousScope(cond);
+  // 요일별·시간별·구간별로 나눠 볼 때 특정 메뉴(검색어·앞 결과)만 보려면 메뉴코드를 서버로 넘긴다
+  let menuCodes = "";
+  if (groupBy !== "menu" && (terms.length > 0 || prevScope)) {
+    const codes = menus
+      .filter((r) => !prevScope || prevScope.has(String(r.lngCode)))
+      .filter((r) => terms.length === 0 || aiMenuNameHit(r, terms))
+      .map((r) => String(r.lngCode));
+    if (codes.length === 0) {
+      const text = `'${cond.keyword || "앞 결과"}'에 해당하는 메뉴를 메뉴 목록에서 찾지 못했습니다.`;
+      pushAiChatLocal("assistant", text, true);
+      return `[매출] ${text}`;
+    }
+    menuCodes = codes.join(",");
+  }
+
+  const res = useTime
+    ? await getMenuSalesTime(
+        groupCd.value,
+        nowStoreCd.value,
+        fromText,
+        toText,
+        weekdays.join(","),
+        ranges.map((r) => `${aiTimeToMinute(r.from)}-${aiTimeToMinute(r.to)}`).join("|"),
+        groupBy === "hour" ? "HOUR" : groupBy === "band" ? "BAND" : "MENU",
+        menuCodes
+      )
+    : await getMenuSales(
+        groupCd.value,
+        nowStoreCd.value,
+        fromText,
+        toText,
+        weekdays.join(","),
+        groupBy === "weekday" ? "WEEKDAY" : "MENU",
+        menuCodes
+      );
   if (res.data.RESULT_CD !== "00") {
     const text = `매출을 조회하지 못했습니다. (${res.data.RESULT_NM})`;
     pushAiChatLocal("assistant", text, true);
@@ -5451,21 +5711,37 @@ const runAiSales = async (cond) => {
     ])
   );
   const totalAmt = [...salesByCode.values()].reduce((sum, s) => sum + s.amt, 0);
-  const menus = aiMenuRows();
-  const menuByCode = new Map(menus.map((r) => [String(r.lngCode), r]));
-  const keyword = normAiText(cond.keyword);
-  const terms = keyword
-    ? [keyword, ...(cond.aliases || []).map(normAiText).filter((a) => a && a !== keyword)]
-    : [];
   const mode = cond.mode || "all";
   const limit = Math.max(0, Math.floor(Number(cond.limit) || 0));
   const scope = String(nowStoreCd.value) === "0" ? "그룹 전체 매장" : "조회 매장";
   const period = `${fromText} ~ ${toText}`;
-  // '이 메뉴들 중'처럼 앞 결과를 이어받으면 그 메뉴들 안에서만 본다
-  const prevScope = aiPreviousScope(cond);
   // 순위 기준: 서버가 sortBy=qty 를 보내면 판매수량, 아니면(값이 없는 이전 API 포함) 실매출
   const byQty = cond.sortBy === "qty";
-  const keywordText = (prevScope ? ` 앞 결과 ${prevScope.size}개 중` : "") + (keyword ? ` '${cond.keyword}'` : "");
+  // 조건 문구: 요일·시간대 (예: '주말(토·일), 런치 11:00~14:00')
+  const condText = [
+    weekdays.length > 0 ? describeAiWeekdays(weekdays) : "",
+    ranges.length > 0 ? describeAiRanges(ranges) : "",
+  ]
+    .filter((t) => t)
+    .join(", ");
+  const keywordText =
+    (prevScope ? ` 앞 결과 ${prevScope.size}개 중` : "") +
+    (keyword ? ` '${cond.keyword}'` : "") +
+    (condText ? ` (${condText})` : "");
+  const condJson = JSON.stringify({ ...cond, fromDate: fromText, toDate: toText });
+
+  // 요일별·시간별·구간별 나눠 보기는 메뉴 순위 대신 구분별 합계 표로 보여 준다
+  if (groupBy !== "menu") {
+    return showAiSalesBreakdown({
+      groupBy,
+      weekdays,
+      ranges,
+      salesByCode,
+      byQty,
+      headText: `${period} ${scope}${keywordText}`,
+      condJson,
+    });
+  }
 
   let rows;
   let content;
@@ -5538,7 +5814,84 @@ const runAiSales = async (cond) => {
           .map((r) => `${r.name}${r.amt ? ` ${r.amt}` : ""}`)
           .join(", ")})`
       : ""
-  } 조건=${JSON.stringify({ ...cond, fromDate: fromText, toDate: toText })}`;
+  } 조건=${condJson}`;
+};
+
+// 매출 요일·시간대 조건 도우미
+const AI_SALES_TIME_MAX_DAYS = 14;
+const AI_WEEKDAY_NAMES = ["", "월", "화", "수", "목", "금", "토", "일"];
+// 이 대화에서 사용자가 정한 시간대 (예: { 런치: { from: "11:00", to: "14:00" } }). 새 대화에서 비움
+const aiTimeBands = ref({});
+// 'HH:mm' → 자정 기준 분 (0~1440). 형식이 틀리면 -1
+const aiTimeToMinute = (time) => {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(String(time ?? "").trim());
+  if (!m) return -1;
+  const minutes = Number(m[1]) * 60 + Number(m[2]);
+  return Number(m[2]) < 60 && minutes <= 1440 ? minutes : -1;
+};
+const describeAiWeekdays = (days) => {
+  const key = days.join(",");
+  if (key === "6,7") return "주말(토·일)";
+  if (key === "1,2,3,4,5") return "평일(월~금)";
+  return `${days.map((d) => AI_WEEKDAY_NAMES[d]).join("·")}요일`;
+};
+const describeAiRanges = (ranges) =>
+  ranges.map((r) => `${String(r.name || "").trim() ? `${String(r.name).trim()} ` : ""}${r.from}~${r.to}`).join(", ");
+
+// 요일별·시간별·시간대 구간별 합계 표 (구성비는 표 안 합계 대비)
+const showAiSalesBreakdown = ({ groupBy, weekdays, ranges, salesByCode, byQty, headText, condJson }) => {
+  const get = (key) => salesByCode.get(String(key)) || { cnt: 0, amt: 0 };
+  let label;
+  let rows;
+  if (groupBy === "weekday") {
+    label = "요일";
+    rows = (weekdays.length > 0 ? weekdays : [1, 2, 3, 4, 5, 6, 7]).map((d) => ({
+      key: String(d),
+      name: `${AI_WEEKDAY_NAMES[d]}요일`,
+      ...get(d),
+    }));
+  } else if (groupBy === "hour") {
+    label = "시간";
+    rows = [...salesByCode.keys()]
+      .map(Number)
+      .sort((a, b) => a - b)
+      .map((h) => ({ key: String(h), name: `${h}시`, ...get(h) }));
+  } else {
+    label = "시간대";
+    rows = ranges.map((r, idx) => ({
+      key: String(idx + 1),
+      name: `${String(r.name || "").trim() || `구간 ${idx + 1}`} (${r.from}~${r.to})`,
+      ...get(idx + 1),
+    }));
+  }
+  const sumCnt = rows.reduce((sum, r) => sum + r.cnt, 0);
+  const sumAmt = rows.reduce((sum, r) => sum + r.amt, 0);
+  // 가장 많이 팔린 구분 (판매수량 기준을 물었으면 수량, 아니면 실매출)
+  const peak = rows.reduce((best, r) => (!best || (byQty ? r.cnt > best.cnt : r.amt > best.amt) ? r : best), null);
+  const content =
+    sumCnt === 0 && sumAmt === 0
+      ? `${headText} 판매 내역이 없습니다.`
+      : `${headText} ${label}별 매출입니다. 수량 ${formatAiPrice(sumCnt)}개, 실매출 ${formatAiAmount(sumAmt)}원.` +
+        (peak && rows.length > 1
+          ? ` ${byQty ? "판매수량" : "실매출"} 기준으로 가장 많이 팔린 ${label}는 ${peak.name}입니다.`
+          : "");
+  aiChatMessages.value.push({
+    role: "assistant",
+    content,
+    breakdownLabel: label,
+    breakdownRows: rows.map((r) => ({
+      key: r.key,
+      name: r.name,
+      cnt: formatAiPrice(r.cnt),
+      amt: `${formatAiAmount(r.amt)}원`,
+      rate: sumAmt > 0 ? `${((r.amt / sumAmt) * 100).toFixed(1)}%` : "-",
+      peak: peak && rows.length > 1 && r.key === peak.key,
+    })),
+    local: true,
+  });
+  return `[매출 ${label}별] ${headText}: ${rows
+    .map((r) => `${r.name} ${formatAiPrice(r.cnt)}개 ${formatAiAmount(r.amt)}원`)
+    .join(", ")} 조건=${condJson}`;
 };
 
 // 분류 목록: 대분류별 소분류를 표로 (메뉴 수는 조회된 메뉴 목록 기준)
@@ -5581,7 +5934,9 @@ const showAiGroups = (cond) => {
 // 메뉴 목록 통계: '전부 과세야?' 같은 질문에 AI가 답할 수 있게 chatAssist 로 함께 보낸다 (메뉴 목록 자체는 보내지 않음)
 const buildAiMenuStats = () => {
   const menus = aiMenuRows();
-  if (menus.length === 0) return JSON.stringify({ total: 0 });
+  // 이 대화에서 사용자가 정한 시간대 (AI가 '런치'를 다시 묻지 않도록)
+  const timeBands = Object.entries(aiTimeBands.value).map(([name, r]) => ({ name, from: r.from, to: r.to }));
+  if (menus.length === 0) return JSON.stringify({ total: 0, timeBands });
   const priced = menus.map((r) => ({ r, price: Number(r.lngPrice) || 0 }));
   const minItem = priced.reduce((a, b) => (b.price < a.price ? b : a));
   const maxItem = priced.reduce((a, b) => (b.price > a.price ? b : a));
@@ -5602,6 +5957,7 @@ const buildAiMenuStats = () => {
     minPrice: { name: minItem.r.strName, code: String(minItem.r.lngCode), price: minItem.price },
     maxPrice: { name: maxItem.r.strName, code: String(maxItem.r.lngCode), price: maxItem.price },
     byMain,
+    timeBands,
   });
 };
 
@@ -6100,16 +6456,53 @@ const refreshAiChatComplete = (item) => {
 // inputCode 가 있으면 그 코드의 사용 여부(inputUsed)와, 사용 중일 때의 다음 빈 번호(code)를 돌려준다
 const fetchMenuCodeSuggestion = async (item, inputCode, index) => {
   const result = await fetchMenuCodeSuggestionByGroup(item, inputCode, index);
+  if (inputCode || result.code) return result;
   // 분류에 기존 메뉴가 없어 제안할 번호가 없으면 '대분류코드 + 소분류코드 + 10' 으로 만든다 (4~9자리일 때만).
   // 이미 쓰는 번호면 그 다음 빈 번호
-  if (!inputCode && !result.code) {
-    const base = `${item.lngMainGroup ?? ""}${item.lngSubGroup ?? ""}10`;
-    if (/^\d{4,9}$/.test(base)) {
-      const checked = await fetchMenuCodeSuggestionByGroup(item, base, index);
-      return { code: checked.inputUsed ? checked.code : base, inputUsed: false };
-    }
+  const base = `${item.lngMainGroup ?? ""}${item.lngSubGroup ?? ""}10`;
+  if (/^\d{4,9}$/.test(base)) {
+    const checked = await fetchMenuCodeSuggestionByGroup(item, base, index);
+    const code = checked.inputUsed ? checked.code : base;
+    if (code) return { code, inputUsed: false };
   }
-  return result;
+  // 메뉴코드(lngCode)는 DB 에서 INT 라 자릿수가 커지면 오류가 나므로, 위 규칙으로 9자리 안에서 만들 수 없으면 6자리로 자동 생성한다
+  return { code: await suggestSixDigitMenuCode(item, index), inputUsed: false };
+};
+
+// 6자리 메뉴코드 자동 생성: 메뉴코드 생성 규칙과 같게 같은 분류의 6자리 코드 중 가장 큰 번호 + 1 부터,
+// 그 분류에 6자리 코드가 없으면 100000 부터 비어 있는 번호를 차례로 찾는다 (DB 중복 확인 포함). 못 찾으면 빈 문자열
+const SIX_DIGIT_MIN = 100000;
+const SIX_DIGIT_MAX = 999999;
+const suggestSixDigitMenuCode = async (item, index) => {
+  const used = getUsedMenuCodes(index);
+  const groupSix = (rowData.value || [])
+    .filter(
+      (r) =>
+        String(r.lngMainGroup) === String(item.lngMainGroup) &&
+        String(r.lngSubGroup) === String(item.lngSubGroup)
+    )
+    .map((r) => String(r.lngCode ?? ""))
+    .filter((c) => /^\d{6}$/.test(c))
+    .map(Number);
+  // 다음 빈 6자리 번호 (끝까지 없으면 100000 부터 다시)
+  const nextFreeSix = (start) => {
+    for (let n = Math.max(start, SIX_DIGIT_MIN); n <= SIX_DIGIT_MAX; n++) {
+      if (!used.has(String(n))) return n;
+    }
+    for (let n = SIX_DIGIT_MIN; n < start && n <= SIX_DIGIT_MAX; n++) {
+      if (!used.has(String(n))) return n;
+    }
+    return 0;
+  };
+  let candidate = nextFreeSix(groupSix.length > 0 ? Math.max(...groupSix) + 1 : SIX_DIGIT_MIN);
+  // 화면 목록에 없는 메뉴(분류가 지워진 메뉴 등)와도 겹치지 않게 DB 로 확인한다
+  for (let i = 0; candidate && i < 20; i++) {
+    const checked = await fetchMenuCodeSuggestionByGroup(item, String(candidate), index);
+    if (!checked.inputUsed) return String(candidate);
+    used.add(String(candidate));
+    candidate = nextFreeSix(candidate + 1);
+  }
+  return "";
 };
 
 // 분류 기준 메뉴코드 제안·중복 확인 (fetchMenuCodeSuggestion 에서 사용)
@@ -6559,6 +6952,7 @@ const resetAiChat = () => {
   aiChatTypoAsked.clear();
   aiChatReturnTo = "";
   aiLastResultCodes.value = null;
+  aiTimeBands.value = {};
 };
 
 // 최종 등록(저장) 직후 아무것도 더 하지 않은 상태에서 닫으면 대화창을 모두 초기화한다
@@ -6569,6 +6963,336 @@ const closeAiChat = () => {
   }
   aiChatZoomImage.value = null;
   aiChatOpen.value = false;
+};
+
+/**
+ * 초간단 메뉴등록: '메뉴명 판매가' 한 줄 → AI가 메뉴명·판매가를 나누고 소분류를 고름(못 고르면 가장 작은 소분류 코드)
+ * → 메뉴코드 자동 → 기존 저장 로직으로 바로 저장(할인 0, 주방출력 1) → 변경 로그 → 메뉴키 자동 배치 여부를 묻는다
+ * 기존 AI 메뉴 관리(대화 등록)와는 따로 동작한다
+ */
+const QUICK_GUIDE_LINES = [
+  { label: "분류", text: "메뉴명으로 알맞은 소분류를 찾아 넣고, 대분류는 자동으로 연결됩니다. 찾지 못하면 가장 작은 소분류 코드에 넣습니다." },
+  { label: "메뉴코드", text: "자동 생성됩니다." },
+  { label: "기본값", text: "할인 0(나중에 설정)\n주방출력 1(기본 출력)" },
+  { label: "메뉴키", text: "등록 후 메뉴키 자동배치 확인을 진행합니다." },
+  { label: "주의", text: "입력하시면 바로 등록되니, 저장 후 메뉴 정보를 꼭 확인해 주세요." },
+];
+const quickOpen = ref(false);
+const quickMessages = ref([]);
+const quickText = ref("");
+const quickLoading = ref(false);
+const quickTestMode = ref(false);
+// input 메뉴 입력 / keyAsk 메뉴키 배치 여부 / keyStores 메뉴키 매장 선택(공통 메뉴 브랜드)
+const quickStep = ref("input");
+// 버튼이 있는 말풍선 번호: 가장 최근 것만 누를 수 있다
+const quickSeq = ref(0);
+// 방금 등록한 메뉴 (메뉴키 배치용): { code, name, main, sub }
+const quickLast = ref(null);
+// 등록은 했지만 아직 남기지 않은 신규 등록 로그: { code, remark }
+let quickPendingLog = null;
+const flushQuickLog = async (keyText) => {
+  const pending = quickPendingLog;
+  if (!pending) return;
+  quickPendingLog = null;
+  await writeAiMenuLog("INSERT", pending.code, "", [pending.remark, keyText].filter((t) => t).join(" · "));
+};
+const quickKeyStores = ref([]);
+const quickKeyChecked = ref([]);
+const quickLogRef = ref(null);
+const quickInputRef = ref(null);
+const quickDisplayMessages = computed(() => [
+  {
+    role: "assistant",
+    content: "메뉴명과 판매가만 입력하시면 바로 등록해 드립니다. 예: 레몬에이드 4500",
+    guide: true,
+  },
+  ...quickMessages.value,
+  ...(quickLoading.value ? [{ role: "assistant", content: "처리하고 있습니다...", typing: true }] : []),
+]);
+const pushQuick = (role, content, extra = {}) => {
+  quickMessages.value.push({ role, content, ...extra });
+};
+const scrollQuickLog = async () => {
+  await nextTick();
+  if (quickLogRef.value) quickLogRef.value.scrollTop = quickLogRef.value.scrollHeight;
+};
+const focusQuickInput = async () => {
+  await nextTick();
+  if (quickInputRef.value) quickInputRef.value.focus();
+};
+
+const openQuickMenu = () => {
+  if (aiDisabledGroup.value) return;
+  if (aiNeedsStorePick.value) {
+    Swal.fire({ title: "경고", text: "매장을 선택해 주십시오.", icon: "warning", confirmButtonText: "확인" });
+    return;
+  }
+  if (afterSearch.value == false) {
+    Swal.fire({ title: "경고", text: "조회를 먼저 진행해주세요.", icon: "warning", confirmButtonText: "확인" });
+    return;
+  }
+  // 다른 매장으로 바꿔 조회했으면 이전 대화는 지우고 새로 시작한다
+  const storeKey = `${groupCd.value}|${nowStoreCd.value}`;
+  if (quickStoreKey && quickStoreKey !== storeKey) {
+    flushQuickLog("메뉴키 배치 답변 전 매장 변경");
+    quickMessages.value = [];
+    quickStep.value = "input";
+    quickLast.value = null;
+  }
+  quickStoreKey = storeKey;
+  quickOpen.value = true;
+  scrollQuickLog();
+  focusQuickInput();
+};
+let quickStoreKey = "";
+// 메뉴키 답변 없이 화면을 떠나면 등록 로그만 남긴다
+onBeforeUnmount(() => {
+  flushQuickLog("메뉴키 배치 답변 전 화면 이동");
+});
+const closeQuickMenu = () => {
+  quickOpen.value = false;
+};
+const onQuickEnter = (e) => {
+  if (e.isComposing || e.shiftKey) return;
+  e.preventDefault();
+  sendQuickMenu();
+};
+
+// 분류를 찾지 못했을 때: 가장 작은 소분류 코드 (그 소분류의 대분류가 연결됨)
+const findSmallestSubGroup = () =>
+  [...(SubMenuGroup.value || [])].sort(
+    (a, b) => Number(a.GroupCd) - Number(b.GroupCd) || Number(a.sublngMajor) - Number(b.sublngMajor)
+  )[0] || null;
+
+const sendQuickMenu = async () => {
+  const text = quickText.value.trim();
+  if (text === "" || quickLoading.value) return;
+  // 메뉴키 배치 여부에 '네'·'아니요'로 답한 경우
+  if (quickStep.value === "keyAsk") {
+    if (AI_CHAT_CONFIRM_WORDS.includes(text) || /^(예|네|응|좋아|배치)/.test(text)) {
+      quickText.value = "";
+      answerQuickMenuKey(true);
+      return;
+    }
+    if (/^(아니|아뇨|괜찮|필요\s*없|안\s*해|no)/i.test(text)) {
+      quickText.value = "";
+      answerQuickMenuKey(false);
+      return;
+    }
+    // 그 밖의 말은 다음 메뉴 등록으로 본다 (메뉴키는 배치하지 않음)
+  }
+  await flushQuickLog("메뉴키 배치 안 함(다음 메뉴 입력)");
+  // 선택된 매장으로만 등록한다 (매장 미선택·매장 변경·조회 전이면 막음)
+  if (aiNeedsStorePick.value || !afterSearch.value || `${groupCd.value}|${nowStoreCd.value}` !== quickStoreKey) {
+    Swal.fire({
+      title: "경고",
+      text: aiNeedsStorePick.value ? "매장을 선택해 주십시오." : "매장을 다시 조회한 뒤 초간단 메뉴등록을 열어 주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    quickOpen.value = false;
+    return;
+  }
+  quickText.value = "";
+  quickStep.value = "input";
+  pushQuick("user", text);
+  if (hasAiUnsavedChanges()) {
+    pushQuick("assistant", "메뉴 목록에 저장하지 않은 변경이 있어 등록할 수 없습니다. 먼저 저장하시거나 다시 조회해 주세요.");
+    scrollQuickLog();
+    return;
+  }
+  quickLoading.value = true;
+  scrollQuickLog();
+  try {
+    const res = await quickMenu(groupCd.value, nowStoreCd.value, text, buildAiGroupList());
+    if (res.data.RESULT_CD !== "00") throw new Error(res.data.RESULT_NM);
+    quickTestMode.value = res.data.RESULT_NM === "TEST_MODE";
+    if (res.data.OK !== "Y") {
+      pushQuick("assistant", res.data.REPLY || "메뉴명과 판매가를 함께 입력해 주세요. 예: 레몬에이드 4500");
+      return;
+    }
+    const name = String(res.data.STR_NAME || "").trim();
+    const price = String(res.data.PRICE || "").replace(/[^0-9]/g, "");
+    if (!name || !price || price === "0") {
+      pushQuick("assistant", "메뉴명과 판매가를 함께 입력해 주세요. 예: 레몬에이드 4500");
+      return;
+    }
+    // 분류: AI가 고른 소분류가 화면 목록에 있으면 그대로, 없으면 가장 작은 소분류 코드
+    let subItem = (SubMenuGroup.value || []).find(
+      (i) =>
+        String(i.GroupCd) === String(res.data.SUB_GROUP || "") &&
+        (!res.data.MAIN_GROUP || String(i.sublngMajor) === String(res.data.MAIN_GROUP))
+    );
+    const byName = !!subItem;
+    if (!subItem) subItem = findSmallestSubGroup();
+    if (!subItem) {
+      pushQuick(
+        "assistant",
+        "이 매장에는 등록된 소분류가 없어 메뉴를 등록할 수 없습니다. 대그룹 코드 등록 화면에서 분류를 먼저 등록해 주세요."
+      );
+      return;
+    }
+    const item = normalizeAiRow(
+      {
+        strName: name,
+        lngPrice: price,
+        lngMainGroup: String(subItem.sublngMajor),
+        lngSubGroup: String(subItem.GroupCd),
+        lngTax: "0",
+        strNote: "",
+      },
+      0
+    );
+    // 기본값: 할인 0(나중에 설정, 할인여부는 그대로), 주방출력 1(출력)
+    item.lngDiscount = "0";
+    item.lngKPG = "1";
+    // 메뉴코드: 묻지 않고 자동 생성 (분류 기준 → 대분류+소분류+10 → 9자리를 넘으면 6자리 빈 번호)
+    const { code } = await fetchMenuCodeSuggestion(item, "", -1);
+    item.lngCode = code;
+    if (!item.lngCode) {
+      pushQuick("assistant", "비어 있는 메뉴코드를 찾지 못해 등록하지 못했습니다. 메뉴코드 목록에서 직접 등록해 주세요.");
+      return;
+    }
+    refreshAiChatComplete(item);
+    await applyAiRow(item);
+    if (!item.applied) {
+      pushQuick("assistant", "메뉴 목록에 넣지 못했습니다. 화면에 나온 안내를 확인해 주세요.");
+      return;
+    }
+    const saved = (await saveButton({ skipConfirm: true })) === true;
+    if (!saved) {
+      pushQuick(
+        "assistant",
+        "등록하지 못했습니다. 화면에 나온 안내를 확인해 주세요. 메뉴 목록에 새 행이 남아 있으면 다시 조회해 주세요."
+      );
+      return;
+    }
+    // 신규 등록 로그는 메뉴키 배치 답변 뒤에 배치 결과를 비고에 붙여 한 번에 남긴다 (flushQuickLog)
+    quickPendingLog = { code: item.lngCode, remark: "초간단 메뉴등록" };
+    quickLast.value = { code: item.lngCode, name, main: item.lngMainGroup, sub: item.lngSubGroup };
+    pushQuick(
+      "assistant",
+      `'${name}'(${formatAiPrice(price)}원) 메뉴를 등록했습니다.\n` +
+        `· 메뉴코드: ${item.lngCode}\n` +
+        `· 분류: ${item.mainName} > ${item.subName} (${
+          byName ? "메뉴명으로 찾은 분류입니다" : "알맞은 분류를 찾지 못해 가장 작은 소분류 코드에 넣었습니다"
+        })\n` +
+        "· 할인 0(나중에 설정)\n" +
+        "· 주방출력 1(기본 출력)\n" +
+        "분류가 맞지 않으면 메뉴 목록에서 이 메뉴를 선택하신 뒤 상세정보에서 바꿔 주세요."
+    );
+    pushQuick("assistant", "메뉴키도 자동으로 배치해 드릴까요?", { keyAsk: true, seq: ++quickSeq.value });
+    quickStep.value = "keyAsk";
+  } catch (error) {
+    pushQuick("assistant", `처리하지 못했습니다. (${error.message || "오류"}) 잠시 후 다시 시도해 주세요.`);
+  } finally {
+    quickLoading.value = false;
+    scrollQuickLog();
+    focusQuickInput();
+  }
+};
+
+// 메뉴키 배치 여부 답변
+const answerQuickMenuKey = (yes) => {
+  if (!["keyAsk", "keyStores"].includes(quickStep.value) || quickLoading.value || !quickLast.value) return;
+  if (!yes) {
+    flushQuickLog("메뉴키 배치 안 함");
+    pushQuick("user", quickStep.value === "keyStores" ? "취소" : "아니오");
+    pushQuick("assistant", "메뉴키는 배치하지 않았습니다. 다음 메뉴를 입력해 주세요.");
+    quickStep.value = "input";
+    scrollQuickLog();
+    focusQuickInput();
+    return;
+  }
+  pushQuick("user", "예");
+  const stores = getAiChatKeyStoreList();
+  if (stores.length === 0) {
+    flushQuickLog("메뉴키 배치 실패(배치할 매장 없음)");
+    pushQuick("assistant", "메뉴키를 배치할 매장을 찾지 못했습니다. 메뉴키 설정 화면에서 배치해 주세요.");
+    quickStep.value = "input";
+    scrollQuickLog();
+    return;
+  }
+  // 매장별 메뉴(특정 매장 조회)는 그 매장에 바로, 공통 메뉴(매장코드 0)는 매장을 골라서 배치
+  if (String(nowStoreCd.value) !== "0") {
+    placeQuickMenuKey(stores);
+    return;
+  }
+  quickKeyStores.value = stores;
+  quickKeyChecked.value = [];
+  pushQuick("assistant", "메뉴키를 배치할 매장을 선택해 주세요.", { keyStores: true, seq: ++quickSeq.value });
+  quickStep.value = "keyStores";
+  scrollQuickLog();
+};
+
+const confirmQuickKeyStores = () => {
+  if (quickStep.value !== "keyStores" || quickLoading.value || quickKeyChecked.value.length === 0) return;
+  const stores = quickKeyStores.value.filter((s) => quickKeyChecked.value.includes(s.code));
+  pushQuick("user", stores.map((s) => s.name).join(", "));
+  placeQuickMenuKey(stores);
+};
+
+// 매장마다 같은 소분류 메뉴가 가장 많이 놓인 화면(없으면 첫 화면)의 마지막 메뉴 다음 자리에, 그 매장 포스 전체로 배치
+const placeQuickMenuKey = async (stores) => {
+  const last = quickLast.value;
+  if (!last) return;
+  quickLoading.value = true;
+  scrollQuickLog();
+  let logText = "메뉴키 배치 실패";
+  try {
+    const res = await getMenuKeyTarget(groupCd.value, stores.map((s) => s.code).join(","), nowStoreCd.value, last.sub);
+    if (res.data.RESULT_CD !== "00") throw new Error(res.data.RESULT_NM);
+    const targets = res.data.List || [];
+    if (targets.length === 0) {
+      logText = "메뉴키 배치 실패(메뉴 화면 없음)";
+      pushQuick("assistant", "선택하신 매장에 메뉴 화면이 없어 메뉴키를 배치하지 못했습니다. 메뉴키 설정 화면에서 확인해 주세요.");
+      return;
+    }
+    const res2 = await appendMenuKeys(
+      groupCd.value,
+      last.code,
+      last.name,
+      targets.map((t) => ({ STORE_CD: String(t.lngStoreCode), SCREEN_NO: String(t.intScreenNo) }))
+    );
+    if (res2.data.RESULT_CD !== "00") throw new Error(res2.data.RESULT_NM);
+    const rows = res2.data.List || [];
+    const lines = stores.map((s) => {
+      const t = targets.find((x) => String(x.lngStoreCode) === String(s.code));
+      if (!t) return `· ${s.name}: 메뉴 화면이 없어 배치하지 못했습니다.`;
+      const counts = {};
+      rows
+        .filter((r) => String(r.STORE_CD) === String(s.code))
+        .forEach((r) => {
+          const k = AI_KEY_RESULT_TEXT[r.RESULT] || r.RESULT;
+          counts[k] = (counts[k] || 0) + 1;
+        });
+      const posText = Object.entries(counts)
+        .map(([k, v]) => `${k} ${v}대`)
+        .join(", ");
+      const screenText = `'${t.strScreenName || "이름 없음"}' 화면(${t.intScreenNo}번)`;
+      const why =
+        Number(t.MATCH_CNT) > 0
+          ? `같은 소분류 메뉴가 ${t.MATCH_CNT}개 있는 화면입니다`
+          : "같은 소분류 메뉴가 있는 화면이 없어 첫 화면에 배치했습니다";
+      return `· ${s.name}: ${screenText}의 마지막 메뉴 다음 자리 — ${why}. (포스: ${posText || "결과 없음"})`;
+    });
+    logText = `메뉴키 배치(${stores
+      .map((s) => {
+        const t = targets.find((x) => String(x.lngStoreCode) === String(s.code));
+        return t ? `${s.name} ${t.intScreenNo}번 화면` : `${s.name} 화면 없음`;
+      })
+      .join(", ")})`;
+    pushQuick("assistant", `메뉴키를 배치했습니다.\n${lines.join("\n")}\n포스에서 환경수신 후 확인해 주세요. 다음 메뉴를 입력해 주세요.`);
+  } catch (error) {
+    logText = `메뉴키 배치 실패(${error.message || "오류"})`;
+    pushQuick("assistant", `메뉴키를 배치하지 못했습니다. (${error.message || "오류"}) 메뉴키 설정 화면에서 확인해 주세요.`);
+  } finally {
+    flushQuickLog(logText);
+    quickStep.value = "input";
+    quickLoading.value = false;
+    scrollQuickLog();
+    focusQuickInput();
+  }
 };
 
 const onAiChatEnter = (e) => {
@@ -6844,12 +7568,10 @@ const sendAiChat = async () => {
           local: true,
         });
       } else {
-        // 분류에 기존 메뉴가 없고 '대분류코드 + 소분류코드 + 10' 도 9자리를 넘거나 숫자가 아니면 사람이 입력한다
+        // 분류 기준·'대분류코드 + 소분류코드 + 10'·6자리 빈 번호 모두로도 만들지 못한 경우에만 사람이 입력한다
         pushAiChatLocal(
           "assistant",
-          `${last.lngMainGroup ?? ""}${last.lngSubGroup ?? ""}10`.length > 9
-            ? "대분류코드와 소분류코드로 만든 번호가 9자리를 넘어 메뉴코드를 자동생성할 수 없습니다. 메뉴코드를 숫자 4~9자리로 입력해 주세요."
-            : "이 분류에는 참고할 메뉴코드가 없습니다. 메뉴코드를 숫자 4~9자리로 입력해 주세요."
+          "비어 있는 메뉴코드를 찾지 못해 자동생성할 수 없습니다. 메뉴코드를 숫자 4~9자리로 입력해 주세요."
         );
       }
     }
@@ -9550,6 +10272,54 @@ const excelButton = async () => {
   align-items: flex-end;
   gap: 0.5rem;
   min-width: 0;
+}
+
+/* 초간단 메뉴등록: 버튼(보라 테두리)·팝업(마스크가 가운데 정렬, AI 대화창보다 작게)·번개 아이콘 */
+.mst003-sub-btn.mst003-quick-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-color: #8b5cf6;
+  color: #6d28d9;
+  font-weight: 600;
+}
+
+.mst003-sub-btn.mst003-quick-btn:hover:not(:disabled) {
+  border-color: #6d28d9;
+  background: #f5f3ff;
+  color: #5b21b6;
+}
+
+.mst003-chat-popup.mst003-quick-popup {
+  position: relative;
+  width: min(42rem, calc(100vw - 2rem));
+  height: min(40rem, calc(100vh - 2rem));
+  min-width: 22rem;
+  min-height: 22rem;
+}
+
+.mst003-chat-head.mst003-quick-head {
+  cursor: default;
+}
+
+.mst003-chat-avatar.mst003-quick-avatar {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+}
+
+.mst003-quick-guide .mst003-chat-examples-label {
+  min-width: 4rem;
+  flex-shrink: 0;
+}
+
+/* 초간단 안내: 항목 이름 옆에 설명, 설명이 여러 줄이면 설명 시작선에 맞춰 줄바꿈 */
+.mst003-quick-guide li {
+  display: flex;
+  gap: 0.25rem;
+  white-space: normal;
+}
+
+.mst003-quick-guide-text {
+  white-space: pre-line;
 }
 
 /* 보내기 버튼: 입력창과 같은 높이 (공통 버튼의 고정 높이 2rem 대신 입력창 높이에 맞춤) */

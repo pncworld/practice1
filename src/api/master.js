@@ -2771,7 +2771,8 @@ export const getMenuDates = (groupCd, storeCd, dateType, fromDate, toDate) => {
   );
 };
 // 메뉴코드등록 AI 도우미: 기간(최대 31일) 메뉴별 판매수량·매출 합계 (판매된 메뉴만, 매장코드 0 이면 그룹 전체)
-export const getMenuSales = (groupCd, storeCd, fromDate, toDate) => {
+// weekdays: 요일(월=1 … 일=7) 쉼표 목록, groupBy: MENU / WEEKDAY, menuCodes: 메뉴코드 쉼표 목록 (모두 생략하면 전체)
+export const getMenuSales = (groupCd, storeCd, fromDate, toDate, weekdays = "", groupBy = "MENU", menuCodes = "") => {
   const aiApiBase = process.env.VUE_APP_AI_API_BASE;
   return api2.post(
     "/MIMASTER/MST01_003INS_AI.asmx/getMenuSales",
@@ -2780,6 +2781,56 @@ export const getMenuSales = (groupCd, storeCd, fromDate, toDate) => {
       STORE_CD: storeCd,
       FROM_DATE: fromDate,
       TO_DATE: toDate,
+      WEEKDAYS: weekdays,
+      GROUP_BY: groupBy,
+      MENU_CODES: menuCodes,
+    },
+    aiApiBase ? { baseURL: aiApiBase } : undefined
+  );
+};
+// 메뉴코드등록 초간단 메뉴등록: '레몬에이드 4500' 한 줄 → 메뉴명·판매가·소분류 (저장 없음)
+export const quickMenu = (groupCd, storeCd, text, groupList) => {
+  const aiApiBase = process.env.VUE_APP_AI_API_BASE;
+  return api2.post(
+    "/MIMASTER/MST01_003INS_AI.asmx/quickMenu",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      TEXT: text,
+      GROUP_LIST: groupList,
+    },
+    aiApiBase ? { baseURL: aiApiBase } : undefined
+  );
+};
+// 메뉴코드등록 초간단 메뉴등록: 매장별 메뉴키 배치 화면 (같은 소분류 메뉴가 많은 화면, 없으면 첫 화면, 조회만)
+export const getMenuKeyTarget = (groupCd, storeCodes, menuStoreCd, subGroup) => {
+  const aiApiBase = process.env.VUE_APP_AI_API_BASE;
+  return api2.post(
+    "/MIMASTER/MST01_003INS_AI.asmx/getMenuKeyTarget",
+    {
+      GROUP_CD: groupCd,
+      STORE_CODES: storeCodes,
+      MENU_STORE_CD: menuStoreCd,
+      SUB_GROUP: subGroup,
+    },
+    aiApiBase ? { baseURL: aiApiBase } : undefined
+  );
+};
+// 메뉴코드등록 AI 도우미: 시간대 조건 메뉴 매출 (거래 상세·주문 시각 기준, 최대 14일)
+// timeRanges: 분 단위 구간 '시작-끝|시작-끝' (예: '660-840' = 11:00~14:00), groupBy: MENU / HOUR / BAND
+export const getMenuSalesTime = (groupCd, storeCd, fromDate, toDate, weekdays, timeRanges, groupBy, menuCodes) => {
+  const aiApiBase = process.env.VUE_APP_AI_API_BASE;
+  return api2.post(
+    "/MIMASTER/MST01_003INS_AI.asmx/getMenuSalesTime",
+    {
+      GROUP_CD: groupCd,
+      STORE_CD: storeCd,
+      FROM_DATE: fromDate,
+      TO_DATE: toDate,
+      WEEKDAYS: weekdays,
+      TIME_RANGES: timeRanges,
+      GROUP_BY: groupBy,
+      MENU_CODES: menuCodes,
     },
     aiApiBase ? { baseURL: aiApiBase } : undefined
   );

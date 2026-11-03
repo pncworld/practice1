@@ -207,6 +207,7 @@
           <button
             type="button"
             class="whitebutton !h-9 !px-5 !py-2 !text-sm !font-semibold !border-gray-500 !text-gray-700 hover:!bg-blue-50 hover:!border-blue-400 disabled:opacity-50 disabled:pointer-events-none"
+            :disabled="isPopupSaving"
             @click="saveButton2">
             저장
           </button>
@@ -2446,7 +2447,19 @@ const deleteStock3 = async () => {
   } catch (error) {}
 };
 
+/** 팝업 저장 중복 클릭 방지 — 처리 끝(성공·검증 return·오류)까지 버튼 잠금 */
+const isPopupSaving = ref(false);
 const saveButton2 = async () => {
+  if (isPopupSaving.value) return;
+  isPopupSaving.value = true;
+  try {
+    await runSaveButton2();
+  } finally {
+    isPopupSaving.value = false;
+  }
+};
+
+const runSaveButton2 = async () => {
   if (isPopupPartAll()) {
     await swalPopupPartFirst();
     return;

@@ -144,7 +144,7 @@
             class="button primary md:w-auto w-14 justify-center text-center disabled:opacity-30"
             type="button"
             @click="saveButton"
-            :disabled="disabled1">
+            :disabled="disabled1 || isPopupConfirming">
             확정
           </button>
           <button
@@ -790,7 +790,19 @@ const onPopupCheckDateChange = async () => {
   popupCheckDatePrev.value = checkYmd;
 };
 
+/** 팝업 확정 중복 클릭 방지 — 처리 끝(성공·검증 return·오류)까지 버튼 잠금 */
+const isPopupConfirming = ref(false);
 const saveButton = async () => {
+  if (isPopupConfirming.value) return;
+  isPopupConfirming.value = true;
+  try {
+    await runSaveButton();
+  } finally {
+    isPopupConfirming.value = false;
+  }
+};
+
+const runSaveButton = async () => {
   const orderYmd =
     toYmdDigits(popupOrderDate.value) || orderYmdFromOrderNo(scond2.value);
   const checkYmd = toYmdDigits(scond7.value);

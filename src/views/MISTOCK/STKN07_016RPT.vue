@@ -200,7 +200,7 @@
         :checkRowAuto2="false"
         @updatedRowData="updatedRowData"
         @allStateRows="allStateRows"
-        :inputUnsignedDecimalColumn="'dblTakeQty'"
+        :inputUnsignedDecimalColumn="'dblTakeQty,curUseQty'"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :exporttoExcel="exportExcel">

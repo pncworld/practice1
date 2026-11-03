@@ -155,7 +155,7 @@
         :searchWord3="cond1"
         :CalculateShortQty="'dblShortQty'"
         :calculateShortQtyGuardCol="'strCheck'"
-        :inputUnsignedDecimalColumn="'dblTakeQty'"
+        :inputUnsignedDecimalColumn="'dblTakeQty,dblResultQty,dblShortQty'"
         :highlightColId="'dblTakeQty'"
         @updatedRowData="updatedRowData"
         @allStateRows="allStateRows"

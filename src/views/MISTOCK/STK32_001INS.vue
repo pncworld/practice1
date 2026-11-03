@@ -115,6 +115,8 @@
         :checkRowAuto="false"
         :checkRowAuto2="true"
         :checkRowAuto2Col="'Selected'"
+        :headerCheckBar="'Selected'"
+        :setAllCheck="setAllCheck"
         :documentSubTitle="documentSubTitle"
         :rowStateeditable="false"
         :exporttoExcel="exportExcel">
@@ -306,6 +308,8 @@ const onConfirmResizeDown = (event) => {
 
 const optionList = ref([]);
 const reload = ref(false);
+/** 머리글·행 체크 원복용 (Realgrid setAllCheck watch) */
+const setAllCheck = ref(false);
 const rowData = ref([]);
 const afterSearch = ref(false);
 
@@ -515,6 +519,8 @@ const searchButton = async () => {
       Selected: false,
     }));
     afterSearch.value = true;
+    // 조회·확정·삭제 후 머리글 「선택」 전체 체크 잔상 해제 (Realgrid setAllCheck watch — PUR08_002INS 와 같은 방식)
+    setAllCheck.value = !setAllCheck.value;
   } catch (error) {}
 };
 
