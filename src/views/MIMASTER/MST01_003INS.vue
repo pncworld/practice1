@@ -2757,8 +2757,8 @@ const sendRowState = (e) => {
 
 const selectedMenu = ref(1);
 const deliveryMenuTabAllowedGroups = ["9999", "3048", "3287"];
-// 임시: 9999는 3048과 동일하게 매장별 조회/저장 테스트용 (롤백 시 ["9999","3287"]로 복구)
-const deliveryMenuNoStoreGroups = ["3287"];
+// 9999·3287: 매장 선택 없이 STORE_CD=0, 배달메뉴명 1~10 / 3048: 매장별
+const deliveryMenuNoStoreGroups = ["9999", "3287"];
 const multiDeliveryMenuNameCount = 10;
 const canUseDeliveryMenuTab = computed(() =>
   deliveryMenuTabAllowedGroups.includes(String(groupCd.value ?? ""))
@@ -2785,10 +2785,12 @@ const deliveryCompanyOptions = ref([]);
 const deliveryMenuRows = ref([]);
 const selectedMenuCodeForDelivery = ref("");
 const isMultiNameDeliveryRow = (row) =>
-  /배달의\s*민족|요기요|쿠팡\s*이츠|네이버/.test(String(row?.name ?? ""));
+  /배달의\s*민족|요기요|쿠팡\s*이츠|네이버|땡겨요|배달\s*e\s*음/i.test(
+    String(row?.name ?? "")
+  );
 const createEmptyMultiMenuNames = () =>
   Array.from({ length: multiDeliveryMenuNameCount }, () => "");
-/** 3287: STORE_CD 고정 0 / 3048·9999(임시): 선택 매장 */
+/** 9999·3287: STORE_CD 고정 0 / 3048: 선택 매장 */
 const resolveDeliveryStoreCdForApi = () => {
   if (isDeliveryMenuNoStoreMode.value) return "0";
   return normalizeDeliveryParam(deliveryStoreCd.value);
@@ -3017,7 +3019,7 @@ const loadDeliveryMenuName = async () => {
   const baseRows = buildDeliveryMenuRows();
   deliveryMenuRows.value = baseRows;
 
-  // 3048·9999(임시): 매장 필수 / 3287: STORE_CD=0 고정이라 메뉴만 있으면 조회
+  // 3048: 매장 필수 / 9999·3287: STORE_CD=0 고정이라 메뉴만 있으면 조회
   if (
     !menuCd ||
     baseRows.length === 0 ||
@@ -7756,7 +7758,7 @@ const saveDeliveryMenuTab = async () => {
         });
 
         if (extractResultCode(saveRes) === "97") {
-          // 무매장(3287): 덮어쓰기 없이 경고만 / 매장단위(3048·9999): 기존 예/아니오
+          // 무매장(9999·3287): 덮어쓰기 없이 경고만 / 매장단위(3048): 기존 예/아니오
           if (isDeliveryMenuNoStoreMode.value) {
             const duplicateMenuCdForMsg = extractDuplicateMenuCd(saveRes);
             const duplicateNameForMsg = extractDuplicateName(saveRes);
