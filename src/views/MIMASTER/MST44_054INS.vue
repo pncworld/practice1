@@ -829,14 +829,9 @@ const onMove = (evt) => {
     return true;
   }
 };
-let targetItemIndex3;
 let dupliScreenKeyOrigin;
-const onMove2 = (evt) => {
-  // 예: 드래그 중 이동할 때의 조건 등을 설정할 수 있음
-  targetItemIndex3 = Array.from(evt.from.children).indexOf(evt.related);
-
+const onMove2 = () => {
   dupliScreenKeyOrigin = [...ScreenKeyOrigin.value];
-  //comsole.log(dupliScreenKeyOrigin);
   return true;
 };
 const clickedMove = ref(false);
@@ -900,14 +895,49 @@ function formatNumber(value) {
   return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 const onEnd2 = (evt) => {
-  const originScreenNo = dupliScreenKeyOrigin[evt.oldIndex].intScreenNo;
-  const targetScreenNo = dupliScreenKeyOrigin[targetItemIndex3].intScreenNo;
+  const previous = Array.isArray(dupliScreenKeyOrigin)
+    ? dupliScreenKeyOrigin
+    : [];
+  const current = ScreenKeyOrigin.value || [];
+  const dragged = previous[evt?.oldIndex];
+
+  // 저장값은 배열 순서가 아니라 intScreenNo다. 조회도 이 번호 순으로 돌아오므로
+  // 드래그로 바뀐 위치에 기존 화면번호를 오름차순으로 다시 붙인다.
+  if (previous.length > 0 && previous.length === current.length) {
+    const sortedNos = previous
+      .map((item) => toNum(item.intScreenNo, 0))
+      .sort((a, b) => a - b);
+    const oldToNew = new Map();
+
+    current.forEach((item, index) => {
+      const oldNo = toNum(item.intScreenNo, 0);
+      const newNo = sortedNos[index];
+      if (oldNo !== newNo) oldToNew.set(oldNo, newNo);
+      item.intScreenNo = newNo;
+    });
+
+    if (oldToNew.size > 0) {
+      (KeyList.value || []).forEach((item) => {
+        const oldNo = toNum(item.intScreenNo, 0);
+        if (oldToNew.has(oldNo)) item.intScreenNo = oldToNew.get(oldNo);
+      });
+      (screenList.value || []).forEach((item) => {
+        if (toNum(item.intScreenType) !== toNum(currentpaymentCd.value)) return;
+        const oldNo = toNum(item.intScreenNo, 0);
+        if (oldToNew.has(oldNo)) item.intScreenNo = oldToNew.get(oldNo);
+      });
+      const clickedNo = toNum(clickedintScreenNo.value, 0);
+      if (oldToNew.has(clickedNo)) {
+        clickedintScreenNo.value = oldToNew.get(clickedNo);
+      }
+    }
+  }
 
   addfor4ScreenKey();
-  //comsole.log(items.value);
-  //comsole.log(KeyList.value);
-  //comsole.log(ScreenKeyOrigin.value);
-  showKeys(targetScreenNo);
+  const focusNo = dragged
+    ? toNum(dragged.intScreenNo, 0)
+    : clickedintScreenNo.value;
+  if (focusNo) showKeys(focusNo);
 };
 /**
  * 저장 함수
@@ -976,6 +1006,22 @@ const saveButton = async () => {
           saveKeys.push({
             intKeySeq: 1,
             intScreenNo: screen.intScreenNo,
+            lngKeyScrNo: 0,
+            strName: "",
+            itemDiscYn: 1,
+          });
+        });
+        // 번호가 바뀌어 결제키가 빠진 화면은 삭제만 하도록 표시한다.
+        // itemDiscYn 1 은 서버에서 해당 화면 키를 지우고 다시 넣지 않는다.
+        ScreenKeyOrigin.value.forEach((screen) => {
+          const screenNo = toNum(screen.intScreenNo, 0);
+          if (!screenNo) return;
+          if (saveKeys.some((item) => toNum(item.intScreenNo, 0) === screenNo)) {
+            return;
+          }
+          saveKeys.push({
+            intKeySeq: 1,
+            intScreenNo: screenNo,
             lngKeyScrNo: 0,
             strName: "",
             itemDiscYn: 1,
