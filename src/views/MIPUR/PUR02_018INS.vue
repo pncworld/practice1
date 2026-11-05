@@ -2363,6 +2363,10 @@ const deleteStock2 = async () => {
   }
 
   if (currentEdit.value == false) {
+    // 수정 모드: 서버에서 바로 삭제하므로 마감월이면 막음
+    if (await blockIfMonthClosed(tempGroupCd.value, tempStoreCd.value, scond2.value, "삭제")) {
+      return;
+    }
     const tempRowDataLength = filteredrowData2.value.length;
     try {
       const checkseqs = checkedRows.map((item) => item.lngCheckSeq).join("\u200b");
@@ -2409,6 +2413,11 @@ const deleteStock2 = async () => {
 const deleteStock3 = async () => {
   console.log(updatedrowdata2.value);
 
+  // 전표삭제: 마감월이면 막음 (수정 모드라 매입일 칸은 잠겨 있어 원래 전표 날짜)
+  if (await blockIfMonthClosed(tempGroupCd.value, tempStoreCd.value, scond2.value, "삭제")) {
+    return;
+  }
+
   try {
     const res = await deleteStockListBypart(
       tempGroupCd.value,
@@ -2447,6 +2456,36 @@ const deleteStock3 = async () => {
   } catch (error) {}
 };
 
+/**
+ * 월마감 확인 — 마감월이거나 확인에 실패하면 막는다 (true = 막음)
+ * getStockCloseDate → usp_VUE_GetCheckStockClose → ufn_CheckSysBusClose
+ */
+const toYmd = (v) => String(v ?? "").replace(/[^0-9]/g, "").slice(0, 8);
+const blockIfMonthClosed = async (groupCd, storeCd, date, actionName) => {
+  const ymd = toYmd(date);
+  let closed = null;
+  try {
+    const res = await getStockCloseDate(groupCd, storeCd, ymd);
+    const flag = res?.data?.List?.[0]?.blnClosed;
+    if (flag !== undefined && flag !== null && String(flag) !== "") {
+      closed = String(flag) === "1";
+    }
+  } catch (error) {
+    closed = null;
+  }
+  if (closed === false) return false;
+  await Swal.fire({
+    title: "경고",
+    html:
+      closed === true
+        ? `마감된 월(${ymd.slice(0, 4)}-${ymd.slice(4, 6)})의 매입 전표는 ${actionName}할 수 없습니다.<br>마감 후에는 조회만 가능합니다.`
+        : `마감 여부를 확인하지 못해 ${actionName}할 수 없습니다.<br>잠시 후 다시 시도해 주세요.`,
+    icon: "warning",
+    confirmButtonText: "확인",
+  });
+  return true;
+};
+
 /** 팝업 저장 중복 클릭 방지 — 처리 끝(성공·검증 return·오류)까지 버튼 잠금 */
 const isPopupSaving = ref(false);
 const saveButton2 = async () => {
@@ -2464,26 +2503,16 @@ const runSaveButton2 = async () => {
     await swalPopupPartFirst();
     return;
   }
-  try {
-    const res = await getStockCloseDate(
+  // 마감월이거나 마감 확인에 실패하면 저장하지 않음 (기존: 확인 실패 시 그대로 저장)
+  if (
+    await blockIfMonthClosed(
       store.state.userData.lngStoreGroup,
       storeCd2.value,
-      scond2.value.replaceAll("-", "")
-    );
-
-    if (res.data.List[0].blnClosed == "1") {
-      Swal.fire({
-        title: "경고",
-        text: "마감된 일자는 매입 등록이 불가능합니다.",
-        icon: "warning",
-
-        confirmButtonText: "확인",
-      });
-      return;
-    }
-  } catch (error) {
-    console.log(error);
-  } finally {
+      scond2.value,
+      "저장"
+    )
+  ) {
+    return;
   }
 
   if (updatedrowdata2.value.length == 0) {
@@ -2952,6 +2981,20 @@ const deleteButton = async () => {
               strOrderNo: "",
             },
           ];
+
+    // 선택한 전표 중 하나라도 마감월이면 삭제하지 않음 (먼저 전부 확인한 뒤 삭제 시작)
+    for (const item of checked) {
+      if (
+        await blockIfMonthClosed(
+          item.lngStoreGroup,
+          item.lngStoreCode,
+          item.dtmCheckDate,
+          `삭제(전표 ${item.strCheckNo ?? ""})`
+        )
+      ) {
+        return;
+      }
+    }
 
     for (const item of targets) {
       const res = await deleteStockListBypart(
