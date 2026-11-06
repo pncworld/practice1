@@ -502,6 +502,7 @@ import {
   getStockListByPart,
   getStoreMoveListBypart,
   saveMoveStorePartList,
+  getStockCloseDate,
 } from "@/api/mipur";
 import { getLossMasterPartList } from "@/api/mistock";
 import BusinessClient from "@/components/businessClient2.vue";
@@ -1622,6 +1623,42 @@ const saveButton = async (e) => {
   }
 };
 
+/**
+ * 월마감 확인 — 출고 매장 기준(출고 저장과 같은 기준). 마감월이거나 확인에 실패하면 막음 (true = 막음)
+ * getStockCloseDate → usp_VUE_GetCheckStockClose → ufn_CheckSysBusClose
+ */
+const blockIfMoveMonthClosed = async (rows) => {
+  const seen = new Set();
+  for (const item of rows) {
+    const ymd = formatLocalDate(item.strMoveDate).replaceAll("-", "");
+    const key = `${item.lngFromStoreCode}|${ymd.slice(0, 6)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    let closed = null;
+    try {
+      const res = await getStockCloseDate(groupCd.value, item.lngFromStoreCode, ymd);
+      const flag = res?.data?.List?.[0]?.blnClosed;
+      if (flag !== undefined && flag !== null && String(flag) !== "") {
+        closed = String(flag) === "1";
+      }
+    } catch (error) {
+      closed = null;
+    }
+    if (closed === false) continue;
+    await Swal.fire({
+      title: "경고",
+      html:
+        closed === true
+          ? `마감된 월(${ymd.slice(0, 4)}-${ymd.slice(4, 6)})의 출고내역은 삭제할 수 없습니다.<br>마감 후에는 조회만 가능합니다.`
+          : "마감 여부를 확인하지 못해 삭제할 수 없습니다.<br>잠시 후 다시 시도해 주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return true;
+  }
+  return false;
+};
+
 const deleteButton = async () => {
   const list = Array.isArray(rowData.value) ? rowData.value : [];
   const filtered = Array.isArray(updatedrowdata.value)
@@ -1636,6 +1673,11 @@ const deleteButton = async () => {
       confirmButtonText: "확인",
     });
     clearGridChecks();
+    return;
+  }
+
+  // 선택한 출고내역 중 하나라도 출고 매장 마감월이면 삭제하지 않음
+  if (await blockIfMoveMonthClosed(filtered)) {
     return;
   }
 

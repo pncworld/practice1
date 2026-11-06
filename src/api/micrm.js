@@ -398,6 +398,39 @@ export const getReceiptDataDetail2 = (groupcd, storecd, receiptNo) => {
     RECEIPT_NO: receiptNo,
   });
 };
+// 임직원할인 (공통코드 448 설정 그룹 전용) : 설정 여부·이번 달 잔여횟수. 설정 그룹이 아니면 List 가 비어 있음
+export const getStaffDcInfo = (groupcd, custNo) => {
+  return api2.post("/MICRM/CRM02_002RPT.asmx/getStaffDcInfo", {
+    GROUP_CD: groupcd,
+    CUST_NO: custNo ?? "",
+  });
+};
+// 직원할인 월별 사용 현황 (공통코드 448 설정 그룹 전용, 고객 실적 조회 팝업) : 직원 x 월
+export const getStaffDcMonthly = (groupcd, fromYM, toYM) => {
+  return api2.post("/MICRM/CRM02_002RPT.asmx/getStaffDcMonthly", {
+    GROUP_CD: groupcd,
+    FROM_YM: fromYM,
+    TO_YM: toYM,
+  });
+};
+// 고객 실적 조회 - 직원할인 설정 그룹 전용 (getCustRecord + POS번호·할인금액·할인차감)
+export const getCustRecord2 = (
+  groupcd,
+  searchNum,
+  sdate,
+  edate,
+  cond,
+  cond2
+) => {
+  return api2.post("/MICRM/CRM02_002RPT.asmx/getCustRecord2", {
+    GROUP_CD: groupcd,
+    SEARCHNUM: searchNum,
+    START_DATE: sdate,
+    END_DATE: edate,
+    COND: cond,
+    COND2: cond2,
+  });
+};
 export const getCustBuyList = (
   groupcd,
   jointype,
@@ -552,6 +585,28 @@ export const getCustCardDisList = (
   cond
 ) => {
   return api2.post("/MICRM/CRM03_004INS.asmx/getCustCardDisList", {
+    GROUP_CD: groupcd,
+    STORE_CD: storeCd,
+    JOIN_TYPE: jointype,
+    SUPER: supervisor,
+    TEAM: teamCd,
+    SDATE: sdate,
+    EDATE: edate,
+    COND: cond,
+  });
+};
+// 고객카드 할인 현황 - 직원할인 설정 그룹 전용 (getCustCardDisList + POS번호·할인차감)
+export const getCustCardDisList2 = (
+  groupcd,
+  storeCd,
+  jointype,
+  teamCd,
+  supervisor,
+  sdate,
+  edate,
+  cond
+) => {
+  return api2.post("/MICRM/CRM03_004INS.asmx/getCustCardDisList2", {
     GROUP_CD: groupcd,
     STORE_CD: storeCd,
     JOIN_TYPE: jointype,

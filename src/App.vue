@@ -6,6 +6,7 @@ import { useStore } from "vuex";
 import LoadingScreen from "./components/LoadingScreen.vue";
 import EmptyLayout from "./views/layout/EmptyLayout.vue";
 import ModalAlert from "./components/ModalAlert.vue";
+import VersionNoticeBar from "./components/VersionNoticeBar.vue";
 import { useModalAlert } from "./utils/modalAlert";
 
 const isMobile = ref(false);
@@ -102,6 +103,9 @@ const { modal, handleModalConfirm, handleModalSave, handleModalCancel } = useMod
     @save="handleModalSave"
     @cancel="handleModalCancel"
   />
+
+  <!-- 새 버전 알림 — 운영 빌드·PC 화면에서만 (모바일·VUEPOS 제외) -->
+  <VersionNoticeBar v-if="!isMobile && !exception" />
 </template>
 
 <style>

@@ -7,6 +7,41 @@ const { PNC_IMAGE_DEV_MIRROR_ORIGIN } = require("./config/pncHosts");
 const appTitle =
   process.env.NODE_ENV === "production" ? "PnC Office" : "DEV PnC Office";
 
+/**
+ * 새 버전 알림(src/components/VersionNoticeBar.vue)용 빌드 버전
+ *  · 운영 빌드: 빌드 시각(YYYYMMDDHHmmss) → 화면 코드(VUE_APP_BUILD_VERSION)와 dist/version.json 에 같은 값
+ *  · 개발 서버: "dev" (알림 기능 꺼짐)
+ */
+const pad2 = (n) => String(n).padStart(2, "0");
+const now = new Date();
+const BUILD_VERSION =
+  process.env.NODE_ENV === "production"
+    ? `${now.getFullYear()}${pad2(now.getMonth() + 1)}${pad2(now.getDate())}` +
+      `${pad2(now.getHours())}${pad2(now.getMinutes())}${pad2(now.getSeconds())}`
+    : "dev";
+process.env.VUE_APP_BUILD_VERSION = BUILD_VERSION;
+
+/** 운영 빌드 결과에 version.json 을 추가 (server.js 가 dist 를 그대로 서비스) */
+class EmitVersionJsonPlugin {
+  apply(compiler) {
+    const { Compilation, sources } = compiler.webpack;
+    compiler.hooks.thisCompilation.tap("EmitVersionJsonPlugin", (compilation) => {
+      compilation.hooks.processAssets.tap(
+        {
+          name: "EmitVersionJsonPlugin",
+          stage: Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
+        },
+        () => {
+          compilation.emitAsset(
+            "version.json",
+            new sources.RawSource(JSON.stringify({ version: BUILD_VERSION }))
+          );
+        }
+      );
+    });
+  }
+}
+
 module.exports = defineConfig({
   transpileDependencies: true,
   lintOnSave: false,
@@ -27,6 +62,10 @@ module.exports = defineConfig({
     config.plugin(htmlPlugin).tap((args) => {
       args[0].title = appTitle;
       return args;
+    });
+    // 운영 빌드에만 version.json 생성 (개발 서버에는 영향 없음)
+    config.when(process.env.NODE_ENV === "production", (c) => {
+      c.plugin("emit-version-json").use(EmitVersionJsonPlugin);
     });
   },
   devServer: {

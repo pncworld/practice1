@@ -693,27 +693,50 @@ const updatedRowData = (e) => {
   updatedrowdata.value = e;
 };
 
-const saveButton2 = async () => {
+/**
+ * 월마감 확인 — getStockCloseDate(blnClosed: "0" 미마감) 결과가 "0"이 아니거나 확인 자체가 실패하면 막음
+ * (기존: 응답이 비거나 오류면 catch 로 넘어가 그대로 저장·삭제)
+ * @returns {Promise<boolean>} true = 막음
+ */
+const blockIfMonthClosed = async (groupCdVal, storeCd, date, closedText) => {
+  let result = null;
   try {
     const res = await getStockCloseDate(
+      groupCdVal,
+      storeCd,
+      String(date ?? "").replace(/[^0-9]/g, "").slice(0, 8)
+    );
+    const flag = res?.data?.List?.[0]?.blnClosed;
+    if (flag !== undefined && flag !== null && String(flag) !== "") {
+      result = String(flag);
+    }
+  } catch (error) {
+    result = null;
+  }
+  if (result === "0") return false;
+  await Swal.fire({
+    title: "경고",
+    html:
+      result === null
+        ? "마감 여부를 확인하지 못해 처리할 수 없습니다.<br>잠시 후 다시 시도해 주세요."
+        : closedText,
+    icon: "warning",
+    confirmButtonText: "확인",
+  });
+  return true;
+};
+
+const saveButton2 = async () => {
+  if (
+    await blockIfMonthClosed(
       groupCd.value,
       storeCode.value,
-      ssscond.value.replaceAll("-", "")
-    );
-    console.log(res);
-    const result = res.data.List[0].blnClosed;
-
-    if (result !== "0") {
-      Swal.fire({
-        title: "경고",
-        text: "해당 출고일로 반품 설정을 할 수 없습니다.",
-        icon: "warning",
-
-        confirmButtonText: "확인",
-      });
-      return;
-    }
-  } catch (error) {}
+      ssscond.value,
+      "해당 출고일로 반품 설정을 할 수 없습니다."
+    )
+  ) {
+    return;
+  }
 
   try {
     const stockids = updatedrowdata.value
@@ -788,28 +811,18 @@ const deleteButton = async () => {
 
   const date = checkedrowdata.value.map((item) => item.dtmReturnDate);
 
-  try {
-    for (let i = 0; i < date.length; i++) {
-      const res = await getStockCloseDate(
+  for (let i = 0; i < date.length; i++) {
+    if (
+      await blockIfMonthClosed(
         groupCd.value,
         storeCode.value,
-        date[i]
-      );
-      console.log(res);
-      const result = res.data.List[0].blnClosed;
-
-      if (result !== "0") {
-        await Swal.fire({
-          title: "경고",
-          text: "자재마감이 끝난 월의 반품전표는 삭제가 불가능합니다.",
-          icon: "warning",
-
-          confirmButtonText: "확인",
-        });
-        return;
-      }
+        date[i],
+        "자재마감이 끝난 월의 반품전표는 삭제가 불가능합니다."
+      )
+    ) {
+      return;
     }
-  } catch (error) {}
+  }
 
   try {
     const returnnos = checkedrowdata.value

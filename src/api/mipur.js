@@ -1748,12 +1748,17 @@ export const getNbiCornTotalSumList = (
 };
 
 export const getNbiCornProductCostRate = (groupcd, storecd, sdate, edate) => {
-  return api2.post("/MIPUR/PUR02_030RPT_02.asmx/getNbiCornProductCostRate", {
-    GROUPCD: groupcd,
-    STORECD: storecd,
-    SDATE: sdate,
-    EDATE: edate,
-  });
+  return api2.post(
+    "/MIPUR/PUR02_030RPT_02.asmx/getNbiCornProductCostRate",
+    {
+      GROUPCD: groupcd,
+      STORECD: storecd,
+      SDATE: sdate,
+      EDATE: edate,
+    },
+    // 조회 프로시저가 월수불 집계를 다시 만들어 30초(공통 기본값)를 넘김 → 이 요청만 10분
+    { timeout: 600000 }
+  );
 };
 
 export const getOrderConfirmList = (groupcd, storecd, supplier, date) => {

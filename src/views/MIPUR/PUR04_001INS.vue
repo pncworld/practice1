@@ -297,6 +297,7 @@ import {
   getStockUnitPriceList,
   getUnitPriceDetailList,
   saveStockPriceHistory,
+  getStockCloseDate,
 } from "@/api/mipur";
 import BusinessClient from "@/components/businessClient2.vue";
 /**
@@ -675,6 +676,65 @@ watch(scond, () => {
   }
 });
 
+/**
+ * 단가 적용시작일 월마감 확인 (true = 막음)
+ *  · 매장을 고른 경우: 그 매장
+ *  · 「공통」(매장 0): 로그인 계정이 볼 수 있는 그룹 매장 전체 — 한 곳이라도 마감이면 막음
+ * 마감월이거나 확인에 실패하면 막는다. getStockCloseDate → ufn_CheckSysBusClose
+ */
+const blockIfPriceMonthClosed = async (fromDate) => {
+  const ymd = String(fromDate ?? "").replace(/[^0-9]/g, "").slice(0, 8);
+  const ym = `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}`;
+  const selected = String(storeCode.value ?? "0").trim();
+  const storeList =
+    selected !== "" && selected !== "0"
+      ? [selected]
+      : (store.state.storeCd || [])
+          .filter((s) => String(s.lngStoreGroup ?? groupCd.value) === String(groupCd.value))
+          .map((s) => String(s.lngStoreCode))
+          .filter((cd) => cd && cd !== "0");
+
+  if (storeList.length === 0) {
+    await Swal.fire({
+      title: "경고",
+      html: "마감 여부를 확인할 매장이 없어 저장할 수 없습니다.<br>매장을 선택한 뒤 다시 시도해 주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return true;
+  }
+
+  const results = await Promise.all(
+    [...new Set(storeList)].map(async (cd) => {
+      try {
+        const res = await getStockCloseDate(groupCd.value, cd, ymd);
+        const flag = res?.data?.List?.[0]?.blnClosed;
+        if (flag === undefined || flag === null || String(flag) === "") return { cd, closed: null };
+        return { cd, closed: String(flag) === "1" };
+      } catch (error) {
+        return { cd, closed: null };
+      }
+    })
+  );
+
+  const closedStores = results.filter((r) => r.closed === true);
+  const failedStores = results.filter((r) => r.closed === null);
+  if (closedStores.length === 0 && failedStores.length === 0) return false;
+
+  await Swal.fire({
+    title: "경고",
+    html:
+      closedStores.length > 0
+        ? `적용시작일(${ym})이 마감된 월이라 단가를 저장할 수 없습니다.` +
+          (storeList.length > 1 ? `<br>(마감된 매장 ${closedStores.length}곳)` : "") +
+          "<br>마감 후에는 조회만 가능합니다. 적용시작일을 마감 이후 날짜로 바꿔 주세요."
+        : "마감 여부를 확인하지 못해 저장할 수 없습니다.<br>잠시 후 다시 시도해 주세요.",
+    icon: "warning",
+    confirmButtonText: "확인",
+  });
+  return true;
+};
+
 const saveButton = async () => {
   if (afterSearch.value == false) {
     Swal.fire({
@@ -756,6 +816,11 @@ const saveButton = async () => {
 
       confirmButtonText: "확인",
     });
+    return;
+  }
+
+  // 적용시작일이 마감월이면 저장하지 않음 — 저장 시 적용시작일 이후 매입·발주 금액을 다시 계산하므로 마감월 금액이 바뀜
+  if (await blockIfPriceMonthClosed(scond4.value)) {
     return;
   }
 

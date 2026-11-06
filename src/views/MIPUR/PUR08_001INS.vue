@@ -323,6 +323,7 @@ import {
   getStockList,
   getStoreMoveList,
   saveMoveStoreList,
+  getStockCloseDate,
 } from "@/api/mipur";
 import { getLossMasterPartList } from "@/api/mistock";
 import BusinessClient from "@/components/businessClient2.vue";
@@ -1191,6 +1192,36 @@ const deleteButton = async () => {
       title: "실패",
       text: "삭제 키가 없는 행이 있습니다. 조회 후 다시 선택해 주십시오.",
       icon: "error",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+
+  // 그리드 체크 잠금 외에 실제 마감 여부도 확인 — 출고 매장 마감월이거나 확인 실패 시 삭제하지 않음
+  const seenClose = new Set();
+  for (const t of targets) {
+    const ymd = toMoveYmd(t.strMoveDate);
+    const key = `${t.lngFromStoreCode}|${ymd.slice(0, 6)}`;
+    if (seenClose.has(key)) continue;
+    seenClose.add(key);
+    let closed = null;
+    try {
+      const res = await getStockCloseDate(groupCd.value, t.lngFromStoreCode, ymd);
+      const flag = res?.data?.List?.[0]?.blnClosed;
+      if (flag !== undefined && flag !== null && String(flag) !== "") {
+        closed = String(flag) === "1";
+      }
+    } catch (error) {
+      closed = null;
+    }
+    if (closed === false) continue;
+    await Swal.fire({
+      title: "경고",
+      html:
+        closed === true
+          ? `마감된 월(${ymd.slice(0, 4)}-${ymd.slice(4, 6)})의 출고내역은 삭제할 수 없습니다.<br>마감 후에는 조회만 가능합니다.`
+          : "마감 여부를 확인하지 못해 삭제할 수 없습니다.<br>잠시 후 다시 시도해 주세요.",
+      icon: "warning",
       confirmButtonText: "확인",
     });
     return;

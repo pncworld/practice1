@@ -452,6 +452,38 @@ function alertAbovePopup(options) {
   });
 }
 
+/**
+ * 월마감 확인 — 마감월이거나 확인에 실패하면 막는다 (true = 막음)
+ * checkStockCloseDate → usp_VUE_GetStoreStockClosed (sysMonthClose 월별 strClosed)
+ */
+async function blockIfMonthClosed(groupCd, storeCd, date, actionName) {
+  const ymd = String(date ?? "").replace(/[^0-9]/g, "").slice(0, 8);
+  const yyyymm = ymd.slice(0, 6);
+  let closed = null;
+  try {
+    const res = await checkStockCloseDate(groupCd, storeCd, ymd);
+    const row = (res?.data?.List || []).find((item) =>
+      String(item.dtmMonth || "").includes(yyyymm)
+    );
+    if (row && row.strClosed != null && String(row.strClosed) !== "") {
+      closed = String(row.strClosed) === "Y";
+    }
+  } catch (error) {
+    closed = null;
+  }
+  if (yyyymm.length === 6 && closed === false) return false;
+  await alertAbovePopup({
+    title: "경고",
+    html:
+      closed === true
+        ? `마감된 월(${yyyymm.slice(0, 4)}-${yyyymm.slice(4, 6)})에는 ${actionName}할 수 없습니다.<br>마감 후에는 조회만 가능합니다.`
+        : `마감 여부를 확인하지 못해 ${actionName}할 수 없습니다.<br>잠시 후 다시 시도해 주세요.`,
+    icon: "warning",
+    confirmButtonText: "확인",
+  });
+  return true;
+}
+
 /** ON20260929-014 → 20260929 */
 function orderYmdFromOrderNo(orderNo) {
   const m = String(orderNo || "").match(/(\d{8})/);
@@ -820,28 +852,9 @@ const runSaveButton = async () => {
     return;
   }
 
-  // 레거시 Div0_btnSave: GetStoreStockClosed — 자재마감월만 차단 (blnChk와 별개)
-  try {
-    const closeRes = await checkStockCloseDate(
-      tempGroup.value,
-      tempStore.value,
-      toYmdDigits(scond7.value)
-    );
-    const yyyymm = toYmdDigits(scond7.value).slice(0, 6);
-    const closedRow = (closeRes.data?.List || []).find((item) =>
-      String(item.dtmMonth || "").includes(yyyymm)
-    );
-    if (closedRow?.strClosed == "Y") {
-      await alertAbovePopup({
-        title: "경고",
-        text: "자재마감이 완료되어있는 월에는 입고확정이 불가능합니다",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
-      return;
-    }
-  } catch (error) {
-    console.log(error);
+  // 레거시 Div0_btnSave: GetStoreStockClosed — 자재마감월 차단. 확인 실패 시에도 막음 (기존: 실패 시 그대로 저장)
+  if (await blockIfMonthClosed(tempGroup.value, tempStore.value, scond7.value, "입고확정")) {
+    return;
   }
 
   try {
@@ -926,30 +939,10 @@ const updatedRowData2 = (e) => {
 };
 
 const cancelButton = async () => {
-  try {
-    const res = await checkStockCloseDate(
-      tempGroup.value,
-      tempStore.value,
-      scond7.value.replaceAll("-", "")
-    );
-
-    ////console.log(res);
-
-    const result = res.data.List.filter((item) =>
-      item.dtmMonth.includes(scond7.value.replaceAll("-", "").slice(0, 6))
-    );
-
-    if (result[0].strClosed == "Y") {
-      await Swal.fire({
-        title: "경고",
-        text: "해당 매입 사항은 마감되어 취소할 수 없습니다.",
-        icon: "warning",
-        confirmButtonText: "확인",
-      });
-      return;
-    }
-    //console.log(result);
-  } catch (error) {}
+  // 마감월이거나 확인에 실패하면 확정 취소하지 않음 (기존: 확인 실패 시 그대로 취소)
+  if (await blockIfMonthClosed(tempGroup.value, tempStore.value, scond7.value, "확정 취소")) {
+    return;
+  }
   try {
     const res = await cancelStockConfirm(
       tempGroup.value,
@@ -998,6 +991,26 @@ const confirmButton = async () => {
       confirmButtonText: "확인",
     });
     return;
+  }
+
+  // 일괄 확정은 입고예정일로 매입 전표를 만듦 → 선택한 전표 중 하나라도 마감월이면 확정하지 않음
+  const closeTargets = new Map();
+  checkedrowdata.value.forEach((item) => {
+    const ymd = toYmdDigits(item.dtmExpectedDate);
+    const key = `${item.lngStoreGroup}|${item.lngStoreCode}|${ymd.slice(0, 6)}`;
+    if (!closeTargets.has(key)) closeTargets.set(key, item);
+  });
+  for (const item of closeTargets.values()) {
+    if (
+      await blockIfMonthClosed(
+        item.lngStoreGroup,
+        item.lngStoreCode,
+        item.dtmExpectedDate,
+        `매입확정(발주번호 ${item.strOrderNo ?? ""})`
+      )
+    ) {
+      return;
+    }
   }
 
   try {
