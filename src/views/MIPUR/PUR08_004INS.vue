@@ -232,6 +232,7 @@ import {
   cancelStoreMoveConfirmList,
   confirmStoreMoveConfirmList,
   getStoreStockMoveListByPart,
+  getStockCloseDate,
 } from "@/api/mipur";
 import { getLossMasterPartList } from "@/api/mistock";
 import Datepicker2 from "@/components/Datepicker2.vue";
@@ -849,6 +850,53 @@ const clearGridChecks = () => {
   setAllCheck.value = !setAllCheck.value;
 };
 
+/**
+ * 매장간 입고 월마감 확인 — 입고일자 기준, 보내는 매장·받는 매장 중 하나라도 마감월이거나 확인에 실패하면 막음 (true = 막음)
+ * getStockCloseDate → usp_VUE_GetCheckStockClose → ufn_CheckSysBusClose
+ */
+const blockIfInMonthClosed = async (rows, actionName) => {
+  const checks = [];
+  for (const item of rows) {
+    const ymd = toYmdDigits(item.strConfirmDate);
+    checks.push({ storeCd: item.lngFromStoreCode, ymd, role: "보내는 매장" });
+    checks.push({ storeCd: item.lngToStoreCode, ymd, role: "받는 매장" });
+  }
+  const seen = new Set();
+  for (const c of checks) {
+    const ymd = String(c.ymd ?? "").replace(/[^0-9]/g, "").slice(0, 8);
+    const storeCd = String(c.storeCd ?? "").trim();
+    const key = `${storeCd}|${ymd.slice(0, 6)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    let closed = null;
+    if (storeCd !== "" && storeCd !== "0" && ymd.length === 8) {
+      try {
+        const res = await getStockCloseDate(groupCd.value, storeCd, ymd);
+        const flag = res?.data?.List?.[0]?.blnClosed;
+        if (flag !== undefined && flag !== null && String(flag) !== "") {
+          closed = String(flag) === "1";
+        }
+      } catch (error) {
+        closed = null;
+      }
+    }
+    if (closed === false) continue;
+    await Swal.fire({
+      title: "경고",
+      html:
+        closed === true
+          ? `${c.role}이 마감된 월(${ymd.slice(0, 4)}-${ymd.slice(4, 6)})이라 ${actionName}할 수 없습니다.<br>마감 후에는 조회만 가능합니다.`
+          : ymd.length !== 8
+          ? `입고일자가 없어 ${actionName}할 수 없습니다.`
+          : `${c.role}의 마감 여부를 확인하지 못해 ${actionName}할 수 없습니다.<br>잠시 후 다시 시도해 주세요.`,
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return true;
+  }
+  return false;
+};
+
 const cancelButton = async () => {
   const cancelRows = Array.isArray(updatedrowdata.value)
     ? updatedrowdata.value.filter((item) => item.cancled == true)
@@ -861,6 +909,10 @@ const cancelButton = async () => {
       confirmButtonText: "확인",
     });
     clearGridChecks();
+    return;
+  }
+  // 입고일자가 보내는 매장·받는 매장 중 하나라도 마감월이면 확정 취소하지 않음
+  if (await blockIfInMonthClosed(cancelRows, "확정 취소")) {
     return;
   }
   try {
@@ -936,6 +988,10 @@ const confirmButton = async () => {
       icon: "warning",
       confirmButtonText: "확인",
     });
+    return;
+  }
+  // 입고일자가 보내는 매장·받는 매장 중 하나라도 마감월이면 입고확정하지 않음
+  if (await blockIfInMonthClosed(selectedRows, "입고확정")) {
     return;
   }
   try {

@@ -308,6 +308,7 @@ import { getCommonList } from "@/api/common";
 import {
   cancelStockConfirm,
   checkStockCloseDate,
+  getStockCloseDate,
   getStockOrderCheckListByPart,
   getStockOrderDetails,
   saveStockCheckedAllByPart,
@@ -454,19 +455,29 @@ function alertAbovePopup(options) {
 
 /**
  * 월마감 확인 — 마감월이거나 확인에 실패하면 막는다 (true = 막음)
- * checkStockCloseDate → usp_VUE_GetStoreStockClosed (sysMonthClose 월별 strClosed)
+ * 두 가지를 모두 확인하고 하나라도 마감이면 막음
+ *  · checkStockCloseDate → usp_VUE_GetStoreStockClosed (sysMonthClose 월별 strClosed)
+ *  · getStockCloseDate → usp_VUE_GetCheckStockClose → ufn_CheckSysBusClose (PUR02_018INS 와 같은 기준)
  */
 async function blockIfMonthClosed(groupCd, storeCd, date, actionName) {
   const ymd = String(date ?? "").replace(/[^0-9]/g, "").slice(0, 8);
   const yyyymm = ymd.slice(0, 6);
   let closed = null;
   try {
-    const res = await checkStockCloseDate(groupCd, storeCd, ymd);
-    const row = (res?.data?.List || []).find((item) =>
+    const [monthRes, busRes] = await Promise.all([
+      checkStockCloseDate(groupCd, storeCd, ymd),
+      getStockCloseDate(groupCd, storeCd, ymd),
+    ]);
+    const row = (monthRes?.data?.List || []).find((item) =>
       String(item.dtmMonth || "").includes(yyyymm)
     );
-    if (row && row.strClosed != null && String(row.strClosed) !== "") {
-      closed = String(row.strClosed) === "Y";
+    const flag = busRes?.data?.List?.[0]?.blnClosed;
+    const monthOk = row && row.strClosed != null && String(row.strClosed) !== "";
+    const busOk = flag !== undefined && flag !== null && String(flag) !== "";
+    if (monthOk && busOk) {
+      closed = String(row.strClosed) === "Y" || String(flag) === "1";
+    } else if ((monthOk && String(row.strClosed) === "Y") || (busOk && String(flag) === "1")) {
+      closed = true;
     }
   } catch (error) {
     closed = null;

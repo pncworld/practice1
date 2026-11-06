@@ -1570,6 +1570,20 @@ const saveButton = async (e) => {
       return;
     }
 
+    // 이동 일자가 보내는 매장·받는 매장 중 하나라도 마감월이면 출고하지 않음
+    const moveYmd = String(scond3.value ?? "").replaceAll("-", "");
+    if (
+      await blockIfMoveStoresClosed(
+        [
+          { storeCd: storeCode3.value, ymd: moveYmd, role: "보내는 매장" },
+          { storeCd: storeCode4.value, ymd: moveYmd, role: "받는 매장" },
+        ],
+        "출고"
+      )
+    ) {
+      return;
+    }
+
     store.state.loading = true;
 
     /** 행마다 단건 호출 — STOCKIDS 등 구분자 일괄 문자열이 서버에서 첫 건만 처리되는 경우 우회 */
@@ -1624,39 +1638,54 @@ const saveButton = async (e) => {
 };
 
 /**
- * 월마감 확인 — 출고 매장 기준(출고 저장과 같은 기준). 마감월이거나 확인에 실패하면 막음 (true = 막음)
+ * 매장간 출고 월마감 확인 — 보내는 매장·받는 매장 중 하나라도 마감월이거나 확인에 실패하면 막음 (true = 막음)
  * getStockCloseDate → usp_VUE_GetCheckStockClose → ufn_CheckSysBusClose
+ * @param {{storeCd: any, ymd: string, role: string}[]} checks
  */
-const blockIfMoveMonthClosed = async (rows) => {
+const blockIfMoveStoresClosed = async (checks, actionName) => {
   const seen = new Set();
-  for (const item of rows) {
-    const ymd = formatLocalDate(item.strMoveDate).replaceAll("-", "");
-    const key = `${item.lngFromStoreCode}|${ymd.slice(0, 6)}`;
+  for (const c of checks) {
+    const ymd = String(c.ymd ?? "").replace(/[^0-9]/g, "").slice(0, 8);
+    const storeCd = String(c.storeCd ?? "").trim();
+    const key = `${storeCd}|${ymd.slice(0, 6)}`;
     if (seen.has(key)) continue;
     seen.add(key);
     let closed = null;
-    try {
-      const res = await getStockCloseDate(groupCd.value, item.lngFromStoreCode, ymd);
-      const flag = res?.data?.List?.[0]?.blnClosed;
-      if (flag !== undefined && flag !== null && String(flag) !== "") {
-        closed = String(flag) === "1";
+    if (storeCd !== "" && storeCd !== "0" && ymd.length === 8) {
+      try {
+        const res = await getStockCloseDate(groupCd.value, storeCd, ymd);
+        const flag = res?.data?.List?.[0]?.blnClosed;
+        if (flag !== undefined && flag !== null && String(flag) !== "") {
+          closed = String(flag) === "1";
+        }
+      } catch (error) {
+        closed = null;
       }
-    } catch (error) {
-      closed = null;
     }
     if (closed === false) continue;
     await Swal.fire({
       title: "경고",
       html:
         closed === true
-          ? `마감된 월(${ymd.slice(0, 4)}-${ymd.slice(4, 6)})의 출고내역은 삭제할 수 없습니다.<br>마감 후에는 조회만 가능합니다.`
-          : "마감 여부를 확인하지 못해 삭제할 수 없습니다.<br>잠시 후 다시 시도해 주세요.",
+          ? `${c.role}이 마감된 월(${ymd.slice(0, 4)}-${ymd.slice(4, 6)})이라 ${actionName}할 수 없습니다.<br>마감 후에는 조회만 가능합니다.`
+          : `${c.role}의 마감 여부를 확인하지 못해 ${actionName}할 수 없습니다.<br>잠시 후 다시 시도해 주세요.`,
       icon: "warning",
       confirmButtonText: "확인",
     });
     return true;
   }
   return false;
+};
+
+/** 삭제 대상 출고내역 → 보내는 매장·받는 매장 마감 확인 */
+const blockIfMoveMonthClosed = async (rows) => {
+  const checks = [];
+  for (const item of rows) {
+    const ymd = formatLocalDate(item.strMoveDate).replaceAll("-", "");
+    checks.push({ storeCd: item.lngFromStoreCode, ymd, role: "보내는 매장" });
+    checks.push({ storeCd: item.lngToStoreCode, ymd, role: "받는 매장" });
+  }
+  return blockIfMoveStoresClosed(checks, "출고내역을 삭제");
 };
 
 const deleteButton = async () => {
@@ -1676,7 +1705,7 @@ const deleteButton = async () => {
     return;
   }
 
-  // 선택한 출고내역 중 하나라도 출고 매장 마감월이면 삭제하지 않음
+  // 선택한 출고내역 중 하나라도 보내는 매장·받는 매장 마감월이면 삭제하지 않음
   if (await blockIfMoveMonthClosed(filtered)) {
     return;
   }
