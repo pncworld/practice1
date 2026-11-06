@@ -622,7 +622,34 @@
                 </select>
               </div>
             </div>
+            <!-- 등급 옆(성별 아래) : 임직원할인 사원(갓잇 3287 · 등급 9) 수정 시에만 재직구분, 그 밖은 기존 빈칸 -->
+            <div v-if="showStaffJoinSts" class="crm01-wire-cell">
+              <div class="crm01-wire-label">재직구분</div>
+              <div class="crm01-wire-field min-w-0 crm01-modal-field-wrap gap-4">
+                <label class="crm01-modal-choice" for="crm01-pop-staff-on">
+                  <input
+                    id="crm01-pop-staff-on"
+                    type="radio"
+                    name="staffJoinSts"
+                    value="1"
+                    :disabled="loadedJoinSts == '3'"
+                    v-model="ccustomorStatus" />
+                  재직
+                </label>
+                <label class="crm01-modal-choice" for="crm01-pop-staff-off">
+                  <input
+                    id="crm01-pop-staff-off"
+                    type="radio"
+                    name="staffJoinSts"
+                    value="3"
+                    :disabled="loadedJoinSts == '3'"
+                    v-model="ccustomorStatus" />
+                  퇴사
+                </label>
+              </div>
+            </div>
             <div
+              v-else
               class="crm01-wire-cell crm01-modal-cell-row-fill"
               aria-hidden="true"></div>
 
@@ -676,6 +703,10 @@
                     "
                   />
                 </div>
+                <!-- 갓잇(3287) 신규 등록 : 연락처 없는 임직원 약속 번호 안내 (이 번호면 직원할인 문자 안 보냄) -->
+                <span v-if="showStaffMobileHint" class="crm01-modal-staff-mobile-hint">
+                  임직원 등록 시 휴대폰번호가 없으면 010-0000-0000 으로 입력하세요.
+                </span>
               </div>
             </div>
             </div>
@@ -1993,6 +2024,24 @@ const saveButton = async () => {
     return;
   }
 
+  // 임직원할인 사원 퇴사 저장 : 탈퇴 처리라 되돌릴 수 없으므로 한 번 더 확인
+  const staffRetire =
+    InsertNew.value == false &&
+    showStaffJoinSts.value &&
+    String(ccustomorStatus.value) === "3" &&
+    String(loadedJoinSts.value) !== "3";
+  if (staffRetire) {
+    const confirmRetire = await Swal.fire({
+      title: "퇴사 처리",
+      html: "퇴사로 저장하면 이름·휴대폰 등 개인정보가 삭제되고 카드가 정지됩니다.<br/>되돌릴 수 없습니다. 저장하시겠습니까?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "퇴사 저장",
+      cancelButtonText: "취소",
+    });
+    if (!confirmRetire.isConfirmed) return;
+  }
+
   try {
     store.state.loading = true;
     let res;
@@ -2163,6 +2212,18 @@ const saveButton = async () => {
       }
       visible.value = false;
       InsertNew.value = false;
+      closeMktSmsPopup();
+      if (afterSearch.value) {
+        await searchButton();
+      }
+    } else if (staffRetire) {
+      // 퇴사(탈퇴) 처리 : 개인정보가 지워져 다시 불러올 내용이 없으므로 팝업을 닫고 목록 재조회
+      await Swal.fire({
+        text: "퇴사 처리되었습니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      });
+      visible.value = false;
       closeMktSmsPopup();
       if (afterSearch.value) {
         await searchButton();
@@ -2822,7 +2883,10 @@ const applyGridRowToPopupForm = (row) => {
   row = normalizePopupCustomerRow(row);
   ccustomorNum.value = getRowCustNo(row);
   ccustomorGroup.value = gridRowField(row, ["lngStoreGroup"], undefined);
-  ccustomorStatus.value = gridRowField(row, ["intJoinSts"], undefined);
+  const joinSts = gridRowField(row, ["intJoinSts"], undefined);
+  // 재직구분 라디오(문자열 값)와 맞추려고 문자열로 보관, 불러온 값은 따로 기억
+  ccustomorStatus.value = joinSts == null ? joinSts : String(joinSts);
+  loadedJoinSts.value = ccustomorStatus.value;
   pcond.value = String(getRowCardId(row)).replace("[", "").replace("]", "");
 
   pcond2.value =
@@ -3043,10 +3107,32 @@ const addButton = (e) => {
 
   ccustomorNum.value = "";
   ccustomorGroup.value = groupCd.value;
-  ccustomorStatus.value = 1;
+  ccustomorStatus.value = 1; // 신규는 항상 정상(임직원할인 사원이면 재직)
+  loadedJoinSts.value = "1";
   visible.value = true;
   preparePopupJoinPath();
 };
+
+// 임직원할인 사원 재직구분 (갓잇 3287 · 등급 9, 수정 화면만)
+//   1 재직 / 3 퇴사 = 기존 회원 탈퇴 처리(usp_crmCustMod → usp_crmCustStop) : 이름·휴대폰 등 개인정보 삭제, 카드 정지, 되돌릴 수 없음
+const STAFF_DC_GROUP = "3287";
+const STAFF_DC_LEVEL = "9";
+const loadedJoinSts = ref(null);
+const showStaffJoinSts = computed(
+  () =>
+    !InsertNew.value &&
+    String(ccustomorGroup.value ?? "") === STAFF_DC_GROUP &&
+    String(pcond10.value ?? "") === STAFF_DC_LEVEL
+);
+// 갓잇(3287) 신규 등록일 때 휴대폰 줄 옆 안내 문구
+const showStaffMobileHint = computed(
+  () =>
+    InsertNew.value && String(ccustomorGroup.value ?? "") === STAFF_DC_GROUP
+);
+// 등급을 9 밖으로 바꾸는 등 재직구분이 숨으면 불러온 가입상태로 되돌림 (숨은 상태로 퇴사 저장 방지)
+watch(showStaffJoinSts, (show) => {
+  if (!show) ccustomorStatus.value = loadedJoinSts.value;
+});
 
 const InputPcond = (e) => {
   let ppcond = e.target.value;
@@ -3917,6 +4003,18 @@ const excelList = (e) => {
   gap: 0.5rem 0.75rem;
   margin-left: 0.375rem;
   padding-left: 0.125rem;
+}
+
+/* 갓잇(3287) 신규 등록 : 연락처 없는 임직원 번호 안내 (남은 폭 안에서 줄바꿈) */
+.crm01-modal-staff-mobile-hint {
+  flex: 1 1 0;
+  min-width: 0;
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  color: #dc2626;
+  white-space: normal;
+  word-break: keep-all;
 }
 
 .crm01-modal-consent-date-label {
