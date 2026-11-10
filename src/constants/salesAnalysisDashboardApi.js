@@ -70,6 +70,10 @@ export function matchesSalesAnalysisHomeTempBypass(u) {
   if (grp === SALES_ANALYSIS_HOME_GROUP_1871) {
     return aid === 10 || aid === 30 || aid >= 90;
   }
+  // 2026-11-10 테스트(5001, 데모 브랜드): 권한값과 관계없이 표시 (공급사 60·그룹관리자 제외). 운영 포함, 별도 요청 전까지 유지
+  if (grp === SALES_ANALYSIS_HOME_GROUP_TEST) {
+    return aid !== 60;
+  }
   return SALES_ANALYSIS_HOME_TEMP_BYPASS_RULES.some(
     (r) => r.lngStoreGroup === grp && r.lngUserAdminIDs.includes(aid)
   );
