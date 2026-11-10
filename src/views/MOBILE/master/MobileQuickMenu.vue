@@ -139,8 +139,8 @@
           <span v-for="n in 7" :key="n" :style="{ animationDelay: n * 0.09 + 's' }"></span>
         </span>
         <span class="mq-listening-state">{{ voiceStep === "prompt" ? "안내하고 있습니다" : "마이크가 켜졌습니다 · 듣고 있습니다" }}</span>
-        <span class="mq-listening-title">메뉴명과 가격을 말씀해주세요.</span>
-        <span class="mq-listening-sub">예: "레몬에이드 4500원" · 화면을 누르면 멈춥니다</span>
+        <span class="mq-listening-title">{{ voicePrompt.title }}</span>
+        <span class="mq-listening-sub">{{ voicePrompt.example }} · 화면을 누르면 멈춥니다</span>
         <span v-if="text" class="mq-listening-heard">{{ text }}</span>
       </div>
       <form class="mq-input" @submit.prevent="send">
@@ -164,6 +164,8 @@
           type="text"
           enterkeyhint="send"
           :readonly="loading"
+          @focus="onInputFocus"
+          @blur="onInputBlur"
           placeholder="예: 레몬에이드 4500" />
         <!-- 처리 중에도 입력창 포커스(키보드)를 유지: 잠그지 않고 읽기 전용, 보내기 버튼은 누를 때 포커스를 가져가지 않음 -->
         <button
@@ -191,6 +193,7 @@ import {
   writeMenuChangeLog,
 } from "@/api/master";
 import { newMenuRow, saveMenuRow } from "./mobileMenuSave";
+import { useKeyboardViewport } from "./mobileViewport";
 import { computed, defineEmits, defineProps, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 
 const props = defineProps({
@@ -207,6 +210,8 @@ const props = defineProps({
   keyStoreList: { type: Array, default: () => [] },
 });
 const emit = defineEmits(["close", "registered"]);
+// 키보드가 올라와도 대화창이 키보드 위에 맞춰지게
+useKeyboardViewport();
 
 const GUIDE_LINES = [
   { label: "분류", text: "메뉴명으로 알맞은 소분류를 찾아 넣습니다. 못 찾으면 가장 작은 소분류 코드에 넣습니다." },
@@ -252,9 +257,18 @@ const scrollLog = async () => {
   await nextTick();
   if (logRef.value) logRef.value.scrollTop = logRef.value.scrollHeight;
 };
+// 휴대폰은 입력창에 커서를 주면 키보드가 올라와 화면을 가리므로, 사용자가 입력 중일 때(입력창에 커서가 있을 때)만
+// 처리 뒤 입력창을 유지한다. 창을 열 때·버튼을 누른 뒤에는 키보드를 올리지 않는다
+let typing = false;
+const onInputFocus = () => {
+  typing = true;
+};
+const onInputBlur = () => {
+  typing = false;
+};
 const focusInput = async () => {
   await nextTick();
-  if (inputRef.value) inputRef.value.focus();
+  if (typing && inputRef.value && document.activeElement !== inputRef.value) inputRef.value.focus();
 };
 const formatPrice = (price) => String(price ?? "0").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
@@ -338,15 +352,19 @@ const speakAssistant = (content, extra) => {
 
 /* ---------- 음성 입력 (브라우저 Web Speech API, 한국어) ---------- */
 // 휴대폰 Chrome·Safari 는 지원, 앱 안 WebView 는 대부분 지원하지 않는다 → 지원할 때만 마이크 버튼을 보인다
-// 흐름: 마이크 버튼 → (스피커 켜짐) "메뉴명과 가격을 말씀해주세요." 안내 → 마이크 켜짐(입력 대기) → 말한 내용을 입력칸에 넣음
-const VOICE_PROMPT = "메뉴명과 가격을 말씀해주세요.";
+// 흐름: 마이크 버튼 → 입력창 비움 → (스피커 켜짐) 지금 단계에 맞는 안내 → 마이크 켜짐(입력 대기) → 말한 내용을 입력칸에 넣음
+// 메뉴키 배치 질문 중이면 '예/아니오' 를 듣고 바로 답한다
+const voicePrompt = computed(() =>
+  step.value === "keyAsk"
+    ? { title: "메뉴키를 배치할까요? 예 또는 아니오로 말씀해 주세요.", example: '예: "예" / "아니오"' }
+    : { title: "메뉴명과 가격을 말씀해주세요.", example: '예: "레몬에이드 4500원"' }
+);
 const SpeechRecognitionCtor =
   typeof window !== "undefined" ? window.SpeechRecognition || window.webkitSpeechRecognition : null;
 const speechSupported = !!SpeechRecognitionCtor;
 const voiceStep = ref(""); // '' 꺼짐 / prompt 안내 중 / listen 입력 대기
 const listening = computed(() => voiceStep.value !== "");
 let recognition = null;
-let speechBase = "";
 const stopListening = () => {
   if (voiceStep.value === "prompt" && ttsSupported) window.speechSynthesis.cancel();
   if (recognition) {
@@ -365,10 +383,16 @@ const startRecognition = () => {
   recognition.interimResults = true;
   recognition.continuous = false;
   recognition.maxAlternatives = 1;
+  let finalSaid = "";
   recognition.onresult = (event) => {
     let said = "";
-    for (let i = 0; i < event.results.length; i++) said += event.results[i][0].transcript;
-    text.value = [speechBase, said.trim()].filter((t) => t).join(" ");
+    let isFinal = false;
+    for (let i = 0; i < event.results.length; i++) {
+      said += event.results[i][0].transcript;
+      if (event.results[i].isFinal) isFinal = true;
+    }
+    text.value = said.trim();
+    if (isFinal) finalSaid = said.trim();
   };
   recognition.onerror = (event) => {
     voiceStep.value = "";
@@ -380,6 +404,12 @@ const startRecognition = () => {
   };
   recognition.onend = () => {
     voiceStep.value = "";
+    // 메뉴키 배치 질문에 '예/아니오' 로 답했으면 바로 처리한다 (메뉴명·가격은 확인 후 보내기를 눌러 등록)
+    if (step.value === "keyAsk" && finalSaid && (YES_RE.test(finalSaid) || NO_RE.test(finalSaid))) {
+      text.value = "";
+      answerKey(YES_RE.test(finalSaid));
+      return;
+    }
     focusInput();
   };
   try {
@@ -395,11 +425,16 @@ const toggleListening = () => {
     stopListening();
     return;
   }
-  // 이미 쓴 글이 있으면 그 뒤에 이어 붙인다
-  speechBase = text.value.trim();
+  // 매장 선택 단계는 화면에서 고른다 (음성 입력 안 함)
+  if (step.value === "keyStores") {
+    push("assistant", "메뉴키를 배치할 매장은 위에서 선택한 뒤 「배치」를 눌러 주세요.");
+    return;
+  }
+  // 새로 말하므로 입력창에 있던 글은 지운다
+  text.value = "";
   voiceStep.value = "prompt";
   if (ttsSupported) window.speechSynthesis.cancel();
-  speak(VOICE_PROMPT, startRecognition);
+  speak(voicePrompt.value.title, startRecognition);
 };
 
 /* ---------- 메뉴코드 자동 생성 (웹 fetchMenuCodeSuggestion 과 같은 규칙) ---------- */
@@ -700,21 +735,39 @@ const placeMenuKey = async (stores) => {
   }
 };
 
+// 창을 열어도 키보드는 올리지 않는다 (입력창을 누르면 올라옴)
 onMounted(() => {
-  focusInput();
+  scrollLog();
 });
 </script>
 
 <style scoped>
+/* 높이·위치는 보이는 영역(키보드 제외)에 맞춘다 — mobileViewport.js */
 .mq-sheet {
   position: fixed;
-  inset: 0;
+  top: var(--mvv-top, 0px);
+  left: 0;
+  right: 0;
   z-index: 10050;
   display: flex;
   flex-direction: column;
   height: 100vh;
-  height: 100dvh;
+  height: var(--mvv-h, 100dvh);
   background: #f8fafc;
+}
+
+/* 키보드가 떠 있으면 머리줄을 줄이고 매장명 줄은 접는다 */
+:global(html.mkb-open) .mq-head {
+  padding-top: 0.45rem;
+  padding-bottom: 0.45rem;
+}
+
+:global(html.mkb-open) .mq-store {
+  display: none;
+}
+
+:global(html.mkb-open) .mq-input {
+  padding-bottom: 0.5rem;
 }
 
 .mq-head {

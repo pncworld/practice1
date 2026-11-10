@@ -1083,7 +1083,7 @@
           </div>
         </div>
         <div class="mst003-chat-input">
-          <!-- 메뉴 이미지 파일 선택 (보이지 않음): 이미지 안내 말풍선의 「이미지 선택」 버튼으로 연다. PNG·JPG → 220×160·2MB 이하로 자동 조정 -->
+          <!-- 메뉴 이미지 파일 선택 (보이지 않음): 이미지 안내 말풍선의 「이미지 선택」 버튼으로 연다. PNG·JPG → 1792×1344·2MB 이하로 자동 조정 -->
           <input
             ref="aiChatImageInputRef"
             type="file"
@@ -1282,7 +1282,7 @@
       <div class="mst003-zoom-box">
         <img :src="aiChatZoomImage" alt="조정한 메뉴 이미지 확대" class="mst003-zoom-img" />
         <div class="mst003-zoom-caption">
-          실제 등록 크기 {{ AI_IMAGE_WIDTH }}×{{ AI_IMAGE_HEIGHT }} · 화면에서 3배 확대 · 클릭하면 닫힙니다
+          등록 크기 {{ AI_IMAGE_WIDTH }}×{{ AI_IMAGE_HEIGHT }} · 클릭하면 닫힙니다
         </div>
       </div>
     </div>
@@ -4415,9 +4415,11 @@ const AI_CHAT_EDIT_EXTRA_STEPS = [
 const AI_CHAT_EDIT_STRICT_RE = /(메뉴명(?!\(영문\))|판매가|가격|대분류|소분류|분류|면세|과세)/;
 const AI_CHAT_SKIP_WORDS =["없음", "없어", "없어요", "없습니다", "건너뛰기", "패스", "아니오", "아니요", "no", "NO"];
 
-// 메뉴 이미지: PNG·JPG만 받고, 화면에서 220×160 으로 맞춰(비율 유지, 빈 곳은 흰색) JPG 로 바꾼다. 2MB 이하
-const AI_IMAGE_WIDTH = 220;
-const AI_IMAGE_HEIGHT = 160;
+// 메뉴 이미지: PNG·JPG만 받고, 화면에서 1792×1344 로 맞춰(비율 유지, 빈 곳은 흰색) JPG 로 바꾼다. 2MB 이하
+// 서버(FileUpload.ashx)가 올린 이미지로 작은 이미지(225×160, MenuImage/Image)와 큰 이미지(1792×1344, MenuImage/t_pos)를
+// 둘 다 만들므로, 큰 이미지 크기로 올려야 큰 이미지가 흐려지지 않는다 (작게 올리면 서버가 크게 늘려 뭉개짐)
+const AI_IMAGE_WIDTH = 1792;
+const AI_IMAGE_HEIGHT = 1344;
 const AI_IMAGE_MAX_BYTES = 2 * 1024 * 1024;
 const aiChatImageInputRef = ref(null);
 // 이미지 미리보기 확대 보기 (미리보기 주소, 없으면 닫힘)
@@ -4429,7 +4431,7 @@ const goAiChatImageStep = () => {
   aiChatMessages.value.push({
     role: "assistant",
     content:
-      "메뉴 이미지가 있으면 등록해 주세요. (PNG·JPG, 220×160 크기와 2MB 이하로 자동 조정됩니다)\n이미지가 없으면 '없음'이라고 입력해 주세요.",
+      "메뉴 이미지가 있으면 등록해 주세요. (PNG·JPG, 2MB 이하로 자동 조정됩니다)\n이미지가 없으면 '없음'이라고 입력해 주세요.",
     imageAsk: true,
     imageAskSeq: ++aiChatImageAskSeqNow.value,
     local: true,
@@ -4462,7 +4464,25 @@ const resizeAiMenuImage = (file) =>
       const scale = Math.min(AI_IMAGE_WIDTH / img.width, AI_IMAGE_HEIGHT / img.height);
       const w = Math.round(img.width * scale);
       const h = Math.round(img.height * scale);
-      ctx.drawImage(img, (AI_IMAGE_WIDTH - w) / 2, (AI_IMAGE_HEIGHT - h) / 2, w, h);
+      // 큰 사진을 한 번에 줄이면 뭉개지므로 절반씩 고품질로 줄여 목표 크기 가까이 만든 뒤 마지막에 맞춘다
+      let src = img;
+      let sw = img.width;
+      let sh = img.height;
+      while (sw / 2 >= w && sh / 2 >= h) {
+        const step = document.createElement("canvas");
+        step.width = Math.round(sw / 2);
+        step.height = Math.round(sh / 2);
+        const sctx = step.getContext("2d");
+        sctx.imageSmoothingEnabled = true;
+        sctx.imageSmoothingQuality = "high";
+        sctx.drawImage(src, 0, 0, step.width, step.height);
+        src = step;
+        sw = step.width;
+        sh = step.height;
+      }
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(src, (AI_IMAGE_WIDTH - w) / 2, (AI_IMAGE_HEIGHT - h) / 2, w, h);
       URL.revokeObjectURL(url);
       const encode = (quality) => {
         canvas.toBlob(
@@ -10078,11 +10098,11 @@ const excelButton = async () => {
   color: #fff;
 }
 
-/* 조정한 이미지 미리보기 (실제 등록 크기 220×160 그대로) */
+/* 조정한 이미지 미리보기 (등록 이미지 1792×1344 를 가로 220px 로 줄여 표시) */
 .mst003-chat-img {
   display: block;
   width: 220px;
-  height: 160px;
+  height: 165px;
   margin-top: 0.4rem;
   border: 1px solid #e2e8f0;
   border-radius: 0.375rem;
@@ -10139,7 +10159,7 @@ const excelButton = async () => {
 .mst003-zoom-img {
   width: min(660px, 90vw);
   height: auto;
-  aspect-ratio: 220 / 160;
+  aspect-ratio: 1792 / 1344;
   border-radius: 0.375rem;
   background: #fff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);

@@ -870,7 +870,7 @@
         </div>
       </div>
       <div class="mst003-chat-input">
-        <!-- 메뉴 이미지 파일 선택 (보이지 않음): 이미지 안내 말풍선의 「이미지 선택」 버튼으로 연다. PNG·JPG → 220×160·2MB 이하로 자동 조정 -->
+        <!-- 메뉴 이미지 파일 선택 (보이지 않음): 이미지 안내 말풍선의 「이미지 선택」 버튼으로 연다. PNG·JPG → 1792×1344·2MB 이하로 자동 조정 -->
         <input
           ref="aiChatImageInputRef"
           type="file"
@@ -881,15 +881,21 @@
           ref="aiChatTextareaRef"
           v-model="aiChatText"
           class="mst003-chat-textarea"
-          rows="2"
+          rows="1"
           maxlength="2000"
           :placeholder="aiChatStep === 'intent' ? '원하시는 작업을 입력해 주세요.' : `${AI_CHAT_STEP_TEXT[aiChatStep]} 입력`"
-          :disabled="aiChatLoading"
+          :readonly="aiChatLoading"
+          @focus="onAiInputFocus"
+          @blur="onAiInputBlur"
+          @input="growAiInput"
           @keydown.enter="onAiChatEnter"></textarea>
         <button
           type="button"
           class="pnc-sub-btn mst003-chat-send shrink-0"
           :disabled="aiChatLoading"
+          aria-label="보내기"
+          @mousedown.prevent
+          @touchstart.prevent="sendAiChat"
           @click="sendAiChat">
           <svg
             class="pnc-sub-btn__icon"
@@ -912,6 +918,20 @@
         AI는 정보 제공 시 실수를 할 수 있습니다.<br />
         성능 향상을 위해 일부 내용은 수집될 수 있습니다.<br />
         개인 정보나 민감한 정보는 입력하지 마십시오.
+      </div>
+    </div>
+  </div>
+</Teleport>
+<!-- AI 대화 이미지 미리보기 확대 (클릭하면 닫힘) -->
+<Teleport to="body">
+  <div
+    v-if="aiChatZoomImage"
+    class="mst003-zoom-mask"
+    @click="aiChatZoomImage = null">
+    <div class="mst003-zoom-box">
+      <img :src="aiChatZoomImage" alt="조정한 메뉴 이미지 확대" class="mst003-zoom-img" />
+      <div class="mst003-zoom-caption">
+        등록 크기 {{ AI_IMAGE_WIDTH }}×{{ AI_IMAGE_HEIGHT }} · 클릭하면 닫힙니다
       </div>
     </div>
   </div>
@@ -949,6 +969,7 @@ import { getPosList } from "@/api/common";
 import { computed, defineEmits, defineProps, nextTick, onMounted, ref, watch } from "vue";
 import { mobileAlert, mobileConfirm } from "./mobileDialog";
 import { newMenuRow, saveMenuRow } from "./mobileMenuSave";
+import { useKeyboardViewport } from "./mobileViewport";
 
 const props = defineProps({
   // 열림 여부 (닫아도 대화 내용은 남겨 두고, 다시 열면 이어서 한다 — 웹과 같음)
@@ -970,6 +991,8 @@ const props = defineProps({
   userPosition: { type: [String, Number], default: "" },
 });
 const emit = defineEmits(["close", "saved", "focus-menu"]);
+// [모바일] 키보드가 올라와도 대화창이 키보드 위에 맞춰지게 (mobileViewport.js)
+useKeyboardViewport();
 
 /* ---------- [모바일] 웹 화면 상태 대신 쓰는 값 ---------- */
 const groupCd = computed(() => String(props.groupCd ?? ""));
@@ -1396,9 +1419,11 @@ const AI_CHAT_EDIT_EXTRA_STEPS = [
 const AI_CHAT_EDIT_STRICT_RE = /(메뉴명(?!\(영문\))|판매가|가격|대분류|소분류|분류|면세|과세)/;
 const AI_CHAT_SKIP_WORDS =["없음", "없어", "없어요", "없습니다", "건너뛰기", "패스", "아니오", "아니요", "no", "NO"];
 
-// 메뉴 이미지: PNG·JPG만 받고, 화면에서 220×160 으로 맞춰(비율 유지, 빈 곳은 흰색) JPG 로 바꾼다. 2MB 이하
-const AI_IMAGE_WIDTH = 220;
-const AI_IMAGE_HEIGHT = 160;
+// 메뉴 이미지: PNG·JPG만 받고, 화면에서 1792×1344 로 맞춰(비율 유지, 빈 곳은 흰색) JPG 로 바꾼다. 2MB 이하
+// 서버(FileUpload.ashx)가 올린 이미지로 작은 이미지(225×160, MenuImage/Image)와 큰 이미지(1792×1344, MenuImage/t_pos)를
+// 둘 다 만들므로, 큰 이미지 크기로 올려야 큰 이미지가 흐려지지 않는다 (작게 올리면 서버가 크게 늘려 뭉개짐)
+const AI_IMAGE_WIDTH = 1792;
+const AI_IMAGE_HEIGHT = 1344;
 const AI_IMAGE_MAX_BYTES = 2 * 1024 * 1024;
 const aiChatImageInputRef = ref(null);
 // 이미지 미리보기 확대 보기 (미리보기 주소, 없으면 닫힘)
@@ -1410,7 +1435,7 @@ const goAiChatImageStep = () => {
   aiChatMessages.value.push({
     role: "assistant",
     content:
-      "메뉴 이미지가 있으면 등록해 주세요. (PNG·JPG, 220×160 크기와 2MB 이하로 자동 조정됩니다)\n이미지가 없으면 '없음'이라고 입력해 주세요.",
+      "메뉴 이미지가 있으면 등록해 주세요. (PNG·JPG, 2MB 이하로 자동 조정됩니다)\n이미지가 없으면 '없음'이라고 입력해 주세요.",
     imageAsk: true,
     imageAskSeq: ++aiChatImageAskSeqNow.value,
     local: true,
@@ -1443,7 +1468,25 @@ const resizeAiMenuImage = (file) =>
       const scale = Math.min(AI_IMAGE_WIDTH / img.width, AI_IMAGE_HEIGHT / img.height);
       const w = Math.round(img.width * scale);
       const h = Math.round(img.height * scale);
-      ctx.drawImage(img, (AI_IMAGE_WIDTH - w) / 2, (AI_IMAGE_HEIGHT - h) / 2, w, h);
+      // 큰 사진을 한 번에 줄이면 뭉개지므로 절반씩 고품질로 줄여 목표 크기 가까이 만든 뒤 마지막에 맞춘다
+      let src = img;
+      let sw = img.width;
+      let sh = img.height;
+      while (sw / 2 >= w && sh / 2 >= h) {
+        const step = document.createElement("canvas");
+        step.width = Math.round(sw / 2);
+        step.height = Math.round(sh / 2);
+        const sctx = step.getContext("2d");
+        sctx.imageSmoothingEnabled = true;
+        sctx.imageSmoothingQuality = "high";
+        sctx.drawImage(src, 0, 0, step.width, step.height);
+        src = step;
+        sw = step.width;
+        sh = step.height;
+      }
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(src, (AI_IMAGE_WIDTH - w) / 2, (AI_IMAGE_HEIGHT - h) / 2, w, h);
       URL.revokeObjectURL(url);
       const encode = (quality) => {
         canvas.toBlob(
@@ -3930,9 +3973,25 @@ const aiItemKey = (item) => `${item.strName}|${item.lngPrice}`;
 
 // 답변을 기다리는 동안 입력창이 비활성화되어 포커스가 빠지므로, 끝나면 입력창으로 되돌린다
 const aiChatTextareaRef = ref(null);
+// [모바일] 휴대폰은 커서를 주면 키보드가 올라와 화면을 가리므로, 입력 중(입력창에 커서가 있을 때)일 때만 유지한다
+let aiTyping = false;
+const onAiInputFocus = () => {
+  aiTyping = true;
+};
+const onAiInputBlur = () => {
+  aiTyping = false;
+};
 const focusAiChatInput = async () => {
   await nextTick();
-  if (aiChatTextareaRef.value) aiChatTextareaRef.value.focus();
+  growAiInput();
+  if (aiTyping && aiChatTextareaRef.value && document.activeElement !== aiChatTextareaRef.value) aiChatTextareaRef.value.focus();
+};
+// [모바일] 입력창 높이: 글 줄 수에 맞춰 늘리고 줄인다 (최대 높이는 CSS)
+const growAiInput = () => {
+  const el = aiChatTextareaRef.value;
+  if (!el) return;
+  el.style.height = "auto";
+  el.style.height = `${el.scrollHeight}px`;
 };
 
 const scrollAiChatLog = async () => {
@@ -4650,11 +4709,11 @@ onMounted(() => {
   color: #fff;
 }
 
-/* 조정한 이미지 미리보기 (실제 등록 크기 220×160 그대로) */
+/* 조정한 이미지 미리보기 (등록 이미지 1792×1344 를 가로 220px 로 줄여 표시) */
 .mst003-chat-img {
   display: block;
   width: 220px;
-  height: 160px;
+  height: 165px;
   margin-top: 0.4rem;
   border: 1px solid #e2e8f0;
   border-radius: 0.375rem;
@@ -4711,7 +4770,7 @@ onMounted(() => {
 .mst003-zoom-img {
   width: min(660px, 90vw);
   height: auto;
-  aspect-ratio: 220 / 160;
+  aspect-ratio: 1792 / 1344;
   border-radius: 0.375rem;
   background: #fff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
@@ -5108,10 +5167,11 @@ onMounted(() => {
 .mst003-chat-popup.mst003-chat-popup--mobile {
   position: fixed;
   left: 0 !important;
-  top: 0 !important;
+  /* 높이·위치는 보이는 영역(키보드 제외)에 맞춘다 — mobileViewport.js */
+  top: var(--mvv-top, 0px) !important;
   width: 100vw;
   height: 100vh;
-  height: 100dvh;
+  height: var(--mvv-h, 100dvh);
   min-width: 0;
   min-height: 0;
   max-width: none;
@@ -5370,6 +5430,81 @@ onMounted(() => {
   font-weight: 700;
   color: #c2410c;
   text-align: center;
+}
+
+/* 키보드가 떠 있으면: 등록할 메뉴 표·이용 안내는 접고, 머리줄을 줄여 대화가 보이는 공간을 넓힌다 */
+:global(html.mkb-open) .mst003-chat-popup--mobile .mst003-chat-items,
+:global(html.mkb-open) .mst003-chat-popup--mobile .mst003-chat-notice {
+  display: none;
+}
+
+:global(html.mkb-open) .mst003-chat-popup--mobile .mst003-chat-head {
+  padding-bottom: 0.3rem;
+}
+
+:global(html.mkb-open) .mst003-chat-popup--mobile {
+  gap: 0.35rem;
+  padding-bottom: 0.4rem;
+}
+
+/* 입력 영역: 채팅 앱처럼 둥근 입력창 하나 + 동그란 보내기 버튼 */
+.mst003-chat-popup--mobile .mst003-chat-input {
+  align-items: flex-end;
+  gap: 0.35rem;
+  padding: 0.3rem 0.3rem 0.3rem 0.9rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 1.5rem;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+}
+
+.mst003-chat-popup--mobile .mst003-chat-input:focus-within {
+  border-color: #a5b4fc;
+}
+
+.mst003-chat-popup--mobile .mst003-chat-textarea {
+  flex: 1;
+  min-width: 0;
+  min-height: 2.3rem;
+  max-height: 7.5rem;
+  padding: 0.5rem 0;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  resize: none;
+  line-height: 1.35;
+  overflow-y: auto;
+}
+
+.mst003-chat-popup--mobile .mst003-chat-textarea:focus {
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+/* 보내기: 글자는 숨기고 동그란 화살표 버튼 */
+.mst003-chat-popup--mobile .pnc-sub-btn.mst003-chat-send {
+  width: 2.3rem;
+  min-width: 2.3rem;
+  height: 2.3rem;
+  min-height: 2.3rem;
+  padding: 0;
+  gap: 0;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #818cf8, #4f46e5);
+  font-size: 0;
+  color: #fff;
+}
+
+.mst003-chat-popup--mobile .pnc-sub-btn.mst003-chat-send:disabled {
+  opacity: 0.45;
+}
+
+.mst003-chat-popup--mobile .pnc-sub-btn.mst003-chat-send .pnc-sub-btn__icon {
+  width: 1.15rem;
+  height: 1.15rem;
 }
 
 </style>
