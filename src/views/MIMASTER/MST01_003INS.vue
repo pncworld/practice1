@@ -15,7 +15,8 @@
       <button @click="searchButton" class="button search md:w-auto w-14">
         조회
       </button>
-      <button @click="saveButton" class="button save w-auto">저장</button>
+      <!-- 매장 계정 + 브랜드 공통 메뉴는 조회만 (저장·추가·삭제·초간단 등록 숨김) -->
+      <button v-if="!isCommonMenuReadOnly" @click="saveButton" class="button save w-auto">저장</button>
       <button @click="excelButton" class="button excel w-auto">엑셀</button>
     </div>
   </div>
@@ -308,7 +309,7 @@
                 <div>{{ msg.content }}</div>
                 <div class="mst003-chat-examples-title">예시</div>
                 <ul class="mst003-chat-examples">
-                  <li v-for="ex in AI_START_EXAMPLES" :key="ex.label">
+                  <li v-for="ex in aiStartExamples" :key="ex.label">
                     <span class="mst003-chat-examples-label">{{ ex.label }}</span>
                     {{ ex.text }}
                   </li>
@@ -1322,6 +1323,7 @@
           </button>
           <!-- 초간단 메뉴등록: 메뉴명·판매가 한 줄로 바로 등록 (AI 메뉴 관리와 같은 사용 조건) -->
           <button
+            v-if="!isCommonMenuReadOnly"
             type="button"
             class="whitebutton mst003-sub-btn mst003-quick-btn"
             title="메뉴명과 판매가만 입력하시면 분류와 메뉴코드를 자동으로 정해 바로 등록해 드립니다."
@@ -1338,6 +1340,7 @@
             초간단 메뉴등록
           </button>
           <button
+            v-if="!isCommonMenuReadOnly"
             type="button"
             class="whitebutton mst003-sub-btn"
             @click="addRow"
@@ -1345,6 +1348,7 @@
             추가
           </button>
           <button
+            v-if="!isCommonMenuReadOnly"
             type="button"
             class="whitebutton mst003-sub-btn"
             @click="deleteRow"
@@ -3121,6 +3125,27 @@ const isStoreImageFeatureEnabled = computed(() => {
     store.state.userData.intCommonMenu ?? store.state.userData.lngCommonMenu;
   return String(commonMenuFlag) === "1";
 });
+/** 매장 계정 — pickStore.vue 와 같은 기준 (브랜드 관리자도 아니고 lngPositionType 1 도 아니면 매장 계정) */
+const isStoreAccountUser = computed(
+  () =>
+    String(store.state.userData?.blnBrandAdmin) !== "True" &&
+    String(store.state.userData?.lngPositionType) !== "1"
+);
+/**
+ * 매장 계정 + 브랜드 공통 메뉴: 메뉴는 조회만 한다 (저장·추가·삭제·복사·초간단 등록·AI 등록/수정·메뉴키 추가 불가).
+ * 공통 메뉴는 브랜드 전체 매장이 함께 쓰므로 등록·수정은 본사 계정에서만 한다
+ */
+const isCommonMenuReadOnly = computed(
+  () => isStoreAccountUser.value && isStoreImageFeatureEnabled.value
+);
+const COMMON_MENU_READONLY_TEXT =
+  "브랜드 공통 메뉴는 매장 계정에서 조회만 할 수 있습니다. 메뉴 등록·수정은 본사에 요청해 주세요.";
+// 막아야 하면 안내창을 띄우고 true
+const blockCommonMenuEdit = () => {
+  if (!isCommonMenuReadOnly.value) return false;
+  Swal.fire({ title: "안내", text: COMMON_MENU_READONLY_TEXT, icon: "warning", confirmButtonText: "확인" });
+  return true;
+};
 /** 이미지 설정 탭 — 공통(그룹)/저장 매장 행만 허용할 매장 그룹 */
 const MENU_IMAGE_SCOPE_STORE_GROUPS = [3051, 9999];
 const isImageScopeStoreGroup = computed(() =>
@@ -3901,6 +3926,7 @@ const clickaddrowSeq = ref();
  */
 
 const addRow = () => {
+  if (blockCommonMenuEdit()) return; // 매장 계정 + 공통 메뉴는 조회만
   const length = updateDeleteInsertrowIndex.value.created.length;
   if (length == 0) {
     const today = new Date();
@@ -5083,6 +5109,7 @@ const AI_KEY_RESULT_TEXT = {
   ERROR: "오류",
 };
 const appendAiChatMenuKeys = async (item) => {
+  if (blockCommonMenuEdit()) return; // 매장 계정 + 공통 메뉴는 조회만
   if (!item.menuKeyTargets || item.menuKeyTargets.length === 0) return "";
   try {
     const res = await appendMenuKeys(
@@ -5250,6 +5277,7 @@ const handleAiChatMultiLangInput = (text) => {
 // 메뉴 저장이 끝난 뒤, AI로 등록한 메뉴의 다국어를 MST44_066INS 와 같은 saveMultiLang 으로 저장한다
 const aiMultiLangByCode = ref({});
 const saveAiMultiLangForSavedMenus = async (savedRows) => {
+  if (blockCommonMenuEdit()) return; // 매장 계정 + 공통 메뉴는 조회만
   const codes = (savedRows || [])
     .map((r) => String(r.lngCode ?? ""))
     .filter((c) => c && aiMultiLangByCode.value[c]);
@@ -5374,12 +5402,16 @@ const pushAiChatLocal = (role, content, plain = false) => {
  */
 // 시작 안내에 보여 주는 입력 예시 (버튼 아님, 사용자가 문장으로 입력하면 AI가 작업 종류를 판단)
 const AI_START_EXAMPLES = [
-  { label: "메뉴 등록", text: "'아이스티 3000원 등록해줘'" },
+  { label: "메뉴 등록", text: "'아이스티 3000원 등록해줘'", edit: true },
   { label: "메뉴 조회", text: "'아메리카노 메뉴만 보여줘', '5천원 이상 메뉴', '미사용 메뉴'" },
-  { label: "메뉴 수정", text: "'아메리카노 가격 5000원으로 바꿔줘', '1001 미사용으로'" },
+  { label: "메뉴 수정", text: "'아메리카노 가격 5000원으로 바꿔줘', '1001 미사용으로'", edit: true },
   { label: "메뉴 매출", text: "'이번 주 아메리카노 매출', '지난달 많이 팔린 메뉴 10개'" },
   { label: "질문", text: "'메뉴코드는 어떻게 정해져?', '주방출력설정이 뭐야?'" },
 ];
+// 메뉴 작업 권한이 없는 계정(매장 계정 + 공통 메뉴)에는 등록·수정 예시를 보여 주지 않는다
+const aiStartExamples = computed(() =>
+  isCommonMenuReadOnly.value ? AI_START_EXAMPLES.filter((ex) => !ex.edit) : AI_START_EXAMPLES
+);
 const AI_SEARCH_MAX_ROWS = 20;
 // 서버로 보내는 도우미 대화 기록은 이전 8턴 + 이번 질문까지 (user 로 시작·끝)
 const AI_ASSIST_MAX_MESSAGES = 17;
@@ -5637,6 +5669,55 @@ const runAiSales = async (cond) => {
   });
   let groupBy = ["weekday", "hour", "band"].includes(cond.groupBy) ? cond.groupBy : "menu";
   if (groupBy === "band" && ranges.length === 0) groupBy = "menu";
+
+  // 매출 조회 매장
+  // · 매장 계정: 메뉴 종류(공통·매장별)·선택과 관계없이 항상 본인 매장(세션 lngPosition)만
+  // · 본사 계정 + 공통 메뉴(매장코드 0): 그룹 전체, 채팅에서 매장을 말하면('송파점 …') 그 매장만
+  // · 본사 계정 + 매장별 메뉴: 위쪽에서 고른 매장만 (매장을 고르지 않았으면 조회하지 않음)
+  const isStoreAccount = isStoreAccountUser.value;
+  const isGroupScope = !isStoreAccount && String(nowStoreCd.value) === "0";
+  let salesStoreCd = isStoreAccount
+    ? String(store.state.userData?.lngPosition ?? "")
+    : String(nowStoreCd.value ?? "");
+  let salesStoreName = "";
+  if (!/^[1-9]\d*$/.test(salesStoreCd) && !isGroupScope) {
+    const text = isStoreAccount
+      ? "로그인한 매장 정보를 찾지 못해 매출을 조회할 수 없습니다. 다시 로그인해 주세요."
+      : "위쪽에서 매장을 선택해 조회한 뒤 다시 물어봐 주세요.";
+    pushAiChatLocal("assistant", text, true);
+    return `[매출] 조회 불가: ${text}`;
+  }
+  if (isStoreAccount) {
+    salesStoreName = getAiSalesStoreList().find((s) => s.code === salesStoreCd)?.name || "";
+  }
+  const storeWord = String(cond.store || "").trim();
+  if (storeWord) {
+    if (!isGroupScope) {
+      const own = getAiSalesStoreList().find((s) => s.code === salesStoreCd);
+      if (!own || findAiSalesStore(storeWord, [own]).length === 0) {
+        const text = isStoreAccount
+          ? "매장 계정은 본인 매장 매출만 조회할 수 있습니다."
+          : "매장별 메뉴는 위쪽에서 고른 매장의 매출만 조회합니다. 다른 매장은 위쪽에서 매장을 바꿔 조회해 주세요.";
+        pushAiChatLocal("assistant", text, true);
+        return `[매출] 조회 불가: ${text}`;
+      }
+    } else {
+      const found = findAiSalesStore(storeWord, getAiSalesStoreList());
+      if (found.length !== 1) {
+        const text =
+          found.length === 0
+            ? `'${storeWord}' 매장을 찾지 못했습니다. 매장명을 다시 말씀해 주세요.`
+            : `'${storeWord}'(으)로 찾은 매장이 ${found.length}개입니다: ${found
+                .slice(0, 10)
+                .map((s) => s.name)
+                .join(", ")}${found.length > 10 ? " …" : ""}. 매장명을 더 정확히 말씀해 주세요.`;
+        pushAiChatLocal("assistant", text, true);
+        return `[매출] 조회 불가: ${text}`;
+      }
+      salesStoreCd = found[0].code;
+      salesStoreName = found[0].name;
+    }
+  }
   if (groupBy === "weekday" && ranges.length > 0) {
     const text =
       "시간대 조건과 요일별 나눠 보기는 함께 조회할 수 없습니다. 시간대 없이 요일별로 보시거나, 요일을 정해서 시간대별로 물어봐 주세요.";
@@ -5683,7 +5764,7 @@ const runAiSales = async (cond) => {
   const res = useTime
     ? await getMenuSalesTime(
         groupCd.value,
-        nowStoreCd.value,
+        salesStoreCd,
         fromText,
         toText,
         weekdays.join(","),
@@ -5693,7 +5774,7 @@ const runAiSales = async (cond) => {
       )
     : await getMenuSales(
         groupCd.value,
-        nowStoreCd.value,
+        salesStoreCd,
         fromText,
         toText,
         weekdays.join(","),
@@ -5715,7 +5796,7 @@ const runAiSales = async (cond) => {
   const totalAmt = [...salesByCode.values()].reduce((sum, s) => sum + s.amt, 0);
   const mode = cond.mode || "all";
   const limit = Math.max(0, Math.floor(Number(cond.limit) || 0));
-  const scope = String(nowStoreCd.value) === "0" ? "그룹 전체 매장" : "조회 매장";
+  const scope = salesStoreName || (salesStoreCd === "0" ? "그룹 전체 매장" : "조회 매장");
   const period = `${fromText} ~ ${toText}`;
   // 순위 기준: 서버가 sortBy=qty 를 보내면 판매수량, 아니면(값이 없는 이전 API 포함) 실매출
   const byQty = cond.sortBy === "qty";
@@ -5809,7 +5890,7 @@ const runAiSales = async (cond) => {
   // 다음 질문에서 '이 메뉴들 중'으로 이어받을 수 있게 이번 결과를 기억한다
   // ('TOP 5'처럼 개수를 정했으면 보여 준 그 메뉴들만, 아니면 표에 다 못 보여 준 것까지 전체)
   aiLastResultCodes.value = (limit > 0 ? shown : rows).map((r) => String(r.code));
-  return `[매출] ${period}${keywordText} ${mode}: ${total}건${
+  return `[매출] ${period} ${scope}${keywordText} ${mode}: ${total}건${
     shown.length > 0
       ? ` (${shown
           .slice(0, 5)
@@ -5836,6 +5917,26 @@ const describeAiWeekdays = (days) => {
   if (key === "6,7") return "주말(토·일)";
   if (key === "1,2,3,4,5") return "평일(월~금)";
   return `${days.map((d) => AI_WEEKDAY_NAMES[d]).join("·")}요일`;
+};
+// AI 매출 매장 목록: PickStore 와 같은 세션 매장 목록 (매장코드 0 제외)
+const getAiSalesStoreList = () =>
+  (store.state.storeCd || [])
+    .map(normalizeStoreOption)
+    .filter((s) => s && String(s.lngStoreCode) !== "0")
+    .map((s) => ({ code: String(s.lngStoreCode), name: s.strName || String(s.lngStoreCode) }));
+// 말한 매장명으로 매장 찾기: 이름·코드가 같으면 그 매장, 아니면 '점'을 뺀 말이 이름에 들어 있는 매장
+// (그중 그 말로 끝나는 매장을 우선. 예: '송파점' → 'OO 송파점')
+const aiStoreKey = (v) => normAiText(v).replace(/[()[\]]/g, "");
+const findAiSalesStore = (word, list) => {
+  const q = aiStoreKey(word);
+  if (!q) return [];
+  const exact = list.filter((s) => aiStoreKey(s.name) === q || s.code === String(word).trim());
+  if (exact.length > 0) return exact;
+  const base = q.replace(/점$/, "");
+  if (!base) return [];
+  const hits = list.filter((s) => aiStoreKey(s.name).includes(base));
+  const tail = hits.filter((s) => aiStoreKey(s.name).replace(/점$/, "").endsWith(base));
+  return tail.length > 0 ? tail : hits;
 };
 const describeAiRanges = (ranges) =>
   ranges.map((r) => `${String(r.name || "").trim() ? `${String(r.name).trim()} ` : ""}${r.from}~${r.to}`).join(", ");
@@ -5938,7 +6039,9 @@ const buildAiMenuStats = () => {
   const menus = aiMenuRows();
   // 이 대화에서 사용자가 정한 시간대 (AI가 '런치'를 다시 묻지 않도록)
   const timeBands = Object.entries(aiTimeBands.value).map(([name, r]) => ({ name, from: r.from, to: r.to }));
-  if (menus.length === 0) return JSON.stringify({ total: 0, timeBands });
+  // readOnly: 메뉴 작업 권한이 없는 계정(매장 계정 + 공통 메뉴) — AI가 등록·수정 방법을 안내하지 않게 한다
+  const readOnly = isCommonMenuReadOnly.value;
+  if (menus.length === 0) return JSON.stringify({ total: 0, timeBands, readOnly });
   const priced = menus.map((r) => ({ r, price: Number(r.lngPrice) || 0 }));
   const minItem = priced.reduce((a, b) => (b.price < a.price ? b : a));
   const maxItem = priced.reduce((a, b) => (b.price > a.price ? b : a));
@@ -5960,6 +6063,7 @@ const buildAiMenuStats = () => {
     maxPrice: { name: maxItem.r.strName, code: String(maxItem.r.lngCode), price: maxItem.price },
     byMain,
     timeBands,
+    readOnly,
   });
 };
 
@@ -5969,7 +6073,11 @@ const runAiInfoIntent = async (intent, data) => {
   if (intent === "search") return runAiSearch(data.SEARCH || {});
   if (intent === "sales") return runAiSales(data.SALES || {});
   if (intent === "groups") return showAiGroups(data.SEARCH || {});
-  const reply = data.REPLY || "메뉴 등록·조회·수정·매출과 이 화면 사용법만 도와드릴 수 있어요.";
+  const reply =
+    data.REPLY ||
+    (isCommonMenuReadOnly.value
+      ? "메뉴 조회·매출과 이 화면 사용법만 도와드릴 수 있어요."
+      : "메뉴 등록·조회·수정·매출과 이 화면 사용법만 도와드릴 수 있어요.");
   pushAiChatLocal("assistant", reply, true);
   return reply;
 };
@@ -6207,6 +6315,7 @@ const cancelAiEdit = () => {
 
 // 수정 저장: 메뉴 목록에서 그 행을 선택하고(상세정보 표시) 값을 그리드에 넣은 뒤 기존 저장 로직(확인창 없이)으로 저장
 const saveAiEdit = async () => {
+  if (blockCommonMenuEdit()) return; // 매장 계정 + 공통 메뉴는 조회만
   const pending = aiEditPending.value;
   if (aiChatStep.value !== "editConfirm" || !pending || !pending.row || aiChatLoading.value) return;
   if (aiStoreGuardFails()) return;
@@ -6356,6 +6465,9 @@ const sendAiAssist = async (text, keepStep = "") => {
       let sideSummary;
       if (AI_INFO_INTENTS.includes(intent)) {
         sideSummary = await runAiInfoIntent(intent, res.data);
+      } else if (isCommonMenuReadOnly.value) {
+        sideSummary = COMMON_MENU_READONLY_TEXT;
+        pushAiChatLocal("assistant", sideSummary, true);
       } else {
         sideSummary = "메뉴 등록 중에는 다른 메뉴를 수정하거나 새로 등록할 수 없습니다. 지금 메뉴를 마치거나 새 대화에서 해 주세요.";
         pushAiChatLocal("assistant", sideSummary, true);
@@ -6363,6 +6475,13 @@ const sendAiAssist = async (text, keepStep = "") => {
       aiAssistHistory.value = [...history, { role: "assistant", content: sideSummary }];
       aiChatStep.value = keepStep;
       pushAiChatLocal("assistant", AI_REGISTER_REASK[keepStep]);
+      return;
+    }
+    // 매장 계정 + 공통 메뉴: 등록·수정 요청은 안내만 하고 조회·매출·질문만 처리
+    if (isCommonMenuReadOnly.value && (intent === "register" || intent === "edit")) {
+      aiEditPending.value = null;
+      pushAiChatLocal("assistant", COMMON_MENU_READONLY_TEXT, true);
+      aiAssistHistory.value = [...history, { role: "assistant", content: COMMON_MENU_READONLY_TEXT }];
       return;
     }
     if (intent === "register") {
@@ -7024,6 +7143,7 @@ const focusQuickInput = async () => {
 };
 
 const openQuickMenu = () => {
+  if (blockCommonMenuEdit()) return; // 매장 계정 + 공통 메뉴는 조회만
   if (aiDisabledGroup.value) return;
   if (aiNeedsStorePick.value) {
     Swal.fire({ title: "경고", text: "매장을 선택해 주십시오.", icon: "warning", confirmButtonText: "확인" });
@@ -7236,6 +7356,7 @@ const confirmQuickKeyStores = () => {
 
 // 매장마다 같은 소분류 메뉴가 가장 많이 놓인 화면(없으면 첫 화면)의 마지막 메뉴 다음 자리에, 그 매장 포스 전체로 배치
 const placeQuickMenuKey = async (stores) => {
+  if (blockCommonMenuEdit()) return; // 매장 계정 + 공통 메뉴는 조회만
   const last = quickLast.value;
   if (!last) return;
   quickLoading.value = true;
@@ -7603,6 +7724,7 @@ const sendAiChat = async () => {
  */
 
 const deleteRow = () => {
+  if (blockCommonMenuEdit()) return; // 매장 계정 + 공통 메뉴는 조회만
   // 현재 선택된 행이 신규행인지 확인
   if (rowIndex.value === undefined || rowIndex.value === null) {
     Swal.fire({
@@ -7648,6 +7770,7 @@ watch(gridvalue9, () => {
 });
 
 const saveDeliveryMenuTab = async () => {
+  if (blockCommonMenuEdit()) return; // 매장 계정 + 공통 메뉴는 조회만
   const targetStoreCd = resolveDeliveryStoreCdForApi();
   const targetMenuCd = normalizeDeliveryParam(
     selectedMenuCodeForDelivery.value || gridvalue3.value
@@ -7870,6 +7993,7 @@ const saveDeliveryMenuTab = async () => {
 
 // options.skipConfirm: AI로 간편메뉴 추가의 최종 등록처럼 이미 확인을 받은 경우 확인창 없이 저장한다 (저장 성공 여부를 돌려줌)
 const saveButton = (options = {}) => {
+  if (blockCommonMenuEdit()) return; // 매장 계정 + 공통 메뉴는 조회만
   if (selectedMenu.value === 4) {
     saveDeliveryMenuTab();
     return;
@@ -8466,6 +8590,7 @@ const handleFileUpload = async (e) => {
 };
 
 const handleFileDelete = async () => {
+  if (blockCommonMenuEdit()) return; // 매장 계정 + 공통 메뉴는 조회만
   if (!showImageGroupScopeControls.value || imageScope.value !== "STORE") {
     Swal.fire({
       title: "경고",
@@ -8660,6 +8785,7 @@ const rowData5 = ref([]);
  */
 
 const copyButton2 = async () => {
+  if (blockCommonMenuEdit()) return; // 매장 계정 + 공통 메뉴는 조회만
   const res = await getAmountListByMenuCode(groupCd.value, gridvalue3.value);
   rowData4.value = res.data.List;
   rowData5.value = res.data.List2;
@@ -8670,6 +8796,7 @@ const copyButton2 = async () => {
  */
 
 const copyButton = async () => {
+  if (blockCommonMenuEdit()) return; // 매장 계정 + 공통 메뉴는 조회만
   if (selectedMenuCd.value.length == 0) {
     Swal.fire({
       title: "경고",
@@ -8737,6 +8864,7 @@ const closeDeliveryCopyPopUp = () => {
   showDeliveryCopyPopUp.value = false;
 };
 const copyDeliveryMenuToStore = async () => {
+  if (blockCommonMenuEdit()) return; // 매장 계정 + 공통 메뉴는 조회만
   const baseStoreCd = normalizeDeliveryParam(deliveryStoreCd.value);
   const targetStoreCd = normalizeDeliveryParam(deliveryCopyTargetStoreCd.value);
   const menuCd = normalizeDeliveryParam(selectedMenuCodeForDelivery.value || gridvalue3.value);
