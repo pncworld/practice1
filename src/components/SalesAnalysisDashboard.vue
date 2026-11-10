@@ -1160,7 +1160,7 @@ function parseDashRate(v) {
 /** 주간 핵심 지표 행 */
 function mapWeeklyDashRow(r) {
   if (!r || typeof r !== "object") {
-    return { label: "", target: 0, actual: 0, rate: 0, wow: null, yoy: null };
+    return { label: "", target: 0, actual: 0, rate: 0, wow: null, mom: null, yoy: null };
   }
   return {
     label: String(pickRow(r, ["label", "LABEL", "GUBUN", "STR_NAME", "DIV_NM"]) ?? ""),
@@ -1168,6 +1168,8 @@ function mapWeeklyDashRow(r) {
     actual: parseDashAmount(pickRow(r, ["actual", "ACTUAL", "SALES", "TOT_AMT"])),
     rate: parseDashRate(pickRow(r, ["rate", "RATE", "ACH_RATE"])) ?? 0,
     wow: parseDashRate(pickRow(r, ["wow", "WOW", "WOW_RATE"])),
+    // 2026-11-10 전월비 (시작일 −1개월 ~ 종료일 −1개월)
+    mom: parseDashRate(pickRow(r, ["mom", "MOM", "MOM_RATE"])),
     yoy: parseDashRate(pickRow(r, ["yoy", "YOY", "YOY_RATE"])),
   };
 }
@@ -1175,7 +1177,7 @@ function mapWeeklyDashRow(r) {
 /** 매장 매출 공통 행 */
 function mapStoreMetricDashRow(r) {
   if (!r || typeof r !== "object") {
-    return { store: "", target: 0, actual: 0, rate: 0, wow: null, yoy: null };
+    return { store: "", target: 0, actual: 0, rate: 0, wow: null, mom: null, yoy: null };
   }
   return {
     store: String(pickRow(r, ["store", "STORE_NM", "STR_STORE_NM", "STORE"]) ?? ""),
@@ -1183,6 +1185,8 @@ function mapStoreMetricDashRow(r) {
     actual: parseDashAmount(pickRow(r, ["actual", "ACTUAL", "AMT", "COST", "TOT_AMT"])),
     rate: parseDashRate(pickRow(r, ["rate", "RATE"])) ?? 0,
     wow: parseDashRate(pickRow(r, ["wow", "WOW", "WOW_RATE"])),
+    // 2026-11-10 전월비
+    mom: parseDashRate(pickRow(r, ["mom", "MOM", "MOM_RATE"])),
     yoy: parseDashRate(pickRow(r, ["yoy", "YOY", "YOY_RATE"])),
   };
 }
@@ -1244,9 +1248,11 @@ function mapCustomerDashRow(r) {
       store: "",
       custCount: 0,
       custWow: null,
+      custMom: null,
       custYoy: null,
       price: 0,
       priceWow: null,
+      priceMom: null,
       priceYoy: null,
     };
   }
@@ -1256,9 +1262,12 @@ function mapCustomerDashRow(r) {
       pickRow(r, ["custCount", "CUST_COUNT", "CUST_CNT", "CUSTOMER_CNT"])
     ),
     custWow: parseDashRate(pickRow(r, ["custWow", "CUST_WOW", "CUST_WOW_RATE"])),
+    // 2026-11-10 전월비
+    custMom: parseDashRate(pickRow(r, ["custMom", "CUST_MOM", "CUST_MOM_RATE"])),
     custYoy: parseDashRate(pickRow(r, ["custYoy", "CUST_YOY", "CUST_YOY_RATE"])),
     price: parseDashAmount(pickRow(r, ["price", "UNIT_PRICE", "PRICE", "CUST_PRICE"])),
     priceWow: parseDashRate(pickRow(r, ["priceWow", "PRICE_WOW", "UNIT_WOW"])),
+    priceMom: parseDashRate(pickRow(r, ["priceMom", "PRICE_MOM", "UNIT_MOM"])),
     priceYoy: parseDashRate(pickRow(r, ["priceYoy", "PRICE_YOY", "UNIT_YOY"])),
   };
 }
