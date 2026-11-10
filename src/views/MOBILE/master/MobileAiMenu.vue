@@ -971,6 +971,7 @@ import { getPosList } from "@/api/common";
 import { computed, defineEmits, defineProps, nextTick, onMounted, ref, watch } from "vue";
 import { mobileAlert, mobileConfirm } from "./mobileDialog";
 import { newMenuRow, saveMenuRow } from "./mobileMenuSave";
+import { useChatKeyboard } from "./mobileChatKeyboard";
 
 const props = defineProps({
   // 열림 여부 (닫아도 대화 내용은 남겨 두고, 다시 열면 이어서 한다 — 웹과 같음)
@@ -992,6 +993,8 @@ const props = defineProps({
   userPosition: { type: [String, Number], default: "" },
 });
 const emit = defineEmits(["close", "saved", "focus-menu"]);
+// [모바일] 키보드가 올라오면 입력창이 키보드 위에 붙게(안드로이드) 하고, 대화 내용을 마지막 답변으로 내린다 (mobileChatKeyboard.js)
+useChatKeyboard(() => scrollAiChatLog());
 
 /* ---------- [모바일] 웹 화면 상태 대신 쓰는 값 ---------- */
 const groupCd = computed(() => String(props.groupCd ?? ""));
@@ -5507,6 +5510,16 @@ onMounted(() => {
 .mst003-chat-popup--mobile .pnc-sub-btn.mst003-chat-send .pnc-sub-btn__icon {
   width: 1.15rem;
   height: 1.15rem;
+}
+
+/* 메신저처럼 말풍선을 입력창 쪽(아래)부터 붙인다: 대화가 짧으면 아래에 모이고, 길어지면 위로 쌓임 */
+.mst003-chat-popup--mobile .mst003-chat-log {
+  display: flex;
+  flex-direction: column;
+}
+
+.mst003-chat-popup--mobile .mst003-chat-log > :first-child {
+  margin-top: auto;
 }
 
 </style>

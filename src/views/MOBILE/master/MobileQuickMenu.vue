@@ -198,6 +198,7 @@ import {
   writeMenuChangeLog,
 } from "@/api/master";
 import { newMenuRow, saveMenuRow } from "./mobileMenuSave";
+import { useChatKeyboard } from "./mobileChatKeyboard";
 import { computed, defineEmits, defineProps, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 
 const props = defineProps({
@@ -214,6 +215,8 @@ const props = defineProps({
   keyStoreList: { type: Array, default: () => [] },
 });
 const emit = defineEmits(["close", "registered"]);
+// 키보드가 올라오면 입력창이 키보드 위에 붙게(안드로이드) 하고, 대화 내용을 마지막 답변으로 내린다
+useChatKeyboard(() => scrollLog());
 
 const GUIDE_LINES = [
   { label: "분류", text: "메뉴명으로 알맞은 소분류를 찾아 넣습니다. 못 찾으면 가장 작은 소분류 코드에 넣습니다." },
@@ -828,10 +831,18 @@ onMounted(() => {
   color: #92400e;
 }
 
+/* 메신저처럼 말풍선을 입력창 쪽(아래)부터 붙인다: 대화가 짧으면 아래에 모이고, 길어지면 위로 쌓임 */
 .mq-log {
+  display: flex;
+  flex-direction: column;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 0.85rem;
+}
+
+.mq-log > :first-child {
+  margin-top: auto;
 }
 
 .mq-guide {
