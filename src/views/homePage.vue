@@ -94,11 +94,33 @@
         </div>
       </div>
     </div>
+
+    <!-- 메뉴 관리: 웹 메뉴코드등록(MST01_003INS) 메뉴가 있는 계정만. 버튼 하나, 가운데 배치. 누르면 메뉴 목록 -->
+    <div v-if="showMenuView" class="home-tools is-single">
+      <button
+        type="button"
+        class="home-card home-tool"
+        @click="openMenuManage">
+        <span class="home-tool-icon is-list" aria-hidden="true">
+          <!-- 메뉴판 아이콘 -->
+          <svg viewBox="0 0 24 24" focusable="false">
+            <rect x="4.5" y="3" width="15" height="18" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+            <path d="M8.5 8h7M8.5 12h7M8.5 16h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </span>
+        <span class="home-tool-text">
+          <span class="home-tool-title">메뉴 관리</span>
+          <span class="home-tool-sub">{{ showQuickMenu ? "메뉴 조회·등록·AI 메뉴관리" : "메뉴 목록·상세 조회" }}</span>
+        </span>
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { getMobileDashBoard } from "@/api/mobile";
+import { canUseQuickMenu, loadMenuAccess } from "@/views/MOBILE/master/mobileMenuAccess";
+import { useRouter } from "vue-router";
 import {
   formatLocalDate2,
   formatNumberWithCommas,
@@ -107,7 +129,7 @@ import {
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -154,12 +176,33 @@ const diffClass = (value) =>
 const isMobile = store.state.isMobile;
 const StoreName = ref("");
 const today = ref(formatLocalDate2(new Date()));
+const router = useRouter();
+
+/**
+ * 메뉴 관리 버튼 (사용 조건은 mobileMenuAccess.js — 웹 메뉴코드등록 MST01_003INS 와 같다)
+ * - 메뉴 조회: 웹 메뉴에 메뉴코드등록이 있는 계정
+ * - 초간단 메뉴등록: 위 + AI 사용 그룹(3015 제외) + 매장 계정·공통 메뉴(조회 전용)가 아닌 계정
+ * - 홈에는 「메뉴 관리」 버튼 하나. 누르면 모바일 메뉴 목록 화면으로 가고, 초간단 메뉴등록은 그 화면 안 버튼으로 연다
+ */
+const menuAccessUser = ref(null);
+const menuAccessMenu = ref(null);
+const showMenuView = computed(() => !!menuAccessUser.value && !!menuAccessMenu.value);
+const showQuickMenu = computed(() => canUseQuickMenu(menuAccessUser.value, menuAccessMenu.value));
+const loadMenuTools = async () => {
+  const access = await loadMenuAccess(store.state.StoreToken);
+  menuAccessUser.value = access.user;
+  menuAccessMenu.value = access.menu;
+};
+const openMenuManage = () => {
+  router.push("/m/MIMASTER/menuManage");
+};
 /**
  * 	화면 Load시 실행 스크립트
  */
 
 onMounted(async () => {
   store.state.loading2 = false;
+  loadMenuTools();
 
   StoreName.value = store.state.userData.STORE_NM;
   store.state.mobileSelectProgName = "";
@@ -416,5 +459,77 @@ onMounted(async () => {
   margin-top: 0.1rem;
   font-weight: 700;
   color: #334155;
+}
+
+/* 메뉴 관리 버튼: 2개면 반반, 1개면 가운데 */
+.home-tools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+}
+
+.home-tools.is-single {
+  grid-template-columns: minmax(0, 15rem);
+  justify-content: center;
+}
+
+.home-tool {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  padding: 0.8rem 0.7rem;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.home-tool:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.home-tool-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.8rem;
+  color: #fff;
+}
+
+.home-tool-icon svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+
+.home-tool-icon.is-list {
+  background: linear-gradient(135deg, #818cf8, #3b82f6);
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+}
+
+.home-tool-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.home-tool-title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #0f172a;
+  word-break: keep-all;
+}
+
+.home-tool-sub {
+  margin-top: 0.15rem;
+  font-size: 0.62rem;
+  line-height: 1.3;
+  color: #94a3b8;
+  word-break: keep-all;
 }
 </style>
