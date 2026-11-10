@@ -94,6 +94,10 @@
           <input
             :value="keyword"
             type="search"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
             placeholder="메뉴명·초성·메뉴코드 검색"
             @input="keyword = $event.target.value" />
         </div>
@@ -182,6 +186,10 @@
                     :type="f.edit === 'lngPrice' ? 'tel' : 'text'"
                     :inputmode="f.edit === 'lngPrice' ? 'numeric' : 'text'"
                     :maxlength="f.edit === 'lngPrice' ? 9 : 50"
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    spellcheck="false"
                     :disabled="saving"
                     @input="onEditInput" />
                   <span class="mm-edit-actions">
@@ -293,7 +301,7 @@ import { mobileAlert, mobileConfirm, mobileToast } from "./mobileDialog";
 import { saveMenuRow } from "./mobileMenuSave";
 import { matchNameWithChoseong } from "@/utils/choseongFilter";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import MobileQuickMenu from "./MobileQuickMenu.vue";
 import MobileAiMenu from "./MobileAiMenu.vue";
@@ -309,6 +317,7 @@ import {
 
 const store = useStore();
 const router = useRouter();
+const route = useRoute();
 // 매장 이름 옆 홈 아이콘: 모바일 홈으로
 const goHome = () => {
   if (saving.value) return;
@@ -689,6 +698,57 @@ const closeQuick = async () => {
   await nextTick();
   itemRefs.get(code)?.scrollIntoView({ behavior: "smooth", block: "center" });
 };
+
+/* ---------- 휴대폰 뒤로가기: 대화창만 닫고 메뉴 관리 화면에 남는다 ---------- */
+// 대화창은 화면 위에 띄운 창이라 그대로면 뒤로가기가 메뉴 관리 화면 자체를 떠난다(대시보드로 나감).
+// 대화창을 열 때 주소에 ?chat=quick|ai 를 붙여 방문 기록을 하나 쌓고, 뒤로가기로 그 표시가 빠지면 대화창을 닫는다.
+// 닫기 버튼 등으로 닫으면 쌓아 둔 기록을 되돌려(router.back) 다음 뒤로가기는 원래대로 동작하게 한다
+const openChat = computed(() => (quickOpen.value ? "quick" : aiOpen.value ? "ai" : ""));
+// 주소 변경은 차례대로 처리한다 (열자마자 닫히는 경우에도 push 가 끝난 뒤 back 하도록)
+let chatNav = Promise.resolve();
+const waitChatQueryChange = () =>
+  new Promise((resolve) => {
+    const stop = watch(
+      () => route.query.chat,
+      () => {
+        stop();
+        resolve();
+      }
+    );
+    setTimeout(() => {
+      stop();
+      resolve();
+    }, 800);
+  });
+watch(openChat, () => {
+  chatNav = chatNav.then(async () => {
+    const now = openChat.value;
+    const inUrl = String(route.query.chat || "");
+    if (now && inUrl !== now) {
+      await router.push({ query: { ...route.query, chat: now } });
+    } else if (!now && inUrl) {
+      const done = waitChatQueryChange();
+      router.back();
+      await done;
+    }
+  });
+});
+watch(
+  () => route.query.chat,
+  (v) => {
+    if (v) return;
+    if (quickOpen.value) closeQuick();
+    if (aiOpen.value) aiOpen.value = false;
+  }
+);
+// 대화창이 열린 주소로 새로 들어온 경우(새로고침 등)는 표시를 지운다
+onMounted(() => {
+  if (route.query.chat) {
+    const query = { ...route.query };
+    delete query.chat;
+    router.replace({ query });
+  }
+});
 
 /* ---------- 맨 위로 ---------- */
 // 모바일 화면은 레이아웃 안쪽 영역이 스크롤되므로, 실제로 스크롤된 영역을 기억해 두고 그 영역을 맨 위로 올린다

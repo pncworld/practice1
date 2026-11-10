@@ -883,6 +883,10 @@
           class="mst003-chat-textarea"
           rows="1"
           maxlength="2000"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
           :placeholder="aiChatStep === 'intent' ? '원하시는 작업을 입력해 주세요.' : `${AI_CHAT_STEP_TEXT[aiChatStep]} 입력`"
           :readonly="aiChatLoading"
           @focus="onAiInputFocus"
@@ -969,7 +973,6 @@ import { getPosList } from "@/api/common";
 import { computed, defineEmits, defineProps, nextTick, onMounted, ref, watch } from "vue";
 import { mobileAlert, mobileConfirm } from "./mobileDialog";
 import { newMenuRow, saveMenuRow } from "./mobileMenuSave";
-import { useKeyboardViewport } from "./mobileViewport";
 
 const props = defineProps({
   // 열림 여부 (닫아도 대화 내용은 남겨 두고, 다시 열면 이어서 한다 — 웹과 같음)
@@ -991,8 +994,6 @@ const props = defineProps({
   userPosition: { type: [String, Number], default: "" },
 });
 const emit = defineEmits(["close", "saved", "focus-menu"]);
-// [모바일] 키보드가 올라와도 대화창이 키보드 위에 맞춰지게 (mobileViewport.js)
-useKeyboardViewport();
 
 /* ---------- [모바일] 웹 화면 상태 대신 쓰는 값 ---------- */
 const groupCd = computed(() => String(props.groupCd ?? ""));
@@ -5167,11 +5168,11 @@ onMounted(() => {
 .mst003-chat-popup.mst003-chat-popup--mobile {
   position: fixed;
   left: 0 !important;
-  /* 높이·위치는 보이는 영역(키보드 제외)에 맞춘다 — mobileViewport.js */
-  top: var(--mvv-top, 0px) !important;
+  /* 화면 전체 고정. 키보드가 올라올 때 크기·위치를 따라 바꾸면 휴대폰에서 키보드가 다시 닫히므로 바꾸지 않는다 */
+  top: 0 !important;
   width: 100vw;
   height: 100vh;
-  height: var(--mvv-h, 100dvh);
+  height: 100dvh;
   min-width: 0;
   min-height: 0;
   max-width: none;
@@ -5430,21 +5431,6 @@ onMounted(() => {
   font-weight: 700;
   color: #c2410c;
   text-align: center;
-}
-
-/* 키보드가 떠 있으면: 등록할 메뉴 표·이용 안내는 접고, 머리줄을 줄여 대화가 보이는 공간을 넓힌다 */
-:global(html.mkb-open) .mst003-chat-popup--mobile .mst003-chat-items,
-:global(html.mkb-open) .mst003-chat-popup--mobile .mst003-chat-notice {
-  display: none;
-}
-
-:global(html.mkb-open) .mst003-chat-popup--mobile .mst003-chat-head {
-  padding-bottom: 0.3rem;
-}
-
-:global(html.mkb-open) .mst003-chat-popup--mobile {
-  gap: 0.35rem;
-  padding-bottom: 0.4rem;
 }
 
 /* 입력 영역: 채팅 앱처럼 둥근 입력창 하나 + 동그란 보내기 버튼 */

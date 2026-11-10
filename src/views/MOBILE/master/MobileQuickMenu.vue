@@ -163,6 +163,10 @@
           v-model="text"
           type="text"
           enterkeyhint="send"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
           :readonly="loading"
           @focus="onInputFocus"
           @blur="onInputBlur"
@@ -193,7 +197,6 @@ import {
   writeMenuChangeLog,
 } from "@/api/master";
 import { newMenuRow, saveMenuRow } from "./mobileMenuSave";
-import { useKeyboardViewport } from "./mobileViewport";
 import { computed, defineEmits, defineProps, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 
 const props = defineProps({
@@ -210,8 +213,6 @@ const props = defineProps({
   keyStoreList: { type: Array, default: () => [] },
 });
 const emit = defineEmits(["close", "registered"]);
-// 키보드가 올라와도 대화창이 키보드 위에 맞춰지게
-useKeyboardViewport();
 
 const GUIDE_LINES = [
   { label: "분류", text: "메뉴명으로 알맞은 소분류를 찾아 넣습니다. 못 찾으면 가장 작은 소분류 코드에 넣습니다." },
@@ -742,32 +743,16 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 높이·위치는 보이는 영역(키보드 제외)에 맞춘다 — mobileViewport.js */
+/* 화면 전체 고정. 키보드가 올라올 때 크기·위치를 따라 바꾸면 휴대폰에서 키보드가 다시 닫히므로 바꾸지 않는다 */
 .mq-sheet {
   position: fixed;
-  top: var(--mvv-top, 0px);
-  left: 0;
-  right: 0;
+  inset: 0;
   z-index: 10050;
   display: flex;
   flex-direction: column;
   height: 100vh;
-  height: var(--mvv-h, 100dvh);
+  height: 100dvh;
   background: #f8fafc;
-}
-
-/* 키보드가 떠 있으면 머리줄을 줄이고 매장명 줄은 접는다 */
-:global(html.mkb-open) .mq-head {
-  padding-top: 0.45rem;
-  padding-bottom: 0.45rem;
-}
-
-:global(html.mkb-open) .mq-store {
-  display: none;
-}
-
-:global(html.mkb-open) .mq-input {
-  padding-bottom: 0.5rem;
 }
 
 .mq-head {
