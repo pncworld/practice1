@@ -459,6 +459,19 @@
                         </template>
                       </tr>
                     </tbody>
+                    <!-- 하단 합계: 앞 N개 합계 + 전체 합계 (전부 보이면 합계 한 줄) -->
+                    <tfoot v-if="!msg.salesUnsold && msg.salesFoot && msg.salesFoot.length > 0">
+                      <tr
+                        v-for="(f, fIdx) in msg.salesFoot"
+                        :key="'foot-' + fIdx"
+                        class="mst003-chat-result-foot"
+                        :class="{ 'mst003-chat-result-foot--all': fIdx === msg.salesFoot.length - 1 }">
+                        <td colspan="3">{{ f.label }}</td>
+                        <td class="text-right">{{ f.cnt }}</td>
+                        <td class="text-right">{{ f.amt }}</td>
+                        <td class="text-right">{{ f.rate }}</td>
+                      </tr>
+                    </tfoot>
                   </table>
                 </div>
               </template>
@@ -5873,17 +5886,41 @@ const runAiSales = async (cond) => {
     content =
       rows.length === 0
         ? `${period} ${scope}에서${keywordText} 판매 내역이 없습니다.`
-        : `${period} ${scope}${keywordText} 메뉴 매출입니다. 메뉴 ${rows.length}개, 수량 ${formatAiPrice(sumCnt)}개, 실매출 ${formatAiAmount(sumAmt)}원` +
-          ` (${byQty ? "판매수량" : "실매출"} 기준 ${mode === "bottom" ? "적게" : "많이"} 팔린 순)`;
+        : `${period} ${scope}${keywordText} 메뉴 매출입니다.\n` +
+          // 합계는 앞 N개가 아니라 조건에 맞는 메뉴 전체 기준
+          `전체 메뉴 ${rows.length}개, 수량 ${formatAiPrice(sumCnt)}개, 실매출 ${formatAiAmount(sumAmt)}원입니다.\n` +
+          `(${byQty ? "판매수량" : "실매출"} 기준 ${mode === "bottom" ? "적게" : "많이"} 팔린 순)`;
   }
   const total = rows.length;
   const shown = rows.slice(0, limit > 0 ? limit : AI_SEARCH_MAX_ROWS);
   if (shown.length < total) content += ` 앞 ${shown.length}개만 보여 드립니다.`;
-  if (shown.length > 0) content += " 행을 누르면 메뉴 목록에서 그 메뉴로 이동합니다.";
+  if (shown.length > 0) content += "\n행을 누르면 메뉴 목록에서 그 메뉴로 이동합니다.";
+  // 표 하단 합계: 보이는 행 합계(앞 N개일 때만) + 전체 합계. 안 팔린 메뉴 목록에는 없음
+  const salesFoot = [];
+  if (mode !== "unsold" && shown.length > 0) {
+    const toNum = (v) => Number(String(v).replace(/[,원]/g, "")) || 0;
+    const footRow = (label, list) => {
+      const cnt = list.reduce((sum, r) => sum + toNum(r.cnt), 0);
+      const amt = list.reduce((sum, r) => sum + toNum(r.amt), 0);
+      return {
+        label,
+        cnt: formatAiPrice(cnt),
+        amt: `${formatAiAmount(amt)}원`,
+        rate: totalAmt > 0 ? `${((amt / totalAmt) * 100).toFixed(1)}%` : "-",
+      };
+    };
+    if (shown.length < total) {
+      salesFoot.push(footRow(`앞 ${shown.length}개 합계`, shown));
+      salesFoot.push(footRow(`전체 ${total}개 합계`, rows));
+    } else {
+      salesFoot.push(footRow("합계", rows));
+    }
+  }
   aiChatMessages.value.push({
     role: "assistant",
     content,
     salesRows: shown,
+    salesFoot,
     salesUnsold: mode === "unsold",
     local: true,
   });
@@ -10220,6 +10257,19 @@ const excelButton = async () => {
 .mst003-chat-result-wrap {
   max-height: 16rem;
   overflow-y: auto;
+}
+
+/* 메뉴 매출 표 하단 합계 — 앞 N개 합계(연한 배경) / 전체 합계(굵게) */
+.mst003-chat-result-foot td {
+  font-weight: 600;
+  background: #f5f3ff;
+  border-top: 1px solid #c4b5fd;
+}
+
+.mst003-chat-result-foot--all td {
+  font-weight: 700;
+  background: #ede9fe;
+  color: #4c1d95;
 }
 
 .mst003-chat-result th {
