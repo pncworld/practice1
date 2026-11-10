@@ -19,7 +19,7 @@
     </div>
   </div>
   <div
-    class="sls01-search-panel relative z-10 mt-2 w-full min-w-0 shrink-0 overflow-x-auto overflow-y-hidden rounded-lg bg-gray-200 px-4 py-2.5 sm:px-6 md:px-10 lg:px-12 xl:py-3 2xl:px-16"
+    class="sls01-search-panel relative z-10 mt-2 w-full min-w-0 shrink-0 overflow-x-auto overflow-y-hidden rounded-lg bg-gray-200 px-3 py-2.5 sm:px-4 md:px-6 lg:px-8 xl:py-3 2xl:px-10"
     :style="{
       '--sls01-control-border': sls01ControlBorder,
       '--sls01-item-gap': sls01ItemGap,
@@ -63,9 +63,9 @@
           :placeholderName="'선택'" />
         </div>
 
-      <!-- 2행 좌: 매출목표액 -->
+      <!-- 2행 좌: 일괄 적용 (요일 + 매출목표액 + 목표객수) -->
       <div class="sls01-wire-cell">
-        <div class="sls01-wire-label">매출목표액</div>
+        <div class="sls01-wire-label">목표 일괄 적용</div>
         <div class="sls01-wire-field sls01-inline-ops min-w-0">
           <select
             id="sls01-target-week"
@@ -76,15 +76,35 @@
               {{ i.strName }}
             </option>
           </select>
-          <input
-            id="sls01-target-amt"
-            type="text"
-            inputmode="numeric"
-            v-model="targetSales"
-            @keydown="onTargetSalesKeydown"
-            @input="onTargetSalesInput"
-            @paste="onTargetSalesPaste"
-            class="sls01-sg-input h-8 min-h-8 min-w-0 flex-1 rounded-md border border-solid bg-white px-2 text-right text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <div class="sls01-bulk-field sls01-bulk-field--amt">
+            <input
+              id="sls01-target-amt"
+              type="text"
+              inputmode="numeric"
+              v-model="targetSales"
+              placeholder="매출목표액"
+              aria-label="일괄 적용 매출목표액"
+              @keydown="onTargetSalesKeydown"
+              @input="onTargetSalesInput"
+              @paste="onTargetSalesPaste"
+              class="sls01-sg-input sls01-bulk-field__input h-8 min-h-8 min-w-0 rounded-md border border-solid bg-white text-right text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <span class="sls01-bulk-field__unit" aria-hidden="true">원</span>
+          </div>
+          <div class="sls01-bulk-field sls01-bulk-field--cnt">
+            <input
+              id="sls01-target-cnt"
+              type="text"
+              inputmode="numeric"
+              v-model="targetCnt"
+              placeholder="객수"
+              maxlength="7"
+              aria-label="일괄 적용 목표객수"
+              @keydown="onTargetCntKeydown"
+              @input="onTargetCntInput"
+              @paste="onTargetCntPaste"
+              class="sls01-sg-input sls01-bulk-field__input h-8 min-h-8 min-w-0 rounded-md border border-solid bg-white text-right text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <span class="sls01-bulk-field__unit" aria-hidden="true">명</span>
+          </div>
           <button
             type="button"
             class="sls01-sub-btn shrink-0"
@@ -202,18 +222,44 @@
             </div>
           </div>
           <div class="sls01-day-popup__row">
-            <label class="sls01-day-popup__label" for="sls01-popup-amt">목표액</label>
+            <label class="sls01-day-popup__label" for="sls01-popup-amt">매출목표</label>
+            <div class="sls01-day-popup__unit-field">
               <input
-              ref="sls01PopupAmtRef"
-              id="sls01-popup-amt"
+                ref="sls01PopupAmtRef"
+                id="sls01-popup-amt"
                 type="text"
-              inputmode="numeric"
-              v-model="clickedProj"
-              @keydown="onClickedProjKeydown"
-              @input="onClickedProjInput"
-              @paste="onClickedProjPaste"
-              class="sls01-day-popup__input sls01-day-popup__input--amount" />
+                inputmode="numeric"
+                v-model="clickedProj"
+                @keydown="onClickedProjKeydown"
+                @input="onClickedProjInput"
+                @paste="onClickedProjPaste"
+                class="sls01-day-popup__input sls01-day-popup__input--amount" />
+              <span class="sls01-day-popup__unit" aria-hidden="true">원</span>
+            </div>
           </div>
+          <div class="sls01-day-popup__row">
+            <label class="sls01-day-popup__label" for="sls01-popup-cnt">객수목표</label>
+            <div class="sls01-day-popup__unit-field">
+              <input
+                ref="sls01PopupCntRef"
+                id="sls01-popup-cnt"
+                type="text"
+                inputmode="numeric"
+                maxlength="7"
+                placeholder="선택 입력"
+                v-model="clickedCnt"
+                @keydown="onClickedCntKeydown"
+                @input="onClickedCntInput"
+                @paste="onClickedCntPaste"
+                class="sls01-day-popup__input sls01-day-popup__input--cnt" />
+              <span class="sls01-day-popup__unit" aria-hidden="true">명</span>
+            </div>
+          </div>
+          <p
+            v-if="sls01PopupCustPriceText"
+            class="sls01-day-popup__hint">
+            객단가 {{ sls01PopupCustPriceText }}
+          </p>
           <div class="sls01-day-popup__row">
             <label class="sls01-day-popup__label" for="sls01-popup-comment">비고</label>
               <input
@@ -252,6 +298,30 @@
         <div class="sls01-cal-toolbar__total">
           <span class="sls01-cal-toolbar__total-label">매출 목표액</span>
           <span class="sls01-cal-toolbar__total-value">{{ targetMonthSales || "0" }}</span>
+          <template v-if="targetMonthCnt">
+            <span class="sls01-cal-toolbar__total-sep" aria-hidden="true"></span>
+            <span class="sls01-cal-toolbar__total-label">객수</span>
+            <span class="sls01-cal-toolbar__total-value sls01-cal-toolbar__total-value--cnt">{{ targetMonthCnt }}명</span>
+          </template>
+        </div>
+        <div class="sls01-cal-toolbar__cust-price">
+          <label class="sls01-cal-toolbar__total-label" for="sls01-target-cust-price">
+            목표객단가
+          </label>
+          <input
+            id="sls01-target-cust-price"
+            v-model="targetCustPrice"
+            type="text"
+            inputmode="numeric"
+            class="sls01-cal-toolbar__cust-price-input"
+            :disabled="!afterSearch"
+            placeholder="선택"
+            maxlength="11"
+            aria-label="월 목표객단가"
+            @keydown="onTargetCustPriceKeydown"
+            @input="onTargetCustPriceInput"
+            @paste="onTargetCustPricePaste" />
+          <span class="sls01-cal-toolbar__cust-price-unit" aria-hidden="true">원</span>
         </div>
         <div
           v-if="showTargetCostRate"
@@ -307,7 +377,14 @@
 </template>
 
 <script setup>
-import { getCostRate, getProjByMonth, saveCostRate, saveExcelDataPlan } from "@/api/misales";
+import {
+  getCostRate,
+  getProjByMonth,
+  saveCostRate,
+  saveCustPrice,
+  saveExcelDataPlan,
+  saveExcelDataPlanCnt,
+} from "@/api/misales";
 /**
  *  해당연월 컴포넌트
  *  */
@@ -369,7 +446,8 @@ import { read, utils, writeFile } from "xlsx-js-style";
 
 /** 조회 AREA — PUR02_017INS / CRM01 search-area-layout 패턴 */
 const sls01ControlBorder = "#cbd5e1";
-const sls01ItemGap = "0.75rem";
+/** 왼쪽 열(년월·일괄 적용·엑셀)과 오른쪽 열(매장) 사이 간격 */
+const sls01ItemGap = "2.5rem";
 const sls01RowGap = "0.5625rem";
 /** 가장 긴 라벨(매출계획 엑셀 업로드) 전체 표시 */
 const sls01LabelCol = "10.5rem";
@@ -416,6 +494,13 @@ const SLS01_TARGET_COST_RATE_GROUPS = new Set([1871, 5001]);
 const showTargetCostRate = computed(() =>
   SLS01_TARGET_COST_RATE_GROUPS.has(Number(lngstoregroup.value))
 );
+/** 일괄 적용 목표객수 (선택 입력) */
+const targetCnt = ref("");
+/** 월 목표객수 합계 (일별 lngProjCnt 합, 입력된 날이 없으면 "") */
+const targetMonthCnt = ref("");
+/** 월 목표객단가 (원) — slsProjectMonthly.curTargetCustPrice, 전 브랜드 선택 입력 */
+const targetCustPrice = ref("");
+const targetCustPriceSaved = ref("");
 /** 조회 후 DB 미등록(null/공란) — 입력·저장 유도 강조 */
 const isTargetCostRateUnset = computed(
   () =>
@@ -582,14 +667,94 @@ const onSls01AmountPaste = (e, refTarget, onChanged) => {
 const onTargetSalesInput = (e) => onSls01AmountInput(e, targetSales);
 const onTargetSalesPaste = (e) => onSls01AmountPaste(e, targetSales);
 const onTargetSalesKeydown = (e) => onSls01AmountKeydown(e, targetSales);
+const onTargetCntInput = (e) => onSls01AmountInput(e, targetCnt);
+const onTargetCntPaste = (e) => onSls01AmountPaste(e, targetCnt);
+const onTargetCntKeydown = (e) => onSls01AmountKeydown(e, targetCnt);
+const onTargetCustPriceInput = (e) => onSls01AmountInput(e, targetCustPrice);
+const onTargetCustPricePaste = (e) => onSls01AmountPaste(e, targetCustPrice);
+const onTargetCustPriceKeydown = (e) => {
+  if (e.key === "Enter" && !e.isComposing) {
+    e.preventDefault();
+    e.target?.blur?.();
+    return;
+  }
+  onSls01AmountKeydown(e, targetCustPrice);
+};
 
-/** 월매출목표액 = 달력 일별 목표액(title) 합계 */
+/** 목표객수 — 미입력 "" / 입력 시 정수 문자열 (콤마 제거) */
+const parseSls01Cnt = (val) => {
+  const s = String(val ?? "")
+    .replace(/,/g, "")
+    .trim();
+  if (s === "") return "";
+  if (!/^\d+$/.test(s)) return null;
+  return String(Number(s));
+};
+
+const formatSls01Cnt = (val) => {
+  const raw = parseSls01Cnt(val);
+  if (raw === "" || raw == null) return "";
+  return formatNumberWithCommas(raw);
+};
+
+/** 매출목표 ÷ 객수목표 (원, 반올림) — 둘 중 하나라도 없으면 "" */
+const calcSls01DayCustPrice = (amt, cnt) => {
+  const a = Number(parseSls01Amount(amt));
+  const c = Number(parseSls01Cnt(cnt));
+  if (!Number.isFinite(a) || !Number.isFinite(c) || a <= 0 || c <= 0) return "";
+  return formatNumberWithCommas(String(Math.round(a / c)));
+};
+
+/** 월매출목표액 = 달력 일별 목표액(title) 합계, 월 목표객수 = 일별 객수 합계 */
 const syncMonthTargetTotal = () => {
   const sum = rowData.value.reduce(
     (acc, item) => acc + (Number(parseSls01Amount(item.title)) || 0),
     0
   );
   targetMonthSales.value = formatSls01Amount(String(sum));
+
+  let cntSum = 0;
+  let hasCnt = false;
+  rowData.value.forEach((item) => {
+    const c = parseSls01Cnt(item.lngProjCnt);
+    if (c !== "" && c != null) {
+      hasCnt = true;
+      cntSum += Number(c);
+    }
+  });
+  targetMonthCnt.value = hasCnt ? formatNumberWithCommas(String(cntSum)) : "";
+};
+
+/** 월 목표객단가 — 미입력 "" / 입력 시 정수 문자열 */
+const normalizeSls01CustPrice = (val) => parseSls01Amount(val);
+
+const isTargetCustPriceDirty = () =>
+  normalizeSls01CustPrice(targetCustPrice.value) !==
+  normalizeSls01CustPrice(targetCustPriceSaved.value);
+
+const pickCustPriceFromResponse = (res) => {
+  const list = res?.data?.List ?? res?.data?.list ?? res?.List;
+  if (!Array.isArray(list) || list.length === 0) return "";
+  const raw = list[0]?.curTargetCustPrice;
+  if (raw == null || raw === "") return "";
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return "";
+  return formatSls01Amount(String(Math.round(n)));
+};
+
+/** 상단 저장과 함께 호출 — 성공 시 true */
+const persistTargetCustPrice = async () => {
+  const payload = normalizeSls01CustPrice(targetCustPrice.value);
+  const res = await saveCustPrice(
+    lngstoregroup.value,
+    lngstorecode.value,
+    selectedstartDate.value,
+    payload
+  );
+  if (!isSls01ApiSuccess(res)) return false;
+  targetCustPriceSaved.value = formatSls01Amount(payload);
+  targetCustPrice.value = targetCustPriceSaved.value;
+  return true;
 };
 
 const parseSls01CostRate = (val) => {
@@ -668,15 +833,13 @@ const pickCostRateFromResponse = (res) => {
   return formatSls01CostRate(raw);
 };
 
+/** 월 목표원가율(1871·5001만) + 월 목표객단가(전 브랜드) — 같은 getCostRate 응답 사용 */
 const loadTargetCostRate = async () => {
-  if (!showTargetCostRate.value) {
-    targetCostRate.value = "";
-    targetCostRateSaved.value = "";
-    return;
-  }
+  targetCostRate.value = "";
+  targetCostRateSaved.value = "";
+  targetCustPrice.value = "";
+  targetCustPriceSaved.value = "";
   if (lngstorecode.value == 0 || !selectedstartDate.value) {
-    targetCostRate.value = "";
-    targetCostRateSaved.value = "";
     return;
   }
   try {
@@ -685,12 +848,19 @@ const loadTargetCostRate = async () => {
       lngstorecode.value,
       selectedstartDate.value
     );
-    const formatted = pickCostRateFromResponse(res);
-    targetCostRate.value = formatted;
-    targetCostRateSaved.value = formatted;
+    if (showTargetCostRate.value) {
+      const formatted = pickCostRateFromResponse(res);
+      targetCostRate.value = formatted;
+      targetCostRateSaved.value = formatted;
+    }
+    const price = pickCustPriceFromResponse(res);
+    targetCustPrice.value = price;
+    targetCustPriceSaved.value = price;
   } catch {
     targetCostRate.value = "";
     targetCostRateSaved.value = "";
+    targetCustPrice.value = "";
+    targetCustPriceSaved.value = "";
   }
 };
 
@@ -714,20 +884,30 @@ const setMonthSales = () => {
     return;
   }
   const rawAmt = parseSls01Amount(targetSales.value);
-  if (selectWeek.value != 0) {
-    const filteredRowData = rowData.value.filter((item) => {
-      return new Date(item.start).getDay() == selectWeek.value - 1;
+  const rawCnt = parseSls01Cnt(targetCnt.value);
+  const applyAmt = rawAmt !== "";
+  const applyCnt = rawCnt !== "" && rawCnt != null;
+  if (!applyAmt && !applyCnt) {
+    Swal.fire({
+      title: "경고",
+      text: "일괄 적용할 매출목표액 또는 객수를 입력하세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
     });
-    filteredRowData.forEach((item) => {
-      item.title = rawAmt;
-      applySls01ChangedFlag(item);
-    });
-  } else {
-    rowData.value.forEach((item) => {
-      item.title = rawAmt;
-      applySls01ChangedFlag(item);
-    });
+    return;
   }
+  // 입력한 항목만 적용 (빈 칸은 기존 값 유지)
+  const targets =
+    selectWeek.value != 0
+      ? rowData.value.filter(
+          (item) => new Date(item.start).getDay() == selectWeek.value - 1
+        )
+      : rowData.value;
+  targets.forEach((item) => {
+    if (applyAmt) item.title = rawAmt;
+    if (applyCnt) item.lngProjCnt = rawCnt;
+    applySls01ChangedFlag(item);
+  });
 };
 const rowData = ref([]);
 const rowData2 = ref([]);
@@ -756,7 +936,8 @@ const normalizeSls01StoreCode = (code) =>
   code == null || code === "" || code === 0 ? 0 : Number(code);
 
 const hasUnsavedSls01Changes = () =>
-  afterSearch.value && (!isSls01RowDataSynced() || isTargetCostRateDirty());
+  afterSearch.value &&
+  (!isSls01RowDataSynced() || isTargetCostRateDirty() || isTargetCustPriceDirty());
 
 const confirmDiscardSls01Changes = async () => {
   const result = await Swal.fire({
@@ -853,7 +1034,14 @@ const initSls01DateSelectors = () => {
 
 const clickedComment = ref("");
 const clickedProj = ref("");
+const clickedCnt = ref("");
 const clickedDate = ref("");
+
+/** 일 팝업 — 그날 매출목표 ÷ 객수목표 */
+const sls01PopupCustPriceText = computed(() => {
+  const text = calcSls01DayCustPrice(clickedProj.value, clickedCnt.value);
+  return text ? `${text}원 (매출목표 ÷ 객수목표)` : "";
+});
 
 /**
  * 	시작 월
@@ -919,8 +1107,17 @@ const SLS01_EXCEL_HEADER_LEGACY = ["매장코드", "일자", "목표금액", "�
 const SLS01_EXCEL_HEADER_STORE = ["매장명", "일자", "목표금액", "비고"];
 const SLS01_EXCEL_HEADER_LEGACY_WD = ["매장코드", "일자", "요일", "목표금액", "비고"];
 const SLS01_EXCEL_HEADER_STORE_WD = ["매장명", "일자", "요일", "목표금액", "비고"];
+/** 2026-11-09 목표객수 열 포함 양식 (샘플 download 기본). 기존 양식도 계속 업로드 가능 — 객수는 기존 값 유지 */
+const SLS01_EXCEL_HEADER_LEGACY_CNT = ["매장코드", "일자", "목표금액", "목표객수", "비고"];
+const SLS01_EXCEL_HEADER_STORE_CNT = ["매장명", "일자", "목표금액", "목표객수", "비고"];
+const SLS01_EXCEL_HEADER_LEGACY_WD_CNT = ["매장코드", "일자", "요일", "목표금액", "목표객수", "비고"];
+const SLS01_EXCEL_HEADER_STORE_WD_CNT = ["매장명", "일자", "요일", "목표금액", "목표객수", "비고"];
 
 const SLS01_EXCEL_HEADER_FORMATS = {
+  [JSON.stringify(SLS01_EXCEL_HEADER_STORE_WD_CNT)]: { type: "name", hasWeekday: true, hasCnt: true },
+  [JSON.stringify(SLS01_EXCEL_HEADER_STORE_CNT)]: { type: "name", hasWeekday: false, hasCnt: true },
+  [JSON.stringify(SLS01_EXCEL_HEADER_LEGACY_WD_CNT)]: { type: "code", hasWeekday: true, hasCnt: true },
+  [JSON.stringify(SLS01_EXCEL_HEADER_LEGACY_CNT)]: { type: "code", hasWeekday: false, hasCnt: true },
   [JSON.stringify(SLS01_EXCEL_HEADER_STORE)]: { type: "name", hasWeekday: false },
   [JSON.stringify(SLS01_EXCEL_HEADER_STORE_WD)]: { type: "name", hasWeekday: true },
   [JSON.stringify(SLS01_EXCEL_HEADER_LEGACY)]: { type: "code", hasWeekday: false },
@@ -1070,8 +1267,10 @@ const parseSls01ExcelAmount = (val) => {
 const parseSls01ExcelRow = (row, format) => {
   const formatType = getSls01ExcelFormatType(format);
   const hasWeekday = format?.hasWeekday === true;
+  const hasCnt = format?.hasCnt === true;
   const amountIdx = hasWeekday ? 3 : 2;
-  const commentIdx = hasWeekday ? 4 : 3;
+  const cntIdx = amountIdx + 1;
+  const commentIdx = hasCnt ? amountIdx + 2 : amountIdx + 1;
 
   return {
     매장코드: formatType === "code" ? row[0] ?? "" : "",
@@ -1079,6 +1278,8 @@ const parseSls01ExcelRow = (row, format) => {
     일자: normalizeSls01ExcelDate(row[1]),
     요일: hasWeekday ? String(row[2] ?? "").trim() : "",
     목표금액: parseSls01ExcelAmount(row[amountIdx]),
+    // undefined = 객수 열 없는 양식(기존 값 유지), "" = 빈칸(미입력), null = 숫자 아님
+    목표객수: hasCnt ? parseSls01Cnt(row[cntIdx]) : undefined,
     비고: row[commentIdx] ?? "",
   };
 };
@@ -1118,6 +1319,13 @@ const validateSls01ExcelUploadRows = (rows, format, options = {}) => {
       return {
         ok: false,
         message: `${year}년 ${month}월은 ${lastDay}일까지입니다. 존재하지 않는 일자(${dateStr})가 포함되어 있습니다.`,
+      };
+    }
+
+    if (row.목표객수 === null) {
+      return {
+        ok: false,
+        message: `목표객수는 0 이상의 정수로 입력하세요. (${dateStr})`,
       };
     }
 
@@ -1212,12 +1420,14 @@ const buildSls01MonthExcelRows = () => {
     const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
     const item = rowData.value.find((r) => r.start === dateStr);
     const amount = item?.title ? parseSls01ExcelAmount(item.title) : "0";
+    const cnt = parseSls01Cnt(item?.lngProjCnt);
     const comment = item?.strComment ? String(item.strComment) : "";
     rows.push([
       storeName,
       dateStr,
       getSls01WeekdayLabel(dateStr),
-      formatSls01Amount(amount) || "0",
+      Number(amount) || 0,
+      cnt === "" || cnt == null ? "" : Number(cnt),
       comment,
     ]);
   }
@@ -1268,7 +1478,7 @@ const applySls01ExcelSheetStyle = (worksheet, monthRows, headerRgb = "FFD9EAD3")
     alignment: { horizontal: "right", vertical: "center" },
   };
 
-  ["A1", "B1", "C1", "D1", "E1"].forEach((cell) => {
+  ["A1", "B1", "C1", "D1", "E1", "F1"].forEach((cell) => {
     if (worksheet[cell]) worksheet[cell].s = headerStyle;
   });
 
@@ -1277,7 +1487,12 @@ const applySls01ExcelSheetStyle = (worksheet, monthRows, headerRgb = "FFD9EAD3")
     const dow = getSls01WeekdayFromDateStr(dateStr);
     const weekendFont = sls01ExcelWeekendFont(dow);
 
-    ["A", "E"].forEach((col) => {
+    const cntCell = `E${r}`;
+    if (!worksheet[cntCell]) worksheet[cntCell] = { t: "s", v: "" };
+    worksheet[cntCell].s = amountStyle;
+    if (worksheet[cntCell].t === "n") worksheet[cntCell].z = "#,##0";
+
+    ["A", "F"].forEach((col) => {
       const cell = `${col}${r}`;
       if (worksheet[cell]) worksheet[cell].s = dataStyle;
     });
@@ -1299,7 +1514,10 @@ const applySls01ExcelSheetStyle = (worksheet, monthRows, headerRgb = "FFD9EAD3")
     }
 
     const amountCell = `D${r}`;
-    if (worksheet[amountCell]) worksheet[amountCell].s = amountStyle;
+    if (worksheet[amountCell]) {
+      worksheet[amountCell].s = amountStyle;
+      if (worksheet[amountCell].t === "n") worksheet[amountCell].z = "#,##0";
+    }
   }
 
   worksheet["!rows"] = [{ hpt: 28 }, ...new Array(rowCount).fill({ hpt: 26 })];
@@ -1312,11 +1530,14 @@ const normalizeSls01AmtForCompare = (val) => {
   return parsed === "" ? "0" : parsed;
 };
 
+const normalizeSls01CntForCompare = (val) => parseSls01Cnt(val) ?? "";
+
 const serializeSls01RowDataForCompare = (items) =>
   [...(items ?? [])]
     .map((item) => ({
       start: String(item?.start ?? ""),
       title: normalizeSls01AmtForCompare(item?.title),
+      lngProjCnt: normalizeSls01CntForCompare(item?.lngProjCnt),
       strComment: normalizeSls01Comment(item?.strComment),
     }))
     .sort((a, b) => a.start.localeCompare(b.start));
@@ -1331,17 +1552,21 @@ const getSls01BaselineByDate = () =>
       item.start,
       {
         title: item.title,
+        lngProjCnt: item.lngProjCnt ?? "",
         strComment: item.strComment ?? "",
       },
     ])
   );
 
-const isSls01ValueChanged = (baseline, amt, comment) => {
+const isSls01ValueChanged = (baseline, amt, comment, cnt) => {
   const baseAmt = normalizeSls01AmtForCompare(baseline?.title);
   const baseComment = normalizeSls01Comment(baseline?.strComment);
   const newAmt = normalizeSls01AmtForCompare(amt);
   const newComment = normalizeSls01Comment(comment);
-  return newAmt !== baseAmt || newComment !== baseComment;
+  const cntChanged =
+    normalizeSls01CntForCompare(cnt) !==
+    normalizeSls01CntForCompare(baseline?.lngProjCnt);
+  return newAmt !== baseAmt || newComment !== baseComment || cntChanged;
 };
 
 const applySls01ChangedFlag = (item) => {
@@ -1349,7 +1574,8 @@ const applySls01ChangedFlag = (item) => {
   item.sls01FromExcel = isSls01ValueChanged(
     baseline,
     item.title,
-    item.strComment
+    item.strComment,
+    item.lngProjCnt
   );
 };
 
@@ -1364,6 +1590,7 @@ const applyExcelRowsToCalendar = (rows) => {
       {
         start: item.start,
         title: item.title,
+        lngProjCnt: item.lngProjCnt ?? "",
         strComment: item.strComment ?? "",
         sls01FromExcel: false,
       },
@@ -1375,12 +1602,18 @@ const applyExcelRowsToCalendar = (rows) => {
     if (!dateStr) return;
     const newAmt = parseSls01ExcelAmount(row.목표금액);
     const newComment = row.비고 ?? "";
+    // 객수 열 없는 기존 양식이면 현재 객수 유지
+    const newCnt =
+      row.목표객수 === undefined
+        ? byDate.get(dateStr)?.lngProjCnt ?? ""
+        : row.목표객수 ?? "";
     const baseline = baselineByDate.get(dateStr);
     byDate.set(dateStr, {
       start: dateStr,
       title: newAmt,
+      lngProjCnt: newCnt,
       strComment: newComment,
-      sls01FromExcel: isSls01ValueChanged(baseline, newAmt, newComment),
+      sls01FromExcel: isSls01ValueChanged(baseline, newAmt, newComment, newCnt),
     });
   });
 
@@ -1405,7 +1638,7 @@ const parseAndValidateSls01ExcelSheet = (sheetIndex) => {
     return {
       ok: false,
       message:
-        "엑셀 형식이 올바르지 않습니다. (매장명/매장코드, 일자, 요일(선택), 목표금액, 비고)",
+        "엑셀 형식이 올바르지 않습니다. (매장명/매장코드, 일자, 요일(선택), 목표금액, 목표객수(선택), 비고)",
       sheetName,
     };
   }
@@ -1438,6 +1671,7 @@ const restoreSls01CalendarFromBaseline = () => {
   rowData.value = rowData2.value.map((item) => ({
     title: item.title,
     start: item.start,
+    lngProjCnt: item.lngProjCnt ?? "",
     strComment: item.strComment ?? "",
     sls01FromExcel: false,
   }));
@@ -1652,7 +1886,11 @@ const onClickedProjKeydown = (e) => {
   if (e.key === "Enter" && !e.isComposing) {
     e.preventDefault();
     syncClickedProjToRow();
-    advanceSls01DayPopupAfterAmtEnter();
+    // 매출목표 Enter → 객수목표 칸으로
+    nextTick(() => {
+      sls01PopupCntRef.value?.focus();
+      sls01PopupCntRef.value?.select?.();
+    });
     return;
   }
   onSls01AmountKeydown(e, clickedProj, syncClickedProjToRow);
@@ -1661,6 +1899,36 @@ const onClickedProjKeydown = (e) => {
 const onClickedProjPaste = (e) => {
   onSls01AmountPaste(e, clickedProj);
   syncClickedProjToRow();
+};
+
+const syncClickedCntToRow = () => {
+  const rawCnt = parseSls01Cnt(clickedCnt.value) ?? "";
+  rowData.value.forEach((item) => {
+    if (item.start == clickedDate.value) {
+      item.lngProjCnt = rawCnt;
+      applySls01ChangedFlag(item);
+    }
+  });
+};
+
+const onClickedCntInput = (e) => {
+  onSls01AmountInput(e, clickedCnt, syncClickedCntToRow);
+};
+
+const onClickedCntKeydown = (e) => {
+  if (e.key === "Enter" && !e.isComposing) {
+    e.preventDefault();
+    syncClickedCntToRow();
+    // 객수목표 Enter → 다음 날 (말일이면 닫기)
+    advanceSls01DayPopupAfterAmtEnter();
+    return;
+  }
+  onSls01AmountKeydown(e, clickedCnt, syncClickedCntToRow);
+};
+
+const onClickedCntPaste = (e) => {
+  onSls01AmountPaste(e, clickedCnt);
+  syncClickedCntToRow();
 };
 
 const changeComment = (e) => {
@@ -1724,13 +1992,23 @@ const saveUploadFile = async () => {
       .map((i) => Number(i.목표금액.replace(/,/g, "")))
       .join(",");
     const comments = sheetRows.map((i) => i.비고).join("\u2063");
-    const res = await saveExcelDataPlan(
-      lngstoregroup.value,
-      lngstorecode.value,
-      dates,
-      projs,
-      comments
-    );
+    // 객수 열 있는 양식만 객수 저장, 기존 양식은 객수 그대로 둠
+    const res = parsed.format?.hasCnt
+      ? await saveExcelDataPlanCnt(
+          lngstoregroup.value,
+          lngstorecode.value,
+          dates,
+          projs,
+          comments,
+          sheetRows.map((i) => i.목표객수 ?? "").join(",")
+        )
+      : await saveExcelDataPlan(
+          lngstoregroup.value,
+          lngstorecode.value,
+          dates,
+          projs,
+          comments
+        );
 
     if (!isSls01ApiSuccess(res)) {
       await Swal.fire({
@@ -1787,7 +2065,8 @@ const saveButton = async () => {
 
   const planDirty = !isSls01RowDataSynced();
   const rateDirty = showTargetCostRate.value && isTargetCostRateDirty();
-  if (!planDirty && !rateDirty) {
+  const priceDirty = isTargetCustPriceDirty();
+  if (!planDirty && !rateDirty && !priceDirty) {
     Swal.fire({
       title: "경고",
       text: "변경된 사항이 없습니다.",
@@ -1831,12 +2110,17 @@ const saveButton = async () => {
               .map((i) => i.strComment)
               .join("\u2063");
 
-            const res = await saveExcelDataPlan(
+            const cnts = rowData.value
+              .map((i) => normalizeSls01CntForCompare(i.lngProjCnt))
+              .join(",");
+
+            const res = await saveExcelDataPlanCnt(
               lngstoregroup.value,
               lngstorecode.value,
               dates,
               projs,
-              comments
+              comments,
+              cnts
             );
 
             if (!isSls01ApiSuccess(res)) {
@@ -1862,6 +2146,26 @@ const saveButton = async () => {
                 confirmButtonText: "확인",
               });
               if (planDirty) {
+                await searchButton({ skipUnsavedCheck: true });
+                await resetSls01ExcelUpload();
+              }
+              return;
+            }
+          }
+
+          if (priceDirty) {
+            const priceOk = await persistTargetCustPrice();
+            if (!priceOk) {
+              await Swal.fire({
+                title: "실패",
+                text:
+                  planDirty || rateDirty
+                    ? "다른 항목은 저장되었으나 목표객단가 저장에 실패했습니다."
+                    : "목표객단가 저장에 실패했습니다.",
+                icon: "error",
+                confirmButtonText: "확인",
+              });
+              if (planDirty || rateDirty) {
                 await searchButton({ skipUnsavedCheck: true });
                 await resetSls01ExcelUpload();
               }
@@ -1897,6 +2201,7 @@ const saveButton = async () => {
 
 const openPopUp = ref(false);
 const sls01PopupAmtRef = ref(null);
+const sls01PopupCntRef = ref(null);
 const tempDate = ref("");
 
 const focusSls01PopupAmt = () => {
@@ -1912,7 +2217,7 @@ const closePopup = () => {
 const positionSls01DayPopup = ({ jsEvent = null, dateStr = null } = {}) => {
   const margin = 8;
   const popupW = 300;
-  const popupH = 268;
+  const popupH = 340;
 
   let anchorX;
   let anchorY;
@@ -1951,6 +2256,7 @@ const loadSls01DayPopupData = (dateStr) => {
   clickedDate.value = popupInfo.start;
   clickedComment.value = popupInfo.strComment ?? "";
   clickedProj.value = formatSls01Amount(popupInfo.title);
+  clickedCnt.value = formatSls01Cnt(popupInfo.lngProjCnt);
   return true;
 };
 
@@ -2087,8 +2393,11 @@ const calendarOptions = ref({
   eventContent: function (arg) {
     const strComment = arg.event.extendedProps.strComment || "";
     const fromExcel = arg.event.extendedProps.sls01FromExcel === true;
-    const title = formatSls01Amount(arg.event.title || "");
+    const title = formatSls01Amount(arg.event.title || "") || "0";
+    const cnt = formatSls01Cnt(arg.event.extendedProps.lngProjCnt);
+    const changedCls = fromExcel ? " sls01-cal-event__amt--excel" : "";
 
+    // 비고(위, 있을 때) / 매출 줄. 객수는 매출 박스 바로 아래 별도 칩(absolute) — 달력 행 높이 계산에 안 들어감
     return {
       html: `<div class="sls01-cal-event${
         strComment ? "" : " sls01-cal-event--amt-only"
@@ -2098,9 +2407,18 @@ const calendarOptions = ref({
                       ? `<span class="sls01-cal-event__comment">${strComment}</span>`
                       : ""
                   }
-                  <span class="sls01-cal-event__amt${
-                    fromExcel ? " sls01-cal-event__amt--excel" : ""
-                  }">${title}</span>
+                  <div class="sls01-cal-event__line">
+                    <span class="sls01-cal-event__tag">매출</span>
+                    <span class="sls01-cal-event__amt${changedCls}">${title}</span>
+                  </div>
+                  ${
+                    cnt
+                      ? `<div class="sls01-cal-event__cnt-chip">
+                    <span class="sls01-cal-event__tag sls01-cal-event__tag--cnt">객수</span>
+                    <span class="sls01-cal-event__cnt${changedCls}">${cnt}<small>명</small></span>
+                  </div>`
+                      : ""
+                  }
                </div>`,
     };
   },
@@ -2151,6 +2469,23 @@ const sls01CalendarOptions = computed(() => ({
   height: sls01CalBodyHeightPx.value,
 }));
 
+/** 페이지 아래 여백(레이아웃 padding 등)만큼 세로 스크롤이 생기면 그 값을 기억해 달력 높이에서 뺌 */
+let sls01CalExtraGapPx = 0;
+const SLS01_CAL_MIN_HEIGHT = 420;
+
+const findSls01ScrollParent = (el) => {
+  let node = el?.parentElement ?? null;
+  while (node && node !== document.body) {
+    const oy = window.getComputedStyle(node).overflowY;
+    if ((oy === "auto" || oy === "scroll") && node.scrollHeight > node.clientHeight) {
+      return node;
+    }
+    node = node.parentElement;
+  }
+  const root = document.scrollingElement || document.documentElement;
+  return root.scrollHeight > root.clientHeight ? root : null;
+};
+
 const syncSls01CalendarSize = () => {
   requestAnimationFrame(() => {
     nextTick(() => {
@@ -2159,8 +2494,8 @@ const syncSls01CalendarSize = () => {
 
       const bodyTop = bodyEl.getBoundingClientRect().top;
       const nextHeight = Math.max(
-        420,
-        Math.floor(window.innerHeight - bodyTop - 16)
+        SLS01_CAL_MIN_HEIGHT,
+        Math.floor(window.innerHeight - bodyTop - 16 - sls01CalExtraGapPx)
       );
 
       if (sls01CalBodyHeightPx.value !== nextHeight) {
@@ -2172,6 +2507,27 @@ const syncSls01CalendarSize = () => {
         if (!api) return;
         api.setOption("height", sls01CalBodyHeightPx.value);
         api.updateSize();
+
+        // 그려진 뒤 스크롤 영역이 넘치면 넘친 만큼 줄임 (최대 120px, 최소 높이 유지)
+        requestAnimationFrame(() => {
+          const scroller = findSls01ScrollParent(bodyEl);
+          if (!scroller) return;
+          const over = Math.ceil(scroller.scrollHeight - scroller.clientHeight);
+          if (over <= 0 || over > 120) return;
+          if (sls01CalBodyHeightPx.value <= SLS01_CAL_MIN_HEIGHT) return;
+          sls01CalExtraGapPx += over;
+          const reduced = Math.max(
+            SLS01_CAL_MIN_HEIGHT,
+            sls01CalBodyHeightPx.value - over
+          );
+          sls01CalBodyHeightPx.value = reduced;
+          nextTick(() => {
+            const api2 = calendarRef.value?.getApi?.();
+            if (!api2) return;
+            api2.setOption("height", reduced);
+            api2.updateSize();
+          });
+        });
       });
     });
   });
@@ -2401,6 +2757,7 @@ const searchButton = async (options = {}) => {
     rowData.value = res.data.List.map((item) => ({
       title: item.lngProjAmt,
       start: item.dtmDate,
+      lngProjCnt: parseSls01Cnt(item.lngProjCnt) ?? "",
       strComment: item.strComment,
       sls01FromExcel: false,
     }));
@@ -2409,6 +2766,7 @@ const searchButton = async (options = {}) => {
         res.data.List.map((item) => ({
           title: item.lngProjAmt,
           start: item.dtmDate,
+          lngProjCnt: parseSls01Cnt(item.lngProjCnt) ?? "",
           strComment: item.strComment,
         }))
       )
@@ -2423,10 +2781,13 @@ const searchButton = async (options = {}) => {
     afterSearch.value = false;
     targetCostRate.value = "";
     targetCostRateSaved.value = "";
+    targetCustPrice.value = "";
+    targetCustPriceSaved.value = "";
     return;
   } finally {
     store.state.loading = false;
     targetSales.value = "";
+    targetCnt.value = "";
     selectWeek.value = 0;
     syncSls01CalendarSize();
   }
@@ -2450,7 +2811,7 @@ const downloadSample = () => {
 
   const storeName = getSls01CurrentStoreDisplayName();
   const monthRows = buildSls01MonthExcelRows();
-  const data = [SLS01_EXCEL_HEADER_STORE_WD, ...monthRows];
+  const data = [SLS01_EXCEL_HEADER_STORE_WD_CNT, ...monthRows];
   const worksheet = utils.aoa_to_sheet(data);
 
   worksheet["!cols"] = [
@@ -2458,6 +2819,7 @@ const downloadSample = () => {
     { wch: 14 },
     { wch: 8 },
     { wch: 16 },
+    { wch: 12 },
     { wch: 40 },
   ];
 
@@ -2467,7 +2829,7 @@ const downloadSample = () => {
   utils.book_append_sheet(workbook, worksheet, buildSls01ExcelSheetName());
 
   const safeStoreName = storeName.replace(/[\\/:*?"<>|]/g, "_") || "매장";
-  const fileName = `${currentYear.value}년${String(currentMonth.value).padStart(2, "0")}월_매출계획_${safeStoreName}.xlsx`;
+  const fileName = `일별매출계획_업로드양식_${safeStoreName}_${currentYear.value}-${String(currentMonth.value).padStart(2, "0")}.xlsx`;
   writeFile(workbook, fileName);
 };
 
@@ -2487,121 +2849,244 @@ const excelButton = () => {
     return;
   }
 
-  const events = rowData.value.map((event) => ({
-    date: new Date(event.start),
-    amount: formatSls01Amount(event.title),
-    comment: event.strComment,
-  }));
+  const year = currentYear.value;
+  const month = currentMonth.value;
+  const mm = String(month).padStart(2, "0");
+  const lastDay = getSls01MonthLastDay(year, month);
+  const storeName = getSls01CurrentStoreDisplayName() || "매장";
 
-  const allDates = events.map((e) => e.date);
-  const minDate = new Date(Math.min(...allDates));
-  const maxDate = new Date(Math.max(...allDates));
-  const year = minDate.getFullYear();
-  const month = minDate.getMonth();
-
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const totalDays = lastDay.getDate();
-
-  let calendarData = [["일", "월", "화", "수", "목", "금", "토"]];
-
-  // 월과 년을 하나의 셀로 가로로 병합하여 추가
-  const headerRow = [
-    "",
-    "",
-    {
-      v: `${currentYear.value}년 ${currentMonth.value}월`,
-      s: { alignment: { horizontal: "center" }, wrapText: true },
-    },
-    "",
-    "",
-    "",
-    "",
-  ];
-
-  // 첫 번째 행에 월과 년 정보 추가
-  calendarData.unshift(headerRow);
-
-  // 데이터를 계속해서 채워넣기
-  let week = new Array(7).fill("");
-  for (let d = 1; d <= totalDays; d++) {
-    let currentDate = new Date(year, month, d);
-    let dayOfWeek = currentDate.getDay();
-
-    let event = events.find((e) => e.date.getDate() === d);
-    week[dayOfWeek] = event
-      ? `${d}일 \n ${event.amount} \n ${event.comment}`
-      : `${d}`;
-
-    if (dayOfWeek === 6 || d === totalDays) {
-      calendarData.push(week);
-      week = new Array(7).fill("");
-    }
+  /** 일자별 값 (매출·객수는 숫자, 미입력 객수는 null) */
+  const days = [];
+  for (let d = 1; d <= lastDay; d += 1) {
+    const dateStr = `${year}-${mm}-${String(d).padStart(2, "0")}`;
+    const item = rowData.value.find((r) => r.start === dateStr);
+    const amt = Number(parseSls01Amount(item?.title)) || 0;
+    const cntRaw = parseSls01Cnt(item?.lngProjCnt);
+    const cnt = cntRaw === "" || cntRaw == null ? null : Number(cntRaw);
+    const dateAtNoon = new Date(`${dateStr}T12:00:00`);
+    days.push({
+      day: d,
+      dateStr,
+      dow: dateAtNoon.getDay(),
+      holiday: getKoreanPublicHolidayShortName(dateAtNoon) ?? "",
+      amt,
+      cnt,
+      comment: String(item?.strComment ?? "").trim(),
+    });
   }
 
-  // worksheet 생성
-  const worksheet = utils.aoa_to_sheet(calendarData);
+  const totalAmt = days.reduce((acc, x) => acc + x.amt, 0);
+  const cntDays = days.filter((x) => x.cnt != null);
+  const totalCnt = cntDays.reduce((acc, x) => acc + x.cnt, 0);
+  const custPrice = normalizeSls01CustPrice(targetCustPrice.value);
+  const costRate = showTargetCostRate.value
+    ? formatSls01CostRate(targetCostRate.value)
+    : "";
 
-  // 셀 병합 (월과 년을 하나의 셀로 가로로 병합)
-  worksheet["!merges"] = [
-    { s: { r: 0, c: 2 }, e: { r: 0, c: 3 } }, // 첫 번째 행에서 '월'과 '년'을 병합
+  // ── 공통 스타일 (xlsx-js-style) ──
+  const C = {
+    line: "CBD5E1",
+    head: "1E3A8A",
+    headSoft: "DBEAFE",
+    sun: "DC2626",
+    sat: "2563EB",
+    sunBg: "FFF1F2",
+    satBg: "EFF6FF",
+    amt: "065F46",
+    cnt: "4338CA",
+    gray: "64748B",
+  };
+  const thin = { style: "thin", color: { rgb: C.line } };
+  const medium = { style: "medium", color: { rgb: "94A3B8" } };
+  const font = (extra = {}) => ({ name: "맑은 고딕", sz: 10, ...extra });
+  const dowColor = (dow, holiday) =>
+    holiday || dow === 0 ? C.sun : dow === 6 ? C.sat : "1F2937";
+  const dowBg = (dow, holiday) =>
+    holiday || dow === 0 ? C.sunBg : dow === 6 ? C.satBg : "FFFFFF";
+  const setCell = (ws, ref, v, s, z) => {
+    const cell =
+      typeof v === "number" ? { t: "n", v } : { t: "s", v: v == null ? "" : String(v) };
+    if (s) cell.s = s;
+    if (z) cell.z = z;
+    ws[ref] = cell;
+  };
+  const col = (i) => String.fromCharCode(65 + i);
+
+  const summaryParts = [`매출목표 합계 ${formatNumberWithCommas(String(totalAmt))}원`];
+  if (cntDays.length) summaryParts.push(`객수 합계 ${formatNumberWithCommas(String(totalCnt))}명`);
+  summaryParts.push(
+    custPrice !== "" ? `목표객단가 ${formatNumberWithCommas(custPrice)}원` : "목표객단가 미입력"
+  );
+  if (costRate !== "") summaryParts.push(`목표원가율 ${costRate}%`);
+  const titleText = `${storeName}  ${year}년 ${month}월 일별 매출 계획`;
+
+  // ───────────── Sheet 1: 달력 (한 주 = 4줄: 날짜 / 매출 / 객수 / 비고) ─────────────
+  const cal = {};
+  const calMerges = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } },
   ];
-
-  // 행 높이 조정 (한 셀을 넓게 보이도록)
-  worksheet["!rows"] = new Array(calendarData.length).fill({ hpt: 65 }); // 40pt 높이
-
-  // 열 너비 조정 (요일과 날짜가 잘 보이도록)
-  worksheet["!cols"] = new Array(7).fill({ wch: 36 }); // 열 너비 15칸
-
-  // 스타일 적용 (모든 셀에 대해 정렬과 텍스트 개행 적용)
-  // Object.keys(worksheet).forEach(cellRef => {
-  //     if (cellRef[0] === "!") return; // "!merges", "!cols" 등은 무시
-
-  //     const cell = worksheet[cellRef];
-
-  //     if (cell && cell.v !== undefined) {
-  //         cell.s = {
-  //             alignment: { horizontal: "center", vertical: "center", wrapText: true }
-  //         };
-  //     }
-  // });
-  Object.keys(worksheet).forEach((cellRef) => {
-    if (cellRef[0] === "!") return; // "!merges", "!cols" 등은 무시
-
-    const cell = worksheet[cellRef];
-
-    if (cell && cell.v !== undefined) {
-      // 기본 스타일: 가운데 정렬, 개행 처리
-      const style = {
-        alignment: { horizontal: "center", vertical: "center", wrapText: true },
-      };
-
-      // 셀 참조에서 숫자(행 번호) 추출 (예: "B3" -> 3)
-      const rowNumberMatch = cellRef.match(/\d+/);
-      if (rowNumberMatch && Number(rowNumberMatch[0]) > 1) {
-        // 1행이 아닌 경우 테두리 추가 (굵은 테두리)
-        style.border = {
-          top: { style: "thick", color: { rgb: "000000" } },
-          bottom: { style: "thick", color: { rgb: "000000" } },
-          left: { style: "thick", color: { rgb: "000000" } },
-          right: { style: "thick", color: { rgb: "000000" } },
-        };
-      }
-
-      cell.s = style;
-    }
+  setCell(cal, "A1", titleText, {
+    font: font({ sz: 16, bold: true, color: { rgb: "FFFFFF" } }),
+    fill: { fgColor: { rgb: C.head } },
+    alignment: { horizontal: "center", vertical: "center" },
+  });
+  setCell(cal, "A2", summaryParts.join("   |   "), {
+    font: font({ sz: 11, bold: true, color: { rgb: C.head } }),
+    fill: { fgColor: { rgb: C.headSoft } },
+    alignment: { horizontal: "center", vertical: "center" },
+  });
+  for (let c = 1; c < 7; c += 1) {
+    setCell(cal, `${col(c)}1`, "", { fill: { fgColor: { rgb: C.head } } });
+    setCell(cal, `${col(c)}2`, "", { fill: { fgColor: { rgb: C.headSoft } } });
+  }
+  SLS01_WEEKDAY_LABELS.forEach((label, c) => {
+    setCell(cal, `${col(c)}3`, label, {
+      font: font({ sz: 11, bold: true, color: { rgb: dowColor(c, "") } }),
+      fill: { fgColor: { rgb: "F1F5F9" } },
+      alignment: { horizontal: "center", vertical: "center" },
+      border: { top: medium, bottom: medium, left: thin, right: thin },
+    });
   });
 
-  //comsole.log(calendarData);
-  // 워크북에 시트 추가
-  const workbook = utils.book_new();
-  utils.book_append_sheet(workbook, worksheet, "월별 목표금액 달력");
+  const rowsMeta = [{ hpt: 30 }, { hpt: 22 }, { hpt: 20 }];
+  const firstDow = days[0].dow;
+  const weekCount = Math.ceil((firstDow + lastDay) / 7);
+  for (let w = 0; w < weekCount; w += 1) {
+    const r0 = 3 + w * 4; // 0-based 행 번호 (날짜 줄)
+    rowsMeta.push({ hpt: 18 }, { hpt: 18 }, { hpt: 16 }, { hpt: 16 });
+    for (let c = 0; c < 7; c += 1) {
+      const idx = w * 7 + c - firstDow;
+      const x = idx >= 0 && idx < lastDay ? days[idx] : null;
+      const bg = x ? dowBg(x.dow, x.holiday) : "F8FAFC";
+      const side = { left: thin, right: thin };
+      const ref = (k) => `${col(c)}${r0 + k + 1}`;
 
-  // 파일 저장
-  writeFile(
-    workbook,
-    `${currentYear.value}년 ${currentMonth.value}월 계획 달력.xlsx`
+      setCell(cal, ref(0), x ? `${x.day}${x.holiday ? `  ${x.holiday}` : ""}` : "", {
+        font: font({ sz: 11, bold: true, color: { rgb: x ? dowColor(x.dow, x.holiday) : C.gray } }),
+        fill: { fgColor: { rgb: bg } },
+        alignment: { horizontal: "left", vertical: "center", indent: 1 },
+        border: { ...side, top: medium },
+      });
+      setCell(
+        cal,
+        ref(1),
+        x ? x.amt : "",
+        {
+          font: font({ sz: 11, bold: true, color: { rgb: C.amt } }),
+          fill: { fgColor: { rgb: bg } },
+          alignment: { horizontal: "right", vertical: "center" },
+          border: side,
+        },
+        "#,##0\"원\""
+      );
+      setCell(
+        cal,
+        ref(2),
+        x && x.cnt != null ? x.cnt : "",
+        {
+          font: font({ color: { rgb: C.cnt } }),
+          fill: { fgColor: { rgb: bg } },
+          alignment: { horizontal: "right", vertical: "center" },
+          border: side,
+        },
+        "#,##0\"명\""
+      );
+      setCell(cal, ref(3), x ? x.comment : "", {
+        font: font({ sz: 9, color: { rgb: C.gray } }),
+        fill: { fgColor: { rgb: bg } },
+        alignment: { horizontal: "left", vertical: "center", indent: 1, shrinkToFit: true },
+        border: { ...side, bottom: medium },
+      });
+    }
+  }
+  cal["!ref"] = `A1:G${3 + weekCount * 4}`;
+  cal["!merges"] = calMerges;
+  cal["!cols"] = new Array(7).fill({ wch: 19 });
+  cal["!rows"] = rowsMeta;
+
+  // ───────────── Sheet 2: 일자별 목록 + 합계 ─────────────
+  const list = {};
+  const listHeader = ["일자", "요일", "매출목표(원)", "객수목표(명)", "객단가(원)", "비고"];
+  const listMerges = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 5 } },
+  ];
+  setCell(list, "A1", titleText, {
+    font: font({ sz: 14, bold: true, color: { rgb: "FFFFFF" } }),
+    fill: { fgColor: { rgb: C.head } },
+    alignment: { horizontal: "center", vertical: "center" },
+  });
+  setCell(list, "A2", summaryParts.join("   |   "), {
+    font: font({ bold: true, color: { rgb: C.head } }),
+    fill: { fgColor: { rgb: C.headSoft } },
+    alignment: { horizontal: "center", vertical: "center" },
+  });
+  for (let c = 1; c < 6; c += 1) {
+    setCell(list, `${col(c)}1`, "", { fill: { fgColor: { rgb: C.head } } });
+    setCell(list, `${col(c)}2`, "", { fill: { fgColor: { rgb: C.headSoft } } });
+  }
+  const box = { top: thin, bottom: thin, left: thin, right: thin };
+  listHeader.forEach((h, c) => {
+    setCell(list, `${col(c)}3`, h, {
+      font: font({ bold: true }),
+      fill: { fgColor: { rgb: "F1F5F9" } },
+      alignment: { horizontal: "center", vertical: "center" },
+      border: { ...box, bottom: medium },
+    });
+  });
+  days.forEach((x, i) => {
+    const r = 4 + i;
+    const color = dowColor(x.dow, x.holiday);
+    const base = { border: box, alignment: { vertical: "center" } };
+    const perCust = x.cnt ? Math.round(x.amt / x.cnt) : "";
+    setCell(list, `A${r}`, x.dateStr, {
+      ...base,
+      font: font({ color: { rgb: color } }),
+      alignment: { horizontal: "center", vertical: "center" },
+    });
+    setCell(list, `B${r}`, `${SLS01_WEEKDAY_LABELS[x.dow]}${x.holiday ? ` (${x.holiday})` : ""}`, {
+      ...base,
+      font: font({ color: { rgb: color } }),
+      alignment: { horizontal: "center", vertical: "center" },
+    });
+    setCell(list, `C${r}`, x.amt, { ...base, font: font(), alignment: { horizontal: "right", vertical: "center" } }, "#,##0");
+    setCell(list, `D${r}`, x.cnt != null ? x.cnt : "", { ...base, font: font(), alignment: { horizontal: "right", vertical: "center" } }, "#,##0");
+    setCell(list, `E${r}`, perCust, { ...base, font: font({ color: { rgb: C.gray } }), alignment: { horizontal: "right", vertical: "center" } }, "#,##0");
+    setCell(list, `F${r}`, x.comment, { ...base, font: font() });
+  });
+  const totalRow = 4 + days.length;
+  const totalStyle = (align) => ({
+    font: font({ bold: true }),
+    fill: { fgColor: { rgb: C.headSoft } },
+    alignment: { horizontal: align, vertical: "center" },
+    border: { ...box, top: medium },
+  });
+  setCell(list, `A${totalRow}`, "합계", totalStyle("center"));
+  setCell(list, `B${totalRow}`, "", totalStyle("center"));
+  setCell(list, `C${totalRow}`, totalAmt, totalStyle("right"), "#,##0");
+  setCell(list, `D${totalRow}`, cntDays.length ? totalCnt : "", totalStyle("right"), "#,##0");
+  // 객단가 합계 = 객수 입력된 날의 매출목표 합 ÷ 객수 합
+  const cntDaysAmt = cntDays.reduce((acc, x) => acc + x.amt, 0);
+  setCell(
+    list,
+    `E${totalRow}`,
+    totalCnt > 0 ? Math.round(cntDaysAmt / totalCnt) : "",
+    totalStyle("right"),
+    "#,##0"
   );
+  setCell(list, `F${totalRow}`, "", totalStyle("left"));
+  list["!ref"] = `A1:F${totalRow}`;
+  list["!merges"] = listMerges;
+  list["!cols"] = [{ wch: 12 }, { wch: 12 }, { wch: 15 }, { wch: 13 }, { wch: 12 }, { wch: 36 }];
+  list["!rows"] = [{ hpt: 28 }, { hpt: 20 }, { hpt: 20 }];
+
+  const workbook = utils.book_new();
+  utils.book_append_sheet(workbook, cal, "달력");
+  utils.book_append_sheet(workbook, list, "일자별 목록");
+
+  const safeStoreName = storeName.replace(/[\\/:*?"<>|]/g, "_") || "매장";
+  writeFile(workbook, `일별매출계획_${safeStoreName}_${year}-${mm}.xlsx`);
 };
 /**
  * 그리드 초기화
@@ -2617,6 +3102,10 @@ const initGrid = () => {
   targetMonthSales.value = formatSls01Amount("0");
   targetCostRate.value = "";
   targetCostRateSaved.value = "";
+  targetCnt.value = "";
+  targetMonthCnt.value = "";
+  targetCustPrice.value = "";
+  targetCustPriceSaved.value = "";
   selectWeek.value = 0;
 };
 </script>
@@ -2627,7 +3116,8 @@ const initGrid = () => {
   width: 100%;
   min-width: 0;
   align-items: center;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* 왼쪽(년월·일괄 적용·엑셀 업로드)을 조금 좁히고 오른쪽(매장 콤보)에 폭을 더 줌 — 둘 다 축소 가능 */
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1fr);
   column-gap: var(--sls01-item-gap);
   row-gap: var(--sls01-row-gap);
 }
@@ -2664,6 +3154,37 @@ const initGrid = () => {
 .sls01-excel-store-col {
   grid-column: 2;
   align-self: center;
+}
+
+/* 목표 일괄 적용 — 매출목표액(넓게) + 객수(좁게), 단위는 칸 안 오른쪽 */
+.sls01-bulk-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/* 매출목표액(최대 9자리+콤마) : 객수(최대 5자리) ≈ 1.5 : 1 */
+.sls01-bulk-field--amt {
+  flex: 1.5 1 0;
+}
+
+.sls01-bulk-field--cnt {
+  flex: 1 1 0;
+}
+
+.sls01-bulk-field__input {
+  width: 100%;
+  padding-left: 0.5rem;
+  padding-right: 1.75rem;
+}
+
+.sls01-bulk-field__unit {
+  position: absolute;
+  right: 0.5rem;
+  font-size: 0.8125rem;
+  color: rgb(100 116 139);
+  pointer-events: none;
 }
 
 .sls01-pick-span {
@@ -2777,6 +3298,72 @@ const initGrid = () => {
   font-variant-numeric: tabular-nums;
   color: rgb(30 64 175);
   white-space: nowrap;
+}
+
+.sls01-cal-toolbar__total-sep {
+  width: 1px;
+  height: 1rem;
+  margin: 0 0.125rem;
+  background: rgb(147 197 253);
+}
+
+.sls01-cal-toolbar__total-value--cnt {
+  color: rgb(67 56 202);
+}
+
+/* 월 목표객단가 — 선택 입력(미입력 강조 없음) */
+.sls01-cal-toolbar__cust-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  max-width: 100%;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid rgb(199 210 254);
+  border-radius: 9999px;
+  background: rgb(238 242 255);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7);
+}
+
+.sls01-cal-toolbar__cust-price .sls01-cal-toolbar__total-label {
+  color: rgb(67 56 202);
+}
+
+.sls01-cal-toolbar__cust-price-input {
+  box-sizing: border-box;
+  width: 6.5rem;
+  height: 1.75rem;
+  margin: 0;
+  padding: 0 0.375rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: rgb(55 48 163);
+  background: #fff;
+  border: 1.5px solid rgb(165 180 252);
+  border-radius: 0.375rem;
+}
+
+.sls01-cal-toolbar__cust-price-input::placeholder {
+  color: rgb(165 180 252);
+  font-weight: 500;
+}
+
+.sls01-cal-toolbar__cust-price-input:focus {
+  outline: none;
+  border-color: rgb(99 102 241);
+  box-shadow: 0 0 0 3px rgb(199 210 254 / 0.85);
+}
+
+.sls01-cal-toolbar__cust-price-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.sls01-cal-toolbar__cust-price-unit {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: rgb(67 56 202);
 }
 
 .sls01-cal-toolbar__cost-rate {
@@ -3099,6 +3686,11 @@ const initGrid = () => {
   box-sizing: border-box;
 }
 
+/* 이 화면만: 매장그룹 콤보 폭 80%(11rem → 8.8rem), 줄어든 만큼 매장명 콤보(1fr)가 넓어짐 */
+.sls01-pick-span :deep(.pss-grid) {
+  --pss-grp-col: 8.8rem;
+}
+
 .sls01-popup-layer {
   pointer-events: none;
 }
@@ -3272,6 +3864,44 @@ const initGrid = () => {
   color: rgb(146 64 14);
 }
 
+.sls01-day-popup__input--cnt {
+  text-align: right;
+  font-weight: 600;
+  color: rgb(67 56 202);
+}
+
+.sls01-day-popup__input--cnt::placeholder {
+  font-weight: 400;
+  color: rgb(165 180 252);
+}
+
+/* 입력칸 안 오른쪽 단위(원/명) */
+.sls01-day-popup__unit-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.sls01-day-popup__unit-field .sls01-day-popup__input {
+  padding-right: 1.75rem;
+}
+
+.sls01-day-popup__unit {
+  position: absolute;
+  right: 0.5rem;
+  font-size: 0.8125rem;
+  color: rgb(100 116 139);
+  pointer-events: none;
+}
+
+.sls01-day-popup__hint {
+  margin: -0.25rem 0 0;
+  padding-left: 4.25rem;
+  font-size: 0.75rem;
+  color: rgb(100 116 139);
+}
+
 .sls01-day-popup__footer {
   display: flex;
   justify-content: flex-end;
@@ -3424,6 +4054,86 @@ const initGrid = () => {
 }
 
 .sls01-cal-section .sls01-cal-event__amt--excel {
+  color: rgb(126 28 158) !important;
+}
+
+/* 객수 칩 — 매출 박스 바로 아래에 붙임. position:absolute 라 박스·행 높이는 그대로 */
+.sls01-cal-section .fc-daygrid-event-harness .fc-event:has(.sls01-cal-event__cnt-chip),
+.sls01-cal-section .fc-daygrid-event-harness .fc-event:has(.sls01-cal-event__cnt-chip) .fc-event-main,
+.sls01-cal-section .sls01-cal-event:has(.sls01-cal-event__cnt-chip) {
+  overflow: visible !important;
+}
+
+.sls01-cal-section .sls01-cal-event {
+  position: relative;
+}
+
+.sls01-cal-section .sls01-cal-event__cnt-chip {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: -1px;
+  right: -1px;
+  z-index: 2;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem;
+  min-width: 0;
+  padding: 0.0625rem 0.25rem;
+  background: rgb(238 242 255);
+  border: 1px solid rgb(165 180 252);
+  border-radius: 0.25rem;
+  box-sizing: border-box;
+}
+
+/* 매출 줄 — 왼쪽 라벨 + 오른쪽 정렬 숫자 */
+.sls01-cal-section .sls01-cal-event__line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.sls01-cal-section .sls01-cal-event__line .sls01-cal-event__amt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sls01-cal-section .sls01-cal-event__tag {
+  flex-shrink: 0;
+  padding: 0 0.3125rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: rgb(6 95 70);
+  background: rgb(255 255 255 / 0.55);
+  border-radius: 0.25rem;
+}
+
+.sls01-cal-section .sls01-cal-event__tag--cnt {
+  color: rgb(67 56 202);
+}
+
+.sls01-cal-section .sls01-cal-event__cnt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(0.875rem, 2vh, 1rem);
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  color: rgb(67 56 202) !important;
+}
+
+.sls01-cal-section .sls01-cal-event__cnt small {
+  margin-left: 0.0625rem;
+  font-size: 0.75em;
+  font-weight: 500;
+}
+
+.sls01-cal-section .sls01-cal-event__cnt.sls01-cal-event__amt--excel {
   color: rgb(126 28 158) !important;
 }
 

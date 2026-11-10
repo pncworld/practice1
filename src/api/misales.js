@@ -1323,6 +1323,28 @@ export const saveExcelDataPlan = (groupCd, storecd, date, proj, comment) => {
     COMMENT: comment,
   });
 };
+
+/** 일별 매출계획 + 일별 목표 객수 저장 (slsProject.lngProjCnt) — custCnt: 일자 순서 쉼표 구분, 빈값 = 미입력 */
+export const saveExcelDataPlanCnt = (groupCd, storecd, date, proj, comment, custCnt) => {
+  return api2.post("/MISALES/SLS01_001INS.asmx/saveExcelDataPlanCnt", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DTM_DATE: date,
+    PROJ: proj,
+    COMMENT: comment,
+    CUST_CNT: custCnt,
+  });
+};
+
+/** 월 목표 객단가 저장 (slsProjectMonthly.curTargetCustPrice) — 빈값 = 미입력 */
+export const saveCustPrice = (groupCd, storecd, startdate, custPrice) => {
+  return api2.post("/MISALES/SLS01_001INS.asmx/saveCustPrice", {
+    GROUP_CD: groupCd,
+    STORE_CD: storecd,
+    DTM_DATE: startdate,
+    CUST_PRICE: custPrice,
+  });
+};
 export const getReceiptDetailStatus = (
   groupCd,
   storecd,
