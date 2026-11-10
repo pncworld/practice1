@@ -198,7 +198,7 @@ import {
   writeMenuChangeLog,
 } from "@/api/master";
 import { newMenuRow, saveMenuRow } from "./mobileMenuSave";
-import { useChatKeyboard } from "./mobileChatKeyboard";
+import { scrollToLatest, useChatKeyboard } from "./mobileChatKeyboard";
 import { computed, defineEmits, defineProps, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 
 const props = defineProps({
@@ -258,9 +258,10 @@ const push = (role, content, extra = {}) => {
   if (role === "assistant") speakAssistant(content, extra);
   scrollLog();
 };
+// 새 답변은 내가 보낸 말풍선부터 보이게 (긴 답변의 앞부분을 지나치지 않게) — mobileChatKeyboard.js
 const scrollLog = async () => {
   await nextTick();
-  if (logRef.value) logRef.value.scrollTop = logRef.value.scrollHeight;
+  scrollToLatest(logRef.value, ".mq-row.is-user");
 };
 // 휴대폰은 입력창에 커서를 주면 키보드가 올라와 화면을 가리므로, 사용자가 입력 중일 때(입력창에 커서가 있을 때)만
 // 처리 뒤 입력창을 유지한다. 창을 열 때·버튼을 누른 뒤에는 키보드를 올리지 않는다

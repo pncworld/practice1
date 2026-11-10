@@ -971,7 +971,7 @@ import { getPosList } from "@/api/common";
 import { computed, defineEmits, defineProps, nextTick, onMounted, ref, watch } from "vue";
 import { mobileAlert, mobileConfirm } from "./mobileDialog";
 import { newMenuRow, saveMenuRow } from "./mobileMenuSave";
-import { useChatKeyboard } from "./mobileChatKeyboard";
+import { scrollToLatest, useChatKeyboard } from "./mobileChatKeyboard";
 
 const props = defineProps({
   // 열림 여부 (닫아도 대화 내용은 남겨 두고, 다시 열면 이어서 한다 — 웹과 같음)
@@ -4001,11 +4001,10 @@ const growAiInput = () => {
   el.style.height = `${el.scrollHeight}px`;
 };
 
+// [모바일] 맨 아래 대신 내가 보낸 말풍선부터 보이게 (mobileChatKeyboard.js scrollToLatest)
 const scrollAiChatLog = async () => {
   await nextTick();
-  if (aiChatLogRef.value) {
-    aiChatLogRef.value.scrollTop = aiChatLogRef.value.scrollHeight;
-  }
+  scrollToLatest(aiChatLogRef.value, ".mst003-chat-row--user");
 };
 
 // 메뉴 개별 설정 브랜드(공통메뉴 아님)는 매장을 골라야 그 매장 메뉴로 AI 기능을 쓸 수 있다

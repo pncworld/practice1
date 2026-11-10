@@ -30,7 +30,25 @@ const restoreHint = () => {
   originalContent = null;
 };
 
-/** 대화창 컴포넌트 setup 에서 부른다. scrollToBottom: 대화 내용을 맨 아래로 내리는 함수 */
+/**
+ * 새 답변 보기 (Claude 앱 방식): 마지막으로 내가 보낸 말풍선을 대화 영역 맨 위에 맞추고 그 아래로 답변을 처음부터 보여 준다.
+ * 답변이 짧아 화면이 남으면 맨 아래까지 내린다. 무조건 맨 아래로 내리면 긴 답변의 앞부분(알아야 할 내용)을 지나치기 때문
+ * log: 대화 스크롤 영역, userSelector: 내 말풍선 줄의 선택자
+ */
+export const scrollToLatest = (log, userSelector) => {
+  if (!log) return;
+  const users = log.querySelectorAll(userSelector);
+  const last = users[users.length - 1];
+  const maxTop = log.scrollHeight - log.clientHeight;
+  if (!last) {
+    log.scrollTop = maxTop;
+    return;
+  }
+  const top = last.getBoundingClientRect().top - log.getBoundingClientRect().top + log.scrollTop - 8;
+  log.scrollTop = Math.max(0, Math.min(top, maxTop));
+};
+
+/** 대화창 컴포넌트 setup 에서 부른다. scrollToBottom: 키보드가 올라올 때 대화 위치를 맞추는 함수 */
 export const useChatKeyboard = (scrollToBottom) => {
   let lastHeight = 0;
   const onViewportResize = () => {
