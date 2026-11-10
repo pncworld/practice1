@@ -158,9 +158,11 @@
             <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
           </svg>
         </button>
+        <!-- v-model 은 한글 조합 중인 글자를 늦게 넘겨 보내기 버튼이 꺼져 있거나 마지막 글자가 빠지므로 input 이벤트로 바로 반영 -->
         <input
           ref="inputRef"
-          v-model="text"
+          :value="text"
+          @input="text = $event.target.value"
           type="text"
           enterkeyhint="send"
           autocomplete="off"
@@ -171,14 +173,13 @@
           @focus="onInputFocus"
           @blur="onInputBlur"
           placeholder="예: 레몬에이드 4500" />
-        <!-- 처리 중에도 입력창 포커스(키보드)를 유지: 잠그지 않고 읽기 전용, 보내기 버튼은 누를 때 포커스를 가져가지 않음 -->
+        <!-- 처리 중에도 입력창 포커스(키보드)를 유지: 잠그지 않고 읽기 전용.
+             보내기 버튼은 누르면 입력창 커서가 빠지게 둔다 — 그래야 한글 조합 중인 마지막 글자가 확정된 뒤 보내진다 -->
         <button
           type="submit"
           class="mq-send"
           :disabled="loading || text.trim() === ''"
-          aria-label="보내기"
-          @mousedown.prevent
-          @touchstart.prevent="send">
+          aria-label="보내기">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M4 12h14M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
@@ -386,6 +387,8 @@ const startRecognition = () => {
   recognition.maxAlternatives = 1;
   let finalSaid = "";
   recognition.onresult = (event) => {
+    // 멈춘 뒤 늦게 들어온 결과는 버린다
+    if (voiceStep.value === "") return;
     let said = "";
     let isFinal = false;
     for (let i = 0; i < event.results.length; i++) {
@@ -546,6 +549,8 @@ const findSmallestSubGroup = () =>
 const send = async () => {
   const input = text.value.trim();
   if (input === "" || loading.value) return;
+  // 마이크가 듣는 중이면 멈춘다 (보낸 뒤 늦게 들어온 음성 결과가 입력창을 다시 채우지 않게)
+  if (voiceStep.value !== "") stopListening();
   if (step.value === "keyAsk") {
     if (YES_RE.test(input)) {
       text.value = "";

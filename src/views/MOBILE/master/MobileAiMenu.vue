@@ -879,7 +879,7 @@
           @change="onAiChatImageSelected" />
         <textarea
           ref="aiChatTextareaRef"
-          v-model="aiChatText"
+          :value="aiChatText"
           class="mst003-chat-textarea"
           rows="1"
           maxlength="2000"
@@ -891,15 +891,13 @@
           :readonly="aiChatLoading"
           @focus="onAiInputFocus"
           @blur="onAiInputBlur"
-          @input="growAiInput"
+          @input="onAiInput"
           @keydown.enter="onAiChatEnter"></textarea>
         <button
           type="button"
           class="pnc-sub-btn mst003-chat-send shrink-0"
           :disabled="aiChatLoading"
           aria-label="보내기"
-          @mousedown.prevent
-          @touchstart.prevent="sendAiChat"
           @click="sendAiChat">
           <svg
             class="pnc-sub-btn__icon"
@@ -3987,6 +3985,11 @@ const focusAiChatInput = async () => {
   growAiInput();
   if (aiTyping && aiChatTextareaRef.value && document.activeElement !== aiChatTextareaRef.value) aiChatTextareaRef.value.focus();
 };
+// [모바일] 입력값을 글자마다 바로 반영(한글 조합 중 포함)하고 높이를 맞춘다
+const onAiInput = (e) => {
+  aiChatText.value = e.target.value;
+  growAiInput();
+};
 // [모바일] 입력창 높이: 글 줄 수에 맞춰 늘리고 줄인다 (최대 높이는 CSS)
 const growAiInput = () => {
   const el = aiChatTextareaRef.value;
@@ -4105,8 +4108,21 @@ const closeAiChat = () => {
   aiChatOpen.value = false;
 };
 const onAiChatEnter = (e) => {
-  if (e.isComposing || e.shiftKey) return;
+  if (e.shiftKey) return;
   e.preventDefault();
+  const el = e.target;
+  // 화면에 보이는 글자(조합 중인 글자 포함)를 그대로 보낸다
+  aiChatText.value = el.value;
+  if (e.isComposing || e.keyCode === 229) {
+    // 조합 중이면 커서를 잠깐 빼 조합을 확정한 뒤 다시 넣고 보낸다 (키보드 유지)
+    el.blur();
+    setTimeout(() => {
+      el.focus();
+      aiChatText.value = el.value;
+      sendAiChat();
+    }, 0);
+    return;
+  }
   sendAiChat();
 };
 
