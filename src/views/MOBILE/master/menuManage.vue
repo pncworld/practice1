@@ -232,6 +232,15 @@
                 </template>
               </div>
               </template>
+              <!-- 메뉴 이미지: 이미지를 올린 메뉴만 버튼이 보이고, 누를 때만 불러와 잠깐 띄운다 -->
+              <button v-if="r.strUserFileName" type="button" class="mm-image-btn" @click="openImage(r)">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <rect x="3.5" y="5" width="17" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+                  <circle cx="9" cy="10" r="1.6" fill="currentColor" />
+                  <path d="M4.5 17l5-4.5 3.5 3 2.5-2 4 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                </svg>
+                이미지 보기
+              </button>
               <button type="button" class="mm-more" @click="showMore = !showMore">
                 {{ showMore ? "접기" : "더보기" }}
               </button>
@@ -282,6 +291,24 @@
       @focus-menu="onAiFocusMenu" />
     <!-- 모바일 전용 확인 시트·완료 알림 (웹 화면 알림창은 그대로) -->
     <MobileDialog />
+    <!-- 메뉴 이미지 미리보기: 화면을 누르면 닫힘 -->
+    <Teleport to="body">
+      <div v-if="imageView" class="mm-image-mask" @click="imageView = null">
+        <div class="mm-image-box">
+          <div class="mm-image-name">{{ imageView.name }}</div>
+          <div class="mm-image-frame">
+            <img
+              v-if="!imageView.failed"
+              :src="imageView.src"
+              :alt="`${imageView.name} 메뉴 이미지`"
+              class="mm-image-img"
+              @error="onImageError" />
+            <div v-else class="mm-image-empty">이미지를 불러오지 못했습니다.</div>
+          </div>
+          <div class="mm-image-hint">화면을 누르면 닫힙니다</div>
+        </div>
+      </div>
+    </Teleport>
     <!-- 맨 위로: 메뉴 화면에서 항상 떠 있다 -->
     <Transition name="mm-top-fade">
       <button v-if="accessState === 'ok'" type="button" class="mm-to-top" aria-label="맨 위로" @click="scrollToTop">
@@ -444,6 +471,35 @@ const setItemRef = (code, el) => {
   if (el) itemRefs.set(String(code), el);
   else itemRefs.delete(String(code));
 };
+/* ---------- 메뉴 이미지 미리보기 ---------- */
+// 파일 이름은 서버 메뉴 조회가 만들어 준다(strUserFileName2: 공통 메뉴·1989·1750 은 그룹코드, 그 밖은 매장코드 10자리_메뉴코드 10자리.jpg).
+// 큰 이미지(MenuImage/t_pos, 1792×1344)를 먼저 보여 주고, 없으면 작은 이미지(MenuImage/Image, 225×160)로 바꾼다
+const MENU_IMAGE_BASE = "https://www.pncapi.kr/MenuImage";
+const imageView = ref(null); // { name, file, src, step: 'large'|'small', failed }
+const openImage = (r) => {
+  const file = String(r.strUserFileName2 || "");
+  if (!file) return;
+  const v = Date.now();
+  imageView.value = {
+    name: r.strName || String(r.lngCode),
+    file,
+    v,
+    step: "large",
+    src: `${MENU_IMAGE_BASE}/t_pos/${file}?v=${v}`,
+    failed: false,
+  };
+};
+const onImageError = () => {
+  const iv = imageView.value;
+  if (!iv) return;
+  if (iv.step === "large") {
+    iv.step = "small";
+    iv.src = `${MENU_IMAGE_BASE}/Image/${iv.file}?v=${iv.v}`;
+  } else {
+    iv.failed = true;
+  }
+};
+
 const toggle = (code) => {
   if (saving.value) return;
   const c = String(code);
@@ -703,7 +759,10 @@ const closeQuick = async () => {
 // 대화창은 화면 위에 띄운 창이라 그대로면 뒤로가기가 메뉴 관리 화면 자체를 떠난다(대시보드로 나감).
 // 대화창을 열 때 주소에 ?chat=quick|ai 를 붙여 방문 기록을 하나 쌓고, 뒤로가기로 그 표시가 빠지면 대화창을 닫는다.
 // 닫기 버튼 등으로 닫으면 쌓아 둔 기록을 되돌려(router.back) 다음 뒤로가기는 원래대로 동작하게 한다
-const openChat = computed(() => (quickOpen.value ? "quick" : aiOpen.value ? "ai" : ""));
+// 메뉴 이미지 미리보기도 같은 방식으로 뒤로가기에 닫힌다 (?chat=image)
+const openChat = computed(() =>
+  quickOpen.value ? "quick" : aiOpen.value ? "ai" : imageView.value ? "image" : ""
+);
 // 주소 변경은 차례대로 처리한다 (열자마자 닫히는 경우에도 push 가 끝난 뒤 back 하도록)
 let chatNav = Promise.resolve();
 const waitChatQueryChange = () =>
@@ -739,6 +798,7 @@ watch(
     if (v) return;
     if (quickOpen.value) closeQuick();
     if (aiOpen.value) aiOpen.value = false;
+    if (imageView.value) imageView.value = null;
   }
 );
 // 대화창이 열린 주소로 새로 들어온 경우(새로고침 등)는 표시를 지운다
@@ -1309,6 +1369,83 @@ onMounted(async () => {
 
 .mm-edit-btn:disabled {
   opacity: 0.5;
+}
+
+.mm-image-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.45rem;
+  border: 1px solid #c7d2fe;
+  border-radius: 0.6rem;
+  background: #eef2ff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #4338ca;
+}
+
+.mm-image-btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.mm-image-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 10055;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.mm-image-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 32rem;
+}
+
+.mm-image-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.mm-image-frame {
+  width: 100%;
+  border-radius: 0.9rem;
+  background: #fff;
+  overflow: hidden;
+}
+
+.mm-image-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  background: #fff;
+}
+
+.mm-image-empty {
+  padding: 2.5rem 1rem;
+  font-size: 0.85rem;
+  color: #64748b;
+  text-align: center;
+}
+
+.mm-image-hint {
+  font-size: 0.72rem;
+  color: #cbd5e1;
 }
 
 .mm-more {
