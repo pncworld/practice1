@@ -123,40 +123,51 @@
                 </li>
               </ul>
             </template>
-            <!-- 메뉴 조회 결과: 행을 누르면 메뉴 목록 그리드에서 그 메뉴로 이동 -->
-            <template v-else-if="msg.searchRows">
-              <div class="mai-text"><span v-for="(p, pi) in maiParts(msg.content)" :key="pi" :class="{ 'mai-num': p.num }">{{ p.text }}</span></div>
-              <div v-if="msg.searchRows.length > 0" class="mst003-chat-result-wrap">
-                <table class="mst003-chat-lang mst003-chat-result">
-                  <thead>
-                    <tr>
-                      <th>메뉴코드</th>
-                      <th>메뉴명</th>
-                      <th class="text-right">판매가</th>
-                      <th>분류</th>
-                      <th>사용여부</th>
-                      <th v-if="msg.searchDateLabel">{{ msg.searchDateLabel }}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="r in msg.searchRows"
-                      :key="r.code"
-                      class="mst003-chat-result-row"
-                      title="누르면 메뉴 목록에서 이 메뉴로 이동합니다"
-                      @click="focusAiMenuRowFromChat(r.code)">
-                      <td>{{ r.code }}</td>
-                      <td>{{ r.name }}</td>
-                      <td class="text-right">{{ r.price }}</td>
-                      <td>{{ r.group || "-" }}</td>
-                      <td :class="{ 'text-red-600': r.use === '미사용' }">{{ r.use }}</td>
-                      <td v-if="msg.searchDateLabel" class="whitespace-nowrap">{{ r.date }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+          <!-- [모바일] 이어서 보기 질문: 「이어서 나머지 N개 메뉴도 보여드릴까요?」 + 네 / 아니오 (가장 최근 질문만 누를 수 있음) -->
+          <template v-else-if="msg.moreAsk">
+            <div class="mai-text"><span v-for="(p, pi) in maiParts(msg.content)" :key="pi" :class="{ 'mai-num': p.num }">{{ p.text }}</span></div>
+            <div class="mst003-chat-confirm-btns">
+              <button
+                type="button"
+                class="pnc-sub-btn"
+                :disabled="msg.moreDone || msg.moreSeq !== aiMoreSeq || aiChatLoading"
+                @click="answerAiMore(msg, true)">
+                네, 보여줘
+              </button>
+              <button
+                type="button"
+                class="pnc-sub-btn pnc-sub-btn--gray"
+                :disabled="msg.moreDone || msg.moreSeq !== aiMoreSeq || aiChatLoading"
+                @click="answerAiMore(msg, false)">
+                아니오
+              </button>
+            </div>
+          </template>
+          <!-- [모바일] 메뉴 조회 결과: 표 대신 카드, 누르면 대화창을 닫고 메뉴 목록에서 그 메뉴를 펼침 -->
+          <template v-else-if="msg.searchRows">
+            <div class="mai-text"><span v-for="(p, pi) in maiParts(msg.content)" :key="pi" :class="{ 'mai-num': p.num }">{{ p.text }}</span></div>
+            <div v-if="msg.searchRows.length > 0" class="mai-cards">
+              <div
+                v-for="r in msg.searchRows"
+                :key="r.code"
+                class="mai-card is-link"
+                @click="focusAiMenuRowFromChat(r.code)">
+                <div class="mai-card-main">
+                  <div class="mai-card-name">
+                    {{ r.name }}
+                    <span v-if="r.use === '미사용'" class="mai-badge-off">미사용</span>
+                  </div>
+                  <div class="mai-card-meta">{{ r.code }} · {{ r.group || "-" }}</div>
+                  <div v-if="msg.searchDateLabel" class="mai-card-meta">{{ msg.searchDateLabel }} {{ r.date }}</div>
+                </div>
+                <div class="mai-card-side">
+                  <div class="mai-card-amt">{{ r.price }}</div>
+                </div>
               </div>
+            </div>
             <div v-if="msg.maxNote" class="mai-max-note">최대 50개까지만 가능합니다.</div>
-            </template>
+            <div v-if="msg.moreNote" class="mai-more-note">{{ msg.moreNote }}</div>
+          </template>
             <!-- 메뉴명 오타 확인: 고친 이름으로 변경 / 그대로 사용 (한 번만 누를 수 있음) -->
             <template v-else-if="msg.typoFix">
               <div>{{ msg.content }}</div>
@@ -271,6 +282,7 @@
               </template>
             </div>
             <div v-if="msg.maxNote" class="mai-max-note">최대 50개까지만 가능합니다.</div>
+            <div v-if="msg.moreNote" class="mai-more-note">{{ msg.moreNote }}</div>
           </template>
           <!-- [모바일] 매출 나눠 보기(요일별·시간별·시간대별): 카드로 크게, 가장 많이 팔린 구분은 강조 -->
           <template v-else-if="msg.breakdownRows">
@@ -1047,6 +1059,108 @@ const MAI_NUM_RE = /(\d{4}-\d{2}-\d{2}|\d[\d,]*(?:\.\d+)?\s?(?:원|개|건|%|일
 const maiParts = (text) => {
   const t = String(text ?? "").replace(/행을 누르면[^.]*이동합니다\.?/g, "메뉴를 누르면 메뉴 목록에서 볼 수 있습니다.");
   return t.split(MAI_NUM_RE).filter((p) => p !== "").map((p) => ({ text: p, num: /^\d/.test(p) }));
+};
+// [모바일] 결과 이어서 보기: 조회·매출 결과가 잘렸으면 '나머지 보여줘 / 이어서 / 더 보여줘' 로 남은 것을 이어서 보여 준다.
+// AI를 다시 부르지 않고 이미 받은 결과에서 꺼내 보여 준다 (한 번에 최대 50개)
+const AI_MORE_RE = /(나머지|이어서|계속\s*보여|더\s*보여|다음\s*(것|거|건)?\s*보여)/;
+const AI_MORE_PAGE = 50;
+let aiPaging = null; // { kind: 'search'|'sales'|'unsold', list, shown }
+const aiMoreSeq = ref(0); // 가장 최근 「이어서 보여드릴까요?」 말풍선 번호 (그 버튼만 누를 수 있음)
+let aiMoreAskOpen = false; // 질문에 아직 답하지 않았으면 true ('네'·'아니오' 로 답할 수 있음)
+// 결과 메시지에 펼쳐 넣는다: ...aiSetPaging(kind, 전체 목록, 보여 준 개수). 남은 게 있으면 결과 뒤에 질문 말풍선을 띄운다
+const aiSetPaging = (kind, list, shown) => {
+  aiPaging = { kind, list: list || [], shown };
+  aiMoreAskOpen = false;
+  if ((list || []).length > shown) nextTick(() => aiAskMore());
+  return {};
+};
+// 「이어서 나머지 N개 메뉴도 보여드릴까요?」 말풍선 (네 / 아니오 버튼)
+const aiAskMore = () => {
+  const p = aiPaging;
+  const remain = p ? p.list.length - p.shown : 0;
+  if (remain <= 0) return;
+  aiMoreAskOpen = true;
+  aiChatMessages.value.push({
+    role: "assistant",
+    content: `이어서 나머지 ${remain}개 메뉴도 보여드릴까요?`,
+    moreAsk: true,
+    moreSeq: ++aiMoreSeq.value,
+    local: true,
+  });
+  scrollAiChatLog();
+};
+const aiMoreNote = () => "";
+// 질문 말풍선의 버튼
+const answerAiMore = (msg, yes) => {
+  if (msg.moreSeq !== aiMoreSeq.value || msg.moreDone || aiChatLoading.value) return;
+  msg.moreDone = true;
+  if (yes) {
+    aiShowMore("네, 이어서 보여줘", true);
+    return;
+  }
+  aiMoreAskOpen = false;
+  pushAiChatLocal("user", "아니오");
+  pushAiChatLocal("assistant", "알겠습니다. 다른 작업을 입력해 주세요.", true);
+  scrollAiChatLog();
+};
+const AI_MORE_YES_RE = /^(네|예|응|그래|좋아|보여|ㅇㅇ|yes|ok)/i;
+const AI_MORE_NO_RE = /^(아니|아뇨|괜찮|됐어|no)/i;
+// 메뉴 조회 카드 한 줄 (웹 조회 결과 표와 같은 값)
+const aiSearchCard = (r) => ({
+  code: String(r.lngCode),
+  name: r.strName,
+  price: `${formatAiPrice(r.lngPrice)}원`,
+  group: [aiMainName(r.lngMainGroup), aiSubName(r.lngMainGroup, r.lngSubGroup)].filter((t) => t).join(" > "),
+  use: isAiInactive(r) ? "미사용" : "사용",
+});
+// 이어서 보기 처리. 처리했으면 true (AI를 부르지 않음)
+const aiShowMore = (text, force = false) => {
+  // 「보여드릴까요?」 질문에 '네·아니오' 로 답한 경우
+  if (!force && aiMoreAskOpen && AI_MORE_NO_RE.test(text)) {
+    aiMoreAskOpen = false;
+    aiChatMessages.value.forEach((m) => {
+      if (m.moreAsk) m.moreDone = true;
+    });
+    pushAiChatLocal("user", text);
+    pushAiChatLocal("assistant", "알겠습니다. 다른 작업을 입력해 주세요.", true);
+    scrollAiChatLog();
+    return true;
+  }
+  const yesToAsk = aiMoreAskOpen && AI_MORE_YES_RE.test(text);
+  if (!force && !yesToAsk && !AI_MORE_RE.test(text)) return false;
+  aiMoreAskOpen = false;
+  aiChatMessages.value.forEach((m) => {
+    if (m.moreAsk) m.moreDone = true;
+  });
+  pushAiChatLocal("user", text);
+  const p = aiPaging;
+  const total = p ? p.list.length : 0;
+  if (!p || p.shown >= total) {
+    pushAiChatLocal("assistant", "이어서 보여 드릴 결과가 없습니다. 새로 조회해 주세요.", true);
+    scrollAiChatLog();
+    return true;
+  }
+  const from = p.shown;
+  const to = Math.min(total, from + AI_MORE_PAGE);
+  p.shown = to;
+  const part = p.list.slice(from, to);
+  const content = `이어서 ${from + 1}~${to}번째입니다. (전체 ${total}건)`;
+  const msg = { role: "assistant", content, local: true, moreNote: aiMoreNote(total - to) };
+  if (p.kind === "search") msg.searchRows = part.map(aiSearchCard);
+  else {
+    msg.salesRows = part;
+    msg.salesUnsold = p.kind === "unsold";
+  }
+  aiChatMessages.value.push(msg);
+  aiAssistHistory.value = [
+    ...aiAssistHistory.value,
+    { role: "user", content: text },
+    { role: "assistant", content: `[이어서] ${content}` },
+  ];
+  scrollAiChatLog();
+  // 아직 남았으면 다시 묻는다
+  if (total > to) nextTick(() => aiAskMore());
+  return true;
 };
 // 막아야 하면 안내창을 띄우고 true
 const blockCommonMenuEdit = () => {
@@ -2452,6 +2566,18 @@ const AI_SEARCH_MAX_ROWS = 20;
 // [모바일] 개수를 말하면 그만큼 보여 주되 최대 50개, 말하지 않으면 20개
 const AI_SHOW_MAX_ROWS = 50;
 const aiShowCount = (limit) => (limit > 0 ? Math.min(limit, AI_SHOW_MAX_ROWS) : AI_SEARCH_MAX_ROWS);
+// [모바일] AI가 개수를 넘겨주지 않아도 내가 입력한 문장으로 개수를 정한다
+// '38건', '30개' → 그 수 / '다·전부·모두·전체 … 보여' → 전부(최대 50개까지 보이고, 넘으면 안내)
+let aiLastUserText = "";
+const AI_ALL_RE = /(다|전부|모두|전체)\s*(다\s*)?(보여|알려|조회|출력|표시|줘)/;
+const aiEffectiveLimit = (condLimit) => {
+  const n = Math.max(0, Math.floor(Number(condLimit) || 0));
+  if (n > 0) return n;
+  const m = aiLastUserText.match(/(\d+)\s*(건|개)/);
+  if (m && Number(m[1]) > 0) return Number(m[1]);
+  if (AI_ALL_RE.test(aiLastUserText)) return 9999;
+  return 0;
+};
 // 서버로 보내는 도우미 대화 기록은 이전 8턴 + 이번 질문까지 (user 로 시작·끝)
 const AI_ASSIST_MAX_MESSAGES = 17;
 // chatAssist 로 보내는 대화 기록 (화면 표시와 별도, user/assistant 번갈아)
@@ -2575,8 +2701,9 @@ const runAiSearch = async (cond) => {
     );
   }
   // 개수 제한: '5개만', '가장 비싼 메뉴' 처럼 말하면 그 개수까지만 보여 준다
-  const limit = Math.max(0, Math.floor(Number(cond.limit) || 0));
+  const limit = aiEffectiveLimit(cond.limit); // [모바일] 입력 문장의 개수도 반영
   const total = rows.length;
+  const aiAllSearchRows = rows.slice(); // [모바일] 이어서 보기용 전체 결과
   if (limit > 0) rows.splice(aiShowCount(limit));
   const conds = [
     prevScope ? `앞 결과 ${prevScope.size}개 중` : "",
@@ -2599,13 +2726,14 @@ const runAiSearch = async (cond) => {
       : `${desc} 조회 결과 ${total}건입니다${sortText}.` +
         (limit > 0 && limit < total ? ` 그중 ${rows.length}건을 보여 드립니다.` : "") +
         (rows.length > aiShowCount(limit)
-          ? ` 앞 ${aiShowCount(limit)}건만 보여 드립니다. 조건을 더 좁혀 주세요.`
+          ? ` 앞 ${aiShowCount(limit)}건을 보여 드립니다.`
           : "") +
         " 행을 누르면 메뉴 목록에서 그 메뉴로 이동합니다.";
   aiChatMessages.value.push({
     role: "assistant",
     content,
-    maxNote: limit > AI_SHOW_MAX_ROWS,
+    maxNote: limit > AI_SHOW_MAX_ROWS && total > AI_SHOW_MAX_ROWS,
+    ...aiSetPaging("search", aiAllSearchRows, Math.min(rows.length, aiShowCount(limit))),
     searchRows: rows.slice(0, aiShowCount(limit)).map((r) => ({
       code: String(r.lngCode),
       name: r.strName,
@@ -2812,7 +2940,7 @@ const runAiSales = async (cond) => {
   );
   const totalAmt = [...salesByCode.values()].reduce((sum, s) => sum + s.amt, 0);
   const mode = cond.mode || "all";
-  const limit = Math.max(0, Math.floor(Number(cond.limit) || 0));
+  const limit = aiEffectiveLimit(cond.limit); // [모바일] 입력 문장의 개수도 반영
   const scope = salesStoreName || (salesStoreCd === "0" ? "그룹 전체 매장" : "조회 매장");
   const period = `${fromText} ~ ${toText}`;
   // 순위 기준: 서버가 sortBy=qty 를 보내면 판매수량, 아니면(값이 없는 이전 API 포함) 실매출
@@ -2923,7 +3051,8 @@ const runAiSales = async (cond) => {
   aiChatMessages.value.push({
     role: "assistant",
     content,
-    maxNote: limit > AI_SHOW_MAX_ROWS,
+    maxNote: limit > AI_SHOW_MAX_ROWS && total > AI_SHOW_MAX_ROWS,
+    ...aiSetPaging(mode === "unsold" ? "unsold" : "sales", rows, shown.length),
     salesRows: shown,
     salesFoot,
     salesUnsold: mode === "unsold",
@@ -3442,6 +3571,9 @@ const AI_REGISTER_REASK = {
 // 시작·조회·수정·질문 단계 입력: 작업 종류를 AI(chatAssist)로 판단한다
 // keepStep: 등록 중에 들어온 조회·질문이면 그 등록 단계 (답한 뒤 그 단계로 돌아감)
 const sendAiAssist = async (text, keepStep = "") => {
+  aiLastUserText = String(text || ""); // [모바일] 개수 판단용
+  // [모바일] '나머지 보여줘·이어서' 는 이미 받은 결과에서 바로 보여 준다 (AI 안 부름)
+  if (!keepStep && aiShowMore(String(text || "").trim())) return;
   if (!keepStep && handleAiEditLocalInput(text)) return;
   const userMsgIndex = aiChatMessages.value.length;
   pushAiChatLocal("user", text);
@@ -5519,6 +5651,31 @@ onMounted(() => {
 
 .mst003-chat-popup--mobile .mst003-chat-log > :first-child {
   margin-top: auto;
+}
+
+/* 메뉴 조회 카드의 미사용 표시 */
+.mai-badge-off {
+  display: inline-block;
+  margin-left: 0.25rem;
+  padding: 0.02rem 0.4rem;
+  border-radius: 999px;
+  background: #fee2e2;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #dc2626;
+  vertical-align: middle;
+}
+
+/* 결과가 잘렸을 때 이어서 보기 안내 */
+.mai-more-note {
+  margin-top: 0.45rem;
+  padding: 0.4rem 0.65rem;
+  border-radius: 0.6rem;
+  background: #eef2ff;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #4338ca;
+  text-align: center;
 }
 
 </style>

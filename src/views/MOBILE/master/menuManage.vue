@@ -711,10 +711,19 @@ const revealMenu = async (code, isNew) => {
   openCode.value = code;
   showMore.value = false;
   editing.value = null;
+  // 목록을 다시 불러오는 중(AI 등록·수정 직후 등)이면 목록이 비어 있으므로 끝날 때까지 기다린다 (최대 약 10초)
+  for (let i = 0; i < 100 && loading.value; i++) await new Promise((resolve) => setTimeout(resolve, 100));
   const index = filteredRows.value.findIndex((r) => String(r.lngCode) === code);
+  if (index < 0) {
+    mobileToast("메뉴 목록에서 이 메뉴를 찾지 못했습니다.");
+    return;
+  }
   if (index >= pageSize.value) pageSize.value = index + 1;
   await nextTick();
-  itemRefs.get(code)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  const scroll = () => itemRefs.get(code)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  scroll();
+  // 대화창 닫힘·뒤로가기 기록 정리가 끝난 뒤 한 번 더 맞춘다 (가끔 위치가 어긋나던 문제)
+  setTimeout(scroll, 450);
 };
 // AI 조회 결과에서 메뉴를 누르면 대화창을 닫고 목록에서 그 메뉴를 펼친다 (다시 열면 대화가 이어짐)
 const onAiFocusMenu = (code) => {
