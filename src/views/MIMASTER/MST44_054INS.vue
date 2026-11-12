@@ -17,10 +17,11 @@
       <button @click="copyButton" class="button copy w-auto">복사</button>
     </div>
   </div>
-  <br />
-  <div
-    class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
+  <!-- 조회 AREA: 한 줄 고정(줄바꿈 금지), 좁으면 이 영역만 가로 스크롤 -->
+  <div class="mst54-search">
     <PickStore
+      compact-search-bar
+      :compact-store-combo-max-rem="mst54StoreComboRem"
       @areaCd="handleStoreAreaCd"
       @update:storeCd="handleStoreCd"
       @posNo="handlePosNo"
@@ -50,181 +51,156 @@
     </DupliPopUp3>
   </div>
 
-  <div
-    v-if="changeScreenKey"
-    class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-    <div class="bg-white p-6 rounded shadow-lg w-[25%] h-[40%]">
-      <h2 class="text-lg font-bold">화면키 수정</h2>
-      <div class="flex flex-col justify-start h-12">
-        <div>
-          <p>화면키명</p>
+  <!-- 화면키 수정 팝업 -->
+  <Teleport to="body">
+    <div v-if="changeScreenKey" class="mst54-pop-mask">
+      <div class="mst54-pop" role="dialog" aria-modal="true">
+        <div class="mst54-pop-head">
+          <h2 class="mst54-pop-title">화면키 수정</h2>
         </div>
-        <div class="h-full w-full rounded-lg">
-          <input
-            type="text"
-            class="border border-gray-400 pl-1 h-full w-full rounded-lg"
-            v-model="currentscreenKeyNm" />
+        <div class="mst54-pop-body">
+          <label class="mst54-pop-field">
+            <span class="mst54-pop-label">화면키명</span>
+            <input
+              type="text"
+              class="mst54-pop-input"
+              v-model="currentscreenKeyNm" />
+          </label>
+          <label v-if="currentpaymentCd == 3" class="mst54-pop-field">
+            <span class="mst54-pop-label">화면키 유형</span>
+            <select
+              name=""
+              id=""
+              class="mst54-pop-input"
+              v-model="currentProduct"
+              :disabled="showEditProduct">
+              <option :value="0">기본</option>
+              <option :value="1">품목할인</option>
+            </select>
+          </label>
+          <ul v-if="currentpaymentCd == 3" class="mst54-pop-notes">
+            <li>화면키는 기본 또는 품목할인으로 유형을 선택할 수 있습니다.</li>
+            <li>품목할인은 매장 당 하나의 화면키만 설정할 수 있습니다.</li>
+            <li>
+              화면키 유형이 품목할인인 경우, 결제코드를 등록하거나 수정할 수
+              없으며, 품목할인 결제코드가 자동으로 노출됩니다.
+            </li>
+          </ul>
         </div>
-      </div>
-
-      <div
-        v-if="currentpaymentCd == 3"
-        class="flex flex-col justify-start h-12">
-        <div>
-          <p>화면키 유형</p>
+        <div class="mst54-pop-foot">
+          <button type="button" class="pnc-sub-btn" @click="confirmScreenKey()">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            확인
+          </button>
+          <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="exitScreenKey">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            닫기
+          </button>
         </div>
-        <div class="h-full w-full rounded-lg">
-          <select
-            name=""
-            id=""
-            class="border border-gray-400 pl-1 h-full w-full rounded-lg"
-            v-model="currentProduct"
-            :disabled="showEditProduct">
-            <option :value="0">기본</option>
-            <option :value="1">품목할인</option>
-          </select>
-        </div>
-      </div>
-      <div
-        v-if="currentpaymentCd == 3"
-        class="flex flex-col mt-5 justify-start items-start">
-        <div>※ 화면키는 기본 또는 품목할인으로 유형을 선택할 수 있습니다.</div>
-        <div>※ 품목할인은 매장 당 하나의 화면키만 설정할 수 있습니다.</div>
-        <div>
-          ※ 화면키 유형이 품목할인인 경우, 결제코드를 등록하거나 수정할 수
-          없으며, 품목할인 결제코드가 자동으로 노출됩니다.
-        </div>
-      </div>
-      <div class="flex justify-center space-x-3 w-full h-16">
-        <button
-          @click="confirmScreenKey()"
-          class="mt-4 p-2 bg-blue-500 text-white rounded">
-          확인
-        </button>
-        <button
-          @click="exitScreenKey"
-          class="mt-4 p-2 bg-blue-500 text-white rounded">
-          닫기
-        </button>
       </div>
     </div>
-  </div>
+  </Teleport>
 
-  <div
-    v-if="addscreenKey"
-    class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-    <div class="bg-white p-6 rounded shadow-lg w-[25%] h-[40%]">
-      <h2 class="text-lg font-bold">화면키 추가</h2>
-      <div class="flex flex-col justify-start h-12">
-        <div>
-          <p>화면키명</p>
+  <!-- 화면키 추가 팝업 -->
+  <Teleport to="body">
+    <div v-if="addscreenKey" class="mst54-pop-mask">
+      <div class="mst54-pop" role="dialog" aria-modal="true">
+        <div class="mst54-pop-head">
+          <h2 class="mst54-pop-title">화면키 추가</h2>
         </div>
-        <div class="h-full w-full rounded-sm">
-          <input
-            type="text"
-            class="border border-gray-400 pl-1 h-14 w-full rounded-sm"
-            v-model="currentscreenKeyNm" />
+        <div class="mst54-pop-body">
+          <label class="mst54-pop-field">
+            <span class="mst54-pop-label">화면키명</span>
+            <input
+              type="text"
+              class="mst54-pop-input"
+              v-model="currentscreenKeyNm" />
+          </label>
+          <label v-if="currentpaymentCd == 3" class="mst54-pop-field">
+            <span class="mst54-pop-label">화면키 유형</span>
+            <select class="mst54-pop-input" v-model="currentProduct">
+              <option :value="0">기본</option>
+              <option :value="1">품목할인</option>
+            </select>
+          </label>
         </div>
-      </div>
-      <div
-        v-if="currentpaymentCd == 3"
-        class="flex flex-col justify-start h-12 mt-3">
-        <div>
-          <p>화면키 유형</p>
+        <div class="mst54-pop-foot">
+          <button type="button" class="pnc-sub-btn pnc-sub-btn--rose" @click="confirmaddScreenKey()">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+            </svg>
+            추가
+          </button>
+          <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="exitScreenKey">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            닫기
+          </button>
         </div>
-        <div class="h-full w-full rounded-lg">
-          <select
-            class="border border-gray-400 pl-1 h-full w-full rounded-lg"
-            v-model="currentProduct">
-            <option :value="0">기본</option>
-            <option :value="1">품목할인</option>
-          </select>
-        </div>
-      </div>
-      <div class="flex justify-center space-x-3 w-full h-16 mt-8">
-        <button
-          @click="confirmaddScreenKey()"
-          class="mt-4 p-2 bg-blue-500 text-white rounded">
-          확인
-        </button>
-        <button
-          @click="exitScreenKey"
-          class="mt-4 p-2 bg-blue-500 text-white rounded">
-          닫기
-        </button>
       </div>
     </div>
-  </div>
+  </Teleport>
   <!-- 그리드 영역-->
   <!-- 드래그 영역-->
-  <div
-    v-show="showChangeScreenKey"
-    class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-    <div class="bg-white p-6 rounded shadow-lg w-2/3 h-3/4 overflow-auto">
-      <div class="border-gray-500 text-2xl">화면키 순서 변경</div>
-      <div class="border-gray-500 text-xl">
-        화면키를 끌어서 이동하면 순서가 변경됩니다.
-      </div>
-      <!-- VueDraggableNext 사용 -->
-      <VueDraggableNext
-        v-model="ScreenKeyOrigin"
-        :group="{ name: 'subCategory', pull: 'clone', put: true }"
-        class="space-y-2"
-        :move="onMove2"
-        @end="onEnd2">
-        <div
-          v-for="(item, index) in ScreenKeyOrigin"
-          class="p-4 bg-gray-200 rounded-lg shadow-md cursor-move h-12"
-          v-show="item && item.strScreenName !== ''">
-          <p>{{ item.strScreenName }}</p>
+  <!-- 화면키 순서 변경 팝업 -->
+  <Teleport to="body">
+    <div v-show="showChangeScreenKey" class="mst54-pop-mask">
+      <div class="mst54-pop mst54-pop--order" role="dialog" aria-modal="true">
+        <div class="mst54-pop-head">
+          <h2 class="mst54-pop-title">화면키 순서 변경</h2>
+          <p class="mst54-pop-desc">화면키를 끌어서 이동하면 순서가 변경됩니다.</p>
         </div>
-      </VueDraggableNext>
-
-      <div class="flex justify-center space-x-3">
-        <button
-          @click="showScreenKeysOrder"
-          class="mt-4 p-2 bg-blue-500 text-white rounded">
-          닫기
-        </button>
+        <div class="mst54-pop-body mst54-pop-body--scroll">
+          <!-- VueDraggableNext 사용 -->
+          <VueDraggableNext
+            v-model="ScreenKeyOrigin"
+            :group="{ name: 'subCategory', pull: 'clone', put: true }"
+            class="mst54-order-list"
+            :move="onMove2"
+            @end="onEnd2">
+            <div
+              v-for="(item, index) in ScreenKeyOrigin"
+              class="mst54-order-item"
+              v-show="item && item.strScreenName !== ''">
+              <svg class="mst54-order-grip" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="9" cy="6" r="1.6" /><circle cx="15" cy="6" r="1.6" />
+                <circle cx="9" cy="12" r="1.6" /><circle cx="15" cy="12" r="1.6" />
+                <circle cx="9" cy="18" r="1.6" /><circle cx="15" cy="18" r="1.6" />
+              </svg>
+              <span class="mst54-order-no">{{ index + 1 }}</span>
+              <p>{{ item.strScreenName }}</p>
+            </div>
+          </VueDraggableNext>
+        </div>
+        <div class="mst54-pop-foot">
+          <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="showScreenKeysOrder">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            닫기
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-  <span
-    class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[700px] z-40">
-    <h1 class="font-bold text-xl z-40">결제키 설정</h1>
-    <span class="flex space-x-3 ml-32 pl-56 items-center"
-      >순서변경 &nbsp; &nbsp;<label class="z-40"
-        ><input
-          type="radio"
-          name="changingMode"
-          @click.stop="changingMode(1)"
-          checked />교체하기 </label
-      ><label class="z-40"
-        ><input
-          type="radio"
-          name="changingMode"
-          @click.stop="changingMode(2)" />밀어내기</label
-      ><button class="whitebutton z-40" @click.stop="deletekey">
-        삭제
-      </button></span
-    >
-  </span>
-  <div class="flex h-[65vh] w-full -mt-5">
-    <div class="flex flex-col w-3/5 h-5/6">
-      <div
-        class="flex justify-between mt-0 ml-10 w-full border-b border-b-gray-300">
-        <div class="font-bold text-xl w-auto">
+  </Teleport>
+  <!-- 본문: 좌(결제코드 목록) / 우(결제키 설정). 키 크기는 고정, 좁아지면 우측 패널만 가로 스크롤 -->
+  <div class="mst54-body">
+    <div class="mst54-left">
+      <div class="mst54-panel-head">
+        <div class="font-bold text-xl">
           <!-- <button class="contents_tab-button " :class="{'text-blue-600' : currentMenu==false }" @click="showMenus(1)">메뉴관리</button> -->
-          {{ currentpaymentType }}&nbsp;결제키선택
+          할인/결제 코드 선택
         </div>
-        <div class="mt-3">
-          <!-- <button class="whitebutton" @click="searchAmountList3">조회</button> -->
-          <button class="whitebutton" @click="movePage">추가</button>
-        </div>
+        <!-- <button class="whitebutton" @click="searchAmountList3">조회</button> -->
+        <button class="whitebutton" @click="movePage">추가</button>
       </div>
-      <div class="h-full" v-show="currentMenu == false">
-        <div
-          class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
+      <div class="mst54-left-body" v-show="currentMenu == false">
+        <div class="grid grid-cols-[1fr,3fr] gap-0 w-full">
           <div class="customtableIndex border border-gray-400 rounded-l-lg">
             결제코드/명
           </div>
@@ -235,7 +211,7 @@
               @input="searchAmountList" />
           </div>
         </div>
-        <div class="ml-10 -mt-9 w-full h-full">
+        <div class="mst54-left-grid">
           <Realgrid
             class="w-full h-full"
             :progname="'MST44_054INS_VUE'"
@@ -246,27 +222,66 @@
             @selcetedrowData="selcetedrowData"
             :searchWord="searchword1"
             :searchColId="'lngCode,strName'"></Realgrid>
-          <div class="flex justify-start">
+        </div>
+        <div class="mst54-notes">
+          <div title="※ 사용여부가 미사용인 결제코드는 목록에서 노출되지 않습니다.">
             ※ 사용여부가 미사용인 결제코드는 목록에서 노출되지 않습니다.
           </div>
-          <div class="flex justify-start">
+          <div title="※ 복사시 결제코드 항목을 추가해야 결제키 화면에 노출됩니다.">
             ※ 복사시 결제코드 항목을 추가해야 결제키 화면에 노출됩니다.
           </div>
         </div>
       </div>
     </div>
-    <div class="grid grid-rows-[1fr,4fr] grid-cols-1 ml-10 w-full h-full z-20">
-      <div
-        class="flex h-full w-[86%] mt-10 items-start justify-center"
-        v-show="afterSearch">
-        <div
-          class="grid grid-cols-4 grid-rows-1 gap-x-1 ml-10 mt-0 w-full h-full">
+    <div class="mst54-right">
+      <div class="mst54-panel-head">
+        <div class="flex items-center gap-4">
+          <h1 class="font-bold text-xl whitespace-nowrap">결제키 설정</h1>
+          <!-- 화면키 순서 변경 — 이전/다음은 화면키 아래 페이지 막대로 옮김 -->
+          <div class="mst54-screen-nav" v-show="afterSearch">
+            <button
+              class="border border-[#CCCCCC] h-full w-full rounded-md flex justify-center items-center"
+              title="화면키 순서 변경"
+              @click="showScreenKeysOrder">
+              <img src="../../assets/table-change_2.svg" alt="" />
+            </button>
+          </div>
+        </div>
+        <span class="flex items-center gap-3 whitespace-nowrap"
+          >순서변경<label class="flex items-center gap-1"
+            ><input
+              type="radio"
+              name="changingMode"
+              @click.stop="changingMode(1)"
+              checked />교체하기</label
+          ><label class="flex items-center gap-1"
+            ><input
+              type="radio"
+              name="changingMode"
+              @click.stop="changingMode(2)" />밀어내기</label
+          ><button class="whitebutton" @click.stop="deletekey">
+            삭제
+          </button></span
+        >
+      </div>
+      <div class="mst54-right-scroll">
+      <div class="mst54-key-area">
+      <!-- 조회 전에는 보이지 않게만 하고 자리는 유지(visibility) — 시작할 때부터 본문 높이가 같도록 -->
+      <div class="mst54-screen-row" :class="{ 'mst54-hidden': !afterSearch }">
+        <div class="mst54-screen-keys">
           <div
             v-for="(item, index) in ScreenKeys"
-            class="custom-grid-style w-[174px] h-[80px]"
+            class="custom-grid-style mst54-screen-key"
             :class="{
-              '!bg-orange-500 !border-blue-700':
-                clickedScreenKeyIndex == index && clickedScreenOrMenu == false,
+              'mst54-screen-key--current':
+                items.length > 0 &&
+                item.intScreenNo !== '' &&
+                item.intScreenNo != null &&
+                item.intScreenNo == clickedintScreenNo,
+              'mst54-screen-key--target':
+                clickedScreenKeyIndex == index &&
+                clickedScreenOrMenu == false &&
+                item.intScreenNo == clickedintScreenNo,
             }"
             @click="
               clickedScreenKeyIndex = index;
@@ -278,6 +293,9 @@
               class="flex items-center justify-center w-full h-full">
               <button class="">{{ item.strScreenName }}</button
               ><button
+                type="button"
+                class="mst54-screen-edit"
+                title="화면키 수정"
                 @click.stop="
                   editScreenKey(
                     item.intScreenNo,
@@ -300,42 +318,82 @@
             <p v-else class="flex items-center justify-center"></p>
           </div>
         </div>
-        <div class="flex mt-5 ml-2 w-36 h-1/5">
+      </div>
+      <!-- 화면키 페이지 막대 — 화면키는 4개씩 보이므로 지금 몇 번째 묶음인지·전체 몇 개인지 표시, 번호로 바로 이동 -->
+      <div class="mst54-screen-pager" :class="{ 'mst54-hidden': !afterSearch }">
+        <button
+          type="button"
+          class="mst54-pager-step"
+          :disabled="mst54ScreenPager.page <= 1"
+          @click="showPrev">
+          ‹ 이전
+        </button>
+        <div class="mst54-pager-pages">
           <button
-            class="border border-[#CCCCCC] w-full h-full rounded-md flex justify-center items-center"
-            @click="showPrev">
-            <img
-              src="../../assets/table-left.svg"
-              alt=""
-              class="w-full h-full object-cover rounded-md" /></button
-          ><button
-            class="border border-[#CCCCCC] h-full w-full rounded-md flex justify-center items-center"
-            @click="showScreenKeysOrder">
-            <img src="../../assets/table-change_2.svg" alt="" /></button
-          ><button
-            class="border border-[#CCCCCC] w-full h-full rounded-md flex justify-center items-center"
-            @click="showNext">
-            <img
-              src="../../assets/table-right.svg"
-              alt=""
-              class="w-full h-full object-cover rounded-md" />
+            v-for="n in mst54ScreenPager.pages"
+            :key="n"
+            type="button"
+            class="mst54-pager-num"
+            :class="{
+              'mst54-pager-num--on': n == mst54ScreenPager.page,
+              'mst54-pager-num--open': mst54OpenScreen && n == mst54OpenScreen.page,
+            }"
+            :title="
+              mst54OpenScreen && n == mst54OpenScreen.page
+                ? `열린 화면: ${mst54OpenScreen.name}`
+                : `${n} 페이지`
+            "
+            @click="mst54GoScreenPage(n)">
+            {{ n }}
           </button>
         </div>
+        <button
+          type="button"
+          class="mst54-pager-step"
+          :disabled="mst54ScreenPager.page >= mst54ScreenPager.pages"
+          @click="showNext">
+          다음 ›
+        </button>
+        <span class="mst54-pager-text">
+          <template v-if="mst54ScreenPager.total == 0">화면키 없음</template>
+          <template v-else-if="mst54ScreenPager.from > mst54ScreenPager.total"
+            >새 화면키 추가 칸 · 총 {{ mst54ScreenPager.total }}개</template
+          >
+          <template v-else
+            >화면키 <b>{{ mst54ScreenPager.from }}–{{ mst54ScreenPager.to }}</b> /
+            총 {{ mst54ScreenPager.total }}개</template
+          >
+        </span>
       </div>
 
-      <div v-show="afterSearch" class="flex mt-4 w-11/12 h-5/6">
-        <div class="flex w-full h-full">
+      <div class="mst54-menu-keys-wrap" :class="{ 'mst54-hidden': !afterSearch }">
+        <!-- 아래 결제키가 어느 화면키 것인지 — 위 화면키를 다른 페이지로 넘겨도 유지 -->
+        <div class="mst54-open-screen">
+          <template v-if="mst54OpenScreen">
+            <span class="mst54-open-screen-label">현재 화면</span>
+            <span class="mst54-open-screen-name">{{ mst54OpenScreen.name }}</span>
+            <button
+              v-if="mst54OpenScreen.page != mst54ScreenPager.page"
+              type="button"
+              class="mst54-open-screen-go"
+              @click="mst54GoScreenPage(mst54OpenScreen.page)">
+              화면키 위치로 ({{ mst54OpenScreen.page }}페이지)
+            </button>
+          </template>
+          <template v-else>위에서 화면키를 선택하면 결제키가 표시됩니다.</template>
+        </div>
+        <div>
           <VueDraggableNext
             v-model="items"
             :move="onMove"
             @end="onEnd"
             animation="200"
-            class="grid grid-cols-5 grid-rows-6 ml-10 mt-4 w-full h-full gap-1">
+            class="mst54-menu-keys">
             <div
               v-for="(item, index) in items"
-              class="custom-grid-style"
+              class="custom-grid-style mst54-menu-key"
               :class="{
-                '!bg-orange-500 !border-blue-700':
+                'mst54-menu-key--selected':
                   clickedMenuKey == index && clickedScreenOrMenu == true,
               }"
               @click="
@@ -359,6 +417,8 @@
           </VueDraggableNext>
         </div>
       </div>
+      </div>
+      </div>
     </div>
   </div>
   <!-- 드래그 영역-->
@@ -380,7 +440,7 @@ import Swal from "sweetalert2";
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 /*
  * 드래그 라이브러리 호출
  */
@@ -428,6 +488,8 @@ const clickedScreenKeyIndex = ref();
 const ScreenKeyOrigin = ref([]);
 const clickedMenuKey = ref();
 const ScreenKeys = ref([]);
+/** 조회 AREA 매장 콤보 폭(rem) — PickStore compact 기본 12rem 대신 매장명이 다 보이도록 */
+const mst54StoreComboRem = 14;
 const currentMenuorTLU = ref(false);
 /**
  *  그리드 검색어 세팅
@@ -503,6 +565,55 @@ const copyButton = () => {
     return;
   }
   showPopup2.value = true;
+};
+
+/** 상단 화면키 안내(표시 전용) — 한 번에 4개씩 보이므로 앞·뒤 페이지에 남은 화면키 수 */
+const mst54ScreenPager = computed(() => {
+  const total = (ScreenKeyOrigin.value || []).filter(
+    (item) => item && item.intScreenNo !== "" && item.intScreenNo != null
+  ).length;
+  const page = Number(currentsubPage.value) || 1;
+  // 넘김 한계는 기존 showNext 와 같은 AllscreenKeyPage (4의 배수일 때 '화면키 추가' 칸 페이지 포함)
+  const pages = Math.max(
+    1,
+    Math.ceil(total / 4),
+    Number(AllscreenKeyPage.value) || 1
+  );
+  return {
+    page,
+    pages,
+    total,
+    from: (page - 1) * 4 + 1,
+    to: Math.min(total, page * 4),
+  };
+});
+
+/** 아래 결제키가 펼쳐진 화면키(이름·몇 페이지에 있는지) — 다른 페이지로 넘겨도 어느 화면 것인지 알리기 위함 (표시 전용) */
+const mst54OpenScreen = computed(() => {
+  if (!items.value.length) return null;
+  const list = (ScreenKeyOrigin.value || []).filter(
+    (item) => item && item.intScreenNo !== "" && item.intScreenNo != null
+  );
+  const idx = list.findIndex(
+    (item) => item.intScreenNo == clickedintScreenNo.value
+  );
+  if (idx < 0) return null;
+  return { name: list[idx].strScreenName, page: Math.floor(idx / 4) + 1 };
+});
+
+/** 페이지 점 클릭 — 기존 이전/다음(showPrev/showNext)을 필요한 횟수만큼 호출 */
+const mst54GoScreenPage = (n) => {
+  let guard = 50;
+  while (Number(currentsubPage.value) < n && guard-- > 0) {
+    const before = currentsubPage.value;
+    showNext();
+    if (currentsubPage.value == before) break;
+  }
+  while (Number(currentsubPage.value) > n && guard-- > 0) {
+    const before = currentsubPage.value;
+    showPrev();
+    if (currentsubPage.value == before) break;
+  }
 };
 
 const showNext = () => {
@@ -1165,8 +1276,19 @@ const handlePosNo = (newValue) => {
     posNo.value != undefined &&
     posNo.value != 0
   ) {
-    searchButton();
+    searchButton().then(openFirstScreenKey);
   }
+};
+
+/** POS번호 선택 후 조회되면 첫 번째 화면키를 바로 열어 결제키를 보여줌 (화면키 클릭과 같은 순서) */
+const openFirstScreenKey = () => {
+  const index = ScreenKeys.value.findIndex(
+    (item) => item && item.strScreenName != ""
+  );
+  if (index < 0) return;
+  showKeys(ScreenKeys.value[index].intScreenNo);
+  clickedScreenKeyIndex.value = index;
+  clickedScreenKeys();
 };
 
 watch(
@@ -1457,4 +1579,531 @@ const searchinit = (newvalue) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+/* 팝업 (화면키 수정·추가·순서 변경) — body 로 Teleport, 덮개 z-index 10050 */
+.mst54-pop-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.45);
+}
+.mst54-pop {
+  display: flex;
+  flex-direction: column;
+  width: 28rem;
+  max-width: 100%;
+  max-height: calc(100vh - 2rem);
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
+  overflow: hidden;
+}
+.mst54-pop--order {
+  width: 32rem;
+}
+.mst54-pop-head {
+  padding: 1.125rem 1.5rem 0.875rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+.mst54-pop-head::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 1.125rem;
+  margin-right: 0.5rem;
+  border-radius: 2px;
+  background: #2563eb;
+  vertical-align: -2px;
+}
+.mst54-pop-title {
+  display: inline;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+.mst54-pop-desc {
+  margin-top: 0.375rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+.mst54-pop-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+.mst54-pop-body--scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+.mst54-pop-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+.mst54-pop-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+}
+.mst54-pop-input {
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  background: #fff;
+  font-size: 0.9375rem;
+  color: #0f172a;
+}
+.mst54-pop-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+.mst54-pop-input:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+.mst54-pop-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 0.875rem 0.75rem 1.75rem;
+  border-radius: 0.5rem;
+  background: #f8fafc;
+  list-style: "※ ";
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: #475569;
+}
+.mst54-pop-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+.mst54-order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.mst54-order-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 3rem;
+  padding: 0 0.875rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  font-size: 0.9375rem;
+  color: #0f172a;
+  cursor: grab;
+}
+.mst54-order-item:hover {
+  border-color: #a5b4fc;
+  background: #f8faff;
+}
+.mst54-order-grip {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+  fill: #94a3b8;
+}
+.mst54-order-no {
+  min-width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.5rem;
+  text-align: center;
+}
+
+/* 조회 AREA — 매장명·포스번호·결제키구분. 숫자 고정·통일
+   - 콤보(그룹·속성·포스번호) 8.5rem, 매장 콤보 14rem, 높이 2rem, 테두리 #cbd5e1
+   - 항목명 → 콤보 1rem, 같은 항목 안 콤보끼리 0.5rem
+   - 앞 공백 = 뒤 공백 (--mst54-pad, 패널 폭에 따라 2.5~6.8rem) */
+.mst54-search {
+  --mst54-ctl-border: #cbd5e1;
+  --mst54-ctl-w: 8.5rem;
+  --mst54-store-w: 14rem;
+  --mst54-label-gap: 1rem;
+  --mst54-ctl-gap: 0.5rem;
+  --mst54-group-gap: 2.5rem;
+  display: flex;
+  align-items: center;
+  min-height: 3.25rem;
+  flex-shrink: 0;
+  margin: 0.75rem 0.5rem 0 1.25rem;
+  padding: 0.5rem 0;
+  background: #e5e7eb;
+  border-radius: 0.5rem;
+  /* 1440px 이하에서 공통 .w-right 가 width:auto 라 내용 폭만큼 늘어나 화면 밖으로 밀림
+     → 이 영역은 폭을 주장하지 않음(inline-size 컨테이너) + 아래 @container 로 줄 배치 결정 */
+  container-type: inline-size;
+}
+/* PickStore 루트 — 앞뒤 여백은 여기 padding 하나로 (cqi = 조회 패널 폭 기준) */
+.mst54-search :deep(> div) {
+  /* 넓으면 6.8cqi(최대 6.8rem), 패널이 좁아지면 한 줄(항목 합계 약 1100px)이 유지되는 만큼만 줄어듦(최소 2.5rem) */
+  --mst54-pad: min(6.8rem, 6.8cqi, max(2.5rem, calc((100cqi - 1100px) / 2)));
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  column-gap: var(--mst54-ctl-gap);
+  row-gap: 0.5rem;
+  width: 100%;
+  padding-inline: var(--mst54-pad);
+  white-space: nowrap;
+}
+/* 항목명 "매장명" → 첫 콤보 간격 = 1rem */
+.mst54-search :deep(> div > div:first-child) {
+  margin-right: calc(var(--mst54-label-gap) - var(--mst54-ctl-gap));
+}
+/* 좁을 때: 결제키구분은 둘째 줄 맨 앞 — "매장명"과 시작선 맞춤 */
+/* 좁을 때: 1줄 = 매장명 + 콤보 3개, 2줄 = 포스번호 + 결제키구분 ("매장명"과 시작선 맞춤)
+   ::after 를 줄바꿈 전용 항목(order 1, 폭 100%)으로 써서 두 덩어리를 둘째 줄로 보냄 */
+@container (max-width: 1179.98px) {
+  .mst54-search :deep(> div)::after {
+    content: "";
+    order: 1;
+    flex-basis: 100%;
+    height: 0;
+  }
+  .mst54-search :deep(> div > div.ml-5) {
+    order: 2;
+    justify-content: flex-start;
+  }
+  /* 매장 콤보 바로 다음 블록(포스번호) = 둘째 줄 첫 항목 */
+  .mst54-search :deep(> div > div.relative.flex-1 + div.ml-5) {
+    padding-left: 0;
+  }
+}
+/* 넓을 때: 한 줄. 덩어리 3개(매장 / 포스번호 / 결제키구분) 사이만 균등하게 벌림 (앞뒤 여백은 padding 으로 동일) */
+@container (min-width: 1180px) {
+  .mst54-search :deep(> div) {
+    flex-wrap: nowrap;
+  }
+  .mst54-search :deep(> div > div.ml-5) {
+    margin-left: auto !important;
+  }
+}
+/* 매장그룹·매장속성 콤보 — 같은 폭 (compact 기본 5.75rem / 4.5rem 은 너무 작음) */
+.mst54-search :deep(#storeGroup),
+.mst54-search :deep(> div > div:nth-child(3) > select) {
+  width: var(--mst54-ctl-w);
+}
+/* 매장 콤보 래퍼(flex-1 + min-w-0)가 찌그러지지 않게 고정 폭 */
+.mst54-search :deep(> div > div.relative.flex-1) {
+  flex: 0 0 auto;
+  width: var(--mst54-store-w);
+}
+/* 포스번호·결제키구분 블록 (PickStore 안 ml-5 블록) — 앞 덩어리와 최소 간격은 padding 으로 */
+.mst54-search :deep(> div > div.ml-5) {
+  display: flex;
+  align-items: center;
+  gap: var(--mst54-label-gap);
+  margin-left: 0;
+  padding-left: var(--mst54-group-gap);
+  flex-shrink: 0;
+  min-height: 2rem;
+}
+.mst54-search :deep(> div > div.ml-5 > span) {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.mst54-search :deep(> div > div.ml-5 select) {
+  width: var(--mst54-ctl-w);
+  height: 2rem;
+  margin-left: 0;
+  padding: 0 0.5rem;
+}
+.mst54-search :deep(> div > div.ml-5 label) {
+  gap: 0.25rem;
+  margin-left: 0;
+  white-space: nowrap;
+}
+.mst54-search :deep(select),
+.mst54-search :deep(.pickstore-vs-shell) {
+  border: 1px solid var(--mst54-ctl-border) !important;
+}
+.mst54-search :deep(select:focus) {
+  border-color: #3b82f6 !important;
+}
+
+/* 본문 — 좌측 목록은 줄어들고, 우측 키 영역은 키 크기를 유지한 채 좁으면 가로 스크롤 */
+.mst54-body {
+  display: grid;
+  /* 우측은 키 영역 폭(약 790px)만큼, 좌측은 남는 폭(최소 320px). 더 좁으면 우측만 가로 스크롤 */
+  grid-template-columns: minmax(320px, 1fr) minmax(0, 800px);
+  column-gap: 1.5rem;
+  /* 높이 = 오른쪽 키 영역 높이(왼쪽 그리드가 채워 아래 끝선이 결제키 끝과 같아짐).
+     화면이 낮으면 화면 안으로 줄어들고 키 영역만 안에서 스크롤 */
+  --mst54-notes-h: 2.5rem;
+  grid-template-rows: minmax(0, 1fr);
+  flex: 0 1 auto;
+  min-height: 0;
+  align-items: stretch;
+  margin-top: 0.75rem;
+  padding: 0 0.5rem 0.5rem 1.25rem;
+}
+.mst54-left,
+.mst54-right {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.mst54-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.5rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid #d1d5db;
+}
+.mst54-left-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-top: 0.5rem;
+}
+.mst54-left-grid {
+  flex: 1 1 auto;
+  min-height: 200px;
+}
+/* 안내문 높이 고정(한 줄씩, 넘치면 … + 마우스 올리면 전체) — 오른쪽 아래 여백과 같은 값이라 끝선이 맞음 */
+.mst54-notes {
+  height: var(--mst54-notes-h);
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: #4b5563;
+}
+.mst54-notes > div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mst54-right-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding-top: 0.75rem;
+  /* 왼쪽 안내문(높이 + 위 간격 0.5rem)만큼 — 결제키 아래 끝 = 왼쪽 그리드 아래 끝 */
+  padding-bottom: calc(var(--mst54-notes-h) + 0.5rem);
+  contain: inline-size;
+}
+/* 키 영역 끝선 = 아래 결제키 5칸 폭. 제목 줄·화면키 4칸·페이지 막대도 같은 끝선 */
+.mst54-right {
+  --mst54-menu-key-w: 150px;
+  --mst54-menu-key-gap: 0.375rem;
+  --mst54-screen-key-gap: 0.5rem;
+  --mst54-keys-w: calc(var(--mst54-menu-key-w) * 5 + var(--mst54-menu-key-gap) * 4);
+}
+.mst54-right > .mst54-panel-head {
+  width: 100%;
+  max-width: var(--mst54-keys-w);
+}
+.mst54-key-area {
+  width: max-content;
+}
+.mst54-screen-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-height: 80px;
+}
+/* 조회 전: 안 보이고 클릭도 안 되지만 자리는 차지 */
+.mst54-hidden {
+  visibility: hidden;
+}
+.mst54-screen-keys {
+  display: flex;
+  gap: var(--mst54-screen-key-gap);
+  width: var(--mst54-keys-w);
+}
+/* 화면키 수정 버튼 — 이름 옆이 아니라 오른쪽 위 구석에 따로 (이름 누르다 잘못 열리지 않게) */
+.mst54-screen-key {
+  position: relative;
+}
+.mst54-screen-edit {
+  position: absolute;
+  top: 0.375rem;
+  right: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.625rem;
+  height: 1.625rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  background: #fff;
+  color: #64748b;
+  font-size: 0.75rem;
+}
+.mst54-screen-edit:hover {
+  border-color: #fda4af;
+  background: #fff1f2;
+  color: #be123c;
+}
+.mst54-screen-key {
+  flex: 0 0 auto;
+  width: calc((var(--mst54-keys-w) - var(--mst54-screen-key-gap) * 3) / 4);
+  height: 80px;
+}
+/* 선택 셀 색 — 상단(현재 화면, 남색 계열) / 하단(선택 키, 주황 계열)을 서로 다른 색으로
+   진한 단색 대신 옅은 바탕 + 2px 테두리 + 진한 글자 */
+.mst54-screen-key.mst54-screen-key--current {
+  background: #eef2ff;
+  border: 2px solid #6366f1;
+  color: #3730a3;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+/* 상단 화면키가 수정·삭제·순서 대상으로 선택된 상태 */
+.mst54-screen-key.mst54-screen-key--target {
+  outline: 3px solid #c7d2fe;
+  outline-offset: 1px;
+}
+.mst54-menu-key.mst54-menu-key--selected {
+  background: #fff7ed;
+  border: 2px solid #f97316;
+  color: #9a3412;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+}
+.mst54-screen-nav {
+  display: flex;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 32px;
+}
+/* 화면키 페이지 막대 (화면키 줄 아래, 화면키 4칸 폭에 맞춤) */
+.mst54-screen-pager {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: var(--mst54-keys-w);
+  margin-top: 0.5rem;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: #f8fafc;
+}
+.mst54-pager-step {
+  height: 1.75rem;
+  padding: 0 0.625rem;
+  border: 1px solid #c7d2fe;
+  border-radius: 0.375rem;
+  background: #fff;
+  color: #4338ca;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.mst54-pager-step:hover:not(:disabled) {
+  background: #eef2ff;
+}
+.mst54-pager-step:disabled {
+  border-color: #e2e8f0;
+  color: #cbd5e1;
+  cursor: default;
+}
+.mst54-pager-pages {
+  display: flex;
+  gap: 0.25rem;
+}
+.mst54-pager-num {
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 0.375rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  background: #fff;
+  color: #475569;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.mst54-pager-num:hover {
+  border-color: #a5b4fc;
+}
+.mst54-pager-num--on {
+  border-color: #6366f1;
+  background: #6366f1;
+  color: #fff;
+}
+/* 아래 결제키가 열린 화면키가 있는 페이지 — 번호 아래 점 */
+.mst54-pager-num--open {
+  position: relative;
+}
+.mst54-pager-num--open::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 9999px;
+  background: #6366f1;
+}
+/* 아래 결제키 제목 줄 */
+.mst54-open-screen {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 1.75rem;
+  margin-bottom: 0.375rem;
+  font-size: 0.875rem;
+  color: #475569;
+}
+.mst54-open-screen-label {
+  color: #4f46e5;
+  font-weight: 600;
+}
+.mst54-open-screen-name {
+  padding: 0.125rem 0.5rem;
+  border: 1px solid #c7d2fe;
+  border-radius: 0.375rem;
+  background: #eef2ff;
+  color: #3730a3;
+  font-weight: 700;
+}
+.mst54-open-screen-go {
+  margin-left: 0.25rem;
+  font-size: 0.8125rem;
+  color: #4f46e5;
+  text-decoration: underline;
+}
+.mst54-pager-text {
+  margin-left: auto;
+  font-size: 0.8125rem;
+  color: #64748b;
+  white-space: nowrap;
+}
+.mst54-pager-text b {
+  color: #3730a3;
+}
+.mst54-menu-keys-wrap {
+  margin-top: 0.875rem;
+}
+.mst54-menu-keys {
+  display: grid;
+  grid-template-columns: repeat(5, var(--mst54-menu-key-w));
+  grid-template-rows: repeat(6, 70px);
+  gap: var(--mst54-menu-key-gap);
+  width: max-content;
+}
+</style>
