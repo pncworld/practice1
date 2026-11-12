@@ -1174,7 +1174,12 @@ const saveButton = async () => {
           confirmButtonText: "확인",
         });
 
-        searchButton();
+        // 저장 후 재조회해도 보던 화면키(와 그 페이지)를 다시 열어 둠
+        const keepNo = items.value.length ? clickedintScreenNo.value : null;
+        const keepName = (ScreenKeyOrigin.value || []).find(
+          (item) => item && item.intScreenNo == keepNo
+        )?.strScreenName;
+        searchButton().then(() => reopenScreenKey(keepNo, keepName));
       }
     }
   });
@@ -1278,6 +1283,37 @@ const handlePosNo = (newValue) => {
   ) {
     searchButton().then(openFirstScreenKey);
   }
+};
+
+/**
+ * 저장 후 재조회 — 저장 전에 열려 있던 화면키를 찾아(번호 우선, 순서 변경으로 번호가 바뀌었으면 이름) 그 페이지로 가서 다시 엶.
+ * 못 찾으면(삭제 등) 첫 번째 화면키를 엶.
+ */
+const reopenScreenKey = (screenNo, screenName) => {
+  if (screenNo == null || screenNo === "") {
+    openFirstScreenKey();
+    return;
+  }
+  const list = (ScreenKeyOrigin.value || []).filter(
+    (item) => item && item.intScreenNo !== "" && item.intScreenNo != null
+  );
+  let idx = list.findIndex(
+    (item) =>
+      item.intScreenNo == screenNo &&
+      (screenName == null || item.strScreenName == screenName)
+  );
+  if (idx < 0 && screenName != null) {
+    idx = list.findIndex((item) => item.strScreenName == screenName);
+  }
+  if (idx < 0) {
+    openFirstScreenKey();
+    return;
+  }
+  currentsubPage.value = Math.floor(idx / 4) + 1;
+  addfor4ScreenKey();
+  showKeys(list[idx].intScreenNo);
+  clickedScreenKeyIndex.value = idx % 4;
+  clickedScreenKeys();
 };
 
 /** POS번호 선택 후 조회되면 첫 번째 화면키를 바로 열어 결제키를 보여줌 (화면키 클릭과 같은 순서) */
