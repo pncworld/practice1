@@ -57,12 +57,37 @@ export const COL_WEEKLY = [
   },
 ];
 
+/** 객수 런치·디너 빈칸 사유 (마우스오버) */
+function getCustomerLunchDinnerBlankReason(row, fieldName) {
+  if (!row || row[fieldName] != null) return "";
+  return "예약타임테이블에 디너 시각이 등록되지 않은 매장입니다";
+}
+
 export const COL_CUSTOMER = [
-  { fieldName: "store", headerText: "매장", width: 88, bodyAlign: "center", fieldDataType: "text" },
+  { fieldName: "store", headerText: "매장", width: 84, bodyAlign: "center", fieldDataType: "text" },
+  // 2026-11-12 런치·디너 (매장별 예약타임테이블의 평일/주말 디너 첫 회차 시각 기준, 디너 = 합산 − 런치)
+  {
+    fieldName: "custLunch",
+    headerText: "런치",
+    width: 60,
+    bodyAlign: "far",
+    fieldDataType: "number",
+    numberFormat: "#,##0",
+    tooltip: (row) => getCustomerLunchDinnerBlankReason(row, "custLunch"),
+  },
+  {
+    fieldName: "custDinner",
+    headerText: "디너",
+    width: 60,
+    bodyAlign: "far",
+    fieldDataType: "number",
+    numberFormat: "#,##0",
+    tooltip: (row) => getCustomerLunchDinnerBlankReason(row, "custDinner"),
+  },
   {
     fieldName: "custCount",
-    headerText: "고객수",
-    width: 71,
+    headerText: "합산",
+    width: 64,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0",
@@ -70,7 +95,7 @@ export const COL_CUSTOMER = [
   {
     fieldName: "custWow",
     headerText: "전주비(%)",
-    width: 65,
+    width: 60,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0.00",
@@ -78,7 +103,7 @@ export const COL_CUSTOMER = [
   {
     fieldName: "custMom",
     headerText: "전월비(%)",
-    width: 65,
+    width: 60,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0.00",
@@ -86,7 +111,7 @@ export const COL_CUSTOMER = [
   {
     fieldName: "custYoy",
     headerText: "전년비(%)",
-    width: 65,
+    width: 60,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0.00",
@@ -94,7 +119,7 @@ export const COL_CUSTOMER = [
   {
     fieldName: "price",
     headerText: "단가",
-    width: 71,
+    width: 66,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0",
@@ -102,7 +127,7 @@ export const COL_CUSTOMER = [
   {
     fieldName: "priceWow",
     headerText: "전주비(%)",
-    width: 65,
+    width: 60,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0.00",
@@ -110,7 +135,7 @@ export const COL_CUSTOMER = [
   {
     fieldName: "priceMom",
     headerText: "전월비(%)",
-    width: 65,
+    width: 60,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0.00",
@@ -118,7 +143,7 @@ export const COL_CUSTOMER = [
   {
     fieldName: "priceYoy",
     headerText: "전년비(%)",
-    width: 65,
+    width: 60,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0.00",
@@ -137,7 +162,7 @@ export const COL_CUSTOMER_LAYOUT = [
     name: "sa_g_cust",
     direction: "horizontal",
     header: { visible: true, text: "객수" },
-    items: ["custCount", "custWow", "custMom", "custYoy"],
+    items: ["custLunch", "custDinner", "custCount", "custWow", "custMom", "custYoy"],
   },
   {
     name: "sa_g_unit",
@@ -293,11 +318,28 @@ export const COL_MATERIAL = [
  */
 /** 예약현황 — 2026-11-11 전주비·단체 전주비·단체 전월비 추가 (조회 기간 기준, 미래 날짜 조회 가능) */
 export const COL_RESERVATION = [
-  { fieldName: "store", headerText: "매장", width: 88, bodyAlign: "center", fieldDataType: "text" },
+  { fieldName: "store", headerText: "매장", width: 80, bodyAlign: "center", fieldDataType: "text" },
+  // 2026-11-12 런치·디너 (예약의 식사구분 — 예약일보 CRM10_024RPT 와 같은 기준), 총합 = 런치 + 디너
+  {
+    fieldName: "rsv_lunch",
+    headerText: "런치",
+    width: 58,
+    bodyAlign: "far",
+    fieldDataType: "number",
+    numberFormat: "#,##0",
+  },
+  {
+    fieldName: "rsv_dinner",
+    headerText: "디너",
+    width: 58,
+    bodyAlign: "far",
+    fieldDataType: "number",
+    numberFormat: "#,##0",
+  },
   {
     fieldName: "rsv",
-    headerText: "예약인원",
-    width: 65,
+    headerText: "총합",
+    width: 62,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0",
@@ -305,7 +347,7 @@ export const COL_RESERVATION = [
   {
     fieldName: "wow",
     headerText: "전주비(%)",
-    width: 65,
+    width: 58,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0.0",
@@ -313,7 +355,7 @@ export const COL_RESERVATION = [
   {
     fieldName: "mom",
     headerText: "전월비(%)",
-    width: 65,
+    width: 58,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0.0",
@@ -321,15 +363,15 @@ export const COL_RESERVATION = [
   {
     fieldName: "yoy",
     headerText: "전년비(%)",
-    width: 65,
+    width: 58,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0.0",
   },
   {
     fieldName: "grp",
-    headerText: "단체건수",
-    width: 65,
+    headerText: "건수",
+    width: 56,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0",
@@ -337,26 +379,43 @@ export const COL_RESERVATION = [
   {
     fieldName: "grp_wow",
     headerText: "전주비(%)",
-    width: 65,
+    width: 58,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0.0",
   },
   {
     fieldName: "grp_mom",
-    headerText: "단체 전월비(%)",
-    width: 65,
+    headerText: "전월비(%)",
+    width: 58,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0.0",
   },
   {
     fieldName: "grp_yoy",
-    headerText: "단체 전년비(%)",
-    width: 65,
+    headerText: "전년비(%)",
+    width: 58,
     bodyAlign: "far",
     fieldDataType: "number",
     numberFormat: "#,##0.0",
+  },
+];
+
+/** 예약현황 — 2026-11-12 2단 헤더 (예약인원 · 단체) */
+export const COL_RESERVATION_LAYOUT = [
+  { name: "sa_r_div", direction: "horizontal", header: { visible: true, text: "구분" }, items: ["store"] },
+  {
+    name: "sa_r_rsv",
+    direction: "horizontal",
+    header: { visible: true, text: "예약인원" },
+    items: ["rsv_lunch", "rsv_dinner", "rsv", "wow", "mom", "yoy"],
+  },
+  {
+    name: "sa_r_grp",
+    direction: "horizontal",
+    header: { visible: true, text: "단체 (10명 이상)" },
+    items: ["grp", "grp_wow", "grp_mom", "grp_yoy"],
   },
 ];
 

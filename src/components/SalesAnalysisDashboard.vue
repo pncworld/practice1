@@ -81,6 +81,13 @@
                 <span class="sa-card-title">주간 핵심 지표</span>
                 <img class="sa-card-title__expand-ic" :src="saIconExtent" width="22" height="22" alt="" />
               </button>
+              <!-- 2026-11-12 A안: 전주비는 지난 완료 주 ÷ 그 앞 주 (조회 기간과 무관) -->
+              <span
+                v-if="weeklyWowRangeText"
+                class="sa-weekly-wow-range"
+                title="전주비는 조회 기간과 관계없이 지난 완료 주(월~일)를 그 앞 주와 비교합니다">
+                전주비 {{ weeklyWowRangeText }}
+              </span>
             </div>
             <div class="sa-card-body">
               <SalesDashReportGrid
@@ -206,6 +213,7 @@
             ref="gridLabor"
             export-label="예약현황"
             :columns="COL_RESERVATION"
+            :column-layout="COL_RESERVATION_LAYOUT"
             :row-data="laborRows"
             :total-row-highlight="STORE_SALES_TOTAL_ROW_HIGHLIGHT" />
         </div>
@@ -393,6 +401,7 @@ import {
   getDashGroupHeaderCells,
   COL_MATERIAL,
   COL_RESERVATION,
+  COL_RESERVATION_LAYOUT,
   COL_STORE_SALES,
   COL_WEEKLY,
 } from "@/constants/salesAnalysisDashboardColumns.js";
@@ -519,7 +528,7 @@ const expandPanelView = computed(() => {
       title: "예약현황",
       exportLabel: "예약현황",
       columns: COL_RESERVATION,
-      columnLayout: null,
+      columnLayout: COL_RESERVATION_LAYOUT,
       rowData: laborRows.value,
       rowHeight: 32,
       fitStyle: "even",
@@ -1254,6 +1263,21 @@ function parseDashRate(v) {
   return Number.isFinite(n) ? n : null;
 }
 
+/** 2026-11-12 주간 핵심 지표 전주비(A안) 비교 주 안내 문구 — 예) 11/02~11/08 ÷ 10/26~11/01 */
+const weeklyWowRangeText = ref("");
+function buildWeeklyWowRangeText(r) {
+  if (!r || typeof r !== "object") return "";
+  const md = (v) => {
+    const s = String(v ?? "").trim();
+    return /^\d{4}-\d{2}-\d{2}/.test(s) ? `${s.slice(5, 7)}/${s.slice(8, 10)}` : "";
+  };
+  const a = md(r.wow_from);
+  const b = md(r.wow_to);
+  const c = md(r.wow_prev_from);
+  const d = md(r.wow_prev_to);
+  return a && b && c && d ? `${a}~${b} ÷ ${c}~${d}` : "";
+}
+
 /** 주간 핵심 지표 행 */
 function mapWeeklyDashRow(r) {
   if (!r || typeof r !== "object") {
@@ -1346,6 +1370,8 @@ function mapReservationDashRow(r) {
   if (!r || typeof r !== "object") {
     return {
       store: "",
+      rsv_lunch: 0,
+      rsv_dinner: 0,
       rsv: 0,
       wow: null,
       mom: null,
@@ -1358,6 +1384,9 @@ function mapReservationDashRow(r) {
   }
   return {
     store: String(pickRow(r, ["store", "STORE_NM", "STR_STORE_NM", "STORE"]) ?? ""),
+    // 2026-11-12 런치·디너 (예약의 식사구분), 총합 = rsv
+    rsv_lunch: parseDashAmount(pickRow(r, ["rsv_lunch", "RSV_LUNCH"])),
+    rsv_dinner: parseDashAmount(pickRow(r, ["rsv_dinner", "RSV_DINNER"])),
     rsv: parseDashAmount(pickRow(r, ["rsv", "RSV", "RSV_CNT", "RESERVATION"])),
     // 2026-11-11 전주비 (시작일·종료일 −7일)
     wow: parseDashRate(pickRow(r, ["wow", "WOW", "WOW_RATE"])),
@@ -1376,6 +1405,8 @@ function mapCustomerDashRow(r) {
   if (!r || typeof r !== "object") {
     return {
       store: "",
+      custLunch: null,
+      custDinner: null,
       custCount: 0,
       custWow: null,
       custMom: null,
@@ -1388,6 +1419,9 @@ function mapCustomerDashRow(r) {
   }
   return {
     store: String(pickRow(r, ["store", "STORE_NM", "STR_STORE_NM", "STORE"]) ?? ""),
+    // 2026-11-12 런치·디너 (디너 시각 미등록 매장은 SP 가 NULL → 빈칸)
+    custLunch: parseDashRate(pickRow(r, ["custLunch", "CUST_LUNCH"])),
+    custDinner: parseDashRate(pickRow(r, ["custDinner", "CUST_DINNER"])),
     custCount: parseDashAmount(
       pickRow(r, ["custCount", "CUST_COUNT", "CUST_CNT", "CUSTOMER_CNT"])
     ),
@@ -1624,6 +1658,9 @@ async function loadSalesAnalysisDashboardData() {
       rw.status === "fulfilled" && Array.isArray(readDashList(rw.value))
         ? readDashList(rw.value).map((row) => mapWeeklyDashRow(row))
         : [];
+    // 2026-11-12 A안 전주비 비교 주 안내 (SP wow_from·wow_to·wow_prev_from·wow_prev_to)
+    weeklyWowRangeText.value =
+      rw.status === "fulfilled" ? buildWeeklyWowRangeText(readDashList(rw.value)[0]) : "";
     customerRows.value =
       rc.status === "fulfilled" && Array.isArray(readDashList(rc.value))
         ? readDashList(rc.value).map((row) => mapCustomerDashRow(row))
@@ -2122,7 +2159,13 @@ function onExcel() {
       COL_CUSTOMER_LAYOUT
     );
     pushSection("재료비", COL_MATERIAL, costMaterialRows.value, STORE_SALES_TOTAL_ROW_HIGHLIGHT);
-    pushSection("예약현황", COL_RESERVATION, laborRows.value, STORE_SALES_TOTAL_ROW_HIGHLIGHT);
+    pushSection(
+      "예약현황",
+      COL_RESERVATION,
+      laborRows.value,
+      STORE_SALES_TOTAL_ROW_HIGHLIGHT,
+      COL_RESERVATION_LAYOUT
+    );
 
     ws["!merges"] = merges;
 
@@ -2287,6 +2330,8 @@ async function onPrint() {
           columns: COL_RESERVATION,
           rows: laborRows.value,
           totalHighlight: STORE_SALES_TOTAL_ROW_HIGHLIGHT,
+          // 2026-11-12 2단 헤더(예약인원·단체)
+          groupHeader: getDashGroupHeaderCells(COL_RESERVATION, COL_RESERVATION_LAYOUT),
         },
       ],
     });
@@ -3094,5 +3139,19 @@ defineExpose({
   justify-content: flex-end;
   gap: 8px;
   margin-top: 12px;
+}
+/* 2026-11-12 주간 핵심 지표 전주비 비교 주 안내 */
+.sa-weekly-wow-range {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 </style>
