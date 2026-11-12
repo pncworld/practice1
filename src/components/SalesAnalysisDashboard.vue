@@ -25,6 +25,16 @@
             <img class="sa-hd-btn__ic" :src="saIconPrint" width="16" height="16" alt="" />
             출력
           </button>
+          <!-- 2026-11-11 매장 선택: 본사 계정만 (매장 계정은 기존대로 자기 매장 고정) -->
+          <button
+            v-if="isHqDashSession"
+            type="button"
+            class="sa-hd-btn sa-hd-btn--ghost"
+            :title="storePickSummaryTitle"
+            @click="openStorePick">
+            매장 선택
+            <span class="sa-store-pick-badge">{{ storePickSummary }}</span>
+          </button>
         </div>
       </div>
       <div class="sa-head-btns">
@@ -278,6 +288,67 @@
       </div>
     </Teleport>
 
+    <!-- 2026-11-11 매장 선택 팝업 (합계·평균은 고른 매장 기준) -->
+    <Teleport to="body">
+      <div
+        v-if="storePickOpen"
+        class="sa-store-pick-overlay"
+        role="presentation"
+        @mousedown.self="closeStorePick">
+        <div class="sa-store-pick" role="dialog" aria-modal="true" aria-label="매장 선택">
+          <div class="sa-store-pick__hd">
+            <span class="sa-store-pick__title">매장 선택</span>
+            <span class="sa-store-pick__count">{{ storePickDraft.length }} / {{ storeOptions.length }}곳</span>
+          </div>
+          <div v-if="storePickLoading" class="sa-store-pick__empty">매장 목록을 불러오는 중입니다.</div>
+          <div v-else-if="!storeOptions.length" class="sa-store-pick__empty">매장 목록이 없습니다.</div>
+          <template v-else>
+            <div class="sa-store-pick__quick">
+              <button type="button" class="sa-store-pick__chip" @click="storePickSelectAll">전체 선택</button>
+              <button type="button" class="sa-store-pick__chip" @click="storePickDraft = []">선택 해제</button>
+            </div>
+            <div
+              v-for="grp in storeQuickGroups"
+              :key="grp.key"
+              class="sa-store-pick__quick">
+              <span class="sa-store-pick__quick-k">{{ grp.label }}</span>
+              <button
+                v-for="v in grp.values"
+                :key="`${grp.key}-${v}`"
+                type="button"
+                class="sa-store-pick__chip"
+                :class="{ 'is-on': isStoreQuickAllOn(grp.key, v) }"
+                @click="toggleStoreQuick(grp.key, v)">
+                {{ v }}
+              </button>
+            </div>
+            <div class="sa-store-pick__list">
+              <label v-for="opt in storeOptions" :key="opt.name" class="sa-store-pick__item">
+                <input v-model="storePickDraft" type="checkbox" :value="opt.name" />
+                <span class="sa-store-pick__name">{{ opt.name }}</span>
+                <span class="sa-store-pick__meta">{{ opt.meta }}</span>
+              </label>
+            </div>
+          </template>
+          <div class="sa-store-pick__ft">
+            <button type="button" class="pnc-sub-btn" @click="applyStorePick">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" />
+              </svg>
+              적용
+            </button>
+            <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="closeStorePick">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 16 16" aria-hidden="true">
+                <circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5" />
+                <path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="currentColor" stroke-width="1.5" />
+              </svg>
+              취소
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
     <ReportPrintShell
       v-model:open="printPreviewOpen"
       title="매출 분석 인쇄 미리보기"
@@ -300,10 +371,16 @@ import { SA_DASH_SHEET_CSS } from "@/components/reportPrint/saDashSheetStyles";
 import SalesAnalysisPrintSheet from "@/components/reportPrint/sheets/SalesAnalysisPrintSheet.vue";
 import {
   getCustomerAndUnitPriceByStore,
+  getCustomerAndUnitPriceByStores,
+  getDashStoreList,
   getMaterialCostByStore,
+  getMaterialCostByStores,
   getReservationByStore,
+  getReservationByStores,
   getStoreSalesByStore,
+  getStoreSalesByStores,
   getWeeklyKeyIndicators,
+  getWeeklyKeyIndicatorsByStores,
 } from "@/api/common";
 import { USER_ADMIN_ID_SUPPLIER_ACCOUNT } from "@/constants/sessionUser";
 import {
@@ -313,6 +390,7 @@ import {
 import {
   COL_CUSTOMER,
   COL_CUSTOMER_LAYOUT,
+  getDashGroupHeaderCells,
   COL_MATERIAL,
   COL_RESERVATION,
   COL_STORE_SALES,
@@ -337,7 +415,7 @@ const router = useRouter();
 /** `store` = `합계` 행 강조 — 매장 매출·객수/객단가 공통 */
 const STORE_SALES_TOTAL_ROW_HIGHLIGHT = Object.freeze({
   field: "store",
-  values: ["합계"],
+  values: ["합계", "평균"], // 2026-11-11 평균 행도 합계와 같은 강조
 });
 
 /** 패널 타이틀 크게 보기 (이 컴포넌트 전용) */
@@ -848,13 +926,27 @@ function onExpandPanelExcel() {
     utils.sheet_add_aoa(ws, [pad([view.title])], { origin: "A1" });
     utils.sheet_add_aoa(
       ws,
-      [pad([`${bullet}조회기간: ${periodLabel.value} (${FROM_DT}~${TO_DT})`])],
+      [pad([`${bullet}조회기간: ${periodLabel.value} (${FROM_DT}~${TO_DT})${storePickExportSuffix.value}`])],
       { origin: "A2" }
     );
     utils.sheet_add_aoa(ws, [pad([`${bullet}조회일시: ${queriedAt}`])], { origin: "A3" });
     utils.sheet_add_aoa(ws, [pad([""])], { origin: "A4" });
 
-    const headerRow1 = 5;
+    // 2026-11-11 2단 헤더(객수/객단가 등)가 있으면 5행에 위쪽 줄, 6행에 열 이름
+    const groupCells = getDashGroupHeaderCells(columns, view.columnLayout);
+    const groupMerges = [];
+    if (groupCells) {
+      const top = [];
+      let c0 = 0;
+      for (const g of groupCells) {
+        top.push(g.text);
+        for (let k = 1; k < g.span; k++) top.push("");
+        if (g.span > 1) groupMerges.push({ s: { r: 4, c: c0 }, e: { r: 4, c: c0 + g.span - 1 } });
+        c0 += g.span;
+      }
+      utils.sheet_add_aoa(ws, [pad(top)], { origin: "A5" });
+    }
+    const headerRow1 = groupCells ? 6 : 5;
     utils.sheet_add_aoa(ws, [pad(columns.map((c) => c.headerText))], {
       origin: utils.encode_cell({ r: headerRow1 - 1, c: 0 }),
     });
@@ -870,7 +962,7 @@ function onExpandPanelExcel() {
         })
       )
     );
-    const dataStart = 6;
+    const dataStart = headerRow1 + 1;
     let dataEnd = 0;
     if (aoa.length) {
       utils.sheet_add_aoa(ws, aoa, { origin: utils.encode_cell({ r: dataStart - 1, c: 0 }) });
@@ -881,6 +973,7 @@ function onExpandPanelExcel() {
       { s: { r: 0, c: 0 }, e: { r: 0, c: maxCols - 1 } },
       { s: { r: 1, c: 0 }, e: { r: 1, c: maxCols - 1 } },
       { s: { r: 2, c: 0 }, e: { r: 2, c: maxCols - 1 } },
+      ...groupMerges,
     ];
     ws["!merges"] = merges;
 
@@ -918,6 +1011,7 @@ function onExpandPanelExcel() {
     paintDashExcelRect(ws, 1, 1, 1, maxCols, titleStyle);
     paintDashExcelRect(ws, 2, 1, 2, maxCols, metaStyle);
     paintDashExcelRect(ws, 3, 1, 3, maxCols, metaStyle);
+    if (groupCells) paintDashExcelRect(ws, 5, 1, 5, maxCols, headerStyle);
     paintDashExcelRect(ws, headerRow1, 1, headerRow1, maxCols, headerStyle);
 
     const tot = view.totalRowHighlight;
@@ -940,7 +1034,9 @@ function onExpandPanelExcel() {
             },
           };
           if (cell.t === "n" && isNumberCol) {
-            cell.z = colDef?.numberFormat?.includes(".") ? "#,##0.00" : "#,##0";
+            cell.z = dashExcelNumFmt(colDef);
+            const signRgb = dashExcelSignColorRgb(colDef, cell.v);
+            if (signRgb) cell.s = { ...cell.s, font: { ...cell.s.font, color: { rgb: signRgb } } };
           }
         }
       }
@@ -950,6 +1046,7 @@ function onExpandPanelExcel() {
     ws["!rows"][0] = { hpt: 32, customHeight: true };
     ws["!rows"][1] = { hpt: 22, customHeight: true };
     ws["!rows"][2] = { hpt: 22, customHeight: true };
+    if (groupCells) ws["!rows"][4] = { hpt: 24, customHeight: true };
     ws["!rows"][headerRow1 - 1] = { hpt: 24, customHeight: true };
     if (dataEnd >= dataStart) {
       for (let rr = dataStart; rr <= dataEnd; rr++) {
@@ -1177,7 +1274,16 @@ function mapWeeklyDashRow(r) {
 /** 매장 매출 공통 행 */
 function mapStoreMetricDashRow(r) {
   if (!r || typeof r !== "object") {
-    return { store: "", target: 0, actual: 0, rate: 0, wow: null, mom: null, yoy: null };
+    return {
+      store: "",
+      target: 0,
+      actual: 0,
+      rate: 0,
+      wow: null,
+      mom: null,
+      yoy: null,
+      member: null,
+    };
   }
   return {
     store: String(pickRow(r, ["store", "STORE_NM", "STR_STORE_NM", "STORE"]) ?? ""),
@@ -1188,6 +1294,8 @@ function mapStoreMetricDashRow(r) {
     // 2026-11-10 전월비
     mom: parseDashRate(pickRow(r, ["mom", "MOM", "MOM_RATE"])),
     yoy: parseDashRate(pickRow(r, ["yoy", "YOY", "YOY_RATE"])),
+    // 2026-11-11 멤버십: 조회 기간 가입 수 (SP member)
+    member: parseDashRate(pickRow(r, ["member", "MEMBER", "JOIN_CNT"])),
   };
 }
 
@@ -1199,6 +1307,9 @@ function mapMaterialDashRow(r) {
       targetRate: 0,
       actualRate: 0,
       rateDiff: 0,
+      xRate: null,
+      mom: null,
+      yoy: null,
       targetAmt: 0,
       purchaseAmt: 0,
       amtDiff: 0,
@@ -1214,8 +1325,12 @@ function mapMaterialDashRow(r) {
       parseDashRate(
         pickRow(r, ["actualRate", "ACTUAL_RATE", "ACTUALRATE", "실제원가율"])
       ) ?? 0,
-    rateDiff:
-      parseDashRate(pickRow(r, ["rateDiff", "RATE_DIFF", "RATEDIFF", "원가율차이"])) ?? 0,
+    // 2026-11-11 목표원가율·매입원가율 중 하나가 0이면 SP가 NULL → 빈칸
+    rateDiff: parseDashRate(pickRow(r, ["rateDiff", "RATE_DIFF", "RATEDIFF", "원가율차이"])),
+    // 2026-11-11 X월 원가율(월마감 없으면 빈칸), 매입원가율 전월비·전년비
+    xRate: parseDashRate(pickRow(r, ["xRate", "XRATE", "X_RATE"])),
+    mom: parseDashRate(pickRow(r, ["mom", "MOM", "MOM_RATE"])),
+    yoy: parseDashRate(pickRow(r, ["yoy", "YOY", "YOY_RATE"])),
     targetAmt: parseDashAmount(
       pickRow(r, ["targetAmt", "TARGET_AMT", "TARGETAMT", "목표금액"])
     ),
@@ -1229,14 +1344,29 @@ function mapMaterialDashRow(r) {
 /** 예약현황 — store, rsv, mom, yoy, grp, grp_yoy */
 function mapReservationDashRow(r) {
   if (!r || typeof r !== "object") {
-    return { store: "", rsv: 0, mom: null, yoy: null, grp: 0, grp_yoy: null };
+    return {
+      store: "",
+      rsv: 0,
+      wow: null,
+      mom: null,
+      yoy: null,
+      grp: 0,
+      grp_wow: null,
+      grp_mom: null,
+      grp_yoy: null,
+    };
   }
   return {
     store: String(pickRow(r, ["store", "STORE_NM", "STR_STORE_NM", "STORE"]) ?? ""),
     rsv: parseDashAmount(pickRow(r, ["rsv", "RSV", "RSV_CNT", "RESERVATION"])),
+    // 2026-11-11 전주비 (시작일·종료일 −7일)
+    wow: parseDashRate(pickRow(r, ["wow", "WOW", "WOW_RATE"])),
     mom: parseDashRate(pickRow(r, ["mom", "MOM", "MOM_RATE"])),
     yoy: parseDashRate(pickRow(r, ["yoy", "YOY", "YOY_RATE"])),
     grp: parseDashAmount(pickRow(r, ["grp", "GRP", "GRP_CNT", "GROUP_CNT"])),
+    // 2026-11-11 단체 전주비·전월비
+    grp_wow: parseDashRate(pickRow(r, ["grp_wow", "GRP_WOW", "GROUP_WOW"])),
+    grp_mom: parseDashRate(pickRow(r, ["grp_mom", "GRP_MOM", "GROUP_MOM"])),
     grp_yoy: parseDashRate(pickRow(r, ["grp_yoy", "GRP_YOY", "GROUP_YOY"])),
   };
 }
@@ -1280,6 +1410,173 @@ function clearSalesAnalysisDashboardRows() {
   laborRows.value = [];
 }
 
+/* ============================================================
+ * 2026-11-11 매장 선택 (원하는 매장만 합계·평균) + 평균 행
+ * - 본사(STORE_CD 0) 세션만 버튼 표시. 매장 계정은 기존대로 자기 매장 고정
+ * - 선택 없음(빈 배열) = 기존 전체 조회와 동일
+ * ============================================================ */
+
+/** 고른 매장코드 (빈 배열 = 전체) */
+const selectedStoreCodes = ref([]);
+/** 팝업 매장 목록 — 표시명 단위로 묶음 `{ name, codes, joinType, area, team, sv, meta }` */
+const storeOptions = ref([]);
+const storePickOpen = ref(false);
+const storePickLoading = ref(false);
+/** 팝업에서 체크 중인 표시명 */
+const storePickDraft = ref([]);
+/** 마지막 적용한 표시명 (요약 표시용) */
+const storePickAppliedNames = ref([]);
+
+const isHqDashSession = computed(() => {
+  const u = store.state.userData;
+  if (!u || typeof u !== "object" || Array.isArray(u)) return false;
+  if (shouldSkipSalesAnalysisDashApis(u)) return false;
+  return Number(resolveSalesDashStoreCd(u)) === 0;
+});
+
+const storePickSummary = computed(() =>
+  storePickAppliedNames.value.length ? `${storePickAppliedNames.value.length}곳` : "전체"
+);
+/** 출력·엑셀 조회기간 뒤에 붙는 선택 매장 표시 (전체면 빈 문자열) */
+const storePickExportSuffix = computed(() =>
+  storePickAppliedNames.value.length
+    ? ` / 선택 매장 ${storePickAppliedNames.value.length}곳: ${storePickAppliedNames.value.join(", ")}`
+    : ""
+);
+const storePickSummaryTitle = computed(() =>
+  storePickAppliedNames.value.length ? storePickAppliedNames.value.join(", ") : "전체 매장"
+);
+
+/** 묶음 선택 버튼 (값이 2개 이상인 구분만) */
+const storeQuickGroups = computed(() => {
+  const defs = [
+    { key: "joinType", label: "직/가맹" },
+    { key: "area", label: "지역" },
+    { key: "team", label: "SV팀" },
+    { key: "sv", label: "SV" },
+  ];
+  return defs
+    .map((d) => ({
+      ...d,
+      values: [...new Set(storeOptions.value.map((o) => o[d.key]).filter((v) => v))],
+    }))
+    .filter((d) => d.values.length > 1);
+});
+
+function isStoreQuickAllOn(key, value) {
+  const names = storeOptions.value.filter((o) => o[key] === value).map((o) => o.name);
+  return names.length > 0 && names.every((n) => storePickDraft.value.includes(n));
+}
+
+/** 묶음 버튼: 모두 체크돼 있으면 해제, 아니면 추가 */
+function toggleStoreQuick(key, value) {
+  const names = storeOptions.value.filter((o) => o[key] === value).map((o) => o.name);
+  if (isStoreQuickAllOn(key, value)) {
+    storePickDraft.value = storePickDraft.value.filter((n) => !names.includes(n));
+  } else {
+    storePickDraft.value = [...new Set([...storePickDraft.value, ...names])];
+  }
+}
+
+function storePickSelectAll() {
+  storePickDraft.value = storeOptions.value.map((o) => o.name);
+}
+
+async function loadStoreOptions() {
+  const u = store.state.userData;
+  storePickLoading.value = true;
+  try {
+    const res = await getDashStoreList(u.lngStoreGroup, resolveSalesDashStoreCd(u), u.lngSequence);
+    /** @type {Map<string, any>} */
+    const byName = new Map();
+    for (const r of readDashList(res)) {
+      const name = String(r.strStoreNM ?? "").trim();
+      const code = Number(r.lngStoreCode);
+      if (!name || !Number.isFinite(code)) continue;
+      if (!byName.has(name)) {
+        byName.set(name, {
+          name,
+          codes: [],
+          joinType: String(r.strJoinType ?? "").trim(),
+          area: String(r.strArea ?? "").trim(),
+          team: String(r.strTeam ?? "").trim(),
+          sv: String(r.strSupervisor ?? "").trim(),
+        });
+      }
+      byName.get(name).codes.push(code);
+    }
+    storeOptions.value = [...byName.values()].map((o) => ({
+      ...o,
+      meta: [o.joinType, o.area, o.sv].filter(Boolean).join(" · "),
+    }));
+  } catch (e) {
+    console.error("[SalesAnalysisDashboard] loadStoreOptions", e);
+    storeOptions.value = [];
+  } finally {
+    storePickLoading.value = false;
+  }
+}
+
+async function openStorePick() {
+  storePickOpen.value = true;
+  if (!storeOptions.value.length) await loadStoreOptions();
+  storePickDraft.value = storePickAppliedNames.value.length
+    ? [...storePickAppliedNames.value]
+    : storeOptions.value.map((o) => o.name);
+}
+
+function closeStorePick() {
+  storePickOpen.value = false;
+}
+
+async function applyStorePick() {
+  if (!storePickDraft.value.length) {
+    await Swal.fire({
+      title: "경고",
+      text: "매장을 한 곳 이상 선택해 주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  const all = storePickDraft.value.length >= storeOptions.value.length;
+  const picked = storeOptions.value.filter((o) => storePickDraft.value.includes(o.name));
+  storePickAppliedNames.value = all ? [] : picked.map((o) => o.name);
+  selectedStoreCodes.value = all ? [] : picked.flatMap((o) => o.codes);
+  storePickOpen.value = false;
+  onSearch();
+}
+
+/**
+ * 합계 행 바로 아래 평균 행 추가 (매장 행 2곳 이상일 때)
+ * - 금액·객수·건수: 매장 행 단순 평균 (= 합계 ÷ 매장 수), 원 단위 반올림
+ * - 비율(소수 형식 열)·객단가: 값이 있는 매장만 단순 평균 (빈칸·0 제외)
+ */
+function appendDashAverageRow(rows, columns) {
+  if (!Array.isArray(rows) || !rows.length) return rows;
+  const isTotal = (r) => String(r?.store ?? "").trim() === "합계";
+  const storeRows = rows.filter((r) => !isTotal(r));
+  if (storeRows.length < 2) return rows;
+  const avg = { store: "평균" };
+  for (const c of columns) {
+    if (c.fieldName === "store" || c.fieldDataType !== "number") continue;
+    const isRateLike = String(c.numberFormat || "").includes(".") || c.fieldName === "price";
+    const vals = storeRows
+      .map((r) => r[c.fieldName])
+      .filter((v) => typeof v === "number" && Number.isFinite(v) && (!isRateLike || v !== 0));
+    if (!vals.length) {
+      avg[c.fieldName] = null;
+      continue;
+    }
+    const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+    avg[c.fieldName] = isRateLike ? Math.round(mean * 100) / 100 : Math.round(mean);
+  }
+  const ti = rows.findIndex(isTotal);
+  const out = rows.slice();
+  out.splice(ti >= 0 ? ti + 1 : 0, 0, avg);
+  return out;
+}
+
 async function loadSalesAnalysisDashboardData() {
   const u = store.state.userData;
   if (!u || typeof u !== "object" || Array.isArray(u)) {
@@ -1302,14 +1599,27 @@ async function loadSalesAnalysisDashboardData() {
   const groupCd = u.lngStoreGroup;
   const storeCd = resolveSalesDashStoreCd(u);
   const sequence = u.lngSequence;
+  // 2026-11-11 매장 선택: 본사(STORE_CD 0)이고 고른 매장이 있을 때만 선택 매장 API 사용 (그 외 기존 그대로)
+  const pickCodes = Number(storeCd) === 0 ? selectedStoreCodes.value : [];
+  const usePick = pickCodes.length > 0;
   try {
-    const [rw, rc, rs, rm, rl] = await Promise.allSettled([
-      getWeeklyKeyIndicators(groupCd, storeCd, sequence, FROM_DT, TO_DT),
-      getCustomerAndUnitPriceByStore(groupCd, storeCd, sequence, FROM_DT, TO_DT),
-      getStoreSalesByStore(groupCd, storeCd, sequence, FROM_DT, TO_DT),
-      getMaterialCostByStore(groupCd, storeCd, sequence, FROM_DT, TO_DT),
-      getReservationByStore(groupCd, storeCd, sequence, FROM_DT, TO_DT),
-    ]);
+    const [rw, rc, rs, rm, rl] = await Promise.allSettled(
+      usePick
+        ? [
+            getWeeklyKeyIndicatorsByStores(groupCd, storeCd, sequence, FROM_DT, TO_DT, pickCodes),
+            getCustomerAndUnitPriceByStores(groupCd, storeCd, sequence, FROM_DT, TO_DT, pickCodes),
+            getStoreSalesByStores(groupCd, storeCd, sequence, FROM_DT, TO_DT, pickCodes),
+            getMaterialCostByStores(groupCd, storeCd, sequence, FROM_DT, TO_DT, pickCodes),
+            getReservationByStores(groupCd, storeCd, sequence, FROM_DT, TO_DT, pickCodes),
+          ]
+        : [
+            getWeeklyKeyIndicators(groupCd, storeCd, sequence, FROM_DT, TO_DT),
+            getCustomerAndUnitPriceByStore(groupCd, storeCd, sequence, FROM_DT, TO_DT),
+            getStoreSalesByStore(groupCd, storeCd, sequence, FROM_DT, TO_DT),
+            getMaterialCostByStore(groupCd, storeCd, sequence, FROM_DT, TO_DT),
+            getReservationByStore(groupCd, storeCd, sequence, FROM_DT, TO_DT),
+          ]
+    );
     weeklyKpi.value =
       rw.status === "fulfilled" && Array.isArray(readDashList(rw.value))
         ? readDashList(rw.value).map((row) => mapWeeklyDashRow(row))
@@ -1330,6 +1640,11 @@ async function loadSalesAnalysisDashboardData() {
       rl.status === "fulfilled" && Array.isArray(readDashList(rl.value))
         ? readDashList(rl.value).map((row) => mapReservationDashRow(row))
         : [];
+    // 2026-11-11 합계 아래 평균 행 (매장 행이 2곳 이상일 때만)
+    customerRows.value = appendDashAverageRow(customerRows.value, COL_CUSTOMER);
+    storeSalesRows.value = appendDashAverageRow(storeSalesRows.value, COL_STORE_SALES);
+    costMaterialRows.value = appendDashAverageRow(costMaterialRows.value, COL_MATERIAL);
+    laborRows.value = appendDashAverageRow(laborRows.value, COL_RESERVATION);
   } catch {
     clearSalesAnalysisDashboardRows();
   } finally {
@@ -1408,6 +1723,21 @@ const SA_EXCEL_BORDER_BANNER_BASE = {
 /** 각 표(구역 제목~데이터) 바깥 둘레만 — 내부 격자는 연한선 유지 */
 const SA_EXCEL_BORDER_BLOCK_OUTLINE = { style: "medium", color: { rgb: "FF000000" } };
 
+/** 2026-11-11 엑셀 숫자 형식 = 열 정의 numberFormat 그대로 (예약현황 #,##0.0 이 0.00 으로 나오던 문제) */
+function dashExcelNumFmt(colDef) {
+  const f = String(colDef?.numberFormat || "");
+  if (f === "#,##0.0" || f === "#,##0.00" || f === "#,##0") return f;
+  return f.includes(".") ? "#,##0.00" : "#,##0";
+}
+
+/** 2026-11-11 열 정의 signColor 면 양수 빨강·음수 파랑 (화면과 동일) */
+function dashExcelSignColorRgb(colDef, v) {
+  if (colDef?.signColor !== true || typeof v !== "number" || !Number.isFinite(v) || v === 0) {
+    return null;
+  }
+  return v > 0 ? "FFDC2626" : "FF2563EB";
+}
+
 /**
  * 한 시트에 표를 위에서 아래로 이어 붙임 (제목·헤더·데이터 + 빈 행)
  * @param {import("xlsx-js-style").WorkSheet} ws
@@ -1416,8 +1746,9 @@ const SA_EXCEL_BORDER_BLOCK_OUTLINE = { style: "medium", color: { rgb: "FF000000
  * @param {{ fieldName: string; headerText: string; fieldDataType?: string; numberFormat?: string }[]} columns
  * @param {Record<string, unknown>[]} rows
  * @param {number} maxCols 가로 폭 맞춤
+ * @param {Array<object> | null} [columnLayout] 2단 헤더(있을 때만 위쪽 줄 추가, 2026-11-11)
  */
-function appendDashExcelSection(ws, row1, sectionTitle, columns, rows, maxCols) {
+function appendDashExcelSection(ws, row1, sectionTitle, columns, rows, maxCols, columnLayout = null) {
   const pad = (/** @type {unknown[]} */ arr) => {
     const x = arr.slice();
     while (x.length < maxCols) x.push("");
@@ -1428,6 +1759,24 @@ function appendDashExcelSection(ws, row1, sectionTitle, columns, rows, maxCols) 
     origin: utils.encode_cell({ r: row1 - 1, c: 0 }),
   });
   let r = row1 + 1;
+  const groupCells = getDashGroupHeaderCells(columns, columnLayout);
+  let groupHeaderRow = 0;
+  const groupMerges = [];
+  if (groupCells) {
+    groupHeaderRow = r;
+    const top = [];
+    let c0 = 0;
+    for (const g of groupCells) {
+      top.push(g.text);
+      for (let k = 1; k < g.span; k++) top.push("");
+      if (g.span > 1) {
+        groupMerges.push({ s: { r: r - 1, c: c0 }, e: { r: r - 1, c: c0 + g.span - 1 } });
+      }
+      c0 += g.span;
+    }
+    utils.sheet_add_aoa(ws, [pad(top)], { origin: utils.encode_cell({ r: r - 1, c: 0 }) });
+    r += 1;
+  }
   const headerRow = r;
   utils.sheet_add_aoa(ws, [pad(columns.map((c) => c.headerText))], {
     origin: utils.encode_cell({ r: r - 1, c: 0 }),
@@ -1457,6 +1806,8 @@ function appendDashExcelSection(ws, row1, sectionTitle, columns, rows, maxCols) 
   return {
     nextRow: r,
     sectionTitleRow,
+    groupHeaderRow,
+    groupMerges,
     headerRow,
     dataStart: aoa.length ? dataStart : 0,
     dataEnd: aoa.length ? dataEnd : 0,
@@ -1607,6 +1958,9 @@ function applySalesDashExcelStyles(ws, layout) {
   for (const b of blocks) {
     const cc = b.colCount ?? b.columns?.length ?? maxCols;
     paintDashExcelRect(ws, b.sectionTitleRow, 1, b.sectionTitleRow, cc, sectionTitleStyle);
+    if (b.groupHeaderRow > 0) {
+      paintDashExcelRect(ws, b.groupHeaderRow, 1, b.groupHeaderRow, cc, headerStyle);
+    }
     paintDashExcelRect(ws, b.headerRow, 1, b.headerRow, cc, headerStyle);
     if (b.dataStart > 0 && b.dataEnd >= b.dataStart) {
       const totalSet = new Set(
@@ -1627,7 +1981,9 @@ function applySalesDashExcelStyles(ws, layout) {
             alignment: { ...base.alignment, horizontal: hz },
           };
           if (cell.t === "n" && isNumberCol) {
-            cell.z = colDef?.numberFormat?.includes(".") ? "#,##0.00" : "#,##0";
+            cell.z = dashExcelNumFmt(colDef);
+            const signRgb = dashExcelSignColorRgb(colDef, cell.v);
+            if (signRgb) cell.s = { ...cell.s, font: { ...cell.s.font, color: { rgb: signRgb } } };
           }
         }
       }
@@ -1644,6 +2000,9 @@ function applySalesDashExcelStyles(ws, layout) {
   for (const b of blocks) {
     if (b.sectionTitleRow > 0) {
       ws["!rows"][b.sectionTitleRow - 1] = { hpt: 26, customHeight: true };
+    }
+    if (b.groupHeaderRow > 0) {
+      ws["!rows"][b.groupHeaderRow - 1] = { hpt: 24, customHeight: true };
     }
     if (b.headerRow > 0) {
       ws["!rows"][b.headerRow - 1] = { hpt: 24, customHeight: true };
@@ -1709,7 +2068,7 @@ function onExcel() {
         ? String(queryDateTimeText.value).trim()
         : formatSalesDashQueryAtSeoul(new Date());
     topBanner[leftCols] =
-      `${SA_EXCEL_META_BULLET}조회기간: ${periodLabel.value} (${FROM_DT}~${TO_DT})\n${SA_EXCEL_META_BULLET}조회일시: ${queriedAt}`;
+      `${SA_EXCEL_META_BULLET}조회기간: ${periodLabel.value} (${FROM_DT}~${TO_DT})${storePickExportSuffix.value}\n${SA_EXCEL_META_BULLET}조회일시: ${queriedAt}`;
     utils.sheet_add_aoa(ws, [topBanner], { origin: utils.encode_cell({ r: 0, c: 0 }) });
 
     let r = 2;
@@ -1723,9 +2082,10 @@ function onExcel() {
 
     const blocks = [];
     /** @param {string} title @param {typeof COL_WEEKLY} cols @param {unknown[]} data @param {{ field: string; values: string[] } | null} [totalHighlight] */
-    const pushSection = (title, cols, data, totalHighlight = null) => {
+    const pushSection = (title, cols, data, totalHighlight = null, columnLayout = null) => {
       const rows = Array.isArray(data) ? data : [];
-      const b = appendDashExcelSection(ws, r, title, cols, rows, maxCols);
+      const b = appendDashExcelSection(ws, r, title, cols, rows, maxCols, columnLayout);
+      merges.push(...b.groupMerges);
       r = b.nextRow;
       const colCount = b.colCount;
       merges.push({
@@ -1742,6 +2102,7 @@ function onExcel() {
       }
       blocks.push({
         sectionTitleRow: b.sectionTitleRow,
+        groupHeaderRow: b.groupHeaderRow,
         headerRow: b.headerRow,
         dataStart: b.dataStart,
         dataEnd: b.dataEnd,
@@ -1753,7 +2114,13 @@ function onExcel() {
     const WEEKLY_TOTAL_HIGHLIGHT = Object.freeze({ field: "label", values: ["합계"] });
     pushSection("주간 핵심 지표", COL_WEEKLY, weeklyKpi.value, WEEKLY_TOTAL_HIGHLIGHT);
     pushSection("매장 매출", COL_STORE_SALES, storeSalesRows.value, STORE_SALES_TOTAL_ROW_HIGHLIGHT);
-    pushSection("객수 / 객단가", COL_CUSTOMER, customerRows.value, STORE_SALES_TOTAL_ROW_HIGHLIGHT);
+    pushSection(
+      "객수 / 객단가",
+      COL_CUSTOMER,
+      customerRows.value,
+      STORE_SALES_TOTAL_ROW_HIGHLIGHT,
+      COL_CUSTOMER_LAYOUT
+    );
     pushSection("재료비", COL_MATERIAL, costMaterialRows.value, STORE_SALES_TOTAL_ROW_HIGHLIGHT);
     pushSection("예약현황", COL_RESERVATION, laborRows.value, STORE_SALES_TOTAL_ROW_HIGHLIGHT);
 
@@ -1832,7 +2199,11 @@ function onGoTargetCostRateRegister() {
   openSls01RegistrationTab("목표원가율 등록");
 }
 
-const maxSelectableDate = computed(() => getSeoulTodayYmdHyphen());
+/** 2026-11-11 예약현황 미래 조회 허용 — 오늘 기준 1년 뒤까지 선택 가능 (매출 등 다른 패널은 미래 구간이 0으로 나옴) */
+const maxSelectableDate = computed(() => {
+  const [y, m, d] = getSeoulTodayYmdHyphen().split("-");
+  return `${Number(y) + 1}-${m}-${d === "29" && m === "02" ? "28" : d}`;
+});
 
 const periodLabel = computed(
   () => `${formatYmdToMdSlash(queriedFromDate.value)} ~ ${formatYmdToMdSlash(queriedToDate.value)}`
@@ -1877,7 +2248,7 @@ async function onPrint() {
   printPages.value = [];
   try {
     printPages.value = loadSalesAnalysisPrintPages({
-      periodText: periodLabel.value,
+      periodText: `${periodLabel.value}${storePickExportSuffix.value}`,
       searchAtText: String(queryDateTimeText.value || "").trim() || "—",
       sections: [
         {
@@ -1900,6 +2271,8 @@ async function onPrint() {
           columns: COL_CUSTOMER,
           rows: customerRows.value,
           totalHighlight: STORE_SALES_TOTAL_ROW_HIGHLIGHT,
+          // 2026-11-11 화면과 같은 2단 헤더(구분·객수·객단가)
+          groupHeader: getDashGroupHeaderCells(COL_CUSTOMER, COL_CUSTOMER_LAYOUT),
         },
         {
           id: "material",
@@ -2589,5 +2962,137 @@ defineExpose({
   min-width: 0;
   width: 100%;
   height: 100%;
+}
+
+/* 2026-11-11 매장 선택 버튼·팝업 */
+.sa-store-pick-badge {
+  margin-left: 4px;
+  padding: 0 6px;
+  border-radius: 9px;
+  background: #dbe6f7;
+  color: #1a3c70;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 18px;
+}
+.sa-store-pick-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.35);
+}
+.sa-store-pick {
+  display: flex;
+  flex-direction: column;
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(640px, calc(100vh - 48px));
+  padding: 16px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.25);
+}
+.sa-store-pick__hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.sa-store-pick__title {
+  position: relative;
+  padding-left: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a3c70;
+}
+.sa-store-pick__title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 3px;
+  bottom: 3px;
+  width: 4px;
+  border-radius: 2px;
+  background: #2563eb;
+}
+.sa-store-pick__count {
+  font-size: 13px;
+  color: #475569;
+}
+.sa-store-pick__empty {
+  padding: 24px 0;
+  text-align: center;
+  color: #64748b;
+}
+.sa-store-pick__quick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.sa-store-pick__quick-k {
+  min-width: 52px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+}
+.sa-store-pick__chip {
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 13px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 12px;
+  cursor: pointer;
+}
+.sa-store-pick__chip:hover {
+  background: #eef2f8;
+}
+.sa-store-pick__chip.is-on {
+  border-color: #2563eb;
+  background: #e0ebff;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+.sa-store-pick__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 12px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}
+.sa-store-pick__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 28px;
+  cursor: pointer;
+}
+.sa-store-pick__name {
+  font-size: 14px;
+  color: #0f172a;
+  white-space: nowrap;
+}
+.sa-store-pick__meta {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 11px;
+  color: #64748b;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.sa-store-pick__ft {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
 }
 </style>

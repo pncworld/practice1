@@ -449,6 +449,57 @@ export const getReservationByStore = (
 /** @deprecated getReservationByStore 사용 */
 export const getReservationStatusByStore = getReservationByStore;
 
+/* 2026-11-11 매장 선택(원하는 매장만 합계·평균) — 기존 함수는 그대로 두고 새로 추가 */
+
+/** 매장 선택 팝업 — 대시보드 대상 매장 목록 (`usp_VUE_saGetDashStoreList`) */
+export const getDashStoreList = (groupCd, storeCd, sequence) => {
+  return api2.post(SALES_ANALYSIS_DASHBOARD_API.dashStoreList, {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+    SEQUENCE: sequence,
+  });
+};
+
+/**
+ * 선택 매장 조회 공통 — 기존 Body + `STORE_LIST`(매장코드 쉼표 구분)
+ * @param {string} url `SALES_ANALYSIS_DASHBOARD_API.*ByStores`
+ */
+const postDashByStores = (url, groupCd, storeCd, sequence, fromDt, toDt, storeList) =>
+  api2.post(url, {
+    ...buildSalesAnalysisDashBody(groupCd, storeCd, sequence, fromDt, toDt),
+    STORE_LIST: Array.isArray(storeList) ? storeList.join(",") : String(storeList ?? ""),
+  });
+
+export const getWeeklyKeyIndicatorsByStores = (groupCd, storeCd, sequence, fromDt, toDt, storeList) =>
+  postDashByStores(
+    SALES_ANALYSIS_DASHBOARD_API.weeklyKeyIndicatorsByStores,
+    groupCd, storeCd, sequence, fromDt, toDt, storeList
+  );
+
+export const getCustomerAndUnitPriceByStores = (groupCd, storeCd, sequence, fromDt, toDt, storeList) =>
+  postDashByStores(
+    SALES_ANALYSIS_DASHBOARD_API.customerAndUnitPriceByStores,
+    groupCd, storeCd, sequence, fromDt, toDt, storeList
+  );
+
+export const getStoreSalesByStores = (groupCd, storeCd, sequence, fromDt, toDt, storeList) =>
+  postDashByStores(
+    SALES_ANALYSIS_DASHBOARD_API.storeSalesByStores,
+    groupCd, storeCd, sequence, fromDt, toDt, storeList
+  );
+
+export const getMaterialCostByStores = (groupCd, storeCd, sequence, fromDt, toDt, storeList) =>
+  postDashByStores(
+    SALES_ANALYSIS_DASHBOARD_API.materialCostByStores,
+    groupCd, storeCd, sequence, fromDt, toDt, storeList
+  );
+
+export const getReservationByStores = (groupCd, storeCd, sequence, fromDt, toDt, storeList) =>
+  postDashByStores(
+    SALES_ANALYSIS_DASHBOARD_API.reservationByStores,
+    groupCd, storeCd, sequence, fromDt, toDt, storeList
+  );
+
 /**
  * @deprecated 예약현황으로 교체 — getReservationByStore 사용
  * @see buildSalesAnalysisDashBody

@@ -44,8 +44,12 @@ function alignClass(col) {
   return "is-center";
 }
 
-function theadHtml(columns) {
-  return `<thead><tr>${columns
+/** 2026-11-11 2단 헤더(groupHeader: [{ text, span }])가 있으면 위쪽 줄 추가 (없으면 기존과 동일) */
+function theadHtml(columns, groupHeader) {
+  const top = Array.isArray(groupHeader) && groupHeader.length
+    ? `<tr>${groupHeader.map((g) => `<th colspan="${g.span}">${esc(g.text)}</th>`).join("")}</tr>`
+    : "";
+  return `<thead>${top}<tr>${columns
     .map((c) => `<th>${esc(c.headerText || c.fieldName)}</th>`)
     .join("")}</tr></thead>`;
 }
@@ -90,7 +94,7 @@ function renderMeasureHtml(meta, sectionsOnPage, { showDocHeader }) {
         : "";
       return `<section class="sa-dash-sheet__sec">
         <h3 class="sa-dash-sheet__sec-title">${esc(sec.title)}${cont}</h3>
-        <table class="sa-dash-sheet__table">${theadHtml(sec.columns)}${tbodyHtml(
+        <table class="sa-dash-sheet__table">${theadHtml(sec.columns, sec.groupHeader)}${tbodyHtml(
           sec.columns,
           sec.rows,
           sec.totalHighlight,
@@ -115,6 +119,7 @@ function renderMeasureHtml(meta, sectionsOnPage, { showDocHeader }) {
  *     columns: Array<object>,
  *     rows: object[],
  *     totalHighlight?: { field: string, values: string[] } | null,
+ *     groupHeader?: Array<{ text: string, span: number }> | null,
  *   }>,
  * }} data
  */
@@ -130,6 +135,7 @@ export function loadSalesAnalysisPrintPages(data) {
     columns: Array.isArray(s.columns) ? s.columns : [],
     rows: Array.isArray(s.rows) ? [...s.rows] : [],
     totalHighlight: s.totalHighlight || null,
+    groupHeader: Array.isArray(s.groupHeader) ? s.groupHeader : null,
   }));
 
   if (typeof document === "undefined") {
@@ -208,6 +214,7 @@ export function loadSalesAnalysisPrintPages(data) {
             rows: [],
             continued: false,
             totalHighlight: sec.totalHighlight,
+            groupHeader: sec.groupHeader,
           },
         ];
         const h = measure(candidate, showDocHeader);
@@ -221,6 +228,7 @@ export function loadSalesAnalysisPrintPages(data) {
               rows: [],
               continued: false,
               totalHighlight: sec.totalHighlight,
+              groupHeader: sec.groupHeader,
             },
           ];
         } else {
@@ -246,6 +254,7 @@ export function loadSalesAnalysisPrintPages(data) {
               rows: slice,
               continued: !firstChunk,
               totalHighlight: sec.totalHighlight,
+              groupHeader: sec.groupHeader,
             },
           ];
           const h = measure(candidate, showDocHeader);
@@ -272,6 +281,7 @@ export function loadSalesAnalysisPrintPages(data) {
           rows: sec.rows.slice(offset, best),
           continued: !firstChunk,
           totalHighlight: sec.totalHighlight,
+          groupHeader: sec.groupHeader,
         });
         offset = best;
         firstChunk = false;

@@ -107,4 +107,13 @@ export const SALES_ANALYSIS_DASHBOARD_API = {
 
   /** @deprecated 예약현황으로 교체 — reservationByStore 사용 */
   laborCostByStore: "/MISALES/SLS00_001DASH.asmx/getLaborCostByStore",
+
+  /* 2026-11-11 매장 선택 — Body: 기존 + STORE_LIST (매장코드 쉼표 구분) */
+  /** 매장 선택 팝업 매장 목록 — Body: GROUP_CD, STORE_CD, SEQUENCE */
+  dashStoreList: "/MISALES/SLS00_001DASH.asmx/getDashStoreList",
+  weeklyKeyIndicatorsByStores: "/MISALES/SLS00_001DASH.asmx/getWeeklyKeyIndicatorsByStores",
+  customerAndUnitPriceByStores: "/MISALES/SLS00_001DASH.asmx/getCustomerAndUnitPriceByStores",
+  storeSalesByStores: "/MISALES/SLS00_001DASH.asmx/getStoreSalesByStores",
+  materialCostByStores: "/MISALES/SLS00_001DASH.asmx/getMaterialCostByStores",
+  reservationByStores: "/MISALES/SLS00_001DASH.asmx/getReservationByStores",
 };

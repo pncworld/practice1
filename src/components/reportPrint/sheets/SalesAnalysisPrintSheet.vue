@@ -26,6 +26,15 @@
       </h3>
       <table class="sa-dash-sheet__table">
         <thead>
+          <!-- 2026-11-11 2단 헤더(groupHeader)가 있을 때만 위쪽 줄 -->
+          <tr v-if="sec.groupHeader && sec.groupHeader.length">
+            <th
+              v-for="(g, gIdx) in sec.groupHeader"
+              :key="`g-${gIdx}`"
+              :colspan="g.span">
+              {{ g.text }}
+            </th>
+          </tr>
           <tr>
             <th v-for="col in sec.columns" :key="col.fieldName">
               {{ col.headerText || col.fieldName }}
@@ -43,7 +52,8 @@
             <td
               v-for="col in sec.columns"
               :key="col.fieldName"
-              :class="tdClass(col)">
+              :class="tdClass(col)"
+              :style="signColorStyle(row, col)">
               {{ formatCell(row, col) }}
             </td>
           </tr>
@@ -96,6 +106,16 @@ function formatCell(row, col) {
     });
   }
   return n.toLocaleString("ko-KR");
+}
+
+/** 2026-11-11 opt-in: 열 정의 signColor 가 있을 때만 양수 빨강·음수 파랑 (없으면 기존과 동일) */
+function signColorStyle(row, col) {
+  if (col?.signColor !== true) return undefined;
+  const v = row?.[col.fieldName];
+  if (v == null || v === "") return undefined;
+  const n = Number(v);
+  if (!Number.isFinite(n) || n === 0) return undefined;
+  return { color: n > 0 ? "#dc2626" : "#2563eb" };
 }
 
 function isTotalRow(row, totalHighlight) {

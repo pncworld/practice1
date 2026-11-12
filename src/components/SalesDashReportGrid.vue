@@ -165,6 +165,27 @@ function buildGrid() {
     if (c.numberFormat) {
       col.numberFormat = c.numberFormat;
     }
+    // 2026-11-11 opt-in: tooltip(row) 함수가 있는 열만 마우스오버 시 사유 표시 (빈 문자열이면 표시 안 함)
+    if (typeof c.tooltip === "function") {
+      col.renderer = { type: "text", showTooltip: true };
+    }
+    // 2026-11-11 opt-in: signColor 열만 양수 빨강·음수 파랑 (옵션 없는 열은 기존과 동일)
+    if (c.signColor === true) {
+      const posCls = `sa_rpt_pos_${id}_${i}`;
+      const negCls = `sa_rpt_neg_${id}_${i}`;
+      css += `td.rg-data-cell.${posCls},td.rg-data-cell.${posCls} .rg-renderer{color:#dc2626!important;}\n`;
+      css += `td.rg-data-cell.${negCls},td.rg-data-cell.${negCls} .rg-renderer{color:#2563eb!important;}\n`;
+      col.styleCallback = (grid, dataCell) => {
+        let v;
+        try {
+          v = Number(grid.getValue(dataCell.index.itemIndex, c.fieldName));
+        } catch {
+          return undefined;
+        }
+        if (!Number.isFinite(v) || v === 0) return undefined;
+        return { styleName: `${bCls} ${v > 0 ? posCls : negCls}` };
+      };
+    }
     return col;
   });
 
@@ -242,6 +263,27 @@ function buildGrid() {
       void 0;
     }
   }
+  // 2026-11-11 opt-in: tooltip 열이 있을 때만 등록 (없으면 기존과 동일)
+  const tooltipCols = new Map(
+    props.columns.filter((c) => typeof c.tooltip === "function").map((c) => [c.fieldName, c.tooltip])
+  );
+  if (tooltipCols.size) {
+    gridView.displayOptions.showTooltip = true;
+    gridView.displayOptions.showEmptyTooltip = true; // 빈칸에서도 사유 표시
+    // 반환값이 없으면 RealGrid 가 tooltip 을 띄우지 않음 → tooltip 없는 열·값 있는 칸은 표시 안 함
+    gridView.onShowTooltip = (grid, index) => {
+      const key = index?.fieldName ?? index?.column?.fieldName ?? index?.column;
+      const fn = tooltipCols.get(key);
+      if (!fn) return undefined;
+      try {
+        const text = fn(grid.getValues(index.itemIndex) || {});
+        return text ? String(text) : undefined;
+      } catch {
+        return undefined;
+      }
+    };
+  }
+
   gridView.displayOptions.selectionStyle = "block";
   gridView.displayOptions.useAlternateRowStyle = true;
 
