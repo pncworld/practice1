@@ -29,8 +29,12 @@ const {
   addAgencyMapping,
   getAgencyMapping,
   deleteAgencyMapping,
+  getPlaceBusinessDetail,
 } = require("../services/placeApi");
 const { getDemoStoreContext } = require("../services/demoStore");
+const { hasStalePosCookie } = require("../services/posSession");
+const { saveStep } = require("../services/pncApi");
+const { toNotice, noticeUrl, closeHintHtml } = require("./naverPosFlow");
 const { rememberNaverUser } = require("../services/npSession");
 const { getBaseUrl } = require("../services/baseUrl");
 const { FRONT_HOST } = require("../services/frontHost");
@@ -146,16 +150,43 @@ function renderConnectedPage({ storeId, naverUniqueId, connected }) {
 router.get("/logout", handleNaverLogout);
 
 router.get("/", async (req, res) => {
-  const { storeId, refreshToken, naverUniqueId } = getDemoStoreContext(req);
+  const { storeId, refreshToken, naverUniqueId, pos } = getDemoStoreContext(req);
   const page = Number.parseInt(req.query.page, 10) || 0;
+  if (!pos && hasStalePosCookie(req)) return toNotice(req, res, "3001");
+
+  // POS 연동: 매장·계정은 서버 세션에 있으므로 주소·폼에 붙이지 않는다
+  const idQs = pos
+    ? ""
+    : `storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}&`;
 
   try {
     const accessToken = await getAccessToken(storeId, refreshToken);
-    rememberNaverUser(res, storeId, naverUniqueId);
+    if (!pos) rememberNaverUser(res, storeId, naverUniqueId);
 
     const connected = await listConnectedBusinesses({ accessToken, naverUniqueId });
     if (connected.length) {
       res.set("Cache-Control", "no-store");
+      if (pos) {
+        // 이미 연동됨 → 실제 상태 저장 후 P2 상태 확인 화면으로
+        const biz = connected[0];
+        const placeName = biz.businessName || biz.name || "";
+        const saved = await saveStep(pos.reqId, "CHECKED", {
+          linkYn: "Y",
+          naverUniqueId,
+          placeId: biz.placeId,
+          placeName,
+        });
+        if (!saved.ok) return toNotice(req, res, saved.resCd);
+        pos.check = {
+          linkYn: "Y",
+          uid: naverUniqueId,
+          placeId: String(biz.placeId),
+          placeName,
+          count: connected.length,
+          synced: saved.syncYn === "Y",
+        };
+        return res.redirect("/naver/start/status");
+      }
       return res.send(renderConnectedPage({ storeId, naverUniqueId, connected }));
     }
 
@@ -166,13 +197,19 @@ router.get("/", async (req, res) => {
     });
 
     const selfUrl = new URL(`/naver/places`, getBaseUrl(req));
-    selfUrl.searchParams.set("storeId", storeId);
-    selfUrl.searchParams.set("naverUniqueId", naverUniqueId);
+    if (!pos) {
+      selfUrl.searchParams.set("storeId", storeId);
+      selfUrl.searchParams.set("naverUniqueId", naverUniqueId);
+    }
 
-    const pageLink = (targetPage) =>
-      `/naver/places?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}&page=${targetPage}`;
+    const pageLink = (targetPage) => `/naver/places?${idQs}page=${targetPage}`;
 
     if (!items || items.length === 0) {
+      if (pos) {
+        // 관리 중인 업체 없음 → 닫기 때 3003
+        const saved = await saveStep(pos.reqId, "NOBIZ");
+        if (!saved.ok) return toNotice(req, res, saved.resCd);
+      }
       const lookupUrl = buildLookupUrl(selfUrl.toString());
       return res.send(
         layout(req, {
@@ -184,6 +221,7 @@ router.get("/", async (req, res) => {
               <p>아래 버튼으로 이동해 업체를 신규 등록하거나, 이미 등록된 업체라면 주인권한을 변경해주세요.</p>
               <a class="btn btn-accent" href="${escapeHtml(lookupUrl)}">업체 찾기 / 주인권한 변경하러 가기</a>
             </div>
+            ${pos ? closeHintHtml("업체 등록·주인권한 변경을 마친 뒤 POS의 [닫기]를 누르고 다시 시작해 주세요.") : ""}
           `,
         })
       );
@@ -204,10 +242,10 @@ router.get("/", async (req, res) => {
         const initial = escapeHtml(String(biz.businessName || "?").charAt(0));
         const isConnected = connectedFlags[index];
         const actionForm = isConnected
-          ? `<form method="post" action="/naver/places/${encodeURIComponent(biz.placeId)}/disconnect?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}&page=${page}" data-np-confirm>
+          ? `<form method="post" action="/naver/places/${encodeURIComponent(biz.placeId)}/disconnect?${idQs}page=${page}" data-np-confirm>
               <button class="btn btn-muted" type="submit">연동 해지</button>
             </form>`
-          : `<form method="post" action="/naver/places/${encodeURIComponent(biz.placeId)}/connect?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}&page=${page}">
+          : `<form method="post" action="/naver/places/${encodeURIComponent(biz.placeId)}/connect?${idQs}page=${page}">
               <button class="btn btn-accent" type="submit">연동하기</button>
             </form>`;
         return `
@@ -271,8 +309,9 @@ router.get("/", async (req, res) => {
  * POST /naver/places/:placeId/connect?storeId=xxx
  */
 router.post("/:placeId/connect", async (req, res) => {
-  const { storeId, refreshToken, naverUniqueId } = getDemoStoreContext(req);
+  const { storeId, refreshToken, naverUniqueId, pos } = getDemoStoreContext(req);
   const { placeId } = req.params;
+  if (!pos && hasStalePosCookie(req)) return toNotice(req, res, "3001");
 
   try {
     const accessToken = await getAccessToken(storeId, refreshToken);
@@ -292,11 +331,48 @@ router.post("/:placeId/connect", async (req, res) => {
     if (!agreedAll) {
       return res.redirect(
         303,
-        `/naver/terms/start?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}`
+        pos
+          ? "/naver/terms/start"
+          : `/naver/terms/start?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}`
       );
     }
 
     const result = await addAgencyMapping({ accessToken, naverUniqueId, placeId });
+
+    if (pos) {
+      // P8 연동 완료 → LINKED 저장 (업체명은 상세 조회, 실패해도 연동은 완료)
+      let placeName = "";
+      try {
+        const detail = await getPlaceBusinessDetail({ accessToken, naverUniqueId, placeId });
+        placeName = detail?.businessName || detail?.name || "";
+      } catch (detailErr) {
+        console.error(`[naver/places/${placeId}/connect] 업체명 조회 실패:`, detailErr.message);
+      }
+
+      let savedNote = "";
+      try {
+        const saved = await saveStep(pos.reqId, "LINKED", { placeId, placeName });
+        if (!saved.ok) {
+          savedNote = `<p class="msg-detail">이 요청은 이미 종료되어 POS 결과에는 반영되지 않습니다. POS에서 다시 시작하면 최신 상태로 맞춰집니다.</p>`;
+        }
+      } catch (saveErr) {
+        console.error(`[naver/places/${placeId}/connect] LINKED 저장 실패:`, saveErr.message);
+      }
+      pos.check = { linkYn: "Y", uid: naverUniqueId, placeId: String(placeId), placeName, count: 1, synced: false };
+
+      return res.send(
+        layout(req, {
+          title: "연동 완료",
+          heading: "연동이 완료되었습니다",
+          body: `
+          <p class="msg">${escapeHtml(placeName || placeId)} 업체와의 네이버 플레이스 연동이 등록되었습니다.</p>
+          <p class="muted">연동 등록 시각: ${escapeHtml(result.regDateTime)}</p>
+          ${savedNote}
+          ${closeHintHtml()}
+        `,
+        })
+      );
+    }
 
     return res.send(
         layout(req, {
@@ -321,6 +397,18 @@ router.post("/:placeId/connect", async (req, res) => {
 
     // 가이드 슬라이드 24 기준 연동 추가 API가 명시하는 오류는 401 / 404 / 500 뿐입니다.
     // 그 외 상태 코드(예: Access Token 발급 실패)는 우리 쪽 502로 감싸서 응답합니다.
+    if (pos) {
+      // POS 연동: 실패 저장 후 P11 안내 (401 주인권한 없음 4001 / 404 업체 없음 4002 / 그 외 4009)
+      const failCd = status === 401 ? "4001" : status === 404 ? "4002" : "4009";
+      try {
+        const saved = await saveStep(pos.reqId, "FAIL", { resCd: failCd, errMsg: `${status || ""} ${errorCode || err.message}` });
+        if (!saved.ok) return toNotice(req, res, saved.resCd);
+      } catch (saveErr) {
+        console.error(`[naver/places/${placeId}/connect] FAIL 저장 실패:`, saveErr.message);
+      }
+      return res.redirect(303, noticeUrl(failCd));
+    }
+
     let message = "연동 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
     let responseStatus = 502;
     if (status === 401) {

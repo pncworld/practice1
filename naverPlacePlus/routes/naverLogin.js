@@ -39,6 +39,9 @@ const {
   hasConsent,
 } = require("../services/npSession");
 const { renderLayout, escapeHtml } = require("../ui/layout");
+const { getPosSession, hasStalePosCookie, newState } = require("../services/posSession");
+const { saveStep } = require("../services/pncApi");
+const { toNotice, noticeUrl } = require("./naverPosFlow");
 
 function getRedirectUri() {
   // 네이버 개발자센터에 등록한 Callback URL 과 글자 하나까지 같아야 합니다.
@@ -52,6 +55,19 @@ function getRedirectUri() {
 }
 
 function handleNaverLogout(req, res) {
+  // POS 연동: 다른 네이버 계정으로 바꿔 로그인 → 이번 로그인 정보만 지우고 새 state 로 다시 로그인
+  const pos = getPosSession(req);
+  if (pos) {
+    pos.loginUniqueId = "";
+    pos.check = null;
+    pos.state = newState();
+    res.set("Cache-Control", "no-store");
+    const posAuthorizeUrl = buildAuthorizeUrl({ redirectUri: getRedirectUri(), state: pos.state });
+    const posLogoutUrl = new URL("https://nid.naver.com/nidlogin.logout");
+    posLogoutUrl.searchParams.set("returl", posAuthorizeUrl);
+    return res.redirect(posLogoutUrl.toString());
+  }
+
   const session = readNaverSession(req);
   const storeId = req.query.storeId || session.storeId || "demo-store-1";
   clearNaverUser(res);
@@ -83,6 +99,14 @@ router.get("/logout", handleNaverLogout);
  * GET /naver/login/start?storeId=xxx
  */
 router.get("/start", (req, res) => {
+  // POS 연동: state 는 무작위 값으로 만들어 서버 세션에 보관하고 콜백에서 대조한다
+  const pos = getPosSession(req);
+  if (pos) {
+    pos.state = newState();
+    return res.redirect(buildAuthorizeUrl({ redirectUri: getRedirectUri(), state: pos.state }));
+  }
+  if (hasStalePosCookie(req)) return toNotice(req, res, "3001");
+
   const storeId = req.query.storeId || "demo-store-1";
 
   // 데모 간소화: state에 storeId를 그대로 실어 보냅니다.
@@ -102,7 +126,109 @@ router.get("/start", (req, res) => {
  * STEP 2. 네이버 로그인 콜백
  * GET /naver/login/callback?code=xxx&state=xxx
  */
+/**
+ * POS 연동 로그인 콜백
+ *  - state 대조 → Unique ID 확보 → LOGIN 저장
+ *  - 이미 연동돼 있으면(전화·메일 가입 포함) CHECKED(Y) 저장 → 필수 약관이 빠져 있으면 약관, 아니면 P2 상태 확인
+ *  - 연동 없으면 CHECKED(N) 저장 → 필수 약관 모두 동의면 업체 선택, 아니면 약관
+ *  - 로그인 취소·실패 → FAIL 4004
+ */
+async function handlePosCallback(req, res, pos) {
+  const { code, state, error, error_description: errorDescription } = req.query;
+
+  const failLogin = async (msg) => {
+    try {
+      const saved = await saveStep(pos.reqId, "FAIL", { resCd: "4004", errMsg: msg });
+      if (!saved.ok) return toNotice(req, res, saved.resCd);
+    } catch (saveErr) {
+      console.error("[naver/login/callback] FAIL 저장 실패:", saveErr.message);
+    }
+    return res.redirect(noticeUrl("4004"));
+  };
+
+  if (error) {
+    console.error("[naver/login/callback] 로그인 거부/오류:", error, errorDescription);
+    return failLogin(`${error} ${errorDescription || ""}`);
+  }
+  if (!code || !state || state !== pos.state) {
+    console.error("[naver/login/callback] state 불일치 또는 code 없음");
+    return failLogin("state mismatch");
+  }
+  pos.state = "";
+
+  let naverUniqueId;
+  try {
+    const loginAccessToken = await exchangeCodeForToken({ code, state });
+    const profile = await getProfile(loginAccessToken);
+    naverUniqueId = profile.id;
+  } catch (err) {
+    console.error("[naver/login/callback] 로그인 처리 실패:", err.response?.data || err.message);
+    return failLogin(err.message);
+  }
+  pos.loginUniqueId = naverUniqueId;
+  pos.check = null;
+
+  try {
+    const saved = await saveStep(pos.reqId, "LOGIN", { naverUniqueId });
+    if (!saved.ok) return toNotice(req, res, saved.resCd);
+  } catch (err) {
+    console.error("[naver/login/callback] LOGIN 저장 실패:", err.message);
+    return toNotice(req, res, "4009");
+  }
+
+  const storeId = `${pos.storeGroup}-${pos.storeCode}`;
+  let nextPath = "/naver/terms/start";
+  try {
+    const placeAccessToken = await getAccessToken(storeId, process.env.DEMO_REFRESH_TOKEN);
+    const connected = await listConnectedBusinesses({ accessToken: placeAccessToken, naverUniqueId });
+    const biz = connected[0] || null;
+    const linkYn = connected.length ? "Y" : "N";
+    const placeName = biz ? biz.businessName || biz.name || "" : "";
+
+    const saved = await saveStep(pos.reqId, "CHECKED", {
+      linkYn,
+      naverUniqueId,
+      placeId: biz ? biz.placeId : "",
+      placeName,
+    });
+    if (!saved.ok) return toNotice(req, res, saved.resCd);
+    pos.check = {
+      linkYn,
+      uid: naverUniqueId,
+      placeId: biz ? String(biz.placeId) : "",
+      placeName,
+      count: connected.length,
+      synced: saved.syncYn === "Y",
+    };
+
+    // 이미 연동된 계정도 필수 약관(사업자 정보제공 동의 포함)이 빠져 있으면 약관 페이지로 보낸다.
+    const summary = await getAgreementSummary({ accessToken: placeAccessToken, naverUniqueId });
+    const agreedAll = hasAllRequiredAgreements(summary);
+    if (connected.length) {
+      nextPath = agreedAll ? "/naver/start/status" : "/naver/terms/start";
+    } else {
+      nextPath = agreedAll ? "/naver/places" : "/naver/terms/start";
+    }
+  } catch (checkErr) {
+    console.error(
+      "[naver/login/callback] 동의여부 조회 실패, 약관 페이지로 진행:",
+      checkErr.response?.data || checkErr.message
+    );
+    try {
+      await saveStep(pos.reqId, "CHECKFAIL", { errMsg: checkErr.message });
+    } catch (saveErr) {
+      console.error("[naver/login/callback] CHECKFAIL 저장 실패:", saveErr.message);
+    }
+  }
+
+  return res.redirect(nextPath);
+}
+
 router.get("/callback", async (req, res) => {
+  const pos = getPosSession(req);
+  if (pos) return handlePosCallback(req, res, pos);
+  if (hasStalePosCookie(req)) return toNotice(req, res, "3001");
+
   const { code, state, error, error_description: errorDescription } = req.query;
   const storeId = state || readNaverSession(req).storeId || "demo-store-1";
 

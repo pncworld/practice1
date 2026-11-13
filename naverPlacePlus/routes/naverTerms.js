@@ -50,14 +50,17 @@ const { getBaseUrl, getNaverStartUrl } = require("../services/baseUrl");
  * GET /naver/terms/start?storeId=xxx
  */
 router.get("/start", async (req, res) => {
-  const { storeId, refreshToken, naverUniqueId } = getDemoStoreContext(req);
+  const { storeId, refreshToken, naverUniqueId, pos } = getDemoStoreContext(req);
 
   try {
     const accessToken = await getAccessToken(storeId, refreshToken);
     const summary = await getAgreementSummary({ accessToken, naverUniqueId });
     if (hasAllRequiredAgreements(summary)) {
+      // POS 연동: 매장·계정은 서버 세션에 있으므로 주소에 붙이지 않는다
       return res.redirect(
-        `/naver/places?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}`
+        pos
+          ? "/naver/start?fromTerms=1"
+          : `/naver/places?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}`
       );
     }
   } catch (err) {
@@ -70,9 +73,11 @@ router.get("/start", async (req, res) => {
   const returnUrl = new URL(getNaverStartUrl(req));
   returnUrl.searchParams.set("consent", "1");
   returnUrl.searchParams.set("fromTerms", "1");
-  returnUrl.searchParams.set("storeId", storeId);
-  if (naverUniqueId && naverUniqueId !== "DEMO_NAVER_UNIQUE_ID") {
-    returnUrl.searchParams.set("naverUniqueId", naverUniqueId);
+  if (!pos) {
+    returnUrl.searchParams.set("storeId", storeId);
+    if (naverUniqueId && naverUniqueId !== "DEMO_NAVER_UNIQUE_ID") {
+      returnUrl.searchParams.set("naverUniqueId", naverUniqueId);
+    }
   }
 
   const serviceCode = process.env.POS_SERVICE_CODE; // 담당자 발급값 그대로 (pnc)

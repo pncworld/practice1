@@ -29,15 +29,83 @@ const {
   listConnectedBusinesses,
 } = require("../services/placeApi");
 const { renderConnectedPage } = require("./naverPlaces");
+const {
+  createPosSession,
+  getPosSession,
+  hasStalePosCookie,
+  endPosSession,
+  isPosOnlyMode,
+} = require("../services/posSession");
+const { openLinkReq, saveStep } = require("../services/pncApi");
+const posFlowRouter = require("./naverPosFlow");
+const { toNotice } = require("./naverPosFlow");
 
 const COMPANY_NAME = process.env.COMPANY_NAME || "우리 회사";
+
+// POS 연동 화면: /naver/start/status, /leave, /notice
+router.use(posFlowRouter);
+
+/**
+ * P1 POS 진입: /naver/start?t={요청 ID}
+ * pncWebService 로 요청 ID 를 확인(1회 사용)하고 서버 세션을 만든 뒤 P2 상태 확인으로 보낸다.
+ */
+async function handlePosEntry(req, res) {
+  res.set("Cache-Control", "no-store");
+  const reqId = String(req.query.t || "").trim();
+  if (!/^[0-9a-fA-F]{32}$/.test(reqId)) return toNotice(req, res, "1005");
+
+  let json;
+  try {
+    json = await openLinkReq(reqId);
+  } catch (err) {
+    console.error("[naver/start] 요청 ID 확인 실패:", err.message);
+    return toNotice(req, res, "4009");
+  }
+  if (json.OK_YN !== "Y") return toNotice(req, res, json.RES_CD || "1005");
+
+  // 이전 POS 세션·데모 쿠키는 정리하고 새 세션으로 시작
+  endPosSession(req, res);
+  clearNaverUser(res);
+  createPosSession(res, {
+    reqId,
+    storeGroup: json.STORE_GROUP,
+    storeCode: json.STORE_CODE,
+    storeName: json.STORE_NAME || "",
+    dbLinkYn: json.DB_LINK_YN || "X",
+    dbUniqueId: json.NAVER_UNIQUE_ID || "",
+    dbPlaceId: json.PLACE_ID || "",
+    dbPlaceName: json.PLACE_NAME || "",
+    dbLinkDt: json.LINK_DT || "",
+    dbUnlinkDt: json.UNLINK_DT || "",
+    loginUniqueId: "",
+    state: "",
+    check: null,
+  });
+  return res.redirect("/naver/start/status");
+}
 
 function withIdentity(path, storeId, naverUniqueId) {
   const params = new URLSearchParams({ storeId, naverUniqueId });
   return `${path}?${params.toString()}`;
 }
 
-router.get("/agree", (req, res) => {
+router.get("/agree", async (req, res) => {
+  // POS 연동: 동의 저장(CONSENT) → 이번 요청에서 로그인했으면 약관, 아니면 네이버 로그인
+  const pos = getPosSession(req);
+  if (pos) {
+    markConsent(res);
+    try {
+      const saved = await saveStep(pos.reqId, "CONSENT");
+      if (!saved.ok) return toNotice(req, res, saved.resCd);
+    } catch (err) {
+      console.error("[naver/start/agree] CONSENT 저장 실패:", err.message);
+      return toNotice(req, res, "4009");
+    }
+    return res.redirect(pos.loginUniqueId ? "/naver/terms/start" : "/naver/login/start");
+  }
+  if (hasStalePosCookie(req)) return toNotice(req, res, "3001");
+  if (isPosOnlyMode()) return toNotice(req, res, "1005");
+
   const session = readNaverSession(req);
   const storeId = req.query.storeId || session.storeId || "demo-store-1";
   const naverUniqueId = req.query.naverUniqueId || session.naverUniqueId || "";
@@ -49,6 +117,35 @@ router.get("/agree", (req, res) => {
 });
 
 router.get("/", async (req, res) => {
+  // P1 POS 진입
+  if (req.query.t) return handlePosEntry(req, res);
+
+  // POS 연동 세션이 있으면 주소의 storeId·naverUniqueId 를 쓰지 않는다
+  const pos = getPosSession(req);
+  if (pos) {
+    res.set("Cache-Control", "no-store");
+    if (req.query.fromTerms === "1") {
+      // 네이버 약관에서 돌아옴 → 필수 약관 재확인 후 업체 선택(업체 선택 화면이 연동 여부도 다시 확인)
+      try {
+        const accessToken = await getAccessToken(`${pos.storeGroup}-${pos.storeCode}`, process.env.DEMO_REFRESH_TOKEN);
+        const summary = await getAgreementSummary({ accessToken, naverUniqueId: pos.loginUniqueId || pos.dbUniqueId });
+        if (hasAllRequiredAgreements(summary)) {
+          const saved = await saveStep(pos.reqId, "TERMS");
+          if (!saved.ok) return toNotice(req, res, saved.resCd);
+        }
+      } catch (err) {
+        console.error("[naver/start] 약관 동의 재확인 실패:", err.response?.data || err.message);
+      }
+      return res.redirect("/naver/places");
+    }
+    if (req.query.consent === "1") {
+      return sendConsentPage(res, "/naver/start/agree", "/naver/start/status");
+    }
+    return res.redirect("/naver/start/status");
+  }
+  if (hasStalePosCookie(req)) return toNotice(req, res, "3001");
+  if (isPosOnlyMode()) return toNotice(req, res, "1005");
+
   const session = readNaverSession(req);
   const storeId = req.query.storeId || session.storeId || "demo-store-1";
   const naverUniqueIdFromQuery = req.query.naverUniqueId || "";
@@ -96,7 +193,12 @@ router.get("/", async (req, res) => {
     naverUniqueId ? `&naverUniqueId=${encodeURIComponent(naverUniqueId)}` : ""
   }`;
 
-  res.send(
+  return sendConsentPage(res, agreeUrl, "/naver/start?consent=1");
+});
+
+/** P3 개인(신용)정보 제3자 제공 동의 화면 (문구는 변경하지 않음) */
+function sendConsentPage(res, agreeUrl, cancelUrl) {
+  return res.send(
     renderLayout({
       title: "네이버 플레이스+ 연동",
       heading: "네이버 플레이스+ 연동",
@@ -150,7 +252,7 @@ router.get("/", async (req, res) => {
         </label>
 
         <div class="btn-row">
-          <a class="btn btn-ghost" href="/naver/start?consent=1">취소</a>
+          <a class="btn btn-ghost" href="${cancelUrl}">취소</a>
           <button class="btn btn-primary is-disabled" id="agreeBtn" disabled type="button">동의하고 시작</button>
         </div>
       `,
@@ -170,6 +272,6 @@ router.get("/", async (req, res) => {
       `,
     })
   );
-});
+}
 
 module.exports = router;
