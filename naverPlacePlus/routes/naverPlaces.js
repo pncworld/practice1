@@ -22,6 +22,8 @@ const router = express.Router();
 
 const { getAccessToken } = require("../services/naverAuth");
 const {
+  getAgreementSummary,
+  hasAllRequiredAgreements,
   getPlaceBusinesses,
   listConnectedBusinesses,
   addAgencyMapping,
@@ -274,6 +276,26 @@ router.post("/:placeId/connect", async (req, res) => {
 
   try {
     const accessToken = await getAccessToken(storeId, refreshToken);
+
+    // 가이드 슬라이드 13: 업체 선택 후 필수 약관(사업자 정보제공 동의 포함)이 빠져 있으면
+    // 약관동의를 먼저 받고 연동한다. (연동 해지 시 정보제공 동의가 철회되므로 재연동 때 필요)
+    let agreedAll = true;
+    try {
+      const summary = await getAgreementSummary({ accessToken, naverUniqueId });
+      agreedAll = hasAllRequiredAgreements(summary);
+    } catch (summaryErr) {
+      console.error(
+        `[naver/places/${placeId}/connect] 동의여부 조회 실패, 연동 진행:`,
+        summaryErr.response?.data || summaryErr.message
+      );
+    }
+    if (!agreedAll) {
+      return res.redirect(
+        303,
+        `/naver/terms/start?storeId=${encodeURIComponent(storeId)}&naverUniqueId=${encodeURIComponent(naverUniqueId)}`
+      );
+    }
+
     const result = await addAgencyMapping({ accessToken, naverUniqueId, placeId });
 
     return res.send(

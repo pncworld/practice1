@@ -70,6 +70,11 @@ router.get("/", async (req, res) => {
       const connected = await listConnectedBusinesses({ accessToken, naverUniqueId });
       if (connected.length) {
         rememberNaverUser(res, storeId, naverUniqueId);
+        // 이미 연동된 계정도 필수 약관(사업자 정보제공 동의 포함)이 빠져 있으면 약관 페이지로 보낸다.
+        const summary = await getAgreementSummary({ accessToken, naverUniqueId });
+        if (!hasAllRequiredAgreements(summary)) {
+          return res.redirect(withIdentity("/naver/terms/start", storeId, naverUniqueId));
+        }
         return res.send(renderConnectedPage({ storeId, naverUniqueId, connected }));
       }
       if (hasConsent(req)) {

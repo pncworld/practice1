@@ -69,14 +69,21 @@ async function getAgreementSummary({ accessToken, naverUniqueId }) {
 /**
  * embed/terms(?service=pnc,booking)에서 받는 필수 약관이 모두 동의됐는지 판별.
  *
- * AGENCY_BUSINESS_DATA_PROVISION(사업자정보 제공)은 이 약관 화면에 안 나오고,
- * 빠져 있어도 업체 목록 API는 된다. 그걸 필수로 두면 이미 동의한 계정이
- * 약관 페이지로 다시 갔다가 to 콜백 없이 멈춘다.
+ * 가이드 슬라이드 22 기준 필수 3개:
+ *   - SMARTPLACE_INTEGRATED_TERMS      통합 이용약관
+ *   - SMARTPLACE_BUSINESS_TERMS        비즈니스 이용약관 (service=booking)
+ *   - AGENCY_BUSINESS_DATA_PROVISION   사업자 등록 정보 제공 동의 (service=pnc)
+ *
+ * 서비스 코드 pnc 는 네이버 확인 완료(2026-11). 미동의 계정은 embed/terms 에
+ * "사업자 등록 정보 제공 동의 (필수)" 항목이 표시된다.
+ * ※ 이미 모두 동의한 계정을 embed/terms 로 보내면 to 콜백 없이 멈추므로,
+ *    반드시 이 함수로 미동의를 확인한 뒤에만 약관 페이지로 보낸다.
  */
 function hasAllRequiredAgreements(summary) {
   const REQUIRED = [
     "SMARTPLACE_INTEGRATED_TERMS",
     "SMARTPLACE_BUSINESS_TERMS",
+    "AGENCY_BUSINESS_DATA_PROVISION",
   ];
 
   const agreed = summary.agreedPlacePrivacyAgreementTypes || [];

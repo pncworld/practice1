@@ -144,7 +144,14 @@ router.get("/callback", async (req, res) => {
         naverUniqueId,
       });
       if (connected.length) {
-        nextPath = "/naver/places";
+        // 이미 연동된 계정도 필수 약관(사업자 정보제공 동의 포함)이 빠져 있으면 약관 페이지로 보낸다.
+        const summary = await getAgreementSummary({
+          accessToken: placeAccessToken,
+          naverUniqueId,
+        });
+        nextPath = hasAllRequiredAgreements(summary)
+          ? "/naver/places"
+          : "/naver/terms/start";
       } else if (!hasConsent(req)) {
         nextPath = "/naver/start";
         showConsent = true;
