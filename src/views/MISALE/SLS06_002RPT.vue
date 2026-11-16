@@ -316,6 +316,13 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
+import { applyNetUnitPrice } from "@/utils/netUnitPrice";
+
+/* 2026-11-13 1871: 객단가·조단가 순매출(실매출÷1.1) 기준 */
+const NET_PRICE_SPECS = [
+  { target: "lngCustAmt", amount: "lngTotAmt", count: "lngCustCnt" },
+  { target: "lngRecAmt", amount: "lngTotAmt", count: "lngRecCnt" },
+];
 
 /** 조회 AREA — SLS06_001 / SLS02_023 패턴 */
 const sls0602ControlBorder = "#cbd5e1";
@@ -584,7 +591,7 @@ const searchButton = async () => {
       sendcheckedDay.join(",")
     );
     //comsole.log(res);
-    rowData.value = res.data.TIMESALE;
+    rowData.value = applyNetUnitPrice(res.data.TIMESALE, selectedGroup.value, NET_PRICE_SPECS);
 
     afterSearch.value = true;
   } catch (error) {
@@ -678,7 +685,7 @@ const searchButton2 = async () => {
       orderPay.value,
       sendcheckedDay.join(",")
     );
-    const temp = res.data.TIMESALE || [];
+    const temp = applyNetUnitPrice(res.data.TIMESALE || [], selectedGroup.value, NET_PRICE_SPECS);
     const valueKeyByOption = {
       1: "lngCustCnt",
       2: "lngCustAmt",

@@ -1751,3 +1751,23 @@ export const dailySalesAnalysisStore = (
     END_DATE: endDate,
   });
 };
+
+/* 2026-11-13 매장·일자별 런치 객수 (1871 런치·디너 열) — usp_VUE_slsGetCustLunchByStoreDate
+   storeCds: 매장코드 쉼표 구분 ('0' 이면 그룹 전체). 결과 List: lngStoreCode, strStoreName, dtmDate, custLunch */
+export const getDailySalesCustLunch = (groupCd, storeCds, startDate, endDate) => {
+  return api2.post("/MISALES/SLS06_004RPT.asmx/getCustLunchByStoreDate", {
+    GROUP_CD: groupCd,
+    STORE_CDS: storeCds,
+    START_DATE: startDate,
+    END_DATE: endDate,
+  });
+};
+
+export const getAreaIndustryCustLunch = (groupCd, storeCds, startDate, endDate) => {
+  return api2.post("/MISALES/SLS02_014RPT.asmx/getCustLunchByStoreDate", {
+    GROUP_CD: groupCd,
+    STORE_CDS: storeCds,
+    START_DATE: startDate,
+    END_DATE: endDate,
+  });
+};

@@ -121,6 +121,7 @@ import { onMounted, ref } from "vue";
  */
 
 import { useStore } from "vuex";
+import { applyNetUnitPrice } from "@/utils/netUnitPrice";
 /**
  * 	화면 Load시 실행 스크립트
  */
@@ -266,7 +267,11 @@ const searchButton = async () => {
       selectedendDate.value + " " + selectedEndTime.value.strName
     );
     //comsole.log(res);
-    rowData.value = res.data.List;
+    /* 2026-11-13 1871: 객단가·조단가 순매출(실매출÷1.1) 기준 */
+    rowData.value = applyNetUnitPrice(res.data.List, selectedGroup.value, [
+      { target: "lngCustAvg", amount: "lngTotAmt", count: "lngCust" },
+      { target: "lngRecAmt", amount: "lngTotAmt", count: "lngRecCnt" },
+    ]);
 
     afterSearch.value = true;
   } catch (error) {

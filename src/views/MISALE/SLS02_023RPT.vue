@@ -154,6 +154,7 @@ import {
   getSubLease,
   isDynamicGrid,
 } from "@/api/misales";
+import { applyNetUnitPrice } from "@/utils/netUnitPrice";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -317,7 +318,11 @@ const searchButton = async () => {
       selectedCode.value,
       setCnt.value
     );
-    rowData.value = res.data.List;
+    /* 2026-11-13 1871: 객단가·조단가 순매출(실매출÷1.1) 기준 */
+    rowData.value = applyNetUnitPrice(res.data.List, groupCd.value, [
+      { target: "lngCustAmt", amount: "lngActAmt", count: "lngCustCnt" },
+      { target: "lngRecAmt", amount: "lngActAmt", count: "lngRecCnt" },
+    ]);
 
     afterSearch.value = true;
   } catch (error) {

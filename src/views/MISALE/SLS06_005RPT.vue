@@ -237,6 +237,7 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
+import { applyNetUnitPrice } from "@/utils/netUnitPrice";
 
 /** 조회 AREA — SLS06_001 / SLS06_004 반응형 패턴 */
 const sls0605ControlBorder = "#cbd5e1";
@@ -305,7 +306,21 @@ const searchButton = async () => {
       selectedSalesType.value
     );
     //comsole.log(res);
-    rowData.value = res.data.List.filter((item) => item.lngCode != "");
+    /* 2026-11-13 1871: 객단가 순매출(실매출÷1.1) 기준, 증감 객단가 = 금년 − 전년 */
+    rowData.value = applyNetUnitPrice(
+      res.data.List.filter((item) => item.lngCode != ""),
+      selectedGroup.value,
+      [
+        { target: "nowCustResult", amount: "nowTotAmt", count: "nowCustCnt", digits: 1 },
+        { target: "lastCustResult", amount: "lastTotAmt", count: "lastCustCnt", digits: 1 },
+      ],
+      (row) => {
+        if ("differCustResult" in row) {
+          const d = Number(row.nowCustResult || 0) - Number(row.lastCustResult || 0);
+          row.differCustResult = Math.round(d * 10) / 10;
+        }
+      }
+    );
 
     afterSearch.value = true;
   } catch (error) {

@@ -67,6 +67,7 @@ import { onMounted, ref } from "vue";
  */
 
 import { useStore } from "vuex";
+import { applyNetUnitPrice } from "@/utils/netUnitPrice";
 import MobileDateStore from "../component/mobileDateStore.vue";
 
 const store = useStore();
@@ -117,7 +118,12 @@ const SEARCHNOW = async (e) => {
       selectEndDate.value
     );
     //comsole.log(res);
-    rowData.value = res.data.List.map((item) => ({
+    /* 2026-11-13 1871: 객단가·객단가누계 순매출(실매출÷1.1) 기준 — 숫자 서식 넣기 전에 계산 */
+    const list = applyNetUnitPrice(res.data.List, selectGroupCd.value, [
+      { target: "lngAvgCustAmt", amount: "lngActAmt", count: "lngCustCnt" },
+      { target: "lngAvgAccCustAmt", amount: "lngAccActAmt", count: "lngAccCustCnt" },
+    ]);
+    rowData.value = list.map((item) => ({
       ...item,
       dblDistRate: Math.ceil(item.dblDistRate),
       lngRecCnt: item.lngRecCnt.toLocaleString(),

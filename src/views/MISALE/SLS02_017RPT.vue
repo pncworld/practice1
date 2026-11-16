@@ -484,6 +484,7 @@ import { utils, writeFile } from "xlsx-js-style";
  */
 
 import { useFloatPopup } from "@/utils/floatPopup";
+import { applyNetUnitPrice } from "@/utils/netUnitPrice";
 
 /** 조회 AREA — SLS02_014 / SLS06_001 반응형 패턴 */
 const sls0217ControlBorder = "#cbd5e1";
@@ -613,7 +614,11 @@ const searchButton = async () => {
     );
     //comsole.log(res);
 
-    rowData.value = res.data.TIMELIST;
+    /* 2026-11-13 1871: 객단가·객단가누계 순매출(실매출÷1.1) 기준 */
+    rowData.value = applyNetUnitPrice(res.data.TIMELIST, selectedGroup.value, [
+      { target: "lngAvgCustAmt", amount: "lngActAmt", count: "lngCustCnt" },
+      { target: "lngAvgAccCustAmt", amount: "lngAccActAmt", count: "lngAccCustCnt" },
+    ]);
     rowData2.value = res.data.SALESDATA1;
     rowData3.value = res.data.SALESDATA1_2;
     rowData4.value = res.data.SALESDATA2;

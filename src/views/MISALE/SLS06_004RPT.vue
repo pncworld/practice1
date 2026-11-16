@@ -216,13 +216,18 @@
         :setGroupSumCustomColumnId="['strWeekName']"
         :setGroupCustomLevel="3"
         :rowStateeditable="false"
-        :setGroupSummaryCenterIds="setGroupSummaryCenterIds" />
+        :setGroupSummaryCenterIds="setGroupSummaryCenterIds"
+        :hideColumnsId="hideLunchDinnerColumns" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { getDailySalesDetailReport, getDailySalesReport } from "@/api/misales";
+import {
+  getDailySalesCustLunch,
+  getDailySalesDetailReport,
+  getDailySalesReport,
+} from "@/api/misales";
 import Chart from "@/components/chart.vue";
 /**
  *  매출 일자 세팅 컴포넌트
@@ -253,12 +258,24 @@ import { insertPageLog } from "@/customFunc/customFunc";
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
 import { useStore } from "vuex";
+import { applyNetUnitPrice } from "@/utils/netUnitPrice";
+import {
+  CUST_LUNCH_DINNER_FIELDS,
+  attachCustLunchDinner,
+  isCustLunchDinnerGroup,
+} from "@/utils/custLunchDinner";
+
+/* 2026-11-13 1871: 객단가·조단가 순매출(실매출÷1.1) 기준 — 실매출 키: 기본 lngTotAmt / 상세 lngActAmt */
+const netPriceSpecs = (amountKey) => [
+  { target: "lngCustAmt", amount: amountKey, count: "lngCustCnt" },
+  { target: "lngRecAmt", amount: amountKey, count: "lngRecCnt" },
+];
 
 /** 조회 AREA — SLS06_001 / SLS04_002 반응형 패턴 */
 const sls0604ControlBorder = "#cbd5e1";
@@ -300,6 +317,8 @@ const setFooterColID = ref([
   "dblDistRate",
   "lngTotAmt",
   "dtmDate",
+  "custLunch",
+  "custDinner",
 ]);
 const setFooterExpressions = ref([
   "sum",
@@ -314,6 +333,8 @@ const setFooterExpressions = ref([
   "sum",
   "sum",
   "custom",
+  "sum",
+  "sum",
 ]);
 const setGroupSummaryCenterIds = ref("dtmDate,strWeekName");
 const progid = ref(1);
@@ -378,7 +399,7 @@ const searchButton = async () => {
         loginedstrLang
       );
       //comsole.log(res);
-      rowData.value = res.data.DAILYSALES;
+      rowData.value = applyNetUnitPrice(res.data.DAILYSALES, selectedGroup.value, netPriceSpecs("lngTotAmt"));
     } else if (progid.value == 2) {
       const res = await getDailySalesDetailReport(
         selectedGroup.value,
@@ -389,8 +410,10 @@ const searchButton = async () => {
         loginedstrLang
       );
       //comsole.log(res);
-      rowData.value = res.data.DAILYSALES;
+      rowData.value = applyNetUnitPrice(res.data.DAILYSALES, selectedGroup.value, netPriceSpecs("lngActAmt"));
     }
+
+    rowData.value = await withCustLunchDinner(rowData.value, selectedStorearr);
 
     afterSearch.value = true;
   } catch (error) {
@@ -402,6 +425,34 @@ const searchButton = async () => {
 
 const selectedGroup = ref();
 const selectedStores = ref();
+
+/* 2026-11-13 1871: 객수 런치·디너 열 (그 외 그룹은 열 숨김) */
+const hideLunchDinnerColumns = computed(() =>
+  isCustLunchDinnerGroup(selectedGroup.value) ? [] : [...CUST_LUNCH_DINNER_FIELDS]
+);
+
+/** 행(매장명·일자)에 런치·디너 객수를 붙임. 1871이 아니거나 조회 실패 시 행 그대로 */
+const withCustLunchDinner = async (rows, storeCds) => {
+  if (!isCustLunchDinnerGroup(selectedGroup.value) || !Array.isArray(rows) || rows.length === 0) {
+    return rows;
+  }
+  try {
+    const res = await getDailySalesCustLunch(
+      selectedGroup.value,
+      storeCds,
+      selectedstartDate.value,
+      selectedendDate.value
+    );
+    if (res?.data?.RESULT_CD !== "00") return rows;
+    return attachCustLunchDinner(rows, res.data.List, {
+      storeKey: "strStore",
+      matchBy: "name",
+      dateKey: "dtmDate",
+    });
+  } catch (e) {
+    return rows;
+  }
+};
 const selectedStoreAttrs = ref();
 /**
  * 페이지 매장 그룹 세팅
@@ -515,7 +566,7 @@ const searchButton2 = async () => {
       loginedstrLang
     );
     //comsole.log(res);
-    let temp = res.data.DAILYSALES;
+    let temp = applyNetUnitPrice(res.data.DAILYSALES, selectedGroup.value, netPriceSpecs("lngActAmt"));
     //comsole.log(temp);
     if (selectOption.value == 1) {
       labels.value = [

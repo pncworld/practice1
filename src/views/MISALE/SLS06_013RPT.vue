@@ -148,6 +148,13 @@ import { computed, onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
+import { applyNetUnitPrice } from "@/utils/netUnitPrice";
+
+/* 2026-11-13 1871: 객단가·영수증단가 순매출(실매출÷1.1) 기준 (원래 계산과 같이 소수점 버림) */
+const NET_PRICE_SPECS = [
+  { target: "custAverage", amount: "actAmt", count: "custCnt", floor: true },
+  { target: "billAverage", amount: "actAmt", count: "billCnt", floor: true },
+];
 
 /**
  * 	화면 Load시 실행 스크립트
@@ -319,12 +326,19 @@ const searchButton = async () => {
       ),
     ]);
 
-    rowDataTotal.value = resTotal.data.dailySalesAnalysis || [];
+    rowDataTotal.value = applyNetUnitPrice(
+      resTotal.data.dailySalesAnalysis || [],
+      selectedGroup.value,
+      NET_PRICE_SPECS
+    );
     // 매장별 프로시저 결과 키는 dailySalesAnalysisStore 또는 dailySalesAnalysis 중 하나일 수 있음
-    rowDataStore.value =
+    rowDataStore.value = applyNetUnitPrice(
       resStore.data.dailySalesAnalysisStore ||
-      resStore.data.dailySalesAnalysis ||
-      [];
+        resStore.data.dailySalesAnalysis ||
+        [],
+      selectedGroup.value,
+      NET_PRICE_SPECS
+    );
 
     afterSearch.value = true;
   } catch (error) {

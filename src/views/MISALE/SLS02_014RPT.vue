@@ -112,7 +112,8 @@
           :documentTitle="'SLS02_014RPT'"
           :rowStateeditable="false"
           :documentSubTitle="documentSubTitle"
-          :exporttoExcel="exportExcel">
+          :exporttoExcel="exportExcel"
+          :hideColumnsId="hideLunchDinnerColumns">
         </Realgrid>
       </div>
     </div>
@@ -120,7 +121,10 @@
 </template>
 
 <script setup>
-import { getAreaIndustrySalesReport } from "@/api/misales";
+import {
+  getAreaIndustryCustLunch,
+  getAreaIndustrySalesReport,
+} from "@/api/misales";
 /**
  *  매출 일자 세팅 컴포넌트
  *  */
@@ -152,12 +156,24 @@ import { insertPageLog } from "@/customFunc/customFunc";
  * 공통 표준  Function
  */
 
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
 
 import { useStore } from "vuex";
+import { applyNetUnitPrice } from "@/utils/netUnitPrice";
+import {
+  CUST_LUNCH_DINNER_FIELDS,
+  attachCustLunchDinner,
+  isCustLunchDinnerGroup,
+} from "@/utils/custLunchDinner";
+
+/* 2026-11-13 1871: 객단가·조단가 순매출(실매출÷1.1) 기준 */
+const NET_PRICE_SPECS = [
+  { target: "lngCustAmt", amount: "lngTotAmt", count: "lngCustCnt" },
+  { target: "lngRecAmt", amount: "lngTotAmt", count: "lngRecCnt" },
+];
 
 /** 조회 AREA — SLS04 / SLS02_031 wire 패턴 */
 const sls0214ControlBorder = "#cbd5e1";
@@ -189,6 +205,8 @@ const setFooterColID = ref([
   "lngWorkDay",
   "lngActAvg",
   "lngStoreCode",
+  "custLunch",
+  "custDinner",
 ]);
 const setGroupFooterColID = ref([
   "strStore",
@@ -205,6 +223,8 @@ const setGroupFooterColID = ref([
   "lngWorkDay",
   "lngActAvg",
   "lngStoreCode",
+  "custLunch",
+  "custDinner",
 ]);
 const setFooterExpressions = ref([
   "custom",
@@ -221,6 +241,8 @@ const setFooterExpressions = ref([
   "sum",
   "avg",
   "custom",
+  "sum",
+  "sum",
 ]);
 const setGroupFooterExpressions = ref([
   "custom",
@@ -237,6 +259,8 @@ const setGroupFooterExpressions = ref([
   "sum",
   "avg",
   "custom",
+  "sum",
+  "sum",
 ]);
 const setGroupSummaryCenterIds = ref("dtmDate,dayName");
 const setGroupSumCustomColumnId = ref(["lngStoreCode"]);
@@ -360,7 +384,7 @@ const searchButton = async () => {
         loginedstrLang
       );
       //comsole.log(res);
-      rowData.value = res.data.areaIndustrySales;
+      rowData.value = applyNetUnitPrice(res.data.areaIndustrySales, selectedGroup.value, NET_PRICE_SPECS);
     } else if (progid.value == 2) {
       // 매장별 조회
       const res = await getAreaIndustrySalesReport(
@@ -372,7 +396,7 @@ const searchButton = async () => {
         loginedstrLang
       );
       //comsole.log(res);
-      rowData.value = res.data.areaIndustrySales;
+      rowData.value = applyNetUnitPrice(res.data.areaIndustrySales, selectedGroup.value, NET_PRICE_SPECS);
     } else if (progid.value == 12) {
       // 일자별 매장별 조회
       const res = await getAreaIndustrySalesReport(
@@ -384,7 +408,7 @@ const searchButton = async () => {
         loginedstrLang
       );
       //comsole.log(res);
-      rowData.value = res.data.areaIndustrySales;
+      rowData.value = applyNetUnitPrice(res.data.areaIndustrySales, selectedGroup.value, NET_PRICE_SPECS);
     } else {
       // 조회
       const res = await getAreaIndustrySalesReport(
@@ -396,8 +420,10 @@ const searchButton = async () => {
         loginedstrLang
       );
       //comsole.log(res);
-      rowData.value = res.data.areaIndustrySales;
+      rowData.value = applyNetUnitPrice(res.data.areaIndustrySales, selectedGroup.value, NET_PRICE_SPECS);
     }
+
+    rowData.value = await withCustLunchDinner(rowData.value, selectedStorearr);
 
     afterSearch.value = true;
   } catch (error) {
@@ -410,6 +436,34 @@ const searchButton = async () => {
 
 const selectedGroup = ref();
 const selectedStores = ref();
+
+/* 2026-11-13 1871: 객수 런치·디너 열 (그 외 그룹은 열 숨김) */
+const hideLunchDinnerColumns = computed(() =>
+  isCustLunchDinnerGroup(selectedGroup.value) ? [] : [...CUST_LUNCH_DINNER_FIELDS]
+);
+
+/** 행(매장코드·일자)에 런치·디너 객수를 붙임. 1871이 아니거나 조회 실패 시 행 그대로 */
+const withCustLunchDinner = async (rows, storeCds) => {
+  if (!isCustLunchDinnerGroup(selectedGroup.value) || !Array.isArray(rows) || rows.length === 0) {
+    return rows;
+  }
+  try {
+    const res = await getAreaIndustryCustLunch(
+      selectedGroup.value,
+      storeCds,
+      selectedstartDate.value,
+      selectedendDate.value
+    );
+    if (res?.data?.RESULT_CD !== "00") return rows;
+    return attachCustLunchDinner(rows, res.data.List, {
+      storeKey: "lngStoreCode",
+      matchBy: "code",
+      dateKey: "dtmDate",
+    });
+  } catch (e) {
+    return rows;
+  }
+};
 const selectedStoreAttrs = ref();
 /**
  * 페이지 매장 그룹 세팅

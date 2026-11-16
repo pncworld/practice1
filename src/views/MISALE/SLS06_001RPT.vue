@@ -160,6 +160,7 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
+import { applyNetUnitPrice } from "@/utils/netUnitPrice";
 
 /** 조회 AREA — SLS02_023 / SLS02_031 패턴 */
 const sls0601ControlBorder = "#cbd5e1";
@@ -345,7 +346,11 @@ const searchButton = async () => {
       reportCheckData.value,
       selectedWeekDayValue
     );
-    rowData.value = res.data.weekdaySales;
+    /* 2026-11-13 1871: 객단가·조단가 순매출(실매출÷1.1) 기준 */
+    rowData.value = applyNetUnitPrice(res.data.weekdaySales, selectedGroup.value, [
+      { target: "lngCustAmt", amount: "lngActAmt", count: "lngCustCnt" },
+      { target: "lngRecAmt", amount: "lngActAmt", count: "lngRecCnt" },
+    ]);
 
     afterSearch.value = true;
   } catch (error) {

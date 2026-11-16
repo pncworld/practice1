@@ -203,6 +203,7 @@ import { useStore } from "vuex";
  */
 
 import { utils, writeFile } from "xlsx-js-style";
+import { applyNetUnitPrice } from "@/utils/netUnitPrice";
 
 /**
  * 	화면 Load시 실행 스크립트
@@ -310,7 +311,11 @@ const searchButton = async () => {
     );
     //comsole.log(res);
 
-    rowData.value = res.data.TIMELIST;
+    /* 2026-11-13 1871: 객단가·객단가누계 순매출(실매출÷1.1) 기준 */
+    rowData.value = applyNetUnitPrice(res.data.TIMELIST, selectedGroup.value, [
+      { target: "lngAvgCustAmt", amount: "lngActAmt", count: "lngCustCnt" },
+      { target: "lngAvgAccCustAmt", amount: "lngAccActAmt", count: "lngAccCustCnt" },
+    ]);
     rowData2.value = res.data.SALESDATA1;
     rowData3.value = res.data.SALESDATA1_2;
     rowData4.value = res.data.SALESDATA2;
