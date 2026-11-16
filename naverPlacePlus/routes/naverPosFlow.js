@@ -52,11 +52,11 @@ function closeHintHtml(text = CLOSE_HINT) {
 }
 
 function dbRecordHtml(pos) {
+  // 해지 이력(해지 여부·해지일)은 화면에 보이지 않는다. 해지된 매장은 처음 가입과 같은 화면으로 보인다.
   let text = "연동 기록이 없습니다.";
-  if (pos.dbLinkYn === "Y") {
+  const unlinkedOnNaver = pos.check && !pos.check.failed && pos.check.linkYn === "N";
+  if (pos.dbLinkYn === "Y" && !unlinkedOnNaver) {
     text = `연동됨 — ${pos.dbPlaceName || "-"}${pos.dbLinkDt ? ` (연동일 ${pos.dbLinkDt.slice(0, 10)})` : ""}`;
-  } else if (pos.dbLinkYn === "N") {
-    text = `연동 안 됨(해지)${pos.dbUnlinkDt ? ` — 해지일 ${pos.dbUnlinkDt.slice(0, 10)}` : ""}`;
   }
   return `<div class="lookup-bar" style="margin-top:0;margin-bottom:12px">
     <strong>우리 쪽 기록</strong> · ${escapeHtml(text)}
@@ -149,19 +149,10 @@ router.get("/status", async (req, res) => {
     }
     buttons = `<a class="btn btn-muted" href="/naver/start/leave">연동 해지</a>`;
   } else {
-    if (pos.dbLinkYn === "Y") {
-      heading = "해지된 상태입니다"; // A2
-      message = "네이버에서 연동이 해지되어 있습니다. (전화·메일 등으로 해지된 것으로 보입니다. 연동 정보를 갱신했습니다.) 다시 연동할 수 있습니다.";
-      buttons = `<a class="btn btn-accent" href="${joinUrl}">다시 연동하기</a>`;
-    } else if (pos.dbLinkYn === "N") {
-      heading = "해지된 상태입니다"; // B1
-      message = "다시 연동할 수 있습니다.";
-      buttons = `<a class="btn btn-accent" href="${joinUrl}">다시 연동하기</a>`;
-    } else {
-      heading = "가입되어 있지 않습니다"; // C2
-      message = "연동할 수 있습니다.";
-      buttons = `<a class="btn btn-accent" href="${joinUrl}">연동하기</a>`;
-    }
+    // A2(전화·메일 해지) / B1(해지) / C2(미가입): 해지 이력 없이 처음 가입(C)과 같은 화면
+    heading = "네이버 플레이스 연동";
+    message = "연동할 수 있습니다. 연동을 진행합니다.";
+    buttons = `<a class="btn btn-accent" href="${joinUrl}">연동하기</a>`;
   }
 
   return res.send(
