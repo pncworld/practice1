@@ -125,17 +125,9 @@ router.get("/", async (req, res) => {
   if (pos) {
     res.set("Cache-Control", "no-store");
     if (req.query.fromTerms === "1") {
-      // 네이버 약관에서 돌아옴 → 필수 약관 재확인 후 업체 선택(업체 선택 화면이 연동 여부도 다시 확인)
-      try {
-        const accessToken = await getAccessToken(`${pos.storeGroup}-${pos.storeCode}`, process.env.DEMO_REFRESH_TOKEN);
-        const summary = await getAgreementSummary({ accessToken, naverUniqueId: pos.loginUniqueId || pos.dbUniqueId });
-        if (hasAllRequiredAgreements(summary)) {
-          const saved = await saveStep(pos.reqId, "TERMS");
-          if (!saved.ok) return toNotice(req, res, saved.resCd);
-        }
-      } catch (err) {
-        console.error("[naver/start] 약관 동의 재확인 실패:", err.response?.data || err.message);
-      }
+      // 네이버 약관에서 돌아옴 → 업체 선택으로.
+      // 약관 단계는 pncWebService 에 저장하지 않는다 (saveNaverLinkStep 에 TERMS 단계가 없어 1007 로 거절됨).
+      // 필수 약관 동의 여부는 [연동하기] 를 누를 때 다시 확인한다 (naverPlaces.js connect).
       return res.redirect("/naver/places");
     }
     if (req.query.consent === "1") {

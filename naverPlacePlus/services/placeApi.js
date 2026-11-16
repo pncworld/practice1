@@ -138,7 +138,16 @@ async function listConnectedBusinesses({ accessToken, naverUniqueId }) {
       )
     );
     list.forEach((biz, index) => {
-      if (checks[index].status === "fulfilled") connected.push(biz);
+      const check = checks[index];
+      if (check.status === "fulfilled") {
+        connected.push(biz);
+        return;
+      }
+      // 미연동은 404(PlaceBusinessNotFound) / 409(PlaceBusinessAgencyMappingNotFound) 뿐이다.
+      // 그 밖의 실패(500·시간 초과·통신 오류 등)를 미연동으로 보면 정상 연동을 해지로 잘못
+      // 기록하게 되므로, 확인 실패로 올려서 호출부가 "실제 상태 확인 실패"로 처리하게 한다.
+      const status = check.reason?.response?.status;
+      if (status !== 404 && status !== 409) throw check.reason;
     });
 
     if (!totalCount || (page + 1) * pageSize >= totalCount) break;

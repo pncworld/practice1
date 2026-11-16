@@ -153,6 +153,8 @@ router.get("/", async (req, res) => {
   const { storeId, refreshToken, naverUniqueId, pos } = getDemoStoreContext(req);
   const page = Number.parseInt(req.query.page, 10) || 0;
   if (!pos && hasStalePosCookie(req)) return toNotice(req, res, "3001");
+  // POS 연동: 가입(업체 선택)은 이번 요청에서 네이버 로그인을 한 뒤에만 연다
+  if (pos && !pos.loginUniqueId) return res.redirect("/naver/start/status");
 
   // POS 연동: 매장·계정은 서버 세션에 있으므로 주소·폼에 붙이지 않는다
   const idQs = pos
@@ -312,9 +314,20 @@ router.post("/:placeId/connect", async (req, res) => {
   const { storeId, refreshToken, naverUniqueId, pos } = getDemoStoreContext(req);
   const { placeId } = req.params;
   if (!pos && hasStalePosCookie(req)) return toNotice(req, res, "3001");
+  // POS 연동: 가입은 항상 이번 요청에서 네이버 로그인을 한 계정으로만 한다 (DB 에 저장된 계정으로 대신하지 않음)
+  if (pos && !pos.loginUniqueId) return res.redirect(303, "/naver/start/status");
 
   try {
     const accessToken = await getAccessToken(storeId, refreshToken);
+
+    if (pos) {
+      // 닫힌·중단·만료된 요청으로는 네이버 연동을 실행하지 않는다.
+      // 네이버 실제 상태를 다시 확인해 CHECKED 로 저장하고, 그 응답으로 요청이 살아 있는지 본다.
+      const connected = await listConnectedBusinesses({ accessToken, naverUniqueId });
+      if (connected.length) return res.redirect(303, "/naver/places"); // 이미 연동됨 → 상태 확인 화면으로 이어짐
+      const alive = await saveStep(pos.reqId, "CHECKED", { linkYn: "N", naverUniqueId });
+      if (!alive.ok) return toNotice(req, res, alive.resCd);
+    }
 
     // 가이드 슬라이드 13: 업체 선택 후 필수 약관(사업자 정보제공 동의 포함)이 빠져 있으면
     // 약관동의를 먼저 받고 연동한다. (연동 해지 시 정보제공 동의가 철회되므로 재연동 때 필요)
@@ -439,9 +452,12 @@ router.post("/:placeId/connect", async (req, res) => {
  * (가이드: DELETE .../agency-mappings, 204 No Content 성공)
  */
 router.post("/:placeId/disconnect", async (req, res) => {
-  const { storeId, refreshToken, naverUniqueId } = getDemoStoreContext(req);
+  const { storeId, refreshToken, naverUniqueId, pos } = getDemoStoreContext(req);
   const { placeId } = req.params;
   const page = req.query.page || 0;
+  // POS 연동: 해지는 요청 상태 확인·UNLINKED 저장을 하는 /naver/start/leave 로만 한다
+  if (pos) return res.redirect(303, "/naver/start/status");
+  if (hasStalePosCookie(req)) return toNotice(req, res, "3001");
 
   try {
     const accessToken = await getAccessToken(storeId, refreshToken);

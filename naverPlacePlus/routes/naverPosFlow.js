@@ -219,6 +219,16 @@ router.post("/leave", async (req, res) => {
   const storeId = `${pos.storeGroup}-${pos.storeCode}`;
   const { uid, placeId, placeName } = pos.check;
 
+  // 닫힌·중단·만료된 요청으로는 네이버 해지를 실행하지 않는다.
+  // 확인해 둔 연동 상태를 CHECKED 로 다시 저장하고, 그 응답으로 요청이 살아 있는지 본다.
+  try {
+    const alive = await saveStep(pos.reqId, "CHECKED", { linkYn: "Y", naverUniqueId: uid, placeId, placeName });
+    if (!alive.ok) return toNotice(req, res, alive.resCd);
+  } catch (aliveErr) {
+    console.error("[naver/start/leave] 요청 상태 확인 실패:", aliveErr.message);
+    return toNotice(req, res, "4009");
+  }
+
   try {
     const accessToken = await getAccessToken(storeId, process.env.DEMO_REFRESH_TOKEN);
     try {

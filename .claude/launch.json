@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "serve"],
       "port": 80
+    },
+    {
+      "name": "naverPlacePlus",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "naver:start"],
+      "port": 3000
     }
   ]
 }
