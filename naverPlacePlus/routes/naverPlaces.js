@@ -223,7 +223,7 @@ router.get("/", async (req, res) => {
               <p>아래 버튼으로 이동해 업체를 신규 등록하거나, 이미 등록된 업체라면 주인권한을 변경해주세요.</p>
               <a class="btn btn-accent" href="${escapeHtml(lookupUrl)}">업체 찾기 / 주인권한 변경하러 가기</a>
             </div>
-            ${pos ? closeHintHtml("업체 등록·주인권한 변경을 마친 뒤 POS의 [닫기]를 누르고 다시 시작해 주세요.") : ""}
+            ${pos ? closeHintHtml("업체 등록·주인권한 변경을 마친 뒤 오른쪽 위의 X 버튼으로 이 창을 닫고 POS에서 다시 시작해 주세요.") : ""}
           `,
         })
       );

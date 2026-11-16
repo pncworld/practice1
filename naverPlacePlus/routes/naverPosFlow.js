@@ -7,7 +7,7 @@
  *   GET  /naver/start/notice   P11 안내·오류 (?c=결과코드)
  *
  * POS 진입(P1, /naver/start?t=요청ID) 은 naverOnboarding.js 에서 처리한다.
- * 닫기는 항상 POS 버튼이다. 끝나는 화면에는 "POS의 [닫기]를 눌러 주세요" 를 둔다.
+ * 닫기는 항상 POS 버튼이다. 끝나는 화면에는 "오른쪽 위의 X 버튼을 눌러 이 창을 닫아 주세요" 를 둔다 (열려 있는 웹 브라우저 창의 X 버튼).
  */
 
 const express = require("express");
@@ -19,8 +19,8 @@ const { listConnectedBusinesses, deleteAgencyMapping } = require("../services/pl
 const { getPosSession, hasStalePosCookie, endPosSession } = require("../services/posSession");
 const { saveStep } = require("../services/pncApi");
 
-const CLOSE_HINT = "POS의 [닫기]를 눌러 주세요.";
-const NOT_WANT_HINT = "원하지 않으면 POS의 [닫기]를 누르세요.";
+const CLOSE_HINT = "오른쪽 위의 X 버튼을 눌러 이 창을 닫아 주세요.";
+const NOT_WANT_HINT = "원하지 않으면 오른쪽 위의 X 버튼을 눌러 이 창을 닫으세요.";
 
 // P11 안내 문구 (pncWebService RES_CD 기준)
 const NOTICE = {
