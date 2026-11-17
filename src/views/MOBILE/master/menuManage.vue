@@ -81,6 +81,14 @@
             </span>
           </button>
         </div>
+        <!-- 초간단은 메뉴코드 등록만, 상세 설정 등록은 AI 메뉴관리 (두 버튼이 다 보일 때) -->
+        <div v-if="canQuick && canAi" class="mm-scope">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="10" fill="currentColor" />
+            <path d="M12 10.5v6M12 7.2v.3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" />
+          </svg>
+          <span>초간단은 <b>메뉴코드 등록만</b>, 상세 메뉴설정 등록은 <b>AI 메뉴관리</b>에서 해 주세요.</span>
+        </div>
       </div>
 
       <template v-if="menuStoreCd !== ''">
@@ -269,8 +277,10 @@
       :sub-groups="subGroups"
       :menu-rows="rows"
       :key-store-list="keyStoreList"
+      :can-go-ai="canAi"
       @registered="onRegistered"
-      @close="closeQuick" />
+      @close="closeQuick"
+      @go-ai="goAiFromQuick" />
     <!-- AI 메뉴관리: 한 번 열면 닫아도 대화가 남아 있다가 다시 열면 이어진다 (웹과 같음). 매장을 바꾸면 새로 시작 -->
     <MobileAiMenu
       v-if="aiMounted"
@@ -738,6 +748,11 @@ watch(aiOpen, (v) => {
   revealMenu(code, true);
 });
 
+// 초간단 창에서 「AI 메뉴관리로 이동」: 초간단 창을 닫고(방금 등록한 메뉴는 목록에 반영) AI 메뉴관리 창을 연다
+const goAiFromQuick = async () => {
+  await closeQuick();
+  openAi();
+};
 const openQuick = () => {
   if (!canQuick.value || !loaded.value) return;
   quickOpen.value = true;
@@ -971,6 +986,34 @@ onMounted(async () => {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.45rem;
   margin-top: 0.75rem;
+}
+
+/* 초간단·AI 메뉴관리 범위 안내 */
+.mm-scope {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.6rem;
+  background: #f5f3ff;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #5b21b6;
+}
+
+.mm-scope svg {
+  flex-shrink: 0;
+  width: 0.9rem;
+  height: 0.9rem;
+  margin-top: 0.05rem;
+  color: #7c3aed;
+}
+
+.mm-scope b {
+  font-weight: 800;
+  color: #4c1d95;
 }
 
 .mm-tools.is-single {

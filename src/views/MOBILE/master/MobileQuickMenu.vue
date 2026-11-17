@@ -55,6 +55,31 @@
               <span class="mq-guide-text">{{ g.text }}</span>
             </li>
           </ul>
+          <!-- 초간단은 메뉴코드 등록만: 상세 설정은 AI 메뉴관리로 안내 (눈에 띄게) -->
+          <div class="mq-scope">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="10" fill="currentColor" />
+              <path d="M12 10.5v6M12 7.2v.3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" />
+            </svg>
+            <span class="mq-scope-body">
+              <span>
+                초간단 메뉴등록에서는 <b>메뉴코드 등록만</b> 가능하며, 상세 메뉴설정 등록은
+                <b>AI 메뉴관리</b>에서 작업해 주세요.
+              </span>
+              <!-- 바로 AI 메뉴관리로: 이 창을 닫고 AI 메뉴관리 창을 연다 -->
+              <button v-if="canGoAi" type="button" class="mq-go-ai" :disabled="loading" @click="goAi">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M12 2.8v2.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                  <circle cx="12" cy="2.6" r="1.2" fill="currentColor" />
+                  <circle cx="12" cy="13.6" r="8.2" fill="none" stroke="currentColor" stroke-width="1.8" />
+                  <circle cx="9" cy="12.6" r="1.4" fill="currentColor" />
+                  <circle cx="15" cy="12.6" r="1.4" fill="currentColor" />
+                  <path d="M9.3 16.3c1.6 1.3 3.8 1.3 5.4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+                AI 메뉴관리로 이동
+              </button>
+            </span>
+          </div>
         </div>
 
         <div
@@ -71,6 +96,23 @@
               등록 완료
             </div>
             <div class="mq-text">{{ msg.content }}</div>
+            <!-- AI 메뉴관리로 이동할지 묻기 -->
+            <div v-if="msg.goAiAsk" class="mq-actions">
+              <button
+                type="button"
+                class="mq-btn is-ai"
+                :disabled="!goAiAskOpen || loading || msg.seq !== goAiSeq"
+                @click="onGoAiButton(msg, true)">
+                예, 이동
+              </button>
+              <button
+                type="button"
+                class="mq-btn"
+                :disabled="!goAiAskOpen || loading || msg.seq !== goAiSeq"
+                @click="onGoAiButton(msg, false)">
+                아니오
+              </button>
+            </div>
             <div v-if="msg.keyAsk" class="mq-actions">
               <button
                 type="button"
@@ -213,8 +255,10 @@ const props = defineProps({
   menuRows: { type: Array, default: () => [] },
   // 메뉴키 배치 가능 매장 [{ code, name }]
   keyStoreList: { type: Array, default: () => [] },
+  // AI 메뉴관리로 바로 이동 버튼을 보일지 (AI 메뉴관리를 쓸 수 있는 계정만)
+  canGoAi: { type: Boolean, default: false },
 });
-const emit = defineEmits(["close", "registered"]);
+const emit = defineEmits(["close", "registered", "go-ai"]);
 // 키보드가 올라오면 입력창이 키보드 위에 붙게(안드로이드) 하고, 대화 내용을 마지막 답변으로 내린다
 useChatKeyboard(() => scrollLog());
 
@@ -296,6 +340,45 @@ const close = () => {
   if (loading.value) return;
   flushLog("메뉴키 배치 답변 전 닫음");
   emit("close");
+};
+// 초간단 범위 밖 요청 → AI 메뉴관리로 안내
+// - 수정·삭제·조회·매출 같은 동작 말: 가격이 있어도 안내 (예: '아메리카노 5000원으로 바꿔줘' 를 새 메뉴로 등록하지 않게)
+// - 옵션·이미지·할인처럼 메뉴명에도 들어갈 수 있는 말: 가격(숫자)이 없을 때만 안내 (예: '옵션세트 5000' 은 등록)
+const OUT_OF_SCOPE_ACTION_RE = /(수정|변경|바꿔|바꾸|삭제|지워|미사용|품절|조회|검색|찾아|보여|매출|팔린)/;
+const OUT_OF_SCOPE_WORD_RE = /(옵션|다국어|영문|영어|일본어|중국어|이미지|사진|할인|주방|메뉴키|키\s*배치|분류|과세|면세)/;
+const isOutOfQuickScope = (input) =>
+  OUT_OF_SCOPE_ACTION_RE.test(input) || (!/\d/.test(input) && OUT_OF_SCOPE_WORD_RE.test(input));
+// 「AI 메뉴관리로 이동하시겠습니까?」 (예 / 아니오) — 가장 최근 질문만 누를 수 있음
+const goAiSeq = ref(0);
+const goAiAskOpen = ref(false);
+const askGoAi = () => {
+  goAiAskOpen.value = true;
+  push(
+    "assistant",
+    "이 작업은 초간단 메뉴등록에서는 할 수 없습니다. 상세 메뉴설정·수정·조회·매출은 AI 메뉴관리에서 할 수 있어요.\nAI 메뉴관리로 이동하시겠습니까?",
+    { goAiAsk: true, seq: ++goAiSeq.value }
+  );
+};
+const answerGoAi = (yes) => {
+  if (!goAiAskOpen.value || loading.value) return;
+  goAiAskOpen.value = false;
+  if (yes) {
+    goAi();
+    return;
+  }
+  push("assistant", "알겠습니다. 메뉴명과 판매가를 입력하시면 바로 등록해 드립니다. 예: 레몬에이드 4500");
+};
+const onGoAiButton = (msg, yes) => {
+  if (msg.seq !== goAiSeq.value || !goAiAskOpen.value) return;
+  push("user", yes ? "예, 이동" : "아니오");
+  answerGoAi(yes);
+};
+// AI 메뉴관리로 바로 이동: 이 창을 닫고(부모가 목록 반영 후) AI 메뉴관리 창을 연다
+const goAi = () => {
+  if (loading.value) return;
+  stopListening();
+  flushLog("메뉴키 배치 답변 전 AI 메뉴관리로 이동");
+  emit("go-ai");
 };
 onBeforeUnmount(() => {
   stopListening();
@@ -555,6 +638,29 @@ const send = async () => {
   if (input === "" || loading.value) return;
   // 마이크가 듣는 중이면 멈춘다 (보낸 뒤 늦게 들어온 음성 결과가 입력창을 다시 채우지 않게)
   if (voiceStep.value !== "") stopListening();
+  // 「AI 메뉴관리로 이동하시겠습니까?」 질문에 '예·아니오' 로 답한 경우
+  if (goAiAskOpen.value) {
+    if (YES_RE.test(input)) {
+      text.value = "";
+      push("user", input);
+      answerGoAi(true);
+      return;
+    }
+    if (NO_RE.test(input)) {
+      text.value = "";
+      push("user", input);
+      answerGoAi(false);
+      return;
+    }
+    goAiAskOpen.value = false;
+  }
+  // 초간단에서 할 수 없는 요청(가격 없이 옵션·다국어·이미지·할인·수정·조회·매출 등)은 AI 메뉴관리로 안내
+  if (props.canGoAi && step.value !== "keyAsk" && isOutOfQuickScope(input)) {
+    text.value = "";
+    push("user", input);
+    askGoAi();
+    return;
+  }
   if (step.value === "keyAsk") {
     if (YES_RE.test(input)) {
       text.value = "";
@@ -579,6 +685,8 @@ const send = async () => {
     testMode.value = res.data.RESULT_NM === "TEST_MODE";
     if (res.data.OK !== "Y") {
       push("assistant", res.data.REPLY || "메뉴명과 판매가를 함께 입력해 주세요. 예: 레몬에이드 4500");
+      // 메뉴명·가격으로 알아듣지 못했으면 AI 메뉴관리도 안내한다
+      if (props.canGoAi) askGoAi();
       return;
     }
     const name = String(res.data.STR_NAME || "").trim();
@@ -875,6 +983,71 @@ onMounted(() => {
   line-height: 1.4;
 }
 
+/* 초간단 범위 안내 (메뉴코드 등록만 / 상세 설정은 AI 메뉴관리) — 눈에 띄게 */
+.mq-scope {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid #c4b5fd;
+  border-radius: 0.7rem;
+  background: #f5f3ff;
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #5b21b6;
+}
+
+.mq-scope svg {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.08rem;
+  color: #7c3aed;
+}
+
+.mq-scope b {
+  font-weight: 800;
+  color: #4c1d95;
+}
+
+.mq-scope-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+/* AI 메뉴관리로 이동 버튼 */
+.mq-go-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.38rem 0.75rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #818cf8, #4f46e5);
+  box-shadow: 0 3px 8px rgba(79, 70, 229, 0.3);
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.mq-go-ai svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.mq-go-ai:disabled {
+  opacity: 0.5;
+}
+
+.mq-go-ai:active {
+  transform: scale(0.97);
+}
+
 .mq-guide-label {
   flex-shrink: 0;
   min-width: 3.4rem;
@@ -957,6 +1130,12 @@ onMounted(() => {
 .mq-btn.is-primary {
   border-color: #f97316;
   background: #f97316;
+  color: #fff;
+}
+
+.mq-btn.is-ai {
+  border-color: #4f46e5;
+  background: linear-gradient(135deg, #818cf8, #4f46e5);
   color: #fff;
 }
 

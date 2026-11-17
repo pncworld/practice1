@@ -5284,6 +5284,35 @@ onMounted(() => {
   white-space: pre-line;
 }
 
+/* 초간단 범위 안내 (메뉴코드 등록만 / 상세 설정은 AI 메뉴관리) — 눈에 띄게 */
+.mst003-quick-scope {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #c4b5fd;
+  border-radius: 0.5rem;
+  background: #f5f3ff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #5b21b6;
+}
+
+.mst003-quick-scope svg {
+  flex-shrink: 0;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 0.1rem;
+  color: #7c3aed;
+}
+
+.mst003-quick-scope b {
+  font-weight: 800;
+  color: #4c1d95;
+}
+
 /* 보내기 버튼: 입력창과 같은 높이 (공통 버튼의 고정 높이 2rem 대신 입력창 높이에 맞춤) */
 .pnc-sub-btn.mst003-chat-send {
   align-self: stretch;

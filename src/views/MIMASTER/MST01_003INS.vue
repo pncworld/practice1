@@ -1184,6 +1184,17 @@
                     <span class="mst003-quick-guide-text">{{ line.text }}</span>
                   </li>
                 </ul>
+                <!-- 초간단은 메뉴코드 등록만: 상세 설정은 AI 메뉴관리로 안내 (눈에 띄게) -->
+                <div class="mst003-quick-scope">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="12" cy="12" r="10" fill="currentColor" />
+                    <path d="M12 10.5v6M12 7.2v.3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" />
+                  </svg>
+                  <span>
+                    초간단 메뉴등록에서는 <b>메뉴코드 등록만</b> 가능하며, 상세 메뉴설정 등록은
+                    <b>AI 메뉴관리</b>에서 작업해 주세요.
+                  </span>
+                </div>
               </template>
               <!-- 메뉴키 자동 배치 여부 -->
               <template v-else-if="msg.keyAsk">
@@ -10520,6 +10531,35 @@ const excelButton = async () => {
 
 .mst003-quick-guide-text {
   white-space: pre-line;
+}
+
+/* 초간단 범위 안내 (메뉴코드 등록만 / 상세 설정은 AI 메뉴관리) — 눈에 띄게 */
+.mst003-quick-scope {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #c4b5fd;
+  border-radius: 0.5rem;
+  background: #f5f3ff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #5b21b6;
+}
+
+.mst003-quick-scope svg {
+  flex-shrink: 0;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 0.1rem;
+  color: #7c3aed;
+}
+
+.mst003-quick-scope b {
+  font-weight: 800;
+  color: #4c1d95;
 }
 
 /* 보내기 버튼: 입력창과 같은 높이 (공통 버튼의 고정 높이 2rem 대신 입력창 높이에 맞춤) */
