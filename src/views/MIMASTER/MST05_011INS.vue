@@ -108,38 +108,55 @@
     </div>
   </div>
 
-  <div
-    v-show="showChangeScreenKey"
-    class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-    <div class="bg-white p-6 rounded shadow-lg w-2/3 h-3/4 overflow-auto">
-      <div class="border-gray-500 text-2xl">화면키 순서 변경</div>
-      <div class="border-gray-500 text-xl">
-        화면키를 끌어서 이동하면 순서가 변경됩니다.
-      </div>
-      <!-- VueDraggableNext 사용 -->
-      <VueDraggableNext
-        v-model="ScreenKeyOrigin"
-        :group="{ name: 'subCategory', pull: 'clone', put: true }"
-        class="space-y-2"
-        :move="onMove2"
-        @end="onEnd2">
-        <div
-          v-for="(item, index) in ScreenKeyOrigin"
-          class="p-4 bg-gray-200 rounded-lg shadow-md cursor-move h-12"
-          v-show="item && item.strScreenName !== ''">
-          <p>{{ item.strScreenName }}</p>
+  <!-- 화면키 순서 변경 팝업 -->
+  <Teleport to="body">
+    <div
+      v-show="showChangeScreenKey"
+      class="mk-order-mask"
+      @click.self="showScreenKeysOrder">
+      <div class="mk-order-pop" role="dialog" aria-modal="true">
+        <div class="mk-order-head">
+          <h2 class="mk-order-title">화면키 순서 변경</h2>
+          <p class="mk-order-desc">
+            화면키를 끌어서 원하는 위치에 놓으면 순서가 바뀝니다. 메뉴키도 함께 이동합니다.
+          </p>
         </div>
-      </VueDraggableNext>
-
-      <div class="flex justify-center space-x-3">
-        <button
-          @click="showScreenKeysOrder"
-          class="mt-4 p-2 bg-blue-500 text-white rounded">
-          닫기
-        </button>
+        <div class="mk-order-body">
+          <VueDraggableNext
+            v-model="ScreenKeyOrigin"
+            :group="{ name: 'subCategory', pull: 'clone', put: true }"
+            class="mk-order-list"
+            :animation="180"
+            ghost-class="mk-order-ghost"
+            chosen-class="mk-order-chosen"
+            :move="onMove2"
+            @end="onEnd2">
+            <div
+              v-for="(item, index) in ScreenKeyOrigin"
+              class="mk-order-item"
+              v-show="item && item.strScreenName !== ''">
+              <svg class="mk-order-grip" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="9" cy="6" r="1.6" /><circle cx="15" cy="6" r="1.6" />
+                <circle cx="9" cy="12" r="1.6" /><circle cx="15" cy="12" r="1.6" />
+                <circle cx="9" cy="18" r="1.6" /><circle cx="15" cy="18" r="1.6" />
+              </svg>
+              <span class="mk-order-no">{{ index + 1 }}</span>
+              <p class="mk-order-name">{{ item.strScreenName }}</p>
+            </div>
+          </VueDraggableNext>
+        </div>
+        <div class="mk-order-foot">
+          <span class="mk-order-hint">변경 내용은 [저장]을 눌러야 반영됩니다.</span>
+          <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="showScreenKeysOrder">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            닫기
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </Teleport>
   <span
     class="h-5 mt-3 flex justify-between items-center w-[50%] ml-[40vw] z-40 text-nowrap">
     <h1 class="font-bold text-xl z-40">메뉴키 설정</h1>
@@ -1480,4 +1497,138 @@ const movePage2 = () => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+/* 화면키 순서 변경 팝업 — body 로 Teleport */
+.mk-order-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.45);
+}
+.mk-order-pop {
+  display: flex;
+  flex-direction: column;
+  width: 32rem;
+  max-width: 100%;
+  max-height: calc(100vh - 2rem);
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
+  overflow: hidden;
+}
+.mk-order-head {
+  padding: 1.125rem 1.5rem 0.875rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+.mk-order-head::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 1.125rem;
+  margin-right: 0.5rem;
+  border-radius: 2px;
+  background: #2563eb;
+  vertical-align: -2px;
+}
+.mk-order-title {
+  display: inline;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+.mk-order-desc {
+  margin-top: 0.375rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: #64748b;
+}
+.mk-order-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1rem 1.5rem;
+  background: #f8fafc;
+}
+.mk-order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.mk-order-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 3rem;
+  padding: 0 0.875rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  font-size: 0.9375rem;
+  color: #0f172a;
+  cursor: grab;
+  user-select: none;
+  transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+}
+.mk-order-item:hover {
+  border-color: #a5b4fc;
+  background: #f8faff;
+}
+.mk-order-item:active {
+  cursor: grabbing;
+}
+.mk-order-grip {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+  fill: #94a3b8;
+}
+.mk-order-no {
+  min-width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.5rem;
+  text-align: center;
+}
+.mk-order-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* 끌고 있는 항목이 놓일 자리 */
+.mk-order-ghost {
+  border: 1px dashed #3b82f6;
+  background: #eff6ff;
+  box-shadow: none;
+}
+.mk-order-ghost > * {
+  opacity: 0.35;
+}
+/* 잡은 항목 */
+.mk-order-chosen {
+  border-color: #3b82f6;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18);
+}
+.mk-order-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  background: #fff;
+}
+.mk-order-hint {
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+</style>
