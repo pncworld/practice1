@@ -86,10 +86,12 @@
               </span>
             </div>
           </div>
-          <label class="pt-1" @click.stop>
+          <label
+            class="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center"
+            @click.stop>
             <input
               type="checkbox"
-              class="h-4 w-4 accent-sky-600"
+              class="h-5 w-5 accent-sky-600"
               v-model="i.Selected"
               :disabled="!isUnissuedDemand(i)"
               true-value="true"
@@ -114,7 +116,10 @@
     @STORE_NM="STORE_NM"
     select-store-label="선택"></MobileDateStore>
 
-  <div class="fixed inset-0 z-[70] flex flex-col bg-slate-50" v-if="open">
+  <div
+    class="fixed inset-0 z-[70] flex flex-col bg-slate-50"
+    style="height: 100dvh"
+    v-if="open">
     <div class="flex h-full w-full flex-col overflow-hidden bg-slate-50">
       <div class="flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200">
         <div>
@@ -271,11 +276,13 @@
         </div>
       </div>
 
-      <div class="border-t bg-white p-3">
+      <div
+        class="border-t bg-white p-3"
+        style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px))">
         <div class="mb-1 text-xs font-semibold text-slate-500">코멘트</div>
         <textarea
           v-model="scond4"
-          class="w-full h-16 rounded-xl border border-slate-200 p-2 text-sm"
+          class="w-full h-16 rounded-xl border border-slate-300 p-2 text-base focus:border-blue-600 focus:outline-none disabled:bg-slate-100 disabled:text-slate-400"
           :disabled="!canEditDemand"
           placeholder="메모를 입력하세요"></textarea>
       </div>
@@ -852,26 +859,47 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* 입력: 높이 44px, 글자 16px(iOS 입력 시 화면 확대·밀림 방지) */
 .stk-field {
   width: 100%;
-  height: 2.25rem;
+  height: 2.75rem;
   border-radius: 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border-strong, #cbd5e1);
   padding: 0 0.75rem;
-  background: #fff;
-  color: #1e293b;
+  background: var(--m-surface, #fff);
+  color: var(--m-text, #1e293b);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stk-field:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 .stk-field:disabled {
-  color: #64748b;
+  border-color: var(--m-border, #e2e8f0);
+  color: var(--m-text-3, #64748b);
+  opacity: 1;
 }
 
+/* 버튼: 높이 44px, 눌림 표시 */
 .stk-list-btn {
-  height: 2rem;
-  padding: 0 0.75rem;
+  min-width: 3.5rem;
+  height: 2.75rem;
+  padding: 0 1rem;
   border-radius: 0.75rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.stk-list-btn:not(:disabled):active {
+  transform: scale(0.96);
+  filter: brightness(0.92);
 }
 
 .stk-list-btn-new {
@@ -880,7 +908,7 @@ onMounted(async () => {
 }
 
 .stk-list-btn-new:disabled {
-  background: #cbd5e1;
+  background: var(--m-surface-3, #cbd5e1);
   color: #fff;
 }
 
@@ -895,14 +923,14 @@ onMounted(async () => {
 }
 
 .stk-list-btn-save:disabled {
-  background: #cbd5e1;
+  background: var(--m-surface-3, #cbd5e1);
   color: #fff;
 }
 
 .stk-list-btn-close {
-  background: #fff;
-  color: #475569;
-  border: 1px solid #e2e8f0;
+  background: var(--m-surface, #fff);
+  color: var(--m-text-2, #475569);
+  border: 1px solid var(--m-border, #e2e8f0);
 }
 
 .stk-item-head {
@@ -917,22 +945,29 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   flex: 1;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 0.65rem;
   overflow: hidden;
-  background: #fff;
+  background: var(--m-surface, #fff);
 }
 
 .stk-tab {
-  height: 2.15rem;
-  font-size: 0.82rem;
+  height: 2.75rem;
+  font-size: 0.875rem;
   font-weight: 700;
-  color: #64748b;
-  background: #fff;
+  color: var(--m-text-3, #64748b);
+  background: var(--m-surface, #fff);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.stk-tab:active {
+  background: var(--m-surface-2, #f1f5f9);
 }
 
 .stk-tab.is-on {
-  background: #eff4ff;
+  background: var(--m-accent-weak, #eff4ff);
   color: #5782ff;
 }
 
@@ -941,7 +976,7 @@ onMounted(async () => {
   text-align: right;
   font-size: 0.8rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
 }
 
 .stk-search {
@@ -949,9 +984,10 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   margin: 0 0.75rem 0.55rem;
-  height: 2.6rem;
+  flex-shrink: 0;
+  height: 2.75rem;
   padding: 0 0.85rem;
-  border-radius: 0.55rem;
+  border-radius: 0.75rem;
   background: #5782ff;
   color: #fff;
 }
@@ -973,7 +1009,7 @@ onMounted(async () => {
   border: 0;
   background: transparent;
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
 }
 
@@ -987,13 +1023,13 @@ onMounted(async () => {
 
 .stk-item {
   display: grid;
-  grid-template-columns: 1.25fr 1fr;
-  border-bottom: 1px solid #e2e8f0;
-  background: #fff;
+  grid-template-columns: minmax(0, 1fr) minmax(10.25rem, 1fr);
+  border-bottom: 1px solid var(--m-border, #e2e8f0);
+  background: var(--m-surface, #fff);
 }
 
 .stk-item.is-on {
-  background: #f8fbff;
+  background: var(--m-surface-2, #f8fbff);
 }
 
 .stk-item-left {
@@ -1004,14 +1040,17 @@ onMounted(async () => {
 }
 
 .stk-check {
-  margin-top: 0.15rem;
+  flex-shrink: 0;
+  width: 1.375rem;
+  height: 1.375rem;
+  margin: 0.1rem 0.25rem 0 0;
   accent-color: #5782ff;
 }
 
 .stk-code {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #334155;
+  color: var(--m-text-2, #334155);
 }
 
 .stk-name {
@@ -1019,7 +1058,7 @@ onMounted(async () => {
   font-size: 0.82rem;
   font-weight: 700;
   line-height: 1.3;
-  color: #0f172a;
+  color: var(--m-text, #0f172a);
   word-break: keep-all;
 }
 
@@ -1027,7 +1066,7 @@ onMounted(async () => {
   margin-top: 0.1rem;
   font-size: 0.72rem;
   line-height: 1.3;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
 }
 
 .stk-unit {
@@ -1036,13 +1075,13 @@ onMounted(async () => {
   gap: 0.35rem;
   margin-top: 0.4rem;
   padding-top: 0.35rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--m-border, #e2e8f0);
   font-size: 0.72rem;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
 }
 
 .stk-unit strong {
-  color: #0f172a;
+  color: var(--m-text, #0f172a);
   font-size: 0.78rem;
   font-weight: 700;
 }
@@ -1053,7 +1092,7 @@ onMounted(async () => {
   justify-content: center;
   gap: 0.28rem;
   padding: 0.65rem 0.7rem 0.65rem 0.55rem;
-  border-left: 1px solid #e2e8f0;
+  border-left: 1px solid var(--m-border, #e2e8f0);
 }
 
 .stk-price-row {
@@ -1062,47 +1101,82 @@ onMounted(async () => {
   justify-content: space-between;
   gap: 0.35rem;
   font-size: 0.72rem;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
 }
 
 .stk-price-row strong {
   font-size: 0.78rem;
-  color: #1e293b;
+  color: var(--m-text, #1e293b);
 }
 
 .stk-price-row.is-sum strong {
   color: #5782ff;
 }
 
+/* 수량 − / + : 한 손으로 누르기 쉽게 버튼을 키운다 */
 .stk-stepper {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.35rem;
+  border: 1px solid var(--m-border-strong, #cbd5e1);
+  border-radius: 0.625rem;
   overflow: hidden;
-  background: #fff;
+  background: var(--m-surface, #fff);
 }
 
 .stk-stepper button {
-  width: 1.55rem;
-  height: 1.55rem;
-  color: #334155;
-  font-size: 0.95rem;
+  width: 2.25rem;
+  height: 2.5rem;
+  color: var(--m-text-2, #334155);
+  font-size: 1.2rem;
+  font-weight: 600;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.stk-stepper button:not(:disabled):active {
+  background: var(--m-surface-3, #e2e8f0);
 }
 
 .stk-stepper button:disabled {
-  color: #cbd5e1;
+  color: var(--m-text-4, #cbd5e1);
 }
 
 .stk-stepper input {
-  width: 2rem;
-  height: 1.55rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
   border: 0;
-  border-left: 1px solid #e2e8f0;
-  border-right: 1px solid #e2e8f0;
+  border-left: 1px solid var(--m-border, #e2e8f0);
+  border-right: 1px solid var(--m-border, #e2e8f0);
+  border-radius: 0;
   text-align: center;
-  font-size: 0.78rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--m-text, #0f172a);
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+
+.stk-stepper input:focus {
+  background: var(--m-accent-weak, #eff4ff);
+}
+
+.stk-stepper input:disabled {
+  background: var(--m-bg, #f8fafc);
+  color: var(--m-text-4, #94a3b8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stk-list-btn,
+  .stk-tab,
+  .stk-field,
+  .stk-stepper button {
+    transition: none;
+  }
+  .stk-list-btn:not(:disabled):active {
+    transform: none;
+  }
 }
 </style>

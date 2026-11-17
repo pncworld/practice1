@@ -5,45 +5,38 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div class="h-full w-full" @click="resetScreen">
-    <div class="h-[15vh] w-full"></div>
-    <div
-      class="relative h-[7vh] items-center text-lg font-medium w-full bg-white flex justify-center">
-      <div class="w-[25%] font-semibold text-nowrap">시간대</div>
-      <div>|</div>
-      <div class="w-[75%] font-semibold">내역</div>
+  <div class="mu-page" @click="resetScreen">
+    <div class="mu-head"></div>
+    <div v-if="rowData.length == 0" class="mu-empty">
+      {{ loaded ? "조회된 내역이 없습니다." : "위 조회 조건을 눌러 기간과 매장을 선택한 뒤 조회하세요." }}
     </div>
-    <div v-for="i in rowData" class="bg-gray-200">
-      <div
-        class="grid grid-rows-1 grid-cols-[2fr,6fr] h-[20vh] justify-center items-center font-medium">
-        <div
-          class="text-nowrap flex flex-col justify-center items-center ml-[5%]">
-          <div class="text-lg">{{ i.strTimeName }}</div>
-          <div class="text-red-500 text-lg">({{ i.dblDistRate }}%)</div>
-        </div>
-
-        <div class="grid grid-rows-4 grid-cols-2 gap-2">
-          <div class="text-blue-500 flex justify-start">조수/누계</div>
-          <div class="text-nowrap flex justify-end pr-[10%]">
-            {{ i.lngRecCnt }}&nbsp;/&nbsp;{{ i.lngAccRecCnt }}
+    <div class="mu-cards">
+      <div v-for="(i, idx) in rowData" :key="idx" class="mu-card">
+        <div class="mu-card-top">
+          <div class="mu-card-title">
+            {{ i.strTimeName }}
+            <span class="mu-sub">({{ i.dblDistRate }}%)</span>
           </div>
-          <div class="text-blue-500 flex justify-start">객수/누계</div>
-          <div class="text-nowrap flex justify-end pr-[10%]">
-            {{ i.lngCustCnt }}&nbsp;/&nbsp;{{ i.lngAccCustCnt }}
-          </div>
-          <div class="text-blue-500 flex justify-start">실매출/실매출누계</div>
-          <div class="text-nowrap flex justify-end pr-[10%]">
-            {{ i.lngActAmt }}&nbsp;/&nbsp;{{ i.lngAccActAmt }}
-          </div>
-          <div class="text-blue-500 flex justify-start">객단가/객단가누계</div>
-          <div class="text-nowrap flex justify-end pr-[10%]">
-            {{ i.lngAvgCustAmt }}&nbsp;/&nbsp;{{ i.lngAvgAccCustAmt }}
+          <div class="mu-key">
+            <div class="mu-key-label">실매출</div>
+            <div class="mu-key-value">{{ i.lngActAmt }}</div>
           </div>
         </div>
+        <dl class="mu-kv">
+          <dt>실매출누계</dt>
+          <dd>{{ i.lngAccActAmt }}</dd>
+          <dt>조수 / 누계</dt>
+          <dd>{{ i.lngRecCnt }} / {{ i.lngAccRecCnt }}</dd>
+          <dt>객수 / 누계</dt>
+          <dd>{{ i.lngCustCnt }} / {{ i.lngAccCustCnt }}</dd>
+          <dt>객단가 / 누계</dt>
+          <dd>{{ i.lngAvgCustAmt }} / {{ i.lngAvgAccCustAmt }}</dd>
+        </dl>
       </div>
     </div>
   </div>
   <MobileDateStore
+    :autoSearch="true"
     @click.stop
     class="z-[10]"
     :changeState="changeState"
@@ -67,6 +60,7 @@ import { onMounted, ref } from "vue";
  */
 
 import { useStore } from "vuex";
+import "../mobileUi.css";
 import { applyNetUnitPrice } from "@/utils/netUnitPrice";
 import MobileDateStore from "../component/mobileDateStore.vue";
 
@@ -108,6 +102,7 @@ const STORE_CD = (e) => {
 };
 
 const rowData = ref([]);
+const loaded = ref(false);
 const SEARCHNOW = async (e) => {
   try {
     store.state.loading2 = true;
@@ -138,6 +133,7 @@ const SEARCHNOW = async (e) => {
   } catch (error) {
   } finally {
     store.state.loading2 = false;
+    loaded.value = true;
   }
 
   //comsole.log(rowData.value);

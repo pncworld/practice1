@@ -71,6 +71,7 @@
           id="StoreSelect"
           ref="StoreSelect"
           v-model="selectedStoreCd2">
+          <option v-if="!selectedStoreCd2" :value="null" disabled>매장을 선택하세요</option>
           <option
             :value="{ STORE_CD: i.STORE_CD, GROUP_CD: i.GROUP_CD }"
             v-for="i in StoreList"
@@ -81,7 +82,13 @@
         <font-awesome-icon :icon="['fas', 'chevron-down']" class="mds-select-chevron" />
       </div>
 
-      <button type="button" class="mds-search" @click="sendSearch">조회</button>
+      <button
+        type="button"
+        class="mds-search"
+        :disabled="!selectedStoreCd2"
+        @click="sendSearch">
+        {{ selectedStoreCd2 ? "조회" : "매장을 선택하세요" }}
+      </button>
     </div>
   </div>
 </template>
@@ -192,6 +199,24 @@ onMounted(async () => {
 
   StoreList.value = res?.data?.List;
   tempStoreList.value = res?.data?.List;
+
+  /*
+   * 본사 계정(목록에 「전체」 행 + 매장 2개 이상): 이 화면(VAN 수수료)의 저장 프로시저는
+   * 매장코드 0(전체)을 처리하지 않으므로 「전체」를 빼고, 매장을 고르기 전에는 조회하지 않는다.
+   */
+  const list = Array.isArray(StoreList.value) ? StoreList.value : [];
+  const isAllRow = (item) =>
+    String(item?.STORE_NM ?? "").replace(/\s/g, "") === "전체" ||
+    (String(item?.STORE_CD ?? "").trim() !== "" && Number(item.STORE_CD) === 0);
+  const concrete = list.filter((item) => !isAllRow(item));
+  if (list.some(isAllRow) && concrete.length > 1) {
+    StoreList.value = concrete;
+    tempStoreList.value = concrete;
+    selectedStoreCd.value = null;
+    selectedStoreCd2.value = null;
+    selectedStoreName.value = "매장을 선택하세요";
+    return;
+  }
   ////console.log(StoreList.value);
   selectedStoreCd.value = {
     STORE_CD: store.state.userData.STORE_CD,
@@ -208,6 +233,13 @@ onMounted(async () => {
     (item) => item.STORE_CD == selectedStoreCd.value.STORE_CD
   )[0]?.STORE_NM;
   selectedStoreName.value = filteredNm;
+
+  /* 매장 계정은 화면에 들어오자마자 오늘 기준으로 바로 조회 (본사는 위에서 return 되어 제외) */
+  emit("startDate", startDate.value);
+  emit("endDate", endDate.value);
+  emit("GROUP_CD", selectedStoreCd.value.GROUP_CD);
+  emit("STORE_CD", selectedStoreCd.value.STORE_CD);
+  emit("SEARCHNOW", true);
 });
 
 const StoreList = ref([]);
@@ -233,6 +265,7 @@ const selectedStoreCd = ref(0);
 
 const selectedStoreCd2 = ref(0);
 const sendSearch = () => {
+  if (!selectedStoreCd2.value) return; /* 본사: 매장을 고르기 전 */
   //comsole.log(selectedStoreCd.value.GROUP_CD);
   emit("startDate", startDate.value);
   emit("endDate", endDate.value);
@@ -320,12 +353,20 @@ onMounted(() => {
   gap: 0.75rem;
   width: 100%;
   height: 7.2vh;
+  min-height: 2.75rem;
   padding: 0 0.85rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 1rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
   text-align: left;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.mds-summary:active {
+  background: var(--m-surface-2, #f1f5f9);
 }
 
 .mds-summary-body {
@@ -339,7 +380,7 @@ onMounted(() => {
   gap: 0.4rem;
   font-size: 0.8125rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--m-text, #1e293b);
   white-space: nowrap;
 }
 
@@ -347,16 +388,16 @@ onMounted(() => {
   margin-top: 0.1rem;
   font-size: 0.75rem;
   font-weight: 500;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
 }
 
 .mds-ico {
   width: 0.85rem;
-  color: #3b82f6;
+  color: var(--m-accent, #3b82f6);
 }
 
 .mds-summary-store .mds-ico {
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
 }
 
 .mds-filter-btn {
@@ -366,8 +407,8 @@ onMounted(() => {
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 0.75rem;
-  background: #eff4ff;
-  color: #3b82f6;
+  background: var(--m-accent-weak, #eff4ff);
+  color: var(--m-accent, #3b82f6);
   flex-shrink: 0;
 }
 
@@ -394,10 +435,14 @@ onMounted(() => {
   right: 0.75rem;
   top: 16vh;
   max-height: 72vh;
+  max-height: calc(100dvh - 16vh - 1rem - env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  -webkit-tap-highlight-color: transparent;
   padding: 1rem;
   border-radius: 1.25rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
 }
 
@@ -411,31 +456,38 @@ onMounted(() => {
 .mds-sheet-title {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--m-text, #0f172a);
 }
 
 .mds-sheet-sub {
   margin-top: 0.15rem;
   font-size: 0.7rem;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
 }
 
 .mds-close {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: -0.375rem -0.375rem 0 0;
   border-radius: 999px;
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--m-surface-2, #f1f5f9);
+  color: var(--m-text-3, #64748b);
+  touch-action: manipulation;
+}
+
+.mds-close:active {
+  background: var(--m-surface-3, #e2e8f0);
 }
 
 .mds-label {
   margin-bottom: 0.4rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
 }
 
 .mds-date-box,
@@ -444,31 +496,49 @@ onMounted(() => {
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.6rem;
-  padding: 0.35rem 0.5rem;
-  border: 1px solid #e2e8f0;
+  padding: 0 0.5rem;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 0.85rem;
-  background: #f8fafc;
+  background: var(--m-bg, #f8fafc);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+.mds-date-box:focus-within,
+.mds-search-row:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* 높이 44px, 글자 16px(iOS 입력 시 화면 확대·밀림 방지) */
 .mds-date,
 .mds-search-input {
   flex: 1;
   min-width: 0;
-  height: 2.1rem;
+  height: 2.75rem;
   border: 0;
+  outline: none;
   background: transparent;
-  font-size: 0.8125rem;
-  color: #1e293b;
+  font-size: 1rem;
+  color: var(--m-text, #1e293b);
 }
 
 .mds-search-go {
-  width: 2rem;
-  color: #3b82f6;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-right: -0.5rem;
+  border-radius: 0.85rem;
+  color: var(--m-accent, #2563eb);
+  touch-action: manipulation;
+}
+
+.mds-search-go:active {
+  background: var(--m-surface-3, #e2e8f0);
 }
 
 .mds-tilde {
   flex-shrink: 0;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
   font-weight: 600;
 }
 
@@ -479,20 +549,26 @@ onMounted(() => {
   margin-bottom: 1rem;
   padding: 0.25rem;
   border-radius: 0.85rem;
-  background: #f1f5f9;
+  background: var(--m-surface-2, #f1f5f9);
 }
 
 .mds-chip {
-  height: 2rem;
+  height: 2.5rem;
   border-radius: 0.65rem;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
+  touch-action: manipulation;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.mds-chip:active {
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .mds-chip.is-on {
-  background: #fff;
-  color: #3b82f6;
+  background: var(--m-surface, #fff);
+  color: var(--m-accent, #2563eb);
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
 }
 
@@ -506,7 +582,7 @@ onMounted(() => {
   top: 50%;
   left: 0.85rem;
   width: 0.85rem;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
   transform: translateY(-50%);
   pointer-events: none;
 }
@@ -515,12 +591,20 @@ onMounted(() => {
   width: 100%;
   height: 2.75rem;
   padding: 0 2.2rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 0.85rem;
-  background: #fff;
-  font-size: 0.875rem;
-  color: #1e293b;
+  background: var(--m-surface, #fff);
+  font-size: 1rem;
+  color: var(--m-text, #1e293b);
   appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  text-overflow: ellipsis;
+}
+
+.mds-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 .mds-select-chevron {
@@ -528,18 +612,44 @@ onMounted(() => {
   top: 50%;
   right: 0.85rem;
   width: 0.7rem;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
   transform: translateY(-50%);
   pointer-events: none;
 }
 
 .mds-search {
   width: 100%;
-  height: 2.75rem;
+  height: 3rem;
   border-radius: 0.85rem;
-  background: #3b82f6;
+  background: #2563eb;
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
+  touch-action: manipulation;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+/* 매장을 고르기 전 (본사 계정) */
+.mds-search:disabled {
+  background: var(--m-surface-3, #e2e8f0);
+  color: var(--m-text-3, #64748b);
+}
+
+.mds-search:active {
+  background: #1d4ed8;
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mds-summary,
+  .mds-chip,
+  .mds-search,
+  .mds-date-box,
+  .mds-search-row {
+    transition: none;
+  }
+  .mds-search:active {
+    transform: none;
+  }
 }
 </style>

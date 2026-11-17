@@ -18,6 +18,7 @@ import mobileMaster from "./mobileMaster";
 import mobileSales from "./mobileSales";
 import SalesbyCornerMenu from "@/views/MOBILE/sales/SalesbyCornerMenu.vue";
 import VanFeeList from "@/views/MOBILE/sales/VanFeeList.vue";
+import UnpaidTable from "@/views/MOBILE/sales/unpaidTable.vue";
 
 export default function mobileRouter() {
   return [
@@ -114,6 +115,11 @@ export default function mobileRouter() {
       path: "20016",
       //component : BasicLayout ,
       component: VanFeeList,
+    },
+    {
+      /* 미결제 테이블 주문 조회 (웹 SLS02_033RPT 모바일판) */
+      path: "20018",
+      component: UnpaidTable,
     },
     {
       path: "50001",

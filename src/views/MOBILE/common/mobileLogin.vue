@@ -5,14 +5,14 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div class="flex items-center justify-center h-screen bg-slate-100 px-5">
+  <div class="ml-screen flex items-center justify-center bg-slate-100 px-5">
     <loading></loading>
     <div class="bg-white p-7 rounded-3xl shadow-lg max-w-sm w-full border border-slate-100">
       <div class="mb-6">
         <img
           :src="loginLogo"
           alt="PNC Office"
-          class="w-full max-w-[152px]" />
+          class="ml-logo w-full max-w-[152px]" />
       </div>
 
       <form @submit.prevent="login2">
@@ -26,7 +26,12 @@
             v-model="username"
             placeholder="아이디를 입력하세요"
             required
-            class="w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            autocomplete="username"
+            autocapitalize="none"
+            autocorrect="off"
+            spellcheck="false"
+            enterkeyhint="next"
+            class="ml-input w-full px-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
             @keyup.enter="login2" />
         </div>
 
@@ -41,18 +46,21 @@
               v-model="password"
               placeholder="비밀번호를 입력하세요"
               required
-              class="w-full px-3 py-2.5 pr-16 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autocomplete="current-password"
+              autocapitalize="none"
+              enterkeyhint="go"
+              class="ml-input w-full px-3 pr-16 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
               @keyup.enter="login2" />
             <button
               type="button"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-blue-500"
+              class="ml-link absolute right-1 top-1/2 -translate-y-1/2 text-sm font-semibold text-blue-600"
               @click="showPassword">
               {{ passwordVisible ? "숨기기" : "보기" }}
             </button>
           </div>
         </div>
 
-        <label for="saveId" class="mb-6 flex cursor-pointer items-center gap-2 text-sm text-slate-600">
+        <label for="saveId" class="mb-4 flex min-h-[2.75rem] cursor-pointer items-center gap-2 text-sm text-slate-600">
           <input
             type="checkbox"
             id="saveId"
@@ -63,19 +71,18 @@
 
         <button
           type="submit"
-          class="w-full py-2.5 px-4 bg-blue-500 text-white font-semibold rounded-xl shadow-md">
+          class="ml-btn w-full px-4 bg-blue-600 text-white font-bold rounded-xl shadow-md">
           로그인
         </button>
         <button
           type="button"
-          class="mt-2 w-full py-2.5 px-4 font-semibold rounded-xl"
-          style="border: 1px solid #222; background: #fff; color: #222;"
+          class="ml-btn ml-btn-outline mt-2 w-full px-4 font-semibold rounded-xl"
           @click="goToOrder">
           소모품 발주
         </button>
       </form>
-      <div class="mt-4 flex justify-end text-sm">
-        <button type="button" class="font-semibold text-blue-500" @click="showCustomorCenter">
+      <div class="mt-2 flex justify-end text-sm">
+        <button type="button" class="ml-link font-semibold text-blue-600" @click="showCustomorCenter">
           고객센터
         </button>
       </div>
@@ -84,7 +91,7 @@
   </div>
 
   <div
-    class="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 px-4 pb-8"
+    class="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 px-4 pb-[max(2rem,env(safe-area-inset-bottom))]"
     v-if="showPopUp"
     @click.self="
       showPopUp = false;
@@ -102,14 +109,14 @@
       </div>
       <button
         type="button"
-        class="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#ffde00] font-semibold text-[#231916]"
+        class="ml-btn mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#ffde00] font-semibold text-[#231916]"
         @click="goToKakao">
         <img :src="kakaoChannelTalkIcon" alt="카카오 채널톡" class="h-5 w-5" />
         카카오 채널톡 상담
       </button>
       <button
         type="button"
-        class="mt-2 h-11 w-full rounded-xl bg-blue-500 font-semibold text-white"
+        class="ml-btn mt-2 w-full rounded-xl bg-blue-600 font-semibold text-white"
         @click="
           showPopUp = false;
           disableBg();
@@ -328,28 +335,89 @@ input[type="checkbox"] {
   -moz-appearance: none;
   appearance: none;
   border-radius: 50%;
-  border: 2px solid #ccc;
-  width: 15px;
-  height: 15px;
-  background-color: white;
+  border: 2px solid var(--m-border-strong, #cbd5e1);
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  background-color: var(--m-surface-2, white);
   position: relative;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 input[type="checkbox"]:checked {
-  background-color: #4a90e2;
-  border-color: #4a90e2;
+  background-color: #2563eb;
+  border-color: #2563eb;
 }
 
 input[type="checkbox"]:checked::after {
   content: "";
   position: absolute;
-  left: 2px;
-  top: 2px;
+  left: 5px;
+  top: 5px;
   width: 8px;
   height: 8px;
   background-color: white;
   border-radius: 50%;
+}
+
+/* 소모품 발주 버튼 (밝은 화면은 기존 흰 바탕·검은 테두리 그대로) */
+.ml-btn-outline {
+  border: 1px solid var(--m-border-strong, #222);
+  background: var(--m-surface-2, #fff);
+  color: var(--m-text, #222);
+}
+
+/* 어두운 화면: 로고의 진한 회색 글자가 바탕에 묻히지 않게 밝기만 뒤집는다 (색 계열은 유지) */
+:global(html[data-mtheme="dark"] .ml-logo) {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* 주소창·키보드로 화면 높이가 바뀌어도 가운데 정렬이 흔들리지 않게 */
+.ml-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-top: max(1.25rem, env(safe-area-inset-top));
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ml-input {
+  height: 3rem;
+  font-size: 1rem;
+}
+
+.ml-btn {
+  height: 3rem;
+  touch-action: manipulation;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.ml-btn:active {
+  transform: scale(0.98);
+  filter: brightness(0.93);
+}
+
+.ml-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.5rem;
+  border-radius: 0.5rem;
+  touch-action: manipulation;
+}
+
+.ml-link:active {
+  background: var(--m-accent-weak, #eff4ff);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ml-btn,
+  input[type="checkbox"] {
+    transition: none;
+  }
+  .ml-btn:active {
+    transform: none;
+  }
 }
 </style>

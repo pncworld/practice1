@@ -888,13 +888,13 @@ onMounted(async () => {
 .mm {
   min-height: 100%;
   padding: 4.2rem 0.75rem 5.5rem;
-  background: #f8fafc;
+  background: var(--m-bg, #f8fafc);
 }
 
 .mm-card {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 1rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
 }
 
@@ -903,7 +903,7 @@ onMounted(async () => {
   text-align: center;
   font-size: 0.8rem;
   line-height: 1.6;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
 }
 
 .mm-top {
@@ -920,14 +920,14 @@ onMounted(async () => {
   flex-shrink: 0;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
 }
 
 .mm-top-store {
   min-width: 0;
   font-size: 0.95rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--m-text, #0f172a);
   word-break: keep-all;
 }
 
@@ -943,10 +943,10 @@ onMounted(async () => {
   width: 2.3rem;
   height: 2.3rem;
   margin-left: auto;
-  border: 1px solid #dbeafe;
+  border: 1px solid var(--m-accent-border, #dbeafe);
   border-radius: 0.75rem;
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--m-accent-weak, #eff6ff);
+  color: var(--m-accent, #2563eb);
 }
 
 .mm-home svg {
@@ -963,21 +963,21 @@ onMounted(async () => {
   min-width: 0;
   height: 2.4rem;
   padding: 0 0.6rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 0.6rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
   font-size: 1rem;
-  color: #0f172a;
+  color: var(--m-text, #0f172a);
 }
 
 .mm-note {
   margin-top: 0.6rem;
   padding: 0.55rem 0.65rem;
   border-radius: 0.6rem;
-  background: #f1f5f9;
+  background: var(--m-surface-2, #f1f5f9);
   font-size: 0.7rem;
   line-height: 1.45;
-  color: #475569;
+  color: var(--m-text-2, #475569);
 }
 
 /* 초간단 메뉴등록 · AI 메뉴관리 버튼: 둘이면 반반, 하나면 한 줄 전체 */
@@ -996,11 +996,11 @@ onMounted(async () => {
   margin-top: 0.5rem;
   padding: 0.45rem 0.6rem;
   border-radius: 0.6rem;
-  background: #f5f3ff;
+  background: var(--m-tint-violet, #f5f3ff);
   font-size: 0.68rem;
   font-weight: 600;
   line-height: 1.45;
-  color: #5b21b6;
+  color: var(--m-violet-text, #5b21b6);
 }
 
 .mm-scope svg {
@@ -1013,7 +1013,7 @@ onMounted(async () => {
 
 .mm-scope b {
   font-weight: 800;
-  color: #4c1d95;
+  color: var(--m-violet-text, #4c1d95);
 }
 
 .mm-tools.is-single {
@@ -1026,19 +1026,19 @@ onMounted(async () => {
   gap: 0.5rem;
   min-width: 0;
   padding: 0.65rem 0.6rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 0.85rem;
   text-align: left;
 }
 
 .mm-tool.is-quick {
-  border-color: #fed7aa;
-  background: linear-gradient(135deg, #fff7ed, #fffbeb);
+  border-color: var(--m-tint-warm-border, #fed7aa);
+  background: linear-gradient(135deg, var(--m-tint-warm, #fff7ed), var(--m-tint-warm, #fffbeb));
 }
 
 .mm-tool.is-ai {
-  border-color: #c7d2fe;
-  background: linear-gradient(135deg, #eef2ff, #eff6ff);
+  border-color: var(--m-accent-border, #c7d2fe);
+  background: linear-gradient(135deg, var(--m-tint-violet, #eef2ff), var(--m-accent-weak, #eff6ff));
 }
 
 .mm-tool:disabled {
@@ -1088,18 +1088,18 @@ onMounted(async () => {
 }
 
 .is-quick .mm-tool-title {
-  color: #9a3412;
+  color: var(--m-warm-text, #9a3412);
 }
 
 .is-ai .mm-tool-title {
-  color: #3730a3;
+  color: var(--m-violet-text, #3730a3);
 }
 
 .mm-tool-sub {
   margin-top: 0.1rem;
   font-size: 0.62rem;
   line-height: 1.3;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
   word-break: keep-all;
 }
 
@@ -1114,7 +1114,7 @@ onMounted(async () => {
   left: 0.8rem;
   width: 1.1rem;
   height: 1.1rem;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
   transform: translateY(-50%);
 }
 
@@ -1122,9 +1122,9 @@ onMounted(async () => {
   width: 100%;
   height: 2.6rem;
   padding: 0 0.85rem 0 2.4rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 999px;
-  background: #fff;
+  background: var(--m-surface, #fff);
   font-size: 1rem;
   outline: none;
 }
@@ -1149,12 +1149,12 @@ onMounted(async () => {
 .mm-chip {
   flex-shrink: 0;
   padding: 0.35rem 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 999px;
-  background: #fff;
+  background: var(--m-surface, #fff);
   font-size: 0.72rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--m-text-2, #475569);
   white-space: nowrap;
 }
 
@@ -1177,7 +1177,7 @@ onMounted(async () => {
 }
 
 .mm-item.is-open {
-  border-color: #93c5fd;
+  border-color: var(--m-accent-border, #93c5fd);
 }
 
 .mm-item.is-new {
@@ -1204,7 +1204,7 @@ onMounted(async () => {
 .mm-item-name {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--m-text, #0f172a);
   word-break: keep-all;
   overflow-wrap: anywhere;
 }
@@ -1212,7 +1212,7 @@ onMounted(async () => {
 .mm-item-meta {
   margin-top: 0.15rem;
   font-size: 0.66rem;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
 }
 
 .mm-item-side {
@@ -1226,7 +1226,7 @@ onMounted(async () => {
 .mm-item-price {
   font-size: 0.82rem;
   font-weight: 800;
-  color: #3b82f6;
+  color: var(--m-accent, #3b82f6);
 }
 
 .mm-badges {
@@ -1242,25 +1242,25 @@ onMounted(async () => {
 }
 
 .mm-badge.is-off {
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--m-surface-2, #f1f5f9);
+  color: var(--m-text-3, #64748b);
 }
 
 .mm-badge.is-sold {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--m-danger-weak, #fee2e2);
+  color: var(--m-danger, #dc2626);
 }
 
 .mm-badge.is-new {
-  background: #ffedd5;
-  color: #c2410c;
+  background: var(--m-tint-warm, #ffedd5);
+  color: var(--m-warm-text, #c2410c);
 }
 
 .mm-item-arrow {
   flex-shrink: 0;
   width: 1rem;
   height: 1rem;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
   transition: transform 0.15s ease;
 }
 
@@ -1270,27 +1270,27 @@ onMounted(async () => {
 
 .mm-detail {
   padding: 0.2rem 0.8rem 0.75rem;
-  border-top: 1px dashed #e2e8f0;
+  border-top: 1px dashed var(--m-border, #e2e8f0);
 }
 
 .mm-field {
   display: flex;
   gap: 0.6rem;
   padding: 0.38rem 0;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--m-border, #f1f5f9);
   font-size: 0.74rem;
 }
 
 .mm-field-label {
   flex-shrink: 0;
   width: 5.5rem;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
 }
 
 .mm-field-value {
   min-width: 0;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--m-text, #1e293b);
   overflow-wrap: anywhere;
 }
 
@@ -1308,12 +1308,12 @@ onMounted(async () => {
   align-items: center;
   gap: 0.2rem;
   padding: 0.2rem 0.5rem;
-  border: 1px solid #bfdbfe;
+  border: 1px solid var(--m-accent-border, #bfdbfe);
   border-radius: 999px;
-  background: #eff6ff;
+  background: var(--m-accent-weak, #eff6ff);
   font-size: 0.66rem;
   font-weight: 700;
-  color: #2563eb;
+  color: var(--m-accent, #2563eb);
 }
 
 .mm-edit-open svg {
@@ -1369,7 +1369,7 @@ onMounted(async () => {
   width: 1.2rem;
   height: 1.2rem;
   border-radius: 999px;
-  background: #fff;
+  background: var(--m-surface, #fff);
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
   transition: transform 0.15s ease;
 }
@@ -1388,9 +1388,9 @@ onMounted(async () => {
   padding: 0 0.5rem;
   border: 1px solid #3b82f6;
   border-radius: 0.5rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
   font-size: 1rem;
-  color: #0f172a;
+  color: var(--m-text, #0f172a);
 }
 
 .mm-edit-group .mm-edit-actions {
@@ -1405,12 +1405,12 @@ onMounted(async () => {
 .mm-edit-btn {
   height: 2.2rem;
   padding: 0 0.7rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 0.5rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
   font-size: 0.75rem;
   font-weight: 700;
-  color: #475569;
+  color: var(--m-text-2, #475569);
 }
 
 .mm-edit-btn.is-save {
@@ -1431,12 +1431,12 @@ onMounted(async () => {
   width: 100%;
   margin-top: 0.5rem;
   padding: 0.45rem;
-  border: 1px solid #c7d2fe;
+  border: 1px solid var(--m-accent-border, #c7d2fe);
   border-radius: 0.6rem;
-  background: #eef2ff;
+  background: var(--m-tint-violet, #eef2ff);
   font-size: 0.75rem;
   font-weight: 700;
-  color: #4338ca;
+  color: var(--m-violet-text, #4338ca);
 }
 
 .mm-image-btn svg {
@@ -1475,7 +1475,7 @@ onMounted(async () => {
 .mm-image-frame {
   width: 100%;
   border-radius: 0.9rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
   overflow: hidden;
 }
 
@@ -1485,19 +1485,19 @@ onMounted(async () => {
   height: auto;
   aspect-ratio: 4 / 3;
   object-fit: contain;
-  background: #fff;
+  background: var(--m-surface, #fff);
 }
 
 .mm-image-empty {
   padding: 2.5rem 1rem;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
   text-align: center;
 }
 
 .mm-image-hint {
   font-size: 0.72rem;
-  color: #cbd5e1;
+  color: var(--m-text-4, #cbd5e1);
 }
 
 .mm-more {
@@ -1505,10 +1505,10 @@ onMounted(async () => {
   margin-top: 0.5rem;
   padding: 0.4rem;
   border-radius: 0.6rem;
-  background: #f8fafc;
+  background: var(--m-bg, #f8fafc);
   font-size: 0.72rem;
   font-weight: 700;
-  color: #475569;
+  color: var(--m-text-2, #475569);
 }
 
 .mm-to-top {
@@ -1550,11 +1550,63 @@ onMounted(async () => {
 
 .mm-load-more {
   padding: 0.65rem;
-  border: 1px dashed #cbd5e1;
+  border: 1px dashed var(--m-border-strong, #cbd5e1);
   border-radius: 0.85rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
   font-size: 0.75rem;
   font-weight: 700;
-  color: #475569;
+  color: var(--m-text-2, #475569);
+}
+
+/* ── 컨트롤 터치 영역 보강 (표시만 변경: 높이 44px, 눌림 표시) ── */
+.mm-select,
+.mm-search input,
+.mm-edit input,
+.mm-edit-select {
+  height: 2.75rem;
+}
+
+.mm-home {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.mm-edit-btn {
+  min-width: 3.25rem;
+  height: 2.75rem;
+  font-size: 0.8125rem;
+  touch-action: manipulation;
+}
+
+.mm-edit-btn:not(:disabled):active {
+  filter: brightness(0.93);
+}
+
+.mm-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0 0.875rem;
+  font-size: 0.8125rem;
+  touch-action: manipulation;
+}
+
+/* 스위치 모양은 그대로, 누를 수 있는 영역만 44px 로 넓힌다 */
+.mm-switch::after {
+  content: "";
+  position: absolute;
+  inset: -0.625rem -0.3rem;
+}
+
+.mm-image-btn,
+.mm-load-more {
+  min-height: 2.75rem;
+  font-size: 0.8125rem;
+  touch-action: manipulation;
+}
+
+.mm-load-more:active,
+.mm-image-btn:active {
+  filter: brightness(0.96);
 }
 </style>

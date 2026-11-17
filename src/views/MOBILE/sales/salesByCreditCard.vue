@@ -5,33 +5,33 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div class="h-full w-full" @click="resetScreen">
-    <div class="h-[15vh] w-full"></div>
-    <div
-      class="relative h-[7vh] items-center text-lg font-medium w-full bg-white flex justify-center">
-      <div class="w-[33%] font-semibold text-nowrap flex justify-start pl-5">
-        카드사명
+  <div class="mu-page" style="--mu-cols: 3fr 2fr 3fr" @click="resetScreen">
+    <div class="mu-head">
+      <div class="mu-thead">
+        <div>카드사명</div>
+        <div class="mu-num">건수</div>
+        <div class="mu-num">금액</div>
       </div>
-      <div class="w-[23%] font-semibold flex justify-end">건수</div>
-      <div class="w-[33%] font-semibold flex justify-end">금액</div>
     </div>
-    <div v-for="i in rowData" class="bg-gray-300">
-      <div
-        :class="i.strBuyName.includes('[') ? 'bg-gray-300' : 'bg-blue-50'"
-        class="grid grid-rows-1 grid-cols-[3fr,2fr,3fr] h-[7vh] justify-center items-center font-medium">
-        <div class="text-nowrap flex justify-start pl-[5vw]">
-          {{ i.strBuyName }}
-        </div>
-
-        <div class="flex justify-end">{{ i.lngCount }}</div>
-        <div class="flex justify-end pr-[5vw]">{{ i.lngAmount }}</div>
-      </div>
+    <div v-if="rowData.length == 0" class="mu-empty">
+      {{ loaded ? "조회된 내역이 없습니다." : "위 조회 조건을 눌러 기간과 매장을 선택한 뒤 조회하세요." }}
+    </div>
+    <div
+      v-for="(i, idx) in rowData"
+      :key="idx"
+      class="mu-row"
+      :class="{ 'is-sum': i.strBuyName.includes('[') }">
+      <div class="mu-wrap">{{ i.strBuyName }}</div>
+      <div class="mu-num">{{ i.lngCount }}</div>
+      <div class="mu-num">{{ i.lngAmount }}</div>
     </div>
   </div>
   <MobileDateStore
+    :autoSearch="true"
     @click.stop
     class="z-[10]"
     :changeState="changeState"
+    :defaultAllStores="true"
     @currState="currState"
     @SEARCHNOW="SEARCHNOW"
     @startDate="startDate"
@@ -52,6 +52,7 @@ import { onMounted, ref } from "vue";
  */
 
 import { useStore } from "vuex";
+import "../mobileUi.css";
 import MobileDateStore from "../component/mobileDateStore.vue";
 
 const store = useStore();
@@ -92,6 +93,7 @@ const STORE_CD = (e) => {
 };
 
 const rowData = ref([]);
+const loaded = ref(false);
 const SEARCHNOW = async (e) => {
   try {
     store.state.loading2 = true;
@@ -110,6 +112,7 @@ const SEARCHNOW = async (e) => {
   } catch (error) {
   } finally {
     store.state.loading2 = false;
+    loaded.value = true;
   }
 
   //comsole.log(rowData.value);

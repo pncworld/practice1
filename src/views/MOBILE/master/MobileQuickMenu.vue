@@ -869,7 +869,7 @@ onMounted(() => {
   flex-direction: column;
   height: 100vh;
   height: 100dvh;
-  background: #f8fafc;
+  background: var(--m-bg, #f8fafc);
 }
 
 .mq-head {
@@ -877,8 +877,8 @@ onMounted(() => {
   align-items: center;
   gap: 0.6rem;
   padding: 0.75rem 0.85rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: #fff;
+  border-bottom: 1px solid var(--m-border, #e2e8f0);
+  background: var(--m-surface, #fff);
 }
 
 .mq-head-icon {
@@ -906,12 +906,12 @@ onMounted(() => {
 .mq-title {
   font-size: 0.95rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--m-text, #0f172a);
 }
 
 .mq-store {
   font-size: 0.7rem;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -924,8 +924,8 @@ onMounted(() => {
   width: 2.2rem;
   height: 2.2rem;
   border-radius: 999px;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--m-surface-2, #f1f5f9);
+  color: var(--m-text-2, #475569);
 }
 
 .mq-close svg {
@@ -935,9 +935,9 @@ onMounted(() => {
 
 .mq-test {
   padding: 0.4rem 0.85rem;
-  background: #fef3c7;
+  background: var(--m-tint-warm, #fef3c7);
   font-size: 0.7rem;
-  color: #92400e;
+  color: var(--m-warm-text, #92400e);
 }
 
 /* 메신저처럼 말풍선을 입력창 쪽(아래)부터 붙인다: 대화가 짧으면 아래에 모이고, 길어지면 위로 쌓임 */
@@ -956,9 +956,9 @@ onMounted(() => {
 
 .mq-guide {
   padding: 0.8rem 0.85rem;
-  border: 1px solid #fde68a;
+  border: 1px solid var(--m-tint-warm-border, #fde68a);
   border-radius: 0.9rem;
-  background: #fffbeb;
+  background: var(--m-tint-warm, #fffbeb);
   font-size: 0.72rem;
   color: #78350f;
 }
@@ -969,7 +969,7 @@ onMounted(() => {
 
 .mq-guide-example {
   margin-top: 0.15rem;
-  color: #b45309;
+  color: var(--m-warm-text, #b45309);
 }
 
 .mq-guide ul {
@@ -990,13 +990,13 @@ onMounted(() => {
   gap: 0.4rem;
   margin-top: 0.65rem;
   padding: 0.55rem 0.65rem;
-  border: 1px solid #c4b5fd;
+  border: 1px solid var(--m-tint-violet-border, #c4b5fd);
   border-radius: 0.7rem;
-  background: #f5f3ff;
+  background: var(--m-tint-violet, #f5f3ff);
   font-size: 0.74rem;
   font-weight: 600;
   line-height: 1.45;
-  color: #5b21b6;
+  color: var(--m-violet-text, #5b21b6);
 }
 
 .mq-scope svg {
@@ -1009,7 +1009,7 @@ onMounted(() => {
 
 .mq-scope b {
   font-weight: 800;
-  color: #4c1d95;
+  color: var(--m-violet-text, #4c1d95);
 }
 
 .mq-scope-body {
@@ -1072,10 +1072,10 @@ onMounted(() => {
 }
 
 .mq-row.is-ai .mq-bubble {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-top-left-radius: 0.25rem;
-  background: #fff;
-  color: #1e293b;
+  background: var(--m-surface, #fff);
+  color: var(--m-text, #1e293b);
 }
 
 .mq-row.is-user .mq-bubble {
@@ -1086,7 +1086,7 @@ onMounted(() => {
 
 .mq-row.is-ai .mq-bubble.is-done {
   border-color: #86efac;
-  background: #f0fdf4;
+  background: var(--m-tint-green, #f0fdf4);
 }
 
 .mq-done {
@@ -1119,12 +1119,12 @@ onMounted(() => {
 .mq-btn {
   flex: 1;
   padding: 0.45rem 0.6rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 0.6rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
   font-size: 0.75rem;
   font-weight: 700;
-  color: #334155;
+  color: var(--m-text-2, #334155);
 }
 
 .mq-btn.is-primary {
@@ -1196,8 +1196,8 @@ onMounted(() => {
   display: flex;
   gap: 0.5rem;
   padding: 0.65rem 0.75rem calc(0.65rem + env(safe-area-inset-bottom));
-  border-top: 1px solid #e2e8f0;
-  background: #fff;
+  border-top: 1px solid var(--m-border, #e2e8f0);
+  background: var(--m-surface, #fff);
 }
 
 .mq-input input {
@@ -1205,7 +1205,7 @@ onMounted(() => {
   min-width: 0;
   height: 2.6rem;
   padding: 0 0.85rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 999px;
   font-size: 1rem; /* 16px 미만이면 아이폰이 입력할 때 화면을 확대한다 */
   outline: none;
@@ -1221,15 +1221,15 @@ onMounted(() => {
   align-items: center;
   gap: 0.3rem;
   padding: 1rem 0.85rem;
-  border-top: 1px solid #fecaca;
-  background: #fef2f2;
+  border-top: 1px solid var(--m-danger-border, #fecaca);
+  background: var(--m-danger-weak, #fef2f2);
   text-align: center;
 }
 
 /* 안내 중(파랑) → 입력 대기(빨강) */
 .mq-listening.is-prompt {
-  border-top-color: #bfdbfe;
-  background: #eff6ff;
+  border-top-color: var(--m-accent-border, #bfdbfe);
+  background: var(--m-accent-weak, #eff6ff);
 }
 
 .mq-voice-visual {
@@ -1321,11 +1321,11 @@ onMounted(() => {
 .mq-listening-state {
   font-size: 0.7rem;
   font-weight: 700;
-  color: #dc2626;
+  color: var(--m-danger, #dc2626);
 }
 
 .is-prompt .mq-listening-state {
-  color: #2563eb;
+  color: var(--m-accent, #2563eb);
 }
 
 .mq-speaker {
@@ -1335,13 +1335,13 @@ onMounted(() => {
   width: 2.2rem;
   height: 2.2rem;
   border-radius: 999px;
-  background: #f1f5f9;
-  color: #94a3b8;
+  background: var(--m-surface-2, #f1f5f9);
+  color: var(--m-text-4, #94a3b8);
 }
 
 .mq-speaker.is-on {
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--m-accent-weak, #eff6ff);
+  color: var(--m-accent, #2563eb);
 }
 
 .mq-speaker svg {
@@ -1352,22 +1352,22 @@ onMounted(() => {
 .mq-listening-title {
   font-size: 1.05rem;
   font-weight: 800;
-  color: #b91c1c;
+  color: var(--m-danger, #b91c1c);
 }
 
 .mq-listening-sub {
   font-size: 0.7rem;
-  color: #ef4444;
+  color: var(--m-danger, #ef4444);
 }
 
 .mq-listening-heard {
   margin-top: 0.2rem;
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
-  background: #fff;
+  background: var(--m-surface, #fff);
   font-size: 0.85rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--m-text, #0f172a);
 }
 
 .mq-mic {
@@ -1377,10 +1377,10 @@ onMounted(() => {
   justify-content: center;
   width: 2.6rem;
   height: 2.6rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 999px;
-  background: #f8fafc;
-  color: #475569;
+  background: var(--m-bg, #f8fafc);
+  color: var(--m-text-2, #475569);
 }
 
 .mq-mic svg {
@@ -1427,5 +1427,49 @@ onMounted(() => {
 .mq-send svg {
   width: 1.2rem;
   height: 1.2rem;
+}
+
+/* ── 컨트롤 터치 영역 보강 (표시만 변경: 높이 44px, 눌림 표시) ── */
+.mq-close,
+.mq-mic,
+.mq-send {
+  width: 2.75rem;
+  height: 2.75rem;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mq-input input {
+  height: 2.75rem;
+}
+
+.mq-btn {
+  min-height: 2.75rem;
+  font-size: 0.8125rem;
+  touch-action: manipulation;
+}
+
+.mq-btn:not(:disabled):active,
+.mq-send:not(:disabled):active,
+.mq-close:active {
+  filter: brightness(0.93);
+}
+
+.mq-store-item {
+  min-height: 2.75rem;
+  padding: 0;
+  font-size: 0.875rem;
+}
+
+.mq-store-item input {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mq-mic.is-on {
+    animation: none;
+  }
 }
 </style>

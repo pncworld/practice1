@@ -296,7 +296,7 @@ const logout = () => {
   width: 17rem;
   height: 100%;
   overflow: hidden;
-  background: #fff;
+  background: var(--m-surface, #fff);
   box-shadow: 8px 0 24px rgba(15, 23, 42, 0.12);
 }
 
@@ -321,15 +321,87 @@ const logout = () => {
   text-align: center;
 }
 
+/*
+ * 그룹 목록(스크롤 영역)
+ * - 위쪽 고정 영역(홈·공지사항)과는 항상 보이는 구분선으로 나눈다
+ * - 스크롤바는 얇게, 끝까지 내려도 뒤 화면이 따라 움직이지 않게
+ */
 .side-scroll {
+  position: relative;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding-bottom: 4.5rem;
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--m-border, #e2e8f0);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.side-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.side-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.side-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--m-surface-3, #cbd5e1);
+}
+
+/*
+ * 목록을 내렸을 때만 고정 영역 아래에 옅은 그림자를 보여 준다 (내용이 그 밑으로 들어간다는 표시)
+ * 스크롤 위치에 따라 바뀌는 효과라 지원하는 브라우저에서만 켠다. 지원하지 않으면 위 구분선만 보인다
+ */
+@supports (animation-timeline: scroll()) {
+  .side-scroll::before {
+    content: "";
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    display: block;
+    height: 0.625rem;
+    margin-bottom: -0.625rem;
+    background: linear-gradient(rgba(15, 23, 42, 0.1), rgba(15, 23, 42, 0));
+    opacity: 0;
+    pointer-events: none;
+    animation: side-scroll-shadow linear both;
+    animation-timeline: scroll(nearest block);
+    animation-range: 0 1.5rem;
+  }
+}
+
+@keyframes side-scroll-shadow {
+  to {
+    opacity: 1;
+  }
 }
 
 .side-group {
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--m-border, #f1f5f9);
+}
+
+.side-group:first-child {
+  border-top: none;
+}
+
+/*
+ * 그룹 머리글(매출조회·발주관리 …): 그 그룹의 하위 메뉴를 보는 동안 목록 맨 위에 붙어 있다
+ * → 하위 메뉴가 위쪽 「공지사항」에 딸린 것처럼 보이지 않는다
+ */
+.side-group > .side-link {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--m-surface, #fff);
+}
+
+/* 펼친 그룹: 머리글 아래에 선을 그어 하위 메뉴와 구분한다 */
+.side-group:has(> .side-sub) > .side-link {
+  box-shadow: 0 1px 0 #e2e8f0;
 }
 
 .side-link {
@@ -337,51 +409,72 @@ const logout = () => {
   align-items: center;
   gap: 0.75rem;
   width: 100%;
+  min-height: 3rem;
   padding: 0.95rem 1.1rem;
-  color: #1e293b;
+  color: var(--m-text, #1e293b);
   font-size: 1rem;
   font-weight: 600;
   text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.side-link:active {
+  background: var(--m-surface-2, #f1f5f9);
+}
+
+.side-group > .side-link:active {
+  background: var(--m-surface-2, #f1f5f9);
 }
 
 .side-link svg,
 .side-img {
   width: 1.15rem;
-  color: #3b82f6;
+  color: var(--m-accent, #3b82f6);
 }
 
 .side-chevron {
   margin-left: auto;
   width: 0.7rem !important;
-  color: #94a3b8 !important;
+  color: var(--m-text-4, #94a3b8) !important;
 }
 
+/* 하위 메뉴: 왼쪽 세로선으로 어느 그룹에 속하는지 보여 준다 */
 .side-sub {
-  padding: 0 0.75rem 0.6rem 2.4rem;
+  margin: 0.35rem 0.75rem 0.6rem 1.65rem;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--m-border, #e2e8f0);
 }
 
 .side-sub-btn {
-  display: block;
+  display: flex;
+  align-items: center;
   width: 100%;
-  padding: 0.55rem 0.7rem;
+  min-height: 2.75rem;
+  padding: 0.4rem 0.7rem;
   border-radius: 0.7rem;
-  color: #475569;
-  font-size: 0.9rem;
+  color: var(--m-text-2, #475569);
+  font-size: 0.9375rem;
   text-align: left;
+  word-break: keep-all;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .side-sub-btn:active {
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--m-accent-weak, #eff6ff);
+  color: var(--m-accent, #2563eb);
 }
 
 .side-foot {
   position: absolute;
   bottom: 0;
+  z-index: 4;
   display: flex;
   width: 100%;
-  border-top: 1px solid #eef2f6;
-  background: #fff;
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top: 1px solid var(--m-border, #e2e8f0);
+  background: var(--m-surface, #fff);
 }
 
 .side-foot-btn {
@@ -391,12 +484,17 @@ const logout = () => {
   justify-content: center;
   gap: 0.35rem;
   height: 3.25rem;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
   font-size: 0.85rem;
   font-weight: 600;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.side-foot-btn:active {
+  background: var(--m-surface-2, #f1f5f9);
 }
 
 .side-foot-out {
-  color: #ef4444;
+  color: var(--m-danger, #ef4444);
 }
 </style>

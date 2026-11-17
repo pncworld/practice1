@@ -5,64 +5,48 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div class="h-full w-full" @click="resetScreen">
-    <div class="h-[15vh] w-full"></div>
-    <div
-      class="relative h-[7vh] items-center text-lg font-medium w-full bg-white flex justify-center">
-      <div class="w-[50%] font-semibold text-nowrap">매장명</div>
-      <div>|</div>
-      <div class="w-[50%] font-semibold">매출 내역</div>
+  <div class="mu-page" @click="resetScreen">
+    <div class="mu-head"></div>
+    <div v-if="rowData.length == 0" class="mu-empty">
+      {{ loaded ? "조회된 내역이 없습니다." : "위 조회 조건을 눌러 기간과 매장을 선택한 뒤 조회하세요." }}
     </div>
-    <div v-for="i in rowData" class="bg-white">
-      <div
-        class="grid grid-rows-1 grid-cols-[1fr,1fr] h-[20vh] justify-center items-center font-medium">
-        <div
-          class="text-nowrap flex flex-col justify-center items-center ml-[5%]">
-          <div
-            class="text-base font-semibold text break-words whitespace-normal">
-            {{ i.STORE_NM }}
+    <div class="mu-cards">
+      <div v-for="(i, idx) in rowData" :key="idx" class="mu-card">
+        <div class="mu-card-top">
+          <div class="mu-card-title">{{ i.STORE_NM }}</div>
+          <div class="mu-key">
+            <div class="mu-key-label">예상실매출</div>
+            <div class="mu-key-value">{{ i.TOT_AMT }}</div>
           </div>
         </div>
-
-        <div class="grid grid-rows-4 grid-cols-2 gap-2 p-1">
-          <div class="text-blue-500 flex justify-start">예상실매출</div>
-          <div class="text-nowrap flex justify-end">
-            {{ i.TOT_AMT }}
+        <dl class="mu-kv">
+          <dt>미결제</dt>
+          <dd>{{ i.ORDER_AMT }}</dd>
+          <dt>총매출</dt>
+          <dd>{{ i.SAL_AMT }}</dd>
+          <dt>할인</dt>
+          <dd>{{ i.DC_AMT }}</dd>
+          <dt>실매출</dt>
+          <dd>{{ i.ACT_AMT }}</dd>
+        </dl>
+        <div class="mu-stats">
+          <div class="mu-stat">
+            조수 <b>{{ i.REC_CNT }}</b>
           </div>
-          <div class="text-blue-500 flex justify-start">미결제</div>
-          <div class="text-nowrap flex justify-end">
-            {{ i.ORDER_AMT }}
+          <div class="mu-stat">
+            객수 <b>{{ i.CUST_CNT }}</b>
           </div>
-          <div class="text-blue-500 flex justify-start">총매출</div>
-          <div class="text-nowrap flex justify-end">
-            {{ i.SAL_AMT }}
-          </div>
-          <div class="text-blue-500 flex justify-start">할인</div>
-          <div class="text-nowrap flex justify-end">
-            {{ i.DC_AMT }}
-          </div>
-          <div class="text-blue-500 flex justify-start">실매출</div>
-          <div class="text-nowrap flex justify-end">
-            {{ i.ACT_AMT }}
-          </div>
-        </div>
-      </div>
-      <div class="grid grid-rows-1 grid-cols-2 bg-gray-300">
-        <div class="flex justify-between items-center p-2">
-          조수
-          <div class="text-red-500">{{ i.REC_CNT }}</div>
-        </div>
-        <div class="flex justify-between items-center p-2">
-          객수
-          <div class="text-red-500">{{ i.CUST_CNT }}</div>
         </div>
       </div>
     </div>
   </div>
   <MobileDateStore
+    :autoSearch="true"
     @click.stop
     class="z-[10]"
     :changeState="changeState"
+    :defaultAllStores="true"
+    :queryPeriod="true"
     @currState="currState"
     @SEARCHNOW="SEARCHNOW"
     @startDate="startDate"
@@ -83,6 +67,7 @@ import { onMounted, ref } from "vue";
  */
 
 import { useStore } from "vuex";
+import "../mobileUi.css";
 import MobileDateStore from "../component/mobileDateStore.vue";
 
 const store = useStore();
@@ -123,6 +108,7 @@ const STORE_CD = (e) => {
 };
 
 const rowData = ref([]);
+const loaded = ref(false);
 const SEARCHNOW = async (e) => {
   try {
     store.state.loading2 = true;
@@ -145,6 +131,7 @@ const SEARCHNOW = async (e) => {
   } catch (error) {
   } finally {
     store.state.loading2 = false;
+    loaded.value = true;
   }
 
   //comsole.log(rowData.value);

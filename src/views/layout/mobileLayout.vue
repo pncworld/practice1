@@ -6,14 +6,14 @@
 ################################################################################*/
 <template>
   <div
-    class="h-screen overflow-y-auto"
+    class="m-vh overflow-y-auto"
     @click="resetScreen"
     ref="scrollContainer3">
     <loading></loading>
     <Loading2></Loading2>
     <Inactive></Inactive>
     <main
-      class="h-screen overflow-y-auto bg-slate-50"
+      class="m-vh overflow-y-auto bg-slate-50"
       ref="scrollContainer"
       v-show="!(notice || personal || order)">
       <router-view v-slot="{ Component, route }" class="mt-1">
@@ -35,23 +35,32 @@
           <div
             v-for="I in notices"
             :key="I.NOTICE_ID"
+            role="button"
             @click="showNoticeDetail(I.NOTICE_ID)"
             :class="I.READ_YN == 1 ? 'is-read' : ''"
             class="m-notice">
-            <div class="m-notice-title">
-              <span v-if="I.IMPORTANT_YN == '1'" class="m-badge">중요</span>
-              <span>{{ I.TITLE_NM }}</span>
+            <div class="m-notice-main">
+              <div class="m-notice-title">
+                <span v-if="I.IMPORTANT_YN == '1'" class="m-badge">중요</span>
+                <span class="m-notice-text">{{ I.TITLE_NM }}</span>
+              </div>
+              <div class="m-notice-meta">{{ I.WRITER_NM }}</div>
+              <div class="m-notice-sub">
+                {{ I.WRITE_DT }} · 조회 {{ I.READ_CNT }}
+              </div>
             </div>
-            <div class="m-notice-meta">{{ I.WRITER_NM }}</div>
-            <div class="m-notice-sub">
-              {{ I.WRITE_DT }} · 조회 {{ I.READ_CNT }}
-            </div>
+            <font-awesome-icon
+              :icon="['fas', 'chevron-right']"
+              class="m-chevron" />
           </div>
         </div>
       </div>
     </div>
 
     <div v-if="personal" class="m-panel">
+      <div class="m-empty" v-if="!(salesMenus && salesMenus.length)">
+        조회할 수 있는 매출조회 메뉴가 없습니다.
+      </div>
       <div class="m-list">
         <button
           v-for="(i, index) in salesMenus"
@@ -65,6 +74,9 @@
       </div>
     </div>
     <div v-if="order" class="m-panel">
+      <div class="m-empty" v-if="!(orderMenus && orderMenus.length)">
+        사용할 수 있는 발주관리 메뉴가 없습니다.
+      </div>
       <div class="m-list">
         <button
           v-for="(i, index) in orderMenus"
@@ -83,7 +95,12 @@
         <div>작성자 {{ DetailNotice.WRITER_NM }}</div>
         <div class="m-detail-row">
           <span>{{ DetailNotice.WRITE_DT }} · 조회 {{ DetailNotice.READ_CNT }}</span>
-          <button type="button" @click="downloadFile">
+          <button
+            type="button"
+            class="m-attach"
+            :class="{ 'is-none': downloadFileLeng == 0 }"
+            @click="downloadFile">
+            <font-awesome-icon :icon="['fas', 'paperclip']" />
             첨부 {{ downloadFileLeng }}
           </button>
         </div>
@@ -133,6 +150,9 @@ import { useRoute } from "vue-router";
 
 import { useStore } from "vuex";
 import MobileTotalMenu from "../MOBILE/component/mobileTotalMenu.vue";
+/* 모바일 색 테마 (밝게/어둡게) — 웹 화면에는 영향 없음 */
+import "../MOBILE/mobileTheme.css";
+import { disposeMobileTheme, initMobileTheme } from "../MOBILE/mobileTheme";
 import { getNoticeDetail, getNoticeList } from "@/api/mobile";
 import { insertMobilePageLog } from "@/customFunc/customFunc";
 const store = useStore();
@@ -407,6 +427,16 @@ const handleScroll2 = () => {
 };
 
 const handleScroll = () => {
+  // 표시 전용 보정: iOS 탄성 스크롤(맨 위·맨 아래 튕김) 구간에서는 방향 판정을 하지 않는다
+  const el = scrollContainer.value;
+  if (el.scrollTop <= 0) {
+    changeBottomMenu.value = true;
+    lastScrollY.value = 0;
+    return;
+  }
+  if (el.scrollTop + el.clientHeight > el.scrollHeight) {
+    return;
+  }
   if (scrollContainer.value.scrollTop > lastScrollY.value) {
     // 아래로 스크롤하면 메뉴 숨기기
     changeBottomMenu.value = false;
@@ -481,6 +511,7 @@ const notices = ref([]);
  */
 
 onMounted(async () => {
+  initMobileTheme(); /* 저장된 밝게/어둡게 적용 */
   if (scrollContainer.value) {
     scrollContainer.value.addEventListener("scroll", handleScroll); // 스크롤 컨테이너에 이벤트 등록
     lastScrollY.value = scrollContainer.value.scrollTop;
@@ -498,6 +529,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+  disposeMobileTheme(); /* 웹 화면으로 갈 때 테마 표시 해제 */
   if (scrollContainer.value) {
     scrollContainer.value.removeEventListener("scroll", handleScroll);
   }
@@ -530,17 +562,24 @@ const movePage = async (e, e2) => {
 </script>
 
 <style scoped>
+/* 주소창이 접히고 펴질 때 높이가 흔들리지 않도록 dvh 사용 (미지원 브라우저는 vh) */
+.m-vh {
+  height: 100vh;
+  height: 100dvh;
+}
+
 .m-panel {
   min-height: 100%;
-  padding: 4.2rem 0.75rem 5.5rem;
-  background: #f8fafc;
+  padding: 4.2rem 0.75rem calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  background: var(--m-bg, #f8fafc);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .m-empty {
   padding: 4rem 1rem;
   text-align: center;
   font-size: 0.875rem;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
 }
 
 .m-list {
@@ -551,19 +590,42 @@ const movePage = async (e, e2) => {
 
 .m-notice,
 .m-menu {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 1rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
 }
 
 .m-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.5rem;
   padding: 0.9rem 1rem;
   text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 0.15s ease;
 }
 
-.m-notice.is-read {
+.m-notice:active,
+.m-menu:active {
+  background: var(--m-surface-2, #eef2f7);
+}
+
+.m-notice-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.m-notice.is-read .m-notice-main {
   opacity: 0.55;
+}
+
+.m-chevron {
+  flex-shrink: 0;
+  color: var(--m-text-4, #cbd5e1);
+  font-size: 0.75rem;
 }
 
 .m-notice-title {
@@ -572,7 +634,17 @@ const movePage = async (e, e2) => {
   gap: 0.4rem;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--m-text, #0f172a);
+}
+
+.m-notice-text {
+  min-width: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .m-badge {
@@ -587,13 +659,13 @@ const movePage = async (e, e2) => {
 .m-notice-meta {
   margin-top: 0.35rem;
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
 }
 
 .m-notice-sub {
   margin-top: 0.15rem;
   font-size: 0.7rem;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
 }
 
 .m-menu {
@@ -601,36 +673,39 @@ const movePage = async (e, e2) => {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  min-height: 3.5rem;
   padding: 0.95rem 1rem;
-  color: #1e293b;
+  color: var(--m-text, #1e293b);
   font-size: 0.95rem;
   font-weight: 600;
   text-align: left;
+  touch-action: manipulation;
+  transition: background-color 0.15s ease;
 }
 
 .m-menu svg {
-  color: #cbd5e1;
+  color: var(--m-text-4, #cbd5e1);
   font-size: 0.75rem;
 }
 
 .m-detail {
   min-height: 100%;
   padding: 4.2rem 0 5.5rem;
-  background: #f8fafc;
+  background: var(--m-bg, #f8fafc);
 }
 
 .m-detail h1 {
   padding: 0.25rem 1.1rem 0.6rem;
   font-size: 1.25rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--m-text, #0f172a);
   text-align: left;
 }
 
 .m-detail-meta {
   padding: 0 1.1rem 0.9rem;
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
   text-align: left;
 }
 
@@ -641,19 +716,65 @@ const movePage = async (e, e2) => {
   margin-top: 0.25rem;
 }
 
-.m-detail-row button {
-  color: #3b82f6;
+.m-attach {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.75rem;
+  padding: 0 0.875rem;
+  border-radius: 999px;
+  background: var(--m-accent-weak, #eff4ff);
+  color: var(--m-accent, #2563eb);
+  font-size: 0.8125rem;
   font-weight: 700;
+  touch-action: manipulation;
+  transition: background-color 0.15s ease;
+}
+
+.m-attach:active {
+  background: var(--m-accent-weak, #dbe7ff);
+}
+
+/* 첨부 파일이 없을 때: 누를 수 없는 상태로 보이게 */
+.m-attach.is-none {
+  background: var(--m-surface-2, #f1f5f9);
+  color: var(--m-text-4, #94a3b8);
 }
 
 .m-detail-body {
   min-height: 24rem;
   margin: 0 0.75rem;
   padding: 1rem;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 1rem;
-  background: #fff;
-  color: #334155;
+  background: var(--m-surface, #fff);
+  color: var(--m-text-2, #334155);
+  font-size: 0.9375rem;
+  line-height: 1.6;
   text-align: left;
   white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+/* 공지 본문 안의 이미지·표가 화면 밖으로 넘치지 않게 */
+.m-detail-body :deep(img),
+.m-detail-body :deep(video) {
+  max-width: 100%;
+  height: auto;
+}
+
+.m-detail-body :deep(table) {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-notice,
+  .m-menu,
+  .m-attach {
+    transition: none;
+  }
 }
 </style>

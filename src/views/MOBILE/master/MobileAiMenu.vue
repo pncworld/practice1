@@ -4681,7 +4681,7 @@ onMounted(() => {
 .mst003-ai-test {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #b45309;
+  color: var(--m-warm-text, #b45309);
 }
 
 /* AI 대화 팝업 (Teleport to body) */
@@ -4712,7 +4712,7 @@ onMounted(() => {
   overflow: hidden;
   padding: 1rem 1.25rem;
   border-radius: 0.5rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
 }
 
@@ -4733,7 +4733,7 @@ onMounted(() => {
 .mst003-chat-title {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--m-text, #1e293b);
 }
 
 /* 팝업 제목 옆 처리 중인 매장명 (메뉴 개별 설정 브랜드) */
@@ -4741,7 +4741,7 @@ onMounted(() => {
   margin-left: 0.25rem;
   font-size: 0.9375rem;
   font-weight: 600;
-  color: #6d28d9;
+  color: var(--m-violet-text, #6d28d9);
 }
 
 .mst003-chat-log {
@@ -4752,9 +4752,9 @@ onMounted(() => {
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.75rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 0.375rem;
-  background: #f8fafc;
+  background: var(--m-bg, #f8fafc);
 }
 
 /* 말풍선: AI는 왼쪽(로봇 얼굴 + 꼬리), 사용자는 오른쪽(꼬리) */
@@ -4848,10 +4848,10 @@ onMounted(() => {
 }
 
 .mst003-chat-row--ai .mst003-chat-bubble {
-  background: #fff;
-  border: 1px solid #ddd6fe;
+  background: var(--m-surface, #fff);
+  border: 1px solid var(--m-tint-violet-border, #ddd6fe);
   border-bottom-left-radius: 0.25rem;
-  color: #1e293b;
+  color: var(--m-text, #1e293b);
 }
 
 .mst003-chat-row--user .mst003-chat-bubble {
@@ -4866,9 +4866,9 @@ onMounted(() => {
   width: 220px;
   height: 165px;
   margin-top: 0.4rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 0.375rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
 }
 
 .mst003-chat-img-wrap {
@@ -4923,7 +4923,7 @@ onMounted(() => {
   height: auto;
   aspect-ratio: 1792 / 1344;
   border-radius: 0.375rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
@@ -4951,12 +4951,12 @@ onMounted(() => {
 .mst003-chat-key-store {
   margin-top: 0.4rem;
   padding-top: 0.3rem;
-  border-top: 1px dashed #ddd6fe;
+  border-top: 1px dashed var(--m-tint-violet-border, #ddd6fe);
 }
 
 .mst003-chat-key-store-name {
   font-weight: 700;
-  color: #4c1d95;
+  color: var(--m-violet-text, #4c1d95);
 }
 
 /* 최종 확인 표 */
@@ -4973,17 +4973,17 @@ onMounted(() => {
 
 .mst003-summary-edit-btn {
   padding: 0.05rem 0.5rem;
-  border: 1px solid #c4b5fd;
+  border: 1px solid var(--m-tint-violet-border, #c4b5fd);
   border-radius: 0.25rem;
-  background: #f5f3ff;
-  color: #6d28d9;
+  background: var(--m-tint-violet, #f5f3ff);
+  color: var(--m-violet-text, #6d28d9);
   font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .mst003-summary-edit-btn:hover:not(:disabled) {
-  background: #ede9fe;
+  background: var(--m-tint-violet, #ede9fe);
 }
 
 .mst003-summary-edit-btn:disabled {
@@ -4996,7 +4996,7 @@ onMounted(() => {
   margin-top: 0.4rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #dc2626;
+  color: var(--m-danger, #dc2626);
 }
 
 .pnc-sub-btn.mst003-final-btn {
@@ -5044,14 +5044,14 @@ onMounted(() => {
 /* 메뉴 매출 표 하단 합계 — 앞 N개 합계(연한 배경) / 전체 합계(굵게) */
 .mst003-chat-result-foot td {
   font-weight: 600;
-  background: #f5f3ff;
-  border-top: 1px solid #c4b5fd;
+  background: var(--m-tint-violet, #f5f3ff);
+  border-top: 1px solid var(--m-tint-violet-border, #c4b5fd);
 }
 
 .mst003-chat-result-foot--all td {
   font-weight: 700;
-  background: #ede9fe;
-  color: #4c1d95;
+  background: var(--m-tint-violet, #ede9fe);
+  color: var(--m-violet-text, #4c1d95);
 }
 
 .mst003-chat-result th {
@@ -5064,7 +5064,7 @@ onMounted(() => {
 }
 
 .mst003-chat-result-row:hover td {
-  background: #f5f3ff;
+  background: var(--m-tint-violet, #f5f3ff);
 }
 
 /* 다국어 제안 표 */
@@ -5077,21 +5077,21 @@ onMounted(() => {
 .mst003-chat-lang th,
 .mst003-chat-lang td {
   padding: 0.2rem 0.6rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   text-align: left;
   white-space: normal;
 }
 
 .mst003-chat-lang th {
   width: 4.5rem;
-  background: #f5f3ff;
+  background: var(--m-tint-violet, #f5f3ff);
   font-weight: 600;
-  color: #4c1d95;
+  color: var(--m-violet-text, #4c1d95);
 }
 
 /* AI 말풍선 안 입력 항목 이름 강조 */
 .mst003-chat-key {
-  color: #dc2626;
+  color: var(--m-danger, #dc2626);
   font-weight: 700;
 }
 
@@ -5108,7 +5108,7 @@ onMounted(() => {
 .mst003-chat-row--ai .mst003-chat-bubble::after {
   left: -0.45rem;
   border-width: 0 0 0.6rem 0.6rem;
-  border-color: transparent transparent #ddd6fe transparent;
+  border-color: transparent transparent var(--m-tint-violet-border, #ddd6fe) transparent;
 }
 
 .mst003-chat-row--user .mst003-chat-bubble::after {
@@ -5119,7 +5119,7 @@ onMounted(() => {
 
 .mst003-chat-empty {
   font-size: 0.8125rem;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
 }
 
 /* 말풍선 안 대분류·소분류 라디오 (세로 배열) */
@@ -5137,12 +5137,12 @@ onMounted(() => {
 .mst003-chat-choices-inline {
   margin-top: 0.4rem;
   padding-top: 0.3rem;
-  border-top: 1px dashed #ddd6fe;
+  border-top: 1px dashed var(--m-tint-violet-border, #ddd6fe);
   white-space: normal;
 }
 
 .mst003-chat-choice:hover {
-  color: #6d28d9;
+  color: var(--m-violet-text, #6d28d9);
 }
 
 /* 등록할 메뉴 표: 대화창보다 넉넉하게 (대화창은 남는 높이를 씀) */
@@ -5160,21 +5160,21 @@ onMounted(() => {
   gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--m-text, #1e293b);
   padding-bottom: 0.25rem;
 }
 
 .mst003-chat-items-hint {
   font-size: 0.75rem;
   font-weight: 400;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
 }
 
 .mst003-chat-table {
   flex: 0 0 auto;
   max-height: 6rem;
   overflow: auto;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 0.375rem;
 }
 
@@ -5189,7 +5189,7 @@ onMounted(() => {
 .mst003-chat-tbl th,
 .mst003-chat-tbl td {
   padding: 0.3rem 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--m-border, #e2e8f0);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5200,9 +5200,9 @@ onMounted(() => {
   position: sticky;
   top: 0;
   z-index: 1;
-  background: #f1f5f9;
+  background: var(--m-surface-2, #f1f5f9);
   font-weight: 600;
-  color: #334155;
+  color: var(--m-text-2, #334155);
   text-align: left;
 }
 
@@ -5242,14 +5242,14 @@ onMounted(() => {
   align-items: center;
   gap: 0.3rem;
   border-color: #8b5cf6;
-  color: #6d28d9;
+  color: var(--m-violet-text, #6d28d9);
   font-weight: 600;
 }
 
 .mst003-sub-btn.mst003-quick-btn:hover:not(:disabled) {
   border-color: #6d28d9;
-  background: #f5f3ff;
-  color: #5b21b6;
+  background: var(--m-tint-violet, #f5f3ff);
+  color: var(--m-violet-text, #5b21b6);
 }
 
 .mst003-chat-popup.mst003-quick-popup {
@@ -5291,13 +5291,13 @@ onMounted(() => {
   gap: 0.4rem;
   margin-top: 0.6rem;
   padding: 0.55rem 0.7rem;
-  border: 1px solid #c4b5fd;
+  border: 1px solid var(--m-tint-violet-border, #c4b5fd);
   border-radius: 0.5rem;
-  background: #f5f3ff;
+  background: var(--m-tint-violet, #f5f3ff);
   font-size: 0.8125rem;
   font-weight: 600;
   line-height: 1.45;
-  color: #5b21b6;
+  color: var(--m-violet-text, #5b21b6);
 }
 
 .mst003-quick-scope svg {
@@ -5310,7 +5310,7 @@ onMounted(() => {
 
 .mst003-quick-scope b {
   font-weight: 800;
-  color: #4c1d95;
+  color: var(--m-violet-text, #4c1d95);
 }
 
 /* 보내기 버튼: 입력창과 같은 높이 (공통 버튼의 고정 높이 2rem 대신 입력창 높이에 맞춤) */
@@ -5334,14 +5334,14 @@ onMounted(() => {
   resize: none;
   padding: 0.375rem 0.5rem;
   font-size: 0.875rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 0.375rem;
 }
 
 /* ---------- [모바일] 휴대폰 전체 화면으로 덧쓰기 ---------- */
 .mst003-chat-mask.mst003-chat-mask--mobile {
   padding: 0;
-  background: #f8fafc;
+  background: var(--m-bg, #f8fafc);
 }
 
 .mst003-chat-popup.mst003-chat-popup--mobile {
@@ -5368,7 +5368,7 @@ onMounted(() => {
   flex-wrap: wrap;
   gap: 0.4rem;
   padding-bottom: 0.45rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--m-border, #e2e8f0);
   cursor: default;
 }
 
@@ -5457,14 +5457,14 @@ onMounted(() => {
   align-items: center;
   gap: 0.6rem;
   padding: 0.65rem 0.7rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 0.8rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
 }
 
 .mai-card.is-peak {
-  border-color: #93c5fd;
-  background: #eff6ff;
+  border-color: var(--m-accent-border, #93c5fd);
+  background: var(--m-accent-weak, #eff6ff);
 }
 
 .mai-rank {
@@ -5475,10 +5475,10 @@ onMounted(() => {
   width: 1.7rem;
   height: 1.7rem;
   border-radius: 999px;
-  background: #f1f5f9;
+  background: var(--m-surface-2, #f1f5f9);
   font-size: 0.78rem;
   font-weight: 800;
-  color: #475569;
+  color: var(--m-text-2, #475569);
 }
 
 .mai-rank.is-top {
@@ -5494,7 +5494,7 @@ onMounted(() => {
 .mai-card-name {
   font-size: 0.92rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--m-text, #0f172a);
   word-break: keep-all;
   overflow-wrap: anywhere;
 }
@@ -5502,7 +5502,7 @@ onMounted(() => {
 .mai-card-meta {
   margin-top: 0.1rem;
   font-size: 0.72rem;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
 }
 
 .mai-card-side {
@@ -5513,21 +5513,21 @@ onMounted(() => {
 .mai-card-amt {
   font-size: 0.95rem;
   font-weight: 800;
-  color: #2563eb;
+  color: var(--m-accent, #2563eb);
 }
 
 .mai-card-rate {
   margin-top: 0.1rem;
   font-size: 0.72rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
 }
 
 .mai-bar {
   height: 0.3rem;
   margin-top: 0.35rem;
   border-radius: 999px;
-  background: #f1f5f9;
+  background: var(--m-surface-2, #f1f5f9);
   overflow: hidden;
 }
 
@@ -5539,12 +5539,12 @@ onMounted(() => {
 }
 
 .mai-foot {
-  background: #f8fafc;
+  background: var(--m-bg, #f8fafc);
 }
 
 .mai-foot.is-all {
-  border-color: #c7d2fe;
-  background: #eef2ff;
+  border-color: var(--m-accent-border, #c7d2fe);
+  background: var(--m-tint-violet, #eef2ff);
 }
 
 .mai-foot .mai-card-name {
@@ -5562,10 +5562,10 @@ onMounted(() => {
   margin-right: 0.35rem;
   padding: 0.08rem 0.45rem;
   border-radius: 999px;
-  background: #f5f3ff;
+  background: var(--m-tint-violet, #f5f3ff);
   font-size: 0.74rem;
   font-weight: 700;
-  color: #6d28d9;
+  color: var(--m-violet-text, #6d28d9);
 }
 
 /* 결과 안내 문장 속 계산된 숫자(기간·메뉴 수·수량·금액·비율) 강조 */
@@ -5575,7 +5575,7 @@ onMounted(() => {
 
 .mai-num {
   font-weight: 800;
-  color: #ea580c;
+  color: var(--m-warm-text, #ea580c);
 }
 
 /* 누르면 메뉴 목록으로 가는 카드: 오른쪽 › 표시 */
@@ -5592,12 +5592,12 @@ onMounted(() => {
   right: 0.6rem;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #cbd5e1;
+  color: var(--m-text-4, #cbd5e1);
   transform: translateY(-55%);
 }
 
 .mai-card.is-link:active {
-  background: #f8fafc;
+  background: var(--m-bg, #f8fafc);
 }
 
 /* 50개보다 많이 달라고 했을 때 결과 아래 안내 */
@@ -5605,10 +5605,10 @@ onMounted(() => {
   margin-top: 0.5rem;
   padding: 0.45rem 0.65rem;
   border-radius: 0.6rem;
-  background: #fff7ed;
+  background: var(--m-tint-warm, #fff7ed);
   font-size: 0.75rem;
   font-weight: 700;
-  color: #c2410c;
+  color: var(--m-warm-text, #c2410c);
   text-align: center;
 }
 
@@ -5617,9 +5617,9 @@ onMounted(() => {
   align-items: flex-end;
   gap: 0.35rem;
   padding: 0.3rem 0.3rem 0.3rem 0.9rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 1.5rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
   box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
 }
 
@@ -5630,16 +5630,19 @@ onMounted(() => {
 .mst003-chat-popup--mobile .mst003-chat-textarea {
   flex: 1;
   min-width: 0;
-  min-height: 2.3rem;
+  min-height: 2.75rem;
   max-height: 7.5rem;
-  padding: 0.5rem 0;
+  padding: 0.65rem 0;
   border: none;
   outline: none;
   box-shadow: none;
   background: transparent;
   resize: none;
+  /* 16px 미만이면 아이폰이 입력할 때 화면을 확대해 화면이 밀린다 */
+  font-size: 1rem;
   line-height: 1.35;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .mst003-chat-popup--mobile .mst003-chat-textarea:focus {
@@ -5650,10 +5653,10 @@ onMounted(() => {
 
 /* 보내기: 글자는 숨기고 동그란 화살표 버튼 */
 .mst003-chat-popup--mobile .pnc-sub-btn.mst003-chat-send {
-  width: 2.3rem;
-  min-width: 2.3rem;
-  height: 2.3rem;
-  min-height: 2.3rem;
+  width: 2.75rem;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  min-height: 2.75rem;
   padding: 0;
   gap: 0;
   border: none;
@@ -5661,6 +5664,8 @@ onMounted(() => {
   background: linear-gradient(135deg, #818cf8, #4f46e5);
   font-size: 0;
   color: #fff;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mst003-chat-popup--mobile .pnc-sub-btn.mst003-chat-send:disabled {
@@ -5688,10 +5693,10 @@ onMounted(() => {
   margin-left: 0.25rem;
   padding: 0.02rem 0.4rem;
   border-radius: 999px;
-  background: #fee2e2;
+  background: var(--m-danger-weak, #fee2e2);
   font-size: 0.66rem;
   font-weight: 700;
-  color: #dc2626;
+  color: var(--m-danger, #dc2626);
   vertical-align: middle;
 }
 
@@ -5700,10 +5705,10 @@ onMounted(() => {
   margin-top: 0.45rem;
   padding: 0.4rem 0.65rem;
   border-radius: 0.6rem;
-  background: #eef2ff;
+  background: var(--m-tint-violet, #eef2ff);
   font-size: 0.74rem;
   font-weight: 600;
-  color: #4338ca;
+  color: var(--m-violet-text, #4338ca);
   text-align: center;
 }
 

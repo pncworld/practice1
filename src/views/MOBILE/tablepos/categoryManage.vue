@@ -5,8 +5,8 @@
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <div class="h-full w-full" @click="resetScreen">
-    <div class="h-[15vh] w-full"></div>
+  <div class="mu-page" @click="resetScreen">
+    <div class="mu-head"></div>
     <!-- <div
       class="relative h-[7vh] text-sm font-medium w-full bg-white grid grid-rows-1 grid-cols-[0.5fr,0.8fr,1.2fr,1.2fr,1fr] items-center">
       <div class="font-semibold text-nowrap">일자</div>
@@ -28,210 +28,264 @@
         <div class="flex justify-end pr-[10%]">{{ i.lngDiscountAmt }}</div>
       </div>
     </div> -->
-    <div class="flex justify-center items-center mt-2 w-full">
-      <div
-        class="grid grid-rows-[3fr,1.8fr,5fr,5fr,5fr] grid-cols-[1fr,3fr] text-sm w-[95vw] h-[55vh]">
-        <!-- <div
-          class="bg-gray-200 flex justify-center border-l border-t border-black items-center">
-          카테고리명
-        </div> -->
-        <div v-if="!FirstSearch"
-          class="border-l border-t border-r border-black flex justify-center items-center  text-lg  p-2 overflow-hidden col-span-2 bg-green-200 ">
-          <span>카테고리를 먼저 선택해주세요. ↗</span>
-        </div>
+    <div class="mu-crumb" :class="{ 'is-guide': !FirstSearch }">
+      <template v-if="!FirstSearch">
+        위 조회 조건에서 카테고리를 먼저 선택해 주세요.
+      </template>
+      <template v-if="FirstSearch">
+        {{ category }} <span class="mu-crumb-sep">›</span> {{ cond1 }}
+      </template>
+    </div>
 
-        <div v-if="FirstSearch"
-          class="border-l border-t border-r border-black flex justify-center pl-2 text-lg items-center overflow-hidden col-span-2 bg-green-200 ">
-         {{ category }} <span class="text-xl pl-2 pr-2">></span> {{ cond1 }}
-        </div>
-
-        <div
-          class="bg-gray-200 flex justify-center border-l border-t border-black items-center">
-          사용여부
-        </div>
-        <div
-          class="border-l border-t border-r border-black flex justify-start pl-2 text-lg items-center space-x-10">
-          <label for="use"
+    <div class="cm-form" :class="{ 'is-locked': !FirstSearch }">
+      <section class="cm-card">
+        <div class="cm-title">사용여부</div>
+        <div class="mu-seg" role="radiogroup" aria-label="사용여부">
+          <label
+            for="use"
+            class="mu-seg-btn cm-seg"
+            :class="{ 'is-on': cond8 == 'Y' }"
             ><input
               type="radio"
+              class="sr-only"
               name="cond8"
               id="use"
               :disabled="!FirstSearch"
               v-model="cond8"
               value="Y" />사용</label
           >
-          <label for="nuse"
+          <label
+            for="nuse"
+            class="mu-seg-btn cm-seg"
+            :class="{ 'is-on': cond8 == 'N' }"
             ><input
               type="radio"
+              class="sr-only"
               name="cond8"
               id="nuse"
-               :disabled="!FirstSearch"
+              :disabled="!FirstSearch"
               v-model="cond8"
               value="N" />미사용</label
           >
         </div>
+      </section>
 
-        <div
-          class="bg-gray-200 flex justify-center border-l border-t border-black items-center ">
-          사용기간
-        </div>
-        <div
-          class="border-l border-t border-r border-black flex flex-col justify-center pl-2 items-start  space-y-2 ">
-          <div class="flex justify-start text-lg">
-            <label for="alldate"
-              ><input
-                type="checkbox"
-                class=""
-                id="alldate"
-                 :disabled="!FirstSearch"
-                v-model="alldate"
-                @click="handleDate" />전체기간</label
-            >
-          </div>
-          <div class="flex flex-col space-y-2 text-lg ">
-            <div class="flex"><span>시작일 : </span><input type="date"  v-model="cond2" class="text-lg ml-1  w-[42vw] disabled:bg-gray-400 !mr-2 " :disabled="!FirstSearch || disable1" /></div>
-           
-            <!-- <span class="flex justify-center items-center">~</span> -->
-            <div class="flex "><span>종료일 : </span><input type="date" v-model="cond5"  class=" ml-1 w-[42vw] disabled:bg-gray-400 !mr-2 text-lg " :disabled="!FirstSearch || disable1" /></div>
-          </div>
-        </div>
-
-        <div
-          class="bg-gray-200 flex justify-center border-l border-t border-black items-center ">
-          사용시간
-        </div>
-        <div
-          class="border-l border-t border-r border-black flex flex-col justify-center pl-2 items-start  space-y-2  text-lg" >
-          <div  class="">
-            <label for="alltime"
-              ><input
-                type="checkbox"
-                id="alltime"
-                 :disabled="!FirstSearch"
-                v-model="alltime"
-                @click="handleTime" />전체시간</label
-            >
-          </div>
-          <div class="flex flex-col space-y-2 ">
-            <div class="pr-2">
-              <span>시작시간 : </span>
-              <select name="" id="" v-model="cond3" :disabled="!FirstSearch || disable2" class="ml-1 text-lg disabled:bg-gray-400  disabled:opacity-100">
-                <option :value="i.lngCode" v-for="i in optionList">
-                  {{ i.strName }}
-                </option>
-              </select>
-              <span>시</span>
-              <select name="" id="" v-model="cond4" :disabled="!FirstSearch || disable2" class="text-lg  disabled:bg-gray-400  disabled:opacity-100">
-                <option :value="i.lngCode" v-for="i in optionList2">
-                  {{ i.strName }}
-                </option>
-              </select>
-              <span>분</span>
-            </div>
-    
-            <div class="pr-2">
-              <span>종료시간 : </span>
-              <select name="" id="" v-model="cond6" :disabled="disable2 || !FirstSearch" class=" text-lg ml-1 disabled:bg-gray-400 disabled:opacity-100">
-                <option :value="i.lngCode" v-for="i in optionList">
-                  {{ i.strName }}
-                </option>
-              </select>
-              <span>시</span>
-              <select name="" id="" v-model="cond7" :disabled="disable2 || !FirstSearch" class=" text-lg disabled:bg-gray-400  disabled:opacity-100">
-                <option :value="i.lngCode" v-for="i in optionList2">
-                  {{ i.strName }}
-                </option>
-              </select>
-              <span>분</span>
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="bg-gray-200 flex justify-center border-l border-t border-b border-black items-center ">
-          사용요일
-        </div>
-        <div
-          class="border-l border-t border-r border-black flex flex-col justify-center pl-2 items-start  space-y-2  text-lg border-b">
-          <div ><label for="allcheck"><input @click="checkDays" type="checkbox" id="allcheck" v-model="allcheck" :disabled="!FirstSearch">전체체크</input></label></div>
-          <div class="flex flex-col">
-            <div class="space-x-3">
-          <label for="mon"
+      <section class="cm-card">
+        <div class="cm-title-row">
+          <div class="cm-title">사용기간</div>
+          <label for="alldate" class="cm-check"
             ><input
               type="checkbox"
+              id="alldate"
+              :disabled="!FirstSearch"
+              v-model="alldate"
+              @click="handleDate" /><span>전체기간</span></label
+          >
+        </div>
+        <div class="cm-pair">
+          <div>
+            <label class="mu-label" for="cmFromDate">시작일</label>
+            <input
+              type="date"
+              id="cmFromDate"
+              v-model="cond2"
+              class="mu-field"
+              :disabled="!FirstSearch || disable1" />
+          </div>
+           
+          <div>
+            <label class="mu-label" for="cmToDate">종료일</label>
+            <input
+              type="date"
+              id="cmToDate"
+              v-model="cond5"
+              class="mu-field"
+              :disabled="!FirstSearch || disable1" />
+          </div>
+        </div>
+      </section>
+
+      <section class="cm-card">
+        <div class="cm-title-row">
+          <div class="cm-title">사용시간</div>
+          <label for="alltime" class="cm-check"
+            ><input
+              type="checkbox"
+              id="alltime"
+              :disabled="!FirstSearch"
+              v-model="alltime"
+              @click="handleTime" /><span>전체시간</span></label
+          >
+        </div>
+        <div class="cm-pair">
+          <div>
+            <span class="mu-label">시작시간</span>
+            <div class="cm-time">
+              <select
+                aria-label="시작 시"
+                v-model="cond3"
+                :disabled="!FirstSearch || disable2"
+                class="mu-field">
+                <option
+                  :value="i.lngCode"
+                  v-for="i in optionList"
+                  :key="i.lngCode">
+                  {{ i.strName }}
+                </option>
+              </select>
+              <span>시</span>
+              <select
+                aria-label="시작 분"
+                v-model="cond4"
+                :disabled="!FirstSearch || disable2"
+                class="mu-field">
+                <option
+                  :value="i.lngCode"
+                  v-for="i in optionList2"
+                  :key="i.lngCode">
+                  {{ i.strName }}
+                </option>
+              </select>
+              <span>분</span>
+            </div>
+          </div>
+    
+          <div>
+            <span class="mu-label">종료시간</span>
+            <div class="cm-time">
+              <select
+                aria-label="종료 시"
+                v-model="cond6"
+                :disabled="disable2 || !FirstSearch"
+                class="mu-field">
+                <option
+                  :value="i.lngCode"
+                  v-for="i in optionList"
+                  :key="i.lngCode">
+                  {{ i.strName }}
+                </option>
+              </select>
+              <span>시</span>
+              <select
+                aria-label="종료 분"
+                v-model="cond7"
+                :disabled="disable2 || !FirstSearch"
+                class="mu-field">
+                <option
+                  :value="i.lngCode"
+                  v-for="i in optionList2"
+                  :key="i.lngCode">
+                  {{ i.strName }}
+                </option>
+              </select>
+              <span>분</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cm-card">
+        <div class="cm-title-row">
+          <div class="cm-title">사용요일</div>
+          <label for="allcheck" class="cm-check"
+            ><input
+              @click="checkDays"
+              type="checkbox"
+              id="allcheck"
+              v-model="allcheck"
+              :disabled="!FirstSearch" /><span>전체체크</span></label
+          >
+        </div>
+        <div class="cm-days">
+          <label for="mon" class="cm-day" :class="{ 'is-on': mon }"
+            ><input
+              type="checkbox"
+              class="sr-only"
               id="mon"
               v-model="mon"
-               :disabled="!FirstSearch"
+              :disabled="!FirstSearch"
               @click="handleday" />월</label
           >
-          <label for="tue"
+          <label for="tue" class="cm-day" :class="{ 'is-on': tue }"
             ><input
               type="checkbox"
+              class="sr-only"
               id="tue"
-               :disabled="!FirstSearch"
+              :disabled="!FirstSearch"
               v-model="tue"
               @click="handleday" />화</label
           >
-          <label for="wed"
+          <label for="wed" class="cm-day" :class="{ 'is-on': wed }"
             ><input
               type="checkbox"
+              class="sr-only"
               id="wed"
-               :disabled="!FirstSearch"
+              :disabled="!FirstSearch"
               v-model="wed"
               @click="handleday" />수</label
           >
-          <label for="thu"
+          <label for="thu" class="cm-day" :class="{ 'is-on': thu }"
             ><input
               type="checkbox"
+              class="sr-only"
               id="thu"
-               :disabled="!FirstSearch"
+              :disabled="!FirstSearch"
               v-model="thu"
               @click="handleday" />목</label
           >
-          <label for="fri"
+          <label for="fri" class="cm-day" :class="{ 'is-on': fri }"
             ><input
               type="checkbox"
+              class="sr-only"
               id="fri"
-               :disabled="!FirstSearch"
+              :disabled="!FirstSearch"
               v-model="fri"
               @click="handleday" />금</label
           >
-        </div>
-        <div class="space-x-3">
-          <label for="sat"
+          <label for="sat" class="cm-day" :class="{ 'is-on': sat }"
             ><input
               type="checkbox"
+              class="sr-only"
               id="sat"
-               :disabled="!FirstSearch"
+              :disabled="!FirstSearch"
               v-model="sat"
               @click="handleday" />토</label
           >
-          <label for="sun"
+          <label for="sun" class="cm-day" :class="{ 'is-on': sun }"
             ><input
               type="checkbox"
+              class="sr-only"
               id="sun"
-               :disabled="!FirstSearch"
+              :disabled="!FirstSearch"
               v-model="sun"
               @click="handleday" />일</label
           >
-          <label for="holiday"
+          <label
+            for="holiday"
+            class="cm-day cm-day--wide"
+            :class="{ 'is-on': holiday }"
             ><input
               type="checkbox"
+              class="sr-only"
               id="holiday"
-               :disabled="!FirstSearch"
+              :disabled="!FirstSearch"
               v-model="holiday"
               @click="handleHoli" />공휴일</label
           >
         </div>
-        </div>
-        </div>
+      </section>
 
       
       </div>
       
-    </div>
-    <div class="flex justify-end pr-2 mt-2 ">
-      <button class="button save" @click="saveButton"  :disabled="!FirstSearch">저장</button>
+    <div class="cm-save">
+      <button
+        type="button"
+        class="mu-btn mu-btn--block"
+        @click="saveButton"
+        :disabled="!FirstSearch">
+        저장
+      </button>
     </div>
   </div>
   <CategorySelect
@@ -258,6 +312,7 @@ import { onMounted, ref, watch } from "vue";
  */
 
 import { useStore } from "vuex";
+import "../mobileUi.css";
 import CategorySelect from "../component/categorySelect.vue";
 import Swal from "sweetalert2";
 import { SetSClassStkRgst } from "@/api/etc";
@@ -648,5 +703,156 @@ onMounted(() => {});
 </script>
 
 <style scoped>
+.cm-form {
+  display: grid;
+  gap: 0.625rem;
+  padding: 0 0.75rem;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cm-card {
+  padding: 0.875rem 1rem 1rem;
+  border: 1px solid var(--m-border, #e2e8f0);
+  border-radius: 1rem;
+  background: var(--m-surface, #fff);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.cm-title {
+  color: var(--m-text, #0f172a);
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.cm-card > .cm-title {
+  margin-bottom: 0.625rem;
+}
+
+.cm-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2.75rem;
+  margin: -0.375rem 0 0.375rem;
+}
+
+/* 체크 항목: 글자까지 포함해 44px 높이로 누를 수 있게 */
+.cm-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding-left: 0.75rem;
+  color: var(--m-text-2, #334155);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.cm-check input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: #2563eb;
+}
+
+.cm-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
+.cm-time {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--m-text-3, #64748b);
+  font-size: 0.8125rem;
+}
+
+.cm-time select.mu-field {
+  padding-left: 0.5rem;
+  padding-right: 1.5rem;
+  background-position: right 0.25rem center;
+}
+
+.cm-seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.cm-days {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.cm-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  border: 1px solid var(--m-border-strong, #cbd5e1);
+  border-radius: 0.75rem;
+  background: var(--m-surface, #fff);
+  color: var(--m-text-2, #475569);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.cm-day--wide {
+  grid-column: span 2;
+}
+
+.cm-day:active {
+  background: var(--m-surface-2, #f1f5f9);
+}
+
+.cm-day.is-on {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #fff;
+}
+
+/* 카테고리 선택 전: 모든 입력이 비활성임을 한눈에 보이게 */
+.cm-form.is-locked .cm-day,
+.cm-form.is-locked .cm-seg,
+.cm-form.is-locked .cm-check {
+  color: var(--m-text-4, #94a3b8);
+  cursor: default;
+}
+
+.cm-form.is-locked .cm-day {
+  border-color: var(--m-border, #e2e8f0);
+  background: var(--m-surface-2, #f1f5f9);
+}
+
+.cm-form.is-locked .cm-seg.is-on {
+  background: transparent;
+  box-shadow: none;
+}
+
+.cm-save {
+  padding: 0.875rem 0.75rem 0;
+}
+
+.cm-save .mu-btn {
+  min-height: 3rem;
+  font-size: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cm-day {
+    transition: none;
+  }
+}
 
 </style>

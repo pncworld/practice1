@@ -5,30 +5,38 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div class="h-full w-full" @click="resetScreen">
-    <div class="h-[15vh] w-full"></div>
-    <div
-      class="relative h-[7vh] text-base font-medium w-full bg-white grid grid-rows-1 grid-cols-[1.5fr,1.5fr,2fr,1fr] p-1">
-      <div class="w-full font-semibold flex items-center">세션구분</div>
-      <div class="w-full font-semibold flex items-center">POS</div>
-      <div class="w-full font-semibold flex items-center">작업시간</div>
-      <div class="w-full font-semibold flex items-center">담당자</div>
-    </div>
-    <div v-for="i in rowData" class="bg-gray-300">
-      <div
-        :class="i.SALE_DT.includes('[') ? 'bg-gray-300' : 'bg-blue-50'"
-        class="grid grid-rows-1 grid-cols-[1fr,1fr,1.8fr,1fr] h-[7vh] justify-center items-center font-medium">
-        <div class="flex justify-center">{{ i.SESSIONSTATUS }}</div>
-        <div class="flex justify-center">{{ i.POS_NO }}</div>
-        <div class="flex justify-center">{{ i.WORK_TM }}</div>
-        <div class="flex justify-center">{{ i.EMP_NM }}</div>
+  <div
+    class="mu-page"
+    style="--mu-cols: 1.1fr 0.8fr 1.8fr 1fr"
+    @click="resetScreen">
+    <div class="mu-head">
+      <div class="mu-thead">
+        <div>세션구분</div>
+        <div class="mu-center">POS</div>
+        <div class="mu-center">작업시간</div>
+        <div class="mu-center">담당자</div>
       </div>
+    </div>
+    <div v-if="rowData.length == 0" class="mu-empty">
+      {{ loaded ? "조회된 내역이 없습니다." : "위 조회 조건을 눌러 기간과 매장을 선택한 뒤 조회하세요." }}
+    </div>
+    <div
+      v-for="(i, idx) in rowData"
+      :key="idx"
+      class="mu-row mu-row--dense"
+      :class="{ 'is-sum': i.SALE_DT.includes('[') }">
+      <div class="mu-wrap">{{ i.SESSIONSTATUS }}</div>
+      <div class="mu-center">{{ i.POS_NO }}</div>
+      <div class="mu-center mu-num">{{ i.WORK_TM }}</div>
+      <div class="mu-center mu-wrap">{{ i.EMP_NM }}</div>
     </div>
   </div>
   <MobileDateStore
+    :autoSearch="true"
     @click.stop
     class="z-[10]"
     :changeState="changeState"
+    :defaultAllStores="true"
     @currState="currState"
     @SEARCHNOW="SEARCHNOW"
     @startDate="startDate"
@@ -53,6 +61,7 @@ import { onMounted, ref } from "vue";
  */
 
 import { useStore } from "vuex";
+import "../mobileUi.css";
 import MobileDateStore from "../component/mobileDateStore.vue";
 
 const store = useStore();
@@ -93,6 +102,7 @@ const STORE_CD = (e) => {
 };
 
 const rowData = ref([]);
+const loaded = ref(false);
 const SEARCHNOW = async (e) => {
   try {
     store.state.loading2 = true;
@@ -107,6 +117,7 @@ const SEARCHNOW = async (e) => {
   } catch (error) {
   } finally {
     store.state.loading2 = false;
+    loaded.value = true;
   }
 
   //comsole.log(rowData.value);

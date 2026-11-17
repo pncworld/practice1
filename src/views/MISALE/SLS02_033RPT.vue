@@ -354,6 +354,7 @@
           :rowData="treeRows"
           :reload="reload"
           :setTreeView="true"
+          :grid-row-height="23"
           :tree-square-expander="true"
           :tree-icon-images="['folder-close.svg?v=6', 'folder-open.svg?v=6']"
           :setFooter="true"
@@ -369,6 +370,7 @@
           :checkRowAuto="false"
           :documentTitle="'SLS02_033RPT'"
           :documentSubTitle="documentSubTitle"
+          :export-show-progress="false"
           :exporttoExcel="exportExcel" />
       </div>
     </div>
@@ -708,6 +710,10 @@ const toggleTreeExpandAll = () => {
     treeAllOpen.value = true;
   }
 };
+/* 다시 조회하면 트리는 새 데이터로 접힌 상태가 되므로 버튼 상태도 「모두 펼치기」로 맞춘다 */
+watch(sourceRows, () => {
+  treeAllOpen.value = false;
+});
 watch(viewMode, (mode) => {
   treeAllOpen.value = false;
   hideLayoutHover();

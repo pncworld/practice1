@@ -5,64 +5,43 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div class="h-full w-full" @click="resetScreen">
-    <div class="h-[15vh] w-full"></div>
-    <div
-      class="relative h-[7vh] items-center text-lg font-medium w-full bg-white flex justify-center">
-      <div class="w-[50%] font-semibold text-nowrap text-center">매장명</div>
-      <div>|</div>
-      <div class="w-[50%] font-semibold text-center">매출 내역</div>
+  <div class="mu-page" @click="resetScreen">
+    <div class="mu-head"></div>
+    <div v-if="rowData.length == 0" class="mu-empty">
+      {{ loaded ? "조회된 내역이 없습니다." : "위 조회 조건을 눌러 기간과 매장을 선택한 뒤 조회하세요." }}
     </div>
-    <div v-for="i in rowData" class="bg-white">
-      <div
-        class="grid grid-rows-1 grid-cols-[1fr,1fr] h-[20vh] justify-center items-center font-medium">
-        <div
-          class="text-nowrap flex flex-col justify-center items-center ml-[5%]">
-          <div
-            class="text-base font-semibold text break-words whitespace-normal">
-            {{ i.CORNER_NM }}
+    <div class="mu-cards">
+      <div v-for="(i, idx) in rowData" :key="idx" class="mu-card">
+        <div class="mu-card-top">
+          <div class="mu-card-title">{{ i.CORNER_NM }}</div>
+          <div class="mu-key">
+            <div class="mu-key-label">실매출</div>
+            <div class="mu-key-value">{{ i.ACT_AMT }}</div>
           </div>
         </div>
-
-        <div class="grid grid-rows-4 grid-cols-2 gap-2 p-1">
-          <div class="text-blue-500 flex justify-start">신용카드</div>
-          <div class="text-nowrap flex justify-end">
-            {{ i.CREDIT_AMT }}
-          </div>
-          <div class="text-blue-500 flex justify-start">현금매출</div>
-          <div class="text-nowrap flex justify-end">
-            {{ i.CASH_AMT }}
-          </div>
-          <div class="text-blue-500 flex justify-start">외상매출</div>
-          <div class="text-nowrap flex justify-end">
-            {{ i.TRUST_AMT }}
-          </div>
-          <div class="text-blue-500 flex justify-start">기타매출</div>
-          <div class="text-nowrap flex justify-end">
-            {{ i.ETC_AMT }}
-          </div>
-          <div class="text-blue-500 flex justify-start">할인액</div>
-          <div class="text-nowrap flex justify-end">
-            {{ i.DC_AMT }}
-          </div>
-        </div>
-      </div>
-      <div class="grid grid-rows-1 grid-cols-2 bg-gray-300">
-        <div class="flex justify-between items-center p-2">
-          총매출
-          <div class="text-red-500">{{ i.TOT_AMT }}</div>
-        </div>
-        <div class="flex justify-between items-center p-2">
-          실매출
-          <div class="text-red-500">{{ i.ACT_AMT }}</div>
-        </div>
+        <dl class="mu-kv">
+          <dt>총매출</dt>
+          <dd>{{ i.TOT_AMT }}</dd>
+          <dt>신용카드</dt>
+          <dd>{{ i.CREDIT_AMT }}</dd>
+          <dt>현금매출</dt>
+          <dd>{{ i.CASH_AMT }}</dd>
+          <dt>외상매출</dt>
+          <dd>{{ i.TRUST_AMT }}</dd>
+          <dt>기타매출</dt>
+          <dd>{{ i.ETC_AMT }}</dd>
+          <dt>할인액</dt>
+          <dd>{{ i.DC_AMT }}</dd>
+        </dl>
       </div>
     </div>
   </div>
   <MobileDateStore
+    :autoSearch="true"
     @click.stop
     class="z-[10]"
     :changeState="changeState"
+    :defaultAllStores="true"
     @currState="currState"
     @SEARCHNOW="SEARCHNOW"
     @startDate="startDate"
@@ -87,6 +66,7 @@ import { onMounted, ref } from "vue";
  */
 
 import { useStore } from "vuex";
+import "../mobileUi.css";
 import MobileDateStore from "../component/mobileDateStore.vue";
 
 const store = useStore();
@@ -127,6 +107,7 @@ const STORE_CD = (e) => {
 };
 
 const rowData = ref([]);
+const loaded = ref(false);
 const SEARCHNOW = async (e) => {
   try {
     store.state.loading2 = true;
@@ -153,6 +134,7 @@ const SEARCHNOW = async (e) => {
   } catch (error) {
   } finally {
     store.state.loading2 = false;
+    loaded.value = true;
   }
 
   //comsole.log(rowData.value);

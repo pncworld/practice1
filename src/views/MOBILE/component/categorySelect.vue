@@ -14,54 +14,61 @@
       </span>
     </button>
   </div>
-  <div
-    class="bg-white absolute top-0 text-black w-full h-[50vh] mt-[6vh]"
-    v-show="show">
-    <div class="flex flex-col">
-      <div class="flex mt-[5vh] space-x-5">
-        <div class="text-lg font-medium ml-[4vw]">지점명</div>
-        <div class="border border-gray-600 w-[70vw]">
-          <select name="" id="" class="w-full h-full" v-model="selectedStoreCd">
-            <option
-              :value="{
-                STORE_CD: i.STORE_CD,
-                GROUP_CD: i.GROUP_CD,
-              }"
-              v-for="i in StoreList">
-              {{ i.STORE_NM }}
-            </option>
-          </select>
-        </div>
-      </div>
-      <div class="flex mt-[5vh] space-x-5">
-        <div class="text-lg font-medium ml-[4vw]">대카테고리</div>
-        <div class="border border-gray-600 w-[60vw]">
-          <select name="" id="" class="w-full h-full" v-model="selectedCond">
-            <option value="0">{{ defaultNm }}</option>
-            <option :value="i.LCLASS_CD" v-for="i in optionList">
-              {{ i.LCLASS_NM }}
-            </option>
-          </select>
-        </div>
-      </div>
-      <div class="flex mt-[5vh] space-x-5">
-        <div class="text-lg font-medium ml-[4vw]">중카테고리</div>
-        <div class="border border-gray-600 w-[60vw]">
-          <select name="" id="" class="w-full h-full" v-model="selectedCond2">
-            <option value="0">{{ defaultNm }}</option>
-            <option :value="i.SCLASS_CD" v-for="i in optionList2">
-              {{ i.FULL_NM }}
-            </option>
-          </select>
-        </div>
-      </div>
-      <div class="flex justify-center items-center">
+  <div class="cat-layer" v-show="show">
+    <div class="cat-dim" @click="show = false"></div>
+    <div class="cat-sheet">
+      <div class="cat-sheet-head">
+        <div class="cat-sheet-title">조회 조건</div>
         <button
-          @click="sendSearch"
-          class="bg-blue-600 text-white text-xl rounded-lg w-[80vw] h-[5vh] mt-[5vh]">
-          조회하기
+          type="button"
+          class="cat-close"
+          aria-label="닫기"
+          @click="show = false">
+          <font-awesome-icon icon="xmark" />
         </button>
       </div>
+
+      <label class="mu-label">지점명</label>
+      <select class="mu-field cat-field" v-model="selectedStoreCd">
+        <option
+          :value="{
+            STORE_CD: i.STORE_CD,
+            GROUP_CD: i.GROUP_CD,
+          }"
+          v-for="i in StoreList"
+          :key="i.GROUP_CD + '-' + i.STORE_CD">
+          {{ i.STORE_NM }}
+        </option>
+      </select>
+
+      <label class="mu-label">대카테고리</label>
+      <select class="mu-field cat-field" v-model="selectedCond">
+        <option value="0">{{ defaultNm }}</option>
+        <option
+          :value="i.LCLASS_CD"
+          v-for="i in optionList"
+          :key="i.LCLASS_CD">
+          {{ i.LCLASS_NM }}
+        </option>
+      </select>
+
+      <label class="mu-label">중카테고리</label>
+      <select class="mu-field cat-field" v-model="selectedCond2">
+        <option value="0">{{ defaultNm }}</option>
+        <option
+          :value="i.SCLASS_CD"
+          v-for="i in optionList2"
+          :key="i.SCLASS_CD">
+          {{ i.FULL_NM }}
+        </option>
+      </select>
+
+      <button
+        type="button"
+        @click="sendSearch"
+        class="mu-btn mu-btn--block cat-submit">
+        조회하기
+      </button>
     </div>
   </div>
 </template>
@@ -77,6 +84,7 @@ import Swal from "sweetalert2";
  */
 
 import { onMounted, ref, watch } from "vue";
+import "../mobileUi.css";
 
 /**
  * 선택한 매출 시작일자
@@ -324,12 +332,86 @@ watch(
   position: absolute;
   top: 3.25rem;
   left: 0;
-  z-index: 20;
+  z-index: 45;
   display: flex;
   align-items: center;
   width: 100%;
   height: 9vh;
   padding: 0 0.75rem;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cat-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cat-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.cat-sheet {
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  top: 16vh;
+  max-height: 72vh;
+  max-height: calc(100dvh - 16vh - 1rem - env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1rem;
+  border-radius: 1.25rem;
+  background: var(--m-surface, #fff);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  text-align: left;
+}
+
+.cat-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.cat-sheet-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--m-text, #0f172a);
+}
+
+.cat-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-right: -0.375rem;
+  border-radius: 999px;
+  background: var(--m-surface-2, #f1f5f9);
+  color: var(--m-text-3, #64748b);
+  touch-action: manipulation;
+}
+
+.cat-close:active {
+  background: var(--m-surface-3, #e2e8f0);
+}
+
+.cat-field {
+  margin-bottom: 0.875rem;
+}
+
+.cat-submit {
+  min-height: 3rem;
+  margin-top: 0.25rem;
+  font-size: 1rem;
+}
+
+.cat-summary:active {
+  background: var(--m-surface-2, #f1f5f9);
 }
 
 .cat-summary {
@@ -339,11 +421,11 @@ watch(
   width: 100%;
   height: 7.2vh;
   padding: 0 0.85rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 1rem;
-  background: #fff;
+  background: var(--m-surface, #fff);
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
-  color: #1e293b;
+  color: var(--m-text, #1e293b);
   font-size: 0.9rem;
   font-weight: 700;
   text-align: left;
@@ -355,7 +437,7 @@ watch(
 }
 
 .cat-ico {
-  color: #3b82f6;
+  color: var(--m-accent, #3b82f6);
 }
 
 .cat-filter {
@@ -365,8 +447,8 @@ watch(
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 0.75rem;
-  background: #eff4ff;
-  color: #3b82f6;
+  background: var(--m-accent-weak, #eff4ff);
+  color: var(--m-accent, #3b82f6);
   flex-shrink: 0;
 }
 </style>

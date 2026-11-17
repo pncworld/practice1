@@ -83,7 +83,7 @@ const onMask = () => closeDialog(dialogState.type === "alert");
   max-width: 32rem;
   padding: 0.6rem 1.1rem calc(1rem + env(safe-area-inset-bottom));
   border-radius: 1.4rem 1.4rem 0 0;
-  background: #fff;
+  background: var(--m-surface, #fff);
   box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.18);
   text-align: center;
 }
@@ -93,7 +93,7 @@ const onMask = () => closeDialog(dialogState.type === "alert");
   height: 0.28rem;
   margin-bottom: 1rem;
   border-radius: 999px;
-  background: #e2e8f0;
+  background: var(--m-surface-3, #e2e8f0);
 }
 
 .md-icon {
@@ -103,8 +103,8 @@ const onMask = () => closeDialog(dialogState.type === "alert");
   width: 3rem;
   height: 3rem;
   border-radius: 999px;
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--m-accent-weak, #eff6ff);
+  color: var(--m-accent, #2563eb);
 }
 
 .md-icon svg {
@@ -113,27 +113,27 @@ const onMask = () => closeDialog(dialogState.type === "alert");
 }
 
 .md-icon.is-warning {
-  background: #fff7ed;
-  color: #ea580c;
+  background: var(--m-tint-warm, #fff7ed);
+  color: var(--m-warm-text, #ea580c);
 }
 
 .md-icon.is-error {
-  background: #fef2f2;
-  color: #dc2626;
+  background: var(--m-danger-weak, #fef2f2);
+  color: var(--m-danger, #dc2626);
 }
 
 .md-title {
   margin-top: 0.7rem;
   font-size: 1.05rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--m-text, #0f172a);
 }
 
 .md-message {
   margin-top: 0.35rem;
   font-size: 0.82rem;
   line-height: 1.5;
-  color: #64748b;
+  color: var(--m-text-3, #64748b);
   white-space: pre-line;
   word-break: keep-all;
 }
@@ -146,7 +146,7 @@ const onMask = () => closeDialog(dialogState.type === "alert");
   margin-top: 0.85rem;
   padding: 0.7rem 0.85rem;
   border-radius: 0.9rem;
-  background: #f8fafc;
+  background: var(--m-bg, #f8fafc);
 }
 
 .md-change-row {
@@ -160,12 +160,12 @@ const onMask = () => closeDialog(dialogState.type === "alert");
   flex-shrink: 0;
   width: 3.2rem;
   font-size: 0.68rem;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
 }
 
 .md-change-from {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--m-text-4, #94a3b8);
   text-decoration: line-through;
   overflow-wrap: anywhere;
 }
@@ -173,7 +173,7 @@ const onMask = () => closeDialog(dialogState.type === "alert");
 .md-change-to {
   font-size: 0.95rem;
   font-weight: 800;
-  color: #2563eb;
+  color: var(--m-accent, #2563eb);
   overflow-wrap: anywhere;
 }
 
@@ -181,7 +181,7 @@ const onMask = () => closeDialog(dialogState.type === "alert");
   width: 1rem;
   height: 1rem;
   margin: 0.25rem 0 0.25rem 0.9rem;
-  color: #cbd5e1;
+  color: var(--m-text-4, #cbd5e1);
 }
 
 .md-actions {
@@ -195,10 +195,10 @@ const onMask = () => closeDialog(dialogState.type === "alert");
   flex: 1;
   height: 3rem;
   border-radius: 0.85rem;
-  background: #f1f5f9;
+  background: var(--m-surface-2, #f1f5f9);
   font-size: 0.92rem;
   font-weight: 700;
-  color: #475569;
+  color: var(--m-text-2, #475569);
 }
 
 .md-btn.is-primary {

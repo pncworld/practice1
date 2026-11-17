@@ -335,6 +335,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /**
+   * opt-in — exporttoExcel 내보내기 때 진행 표시창 사용 여부 (기본 true = 기존 동작)
+   * 트리 그리드는 진행 표시 후 화면 갱신이 멈춰 접기·펼치기가 안 보이는 경우가 있어, 필요한 화면만 false 로 끈다
+   */
+  exportShowProgress: {
+    type: Boolean,
+    default: true,
+  },
   ExcelNm: {
     // 폐기
     type: String,
@@ -7792,7 +7800,7 @@ watch(
         styleName: "documentSubtitleStyle",
       },
       fileName: excelNm + ".xlsx",
-      showProgress: true,
+      showProgress: props.exportShowProgress,
       progressMessage: "엑셀 Export중입니다.",
       indicator: true,
       header: true,

@@ -1,0 +1,128 @@
+/*
+ * 모바일 화면 색 테마 (밝게 / 어둡게)
+ * - 밝은 화면: 변수를 정의하지 않는다 → 각 화면의 var(--m-*, 원래색) 에서 원래 색이 그대로 쓰인다 (기존과 동일)
+ * - 어두운 화면: <html data-mtheme="dark"> 일 때만 아래 값으로 바뀐다 (mobileTheme.js 가 붙인다)
+ * - 웹(PC) 화면은 var(--m-*) 를 쓰지 않으므로 영향 없음
+ */
+html[data-mtheme="dark"] {
+  color-scheme: dark;
+  --m-bg: #0b1120;
+  --m-surface: #131c2e;
+  --m-surface-2: #1b2539;
+  --m-surface-3: #24304a;
+  --m-border: #34425c;
+  --m-border-strong: #4a5a78;
+  --m-text: #eef1f6;
+  --m-text-2: #d3d9e3;
+  --m-text-3: #aab4c5;
+  --m-text-4: #8f9bb2;
+  --m-accent: #60a5fa;
+  --m-accent-strong: #93c5fd;
+  --m-accent-weak: #172554;
+  --m-danger: #f87171;
+  --m-danger-weak: #3b1219;
+  --m-danger-border: #7f1d1d;
+  --m-accent-border: #1e3a8a;
+  --m-chart-dim: #4a5a78; /* 그래프 '이전' 막대 */
+  /* 연한 강조 배경(주황·보라·초록)과 그 위 글자색 */
+  --m-tint-warm: #2a1c0e;
+  --m-tint-warm-border: #5c3a12;
+  --m-warm-text: #fdba74;
+  --m-tint-violet: #1f1b3d;
+  --m-tint-violet-border: #3d3373;
+  --m-violet-text: #c4b5fd;
+  --m-tint-green: #0f2a1c;
+  --m-tint-green-border: #14532d;
+  --m-green-text: #86efac;
+}
+
+/* 어두운 화면: 모바일 레이아웃 바탕 (레이아웃의 Tailwind bg-slate-50 대신) */
+html[data-mtheme="dark"] body,
+html[data-mtheme="dark"] main.bg-slate-50 {
+  background-color: var(--m-bg);
+}
+
+/* 어두운 화면: 공통 서브 버튼(style.css 의 pnc-sub-btn). 공통 파일은 그대로 두고 모바일 어두운 화면에서만 덮어쓴다 */
+html[data-mtheme="dark"] .pnc-sub-btn {
+  color: var(--m-accent-strong);
+  border-color: var(--m-accent-border);
+  background-color: var(--m-accent-weak);
+}
+html[data-mtheme="dark"] .pnc-sub-btn--gray {
+  color: var(--m-text-2);
+  border-color: var(--m-border-strong);
+  background-color: var(--m-surface-2);
+}
+html[data-mtheme="dark"] .pnc-sub-btn--gray:hover:not(:disabled) {
+  background-color: var(--m-surface-3);
+}
+html[data-mtheme="dark"] .pnc-sub-btn--rose {
+  color: #f9a8d4;
+  border-color: #831843;
+  background-color: #3a1028;
+}
+html[data-mtheme="dark"] .pnc-sub-btn--rose:hover:not(:disabled) {
+  background-color: #4a1433;
+}
+
+/*
+ * 어두운 화면: 예전 모바일 화면이 template 에 직접 쓴 Tailwind 색 클래스.
+ * data-mtheme 는 모바일 레이아웃에만 붙으므로 웹(PC) 화면의 같은 클래스에는 영향 없음
+ */
+html[data-mtheme="dark"] .bg-white { background-color: var(--m-surface); }
+html[data-mtheme="dark"] .bg-slate-50 { background-color: var(--m-bg); }
+html[data-mtheme="dark"] .bg-slate-100,
+html[data-mtheme="dark"] .bg-gray-100 { background-color: var(--m-surface-2); }
+html[data-mtheme="dark"] .bg-gray-200,
+html[data-mtheme="dark"] .bg-gray-300 { background-color: var(--m-surface-3); }
+html[data-mtheme="dark"] .bg-blue-50,
+html[data-mtheme="dark"] .bg-blue-100 { background-color: var(--m-accent-weak); }
+html[data-mtheme="dark"] .bg-amber-100 { background-color: var(--m-tint-warm); }
+html[data-mtheme="dark"] .bg-emerald-100 { background-color: var(--m-tint-green); }
+
+html[data-mtheme="dark"] .text-slate-800,
+html[data-mtheme="dark"] .text-slate-700,
+html[data-mtheme="dark"] .text-gray-700 { color: var(--m-text); }
+html[data-mtheme="dark"] .text-slate-600,
+html[data-mtheme="dark"] .text-gray-600 { color: var(--m-text-2); }
+html[data-mtheme="dark"] .text-slate-500,
+html[data-mtheme="dark"] .text-gray-500 { color: var(--m-text-3); }
+html[data-mtheme="dark"] .text-slate-400,
+html[data-mtheme="dark"] .text-slate-300 { color: var(--m-text-4); }
+html[data-mtheme="dark"] .text-blue-600,
+html[data-mtheme="dark"] .text-blue-500,
+html[data-mtheme="dark"] .text-sky-600,
+html[data-mtheme="dark"] .text-sky-700 { color: var(--m-accent); }
+html[data-mtheme="dark"] .text-amber-700 { color: var(--m-warm-text); }
+html[data-mtheme="dark"] .text-emerald-700 { color: var(--m-green-text); }
+html[data-mtheme="dark"] .text-red-500 { color: var(--m-danger); }
+
+html[data-mtheme="dark"] .border-slate-100,
+html[data-mtheme="dark"] .border-slate-200 { border-color: var(--m-border); }
+html[data-mtheme="dark"] .border-slate-300,
+html[data-mtheme="dark"] .border-gray-300,
+html[data-mtheme="dark"] .border-gray-500 { border-color: var(--m-border-strong); }
+html[data-mtheme="dark"] .border-amber-200 { border-color: var(--m-tint-warm-border); }
+
+/* 어두운 화면: 입력칸·선택칸 기본 색 (화면에서 색을 따로 주지 않은 경우) */
+html[data-mtheme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html[data-mtheme="dark"] select,
+html[data-mtheme="dark"] textarea {
+  color: var(--m-text);
+}
+
+/* 테마가 바뀔 때 색만 부드럽게 (움직임 줄이기 설정이면 즉시) */
+html.m-theme-switching,
+html.m-theme-switching * {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.m-theme-switching,
+  html.m-theme-switching * {
+    transition: none !important;
+  }
+}

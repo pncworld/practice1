@@ -5,8 +5,8 @@
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <div class="h-full w-full" @click="resetScreen">
-    <div class="h-[15vh] w-full"></div>
+  <div class="mu-page" @click="resetScreen">
+    <div class="mu-head"></div>
     <!-- <div
         class="relative h-[7vh] text-sm font-medium w-full bg-white grid grid-rows-1 grid-cols-[0.5fr,0.8fr,1.2fr,1.2fr,1fr] items-center">
         <div class="font-semibold text-nowrap">일자</div>
@@ -28,140 +28,92 @@
           <div class="flex justify-end pr-[10%]">{{ i.lngDiscountAmt }}</div>
         </div>
       </div> -->
-    <div class="flex justify-center items-center mt-2 w-full">
-      <div
-        class="grid grid-rows-2 grid-cols-[1fr,1fr,1fr,3fr] text-sm w-[95vw] h-[15vh]">
-        <!-- <div
-            class="bg-gray-200 flex justify-center border-l border-t border-black items-center">
-            카테고리명
-          </div> -->
-        <div
-          v-if="!FirstSearch"
-          class="border-l border-t border-r border-black flex justify-center pl-2 text-lg items-center overflow-hidden col-span-4 bg-green-200">
-          카테고리를 먼저 선택해주세요. ↗
-        </div>
-        <div
-          v-if="FirstSearch"
-          class="border-l border-t border-black border-r flex justify-center pl-2 text-lg items-center overflow-hidden col-span-4 bg-green-200">
-          {{ category }} <span class="text-xl pl-2 pr-2">></span> {{ cond1 }}
-        </div>
-
-        <div
-          class="bg-gray-200 flex justify-center border-l border-t border-b border-black items-center">
-          판매상태
-        </div>
-        <div
-          class="border-l border-t border-b border-black flex justify-center p-1 text-lg items-center space-x-10">
-          <select name="" id="" class="border border-black" v-model="scond">
-            <option value="9">전체</option>
-            <option value="0">판매중</option>
-            <option value="1">당일품절</option>
-            <option value="2">계속품절</option>
-          </select>
-        </div>
-
-        <div
-          class="bg-gray-200 flex justify-center border-l border-t border-b border-black items-center">
-          메뉴명
-        </div>
-        <div
-          class="border-l border-t border-b border-r border-black flex justify-start pl-2 text-lg items-center">
-          <input
-            type="text"
-            class="border border-black w-[90%]"
-            v-model="scond2" />
-        </div>
-      </div>
+    <div class="so-crumb" :class="{ 'is-guide': !FirstSearch }">
+      <template v-if="!FirstSearch">
+        위 조회 조건에서 카테고리를 먼저 선택해 주세요.
+      </template>
+      <template v-if="FirstSearch">
+        {{ category }} <span class="so-crumb-sep">›</span> {{ cond1 }}
+      </template>
     </div>
-    <div class="flex justify-between pr-2 mt-2 items-center">
-      <label for="allcheck" class="pl-3"
-        ><input
-          type="checkbox"
-          id="allcheck"
-          @click="allCheck" />전체선택</label
+
+    <div class="so-filter">
+      <div>
+        <label class="mu-label" for="soStatus">판매상태</label>
+        <select id="soStatus" class="mu-field" v-model="scond">
+          <option value="9">전체</option>
+          <option value="0">판매중</option>
+          <option value="1">당일품절</option>
+          <option value="2">계속품절</option>
+        </select>
+      </div>
+      <div>
+        <label class="mu-label" for="soName">메뉴명</label>
+        <input
+          id="soName"
+          type="text"
+          class="mu-field"
+          enterkeyhint="search"
+          autocomplete="off"
+          placeholder="메뉴명 입력"
+          v-model="scond2" />
+      </div>
+      <button type="button" class="mu-btn so-search" @click="searchButton">
+        조회
+      </button>
+    </div>
+
+    <div class="so-list-head">
+      <label for="allcheck" class="so-check so-check--all"
+        ><input type="checkbox" id="allcheck" @click="allCheck" /><span
+          >전체선택</span
+        ></label
       >
-      <button class="button search" @click="searchButton">조회</button>
+      <span class="mu-sub">메뉴를 누르면 선택됩니다</span>
     </div>
-    <div class="flex justify-center items-center mt-2">
-      <div
-        class="w-[95vw] h-10 grid grid-rows-none auto-rows-auto grid-cols-[1fr,2fr,4fr,1.6fr,1.5fr]">
-        <div
-          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
-          선택
-        </div>
-        <div
-          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
-          메뉴코드
-        </div>
-        <div
-          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
-          메뉴명
-        </div>
-        <div
-          class="border-l border-t border-b bg-sky-200 border-black flex justify-center items-center h-8">
-          단가
-        </div>
-        <div
-          class="border-l border-t border-b bg-sky-200 border-r border-black flex justify-center items-center h-8">
-          판매상태
-        </div>
 
-        <template v-for="(menu, idx) in menuList" :key="idx">
-          <div
-            class="border-l border-t bg-sky-50 border-black flex justify-center h-auto"
-            :class="{
-              'border-b': idx == menuList.length - 1,
-              'bg-red-300': ischecked(menu.MENU_CD),
-            }">
-            <input type="checkbox" @change="toggleSelection(menu.MENU_CD)" />
-          </div>
-          <div
-            class="border-l border-t bg-sky-50 border-black h-auto flex items-center"
-            :class="{
-              'border-b': idx == menuList.length - 1,
-              'bg-red-300': ischecked(menu.MENU_CD),
-            }">
-            {{ menu.MENU_CD }}
-          </div>
-          <div
-            class="border-l border-t bg-sky-50 border-black flex h-auto whitespace-normal items-center"
-            :class="{
-              'border-b': idx == menuList.length - 1,
-              'bg-red-300': ischecked(menu.MENU_CD),
-              'items-center min-h-10': wordLength(menu.MENU_NAME),
-            }">
-            <div class="whitespace-normal break-words leading-snug w-full">
-              {{ menu.MENU_NAME }}
-            </div>
-          </div>
-          <div
-            class="border-l border-t bg-sky-50 border-black flex h-auto justify-end items-center"
-            :class="{
-              'border-b': idx == menuList.length - 1,
-              'bg-red-300': ischecked(menu.MENU_CD),
-            }">
-            {{ formatNumberWithCommas(menu.MENU_PRICE) }}
-          </div>
-          <div
-            class="border-l border-t border-r bg-sky-50 border-black h-auto flex items-center"
-            :class="{
-              'border-b': idx == menuList.length - 1,
-              'bg-red-300': ischecked(menu.MENU_CD),
-              'text-red-500':
-                menu.MENU_STATUS.includes(1) || menu.MENU_STATUS.includes(2),
-            }">
-            {{
-              menu.MENU_STATUS == "1"
-                ? "당일품절"
-                : menu.MENU_STATUS == "2"
-                ? "계속품절"
-                : "판매중"
-            }}
-          </div>
-        </template>
-        <div class="!h-[20vh] w-full bg-gray-100"></div>
-      </div>
+    <div v-if="menuList.length == 0" class="mu-empty">
+      {{
+        FirstSearch
+          ? "조회된 메뉴가 없습니다. 조건을 확인한 뒤 조회를 눌러 주세요."
+          : "카테고리를 선택하면 메뉴 목록이 표시됩니다."
+      }}
     </div>
+
+    <label
+      v-for="(menu, idx) in menuList"
+      :key="idx"
+      class="so-row"
+      :class="{
+        'is-checked': ischecked(menu.MENU_CD),
+        'is-long': wordLength(menu.MENU_NAME),
+      }">
+      <span class="so-check">
+        <input type="checkbox" @change="toggleSelection(menu.MENU_CD)" />
+      </span>
+      <span class="so-main">
+        <span class="so-name">{{ menu.MENU_NAME }}</span>
+        <span class="mu-sub"
+          >{{ menu.MENU_CD }} ·
+          {{ formatNumberWithCommas(menu.MENU_PRICE) }}원</span
+        >
+      </span>
+      <span
+        class="mu-badge so-status"
+        :class="{
+          'is-soldout':
+            menu.MENU_STATUS.includes(1) || menu.MENU_STATUS.includes(2),
+        }">
+        {{
+          menu.MENU_STATUS == "1"
+            ? "당일품절"
+            : menu.MENU_STATUS == "2"
+            ? "계속품절"
+            : "판매중"
+        }}
+      </span>
+    </label>
+    <div class="so-bottom-space" :class="{ 'is-save': showSave }"></div>
   </div>
 
   <CategorySelect
@@ -174,50 +126,53 @@
     @mainCategory="mainCategory"
     @GROUP_CD="GROUP_CD"
     @STORE_CD="STORE_CD"></CategorySelect>
-  <div
-    class="fixed bottom-[11vh] w-full h-10 text-white font-bold"
-    v-if="showSave">
-    <div class="w-full h-auto pl-2 bg-red-500">
-      선택하신 메뉴수 : {{ selectedLeng }}
+  <div class="so-save" v-if="showSave">
+    <div class="so-save-count">
+      선택한 메뉴 <b>{{ selectedLeng }}</b
+      >개를 아래 상태로 변경
     </div>
-    <div class="grid grid-rows-1 grid-cols-[1fr,1fr,1fr,1fr] w-full h-full">
-      <div
-        class="flex justify-center items-center border-l border-t border-white bg-red-500">
-        <label for="sale"
+    <div class="so-save-row">
+      <div class="mu-seg so-save-seg" role="radiogroup" aria-label="변경할 판매상태">
+        <label
+          for="sale"
+          class="mu-seg-btn so-seg-label"
+          :class="{ 'is-on': salecond == '0' }"
           ><input
             type="radio"
+            class="sr-only"
             name="savecond"
             id="sale"
             value="0"
             v-model="salecond" />판매중</label
         >
-      </div>
-      <div
-        class="flex justify-center items-center border-l border-t border-white bg-red-500">
-        <label for="tsoldout"
+        <label
+          for="tsoldout"
+          class="mu-seg-btn so-seg-label"
+          :class="{ 'is-on': salecond == '1' }"
           ><input
             type="radio"
+            class="sr-only"
             name="savecond"
             id="tsoldout"
             value="1"
             v-model="salecond" />당일품절</label
         >
-      </div>
-      <div
-        class="flex justify-center items-center border-l border-t border-white bg-red-500">
-        <label for="csoldout"
+        <label
+          for="csoldout"
+          class="mu-seg-btn so-seg-label"
+          :class="{ 'is-on': salecond == '2' }"
           ><input
             type="radio"
+            class="sr-only"
             name="savecond"
             id="csoldout"
             value="2"
             v-model="salecond" />계속품절</label
         >
       </div>
-      <div
-        class="flex justify-center items-center border-l border-t border-white bg-white">
-        <button class="button save" @click="saveButton">저장</button>
-      </div>
+      <button type="button" class="mu-btn so-save-btn" @click="saveButton">
+        저장
+      </button>
     </div>
   </div>
   <!-- <div class="absolute inset-0 bg-black bg-opacity-40" v-if="openPu">
@@ -248,6 +203,7 @@ import { GetMenuStkInfo, SetMenuStkRgst } from "@/api/etc";
 import { formatNumberWithCommas } from "@/customFunc/customFunc";
 import Swal from "sweetalert2";
 import { useStore } from "vuex";
+import "../mobileUi.css";
 import CategorySelect from "../component/categorySelect.vue";
 
 const store = useStore();
@@ -548,4 +504,192 @@ const allCheck = (e) => {
 onMounted(() => {});
 </script>
 
-<style scoped></style>
+<style scoped>
+.so-crumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  min-height: 2.75rem;
+  margin: 0.25rem 0.75rem 0.625rem;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--m-accent-border, #dbe7ff);
+  border-radius: 0.75rem;
+  background: var(--m-accent-weak, #eff4ff);
+  color: var(--m-accent-strong, #1e40af);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  word-break: keep-all;
+}
+
+.so-crumb.is-guide {
+  border-color: var(--m-border, #e2e8f0);
+  background: var(--m-surface, #fff);
+  color: var(--m-text-3, #64748b);
+  font-weight: 500;
+}
+
+.so-crumb-sep {
+  padding: 0 0.25rem;
+  color: var(--m-text-3, #93a8d6);
+}
+
+/* 판매상태 · 메뉴명 · 조회 버튼을 한 줄에, 아래 끝선을 맞춘다 */
+.so-filter {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr) auto;
+  align-items: end;
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+}
+
+.so-search {
+  min-width: 4rem;
+}
+
+.so-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+  padding: 0 1rem 0 0.25rem;
+  border-top: 1px solid var(--m-border, #e2e8f0);
+  border-bottom: 1px solid var(--m-border, #e2e8f0);
+  background: var(--m-surface, #fff);
+}
+
+.so-check {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  min-height: 2.75rem;
+}
+
+.so-check--all {
+  width: auto;
+  gap: 0.125rem;
+  padding-right: 0.5rem;
+  color: var(--m-text-2, #334155);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.so-check--all input {
+  margin: 0 0.75rem;
+}
+
+.so-check input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: #2563eb;
+}
+
+.so-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 3.5rem;
+  padding: 0.5rem 1rem 0.5rem 0.25rem;
+  border-bottom: 1px solid var(--m-border, #f1f5f9);
+  background: var(--m-surface, #fff);
+  touch-action: manipulation;
+  transition: background-color 0.15s ease;
+}
+
+.so-row:active {
+  background: var(--m-surface-2, #f1f5f9);
+}
+
+.so-row.is-checked {
+  background: var(--m-accent-weak, #eff4ff);
+}
+
+.so-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.125rem;
+}
+
+.so-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.so-status {
+  flex-shrink: 0;
+  min-width: 3.75rem;
+}
+
+.so-status.is-soldout {
+  background: var(--m-danger-weak, #fee2e2);
+  color: var(--m-danger, #dc2626);
+}
+
+/* 저장 영역이 떠 있을 때 마지막 메뉴가 가려지지 않도록 */
+.so-bottom-space.is-save {
+  height: 7.5rem;
+}
+
+.so-save {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(3.6rem + env(safe-area-inset-bottom, 0px));
+  z-index: 25;
+  padding: 0.625rem 0.75rem 0.75rem;
+  border-top: 1px solid var(--m-border, #e2e8f0);
+  border-radius: 1rem 1rem 0 0;
+  background: var(--m-surface, #fff);
+  box-shadow: 0 -8px 20px rgba(15, 23, 42, 0.08);
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.so-save-count {
+  margin-bottom: 0.5rem;
+  color: var(--m-text-2, #475569);
+  font-size: 0.8125rem;
+}
+
+.so-save-count b {
+  color: var(--m-accent, #2563eb);
+  font-size: 0.9375rem;
+}
+
+.so-save-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.so-save-seg {
+  flex: 1;
+  min-width: 0;
+}
+
+.so-seg-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.so-save-btn {
+  min-width: 4.5rem;
+  min-height: 3rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .so-row {
+    transition: none;
+  }
+}
+</style>

@@ -5,36 +5,30 @@
 # Author : 권맑음                     
 ################################################################################*/ -->
 <template>
-  <div class="h-full w-full" @click="resetScreen">
-    <div class="h-[15vh] w-full"></div>
-    <div
-      class="relative h-[7vh] items-center text-base font-medium w-full bg-white flex">
-      <div class="w-[30vw] font-semibold text-nowrap text-center">금액구간</div>
-      <div class="w-[30vw] font-semibold text-end">건수</div>
-      <div class="w-[30vw] font-semibold flex justify-end text-end">
-        KIS수수료
-      </div>
-      <div
-        class="w-[28vw] font-semibold flex justify-end text-end pr-1 text-red-500">
-        KS수수료
+  <div
+    class="mu-page"
+    style="--mu-cols: 3.3fr 1.5fr 2.5fr 2.5fr"
+    @click="resetScreen">
+    <div class="mu-head">
+      <div class="mu-thead">
+        <div>금액구간</div>
+        <div class="mu-num">건수</div>
+        <div class="mu-num">KIS수수료</div>
+        <div class="mu-num text-red-500">KS수수료</div>
       </div>
     </div>
-    <div v-for="i in rowData" class="bg-gray-300">
-      <div
-        :class="i.strAmtSection.includes('[') ? 'bg-gray-300' : 'bg-gray-200'"
-        class="grid grid-rows-1 grid-cols-[3.3fr,1.5fr,2.5fr,2.5fr] h-[7vh] justify-center items-center font-medium">
-        <div class="pl-1 text-nowrap overflow-hidden">
-          {{ i.strAmtSection }}
-        </div>
-
-        <div class="overflow-hidden text-nowrap text-end">
-          {{ i.lngAprvlCnt }}
-        </div>
-        <div class="flex justify-end overflow-hidden">{{ i.curKisVanFee }}</div>
-        <div class="flex justify-end pr-[10%] overflow-hidden">
-          {{ i.curKsVanFee }}
-        </div>
-      </div>
+    <div v-if="rowData.length == 0" class="mu-empty">
+      {{ loaded ? "조회된 내역이 없습니다." : "위 조회 조건을 눌러 기간과 매장을 선택한 뒤 조회하세요." }}
+    </div>
+    <div
+      v-for="(i, idx) in rowData"
+      :key="idx"
+      class="mu-row mu-row--dense"
+      :class="{ 'is-sum': i.strAmtSection.includes('[') }">
+      <div class="mu-wrap">{{ i.strAmtSection }}</div>
+      <div class="mu-num">{{ i.lngAprvlCnt }}</div>
+      <div class="mu-num">{{ i.curKisVanFee }}</div>
+      <div class="mu-num">{{ i.curKsVanFee }}</div>
     </div>
   </div>
   <MobileDateStore2
@@ -61,6 +55,7 @@ import { onMounted, ref } from "vue";
  */
 
 import { useStore } from "vuex";
+import "../mobileUi.css";
 import MobileDateStore2 from "../component/mobileDateStore2.vue";
 
 const store = useStore();
@@ -101,6 +96,7 @@ const STORE_CD = (e) => {
 };
 
 const rowData = ref([]);
+const loaded = ref(false);
 const SEARCHNOW = async (e) => {
   try {
     store.state.loading2 = true;
@@ -119,6 +115,7 @@ const SEARCHNOW = async (e) => {
   } catch (error) {
   } finally {
     store.state.loading2 = false;
+    loaded.value = true;
   }
 
   //comsole.log(rowData.value);

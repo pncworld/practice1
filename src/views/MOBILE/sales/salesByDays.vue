@@ -5,34 +5,40 @@
 # Author : 권맑음                     
 ################################################################################*/
 <template>
-  <div class="h-full w-full" @click="resetScreen">
-    <div class="h-[15vh] w-full"></div>
-    <div
-      class="relative h-[7vh] text-sm font-medium w-full bg-white grid grid-rows-1 grid-cols-[0.5fr,0.8fr,1.2fr,1.2fr,1fr] items-center">
-      <div class="font-semibold text-nowrap">일자</div>
-      <div class="font-semibold text-nowrap">객수/조수</div>
-      <div class="font-semibold text-nowrap">총매출</div>
-      <div class="font-semibold text-nowrap">실매출</div>
-      <div class="font-semibold text-nowrap">할인액</div>
-    </div>
-    <div v-for="i in rowData" class="bg-gray-300">
-      <div
-        :class="i.dtmDate.includes('[') ? 'bg-gray-300 text-xs' : 'bg-blue-50'"
-        class="grid grid-rows-1 grid-cols-[0.5fr,0.8fr,1.2fr,1.2fr,1fr] h-[7vh] justify-center items-center font-medium text-xs">
-        <div class="flex justify-start pl-[10%]">{{ i.dtmDate }}</div>
-        <div class="flex justify-center">
-          {{ i.lngCustCnt }}/{{ i.lngRecCnt }}
-        </div>
-        <div class="flex justify-end">{{ i.lngSalAmt }}</div>
-        <div class="flex justify-end">{{ i.lngActAmt }}</div>
-        <div class="flex justify-end pr-[10%]">{{ i.lngDiscountAmt }}</div>
+  <div
+    class="mu-page"
+    style="--mu-cols: 0.6fr 0.9fr 1.2fr 1.2fr 1fr"
+    @click="resetScreen">
+    <div class="mu-head">
+      <div class="mu-thead">
+        <div>일자</div>
+        <div class="mu-center">객수/조수</div>
+        <div class="mu-num">총매출</div>
+        <div class="mu-num">실매출</div>
+        <div class="mu-num">할인액</div>
       </div>
+    </div>
+    <div v-if="rowData.length == 0" class="mu-empty">
+      {{ loaded ? "조회된 내역이 없습니다." : "위 조회 조건을 눌러 기간과 매장을 선택한 뒤 조회하세요." }}
+    </div>
+    <div
+      v-for="(i, idx) in rowData"
+      :key="idx"
+      class="mu-row mu-row--dense"
+      :class="{ 'is-sum': i.dtmDate.includes('[') }">
+      <div class="mu-wrap">{{ i.dtmDate }}</div>
+      <div class="mu-center mu-num">{{ i.lngCustCnt }}/{{ i.lngRecCnt }}</div>
+      <div class="mu-num">{{ i.lngSalAmt }}</div>
+      <div class="mu-num font-bold">{{ i.lngActAmt }}</div>
+      <div class="mu-num">{{ i.lngDiscountAmt }}</div>
     </div>
   </div>
   <MobileDateStore
+    :autoSearch="true"
     @click.stop
     class="z-[10]"
     :changeState="changeState"
+    :defaultAllStores="true"
     @currState="currState"
     @SEARCHNOW="SEARCHNOW"
     @startDate="startDate"
@@ -53,6 +59,7 @@ import { onMounted, ref } from "vue";
  */
 
 import { useStore } from "vuex";
+import "../mobileUi.css";
 import MobileDateStore from "../component/mobileDateStore.vue";
 
 const store = useStore();
@@ -93,6 +100,7 @@ const STORE_CD = (e) => {
 };
 
 const rowData = ref([]);
+const loaded = ref(false);
 const SEARCHNOW = async (e) => {
   try {
     store.state.loading2 = true;
@@ -114,6 +122,7 @@ const SEARCHNOW = async (e) => {
   } catch (error) {
   } finally {
     store.state.loading2 = false;
+    loaded.value = true;
   }
 
   //comsole.log(rowData.value);
