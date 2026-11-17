@@ -235,6 +235,20 @@ export const getRealTimeReport = (
     DAY_ON: seeday,
   });
 };
+/** SLS02_033RPT 미결제 테이블 주문 조회 (fosTableOrder + 상세) */
+export const getUnpaidTableOrder = (groupCd, storeCd) => {
+  return api2.post("/MISALES/SLS02_033RPT.asmx/getUnpaidTableOrder", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
+/** SLS02_033RPT 배치도 보기 — POS 1번 테이블 화면·키 배치 */
+export const getUnpaidTableLayout = (groupCd, storeCd) => {
+  return api2.post("/MISALES/SLS02_033RPT.asmx/getTableLayout", {
+    GROUP_CD: groupCd,
+    STORE_CD: storeCd,
+  });
+};
 export const getTableSearchCondition = (groupCd, storeCd, selectedMenuCond) => {
   return api2.post("/MISALES/SLS04_002RPT.asmx/getTableSearchCondition", {
     GROUP_CD: groupCd,

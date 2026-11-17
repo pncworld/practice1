@@ -1458,6 +1458,15 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /**
+   * 행별 CSS 클래스 (rowData 와 같은 순서의 배열). 기본 null = 사용 안 함(기존 동작 그대로).
+   * 넘긴 화면만 해당 행에 클래스를 붙인다. demandDetailColColors·setRowStyleCalls·highlightNewRows 가
+   * 켜져 있으면 그쪽이 우선한다. 예) 테이블이 바뀔 때마다 줄 색 교대
+   */
+  rowClassList: {
+    type: Array,
+    default: null,
+  },
   headerColors: {
     // 헤더 적용 스타일 이름
     type: Array,
@@ -4693,6 +4702,13 @@ const runFuncshowGrid = async () => {
         return "rg-row-unsaved";
       }
       return "";
+    });
+  } else if (Array.isArray(props.rowClassList)) {
+    /* opt-in: 화면이 넘긴 행별 클래스 (호출 시점의 최신 배열을 읽는다) */
+    gridView.setRowStyleCallback((grid, item) => {
+      const list = props.rowClassList;
+      const idx = item.dataRow ?? item.index;
+      return (Array.isArray(list) && list[idx]) || "";
     });
   }
 
