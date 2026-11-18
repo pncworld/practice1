@@ -432,26 +432,46 @@ const handleScroll2 = () => {
   lastScrollY.value = scrollArea.value.scrollTop;
 };
 
-const handleScroll = () => {
-  // 표시 전용 보정: iOS 탄성 스크롤(맨 위·맨 아래 튕김) 구간에서는 방향 판정을 하지 않는다
-  const el = scrollContainer.value;
-  if (el.scrollTop <= 0) {
+/*
+ * 하단 탭 숨김·표시 (포털 앱과 같은 방식)
+ * - 같은 방향으로 NAV_DELTA px 이상 움직였을 때만 바꾼다 (손 떨림·관성 스크롤 끝 흔들림에 들락날락하지 않게)
+ * - 맨 위 근처, 맨 아래 끝, 스크롤할 내용이 거의 없을 때는 항상 보인다
+ * - iOS 탄성 스크롤(맨 위·맨 아래 튕김) 구간에서는 판정하지 않는다
+ */
+const NAV_DELTA = 24;
+const NAV_TOP_KEEP = 56;
+const navTrack = { last: 0, anchor: 0, dir: 0 };
+const updateBottomNav = (el) => {
+  if (!el) return;
+  const y = el.scrollTop;
+  const max = el.scrollHeight - el.clientHeight;
+  if (max <= NAV_DELTA * 2 || y <= NAV_TOP_KEEP) {
     changeBottomMenu.value = true;
-    lastScrollY.value = 0;
+    navTrack.last = navTrack.anchor = Math.max(0, y);
+    navTrack.dir = 0;
     return;
   }
-  if (el.scrollTop + el.clientHeight > el.scrollHeight) {
+  if (y > max) return;
+  if (y >= max - 2) {
+    changeBottomMenu.value = true;
+    navTrack.last = navTrack.anchor = y;
+    navTrack.dir = 0;
     return;
   }
-  if (scrollContainer.value.scrollTop > lastScrollY.value) {
-    // 아래로 스크롤하면 메뉴 숨기기
-    changeBottomMenu.value = false;
-  } else {
-    // 위로 스크롤하면 메뉴 보이기
-    changeBottomMenu.value = true;
+  const dir = y > navTrack.last ? 1 : y < navTrack.last ? -1 : 0;
+  if (dir === 0) return;
+  if (dir !== navTrack.dir) {
+    navTrack.dir = dir;
+    navTrack.anchor = navTrack.last;
   }
+  if (dir > 0 && y - navTrack.anchor >= NAV_DELTA) changeBottomMenu.value = false;
+  if (dir < 0 && navTrack.anchor - y >= NAV_DELTA) changeBottomMenu.value = true;
+  navTrack.last = y;
+};
 
-  lastScrollY.value = scrollContainer.value.scrollTop;
+const handleScroll = () => {
+  updateBottomNav(scrollContainer.value);
+  lastScrollY.value = scrollContainer.value?.scrollTop || 0;
 };
 const handleScroll3 = async (e) => {
   const target = scrollContainer3.value;
@@ -475,13 +495,8 @@ const handleScroll3 = async (e) => {
     notices.value.push(...res.data.List);
   }
 
-  if (scrollContainer3.value.scrollTop > lastScrollY3.value) {
-    // 아래로 스크롤하면 메뉴 숨기기
-    changeBottomMenu.value = false;
-  } else {
-    // 위로 스크롤하면 메뉴 보이기
-    changeBottomMenu.value = true;
-  }
+  // 하단 탭: 본문과 같은 방식 (updateBottomNav)
+  updateBottomNav(scrollContainer3.value);
 
   lastScrollY3.value = scrollContainer3.value.scrollTop;
 };
